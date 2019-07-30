@@ -54,6 +54,7 @@ if(BUILD_TESTING)
     add_executable(az_exampleshortname_tests)
     target_sources(az_exampleshortname_tests PRIVATE ${az_exampleshortname_test_src})
     target_link_libraries(az_exampleshortname_tests PRIVATE az_exampleshortname Catch2::Catch2)
+    catch_discover_tests(az_exampleshortname_tests)
 endif()
 
 #generate documentation
