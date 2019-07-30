@@ -11,15 +11,6 @@ option(az_exampleshortname_with_docs "Build documentation" ON)
 option(BUILD_TESTING "Build tests" ON)
 
 
-
-
-
-# this is a cmake 3.15 feature that tells find_package to 
-# look at config files before module files. This makes it easier
-# to write buildsystems that work on many platforms, espicially
-# when finding libraries that have multiple build systems.
-
-
 # if needed: add ./cmake to the module path
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 
