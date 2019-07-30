@@ -1,5 +1,3 @@
 cmake_minimum_required (VERSION 3.0)
 project (az_keyvault)
-message("CMAKE_SYSTEM_NAME: ${CMAKE_SYSTEM_NAME}")
-message("CMAKE_SYSTEM_VERSION: ${CMAKE_SYSTEM_VERSION}")
 add_library (az_keyvault src/az_keyvault.c)
