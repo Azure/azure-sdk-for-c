@@ -70,6 +70,28 @@ if(BUILD_TESTING)
     target_link_libraries(az_exampleshortname_tests PRIVATE az_exampleshortname Catch2::Catch2)
 endif()
 
+#generate documentation
+if(az_exampleshortname_with_docs)
+    if(NOT TARGET Doxygen::doxygen)
+        find_package(Doxygen REQUIRED doxygen)
+    endif()
+
+    # note: DOXYGEN_ options are strings to cmake, not
+    # booleans, thus use only YES and NO
+    set(DOXYGEN_GENERATE_XML YES)
+    set(DOXYGEN_GENERATE_HTML YES)
+
+    set(DOXYGEN_OPTIMIZE_OUTPUT_FOR_C YES)
+    set(DOXYGEN_EXTRACT_PACKAGE YES)
+    set(DOXYGEN_INLINE_SIMPLE_STRUCTS YES)
+    set(DOXYGEN_TYPEDEF_HIDES_STRUCT YES)
+    doxygen_add_docs(docs
+        ${PROJECT_SOURCE_DIR}/inc
+        ${PROJECT_BINARY_DIR}/inc
+        ${PROJECT_SOURCE_DIR}/doc
+        ${PROJECT_SOURCE_DIR}/src
+        COMMENT "Generate Documentation")
+endif()
 
 # generate the install steps
 include(KDEInstallDirs)
