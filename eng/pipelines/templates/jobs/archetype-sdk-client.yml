@@ -1,1 +1,13 @@
-jobs: []
+jobs:
+- job: Build
+  strategy:
+    matrix:
+      Linux:
+        vm.image: 'Ubuntu 16.04'
+      Win:
+        vm.image: 'vs2017-win2016'
+  pool:
+    vmImage: $(vm.image)
+  steps:
+  - task: CMake@1
+
