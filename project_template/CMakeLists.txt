@@ -7,9 +7,9 @@ project(az_exampleshortname
     LANGUAGES C CXX
     VERSION 0.1.0)
 
-option(az_exampleshortname_with_docs "Build documentation" ON)
+option(BUILD_DOCS "Build documentation" ON)
 option(BUILD_TESTING "Build tests" ON)
-
+set(AZ_INSTALL_CMAKEPACKAGEDIR "share/cmake" CACHE STRING "directory to install cmake packages into")
 
 # if needed: add ./cmake to the module path
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
@@ -28,11 +28,6 @@ set_property(DIRECTORY PROPERTY COMPILE_OPTIONS
     $<$<COMPILE_LANG_AND_ID:C,Clang>:-Xclang -Wall -Wextra -Wno-microsoft-anon-tag -Wdocumentation>)
 
 add_subdirectory(external)
-
-if(NOT DEFINED ECM_MODULE_PATH)
-    find_package(ECM REQUIRED CONFIG)
-endif()
-list(APPEND CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
 
 
 file(GLOB_RECURSE az_exampleshortname_src CONFIGURE_DEPENDS src/*.c)
@@ -62,7 +57,7 @@ if(BUILD_TESTING)
 endif()
 
 #generate documentation
-if(az_exampleshortname_with_docs)
+if(BUILD_DOCS)
     if(NOT TARGET Doxygen::doxygen)
         find_package(Doxygen REQUIRED doxygen)
     endif()
@@ -85,11 +80,10 @@ if(az_exampleshortname_with_docs)
 endif()
 
 # generate the install steps
-include(KDEInstallDirs)
+include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 configure_package_config_file(config.cmake.in ${PROJECT_NAME}-config.cmake
-    INSTALL_DESTINATION ${KDE_INSTALL_CMAKEPACKAGEDIR}/${PROJECT_NAME})
-install(TARGETS az_exampleshortname EXPORT ${PROJECT_NAME}-targets
-    ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
-install(DIRECTORY inc DESTINATION ${KDE_INSTALL_INCLUDEDIR})
-install(EXPORT ${PROJECT_NAME}-targets DESTINATION ${KDE_INSTALL_CMAKEPACKAGEDIR}/${PROJECT_NAME} NAMESPACE az::)
+    INSTALL_DESTINATION ${AZ_INSTALL_CMAKEPACKAGEDIR}/${PROJECT_NAME})
+install(TARGETS az_exampleshortname EXPORT ${PROJECT_NAME}-targets)
+install(DIRECTORY inc DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(EXPORT ${PROJECT_NAME}-targets DESTINATION ${AZ_INSTALL_CMAKEPACKAGEDIR}/${PROJECT_NAME} NAMESPACE az::)

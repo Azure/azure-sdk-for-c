@@ -1,7 +1,7 @@
 
 ## Requirements
 
-This azure sdk module has several external build-time requirements.
+This Azure SDK module has several external build-time requirements.
 
 - **Catch2** (for tests): https://github.com/catchorg/Catch2.git
 - **extra-cmake-modules**: https://github.com/KDE/extra-cmake-modules.git
