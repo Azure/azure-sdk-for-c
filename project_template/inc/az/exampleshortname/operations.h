@@ -3,8 +3,8 @@
 
 /** @file operations.h */
 #pragma once
-#include <stdint.h>
 #include <az/exampleshortname/export.h>
+#include <stdint.h>
 #ifdef __cplusplus
 extern "C" {
 #endif

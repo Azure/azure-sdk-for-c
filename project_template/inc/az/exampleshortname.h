@@ -2,4 +2,4 @@
 // SPDX-License-Identifier: MIT
 
 /** @file exampleshortname.h Azure example library */
-#include <az/exampleshortname/operations.h>
+#include "exampleshortname/operations.h"
