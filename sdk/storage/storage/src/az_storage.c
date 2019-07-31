@@ -1,0 +1,3 @@
+void az_storage()
+{
+}

@@ -1,3 +1,0 @@
-void az_keyvault()
-{
-}
