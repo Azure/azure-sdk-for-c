@@ -45,6 +45,7 @@ target_include_directories(az_exampleshortname PUBLIC
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/inc/az/exampleshortname
         ${CMAKE_CURRENT_BINARY_DIR}/inc/az/exampleshortname)
+
 if(BUILD_TESTING)
     include(CTest)
     if(NOT TARGET Catch2::Catch2)

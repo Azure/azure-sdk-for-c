@@ -7,7 +7,7 @@ option(az_exampleshortname_embed_default "embed libraries by default" ON)
 cmake_dependent_option(az_exampleshortname_embed_catch2 "use embedded catch2" ${az_exampleshortname_embed_default} 
     "az_exampleshortname_allow_embed" OFF)
 
-#this makes set() override option() even in projects
+# this makes set() override option() even in projects
 # that specify a minimum_required version before that policy
 # was introduced
 set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
