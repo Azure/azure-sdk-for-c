@@ -3,8 +3,6 @@
 
 cmake_minimum_required (VERSION 3.12)
 
-project (az_storage LANGUAGE C)
-
-set(CMAKE_C_STANDARD 99)
+project (az_storage)
 
 add_library (az_storage src/az_storage.c)
