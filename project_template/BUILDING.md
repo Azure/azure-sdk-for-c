@@ -1,11 +1,5 @@
 
 ## Requirements
 
-This Azure SDK module has several external build-time requirements.
-
-- **Catch2** (for tests): https://github.com/catchorg/Catch2.git
-
-These may be installed using a package manager or embedded in the external/ folder.
-
-By default, dependencies will be found via the system; to enable embedding set
-`-Daz_exampleshortname_allow_embed=ON`.
+This Azure SDK module has no build requirements aside from a C99 (-VLA) compiler,
+and cmake >=3.7
