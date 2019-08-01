@@ -1,57 +1,41 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # SPDX-License-Identifier: MIT
 
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.7)
 
 project(az_exampleshortname
-    LANGUAGES C CXX
+    LANGUAGES C
     VERSION 0.1.0)
 
 option(BUILD_DOCS "Build documentation" ON)
-option(BUILD_TESTING "Build tests" ON)
+option(BUILD_EXAMPLES "Build examples" ON)
+option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 set(AZ_INSTALL_CMAKEPACKAGEDIR "share/cmake" CACHE STRING "directory to install cmake packages into")
-
-# if needed: add ./cmake to the module path
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_CXX_STANDARD 17)
 
-# default to hidden symbols when building shared libraries
-# on unix systems
-set(CMAKE_C_VISIBILITY_PRESET hidden)
-set(CMAKE_CXX_VISIBILITY_PRESET hidden)
-set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
-
-set_property(DIRECTORY PROPERTY COMPILE_OPTIONS
-    $<$<COMPILE_LANG_AND_ID:C,MSVC>:/W4 /wd4201>
-    $<$<COMPILE_LANG_AND_ID:C,Clang>:-Xclang -Wall -Wextra -Wno-microsoft-anon-tag -Wdocumentation>)
-
-add_subdirectory(external)
-
 
 file(GLOB_RECURSE az_exampleshortname_src CONFIGURE_DEPENDS src/*.c)
-file(GLOB_RECURSE az_exampleshortname_test_src CONFIGURE_DEPENDS test/*.cpp)
-add_library(az_exampleshortname)
-include(GenerateExportHeader)
-generate_export_header(az_exampleshortname EXPORT_FILE_NAME inc/az/exampleshortname/export.h)
+file(GLOB_RECURSE az_exampleshortname_example_src CONFIGURE_DEPENDS examples/*.c)
+
+add_library(az_exampleshortname ${az_exampleshortname_src} exports.def)
+get_filename_component(linker_name ${CMAKE_LINKER} NAME)
+if(NOT linker_name MATCHES link)
+    set_property(TARGET az_exampleshortname PROPERTY LINK_FLAGS -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/exports.lds)
+endif()
 add_library(az::exampleshortname ALIAS az_exampleshortname)
-target_sources(az_exampleshortname PRIVATE ${az_exampleshortname_src})
 target_include_directories(az_exampleshortname PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/inc>
     $<INSTALL_INTERFACE:include>)
 
-if(BUILD_TESTING)
-    enable_testing()
-    if(NOT TARGET Catch2::Catch2)
-        find_package(Catch2 REQUIRED CONFIG)
-    endif()
-    include(Catch)
-    add_executable(az_exampleshortname_tests)
-    target_sources(az_exampleshortname_tests PRIVATE ${az_exampleshortname_test_src})
-    target_link_libraries(az_exampleshortname_tests PRIVATE az_exampleshortname Catch2::Catch2)
-    catch_discover_tests(az_exampleshortname_tests)
+if(BUILD_EXAMPLES) 
+foreach(example_src IN LISTS az_exampleshortname_example_src)
+    get_filename_component(example_name ${example_src} NAME_WE)
+    add_executable(${example_name} ${example_src})
+    target_link_libraries(${example_name} PRIVATE az_exampleshortname)
+endforeach()
 endif()
 
 #generate documentation
@@ -82,6 +66,9 @@ include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 configure_package_config_file(config.cmake.in ${PROJECT_NAME}-config.cmake
     INSTALL_DESTINATION ${AZ_INSTALL_CMAKEPACKAGEDIR}/${PROJECT_NAME})
-install(TARGETS az_exampleshortname EXPORT ${PROJECT_NAME}-targets)
+install(TARGETS az_exampleshortname EXPORT ${PROJECT_NAME}-targets
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(DIRECTORY inc DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(EXPORT ${PROJECT_NAME}-targets DESTINATION ${AZ_INSTALL_CMAKEPACKAGEDIR}/${PROJECT_NAME} NAMESPACE az::)

@@ -1,2 +1,5 @@
 /external/**/
-/build*
+/build
+/builddir
+/cmake
+/out
