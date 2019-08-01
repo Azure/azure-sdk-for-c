@@ -330,10 +330,4 @@ ASALocalRun/
 .mfractor/
 
 # CMake
-CMakeCache.txt
-CMakeFiles/
-
-*.vcxproj
-*.vcxproj.filters
-*.sln
-cmake_install.cmake
+build/
