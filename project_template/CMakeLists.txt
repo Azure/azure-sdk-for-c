@@ -55,7 +55,6 @@ if(BUILD_DOCS)
     set(DOXYGEN_TYPEDEF_HIDES_STRUCT YES)
     doxygen_add_docs(docs
         ${PROJECT_SOURCE_DIR}/inc
-        ${PROJECT_BINARY_DIR}/inc
         ${PROJECT_SOURCE_DIR}/doc
         ${PROJECT_SOURCE_DIR}/src
         COMMENT "Generate Documentation")

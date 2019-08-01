@@ -7,10 +7,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-/** @brief add two numbers together
- *  @param[in] a
- *  @param[in] b
- *  @return @p a + @p b
+/** @brief do an example operation
+ *  @retval b if @p a == 0
+ *  @retval a otherwise
  */
 int32_t az_exampleshortname_operation(int32_t a, int32_t b);
 
