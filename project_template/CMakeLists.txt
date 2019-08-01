@@ -33,21 +33,17 @@ add_subdirectory(external)
 file(GLOB_RECURSE az_exampleshortname_src CONFIGURE_DEPENDS src/*.c)
 file(GLOB_RECURSE az_exampleshortname_test_src CONFIGURE_DEPENDS test/*.cpp)
 add_library(az_exampleshortname)
-add_library(az::exampleshortname ALIAS az_exampleshortname)
 include(GenerateExportHeader)
-generate_export_header(az_exampleshortname 
-    EXPORT_FILE_NAME inc/az/exampleshortname/export.h)
+generate_export_header(az_exampleshortname EXPORT_FILE_NAME inc/az/exampleshortname/export.h)
+add_library(az::exampleshortname ALIAS az_exampleshortname)
 target_sources(az_exampleshortname PRIVATE ${az_exampleshortname_src})
 target_include_directories(az_exampleshortname PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/inc>
-    $<INSTALL_INTERFACE:include>
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/inc/az/exampleshortname
-        ${CMAKE_CURRENT_BINARY_DIR}/inc/az/exampleshortname)
+    $<INSTALL_INTERFACE:include>)
 
 if(BUILD_TESTING)
-    include(CTest)
+    enable_testing()
     if(NOT TARGET Catch2::Catch2)
         find_package(Catch2 REQUIRED CONFIG)
     endif()
