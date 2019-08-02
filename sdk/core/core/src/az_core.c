@@ -3,7 +3,7 @@
 
 #include "../inc/az_core.h"
 
-STRING const s = CREATE_STRING("Hello world, xxx!");
+STRING const s = CREATE_STRING("1234567890");
 
 int const array[] = { 1, 2, 3 };
 
