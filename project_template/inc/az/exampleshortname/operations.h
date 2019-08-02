@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 /** @file operations.h */
-#pragma once
+#ifndef AZ_EXAMPLESHORTNAME_OPERATIONS_H_
+#define AZ_EXAMPLESHORTNAME_OPERATIONS_H_
+
 #include <stdint.h>
 #ifdef __cplusplus
 extern "C" {
@@ -15,4 +17,6 @@ int32_t az_exampleshortname_operation(int32_t a, int32_t b);
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif
