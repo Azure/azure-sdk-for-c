@@ -14,7 +14,7 @@ static inline az_error write_string(az_json_write_string const f, az_string cons
 }
 
 static inline az_error write_char(az_json_write_string const f, char const c) {
-  az_string const s = { .p = &c, .size = 1 };
+  az_string const s = { .begin = &c, .size = 1 };
   return write_string(f, s);
 }
 
@@ -40,10 +40,10 @@ static inline az_error write_json_property(az_json_write_string const f, az_json
 static inline az_error write_json_object(az_json_write_string const f, az_json_object a) {
   RETURN_ON_ERROR(write_char(f, '{'));
   if (a.size > 0) {
-    RETURN_ON_ERROR(write_json_property(f, *a.p));
-    for (++a.p, --a.size; a.size > 0; ++a.p, --a.size) {
+    RETURN_ON_ERROR(write_json_property(f, a.begin[0]));
+    for (size_t i = 1; i < a.size; ++i) {
       RETURN_ON_ERROR(write_char(f, ','));
-      RETURN_ON_ERROR(write_json_property(f, *a.p));
+      RETURN_ON_ERROR(write_json_property(f, a.begin[i]));
     }
   }
   RETURN_ON_ERROR(write_char(f, '}'));
@@ -52,13 +52,11 @@ static inline az_error write_json_object(az_json_write_string const f, az_json_o
 
 static inline az_error write_json_array(az_json_write_string f, az_json_array a) {
   RETURN_ON_ERROR(write_char(f, '['));
-  az_json const *b = a.p;
-  az_json const *const e = b + a.size;
-  if (b != e) {
-    RETURN_ON_ERROR(az_json_write(f, *b));
-    for (++b; b != e; ++b) {
+  if (a.size > 0) {
+    RETURN_ON_ERROR(az_json_write(f, a.begin[0]));
+    for (size_t i = 1; i < a.size; ++i) {
       RETURN_ON_ERROR(write_char(f, ','));
-      RETURN_ON_ERROR(az_json_write(f, *b));
+      RETURN_ON_ERROR(az_json_write(f, a.begin[i]));
     }
   }
   RETURN_ON_ERROR(write_char(f, ']'));
