@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// SPDX-License-Identifier: MIT
+
 #include "../inc/az_json.h"
 
 az_string const null_string = AZ_STRING("null");
@@ -6,41 +9,41 @@ az_string const true_string = AZ_STRING("true");
 
 az_string const false_string = AZ_STRING("false");
 
-static inline az_error write_string(az_json_write_string f, az_string s) {
+static inline az_error write_string(az_json_write_string const f, az_string const s) {
   return f.write(f.context, s);
 }
 
-static inline az_error write_char(az_json_write_string f, char c) {
-  az_string const s = AZ_STRING(&c);
+static inline az_error write_char(az_json_write_string const f, char const c) {
+  az_string const s = { .p = &c, .size = 1 };
   return write_string(f, s);
 }
 
-static inline az_error write_json_number(az_json_write_string f, double numer) {
+static inline az_error write_json_number(az_json_write_string const f, double const numer) {
   return write_char(f, '0');
 }
 
 #define RETURN_ON_ERROR(E) { az_error const result = (E); if (result != AZ_OK) { return result; } }
 
-static inline az_error write_json_string(az_json_write_string f, az_string s) {
+static inline az_error write_json_string(az_json_write_string const f, az_string const s) {
   RETURN_ON_ERROR(write_char(f, '"'));
   RETURN_ON_ERROR(write_char(f, '"'));
   return AZ_OK;
 }
 
-static inline az_error write_json_property(az_json_write_string f, az_json_property p) {
+static inline az_error write_json_property(az_json_write_string const f, az_json_property const p) {
   RETURN_ON_ERROR(write_json_string(f, p.name));
   RETURN_ON_ERROR(write_char(f, ':'));
   RETURN_ON_ERROR(az_json_write(f, p.value));
   return AZ_OK;
 }
 
-static inline az_error write_json_object(az_json_write_string f, az_json_object o) {
+static inline az_error write_json_object(az_json_write_string const f, az_json_object a) {
   RETURN_ON_ERROR(write_char(f, '{'));
-  if (o.size > 0) {
-    RETURN_ON_ERROR(write_json_property(f, o.p[0]));
-    for (size_t i = 1; i < o.size; ++i) {
+  if (a.size > 0) {
+    RETURN_ON_ERROR(write_json_property(f, *a.p));
+    for (++a.p, --a.size; a.size > 0; ++a.p, --a.size) {
       RETURN_ON_ERROR(write_char(f, ','));
-      RETURN_ON_ERROR(write_json_property(f, o.p[i]));
+      RETURN_ON_ERROR(write_json_property(f, *a.p));
     }
   }
   RETURN_ON_ERROR(write_char(f, '}'));
@@ -49,11 +52,13 @@ static inline az_error write_json_object(az_json_write_string f, az_json_object 
 
 static inline az_error write_json_array(az_json_write_string f, az_json_array a) {
   RETURN_ON_ERROR(write_char(f, '['));
-  if (a.size > 0) {
-    RETURN_ON_ERROR(az_json_write(f, a.p[0]));
-    for (size_t i = 1; i < a.size; ++i) {
+  az_json const *b = a.p;
+  az_json const *const e = b + a.size;
+  if (b != e) {
+    RETURN_ON_ERROR(az_json_write(f, *b));
+    for (++b; b != e; ++b) {
       RETURN_ON_ERROR(write_char(f, ','));
-      RETURN_ON_ERROR(az_json_write(f, a.p[i]));
+      RETURN_ON_ERROR(az_json_write(f, *b));
     }
   }
   RETURN_ON_ERROR(write_char(f, ']'));

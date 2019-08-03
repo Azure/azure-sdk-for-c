@@ -1,4 +1,7 @@
-#include "az_core.h"
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// SPDX-License-Identifier: MIT
+
+#include "az_types.h"
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -11,11 +14,11 @@ typedef enum {
   AZ_JSON_TYPE_ARRAY = 6,
 } az_json_type;
 
-struct az_json;
-struct az_json_property;
+typedef struct az_json az_json;
+typedef struct az_json_property az_json_property;
 
-AZ_DEFINE_SLICE(struct az_json_property, az_json_object);
-AZ_DEFINE_SLICE(struct az_json, az_json_array);
+AZ_DEFINE_SLICE(az_json_property const, az_json_object);
+AZ_DEFINE_SLICE(az_json const, az_json_array);
 
 typedef struct az_json {
   az_json_type type;
@@ -42,7 +45,7 @@ typedef struct az_json_property {
   az_json value;
 } az_json_property;
 
-typedef void *az_error;
+typedef void const *az_error;
 
 #define AZ_OK NULL
 
