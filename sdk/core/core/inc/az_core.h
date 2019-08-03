@@ -3,16 +3,16 @@
 
 #include <stddef.h>
 
-#define DEFINE_SLICE(TYPE, NAME) typedef struct { size_t const size; TYPE const *p; } NAME
+#define AZ_DEFINE_SLICE(TYPE, NAME) typedef struct { size_t size; TYPE const *p; } NAME
 
-DEFINE_SLICE(char, STRING);
+AZ_DEFINE_SLICE(char, az_string);
 
-DEFINE_SLICE(int, INT_SLICE);
+AZ_DEFINE_SLICE(int, az_int_slice);
 
-#define STRING_SIZE(S) (sizeof(S) - 1)
+#define AZ_STRING_SIZE(S) (sizeof(S) - 1)
 
-#define ARRAY_SIZE(A) (sizeof(A) / sizeof(*(A)))
+#define AZ_ARRAY_SIZE(A) (sizeof(A) / sizeof(*(A)))
 
-#define CREATE_STRING(S) { .size = STRING_SIZE(S), .p = (S) }
+#define AZ_STRING(S) { .size = AZ_STRING_SIZE(S), .p = (S) }
 
-#define CREATE_SLICE(A) { .size = ARRAY_SIZE(A), .p = (A) }
+#define AZ_SLICE(A) { .size = AZ_ARRAY_SIZE(A), .p = (A) }

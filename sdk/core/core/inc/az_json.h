@@ -1,4 +1,6 @@
 #include "az_core.h"
+#include <stdint.h>
+#include <stdbool.h>
 
 typedef enum {
   AZ_JSON_TYPE_NULL = 0,
@@ -7,31 +9,44 @@ typedef enum {
   AZ_JSON_TYPE_STRING = 4,
   AZ_JSON_TYPE_OBJECT = 5,
   AZ_JSON_TYPE_ARRAY = 6,
-} AZ_JSON_TYPE;
+} az_json_type;
 
-struct AZ_JSON;
-struct AZ_JSON_PROPERTY;
+struct az_json;
+struct az_json_property;
 
-DEFINE_SLICE(struct AZ_JSON_PROPERTY, AZ_JSON_OBJECT);
-DEFINE_SLICE(struct AZ_JSON, AZ_JSON_ARRAY);
+AZ_DEFINE_SLICE(struct az_json_property, az_json_object);
+AZ_DEFINE_SLICE(struct az_json, az_json_array);
 
-typedef struct AZ_JSON {
-  AZ_JSON_TYPE type;
+typedef struct az_json {
+  az_json_type type;
   union {
     // AZ_JSON_BOOL
     bool boolean;
+
     // AZ_JSON_NUMBER
     double number;
-    // AZ_JSON_STRING
-    STRING string;
-    // AZ_JSON_OBJECT
-    AZ_JSON_OBJECT object;
-    // AZ_JSON_ARRAY
-    AZ_JSON_ARRAY array;
-  };
-} AZ_JSON;
 
-typedef struct AZ_JSON_PROPERTY {
-  STRING name;
-  AZ_JSON value;
-} AZ_JSON_PROPERTY;
+    // AZ_JSON_STRING
+    az_string string;
+
+    // AZ_JSON_OBJECT
+    az_json_object object;
+
+    // AZ_JSON_ARRAY
+    az_json_array array;
+  };
+} az_json;
+
+typedef struct az_json_property {
+  az_string name;
+  az_json value;
+} az_json_property;
+
+typedef void *az_error;
+
+typedef struct {
+  void *context;
+  az_error (*write)(void *context, az_string s);
+} az_json_write_string;
+
+az_error az_json_write(az_json_write_string write_string, az_json json);

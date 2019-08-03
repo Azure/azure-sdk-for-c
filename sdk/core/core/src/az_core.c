@@ -3,8 +3,8 @@
 
 #include "../inc/az_core.h"
 
-STRING const s = CREATE_STRING("1234567890");
+az_string const s = AZ_STRING("1234567890");
 
 int const array[] = { 1, 2, 3 };
 
-INT_SLICE const slice = CREATE_SLICE(array);
+az_int_slice const slice = AZ_SLICE(array);
