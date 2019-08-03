@@ -3,18 +3,18 @@
 
 #include "../inc/az_json.h"
 
-az_string const null_string = AZ_STRING("null");
+AZ_DEFINE_STRING(null_str, "null");
 
-az_string const true_string = AZ_STRING("true");
+AZ_DEFINE_STRING(true_str, "true");
 
-az_string const false_string = AZ_STRING("false");
+AZ_DEFINE_STRING(false_str, "false");
 
 static inline az_error write_string(az_json_write_string const f, az_string const s) {
-  return s.size > 0 ? f.write(f.context, s) : AZ_OK;
+  return s.begin != s.end ? f.write(f.context, s) : AZ_OK;
 }
 
 static inline az_error write_char(az_json_write_string const f, char const c) {
-  az_string const s = { .begin = &c, .size = 1 };
+  az_string const s = { .begin = &c, .end = &c + 1 };
   return write_string(f, s);
 }
 
@@ -24,21 +24,21 @@ static inline az_error write_json_number(az_json_write_string const f, double co
 
 #define RETURN_ON_ERROR(E) { az_error const result = (E); if (result != AZ_OK) { return result; } }
 
-az_string const empty = { .begin = NULL, .size = 0 };
+az_string const empty = { .begin = NULL, .end = NULL };
 
-az_string const escape_quotation_mark = AZ_STRING("\\\"");
+AZ_DEFINE_STRING(escape_quotation_mark, "\\\"");
 
-az_string const escape_reverse_solidus = AZ_STRING("\\\\");
+AZ_DEFINE_STRING(escape_reverse_solidus, "\\\\");
 
-az_string const escape_backspace = AZ_STRING("\\b");
+AZ_DEFINE_STRING(escape_backspace, "\\b");
 
-az_string const escape_formfeed = AZ_STRING("\\f");
+AZ_DEFINE_STRING(escape_formfeed, "\\f");
 
-az_string const escape_horizontal_tab = AZ_STRING("\\t");
+AZ_DEFINE_STRING(escape_horizontal_tab, "\\t");
 
-az_string  const escape_linefeed = AZ_STRING("\\n");
+AZ_DEFINE_STRING(escape_linefeed, "\\n");
 
-az_string const escape_carriage_return = AZ_STRING("\\r");
+AZ_DEFINE_STRING(escape_carriage_return, "\\r");
 
 static inline az_string escape(char const c) {
   switch (c) {
@@ -60,34 +60,21 @@ static inline az_string escape(char const c) {
   return empty;
 }
 
-static inline az_error write_sub_string(
-  az_json_write_string const f,
-  az_string const s,
-  ptrdiff_t begin,
-  ptrdiff_t end
-) {
-  if (begin < end) {
-    const az_string sub = AZ_SUB_RANGE(s, begin, end);
-    return write_string(f, sub);
-  }
-  return AZ_OK;
-}
-
-static az_error write_json_string(az_json_write_string const f, az_string const s) {
+static az_error write_json_string(az_json_write_string const f, az_string s) {
   RETURN_ON_ERROR(write_char(f, '"'));
-  size_t last = 0;
-  for (size_t i = 0; i < s.size; ++i) {
-    char const c = s.begin[i];
+  char const *last = s.begin;
+  for (; s.begin != s.end; ++s.begin) {
+    char const c = *s.begin;
     az_string const e = escape(c);
-    if (e.size > 0) {
-      const az_string previous = AZ_SUB_RANGE(s, last, i);
+    if (s.begin != s.end) {
+      const az_string previous = { .begin = last, .end = s.begin };
       RETURN_ON_ERROR(write_string(f, previous));
       RETURN_ON_ERROR(write_string(f, e));
-      last = i + 1;
+      last = s.begin + 1;
     }
   }
   {
-    const az_string previous = AZ_SUB_RANGE(s, last, s.size);
+    const az_string previous = { .begin = last, .end = s.begin };
     RETURN_ON_ERROR(write_string(f, previous));
   }
   RETURN_ON_ERROR(write_char(f, '"'));
@@ -101,26 +88,27 @@ static inline az_error write_json_property(az_json_write_string const f, az_json
   return AZ_OK;
 }
 
-static inline az_error write_json_object(az_json_write_string const f, az_json_object const a) {
+static inline az_error write_json_object(az_json_write_string const f, az_json_object a) {
   RETURN_ON_ERROR(write_char(f, '{'));
-  if (a.size > 0) {
-    RETURN_ON_ERROR(write_json_property(f, a.begin[0]));
-    for (size_t i = 1; i < a.size; ++i) {
+  if (a.begin != a.end) {
+    ++a.begin;
+    RETURN_ON_ERROR(write_json_property(f, *a.begin));
+    for (; a.begin != a.end; ++a.begin) {
       RETURN_ON_ERROR(write_char(f, ','));
-      RETURN_ON_ERROR(write_json_property(f, a.begin[i]));
+      RETURN_ON_ERROR(write_json_property(f, *a.begin));
     }
   }
   RETURN_ON_ERROR(write_char(f, '}'));
   return AZ_OK;
 }
 
-static inline az_error write_json_array(az_json_write_string const f, az_json_array const a) {
+static inline az_error write_json_array(az_json_write_string const f, az_json_array a) {
   RETURN_ON_ERROR(write_char(f, '['));
-  if (a.size > 0) {
-    RETURN_ON_ERROR(az_json_write(f, a.begin[0]));
-    for (size_t i = 1; i < a.size; ++i) {
+  if (a.begin != a.end) {
+    RETURN_ON_ERROR(az_json_write(f, *a.begin));
+    for (; a.begin != a.end; ++a.begin) {
       RETURN_ON_ERROR(write_char(f, ','));
-      RETURN_ON_ERROR(az_json_write(f, a.begin[i]));
+      RETURN_ON_ERROR(az_json_write(f, *a.begin));
     }
   }
   RETURN_ON_ERROR(write_char(f, ']'));
@@ -128,11 +116,11 @@ static inline az_error write_json_array(az_json_write_string const f, az_json_ar
 }
 
 static inline az_error write_json_null(az_json_write_string const f) {
-  return write_string(f, null_string);
+  return write_string(f, null_str);
 }
 
 static inline az_error write_json_boolean(az_json_write_string const f, bool const b) {
-  return write_string(f, b ? true_string : false_string);
+  return write_string(f, b ? true_str : false_str);
 }
 
 az_error az_json_write(az_json_write_string const f, az_json const json) {
@@ -148,6 +136,7 @@ az_error az_json_write(az_json_write_string const f, az_json const json) {
     case AZ_JSON_TYPE_ARRAY:
       return write_json_array(f, json.array);
     case AZ_JSON_TYPE_NULL:
+    default:
       return write_json_null(f);
   }
 }

@@ -17,8 +17,8 @@ typedef enum {
 typedef struct az_json az_json;
 typedef struct az_json_property az_json_property;
 
-AZ_DEFINE_SLICE(az_json_property const, az_json_object);
-AZ_DEFINE_SLICE(az_json const, az_json_array);
+AZ_DEFINE_RANGE(az_json_property const, az_json_object);
+AZ_DEFINE_RANGE(az_json const, az_json_array);
 
 typedef struct az_json {
   az_json_type type;
@@ -54,4 +54,4 @@ typedef struct {
   az_error (*write)(void *context, az_string s);
 } az_json_write_string;
 
-az_error az_json_write(az_json_write_string write_string, az_json json);
+az_error az_json_write(az_json_write_string const write_string, az_json const json);
