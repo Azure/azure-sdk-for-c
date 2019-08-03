@@ -18,7 +18,8 @@ static inline az_error write_char(az_json_write_string const f, char const c) {
   return write_string(f, s);
 }
 
-static inline az_error write_json_number(az_json_write_string const f, double const numer) {
+static inline az_error write_json_number(az_json_write_string const f, double const number) {
+  // TODO: implement :-)
   return write_char(f, '0');
 }
 

@@ -20,5 +20,3 @@ AZ_DEFINE_RANGE(char const, az_string);
   static az_string NAME = { .begin = ARRAY, .end = ARRAY + AZ_STRING_SIZE(VALUE) }
 
 #define AZ_DEFINE_STRING(NAME, VALUE) _AZ_STRING(NAME, _ ## NAME, VALUE)
-
-AZ_DEFINE_STRING(hello, "Hello world!");
