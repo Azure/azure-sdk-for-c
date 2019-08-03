@@ -9,9 +9,9 @@
 
 #define AZ_ARRAY_SIZE(A) (sizeof(A) / sizeof(*(A)))
 
-AZ_DEFINE_RANGE(char const, az_string);
-
 // String
+
+AZ_DEFINE_RANGE(char const, az_string);
 
 #define AZ_STRING_SIZE(S) (sizeof(S "") - 1)
 
