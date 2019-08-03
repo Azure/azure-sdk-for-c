@@ -27,8 +27,22 @@ static inline az_error write_json_string(az_json_write_string f, az_string s) {
   return AZ_OK;
 }
 
+static inline az_error write_json_property(az_json_write_string f, az_json_property p) {
+  RETURN_ON_ERROR(write_json_string(f, p.name));
+  RETURN_ON_ERROR(write_char(f, ':'));
+  RETURN_ON_ERROR(az_json_write(f, p.value));
+  return AZ_OK;
+}
+
 static inline az_error write_json_object(az_json_write_string f, az_json_object o) {
   RETURN_ON_ERROR(write_char(f, '{'));
+  if (o.size > 0) {
+    RETURN_ON_ERROR(write_json_property(f, o.p[0]));
+    for (size_t i = 1; i < o.size; ++i) {
+      RETURN_ON_ERROR(write_char(f, ','));
+      RETURN_ON_ERROR(write_json_property(f, o.p[i]));
+    }
+  }
   RETURN_ON_ERROR(write_char(f, '}'));
   return AZ_OK;
 }
