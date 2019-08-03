@@ -89,7 +89,7 @@ static inline az_error write_json_property(az_json_write_string const f, az_json
   return AZ_OK;
 }
 
-static inline az_error write_json_object(az_json_write_string const f, az_json_object a) {
+static az_error write_json_object(az_json_write_string const f, az_json_object a) {
   RETURN_ON_ERROR(write_char(f, '{'));
   if (a.begin != a.end) {
     ++a.begin;
@@ -103,7 +103,7 @@ static inline az_error write_json_object(az_json_write_string const f, az_json_o
   return AZ_OK;
 }
 
-static inline az_error write_json_array(az_json_write_string const f, az_json_array a) {
+static az_error write_json_array(az_json_write_string const f, az_json_array a) {
   RETURN_ON_ERROR(write_char(f, '['));
   if (a.begin != a.end) {
     RETURN_ON_ERROR(az_json_write(f, *a.begin));
