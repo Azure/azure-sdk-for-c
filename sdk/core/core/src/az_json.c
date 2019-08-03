@@ -19,18 +19,18 @@ static inline az_error write_json_number(az_json_write_string f, double numer) {
   return write_char(f, '0');
 }
 
-#define RETURN_ON_ERROR(E) { az_error const result = (E); if (result != NULL) { return result; } }
+#define RETURN_ON_ERROR(E) { az_error const result = (E); if (result != AZ_OK) { return result; } }
 
 static inline az_error write_json_string(az_json_write_string f, az_string s) {
   RETURN_ON_ERROR(write_char(f, '"'));
   RETURN_ON_ERROR(write_char(f, '"'));
-  return NULL;
+  return AZ_OK;
 }
 
 static inline az_error write_json_object(az_json_write_string f, az_json_object o) {
   RETURN_ON_ERROR(write_char(f, '{'));
   RETURN_ON_ERROR(write_char(f, '}'));
-  return NULL;
+  return AZ_OK;
 }
 
 static inline az_error write_json_array(az_json_write_string f, az_json_array a) {
@@ -43,7 +43,7 @@ static inline az_error write_json_array(az_json_write_string f, az_json_array a)
     }
   }
   RETURN_ON_ERROR(write_char(f, ']'));
-  return NULL;
+  return AZ_OK;
 }
 
 static inline az_error write_json_null(az_json_write_string f) {

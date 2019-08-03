@@ -44,6 +44,8 @@ typedef struct az_json_property {
 
 typedef void *az_error;
 
+#define AZ_OK NULL
+
 typedef struct {
   void *context;
   az_error (*write)(void *context, az_string s);
