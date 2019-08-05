@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "az_types.h"
+#include "az_stream.h"
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -45,48 +46,4 @@ struct az_json_property {
   az_json value;
 };
 
-typedef void const *az_error;
-
-#define AZ_OK NULL
-
-typedef struct {
-  void *context;
-  az_error (*write)(void *context, az_string s);
-} az_json_write_string;
-
-az_error az_json_write(az_json_write_string const write_string, az_json const json);
-
-typedef struct {
-  void *context;
-  az_error (*done)(void *context);
-  az_error (*sub_string)(void *context, az_string s);
-} az_json_string_reader;
-
-typedef struct az_json_property_reader az_json_property_reader;
-typedef struct az_json_array_reader az_json_array_reader;
-
-typedef struct {
-  void *context;
-  az_error (*done)(void *context);
-  az_error (*property)(void *context, az_json_property_reader const *p_reader);
-} az_json_object_reader;
-
-typedef struct {
-  void *context;
-  az_error (*null)(void *context);
-  az_error (*boolean)(void *context, bool value);
-  az_error (*number)(void *context, double value);
-  az_error (*string)(void *context, az_json_string_reader const *p_reader);
-  az_error (*object)(void *context, az_json_object_reader const *p_reader);
-} az_json_reader;
-
-struct az_json_property_reader {
-  az_json_string_reader name;
-  az_json_reader value;
-};
-
-struct az_json_array_reader {
-  void *context;
-  az_error (*done)(void *context);
-  az_error (*item)(void *context, az_json_reader const *p_reader);
-};
+az_error az_json_write(az_write const write, az_json const json);

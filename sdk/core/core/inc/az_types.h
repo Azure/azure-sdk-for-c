@@ -2,10 +2,11 @@
 // SPDX-License-Identifier: MIT
 
 #include <stddef.h>
+#include <stdint.h>
 
 // Range
 
-#define AZ_DEFINE_RANGE(TYPE, NAME) typedef struct { TYPE *begin; TYPE *end; } NAME;
+#define AZ_DEFINE_RANGE(TYPE, NAME) typedef struct { TYPE *begin; TYPE *const end; } NAME;
 
 #define AZ_ARRAY_SIZE(A) (sizeof(A) / sizeof(*(A)))
 
@@ -13,10 +14,12 @@
 
 AZ_DEFINE_RANGE(char const, az_string);
 
-#define AZ_STRING_SIZE(S) (sizeof(S "") - 1)
+AZ_DEFINE_RANGE(char, az_mutate_string)
 
-#define _AZ_STRING(NAME, ARRAY, VALUE) \
+#define AZ_STR_SIZE(S) (sizeof(S "") - 1)
+
+#define _AZ_DEFINE_STR(NAME, ARRAY, VALUE) \
   static char const ARRAY[] = VALUE; \
-  static az_string NAME = { .begin = ARRAY, .end = ARRAY + AZ_STRING_SIZE(VALUE) }
+  static az_string NAME = { .begin = ARRAY, .end = ARRAY + AZ_STR_SIZE(VALUE) }
 
-#define AZ_DEFINE_STRING(NAME, VALUE) _AZ_STRING(NAME, _ ## NAME, VALUE)
+#define AZ_DEFINE_STR(NAME, VALUE) _AZ_DEFINE_STR(NAME, _ ## NAME, VALUE)
