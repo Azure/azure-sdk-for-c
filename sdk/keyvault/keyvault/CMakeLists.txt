@@ -10,4 +10,4 @@ set(CMAKE_C_STANDARD 99)
 add_library (az_keyvault src/az_keyvault.c)
 
 # make sure that users can consume `az_keyvault` as a library.
-add_library (az::keyvault az_keyvault)
+add_library (az::keyvault ALIAS az_keyvault)
