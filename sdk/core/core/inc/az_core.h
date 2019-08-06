@@ -10,17 +10,12 @@
 extern "C" {
 #endif
 
-// Range
-
-#define AZ_DEFINE_RANGE(TYPE, NAME) typedef struct { TYPE *begin; TYPE *end; } NAME;
-
-#define AZ_ARRAY_SIZE(A) (sizeof(A) / sizeof(*(A)))
+typedef struct {
+  char const *begin;
+  char const *end;
+} az_cstr;
 
 // String
-
-AZ_DEFINE_RANGE(char const, az_cstr);
-
-AZ_DEFINE_RANGE(char, az_str)
 
 // adding `""` to make sure that S is a `string literal`.
 #define AZ_STRING_LITERAL_SIZE(S) (sizeof(S "") - 1)
