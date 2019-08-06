@@ -17,7 +17,7 @@ UTF-8. No MUTF-8.
 
    ```c
    for (; begin != end; ++begin) {
-     *begin;
+     ...*begin...
    }
    ```
 
@@ -31,8 +31,8 @@ UTF-8. No MUTF-8.
    ```
 
    ```c
-   for (int i = 0; i < size; ++i) {
-     begin[i]
+   for (size_t i = 0; i < size; ++i) {
+     ...begin[i]...
    }
    ```
 
