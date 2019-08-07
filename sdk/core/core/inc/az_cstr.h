@@ -19,7 +19,8 @@ typedef struct {
   char const *end;
 } az_cstr;
 
-// A size of the string literal. Adding `""` to make sure that S is a `string literal`.
+// A size of the string literal.
+// Details: to make sure that `S` is a `string literal`, we are adding `""` to `S`.
 #define AZ_STRING_LITERAL_SIZE(S) (sizeof(S "") - 1)
 
 #define _AZ_CSTR(NAME, ARRAY, STRING_LITERAL) \
