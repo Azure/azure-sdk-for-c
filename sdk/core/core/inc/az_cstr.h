@@ -11,10 +11,11 @@ extern "C" {
 #endif
 
 // A constant string.
+// The range is empty if `begin` == `end`.
 typedef struct {
   // Points to the first character.
   char const *begin;
-  // Length (in chars) of the string.
+  // Points to the character after the last one.
   char const *end;
 } az_cstr;
 
@@ -22,7 +23,7 @@ typedef struct {
 // Details: to make sure that `S` is a `string literal`, we are adding `""` to `S`.
 #define AZ_STRING_LITERAL_SIZE(S) (sizeof(S "") - 1)
 
-// Defined a new constant string `NAME` which is equalent to the `STRING_LITERAL` value.
+// Defines a new constant string `NAME` which points to the `STRING_LITERAL` value.
 // For example:
 //
 // ```c
