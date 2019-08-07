@@ -9,7 +9,7 @@
 extern "C" {
 #endif
 
-#define AZ_STATIC_ASSERT(C) typedef int _az_static_assert[(C) ? 1 : -1];
+#define AZ_STATIC_ASSERT(CONDITION) typedef int _az_static_assert[(CONDITION) ? 1 : -1];
 
 AZ_STATIC_ASSERT(true);
 
