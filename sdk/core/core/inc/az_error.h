@@ -10,9 +10,10 @@
 extern "C" {
 #endif
 
-typedef void *az_error;
-
-#define AZ_OK 0
+typedef enum {
+  AZ_OK = 0,
+  AZ_JSON_ERROR = 0x10000,
+} az_error;
 
 #ifdef __cplusplus
 }
