@@ -13,6 +13,16 @@
 extern "C" {
 #endif
 
+typedef struct {
+  size_t begin;
+  size_t end;
+} az_index_range;
+
+typedef enum {
+  AZ_JSON_ERROR_UNEXPECTED_END = AZ_JSON_ERROR + 1,
+  AZ_JSON_ERROR_UNEXPECTED_SYMBOL = AZ_JSON_ERROR + 2,
+} az_json_error;
+
 typedef enum {
   AZ_JSON_VALUE_NULL,
   AZ_JSON_VALUE_FALSE,
@@ -26,45 +36,12 @@ typedef enum {
 typedef struct {
   az_json_value_type type;
   union {
+    az_index_range string;
     double number;
-    az_cstr string;
   };
 } az_json_value;
 
-az_error az_json_read_value(az_cstr *p_state, az_json_value *p_value);
-
-typedef enum {
-  AZ_JSON_OBJECT_TOKEN_END,
-  AZ_JSON_OBJECT_TOKEN_PROPERTY,
-} az_json_object_token_type;
-
-typedef struct {
-  az_cstr name;
-  az_json_value value;
-} az_json_property;
-
-typedef struct {
-  az_json_object_token_type type;
-  union {
-    az_json_property property;
-  };
-} az_json_object_token;
-
-az_error az_json_read_object_token(az_cstr *p_state, az_json_object_token *p_token);
-
-typedef enum {
-  AZ_JSON_ARRAY_TOKEN_END,
-  AZ_JSON_ARRAY_TOKEN_ITEM,
-} az_json_array_token_type;
-
-typedef struct {
-  az_json_array_token_type type;
-  union {
-    az_json_value item;
-  };
-} az_json_array_token;
-
-az_error az_json_read_array_token(az_cstr *p_state, az_json_array_token *p_token);
+az_error az_json_parse_value(az_cstr const s, size_t *const p_i, az_json_value *const out_value);
 
 #ifdef __cplusplus
 }

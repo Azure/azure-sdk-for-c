@@ -13,3 +13,6 @@ add_library (az_core src/az_json.c)
 add_library (az::core ALIAS az_core)
 
 include_directories (inc)
+
+add_executable(az_core_test test/main.c)
+target_link_libraries(az_core_test az_core)

@@ -11,12 +11,10 @@ extern "C" {
 #endif
 
 // A constant string.
-// The range is empty if `begin` == `end`.
 typedef struct {
   // Points to the first character.
-  char const *begin;
-  // Points to the character after the last one.
-  char const *end;
+  char const *p;
+  size_t len;
 } az_cstr;
 
 // A size of the string literal.
@@ -24,20 +22,8 @@ typedef struct {
 #define AZ_STRING_LITERAL_SIZE(S) (sizeof(S "") - 1)
 
 // Defines a new constant string `NAME` which points to the `STRING_LITERAL` value.
-// For example:
-//
-// ```c
-// AZ_CSTR(hello_world, "Hello world!");
-//
-// for (char const *i = hello_world.begin; i != hello_world.end; ++i) {
-//   ...*i...
-// }
-// ```
-#define _AZ_CSTR(NAME, ARRAY, VALUE) \
-  static char const ARRAY[] = VALUE; \
-  static az_cstr const NAME = { .begin = ARRAY, .end = ARRAY + AZ_STR_SIZE(VALUE) }
-
-#define AZ_CSTR(NAME, VALUE) _AZ_DEFINE_STR(NAME, _ ## NAME, VALUE)
+#define AZ_CSTR(NAME, VALUE) \
+  static az_cstr const NAME = { .p = VALUE, .len = AZ_STRING_LITERAL_SIZE(VALUE) }
 
 #ifdef __cplusplus
 }
