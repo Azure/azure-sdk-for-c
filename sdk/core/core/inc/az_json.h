@@ -29,7 +29,9 @@ typedef enum {
   AZ_JSON_VALUE_TRUE,
   AZ_JSON_VALUE_NUMBER,
   AZ_JSON_VALUE_STRING,
+  AZ_JSON_VALUE_EMPTY_OBJECT,
   AZ_JSON_VALUE_OBJECT,
+  AZ_JSON_VALUE_EMPTY_ARRAY,
   AZ_JSON_VALUE_ARRAY,
 } az_json_value_type;
 
@@ -42,6 +44,23 @@ typedef struct {
 } az_json_value;
 
 az_error az_json_parse_value(az_cstr const s, size_t *const p_i, az_json_value *const out_value);
+
+typedef struct {
+  az_cstr name;
+  az_json_value value;
+  bool has_next;
+} az_json_object_property;
+
+// call it only if `az_json_value.type == AZ_JSON_VALUE_OBJECT` or `az_json_object_property.has_next`.
+az_error az_json_parse_object_property(az_cstr const s, size_t *const p_i, az_json_object_property *const out_property);
+
+typedef struct {
+  az_json_value value;
+  bool has_next;
+} az_json_array_item;
+
+// call it only if `az_json_value.type == AZ_JSON_VALUE_ARRAY` or `az_json_array_item.has_next`.
+az_error az_json_parse_array_item(az_cstr const s, size_t *const p_i, az_json_array_item *const out_item);
 
 #ifdef __cplusplus
 }

@@ -5,6 +5,8 @@
 
 #include <az_json.h>
 
+#include <stdio.h>
+
 static inline bool is_white_space(char c) {
   return c == ' ' || c == '\t' || c == '\r' || c == '\n';
 }
@@ -15,7 +17,7 @@ static inline bool is_digit(char c) {
 
 static az_error read_keyword(az_cstr expected, az_cstr const input, size_t *const p_i) {
   size_t i = *p_i;
-  if (input.len <= i + expected.len) {
+  if (input.len < i + expected.len) {
     return AZ_JSON_ERROR_UNEXPECTED_END;
   }
   for (size_t e = 0; e < expected.len; ++e, ++i) {
