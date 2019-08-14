@@ -4,7 +4,7 @@
 
 UTF-8. No MUTF-8.
 
-## Ranges vs. slices
+## Ranges vs. Slices vs. Index Ranges
 
 1. Ranges (common in C++, SubRange)
 
@@ -25,15 +25,29 @@ UTF-8. No MUTF-8.
 
    ```c
    typedef struct {
-     int *begin;
+     int *p;
      size_t size;
    } az_int_slice;
    ```
 
    ```c
    for (size_t i = 0; i < size; ++i) {
-     ...begin[i]...
+     ...p[i]...
    }
+   ```
+
+1. Slices and index ranges. **Preferred because it adds extra safety.**
+
+   ```c
+   typedef struct {
+     int *p;
+     size_t size;
+   } az_int_slice;
+
+   typedef struct {
+     size_t begin;
+     size_t end;
+   } az_index_range;
    ```
 
 ## Immutability
@@ -52,7 +66,7 @@ UTF-8. No MUTF-8.
    } az_mutable_int_range;
    ```
 
-1. Mutable by default (common in C and C++).
+1. Mutable by default (**Preffered because it is common in C and C++).
 
    ```c
    typedef struct {
@@ -65,3 +79,22 @@ UTF-8. No MUTF-8.
      int const *end;
    } az_cint_range;
    ```
+
+## Error Handling
+
+1. All functions returns common `enum az_error`.
+
+   ```c
+   typedef enum {
+     AZ_OK = 0,
+     AZ_STORAGE_ERROR = 0x10000,
+   } az_error;
+
+   typedef enum {
+     AZ_STORAGE_READ_ERROR = AZ_STORAGE_ERROR + 1,
+   } az_storage_error;
+
+   az_error az_storage_read(...);
+   ```
+
+   Additional information could be passed using output parameters.

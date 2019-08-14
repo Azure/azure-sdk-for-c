@@ -21,6 +21,10 @@ AZ_CSTR(json_null, "null");
 AZ_CSTR(json_nulx, "nulx");
 AZ_CSTR(json_false, "false");
 AZ_CSTR(json_true, "true");
+AZ_CSTR(json_null_space, "null  ");
+AZ_CSTR(json_string, "\"Hello world!\"");
+AZ_CSTR(json_invalid_string, "\"Hello world\n\"");
+AZ_CSTR(json_no_end_string, "\"Hello");
 
 int main() {
   ASSERT(json_parse(json) == AZ_JSON_ERROR_UNEXPECTED_END);
@@ -47,5 +51,25 @@ int main() {
     ASSERT(e == AZ_OK);
     ASSERT(value.type == AZ_JSON_VALUE_TRUE);
   }
+  {
+    size_t i = 0;
+    az_json_value value;
+    const e = az_json_parse_value(json_null_space, &i, &value);
+    ASSERT(e == AZ_OK);
+    ASSERT(value.type == AZ_JSON_VALUE_NULL);
+  }
+  {
+    size_t i = 0;
+    az_json_value value;
+    const e = az_json_parse_value(json_string, &i, &value);
+    ASSERT(e == AZ_OK);
+    ASSERT(value.type == AZ_JSON_VALUE_STRING);
+    ASSERT(value.string.begin == 1);
+    // "Hello world!"
+    // 01234567890123
+    ASSERT(value.string.end == 13);
+  }
+  ASSERT(json_parse(json_invalid_string) == AZ_JSON_ERROR_UNEXPECTED_SYMBOL);
+  ASSERT(json_parse(json_no_end_string) == AZ_JSON_ERROR_UNEXPECTED_END);
   return result;
 }

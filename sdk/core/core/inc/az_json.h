@@ -28,6 +28,7 @@ typedef enum {
   AZ_JSON_VALUE_FALSE,
   AZ_JSON_VALUE_TRUE,
   AZ_JSON_VALUE_NUMBER,
+  AZ_JSON_VALUE_INTEGER,
   AZ_JSON_VALUE_STRING,
   AZ_JSON_VALUE_EMPTY_OBJECT,
   AZ_JSON_VALUE_OBJECT,
@@ -40,6 +41,7 @@ typedef struct {
   union {
     az_index_range string;
     double number;
+    int64_t integer;
   };
 } az_json_value;
 
