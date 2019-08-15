@@ -1,8 +1,29 @@
 # Options
 
-## Strings
+## Discriminated Unions
 
-UTF-8. No MUTF-8.
+Example of `az_some_class` discriminated union. variant/tag union.
+
+```c
+typedef enum {
+  AZ_SOME_CLASS_STRING,
+  AZ_SOME_CLASS_NUMBER,
+  AZ_SOME_CLASS_NOTHING,
+} az_some_class_type;
+
+typedef struct {
+  az_some_class_type type;
+  union {
+    // AZ_SOME_CLASS_STRING
+    az_index_range string;
+    // AZ_SOME_CLASS_NUMBER
+    double number;
+    // AZ_SOME_CLASS_NOTHING
+  };
+} az_some_class;
+```
+
+We may have a type 'az_core_any_type`...
 
 ## Ranges vs. Slices vs. Index Ranges
 
@@ -42,13 +63,17 @@ UTF-8. No MUTF-8.
    typedef struct {
      int *p;
      size_t size;
-   } az_int_slice;
+   } az_int_container;
 
    typedef struct {
      size_t begin;
      size_t end;
    } az_index_range;
    ```
+
+## Strings
+
+UTF-8. No MUTF-8. We can use 0xFF as the end of character stream.
 
 ## Immutability
 
@@ -98,3 +123,22 @@ UTF-8. No MUTF-8.
    ```
 
    Additional information could be passed using output parameters.
+
+1. Functions use structures to return all results using structures and discriminated unions.
+
+   ```c
+   typedef enum {
+     AZ_OK = 0,
+     AZ_SOME_ERROR = 1,
+   } az_error;
+
+   typedef struct {
+     az_error error;
+     union {
+       int ok;
+       az_some_error_additional_information some_error;
+     };
+   } az_myfunc_result;
+
+   az_myfunc_result az_myfunc(int some_parameter);
+   ```
