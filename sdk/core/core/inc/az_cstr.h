@@ -14,6 +14,7 @@ extern "C" {
 typedef struct {
   // Points to the first character.
   char const *p;
+  // A numer of C characters (bytes) in the string.
   size_t len;
 } az_cstr;
 

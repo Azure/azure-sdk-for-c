@@ -1,10 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_json.h>
+#include <az_json_state.h>
 
 #include <stdio.h>
 
+/*
 static inline bool is_white_space(char c) {
   return c == ' ' || c == '\t' || c == '\r' || c == '\n';
 }
