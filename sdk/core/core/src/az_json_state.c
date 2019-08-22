@@ -2,8 +2,140 @@
 // SPDX-License-Identifier: MIT
 
 #include <az_json_state.h>
+#include <az_cstr.h>
 
 #include <stdio.h>
+
+static inline bool is_white_space(char c) {
+  return c == ' ' || c == '\t' || c == '\r' || c == '\n';
+}
+
+inline az_json_token az_json_token_create(az_json_token_tag const tag) {
+  return (az_json_token){ .tag = tag };
+}
+
+inline az_json_token az_json_token_white_space() {
+  return az_json_token_create(AZ_JSON_TOKEN_WHITE_SPACE);
+}
+
+inline az_json_token az_json_token_error(char const c) {
+  return (az_json_token){ .done = true, .tag = AZ_JSON_TOKEN_ERROR };
+}
+
+inline az_json_token az_json_token_integer_create(bool negative, int64_t const integer) {
+  return (az_json_token){
+    .tag = AZ_JSON_TOKEN_INTEGER,
+    .integer_negative = negative,
+    .integer = integer
+  };
+}
+
+inline az_json_token az_json_white_space_parse(char const c) {
+  switch (c) {
+    case ' ':
+    case '\t':
+    case '\r':
+    case '\n':
+      return az_json_token_white_space();
+    case '{':
+    case '}':
+    case '[':
+    case ']':
+    case ':':
+    case ',':
+    case '"':
+    case 'n':
+    case 'f':
+    case 't':
+    case '-':
+      return az_json_token_integer_create(true, 0);
+    case '0':
+    case '1':
+    case '2':
+    case '3':
+    case '4':
+    case '5':
+    case '6':
+    case '7':
+    case '8':
+    case '9':
+      return az_json_token_integer_create(false, c - '0');
+    default:
+      return az_json_token_error(c);
+  }
+}
+
+inline az_json_token az_json_keyword(az_json_token_tag const tag, uint8_t i) {
+  return (az_json_token){ .tag = tag, .keyword_position = i };
+}
+
+inline az_json_token az_json_token_done(az_json_token_tag tag, char next) {
+  return (az_json_token){ .done = true, .tag = tag, .next = next };
+}
+
+inline az_json_token az_json_keyword_parse(az_json_token const token, char const c, az_cstr const keyword) {
+  int const i = token.keyword_position + 1;
+  az_json_token_tag const tag = token.tag;
+  if (i < keyword.len) {
+    return keyword.p[i] == c ? az_json_keyword(tag, i) : az_json_token_error(c);
+  }
+  if (is_white_space(c)) {
+    return az_json_token_done(tag, c);
+  }
+  switch (c) {
+    case ',': case ']': case '}':
+      return az_json_token_done(tag, c);
+    default:
+      return az_json_token_error(c);
+  }
+}
+
+static az_cstr const null_keyword = AZ_CSTR("null");
+
+static az_cstr const false_keyword = AZ_CSTR("false");
+
+static az_cstr const true_keyword = AZ_CSTR("true");
+
+inline az_json_token az_json_string_parse(az_json_token const token, char const c) {
+  switch (token.string_tag) {
+    case AZ_JSON_TOKEN_STRING_OPEN:
+    case AZ_JSON_TOKEN_STRING_CHAR:
+      switch (c) {
+        case '"':
+          return (az_json_token){ .tag = AZ_JSON_TOKEN_STRING, .string_tag = AZ_JSON_TOKEN_STRING };
+      }
+  }
+}
+
+inline az_json_token az_json_parse_continue(az_json_token const token, char const c) {
+  AZ_ASSERT(!token.done);
+  const tag = token.tag;
+  switch (tag) {
+    case AZ_JSON_TOKEN_WHITE_SPACE:
+      return az_json_white_space_parse(c);
+    case AZ_JSON_TOKEN_NULL:
+      return az_json_keyword_parse(token, c, null_keyword);
+    case AZ_JSON_TOKEN_FALSE:
+      return az_json_keyword_parse(token, c, false_keyword);
+    case AZ_JSON_TOKEN_TRUE:
+      return az_json_keyword_parse(token, c, true_keyword);
+    case AZ_JSON_TOKEN_STRING:
+      return az_json_string_parse(token, c);
+    default:
+      return az_json_token_done(tag, c);
+  }
+}
+
+az_json_token az_json_parse(az_json_token const token, char const c) {
+  if (!token.done) {
+    return az_json_parse_continue(token, c);
+  }
+  az_json_token const result = az_json_parse_continue(az_json_token_white_space(), token.next);
+  if (result.tag == AZ_JSON_TOKEN_ERROR) {
+    return result;
+  }
+  return az_json_parse_continue(result, c);
+}
 
 /*
 static inline bool is_white_space(char c) {

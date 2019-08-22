@@ -7,7 +7,7 @@ project (az_storage LANGUAGES C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_library (az_core src/az_json.c)
+add_library (az_core src/az_json_state.c)
 
 # make sure that users can consume the project as a library.
 add_library (az::core ALIAS az_core)
