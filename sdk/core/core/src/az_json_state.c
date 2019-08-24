@@ -1,6 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include <az_json_number.h>
+
+/*
 #include <az_json_state.h>
 #include <az_cstr.h>
 

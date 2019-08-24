@@ -142,3 +142,37 @@ UTF-8. No MUTF-8. We can use 0xFF as the end of character stream.
 
    az_myfunc_result az_myfunc(int some_parameter);
    ```
+
+## OOP Conventions
+
+```c
+enum {
+  AZ_MYTYPE_FOO,
+  AZ_MYTYPE_BAR,
+};
+
+typedef uint8_t az_mytype_tag;
+
+typedef double az_mytype_foo;
+
+typedef struct {
+  double a;
+  double b;
+} az_mytype_bar;
+
+inline az_mytype_bar az_mytype_bar_create(double const a, double const b) {
+  return (az_mytype_bar){ .a = a, .b = b };
+}
+
+typedef struct {
+  az_mytype_tag tag;
+  union {
+    az_mytype_foo foo;
+    az_mytype_bar bar;
+  };
+} az_mytype;
+
+inline az_mytype_create_bar(az_mytype_bar const bar) {
+  return (az_mytype){ .tag = AZ_MYTYPE_BAR, .bar = bar };
+}
+```

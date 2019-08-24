@@ -23,7 +23,7 @@ typedef struct {
 #define AZ_STRING_LITERAL_SIZE(S) (sizeof(S "") - 1)
 
 // Defines a new constant string `NAME` which points to the `STRING_LITERAL` value.
-#define AZ_CSTR(VALUE) { .p = VALUE, .len = AZ_STRING_LITERAL_SIZE(VALUE) }
+#define AZ_CSTR(VALUE) ((az_cstr){ .p = VALUE, .len = AZ_STRING_LITERAL_SIZE(VALUE) })
 
 #ifdef __cplusplus
 }
