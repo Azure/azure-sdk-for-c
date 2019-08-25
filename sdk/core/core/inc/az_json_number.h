@@ -5,19 +5,14 @@
 #define AZ_JSON_NUMBER_H
 
 #include <stdint.h>
-#include <az_static_assert.h>
+#include <az_sign.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef int8_t az_sign;
-
-enum {
-  AZ_JSON_TERMINAL = '\xFF',
-};
-
 typedef enum {
+  AZ_JSON_NUMBER_NONE,
   AZ_JSON_NUMBER_MINUS,
   AZ_JSON_NUMBER_ZERO,
   AZ_JSON_NUMBER_INTEGER,
@@ -76,6 +71,10 @@ typedef struct {
   };
 } az_json_number;
 
+inline az_json_number az_json_number_create_none() {
+  return (az_json_number){ .tag= AZ_JSON_NUMBER_NONE };
+}
+
 inline az_json_number az_json_number_create_minus() {
   return (az_json_number){ .tag = AZ_JSON_NUMBER_MINUS };
 }
@@ -115,8 +114,6 @@ inline az_json_number az_json_number_create_done(az_json_number_done const done)
 inline az_json_number az_json_number_create_error() {
   return (az_json_number){ .tag = AZ_JSON_NUMBER_ERROR };
 }
-
-az_json_number az_json_number_try_parse(char const c);
 
 az_json_number az_json_number_parse(az_json_number const state, char const c);
 

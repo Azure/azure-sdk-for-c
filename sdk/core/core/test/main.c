@@ -5,6 +5,7 @@
 #include <az_json_number.h>
 
 #include <stdio.h>
+#include <stdbool.h>
 
 int exit_code = 0;
 
@@ -15,12 +16,11 @@ int exit_code = 0;
 
 az_json_number parse_number(az_cstr const str) {
   size_t const len = str.len;
-  size_t i = 0;
-  az_json_number n = az_json_number_try_parse(str.p[i]);
-  for (++i; i < len; ++i) {
+  az_json_number n = az_json_number_create_none();
+  for (size_t i = 0; i < len; ++i) {
     n = az_json_number_parse(n, str.p[i]);
   }
-  n = az_json_number_parse(n, AZ_JSON_TERMINAL);
+  n = az_json_number_parse(n, AZ_STR_TERMINAL);
   return n;
 }
 
@@ -40,13 +40,14 @@ void test_number_error(az_cstr const str) {
 }
 
 int main() {
-  test_number_done(AZ_CSTR("0"), 0, AZ_JSON_TERMINAL);
-  test_number_done(AZ_CSTR("-0"), 0, AZ_JSON_TERMINAL);
-  test_number_done(AZ_CSTR("123"), 123, AZ_JSON_TERMINAL);
-  test_number_done(AZ_CSTR("-123.56"), -123.56, AZ_JSON_TERMINAL);
-  test_number_done(AZ_CSTR("-123.56e3"), -123560, AZ_JSON_TERMINAL);
-  test_number_done(AZ_CSTR("123.56e-4"), 0.012356, AZ_JSON_TERMINAL);
-  // test_number_done(AZ_CSTR("-0.056"), -0.056, AZ_JSON_TERMINAL);
+  test_number_done(AZ_CSTR("0"), 0, AZ_STR_TERMINAL);
+  test_number_done(AZ_CSTR("-0"), 0, AZ_STR_TERMINAL);
+  test_number_done(AZ_CSTR("123"), 123, AZ_STR_TERMINAL);
+  test_number_done(AZ_CSTR("-123.56"), -123.56, AZ_STR_TERMINAL);
+  test_number_done(AZ_CSTR("-123.56e3"), -123560, AZ_STR_TERMINAL);
+  test_number_done(AZ_CSTR("123.56e-4"), 0.012356, AZ_STR_TERMINAL);
+  // test_number_done(AZ_CSTR("-0.056"), -0.056, AZ_STR_TERMINAL);
+  test_number_done(AZ_CSTR("1e+10"), 10000000000, AZ_STR_TERMINAL);
   test_number_error(AZ_CSTR("-00"));
   return exit_code;
 }

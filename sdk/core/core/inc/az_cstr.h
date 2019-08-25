@@ -25,6 +25,10 @@ typedef struct {
 // Defines a new constant string `NAME` which points to the `STRING_LITERAL` value.
 #define AZ_CSTR(VALUE) ((az_cstr){ .p = VALUE, .len = AZ_STRING_LITERAL_SIZE(VALUE) })
 
+enum {
+  AZ_STR_TERMINAL = '\xFF',
+};
+
 #ifdef __cplusplus
 }
 #endif

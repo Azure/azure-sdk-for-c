@@ -3,15 +3,9 @@
 
 #include <az_json_number.h>
 
+#include <az_digit.h>
+#include <stdbool.h>
 #include <math.h>
-
-inline bool az_is_digit(char const c) {
-  return '0' <= c && c <= '9';
-}
-
-inline int8_t az_to_digit(char const c) {
-  return c - '0';
-}
 
 inline bool az_is_e(char const c) {
   return c == 'e' || c == 'E';
@@ -25,7 +19,7 @@ az_json_number az_json_number_integer_add(az_json_number_integer const integer, 
   });
 }
 
-az_json_number az_json_number_sign_parse(az_sign sign, char const c) {
+az_json_number az_json_number_sign_parse(az_sign sign, char const c, az_json_number const default_) {
   if (c == '0') {
     return az_json_number_create_zero(sign);
   }
@@ -35,21 +29,21 @@ az_json_number az_json_number_sign_parse(az_sign sign, char const c) {
       c
     );
   }
-  return az_json_number_create_error();
+  return default_;
 }
 
-az_json_number az_json_number_try_parse(char const c) {
+az_json_number az_json_number_none_parse(char const c) {
   if (c == '-') {
     return az_json_number_create_minus();
   }
-  return az_json_number_sign_parse(1, c);
+  return az_json_number_sign_parse(1, c, az_json_number_create_none());
 }
 
 az_json_number az_json_number_minus_parse(char const c) {
-  return az_json_number_sign_parse(-1, c);
+  return az_json_number_sign_parse(-1, c, az_json_number_create_error());
 }
 
-az_json_number az_json_numer_fraction_parse_end(double const number, char const c) {
+az_json_number az_json_number_fraction_parse_end(double const number, char const c) {
   if (az_is_e(c)) {
     return az_json_number_create_e(number);
   }
@@ -60,7 +54,7 @@ az_json_number az_json_number_integer_parse_end(az_json_number_integer const int
   if (c == '.') {
     return az_json_number_create_dot(integer);
   }
-  return az_json_numer_fraction_parse_end(integer.number, c);
+  return az_json_number_fraction_parse_end(integer.number, c);
 }
 
 az_json_number az_json_number_zero_parse(az_sign const sign, char const c) {
@@ -93,7 +87,7 @@ az_json_number az_json_number_fraction_parse(az_json_number_fraction const fract
   if (az_is_digit(c)) {
     return az_json_number_fraction_add(fraction, c);
   }
-  return az_json_numer_fraction_parse_end(fraction.number, c);
+  return az_json_number_fraction_parse_end(fraction.number, c);
 }
 
 az_json_number az_json_number_e_sign_parse(az_json_number_e_sign const e_sign, char const c) {
@@ -135,6 +129,8 @@ az_json_number az_json_number_e_number_parse(az_json_number_e_number const e_num
 
 az_json_number az_json_number_parse(az_json_number const state, char const c) {
   switch (state.tag) {
+    case AZ_JSON_NUMBER_NONE:
+      return az_json_number_none_parse(c);
     case AZ_JSON_NUMBER_MINUS:
       return az_json_number_minus_parse(c);
     case AZ_JSON_NUMBER_ZERO:
