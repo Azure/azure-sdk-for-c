@@ -12,7 +12,15 @@ extern "C" {
 #endif
 
 typedef enum {
+  // white space
   AZ_JSON_NUMBER_NONE,
+
+  // error
+  AZ_JSON_NUMBER_ERROR,
+
+  // the number is ready.
+  AZ_JSON_NUMBER_DONE,
+
   AZ_JSON_NUMBER_MINUS,
   AZ_JSON_NUMBER_ZERO,
   AZ_JSON_NUMBER_INTEGER,
@@ -21,8 +29,6 @@ typedef enum {
   AZ_JSON_NUMBER_E,
   AZ_JSON_NUMBER_E_SIGN,
   AZ_JSON_NUMBER_E_NUMBER,
-  AZ_JSON_NUMBER_DONE,
-  AZ_JSON_NUMBER_ERROR,
 } az_json_number_tag;
 
 typedef az_sign az_json_number_zero;

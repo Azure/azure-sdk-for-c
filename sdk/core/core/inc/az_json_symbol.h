@@ -12,9 +12,9 @@ extern "C" {
 
 enum {
   AZ_JSON_SYMBOL_NONE,
-  AZ_JSON_SYMBOL_CHAR,
-  AZ_JSON_SYMBOL_DONE,
   AZ_JSON_SYMBOL_ERROR,
+  AZ_JSON_SYMBOL_DONE,
+  AZ_JSON_SYMBOL_CHAR,
 };
 
 typedef int8_t az_json_symbol_tag;

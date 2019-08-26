@@ -13,9 +13,9 @@ extern "C" {
 
 enum {
   AZ_JSON_KEYWORD_NONE,
-  AZ_JSON_KEYWORD_CHAR,
-  AZ_JSON_KEYWORD_DONE,
   AZ_JSON_KEYWORD_ERROR,
+  AZ_JSON_KEYWORD_DONE,
+  AZ_JSON_KEYWORD_CHAR,
 };
 
 typedef int8_t az_json_keyword_tag;

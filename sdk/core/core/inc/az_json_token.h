@@ -17,11 +17,11 @@ extern "C" {
 
 enum {
   AZ_JSON_TOKEN_PROGRESS,
+  AZ_JSON_TOKEN_ERROR,
   AZ_JSON_TOKEN_KEYWORD,
   AZ_JSON_TOKEN_STRING,
   AZ_JSON_TOKEN_NUMBER,
   AZ_JSON_TOKEN_SYMBOL,
-  AZ_JSON_TOKEN_ERROR,
 };
 
 typedef int8_t az_json_token_tag;
