@@ -1,4 +1,4 @@
-# Options
+# Data Types
 
 ## Tagged Unions
 
