@@ -5,6 +5,7 @@
 #include <az_json_number.h>
 #include <az_json_string.h>
 #include <az_json_keyword.h>
+#include <az_json_token.h>
 
 #include <assert.h>
 #include <stdio.h>
@@ -81,6 +82,30 @@ void test_keyword_error(az_cstr const str) {
   TEST_ASSERT(s.tag == AZ_JSON_KEYWORD_ERROR);
 }
 
+typedef struct {
+  az_cstr buffer;
+  int i;
+  az_json_token token;
+} input_state;
+
+input_state create_input_state(az_cstr const s) {
+  return (input_state){
+    .buffer = s,
+    .i = 0,
+    .token = az_json_token_create_progress(az_json_progress_create_none()),
+  };
+}
+
+az_json_token get_next_token(input_state *p) {
+  for (; p->i < p->buffer.len; ++(p->i)) {
+    p->token = az_json_token_parse(p->token, p->buffer.p[p->i]);
+    if (p->token.tag != AZ_JSON_TOKEN_PROGRESS) {
+      break;
+    }
+  }
+  return p->token;
+}
+
 int main() {
   printf("\nnumber\n");
   test_number_done(AZ_CSTR("0"), 0);
@@ -101,5 +126,31 @@ int main() {
   test_keyword_done(AZ_CSTR("true"), AZ_JSON_KEYWORD_TRUE);
   test_keyword_done(AZ_CSTR("false"), AZ_JSON_KEYWORD_FALSE);
   test_keyword_error(AZ_CSTR("fulse"));
+
+  printf("\ntoken\n");
+  {
+    input_state state = create_input_state(AZ_CSTR("     null     -12.41e+1  \"Hello world!\" { "));
+    {
+      az_json_token token = get_next_token(&state);
+      TEST_ASSERT(token.tag == AZ_JSON_TOKEN_KEYWORD);
+      TEST_ASSERT(token.keyword.type == AZ_JSON_KEYWORD_NULL);
+    }
+    {
+      az_json_token token = get_next_token(&state);
+      TEST_ASSERT(token.tag == AZ_JSON_TOKEN_NUMBER);
+      TEST_ASSERT(token.number.number == -124.1);
+    }
+    {
+      az_json_token token = get_next_token(&state);
+      TEST_ASSERT(token.tag == AZ_JSON_TOKEN_STRING);
+      TEST_ASSERT(token.string.position == 12);
+    }
+    {
+      az_json_token token = get_next_token(&state);
+      TEST_ASSERT(token.tag = AZ_JSON_TOKEN_SYMBOL);
+      TEST_ASSERT(token.symbol.char_ == '{');
+    }
+  }
+
   return exit_code;
 }
