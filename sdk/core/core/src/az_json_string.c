@@ -3,6 +3,7 @@
 
 #include <az_json_string.h>
 
+#include <az_digit.h>
 #include <az_cstr.h>
 
 az_json_string az_json_string_none_parse(char const c) {
@@ -49,7 +50,7 @@ az_json_string az_json_string_esc_parse(int32_t position, char const c) {
   if (c == 'u') {
     return az_json_string_create_u((az_json_string_u){ .position = position, .code = 0, .i = 0 });
   }
-  char const e = az_json_esc_decode(c);
+  char const e = az_json_string_esc_decode(c);
   if (e != AZ_STR_TERMINAL) {
     return az_json_string_create_char((az_json_string_char){ .position = position, .code = c });
   }
@@ -100,7 +101,7 @@ az_json_string az_json_string_parse(az_json_string const state, char const c) {
       az_json_string_u const u = state.u;
       return az_json_string_u_parse(u.position + 1, u.code, u.i, c);
     case AZ_JSON_STRING_CLOSE:
-      return az_json_string_close_parse(state.close + 1, c);
+      return az_json_string_close_parse(state.close, c);
   }
   return az_json_string_create_error();
 }

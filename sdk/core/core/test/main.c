@@ -3,7 +3,10 @@
 
 #include <az_cstr.h>
 #include <az_json_number.h>
+#include <az_json_string.h>
+#include <az_json_keyword.h>
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdbool.h>
 
@@ -11,7 +14,7 @@ int exit_code = 0;
 
 #define TEST_ASSERT(c) \
   do { \
-    if(c) { printf("  - `%s`: succeeded\n", #c); } else { fprintf(stderr, "- `%s`: failed\n", #c); exit_code = 1; } \
+    if(c) { printf("  - `%s`: succeeded\n", #c); } else { fprintf(stderr, "- `%s`: failed\n", #c); assert(false); exit_code = 1; } \
   } while(false);
 
 az_json_number parse_number(az_cstr const str) {
@@ -39,7 +42,47 @@ void test_number_error(az_cstr const str) {
   TEST_ASSERT(n.tag == AZ_JSON_NUMBER_ERROR);
 }
 
+az_json_string parse_string(az_cstr const str) {
+  size_t const len = str.len;
+  az_json_string n = az_json_string_create_none();
+  for (size_t i = 0; i < len; ++i) {
+    n = az_json_string_parse(n, str.p[i]);
+  }
+  n = az_json_string_parse(n, AZ_STR_TERMINAL);
+  return n;
+}
+
+void test_string_done(az_cstr const str, int32_t const size, char const next) {
+  az_json_string const s = parse_string(str);
+  TEST_ASSERT(s.tag == AZ_JSON_STRING_DONE);
+  TEST_ASSERT(s.done.position == size);
+  TEST_ASSERT(s.done.next == next);
+}
+
+az_json_keyword parse_keyword(az_cstr const str) {
+  size_t const len = str.len;
+  az_json_keyword n = az_json_keyword_create_none();
+  for (size_t i = 0; i < len; ++i) {
+    n = az_json_keyword_parse(n, str.p[i]);
+  }
+  n = az_json_keyword_parse(n, AZ_STR_TERMINAL);
+  return n;
+}
+
+void test_keyword_done(az_cstr const str, az_json_keyword_type const type, char next) {
+  az_json_keyword const s = parse_keyword(str);
+  TEST_ASSERT(s.tag == AZ_JSON_KEYWORD_DONE);
+  TEST_ASSERT(s.done.type == type);
+  TEST_ASSERT(s.done.next == next);
+}
+
+void test_keyword_error(az_cstr const str) {
+  az_json_keyword const s = parse_keyword(str);
+  TEST_ASSERT(s.tag == AZ_JSON_KEYWORD_ERROR);
+}
+
 int main() {
+  printf("\nnumber\n");
   test_number_done(AZ_CSTR("0"), 0, AZ_STR_TERMINAL);
   test_number_done(AZ_CSTR("-0"), 0, AZ_STR_TERMINAL);
   test_number_done(AZ_CSTR("123"), 123, AZ_STR_TERMINAL);
@@ -49,72 +92,14 @@ int main() {
   // test_number_done(AZ_CSTR("-0.056"), -0.056, AZ_STR_TERMINAL);
   test_number_done(AZ_CSTR("1e+10"), 10000000000, AZ_STR_TERMINAL);
   test_number_error(AZ_CSTR("-00"));
+
+  printf("\nstring\n");
+  test_string_done(AZ_CSTR("\"Hello world!\""), 12, AZ_STR_TERMINAL);
+
+  printf("\nkeyword\n");
+  test_keyword_done(AZ_CSTR("null"), AZ_JSON_KEYWORD_NULL, AZ_STR_TERMINAL);
+  test_keyword_done(AZ_CSTR("true"), AZ_JSON_KEYWORD_TRUE, AZ_STR_TERMINAL);
+  test_keyword_done(AZ_CSTR("false"), AZ_JSON_KEYWORD_FALSE, AZ_STR_TERMINAL);
+  test_keyword_error(AZ_CSTR("fulse"));
   return exit_code;
 }
-
-/*
-az_error json_parse(az_cstr s) {
-  size_t i = 0;
-  az_json_value value;
-  return az_json_parse_value(s, &i, &value);
-}
-
-AZ_CSTR(json, "");
-AZ_CSTR(json_ws, "   \r \n \t ");
-AZ_CSTR(json_null, "null");
-AZ_CSTR(json_nulx, "nulx");
-AZ_CSTR(json_false, "false");
-AZ_CSTR(json_true, "true");
-AZ_CSTR(json_null_space, "null  ");
-AZ_CSTR(json_string, "\"Hello world!\"");
-AZ_CSTR(json_invalid_string, "\"Hello world\n\"");
-AZ_CSTR(json_no_end_string, "\"Hello");
-
-int main() {
-  ASSERT(json_parse(json) == AZ_JSON_ERROR_UNEXPECTED_END);
-  ASSERT(json_parse(json_ws) == AZ_JSON_ERROR_UNEXPECTED_END);
-  {
-    size_t i = 0;
-    az_json_value value;
-    const e = az_json_parse_value(json_null, &i, &value);
-    ASSERT(e == AZ_OK);
-    ASSERT(value.type == AZ_JSON_VALUE_NULL);
-  }
-  ASSERT(json_parse(json_nulx) == AZ_JSON_ERROR_UNEXPECTED_SYMBOL);
-  {
-    size_t i = 0;
-    az_json_value value;
-    const e = az_json_parse_value(json_false, &i, &value);
-    ASSERT(e == AZ_OK);
-    ASSERT(value.type == AZ_JSON_VALUE_FALSE);
-  }
-  {
-    size_t i = 0;
-    az_json_value value;
-    const e = az_json_parse_value(json_true, &i, &value);
-    ASSERT(e == AZ_OK);
-    ASSERT(value.type == AZ_JSON_VALUE_TRUE);
-  }
-  {
-    size_t i = 0;
-    az_json_value value;
-    const e = az_json_parse_value(json_null_space, &i, &value);
-    ASSERT(e == AZ_OK);
-    ASSERT(value.type == AZ_JSON_VALUE_NULL);
-  }
-  {
-    size_t i = 0;
-    az_json_value value;
-    const e = az_json_parse_value(json_string, &i, &value);
-    ASSERT(e == AZ_OK);
-    ASSERT(value.type == AZ_JSON_VALUE_STRING);
-    ASSERT(value.string.begin == 1);
-    // "Hello world!"
-    // 01234567890123
-    ASSERT(value.string.end == 13);
-  }
-  ASSERT(json_parse(json_invalid_string) == AZ_JSON_ERROR_UNEXPECTED_SYMBOL);
-  ASSERT(json_parse(json_no_end_string) == AZ_JSON_ERROR_UNEXPECTED_END);
-  return result;
-}
-*/
