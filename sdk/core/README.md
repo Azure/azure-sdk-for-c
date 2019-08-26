@@ -44,9 +44,7 @@ UTF-8. No MUTF-8. Defined in `az_cstr.h`. It's a pair of a pointer to `char cons
 az_cstr const hello_world = AZ_CSTR("Hello world!");
 ```
 
-## Ranges vs. Slices vs. Index Ranges
-
-Slices and index ranges.
+## Slices and Index Ranges
 
 ```c
 typedef struct {
