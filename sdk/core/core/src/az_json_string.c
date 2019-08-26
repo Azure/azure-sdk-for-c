@@ -43,7 +43,7 @@ char az_json_string_esc_decode(char c) {
     case 't':
       return '\t';
   }
-  return AZ_STR_TERMINAL;
+  return 0;
 }
 
 az_json_string az_json_string_esc_parse(int32_t position, char const c) {
@@ -51,7 +51,7 @@ az_json_string az_json_string_esc_parse(int32_t position, char const c) {
     return az_json_string_create_u((az_json_string_u){ .position = position, .code = 0, .i = 0 });
   }
   char const e = az_json_string_esc_decode(c);
-  if (e != AZ_STR_TERMINAL) {
+  if (e != 0) {
     return az_json_string_create_char((az_json_string_char){ .position = position, .code = c });
   }
   return az_json_string_create_error();
