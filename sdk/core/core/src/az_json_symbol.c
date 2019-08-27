@@ -3,7 +3,7 @@
 
 #include <az_json_symbol.h>
 
-az_json_symbol az_json_symbol_none_parse(char const c) {
+inline az_json_symbol az_json_symbol_none_parse(char const c) {
   switch (c) {
     case '{':
     case '}':
@@ -16,7 +16,7 @@ az_json_symbol az_json_symbol_none_parse(char const c) {
   return az_json_symbol_create_none();
 }
 
-az_json_symbol az_json_symbol_char_parse(char const c, char const next) {
+inline az_json_symbol az_json_symbol_char_parse(char const c, char const next) {
   return az_json_symbol_create_done((az_json_symbol_done){ .char_ = c, .next = next });
 }
 
