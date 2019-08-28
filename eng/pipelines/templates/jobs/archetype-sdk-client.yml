@@ -11,6 +11,8 @@ jobs:
   pool:
     vmImage: $(vm.image)
   steps:
+  - checkout: self
+    submodules: recursive
   - task: CMake@1
     inputs:
       cmakeArgs: ..
