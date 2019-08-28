@@ -15,6 +15,14 @@ typedef enum {
   AZ_JSON_ERROR = 0x10000,
 } az_error;
 
+#define AZ_RETURN_ON_ERROR(exp) \
+  do { \
+    az_error const error = (exp); \
+    if (error != AZ_OK) { \
+      return error; \
+    } \
+  } while (0)
+
 #ifdef __cplusplus
 }
 #endif

@@ -143,7 +143,7 @@ int main() {
     {
       az_json_token token = get_next_token(&state);
       TEST_ASSERT(token.tag == AZ_JSON_TOKEN_STRING);
-      TEST_ASSERT(token.string.position == 12);
+      TEST_ASSERT(token.string.size == 12);
     }
     {
       az_json_token token = get_next_token(&state);

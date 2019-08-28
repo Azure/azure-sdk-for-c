@@ -27,14 +27,14 @@ enum {
 typedef int8_t az_json_string_tag;
 
 typedef struct {
-  int32_t position;
+  int32_t size;
   int32_t code;
 } az_json_string_char;
 
 typedef int32_t az_json_string_esc;
 
 typedef struct {
-  int32_t position;
+  int32_t size;
   int32_t code;
   int8_t i;
 } az_json_string_u;
@@ -42,7 +42,7 @@ typedef struct {
 typedef int32_t az_json_string_close;
 
 typedef struct {
-  int32_t position;
+  size_t size;
   char next;
 } az_json_string_done;
 
