@@ -19,7 +19,7 @@ inline bool az_is_digit(char const c) {
   return az_in_range('0', '9', c);
 }
 
-inline int8_t az_to_digit(char const c) {
+inline uint8_t az_to_digit(char const c) {
   return c - '0';
 }
 
