@@ -13,6 +13,7 @@ jobs:
   steps:
   - checkout: self
     submodules: recursive
+    persistCredentials: true
   - task: CMake@1
     inputs:
       cmakeArgs: ..
