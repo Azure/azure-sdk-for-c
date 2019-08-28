@@ -23,10 +23,10 @@ az_json_keyword az_json_keyword_none_parse(char const c) {
 
 az_json_keyword az_json_keyword_check(az_json_keyword_char const state, char c, az_cstr value) {
   int8_t const i = state.size + 1;
-  if (value.len <= i) {
+  if (value.size <= i) {
     return az_json_keyword_create_done((az_json_keyword_done){ .type = state.type, .next = c });
   }
-  if (value.p[i] == c) {
+  if (value.begin == c) {
     return az_json_keyword_create_char((az_json_keyword_char){ .type = state.type, .size = i });
   }
   return az_json_keyword_create_error();
