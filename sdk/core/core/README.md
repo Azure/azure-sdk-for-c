@@ -1,5 +1,11 @@
 # Azure SDK Core Library
 
+In high-level languages, an [inversion of control](https://en.wikipedia.org/wiki/Inversion_of_control) is commonly used.
+For example, a generic JSON deserializer may call a user provided function to set object property value (similar to [Visitor Pattern](https://en.wikipedia.org/wiki/Visitor_pattern)). The principle requires a call-back
+function or a virtual table. In C, a call-back and a virtual table require an untyped parameter `void *context`.
+It's very hard to work safely with such function so Azure SDK Core library for C tries to avoid these technic.
+Instead, the Core library provides safe and useful parts to construct complex solutions.
+
 ## 1. Data Types
 
 ### 1.1. Tagged Unions
@@ -78,9 +84,9 @@ Additional information could be passed using output parameters.
 The main purpose of the JSON parser is to deserialize JSON HTTP Responses into known the data structure.
 The assumption is that we receive a valid standard JSON.
 
-### 2.1. Layer 0. JSON State Machine.
+### 2.1. Layer 0. JSON State Machine
 
-This layer is a JSON state machine which can be used as a part of asynchnous/reactive JSON parser.
+A JSON state machine which can be used as a part of asynchronous/reactive JSON parser.
 
 ```c
 typedef enum {
@@ -98,9 +104,9 @@ inline az_json_state az_json_state_value_parse(az_json_state state, char c);
 
 ### 2.2. Layer 1. Synchronous JSON Value Parser
 
-This layer is utility functions to read primitive values, object and arrays from a continuous JSON string.
+Utility functions to read primitive values, objects and arrays from a continuous JSON string.
 The functions doesn't maintain a stack for nested objects and arrays. The assumption is that deserializer knows
-the type structure and can maintain a proper stack.
+the structures and can maintain a proper stack.
 
 ```c
 typedef struct {
