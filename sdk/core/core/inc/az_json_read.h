@@ -60,6 +60,18 @@ inline az_json_value az_json_value_create_string(az_json_string const string) {
   return (az_json_value){ .tag = AZ_JSON_STRING, .string = string };
 }
 
+inline az_json_value az_json_value_create_number(double number) {
+  return (az_json_value){ .tag = AZ_JSON_NUMBER, .number = number };
+}
+
+inline az_json_value az_json_value_create_object(bool has_properties) {
+  return (az_json_value){ .tag = AZ_JSON_OBJECT, .object = has_properties };
+}
+
+inline az_json_value az_json_value_create_array(bool has_properties) {
+  return (az_json_value){ .tag = AZ_JSON_OBJECT, .array = has_properties };
+}
+
 az_error az_json_read_value(az_cstr const buffer, size_t *p_position, az_json_value *out_json_value);
 
 typedef struct {

@@ -117,11 +117,47 @@ inline az_json_state az_json_state_number_dot_parse(char const c) {
   return AZ_JSON_STATE_ERROR;
 }
 
+inline az_json_state az_json_state_number_fraction_parse(char const c) {
+  switch (c) {
+    case 'e': case 'E':
+      return AZ_JSON_STATE_NUMBER_E;
+  }
+  if (az_is_digit(c)) {
+    return AZ_JSON_STATE_NUMBER_FRACTION;
+  }
+  return AZ_JSON_STATE_NUMBER;
+}
+
+inline az_json_state az_json_state_number_e_parse(char const c) {
+  switch (c) {
+    case '-': case '+':
+      return AZ_JSON_STATE_NUMBER_E_SIGN;
+  }
+  return az_json_state_number_e_parse(c);
+}
+
+inline az_json_state az_json_state_number_e_sign_parse(char const c) {
+  return az_is_digit(c) ? AZ_JSON_STATE_NUMBER_DIGIT : AZ_JSON_STATE_ERROR;
+}
+
+inline az_json_state az_json_state_number_e_digit_parse(char const c) {
+  return az_is_digit(c) ? AZ_JSON_STATE_NUMBER_DIGIT : AZ_JSON_STATE_NUMBER;
+}
+
+inline bool az_is_white_space(char const c) {
+    switch (c) {
+      case ' ': case '\t': case '\n': case '\r':
+        return true;
+    }
+    return false;
+}
+
 inline az_json_state az_json_state_none_parse(char const c) {
+  if (az_is_white_space(c)) {
+    return AZ_JSON_STATE_NONE;
+  }
   switch (c)
   {
-    case ' ': case '\t': case '\n': case '\r':
-      return AZ_JSON_STATE_NONE;
     case 'n':
       return AZ_JSON_STATE_N;
     case 'f':
@@ -179,6 +215,23 @@ inline az_json_state az_json_state_string_esc_parse(char const c) {
   return AZ_JSON_STATE_ERROR;
 }
 
+inline az_json_state az_json_state_object_open_parse(char const c) {
+  switch (c) {
+    case '}':
+      return AZ_JSON_STATE_OBJECT_EMPTY;
+    case '"':
+      return AZ_JSON_STATE_OBJECT_PROPERTY;
+  }
+  return az_is_white_space(c) ? AZ_JSON_STATE_OBJECT_OPEN : AZ_JSON_STATE_ERROR;
+}
+
+inline az_json_state az_json_state_array_open_parse(char const c) {
+  if (c == ']') {
+    return AZ_JSON_STATE_ARRAY_EMPTY;
+  }
+  return az_is_white_space(c) ? AZ_JSON_STATE_OBJECT_OPEN : AZ_JSON_STATE_ARRAY_ITEM;
+}
+
 inline az_json_state az_json_state_value_parse(az_json_state const state, char const c) {
   switch (state) {
     case AZ_JSON_STATE_NONE:
@@ -231,6 +284,19 @@ inline az_json_state az_json_state_value_parse(az_json_state const state, char c
       return az_json_state_number_digit_parse(c);
     case AZ_JSON_STATE_NUMBER_DOT:
       return az_json_state_number_dot_parse(c);
+    case AZ_JSON_STATE_NUMBER_FRACTION:
+      return az_json_state_number_fraction_parse(c);
+    case AZ_JSON_STATE_NUMBER_E:
+      return az_json_state_number_e_parse(c);
+    case AZ_JSON_STATE_NUMBER_E_SIGN:
+      return az_json_state_number_e_sign_parse(c);
+    case AZ_JSON_STATE_NUMBER_E_DIGIT:
+      return az_json_state_number_e_digit_parse(c);
+
+    case AZ_JSON_STATE_OBJECT_OPEN:
+      return az_json_state_object_open_parse(c);
+    case AZ_JSON_STATE_ARRAY_OPEN:
+      return az_json_state_array_open_parse(c);
   }
   return AZ_JSON_STATE_ERROR;
 }
