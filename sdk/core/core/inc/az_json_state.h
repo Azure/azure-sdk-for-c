@@ -71,6 +71,15 @@ enum {
   AZ_JSON_STATE_ARRAY_EMPTY,
   // terminal - 1
   AZ_JSON_STATE_ARRAY_ITEM,
+
+  // terminal
+  AZ_JSON_STATE_COLON,
+  // terminal
+  AZ_JSON_STATE_COMMA,
+  // terminal
+  AZ_JSON_STATE_OBJECT_CLOSE,
+  // terminal
+  AZ_JSON_STATE_ARRAY_CLOSE,
 };
 
 typedef uint8_t az_json_state;
@@ -174,6 +183,14 @@ inline az_json_state az_json_state_none_parse(char const c) {
       return AZ_JSON_STATE_OBJECT_OPEN;
     case '[':
       return AZ_JSON_STATE_ARRAY_OPEN;
+    case ':':
+      return AZ_JSON_STATE_COLON;
+    case ',':
+      return AZ_JSON_STATE_COMMA;
+    case '}':
+      return AZ_JSON_STATE_OBJECT_CLOSE;
+    case ']':
+      return AZ_JSON_STATE_ARRAY_CLOSE;
   }
   if (az_is_digit(c)) {
     return AZ_JSON_STATE_NUMBER_DIGIT;

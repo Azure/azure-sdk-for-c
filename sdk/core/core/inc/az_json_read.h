@@ -43,7 +43,7 @@ typedef struct {
     // false - the object has properties (use `az_json_read_property` and `az_json_read_object_end`).
     bool object;
     // true - is done (an empty array).
-    // false - the array has items (use `az_json_read_property` and `az_json_read_object_end`).
+    // false - the array has items (use `az_json_read_value` and `az_json_read_array_end`).
     bool array;
   };
 } az_json_value;
@@ -74,20 +74,16 @@ inline az_json_value az_json_value_create_array(bool has_properties) {
 
 az_error az_json_read_value(az_cstr const buffer, size_t *const p_position, az_json_value *const out_json_value);
 
-az_error az_json_read_value(az_cstr const buffer, size_t *p_position, az_json_value *out_json_value);
-
 typedef struct {
   az_json_string name;
   az_json_value value;
 } az_json_property;
 
-az_error az_json_read_object_property(az_cstr const buffer, size_t *p_position, az_json_property *out_property);
+az_error az_json_read_object_property(az_cstr const buffer, size_t *const p_position, az_json_property *const out_property);
 
-az_error az_json_read_object_end(az_cstr const buffer, size_t *p_position, bool *out_more_properties);
+az_error az_json_read_object_end(az_cstr const buffer, size_t *const p_position, bool *const out_end);
 
-az_error az_json_read_array_item(az_cstr const buffer, size_t *p_position, az_json_value *out_item);
-
-az_error az_json_read_array_end(az_cstr const buffer, size_t *p_position, bool *out_more_items);
+az_error az_json_read_array_end(az_cstr const buffer, size_t *const p_position, bool *const out_end);
 
 #ifdef __cplusplus
 }
