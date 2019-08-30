@@ -158,6 +158,8 @@ az_error az_json_read_item(az_cstr const buffer, size_t *p_position, az_json_val
 az_error az_json_read_array_end(az_cstr const buffer, size_t *p_position, bool *out_more_items);
 ```
 
+JSON stack size https://softwareengineering.stackexchange.com/questions/279207/how-deeply-can-a-json-object-be-nested
+
 ## Issues
 
 - [ ] JSON number reader/writer should produce the same numbers as C library.
