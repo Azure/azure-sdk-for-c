@@ -23,6 +23,10 @@ inline uint8_t az_to_digit(char const c) {
   return c - '0';
 }
 
+inline uint8_t az_is_hex_digit(char const c) {
+  return az_is_digit(c) || az_in_range('a', 'f', c) || az_in_range('A', 'F', c);
+}
+
 #ifdef __cplusplus
 }
 #endif

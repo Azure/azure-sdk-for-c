@@ -4,8 +4,8 @@
 #ifndef AZ_JSON_READ_H
 #define AZ_JSON_READ_H
 
-#include <az_cstr.h>
-#include <az_error.h>
+#include <az_const_str.h>
+#include <az_result.h>
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -14,23 +14,23 @@
 extern "C" {
 #endif
 
-typedef enum {
-  AZ_JSON_ERROR_UNEXPECTED_END  = AZ_JSON_ERROR + 1,
+enum {
+  AZ_JSON_NO_MORE_ITEMS = AZ_JSON_RESULT + 1,
+  AZ_JSON_ERROR_UNEXPECTED_END,
   AZ_JSON_ERROR_UNEXPECTED_CHAR,
-} az_json_error;
+  AZ_JSON_ERROR_INVALID_STATE,
+};
 
-typedef struct {
-  size_t begin;
-  size_t end;
-} az_json_string;
+typedef az_const_str az_json_string;
 
 typedef enum {
-  AZ_JSON_NULL,
-  AZ_JSON_BOOLEAN,
-  AZ_JSON_STRING,
-  AZ_JSON_NUMBER,
-  AZ_JSON_OBJECT,
-  AZ_JSON_ARRAY,
+  AZ_JSON_NONE    = 0,
+  AZ_JSON_NULL    = 1,
+  AZ_JSON_BOOLEAN = 2,
+  AZ_JSON_NUMBER  = 3,
+  AZ_JSON_STRING  = 4,
+  AZ_JSON_OBJECT  = 5,
+  AZ_JSON_ARRAY   = 6,
 } az_json_value_tag;
 
 typedef struct {
@@ -39,51 +39,36 @@ typedef struct {
     bool boolean;
     az_json_string string;
     double number;
-    // true - is done (an empty object).
-    // false - the object has properties (use `az_json_read_property` and `az_json_read_object_end`).
-    bool object;
-    // true - is done (an empty array).
-    // false - the array has items (use `az_json_read_value` and `az_json_read_array_end`).
-    bool array;
   };
 } az_json_value;
-
-inline az_json_value az_json_value_create_null() {
-  return (az_json_value){ .tag = AZ_JSON_NULL };
-}
-
-inline az_json_value az_json_value_create_boolean(bool const boolean) {
-  return (az_json_value){ .tag = AZ_JSON_BOOLEAN, .boolean = boolean };
-}
-
-inline az_json_value az_json_value_create_string(az_json_string const string) {
-  return (az_json_value){ .tag = AZ_JSON_STRING, .string = string };
-}
-
-inline az_json_value az_json_value_create_number(double number) {
-  return (az_json_value){ .tag = AZ_JSON_NUMBER, .number = number };
-}
-
-inline az_json_value az_json_value_create_object(bool has_properties) {
-  return (az_json_value){ .tag = AZ_JSON_OBJECT, .object = has_properties };
-}
-
-inline az_json_value az_json_value_create_array(bool has_properties) {
-  return (az_json_value){ .tag = AZ_JSON_OBJECT, .array = has_properties };
-}
-
-az_error az_json_read_value(az_cstr const buffer, size_t *const p_position, az_json_value *const out_json_value);
 
 typedef struct {
   az_json_string name;
   az_json_value value;
-} az_json_property;
+} az_json_member;
 
-az_error az_json_read_object_property(az_cstr const buffer, size_t *const p_position, az_json_property *const out_property);
+typedef uint64_t az_json_stack;
 
-az_error az_json_read_object_end(az_cstr const buffer, size_t *const p_position, bool *const out_end);
+typedef enum {
+  AZ_JSON_STACK_OBJECT,
+  AZ_JSON_STACK_ARRAY,
+} az_json_stack_item;
 
-az_error az_json_read_array_end(az_cstr const buffer, size_t *const p_position, bool *const out_end);
+typedef struct {
+  az_const_str buffer;
+  bool no_more_items;
+  az_json_stack stack;
+} az_json_state;
+
+az_result az_json_state_init(az_json_state *const out_state, az_const_str const buffer);
+
+az_result az_json_read_value(az_json_state *const p_state, az_json_value *const out_value);
+
+az_result az_json_read_object_member(az_json_state *const p_state, az_json_member *const out_member);
+
+az_result az_json_read_array_element(az_json_state *const p_state, az_json_value *const out_value);
+
+az_result az_json_state_done(az_json_state *const p_state);
 
 #ifdef __cplusplus
 }

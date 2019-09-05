@@ -2,7 +2,7 @@
 
 In high-level languages, an [inversion of control](https://en.wikipedia.org/wiki/Inversion_of_control) is commonly used.
 For example, a generic JSON deserializer may call a user provided function to set object property value (similar to [Visitor Pattern](https://en.wikipedia.org/wiki/Visitor_pattern)). The principle requires a call-back
-function or a virtual table. In C, a call-back and a virtual table require an untyped parameter `void *context`.
+function or a virtual table. In C, a call-back or a virtual table requires an untyped parameter `void *context`.
 It's very hard to work safely with such function so Azure SDK Core library for C tries to avoid these technic.
 Instead, the Core library provides safe and useful parts to construct complex solutions.
 
@@ -31,6 +31,11 @@ inline az_mytype_bar az_mytype_bar_create(double const a, double const b) {
   return (az_mytype_bar){ .a = a, .b = b };
 }
 
+struct my_type {
+};
+
+#define MY_TYPE struct my_type
+
 typedef struct {
   az_mytype_tag tag;
   union {
@@ -46,20 +51,29 @@ inline az_mytype_create_bar(az_mytype_bar const bar) {
 
 ### 1.2. Strings
 
-UTF-8. No MUTF-8. Defined in `az_cstr.h`. It's a pair of a pointer to `char const` and size.
+UTF-8. No MUTF-8. Defined in `az_str.h`. It's a pair of a pointer to `char const` and size.
 
 ```c
 typedef struct {
-  char const *begin;
-  size_t size;
-} az_cstr;
+  char const *const begin;
+  size_t const size;
+} az_const_str;
 
-az_cstr const hello_world = AZ_CSTR("Hello world!");
+az_const_str const hello_world = AZ_CONST_STR("Hello world!");
+
+typedef struct {
+  char *const begin;
+  size_t const size;
+} az_str;
+
+inline az_const_str az_to_const_str(az_str const str) {
+  return (az_const_str){ .begin = str.begin, .size = str.size };
+}
 ```
 
 ### 1.3 Error Structure
 
-Common `enum az_error`.
+Common `enum az_result`.
 
 ```c
 // az_core.h
@@ -69,16 +83,16 @@ typedef enum {
   AZ_JSON_ERROR    = 0x10000,
   AZ_STORAGE_ERROR = 0x20000,
   ...
-} az_error;
+} az_result;
 ```
 
 ```c
 // az_storage.h
-typedef enum {
+enum {
   AZ_STORAGE_READ_ERROR = AZ_STORAGE_ERROR + 1,
-} az_storage_error;
+};
 
-az_error az_storage_read(...);
+az_result az_storage_read(...);
 ```
 
 Additional information could be passed using output parameters.
@@ -113,12 +127,14 @@ The functions doesn't maintain a stack for nested objects and arrays. The assump
 the structures and can maintain a proper stack.
 
 ```c
-typedef struct {
-  size_t begin;
-  size_t end;
-} az_json_string;
+typedef struct {} az_json_reader;
+
+az_json_reader az_json_reader_create(az_const_str const buffer);
+
+typedef az_const_str az_json_string;
 
 typedef enum {
+  AZ_JSON_NONE,
   AZ_JSON_NULL,
   AZ_JSON_BOOLEAN,
   AZ_JSON_STRING,
@@ -133,29 +149,21 @@ typedef struct {
     bool boolean;
     az_json_string string;
     double number;
-    // true - is done (an empty object).
-    // false - the object has properties (use `az_json_read_property` and `az_json_read_object_end`).
-    bool object;
-    // true - is done (an empty array).
-    // false - the array has items (use `az_json_read_property` and `az_json_read_object_end`).
-    bool array;
   };
 } az_json_value;
 
-az_error az_json_read_value(az_cstr const buffer, size_t *p_position, az_json_value *out_json_value);
+az_error az_json_read_value(az_json_reader *const p_reader, az_json_value *const out_value);
 
 typedef struct {
   az_json_string name;
   az_json_value value;
 } az_json_property;
 
-az_error az_json_read_property(az_cstr const buffer, size_t *p_position, az_json_property *out_property);
+// if out_property->value.tag == AZ_JSON_NONE then there are no more properties and the object is closed.
+az_error az_json_read_property(az_json_reader *const p_reader, az_json_property *const out_property);
 
-az_error az_json_read_object_end(az_cstr const buffer, size_t *p_position, bool *out_more_properties);
-
-az_error az_json_read_item(az_cstr const buffer, size_t *p_position, az_json_value *out_item);
-
-az_error az_json_read_array_end(az_cstr const buffer, size_t *p_position, bool *out_more_items);
+// if out_value->tag == AZ_JSON_NONE then there are no more items and the array is closed.
+az_error az_json_read_item(az_json_reader *const p_reader, az_json_value *const out_value);
 ```
 
 JSON stack size https://softwareengineering.stackexchange.com/questions/279207/how-deeply-can-a-json-object-be-nested

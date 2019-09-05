@@ -1,144 +1,78 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// SPDX-License-Identifier: MIT
+
 #include <az_json_read.h>
 
-#include <az_json_state.h>
-
-inline az_error az_json_result(az_error const error, size_t *const p_index, size_t i) {
-  *p_index = i;
-  return error;
+/*
+inline bool az_json_stack_is_empty(az_json_state const *const p_state) {
+  return p_state->stack == 1;
 }
 
-inline az_error az_json_value_ok(
-  size_t *const p_index,
-  size_t const i,
-  az_json_value *const out_value,
-  az_json_value const value
-) {
-  *out_value = value;
-  return az_json_result(AZ_OK, p_index, i);
+inline az_json_stack_item az_json_stack_last(az_json_state const *const p_state) {
+  return p_state->stack & 1;
 }
 
-az_error az_json_read_value(az_cstr const buffer, size_t *const p_index, az_json_value *const out_value) {
-  az_json_state state = AZ_JSON_STATE_NONE;
-  size_t string_open;
-  size_t i = *p_index;
-  for (; i < buffer.size; ++i) {
-    char const c = az_cstr_item(buffer, i);
-    state = az_json_state_value_parse(state, c);
-    switch (state) {
-      case AZ_JSON_STATE_ERROR:
-        *p_index = i + 1;
-        return AZ_JSON_ERROR_UNEXPECTED_CHAR;
-      case AZ_JSON_STATE_TRUE:
-        *out_value = az_json_value_create_boolean(true);
-        *p_index = i + 1;
-        return AZ_OK;
-      case AZ_JSON_STATE_FALSE:
-        *out_value = az_json_value_create_boolean(false);
-        *p_index = i + 1;
-        return AZ_OK;
-      case AZ_JSON_STATE_NULL:
-        *out_value = az_json_value_create_null();
-        *p_index = i + 1;
-        return AZ_OK;
-      case AZ_JSON_STATE_STRING_OPEN:
-        string_open = i + 1;
-        break;
-      case AZ_JSON_STATE_STRING:
-        *out_value = az_json_value_create_string((az_json_string){ .begin = string_open, .end = i });
-        *p_index = i + 1;
-        return AZ_OK;
-      case AZ_JSON_STATE_NUMBER:
-        *out_value = az_json_value_create_number(0);
-        *p_index = i;
-        return AZ_OK;
-      case AZ_JSON_STATE_OBJECT_EMPTY:
-        *out_value = az_json_value_create_object(true);
-        *p_index = i + 1;
-        return AZ_OK;
-      case AZ_JSON_STATE_OBJECT_PROPERTY:
-        *out_value = az_json_value_create_object(false);
-        *p_index = i;
-        return AZ_OK;
-      case AZ_JSON_STATE_ARRAY_EMPTY:
-        *out_value = az_json_value_create_array(true);
-        *p_index = i + 1;
-        return AZ_OK;
-      case AZ_JSON_STATE_ARRAY_ITEM:
-        *out_value = az_json_value_create_array(false);
-        *p_index = i;
-        return AZ_OK;
-      case AZ_JSON_STATE_ARRAY_CLOSE:
-      case AZ_JSON_STATE_OBJECT_CLOSE:
-      case AZ_JSON_STATE_COLON:
-      case AZ_JSON_STATE_COMMA:
-        *p_index = i;
-        return AZ_JSON_ERROR_UNEXPECTED_CHAR;
+az_result az_json_state_init(az_json_state *const out_state, az_const_str const buffer) {
+  *out_state = (az_json_state){
+    .buffer = buffer,
+    .no_more_items = false,
+    .stack = 1,
+  };
+}
+
+az_result az_json_stack_last_check(az_json_state *const p_state, az_json_stack_item const expected) {
+  return !az_json_stack_is_empty(p_state) && az_json_stack_last(p_state) == expected
+    ? AZ_OK
+    : AZ_JSON_ERROR_INVALID_STATE;
+}
+
+void az_json_read_white_space(az_json_state *const p_state) {
+  size_t size = p_state->buffer.size;
+  size_t i = 0;
+  for (; i < size; ++i) {
+    switch (az_const_str_item(p_state->buffer, i)) {
+      case ' ': case '\t': case '\n': case '\r':
+        continue;
     }
+    break;
   }
-  *p_index = i;
-  return AZ_JSON_ERROR_UNEXPECTED_END;
+  p_state->buffer = az_const_str_from(p_state->buffer, i);
 }
 
-az_error az_json_read_non_whitespace(az_cstr const buffer, size_t *const p_index, az_json_state *out_state) {
-  az_json_state state = AZ_JSON_STATE_NONE;
-  size_t i = *p_index;
-  for (; i < buffer.size; ++i) {
-    char const c = az_cstr_item(buffer, i);
-    state = az_json_state_value_parse(state, c);
-    if(state != AZ_JSON_STATE_NONE) {
-      *p_index = i + 1;
-      *out_state = state;
-      return AZ_OK;
-    }
-  }
-  *p_index = i;
-  return AZ_JSON_ERROR_UNEXPECTED_END;
+az_result az_json_state_no_more_items_check() {
+
 }
 
-az_error az_json_read_object_property(az_cstr const buffer, size_t *const p_position, az_json_property *const out_property) {
-  {
-    az_json_value name;
-    AZ_RETURN_ON_ERROR(az_json_read_value(buffer, p_position, &name));
-    if (name.tag != AZ_JSON_STRING) {
-      return AZ_JSON_ERROR_UNEXPECTED_CHAR;
-    }
-    out_property->name = name.string;
+az_result az_json_read_value(az_json_state *const p_state, az_json_value *const out_value) {
+  if (!az_json_stack_is_empty(p_state) || p_state->no_more_items) {
+    return AZ_JSON_ERROR_INVALID_STATE;
   }
-  {
-    az_json_state state;
-    AZ_RETURN_ON_ERROR(az_json_read_non_whitespace(buffer, p_position, &state));
-    if (state != AZ_JSON_STATE_COLON) {
-      return AZ_JSON_ERROR_UNEXPECTED_CHAR;
-    }
-  }
-  AZ_RETURN_ON_ERROR(az_json_read_value(buffer, p_position, &out_property->value));
-  return AZ_OK;
+  az_json_read_white_space(p_state);
+
 }
 
-az_error az_json_read_object_end(az_cstr const buffer, size_t *const p_position, bool *const out_end) {
-  az_json_state state;
-  AZ_RETURN_ON_ERROR(az_json_read_non_whitespace(buffer, p_position, &state));
-  switch (state) {
-    case AZ_JSON_STATE_COMMA:
-      *out_end = false;
-      return AZ_OK;
-    case AZ_JSON_STATE_OBJECT_CLOSE:
-      *out_end = true;
-      return AZ_OK;
+az_result az_json_read_object_member(az_json_state *const p_state, az_json_member *const out_member) {
+  AZ_RETURN_ON_ERROR(az_json_stack_last_check(p_state, AZ_JSON_STACK_OBJECT));
+  if (p_state->no_more_items) {
+    // p_state->stack >>= 1;
+    // az_json_read_white_space(p_state);
+
+    // TODO: move to the parent item.
+    return AZ_JSON_NO_MORE_ITEMS;
   }
-  return AZ_JSON_ERROR_UNEXPECTED_CHAR;
 }
 
-az_error az_json_read_array_end(az_cstr const buffer, size_t *const p_position, bool *const out_end) {
-  az_json_state state;
-  AZ_RETURN_ON_ERROR(az_json_read_non_whitespace(buffer, p_position, &state));
-  switch (state) {
-    case AZ_JSON_STATE_COMMA:
-      *out_end = false;
-      return AZ_OK;
-    case AZ_JSON_STATE_ARRAY_CLOSE:
-      *out_end = true;
-      return AZ_OK;
+az_result az_json_read_array_element(az_json_state *const p_state, az_json_value *const out_value) {
+  AZ_RETURN_ON_ERROR(az_json_stack_last_check(p_state, AZ_JSON_STACK_ARRAY));
+  if (p_state->no_more_items) {
+    // TODO: move to the parent item.
+    return AZ_JSON_NO_MORE_ITEMS;
   }
-  return AZ_JSON_ERROR_UNEXPECTED_CHAR;
 }
+
+az_result az_json_state_done(az_json_state const *const p_state) {
+  return p_state->buffer.size == 0 && az_json_stack_is_empty(p_state) && p_state->no_more_items == true
+    ? AZ_OK
+    : AZ_JSON_ERROR_INVALID_STATE;
+}
+*/

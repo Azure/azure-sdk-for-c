@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef AZ_ERROR_H
-#define AZ_ERROR_H
+#ifndef AZ_RESULT_H
+#define AZ_RESULT_H
 
 #include <stdint.h>
 
@@ -12,14 +12,14 @@ extern "C" {
 
 typedef enum {
   AZ_OK = 0,
-  AZ_JSON_ERROR = 0x10000,
-} az_error;
+  AZ_JSON_RESULT = 0x10000,
+} az_result;
 
 #define AZ_RETURN_ON_ERROR(exp) \
   do { \
-    az_error const error = (exp); \
-    if (error != AZ_OK) { \
-      return error; \
+    az_result const result = (exp); \
+    if (result != AZ_OK) { \
+      return result; \
     } \
   } while (0)
 

@@ -1,8 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_cstr.h>
-#include <az_json_read.h>
+#include <az_json_token_state.h>
 
 #include <assert.h>
 #include <stdio.h>
@@ -12,75 +11,34 @@ int exit_code = 0;
 
 #define TEST_ASSERT(c) \
   do { \
-    if(c) { printf("  - `%s`: succeeded\n", #c); } else { fprintf(stderr, "- `%s`: failed\n", #c); assert(false); exit_code = 1; } \
+    if(c) { \
+      printf("  - `%s`: succeeded\n", #c); \
+    } else { \
+      fprintf(stderr, "  - `%s`: failed\n", #c); \
+      assert(false); \
+      exit_code = 1; \
+    } \
   } while(false);
 
+void json_token_state(az_const_str const input, az_const_str const expected) {
+  size_t const size = input.size;
+  TEST_ASSERT(size == expected.size);
+  az_jts state = AZ_JTS_SPACE;
+  for (size_t i = 0; i < size; ++i) {
+    state = az_jts_next(state, az_const_str_item(input, i));
+    printf(">>%d<<\n", (int)state);
+    TEST_ASSERT(state == az_const_str_item(expected, i));
+  }
+}
+
 int main() {
-
-  printf("\nparse value\n");
-  {
-    size_t i = 0;
-    az_json_value value;
-    az_error const result = az_json_read_value(AZ_CSTR("null"), &i, &value);
-    TEST_ASSERT(result == AZ_OK);
-    TEST_ASSERT(value.tag == AZ_JSON_NULL);
-  }
-
-  {
-    size_t i = 0;
-    az_json_value value;
-    az_error const result = az_json_read_value(AZ_CSTR("    false "), &i, &value);
-    TEST_ASSERT(result == AZ_OK);
-    TEST_ASSERT(value.tag == AZ_JSON_BOOLEAN);
-    TEST_ASSERT(value.boolean == false);
-  }
-
-  {
-    size_t i = 0;
-    az_json_value value;
-    az_error const result = az_json_read_value(AZ_CSTR("    {   } "), &i, &value);
-    TEST_ASSERT(result == AZ_OK);
-    TEST_ASSERT(value.tag == AZ_JSON_OBJECT);
-    TEST_ASSERT(value.object == true);
-  }
-
-  {
-    //                        01234567 89 0123456
-    az_cstr buffer = AZ_CSTR("    {  \"a\" : 4 } ");
-    size_t i = 0;
-    az_json_value value;
-    {
-      az_error const result = az_json_read_value(buffer, &i, &value);
-      TEST_ASSERT(result == AZ_OK);
-      TEST_ASSERT(value.tag == AZ_JSON_OBJECT);
-      TEST_ASSERT(value.object == false);
-    }
-    {
-      az_json_property property;
-      az_error const result = az_json_read_object_property(buffer, &i, &property);
-      TEST_ASSERT(result == AZ_OK);
-      TEST_ASSERT(property.name.begin = 8);
-      TEST_ASSERT(property.name.end = 9);
-      TEST_ASSERT(property.value.tag == AZ_JSON_NUMBER);
-    }
-    {
-      bool end;
-      az_error result = az_json_read_object_end(buffer, &i, &end);
-      TEST_ASSERT(result == AZ_OK);
-      TEST_ASSERT(end);
-    }
-  }
-
-  {
-    size_t i = 0;
-    az_json_value value;
-    //                                                  01234 567890 12
-    az_error const result = az_json_read_value(AZ_CSTR("    \"hello\"  "), &i, &value);
-    TEST_ASSERT(result == AZ_OK);
-    TEST_ASSERT(value.tag == AZ_JSON_STRING);
-    TEST_ASSERT(value.string.begin == 5);
-    TEST_ASSERT(value.string.end == 10);
-  }
-
+  json_token_state(AZ_CONST_STR("  "), AZ_CONST_STR("\0\0"));
+  json_token_state(AZ_CONST_STR("  12 "), AZ_CONST_STR("\0\0\x32\x32\2"));
+  json_token_state(AZ_CONST_STR("  sa "), AZ_CONST_STR("\0\0\1\1\1"));
+  json_token_state(AZ_CONST_STR("  12.4 "), AZ_CONST_STR("\0\0\x32\x32\x34\x35\2"));
+  json_token_state(AZ_CONST_STR("-0.66e+55 "), AZ_CONST_STR("\x30\x31\x34\x35\x35\x38\x39\x3A\x3A\2"));
+  json_token_state(AZ_CONST_STR("-0.66e+ "), AZ_CONST_STR("\x30\x31\x34\x35\x35\x38\x39\1"));
+  json_token_state(AZ_CONST_STR(" true "), AZ_CONST_STR("\0\x28\x29\x2A\x2B\2"));
+  json_token_state(AZ_CONST_STR(" \"\" "), AZ_CONST_STR("\0\x40\x29\x2A\x2B\2"));
   return exit_code;
 }
