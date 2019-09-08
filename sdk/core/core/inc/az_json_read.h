@@ -55,14 +55,14 @@ typedef enum {
 } az_json_stack_item;
 
 typedef struct {
-  az_const_str buffer;
-  bool no_more_items;
+  char const *begin;
+  char const *end;
   az_json_stack stack;
 } az_json_state;
 
-az_result az_json_state_init(az_json_state *const out_state, az_const_str const buffer);
+az_json_state az_json_state_create(az_const_str const buffer);
 
-az_result az_json_read_value(az_json_state *const p_state, az_json_value *const out_value);
+az_result az_json_read(az_json_state *const p_state, az_json_value *const out_value);
 
 az_result az_json_read_object_member(az_json_state *const p_state, az_json_member *const out_member);
 

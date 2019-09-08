@@ -14,80 +14,82 @@ extern "C" {
 #endif
 
 enum {
-  AZ_JTS_PREFIX_MASK     = 0xF0,
+  AZ_JTS_PREFIX_MASK       = 0xF0,
 
-  AZ_JTS_SPACE           = 0,
+  AZ_JTS_SPACE             = 0,
 
-  AZ_JTS_ERROR           = 1,
+  AZ_JTS_ERROR             = 1,
 
-  AZ_JTS_VALUE_SPACE     = 2,
+  AZ_JTS_VALUE_SPACE       = 2,
+  AZ_JTS_OBJECT_OPEN_SPACE = 3,
+  AZ_JTS_ARRAY_OPEN_SPACE  = 4,
 
-  AZ_JTS_COMMA           = 3,
-  AZ_JTS_COLON           = 4,
+  AZ_JTS_COMMA             = 5,
+  AZ_JTS_COLON             = 6,
 
   // null
-  AZ_JTS_NULL_PREFIX     = AZ_JSON_NULL << 4,
+  AZ_JTS_NULL_PREFIX       = AZ_JSON_NULL << 4,
 
-  AZ_JTS_N               = AZ_JTS_NULL_PREFIX + 0,
-  AZ_JTS_NU              = AZ_JTS_NULL_PREFIX + 1,
-  AZ_JTS_NUL             = AZ_JTS_NULL_PREFIX + 2,
-  AZ_JTS_NULL            = AZ_JTS_NULL_PREFIX + 3,
+  AZ_JTS_N                 = AZ_JTS_NULL_PREFIX + 0,
+  AZ_JTS_NU                = AZ_JTS_NULL_PREFIX + 1,
+  AZ_JTS_NUL               = AZ_JTS_NULL_PREFIX + 2,
+  AZ_JTS_NULL              = AZ_JTS_NULL_PREFIX + 3,
 
   // boolean
-  AZ_JTS_BOOLEAN_PREFIX  = AZ_JSON_BOOLEAN << 4,
+  AZ_JTS_BOOLEAN_PREFIX    = AZ_JSON_BOOLEAN << 4,
 
-  AZ_JTS_F               = AZ_JTS_BOOLEAN_PREFIX + 0,
-  AZ_JTS_FA              = AZ_JTS_BOOLEAN_PREFIX + 1,
-  AZ_JTS_FAL             = AZ_JTS_BOOLEAN_PREFIX + 2,
-  AZ_JTS_FALS            = AZ_JTS_BOOLEAN_PREFIX + 3,
-  AZ_JTS_FALSE           = AZ_JTS_BOOLEAN_PREFIX + 4,
+  AZ_JTS_F                 = AZ_JTS_BOOLEAN_PREFIX + 0,
+  AZ_JTS_FA                = AZ_JTS_BOOLEAN_PREFIX + 1,
+  AZ_JTS_FAL               = AZ_JTS_BOOLEAN_PREFIX + 2,
+  AZ_JTS_FALS              = AZ_JTS_BOOLEAN_PREFIX + 3,
+  AZ_JTS_FALSE             = AZ_JTS_BOOLEAN_PREFIX + 4,
 
-  AZ_JTS_T               = AZ_JTS_BOOLEAN_PREFIX + 8,
-  AZ_JTS_TR              = AZ_JTS_BOOLEAN_PREFIX + 9,
-  AZ_JTS_TRU             = AZ_JTS_BOOLEAN_PREFIX + 0xA,
-  AZ_JTS_TRUE            = AZ_JTS_BOOLEAN_PREFIX + 0xB,
+  AZ_JTS_T                 = AZ_JTS_BOOLEAN_PREFIX + 8,
+  AZ_JTS_TR                = AZ_JTS_BOOLEAN_PREFIX + 9,
+  AZ_JTS_TRU               = AZ_JTS_BOOLEAN_PREFIX + 0xA,
+  AZ_JTS_TRUE              = AZ_JTS_BOOLEAN_PREFIX + 0xB,
 
   // number
-  AZ_JTS_NUMBER_PREFIX   = AZ_JSON_NUMBER << 4,
+  AZ_JTS_NUMBER_PREFIX     = AZ_JSON_NUMBER << 4,
 
-  AZ_JTS_NUMBER_MINUS    = AZ_JTS_NUMBER_PREFIX + 0,
-  AZ_JTS_NUMBER_ZERO     = AZ_JTS_NUMBER_PREFIX + 1,
-  AZ_JTS_NUMBER_DIGIT    = AZ_JTS_NUMBER_PREFIX + 2,
+  AZ_JTS_NUMBER_MINUS      = AZ_JTS_NUMBER_PREFIX + 0,
+  AZ_JTS_NUMBER_ZERO       = AZ_JTS_NUMBER_PREFIX + 1,
+  AZ_JTS_NUMBER_DIGIT      = AZ_JTS_NUMBER_PREFIX + 2,
 
-  AZ_JTS_NUMBER_DOT      = AZ_JTS_NUMBER_PREFIX + 4,
-  AZ_JTS_NUMBER_FRACTION = AZ_JTS_NUMBER_PREFIX + 5,
+  AZ_JTS_NUMBER_DOT        = AZ_JTS_NUMBER_PREFIX + 4,
+  AZ_JTS_NUMBER_FRACTION   = AZ_JTS_NUMBER_PREFIX + 5,
 
-  AZ_JTS_NUMBER_E        = AZ_JTS_NUMBER_PREFIX + 8,
-  AZ_JTS_NUMBER_E_SIGN   = AZ_JTS_NUMBER_PREFIX + 9,
-  AZ_JTS_NUMBER_E_DIGIT  = AZ_JTS_NUMBER_PREFIX + 0xA,
+  AZ_JTS_NUMBER_E          = AZ_JTS_NUMBER_PREFIX + 8,
+  AZ_JTS_NUMBER_E_SIGN     = AZ_JTS_NUMBER_PREFIX + 9,
+  AZ_JTS_NUMBER_E_DIGIT    = AZ_JTS_NUMBER_PREFIX + 0xA,
 
   // string
-  AZ_JTS_STRING_PREFIX   = AZ_JSON_STRING << 4,
+  AZ_JTS_STRING_PREFIX     = AZ_JSON_STRING << 4,
 
-  AZ_JTS_STRING_OPEN     = AZ_JSON_STRING + 1,
-  AZ_JTS_STRING_CLOSE    = AZ_JSON_STRING + 2,
+  AZ_JTS_STRING_OPEN       = AZ_JSON_STRING + 1,
+  AZ_JTS_STRING_CLOSE      = AZ_JSON_STRING + 2,
 
-  AZ_JTS_STRING_CHAR     = AZ_JSON_STRING + 3,
-  AZ_JTS_STRING_ESC      = AZ_JSON_STRING + 4,
-  AZ_JTS_STRING_ESC_CHAR = AZ_JSON_STRING + 5,
+  AZ_JTS_STRING_CHAR       = AZ_JSON_STRING + 3,
+  AZ_JTS_STRING_ESC        = AZ_JSON_STRING + 4,
+  AZ_JTS_STRING_ESC_CHAR   = AZ_JSON_STRING + 5,
 
-  AZ_JTS_STRING_ESC_U    = AZ_JSON_STRING + 8,
-  AZ_JTS_STRING_ESC_U1   = AZ_JSON_STRING + 9,
-  AZ_JTS_STRING_ESC_U2   = AZ_JSON_STRING + 0xA,
-  AZ_JTS_STRING_ESC_U3   = AZ_JSON_STRING + 0xB,
-  AZ_JTS_STRING_ESC_U4   = AZ_JSON_STRING + 0xC,
+  AZ_JTS_STRING_ESC_U      = AZ_JSON_STRING + 8,
+  AZ_JTS_STRING_ESC_U1     = AZ_JSON_STRING + 9,
+  AZ_JTS_STRING_ESC_U2     = AZ_JSON_STRING + 0xA,
+  AZ_JTS_STRING_ESC_U3     = AZ_JSON_STRING + 0xB,
+  AZ_JTS_STRING_ESC_U4     = AZ_JSON_STRING + 0xC,
 
   // object
-  AZ_JTS_OBJECT_PREFIX   = AZ_JSON_OBJECT << 4,
+  AZ_JTS_OBJECT_PREFIX     = AZ_JSON_OBJECT << 4,
 
-  AZ_JTS_OBJECT_OPEN     = AZ_JTS_OBJECT_PREFIX + 0,
-  AZ_JTS_OBJECT_CLOSE    = AZ_JTS_OBJECT_PREFIX + 1,
+  AZ_JTS_OBJECT_OPEN       = AZ_JTS_OBJECT_PREFIX + 0,
+  AZ_JTS_OBJECT_CLOSE      = AZ_JTS_OBJECT_PREFIX + 1,
 
   // array
-  AZ_JTS_ARRAY_PREFIX    = AZ_JSON_ARRAY << 4,
+  AZ_JTS_ARRAY_PREFIX      = AZ_JSON_ARRAY << 4,
 
-  AZ_JTS_ARRAY_OPEN      = AZ_JTS_ARRAY_PREFIX + 0,
-  AZ_JTS_ARRAY_CLOSE     = AZ_JTS_ARRAY_PREFIX + 1,
+  AZ_JTS_ARRAY_OPEN        = AZ_JTS_ARRAY_PREFIX + 0,
+  AZ_JTS_ARRAY_CLOSE       = AZ_JTS_ARRAY_PREFIX + 1,
 };
 
 typedef uint8_t az_jts;
@@ -100,7 +102,7 @@ inline az_jts az_jts_space_only(char const c, az_jts state) {
   return AZ_JTS_ERROR;
 }
 
-inline az_jts az_jts_space_next(char const c) {
+inline az_jts az_jts_space_next(char const c, az_jts state) {
   switch (c) {
     case 'n':
       return AZ_JTS_N;
@@ -122,7 +124,7 @@ inline az_jts az_jts_space_next(char const c) {
   if (az_is_digit(c)) {
     return AZ_JTS_NUMBER_DIGIT;
   }
-  return az_jts_space_only(c, AZ_JTS_SPACE);
+  return az_jts_space_only(c, state);
 }
 
 inline az_jts az_jts_value_space_next(char const c) {
@@ -248,6 +250,20 @@ inline az_jts az_jts_number_next(az_jts const state, char const c) {
   return AZ_JTS_ERROR;
 }
 
+inline az_jts az_jts_object_open_next(char const c) {
+  switch (c) {
+    case '"':
+      return AZ_JTS_STRING_OPEN;
+    case '}':
+      return AZ_JTS_OBJECT_CLOSE;
+  }
+  return az_jts_space_only(c, AZ_JTS_OBJECT_OPEN_SPACE);
+}
+
+inline az_jts az_jts_array_open_next(char const c) {
+  return c == ']' ? AZ_JTS_ARRAY_CLOSE : az_jts_space_next(c, AZ_JTS_ARRAY_OPEN_SPACE);
+}
+
 inline az_jts az_jts_next(az_jts const state, char const c) {
   switch (state & AZ_JTS_PREFIX_MASK) {
     case AZ_JTS_NULL_PREFIX:
@@ -260,10 +276,16 @@ inline az_jts az_jts_next(az_jts const state, char const c) {
   switch (state) {
     case AZ_JTS_COMMA:
     case AZ_JTS_COLON:
-    case AZ_JTS_OBJECT_OPEN:
-    case AZ_JTS_ARRAY_OPEN:
     case AZ_JTS_SPACE:
-      return az_jts_space_next(c);
+      return az_jts_space_next(c, AZ_JTS_SPACE);
+
+    case AZ_JTS_OBJECT_OPEN:
+    case AZ_JTS_OBJECT_OPEN_SPACE:
+      return az_jts_object_open_next(c);
+
+    case AZ_JTS_ARRAY_OPEN:
+    case AZ_JTS_ARRAY_OPEN_SPACE:
+      return az_jts_array_open_next(c);
 
     case AZ_JTS_OBJECT_CLOSE:
     case AZ_JTS_ARRAY_CLOSE:
