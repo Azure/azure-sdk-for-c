@@ -11,6 +11,17 @@ To get started with a specific library, see the **README.md** file located in th
 ### Prerequisites
 CMake version 3.12 is required to use these libraries.
 
+### Development Environment
+Project contains files to work on Windows or Linux based OS.
+
+#### Windows
+Use PowerShell to run {projectDir}/build.ps1
+
+#### Linux
+Use bash to run {projectDir}/build-tools/build.sh
+
+Output libraries are created in /build folder
+
 ## Need help?
 * File an issue via [Github Issues](https://github.com/Azure/azure-sdk-for-c/issues/new/choose).
 * Check [previous questions](https://stackoverflow.com/questions/tagged/azure+c) or ask new ones on StackOverflow using `azure` and `c` tags.
