@@ -9,7 +9,10 @@
 
 inline bool az_json_is_white_space(char const c) {
   switch (c) {
-    case ' ': case '\t': case '\n': case '\r':
+    case ' ': 
+    case '\t': 
+    case '\n': 
+    case '\r':
       return true;
   }
   return false;
@@ -60,7 +63,7 @@ az_result az_json_expect_char(az_const_str const buffer, size_t *const p, char c
   if (c != expected) {
     return AZ_JSON_ERROR_UNEXPECTED_CHAR;
   }
-  ++*p;
+  *p += 1;
   return AZ_OK;
 }
 
@@ -86,7 +89,7 @@ az_result az_json_read_keyword_rest(
   size_t *const p,
   az_const_str const keyword
 ) {
-  ++*p;
+  *p += 1;
   for (size_t k = 0; k != keyword.size; ++*p, ++k) {
     if (*p == buffer.size) {
       return AZ_JSON_ERROR_UNEXPECTED_END;
@@ -113,21 +116,21 @@ az_result az_json_read_number_digit_rest(
       // read an integer part of the number
       do {
         value = value * 10 + (c - '0');
-        ++*p;
+        *p += 1;
         if (*p == buffer.size) {
           break;
         }
         c = az_const_str_item(buffer, *p);
       } while (az_is_digit(c));
     } else {
-      ++*p;
+      *p += 1;
     }
   }
 
   // fraction
   int16_t exp = 0;
   if (*p != buffer.size && az_const_str_item(buffer, *p) == '.') {
-    ++*p;
+    *p += 1;
     if (*p == buffer.size) {
       return AZ_JSON_ERROR_UNEXPECTED_END;
     }
@@ -138,7 +141,7 @@ az_result az_json_read_number_digit_rest(
     do {
       value = value * 10 + (c - '0');
       --exp;
-      ++*p;
+      *p += 1;
       if (*p == buffer.size) {
         break;
       }
@@ -153,7 +156,7 @@ az_result az_json_read_number_digit_rest(
       case 'E':
         {
           // skip 'e' or 'E'
-          ++*p;
+          *p += 1;
 
           if (*p == buffer.size) {
             return AZ_JSON_ERROR_UNEXPECTED_END;
@@ -166,7 +169,7 @@ az_result az_json_read_number_digit_rest(
             case '-':
               e_sign = -1;
             case '+':
-              ++*p;
+              *p += 1;
               if (*p == buffer.size) {
                 return AZ_JSON_ERROR_UNEXPECTED_END;
               }
@@ -181,7 +184,7 @@ az_result az_json_read_number_digit_rest(
           int16_t e_int = 0;
           do {
             e_int = e_int * 10 + (c - '0');
-            ++*p;
+            *p += 1;
             if (*p == buffer.size) {
               break;
             }
@@ -198,7 +201,7 @@ az_result az_json_read_number_digit_rest(
 
 az_result az_json_read_number_minus_rest(az_const_str const buffer, size_t *const p, double *const out_value) {
   // skip '-'
-  ++*p;
+  *p += 1;
   // read digit.
   char c;
   AZ_RETURN_ON_ERROR(az_json_get_char(buffer, *p, &c));
@@ -217,10 +220,10 @@ az_result az_json_read_string_rest(az_const_str const buffer, size_t *const p, a
     switch (c) {
       case '"':
         string->size = *p - begin;
-        ++*p;
+        *p += 1;
         return AZ_OK;
       case '\\':
-        ++*p;
+        *p += 1;
         if (*p == buffer.size) {
           return AZ_JSON_ERROR_UNEXPECTED_END;
         }
@@ -242,7 +245,7 @@ az_result az_json_read_string_rest(az_const_str const buffer, size_t *const p, a
     if (c < 0x20) {
       return AZ_JSON_ERROR_UNEXPECTED_CHAR;
     }
-    ++*p;
+    *p += 1;
   }
 }
 
@@ -272,18 +275,18 @@ az_result az_json_read_value(az_json_state *const p_state, az_json_value *const 
       return az_json_read_keyword_rest(buffer, p, AZ_CONST_STR("ull"));
     case '"':
       out_value->tag = AZ_JSON_STRING;
-      ++*p;
+      *p += 1;
       return az_json_read_string_rest(buffer, p, &out_value->string);
     case '-':
       out_value->tag = AZ_JSON_NUMBER;
       return az_json_read_number_minus_rest(buffer, p, &out_value->number);
     case '{':
       out_value->tag = AZ_JSON_OBJECT;
-      ++*p;
+      *p += 1;
       return az_json_stack_push(p_state, AZ_JSON_STACK_OBJECT);
     case '[':
       out_value->tag = AZ_JSON_ARRAY;
-      ++*p;
+      *p += 1;
       return az_json_stack_push(p_state, AZ_JSON_STACK_ARRAY);
   }
   return AZ_JSON_ERROR_UNEXPECTED_CHAR;
