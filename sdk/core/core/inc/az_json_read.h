@@ -19,6 +19,7 @@ enum {
   AZ_JSON_ERROR_UNEXPECTED_END,
   AZ_JSON_ERROR_UNEXPECTED_CHAR,
   AZ_JSON_ERROR_INVALID_STATE,
+  AZ_JSON_ERROR_STACK_OVERFLOW,
 };
 
 typedef az_const_str az_json_string;
@@ -55,8 +56,8 @@ typedef enum {
 } az_json_stack_item;
 
 typedef struct {
-  char const *begin;
-  char const *end;
+  az_const_str buffer;
+  size_t i;
   az_json_stack stack;
 } az_json_state;
 
@@ -68,7 +69,7 @@ az_result az_json_read_object_member(az_json_state *const p_state, az_json_membe
 
 az_result az_json_read_array_element(az_json_state *const p_state, az_json_value *const out_value);
 
-az_result az_json_state_done(az_json_state *const p_state);
+az_result az_json_state_done(az_json_state const *const p_state);
 
 #ifdef __cplusplus
 }
