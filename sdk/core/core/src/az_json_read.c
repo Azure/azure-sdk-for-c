@@ -322,12 +322,12 @@ az_result az_json_read(az_json_state *const p_state, az_json_value *const out_va
   return is_empty ? AZ_OK: AZ_JSON_ERROR_UNEXPECTED_CHAR;
 }
 
-az_result az_json_read_comma(az_json_state* const p_state) {
+az_result az_json_read_comma_or_close(az_json_state* const p_state) {
   char c;
   AZ_RETURN_ON_ERROR(az_json_get_char(p_state->buffer, p_state->i, &c));
   if (c == ',') {
     // skip ',' and read all whitespaces.
-    ++p_state->i;
+    p_state->i += 1;
     return az_json_read_white_space(p_state->buffer, &p_state->i);
   }
   char const close = az_json_stack_last(p_state) == AZ_JSON_STACK_OBJECT ? '}' : ']';
@@ -346,10 +346,10 @@ az_result az_json_check_item_begin(
   AZ_RETURN_ON_ERROR(az_json_get_char(p_state->buffer, p_state->i, &c));
   if (c == close) {
     AZ_RETURN_ON_ERROR(az_json_stack_pop(p_state));
-    ++p_state->i;
+    p_state->i += 1;
     AZ_RETURN_ON_ERROR(az_json_read_white_space(p_state->buffer, &p_state->i));
     if (!az_json_stack_is_empty(p_state)) {
-      AZ_RETURN_ON_ERROR(az_json_read_comma(p_state));
+      AZ_RETURN_ON_ERROR(az_json_read_comma_or_close(p_state));
     }
     return AZ_JSON_NO_MORE_ITEMS;
   }
@@ -362,7 +362,7 @@ az_result az_json_check_item_end(az_json_state *const p_state, az_json_value con
   case AZ_JSON_ARRAY:
     return AZ_OK;
   }
-  return az_json_read_comma(p_state);
+  return az_json_read_comma_or_close(p_state);
 }
 
 az_result az_json_read_object_member(az_json_state *const p_state, az_json_member *const out_member) {

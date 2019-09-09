@@ -205,6 +205,7 @@ int main() {
     size_t o = 0;
     TEST_ASSERT(read_write(AZ_CONST_STR("{ \"a\" : [ true, { \"b\": [{}]}, 15 ] }"), output, &o) == AZ_OK);
     az_const_str x = az_const_substr(az_to_const_str(output), 0, o);
+    TEST_ASSERT(az_const_str_eq(x, AZ_CONST_STR("{\"a\":[true,{\"b\":[{}]},0]}")));
   }
   {
     size_t o = 0;
