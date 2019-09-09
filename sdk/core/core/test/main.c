@@ -190,5 +190,36 @@ int main() {
     TEST_ASSERT(read_write(AZ_CONST_STR("{ \"a\" : [ true, { \"b\": [{}]}, 15 ] }"), output, &o) == AZ_OK);
     az_const_str x = az_const_substr(az_to_const_str(output), 0, o);
   }
+  {
+    size_t o = 0;
+    az_const_str const json = AZ_CONST_STR(
+    // 0           1           2           3           4           5           6
+    // 01234 56789 01234 56678 01234 56789 01234 56789 01234 56789 01234 56789 0123
+      "[[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[["
+    );
+    az_result const result = read_write(json, output, &o);
+    TEST_ASSERT(result == AZ_JSON_ERROR_STACK_OVERFLOW);
+  }
+  {
+    size_t o = 0;
+    az_const_str const json = AZ_CONST_STR(
+    // 0           1           2           3           4           5           6
+    // 01234 56789 01234 56678 01234 56789 01234 56789 01234 56789 01234 56789 012
+      "[[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[["
+    );
+    az_result const result = read_write(json, output, &o);
+    TEST_ASSERT(result == AZ_JSON_ERROR_UNEXPECTED_END);
+  }
+  {
+    size_t o = 0;
+    az_const_str const json = AZ_CONST_STR(
+    // 0           1           2           3           4           5           6
+    // 01234 56789 01234 56678 01234 56789 01234 56789 01234 56789 01234 56789 012
+      "[[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[["
+      "]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]"
+    );
+    az_result const result = read_write(json, output, &o);
+    TEST_ASSERT(result == AZ_OK);
+  }
   return exit_code;
 }

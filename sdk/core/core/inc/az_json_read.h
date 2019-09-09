@@ -48,6 +48,10 @@ typedef struct {
   az_json_value value;
 } az_json_member;
 
+enum {
+  AZ_JSON_STACK_SIZE = 63
+};
+
 typedef uint64_t az_json_stack;
 
 typedef enum {

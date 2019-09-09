@@ -74,6 +74,9 @@ az_result az_json_read_white_space(az_const_str const buffer, size_t *const p) {
 }
 
 az_result az_json_stack_push(az_json_state *const p_state, az_json_stack const stack) {
+  if (p_state->stack >> AZ_JSON_STACK_SIZE != 0) {
+    return AZ_JSON_ERROR_STACK_OVERFLOW;
+  }
   p_state->stack = (p_state->stack << 1) | stack;
   return AZ_OK;
 }
