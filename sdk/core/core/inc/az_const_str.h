@@ -29,10 +29,10 @@ typedef struct {
 
 // A size of the string literal.
 // Details: to make sure that `S` is a `string literal`, we are appending `""` to `S`.
-#define AZ_STRING_LITERAL_SIZE(S) (sizeof(S "") - 1)
+#define AZ_STRING_LITERAL_LEN(S) (sizeof(S "") - 1)
 
 #define AZ_CONST_STR(STRING_LITERAL) \
-  (az_const_str){ .begin = STRING_LITERAL, .size = AZ_STRING_LITERAL_SIZE(STRING_LITERAL) }
+  (az_const_str){ .begin = STRING_LITERAL, .size = AZ_STRING_LITERAL_LEN(STRING_LITERAL) }
 
 inline char const *az_const_str_ptr(az_const_str const buffer, size_t const index) {
   AZ_ASSERT(index <= buffer.size);
