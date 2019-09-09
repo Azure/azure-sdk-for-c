@@ -34,18 +34,16 @@ inline az_mytype_bar az_mytype_bar_create(double const a, double const b) {
 struct my_type {
 };
 
-#define MY_TYPE struct my_type
-
 typedef struct {
   az_mytype_tag tag;
   union {
     az_mytype_foo foo;
     az_mytype_bar bar;
-  };
+  } val;
 } az_mytype;
 
 inline az_mytype_create_bar(az_mytype_bar const bar) {
-  return (az_mytype){ .tag = AZ_MYTYPE_BAR, .bar = bar };
+  return (az_mytype){ .tag = AZ_MYTYPE_BAR, .val.bar = bar };
 }
 ```
 
@@ -127,9 +125,9 @@ The functions doesn't maintain a stack for nested objects and arrays. The assump
 the structures and can maintain a proper stack.
 
 ```c
-typedef struct {} az_json_reader;
+typedef struct { ... } az_json_state;
 
-az_json_reader az_json_reader_create(az_const_str const buffer);
+az_json_state az_json_reader_create(az_const_str const buffer);
 
 typedef az_const_str az_json_string;
 
@@ -149,21 +147,21 @@ typedef struct {
     bool boolean;
     az_json_string string;
     double number;
-  };
+  } val;
 } az_json_value;
 
-az_error az_json_read_value(az_json_reader *const p_reader, az_json_value *const out_value);
+az_error az_json_read(az_json_state *const p_state, az_json_value *const out_value);
 
 typedef struct {
   az_json_string name;
   az_json_value value;
-} az_json_property;
+} az_json_member;
 
-// if out_property->value.tag == AZ_JSON_NONE then there are no more properties and the object is closed.
-az_error az_json_read_property(az_json_reader *const p_reader, az_json_property *const out_property);
+// if returns AZ_JSON_NO_MORE_ITEMS then there are no more properties and the object is closed.
+az_error az_json_read_object_member(az_json_state *const p_state, az_json_member *const out_member);
 
-// if out_value->tag == AZ_JSON_NONE then there are no more items and the array is closed.
-az_error az_json_read_item(az_json_reader *const p_reader, az_json_value *const out_value);
+// if returns AZ_JSON_NO_MORE_ITEMS then there are no more items and the array is closed.
+az_error az_json_read_array_element(az_json_state *const p_state, az_json_value *const out_element);
 ```
 
 JSON stack size https://softwareengineering.stackexchange.com/questions/279207/how-deeply-can-a-json-object-be-nested
