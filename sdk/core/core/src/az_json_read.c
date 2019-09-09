@@ -228,21 +228,25 @@ az_result az_json_read_string_rest(az_const_str const buffer, size_t *const p, a
     switch (c) {
       // end of the string
       case '"':
+      {
         string->size = *p - begin;
         *p += 1;
         return AZ_OK;
+      }
       // escape sequence
       case '\\':
+      {
         *p += 1;
         if (*p == buffer.size) {
           return AZ_JSON_ERROR_UNEXPECTED_END;
         }
         char const c = az_const_str_item(buffer, *p);
-        if (!az_json_is_esc(c)) {
-          if (c != 'u') {
-            return AZ_JSON_ERROR_UNEXPECTED_END;
-          }
-          for (size_t const u = *p + 4; *p != u; ++*p) {
+        if (az_json_is_esc(c)) {
+          *p += 1;
+        }
+        else {
+          AZ_RETURN_ON_ERROR(az_json_expect_char(buffer, p, 'u'));
+          for (size_t const u = *p + 4; *p != u; *p += 1) {
             if (*p == buffer.size) {
               return AZ_JSON_ERROR_UNEXPECTED_END;
             }
@@ -251,11 +255,16 @@ az_result az_json_read_string_rest(az_const_str const buffer, size_t *const p, a
             }
           }
         }
+        break;
+      }
+      default:
+      {
+        if (c < 0x20) {
+          return AZ_JSON_ERROR_UNEXPECTED_CHAR;
+        }
+        *p += 1;
+      }
     }
-    if (c < 0x20) {
-      return AZ_JSON_ERROR_UNEXPECTED_CHAR;
-    }
-    *p += 1;
   }
 }
 
