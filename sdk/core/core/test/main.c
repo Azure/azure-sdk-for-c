@@ -48,7 +48,9 @@ az_result read_write_value(az_str const output, size_t *o, az_json_state *const 
     case AZ_JSON_STRING:
       return write_str(output, o, value.string);
     case AZ_JSON_OBJECT:
+    {
       AZ_RETURN_ON_ERROR(write(output, o, AZ_CONST_STR("{")));
+      bool need_comma = false;
       while (true) {
         az_json_member member;
         az_result const result = az_json_read_object_member(state, &member);
@@ -58,14 +60,22 @@ az_result read_write_value(az_str const output, size_t *o, az_json_state *const 
         if (result != AZ_OK) {
           return result;
         }
+        if (need_comma) {
+          AZ_RETURN_ON_ERROR(write(output, o, AZ_CONST_STR(",")));
+        }
+        else {
+          need_comma = true;
+        }
         AZ_RETURN_ON_ERROR(write_str(output, o, member.name));
         AZ_RETURN_ON_ERROR(write(output, o, AZ_CONST_STR(":")));
         AZ_RETURN_ON_ERROR(read_write_value(output, o, state, member.value));
-        AZ_RETURN_ON_ERROR(write(output, o, AZ_CONST_STR(",")));
       }
       return write(output, o, AZ_CONST_STR("}"));
+    }
     case AZ_JSON_ARRAY:
+    {
       AZ_RETURN_ON_ERROR(write(output, o, AZ_CONST_STR("[")));
+      bool need_comma = false;
       while (true) {
         az_json_value element;
         az_result const result = az_json_read_array_element(state, &element);
@@ -75,10 +85,16 @@ az_result read_write_value(az_str const output, size_t *o, az_json_state *const 
         if (result != AZ_OK) {
           return result;
         }
+        if (need_comma) {
+          AZ_RETURN_ON_ERROR(write(output, o, AZ_CONST_STR(",")));
+        }
+        else {
+          need_comma = true;
+        }
         AZ_RETURN_ON_ERROR(read_write_value(output, o, state, element));
-        AZ_RETURN_ON_ERROR(write(output, o, AZ_CONST_STR(",")));
       }
       return write(output, o, AZ_CONST_STR("]"));
+    }
   }
 }
 
@@ -220,6 +236,10 @@ int main() {
     );
     az_result const result = read_write(json, output, &o);
     TEST_ASSERT(result == AZ_OK);
+    az_const_str x = az_const_substr(az_to_const_str(output), 0, o);
+    TEST_ASSERT(az_const_str_eq(x, AZ_CONST_STR(
+      "[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[["
+      "]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]")));
   }
   return exit_code;
 }

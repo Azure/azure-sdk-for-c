@@ -7,6 +7,8 @@
 #include <az_assert.h>
 
 #include <stdint.h>
+#include <stdbool.h>
+#include <string.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -60,6 +62,10 @@ inline az_const_str az_const_substr(az_const_str const buffer, size_t const from
 
 inline az_const_str az_to_const_str(az_str const str) {
   return (az_const_str) { .begin = str.begin, .size = str.size };
+}
+
+inline bool az_const_str_eq(az_const_str const a, az_const_str const b) {
+  return a.size == b.size && memcmp(a.begin, b.begin, a.size) == 0;
 }
 
 #ifdef __cplusplus
