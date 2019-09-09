@@ -40,7 +40,7 @@ typedef struct {
     bool boolean;
     az_json_string string;
     double number;
-  };
+  } val;
 } az_json_value;
 
 typedef struct {
