@@ -10,9 +10,9 @@
 
 inline bool az_json_is_white_space(char const c) {
   switch (c) {
-    case ' ': 
-    case '\t': 
-    case '\n': 
+    case ' ':
+    case '\t':
+    case '\n':
     case '\r':
       return true;
   }
@@ -110,34 +110,62 @@ az_result az_json_read_keyword_rest(
   return AZ_OK;
 }
 
+typedef struct {
+  uint64_t value;
+  int16_t exp;
+} az_json_number_int;
+
+az_result az_json_number_int_add(az_json_number_int* const p, char const c, int16_t const e_offset) {
+  int d = c - '0';
+  if (p->value <= (UINT64_MAX - d) / 10) {
+    p->value = p->value * 10 + d;
+    p->exp += e_offset;
+  }
+  else {
+    p->exp += (e_offset + 1);
+  }
+  return AZ_OK;
+}
+
+az_result az_json_number_int_parse(
+  az_const_str const buffer, 
+  size_t *const p, 
+  az_json_number_int *const p_n, 
+  int16_t const e_offset, 
+  char const first
+) {
+  char c = first;
+  // read an integer part of the number
+  do {
+    AZ_RETURN_ON_ERROR(az_json_number_int_add(p_n, c, e_offset));
+    *p += 1;
+    if (*p == buffer.size) {
+      break;
+    }
+    c = az_const_str_item(buffer, *p);
+  } while (isdigit(c));
+  return AZ_OK;
+}
+
 az_result az_json_read_number_digit_rest(
   az_const_str const buffer,
   size_t *const p,
   double *const out_value,
   int const sign
 ) {
-  double value = 0;
+  az_json_number_int i = { .value = 0, .exp = 0 };
 
   // integer part
   {
     char c = az_const_str_item(buffer, *p);
     if (c != '0') {
-      // read an integer part of the number
-      do {
-        value = value * 10 + (c - '0');
-        *p += 1;
-        if (*p == buffer.size) {
-          break;
-        }
-        c = az_const_str_item(buffer, *p);
-      } while (isdigit(c));
+      AZ_RETURN_ON_ERROR(az_json_number_int_parse(buffer, p, &i, 0, c));
     } else {
       *p += 1;
     }
   }
 
   // fraction
-  int16_t exp = 0;
   if (*p != buffer.size && az_const_str_item(buffer, *p) == '.') {
     *p += 1;
     if (*p == buffer.size) {
@@ -147,15 +175,7 @@ az_result az_json_read_number_digit_rest(
     if (!isdigit(c)) {
       return AZ_JSON_ERROR_UNEXPECTED_CHAR;
     }
-    do {
-      value = value * 10 + (c - '0');
-      --exp;
-      *p += 1;
-      if (*p == buffer.size) {
-        break;
-      }
-      c = az_const_str_item(buffer, *p);
-    } while (isdigit(c));
+    AZ_RETURN_ON_ERROR(az_json_number_int_parse(buffer, p, &i, -1, c));
   }
 
   // exp
@@ -199,12 +219,12 @@ az_result az_json_read_number_digit_rest(
             }
             c = az_const_str_item(buffer, *p);
           } while (isdigit(c));
-          exp += e_int * e_sign;
+          i.exp += e_int * e_sign;
         }
     }
   }
 
-  *out_value = value * pow(10.0, exp) * sign;
+  *out_value = i.value * pow(10.0, i.exp) * sign;
   return AZ_OK;
 }
 
@@ -217,10 +237,9 @@ az_result az_json_read_number_minus_rest(az_const_str const buffer, size_t *cons
   return isdigit(c) ? az_json_read_number_digit_rest(buffer, p, out_value, -1) : AZ_JSON_ERROR_UNEXPECTED_CHAR;
 }
 
-az_result az_json_read_string_rest(az_const_str const buffer, size_t *const p, az_json_string *const string) {
+az_result az_json_read_string_rest(az_const_str const buffer, size_t *const p, az_const_str *const string) {
   // skip '"'
   size_t const begin = *p;
-  string->begin = buffer.begin + begin;
   while (true) {
     if (*p == buffer.size) {
       return AZ_JSON_ERROR_UNEXPECTED_END;
@@ -230,7 +249,7 @@ az_result az_json_read_string_rest(az_const_str const buffer, size_t *const p, a
       // end of the string
       case '"':
       {
-        string->size = *p - begin;
+        *string = (az_const_str){ .begin = buffer.begin + begin, .size = *p - begin };
         *p += 1;
         return AZ_OK;
       }

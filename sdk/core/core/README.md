@@ -168,6 +168,69 @@ JSON stack size https://softwareengineering.stackexchange.com/questions/279207/h
 
 ## Issues
 
+- [ ] C unit test framework.
+  - [ ] Visual Studio support.
+  - [ ] Code coverage.
+- [ ] Use `AZ_JSON_NO_MORE_ITEMS` or `AZ_JSON_NONE`?
+- [ ] string reader/writer (in-memory text reader/writer).
+  ```c
+  typedef struct {
+    az_const_str buffer;
+    size_t i;
+  } az_str_reader;
+
+  typedef struct {
+    az_str buffer;
+    size_t i;
+  } az_str_writer;
+
+  enum {
+    // AZ_STR_ERROR_END_OF_BUFFER
+    AZ_STR_ERROR_UNEXPECTED_END = ...
+  };
+  ```
 - [ ] JSON number reader/writer should produce the same numbers as C library.
 - [ ] check `static inline` for Linux.
-- [ ] Immutable value az_cstr.
+
+## const fields in az_const_str
+
+We can't use const fields in the structure and output parameters. For example:
+
+```c
+struct my_struct {
+  size_t const size;
+};
+
+void my_struct_init(struct my_struct *const p) {
+  // compilation error.
+  *p = (struct my_struct){ .size = 5 };
+}
+
+// ok
+struct my_struct my_struct_create() {
+  return (struct my_struct){ .size = 5 };
+}
+```
+
+C++ example:
+
+```c++
+class wrap {
+public:
+  explicit wrap(int const i): i(i) {}
+  wrap plus(int const i) const { return wrap(this->i + i); }
+
+  // not required.
+  wrap &operator=(wrap const &w) {
+    this->i = w.i;
+    return *this;
+  }
+private:
+  int i;
+};
+
+void test(wrap *const p) {
+  *p = wrap(7);
+  *p = p->plus(7);
+}
+```

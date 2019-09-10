@@ -22,8 +22,6 @@ enum {
   AZ_JSON_ERROR_STACK_OVERFLOW,
 };
 
-typedef az_const_str az_json_string;
-
 typedef enum {
   AZ_JSON_NONE    = 0,
   AZ_JSON_NULL    = 1,
@@ -38,13 +36,13 @@ typedef struct {
   az_json_value_tag tag;
   union {
     bool boolean;
-    az_json_string string;
+    az_const_str string;
     double number;
   } val;
 } az_json_value;
 
 typedef struct {
-  az_json_string name;
+  az_const_str name;
   az_json_value value;
 } az_json_member;
 

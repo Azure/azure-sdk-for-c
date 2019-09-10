@@ -30,7 +30,7 @@ az_result write(az_str const output, size_t *const o, az_const_str const s) {
   return 0;
 }
 
-az_result write_str(az_str const output, size_t* o, az_json_string const s) {
+az_result write_str(az_str const output, size_t* o, az_const_str const s) {
   AZ_RETURN_ON_ERROR(write(output, o, AZ_CONST_STR("\"")));
   AZ_RETURN_ON_ERROR(write(output, o, s));
   AZ_RETURN_ON_ERROR(write(output, o, AZ_CONST_STR("\"")));
@@ -96,6 +96,7 @@ az_result read_write_value(az_str const output, size_t *o, az_json_state *const 
       return write(output, o, AZ_CONST_STR("]"));
     }
   }
+  return AZ_JSON_ERROR_INVALID_STATE;
 }
 
 az_result read_write(az_const_str const input, az_str const output, size_t *const o) {
@@ -210,7 +211,7 @@ int main() {
     TEST_ASSERT(value.val.boolean == true);
     TEST_ASSERT(az_json_read_array_element(&state, &value) == AZ_OK);
     TEST_ASSERT(value.tag == AZ_JSON_NUMBER);
-    //TEST_ASSERT(value.number == 0.3);
+    // TEST_ASSERT(value.val.number == 0.3);
     TEST_ASSERT(az_json_read_array_element(&state, &value) == AZ_JSON_NO_MORE_ITEMS);
     TEST_ASSERT(az_json_state_done(&state) == AZ_OK);
   }
