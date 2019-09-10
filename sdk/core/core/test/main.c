@@ -108,16 +108,21 @@ az_result read_write(az_const_str const input, az_str const output, size_t *cons
 
 int main() {
   {
-	az_json_state state = az_json_state_create(AZ_CONST_STR("    "));
-	az_json_value value;
-	TEST_ASSERT(az_json_read(&state, &value) == AZ_JSON_ERROR_UNEXPECTED_END);
+	  az_json_state state = az_json_state_create(AZ_CONST_STR("    "));
+	  az_json_value value;
+	  TEST_ASSERT(az_json_read(&state, &value) == AZ_JSON_ERROR_UNEXPECTED_END);
   }
   {
     az_json_state state = az_json_state_create(AZ_CONST_STR("  null  "));
     az_json_value value;
     TEST_ASSERT(az_json_read(&state, &value) == AZ_OK);
     TEST_ASSERT(value.tag == AZ_JSON_NULL);
-	TEST_ASSERT(az_json_state_done(&state) == AZ_OK);
+	  TEST_ASSERT(az_json_state_done(&state) == AZ_OK);
+  }
+  {
+    az_json_state state = az_json_state_create(AZ_CONST_STR("  nul"));
+    az_json_value value;
+    TEST_ASSERT(az_json_read(&state, &value) == AZ_JSON_ERROR_UNEXPECTED_END);
   }
   {
 	  az_json_state state = az_json_state_create(AZ_CONST_STR("  false"));
@@ -128,6 +133,11 @@ int main() {
 	  TEST_ASSERT(az_json_state_done(&state) == AZ_OK);
   }
   {
+    az_json_state state = az_json_state_create(AZ_CONST_STR("  falsx  "));
+    az_json_value value;
+    TEST_ASSERT(az_json_read(&state, &value) == AZ_JSON_ERROR_UNEXPECTED_CHAR);
+  }
+  {
 	  az_json_state state = az_json_state_create(AZ_CONST_STR("true "));
 	  az_json_value value;
 	  TEST_ASSERT(az_json_read(&state, &value) == AZ_OK);
@@ -136,14 +146,35 @@ int main() {
 	  TEST_ASSERT(az_json_state_done(&state) == AZ_OK);
   }
   {
-    az_const_str const s = AZ_CONST_STR(" \"tr\\\"ue\" ");
+    az_json_state state = az_json_state_create(AZ_CONST_STR("  truem"));
+    az_json_value value;
+    TEST_ASSERT(az_json_read(&state, &value) == AZ_JSON_ERROR_UNEXPECTED_CHAR);
+  }
+  {
+    az_const_str const s = AZ_CONST_STR(" \"tr\\\"ue\\t\" ");
 	  az_json_state state = az_json_state_create(s);
 	  az_json_value value;
 	  TEST_ASSERT(az_json_read(&state, &value) == AZ_OK);
 	  TEST_ASSERT(value.tag == AZ_JSON_STRING);
     TEST_ASSERT(value.val.string.begin == s.begin + 2);
-    TEST_ASSERT(value.val.string.size == 6);
+    TEST_ASSERT(value.val.string.size == 8);
 	  TEST_ASSERT(az_json_state_done(&state) == AZ_OK);
+  }
+  {
+    az_const_str const s = AZ_CONST_STR("\"\\uFf0F\"");
+    az_json_state state = az_json_state_create(s);
+    az_json_value value;
+    TEST_ASSERT(az_json_read(&state, &value) == AZ_OK);
+    TEST_ASSERT(value.tag == AZ_JSON_STRING);
+    TEST_ASSERT(value.val.string.begin == s.begin + 1);
+    TEST_ASSERT(value.val.string.size == 6);
+    TEST_ASSERT(az_json_state_done(&state) == AZ_OK);
+  }
+  {
+    az_const_str const s = AZ_CONST_STR("\"\\uFf0\"");
+    az_json_state state = az_json_state_create(s);
+    az_json_value value;
+    TEST_ASSERT(az_json_read(&state, &value) == AZ_JSON_ERROR_UNEXPECTED_CHAR);
   }
   {
     az_json_state state = az_json_state_create(AZ_CONST_STR(" 23 "));

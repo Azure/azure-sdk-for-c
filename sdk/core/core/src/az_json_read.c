@@ -3,9 +3,10 @@
 
 #include <az_json_read.h>
 
-#include <az_digit.h>
+// #include <az_digit.h>
 
 #include <math.h>
+#include <ctype.h>
 
 inline bool az_json_is_white_space(char const c) {
   switch (c) {
@@ -129,7 +130,7 @@ az_result az_json_read_number_digit_rest(
           break;
         }
         c = az_const_str_item(buffer, *p);
-      } while (az_is_digit(c));
+      } while (isdigit(c));
     } else {
       *p += 1;
     }
@@ -143,7 +144,7 @@ az_result az_json_read_number_digit_rest(
       return AZ_JSON_ERROR_UNEXPECTED_END;
     }
     char c = az_const_str_item(buffer, *p);
-    if (!az_is_digit(c)) {
+    if (!isdigit(c)) {
       return AZ_JSON_ERROR_UNEXPECTED_CHAR;
     }
     do {
@@ -154,7 +155,7 @@ az_result az_json_read_number_digit_rest(
         break;
       }
       c = az_const_str_item(buffer, *p);
-    } while (az_is_digit(c));
+    } while (isdigit(c));
   }
 
   // exp
@@ -185,7 +186,7 @@ az_result az_json_read_number_digit_rest(
           }
 
           // expect at least one digit.
-          if (!az_is_digit(c)) {
+          if (!isdigit(c)) {
             return AZ_JSON_ERROR_UNEXPECTED_CHAR;
           }
 
@@ -197,7 +198,7 @@ az_result az_json_read_number_digit_rest(
               break;
             }
             c = az_const_str_item(buffer, *p);
-          } while (az_is_digit(c));
+          } while (isdigit(c));
           exp += e_int * e_sign;
         }
     }
@@ -213,7 +214,7 @@ az_result az_json_read_number_minus_rest(az_const_str const buffer, size_t *cons
   // read digit.
   char c;
   AZ_RETURN_ON_ERROR(az_json_get_char(buffer, *p, &c));
-  return az_is_digit(c) ? az_json_read_number_digit_rest(buffer, p, out_value, -1) : AZ_JSON_ERROR_UNEXPECTED_CHAR;
+  return isdigit(c) ? az_json_read_number_digit_rest(buffer, p, out_value, -1) : AZ_JSON_ERROR_UNEXPECTED_CHAR;
 }
 
 az_result az_json_read_string_rest(az_const_str const buffer, size_t *const p, az_json_string *const string) {
@@ -250,7 +251,7 @@ az_result az_json_read_string_rest(az_const_str const buffer, size_t *const p, a
             if (*p == buffer.size) {
               return AZ_JSON_ERROR_UNEXPECTED_END;
             }
-            if (!az_is_hex_digit(az_const_str_item(buffer, *p))) {
+            if (!isxdigit(az_const_str_item(buffer, *p))) {
               return AZ_JSON_ERROR_UNEXPECTED_CHAR;
             }
           }
@@ -276,7 +277,7 @@ az_result az_json_read_value(az_json_state *const p_state, az_json_value *const 
 	  return AZ_JSON_ERROR_UNEXPECTED_END;
   }
   char const c = az_const_str_item(buffer, *p);
-  if (az_is_digit(c)) {
+  if (isdigit(c)) {
     out_value->tag = AZ_JSON_NUMBER;
     return az_json_read_number_digit_rest(buffer, p, &out_value->val.number, 1);
   }
