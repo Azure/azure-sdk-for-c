@@ -189,6 +189,7 @@ JSON stack size https://softwareengineering.stackexchange.com/questions/279207/h
     AZ_STR_ERROR_UNEXPECTED_END = ...
   };
   ```
+
 - [ ] JSON number reader/writer should produce the same numbers as C library.
 - [ ] check `static inline` for Linux.
 
