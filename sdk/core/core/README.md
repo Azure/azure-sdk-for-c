@@ -100,24 +100,6 @@ Additional information could be passed using output parameters.
 The main purpose of the JSON parser is to deserialize JSON HTTP Responses into known the data structure.
 The assumption is that we receive a valid standard JSON.
 
-### 2.1. Layer 0. JSON State Machine
-
-A JSON state machine which can be used as a part of asynchronous/reactive JSON parser.
-
-```c
-typedef enum {
-  AZ_JSON_STATE_WHITESPACE,
-  AZ_JSON_STATE_ERROR,
-  ...
-  AZ_JSON_STATE_NULL,
-  AZ_JSON_STATE_FALSE,
-  ...
-} az_json_state;
-
-// The function accepts a previous state and a new character and returns an new state.
-inline az_json_state az_json_state_value_parse(az_json_state state, char c);
-```
-
 ### 2.2. Layer 1. Synchronous JSON Value Parser
 
 Utility functions to read primitive values, objects and arrays from a continuous JSON string.
