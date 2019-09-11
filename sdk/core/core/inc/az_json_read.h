@@ -26,17 +26,17 @@ enum {
 };
 
 typedef enum {
-  AZ_JSON_NONE    = 0,
-  AZ_JSON_NULL    = 1,
-  AZ_JSON_BOOLEAN = 2,
-  AZ_JSON_NUMBER  = 3,
-  AZ_JSON_STRING  = 4,
-  AZ_JSON_OBJECT  = 5,
-  AZ_JSON_ARRAY   = 6,
-} az_json_value_tag;
+  AZ_JSON_VALUE_NONE    = 0,
+  AZ_JSON_VALUE_NULL    = 1,
+  AZ_JSON_VALUE_BOOLEAN = 2,
+  AZ_JSON_VALUE_NUMBER  = 3,
+  AZ_JSON_VALUE_STRING  = 4,
+  AZ_JSON_VALUE_OBJECT  = 5,
+  AZ_JSON_VALUE_ARRAY   = 6,
+} az_json_value_kind;
 
 typedef struct {
-  az_json_value_tag tag;
+  az_json_value_kind kind;
   union {
     bool boolean;
     az_const_str string;

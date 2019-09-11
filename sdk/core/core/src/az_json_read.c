@@ -85,7 +85,7 @@ az_result az_json_get_char(az_const_str const buffer, size_t const i, char *cons
 
 az_result az_json_expect_char(az_const_str const buffer, size_t *const p_i, char const expected) {
   char c;
-  AZ_RETURN_ON_ERROR(az_json_get_char(buffer, *p_i, &c));
+  AZ_RETURN_IF_NOT_OK(az_json_get_char(buffer, *p_i, &c));
   if (c != expected) {
     return AZ_JSON_ERROR_UNEXPECTED_CHAR;
   }
@@ -163,7 +163,7 @@ az_result az_json_read_number_digit_rest(
   {
     char c = az_const_str_item(buffer, *p);
     if (c != '0') {
-      AZ_RETURN_ON_ERROR(az_json_number_int_parse(buffer, p, &i, 0, c));
+      AZ_RETURN_IF_NOT_OK(az_json_number_int_parse(buffer, p, &i, 0, c));
     } else {
       *p += 1;
     }
@@ -179,7 +179,7 @@ az_result az_json_read_number_digit_rest(
     if (!isdigit(c)) {
       return AZ_JSON_ERROR_UNEXPECTED_CHAR;
     }
-    AZ_RETURN_ON_ERROR(az_json_number_int_parse(buffer, p, &i, -1, c));
+    AZ_RETURN_IF_NOT_OK(az_json_number_int_parse(buffer, p, &i, -1, c));
   }
 
   // exp
@@ -231,7 +231,7 @@ az_result az_json_read_number_minus_rest(az_const_str const buffer, size_t *cons
   *p += 1;
   // read digit.
   char c;
-  AZ_RETURN_ON_ERROR(az_json_get_char(buffer, *p, &c));
+  AZ_RETURN_IF_NOT_OK(az_json_get_char(buffer, *p, &c));
   return isdigit(c) ? az_json_read_number_digit_rest(buffer, p, out_value, -1) : AZ_JSON_ERROR_UNEXPECTED_CHAR;
 }
 
@@ -263,7 +263,7 @@ az_result az_json_read_string_rest(az_const_str const buffer, size_t *const p, a
           *p += 1;
         }
         else {
-          AZ_RETURN_ON_ERROR(az_json_expect_char(buffer, p, 'u'));
+          AZ_RETURN_IF_NOT_OK(az_json_expect_char(buffer, p, 'u'));
           for (size_t const u = *p + 4; *p != u; *p += 1) {
             if (*p == buffer.size) {
               return AZ_JSON_ERROR_UNEXPECTED_END;
@@ -295,34 +295,34 @@ az_result az_json_read_value(az_json_state *const p_state, az_json_value *const 
   }
   char const c = az_const_str_item(buffer, *p);
   if (isdigit(c)) {
-    out_value->tag = AZ_JSON_NUMBER;
+    out_value->kind = AZ_JSON_VALUE_NUMBER;
     return az_json_read_number_digit_rest(buffer, p, &out_value->val.number, 1);
   }
   switch (c) {
     case 't':
-      out_value->tag = AZ_JSON_BOOLEAN;
+      out_value->kind = AZ_JSON_VALUE_BOOLEAN;
       out_value->val.boolean = true;
       return az_json_read_keyword_rest(buffer, p, AZ_CONST_STR("rue"));
     case 'f':
-      out_value->tag = AZ_JSON_BOOLEAN;
+      out_value->kind = AZ_JSON_VALUE_BOOLEAN;
       out_value->val.boolean = false;
       return az_json_read_keyword_rest(buffer, p, AZ_CONST_STR("alse"));
     case 'n':
-      out_value->tag = AZ_JSON_NULL;
+      out_value->kind = AZ_JSON_VALUE_NULL;
       return az_json_read_keyword_rest(buffer, p, AZ_CONST_STR("ull"));
     case '"':
-      out_value->tag = AZ_JSON_STRING;
+      out_value->kind = AZ_JSON_VALUE_STRING;
       *p += 1;
       return az_json_read_string_rest(buffer, p, &out_value->val.string);
     case '-':
-      out_value->tag = AZ_JSON_NUMBER;
+      out_value->kind = AZ_JSON_VALUE_NUMBER;
       return az_json_read_number_minus_rest(buffer, p, &out_value->val.number);
     case '{':
-      out_value->tag = AZ_JSON_OBJECT;
+      out_value->kind = AZ_JSON_VALUE_OBJECT;
       *p += 1;
       return az_json_stack_push(p_state, AZ_JSON_STACK_OBJECT);
     case '[':
-      out_value->tag = AZ_JSON_ARRAY;
+      out_value->kind = AZ_JSON_VALUE_ARRAY;
       *p += 1;
       return az_json_stack_push(p_state, AZ_JSON_STACK_ARRAY);
   }
@@ -330,7 +330,7 @@ az_result az_json_read_value(az_json_state *const p_state, az_json_value *const 
 }
 
 az_result az_json_read_value_space(az_json_state *const p_state, az_json_value *const out_value) {
-  AZ_RETURN_ON_ERROR(az_json_read_value(p_state, out_value));
+  AZ_RETURN_IF_NOT_OK(az_json_read_value(p_state, out_value));
   return az_json_read_white_space(p_state->buffer, &p_state->i);
 }
 
@@ -338,12 +338,12 @@ az_result az_json_read(az_json_state *const p_state, az_json_value *const out_va
   if (!az_json_stack_is_empty(p_state)) {
     return AZ_JSON_ERROR_INVALID_STATE;
   }
-  AZ_RETURN_ON_ERROR(az_json_read_white_space(p_state->buffer, &p_state->i));
-  AZ_RETURN_ON_ERROR(az_json_read_value_space(p_state, out_value));
+  AZ_RETURN_IF_NOT_OK(az_json_read_white_space(p_state->buffer, &p_state->i));
+  AZ_RETURN_IF_NOT_OK(az_json_read_value_space(p_state, out_value));
   bool const is_empty = p_state->i == p_state->buffer.size;
-  switch (out_value->tag) {
-    case AZ_JSON_ARRAY:
-    case AZ_JSON_OBJECT:
+  switch (out_value->kind) {
+    case AZ_JSON_VALUE_ARRAY:
+    case AZ_JSON_VALUE_OBJECT:
       return is_empty ? AZ_JSON_ERROR_UNEXPECTED_END : AZ_OK;
   }
   return is_empty ? AZ_OK: AZ_JSON_ERROR_UNEXPECTED_CHAR;
@@ -351,7 +351,7 @@ az_result az_json_read(az_json_state *const p_state, az_json_value *const out_va
 
 az_result az_json_read_comma_or_close(az_json_state* const p_state) {
   char c;
-  AZ_RETURN_ON_ERROR(az_json_get_char(p_state->buffer, p_state->i, &c));
+  AZ_RETURN_IF_NOT_OK(az_json_get_char(p_state->buffer, p_state->i, &c));
   if (c == ',') {
     // skip ',' and read all whitespaces.
     p_state->i += 1;
@@ -370,43 +370,43 @@ az_result az_json_check_item_begin(
     return AZ_JSON_ERROR_INVALID_STATE;
   }
   char c;
-  AZ_RETURN_ON_ERROR(az_json_get_char(p_state->buffer, p_state->i, &c));
+  AZ_RETURN_IF_NOT_OK(az_json_get_char(p_state->buffer, p_state->i, &c));
   if (c != close) {
     return AZ_OK;
   }
   // c == close
-  AZ_RETURN_ON_ERROR(az_json_stack_pop(p_state));
+  AZ_RETURN_IF_NOT_OK(az_json_stack_pop(p_state));
   p_state->i += 1;
-  AZ_RETURN_ON_ERROR(az_json_read_white_space(p_state->buffer, &p_state->i));
+  AZ_RETURN_IF_NOT_OK(az_json_read_white_space(p_state->buffer, &p_state->i));
   if (!az_json_stack_is_empty(p_state)) {
-    AZ_RETURN_ON_ERROR(az_json_read_comma_or_close(p_state));
+    AZ_RETURN_IF_NOT_OK(az_json_read_comma_or_close(p_state));
   }
   return AZ_JSON_NO_MORE_ITEMS;
 }
 
 az_result az_json_check_item_end(az_json_state *const p_state, az_json_value const value) {
-  switch (value.tag) {
-  case AZ_JSON_OBJECT:
-  case AZ_JSON_ARRAY:
+  switch (value.kind) {
+  case AZ_JSON_VALUE_OBJECT:
+  case AZ_JSON_VALUE_ARRAY:
     return AZ_OK;
   }
   return az_json_read_comma_or_close(p_state);
 }
 
 az_result az_json_read_object_member(az_json_state *const p_state, az_json_member *const out_member) {
-  AZ_RETURN_ON_ERROR(az_json_check_item_begin(p_state, AZ_JSON_STACK_OBJECT, '}'));
-  AZ_RETURN_ON_ERROR(az_json_expect_char(p_state->buffer, &p_state->i, '"'));
-  AZ_RETURN_ON_ERROR(az_json_read_string_rest(p_state->buffer, &p_state->i, &out_member->name));
-  AZ_RETURN_ON_ERROR(az_json_read_white_space(p_state->buffer, &p_state->i));
-  AZ_RETURN_ON_ERROR(az_json_expect_char(p_state->buffer, &p_state->i, ':'));
-  AZ_RETURN_ON_ERROR(az_json_read_white_space(p_state->buffer, &p_state->i));
-  AZ_RETURN_ON_ERROR(az_json_read_value_space(p_state, &out_member->value));
+  AZ_RETURN_IF_NOT_OK(az_json_check_item_begin(p_state, AZ_JSON_STACK_OBJECT, '}'));
+  AZ_RETURN_IF_NOT_OK(az_json_expect_char(p_state->buffer, &p_state->i, '"'));
+  AZ_RETURN_IF_NOT_OK(az_json_read_string_rest(p_state->buffer, &p_state->i, &out_member->name));
+  AZ_RETURN_IF_NOT_OK(az_json_read_white_space(p_state->buffer, &p_state->i));
+  AZ_RETURN_IF_NOT_OK(az_json_expect_char(p_state->buffer, &p_state->i, ':'));
+  AZ_RETURN_IF_NOT_OK(az_json_read_white_space(p_state->buffer, &p_state->i));
+  AZ_RETURN_IF_NOT_OK(az_json_read_value_space(p_state, &out_member->value));
   return az_json_check_item_end(p_state, out_member->value);
 }
 
 az_result az_json_read_array_element(az_json_state *const p_state, az_json_value *const out_element) {
-  AZ_RETURN_ON_ERROR(az_json_check_item_begin(p_state, AZ_JSON_STACK_ARRAY, ']'));
-  AZ_RETURN_ON_ERROR(az_json_read_value_space(p_state, out_element));
+  AZ_RETURN_IF_NOT_OK(az_json_check_item_begin(p_state, AZ_JSON_STACK_ARRAY, ']'));
+  AZ_RETURN_IF_NOT_OK(az_json_read_value_space(p_state, out_element));
   return az_json_check_item_end(p_state, *out_element);
 }
 

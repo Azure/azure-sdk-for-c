@@ -10,7 +10,7 @@
 extern "C" {
 #endif
 
-typedef enum {
+enum {
   AZ_OK          = 0,
   AZ_ERROR_FLAG  = 0x80000000,
   AZ_JSON_RESULT =    0x10000,
@@ -30,10 +30,10 @@ inline bool az_succedded(az_result result) {
   return result >= 0;
 }
 
-#define AZ_RETURN_ON_ERROR(exp) \
+#define AZ_RETURN_IF_NOT_OK(exp) \
   do { \
     az_result const result = (exp); \
-    if (az_failed(result)) { \
+    if (result != AZ_OK) { \
       return result; \
     } \
   } while (0)
