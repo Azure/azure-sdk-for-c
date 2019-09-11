@@ -31,6 +31,9 @@ typedef struct {
 // Details: to make sure that `S` is a `string literal`, we are appending `""` to `S`.
 #define AZ_STRING_LITERAL_LEN(S) (sizeof(S "") - 1)
 
+#define AZ_CONST_STR_DECL(NAME, STRING_LITERAL) \
+  static az_const_str const NAME = { .begin = STRING_LITERAL, .size = AZ_STRING_LITERAL_LEN(STRING_LITERAL) };
+
 #define AZ_CONST_STR(STRING_LITERAL) \
   (az_const_str){ .begin = STRING_LITERAL, .size = AZ_STRING_LITERAL_LEN(STRING_LITERAL) }
 

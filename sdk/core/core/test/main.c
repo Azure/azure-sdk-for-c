@@ -107,6 +107,34 @@ az_result read_write(az_const_str const input, az_str const output, size_t *cons
   return az_json_state_done(&state);
 }
 
+AZ_CONST_STR_DECL(
+  sample1, 
+  "{\n"
+  "  \"parameters\": {\n"
+  "    \"subscriptionId\": \"{subscription-id}\",\n"
+  "      \"resourceGroupName\" : \"res4303\",\n"
+  "      \"accountName\" : \"sto7280\",\n"
+  "      \"containerName\" : \"container8723\",\n"
+  "      \"api-version\" : \"2019-04-01\",\n"
+  "      \"monitor\" : \"true\",\n"
+  "      \"LegalHold\" : {\n"
+  "      \"tags\": [\n"
+  "        \"tag1\",\n"
+  "          \"tag2\",\n"
+  "          \"tag3\"\n"
+  "      ]\n"
+  "    }\n"
+  "  },\n"
+  "    \"responses\": {\n"
+  "    \"200\": {\n"
+  "      \"body\": {\n"
+  "        \"hasLegalHold\": false,\n"
+  "          \"tags\" : []\n"
+  "      }\n"
+  "    }\n"
+  "  }\n"
+  "}\n");
+
 int main() {
   {
 	  az_json_state state = az_json_state_create(AZ_CONST_STR("    "));
@@ -275,6 +303,12 @@ int main() {
       "[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[{"
       "\"\\t\\n\":\"\\u0abc\""
       "}]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]")));
+  }
+  //
+  {
+    size_t o = 0;
+    az_result const result = read_write(sample1, output, &o);
+    TEST_ASSERT(result == AZ_OK);
   }
   return exit_code;
 }
