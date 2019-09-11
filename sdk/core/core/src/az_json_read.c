@@ -371,16 +371,17 @@ az_result az_json_check_item_begin(
   }
   char c;
   AZ_RETURN_ON_ERROR(az_json_get_char(p_state->buffer, p_state->i, &c));
-  if (c == close) {
-    AZ_RETURN_ON_ERROR(az_json_stack_pop(p_state));
-    p_state->i += 1;
-    AZ_RETURN_ON_ERROR(az_json_read_white_space(p_state->buffer, &p_state->i));
-    if (!az_json_stack_is_empty(p_state)) {
-      AZ_RETURN_ON_ERROR(az_json_read_comma_or_close(p_state));
-    }
-    return AZ_JSON_NO_MORE_ITEMS;
+  if (c != close) {
+    return AZ_OK;
   }
-  return AZ_OK;
+  // c == close
+  AZ_RETURN_ON_ERROR(az_json_stack_pop(p_state));
+  p_state->i += 1;
+  AZ_RETURN_ON_ERROR(az_json_read_white_space(p_state->buffer, &p_state->i));
+  if (!az_json_stack_is_empty(p_state)) {
+    AZ_RETURN_ON_ERROR(az_json_read_comma_or_close(p_state));
+  }
+  return AZ_JSON_NO_MORE_ITEMS;
 }
 
 az_result az_json_check_item_end(az_json_state *const p_state, az_json_value const value) {
