@@ -41,10 +41,10 @@ target_include_directories(azure_iot_ustorageclient PRIVATE
     ${PROJECT_SOURCE_DIR}/deps/umock-c/inc
     ${PROJECT_SOURCE_DIR}/deps/azure-macro-utils-c/inc
     ${PROJECT_SOURCE_DIR}/deps/azure-c-shared-utility/inc
-    ${PROJECT_SOURCE_DIR}/deps/azure-ulib-c/inc
-    ${PROJECT_SOURCE_DIR}/deps/azure-ulib-c/config
+    #${PROJECT_SOURCE_DIR}/deps/azure-ulib-c/inc
+    #${PROJECT_SOURCE_DIR}/deps/azure-ulib-c/config
     #ulib pal directory TODO: fix with environment variable from azure-ulib-c cmake
-    ${PROJECT_SOURCE_DIR}/deps/azure-ulib-c/pal/MSBUILD/X86
+    #${PROJECT_SOURCE_DIR}/deps/azure-ulib-c/pal/MSBUILD/X86
 )
 
 set(AZURE_IOT_USTORAGECLIENT_INC_FOLDER ${PROJECT_SOURCE_DIR}/inc CACHE INTERNAL "this is what needs to be included if using sharedLib lib" FORCE)
@@ -56,7 +56,7 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/deps/azure-c-testrunnerswitcher EXCLUDE_F
 #turn on use_built_in_httpapi option for azure-c-shared-utility
 set(use_builtin_httpapi ON CACHE BOOL "enable built-in httpapi_compact")
 add_subdirectory(${PROJECT_SOURCE_DIR}/deps/azure-c-shared-utility EXCLUDE_FROM_ALL)
-add_subdirectory(${PROJECT_SOURCE_DIR}/deps/azure-ulib-c EXCLUDE_FROM_ALL)
+#add_subdirectory(${PROJECT_SOURCE_DIR}/deps/azure-ulib-c EXCLUDE_FROM_ALL)
 
 setTargetBuildProperties(azure_iot_ustorageclient)
 

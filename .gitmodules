@@ -10,9 +10,6 @@
 [submodule "sdk/ustorageclient/deps/azure-macro-utils-c"]
 	path = sdk/ustorageclient/deps/azure-macro-utils-c
 	url = https://github.com/Azure/azure-macro-utils-c.git
-[submodule "sdk/ustorageclient/deps/azure-ulib-c"]
-	path = sdk/ustorageclient/deps/azure-ulib-c
-	url = https://github.com/Azure/azure-ulib-c.git
 [submodule "sdk/ustorageclient/deps/azure-c-shared-utility"]
 	path = sdk/ustorageclient/deps/azure-c-shared-utility
 	url = https://github.com/Azure/azure-c-shared-utility.git

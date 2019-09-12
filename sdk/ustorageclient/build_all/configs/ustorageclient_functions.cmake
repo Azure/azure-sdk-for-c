@@ -54,7 +54,8 @@ function(azstorage_c_windows_unittests_add_dll what_is_building folder)
 
     #Link necessary libs to dll library
     target_link_libraries(${what_is_building}_dll
-                PRIVATE azure_ulib_c umock_c ctest testrunnerswitcher azure_iot_ustorageclient ${what_is_building}_testsonly_lib
+                #add azure_ulib_c back later
+                PRIVATE umock_c ctest testrunnerswitcher azure_iot_ustorageclient ${what_is_building}_testsonly_lib
     )
 
 endfunction()
@@ -79,7 +80,8 @@ function(azstorage_c_windows_unittests_add_exe what_is_building folder)
     target_compile_definitions(${what_is_building}_exe PUBLIC USE_CTEST)
     target_include_directories(${what_is_building}_exe PUBLIC ${sharedutil_include_directories})
     target_link_libraries(${what_is_building}_exe
-                PRIVATE azure_ulib_c umock_c ctest testrunnerswitcher azure_iot_ustorageclient
+                #add azure_ulib_c back later
+                PRIVATE umock_c ctest testrunnerswitcher azure_iot_ustorageclient
     )
 
     #Add test to ctest list
@@ -107,7 +109,8 @@ function(azstorage_c_linux_unittests_add_exe what_is_building folder)
     target_compile_definitions(${what_is_building}_exe PUBLIC USE_CTEST)
     target_include_directories(${what_is_building}_exe PUBLIC ${sharedutil_include_directories})
     target_link_libraries(${what_is_building}_exe
-                PRIVATE azure_ulib_c umock_c ctest testrunnerswitcher azure_iot_ustorageclient
+                #add azure_ulib_c back later
+                PRIVATE umock_c ctest testrunnerswitcher azure_iot_ustorageclient
     )
 
     #Add test to ctest list
@@ -133,7 +136,8 @@ function(azstorage_build_c_test_target what_is_building folder)
     include_directories(${PROJECT_SOURCE_DIR}/config)
 
     #Set shared utility include directories
-    set(ustorageclient_test_framework_includes ${sharedutil_include_directories} ${AZURE_ULIB_C_INC_FOLDER} ${MACRO_UTILS_INC_FOLDER} ${UMOCK_C_INC_FOLDER} ${TESTRUNNERSWITCHER_INC_FOLDER} ${CTEST_INC_FOLDER})
+    #add ${AZURE_ULIB_C_INC_FOLDER} back later
+    set(ustorageclient_test_framework_includes ${sharedutil_include_directories} ${MACRO_UTILS_INC_FOLDER} ${UMOCK_C_INC_FOLDER} ${TESTRUNNERSWITCHER_INC_FOLDER} ${CTEST_INC_FOLDER})
     include_directories(${ustorageclient_test_framework_includes})
 
     #Create Windows/Linux test executables
@@ -170,7 +174,7 @@ function(azstorage_build_c_sample_target what_is_building folder)
     )
     target_link_libraries(${what_is_building}_exe
                 PRIVATE azure_iot_ustorageclient
-                PRIVATE azure_ulib_c
+                #PRIVATE azure_ulib_c
                 PRIVATE aziotsharedutil
     )
 

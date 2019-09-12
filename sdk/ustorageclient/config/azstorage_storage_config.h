@@ -13,7 +13,8 @@
  * call stack and will be hard to interpret.
  * Only comment this out if you have already tested your function arguments.
  */
-#define AZSTORAGE_BLOB_VALIDATE_ARGUMENTS
+// TODO: once azure-ulib-c is public this can be enabled
+// #define AZSTORAGE_BLOB_VALIDATE_ARGUMENTS
 
 /**
  * @brief bytes allocated to storing a whole blob in an array
