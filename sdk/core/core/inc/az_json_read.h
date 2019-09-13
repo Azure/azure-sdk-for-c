@@ -4,7 +4,7 @@
 #ifndef AZ_JSON_READ_H
 #define AZ_JSON_READ_H
 
-#include <az_const_str.h>
+#include <az_str.h>
 #include <az_result.h>
 
 #include <stdint.h>

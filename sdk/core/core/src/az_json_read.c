@@ -3,8 +3,6 @@
 
 #include <az_json_read.h>
 
-// #include <az_digit.h>
-
 #include <math.h>
 #include <ctype.h>
 
@@ -232,7 +230,10 @@ az_result az_json_read_number_minus_rest(az_const_str const buffer, size_t *cons
   // read digit.
   char c;
   AZ_RETURN_IF_NOT_OK(az_json_get_char(buffer, *p, &c));
-  return isdigit(c) ? az_json_read_number_digit_rest(buffer, p, out_value, -1) : AZ_JSON_ERROR_UNEXPECTED_CHAR;
+  if (!isdigit(c)) {
+    return AZ_JSON_ERROR_UNEXPECTED_CHAR;
+  }
+  return az_json_read_number_digit_rest(buffer, p, out_value, -1);
 }
 
 az_result az_json_read_string_rest(az_const_str const buffer, size_t *const p, az_const_str *const string) {
@@ -411,7 +412,8 @@ az_result az_json_read_array_element(az_json_state *const p_state, az_json_value
 }
 
 az_result az_json_state_done(az_json_state const *const p_state) {
-  return p_state->i == p_state->buffer.size && az_json_stack_is_empty(p_state)
-    ? AZ_OK
-    : AZ_JSON_ERROR_INVALID_STATE;
+  if (p_state->i != p_state->buffer.size || !az_json_stack_is_empty(p_state)) {
+    return AZ_JSON_ERROR_INVALID_STATE;
+  }
+  return AZ_OK;
 }

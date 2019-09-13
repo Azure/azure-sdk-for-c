@@ -5,15 +5,17 @@
 #define AZ_RESULT_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 enum {
-  AZ_OK          = 0,
-  AZ_ERROR_FLAG  = 0x80000000,
-  AZ_JSON_RESULT =    0x10000,
+  AZ_OK            =          0,
+  AZ_ERROR_FLAG    = 0x80000000,
+  AZ_STREAM_RESULT =    0x10000,
+  AZ_JSON_RESULT   =    0x20000,
 };
 
 typedef int32_t az_result;
