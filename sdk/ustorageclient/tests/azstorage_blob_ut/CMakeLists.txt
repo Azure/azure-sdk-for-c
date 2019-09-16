@@ -25,10 +25,10 @@ include_directories(
     ${PROJECT_SOURCE_DIR}/deps/umock-c/inc
     ${PROJECT_SOURCE_DIR}/deps/azure-macro-utils-c/inc
     ${PROJECT_SOURCE_DIR}/deps/azure-c-shared-utility/inc
-    ${PROJECT_SOURCE_DIR}/deps/azure-ulib-c/inc
-    ${PROJECT_SOURCE_DIR}/deps/azure-ulib-c/config
+    #${PROJECT_SOURCE_DIR}/deps/azure-ulib-c/inc
+    #${PROJECT_SOURCE_DIR}/deps/azure-ulib-c/config
     #ulib pal directory TODO: fix with environment variable from azure-ulib-c cmake
-    ${PROJECT_SOURCE_DIR}/deps/azure-ulib-c/pal/MSBUILD/X86
+    #${PROJECT_SOURCE_DIR}/deps/azure-ulib-c/pal/MSBUILD/X86
 )
 
 add_definitions(-DNO_LOGGING)

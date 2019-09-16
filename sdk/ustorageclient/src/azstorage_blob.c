@@ -10,7 +10,8 @@
 #include "azure_c_shared_utility/platform.h"
 #include "azure_c_shared_utility/xlogging.h"
 #include "azure_c_shared_utility/strings.h"
-#include "ucontract.h"
+// TODO: once azure-ulib-c is public this can be enabled
+//#include "ucontract.h"
 
 #include "azstorage_storage_config.h"
 
@@ -140,6 +141,11 @@ AZSTORAGE_RESULT azstorage_blob_storage_client_create(AZSTORAGE_BLOB_HANDLE blob
         /*[azstorage_blob_service_client_create_service_uri_NULL_FAIL]*/
         UCONTRACT_REQUIRE_NOT_NULL(service_uri, AZSTORAGE_ILLEGAL_ARGUMENT_ERROR)
     );
+    #else
+        if (blob_storage_client == NULL || service_uri == NULL)
+        {
+            return AZSTORAGE_ILLEGAL_ARGUMENT_ERROR;
+        }
     #endif
 
     AZSTORAGE_RESULT result;
@@ -170,6 +176,11 @@ void azstorage_blob_storage_client_destroy(AZSTORAGE_BLOB_HANDLE blob_storage_cl
         /*[azstorage_blob_storage_client_destroy_blob_storage_client_NULL_FAIL]*/
         UCONTRACT_REQUIRE_NOT_NULL(blob_storage_client,);
     );
+    #else
+        if (blob_storage_client == NULL)
+        {
+            return;
+        }
     #endif
 
     AZSTORAGE_BLOB_STORAGE_CLIENT* cb = (AZSTORAGE_BLOB_STORAGE_CLIENT*)blob_storage_client;
@@ -207,6 +218,12 @@ AZSTORAGE_RESULT azstorage_blob_put(AZSTORAGE_BLOB_HANDLE blob_storage_client, A
             AZSTORAGE_ILLEGAL_ARGUMENT_ERROR,
             "If buffer is NULL, buffer_len shall be 0.\nIf buffer is NOT NULL, buffer_len shall be greater than 0.\n")
     );
+    #else
+        if (blob_storage_client == NULL || blob_path == NULL || blob_type > AZSTORAGE_BLOB_TYPE_APPEND_BLOB ||
+            ((buffer != NULL && buffer_len == 0) || (buffer_len > 0 && buffer == NULL )))
+        {
+            return AZSTORAGE_ILLEGAL_ARGUMENT_ERROR;
+        }
     #endif
 
     AZSTORAGE_RESULT result;
@@ -280,6 +297,11 @@ AZSTORAGE_RESULT azstorage_blob_append_block(AZSTORAGE_BLOB_HANDLE blob_storage_
         UCONTRACT_REQUIRE_NOT_NULL(buffer, AZSTORAGE_ILLEGAL_ARGUMENT_ERROR),
         UCONTRACT_REQUIRE_NOT_EQUALS(buffer_len, 0, AZSTORAGE_ILLEGAL_ARGUMENT_ERROR)
     );
+    #else
+        if (blob_storage_client == NULL || blob_path == NULL || buffer == NULL || buffer_len == 0)
+        {
+            return AZSTORAGE_ILLEGAL_ARGUMENT_ERROR;
+        }
     #endif
 
     AZSTORAGE_RESULT result;
@@ -347,6 +369,11 @@ AZSTORAGE_RESULT azstorage_blob_get_metadata(AZSTORAGE_BLOB_HANDLE blob_storage_
         /*[azstorage_blob_get_metadata_response_header_NULL_FAIL]*/
         UCONTRACT_REQUIRE_NOT_NULL(response_headers, AZSTORAGE_ILLEGAL_ARGUMENT_ERROR)
     );
+    #else
+        if (blob_storage_client == NULL || blob_path == NULL || response_headers == NULL)
+        {
+            return AZSTORAGE_ILLEGAL_ARGUMENT_ERROR;
+        }
     #endif
 
     AZSTORAGE_RESULT result;
@@ -394,6 +421,11 @@ AZSTORAGE_RESULT azstorage_blob_get_bytes(AZSTORAGE_BLOB_HANDLE blob_storage_cli
         /*[azstorage_blob_get_bytes_buffer_len_zero_FAIL]*/
         UCONTRACT_REQUIRE_NOT_EQUALS(buffer_len, 0, AZSTORAGE_ILLEGAL_ARGUMENT_ERROR)
     );
+    #else
+        if (blob_storage_client == NULL || blob_path == NULL || buffer == NULL || buffer_len == 0)
+        {
+            return AZSTORAGE_ILLEGAL_ARGUMENT_ERROR;
+        }
     #endif
 
     AZSTORAGE_RESULT result;
