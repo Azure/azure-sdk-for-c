@@ -15,6 +15,7 @@ pr:
     include:
       - master
       - feature/*
+      - storagesdkv0
   paths:
     include:
       - sdk/storage/
