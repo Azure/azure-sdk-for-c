@@ -29,6 +29,8 @@ typedef struct {
   size_t size;
 } az_str;
 
+AZ_STATIC_ASSERT(CHAR_BIT == 8);
+
 // A size of the string literal.
 // Details: to make sure that `S` is a `string literal`, we are appending `""` to `S`.
 #define AZ_STRING_LITERAL_LEN(S) (sizeof(S "") - 1)
