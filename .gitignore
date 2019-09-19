@@ -331,3 +331,4 @@ ASALocalRun/
 
 # CMake
 build/
+/cmake-build-debug
