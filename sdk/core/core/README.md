@@ -1,7 +1,7 @@
 # Azure SDK Core Library
 
-In high-level languages, an [inversion of control](https://en.wikipedia.org/wiki/Inversion_of_control) is commonly used.
-For example, a generic JSON deserializer may call a user provided function to set an object property value
+In high-level programming languages, an [inversion of control](https://en.wikipedia.org/wiki/Inversion_of_control)
+is commonly used. For example, a generic JSON deserializer may call a user provided function to set an object property value
 (similar to [Visitor Pattern](https://en.wikipedia.org/wiki/Visitor_pattern)). The principle requires a call-back
 function or a virtual table. In C, a call-back or a virtual table requires an untyped parameter `void *context`.
 It's very hard to work safely with such functions so Azure SDK Core library for C tries to avoid these technic.
