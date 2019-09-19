@@ -18,9 +18,9 @@ extern "C" {
 
 // A constant string.
 typedef struct {
-  // Points to the first character.
+  // Points to the first byte (character).
   uint8_t const *begin;
-  // A numer of C characters (bytes) in the string.
+  // A numer of octets (bytes) in the string.
   size_t size;
 } az_const_str;
 
@@ -41,21 +41,21 @@ AZ_STATIC_ASSERT(CHAR_BIT == 8);
 #define AZ_CONST_STR(STRING_LITERAL) \
   (az_const_str){ .begin = STRING_LITERAL, .size = AZ_STRING_LITERAL_LEN(STRING_LITERAL) }
 
-inline char const *az_const_str_ptr(az_const_str const buffer, size_t const index) {
+inline uint8_t const *az_const_str_ptr(az_const_str const buffer, size_t const index) {
   AZ_ASSERT(index <= buffer.size);
   return buffer.begin + index;
 }
 
-inline char az_const_str_item(az_const_str const buffer, size_t const index) {
+inline uint8_t az_const_str_item(az_const_str const buffer, size_t const index) {
   AZ_ASSERT(index < buffer.size);
   return buffer.begin[index];
 }
 
-inline char const *az_const_str_end(az_const_str const buffer) {
+inline uint8_t const *az_const_str_end(az_const_str const buffer) {
   return az_const_str_ptr(buffer, buffer.size);
 }
 
-inline size_t az_const_str_index(az_const_str const buffer, char const *const p) {
+inline size_t az_const_str_index(az_const_str const buffer, uint8_t const *const p) {
   size_t const result = p - buffer.begin;
   AZ_ASSERT(result <= buffer.size);
   return result;
