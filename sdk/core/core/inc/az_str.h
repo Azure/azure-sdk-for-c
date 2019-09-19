@@ -6,9 +6,11 @@
 
 #include <az_assert.h>
 
+#include <az_static_assert.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
+#include <limits.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -17,15 +19,17 @@ extern "C" {
 // A constant string.
 typedef struct {
   // Points to the first character.
-  char const *begin;
+  uint8_t const *begin;
   // A numer of C characters (bytes) in the string.
   size_t size;
 } az_const_str;
 
 typedef struct {
-  char* begin;
+  uint8_t* begin;
   size_t size;
 } az_str;
+
+AZ_STATIC_ASSERT(CHAR_BIT == 8);
 
 // A size of the string literal.
 // Details: to make sure that `S` is a `string literal`, we are appending `""` to `S`.

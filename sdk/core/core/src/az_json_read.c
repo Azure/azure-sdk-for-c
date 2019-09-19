@@ -117,15 +117,24 @@ az_result az_json_read_keyword_rest(
   return AZ_OK;
 }
 
+// 17 decimal digits. 10^17 - 1.
+//                        01234567890123456
+#define AZ_DEC_NUMBER_MAX 99999999999999999ull
+
 typedef struct {
+  int sign;
   uint64_t value;
   int16_t exp;
-} az_json_number_int;
+} az_dec_number;
+
+double az_json_number_to_double(az_dec_number const* p) {
+  return p->value * pow(10, p->exp) * p->sign;
+}
 
 az_result az_json_number_int_parse(
   az_const_str const buffer, 
   size_t *const p, 
-  az_json_number_int *const p_n, 
+  az_dec_number *const p_n,
   int16_t const e_offset, 
   char const first
 ) {
@@ -133,7 +142,7 @@ az_result az_json_number_int_parse(
   // read an integer part of the number
   do {
     int d = c - '0';
-    if (p_n->value <= (UINT64_MAX - d) / 10) {
+    if (p_n->value <= (AZ_DEC_NUMBER_MAX - d) / 10) {
       p_n->value = p_n->value * 10 + d;
       p_n->exp += e_offset;
     }
@@ -152,14 +161,29 @@ az_result az_json_number_int_parse(
 az_result az_json_read_number_digit_rest(
   az_const_str const buffer,
   size_t *const p,
-  double *const out_value,
-  int const sign
+  double *const out_value
 ) {
-  az_json_number_int i = { .value = 0, .exp = 0 };
+  az_dec_number i = { 
+    .sign = 1,
+    .value = 0,
+    .remainder = false,
+    .exp = 0,
+  };
 
   // integer part
   {
     char c = az_const_str_item(buffer, *p);
+    if (c == '-') {
+      i.sign = -1;
+      *p += 1;
+      if (*p == buffer.size) {
+        return AZ_JSON_ERROR_UNEXPECTED_END;
+      }
+      c = az_const_str_item(buffer, *p);
+      if (!isdigit(c)) {
+        return AZ_JSON_ERROR_UNEXPECTED_CHAR;
+      }
+    }
     if (c != '0') {
       AZ_RETURN_IF_NOT_OK(az_json_number_int_parse(buffer, p, &i, 0, c));
     } else {
@@ -220,20 +244,8 @@ az_result az_json_read_number_digit_rest(
     i.exp += e_int * e_sign;
   }
 
-  *out_value = i.value * pow(10, i.exp) * sign;
+  *out_value = az_json_number_to_double(&i);
   return AZ_OK;
-}
-
-az_result az_json_read_number_minus_rest(az_const_str const buffer, size_t *const p, double *const out_value) {
-  // skip '-'
-  *p += 1;
-  // read digit.
-  char c;
-  AZ_RETURN_IF_NOT_OK(az_json_get_char(buffer, *p, &c));
-  if (!isdigit(c)) {
-    return AZ_JSON_ERROR_UNEXPECTED_CHAR;
-  }
-  return az_json_read_number_digit_rest(buffer, p, out_value, -1);
 }
 
 az_result az_json_read_string_rest(az_const_str const buffer, size_t *const p, az_const_str *const string) {
@@ -297,16 +309,16 @@ az_result az_json_read_value(az_json_state *const p_state, az_json_value *const 
   char const c = az_const_str_item(buffer, *p);
   if (isdigit(c)) {
     out_value->kind = AZ_JSON_VALUE_NUMBER;
-    return az_json_read_number_digit_rest(buffer, p, &out_value->val.number, 1);
+    return az_json_read_number_digit_rest(buffer, p, &out_value->data.number);
   }
   switch (c) {
     case 't':
       out_value->kind = AZ_JSON_VALUE_BOOLEAN;
-      out_value->val.boolean = true;
+      out_value->data.boolean = true;
       return az_json_read_keyword_rest(buffer, p, AZ_CONST_STR("rue"));
     case 'f':
       out_value->kind = AZ_JSON_VALUE_BOOLEAN;
-      out_value->val.boolean = false;
+      out_value->data.boolean = false;
       return az_json_read_keyword_rest(buffer, p, AZ_CONST_STR("alse"));
     case 'n':
       out_value->kind = AZ_JSON_VALUE_NULL;
@@ -314,10 +326,10 @@ az_result az_json_read_value(az_json_state *const p_state, az_json_value *const 
     case '"':
       out_value->kind = AZ_JSON_VALUE_STRING;
       *p += 1;
-      return az_json_read_string_rest(buffer, p, &out_value->val.string);
+      return az_json_read_string_rest(buffer, p, &out_value->data.string);
     case '-':
       out_value->kind = AZ_JSON_VALUE_NUMBER;
-      return az_json_read_number_minus_rest(buffer, p, &out_value->val.number);
+      return az_json_read_number_digit_rest(buffer, p, &out_value->data.number);
     case '{':
       out_value->kind = AZ_JSON_VALUE_OBJECT;
       *p += 1;

@@ -41,7 +41,7 @@ typedef struct {
     bool boolean;
     az_const_str string;
     double number;
-  } val;
+  } data;
 } az_json_value;
 
 typedef struct {

@@ -8,7 +8,27 @@ Instead, the Core library provides safe and useful parts to construct complex so
 
 ## 1. Data Types
 
-### 1.1. Tagged Unions
+### 1.1. Const in `struct`
+
+Don't use `const` fields in structures and unions. For example:
+
+```c
+struct my_struct {
+  size_t const size;
+};
+
+// ok
+struct my_struct my_struct_create() {
+  return (struct my_struct){ .size = 5 };
+}
+
+void my_struct_init(struct my_struct *const p) {
+  // compilation error.
+  *p = (struct my_struct){ .size = 5 };
+}
+```
+
+### 1.2. Tagged Unions
 
 Example of `az_mytype` tagged union.
 
@@ -18,7 +38,7 @@ enum {
   AZ_MYTYPE_BAR,
 };
 
-typedef uint8_t az_mytype_tag;
+typedef uint8_t az_mytype_kind;
 
 typedef double az_mytype_foo;
 
@@ -35,32 +55,32 @@ struct my_type {
 };
 
 typedef struct {
-  az_mytype_tag tag;
+  az_mytype_kind kind;
   union {
     az_mytype_foo foo;
     az_mytype_bar bar;
-  } val;
+  } data;
 } az_mytype;
 
 inline az_mytype_create_bar(az_mytype_bar const bar) {
-  return (az_mytype){ .tag = AZ_MYTYPE_BAR, .val.bar = bar };
+  return (az_mytype){ .kind = AZ_MYTYPE_BAR, .data.bar = bar };
 }
 ```
 
-### 1.2. Strings
+### 1.3. Strings
 
-UTF-8. No MUTF-8. Defined in `az_str.h`. It's a pair of a pointer to `char const` and size.
+UTF-8. No MUTF-8. Defined in `az_str.h`. It's a pair of a pointer to `int8_t const` and size.
 
 ```c
 typedef struct {
-  char const *const begin;
-  size_t const size;
+  int8_t const *begin;
+  size_t size;
 } az_const_str;
 
 az_const_str const hello_world = AZ_CONST_STR("Hello world!");
 
 typedef struct {
-  char *const begin;
+  int8_t *const begin;
   size_t const size;
 } az_str;
 
@@ -69,28 +89,34 @@ inline az_const_str az_to_const_str(az_str const str) {
 }
 ```
 
-### 1.3 Error Structure
-
-Common `enum az_result`.
+### 1.4 Error Structure
 
 ```c
 // az_core.h
-typedef enum {
-  AZ_OK = 0,
-  ...
-  AZ_JSON_ERROR    = 0x10000,
-  AZ_STORAGE_ERROR = 0x20000,
-  ...
-} az_result;
-```
-
-```c
-// az_storage.h
 enum {
-  AZ_STORAGE_READ_ERROR = AZ_STORAGE_ERROR + 1,
+  AZ_OK              =          0,
+  AZ_ERROR_FLAG      = 0x80000000,
+
+  AZ_CORE_FACILITY   =    0x10000,
 };
 
-az_result az_storage_read(...);
+typedef int32_t az_result;
+
+#define AZ_MAKE_ERROR(facility, code) ((az_result)(0x80000000 | ((uint32_t)(facility) << 16)) | (uint32_t)(code))
+
+#define AZ_MAKE_RESULT(facility, code) ((az_result)(((uint32_t)(facility) << 16)) | (uint32_t)(code))
+
+enum {
+  AZ_STREAM_ERROR = AZ_MAKE_ERROR(AZ_CORE_FACILITY, 1),
+};
+
+inline bool az_failed(az_result result) {
+  return (result & AZ_ERROR_FLAG) != 0;
+}
+
+inline bool az_succeeded(az_result result) {
+  return (result & AZ_ERROR_FLAG) == 0;
+}
 ```
 
 Additional information could be passed using output parameters.
@@ -100,7 +126,7 @@ Additional information could be passed using output parameters.
 The main purpose of the JSON parser is to deserialize JSON HTTP Responses into known the data structure.
 The assumption is that we receive a valid standard JSON.
 
-### 2.2. Layer 1. Synchronous JSON Value Parser
+### 2.1. Layer 1. Synchronous JSON Value Parser
 
 Utility functions to read primitive values, objects and arrays from a continuous JSON string.
 The functions doesn't maintain a stack for nested objects and arrays. The assumption is that deserializer knows
@@ -114,22 +140,22 @@ az_json_state az_json_reader_create(az_const_str const buffer);
 typedef az_const_str az_json_string;
 
 typedef enum {
-  AZ_JSON_NONE,
-  AZ_JSON_NULL,
-  AZ_JSON_BOOLEAN,
-  AZ_JSON_STRING,
-  AZ_JSON_NUMBER,
-  AZ_JSON_OBJECT,
-  AZ_JSON_ARRAY,
-} az_json_value_tag;
+  AZ_JSON_VALUE_NONE,
+  AZ_JSON_VALUE_NULL,
+  AZ_JSON_VALUE_BOOLEAN,
+  AZ_JSON_VALUE_STRING,
+  AZ_JSON_VALUE_NUMBER,
+  AZ_JSON_VALUE_OBJECT,
+  AZ_JSON_VALUE_ARRAY,
+} az_json_value_kind;
 
 typedef struct {
-  az_json_value_tag tag;
+  az_json_value_kind kind;
   union {
     bool boolean;
     az_json_string string;
     double number;
-  } val;
+  } data;
 } az_json_value;
 
 az_error az_json_read(az_json_state *const p_state, az_json_value *const out_value);
@@ -148,7 +174,7 @@ az_error az_json_read_array_element(az_json_state *const p_state, az_json_value 
 
 JSON stack size https://softwareengineering.stackexchange.com/questions/279207/how-deeply-can-a-json-object-be-nested
 
-## Issues
+## 3. Issues
 
 - [ ] C unit test framework.
   - [ ] Visual Studio support.
@@ -175,45 +201,6 @@ JSON stack size https://softwareengineering.stackexchange.com/questions/279207/h
 - [ ] JSON number reader/writer should produce the same numbers as C library.
 - [ ] check `static inline` for Linux.
 
-## const fields in az_const_str
+### const fields in az_const_str
 
-We can't use const fields in the structure and output parameters. For example:
 
-```c
-struct my_struct {
-  size_t const size;
-};
-
-void my_struct_init(struct my_struct *const p) {
-  // compilation error.
-  *p = (struct my_struct){ .size = 5 };
-}
-
-// ok
-struct my_struct my_struct_create() {
-  return (struct my_struct){ .size = 5 };
-}
-```
-
-C++ example:
-
-```c++
-class wrap {
-public:
-  explicit wrap(int const i): i(i) {}
-  wrap plus(int const i) const { return wrap(this->i + i); }
-
-  // not required.
-  wrap &operator=(wrap const &w) {
-    this->i = w.i;
-    return *this;
-  }
-private:
-  int i;
-};
-
-void test(wrap *const p) {
-  *p = wrap(7);
-  *p = p->plus(7);
-}
-```
