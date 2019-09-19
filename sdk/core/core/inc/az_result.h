@@ -25,11 +25,11 @@ typedef int32_t az_result;
 #define AZ_MAKE_RESULT(facility, code) ((az_result)(((uint32_t)(facility) << 16)) | (uint32_t)(code))
 
 inline bool az_failed(az_result result) {
-  return result < 0;
+  return (result & AZ_ERROR_FLAG) != 0;
 }
 
 inline bool az_succedded(az_result result) {
-  return result >= 0;
+  return (result & AZ_ERROR_FLAG) == 0;
 }
 
 #define AZ_RETURN_IF_NOT_OK(exp) \
