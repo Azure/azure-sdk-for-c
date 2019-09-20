@@ -28,7 +28,7 @@ inline uint8_t az_str_reader_current(az_str_reader const *const p_reader) {
   return az_const_str_item(p_reader->buffer, p_reader->i);
 }
 
-inline az_result az_str_reader_next(az_str_reader* const p_reader) {
+inline az_result az_str_reader_next(az_str_reader *const p_reader) {
   if (p_reader->i == p_reader->buffer.size) {
     return AZ_STREAM_ERROR_END;
   }
