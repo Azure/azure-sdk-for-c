@@ -6,10 +6,14 @@
 ###########
 
 # Catch all
-/sdk/ @jhendrixMSFT @joshfree @sergey-shandar 
+/sdk/ @joshfree @sergey-shandar @jhendrixmsft @jeffreyrichter
 
 # Service teams
-/sdk/storage/   @jhendrixMSFT @sergey-shandar 
+/sdk/core/      @sergey-shandar @vhvb1989 @antkmsft @gilbertw @jhendrixmsft
+/sdk/identity/  @antkmsft
+/sdk/keyvault/  @gilbertw
+/sdk/storage/   @sergey-shandar @gilbertw
+/sdk/tracing/   @antkmsft
 
 ###########
 # Eng Sys
