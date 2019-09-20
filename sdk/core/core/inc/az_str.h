@@ -25,7 +25,7 @@ typedef struct {
 } az_const_str;
 
 typedef struct {
-  uint8_t* begin;
+  uint8_t *begin;
   size_t size;
 } az_str;
 
