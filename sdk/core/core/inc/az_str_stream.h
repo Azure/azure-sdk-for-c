@@ -12,7 +12,7 @@ extern "C" {
 #endif
 
 enum {
-  AZ_STREAM_ERROR_END = AZ_MAKE_ERROR(AZ_STREAM_RESULT, 1)
+  AZ_STREAM_ERROR_END = AZ_MAKE_ERROR(AZ_STREAM_FACILITY, 1)
 };
 
 typedef struct {

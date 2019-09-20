@@ -14,10 +14,18 @@ extern "C" {
 enum {
   AZ_OK            =          0,
   AZ_ERROR_FLAG    = 0x80000000,
-  AZ_STREAM_RESULT =    0x10000,
-  AZ_JSON_RESULT   =    0x20000,
 };
 
+enum {
+  AZ_STREAM_FACILITY = 0x1,
+  AZ_JSON_FACILITY   = 0x2,
+};
+
+// The type represents error conditions.
+// Bits:
+// -  0..15 Code.
+// - 16..30 Facility.
+// - 31     Severity (0 - success, 1 - failure).
 typedef int32_t az_result;
 
 #define AZ_MAKE_ERROR(facility, code) ((az_result)(0x80000000 | ((uint32_t)(facility) << 16)) | (uint32_t)(code))
