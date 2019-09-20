@@ -2,15 +2,13 @@ jobs:
 - job: Build
   strategy:
     matrix:
-      Linux:
-        vm.image: 'ubuntu-16.04'
       Win:
         vm.image: 'windows-2019'
-      MacOS:
-        vm.image: 'macOS-10.14'
   pool:
     vmImage: $(vm.image)
   steps:
+  - checkout: self
+    submodules: recursive
   - task: CMake@1
     inputs:
       cmakeArgs: ..

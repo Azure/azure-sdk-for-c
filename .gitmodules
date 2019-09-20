@@ -1,0 +1,15 @@
+[submodule "sdk/ustorageclient/deps/umock-c"]
+	path = sdk/storage/ustorageclient/deps/umock-c
+	url = https://github.com/Azure/umock-c.git
+[submodule "sdk/ustorageclient/deps/azure-ctest"]
+	path = sdk/storage/ustorageclient/deps/azure-ctest
+	url = https://github.com/Azure/azure-ctest.git
+[submodule "sdk/ustorageclient/deps/azure-c-testrunnerswitcher"]
+	path = sdk/storage/ustorageclient/deps/azure-c-testrunnerswitcher
+	url = https://github.com/Azure/azure-c-testrunnerswitcher.git
+[submodule "sdk/ustorageclient/deps/azure-macro-utils-c"]
+	path = sdk/storage/ustorageclient/deps/azure-macro-utils-c
+	url = https://github.com/Azure/azure-macro-utils-c.git
+[submodule "sdk/ustorageclient/deps/azure-c-shared-utility"]
+	path = sdk/storage/ustorageclient/deps/azure-c-shared-utility
+	url = https://github.com/Azure/azure-c-shared-utility.git
