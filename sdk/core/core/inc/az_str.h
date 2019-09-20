@@ -16,7 +16,7 @@
 extern "C" {
 #endif
 
-// A constant string.
+// An immutable string slice.
 typedef struct {
   // Points to the first byte (character).
   uint8_t const *begin;
@@ -24,6 +24,7 @@ typedef struct {
   size_t size;
 } az_const_str;
 
+// A muttable string slice.
 typedef struct {
   uint8_t *begin;
   size_t size;
