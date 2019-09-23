@@ -18,3 +18,7 @@ add_executable (az_core_test test/main.c)
 
 target_include_directories (az_core_test PRIVATE inc)
 target_link_libraries(az_core_test PRIVATE az_core)
+
+enable_testing()
+
+add_test(NAME az_core_test COMMAND ${EXECUTABLE_OUTPUT_PATH}/az_core_test)
