@@ -2,7 +2,7 @@
 
 Azure Core library (`az_core`) provides shared primitives, abstractions, and helpers for modern Azure SDK client libraries written in the C programming language. These libraries follow the Azure SDK Design Guidelines for Embedded C.
 
-The library allows client libraries to expose common functionality in a consistent fashion, so that once you learn how to use these APIs in one client library, you will know hot to use them in other client libraries.
+The library allows client libraries to expose common functionality in a consistent fashion, so that once you learn how to use these APIs in one client library, you will know how to use them in other client libraries.
 
 ## 1. Error Structure
 
@@ -22,10 +22,6 @@ typedef int32_t az_result;
 #define AZ_MAKE_ERROR(facility, code) ((az_result)(0x80000000 | ((uint32_t)(facility) << 16)) | (uint32_t)(code))
 
 #define AZ_MAKE_RESULT(facility, code) ((az_result)(((uint32_t)(facility) << 16)) | (uint32_t)(code))
-
-enum {
-  AZ_STREAM_ERROR = AZ_MAKE_ERROR(AZ_CORE_FACILITY, 1),
-};
 
 inline bool az_failed(az_result result) {
   return (result & AZ_ERROR_FLAG) != 0;

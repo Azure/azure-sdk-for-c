@@ -38,13 +38,13 @@ typedef struct {
   az_json_value_kind kind;
   union {
     bool boolean;
-    az_const_str string;
+    az_const_span string;
     double number;
   } data;
 } az_json_value;
 
 typedef struct {
-  az_const_str name;
+  az_const_span name;
   az_json_value value;
 } az_json_member;
 
@@ -60,12 +60,12 @@ typedef enum {
 } az_json_stack_item;
 
 typedef struct {
-  az_const_str buffer;
+  az_const_span buffer;
   size_t i;
   az_json_stack stack;
 } az_json_state;
 
-az_json_state az_json_state_create(az_const_str const buffer);
+az_json_state az_json_state_create(az_const_span const buffer);
 
 az_result az_json_read(az_json_state *const p_state, az_json_value *const out_value);
 

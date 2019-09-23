@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef AZ_STR_STREAM_H
-#define AZ_STR_STREAM_H
+#ifndef AZ_SPAN_STREAM_H
+#define AZ_SPAN_STREAM_H
 
 #include <az_str.h>
 #include <az_result.h>
@@ -16,20 +16,20 @@ enum {
 };
 
 typedef struct {
-  az_const_str buffer;
+  az_const_span span;
   size_t i;
-} az_str_reader;
+} az_span_reader;
 
-inline bool az_str_reader_is_empty(az_str_reader const *const p_reader) {
-  return p_reader->buffer.size == p_reader->i;
+inline bool az_span_reader_is_empty(az_span_reader const *const p_reader) {
+  return p_reader->span.size == p_reader->i;
 }
 
-inline uint8_t az_str_reader_current(az_str_reader const *const p_reader) {
-  return az_const_str_item(p_reader->buffer, p_reader->i);
+inline uint8_t az_span_reader_current(az_span_reader const *const p_reader) {
+  return az_const_span_get(p_reader->span, p_reader->i);
 }
 
-inline az_result az_str_reader_next(az_str_reader *const p_reader) {
-  if (p_reader->i == p_reader->buffer.size) {
+inline az_result az_span_reader_next(az_span_reader *const p_reader) {
+  if (p_reader->i == p_reader->span.size) {
     return AZ_STREAM_ERROR_END;
   }
   p_reader->i += 1;
