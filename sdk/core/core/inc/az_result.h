@@ -36,7 +36,7 @@ inline bool az_failed(az_result result) {
   return (result & AZ_ERROR_FLAG) != 0;
 }
 
-inline bool az_succedded(az_result result) {
+inline bool az_succeeded(az_result result) {
   return (result & AZ_ERROR_FLAG) == 0;
 }
 
