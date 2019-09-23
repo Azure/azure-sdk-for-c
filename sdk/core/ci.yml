@@ -8,7 +8,7 @@ trigger:
       - feature/*
   paths:
     include:
-      - sdk/storage/
+      - sdk/core/
 
 pr:
   branches:
@@ -17,9 +17,9 @@ pr:
       - feature/*
   paths:
     include:
-      - sdk/storage/
+      - sdk/core/
 
 jobs:
   - template: ../../eng/pipelines/templates/jobs/archetype-sdk-client.yml
     parameters:
-      ServiceDirectory: storage
+      ServiceDirectory: core
