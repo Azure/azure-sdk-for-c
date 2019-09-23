@@ -34,24 +34,26 @@ inline bool az_succeeded(az_result result) {
 
 Additional information could be passed using output parameters.
 
-## 2. Strings
+## 2. Span of bytes
 
-UTF-8. Defined in [inc/az_str.h](inc/az_str.h). It's a pair of a pointer to `uint8_t const` and size.
+Defined in [inc/az_span.h](inc/az_span.h).
 
 ```c
 typedef struct {
   uint8_t const *begin;
   size_t size;
-} az_const_str;
-
-az_const_str const hello_world = AZ_CONST_STR("Hello world!");
+} az_const_span;
 
 typedef struct {
   uint8_t *begin;
   size_t size;
-} az_str;
+} az_span;
+```
 
-inline az_const_str az_to_const_str(az_str const str) {
-  return (az_const_str){ .begin = str.begin, .size = str.size };
-}
+## 3. Strings
+
+A string is a span of UTF-8 characters. It's not a zero-terminated string. Defined in [inc/az_str.h](inc/az_str.h).
+
+```c
+az_const_span const hello_world = AZ_STR("Hello world!");
 ```

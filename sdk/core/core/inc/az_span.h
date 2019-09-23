@@ -32,36 +32,32 @@ typedef struct {
 
 AZ_STATIC_ASSERT(CHAR_BIT == 8);
 
-inline uint8_t const *az_const_span_ptr(az_const_span const span, size_t const index) {
-  AZ_ASSERT(index <= span.size);
-  return span.begin + index;
-}
-
+// Returns a byte in `index` position.
 inline uint8_t az_const_span_get(az_const_span const span, size_t const index) {
   AZ_ASSERT(index < span.size);
   return span.begin[index];
 }
 
-inline uint8_t const *az_const_span_end(az_const_span const span) {
-  return az_const_span_ptr(span, span.size);
-}
-
+// Returns an index of `*p` element in the span.
 inline size_t az_const_span_index(az_const_span const span, uint8_t const *const p) {
   size_t const result = p - span.begin;
   AZ_ASSERT(result <= span.size);
   return result;
 }
 
+// Returns a sub span of the given span.
 inline az_const_span az_const_sub_span(az_const_span const span, size_t const from, size_t const to) {
   AZ_ASSERT(from <= to);
   AZ_ASSERT(to <= span.size);
-  return (az_const_span){ .begin = az_const_span_ptr(span, from), .size = to - from };
+  return (az_const_span){ .begin = span.begin + from, .size = to - from };
 }
 
+// Cast the given mutable span to an immutable span.  
 inline az_const_span az_to_const_span(az_span const span) {
   return (az_const_span) { .begin = span.begin, .size = span.size };
 }
 
+// Returns `true` if a content of the `a` span is equal to a content of the `b` span. 
 inline bool az_const_span_eq(az_const_span const a, az_const_span const b) {
   return a.size == b.size && memcmp(a.begin, b.begin, a.size) == 0;
 }

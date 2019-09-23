@@ -118,13 +118,14 @@ az_result az_json_read_keyword_rest(
   return AZ_OK;
 }
 
-// 17 decimal digits. 10^17 - 1.
-//                        01234567890123456
-#define AZ_DEC_NUMBER_MAX 99999999999999999ull
+// 18 decimal digits. 10^18 - 1.
+//                        012345678901234567
+#define AZ_DEC_NUMBER_MAX 999999999999999999ull
 
 typedef struct {
   int sign;
   uint64_t value;
+  bool remainder;
   int16_t exp;
 } az_dec_number;
 
@@ -148,6 +149,9 @@ az_result az_json_number_int_parse(
       p_n->exp += e_offset;
     }
     else {
+      if (d != 0) {
+        p_n->remainder = true;
+      }
       p_n->exp += e_offset + 1;
     }
     *p += 1;
@@ -167,7 +171,7 @@ az_result az_json_read_number_digit_rest(
   az_dec_number i = { 
     .sign = 1,
     .value = 0,
-//    .remainder = false,
+    .remainder = false,
     .exp = 0,
   };
 
