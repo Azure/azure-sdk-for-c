@@ -2,8 +2,12 @@ jobs:
 - job: Build
   strategy:
     matrix:
+      Linux:
+        vm.image: 'ubuntu-16.04'
       Win:
         vm.image: 'windows-2019'
+      MacOS:
+        vm.image: 'macOS-10.14'
   pool:
     vmImage: $(vm.image)
   steps:
@@ -11,7 +15,7 @@ jobs:
     submodules: recursive
   - task: CMake@1
     inputs:
-      cmakeArgs: ..
+      cmakeArgs: -Duse_default_uuid=ON ..
   - task: CMake@1
     inputs:
       cmakeArgs: --build .

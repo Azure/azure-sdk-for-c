@@ -20,7 +20,7 @@ static unsigned char buffer_download[AZSTORAGE_BUFFER_SIZE];
 static unsigned char file[AZSTORAGE_AVAILABLE_STORAGE];
 static size_t file_size = AZSTORAGE_AVAILABLE_STORAGE;
 
-void main(void)
+int main(void)
 {
     // start sample
     (void)printf("********** Sample '%s' START **********\r\n\n", AZSTORAGE_CONFIG_SAMPLE_NAME);
@@ -56,4 +56,6 @@ void main(void)
 
     // end sample
     (void)printf("\n********** Sample '%s' COMPLETE **********\r\n", AZSTORAGE_CONFIG_SAMPLE_NAME);
+
+    return 0;
 }

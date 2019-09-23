@@ -20,7 +20,7 @@ static unsigned char buffer_download[AZSTORAGE_BUFFER_SIZE];
 static unsigned char file[AZSTORAGE_AVAILABLE_STORAGE];
 static size_t file_size = AZSTORAGE_AVAILABLE_STORAGE;
 
-void main(void)
+int main(void)
 {
     // start sample
     (void)printf("********** Sample '%s' START **********\r\n\n", AZSTORAGE_CONFIG_SAMPLE_NAME);
@@ -70,7 +70,7 @@ void main(void)
         (void)printf("Uploaded Data:\n%s\n", data);
         (void)printf("Downloaded Data:\n%.*s\n", (int)file_size, file);
         // compare
-        if(strncmp(data, file, sizeof(data)) == 0)
+        if(strncmp((const char *)data, (const char *)file, sizeof(data)) == 0)
         {
             (void)printf("Downloaded blob matches uploaded append blob!\r\n");
         }
@@ -82,4 +82,6 @@ void main(void)
 
     // end sample
     (void)printf("\n********** Sample '%s' FINISH **********\r\n", AZSTORAGE_CONFIG_SAMPLE_NAME);
+
+    return 0;
 }

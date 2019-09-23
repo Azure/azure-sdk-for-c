@@ -16,7 +16,7 @@
 static const unsigned char file_buffer[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcefghijklmnopqrstuvwxyz0123456789";
 
 
-void main(void)
+int main(void)
 {
     // start sample
     (void)printf("********** Sample '%s' START **********\r\n\n", AZSTORAGE_CONFIG_SAMPLE_NAME);
@@ -53,5 +53,7 @@ void main(void)
 
     // end sample
     (void)printf("\n********** Sample '%s' COMPLETE **********\r\n", AZSTORAGE_CONFIG_SAMPLE_NAME);
+
+    return 0;
 
 }

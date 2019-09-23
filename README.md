@@ -14,13 +14,25 @@ CMake version 3.12 is required to use these libraries.
 ### Development Environment
 Project contains files to work on Windows or Linux based OS.
 
+> Note: Project contains git submodules required to build. Before building run `git submodule update --init --recursive`
+
 #### Windows
 Use PowerShell to run {projectDir}/build.ps1
 
 #### Linux
-Use bash to run {projectDir}/build-tools/build.sh
+- Install `openssl version 1.1.1`
+  - For ubuntu: ```sudo apt-get install libssl-dev```
+- Install `uuid`
+  - ```sudo apt-get install uuid-dev```
 
-Output libraries are created in /build folder
+##### steps to build
+```
+mkdir build
+build
+cmake ../
+make
+```
+> Note: use `cmake -Duse_default_uuid=ON ../` if no uuid-dev is installed in system
 
 ## Need help?
 * File an issue via [Github Issues](https://github.com/Azure/azure-sdk-for-c/issues/new/choose).
