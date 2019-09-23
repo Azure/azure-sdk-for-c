@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include <az_json_read.h>
+#include <az_str_stream.h>
 
 #include <assert.h>
 #include <stdio.h>
@@ -139,7 +140,7 @@ int main() {
   {
 	  az_json_state state = az_json_state_create(AZ_CONST_STR("    "));
 	  az_json_value value;
-	  TEST_ASSERT(az_json_read(&state, &value) == AZ_JSON_ERROR_UNEXPECTED_END);
+	  TEST_ASSERT(az_json_read(&state, &value) == AZ_STREAM_ERROR_END);
   }
   {
     az_json_state state = az_json_state_create(AZ_CONST_STR("  null  "));
@@ -151,7 +152,7 @@ int main() {
   {
     az_json_state state = az_json_state_create(AZ_CONST_STR("  nul"));
     az_json_value value;
-    TEST_ASSERT(az_json_read(&state, &value) == AZ_JSON_ERROR_UNEXPECTED_END);
+    TEST_ASSERT(az_json_read(&state, &value) == AZ_STREAM_ERROR_END);
   }
   {
 	  az_json_state state = az_json_state_create(AZ_CONST_STR("  false"));
@@ -285,7 +286,7 @@ int main() {
       "[[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[["
     );
     az_result const result = read_write(json, output, &o);
-    TEST_ASSERT(result == AZ_JSON_ERROR_UNEXPECTED_END);
+    TEST_ASSERT(result == AZ_STREAM_ERROR_END);
   }
   {
     size_t o = 0;

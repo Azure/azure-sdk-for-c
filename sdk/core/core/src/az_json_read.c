@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include <az_json_read.h>
+#include <az_str_stream.h>
 
 #include <math.h>
 #include <ctype.h>
@@ -75,7 +76,7 @@ az_json_state az_json_state_create(az_const_str const buffer) {
 
 az_result az_json_get_char(az_const_str const buffer, size_t const i, char *const out_char) {
   if (i == buffer.size) {
-    return AZ_JSON_ERROR_UNEXPECTED_END;
+    return AZ_STREAM_ERROR_END;
   }
   *out_char = az_const_str_item(buffer, i);
   return AZ_OK;
@@ -108,7 +109,7 @@ az_result az_json_read_keyword_rest(
   *p += 1;
   for (size_t k = 0; k != keyword.size; ++*p, ++k) {
     if (*p == buffer.size) {
-      return AZ_JSON_ERROR_UNEXPECTED_END;
+      return AZ_STREAM_ERROR_END;
     }
     if (az_const_str_item(buffer, *p) != az_const_str_item(keyword, k)) {
       return AZ_JSON_ERROR_UNEXPECTED_CHAR;
@@ -166,7 +167,7 @@ az_result az_json_read_number_digit_rest(
   az_dec_number i = { 
     .sign = 1,
     .value = 0,
-    .remainder = false,
+//    .remainder = false,
     .exp = 0,
   };
 
@@ -177,7 +178,7 @@ az_result az_json_read_number_digit_rest(
       i.sign = -1;
       *p += 1;
       if (*p == buffer.size) {
-        return AZ_JSON_ERROR_UNEXPECTED_END;
+        return AZ_STREAM_ERROR_END;
       }
       c = az_const_str_item(buffer, *p);
       if (!isdigit(c)) {
@@ -195,7 +196,7 @@ az_result az_json_read_number_digit_rest(
   if (*p != buffer.size && az_const_str_item(buffer, *p) == '.') {
     *p += 1;
     if (*p == buffer.size) {
-      return AZ_JSON_ERROR_UNEXPECTED_END;
+      return AZ_STREAM_ERROR_END;
     }
     char c = az_const_str_item(buffer, *p);
     if (!isdigit(c)) {
@@ -210,7 +211,7 @@ az_result az_json_read_number_digit_rest(
     *p += 1;
 
     if (*p == buffer.size) {
-      return AZ_JSON_ERROR_UNEXPECTED_END;
+      return AZ_STREAM_ERROR_END;
     }
     char c = az_const_str_item(buffer, *p);
 
@@ -222,7 +223,7 @@ az_result az_json_read_number_digit_rest(
       case '+':
         *p += 1;
         if (*p == buffer.size) {
-          return AZ_JSON_ERROR_UNEXPECTED_END;
+          return AZ_STREAM_ERROR_END;
         }
         c = az_const_str_item(buffer, *p);
     }
@@ -253,7 +254,7 @@ az_result az_json_read_string_rest(az_const_str const buffer, size_t *const p, a
   size_t const begin = *p;
   while (true) {
     if (*p == buffer.size) {
-      return AZ_JSON_ERROR_UNEXPECTED_END;
+      return AZ_STREAM_ERROR_END;
     };
     char const c = az_const_str_item(buffer, *p);
     switch (c) {
@@ -269,7 +270,7 @@ az_result az_json_read_string_rest(az_const_str const buffer, size_t *const p, a
       {
         *p += 1;
         if (*p == buffer.size) {
-          return AZ_JSON_ERROR_UNEXPECTED_END;
+          return AZ_STREAM_ERROR_END;
         }
         char const c = az_const_str_item(buffer, *p);
         if (az_json_is_esc(c)) {
@@ -279,7 +280,7 @@ az_result az_json_read_string_rest(az_const_str const buffer, size_t *const p, a
           AZ_RETURN_IF_NOT_OK(az_json_expect_char(buffer, p, 'u'));
           for (size_t const u = *p + 4; *p != u; *p += 1) {
             if (*p == buffer.size) {
-              return AZ_JSON_ERROR_UNEXPECTED_END;
+              return AZ_STREAM_ERROR_END;
             }
             if (!isxdigit(az_const_str_item(buffer, *p))) {
               return AZ_JSON_ERROR_UNEXPECTED_CHAR;
@@ -304,7 +305,7 @@ az_result az_json_read_value(az_json_state *const p_state, az_json_value *const 
   az_const_str const buffer = p_state->buffer;
   size_t *const p = &p_state->i;
   if (*p == buffer.size) {
-	  return AZ_JSON_ERROR_UNEXPECTED_END;
+	  return AZ_STREAM_ERROR_END;
   }
   char const c = az_const_str_item(buffer, *p);
   if (isdigit(c)) {
@@ -357,7 +358,7 @@ az_result az_json_read(az_json_state *const p_state, az_json_value *const out_va
   switch (out_value->kind) {
     case AZ_JSON_VALUE_ARRAY:
     case AZ_JSON_VALUE_OBJECT:
-      return is_empty ? AZ_JSON_ERROR_UNEXPECTED_END : AZ_OK;
+      return is_empty ? AZ_STREAM_ERROR_END : AZ_OK;
   }
   return is_empty ? AZ_OK: AZ_JSON_ERROR_UNEXPECTED_CHAR;
 }
