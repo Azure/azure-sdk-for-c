@@ -6,6 +6,7 @@
 
 #include <az_str.h>
 #include <az_result.h>
+#include <az_span_reader.h>
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -60,8 +61,7 @@ typedef enum {
 } az_json_stack_item;
 
 typedef struct {
-  az_const_span buffer;
-  size_t i;
+  az_span_reader reader;
   az_json_stack stack;
 } az_json_state;
 
