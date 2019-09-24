@@ -15,7 +15,7 @@ extern "C" {
 #define AZ_STRING_LITERAL_LEN(S) (sizeof(S "") - 1)
 
 #define AZ_STR_DECL(NAME, STRING_LITERAL) \
-  az_const_span const NAME = { .begin = STRING_LITERAL,.size = AZ_STRING_LITERAL_LEN(STRING_LITERAL) }
+  az_const_span const NAME = { .begin = STRING_LITERAL, .size = AZ_STRING_LITERAL_LEN(STRING_LITERAL) }
 
 #define AZ_STR(STRING_LITERAL) \
   (az_const_span){ .begin = STRING_LITERAL, .size = AZ_STRING_LITERAL_LEN(STRING_LITERAL) }

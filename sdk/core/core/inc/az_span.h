@@ -38,13 +38,6 @@ inline uint8_t az_const_span_get(az_const_span const span, size_t const index) {
   return span.begin[index];
 }
 
-// Returns an index of `*p` element in the span.
-inline size_t az_const_span_index(az_const_span const span, uint8_t const *const p) {
-  size_t const result = p - span.begin;
-  AZ_ASSERT(result <= span.size);
-  return result;
-}
-
 // Returns a sub span of the given span.
 inline az_const_span az_const_sub_span(az_const_span const span, size_t const from, size_t const to) {
   AZ_ASSERT(from <= to);
