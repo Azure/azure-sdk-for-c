@@ -14,4 +14,4 @@ jobs:
       cmakeArgs: ..
   - task: CMake@1
     inputs:
-      cmakeArgs: --build . --target RUN_TESTS
+      cmakeArgs: --build .

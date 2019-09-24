@@ -237,7 +237,7 @@ int main() {
     TEST_ASSERT(value.kind == AZ_JSON_VALUE_ARRAY);
     TEST_ASSERT(az_json_read_array_element(&state, &value) == AZ_OK);
     TEST_ASSERT(value.kind == AZ_JSON_VALUE_BOOLEAN);
-    TEST_ASSERT(value.data.boolean == true);
+    TEST_ASSERT(value.data.boolean == false);
     TEST_ASSERT(az_json_read_array_element(&state, &value) == AZ_OK);
     TEST_ASSERT(value.kind == AZ_JSON_VALUE_NUMBER);
     // TEST_ASSERT(value.val.number == 0.3);
