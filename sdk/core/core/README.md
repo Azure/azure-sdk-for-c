@@ -2,7 +2,7 @@
 
 Azure Core library (`az_core`) provides shared primitives, abstractions, and helpers for modern Azure SDK client libraries written in the C programming language. These libraries follow the Azure SDK Design Guidelines for Embedded C.
 
-The library allows client libraries to expose common functionality in a consistent fashion, so that once you learn how to use these APIs in one client library, you will know hot to use them in other client libraries.
+The library allows client libraries to expose common functionality in a consistent fashion, so that once you learn how to use these APIs in one client library, you will know how to use them in other client libraries.
 
 ## 1. Error Structure
 
@@ -23,10 +23,6 @@ typedef int32_t az_result;
 
 #define AZ_MAKE_RESULT(facility, code) ((az_result)(((uint32_t)(facility) << 16)) | (uint32_t)(code))
 
-enum {
-  AZ_STREAM_ERROR = AZ_MAKE_ERROR(AZ_CORE_FACILITY, 1),
-};
-
 inline bool az_failed(az_result result) {
   return (result & AZ_ERROR_FLAG) != 0;
 }
@@ -38,24 +34,26 @@ inline bool az_succeeded(az_result result) {
 
 Additional information could be passed using output parameters.
 
-## 2. Strings
+## 2. Span of bytes
 
-UTF-8. Defined in [inc/az_str.h](inc/az_str.h). It's a pair of a pointer to `uint8_t const` and size.
+Defined in [inc/az_span.h](inc/az_span.h).
 
 ```c
 typedef struct {
   uint8_t const *begin;
   size_t size;
-} az_const_str;
-
-az_const_str const hello_world = AZ_CONST_STR("Hello world!");
+} az_const_span;
 
 typedef struct {
   uint8_t *begin;
   size_t size;
-} az_str;
+} az_span;
+```
 
-inline az_const_str az_to_const_str(az_str const str) {
-  return (az_const_str){ .begin = str.begin, .size = str.size };
-}
+## 3. Strings
+
+A string is a span of UTF-8 characters. It's not a zero-terminated string. Defined in [inc/az_str.h](inc/az_str.h).
+
+```c
+az_const_span const hello_world = AZ_STR("Hello world!");
 ```
