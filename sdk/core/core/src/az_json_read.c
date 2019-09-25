@@ -132,13 +132,12 @@ double az_json_number_to_double(az_dec_number const* p) {
 }
 
 az_result az_json_number_int_parse(
-  az_const_span const buffer, 
-  size_t *const p, 
+  az_span_reader const *p_reader,
   az_dec_number *const p_n,
   int16_t const e_offset, 
   char const first
 ) {
-  char c = first;
+  az_result c = first;
   // read an integer part of the number
   do {
     int d = c - '0';
@@ -152,18 +151,14 @@ az_result az_json_number_int_parse(
       }
       p_n->exp += e_offset + 1;
     }
-    *p += 1;
-    if (*p == buffer.size) {
-      break;
-    }
-    c = az_const_span_get(buffer, *p);
+    az_span_reader_next(p_reader);
+    c = az_span_reader_current(p_reader);
   } while (isdigit(c));
   return AZ_OK;
 }
 
 az_result az_json_read_number_digit_rest(
-  az_const_span const buffer,
-  size_t *const p,
+  az_span_reader *const p_reader,
   double *const out_value
 ) {
   az_dec_number i = { 
@@ -175,47 +170,46 @@ az_result az_json_read_number_digit_rest(
 
   // integer part
   {
-    char c = az_const_span_get(buffer, *p);
+    az_result c = az_span_reader_current(p_reader);
     if (c == '-') {
       i.sign = -1;
-      *p += 1;
-      if (*p == buffer.size) {
-        return AZ_STREAM_ERROR_END;
+      az_span_reader_next(p_reader);
+      c = az_span_reader_current(p_reader);
+      if (az_failed(c)) {
+        return c;
       }
-      c = az_const_span_get(buffer, *p);
       if (!isdigit(c)) {
         return AZ_JSON_ERROR_UNEXPECTED_CHAR;
       }
     }
     if (c != '0') {
-      AZ_RETURN_IF_NOT_OK(az_json_number_int_parse(buffer, p, &i, 0, c));
+      AZ_RETURN_IF_NOT_OK(az_json_number_int_parse(p_reader, &i, 0, c));
     } else {
-      *p += 1;
+      p_reader->i += 1;
     }
   }
 
   // fraction
-  if (*p != buffer.size && az_const_span_get(buffer, *p) == '.') {
-    *p += 1;
-    if (*p == buffer.size) {
+  if (az_span_reader_current(p_reader) == '.') {
+    az_span_reader_next(p_reader);
+    char const c = az_span_reader_current(p_reader);
+    if (az_failed(c)) {
       return AZ_STREAM_ERROR_END;
     }
-    char c = az_const_span_get(buffer, *p);
     if (!isdigit(c)) {
       return AZ_JSON_ERROR_UNEXPECTED_CHAR;
     }
-    AZ_RETURN_IF_NOT_OK(az_json_number_int_parse(buffer, p, &i, -1, c));
+    AZ_RETURN_IF_NOT_OK(az_json_number_int_parse(p_reader, &i, -1, c));
   }
 
   // exp
-  if (*p != buffer.size && az_json_is_e(az_const_span_get(buffer, *p))) {
+  if (az_json_is_e(az_span_reader_current(p_reader))) {
     // skip 'e' or 'E'
-    *p += 1;
-
-    if (*p == buffer.size) {
-      return AZ_STREAM_ERROR_END;
+    az_span_reader_next(p_reader);
+    az_result c = az_span_reader_current(p_reader);
+    if (az_failed(c)) {
+      return c;
     }
-    char c = az_const_span_get(buffer, *p);
 
     // read sign, if any.
     int e_sign = 1;
@@ -223,11 +217,11 @@ az_result az_json_read_number_digit_rest(
       case '-':
         e_sign = -1;
       case '+':
-        *p += 1;
-        if (*p == buffer.size) {
-          return AZ_STREAM_ERROR_END;
+        az_span_reader_next(p_reader);
+        c = az_span_reader_current(p_reader);
+        if (az_failed(c)) {
+          return c;
         }
-        c = az_const_span_get(buffer, *p);
     }
 
     // expect at least one digit.
@@ -238,11 +232,9 @@ az_result az_json_read_number_digit_rest(
     int16_t e_int = 0;
     do {
       e_int = e_int * 10 + (c - '0');
-      *p += 1;
-      if (*p == buffer.size) {
-        break;
-      }
-      c = az_const_span_get(buffer, *p);
+      az_span_reader_next(p_reader);
+      c = az_span_reader_current(p_reader);
+
     } while (isdigit(c));
     i.exp += e_int * e_sign;
   }
@@ -304,15 +296,16 @@ az_result az_json_read_string_rest(az_const_span const buffer, size_t *const p, 
 
 // _value_
 az_result az_json_read_value(az_json_state *const p_state, az_json_value *const out_value) {
-  az_const_span const buffer = p_state->reader.span;
-  size_t *const p = &p_state->reader.i;
-  if (*p == buffer.size) {
+  az_span_reader* p_reader = &p_state->reader;
+  az_const_span const buffer = p_reader->span;
+  size_t *const p = &p_reader->i;
+  if (az_span_reader_is_empty(p_reader)) {
 	  return AZ_STREAM_ERROR_END;
   }
-  char const c = az_const_span_get(buffer, *p);
+  char const c = az_span_reader_current(p_reader);
   if (isdigit(c)) {
     out_value->kind = AZ_JSON_VALUE_NUMBER;
-    return az_json_read_number_digit_rest(buffer, p, &out_value->data.number);
+    return az_json_read_number_digit_rest(p_reader, &out_value->data.number);
   }
   switch (c) {
     case 't':
@@ -332,7 +325,7 @@ az_result az_json_read_value(az_json_state *const p_state, az_json_value *const 
       return az_json_read_string_rest(buffer, p, &out_value->data.string);
     case '-':
       out_value->kind = AZ_JSON_VALUE_NUMBER;
-      return az_json_read_number_digit_rest(buffer, p, &out_value->data.number);
+      return az_json_read_number_digit_rest(p_reader, &out_value->data.number);
     case '{':
       out_value->kind = AZ_JSON_VALUE_OBJECT;
       *p += 1;
