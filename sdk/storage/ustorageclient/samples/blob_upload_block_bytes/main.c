@@ -26,7 +26,7 @@ void main(void)
     platform_init();
 
     AZSTORAGE_RESULT result;
-	AZSTORAGE_BLOB blob_storage_client;
+    AZSTORAGE_BLOB blob_storage_client;
     AZSTORAGE_BLOB_TYPE blob_type = AZSTORAGE_BLOB_TYPE_BLOCK_BLOB;
 
     (void)printf("Begin uploading block blob.\r\n");
