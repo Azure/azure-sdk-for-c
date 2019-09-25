@@ -132,7 +132,7 @@ double az_json_number_to_double(az_dec_number const* p) {
 }
 
 az_result az_json_number_int_parse(
-  az_span_reader const *p_reader,
+  az_span_reader *const p_reader,
   az_dec_number *const p_n,
   int16_t const e_offset, 
   char const first
