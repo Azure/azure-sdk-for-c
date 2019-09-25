@@ -300,7 +300,7 @@ az_result az_json_read_value(az_json_state *const p_state, az_json_value *const 
   az_const_span const buffer = p_reader->span;
   size_t *const p = &p_reader->i;
   if (az_span_reader_is_empty(p_reader)) {
-	  return AZ_STREAM_ERROR_END;
+    return AZ_STREAM_ERROR_END;
   }
   char const c = az_span_reader_current(p_reader);
   if (isdigit(c)) {
