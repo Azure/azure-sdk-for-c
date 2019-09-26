@@ -104,17 +104,14 @@ az_result az_json_read_white_space(az_const_span const buffer, size_t *const p) 
 }
 
 az_result az_json_read_keyword_rest(
-  az_const_span const buffer,
-  size_t *const p,
+  az_span_reader *const p_reader,
   az_const_span const keyword
 ) {
-  *p += 1;
-  for (size_t k = 0; k != keyword.size; ++*p, ++k) {
-    if (*p == buffer.size) {
-      return AZ_JSON_ERROR_UNEXPECTED_END;
-    }
-    if (az_const_span_get(buffer, *p) != az_const_span_get(keyword, k)) {
-      return AZ_JSON_ERROR_UNEXPECTED_CHAR;
+  az_span_reader_next(p_reader);
+  for (size_t k = 0; k != keyword.size; az_span_reader_next(p_reader), ++k) {
+    az_option_byte o = az_span_reader_current(p_reader);
+    if (o != az_const_span_get(keyword, k)) {
+      return az_json_error_unexpected(o);
     }
   }
   return AZ_OK;
@@ -176,17 +173,17 @@ az_result az_json_read_number_digit_rest(
 
   // integer part
   {
-    az_option_byte c = az_span_reader_current(p_reader);
-    if (c == '-') {
+    az_option_byte o = az_span_reader_current(p_reader);
+    if (o == '-') {
       i.sign = -1;
       az_span_reader_next(p_reader);
-      c = az_span_reader_current(p_reader);
-      if (!isdigit(c)) {
-        return az_json_error_unexpected(c);
+      o = az_span_reader_current(p_reader);
+      if (!isdigit(o)) {
+        return az_json_error_unexpected(o);
       }
     }
-    if (c != '0') {
-      AZ_RETURN_IF_NOT_OK(az_json_number_int_parse(p_reader, &i, 0, c));
+    if (o != '0') {
+      AZ_RETURN_IF_NOT_OK(az_json_number_int_parse(p_reader, &i, 0, o));
     } else {
       az_span_reader_next(p_reader);
     }
@@ -234,7 +231,6 @@ az_result az_json_read_number_digit_rest(
       e_int = e_int * 10 + (c - '0');
       az_span_reader_next(p_reader);
       c = az_span_reader_current(p_reader);
-
     } while (isdigit(c));
     i.exp += e_int * e_sign;
   }
@@ -311,14 +307,14 @@ az_result az_json_read_value(az_json_state *const p_state, az_json_value *const 
     case 't':
       out_value->kind = AZ_JSON_VALUE_BOOLEAN;
       out_value->data.boolean = true;
-      return az_json_read_keyword_rest(buffer, p, AZ_STR("rue"));
+      return az_json_read_keyword_rest(p_reader, AZ_STR("rue"));
     case 'f':
       out_value->kind = AZ_JSON_VALUE_BOOLEAN;
       out_value->data.boolean = false;
-      return az_json_read_keyword_rest(buffer, p, AZ_STR("alse"));
+      return az_json_read_keyword_rest(p_reader, AZ_STR("alse"));
     case 'n':
       out_value->kind = AZ_JSON_VALUE_NULL;
-      return az_json_read_keyword_rest(buffer, p, AZ_STR("ull"));
+      return az_json_read_keyword_rest(p_reader, AZ_STR("ull"));
     case '"':
       out_value->kind = AZ_JSON_VALUE_STRING;
       *p += 1;

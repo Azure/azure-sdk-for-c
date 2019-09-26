@@ -5,8 +5,9 @@
 #define AZ_SPAN_H
 
 #include <az_assert.h>
-
 #include <az_static_assert.h>
+#include <az_option_byte.h>
+
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
