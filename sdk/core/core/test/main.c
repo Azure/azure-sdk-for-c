@@ -265,7 +265,7 @@ int main() {
   {
     size_t o = 0;
     TEST_ASSERT(read_write(AZ_STR("{ \"a\" : [ true, { \"b\": [{}]}, 15 ] }"), output, &o) == AZ_OK);
-    az_const_span x = az_const_sub_span(az_to_const_span(output), 0, o);
+    az_const_span x = az_const_span_sub(az_to_const_span(output), 0, o);
     TEST_ASSERT(az_const_span_eq(x, AZ_STR("{\"a\":[true,{\"b\":[{}]},0]}")));
   }
   {
@@ -299,7 +299,7 @@ int main() {
     );
     az_result const result = read_write(json, output, &o);
     TEST_ASSERT(result == AZ_OK);
-    az_const_span x = az_const_sub_span(az_to_const_span(output), 0, o);
+    az_const_span x = az_const_span_sub(az_to_const_span(output), 0, o);
     TEST_ASSERT(az_const_span_eq(x, AZ_STR(
       "[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[{"
       "\"\\t\\n\":\"\\u0abc\""

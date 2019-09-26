@@ -25,9 +25,6 @@ inline bool az_span_reader_is_empty(az_span_reader const *const p_reader) {
 }
 
 inline az_option_byte az_span_reader_current(az_span_reader const *const p_reader) {
-  if (az_span_reader_is_empty(p_reader)) {
-    return AZ_OPTION_BYTE_NONE;
-  }
   return az_const_span_get(p_reader->span, p_reader->i);
 }
 

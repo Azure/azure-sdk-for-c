@@ -236,7 +236,7 @@ az_result az_json_read_string_rest(az_span_reader *const p_reader, az_const_span
       // end of the string
       case '"':
       {
-        *string = az_const_sub_span(p_reader->span, begin, p_reader->i);
+        *string = az_const_span_sub(p_reader->span, begin, p_reader->i);
         az_span_reader_next(p_reader);
         return AZ_OK;
       }
