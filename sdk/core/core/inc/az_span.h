@@ -16,6 +16,10 @@
 extern "C" {
 #endif
 
+#ifdef _MSC_VER
+#pragma warning(disable: 4204)
+#endif
+
 // An immutable span of bytes (octets).
 typedef struct {
   // Points to the first byte.
