@@ -9,6 +9,12 @@ set(CMAKE_C_STANDARD 99)
 
 add_library (az_core src/az_core.c src/az_json_read.c)
 
+if(MSVC)
+  target_compile_options(az_core PRIVATE /W4 /WX)
+else()
+  target_compile_options(az_core PRIVATE -Wall -Wextra -pedantic -Werror)
+endif()
+
 target_include_directories (az_core PUBLIC inc)
 
 # make sure that users can consume the project as a library.
