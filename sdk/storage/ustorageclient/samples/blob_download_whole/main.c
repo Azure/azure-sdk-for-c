@@ -31,7 +31,7 @@ void main(void)
     AZSTORAGE_RESULT result;
 
     // create blob storage client
-	AZSTORAGE_BLOB blob_storage_client;
+    AZSTORAGE_BLOB blob_storage_client;
     (void)printf("Begin downloading blob\n");
     if((result = azstorage_blob_storage_client_create(&blob_storage_client, AZSTORAGE_CONFIG_ACCOUNT_HOST_NAME))
         != AZSTORAGE_SUCCESS)
