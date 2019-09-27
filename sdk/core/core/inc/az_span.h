@@ -75,8 +75,10 @@ inline az_const_span az_const_span_drop(az_const_span const span, size_t const n
 /**
  * Returns a sub span of the given span.
  */
-inline az_const_span
-az_const_span_sub(az_const_span const span, size_t const begin, size_t const end) {
+inline az_const_span az_const_span_sub(
+    az_const_span const span,
+    size_t const begin,
+    size_t const end) {
   az_const_span const t = az_const_span_take(span, end);
   return az_const_span_drop(t, begin);
 }

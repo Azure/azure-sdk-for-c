@@ -21,11 +21,13 @@ enum {
   AZ_JSON_FACILITY = 0x2,
 };
 
-// The type represents error conditions.
-// Bits:
-// -  0..15 Code.
-// - 16..30 Facility.
-// - 31     Severity (0 - success, 1 - failure).
+/**
+ * The type represents error conditions.
+ * Bits:
+ * -  0..15 Code.
+ * - 16..30 Facility.
+ * - 31     Severity (0 - success, 1 - failure).
+ */
 typedef int32_t az_result;
 
 #define AZ_MAKE_ERROR(facility, code) \
