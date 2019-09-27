@@ -1,2 +1,8 @@
 BasedOnStyle: LLVM
+AlignAfterOpenBracket: AlwaysBreak
+AlignEscapedNewlines: DontAlign
+AllowAllParametersOfDeclarationOnNextLine: false
+PenaltyReturnTypeOnItsOwnLine: 200
+BinPackParameters: false
+ColumnLimit: 100
 IndentCaseLabels: true

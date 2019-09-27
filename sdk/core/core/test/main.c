@@ -5,21 +5,21 @@
 #include <az_span_reader.h>
 
 #include <assert.h>
-#include <stdio.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 int exit_code = 0;
 
 #define TEST_ASSERT(c) \
   do { \
-    if(c) { \
+    if (c) { \
       printf("  - `%s`: succeeded\n", #c); \
     } else { \
       fprintf(stderr, "  - `%s`: failed\n", #c); \
       assert(false); \
       exit_code = 1; \
     } \
-  } while(false);
+  } while (false);
 
 az_result write(az_span const output, size_t *const o, az_const_span const s) {
   for (size_t i = 0; i != s.size; ++i, ++*o) {
@@ -31,14 +31,18 @@ az_result write(az_span const output, size_t *const o, az_const_span const s) {
   return 0;
 }
 
-az_result write_str(az_span const output, size_t* o, az_const_span const s) {
+az_result write_str(az_span const output, size_t *o, az_const_span const s) {
   AZ_RETURN_IF_NOT_OK(write(output, o, AZ_STR("\"")));
   AZ_RETURN_IF_NOT_OK(write(output, o, s));
   AZ_RETURN_IF_NOT_OK(write(output, o, AZ_STR("\"")));
   return AZ_OK;
 }
 
-az_result read_write_value(az_span const output, size_t *o, az_json_state *const state, az_json_value const value) {
+az_result read_write_value(
+    az_span const output,
+    size_t *o,
+    az_json_state *const state,
+    az_json_value const value) {
   switch (value.kind) {
     case AZ_JSON_VALUE_NULL:
       return write(output, o, AZ_STR("null"));
@@ -48,8 +52,7 @@ az_result read_write_value(az_span const output, size_t *o, az_json_state *const
       return write(output, o, AZ_STR("0"));
     case AZ_JSON_VALUE_STRING:
       return write_str(output, o, value.data.string);
-    case AZ_JSON_VALUE_OBJECT:
-    {
+    case AZ_JSON_VALUE_OBJECT: {
       AZ_RETURN_IF_NOT_OK(write(output, o, AZ_STR("{")));
       bool need_comma = false;
       while (true) {
@@ -63,8 +66,7 @@ az_result read_write_value(az_span const output, size_t *o, az_json_state *const
         }
         if (need_comma) {
           AZ_RETURN_IF_NOT_OK(write(output, o, AZ_STR(",")));
-        }
-        else {
+        } else {
           need_comma = true;
         }
         AZ_RETURN_IF_NOT_OK(write_str(output, o, member.name));
@@ -73,8 +75,7 @@ az_result read_write_value(az_span const output, size_t *o, az_json_state *const
       }
       return write(output, o, AZ_STR("}"));
     }
-    case AZ_JSON_VALUE_ARRAY:
-    {
+    case AZ_JSON_VALUE_ARRAY: {
       AZ_RETURN_IF_NOT_OK(write(output, o, AZ_STR("[")));
       bool need_comma = false;
       while (true) {
@@ -88,8 +89,7 @@ az_result read_write_value(az_span const output, size_t *o, az_json_state *const
         }
         if (need_comma) {
           AZ_RETURN_IF_NOT_OK(write(output, o, AZ_STR(",")));
-        }
-        else {
+        } else {
           need_comma = true;
         }
         AZ_RETURN_IF_NOT_OK(read_write_value(output, o, state, element));
@@ -109,38 +109,38 @@ az_result read_write(az_const_span const input, az_span const output, size_t *co
 }
 
 AZ_STR_DECL(
-  sample1,
-  "{\n"
-  "  \"parameters\": {\n"
-  "    \"subscriptionId\": \"{subscription-id}\",\n"
-  "      \"resourceGroupName\" : \"res4303\",\n"
-  "      \"accountName\" : \"sto7280\",\n"
-  "      \"containerName\" : \"container8723\",\n"
-  "      \"api-version\" : \"2019-04-01\",\n"
-  "      \"monitor\" : \"true\",\n"
-  "      \"LegalHold\" : {\n"
-  "      \"tags\": [\n"
-  "        \"tag1\",\n"
-  "          \"tag2\",\n"
-  "          \"tag3\"\n"
-  "      ]\n"
-  "    }\n"
-  "  },\n"
-  "    \"responses\": {\n"
-  "    \"200\": {\n"
-  "      \"body\": {\n"
-  "        \"hasLegalHold\": false,\n"
-  "          \"tags\" : []\n"
-  "      }\n"
-  "    }\n"
-  "  }\n"
-  "}\n");
+    sample1,
+    "{\n"
+    "  \"parameters\": {\n"
+    "    \"subscriptionId\": \"{subscription-id}\",\n"
+    "      \"resourceGroupName\" : \"res4303\",\n"
+    "      \"accountName\" : \"sto7280\",\n"
+    "      \"containerName\" : \"container8723\",\n"
+    "      \"api-version\" : \"2019-04-01\",\n"
+    "      \"monitor\" : \"true\",\n"
+    "      \"LegalHold\" : {\n"
+    "      \"tags\": [\n"
+    "        \"tag1\",\n"
+    "          \"tag2\",\n"
+    "          \"tag3\"\n"
+    "      ]\n"
+    "    }\n"
+    "  },\n"
+    "    \"responses\": {\n"
+    "    \"200\": {\n"
+    "      \"body\": {\n"
+    "        \"hasLegalHold\": false,\n"
+    "          \"tags\" : []\n"
+    "      }\n"
+    "    }\n"
+    "  }\n"
+    "}\n");
 
 int main() {
   {
-	  az_json_state state = az_json_state_create(AZ_STR("    "));
-	  az_json_value value;
-	  TEST_ASSERT(az_json_read(&state, &value) == AZ_JSON_ERROR_UNEXPECTED_END);
+    az_json_state state = az_json_state_create(AZ_STR("    "));
+    az_json_value value;
+    TEST_ASSERT(az_json_read(&state, &value) == AZ_JSON_ERROR_UNEXPECTED_END);
   }
   {
     az_json_state state = az_json_state_create(AZ_STR("  null  "));
@@ -261,49 +261,53 @@ int main() {
     TEST_ASSERT(az_json_state_done(&state) == AZ_OK);
   }
   char buffer[1000];
-  az_span output = { .begin = buffer, .size = 1000 };
+  az_span output = {.begin = buffer, .size = 1000};
   {
     size_t o = 0;
-    TEST_ASSERT(read_write(AZ_STR("{ \"a\" : [ true, { \"b\": [{}]}, 15 ] }"), output, &o) == AZ_OK);
+    TEST_ASSERT(
+        read_write(AZ_STR("{ \"a\" : [ true, { \"b\": [{}]}, 15 ] }"), output, &o) == AZ_OK);
     az_const_span x = az_const_span_sub(az_to_const_span(output), 0, o);
     TEST_ASSERT(az_const_span_eq(x, AZ_STR("{\"a\":[true,{\"b\":[{}]},0]}")));
   }
   {
     size_t o = 0;
     az_const_span const json = AZ_STR(
-    // 0           1           2           3           4           5           6
-    // 01234 56789 01234 56678 01234 56789 01234 56789 01234 56789 01234 56789 0123
-      "[[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[["
-    );
+        // 0           1           2           3           4           5 6
+        // 01234 56789 01234 56678 01234 56789 01234 56789 01234 56789 01234
+        // 56789 0123
+        "[[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ "
+        "[[[[[ [[[[");
     az_result const result = read_write(json, output, &o);
     TEST_ASSERT(result == AZ_JSON_ERROR_STACK_OVERFLOW);
   }
   {
     size_t o = 0;
     az_const_span const json = AZ_STR(
-    // 0           1           2           3           4           5           6
-    // 01234 56789 01234 56678 01234 56789 01234 56789 01234 56789 01234 56789 012
-      "[[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[["
-    );
+        // 0           1           2           3           4           5 6 01234
+        // 56789 01234 56678 01234 56789 01234 56789 01234 56789 01234 56789 012
+        "[[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ "
+        "[[[[[ [[[");
     az_result const result = read_write(json, output, &o);
     TEST_ASSERT(result == AZ_JSON_ERROR_UNEXPECTED_END);
   }
   {
     size_t o = 0;
     az_const_span const json = AZ_STR(
-    // 0           1           2           3           4           5           6
-    // 01234 56789 01234 56678 01234 56789 01234 56789 01234 56789 01234 56789 012
-      "[[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[{"
-      "   \"\\t\\n\": \"\\u0abc\"   "
-      "}]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]"
-    );
+        // 0           1           2           3           4           5 6 01234
+        // 56789 01234 56678 01234 56789 01234 56789 01234 56789 01234 56789 012
+        "[[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ "
+        "[[[[[ [[{"
+        "   \"\\t\\n\": \"\\u0abc\"   "
+        "}]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] "
+        "]]]]] ]]]");
     az_result const result = read_write(json, output, &o);
     TEST_ASSERT(result == AZ_OK);
     az_const_span x = az_const_span_sub(az_to_const_span(output), 0, o);
-    TEST_ASSERT(az_const_span_eq(x, AZ_STR(
-      "[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[{"
-      "\"\\t\\n\":\"\\u0abc\""
-      "}]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]")));
+    TEST_ASSERT(az_const_span_eq(
+        x, AZ_STR("[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[{"
+                  "\"\\t\\n\":\"\\u0abc\""
+                  "}]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]"
+                  "]")));
   }
   //
   {

@@ -41,8 +41,7 @@ AZ_STATIC_ASSERT(CHAR_BIT == 8);
  * Returns a byte in `index` position.
  * Returns `AZ_OPTION_BYTE_NONE` if the `index` is out of the span range.
  */
-inline az_option_byte az_const_span_get(az_const_span const span,
-                                        size_t const index) {
+inline az_option_byte az_const_span_get(az_const_span const span, size_t const index) {
   if (span.size <= index) {
     return AZ_OPTION_BYTE_NONE;
   }
@@ -54,8 +53,7 @@ inline az_option_byte az_const_span_get(az_const_span const span,
  *
  * If the \n is greater than the \span.size than the whole \span is returned.
  */
-inline az_const_span az_const_span_take(az_const_span const span,
-                                        size_t const n) {
+inline az_const_span az_const_span_take(az_const_span const span, size_t const n) {
   if (span.size <= n) {
     return span;
   }
@@ -67,8 +65,7 @@ inline az_const_span az_const_span_take(az_const_span const span,
  *
  * If the \n is greater than \span.size than an empty span is returned
  */
-inline az_const_span az_const_span_drop(az_const_span const span,
-                                        size_t const n) {
+inline az_const_span az_const_span_drop(az_const_span const span, size_t const n) {
   if (span.size <= n) {
     return (az_const_span){.begin = NULL, .size = 0};
   }
@@ -78,8 +75,8 @@ inline az_const_span az_const_span_drop(az_const_span const span,
 /**
  * Returns a sub span of the given span.
  */
-inline az_const_span az_const_span_sub(az_const_span const span,
-                                       size_t const begin, size_t const end) {
+inline az_const_span
+az_const_span_sub(az_const_span const span, size_t const begin, size_t const end) {
   az_const_span const t = az_const_span_take(span, end);
   return az_const_span_drop(t, begin);
 }

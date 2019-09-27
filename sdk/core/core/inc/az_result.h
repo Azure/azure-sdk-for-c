@@ -28,26 +28,22 @@ enum {
 // - 31     Severity (0 - success, 1 - failure).
 typedef int32_t az_result;
 
-#define AZ_MAKE_ERROR(facility, code)                                          \
+#define AZ_MAKE_ERROR(facility, code) \
   ((az_result)(0x80000000 | ((uint32_t)(facility) << 16)) | (uint32_t)(code))
 
-#define AZ_MAKE_RESULT(facility, code)                                         \
+#define AZ_MAKE_RESULT(facility, code) \
   ((az_result)(((uint32_t)(facility) << 16)) | (uint32_t)(code))
 
-inline bool az_failed(az_result result) {
-  return (result & AZ_ERROR_FLAG) != 0;
-}
+inline bool az_failed(az_result result) { return (result & AZ_ERROR_FLAG) != 0; }
 
-inline bool az_succeeded(az_result result) {
-  return (result & AZ_ERROR_FLAG) == 0;
-}
+inline bool az_succeeded(az_result result) { return (result & AZ_ERROR_FLAG) == 0; }
 
-#define AZ_RETURN_IF_NOT_OK(exp)                                               \
-  do {                                                                         \
-    az_result const result = (exp);                                            \
-    if (result != AZ_OK) {                                                     \
-      return result;                                                           \
-    }                                                                          \
+#define AZ_RETURN_IF_NOT_OK(exp) \
+  do { \
+    az_result const result = (exp); \
+    if (result != AZ_OK) { \
+      return result; \
+    } \
   } while (0)
 
 #ifdef __cplusplus

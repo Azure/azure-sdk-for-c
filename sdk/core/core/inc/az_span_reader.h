@@ -24,8 +24,7 @@ inline bool az_span_reader_is_empty(az_span_reader const *const p_reader) {
   return p_reader->span.size <= p_reader->i;
 }
 
-inline az_option_byte
-az_span_reader_current(az_span_reader const *const p_reader) {
+inline az_option_byte az_span_reader_current(az_span_reader const *const p_reader) {
   return az_const_span_get(p_reader->span, p_reader->i);
 }
 
