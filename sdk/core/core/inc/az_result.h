@@ -48,6 +48,10 @@ inline bool az_succeeded(az_result result) { return (result & AZ_ERROR_FLAG) == 
     } \
   } while (0)
 
+enum {
+  AZ_CORE_ERROR_ARGUMENT = AZ_MAKE_ERROR(AZ_CORE_FACILITY, 1),
+};
+
 #ifdef __cplusplus
 }
 #endif
