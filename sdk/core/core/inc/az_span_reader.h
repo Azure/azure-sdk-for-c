@@ -7,7 +7,7 @@
 #include <az_option_byte.h>
 #include <az_span.h>
 
-#include <az_cfg_prefix.h>
+#include <_az_cfg_prefix.h>
 
 typedef struct {
   az_const_span span;
@@ -33,6 +33,6 @@ inline void az_span_reader_next(az_span_reader * const p_reader) {
   p_reader->i += 1;
 }
 
-#include <az_cfg_suffix.h>
+#include <_az_cfg_suffix.h>
 
 #endif

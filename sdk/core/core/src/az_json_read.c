@@ -6,6 +6,8 @@
 #include <ctype.h>
 #include <math.h>
 
+#include <_az_cfg_warn.h>
+
 inline bool az_json_is_white_space(az_option_byte const c) {
   switch (c) {
     case ' ':

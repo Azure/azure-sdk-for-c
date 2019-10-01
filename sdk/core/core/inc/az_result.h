@@ -7,7 +7,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include <az_cfg_prefix.h>
+#include <_az_cfg_prefix.h>
 
 enum {
   AZ_OK = 0,
@@ -48,6 +48,6 @@ enum {
   AZ_CORE_ERROR_ARGUMENT = AZ_MAKE_ERROR(AZ_CORE_FACILITY, 1),
 };
 
-#include <az_cfg_suffix.h>
+#include <_az_cfg_suffix.h>
 
 #endif

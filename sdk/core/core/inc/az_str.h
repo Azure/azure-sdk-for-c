@@ -6,7 +6,7 @@
 
 #include <az_span.h>
 
-#include <az_cfg_prefix.h>
+#include <_az_cfg_prefix.h>
 
 // A size of the string literal.
 // Details: to make sure that `S` is a `string literal`, we are appending `""`
@@ -22,6 +22,6 @@
     .begin = (uint8_t const *)STRING_LITERAL, .size = AZ_STRING_LITERAL_LEN(STRING_LITERAL) \
   }
 
-#include <az_cfg_suffix.h>
+#include <_az_cfg_suffix.h>
 
 #endif

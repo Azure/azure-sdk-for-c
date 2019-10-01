@@ -11,7 +11,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include <az_cfg_prefix.h>
+#include <_az_cfg_prefix.h>
 
 enum {
   // success codes
@@ -76,6 +76,6 @@ az_result az_json_read_array_element(
 
 az_result az_json_state_done(az_json_state const * const p_state);
 
-#include <az_cfg_suffix.h>
+#include <_az_cfg_suffix.h>
 
 #endif

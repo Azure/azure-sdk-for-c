@@ -8,7 +8,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include <az_cfg_prefix.h>
+#include <_az_cfg_prefix.h>
 
 typedef int16_t az_option_byte;
 
@@ -16,6 +16,6 @@ enum {
   AZ_OPTION_BYTE_NONE = EOF,
 };
 
-#include <az_cfg_suffix.h>
+#include <_az_cfg_suffix.h>
 
 #endif

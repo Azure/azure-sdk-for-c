@@ -13,7 +13,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <az_cfg_prefix.h>
+#include <_az_cfg_prefix.h>
 
 /**
  * An immutable span of bytes (octets).
@@ -100,6 +100,6 @@ inline bool az_const_span_eq(az_const_span const a, az_const_span const b) {
   return a.size == b.size && memcmp(a.begin, b.begin, a.size) == 0;
 }
 
-#include <az_cfg_suffix.h>
+#include <_az_cfg_suffix.h>
 
 #endif

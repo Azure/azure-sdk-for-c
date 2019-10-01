@@ -7,6 +7,6 @@ extern "C" {
 
 #ifdef _MSC_VER
 #pragma warning(push)
-// warning C4204: nonstandard extension used: non-constant aggregate initializer
-#pragma warning(disable : 4204)
 #endif
+
+#include <_az_cfg_warn.h>
