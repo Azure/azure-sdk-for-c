@@ -14,10 +14,13 @@
 #define AZ_STRING_LITERAL_LEN(S) (sizeof(S "") - 1)
 
 #define AZ_STR_DECL(NAME, STRING_LITERAL) \
-  az_const_span const NAME = { .begin = (uint8_t const *)STRING_LITERAL, .size = AZ_STRING_LITERAL_LEN(STRING_LITERAL) }
+  az_const_span const NAME = { .begin = (uint8_t const *)STRING_LITERAL, \
+                               .size = AZ_STRING_LITERAL_LEN(STRING_LITERAL) }
 
 #define AZ_STR(STRING_LITERAL) \
-  (az_const_span) { .begin = (uint8_t const *)STRING_LITERAL, .size = AZ_STRING_LITERAL_LEN(STRING_LITERAL) }
+  (az_const_span) { \
+    .begin = (uint8_t const *)STRING_LITERAL, .size = AZ_STRING_LITERAL_LEN(STRING_LITERAL) \
+  }
 
 #include <az_cfg_suffix.h>
 
