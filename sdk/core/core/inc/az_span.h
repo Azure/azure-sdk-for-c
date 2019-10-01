@@ -100,8 +100,6 @@ inline bool az_const_span_eq(az_const_span const a, az_const_span const b) {
   return a.size == b.size && memcmp(a.begin, b.begin, a.size) == 0;
 }
 
-#ifdef __cplusplus
-}
-#endif
+#include <az_cfg_suffix.h>
 
 #endif
