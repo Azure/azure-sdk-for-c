@@ -13,14 +13,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#ifdef _MSC_VER
-// warning C4204: nonstandard extension used: non-constant aggregate initializer
-#pragma warning(disable : 4204)
-#endif
+#include <az_cfg_prefix.h>
 
 /**
  * An immutable span of bytes (octets).

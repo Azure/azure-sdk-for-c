@@ -7,9 +7,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <az_cfg_prefix.h>
 
 typedef int16_t az_option_byte;
 
@@ -17,8 +15,6 @@ enum {
   AZ_OPTION_BYTE_NONE = -1,
 };
 
-#ifdef __cplusplus
-}
-#endif
+#include <az_cfg_suffix.h>
 
 #endif

@@ -66,6 +66,8 @@ inline az_result az_json_stack_pop(az_json_state * const p_state) {
 }
 
 az_json_state az_json_state_create(az_const_span const buffer) {
+  az_const_span buf = (az_const_span){ .begin = buffer.begin, .size = buffer.size };
+  buf;
   return (az_json_state){
     .reader = az_span_reader_create(buffer),
     .stack = 1,
