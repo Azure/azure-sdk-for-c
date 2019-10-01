@@ -9,16 +9,6 @@
 
 #include <_az_cfg_prefix.h>
 
-enum {
-  AZ_OK = 0,
-  AZ_ERROR_FLAG = 0x80000000,
-};
-
-enum {
-  AZ_CORE_FACILITY = 0x1,
-  AZ_JSON_FACILITY = 0x2,
-};
-
 /**
  * The type represents error conditions.
  * Bits:
@@ -28,9 +18,21 @@ enum {
  */
 typedef int32_t az_result;
 
-#define AZ_MAKE_ERROR(facility, code) ((az_result)(0x80000000 | ((uint32_t)(facility) << 16)) | (uint32_t)(code))
+enum {
+  AZ_OK = 0,
+  AZ_ERROR_FLAG = (az_result)0x80000000,
+};
 
-#define AZ_MAKE_RESULT(facility, code) ((az_result)(((uint32_t)(facility) << 16)) | (uint32_t)(code))
+enum {
+  AZ_CORE_FACILITY = 0x1,
+  AZ_JSON_FACILITY = 0x2,
+};
+
+#define AZ_MAKE_ERROR(facility, code) \
+  ((az_result)(0x80000000 | ((uint32_t)(facility) << 16) | (uint32_t)(code)))
+
+#define AZ_MAKE_RESULT(facility, code) \
+  ((az_result)(((uint32_t)(facility) << 16) | (uint32_t)(code)))
 
 inline bool az_failed(az_result result) { return (result & AZ_ERROR_FLAG) != 0; }
 
@@ -44,9 +46,7 @@ inline bool az_succeeded(az_result result) { return (result & AZ_ERROR_FLAG) == 
     } \
   } while (0)
 
-enum {
-  AZ_ERROR_ARG = AZ_MAKE_ERROR(AZ_CORE_FACILITY, 1),
-};
+enum { AZ_ERROR_ARG = AZ_MAKE_ERROR(AZ_CORE_FACILITY, 1) };
 
 #include <_az_cfg_suffix.h>
 
