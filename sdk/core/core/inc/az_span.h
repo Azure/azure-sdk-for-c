@@ -29,7 +29,7 @@ typedef struct {
   /**
    * Points to the first byte.
    */
-  uint8_t const *begin;
+  uint8_t const * begin;
   /**
    * A number of bytes in the span.
    */
@@ -40,7 +40,7 @@ typedef struct {
  * A mutable span of bytes.
  */
 typedef struct {
-  uint8_t *begin;
+  uint8_t * begin;
   size_t size;
 } az_span;
 
@@ -66,7 +66,7 @@ inline az_const_span az_const_span_take(az_const_span const span, size_t const n
   if (span.size <= n) {
     return span;
   }
-  return (az_const_span){.begin = span.begin, .size = n};
+  return (az_const_span){ .begin = span.begin, .size = n };
 }
 
 /**
@@ -76,18 +76,15 @@ inline az_const_span az_const_span_take(az_const_span const span, size_t const n
  */
 inline az_const_span az_const_span_drop(az_const_span const span, size_t const n) {
   if (span.size <= n) {
-    return (az_const_span){.begin = NULL, .size = 0};
+    return (az_const_span){ .begin = NULL, .size = 0 };
   }
-  return (az_const_span){.begin = span.begin + n, .size = span.size - n};
+  return (az_const_span){ .begin = span.begin + n, .size = span.size - n };
 }
 
 /**
  * Returns a sub span of the given span.
  */
-inline az_const_span az_const_span_sub(
-    az_const_span const span,
-    size_t const begin,
-    size_t const end) {
+inline az_const_span az_const_span_sub(az_const_span const span, size_t const begin, size_t const end) {
   az_const_span const t = az_const_span_take(span, end);
   return az_const_span_drop(t, begin);
 }
@@ -96,7 +93,7 @@ inline az_const_span az_const_span_sub(
  * Cast the given mutable span to an immutable span.
  */
 inline az_const_span az_to_const_span(az_span const span) {
-  return (az_const_span){.begin = span.begin, .size = span.size};
+  return (az_const_span){ .begin = span.begin, .size = span.size };
 }
 
 /**
