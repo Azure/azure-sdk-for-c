@@ -6,7 +6,7 @@
 #include <ctype.h>
 #include <math.h>
 
-inline bool az_json_is_white_space(az_option_byte const c) {
+inline bool az_json_is_white_space(az_result_byte const c) {
   switch (c) {
     case ' ':
     case '\t':
@@ -17,7 +17,7 @@ inline bool az_json_is_white_space(az_option_byte const c) {
   return false;
 }
 
-inline bool az_json_is_esc(az_option_byte const c) {
+inline bool az_json_is_esc(az_result_byte const c) {
   switch (c) {
     case '\\':
     case '"':
@@ -32,7 +32,7 @@ inline bool az_json_is_esc(az_option_byte const c) {
   return false;
 }
 
-inline bool az_json_is_e(az_option_byte const c) {
+inline bool az_json_is_e(az_result_byte const c) {
   switch (c) {
     case 'e':
     case 'E':
@@ -41,8 +41,8 @@ inline bool az_json_is_e(az_option_byte const c) {
   return false;
 }
 
-inline az_result az_json_error_unexpected(az_option_byte const c) {
-  return c == AZ_OPTION_BYTE_NONE ? AZ_JSON_ERROR_UNEXPECTED_END : AZ_JSON_ERROR_UNEXPECTED_CHAR;
+inline az_result az_json_error_unexpected(az_result_byte const c) {
+  return az_failed(c) ? c : AZ_JSON_ERROR_UNEXPECTED_CHAR;
 }
 
 inline bool az_json_stack_is_empty(az_json_state const * const p) { return p->stack == 1; }
@@ -73,7 +73,7 @@ az_json_state az_json_state_create(az_const_span const buffer) {
 }
 
 az_result az_json_read_expected_char(az_span_reader * const p_reader, uint8_t const expected) {
-  az_option_byte const c = az_span_reader_current(p_reader);
+  az_result_byte const c = az_span_reader_current(p_reader);
   if (c != expected) {
     return az_json_error_unexpected(c);
   }
@@ -91,11 +91,11 @@ az_result az_json_read_keyword_rest(az_span_reader * const p_reader, az_const_sp
   az_span_reader_next(p_reader);
   az_span_reader k = az_span_reader_create(keyword);
   while (true) {
-    az_option_byte const ko = az_span_reader_current(&k);
-    if (ko == AZ_OPTION_BYTE_NONE) {
+    az_result_byte const ko = az_span_reader_current(&k);
+    if (ko == AZ_ERROR_NO_MORE_ITEMS) {
       return AZ_OK;
     }
-    az_option_byte const o = az_span_reader_current(p_reader);
+    az_result_byte const o = az_span_reader_current(p_reader);
     if (o != ko) {
       return az_json_error_unexpected(o);
     }
@@ -122,8 +122,8 @@ az_result az_json_number_int_parse(
     az_span_reader * const p_reader,
     az_dec_number * const p_n,
     int16_t const e_offset,
-    az_option_byte const first) {
-  az_option_byte c = first;
+    az_result_byte const first) {
+  az_result_byte c = first;
   // read an integer part of the number
   while (true) {
     int d = c - '0';
@@ -154,7 +154,7 @@ az_result az_json_read_number_digit_rest(az_span_reader * const p_reader, double
 
   // integer part
   {
-    az_option_byte o = az_span_reader_current(p_reader);
+    az_result_byte o = az_span_reader_current(p_reader);
     if (o == '-') {
       i.sign = -1;
       az_span_reader_next(p_reader);
@@ -173,7 +173,7 @@ az_result az_json_read_number_digit_rest(az_span_reader * const p_reader, double
   // fraction
   if (az_span_reader_current(p_reader) == '.') {
     az_span_reader_next(p_reader);
-    az_option_byte o = az_span_reader_current(p_reader);
+    az_result_byte o = az_span_reader_current(p_reader);
     if (!isdigit(o)) {
       return az_json_error_unexpected(o);
     }
@@ -184,7 +184,7 @@ az_result az_json_read_number_digit_rest(az_span_reader * const p_reader, double
   if (az_json_is_e(az_span_reader_current(p_reader))) {
     // skip 'e' or 'E'
     az_span_reader_next(p_reader);
-    az_option_byte c = az_span_reader_current(p_reader);
+    az_result_byte c = az_span_reader_current(p_reader);
 
     // read sign, if any.
     int8_t e_sign = 1;
@@ -203,7 +203,7 @@ az_result az_json_read_number_digit_rest(az_span_reader * const p_reader, double
 
     int16_t e_int = 0;
     do {
-      e_int = e_int * 10 + (c - '0');
+      e_int = e_int * 10 + (int16_t)(c - '0');
       az_span_reader_next(p_reader);
       c = az_span_reader_current(p_reader);
     } while (isdigit(c));
@@ -218,7 +218,7 @@ az_result az_json_read_string_rest(az_span_reader * const p_reader, az_const_spa
   // skip '"'
   size_t const begin = p_reader->i;
   while (true) {
-    az_option_byte c = az_span_reader_current(p_reader);
+    az_result_byte c = az_span_reader_current(p_reader);
     switch (c) {
         // end of the string
       case '"': {
@@ -258,7 +258,7 @@ az_result az_json_read_string_rest(az_span_reader * const p_reader, az_const_spa
 // _value_
 az_result az_json_read_value(az_json_state * const p_state, az_json_value * const out_value) {
   az_span_reader * const p_reader = &p_state->reader;
-  az_option_byte const c = az_span_reader_current(p_reader);
+  az_result_byte const c = az_span_reader_current(p_reader);
   if (isdigit(c)) {
     out_value->kind = AZ_JSON_VALUE_NUMBER;
     return az_json_read_number_digit_rest(p_reader, &out_value->data.number);
@@ -320,7 +320,7 @@ inline uint8_t az_json_stack_item_to_close(az_json_stack_item const item) {
 }
 
 az_result az_json_read_comma_or_close(az_json_state * const p_state) {
-  az_option_byte const c = az_span_reader_current(&p_state->reader);
+  az_result_byte const c = az_span_reader_current(&p_state->reader);
   if (c == ',') {
     // skip ',' and read all whitespaces.
     az_span_reader_next(&p_state->reader);
@@ -338,7 +338,7 @@ az_result az_json_check_item_begin(az_json_state * const p_state, az_json_stack_
   if (az_json_stack_is_empty(p_state) || az_json_stack_last(p_state) != stack_item) {
     return AZ_JSON_ERROR_INVALID_STATE;
   }
-  az_option_byte const c = az_span_reader_current(&p_state->reader);
+  az_result_byte const c = az_span_reader_current(&p_state->reader);
   if (c != az_json_stack_item_to_close(stack_item)) {
     return AZ_OK;
   }
