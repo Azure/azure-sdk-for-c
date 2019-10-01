@@ -6,6 +6,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -14,7 +15,7 @@ extern "C" {
 typedef int16_t az_option_byte;
 
 enum {
-  AZ_OPTION_BYTE_NONE = -1,
+  AZ_OPTION_BYTE_NONE = EOF,
 };
 
 #ifdef __cplusplus
