@@ -7,9 +7,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <az_cfg_prefix.h>
 
 enum {
   AZ_OK = 0,
@@ -50,8 +48,6 @@ enum {
   AZ_CORE_ERROR_ARGUMENT = AZ_MAKE_ERROR(AZ_CORE_FACILITY, 1),
 };
 
-#ifdef __cplusplus
-}
-#endif
+#include <az_cfg_suffix.h>
 
 #endif

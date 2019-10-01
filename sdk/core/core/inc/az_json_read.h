@@ -11,9 +11,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <az_cfg_prefix.h>
 
 enum {
   // success codes
@@ -68,14 +66,16 @@ az_json_state az_json_state_create(az_const_span const buffer);
 
 az_result az_json_read(az_json_state * const p_state, az_json_value * const out_value);
 
-az_result az_json_read_object_member(az_json_state * const p_state, az_json_member * const out_member);
+az_result az_json_read_object_member(
+    az_json_state * const p_state,
+    az_json_member * const out_member);
 
-az_result az_json_read_array_element(az_json_state * const p_state, az_json_value * const out_value);
+az_result az_json_read_array_element(
+    az_json_state * const p_state,
+    az_json_value * const out_value);
 
 az_result az_json_state_done(az_json_state const * const p_state);
 
-#ifdef __cplusplus
-}
-#endif
+#include <az_cfg_suffix.h>
 
 #endif

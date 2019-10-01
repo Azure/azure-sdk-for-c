@@ -6,9 +6,7 @@
 
 #include <az_span.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <az_cfg_prefix.h>
 
 // A size of the string literal.
 // Details: to make sure that `S` is a `string literal`, we are appending `""`
@@ -16,13 +14,14 @@ extern "C" {
 #define AZ_STRING_LITERAL_LEN(S) (sizeof(S "") - 1)
 
 #define AZ_STR_DECL(NAME, STRING_LITERAL) \
-  az_const_span const NAME = { .begin = (uint8_t const *)STRING_LITERAL, .size = AZ_STRING_LITERAL_LEN(STRING_LITERAL) }
+  az_const_span const NAME = { .begin = (uint8_t const *)STRING_LITERAL, \
+                               .size = AZ_STRING_LITERAL_LEN(STRING_LITERAL) }
 
 #define AZ_STR(STRING_LITERAL) \
-  (az_const_span) { .begin = (uint8_t const *)STRING_LITERAL, .size = AZ_STRING_LITERAL_LEN(STRING_LITERAL) }
+  (az_const_span) { \
+    .begin = (uint8_t const *)STRING_LITERAL, .size = AZ_STRING_LITERAL_LEN(STRING_LITERAL) \
+  }
 
-#ifdef __cplusplus
-}
-#endif
+#include <az_cfg_suffix.h>
 
 #endif

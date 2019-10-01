@@ -38,7 +38,11 @@ az_result write_str(az_span const output, size_t * o, az_const_span const s) {
   return AZ_OK;
 }
 
-az_result read_write_value(az_span const output, size_t * o, az_json_state * const state, az_json_value const value) {
+az_result read_write_value(
+    az_span const output,
+    size_t * o,
+    az_json_state * const state,
+    az_json_value const value) {
   switch (value.kind) {
     case AZ_JSON_VALUE_NULL:
       return write(output, o, AZ_STR("null"));
@@ -260,7 +264,8 @@ int main() {
   az_span output = { .begin = buffer, .size = 1000 };
   {
     size_t o = 0;
-    TEST_ASSERT(read_write(AZ_STR("{ \"a\" : [ true, { \"b\": [{}]}, 15 ] }"), output, &o) == AZ_OK);
+    TEST_ASSERT(
+        read_write(AZ_STR("{ \"a\" : [ true, { \"b\": [{}]}, 15 ] }"), output, &o) == AZ_OK);
     az_const_span x = az_const_span_sub(az_to_const_span(output), 0, o);
     TEST_ASSERT(az_const_span_eq(x, AZ_STR("{\"a\":[true,{\"b\":[{}]},0]}")));
   }

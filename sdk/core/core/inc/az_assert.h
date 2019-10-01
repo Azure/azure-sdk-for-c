@@ -6,14 +6,10 @@
 
 #include <assert.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <az_cfg_prefix.h>
 
 #define AZ_ASSERT(CONDITION) assert(CONDITION)
 
-#ifdef __cplusplus
-}
-#endif
+#include <az_cfg_suffix.h>
 
 #endif
