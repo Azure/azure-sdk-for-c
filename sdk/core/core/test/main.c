@@ -21,7 +21,7 @@ int exit_code = 0;
     } \
   } while (false);
 
-az_result write(az_span const output, size_t *const o, az_const_span const s) {
+az_result write(az_span const output, size_t * const o, az_const_span const s) {
   for (size_t i = 0; i != s.size; ++i, ++*o) {
     if (*o == output.size) {
       return 1;
@@ -31,18 +31,14 @@ az_result write(az_span const output, size_t *const o, az_const_span const s) {
   return 0;
 }
 
-az_result write_str(az_span const output, size_t *o, az_const_span const s) {
+az_result write_str(az_span const output, size_t * o, az_const_span const s) {
   AZ_RETURN_IF_NOT_OK(write(output, o, AZ_STR("\"")));
   AZ_RETURN_IF_NOT_OK(write(output, o, s));
   AZ_RETURN_IF_NOT_OK(write(output, o, AZ_STR("\"")));
   return AZ_OK;
 }
 
-az_result read_write_value(
-    az_span const output,
-    size_t *o,
-    az_json_state *const state,
-    az_json_value const value) {
+az_result read_write_value(az_span const output, size_t * o, az_json_state * const state, az_json_value const value) {
   switch (value.kind) {
     case AZ_JSON_VALUE_NULL:
       return write(output, o, AZ_STR("null"));
@@ -100,7 +96,7 @@ az_result read_write_value(
   return AZ_JSON_ERROR_INVALID_STATE;
 }
 
-az_result read_write(az_const_span const input, az_span const output, size_t *const o) {
+az_result read_write(az_const_span const input, az_span const output, size_t * const o) {
   az_json_state state = az_json_state_create(input);
   az_json_value value;
   AZ_RETURN_IF_NOT_OK(az_json_read(&state, &value));
@@ -261,11 +257,10 @@ int main() {
     TEST_ASSERT(az_json_state_done(&state) == AZ_OK);
   }
   char buffer[1000];
-  az_span output = {.begin = buffer, .size = 1000};
+  az_span output = { .begin = buffer, .size = 1000 };
   {
     size_t o = 0;
-    TEST_ASSERT(
-        read_write(AZ_STR("{ \"a\" : [ true, { \"b\": [{}]}, 15 ] }"), output, &o) == AZ_OK);
+    TEST_ASSERT(read_write(AZ_STR("{ \"a\" : [ true, { \"b\": [{}]}, 15 ] }"), output, &o) == AZ_OK);
     az_const_span x = az_const_span_sub(az_to_const_span(output), 0, o);
     TEST_ASSERT(az_const_span_eq(x, AZ_STR("{\"a\":[true,{\"b\":[{}]},0]}")));
   }
@@ -304,10 +299,11 @@ int main() {
     TEST_ASSERT(result == AZ_OK);
     az_const_span x = az_const_span_sub(az_to_const_span(output), 0, o);
     TEST_ASSERT(az_const_span_eq(
-        x, AZ_STR("[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[{"
-                  "\"\\t\\n\":\"\\u0abc\""
-                  "}]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]"
-                  "]")));
+        x,
+        AZ_STR("[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[{"
+               "\"\\t\\n\":\"\\u0abc\""
+               "}]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]"
+               "]")));
   }
   //
   {
