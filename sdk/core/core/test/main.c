@@ -96,6 +96,8 @@ az_result read_write_value(
       }
       return write(output, o, AZ_STR("]"));
     }
+    default:
+      break;
   }
   return AZ_JSON_ERROR_INVALID_STATE;
 }

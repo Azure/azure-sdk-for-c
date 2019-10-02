@@ -24,4 +24,8 @@ add_executable (az_core_test test/main.c)
 
 target_link_libraries(az_core_test PRIVATE az_core)
 
+if (CMAKE_COMPILER_IS_GNUC)
+  target_link_libraries(az_core_test PRIVATE m)
+endif()
+
 add_test(NAME az_core_test COMMAND az_core_test)
