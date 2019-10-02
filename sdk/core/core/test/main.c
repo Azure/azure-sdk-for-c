@@ -260,8 +260,8 @@ int main() {
     TEST_ASSERT(az_json_read_object_member(&state, &member) == AZ_JSON_NO_MORE_ITEMS);
     TEST_ASSERT(az_json_state_done(&state) == AZ_OK);
   }
-  char buffer[1000];
-  az_span output = { .begin = buffer, .size = 1000 };
+  uint8_t buffer[1000];
+  az_span const output = { .begin = buffer, .size = 1000 };
   {
     size_t o = 0;
     TEST_ASSERT(
