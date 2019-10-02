@@ -37,7 +37,7 @@ typedef struct {
   size_t size;
 } az_span;
 
-AZ_STATIC_ASSERT(CHAR_BIT == 8);
+AZ_STATIC_ASSERT(CHAR_BIT == 8)
 
 /**
  * Returns a byte in `index` position.
