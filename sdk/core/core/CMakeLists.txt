@@ -7,7 +7,7 @@ project (az_core LANGUAGES C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_library (az_core src/az_core.c src/az_json_read.c)
+add_library (az_core src/az_json_read.c)
 
 if(MSVC)
   target_compile_options(az_core PRIVATE /W4 /WX)
