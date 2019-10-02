@@ -7,8 +7,6 @@
 
 #include <_az_cfg_prefix.h>
 
-#define AZ_CAT(A, B) 
-
 inline void az_static_assert(int x[1]) { x; }
 
 #define AZ_STATIC_ASSERT(CONDITION) inline void az_static_assert(int x[(CONDITION) ? 1 : -1]);
