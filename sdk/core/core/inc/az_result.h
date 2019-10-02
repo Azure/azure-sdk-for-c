@@ -4,41 +4,39 @@
 #ifndef AZ_RESULT_H
 #define AZ_RESULT_H
 
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <_az_cfg_prefix.h>
 
-enum {
-  AZ_OK            =          0,
-  AZ_ERROR_FLAG    = 0x80000000,
-};
-
-enum {
-  AZ_STREAM_FACILITY = 0x1,
-  AZ_JSON_FACILITY   = 0x2,
-};
-
-// The type represents error conditions.
-// Bits:
-// -  0..15 Code.
-// - 16..30 Facility.
-// - 31     Severity (0 - success, 1 - failure).
+/**
+ * The type represents error conditions.
+ * Bits:
+ * -  0..15 Code.
+ * - 16..30 Facility.
+ * - 31     Severity (0 - success, 1 - failure).
+ */
 typedef int32_t az_result;
 
-#define AZ_MAKE_ERROR(facility, code) ((az_result)(0x80000000 | ((uint32_t)(facility) << 16)) | (uint32_t)(code))
+enum {
+  AZ_OK = 0,
+  AZ_ERROR_FLAG = (az_result)0x80000000,
+};
 
-#define AZ_MAKE_RESULT(facility, code) ((az_result)(((uint32_t)(facility) << 16)) | (uint32_t)(code))
+enum {
+  AZ_CORE_FACILITY = 0x1,
+  AZ_JSON_FACILITY = 0x2,
+};
 
-inline bool az_failed(az_result result) {
-  return (result & AZ_ERROR_FLAG) != 0;
-}
+#define AZ_MAKE_ERROR(facility, code) \
+  ((az_result)(0x80000000 | ((uint32_t)(facility) << 16) | (uint32_t)(code)))
 
-inline bool az_succeeded(az_result result) {
-  return (result & AZ_ERROR_FLAG) == 0;
-}
+#define AZ_MAKE_RESULT(facility, code) \
+  ((az_result)(((uint32_t)(facility) << 16) | (uint32_t)(code)))
+
+static inline bool az_failed(az_result result) { return (result & AZ_ERROR_FLAG) != 0; }
+
+static inline bool az_succeeded(az_result result) { return (result & AZ_ERROR_FLAG) == 0; }
 
 #define AZ_RETURN_IF_NOT_OK(exp) \
   do { \
@@ -48,8 +46,8 @@ inline bool az_succeeded(az_result result) {
     } \
   } while (0)
 
-#ifdef __cplusplus
-}
-#endif
+enum { AZ_ERROR_ARG = AZ_MAKE_ERROR(AZ_CORE_FACILITY, 1) };
+
+#include <_az_cfg_suffix.h>
 
 #endif
