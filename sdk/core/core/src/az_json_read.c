@@ -317,8 +317,9 @@ az_result az_json_read(az_json_state * const p_state, az_json_value * const out_
     case AZ_JSON_VALUE_ARRAY:
     case AZ_JSON_VALUE_OBJECT:
       return is_empty ? AZ_JSON_ERROR_UNEXPECTED_END : AZ_OK;
+    default:
+      return is_empty ? AZ_OK : AZ_JSON_ERROR_UNEXPECTED_CHAR;
   }
-  return is_empty ? AZ_OK : AZ_JSON_ERROR_UNEXPECTED_CHAR;
 }
 
 inline uint8_t az_json_stack_item_to_close(az_json_stack_item const item) {
@@ -365,8 +366,9 @@ az_result az_json_check_item_end(az_json_state * const p_state, az_json_value co
     case AZ_JSON_VALUE_OBJECT:
     case AZ_JSON_VALUE_ARRAY:
       return AZ_OK;
+    default:
+      return az_json_read_comma_or_close(p_state);
   }
-  return az_json_read_comma_or_close(p_state);
 }
 
 az_result az_json_read_object_member(
