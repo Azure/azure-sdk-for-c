@@ -6,6 +6,9 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
+
+#include <az_static_assert.h>
 
 #include <_az_cfg_prefix.h>
 
@@ -26,6 +29,7 @@ enum {
 enum {
   AZ_CORE_FACILITY = 0x1,
   AZ_JSON_FACILITY = 0x2,
+  AZ_STD_FACILITY = 0x7FFF,
 };
 
 #define AZ_MAKE_ERROR(facility, code) \
@@ -46,7 +50,12 @@ static inline bool az_succeeded(az_result result) { return (result & AZ_ERROR_FL
     } \
   } while (0)
 
-enum { AZ_ERROR_ARG = AZ_MAKE_ERROR(AZ_CORE_FACILITY, 1) };
+enum {
+  AZ_ERROR_ARG = AZ_MAKE_ERROR(AZ_CORE_FACILITY, 1),
+  AZ_ERROR_EOF = AZ_MAKE_ERROR(AZ_STD_FACILITY, 0xFFFF),
+};
+
+AZ_STATIC_ASSERT(AZ_ERROR_EOF == EOF);
 
 #include <_az_cfg_suffix.h>
 
