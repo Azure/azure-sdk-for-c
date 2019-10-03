@@ -52,7 +52,7 @@ enum {
   AZ_ERROR_EOF = AZ_MAKE_ERROR(AZ_STD_FACILITY, 0xFFFF),
 };
 
-AZ_STATIC_ASSERT(AZ_ERROR_EOF == EOF);
+AZ_STATIC_ASSERT(AZ_ERROR_EOF == EOF)
 
 typedef az_result az_result_bool;
 
