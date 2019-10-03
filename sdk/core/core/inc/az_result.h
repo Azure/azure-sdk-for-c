@@ -35,9 +35,6 @@ enum {
 #define AZ_MAKE_ERROR(facility, code) \
   ((az_result)(0x80000000 | ((uint32_t)(facility) << 16) | (uint32_t)(code)))
 
-#define AZ_MAKE_RESULT(facility, code) \
-  ((az_result)(((uint32_t)(facility) << 16) | (uint32_t)(code)))
-
 static inline bool az_failed(az_result result) { return (result & AZ_ERROR_FLAG) != 0; }
 
 static inline bool az_succeeded(az_result result) { return (result & AZ_ERROR_FLAG) == 0; }
@@ -56,6 +53,8 @@ enum {
 };
 
 AZ_STATIC_ASSERT(AZ_ERROR_EOF == EOF);
+
+typedef az_result az_result_bool;
 
 #include <_az_cfg_suffix.h>
 
