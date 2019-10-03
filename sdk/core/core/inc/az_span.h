@@ -4,8 +4,7 @@
 #ifndef AZ_SPAN_H
 #define AZ_SPAN_H
 
-#include <az_assert.h>
-#include <az_option_byte.h>
+#include <az_result.h>
 #include <az_static_assert.h>
 
 #include <limits.h>
@@ -39,13 +38,15 @@ typedef struct {
 
 AZ_STATIC_ASSERT(CHAR_BIT == 8)
 
+typedef az_result az_result_byte;
+
 /**
  * Returns a byte in `index` position.
- * Returns `AZ_OPTION_BYTE_NONE` if the `index` is out of the span range.
+ * Returns `AZ_ERROR_EOF` if the `index` is out of the span range.
  */
-static inline az_option_byte az_const_span_get(az_const_span const span, size_t const index) {
+static inline az_result_byte az_const_span_get(az_const_span const span, size_t const index) {
   if (span.size <= index) {
-    return AZ_OPTION_BYTE_NONE;
+    return AZ_ERROR_EOF;
   }
   return span.begin[index];
 }
