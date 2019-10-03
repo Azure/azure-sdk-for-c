@@ -54,8 +54,6 @@ enum {
 
 AZ_STATIC_ASSERT(AZ_ERROR_EOF == EOF)
 
-typedef az_result az_result_bool;
-
 #include <_az_cfg_suffix.h>
 
 #endif
