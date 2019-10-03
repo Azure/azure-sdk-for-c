@@ -15,9 +15,12 @@
 /**
  * The type represents error conditions.
  * Bits:
- * -  0..15 Code.
- * - 16..30 Facility.
- * - 31     Severity (0 - success, 1 - failure).
+ * - 31 Severity (0 - success, 1 - failure).
+ * - if failure then
+ *   - 16..30 Facility.
+ *   -  0..15 Code.
+ * - otherwise
+ *   -  0..30 Value
  */
 typedef int32_t az_result;
 
