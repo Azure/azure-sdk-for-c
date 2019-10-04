@@ -22,8 +22,7 @@ az_result az_net_invoke_rest_method(
     az_const_span const body,
     az_const_span const headers,
     az_span const response_buffer,
-    az_const_span * const out_response
-  );
+    az_const_span * const out_response);
 
 az_result az_net_uri_escape(
     az_const_span const s,
