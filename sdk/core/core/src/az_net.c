@@ -199,8 +199,9 @@ az_result az_net_invoke_rest_method(
     char const * cmd_part1 = "Invoke-RestMethod -Method ";
     char const * cmd_part2 = " -Uri '";
     char const * cmd_part34_body = "' -Body '";
-    char const * cmd_part34_headers = "' -Headers '";
-    char const * cmd_part45_end = "' | ConvertTo-Json -Compress";
+    char const * cmd_part34_body_end = "'";
+    char const * cmd_part34_headers = "' -Headers ";
+    char const * cmd_part45_end = " | ConvertTo-Json -Compress";
 
     bool has_body = (body.size > 0);
     bool has_headers = (headers.size > 0);
@@ -228,11 +229,16 @@ az_result az_net_invoke_rest_method(
       char const * const body_str = alloc_c_str(body);
       char const * const cmd_old = cmd;
 
-      cmd = alloc_concat_3_strings(
-          cmd, body_str, has_headers ? cmd_part34_headers : cmd_part45_end);
+      cmd = alloc_concat_3_strings(cmd, body_str, cmd_part34_body_end);
 
       free((void *)cmd_old);
       free((void *)body_str);
+
+      {
+        char const * const cmd_old2 = cmd;
+        cmd = alloc_concat_3_strings(cmd, "", has_headers ? cmd_part34_headers : cmd_part45_end);
+        free((void *)cmd_old2);
+      }
     }
 
     if (has_headers) {
