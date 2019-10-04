@@ -105,8 +105,7 @@ int main() {
 
   AZ_STR_DECL(
       kv_secret_uri,
-      "https://antk-keyvault.vault.azure.net/secrets/Password/"
-      "16957d9befa44e30b6b99c469e4f800e?api-version=7.0");
+      "https://antk-keyvault.vault.azure.net/secrets/Password?api-version=7.0");
 
   strcpy(kv_headers_buf, "@{'authorization' = 'Bearer ");
 
