@@ -82,7 +82,13 @@ az_json_state az_json_state_create(az_const_span const buffer) {
 }
 
 az_result az_json_read_expected_char(az_span_reader * const p_reader, uint8_t const expected) {
-  az_result_byte const c = az_span_reader_current(p_reader);
+  // We can't use `char const` because it's used as output parameter.
+  char c;
+  az_result_byte const result = az_span_reader_current(p_reader, &c);
+  // We only can check `c` if the `result` is AZ_OK.
+  if (az_failed(result)) {
+    return result;
+  }
   if (c != expected) {
     return az_json_error_unexpected(c);
   }
@@ -90,8 +96,16 @@ az_result az_json_read_expected_char(az_span_reader * const p_reader, uint8_t co
   return AZ_OK;
 }
 
-static void az_json_read_white_space(az_span_reader * const p_reader) {
-  while (az_json_is_white_space(az_span_reader_current(p_reader))) {
+static az_result az_json_read_white_space(az_span_reader * const p_reader) {
+  while (true) {
+    char c;
+    az_result const result = az_span_reader_current(p_reader, &c);
+    if (az_failed(result)) {
+      return result;
+    }
+    if (!az_json_is_white_space(c)) {
+      return AZ_OK;
+    }
     az_span_reader_next(p_reader);
   }
 }
@@ -100,13 +114,22 @@ static az_result az_json_read_keyword_rest(az_span_reader * const p_reader, az_c
   az_span_reader_next(p_reader);
   az_span_reader k = az_span_reader_create(keyword);
   while (true) {
-    az_result_byte const ko = az_span_reader_current(&k);
-    if (ko == AZ_ERROR_EOF) {
+    char kc;
+    az_result_byte const k_result = az_span_reader_current(&k, &kc);
+    if (k_result == AZ_ERROR_EOF) {
       return AZ_OK;
     }
-    az_result_byte const o = az_span_reader_current(p_reader);
-    if (o != ko) {
-      return az_json_error_unexpected(o);
+    // We don't need this check because `az_span_reader_current` can't return anything else but just in case.
+    if (az_failed(k_result)) {
+      return k_result;
+    }
+    char c;
+    az_result_byte const result = az_span_reader_current(p_reader, &c);
+    if (az_failed(result)) {
+      return result;
+    }
+    if (c != kc) {
+      return AZ_JSON_ERROR_UNEXPECTED_CHAR;
     }
     az_span_reader_next(p_reader);
     az_span_reader_next(&k);

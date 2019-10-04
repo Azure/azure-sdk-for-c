@@ -44,11 +44,15 @@ typedef az_result az_result_byte;
  * Returns a byte in `index` position.
  * Returns `AZ_ERROR_EOF` if the `index` is out of the span range.
  */
-static inline az_result_byte az_const_span_get(az_const_span const span, size_t const index) {
+static inline az_result az_const_span_get(az_const_span const span, size_t const index, char *out_c) {
   if (span.size <= index) {
     return AZ_ERROR_EOF;
   }
-  return span.begin[index];
+  if (out_c == NULL) {
+    return AZ_ERROR_ARG;
+  }
+  *out_c = span.begin[index];
+  return AZ_OK;
 }
 
 /**
