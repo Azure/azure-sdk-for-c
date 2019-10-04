@@ -43,7 +43,7 @@ AZ_STATIC_ASSERT(CHAR_BIT == 8)
  * Returns a byte in `index` position.
  * Returns `AZ_OPTION_BYTE_NONE` if the `index` is out of the span range.
  */
-static inline az_option_byte az_const_span_get(az_const_span const span, size_t const index) {
+inline az_option_byte az_const_span_get(az_const_span const span, size_t const index) {
   if (span.size <= index) {
     return AZ_OPTION_BYTE_NONE;
   }
@@ -55,7 +55,7 @@ static inline az_option_byte az_const_span_get(az_const_span const span, size_t 
  *
  * If the @n is greater than the @span.size than the whole @span is returned.
  */
-static inline az_const_span az_const_span_take(az_const_span const span, size_t const n) {
+inline az_const_span az_const_span_take(az_const_span const span, size_t const n) {
   if (span.size <= n) {
     return span;
   }
@@ -67,7 +67,7 @@ static inline az_const_span az_const_span_take(az_const_span const span, size_t 
  *
  * If the @n is greater than @span.size than an empty span is returned
  */
-static inline az_const_span az_const_span_drop(az_const_span const span, size_t const n) {
+inline az_const_span az_const_span_drop(az_const_span const span, size_t const n) {
   if (span.size <= n) {
     return (az_const_span){ .begin = NULL, .size = 0 };
   }
@@ -77,7 +77,7 @@ static inline az_const_span az_const_span_drop(az_const_span const span, size_t 
 /**
  * Returns a sub span of the given span.
  */
-static inline az_const_span az_const_span_sub(
+inline az_const_span az_const_span_sub(
     az_const_span const span,
     size_t const begin,
     size_t const end) {
@@ -88,7 +88,7 @@ static inline az_const_span az_const_span_sub(
 /**
  * Cast the given mutable span to an immutable span.
  */
-static inline az_const_span az_to_const_span(az_span const span) {
+inline az_const_span az_to_const_span(az_span const span) {
   return (az_const_span){ .begin = span.begin, .size = span.size };
 }
 
@@ -96,7 +96,7 @@ static inline az_const_span az_to_const_span(az_span const span) {
  * Returns `true` if a content of the @a span is equal to a content of the @b
  * span.
  */
-static inline bool az_const_span_eq(az_const_span const a, az_const_span const b) {
+inline bool az_const_span_eq(az_const_span const a, az_const_span const b) {
   return a.size == b.size && memcmp(a.begin, b.begin, a.size) == 0;
 }
 
