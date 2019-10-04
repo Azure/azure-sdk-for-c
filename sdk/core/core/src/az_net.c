@@ -10,6 +10,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef _WIN32
+#define NOMINMAX
+#include <Windows.h>
+#else
+#include <unistd.h>
+#endif
+
 #include <_az_cfg_warn.h>
 
 #ifdef _MSC_VER
@@ -18,27 +25,36 @@
 #pragma warning(disable : 4996)
 #endif
 
+static inline void delay() {
+  int const milliseconds = 1000;
+#ifdef _WIN32
+  Sleep(milliseconds);
+#else
+  usleep(milliseconds * 1000);
+#endif
+}
+
 static char const * alloc_shell_exec(char const * const cmd) {
   assert(cmd != NULL);
 
   FILE * const cmd_output = _popen(cmd, "r");
   assert(cmd_output != NULL);
 
-  int seek_end_status = fseek(cmd_output, 0, SEEK_END);
-  assert(seek_end_status == 0);
-  size_t const output_length = (size_t)ftell(cmd_output);
+  delay();
 
-  long const rewind_pos = fseek(cmd_output, 0, SEEK_SET);
-  assert(rewind_pos == 0);
+  size_t output_length
+      = 4 * 1024; // trying to determine file size via fseek isn't going to work for the size
+                  // >=~1200 bytes for the reason that we are reading from a pipe. So we allocate
+                  // just large enough buffer and hope it is sufficient.
 
-  char * const result = calloc(output_length + 1, sizeof(char));
+  char * result = calloc(output_length, sizeof(char));
   assert(result != NULL);
 
-  size_t const chars_read = fread(result, sizeof(char), output_length, cmd_output) / sizeof(char);
-  assert(chars_read == output_length);
-  assert(feof(cmd_output));
+  fgets(result, (int)output_length, cmd_output);
 
-  fclose(cmd_output);
+  _pclose(cmd_output);
+
+  result[strlen(result) - 1] = '\0'; // drop EOL at EOF
 
   return result;
 }
@@ -119,14 +135,13 @@ static inline az_result copy_to_span(
 
   assert(out_result != NULL);
   assert(span.begin == out_result->begin);
-  assert(span.size == out_result->size);
 
   size_t s_strlen = strlen(s);
   if (s_strlen > span.size) {
     return AZ_ERROR_NO_BUFFER_SPACE;
   }
 
-  memcpy(out_result, s, s_strlen * sizeof(char));
+  memcpy((void *)out_result->begin, s, s_strlen * sizeof(char));
   out_result->size = s_strlen;
 
   return AZ_OK;
