@@ -6,15 +6,21 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
+
+#include <az_static_assert.h>
 
 #include <_az_cfg_prefix.h>
 
 /**
  * The type represents error conditions.
  * Bits:
- * -  0..15 Code.
- * - 16..30 Facility.
- * - 31     Severity (0 - success, 1 - failure).
+ * - 31 Severity (0 - success, 1 - failure).
+ * - if failure then
+ *   - 16..30 Facility.
+ *   -  0..15 Code.
+ * - otherwise
+ *   -  0..30 Value
  */
 typedef int32_t az_result;
 
@@ -26,13 +32,11 @@ enum {
 enum {
   AZ_CORE_FACILITY = 0x1,
   AZ_JSON_FACILITY = 0x2,
+  AZ_STD_FACILITY = 0x7FFF,
 };
 
 #define AZ_MAKE_ERROR(facility, code) \
   ((az_result)(0x80000000 | ((uint32_t)(facility) << 16) | (uint32_t)(code)))
-
-#define AZ_MAKE_RESULT(facility, code) \
-  ((az_result)(((uint32_t)(facility) << 16) | (uint32_t)(code)))
 
 static inline bool az_failed(az_result result) { return (result & AZ_ERROR_FLAG) != 0; }
 
@@ -46,7 +50,12 @@ static inline bool az_succeeded(az_result result) { return (result & AZ_ERROR_FL
     } \
   } while (0)
 
-enum { AZ_ERROR_ARG = AZ_MAKE_ERROR(AZ_CORE_FACILITY, 1) };
+enum {
+  AZ_ERROR_ARG = AZ_MAKE_ERROR(AZ_CORE_FACILITY, 1),
+  AZ_ERROR_EOF = AZ_MAKE_ERROR(AZ_STD_FACILITY, 0xFFFF),
+};
+
+AZ_STATIC_ASSERT(AZ_ERROR_EOF == EOF)
 
 #include <_az_cfg_suffix.h>
 

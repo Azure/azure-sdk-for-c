@@ -4,7 +4,7 @@
 #ifndef AZ_SPAN_READER_H
 #define AZ_SPAN_READER_H
 
-#include <az_option_byte.h>
+#include <az_result.h>
 #include <az_span.h>
 
 #include <_az_cfg_prefix.h>
@@ -22,7 +22,7 @@ static inline bool az_span_reader_is_empty(az_span_reader const * const p_reader
   return p_reader->span.size <= p_reader->i;
 }
 
-static inline az_option_byte az_span_reader_current(az_span_reader const * const p_reader) {
+static inline az_result_byte az_span_reader_current(az_span_reader const * const p_reader) {
   return az_const_span_get(p_reader->span, p_reader->i);
 }
 
