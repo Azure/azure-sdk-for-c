@@ -22,7 +22,7 @@ static inline bool az_span_reader_is_empty(az_span_reader const * const p_reader
   return p_reader->span.size <= p_reader->i;
 }
 
-static inline az_result az_span_reader_current(az_span_reader const * const p_reader, char *out) {
+static inline az_result az_span_reader_current(az_span_reader const * const p_reader, uint8_t *out) {
   return az_const_span_get(p_reader->span, p_reader->i, out);
 }
 

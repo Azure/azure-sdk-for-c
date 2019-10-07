@@ -38,13 +38,13 @@ typedef struct {
 
 AZ_STATIC_ASSERT(CHAR_BIT == 8)
 
-typedef az_result az_result_byte;
+// typedef az_result az_result_byte;
 
 /**
  * Returns a byte in `index` position.
  * Returns `AZ_ERROR_EOF` if the `index` is out of the span range.
  */
-static inline az_result az_const_span_get(az_const_span const span, size_t const index, char *out_c) {
+static inline az_result az_const_span_get(az_const_span const span, size_t const index, uint8_t *out_c) {
   if (span.size <= index) {
     return AZ_ERROR_EOF;
   }

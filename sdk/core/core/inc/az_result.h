@@ -44,9 +44,9 @@ static inline bool az_succeeded(az_result result) { return (result & AZ_ERROR_FL
 
 #define AZ_RETURN_IF_NOT_OK(exp) \
   do { \
-    az_result const result = (exp); \
-    if (result != AZ_OK) { \
-      return result; \
+    az_result const _result = (exp); \
+    if (_result != AZ_OK) { \
+      return _result; \
     } \
   } while (0)
 

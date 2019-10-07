@@ -8,7 +8,7 @@
 
 #include <_az_cfg_warn.h>
 
-static inline bool az_json_is_white_space(az_result_byte const c) {
+static inline bool az_json_is_white_space(uint8_t const c) {
   switch (c) {
     case ' ':
     case '\t':
@@ -19,7 +19,7 @@ static inline bool az_json_is_white_space(az_result_byte const c) {
   return false;
 }
 
-static inline bool az_json_is_esc(az_result_byte const c) {
+static inline bool az_json_is_esc(uint8_t const c) {
   switch (c) {
     case '\\':
     case '"':
@@ -34,20 +34,13 @@ static inline bool az_json_is_esc(az_result_byte const c) {
   return false;
 }
 
-static inline bool az_json_is_e(az_result_byte const c) {
+static inline bool az_json_is_e(uint8_t const c) {
   switch (c) {
     case 'e':
     case 'E':
       return true;
   }
   return false;
-}
-
-static inline az_result az_json_error_unexpected(az_result_byte const c) {
-  if (c == AZ_ERROR_EOF) {
-    return AZ_JSON_ERROR_UNEXPECTED_END;
-  }
-  return az_failed(c) ? c : AZ_JSON_ERROR_UNEXPECTED_CHAR;
 }
 
 static inline bool az_json_stack_is_empty(az_json_state const * const p) { return p->stack == 1; }
@@ -83,14 +76,14 @@ az_json_state az_json_state_create(az_const_span const buffer) {
 
 az_result az_json_read_expected_char(az_span_reader * const p_reader, uint8_t const expected) {
   // We can't use `char const` because it's used as output parameter.
-  char c;
-  az_result_byte const result = az_span_reader_current(p_reader, &c);
+  uint8_t c;
+  az_result const result = az_span_reader_current(p_reader, &c);
   // We only can check `c` if the `result` is AZ_OK.
   if (az_failed(result)) {
     return result;
   }
   if (c != expected) {
-    return az_json_error_unexpected(c);
+    return AZ_JSON_ERROR_UNEXPECTED_CHAR;
   }
   az_span_reader_next(p_reader);
   return AZ_OK;
@@ -98,7 +91,7 @@ az_result az_json_read_expected_char(az_span_reader * const p_reader, uint8_t co
 
 static az_result az_json_read_white_space(az_span_reader * const p_reader) {
   while (true) {
-    char c;
+    uint8_t c;
     az_result const result = az_span_reader_current(p_reader, &c);
     if (az_failed(result)) {
       return result;
@@ -114,8 +107,8 @@ static az_result az_json_read_keyword_rest(az_span_reader * const p_reader, az_c
   az_span_reader_next(p_reader);
   az_span_reader k = az_span_reader_create(keyword);
   while (true) {
-    char kc;
-    az_result_byte const k_result = az_span_reader_current(&k, &kc);
+    uint8_t kc;
+    az_result const k_result = az_span_reader_current(&k, &kc);
     if (k_result == AZ_ERROR_EOF) {
       return AZ_OK;
     }
@@ -123,8 +116,8 @@ static az_result az_json_read_keyword_rest(az_span_reader * const p_reader, az_c
     if (az_failed(k_result)) {
       return k_result;
     }
-    char c;
-    az_result_byte const result = az_span_reader_current(p_reader, &c);
+    uint8_t c;
+    az_result const result = az_span_reader_current(p_reader, &c);
     if (az_failed(result)) {
       return result;
     }
@@ -156,8 +149,8 @@ static az_result az_json_number_int_parse(
     az_span_reader * const p_reader,
     az_dec_number * const p_n,
     int16_t const e_offset,
-    az_result_byte const first) {
-  az_result_byte c = first;
+    uint8_t const first) {
+  uint8_t c = first;
   // read an integer part of the number
   while (true) {
     int d = c - '0';
@@ -171,7 +164,10 @@ static az_result az_json_number_int_parse(
       p_n->exp += e_offset + 1;
     }
     az_span_reader_next(p_reader);
-    c = az_span_reader_current(p_reader);
+    az_result const result = az_span_reader_current(p_reader, &c);
+    if (az_failed(result)) {
+      return result;
+    }
     if (!isdigit(c)) {
       return AZ_OK;
     }
@@ -190,37 +186,56 @@ static az_result az_json_read_number_digit_rest(
 
   // integer part
   {
-    az_result_byte o = az_span_reader_current(p_reader);
-    if (o == '-') {
+    uint8_t c;
+    az_result result = az_span_reader_current(p_reader, &c);
+    if (az_failed(result)) {
+      return result;
+    }
+    if (c == '-') {
       i.sign = -1;
       az_span_reader_next(p_reader);
-      o = az_span_reader_current(p_reader);
-      if (!isdigit(o)) {
-        return az_json_error_unexpected(o);
+      result = az_span_reader_current(p_reader, &c);
+      if (az_failed(result)) {
+        return result;
+      }
+      if (!isdigit(c)) {
+        return AZ_JSON_ERROR_UNEXPECTED_END;
       }
     }
-    if (o != '0') {
-      AZ_RETURN_IF_NOT_OK(az_json_number_int_parse(p_reader, &i, 0, o));
+    if (c != '0') {
+      AZ_RETURN_IF_NOT_OK(az_json_number_int_parse(p_reader, &i, 0, c));
     } else {
       az_span_reader_next(p_reader);
     }
   }
 
   // fraction
-  if (az_span_reader_current(p_reader) == '.') {
+  uint8_t c;
+  az_result result = az_span_reader_current(p_reader, &c);
+  if (result != AZ_ERROR_EOF && az_failed(result)) {
+    return result;
+  }
+  if (az_succeeded(result) && c == '.') {
     az_span_reader_next(p_reader);
-    az_result_byte o = az_span_reader_current(p_reader);
-    if (!isdigit(o)) {
-      return az_json_error_unexpected(o);
+    result = az_span_reader_current(p_reader, &c);
+    if (az_failed(result)) {
+      return result;
     }
-    AZ_RETURN_IF_NOT_OK(az_json_number_int_parse(p_reader, &i, -1, o));
+    if (!isdigit(c)) {
+      return AZ_JSON_ERROR_UNEXPECTED_CHAR;
+    }
+    AZ_RETURN_IF_NOT_OK(az_json_number_int_parse(p_reader, &i, -1, c));
   }
 
   // exp
-  if (az_json_is_e(az_span_reader_current(p_reader))) {
+  result = az_span_reader_current(p_reader, &c);
+  if (az_succeeded(result) && az_json_is_e(c)) {
     // skip 'e' or 'E'
     az_span_reader_next(p_reader);
-    az_result_byte c = az_span_reader_current(p_reader);
+    result = az_span_reader_current(p_reader, &c);
+    if (az_failed(result)) {
+      return result;
+    }
 
     // read sign, if any.
     int8_t e_sign = 1;
@@ -229,20 +244,23 @@ static az_result az_json_read_number_digit_rest(
         e_sign = -1;
       case '+':
         az_span_reader_next(p_reader);
-        c = az_span_reader_current(p_reader);
+        result = az_span_reader_current(p_reader, &c);
+        if (az_failed(result)) {
+          return result;
+        }
     }
 
     // expect at least one digit.
     if (!isdigit(c)) {
-      return az_json_error_unexpected(c);
+      return AZ_JSON_ERROR_UNEXPECTED_CHAR;
     }
 
     int16_t e_int = 0;
     do {
       e_int = e_int * 10 + (int16_t)(c - '0');
       az_span_reader_next(p_reader);
-      c = az_span_reader_current(p_reader);
-    } while (isdigit(c));
+      result = az_span_reader_current(p_reader, &c);
+    } while (az_succedded(result) && isdigit(c));
     i.exp += e_int * e_sign;
   }
 
@@ -254,7 +272,11 @@ static az_result az_json_read_string_rest(az_span_reader * const p_reader, az_co
   // skip '"'
   size_t const begin = p_reader->i;
   while (true) {
-    az_result_byte c = az_span_reader_current(p_reader);
+    uint8_t c;
+    az_result const result = az_span_reader_current(p_reader, &c);
+    if (az_failed(result)) {
+      return result;
+    }
     switch (c) {
         // end of the string
       case '"': {
@@ -265,19 +287,25 @@ static az_result az_json_read_string_rest(az_span_reader * const p_reader, az_co
         // escape sequence
       case '\\': {
         az_span_reader_next(p_reader);
-        c = az_span_reader_current(p_reader);
+        az_result result = az_span_reader_current(p_reader, &c);
+        if (az_failed(result)) {
+          return result;
+        }
         if (az_json_is_esc(c)) {
           az_span_reader_next(p_reader);
         } else if (c == 'u') {
           az_span_reader_next(p_reader);
           for (size_t i = 0; i < 4; ++i, az_span_reader_next(p_reader)) {
-            c = az_span_reader_current(p_reader);
+            result = az_span_reader_current(p_reader, &c);
+            if (az_failed(result)) {
+              return result;
+            }
             if (!isxdigit(c)) {
-              return az_json_error_unexpected(c);
+              return AZ_JSON_ERROR_UNEXPECTED_CHAR;
             }
           }
         } else {
-          return az_json_error_unexpected(c);
+          return AZ_JSON_ERROR_UNEXPECTED_CHAR;
         }
         break;
       }
@@ -294,7 +322,11 @@ static az_result az_json_read_string_rest(az_span_reader * const p_reader, az_co
 // _value_
 static az_result az_json_read_value(az_json_state * const p_state, az_json_value * const out_value) {
   az_span_reader * const p_reader = &p_state->reader;
-  az_result_byte const c = az_span_reader_current(p_reader);
+  uint8_t c;
+  az_result const result = az_span_reader_current(p_reader, &c);
+  if (az_failed(result)) {
+    return result;
+  }
   if (isdigit(c)) {
     out_value->kind = AZ_JSON_VALUE_NUMBER;
     return az_json_read_number_digit_rest(p_reader, &out_value->data.number);
@@ -358,7 +390,11 @@ static inline uint8_t az_json_stack_item_to_close(az_json_stack_item const item)
 }
 
 static az_result az_json_read_comma_or_close(az_json_state * const p_state) {
-  az_result_byte const c = az_span_reader_current(&p_state->reader);
+  uint8_t c;
+  az_result result = az_span_reader_current(&p_state->reader, &c);
+  if (az_failed(result)) {
+    return result;
+  }
   if (c == ',') {
     // skip ',' and read all whitespaces.
     az_span_reader_next(&p_state->reader);
@@ -378,7 +414,11 @@ static az_result az_json_check_item_begin(
   if (az_json_stack_is_empty(p_state) || az_json_stack_last(p_state) != stack_item) {
     return AZ_JSON_ERROR_INVALID_STATE;
   }
-  az_result_byte const c = az_span_reader_current(&p_state->reader);
+  char c;
+  az_result const result = az_span_reader_current(&p_state->reader, &c);
+  if (az_failed(result)) {
+    return result;
+  }
   if (c != az_json_stack_item_to_close(stack_item)) {
     return AZ_OK;
   }
