@@ -8,11 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#ifdef _MSC_VER
-// warning C4996: 'strcpy/strcat': This function or variable may be unsafe. Consider using
-// strcpy_s/strcat_s instead.
-#pragma warning(disable : 4996)
-#endif
+#include <_az_cfg_warn.h>
 
 void println_span(az_const_span const span) {
   for (size_t i = 0; i < span.size; ++i) {
