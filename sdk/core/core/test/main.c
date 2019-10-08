@@ -4,6 +4,7 @@
 #include <az_net.h>
 #include <az_str.h>
 
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 
