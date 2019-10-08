@@ -19,12 +19,6 @@
 
 #include <_az_cfg_warn.h>
 
-#ifdef _MSC_VER
-// warning C4996: 'strcpy/strcat': This function or variable may be unsafe. Consider using
-// strcpy_s/strcat_s instead.
-#pragma warning(disable : 4996)
-#endif
-
 static inline void delay() {
   int const milliseconds = 1000;
 #ifdef _WIN32
@@ -34,10 +28,26 @@ static inline void delay() {
 #endif
 }
 
+static inline FILE * proc_pipe_open(char const * const cmd) {
+#ifdef _WIN32
+  return _popen(cmd, "r");
+#else
+  return popen(cmd, "r");
+#endif
+}
+
+static inline int proc_pipe_close(FILE * const proc_pipe) {
+#ifdef _WIN32
+  return _pclose(proc_pipe);
+#else
+  return pclose(proc_pipe);
+#endif
+}
+
 static char const * alloc_shell_exec(char const * const cmd) {
   assert(cmd != NULL);
 
-  FILE * const cmd_output = _popen(cmd, "r");
+  FILE * const cmd_output = proc_pipe_open(cmd);
   assert(cmd_output != NULL);
 
   delay();
@@ -52,7 +62,7 @@ static char const * alloc_shell_exec(char const * const cmd) {
 
   fgets(result, (int)output_length, cmd_output);
 
-  _pclose(cmd_output);
+  proc_pipe_close(cmd_output);
 
   result[strlen(result) - 1] = '\0'; // drop EOL at EOF
 
