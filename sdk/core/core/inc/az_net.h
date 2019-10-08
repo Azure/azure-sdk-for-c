@@ -39,8 +39,8 @@ static inline az_result az_net_uri_unescape(
 
   {
     // C4100: unreferenced formal parameter && error: statement with no effect
-    assert(&s != NULL);
-    assert(&buffer != NULL);
+    (void)s;
+    (void)buffer;
   }
 
   return AZ_ERROR_NOT_IMPLEMENTED;
