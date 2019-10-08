@@ -3,6 +3,8 @@
 
 #include <az_json_read.h>
 
+#include <az_contract.h>
+
 #include <ctype.h>
 #include <math.h>
 
@@ -177,7 +179,7 @@ static az_result az_json_read_number_digit_rest(
       }
     }
     if (o != '0') {
-      AZ_RETURN_IF_NOT_OK(az_json_number_int_parse(p_reader, &i, 0, o));
+      AZ_RETURN_IF_FAILED(az_json_number_int_parse(p_reader, &i, 0, o));
     } else {
       az_span_reader_next(p_reader);
     }
@@ -190,7 +192,7 @@ static az_result az_json_read_number_digit_rest(
     if (!isdigit(o)) {
       return az_json_error_unexpected(o);
     }
-    AZ_RETURN_IF_NOT_OK(az_json_number_int_parse(p_reader, &i, -1, o));
+    AZ_RETURN_IF_FAILED(az_json_number_int_parse(p_reader, &i, -1, o));
   }
 
   // exp
@@ -308,17 +310,20 @@ static az_result az_json_read_value(az_json_state * const p_state, az_json_value
 }
 
 static az_result az_json_read_value_space(az_json_state * const p_state, az_json_value * const out_value) {
-  AZ_RETURN_IF_NOT_OK(az_json_read_value(p_state, out_value));
+  AZ_RETURN_IF_FAILED(az_json_read_value(p_state, out_value));
   az_json_read_white_space(&p_state->reader);
   return AZ_OK;
 }
 
 az_result az_json_read(az_json_state * const p_state, az_json_value * const out_value) {
+  AZ_CONTRACT_ARG_NOT_NULL(p_state);
+  AZ_CONTRACT_ARG_NOT_NULL(out_value);
+
   if (!az_json_stack_is_empty(p_state)) {
     return AZ_JSON_ERROR_INVALID_STATE;
   }
   az_json_read_white_space(&p_state->reader);
-  AZ_RETURN_IF_NOT_OK(az_json_read_value_space(p_state, out_value));
+  AZ_RETURN_IF_FAILED(az_json_read_value_space(p_state, out_value));
   bool const is_empty = az_span_reader_is_empty(&p_state->reader);
   switch (out_value->kind) {
     case AZ_JSON_VALUE_ARRAY:
@@ -360,13 +365,13 @@ static az_result az_json_check_item_begin(
     return AZ_OK;
   }
   // c == close
-  AZ_RETURN_IF_NOT_OK(az_json_stack_pop(p_state));
+  AZ_RETURN_IF_FAILED(az_json_stack_pop(p_state));
   az_span_reader_next(&p_state->reader);
   az_json_read_white_space(&p_state->reader);
   if (!az_json_stack_is_empty(p_state)) {
-    AZ_RETURN_IF_NOT_OK(az_json_read_comma_or_close(p_state));
+    AZ_RETURN_IF_FAILED(az_json_read_comma_or_close(p_state));
   }
-  return AZ_JSON_NO_MORE_ITEMS;
+  return AZ_JSON_ERROR_NO_MORE_ITEMS;
 }
 
 static az_result az_json_check_item_end(az_json_state * const p_state, az_json_value const value) {
@@ -383,25 +388,33 @@ static az_result az_json_check_item_end(az_json_state * const p_state, az_json_v
 az_result az_json_read_object_member(
     az_json_state * const p_state,
     az_json_member * const out_member) {
-  AZ_RETURN_IF_NOT_OK(az_json_check_item_begin(p_state, AZ_JSON_STACK_OBJECT));
-  AZ_RETURN_IF_NOT_OK(az_json_read_expected_char(&p_state->reader, '"'));
-  AZ_RETURN_IF_NOT_OK(az_json_read_string_rest(&p_state->reader, &out_member->name));
+  AZ_CONTRACT_ARG_NOT_NULL(p_state);
+  AZ_CONTRACT_ARG_NOT_NULL(out_member);
+
+  AZ_RETURN_IF_FAILED(az_json_check_item_begin(p_state, AZ_JSON_STACK_OBJECT));
+  AZ_RETURN_IF_FAILED(az_json_read_expected_char(&p_state->reader, '"'));
+  AZ_RETURN_IF_FAILED(az_json_read_string_rest(&p_state->reader, &out_member->name));
   az_json_read_white_space(&p_state->reader);
-  AZ_RETURN_IF_NOT_OK(az_json_read_expected_char(&p_state->reader, ':'));
+  AZ_RETURN_IF_FAILED(az_json_read_expected_char(&p_state->reader, ':'));
   az_json_read_white_space(&p_state->reader);
-  AZ_RETURN_IF_NOT_OK(az_json_read_value_space(p_state, &out_member->value));
+  AZ_RETURN_IF_FAILED(az_json_read_value_space(p_state, &out_member->value));
   return az_json_check_item_end(p_state, out_member->value);
 }
 
 az_result az_json_read_array_element(
     az_json_state * const p_state,
     az_json_value * const out_element) {
-  AZ_RETURN_IF_NOT_OK(az_json_check_item_begin(p_state, AZ_JSON_STACK_ARRAY));
-  AZ_RETURN_IF_NOT_OK(az_json_read_value_space(p_state, out_element));
+  AZ_CONTRACT_ARG_NOT_NULL(p_state);
+  AZ_CONTRACT_ARG_NOT_NULL(out_element);
+
+  AZ_RETURN_IF_FAILED(az_json_check_item_begin(p_state, AZ_JSON_STACK_ARRAY));
+  AZ_RETURN_IF_FAILED(az_json_read_value_space(p_state, out_element));
   return az_json_check_item_end(p_state, *out_element);
 }
 
 az_result az_json_state_done(az_json_state const * const p_state) {
+  AZ_CONTRACT_ARG_NOT_NULL(p_state);
+
   if (!az_span_reader_is_empty(&p_state->reader) || !az_json_stack_is_empty(p_state)) {
     return AZ_JSON_ERROR_INVALID_STATE;
   }

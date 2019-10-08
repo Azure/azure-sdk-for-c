@@ -42,11 +42,11 @@ static inline bool az_failed(az_result result) { return (result & AZ_ERROR_FLAG)
 
 static inline bool az_succeeded(az_result result) { return (result & AZ_ERROR_FLAG) == 0; }
 
-#define AZ_RETURN_IF_NOT_OK(exp) \
+#define AZ_RETURN_IF_FAILED(exp) \
   do { \
-    az_result const result = (exp); \
-    if (result != AZ_OK) { \
-      return result; \
+    az_result const _result = (exp); \
+    if (az_failed(_result)) { \
+      return _result; \
     } \
   } while (0)
 

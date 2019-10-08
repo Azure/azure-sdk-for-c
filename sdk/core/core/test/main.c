@@ -32,9 +32,9 @@ az_result write(az_span const output, size_t * const o, az_const_span const s) {
 }
 
 az_result write_str(az_span const output, size_t * o, az_const_span const s) {
-  AZ_RETURN_IF_NOT_OK(write(output, o, AZ_STR("\"")));
-  AZ_RETURN_IF_NOT_OK(write(output, o, s));
-  AZ_RETURN_IF_NOT_OK(write(output, o, AZ_STR("\"")));
+  AZ_RETURN_IF_FAILED(write(output, o, AZ_STR("\"")));
+  AZ_RETURN_IF_FAILED(write(output, o, s));
+  AZ_RETURN_IF_FAILED(write(output, o, AZ_STR("\"")));
   return AZ_OK;
 }
 
@@ -53,46 +53,42 @@ az_result read_write_value(
     case AZ_JSON_VALUE_STRING:
       return write_str(output, o, value.data.string);
     case AZ_JSON_VALUE_OBJECT: {
-      AZ_RETURN_IF_NOT_OK(write(output, o, AZ_STR("{")));
+      AZ_RETURN_IF_FAILED(write(output, o, AZ_STR("{")));
       bool need_comma = false;
       while (true) {
         az_json_member member;
         az_result const result = az_json_read_object_member(state, &member);
-        if (result == AZ_JSON_NO_MORE_ITEMS) {
+        if (result == AZ_JSON_ERROR_NO_MORE_ITEMS) {
           break;
         }
-        if (result != AZ_OK) {
-          return result;
-        }
+        AZ_RETURN_IF_FAILED(result);
         if (need_comma) {
-          AZ_RETURN_IF_NOT_OK(write(output, o, AZ_STR(",")));
+          AZ_RETURN_IF_FAILED(write(output, o, AZ_STR(",")));
         } else {
           need_comma = true;
         }
-        AZ_RETURN_IF_NOT_OK(write_str(output, o, member.name));
-        AZ_RETURN_IF_NOT_OK(write(output, o, AZ_STR(":")));
-        AZ_RETURN_IF_NOT_OK(read_write_value(output, o, state, member.value));
+        AZ_RETURN_IF_FAILED(write_str(output, o, member.name));
+        AZ_RETURN_IF_FAILED(write(output, o, AZ_STR(":")));
+        AZ_RETURN_IF_FAILED(read_write_value(output, o, state, member.value));
       }
       return write(output, o, AZ_STR("}"));
     }
     case AZ_JSON_VALUE_ARRAY: {
-      AZ_RETURN_IF_NOT_OK(write(output, o, AZ_STR("[")));
+      AZ_RETURN_IF_FAILED(write(output, o, AZ_STR("[")));
       bool need_comma = false;
       while (true) {
         az_json_value element;
         az_result const result = az_json_read_array_element(state, &element);
-        if (result == AZ_JSON_NO_MORE_ITEMS) {
+        if (result == AZ_JSON_ERROR_NO_MORE_ITEMS) {
           break;
         }
-        if (result != AZ_OK) {
-          return result;
-        }
+        AZ_RETURN_IF_FAILED(result);
         if (need_comma) {
-          AZ_RETURN_IF_NOT_OK(write(output, o, AZ_STR(",")));
+          AZ_RETURN_IF_FAILED(write(output, o, AZ_STR(",")));
         } else {
           need_comma = true;
         }
-        AZ_RETURN_IF_NOT_OK(read_write_value(output, o, state, element));
+        AZ_RETURN_IF_FAILED(read_write_value(output, o, state, element));
       }
       return write(output, o, AZ_STR("]"));
     }
@@ -105,8 +101,8 @@ az_result read_write_value(
 az_result read_write(az_const_span const input, az_span const output, size_t * const o) {
   az_json_state state = az_json_state_create(input);
   az_json_value value;
-  AZ_RETURN_IF_NOT_OK(az_json_read(&state, &value));
-  AZ_RETURN_IF_NOT_OK(read_write_value(output, o, &state, value));
+  AZ_RETURN_IF_FAILED(az_json_read(&state, &value));
+  AZ_RETURN_IF_FAILED(read_write_value(output, o, &state, value));
   return az_json_state_done(&state);
 }
 
@@ -243,7 +239,7 @@ int main() {
     TEST_ASSERT(az_json_read_array_element(&state, &value) == AZ_OK);
     TEST_ASSERT(value.kind == AZ_JSON_VALUE_NUMBER);
     // TEST_ASSERT(value.val.number == 0.3);
-    TEST_ASSERT(az_json_read_array_element(&state, &value) == AZ_JSON_NO_MORE_ITEMS);
+    TEST_ASSERT(az_json_read_array_element(&state, &value) == AZ_JSON_ERROR_NO_MORE_ITEMS);
     TEST_ASSERT(az_json_state_done(&state) == AZ_OK);
   }
   {
@@ -259,7 +255,7 @@ int main() {
     TEST_ASSERT(member.value.kind == AZ_JSON_VALUE_STRING);
     TEST_ASSERT(member.value.data.string.begin == json.begin + 6);
     TEST_ASSERT(member.value.data.string.size == 12);
-    TEST_ASSERT(az_json_read_object_member(&state, &member) == AZ_JSON_NO_MORE_ITEMS);
+    TEST_ASSERT(az_json_read_object_member(&state, &member) == AZ_JSON_ERROR_NO_MORE_ITEMS);
     TEST_ASSERT(az_json_state_done(&state) == AZ_OK);
   }
   uint8_t buffer[1000];
