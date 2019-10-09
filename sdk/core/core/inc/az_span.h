@@ -40,6 +40,8 @@ AZ_STATIC_ASSERT(CHAR_BIT == 8)
 
 typedef az_result az_result_byte;
 
+static inline bool az_const_span_is_empty(az_const_span const span) { return span.size == 0; }
+
 /**
  * Returns a byte in `index` position.
  * Returns `AZ_ERROR_EOF` if the `index` is out of the span range.
