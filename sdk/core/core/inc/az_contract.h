@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef AZ_ITER_H
-#define AZ_ITER_H
+#ifndef AZ_CONTRACT_H
+#define AZ_CONTRACT_H
 
 #include <az_span.h>
 
