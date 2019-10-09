@@ -137,6 +137,14 @@ AZ_STR_DECL(
 int main() {
   {
     az_json_state state = az_json_state_create(AZ_STR("    "));
+    TEST_ASSERT(az_json_read(&state, NULL) == AZ_ERROR_ARG);
+  }
+  {
+    az_json_value value;
+    TEST_ASSERT(az_json_read(NULL, &value) == AZ_ERROR_ARG);
+  }
+  {
+    az_json_state state = az_json_state_create(AZ_STR("    "));
     az_json_value value;
     TEST_ASSERT(az_json_read(&state, &value) == AZ_JSON_ERROR_UNEXPECTED_END);
   }
