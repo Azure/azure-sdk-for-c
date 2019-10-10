@@ -13,14 +13,22 @@
 // to `S`.
 #define AZ_STRING_LITERAL_LEN(S) (sizeof(S "") - 1)
 
-#define AZ_STR_DECL(NAME, STRING_LITERAL) \
-  az_const_span const NAME = { .begin = (uint8_t const *)STRING_LITERAL, \
-                               .size = AZ_STRING_LITERAL_LEN(STRING_LITERAL) }
+/**
+ * Creates a span which can be used inside constant initializers. Fro example
+ *
+ * `static az_const_span foo[] = { AZ_CONST_STR("Hello"), AZ_CONST_STR("world!") };`
+ */
+#define AZ_CONST_STR(STRING_LITERAL) \
+  { .begin = (uint8_t const *)STRING_LITERAL, .size = AZ_STRING_LITERAL_LEN(STRING_LITERAL), }
 
-#define AZ_STR(STRING_LITERAL) \
-  (az_const_span) { \
-    .begin = (uint8_t const *)STRING_LITERAL, .size = AZ_STRING_LITERAL_LEN(STRING_LITERAL) \
-  }
+// Creates a span which can be passed as a paramater. For example,
+//
+// `some_function(AZ_STR("Hello world"));`
+//
+// where
+//
+// `void some_function(az_const_span const span);`
+#define AZ_STR(STRING_LITERAL) (az_const_span) AZ_CONST_STR(STRING_LITERAL)
 
 #include <_az_cfg_suffix.h>
 

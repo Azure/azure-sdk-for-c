@@ -52,10 +52,14 @@ static inline bool az_succeeded(az_result result) { return (result & AZ_ERROR_FL
 
 enum {
   AZ_ERROR_ARG = AZ_MAKE_ERROR(AZ_CORE_FACILITY, 1),
+  AZ_ERROR_BUFFER_OVERFLOW = AZ_MAKE_ERROR(AZ_CORE_FACILITY, 2),
+
   AZ_ERROR_EOF = AZ_MAKE_ERROR(AZ_STD_FACILITY, 0xFFFF),
 };
 
 AZ_STATIC_ASSERT(AZ_ERROR_EOF == EOF)
+AZ_STATIC_ASSERT(EOF == -1)
+AZ_STATIC_ASSERT(-1 == ~0)
 
 #include <_az_cfg_suffix.h>
 

@@ -103,6 +103,25 @@ static inline bool az_const_span_eq(az_const_span const a, az_const_span const b
   return a.size == b.size && memcmp(a.begin, b.begin, a.size) == 0;
 }
 
+static inline az_result az_span_copy(az_const_span const src, az_span const dst) { 
+  if (dst.size < src.size) {
+    return AZ_ERROR_BUFFER_OVERFLOW;
+  }
+
+  memcpy(dst.begin, src.begin, src.size);
+  return AZ_OK;
+}
+
+static inline az_span az_span_drop(az_span const span, size_t n) {
+  if (span.size <= n) {
+    return (az_span){ .begin = NULL, .size = 0 };
+  }
+  return (az_span){ .begin = span.begin + n, .size = span.size - n };
+}
+
+#define AZ_SPAN(ARRAY) \
+  { .begin = ARRAY, .size = sizeof(ARRAY) / sizeof(*ARRAY) }
+
 #include <_az_cfg_suffix.h>
 
 #endif

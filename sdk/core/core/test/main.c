@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include <az_http_request.h>
 #include <az_json_read.h>
 #include <az_span_reader.h>
 
@@ -39,10 +40,7 @@ az_result write_str(az_span const output, size_t * o, az_const_span const s) {
 }
 
 az_result read_write_value(
-    az_span const output,
-    size_t * o,
-    az_json_state * const state,
-    az_json_value const value) {
+    az_span const output, size_t * o, az_json_state * const state, az_json_value const value) {
   switch (value.kind) {
     case AZ_JSON_VALUE_NULL:
       return write(output, o, AZ_STR("null"));
@@ -106,8 +104,7 @@ az_result read_write(az_const_span const input, az_span const output, size_t * c
   return az_json_state_done(&state);
 }
 
-AZ_STR_DECL(
-    sample1,
+static az_const_span const sample1 = AZ_CONST_STR( //
     "{\n"
     "  \"parameters\": {\n"
     "    \"subscriptionId\": \"{subscription-id}\",\n"
@@ -311,15 +308,41 @@ int main() {
     az_const_span x = az_const_span_sub(az_to_const_span(output), 0, o);
     TEST_ASSERT(az_const_span_eq(
         x,
-        AZ_STR("[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[{"
-               "\"\\t\\n\":\"\\u0abc\""
-               "}]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]"
-               "]")));
+        AZ_STR( //
+            "[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[{"
+            "\"\\t\\n\":\"\\u0abc\""
+            "}]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]"
+            "]")));
   }
   //
   {
     size_t o = 0;
     az_result const result = read_write(sample1, output, &o);
+    TEST_ASSERT(result == AZ_OK);
+  }
+
+  // HTTP Builder
+  {
+    az_pair const query_array[] = {
+      { .key = AZ_STR("hello"), .value = AZ_STR("world!") },
+      { .key = AZ_STR("x"), .value = AZ_STR("42") },
+    };
+    //
+    az_pair const headers_array[] = {
+      { .key = AZ_STR("some"), .value = AZ_STR("xml") },
+      { .key = AZ_STR("xyz"), .value = AZ_STR("very_long") },
+    };
+    //
+    az_http_request const request = {
+      .method = AZ_STR("GET"),
+      .path = AZ_STR("/foo"),
+      .query = az_pair_span_to_iter((az_pair_span)AZ_SPAN(query_array)),
+      .headers = az_pair_span_to_iter((az_pair_span)AZ_SPAN(headers_array)),
+      .body = AZ_STR("{ \"somejson\": true }"),
+    };
+    uint8_t buffer[1024];
+    az_span out;
+    az_result const result = az_http_request_to_buffer(&request, (az_span)AZ_SPAN(buffer), &out);
     TEST_ASSERT(result == AZ_OK);
   }
   return exit_code;
