@@ -8,27 +8,6 @@
 
 #include <_az_cfg_warn.h>
 
-az_result _az_pair_span_iter_func(az_pair_iter * const p_i, az_pair * const out) {
-  AZ_CONTRACT_ARG_NOT_NULL(p_i);
-  AZ_CONTRACT_ARG_NOT_NULL(out);
-
-  az_pair const * const begin = p_i->data.begin;
-  az_pair const * const end = p_i->data.end;
-  if (begin == end) {
-    return AZ_ERROR_EOF;
-  }
-  *out = *begin;
-  p_i->data.begin = begin + 1;
-  return AZ_OK;
-}
-
-az_pair_iter az_pair_span_to_iter(az_pair_span const span) {
-  return (az_pair_iter){
-    .func = _az_pair_span_iter_func,
-    .data = { .begin = span.begin, .end = span.begin + span.size },
-  };
-}
-
 typedef struct {
   az_span span;
   size_t i;
@@ -59,7 +38,7 @@ AZ_STATIC_ASSERT('\n' == 10);
 static az_const_span const az_crlf = AZ_CONST_STR(AZ_CRLF);
 
 az_result az_http_request_to_buffer(
-    az_http_request * const p_request, az_span const span, az_span * const out) {
+    az_http_request const * const p_request, az_span const span, az_span * const out) {
   AZ_CONTRACT_ARG_NOT_NULL(p_request);
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
