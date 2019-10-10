@@ -5,10 +5,10 @@
 #define AZ_HTTP_REQUEST_H
 
 #include <az_contract.h>
-#include <az_span.h>
-#include <az_str.h>
 #include <az_iter_data.h>
 #include <az_pair.h>
+#include <az_span.h>
+#include <az_str.h>
 
 #include <_az_cfg_prefix.h>
 
@@ -22,12 +22,18 @@ typedef struct {
   az_const_span body;
 } az_http_request;
 
-typedef az_result (*az_http_request_policy)(az_http_request *const p_policy);
-
 az_result az_http_request_to_buffer(
     az_http_request const * const p_request,
     az_span const span,
     az_span * const out);
+
+typedef struct {
+  az_pair_iter original_headers;
+} az_http_standard_headers;
+
+az_result az_http_standard_headers_policy(
+    az_http_standard_headers * out,
+    az_http_request * const p_request);
 
 #include <_az_cfg_suffix.h>
 

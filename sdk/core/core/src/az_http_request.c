@@ -105,3 +105,11 @@ az_result az_http_request_to_buffer(
 
   return AZ_OK;
 }
+
+
+az_result az_http_standard_headers_policy(
+  az_http_standard_headers* out,
+  az_http_request* const p_request) {
+  out->original_headers = p_request->headers;
+  return AZ_OK;
+}
