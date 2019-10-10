@@ -4,7 +4,7 @@
 #ifndef AZ_CONTRACT_H
 #define AZ_CONTRACT_H
 
-#include <az_span.h>
+#include <az_result.h>
 
 #include <_az_cfg_prefix.h>
 
