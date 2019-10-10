@@ -25,7 +25,8 @@ static inline az_span az_write_span_iter_result(az_write_span_iter const * const
 }
 
 static inline az_result az_write_span_iter_write(
-    az_write_span_iter * const p_i, az_const_span const span) {
+    az_write_span_iter * const p_i,
+    az_const_span const span) {
   AZ_CONTRACT_ARG_NOT_NULL(p_i);
 
   az_span const remainder = az_span_drop(p_i->span, p_i->i);
@@ -42,7 +43,9 @@ AZ_STATIC_ASSERT('\n' == 10)
 static az_const_span const az_crlf = AZ_CONST_STR(AZ_CRLF);
 
 az_result az_http_request_to_buffer(
-    az_http_request const * const p_request, az_span const span, az_span * const out) {
+    az_http_request const * const p_request,
+    az_span const span,
+    az_span * const out) {
   AZ_CONTRACT_ARG_NOT_NULL(p_request);
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
@@ -106,10 +109,33 @@ az_result az_http_request_to_buffer(
   return AZ_OK;
 }
 
+static az_pair const az_http_standard_headers_array[] = {
+  { .key = AZ_CONST_STR("ContentType"), .value = AZ_CONST_STR("text/plain; charset=utf-8") },
+};
+
+az_result az_http_standard_headers_iter_func(az_pair_iter * const p_iter, az_pair * const out) {
+  size_t const size = AZ_ARRAY_SIZE(az_http_standard_headers_array);
+  size_t const i = (size_t)(p_iter->data.end);
+  if (i < size) {
+    *out = az_http_standard_headers_array[i];
+    p_iter->data.end = (void const *)(i + 1);
+    return AZ_OK;
+  }
+  az_http_standard_headers const * h = p_iter->data.begin;
+  *p_iter = h->original_headers;
+  return AZ_OK;
+}
 
 az_result az_http_standard_headers_policy(
-  az_http_standard_headers* out,
-  az_http_request* const p_request) {
-  out->original_headers = p_request->headers;
+    az_http_request const * const p_request,
+    az_http_standard_headers * const out) {
+  *out = (az_http_standard_headers){
+    .original_headers = p_request->headers,
+    .request = *p_request,
+  };
+  out->request.headers = (az_pair_iter){
+    .func = az_http_standard_headers_iter_func,
+    .data = { .begin = out, .end = 0, },
+  };
   return AZ_OK;
 }

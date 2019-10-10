@@ -40,7 +40,10 @@ az_result write_str(az_span const output, size_t * o, az_const_span const s) {
 }
 
 az_result read_write_value(
-    az_span const output, size_t * o, az_json_state * const state, az_json_value const value) {
+    az_span const output,
+    size_t * o,
+    az_json_state * const state,
+    az_json_value const value) {
   switch (value.kind) {
     case AZ_JSON_VALUE_NULL:
       return write(output, o, AZ_STR("null"));
@@ -341,16 +344,40 @@ int main() {
       .body = AZ_STR("{ \"somejson\": true }"),
     };
     uint8_t buffer[1024];
-    az_span out;
-    az_const_span const expected = AZ_STR( //
-        "GET /foo?hello=world!&x=42 HTTP/1.1\r\n"
-        "some: xml\r\n"
-        "xyz: very_long\r\n"
-        "\r\n"
-        "{ \"somejson\": true }");
-    az_result const result = az_http_request_to_buffer(&request, (az_span)AZ_SPAN(buffer), &out);
-    TEST_ASSERT(result == AZ_OK);
-    TEST_ASSERT(az_const_span_eq(az_to_const_span(out), expected));
+    {
+      az_span out;
+      az_const_span const expected = AZ_STR( //
+          "GET /foo?hello=world!&x=42 HTTP/1.1\r\n"
+          "some: xml\r\n"
+          "xyz: very_long\r\n"
+          "\r\n"
+          "{ \"somejson\": true }");
+      az_result const result = az_http_request_to_buffer(&request, (az_span)AZ_SPAN(buffer), &out);
+      TEST_ASSERT(result == AZ_OK);
+      TEST_ASSERT(az_const_span_eq(az_to_const_span(out), expected));
+    }
+    // HTTP Builder with policies.
+    {
+      az_span out;
+      az_const_span const expected = AZ_STR( //
+          "GET /foo?hello=world!&x=42 HTTP/1.1\r\n"
+          "ContentType: text/plain; charset=utf-8\r\n"
+          "some: xml\r\n"
+          "xyz: very_long\r\n"
+          "\r\n"
+          "{ \"somejson\": true }");
+      az_http_standard_headers s;
+      { 
+        az_result const result = az_http_standard_headers_policy(&request, &s);
+        TEST_ASSERT(result == AZ_OK);
+      }
+      {
+        az_result const result
+            = az_http_request_to_buffer(&s.request, (az_span)AZ_SPAN(buffer), &out);
+        TEST_ASSERT(result == AZ_OK);
+      }
+      TEST_ASSERT(az_const_span_eq(az_to_const_span(out), expected));
+    }
   }
   return exit_code;
 }

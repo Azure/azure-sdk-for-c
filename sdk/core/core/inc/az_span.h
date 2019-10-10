@@ -103,7 +103,7 @@ static inline bool az_const_span_eq(az_const_span const a, az_const_span const b
   return a.size == b.size && memcmp(a.begin, b.begin, a.size) == 0;
 }
 
-static inline az_result az_span_copy(az_const_span const src, az_span const dst) { 
+static inline az_result az_span_copy(az_const_span const src, az_span const dst) {
   if (dst.size < src.size) {
     return AZ_ERROR_BUFFER_OVERFLOW;
   }
@@ -126,8 +126,10 @@ static inline az_span az_span_take(az_span const span, size_t n) {
   return (az_span){ .begin = span.begin, .size = n };
 }
 
+#define AZ_ARRAY_SIZE(ARRAY) (sizeof(ARRAY) / sizeof(*ARRAY))
+
 #define AZ_SPAN(ARRAY) \
-  { .begin = ARRAY, .size = sizeof(ARRAY) / sizeof(*ARRAY) }
+  { .begin = ARRAY, .size = AZ_ARRAY_SIZE(ARRAY) }
 
 #include <_az_cfg_suffix.h>
 
