@@ -4,18 +4,38 @@ jobs:
     matrix:
       Linux:
         vm.image: 'ubuntu-16.04'
+        vcpkg.deps: 'curl[ssl]'
+        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
       Win:
         vm.image: 'windows-2019'
+        vcpkg.deps: 'curl[winssl]'
+        VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
       MacOS:
         vm.image: 'macOS-10.14'
+        vcpkg.deps: 'curl[ssl]'
+        VCPKG_DEFAULT_TRIPLET: 'x64-osx'
   pool:
     vmImage: $(vm.image)
   steps:
   - checkout: self
     submodules: recursive
+  - script: |
+      brew install gcc6
+      git clone https://github.com/Microsoft/vcpkg.git
+      cd vcpkg
+      ./bootstrap-vcpkg.sh
+      echo "##vso[task.prependpath]$(pwd)"
+      echo "##vso[task.setvariable variable=VCPKG_INSTALLATION_ROOT;]$(pwd)"
+    condition: eq(variables['vm.image'], 'macOS-10.14')
+    displayName: "vcpkg bootstrap"
+  - script: |
+      vcpkg install $(vcpkg.deps)
+    displayName: vcpkg install dependencies
   - task: CMake@1
     inputs:
       cmakeArgs: -Duse_default_uuid=ON ..
+    displayName: cmake
   - task: CMake@1
     inputs:
       cmakeArgs: --build .
+    displayName: cmake build

@@ -6,13 +6,17 @@ cmake_minimum_required (VERSION 3.12)
 project (az_core LANGUAGES C)
 
 set(CMAKE_C_STANDARD 99)
+find_package(CURL CONFIG)
+if(NOT CURL_FOUND)
+  find_package(CURL REQUIRED)
+endif()
 
 add_library (az_core src/az_json_read.c src/az_http_request.c src/az_pair.c)
 
 if(MSVC)
   target_compile_options(az_core PRIVATE /W4 /WX)
 else()
-  target_compile_options(az_core PRIVATE -Wall -Wextra -pedantic -Werror)
+  target_compile_options(az_core PRIVATE -Wall -Wextra -pedantic)
 endif()
 
 target_include_directories (az_core PUBLIC inc)
@@ -24,8 +28,15 @@ add_executable (az_core_test test/main.c)
 
 target_link_libraries(az_core_test PRIVATE az_core)
 
+# curl easy perform POC
+add_executable (curl_easy_perform_poc test/curl_easy_perform_poc.c)
+target_link_libraries(curl_easy_perform_poc PRIVATE 
+  az_core 
+  CURL::libcurl)
+
 if (UNIX)
   target_link_libraries(az_core_test PRIVATE m)
+  target_link_libraries(curl_easy_perform_poc PRIVATE m)
 endif()
 
 add_test(NAME az_core_test COMMAND az_core_test)
