@@ -119,6 +119,13 @@ static inline az_span az_span_drop(az_span const span, size_t n) {
   return (az_span){ .begin = span.begin + n, .size = span.size - n };
 }
 
+static inline az_span az_span_take(az_span const span, size_t n) {
+  if (span.size <= n) {
+    return span;
+  }
+  return (az_span){ .begin = span.begin, .size = n };
+}
+
 #define AZ_SPAN(ARRAY) \
   { .begin = ARRAY, .size = sizeof(ARRAY) / sizeof(*ARRAY) }
 

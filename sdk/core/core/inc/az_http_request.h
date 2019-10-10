@@ -22,6 +22,8 @@ typedef struct {
   az_const_span body;
 } az_http_request;
 
+typedef az_result (*az_http_request_policy)(az_http_request *const p_policy);
+
 az_result az_http_request_to_buffer(
     az_http_request const * const p_request,
     az_span const span,

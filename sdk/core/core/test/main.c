@@ -342,8 +342,15 @@ int main() {
     };
     uint8_t buffer[1024];
     az_span out;
+    az_const_span const expected = AZ_STR( //
+        "GET /foo?hello=world!&x=42 HTTP/1.1\r\n"
+        "some: xml\r\n"
+        "xyz: very_long\r\n"
+        "\r\n"
+        "{ \"somejson\": true }");
     az_result const result = az_http_request_to_buffer(&request, (az_span)AZ_SPAN(buffer), &out);
     TEST_ASSERT(result == AZ_OK);
+    TEST_ASSERT(az_const_span_eq(az_to_const_span(out), expected));
   }
   return exit_code;
 }

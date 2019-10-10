@@ -20,6 +20,10 @@ static inline az_write_span_iter az_write_span_iter_create(az_span const span) {
   };
 }
 
+static inline az_span az_write_span_iter_result(az_write_span_iter const * const p_i) {
+  return az_span_take(p_i->span, p_i->i);
+}
+
 static inline az_result az_write_span_iter_write(
     az_write_span_iter * const p_i, az_const_span const span) {
   AZ_CONTRACT_ARG_NOT_NULL(p_i);
@@ -96,6 +100,8 @@ az_result az_http_request_to_buffer(
 
   // body.
   AZ_RETURN_IF_FAILED(az_write_span_iter_write(&wi, p_request->body));
+
+  *out = az_write_span_iter_result(&wi);
 
   return AZ_OK;
 }
