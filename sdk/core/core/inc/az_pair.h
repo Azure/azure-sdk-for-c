@@ -10,22 +10,19 @@
 
 #include <_az_cfg_prefix.h>
 
-// pair
-
+/// A pair of strings.
 typedef struct {
   az_const_span key;
   az_const_span value;
 } az_pair;
 
-// pait span
-
+/// A span of pairs.
 typedef struct {
   az_pair const * begin;
   size_t size;
 } az_pair_span;
 
-// pair iterator
-
+/// A pair iterator.
 typedef struct az_pair_iter az_pair_iter;
 
 typedef az_result (*az_pair_iter_func)(az_pair_iter * const p_i, az_pair * const out);
@@ -43,6 +40,9 @@ static inline az_result az_pair_iter_call(az_pair_iter * const p_i, az_pair * co
   return p_i->func(p_i, out);
 }
 
+/**
+ * Creates an iterator of pairs from a span of pairs.
+ */
 az_pair_iter az_pair_span_to_iter(az_pair_span const span);
 
 #include <_az_cfg_suffix.h>
