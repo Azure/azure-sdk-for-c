@@ -4,6 +4,8 @@
 #ifndef AZ_SPAN_ITER_H
 #define AZ_SPAN_ITER_H
 
+#include <az_iter_data.h>
+
 #include <_az_cfg_prefix.h>
 
 typedef struct az_span_iter az_span_iter;
