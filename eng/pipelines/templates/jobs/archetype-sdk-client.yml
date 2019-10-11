@@ -19,3 +19,6 @@ jobs:
   - task: CMake@1
     inputs:
       cmakeArgs: --build .
+  - task: CmdLine@2
+    inputs:
+      script: 'CTask -C Debug'
