@@ -9,7 +9,7 @@ This repository contains official Embedded C libraries for Azure services.
 To get started with a specific library, see the **README.md** file located in the library's project folder. You can find service libraries in the `/sdk` directory.
 
 ### Prerequisites
-CMake version 3.12 is required to use these libraries.
+- CMake version 3.12 is required to use these libraries.
 
 ### Development Environment
 Project contains files to work on Windows or Linux based OS.
@@ -18,6 +18,17 @@ Project contains files to work on Windows or Linux based OS.
 
 #### Windows
 Use PowerShell to run {projectDir}/build.ps1
+
+> Note: Cmake will look for CURL within windows. Follow next steps to set up CURL using VCPKG:
+<br> - Clone vcpgk: `git clone https://github.com/Microsoft/vcpkg.git`
+<br> - cd vcpkg (consider this path as PATH_TO_VCPKG)
+<br> - .\bootstrap-vcpkg.bat
+<br> - vcpkg.exe install --triplet x64-windows-static curl[winssl]
+<br> - Add windows system variable: VCPKG_DEFAULT_TRIPLET=x64-windows-static
+<br> - Add windows system variable: VCPKG_ROOT=[PATH_TO_VCPKG] (replace PATH_TO_VCPKG for where vcpkg is installed)
+
+##### Visual Studio 2019
+When following previous steps to set up CURL with VCPKG, open project forlder with Visual Studio and everything will be ready to build and run tests.
 
 #### Linux
 - Install `openssl version 1.1.1`
