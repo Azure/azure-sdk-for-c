@@ -41,4 +41,4 @@ jobs:
       displayName: cmake build
   - task: CmdLine@2
     inputs:
-      script: 'CTask -C Debug'
+      script: 'CTest -C Debug'
