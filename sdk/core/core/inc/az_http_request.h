@@ -27,14 +27,12 @@ az_result az_http_request_to_buffer(
     az_span const span,
     az_span * const out);
 
-typedef struct {
-  az_http_request request;
-  az_pair_iter original_headers;
-} az_http_standard_headers;
-
+/**
+ * Note: `*out` should not live longer then `*p_request`. 
+ */
 az_result az_http_standard_headers_policy(
     az_http_request const * const p_request,
-    az_http_standard_headers * const out);
+    az_http_request * const out);
 
 #include <_az_cfg_suffix.h>
 

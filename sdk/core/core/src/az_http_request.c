@@ -89,27 +89,25 @@ static az_pair const az_http_standard_headers_array[] = {
 
 az_result az_http_standard_headers_iter_func(az_pair_iter * const p_iter, az_pair * const out) {
   size_t const size = AZ_ARRAY_SIZE(az_http_standard_headers_array);
-  size_t const i = (size_t)(p_iter->data.end);
+  size_t i = (size_t)(p_iter->data.end);
+  *out = az_http_standard_headers_array[i];
+  i += 1;
   if (i < size) {
-    *out = az_http_standard_headers_array[i];
-    p_iter->data.end = (void const *)(i + 1);
-    return AZ_OK;
+    p_iter->data.end = (void const *)i;
+  } else {
+    az_http_request const * original = p_iter->data.begin;
+    *p_iter = original->headers;
   }
-  az_http_standard_headers const * h = p_iter->data.begin;
-  *p_iter = h->original_headers;
   return AZ_OK;
 }
 
 az_result az_http_standard_headers_policy(
     az_http_request const * const p_request,
-    az_http_standard_headers * const out) {
-  *out = (az_http_standard_headers){
-    .original_headers = p_request->headers,
-    .request = *p_request,
-  };
-  out->request.headers = (az_pair_iter){
+    az_http_request * const out) {
+  *out = *p_request;
+  out->headers = (az_pair_iter){
     .func = az_http_standard_headers_iter_func,
-    .data = { .begin = out, .end = 0, },
+    .data = { .begin = p_request, .end = 0, },
   };
   return AZ_OK;
 }
