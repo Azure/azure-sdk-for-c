@@ -31,6 +31,9 @@ typedef struct {
   az_pair_iter original_headers;
 } az_http_standard_headers_data;
 
+/**
+ * Note: `*p_request` should not be used after `*out` is destroyed.
+ */
 az_result az_http_standard_headers_policy(
     az_http_request * const p_request,
     az_http_standard_headers_data * const out);
