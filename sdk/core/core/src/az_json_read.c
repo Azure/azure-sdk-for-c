@@ -206,6 +206,7 @@ static az_result az_json_read_number_digit_rest(
     switch (c) {
       case '-':
         e_sign = -1;
+        /*[[fallthrough]]*/
       case '+':
         az_span_reader_next(p_reader);
         c = az_span_reader_current(p_reader);
