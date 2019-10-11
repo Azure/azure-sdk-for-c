@@ -13,20 +13,19 @@ typedef struct {
   size_t i;
 } az_write_span_iter;
 
-static inline az_write_span_iter az_write_span_iter_create(az_span const span) {
+AZ_INLINE az_write_span_iter az_write_span_iter_create(az_span const span) {
   return (az_write_span_iter){
     .span = span,
     .i = 0,
   };
 }
 
-static inline az_span az_write_span_iter_result(az_write_span_iter const * const p_i) {
+AZ_INLINE az_span az_write_span_iter_result(az_write_span_iter const * const p_i) {
   return az_span_take(p_i->span, p_i->i);
 }
 
-static inline az_result az_write_span_iter_write(
-    az_write_span_iter * const p_i,
-    az_const_span const span) {
+AZ_INLINE az_result
+az_write_span_iter_write(az_write_span_iter * const p_i, az_const_span const span) {
   AZ_CONTRACT_ARG_NOT_NULL(p_i);
 
   az_span const remainder = az_span_drop(p_i->span, p_i->i);
