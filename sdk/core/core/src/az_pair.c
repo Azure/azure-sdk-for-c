@@ -3,7 +3,7 @@
 
 #include <az_pair.h>
 
-#include <_az_cfg_warn.h>
+#include <_az_cfg.h>
 
 az_result _az_pair_span_iter_func(az_pair_iter * const p_i, az_pair * const out) {
   AZ_CONTRACT_ARG_NOT_NULL(p_i);

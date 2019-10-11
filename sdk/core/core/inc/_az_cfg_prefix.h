@@ -9,6 +9,4 @@ extern "C" {
 #pragma warning(push)
 #endif
 
-#include <_az_cfg_warn.h>
-
-#include <_az_cfg_lang_ext.h>
+#include <_az_cfg.h>

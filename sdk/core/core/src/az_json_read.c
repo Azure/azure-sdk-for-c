@@ -8,7 +8,7 @@
 #include <ctype.h>
 #include <math.h>
 
-#include <_az_cfg_warn.h>
+#include <_az_cfg.h>
 
 AZ_INLINE bool az_json_is_white_space(az_result_byte const c) {
   switch (c) {
@@ -206,6 +206,7 @@ static az_result az_json_read_number_digit_rest(
     switch (c) {
       case '-':
         e_sign = -1;
+        AZ_FALLTHROUGH;
       case '+':
         az_span_reader_next(p_reader);
         c = az_span_reader_current(p_reader);
