@@ -11,16 +11,14 @@
 
 #ifdef _MSC_VER
 #define AZ_INLINE static __forceinline
-#elif defined(__GNUC__)
-#define AZ_INLINE static inline __extension__ __attribute__((always_inline))
-#elif defined(__clang__)
+#elif defined(__GNUC__) || defined(__clang__)
 #define AZ_INLINE static inline __attribute__((always_inline))
 #else
 #define AZ_INLINE static inline
 #endif
 
 #ifdef __GNUC__
-#define AZ_FALLTHROUGH __extension__ __attribute__((fallthrough))
+#define AZ_FALLTHROUGH __attribute__((fallthrough))
 #else
 #define AZ_FALLTHROUGH \
   do { \
