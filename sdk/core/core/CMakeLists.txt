@@ -16,7 +16,7 @@ add_library (az_core src/az_json_read.c src/az_http_request.c src/az_pair.c)
 if(MSVC)
   target_compile_options(az_core PRIVATE /W4 /WX)
 else()
-  target_compile_options(az_core PRIVATE -Wall -Wextra -pedantic -Werror -Wimplicit-fallthrough=2)
+  target_compile_options(az_core PRIVATE -Wall -Wextra -pedantic -Werror -Wno-error=unknown-warning -Wunknown-warning-option -Wimplicit-fallthrough=2)
 endif()
 
 target_include_directories (az_core PUBLIC inc)
