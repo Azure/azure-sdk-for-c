@@ -40,7 +40,6 @@ jobs:
       cmakeArgs: --build .
     displayName: cmake build
   - task: CmdLine@2
-
     inputs:
       workingDirectory: build
       script: 'CTest -C Debug'
