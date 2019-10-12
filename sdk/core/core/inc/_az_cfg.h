@@ -20,7 +20,7 @@
 #define AZ_INLINE static inline
 #endif
 
-#ifdef __GNUC__
+#if defined(__GNUC__) && __GNUC__ >= 7
 #define AZ_FALLTHROUGH __attribute__((fallthrough))
 #else
 #define AZ_FALLTHROUGH \
