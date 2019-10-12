@@ -5,9 +5,8 @@
 // warning C4204: nonstandard extension used: non-constant aggregate initializer
 #pragma warning(disable : 4204)
 
-// warning C4996: This function or variable may be unsafe. Consider using ..._s instead. To disable
-// deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-#define _CRT_SECURE_NO_WARNINGS
+// warning C4996: This function or variable may be unsafe. Consider using ..._s instead.
+#pragma warning(disable : 4996)
 #endif
 
 #ifndef AZ_CFG_H
