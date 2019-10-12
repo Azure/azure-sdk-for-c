@@ -4,6 +4,10 @@
 #ifdef _MSC_VER
 // warning C4204: nonstandard extension used: non-constant aggregate initializer
 #pragma warning(disable : 4204)
+
+// warning C4996: This function or variable may be unsafe. Consider using ..._s instead. To disable
+// deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+#define _CRT_SECURE_NO_WARNINGS
 #endif
 
 #ifndef AZ_CFG_H
