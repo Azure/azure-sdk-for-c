@@ -366,14 +366,15 @@ int main() {
           "xyz: very_long\r\n"
           "\r\n"
           "{ \"somejson\": true }");
-      az_http_standard_headers s;
+      az_http_request new_request = request;
+      az_http_standard_headers_data s;
       { 
-        az_result const result = az_http_standard_headers_policy(&request, &s);
+        az_result const result = az_http_standard_headers_policy(&new_request, &s);
         TEST_ASSERT(result == AZ_OK);
       }
       {
         az_result const result
-            = az_http_request_to_buffer(&s.request, (az_span)AZ_SPAN(buffer), &out);
+            = az_http_request_to_buffer(&new_request, (az_span)AZ_SPAN(buffer), &out);
         TEST_ASSERT(result == AZ_OK);
       }
       TEST_ASSERT(az_const_span_eq(az_to_const_span(out), expected));

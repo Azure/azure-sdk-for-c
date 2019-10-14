@@ -39,3 +39,8 @@ jobs:
     inputs:
       cmakeArgs: --build .
     displayName: cmake build
+  - task: CmdLine@2
+    inputs:
+      workingDirectory: build
+      script: 'ctest -C Debug'
+    displayName: ctest

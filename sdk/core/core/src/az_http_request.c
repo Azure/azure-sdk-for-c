@@ -89,25 +89,25 @@ static az_pair const az_http_standard_headers_array[] = {
 
 az_result az_http_standard_headers_iter_func(az_pair_iter * const p_iter, az_pair * const out) {
   size_t const size = AZ_ARRAY_SIZE(az_http_standard_headers_array);
-  size_t const i = (size_t)(p_iter->data.end);
-  if (i < size) {
-    *out = az_http_standard_headers_array[i];
-    p_iter->data.end = (void const *)(i + 1);
+  size_t i = (size_t)(p_iter->data.end);
+  *out = az_http_standard_headers_array[i];
+  size_t const new_i = i + 1;
+  if (new_i < size) {
+    p_iter->data.end = (void const *)new_i;
     return AZ_OK;
   }
-  az_http_standard_headers const * h = p_iter->data.begin;
+  az_http_standard_headers_data const * h = p_iter->data.begin;
   *p_iter = h->original_headers;
   return AZ_OK;
 }
 
 az_result az_http_standard_headers_policy(
-    az_http_request const * const p_request,
-    az_http_standard_headers * const out) {
-  *out = (az_http_standard_headers){
+    az_http_request * const p_request,
+    az_http_standard_headers_data * const out) {
+  *out = (az_http_standard_headers_data){
     .original_headers = p_request->headers,
-    .request = *p_request,
   };
-  out->request.headers = (az_pair_iter){
+  p_request->headers = (az_pair_iter){
     .func = az_http_standard_headers_iter_func,
     .data = { .begin = out, .end = 0, },
   };
