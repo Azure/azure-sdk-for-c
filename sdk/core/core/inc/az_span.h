@@ -124,7 +124,7 @@ AZ_INLINE az_result az_span_move(az_span * const p_dest, az_const_span const src
   AZ_CONTRACT_ARG_VALID_SPAN(src);
 
   if (p_dest->size < src.size) {
-    return AZ_ERROR_BUFFER_OVERFLOW;
+    return AZ_ERROR_BUFFER_SPACE;
   }
 
   if (!az_const_span_is_empty(src)) {
@@ -166,7 +166,7 @@ AZ_INLINE az_result az_span_copy(az_span * const p_dest, az_const_span const src
   }
 
   if (p_dest->size < src.size) {
-    return AZ_ERROR_BUFFER_OVERFLOW;
+    return AZ_ERROR_BUFFER_SPACE;
   }
 
   if (!az_const_span_is_empty(src)) {
@@ -176,6 +176,20 @@ AZ_INLINE az_result az_span_copy(az_span * const p_dest, az_const_span const src
   p_dest->size = src.size;
 
   return AZ_OK;
+}
+
+AZ_INLINE az_span az_span_drop(az_span const span, size_t n) {
+  if (span.size <= n) {
+    return (az_span){ .begin = NULL, .size = 0 };
+  }
+  return (az_span){ .begin = span.begin + n, .size = span.size - n };
+}
+
+AZ_INLINE az_span az_span_take(az_span const span, size_t n) {
+  if (span.size <= n) {
+    return span;
+  }
+  return (az_span){ .begin = span.begin, .size = n };
 }
 
 AZ_INLINE az_result az_span_set(az_span const span, uint8_t fill) {
@@ -229,6 +243,11 @@ AZ_INLINE az_result az_span_to_c_str(az_span * const p_dest, az_const_span const
 
   return AZ_OK;
 }
+
+#define AZ_ARRAY_SIZE(ARRAY) (sizeof(ARRAY) / sizeof(*ARRAY))
+
+#define AZ_SPAN(ARRAY) \
+  { .begin = ARRAY, .size = AZ_ARRAY_SIZE(ARRAY) }
 
 #include <_az_cfg_suffix.h>
 
