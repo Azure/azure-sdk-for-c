@@ -15,7 +15,7 @@ struct az_span_iter {
   az_iter_data data;
 };
 
-static inline az_result az_span_iter_call(az_span_iter * const p_i, az_span * const out) {
+AZ_INLINE az_result az_span_iter_call(az_span_iter * const p_i, az_span * const out) {
   AZ_CONTRACT_ARG_NOT_NULL(p_i);
   AZ_CONTRACT_ARG_NOT_NULL(p_i->func);
   AZ_CONTRACT_ARG_NOT_NULL(out);

@@ -8,9 +8,9 @@
 #include <ctype.h>
 #include <math.h>
 
-#include <_az_cfg_warn.h>
+#include <_az_cfg.h>
 
-static inline bool az_json_is_white_space(az_result_byte const c) {
+AZ_INLINE bool az_json_is_white_space(az_result_byte const c) {
   switch (c) {
     case ' ':
     case '\t':
@@ -21,7 +21,7 @@ static inline bool az_json_is_white_space(az_result_byte const c) {
   return false;
 }
 
-static inline bool az_json_is_esc(az_result_byte const c) {
+AZ_INLINE bool az_json_is_esc(az_result_byte const c) {
   switch (c) {
     case '\\':
     case '"':
@@ -36,7 +36,7 @@ static inline bool az_json_is_esc(az_result_byte const c) {
   return false;
 }
 
-static inline bool az_json_is_e(az_result_byte const c) {
+AZ_INLINE bool az_json_is_e(az_result_byte const c) {
   switch (c) {
     case 'e':
     case 'E':
@@ -45,22 +45,20 @@ static inline bool az_json_is_e(az_result_byte const c) {
   return false;
 }
 
-static inline az_result az_json_error_unexpected(az_result_byte const c) {
+AZ_INLINE az_result az_json_error_unexpected(az_result_byte const c) {
   if (c == AZ_ERROR_EOF) {
     return AZ_JSON_ERROR_UNEXPECTED_END;
   }
   return az_failed(c) ? c : AZ_JSON_ERROR_UNEXPECTED_CHAR;
 }
 
-static inline bool az_json_stack_is_empty(az_json_state const * const p) { return p->stack == 1; }
+AZ_INLINE bool az_json_stack_is_empty(az_json_state const * const p) { return p->stack == 1; }
 
-static inline az_json_stack_item az_json_stack_last(az_json_state const * const p) {
+AZ_INLINE az_json_stack_item az_json_stack_last(az_json_state const * const p) {
   return p->stack & 1;
 }
 
-static inline az_result az_json_stack_push(
-    az_json_state * const p_state,
-    az_json_stack const stack) {
+AZ_INLINE az_result az_json_stack_push(az_json_state * const p_state, az_json_stack const stack) {
   if (p_state->stack >> AZ_JSON_STACK_SIZE != 0) {
     return AZ_JSON_ERROR_STACK_OVERFLOW;
   }
@@ -68,7 +66,7 @@ static inline az_result az_json_stack_push(
   return AZ_OK;
 }
 
-static inline az_result az_json_stack_pop(az_json_state * const p_state) {
+AZ_INLINE az_result az_json_stack_pop(az_json_state * const p_state) {
   if (p_state->stack <= 1) {
     return AZ_JSON_ERROR_INVALID_STATE;
   }
@@ -98,7 +96,9 @@ static void az_json_read_white_space(az_span_reader * const p_reader) {
   }
 }
 
-static az_result az_json_read_keyword_rest(az_span_reader * const p_reader, az_const_span const keyword) {
+static az_result az_json_read_keyword_rest(
+    az_span_reader * const p_reader,
+    az_const_span const keyword) {
   az_span_reader_next(p_reader);
   az_span_reader k = az_span_reader_create(keyword);
   while (true) {
@@ -206,6 +206,7 @@ static az_result az_json_read_number_digit_rest(
     switch (c) {
       case '-':
         e_sign = -1;
+        AZ_FALLTHROUGH;
       case '+':
         az_span_reader_next(p_reader);
         c = az_span_reader_current(p_reader);
@@ -229,7 +230,9 @@ static az_result az_json_read_number_digit_rest(
   return AZ_OK;
 }
 
-static az_result az_json_read_string_rest(az_span_reader * const p_reader, az_const_span * const string) {
+static az_result az_json_read_string_rest(
+    az_span_reader * const p_reader,
+    az_const_span * const string) {
   // skip '"'
   size_t const begin = p_reader->i;
   while (true) {
@@ -271,7 +274,9 @@ static az_result az_json_read_string_rest(az_span_reader * const p_reader, az_co
 }
 
 // _value_
-static az_result az_json_read_value(az_json_state * const p_state, az_json_value * const out_value) {
+static az_result az_json_read_value(
+    az_json_state * const p_state,
+    az_json_value * const out_value) {
   az_span_reader * const p_reader = &p_state->reader;
   az_result_byte const c = az_span_reader_current(p_reader);
   if (isdigit(c)) {
@@ -309,7 +314,9 @@ static az_result az_json_read_value(az_json_state * const p_state, az_json_value
   return az_json_error_unexpected(c);
 }
 
-static az_result az_json_read_value_space(az_json_state * const p_state, az_json_value * const out_value) {
+static az_result az_json_read_value_space(
+    az_json_state * const p_state,
+    az_json_value * const out_value) {
   AZ_RETURN_IF_FAILED(az_json_read_value(p_state, out_value));
   az_json_read_white_space(&p_state->reader);
   return AZ_OK;
@@ -335,7 +342,7 @@ az_result az_json_read(az_json_state * const p_state, az_json_value * const out_
   return is_empty ? AZ_OK : AZ_JSON_ERROR_UNEXPECTED_CHAR;
 }
 
-static inline uint8_t az_json_stack_item_to_close(az_json_stack_item const item) {
+AZ_INLINE uint8_t az_json_stack_item_to_close(az_json_stack_item const item) {
   return item == AZ_JSON_STACK_OBJECT ? '}' : ']';
 }
 
