@@ -87,13 +87,6 @@ AZ_INLINE az_const_span az_const_span_drop(az_const_span const span, size_t cons
   return (az_const_span){ .begin = span.begin + n, .size = span.size - n };
 }
 
-AZ_INLINE az_span az_span_drop(az_span const span, size_t const n) {
-  if (span.size <= n) {
-    return (az_span){ .begin = NULL, .size = 0 };
-  }
-  return (az_span){ .begin = span.begin + n, .size = span.size - n };
-}
-
 /**
  * Returns a sub span of the given span.
  */
