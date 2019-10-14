@@ -3,7 +3,7 @@ jobs:
   strategy:
     matrix:
       Linux:
-        vm.image: 'ubuntu-16.04'
+        vm.image: 'ubuntu-18.04'
         vcpkg.deps: 'curl[ssl]'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
       Win:
