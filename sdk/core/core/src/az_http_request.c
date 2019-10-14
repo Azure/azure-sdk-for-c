@@ -16,6 +16,33 @@ AZ_STATIC_ASSERT('\n' == 10)
 
 static az_const_span const az_crlf = AZ_CONST_STR(AZ_CRLF);
 
+typedef struct {
+
+} az_query_data;
+
+az_result az_query_to_buffer(az_write_span_iter * p_iter, az_pair const pair) {
+  AZ_CONTRACT_ARG_NOT_NULL(p_iter);
+
+  az_write_span_iter_write(p_iter, p_request->method)
+}
+
+az_result az_http_request_e_to_buffer(
+    az_http_request_e const * const p_request,
+    az_span const span,
+    az_span * const out) {
+  AZ_CONTRACT_ARG_NOT_NULL(p_request);
+  AZ_CONTRACT_ARG_NOT_NULL(out);
+
+  az_write_span_iter wi = az_write_span_iter_create(span);
+
+  // a request line
+  {
+    AZ_RETURN_IF_FAILED(az_write_span_iter_write(&wi, p_request->method));
+    AZ_RETURN_IF_FAILED(az_write_span_iter_write(&wi, AZ_STR(" ")));
+    AZ_RETURN_IF_FAILED(az_write_span_iter_write(&wi, p_request->path));
+  }
+}
+
 az_result az_http_request_to_buffer(
     az_http_request const * const p_request,
     az_span const span,
