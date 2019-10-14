@@ -34,6 +34,11 @@ target_link_libraries(curl_easy_perform_poc PRIVATE
   az_core 
   CURL::libcurl)
 
+if (MOCK_CURL)
+  MESSAGE("Will mocked all calls to http client with static responses")
+  add_definitions(-DMOCK_CURL="MOCK")
+endif()
+
 if (UNIX)
   target_link_libraries(az_core_test PRIVATE m)
   target_link_libraries(curl_easy_perform_poc PRIVATE m)

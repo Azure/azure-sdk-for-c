@@ -1,36 +1,36 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+/**
+ * Test http client PAL
+ * 
+ */
+
 #include <stdio.h>
-#include <curl/curl.h>
+#include <az_http_client.h>
+#include <az_str.h>
 
-int main(int _, char **argv)
+#define TEST_URL_CONST "http://www.laboratoons.com/wp-content/uploads/2018/11/Alternativas-A.jpg"
+#define TEST_FILE_CONST "downloadTest.jpg"
+
+static az_const_span TEST_URL = AZ_CONST_STR(TEST_URL_CONST);
+static az_const_span TEST_FILE = AZ_CONST_STR(TEST_FILE_CONST);
+
+int main()
 {
-    CURL *curl;
-    curl = curl_easy_init();
     int result;
-
-    FILE *f;
-    f = fopen("here.jpg", "wb");
-
-    printf("\n1...");
     
-    curl_easy_setopt(curl, CURLOPT_URL, "http://www.laboratoons.com/wp-content/uploads/2018/11/Alternativas-A.jpg");
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, f);
-    curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1l);
+    az_http_client_init();
+    az_http_client_set_URL(TEST_URL);
+    result = az_http_client_download_to_file(TEST_FILE);
 
-    result = curl_easy_perform(curl);
-
-    if (result == CURLE_OK) {
+    if (result == AZ_OK) {
         printf("\n Done.");
     } else {
-        printf("\n Error: %s\n", curl_easy_strerror(result));
+        printf("\n Error:\n");
     }
+    
+    az_http_client_clean();
 
-    // clean up
-    fclose(f);
-    curl_easy_cleanup(curl);
-
-    printf("Hello world");
-    return _;
+    return 0;
 }
