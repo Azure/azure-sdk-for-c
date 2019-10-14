@@ -42,4 +42,4 @@ jobs:
   - task: CmdLine@2
     inputs:
       workingDirectory: build
-      script: 'CTest -C Debug'
+      script: 'ctest -C Debug'
