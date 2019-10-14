@@ -43,4 +43,4 @@ jobs:
     inputs:
       workingDirectory: build
       script: 'ctest -C Debug'
-	displayName: ctest
+    displayName: ctest
