@@ -117,7 +117,7 @@ AZ_INLINE az_result az_span_move(az_span * const p_dest, az_const_span const src
   AZ_CONTRACT_ARG_VALID_SPAN(src);
 
   if (p_dest->size < src.size) {
-    return AZ_ERROR_BUFFER_SPACE;
+    return AZ_ERROR_BUFFER_OVERFLOW;
   }
 
   if (!az_const_span_is_empty(src)) {
