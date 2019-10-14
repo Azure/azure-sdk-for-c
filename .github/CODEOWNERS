@@ -6,10 +6,10 @@
 ###########
 
 # Catch all
-/sdk/ @joshfree @sergey-shandar @jhendrixmsft @jeffreyrichter
+/sdk/ @joshfree @sergey-shandar @jeffreyrichter
 
 # Service teams
-/sdk/core/      @sergey-shandar @vhvb1989 @antkmsft @gilbertw @jhendrixmsft
+/sdk/core/      @sergey-shandar @vhvb1989 @antkmsft @gilbertw
 /sdk/identity/  @antkmsft
 /sdk/keyvault/  @gilbertw
 /sdk/storage/   @sergey-shandar @gilbertw
