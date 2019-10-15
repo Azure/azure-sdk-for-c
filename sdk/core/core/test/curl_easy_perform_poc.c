@@ -2,37 +2,40 @@
 // SPDX-License-Identifier: MIT
 
 #include <stdio.h>
+
 #include <curl/curl.h>
 
-#pragma warning(disable: 4996)
+#include <_az_cfg.h>
 
-int main(int _, char **argv)
-{
-    CURL *curl;
-    curl = curl_easy_init();
-    int result;
+int main(int _, char ** argv) {
+  CURL * curl;
+  curl = curl_easy_init();
+  int result;
 
-    FILE *f;
-    f = fopen("here.jpg", "wb");
+  FILE * f;
+  f = fopen("here.jpg", "wb");
 
-    printf("\n1...");
-    
-    curl_easy_setopt(curl, CURLOPT_URL, "http://www.laboratoons.com/wp-content/uploads/2018/11/Alternativas-A.jpg");
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, f);
-    curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1l);
+  printf("\n1...");
 
-    result = curl_easy_perform(curl);
+  curl_easy_setopt(
+      curl,
+      CURLOPT_URL,
+      "http://www.laboratoons.com/wp-content/uploads/2018/11/Alternativas-A.jpg");
+  curl_easy_setopt(curl, CURLOPT_WRITEDATA, f);
+  curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1l);
 
-    if (result == CURLE_OK) {
-        printf("\n Done.");
-    } else {
-        printf("\n Error: %s\n", curl_easy_strerror(result));
-    }
+  result = curl_easy_perform(curl);
 
-    // clean up
-    fclose(f);
-    curl_easy_cleanup(curl);
+  if (result == CURLE_OK) {
+    printf("\n Done.");
+  } else {
+    printf("\n Error: %s\n", curl_easy_strerror(result));
+  }
 
-    printf("Hello world");
-    return _;
+  // clean up
+  fclose(f);
+  curl_easy_cleanup(curl);
+
+  printf("Hello world");
+  return _;
 }
