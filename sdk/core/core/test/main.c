@@ -368,7 +368,7 @@ int main() {
           "{ \"somejson\": true }");
       az_http_request new_request = request;
       az_http_standard_headers_data s;
-      { 
+      {
         az_result const result = az_http_standard_headers_policy(&new_request, &s);
         TEST_ASSERT(result == AZ_OK);
       }
@@ -379,6 +379,44 @@ int main() {
       }
       TEST_ASSERT(az_const_span_eq(az_span_to_const_span(out), expected));
     }
+  }
+  {
+    az_const_span const expected = AZ_STR("@###copy#copy#make some zero-terminated strings#make "
+                                          "some\0zero-terminated\0strings\0####@");
+
+    uint8_t buf[87];
+    assert(expected.size == sizeof(buf));
+    for (size_t i = 0; i < sizeof(buf); ++i) {
+      buf[i] = '@';
+    }
+
+    az_span actual = { .begin = &buf, .size = sizeof(buf) };
+    az_span_set((az_span){ .begin = actual.begin + 1, .size = actual.size - 2 }, '#');
+
+    az_span result;
+
+    char const phrase1[] = "copy";
+    memcpy(actual.begin + 4, &phrase1, sizeof(phrase1) - 1);
+    az_span_copy(
+        (az_span){ .begin = actual.begin + 9, .size = 4 },
+        (az_const_span){ .begin = actual.begin + 4, .size = 4 },
+        &result);
+
+    char const phrase2[] = "make some zero-terminated strings";
+    memcpy(actual.begin + 14, &phrase2, sizeof(phrase2) - 1);
+
+    az_const_span const make_some = (az_const_span){ .begin = actual.begin + 14, .size = 9 };
+    az_const_span const zero_terminated = (az_const_span){ .begin = actual.begin + 24, .size = 15 };
+    az_const_span const strings = (az_const_span){ .begin = actual.begin + 40, .size = 7 };
+
+    az_span_to_c_str((az_span){ .begin = actual.begin + 48, .size = 10}, make_some, &result);
+    az_span_to_c_str((az_span){ .begin = actual.begin + 58, .size = 16}, zero_terminated, &result);
+    az_span_to_c_str((az_span){ .begin = actual.begin + 74, .size = 8 }, strings, &result);
+
+    result.begin[result.size - 1] = '$';
+    az_span_to_c_str(result, strings, &result);
+
+    TEST_ASSERT(az_const_span_eq(az_span_to_const_span(actual), expected));
   }
   return exit_code;
 }
