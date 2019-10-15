@@ -114,9 +114,11 @@ AZ_CALLBACK_DATA(az_http_standard_policy_to_pair_seq, az_http_standard_policy co
 az_result az_http_standard_policy_func(
     az_http_standard_policy const * const p_data,
     az_pair_visitor const visitor) {
-  az_pair_seq const headers = p_data->headers;
   AZ_RETURN_IF_FAILED(visitor.func(visitor.data, az_http_standard_header));
-  AZ_RETURN_IF_FAILED(headers.func(headers.data, visitor));
+  {
+    az_pair_seq const headers = p_data->headers;
+    AZ_RETURN_IF_FAILED(headers.func(headers.data, visitor));
+  }
   return AZ_OK;
 }
 
