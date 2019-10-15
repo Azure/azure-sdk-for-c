@@ -29,8 +29,9 @@ az_write_span_iter_write(az_write_span_iter * const p_i, az_const_span const spa
   AZ_CONTRACT_ARG_NOT_NULL(p_i);
 
   az_span const remainder = az_span_drop(p_i->span, p_i->i);
-  AZ_RETURN_IF_FAILED(az_span_copy(span, remainder));
-  p_i->i += span.size;
+  az_span result;
+  AZ_RETURN_IF_FAILED(az_span_copy(remainder, span, &result));
+  p_i->i += result.size;
   return AZ_OK;
 }
 

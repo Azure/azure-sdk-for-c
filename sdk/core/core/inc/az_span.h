@@ -4,6 +4,7 @@
 #ifndef AZ_SPAN_H
 #define AZ_SPAN_H
 
+#include <az_contract.h>
 #include <az_result.h>
 #include <az_static_assert.h>
 
@@ -37,10 +38,25 @@ typedef struct {
 } az_span;
 
 AZ_STATIC_ASSERT(CHAR_BIT == 8)
+AZ_STATIC_ASSERT(sizeof(uint8_t) == 1)
 
 typedef az_result az_result_byte;
 
-AZ_INLINE bool az_const_span_is_empty(az_const_span const span) { return span.size == 0; }
+AZ_INLINE bool az_span_is_empty(az_span const span) { return !(span.size > 0); }
+
+AZ_INLINE bool az_const_span_is_empty(az_const_span const span) { return !(span.size > 0); }
+
+AZ_INLINE bool az_span_is_valid(az_span const span) {
+  return span.begin == NULL ? span.size == 0
+                            : ((span.size == 0 || span.size > 0)
+                               && (span.size == 0 || span.begin <= (span.begin + span.size - 1)));
+}
+
+AZ_INLINE bool az_const_span_is_valid(az_const_span const span) {
+  return span.begin == NULL ? span.size == 0
+                            : ((span.size == 0 || span.size > 0)
+                               && (span.size == 0 || span.begin <= (span.begin + span.size - 1)));
+}
 
 /**
  * Returns a byte in `index` position.
@@ -89,7 +105,7 @@ az_const_span_sub(az_const_span const span, size_t const begin, size_t const end
 /**
  * Cast the given mutable span to an immutable span.
  */
-AZ_INLINE az_const_span az_to_const_span(az_span const span) {
+AZ_INLINE az_const_span az_span_to_const_span(az_span const span) {
   return (az_const_span){ .begin = span.begin, .size = span.size };
 }
 
@@ -101,12 +117,59 @@ AZ_INLINE bool az_const_span_eq(az_const_span const a, az_const_span const b) {
   return a.size == b.size && memcmp(a.begin, b.begin, a.size) == 0;
 }
 
-AZ_INLINE az_result az_span_copy(az_const_span const src, az_span const dst) {
-  if (dst.size < src.size) {
+AZ_INLINE az_result
+az_span_move(az_span const buffer, az_const_span const src, az_span * const out_result) {
+  AZ_CONTRACT_ARG_NOT_NULL(out_result);
+  if (!az_span_is_valid(buffer) || !az_const_span_is_valid(src)) {
+    return AZ_ERROR_ARG;
+  }
+
+  if (buffer.size < src.size) {
     return AZ_ERROR_BUFFER_OVERFLOW;
   }
 
-  memcpy(dst.begin, src.begin, src.size);
+  if (!az_const_span_is_empty(src)) {
+    memmove((void *)buffer.begin, (void const *)src.begin, src.size * sizeof(*src.begin));
+  }
+
+  out_result->begin = buffer.begin;
+  out_result->size = src.size;
+
+  return AZ_OK;
+}
+
+AZ_INLINE bool az_const_span_is_overlap(az_const_span const a, az_const_span const b) {
+  return (!az_const_span_is_empty(a) && !az_const_span_is_empty(b))
+      && ((a.begin < b.begin && (a.begin + a.size - 1) >= b.begin)
+          || (b.begin < a.begin && (b.begin + b.size - 1) >= a.begin) || (a.begin == b.begin));
+}
+
+AZ_INLINE bool az_span_is_overlap(az_span const a, az_span const b) {
+  return az_const_span_is_overlap(az_span_to_const_span(a), az_span_to_const_span(b));
+}
+
+AZ_INLINE az_result
+az_span_copy(az_span const buffer, az_const_span const src, az_span * const out_result) {
+  AZ_CONTRACT_ARG_NOT_NULL(out_result);
+  if (!az_span_is_valid(buffer) || !az_const_span_is_valid(src)) {
+    return AZ_ERROR_ARG;
+  }
+
+  if (az_const_span_is_overlap(az_span_to_const_span(buffer), src)) {
+    return AZ_ERROR_ARG;
+  }
+
+  if (buffer.size < src.size) {
+    return AZ_ERROR_BUFFER_OVERFLOW;
+  }
+
+  if (!az_const_span_is_empty(src)) {
+    memcpy((void *)buffer.begin, (void const *)src.begin, src.size);
+  }
+
+  out_result->begin = buffer.begin;
+  out_result->size = src.size;
+
   return AZ_OK;
 }
 
@@ -122,6 +185,69 @@ AZ_INLINE az_span az_span_take(az_span const span, size_t n) {
     return span;
   }
   return (az_span){ .begin = span.begin, .size = n };
+}
+
+AZ_INLINE az_result az_span_set(az_span const span, uint8_t fill) {
+  if (!az_span_is_valid(span)) {
+    return AZ_ERROR_ARG;
+  }
+
+  if (!az_span_is_empty(span)) {
+    memset(span.begin, fill, span.size);
+  }
+
+  return AZ_OK;
+}
+
+AZ_INLINE az_result az_span_swap(az_span const a, az_span const b) {
+  if (!az_span_is_valid(a) || !az_span_is_valid(b)) {
+    return AZ_ERROR_ARG;
+  }
+
+  if (a.size != b.size || az_span_is_overlap(a, b)) {
+    return AZ_ERROR_ARG;
+  }
+
+  if (!az_span_is_empty(a)) {
+    uint8_t * a_ptr = a.begin;
+    uint8_t * b_ptr = b.begin;
+    uint8_t const * const a_end = a.begin + a.size;
+    do {
+      uint8_t const old_a = *a_ptr;
+      *a_ptr = *b_ptr;
+      *b_ptr = old_a;
+
+      ++a_ptr;
+      ++b_ptr;
+    } while (a_ptr != a_end);
+  }
+
+  return AZ_OK;
+}
+
+AZ_INLINE az_result
+az_span_to_c_str(az_span const buffer, az_const_span const src, az_span * const out_result) {
+  AZ_CONTRACT_ARG_NOT_NULL(out_result);
+
+  if (!az_const_span_is_valid(src)) {
+    return AZ_ERROR_ARG;
+  }
+
+  AZ_CONTRACT_ARG_NOT_NULL(buffer.begin);
+  if (buffer.size < src.size + 1) {
+    return AZ_ERROR_BUFFER_OVERFLOW;
+  }
+
+  if (!az_const_span_is_empty(src)) {
+    memmove((void *)buffer.begin, (void const *)src.begin, src.size);
+  }
+
+  buffer.begin[src.size] = '\0';
+
+  out_result->begin = buffer.begin;
+  out_result->size = src.size + 1;
+
+  return AZ_OK;
 }
 
 #define AZ_ARRAY_SIZE(ARRAY) (sizeof(ARRAY) / sizeof(*ARRAY))
