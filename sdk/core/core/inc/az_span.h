@@ -47,11 +47,15 @@ AZ_INLINE bool az_span_is_empty(az_span const span) { return !(span.size > 0); }
 AZ_INLINE bool az_const_span_is_empty(az_const_span const span) { return !(span.size > 0); }
 
 AZ_INLINE bool az_span_is_valid(az_span const span) {
-  return span.begin == NULL ? span.size == 0 : (span.size == 0 || span.size > 0);
+  return span.begin == NULL ? span.size == 0
+                            : ((span.size == 0 || span.size > 0)
+                               && (span.size == 0 || span.begin <= (span.begin + span.size - 1)));
 }
 
 AZ_INLINE bool az_const_span_is_valid(az_const_span const span) {
-  return span.begin == NULL ? span.size == 0 : (span.size == 0 || span.size > 0);
+  return span.begin == NULL ? span.size == 0
+                            : ((span.size == 0 || span.size > 0)
+                               && (span.size == 0 || span.begin <= (span.begin + span.size - 1)));
 }
 
 /**
@@ -137,8 +141,7 @@ az_span_move(az_span const buffer, az_const_span const src, az_span * const out_
 AZ_INLINE bool az_const_span_is_overlap(az_const_span const a, az_const_span const b) {
   return (!az_const_span_is_empty(a) && !az_const_span_is_empty(b))
       && ((a.begin < b.begin && (a.begin + a.size - 1) >= b.begin)
-          || (b.begin < a.begin && (b.begin + b.size - 1) >= a.begin)
-          || (a.begin == b.begin));
+          || (b.begin < a.begin && (b.begin + b.size - 1) >= a.begin) || (a.begin == b.begin));
 }
 
 AZ_INLINE bool az_span_is_overlap(az_span const a, az_span const b) {
@@ -216,7 +219,7 @@ AZ_INLINE az_result az_span_swap(az_span const a, az_span const b) {
 
       ++a_ptr;
       ++b_ptr;
-    } while (a_ptr < a_end);
+    } while (a_ptr != a_end);
   }
 
   return AZ_OK;
