@@ -9,9 +9,9 @@ To get started with a specific library, see the **README.md** file located in th
 service libraries in the `/sdk` directory.
 
 ### Prerequisites
-- CMake version 3.12 is required to use these libraries.
+- CMake version 3.12 or higher is required to use these libraries.
 - Vcpkg is required to download project dependencies.
-- On Linux, development headers for OpenSSL 1.1.1 and UUID are required to build the project.
+- On Linux/macOS, development headers for OpenSSL 1.1 are required to build the project.
 
 ### Building the SDK
 Follow the instructions in the [contributing guide](CONTRIBUTING.md) to build the SDK. The same instructions apply
