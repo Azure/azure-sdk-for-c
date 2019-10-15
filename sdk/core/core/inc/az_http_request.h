@@ -12,52 +12,41 @@
 
 #include <_az_cfg_prefix.h>
 
-typedef az_result (*az_pair_event_func)(void * context, az_pair const pair);
+typedef ptrdiff_t az_callback_data;
 
-typedef struct {
-  az_pair_event_func func;
-  void * context;
-} az_pair_event;
+#define AZ_CAT(A, B) A##B
 
-AZ_INLINE az_result az_pair_event_call(az_pair_event const event, az_pair const pair) {
-  AZ_CONTRACT_ARG_NOT_NULL(event.func);
+#define AZ_CALLBACK_ARG(NAME) AZ_CAT(NAME, _arg)
 
-  return event.func(event.context, pair);
-}
+#define AZ_CALLBACK_DECL(NAME, ARG) \
+  typedef ARG AZ_CALLBACK_ARG(NAME); \
+  typedef struct { \
+    az_result (*func)(az_callback_data const, ARG const); \
+    az_callback_data data; \
+  } NAME;
 
-typedef az_result (*az_pair_event_list_func)(void * context, az_pair_event const event);
+#define AZ_CALLBACK_DATA(NAME, DATA, CALLBACK) \
+  AZ_STATIC_ASSERT(sizeof(DATA) <= sizeof(az_callback_data)) \
+  AZ_INLINE CALLBACK NAME(DATA const data, az_result (* const func)(DATA const, AZ_CALLBACK_ARG(CALLBACK) const)) { \
+    return (CALLBACK){ \
+      .func = (az_result (*)(az_callback_data, AZ_CALLBACK_ARG(CALLBACK)))func, \
+      .data = (az_callback_data)data, \
+    }; \
+  }
 
-typedef struct {
-  az_pair_event_list_func func;
-  void * context;
-} az_pair_event_list;
+AZ_CALLBACK_DECL(az_pair_visitor, az_pair);
 
-AZ_INLINE az_result az_pair_event_list_call(az_pair_event_list const list, az_pair_event const event) {
-  AZ_CONTRACT_ARG_NOT_NULL(list.func);
+AZ_CALLBACK_DECL(az_pair_seq, az_pair_visitor);
 
-  return list.func(list.context, event);
-}
+az_pair_seq az_pair_span_to_seq(az_pair_span const * const p_span);
 
 // request
 
 typedef struct {
   az_const_span method;
   az_const_span path;
-  az_pair_event_list query;
-  az_pair_event_list headers;
-  az_const_span body;
-} az_http_request_e;
-
-az_result az_http_request_e_to_buffer(
-    az_http_request_e const * const p_request,
-    az_span const span,
-    az_span * const out);
-
-typedef struct {
-  az_const_span method;
-  az_const_span path;
-  az_pair_iter query;
-  az_pair_iter headers;
+  az_pair_seq query;
+  az_pair_seq headers;
   az_const_span body;
 } az_http_request;
 
@@ -67,15 +56,15 @@ az_result az_http_request_to_buffer(
     az_span * const out);
 
 typedef struct {
-  az_pair_iter original_headers;
-} az_http_standard_headers_data;
+  az_pair_seq headers;
+} az_http_standard_policy;
 
 /**
  * Note: `*p_request` should not be used after `*out` is destroyed.
  */
-az_result az_http_standard_headers_policy(
+az_result az_http_standard_policy_create(
     az_http_request * const p_request,
-    az_http_standard_headers_data * const out);
+    az_http_standard_policy * const out);
 
 #include <_az_cfg_suffix.h>
 

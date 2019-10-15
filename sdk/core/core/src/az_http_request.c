@@ -3,11 +3,30 @@
 
 #include <az_http_request.h>
 
-#include <az_write_span_iter.h>
 #include <az_contract.h>
 #include <az_str.h>
+#include <az_write_span_iter.h>
 
 #include <_az_cfg.h>
+
+AZ_CALLBACK_DATA(az_pair_span_to_seq_data, az_pair_span const *, az_pair_seq)
+
+az_result az_pair_span_to_seq_func(
+    az_pair_span const * const context,
+    az_pair_visitor const visitor) {
+  AZ_CONTRACT_ARG_NOT_NULL(context);
+
+  size_t const size = context->size;
+  az_pair const * begin = context->begin;
+  for (size_t i = 0; i < size; ++i) {
+    AZ_RETURN_IF_FAILED(visitor.func(visitor.data, begin[i]));
+  }
+  return AZ_OK;
+}
+
+az_pair_seq az_pair_span_to_seq(az_pair_span const * const p_span) {
+  return az_pair_span_to_seq_data(p_span, az_pair_span_to_seq_func);
+}
 
 #define AZ_CRLF "\r\n"
 
@@ -17,30 +36,31 @@ AZ_STATIC_ASSERT('\n' == 10)
 static az_const_span const az_crlf = AZ_CONST_STR(AZ_CRLF);
 
 typedef struct {
+  az_write_span_iter wi;
+  az_const_span separator;
+} az_data;
 
-} az_query_data;
+AZ_CALLBACK_DATA(az_data_to_pair_visitor, az_data *, az_pair_visitor)
 
-az_result az_query_to_buffer(az_write_span_iter * p_iter, az_pair const pair) {
-  AZ_CONTRACT_ARG_NOT_NULL(p_iter);
+az_result az_query_to_buffer_func(az_data * const p, az_pair const pair) {
+  AZ_CONTRACT_ARG_NOT_NULL(p);
 
-  az_write_span_iter_write(p_iter, p_request->method)
+  AZ_RETURN_IF_FAILED(az_write_span_iter_write(&p->wi, p->separator));
+  AZ_RETURN_IF_FAILED(az_write_span_iter_write(&p->wi, pair.key));
+  AZ_RETURN_IF_FAILED(az_write_span_iter_write(&p->wi, AZ_STR("=")));
+  AZ_RETURN_IF_FAILED(az_write_span_iter_write(&p->wi, pair.value));
+  p->separator = AZ_STR("&");
+  return AZ_OK;
 }
 
-az_result az_http_request_e_to_buffer(
-    az_http_request_e const * const p_request,
-    az_span const span,
-    az_span * const out) {
-  AZ_CONTRACT_ARG_NOT_NULL(p_request);
-  AZ_CONTRACT_ARG_NOT_NULL(out);
+az_result az_header_to_buffer_func(az_data * const p, az_pair const pair) {
+  AZ_CONTRACT_ARG_NOT_NULL(p);
 
-  az_write_span_iter wi = az_write_span_iter_create(span);
-
-  // a request line
-  {
-    AZ_RETURN_IF_FAILED(az_write_span_iter_write(&wi, p_request->method));
-    AZ_RETURN_IF_FAILED(az_write_span_iter_write(&wi, AZ_STR(" ")));
-    AZ_RETURN_IF_FAILED(az_write_span_iter_write(&wi, p_request->path));
-  }
+  AZ_RETURN_IF_FAILED(az_write_span_iter_write(&p->wi, pair.key));
+  AZ_RETURN_IF_FAILED(az_write_span_iter_write(&p->wi, AZ_STR(": ")));
+  AZ_RETURN_IF_FAILED(az_write_span_iter_write(&p->wi, pair.value));
+  AZ_RETURN_IF_FAILED(az_write_span_iter_write(&p->wi, az_crlf));
+  return AZ_OK;
 }
 
 az_result az_http_request_to_buffer(
@@ -50,93 +70,60 @@ az_result az_http_request_to_buffer(
   AZ_CONTRACT_ARG_NOT_NULL(p_request);
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
-  az_write_span_iter wi = az_write_span_iter_create(span);
+  az_data data = {
+    .wi = az_write_span_iter_create(span),
+    .separator = AZ_STR("?"),
+  };
 
   // a request line
   {
-    AZ_RETURN_IF_FAILED(az_write_span_iter_write(&wi, p_request->method));
-    AZ_RETURN_IF_FAILED(az_write_span_iter_write(&wi, AZ_STR(" ")));
-    AZ_RETURN_IF_FAILED(az_write_span_iter_write(&wi, p_request->path));
-    // query parameters
+    AZ_RETURN_IF_FAILED(az_write_span_iter_write(&data.wi, p_request->method));
+    AZ_RETURN_IF_FAILED(az_write_span_iter_write(&data.wi, AZ_STR(" ")));
+    AZ_RETURN_IF_FAILED(az_write_span_iter_write(&data.wi, p_request->path));
     {
-      az_const_span separator = AZ_STR("?");
-      az_pair_iter i = p_request->query;
-      while (true) {
-        az_pair p;
-        {
-          az_result const result = az_pair_iter_call(&i, &p);
-          if (result == AZ_ERROR_EOF) {
-            break;
-          }
-          AZ_RETURN_IF_FAILED(result);
-        }
-        AZ_RETURN_IF_FAILED(az_write_span_iter_write(&wi, separator));
-        AZ_RETURN_IF_FAILED(az_write_span_iter_write(&wi, p.key));
-        AZ_RETURN_IF_FAILED(az_write_span_iter_write(&wi, AZ_STR("=")));
-        AZ_RETURN_IF_FAILED(az_write_span_iter_write(&wi, p.value));
-        separator = AZ_STR("&");
-      }
+      az_pair_seq const query = p_request->query;
+      az_pair_visitor const visitor = az_data_to_pair_visitor(&data, &az_query_to_buffer_func);
+      AZ_RETURN_IF_FAILED(query.func(query.data, visitor));
     }
-    AZ_RETURN_IF_FAILED(az_write_span_iter_write(&wi, AZ_STR(" HTTP/1.1" AZ_CRLF)));
+    AZ_RETURN_IF_FAILED(az_write_span_iter_write(&data.wi, AZ_STR(" HTTP/1.1" AZ_CRLF)));
   }
 
   // headers
   {
-    az_pair_iter i = p_request->headers;
-    while (true) {
-      az_pair p;
-      {
-        az_result const result = az_pair_iter_call(&i, &p);
-        if (result == AZ_ERROR_EOF) {
-          break;
-        }
-        AZ_RETURN_IF_FAILED(result);
-      }
-      AZ_RETURN_IF_FAILED(az_write_span_iter_write(&wi, p.key));
-      AZ_RETURN_IF_FAILED(az_write_span_iter_write(&wi, AZ_STR(": ")));
-      AZ_RETURN_IF_FAILED(az_write_span_iter_write(&wi, p.value));
-      AZ_RETURN_IF_FAILED(az_write_span_iter_write(&wi, az_crlf));
-    }
+    az_pair_seq const headers = p_request->headers;
+    az_pair_visitor const visitor = az_data_to_pair_visitor(&data, az_header_to_buffer_func);
+    AZ_RETURN_IF_FAILED(headers.func(headers.data, visitor));
   }
 
   // empty line
-  AZ_RETURN_IF_FAILED(az_write_span_iter_write(&wi, az_crlf));
+  AZ_RETURN_IF_FAILED(az_write_span_iter_write(&data.wi, az_crlf));
 
   // body.
-  AZ_RETURN_IF_FAILED(az_write_span_iter_write(&wi, p_request->body));
+  AZ_RETURN_IF_FAILED(az_write_span_iter_write(&data.wi, p_request->body));
 
-  *out = az_write_span_iter_result(&wi);
+  *out = az_write_span_iter_result(&data.wi);
 
   return AZ_OK;
 }
 
-static az_pair const az_http_standard_headers_array[] = {
-  { .key = AZ_CONST_STR("ContentType"), .value = AZ_CONST_STR("text/plain; charset=utf-8") },
-};
+az_pair const az_http_standard_header
+    = { .key = AZ_CONST_STR("ContentType"), .value = AZ_CONST_STR("text/plain; charset=utf-8") };
 
-az_result az_http_standard_headers_iter_func(az_pair_iter * const p_iter, az_pair * const out) {
-  size_t const size = AZ_ARRAY_SIZE(az_http_standard_headers_array);
-  size_t i = (size_t)(p_iter->data.end);
-  *out = az_http_standard_headers_array[i];
-  size_t const new_i = i + 1;
-  if (new_i < size) {
-    p_iter->data.end = (void const *)new_i;
-    return AZ_OK;
-  }
-  az_http_standard_headers_data const * h = p_iter->data.begin;
-  *p_iter = h->original_headers;
+AZ_CALLBACK_DATA(az_http_standard_policy_to_pair_seq, az_http_standard_policy const *, az_pair_seq)
+
+az_result az_http_standard_policy_func(
+    az_http_standard_policy const * const p_data,
+    az_pair_visitor const visitor) {
+  az_pair_seq const headers = p_data->headers;
+  AZ_RETURN_IF_FAILED(visitor.func(visitor.data, az_http_standard_header));
+  AZ_RETURN_IF_FAILED(headers.func(headers.data, visitor));
   return AZ_OK;
 }
 
-az_result az_http_standard_headers_policy(
+az_result az_http_standard_policy_create(
     az_http_request * const p_request,
-    az_http_standard_headers_data * const out) {
-  *out = (az_http_standard_headers_data){
-    .original_headers = p_request->headers,
-  };
-  p_request->headers = (az_pair_iter){
-    .func = az_http_standard_headers_iter_func,
-    .data = { .begin = out, .end = 0, },
-  };
+    az_http_standard_policy * const out) {
+  out->headers = p_request->headers;
+  p_request->headers = az_http_standard_policy_to_pair_seq(out, az_http_standard_policy_func);
   return AZ_OK;
 }

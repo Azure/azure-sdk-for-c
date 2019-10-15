@@ -330,17 +330,19 @@ int main() {
       { .key = AZ_STR("hello"), .value = AZ_STR("world!") },
       { .key = AZ_STR("x"), .value = AZ_STR("42") },
     };
+    az_span const query = AZ_SPAN(query_array);
     //
     az_pair const headers_array[] = {
       { .key = AZ_STR("some"), .value = AZ_STR("xml") },
       { .key = AZ_STR("xyz"), .value = AZ_STR("very_long") },
     };
+    az_span const headers = AZ_SPAN(headers_array);
     //
     az_http_request const request = {
       .method = AZ_STR("GET"),
       .path = AZ_STR("/foo"),
-      .query = az_pair_span_to_iter((az_pair_span)AZ_SPAN(query_array)),
-      .headers = az_pair_span_to_iter((az_pair_span)AZ_SPAN(headers_array)),
+      .query = az_pair_span_to_seq(&query),
+      .headers = az_pair_span_to_seq(&headers),
       .body = AZ_STR("{ \"somejson\": true }"),
     };
     uint8_t buffer[1024];
@@ -367,9 +369,9 @@ int main() {
           "\r\n"
           "{ \"somejson\": true }");
       az_http_request new_request = request;
-      az_http_standard_headers_data s;
+      az_http_standard_policy s;
       { 
-        az_result const result = az_http_standard_headers_policy(&new_request, &s);
+        az_result const result = az_http_standard_policy_create(&new_request, &s);
         TEST_ASSERT(result == AZ_OK);
       }
       {
