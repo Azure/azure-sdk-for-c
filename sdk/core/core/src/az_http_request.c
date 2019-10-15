@@ -17,72 +17,70 @@ AZ_STATIC_ASSERT('\n' == 10)
 static az_const_span const az_crlf = AZ_CONST_STR(AZ_CRLF);
 
 typedef struct {
-  az_write_span_iter wi;
+  az_span_visitor visitor;
   az_const_span separator;
 } az_data;
 
 AZ_CALLBACK_DATA(az_data_to_pair_visitor, az_data *, az_pair_visitor)
 
-az_result az_query_to_buffer_func(az_data * const p, az_pair const pair) {
+az_result az_query_to_spans_func(az_data * const p, az_pair const pair) {
   AZ_CONTRACT_ARG_NOT_NULL(p);
 
-  AZ_RETURN_IF_FAILED(az_write_span_iter_write(&p->wi, p->separator));
-  AZ_RETURN_IF_FAILED(az_write_span_iter_write(&p->wi, pair.key));
-  AZ_RETURN_IF_FAILED(az_write_span_iter_write(&p->wi, AZ_STR("=")));
-  AZ_RETURN_IF_FAILED(az_write_span_iter_write(&p->wi, pair.value));
+  az_span_visitor const visitor = p->visitor;
+  AZ_RETURN_IF_FAILED(visitor.func(visitor.data, p->separator));
+  AZ_RETURN_IF_FAILED(visitor.func(visitor.data, pair.key));
+  AZ_RETURN_IF_FAILED(visitor.func(visitor.data, AZ_STR("=")));
+  AZ_RETURN_IF_FAILED(visitor.func(visitor.data, pair.value));
   p->separator = AZ_STR("&");
   return AZ_OK;
 }
 
-az_result az_header_to_buffer_func(az_data * const p, az_pair const pair) {
+az_result az_header_to_spans_func(az_data * const p, az_pair const pair) {
   AZ_CONTRACT_ARG_NOT_NULL(p);
 
-  AZ_RETURN_IF_FAILED(az_write_span_iter_write(&p->wi, pair.key));
-  AZ_RETURN_IF_FAILED(az_write_span_iter_write(&p->wi, AZ_STR(": ")));
-  AZ_RETURN_IF_FAILED(az_write_span_iter_write(&p->wi, pair.value));
-  AZ_RETURN_IF_FAILED(az_write_span_iter_write(&p->wi, az_crlf));
+  az_span_visitor const visitor = p->visitor;
+  AZ_RETURN_IF_FAILED(visitor.func(visitor.data, pair.key));
+  AZ_RETURN_IF_FAILED(visitor.func(visitor.data, AZ_STR(": ")));
+  AZ_RETURN_IF_FAILED(visitor.func(visitor.data, pair.value));
+  AZ_RETURN_IF_FAILED(visitor.func(visitor.data, az_crlf));
   return AZ_OK;
 }
 
-az_result az_http_request_to_buffer(
-    az_http_request const * const p_request,
-    az_span const span,
-    az_span * const out) {
+az_result az_http_request_to_spans(
+  az_http_request const* const p_request,
+  az_span_visitor const visitor) {
   AZ_CONTRACT_ARG_NOT_NULL(p_request);
-  AZ_CONTRACT_ARG_NOT_NULL(out);
 
   az_data data = {
-    .wi = az_write_span_iter_create(span),
+    .visitor = visitor,
     .separator = AZ_STR("?"),
   };
 
   // a request line
   {
-    AZ_RETURN_IF_FAILED(az_write_span_iter_write(&data.wi, p_request->method));
-    AZ_RETURN_IF_FAILED(az_write_span_iter_write(&data.wi, AZ_STR(" ")));
-    AZ_RETURN_IF_FAILED(az_write_span_iter_write(&data.wi, p_request->path));
+    AZ_RETURN_IF_FAILED(visitor.func(visitor.data, p_request->method));
+    AZ_RETURN_IF_FAILED(visitor.func(visitor.data, AZ_STR(" ")));
+    AZ_RETURN_IF_FAILED(visitor.func(visitor.data, p_request->path));
     {
       az_pair_seq const query = p_request->query;
-      az_pair_visitor const visitor = az_data_to_pair_visitor(&data, &az_query_to_buffer_func);
-      AZ_RETURN_IF_FAILED(query.func(query.data, visitor));
+      az_pair_visitor const pair_visitor = az_data_to_pair_visitor(&data, az_query_to_spans_func);
+      AZ_RETURN_IF_FAILED(query.func(query.data, pair_visitor));
     }
-    AZ_RETURN_IF_FAILED(az_write_span_iter_write(&data.wi, AZ_STR(" HTTP/1.1" AZ_CRLF)));
+    AZ_RETURN_IF_FAILED(visitor.func(visitor.data, AZ_STR(" HTTP/1.1" AZ_CRLF)));
   }
 
   // headers
   {
     az_pair_seq const headers = p_request->headers;
-    az_pair_visitor const visitor = az_data_to_pair_visitor(&data, az_header_to_buffer_func);
-    AZ_RETURN_IF_FAILED(headers.func(headers.data, visitor));
+    az_pair_visitor const pair_visitor = az_data_to_pair_visitor(&data, az_header_to_spans_func);
+    AZ_RETURN_IF_FAILED(headers.func(headers.data, pair_visitor));
   }
 
   // empty line
-  AZ_RETURN_IF_FAILED(az_write_span_iter_write(&data.wi, az_crlf));
+  AZ_RETURN_IF_FAILED(visitor.func(visitor.data, az_crlf));
 
   // body.
-  AZ_RETURN_IF_FAILED(az_write_span_iter_write(&data.wi, p_request->body));
-
-  *out = az_write_span_iter_result(&data.wi);
+  AZ_RETURN_IF_FAILED(visitor.func(visitor.data, p_request->body));
 
   return AZ_OK;
 }

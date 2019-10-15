@@ -7,6 +7,7 @@
 #include <az_contract.h>
 #include <az_result.h>
 #include <az_static_assert.h>
+#include <az_callback.h>
 
 #include <limits.h>
 #include <stdbool.h>
@@ -254,6 +255,8 @@ az_span_to_c_str(az_span const buffer, az_const_span const src, az_span * const 
 
 #define AZ_SPAN(ARRAY) \
   { .begin = ARRAY, .size = AZ_ARRAY_SIZE(ARRAY) }
+
+AZ_CALLBACK_DECL(az_span_visitor, az_const_span)
 
 #include <_az_cfg_suffix.h>
 

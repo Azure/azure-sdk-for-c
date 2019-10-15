@@ -21,10 +21,9 @@ typedef struct {
   az_const_span body;
 } az_http_request;
 
-az_result az_http_request_to_buffer(
+az_result az_http_request_to_spans(
     az_http_request const * const p_request,
-    az_span const span,
-    az_span * const out);
+    az_span_visitor const span_visitor);
 
 typedef struct {
   az_pair_seq headers;

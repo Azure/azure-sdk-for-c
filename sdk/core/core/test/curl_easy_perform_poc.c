@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <curl/curl.h>
 
+#pragma warning(disable: 4996)
+
 int main(int _, char **argv)
 {
     CURL *curl;

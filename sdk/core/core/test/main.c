@@ -4,6 +4,7 @@
 #include <az_http_request.h>
 #include <az_json_read.h>
 #include <az_span_reader.h>
+#include <az_write_span_iter.h>
 
 #include <assert.h>
 #include <stdbool.h>
@@ -347,20 +348,23 @@ int main() {
     };
     uint8_t buffer[1024];
     {
-      az_span out;
+      az_write_span_iter wi = az_write_span_iter_create((az_span)AZ_SPAN(buffer));
+      az_span_visitor sv = az_write_span_iter_to_span_visitor(&wi);
       az_const_span const expected = AZ_STR( //
           "GET /foo?hello=world!&x=42 HTTP/1.1\r\n"
           "some: xml\r\n"
           "xyz: very_long\r\n"
           "\r\n"
           "{ \"somejson\": true }");
-      az_result const result = az_http_request_to_buffer(&request, (az_span)AZ_SPAN(buffer), &out);
+      az_result const result = az_http_request_to_spans(&request, sv);
       TEST_ASSERT(result == AZ_OK);
+      az_span out = az_write_span_iter_result(&wi);
       TEST_ASSERT(az_const_span_eq(az_span_to_const_span(out), expected));
     }
     // HTTP Builder with policies.
     {
-      az_span out;
+      az_write_span_iter wi = az_write_span_iter_create((az_span)AZ_SPAN(buffer));
+      az_span_visitor sv = az_write_span_iter_to_span_visitor(&wi);
       az_const_span const expected = AZ_STR( //
           "GET /foo?hello=world!&x=42 HTTP/1.1\r\n"
           "ContentType: text/plain; charset=utf-8\r\n"
@@ -370,15 +374,15 @@ int main() {
           "{ \"somejson\": true }");
       az_http_request new_request = request;
       az_http_standard_policy s;
-      { 
+      {
         az_result const result = az_http_standard_policy_create(&new_request, &s);
         TEST_ASSERT(result == AZ_OK);
       }
       {
-        az_result const result
-            = az_http_request_to_buffer(&new_request, (az_span)AZ_SPAN(buffer), &out);
+        az_result const result = az_http_request_to_spans(&new_request, sv);
         TEST_ASSERT(result == AZ_OK);
       }
+      az_span out = az_write_span_iter_result(&wi);
       TEST_ASSERT(az_const_span_eq(az_span_to_const_span(out), expected));
     }
   }
@@ -392,7 +396,7 @@ int main() {
       buf[i] = '@';
     }
 
-    az_span actual = { .begin = &buf, .size = sizeof(buf) };
+    az_span actual = { .begin = buf, .size = sizeof(buf) };
     az_span_set((az_span){ .begin = actual.begin + 1, .size = actual.size - 2 }, '#');
 
     az_span result;
@@ -411,8 +415,8 @@ int main() {
     az_const_span const zero_terminated = (az_const_span){ .begin = actual.begin + 24, .size = 15 };
     az_const_span const strings = (az_const_span){ .begin = actual.begin + 40, .size = 7 };
 
-    az_span_to_c_str((az_span){ .begin = actual.begin + 48, .size = 10}, make_some, &result);
-    az_span_to_c_str((az_span){ .begin = actual.begin + 58, .size = 16}, zero_terminated, &result);
+    az_span_to_c_str((az_span){ .begin = actual.begin + 48, .size = 10 }, make_some, &result);
+    az_span_to_c_str((az_span){ .begin = actual.begin + 58, .size = 16 }, zero_terminated, &result);
     az_span_to_c_str((az_span){ .begin = actual.begin + 74, .size = 8 }, strings, &result);
 
     result.begin[result.size - 1] = '$';
