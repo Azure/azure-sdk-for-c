@@ -272,7 +272,7 @@ int main() {
     size_t o = 0;
     TEST_ASSERT(
         read_write(AZ_STR("{ \"a\" : [ true, { \"b\": [{}]}, 15 ] }"), output, &o) == AZ_OK);
-    az_const_span x = az_const_span_sub(az_to_const_span(output), 0, o);
+    az_const_span x = az_const_span_sub(az_span_to_const_span(output), 0, o);
     TEST_ASSERT(az_const_span_eq(x, AZ_STR("{\"a\":[true,{\"b\":[{}]},0]}")));
   }
   {
@@ -308,7 +308,7 @@ int main() {
         "]]]]] ]]]");
     az_result const result = read_write(json, output, &o);
     TEST_ASSERT(result == AZ_OK);
-    az_const_span x = az_const_span_sub(az_to_const_span(output), 0, o);
+    az_const_span x = az_const_span_sub(az_span_to_const_span(output), 0, o);
     TEST_ASSERT(az_const_span_eq(
         x,
         AZ_STR( //
@@ -356,7 +356,7 @@ int main() {
           "{ \"somejson\": true }");
       az_result const result = az_http_request_to_buffer(&request, (az_span)AZ_SPAN(buffer), &out);
       TEST_ASSERT(result == AZ_OK);
-      TEST_ASSERT(az_const_span_eq(az_to_const_span(out), expected));
+      TEST_ASSERT(az_const_span_eq(az_span_to_const_span(out), expected));
     }
     // HTTP Builder with policies.
     {
@@ -379,8 +379,46 @@ int main() {
             = az_http_request_to_buffer(&new_request, (az_span)AZ_SPAN(buffer), &out);
         TEST_ASSERT(result == AZ_OK);
       }
-      TEST_ASSERT(az_const_span_eq(az_to_const_span(out), expected));
+      TEST_ASSERT(az_const_span_eq(az_span_to_const_span(out), expected));
     }
+  }
+  {
+    az_const_span const expected = AZ_STR("@###copy#copy#make some zero-terminated strings#make "
+                                          "some\0zero-terminated\0strings\0####@");
+
+    uint8_t buf[87];
+    assert(expected.size == sizeof(buf));
+    for (size_t i = 0; i < sizeof(buf); ++i) {
+      buf[i] = '@';
+    }
+
+    az_span actual = { .begin = &buf, .size = sizeof(buf) };
+    az_span_set((az_span){ .begin = actual.begin + 1, .size = actual.size - 2 }, '#');
+
+    az_span result;
+
+    char const phrase1[] = "copy";
+    memcpy(actual.begin + 4, &phrase1, sizeof(phrase1) - 1);
+    az_span_copy(
+        (az_span){ .begin = actual.begin + 9, .size = 4 },
+        (az_const_span){ .begin = actual.begin + 4, .size = 4 },
+        &result);
+
+    char const phrase2[] = "make some zero-terminated strings";
+    memcpy(actual.begin + 14, &phrase2, sizeof(phrase2) - 1);
+
+    az_const_span const make_some = (az_const_span){ .begin = actual.begin + 14, .size = 9 };
+    az_const_span const zero_terminated = (az_const_span){ .begin = actual.begin + 24, .size = 15 };
+    az_const_span const strings = (az_const_span){ .begin = actual.begin + 40, .size = 7 };
+
+    az_span_to_c_str((az_span){ .begin = actual.begin + 48, .size = 10}, make_some, &result);
+    az_span_to_c_str((az_span){ .begin = actual.begin + 58, .size = 16}, zero_terminated, &result);
+    az_span_to_c_str((az_span){ .begin = actual.begin + 74, .size = 8 }, strings, &result);
+
+    result.begin[result.size - 1] = '$';
+    az_span_to_c_str(result, strings, &result);
+
+    TEST_ASSERT(az_const_span_eq(az_span_to_const_span(actual), expected));
   }
   return exit_code;
 }
