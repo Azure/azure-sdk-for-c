@@ -134,20 +134,11 @@ az_span_move(az_span const buffer, az_const_span const src, az_span * const out_
   return AZ_OK;
 }
 
-AZ_INLINE uint8_t * az_span_end(az_span const span) { return span.begin + span.size; }
-
-AZ_INLINE uint8_t const * az_const_span_end(az_const_span const span) {
-  return span.begin + span.size;
-}
-
 AZ_INLINE bool az_const_span_is_overlap(az_const_span const a, az_const_span const b) {
-  uint8_t const * const a_begin = a.begin;
-  uint8_t const * const a_end = az_const_span_end(a);
-  uint8_t const * const b_begin = b.begin;
-  uint8_t const * const b_end = az_const_span_end(b);
-
   return (!az_const_span_is_empty(a) && !az_const_span_is_empty(b))
-      && ((a_begin < b_begin && a_end > b_begin) || (b_begin < a_begin && b_end > a_begin));
+      && ((a.begin < b.begin && (a.begin + a.size - 1) >= b.begin)
+          || (b.begin < a.begin && (b.begin + b.size - 1) >= a.begin)
+          || (a.begin == b.begin));
 }
 
 AZ_INLINE bool az_span_is_overlap(az_span const a, az_span const b) {
