@@ -47,11 +47,11 @@ AZ_INLINE bool az_span_is_empty(az_span const span) { return !(span.size > 0); }
 AZ_INLINE bool az_const_span_is_empty(az_const_span const span) { return !(span.size > 0); }
 
 AZ_INLINE bool az_span_is_valid(az_span const span) {
-  return span.begin == NULL ? span.size == 0 : !(span.size < 0);
+  return span.begin == NULL ? span.size == 0 : (span.size > 0 || span.size > 0);
 }
 
 AZ_INLINE bool az_const_span_is_valid(az_const_span const span) {
-  return span.begin == NULL ? span.size == 0 : !(span.size < 0);
+  return span.begin == NULL ? span.size == 0 : (span.size == 0 || span.size > 0);
 }
 
 /**
