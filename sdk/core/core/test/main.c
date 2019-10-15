@@ -390,7 +390,7 @@ int main() {
       buf[i] = '@';
     }
 
-    az_span actual = { .begin = &buf, .size = sizeof(buf) };
+    az_span actual = { .begin = (uint8_t *)&buf, .size = sizeof(buf) };
     az_span_set((az_span){ .begin = actual.begin + 1, .size = actual.size - 2 }, '#');
 
     az_span result;
@@ -409,8 +409,8 @@ int main() {
     az_const_span const zero_terminated = (az_const_span){ .begin = actual.begin + 24, .size = 15 };
     az_const_span const strings = (az_const_span){ .begin = actual.begin + 40, .size = 7 };
 
-    az_span_to_c_str((az_span){ .begin = actual.begin + 48, .size = 10}, make_some, &result);
-    az_span_to_c_str((az_span){ .begin = actual.begin + 58, .size = 16}, zero_terminated, &result);
+    az_span_to_c_str((az_span){ .begin = actual.begin + 48, .size = 10 }, make_some, &result);
+    az_span_to_c_str((az_span){ .begin = actual.begin + 58, .size = 16 }, zero_terminated, &result);
     az_span_to_c_str((az_span){ .begin = actual.begin + 74, .size = 8 }, strings, &result);
 
     result.begin[result.size - 1] = '$';

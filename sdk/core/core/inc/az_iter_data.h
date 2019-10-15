@@ -10,7 +10,7 @@
  * Generic data for any polymorphic iterator.
  *
  * The assumption is that one pointer points to an immutable container and another one is used
- * for iteration (mutable field). 
+ * for iteration (mutable field).
  *
  * Examples:
  * - span iterator:
