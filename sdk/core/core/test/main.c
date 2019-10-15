@@ -330,13 +330,13 @@ int main() {
       { .key = AZ_STR("hello"), .value = AZ_STR("world!") },
       { .key = AZ_STR("x"), .value = AZ_STR("42") },
     };
-    az_span const query = AZ_SPAN(query_array);
+    az_pair_span const query = AZ_SPAN(query_array);
     //
     az_pair const headers_array[] = {
       { .key = AZ_STR("some"), .value = AZ_STR("xml") },
       { .key = AZ_STR("xyz"), .value = AZ_STR("very_long") },
     };
-    az_span const headers = AZ_SPAN(headers_array);
+    az_pair_span const headers = AZ_SPAN(headers_array);
     //
     az_http_request const request = {
       .method = AZ_STR("GET"),

@@ -5,40 +5,11 @@
 #define AZ_HTTP_REQUEST_H
 
 #include <az_contract.h>
-#include <az_iter_data.h>
 #include <az_pair.h>
 #include <az_span.h>
 #include <az_str.h>
 
 #include <_az_cfg_prefix.h>
-
-typedef ptrdiff_t az_callback_data;
-
-#define AZ_CAT(A, B) A##B
-
-#define AZ_CALLBACK_ARG(NAME) AZ_CAT(NAME, _arg)
-
-#define AZ_CALLBACK_DECL(NAME, ARG) \
-  typedef ARG AZ_CALLBACK_ARG(NAME); \
-  typedef struct { \
-    az_result (*func)(az_callback_data const, ARG const); \
-    az_callback_data data; \
-  } NAME;
-
-#define AZ_CALLBACK_DATA(NAME, DATA, CALLBACK) \
-  AZ_STATIC_ASSERT(sizeof(DATA) <= sizeof(az_callback_data)) \
-  AZ_INLINE CALLBACK NAME(DATA const data, az_result (* const func)(DATA const, AZ_CALLBACK_ARG(CALLBACK) const)) { \
-    return (CALLBACK){ \
-      .func = (az_result (*)(az_callback_data, AZ_CALLBACK_ARG(CALLBACK)))func, \
-      .data = (az_callback_data)data, \
-    }; \
-  }
-
-AZ_CALLBACK_DECL(az_pair_visitor, az_pair);
-
-AZ_CALLBACK_DECL(az_pair_seq, az_pair_visitor);
-
-az_pair_seq az_pair_span_to_seq(az_pair_span const * const p_span);
 
 // request
 
