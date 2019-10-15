@@ -208,7 +208,7 @@ AZ_INLINE az_result az_span_swap(az_span const a, az_span const b) {
   if (!az_span_is_empty(a)) {
     uint8_t * a_ptr = a.begin;
     uint8_t * b_ptr = b.begin;
-    uint8_t const * const a_end = az_span_end(a);
+    uint8_t const * const a_end = a.begin + a.size;
     do {
       uint8_t const old_a = *a_ptr;
       *a_ptr = *b_ptr;
@@ -216,7 +216,7 @@ AZ_INLINE az_result az_span_swap(az_span const a, az_span const b) {
 
       ++a_ptr;
       ++b_ptr;
-    } while (a_ptr <= a_end);
+    } while (a_ptr < a_end);
   }
 
   return AZ_OK;
