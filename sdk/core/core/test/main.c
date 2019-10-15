@@ -390,20 +390,20 @@ int main() {
       buf[i] = '@';
     }
 
-    az_span actual = { .begin = (uint8_t *)&buf, .size = sizeof(buf) };
+    az_span actual = { .begin = buf, .size = sizeof(buf) };
     az_span_set((az_span){ .begin = actual.begin + 1, .size = actual.size - 2 }, '#');
 
     az_span result;
 
     char const phrase1[] = "copy";
-    memcpy(actual.begin + 4, &phrase1, sizeof(phrase1) - 1);
+    memcpy(actual.begin + 4, phrase1, sizeof(phrase1) - 1);
     az_span_copy(
         (az_span){ .begin = actual.begin + 9, .size = 4 },
         (az_const_span){ .begin = actual.begin + 4, .size = 4 },
         &result);
 
     char const phrase2[] = "make some zero-terminated strings";
-    memcpy(actual.begin + 14, &phrase2, sizeof(phrase2) - 1);
+    memcpy(actual.begin + 14, phrase2, sizeof(phrase2) - 1);
 
     az_const_span const make_some = (az_const_span){ .begin = actual.begin + 14, .size = 9 };
     az_const_span const zero_terminated = (az_const_span){ .begin = actual.begin + 24, .size = 15 };
