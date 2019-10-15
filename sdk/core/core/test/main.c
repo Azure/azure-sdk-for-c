@@ -354,7 +354,7 @@ int main() {
           "{ \"somejson\": true }");
       az_result const result = az_http_request_to_buffer(&request, (az_span)AZ_SPAN(buffer), &out);
       TEST_ASSERT(result == AZ_OK);
-      TEST_ASSERT(az_const_span_eq(az_to_const_span(out), expected));
+      TEST_ASSERT(az_const_span_eq(az_span_to_const_span(out), expected));
     }
     // HTTP Builder with policies.
     {
@@ -377,7 +377,7 @@ int main() {
             = az_http_request_to_buffer(&new_request, (az_span)AZ_SPAN(buffer), &out);
         TEST_ASSERT(result == AZ_OK);
       }
-      TEST_ASSERT(az_const_span_eq(az_to_const_span(out), expected));
+      TEST_ASSERT(az_const_span_eq(az_span_to_const_span(out), expected));
     }
   }
   return exit_code;
