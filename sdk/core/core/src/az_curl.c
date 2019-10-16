@@ -20,7 +20,7 @@ az_result az_headers_to_curl(az_headers_data * const p_state, az_pair const pair
     AZ_STR(": "),
     pair.value,
   };
-  az_span_span const span = AZ_SPAN(&*header);
+  az_span_span const span = AZ_SPAN(header);
   az_span_seq const seq = az_span_span_to_seq(&span);
   size_t size;
   AZ_RETURN_IF_FAILED(az_span_seq_size(seq, &size));
