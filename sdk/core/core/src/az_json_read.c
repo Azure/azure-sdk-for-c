@@ -427,3 +427,29 @@ az_result az_json_state_done(az_json_state const * const p_state) {
   }
   return AZ_OK;
 }
+
+az_result az_json_get_object_member_value(
+    az_const_span const json,
+    az_const_span const name,
+    az_json_value * const out_value) {
+  AZ_CONTRACT_ARG_NOT_NULL(out_value);
+  if (!az_const_span_is_valid(json) || !az_const_span_is_valid(name)) {
+    return AZ_ERROR_ARG;
+  }
+
+  az_json_state state = az_json_state_create(json);
+  az_json_value value;
+  AZ_RETURN_IF_FAILED(az_json_read(&state, &value));
+
+  if (value.kind == AZ_JSON_VALUE_OBJECT) {
+    az_json_member member;
+    while (az_json_read_object_member(&state, &member) != AZ_JSON_ERROR_NO_MORE_ITEMS) {
+      if (az_const_span_eq(member.name, name)) {
+        *out_value = member.value;
+        return AZ_OK;
+      }
+    }
+  }
+
+  return AZ_JSON_ERROR_NOT_FOUND;
+}
