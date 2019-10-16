@@ -6,7 +6,7 @@
 
 #include <_az_cfg_prefix.h>
 
-typedef ptrdiff_t az_callback_data;
+typedef void * az_callback_data;
 
 #define AZ_CAT(A, B) A##B
 
