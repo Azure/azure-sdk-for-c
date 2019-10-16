@@ -46,4 +46,6 @@ typedef struct {
   az_http_policy * const p_policies;
 } az_http_pipeline;
 
+#include <_az_cfg_suffix.h>
+
 #endif
