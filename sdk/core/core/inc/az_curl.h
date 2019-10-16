@@ -5,6 +5,7 @@
 #define AZ_CURL_H
 
 #include <az_http_request.h>
+
 #include <curl/curl.h>
 
 #include <_az_cfg_prefix.h>

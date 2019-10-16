@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include <az_span_seq.h>
 #include <az_http_request.h>
 #include <az_json_read.h>
 #include <az_span_reader.h>
@@ -361,6 +362,21 @@ int main() {
       az_span out = az_write_span_iter_result(&wi);
       TEST_ASSERT(az_const_span_eq(az_span_to_const_span(out), expected));
     }
+  }
+
+  // span seq size
+  {
+    az_const_span const array[] = {
+      AZ_STR("Hello"),
+      AZ_STR(" "),
+      AZ_STR("world!"),
+    };
+    az_span_span const span = AZ_SPAN(array);
+    az_span_seq const seq = az_span_span_to_seq(&span);
+    size_t s = 42;
+    az_result const result = az_span_seq_size(seq, &s);
+    TEST_ASSERT(result == AZ_OK);
+    TEST_ASSERT(s == 12);
   }
 
   {
