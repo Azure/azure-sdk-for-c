@@ -11,7 +11,7 @@ if(NOT CURL_FOUND)
   find_package(CURL REQUIRED)
 endif()
 
-add_library (az_core src/az_json_read.c src/az_http_request.c src/az_pair.c src/az_write_span_iter.c)
+add_library (az_core src/az_json_read.c src/az_http_request.c src/az_pair.c src/az_write_span_iter.c src/az_curl.c)
 
 if(MSVC)
   target_compile_options(az_core PRIVATE /W4 /WX)
@@ -33,6 +33,8 @@ add_executable (curl_easy_perform_poc test/curl_easy_perform_poc.c)
 target_link_libraries(curl_easy_perform_poc PRIVATE 
   az_core 
   CURL::libcurl)
+
+target_link_libraries(az_core PRIVATE CURL::libcurl)
 
 if (UNIX)
   target_link_libraries(az_core_test PRIVATE m)

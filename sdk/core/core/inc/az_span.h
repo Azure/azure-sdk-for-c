@@ -256,6 +256,21 @@ az_span_to_c_str(az_span const buffer, az_const_span const src, az_span * const 
 #define AZ_SPAN(ARRAY) \
   { .begin = ARRAY, .size = AZ_ARRAY_SIZE(ARRAY) }
 
+/**
+ * ```c
+ * typedef struct {
+ *   az_result (*func)(ptrdiff_t, az_const_span);
+ *   ptrdiff_t data;
+ * } az_span_visitor;
+ * ```
+ *
+ * Example of usage
+ *
+ * ```c
+ * az_span_visitor const visitor = ...;
+ * visitor.func(visitor.data, AZ_CONST_SPAN("Something"));
+ * ```
+ */
 AZ_CALLBACK_DECL(az_span_visitor, az_const_span)
 
 #include <_az_cfg_suffix.h>

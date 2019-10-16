@@ -57,6 +57,7 @@ az_result az_http_request_to_spans(
     AZ_RETURN_IF_FAILED(spans.func(spans.data, p_request->method));
     AZ_RETURN_IF_FAILED(spans.func(spans.data, AZ_STR(" ")));
     AZ_RETURN_IF_FAILED(spans.func(spans.data, p_request->path));
+    // query parameters
     {
       az_query_state state = {
         .spans = spans,
@@ -65,6 +66,7 @@ az_result az_http_request_to_spans(
       az_pair_visitor const pair_visitor
           = az_query_state_to_pair_visitor(&state, az_query_to_spans);
       az_pair_seq const query = p_request->query;
+      // for each query parameter apply `pair_visitor`
       AZ_RETURN_IF_FAILED(query.func(query.data, pair_visitor));
     }
     AZ_RETURN_IF_FAILED(spans.func(spans.data, AZ_STR(" HTTP/1.1" AZ_CRLF)));
