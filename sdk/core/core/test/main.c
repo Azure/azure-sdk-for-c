@@ -1,10 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_span_seq.h>
 #include <az_http_request.h>
 #include <az_json_read.h>
 #include <az_span_reader.h>
+#include <az_span_seq.h>
 #include <az_write_span_iter.h>
 
 #include <assert.h>
@@ -377,6 +377,23 @@ int main() {
     az_result const result = az_span_seq_size(seq, &s);
     TEST_ASSERT(result == AZ_OK);
     TEST_ASSERT(s == 12);
+  }
+
+  // span seq to new str
+  {
+    az_const_span const array[] = {
+      AZ_STR("Hello"),
+      AZ_STR(" "),
+      AZ_STR("world!"),
+    };
+    az_span_span const span = AZ_SPAN(array);
+    az_span_seq const seq = az_span_span_to_seq(&span);
+    //
+    char * p;
+    az_result const result = az_span_seq_to_new_str(seq, &p);
+    TEST_ASSERT(result == AZ_OK);
+    TEST_ASSERT(strcmp(p, "Hello world!") == 0);
+    free(p);
   }
 
   {

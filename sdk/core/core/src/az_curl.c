@@ -3,6 +3,7 @@
 
 #include <az_callback.h>
 #include <az_curl.h>
+#include <az_span_seq.h>
 
 #include <_az_cfg.h>
 
@@ -14,6 +15,15 @@ AZ_CALLBACK_DATA(az_create_headers_callback, az_headers_data *, az_pair_visitor)
 
 az_result az_headers_to_curl(az_headers_data * const p_state, az_pair const pair) {
   printf("\nSet header: %s:%s", pair.key.begin, pair.value.begin);
+  az_const_span const header[3] = {
+    pair.key,
+    AZ_STR(": "),
+    pair.value,
+  };
+  az_span_span const span = AZ_SPAN(&*header);
+  az_span_seq const seq = az_span_span_to_seq(&span);
+  size_t size;
+  AZ_RETURN_IF_FAILED(az_span_seq_size(seq, &size));
   p_state->p_list = curl_slist_append(p_state->p_list, "TODO: JOIN_KEY_AND_VALUE_HERE");
   return AZ_OK;
 }

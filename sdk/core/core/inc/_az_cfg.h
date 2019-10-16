@@ -7,6 +7,10 @@
 
 // warning C4996: This function or variable may be unsafe. Consider using ..._s instead.
 #pragma warning(disable : 4996)
+
+// warning C4221: nonstandard extension used: '...': cannot be initialized using address of automatic variable '...'
+#pragma warning(disable: 4221)
+
 #endif
 
 #ifndef AZ_CFG_H
