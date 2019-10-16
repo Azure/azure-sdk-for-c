@@ -11,7 +11,12 @@ if(NOT CURL_FOUND)
   find_package(CURL REQUIRED)
 endif()
 
-add_library (az_core src/az_json_read.c src/az_http_request.c src/az_pair.c)
+add_library (
+  az_core
+  src/az_json_read.c
+  src/az_http_request.c
+  src/az_pair.c
+  src/az_curl_adapter.c)
 
 if(MSVC)
   target_compile_options(az_core PRIVATE /W4 /WX)
@@ -34,6 +39,12 @@ target_link_libraries(curl_easy_perform_poc PRIVATE
   az_core 
   CURL::libcurl)
 
+# azure http to curl poc
+add_executable (az_http_to_curl_poc test/az_http_request_to_curl_poc.c)
+target_link_libraries(az_http_to_curl_poc PRIVATE 
+  az_core 
+  CURL::libcurl)
+
 if (MOCK_CURL)
   MESSAGE("Will mocked all calls to http client with static responses")
   add_definitions(-DMOCK_CURL="MOCK")
@@ -42,6 +53,7 @@ endif()
 if (UNIX)
   target_link_libraries(az_core_test PRIVATE m)
   target_link_libraries(curl_easy_perform_poc PRIVATE m)
+  target_link_libraries(az_http_to_curl_poc PRIVATE m)
 endif()
 
 add_test(NAME az_core_test COMMAND az_core_test)

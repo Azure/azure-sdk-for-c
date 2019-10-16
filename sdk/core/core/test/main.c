@@ -367,7 +367,7 @@ int main() {
           "\r\n"
           "{ \"somejson\": true }");
       az_http_standard_headers s;
-      { 
+      {
         az_result const result = az_http_standard_headers_policy(&request, &s);
         TEST_ASSERT(result == AZ_OK);
       }

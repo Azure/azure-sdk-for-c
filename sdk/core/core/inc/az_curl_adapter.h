@@ -4,41 +4,19 @@
 #ifndef AZ_CURL_ADAPTER
 #define AZ_CURL_ADAPTER
 
-#include <stdio.h>
-#include <curl/curl.h>
+#include <az_http_request.h>
 #include <az_span.h>
+#include <curl/curl.h>
+#include <stdio.h>
 
-CURL *curl;
+CURL * curl;
+CURLcode res;
+struct curl_slist * chunk = NULL;
 
-az_result az_http_client_init_impl() {
-    curl = curl_easy_init();
-    curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1l);
-    return AZ_OK;
-}
-
-az_result az_http_client_set_URL_impl(az_const_span span) {
-    curl_easy_setopt(curl, CURLOPT_URL, span.begin);
-}
-
-az_result az_http_client_download_to_file_impl(az_const_span path) {
-    FILE *f;
-    f = fopen(path.begin, "wb");
-    int result;
-
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, f);
-    result = curl_easy_perform(curl);
-    fclose(f);
-
-    if (result == CURLE_OK) {
-        return AZ_OK;
-    } else {
-        return AZ_ERROR_HTTP_CLIENT_ERROR;
-    }
-}
-
-az_result az_http_client_clean_impl() {
-    curl_easy_cleanup(curl);
-    return AZ_OK;
-}
+az_result az_http_client_init_impl();
+az_result az_http_client_set_URL_impl(az_const_span span);
+az_result az_http_client_download_to_file_impl(az_const_span path);
+az_result az_http_client_clean_impl();
+az_result az_http_client_send_impl(az_http_request const * const request);
 
 #endif
