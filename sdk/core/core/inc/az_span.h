@@ -4,10 +4,10 @@
 #ifndef AZ_SPAN_H
 #define AZ_SPAN_H
 
+#include <az_callback.h>
 #include <az_contract.h>
 #include <az_result.h>
 #include <az_static_assert.h>
-#include <az_callback.h>
 
 #include <limits.h>
 #include <stdbool.h>
