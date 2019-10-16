@@ -3,39 +3,36 @@
 
 #include <stdio.h>
 
-#include <curl/curl.h>
-
 #include <_az_cfg.h>
+#include <az_curl.h>
 
-int main(int _, char ** argv) {
-  CURL * curl;
-  curl = curl_easy_init();
-  int result;
+int exit_code = 0;
 
-  FILE * f;
-  f = fopen("here.jpg", "wb");
+int main() {
+  az_pair const query_array[] = {
+    { .key = AZ_STR("hello"), .value = AZ_STR("world!") },
+    { .key = AZ_STR("x"), .value = AZ_STR("42") },
+  };
+  az_pair_span const query = AZ_SPAN(query_array);
+  //
+  az_pair const headers_array[] = {
+    { .key = AZ_STR("some"), .value = AZ_STR("xml") },
+    { .key = AZ_STR("xyz"), .value = AZ_STR("very_long") },
+  };
+  az_pair_span const headers = AZ_SPAN(headers_array);
+  //
+  az_http_request const request = {
+    .method = AZ_STR("GET"),
+    .path = AZ_STR("/foo"),
+    .query = az_pair_span_to_seq(&query),
+    .headers = az_pair_span_to_seq(&headers),
+    .body = AZ_STR("{ \"somejson\": true }"),
+  };
 
-  printf("\n1...");
+  az_curl p_c;
+  az_curl_init(&p_c);
+  az_curl_http_request(&p_c, &request);
+  az_curl_done(&p_c);
 
-  curl_easy_setopt(
-      curl,
-      CURLOPT_URL,
-      "http://www.laboratoons.com/wp-content/uploads/2018/11/Alternativas-A.jpg");
-  curl_easy_setopt(curl, CURLOPT_WRITEDATA, f);
-  curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1l);
-
-  result = curl_easy_perform(curl);
-
-  if (result == CURLE_OK) {
-    printf("\n Done.");
-  } else {
-    printf("\n Error: %s\n", curl_easy_strerror(result));
-  }
-
-  // clean up
-  fclose(f);
-  curl_easy_cleanup(curl);
-
-  printf("Hello world");
-  return _;
+  return exit_code;
 }
