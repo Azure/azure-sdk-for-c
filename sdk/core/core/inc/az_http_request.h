@@ -11,8 +11,6 @@
 
 #include <_az_cfg_prefix.h>
 
-// request
-
 typedef struct {
   az_const_span method;
   az_const_span path;
@@ -24,17 +22,6 @@ typedef struct {
 az_result az_http_request_to_spans(
     az_http_request const * const p_request,
     az_span_visitor const span_visitor);
-
-typedef struct {
-  az_pair_seq headers;
-} az_http_standard_policy;
-
-/**
- * Note: `*p_request` should not be used after `*out` is destroyed.
- */
-az_result az_http_standard_policy_create(
-    az_http_request * const p_request,
-    az_http_standard_policy * const out);
 
 #include <_az_cfg_suffix.h>
 
