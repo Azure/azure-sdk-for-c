@@ -23,10 +23,10 @@ typedef struct {
 } az_pair_span;
 
 /// @az_pair_visitor is a callback with one argument @az_pair.
-AZ_CALLBACK_DECL(az_pair_visitor, az_pair);
+AZ_CALLBACK_DECL(az_pair_visitor, az_pair)
 
 /// @az_pair_seq is a @az_pair sequence visitor. 
-AZ_CALLBACK_DECL(az_pair_seq, az_pair_visitor);
+AZ_CALLBACK_DECL(az_pair_seq, az_pair_visitor)
 
 /**
  * Creates @az_pair_seq from @az_pair_span.
