@@ -5,23 +5,21 @@
 
 #include <_az_cfg.h>
 
-az_result _az_pair_span_iter_func(az_pair_iter * const p_i, az_pair * const out) {
-  AZ_CONTRACT_ARG_NOT_NULL(p_i);
-  AZ_CONTRACT_ARG_NOT_NULL(out);
+AZ_CALLBACK_DATA(az_pair_span_to_seq_data, az_pair_span const *, az_pair_seq)
 
-  az_pair const * const begin = p_i->data.begin;
-  az_pair const * const end = p_i->data.end;
-  if (begin == end) {
-    return AZ_ERROR_EOF;
+az_result az_pair_span_to_seq_func(
+    az_pair_span const * const context,
+    az_pair_visitor const visitor) {
+  AZ_CONTRACT_ARG_NOT_NULL(context);
+
+  size_t const size = context->size;
+  az_pair const * begin = context->begin;
+  for (size_t i = 0; i < size; ++i) {
+    AZ_RETURN_IF_FAILED(visitor.func(visitor.data, begin[i]));
   }
-  *out = *begin;
-  p_i->data.begin = begin + 1;
   return AZ_OK;
 }
 
-az_pair_iter az_pair_span_to_iter(az_pair_span const span) {
-  return (az_pair_iter){
-    .func = _az_pair_span_iter_func,
-    .data = { .begin = span.begin, .end = span.begin + span.size },
-  };
+az_pair_seq az_pair_span_to_seq(az_pair_span const * const p_span) {
+  return az_pair_span_to_seq_data(p_span, az_pair_span_to_seq_func);
 }
