@@ -61,6 +61,7 @@ az_result az_curl_sed_request(az_curl * const p_curl, az_http_request const * co
   char * url;
   AZ_RETURN_IF_FAILED(az_http_url_to_new_str(p_request, &url));
   curl_easy_setopt(p_curl->p_curl, CURLOPT_URL, url);
+  free(url);
 
   CURLcode res = curl_easy_perform(p_curl->p_curl);
   if (res != CURLE_OK)
