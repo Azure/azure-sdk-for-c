@@ -11,6 +11,8 @@
 
 #include <_az_cfg_prefix.h>
 
+#include <stdlib.h>
+
 typedef struct {
   az_const_span method;
   az_const_span path;
@@ -22,6 +24,14 @@ typedef struct {
 az_result az_http_request_to_spans(
     az_http_request const * const p_request,
     az_span_visitor const span_visitor);
+
+az_result az_http_url_to_spans(
+    az_http_request const * const p_request,
+    az_span_visitor const span_visitor);
+
+az_result az_http_get_url_size(az_http_request const * const p_request, size_t * out);
+
+az_result az_http_url_to_new_str(az_http_request const * const p_request, char ** const out);
 
 #include <_az_cfg_suffix.h>
 
