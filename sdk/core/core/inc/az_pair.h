@@ -7,6 +7,7 @@
 #include <az_callback.h>
 #include <az_contract.h>
 #include <az_span.h>
+#include <az_callback.h>
 
 #include <_az_cfg_prefix.h>
 
