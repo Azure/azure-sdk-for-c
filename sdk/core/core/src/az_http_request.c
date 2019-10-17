@@ -4,6 +4,7 @@
 #include <az_http_request.h>
 
 #include <az_contract.h>
+#include <az_span_seq.h>
 #include <az_str.h>
 #include <az_write_span_iter.h>
 
@@ -86,5 +87,56 @@ az_result az_http_request_to_spans(
   // body.
   AZ_RETURN_IF_FAILED(spans.func(spans.data, p_request->body));
 
+  return AZ_OK;
+}
+
+az_result az_http_url_to_spans(
+    az_http_request const * const p_request,
+    az_span_visitor const spans) {
+  AZ_CONTRACT_ARG_NOT_NULL(p_request);
+
+  // host path
+  {
+    AZ_RETURN_IF_FAILED(spans.func(spans.data, p_request->path));
+    // query parameters
+    {
+      az_query_state state = {
+        .spans = spans,
+        .separator = AZ_STR("?"),
+      };
+      az_pair_visitor const pair_visitor
+          = az_query_state_to_pair_visitor(&state, az_query_to_spans);
+      az_pair_seq const query = p_request->query;
+      // for each query parameter apply `pair_visitor`
+      AZ_RETURN_IF_FAILED(query.func(query.data, pair_visitor));
+    }
+  }
+  return AZ_OK;
+}
+
+AZ_CALLBACK_DATA(az_size_callback, size_t *, az_span_visitor)
+
+az_result az_http_get_url_size(az_http_request const * const p_request, size_t * out) {
+  return az_http_url_to_spans(p_request, az_size_callback(out, az_span_add_size));
+}
+
+az_result az_http_url_to_new_str(az_http_request const * const p_request, char ** const out) {
+  *out = NULL;
+  size_t size = 0;
+  AZ_RETURN_IF_FAILED(az_http_get_url_size(p_request, &size));
+  size += 1;
+  uint8_t * const p = (uint8_t *)malloc(size);
+  if (p == NULL) {
+    return AZ_ERROR_OUT_OF_MEMORY;
+  }
+  az_write_span_iter i = az_write_span_iter_create((az_span){ .begin = p, .size = size });
+  az_span_visitor sv = az_write_span_iter_to_span_visitor(&i);
+  az_result const result = az_http_url_to_spans(p_request, sv);
+  az_write_span_iter_write(&i, AZ_STR("\0"));
+  if (az_failed(result)) {
+    free(p);
+    return result;
+  }
+  *out = (char *)p;
   return AZ_OK;
 }

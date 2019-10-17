@@ -4,7 +4,10 @@
 #ifndef AZ_CURL_H
 #define AZ_CURL_H
 
+#include <_az_cfg.h>
+#include <az_callback.h>
 #include <az_http_request.h>
+#include <az_span_seq.h>
 
 #include <curl/curl.h>
 

@@ -10,8 +10,8 @@ int exit_code = 0;
 
 int main() {
   az_pair const query_array[] = {
-    { .key = AZ_STR("hello"), .value = AZ_STR("world!") },
-    { .key = AZ_STR("x"), .value = AZ_STR("42") },
+    { .key = AZ_STR("arg1"), .value = AZ_STR("curl_arg1") },
+    { .key = AZ_STR("arg2"), .value = AZ_STR("curl_arg2") },
   };
   az_pair_span const query = AZ_SPAN(query_array);
   //
