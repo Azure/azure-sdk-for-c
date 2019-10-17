@@ -10,6 +10,7 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 int exit_code = 0;
 
@@ -361,6 +362,34 @@ int main() {
       TEST_ASSERT(result == AZ_OK);
       az_span out = az_write_span_iter_result(&wi);
       TEST_ASSERT(az_const_span_eq(az_span_to_const_span(out), expected));
+    }
+    {
+      printf("----Test: az_http_request_to_url_span\n");
+      az_write_span_iter wi = az_write_span_iter_create((az_span)AZ_SPAN(buffer));
+      az_span_visitor sv = az_write_span_iter_to_span_visitor(&wi);
+      az_const_span const expected = AZ_STR("/foo?hello=world!&x=42");
+      az_result const result = az_http_url_to_spans(&request, sv);
+      TEST_ASSERT(result == AZ_OK);
+      az_span out = az_write_span_iter_result(&wi);
+      TEST_ASSERT(az_const_span_eq(az_span_to_const_span(out), expected));
+    }
+    // url size
+    {
+      printf("----Test: az_http_get_url_size\n");
+      size_t x = 0;
+      size_t const expected = 22;
+      az_result const result = az_http_get_url_size(&request, &x);
+      TEST_ASSERT(result == AZ_OK);
+      TEST_ASSERT(expected == x);
+    }
+    // url to str
+    {
+      printf("----Test: az_http_url_to_new_str\n");
+      char * p;
+      az_result const result = az_http_url_to_new_str(&request, &p);
+      TEST_ASSERT(result == AZ_OK);
+      TEST_ASSERT(strcmp(p, "/foo?hello=world!&x=42") == 0);
+      free(p);
     }
   }
 
