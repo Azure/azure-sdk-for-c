@@ -16,7 +16,7 @@ add_library (az_core
 	src/az_http_request.c 
 	src/az_pair.c 
 	src/az_write_span_iter.c 
-	src/az_curl.c
+	src/az_curl_adapter.c
 	src/az_span_seq.c)
 
 if(MSVC)
@@ -41,6 +41,11 @@ target_link_libraries(curl_easy_perform_poc PRIVATE
   CURL::libcurl)
 
 target_link_libraries(az_core PRIVATE CURL::libcurl)
+
+if (MOCK_CURL)
+  MESSAGE("Will mock all calls to http client with static responses")
+  add_definitions(-DMOCK_CURL="MOCK")
+endif()
 
 if (UNIX)
   target_link_libraries(az_core_test PRIVATE m)

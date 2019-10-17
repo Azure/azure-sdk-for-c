@@ -1,15 +1,17 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef AZ_CURL_H
-#define AZ_CURL_H
+#ifndef AZ_CURL_ADAPTER_H
+#define AZ_CURL_ADAPTER__H
 
 #include <_az_cfg.h>
 #include <az_callback.h>
 #include <az_http_request.h>
 #include <az_span_seq.h>
+#include <az_write_span_iter.h>
 
 #include <curl/curl.h>
+#include <stdlib.h>
 
 #include <_az_cfg_prefix.h>
 
@@ -34,7 +36,8 @@ AZ_INLINE az_result az_curl_done(az_curl * const p) {
   return AZ_OK;
 }
 
-az_result az_curl_http_request(az_curl * const p, az_http_request const * const p_request);
+az_result az_send_request_impl(az_http_request const * const p_request);
+az_result az_curl_sed_request(az_curl * const p_curl, az_http_request const * const p_request);
 
 #include <_az_cfg_suffix.h>
 
