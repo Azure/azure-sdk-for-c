@@ -21,8 +21,6 @@ az_result az_headers_to_curl(az_headers_data * const p_state, az_pair const pair
   char * str_header;
   AZ_RETURN_IF_FAILED(az_span_seq_to_new_str(tokens_seq, &str_header));
 
-  // printf("\nSet header: %s", str_header); TODO: add this to logging level verbose
-
   p_state->p_list = curl_slist_append(p_state->p_list, str_header);
 
   free(str_header);
@@ -47,7 +45,7 @@ az_result az_send_request_impl(az_http_request const * const p_request) {
   return result;
 }
 
-az_result az_curl_sed_request(az_curl * const p_curl, az_http_request const * const p_request) {
+az_result az_curl_send_request(az_curl * const p_curl, az_http_request const * const p_request) {
   // creates a slist for bulding curl headers
   az_headers_data headers = {
     .p_list = NULL,

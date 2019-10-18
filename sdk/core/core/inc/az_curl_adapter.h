@@ -37,7 +37,7 @@ AZ_INLINE az_result az_curl_done(az_curl * const p) {
 }
 
 az_result az_send_request_impl(az_http_request const * const p_request);
-az_result az_curl_sed_request(az_curl * const p_curl, az_http_request const * const p_request);
+az_result az_curl_send_request(az_curl * const p_curl, az_http_request const * const p_request);
 
 #include <_az_cfg_suffix.h>
 

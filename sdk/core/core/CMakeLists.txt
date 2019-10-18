@@ -12,12 +12,12 @@ if(NOT CURL_FOUND)
 endif()
 
 add_library (az_core 
-	src/az_json_read.c 
-	src/az_http_request.c 
-	src/az_pair.c 
-	src/az_write_span_iter.c 
-	src/az_curl_adapter.c
-	src/az_span_seq.c)
+  src/az_curl_adapter.c
+  src/az_http_request.c
+  src/az_json_read.c
+  src/az_pair.c
+  src/az_span_seq.c
+	src/az_write_span_iter.c)
 
 if(MSVC)
   target_compile_options(az_core PRIVATE /W4 /WX)
