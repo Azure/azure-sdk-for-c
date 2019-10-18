@@ -36,14 +36,19 @@ az_result az_query_to_spans(az_query_state * const p, az_pair const pair) {
   return AZ_OK;
 }
 
+az_result az_build_header(az_pair const * header, az_span_visitor const visitor) {
+  AZ_RETURN_IF_FAILED(visitor.func(visitor.data, header->key));
+  AZ_RETURN_IF_FAILED(visitor.func(visitor.data, AZ_STR(": ")));
+  AZ_RETURN_IF_FAILED(visitor.func(visitor.data, header->value));
+  return AZ_OK;
+}
+
 AZ_CALLBACK_DATA(az_span_visitor_to_pair_visitor, az_span_visitor const *, az_pair_visitor)
 
 az_result az_header_to_spans(az_span_visitor const * const p, az_pair const pair) {
   AZ_CONTRACT_ARG_NOT_NULL(p);
 
-  AZ_RETURN_IF_FAILED(p->func(p->data, pair.key));
-  AZ_RETURN_IF_FAILED(p->func(p->data, AZ_STR(": ")));
-  AZ_RETURN_IF_FAILED(p->func(p->data, pair.value));
+  AZ_RETURN_IF_FAILED(az_build_header(&pair, *p));
   AZ_RETURN_IF_FAILED(p->func(p->data, az_crlf));
   return AZ_OK;
 }

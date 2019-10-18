@@ -33,6 +33,8 @@ az_result az_http_get_url_size(az_http_request const * const p_request, size_t *
 
 az_result az_http_url_to_new_str(az_http_request const * const p_request, char ** const out);
 
+az_result az_build_header(az_pair const * header, az_span_visitor const visitor);
+
 #include <_az_cfg_suffix.h>
 
 #endif

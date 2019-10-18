@@ -3,23 +3,18 @@
 
 #include <az_curl_adapter.h>
 
+AZ_CALLBACK_DATA(az_pair_callback, az_pair const *, az_span_seq)
+
 typedef struct {
   struct curl_slist * p_list;
 } az_headers_data;
 
 AZ_CALLBACK_DATA(az_create_headers_callback, az_headers_data *, az_pair_visitor)
 
-az_result az_headers_to_curl(az_headers_data * const p_state, az_pair const pair) {
-  az_const_span const header_tokens[] = {
-    pair.key,
-    AZ_STR(": "),
-    pair.value,
-  };
-  az_span_span const tokens_span = AZ_SPAN(header_tokens);
-  az_span_seq const tokens_seq = az_span_span_to_seq(&tokens_span);
-
+az_result az_headers_to_curl(az_headers_data * const p_state, az_pair const header) {
+  const az_span_seq token_seq = az_pair_callback(&header, az_build_header);
   char * str_header;
-  AZ_RETURN_IF_FAILED(az_span_seq_to_new_str(tokens_seq, &str_header));
+  AZ_RETURN_IF_FAILED(az_span_seq_to_new_str(token_seq, &str_header));
 
   p_state->p_list = curl_slist_append(p_state->p_list, str_header);
 
@@ -40,7 +35,7 @@ az_result az_build_headers(az_http_request const * const p_request, az_headers_d
 az_result az_send_request_impl(az_http_request const * const p_request) {
   az_curl p_curl;
   AZ_RETURN_IF_FAILED(az_curl_init(&p_curl));
-  az_result result = az_curl_sed_request(&p_curl, p_request);
+  az_result result = az_curl_send_request(&p_curl, p_request);
   az_curl_done(&p_curl);
   return result;
 }
