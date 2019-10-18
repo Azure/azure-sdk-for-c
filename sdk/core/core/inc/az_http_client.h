@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #ifndef AZ_HTTP_CLIENT_H
-#define AZ_HTTP_CLIENT__H
+#define AZ_HTTP_CLIENT_H
 
 #ifdef MOCK_CURL
 #include <az_mock_curl.h>
