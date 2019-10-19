@@ -508,8 +508,9 @@ int main() {
             &b64_encoded5, &b64_encoded6, &b64_encoded_bin1, &b64_encoded_bin2, &b64_encoded_bin3 };
 
     az_const_span const * const url_encoded_input[]
-        = { &b64_encoded0u, &b64_encoded1u, &b64_encoded2u,     &b64_encoded3u,     &b64_encoded4u,
-            &b64_encoded5u, &b64_encoded6u, &b64_encoded_bin1u, &b64_encoded_bin2u, &b64_encoded_bin3u };
+        = { &b64_encoded0u,     &b64_encoded1u,    &b64_encoded2u, &b64_encoded3u,
+            &b64_encoded4u,     &b64_encoded5u,    &b64_encoded6u, &b64_encoded_bin1u,
+            &b64_encoded_bin2u, &b64_encoded_bin3u };
 
     for (size_t i = 0; i < 10; ++i) {
       az_base64_encode(false, buffer, *decoded_input[i], &result);

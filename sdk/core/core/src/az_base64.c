@@ -81,6 +81,27 @@ AZ_INLINE uint8_t uint6_as_base64(bool const base64url, uint8_t const uint6) {
   }
 }
 
+AZ_INLINE uint8_t base64_as_uint6(uint8_t const base64) {
+  if (BASE64_RANGE1_MIN <= base64 && base64 <= BASE64_RANGE1_MAX) {
+    return BASE64_RANGE1_START + (base64 - BASE64_RANGE1_MIN);
+  } else if (BASE64_RANGE2_MIN <= base64 && base64 <= BASE64_RANGE2_MAX) {
+    return BASE64_RANGE2_START + (base64 - BASE64_RANGE2_MIN);
+  } else if (BASE64_RANGE3_MIN <= base64 && base64 <= BASE64_RANGE3_MAX) {
+    return BASE64_RANGE3_START + (base64 - BASE64_RANGE3_MIN);
+  } else {
+    switch (base64) {
+      case BASE64_CHAR63:
+      case BASE64_CHAR63_URL:
+        return BASE64_CHAR63_INDEX;
+      case BASE64_CHAR64:
+      case BASE64_CHAR64_URL:
+        return BASE64_CHAR64_INDEX;
+      default:
+        return (uint8_t)BASE64_INVALID_VALUE;
+    }
+  }
+}
+
 az_result az_base64_encode(
     bool const base64url,
     az_span const buffer,
@@ -160,27 +181,6 @@ az_result az_base64_encode(
 
   *out_result = result;
   return AZ_OK;
-}
-
-AZ_INLINE uint8_t base64_as_uint6(uint8_t const base64) {
-  if (BASE64_RANGE1_MIN <= base64 && base64 <= BASE64_RANGE1_MAX) {
-    return BASE64_RANGE1_START + (base64 - BASE64_RANGE1_MIN);
-  } else if (BASE64_RANGE2_MIN <= base64 && base64 <= BASE64_RANGE2_MAX) {
-    return BASE64_RANGE2_START + (base64 - BASE64_RANGE2_MIN);
-  } else if (BASE64_RANGE3_MIN <= base64 && base64 <= BASE64_RANGE3_MAX) {
-    return BASE64_RANGE3_START + (base64 - BASE64_RANGE3_MIN);
-  } else {
-    switch (base64) {
-      case BASE64_CHAR63:
-      case BASE64_CHAR63_URL:
-        return BASE64_CHAR63_INDEX;
-      case BASE64_CHAR64:
-      case BASE64_CHAR64_URL:
-        return BASE64_CHAR64_INDEX;
-      default:
-        return (uint8_t)BASE64_INVALID_VALUE;
-    }
-  }
 }
 
 az_result az_base64_decode(
