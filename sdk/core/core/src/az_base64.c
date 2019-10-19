@@ -60,7 +60,7 @@ enum {
   BASE64_CHAR64_URL = '_',
   BASE64_CHAR64_INDEX = BASE64_CHAR63_INDEX + 1,
 
-  BASE64_INVALID_VALUE = ~0,
+  BASE64_INVALID_VALUE = (uint8_t)~0,
   BASE64_PADDING_CHAR = '=',
 
   BASE64_MAP_SIZE = (sizeof(to_base64) - sizeof((uint8_t)'\0')),
