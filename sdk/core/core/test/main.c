@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include <az_base64.h>
 #include <az_http_request.h>
 #include <az_json_read.h>
 #include <az_span_reader.h>
@@ -423,6 +424,106 @@ int main() {
     az_span_to_c_str(result, strings, &result);
 
     TEST_ASSERT(az_const_span_eq(az_span_to_const_span(actual), expected));
+  }
+  {
+    az_const_span const decoded0 = AZ_STR("");
+    az_const_span const decoded1 = AZ_STR("1");
+    az_const_span const decoded2 = AZ_STR("12");
+    az_const_span const decoded3 = AZ_STR("123");
+    az_const_span const decoded4 = AZ_STR("1234");
+    az_const_span const decoded5 = AZ_STR("12345");
+    az_const_span const decoded6 = AZ_STR("123456");
+
+    az_const_span const encoded0 = AZ_STR("");
+    az_const_span const encoded1 = AZ_STR("MQ==");
+    az_const_span const encoded2 = AZ_STR("MTI=");
+    az_const_span const encoded3 = AZ_STR("MTIz");
+    az_const_span const encoded4 = AZ_STR("MTIzNA==");
+    az_const_span const encoded5 = AZ_STR("MTIzNDU=");
+    az_const_span const encoded6 = AZ_STR("MTIzNDU2");
+
+    az_const_span const encoded0u = AZ_STR("");
+    az_const_span const encoded1u = AZ_STR("MQ");
+    az_const_span const encoded2u = AZ_STR("MTI");
+    az_const_span const encoded3u = AZ_STR("MTIz");
+    az_const_span const encoded4u = AZ_STR("MTIzNA");
+    az_const_span const encoded5u = AZ_STR("MTIzNDU");
+    az_const_span const encoded6u = AZ_STR("MTIzNDU2");
+
+    az_const_span const encoded_bin1
+        = AZ_STR("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/");
+
+    az_const_span const encoded_bin1u
+        = AZ_STR("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_");
+
+    uint8_t const decoded_bin1_buf[]
+        = { 0x00, 0x10, 0x83, 0x10, 0x51, 0x87, 0x20, 0x92, 0x8B, 0x30, 0xD3, 0x8F,
+            0x41, 0x14, 0x93, 0x51, 0x55, 0x97, 0x61, 0x96, 0x9B, 0x71, 0xD7, 0x9F,
+            0x82, 0x18, 0xA3, 0x92, 0x59, 0xA7, 0xA2, 0x9A, 0xAB, 0xB2, 0xDB, 0xAF,
+            0xC3, 0x1C, 0xB3, 0xD3, 0x5D, 0xB7, 0xE3, 0x9E, 0xBB, 0xF3, 0xDF, 0xBF };
+
+    az_const_span const decoded_bin1
+        = { .begin = decoded_bin1_buf, .size = sizeof(decoded_bin1_buf) };
+
+    az_const_span const encoded_bin2
+        = AZ_STR("/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+zQ==");
+
+    az_const_span const encoded_bin2u
+        = AZ_STR("_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-zQ");
+
+    uint8_t const decoded_bin2_buf[]
+        = { 0xFC, 0x00, 0x42, 0x0C, 0x41, 0x46, 0x1C, 0x82, 0x4A, 0x2C, 0xC3, 0x4E, 0x3D,
+            0x04, 0x52, 0x4D, 0x45, 0x56, 0x5D, 0x86, 0x5A, 0x6D, 0xC7, 0x5E, 0x7E, 0x08,
+            0x62, 0x8E, 0x49, 0x66, 0x9E, 0x8A, 0x6A, 0xAE, 0xCB, 0x6E, 0xBF, 0x0C, 0x72,
+            0xCF, 0x4D, 0x76, 0xDF, 0x8E, 0x7A, 0xEF, 0xCF, 0x7E, 0xCD };
+
+    az_const_span const decoded_bin2
+        = { .begin = decoded_bin2_buf, .size = sizeof(decoded_bin2_buf) };
+
+    az_const_span const encoded_bin3
+        = AZ_STR("V/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+zQ=");
+
+    az_const_span const encoded_bin3u
+        = AZ_STR("V_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-zQ");
+
+    uint8_t const decoded_bin3_buf[]
+        = { 0x57, 0xF0, 0x01, 0x08, 0x31, 0x05, 0x18, 0x72, 0x09, 0x28, 0xB3, 0x0D, 0x38,
+            0xF4, 0x11, 0x49, 0x35, 0x15, 0x59, 0x76, 0x19, 0x69, 0xB7, 0x1D, 0x79, 0xF8,
+            0x21, 0x8A, 0x39, 0x25, 0x9A, 0x7A, 0x29, 0xAA, 0xBB, 0x2D, 0xBA, 0xFC, 0x31,
+            0xCB, 0x3D, 0x35, 0xDB, 0x7E, 0x39, 0xEB, 0xBF, 0x3D, 0xFB, 0x34 };
+
+    az_const_span const decoded_bin3
+        = { .begin = decoded_bin3_buf, .size = sizeof(decoded_bin3_buf) };
+
+    uint8_t buf[68];
+    az_span const buffer = { .begin = buf, .size = sizeof(buf) };
+    az_const_span result;
+
+    az_const_span const * const decoded_input[]
+        = { &decoded0, &decoded1, &decoded2,     &decoded3,     &decoded4,
+            &decoded5, &decoded6, &decoded_bin1, &decoded_bin2, &decoded_bin3 };
+
+    az_const_span const * const encoded_input[]
+        = { &encoded0, &encoded1, &encoded2,     &encoded3,     &encoded4,
+            &encoded5, &encoded6, &encoded_bin1, &encoded_bin2, &encoded_bin3 };
+
+    az_const_span const * const url_encoded_input[]
+        = { &encoded0u, &encoded1u, &encoded2u,     &encoded3u,     &encoded4u,
+            &encoded5u, &encoded6u, &encoded_bin1u, &encoded_bin2u, &encoded_bin3u };
+
+    for (size_t i = 0; i < 10; ++i) {
+      az_base64_encode(false, buffer, *decoded_input[i], &result);
+      TEST_ASSERT(az_const_span_eq(result, *encoded_input[i]));
+
+      az_base64_decode(buffer, *encoded_input[i], &result);
+      TEST_ASSERT(az_const_span_eq(result, *decoded_input[i]));
+
+      az_base64_encode(true, buffer, *decoded_input[i], &result);
+      TEST_ASSERT(az_const_span_eq(result, *url_encoded_input[i]));
+
+      az_base64_decode(buffer, *url_encoded_input[i], &result);
+      TEST_ASSERT(az_const_span_eq(result, *decoded_input[i]));
+    }
   }
   return exit_code;
 }

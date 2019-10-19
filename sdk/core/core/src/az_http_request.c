@@ -11,9 +11,6 @@
 
 #define AZ_CRLF "\r\n"
 
-AZ_STATIC_ASSERT('\r' == 13)
-AZ_STATIC_ASSERT('\n' == 10)
-
 static az_const_span const az_crlf = AZ_CONST_STR(AZ_CRLF);
 
 typedef struct {

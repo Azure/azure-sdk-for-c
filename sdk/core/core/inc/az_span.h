@@ -4,12 +4,11 @@
 #ifndef AZ_SPAN_H
 #define AZ_SPAN_H
 
+#include <az_callback.h>
 #include <az_contract.h>
 #include <az_result.h>
 #include <az_static_assert.h>
-#include <az_callback.h>
 
-#include <limits.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
@@ -37,9 +36,6 @@ typedef struct {
   uint8_t * begin;
   size_t size;
 } az_span;
-
-AZ_STATIC_ASSERT(CHAR_BIT == 8)
-AZ_STATIC_ASSERT(sizeof(uint8_t) == 1)
 
 typedef az_result az_result_byte;
 
@@ -174,7 +170,7 @@ az_span_copy(az_span const buffer, az_const_span const src, az_span * const out_
   return AZ_OK;
 }
 
-AZ_INLINE az_span az_span_drop(az_span const span, size_t n) {
+AZ_INLINE az_span az_span_drop(az_span const span, size_t const n) {
   if (span.size <= n) {
     return (az_span){ .begin = NULL, .size = 0 };
   }
@@ -188,7 +184,7 @@ AZ_INLINE az_span az_span_take(az_span const span, size_t n) {
   return (az_span){ .begin = span.begin, .size = n };
 }
 
-AZ_INLINE az_result az_span_set(az_span const span, uint8_t fill) {
+AZ_INLINE az_result az_span_set(az_span const span, uint8_t const fill) {
   if (!az_span_is_valid(span)) {
     return AZ_ERROR_ARG;
   }
@@ -250,6 +246,12 @@ az_span_to_c_str(az_span const buffer, az_const_span const src, az_span * const 
 
   return AZ_OK;
 }
+
+az_result az_span_replace(
+    az_span const buffer,
+    az_const_span const src,
+    uint8_t (*const func)(uint8_t const),
+    az_span * const out_result);
 
 #define AZ_ARRAY_SIZE(ARRAY) (sizeof(ARRAY) / sizeof(*ARRAY))
 
