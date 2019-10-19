@@ -20,17 +20,14 @@ az_result az_span_replace(
     return AZ_ERROR_BUFFER_OVERFLOW;
   }
 
-  size_t first_index = 0;
-  size_t last_index = src.size - 1;
-  signed int increment = +1;
   if (az_const_span_is_overlap(az_span_to_const_span(buffer), src) && buffer.begin > src.begin) {
-    first_index = last_index;
-    last_index = 0;
-    increment = -1;
-  }
-
-  for (size_t i = first_index; i <= last_index; i += increment) {
-    buffer.begin[i] = func(src.begin[i]);
+    for (size_t ri = src.size; ri > 0; --ri) {
+      buffer.begin[ri - 1] = func(src.begin[ri - 1]);
+    }
+  } else {
+    for (size_t i = 0; i < src.size; ++i) {
+      buffer.begin[i] = func(src.begin[i]);
+    }
   }
 
   *out_result = (az_span){ .begin = buffer.begin, .size = src.size };

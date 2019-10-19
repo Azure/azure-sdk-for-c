@@ -35,10 +35,6 @@ enum {
   TRIBYTE_OCTET2_SEXTET2_RSHIFT = 6,
 };
 
-static uint8_t const to_base64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                   "abcdefghijklmnopqrstuvwxyz"
-                                   "0123456789";
-
 enum {
   BASE64_RANGE1_MIN = 'A',
   BASE64_RANGE1_MAX = 'Z',
@@ -62,25 +58,26 @@ enum {
 
   BASE64_INVALID_VALUE = (uint8_t)~0,
   BASE64_PADDING_CHAR = '=',
-
-  BASE64_MAP_SIZE = (sizeof(to_base64) - sizeof((uint8_t)'\0')),
 };
 
-AZ_STATIC_ASSERT(BASE64_MAP_SIZE == BASE64_CHAR63_INDEX)
-AZ_STATIC_ASSERT(BASE64_CHAR64_INDEX == BASE64_CHAR63_INDEX + 1)
+AZ_STATIC_ASSERT(BASE64_CHAR64_INDEX == 63)
 
 AZ_INLINE uint8_t uint6_as_base64(bool const base64url, uint8_t const uint6) {
-  if (uint6 < BASE64_MAP_SIZE) {
-    return to_base64[uint6];
-  }
-
-  switch (uint6) {
-    case BASE64_CHAR63_INDEX:
-      return base64url ? BASE64_CHAR63_URL : BASE64_CHAR63;
-    case BASE64_CHAR64_INDEX:
-      return base64url ? BASE64_CHAR64_URL : BASE64_CHAR64;
-    default:
-      return BASE64_PADDING_CHAR;
+  if (BASE64_RANGE1_START <= uint6 && uint6 < BASE64_RANGE2_START) {
+    return BASE64_RANGE1_MIN + uint6 - BASE64_RANGE1_START;
+  } else if (BASE64_RANGE2_START <= uint6 && uint6 < BASE64_RANGE3_START) {
+    return BASE64_RANGE2_MIN + uint6 - BASE64_RANGE2_START;
+  } else if (BASE64_RANGE3_START <= uint6 && uint6 < BASE64_CHAR63_INDEX) {
+    return BASE64_RANGE3_MIN + uint6 - BASE64_RANGE3_START;
+  } else {
+    switch (uint6) {
+      case BASE64_CHAR63_INDEX:
+        return base64url ? BASE64_CHAR63_URL : BASE64_CHAR63;
+      case BASE64_CHAR64_INDEX:
+        return base64url ? BASE64_CHAR64_URL : BASE64_CHAR64;
+      default:
+        return BASE64_PADDING_CHAR;
+    }
   }
 }
 
@@ -197,18 +194,16 @@ az_result az_base64_decode(
   }
 
   size_t padding = 0;
-  {
-    for (size_t ri = input.size; ri > 0; --ri) {
-      if (input.begin[ri - 1] == BASE64_PADDING_CHAR) {
-        ++padding;
-      } else {
-        for (; ri > 0; --ri) {
-          if (base64_as_uint6(input.begin[ri - 1]) == BASE64_INVALID_VALUE) {
-            return AZ_ERROR_ARG;
-          }
+  for (size_t ri = input.size; ri > 0; --ri) {
+    if (input.begin[ri - 1] == BASE64_PADDING_CHAR) {
+      ++padding;
+    } else {
+      for (; ri > 0; --ri) {
+        if (base64_as_uint6(input.begin[ri - 1]) == BASE64_INVALID_VALUE) {
+          return AZ_ERROR_ARG;
         }
-        break;
       }
+      break;
     }
   }
 
