@@ -8,7 +8,6 @@
 #include <az_span.h>
 
 #include <stdbool.h>
-#include <stdint.h>
 
 #include <_az_cfg_prefix.h>
 
