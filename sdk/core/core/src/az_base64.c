@@ -63,7 +63,8 @@ enum {
 AZ_STATIC_ASSERT(BASE64_CHAR64_INDEX == 63)
 
 AZ_INLINE uint8_t uint6_as_base64(bool const base64url, uint8_t const uint6) {
-  if (BASE64_RANGE1_START <= uint6 && uint6 < BASE64_RANGE2_START) {
+  if (uint6 == BASE64_RANGE1_START
+      || (BASE64_RANGE1_START < uint6 && uint6 < BASE64_RANGE2_START)) {
     return BASE64_RANGE1_MIN + uint6 - BASE64_RANGE1_START;
   } else if (BASE64_RANGE2_START <= uint6 && uint6 < BASE64_RANGE3_START) {
     return BASE64_RANGE2_MIN + uint6 - BASE64_RANGE2_START;
