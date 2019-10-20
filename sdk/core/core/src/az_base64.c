@@ -77,6 +77,7 @@ AZ_INLINE uint8_t uint6_as_base64(bool const base64url, uint8_t const uint6) {
       case BASE64_CHAR64_INDEX:
         return base64url ? BASE64_CHAR64_URL : BASE64_CHAR64;
       default:
+        assert(uint6 < 64);
         return BASE64_PADDING_CHAR;
     }
   }

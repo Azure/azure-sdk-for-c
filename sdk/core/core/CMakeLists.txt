@@ -19,6 +19,7 @@ add_library (
     src/az_http_request.c
     src/az_pair.c
     src/az_span.c
+    src/az_uri.c
     src/az_write_span_iter.c
     )
 
