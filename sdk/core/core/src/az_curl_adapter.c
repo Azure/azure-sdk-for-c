@@ -110,7 +110,7 @@ int write_to_span(void * contents, size_t size, size_t nmemb, void * userp) {
   mem->begin[mem->size] = 0;
 
   // This callback needs to return the response size or curl will consider it as it failed
-  return realsize - 1;
+  return (int) realsize - 1;
 }
 
 /**
