@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #ifndef AZ_CURL_ADAPTER_H
-#define AZ_CURL_ADAPTER__H
+#define AZ_CURL_ADAPTER_H
 
 #include <_az_cfg.h>
 #include <az_callback.h>
