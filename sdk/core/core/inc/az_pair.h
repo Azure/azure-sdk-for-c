@@ -4,10 +4,9 @@
 #ifndef AZ_PAIR_H
 #define AZ_PAIR_H
 
-#include <az_callback.h>
+#include <az_functor.h>
 #include <az_contract.h>
 #include <az_span.h>
-#include <az_callback.h>
 
 #include <_az_cfg_prefix.h>
 
@@ -24,10 +23,10 @@ typedef struct {
 } az_pair_span;
 
 /// @az_pair_visitor is a callback with one argument @az_pair.
-AZ_CALLBACK_DECL(az_pair_visitor, az_pair)
+AZ_FUNCTOR_DECL(az_pair_visitor, az_pair)
 
 /// @az_pair_seq is a @az_pair sequence visitor.
-AZ_CALLBACK_DECL(az_pair_seq, az_pair_visitor)
+AZ_FUNCTOR_DECL(az_pair_seq, az_pair_visitor)
 
 /**
  * Creates @az_pair_seq from @az_pair_span.

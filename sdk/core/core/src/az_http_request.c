@@ -22,7 +22,7 @@ typedef struct {
   az_const_span separator;
 } az_query_state;
 
-AZ_CALLBACK_DATA(az_query_state_to_pair_visitor, az_query_state *, az_pair_visitor)
+AZ_FUNCTOR_DATA(az_query_state_to_pair_visitor, az_query_state *, az_pair_visitor)
 
 az_result az_query_to_spans(az_query_state * const p, az_pair const pair) {
   AZ_CONTRACT_ARG_NOT_NULL(p);
@@ -43,7 +43,7 @@ az_result az_build_header(az_pair const * header, az_span_visitor const visitor)
   return AZ_OK;
 }
 
-AZ_CALLBACK_DATA(az_span_visitor_to_pair_visitor, az_span_visitor const *, az_pair_visitor)
+AZ_FUNCTOR_DATA(az_span_visitor_to_pair_visitor, az_span_visitor const *, az_pair_visitor)
 
 az_result az_header_to_spans(az_span_visitor const * const p, az_pair const pair) {
   AZ_CONTRACT_ARG_NOT_NULL(p);
@@ -119,7 +119,7 @@ az_result az_http_url_to_spans(
   return AZ_OK;
 }
 
-AZ_CALLBACK_DATA(az_size_callback, size_t *, az_span_visitor)
+AZ_FUNCTOR_DATA(az_size_callback, size_t *, az_span_visitor)
 
 az_result az_http_get_url_size(az_http_request const * const p_request, size_t * out) {
   return az_http_url_to_spans(p_request, az_size_callback(out, az_span_add_size));

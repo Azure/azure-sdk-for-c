@@ -3,13 +3,13 @@
 
 #include <az_curl_adapter.h>
 
-AZ_CALLBACK_DATA(az_pair_callback, az_pair const *, az_span_seq)
+AZ_FUNCTOR_DATA(az_pair_callback, az_pair const *, az_span_seq)
 
 typedef struct {
   struct curl_slist * p_list;
 } az_headers_data;
 
-AZ_CALLBACK_DATA(az_create_headers_callback, az_headers_data *, az_pair_visitor)
+AZ_FUNCTOR_DATA(az_create_headers_callback, az_headers_data *, az_pair_visitor)
 
 az_result az_headers_to_curl(az_headers_data * const p_state, az_pair const header) {
   const az_span_seq token_seq = az_pair_callback(&header, az_build_header);

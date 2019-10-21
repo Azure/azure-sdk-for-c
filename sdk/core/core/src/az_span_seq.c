@@ -12,7 +12,7 @@
 
 //
 
-AZ_CALLBACK_DATA(az_span_span_callback, az_span_span const *, az_span_seq)
+AZ_FUNCTOR_DATA(az_span_span_callback, az_span_span const *, az_span_seq)
 
 az_result az_span_span_to_seq_func(
     az_span_span const * const context,
@@ -33,7 +33,7 @@ az_span_seq az_span_span_to_seq(az_span_span const * const p_span) {
 
 //
 
-AZ_CALLBACK_DATA(az_size_callback, size_t *, az_span_visitor)
+AZ_FUNCTOR_DATA(az_size_callback, size_t *, az_span_visitor)
 
 az_result az_span_add_size(size_t * const p_size, az_const_span const span) {
   *p_size += span.size;
