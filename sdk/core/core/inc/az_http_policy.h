@@ -31,20 +31,18 @@ typedef struct {
   az_span data;
 } az_http_response_data;
 
-az_result (*az_http_policy_process)(az_http_request * const p_request, az_http_response_data * const out);
+//PipelinePolicies must implement the process function
+// 
+typedef az_result (*az_http_policy_pfnc_process)(az_http_request * const p_request, az_http_response_data * const out);
 
 typedef struct {
   az_span data;
 } az_http_policy_data;
 
 typedef struct {
-  (*az_http_policy_process) process;
+  az_http_policy_pfnc_process pfnc_process;
   az_http_policy_data data;
 } az_http_policy;
-
-typedef struct {
-  az_http_policy * const p_policies;
-} az_http_pipeline;
 
 #include <_az_cfg_suffix.h>
 
