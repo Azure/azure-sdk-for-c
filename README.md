@@ -5,17 +5,45 @@
 This repository contains official Embedded C libraries for Azure services.
 
 ## Getting started
-To get started with a specific library, see the **README.md** file located in the library's project folder. You can find
-service libraries in the `/sdk` directory.
+
+To get started with a specific library, see the **README.md** file located in the library's project folder. You can find service libraries in the `/sdk` directory.
 
 ### Prerequisites
-- CMake version 3.12 or higher is required to use these libraries.
-- Vcpkg is required to download project dependencies.
-- On Linux/macOS, development headers for OpenSSL 1.1 are required to build the project.
+- CMake version 3.12 is required to use these libraries.
 
-### Building the SDK
-Follow the instructions in the [contributing guide](CONTRIBUTING.md) to build the SDK. The same instructions apply
-regardless of whether you wish to use the SDK in your project, or contribute to the SDK itself.
+### Development Environment
+Project contains files to work on Windows or Linux based OS.
+
+> Note: Project contains git submodules required to build. Before building run `git submodule update --init --recursive`
+
+#### Windows
+Use PowerShell to run {projectDir}/build.ps1
+
+> Note: Cmake will look for CURL within windows. Follow next steps to set up CURL using VCPKG:
+<br> - Clone vcpgk: `git clone https://github.com/Microsoft/vcpkg.git`
+<br> - cd vcpkg (consider this path as PATH_TO_VCPKG)
+<br> - .\bootstrap-vcpkg.bat
+<br> - vcpkg.exe install --triplet x64-windows-static curl[winssl]
+<br> - Add windows system variable: VCPKG_DEFAULT_TRIPLET=x64-windows-static
+<br> - Add windows system variable: VCPKG_ROOT=[PATH_TO_VCPKG] (replace PATH_TO_VCPKG for where vcpkg is installed)
+
+##### Visual Studio 2019
+When following previous steps to set up CURL with VCPKG, open project forlder with Visual Studio and everything will be ready to build and run tests.
+
+#### Linux
+- Install `openssl version 1.1.1`
+  - For ubuntu: ```sudo apt-get install libssl-dev```
+- Install `uuid`
+  - ```sudo apt-get install uuid-dev```
+
+##### steps to build
+```
+mkdir build
+build
+cmake ../
+make
+```
+> Note: use `cmake -Duse_default_uuid=ON ../` if no uuid-dev is installed in system
 
 ## Need help?
 * File an issue via [Github Issues](https://github.com/Azure/azure-sdk-for-c/issues/new/choose).
