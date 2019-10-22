@@ -29,12 +29,14 @@ AZ_CALLBACK_DECL(az_pair_visitor, az_pair)
 /// @az_pair_seq is a @az_pair sequence visitor.
 AZ_CALLBACK_DECL(az_pair_seq, az_pair_visitor)
 
+az_result az_pair_span_to_seq(az_pair_span const * const context, az_pair_visitor const visitor);
+
 /**
  * Creates @az_pair_seq from @az_pair_span.
  *
  * Note: the result of the function shouldn't be used after `*p_span` is destroyed.
  */
-az_pair_seq az_pair_span_to_seq(az_pair_span const * const p_span);
+AZ_CALLBACK_FUNC(az_pair_span_to_seq, az_pair_span const *, az_pair_seq)
 
 #include <_az_cfg_suffix.h>
 

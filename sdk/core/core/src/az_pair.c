@@ -5,9 +5,7 @@
 
 #include <_az_cfg.h>
 
-AZ_CALLBACK_DATA(az_pair_span_to_seq_data, az_pair_span const *, az_pair_seq)
-
-az_result az_pair_span_to_seq_func(
+az_result az_pair_span_to_seq(
     az_pair_span const * const context,
     az_pair_visitor const visitor) {
   AZ_CONTRACT_ARG_NOT_NULL(context);
@@ -18,8 +16,4 @@ az_result az_pair_span_to_seq_func(
     AZ_RETURN_IF_FAILED(visitor.func(visitor.data, begin[i]));
   }
   return AZ_OK;
-}
-
-az_pair_seq az_pair_span_to_seq(az_pair_span const * const p_span) {
-  return az_pair_span_to_seq_data(p_span, az_pair_span_to_seq_func);
 }

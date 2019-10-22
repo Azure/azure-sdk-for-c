@@ -344,14 +344,14 @@ int main() {
     az_http_request const request = {
       .method = AZ_STR("GET"),
       .path = AZ_STR("/foo"),
-      .query = az_pair_span_to_seq(&query),
-      .headers = az_pair_span_to_seq(&headers),
+      .query = az_pair_span_to_seq_callback(&query),
+      .headers = az_pair_span_to_seq_callback(&headers),
       .body = AZ_STR("{ \"somejson\": true }"),
     };
     uint8_t buffer[1024];
     {
       az_write_span_iter wi = az_write_span_iter_create((az_span)AZ_SPAN(buffer));
-      az_span_visitor sv = az_write_span_iter_to_span_visitor(&wi);
+      az_span_visitor sv = az_write_span_iter_write_callback(&wi);
       az_const_span const expected = AZ_STR( //
           "GET /foo?hello=world!&x=42 HTTP/1.1\r\n"
           "some: xml\r\n"
@@ -366,7 +366,7 @@ int main() {
     {
       printf("----Test: az_http_request_to_url_span\n");
       az_write_span_iter wi = az_write_span_iter_create((az_span)AZ_SPAN(buffer));
-      az_span_visitor sv = az_write_span_iter_to_span_visitor(&wi);
+      az_span_visitor sv = az_write_span_iter_write_callback(&wi);
       az_const_span const expected = AZ_STR("/foo?hello=world!&x=42");
       az_result const result = az_http_url_to_spans(&request, sv);
       TEST_ASSERT(result == AZ_OK);
@@ -401,7 +401,7 @@ int main() {
       AZ_STR("world!"),
     };
     az_span_span const span = AZ_SPAN(array);
-    az_span_seq const seq = az_span_span_to_seq(&span);
+    az_span_seq const seq = az_span_span_to_seq_callback(&span);
     size_t s = 42;
     az_result const result = az_span_seq_size(seq, &s);
     TEST_ASSERT(result == AZ_OK);
@@ -416,7 +416,7 @@ int main() {
       AZ_STR("world!"),
     };
     az_span_span const span = AZ_SPAN(array);
-    az_span_seq const seq = az_span_span_to_seq(&span);
+    az_span_seq const seq = az_span_span_to_seq_callback(&span);
     //
     char * p;
     az_result const result = az_span_seq_to_new_str(seq, &p);

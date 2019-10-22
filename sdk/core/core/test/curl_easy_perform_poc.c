@@ -23,8 +23,8 @@ int main() {
   az_http_request const request = {
     .method = AZ_STR("GET"),
     .path = AZ_STR("http://127.0.0.1:5000/test/yo"),
-    .query = az_pair_span_to_seq(&query),
-    .headers = az_pair_span_to_seq(&headers),
+    .query = az_pair_span_to_seq_callback(&query),
+    .headers = az_pair_span_to_seq_callback(&headers),
     .body = AZ_STR("{ \"somejson\": true }"),
   };
 
