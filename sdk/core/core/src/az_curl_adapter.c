@@ -8,8 +8,6 @@ typedef struct {
 } az_headers_data;
 
 AZ_CALLBACK_FUNC(az_headers_to_curl, az_headers_data *, az_pair_visitor)
-//AZ_CALLBACK_DATA(az_create_headers_callback, az_headers_data *, az_pair_visitor)
-//AZ_CALLBACK_DATA(az_pair_callback, az_pair const *, az_span_seq)
 
 az_result az_headers_to_curl(az_headers_data * const p_state, az_pair const header) {
   const az_span_seq token_seq = az_build_header_callback(&header);
