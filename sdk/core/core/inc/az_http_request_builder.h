@@ -15,7 +15,7 @@
 #define AZ_HTTP_REQUEST_DEFAULT_MAX_BODY_SIZE (AZ_HTTP_REQUEST_DEFAULT_URL_SIZE * 4)
 
 typedef struct {
-  uint8_t * buffer;
+  az_span * buffer;
   int16_t max_headers;
   int16_t max_url_size;
   az_const_span method_verb;
@@ -29,16 +29,25 @@ typedef struct {
   int16_t const min_buffer_size;
 } az_http_request_defaults;
 
+/**
+ * @brief format buffer as a http request containing headers, url and body. Url max size is
+ * initially set to a default size. use `az_http_request_builder_set_max_url_size` after init to
+ * change this value if required
+ *
+ * @param out
+ * @param buffer
+ * @param method_verb
+ * @return az_result
+ */
 az_result az_http_request_builder_init(
     az_http_request_builder * const out,
     az_span const buffer,
     az_const_span const method_verb);
 
-/*
 az_result az_http_request_builder_set_initial_url(
     az_http_request_builder * const p_builder,
     az_const_span const url);
-
+/*
 az_result az_http_request_builder_set_query_parameter(
     az_http_request_builder * const p_builder,
     az_const_span const name,
