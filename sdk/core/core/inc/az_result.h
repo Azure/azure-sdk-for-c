@@ -59,7 +59,6 @@ enum {
 
 AZ_STATIC_ASSERT(AZ_ERROR_EOF == EOF)
 AZ_STATIC_ASSERT(EOF == -1)
-AZ_STATIC_ASSERT(-1 == ~0)
 
 #include <_az_cfg_suffix.h>
 
