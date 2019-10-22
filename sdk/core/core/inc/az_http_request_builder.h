@@ -8,6 +8,7 @@
 
 #include <az_pair.h>
 #include <az_span.h>
+#include <az_write_span_iter.h>
 
 #define AZ_HTTP_REQUEST_DEFAULT_URL_SIZE 1024
 #define AZ_HTTP_REQUEST_DEFAULT_HEADER_SIZE sizeof(az_pair)

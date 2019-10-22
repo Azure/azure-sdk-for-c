@@ -35,6 +35,9 @@ az_result az_http_request_builder_init(
 az_result az_http_request_builder_set_initial_url(
     az_http_request_builder * const p_builder,
     az_const_span const url) {
+  az_write_span_iter builder = az_write_span_iter_create(*p_builder->buffer);
+  az_write_span_iter_write(&builder, url);
+  az_write_span_iter_result(&builder);
   return AZ_OK;
 }
 /*
