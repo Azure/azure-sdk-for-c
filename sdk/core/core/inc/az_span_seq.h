@@ -8,7 +8,7 @@
 
 #include <_az_cfg_prefix.h>
 
-AZ_CALLBACK_DECL(az_span_seq, az_span_visitor)
+AZ_CALLBACK_TYPE(az_span_seq, az_span_visitor)
 
 typedef struct {
   az_const_span const * begin;

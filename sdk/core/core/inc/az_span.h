@@ -272,7 +272,7 @@ az_span_to_c_str(az_span const buffer, az_const_span const src, az_span * const 
  * visitor.func(visitor.data, AZ_CONST_SPAN("Something"));
  * ```
  */
-AZ_CALLBACK_DECL(az_span_visitor, az_const_span)
+AZ_CALLBACK_TYPE(az_span_visitor, az_const_span)
 
 #include <_az_cfg_suffix.h>
 

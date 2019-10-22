@@ -22,8 +22,6 @@ typedef struct {
   az_const_span separator;
 } az_query_state;
 
-// AZ_CALLBACK_DATA(az_query_state_to_pair_visitor, az_query_state *, az_pair_visitor)
-
 AZ_CALLBACK_FUNC(az_query_to_spans, az_query_state *, az_pair_visitor)
 
 az_result az_query_to_spans(az_query_state * const p, az_pair const pair) {
@@ -44,8 +42,6 @@ az_result az_build_header(az_pair const * header, az_span_visitor const visitor)
   AZ_RETURN_IF_FAILED(visitor.func(visitor.data, header->value));
   return AZ_OK;
 }
-
-// AZ_CALLBACK_DATA(az_span_visitor_to_pair_visitor, az_span_visitor const *, az_pair_visitor)
 
 AZ_CALLBACK_FUNC(az_header_to_spans, az_span_visitor const *, az_pair_visitor)
 

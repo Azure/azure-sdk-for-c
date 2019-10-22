@@ -12,7 +12,7 @@ typedef void * az_callback_data;
 
 #define AZ_CALLBACK_ARG(NAME) AZ_CAT(NAME, _arg)
 
-#define AZ_CALLBACK_DECL(NAME, ARG) \
+#define AZ_CALLBACK_TYPE(NAME, ARG) \
   typedef ARG AZ_CALLBACK_ARG(NAME); \
   typedef struct { \
     az_result (*func)(az_callback_data const, ARG const); \
