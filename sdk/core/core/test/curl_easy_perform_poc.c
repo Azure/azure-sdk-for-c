@@ -23,8 +23,8 @@ int main() {
     .method = AZ_STR("POST"),
     .path
     = AZ_STR("https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47/oauth2/token"),
-    .query = az_pair_span_to_seq(&query),
-    .headers = az_pair_span_to_seq(&header),
+    .query = az_pair_span_to_seq_callback(&query),
+    .headers = az_pair_span_to_seq_callback(&header),
     .body = req_body,
   };
 
