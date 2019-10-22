@@ -9,6 +9,11 @@
 #include <az_pair.h>
 #include <az_span.h>
 
+#define AZ_HTTP_REQUEST_DEFAULT_URL_SIZE 1024
+#define AZ_HTTP_REQUEST_DEFAULT_HEADER_SIZE sizeof(az_pair)
+#define AZ_HTTP_REQUEST_DEFAULT_MAX_HEADERS 50
+#define AZ_HTTP_REQUEST_DEFAULT_MAX_BODY_SIZE (AZ_HTTP_REQUEST_DEFAULT_URL_SIZE * 4)
+
 typedef struct {
   uint8_t * buffer;
   int16_t max_headers;
@@ -18,11 +23,18 @@ typedef struct {
   int16_t headers_end;
 } az_http_request_builder;
 
+typedef struct {
+  int16_t const max_url_size;
+  int16_t const max_headers;
+  int16_t const min_buffer_size;
+} az_http_request_defaults;
+
 az_result az_http_request_builder_init(
     az_http_request_builder * const out,
     az_span const buffer,
     az_const_span const method_verb);
 
+/*
 az_result az_http_request_builder_set_initial_url(
     az_http_request_builder * const p_builder,
     az_const_span const url);
@@ -41,6 +53,14 @@ az_result az_http_request_builder_mark_retry_headers_start(
     az_http_request_builder * const p_builder);
 
 az_result az_http_request_builder_remove_retry_headers(az_http_request_builder * const p_builder);
+*/
+
+AZ_INLINE az_result az_http_request_builder_set_max_url_size(
+    az_http_request_builder * const p_builder,
+    int16_t const size) {
+  p_builder->max_url_size = size;
+  return AZ_OK;
+}
 
 #include <_az_cfg_suffix.h>
 

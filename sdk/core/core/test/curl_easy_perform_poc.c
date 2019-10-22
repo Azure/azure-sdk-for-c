@@ -45,7 +45,7 @@ int main() {
 
   /****** -------------  Create buffer for header auth ---------******/
   // can't print token right now since it is not 0-terminated
-  uint8_t const buffer[2000];
+  uint8_t buffer[sizeof("Bearer ")];
 
   /****** -------------  use Span builder to concatenate ---------******/
   az_span const buf = AZ_SPAN(buffer);

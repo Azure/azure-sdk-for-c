@@ -3,10 +3,11 @@
 
 #include <az_base64.h>
 #include <az_http_request.h>
+#include <az_http_request_builder.h>
 #include <az_json_read.h>
 #include <az_span_reader.h>
-#include <az_uri.h>
 #include <az_span_seq.h>
+#include <az_uri.h>
 #include <az_write_span_iter.h>
 
 #include <assert.h>
@@ -26,6 +27,7 @@ int exit_code = 0;
       exit_code = 1; \
     } \
   } while (false);
+#define TEST_LABEL(label) printf("-------> Test: %s \n", #label);
 
 az_result write(az_span const output, size_t * const o, az_const_span const s) {
   for (size_t i = 0; i != s.size; ++i, ++*o) {
@@ -489,7 +491,7 @@ int main() {
       TEST_ASSERT(az_const_span_eq(az_span_to_const_span(out), expected));
     }
     {
-      printf("----Test: az_http_request_to_url_span\n");
+      TEST_LABEL("az_http_request_to_url_span")
       az_write_span_iter wi = az_write_span_iter_create((az_span)AZ_SPAN(buffer));
       az_span_visitor sv = az_write_span_iter_to_span_visitor(&wi);
       az_const_span const expected = AZ_STR("/foo?hello=world!&x=42");
@@ -500,7 +502,7 @@ int main() {
     }
     // url size
     {
-      printf("----Test: az_http_get_url_size\n");
+      TEST_LABEL("az_http_get_url_size")
       size_t x = 0;
       size_t const expected = 22;
       az_result const result = az_http_get_url_size(&request, &x);
@@ -509,7 +511,7 @@ int main() {
     }
     // url to str
     {
-      printf("----Test: az_http_url_to_new_str\n");
+      TEST_LABEL("az_http_url_to_new_str")
       char * p;
       az_result const result = az_http_url_to_new_str(&request, &p);
       TEST_ASSERT(result == AZ_OK);
@@ -642,6 +644,24 @@ int main() {
 
     az_uri_decode(buffer, uri_encoded3, &result);
     TEST_ASSERT(az_const_span_eq(result, uri_decoded));
+  }
+  {
+    {
+      TEST_LABEL("min size for buffer error")
+      uint8_t buffer[100];
+      az_span buffer_span = AZ_SPAN(buffer);
+      az_http_request_builder builder;
+      az_result result = az_http_request_builder_init(&builder, buffer_span, AZ_STR("GET"));
+      TEST_ASSERT(result == AZ_ERROR_ARG);
+    }
+    {
+      TEST_LABEL("min size for buffer OK")
+      uint8_t buffer[1024 * 4];
+      az_span buffer_span = AZ_SPAN(buffer);
+      az_http_request_builder builder;
+      az_result result = az_http_request_builder_init(&builder, buffer_span, AZ_STR("GET"));
+      TEST_ASSERT(result == AZ_ERROR_ARG);
+    }
   }
   return exit_code;
 }
