@@ -17,7 +17,6 @@
 // request
 
 typedef struct {
-  az_http_pipeline pipeline;
   az_const_span method;
   az_const_span path;
   az_pair_iter query;

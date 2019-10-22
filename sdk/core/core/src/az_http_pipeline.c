@@ -16,7 +16,7 @@ az_result az_http_pipeline_build(az_http_request * p_request) { return AZ_OK; };
 az_result az_http_pipeline_next(az_http_pipeline * self) {
   if (self && self->pipeline_stage < self->num_policies) {
     self->pipeline_stage++;
-    return self->policies[pipeline_stage]();
+    return self.policies[pipeline_stage].pfnc_process();
   }
   return AZ_OK;
 }

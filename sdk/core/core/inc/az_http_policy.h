@@ -8,6 +8,7 @@
 #include <az_http_request.h>
 #include <az_iter_data.h>
 #include <az_pair.h>
+#include <az_result.h>
 #include <az_span.h>
 #include <az_str.h>
 
@@ -33,7 +34,7 @@ typedef struct {
 
 //PipelinePolicies must implement the process function
 // 
-typedef az_result (*az_http_policy_pfnc_process)(az_http_request * const p_request, az_http_response_data * const out);
+typedef az_result (*az_http_policy_pfnc_process)(az_http_request * p_request, az_http_response_data * out);
 
 typedef struct {
   az_span data;
