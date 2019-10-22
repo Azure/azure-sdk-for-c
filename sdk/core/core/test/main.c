@@ -645,33 +645,5 @@ int main() {
     az_uri_decode(buffer, uri_encoded3, &result);
     TEST_ASSERT(az_const_span_eq(result, uri_decoded));
   }
-  {
-    {
-      TEST_LABEL("min size for buffer error")
-      uint8_t buffer[100];
-      az_span buffer_span = AZ_SPAN(buffer);
-      az_http_request_builder builder;
-      az_result result = az_http_request_builder_init(&builder, &buffer_span, AZ_STR("GET"));
-      TEST_ASSERT(result == AZ_ERROR_ARG);
-    }
-    {
-      TEST_LABEL("min size for buffer OK")
-      uint8_t buffer[1024 * 4];
-      az_span buffer_span = AZ_SPAN(buffer);
-      az_http_request_builder builder;
-      az_result result = az_http_request_builder_init(&builder, &buffer_span, AZ_STR("GET"));
-      TEST_ASSERT(result == AZ_OK);
-    }
-    {
-      TEST_LABEL("write url to buffer")
-      uint8_t buffer[1024 * 4];
-      az_span buffer_span = AZ_SPAN(buffer);
-      az_http_request_builder builder;
-      az_result result = az_http_request_builder_init(&builder, &buffer_span, AZ_STR("GET"));
-      result = az_http_request_builder_set_initial_url(
-          &builder, AZ_STR("http://url.example.for.test/test?q=1"));
-      printf(".. %s", builder.buffer->begin);
-    }
-  }
   return exit_code;
 }
