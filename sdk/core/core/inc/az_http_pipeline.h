@@ -36,6 +36,8 @@ az_result az_http_pipeline_process(
     az_http_request * const request,
     az_http_response_data * const response);
 
+typedef az_result az_http_pipeline_next(az_http_pipeline * p_pipeline);
+
 #include <_az_cfg_suffix.h>
 
 #endif
