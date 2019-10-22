@@ -11,8 +11,11 @@
 
 #include <_az_cfg_prefix.h>
 
-AZ_INLINE az_result az_send_request_impl(az_http_request const * const p_request) {
-  printf("TO BE IMPLEMENTED");
+AZ_INLINE az_result az_send_request_impl(
+    az_http_request const * const p_request,
+    az_span * const response,
+    bool allow_allocate) {
+  printf("TO BE IMPLEMENTED, allocating opt: %b", allow_allocate);
   return AZ_OK;
 };
 
