@@ -12,11 +12,15 @@ if(NOT CURL_FOUND)
 endif()
 
 add_library (az_core 
+  src/az_assumptions.c
+  src/az_base64.c
   src/az_curl_adapter.c
   src/az_http_request.c
   src/az_json_read.c
   src/az_pair.c
+  src/az_span.c
   src/az_span_seq.c
+  src/az_uri.c
   src/az_write_span_iter.c)
 
 if(MSVC)
