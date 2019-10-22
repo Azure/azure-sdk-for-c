@@ -13,7 +13,7 @@
 #define AZ_HTTP_REQUEST_DEFAULT_URL_SIZE 1024
 #define AZ_HTTP_REQUEST_DEFAULT_HEADER_SIZE sizeof(az_pair)
 #define AZ_HTTP_REQUEST_DEFAULT_MAX_HEADERS 50
-#define AZ_HTTP_REQUEST_DEFAULT_MAX_BODY_SIZE (AZ_HTTP_REQUEST_DEFAULT_URL_SIZE * 4)
+#define AZ_HTTP_REQUEST_DEFAULT_MAX_BODY_SIZE (AZ_HTTP_REQUEST_DEFAULT_URL_SIZE * 1)
 
 typedef struct {
   az_span * buffer;
@@ -42,7 +42,7 @@ typedef struct {
  */
 az_result az_http_request_builder_init(
     az_http_request_builder * const out,
-    az_span const buffer,
+    az_span * const buffer,
     az_const_span const method_verb);
 
 az_result az_http_request_builder_set_initial_url(

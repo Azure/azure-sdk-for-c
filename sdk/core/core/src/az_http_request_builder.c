@@ -12,13 +12,13 @@ az_http_request_defaults const az_http_request_builder_defaults
 
 az_result az_http_request_builder_init(
     az_http_request_builder * const out,
-    az_span const buffer,
+    az_span * const buffer,
     az_const_span const method_verb) {
-  if (buffer.size < (size_t)az_http_request_builder_defaults.min_buffer_size) {
+  if (buffer->size < (size_t)az_http_request_builder_defaults.min_buffer_size) {
     return AZ_ERROR_ARG;
   }
   // set buffer
-  *out->buffer = buffer;
+  out->buffer = buffer;
   // set config
   out->max_url_size = az_http_request_builder_defaults.min_buffer_size;
   out->max_headers = az_http_request_builder_defaults.max_headers;
