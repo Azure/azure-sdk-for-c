@@ -31,7 +31,7 @@ az_result az_uri_encode(
     az_const_span * const out_result);
 
 /**
- * @brief _URI-Decode_ (a.k.a. _URL-Decode_): `this text` becomes `this%20text`.
+ * @brief _URI-Decode_ (a.k.a. _URL-Decode_): `this%20text` becomes `this text`.
  *
  * @param buffer a buffer to put the `out_result` in.
  * @param input an input to decode.
