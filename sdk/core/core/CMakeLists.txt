@@ -11,7 +11,8 @@ if(NOT CURL_FOUND)
   find_package(CURL REQUIRED)
 endif()
 
-add_library (az_core 
+add_library (
+  az_core
   src/az_assumptions.c
   src/az_base64.c
   src/az_curl_adapter.c
@@ -21,7 +22,8 @@ add_library (az_core
   src/az_span.c
   src/az_span_seq.c
   src/az_uri.c
-  src/az_write_span_iter.c)
+  src/az_write_span_iter.c
+  )
 
 if(MSVC)
   target_compile_options(az_core PRIVATE /W4 /WX)

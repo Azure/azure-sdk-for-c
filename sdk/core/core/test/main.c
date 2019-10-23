@@ -491,7 +491,7 @@ int main() {
     {
       printf("----Test: az_http_request_to_url_span\n");
       az_write_span_iter wi = az_write_span_iter_create((az_span)AZ_SPAN(buffer));
-      az_span_visitor sv = az_write_span_iter_write_callback(&wi);
+      az_span_visitor sv = az_write_span_iter_to_span_visitor(&wi);
       az_const_span const expected = AZ_STR("/foo?hello=world!&x=42");
       az_result const result = az_http_url_to_spans(&request, sv);
       TEST_ASSERT(result == AZ_OK);
@@ -526,7 +526,7 @@ int main() {
       AZ_STR("world!"),
     };
     az_span_span const span = AZ_SPAN(array);
-    az_span_seq const seq = az_span_span_to_seq_callback(&span);
+    az_span_seq const seq = az_span_span_to_seq(&span);
     size_t s = 42;
     az_result const result = az_span_seq_size(seq, &s);
     TEST_ASSERT(result == AZ_OK);
@@ -541,7 +541,7 @@ int main() {
       AZ_STR("world!"),
     };
     az_span_span const span = AZ_SPAN(array);
-    az_span_seq const seq = az_span_span_to_seq_callback(&span);
+    az_span_seq const seq = az_span_span_to_seq(&span);
     //
     char * p;
     az_result const result = az_span_seq_to_new_str(seq, &p);
