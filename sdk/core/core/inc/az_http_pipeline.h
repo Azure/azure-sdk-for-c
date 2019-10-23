@@ -16,9 +16,9 @@
 #include <_az_cfg_prefix.h>
 
 typedef struct {
-  az_http_policy const []policies;
-  uint16_t num_policies;
-  uint16_t pipeline_stage;
+  az_http_policy policies[10];
+  int num_policies;
+  int pipeline_stage;
 
   //Each policy calls next
   typedef az_result (*az_http_pipeline_next)(az_http_pipeline const * pipeline, az_http_request const * p_request);
