@@ -16,7 +16,7 @@ AZ_INLINE az_result az_send_request_impl(
     az_span * const response,
     bool allow_allocate) {
   printf("TO BE IMPLEMENTED, allocating opt: %b", allow_allocate);
-  return AZ_OK;
+  return AZ_ERROR_NOT_IMPLEMENTED;
 };
 
 #include <_az_cfg_suffix.h>
