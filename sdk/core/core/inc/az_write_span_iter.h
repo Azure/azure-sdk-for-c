@@ -24,14 +24,7 @@ AZ_INLINE az_span az_write_span_iter_result(az_write_span_iter const * const p_i
   return az_span_take(p_i->span, p_i->i);
 }
 
-az_result
-az_write_span_iter_write(az_write_span_iter * const p_i, az_const_span const span);
-
-AZ_CALLBACK_DATA(az_write_span_iter_cast, az_write_span_iter *, az_span_visitor)
-
-AZ_INLINE az_span_visitor az_write_span_iter_to_span_visitor(az_write_span_iter* const p_i) {
-  return az_write_span_iter_cast(p_i, az_write_span_iter_write);
-}
+AZ_CALLBACK_FUNC(az_write_span_iter_write, az_write_span_iter *, az_span_visitor)
 
 #include <_az_cfg_suffix.h>
 
