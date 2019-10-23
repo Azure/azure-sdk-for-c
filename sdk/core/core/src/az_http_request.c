@@ -115,7 +115,7 @@ az_result az_http_url_to_spans(
   return AZ_OK;
 }
 
-AZ_CALLBACK_FUNC(az_http_url_to_spans, az_http_request const *, az_span_seq);
+AZ_CALLBACK_FUNC(az_http_url_to_spans, az_http_request const *, az_span_seq)
 
 az_result az_http_get_url_size(az_http_request const * const p_request, size_t * out) {
   return az_span_seq_size(az_http_url_to_spans_callback(p_request), out);
