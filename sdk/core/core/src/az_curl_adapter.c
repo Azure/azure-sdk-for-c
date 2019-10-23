@@ -9,6 +9,7 @@ typedef struct {
   struct curl_slist * p_list;
 } az_headers_data;
 
+/*
 AZ_CALLBACK_DATA(az_create_headers_callback, az_headers_data *, az_pair_visitor)
 AZ_CALLBACK_DATA(az_pair_callback, az_pair const *, az_span_seq)
 
@@ -32,3 +33,10 @@ az_result az_build_headers(az_http_request const * const p_request, az_headers_d
 
   return AZ_OK;
 }
+*/
+
+az_result az_http_client_send_request_impl(
+    az_http_request_builder const * const p_hrb,
+    az_span * const response) {
+  return AZ_OK;
+};

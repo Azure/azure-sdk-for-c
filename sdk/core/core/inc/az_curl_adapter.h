@@ -5,7 +5,7 @@
 #define AZ_CURL_ADAPTER_H
 
 #include <az_callback.h>
-#include <az_http_request.h>
+#include <az_http_request_builder.h>
 #include <az_span_seq.h>
 #include <az_write_span_iter.h>
 
@@ -34,6 +34,10 @@ AZ_INLINE az_result az_curl_done(az_curl * const p) {
   p->p_curl = NULL;
   return AZ_OK;
 }
+
+az_result az_http_client_send_request_impl(
+    az_http_request_builder const * const p_hrb,
+    az_span * const response);
 
 #include <_az_cfg_suffix.h>
 
