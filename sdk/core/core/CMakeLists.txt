@@ -17,6 +17,7 @@ add_library (
   src/az_base64.c
   src/az_curl_adapter.c
   src/az_http_request.c
+  src/az_http_request_builder.c
   src/az_json_read.c
   src/az_pair.c
   src/az_span.c
