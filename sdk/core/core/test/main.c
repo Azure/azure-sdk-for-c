@@ -6,11 +6,13 @@
 #include <az_json_read.h>
 #include <az_span_reader.h>
 #include <az_uri.h>
+#include <az_span_seq.h>
 #include <az_write_span_iter.h>
 
 #include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 int exit_code = 0;
 
@@ -486,31 +488,68 @@ int main() {
       az_span out = az_write_span_iter_result(&wi);
       TEST_ASSERT(az_const_span_eq(az_span_to_const_span(out), expected));
     }
-    // HTTP Builder with policies.
     {
+      printf("----Test: az_http_request_to_url_span\n");
       az_write_span_iter wi = az_write_span_iter_create((az_span)AZ_SPAN(buffer));
       az_span_visitor sv = az_write_span_iter_to_span_visitor(&wi);
-      az_const_span const expected = AZ_STR( //
-          "GET /foo?hello=world!&x=42 HTTP/1.1\r\n"
-          "ContentType: text/plain; charset=utf-8\r\n"
-          "some: xml\r\n"
-          "xyz: very_long\r\n"
-          "\r\n"
-          "{ \"somejson\": true }");
-      az_http_request new_request = request;
-      az_http_standard_policy s;
-      {
-        az_result const result = az_http_standard_policy_create(&new_request, &s);
-        TEST_ASSERT(result == AZ_OK);
-      }
-      {
-        az_result const result = az_http_request_to_spans(&new_request, sv);
-        TEST_ASSERT(result == AZ_OK);
-      }
+      az_const_span const expected = AZ_STR("/foo?hello=world!&x=42");
+      az_result const result = az_http_url_to_spans(&request, sv);
+      TEST_ASSERT(result == AZ_OK);
       az_span out = az_write_span_iter_result(&wi);
       TEST_ASSERT(az_const_span_eq(az_span_to_const_span(out), expected));
     }
+    // url size
+    {
+      printf("----Test: az_http_get_url_size\n");
+      size_t x = 0;
+      size_t const expected = 22;
+      az_result const result = az_http_get_url_size(&request, &x);
+      TEST_ASSERT(result == AZ_OK);
+      TEST_ASSERT(expected == x);
+    }
+    // url to str
+    {
+      printf("----Test: az_http_url_to_new_str\n");
+      char * p;
+      az_result const result = az_http_url_to_new_str(&request, &p);
+      TEST_ASSERT(result == AZ_OK);
+      TEST_ASSERT(strcmp(p, "/foo?hello=world!&x=42") == 0);
+      free(p);
+    }
   }
+
+  // span seq size
+  {
+    az_const_span const array[] = {
+      AZ_STR("Hello"),
+      AZ_STR(" "),
+      AZ_STR("world!"),
+    };
+    az_span_span const span = AZ_SPAN(array);
+    az_span_seq const seq = az_span_span_to_seq(&span);
+    size_t s = 42;
+    az_result const result = az_span_seq_size(seq, &s);
+    TEST_ASSERT(result == AZ_OK);
+    TEST_ASSERT(s == 12);
+  }
+
+  // span seq to new str
+  {
+    az_const_span const array[] = {
+      AZ_STR("Hello"),
+      AZ_STR(" "),
+      AZ_STR("world!"),
+    };
+    az_span_span const span = AZ_SPAN(array);
+    az_span_seq const seq = az_span_span_to_seq(&span);
+    //
+    char * p;
+    az_result const result = az_span_seq_to_new_str(seq, &p);
+    TEST_ASSERT(result == AZ_OK);
+    TEST_ASSERT(strcmp(p, "Hello world!") == 0);
+    free(p);
+  }
+
   {
     az_const_span const expected = AZ_STR("@###copy#copy#make some zero-terminated strings#make "
                                           "some\0zero-terminated\0strings\0####@");
