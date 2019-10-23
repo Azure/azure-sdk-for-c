@@ -4,7 +4,7 @@
 #include <az_span_seq.h>
 
 #include <az_str.h>
-#include <az_write_span_iter>
+#include <az_write_span_iter.h>
 
 #include <stdlib.h>
 
