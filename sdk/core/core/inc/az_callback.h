@@ -12,19 +12,26 @@ typedef void * az_callback_data;
 
 #define AZ_CALLBACK_ARG(NAME) AZ_CAT(NAME, _arg)
 
-#define AZ_CALLBACK_DECL(NAME, ARG) \
+/**
+ * Defines a callback @NAME type which accepts an argument of type @ARG.
+ */
+#define AZ_CALLBACK_TYPE(NAME, ARG) \
   typedef ARG AZ_CALLBACK_ARG(NAME); \
   typedef struct { \
     az_result (*func)(az_callback_data const, ARG const); \
     az_callback_data data; \
   } NAME;
 
-#define AZ_CALLBACK_DATA(NAME, DATA, CALLBACK) \
+/**
+ * Defines a function @NAME##_callback which creates a callback of type @CALLBACK
+ * using the given @NAME function.
+ */
+#define AZ_CALLBACK_FUNC(NAME, DATA, CALLBACK) \
   AZ_STATIC_ASSERT(sizeof(DATA) <= sizeof(az_callback_data)) \
-  AZ_INLINE CALLBACK NAME( \
-      DATA const data, az_result (*const func)(DATA const, AZ_CALLBACK_ARG(CALLBACK) const)) { \
-    return (CALLBACK){ \
-      .func = (az_result(*)(az_callback_data, AZ_CALLBACK_ARG(CALLBACK)))func, \
+  az_result NAME(DATA const, AZ_CALLBACK_ARG(CALLBACK) const); \
+  AZ_INLINE CALLBACK AZ_CAT(NAME, _callback)(DATA const data) { \
+    return (CALLBACK) { \
+      .func = (az_result(*)(az_callback_data, AZ_CALLBACK_ARG(CALLBACK)))NAME, \
       .data = (az_callback_data)data, \
     }; \
   }
