@@ -5,39 +5,36 @@
 #define AZ_HTTP_REQUEST_H
 
 #include <az_contract.h>
-#include <az_iter_data.h>
 #include <az_pair.h>
 #include <az_span.h>
 #include <az_str.h>
+#include <az_span_seq.h>
 
 #include <_az_cfg_prefix.h>
 
-
-// request
+#include <stddef.h>
 
 typedef struct {
   az_const_span method;
   az_const_span path;
-  az_pair_iter query;
-  az_pair_iter headers;
+  az_pair_seq query;
+  az_pair_seq headers;
   az_const_span body;
 } az_http_request;
 
-az_result az_http_request_to_buffer(
+az_result az_http_request_to_spans(
     az_http_request const * const p_request,
-    az_span const span,
-    az_span * const out);
+    az_span_visitor const span_visitor);
 
-typedef struct {
-  az_pair_iter original_headers;
-} az_http_standard_headers_data;
+az_result az_http_url_to_spans(
+    az_http_request const * const p_request,
+    az_span_visitor const span_visitor);
 
-/**
- * Note: `*p_request` should not be used after `*out` is destroyed.
- */
-az_result az_http_standard_headers_policy(
-    az_http_request * const p_request,
-    az_http_standard_headers_data * const out);
+az_result az_http_get_url_size(az_http_request const * const p_request, size_t * out);
+
+az_result az_http_url_to_new_str(az_http_request const * const p_request, char ** const out);
+
+AZ_CALLBACK_FUNC(az_build_header, az_pair const *, az_span_seq)
 
 #include <_az_cfg_suffix.h>
 

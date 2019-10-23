@@ -6,6 +6,8 @@
 
 #include <az_result.h>
 
+#include <stddef.h>
+
 #include <_az_cfg_prefix.h>
 
 #define AZ_CONTRACT_ARG_NOT_NULL(arg) \

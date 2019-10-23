@@ -4,9 +4,10 @@
 #ifndef AZ_PAIR_H
 #define AZ_PAIR_H
 
+#include <az_callback.h>
 #include <az_contract.h>
-#include <az_iter_data.h>
 #include <az_span.h>
+#include <az_callback.h>
 
 #include <_az_cfg_prefix.h>
 
@@ -22,28 +23,20 @@ typedef struct {
   size_t size;
 } az_pair_span;
 
-/// A pair iterator.
-typedef struct az_pair_iter az_pair_iter;
+/// @az_pair_visitor is a callback with one argument @az_pair.
+AZ_CALLBACK_TYPE(az_pair_visitor, az_pair)
 
-typedef az_result (*az_pair_iter_func)(az_pair_iter * const p_i, az_pair * const out);
+/// @az_pair_seq is a @az_pair sequence visitor.
+AZ_CALLBACK_TYPE(az_pair_seq, az_pair_visitor)
 
-struct az_pair_iter {
-  az_pair_iter_func func;
-  az_iter_data data;
-};
-
-AZ_INLINE az_result az_pair_iter_call(az_pair_iter * const p_i, az_pair * const out) {
-  AZ_CONTRACT_ARG_NOT_NULL(p_i);
-  AZ_CONTRACT_ARG_NOT_NULL(p_i->func);
-  AZ_CONTRACT_ARG_NOT_NULL(out);
-
-  return p_i->func(p_i, out);
-}
+az_result az_pair_span_to_seq(az_pair_span const * const context, az_pair_visitor const visitor);
 
 /**
- * Creates an iterator of pairs from a span of pairs.
+ * Creates @az_pair_seq from @az_pair_span.
+ *
+ * Note: the result of the function shouldn't be used after `*p_span` is destroyed.
  */
-az_pair_iter az_pair_span_to_iter(az_pair_span const span);
+AZ_CALLBACK_FUNC(az_pair_span_to_seq, az_pair_span const *, az_pair_seq)
 
 #include <_az_cfg_suffix.h>
 

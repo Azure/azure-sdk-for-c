@@ -2,11 +2,17 @@
 // SPDX-License-Identifier: MIT
 
 #ifdef _MSC_VER
+
 // warning C4204: nonstandard extension used: non-constant aggregate initializer
 #pragma warning(disable : 4204)
 
+// warning C4221: nonstandard extension used: '...': cannot be initialized using address of
+// automatic variable '...'
+#pragma warning(disable : 4221)
+
 // warning C4996: This function or variable may be unsafe. Consider using ..._s instead.
 #pragma warning(disable : 4996)
+
 #endif
 
 #ifndef AZ_CFG_H
