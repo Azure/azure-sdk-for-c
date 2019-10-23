@@ -11,7 +11,7 @@
 
 #include <_az_cfg_prefix.h>
 
-#include <stdlib.h>
+#include <stddef.h>
 
 typedef struct {
   az_const_span method;

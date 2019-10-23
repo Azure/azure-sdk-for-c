@@ -4,7 +4,6 @@
 #ifndef AZ_CURL_ADAPTER_H
 #define AZ_CURL_ADAPTER_H
 
-#include <_az_cfg.h>
 #include <az_callback.h>
 #include <az_http_request.h>
 #include <az_span_seq.h>
