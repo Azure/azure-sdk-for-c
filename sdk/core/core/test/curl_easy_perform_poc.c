@@ -8,6 +8,8 @@
 #include <az_pair.h>
 #include <az_write_span_iter.h>
 
+#include <_az_cfg.h>
+
 int exit_code = 0;
 
 int main() {

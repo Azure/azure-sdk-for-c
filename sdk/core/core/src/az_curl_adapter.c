@@ -3,6 +3,8 @@
 
 #include <az_curl_adapter.h>
 
+#include <_az_cfg.h>
+
 typedef struct {
   struct curl_slist * p_list;
 } az_headers_data;
