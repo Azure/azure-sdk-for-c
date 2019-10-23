@@ -3,10 +3,10 @@
 
 #include <stdio.h>
 
-#include <az_write_span_iter.h>
 #include <az_http_request.h>
-#include <az_pair.h>
 #include <az_json_read.h>
+#include <az_pair.h>
+#include <az_write_span_iter.h>
 
 int exit_code = 0;
 

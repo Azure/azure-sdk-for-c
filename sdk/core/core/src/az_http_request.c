@@ -8,6 +8,8 @@
 #include <az_str.h>
 #include <az_write_span_iter.h>
 
+#include <stdlib.h>
+
 #include <_az_cfg.h>
 
 #define AZ_CRLF "\r\n"
