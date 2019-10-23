@@ -35,7 +35,7 @@ az_result az_query_to_spans(az_query_state * const p, az_pair const pair) {
   return AZ_OK;
 }
 
-az_result az_build_header(az_pair const * header, az_span_visitor const visitor) {
+az_result az_build_header(az_pair const * const header, az_span_visitor const visitor) {
   AZ_RETURN_IF_FAILED(visitor.func(visitor.data, header->key));
   AZ_RETURN_IF_FAILED(visitor.func(visitor.data, AZ_STR(": ")));
   AZ_RETURN_IF_FAILED(visitor.func(visitor.data, header->value));
