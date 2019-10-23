@@ -22,7 +22,7 @@ add_library (
   src/az_span.c
   src/az_span_seq.c
   src/az_uri.c
-  src/az_write_span_iter.c
+  src/az_span_builder.c
   )
 
 if(MSVC)
