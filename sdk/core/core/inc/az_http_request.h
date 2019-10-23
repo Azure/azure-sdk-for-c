@@ -9,7 +9,6 @@
 #include <az_pair.h>
 #include <az_span.h>
 #include <az_str.h>
-#include <az_http_pipeline.h>
 
 #include <_az_cfg_prefix.h>
 
@@ -17,7 +16,6 @@
 // request
 
 typedef struct {
-  az_http_pipeline pipeline;
   az_const_span method;
   az_const_span path;
   az_pair_iter query;

@@ -17,12 +17,19 @@
 
 typedef struct {
   az_http_policy const []policies;
-  int num_policies;
-  int pipeline_stage;
+  uint16_t num_policies;
+  uint16_t pipeline_stage;
 
   //Each policy calls next
-  typedef az_result (*az_http_pipeline_next)(az_http_pipeline *);
+  typedef az_result (*az_http_pipeline_next)(az_http_pipeline const * pipeline, az_http_request const * p_request);
 } az_http_pipeline;
+
+//Returns a pipeline
+az_result az_http_pipeline_build(az_http_pipeline * p_pipeline);
+
+az_result az_http_pipeline_process(
+    az_http_pipeline const * pipeline,
+    az_http_request const * request);
 
 #include <_az_cfg_suffix.h>
 
