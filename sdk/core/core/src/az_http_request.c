@@ -124,6 +124,6 @@ AZ_NODISCARD az_result az_http_get_url_size(az_http_request const * const p_requ
   return az_span_seq_size(az_http_url_to_spans_callback(p_request), out);
 }
 
-az_result az_http_url_to_new_str(az_http_request const * const p_request, char ** const out) {
+AZ_NODISCARD az_result az_http_url_to_new_str(az_http_request const * const p_request, char ** const out) {
   return az_span_seq_to_new_str(az_http_url_to_spans_callback(p_request), out);
 }

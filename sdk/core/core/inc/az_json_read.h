@@ -77,7 +77,7 @@ az_json_read_array_element(
 
 AZ_NODISCARD az_result az_json_state_done(az_json_state const * const p_state);
 
-az_result az_json_get_object_member_value(
+AZ_NODISCARD az_result az_json_get_object_member_value(
     az_const_span const json,
     az_const_span const name,
     az_json_value * const out_value);

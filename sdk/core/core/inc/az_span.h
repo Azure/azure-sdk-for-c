@@ -247,7 +247,7 @@ az_span_to_c_str(az_span const buffer, az_const_span const src, az_span * const 
   return AZ_OK;
 }
 
-az_result az_span_replace(
+AZ_NODISCARD az_result az_span_replace(
     az_span const buffer,
     az_const_span const src,
     uint8_t (*const func)(uint8_t const),

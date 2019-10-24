@@ -13,6 +13,12 @@
 // warning C4996: This function or variable may be unsafe. Consider using ..._s instead.
 #pragma warning(disable : 4996)
 
+// warning C4820: '<unnamed-tag>': '4' bytes padding added after data member '...'
+#pragma warning(disable : 4820)
+
+// warning C5045: Compiler will insert Spectre mitigation for memory load if /Qspectre switch specified
+#pragma warning(disable : 5045)
+
 #endif
 
 #ifndef AZ_CFG_H
