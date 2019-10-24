@@ -101,6 +101,58 @@ az_result az_build_headers(
 }
 
 /**
+ * @brief writes a url request adds a cero to make it a c-string. Return error if any of the write
+ * operations fails.
+ *
+ * @param writable_buffer
+ * @param url_from_request
+ * @return az_result
+ */
+az_result az_write_url(az_span const writable_buffer, az_const_span const url_from_request) {
+  az_write_span_iter writer = az_write_span_iter_create(writable_buffer);
+  az_result write_result;
+  write_result = az_write_span_iter_write(&writer, url_from_request);
+  if (write_result != AZ_OK) {
+    return AZ_ERROR_ARG;
+  }
+  write_result = az_write_span_iter_write(&writer, AZ_STR("\0"));
+  if (write_result != AZ_OK) {
+    return AZ_ERROR_ARG;
+  }
+  return AZ_OK;
+}
+
+/**
+ * @brief Gets the url from request and writes it to a new buffer as a c-string. Then sets curl url
+ * whit this string. Memory for the new buffer is free after setting curl value or if write
+ * operation fails.
+ *
+ * @param p_curl
+ * @param p_hrb
+ * @return az_result
+ */
+az_result az_build_url(az_curl * const p_curl, az_http_request_builder const * const p_hrb) {
+  // allocate a new buffer for url with 0 terminated
+  uint8_t * const p_writable_buffer = (uint8_t * const)malloc(p_hrb->url_info.size + 1);
+  if (p_writable_buffer == NULL) {
+    return AZ_ERROR_OUT_OF_MEMORY;
+  }
+  char * buffer = (char *)p_writable_buffer;
+
+  // get a new span for url inside request buffer
+  az_const_span const url_from_request = { .begin = &p_hrb->buffer, .size = p_hrb->url_info.size };
+  az_span const writable_buffer = AZ_SPAN(p_writable_buffer);
+
+  az_result write_result = az_write_url(writable_buffer, url_from_request);
+
+  if (write_result == AZ_OK) {
+    curl_easy_setopt(p_curl->p_curl, CURLOPT_URL, buffer);
+  }
+  free(p_writable_buffer);
+  return write_result;
+}
+
+/**
  * handles GET request
  */
 az_result az_curl_send_request(
@@ -117,10 +169,7 @@ az_result az_curl_send_request(
   curl_easy_setopt(p_curl->p_curl, CURLOPT_HTTPHEADER, headers.p_list);
 
   // set URL
-  // char * url;
-  // TODO: AZ_RETURN_IF_FAILED(az_http_url_to_new_str(p_hrb, &url));
-  // curl_easy_setopt(p_curl->p_curl, CURLOPT_URL, url);
-  // free(url);
+  AZ_RETURN_IF_FAILED(az_build_url(p_curl->p_curl, p_hrb));
 
   CURLcode res = curl_easy_perform(p_curl->p_curl);
   if (res != CURLE_OK)
