@@ -3,6 +3,7 @@
 
 #include <az_base64.h>
 #include <az_http_request.h>
+#include <az_http_request_builder.h>
 #include <az_json_read.h>
 #include <az_span_reader.h>
 #include <az_span_seq.h>
@@ -260,6 +261,113 @@ static uint8_t const uri_decoded_buf[] = {
   0xE0, 0xE1, 0xE2, 0xE3, 0xE4, 0xE5, 0xE6, 0xE7, 0xE8, 0xE9, 0xEA, 0xEB, 0xEC, 0xED, 0xEE, 0xEF,
   0xF0, 0xF1, 0xF2, 0xF3, 0xF4, 0xF5, 0xF6, 0xF7, 0xF8, 0xF9, 0xFA, 0xFB, 0xFC, 0xFD, 0xFE, 0xFF
 };
+
+static az_const_span hrb_url
+    = AZ_CONST_STR("https://antk-keyvault.vault.azure.net/secrets/Password");
+
+static az_const_span hrb_param_api_version_name = AZ_CONST_STR("api-version");
+static az_const_span hrb_param_api_version_value = AZ_CONST_STR("7.0");
+
+static az_const_span hrb_param_test_param_name = AZ_CONST_STR("test-param");
+static az_const_span hrb_param_test_param_value = AZ_CONST_STR("value");
+
+static az_const_span hrb_header_content_type_name = AZ_CONST_STR("Content-Type");
+static az_const_span hrb_header_content_type_value
+    = AZ_CONST_STR("application/x-www-form-urlencoded");
+
+static az_const_span hrb_header_authorization_name = AZ_CONST_STR("authorization");
+static az_const_span hrb_header_authorization_value1 = AZ_CONST_STR("Bearer 123456789");
+static az_const_span hrb_header_authorization_value2 = AZ_CONST_STR("Bearer 99887766554433221100");
+
+static az_const_span hrb_buffer1 = AZ_CONST_STR(
+    "GET"
+    "https://antk-keyvault.vault.azure.net/secrets/Password"
+    "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
+    "\0\0\0\0\0\0\0\0\0\0"
+    "\0\0\0\0\0\0\0\0\0\0"
+    "\0\0\0\0\0\0\0\0\0\0"
+    "\0\0\0\0\0\0\0\0\0\0"
+    "\0\0\0\0\0\0\0\0\0\0"
+    "\0\0\0\0\0\0\0\0\0\0"
+    "\0\0\0\0\0\0\0\0\0\0"
+    "\0\0\0\0\0\0\0\0\0\0"
+    "\0\0\0\0\0\0\0\0\0\0"
+    "\0\0\0\0\0\0\0\0\0\0");
+
+static az_const_span hrb_buffer2
+    = AZ_CONST_STR("GET"
+                   "https://antk-keyvault.vault.azure.net/secrets/Password"
+                   "?api-version=7.0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
+                   "\0\0\0\0\0\0\0\0\0\0"
+                   "\0\0\0\0\0\0\0\0\0\0"
+                   "\0\0\0\0\0\0\0\0\0\0"
+                   "\0\0\0\0\0\0\0\0\0\0"
+                   "\0\0\0\0\0\0\0\0\0\0"
+                   "\0\0\0\0\0\0\0\0\0\0"
+                   "\0\0\0\0\0\0\0\0\0\0"
+                   "\0\0\0\0\0\0\0\0\0\0"
+                   "\0\0\0\0\0\0\0\0\0\0"
+                   "\0\0\0\0\0\0\0\0\0\0");
+
+static az_const_span hrb_buffer3
+    = AZ_CONST_STR("GET"
+                   "https://antk-keyvault.vault.azure.net/secrets/Password"
+                   "?api-version=7.0&test-param=value\0\0\0\0\0\0\0\0\0\0\0\0\0"
+                   "\0\0\0\0\0\0\0\0\0\0"
+                   "\0\0\0\0\0\0\0\0\0\0"
+                   "\0\0\0\0\0\0\0\0\0\0"
+                   "\0\0\0\0\0\0\0\0\0\0"
+                   "\0\0\0\0\0\0\0\0\0\0"
+                   "\0\0\0\0\0\0\0\0\0\0"
+                   "\0\0\0\0\0\0\0\0\0\0"
+                   "\0\0\0\0\0\0\0\0\0\0"
+                   "\0\0\0\0\0\0\0\0\0\0"
+                   "\0\0\0\0\0\0\0\0\0\0");
+
+static az_const_span hrb_buffer4
+    = AZ_CONST_STR("GET"
+                   "https://antk-keyvault.vault.azure.net/secrets/Password"
+                   "?api-version=7.0&test-param=value\0\0\0\0\0\0\0\0\0\0\0\0\0"
+                   "Content-Ty"
+                   "pe\0applica"
+                   "tion/x-www"
+                   "-form-urle"
+                   "ncoded\0\0\0\0"
+                   "\0\0\0\0\0\0\0\0\0\0"
+                   "\0\0\0\0\0\0\0\0\0\0"
+                   "\0\0\0\0\0\0\0\0\0\0"
+                   "\0\0\0\0\0\0\0\0\0\0"
+                   "\0\0\0\0\0\0\0\0\0\0");
+
+static az_const_span hrb_buffer5
+    = AZ_CONST_STR("GET"
+                   "https://antk-keyvault.vault.azure.net/secrets/Password"
+                   "?api-version=7.0&test-param=value\0\0\0\0\0\0\0\0\0\0\0\0\0"
+                   "Content-Ty"
+                   "pe\0applica"
+                   "tion/x-www"
+                   "-form-urle"
+                   "ncoded\0\0au"
+                   "thorizatio"
+                   "n\0Bearer 1"
+                   "23456789\0\0"
+                   "\0\0\0\0\0\0\0\0\0\0"
+                   "\0\0\0\0\0\0\0\0\0\0");
+
+static az_const_span hrb_buffer6
+    = AZ_CONST_STR("GET"
+                   "https://antk-keyvault.vault.azure.net/secrets/Password"
+                   "?api-version=7.0&test-param=value\0\0\0\0\0\0\0\0\0\0\0\0\0"
+                   "Content-Ty"
+                   "pe\0applica"
+                   "tion/x-www"
+                   "-form-urle"
+                   "ncoded\0\0au"
+                   "thorizatio"
+                   "n\0Bearer 9"
+                   "9887766554"
+                   "433221100\0"
+                   "\0\0\0\0\0\0\0\0\0\0");
 
 static az_const_span const uri_decoded
     = { .begin = uri_decoded_buf, .size = sizeof(uri_decoded_buf) };
@@ -644,6 +752,37 @@ int main() {
 
     az_uri_decode(buffer, uri_encoded3, &result);
     TEST_ASSERT(az_const_span_eq(result, uri_decoded));
+  }
+  {
+    uint8_t buf[200 + 3];
+    memset(buf, 0, sizeof(buf));
+    az_span const http_buf = { .begin = buf, .size = sizeof(buf) };
+    az_http_request_builder hrb;
+
+    az_http_request_builder_init(&hrb, http_buf, AZ_HTTP_METHOD_VERB_GET, hrb_url, 100, 2);
+    TEST_ASSERT(az_const_span_eq(az_span_to_const_span(http_buf), hrb_buffer1));
+
+    az_http_request_builder_set_query_parameter(
+        &hrb, hrb_param_api_version_name, hrb_param_api_version_value);
+    TEST_ASSERT(az_const_span_eq(az_span_to_const_span(http_buf), hrb_buffer2));
+
+    az_http_request_builder_set_query_parameter(
+        &hrb, hrb_param_test_param_name, hrb_param_test_param_value);
+    TEST_ASSERT(az_const_span_eq(az_span_to_const_span(http_buf), hrb_buffer3));
+
+    az_http_request_builder_append_header(&hrb, hrb_header_content_type_name, hrb_header_content_type_value);
+    TEST_ASSERT(az_const_span_eq(az_span_to_const_span(http_buf), hrb_buffer4));
+
+    az_http_request_builder_mark_retry_headers_start(&hrb);
+    az_http_request_builder_append_header(
+        &hrb, hrb_header_authorization_name, hrb_header_authorization_value1);
+    TEST_ASSERT(az_const_span_eq(az_span_to_const_span(http_buf), hrb_buffer5));
+
+    az_http_request_builder_remove_retry_headers(&hrb);
+
+    az_http_request_builder_append_header(
+        &hrb, hrb_header_authorization_name, hrb_header_authorization_value2);
+    TEST_ASSERT(az_const_span_eq(az_span_to_const_span(http_buf), hrb_buffer6));
   }
   return exit_code;
 }

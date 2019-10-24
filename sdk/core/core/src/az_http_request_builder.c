@@ -44,16 +44,20 @@ AZ_NODISCARD az_result az_http_request_builder_init(
 
   AZ_RETURN_IF_FAILED(az_span_set(buffer, '\0'));
 
-  az_span method_verb_buf = { .begin = buffer.begin, .size = method_verb.size };
-  az_span uri_buf = { .begin = method_verb_buf.begin + method_verb.size, .size = max_url_size };
+  az_span method_verb_buf = { 0, 0 };
+  AZ_RETURN_IF_FAILED(az_span_copy(
+      (az_span){ .begin = buffer.begin, .size = method_verb.size }, method_verb, &method_verb_buf));
 
-  az_span unused;
-  AZ_RETURN_IF_FAILED(az_span_copy(method_verb_buf, method_verb, &unused));
-  AZ_RETURN_IF_FAILED(az_span_copy(uri_buf, method_verb, &unused));
+  az_span uri_buf = { 0, 0 };
+  AZ_RETURN_IF_FAILED(az_span_copy(
+      (az_span){ .begin = method_verb_buf.begin + method_verb.size, .size = max_url_size },
+      initial_url,
+      &uri_buf));
 
   *p_hrb = (az_http_request_builder){ .buffer = buffer,
                                       .method_verb = az_span_to_const_span(method_verb_buf),
                                       .url = uri_buf,
+                                      .max_url_size = max_url_size,
                                       .max_headers = max_headers,
                                       .retry_headers_start = max_headers,
                                       .headers_end = 0 };
@@ -84,7 +88,7 @@ AZ_NODISCARD az_result az_http_request_builder_set_query_parameter(
     if (name_and_value_size < name.size || name_and_value_size < value.size
         || appended_size < name_and_value_size || appended_size < extra_chars_size
         || new_url_size < appended_size || new_url_size < p_hrb->url.size
-        || new_url_size < p_hrb->max_url_size) {
+        || new_url_size > p_hrb->max_url_size) {
       return AZ_ERROR_BUFFER_OVERFLOW;
     }
 
@@ -164,7 +168,7 @@ AZ_NODISCARD az_result az_http_request_builder_append_header(
     if (p_hrb->headers_end == 0) {
       new_header_start = headers_start;
     } else {
-      uint16_t nheader = 0;
+      uint16_t nheader = 1;
       for (size_t i = 0; i < headers_space - separator_sizes; ++i) {
         if (headers_start[i] == '\0' && headers_start[i + 1] == '\0') {
           assert(i < headers_space);
@@ -187,7 +191,7 @@ AZ_NODISCARD az_result az_http_request_builder_append_header(
     size_t const required_space = name_and_value_size + separator_sizes;
 
     if (name_and_value_size < name.size || name_and_value_size < value.size
-        || required_space < name_and_value_size || required_space < available_space) {
+        || required_space < name_and_value_size || required_space > available_space) {
       return AZ_ERROR_BUFFER_OVERFLOW;
     }
 
