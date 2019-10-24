@@ -104,7 +104,7 @@ AZ_INLINE uint8_t base64_as_uint6(uint8_t const base64) {
   }
 }
 
-az_result az_base64_encode(
+AZ_NODISCARD az_result az_base64_encode(
     bool const base64url,
     az_span const buffer,
     az_const_span const input,
@@ -185,7 +185,7 @@ az_result az_base64_encode(
   return AZ_OK;
 }
 
-az_result az_base64_decode(
+AZ_NODISCARD az_result az_base64_decode(
     az_span const buffer,
     az_const_span const input,
     az_const_span * const out_result) {

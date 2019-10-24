@@ -29,7 +29,7 @@
  *     - `buffer` or `input` are invalid spans (see @ref az_span_is_valid).
  *     - `out_result` would overlap `input`.
  */
-az_result az_base64_encode(
+AZ_NODISCARD az_result az_base64_encode(
     bool const base64url,
     az_span const buffer,
     az_const_span const input,
@@ -53,10 +53,8 @@ az_result az_base64_encode(
  * _padding_ (`=` character) in the middle, or has invalid length (1, 5, 9, and so on).
  *     - `out_result` would overlap `input`.
  */
-az_result az_base64_decode(
-    az_span const buffer,
-    az_const_span const input,
-    az_const_span * const out_result);
+AZ_NODISCARD az_result
+az_base64_decode(az_span const buffer, az_const_span const input, az_const_span * const out_result);
 
 #include <_az_cfg_suffix.h>
 

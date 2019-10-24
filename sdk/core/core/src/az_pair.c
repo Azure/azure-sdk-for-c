@@ -5,7 +5,8 @@
 
 #include <_az_cfg.h>
 
-az_result az_pair_span_to_seq(
+AZ_NODISCARD az_result
+az_pair_span_to_seq(
     az_pair_span const * const context,
     az_pair_visitor const visitor) {
   AZ_CONTRACT_ARG_NOT_NULL(context);

@@ -23,7 +23,7 @@ typedef struct {
 
 AZ_CALLBACK_FUNC(az_query_to_spans, az_query_state *, az_pair_visitor)
 
-az_result az_query_to_spans(az_query_state * const p, az_pair const pair) {
+AZ_NODISCARD az_result az_query_to_spans(az_query_state * const p, az_pair const pair) {
   AZ_CONTRACT_ARG_NOT_NULL(p);
 
   az_span_visitor const spans = p->spans;
@@ -35,7 +35,8 @@ az_result az_query_to_spans(az_query_state * const p, az_pair const pair) {
   return AZ_OK;
 }
 
-az_result az_build_header(az_pair const * const header, az_span_visitor const visitor) {
+AZ_NODISCARD az_result
+az_build_header(az_pair const * const header, az_span_visitor const visitor) {
   AZ_RETURN_IF_FAILED(visitor.func(visitor.data, header->key));
   AZ_RETURN_IF_FAILED(visitor.func(visitor.data, AZ_STR(": ")));
   AZ_RETURN_IF_FAILED(visitor.func(visitor.data, header->value));
@@ -44,7 +45,7 @@ az_result az_build_header(az_pair const * const header, az_span_visitor const vi
 
 AZ_CALLBACK_FUNC(az_header_to_spans, az_span_visitor const *, az_pair_visitor)
 
-az_result az_header_to_spans(az_span_visitor const * const p, az_pair const pair) {
+AZ_NODISCARD az_result az_header_to_spans(az_span_visitor const * const p, az_pair const pair) {
   AZ_CONTRACT_ARG_NOT_NULL(p);
 
   AZ_RETURN_IF_FAILED(az_build_header(&pair, *p));
@@ -52,7 +53,8 @@ az_result az_header_to_spans(az_span_visitor const * const p, az_pair const pair
   return AZ_OK;
 }
 
-az_result az_http_request_to_spans(
+AZ_NODISCARD az_result
+az_http_request_to_spans(
     az_http_request const * const p_request,
     az_span_visitor const spans) {
   AZ_CONTRACT_ARG_NOT_NULL(p_request);
@@ -92,7 +94,8 @@ az_result az_http_request_to_spans(
   return AZ_OK;
 }
 
-az_result az_http_url_to_spans(
+AZ_NODISCARD az_result
+az_http_url_to_spans(
     az_http_request const * const p_request,
     az_span_visitor const spans) {
   AZ_CONTRACT_ARG_NOT_NULL(p_request);
@@ -115,11 +118,12 @@ az_result az_http_url_to_spans(
   return AZ_OK;
 }
 
-az_result az_http_get_url_size(az_http_request const * const p_request, size_t * out) {
+AZ_NODISCARD az_result az_http_get_url_size(az_http_request const * const p_request, size_t * out) {
   return az_http_url_to_spans(p_request, az_span_add_size_callback(out));
 }
 
-az_result az_http_url_to_new_str(az_http_request const * const p_request, char ** const out) {
+AZ_NODISCARD az_result
+az_http_url_to_new_str(az_http_request const * const p_request, char ** const out) {
   *out = NULL;
   size_t size = 0;
   AZ_RETURN_IF_FAILED(az_http_get_url_size(p_request, &size));

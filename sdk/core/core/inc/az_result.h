@@ -38,9 +38,9 @@ enum {
 #define AZ_MAKE_ERROR(facility, code) \
   ((az_result)(0x80000000 | ((uint32_t)(facility) << 16) | (uint32_t)(code)))
 
-AZ_INLINE bool az_failed(az_result result) { return (result & AZ_ERROR_FLAG) != 0; }
+AZ_NODISCARD AZ_INLINE bool az_failed(az_result result) { return (result & AZ_ERROR_FLAG) != 0; }
 
-AZ_INLINE bool az_succeeded(az_result result) { return (result & AZ_ERROR_FLAG) == 0; }
+AZ_NODISCARD AZ_INLINE bool az_succeeded(az_result result) { return (result & AZ_ERROR_FLAG) == 0; }
 
 #define AZ_RETURN_IF_FAILED(exp) \
   do { \
@@ -55,7 +55,7 @@ enum {
   AZ_ERROR_BUFFER_OVERFLOW = AZ_MAKE_ERROR(AZ_CORE_FACILITY, 2),
   AZ_ERROR_OUT_OF_MEMORY = AZ_MAKE_ERROR(AZ_CORE_FACILITY, 3),
   AZ_ERROR_NOT_IMPLEMENTED = AZ_MAKE_ERROR(AZ_CORE_FACILITY, 4),
-  
+
   AZ_ERROR_EOF = AZ_MAKE_ERROR(AZ_STD_FACILITY, 0xFFFF),
 };
 

@@ -13,14 +13,14 @@ typedef struct {
   size_t i;
 } az_write_span_iter;
 
-AZ_INLINE az_write_span_iter az_write_span_iter_create(az_span const span) {
+AZ_NODISCARD AZ_INLINE az_write_span_iter az_write_span_iter_create(az_span const span) {
   return (az_write_span_iter){
     .span = span,
     .i = 0,
   };
 }
 
-AZ_INLINE az_span az_write_span_iter_result(az_write_span_iter const * const p_i) {
+AZ_NODISCARD AZ_INLINE az_span az_write_span_iter_result(az_write_span_iter const * const p_i) {
   return az_span_take(p_i->span, p_i->i);
 }
 

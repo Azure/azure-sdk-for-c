@@ -21,7 +21,9 @@
 #ifdef _MSC_VER
 #define AZ_INLINE static __forceinline
 #elif defined(__GNUC__) || defined(__clang__)
-#define AZ_INLINE static inline __attribute__((always_inline))
+#define AZ_INLINE \
+  __attribute__((always_inline)) \
+  static inline
 #else
 #define AZ_INLINE static inline
 #endif
@@ -32,6 +34,14 @@
 #define AZ_FALLTHROUGH \
   do { \
   } while (0)
+#endif
+
+#ifdef _MSC_VER
+#define AZ_NODISCARD _Check_return_
+#elif defined(__GNUC__) || defined(__clang__)
+#define AZ_NODISCARD __attribute__((warn_unused_result))
+#else
+#define AZ_NODISCARD
 #endif
 
 #endif

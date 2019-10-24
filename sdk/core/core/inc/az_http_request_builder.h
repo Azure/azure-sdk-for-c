@@ -37,7 +37,7 @@ typedef struct {
  * @param method_verb
  * @return az_result
  */
-az_result az_http_request_builder_init(
+AZ_NODISCARD az_result az_http_request_builder_init(
     az_http_request_builder * const p_hrb,
     az_span const buffer,
     int16_t const max_url_size,
@@ -53,7 +53,7 @@ az_result az_http_request_builder_init(
  * @param value
  * @return az_result
  */
-az_result az_http_request_builder_set_query_parameter(
+AZ_NODISCARD az_result az_http_request_builder_set_query_parameter(
     az_http_request_builder * const p_hrb,
     az_const_span const name,
     az_const_span const value);
@@ -66,7 +66,7 @@ az_result az_http_request_builder_set_query_parameter(
  * @param value
  * @return az_result
  */
-az_result az_http_request_builder_append_header(
+AZ_NODISCARD az_result az_http_request_builder_append_header(
     az_http_request_builder * const p_hrb,
     az_const_span const name,
     az_const_span const value);
@@ -77,7 +77,8 @@ az_result az_http_request_builder_append_header(
  * @param p_hrb
  * @return az_result
  */
-az_result az_http_request_builder_mark_retry_headers_start(az_http_request_builder * const p_hrb);
+AZ_NODISCARD az_result
+az_http_request_builder_mark_retry_headers_start(az_http_request_builder * const p_hrb);
 
 /**
  * @brief
@@ -85,7 +86,8 @@ az_result az_http_request_builder_mark_retry_headers_start(az_http_request_build
  * @param p_hrb
  * @return az_result
  */
-az_result az_http_request_builder_remove_retry_headers(az_http_request_builder * const p_hrb);
+AZ_NODISCARD az_result
+az_http_request_builder_remove_retry_headers(az_http_request_builder * const p_hrb);
 
 /**
  * @brief
@@ -93,7 +95,8 @@ az_result az_http_request_builder_remove_retry_headers(az_http_request_builder *
  * @param p_hrb
  * @return az_result
  */
-az_result az_http_request_builder_remove_retry_headers(az_http_request_builder * const p_hrb);
+AZ_NODISCARD az_result
+az_http_request_builder_remove_retry_headers(az_http_request_builder * const p_hrb);
 
 #include <_az_cfg_suffix.h>
 

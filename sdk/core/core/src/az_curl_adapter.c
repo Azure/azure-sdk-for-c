@@ -11,7 +11,7 @@ typedef struct {
 
 AZ_CALLBACK_FUNC(az_headers_to_curl, az_headers_data *, az_pair_visitor)
 
-az_result az_headers_to_curl(az_headers_data * const p_state, az_pair const header) {
+AZ_NODISCARD az_result az_headers_to_curl(az_headers_data * const p_state, az_pair const header) {
   const az_span_seq token_seq = az_build_header_callback(&header);
   char * str_header;
   AZ_RETURN_IF_FAILED(az_span_seq_to_new_str(token_seq, &str_header));
@@ -22,7 +22,8 @@ az_result az_headers_to_curl(az_headers_data * const p_state, az_pair const head
   return AZ_OK;
 }
 
-az_result az_build_headers(az_http_request const * const p_request, az_headers_data * p_headers) {
+AZ_NODISCARD az_result
+az_build_headers(az_http_request const * const p_request, az_headers_data * p_headers) {
   // create callback for visitor
   az_pair_visitor const pair_visitor = az_headers_to_curl_callback(p_headers);
 
