@@ -786,12 +786,12 @@ int main() {
     TEST_ASSERT(az_const_span_eq(az_span_to_const_span(hrb.url), hrb_url_final));
 
     TEST_ASSERT(hrb.headers_end == 2);
-    az_const_span_pair expected_headers[2] = {
+    az_pair expected_headers[2] = {
       { .key = hrb_header_content_type_name, .value = hrb_header_content_type_value },
       { .key = hrb_header_authorization_name, .value = hrb_header_authorization_value2 },
     };
     for (uint16_t i = 0; i < hrb.headers_end; ++i) {
-      az_const_span_pair header = { 0, 0 };
+      az_pair header = { 0, 0 };
       az_http_request_builder_get_header(&hrb, i, &header);
 
       TEST_ASSERT(az_const_span_eq(header.key, expected_headers[i].key));

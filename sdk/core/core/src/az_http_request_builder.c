@@ -228,7 +228,7 @@ AZ_NODISCARD az_result az_http_request_builder_remove_retry_headers(az_http_requ
 az_result az_http_request_builder_get_header(
     az_http_request_builder * const p_hrb,
     uint16_t const index,
-    az_const_span_pair * const out_result) {
+    az_pair * const out_result) {
   AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
   AZ_CONTRACT_ARG_NOT_NULL(out_result);
 
@@ -254,7 +254,7 @@ az_result az_http_request_builder_get_header(
         last_header_name_end = headers_start + i;
       } else {
         if (nheader == index) {
-          *out_result = (az_const_span_pair){
+          *out_result = (az_pair){
             .key = { .begin = last_header_start, .size = last_header_name_end - last_header_start },
             .value
             = { .begin = last_header_name_end + sizeof((uint8_t)'\0'),
