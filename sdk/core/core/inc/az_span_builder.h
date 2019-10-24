@@ -19,9 +19,9 @@ typedef struct {
    */
   az_span buffer;
   /**
-   * A current position in the buffer. The field is change after each write.
+   * A current size in the resulting span. The field is increased after each write.
    */
-  size_t position;
+  size_t size;
 } az_span_builder;
 
 /**
@@ -32,7 +32,7 @@ typedef struct {
 AZ_INLINE az_span_builder az_span_builder_create(az_span const buffer) {
   return (az_span_builder){
     .buffer = buffer,
-    .position = 0,
+    .size = 0,
   };
 }
 
@@ -40,7 +40,7 @@ AZ_INLINE az_span_builder az_span_builder_create(az_span const buffer) {
  * Returns a span of bytes that were written into the builder's buffer.
  */
 AZ_INLINE az_span az_span_builder_result(az_span_builder const * const p_builder) {
-  return az_span_take(p_builder->buffer, p_builder->position);
+  return az_span_take(p_builder->buffer, p_builder->size);
 }
 
 /**
