@@ -275,6 +275,11 @@ AZ_NODISCARD az_result az_span_replace(
  */
 AZ_CALLBACK_TYPE(az_span_visitor, az_const_span)
 
+typedef struct {
+  az_const_span key;
+  az_const_span value;
+} az_const_span_pair;
+
 #include <_az_cfg_suffix.h>
 
 #endif

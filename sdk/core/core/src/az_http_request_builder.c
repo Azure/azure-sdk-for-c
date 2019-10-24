@@ -38,24 +38,18 @@ AZ_NODISCARD az_result az_http_request_builder_init(
     return AZ_ERROR_ARG;
   }
 
-  if (buffer.size < method_verb.size + max_url_size) {
+  if (buffer.size < max_url_size) {
     return AZ_ERROR_BUFFER_OVERFLOW;
   }
 
   AZ_RETURN_IF_FAILED(az_span_set(buffer, '\0'));
 
-  az_span method_verb_buf = { 0, 0 };
-  AZ_RETURN_IF_FAILED(az_span_copy(
-      (az_span){ .begin = buffer.begin, .size = method_verb.size }, method_verb, &method_verb_buf));
-
   az_span uri_buf = { 0, 0 };
   AZ_RETURN_IF_FAILED(az_span_copy(
-      (az_span){ .begin = method_verb_buf.begin + method_verb.size, .size = max_url_size },
-      initial_url,
-      &uri_buf));
+      (az_span){ .begin = buffer.begin, .size = max_url_size }, initial_url, &uri_buf));
 
   *p_hrb = (az_http_request_builder){ .buffer = buffer,
-                                      .method_verb = az_span_to_const_span(method_verb_buf),
+                                      .method_verb = method_verb,
                                       .url = uri_buf,
                                       .max_url_size = max_url_size,
                                       .max_headers = max_headers,
@@ -213,9 +207,8 @@ AZ_NODISCARD az_result az_http_request_builder_append_header(
   memcpy(new_header_start, value.begin, value.size);
   new_header_start += value.size;
 
-  for (size_t i = 0; i < 3; ++i) {
-    new_header_start[i] = '\0';
-  }
+  new_header_start[0] = '\0';
+  new_header_start[1] = '\0';
 
   ++(p_hrb->headers_end);
 
@@ -230,4 +223,51 @@ AZ_NODISCARD az_result az_http_request_builder_mark_retry_headers_start(az_http_
 AZ_NODISCARD az_result az_http_request_builder_remove_retry_headers(az_http_request_builder * const p_hrb) {
   p_hrb->headers_end = p_hrb->retry_headers_start;
   return AZ_OK;
+}
+
+az_result az_http_request_builder_get_header(
+    az_http_request_builder * const p_hrb,
+    uint16_t const index,
+    az_const_span_pair * const out_result) {
+  AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
+  AZ_CONTRACT_ARG_NOT_NULL(out_result);
+
+  if (index >= p_hrb->headers_end) {
+    return AZ_ERROR_ARG;
+  }
+
+  uint8_t * const buffer_end = p_hrb->buffer.begin + p_hrb->buffer.size;
+  uint8_t * const headers_start = p_hrb->url.begin + p_hrb->max_url_size;
+
+  size_t const headers_space = buffer_end - headers_start;
+
+  if (headers_start >= buffer_end || headers_space < (2 * sizeof((uint8_t)'\0'))) {
+    return AZ_ERROR_ARG;
+  }
+
+  uint16_t nheader = 0;
+  uint8_t * last_header_start = headers_start;
+  uint8_t * last_header_name_end = last_header_start;
+  for (size_t i = 0; i < headers_space - (2 * sizeof((uint8_t)'\0')); ++i) {
+    if (headers_start[i] == '\0')
+      if (headers_start[i + 1] != '\0') {
+        last_header_name_end = headers_start + i;
+      } else {
+        if (nheader == index) {
+          *out_result = (az_const_span_pair){
+            .key = { .begin = last_header_start, .size = last_header_name_end - last_header_start },
+            .value
+            = { .begin = last_header_name_end + sizeof((uint8_t)'\0'),
+                .size = (headers_start + i) - (last_header_name_end + sizeof((uint8_t)'\0')) }
+          };
+          return AZ_OK;
+        }
+
+        ++nheader;
+        last_header_start = headers_start + (i + sizeof((uint8_t)'\0')) + 1;
+        last_header_name_end = last_header_start;
+      }
+  }
+
+  return AZ_ERROR_ARG;
 }

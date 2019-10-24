@@ -271,6 +271,9 @@ static az_const_span hrb_param_api_version_value = AZ_CONST_STR("7.0");
 static az_const_span hrb_param_test_param_name = AZ_CONST_STR("test-param");
 static az_const_span hrb_param_test_param_value = AZ_CONST_STR("value");
 
+static az_const_span hrb_url_final = AZ_CONST_STR(
+    "https://antk-keyvault.vault.azure.net/secrets/Password?api-version=7.0&test-param=value");
+
 static az_const_span hrb_header_content_type_name = AZ_CONST_STR("Content-Type");
 static az_const_span hrb_header_content_type_value
     = AZ_CONST_STR("application/x-www-form-urlencoded");
@@ -280,7 +283,6 @@ static az_const_span hrb_header_authorization_value1 = AZ_CONST_STR("Bearer 1234
 static az_const_span hrb_header_authorization_value2 = AZ_CONST_STR("Bearer 99887766554433221100");
 
 static az_const_span hrb_buffer1 = AZ_CONST_STR(
-    "GET"
     "https://antk-keyvault.vault.azure.net/secrets/Password"
     "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
     "\0\0\0\0\0\0\0\0\0\0"
@@ -295,8 +297,7 @@ static az_const_span hrb_buffer1 = AZ_CONST_STR(
     "\0\0\0\0\0\0\0\0\0\0");
 
 static az_const_span hrb_buffer2
-    = AZ_CONST_STR("GET"
-                   "https://antk-keyvault.vault.azure.net/secrets/Password"
+    = AZ_CONST_STR("https://antk-keyvault.vault.azure.net/secrets/Password"
                    "?api-version=7.0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
                    "\0\0\0\0\0\0\0\0\0\0"
                    "\0\0\0\0\0\0\0\0\0\0"
@@ -310,8 +311,7 @@ static az_const_span hrb_buffer2
                    "\0\0\0\0\0\0\0\0\0\0");
 
 static az_const_span hrb_buffer3
-    = AZ_CONST_STR("GET"
-                   "https://antk-keyvault.vault.azure.net/secrets/Password"
+    = AZ_CONST_STR("https://antk-keyvault.vault.azure.net/secrets/Password"
                    "?api-version=7.0&test-param=value\0\0\0\0\0\0\0\0\0\0\0\0\0"
                    "\0\0\0\0\0\0\0\0\0\0"
                    "\0\0\0\0\0\0\0\0\0\0"
@@ -325,8 +325,7 @@ static az_const_span hrb_buffer3
                    "\0\0\0\0\0\0\0\0\0\0");
 
 static az_const_span hrb_buffer4
-    = AZ_CONST_STR("GET"
-                   "https://antk-keyvault.vault.azure.net/secrets/Password"
+    = AZ_CONST_STR("https://antk-keyvault.vault.azure.net/secrets/Password"
                    "?api-version=7.0&test-param=value\0\0\0\0\0\0\0\0\0\0\0\0\0"
                    "Content-Ty"
                    "pe\0applica"
@@ -340,8 +339,7 @@ static az_const_span hrb_buffer4
                    "\0\0\0\0\0\0\0\0\0\0");
 
 static az_const_span hrb_buffer5
-    = AZ_CONST_STR("GET"
-                   "https://antk-keyvault.vault.azure.net/secrets/Password"
+    = AZ_CONST_STR("https://antk-keyvault.vault.azure.net/secrets/Password"
                    "?api-version=7.0&test-param=value\0\0\0\0\0\0\0\0\0\0\0\0\0"
                    "Content-Ty"
                    "pe\0applica"
@@ -355,8 +353,7 @@ static az_const_span hrb_buffer5
                    "\0\0\0\0\0\0\0\0\0\0");
 
 static az_const_span hrb_buffer6
-    = AZ_CONST_STR("GET"
-                   "https://antk-keyvault.vault.azure.net/secrets/Password"
+    = AZ_CONST_STR("https://antk-keyvault.vault.azure.net/secrets/Password"
                    "?api-version=7.0&test-param=value\0\0\0\0\0\0\0\0\0\0\0\0\0"
                    "Content-Ty"
                    "pe\0applica"
@@ -754,7 +751,7 @@ int main() {
     TEST_ASSERT(az_const_span_eq(result, uri_decoded));
   }
   {
-    uint8_t buf[200 + 3];
+    uint8_t buf[200];
     memset(buf, 0, sizeof(buf));
     az_span const http_buf = { .begin = buf, .size = sizeof(buf) };
     az_http_request_builder hrb;
@@ -770,7 +767,8 @@ int main() {
         &hrb, hrb_param_test_param_name, hrb_param_test_param_value);
     TEST_ASSERT(az_const_span_eq(az_span_to_const_span(http_buf), hrb_buffer3));
 
-    az_http_request_builder_append_header(&hrb, hrb_header_content_type_name, hrb_header_content_type_value);
+    az_http_request_builder_append_header(
+        &hrb, hrb_header_content_type_name, hrb_header_content_type_value);
     TEST_ASSERT(az_const_span_eq(az_span_to_const_span(http_buf), hrb_buffer4));
 
     az_http_request_builder_mark_retry_headers_start(&hrb);
@@ -783,6 +781,22 @@ int main() {
     az_http_request_builder_append_header(
         &hrb, hrb_header_authorization_name, hrb_header_authorization_value2);
     TEST_ASSERT(az_const_span_eq(az_span_to_const_span(http_buf), hrb_buffer6));
+
+    TEST_ASSERT(az_const_span_eq(hrb.method_verb, AZ_HTTP_METHOD_VERB_GET));
+    TEST_ASSERT(az_const_span_eq(az_span_to_const_span(hrb.url), hrb_url_final));
+
+    TEST_ASSERT(hrb.headers_end == 2);
+    az_const_span_pair expected_headers[2] = {
+      { .key = hrb_header_content_type_name, .value = hrb_header_content_type_value },
+      { .key = hrb_header_authorization_name, .value = hrb_header_authorization_value2 },
+    };
+    for (uint16_t i = 0; i < hrb.headers_end; ++i) {
+      az_const_span_pair header = { 0, 0 };
+      az_http_request_builder_get_header(&hrb, i, &header);
+
+      TEST_ASSERT(az_const_span_eq(header.key, expected_headers[i].key));
+      TEST_ASSERT(az_const_span_eq(header.value, expected_headers[i].value));
+    }
   }
   return exit_code;
 }
