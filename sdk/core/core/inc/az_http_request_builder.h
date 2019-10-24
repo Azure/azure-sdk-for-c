@@ -16,7 +16,6 @@
 
 #include <az_pair.h>
 #include <az_span.h>
-#include <az_write_span_iter.h>
 
 typedef struct {
   az_span buffer;
