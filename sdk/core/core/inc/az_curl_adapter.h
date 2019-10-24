@@ -7,7 +7,7 @@
 #include <az_callback.h>
 #include <az_http_request.h>
 #include <az_span_seq.h>
-#include <az_write_span_iter.h>
+#include <az_span_builder.h>
 
 #include <curl/curl.h>
 #include <stdlib.h>
