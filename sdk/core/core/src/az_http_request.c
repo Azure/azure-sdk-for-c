@@ -4,9 +4,9 @@
 #include <az_http_request.h>
 
 #include <az_contract.h>
+#include <az_span_builder.h>
 #include <az_span_seq.h>
 #include <az_str.h>
-#include <az_write_span_iter.h>
 
 #include <stdlib.h>
 
@@ -115,27 +115,12 @@ az_result az_http_url_to_spans(
   return AZ_OK;
 }
 
+AZ_CALLBACK_FUNC(az_http_url_to_spans, az_http_request const *, az_span_seq)
+
 az_result az_http_get_url_size(az_http_request const * const p_request, size_t * out) {
-  return az_http_url_to_spans(p_request, az_span_add_size_callback(out));
+  return az_span_seq_size(az_http_url_to_spans_callback(p_request), out);
 }
 
 az_result az_http_url_to_new_str(az_http_request const * const p_request, char ** const out) {
-  *out = NULL;
-  size_t size = 0;
-  AZ_RETURN_IF_FAILED(az_http_get_url_size(p_request, &size));
-  size += 1;
-  uint8_t * const p = (uint8_t *)malloc(size);
-  if (p == NULL) {
-    return AZ_ERROR_OUT_OF_MEMORY;
-  }
-  az_write_span_iter i = az_write_span_iter_create((az_span){ .begin = p, .size = size });
-  az_span_visitor sv = az_write_span_iter_write_callback(&i);
-  az_result const result = az_http_url_to_spans(p_request, sv);
-  az_write_span_iter_write(&i, AZ_STR("\0"));
-  if (az_failed(result)) {
-    free(p);
-    return result;
-  }
-  *out = (char *)p;
-  return AZ_OK;
+  return az_span_seq_to_new_str(az_http_url_to_spans_callback(p_request), out);
 }
