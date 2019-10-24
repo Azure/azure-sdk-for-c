@@ -20,12 +20,23 @@
 #include <az_write_span_iter.h>
 
 typedef struct {
-  az_span buffer;
-  int16_t max_headers;
-  int16_t max_url_size;
-  az_const_span method_verb;
-  int16_t retry_headers_start;
+  int16_t capacity;
+  az_pair * headers_start;
+  int16_t size;
+  az_pair * retry_headers_start;
   int16_t headers_end;
+} az_http_request_headers_info;
+
+typedef struct {
+  int16_t capacity;
+  int16_t size;
+} az_http_request_url_info;
+
+typedef struct {
+  az_span buffer;
+  az_http_request_headers_info headers_info;
+  az_http_request_url_info url_info;
+  az_const_span method_verb;
 } az_http_request_builder;
 
 /**

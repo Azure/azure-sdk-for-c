@@ -5,7 +5,100 @@
 
 typedef struct {
   struct curl_slist * p_list;
-} az_headers_data;
+} az_curl_headers_list;
+
+/**
+ * @brief writes a header key and value to a buffer as a 0-terminated string and using a separator
+ * span in between. Returns error as soon as any of the write operations fails
+ *
+ * @param writable_buffer
+ * @param p_header
+ * @param separator
+ * @return az_result
+ */
+az_result az_write_to_buffer(
+    az_span const writable_buffer,
+    az_pair * const p_header,
+    az_const_span separator) {
+  az_write_span_iter writer = az_write_span_iter_create(writable_buffer);
+  az_result write_result;
+  write_result = az_write_span_iter_write(&writer, p_header->key);
+  if (write_result != AZ_OK) {
+    return AZ_ERROR_ARG;
+  }
+  write_result = az_write_span_iter_write(&writer, separator);
+  if (write_result != AZ_OK) {
+    return AZ_ERROR_ARG;
+  }
+  write_result = az_write_span_iter_write(&writer, p_header->value);
+  if (write_result != AZ_OK) {
+    return AZ_ERROR_ARG;
+  }
+  write_result = az_write_span_iter_write(&writer, AZ_STR("\0"));
+  if (write_result != AZ_OK) {
+    return AZ_ERROR_ARG;
+  }
+  az_write_span_iter_result(&writer);
+
+  return AZ_OK;
+}
+
+/**
+ * @brief allocate a buffer for a header. Then reads the az_pair header and writes a buffer. Then
+ * uses that buffer to set curl header. Header is set only if write operations were OK. Buffer is
+ * free after setting curl header.
+ *
+ * @param p_header
+ * @param p_headers
+ * @param separator
+ * @return az_result
+ */
+az_result az_add_header_to_curl_list(
+    az_pair * const p_header,
+    az_curl_headers_list * const p_headers,
+    az_const_span separator) {
+  // allocate a buffet for header
+  int16_t buffer_size = p_header->key.size + separator.size + p_header->value.size + 1;
+  uint8_t * const p_writable_buffer = (uint8_t * const)malloc(buffer_size);
+  if (p_writable_buffer == NULL) {
+    return AZ_ERROR_OUT_OF_MEMORY;
+  }
+  char * buffer = (char *)p_writable_buffer;
+
+  // write buffer
+  az_span const writable_buffer = AZ_SPAN(p_writable_buffer);
+  az_result write_result = az_write_to_buffer(writable_buffer, p_header, separator);
+
+  // attach header only when write was OK
+  if (write_result == AZ_OK) {
+    p_headers->p_list = curl_slist_append(p_headers->p_list, buffer);
+  }
+  // at any case, error or OK, free the allocated memory
+  free(p_writable_buffer);
+  return write_result;
+}
+
+/**
+ * @brief loop all the headers from a HTTP request and set each header into easy curl
+ *
+ * @param p_hrb
+ * @param p_headers
+ * @return az_result
+ */
+az_result az_build_headers(
+    az_http_request_builder const * const p_hrb,
+    az_curl_headers_list * p_headers) {
+  az_const_span separator = AZ_STR(": ");
+  // get pointer to first header
+  az_pair * p_header = p_hrb->headers_info.headers_start;
+
+  for (int8_t offset = 1; offset < p_hrb->headers_info.size; offset++) {
+    AZ_RETURN_IF_FAILED(az_add_header_to_curl_list(p_header, p_headers, separator));
+    p_header += 1;
+  }
+
+  return AZ_OK;
+}
 
 /**
  * handles GET request
@@ -15,11 +108,11 @@ az_result az_curl_send_request(
     az_http_request_builder const * const p_hrb) {
   (void)p_hrb;
   // creates a slist for bulding curl headers
-  az_headers_data headers = {
+  az_curl_headers_list headers = {
     .p_list = NULL,
   };
   // build headers into a slist as curl is expecting
-  // TODO: AZ_RETURN_IF_FAILED(az_build_headers(p_hrb, &headers));
+  AZ_RETURN_IF_FAILED(az_build_headers(p_hrb, &headers));
   // set all headers from slist
   curl_easy_setopt(p_curl->p_curl, CURLOPT_HTTPHEADER, headers.p_list);
 
