@@ -4,11 +4,11 @@
 #ifndef AZ_RESULT_H
 #define AZ_RESULT_H
 
+#include <az_static_assert.h>
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
-
-#include <az_static_assert.h>
 
 #include <_az_cfg_prefix.h>
 
@@ -55,7 +55,7 @@ enum {
   AZ_ERROR_BUFFER_OVERFLOW = AZ_MAKE_ERROR(AZ_CORE_FACILITY, 2),
   AZ_ERROR_OUT_OF_MEMORY = AZ_MAKE_ERROR(AZ_CORE_FACILITY, 3),
   AZ_ERROR_NOT_IMPLEMENTED = AZ_MAKE_ERROR(AZ_CORE_FACILITY, 4),
-  
+
   AZ_ERROR_EOF = AZ_MAKE_ERROR(AZ_STD_FACILITY, 0xFFFF),
 };
 

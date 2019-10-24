@@ -1,8 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_contract.h>
 #include <az_uri.h>
+
+#include <az_contract.h>
 
 #include <assert.h>
 #include <stdbool.h>
