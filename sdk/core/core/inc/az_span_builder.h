@@ -8,22 +8,44 @@
 
 #include <_az_cfg_prefix.h>
 
+/**
+ * A byte span builder.
+ *
+ * A builder is writing sequentially into a preallocated buffer.
+ */
 typedef struct {
-  az_span span;
-  size_t i;
+  /**
+   * A buffer for writting. This field is immutable.
+   */
+  az_span buffer;
+  /**
+   * A current position in the buffer. The field is change after each write.
+   */
+  size_t position;
 } az_span_builder;
 
-AZ_INLINE az_span_builder az_span_builder_create(az_span const span) {
+/**
+ * Creates a byte span builder.
+ *
+ * @buffer a buffer for writing. 
+ */
+AZ_INLINE az_span_builder az_span_builder_create(az_span const buffer) {
   return (az_span_builder){
-    .span = span,
-    .i = 0,
+    .buffer = buffer,
+    .position = 0,
   };
 }
 
-AZ_INLINE az_span az_span_builder_result(az_span_builder const * const p_i) {
-  return az_span_take(p_i->span, p_i->i);
+/**
+ * Returns a span of bytes that were written into the builder's buffer.
+ */
+AZ_INLINE az_span az_span_builder_result(az_span_builder const * const p_builder) {
+  return az_span_take(p_builder->buffer, p_builder->position);
 }
 
+/**
+ * Append a given span of bytes.
+ */
 az_result az_span_builder_append(az_span_builder * const p_builder, az_const_span const span);
 
 AZ_CALLBACK_FUNC(az_span_builder_append, az_span_builder *, az_span_visitor)
