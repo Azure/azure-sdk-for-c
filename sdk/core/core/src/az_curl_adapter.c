@@ -20,11 +20,11 @@ az_result az_write_to_buffer(
     az_span const writable_buffer,
     az_pair * const p_header,
     az_const_span separator) {
-  az_write_span_iter writer = az_write_span_iter_create(writable_buffer);
-  AZ_RETURN_IF_FAILED(az_write_span_iter_write(&writer, p_header->key));
-  AZ_RETURN_IF_FAILED(az_write_span_iter_write(&writer, separator));
-  AZ_RETURN_IF_FAILED(az_write_span_iter_write(&writer, p_header->value));
-  AZ_RETURN_IF_FAILED(az_write_span_iter_write(&writer, AZ_STR("\0")));
+  az_span_builder writer = az_span_builder_create(writable_buffer);
+  AZ_RETURN_IF_FAILED(az_span_builder_append(&writer, p_header->key));
+  AZ_RETURN_IF_FAILED(az_span_builder_append(&writer, separator));
+  AZ_RETURN_IF_FAILED(az_span_builder_append(&writer, p_header->value));
+  AZ_RETURN_IF_FAILED(az_span_builder_append(&writer, AZ_STR("\0")));
   return AZ_OK;
 }
 
@@ -97,9 +97,9 @@ az_result az_build_headers(
  * @return az_result
  */
 az_result az_write_url(az_span const writable_buffer, az_const_span const url_from_request) {
-  az_write_span_iter writer = az_write_span_iter_create(writable_buffer);
-  AZ_RETURN_IF_FAILED(az_write_span_iter_write(&writer, url_from_request));
-  AZ_RETURN_IF_FAILED(az_write_span_iter_write(&writer, AZ_STR("\0")));
+  az_span_builder writer = az_span_builder_create(writable_buffer);
+  AZ_RETURN_IF_FAILED(az_span_builder_append(&writer, url_from_request));
+  AZ_RETURN_IF_FAILED(az_span_builder_append(&writer, AZ_STR("\0")));
   return AZ_OK;
 }
 
