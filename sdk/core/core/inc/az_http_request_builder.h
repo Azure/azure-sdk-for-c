@@ -36,6 +36,9 @@ extern az_const_span const AZ_HTTP_METHOD_VERB_OPTIONS;
 extern az_const_span const AZ_HTTP_METHOD_VERB_CONNECT;
 extern az_const_span const AZ_HTTP_METHOD_VERB_PATCH;
 
+/**
+ * @brief format buffer as a http request containing headers and url.
+ */
 AZ_NODISCARD az_result az_http_request_builder_init(
     az_http_request_builder * const p_hrb,
     az_span const buffer,
@@ -44,11 +47,18 @@ AZ_NODISCARD az_result az_http_request_builder_init(
     uint16_t const max_url_size,
     uint16_t const max_headers);
 
+/**
+ * @brief set a query parameter. If the query name is not in url yet, it will be added, otherwise
+ * modified
+ */
 AZ_NODISCARD az_result az_http_request_builder_set_query_parameter(
     az_http_request_builder * const p_hrb,
     az_const_span const name,
     az_const_span const value);
 
+/**
+ * @brief add a new header for the request.
+ */
 AZ_NODISCARD az_result az_http_request_builder_append_header(
     az_http_request_builder * const p_hrb,
     az_const_span const name,
