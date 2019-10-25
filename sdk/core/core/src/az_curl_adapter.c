@@ -21,25 +21,10 @@ az_result az_write_to_buffer(
     az_pair * const p_header,
     az_const_span separator) {
   az_write_span_iter writer = az_write_span_iter_create(writable_buffer);
-  az_result write_result;
-  write_result = az_write_span_iter_write(&writer, p_header->key);
-  if (write_result != AZ_OK) {
-    return AZ_ERROR_ARG;
-  }
-  write_result = az_write_span_iter_write(&writer, separator);
-  if (write_result != AZ_OK) {
-    return AZ_ERROR_ARG;
-  }
-  write_result = az_write_span_iter_write(&writer, p_header->value);
-  if (write_result != AZ_OK) {
-    return AZ_ERROR_ARG;
-  }
-  write_result = az_write_span_iter_write(&writer, AZ_STR("\0"));
-  if (write_result != AZ_OK) {
-    return AZ_ERROR_ARG;
-  }
-  az_write_span_iter_result(&writer);
-
+  AZ_RETURN_IF_FAILED(az_write_span_iter_write(&writer, p_header->key));
+  AZ_RETURN_IF_FAILED(az_write_span_iter_write(&writer, separator));
+  AZ_RETURN_IF_FAILED(az_write_span_iter_write(&writer, p_header->value));
+  AZ_RETURN_IF_FAILED(az_write_span_iter_write(&writer, AZ_STR("\0")));
   return AZ_OK;
 }
 
@@ -66,11 +51,12 @@ az_result az_add_header_to_curl_list(
   char * buffer = (char *)p_writable_buffer;
 
   // write buffer
-  az_span const writable_buffer = AZ_SPAN(p_writable_buffer);
+  az_span const writable_buffer
+      = (az_span const){ .begin = p_writable_buffer, .size = buffer_size };
   az_result write_result = az_write_to_buffer(writable_buffer, p_header, separator);
 
   // attach header only when write was OK
-  if (write_result == AZ_OK) {
+  if (az_succeeded(write_result)) {
     p_headers->p_list = curl_slist_append(p_headers->p_list, buffer);
   }
   // at any case, error or OK, free the allocated memory
@@ -86,15 +72,17 @@ az_result az_add_header_to_curl_list(
  * @return az_result
  */
 az_result az_build_headers(
-    az_http_request_builder const * const p_hrb,
+    az_http_request_builder * const p_hrb,
     az_curl_headers_list * p_headers) {
   az_const_span separator = AZ_STR(": ");
   // get pointer to first header
-  az_pair * p_header = p_hrb->headers_info.headers_start;
 
-  for (int8_t offset = 1; offset < p_hrb->headers_info.size; offset++) {
+  az_pair a;
+  az_pair * p_header = &a;
+
+  for (uint16_t offset = 0; offset < p_hrb->headers_end; ++offset) {
+    AZ_RETURN_IF_FAILED(az_http_request_builder_get_header(p_hrb, offset, p_header));
     AZ_RETURN_IF_FAILED(az_add_header_to_curl_list(p_header, p_headers, separator));
-    p_header += 1;
   }
 
   return AZ_OK;
@@ -110,15 +98,8 @@ az_result az_build_headers(
  */
 az_result az_write_url(az_span const writable_buffer, az_const_span const url_from_request) {
   az_write_span_iter writer = az_write_span_iter_create(writable_buffer);
-  az_result write_result;
-  write_result = az_write_span_iter_write(&writer, url_from_request);
-  if (write_result != AZ_OK) {
-    return AZ_ERROR_ARG;
-  }
-  write_result = az_write_span_iter_write(&writer, AZ_STR("\0"));
-  if (write_result != AZ_OK) {
-    return AZ_ERROR_ARG;
-  }
+  AZ_RETURN_IF_FAILED(az_write_span_iter_write(&writer, url_from_request));
+  AZ_RETURN_IF_FAILED(az_write_span_iter_write(&writer, AZ_STR("\0")));
   return AZ_OK;
 }
 
@@ -133,21 +114,23 @@ az_result az_write_url(az_span const writable_buffer, az_const_span const url_fr
  */
 az_result az_build_url(az_curl * const p_curl, az_http_request_builder const * const p_hrb) {
   // allocate a new buffer for url with 0 terminated
-  uint8_t * const p_writable_buffer = (uint8_t * const)malloc(p_hrb->url_info.size + 1);
+  uint8_t * const p_writable_buffer = (uint8_t * const)malloc(p_hrb->url.size + 1);
   if (p_writable_buffer == NULL) {
     return AZ_ERROR_OUT_OF_MEMORY;
   }
   char * buffer = (char *)p_writable_buffer;
 
-  // get a new span for url inside request buffer
-  az_const_span const url_from_request = { .begin = &p_hrb->buffer, .size = p_hrb->url_info.size };
-  az_span const writable_buffer = AZ_SPAN(p_writable_buffer);
+  az_span const writable_buffer
+      = (az_span const){ .begin = p_writable_buffer, .size = p_hrb->url.size + 1 };
+  az_result write_result = az_write_url(writable_buffer, az_span_to_const_span(p_hrb->url));
 
-  az_result write_result = az_write_url(writable_buffer, url_from_request);
-
-  if (write_result == AZ_OK) {
+  if (az_succeeded(write_result)) {
     curl_easy_setopt(p_curl->p_curl, CURLOPT_URL, buffer);
+    printf("%s", buffer);
   }
+
+  memset(p_writable_buffer, 0, p_hrb->max_url_size + 1);
+  printf("%s", buffer);
   free(p_writable_buffer);
   return write_result;
 }
@@ -155,10 +138,7 @@ az_result az_build_url(az_curl * const p_curl, az_http_request_builder const * c
 /**
  * handles GET request
  */
-az_result az_curl_send_request(
-    az_curl * const p_curl,
-    az_http_request_builder const * const p_hrb) {
-  (void)p_hrb;
+az_result az_curl_send_request(az_curl * const p_curl, az_http_request_builder * const p_hrb) {
   // creates a slist for bulding curl headers
   az_curl_headers_list headers = {
     .p_list = NULL,
@@ -169,11 +149,22 @@ az_result az_curl_send_request(
   curl_easy_setopt(p_curl->p_curl, CURLOPT_HTTPHEADER, headers.p_list);
 
   // set URL
-  AZ_RETURN_IF_FAILED(az_build_url(p_curl->p_curl, p_hrb));
+  uint8_t * const p_writable_buffer = (uint8_t * const)malloc(p_hrb->url.size + 1);
+  char * buffer = (char *)p_writable_buffer;
+  az_span const writable_buffer
+      = (az_span const){ .begin = p_writable_buffer, .size = p_hrb->url.size + 1 };
+  az_result result = az_write_url(writable_buffer, az_span_to_const_span(p_hrb->url));
+  if (az_succeeded(result)) {
+    curl_easy_setopt(p_curl->p_curl, CURLOPT_URL, buffer);
+  }
+  memset(p_writable_buffer, 0, p_hrb->url.size + 1);
+  free(buffer);
 
+  // send
   CURLcode res = curl_easy_perform(p_curl->p_curl);
-  if (res != CURLE_OK)
+  if (res != CURLE_OK) {
     fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+  }
 
   // TODO: would this be part of done function instead?
   curl_slist_free_all(headers.p_list);
@@ -246,7 +237,7 @@ az_result az_curl_post_request(
 }
 
 az_result az_http_client_send_request_impl(
-    az_http_request_builder const * const p_hrb,
+    az_http_request_builder * const p_hrb,
     az_span * const response) {
   az_curl p_curl;
   AZ_RETURN_IF_FAILED(az_curl_init(&p_curl));

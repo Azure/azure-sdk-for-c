@@ -6,7 +6,9 @@
 
 #include <az_callback.h>
 #include <az_http_request_builder.h>
+#include <az_pair.h>
 #include <az_span_seq.h>
+#include <az_str.h>
 #include <az_write_span_iter.h>
 
 #include <_az_cfg_prefix.h>
@@ -36,7 +38,7 @@ AZ_INLINE az_result az_curl_done(az_curl * const p) {
 }
 
 az_result az_http_client_send_request_impl(
-    az_http_request_builder const * const p_hrb,
+    az_http_request_builder * const p_hrb,
     az_span * const response);
 
 #include <_az_cfg_suffix.h>

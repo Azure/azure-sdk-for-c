@@ -3,32 +3,34 @@
 
 #include <stdio.h>
 
-#include <az_http_request.h>
+#include <az_http_client.h>
+#include <az_http_request_builder.h>
 #include <az_json_read.h>
 #include <az_pair.h>
 #include <az_write_span_iter.h>
+#include <stdlib.h>
 
 int exit_code = 0;
 
+static az_const_span hrb_url = AZ_CONST_STR("http://127.0.0.1:5000/test/yo?arg1=vh");
+
+static az_const_span hrb_header_content_type_name = AZ_CONST_STR("Content-Type");
+static az_const_span hrb_header_content_type_value = AZ_CONST_STR("testThis");
+
 int main() {
+  // create a buffer for request
+  uint8_t buf[1024 * 4];
+  az_span const http_buf = AZ_SPAN(buf);
+  az_http_request_builder hrb;
 
-  /****** -------------  Create request from arrays ---------******/
-  az_pair const query_array[] = { { .key = AZ_STR("key"), .value = AZ_STR("value") } };
-  az_pair_span const query = AZ_SPAN(query_array);
-  az_pair const header_array[] = { { .key = AZ_STR("key"), .value = AZ_STR("value") } };
-  az_pair_span const header = AZ_SPAN(header_array);
+  // init buffer
+  az_http_request_builder_init(&hrb, http_buf, AZ_HTTP_METHOD_VERB_GET, hrb_url, 100, 2);
 
-  az_const_span req_body
-      = AZ_STR("grant_type=client_credentials&client_id=4317a660-6bfb-4585-9ce9-8f222314879c&"
-               "client_secret=O2CT[Y:dkTqblml5V/T]ZEi9x1W1zoBW&resource=https://vault.azure.net");
-  az_http_request const request = {
-    .method = AZ_STR("POST"),
-    .path
-    = AZ_STR("https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47/oauth2/token"),
-    .query = az_pair_span_to_seq_callback(&query),
-    .headers = az_pair_span_to_seq_callback(&header),
-    .body = req_body,
-  };
+  // add header
+  az_http_request_builder_append_header(
+      &hrb, hrb_header_content_type_name, hrb_header_content_type_value);
+
+  az_http_client_send_request(&hrb, NULL);
 
   return exit_code;
 }
