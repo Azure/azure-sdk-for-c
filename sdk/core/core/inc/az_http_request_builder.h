@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// SPDX-License-Identifier: MIT
+
 #ifndef AZ_HTTP_REQUEST_BUILDER_H
 #define AZ_HTTP_REQUEST_BUILDER_H
 
