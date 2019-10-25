@@ -4,15 +4,12 @@
 #ifndef AZ_HTTP_REQUEST_H
 #define AZ_HTTP_REQUEST_H
 
-#include <az_contract.h>
 #include <az_pair.h>
 #include <az_span.h>
 #include <az_span_seq.h>
 #include <az_str.h>
 
 #include <_az_cfg_prefix.h>
-
-#include <stddef.h>
 
 typedef struct {
   az_const_span method;

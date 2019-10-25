@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include <az_base64.h>
+
 #include <az_contract.h>
 
 #include <assert.h>

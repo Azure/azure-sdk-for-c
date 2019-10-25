@@ -4,11 +4,11 @@
 #ifndef AZ_RESULT_H
 #define AZ_RESULT_H
 
+#include <az_static_assert.h>
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
-
-#include <az_static_assert.h>
 
 #include <_az_cfg_prefix.h>
 

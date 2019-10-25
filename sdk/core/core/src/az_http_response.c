@@ -13,5 +13,5 @@ az_http_response_parse(az_const_span const span, az_http_response const response
 
   // https://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html
   // HTTP/1.1 200 OK
-  // 
+  //
 }
