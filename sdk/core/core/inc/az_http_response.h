@@ -4,14 +4,14 @@
 #ifndef AZ_HTTP_RESPONSE_H
 #define AZ_HTTP_RESPONSE_H
 
+#include <az_pair.h>
 #include <az_result.h>
 #include <az_span.h>
 
 #include <_az_cfg_prefix.h>
 
 typedef struct {
-  az_span_visitor header_name;
-  az_span_visitor header_value;
+  az_pair_visitor header;
   az_span_visitor body;
 } az_http_response;
 
