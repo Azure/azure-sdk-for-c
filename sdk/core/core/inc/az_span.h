@@ -263,17 +263,17 @@ AZ_NODISCARD az_result az_span_replace(
  * typedef struct {
  *   az_result (*func)(ptrdiff_t, az_const_span);
  *   ptrdiff_t data;
- * } az_span_visitor;
+ * } az_span_append;
  * ```
  *
  * Example of usage
  *
  * ```c
- * az_span_visitor const visitor = ...;
- * visitor.func(visitor.data, AZ_CONST_SPAN("Something"));
+ * az_span_append const append = ...;
+ * az_span_append_do(append, AZ_CONST_SPAN("Something"));
  * ```
  */
-AZ_CALLBACK_TYPE(az_span_visitor, az_const_span)
+AZ_CALLBACK_TYPE(az_span_append, az_const_span)
 
 #include <_az_cfg_suffix.h>
 

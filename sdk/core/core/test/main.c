@@ -478,7 +478,7 @@ int main() {
     uint8_t buffer[1024];
     {
       az_span_builder wi = az_span_builder_create((az_span)AZ_SPAN(buffer));
-      az_span_visitor sv = az_span_builder_append_callback(&wi);
+      az_span_append sv = az_span_builder_append_callback(&wi);
       az_const_span const expected = AZ_STR( //
           "GET /foo?hello=world!&x=42 HTTP/1.1\r\n"
           "some: xml\r\n"
@@ -493,9 +493,9 @@ int main() {
     {
       printf("----Test: az_http_request_to_url_span\n");
       az_span_builder wi = az_span_builder_create((az_span)AZ_SPAN(buffer));
-      az_span_visitor sv = az_span_builder_append_callback(&wi);
+      az_span_append sv = az_span_builder_append_callback(&wi);
       az_const_span const expected = AZ_STR("/foo?hello=world!&x=42");
-      az_result const result = az_http_url_to_spans(&request, sv);
+      az_result const result = az_build_url(&request, sv);
       TEST_ASSERT(result == AZ_OK);
       az_span out = az_span_builder_result(&wi);
       TEST_ASSERT(az_const_span_eq(az_span_to_const_span(out), expected));

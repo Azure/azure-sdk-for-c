@@ -13,13 +13,13 @@
 AZ_NODISCARD az_result
 az_span_span_to_seq(
     az_span_span const * const context,
-    az_span_visitor const visitor) {
+    az_span_append const append) {
   AZ_CONTRACT_ARG_NOT_NULL(context);
 
   size_t const size = context->size;
   az_const_span const * begin = context->begin;
   for (size_t i = 0; i < size; ++i) {
-    AZ_RETURN_IF_FAILED(visitor.func(visitor.data, begin[i]));
+    AZ_RETURN_IF_FAILED(az_span_append_do(append, begin[i]));
   }
   return AZ_OK;
 }

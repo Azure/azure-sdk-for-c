@@ -16,114 +16,124 @@
 
 static az_const_span const az_crlf = AZ_CONST_STR(AZ_CRLF);
 
+/**
+ * A query state.
+ */
 typedef struct {
-  az_span_visitor spans;
+  /**
+   * A callback which accept a span of bytes. 
+   *
+   * An immutable field.
+   */
+  az_span_append append;
+  /**
+   * A query parameter separator. Usually it's `&` but it can be `?` before the first query parameter.
+   *
+   * A mutable field.
+   */
   az_const_span separator;
 } az_query_state;
 
-AZ_CALLBACK_FUNC(az_query_to_spans, az_query_state *, az_pair_visitor)
+AZ_CALLBACK_FUNC(az_build_query_param, az_query_state *, az_pair_visitor)
 
-AZ_NODISCARD az_result az_query_to_spans(az_query_state * const p, az_pair const pair) {
+/**
+ * Creates a span sequence from a query parameter. 
+ *
+ * An example, if p->separator is "&", pair.key is "foo" and pair.value is "bar" then
+ * the result sequence is "&foo=bar".
+ *
+ * Note: currently, the function assumes that pair.key and pair.value encoded into URL format. 
+ */
+AZ_NODISCARD az_result az_build_query_param(az_query_state * const p, az_pair const pair) {
   AZ_CONTRACT_ARG_NOT_NULL(p);
 
-  az_span_visitor const spans = p->spans;
-  AZ_RETURN_IF_FAILED(spans.func(spans.data, p->separator));
-  AZ_RETURN_IF_FAILED(spans.func(spans.data, pair.key));
-  AZ_RETURN_IF_FAILED(spans.func(spans.data, AZ_STR("=")));
-  AZ_RETURN_IF_FAILED(spans.func(spans.data, pair.value));
+  az_span_append const append = p->append;
+  AZ_RETURN_IF_FAILED(az_span_append_do(append, p->separator));
+  AZ_RETURN_IF_FAILED(az_span_append_do(append, pair.key));
+  AZ_RETURN_IF_FAILED(az_span_append_do(append, AZ_STR("=")));
+  AZ_RETURN_IF_FAILED(az_span_append_do(append, pair.value));
   p->separator = AZ_STR("&");
   return AZ_OK;
 }
 
 AZ_NODISCARD az_result
-az_build_header(az_pair const * const header, az_span_visitor const visitor) {
-  AZ_RETURN_IF_FAILED(visitor.func(visitor.data, header->key));
-  AZ_RETURN_IF_FAILED(visitor.func(visitor.data, AZ_STR(": ")));
-  AZ_RETURN_IF_FAILED(visitor.func(visitor.data, header->value));
+az_build_header(az_pair const * const header, az_span_append const append) {
+  AZ_RETURN_IF_FAILED(az_span_append_do(append, header->key));
+  AZ_RETURN_IF_FAILED(az_span_append_do(append, AZ_STR(": ")));
+  AZ_RETURN_IF_FAILED(az_span_append_do(append, header->value));
   return AZ_OK;
 }
 
-AZ_CALLBACK_FUNC(az_header_to_spans, az_span_visitor const *, az_pair_visitor)
+AZ_CALLBACK_FUNC(az_header_to_spans, az_span_append const *, az_pair_visitor)
 
-AZ_NODISCARD az_result az_header_to_spans(az_span_visitor const * const p, az_pair const pair) {
-  AZ_CONTRACT_ARG_NOT_NULL(p);
+AZ_NODISCARD az_result az_header_to_spans(az_span_append const * const p_append, az_pair const pair) {
+  AZ_CONTRACT_ARG_NOT_NULL(p_append);
 
-  AZ_RETURN_IF_FAILED(az_build_header(&pair, *p));
-  AZ_RETURN_IF_FAILED(p->func(p->data, az_crlf));
+  AZ_RETURN_IF_FAILED(az_build_header(&pair, *p_append));
+  AZ_RETURN_IF_FAILED(az_span_append_do(*p_append, az_crlf));
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result
-az_http_request_to_spans(
+AZ_NODISCARD az_result az_http_request_to_spans(
     az_http_request const * const p_request,
-    az_span_visitor const spans) {
+    az_span_append const append) {
   AZ_CONTRACT_ARG_NOT_NULL(p_request);
 
   // a request line
   {
-    AZ_RETURN_IF_FAILED(spans.func(spans.data, p_request->method));
-    AZ_RETURN_IF_FAILED(spans.func(spans.data, AZ_STR(" ")));
-    AZ_RETURN_IF_FAILED(spans.func(spans.data, p_request->path));
+    AZ_RETURN_IF_FAILED(az_span_append_do(append, p_request->method));
+    AZ_RETURN_IF_FAILED(az_span_append_do(append, AZ_STR(" ")));
+    AZ_RETURN_IF_FAILED(az_span_append_do(append, p_request->path));
     // query parameters
     {
       az_query_state state = {
-        .spans = spans,
+        .append = append,
         .separator = AZ_STR("?"),
       };
-      az_pair_visitor const pair_visitor = az_query_to_spans_callback(&state);
-      az_pair_seq const query = p_request->query;
       // for each query parameter apply `pair_visitor`
-      AZ_RETURN_IF_FAILED(query.func(query.data, pair_visitor));
+      AZ_RETURN_IF_FAILED(az_pair_seq_do(p_request->query, az_build_query_param_callback(&state)));
     }
-    AZ_RETURN_IF_FAILED(spans.func(spans.data, AZ_STR(" HTTP/1.1" AZ_CRLF)));
+    AZ_RETURN_IF_FAILED(az_span_append_do(append, AZ_STR(" HTTP/1.1" AZ_CRLF)));
   }
 
   // headers
-  {
-    az_pair_visitor const pair_visitor = az_header_to_spans_callback(&spans);
-    az_pair_seq const headers = p_request->headers;
-    AZ_RETURN_IF_FAILED(headers.func(headers.data, pair_visitor));
-  }
+  AZ_RETURN_IF_FAILED(
+      az_pair_seq_do(p_request->headers, az_header_to_spans_callback(&append)));
 
   // an empty line
-  AZ_RETURN_IF_FAILED(spans.func(spans.data, az_crlf));
+  AZ_RETURN_IF_FAILED(az_span_append_do(append, az_crlf));
 
   // body.
-  AZ_RETURN_IF_FAILED(spans.func(spans.data, p_request->body));
+  AZ_RETURN_IF_FAILED(az_span_append_do(append, p_request->body));
 
   return AZ_OK;
 }
 
 AZ_NODISCARD az_result
-az_http_url_to_spans(
-    az_http_request const * const p_request,
-    az_span_visitor const spans) {
+az_build_url(az_http_request const * const p_request, az_span_append const append) {
   AZ_CONTRACT_ARG_NOT_NULL(p_request);
 
   // host path
+  AZ_RETURN_IF_FAILED(az_span_append_do(append, p_request->path));
+  // query parameters
   {
-    AZ_RETURN_IF_FAILED(spans.func(spans.data, p_request->path));
-    // query parameters
-    {
-      az_query_state state = {
-        .spans = spans,
-        .separator = AZ_STR("?"),
-      };
-      az_pair_visitor const pair_visitor = az_query_to_spans_callback(&state);
-      az_pair_seq const query = p_request->query;
-      // for each query parameter apply `pair_visitor`
-      AZ_RETURN_IF_FAILED(query.func(query.data, pair_visitor));
-    }
+    az_query_state state = {
+      .append = append,
+      .separator = AZ_STR("?"),
+    };
+    // for each query parameter apply `az_query_to_spans`.
+    AZ_RETURN_IF_FAILED(az_pair_seq_do(p_request->query, az_build_query_param_callback(&state)));
   }
   return AZ_OK;
 }
 
-AZ_CALLBACK_FUNC(az_http_url_to_spans, az_http_request const *, az_span_seq)
+AZ_CALLBACK_FUNC(az_build_url, az_http_request const *, az_span_seq)
 
 AZ_NODISCARD az_result az_http_get_url_size(az_http_request const * const p_request, size_t * out) {
-  return az_span_seq_size(az_http_url_to_spans_callback(p_request), out);
+  return az_span_seq_size(az_build_url_callback(p_request), out);
 }
 
-AZ_NODISCARD az_result az_http_url_to_new_str(az_http_request const * const p_request, char ** const out) {
-  return az_span_seq_to_new_str(az_http_url_to_spans_callback(p_request), out);
+AZ_NODISCARD az_result
+az_http_url_to_new_str(az_http_request const * const p_request, char ** const out) {
+  return az_span_seq_to_new_str(az_build_url_callback(p_request), out);
 }

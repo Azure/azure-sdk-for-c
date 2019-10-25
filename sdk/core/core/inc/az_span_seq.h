@@ -8,7 +8,7 @@
 
 #include <_az_cfg_prefix.h>
 
-AZ_CALLBACK_TYPE(az_span_seq, az_span_visitor)
+AZ_CALLBACK_TYPE(az_span_seq, az_span_append)
 
 typedef struct {
   az_const_span const * begin;
@@ -16,13 +16,13 @@ typedef struct {
 } az_span_span;
 
 AZ_NODISCARD az_result
-az_span_span_to_seq(az_span_span const * const context, az_span_visitor const visitor);
+az_span_span_to_seq(az_span_span const * const context, az_span_append const append);
 
 AZ_CALLBACK_FUNC(az_span_span_to_seq, az_span_span const *, az_span_seq)
 
 AZ_NODISCARD az_result az_span_add_size(size_t * const p_size, az_const_span const span);
 
-AZ_CALLBACK_FUNC(az_span_add_size, size_t *, az_span_visitor)
+AZ_CALLBACK_FUNC(az_span_add_size, size_t *, az_span_append)
 
 AZ_NODISCARD az_result az_span_seq_size(az_span_seq const seq, size_t * const out_size);
 

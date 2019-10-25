@@ -49,7 +49,7 @@ AZ_NODISCARD AZ_INLINE az_span az_span_builder_result(az_span_builder const * co
 AZ_NODISCARD az_result
 az_span_builder_append(az_span_builder * const p_builder, az_const_span const span);
 
-AZ_CALLBACK_FUNC(az_span_builder_append, az_span_builder *, az_span_visitor)
+AZ_CALLBACK_FUNC(az_span_builder_append, az_span_builder *, az_span_append)
 
 #include <_az_cfg_suffix.h>
 
