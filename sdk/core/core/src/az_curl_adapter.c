@@ -104,38 +104,6 @@ az_result az_write_url(az_span const writable_buffer, az_const_span const url_fr
 }
 
 /**
- * @brief Gets the url from request and writes it to a new buffer as a c-string. Then sets curl url
- * whit this string. Memory for the new buffer is free after setting curl value or if write
- * operation fails.
- *
- * @param p_curl
- * @param p_hrb
- * @return az_result
- */
-az_result az_build_url(az_curl * const p_curl, az_http_request_builder const * const p_hrb) {
-  // allocate a new buffer for url with 0 terminated
-  uint8_t * const p_writable_buffer = (uint8_t * const)malloc(p_hrb->url.size + 1);
-  if (p_writable_buffer == NULL) {
-    return AZ_ERROR_OUT_OF_MEMORY;
-  }
-  char * buffer = (char *)p_writable_buffer;
-
-  az_span const writable_buffer
-      = (az_span const){ .begin = p_writable_buffer, .size = p_hrb->url.size + 1 };
-  az_result write_result = az_write_url(writable_buffer, az_span_to_const_span(p_hrb->url));
-
-  if (az_succeeded(write_result)) {
-    curl_easy_setopt(p_curl->p_curl, CURLOPT_URL, buffer);
-    printf("%s", buffer);
-  }
-
-  memset(p_writable_buffer, 0, p_hrb->max_url_size + 1);
-  printf("%s", buffer);
-  free(p_writable_buffer);
-  return write_result;
-}
-
-/**
  * handles GET request
  */
 az_result az_curl_send_request(az_curl * const p_curl, az_http_request_builder * const p_hrb) {
