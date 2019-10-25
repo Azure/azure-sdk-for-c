@@ -249,7 +249,7 @@ az_result az_http_request_builder_get_header(
   uint8_t * last_header_start = headers_start;
   uint8_t * last_header_name_end = last_header_start;
   for (size_t i = 0; i < headers_space - (2 * sizeof((uint8_t)'\0')); ++i) {
-    if (headers_start[i] == '\0')
+    if (headers_start[i] == '\0') {
       if (headers_start[i + 1] != '\0') {
         last_header_name_end = headers_start + i;
       } else {
@@ -267,6 +267,7 @@ az_result az_http_request_builder_get_header(
         last_header_start = headers_start + (i + sizeof((uint8_t)'\0')) + 1;
         last_header_name_end = last_header_start;
       }
+    }
   }
 
   return AZ_ERROR_ARG;
