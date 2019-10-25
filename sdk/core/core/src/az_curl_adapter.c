@@ -3,6 +3,11 @@
 
 #include <az_curl_adapter.h>
 
+#include <az_callback.h>
+#include <az_http_request.h>
+
+#include <_az_cfg.h>
+
 typedef struct {
   struct curl_slist * p_list;
 } az_curl_headers_list;

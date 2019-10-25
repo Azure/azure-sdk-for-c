@@ -5,14 +5,16 @@
 #include <az_http_request.h>
 #include <az_json_read.h>
 #include <az_span_reader.h>
-#include <az_uri.h>
 #include <az_span_seq.h>
+#include <az_uri.h>
 #include <az_span_builder.h>
 
 #include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <_az_cfg.h>
 
 int exit_code = 0;
 

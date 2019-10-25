@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <stdio.h>
-
 #include <az_http_client.h>
 #include <az_http_request_builder.h>
 #include <az_json_read.h>
@@ -10,7 +8,9 @@
 #include <az_span_builder.h>
 #include <stdlib.h>
 
-int exit_code = 0;
+#include <stdio.h>
+
+#include <_az_cfg.h>
 
 static az_const_span hrb_url = AZ_CONST_STR("http://127.0.0.1:5000/test/yo?arg1=vh");
 
@@ -32,5 +32,5 @@ int main() {
 
   az_http_client_send_request(&hrb, NULL);
 
-  return exit_code;
+  return 0;
 }
