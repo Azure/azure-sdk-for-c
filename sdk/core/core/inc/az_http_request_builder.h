@@ -24,7 +24,7 @@ typedef struct {
 } az_http_request_builder;
 
 /**
- * @brief format buffer as a http request containing headers, url and body. Url max size is
+ * @brief format buffer as a http request containing headers, url and body.
  */
 az_result az_http_request_builder_init(
     az_http_request_builder * const p_hrb,
