@@ -61,26 +61,28 @@ typedef struct {
   az_json_stack stack;
 } az_json_state;
 
-az_json_state az_json_state_create(az_const_span const buffer);
+AZ_NODISCARD az_json_state az_json_state_create(az_const_span const buffer);
 
-az_result az_json_read(az_json_state * const p_state, az_json_value * const out_value);
+AZ_NODISCARD az_result az_json_read(az_json_state * const p_state, az_json_value * const out_value);
 
-az_result az_json_read_object_member(
+AZ_NODISCARD az_result
+az_json_read_object_member(
     az_json_state * const p_state,
     az_json_member * const out_member);
 
-az_result az_json_read_array_element(
+AZ_NODISCARD az_result
+az_json_read_array_element(
     az_json_state * const p_state,
     az_json_value * const out_value);
 
-az_result az_json_state_done(az_json_state const * const p_state);
+AZ_NODISCARD az_result az_json_state_done(az_json_state const * const p_state);
 
-az_result az_json_get_object_member_value(
+AZ_NODISCARD az_result az_json_get_object_member_value(
     az_const_span const json,
     az_const_span const name,
     az_json_value * const out_value);
 
-AZ_INLINE az_result az_json_get_object_member_string_value(
+AZ_NODISCARD AZ_INLINE az_result az_json_get_object_member_string_value(
     az_const_span const json,
     az_const_span const name,
     az_const_span * const out_value) {
@@ -96,7 +98,7 @@ AZ_INLINE az_result az_json_get_object_member_string_value(
   return AZ_OK;
 }
 
-AZ_INLINE az_result az_json_get_object_member_numeric_value(
+AZ_NODISCARD AZ_INLINE az_result az_json_get_object_member_numeric_value(
     az_const_span const json,
     az_const_span const name,
     double * const out_value) {
@@ -112,7 +114,7 @@ AZ_INLINE az_result az_json_get_object_member_numeric_value(
   return AZ_OK;
 }
 
-AZ_INLINE az_result az_json_get_object_member_boolean_value(
+AZ_NODISCARD AZ_INLINE az_result az_json_get_object_member_boolean_value(
     az_const_span const json,
     az_const_span const name,
     bool * const out_value) {

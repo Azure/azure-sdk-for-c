@@ -38,9 +38,9 @@ enum {
 #define AZ_MAKE_ERROR(facility, code) \
   ((az_result)(0x80000000 | ((uint32_t)(facility) << 16) | (uint32_t)(code)))
 
-AZ_INLINE bool az_failed(az_result result) { return (result & AZ_ERROR_FLAG) != 0; }
+AZ_NODISCARD AZ_INLINE bool az_failed(az_result result) { return (result & AZ_ERROR_FLAG) != 0; }
 
-AZ_INLINE bool az_succeeded(az_result result) { return (result & AZ_ERROR_FLAG) == 0; }
+AZ_NODISCARD AZ_INLINE bool az_succeeded(az_result result) { return (result & AZ_ERROR_FLAG) == 0; }
 
 #define AZ_RETURN_IF_FAILED(exp) \
   do { \

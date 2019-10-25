@@ -5,7 +5,7 @@
 
 #include <_az_cfg.h>
 
-az_result az_http_request_builder_init(
+AZ_NODISCARD az_result az_http_request_builder_init(
     az_http_request_builder * const p_hrb,
     az_span const buffer,
     int16_t const max_url_size,
@@ -19,7 +19,7 @@ az_result az_http_request_builder_init(
   return AZ_OK;
 }
 
-az_result az_http_request_builder_set_query_parameter(
+AZ_NODISCARD az_result az_http_request_builder_set_query_parameter(
     az_http_request_builder * const p_hrb,
     az_const_span const name,
     az_const_span const value) {
@@ -29,7 +29,7 @@ az_result az_http_request_builder_set_query_parameter(
   return AZ_OK;
 }
 
-az_result az_http_request_builder_append_header(
+AZ_NODISCARD az_result az_http_request_builder_append_header(
     az_http_request_builder * const p_hrb,
     az_const_span const name,
     az_const_span const value) {
@@ -39,12 +39,12 @@ az_result az_http_request_builder_append_header(
   return AZ_OK;
 }
 
-az_result az_http_request_builder_mark_retry_headers_start(az_http_request_builder * const p_hrb) {
+AZ_NODISCARD az_result az_http_request_builder_mark_retry_headers_start(az_http_request_builder * const p_hrb) {
   (void)p_hrb;
   return AZ_OK;
 }
 
-az_result az_http_request_builder_remove_retry_headers(az_http_request_builder * const p_hrb) {
+AZ_NODISCARD az_result az_http_request_builder_remove_retry_headers(az_http_request_builder * const p_hrb) {
   (void)p_hrb;
   return AZ_OK;
 }

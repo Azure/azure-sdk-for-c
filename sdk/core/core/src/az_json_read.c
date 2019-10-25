@@ -10,7 +10,7 @@
 
 #include <_az_cfg.h>
 
-AZ_INLINE bool az_json_is_white_space(az_result_byte const c) {
+AZ_NODISCARD AZ_INLINE bool az_json_is_white_space(az_result_byte const c) {
   switch (c) {
     case ' ':
     case '\t':
@@ -21,7 +21,7 @@ AZ_INLINE bool az_json_is_white_space(az_result_byte const c) {
   return false;
 }
 
-AZ_INLINE bool az_json_is_esc(az_result_byte const c) {
+AZ_NODISCARD AZ_INLINE bool az_json_is_esc(az_result_byte const c) {
   switch (c) {
     case '\\':
     case '"':
@@ -36,7 +36,7 @@ AZ_INLINE bool az_json_is_esc(az_result_byte const c) {
   return false;
 }
 
-AZ_INLINE bool az_json_is_e(az_result_byte const c) {
+AZ_NODISCARD AZ_INLINE bool az_json_is_e(az_result_byte const c) {
   switch (c) {
     case 'e':
     case 'E':
@@ -45,20 +45,23 @@ AZ_INLINE bool az_json_is_e(az_result_byte const c) {
   return false;
 }
 
-AZ_INLINE az_result az_json_error_unexpected(az_result_byte const c) {
+AZ_NODISCARD AZ_INLINE az_result az_json_error_unexpected(az_result_byte const c) {
   if (c == AZ_ERROR_EOF) {
     return AZ_JSON_ERROR_UNEXPECTED_END;
   }
   return az_failed(c) ? c : AZ_JSON_ERROR_UNEXPECTED_CHAR;
 }
 
-AZ_INLINE bool az_json_stack_is_empty(az_json_state const * const p) { return p->stack == 1; }
+AZ_NODISCARD AZ_INLINE bool az_json_stack_is_empty(az_json_state const * const p) {
+  return p->stack == 1;
+}
 
-AZ_INLINE az_json_stack_item az_json_stack_last(az_json_state const * const p) {
+AZ_NODISCARD AZ_INLINE az_json_stack_item az_json_stack_last(az_json_state const * const p) {
   return p->stack & 1;
 }
 
-AZ_INLINE az_result az_json_stack_push(az_json_state * const p_state, az_json_stack const stack) {
+AZ_NODISCARD AZ_INLINE az_result
+az_json_stack_push(az_json_state * const p_state, az_json_stack const stack) {
   if (p_state->stack >> AZ_JSON_STACK_SIZE != 0) {
     return AZ_JSON_ERROR_STACK_OVERFLOW;
   }
@@ -66,7 +69,7 @@ AZ_INLINE az_result az_json_stack_push(az_json_state * const p_state, az_json_st
   return AZ_OK;
 }
 
-AZ_INLINE az_result az_json_stack_pop(az_json_state * const p_state) {
+AZ_NODISCARD AZ_INLINE az_result az_json_stack_pop(az_json_state * const p_state) {
   if (p_state->stack <= 1) {
     return AZ_JSON_ERROR_INVALID_STATE;
   }
@@ -74,14 +77,15 @@ AZ_INLINE az_result az_json_stack_pop(az_json_state * const p_state) {
   return AZ_OK;
 }
 
-az_json_state az_json_state_create(az_const_span const buffer) {
+AZ_NODISCARD az_json_state az_json_state_create(az_const_span const buffer) {
   return (az_json_state){
     .reader = az_span_reader_create(buffer),
     .stack = 1,
   };
 }
 
-az_result az_json_read_expected_char(az_span_reader * const p_reader, uint8_t const expected) {
+AZ_NODISCARD az_result
+az_json_read_expected_char(az_span_reader * const p_reader, uint8_t const expected) {
   az_result_byte const c = az_span_reader_current(p_reader);
   if (c != expected) {
     return az_json_error_unexpected(c);
@@ -96,7 +100,7 @@ static void az_json_read_white_space(az_span_reader * const p_reader) {
   }
 }
 
-static az_result az_json_read_keyword_rest(
+AZ_NODISCARD static az_result az_json_read_keyword_rest(
     az_span_reader * const p_reader,
     az_const_span const keyword) {
   az_span_reader_next(p_reader);
@@ -127,11 +131,11 @@ typedef struct {
   int16_t exp;
 } az_dec_number;
 
-static double az_json_number_to_double(az_dec_number const * p) {
+AZ_NODISCARD static double az_json_number_to_double(az_dec_number const * p) {
   return p->value * pow(10, p->exp) * p->sign;
 }
 
-static az_result az_json_number_int_parse(
+AZ_NODISCARD static az_result az_json_number_int_parse(
     az_span_reader * const p_reader,
     az_dec_number * const p_n,
     int16_t const e_offset,
@@ -157,7 +161,7 @@ static az_result az_json_number_int_parse(
   };
 }
 
-static az_result az_json_read_number_digit_rest(
+AZ_NODISCARD static az_result az_json_read_number_digit_rest(
     az_span_reader * const p_reader,
     double * const out_value) {
   az_dec_number i = {
@@ -230,7 +234,7 @@ static az_result az_json_read_number_digit_rest(
   return AZ_OK;
 }
 
-static az_result az_json_read_string_rest(
+AZ_NODISCARD static az_result az_json_read_string_rest(
     az_span_reader * const p_reader,
     az_const_span * const string) {
   // skip '"'
@@ -274,7 +278,7 @@ static az_result az_json_read_string_rest(
 }
 
 // _value_
-static az_result az_json_read_value(
+AZ_NODISCARD static az_result az_json_read_value(
     az_json_state * const p_state,
     az_json_value * const out_value) {
   az_span_reader * const p_reader = &p_state->reader;
@@ -314,7 +318,7 @@ static az_result az_json_read_value(
   return az_json_error_unexpected(c);
 }
 
-static az_result az_json_read_value_space(
+AZ_NODISCARD static az_result az_json_read_value_space(
     az_json_state * const p_state,
     az_json_value * const out_value) {
   AZ_RETURN_IF_FAILED(az_json_read_value(p_state, out_value));
@@ -322,7 +326,8 @@ static az_result az_json_read_value_space(
   return AZ_OK;
 }
 
-az_result az_json_read(az_json_state * const p_state, az_json_value * const out_value) {
+AZ_NODISCARD az_result
+az_json_read(az_json_state * const p_state, az_json_value * const out_value) {
   AZ_CONTRACT_ARG_NOT_NULL(p_state);
   AZ_CONTRACT_ARG_NOT_NULL(out_value);
 
@@ -342,11 +347,11 @@ az_result az_json_read(az_json_state * const p_state, az_json_value * const out_
   return is_empty ? AZ_OK : AZ_JSON_ERROR_UNEXPECTED_CHAR;
 }
 
-AZ_INLINE uint8_t az_json_stack_item_to_close(az_json_stack_item const item) {
+AZ_NODISCARD AZ_INLINE uint8_t az_json_stack_item_to_close(az_json_stack_item const item) {
   return item == AZ_JSON_STACK_OBJECT ? '}' : ']';
 }
 
-static az_result az_json_read_comma_or_close(az_json_state * const p_state) {
+AZ_NODISCARD static az_result az_json_read_comma_or_close(az_json_state * const p_state) {
   az_result_byte const c = az_span_reader_current(&p_state->reader);
   if (c == ',') {
     // skip ',' and read all whitespaces.
@@ -361,7 +366,7 @@ static az_result az_json_read_comma_or_close(az_json_state * const p_state) {
   return AZ_OK;
 }
 
-static az_result az_json_check_item_begin(
+AZ_NODISCARD static az_result az_json_check_item_begin(
     az_json_state * const p_state,
     az_json_stack_item const stack_item) {
   if (az_json_stack_is_empty(p_state) || az_json_stack_last(p_state) != stack_item) {
@@ -381,7 +386,9 @@ static az_result az_json_check_item_begin(
   return AZ_JSON_ERROR_NO_MORE_ITEMS;
 }
 
-static az_result az_json_check_item_end(az_json_state * const p_state, az_json_value const value) {
+AZ_NODISCARD static az_result az_json_check_item_end(
+    az_json_state * const p_state,
+    az_json_value const value) {
   switch (value.kind) {
     case AZ_JSON_VALUE_OBJECT:
     case AZ_JSON_VALUE_ARRAY:
@@ -392,7 +399,8 @@ static az_result az_json_check_item_end(az_json_state * const p_state, az_json_v
   return az_json_read_comma_or_close(p_state);
 }
 
-az_result az_json_read_object_member(
+AZ_NODISCARD az_result
+az_json_read_object_member(
     az_json_state * const p_state,
     az_json_member * const out_member) {
   AZ_CONTRACT_ARG_NOT_NULL(p_state);
@@ -408,7 +416,8 @@ az_result az_json_read_object_member(
   return az_json_check_item_end(p_state, out_member->value);
 }
 
-az_result az_json_read_array_element(
+AZ_NODISCARD az_result
+az_json_read_array_element(
     az_json_state * const p_state,
     az_json_value * const out_element) {
   AZ_CONTRACT_ARG_NOT_NULL(p_state);
@@ -419,7 +428,7 @@ az_result az_json_read_array_element(
   return az_json_check_item_end(p_state, *out_element);
 }
 
-az_result az_json_state_done(az_json_state const * const p_state) {
+AZ_NODISCARD az_result az_json_state_done(az_json_state const * const p_state) {
   AZ_CONTRACT_ARG_NOT_NULL(p_state);
 
   if (!az_span_reader_is_empty(&p_state->reader) || !az_json_stack_is_empty(p_state)) {
@@ -428,7 +437,7 @@ az_result az_json_state_done(az_json_state const * const p_state) {
   return AZ_OK;
 }
 
-az_result az_json_get_object_member_value(
+AZ_NODISCARD az_result az_json_get_object_member_value(
     az_const_span const json,
     az_const_span const name,
     az_json_value * const out_value) {
