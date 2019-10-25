@@ -3,7 +3,7 @@
 
 #include <az_span_seq.h>
 
-#include <az_write_span_iter.h>
+#include <az_span_builder.h>
 #include <az_str.h>
 
 #include <stdlib.h>
@@ -38,9 +38,9 @@ az_result az_span_seq_size(az_span_seq const seq, size_t * const out_size) {
 //
 
 az_result az_span_seq_to_str(az_span_seq const seq, az_span const span) {
-  az_write_span_iter i = az_write_span_iter_create(span);
-  AZ_RETURN_IF_FAILED(seq.func(seq.data, az_write_span_iter_write_callback(&i)));
-  AZ_RETURN_IF_FAILED(az_write_span_iter_write(&i, AZ_STR("\0")));
+  az_span_builder i = az_span_builder_create(span);
+  AZ_RETURN_IF_FAILED(seq.func(seq.data, az_span_builder_append_callback(&i)));
+  AZ_RETURN_IF_FAILED(az_span_builder_append(&i, AZ_STR("\0")));
   return AZ_OK;
 }
 

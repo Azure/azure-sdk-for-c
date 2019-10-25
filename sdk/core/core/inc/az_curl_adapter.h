@@ -7,9 +7,9 @@
 #include <az_callback.h>
 #include <az_http_request_builder.h>
 #include <az_pair.h>
+#include <az_span_builder.h>
 #include <az_span_seq.h>
 #include <az_str.h>
-#include <az_write_span_iter.h>
 
 #include <_az_cfg_prefix.h>
 

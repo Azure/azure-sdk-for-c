@@ -7,7 +7,7 @@
 #include <az_http_request_builder.h>
 #include <az_json_read.h>
 #include <az_pair.h>
-#include <az_write_span_iter.h>
+#include <az_span_builder.h>
 #include <stdlib.h>
 
 int exit_code = 0;
