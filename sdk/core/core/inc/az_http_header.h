@@ -11,7 +11,7 @@
 #include <_az_cfg_prefix.h>
 
 /**
- * Converts an HTTP header to a sequence of spans.
+ * Converts an HTTP header to a sequence of spans in a format "%{key}: %{value}"
  */
 AZ_NODISCARD az_result
 az_http_header_to_span_seq(az_pair const * p_header, az_span_append const append);

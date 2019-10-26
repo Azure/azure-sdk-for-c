@@ -19,6 +19,9 @@ typedef struct {
   az_const_span body;
 } az_http_request;
 
+/**
+ * Creates a raw HTTP request.
+ */
 AZ_NODISCARD az_result
 az_http_request_to_span_seq(az_http_request const * const p_request, az_span_append const append);
 
