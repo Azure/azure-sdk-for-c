@@ -7,7 +7,7 @@
 
 AZ_NODISCARD az_result az_http_request_builder_init(
     az_http_request_builder * const p_hrb,
-    az_span const buffer,
+    az_mut_span const buffer,
     int16_t const max_url_size,
     az_const_span const method_verb,
     az_const_span const initial_url) {

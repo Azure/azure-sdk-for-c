@@ -4,34 +4,34 @@
 #include <az_curl_adapter.h>
 
 #include <az_callback.h>
-#include <az_http_request.h>
+#include <az_http_header.h>
 
 #include <_az_cfg.h>
 
-typedef struct {
-  struct curl_slist * p_list;
-} az_headers_data;
+/**
+ * Adds a header string to the given CURL list.
+ */
+AZ_NODISCARD az_result
+az_http_header_str_to_curl(struct curl_slist ** const pp_list, char const * str) {
+  AZ_CONTRACT_ARG_NOT_NULL(pp_list);
+  AZ_CONTRACT_ARG_NOT_NULL(str);
 
-AZ_CALLBACK_FUNC(az_headers_to_curl, az_headers_data *, az_pair_visitor)
-
-AZ_NODISCARD az_result az_headers_to_curl(az_headers_data * const p_state, az_pair const header) {
-  const az_span_seq token_seq = az_build_header_callback(&header);
-  char * str_header;
-  AZ_RETURN_IF_FAILED(az_span_seq_to_new_str(token_seq, &str_header));
-
-  p_state->p_list = curl_slist_append(p_state->p_list, str_header);
-
-  free(str_header);
+  struct curl_slist * const p_list = curl_slist_append(*pp_list, str);
+  if (p_list == NULL) {
+    return AZ_ERROR_HTTP_UNKNOWN;
+  }
+  *pp_list = p_list;
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result
-az_build_headers(az_http_request const * const p_request, az_headers_data * p_headers) {
-  // create callback for visitor
-  az_pair_visitor const pair_visitor = az_headers_to_curl_callback(p_headers);
+AZ_CALLBACK_FUNC(az_http_header_str_to_curl, struct curl_slist **, az_str_callback)
 
-  az_pair_seq const request_headers_seq = p_request->headers;
-  AZ_RETURN_IF_FAILED(request_headers_seq.func(request_headers_seq.data, pair_visitor));
+/**
+ * Adds a header to the given CURL list.
+ */
+AZ_NODISCARD az_result az_http_header_to_curl(struct curl_slist ** pp_list, az_pair const header) {
+  AZ_CONTRACT_ARG_NOT_NULL(pp_list);
 
-  return AZ_OK;
+  return az_span_seq_to_tmp_str(
+      az_http_header_to_span_seq_callback(&header), az_http_header_str_to_curl_callback(pp_list));
 }

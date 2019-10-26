@@ -31,7 +31,7 @@
  */
 AZ_NODISCARD az_result az_base64_encode(
     bool const base64url,
-    az_span const buffer,
+    az_mut_span const buffer,
     az_const_span const input,
     az_const_span * const out_result);
 
@@ -54,7 +54,7 @@ AZ_NODISCARD az_result az_base64_encode(
  *     - `out_result` would overlap `input`.
  */
 AZ_NODISCARD az_result
-az_base64_decode(az_span const buffer, az_const_span const input, az_const_span * const out_result);
+az_base64_decode(az_mut_span const buffer, az_const_span const input, az_const_span * const out_result);
 
 #include <_az_cfg_suffix.h>
 

@@ -27,7 +27,7 @@
  */
 AZ_NODISCARD az_result
 az_uri_encode(
-    az_span const buffer,
+    az_mut_span const buffer,
     az_const_span const input,
     az_const_span * const out_result);
 
@@ -51,7 +51,7 @@ az_uri_encode(
  */
 AZ_NODISCARD az_result
 az_uri_decode(
-    az_span const buffer,
+    az_mut_span const buffer,
     az_const_span const input,
     az_const_span * const out_result);
 

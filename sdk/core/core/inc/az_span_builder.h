@@ -17,7 +17,7 @@ typedef struct {
   /**
    * A buffer for writting. This field is immutable.
    */
-  az_span buffer;
+  az_mut_span buffer;
   /**
    * A current size in the resulting span. The field is increased after each write.
    */
@@ -29,7 +29,7 @@ typedef struct {
  *
  * @buffer a buffer for writing.
  */
-AZ_NODISCARD AZ_INLINE az_span_builder az_span_builder_create(az_span const buffer) {
+AZ_NODISCARD AZ_INLINE az_span_builder az_span_builder_create(az_mut_span const buffer) {
   return (az_span_builder){
     .buffer = buffer,
     .size = 0,
@@ -39,7 +39,7 @@ AZ_NODISCARD AZ_INLINE az_span_builder az_span_builder_create(az_span const buff
 /**
  * Returns a span of bytes that were written into the builder's buffer.
  */
-AZ_NODISCARD AZ_INLINE az_span az_span_builder_result(az_span_builder const * const p_builder) {
+AZ_NODISCARD AZ_INLINE az_mut_span az_span_builder_result(az_span_builder const * const p_builder) {
   return az_span_take(p_builder->buffer, p_builder->size);
 }
 

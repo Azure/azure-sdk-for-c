@@ -15,7 +15,7 @@
 #include <_az_cfg_prefix.h>
 
 typedef struct {
-  az_span buffer;
+  az_mut_span buffer;
   int16_t max_headers;
   int16_t max_url_size;
   az_const_span method_verb;
@@ -28,7 +28,7 @@ typedef struct {
  */
 AZ_NODISCARD az_result az_http_request_builder_init(
     az_http_request_builder * const p_hrb,
-    az_span const buffer,
+    az_mut_span const buffer,
     int16_t const max_url_size,
     az_const_span const method_verb,
     az_const_span const initial_url);

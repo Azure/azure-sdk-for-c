@@ -4,6 +4,7 @@
 #ifndef AZ_STR_H
 #define AZ_STR_H
 
+#include <az_callback.h>
 #include <az_span.h>
 
 #include <_az_cfg_prefix.h>
@@ -29,6 +30,11 @@
 //
 // `void some_function(az_const_span const span);`
 #define AZ_STR(STRING_LITERAL) (az_const_span) AZ_CONST_STR(STRING_LITERAL)
+
+/**
+ * A callack that accepts zero-terminated string `char const *`.
+ */
+AZ_CALLBACK_TYPE(az_str_callback, char const *)
 
 #include <_az_cfg_suffix.h>
 

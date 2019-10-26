@@ -29,7 +29,7 @@ int exit_code = 0;
     } \
   } while (false);
 
-az_result write(az_span const output, size_t * const o, az_const_span const s) {
+az_result write(az_mut_span const output, size_t * const o, az_const_span const s) {
   for (size_t i = 0; i != s.size; ++i, ++*o) {
     if (*o == output.size) {
       return 1;
@@ -39,7 +39,7 @@ az_result write(az_span const output, size_t * const o, az_const_span const s) {
   return 0;
 }
 
-az_result write_str(az_span const output, size_t * o, az_const_span const s) {
+az_result write_str(az_mut_span const output, size_t * o, az_const_span const s) {
   AZ_RETURN_IF_FAILED(write(output, o, AZ_STR("\"")));
   AZ_RETURN_IF_FAILED(write(output, o, s));
   AZ_RETURN_IF_FAILED(write(output, o, AZ_STR("\"")));
@@ -47,7 +47,7 @@ az_result write_str(az_span const output, size_t * o, az_const_span const s) {
 }
 
 az_result read_write_value(
-    az_span const output,
+    az_mut_span const output,
     size_t * o,
     az_json_state * const state,
     az_json_value const value) {
@@ -106,7 +106,7 @@ az_result read_write_value(
   return AZ_JSON_ERROR_INVALID_STATE;
 }
 
-az_result read_write(az_const_span const input, az_span const output, size_t * const o) {
+az_result read_write(az_const_span const input, az_mut_span const output, size_t * const o) {
   az_json_state state = az_json_state_create(input);
   az_json_value value;
   AZ_RETURN_IF_FAILED(az_json_read(&state, &value));
@@ -397,12 +397,12 @@ int main() {
     TEST_ASSERT(az_json_state_done(&state) == AZ_OK);
   }
   uint8_t buffer[1000];
-  az_span const output = { .begin = buffer, .size = 1000 };
+  az_mut_span const output = { .begin = buffer, .size = 1000 };
   {
     size_t o = 0;
     TEST_ASSERT(
         read_write(AZ_STR("{ \"a\" : [ true, { \"b\": [{}]}, 15 ] }"), output, &o) == AZ_OK);
-    az_const_span x = az_const_span_sub(az_span_to_const_span(output), 0, o);
+    az_const_span x = az_const_span_sub(az_mut_span_to_const_span(output), 0, o);
     TEST_ASSERT(az_const_span_eq(x, AZ_STR("{\"a\":[true,{\"b\":[{}]},0]}")));
   }
   {
@@ -438,7 +438,7 @@ int main() {
         "]]]]] ]]]");
     az_result const result = read_write(json, output, &o);
     TEST_ASSERT(result == AZ_OK);
-    az_const_span x = az_const_span_sub(az_span_to_const_span(output), 0, o);
+    az_const_span x = az_const_span_sub(az_mut_span_to_const_span(output), 0, o);
     TEST_ASSERT(az_const_span_eq(
         x,
         AZ_STR( //
@@ -477,7 +477,7 @@ int main() {
     };
     uint8_t buffer[1024];
     {
-      az_span_builder wi = az_span_builder_create((az_span)AZ_SPAN(buffer));
+      az_span_builder wi = az_span_builder_create((az_mut_span)AZ_SPAN(buffer));
       az_span_append sv = az_span_builder_append_callback(&wi);
       az_const_span const expected = AZ_STR( //
           "GET /foo?hello=world!&x=42 HTTP/1.1\r\n"
@@ -485,20 +485,20 @@ int main() {
           "xyz: very_long\r\n"
           "\r\n"
           "{ \"somejson\": true }");
-      az_result const result = az_http_request_to_spans(&request, sv);
+      az_result const result = az_http_request_to_span_seq(&request, sv);
       TEST_ASSERT(result == AZ_OK);
-      az_span out = az_span_builder_result(&wi);
-      TEST_ASSERT(az_const_span_eq(az_span_to_const_span(out), expected));
+      az_mut_span out = az_span_builder_result(&wi);
+      TEST_ASSERT(az_const_span_eq(az_mut_span_to_const_span(out), expected));
     }
     {
       printf("----Test: az_http_request_to_url_span\n");
-      az_span_builder wi = az_span_builder_create((az_span)AZ_SPAN(buffer));
+      az_span_builder wi = az_span_builder_create((az_mut_span)AZ_SPAN(buffer));
       az_span_append sv = az_span_builder_append_callback(&wi);
       az_const_span const expected = AZ_STR("/foo?hello=world!&x=42");
       az_result const result = az_build_url(&request, sv);
       TEST_ASSERT(result == AZ_OK);
-      az_span out = az_span_builder_result(&wi);
-      TEST_ASSERT(az_const_span_eq(az_span_to_const_span(out), expected));
+      az_mut_span out = az_span_builder_result(&wi);
+      TEST_ASSERT(az_const_span_eq(az_mut_span_to_const_span(out), expected));
     }
     // url size
     {
@@ -562,15 +562,15 @@ int main() {
       buf[i] = '@';
     }
 
-    az_span actual = { .begin = buf, .size = sizeof(buf) };
-    az_span_set((az_span){ .begin = actual.begin + 1, .size = actual.size - 2 }, '#');
+    az_mut_span actual = { .begin = buf, .size = sizeof(buf) };
+    az_span_set((az_mut_span){ .begin = actual.begin + 1, .size = actual.size - 2 }, '#');
 
-    az_span result;
+    az_mut_span result;
 
     char const phrase1[] = "copy";
     memcpy(actual.begin + 4, phrase1, sizeof(phrase1) - 1);
     az_span_copy(
-        (az_span){ .begin = actual.begin + 9, .size = 4 },
+        (az_mut_span){ .begin = actual.begin + 9, .size = 4 },
         (az_const_span){ .begin = actual.begin + 4, .size = 4 },
         &result);
 
@@ -581,18 +581,18 @@ int main() {
     az_const_span const zero_terminated = (az_const_span){ .begin = actual.begin + 24, .size = 15 };
     az_const_span const strings = (az_const_span){ .begin = actual.begin + 40, .size = 7 };
 
-    az_span_to_c_str((az_span){ .begin = actual.begin + 48, .size = 10 }, make_some, &result);
-    az_span_to_c_str((az_span){ .begin = actual.begin + 58, .size = 16 }, zero_terminated, &result);
-    az_span_to_c_str((az_span){ .begin = actual.begin + 74, .size = 8 }, strings, &result);
+    az_span_to_c_str((az_mut_span){ .begin = actual.begin + 48, .size = 10 }, make_some, &result);
+    az_span_to_c_str((az_mut_span){ .begin = actual.begin + 58, .size = 16 }, zero_terminated, &result);
+    az_span_to_c_str((az_mut_span){ .begin = actual.begin + 74, .size = 8 }, strings, &result);
 
     result.begin[result.size - 1] = '$';
     az_span_to_c_str(result, strings, &result);
 
-    TEST_ASSERT(az_const_span_eq(az_span_to_const_span(actual), expected));
+    TEST_ASSERT(az_const_span_eq(az_mut_span_to_const_span(actual), expected));
   }
   {
     uint8_t buf[68];
-    az_span const buffer = { .begin = buf, .size = sizeof(buf) };
+    az_mut_span const buffer = { .begin = buf, .size = sizeof(buf) };
     az_const_span result;
 
     az_const_span const * const decoded_input[]
@@ -624,7 +624,7 @@ int main() {
   }
   {
     uint8_t buf[256 * 3];
-    az_span const buffer = { .begin = buf, .size = sizeof(buf) };
+    az_mut_span const buffer = { .begin = buf, .size = sizeof(buf) };
     az_const_span result;
 
     az_uri_encode(buffer, AZ_STR("https://vault.azure.net"), &result);

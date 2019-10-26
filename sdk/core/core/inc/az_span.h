@@ -35,15 +35,15 @@ typedef struct {
 typedef struct {
   uint8_t * begin;
   size_t size;
-} az_span;
+} az_mut_span;
 
 typedef az_result az_result_byte;
 
-AZ_INLINE bool az_span_is_empty(az_span const span) { return !(span.size > 0); }
+AZ_INLINE bool az_mut_span_is_empty(az_mut_span const span) { return !(span.size > 0); }
 
 AZ_INLINE bool az_const_span_is_empty(az_const_span const span) { return !(span.size > 0); }
 
-AZ_INLINE bool az_span_is_valid(az_span const span) {
+AZ_INLINE bool az_mut_span_is_valid(az_mut_span const span) {
   return span.begin == NULL ? span.size == 0
                             : ((span.size == 0 || span.size > 0)
                                && (span.size == 0 || span.begin <= (span.begin + span.size - 1)));
@@ -102,7 +102,7 @@ az_const_span_sub(az_const_span const span, size_t const begin, size_t const end
 /**
  * Cast the given mutable span to an immutable span.
  */
-AZ_INLINE az_const_span az_span_to_const_span(az_span const span) {
+AZ_INLINE az_const_span az_mut_span_to_const_span(az_mut_span const span) {
   return (az_const_span){ .begin = span.begin, .size = span.size };
 }
 
@@ -115,9 +115,10 @@ AZ_INLINE bool az_const_span_eq(az_const_span const a, az_const_span const b) {
 }
 
 AZ_INLINE az_result
-az_span_move(az_span const buffer, az_const_span const src, az_span * const out_result) {
+az_mut_span_move(az_mut_span const buffer, az_const_span const src, az_mut_span * const out_result) {
   AZ_CONTRACT_ARG_NOT_NULL(out_result);
-  if (!az_span_is_valid(buffer) || !az_const_span_is_valid(src)) {
+
+  if (!az_mut_span_is_valid(buffer) || !az_const_span_is_valid(src)) {
     return AZ_ERROR_ARG;
   }
 
@@ -141,18 +142,18 @@ AZ_INLINE bool az_const_span_is_overlap(az_const_span const a, az_const_span con
           || (b.begin < a.begin && (b.begin + b.size - 1) >= a.begin) || (a.begin == b.begin));
 }
 
-AZ_INLINE bool az_span_is_overlap(az_span const a, az_span const b) {
-  return az_const_span_is_overlap(az_span_to_const_span(a), az_span_to_const_span(b));
+AZ_INLINE bool az_mut_span_is_overlap(az_mut_span const a, az_mut_span const b) {
+  return az_const_span_is_overlap(az_mut_span_to_const_span(a), az_mut_span_to_const_span(b));
 }
 
 AZ_INLINE az_result
-az_span_copy(az_span const buffer, az_const_span const src, az_span * const out_result) {
+az_mut_span_copy(az_mut_span const buffer, az_const_span const src, az_mut_span * const out_result) {
   AZ_CONTRACT_ARG_NOT_NULL(out_result);
-  if (!az_span_is_valid(buffer) || !az_const_span_is_valid(src)) {
+  if (!az_mut_span_is_valid(buffer) || !az_const_span_is_valid(src)) {
     return AZ_ERROR_ARG;
   }
 
-  if (az_const_span_is_overlap(az_span_to_const_span(buffer), src)) {
+  if (az_const_span_is_overlap(az_mut_span_to_const_span(buffer), src)) {
     return AZ_ERROR_ARG;
   }
 
@@ -170,42 +171,42 @@ az_span_copy(az_span const buffer, az_const_span const src, az_span * const out_
   return AZ_OK;
 }
 
-AZ_INLINE az_span az_span_drop(az_span const span, size_t const n) {
+AZ_INLINE az_mut_span az_mut_span_drop(az_mut_span const span, size_t const n) {
   if (span.size <= n) {
-    return (az_span){ .begin = NULL, .size = 0 };
+    return (az_mut_span){ .begin = NULL, .size = 0 };
   }
-  return (az_span){ .begin = span.begin + n, .size = span.size - n };
+  return (az_mut_span){ .begin = span.begin + n, .size = span.size - n };
 }
 
-AZ_INLINE az_span az_span_take(az_span const span, size_t n) {
+AZ_INLINE az_mut_span az_span_take(az_mut_span const span, size_t n) {
   if (span.size <= n) {
     return span;
   }
-  return (az_span){ .begin = span.begin, .size = n };
+  return (az_mut_span){ .begin = span.begin, .size = n };
 }
 
-AZ_INLINE az_result az_span_set(az_span const span, uint8_t const fill) {
-  if (!az_span_is_valid(span)) {
+AZ_INLINE az_result az_span_set(az_mut_span const span, uint8_t const fill) {
+  if (!az_mut_span_is_valid(span)) {
     return AZ_ERROR_ARG;
   }
 
-  if (!az_span_is_empty(span)) {
+  if (!az_mut_span_is_empty(span)) {
     memset(span.begin, fill, span.size);
   }
 
   return AZ_OK;
 }
 
-AZ_INLINE az_result az_span_swap(az_span const a, az_span const b) {
-  if (!az_span_is_valid(a) || !az_span_is_valid(b)) {
+AZ_INLINE az_result az_mut_span_swap(az_mut_span const a, az_mut_span const b) {
+  if (!az_mut_span_is_valid(a) || !az_mut_span_is_valid(b)) {
     return AZ_ERROR_ARG;
   }
 
-  if (a.size != b.size || az_span_is_overlap(a, b)) {
+  if (a.size != b.size || az_mut_span_is_overlap(a, b)) {
     return AZ_ERROR_ARG;
   }
 
-  if (!az_span_is_empty(a)) {
+  if (!az_mut_span_is_empty(a)) {
     uint8_t * a_ptr = a.begin;
     uint8_t * b_ptr = b.begin;
     uint8_t const * const a_end = a.begin + a.size;
@@ -223,7 +224,7 @@ AZ_INLINE az_result az_span_swap(az_span const a, az_span const b) {
 }
 
 AZ_INLINE az_result
-az_span_to_c_str(az_span const buffer, az_const_span const src, az_span * const out_result) {
+az_mut_span_to_str(az_mut_span const buffer, az_const_span const src, az_mut_span * const out_result) {
   AZ_CONTRACT_ARG_NOT_NULL(out_result);
 
   if (!az_const_span_is_valid(src)) {
@@ -248,10 +249,10 @@ az_span_to_c_str(az_span const buffer, az_const_span const src, az_span * const 
 }
 
 AZ_NODISCARD az_result az_span_replace(
-    az_span const buffer,
+    az_mut_span const buffer,
     az_const_span const src,
     uint8_t (*const func)(uint8_t const),
-    az_span * const out_result);
+    az_mut_span * const out_result);
 
 #define AZ_ARRAY_SIZE(ARRAY) (sizeof(ARRAY) / sizeof(*ARRAY))
 

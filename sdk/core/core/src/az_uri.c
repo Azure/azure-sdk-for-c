@@ -61,11 +61,11 @@ AZ_NODISCARD AZ_INLINE size_t encode(uint8_t const c, uint8_t * const p) {
 
 AZ_NODISCARD az_result
 az_uri_encode(
-    az_span const buffer,
+    az_mut_span const buffer,
     az_const_span const input,
     az_const_span * const out_result) {
   AZ_CONTRACT_ARG_NOT_NULL(out_result);
-  if (!az_span_is_valid(buffer) || !az_const_span_is_valid(input)) {
+  if (!az_mut_span_is_valid(buffer) || !az_const_span_is_valid(input)) {
     return AZ_ERROR_ARG;
   }
 
@@ -98,12 +98,12 @@ az_uri_encode(
 
 AZ_NODISCARD az_result
 az_uri_decode(
-    az_span const buffer,
+    az_mut_span const buffer,
     az_const_span const input,
     az_const_span * const out_result) {
   AZ_CONTRACT_ARG_NOT_NULL(out_result);
 
-  if (!az_span_is_valid(buffer) || !az_const_span_is_valid(input)) {
+  if (!az_mut_span_is_valid(buffer) || !az_const_span_is_valid(input)) {
     return AZ_ERROR_ARG;
   }
 
