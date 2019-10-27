@@ -32,6 +32,6 @@ AZ_CALLBACK_FUNC(az_http_header_str_to_curl, struct curl_slist **, az_str_callba
 AZ_NODISCARD az_result az_http_header_to_curl(struct curl_slist ** pp_list, az_pair const header) {
   AZ_CONTRACT_ARG_NOT_NULL(pp_list);
 
-  return az_span_seq_to_tmp_str(
-      az_http_header_to_span_seq_callback(&header), az_http_header_str_to_curl_callback(pp_list));
+  return az_span_emitter_to_tmp_str(
+      az_http_header_emit_spans_callback(&header), az_http_header_str_to_curl_callback(pp_list));
 }

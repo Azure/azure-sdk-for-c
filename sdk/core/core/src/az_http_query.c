@@ -3,6 +3,8 @@
 
 #include <az_http_query.h>
 
+#include <az_str.h>
+
 #include <_az_cfg.h>
 
 /**
@@ -10,7 +12,7 @@
  */
 typedef struct {
   /**
-   * A callback which accept a span of bytes.
+   * A callback which accepts a span of bytes.
    *
    * An immutable field.
    */
@@ -47,11 +49,10 @@ AZ_NODISCARD az_result az_http_query_param(az_http_query_state * const p, az_pai
 }
 
 AZ_NODISCARD az_result
-az_http_query_to_span_seq(az_pair_seq const query, az_span_append const append) {
+az_http_query_emit_spans(az_pair_seq const query, az_span_append const append) {
   az_http_query_state state = {
     .append = append,
     .separator = AZ_STR("?"),
   };
-  // for each query parameter apply `pair_visitor`
-  AZ_RETURN_IF_FAILED(az_pair_seq_do(p_request->query, az_http_query_param_callback(&state)));
+  return az_pair_seq_do(query, az_http_query_param_callback(&state));
 }

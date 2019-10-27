@@ -8,8 +8,12 @@
 
 #include <_az_cfg_prefix.h>
 
+/**
+ * Emits the given query as a sequence of spans. In a format 
+ * "?param1=value1&param2=value2".
+ */
 AZ_NODISCARD az_result
-az_http_query_to_span_seq(az_pair_seq const query, az_span_append const append);
+az_http_query_emit_spans(az_pair_seq const query, az_span_append const append);
 
 #include <_az_cfg_suffix.h>
 

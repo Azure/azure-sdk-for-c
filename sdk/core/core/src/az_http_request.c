@@ -7,7 +7,7 @@
 #include <az_http_header.h>
 #include <az_contract.h>
 #include <az_span_builder.h>
-#include <az_span_seq.h>
+#include <az_span_emitter.h>
 #include <az_str.h>
 
 #include <stdlib.h>
@@ -20,7 +20,7 @@ static az_const_span const az_crlf = AZ_CONST_STR(AZ_CRLF);
 
 AZ_NODISCARD az_result
 az_http_header_line(az_span_append const * const p_append, az_pair const header) {
-  AZ_RETURN_IF_FAILED(az_http_header_to_span_seq(&header, *p_append));
+  AZ_RETURN_IF_FAILED(az_http_header_emit_spans(&header, *p_append));
   AZ_RETURN_IF_FAILED(az_span_append_do(*p_append, az_crlf));
   return AZ_OK;
 }
@@ -28,7 +28,7 @@ az_http_header_line(az_span_append const * const p_append, az_pair const header)
 AZ_CALLBACK_FUNC(az_http_header_line, az_span_append const *, az_pair_append)
 
 AZ_NODISCARD az_result
-az_http_request_to_span_seq(az_http_request const * const p_request, az_span_append const append) {
+az_http_request_emit_spans(az_http_request const * const p_request, az_span_append const append) {
   AZ_CONTRACT_ARG_NOT_NULL(p_request);
 
   // a request line
@@ -36,7 +36,7 @@ az_http_request_to_span_seq(az_http_request const * const p_request, az_span_app
     AZ_RETURN_IF_FAILED(az_span_append_do(append, p_request->method));
     AZ_RETURN_IF_FAILED(az_span_append_do(append, AZ_STR(" ")));
     AZ_RETURN_IF_FAILED(az_span_append_do(append, p_request->path));
-    AZ_RETURN_IF_FAILED(az_http_query_to_span_seq(p_request->query, append));
+    AZ_RETURN_IF_FAILED(az_http_query_emit_spans(p_request->query, append));
     AZ_RETURN_IF_FAILED(az_span_append_do(append, AZ_STR(" HTTP/1.1" AZ_CRLF)));
   }
 

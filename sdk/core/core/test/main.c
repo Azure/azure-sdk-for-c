@@ -5,7 +5,7 @@
 #include <az_http_request.h>
 #include <az_json_read.h>
 #include <az_span_reader.h>
-#include <az_span_seq.h>
+#include <az_span_emitter.h>
 #include <az_uri.h>
 #include <az_span_builder.h>
 
@@ -485,7 +485,7 @@ int main() {
           "xyz: very_long\r\n"
           "\r\n"
           "{ \"somejson\": true }");
-      az_result const result = az_http_request_to_span_seq(&request, sv);
+      az_result const result = az_http_request_emit_spans(&request, sv);
       TEST_ASSERT(result == AZ_OK);
       az_mut_span out = az_span_builder_result(&wi);
       TEST_ASSERT(az_const_span_eq(az_mut_span_to_const_span(out), expected));
@@ -528,9 +528,9 @@ int main() {
       AZ_STR("world!"),
     };
     az_span_span const span = AZ_SPAN(array);
-    az_span_seq const seq = az_span_span_to_seq_callback(&span);
+    az_span_emitter const emitter = az_span_span_emit_callback(&span);
     size_t s = 42;
-    az_result const result = az_span_seq_size(seq, &s);
+    az_result const result = az_span_seq_size(emitter, &s);
     TEST_ASSERT(result == AZ_OK);
     TEST_ASSERT(s == 12);
   }
@@ -543,7 +543,7 @@ int main() {
       AZ_STR("world!"),
     };
     az_span_span const span = AZ_SPAN(array);
-    az_span_seq const seq = az_span_span_to_seq_callback(&span);
+    az_span_emitter const seq = az_span_span_emit_callback(&span);
     //
     char * p;
     az_result const result = az_span_seq_to_new_str(seq, &p);

@@ -4,22 +4,22 @@
 #ifndef AZ_HTTP_HEADER_H
 #define AZ_HTTP_HEADER_H
 
-#include <az_span_seq.h>
+#include <az_span_emitter.h>
 #include <az_callback.h>
 #include <az_pair.h>
 
 #include <_az_cfg_prefix.h>
 
 /**
- * Converts an HTTP header to a sequence of spans in a format "%{key}: %{value}"
+ * Emits an HTTP header as a sequence of spans in a format "%{key}: %{value}"
  */
 AZ_NODISCARD az_result
-az_http_header_to_span_seq(az_pair const * p_header, az_span_append const append);
+az_http_header_emit_spans(az_pair const * p_header, az_span_append const append);
 
 /**
- * @az_http_header_to_span_seq callback.
+ * @az_http_header_emit_spans callback.
  */
-AZ_CALLBACK_FUNC(az_http_header_to_span_seq, az_pair const *, az_span_seq)
+AZ_CALLBACK_FUNC(az_http_header_emit_spans, az_pair const *, az_span_emitter)
 
 #include <_az_cfg_suffix.h>
 

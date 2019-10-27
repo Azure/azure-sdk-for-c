@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_span_seq.h>
+#include <az_span_emitter.h>
 
 #include <az_span_builder.h>
 #include <az_str.h>
@@ -11,7 +11,7 @@
 #include <_az_cfg.h>
 
 AZ_NODISCARD az_result
-az_span_span_to_seq(az_span_span const * const context, az_span_append const append) {
+az_span_span_emit(az_span_span const * const context, az_span_append const append) {
   AZ_CONTRACT_ARG_NOT_NULL(context);
 
   size_t const size = context->size;
@@ -31,21 +31,21 @@ AZ_NODISCARD az_result az_span_add_size(size_t * const p_size, az_const_span con
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_span_seq_size(az_span_seq const seq, size_t * const out_size) {
+AZ_NODISCARD az_result az_span_emmiter_size(az_span_emitter const emitter, size_t * const out_size) {
   AZ_CONTRACT_ARG_NOT_NULL(out_size);
 
   *out_size = 0;
-  return az_span_seq_do(seq, az_span_add_size_callback(out_size));
+  return az_span_emitter_do(emitter, az_span_add_size_callback(out_size));
 }
 
-// az_span_seq_to_tmp_str() and its utilities
+// az_span_emitter_to_tmp_str() and its utilities
 
 AZ_NODISCARD az_result
-az_span_seq_to_str(az_span_seq const seq, az_mut_span const span, char const ** const out) {
+az_span_emitter_to_str(az_span_emitter const emitter, az_mut_span const span, char const ** const out) {
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
   az_span_builder i = az_span_builder_create(span);
-  AZ_RETURN_IF_FAILED(az_span_seq_do(seq, az_span_builder_append_callback(&i)));
+  AZ_RETURN_IF_FAILED(az_span_emitter_do(emitter, az_span_builder_append_callback(&i)));
   AZ_RETURN_IF_FAILED(az_span_builder_append(&i, AZ_STR("\0")));
   *out = (char const *)span.begin;
   return AZ_OK;
@@ -81,7 +81,7 @@ AZ_NODISCARD az_result az_tmp_span(size_t const size, az_span_callback const cal
 }
 
 typedef struct {
-  az_span_seq seq;
+  az_span_emitter emitter;
   az_str_callback str_callback;
 } az_span_callback_to_str_callback_data;
 
@@ -96,18 +96,18 @@ AZ_NODISCARD az_result az_span_callack_to_str_callback(
   AZ_CONTRACT_ARG_NOT_NULL(p);
 
   char const * str = NULL;
-  AZ_RETURN_IF_FAILED(az_span_seq_to_str(p->seq, span, &str));
+  AZ_RETURN_IF_FAILED(az_span_emitter_to_str(p->emitter, span, &str));
   AZ_RETURN_IF_FAILED(az_str_callback_do(p->str_callback, str));
   return AZ_OK;
 }
 
 AZ_NODISCARD az_result
-az_span_seq_to_tmp_str(az_span_seq const seq, az_str_callback const callback) {
+az_span_emitter_to_tmp_str(az_span_emitter const emitter, az_str_callback const callback) {
   size_t size = 0;
-  AZ_RETURN_IF_FAILED(az_span_seq_size(seq, &size));
+  AZ_RETURN_IF_FAILED(az_span_emitter_size(emitter, &size));
   {
     az_span_callback_to_str_callback_data data = {
-      .seq = seq,
+      .emitter = emitter,
       .str_callback = callback,
     };
     AZ_RETURN_IF_FAILED(az_tmp_span(size, az_span_callback_to_str_callback_callback(&data)));
