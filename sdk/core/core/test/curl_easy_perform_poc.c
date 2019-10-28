@@ -6,6 +6,8 @@
 #include <az_pair.h>
 #include <az_span_builder.h>
 
+#include <az_http_pipeline.h>
+
 #include <stdio.h>
 
 #include <_az_cfg.h>
@@ -29,6 +31,13 @@ int main() {
     .headers = az_pair_span_to_seq_callback(&header),
     .body = req_body,
   };
+
+  az_http_pipeline const pipeline = { .num_policies = 0, .pipeline_stage = 0 
+  };
+
+  az_http_response_data const response;
+  az_result result;
+  result = az_http_pipeline_process(&pipeline, &request, &response);
 
   return 0;
 }

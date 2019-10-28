@@ -18,6 +18,8 @@ add_library (
   src/az_curl_adapter.c
   src/az_http_request.c
   src/az_http_request_builder.c
+  src/az_http_pipeline.c
+  src/az_http_policy.c
   src/az_json_read.c
   src/az_pair.c
   src/az_span.c
