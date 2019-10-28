@@ -4,10 +4,10 @@
 #include <az_base64.h>
 #include <az_http_request.h>
 #include <az_json_read.h>
+#include <az_span_builder.h>
 #include <az_span_reader.h>
 #include <az_span_seq.h>
 #include <az_uri.h>
-#include <az_span_builder.h>
 
 #include <assert.h>
 #include <stdbool.h>
@@ -608,17 +608,18 @@ int main() {
             &b64_encoded4u,     &b64_encoded5u,    &b64_encoded6u, &b64_encoded_bin1u,
             &b64_encoded_bin2u, &b64_encoded_bin3u };
 
+    az_result ignore_result;
     for (size_t i = 0; i < 10; ++i) {
-      az_base64_encode(false, buffer, *decoded_input[i], &result);
+      ignore_result = az_base64_encode(false, buffer, *decoded_input[i], &result);
       TEST_ASSERT(az_const_span_eq(result, *encoded_input[i]));
 
-      az_base64_decode(buffer, *encoded_input[i], &result);
+      ignore_result = az_base64_decode(buffer, *encoded_input[i], &result);
       TEST_ASSERT(az_const_span_eq(result, *decoded_input[i]));
 
-      az_base64_encode(true, buffer, *decoded_input[i], &result);
+      ignore_result = az_base64_encode(true, buffer, *decoded_input[i], &result);
       TEST_ASSERT(az_const_span_eq(result, *url_encoded_input[i]));
 
-      az_base64_decode(buffer, *url_encoded_input[i], &result);
+      ignore_result = az_base64_decode(buffer, *url_encoded_input[i], &result);
       TEST_ASSERT(az_const_span_eq(result, *decoded_input[i]));
     }
   }
@@ -626,23 +627,24 @@ int main() {
     uint8_t buf[256 * 3];
     az_span const buffer = { .begin = buf, .size = sizeof(buf) };
     az_const_span result;
+    az_result ignore_result;
 
-    az_uri_encode(buffer, AZ_STR("https://vault.azure.net"), &result);
+    ignore_result = az_uri_encode(buffer, AZ_STR("https://vault.azure.net"), &result);
     TEST_ASSERT(az_const_span_eq(result, AZ_STR("https%3A%2F%2Fvault.azure.net")));
 
-    az_uri_decode(buffer, AZ_STR("https%3A%2F%2Fvault.azure.net"), &result);
+    ignore_result = az_uri_decode(buffer, AZ_STR("https%3A%2F%2Fvault.azure.net"), &result);
     TEST_ASSERT(az_const_span_eq(result, AZ_STR("https://vault.azure.net")));
 
-    az_uri_encode(buffer, uri_decoded, &result);
+    ignore_result = az_uri_encode(buffer, uri_decoded, &result);
     TEST_ASSERT(az_const_span_eq(result, uri_encoded));
 
-    az_uri_decode(buffer, uri_encoded, &result);
+    ignore_result = az_uri_decode(buffer, uri_encoded, &result);
     TEST_ASSERT(az_const_span_eq(result, uri_decoded));
 
-    az_uri_decode(buffer, uri_encoded2, &result);
+    ignore_result = az_uri_decode(buffer, uri_encoded2, &result);
     TEST_ASSERT(az_const_span_eq(result, uri_decoded));
 
-    az_uri_decode(buffer, uri_encoded3, &result);
+    ignore_result = az_uri_decode(buffer, uri_encoded3, &result);
     TEST_ASSERT(az_const_span_eq(result, uri_decoded));
   }
   return exit_code;

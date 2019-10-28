@@ -30,6 +30,9 @@
 // `void some_function(az_const_span const span);`
 #define AZ_STR(STRING_LITERAL) (az_const_span) AZ_CONST_STR(STRING_LITERAL)
 
+#define AZ_ZERO_STR AZ_STR("\0")
+#define AZ_HEADER_SEPARATOR_STR AZ_STR(": ")
+
 #include <_az_cfg_suffix.h>
 
 #endif

@@ -49,7 +49,7 @@ AZ_NODISCARD AZ_INLINE az_result az_curl_done(az_curl * const p) {
 
 az_result az_http_client_send_request_impl(
     az_http_request_builder * const p_hrb,
-    az_span const * response);
+    az_span const * const response);
 
 #include <_az_cfg_suffix.h>
 

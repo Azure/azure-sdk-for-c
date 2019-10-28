@@ -34,9 +34,13 @@ int main() {
   az_http_request_builder_append_header(
       &hrb, hrb_header_content_type_name, hrb_header_content_type_value);
 
-  az_http_client_send_request(&hrb, &http_bufbuf_response);
+  az_result const result = az_http_client_send_request(&hrb, &http_bufbuf_response);
 
-  printf("Response is: \n%s", http_bufbuf_response.begin);
+  if (az_succeeded(result)) {
+    printf("Response is: \n%s", http_bufbuf_response.begin);
+  } else {
+    printf("Error during running test\n");
+  }
 
   return 0;
 }

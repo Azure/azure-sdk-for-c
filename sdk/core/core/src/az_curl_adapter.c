@@ -29,7 +29,7 @@ az_result az_write_to_buffer(
   AZ_RETURN_IF_FAILED(az_span_builder_append(&writer, p_header->key));
   AZ_RETURN_IF_FAILED(az_span_builder_append(&writer, separator));
   AZ_RETURN_IF_FAILED(az_span_builder_append(&writer, p_header->value));
-  AZ_RETURN_IF_FAILED(az_span_builder_append(&writer, AZ_STR("\0")));
+  AZ_RETURN_IF_FAILED(az_span_builder_append(&writer, AZ_ZERO_STR));
   return AZ_OK;
 }
 
@@ -79,13 +79,11 @@ az_result az_add_header_to_curl_list(
 az_result az_build_headers(
     az_http_request_builder * const p_hrb,
     az_curl_headers_list * p_headers) {
-  az_const_span separator = AZ_STR(": ");
-  // get pointer to first header
 
   az_pair header;
   for (uint16_t offset = 0; offset < p_hrb->headers_end; ++offset) {
     AZ_RETURN_IF_FAILED(az_http_request_builder_get_header(p_hrb, offset, &header));
-    AZ_RETURN_IF_FAILED(az_add_header_to_curl_list(&header, p_headers, separator));
+    AZ_RETURN_IF_FAILED(az_add_header_to_curl_list(&header, p_headers, AZ_HEADER_SEPARATOR_STR));
   }
 
   return AZ_OK;
@@ -142,7 +140,7 @@ int write_to_span(void * contents, size_t size, size_t nmemb, void * userp) {
 az_result az_curl_send_request(
     az_curl * const p_curl,
     az_http_request_builder * const p_hrb,
-    az_span const * response) {
+    az_span const * const response) {
   // creates a slist for bulding curl headers
   az_curl_headers_list headers = {
     .p_list = NULL,
@@ -198,7 +196,7 @@ az_result az_curl_send_request(
 az_result az_curl_post_request(
     az_curl * const p_curl,
     az_http_request_builder const * const p_hrb,
-    az_span const * response) {
+    az_span const * const response) {
   (void)p_hrb;
   // Method
   // TODO: curl_easy_setopt(p_curl->p_curl, CURLOPT_POSTFIELDS, p_hrb->body.begin);
@@ -222,7 +220,7 @@ az_result az_curl_post_request(
 
 az_result az_http_client_send_request_impl(
     az_http_request_builder * const p_hrb,
-    az_span const * response) {
+    az_span const * const response) {
   az_curl p_curl;
   AZ_RETURN_IF_FAILED(az_curl_init(&p_curl));
   az_result result;
@@ -233,6 +231,6 @@ az_result az_http_client_send_request_impl(
     result = az_curl_post_request(&p_curl, p_hrb, response);
   }
 
-  az_curl_done(&p_curl);
+  AZ_RETURN_IF_FAILED(az_curl_done(&p_curl));
   return result;
 }
