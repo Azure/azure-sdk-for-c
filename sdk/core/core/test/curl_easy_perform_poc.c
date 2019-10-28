@@ -1,14 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <stdio.h>
-
 #include <az_http_request.h>
 #include <az_json_read.h>
 #include <az_pair.h>
-#include <az_write_span_iter.h>
+#include <az_span_builder.h>
 
-int exit_code = 0;
+#include <stdio.h>
+
+#include <_az_cfg.h>
 
 int main() {
 
@@ -30,5 +30,5 @@ int main() {
     .body = req_body,
   };
 
-  return exit_code;
+  return 0;
 }

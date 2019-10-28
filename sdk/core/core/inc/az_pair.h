@@ -7,7 +7,6 @@
 #include <az_callback.h>
 #include <az_contract.h>
 #include <az_span.h>
-#include <az_callback.h>
 
 #include <_az_cfg_prefix.h>
 
@@ -29,7 +28,8 @@ AZ_CALLBACK_TYPE(az_pair_visitor, az_pair)
 /// @az_pair_seq is a @az_pair sequence visitor.
 AZ_CALLBACK_TYPE(az_pair_seq, az_pair_visitor)
 
-az_result az_pair_span_to_seq(az_pair_span const * const context, az_pair_visitor const visitor);
+AZ_NODISCARD az_result
+az_pair_span_to_seq(az_pair_span const * const context, az_pair_visitor const visitor);
 
 /**
  * Creates @az_pair_seq from @az_pair_span.

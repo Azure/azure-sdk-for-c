@@ -3,14 +3,15 @@
 
 #include <az_span_seq.h>
 
-#include <az_write_span_iter.h>
+#include <az_span_builder.h>
 #include <az_str.h>
 
 #include <stdlib.h>
 
 #include <_az_cfg.h>
 
-az_result az_span_span_to_seq(
+AZ_NODISCARD az_result
+az_span_span_to_seq(
     az_span_span const * const context,
     az_span_visitor const visitor) {
   AZ_CONTRACT_ARG_NOT_NULL(context);
@@ -23,12 +24,12 @@ az_result az_span_span_to_seq(
   return AZ_OK;
 }
 
-az_result az_span_add_size(size_t * const p_size, az_const_span const span) {
+AZ_NODISCARD az_result az_span_add_size(size_t * const p_size, az_const_span const span) {
   *p_size += span.size;
   return AZ_OK;
 }
 
-az_result az_span_seq_size(az_span_seq const seq, size_t * const out_size) {
+AZ_NODISCARD az_result az_span_seq_size(az_span_seq const seq, size_t * const out_size) {
   AZ_CONTRACT_ARG_NOT_NULL(out_size);
 
   *out_size = 0;
@@ -37,16 +38,16 @@ az_result az_span_seq_size(az_span_seq const seq, size_t * const out_size) {
 
 //
 
-az_result az_span_seq_to_str(az_span_seq const seq, az_span const span) {
-  az_write_span_iter i = az_write_span_iter_create(span);
-  AZ_RETURN_IF_FAILED(seq.func(seq.data, az_write_span_iter_write_callback(&i)));
-  AZ_RETURN_IF_FAILED(az_write_span_iter_write(&i, AZ_STR("\0")));
+AZ_NODISCARD az_result az_span_seq_to_str(az_span_seq const seq, az_span const span) {
+  az_span_builder i = az_span_builder_create(span);
+  AZ_RETURN_IF_FAILED(seq.func(seq.data, az_span_builder_append_callback(&i)));
+  AZ_RETURN_IF_FAILED(az_span_builder_append(&i, AZ_STR("\0")));
   return AZ_OK;
 }
 
 //
 
-az_result az_span_seq_to_new_str(az_span_seq const seq, char * * const out) { 
+AZ_NODISCARD az_result az_span_seq_to_new_str(az_span_seq const seq, char ** const out) { 
   *out = NULL;
   size_t size; 
   AZ_RETURN_IF_FAILED(az_span_seq_size(seq, &size));
