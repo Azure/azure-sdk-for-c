@@ -67,3 +67,10 @@ az_result az_http_request__emit__spans(az_http_request, span_action);
                        // bad for C name constructions by conventions, Rx uses events which are slightly different
            _to_span_emitter // doesn't describe what the function does. It doesn't create an emitter, it emits.
 ```
+
+### One Way Street
+
+Iterators (both 'pull' and 'push') allow to construct a program as an immutable [data flow](https://en.wikipedia.org/wiki/Dataflow) which 
+usually doesn't require big intermidiate storages/buffers. Also, the amount of interfaces can be reduces, for example, an interface for 
+a JSON parser should be compatable with a JSON builder. A JSON parser output is an input for a JSON builder. And a JSON builder output 
+(usially it's a byte span iterator) is an input for a JSON parser.

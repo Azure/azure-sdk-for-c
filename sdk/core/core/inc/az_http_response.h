@@ -11,11 +11,16 @@
 #include <_az_cfg_prefix.h>
 
 typedef struct {
-  az_pair_visitor header;
-  az_span_visitor body;
+  /**
+   * Note: if we recieve data in chunks, we should have two `span_action`. One for a haeder name and
+   * another one for a header value. Same design change may apply on JSON parser.
+   */
+  az_pair_action header;
+  az_span_action body;
 } az_http_response;
 
-AZ_NODISCARD az_result az_http_response_parse(az_const_span const buffer, az_http_response const response);
+AZ_NODISCARD az_result
+az_http_response_parse(az_span const buffer, az_http_response const response);
 
 #include <_az_cfg_suffix.h>
 
