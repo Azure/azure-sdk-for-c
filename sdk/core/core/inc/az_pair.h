@@ -17,10 +17,7 @@ typedef struct {
 } az_pair;
 
 /// A span of pairs.
-typedef struct {
-  az_pair const * begin;
-  size_t size;
-} az_pair_span;
+AZ_SPAN_TYPE(az_pair_span, az_pair const)
 
 /// @az_pair_visitor is a callback with one argument @az_pair.
 AZ_ACTION_TYPE(az_pair_action, az_pair)

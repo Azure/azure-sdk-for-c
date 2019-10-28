@@ -15,19 +15,16 @@
 
 #include <_az_cfg_prefix.h>
 
+#define AZ_SPAN_TYPE(NAME, VALUE) \
+  typedef struct { \
+    VALUE * begin; \
+    size_t size; \
+  } NAME;
+
 /**
  * An immutable span of bytes (octets).
  */
-typedef struct {
-  /**
-   * Points to the first byte.
-   */
-  uint8_t const * begin;
-  /**
-   * A number of bytes in the span.
-   */
-  size_t size;
-} az_span;
+AZ_SPAN_TYPE(az_span, uint8_t const);
 
 typedef az_result az_result_byte;
 
