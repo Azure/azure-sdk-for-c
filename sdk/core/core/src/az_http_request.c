@@ -53,34 +53,3 @@ az_http_request_emit_span_seq(az_http_request const * const self, az_span_action
 
   return AZ_OK;
 }
-
-/*
-AZ_NODISCARD az_result
-az_build_url(az_http_request const * const p_request, az_span_append const append) {
-  AZ_CONTRACT_ARG_NOT_NULL(p_request);
-
-  // host path
-  AZ_RETURN_IF_FAILED(az_span_append_do(append, p_request->path));
-  // query parameters
-  {
-    az_query_state state = {
-      .append = append,
-      .separator = AZ_STR("?"),
-    };
-    // for each query parameter apply `az_query_to_spans`.
-    AZ_RETURN_IF_FAILED(az_pair_seq_do(p_request->query, az_build_query_param_callback(&state)));
-  }
-  return AZ_OK;
-}
-
-AZ_CALLBACK_FUNC(az_build_url, az_http_request const *, az_span_seq)
-
-AZ_NODISCARD az_result az_http_get_url_size(az_http_request const * const p_request, size_t * out) {
-  return az_span_seq_size(az_build_url_callback(p_request), out);
-}
-
-AZ_NODISCARD az_result
-az_http_url_to_new_str(az_http_request const * const p_request, char ** const out) {
-  return az_span_seq_to_new_str(az_build_url_callback(p_request), out);
-}
-*/
