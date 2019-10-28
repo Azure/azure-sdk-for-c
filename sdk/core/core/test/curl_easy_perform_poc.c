@@ -23,6 +23,10 @@ int main() {
   az_span const http_buf = AZ_SPAN(buf);
   az_http_request_builder hrb;
 
+  // response buffer
+  uint8_t buf_response[1024 * 4];
+  az_span const http_bufbuf_response = AZ_SPAN(buf_response);
+
   // init buffer
   az_http_request_builder_init(&hrb, http_buf, AZ_HTTP_METHOD_VERB_GET, hrb_url, 100, 2);
 
@@ -30,7 +34,9 @@ int main() {
   az_http_request_builder_append_header(
       &hrb, hrb_header_content_type_name, hrb_header_content_type_value);
 
-  az_http_client_send_request(&hrb, NULL);
+  az_http_client_send_request(&hrb, &http_bufbuf_response);
+
+  printf("Response is: \n%s", http_bufbuf_response.begin);
 
   return 0;
 }

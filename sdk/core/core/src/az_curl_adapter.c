@@ -107,45 +107,6 @@ az_result az_write_url(az_span const writable_buffer, az_const_span const url_fr
 }
 
 /**
- * handles GET request
- */
-az_result az_curl_send_request(az_curl * const p_curl, az_http_request_builder * const p_hrb) {
-  // creates a slist for bulding curl headers
-  az_curl_headers_list headers = {
-    .p_list = NULL,
-  };
-  // build headers into a slist as curl is expecting
-  AZ_RETURN_IF_FAILED(az_build_headers(p_hrb, &headers));
-  // set all headers from slist
-  curl_easy_setopt(p_curl->p_curl, CURLOPT_HTTPHEADER, headers.p_list);
-
-  // set URL as 0-terminated str
-  size_t const extra_space_for_zero = (size_t)sizeof("\0");
-  size_t const url_final_size = p_hrb->url.size + extra_space_for_zero;
-  uint8_t * const p_writable_buffer = (uint8_t * const)malloc(url_final_size);
-  char * buffer = (char *)p_writable_buffer;
-  az_span const writable_buffer
-      = (az_span const){ .begin = p_writable_buffer, .size = url_final_size };
-  az_result result = az_write_url(writable_buffer, az_span_to_const_span(p_hrb->url));
-  if (az_succeeded(result)) {
-    curl_easy_setopt(p_curl->p_curl, CURLOPT_URL, buffer);
-  }
-  memset(p_writable_buffer, 0, url_final_size);
-  free(buffer);
-
-  // send
-  CURLcode res = curl_easy_perform(p_curl->p_curl);
-  if (res != CURLE_OK) {
-    fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
-  }
-
-  // TODO: would this be part of done function instead?
-  curl_slist_free_all(headers.p_list);
-
-  return AZ_OK;
-}
-
-/**
  * @brief This is the function that curl will use to write response into a user provider span
  * Function receives the size of the response and must return this same number, otherwise it is
  * consider that function failed
@@ -157,28 +118,78 @@ az_result az_curl_send_request(az_curl * const p_curl, az_http_request_builder *
  * @return int
  */
 int write_to_span(void * contents, size_t size, size_t nmemb, void * userp) {
-  size_t realsize = size * nmemb + 1;
-  az_span * const mem = (az_span * const)userp;
+  size_t const realsize = size * nmemb + 1;
+  az_span * const user_buffer = (az_span * const)userp;
 
-  if (mem->size == 0) {
-    mem->begin = malloc(realsize);
-    mem->size = realsize;
-  } else if (mem->size < realsize) {
-    uint8_t * ptr = realloc(mem->begin, realsize);
-    if (ptr == NULL) {
-      /* out of memory! */
-      printf("not enough memory (realloc returned NULL)\n");
-      return AZ_ERROR_ARG;
-    }
-    mem->begin = ptr;
+  // handle error when response won't feat user buffer
+  if (user_buffer->size < realsize) {
+    fprintf(stderr, "response size is greater than user buffer for writing response");
+    return AZ_ERROR_HTTP_FAILED_REQUEST;
   }
 
-  memcpy(&(mem->begin[0]), contents, realsize);
-  mem->size += realsize;
-  mem->begin[mem->size] = 0;
+  // TODO: format buffer with AZ_RESPONSE_BUILDER
+  memcpy(&(user_buffer->begin[0]), contents, realsize);
+  // add 0 so response can be printed
+  user_buffer->begin[user_buffer->size] = 0;
 
   // This callback needs to return the response size or curl will consider it as it failed
   return (int)realsize - 1;
+}
+
+/**
+ * handles GET request
+ */
+az_result az_curl_send_request(
+    az_curl * const p_curl,
+    az_http_request_builder * const p_hrb,
+    az_span const * response) {
+  // creates a slist for bulding curl headers
+  az_curl_headers_list headers = {
+    .p_list = NULL,
+  };
+  // build headers into a slist as curl is expecting
+  AZ_RETURN_IF_FAILED(az_build_headers(p_hrb, &headers));
+  // set all headers from slist
+  AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl->p_curl, CURLOPT_HTTPHEADER, headers.p_list));
+
+  // set URL as 0-terminated str
+  size_t const extra_space_for_zero = (size_t)sizeof("\0");
+  size_t const url_final_size = p_hrb->url.size + extra_space_for_zero;
+  // allocate buffer to add \0
+  uint8_t * const p_writable_buffer = (uint8_t * const)malloc(url_final_size);
+  if (p_writable_buffer == NULL) {
+    return AZ_ERROR_OUT_OF_MEMORY;
+  }
+  // write url in buffer (will add \0 at the end)
+  char * buffer = (char *)p_writable_buffer;
+  az_span const writable_buffer
+      = (az_span const){ .begin = p_writable_buffer, .size = url_final_size };
+  az_result const result = az_write_url(writable_buffer, az_span_to_const_span(p_hrb->url));
+  CURLcode const set_headers_result = curl_easy_setopt(p_curl->p_curl, CURLOPT_URL, buffer);
+  // free used buffer before anything else
+  memset(p_writable_buffer, 0, url_final_size);
+  free(buffer);
+
+  // handle writing to buffer error
+  if (az_failed(result)) {
+    return result;
+  }
+  // handle setting curl url
+  if (set_headers_result != CURLE_OK) {
+    return AZ_ERROR_HTTP_FAILED_REQUEST;
+  }
+
+  // check if response will be redirected to user span
+  if (response != NULL) {
+    AZ_RETURN_IF_CURL_FAILED(
+        curl_easy_setopt(p_curl->p_curl, CURLOPT_WRITEFUNCTION, write_to_span));
+    AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl->p_curl, CURLOPT_WRITEDATA, (void *)response));
+  }
+
+  // send
+  AZ_RETURN_IF_CURL_FAILED(curl_easy_perform(p_curl->p_curl));
+
+  return AZ_OK;
 }
 
 /**
@@ -187,7 +198,7 @@ int write_to_span(void * contents, size_t size, size_t nmemb, void * userp) {
 az_result az_curl_post_request(
     az_curl * const p_curl,
     az_http_request_builder const * const p_hrb,
-    az_span * const response) {
+    az_span const * response) {
   (void)p_hrb;
   // Method
   // TODO: curl_easy_setopt(p_curl->p_curl, CURLOPT_POSTFIELDS, p_hrb->body.begin);
@@ -211,13 +222,13 @@ az_result az_curl_post_request(
 
 az_result az_http_client_send_request_impl(
     az_http_request_builder * const p_hrb,
-    az_span * const response) {
+    az_span const * response) {
   az_curl p_curl;
   AZ_RETURN_IF_FAILED(az_curl_init(&p_curl));
   az_result result;
 
   if (az_const_span_eq(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_GET)) {
-    result = az_curl_send_request(&p_curl, p_hrb);
+    result = az_curl_send_request(&p_curl, p_hrb, response);
   } else if (az_const_span_eq(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_POST)) {
     result = az_curl_post_request(&p_curl, p_hrb, response);
   }

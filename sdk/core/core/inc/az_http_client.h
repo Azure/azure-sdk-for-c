@@ -20,7 +20,7 @@
  * @return AZ_INLINE az_http_client_send_request
  */
 AZ_INLINE az_result
-az_http_client_send_request(az_http_request_builder * const p_hrb, az_span * const response) {
+az_http_client_send_request(az_http_request_builder * const p_hrb, az_span const * response) {
   return az_http_client_send_request_impl(p_hrb, response);
 }
 

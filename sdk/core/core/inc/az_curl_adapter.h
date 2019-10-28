@@ -16,6 +16,16 @@
 
 #include <_az_cfg_prefix.h>
 
+// returning AZ error on CURL Error
+#define AZ_RETURN_IF_CURL_FAILED(exp) \
+  do { \
+    CURLcode const _result = (exp); \
+    if (_result != CURLE_OK) { \
+      fprintf(stderr, "curl error: %s\n", curl_easy_strerror(_result)); \
+      return AZ_ERROR_HTTP_FAILED_REQUEST; \
+    } \
+  } while (0)
+
 typedef struct {
   CURL * p_curl;
 } az_curl;
@@ -39,7 +49,7 @@ AZ_INLINE az_result az_curl_done(az_curl * const p) {
 
 az_result az_http_client_send_request_impl(
     az_http_request_builder * const p_hrb,
-    az_span * const response);
+    az_span const * response);
 
 #include <_az_cfg_suffix.h>
 
