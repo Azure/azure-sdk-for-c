@@ -24,7 +24,7 @@ typedef struct {
 az_result az_write_to_buffer(
     az_span const writable_buffer,
     az_pair * const p_header,
-    az_const_span separator) {
+    az_const_span const separator) {
   az_span_builder writer = az_span_builder_create(writable_buffer);
   AZ_RETURN_IF_FAILED(az_span_builder_append(&writer, p_header->key));
   AZ_RETURN_IF_FAILED(az_span_builder_append(&writer, separator));
@@ -48,7 +48,7 @@ az_result az_add_header_to_curl_list(
     az_curl_headers_list * const p_headers,
     az_const_span separator) {
   // allocate a buffet for header
-  int16_t buffer_size = p_header->key.size + separator.size + p_header->value.size + 1;
+  int16_t const buffer_size = p_header->key.size + separator.size + p_header->value.size + 1;
   uint8_t * const p_writable_buffer = (uint8_t * const)malloc(buffer_size);
   if (p_writable_buffer == NULL) {
     return AZ_ERROR_OUT_OF_MEMORY;
@@ -58,7 +58,7 @@ az_result az_add_header_to_curl_list(
   // write buffer
   az_span const writable_buffer
       = (az_span const){ .begin = p_writable_buffer, .size = buffer_size };
-  az_result write_result = az_write_to_buffer(writable_buffer, p_header, separator);
+  az_result const write_result = az_write_to_buffer(writable_buffer, p_header, separator);
 
   // attach header only when write was OK
   if (az_succeeded(write_result)) {
@@ -82,12 +82,10 @@ az_result az_build_headers(
   az_const_span separator = AZ_STR(": ");
   // get pointer to first header
 
-  az_pair a;
-  az_pair * p_header = &a;
-
+  az_pair header;
   for (uint16_t offset = 0; offset < p_hrb->headers_end; ++offset) {
-    AZ_RETURN_IF_FAILED(az_http_request_builder_get_header(p_hrb, offset, p_header));
-    AZ_RETURN_IF_FAILED(az_add_header_to_curl_list(p_header, p_headers, separator));
+    AZ_RETURN_IF_FAILED(az_http_request_builder_get_header(p_hrb, offset, &header));
+    AZ_RETURN_IF_FAILED(az_add_header_to_curl_list(&header, p_headers, separator));
   }
 
   return AZ_OK;
@@ -121,16 +119,18 @@ az_result az_curl_send_request(az_curl * const p_curl, az_http_request_builder *
   // set all headers from slist
   curl_easy_setopt(p_curl->p_curl, CURLOPT_HTTPHEADER, headers.p_list);
 
-  // set URL
-  uint8_t * const p_writable_buffer = (uint8_t * const)malloc(p_hrb->url.size + 1);
+  // set URL as 0-terminated str
+  size_t const extra_space_for_zero = (size_t)sizeof("\0");
+  size_t const url_final_size = p_hrb->url.size + extra_space_for_zero;
+  uint8_t * const p_writable_buffer = (uint8_t * const)malloc(url_final_size);
   char * buffer = (char *)p_writable_buffer;
   az_span const writable_buffer
-      = (az_span const){ .begin = p_writable_buffer, .size = p_hrb->url.size + 1 };
+      = (az_span const){ .begin = p_writable_buffer, .size = url_final_size };
   az_result result = az_write_url(writable_buffer, az_span_to_const_span(p_hrb->url));
   if (az_succeeded(result)) {
     curl_easy_setopt(p_curl->p_curl, CURLOPT_URL, buffer);
   }
-  memset(p_writable_buffer, 0, p_hrb->url.size + 1);
+  memset(p_writable_buffer, 0, url_final_size);
   free(buffer);
 
   // send
@@ -216,9 +216,9 @@ az_result az_http_client_send_request_impl(
   AZ_RETURN_IF_FAILED(az_curl_init(&p_curl));
   az_result result;
 
-  if (az_const_span_eq(p_hrb->method_verb, AZ_STR("GET"))) {
+  if (az_const_span_eq(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_GET)) {
     result = az_curl_send_request(&p_curl, p_hrb);
-  } else if (az_const_span_eq(p_hrb->method_verb, AZ_STR("GET"))) {
+  } else if (az_const_span_eq(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_POST)) {
     result = az_curl_post_request(&p_curl, p_hrb, response);
   }
 

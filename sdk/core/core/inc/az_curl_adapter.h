@@ -9,6 +9,7 @@
 #include <az_http_request_builder.h>
 #include <az_span_builder.h>
 #include <az_span_seq.h>
+#include <az_str.h>
 
 #include <curl/curl.h>
 #include <stdlib.h>
