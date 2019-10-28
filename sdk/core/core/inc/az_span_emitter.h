@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef AZ_SPAN_SEQ_H
-#define AZ_SPAN_SEQ_H
+#ifndef AZ_SPAN_EMITTER_H
+#define AZ_SPAN_EMITTER_H
 
 #include <az_str.h>
 #include <az_span.h>
