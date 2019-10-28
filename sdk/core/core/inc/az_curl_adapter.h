@@ -5,16 +5,15 @@
 #define AZ_CURL_ADAPTER_H
 
 #include <az_callback.h>
+#include <az_http_request.h>
 #include <az_http_request_builder.h>
-#include <az_pair.h>
 #include <az_span_builder.h>
 #include <az_span_seq.h>
-#include <az_str.h>
-
-#include <_az_cfg_prefix.h>
 
 #include <curl/curl.h>
 #include <stdlib.h>
+
+#include <_az_cfg_prefix.h>
 
 typedef struct {
   CURL * p_curl;
