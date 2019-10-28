@@ -15,7 +15,7 @@ AZ_ACTION_TYPE(az_span_emitter, az_span_action)
  * A span of spans of bytes.
  */
 typedef struct {
-  az_const_span const * begin;
+  az_span const * begin;
   size_t size;
 } az_span_span;
 

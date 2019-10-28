@@ -14,8 +14,8 @@ AZ_NODISCARD az_result
 az_span_span_emit(az_span_span const * const context, az_span_action const action) {
   AZ_CONTRACT_ARG_NOT_NULL(context);
 
-  az_const_span const * i = context->begin;
-  az_const_span const * const end = i + context->size;
+  az_span const * i = context->begin;
+  az_span const * const end = i + context->size;
   for (; i < end; ++i) {
     AZ_RETURN_IF_FAILED(az_span_action_do(action, *i));
   }
@@ -24,7 +24,7 @@ az_span_span_emit(az_span_span const * const context, az_span_action const actio
 
 // az_span_emitter_size() and its utilities
 
-AZ_NODISCARD az_result az_span_add_size(size_t * const p_size, az_const_span const span) {
+AZ_NODISCARD az_result az_span_add_size(size_t * const p_size, az_span const span) {
   *p_size += span.size;
   return AZ_OK;
 }
@@ -72,8 +72,6 @@ void az_span_free(az_mut_span * const p) {
   free(p->begin);
   *p = (az_mut_span){ 0 };
 }
-
-AZ_ACTION_TYPE(az_mut_span_action, az_mut_span)
 
 AZ_NODISCARD az_result az_tmp_span(size_t const size, az_mut_span_action const mut_span_action) {
   az_mut_span span = { 0 };

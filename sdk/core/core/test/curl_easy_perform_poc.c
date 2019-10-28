@@ -14,11 +14,11 @@ int main() {
 
   /****** -------------  Create request from arrays ---------******/
   az_pair const query_array[] = { { .key = AZ_STR("key"), .value = AZ_STR("value") } };
-  az_pair_span const query = AZ_SPAN(query_array);
+  az_pair_span const query = AZ_SPAN_FROM_ARRAY(query_array);
   az_pair const header_array[] = { { .key = AZ_STR("key"), .value = AZ_STR("value") } };
-  az_pair_span const header = AZ_SPAN(header_array);
+  az_pair_span const header = AZ_SPAN_FROM_ARRAY(header_array);
 
-  az_const_span req_body
+  az_span req_body
       = AZ_STR("grant_type=client_credentials&client_id=4317a660-6bfb-4585-9ce9-8f222314879c&"
                "client_secret=O2CT[Y:dkTqblml5V/T]ZEi9x1W1zoBW&resource=https://vault.azure.net");
   az_http_request const request = {

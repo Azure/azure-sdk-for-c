@@ -12,11 +12,11 @@
 #include <_az_cfg_prefix.h>
 
 typedef struct {
-  az_const_span method;
-  az_const_span path;
+  az_span method;
+  az_span path;
   az_pair_emitter query;
   az_pair_emitter headers;
-  az_const_span body;
+  az_span body;
 } az_http_request;
 
 /**

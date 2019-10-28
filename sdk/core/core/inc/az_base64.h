@@ -4,6 +4,7 @@
 #ifndef AZ_BASE64_H
 #define AZ_BASE64_H
 
+#include <az_mut_span.h>
 #include <az_result.h>
 #include <az_span.h>
 
@@ -32,8 +33,8 @@
 AZ_NODISCARD az_result az_base64_encode(
     bool const base64url,
     az_mut_span const buffer,
-    az_const_span const input,
-    az_const_span * const out_result);
+    az_span const input,
+    az_span * const out_result);
 
 /**
  * @brief Decode from _Base64_: `VGV4dA==` becomes `Text`
@@ -54,7 +55,7 @@ AZ_NODISCARD az_result az_base64_encode(
  *     - `out_result` would overlap `input`.
  */
 AZ_NODISCARD az_result
-az_base64_decode(az_mut_span const buffer, az_const_span const input, az_const_span * const out_result);
+az_base64_decode(az_mut_span const buffer, az_span const input, az_span * const out_result);
 
 #include <_az_cfg_suffix.h>
 

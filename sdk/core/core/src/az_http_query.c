@@ -23,7 +23,7 @@ typedef struct {
    *
    * A mutable field.
    */
-  az_const_span separator;
+  az_span separator;
 } az_http_query_state;
 
 AZ_ACTION_FUNC(az_http_query_param, az_http_query_state, az_pair_action)

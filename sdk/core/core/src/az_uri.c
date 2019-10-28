@@ -62,12 +62,11 @@ AZ_NODISCARD AZ_INLINE size_t encode(uint8_t const c, uint8_t * const p) {
 AZ_NODISCARD az_result
 az_uri_encode(
     az_mut_span const buffer,
-    az_const_span const input,
-    az_const_span * const out_result) {
+    az_span const input,
+    az_span * const out_result) {
   AZ_CONTRACT_ARG_NOT_NULL(out_result);
-  if (!az_mut_span_is_valid(buffer) || !az_const_span_is_valid(input)) {
-    return AZ_ERROR_ARG;
-  }
+  AZ_CONTRACT_ARG_VALID_MUT_SPAN(buffer);
+  AZ_CONTRACT_ARG_VALID_SPAN(input);
 
   size_t result_size = 0;
   for (size_t i = 0; i < input.size; ++i) {
@@ -75,9 +74,9 @@ az_uri_encode(
   }
 
   assert(result_size <= buffer.size);
-  az_const_span const result = (az_const_span){ .begin = buffer.begin, .size = result_size };
+  az_span const result = (az_span){ .begin = buffer.begin, .size = result_size };
 
-  if (az_const_span_is_overlap(input, result)) {
+  if (az_span_is_overlap(input, result)) {
     return AZ_ERROR_ARG;
   }
 
@@ -99,13 +98,11 @@ az_uri_encode(
 AZ_NODISCARD az_result
 az_uri_decode(
     az_mut_span const buffer,
-    az_const_span const input,
-    az_const_span * const out_result) {
+    az_span const input,
+    az_span * const out_result) {
   AZ_CONTRACT_ARG_NOT_NULL(out_result);
-
-  if (!az_mut_span_is_valid(buffer) || !az_const_span_is_valid(input)) {
-    return AZ_ERROR_ARG;
-  }
+  AZ_CONTRACT_ARG_VALID_MUT_SPAN(buffer);
+  AZ_CONTRACT_ARG_VALID_SPAN(input);
 
   size_t result_size = 0;
   for (size_t i = 0; i < input.size; ++i) {
@@ -120,9 +117,9 @@ az_uri_decode(
     ++result_size;
   }
 
-  az_const_span const result = (az_const_span){ .begin = buffer.begin, .size = result_size };
+  az_span const result = (az_span){ .begin = buffer.begin, .size = result_size };
 
-  if (az_const_span_is_overlap(input, result)) {
+  if (az_span_is_overlap(input, result)) {
     return AZ_ERROR_ARG;
   }
 

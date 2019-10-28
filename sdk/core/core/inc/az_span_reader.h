@@ -10,11 +10,11 @@
 #include <_az_cfg_prefix.h>
 
 typedef struct {
-  az_const_span span;
+  az_span span;
   size_t i;
 } az_span_reader;
 
-AZ_NODISCARD AZ_INLINE az_span_reader az_span_reader_create(az_const_span const span) {
+AZ_NODISCARD AZ_INLINE az_span_reader az_span_reader_create(az_span const span) {
   return (az_span_reader){ .span = span, .i = 0 };
 }
 
@@ -24,7 +24,7 @@ AZ_NODISCARD AZ_INLINE bool az_span_reader_is_empty(az_span_reader const * const
 
 AZ_NODISCARD AZ_INLINE az_result_byte
 az_span_reader_current(az_span_reader const * const p_reader) {
-  return az_const_span_get(p_reader->span, p_reader->i);
+  return az_span_get(p_reader->span, p_reader->i);
 }
 
 AZ_INLINE void az_span_reader_next(az_span_reader * const p_reader) {

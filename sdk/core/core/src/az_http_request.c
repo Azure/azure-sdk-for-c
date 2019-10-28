@@ -16,7 +16,7 @@
 
 #define AZ_CRLF "\r\n"
 
-static az_const_span const az_crlf = AZ_CONST_STR(AZ_CRLF);
+static az_span const az_crlf = AZ_CONST_STR(AZ_CRLF);
 
 AZ_NODISCARD az_result
 az_http_header_line(az_span_action const * const self, az_pair const header) {

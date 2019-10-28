@@ -77,7 +77,7 @@ AZ_NODISCARD AZ_INLINE az_result az_json_stack_pop(az_json_state * const p_state
   return AZ_OK;
 }
 
-AZ_NODISCARD az_json_state az_json_state_create(az_const_span const buffer) {
+AZ_NODISCARD az_json_state az_json_state_create(az_span const buffer) {
   return (az_json_state){
     .reader = az_span_reader_create(buffer),
     .stack = 1,
@@ -102,7 +102,7 @@ static void az_json_read_white_space(az_span_reader * const p_reader) {
 
 AZ_NODISCARD static az_result az_json_read_keyword_rest(
     az_span_reader * const p_reader,
-    az_const_span const keyword) {
+    az_span const keyword) {
   az_span_reader_next(p_reader);
   az_span_reader k = az_span_reader_create(keyword);
   while (true) {
@@ -236,7 +236,7 @@ AZ_NODISCARD static az_result az_json_read_number_digit_rest(
 
 AZ_NODISCARD static az_result az_json_read_string_rest(
     az_span_reader * const p_reader,
-    az_const_span * const string) {
+    az_span * const string) {
   // skip '"'
   size_t const begin = p_reader->i;
   while (true) {
@@ -244,7 +244,7 @@ AZ_NODISCARD static az_result az_json_read_string_rest(
     switch (c) {
         // end of the string
       case '"': {
-        *string = az_const_span_sub(p_reader->span, begin, p_reader->i);
+        *string = az_span_sub(p_reader->span, begin, p_reader->i);
         az_span_reader_next(p_reader);
         return AZ_OK;
       }
@@ -438,13 +438,12 @@ AZ_NODISCARD az_result az_json_state_done(az_json_state const * const p_state) {
 }
 
 AZ_NODISCARD az_result az_json_get_object_member_value(
-    az_const_span const json,
-    az_const_span const name,
+    az_span const json,
+    az_span const name,
     az_json_value * const out_value) {
   AZ_CONTRACT_ARG_NOT_NULL(out_value);
-  if (!az_const_span_is_valid(json) || !az_const_span_is_valid(name)) {
-    return AZ_ERROR_ARG;
-  }
+  AZ_CONTRACT_ARG_VALID_SPAN(json);
+  AZ_CONTRACT_ARG_VALID_SPAN(name);
 
   az_json_state state = az_json_state_create(json);
   az_json_value value;
@@ -453,7 +452,7 @@ AZ_NODISCARD az_result az_json_get_object_member_value(
   if (value.kind == AZ_JSON_VALUE_OBJECT) {
     az_json_member member;
     while (az_json_read_object_member(&state, &member) != AZ_JSON_ERROR_NO_MORE_ITEMS) {
-      if (az_const_span_eq(member.name, name)) {
+      if (az_span_eq(member.name, name)) {
         *out_value = member.value;
         return AZ_OK;
       }

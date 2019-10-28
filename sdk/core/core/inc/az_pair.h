@@ -12,8 +12,8 @@
 
 /// A pair of strings.
 typedef struct {
-  az_const_span key;
-  az_const_span value;
+  az_span key;
+  az_span value;
 } az_pair;
 
 /// A span of pairs.

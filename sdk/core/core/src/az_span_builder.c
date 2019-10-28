@@ -5,7 +5,7 @@
 
 #include <_az_cfg.h>
 
-AZ_NODISCARD az_result az_span_builder_append(az_span_builder * const p_builder, az_const_span const span) {
+AZ_NODISCARD az_result az_span_builder_append(az_span_builder * const p_builder, az_span const span) {
   AZ_CONTRACT_ARG_NOT_NULL(p_builder);
 
   az_mut_span const remainder = az_mut_span_drop(p_builder->buffer, p_builder->size);

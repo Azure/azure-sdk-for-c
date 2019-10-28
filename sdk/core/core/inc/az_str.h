@@ -29,7 +29,7 @@
 // where
 //
 // `void some_function(az_const_span const span);`
-#define AZ_STR(STRING_LITERAL) (az_const_span) AZ_CONST_STR(STRING_LITERAL)
+#define AZ_STR(STRING_LITERAL) (az_span) AZ_CONST_STR(STRING_LITERAL)
 
 /**
  * A callack that accepts zero-terminated string `char const *`.

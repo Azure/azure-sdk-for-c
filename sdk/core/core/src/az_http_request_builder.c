@@ -9,8 +9,8 @@ AZ_NODISCARD az_result az_http_request_builder_init(
     az_http_request_builder * const p_hrb,
     az_mut_span const buffer,
     int16_t const max_url_size,
-    az_const_span const method_verb,
-    az_const_span const initial_url) {
+    az_span const method_verb,
+    az_span const initial_url) {
   (void)p_hrb;
   (void)buffer;
   (void)max_url_size;
@@ -21,8 +21,8 @@ AZ_NODISCARD az_result az_http_request_builder_init(
 
 AZ_NODISCARD az_result az_http_request_builder_set_query_parameter(
     az_http_request_builder * const p_hrb,
-    az_const_span const name,
-    az_const_span const value) {
+    az_span const name,
+    az_span const value) {
   (void)p_hrb;
   (void)name;
   (void)value;
@@ -31,8 +31,8 @@ AZ_NODISCARD az_result az_http_request_builder_set_query_parameter(
 
 AZ_NODISCARD az_result az_http_request_builder_append_header(
     az_http_request_builder * const p_hrb,
-    az_const_span const name,
-    az_const_span const value) {
+    az_span const name,
+    az_span const value) {
   (void)p_hrb;
   (void)name;
   (void)value;
