@@ -23,7 +23,7 @@ AZ_NODISCARD az_result
 az_span_span_emit(az_span_span const * const self, az_span_action const action);
 
 /**
- * @az_span_span_emit as a callback.
+ * @az_span_span_emit as an action of type @az_span_emitter.
  */
 AZ_ACTION_FUNC(az_span_span_emit, az_span_span const, az_span_emitter)
 
