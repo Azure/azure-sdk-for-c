@@ -4,7 +4,7 @@
 #ifndef AZ_SPAN_H
 #define AZ_SPAN_H
 
-#include <az_callback.h>
+#include <az_action.h>
 #include <az_contract.h>
 #include <az_result.h>
 #include <az_static_assert.h>
@@ -262,19 +262,19 @@ AZ_NODISCARD az_result az_span_replace(
 /**
  * ```c
  * typedef struct {
- *   az_result (*func)(ptrdiff_t, az_const_span);
- *   ptrdiff_t data;
- * } az_span_append;
+ *   az_result (* func)(void *, az_const_span);
+ *   void * self;
+ * } az_span_action;
  * ```
  *
  * Example of usage
  *
  * ```c
- * az_span_append const append = ...;
- * az_span_append_do(append, AZ_CONST_SPAN("Something"));
+ * az_span_action const action = ...;
+ * az_span_action_do(append, AZ_CONST_SPAN("Something"));
  * ```
  */
-AZ_CALLBACK_TYPE(az_span_append, az_const_span)
+AZ_ACTION_TYPE(az_span_action, az_const_span)
 
 #include <_az_cfg_suffix.h>
 

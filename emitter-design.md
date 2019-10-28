@@ -45,9 +45,13 @@ https://blogs.msdn.microsoft.com/ericlippert/2009/07/23/iterator-blocks-part-fiv
 C has heither no GC nor lifetime checks (like Rust https://doc.rust-lang.org/nomicon/lifetimes.html). It also has no
 RAII (https://en.wikipedia.org/wiki/Resource_acquisition_is_initialization). So creating a `pull` iterator is complicated and could be unsafe. One of the way to solve the problem is to use a `push` iterator. It gives some scoped lifetime (a lifetime of a function execution) and it's very easy to create a complicated `push` iterator by using code flow (a code state machine) instead of a data state machine.
 
-A `push` iterator can have a big set of map/reduce operations similar to a `pull` iterator. Including, concatenation, a flat map (SelectMany), filters, reduce, groupBy etc.
+A `push` iterator can have a big set of map/reduce operations similar to a `pull` iterator. Including concatenation, a flat map (SelectMany), filters, reduce, groupBy etc.
 
-In the same time, a `push` iterator has some limitations that a `pull` iterator doesn't. It's hard (or even impossible) to run two `push` iterators in the same time. Sometimes it's required for such operations as `zip merge`, `equal`, `compare` etc. However serialization/deserialization and reading/writing to IO (file, network, HTTP etc) don't require comparisons of emitters.
+In the same time, a `push` iterator has some limitations that a `pull` iterator doesn't. It's hard (or even impossible) to run two `push` iterators in the same time. Sometimes it's required for such operations as `zip merge`, `equal`, `compare` etc. However serialization/deserialization and reading/writing to IO (file, network, HTTP etc) don't require comparisons of emitters, usually.
+
+It's possible to convert from a iterator to an emitter. It's a function which accepts an iterator and an action. and applies this action for all items in the iterator. Usually, this function is called for each.
+
+An emitter is a similar to a cold observable collection in reactive programming (Rx). The main difference is that an emitter is using an action instead of a subscriber.
 
 ```c
 // (SVO) subject verb object // https://en.wikipedia.org/wiki/Subject–verb–object

@@ -4,7 +4,7 @@
 #ifndef AZ_STR_H
 #define AZ_STR_H
 
-#include <az_callback.h>
+#include <az_action.h>
 #include <az_span.h>
 
 #include <_az_cfg_prefix.h>
@@ -34,7 +34,7 @@
 /**
  * A callack that accepts zero-terminated string `char const *`.
  */
-AZ_CALLBACK_TYPE(az_str_callback, char const *)
+AZ_ACTION_TYPE(az_str_action, char const *)
 
 #include <_az_cfg_suffix.h>
 

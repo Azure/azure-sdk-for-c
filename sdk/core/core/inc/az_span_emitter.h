@@ -9,7 +9,7 @@
 
 #include <_az_cfg_prefix.h>
 
-AZ_CALLBACK_TYPE(az_span_emitter, az_span_append)
+AZ_ACTION_TYPE(az_span_emitter, az_span_action)
 
 /**
  * A span of spans of bytes.
@@ -23,12 +23,12 @@ typedef struct {
  * Emits all spans from `*p_span_span` into @append.
  */
 AZ_NODISCARD az_result
-az_span_span_emit(az_span_span const * const p_span_span, az_span_append const append);
+az_span_span_emit(az_span_span const * const p_span_span, az_span_action const action);
 
 /**
  * @az_span_span_emit as a callback.
  */
-AZ_CALLBACK_FUNC(az_span_span_emit, az_span_span const *, az_span_emitter)
+AZ_ACTION_FUNC(az_span_span_emit, az_span_span const, az_span_emitter)
 
 /**
  * Calculates a size of a contigous buffer to store all spans from @seq.
@@ -41,7 +41,7 @@ AZ_NODISCARD az_result az_span_emitter_size(az_span_emitter const emitter, size_
  * destroyed.
  */
 AZ_NODISCARD az_result
-az_span_emitter_to_tmp_str(az_span_emitter const emitter, az_str_callback const str_callback);
+az_span_emitter_to_tmp_str(az_span_emitter const emitter, az_str_action const str_action);
 
 #include <_az_cfg_suffix.h>
 

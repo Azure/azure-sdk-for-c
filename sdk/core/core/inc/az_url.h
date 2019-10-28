@@ -18,7 +18,7 @@ typedef struct {
   az_pair_seq query;
 } az_url;
 
-AZ_NODISCARD az_result az_url_emit_spans(az_url const * p_url, az_span_append const append);
+AZ_NODISCARD az_result az_url_emit_span_seq(az_url const * p_url, az_span_append const append);
 
 #include <_az_cfg_suffix.h>
 

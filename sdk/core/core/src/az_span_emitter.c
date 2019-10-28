@@ -11,41 +11,44 @@
 #include <_az_cfg.h>
 
 AZ_NODISCARD az_result
-az_span_span_emit(az_span_span const * const context, az_span_append const append) {
+az_span_span_emit(az_span_span const * const context, az_span_action const action) {
   AZ_CONTRACT_ARG_NOT_NULL(context);
 
-  size_t const size = context->size;
-  az_const_span const * begin = context->begin;
-  for (size_t i = 0; i < size; ++i) {
-    AZ_RETURN_IF_FAILED(az_span_append_do(append, begin[i]));
+  az_const_span const * i = context->begin;
+  az_const_span const * const end = i + context->size;
+  for (; i < end; ++i) {
+    AZ_RETURN_IF_FAILED(az_span_action_do(action, *i));
   }
   return AZ_OK;
 }
 
-// az_span_seq_size() and its utilities
-
-AZ_CALLBACK_FUNC(az_span_add_size, size_t *, az_span_append)
+// az_span_emitter_size() and its utilities
 
 AZ_NODISCARD az_result az_span_add_size(size_t * const p_size, az_const_span const span) {
   *p_size += span.size;
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_span_emmiter_size(az_span_emitter const emitter, size_t * const out_size) {
+AZ_ACTION_FUNC(az_span_add_size, size_t, az_span_action)
+
+AZ_NODISCARD az_result
+az_span_emitter_size(az_span_emitter const emitter, size_t * const out_size) {
   AZ_CONTRACT_ARG_NOT_NULL(out_size);
 
   *out_size = 0;
-  return az_span_emitter_do(emitter, az_span_add_size_callback(out_size));
+  return az_span_emitter_do(emitter, az_span_add_size_action(out_size));
 }
 
 // az_span_emitter_to_tmp_str() and its utilities
 
-AZ_NODISCARD az_result
-az_span_emitter_to_str(az_span_emitter const emitter, az_mut_span const span, char const ** const out) {
+AZ_NODISCARD az_result az_span_emitter_to_str(
+    az_span_emitter const emitter,
+    az_mut_span const span,
+    char const ** const out) {
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
   az_span_builder i = az_span_builder_create(span);
-  AZ_RETURN_IF_FAILED(az_span_emitter_do(emitter, az_span_builder_append_callback(&i)));
+  AZ_RETURN_IF_FAILED(az_span_emitter_do(emitter, az_span_builder_append_action(&i)));
   AZ_RETURN_IF_FAILED(az_span_builder_append(&i, AZ_STR("\0")));
   *out = (char const *)span.begin;
   return AZ_OK;
@@ -70,47 +73,47 @@ void az_span_free(az_mut_span * const p) {
   *p = (az_mut_span){ 0 };
 }
 
-AZ_CALLBACK_TYPE(az_span_callback, az_mut_span)
+AZ_ACTION_TYPE(az_mut_span_action, az_mut_span)
 
-AZ_NODISCARD az_result az_tmp_span(size_t const size, az_span_callback const callback) {
+AZ_NODISCARD az_result az_tmp_span(size_t const size, az_mut_span_action const mut_span_action) {
   az_mut_span span = { 0 };
   AZ_RETURN_IF_FAILED(az_span_malloc(size, &span));
-  az_result const result = az_span_callback_do(callback, span);
+  az_result const result = az_mut_span_action_do(mut_span_action, span);
   az_span_free(&span);
   return result;
 }
 
 typedef struct {
   az_span_emitter emitter;
-  az_str_callback str_callback;
-} az_span_callback_to_str_callback_data;
+  az_str_action str_action;
+} az_str_action_to_mut_span_action_data;
 
-AZ_CALLBACK_FUNC(
-    az_span_callback_to_str_callback,
-    az_span_callback_to_str_callback_data const *,
-    az_span_callback)
+AZ_ACTION_FUNC(
+    az_str_action_to_mut_span_action,
+    az_str_action_to_mut_span_action_data const,
+    az_mut_span_action)
 
-AZ_NODISCARD az_result az_span_callack_to_str_callback(
-    az_span_callback_to_str_callback_data const * const p,
+AZ_NODISCARD az_result az_str_action_to_mut_span_action(
+    az_str_action_to_mut_span_action_data const * const self,
     az_mut_span const span) {
-  AZ_CONTRACT_ARG_NOT_NULL(p);
+  AZ_CONTRACT_ARG_NOT_NULL(self);
 
   char const * str = NULL;
-  AZ_RETURN_IF_FAILED(az_span_emitter_to_str(p->emitter, span, &str));
-  AZ_RETURN_IF_FAILED(az_str_callback_do(p->str_callback, str));
+  AZ_RETURN_IF_FAILED(az_span_emitter_to_str(self->emitter, span, &str));
+  AZ_RETURN_IF_FAILED(az_str_action_do(self->str_action, str));
   return AZ_OK;
 }
 
 AZ_NODISCARD az_result
-az_span_emitter_to_tmp_str(az_span_emitter const emitter, az_str_callback const callback) {
+az_span_emitter_to_tmp_str(az_span_emitter const emitter, az_str_action const str_action) {
   size_t size = 0;
   AZ_RETURN_IF_FAILED(az_span_emitter_size(emitter, &size));
   {
-    az_span_callback_to_str_callback_data data = {
+    az_str_action_to_mut_span_action_data data = {
       .emitter = emitter,
-      .str_callback = callback,
+      .str_action = str_action,
     };
-    AZ_RETURN_IF_FAILED(az_tmp_span(size, az_span_callback_to_str_callback_callback(&data)));
+    AZ_RETURN_IF_FAILED(az_tmp_span(size, az_str_action_to_mut_span_action_action(&data)));
   }
   return AZ_OK;
 }

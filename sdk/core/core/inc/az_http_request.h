@@ -14,8 +14,8 @@
 typedef struct {
   az_const_span method;
   az_const_span path;
-  az_pair_seq query;
-  az_pair_seq headers;
+  az_pair_emitter query;
+  az_pair_emitter headers;
   az_const_span body;
 } az_http_request;
 
@@ -23,7 +23,7 @@ typedef struct {
  * Creates a raw HTTP request.
  */
 AZ_NODISCARD az_result
-az_http_request_emit_spans(az_http_request const * const p_request, az_span_append const append);
+az_http_request_emit_span_seq(az_http_request const * const self, az_span_action const action);
 
 #include <_az_cfg_suffix.h>
 
