@@ -24,7 +24,7 @@
 /**
  * An immutable span of bytes (octets).
  */
-AZ_SPAN_TYPE(az_span, uint8_t const);
+AZ_SPAN_TYPE(az_span, uint8_t const)
 
 typedef az_result az_result_byte;
 

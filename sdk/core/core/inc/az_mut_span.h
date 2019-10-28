@@ -19,7 +19,7 @@
 /**
  * A mutable span of bytes.
  */
-AZ_SPAN_TYPE(az_mut_span, uint8_t);
+AZ_SPAN_TYPE(az_mut_span, uint8_t)
 
 AZ_INLINE bool az_mut_span_is_empty(az_mut_span const span) { return span.size <= 0; }
 
