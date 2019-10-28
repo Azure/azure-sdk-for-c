@@ -14,15 +14,16 @@ typedef struct {
   size_t i;
 } az_span_reader;
 
-AZ_INLINE az_span_reader az_span_reader_create(az_const_span const span) {
+AZ_NODISCARD AZ_INLINE az_span_reader az_span_reader_create(az_const_span const span) {
   return (az_span_reader){ .span = span, .i = 0 };
 }
 
-AZ_INLINE bool az_span_reader_is_empty(az_span_reader const * const p_reader) {
+AZ_NODISCARD AZ_INLINE bool az_span_reader_is_empty(az_span_reader const * const p_reader) {
   return p_reader->span.size <= p_reader->i;
 }
 
-AZ_INLINE az_result_byte az_span_reader_current(az_span_reader const * const p_reader) {
+AZ_NODISCARD AZ_INLINE az_result_byte
+az_span_reader_current(az_span_reader const * const p_reader) {
   return az_const_span_get(p_reader->span, p_reader->i);
 }
 

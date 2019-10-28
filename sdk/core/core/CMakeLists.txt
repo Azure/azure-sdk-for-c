@@ -27,7 +27,7 @@ add_library (
   )
 
 if(MSVC)
-  target_compile_options(az_core PRIVATE /W4 /WX)
+  target_compile_options(az_core PRIVATE /Wall /WX /wd5031 /wd4668 /wd4820 /wd4255 /analyze)
 else()
   target_compile_options(az_core PRIVATE -Wall -Wextra -pedantic -Werror)
 endif()

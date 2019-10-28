@@ -39,7 +39,7 @@ typedef struct {
 /**
  * @brief format buffer as a http request containing headers, url and body.
  */
-az_result az_http_request_builder_init(
+AZ_NODISCARD az_result az_http_request_builder_init(
     az_http_request_builder * const p_hrb,
     az_span const buffer,
     int16_t const max_url_size,
@@ -50,7 +50,7 @@ az_result az_http_request_builder_init(
  * @brief set a query parameter. If the query name is not in url yet, it will be added, otherwise
  * modified
  */
-az_result az_http_request_builder_set_query_parameter(
+AZ_NODISCARD az_result az_http_request_builder_set_query_parameter(
     az_http_request_builder * const p_hrb,
     az_const_span const name,
     az_const_span const value);
@@ -58,16 +58,16 @@ az_result az_http_request_builder_set_query_parameter(
 /**
  * @brief add a new header for the request.
  */
-az_result az_http_request_builder_append_header(
+AZ_NODISCARD az_result az_http_request_builder_append_header(
     az_http_request_builder * const p_hrb,
     az_const_span const name,
     az_const_span const value);
 
-az_result az_http_request_builder_mark_retry_headers_start(az_http_request_builder * const p_hrb);
+AZ_NODISCARD az_result az_http_request_builder_mark_retry_headers_start(az_http_request_builder * const p_hrb);
 
-az_result az_http_request_builder_remove_retry_headers(az_http_request_builder * const p_hrb);
+AZ_NODISCARD az_result az_http_request_builder_remove_retry_headers(az_http_request_builder * const p_hrb);
 
-az_result az_http_request_builder_remove_retry_headers(az_http_request_builder * const p_hrb);
+AZ_NODISCARD az_result az_http_request_builder_remove_retry_headers(az_http_request_builder * const p_hrb);
 
 #include <_az_cfg_suffix.h>
 

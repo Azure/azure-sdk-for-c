@@ -25,7 +25,8 @@
  *     - `buffer` or `input` are invalid spans (see @ref az_span_is_valid).
  *     - `out_result` would overlap `input`.
  */
-az_result az_uri_encode(
+AZ_NODISCARD az_result
+az_uri_encode(
     az_span const buffer,
     az_const_span const input,
     az_const_span * const out_result);
@@ -48,7 +49,8 @@ az_result az_uri_encode(
  * (_`%[0-9A-Fa-f]{2}`_) characters: `%XZ`.
  *     - `out_result` would overlap `input`.
  */
-az_result az_uri_decode(
+AZ_NODISCARD az_result
+az_uri_decode(
     az_span const buffer,
     az_const_span const input,
     az_const_span * const out_result);

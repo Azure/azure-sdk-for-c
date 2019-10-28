@@ -15,7 +15,7 @@ typedef struct {
   az_span_visitor body;
 } az_http_response;
 
-az_result az_http_response_parse(az_const_span const buffer, az_http_response const response);
+AZ_NODISCARD az_result az_http_response_parse(az_const_span const buffer, az_http_response const response);
 
 #include <_az_cfg_suffix.h>
 
