@@ -18,7 +18,8 @@ typedef enum {
 } az_http_response_value_kind;
 
 typedef struct {
-  az_span version;
+  uint8_t major_version;
+  uint8_t minor_version;
   uint16_t code;
   az_span phrase;
 } az_http_response_status;

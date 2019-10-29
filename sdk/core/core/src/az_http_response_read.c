@@ -26,9 +26,11 @@ AZ_NODISCARD az_result az_http_response_state_read_status(
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
+  az_span_reader * const p_reader = &self->reader;
   // HTTP-version = HTTP-name "/" DIGIT "." DIGIT
   // https://tools.ietf.org/html/rfc7230#section-2.6
-  AZ_RETURN_IF_FAILED(az_span_reader_expect_span(&self->reader, AZ_STR("HTTP/")));
+  AZ_RETURN_IF_FAILED(az_span_reader_expect_span(p_reader, AZ_STR("HTTP/")));
+  AZ_RETURN_IF_FAILED(az_span_reader_expect_digit(p_reader, &out->major_version));
 
   self->kind = AZ_HTTP_RESPONSE_STATE_HEADER;
   return AZ_OK;
