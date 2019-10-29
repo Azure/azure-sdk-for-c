@@ -1,5 +1,8 @@
 # Actions and Emitters
 
+Weinberg's Second Law: If builders built buildings the way programmers wrote programs, 
+then the first woodpecker that came along would destroy civilization. 
+
 ## Actions
 
 ```c
@@ -20,11 +23,11 @@
 struct az_span_action {
   az_result (*func)(az_span); // fn (less known)
   // https://en.wikipedia.org/wiki/This_%28computer_programming%29
-  void *self; // data (too generic, it doesn't describe the meaning of the field),
-              // this (bad for C++ compatibility),
-              // self (used in some languages),
-              // context (long and non-descriptive)
-              // me (VB :-) )
+  void * self; // data (too generic, it doesn't describe the meaning of the field),
+               // this (bad for C++ compatibility),
+               // self (used in some languages),
+               // context (long and non-descriptive)
+               // me (VB :-) )
 };
 
 az_result az_span_action_do(az_span_action const action, az_span const arg) {
@@ -74,3 +77,56 @@ Iterators (both 'pull' and 'push') allow to construct a program as an immutable 
 usually doesn't require big intermidiate storages/buffers. Also, the amount of interfaces can be reduces, for example, an interface for 
 a JSON parser should be compatable with a JSON builder. A JSON parser output is an input for a JSON builder. And a JSON builder output 
 (usially it's a byte span iterator) is an input for a JSON parser.
+
+### Disciminated Unions
+
+C doesn't have discriminated unions. There are two main options to implement discriminated unions. The first one is to use conventions. For example,
+
+```c
+typedef enum {
+  FOO = 0,
+  BAR = 1,
+} foo_or_bar_kind;
+
+typedef struct {
+  foo_or_bar_kind kind;
+  union {
+    char const * foo;
+	bool bar;
+  };
+} foo_or_bar;
+```
+
+A user must access the `foo` field only if `kind` is `FOO` and access the `bar` field only if `kind` is `BAR`. 
+Otherwise, we may have an undefined behaviour which can lead to all sort of very bad bugs (dangling pointer, 
+memory leak, security issues etc).
+
+The second option is to use a visitor pattern (simplified).
+
+```c
+typedef void (*foo_action)(int);
+typedef void (*bar_action)(bool);
+typedef void (*foo_or_bar)(foo_action, bar_action);
+```
+
+The second options looks a little bit more complicated but it eliminates a class of bugs when `kind` is not respected. 
+
+The visitor pattern can be represented using actions. 
+
+```c
+struct {
+  str_action foo;
+  bool_action bar;
+} foo_or_bar_visitor;
+
+struct {
+  az_result (* func)(void *, foo_or_bar_visitor const *);
+  void * self;
+} foo_or_bar;
+
+az_result foo_or_bar_do(foo_or_bar const self, foo_or_bar_visitor const * p_visitor) {
+	AZ_CONTRACT_ARG_NOT_NULL(self.func);
+
+	return self.func(self.self, p_visitor);
+}
+```
