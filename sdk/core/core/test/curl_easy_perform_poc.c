@@ -28,11 +28,20 @@ int main() {
   az_span const http_bufbuf_response = AZ_SPAN(buf_response);
 
   // init buffer
-  az_http_request_builder_init(&hrb, http_buf, AZ_HTTP_METHOD_VERB_GET, hrb_url, 100, 2);
+  az_result const build_result
+      = az_http_request_builder_init(&hrb, http_buf, 100, AZ_HTTP_METHOD_VERB_GET, hrb_url);
+
+  if (az_failed(build_result)) {
+    return build_result;
+  }
 
   // add header
-  az_http_request_builder_append_header(
+  az_result const add_header_result = az_http_request_builder_append_header(
       &hrb, hrb_header_content_type_name, hrb_header_content_type_value);
+
+  if (az_failed(add_header_result)) {
+    return add_header_result;
+  }
 
   az_result const result = az_http_client_send_request(&hrb, &http_bufbuf_response);
 

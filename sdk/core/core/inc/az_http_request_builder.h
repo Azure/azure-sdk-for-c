@@ -11,8 +11,8 @@
 #include <az_pair.h>
 #include <az_result.h>
 #include <az_span.h>
+#include <az_span_builder.h>
 #include <az_str.h>
-#include <az_write_span_iter.h>
 
 typedef struct {
   int16_t capacity;
