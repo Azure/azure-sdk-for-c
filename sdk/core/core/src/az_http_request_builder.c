@@ -35,7 +35,7 @@ AZ_INLINE uint16_t get_headers_max(az_span const buffer, az_pair * const headers
   // If there's enough space in the buffer, return the max number of elements it can fit (capped to
   // uint16_t's max)
   return buffer_end > headers_start_uint8ptr
-      ? (max_headers > ~(uint16_t)0 ? ~(uint16_t)0 : (uint16_t)max_headers)
+      ? (max_headers > (size_t)~(uint16_t)0 ? ~(uint16_t)0 : (uint16_t)max_headers)
       : 0;
 }
 
