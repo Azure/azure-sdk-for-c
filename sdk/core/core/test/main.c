@@ -14,20 +14,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "./az_test.h"
+#include "./test_http_response_parser.h"
+
 #include <_az_cfg.h>
 
 int exit_code = 0;
-
-#define TEST_ASSERT(c) \
-  do { \
-    if (c) { \
-      printf("  - `%s`: succeeded\n", #c); \
-    } else { \
-      fprintf(stderr, "  - `%s`: failed\n", #c); \
-      assert(false); \
-      exit_code = 1; \
-    } \
-  } while (false);
 
 az_result write(az_mut_span const output, size_t * const o, az_span const s) {
   for (size_t i = 0; i != s.size; ++i, ++*o) {
@@ -649,5 +641,7 @@ int main() {
     az_uri_decode(buffer, uri_encoded3, &result);
     TEST_ASSERT(az_span_eq(result, uri_decoded));
   }
+
+  test_http_response_parser();
   return exit_code;
 }
