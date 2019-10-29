@@ -52,7 +52,7 @@ A `push` iterator can have a big set of map/reduce operations similar to a `pull
 
 In the same time, a `push` iterator has some limitations that a `pull` iterator doesn't. It's hard (or even impossible) to run two `push` iterators in the same time. Sometimes it's required for such operations as `zip merge`, `equal`, `compare` etc. However serialization/deserialization and reading/writing to IO (file, network, HTTP etc) don't require comparisons of emitters, usually.
 
-It's possible to convert from an iterator to an emitter. It's a function which accepts an iterator and an action. and applies this action for all items in the iterator. Usually, this function is called `for_each`.
+It's possible to convert from an iterator to an emitter. The function which accepts an iterator and an action. and applies this action for all items in the iterator. Usually, this function is called `for_each`.
 
 An emitter is a similar to a cold observable collection in reactive programming (Rx). The main difference is that an emitter is using an action instead of a subscriber.
 
