@@ -61,7 +61,7 @@ AZ_NODISCARD az_result az_http_request_builder_set_query_parameter(
  */
 AZ_NODISCARD az_result az_http_request_builder_append_header(
     az_http_request_builder * const p_hrb,
-    az_const_span const name,
+    az_const_span const key,
     az_const_span const value);
 
 AZ_NODISCARD az_result az_http_request_builder_mark_retry_headers_start(az_http_request_builder * const p_hrb);

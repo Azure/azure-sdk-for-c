@@ -85,23 +85,22 @@ AZ_NODISCARD az_result az_http_request_builder_set_query_parameter(
     az_const_span const value) {
   AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
 
-  if (!az_const_span_is_valid(name) || !az_const_span_is_valid(value)
-      || name.size == 0 // name can't be empty
+  if (!az_const_span_is_valid(name) || !az_const_span_is_valid(value) || name.size == 0
+      || value.size == 0 // name or value can't be empty
   ) {
     return AZ_ERROR_ARG;
   }
 
   size_t new_url_size;
-  bool const has_value = value.size > 0;
   {
     az_span new_url_span = { .begin = p_hrb->url.begin };
-    size_t const extra_chars_size = sizeof((uint8_t)'?') + (has_value ? sizeof((uint8_t)'=') : 0);
+    size_t const extra_chars_size = sizeof((uint8_t)'?') + sizeof((uint8_t)'=');
     size_t const name_and_value_size = name.size + value.size;
     size_t const appended_size = name_and_value_size + extra_chars_size;
 
     new_url_size = p_hrb->url.size + appended_size;
 
-    // check for integer ovreflows, and finally whether the result would fit
+    // check for integer overflows, and finally whether the result would fit
     if (name_and_value_size < name.size || name_and_value_size < value.size
         || appended_size < name_and_value_size || appended_size < extra_chars_size
         || new_url_size < appended_size || new_url_size < p_hrb->url.size
@@ -118,19 +117,21 @@ AZ_NODISCARD az_result az_http_request_builder_set_query_parameter(
     }
   }
 
-  // Find whether the URL contains '?'character already.
+  // Find whether the URL contains '?' or '&' character already.
   // So that we know if we should append "?text" or "&text".
-  // Scan from the end until the first occurrence of '?'.
+  // Scan from the end until the first occurrence of '&', or '?'.
   bool first_parameter = true;
-  for (size_t i = p_hrb->url.size; i > 0;) {
+  for (size_t i = p_hrb->url.size; first_parameter == true && i > 0;) {
     --i;
-    if (p_hrb->url.begin[i] == '?') {
+
+    uint8_t const c = p_hrb->url.begin[i];
+    if (c == '?' || c == '&') {
       first_parameter = false;
       break;
     }
   }
 
-  // Appent either '?' or '&'
+  // Append either '?' or '&'
   p_hrb->url.begin[p_hrb->url.size] = first_parameter ? '?' : '&';
   ++(p_hrb->url.size);
 
@@ -138,14 +139,12 @@ AZ_NODISCARD az_result az_http_request_builder_set_query_parameter(
   memcpy(p_hrb->url.begin + p_hrb->url.size, name.begin, name.size);
   p_hrb->url.size += name.size;
 
-  // Append "=<parameter value>", if there's one.
-  if (has_value) {
-    p_hrb->url.begin[p_hrb->url.size] = '=';
-    ++(p_hrb->url.size);
+  p_hrb->url.begin[p_hrb->url.size] = '=';
+  ++(p_hrb->url.size);
 
-    memcpy(p_hrb->url.begin + p_hrb->url.size, value.begin, value.size);
-    p_hrb->url.size += value.size;
-  }
+  // Parameter value
+  memcpy(p_hrb->url.begin + p_hrb->url.size, value.begin, value.size);
+  p_hrb->url.size += value.size;
 
   assert(p_hrb->url.size == new_url_size);
   return AZ_OK;
@@ -153,11 +152,11 @@ AZ_NODISCARD az_result az_http_request_builder_set_query_parameter(
 
 AZ_NODISCARD az_result az_http_request_builder_append_header(
     az_http_request_builder * const p_hrb,
-    az_const_span const name,
+    az_const_span const key,
     az_const_span const value) {
   AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
 
-  if (!az_const_span_is_valid(name) || !az_const_span_is_valid(value) || name.size == 0
+  if (!az_const_span_is_valid(key) || !az_const_span_is_valid(value) || key.size == 0
       || value.size == 0) {
     return AZ_ERROR_ARG;
   }
@@ -167,7 +166,7 @@ AZ_NODISCARD az_result az_http_request_builder_append_header(
   }
 
   az_pair * const headers = get_headers_start(p_hrb->buffer, p_hrb->max_url_size);
-  headers[p_hrb->headers_end] = (az_pair){ .key = name, .value = value };
+  headers[p_hrb->headers_end] = (az_pair){ .key = key, .value = value };
   ++(p_hrb->headers_end);
 
   return AZ_OK;
