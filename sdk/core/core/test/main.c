@@ -276,7 +276,7 @@ int main() {
   {
     az_json_state state = az_json_state_create(AZ_STR("    "));
     az_json_value value;
-    TEST_ASSERT(az_json_read(&state, &value) == AZ_JSON_ERROR_UNEXPECTED_END);
+    TEST_ASSERT(az_json_read(&state, &value) == AZ_ERROR_EOF);
   }
   {
     az_json_state state = az_json_state_create(AZ_STR("  null  "));
@@ -288,7 +288,7 @@ int main() {
   {
     az_json_state state = az_json_state_create(AZ_STR("  nul"));
     az_json_value value;
-    TEST_ASSERT(az_json_read(&state, &value) == AZ_JSON_ERROR_UNEXPECTED_END);
+    TEST_ASSERT(az_json_read(&state, &value) == AZ_ERROR_EOF);
   }
   {
     az_json_state state = az_json_state_create(AZ_STR("  false"));
@@ -301,7 +301,7 @@ int main() {
   {
     az_json_state state = az_json_state_create(AZ_STR("  falsx  "));
     az_json_value value;
-    TEST_ASSERT(az_json_read(&state, &value) == AZ_JSON_ERROR_UNEXPECTED_CHAR);
+    TEST_ASSERT(az_json_read(&state, &value) == AZ_ERROR_UNEXPECTED_CHAR);
   }
   {
     az_json_state state = az_json_state_create(AZ_STR("true "));
@@ -314,7 +314,7 @@ int main() {
   {
     az_json_state state = az_json_state_create(AZ_STR("  truem"));
     az_json_value value;
-    TEST_ASSERT(az_json_read(&state, &value) == AZ_JSON_ERROR_UNEXPECTED_CHAR);
+    TEST_ASSERT(az_json_read(&state, &value) == AZ_ERROR_UNEXPECTED_CHAR);
   }
   {
     az_span const s = AZ_STR(" \"tr\\\"ue\\t\" ");
@@ -340,7 +340,7 @@ int main() {
     az_span const s = AZ_STR("\"\\uFf0\"");
     az_json_state state = az_json_state_create(s);
     az_json_value value;
-    TEST_ASSERT(az_json_read(&state, &value) == AZ_JSON_ERROR_UNEXPECTED_CHAR);
+    TEST_ASSERT(az_json_read(&state, &value) == AZ_ERROR_UNEXPECTED_CHAR);
   }
   {
     az_json_state state = az_json_state_create(AZ_STR(" 23 "));
@@ -424,7 +424,7 @@ int main() {
         "[[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ "
         "[[[[[ [[[");
     az_result const result = read_write(json, output, &o);
-    TEST_ASSERT(result == AZ_JSON_ERROR_UNEXPECTED_END);
+    TEST_ASSERT(result == AZ_ERROR_EOF);
   }
   {
     size_t o = 0;

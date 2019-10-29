@@ -44,8 +44,7 @@ typedef struct {
   az_http_response_state_kind kind;
 } az_http_response_state;
 
-AZ_NODISCARD az_result
-az_http_response_state_init(az_span const buffer, az_http_response_state * const out);
+AZ_NODISCARD az_http_response_state az_http_response_state_create(az_span const buffer);
 
 AZ_NODISCARD az_result az_http_response_state_read(
     az_http_response_state * const self,

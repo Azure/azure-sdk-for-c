@@ -34,6 +34,21 @@ AZ_INLINE void az_span_reader_next(az_span_reader * const p_reader) {
   p_reader->i += 1;
 }
 
+// Parsing utilities
+
+AZ_NODISCARD AZ_INLINE az_result az_error_unexpected_char(az_result_byte const c) {
+  return az_failed(c) ? c : AZ_ERROR_UNEXPECTED_CHAR;
+}
+
+/**
+ * Read a span form a reader and compare it with the given @span
+ *
+ * If it doesn't match the given @span, the function returns AZ_ERROR_UNEXPECTED_CHAR.
+ */
+AZ_NODISCARD static az_result az_span_reader_expect_span(
+    az_span_reader * const self,
+    az_span const span);
+
 #include <_az_cfg_suffix.h>
 
 #endif
