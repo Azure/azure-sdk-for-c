@@ -8,6 +8,7 @@ then the first woodpecker that came along would destroy civilization.
 An action is similar to C# generic type `Action<T>`. It contains a pointer to a function `func` and a context `self`.
 
 It's also known as
+
 - an actor,
 - a reactor,
 - a callback (in some C programms),
@@ -31,6 +32,7 @@ az_result az_span_action_do(az_span_action const action, az_span const arg) {
 
 The [self](https://en.wikipedia.org/wiki/This_%28computer_programming%29) field points on actor data.
 This data is also known as
+
 - `this` in C++, C#,
 - `context`,
 - `me` in VB :-).
@@ -61,14 +63,16 @@ az_result az_http_request__emit__span_seq(az_http_request, span_action);
 
 ### One Way Street
 
-Iterators (both 'pull' and 'push') allow to construct a program as an immutable [data flow](https://en.wikipedia.org/wiki/Dataflow) which
-usually doesn't require big intermidiate storages/buffers. Also, the amount of interfaces can be reduces, for example, an interface for
-a JSON parser should be compatable with a JSON builder. A JSON parser output is an input for a JSON builder. And a JSON builder output
-(usially it's a byte span iterator) is an input for a JSON parser.
+Iterators (both 'pull' and 'push') allow to construct a program as an immutable
+[data flow](https://en.wikipedia.org/wiki/Dataflow) which usually doesn't require big intermediate storages/buffers.
+Also, the amount of interfaces can be reduces, for example, an interface for a JSON parser should be compatible
+with a JSON builder. A JSON parser output is an input for a JSON builder. And a JSON builder output
+(usually it's a byte span iterator) is an input for a JSON parser.
 
-### Disciminated Unions
+### Discriminated Unions
 
-C doesn't have discriminated unions. There are two main options to implement discriminated unions. The first one is to use conventions. For example,
+C doesn't have discriminated unions. There are two main options to implement discriminated unions.
+The first one is to use conventions. For example,
 
 ```c
 typedef enum {
@@ -86,7 +90,7 @@ typedef struct {
 ```
 
 A user must access the `foo` field only if `kind` is `FOO` and access the `bar` field only if `kind` is `BAR`.
-Otherwise, we may have an undefined behaviour which can lead to all sort of very bad bugs (dangling pointer,
+Otherwise, we may have an undefined behavior which can lead to all sort of very bad bugs (dangling pointer,
 memory leak, security issues etc).
 
 The second option is to use a visitor pattern (simplified).
