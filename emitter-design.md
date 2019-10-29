@@ -70,7 +70,7 @@ az_result az_http_request__emit__span_seq(az_http_request, span_action);
 ```
 
 As any other iterator type, a `push` iterator is lazy. It means it doesn't produce values until it's asked for. This property can be very useful on platforms with limited resources. All iterator transformations, like concatenations
-and filters are also lazy. For example, concatenation of two very long `push` sequences doesn't require memory that can holds these two sequences.
+and filters are also lazy. For example, concatenation of two very long `push` sequences doesn't require memory that can hold these two sequences.
 
 ### One Way Street
 
