@@ -197,24 +197,45 @@ az_result az_curl_post_request(
     az_curl * const p_curl,
     az_http_request_builder const * const p_hrb,
     az_span const * const response) {
-  (void)p_hrb;
   // Method
-  // TODO: curl_easy_setopt(p_curl->p_curl, CURLOPT_POSTFIELDS, p_hrb->body.begin);
+  AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl->p_curl, CURLOPT_POSTFIELDS, p_hrb->body.begin));
 
-  // URL
-  // char * url;
-  // TODO: AZ_RETURN_IF_FAILED(az_http_url_to_new_str(p_hrb, &url));
-  // curl_easy_setopt(p_curl->p_curl, CURLOPT_URL, url);
-  // free(url);
+  // URL TODO: refactor GET and POST so both uses the same code to set url (method)
+  // set URL as 0-terminated str
+  size_t const extra_space_for_zero = (size_t)sizeof("\0");
+  size_t const url_final_size = p_hrb->url.size + extra_space_for_zero;
+  // allocate buffer to add \0
+  uint8_t * const p_writable_buffer = (uint8_t * const)malloc(url_final_size);
+  if (p_writable_buffer == NULL) {
+    return AZ_ERROR_OUT_OF_MEMORY;
+  }
+  // write url in buffer (will add \0 at the end)
+  char * buffer = (char *)p_writable_buffer;
+  az_span const writable_buffer
+      = (az_span const){ .begin = p_writable_buffer, .size = url_final_size };
+  az_result const result = az_write_url(writable_buffer, az_span_to_const_span(p_hrb->url));
+  CURLcode const set_headers_result = curl_easy_setopt(p_curl->p_curl, CURLOPT_URL, buffer);
+  // free used buffer before anything else
+  memset(p_writable_buffer, 0, url_final_size);
+  free(buffer);
 
-  curl_easy_setopt(p_curl->p_curl, CURLOPT_WRITEFUNCTION, write_to_span);
-  curl_easy_setopt(p_curl->p_curl, CURLOPT_WRITEDATA, (void *)response);
+  // handle writing to buffer error
+  if (az_failed(result)) {
+    return result;
+  }
+  // handle setting curl url
+  if (set_headers_result != CURLE_OK) {
+    return AZ_ERROR_HTTP_FAILED_REQUEST;
+  }
 
-  CURLcode res = curl_easy_perform(p_curl->p_curl);
+  // check if response will be redirected to user span
+  if (response != NULL) {
+    AZ_RETURN_IF_CURL_FAILED(
+        curl_easy_setopt(p_curl->p_curl, CURLOPT_WRITEFUNCTION, write_to_span));
+    AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl->p_curl, CURLOPT_WRITEDATA, (void *)response));
+  }
 
-  if (res != CURLE_OK)
-    fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
-
+  AZ_RETURN_IF_CURL_FAILED(curl_easy_perform(p_curl->p_curl));
   return AZ_OK;
 }
 
