@@ -1,0 +1,22 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// SPDX-License-Identifier: MIT
+
+#ifndef AZ_CURL_SLIST_H
+#define AZ_CURL_SLIST_H
+
+#include <az_pair.h>
+#include <az_result.h>
+
+#include <curl/curl.h>
+
+#include <_az_cfg_prefix.h>
+
+/**
+ * Appends a header to the given CURL list.
+ */
+AZ_NODISCARD az_result
+az_curl_slist_append_header(struct curl_slist ** pp_list, az_pair const header);
+
+#include <_az_cfg_suffix.h>
+
+#endif
