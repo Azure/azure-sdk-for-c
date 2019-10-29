@@ -3,8 +3,8 @@
 
 #include <az_http_response_read.h>
 
-#include <az_str.h>
 #include <az_http_result.h>
+#include <az_str.h>
 
 #include <_az_cfg.h>
 
@@ -19,6 +19,7 @@ AZ_NODISCARD az_http_response_state az_http_response_state_create(az_span const 
 
 /**
  * Status line https://tools.ietf.org/html/rfc7230#section-3.1.2
+ * HTTP-version SP status-code SP reason-phrase CRLF
  */
 AZ_NODISCARD az_result az_http_response_state_read_status(
     az_http_response_state * const self,
@@ -27,10 +28,35 @@ AZ_NODISCARD az_result az_http_response_state_read_status(
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
   az_span_reader * const p_reader = &self->reader;
+
   // HTTP-version = HTTP-name "/" DIGIT "." DIGIT
   // https://tools.ietf.org/html/rfc7230#section-2.6
   AZ_RETURN_IF_FAILED(az_span_reader_expect_span(p_reader, AZ_STR("HTTP/")));
   AZ_RETURN_IF_FAILED(az_span_reader_expect_digit(p_reader, &out->major_version));
+  AZ_RETURN_IF_FAILED(az_span_reader_expect_char(p_reader, '.'));
+  AZ_RETURN_IF_FAILED(az_span_reader_expect_digit(p_reader, &out->minor_version));
+
+  // SP = " "
+  AZ_RETURN_IF_FAILED(az_span_reader_expect_char(p_reader, ' '));
+
+  // status-code = 3DIGIT
+  {
+    uint16_t status_code = 0;
+    for (int i = 3; i > 0;) {
+      --i;
+      uint8_t digit = 0;
+      AZ_RETURN_IF_FAILED(az_span_reader_expect_digit(p_reader, &digit));
+      status_code = status_code * 10 + digit;
+    }
+    out->status_code = status_code;
+  }
+
+  // SP
+  AZ_RETURN_IF_FAILED(az_span_reader_expect_char(p_reader, ' '));
+
+  // reason-phrase = *(HTAB / SP / VCHAR / obs-text)
+  // HTAB = "\t"
+  // VCHAR or obs-text is %x80-FF,
 
   self->kind = AZ_HTTP_RESPONSE_STATE_HEADER;
   return AZ_OK;

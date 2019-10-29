@@ -20,8 +20,8 @@ typedef enum {
 typedef struct {
   uint8_t major_version;
   uint8_t minor_version;
-  uint16_t code;
-  az_span phrase;
+  uint16_t status_code;
+  az_span reason_phrase;
 } az_http_response_status;
 
 typedef struct {

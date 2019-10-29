@@ -391,10 +391,10 @@ az_json_read_object_member(
 
   az_span_reader * const p_reader = &p_state->reader;
   AZ_RETURN_IF_FAILED(az_json_check_item_begin(p_state, AZ_JSON_STACK_OBJECT));
-  AZ_RETURN_IF_FAILED(az_span_reader_expected_char(p_reader, '"'));
+  AZ_RETURN_IF_FAILED(az_span_reader_expect_char(p_reader, '"'));
   AZ_RETURN_IF_FAILED(az_json_read_string_rest(p_reader, &out_member->name));
   az_json_read_white_space(p_reader);
-  AZ_RETURN_IF_FAILED(az_span_reader_expected_char(p_reader, ':'));
+  AZ_RETURN_IF_FAILED(az_span_reader_expect_char(p_reader, ':'));
   az_json_read_white_space(p_reader);
   AZ_RETURN_IF_FAILED(az_json_read_value_space(p_state, &out_member->value));
   return az_json_check_item_end(p_state, out_member->value);

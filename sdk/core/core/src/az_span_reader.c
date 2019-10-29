@@ -6,7 +6,7 @@
 #include <_az_cfg.h>
 
 AZ_NODISCARD az_result
-az_span_reader_expected_char(az_span_reader * const p_reader, uint8_t const expected) {
+az_span_reader_expect_char(az_span_reader * const p_reader, uint8_t const expected) {
   az_result_byte const c = az_span_reader_current(p_reader);
   if (c != expected) {
     return az_error_unexpected_char(c);
@@ -25,7 +25,7 @@ AZ_NODISCARD az_result az_span_reader_expect_span(
       return AZ_OK;
     }
     az_span_reader_next(&k);
-    AZ_RETURN_IF_FAILED(az_span_reader_expected_char(self, (uint8_t)ko));
+    AZ_RETURN_IF_FAILED(az_span_reader_expect_char(self, (uint8_t)ko));
   }
 }
 
