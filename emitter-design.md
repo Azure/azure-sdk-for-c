@@ -11,7 +11,7 @@ It's also known as
 
 - an actor,
 - a reactor,
-- a callback (in some C programms),
+- a callback (in some C programs),
 - a functor (in C++),
 - an observer and a subscriber (in Reactive programming),
 - a closure (in some high-level languages),
@@ -46,11 +46,19 @@ See also https://blogs.msdn.microsoft.com/ericlippert/2009/06/26/iterators-at-th
 https://blogs.msdn.microsoft.com/ericlippert/2009/07/23/iterator-blocks-part-five-push-vs-pull/.
 
 C has neither GC nor lifetime checks (like Rust https://doc.rust-lang.org/nomicon/lifetimes.html). It also has no
-RAII (https://en.wikipedia.org/wiki/Resource_acquisition_is_initialization). So creating a `pull` iterator is complicated and could be unsafe. One of the way to solve the problem is to use a `push` iterator. It gives some scoped lifetime (a lifetime of a function execution) and it's very easy to create a complicated `push` iterator by using code flow (a code state machine) instead of a data state machine.
+RAII (https://en.wikipedia.org/wiki/Resource_acquisition_is_initialization).
+So creating a `pull` iterator is complicated and could be unsafe.
+One of the way to solve the problem is to use a `push` iterator.
+It gives some scoped lifetime (a lifetime of a function execution) and it's very easy to create
+a complicated `push` iterator by using code flow (a code state machine) instead of a data state machine.
 
-A `push` iterator can have a big set of map/reduce operations similar to a `pull` iterator. Including concatenation, a flat map (SelectMany), filters, reduce, groupBy etc.
+A `push` iterator can have a big set of map/reduce operations similar to a `pull` iterator.
+Including concatenation, a flat map (SelectMany), filters, reduce, groupBy etc.
 
-In the same time, a `push` iterator has some limitations that a `pull` iterator doesn't. It's hard (or even impossible) to run two `push` iterators in the same time. Sometimes it's required for such operations as `zip merge`, `equal`, `compare` etc. However serialization/deserialization and reading/writing to IO (file, network, HTTP etc) don't require comparisons of emitters, usually.
+The `push` iterator has some limitations that a `pull` iterator doesn't. It's hard (or even impossible)
+to run two `push` iterators simultaneously. Sometimes it's required for such operations as
+`zip merge`, `equal`, `compare` etc. However serialization/deserialization and reading/writing
+to IO (file, network, HTTP etc) don't require comparisons of emitters, usually.
 
 It's possible to convert from an iterator to an emitter. The function which accepts an iterator and an action. and applies this action for all items in the iterator. Usually, this function is called `for_each`.
 
@@ -90,8 +98,8 @@ typedef struct {
 ```
 
 A user must access the `foo` field only if `kind` is `FOO` and access the `bar` field only if `kind` is `BAR`.
-Otherwise, we may have an undefined behavior which can lead to all sort of very bad bugs (dangling pointer,
-memory leak, security issues etc).
+Otherwise, we may have an undefined behavior which can lead to all sort of very bad bugs (dangling pointers,
+memory leaks, security issues etc).
 
 The second option is to use a visitor pattern (simplified).
 
