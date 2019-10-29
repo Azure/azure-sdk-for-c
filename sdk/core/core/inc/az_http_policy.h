@@ -27,22 +27,26 @@
 //    TransportPolicy
 //  ===Transport Layer===
 
+#define AZ_ERROR_PIPELINE_INVALID 0XF000001
+
 typedef struct {
   az_span data;
 } az_http_response_data;
 
-//PipelinePolicies must implement the process function
-// 
-typedef az_result (*az_http_policy_pfnc_process)(az_http_request * p_request, az_http_response_data * out);
+typedef struct az_http_policy az_http_policy;
+
+// PipelinePolicies must implement the process function
+//
+typedef az_result (*az_http_policy_pfnc_process)(az_http_policy * policies, az_http_request * p_request, az_http_response_data * out);
 
 typedef struct {
   az_span data;
 } az_http_policy_data;
 
-typedef struct {
+struct az_http_policy {
   az_http_policy_pfnc_process pfnc_process;
   az_http_policy_data data;
-} az_http_policy;
+};
 
 #include <_az_cfg_suffix.h>
 

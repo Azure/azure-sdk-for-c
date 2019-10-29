@@ -31,7 +31,7 @@ az_result az_http_pipeline_process(
 
   if (self && self->pipeline_stage < self->num_policies) {
     self->pipeline_stage = self->pipeline_stage++;
-    return self->policies[self->pipeline_stage].pfnc_process(request, response);
+    return self->policies[self->pipeline_stage].pfnc_process(self->policies, request, response);
   }
   return AZ_OK;
 }
