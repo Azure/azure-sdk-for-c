@@ -119,11 +119,13 @@ struct {
   bool_action bar;
 } foo_or_bar_visitor;
 
+// foo_or_bar is an action.
 struct {
   az_result (* func)(void *, foo_or_bar_visitor const *);
   void * self;
 } foo_or_bar;
 
+// a helper function to safely call the @foo_or_bar action.
 az_result foo_or_bar_do(foo_or_bar const self, foo_or_bar_visitor const * p_visitor) {
   AZ_CONTRACT_ARG_NOT_NULL(self.func);
 
