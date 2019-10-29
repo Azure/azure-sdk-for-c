@@ -76,9 +76,14 @@ and filters are also lazy. For example, concatenation of two very long `push` se
 
 Iterators (both 'pull' and 'push') allow to construct a program as an immutable
 [data flow](https://en.wikipedia.org/wiki/Dataflow) which usually doesn't require big intermediate storages/buffers.
-Also, the amount of interfaces can be reduces, for example, an interface for a JSON parser should be compatible
+Also, the amount of interfaces can be reduces. For example, an interface for a JSON parser should be compatible
 with a JSON builder. A JSON parser output is an input for a JSON builder. And a JSON builder output
-(usually it's a byte span iterator) is an input for a JSON parser.
+(usually it's an iterator of byte spans) is an input for a JSON parser.
+
+Because all these transformation are lazy we can serialize data, stream it to HTTP as JSON, read JSON from HTTP
+and then deserialize it without allocating intermediate buffers.
+There are some allocations on stack but there are fixed in size and don't depend on size of input/output data
+(`O(1)` space).
 
 ## Discriminated Unions
 
