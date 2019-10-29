@@ -14,8 +14,6 @@
 
 #include <_az_cfg.h>
 
-#define AZ_CRLF "\r\n"
-
 static az_span const az_crlf = AZ_CONST_STR(AZ_CRLF);
 
 AZ_NODISCARD az_result

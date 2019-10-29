@@ -36,6 +36,8 @@
  */
 AZ_ACTION_TYPE(az_str_action, char const *)
 
+#define AZ_CRLF "\r\n"
+
 #include <_az_cfg_suffix.h>
 
 #endif

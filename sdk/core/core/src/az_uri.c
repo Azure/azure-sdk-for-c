@@ -7,23 +7,20 @@
 
 #include <assert.h>
 #include <stdbool.h>
+#include <ctype.h>
 
 #include <_az_cfg.h>
 
 AZ_NODISCARD AZ_INLINE bool should_encode(uint8_t const c) {
   switch (c) {
-    default:
-      return !(('0' <= c && c <= '9') || ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z'));
     case '-':
     case '_':
     case '.':
     case '~':
       return false;
+    default:
+      return !(('0' <= c && c <= '9') || ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z'));
   }
-}
-
-AZ_NODISCARD AZ_INLINE bool is_hex_char(uint8_t const c) {
-  return ('0' <= c && c <= '9') || ('A' <= c && c <= 'F') || ('a' <= c && c <= 'f');
 }
 
 AZ_NODISCARD AZ_INLINE int8_t hex_to_int4(uint8_t const c) {
@@ -108,8 +105,8 @@ az_uri_decode(
   for (size_t i = 0; i < input.size; ++i) {
     uint8_t c = input.begin[i];
     if (c == '%') {
-      if (i + 2 < i || i + 2 >= input.size || !is_hex_char(input.begin[i + 1])
-          || !is_hex_char(input.begin[i + 2])) {
+      if (i + 2 < i || i + 2 >= input.size || !isxdigit(input.begin[i + 1])
+          || !isxdigit(input.begin[i + 2])) {
         return AZ_ERROR_ARG;
       }
       i += 2;
