@@ -70,7 +70,6 @@ AZ_NODISCARD az_result az_http_request_builder_init(
   *p_hrb = (az_http_request_builder){ .buffer = buffer,
                                       .method_verb = method_verb,
                                       .url = uri_buf,
-                                      .body = { .begin = NULL, .size = 0 },
                                       .max_url_size = max_url_size,
                                       .max_headers = max_headers,
                                       .retry_headers_start = max_headers,
@@ -185,7 +184,7 @@ AZ_NODISCARD az_result az_http_request_builder_remove_retry_headers(az_http_requ
   return AZ_OK;
 }
 
-az_result az_http_request_builder_get_header(
+AZ_NODISCARD az_result az_http_request_builder_get_header(
     az_http_request_builder * const p_hrb,
     uint16_t const index,
     az_pair * const out_result) {

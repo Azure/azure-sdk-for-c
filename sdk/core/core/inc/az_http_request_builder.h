@@ -20,7 +20,6 @@ typedef struct {
   az_span buffer;
   az_const_span method_verb;
   az_span url;
-  az_span body;
   uint16_t max_url_size;
   uint16_t max_headers;
   uint16_t retry_headers_start;
