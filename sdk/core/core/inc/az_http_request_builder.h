@@ -20,6 +20,7 @@ typedef struct {
   az_span buffer;
   az_const_span method_verb;
   az_span url;
+  az_span body;
   uint16_t max_url_size;
   uint16_t max_headers;
   uint16_t retry_headers_start;
@@ -42,10 +43,9 @@ extern az_const_span const AZ_HTTP_METHOD_VERB_PATCH;
 AZ_NODISCARD az_result az_http_request_builder_init(
     az_http_request_builder * const p_hrb,
     az_span const buffer,
-    az_const_span const method_verb,
-    az_const_span const initial_url,
     uint16_t const max_url_size,
-    uint16_t const max_headers);
+    az_const_span const method_verb,
+    az_const_span const initial_url);
 
 /**
  * @brief set a query parameter. If the query name is not in url yet, it will be added, otherwise

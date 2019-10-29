@@ -676,7 +676,7 @@ int main() {
     az_span const http_buf = { .begin = buf, .size = sizeof(buf) };
     az_http_request_builder hrb;
 
-    az_http_request_builder_init(&hrb, http_buf, AZ_HTTP_METHOD_VERB_GET, hrb_url, 100, 2);
+    az_http_request_builder_init(&hrb, http_buf, 100, AZ_HTTP_METHOD_VERB_GET, hrb_url);
     TEST_ASSERT(az_const_span_eq(hrb.method_verb, AZ_HTTP_METHOD_VERB_GET));
     TEST_ASSERT(az_const_span_eq(az_span_to_const_span(hrb.url), hrb_url));
     TEST_ASSERT(hrb.max_url_size == 100);
