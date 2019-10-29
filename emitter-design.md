@@ -5,29 +5,21 @@ then the first woodpecker that came along would destroy civilization.
 
 ## Actions
 
+An action is similar to C# generic type `Action<T>`. It contains a pointer to a function `func` and a context `self`.
+
+It's also known as 
+- an actor,
+- a reactor,
+- a callback (in some C programms),
+- a functor (in C++),
+- an observer and a subscriber (in Reactive programming),
+- a closure (in some high-level languages),
+- a delegate and an event.
+
 ```c
-// action (used in C#, eg. `Action<T>` is `AZ_ACTION(T)`),
-//   actor (drama?),
-//   reactor (Nuclear?),
-// accept (..hm... no),
-//   acceptor (too long)
-// callback (too long,
-//           too scary,
-//           too specific (a callback in C as a function passed to some special functions with events) and
-//           too generic (it can be any function with different arguments and parameter structure, eg, without self etc.),
-// functor (C++ has slightly different meaning, has a different meaning in Theory of Category),
-// ftor (chemistry?)
-// observer, subscriber (Reactive, but Rx uses this for events)
-// closure (has slightly different meaning as a syntax sugar)
-// event, delegate (it's even more confusing)
 struct az_span_action {
   az_result (*func)(az_span); // fn (less known)
-  // https://en.wikipedia.org/wiki/This_%28computer_programming%29
-  void * self; // data (too generic, it doesn't describe the meaning of the field),
-               // this (bad for C++ compatibility),
-               // self (used in some languages),
-               // context (long and non-descriptive)
-               // me (VB :-) )
+  void * self;
 };
 
 az_result az_span_action_do(az_span_action const action, az_span const arg) {
@@ -36,6 +28,12 @@ az_result az_span_action_do(az_span_action const action, az_span const arg) {
   return action.func(action.self, arg);
 }
 ```
+
+The [self](https://en.wikipedia.org/wiki/This_%28computer_programming%29) field points on actor data. 
+This data is also known as 
+- `this` in C++, C#,
+- `context`,
+- `me` in VB :-).
 
 ## Emitters (push iterators)
 
@@ -58,17 +56,7 @@ An emitter is a similar to a cold observable collection in reactive programming 
 
 ```c
 // (SVO) subject verb object // https://en.wikipedia.org/wiki/Subject–verb–object
-az_result az_http_request__emit__spans(az_http_request, span_action);
-           _emit_span_seq // good one because it avoids plural forms.
-                          // it describes what the function does.
-           _emit_span_list // list is more specific than a sequence (seq).
-           _push_span_seq // an action arg is not necessary a container.
-           _append_span_seq // an action arg is not necessary a container.
-           _emitter // bad for C name constructions by conventions.
-                    // However we may use `_something_emitter` as a synonym for `..._emit_something_seq_action`
-           _observable // too long,
-                       // bad for C name constructions by conventions, Rx uses events which are slightly different
-           _to_span_emitter // doesn't describe what the function does. It doesn't create an emitter, it emits.
+az_result az_http_request__emit__span_seq(az_http_request, span_action);
 ```
 
 ### One Way Street
