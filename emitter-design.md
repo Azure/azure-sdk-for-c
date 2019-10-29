@@ -1,13 +1,13 @@
 # Actions and Emitters
 
-Weinberg's Second Law: If builders built buildings the way programmers wrote programs, 
-then the first woodpecker that came along would destroy civilization. 
+Weinberg's Second Law: If builders built buildings the way programmers wrote programs,
+then the first woodpecker that came along would destroy civilization.
 
 ## Actions
 
 An action is similar to C# generic type `Action<T>`. It contains a pointer to a function `func` and a context `self`.
 
-It's also known as 
+It's also known as
 - an actor,
 - a reactor,
 - a callback (in some C programms),
@@ -29,8 +29,8 @@ az_result az_span_action_do(az_span_action const action, az_span const arg) {
 }
 ```
 
-The [self](https://en.wikipedia.org/wiki/This_%28computer_programming%29) field points on actor data. 
-This data is also known as 
+The [self](https://en.wikipedia.org/wiki/This_%28computer_programming%29) field points on actor data.
+This data is also known as
 - `this` in C++, C#,
 - `context`,
 - `me` in VB :-).
@@ -61,9 +61,9 @@ az_result az_http_request__emit__span_seq(az_http_request, span_action);
 
 ### One Way Street
 
-Iterators (both 'pull' and 'push') allow to construct a program as an immutable [data flow](https://en.wikipedia.org/wiki/Dataflow) which 
-usually doesn't require big intermidiate storages/buffers. Also, the amount of interfaces can be reduces, for example, an interface for 
-a JSON parser should be compatable with a JSON builder. A JSON parser output is an input for a JSON builder. And a JSON builder output 
+Iterators (both 'pull' and 'push') allow to construct a program as an immutable [data flow](https://en.wikipedia.org/wiki/Dataflow) which
+usually doesn't require big intermidiate storages/buffers. Also, the amount of interfaces can be reduces, for example, an interface for
+a JSON parser should be compatable with a JSON builder. A JSON parser output is an input for a JSON builder. And a JSON builder output
 (usially it's a byte span iterator) is an input for a JSON parser.
 
 ### Disciminated Unions
@@ -80,13 +80,13 @@ typedef struct {
   foo_or_bar_kind kind;
   union {
     char const * foo;
-	bool bar;
+    bool bar;
   };
 } foo_or_bar;
 ```
 
-A user must access the `foo` field only if `kind` is `FOO` and access the `bar` field only if `kind` is `BAR`. 
-Otherwise, we may have an undefined behaviour which can lead to all sort of very bad bugs (dangling pointer, 
+A user must access the `foo` field only if `kind` is `FOO` and access the `bar` field only if `kind` is `BAR`.
+Otherwise, we may have an undefined behaviour which can lead to all sort of very bad bugs (dangling pointer,
 memory leak, security issues etc).
 
 The second option is to use a visitor pattern (simplified).
@@ -97,9 +97,9 @@ typedef void (*bar_action)(bool);
 typedef void (*foo_or_bar)(foo_action, bar_action);
 ```
 
-The second options looks a little bit more complicated but it eliminates a class of bugs when `kind` is not respected. 
+The second options looks a little bit more complicated but it eliminates a class of bugs when `kind` is not respected.
 
-The visitor pattern can be represented using actions. 
+The visitor pattern can be represented using actions.
 
 ```c
 struct {
@@ -113,8 +113,8 @@ struct {
 } foo_or_bar;
 
 az_result foo_or_bar_do(foo_or_bar const self, foo_or_bar_visitor const * p_visitor) {
-	AZ_CONTRACT_ARG_NOT_NULL(self.func);
+  AZ_CONTRACT_ARG_NOT_NULL(self.func);
 
-	return self.func(self.self, p_visitor);
+  return self.func(self.self, p_visitor);
 }
 ```
