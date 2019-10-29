@@ -29,6 +29,9 @@
 /**
  * Defines a function @NAME##_action which creates an action of type @ACTION
  * using the given @NAME function.
+ *
+ * The function is a safe way to create an action with the same type @SELF for 
+ * the first argument of the function @NAME and @ACTION.self.
  */
 #define AZ_ACTION_FUNC(NAME, SELF, ACTION) \
   AZ_NODISCARD az_result NAME(SELF * const, AZ_ACTION_ARG(ACTION) const); \

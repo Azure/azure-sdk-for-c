@@ -18,10 +18,10 @@ It's also known as
 - a delegate and an event.
 
 ```c
-struct az_span_action {
-  az_result (*func)(az_span); // fn (less known)
+typedef struct {
+  az_result (*func)(az_span);
   void * self;
-};
+} az_span_action;
 
 az_result az_span_action_do(az_span_action const action, az_span const arg) {
   AZ_CONTRACT_ARG_NOT_NULL(action.func);
@@ -69,6 +69,9 @@ An emitter is a similar to a cold observable collection in reactive programming 
 az_result az_http_request__emit__span_seq(az_http_request, span_action);
 ```
 
+As any other iterator type, a `push` iterator is lazy. It means it doesn't produce values until it's ask for. This property can be very useful on platforms with limited resources. All iterator transformations, like concatenations
+and filters are also lazy. For example, concatenation of two very long `push` sequences doesn't require memory that can holds this two sequences.
+
 ### One Way Street
 
 Iterators (both 'pull' and 'push') allow to construct a program as an immutable
@@ -77,7 +80,7 @@ Also, the amount of interfaces can be reduces, for example, an interface for a J
 with a JSON builder. A JSON parser output is an input for a JSON builder. And a JSON builder output
 (usually it's a byte span iterator) is an input for a JSON parser.
 
-### Discriminated Unions
+## Discriminated Unions
 
 C doesn't have discriminated unions. There are two main options to implement discriminated unions.
 The first one is to use conventions. For example,
