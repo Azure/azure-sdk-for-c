@@ -171,12 +171,17 @@ AZ_NODISCARD az_result az_http_request_builder_append_header(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_http_request_builder_mark_retry_headers_start(az_http_request_builder * const p_hrb) {
+AZ_NODISCARD az_result
+az_http_request_builder_mark_retry_headers_start(az_http_request_builder * const p_hrb) {
+  AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
   p_hrb->retry_headers_start = p_hrb->headers_end;
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_http_request_builder_remove_retry_headers(az_http_request_builder * const p_hrb) {
+AZ_NODISCARD az_result
+az_http_request_builder_remove_retry_headers(az_http_request_builder * const p_hrb) {
+  AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
+
   if (p_hrb->headers_end > p_hrb->retry_headers_start) {
     p_hrb->headers_end = p_hrb->retry_headers_start;
   }
