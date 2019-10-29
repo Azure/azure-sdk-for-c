@@ -68,7 +68,7 @@ AZ_NODISCARD az_result az_http_request_builder_mark_retry_headers_start(az_http_
 
 AZ_NODISCARD az_result az_http_request_builder_remove_retry_headers(az_http_request_builder * const p_hrb);
 
-az_result az_http_request_builder_get_header(
+AZ_NODISCARD az_result az_http_request_builder_get_header(
     az_http_request_builder * const p_hrb,
     uint16_t const index,
     az_pair * const out_result);
