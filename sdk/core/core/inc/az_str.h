@@ -32,7 +32,7 @@
 #define AZ_STR(STRING_LITERAL) (az_span) AZ_CONST_STR(STRING_LITERAL)
 
 /**
- * A callack that accepts zero-terminated string `char const *`.
+ * A callback that accepts zero-terminated string `char const *`.
  */
 AZ_ACTION_TYPE(az_str_action, char const *)
 

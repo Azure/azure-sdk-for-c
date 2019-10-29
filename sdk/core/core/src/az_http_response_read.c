@@ -3,6 +3,7 @@
 
 #include <az_http_response_read.h>
 
+#include <az_str.h>
 #include <az_http_result.h>
 
 #include <_az_cfg.h>
@@ -27,9 +28,10 @@ AZ_NODISCARD az_result az_http_response_state_read_status(
 
   // HTTP-version = HTTP-name "/" DIGIT "." DIGIT
   // https://tools.ietf.org/html/rfc7230#section-2.6
+  AZ_RETURN_IF_FAILED(az_span_reader_expect_span(&self->reader, AZ_STR("HTTP/")));
 
-
-  return AZ_ERROR_NOT_IMPLEMENTED;
+  self->kind = AZ_HTTP_RESPONSE_STATE_HEADER;
+  return AZ_OK;
 }
 
 AZ_NODISCARD az_result az_http_response_state_read_header() { return AZ_ERROR_NOT_IMPLEMENTED; }

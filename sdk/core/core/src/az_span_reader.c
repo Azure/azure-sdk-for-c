@@ -5,7 +5,7 @@
 
 #include <_az_cfg.h>
 
-AZ_NODISCARD static az_result az_span_reader_expect_span(
+AZ_NODISCARD az_result az_span_reader_expect_span(
     az_span_reader * const self,
     az_span const span) {
   az_span_reader k = az_span_reader_create(span);

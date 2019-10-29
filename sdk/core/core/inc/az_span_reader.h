@@ -45,9 +45,7 @@ AZ_NODISCARD AZ_INLINE az_result az_error_unexpected_char(az_result_byte const c
  *
  * If it doesn't match the given @span, the function returns AZ_ERROR_UNEXPECTED_CHAR.
  */
-AZ_NODISCARD static az_result az_span_reader_expect_span(
-    az_span_reader * const self,
-    az_span const span);
+AZ_NODISCARD az_result az_span_reader_expect_span(az_span_reader * const self, az_span const span);
 
 #include <_az_cfg_suffix.h>
 
