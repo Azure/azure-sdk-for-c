@@ -35,7 +35,7 @@ AZ_INLINE uint16_t get_headers_max(az_span const buffer, az_pair * const headers
   // If there's enough space in the buffer, return the max number of elements it can fit (capped to
   // uint16_t's max)
   return buffer_end > headers_start_uint8ptr
-      ? (max_headers > (size_t)~(uint16_t)0 ? ~(uint16_t)0 : (uint16_t)max_headers)
+      ? (max_headers > (size_t) ~(uint16_t)0 ? ~(uint16_t)0 : (uint16_t)max_headers)
       : 0;
 }
 
@@ -171,12 +171,17 @@ AZ_NODISCARD az_result az_http_request_builder_append_header(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_http_request_builder_mark_retry_headers_start(az_http_request_builder * const p_hrb) {
+AZ_NODISCARD az_result
+az_http_request_builder_mark_retry_headers_start(az_http_request_builder * const p_hrb) {
+  AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
   p_hrb->retry_headers_start = p_hrb->headers_end;
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_http_request_builder_remove_retry_headers(az_http_request_builder * const p_hrb) {
+AZ_NODISCARD az_result
+az_http_request_builder_remove_retry_headers(az_http_request_builder * const p_hrb) {
+  AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
+
   if (p_hrb->headers_end > p_hrb->retry_headers_start) {
     p_hrb->headers_end = p_hrb->retry_headers_start;
   }
