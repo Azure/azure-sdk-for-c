@@ -13,7 +13,7 @@
  * Appends a zero-terminated string to the given CURL list.
  */
 AZ_NODISCARD az_result
-az_curl_slist_append(struct curl_slist ** const self, char const * str) {
+az_curl_slist_append(struct curl_slist ** const self, char const * const str) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(str);
 
@@ -31,11 +31,11 @@ az_curl_slist_append(struct curl_slist ** const self, char const * str) {
  */
 AZ_ACTION_FUNC(az_curl_slist_append, struct curl_slist *, az_str_action)
 
-AZ_NODISCARD az_result az_curl_slist_append_header(struct curl_slist ** pp_list, az_pair const header) {
-  AZ_CONTRACT_ARG_NOT_NULL(pp_list);
+AZ_NODISCARD az_result az_curl_slist_append_header(struct curl_slist ** const self, az_pair const header) {
+  AZ_CONTRACT_ARG_NOT_NULL(self);
 
   az_span_emitter const header_span_emitter = az_http_header_emit_span_seq_action(&header);
-  az_str_action const curl_slist_append_action = az_curl_slist_append_action(pp_list);
+  az_str_action const curl_slist_append_action = az_curl_slist_append_action(self);
 
   // the function creates a temporary dynamic zero-terminated string from `header_span_emitter` 
   // and passes it to `curl_slist_append_action`.

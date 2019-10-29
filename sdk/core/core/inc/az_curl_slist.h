@@ -12,10 +12,10 @@
 #include <_az_cfg_prefix.h>
 
 /**
- * Appends a header to the given CURL list.
+ * Appends an HTTP header to the given CURL list.
  */
 AZ_NODISCARD az_result
-az_curl_slist_append_header(struct curl_slist ** pp_list, az_pair const header);
+az_curl_slist_append_header(struct curl_slist ** const pp_list, az_pair const header);
 
 #include <_az_cfg_suffix.h>
 
