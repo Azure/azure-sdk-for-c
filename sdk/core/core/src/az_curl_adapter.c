@@ -19,7 +19,7 @@ az_const_span const AZ_HTTP_REQUEST_BUILDER_HEADER_SEPARATOR = AZ_CONST_STR(": "
  * @param separator
  * @return az_result
  */
-az_result az_write_to_buffer(
+AZ_NODISCARD az_result az_write_to_buffer(
     az_span const writable_buffer,
     az_pair const p_header,
     az_const_span const separator) {
@@ -41,7 +41,7 @@ az_result az_write_to_buffer(
  * @param separator
  * @return az_result
  */
-az_result az_add_header_to_curl_list(
+AZ_NODISCARD az_result az_add_header_to_curl_list(
     az_pair const header,
     struct curl_slist ** const p_list,
     az_const_span const separator) {
@@ -75,9 +75,8 @@ az_result az_add_header_to_curl_list(
  * @param p_headers
  * @return az_result
  */
-az_result az_build_headers(
-    az_http_request_builder const * const p_hrb,
-    struct curl_slist ** p_headers) {
+AZ_NODISCARD az_result
+az_build_headers(az_http_request_builder const * const p_hrb, struct curl_slist ** p_headers) {
 
   az_pair header;
   for (uint16_t offset = 0; offset < p_hrb->headers_end; ++offset) {
@@ -97,7 +96,8 @@ az_result az_build_headers(
  * @param url_from_request
  * @return az_result
  */
-az_result az_write_url(az_span const writable_buffer, az_const_span const url_from_request) {
+AZ_NODISCARD az_result
+az_write_url(az_span const writable_buffer, az_const_span const url_from_request) {
   az_span_builder writer = az_span_builder_create(writable_buffer);
   AZ_RETURN_IF_FAILED(az_span_builder_append(&writer, url_from_request));
   AZ_RETURN_IF_FAILED(az_span_builder_append(&writer, AZ_STR_ZERO));
@@ -138,7 +138,7 @@ size_t write_to_span(void * contents, size_t size, size_t nmemb, void * userp) {
 /**
  * handles GET request
  */
-az_result az_curl_send_request(az_curl * const p_curl) {
+AZ_NODISCARD az_result az_curl_send_request(az_curl * const p_curl) {
   // send
   AZ_RETURN_IF_CURL_FAILED(curl_easy_perform(p_curl->p_curl));
 
@@ -148,9 +148,8 @@ az_result az_curl_send_request(az_curl * const p_curl) {
 /**
  * handles POST request. It handles seting up a body for request
  */
-az_result az_curl_post_request(
-    az_curl * const p_curl,
-    az_http_request_builder const * const p_hrb) {
+AZ_NODISCARD az_result
+az_curl_post_request(az_curl * const p_curl, az_http_request_builder const * const p_hrb) {
   // Method
   AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl->p_curl, CURLOPT_POSTFIELDS, p_hrb->body.begin));
 
@@ -165,7 +164,8 @@ az_result az_curl_post_request(
  * @param p_hrb
  * @return az_result
  */
-az_result setup_headers(az_curl const * const p_curl, az_http_request_builder const * const p_hrb) {
+AZ_NODISCARD az_result
+setup_headers(az_curl const * const p_curl, az_http_request_builder const * const p_hrb) {
   AZ_CONTRACT_ARG_NOT_NULL(p_curl);
   AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
   if (!az_http_request_builder_has_headers(p_hrb)) {
@@ -190,7 +190,8 @@ az_result setup_headers(az_curl const * const p_curl, az_http_request_builder co
  * @param p_hrb
  * @return az_result
  */
-az_result setup_url(az_curl const * const p_curl, az_http_request_builder const * const p_hrb) {
+AZ_NODISCARD az_result
+setup_url(az_curl const * const p_curl, az_http_request_builder const * const p_hrb) {
   // set URL as 0-terminated str
   size_t const extra_space_for_zero = AZ_STR_ZERO.size;
   size_t const url_final_size = p_hrb->url.size + extra_space_for_zero;
@@ -223,7 +224,8 @@ az_result setup_url(az_curl const * const p_curl, az_http_request_builder const 
  * @param p_hrb
  * @return az_result
  */
-az_result setup_response_redirect(az_curl const * const p_curl, az_span const * const response) {
+AZ_NODISCARD az_result
+setup_response_redirect(az_curl const * const p_curl, az_span const * const response) {
   // check if response will be redirected to user span
   if (response != NULL) {
     AZ_RETURN_IF_CURL_FAILED(
@@ -241,7 +243,7 @@ az_result setup_response_redirect(az_curl const * const p_curl, az_span const * 
  * @param response
  * @return az_result
  */
-az_result az_http_client_send_request_impl(
+AZ_NODISCARD az_result az_http_client_send_request_impl(
     az_http_request_builder * const p_hrb,
     az_span const * const response) {
   az_curl p_curl;
