@@ -168,7 +168,7 @@ az_result az_curl_post_request(
 az_result setup_headers(az_curl const * const p_curl, az_http_request_builder const * const p_hrb) {
   AZ_CONTRACT_ARG_NOT_NULL(p_curl);
   AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
-  if (!az_http_request_builder_has_headers(*p_hrb)) {
+  if (!az_http_request_builder_has_headers(p_hrb)) {
     // no headers, no need to set it up
     return AZ_OK;
   }
