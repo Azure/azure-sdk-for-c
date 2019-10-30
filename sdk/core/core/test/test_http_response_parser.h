@@ -3,6 +3,7 @@
 
 #include <az_http_response_parser.h>
 #include <az_span.h>
+#include <az_http_result.h>
 
 #include "./az_test.h"
 
@@ -28,6 +29,12 @@ static void test_http_response_parser() {
       TEST_ASSERT(status_line.status_code == 404);
       TEST_ASSERT(az_span_eq(status_line.reason_phrase, AZ_STR("We removed the\tpage!")));
     }
+    // try to read a header
+    {
+      az_pair header = { 0 };
+      az_result const result = az_http_response_parser_get_header(&parser, &header);
+      TEST_ASSERT(result == AZ_HTTP_ERROR_NO_MORE_HEADERS);
+    } 
     // read a body
     {
       az_span body = { 0 };
@@ -73,6 +80,12 @@ static void test_http_response_parser() {
       TEST_ASSERT(result == AZ_OK);
       TEST_ASSERT(az_span_eq(header.key, AZ_STR("Header2")));
       TEST_ASSERT(az_span_eq(header.value, AZ_STR("something")));
+    }
+    // try to read a header
+    {
+      az_pair header = { 0 };
+      az_result const result = az_http_response_parser_get_header(&parser, &header);
+      TEST_ASSERT(result == AZ_HTTP_ERROR_NO_MORE_HEADERS);
     }
     // read a body
     {
