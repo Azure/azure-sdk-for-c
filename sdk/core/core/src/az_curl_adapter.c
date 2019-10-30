@@ -134,15 +134,7 @@ int write_to_span(void * contents, size_t size, size_t nmemb, void * userp) {
 /**
  * handles GET request
  */
-az_result az_curl_send_request(az_curl * const p_curl, az_span const * const response) {
-
-  // check if response will be redirected to user span
-  if (response != NULL) {
-    AZ_RETURN_IF_CURL_FAILED(
-        curl_easy_setopt(p_curl->p_curl, CURLOPT_WRITEFUNCTION, write_to_span));
-    AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl->p_curl, CURLOPT_WRITEDATA, (void *)response));
-  }
-
+az_result az_curl_send_request(az_curl * const p_curl) {
   // send
   AZ_RETURN_IF_CURL_FAILED(curl_easy_perform(p_curl->p_curl));
 
@@ -150,21 +142,13 @@ az_result az_curl_send_request(az_curl * const p_curl, az_span const * const res
 }
 
 /**
- * handles POST request
+ * handles POST request. It handles seting up a body for request
  */
 az_result az_curl_post_request(
     az_curl * const p_curl,
-    az_http_request_builder const * const p_hrb,
-    az_span const * const response) {
+    az_http_request_builder const * const p_hrb) {
   // Method
   AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl->p_curl, CURLOPT_POSTFIELDS, p_hrb->body.begin));
-
-  // check if response will be redirected to user span
-  if (response != NULL) {
-    AZ_RETURN_IF_CURL_FAILED(
-        curl_easy_setopt(p_curl->p_curl, CURLOPT_WRITEFUNCTION, write_to_span));
-    AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl->p_curl, CURLOPT_WRITEDATA, (void *)response));
-  }
 
   AZ_RETURN_IF_CURL_FAILED(curl_easy_perform(p_curl->p_curl));
   return AZ_OK;
@@ -228,6 +212,24 @@ az_result setup_url(az_curl const * const p_curl, az_http_request_builder const 
 }
 
 /**
+ * @brief set url the response redirection to user buffer
+ *
+ * @param p_curl
+ * @param p_hrb
+ * @return az_result
+ */
+az_result setup_response_redirect(az_curl const * const p_curl, az_span const * const response) {
+  // check if response will be redirected to user span
+  if (response != NULL) {
+    AZ_RETURN_IF_CURL_FAILED(
+        curl_easy_setopt(p_curl->p_curl, CURLOPT_WRITEFUNCTION, write_to_span));
+    AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl->p_curl, CURLOPT_WRITEDATA, (void *)response));
+  }
+
+  return AZ_OK;
+}
+
+/**
  * @brief uses AZ_HTTP_BUILDER to set up CURL request and perform it
  *
  * @param p_hrb
@@ -245,10 +247,12 @@ az_result az_http_client_send_request_impl(
 
   AZ_RETURN_IF_CURL_FAILED(setup_url(&p_curl, p_hrb));
 
+  AZ_RETURN_IF_CURL_FAILED(setup_response_redirect(&p_curl, response));
+
   if (az_const_span_eq(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_GET)) {
-    result = az_curl_send_request(&p_curl, response);
+    result = az_curl_send_request(&p_curl);
   } else if (az_const_span_eq(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_POST)) {
-    result = az_curl_post_request(&p_curl, p_hrb, response);
+    result = az_curl_post_request(&p_curl, p_hrb);
   }
 
   AZ_RETURN_IF_FAILED(az_curl_done(&p_curl));
