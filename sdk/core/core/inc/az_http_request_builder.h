@@ -158,7 +158,7 @@ az_http_request_builder_remove_retry_headers(az_http_request_builder * const p_h
  *     - `index` is out of range.
  */
 AZ_NODISCARD az_result az_http_request_builder_get_header(
-    az_http_request_builder * const p_hrb,
+    az_http_request_builder const * const p_hrb,
     uint16_t const index,
     az_pair * const out_result);
 
