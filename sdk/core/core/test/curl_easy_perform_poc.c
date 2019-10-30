@@ -86,7 +86,7 @@ int main() {
   ignore_result = az_span_builder_append(&builder, AZ_STR("Bearer "));
   ignore_result = az_span_builder_append(&builder, token);
   ignore_result = az_span_builder_append(
-      &builder, AZ_STR("\0")); // add a 0 so it can be printed and used by Curl
+      &builder, AZ_STR_ZERO); // add a 0 so it can be printed and used by Curl
 
   // add auth Header with parsed token
   az_result const add_header_result = az_http_request_builder_append_header(
