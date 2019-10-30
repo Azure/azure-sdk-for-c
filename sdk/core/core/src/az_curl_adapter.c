@@ -113,23 +113,24 @@ az_result az_write_url(az_span const writable_buffer, az_const_span const url_fr
  * @param userp
  * @return int
  */
-int write_to_span(void * contents, size_t size, size_t nmemb, void * userp) {
-  size_t const realsize = size * nmemb + 1;
+size_t write_to_span(void * contents, size_t size, size_t nmemb, void * userp) {
+  size_t const expected_size = size * nmemb;
+  size_t const size_with_extra_space = expected_size + AZ_STR_ZERO.size;
   az_span * const user_buffer = (az_span *)userp;
 
   // handle error when response won't feat user buffer
-  if (user_buffer->size < realsize) {
+  if (user_buffer->size < size_with_extra_space) {
     fprintf(stderr, "response size is greater than user buffer for writing response");
     return AZ_ERROR_HTTP_FAILED_REQUEST;
   }
 
   // TODO: format buffer with AZ_RESPONSE_BUILDER
-  memcpy(user_buffer->begin, contents, realsize);
+  memcpy(user_buffer->begin, contents, size_with_extra_space);
   // add 0 so response can be printed
-  user_buffer->begin[realsize] = *AZ_STR_ZERO.begin;
+  user_buffer->begin[size_with_extra_space] = *AZ_STR_ZERO.begin;
 
   // This callback needs to return the response size or curl will consider it as it failed
-  return (int)realsize - 1;
+  return expected_size;
 }
 
 /**
