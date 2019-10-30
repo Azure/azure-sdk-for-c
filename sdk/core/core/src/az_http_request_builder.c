@@ -62,7 +62,7 @@ AZ_NODISCARD az_result az_http_request_builder_init(
 
   az_mut_span uri_buf = { 0, 0 };
   AZ_RETURN_IF_FAILED(az_mut_span_copy( // copy URL to buffer
-      (az_mut_span){ .begin = buffer.begin, .size = max_url_size },
+      az_mut_span_take(buffer, max_url_size),
       initial_url,
       &uri_buf));
 
@@ -97,7 +97,6 @@ AZ_NODISCARD az_result az_http_request_builder_set_query_parameter(
 
   size_t new_url_size;
   {
-    az_mut_span new_url_span = { .begin = p_hrb->url.begin };
     size_t const extra_chars_size = AZ_STRING_LITERAL_LEN("?=");
     size_t const name_and_value_size = name.size + value.size;
     size_t const appended_size = name_and_value_size + extra_chars_size;
@@ -112,7 +111,7 @@ AZ_NODISCARD az_result az_http_request_builder_set_query_parameter(
       return AZ_ERROR_BUFFER_OVERFLOW;
     }
 
-    new_url_span.size = new_url_size;
+    az_mut_span const new_url_span = { .begin = p_hrb->url.begin, .size = new_url_size };
 
     // check whether name or value regions overlap with destination for some reason (unlikely)
     if (az_span_is_overlap(az_mut_span_to_span(new_url_span), name)
@@ -137,14 +136,14 @@ AZ_NODISCARD az_result az_http_request_builder_set_query_parameter(
 
   // Append either '?' or '&'
   p_hrb->url.begin[p_hrb->url.size] = first_parameter ? '?' : '&';
-  ++(p_hrb->url.size);
+  p_hrb->url.size += 1;
 
   // Append parameter name
   memcpy(p_hrb->url.begin + p_hrb->url.size, name.begin, name.size);
   p_hrb->url.size += name.size;
 
   p_hrb->url.begin[p_hrb->url.size] = '=';
-  ++(p_hrb->url.size);
+  p_hrb->url.size += 1;
 
   // Parameter value
   memcpy(p_hrb->url.begin + p_hrb->url.size, value.begin, value.size);
@@ -172,7 +171,7 @@ AZ_NODISCARD az_result az_http_request_builder_append_header(
 
   az_pair * const headers = get_headers_start(p_hrb->buffer, p_hrb->max_url_size);
   headers[p_hrb->headers_end] = (az_pair){ .key = key, .value = value };
-  ++(p_hrb->headers_end);
+  p_hrb->headers_end += 1;
 
   return AZ_OK;
 }
