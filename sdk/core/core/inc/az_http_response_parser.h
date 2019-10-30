@@ -38,18 +38,6 @@ typedef enum {
 } az_http_response_kind;
 
 /**
- * An HTTP response value is either `status line`, `header`, or `body`.
- */
-typedef struct {
-  az_http_response_kind kind;
-  union {
-    az_http_response_status_line status_line;
-    az_http_response_header header;
-    az_http_response_body body;
-  } data;
-} az_http_response_value;
-
-/**
  * An HTTP response parser.
  */
 typedef struct {
@@ -64,11 +52,25 @@ AZ_NODISCARD az_result
 az_http_response_parser_init(az_span const buffer, az_http_response_parser * const out);
 
 /**
- * Returns the next HTTP response value.
+ * An HTTP status line.
  */
-AZ_NODISCARD az_result az_http_response_parser_read(
+AZ_NODISCARD az_result az_http_response_parser_read_status_line(
     az_http_response_parser * const self,
-    az_http_response_value * const out);
+    az_http_response_status_line * const out);
+
+/**
+ * An HTTP header.
+ */
+AZ_NODISCARD az_result az_http_response_parser_read_header(
+    az_http_response_parser * const self,
+    az_http_response_header * const out);
+
+/**
+ * An HTTP body.
+ */
+AZ_NODISCARD az_result az_http_response_parser_read_body(
+    az_http_response_parser * const self,
+    az_http_response_body * const out);
 
 #include <_az_cfg_suffix.h>
 

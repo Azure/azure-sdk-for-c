@@ -20,11 +20,9 @@ static void test_http_response_parser() {
     }
     // read a status line
     {
-      az_http_response_value value = { 0 };
-      az_result const result = az_http_response_parser_read(&parser, &value);
+      az_http_response_status_line status_line = { 0 };
+      az_result const result = az_http_response_parser_read_status_line(&parser, &status_line);
       TEST_ASSERT(result == AZ_OK);
-      TEST_ASSERT(value.kind == AZ_HTTP_RESPONSE_STATUS_LINE);
-      az_http_response_status_line const status_line = value.data.status_line;
       TEST_ASSERT(status_line.major_version == 1);
       TEST_ASSERT(status_line.minor_version == 2);
       TEST_ASSERT(status_line.status_code == 404);
@@ -32,11 +30,9 @@ static void test_http_response_parser() {
     }
     // read a body
     {
-      az_http_response_value value = { 0 };
-      az_result const result = az_http_response_parser_read(&parser, &value);
+      az_http_response_body body = { 0 };
+      az_result const result = az_http_response_parser_read_body(&parser, &body);
       TEST_ASSERT(result == AZ_OK);
-      TEST_ASSERT(value.kind == AZ_HTTP_RESPONSE_BODY);
-      az_http_response_body const body = value.data.body;
       TEST_ASSERT(az_span_eq(body, AZ_STR("But there is somebody. :-)")));
     }
   }
@@ -54,11 +50,9 @@ static void test_http_response_parser() {
     }
     // read a status line
     {
-      az_http_response_value value = { 0 };
-      az_result const result = az_http_response_parser_read(&parser, &value);
+      az_http_response_status_line status_line = { 0 };
+      az_result const result = az_http_response_parser_read_status_line(&parser, &status_line);
       TEST_ASSERT(result == AZ_OK);
-      TEST_ASSERT(value.kind == AZ_HTTP_RESPONSE_STATUS_LINE);
-      az_http_response_status_line const status_line = value.data.status_line;
       TEST_ASSERT(status_line.major_version == 2);
       TEST_ASSERT(status_line.minor_version == 0);
       TEST_ASSERT(status_line.status_code == 205);
@@ -66,31 +60,25 @@ static void test_http_response_parser() {
     }
     // read a header1
     {
-      az_http_response_value value = { 0 };
-      az_result const result = az_http_response_parser_read(&parser, &value);
+      az_http_response_header header = { 0 };
+      az_result const result = az_http_response_parser_read_header(&parser, &header);
       TEST_ASSERT(result == AZ_OK);
-      TEST_ASSERT(value.kind == AZ_HTTP_RESPONSE_HEADER);
-      az_http_response_header const header = value.data.header;
       TEST_ASSERT(az_span_eq(header.key, AZ_STR("header1")));
       TEST_ASSERT(az_span_eq(header.value, AZ_STR("some value")));
     }
     // read a Header2
     {
-      az_http_response_value value = { 0 };
-      az_result const result = az_http_response_parser_read(&parser, &value);
+      az_http_response_header header = { 0 };
+      az_result const result = az_http_response_parser_read_header(&parser, &header);
       TEST_ASSERT(result == AZ_OK);
-      TEST_ASSERT(value.kind == AZ_HTTP_RESPONSE_HEADER);
-      az_http_response_header const header = value.data.header;
       TEST_ASSERT(az_span_eq(header.key, AZ_STR("Header2")));
       TEST_ASSERT(az_span_eq(header.value, AZ_STR("something")));
     }
     // read a body
     {
-      az_http_response_value value = { 0 };
-      az_result const result = az_http_response_parser_read(&parser, &value);
+      az_http_response_body body = { 0 };
+      az_result const result = az_http_response_parser_read_body(&parser, &body);
       TEST_ASSERT(result == AZ_OK);
-      TEST_ASSERT(value.kind == AZ_HTTP_RESPONSE_BODY);
-      az_http_response_body const body = value.data.body;
       TEST_ASSERT(az_span_eq(body, AZ_STR("")));
     }
   }
