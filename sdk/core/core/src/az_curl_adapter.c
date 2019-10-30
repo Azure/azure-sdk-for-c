@@ -25,7 +25,7 @@ az_result az_write_to_buffer(
   AZ_RETURN_IF_FAILED(az_span_builder_append(&writer, p_header.key));
   AZ_RETURN_IF_FAILED(az_span_builder_append(&writer, separator));
   AZ_RETURN_IF_FAILED(az_span_builder_append(&writer, p_header.value));
-  AZ_RETURN_IF_FAILED(az_span_builder_append(&writer, AZ_ZERO_STR));
+  AZ_RETURN_IF_FAILED(az_span_builder_append(&writer, AZ_STR_ZERO));
   return AZ_OK;
 }
 
@@ -80,7 +80,8 @@ az_result az_build_headers(
   az_pair header;
   for (uint16_t offset = 0; offset < p_hrb->headers_end; ++offset) {
     AZ_RETURN_IF_FAILED(az_http_request_builder_get_header(p_hrb, offset, &header));
-    AZ_RETURN_IF_FAILED(az_add_header_to_curl_list(header, p_headers, AZ_HEADER_SEPARATOR_STR));
+    AZ_RETURN_IF_FAILED(
+        az_add_header_to_curl_list(header, p_headers, AZ_HTTP_REQUEST_BUILDER_HEADER_SEPARATOR));
   }
 
   return AZ_OK;
@@ -97,7 +98,7 @@ az_result az_build_headers(
 az_result az_write_url(az_span const writable_buffer, az_const_span const url_from_request) {
   az_span_builder writer = az_span_builder_create(writable_buffer);
   AZ_RETURN_IF_FAILED(az_span_builder_append(&writer, url_from_request));
-  AZ_RETURN_IF_FAILED(az_span_builder_append(&writer, AZ_ZERO_STR));
+  AZ_RETURN_IF_FAILED(az_span_builder_append(&writer, AZ_STR_ZERO));
   return AZ_OK;
 }
 
@@ -125,7 +126,7 @@ int write_to_span(void * contents, size_t size, size_t nmemb, void * userp) {
   // TODO: format buffer with AZ_RESPONSE_BUILDER
   memcpy(user_buffer->begin, contents, realsize);
   // add 0 so response can be printed
-  user_buffer->begin[realsize] = *AZ_ZERO_STR.begin;
+  user_buffer->begin[realsize] = *AZ_STR_ZERO.begin;
 
   // This callback needs to return the response size or curl will consider it as it failed
   return (int)realsize - 1;
@@ -187,7 +188,7 @@ az_result setup_headers(az_curl const * const p_curl, az_http_request_builder co
  */
 az_result setup_url(az_curl const * const p_curl, az_http_request_builder const * const p_hrb) {
   // set URL as 0-terminated str
-  size_t const extra_space_for_zero = AZ_ZERO_STR.size;
+  size_t const extra_space_for_zero = AZ_STR_ZERO.size;
   size_t const url_final_size = p_hrb->url.size + extra_space_for_zero;
   // allocate buffer to add \0
   uint8_t * const p_writable_buffer = (uint8_t *)malloc(url_final_size);

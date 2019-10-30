@@ -53,6 +53,7 @@ extern az_const_span const AZ_HTTP_METHOD_VERB_OPTIONS;
 extern az_const_span const AZ_HTTP_METHOD_VERB_CONNECT;
 extern az_const_span const AZ_HTTP_METHOD_VERB_PATCH;
 
+extern az_const_span const AZ_HTTP_REQUEST_BUILDER_HEADER_SEPARATOR;
 /**
  * @brief Format buffer as a http request containing URL and header spans.
  *
