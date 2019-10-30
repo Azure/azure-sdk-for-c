@@ -42,7 +42,7 @@ int main() {
     return build_result;
   }
   // attach a body for the POST request
-  az_result const add_body_result = az_http_request_builder_add_body(&hrb, &token_request_body);
+  az_result const add_body_result = az_http_request_builder_add_body(&hrb, token_request_body);
   if (az_failed(add_body_result)) {
     return add_body_result;
   }
@@ -77,7 +77,7 @@ int main() {
 
   /****** -------------  Create buffer for header auth ---------******/
   // can't print token right now since it is not 0-terminated
-  size_t const buffer_for_header_size = sizeof("Bearer ") + token.size + 1;
+  size_t const buffer_for_header_size = sizeof("Bearer ") + token.size;
   uint8_t * const buffer_for_header = (uint8_t *)malloc(buffer_for_header_size);
 
   /****** -------------  use Span builder to concatenate ---------******/

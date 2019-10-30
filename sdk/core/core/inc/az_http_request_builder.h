@@ -8,6 +8,7 @@
 #ifndef AZ_HTTP_REQUEST_BUILDER_H
 #define AZ_HTTP_REQUEST_BUILDER_H
 
+#include <az_contract.h>
 #include <az_pair.h>
 #include <az_result.h>
 #include <az_span.h>
@@ -52,8 +53,6 @@ extern az_const_span const AZ_HTTP_METHOD_VERB_TRACE;
 extern az_const_span const AZ_HTTP_METHOD_VERB_OPTIONS;
 extern az_const_span const AZ_HTTP_METHOD_VERB_CONNECT;
 extern az_const_span const AZ_HTTP_METHOD_VERB_PATCH;
-
-extern az_const_span const AZ_HTTP_REQUEST_BUILDER_HEADER_SEPARATOR;
 /**
  * @brief Format buffer as a http request containing URL and header spans.
  *
@@ -167,15 +166,14 @@ AZ_NODISCARD az_result az_http_request_builder_get_header(
 /**
  * @brief Adds a body reference for request builder.
  *
- * Returns AZ_ERROR_ARG if body or builder reference are NULL
+ * Returns AZ_ERROR_ARG if builder reference is NULL
  *
  */
 AZ_NODISCARD AZ_INLINE az_result az_http_request_builder_add_body(
     az_http_request_builder * const p_hrb,
-    az_const_span const * const body) {
-  AZ_CONTRACT_ARG_NOT_NULL(body);
+    az_const_span const body) {
   AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
-  p_hrb->body = *body;
+  p_hrb->body = body;
   return AZ_OK;
 }
 
@@ -184,8 +182,8 @@ AZ_NODISCARD AZ_INLINE az_result az_http_request_builder_add_body(
  *
  */
 AZ_NODISCARD AZ_INLINE bool az_http_request_builder_has_headers(
-    az_http_request_builder const * const p_hrb) {
-  return p_hrb->headers_end > 0;
+    az_http_request_builder const p_hrb) {
+  return p_hrb.headers_end > 0;
 }
 
 #include <_az_cfg_suffix.h>

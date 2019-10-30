@@ -20,8 +20,6 @@ az_const_span const AZ_HTTP_METHOD_VERB_OPTIONS = AZ_CONST_STR("OPTIONS");
 az_const_span const AZ_HTTP_METHOD_VERB_CONNECT = AZ_CONST_STR("CONNECT");
 az_const_span const AZ_HTTP_METHOD_VERB_PATCH = AZ_CONST_STR("PATCH");
 
-az_const_span const AZ_HTTP_REQUEST_BUILDER_HEADER_SEPARATOR = AZ_CONST_STR(": ");
-
 AZ_INLINE az_pair * get_headers_start(az_span const buffer, int16_t const max_url_size) {
   // 8-byte address alignment
   return (az_pair *)((uintptr_t)(buffer.begin + max_url_size + 7) & ~(uintptr_t)7);
