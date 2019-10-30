@@ -110,9 +110,8 @@ AZ_NODISCARD bool az_is_http_whitespace(az_result_byte const c) {
 /**
  * https://tools.ietf.org/html/rfc7230#section-3.2
  */
-AZ_NODISCARD az_result az_http_response_parser_get_header(
-    az_http_response_parser * const self,
-    az_http_response_header * const out) {
+AZ_NODISCARD az_result
+az_http_response_parser_get_header(az_http_response_parser * const self, az_pair * const out) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
@@ -203,9 +202,8 @@ AZ_NODISCARD az_result az_http_response_parser_get_header(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_http_response_parser_get_body(
-    az_http_response_parser * const self,
-    az_http_response_body * const out) {
+AZ_NODISCARD az_result
+az_http_response_parser_get_body(az_http_response_parser * const self, az_span * const out) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(out);
 

@@ -26,10 +26,6 @@ typedef struct {
   az_span reason_phrase;
 } az_http_response_status_line;
 
-typedef az_pair az_http_response_header;
-
-typedef az_span az_http_response_body;
-
 typedef enum {
   AZ_HTTP_RESPONSE_NONE = 0,
   AZ_HTTP_RESPONSE_STATUS_LINE = 1,
@@ -61,16 +57,14 @@ AZ_NODISCARD az_result az_http_response_parser_get_status_line(
 /**
  * An HTTP header.
  */
-AZ_NODISCARD az_result az_http_response_parser_get_header(
-    az_http_response_parser * const self,
-    az_http_response_header * const out);
+AZ_NODISCARD az_result
+az_http_response_parser_get_header(az_http_response_parser * const self, az_pair * const out);
 
 /**
  * An HTTP body.
  */
-AZ_NODISCARD az_result az_http_response_parser_get_body(
-    az_http_response_parser * const self,
-    az_http_response_body * const out);
+AZ_NODISCARD az_result
+az_http_response_parser_get_body(az_http_response_parser * const self, az_span * const out);
 
 #include <_az_cfg_suffix.h>
 

@@ -30,7 +30,7 @@ static void test_http_response_parser() {
     }
     // read a body
     {
-      az_http_response_body body = { 0 };
+      az_span body = { 0 };
       az_result const result = az_http_response_parser_get_body(&parser, &body);
       TEST_ASSERT(result == AZ_OK);
       TEST_ASSERT(az_span_eq(body, AZ_STR("But there is somebody. :-)")));
@@ -60,7 +60,7 @@ static void test_http_response_parser() {
     }
     // read a header1
     {
-      az_http_response_header header = { 0 };
+      az_pair header = { 0 };
       az_result const result = az_http_response_parser_get_header(&parser, &header);
       TEST_ASSERT(result == AZ_OK);
       TEST_ASSERT(az_span_eq(header.key, AZ_STR("header1")));
@@ -68,7 +68,7 @@ static void test_http_response_parser() {
     }
     // read a Header2
     {
-      az_http_response_header header = { 0 };
+      az_pair header = { 0 };
       az_result const result = az_http_response_parser_get_header(&parser, &header);
       TEST_ASSERT(result == AZ_OK);
       TEST_ASSERT(az_span_eq(header.key, AZ_STR("Header2")));
@@ -76,7 +76,7 @@ static void test_http_response_parser() {
     }
     // read a body
     {
-      az_http_response_body body = { 0 };
+      az_span body = { 0 };
       az_result const result = az_http_response_parser_get_body(&parser, &body);
       TEST_ASSERT(result == AZ_OK);
       TEST_ASSERT(az_span_eq(body, AZ_STR("")));
