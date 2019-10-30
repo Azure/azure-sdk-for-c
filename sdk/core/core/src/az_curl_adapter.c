@@ -8,6 +8,8 @@
 
 #include <_az_cfg.h>
 
+az_const_span const AZ_HTTP_REQUEST_BUILDER_HEADER_SEPARATOR = AZ_CONST_STR(": ");
+
 /**
  * @brief writes a header key and value to a buffer as a 0-terminated string and using a separator
  * span in between. Returns error as soon as any of the write operations fails
@@ -40,13 +42,13 @@ az_result az_write_to_buffer(
  * @return az_result
  */
 az_result az_add_header_to_curl_list(
-    az_pair const p_header,
+    az_pair const header,
     struct curl_slist ** const p_list,
     az_const_span const separator) {
   AZ_CONTRACT_ARG_NOT_NULL(p_list);
 
-  // allocate a buffet for header
-  size_t const buffer_size = p_header.key.size + separator.size + p_header.value.size + 1;
+  // allocate a buffer for header
+  size_t const buffer_size = header.key.size + separator.size + header.value.size + 1;
   uint8_t * const p_writable_buffer = (uint8_t *)malloc(buffer_size);
   if (p_writable_buffer == NULL) {
     return AZ_ERROR_OUT_OF_MEMORY;
@@ -55,7 +57,7 @@ az_result az_add_header_to_curl_list(
 
   // write buffer
   az_span const writable_buffer = (az_span){ .begin = p_writable_buffer, .size = buffer_size };
-  az_result const write_result = az_write_to_buffer(writable_buffer, p_header, separator);
+  az_result const write_result = az_write_to_buffer(writable_buffer, header, separator);
 
   // attach header only when write was OK
   if (az_succeeded(write_result)) {
@@ -164,7 +166,8 @@ az_result az_curl_post_request(
  * @return az_result
  */
 az_result setup_headers(az_curl const * const p_curl, az_http_request_builder const * const p_hrb) {
-
+  AZ_CONTRACT_ARG_NOT_NULL(p_curl);
+  AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
   if (!az_http_request_builder_has_headers(p_hrb)) {
     // no headers, no need to set it up
     return AZ_OK;
@@ -242,7 +245,7 @@ az_result az_http_client_send_request_impl(
     az_http_request_builder * const p_hrb,
     az_span const * const response) {
   az_curl p_curl;
-  az_result result = 0;
+  az_result result = AZ_ERROR_ARG;
   AZ_RETURN_IF_FAILED(az_curl_init(&p_curl));
 
   AZ_RETURN_IF_CURL_FAILED(setup_headers(&p_curl, p_hrb));
