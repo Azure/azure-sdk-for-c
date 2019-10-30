@@ -78,7 +78,7 @@ int main() {
   /****** -------------  Create buffer for header auth ---------******/
   // can't print token right now since it is not 0-terminated
   size_t const buffer_for_header_size = sizeof("Bearer ") + token.size + 1;
-  uint8_t const * buffer_for_header = (uint8_t *)malloc(buffer_for_header_size);
+  uint8_t * const buffer_for_header = (uint8_t *)malloc(buffer_for_header_size);
 
   /****** -------------  use Span builder to concatenate ---------******/
   az_span temp_buf = (az_span){ .begin = buffer_for_header, .size = buffer_for_header_size };
