@@ -17,7 +17,7 @@ AZ_ACTION_TYPE(az_span_emitter, az_span_action)
 AZ_SPAN_TYPE(az_span_span, az_span const)
 
 /**
- * Emits all spans from @self into @append.
+ * Emits all spans from @self into @action.
  */
 AZ_NODISCARD az_result
 az_span_span_emit(az_span_span const * const self, az_span_action const action);
