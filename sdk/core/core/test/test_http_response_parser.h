@@ -12,7 +12,7 @@ static void test_http_response_parser() {
       "\r\n"
       "But there is somebody. :-)");
   az_http_response_state state = az_http_response_state_create(response);
-  // reade status line
+  // read a status line
   {
     az_http_response_value value = { 0 };
     az_result const result = az_http_response_state_read(&state, &value);
@@ -24,7 +24,7 @@ static void test_http_response_parser() {
     TEST_ASSERT(status_line.status_code == 404);
     TEST_ASSERT(az_span_eq(status_line.reason_phrase, AZ_STR("We removed the\tpage!")));
   }
-  // reade body
+  // read a body
   {
     az_http_response_value value = { 0 };
     az_result const result = az_http_response_state_read(&state, &value);
