@@ -656,7 +656,6 @@ int main() {
     uint8_t buf[256 * 3];
     az_span const buffer = { .begin = buf, .size = sizeof(buf) };
     az_const_span result;
-    az_result ignore_result;
 
     az_result res_code = AZ_OK;
 
