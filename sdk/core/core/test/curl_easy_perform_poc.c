@@ -31,10 +31,6 @@ int main() {
   az_span const http_buf = AZ_SPAN(buf);
   az_http_request_builder hrb;
 
-  uint8_t buf2[1024 * 4];
-  az_span const http_buf2 = AZ_SPAN(buf2);
-  az_http_request_builder hrb2;
-
   // response buffer
   uint8_t buf_response[1024 * 4];
   az_span const http_buf_response = AZ_SPAN(buf_response);
@@ -60,14 +56,14 @@ int main() {
 
   // create request for keyVault
   build_result
-      = az_http_request_builder_init(&hrb2, http_buf2, 100, AZ_HTTP_METHOD_VERB_GET, KEY_VAULT_URL);
+      = az_http_request_builder_init(&hrb, http_buf, 100, AZ_HTTP_METHOD_VERB_GET, KEY_VAULT_URL);
   if (az_failed(build_result)) {
     return build_result;
   }
 
   // add query param
   az_result add_query_result = az_http_request_builder_set_query_parameter(
-      &hrb2, API_VERSION_QUERY_NAME, API_VERSION_QUERY_VALUE);
+      &hrb, API_VERSION_QUERY_NAME, API_VERSION_QUERY_VALUE);
   if (az_failed(add_query_result)) {
     return add_query_result;
   }
@@ -93,13 +89,13 @@ int main() {
 
   // add auth Header with parsed token
   az_result const add_header_result = az_http_request_builder_append_header(
-      &hrb2, AZ_STR("authorization"), az_span_to_const_span(temp_buf));
+      &hrb, AZ_STR("authorization"), az_span_to_const_span(temp_buf));
   if (az_failed(add_header_result)) {
     return add_header_result;
   }
 
   // *************************send GET
-  az_result const get_response = az_http_client_send_request(&hrb2, &http_buf_response);
+  az_result const get_response = az_http_client_send_request(&hrb, &http_buf_response);
 
   if (az_succeeded(get_response)) {
     printf("Response is: \n%s", http_buf_response.begin);
