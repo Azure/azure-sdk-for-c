@@ -1,14 +1,18 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef AZ_HTTP_RESPONSE_READ_H
-#define AZ_HTTP_RESPONSE_READ_H
+#ifndef AZ_HTTP_RESPONSE_PARSER_H
+#define AZ_HTTP_RESPONSE_PARSER_H
 
 #include <az_pair.h>
 #include <az_span.h>
 #include <az_span_reader.h>
 
 #include <_az_cfg_prefix.h>
+
+typedef enum {
+  AZ_HTTP_STATUS_CODE_OK = 200,
+} az_http_status_code;
 
 /**
  * An HTTP response status line
@@ -45,21 +49,25 @@ typedef struct {
   } data;
 } az_http_response_value;
 
+/**
+ * An HTTP response parser.
+ */
 typedef struct {
   az_span_reader reader;
   az_http_response_kind kind;
-} az_http_response_state;
+} az_http_response_parser;
 
 /**
- * Creates an HTTP response parser.
+ * Initializes an HTTP response parser.
  */
-AZ_NODISCARD az_http_response_state az_http_response_state_create(az_span const buffer);
+AZ_NODISCARD az_result
+az_http_response_parser_init(az_span const buffer, az_http_response_parser * const out);
 
 /**
  * Returns a next HTTP response value.
  */
-AZ_NODISCARD az_result az_http_response_state_read(
-    az_http_response_state * const self,
+AZ_NODISCARD az_result az_http_response_parser_read(
+    az_http_response_parser * const self,
     az_http_response_value * const out);
 
 #include <_az_cfg_suffix.h>

@@ -1,18 +1,20 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_http_response_read.h>
+#include <az_http_response_parser.h>
 
 #include <az_http_result.h>
 #include <az_str.h>
 
 #include <_az_cfg.h>
 
-AZ_NODISCARD az_http_response_state az_http_response_state_create(az_span const buffer) {
-  return (az_http_response_state){
+AZ_NODISCARD az_result
+az_http_response_parser_init(az_span const buffer, az_http_response_parser * const out) {
+  *out = (az_http_response_parser){
     .reader = az_span_reader_create(buffer),
     .kind = AZ_HTTP_RESPONSE_STATUS_LINE,
   };
+  return AZ_OK;
 }
 
 AZ_NODISCARD AZ_INLINE bool az_is_reason_phrase_symbol(az_result_byte const c) {
@@ -20,7 +22,7 @@ AZ_NODISCARD AZ_INLINE bool az_is_reason_phrase_symbol(az_result_byte const c) {
 }
 
 AZ_NODISCARD AZ_INLINE az_result
-az_http_response_state_set_kind(az_http_response_state * const self) {
+az_http_response_parser_set_kind(az_http_response_parser * const self) {
   az_span_reader * const p_reader = &self->reader;
 
   // check if it's an empty line.
@@ -39,8 +41,8 @@ az_http_response_state_set_kind(az_http_response_state * const self) {
  * Status line https://tools.ietf.org/html/rfc7230#section-3.1.2
  * HTTP-version SP status-code SP reason-phrase CRLF
  */
-AZ_NODISCARD az_result az_http_response_state_read_status(
-    az_http_response_state * const self,
+AZ_NODISCARD az_result az_http_response_parser_read_status(
+    az_http_response_parser * const self,
     az_http_response_status_line * const out) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(out);
@@ -87,30 +89,108 @@ AZ_NODISCARD az_result az_http_response_state_read_status(
   AZ_RETURN_IF_FAILED(az_span_reader_expect_span(p_reader, AZ_STR(AZ_CRLF)));
 
   // set state.kind of the next HTTP response value.
-  AZ_RETURN_IF_FAILED(az_http_response_state_set_kind(self));
+  AZ_RETURN_IF_FAILED(az_http_response_parser_set_kind(self));
 
   return AZ_OK;
+}
+
+AZ_NODISCARD bool az_is_http_whitespace(az_result_byte const c) {
+  switch (c) {
+    case ' ':
+    case '\t':
+      return true;
+  }
+  return false;
 }
 
 /**
  * https://tools.ietf.org/html/rfc7230#section-3.2
  */
-AZ_NODISCARD az_result az_http_response_state_read_header(
-    az_http_response_state * const self,
+AZ_NODISCARD az_result az_http_response_parser_read_header(
+    az_http_response_parser * const self,
     az_http_response_header * const out) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
-  // az_span_reader * const p_reader = &self->reader;
+  az_span_reader * const p_reader = &self->reader;
+
+  // header-field   = field-name ":" OWS field-value OWS
+
+  // field-name     = token
+  {
+    size_t const field_name_begin = p_reader->i;
+
+    // https://tools.ietf.org/html/rfc7230#section-3.2.6
+    // token = 1*tchar
+    // tchar = "!" / "#" / "$" / "%" / "&" / "'" / "*" / "+" / "-" / "." / "^" /
+    //         "_" / "`" / "|" / "~" / DIGIT / ALPHA;
+    // any VCHAR,
+    //    except delimiters
+    while (true) {
+      az_result_byte const c = az_span_reader_current(p_reader);
+      az_span_reader_next(p_reader);
+      if (c == ':') {
+        break;
+      }
+      // c must be VCHAR.
+      if (c <= ' ') {
+        return az_error_unexpected_char(c);
+      }
+    }
+
+    // form a header name. In the current position, p_reader->i points on the next character after `:`
+    // so we subtract 1.
+    out->key = az_span_sub(p_reader->span, field_name_begin, p_reader->i - 1);
+  }
+
+  // OWS
+  while (true) {
+    az_result_byte const c = az_span_reader_current(p_reader);
+    if (!az_is_http_whitespace(c)) {
+      break;
+    }
+    az_span_reader_next(p_reader);
+  }
+
+  // field-value    = *( field-content / obs-fold )
+  // field-content  = field-vchar [ 1*( SP / HTAB ) field-vchar ]
+  // field-vchar    = VCHAR / obs-text
+  //
+  // obs-fold       = CRLF 1*( SP / HTAB )
+  //                ; obsolete line folding
+  //                ; see Section 3.2.4
+  //
+  // Note: obs-fold is not implemented.
+  {
+    size_t const field_value_begin = p_reader->i;
+    size_t field_value_end = field_value_begin;
+    while (true) {
+      az_result_byte const c = az_span_reader_current(p_reader);
+      az_span_reader_next(p_reader);
+      if (c == AZ_CR) {
+        break;
+      }
+      if (az_is_http_whitespace(c)) {
+        continue;
+      }
+      if (c <= ' ') {
+        return az_error_unexpected_char(c);
+      }
+      field_value_end = p_reader->i;
+    }
+    out->value = az_span_sub(p_reader->span, field_value_begin, field_value_end);
+  }
+
+  AZ_RETURN_IF_FAILED(az_span_reader_expect_char(p_reader, AZ_LF));
 
   // set state.kind of the next HTTP response value.
-  AZ_RETURN_IF_FAILED(az_http_response_state_set_kind(self));
+  AZ_RETURN_IF_FAILED(az_http_response_parser_set_kind(self));
 
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_http_response_state_read_body(
-    az_http_response_state * const self,
+AZ_NODISCARD az_result az_http_response_parser_read_body(
+    az_http_response_parser * const self,
     az_http_response_body * const out) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(out);
@@ -121,16 +201,16 @@ AZ_NODISCARD az_result az_http_response_state_read_body(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_http_response_state_read(
-    az_http_response_state * const self,
+AZ_NODISCARD az_result az_http_response_parser_read(
+    az_http_response_parser * const self,
     az_http_response_value * const out) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
   switch (self->kind) {
     case AZ_HTTP_RESPONSE_STATUS_LINE: {
-      az_http_response_status_line status_line = { 0 };
-      AZ_RETURN_IF_FAILED(az_http_response_state_read_status(self, &status_line));
+      az_http_response_status_line status_line;
+      AZ_RETURN_IF_FAILED(az_http_response_parser_read_status(self, &status_line));
       *out = (az_http_response_value){
         .kind = AZ_HTTP_RESPONSE_STATUS_LINE,
         .data.status_line = status_line,
@@ -138,8 +218,8 @@ AZ_NODISCARD az_result az_http_response_state_read(
       return AZ_OK;
     }
     case AZ_HTTP_RESPONSE_HEADER: {
-      az_http_response_header header = { 0 };
-      AZ_RETURN_IF_FAILED(az_http_response_state_read_header(self, &header));
+      az_http_response_header header;
+      AZ_RETURN_IF_FAILED(az_http_response_parser_read_header(self, &header));
       *out = (az_http_response_value){
         .kind = AZ_HTTP_RESPONSE_HEADER,
         .data.header = header,
@@ -147,8 +227,8 @@ AZ_NODISCARD az_result az_http_response_state_read(
       return AZ_OK;
     }
     case AZ_HTTP_RESPONSE_BODY: {
-      az_http_response_body body = { 0 };
-      AZ_RETURN_IF_FAILED(az_http_response_state_read_body(self, &body));
+      az_http_response_body body;
+      AZ_RETURN_IF_FAILED(az_http_response_parser_read_body(self, &body));
       *out = (az_http_response_value){
         .kind = AZ_HTTP_RESPONSE_BODY,
         .data.body = body,
