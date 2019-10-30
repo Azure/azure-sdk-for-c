@@ -121,7 +121,8 @@ size_t write_to_span(void * contents, size_t size, size_t nmemb, void * userp) {
   // handle error when response won't feat user buffer
   if (user_buffer->size < size_with_extra_space) {
     fprintf(stderr, "response size is greater than user buffer for writing response");
-    return AZ_ERROR_HTTP_FAILED_REQUEST;
+    // return number of bytes it took care
+    return 0;
   }
 
   // TODO: format buffer with AZ_RESPONSE_BUILDER
