@@ -10,43 +10,54 @@
 
 #include <_az_cfg_prefix.h>
 
-typedef enum {
-  AZ_HTTP_RESPONSE_VALUE_NONE = 0,
-  AZ_HTTP_RESPONSE_VALUE_STATUS = 1,
-  AZ_HTTP_RESPONSE_VALUE_HEADER = 2,
-  AZ_HTTP_RESPONSE_BODY = 3,
-} az_http_response_value_kind;
-
+/**
+ * An HTTP response status line
+ *
+ * See https://tools.ietf.org/html/rfc7230#section-3.1.2
+ */
 typedef struct {
   uint8_t major_version;
   uint8_t minor_version;
   uint16_t status_code;
   az_span reason_phrase;
-} az_http_response_status;
+} az_http_response_status_line;
 
+typedef az_pair az_http_response_header;
+
+typedef az_span az_http_response_body;
+
+typedef enum {
+  AZ_HTTP_RESPONSE_NONE = 0,
+  AZ_HTTP_RESPONSE_STATUS_LINE = 1,
+  AZ_HTTP_RESPONSE_HEADER = 2,
+  AZ_HTTP_RESPONSE_BODY = 3,
+} az_http_response_kind;
+
+/**
+ * An HTTP response value is either `status line`, `header`, or `body`.
+ */
 typedef struct {
-  az_http_response_value_kind kind;
+  az_http_response_kind kind;
   union {
-    az_http_response_status status;
-    az_pair header;
-    az_span body;
+    az_http_response_status_line status_line;
+    az_http_response_header header;
+    az_http_response_body body;
   } data;
 } az_http_response_value;
 
-typedef enum {
-  AZ_HTTP_RESPONSE_STATE_STATUS = 0,
-  AZ_HTTP_RESPONSE_STATE_HEADER = 1,
-  AZ_HTTP_RESPONSE_STATE_BODY = 2,
-  AZ_HTTP_RESPONSE_STATE_DONE = 3,
-} az_http_response_state_kind;
-
 typedef struct {
   az_span_reader reader;
-  az_http_response_state_kind kind;
+  az_http_response_kind kind;
 } az_http_response_state;
 
+/**
+ * Creates an HTTP response parser.
+ */
 AZ_NODISCARD az_http_response_state az_http_response_state_create(az_span const buffer);
 
+/**
+ * Returns a next HTTP response value.
+ */
 AZ_NODISCARD az_result az_http_response_state_read(
     az_http_response_state * const self,
     az_http_response_value * const out);
