@@ -182,8 +182,8 @@ AZ_NODISCARD AZ_INLINE az_result az_http_request_builder_add_body(
  *
  */
 AZ_NODISCARD AZ_INLINE bool az_http_request_builder_has_headers(
-    az_http_request_builder const p_hrb) {
-  return p_hrb.headers_end > 0;
+    az_http_request_builder const * const p_hrb) {
+  return p_hrb->headers_end > 0;
 }
 
 #include <_az_cfg_suffix.h>
