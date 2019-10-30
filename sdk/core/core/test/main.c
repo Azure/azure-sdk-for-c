@@ -24,7 +24,6 @@ int exit_code = 0;
     if (c) { \
       printf("  - `%s`: succeeded\n", #c); \
     } else { \
-      fprintf(stderr, "  - `%s`: failed\n", #c); \
       assert(false); \
       exit_code = 1; \
     } \

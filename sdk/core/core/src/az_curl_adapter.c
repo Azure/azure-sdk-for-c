@@ -46,7 +46,7 @@ az_result az_add_header_to_curl_list(
   AZ_CONTRACT_ARG_NOT_NULL(p_list);
 
   // allocate a buffet for header
-  int16_t const buffer_size = p_header.key.size + separator.size + p_header.value.size + 1;
+  size_t const buffer_size = p_header.key.size + separator.size + p_header.value.size + 1;
   uint8_t * const p_writable_buffer = (uint8_t *)malloc(buffer_size);
   if (p_writable_buffer == NULL) {
     return AZ_ERROR_OUT_OF_MEMORY;
@@ -120,7 +120,6 @@ size_t write_to_span(void * contents, size_t size, size_t nmemb, void * userp) {
 
   // handle error when response won't feat user buffer
   if (user_buffer->size < size_with_extra_space) {
-    fprintf(stderr, "response size is greater than user buffer for writing response");
     // return number of bytes it took care
     return 0;
   }
@@ -243,8 +242,8 @@ az_result az_http_client_send_request_impl(
     az_http_request_builder * const p_hrb,
     az_span const * const response) {
   az_curl p_curl;
+  az_result result = 0;
   AZ_RETURN_IF_FAILED(az_curl_init(&p_curl));
-  az_result result;
 
   AZ_RETURN_IF_CURL_FAILED(setup_headers(&p_curl, p_hrb));
 

@@ -22,7 +22,7 @@ static az_const_span API_VERSION_QUERY_NAME = AZ_CONST_STR("api-version");
 static az_const_span API_VERSION_QUERY_VALUE = AZ_CONST_STR("7.0");
 
 static az_const_span token_request_body
-    = AZ_STR("grant_type=client_credentials&client_id=4317a660-6bfb-4585-9ce9-8f222314879c&"
+    = AZ_CONST_STR("grant_type=client_credentials&client_id=4317a660-6bfb-4585-9ce9-8f222314879c&"
              "client_secret=O2CT[Y:dkTqblml5V/T]ZEi9x1W1zoBW&resource=https://vault.azure.net");
 
 int main() {
@@ -77,10 +77,11 @@ int main() {
 
   /****** -------------  Create buffer for header auth ---------******/
   // can't print token right now since it is not 0-terminated
-  uint8_t buffer[sizeof("Bearer ") + token.size + 1];
+  size_t const buffer_for_header_size = sizeof("Bearer ") + token.size + 1;
+  uint8_t const * buffer_for_header = (uint8_t *)malloc(buffer_for_header_size);
 
   /****** -------------  use Span builder to concatenate ---------******/
-  az_span const temp_buf = AZ_SPAN(buffer);
+  az_span temp_buf = (az_span){ .begin = buffer_for_header, .size = buffer_for_header_size };
   az_span_builder builder = az_span_builder_create(temp_buf);
   ignore_result = az_span_builder_append(&builder, AZ_STR("Bearer "));
   ignore_result = az_span_builder_append(&builder, token);
@@ -103,6 +104,8 @@ int main() {
     printf("Error during running test\n");
     return get_response;
   }
+
+  free(buffer_for_header);
 
   return 0;
 }

@@ -21,7 +21,6 @@
   do { \
     CURLcode const _result = (exp); \
     if (_result != CURLE_OK) { \
-      fprintf(stderr, "curl error: %s\n", curl_easy_strerror(_result)); \
       return AZ_ERROR_HTTP_FAILED_REQUEST; \
     } \
   } while (0)
