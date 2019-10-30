@@ -10,10 +10,11 @@ jobs:
         vm.image: 'windows-2019'
         vcpkg.deps: 'curl[winssl]'
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
-      MacOS:
-        vm.image: 'macOS-10.14'
-        vcpkg.deps: 'curl[ssl]'
-        VCPKG_DEFAULT_TRIPLET: 'x64-osx'
+#      MacOS:
+#        vm.image: 'macOS-10.14'
+#        vcpkg.deps: 'curl[ssl]'
+#        VCPKG_DEFAULT_TRIPLET: 'x64-osx'
+# vcpkg is not currently working on mac. Disabling for now
   pool:
     vmImage: $(vm.image)
   steps:
