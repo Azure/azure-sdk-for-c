@@ -27,6 +27,7 @@ typedef struct {
   int16_t size;
 } az_http_request_url_info;
 
+#include <stdbool.h>
 #include <stdint.h>
 
 #include <_az_cfg_prefix.h>
@@ -175,6 +176,15 @@ AZ_NODISCARD AZ_INLINE az_result az_http_request_builder_add_body(
   AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
   p_hrb->body = *body;
   return AZ_OK;
+}
+
+/**
+ * @brief utility function for checking if there is at least one header in the request
+ *
+ */
+AZ_NODISCARD AZ_INLINE bool az_http_request_builder_has_headers(
+    az_http_request_builder const * const p_hrb) {
+  return p_hrb->headers_end > 0;
 }
 
 #include <_az_cfg_suffix.h>

@@ -181,6 +181,12 @@ az_result az_curl_send_request(
  * @return az_result
  */
 az_result setup_headers(az_curl const * const p_curl, az_http_request_builder const * const p_hrb) {
+
+  if (!az_http_request_builder_has_headers(p_hrb)) {
+    // no headers, no need to set it up
+    return AZ_OK;
+  }
+
   // creates a slist for bulding curl headers
   struct curl_slist * p_list = NULL;
   // build headers into a slist as curl is expecting
@@ -240,6 +246,13 @@ az_result az_curl_post_request(
   return AZ_OK;
 }
 
+/**
+ * @brief uses AZ_HTTP_BUILDER to set up CURL request and perform it
+ *
+ * @param p_hrb
+ * @param response
+ * @return az_result
+ */
 az_result az_http_client_send_request_impl(
     az_http_request_builder * const p_hrb,
     az_span const * const response) {
