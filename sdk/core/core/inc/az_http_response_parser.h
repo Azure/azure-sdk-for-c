@@ -49,26 +49,26 @@ typedef struct {
  * Initializes an HTTP response parser.
  */
 AZ_NODISCARD az_result
-az_http_response_parser_init(az_span const buffer, az_http_response_parser * const out);
+az_http_response_parser_init(az_http_response_parser * const out, az_span const buffer);
 
 /**
  * An HTTP status line.
  */
-AZ_NODISCARD az_result az_http_response_parser_read_status_line(
+AZ_NODISCARD az_result az_http_response_parser_get_status_line(
     az_http_response_parser * const self,
     az_http_response_status_line * const out);
 
 /**
  * An HTTP header.
  */
-AZ_NODISCARD az_result az_http_response_parser_read_header(
+AZ_NODISCARD az_result az_http_response_parser_get_header(
     az_http_response_parser * const self,
     az_http_response_header * const out);
 
 /**
  * An HTTP body.
  */
-AZ_NODISCARD az_result az_http_response_parser_read_body(
+AZ_NODISCARD az_result az_http_response_parser_get_body(
     az_http_response_parser * const self,
     az_http_response_body * const out);
 

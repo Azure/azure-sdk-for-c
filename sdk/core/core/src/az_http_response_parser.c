@@ -9,7 +9,7 @@
 #include <_az_cfg.h>
 
 AZ_NODISCARD az_result
-az_http_response_parser_init(az_span const buffer, az_http_response_parser * const out) {
+az_http_response_parser_init(az_http_response_parser * const out, az_span const buffer) {
   *out = (az_http_response_parser){
     .reader = az_span_reader_create(buffer),
     .kind = AZ_HTTP_RESPONSE_STATUS_LINE,
@@ -41,13 +41,13 @@ az_http_response_parser_set_kind(az_http_response_parser * const self) {
  * Status line https://tools.ietf.org/html/rfc7230#section-3.1.2
  * HTTP-version SP status-code SP reason-phrase CRLF
  */
-AZ_NODISCARD az_result az_http_response_parser_read_status_line(
+AZ_NODISCARD az_result az_http_response_parser_get_status_line(
     az_http_response_parser * const self,
     az_http_response_status_line * const out) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
-  if (self->kind != AZ_HTTP_RESPONSE_HEADER) {
+  if (self->kind != AZ_HTTP_RESPONSE_STATUS_LINE) {
     return AZ_HTTP_ERROR_INVALID_STATE;
   }
 
@@ -110,7 +110,7 @@ AZ_NODISCARD bool az_is_http_whitespace(az_result_byte const c) {
 /**
  * https://tools.ietf.org/html/rfc7230#section-3.2
  */
-AZ_NODISCARD az_result az_http_response_parser_read_header(
+AZ_NODISCARD az_result az_http_response_parser_get_header(
     az_http_response_parser * const self,
     az_http_response_header * const out) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
@@ -203,7 +203,7 @@ AZ_NODISCARD az_result az_http_response_parser_read_header(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_http_response_parser_read_body(
+AZ_NODISCARD az_result az_http_response_parser_get_body(
     az_http_response_parser * const self,
     az_http_response_body * const out) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
