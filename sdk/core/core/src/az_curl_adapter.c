@@ -21,12 +21,12 @@ az_const_span const AZ_HTTP_REQUEST_BUILDER_HEADER_SEPARATOR = AZ_CONST_STR(": "
  */
 AZ_NODISCARD az_result az_write_to_buffer(
     az_span const writable_buffer,
-    az_pair const p_header,
+    az_pair const header,
     az_const_span const separator) {
   az_span_builder writer = az_span_builder_create(writable_buffer);
-  AZ_RETURN_IF_FAILED(az_span_builder_append(&writer, p_header.key));
+  AZ_RETURN_IF_FAILED(az_span_builder_append(&writer, header.key));
   AZ_RETURN_IF_FAILED(az_span_builder_append(&writer, separator));
-  AZ_RETURN_IF_FAILED(az_span_builder_append(&writer, p_header.value));
+  AZ_RETURN_IF_FAILED(az_span_builder_append(&writer, header.value));
   AZ_RETURN_IF_FAILED(az_span_builder_append(&writer, AZ_STR_ZERO));
   return AZ_OK;
 }
@@ -77,6 +77,7 @@ AZ_NODISCARD az_result az_add_header_to_curl_list(
  */
 AZ_NODISCARD az_result
 az_build_headers(az_http_request_builder const * const p_hrb, struct curl_slist ** p_headers) {
+  AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
 
   az_pair header;
   for (uint16_t offset = 0; offset < p_hrb->headers_end; ++offset) {
@@ -138,7 +139,9 @@ size_t write_to_span(void * contents, size_t size, size_t nmemb, void * userp) {
 /**
  * handles GET request
  */
-AZ_NODISCARD az_result az_curl_send_request(az_curl * const p_curl) {
+AZ_NODISCARD az_result az_curl_send_get_request(az_curl * const p_curl) {
+  AZ_CONTRACT_ARG_NOT_NULL(p_curl);
+
   // send
   AZ_RETURN_IF_CURL_FAILED(curl_easy_perform(p_curl->p_curl));
 
@@ -149,7 +152,10 @@ AZ_NODISCARD az_result az_curl_send_request(az_curl * const p_curl) {
  * handles POST request. It handles seting up a body for request
  */
 AZ_NODISCARD az_result
-az_curl_post_request(az_curl * const p_curl, az_http_request_builder const * const p_hrb) {
+az_curl_send_post_request(az_curl * const p_curl, az_http_request_builder const * const p_hrb) {
+  AZ_CONTRACT_ARG_NOT_NULL(p_curl);
+  AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
+
   // Method
   AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl->p_curl, CURLOPT_POSTFIELDS, p_hrb->body.begin));
 
@@ -192,6 +198,9 @@ setup_headers(az_curl const * const p_curl, az_http_request_builder const * cons
  */
 AZ_NODISCARD az_result
 setup_url(az_curl const * const p_curl, az_http_request_builder const * const p_hrb) {
+  AZ_CONTRACT_ARG_NOT_NULL(p_curl);
+  AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
+
   // set URL as 0-terminated str
   size_t const extra_space_for_zero = AZ_STR_ZERO.size;
   size_t const url_final_size = p_hrb->url.size + extra_space_for_zero;
@@ -212,7 +221,7 @@ setup_url(az_curl const * const p_curl, az_http_request_builder const * const p_
   // handle writing to buffer error
   AZ_RETURN_IF_FAILED(result);
   // handle setting curl url
-  AZ_RETURN_IF_FAILED(set_headers_result);
+  AZ_RETURN_IF_CURL_FAILED(set_headers_result);
 
   return AZ_OK;
 }
@@ -226,6 +235,9 @@ setup_url(az_curl const * const p_curl, az_http_request_builder const * const p_
  */
 AZ_NODISCARD az_result
 setup_response_redirect(az_curl const * const p_curl, az_span const * const response) {
+  AZ_CONTRACT_ARG_NOT_NULL(p_curl);
+  AZ_CONTRACT_ARG_NOT_NULL(response);
+
   // check if response will be redirected to user span
   if (response != NULL) {
     AZ_RETURN_IF_CURL_FAILED(
@@ -246,6 +258,9 @@ setup_response_redirect(az_curl const * const p_curl, az_span const * const resp
 AZ_NODISCARD az_result az_http_client_send_request_impl(
     az_http_request_builder * const p_hrb,
     az_span const * const response) {
+  AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
+  AZ_CONTRACT_ARG_NOT_NULL(response);
+
   az_curl p_curl;
   az_result result = AZ_ERROR_ARG;
   AZ_RETURN_IF_FAILED(az_curl_init(&p_curl));
@@ -257,9 +272,9 @@ AZ_NODISCARD az_result az_http_client_send_request_impl(
   AZ_RETURN_IF_CURL_FAILED(setup_response_redirect(&p_curl, response));
 
   if (az_const_span_eq(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_GET)) {
-    result = az_curl_send_request(&p_curl);
+    result = az_curl_send_get_request(&p_curl);
   } else if (az_const_span_eq(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_POST)) {
-    result = az_curl_post_request(&p_curl, p_hrb);
+    result = az_curl_send_post_request(&p_curl, p_hrb);
   }
 
   AZ_RETURN_IF_FAILED(az_curl_done(&p_curl));
