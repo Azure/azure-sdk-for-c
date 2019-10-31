@@ -6,13 +6,24 @@
 
 #include <az_callback.h>
 #include <az_http_request.h>
-#include <az_span_seq.h>
+#include <az_http_request_builder.h>
 #include <az_span_builder.h>
+#include <az_span_seq.h>
+#include <az_str.h>
 
 #include <curl/curl.h>
 #include <stdlib.h>
 
 #include <_az_cfg_prefix.h>
+
+// returning AZ error on CURL Error
+#define AZ_RETURN_IF_CURL_FAILED(exp) \
+  do { \
+    CURLcode const _result = (exp); \
+    if (_result != CURLE_OK) { \
+      return AZ_ERROR_HTTP_FAILED_REQUEST; \
+    } \
+  } while (0)
 
 typedef struct {
   CURL * p_curl;
@@ -34,6 +45,10 @@ AZ_NODISCARD AZ_INLINE az_result az_curl_done(az_curl * const p) {
   p->p_curl = NULL;
   return AZ_OK;
 }
+
+AZ_NODISCARD az_result az_http_client_send_request_impl(
+    az_http_request_builder * const p_hrb,
+    az_span const * const response);
 
 #include <_az_cfg_suffix.h>
 
