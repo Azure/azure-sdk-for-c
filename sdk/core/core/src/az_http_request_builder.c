@@ -35,7 +35,7 @@ AZ_INLINE uint16_t get_headers_max(az_span const buffer, az_pair * const headers
   // If there's enough space in the buffer, return the max number of elements it can fit (capped to
   // uint16_t's max)
   return buffer_end > headers_start_uint8ptr
-      ? (max_headers > (size_t)~(uint16_t)0 ? ~(uint16_t)0 : (uint16_t)max_headers)
+      ? (max_headers > (size_t) ~(uint16_t)0 ? ~(uint16_t)0 : (uint16_t)max_headers)
       : 0;
 }
 
@@ -190,7 +190,7 @@ az_http_request_builder_remove_retry_headers(az_http_request_builder * const p_h
 }
 
 AZ_NODISCARD az_result az_http_request_builder_get_header(
-    az_http_request_builder * const p_hrb,
+    az_http_request_builder const * const p_hrb,
     uint16_t const index,
     az_pair * const out_result) {
   AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
