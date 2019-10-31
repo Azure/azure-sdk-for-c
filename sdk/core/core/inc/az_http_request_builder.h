@@ -8,11 +8,28 @@
 #ifndef AZ_HTTP_REQUEST_BUILDER_H
 #define AZ_HTTP_REQUEST_BUILDER_H
 
+#include <az_contract.h>
 #include <az_mut_span.h>
 #include <az_pair.h>
 #include <az_result.h>
 #include <az_span.h>
+#include <az_span_builder.h>
+#include <az_str.h>
 
+typedef struct {
+  int16_t capacity;
+  az_pair * headers_start;
+  int16_t size;
+  az_pair * retry_headers_start;
+  int16_t headers_end;
+} az_http_request_headers_info;
+
+typedef struct {
+  int16_t capacity;
+  int16_t size;
+} az_http_request_url_info;
+
+#include <stdbool.h>
 #include <stdint.h>
 
 #include <_az_cfg_prefix.h>
@@ -25,6 +42,7 @@ typedef struct {
   uint16_t max_headers;
   uint16_t retry_headers_start;
   uint16_t headers_end;
+  az_span body;
 } az_http_request_builder;
 
 extern az_span const AZ_HTTP_METHOD_VERB_GET;
@@ -143,9 +161,32 @@ az_http_request_builder_remove_retry_headers(az_http_request_builder * const p_h
  *     - `index` is out of range.
  */
 AZ_NODISCARD az_result az_http_request_builder_get_header(
-    az_http_request_builder * const p_hrb,
+    az_http_request_builder const * const p_hrb,
     uint16_t const index,
     az_pair * const out_result);
+
+/**
+ * @brief Adds a body reference for request builder.
+ *
+ * Returns AZ_ERROR_ARG if builder reference is NULL
+ *
+ */
+AZ_NODISCARD AZ_INLINE az_result az_http_request_builder_add_body(
+    az_http_request_builder * const p_hrb,
+    az_span const body) {
+  AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
+  p_hrb->body = body;
+  return AZ_OK;
+}
+
+/**
+ * @brief utility function for checking if there is at least one header in the request
+ *
+ */
+AZ_NODISCARD AZ_INLINE bool az_http_request_builder_has_headers(
+    az_http_request_builder const * const p_hrb) {
+  return p_hrb->headers_end > 0;
+}
 
 #include <_az_cfg_suffix.h>
 
