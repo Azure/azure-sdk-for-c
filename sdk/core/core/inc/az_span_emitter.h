@@ -14,7 +14,10 @@ AZ_ACTION_TYPE(az_span_emitter, az_span_action)
 /**
  * A span of spans of bytes.
  */
-AZ_SPAN_TYPE(az_span_span, az_span const)
+typedef struct {
+  az_span const * begin;
+  size_t size;
+} az_span_span;
 
 /**
  * Emits all spans from @self into @action.

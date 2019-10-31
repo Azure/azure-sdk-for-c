@@ -15,7 +15,7 @@ static void test_http_response_parser() {
         "But there is somebody. :-)");
     az_http_response_parser parser;
     {
-      az_result const result = az_http_response_parser_init(response, &parser);
+      az_result const result = az_http_response_parser_init(&parser, response);
       TEST_ASSERT(result == AZ_OK);
     }
     // read a status line
@@ -49,7 +49,7 @@ static void test_http_response_parser() {
         "\r\n");
     az_http_response_parser parser;
     {
-      az_result const result = az_http_response_parser_init(response, &parser);
+      az_result const result = az_http_response_parser_init(&parser, response);
       TEST_ASSERT(result == AZ_OK);
     }
     // read a status line

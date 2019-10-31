@@ -9,7 +9,7 @@
 #include <_az_cfg.h>
 
 AZ_NODISCARD az_result
-az_http_response_parser_init(az_span const buffer, az_http_response_parser * const out) {
+az_http_response_parser_init(az_http_response_parser * const out, az_span const buffer) {
   *out = (az_http_response_parser){
     .reader = az_span_reader_create(buffer),
     .kind = AZ_HTTP_RESPONSE_STATUS_LINE,
