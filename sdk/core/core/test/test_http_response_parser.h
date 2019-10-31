@@ -32,7 +32,7 @@ static void test_http_response_parser() {
     // try to read a header
     {
       az_pair header = { 0 };
-      az_result const result = az_http_response_parser_get_header(&parser, &header);
+      az_result const result = az_http_response_parser_get_next_header(&parser, &header);
       TEST_ASSERT(result == AZ_HTTP_ERROR_NO_MORE_HEADERS);
     } 
     // read a body
@@ -68,7 +68,7 @@ static void test_http_response_parser() {
     // read a header1
     {
       az_pair header = { 0 };
-      az_result const result = az_http_response_parser_get_header(&parser, &header);
+      az_result const result = az_http_response_parser_get_next_header(&parser, &header);
       TEST_ASSERT(result == AZ_OK);
       TEST_ASSERT(az_span_eq(header.key, AZ_STR("header1")));
       TEST_ASSERT(az_span_eq(header.value, AZ_STR("some value")));
@@ -76,7 +76,7 @@ static void test_http_response_parser() {
     // read a Header2
     {
       az_pair header = { 0 };
-      az_result const result = az_http_response_parser_get_header(&parser, &header);
+      az_result const result = az_http_response_parser_get_next_header(&parser, &header);
       TEST_ASSERT(result == AZ_OK);
       TEST_ASSERT(az_span_eq(header.key, AZ_STR("Header2")));
       TEST_ASSERT(az_span_eq(header.value, AZ_STR("something")));
@@ -84,7 +84,7 @@ static void test_http_response_parser() {
     // try to read a header
     {
       az_pair header = { 0 };
-      az_result const result = az_http_response_parser_get_header(&parser, &header);
+      az_result const result = az_http_response_parser_get_next_header(&parser, &header);
       TEST_ASSERT(result == AZ_HTTP_ERROR_NO_MORE_HEADERS);
     }
     // read a body

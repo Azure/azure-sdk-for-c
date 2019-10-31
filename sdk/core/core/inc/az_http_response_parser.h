@@ -58,7 +58,7 @@ AZ_NODISCARD az_result az_http_response_parser_get_status_line(
  * An HTTP header.
  */
 AZ_NODISCARD az_result
-az_http_response_parser_get_header(az_http_response_parser * const self, az_pair * const out);
+az_http_response_parser_get_next_header(az_http_response_parser * const self, az_pair * const out);
 
 /**
  * An HTTP body.

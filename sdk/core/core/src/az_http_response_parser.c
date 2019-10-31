@@ -103,15 +103,16 @@ AZ_NODISCARD bool az_is_http_whitespace(az_result_byte const c) {
     case ' ':
     case '\t':
       return true;
+    default:
+      return false;
   }
-  return false;
 }
 
 /**
  * https://tools.ietf.org/html/rfc7230#section-3.2
  */
 AZ_NODISCARD az_result
-az_http_response_parser_get_header(az_http_response_parser * const self, az_pair * const out) {
+az_http_response_parser_get_next_header(az_http_response_parser * const self, az_pair * const out) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
