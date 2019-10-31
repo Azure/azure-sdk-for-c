@@ -5,4 +5,4 @@
 
 #include <_az_cfg.h>
 
-az_const_span const AZ_STR_ZERO = AZ_CONST_STR("\0");
+az_span const AZ_STR_ZERO = AZ_CONST_STR("\0");

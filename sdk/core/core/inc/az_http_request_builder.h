@@ -42,7 +42,7 @@ typedef struct {
   uint16_t max_headers;
   uint16_t retry_headers_start;
   uint16_t headers_end;
-  az_const_span body;
+  az_span body;
 } az_http_request_builder;
 
 extern az_span const AZ_HTTP_METHOD_VERB_GET;
@@ -173,7 +173,7 @@ AZ_NODISCARD az_result az_http_request_builder_get_header(
  */
 AZ_NODISCARD AZ_INLINE az_result az_http_request_builder_add_body(
     az_http_request_builder * const p_hrb,
-    az_const_span const body) {
+    az_span const body) {
   AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
   p_hrb->body = body;
   return AZ_OK;
