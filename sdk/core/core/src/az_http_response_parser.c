@@ -117,7 +117,7 @@ az_http_response_parser_get_next_header(az_http_response_parser * const self, az
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
   {
-    az_result const kind = self->kind;
+    az_http_response_kind const kind = self->kind;
     if (kind == AZ_HTTP_RESPONSE_BODY) {
       return AZ_HTTP_ERROR_NO_MORE_HEADERS;
     }
