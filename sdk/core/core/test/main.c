@@ -22,7 +22,17 @@
 
 int exit_code = 0;
 
-az_result write(az_mut_span const output, size_t * const o, az_span const s) {
+#define TEST_ASSERT(c) \
+  do { \
+    if (c) { \
+      printf("  - `%s`: succeeded\n", #c); \
+    } else { \
+      assert(false); \
+      exit_code = 1; \
+    } \
+  } while (false);
+
+az_result write(az_span const output, size_t * const o, az_const_span const s) {
   for (size_t i = 0; i != s.size; ++i, ++*o) {
     if (*o == output.size) {
       return 1;

@@ -28,6 +28,9 @@ add_library (
   src/az_span_builder.c
   src/az_span_emitter.c
   src/az_span_reader.c
+  src/az_span.c
+  src/az_span_seq.c
+  src/az_str.c
   src/az_uri.c
   src/az_url.c
   )

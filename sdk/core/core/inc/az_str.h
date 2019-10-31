@@ -42,6 +42,8 @@ AZ_ACTION_TYPE(az_str_action, char const *)
 
 #define AZ_CRLF "\r\n"
 
+extern az_const_span const AZ_STR_ZERO;
+
 #include <_az_cfg_suffix.h>
 
 #endif

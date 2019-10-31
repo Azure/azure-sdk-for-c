@@ -10,10 +10,11 @@ jobs:
         vm.image: 'windows-2019'
         vcpkg.deps: 'curl[winssl]'
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
-      MacOS:
-        vm.image: 'macOS-10.14'
-        vcpkg.deps: 'curl[ssl]'
-        VCPKG_DEFAULT_TRIPLET: 'x64-osx'
+# disabling MAC until pipeline gest fixed for it : https://github.com/Azure/azure-sdk-for-c/issues/127
+#      MacOS:
+#        vm.image: 'macOS-10.14'
+#        vcpkg.deps: 'curl[ssl]'
+#        VCPKG_DEFAULT_TRIPLET: 'x64-osx'
   pool:
     vmImage: $(vm.image)
   steps:
