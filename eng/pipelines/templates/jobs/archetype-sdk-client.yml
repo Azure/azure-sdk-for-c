@@ -20,8 +20,8 @@ jobs:
   - checkout: self
     submodules: recursive
   - script: |
+      sudo xcode-select --switch /Applications/Xcode_9.4.1.app
       brew install gcc6
-      sudo installer -pkg /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg -target /
       git clone https://github.com/Microsoft/vcpkg.git
       cd vcpkg
       ./bootstrap-vcpkg.sh
