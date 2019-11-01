@@ -21,9 +21,9 @@ static az_const_span KEY_VAULT_URL
 static az_const_span API_VERSION_QUERY_NAME = AZ_CONST_STR("api-version");
 static az_const_span API_VERSION_QUERY_VALUE = AZ_CONST_STR("7.0");
 
-static az_const_span token_request_body
-    = AZ_CONST_STR("grant_type=client_credentials&client_id=4317a660-6bfb-4585-9ce9-8f222314879c&"
-             "client_secret=O2CT[Y:dkTqblml5V/T]ZEi9x1W1zoBW&resource=https://vault.azure.net");
+static az_const_span token_request_body = AZ_CONST_STR(
+    "grant_type=client_credentials&client_id=4317a660-6bfb-4585-9ce9-8f222314879c&"
+    "client_secret=O2CT[Y:dkTqblml5V/T]ZEi9x1W1zoBW&resource=https://vault.azure.net");
 
 int main() {
   // create a buffer for request
@@ -86,7 +86,7 @@ int main() {
   ignore_result = az_span_builder_append(&builder, AZ_STR("Bearer "));
   ignore_result = az_span_builder_append(&builder, token);
   ignore_result = az_span_builder_append(
-      &builder, AZ_STR("\0")); // add a 0 so it can be printed and used by Curl
+      &builder, AZ_STR_ZERO); // add a 0 so it can be printed and used by Curl
 
   // add auth Header with parsed token
   az_result const add_header_result = az_http_request_builder_append_header(

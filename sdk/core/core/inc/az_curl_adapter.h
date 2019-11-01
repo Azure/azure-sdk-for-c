@@ -46,7 +46,7 @@ AZ_NODISCARD AZ_INLINE az_result az_curl_done(az_curl * const p) {
   return AZ_OK;
 }
 
-az_result az_http_client_send_request_impl(
+AZ_NODISCARD az_result az_http_client_send_request_impl(
     az_http_request_builder * const p_hrb,
     az_span const * const response);
 
