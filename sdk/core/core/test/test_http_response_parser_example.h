@@ -9,8 +9,9 @@
   "}\n"
 
 static az_result http_response_parser_example(az_span const response) {
-  az_http_response_parser parser;
 
+  // create a parser.
+  az_http_response_parser parser;
   AZ_RETURN_IF_FAILED(az_http_response_parser_init(&parser, response));
 
   // make sure it's a known protocol "1.1" and a status code is Ok (200).
@@ -62,7 +63,6 @@ static az_result http_response_parser_example(az_span const response) {
 }
 
 static az_result http_response_getters_example(az_span const response) {
-  az_http_response_parser parser;
 
   // make sure it's a known protocol "1.1" and a status code is Ok (200).
   {

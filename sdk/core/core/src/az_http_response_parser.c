@@ -8,7 +8,7 @@
 
 #include <_az_cfg.h>
 
-///////////////////////////////////////////////////////////////////////////////////////////
+// HTTP Response utility functions
 
 AZ_NODISCARD AZ_INLINE bool az_is_reason_phrase_symbol(az_result_byte const c) {
   return c == '\t' || c >= ' ';
@@ -23,6 +23,8 @@ AZ_NODISCARD bool az_is_http_whitespace(az_result_byte const c) {
       return false;
   }
 }
+
+// Reading HTTP Response parts from @az_span_reader.
 
 /**
  * Status line https://tools.ietf.org/html/rfc7230#section-3.1.2
@@ -120,10 +122,6 @@ az_http_response_parser_set_kind(az_http_response_parser * const self) {
   return AZ_OK;
 }
 
-/**
- * Status line https://tools.ietf.org/html/rfc7230#section-3.1.2
- * HTTP-version SP status-code SP reason-phrase CRLF
- */
 AZ_NODISCARD az_result az_http_response_parser_get_status_line(
     az_http_response_parser * const self,
     az_http_response_status_line * const out) {
@@ -149,9 +147,6 @@ AZ_NODISCARD az_result az_http_response_parser_get_status_line(
   return AZ_OK;
 }
 
-/**
- * https://tools.ietf.org/html/rfc7230#section-3.2
- */
 AZ_NODISCARD az_result
 az_http_response_parser_get_next_header(az_http_response_parser * const self, az_pair * const out) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
@@ -168,6 +163,8 @@ az_http_response_parser_get_next_header(az_http_response_parser * const self, az
   }
 
   az_span_reader * const p_reader = &self->reader;
+
+  // https://tools.ietf.org/html/rfc7230#section-3.2
 
   // header-field   = field-name ":" OWS field-value OWS
 
