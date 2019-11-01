@@ -13,9 +13,7 @@
 
 #include <_az_cfg.h>
 
-AZ_NODISCARD az_result 
-
-// Note: Options can be passed as NULL
+// Note: Options can be NULL
 //   results in default options being used
 AZ_NODISCARD az_result az_keyvault_keys_client_init(az_keyvault_keys_client * client, az_span uri, /*Azure Credentials */, az_keyvault_keys_client_options * options)
 
