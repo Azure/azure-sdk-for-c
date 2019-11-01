@@ -73,7 +73,7 @@ static az_result http_response_getters_example(az_span const response) {
     AZ_RETURN_IF_FAILED(status_line.status_code == AZ_HTTP_STATUS_CODE_OK);
   }
 
-  // last header is used for reading body and must be properly initialized (set zero).
+  // Last header is used for reading body and must be properly initialized (set to zeros).
   az_pair header = { { 0 } };
 
   // reading headers
