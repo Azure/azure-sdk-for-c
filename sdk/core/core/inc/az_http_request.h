@@ -6,32 +6,24 @@
 
 #include <az_pair.h>
 #include <az_span.h>
-#include <az_span_seq.h>
+#include <az_span_emitter.h>
 #include <az_str.h>
 
 #include <_az_cfg_prefix.h>
 
 typedef struct {
-  az_const_span method;
-  az_const_span path;
-  az_pair_seq query;
-  az_pair_seq headers;
-  az_const_span body;
+  az_span method;
+  az_span path;
+  az_pair_emitter query;
+  az_pair_emitter headers;
+  az_span body;
 } az_http_request;
 
-AZ_NODISCARD az_result az_http_request_to_spans(
-    az_http_request const * const p_request,
-    az_span_visitor const span_visitor);
-
+/**
+ * Creates a raw HTTP request.
+ */
 AZ_NODISCARD az_result
-az_http_url_to_spans(az_http_request const * const p_request, az_span_visitor const span_visitor);
-
-AZ_NODISCARD az_result az_http_get_url_size(az_http_request const * const p_request, size_t * out);
-
-AZ_NODISCARD az_result
-az_http_url_to_new_str(az_http_request const * const p_request, char ** const out);
-
-AZ_CALLBACK_FUNC(az_build_header, az_pair const *, az_span_seq)
+az_http_request_emit_span_seq(az_http_request const * const self, az_span_action const action);
 
 #include <_az_cfg_suffix.h>
 

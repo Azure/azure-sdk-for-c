@@ -107,22 +107,21 @@ AZ_INLINE uint8_t base64_as_uint6(uint8_t const base64) {
 
 AZ_NODISCARD az_result az_base64_encode(
     bool const base64url,
-    az_span const buffer,
-    az_const_span const input,
-    az_const_span * const out_result) {
+    az_mut_span const buffer,
+    az_span const input,
+    az_span * const out_result) {
   AZ_CONTRACT_ARG_NOT_NULL(out_result);
-  if (!az_span_is_valid(buffer) || !az_const_span_is_valid(input)) {
-    return AZ_ERROR_ARG;
-  }
+  AZ_CONTRACT_ARG_VALID_MUT_SPAN(buffer);
+  AZ_CONTRACT_ARG_VALID_SPAN(input);
 
   size_t const result_size = (TRIBYTE_SEXTETS * (input.size / TRIBYTE_OCTETS))
       + ((input.size % TRIBYTE_OCTETS == 0)
              ? 0
              : (base64url ? 1 + (input.size % TRIBYTE_OCTETS) : TRIBYTE_SEXTETS));
 
-  az_const_span const result = (az_const_span){ .begin = buffer.begin, .size = result_size };
+  az_span const result = (az_span){ .begin = buffer.begin, .size = result_size };
 
-  if (az_const_span_is_overlap(input, result)) {
+  if (az_span_is_overlap(input, result)) {
     return AZ_ERROR_ARG;
   }
 
@@ -187,14 +186,12 @@ AZ_NODISCARD az_result az_base64_encode(
 }
 
 AZ_NODISCARD az_result az_base64_decode(
-    az_span const buffer,
-    az_const_span const input,
-    az_const_span * const out_result) {
+    az_mut_span const buffer,
+    az_span const input,
+    az_span * const out_result) {
   AZ_CONTRACT_ARG_NOT_NULL(out_result);
-
-  if (!az_span_is_valid(buffer) || !az_const_span_is_valid(input)) {
-    return AZ_ERROR_ARG;
-  }
+  AZ_CONTRACT_ARG_VALID_MUT_SPAN(buffer);
+  AZ_CONTRACT_ARG_VALID_SPAN(input);
 
   size_t padding = 0;
   for (size_t ri = input.size; ri > 0; --ri) {
@@ -220,9 +217,9 @@ AZ_NODISCARD az_result az_base64_decode(
   size_t const result_size
       = (TRIBYTE_OCTETS * (input_size / TRIBYTE_SEXTETS)) + (remainder == 0 ? 0 : remainder - 1);
 
-  az_const_span const result = (az_const_span){ .begin = buffer.begin, .size = result_size };
+  az_span const result = (az_span){ .begin = buffer.begin, .size = result_size };
 
-  if (az_const_span_is_overlap(input, result)) {
+  if (az_span_is_overlap(input, result)) {
     return AZ_ERROR_ARG;
   }
 

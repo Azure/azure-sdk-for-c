@@ -9,6 +9,7 @@
 #define AZ_HTTP_REQUEST_BUILDER_H
 
 #include <az_contract.h>
+#include <az_mut_span.h>
 #include <az_pair.h>
 #include <az_result.h>
 #include <az_span.h>
@@ -34,25 +35,26 @@ typedef struct {
 #include <_az_cfg_prefix.h>
 
 typedef struct {
-  az_span buffer;
-  az_const_span method_verb;
-  az_span url;
+  az_mut_span buffer;
+  az_span method_verb;
+  az_mut_span url;
   uint16_t max_url_size;
   uint16_t max_headers;
   uint16_t retry_headers_start;
   uint16_t headers_end;
-  az_const_span body;
+  az_span body;
 } az_http_request_builder;
 
-extern az_const_span const AZ_HTTP_METHOD_VERB_GET;
-extern az_const_span const AZ_HTTP_METHOD_VERB_HEAD;
-extern az_const_span const AZ_HTTP_METHOD_VERB_POST;
-extern az_const_span const AZ_HTTP_METHOD_VERB_PUT;
-extern az_const_span const AZ_HTTP_METHOD_VERB_DELETE;
-extern az_const_span const AZ_HTTP_METHOD_VERB_TRACE;
-extern az_const_span const AZ_HTTP_METHOD_VERB_OPTIONS;
-extern az_const_span const AZ_HTTP_METHOD_VERB_CONNECT;
-extern az_const_span const AZ_HTTP_METHOD_VERB_PATCH;
+extern az_span const AZ_HTTP_METHOD_VERB_GET;
+extern az_span const AZ_HTTP_METHOD_VERB_HEAD;
+extern az_span const AZ_HTTP_METHOD_VERB_POST;
+extern az_span const AZ_HTTP_METHOD_VERB_PUT;
+extern az_span const AZ_HTTP_METHOD_VERB_DELETE;
+extern az_span const AZ_HTTP_METHOD_VERB_TRACE;
+extern az_span const AZ_HTTP_METHOD_VERB_OPTIONS;
+extern az_span const AZ_HTTP_METHOD_VERB_CONNECT;
+extern az_span const AZ_HTTP_METHOD_VERB_PATCH;
+
 /**
  * @brief Format buffer as a http request containing URL and header spans.
  *
@@ -72,10 +74,10 @@ extern az_const_span const AZ_HTTP_METHOD_VERB_PATCH;
  */
 AZ_NODISCARD az_result az_http_request_builder_init(
     az_http_request_builder * const p_hrb,
-    az_span const buffer,
+    az_mut_span const buffer,
     uint16_t const max_url_size,
-    az_const_span const method_verb,
-    az_const_span const initial_url);
+    az_span const method_verb,
+    az_span const initial_url);
 
 /**
  * @brief Set query parameter.
@@ -96,8 +98,8 @@ AZ_NODISCARD az_result az_http_request_builder_init(
  */
 AZ_NODISCARD az_result az_http_request_builder_set_query_parameter(
     az_http_request_builder * const p_hrb,
-    az_const_span const name,
-    az_const_span const value);
+    az_span const name,
+    az_span const value);
 
 /**
  * @brief Add a new HTTP header for the request.
@@ -117,8 +119,8 @@ AZ_NODISCARD az_result az_http_request_builder_set_query_parameter(
  */
 AZ_NODISCARD az_result az_http_request_builder_append_header(
     az_http_request_builder * const p_hrb,
-    az_const_span const key,
-    az_const_span const value);
+    az_span const key,
+    az_span const value);
 
 /**
  * @brief Mark that the HTTP headers that are gong to be added via
@@ -171,7 +173,7 @@ AZ_NODISCARD az_result az_http_request_builder_get_header(
  */
 AZ_NODISCARD AZ_INLINE az_result az_http_request_builder_add_body(
     az_http_request_builder * const p_hrb,
-    az_const_span const body) {
+    az_span const body) {
   AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
   p_hrb->body = body;
   return AZ_OK;
