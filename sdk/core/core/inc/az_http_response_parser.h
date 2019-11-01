@@ -66,6 +66,30 @@ az_http_response_parser_get_next_header(az_http_response_parser * const self, az
 AZ_NODISCARD az_result
 az_http_response_parser_get_body(az_http_response_parser * const self, az_span * const out);
 
+// Get information from HTTP response.
+
+/**
+ * Get an HTTP status line.
+ */
+AZ_NODISCARD az_result
+az_http_response_get_status_line(az_span const self, az_http_response_status_line * const out);
+
+/**
+ * Get the next HTTP header.
+ *
+ * @p_header has to be either a previous header or an empty one for the first header.
+ */
+AZ_NODISCARD az_result
+az_http_response_get_next_header(az_span const self, az_pair * const p_header);
+
+/**
+ * Get an HTTP body.
+ *
+ * @p_header has to be the last header!
+ */
+AZ_NODISCARD az_result
+az_http_response_get_body(az_span const self, az_pair * const p_last_header, az_span * const body);
+
 #include <_az_cfg_suffix.h>
 
 #endif

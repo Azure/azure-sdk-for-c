@@ -13,7 +13,7 @@
 #define AZ_CONTRACT(condition, error) \
   do { \
     if (!(condition)) { \
-      return AZ_ERROR_ARG; \
+      return error; \
     } \
   } while (0)
 

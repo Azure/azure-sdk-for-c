@@ -98,15 +98,21 @@ static void test_http_response_parser() {
     }
   }
 
+    az_span const response = AZ_STR( //
+      "HTTP/1.1 200 Ok\r\n"
+      "Content-Type: text/html; charset=UTF-8\r\n"
+      "\r\n"
+      // body
+      EXAMPLE_BODY);
+
   // an example
   {
-    az_span const response = AZ_STR( //
-        "HTTP/1.1 200 Ok\r\n"
-        "Content-Type: text/html; charset=UTF-8\r\n"
-        "\r\n"
-        // body
-        EXAMPLE_BODY);
     az_result const result = http_response_parser_example(response);
+    TEST_ASSERT(result == AZ_OK);
+  }
+  // an example of getters 
+  {
+    az_result const result = http_response_getters_example(response);
     TEST_ASSERT(result == AZ_OK);
   }
 }
