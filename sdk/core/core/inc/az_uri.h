@@ -4,6 +4,7 @@
 #ifndef AZ_URI_H
 #define AZ_URI_H
 
+#include <az_mut_span.h>
 #include <az_result.h>
 #include <az_span.h>
 
@@ -27,9 +28,9 @@
  */
 AZ_NODISCARD az_result
 az_uri_encode(
-    az_span const buffer,
-    az_const_span const input,
-    az_const_span * const out_result);
+    az_mut_span const buffer,
+    az_span const input,
+    az_span * const out_result);
 
 /**
  * @brief _URI-Decode_ (a.k.a. _URL-Decode_): `this%20text` becomes `this text`.
@@ -51,9 +52,9 @@ az_uri_encode(
  */
 AZ_NODISCARD az_result
 az_uri_decode(
-    az_span const buffer,
-    az_const_span const input,
-    az_const_span * const out_result);
+    az_mut_span const buffer,
+    az_span const input,
+    az_span * const out_result);
 
 #include <_az_cfg_suffix.h>
 

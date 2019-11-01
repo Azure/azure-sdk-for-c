@@ -1,12 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef AZ_CURL_ADAPTER_H
-#define AZ_CURL_ADAPTER_H
+#ifndef AZ_CURL_H
+#define AZ_CURL_H
 
+#include <az_action.h>
 #include <az_http_request.h>
 #include <az_http_request_builder.h>
 #include <az_span_builder.h>
+#include <az_span_seq.h>
 #include <az_str.h>
 
 #include <curl/curl.h>
