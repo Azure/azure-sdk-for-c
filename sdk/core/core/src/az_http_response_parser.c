@@ -256,7 +256,7 @@ az_http_response_parser_get_body(az_http_response_parser * const self, az_span *
   return AZ_OK;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
+// HTTP Response get functions
 
 AZ_NODISCARD az_result
 az_http_response_get_status_line(az_span const self, az_http_response_status_line * const out) {
