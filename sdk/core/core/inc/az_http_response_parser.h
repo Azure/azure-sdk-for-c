@@ -26,28 +26,12 @@ typedef struct {
   az_span reason_phrase;
 } az_http_response_status_line;
 
-typedef az_pair az_http_response_header;
-
-typedef az_span az_http_response_body;
-
 typedef enum {
   AZ_HTTP_RESPONSE_NONE = 0,
   AZ_HTTP_RESPONSE_STATUS_LINE = 1,
   AZ_HTTP_RESPONSE_HEADER = 2,
   AZ_HTTP_RESPONSE_BODY = 3,
 } az_http_response_kind;
-
-/**
- * An HTTP response value is either `status line`, `header`, or `body`.
- */
-typedef struct {
-  az_http_response_kind kind;
-  union {
-    az_http_response_status_line status_line;
-    az_http_response_header header;
-    az_http_response_body body;
-  } data;
-} az_http_response_value;
 
 /**
  * An HTTP response parser.
@@ -64,11 +48,47 @@ AZ_NODISCARD az_result
 az_http_response_parser_init(az_http_response_parser * const out, az_span const buffer);
 
 /**
- * Returns the next HTTP response value.
+ * An HTTP status line.
  */
-AZ_NODISCARD az_result az_http_response_parser_read(
+AZ_NODISCARD az_result az_http_response_parser_get_status_line(
     az_http_response_parser * const self,
-    az_http_response_value * const out);
+    az_http_response_status_line * const out);
+
+/**
+ * An HTTP header.
+ */
+AZ_NODISCARD az_result
+az_http_response_parser_get_next_header(az_http_response_parser * const self, az_pair * const out);
+
+/**
+ * An HTTP body.
+ */
+AZ_NODISCARD az_result
+az_http_response_parser_get_body(az_http_response_parser * const self, az_span * const out);
+
+// Get information from HTTP response.
+
+/**
+ * Get an HTTP status line.
+ */
+AZ_NODISCARD az_result
+az_http_response_get_status_line(az_span const self, az_http_response_status_line * const out);
+
+/**
+ * Get the next HTTP header.
+ *
+ * @p_header has to be either a previous header or an empty one for the first header.
+ */
+AZ_NODISCARD az_result
+az_http_response_get_next_header(az_span const self, az_pair * const p_header);
+
+/**
+ * Get an HTTP body.
+ *
+ * @p_header has to be the last header!
+ */
+AZ_NODISCARD az_result
+az_http_response_get_body(az_span const self, az_pair * const p_last_header, az_span * const body);
 
 #include <_az_cfg_suffix.h>
 

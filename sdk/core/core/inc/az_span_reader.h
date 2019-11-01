@@ -36,6 +36,14 @@ AZ_INLINE void az_span_reader_next(az_span_reader * const p_reader) {
   p_reader->i += 1;
 }
 
+AZ_NODISCARD AZ_INLINE az_result
+az_span_reader_set_pos(az_span_reader * const p_reader, size_t const i) {
+  AZ_CONTRACT(i <= p_reader->span.size, AZ_ERROR_ARG);
+
+  p_reader->i = i;
+  return AZ_OK;
+}
+
 // Parsing utilities
 
 AZ_NODISCARD AZ_INLINE az_result az_error_unexpected_char(az_result_byte const c) {
