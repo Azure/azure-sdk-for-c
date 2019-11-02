@@ -15,14 +15,12 @@
 
 #include <_az_cfg_prefix.h>
 
+AZ_NODISCARD AZ_INLINE az_result az_curl_code_to_result(CURLcode const code) {
+  return code == CURLE_OK ? AZ_OK : AZ_ERROR_HTTP_PAL;
+}
+
 // returning AZ error on CURL Error
-#define AZ_RETURN_IF_CURL_FAILED(exp) \
-  do { \
-    CURLcode const _result = (exp); \
-    if (_result != CURLE_OK) { \
-      return AZ_ERROR_HTTP_FAILED_REQUEST; \
-    } \
-  } while (0)
+#define AZ_RETURN_IF_CURL_FAILED(exp) AZ_RETURN_IF_FAILED(az_curl_code_to_result(exp))
 
 typedef struct {
   CURL * p_curl;

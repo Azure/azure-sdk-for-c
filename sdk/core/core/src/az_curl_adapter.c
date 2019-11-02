@@ -216,21 +216,18 @@ setup_url(az_curl const * const p_curl, az_http_request_builder const * const p_
   }
 
   // write url in buffer (will add \0 at the end)
-  az_result const result = az_write_url(writable_buffer, az_mut_span_to_span(p_hrb->url));
+  az_result result = az_write_url(writable_buffer, az_mut_span_to_span(p_hrb->url));
 
-  char * buffer = (char *)writable_buffer.begin;
-  CURLcode const set_headers_result = curl_easy_setopt(p_curl->p_curl, CURLOPT_URL, buffer);
+  if (az_succeeded(result)) {
+    char * buffer = (char *)writable_buffer.begin;
+    result = az_curl_code_to_result(curl_easy_setopt(p_curl->p_curl, CURLOPT_URL, buffer));
+  }
 
   // free used buffer before anything else
   az_mut_span_set(writable_buffer, 0);
   az_span_free(&writable_buffer);
 
-  // handle writing to buffer error
-  AZ_RETURN_IF_FAILED(result);
-  // handle setting curl url
-  AZ_RETURN_IF_CURL_FAILED(set_headers_result);
-
-  return AZ_OK;
+  return result;
 }
 
 /**
