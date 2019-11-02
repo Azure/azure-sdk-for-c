@@ -3,7 +3,9 @@
 
 #include <az_curl_adapter.h>
 
+#include <az_curl_slist.h>
 #include <az_http_request.h>
+#include <az_span_malloc.h>
 
 #include <_az_cfg.h>
 
@@ -47,24 +49,24 @@ AZ_NODISCARD az_result az_add_header_to_curl_list(
   AZ_CONTRACT_ARG_NOT_NULL(p_list);
 
   // allocate a buffer for header
-  size_t const buffer_size = header.key.size + separator.size + header.value.size + 1;
-  uint8_t * const p_writable_buffer = (uint8_t *)malloc(buffer_size);
-  if (p_writable_buffer == NULL) {
-    return AZ_ERROR_OUT_OF_MEMORY;
+  az_mut_span writable_buffer;
+  {
+    size_t const buffer_size = header.key.size + separator.size + header.value.size + 1;
+    AZ_RETURN_IF_FAILED(az_span_malloc(buffer_size, &writable_buffer));
   }
-  char * buffer = (char *)p_writable_buffer;
 
   // write buffer
-  az_mut_span const writable_buffer = (az_mut_span){ .begin = p_writable_buffer, .size = buffer_size };
-  az_result const write_result = az_write_to_buffer(writable_buffer, header, separator);
+  az_result result = az_write_to_buffer(writable_buffer, header, separator);
 
   // attach header only when write was OK
-  if (az_succeeded(write_result)) {
-    *p_list = curl_slist_append(*p_list, buffer);
+  if (az_succeeded(result)) {
+    char const * const buffer = (char const *)writable_buffer.begin;
+    result = az_curl_slist_append(p_list, buffer);
   }
+
   // at any case, error or OK, free the allocated memory
-  free(p_writable_buffer);
-  return write_result;
+  az_span_free(&writable_buffer);
+  return result;
 }
 
 /**
@@ -89,7 +91,7 @@ az_build_headers(az_http_request_builder const * const p_hrb, struct curl_slist 
 }
 
 /**
- * @brief writes a url request adds a cero to make it a c-string. Return error if any of the write
+ * @brief writes a url request adds a zero to make it a c-string. Return error if any of the write
  * operations fails.
  *
  * @param writable_buffer
@@ -115,7 +117,11 @@ az_write_url(az_mut_span const writable_buffer, az_span const url_from_request) 
  * @param userp
  * @return int
  */
-size_t write_to_span(void * contents, size_t size, size_t nmemb, void * userp) {
+size_t write_to_span(
+    void * const contents,
+    size_t const size,
+    size_t const nmemb,
+    void * const userp) {
   size_t const expected_size = size * nmemb;
   size_t const size_with_extra_space = expected_size + AZ_STR_ZERO.size;
   az_mut_span * const user_buffer = (az_mut_span *)userp;
@@ -200,22 +206,24 @@ setup_url(az_curl const * const p_curl, az_http_request_builder const * const p_
   AZ_CONTRACT_ARG_NOT_NULL(p_curl);
   AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
 
-  // set URL as 0-terminated str
-  size_t const extra_space_for_zero = AZ_STR_ZERO.size;
-  size_t const url_final_size = p_hrb->url.size + extra_space_for_zero;
-  // allocate buffer to add \0
-  uint8_t * const p_writable_buffer = (uint8_t *)malloc(url_final_size);
-  if (p_writable_buffer == NULL) {
-    return AZ_ERROR_OUT_OF_MEMORY;
+  az_mut_span writable_buffer;
+  {
+    // set URL as 0-terminated str
+    size_t const extra_space_for_zero = AZ_STR_ZERO.size;
+    size_t const url_final_size = p_hrb->url.size + extra_space_for_zero;
+    // allocate buffer to add \0
+    AZ_RETURN_IF_FAILED(az_span_malloc(url_final_size, &writable_buffer));
   }
+
   // write url in buffer (will add \0 at the end)
-  char * buffer = (char *)p_writable_buffer;
-  az_mut_span const writable_buffer = (az_mut_span){ .begin = p_writable_buffer, .size = url_final_size };
   az_result const result = az_write_url(writable_buffer, az_mut_span_to_span(p_hrb->url));
+
+  char * buffer = (char *)writable_buffer.begin;
   CURLcode const set_headers_result = curl_easy_setopt(p_curl->p_curl, CURLOPT_URL, buffer);
+
   // free used buffer before anything else
-  memset(p_writable_buffer, 0, url_final_size);
-  free(buffer);
+  az_mut_span_set(writable_buffer, 0);
+  az_span_free(&writable_buffer);
 
   // handle writing to buffer error
   AZ_RETURN_IF_FAILED(result);

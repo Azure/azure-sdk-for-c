@@ -12,6 +12,12 @@
 #include <_az_cfg_prefix.h>
 
 /**
+ * Appends a zero-terminated string to the given CURL list.
+ */
+AZ_NODISCARD az_result
+az_curl_slist_append(struct curl_slist ** const self, char const * const str);
+
+/**
  * Appends an HTTP header to the given CURL list.
  */
 AZ_NODISCARD az_result
