@@ -56,7 +56,7 @@ AZ_NODISCARD AZ_INLINE az_json_stack_item az_json_stack_last(az_json_state const
 AZ_NODISCARD AZ_INLINE az_result
 az_json_stack_push(az_json_state * const p_state, az_json_stack const stack) {
   if (p_state->stack >> AZ_JSON_STACK_SIZE != 0) {
-    return AZ_JSON_ERROR_STACK_OVERFLOW;
+    return AZ_ERROR_JSON_STACK_OVERFLOW;
   }
   p_state->stack = (p_state->stack << 1) | stack;
   return AZ_OK;
@@ -64,7 +64,7 @@ az_json_stack_push(az_json_state * const p_state, az_json_stack const stack) {
 
 AZ_NODISCARD AZ_INLINE az_result az_json_stack_pop(az_json_state * const p_state) {
   if (p_state->stack <= 1) {
-    return AZ_JSON_ERROR_INVALID_STATE;
+    return AZ_ERROR_JSON_INVALID_STATE;
   }
   p_state->stack >>= 1;
   return AZ_OK;
@@ -315,7 +315,7 @@ az_json_read(az_json_state * const p_state, az_json_value * const out_value) {
   AZ_CONTRACT_ARG_NOT_NULL(out_value);
 
   if (!az_json_stack_is_empty(p_state)) {
-    return AZ_JSON_ERROR_INVALID_STATE;
+    return AZ_ERROR_JSON_INVALID_STATE;
   }
   az_json_read_white_space(&p_state->reader);
   AZ_RETURN_IF_FAILED(az_json_read_value_space(p_state, out_value));
@@ -353,7 +353,7 @@ AZ_NODISCARD static az_result az_json_check_item_begin(
     az_json_state * const p_state,
     az_json_stack_item const stack_item) {
   if (az_json_stack_is_empty(p_state) || az_json_stack_last(p_state) != stack_item) {
-    return AZ_JSON_ERROR_INVALID_STATE;
+    return AZ_ERROR_JSON_INVALID_STATE;
   }
   az_result_byte const c = az_span_reader_current(&p_state->reader);
   if (c != az_json_stack_item_to_close(stack_item)) {
@@ -366,7 +366,7 @@ AZ_NODISCARD static az_result az_json_check_item_begin(
   if (!az_json_stack_is_empty(p_state)) {
     AZ_RETURN_IF_FAILED(az_json_read_comma_or_close(p_state));
   }
-  return AZ_JSON_ERROR_NO_MORE_ITEMS;
+  return AZ_ERROR_JSON_NO_MORE_ITEMS;
 }
 
 AZ_NODISCARD static az_result az_json_check_item_end(
@@ -416,7 +416,7 @@ AZ_NODISCARD az_result az_json_state_done(az_json_state const * const p_state) {
   AZ_CONTRACT_ARG_NOT_NULL(p_state);
 
   if (!az_span_reader_is_empty(&p_state->reader) || !az_json_stack_is_empty(p_state)) {
-    return AZ_JSON_ERROR_INVALID_STATE;
+    return AZ_ERROR_JSON_INVALID_STATE;
   }
   return AZ_OK;
 }
@@ -435,7 +435,7 @@ AZ_NODISCARD az_result az_json_get_object_member_value(
 
   if (value.kind == AZ_JSON_VALUE_OBJECT) {
     az_json_member member;
-    while (az_json_read_object_member(&state, &member) != AZ_JSON_ERROR_NO_MORE_ITEMS) {
+    while (az_json_read_object_member(&state, &member) != AZ_ERROR_JSON_NO_MORE_ITEMS) {
       if (az_span_eq(member.name, name)) {
         *out_value = member.value;
         return AZ_OK;
@@ -443,5 +443,5 @@ AZ_NODISCARD az_result az_json_get_object_member_value(
     }
   }
 
-  return AZ_JSON_ERROR_NOT_FOUND;
+  return AZ_ERROR_JSON_NOT_FOUND;
 }

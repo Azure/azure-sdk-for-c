@@ -31,7 +31,7 @@ static az_result http_response_parser_example(az_span const response) {
       // read a header
       {
         az_result const result = az_http_response_parser_get_next_header(&parser, &header);
-        if (result == AZ_HTTP_ERROR_NO_MORE_HEADERS) {
+        if (result == AZ_ERROR_HTTP_NO_MORE_HEADERS) {
           break;
         }
         AZ_RETURN_IF_FAILED(result);
@@ -40,13 +40,13 @@ static az_result http_response_parser_example(az_span const response) {
       if (az_span_eq(header.key, AZ_STR("Content-Type"))) {
         contentType = header.value;
       } else {
-        return AZ_HTTP_ERROR_INVALID_STATE;
+        return AZ_ERROR_HTTP_INVALID_STATE;
       }
     }
 
     // make sure we have a Content-Type header and it's what we expect.
     if (!az_span_eq(contentType, AZ_STR("text/html; charset=UTF-8"))) {
-      return AZ_HTTP_ERROR_INVALID_STATE;
+      return AZ_ERROR_HTTP_INVALID_STATE;
     }
   }
 
@@ -55,7 +55,7 @@ static az_result http_response_parser_example(az_span const response) {
     az_span body;
     AZ_RETURN_IF_FAILED(az_http_response_parser_get_body(&parser, &body));
     if (!az_span_eq(body, AZ_STR(EXAMPLE_BODY))) {
-      return AZ_HTTP_ERROR_INVALID_STATE;
+      return AZ_ERROR_HTTP_INVALID_STATE;
     }
   }
 
@@ -83,7 +83,7 @@ static az_result http_response_getters_example(az_span const response) {
       // read a header
       {
         az_result const result = az_http_response_get_next_header(response, &header);
-        if (result == AZ_HTTP_ERROR_NO_MORE_HEADERS) {
+        if (result == AZ_ERROR_HTTP_NO_MORE_HEADERS) {
           break;
         }
         AZ_RETURN_IF_FAILED(result);
@@ -92,13 +92,13 @@ static az_result http_response_getters_example(az_span const response) {
       if (az_span_eq(header.key, AZ_STR("Content-Type"))) {
         contentType = header.value;
       } else {
-        return AZ_HTTP_ERROR_INVALID_STATE;
+        return AZ_ERROR_HTTP_INVALID_STATE;
       }
     }
 
     // make sure we have a Content-Type header and it's what we expect.
     if (!az_span_eq(contentType, AZ_STR("text/html; charset=UTF-8"))) {
-      return AZ_HTTP_ERROR_INVALID_STATE;
+      return AZ_ERROR_HTTP_INVALID_STATE;
     }
   }
 
@@ -107,7 +107,7 @@ static az_result http_response_getters_example(az_span const response) {
     az_span body;
     AZ_RETURN_IF_FAILED(az_http_response_get_body(response, &header, &body));
     if (!az_span_eq(body, AZ_STR(EXAMPLE_BODY))) {
-      return AZ_HTTP_ERROR_INVALID_STATE;
+      return AZ_ERROR_HTTP_INVALID_STATE;
     }
   }
 

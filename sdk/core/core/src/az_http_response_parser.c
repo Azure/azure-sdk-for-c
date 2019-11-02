@@ -130,7 +130,7 @@ AZ_NODISCARD az_result az_http_response_parser_get_status_line(
 
   // check the status.
   if (self->kind != AZ_HTTP_RESPONSE_STATUS_LINE) {
-    return AZ_HTTP_ERROR_INVALID_STATE;
+    return AZ_ERROR_HTTP_INVALID_STATE;
   }
 
   az_span_reader * const p_reader = &self->reader;
@@ -155,10 +155,10 @@ az_http_response_parser_get_next_header(az_http_response_parser * const self, az
   {
     az_http_response_kind const kind = self->kind;
     if (kind == AZ_HTTP_RESPONSE_BODY) {
-      return AZ_HTTP_ERROR_NO_MORE_HEADERS;
+      return AZ_ERROR_HTTP_NO_MORE_HEADERS;
     }
     if (kind != AZ_HTTP_RESPONSE_HEADER) {
-      return AZ_HTTP_ERROR_INVALID_STATE;
+      return AZ_ERROR_HTTP_INVALID_STATE;
     }
   }
 
@@ -247,7 +247,7 @@ az_http_response_parser_get_body(az_http_response_parser * const self, az_span *
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
   if (self->kind != AZ_HTTP_RESPONSE_BODY) {
-    return AZ_HTTP_ERROR_INVALID_STATE;
+    return AZ_ERROR_HTTP_INVALID_STATE;
   }
 
   az_span_reader * const p_reader = &self->reader;
@@ -266,8 +266,10 @@ az_http_response_get_status_line(az_span const self, az_http_response_status_lin
   return az_span_reader_get_http_status_line(&reader, out);
 }
 
-AZ_NODISCARD az_result
-az_http_response_parser_init_from_header(az_http_response_parser * const out, az_span const response, az_pair const * const p_header) {
+AZ_NODISCARD az_result az_http_response_parser_init_from_header(
+    az_http_response_parser * const out,
+    az_span const response,
+    az_pair const * const p_header) {
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
   AZ_RETURN_IF_FAILED(az_http_response_parser_init(out, response));

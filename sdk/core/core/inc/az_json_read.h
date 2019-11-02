@@ -15,10 +15,10 @@
 
 enum {
   // error codes
-  AZ_JSON_ERROR_NO_MORE_ITEMS = AZ_MAKE_ERROR(AZ_JSON_FACILITY, 1),
-  AZ_JSON_ERROR_INVALID_STATE = AZ_MAKE_ERROR(AZ_JSON_FACILITY, 2),
-  AZ_JSON_ERROR_STACK_OVERFLOW = AZ_MAKE_ERROR(AZ_JSON_FACILITY, 3),
-  AZ_JSON_ERROR_NOT_FOUND = AZ_MAKE_ERROR(AZ_JSON_FACILITY, 4),
+  AZ_ERROR_JSON_NO_MORE_ITEMS = AZ_MAKE_ERROR(AZ_JSON_FACILITY, 1),
+  AZ_ERROR_JSON_INVALID_STATE = AZ_MAKE_ERROR(AZ_JSON_FACILITY, 2),
+  AZ_ERROR_JSON_STACK_OVERFLOW = AZ_MAKE_ERROR(AZ_JSON_FACILITY, 3),
+  AZ_ERROR_JSON_NOT_FOUND = AZ_MAKE_ERROR(AZ_JSON_FACILITY, 4),
 };
 
 typedef enum {
@@ -89,7 +89,7 @@ AZ_NODISCARD AZ_INLINE az_result az_json_get_object_member_string_value(
   AZ_RETURN_IF_FAILED(az_json_get_object_member_value(json, name, &value));
 
   if (value.kind != AZ_JSON_VALUE_STRING) {
-    return AZ_JSON_ERROR_NOT_FOUND;
+    return AZ_ERROR_JSON_NOT_FOUND;
   }
 
   *out_value = value.data.string;
@@ -105,7 +105,7 @@ AZ_NODISCARD AZ_INLINE az_result az_json_get_object_member_numeric_value(
   AZ_RETURN_IF_FAILED(az_json_get_object_member_value(json, name, &value));
 
   if (value.kind != AZ_JSON_VALUE_NUMBER) {
-    return AZ_JSON_ERROR_NOT_FOUND;
+    return AZ_ERROR_JSON_NOT_FOUND;
   }
 
   *out_value = value.data.number;
@@ -117,11 +117,12 @@ AZ_NODISCARD AZ_INLINE az_result az_json_get_object_member_boolean_value(
     az_span const name,
     bool * const out_value) {
   AZ_CONTRACT_ARG_NOT_NULL(out_value);
+
   az_json_value value;
   AZ_RETURN_IF_FAILED(az_json_get_object_member_value(json, name, &value));
 
   if (value.kind != AZ_JSON_VALUE_NUMBER) {
-    return AZ_JSON_ERROR_NOT_FOUND;
+    return AZ_ERROR_JSON_NOT_FOUND;
   }
 
   *out_value = value.data.boolean;
