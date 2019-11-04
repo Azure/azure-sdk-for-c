@@ -265,7 +265,6 @@ AZ_NODISCARD az_result setup_url(CURL * const p_curl, az_http_request_builder co
     result = az_curl_code_to_result(curl_easy_setopt(p_curl, CURLOPT_URL, buffer));
   }
 
-  CURLcode const set_headers_result = curl_easy_setopt(p_curl->p_curl, CURLOPT_URL, buffer);
   // free used buffer before anything else
   az_mut_span_set(writable_buffer, 0);
   az_span_free(&writable_buffer);
@@ -294,9 +293,8 @@ setup_response_redirect(CURL * const p_curl, az_mut_span const * const response)
         AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER.begin,
         AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER.size);
 
-    AZ_RETURN_IF_CURL_FAILED(
-        curl_easy_setopt(p_curl->p_curl, CURLOPT_WRITEFUNCTION, write_to_span));
-    AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl->p_curl, CURLOPT_WRITEDATA, (void *)response));
+    AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl, CURLOPT_WRITEFUNCTION, write_to_span));
+    AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl, CURLOPT_WRITEDATA, (void *)response));
   }
 
   return AZ_OK;

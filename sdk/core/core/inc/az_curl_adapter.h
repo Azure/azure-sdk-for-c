@@ -17,6 +17,9 @@
 
 extern az_span const AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER;
 
+/**
+ * Converts CURLcode to az_result.
+ */
 AZ_NODISCARD AZ_INLINE az_result az_curl_code_to_result(CURLcode const code) {
   return code == CURLE_OK ? AZ_OK : AZ_ERROR_HTTP_PAL;
 }
