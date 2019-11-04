@@ -318,8 +318,10 @@ az_http_response_get_body(az_span const self, az_pair * const p_last_header, az_
 
 /**
  * Get an HTTP header by name.
+ *
+ * Returns @AZ_ERROR_HTTP_NO_MORE_ITEMS
  */
-AZ_NODISCARD az_result az_http_response_get_header(
+AZ_NODISCARD az_result az_http_response_get_header_by_name(
     az_span const self,
     az_span const header_name,
     az_span * const header_value) {
