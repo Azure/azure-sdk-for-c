@@ -15,6 +15,9 @@
 
 #include <_az_cfg_prefix.h>
 
+/**
+ * Converts CURLcode to az_result.
+ */
 AZ_NODISCARD AZ_INLINE az_result az_curl_code_to_result(CURLcode const code) {
   return code == CURLE_OK ? AZ_OK : AZ_ERROR_HTTP_PAL;
 }
