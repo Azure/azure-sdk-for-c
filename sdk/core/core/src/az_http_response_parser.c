@@ -266,8 +266,10 @@ az_http_response_get_status_line(az_span const self, az_http_response_status_lin
   return az_span_reader_get_http_status_line(&reader, out);
 }
 
-AZ_NODISCARD az_result
-az_http_response_parser_init_from_header(az_http_response_parser * const out, az_span const response, az_pair const * const p_header) {
+AZ_NODISCARD az_result az_http_response_parser_init_from_header(
+    az_http_response_parser * const out,
+    az_span const response,
+    az_pair const * const p_header) {
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
   AZ_RETURN_IF_FAILED(az_http_response_parser_init(out, response));
@@ -311,5 +313,17 @@ az_http_response_get_body(az_span const self, az_pair * const p_last_header, az_
   az_http_response_parser parser;
   AZ_RETURN_IF_FAILED(az_http_response_parser_init_from_header(&parser, self, p_last_header));
   AZ_RETURN_IF_FAILED(az_http_response_parser_get_body(&parser, body));
+  return AZ_OK;
+}
+
+/**
+ * Get an HTTP header by name.
+ */
+AZ_NODISCARD az_result az_http_response_get_header(
+  az_span const self,
+  az_span const header_name,
+  az_span* const header_value) {
+  AZ_CONTRACT_ARG_NOT_NULL(header_value);
+
   return AZ_OK;
 }

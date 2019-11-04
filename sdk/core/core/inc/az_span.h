@@ -25,9 +25,9 @@ typedef struct {
 
 typedef az_result az_result_byte;
 
-AZ_INLINE bool az_span_is_empty(az_span const span) { return span.size <= 0; }
+AZ_NODISCARD AZ_INLINE bool az_span_is_empty(az_span const span) { return span.size <= 0; }
 
-AZ_INLINE bool az_span_is_valid(az_span const span) {
+AZ_NODISCARD AZ_INLINE bool az_span_is_valid(az_span const span) {
   return span.size == 0 || (span.begin != NULL && span.begin <= span.begin + span.size - 1);
 }
 
@@ -35,7 +35,7 @@ AZ_INLINE bool az_span_is_valid(az_span const span) {
  * Returns a byte in `index` position.
  * Returns `AZ_ERROR_EOF` if the `index` is out of the span range.
  */
-AZ_INLINE az_result_byte az_span_get(az_span const span, size_t const index) {
+AZ_NODISCARD AZ_INLINE az_result_byte az_span_get(az_span const span, size_t const index) {
   if (span.size <= index) {
     return AZ_ERROR_EOF;
   }
@@ -47,7 +47,7 @@ AZ_INLINE az_result_byte az_span_get(az_span const span, size_t const index) {
  *
  * If the @n is greater than the @span.size than the whole @span is returned.
  */
-AZ_INLINE az_span az_span_take(az_span const span, size_t const n) {
+AZ_NODISCARD AZ_INLINE az_span az_span_take(az_span const span, size_t const n) {
   if (span.size <= n) {
     return span;
   }
@@ -59,7 +59,7 @@ AZ_INLINE az_span az_span_take(az_span const span, size_t const n) {
  *
  * If the @n is greater than @span.size than an empty span is returned
  */
-AZ_INLINE az_span az_span_drop(az_span const span, size_t const n) {
+AZ_NODISCARD AZ_INLINE az_span az_span_drop(az_span const span, size_t const n) {
   if (span.size <= n) {
     return (az_span){ .begin = NULL, .size = 0 };
   }
@@ -69,7 +69,7 @@ AZ_INLINE az_span az_span_drop(az_span const span, size_t const n) {
 /**
  * Returns a sub span of the given span.
  */
-AZ_INLINE az_span
+AZ_NODISCARD AZ_INLINE az_span
 az_span_sub(az_span const span, size_t const begin, size_t const end) {
   az_span const t = az_span_take(span, end);
   return az_span_drop(t, begin);
@@ -79,11 +79,17 @@ az_span_sub(az_span const span, size_t const begin, size_t const end) {
  * Returns `true` if a content of the @a span is equal to a content of the @b
  * span.
  */
-AZ_INLINE bool az_span_eq(az_span const a, az_span const b) {
+AZ_NODISCARD AZ_INLINE bool az_span_eq(az_span const a, az_span const b) {
   return a.size == b.size && memcmp(a.begin, b.begin, a.size) == 0;
 }
 
-AZ_INLINE bool az_span_is_overlap(az_span const a, az_span const b) {
+/**
+ * Returns `true` if a content of the @a span is equal to a content of the @b
+ * span using case-insensetive compare.
+ */
+AZ_NODISCARD AZ_INLINE bool az_span_eq_ignore_case(az_span const a, az_span const b);
+
+AZ_NODISCARD AZ_INLINE bool az_span_is_overlap(az_span const a, az_span const b) {
   return (!az_span_is_empty(a) && !az_span_is_empty(b))
       && ((a.begin < b.begin && (a.begin + a.size - 1) >= b.begin)
           || (b.begin < a.begin && (b.begin + b.size - 1) >= a.begin) || (a.begin == b.begin));
