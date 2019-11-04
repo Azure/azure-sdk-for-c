@@ -320,10 +320,25 @@ az_http_response_get_body(az_span const self, az_pair * const p_last_header, az_
  * Get an HTTP header by name.
  */
 AZ_NODISCARD az_result az_http_response_get_header(
-  az_span const self,
-  az_span const header_name,
-  az_span* const header_value) {
+    az_span const self,
+    az_span const header_name,
+    az_span * const header_value) {
   AZ_CONTRACT_ARG_NOT_NULL(header_value);
 
-  return AZ_OK;
+  az_http_response_parser parser;
+  AZ_RETURN_IF_FAILED(az_http_response_parser_init(&parser, self));
+
+  { 
+    az_http_response_status_line status_line;
+    AZ_RETURN_IF_FAILED(az_http_response_parser_get_status_line(&parser, &status_line)); 
+  }
+
+  while (true) {
+    az_pair header;
+    AZ_RETURN_IF_FAILED(az_http_response_parser_get_next_header(&parser, &header));
+    if (az_span_eq_ascii_ignore_case(header_name, header.key)) {
+      *header_value = header.value;
+      return AZ_OK;
+    }
+  }
 }
