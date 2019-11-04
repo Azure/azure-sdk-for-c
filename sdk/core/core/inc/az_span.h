@@ -23,7 +23,7 @@ typedef struct {
   size_t size;
 } az_span;
 
-typedef int32_t az_result_byte;
+typedef az_result az_result_byte;
 
 AZ_INLINE bool az_span_is_empty(az_span const span) { return span.size <= 0; }
 
