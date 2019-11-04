@@ -3,12 +3,11 @@
 
 #include <az_curl_adapter.h>
 
-#include <az_callback.h>
 #include <az_http_request.h>
 
 #include <_az_cfg.h>
 
-az_const_span const AZ_HTTP_REQUEST_BUILDER_HEADER_SEPARATOR = AZ_CONST_STR(": ");
+az_span const AZ_HTTP_REQUEST_BUILDER_HEADER_SEPARATOR = AZ_CONST_STR(": ");
 
 AZ_NODISCARD char az_digit_to_char(size_t const digit) {
   switch (digit) {
@@ -53,9 +52,9 @@ AZ_NODISCARD char az_get_min_version(size_t const version) {
  * @return az_result
  */
 AZ_NODISCARD az_result az_write_to_buffer(
-    az_span const writable_buffer,
+    az_mut_span const writable_buffer,
     az_pair const header,
-    az_const_span const separator) {
+    az_span const separator) {
   az_span_builder writer = az_span_builder_create(writable_buffer);
   AZ_RETURN_IF_FAILED(az_span_builder_append(&writer, header.key));
   AZ_RETURN_IF_FAILED(az_span_builder_append(&writer, separator));
@@ -77,7 +76,7 @@ AZ_NODISCARD az_result az_write_to_buffer(
 AZ_NODISCARD az_result az_add_header_to_curl_list(
     az_pair const header,
     struct curl_slist ** const p_list,
-    az_const_span const separator) {
+    az_span const separator) {
   AZ_CONTRACT_ARG_NOT_NULL(p_list);
 
   // allocate a buffer for header
@@ -89,7 +88,7 @@ AZ_NODISCARD az_result az_add_header_to_curl_list(
   char * buffer = (char *)p_writable_buffer;
 
   // write buffer
-  az_span const writable_buffer = (az_span){ .begin = p_writable_buffer, .size = buffer_size };
+  az_mut_span const writable_buffer = (az_mut_span){ .begin = p_writable_buffer, .size = buffer_size };
   az_result const write_result = az_write_to_buffer(writable_buffer, header, separator);
 
   // attach header only when write was OK
@@ -131,7 +130,7 @@ az_build_headers(az_http_request_builder const * const p_hrb, struct curl_slist 
  * @return az_result
  */
 AZ_NODISCARD az_result
-az_write_url(az_span const writable_buffer, az_const_span const url_from_request) {
+az_write_url(az_mut_span const writable_buffer, az_span const url_from_request) {
   az_span_builder writer = az_span_builder_create(writable_buffer);
   AZ_RETURN_IF_FAILED(az_span_builder_append(&writer, url_from_request));
   AZ_RETURN_IF_FAILED(az_span_builder_append(&writer, AZ_STR_ZERO));
@@ -154,7 +153,7 @@ az_write_url(az_span const writable_buffer, az_const_span const url_from_request
 size_t write_to_span(void * contents, size_t size, size_t nmemb, void * userp) {
   size_t const expected_size = size * nmemb;
   size_t const size_with_extra_space = expected_size + AZ_STR_ZERO.size;
-  az_span * const user_buffer = (az_span *)userp;
+  az_mut_span * const user_buffer = (az_mut_span *)userp;
 
   // handle error when response won't feat user buffer
   if (user_buffer->size < size_with_extra_space) {
@@ -246,8 +245,8 @@ setup_url(az_curl const * const p_curl, az_http_request_builder const * const p_
   }
   // write url in buffer (will add \0 at the end)
   char * buffer = (char *)p_writable_buffer;
-  az_span const writable_buffer = (az_span){ .begin = p_writable_buffer, .size = url_final_size };
-  az_result const result = az_write_url(writable_buffer, az_span_to_const_span(p_hrb->url));
+  az_mut_span const writable_buffer = (az_mut_span){ .begin = p_writable_buffer, .size = url_final_size };
+  az_result const result = az_write_url(writable_buffer, az_mut_span_to_span(p_hrb->url));
   CURLcode const set_headers_result = curl_easy_setopt(p_curl->p_curl, CURLOPT_URL, buffer);
   // free used buffer before anything else
   memset(p_writable_buffer, 0, url_final_size);
@@ -269,7 +268,7 @@ setup_url(az_curl const * const p_curl, az_http_request_builder const * const p_
  * @return az_result
  */
 AZ_NODISCARD az_result
-setup_response_redirect(az_curl const * const p_curl, az_span const * const response) {
+setup_response_redirect(az_curl const * const p_curl, az_mut_span const * const response) {
   AZ_CONTRACT_ARG_NOT_NULL(p_curl);
 
   // check if response will be redirected to user span
@@ -292,7 +291,7 @@ setup_response_redirect(az_curl const * const p_curl, az_span const * const resp
  */
 AZ_NODISCARD az_result az_http_client_send_request_impl(
     az_http_request_builder * const p_hrb,
-    az_span const * const response) {
+    az_mut_span const * const response) {
   AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
   AZ_CONTRACT_ARG_NOT_NULL(response);
 
@@ -308,9 +307,9 @@ AZ_NODISCARD az_result az_http_client_send_request_impl(
 
   AZ_RETURN_IF_CURL_FAILED(setup_response_redirect(&p_curl, response));
 
-  if (az_const_span_eq(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_GET)) {
+  if (az_span_eq(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_GET)) {
     result = az_curl_send_get_request(&p_curl);
-  } else if (az_const_span_eq(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_POST)) {
+  } else if (az_span_eq(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_POST)) {
     result = az_curl_send_post_request(&p_curl, p_hrb);
   }
 

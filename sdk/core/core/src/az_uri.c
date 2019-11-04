@@ -7,23 +7,20 @@
 
 #include <assert.h>
 #include <stdbool.h>
+#include <ctype.h>
 
 #include <_az_cfg.h>
 
 AZ_NODISCARD AZ_INLINE bool should_encode(uint8_t const c) {
   switch (c) {
-    default:
-      return !(('0' <= c && c <= '9') || ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z'));
     case '-':
     case '_':
     case '.':
     case '~':
       return false;
+    default:
+      return !(('0' <= c && c <= '9') || ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z'));
   }
-}
-
-AZ_NODISCARD AZ_INLINE bool is_hex_char(uint8_t const c) {
-  return ('0' <= c && c <= '9') || ('A' <= c && c <= 'F') || ('a' <= c && c <= 'f');
 }
 
 AZ_NODISCARD AZ_INLINE int8_t hex_to_int4(uint8_t const c) {
@@ -61,13 +58,12 @@ AZ_NODISCARD AZ_INLINE size_t encode(uint8_t const c, uint8_t * const p) {
 
 AZ_NODISCARD az_result
 az_uri_encode(
-    az_span const buffer,
-    az_const_span const input,
-    az_const_span * const out_result) {
+    az_mut_span const buffer,
+    az_span const input,
+    az_span * const out_result) {
   AZ_CONTRACT_ARG_NOT_NULL(out_result);
-  if (!az_span_is_valid(buffer) || !az_const_span_is_valid(input)) {
-    return AZ_ERROR_ARG;
-  }
+  AZ_CONTRACT_ARG_VALID_MUT_SPAN(buffer);
+  AZ_CONTRACT_ARG_VALID_SPAN(input);
 
   size_t result_size = 0;
   for (size_t i = 0; i < input.size; ++i) {
@@ -75,9 +71,9 @@ az_uri_encode(
   }
 
   assert(result_size <= buffer.size);
-  az_const_span const result = (az_const_span){ .begin = buffer.begin, .size = result_size };
+  az_span const result = (az_span){ .begin = buffer.begin, .size = result_size };
 
-  if (az_const_span_is_overlap(input, result)) {
+  if (az_span_is_overlap(input, result)) {
     return AZ_ERROR_ARG;
   }
 
@@ -98,21 +94,19 @@ az_uri_encode(
 
 AZ_NODISCARD az_result
 az_uri_decode(
-    az_span const buffer,
-    az_const_span const input,
-    az_const_span * const out_result) {
+    az_mut_span const buffer,
+    az_span const input,
+    az_span * const out_result) {
   AZ_CONTRACT_ARG_NOT_NULL(out_result);
-
-  if (!az_span_is_valid(buffer) || !az_const_span_is_valid(input)) {
-    return AZ_ERROR_ARG;
-  }
+  AZ_CONTRACT_ARG_VALID_MUT_SPAN(buffer);
+  AZ_CONTRACT_ARG_VALID_SPAN(input);
 
   size_t result_size = 0;
   for (size_t i = 0; i < input.size; ++i) {
     uint8_t c = input.begin[i];
     if (c == '%') {
-      if (i + 2 < i || i + 2 >= input.size || !is_hex_char(input.begin[i + 1])
-          || !is_hex_char(input.begin[i + 2])) {
+      if (i + 2 < i || i + 2 >= input.size || !isxdigit(input.begin[i + 1])
+          || !isxdigit(input.begin[i + 2])) {
         return AZ_ERROR_ARG;
       }
       i += 2;
@@ -120,9 +114,9 @@ az_uri_decode(
     ++result_size;
   }
 
-  az_const_span const result = (az_const_span){ .begin = buffer.begin, .size = result_size };
+  az_span const result = (az_span){ .begin = buffer.begin, .size = result_size };
 
-  if (az_const_span_is_overlap(input, result)) {
+  if (az_span_is_overlap(input, result)) {
     return AZ_ERROR_ARG;
   }
 
