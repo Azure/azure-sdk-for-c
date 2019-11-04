@@ -8,7 +8,6 @@
 #include <az_http_request_builder.h>
 #include <az_span_builder.h>
 #include <az_str.h>
-#include <az_http_result.h>
 
 #include <curl/curl.h>
 #include <stdlib.h>
@@ -20,7 +19,7 @@
   do { \
     CURLcode const _result = (exp); \
     if (_result != CURLE_OK) { \
-      return AZ_ERROR_HTTP_FAILED_REQUEST; \
+      return AZ_ERROR_HTTP_PAL; \
     } \
   } while (0)
 

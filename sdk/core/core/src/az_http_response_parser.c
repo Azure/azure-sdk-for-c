@@ -3,7 +3,6 @@
 
 #include <az_http_response_parser.h>
 
-#include <az_http_result.h>
 #include <az_str.h>
 
 #include <_az_cfg.h>

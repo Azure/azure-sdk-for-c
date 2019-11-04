@@ -5,7 +5,6 @@
 
 #include <az_action.h>
 #include <az_http_header.h>
-#include <az_http_result.h>
 
 #include <_az_cfg.h>
 
