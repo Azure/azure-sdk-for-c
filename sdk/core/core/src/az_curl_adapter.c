@@ -155,24 +155,13 @@ az_write_url(az_mut_span const writable_buffer, az_span const url_from_request) 
 size_t write_to_span(void * contents, size_t size, size_t nmemb, void * userp) {
   size_t const expected_size = size * nmemb;
   size_t const size_with_extra_space = expected_size + AZ_STR_ZERO.size;
-  az_mut_span * const user_buffer = (az_mut_span *)userp;
-  size_t const user_buffer_remaining_space
-      = user_buffer->size - AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER.size;
-
-  // handle error when response won't feat user buffer
-  if (user_buffer_remaining_space < size_with_extra_space) {
-    // return number of bytes it took care
-    return 0;
-  }
+  az_span_builder * const user_buffer_builder = (az_span_builder *)userp;
 
   // TODO: format buffer with AZ_RESPONSE_BUILDER
-  memcpy(
-      user_buffer->begin + AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER.size,
-      contents,
-      size_with_extra_space);
+  az_span const span_for_content = (az_span){ .begin = contents, .size = size_with_extra_space };
+  AZ_RETURN_IF_FAILED(az_span_builder_append(user_buffer_builder, span_for_content));
   // add 0 so response can be printed
-  user_buffer->begin[AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER.size + size_with_extra_space]
-      = *AZ_STR_ZERO.begin;
+  AZ_RETURN_IF_FAILED(az_span_builder_append(user_buffer_builder, AZ_STR_ZERO));
 
   // This callback needs to return the response size or curl will consider it as it failed
   return expected_size;
@@ -276,24 +265,20 @@ setup_url(az_curl const * const p_curl, az_http_request_builder const * const p_
  * @param p_hrb
  * @return az_result
  */
-AZ_NODISCARD az_result
-setup_response_redirect(az_curl const * const p_curl, az_mut_span const * const response) {
+AZ_NODISCARD az_result setup_response_redirect(
+    az_curl const * const p_curl,
+    az_span_builder * const response_builder,
+    bool const buildRFC7230) {
   AZ_CONTRACT_ARG_NOT_NULL(p_curl);
-  // check if response will be redirected to user span
-  if (response != NULL) {
 
-    if (response->size < AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER.size) {
-      return AZ_ERROR_HTTP_FAILED_REQUEST;
-    }
-    memcpy(
-        response->begin,
-        AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER.begin,
-        AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER.size);
-
-    AZ_RETURN_IF_CURL_FAILED(
-        curl_easy_setopt(p_curl->p_curl, CURLOPT_WRITEFUNCTION, write_to_span));
-    AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl->p_curl, CURLOPT_WRITEDATA, (void *)response));
+  if (buildRFC7230) {
+    AZ_RETURN_IF_FAILED(
+        az_span_builder_append(response_builder, AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER));
   }
+
+  AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl->p_curl, CURLOPT_WRITEFUNCTION, write_to_span));
+  AZ_RETURN_IF_CURL_FAILED(
+      curl_easy_setopt(p_curl->p_curl, CURLOPT_WRITEDATA, (void *)response_builder));
 
   return AZ_OK;
 }
@@ -307,12 +292,14 @@ setup_response_redirect(az_curl const * const p_curl, az_mut_span const * const 
  */
 AZ_NODISCARD az_result az_http_client_send_request_impl(
     az_http_request_builder * const p_hrb,
-    az_mut_span const * const response) {
+    az_mut_span const * const response,
+    bool const buildRFC7230) {
   AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
   AZ_CONTRACT_ARG_NOT_NULL(response);
 
   az_curl p_curl;
   az_result result = AZ_ERROR_ARG;
+  az_span_builder response_builder = az_span_builder_create(*response);
 
   AZ_RETURN_IF_FAILED(az_curl_init(&p_curl));
 
@@ -320,7 +307,7 @@ AZ_NODISCARD az_result az_http_client_send_request_impl(
 
   AZ_RETURN_IF_CURL_FAILED(setup_url(&p_curl, p_hrb));
 
-  AZ_RETURN_IF_CURL_FAILED(setup_response_redirect(&p_curl, response));
+  AZ_RETURN_IF_CURL_FAILED(setup_response_redirect(&p_curl, &response_builder, buildRFC7230));
 
   if (az_span_eq(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_GET)) {
     result = az_curl_send_get_request(&p_curl);
@@ -328,9 +315,6 @@ AZ_NODISCARD az_result az_http_client_send_request_impl(
     result = az_curl_send_post_request(&p_curl, p_hrb);
   }
 
-  if (result != CURLE_OK) {
-    printf("= %s =", curl_easy_strerror(result));
-  }
   /*
   long response_code;
   AZ_RETURN_IF_CURL_FAILED(

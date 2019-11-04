@@ -15,8 +15,8 @@
 
 static az_span GET_TOKEN_URL = AZ_CONST_STR(
     "https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47/oauth2/token");
-static az_span KEY_VAULT_URL = AZ_CONST_STR("http://127.0.0.1:5000/test/vh");
-// https://antk-keyvault.vault.azure.net/secrets/Password
+static az_span KEY_VAULT_URL
+    = AZ_CONST_STR("https://antk-keyvault.vault.azure.net/secrets/Password");
 
 static az_span API_VERSION_QUERY_NAME = AZ_CONST_STR("api-version");
 static az_span API_VERSION_QUERY_VALUE = AZ_CONST_STR("7.0");
@@ -46,9 +46,9 @@ int main() {
   if (az_failed(add_body_result)) {
     return add_body_result;
   }
-  // *************************send POST
+  // *************************send POST and read body response only
   az_result const post_response = az_http_client_send_request(&hrb, &http_buf_response);
-  // printf("******* %s *****", http_buf_response.begin);
+  printf("******* %s *****", http_buf_response.begin);
 
   if (az_failed(post_response)) {
     printf("Error during running test\n");
@@ -105,10 +105,9 @@ int main() {
   } else {
     printf("Error during running test\n");
     printf("Response is: \n%s", http_buf_response.begin);
-    return get_response;
+    // return get_response;
   }
 
   free(buffer_for_header);
-
   return 0;
 }
