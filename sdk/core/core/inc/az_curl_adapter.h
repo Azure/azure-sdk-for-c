@@ -14,6 +14,8 @@
 
 #include <_az_cfg_prefix.h>
 
+extern az_span const AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER;
+
 // returning AZ error on CURL Error
 #define AZ_RETURN_IF_CURL_FAILED(exp) \
   do { \
