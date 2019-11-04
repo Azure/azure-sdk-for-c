@@ -70,7 +70,7 @@ void az_span_free(az_mut_span * const p) {
     return;
   }
   free(p->begin);
-  *p = (az_mut_span){ 0 };
+  *p = (az_mut_span){ .begin = NULL, .size = 0 };
 }
 
 AZ_NODISCARD az_result az_tmp_span(size_t const size, az_mut_span_action const mut_span_action) {
