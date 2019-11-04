@@ -74,22 +74,6 @@ AZ_NODISCARD az_result az_span_reader_get_http_status_line(
   return AZ_OK;
 }
 
-AZ_NODISCARD AZ_INLINE az_result
-az_span_reader_get_http_value_kind(az_span_reader * const self, az_http_response_kind * const out) {
-  AZ_CONTRACT_ARG_NOT_NULL(self);
-  AZ_CONTRACT_ARG_NOT_NULL(out);
-
-  az_result_byte const c = az_span_reader_current(self);
-  if (c == AZ_CR) {
-    az_span_reader_next(self);
-    AZ_RETURN_IF_FAILED(az_span_reader_expect_char(self, AZ_LF));
-    *out = AZ_HTTP_RESPONSE_BODY;
-  } else {
-    *out = AZ_HTTP_RESPONSE_HEADER;
-  }
-  return AZ_OK;
-}
-
 // An HTTP parser.
 //
 // It accesses a response buffer only by `az_span_reader_current()`
