@@ -10,6 +10,39 @@
 
 az_const_span const AZ_HTTP_REQUEST_BUILDER_HEADER_SEPARATOR = AZ_CONST_STR(": ");
 
+AZ_NODISCARD char az_digit_to_char(size_t const digit) {
+  switch (digit) {
+    case 0:
+      return '0';
+    case 1:
+      return '1';
+    case 2:
+      return '2';
+    case 3:
+      return '3';
+    case 4:
+      return '4';
+    case 5:
+      return '5';
+    case 6:
+      return '6';
+    case 7:
+      return '7';
+    case 8:
+      return '8';
+    case 9:
+      return '9';
+    default:
+      break;
+  }
+  return ';';
+}
+AZ_NODISCARD char az_get_max_version(size_t const version) {
+  return az_digit_to_char(version / 10);
+}
+AZ_NODISCARD char az_get_min_version(size_t const version) {
+  return az_digit_to_char(version % 10);
+}
 /**
  * @brief writes a header key and value to a buffer as a 0-terminated string and using a separator
  * span in between. Returns error as soon as any of the write operations fails
@@ -104,6 +137,8 @@ az_write_url(az_span const writable_buffer, az_const_span const url_from_request
   AZ_RETURN_IF_FAILED(az_span_builder_append(&writer, AZ_STR_ZERO));
   return AZ_OK;
 }
+
+// AZ_NODISCARD az_result az_curl_to_http_response(az_span user_buffer) { return AZ_OK; }
 
 /**
  * @brief This is the function that curl will use to write response into a user provider span
@@ -236,7 +271,6 @@ setup_url(az_curl const * const p_curl, az_http_request_builder const * const p_
 AZ_NODISCARD az_result
 setup_response_redirect(az_curl const * const p_curl, az_span const * const response) {
   AZ_CONTRACT_ARG_NOT_NULL(p_curl);
-  AZ_CONTRACT_ARG_NOT_NULL(response);
 
   // check if response will be redirected to user span
   if (response != NULL) {
@@ -249,7 +283,8 @@ setup_response_redirect(az_curl const * const p_curl, az_span const * const resp
 }
 
 /**
- * @brief uses AZ_HTTP_BUILDER to set up CURL request and perform it
+ * @brief uses AZ_HTTP_BUILDER to set up CURL request and perform it.
+ *
  *
  * @param p_hrb
  * @param response
@@ -263,6 +298,8 @@ AZ_NODISCARD az_result az_http_client_send_request_impl(
 
   az_curl p_curl;
   az_result result = AZ_ERROR_ARG;
+  long response_code;
+
   AZ_RETURN_IF_FAILED(az_curl_init(&p_curl));
 
   AZ_RETURN_IF_CURL_FAILED(setup_headers(&p_curl, p_hrb));
@@ -276,6 +313,18 @@ AZ_NODISCARD az_result az_http_client_send_request_impl(
   } else if (az_const_span_eq(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_POST)) {
     result = az_curl_send_post_request(&p_curl, p_hrb);
   }
+
+  AZ_RETURN_IF_CURL_FAILED(
+      curl_easy_getinfo(p_curl.p_curl, CURLINFO_RESPONSE_CODE, &response_code));
+
+  size_t http_version;
+  curl_easy_getinfo(p_curl.p_curl, CURLINFO_HTTP_VERSION, &http_version);
+  printf("1 %c", az_digit_to_char(http_version / 10));
+  printf("2 %c\n", az_get_min_version(http_version));
+
+  *(response->begin + 19) = '.';
+  *(response->begin + 20) = az_get_max_version(http_version);
+  *(response->begin + 26) = az_get_min_version(http_version);
 
   AZ_RETURN_IF_FAILED(az_curl_done(&p_curl));
   return result;
