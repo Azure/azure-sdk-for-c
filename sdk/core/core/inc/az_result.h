@@ -12,20 +12,8 @@
 
 #include <_az_cfg_prefix.h>
 
-/**
- * The type represents error conditions.
- * Bits:
- * - 31 Severity (0 - success, 1 - failure).
- * - if failure then
- *   - 16..30 Facility.
- *   -  0..15 Code.
- * - otherwise
- *   -  0..30 Value
- */
-typedef int32_t az_result;
-
 enum {
-  AZ_ERROR_FLAG = (az_result)0x80000000,
+  AZ_ERROR_FLAG = (int32_t)0x80000000,
 };
 
 enum {
@@ -36,7 +24,7 @@ enum {
 };
 
 #define AZ_MAKE_ERROR(facility, code) \
-  ((az_result)(0x80000000 | ((uint32_t)(facility) << 16) | (uint32_t)(code)))
+  ((int32_t)(0x80000000 | ((uint32_t)(facility) << 16) | (uint32_t)(code)))
 
 #define AZ_RETURN_IF_FAILED(exp) \
   do { \
@@ -46,7 +34,17 @@ enum {
     } \
   } while (0)
 
-enum az_result {
+/**
+ * The type represents error conditions.
+ * Bits:
+ * - 31 Severity (0 - success, 1 - failure).
+ * - if failure then
+ *   - 16..30 Facility.
+ *   -  0..15 Code.
+ * - otherwise
+ *   -  0..30 Value
+ */
+typedef enum az_result {
   AZ_OK = 0,
 
   // Core
@@ -70,9 +68,9 @@ enum az_result {
 
   // C standard errors
   AZ_ERROR_EOF = AZ_MAKE_ERROR(AZ_STD_FACILITY, 0xFFFF),
-};
+} az_result;
 
-AZ_STATIC_ASSERT(sizeof(enum az_result) == 4)
+AZ_STATIC_ASSERT(sizeof(az_result) == 4)
 
 AZ_STATIC_ASSERT(AZ_ERROR_EOF == EOF)
 AZ_STATIC_ASSERT(EOF == -1)
