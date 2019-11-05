@@ -14,8 +14,6 @@
 
 #include <_az_cfg_prefix.h>
 
-extern az_span const AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER;
-
 /**
  * Converts CURLcode to az_result.
  */

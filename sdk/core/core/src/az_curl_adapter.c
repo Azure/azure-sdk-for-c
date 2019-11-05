@@ -285,6 +285,6 @@ AZ_NODISCARD az_result az_http_client_send_request_impl(
     AZ_RETURN_IF_FAILED(az_span_builder_append(&response_builder, AZ_STR_ZERO));
   }
 
-  AZ_RETURN_IF_FAILED(az_curl_done(&p_curl));
+  AZ_RETURN_IF_FAILED(az_curl_done(p_curl));
   return result;
 }
