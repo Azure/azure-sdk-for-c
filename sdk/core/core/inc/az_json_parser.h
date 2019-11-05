@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef AZ_JSON_READ_H
-#define AZ_JSON_READ_H
+#ifndef AZ_JSON_PARSER_H
+#define AZ_JSON_PARSER_H
 
 #include <az_result.h>
 #include <az_span_reader.h>
@@ -49,23 +49,23 @@ typedef enum {
 typedef struct {
   az_span_reader reader;
   az_json_stack stack;
-} az_json_state;
+} az_json_parser;
 
-AZ_NODISCARD az_json_state az_json_state_create(az_span const buffer);
+AZ_NODISCARD az_json_parser az_json_parser_create(az_span const buffer);
 
-AZ_NODISCARD az_result az_json_read(az_json_state * const p_state, az_json_value * const out_value);
+AZ_NODISCARD az_result az_json_parser_get(az_json_parser * const self, az_json_value * const out_value);
 
 AZ_NODISCARD az_result
-az_json_read_object_member(
-    az_json_state * const p_state,
+az_json_parser_get_object_member(
+    az_json_parser * const self,
     az_json_member * const out_member);
 
 AZ_NODISCARD az_result
-az_json_read_array_element(
-    az_json_state * const p_state,
+az_json_parser_get_array_element(
+    az_json_parser * const self,
     az_json_value * const out_value);
 
-AZ_NODISCARD az_result az_json_state_done(az_json_state const * const p_state);
+AZ_NODISCARD az_result az_json_parser_done(az_json_parser const * const self);
 
 AZ_NODISCARD az_result az_json_get_object_member_value(
     az_span const json,
@@ -77,6 +77,7 @@ AZ_NODISCARD AZ_INLINE az_result az_json_get_object_member_string_value(
     az_span const name,
     az_span * const out_value) {
   AZ_CONTRACT_ARG_NOT_NULL(out_value);
+
   az_json_value value;
   AZ_RETURN_IF_FAILED(az_json_get_object_member_value(json, name, &value));
 
@@ -93,6 +94,7 @@ AZ_NODISCARD AZ_INLINE az_result az_json_get_object_member_numeric_value(
     az_span const name,
     double * const out_value) {
   AZ_CONTRACT_ARG_NOT_NULL(out_value);
+
   az_json_value value;
   AZ_RETURN_IF_FAILED(az_json_get_object_member_value(json, name, &value));
 
