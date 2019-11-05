@@ -153,9 +153,22 @@ az_curl_send_post_request(CURL * const p_curl, az_http_request_builder const * c
   AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
 
   // Method
-  AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl, CURLOPT_POSTFIELDS, p_hrb->body.begin));
+  az_mut_span body = { 0, 0 };
+  AZ_RETURN_IF_FAILED(az_span_malloc(p_hrb->body.size + 1, &body));
 
-  AZ_RETURN_IF_CURL_FAILED(curl_easy_perform(p_curl));
+  az_mut_span zt_buf = { 0, 0 };
+  az_result res_code = az_mut_span_to_str(body, p_hrb->body, &zt_buf);
+
+  if (az_succeeded(res_code)) {
+    res_code = az_curl_code_to_result(curl_easy_setopt(p_curl, CURLOPT_POSTFIELDS, zt_buf.begin));
+    if (az_succeeded(res_code)) {
+      res_code = az_curl_code_to_result(curl_easy_perform(p_curl));
+    }
+  }
+
+  az_span_free(&body);
+  AZ_RETURN_IF_FAILED(res_code);
+  
   return AZ_OK;
 }
 
@@ -283,6 +296,6 @@ AZ_NODISCARD az_result az_http_client_send_request_impl(
     AZ_RETURN_IF_FAILED(az_span_builder_append(&response_builder, AZ_STR_ZERO));
   }
 
-  AZ_RETURN_IF_FAILED(az_curl_done(p_curl));
+  AZ_RETURN_IF_FAILED(az_curl_done(&p_curl));
   return result;
 }
