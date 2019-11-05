@@ -37,7 +37,7 @@ enum {
   MIN_BUFFER = 1350, // if you measure the length of the login.microsoftonline.com's response, it is
                      // around 1324 characters for key vault service.
   URLENCODE_FACTOR = 3, // maximum characters needed when URL encoding (3x the original)
-  NREQUEST_ELEMENTS = 6
+  NREQUEST_ELEMENTS = 5
 };
 
 AZ_NODISCARD az_result az_auth_get_token(
@@ -82,9 +82,7 @@ AZ_NODISCARD az_result az_auth_get_token(
       credentials.data.client_credentials.client_id.size * URLENCODE_FACTOR,
       credentials.data.client_credentials.client_secret.size * URLENCODE_FACTOR,
       resource_url.size * URLENCODE_FACTOR,
-      auth_url_maxsize,
-      1 // Bug: curl wrapper does not zero-terminate body. After it is fixed, remove 1 and decrement
-        // NREQUEST_ELEMENTS
+      auth_url_maxsize
     };
 
     size_t required_request_size
@@ -186,9 +184,6 @@ AZ_NODISCARD az_result az_auth_get_token(
         .begin = buf.begin + tmp_span.size,
         .size = buf.size - tmp_span.size,
       };
-
-      // Workaround for the bug in curl wrapper - it does not zero-terminate body.
-      buf.begin[0] = '\0';
 
       auth_body.size = (buf.begin - auth_body.begin);
     }
