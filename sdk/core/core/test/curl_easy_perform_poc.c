@@ -47,11 +47,11 @@ int main() {
     return add_body_result;
   }
   // *************************send POST and read body response only
-  az_result const post_response = az_http_client_send_request(&hrb, &http_buf_response);
-  printf("******* %s *****", http_buf_response.begin);
+  az_result const post_response
+      = az_http_client_send_request_and_get_body(&hrb, &http_buf_response);
 
   if (az_failed(post_response)) {
-    printf("Error during running test\n");
+    printf("Error while getting auth token\n");
     return post_response;
   }
 

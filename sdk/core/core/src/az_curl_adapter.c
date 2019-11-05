@@ -8,43 +8,7 @@
 #include <_az_cfg.h>
 
 az_span const AZ_HTTP_REQUEST_BUILDER_HEADER_SEPARATOR = AZ_CONST_STR(": ");
-az_span const AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER_HTTP = AZ_CONST_STR("HTTP/");
-az_span const AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER_VERSION = AZ_CONST_STR("X.X ");
-az_span const AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER_CODE = AZ_CONST_STR("XXX \r\n");
 
-AZ_NODISCARD char az_digit_to_char(long const digit) {
-  switch (digit) {
-    case 0:
-      return '0';
-    case 1:
-      return '1';
-    case 2:
-      return '2';
-    case 3:
-      return '3';
-    case 4:
-      return '4';
-    case 5:
-      return '5';
-    case 6:
-      return '6';
-    case 7:
-      return '7';
-    case 8:
-      return '8';
-    case 9:
-      return '9';
-    default:
-      break;
-  }
-  return ';';
-}
-AZ_NODISCARD char az_get_max_version(long const version) {
-  return version < 10 ? az_digit_to_char(version) : az_digit_to_char(version / 10);
-}
-AZ_NODISCARD char az_get_min_version(long const version) {
-  return version < 10 ? '0' : az_digit_to_char(version % 10);
-}
 /**
  * @brief writes a header key and value to a buffer as a 0-terminated string and using a separator
  * span in between. Returns error as soon as any of the write operations fails
@@ -156,14 +120,10 @@ az_write_url(az_mut_span const writable_buffer, az_span const url_from_request) 
  */
 size_t write_to_span(void * contents, size_t size, size_t nmemb, void * userp) {
   size_t const expected_size = size * nmemb;
-  size_t const size_with_extra_space = expected_size + AZ_STR_ZERO.size;
   az_span_builder * const user_buffer_builder = (az_span_builder *)userp;
 
-  // TODO: format buffer with AZ_RESPONSE_BUILDER
-  az_span const span_for_content = (az_span){ .begin = contents, .size = size_with_extra_space };
+  az_span const span_for_content = (az_span){ .begin = contents, .size = expected_size };
   AZ_RETURN_IF_FAILED(az_span_builder_append(user_buffer_builder, span_for_content));
-  // add 0 so response can be printed
-  AZ_RETURN_IF_FAILED(az_span_builder_append(user_buffer_builder, AZ_STR_ZERO));
 
   // This callback needs to return the response size or curl will consider it as it failed
   return expected_size;
@@ -274,52 +234,15 @@ AZ_NODISCARD az_result setup_response_redirect(
   AZ_CONTRACT_ARG_NOT_NULL(p_curl);
 
   if (buildRFC7230) {
-    AZ_RETURN_IF_FAILED(
-        az_span_builder_append(response_builder, AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER_HTTP));
-    AZ_RETURN_IF_FAILED(
-        az_span_builder_append(response_builder, AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER_VERSION));
-    AZ_RETURN_IF_FAILED(
-        az_span_builder_append(response_builder, AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER_CODE));
+    AZ_RETURN_IF_CURL_FAILED(
+        curl_easy_setopt(p_curl->p_curl, CURLOPT_HEADERFUNCTION, write_to_span));
+    AZ_RETURN_IF_CURL_FAILED(
+        curl_easy_setopt(p_curl->p_curl, CURLOPT_HEADERDATA, (void *)response_builder));
   }
 
   AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl->p_curl, CURLOPT_WRITEFUNCTION, write_to_span));
   AZ_RETURN_IF_CURL_FAILED(
       curl_easy_setopt(p_curl->p_curl, CURLOPT_WRITEDATA, (void *)response_builder));
-
-  return AZ_OK;
-}
-
-/**
- * @brief Uses curl response to update placeholder values with code and version
- * transelates placeholder HTTP/X.X XXX to real value
- *
- * @param p_curl
- * @param response
- * @return AZ_NODISCARD update_placeholder
- */
-AZ_NODISCARD az_result
-update_placeholder(az_curl const * const p_curl, az_mut_span const * const response) {
-  long const response_code;
-  long const http_version;
-
-  AZ_RETURN_IF_CURL_FAILED(
-      curl_easy_getinfo(p_curl->p_curl, CURLINFO_RESPONSE_CODE, &response_code));
-  curl_easy_getinfo(p_curl->p_curl, CURLINFO_HTTP_VERSION, &http_version);
-
-  *(response->begin + AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER_HTTP.size)
-      = az_get_max_version(http_version);
-  *(response->begin + AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER_HTTP.size + 2)
-      = az_get_min_version(http_version);
-
-  *(response->begin + AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER_HTTP.size
-    + AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER_VERSION.size)
-      = az_digit_to_char(response_code / 100);
-  *(response->begin + AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER_HTTP.size
-    + AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER_VERSION.size + 1)
-      = az_digit_to_char((response_code % 100) / 10);
-  *(response->begin + AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER_HTTP.size
-    + AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER_VERSION.size + 2)
-      = az_digit_to_char((response_code % 100) % 10);
 
   return AZ_OK;
 }
@@ -356,7 +279,7 @@ AZ_NODISCARD az_result az_http_client_send_request_impl(
     result = az_curl_send_post_request(&p_curl, p_hrb);
   }
   if (az_succeeded(result)) {
-    AZ_RETURN_IF_CURL_FAILED(update_placeholder(&p_curl, response));
+    AZ_RETURN_IF_FAILED(az_span_builder_append(&response_builder, AZ_STR_ZERO));
   }
 
   AZ_RETURN_IF_FAILED(az_curl_done(&p_curl));
