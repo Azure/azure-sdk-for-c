@@ -14,6 +14,7 @@ endif()
 add_library (
   az_core
   src/az_assumptions.c
+  src/az_auth.c
   src/az_base64.c
   src/az_curl_adapter.c
   src/az_curl_slist.c
@@ -52,6 +53,9 @@ add_executable (az_core_test test/main.c)
 
 target_link_libraries(az_core_test PRIVATE az_core)
 
+add_executable (az_auth_poc test/az_auth_poc.c)
+target_link_libraries(az_auth_poc PRIVATE az_core)
+
 # curl easy perform POC
 add_executable (curl_easy_perform_poc test/curl_easy_perform_poc.c)
 target_link_libraries(curl_easy_perform_poc PRIVATE 
@@ -67,6 +71,7 @@ endif()
 
 if (UNIX)
   target_link_libraries(az_core_test PRIVATE m)
+  target_link_libraries(az_auth_poc PRIVATE m)
   target_link_libraries(curl_easy_perform_poc PRIVATE m)
 endif()
 
