@@ -14,7 +14,7 @@ AZ_NODISCARD AZ_INLINE az_result_byte az_ascii_lower(az_result_byte const value)
 
 AZ_NODISCARD bool az_span_eq_ascii_ignore_case(az_span const a, az_span const b) {
   size_t const size = a.size;
-  if (size == b.size) {
+  if (size != b.size) {
     return false;
   }
   for (size_t i = 0; i < size; ++i) {
