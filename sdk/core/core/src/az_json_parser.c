@@ -83,27 +83,6 @@ static void az_span_reader_skip_json_white_space(az_span_reader * const self) {
   }
 }
 
-/*
-AZ_NODISCARD static az_result az_json_parser_read_keyword_rest(
-    az_span_reader * const self,
-    az_span const keyword) {
-  az_span_reader_next(self);
-  az_span_reader k = az_span_reader_create(keyword);
-  while (true) {
-    az_result_byte const ko = az_span_reader_current(&k);
-    if (ko == AZ_ERROR_EOF) {
-      return AZ_OK;
-    }
-    az_result_byte const o = az_span_reader_current(self);
-    if (o != ko) {
-      return az_error_unexpected_char(o);
-    }
-    az_span_reader_next(self);
-    az_span_reader_next(&k);
-  }
-}
-*/
-
 // 18 decimal digits. 10^18 - 1.
 //                        0         1
 //                        012345678901234567
