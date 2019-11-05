@@ -30,6 +30,19 @@ typedef struct {
   az_span option;
 } az_keyvault_keys_keys_options;
 
+AZ_NODISCARD az_result az_keyvault_keys_client_init(
+    az_keyvault_keys_client * client,
+    az_span uri,
+    /*Azure Credentials */
+    az_keyvault_keys_client_options * options);
+
+AZ_NODISCARD az_result az_keyvault_keys_createKey(
+    az_keyvault_keys_client * client,
+    az_span keyname,
+    az_span keytype,
+    az_keyvault_keys_keys_options * options,
+    az_span * out);
+
 #include <_az_cfg_suffix.h>
 
 #endif
