@@ -106,8 +106,6 @@ az_write_url(az_mut_span const writable_buffer, az_span const url_from_request) 
   return AZ_OK;
 }
 
-// AZ_NODISCARD az_result az_curl_to_http_response(az_span user_buffer) { return AZ_OK; }
-
 /**
  * @brief This is the function that curl will use to write response into a user provider span
  * Function receives the size of the response and must return this same number, otherwise it is
