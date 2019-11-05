@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 #include <az_http_response_parser.h>
-#include <az_http_result.h>
 #include <az_span.h>
 
 #include "./az_test.h"
