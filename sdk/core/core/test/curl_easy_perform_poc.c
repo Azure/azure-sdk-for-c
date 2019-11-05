@@ -4,7 +4,7 @@
 #include <az_http_client.h>
 #include <az_http_request_builder.h>
 #include <az_http_response_parser.h>
-#include <az_json_parser.h>
+#include <az_json_get.h>
 #include <az_pair.h>
 #include <az_span.h>
 #include <az_span_builder.h>
@@ -77,7 +77,7 @@ int main() {
 
   // Get the access_token from previous response. It will be just a reference to it (span) with
   // non-0 terminated
-  ignore_result = az_json_get_object_member_string_value(
+  ignore_result = az_json_get_object_member_string(
       az_mut_span_to_span(http_buf_response), AZ_STR("access_token"), &auth_token);
 
   /****** -------------  Create buffer for header auth ---------******/
