@@ -6,7 +6,6 @@
 
 #include <az_http_request.h>
 #include <az_http_request_builder.h>
-#include <az_http_result.h>
 #include <az_span_builder.h>
 #include <az_str.h>
 
