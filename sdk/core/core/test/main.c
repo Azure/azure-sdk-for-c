@@ -394,7 +394,7 @@ int main() {
     TEST_ASSERT(value.kind == AZ_JSON_VALUE_NUMBER);
     // TEST_ASSERT(value.val.number == 0.3);
     TEST_ASSERT(az_json_parser_get_array_element(&state, &value) == AZ_ERROR_ITEM_NOT_FOUND);
-    TEST_ASSERT(az_json_state_done(&state) == AZ_OK);
+    TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
   }
   {
     az_span const json = AZ_STR("{\"a\":\"Hello world!\"}");
