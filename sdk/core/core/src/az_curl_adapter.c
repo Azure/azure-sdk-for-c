@@ -238,9 +238,9 @@ AZ_NODISCARD az_result setup_response_redirect(
 
   if (buildRFC7230) {
     AZ_RETURN_IF_CURL_FAILED(
-        curl_easy_setopt(p_curl->p_curl, CURLOPT_HEADERFUNCTION, write_to_span));
+        curl_easy_setopt(p_curl, CURLOPT_HEADERFUNCTION, write_to_span));
     AZ_RETURN_IF_CURL_FAILED(
-        curl_easy_setopt(p_curl->p_curl, CURLOPT_HEADERDATA, (void *)response_builder));
+        curl_easy_setopt(p_curl, CURLOPT_HEADERDATA, (void *)response_builder));
   }
 
   AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl, CURLOPT_WRITEFUNCTION, write_to_span));
@@ -274,7 +274,7 @@ AZ_NODISCARD az_result az_http_client_send_request_impl(
 
   AZ_RETURN_IF_CURL_FAILED(setup_url(p_curl, p_hrb));
 
-  AZ_RETURN_IF_CURL_FAILED(setup_response_redirect(&p_curl, &response_builder, buildRFC7230));
+  AZ_RETURN_IF_CURL_FAILED(setup_response_redirect(p_curl, &response_builder, buildRFC7230));
 
   if (az_span_eq(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_GET)) {
     result = az_curl_send_get_request(p_curl);
@@ -282,6 +282,11 @@ AZ_NODISCARD az_result az_http_client_send_request_impl(
     result = az_curl_send_post_request(p_curl, p_hrb);
   }
 
-  AZ_RETURN_IF_FAILED(az_curl_done(p_curl));
+  // make sure to set the end of the body response as the end of the complete response
+  if (az_succeeded(result)) {
+    AZ_RETURN_IF_FAILED(az_span_builder_append(&response_builder, AZ_STR_ZERO));
+  }
+
+  AZ_RETURN_IF_FAILED(az_curl_done(&p_curl));
   return result;
 }
