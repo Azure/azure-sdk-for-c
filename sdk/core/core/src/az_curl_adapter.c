@@ -166,18 +166,18 @@ az_curl_send_post_request(CURL * const p_curl, az_http_request_builder const * c
   AZ_RETURN_IF_FAILED(az_span_malloc(p_hrb->body.size + 1, &body));
 
   az_mut_span zt_buf = { 0 };
-  az_result const zt_result = az_mut_span_to_str(body, p_hrb->body, &zt_buf);
+  az_result res_code = az_mut_span_to_str(body, p_hrb->body, &zt_buf);
 
-  CURLcode curl_result = CURLE_OK;
-  if (az_succeeded(zt_result)) {
-    CURLcode curl_result = curl_easy_setopt(p_curl, CURLOPT_POSTFIELDS, zt_buf.begin);
+  if (az_succeeded(res_code)) {
+    res_code = az_curl_code_to_result(curl_easy_setopt(p_curl, CURLOPT_POSTFIELDS, zt_buf.begin));
+    if (az_succeeded(res_code)) {
+      res_code = az_curl_code_to_result(curl_easy_perform(p_curl));
+    }
   }
 
   az_span_free(&body);
-  AZ_RETURN_IF_FAILED(zt_result);
-  AZ_RETURN_IF_CURL_FAILED(curl_result);
-
-  AZ_RETURN_IF_CURL_FAILED(curl_easy_perform(p_curl));
+  AZ_RETURN_IF_FAILED(res_code);
+  
   return AZ_OK;
 }
 
