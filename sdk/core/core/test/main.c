@@ -59,7 +59,7 @@ az_result read_write_value(
       while (true) {
         az_json_member member;
         az_result const result = az_json_read_object_member(state, &member);
-        if (result == AZ_JSON_ERROR_NO_MORE_ITEMS) {
+        if (result == AZ_ERROR_JSON_NO_MORE_ITEMS) {
           break;
         }
         AZ_RETURN_IF_FAILED(result);
@@ -80,7 +80,7 @@ az_result read_write_value(
       while (true) {
         az_json_value element;
         az_result const result = az_json_read_array_element(state, &element);
-        if (result == AZ_JSON_ERROR_NO_MORE_ITEMS) {
+        if (result == AZ_ERROR_JSON_NO_MORE_ITEMS) {
           break;
         }
         AZ_RETURN_IF_FAILED(result);
@@ -96,7 +96,7 @@ az_result read_write_value(
     default:
       break;
   }
-  return AZ_JSON_ERROR_INVALID_STATE;
+  return AZ_ERROR_JSON_INVALID_STATE;
 }
 
 az_result read_write(az_span const input, az_mut_span const output, size_t * const o) {
@@ -393,7 +393,7 @@ int main() {
     TEST_ASSERT(az_json_read_array_element(&state, &value) == AZ_OK);
     TEST_ASSERT(value.kind == AZ_JSON_VALUE_NUMBER);
     // TEST_ASSERT(value.val.number == 0.3);
-    TEST_ASSERT(az_json_read_array_element(&state, &value) == AZ_JSON_ERROR_NO_MORE_ITEMS);
+    TEST_ASSERT(az_json_read_array_element(&state, &value) == AZ_ERROR_JSON_NO_MORE_ITEMS);
     TEST_ASSERT(az_json_state_done(&state) == AZ_OK);
   }
   {
@@ -409,7 +409,7 @@ int main() {
     TEST_ASSERT(member.value.kind == AZ_JSON_VALUE_STRING);
     TEST_ASSERT(member.value.data.string.begin == json.begin + 6);
     TEST_ASSERT(member.value.data.string.size == 12);
-    TEST_ASSERT(az_json_read_object_member(&state, &member) == AZ_JSON_ERROR_NO_MORE_ITEMS);
+    TEST_ASSERT(az_json_read_object_member(&state, &member) == AZ_ERROR_JSON_NO_MORE_ITEMS);
     TEST_ASSERT(az_json_state_done(&state) == AZ_OK);
   }
   uint8_t buffer[1000];
@@ -430,7 +430,7 @@ int main() {
         "[[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ "
         "[[[[[ [[[[");
     az_result const result = read_write(json, output, &o);
-    TEST_ASSERT(result == AZ_JSON_ERROR_STACK_OVERFLOW);
+    TEST_ASSERT(result == AZ_ERROR_JSON_STACK_OVERFLOW);
   }
   {
     size_t o = 0;

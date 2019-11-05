@@ -21,7 +21,7 @@ extern az_span const AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER;
   do { \
     CURLcode const _result = (exp); \
     if (_result != CURLE_OK) { \
-      return AZ_ERROR_HTTP_FAILED_REQUEST; \
+      return AZ_ERROR_HTTP_PAL; \
     } \
   } while (0)
 
