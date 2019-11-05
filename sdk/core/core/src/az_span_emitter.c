@@ -54,7 +54,7 @@ AZ_NODISCARD az_result az_span_emitter_to_str(
 }
 
 AZ_NODISCARD az_result az_tmp_span(size_t const size, az_mut_span_action const mut_span_action) {
-  az_mut_span span = { 0 };
+  az_mut_span span;
   AZ_RETURN_IF_FAILED(az_span_malloc(size, &span));
   az_result const result = az_mut_span_action_do(mut_span_action, span);
   az_span_free(&span);

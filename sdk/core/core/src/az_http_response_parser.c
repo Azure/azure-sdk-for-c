@@ -3,7 +3,6 @@
 
 #include <az_http_response_parser.h>
 
-#include <az_http_result.h>
 #include <az_str.h>
 
 #include <_az_cfg.h>
@@ -71,22 +70,6 @@ AZ_NODISCARD az_result az_span_reader_get_http_status_line(
   }
 
   out->reason_phrase = az_span_sub(self->span, begin, self->i);
-  return AZ_OK;
-}
-
-AZ_NODISCARD AZ_INLINE az_result
-az_span_reader_get_http_value_kind(az_span_reader * const self, az_http_response_kind * const out) {
-  AZ_CONTRACT_ARG_NOT_NULL(self);
-  AZ_CONTRACT_ARG_NOT_NULL(out);
-
-  az_result_byte const c = az_span_reader_current(self);
-  if (c == AZ_CR) {
-    az_span_reader_next(self);
-    AZ_RETURN_IF_FAILED(az_span_reader_expect_char(self, AZ_LF));
-    *out = AZ_HTTP_RESPONSE_BODY;
-  } else {
-    *out = AZ_HTTP_RESPONSE_HEADER;
-  }
   return AZ_OK;
 }
 
