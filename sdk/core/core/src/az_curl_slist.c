@@ -8,9 +8,6 @@
 
 #include <_az_cfg.h>
 
-/**
- * Appends a zero-terminated string to the given CURL list.
- */
 AZ_NODISCARD az_result
 az_curl_slist_append(struct curl_slist ** const self, char const * const str) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
@@ -25,7 +22,7 @@ az_curl_slist_append(struct curl_slist ** const self, char const * const str) {
 }
 
 /**
- * Creates a function `az_curl_slist_append_action(struct curlt_slist **)`
+ * Creates a function `az_curl_slist_append_action(struct curl_slist **)`
  * that returns a value of type `az_str_action`.
  */
 AZ_ACTION_FUNC(az_curl_slist_append, struct curl_slist *, az_str_action)
