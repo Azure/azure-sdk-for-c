@@ -327,7 +327,7 @@ az_json_read(az_json_state * const p_state, az_json_value * const out_value) {
     default:
       break;
   }
-  return is_empty ? AZ_OK : AZ_ERROR_UNEXPECTED_CHAR;
+  return is_empty ? AZ_OK : AZ_ERROR_PARSER_UNEXPECTED_CHAR;
 }
 
 AZ_NODISCARD AZ_INLINE uint8_t az_json_stack_item_to_close(az_json_stack_item const item) {
@@ -366,7 +366,7 @@ AZ_NODISCARD static az_result az_json_check_item_begin(
   if (!az_json_stack_is_empty(p_state)) {
     AZ_RETURN_IF_FAILED(az_json_read_comma_or_close(p_state));
   }
-  return AZ_ERROR_JSON_NO_MORE_ITEMS;
+  return AZ_ERROR_ITEM_NOT_FOUND;
 }
 
 AZ_NODISCARD static az_result az_json_check_item_end(
@@ -435,7 +435,7 @@ AZ_NODISCARD az_result az_json_get_object_member_value(
 
   if (value.kind == AZ_JSON_VALUE_OBJECT) {
     az_json_member member;
-    while (az_json_read_object_member(&state, &member) != AZ_ERROR_JSON_NO_MORE_ITEMS) {
+    while (az_json_read_object_member(&state, &member) != AZ_ERROR_ITEM_NOT_FOUND) {
       if (az_span_eq(member.name, name)) {
         *out_value = member.value;
         return AZ_OK;
@@ -443,5 +443,5 @@ AZ_NODISCARD az_result az_json_get_object_member_value(
     }
   }
 
-  return AZ_ERROR_JSON_NOT_FOUND;
+  return AZ_ERROR_ITEM_NOT_FOUND;
 }

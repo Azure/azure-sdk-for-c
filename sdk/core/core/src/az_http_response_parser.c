@@ -138,7 +138,7 @@ az_http_response_parser_get_next_header(az_http_response_parser * const self, az
   {
     az_http_response_kind const kind = self->kind;
     if (kind == AZ_HTTP_RESPONSE_BODY) {
-      return AZ_ERROR_HTTP_NO_MORE_HEADERS;
+      return AZ_ERROR_ITEM_NOT_FOUND;
     }
     if (kind != AZ_HTTP_RESPONSE_HEADER) {
       return AZ_ERROR_HTTP_INVALID_STATE;

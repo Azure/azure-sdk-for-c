@@ -81,7 +81,7 @@ AZ_NODISCARD AZ_INLINE az_result az_json_get_object_member_string_value(
   AZ_RETURN_IF_FAILED(az_json_get_object_member_value(json, name, &value));
 
   if (value.kind != AZ_JSON_VALUE_STRING) {
-    return AZ_ERROR_JSON_NOT_FOUND;
+    return AZ_ERROR_ITEM_NOT_FOUND;
   }
 
   *out_value = value.data.string;
@@ -97,7 +97,7 @@ AZ_NODISCARD AZ_INLINE az_result az_json_get_object_member_numeric_value(
   AZ_RETURN_IF_FAILED(az_json_get_object_member_value(json, name, &value));
 
   if (value.kind != AZ_JSON_VALUE_NUMBER) {
-    return AZ_ERROR_JSON_NOT_FOUND;
+    return AZ_ERROR_ITEM_NOT_FOUND;
   }
 
   *out_value = value.data.number;
@@ -114,7 +114,7 @@ AZ_NODISCARD AZ_INLINE az_result az_json_get_object_member_boolean_value(
   AZ_RETURN_IF_FAILED(az_json_get_object_member_value(json, name, &value));
 
   if (value.kind != AZ_JSON_VALUE_NUMBER) {
-    return AZ_ERROR_JSON_NOT_FOUND;
+    return AZ_ERROR_ITEM_NOT_FOUND;
   }
 
   *out_value = value.data.boolean;
