@@ -237,15 +237,13 @@ AZ_NODISCARD az_result setup_response_redirect(
   AZ_CONTRACT_ARG_NOT_NULL(p_curl);
 
   if (buildRFC7230) {
-    AZ_RETURN_IF_CURL_FAILED(
-        curl_easy_setopt(p_curl, CURLOPT_HEADERFUNCTION, write_to_span));
+    AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl, CURLOPT_HEADERFUNCTION, write_to_span));
     AZ_RETURN_IF_CURL_FAILED(
         curl_easy_setopt(p_curl, CURLOPT_HEADERDATA, (void *)response_builder));
   }
 
   AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl, CURLOPT_WRITEFUNCTION, write_to_span));
-  AZ_RETURN_IF_CURL_FAILED(
-      curl_easy_setopt(p_curl, CURLOPT_WRITEDATA, (void *)response_builder));
+  AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl, CURLOPT_WRITEDATA, (void *)response_builder));
 
   return AZ_OK;
 }

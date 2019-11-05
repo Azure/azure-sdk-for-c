@@ -3,10 +3,12 @@
 
 #include <az_http_client.h>
 #include <az_http_request_builder.h>
+#include <az_http_response_parser.h>
 #include <az_json_read.h>
 #include <az_pair.h>
 #include <az_span.h>
 #include <az_span_builder.h>
+#include <az_span_malloc.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -70,27 +72,28 @@ int main() {
   }
 
   // build auth header
+  az_span auth_token = { .begin = 0, .size = 0 };
   az_result ignore_result;
-  az_span token = { .begin = 0, .size = 0 };
+
+  // Get the access_token from previous response. It will be just a reference to it (span) with
+  // non-0 terminated
   ignore_result = az_json_get_object_member_string_value(
-      az_mut_span_to_span(http_buf_response), AZ_STR("access_token"), &token);
-  // printf("******* %s *****", token.begin);
+      az_mut_span_to_span(http_buf_response), AZ_STR("access_token"), &auth_token);
 
   /****** -------------  Create buffer for header auth ---------******/
-  // can't print token right now since it is not 0-terminated
-  size_t const buffer_for_header_size = sizeof("Bearer ") + token.size;
-  uint8_t * const buffer_for_header = (uint8_t *)malloc(buffer_for_header_size);
+  // can't print auth_token right now since it is not 0-terminated
+  size_t const buffer_for_header_size = sizeof("Bearer ") + auth_token.size;
+  az_mut_span temp_buf;
+  ignore_result = az_span_malloc(buffer_for_header_size, &temp_buf);
 
   /****** -------------  use Span builder to concatenate ---------******/
-  az_mut_span const temp_buf
-      = (az_mut_span){ .begin = buffer_for_header, .size = buffer_for_header_size };
   az_span_builder builder = az_span_builder_create(temp_buf);
   ignore_result = az_span_builder_append(&builder, AZ_STR("Bearer "));
-  ignore_result = az_span_builder_append(&builder, token);
+  ignore_result = az_span_builder_append(&builder, auth_token);
   ignore_result = az_span_builder_append(
       &builder, AZ_STR_ZERO); // add a 0 so it can be printed and used by Curl
 
-  // add auth Header with parsed token
+  // add auth Header with parsed auth_token
   az_result const add_header_result = az_http_request_builder_append_header(
       &hrb, AZ_STR("authorization"), az_mut_span_to_span(temp_buf));
   if (az_failed(add_header_result)) {
@@ -99,15 +102,22 @@ int main() {
 
   // *************************send GET
   az_result const get_response = az_http_client_send_request(&hrb, &http_buf_response);
+  if (az_failed(get_response)) {
+    printf("Error after request key from KeyVault\n");
+    return get_response;
+  }
 
   if (az_succeeded(get_response)) {
     printf("Response is: \n%s", http_buf_response.begin);
   } else {
     printf("Error during running test\n");
     printf("Response is: \n%s", http_buf_response.begin);
-    // return get_response;
+    return get_response;
   }
 
-  free(buffer_for_header);
+  // free the temporal buffer holding auth token
+  az_mut_span_set(temp_buf, 0);
+  az_span_free(&temp_buf);
+
   return 0;
 }
