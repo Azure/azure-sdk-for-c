@@ -123,19 +123,10 @@ size_t write_to_span(
     size_t const nmemb,
     void * const userp) {
   size_t const expected_size = size * nmemb;
-  size_t const size_with_extra_space = expected_size + AZ_STR_ZERO.size;
-  az_mut_span * const user_buffer = (az_mut_span *)userp;
+  az_span_builder * const user_buffer_builder = (az_span_builder *)userp;
 
-  // handle error when response won't feat user buffer
-  if (user_buffer->size < size_with_extra_space) {
-    // return number of bytes it took care
-    return 0;
-  }
-
-  // TODO: format buffer with AZ_RESPONSE_BUILDER
-  memcpy(user_buffer->begin, contents, size_with_extra_space);
-  // add 0 so response can be printed
-  user_buffer->begin[size_with_extra_space] = *AZ_STR_ZERO.begin;
+  az_span const span_for_content = (az_span){ .begin = contents, .size = expected_size };
+  AZ_RETURN_IF_FAILED(az_span_builder_append(user_buffer_builder, span_for_content));
 
   // This callback needs to return the response size or curl will consider it as it failed
   return expected_size;
@@ -237,22 +228,26 @@ AZ_NODISCARD az_result setup_url(CURL * const p_curl, az_http_request_builder co
  * @param p_hrb
  * @return az_result
  */
-AZ_NODISCARD az_result
-setup_response_redirect(CURL * const p_curl, az_mut_span const * const response) {
+AZ_NODISCARD az_result setup_response_redirect(
+    CURL * const p_curl,
+    az_span_builder * const response_builder,
+    bool const buildRFC7230) {
   AZ_CONTRACT_ARG_NOT_NULL(p_curl);
-  AZ_CONTRACT_ARG_NOT_NULL(response);
 
-  // check if response will be redirected to user span
-  if (response != NULL) {
-    AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl, CURLOPT_WRITEFUNCTION, write_to_span));
-    AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl, CURLOPT_WRITEDATA, (void *)response));
+  if (buildRFC7230) {
+    AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl, CURLOPT_HEADERFUNCTION, write_to_span));
+    AZ_RETURN_IF_CURL_FAILED(
+        curl_easy_setopt(p_curl, CURLOPT_HEADERDATA, (void *)response_builder));
   }
+
+  AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl, CURLOPT_WRITEFUNCTION, write_to_span));
+  AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl, CURLOPT_WRITEDATA, (void *)response_builder));
 
   return AZ_OK;
 }
 
 /**
- * @brief uses AZ_HTTP_BUILDER to set up CURL request and perform it
+ * @brief uses AZ_HTTP_BUILDER to set up CURL request and perform it.
  *
  * @param p_hrb
  * @param response
@@ -260,24 +255,32 @@ setup_response_redirect(CURL * const p_curl, az_mut_span const * const response)
  */
 AZ_NODISCARD az_result az_http_client_send_request_impl(
     az_http_request_builder * const p_hrb,
-    az_mut_span const * const response) {
+    az_mut_span const * const response,
+    bool const buildRFC7230) {
   AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
   AZ_CONTRACT_ARG_NOT_NULL(response);
 
   CURL * p_curl = NULL;
   az_result result = AZ_ERROR_ARG;
+  az_span_builder response_builder = az_span_builder_create(*response);
+
   AZ_RETURN_IF_FAILED(az_curl_init(&p_curl));
 
   AZ_RETURN_IF_CURL_FAILED(setup_headers(p_curl, p_hrb));
 
   AZ_RETURN_IF_CURL_FAILED(setup_url(p_curl, p_hrb));
 
-  AZ_RETURN_IF_CURL_FAILED(setup_response_redirect(p_curl, response));
+  AZ_RETURN_IF_CURL_FAILED(setup_response_redirect(p_curl, &response_builder, buildRFC7230));
 
   if (az_span_eq(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_GET)) {
     result = az_curl_send_get_request(p_curl);
   } else if (az_span_eq(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_POST)) {
     result = az_curl_send_post_request(p_curl, p_hrb);
+  }
+
+  // make sure to set the end of the body response as the end of the complete response
+  if (az_succeeded(result)) {
+    AZ_RETURN_IF_FAILED(az_span_builder_append(&response_builder, AZ_STR_ZERO));
   }
 
   AZ_RETURN_IF_FAILED(az_curl_done(p_curl));
