@@ -14,33 +14,28 @@
 
 #include <_az_cfg_prefix.h>
 
+/**
+ * Converts CURLcode to az_result.
+ */
+AZ_NODISCARD AZ_INLINE az_result az_curl_code_to_result(CURLcode const code) {
+  return code == CURLE_OK ? AZ_OK : AZ_ERROR_HTTP_PAL;
+}
+
 // returning AZ error on CURL Error
-#define AZ_RETURN_IF_CURL_FAILED(exp) \
-  do { \
-    CURLcode const _result = (exp); \
-    if (_result != CURLE_OK) { \
-      return AZ_ERROR_HTTP_PAL; \
-    } \
-  } while (0)
+#define AZ_RETURN_IF_CURL_FAILED(exp) AZ_RETURN_IF_FAILED(az_curl_code_to_result(exp))
 
-typedef struct {
-  CURL * p_curl;
-} az_curl;
-
-AZ_NODISCARD AZ_INLINE az_result az_curl_init(az_curl * const out) {
-  *out = (az_curl){
-    .p_curl = curl_easy_init(),
-  };
-  curl_easy_setopt(out->p_curl, CURLOPT_FAILONERROR, 1);
+AZ_NODISCARD AZ_INLINE az_result az_curl_init(CURL ** const out) {
+  *out = curl_easy_init();
+  curl_easy_setopt(*out, CURLOPT_FAILONERROR, 1);
   return AZ_OK;
 }
 
-AZ_NODISCARD AZ_INLINE az_result az_curl_done(az_curl * const p) {
-  AZ_CONTRACT_ARG_NOT_NULL(p);
-  AZ_CONTRACT_ARG_NOT_NULL(p->p_curl);
+AZ_NODISCARD AZ_INLINE az_result az_curl_done(CURL ** const pp) {
+  AZ_CONTRACT_ARG_NOT_NULL(pp);
+  AZ_CONTRACT_ARG_NOT_NULL(*pp);
 
-  curl_easy_cleanup(p->p_curl);
-  p->p_curl = NULL;
+  curl_easy_cleanup(*pp);
+  *pp = NULL;
   return AZ_OK;
 }
 
