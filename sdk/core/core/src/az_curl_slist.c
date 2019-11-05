@@ -5,7 +5,6 @@
 
 #include <az_action.h>
 #include <az_http_header.h>
-#include <az_http_result.h>
 
 #include <_az_cfg.h>
 
@@ -19,7 +18,7 @@ az_curl_slist_append(struct curl_slist ** const self, char const * const str) {
 
   struct curl_slist * const p_list = curl_slist_append(*self, str);
   if (p_list == NULL) {
-    return AZ_HTTP_ERROR_PAL;
+    return AZ_ERROR_HTTP_PAL;
   }
   *self = p_list;
   return AZ_OK;
