@@ -19,25 +19,19 @@ struct az_http_policies * az_http_policy = {
 };
 */
 
-typedef struct _az_http_pipeline {
+typedef struct {
   az_http_policy policies[10];
   //az_http_policy policies* az_http_policies;
-  int num_policies;
-  int pipeline_stage;
 } az_http_pipeline;
 
 // Returns a pipeline
 az_result az_http_pipeline_build(az_http_pipeline * p_pipeline);
 
-// SendRequest
-
+// Start the pipeline
 az_result az_http_pipeline_process(
     az_http_pipeline * const pipeline,
     az_http_request * const request,
     az_http_response_data * const response);
 
-typedef az_result az_http_pipeline_next(az_http_pipeline * p_pipeline);
-
 #include <_az_cfg_suffix.h>
-
 #endif

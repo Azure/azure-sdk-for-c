@@ -109,8 +109,7 @@ int main() {
 
   free(buffer_for_header);
 
-  az_http_pipeline const pipeline = { .num_policies = 0, .pipeline_stage = 0 
-  };
+  az_http_pipeline const pipeline;
 
   az_http_response_data const response;
   az_result result;

@@ -27,8 +27,6 @@
 //    TransportPolicy
 //  ===Transport Layer===
 
-#define AZ_ERROR_PIPELINE_INVALID 0XF000001
-
 typedef struct {
   az_span data;
 } az_http_response_data;

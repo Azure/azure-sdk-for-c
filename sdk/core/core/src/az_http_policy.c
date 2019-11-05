@@ -4,6 +4,7 @@
 #include <az_http_policy.h>
 
 #include <az_contract.h>
+#include <az_result.h>
 #include <az_str.h>
 
 #include <az_http_pipeline.h>
@@ -22,7 +23,7 @@ inline az_result az_http_pipeline_nextpolicy(
   //Transport Policy is the last policy in the pipeline
   //  it returns without calling nextpolicy
   if (&(p_policies[0]) == NULL) {
-    return AZ_ERROR_PIPELINE_INVALID;
+    return AZ_ERROR_HTTP_PIPELINE_INVALID_POLICY;
   }
   
   az_http_policy_pfnc_process next_policy = p_policies[0].pfnc_process;
