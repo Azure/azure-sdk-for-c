@@ -290,6 +290,41 @@ AZ_NODISCARD az_result setup_response_redirect(
 }
 
 /**
+ * @brief Uses curl response to update placeholder values with code and version
+ * transelates placeholder HTTP/X.X XXX to real value
+ *
+ * @param p_curl
+ * @param response
+ * @return AZ_NODISCARD update_placeholder
+ */
+AZ_NODISCARD az_result
+update_placeholder(az_curl const * const p_curl, az_mut_span const * const response) {
+  long const response_code;
+  long const http_version;
+
+  AZ_RETURN_IF_CURL_FAILED(
+      curl_easy_getinfo(p_curl->p_curl, CURLINFO_RESPONSE_CODE, &response_code));
+  curl_easy_getinfo(p_curl->p_curl, CURLINFO_HTTP_VERSION, &http_version);
+
+  *(response->begin + AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER_HTTP.size)
+      = az_get_max_version(http_version);
+  *(response->begin + AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER_HTTP.size + 2)
+      = az_get_min_version(http_version);
+
+  *(response->begin + AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER_HTTP.size
+    + AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER_VERSION.size)
+      = az_digit_to_char(response_code / 100);
+  *(response->begin + AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER_HTTP.size
+    + AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER_VERSION.size + 1)
+      = az_digit_to_char((response_code % 100) / 10);
+  *(response->begin + AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER_HTTP.size
+    + AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER_VERSION.size + 2)
+      = az_digit_to_char((response_code % 100) % 10);
+
+  return AZ_OK;
+}
+
+/**
  * @brief uses AZ_HTTP_BUILDER to set up CURL request and perform it.
  *
  * @param p_hrb
@@ -320,30 +355,8 @@ AZ_NODISCARD az_result az_http_client_send_request_impl(
   } else if (az_span_eq(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_POST)) {
     result = az_curl_send_post_request(&p_curl, p_hrb);
   }
-
-  {
-    // HTTP/X.X XXX
-    long const response_code;
-    long const http_version;
-
-    AZ_RETURN_IF_CURL_FAILED(
-        curl_easy_getinfo(p_curl.p_curl, CURLINFO_RESPONSE_CODE, &response_code));
-    curl_easy_getinfo(p_curl.p_curl, CURLINFO_HTTP_VERSION, &http_version);
-
-    *(response->begin + AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER_HTTP.size)
-        = az_get_max_version(http_version);
-    *(response->begin + AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER_HTTP.size + 2)
-        = az_get_min_version(http_version);
-
-    *(response->begin + AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER_HTTP.size
-      + AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER_VERSION.size)
-        = az_digit_to_char(response_code / 100);
-    *(response->begin + AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER_HTTP.size
-      + AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER_VERSION.size + 1)
-        = az_digit_to_char((response_code % 100) / 10);
-    *(response->begin + AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER_HTTP.size
-      + AZ_CURL_ADAPTER_RESPONSE_PLACEHOLDER_VERSION.size + 2)
-        = az_digit_to_char((response_code % 100) % 10);
+  if (az_succeeded(result)) {
+    AZ_RETURN_IF_CURL_FAILED(update_placeholder(&p_curl, response));
   }
 
   AZ_RETURN_IF_FAILED(az_curl_done(&p_curl));
