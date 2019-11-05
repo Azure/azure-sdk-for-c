@@ -278,9 +278,6 @@ AZ_NODISCARD az_result az_http_client_send_request_impl(
   } else if (az_span_eq(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_POST)) {
     result = az_curl_send_post_request(&p_curl, p_hrb);
   }
-  if (az_succeeded(result)) {
-    AZ_RETURN_IF_FAILED(az_span_builder_append(&response_builder, AZ_STR_ZERO));
-  }
 
   AZ_RETURN_IF_FAILED(az_curl_done(&p_curl));
   return result;

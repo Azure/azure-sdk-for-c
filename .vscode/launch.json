@@ -1,0 +1,24 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "CurlPoc",
+            "type": "gdb",
+            "request": "launch",
+            "target": "./Debug/sdk/core/core/curl_easy_perform_poc",
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "build"
+        },
+        {
+            "name": "MainTests",
+            "type": "gdb",
+            "request": "launch",
+            "target": "./Debug/sdk/core/core/az_core_test",
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "build"
+        }
+    ]
+}
