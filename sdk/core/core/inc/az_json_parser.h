@@ -77,6 +77,7 @@ AZ_NODISCARD AZ_INLINE az_result az_json_get_object_member_string_value(
     az_span const name,
     az_span * const out_value) {
   AZ_CONTRACT_ARG_NOT_NULL(out_value);
+
   az_json_value value;
   AZ_RETURN_IF_FAILED(az_json_get_object_member_value(json, name, &value));
 
@@ -93,6 +94,7 @@ AZ_NODISCARD AZ_INLINE az_result az_json_get_object_member_numeric_value(
     az_span const name,
     double * const out_value) {
   AZ_CONTRACT_ARG_NOT_NULL(out_value);
+
   az_json_value value;
   AZ_RETURN_IF_FAILED(az_json_get_object_member_value(json, name, &value));
 
