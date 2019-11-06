@@ -8,7 +8,7 @@
 
 static void test_json_value() {
   az_json_value const boolean = az_json_value_create_boolean(true);
-  az_json_value const n = az_json_value_create_number(-42.3);
+  az_json_value const number = az_json_value_create_number(-42.3);
   az_json_value const s = az_json_value_create_string(AZ_STR("Hello"));
 
   { 
