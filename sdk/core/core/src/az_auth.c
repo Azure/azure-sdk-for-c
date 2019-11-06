@@ -34,10 +34,10 @@ AZ_NODISCARD az_result az_auth_init_client_credentials(
 }
 
 enum {
-  MIN_BUFFER = 1350, // if you measure the length of the login.microsoftonline.com's response, it is
-                     // around 1324 characters for key vault service.
-  URLENCODE_FACTOR = 3, // maximum characters needed when URL encoding (3x the original)
-  NREQUEST_ELEMENTS = 5
+  AZ_AUTH_GET_TOKEN_MIN_BUFFER
+  = 1350, // if you measure the length of the login.microsoftonline.com's response, it is
+          // around 1324 characters for key vault service.
+  AZ_AUTH_URLENCODE_FACTOR = 3, // maximum characters needed when URL encoding (3x the original)
 };
 
 AZ_NODISCARD az_result az_auth_get_token(
@@ -70,24 +70,24 @@ AZ_NODISCARD az_result az_auth_get_token(
   static az_span const auth_body3 = AZ_CONST_STR("&resource=");
 
   size_t const auth_url_maxsize
-      = auth_url1.size + (credentials.tenant_id.size * URLENCODE_FACTOR) + auth_url2.size;
+      = auth_url1.size + (credentials.tenant_id.size * AZ_AUTH_URLENCODE_FACTOR) + auth_url2.size;
 
   AZ_CONTRACT(auth_url_maxsize <= (size_t) ~(uint16_t)0, AZ_ERROR_ARG);
 
   {
-    AZ_CONTRACT(response_buf.size >= MIN_BUFFER, AZ_ERROR_BUFFER_OVERFLOW);
+    AZ_CONTRACT(response_buf.size >= AZ_AUTH_GET_TOKEN_MIN_BUFFER, AZ_ERROR_BUFFER_OVERFLOW);
 
-    size_t const request_elements[NREQUEST_ELEMENTS]
-        = { credentials.tenant_id.size * URLENCODE_FACTOR,
-            credentials.data.client_credentials.client_id.size * URLENCODE_FACTOR,
-            credentials.data.client_credentials.client_secret.size * URLENCODE_FACTOR,
-            resource_url.size * URLENCODE_FACTOR,
+    size_t const request_elements[]
+        = { credentials.tenant_id.size * AZ_AUTH_URLENCODE_FACTOR,
+            credentials.data.client_credentials.client_id.size * AZ_AUTH_URLENCODE_FACTOR,
+            credentials.data.client_credentials.client_secret.size * AZ_AUTH_URLENCODE_FACTOR,
+            resource_url.size * AZ_AUTH_URLENCODE_FACTOR,
             auth_url_maxsize };
 
     size_t required_request_size
         = auth_url1.size + auth_url2.size + auth_body1.size + auth_body2.size + auth_body3.size;
 
-    for (size_t i = 0; i < NREQUEST_ELEMENTS; ++i) {
+    for (size_t i = 0; i < (sizeof(request_elements) / sizeof(request_elements[0])); ++i) {
       required_request_size += request_elements[i];
       AZ_CONTRACT(required_request_size > request_elements[i], AZ_ERROR_BUFFER_OVERFLOW);
     }
