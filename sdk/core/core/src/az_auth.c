@@ -6,7 +6,7 @@
 #include <az_contract.h>
 #include <az_http_client.h>
 #include <az_http_request_builder.h>
-#include <az_json_parser.h>
+#include <az_json_get.h>
 #include <az_str.h>
 #include <az_uri.h>
 
@@ -204,7 +204,7 @@ AZ_NODISCARD az_result az_auth_get_token(
     AZ_RETURN_IF_FAILED(az_http_client_send_request_and_get_body(&hrb, &response_buf));
   }
 
-  AZ_RETURN_IF_FAILED(az_json_get_object_member_string_value(
+  AZ_RETURN_IF_FAILED(az_json_get_object_member_string(
       az_mut_span_to_span(response_buf), AZ_STR("access_token"), out_result));
 
   return AZ_OK;
