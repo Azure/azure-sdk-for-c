@@ -14,7 +14,7 @@ static void test_json_value() {
   { 
     bool boolean_value = false;
     TEST_ASSERT(az_json_value_get_boolean(&json_boolean, &boolean_value) == AZ_OK);
-    TEST_ASSERT(x == true);
+    TEST_ASSERT(boolean_value == true);
   }
   {
     bool x = false;
