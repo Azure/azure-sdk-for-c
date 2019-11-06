@@ -201,7 +201,7 @@ AZ_NODISCARD az_result az_auth_get_token(
         auth_url));
 
     AZ_RETURN_IF_FAILED(az_http_request_builder_add_body(&hrb, auth_body));
-    AZ_RETURN_IF_FAILED(az_http_client_send_request(&hrb, &response_buf));
+    AZ_RETURN_IF_FAILED(az_http_client_send_request_and_get_body(&hrb, &response_buf));
   }
 
   AZ_RETURN_IF_FAILED(az_json_get_object_member_string_value(
