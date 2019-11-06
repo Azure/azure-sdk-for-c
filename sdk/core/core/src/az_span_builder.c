@@ -5,12 +5,12 @@
 
 #include <_az_cfg.h>
 
-AZ_NODISCARD az_result az_span_builder_append(az_span_builder * const p_builder, az_span const span) {
-  AZ_CONTRACT_ARG_NOT_NULL(p_builder);
+AZ_NODISCARD az_result az_span_builder_append(az_span_builder * const self, az_span const span) {
+  AZ_CONTRACT_ARG_NOT_NULL(self);
 
-  az_mut_span const remainder = az_mut_span_drop(p_builder->buffer, p_builder->size);
+  az_mut_span const remainder = az_mut_span_drop(self->buffer, self->size);
   az_mut_span result;
   AZ_RETURN_IF_FAILED(az_mut_span_copy(remainder, span, &result));
-  p_builder->size += result.size;
+  self->size += result.size;
   return AZ_OK;
 }

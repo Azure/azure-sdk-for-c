@@ -14,6 +14,7 @@ endif()
 add_library (
   az_core
   src/az_assumptions.c
+  src/az_auth.c
   src/az_base64.c
   src/az_curl_adapter.c
   src/az_curl_slist.c
@@ -23,9 +24,11 @@ add_library (
   src/az_http_request_builder.c
   src/az_http_response_action.c
   src/az_http_response_parser.c
+  src/az_json_get.c
   src/az_json_parser.c
   src/az_mut_span.c
   src/az_pair.c
+  src/az_span.c
   src/az_span_builder.c
   src/az_span_emitter.c
   src/az_span_malloc.c
@@ -38,7 +41,7 @@ add_library (
 if(MSVC)
   target_compile_options(az_core PRIVATE /Wall /WX /wd5031 /wd4668 /wd4820 /wd4255 /analyze)
 else()
-  target_compile_options(az_core PRIVATE -Wall -Wextra -pedantic -Werror)
+  target_compile_options(az_core PRIVATE -Wall -Wextra -pedantic -Werror -Wno-missing-field-initializers -Wno-missing-braces)
 endif()
 
 target_include_directories (az_core PUBLIC inc)

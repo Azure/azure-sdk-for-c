@@ -31,7 +31,7 @@ static az_result http_response_parser_example(az_span const response) {
       // read a header
       {
         az_result const result = az_http_response_parser_get_next_header(&parser, &header);
-        if (result == AZ_ERROR_HTTP_NO_MORE_HEADERS) {
+        if (result == AZ_ERROR_ITEM_NOT_FOUND) {
           break;
         }
         AZ_RETURN_IF_FAILED(result);
@@ -83,7 +83,7 @@ static az_result http_response_getters_example(az_span const response) {
       // read a header
       {
         az_result const result = az_http_response_get_next_header(response, &header);
-        if (result == AZ_ERROR_HTTP_NO_MORE_HEADERS) {
+        if (result == AZ_ERROR_ITEM_NOT_FOUND) {
           break;
         }
         AZ_RETURN_IF_FAILED(result);
@@ -104,7 +104,7 @@ static az_result http_response_getters_example(az_span const response) {
 
   // reading body
   {
-    az_span body;
+    az_span body = { 0 };
     AZ_RETURN_IF_FAILED(az_http_response_get_body(response, &header, &body));
     if (!az_span_eq(body, AZ_STR(EXAMPLE_BODY))) {
       return AZ_ERROR_HTTP_INVALID_STATE;

@@ -1,10 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include <az_auth.h>
 #include <az_http_client.h>
 #include <az_http_request_builder.h>
 #include <az_http_response_parser.h>
-#include <az_json_parser.h>
+#include <az_json_get.h>
 #include <az_pair.h>
 #include <az_span.h>
 #include <az_span_builder.h>
@@ -15,17 +16,11 @@
 
 #include <_az_cfg.h>
 
-static az_span GET_TOKEN_URL = AZ_CONST_STR(
-    "https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47/oauth2/token");
 static az_span KEY_VAULT_URL
     = AZ_CONST_STR("https://antk-keyvault.vault.azure.net/secrets/Password");
 
 static az_span API_VERSION_QUERY_NAME = AZ_CONST_STR("api-version");
 static az_span API_VERSION_QUERY_VALUE = AZ_CONST_STR("7.0");
-
-static az_span token_request_body = AZ_CONST_STR(
-    "grant_type=client_credentials&client_id=4317a660-6bfb-4585-9ce9-8f222314879c&"
-    "client_secret=O2CT[Y:dkTqblml5V/T]ZEi9x1W1zoBW&resource=https://vault.azure.net");
 
 int main() {
   // create a buffer for request
@@ -37,28 +32,29 @@ int main() {
   uint8_t buf_response[1024 * 4];
   az_mut_span const http_buf_response = AZ_SPAN_FROM_ARRAY(buf_response);
 
-  // init request with POST for getting a token
-  az_result build_result
-      = az_http_request_builder_init(&hrb, http_buf, 100, AZ_HTTP_METHOD_VERB_POST, GET_TOKEN_URL);
-  if (az_failed(build_result)) {
-    return build_result;
-  }
-  // attach a body for the POST request
-  az_result const add_body_result = az_http_request_builder_add_body(&hrb, token_request_body);
-  if (az_failed(add_body_result)) {
-    return add_body_result;
-  }
-  // *************************send POST and read body response only
-  az_result const post_response
-      = az_http_client_send_request_and_get_body(&hrb, &http_buf_response);
+  az_auth_credentials creds = { { 0 } };
+  az_result const creds_retcode = az_auth_init_client_credentials(
+      &creds,
+      AZ_STR("72f988bf-86f1-41af-91ab-2d7cd011db47"),
+      AZ_STR("4317a660-6bfb-4585-9ce9-8f222314879c"),
+      AZ_STR("O2CT[Y:dkTqblml5V/T]ZEi9x1W1zoBW"));
 
-  if (az_failed(post_response)) {
+  if (!az_succeeded(creds_retcode)) {
+    printf("Error initializing credentials\n");
+    return creds_retcode;
+  }
+
+  az_span auth_token = { 0 };
+  az_result const token_retcode
+      = az_auth_get_token(creds, AZ_STR("https://vault.azure.net"), http_buf_response, &auth_token);
+
+  if (az_failed(token_retcode)) {
     printf("Error while getting auth token\n");
-    return post_response;
+    return token_retcode;
   }
 
   // create request for keyVault
-  build_result
+  az_result build_result
       = az_http_request_builder_init(&hrb, http_buf, 100, AZ_HTTP_METHOD_VERB_GET, KEY_VAULT_URL);
   if (az_failed(build_result)) {
     return build_result;
@@ -71,20 +67,11 @@ int main() {
     return add_query_result;
   }
 
-  // build auth header
-  az_span auth_token = { .begin = 0, .size = 0 };
-  az_result ignore_result;
-
-  // Get the access_token from previous response. It will be just a reference to it (span) with
-  // non-0 terminated
-  ignore_result = az_json_get_object_member_string_value(
-      az_mut_span_to_span(http_buf_response), AZ_STR("access_token"), &auth_token);
-
   /****** -------------  Create buffer for header auth ---------******/
   // can't print auth_token right now since it is not 0-terminated
   size_t const buffer_for_header_size = sizeof("Bearer ") + auth_token.size;
   az_mut_span temp_buf;
-  ignore_result = az_span_malloc(buffer_for_header_size, &temp_buf);
+  az_result ignore_result = az_span_malloc(buffer_for_header_size, &temp_buf);
 
   /****** -------------  use Span builder to concatenate ---------******/
   az_span_builder builder = az_span_builder_create(temp_buf);
