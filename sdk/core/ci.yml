@@ -6,6 +6,8 @@ trigger:
     include:
       - master
       - feature/*
+      - release/*
+      - hotfix/*
   paths:
     include:
       - sdk/core/
