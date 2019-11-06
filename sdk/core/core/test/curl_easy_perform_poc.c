@@ -32,7 +32,7 @@ int main() {
   uint8_t buf_response[1024 * 4];
   az_mut_span const http_buf_response = AZ_SPAN_FROM_ARRAY(buf_response);
 
-  az_auth_credentials creds = { 0 };
+  az_auth_credentials creds = { { 0 } };
   az_result const creds_retcode = az_auth_init_client_credentials(
       &creds,
       AZ_STR("72f988bf-86f1-41af-91ab-2d7cd011db47"),
