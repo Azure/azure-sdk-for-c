@@ -30,7 +30,7 @@ az_result az_http_pipeline_build(az_http_pipeline * p_pipeline);
 // Start the pipeline
 az_result az_http_pipeline_process(
     az_http_pipeline * const pipeline,
-    az_http_request * const request,
+    az_http_request_builder * const hrb,
     az_http_response_data * const response);
 
 #include <_az_cfg_suffix.h>

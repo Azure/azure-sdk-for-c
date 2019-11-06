@@ -20,14 +20,14 @@ az_result az_http_pipeline_build(az_http_pipeline * p_pipeline) {
 
 az_result az_http_pipeline_process(
     az_http_pipeline * const self,
-    az_http_request * const request,
+    az_http_request_builder * const hrb,
     az_http_response_data * const response) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
-  AZ_CONTRACT_ARG_NOT_NULL(request);
+  AZ_CONTRACT_ARG_NOT_NULL(hrb);
   AZ_CONTRACT_ARG_NOT_NULL(response);
 
   if (self) {
-    return self->policies[0].pfnc_process(self->policies, request, response);
+    return self->policies[0].pfnc_process(self->policies, hrb, response);
   }
   return AZ_OK;
 }

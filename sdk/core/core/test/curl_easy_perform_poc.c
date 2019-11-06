@@ -112,7 +112,7 @@ int main() {
 
   az_http_response_data const response;
   az_result result;
-  result = az_http_pipeline_process(&pipeline, &request, &response);
+  result = az_http_pipeline_process(&pipeline, &hrb, &response);
 
   return 0;
 }

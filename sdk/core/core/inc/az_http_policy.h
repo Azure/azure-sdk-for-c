@@ -5,7 +5,7 @@
 #define AZ_HTTP_POLICY_H
 
 #include <az_contract.h>
-#include <az_http_request.h>
+#include <az_http_request_builder.h>
 #include <az_pair.h>
 #include <az_result.h>
 #include <az_span.h>
@@ -35,7 +35,7 @@ typedef struct az_http_policy az_http_policy;
 
 // PipelinePolicies must implement the process function
 //
-typedef az_result (*az_http_policy_pfnc_process)(az_http_policy * policies, az_http_request * p_request, az_http_response_data * out);
+typedef az_result (*az_http_policy_pfnc_process)(az_http_policy * policies, az_http_request_builder * hrb, az_http_response_data * out);
 
 typedef struct {
   az_span data;
