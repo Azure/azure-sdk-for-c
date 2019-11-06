@@ -6,6 +6,7 @@
 #include <az_curl_slist.h>
 #include <az_http_request.h>
 #include <az_span_malloc.h>
+#include <az_str.h>
 
 #include <_az_cfg.h>
 
@@ -154,7 +155,7 @@ az_curl_send_post_request(CURL * const p_curl, az_http_request_builder const * c
 
   // Method
   az_mut_span body = { 0 };
-  AZ_RETURN_IF_FAILED(az_span_malloc(p_hrb->body.size + 1, &body));
+  AZ_RETURN_IF_FAILED(az_span_malloc(p_hrb->body.size + AZ_STR_ZERO.size, &body));
 
   az_mut_span zt_buf = { 0 };
   az_result res_code = az_mut_span_to_str(body, p_hrb->body, &zt_buf);
