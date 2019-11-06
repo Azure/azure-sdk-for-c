@@ -49,7 +49,8 @@ AZ_NODISCARD AZ_INLINE bool az_json_parser_stack_is_empty(az_json_parser const *
   return self->stack == 1;
 }
 
-AZ_NODISCARD AZ_INLINE az_json_stack_item az_json_parser_stack_last(az_json_parser const * const self) {
+AZ_NODISCARD AZ_INLINE az_json_stack_item
+az_json_parser_stack_last(az_json_parser const * const self) {
   return self->stack & 1;
 }
 
@@ -367,9 +368,7 @@ AZ_NODISCARD static az_result az_json_parser_check_item_end(
 }
 
 AZ_NODISCARD az_result
-az_json_parser_get_object_member(
-    az_json_parser * const self,
-    az_json_member * const out_member) {
+az_json_parser_get_object_member(az_json_parser * const self, az_json_member * const out_member) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(out_member);
 
@@ -385,9 +384,7 @@ az_json_parser_get_object_member(
 }
 
 AZ_NODISCARD az_result
-az_json_parser_get_array_element(
-    az_json_parser * const self,
-    az_json_value * const out_element) {
+az_json_parser_get_array_element(az_json_parser * const self, az_json_value * const out_element) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(out_element);
 

@@ -75,3 +75,20 @@ az_json_get_object_member_boolean(az_span const json, az_span const name, bool *
   *out_value = value.data.boolean;
   return AZ_OK;
 }
+
+AZ_NODISCARD az_result az_json_pointer_parser_get(az_span_reader * const self, az_span * const out) {
+  AZ_CONTRACT_ARG_NOT_NULL(self);
+  AZ_CONTRACT_ARG_NOT_NULL(out);
+
+  return AZ_ERROR_NOT_IMPLEMENTED;
+}
+
+AZ_NODISCARD az_result
+az_json_get_by_pointer(az_span const self, az_span const pointer, az_json_value * const out_value) {
+  AZ_CONTRACT_ARG_NOT_NULL(out_value);
+
+  az_json_parser json_parser = az_json_parser_create(self);
+  az_span_reader pointer_parser = az_span_reader_create(pointer);
+
+  return AZ_ERROR_NOT_IMPLEMENTED;
+}
