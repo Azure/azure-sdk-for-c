@@ -90,6 +90,14 @@ az_http_response_get_next_header(az_span const self, az_pair * const p_header);
 AZ_NODISCARD az_result
 az_http_response_get_body(az_span const self, az_pair * const p_last_header, az_span * const body);
 
+/**
+ * Get an HTTP header by name.
+ */
+AZ_NODISCARD az_result az_http_response_get_header_by_name(
+    az_span const self,
+    az_span const header_name,
+    az_span * const header_value);
+
 #include <_az_cfg_suffix.h>
 
 #endif
