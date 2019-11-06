@@ -153,10 +153,10 @@ az_curl_send_post_request(CURL * const p_curl, az_http_request_builder const * c
   AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
 
   // Method
-  az_mut_span body = (az_mut_span){ 0 };
+  az_mut_span body = { 0 };
   AZ_RETURN_IF_FAILED(az_span_malloc(p_hrb->body.size + 1, &body));
 
-  az_mut_span zt_buf = (az_mut_span){ 0 };
+  az_mut_span zt_buf = { 0 };
   az_result res_code = az_mut_span_to_str(body, p_hrb->body, &zt_buf);
 
   if (az_succeeded(res_code)) {

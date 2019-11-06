@@ -44,7 +44,7 @@ int main() {
     return creds_retcode;
   }
 
-  az_span auth_token = (az_span){ 0 };
+  az_span auth_token = { 0 };
   az_result const token_retcode
       = az_auth_get_token(creds, AZ_STR("https://vault.azure.net"), http_buf_response, &auth_token);
 
