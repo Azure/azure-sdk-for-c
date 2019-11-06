@@ -53,9 +53,6 @@ add_executable (az_core_test test/main.c)
 
 target_link_libraries(az_core_test PRIVATE az_core)
 
-add_executable (az_auth_poc test/az_auth_poc.c)
-target_link_libraries(az_auth_poc PRIVATE az_core)
-
 # curl easy perform POC
 add_executable (curl_easy_perform_poc test/curl_easy_perform_poc.c)
 target_link_libraries(curl_easy_perform_poc PRIVATE 
@@ -71,7 +68,6 @@ endif()
 
 if (UNIX)
   target_link_libraries(az_core_test PRIVATE m)
-  target_link_libraries(az_auth_poc PRIVATE m)
   target_link_libraries(curl_easy_perform_poc PRIVATE m)
 endif()
 
