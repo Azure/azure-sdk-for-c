@@ -18,6 +18,7 @@
 #include "./az_test.h"
 #include "./test_http_response_parser.h"
 #include "./test_json_value.h"
+#include "./test_json_pointer_parser.h"
 
 #include <_az_cfg.h>
 
@@ -744,5 +745,6 @@ int main() {
 
   test_http_response_parser();
   test_json_value();
+  test_json_pointer_parser();
   return exit_code;
 }
