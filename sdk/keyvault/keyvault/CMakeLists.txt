@@ -8,17 +8,19 @@ project (az_keyvault LANGUAGES C)
 set(CMAKE_C_STANDARD 99)
 
 add_library (
-  az_core
-  src/az_keyvault_keyvaultclient.c
+  az_keyvault
+  src/az_keyvault_client.c
   )
 
 if(MSVC)
-  target_compile_options(az_core PRIVATE /Wall /WX /wd5031 /wd4668 /wd4820 /wd4255 /analyze)
+  target_compile_options(az_keyvault PRIVATE /Wall /WX /wd5031 /wd4668 /wd4820 /wd4255 /analyze)
 else()
-  target_compile_options(az_core PRIVATE -Wall -Wextra -pedantic -Werror)
+  target_compile_options(az_keyvault PRIVATE -Wall -Wextra -pedantic -Werror)
 endif()
 
 target_include_directories (az_keyvault PUBLIC inc)
+
+target_link_libraries(az_keyvault PUBLIC az_core)
 
 # make sure that users can consume the project as a library.
 add_library (az::keyvault ALIAS az_keyvault)

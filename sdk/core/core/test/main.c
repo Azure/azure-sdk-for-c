@@ -6,8 +6,8 @@
 #include <az_http_request_builder.h>
 #include <az_json_parser.h>
 #include <az_span_builder.h>
-#include <az_span_reader.h>
 #include <az_span_emitter.h>
+#include <az_span_reader.h>
 #include <az_uri.h>
 
 #include <assert.h>
@@ -17,6 +17,7 @@
 
 #include "./az_test.h"
 #include "./test_http_response_parser.h"
+#include "./test_json_value.h"
 
 #include <_az_cfg.h>
 
@@ -254,11 +255,9 @@ static uint8_t const uri_decoded_buf[] = {
   0xF0, 0xF1, 0xF2, 0xF3, 0xF4, 0xF5, 0xF6, 0xF7, 0xF8, 0xF9, 0xFA, 0xFB, 0xFC, 0xFD, 0xFE, 0xFF
 };
 
-static az_span const uri_decoded
-    = { .begin = uri_decoded_buf, .size = sizeof(uri_decoded_buf) };
+static az_span const uri_decoded = { .begin = uri_decoded_buf, .size = sizeof(uri_decoded_buf) };
 
-static az_span hrb_url
-    = AZ_CONST_STR("https://antk-keyvault.vault.azure.net/secrets/Password");
+static az_span hrb_url = AZ_CONST_STR("https://antk-keyvault.vault.azure.net/secrets/Password");
 
 static az_span hrb_param_api_version_name = AZ_CONST_STR("api-version");
 static az_span hrb_param_api_version_value = AZ_CONST_STR("7.0");
@@ -273,8 +272,7 @@ static az_span hrb_url3 = AZ_CONST_STR(
     "https://antk-keyvault.vault.azure.net/secrets/Password?api-version=7.0&test-param=value");
 
 static az_span hrb_header_content_type_name = AZ_CONST_STR("Content-Type");
-static az_span hrb_header_content_type_value
-    = AZ_CONST_STR("application/x-www-form-urlencoded");
+static az_span hrb_header_content_type_value = AZ_CONST_STR("application/x-www-form-urlencoded");
 
 static az_span hrb_header_authorization_name = AZ_CONST_STR("authorization");
 static az_span hrb_header_authorization_value1 = AZ_CONST_STR("Bearer 123456789");
@@ -409,7 +407,7 @@ int main() {
     TEST_ASSERT(member.value.kind == AZ_JSON_VALUE_STRING);
     TEST_ASSERT(member.value.data.string.begin == json.begin + 6);
     TEST_ASSERT(member.value.data.string.size == 12);
-    TEST_ASSERT(az_json_parser_get_object_member(&state, &member) ==  AZ_ERROR_ITEM_NOT_FOUND);
+    TEST_ASSERT(az_json_parser_get_object_member(&state, &member) == AZ_ERROR_ITEM_NOT_FOUND);
     TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
   }
   uint8_t buffer[1000];
@@ -553,28 +551,9 @@ int main() {
     TEST_ASSERT(s == 12);
   }
 
-  // span seq to new str
-  /*
-  {
-    az_const_span const array[] = {
-      AZ_STR("Hello"),
-      AZ_STR(" "),
-      AZ_STR("world!"),
-    };
-    az_span_span const span = AZ_SPAN(array);
-    az_span_emitter const seq = az_span_span_emit_action(&span);
-    //
-    char * p;
-    az_result const result = az_span_emitter_to_tmp_str(seq, &p);
-    TEST_ASSERT(result == AZ_OK);
-    TEST_ASSERT(strcmp(p, "Hello world!") == 0);
-    free(p);
-  }
-  */
-
   {
     az_span const expected = AZ_STR("@###copy#copy#make some zero-terminated strings#make "
-                                          "some\0zero-terminated\0strings\0####@");
+                                    "some\0zero-terminated\0strings\0####@");
 
     uint8_t buf[87];
     assert(expected.size == sizeof(buf));
@@ -602,7 +581,8 @@ int main() {
     az_span const strings = (az_span){ .begin = actual.begin + 40, .size = 7 };
 
     az_mut_span_to_str((az_mut_span){ .begin = actual.begin + 48, .size = 10 }, make_some, &result);
-    az_mut_span_to_str((az_mut_span){ .begin = actual.begin + 58, .size = 16 }, zero_terminated, &result);
+    az_mut_span_to_str(
+        (az_mut_span){ .begin = actual.begin + 58, .size = 16 }, zero_terminated, &result);
     az_mut_span_to_str((az_mut_span){ .begin = actual.begin + 74, .size = 8 }, strings, &result);
 
     result.begin[result.size - 1] = '$';
@@ -651,33 +631,33 @@ int main() {
   {
     uint8_t buf[256 * 3];
     az_mut_span const buffer = { .begin = buf, .size = sizeof(buf) };
-    az_span result;
+    az_mut_span result;
 
     az_result res_code = AZ_OK;
 
     res_code = az_uri_encode(buffer, AZ_STR("https://vault.azure.net"), &result);
     TEST_ASSERT(res_code == AZ_OK);
-    TEST_ASSERT(az_span_eq(result, AZ_STR("https%3A%2F%2Fvault.azure.net")));
+    TEST_ASSERT(az_span_eq(az_mut_span_to_span(result), AZ_STR("https%3A%2F%2Fvault.azure.net")));
 
     res_code = az_uri_decode(buffer, AZ_STR("https%3A%2F%2Fvault.azure.net"), &result);
     TEST_ASSERT(res_code == AZ_OK);
-    TEST_ASSERT(az_span_eq(result, AZ_STR("https://vault.azure.net")));
+    TEST_ASSERT(az_span_eq(az_mut_span_to_span(result), AZ_STR("https://vault.azure.net")));
 
     res_code = az_uri_encode(buffer, uri_decoded, &result);
     TEST_ASSERT(res_code == AZ_OK);
-    TEST_ASSERT(az_span_eq(result, uri_encoded));
+    TEST_ASSERT(az_span_eq(az_mut_span_to_span(result), uri_encoded));
 
     res_code = az_uri_decode(buffer, uri_encoded, &result);
     TEST_ASSERT(res_code == AZ_OK);
-    TEST_ASSERT(az_span_eq(result, uri_decoded));
+    TEST_ASSERT(az_span_eq(az_mut_span_to_span(result), uri_decoded));
 
     res_code = az_uri_decode(buffer, uri_encoded2, &result);
     TEST_ASSERT(res_code == AZ_OK);
-    TEST_ASSERT(az_span_eq(result, uri_decoded));
+    TEST_ASSERT(az_span_eq(az_mut_span_to_span(result), uri_decoded));
 
     res_code = az_uri_decode(buffer, uri_encoded3, &result);
     TEST_ASSERT(res_code == AZ_OK);
-    TEST_ASSERT(az_span_eq(result, uri_decoded));
+    TEST_ASSERT(az_span_eq(az_mut_span_to_span(result), uri_decoded));
   }
   {
     int16_t const url_max = 100;
@@ -729,7 +709,7 @@ int main() {
       { .key = hrb_header_authorization_name, .value = hrb_header_authorization_value1 },
     };
     for (uint16_t i = 0; i < hrb.headers_end; ++i) {
-      az_pair header = { 0, 0 };
+      az_pair header = { 0 };
       result = az_http_request_builder_get_header(&hrb, i, &header);
       TEST_ASSERT(result == AZ_OK);
 
@@ -753,7 +733,7 @@ int main() {
       { .key = hrb_header_authorization_name, .value = hrb_header_authorization_value2 },
     };
     for (uint16_t i = 0; i < hrb.headers_end; ++i) {
-      az_pair header = { 0, 0 };
+      az_pair header = { 0 };
       result = az_http_request_builder_get_header(&hrb, i, &header);
       TEST_ASSERT(result == AZ_OK);
 
@@ -763,5 +743,6 @@ int main() {
   }
 
   test_http_response_parser();
+  test_json_value();
   return exit_code;
 }
