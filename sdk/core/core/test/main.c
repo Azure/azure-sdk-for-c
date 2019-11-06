@@ -17,6 +17,7 @@
 
 #include "./az_test.h"
 #include "./test_http_response_parser.h"
+#include "./test_json_value.h"
 
 #include <_az_cfg.h>
 
@@ -550,25 +551,6 @@ int main() {
     TEST_ASSERT(s == 12);
   }
 
-  // span seq to new str
-  /*
-  {
-    az_const_span const array[] = {
-      AZ_STR("Hello"),
-      AZ_STR(" "),
-      AZ_STR("world!"),
-    };
-    az_span_span const span = AZ_SPAN(array);
-    az_span_emitter const seq = az_span_span_emit_action(&span);
-    //
-    char * p;
-    az_result const result = az_span_emitter_to_tmp_str(seq, &p);
-    TEST_ASSERT(result == AZ_OK);
-    TEST_ASSERT(strcmp(p, "Hello world!") == 0);
-    free(p);
-  }
-  */
-
   {
     az_span const expected = AZ_STR("@###copy#copy#make some zero-terminated strings#make "
                                     "some\0zero-terminated\0strings\0####@");
@@ -761,5 +743,6 @@ int main() {
   }
 
   test_http_response_parser();
+  test_json_value();
   return exit_code;
 }

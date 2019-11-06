@@ -77,12 +77,13 @@ AZ_NODISCARD az_result az_auth_get_token(
   {
     AZ_CONTRACT(response_buf.size >= AZ_AUTH_GET_TOKEN_MIN_BUFFER, AZ_ERROR_BUFFER_OVERFLOW);
 
-    size_t const request_elements[]
-        = { credentials.tenant_id.size * AZ_AUTH_URLENCODE_FACTOR,
-            credentials.data.client_credentials.client_id.size * AZ_AUTH_URLENCODE_FACTOR,
-            credentials.data.client_credentials.client_secret.size * AZ_AUTH_URLENCODE_FACTOR,
-            resource_url.size * AZ_AUTH_URLENCODE_FACTOR,
-            auth_url_maxsize };
+    size_t const request_elements[] = {
+      credentials.tenant_id.size * AZ_AUTH_URLENCODE_FACTOR,
+      credentials.data.client_credentials.client_id.size * AZ_AUTH_URLENCODE_FACTOR,
+      credentials.data.client_credentials.client_secret.size * AZ_AUTH_URLENCODE_FACTOR,
+      resource_url.size * AZ_AUTH_URLENCODE_FACTOR,
+      auth_url_maxsize,
+    };
 
     size_t required_request_size
         = auth_url1.size + auth_url2.size + auth_body1.size + auth_body2.size + auth_body3.size;
@@ -204,8 +205,12 @@ AZ_NODISCARD az_result az_auth_get_token(
     AZ_RETURN_IF_FAILED(az_http_client_send_request_and_get_body(&hrb, &response_buf));
   }
 
-  AZ_RETURN_IF_FAILED(az_json_get_object_member_string(
-      az_mut_span_to_span(response_buf), AZ_STR("access_token"), out_result));
+  {
+    az_json_value value;
+    AZ_RETURN_IF_FAILED(az_json_get_object_member(
+        az_mut_span_to_span(response_buf), AZ_STR("access_token"), &value));
+    AZ_RETURN_IF_FAILED(az_json_value_get_string(&value, out_result));
+  }
 
   return AZ_OK;
 }
