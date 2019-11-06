@@ -302,7 +302,7 @@ az_http_response_get_body(az_span const self, az_pair * const p_last_header, az_
 /**
  * Get an HTTP header by name.
  *
- * Returns @AZ_ERROR_ITEM_NOT_FOUND
+ * Returns an error if the header is not found.
  */
 AZ_NODISCARD az_result az_http_response_get_header_by_name(
     az_span const self,
@@ -313,13 +313,14 @@ AZ_NODISCARD az_result az_http_response_get_header_by_name(
   az_http_response_parser parser;
   AZ_RETURN_IF_FAILED(az_http_response_parser_init(&parser, self));
 
-  { 
+  {
     az_http_response_status_line status_line;
-    AZ_RETURN_IF_FAILED(az_http_response_parser_get_status_line(&parser, &status_line)); 
+    AZ_RETURN_IF_FAILED(az_http_response_parser_get_status_line(&parser, &status_line));
   }
 
   while (true) {
     az_pair header;
+    // Return if either there is no more items (AZ_ERROR_ITEM_NO_MORE_ITEMS) or an error.
     AZ_RETURN_IF_FAILED(az_http_response_parser_get_next_header(&parser, &header));
     if (az_span_eq_ascii_ignore_case(header_name, header.key)) {
       *header_value = header.value;
