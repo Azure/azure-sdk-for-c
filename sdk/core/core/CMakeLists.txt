@@ -26,6 +26,7 @@ add_library (
   src/az_http_response_parser.c
   src/az_json_get.c
   src/az_json_parser.c
+  src/az_json_value.c
   src/az_mut_span.c
   src/az_pair.c
   src/az_span.c

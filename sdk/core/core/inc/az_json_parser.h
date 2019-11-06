@@ -4,6 +4,7 @@
 #ifndef AZ_JSON_PARSER_H
 #define AZ_JSON_PARSER_H
 
+#include <az_json_value.h>
 #include <az_result.h>
 #include <az_span_reader.h>
 #include <az_str.h>
@@ -12,25 +13,6 @@
 #include <stdint.h>
 
 #include <_az_cfg_prefix.h>
-
-typedef enum {
-  AZ_JSON_VALUE_NONE = 0,
-  AZ_JSON_VALUE_NULL = 1,
-  AZ_JSON_VALUE_BOOLEAN = 2,
-  AZ_JSON_VALUE_NUMBER = 3,
-  AZ_JSON_VALUE_STRING = 4,
-  AZ_JSON_VALUE_OBJECT = 5,
-  AZ_JSON_VALUE_ARRAY = 6,
-} az_json_value_kind;
-
-typedef struct {
-  az_json_value_kind kind;
-  union {
-    bool boolean;
-    az_span string;
-    double number;
-  } data;
-} az_json_value;
 
 typedef struct {
   az_span name;
@@ -42,8 +24,8 @@ enum { AZ_JSON_STACK_SIZE = 63 };
 typedef uint64_t az_json_stack;
 
 typedef enum {
-  AZ_JSON_STACK_OBJECT,
-  AZ_JSON_STACK_ARRAY,
+  AZ_JSON_STACK_OBJECT = 0,
+  AZ_JSON_STACK_ARRAY = 1,
 } az_json_stack_item;
 
 typedef struct {
