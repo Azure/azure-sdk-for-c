@@ -18,7 +18,7 @@ static void test_json_value() {
   }
   {
     bool x = false;
-    TEST_ASSERT(az_json_value_get_boolean(&n, &x) == AZ_ERROR_ITEM_NOT_FOUND);
+    TEST_ASSERT(az_json_value_get_boolean(&json_number, &boolean_value) == AZ_ERROR_ITEM_NOT_FOUND);
   }
 
   {
