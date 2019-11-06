@@ -28,7 +28,7 @@ static void test_json_value() {
   }
   {
     az_span x = { 0 };
-    TEST_ASSERT(az_json_value_get_string(&b, &x) == AZ_ERROR_ITEM_NOT_FOUND);
+    TEST_ASSERT(az_json_value_get_string(&json_boolean, &string_value) == AZ_ERROR_ITEM_NOT_FOUND);
   }
 
   {
