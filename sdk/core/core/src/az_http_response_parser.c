@@ -138,7 +138,7 @@ az_http_response_parser_get_next_header(az_http_response_parser * const self, az
   {
     az_http_response_kind const kind = self->kind;
     if (kind == AZ_HTTP_RESPONSE_BODY) {
-      return AZ_ERROR_HTTP_NO_MORE_HEADERS;
+      return AZ_ERROR_ITEM_NOT_FOUND;
     }
     if (kind != AZ_HTTP_RESPONSE_HEADER) {
       return AZ_ERROR_HTTP_INVALID_STATE;
@@ -297,4 +297,34 @@ az_http_response_get_body(az_span const self, az_pair * const p_last_header, az_
   AZ_RETURN_IF_FAILED(az_http_response_parser_init_from_header(&parser, self, p_last_header));
   AZ_RETURN_IF_FAILED(az_http_response_parser_get_body(&parser, body));
   return AZ_OK;
+}
+
+/**
+ * Get an HTTP header by name.
+ *
+ * Returns an error if the header is not found.
+ */
+AZ_NODISCARD az_result az_http_response_get_header_by_name(
+    az_span const self,
+    az_span const header_name,
+    az_span * const header_value) {
+  AZ_CONTRACT_ARG_NOT_NULL(header_value);
+
+  az_http_response_parser parser;
+  AZ_RETURN_IF_FAILED(az_http_response_parser_init(&parser, self));
+
+  {
+    az_http_response_status_line status_line;
+    AZ_RETURN_IF_FAILED(az_http_response_parser_get_status_line(&parser, &status_line));
+  }
+
+  while (true) {
+    az_pair header;
+    // Return if either there is no more items (AZ_ERROR_ITEM_NO_MORE_ITEMS) or an error.
+    AZ_RETURN_IF_FAILED(az_http_response_parser_get_next_header(&parser, &header));
+    if (az_span_eq_ascii_ignore_case(header_name, header.key)) {
+      *header_value = header.value;
+      return AZ_OK;
+    }
+  }
 }

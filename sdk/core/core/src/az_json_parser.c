@@ -309,7 +309,7 @@ az_json_parser_get(az_json_parser * const self, az_json_value * const out_value)
     default:
       break;
   }
-  return is_empty ? AZ_OK : AZ_ERROR_UNEXPECTED_CHAR;
+  return is_empty ? AZ_OK : AZ_ERROR_PARSER_UNEXPECTED_CHAR;
 }
 
 AZ_NODISCARD AZ_INLINE uint8_t az_json_stack_item_to_close(az_json_stack_item const item) {
@@ -350,7 +350,7 @@ AZ_NODISCARD static az_result az_json_parser_check_item_begin(
   if (!az_json_parser_stack_is_empty(self)) {
     AZ_RETURN_IF_FAILED(az_json_parser_read_comma_or_close(self));
   }
-  return AZ_ERROR_JSON_NO_MORE_ITEMS;
+  return AZ_ERROR_ITEM_NOT_FOUND;
 }
 
 AZ_NODISCARD static az_result az_json_parser_check_item_end(
