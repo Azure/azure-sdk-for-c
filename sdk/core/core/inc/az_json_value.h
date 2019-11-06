@@ -29,12 +29,48 @@ typedef struct {
   } data;
 } az_json_value;
 
+AZ_NODISCARD AZ_INLINE az_json_value az_json_value_create_boolean(bool const value) {
+  return (az_json_value){
+    .kind = AZ_JSON_VALUE_BOOLEAN,
+    .data.boolean = value,
+  };
+}
+
+AZ_NODISCARD AZ_INLINE az_json_value az_json_value_create_string(az_span const value) {
+  return (az_json_value){
+    .kind = AZ_JSON_VALUE_STRING,
+    .data.string = value,
+  };
+}
+
+AZ_NODISCARD AZ_INLINE az_json_value az_json_value_create_number(double const value) {
+  return (az_json_value){
+    .kind = AZ_JSON_VALUE_NUMBER,
+    .data.number = value,
+  };
+}
+
+/**
+ * Copies a boolean value to @out from the given JSON value.
+ *
+ * If the JSON value is not boolean then the function returns an error.
+ */
 AZ_NODISCARD az_result
 az_json_value_get_boolean(az_json_value const * const self, bool * const out);
 
+/**
+ * Copies a string span to @out from the given JSON value.
+ *
+ * If the JSON value is not string then the function returns an error.
+ */
 AZ_NODISCARD az_result
 az_json_value_get_string(az_json_value const * const self, az_span * const out);
 
+/**
+ * Copies a number to @out from the given JSON value.
+ *
+ * If the JSON value is not number then the function returns an error.
+ */
 AZ_NODISCARD az_result
 az_json_value_get_number(az_json_value const * const self, double * const out);
 
