@@ -114,11 +114,11 @@ AZ_NODISCARD az_result az_auth_get_token(
         AZ_ERROR_ARG);
   }
 
-  az_span auth_url = { 0 };
-  az_span auth_body = { 0 };
+  az_span auth_url = { 0, 0 };
+  az_span auth_body = { 0, 0 };
   {
     az_mut_span buf = response_buf;
-    az_mut_span tmp_span = { 0 };
+    az_mut_span tmp_span = { 0, 0 };
 
     {
       auth_url.begin = buf.begin;

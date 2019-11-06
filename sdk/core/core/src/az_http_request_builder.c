@@ -60,7 +60,7 @@ AZ_NODISCARD az_result az_http_request_builder_init(
 
   AZ_RETURN_IF_FAILED(az_mut_span_set(buffer, '\0')); // zero the buffer; we don't have to do this
 
-  az_mut_span uri_buf = { 0 };
+  az_mut_span uri_buf = { 0, 0 };
   AZ_RETURN_IF_FAILED(az_mut_span_copy( // copy URL to buffer
       az_mut_span_take(buffer, max_url_size),
       initial_url,
