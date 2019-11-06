@@ -53,75 +53,16 @@ typedef struct {
 
 AZ_NODISCARD az_json_parser az_json_parser_create(az_span const buffer);
 
-AZ_NODISCARD az_result az_json_parser_get(az_json_parser * const self, az_json_value * const out_value);
+AZ_NODISCARD az_result
+az_json_parser_get(az_json_parser * const self, az_json_value * const out_value);
 
 AZ_NODISCARD az_result
-az_json_parser_get_object_member(
-    az_json_parser * const self,
-    az_json_member * const out_member);
+az_json_parser_get_object_member(az_json_parser * const self, az_json_member * const out_member);
 
 AZ_NODISCARD az_result
-az_json_parser_get_array_element(
-    az_json_parser * const self,
-    az_json_value * const out_value);
+az_json_parser_get_array_element(az_json_parser * const self, az_json_value * const out_value);
 
 AZ_NODISCARD az_result az_json_parser_done(az_json_parser const * const self);
-
-AZ_NODISCARD az_result az_json_get_object_member_value(
-    az_span const json,
-    az_span const name,
-    az_json_value * const out_value);
-
-AZ_NODISCARD AZ_INLINE az_result az_json_get_object_member_string_value(
-    az_span const json,
-    az_span const name,
-    az_span * const out_value) {
-  AZ_CONTRACT_ARG_NOT_NULL(out_value);
-
-  az_json_value value;
-  AZ_RETURN_IF_FAILED(az_json_get_object_member_value(json, name, &value));
-
-  if (value.kind != AZ_JSON_VALUE_STRING) {
-    return AZ_ERROR_ITEM_NOT_FOUND;
-  }
-
-  *out_value = value.data.string;
-  return AZ_OK;
-}
-
-AZ_NODISCARD AZ_INLINE az_result az_json_get_object_member_numeric_value(
-    az_span const json,
-    az_span const name,
-    double * const out_value) {
-  AZ_CONTRACT_ARG_NOT_NULL(out_value);
-
-  az_json_value value;
-  AZ_RETURN_IF_FAILED(az_json_get_object_member_value(json, name, &value));
-
-  if (value.kind != AZ_JSON_VALUE_NUMBER) {
-    return AZ_ERROR_ITEM_NOT_FOUND;
-  }
-
-  *out_value = value.data.number;
-  return AZ_OK;
-}
-
-AZ_NODISCARD AZ_INLINE az_result az_json_get_object_member_boolean_value(
-    az_span const json,
-    az_span const name,
-    bool * const out_value) {
-  AZ_CONTRACT_ARG_NOT_NULL(out_value);
-
-  az_json_value value;
-  AZ_RETURN_IF_FAILED(az_json_get_object_member_value(json, name, &value));
-
-  if (value.kind != AZ_JSON_VALUE_NUMBER) {
-    return AZ_ERROR_ITEM_NOT_FOUND;
-  }
-
-  *out_value = value.data.boolean;
-  return AZ_OK;
-}
 
 #include <_az_cfg_suffix.h>
 
