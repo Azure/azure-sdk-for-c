@@ -16,8 +16,9 @@ az_json_get_object_member(az_span const json, az_span const name, az_json_value 
   AZ_RETURN_IF_FAILED(az_json_parser_get(&parser, &value));
 
   if (value.kind == AZ_JSON_VALUE_OBJECT) {
-    az_json_member member;
-    while (az_json_parser_get_object_member(&parser, &member) != AZ_ERROR_JSON_NO_MORE_ITEMS) {
+    while (true) {
+      az_json_member member;
+      AZ_RETURN_IF_FAILED(az_json_parser_get_object_member(&parser, &member));
       if (az_span_eq(member.name, name)) {
         *out_value = member.value;
         return AZ_OK;
@@ -25,7 +26,7 @@ az_json_get_object_member(az_span const json, az_span const name, az_json_value 
     }
   }
 
-  return AZ_ERROR_JSON_NOT_FOUND;
+  return AZ_ERROR_ITEM_NOT_FOUND;
 }
 
 AZ_NODISCARD az_result az_json_get_object_member_string(
@@ -38,7 +39,7 @@ AZ_NODISCARD az_result az_json_get_object_member_string(
   AZ_RETURN_IF_FAILED(az_json_get_object_member(json, name, &value));
 
   if (value.kind != AZ_JSON_VALUE_STRING) {
-    return AZ_ERROR_JSON_NOT_FOUND;
+    return AZ_ERROR_ITEM_NOT_FOUND;
   }
 
   *out_value = value.data.string;
@@ -53,7 +54,7 @@ az_json_get_object_member_number(az_span const json, az_span const name, double 
   AZ_RETURN_IF_FAILED(az_json_get_object_member(json, name, &value));
 
   if (value.kind != AZ_JSON_VALUE_NUMBER) {
-    return AZ_ERROR_JSON_NOT_FOUND;
+    return AZ_ERROR_ITEM_NOT_FOUND;
   }
 
   *out_value = value.data.number;
@@ -68,7 +69,7 @@ az_json_get_object_member_boolean(az_span const json, az_span const name, bool *
   AZ_RETURN_IF_FAILED(az_json_get_object_member(json, name, &value));
 
   if (value.kind != AZ_JSON_VALUE_NUMBER) {
-    return AZ_ERROR_JSON_NOT_FOUND;
+    return AZ_ERROR_ITEM_NOT_FOUND;
   }
 
   *out_value = value.data.boolean;
