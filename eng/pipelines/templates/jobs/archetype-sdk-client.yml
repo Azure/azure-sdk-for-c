@@ -10,28 +10,33 @@ jobs:
         vm.image: 'windows-2019'
         vcpkg.deps: 'curl[winssl]'
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
-# disabling MAC until pipeline gest fixed for it : https://github.com/Azure/azure-sdk-for-c/issues/127
-#      MacOS:
-#        vm.image: 'macOS-10.14'
-#        vcpkg.deps: 'curl[ssl]'
-#        VCPKG_DEFAULT_TRIPLET: 'x64-osx'
+      MacOS:
+        vm.image: 'macOS-10.14'
+        vcpkg.deps: 'curl[ssl]'
+        VCPKG_DEFAULT_TRIPLET: 'x64-osx'
   pool:
     vmImage: $(vm.image)
   steps:
   - checkout: self
     submodules: recursive
   - script: |
+      sudo xcode-select --switch /Applications/Xcode_9.4.1.app
       brew install gcc6
       git clone https://github.com/Microsoft/vcpkg.git
       cd vcpkg
       ./bootstrap-vcpkg.sh
       echo "##vso[task.prependpath]$(pwd)"
       echo "##vso[task.setvariable variable=VCPKG_INSTALLATION_ROOT;]$(pwd)"
-    condition: eq(variables['vm.image'], 'macOS-10.14')
+    condition: contains(variables['vm.image'], 'macOS')
     displayName: vcpkg bootstrap
   - script: |
       vcpkg install $(vcpkg.deps)
     displayName: vcpkg install dependencies
+
+  - task: CMake@1
+    inputs:
+      cmakeArgs: --version
+    displayName: cmake version
   - task: CMake@1
     inputs:
       cmakeArgs: -Duse_default_uuid=ON ..

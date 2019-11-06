@@ -7,14 +7,16 @@
 #include <az_result.h>
 #include <az_span.h>
 
+#include <ctype.h>
+
 #include <_az_cfg_prefix.h>
 
 typedef struct {
-  az_const_span span;
+  az_span span;
   size_t i;
 } az_span_reader;
 
-AZ_NODISCARD AZ_INLINE az_span_reader az_span_reader_create(az_const_span const span) {
+AZ_NODISCARD AZ_INLINE az_span_reader az_span_reader_create(az_span const span) {
   return (az_span_reader){ .span = span, .i = 0 };
 }
 
@@ -24,7 +26,7 @@ AZ_NODISCARD AZ_INLINE bool az_span_reader_is_empty(az_span_reader const * const
 
 AZ_NODISCARD AZ_INLINE az_result_byte
 az_span_reader_current(az_span_reader const * const p_reader) {
-  return az_const_span_get(p_reader->span, p_reader->i);
+  return az_span_get(p_reader->span, p_reader->i);
 }
 
 AZ_INLINE void az_span_reader_next(az_span_reader * const p_reader) {
@@ -33,6 +35,33 @@ AZ_INLINE void az_span_reader_next(az_span_reader * const p_reader) {
   }
   p_reader->i += 1;
 }
+
+AZ_NODISCARD AZ_INLINE az_result
+az_span_reader_set_pos(az_span_reader * const p_reader, size_t const i) {
+  AZ_CONTRACT(i <= p_reader->span.size, AZ_ERROR_ARG);
+
+  p_reader->i = i;
+  return AZ_OK;
+}
+
+// Parsing utilities
+
+AZ_NODISCARD AZ_INLINE az_result az_error_unexpected_char(az_result_byte const c) {
+  return az_failed(c) ? c : AZ_ERROR_PARSER_UNEXPECTED_CHAR;
+}
+
+/**
+ * Read a span form a reader and compare it with the given @span
+ *
+ * If it doesn't match the given @span, the function returns AZ_ERROR_UNEXPECTED_CHAR.
+ */
+AZ_NODISCARD az_result az_span_reader_expect_span(az_span_reader * const self, az_span const span);
+
+AZ_NODISCARD az_result
+az_span_reader_expect_digit(az_span_reader * const self, uint8_t * const digit);
+
+AZ_NODISCARD az_result
+az_span_reader_expect_char(az_span_reader * const p_reader, uint8_t const expected);
 
 #include <_az_cfg_suffix.h>
 

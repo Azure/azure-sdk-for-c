@@ -5,31 +5,26 @@
 
 #include <_az_cfg.h>
 
-AZ_NODISCARD az_result az_span_replace(
-    az_span const buffer,
-    az_const_span const src,
-    uint8_t (*const func)(uint8_t const),
-    az_span * const out_result) {
-  AZ_CONTRACT_ARG_NOT_NULL(func);
-  AZ_CONTRACT_ARG_NOT_NULL(out_result);
-  if (!az_span_is_valid(buffer) || !az_const_span_is_valid(src)) {
-    return AZ_ERROR_ARG;
-  }
+enum {
+  AZ_ASCII_LOWER_DIF = 'a' - 'A',
+};
 
-  if (buffer.size < src.size) {
-    return AZ_ERROR_BUFFER_OVERFLOW;
-  }
+/**
+ * ASCII lower case.
+ */
+AZ_NODISCARD AZ_INLINE az_result_byte az_ascii_lower(az_result_byte const value) {
+  return 'A' <= value && value <= 'Z' ? value + AZ_ASCII_LOWER_DIF : value;
+}
 
-  if (az_const_span_is_overlap(az_span_to_const_span(buffer), src) && buffer.begin > src.begin) {
-    for (size_t ri = src.size; ri > 0; --ri) {
-      buffer.begin[ri - 1] = func(src.begin[ri - 1]);
-    }
-  } else {
-    for (size_t i = 0; i < src.size; ++i) {
-      buffer.begin[i] = func(src.begin[i]);
+AZ_NODISCARD bool az_span_eq_ascii_ignore_case(az_span const a, az_span const b) {
+  size_t const size = a.size;
+  if (size != b.size) {
+    return false;
+  }
+  for (size_t i = 0; i < size; ++i) {
+    if (az_ascii_lower(az_span_get(a, i)) != az_ascii_lower(az_span_get(b, i))) {
+      return false;
     }
   }
-
-  *out_result = (az_span){ .begin = buffer.begin, .size = src.size };
-  return AZ_OK;
+  return true;
 }

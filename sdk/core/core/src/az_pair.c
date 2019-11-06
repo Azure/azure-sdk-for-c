@@ -6,15 +6,15 @@
 #include <_az_cfg.h>
 
 AZ_NODISCARD az_result
-az_pair_span_to_seq(
-    az_pair_span const * const context,
-    az_pair_visitor const visitor) {
-  AZ_CONTRACT_ARG_NOT_NULL(context);
+az_pair_span_emit(
+    az_pair_span const * const self,
+    az_pair_action const action) {
+  AZ_CONTRACT_ARG_NOT_NULL(self);
 
-  size_t const size = context->size;
-  az_pair const * begin = context->begin;
-  for (size_t i = 0; i < size; ++i) {
-    AZ_RETURN_IF_FAILED(visitor.func(visitor.data, begin[i]));
+  az_pair const * i = self->begin;
+  az_pair const * const end = i + self->size;
+  for (; i < end; ++i) {
+    AZ_RETURN_IF_FAILED(az_pair_action_do(action, *i));
   }
   return AZ_OK;
 }
