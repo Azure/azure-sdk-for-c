@@ -6,7 +6,7 @@
 #include <az_contract.h>
 #include <az_http_client.h>
 #include <az_http_request_builder.h>
-#include <az_json_read.h>
+#include <az_json_parser.h>
 #include <az_str.h>
 #include <az_uri.h>
 
@@ -77,13 +77,12 @@ AZ_NODISCARD az_result az_auth_get_token(
   {
     AZ_CONTRACT(response_buf.size >= MIN_BUFFER, AZ_ERROR_BUFFER_OVERFLOW);
 
-    size_t const request_elements[NREQUEST_ELEMENTS] = {
-      credentials.tenant_id.size * URLENCODE_FACTOR,
-      credentials.data.client_credentials.client_id.size * URLENCODE_FACTOR,
-      credentials.data.client_credentials.client_secret.size * URLENCODE_FACTOR,
-      resource_url.size * URLENCODE_FACTOR,
-      auth_url_maxsize
-    };
+    size_t const request_elements[NREQUEST_ELEMENTS]
+        = { credentials.tenant_id.size * URLENCODE_FACTOR,
+            credentials.data.client_credentials.client_id.size * URLENCODE_FACTOR,
+            credentials.data.client_credentials.client_secret.size * URLENCODE_FACTOR,
+            resource_url.size * URLENCODE_FACTOR,
+            auth_url_maxsize };
 
     size_t required_request_size
         = auth_url1.size + auth_url2.size + auth_body1.size + auth_body2.size + auth_body3.size;
@@ -192,7 +191,7 @@ AZ_NODISCARD az_result az_auth_get_token(
   {
     assert(auth_url.size <= auth_url_maxsize);
 
-    az_http_request_builder hrb = { 0 };
+    az_http_request_builder hrb = { { 0, 0 }, { 0, 0 }, { 0, 0 }, 0, 0, 0, 0, { 0, 0 } };
     AZ_RETURN_IF_FAILED(az_http_request_builder_init(
         &hrb,
         (az_mut_span){ .begin = response_buf.begin + response_buf.size - auth_url.size,
