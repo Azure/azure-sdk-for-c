@@ -727,7 +727,7 @@ int main() {
       { .key = hrb_header_authorization_name, .value = hrb_header_authorization_value1 },
     };
     for (uint16_t i = 0; i < hrb.headers_end; ++i) {
-      az_pair header = { 0, 0 };
+      az_pair header = (az_pair){ 0 };
       result = az_http_request_builder_get_header(&hrb, i, &header);
       TEST_ASSERT(result == AZ_OK);
 
@@ -751,7 +751,7 @@ int main() {
       { .key = hrb_header_authorization_name, .value = hrb_header_authorization_value2 },
     };
     for (uint16_t i = 0; i < hrb.headers_end; ++i) {
-      az_pair header = { 0, 0 };
+      az_pair header = (az_pair){ 0 };
       result = az_http_request_builder_get_header(&hrb, i, &header);
       TEST_ASSERT(result == AZ_OK);
 

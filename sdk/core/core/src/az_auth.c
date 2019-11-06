@@ -113,11 +113,11 @@ AZ_NODISCARD az_result az_auth_get_token(
         AZ_ERROR_ARG);
   }
 
-  az_span auth_url;
-  az_span auth_body;
+  az_span auth_url = (az_span){ 0 };
+  az_span auth_body = (az_span){ 0 };
   {
     az_mut_span buf = response_buf;
-    az_mut_span tmp_span;
+    az_mut_span tmp_span = (az_mut_span){ 0 };
 
     {
       auth_url.begin = buf.begin;
@@ -191,7 +191,7 @@ AZ_NODISCARD az_result az_auth_get_token(
   {
     assert(auth_url.size <= auth_url_maxsize);
 
-    az_http_request_builder hrb;
+    az_http_request_builder hrb = (az_http_request_builder){ 0 };
     AZ_RETURN_IF_FAILED(az_http_request_builder_init(
         &hrb,
         (az_mut_span){ .begin = response_buf.begin + response_buf.size - auth_url.size,

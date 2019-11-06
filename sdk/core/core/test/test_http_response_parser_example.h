@@ -25,7 +25,7 @@ static az_result http_response_parser_example(az_span const response) {
 
   // reading headers
   {
-    az_span contentType = { 0 };
+    az_span contentType = (az_span){ 0 };
     while (true) {
       az_pair header;
       // read a header
@@ -78,7 +78,7 @@ static az_result http_response_getters_example(az_span const response) {
 
   // reading headers
   {
-    az_span contentType = { 0 };
+    az_span contentType = (az_span){ 0 };
     while (true) {
       // read a header
       {
@@ -104,7 +104,7 @@ static az_result http_response_getters_example(az_span const response) {
 
   // reading body
   {
-    az_span body;
+    az_span body = (az_span){ 0 };
     AZ_RETURN_IF_FAILED(az_http_response_get_body(response, &header, &body));
     if (!az_span_eq(body, AZ_STR(EXAMPLE_BODY))) {
       return AZ_ERROR_HTTP_INVALID_STATE;
