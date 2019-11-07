@@ -14,6 +14,9 @@ typedef enum {
   AZ_JSON_POINTER_CHAR_SEPARATOR = 256,
 } az_json_pointer_char;
 
+// make sure we can store `az_result` in `az_json_pointer_char`.
+AZ_STATIC_ASSERT(sizeof(az_json_pointer_char) == sizeof(az_result))
+
 AZ_NODISCARD static az_json_pointer_char az_span_reader_get_json_pointer_char(
     az_span_reader * const self) {
   AZ_CONTRACT_ARG_NOT_NULL(self);

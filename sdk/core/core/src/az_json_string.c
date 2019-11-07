@@ -1,0 +1,88 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// SPDX-License-Identifier: MIT
+
+#include <az_json_string.h>
+
+#include <_az_cfg.h>
+
+enum {
+  AZ_HEX_LOWER_OFFSET = 'a' - 10,
+  AZ_HEX_UPPER_OFFSET = 'A' - 10,
+};
+
+AZ_NODISCARD AZ_INLINE az_result_byte az_hex_to_digit(az_result_byte const c) {
+  if (isdigit(c)) {
+    return c - '0';
+  }
+  if ('a' <= c && c <= 'f') {
+    return c - AZ_HEX_LOWER_OFFSET;
+  }
+  if ('A' <= c && c <= 'F') {
+    return c - AZ_HEX_UPPER_OFFSET;
+  }
+  return az_error_unexpected_char(c);
+}
+
+AZ_NODISCARD AZ_INLINE az_result_byte az_json_esc_decode(az_result_byte const c) {
+  switch (c) {
+    case '\\':
+    case '"':
+    case '/': {
+      return c;
+    }
+    case 'b': {
+      return '\b';
+    }
+    case 'f': {
+      return '\f';
+    }
+    case 'n': {
+      return '\n';
+    }
+    case 'r': {
+      return '\r';
+    }
+    case 't': {
+      return '\t';
+    }
+    default:
+      return az_error_unexpected_char(c);
+  }
+}
+
+AZ_NODISCARD az_json_string_char az_span_reader_get_json_string_char(az_span_reader * const self) {
+  AZ_CONTRACT_ARG_NOT_NULL(self);
+
+  az_result_byte result = az_span_reader_current(self);
+  switch (result) {
+    case AZ_ERROR_EOF: {
+      return AZ_ERROR_ITEM_NOT_FOUND;
+    }
+    case '"': {
+      return AZ_JSON_STRING_CHAR_END;
+    }
+    case '\\': {
+      az_span_reader_next(self);
+      az_result const c = az_span_reader_current(self);
+      az_span_reader_next(self);
+      if (c == 'u') {
+        uint16_t r = 0;
+        for (size_t i = 0; i < 4; ++i, az_span_reader_next(self)) {
+          az_result_byte const digit = az_hex_to_digit(az_span_reader_current(self));
+          AZ_RETURN_IF_FAILED(digit);
+          r = (r << 4) + (uint16_t)digit;
+        }
+        return r;
+      } else {
+        return az_json_esc_decode(c);
+      }
+    }
+    default: {
+      if (result < 0x20) {
+        return az_error_unexpected_char(result);
+      }
+      az_span_reader_next(self);
+      return result;
+    }
+  }
+}

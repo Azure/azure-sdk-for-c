@@ -4,6 +4,7 @@
 #include <az_json_parser.h>
 
 #include <az_contract.h>
+#include <az_json_string.h>
 
 #include <ctype.h>
 #include <math.h>
@@ -16,21 +17,6 @@ AZ_NODISCARD AZ_INLINE bool az_json_is_white_space(az_result_byte const c) {
     case '\t':
     case '\n':
     case '\r':
-      return true;
-  }
-  return false;
-}
-
-AZ_NODISCARD AZ_INLINE bool az_json_is_esc(az_result_byte const c) {
-  switch (c) {
-    case '\\':
-    case '"':
-    case '/':
-    case 'b':
-    case 'f':
-    case 'n':
-    case 'r':
-    case 't':
       return true;
   }
   return false;
@@ -205,38 +191,18 @@ AZ_NODISCARD static az_result az_span_reader_get_json_string_rest(
   // skip '"'
   size_t const begin = self->i;
   while (true) {
-    az_result_byte c = az_span_reader_current(self);
+    az_json_string_char const c = az_span_reader_get_json_string_char(self);
     switch (c) {
-        // end of the string
-      case '"': {
+      case AZ_JSON_STRING_CHAR_END: {
         *string = az_span_sub(self->span, begin, self->i);
         az_span_reader_next(self);
         return AZ_OK;
       }
-        // escape sequence
-      case '\\': {
-        az_span_reader_next(self);
-        c = az_span_reader_current(self);
-        if (az_json_is_esc(c)) {
-          az_span_reader_next(self);
-        } else if (c == 'u') {
-          az_span_reader_next(self);
-          for (size_t i = 0; i < 4; ++i, az_span_reader_next(self)) {
-            c = az_span_reader_current(self);
-            if (!isxdigit(c)) {
-              return az_error_unexpected_char(c);
-            }
-          }
-        } else {
-          return az_error_unexpected_char(c);
-        }
-        break;
+      case AZ_ERROR_ITEM_NOT_FOUND: {
+        return AZ_ERROR_EOF;
       }
-      default: {
-        if (c < 0x20) {
-          return az_error_unexpected_char(c);
-        }
-        az_span_reader_next(self);
+      default : {
+        AZ_RETURN_IF_FAILED(c);
       }
     }
   }
