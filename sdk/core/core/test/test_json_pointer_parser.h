@@ -24,7 +24,7 @@ static void test_json_pointer_parser() {
     TEST_ASSERT(az_json_pointer_parser_get(&parser, &p) == AZ_OK);
     TEST_ASSERT(az_span_eq(p, AZ_STR("abc")));
     // test az_json_pointer_token_parser_get
-    { 
+    {
       az_span_reader token_parser = az_span_reader_create(p);
       uint8_t buffer[10];
       int i = 0;
@@ -139,7 +139,8 @@ static void test_json_pointer_parser() {
   {
     az_span_reader token_parser = az_span_reader_create(AZ_STR("/"));
     char c;
-    TEST_ASSERT(az_json_pointer_token_parser_get(&token_parser, &c) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+    TEST_ASSERT(
+        az_json_pointer_token_parser_get(&token_parser, &c) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
   }
   // test az_json_pointer_token_parser_get
   {
