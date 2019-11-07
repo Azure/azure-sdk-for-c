@@ -31,6 +31,8 @@ AZ_INLINE az_result az_http_pipeline_nextpolicy(
   return next_policy(next_polices, hrb, out);
 }
 
+static az_span AZ_MS_CLIENT_REQUESTID = AZ_CONST_STR("x-ms-client-request-id");
+
 az_result az_http_pipeline_policy_uniquerequestid(
     az_http_policy * const p_policies,
     az_http_request_builder * const hrb,
@@ -38,6 +40,17 @@ az_result az_http_pipeline_policy_uniquerequestid(
   AZ_CONTRACT_ARG_NOT_NULL(p_policies);
   AZ_CONTRACT_ARG_NOT_NULL(hrb);
   AZ_CONTRACT_ARG_NOT_NULL(out);
+
+  //TODO - add a UUID create implementation
+  az_span uniqueid = AZ_CONST_STR("123e4567-e89b-12d3-a456-426655440000");
+
+    // add auth Header with parsed auth_token
+  az_result const add_header_result = az_http_request_builder_append_header(
+      &hrb, AZ_MS_CLIENT_REQUESTID, uniqueid);
+  if (az_failed(add_header_result)) {
+    return add_header_result;
+  }
+
   // Append the Unique GUID into the headers
   //  x-ms-client-request-id
   return az_http_pipeline_nextpolicy(p_policies, hrb, out);
