@@ -11,8 +11,8 @@ az_json_pointer_parser_get(az_span_reader * const json_pointer_parser, az_span *
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
   // read `/` if any.
-  { 
-    az_result result = az_span_reader_expect_char(json_pointer_parser, '/'); 
+  {
+    az_result result = az_span_reader_expect_char(json_pointer_parser, '/');
     if (result == AZ_ERROR_EOF) {
       return AZ_ERROR_ITEM_NOT_FOUND;
     }
@@ -48,5 +48,46 @@ az_json_pointer_parser_get(az_span_reader * const json_pointer_parser, az_span *
       }
     }
     az_span_reader_next(json_pointer_parser);
+  }
+}
+
+AZ_NODISCARD az_result az_json_pointer_token_parser_get(
+    az_span_reader * const json_pointer_token_parser,
+    uint8_t * const out) {
+  AZ_CONTRACT_ARG_NOT_NULL(json_pointer_token_parser);
+  AZ_CONTRACT_ARG_NOT_NULL(out);
+
+  az_result_byte const result = az_span_reader_current(json_pointer_token_parser);
+  if (result == AZ_ERROR_EOF) {
+    return AZ_ERROR_ITEM_NOT_FOUND;
+  }
+  AZ_RETURN_IF_FAILED(result);
+
+  az_span_reader_next(json_pointer_token_parser);
+  switch (result) {
+    case '/': {
+      return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
+    }
+    case '~': {
+      az_result_byte const e = az_span_reader_current(json_pointer_token_parser);
+      az_span_reader_next(json_pointer_token_parser);
+      switch (e) {
+        case '0': {
+          *out = '~';
+          return AZ_OK;
+        }
+        case '1': {
+          *out = '/';
+          return AZ_OK;
+        }
+        default: {
+          return az_error_unexpected_char(e);
+        }
+      }
+    }
+    default: {
+      *out = (uint8_t)result;
+      return AZ_OK;
+    }
   }
 }

@@ -9,12 +9,16 @@
 #include <_az_cfg_prefix.h>
 
 /**
- * Returns a next item in the JSON pointer. The JSON pointer parser is @az_span_reader.
+ * Returns a next reference token in the JSON pointer. The JSON pointer parser is @az_span_reader.
  *
  * See https://tools.ietf.org/html/rfc6901
  */
 AZ_NODISCARD az_result
 az_json_pointer_parser_get(az_span_reader * const json_pointer_parser, az_span * const out);
+
+AZ_NODISCARD az_result az_json_pointer_token_parser_get(
+    az_span_reader * const json_pointer_token_parser,
+    uint8_t * const out);
 
 #include <_az_cfg_suffix.h>
 

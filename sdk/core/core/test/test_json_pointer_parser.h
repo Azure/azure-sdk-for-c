@@ -23,24 +23,90 @@ static void test_json_pointer_parser() {
     az_span p;
     TEST_ASSERT(az_json_pointer_parser_get(&parser, &p) == AZ_OK);
     TEST_ASSERT(az_span_eq(p, AZ_STR("abc")));
+    // test az_json_pointer_token_parser_get
+    { 
+      az_span_reader token_parser = az_span_reader_create(p);
+      uint8_t buffer[10];
+      int i = 0;
+      while (true) {
+        az_result const result = az_json_pointer_token_parser_get(&token_parser, buffer + i);
+        if (result == AZ_ERROR_ITEM_NOT_FOUND) {
+          break;
+        }
+        TEST_ASSERT(result == AZ_OK);
+        ++i;
+      }
+      az_span const b = { .begin = buffer, .size = i };
+      TEST_ASSERT(az_span_eq(b, AZ_STR("abc")));
+    }
     TEST_ASSERT(az_json_pointer_parser_get(&parser, &p) == AZ_ERROR_ITEM_NOT_FOUND);
   }
   {
-    az_span_reader parser = az_span_reader_create(AZ_STR("/abc/dffgg21"));
+    az_span_reader parser = az_span_reader_create(AZ_STR("/abc//dffgg21"));
     az_span p;
     TEST_ASSERT(az_json_pointer_parser_get(&parser, &p) == AZ_OK);
     TEST_ASSERT(az_span_eq(p, AZ_STR("abc")));
+    // test az_json_pointer_token_parser_get
+    {
+      az_span_reader token_parser = az_span_reader_create(p);
+      uint8_t buffer[10];
+      int i = 0;
+      while (true) {
+        az_result const result = az_json_pointer_token_parser_get(&token_parser, buffer + i);
+        if (result == AZ_ERROR_ITEM_NOT_FOUND) {
+          break;
+        }
+        TEST_ASSERT(result == AZ_OK);
+        ++i;
+      }
+      az_span const b = { .begin = buffer, .size = i };
+      TEST_ASSERT(az_span_eq(b, AZ_STR("abc")));
+    }
+    TEST_ASSERT(az_json_pointer_parser_get(&parser, &p) == AZ_OK);
+    TEST_ASSERT(az_span_eq(p, AZ_STR("")));
     TEST_ASSERT(az_json_pointer_parser_get(&parser, &p) == AZ_OK);
     TEST_ASSERT(az_span_eq(p, AZ_STR("dffgg21")));
     TEST_ASSERT(az_json_pointer_parser_get(&parser, &p) == AZ_ERROR_ITEM_NOT_FOUND);
   }
   {
-    az_span_reader parser = az_span_reader_create(AZ_STR("/ab~1c/dff~0"));
+    az_span_reader parser = az_span_reader_create(AZ_STR("/ab~1c/dff~0x"));
     az_span p;
     TEST_ASSERT(az_json_pointer_parser_get(&parser, &p) == AZ_OK);
     TEST_ASSERT(az_span_eq(p, AZ_STR("ab~1c")));
+    // test az_json_pointer_token_parser_get
+    {
+      az_span_reader token_parser = az_span_reader_create(p);
+      uint8_t buffer[10];
+      int i = 0;
+      while (true) {
+        az_result const result = az_json_pointer_token_parser_get(&token_parser, buffer + i);
+        if (result == AZ_ERROR_ITEM_NOT_FOUND) {
+          break;
+        }
+        TEST_ASSERT(result == AZ_OK);
+        ++i;
+      }
+      az_span const b = { .begin = buffer, .size = i };
+      TEST_ASSERT(az_span_eq(b, AZ_STR("ab/c")));
+    }
     TEST_ASSERT(az_json_pointer_parser_get(&parser, &p) == AZ_OK);
-    TEST_ASSERT(az_span_eq(p, AZ_STR("dff~0")));
+    TEST_ASSERT(az_span_eq(p, AZ_STR("dff~0x")));
+    // test az_json_pointer_token_parser_get
+    {
+      az_span_reader token_parser = az_span_reader_create(p);
+      uint8_t buffer[10];
+      int i = 0;
+      while (true) {
+        az_result const result = az_json_pointer_token_parser_get(&token_parser, buffer + i);
+        if (result == AZ_ERROR_ITEM_NOT_FOUND) {
+          break;
+        }
+        TEST_ASSERT(result == AZ_OK);
+        ++i;
+      }
+      az_span const b = { .begin = buffer, .size = i };
+      TEST_ASSERT(az_span_eq(b, AZ_STR("dff~x")));
+    }
     TEST_ASSERT(az_json_pointer_parser_get(&parser, &p) == AZ_ERROR_ITEM_NOT_FOUND);
   }
   {
