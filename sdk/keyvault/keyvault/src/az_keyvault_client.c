@@ -11,7 +11,7 @@ AZ_NODISCARD az_result az_keyvault_keys_client_init(
     az_keyvault_keys_client * client,
     az_span uri,
     /*Azure Credentials */
-    az_keyvault_keys_client_options * options) {
+    az_keyvault_keys_client_options const * options) {
   (void)client;
   (void)uri;
   (void)options;

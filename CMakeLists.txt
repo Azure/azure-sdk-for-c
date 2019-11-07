@@ -17,6 +17,22 @@ endif()
 
 project(az LANGUAGES C)
 enable_testing ()
-add_subdirectory(sdk/core/core)
-add_subdirectory(sdk/keyvault/keyvault)
-# add_subdirectory(sdk/storage/ustorageclient)
+
+# make options for each subdirectoy so it can be selected what to build on CI Pipelines
+option(BUILD_AZ_CORE "Build lib and targets from Azure CORE" ON)
+option(BUILD_AZ_KEY_VAULT_CLIENT "Build lib and targets from Azure KeyVault client" OFF)
+option(BUILD_AZ_USTORAGE_CLIENT "Build targets from u-storage cliente" OFF)
+
+if (BUILD_AZ_CORE)
+  add_subdirectory(sdk/core/core)
+endif()
+if (BUILD_AZ_KEY_VAULT_CLIENT)
+  # adding core only for linking library. No tests or executables will be created
+  if (NOT BUILD_AZ_CORE)
+    add_subdirectory(sdk/core/core)
+  endif()
+  add_subdirectory(sdk/keyvault/keyvault)
+endif()
+if (BUILD_AZ_USTORAGE_CLIENT)
+  add_subdirectory(sdk/storage/ustorageclient)
+endif()

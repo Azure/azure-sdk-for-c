@@ -51,26 +51,28 @@ target_include_directories (az_core PUBLIC inc)
 # make sure that users can consume the project as a library.
 add_library (az::core ALIAS az_core)
 
-add_executable (az_core_test test/main.c)
+# build test and executables only if requested
+if (BUILD_AZ_CORE)
+  add_executable (az_core_test test/main.c)
+  target_link_libraries(az_core_test PRIVATE az_core)
+  target_link_libraries(az_core PRIVATE CURL::libcurl)
 
-target_link_libraries(az_core_test PRIVATE az_core)
+  # curl easy perform POC
+  add_executable (curl_easy_perform_poc test/curl_easy_perform_poc.c)
+  target_link_libraries(curl_easy_perform_poc PRIVATE 
+    az_core 
+    CURL::libcurl)
 
-# curl easy perform POC
-add_executable (curl_easy_perform_poc test/curl_easy_perform_poc.c)
-target_link_libraries(curl_easy_perform_poc PRIVATE 
-  az_core 
-  CURL::libcurl)
+  if (UNIX)
+    target_link_libraries(az_core_test PRIVATE m)
+    target_link_libraries(curl_easy_perform_poc PRIVATE m)
+  endif()
 
-target_link_libraries(az_core PRIVATE CURL::libcurl)
+  add_test(NAME az_core_test COMMAND az_core_test)
+
+endif()
 
 if (MOCK_CURL)
   MESSAGE("Will mock all calls to http client with static responses")
   add_definitions(-DMOCK_CURL="MOCK")
 endif()
-
-if (UNIX)
-  target_link_libraries(az_core_test PRIVATE m)
-  target_link_libraries(curl_easy_perform_poc PRIVATE m)
-endif()
-
-add_test(NAME az_core_test COMMAND az_core_test)
