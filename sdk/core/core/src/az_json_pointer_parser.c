@@ -5,7 +5,7 @@
 
 #include <_az_cfg.h>
 
-/** 
+/**
  * - ..-1 errors
  * - 0..255 UTF-8 byte
  * - 256 unescaped "/"
@@ -14,8 +14,8 @@ typedef enum {
   AZ_JSON_POINTER_CHAR_SEPARATOR = 256,
 } az_json_pointer_char;
 
-AZ_NODISCARD AZ_INLINE az_json_pointer_char
-az_span_reader_get_json_pointer_char(az_span_reader * const self) {
+AZ_NODISCARD static az_json_pointer_char az_span_reader_get_json_pointer_char(
+    az_span_reader * const self) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
   az_result_byte const result = az_span_reader_current(self);
@@ -83,7 +83,8 @@ AZ_NODISCARD az_result az_json_pointer_token_parser_get(
   AZ_CONTRACT_ARG_NOT_NULL(json_pointer_token_parser);
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
-  az_json_pointer_char result = az_span_reader_get_json_pointer_char(json_pointer_token_parser);
+  az_json_pointer_char const result
+      = az_span_reader_get_json_pointer_char(json_pointer_token_parser);
   if (result == AZ_JSON_POINTER_CHAR_SEPARATOR) {
     return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
