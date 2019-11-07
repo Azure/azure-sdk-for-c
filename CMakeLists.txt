@@ -19,9 +19,9 @@ project(az LANGUAGES C)
 enable_testing ()
 
 # make options for each subdirectoy so it can be selected what to build on CI Pipelines
-option(BUILD_AZ_CORE "Build lib and targets from Azure CORE" ON)
-option(BUILD_AZ_KEY_VAULT_CLIENT "Build lib and targets from Azure KeyVault client" OFF)
-option(BUILD_AZ_USTORAGE_CLIENT "Build targets from u-storage cliente" OFF)
+option(BUILD_AZ_CORE "Build lib and targets from Azure core" ON)
+option(BUILD_AZ_KEY_VAULT_CLIENT "Build lib and targets from Azure Key Vault client" OFF)
+option(BUILD_AZ_USTORAGE_CLIENT "Build targets from u-storage client" OFF)
 
 if (BUILD_AZ_CORE)
   add_subdirectory(sdk/core/core)
