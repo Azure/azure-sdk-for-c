@@ -5,11 +5,12 @@
 #include <az_http_client.h>
 #include <az_http_request_builder.h>
 #include <az_http_response_parser.h>
-#include <az_json_get.h>
 #include <az_pair.h>
 #include <az_span.h>
 #include <az_span_builder.h>
 #include <az_span_malloc.h>
+
+#include <az_http_pipeline.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -105,6 +106,9 @@ int main() {
   // free the temporal buffer holding auth token
   az_mut_span_set(temp_buf, 0);
   az_span_free(&temp_buf);
+
+  az_result result;
+  result = az_http_pipeline_process(&hrb, &http_buf_response);
 
   return 0;
 }
