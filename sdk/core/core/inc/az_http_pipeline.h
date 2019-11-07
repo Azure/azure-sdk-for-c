@@ -4,12 +4,9 @@
 #ifndef AZ_HTTP_PIPELINE_H
 #define AZ_HTTP_PIPELINE_H
 
-#include <az_contract.h>
-#include <az_http_policy.h>
-#include <az_http_request.h>
-#include <az_pair.h>
-#include <az_span.h>
-#include <az_str.h>
+#include <az_result.h>
+#include <az_http_request_builder.h>
+#include <az_mut_span.h>
 
 #include <_az_cfg_prefix.h>
 

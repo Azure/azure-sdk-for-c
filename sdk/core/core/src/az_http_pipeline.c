@@ -18,7 +18,7 @@ az_http_policy pipeline[8] = {
 };
 
 AZ_NODISCARD az_result
-az_http_pipeline_process(az_http_request_builder * const hrb, az_mut_span const * const response) {
+az_http_pipeline_process(az_http_request_builder * const hrb, const az_mut_span * const response) {
   AZ_CONTRACT_ARG_NOT_NULL(hrb);
   AZ_CONTRACT_ARG_NOT_NULL(response);
 

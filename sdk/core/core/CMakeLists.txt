@@ -19,6 +19,8 @@ add_library (
   src/az_curl_adapter.c
   src/az_curl_slist.c
   src/az_http_header.c
+  src/az_http_pipeline.c
+  src/az_http_policy.c
   src/az_http_query.c
   src/az_http_request.c
   src/az_http_request_builder.c
@@ -29,8 +31,6 @@ add_library (
   src/az_json_pointer_parser.c
   src/az_json_value.c
   src/az_mut_span.c
-  src/az_http_pipeline.c
-  src/az_http_policy.c
   src/az_pair.c
   src/az_span.c
   src/az_span_builder.c
