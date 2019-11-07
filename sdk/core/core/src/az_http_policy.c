@@ -11,7 +11,7 @@
 
 #include <_az_cfg.h>
 
-AZ_INLINE az_result az_http_pipeline_nextpolicy(
+AZ_NODISCARD AZ_INLINE az_result az_http_pipeline_nextpolicy(
     az_http_policy * const p_policies,
     az_http_request_builder * const hrb,
     az_mut_span const * const response) {
@@ -31,7 +31,7 @@ AZ_INLINE az_result az_http_pipeline_nextpolicy(
 
 static az_span const AZ_MS_CLIENT_REQUESTID = AZ_CONST_STR("x-ms-client-request-id");
 
-az_result az_http_pipeline_policy_uniquerequestid(
+AZ_NODISCARD az_result az_http_pipeline_policy_uniquerequestid(
     az_http_policy * const p_policies,
     az_http_request_builder * const hrb,
     az_mut_span const * const response) {
@@ -54,7 +54,7 @@ az_result az_http_pipeline_policy_uniquerequestid(
   return az_http_pipeline_nextpolicy(p_policies, hrb, response);
 }
 
-az_result az_http_pipeline_policy_retry(
+AZ_NODISCARD az_result az_http_pipeline_policy_retry(
     az_http_policy * const p_policies,
     az_http_request_builder * const hrb,
     az_mut_span const * const response) {
@@ -65,7 +65,7 @@ az_result az_http_pipeline_policy_retry(
   return az_http_pipeline_nextpolicy(p_policies, hrb, response);
 }
 
-az_result az_http_pipeline_policy_authentication(
+AZ_NODISCARD az_result az_http_pipeline_policy_authentication(
     az_http_policy * const p_policies,
     az_http_request_builder * const hrb,
     az_mut_span const * const response) {
@@ -76,7 +76,7 @@ az_result az_http_pipeline_policy_authentication(
   return az_http_pipeline_nextpolicy(p_policies, hrb, response);
 }
 
-az_result az_http_pipeline_policy_logging(
+AZ_NODISCARD az_result az_http_pipeline_policy_logging(
     az_http_policy * const p_policies,
     az_http_request_builder * const hrb,
     az_mut_span const * const response) {
@@ -87,7 +87,7 @@ az_result az_http_pipeline_policy_logging(
   return az_http_pipeline_nextpolicy(p_policies, hrb, response);
 }
 
-az_result az_http_pipeline_policy_bufferresponse(
+AZ_NODISCARD az_result az_http_pipeline_policy_bufferresponse(
     az_http_policy * const p_policies,
     az_http_request_builder * const hrb,
     az_mut_span const * const response) {
@@ -99,7 +99,7 @@ az_result az_http_pipeline_policy_bufferresponse(
   return az_http_pipeline_nextpolicy(p_policies, hrb, response);
 }
 
-az_result az_http_pipeline_policy_distributedtracing(
+AZ_NODISCARD az_result az_http_pipeline_policy_distributedtracing(
     az_http_policy * const p_policies,
     az_http_request_builder * const hrb,
     az_mut_span const * const response) {
@@ -110,7 +110,7 @@ az_result az_http_pipeline_policy_distributedtracing(
   return az_http_pipeline_nextpolicy(p_policies, hrb, response);
 }
 
-az_result az_http_pipeline_policy_transport(
+AZ_NODISCARD az_result az_http_pipeline_policy_transport(
     az_http_policy * const p_policies,
     az_http_request_builder * const hrb,
     az_mut_span const * const response) {
