@@ -28,3 +28,13 @@ az_json_get_object_member(az_span const json, az_span const name, az_json_value 
 
   return AZ_ERROR_ITEM_NOT_FOUND;
 }
+
+AZ_NODISCARD az_result
+az_json_get_by_pointer(az_span const json, az_span const pointer, az_json_value * const out_value) {
+  AZ_CONTRACT_ARG_NOT_NULL(out_value);
+
+  az_json_parser json_parser = az_json_parser_create(json);
+  az_span_reader pointer_parser = az_span_reader_create(pointer);
+
+  return AZ_ERROR_NOT_IMPLEMENTED;
+}
