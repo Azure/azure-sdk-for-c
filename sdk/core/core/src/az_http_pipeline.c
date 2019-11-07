@@ -4,8 +4,6 @@
 #include <az_http_pipeline.h>
 #include <az_http_policy.h>
 
-#include <az_contract.h>
-
 #include <_az_cfg.h>
 
 az_http_policy pipeline[8] = {
