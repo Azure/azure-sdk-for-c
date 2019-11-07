@@ -7,37 +7,43 @@
 #include "./az_test.h"
 
 static void test_json_value() {
-  az_json_value const b = az_json_value_create_boolean(true);
-  az_json_value const n = az_json_value_create_number(-42.3);
-  az_json_value const s = az_json_value_create_string(AZ_STR("Hello"));
+  az_json_value const json_boolean = az_json_value_create_boolean(true);
+  az_json_value const json_number = az_json_value_create_number(-42.3);
+  az_json_value const json_string = az_json_value_create_string(AZ_STR("Hello"));
 
-  { 
-    bool x = false;
-    TEST_ASSERT(az_json_value_get_boolean(&b, &x) == AZ_OK);
-    TEST_ASSERT(x == true);
-  }
+  // boolean from boolean
   {
-    bool x = false;
-    TEST_ASSERT(az_json_value_get_boolean(&n, &x) == AZ_ERROR_ITEM_NOT_FOUND);
+    bool boolean_value = false;
+    TEST_ASSERT(az_json_value_get_boolean(&json_boolean, &boolean_value) == AZ_OK);
+    TEST_ASSERT(boolean_value == true);
   }
-
+  // boolean from number
   {
-    az_span x = { 0, 0 };
-    TEST_ASSERT(az_json_value_get_string(&s, &x) == AZ_OK);
-    TEST_ASSERT(az_span_eq(x, AZ_STR("Hello")));
-  }
-  {
-    az_span x = { 0, 0 };
-    TEST_ASSERT(az_json_value_get_string(&b, &x) == AZ_ERROR_ITEM_NOT_FOUND);
+    bool boolean_value = false;
+    TEST_ASSERT(az_json_value_get_boolean(&json_number, &boolean_value) == AZ_ERROR_ITEM_NOT_FOUND);
   }
 
+  // string from string
   {
-    double x = 0.79;
-    TEST_ASSERT(az_json_value_get_number(&n, &x) == AZ_OK);
-    TEST_ASSERT(x == -42.3);
+    az_span string_value = { 0 };
+    TEST_ASSERT(az_json_value_get_string(&json_string, &string_value) == AZ_OK);
+    TEST_ASSERT(az_span_eq(string_value, AZ_STR("Hello")));
   }
+  // string from boolean
   {
-    double x = 0.79;
-    TEST_ASSERT(az_json_value_get_number(&s, &x) == AZ_ERROR_ITEM_NOT_FOUND);
+    az_span string_value = { 0 };
+    TEST_ASSERT(az_json_value_get_string(&json_boolean, &string_value) == AZ_ERROR_ITEM_NOT_FOUND);
+  }
+
+  // number from number
+  {
+    double number_value = 0.79;
+    TEST_ASSERT(az_json_value_get_number(&json_number, &number_value) == AZ_OK);
+    TEST_ASSERT(number_value == -42.3);
+  }
+  // number from string
+  {
+    double number_value = 0.79;
+    TEST_ASSERT(az_json_value_get_number(&json_string, &number_value) == AZ_ERROR_ITEM_NOT_FOUND);
   }
 }
