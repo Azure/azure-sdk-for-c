@@ -27,44 +27,43 @@
 //    TransportPolicy
 //  ===Transport Layer===
 
-typedef struct {
-  az_span data;
-} az_http_response_data;
-
 typedef struct az_http_policy az_http_policy;
 
 // PipelinePolicies must implement the process function
 //
-typedef az_result (*az_http_policy_pfnc_process)(az_http_policy * policies, az_http_request_builder * hrb, az_http_response_data * out);
+typedef az_result (*az_http_policy_pfnc_process)(
+    az_http_policy * policies,
+    az_http_request_builder * hrb,
+    az_mut_span const * const response);
 
 az_result az_http_pipeline_policy_uniquerequestid(
     az_http_policy * const policies,
     az_http_request_builder * const hrb,
-    az_http_response_data * const out);
+    az_mut_span const * const response);
 az_result az_http_pipeline_policy_retry(
     az_http_policy * const policies,
     az_http_request_builder * const hrb,
-    az_http_response_data * const out);
+    az_mut_span const * const response);
 az_result az_http_pipeline_policy_authentication(
     az_http_policy * const policies,
     az_http_request_builder * const hrb,
-    az_http_response_data * const out);
+    az_mut_span const * const response);
 az_result az_http_pipeline_policy_logging(
     az_http_policy * const policies,
     az_http_request_builder * const hrb,
-    az_http_response_data * const out);
+    az_mut_span const * const response);
 az_result az_http_pipeline_policy_bufferresponse(
     az_http_policy * const policies,
     az_http_request_builder * const hrb,
-    az_http_response_data * const out);
+    az_mut_span const * const response);
 az_result az_http_pipeline_policy_distributedtracing(
     az_http_policy * const policies,
     az_http_request_builder * const hrb,
-    az_http_response_data * const out);
+    az_mut_span const * const response);
 az_result az_http_pipeline_policy_transport(
     az_http_policy * const policies,
     az_http_request_builder * const hrb,
-    az_http_response_data * const out);
+    az_mut_span const * const response);
 
 typedef struct {
   az_span data;

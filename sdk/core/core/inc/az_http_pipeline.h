@@ -16,7 +16,7 @@
 // Start the pipeline
 az_result az_http_pipeline_process(
     az_http_request_builder * const hrb,
-    az_http_response_data * const response);
+    az_mut_span const * const response);
 
 #include <_az_cfg_suffix.h>
 #endif

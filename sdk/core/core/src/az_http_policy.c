@@ -14,11 +14,11 @@
 AZ_INLINE az_result az_http_pipeline_nextpolicy(
     az_http_policy * const p_policies,
     az_http_request_builder * const hrb,
-    az_http_response_data * const out) {
+    az_mut_span const * const response) {
 
   AZ_CONTRACT_ARG_NOT_NULL(p_policies);
   AZ_CONTRACT_ARG_NOT_NULL(hrb);
-  AZ_CONTRACT_ARG_NOT_NULL(out);
+  AZ_CONTRACT_ARG_NOT_NULL(response);
 
   //Transport Policy is the last policy in the pipeline
   //  it returns without calling nextpolicy
@@ -26,7 +26,7 @@ AZ_INLINE az_result az_http_pipeline_nextpolicy(
     return AZ_ERROR_HTTP_PIPELINE_INVALID_POLICY;
   }
 
-  return p_policies[0].pfnc_process(&(p_policies[1]), hrb, out);
+  return p_policies[0].pfnc_process(&(p_policies[1]), hrb, response);
 }
 
 static az_span const AZ_MS_CLIENT_REQUESTID = AZ_CONST_STR("x-ms-client-request-id");
@@ -34,10 +34,10 @@ static az_span const AZ_MS_CLIENT_REQUESTID = AZ_CONST_STR("x-ms-client-request-
 az_result az_http_pipeline_policy_uniquerequestid(
     az_http_policy * const p_policies,
     az_http_request_builder * const hrb,
-    az_http_response_data * const out) {
+    az_mut_span const * const response) {
   AZ_CONTRACT_ARG_NOT_NULL(p_policies);
   AZ_CONTRACT_ARG_NOT_NULL(hrb);
-  AZ_CONTRACT_ARG_NOT_NULL(out);
+  AZ_CONTRACT_ARG_NOT_NULL(response);
 
   //TODO - add a UUID create implementation
   az_span const uniqueid = AZ_CONST_STR("123e4567-e89b-12d3-a456-426655440000");
@@ -51,73 +51,73 @@ az_result az_http_pipeline_policy_uniquerequestid(
     return add_header_result;
   }
 
-  return az_http_pipeline_nextpolicy(p_policies, hrb, out);
+  return az_http_pipeline_nextpolicy(p_policies, hrb, response);
 }
 
 az_result az_http_pipeline_policy_retry(
     az_http_policy * const p_policies,
     az_http_request_builder * const hrb,
-    az_http_response_data * const out) {
+    az_mut_span const * const response) {
   AZ_CONTRACT_ARG_NOT_NULL(p_policies);
   AZ_CONTRACT_ARG_NOT_NULL(hrb);
-  AZ_CONTRACT_ARG_NOT_NULL(out);
+  AZ_CONTRACT_ARG_NOT_NULL(response);
   // Retry logic
-  return az_http_pipeline_nextpolicy(p_policies, hrb, out);
+  return az_http_pipeline_nextpolicy(p_policies, hrb, response);
 }
 
 az_result az_http_pipeline_policy_authentication(
     az_http_policy * const p_policies,
     az_http_request_builder * const hrb,
-    az_http_response_data * const out) {
+    az_mut_span const * const response) {
   AZ_CONTRACT_ARG_NOT_NULL(p_policies);
   AZ_CONTRACT_ARG_NOT_NULL(hrb);
-  AZ_CONTRACT_ARG_NOT_NULL(out);
+  AZ_CONTRACT_ARG_NOT_NULL(response);
   // Authentication logic
-  return az_http_pipeline_nextpolicy(p_policies, hrb, out);
+  return az_http_pipeline_nextpolicy(p_policies, hrb, response);
 }
 
 az_result az_http_pipeline_policy_logging(
     az_http_policy * const p_policies,
     az_http_request_builder * const hrb,
-    az_http_response_data * const out) {
+    az_mut_span const * const response) {
   AZ_CONTRACT_ARG_NOT_NULL(p_policies);
   AZ_CONTRACT_ARG_NOT_NULL(hrb);
-  AZ_CONTRACT_ARG_NOT_NULL(out);
+  AZ_CONTRACT_ARG_NOT_NULL(response);
   // Authentication logic
-  return az_http_pipeline_nextpolicy(p_policies, hrb, out);
+  return az_http_pipeline_nextpolicy(p_policies, hrb, response);
 }
 
 az_result az_http_pipeline_policy_bufferresponse(
     az_http_policy * const p_policies,
     az_http_request_builder * const hrb,
-    az_http_response_data * const out) {
+    az_mut_span const * const response) {
   AZ_CONTRACT_ARG_NOT_NULL(p_policies);
   AZ_CONTRACT_ARG_NOT_NULL(hrb);
-  AZ_CONTRACT_ARG_NOT_NULL(out);
+  AZ_CONTRACT_ARG_NOT_NULL(response);
   // buffer response logic
   //  this might be uStream
-  return az_http_pipeline_nextpolicy(p_policies, hrb, out);
+  return az_http_pipeline_nextpolicy(p_policies, hrb, response);
 }
 
 az_result az_http_pipeline_policy_distributedtracing(
     az_http_policy * const p_policies,
     az_http_request_builder * const hrb,
-    az_http_response_data * const out) {
+    az_mut_span const * const response) {
   AZ_CONTRACT_ARG_NOT_NULL(p_policies);
   AZ_CONTRACT_ARG_NOT_NULL(hrb);
-  AZ_CONTRACT_ARG_NOT_NULL(out);
+  AZ_CONTRACT_ARG_NOT_NULL(response);
   // Distributed tracing logic
-  return az_http_pipeline_nextpolicy(p_policies, hrb, out);
+  return az_http_pipeline_nextpolicy(p_policies, hrb, response);
 }
 
 az_result az_http_pipeline_policy_transport(
     az_http_policy * const p_policies,
     az_http_request_builder * const hrb,
-    az_http_response_data * const out) {
+    az_mut_span const * const response) {
 
   AZ_CONTRACT_ARG_NOT_NULL(p_policies);
   AZ_CONTRACT_ARG_NOT_NULL(hrb);
-  AZ_CONTRACT_ARG_NOT_NULL(out);
+  AZ_CONTRACT_ARG_NOT_NULL(response);
   // Make the actual request
 
   // Transport policy is the last policy

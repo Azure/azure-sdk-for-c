@@ -22,7 +22,7 @@ az_http_policy pipeline[8] = {
 
 az_result az_http_pipeline_process(
     az_http_request_builder * const hrb,
-    az_http_response_data * const response) {
+    az_mut_span const * const response) {
   AZ_CONTRACT_ARG_NOT_NULL(hrb);
   AZ_CONTRACT_ARG_NOT_NULL(response);
 
