@@ -14,6 +14,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "./az_test.h"
+
 #include <_az_cfg.h>
 
 static az_span KEY_VAULT_URL
@@ -21,6 +23,8 @@ static az_span KEY_VAULT_URL
 
 static az_span API_VERSION_QUERY_NAME = AZ_CONST_STR("api-version");
 static az_span API_VERSION_QUERY_VALUE = AZ_CONST_STR("7.0");
+
+int exit_code = 0;
 
 int main() {
   // create a buffer for request
@@ -106,5 +110,5 @@ int main() {
   az_mut_span_set(temp_buf, 0);
   az_span_free(&temp_buf);
 
-  return 0;
+  return exit_code;
 }
