@@ -39,7 +39,7 @@ jobs:
     displayName: cmake version
   - task: CMake@1
     inputs:
-      cmakeArgs: -Duse_default_uuid=ON ..
+      cmakeArgs: -DBUILD_AZ_KEY_VAULT_CLIENT=ON
     displayName: cmake generate
   - task: CMake@1
     inputs:

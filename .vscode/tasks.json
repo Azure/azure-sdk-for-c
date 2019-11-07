@@ -4,7 +4,7 @@
         {
             "label": "build",
             "type": "shell",
-            "command": "cd Debug && rm -rf * && cmake -Duse_default_uuid=ON -DCMAKE_BUILD_TYPE=Debug  .. && make"
+            "command": "cd Debug && rm -rf * && cmake -DBUILD_AZ_KEY_VAULT_CLIENT=ON -DCMAKE_BUILD_TYPE=Debug  .. && make"
         }
     ]
 }
