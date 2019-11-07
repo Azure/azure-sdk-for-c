@@ -71,14 +71,14 @@ int main() {
   // can't print auth_token right now since it is not 0-terminated
   size_t const buffer_for_header_size = sizeof("Bearer ") + auth_token.size;
   az_mut_span temp_buf;
-  az_result ignore_result = az_span_malloc(buffer_for_header_size, &temp_buf);
+  AZ_EXPECT_SUCCESS(az_span_malloc(buffer_for_header_size, &temp_buf));
 
   /****** -------------  use Span builder to concatenate ---------******/
   az_span_builder builder = az_span_builder_create(temp_buf);
-  ignore_result = az_span_builder_append(&builder, AZ_STR("Bearer "));
-  ignore_result = az_span_builder_append(&builder, auth_token);
-  ignore_result = az_span_builder_append(
-      &builder, AZ_STR_ZERO); // add a 0 so it can be printed and used by Curl
+  AZ_EXPECT_SUCCESS(az_span_builder_append(&builder, AZ_STR("Bearer ")));
+  AZ_EXPECT_SUCCESS(az_span_builder_append(&builder, auth_token));
+  AZ_EXPECT_SUCCESS(az_span_builder_append(
+      &builder, AZ_STR_ZERO)); // add a 0 so it can be printed and used by Curl
 
   // add auth Header with parsed auth_token
   az_result const add_header_result = az_http_request_builder_append_header(

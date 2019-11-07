@@ -13,3 +13,9 @@ extern int exit_code;
       exit_code = 1; \
     } \
   } while (false);
+
+#define AZ_EXPECT_SUCCESS(exp) \
+  do { \
+    az_result const _result = (exp); \
+    TEST_ASSERT(!az_failed(_result)); \
+  } while (0)
