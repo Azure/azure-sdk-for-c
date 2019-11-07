@@ -12,7 +12,7 @@ static void test_json_value() {
   az_json_value const json_string = az_json_value_create_string(AZ_STR("Hello"));
 
   // boolean from boolean
-  { 
+  {
     bool boolean_value = false;
     TEST_ASSERT(az_json_value_get_boolean(&json_boolean, &boolean_value) == AZ_OK);
     TEST_ASSERT(boolean_value == true);
