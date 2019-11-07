@@ -5,7 +5,7 @@
 #include <az_http_client.h>
 #include <az_http_request_builder.h>
 #include <az_http_response_parser.h>
-#include <az_json_get.h>
+//#include <az_json_get.h>
 #include <az_pair.h>
 #include <az_span.h>
 #include <az_span_builder.h>
@@ -108,11 +108,9 @@ int main() {
   az_mut_span_set(temp_buf, 0);
   az_span_free(&temp_buf);
 
-  az_http_pipeline const pipeline;
-
   az_http_response_data const response;
   az_result result;
-  result = az_http_pipeline_process(&pipeline, &hrb, &response);
+  result = az_http_pipeline_process(&hrb, &response);
 
   return 0;
 }
