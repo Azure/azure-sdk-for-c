@@ -14,7 +14,7 @@
 #include <_az_cfg_prefix.h>
 
 // Start the pipeline
-az_result az_http_pipeline_process(
+AZ_NODISCARD az_result az_http_pipeline_process(
     az_http_request_builder * const hrb,
     az_mut_span const * const response);
 
