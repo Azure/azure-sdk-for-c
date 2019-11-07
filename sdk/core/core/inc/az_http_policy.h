@@ -29,12 +29,21 @@
 
 typedef struct az_http_policy az_http_policy;
 
+typedef struct {
+  az_span data;
+} az_http_policy_data;
+
 // PipelinePolicies must implement the process function
 //
 typedef AZ_NODISCARD az_result (*az_http_policy_pfnc_process)(
     az_http_policy * policies,
     az_http_request_builder * hrb,
     az_mut_span const * const response);
+
+struct az_http_policy {
+  az_http_policy_pfnc_process pfnc_process;
+  az_http_policy_data data;
+};
 
 AZ_NODISCARD az_result az_http_pipeline_policy_uniquerequestid(
     az_http_policy * const policies,
@@ -64,15 +73,6 @@ AZ_NODISCARD az_result az_http_pipeline_policy_transport(
     az_http_policy * const policies,
     az_http_request_builder * const hrb,
     az_mut_span const * const response);
-
-typedef struct {
-  az_span data;
-} az_http_policy_data;
-
-struct az_http_policy {
-  az_http_policy_pfnc_process pfnc_process;
-  az_http_policy_data data;
-};
 
 #include <_az_cfg_suffix.h>
 
