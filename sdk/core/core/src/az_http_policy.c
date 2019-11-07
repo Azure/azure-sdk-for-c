@@ -44,15 +44,15 @@ az_result az_http_pipeline_policy_uniquerequestid(
   //TODO - add a UUID create implementation
   az_span uniqueid = AZ_CONST_STR("123e4567-e89b-12d3-a456-426655440000");
 
-    // add auth Header with parsed auth_token
+
+  // Append the Unique GUID into the headers
+  //  x-ms-client-request-id
   az_result const add_header_result = az_http_request_builder_append_header(
       &hrb, AZ_MS_CLIENT_REQUESTID, uniqueid);
   if (az_failed(add_header_result)) {
     return add_header_result;
   }
 
-  // Append the Unique GUID into the headers
-  //  x-ms-client-request-id
   return az_http_pipeline_nextpolicy(p_policies, hrb, out);
 }
 
