@@ -24,6 +24,10 @@
 #pragma clang diagnostic ignored "-Wmissing-field-initializers"
 #pragma clang diagnostic ignored "-Wmissing-braces"
 
+#elif defined(__GNUC__)
+
+#pragma clang diagnostic ignored "-Wmissing-braces"
+
 #endif
 
 #ifndef AZ_CFG_H
