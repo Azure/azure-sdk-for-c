@@ -25,8 +25,8 @@
 
 #elif defined(__clang__)
 
-#pragma clang diagnostic ignored "-Wno-missing-field-initializers"
-#pragma clang diagnostic ignored "-Wno-missing-braces"
+#pragma clang diagnostic ignored "-Wmissing-field-initializers"
+#pragma clang diagnostic ignored "-Wmissing-braces"
 
 #endif
 
