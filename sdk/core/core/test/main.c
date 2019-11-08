@@ -626,25 +626,31 @@ int main() {
   {
     uint8_t buf[256 * 3];
     az_mut_span const buffer = { .begin = buf, .size = sizeof(buf) };
-    az_mut_span result;
 
-    AZ_EXPECT_SUCCESS(az_uri_encode(buffer, AZ_STR("https://vault.azure.net"), &result));
-    TEST_ASSERT(az_span_eq(az_mut_span_to_span(result), AZ_STR("https%3A%2F%2Fvault.azure.net")));
+    az_span_builder builder = az_span_builder_create(buffer);
+    res_code = az_uri_encode(AZ_STR("https://vault.azure.net"), &builder);
+    TEST_ASSERT(
+        az_span_eq(az_span_builder_result(&builder), AZ_STR("https%3A%2F%2Fvault.azure.net")));
 
-    AZ_EXPECT_SUCCESS(az_uri_decode(buffer, AZ_STR("https%3A%2F%2Fvault.azure.net"), &result));
-    TEST_ASSERT(az_span_eq(az_mut_span_to_span(result), AZ_STR("https://vault.azure.net")));
+    builder = az_span_builder_create(buffer);
+    AZ_EXPECT_SUCCESS(az_uri_decode(AZ_STR("https%3A%2F%2Fvault.azure.net"), &builder));
+    TEST_ASSERT(az_span_eq(az_span_builder_result(&builder), AZ_STR("https://vault.azure.net")));
 
-    AZ_EXPECT_SUCCESS(az_uri_encode(buffer, uri_decoded, &result));
-    TEST_ASSERT(az_span_eq(az_mut_span_to_span(result), uri_encoded));
+    builder = az_span_builder_create(buffer);
+    AZ_EXPECT_SUCCESS(az_uri_encode(uri_decoded, &builder));
+    TEST_ASSERT(az_span_eq(az_span_builder_result(&builder), uri_encoded));
 
-    AZ_EXPECT_SUCCESS(az_uri_decode(buffer, uri_encoded, &result));
-    TEST_ASSERT(az_span_eq(az_mut_span_to_span(result), uri_decoded));
+    builder = az_span_builder_create(buffer);
+    AZ_EXPECT_SUCCESS(az_uri_decode(uri_encoded, &builder));
+    TEST_ASSERT(az_span_eq(az_span_builder_result(&builder), uri_decoded));
 
-    AZ_EXPECT_SUCCESS(az_uri_decode(buffer, uri_encoded2, &result));
-    TEST_ASSERT(az_span_eq(az_mut_span_to_span(result), uri_decoded));
+    builder = az_span_builder_create(buffer);
+    AZ_EXPECT_SUCCESS(az_uri_decode(uri_encoded2, &builder));
+    TEST_ASSERT(az_span_eq(az_span_builder_result(&builder), uri_decoded));
 
-    AZ_EXPECT_SUCCESS(az_uri_decode(buffer, uri_encoded3, &result));
-    TEST_ASSERT(az_span_eq(az_mut_span_to_span(result), uri_decoded));
+    builder = az_span_builder_create(buffer);
+    AZ_EXPECT_SUCCESS(az_uri_decode(uri_encoded3, &builder));
+    TEST_ASSERT(az_span_eq(az_span_builder_result(&builder), uri_decoded));
   }
   {
     int16_t const url_max = 100;

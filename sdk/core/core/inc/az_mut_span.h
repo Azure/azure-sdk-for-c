@@ -67,6 +67,28 @@ AZ_INLINE az_result az_mut_span_copy(
   return AZ_OK;
 }
 
+AZ_INLINE az_result
+az_mut_span_move(az_mut_span const buffer, az_span const src, az_mut_span * const out_result) {
+  AZ_CONTRACT_ARG_NOT_NULL(out_result);
+  if (!az_mut_span_is_valid(buffer) || !az_span_is_valid(src)) {
+    return AZ_ERROR_ARG;
+  }
+
+  if (buffer.size < src.size) {
+    return AZ_ERROR_BUFFER_OVERFLOW;
+  }
+
+  if (!az_span_is_empty(src)) {
+    memmove((void *)buffer.begin, (void const *)src.begin, src.size);
+  }
+
+  out_result->begin = buffer.begin;
+  out_result->size = src.size;
+
+  return AZ_OK;
+}
+
+
 AZ_INLINE az_mut_span az_mut_span_drop(az_mut_span const span, size_t const n) {
   if (span.size <= n) {
     return (az_mut_span){ .begin = NULL, .size = 0 };
