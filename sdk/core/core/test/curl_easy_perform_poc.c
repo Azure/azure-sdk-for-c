@@ -15,6 +15,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "./az_test.h"
+int exit_code = 0;
+
 #include <_az_cfg.h>
 
 static az_span KEY_VAULT_URL
@@ -72,13 +75,13 @@ int main() {
   // can't print auth_token right now since it is not 0-terminated
   size_t const buffer_for_header_size = sizeof("Bearer ") + auth_token.size;
   az_mut_span temp_buf;
-  AZ_EXPECT_SUCCESS(az_span_malloc(buffer_for_header_size, &temp_buf));
+  TEST_EXPECT_SUCCESS(az_span_malloc(buffer_for_header_size, &temp_buf));
 
   /****** -------------  use Span builder to concatenate ---------******/
   az_span_builder builder = az_span_builder_create(temp_buf);
-  AZ_EXPECT_SUCCESS(az_span_builder_append(&builder, AZ_STR("Bearer ")));
-  AZ_EXPECT_SUCCESS(az_span_builder_append(&builder, auth_token));
-  AZ_EXPECT_SUCCESS(az_span_builder_append(
+  TEST_EXPECT_SUCCESS(az_span_builder_append(&builder, AZ_STR("Bearer ")));
+  TEST_EXPECT_SUCCESS(az_span_builder_append(&builder, auth_token));
+  TEST_EXPECT_SUCCESS(az_span_builder_append(
       &builder, AZ_STR_ZERO)); // add a 0 so it can be printed and used by Curl
 
   // add auth Header with parsed auth_token
@@ -104,7 +107,7 @@ int main() {
   }
 
   // free the temporal buffer holding auth token
-  az_mut_span_memset(temp_buf, 0);
+  TEST_EXPECT_SUCCESS(az_mut_span_memset(temp_buf, 0));
   az_span_free(&temp_buf);
 
   az_result result;
