@@ -18,6 +18,10 @@ typedef enum {
   AZ_JSON_STRING_CHAR_END = 0x10000,
 } az_json_string_char;
 
+/**
+ * TODO: this function and JSON pointer get functions should return proper UNICODE
+ *       code-point to be compatible.
+ */
 AZ_NODISCARD az_json_string_char az_span_reader_get_json_string_char(az_span_reader * const self);
 
 #include <_az_cfg_suffix.h>

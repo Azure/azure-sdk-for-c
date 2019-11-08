@@ -95,6 +95,14 @@ AZ_NODISCARD AZ_INLINE bool az_span_is_overlap(az_span const a, az_span const b)
           || (b.begin < a.begin && (b.begin + b.size - 1) >= a.begin) || (a.begin == b.begin));
 }
 
+// Parsing utilities
+
+AZ_NODISCARD AZ_INLINE az_result az_error_unexpected_char(az_result_byte const c) {
+  return az_failed(c) ? c : AZ_ERROR_PARSER_UNEXPECTED_CHAR;
+}
+
+AZ_NODISCARD az_result az_span_get_uint64(az_span const self, uint64_t * const out);
+
 #define AZ_ARRAY_SIZE(ARRAY) (sizeof(ARRAY) / sizeof(*ARRAY))
 
 #define AZ_SPAN_FROM_ARRAY(ARRAY) \
