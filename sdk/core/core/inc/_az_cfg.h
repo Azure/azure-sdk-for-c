@@ -26,7 +26,7 @@
 
 #elif defined(__GNUC__)
 
-#pragma clang diagnostic ignored "-Wmissing-braces"
+#pragma clang diagnostic ignored "-Werror=unknown-pragmas"
 
 #endif
 
