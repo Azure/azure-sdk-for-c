@@ -6,7 +6,7 @@
 
 #include <_az_cfg.h>
 
-az_http_policy pipeline[8] = {
+az_http_policy pipeline[] = {
   { .pfnc_process = az_http_pipeline_policy_uniquerequestid, .data = { 0 } },
   { .pfnc_process = az_http_pipeline_policy_retry, .data = { 0 } },
   { .pfnc_process = az_http_pipeline_policy_authentication, .data = { 0 } },
@@ -14,7 +14,7 @@ az_http_policy pipeline[8] = {
   { .pfnc_process = az_http_pipeline_policy_bufferresponse, .data = { 0 } },
   { .pfnc_process = az_http_pipeline_policy_distributedtracing, .data = { 0 } },
   { .pfnc_process = az_http_pipeline_policy_transport, .data = { 0 } },
-  { 0 },
+  { .pfnc_process = NULL, .data = { 0 } },
 };
 
 AZ_NODISCARD az_result

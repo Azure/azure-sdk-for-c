@@ -17,7 +17,7 @@ AZ_NODISCARD AZ_INLINE az_result az_http_pipeline_nextpolicy(
 
   // Transport Policy is the last policy in the pipeline
   //  it returns without calling nextpolicy
-  if (&(p_policies[0]) == NULL || p_policies[0].pfnc_process == NULL) {
+  if (p_policies[0].pfnc_process == NULL) {
     return AZ_ERROR_HTTP_PIPELINE_INVALID_POLICY;
   }
 
