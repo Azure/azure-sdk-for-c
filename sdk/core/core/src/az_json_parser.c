@@ -367,10 +367,3 @@ AZ_NODISCARD az_result az_json_parser_done(az_json_parser const * const self) {
   }
   return AZ_OK;
 }
-
-AZ_NODISCARD az_result_byte az_json_string_parser_get(az_span_reader * const self, uint8_t * out) {
-  AZ_CONTRACT_ARG_NOT_NULL(self);
-  AZ_CONTRACT_ARG_NOT_NULL(out);
-
-  return AZ_OK;
-}

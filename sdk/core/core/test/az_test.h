@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include <assert.h>
+
 extern int exit_code;
 
 #define TEST_ASSERT(c) \
