@@ -117,6 +117,4 @@ AZ_NODISCARD az_result az_http_pipeline_policy_transport(
   }
 
   return az_http_client_send_request(hrb, response);
-
-  return AZ_OK;
 }
