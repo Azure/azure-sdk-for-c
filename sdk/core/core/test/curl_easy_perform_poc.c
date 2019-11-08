@@ -102,5 +102,8 @@ int main() {
   az_mut_span_set(temp_buf, 0);
   az_span_free(&temp_buf);
 
+  az_result result;
+  result = az_http_pipeline_process(&hrb, &http_buf_response);
+
   return 0;
 }
