@@ -7,6 +7,8 @@ extern "C" {
 
 #ifdef _MSC_VER
 #pragma warning(push)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic push
 #elif defined(__clang__)
 #pragma clang diagnostic push
 #endif
