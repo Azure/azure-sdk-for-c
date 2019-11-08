@@ -19,6 +19,11 @@
 // warning C5045: Compiler will insert Spectre mitigation for memory load if /Qspectre switch specified
 #pragma warning(disable : 5045)
 
+#elif defined(__clang__)
+
+#pragma clang diagnostic ignored "-Wno-missing-field-initializers"
+#pragma clang diagnostic ignored "-Wno-missing-braces"
+
 #endif
 
 #ifndef AZ_CFG_H
