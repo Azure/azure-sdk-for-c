@@ -34,6 +34,9 @@ enum {
     } \
   } while (0)
 
+#define AZ_IGNORE_RESULT(exp) \
+  if (exp) {};
+
 /**
  * The type represents error conditions.
  * Bits:
