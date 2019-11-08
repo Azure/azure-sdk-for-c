@@ -51,5 +51,6 @@ AZ_NODISCARD az_result az_span_get_uint64(az_span const self, uint64_t* const ou
       return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
     }
     value = value * 10 + d;
+    i += 1;
   }
 }

@@ -23,6 +23,8 @@
 
 #include <_az_cfg.h>
 
+void test_json_get_by_pointer();
+
 int exit_code = 0;
 
 az_result write(az_mut_span const output, size_t * const o, az_span const s) {
@@ -748,5 +750,6 @@ int main() {
   test_json_value();
   test_json_pointer_parser();
   test_json_string();
+  test_json_get_by_pointer();
   return exit_code;
 }
