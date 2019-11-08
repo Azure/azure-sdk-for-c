@@ -18,12 +18,8 @@ AZ_NODISCARD az_result az_span_builder_append(az_span_builder * const self, az_s
 AZ_NODISCARD az_result az_span_builder_append_byte(az_span_builder * const self, uint8_t const c) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
-  if (self->size >= self->buffer.size) {
-    return AZ_ERROR_BUFFER_OVERFLOW;
-  }
-
-  az_mut_span const remainder = az_mut_span_drop(self->buffer, self->size);
-  remainder.begin[0] = c;
-  self->size += 1;
+  size_t const i = self->size + 1;
+  AZ_RETURN_IF_FAILED(az_mut_span_set(self->buffer, i, c));
+  self->size = i;
   return AZ_OK;
 }

@@ -104,7 +104,7 @@ int main() {
   }
 
   // free the temporal buffer holding auth token
-  az_mut_span_set(temp_buf, 0);
+  az_mut_span_memset(temp_buf, 0);
   az_span_free(&temp_buf);
 
   az_result result;

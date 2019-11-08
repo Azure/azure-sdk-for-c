@@ -229,7 +229,7 @@ AZ_NODISCARD az_result setup_url(CURL * const p_curl, az_http_request_builder co
   }
 
   // free used buffer before anything else
-  az_mut_span_set(writable_buffer, 0);
+  (void)az_mut_span_memset(writable_buffer, 0);
   az_span_free(&writable_buffer);
 
   return result;
