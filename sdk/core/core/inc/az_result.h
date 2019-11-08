@@ -35,7 +35,7 @@ enum {
   } while (0)
 
 #define AZ_IGNORE_RESULT(exp) \
-  if (exp) {};
+  do { exp; } while (0);
 
 /**
  * The type represents error conditions.
