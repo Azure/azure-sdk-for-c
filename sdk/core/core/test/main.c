@@ -15,15 +15,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "./test_json_string.h"
 #include "./az_test.h"
 #include "./test_http_response_parser.h"
 #include "./test_json_value.h"
-#include "./test_json_pointer_parser.h"
 
 #include <_az_cfg.h>
 
 void test_json_get_by_pointer();
+void test_json_pointer();
+void test_json_string();
 
 int exit_code = 0;
 
@@ -748,7 +748,7 @@ int main() {
 
   test_http_response_parser();
   test_json_value();
-  test_json_pointer_parser();
+  test_json_pointer();
   test_json_string();
   test_json_get_by_pointer();
   return exit_code;

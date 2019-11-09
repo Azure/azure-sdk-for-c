@@ -3,7 +3,7 @@
 
 #include <az_json_get.h>
 
-#include <az_json_pointer_parser.h>
+#include <az_json_pointer.h>
 #include <az_json_string.h>
 
 #include <_az_cfg.h>
@@ -14,10 +14,10 @@ AZ_NODISCARD bool az_json_pointer_token_eq_json_string(
   az_span_reader pt_reader = az_span_reader_create(pointer_token);
   az_span_reader js_reader = az_span_reader_create(json_string);
   while (true) {
-    uint8_t pt_c = { 0 };
+    uint32_t pt_c = { 0 };
     az_result const pt_result = az_span_reader_read_json_pointer_token_char(&pt_reader, &pt_c);
-    uint16_t js_c = { 0 };
-    az_result const js_result = az_span_reader_get_json_string_char(&js_reader, &js_c);
+    uint32_t js_c = { 0 };
+    az_result const js_result = az_span_reader_read_json_string_char(&js_reader, &js_c);
     if (js_result == AZ_ERROR_ITEM_NOT_FOUND && pt_result == AZ_ERROR_ITEM_NOT_FOUND) {
       return true;
     }

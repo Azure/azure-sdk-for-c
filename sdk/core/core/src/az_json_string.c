@@ -51,7 +51,7 @@ AZ_NODISCARD AZ_INLINE az_result_byte az_json_esc_decode(az_result_byte const c)
 }
 
 AZ_NODISCARD az_result
-az_span_reader_get_json_string_char(az_span_reader * const self, uint16_t * const out) {
+az_span_reader_read_json_string_char(az_span_reader * const self, uint32_t * const out) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
   az_result_byte const result = az_span_reader_current(self);
@@ -67,17 +67,17 @@ az_span_reader_get_json_string_char(az_span_reader * const self, uint16_t * cons
       az_result const c = az_span_reader_current(self);
       az_span_reader_next(self);
       if (c == 'u') {
-        uint16_t r = 0;
+        uint32_t r = 0;
         for (size_t i = 0; i < 4; ++i, az_span_reader_next(self)) {
           az_result_byte const digit = az_hex_to_digit(az_span_reader_current(self));
           AZ_RETURN_IF_FAILED(digit);
-          r = (r << 4) + (uint16_t)digit;
+          r = (r << 4) + digit;
         }
         *out = r;
       } else {
         az_result_byte const r = az_json_esc_decode(c);
         AZ_RETURN_IF_FAILED(r);
-        *out = (uint16_t)r;
+        *out = r;
       }
       return AZ_OK;
     }

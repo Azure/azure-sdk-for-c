@@ -26,7 +26,7 @@ add_library (
   src/az_http_response_parser.c
   src/az_json_get.c
   src/az_json_parser.c
-  src/az_json_pointer_parser.c
+  src/az_json_pointer.c
   src/az_json_string.c
   src/az_json_value.c
   src/az_mut_span.c
@@ -52,7 +52,11 @@ target_include_directories (az_core PUBLIC inc)
 # make sure that users can consume the project as a library.
 add_library (az::core ALIAS az_core)
 
-add_executable (az_core_test test/main.c test/test_json_string.c test/test_json_get_by_pointer.c)
+add_executable (az_core_test 
+    test/main.c 
+    test/test_json_string.c 
+    test/test_json_pointer.c 
+    test/test_json_get_by_pointer.c)
 
 target_link_libraries(az_core_test PRIVATE az_core)
 

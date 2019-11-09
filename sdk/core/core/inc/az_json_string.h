@@ -9,11 +9,11 @@
 #include <_az_cfg_prefix.h>
 
 /**
- * TODO: this function and JSON pointer get functions should return proper UNICODE
+ * TODO: this function and JSON pointer read functions should return proper UNICODE
  *       code-point to be compatible.
  */
 AZ_NODISCARD az_result
-az_span_reader_get_json_string_char(az_span_reader * const self, uint16_t * const out);
+az_span_reader_read_json_string_char(az_span_reader * const self, uint32_t * const out);
 
 #include <_az_cfg_suffix.h>
 

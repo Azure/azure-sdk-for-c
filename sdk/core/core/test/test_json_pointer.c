@@ -1,13 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_json_pointer_parser.h>
-#include <az_span_reader.h>
 #include <az_str.h>
+#include <az_span_reader.h>
 
 #include "./az_test.h"
 
-static void test_json_pointer_parser() {
+#include <_az_cfg.h>
+
+void test_json_pointer() {
   {
     az_span_reader parser = az_span_reader_create(AZ_STR(""));
     az_span p;
