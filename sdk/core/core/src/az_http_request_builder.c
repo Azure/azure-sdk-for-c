@@ -10,9 +10,6 @@
 
 #include <_az_cfg.h>
 
-//#pragma clang diagnostic ignored "-Wmissing-field-initializers"
-//#pragma clang diagnostic ignored "-Wmissing-braces"
-
 az_span const AZ_HTTP_METHOD_VERB_GET = AZ_CONST_STR("GET");
 az_span const AZ_HTTP_METHOD_VERB_HEAD = AZ_CONST_STR("HEAD");
 az_span const AZ_HTTP_METHOD_VERB_POST = AZ_CONST_STR("POST");

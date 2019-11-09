@@ -15,9 +15,6 @@
 
 #include <_az_cfg.h>
 
-#pragma clang diagnostic ignored "-Wmissing-field-initializers"
-#pragma clang diagnostic ignored "-Wmissing-braces"
-
 AZ_NODISCARD az_result az_auth_init_client_credentials(
     az_auth_credentials * const out_result,
     az_span const tenant_id,
