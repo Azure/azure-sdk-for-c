@@ -23,22 +23,19 @@
 
 #pragma GCC diagnostic ignored "-Wmissing-braces"
 
-#elif defined(__clang__)
+#elif defined(__llvm__)
 
 #pragma clang diagnostic ignored "-Wmissing-field-initializers"
 #pragma clang diagnostic ignored "-Wmissing-braces"
 
 #endif
 
-#pragma clang diagnostic ignored "-Wmissing-field-initializers"
-#pragma clang diagnostic ignored "-Wmissing-braces"
-
 #ifndef AZ_CFG_H
 #define AZ_CFG_H
 
 #ifdef _MSC_VER
 #define AZ_INLINE static __forceinline
-#elif defined(__GNUC__) || defined(__clang__)
+#elif defined(__GNUC__) || defined(__llvm__)
 #define AZ_INLINE \
   __attribute__((always_inline)) \
   static inline
@@ -56,7 +53,7 @@
 
 #ifdef _MSC_VER
 #define AZ_NODISCARD _Check_return_
-#elif defined(__GNUC__) || defined(__clang__)
+#elif defined(__GNUC__) || defined(__llvm__)
 #define AZ_NODISCARD __attribute__((warn_unused_result))
 #else
 #define AZ_NODISCARD
