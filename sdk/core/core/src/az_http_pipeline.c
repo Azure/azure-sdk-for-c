@@ -6,6 +6,9 @@
 
 #include <_az_cfg.h>
 
+#pragma clang diagnostic ignored "-Wmissing-field-initializers"
+#pragma clang diagnostic ignored "-Wmissing-braces"
+
 az_http_policy pipeline[] = {
   { .pfnc_process = az_http_pipeline_policy_uniquerequestid, .data = { 0 } },
   { .pfnc_process = az_http_pipeline_policy_retry, .data = { 0 } },
