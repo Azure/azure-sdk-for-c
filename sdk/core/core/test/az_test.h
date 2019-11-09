@@ -15,3 +15,5 @@ extern int exit_code;
       exit_code = 1; \
     } \
   } while (false);
+
+#define TEST_EXPECT_SUCCESS(exp) TEST_ASSERT(az_succeeded(exp))
