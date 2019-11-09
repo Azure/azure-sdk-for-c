@@ -44,6 +44,8 @@ az_json_get_object_member(az_span const json, az_span const name, az_json_value 
     while (true) {
       az_json_member member = { 0 };
       AZ_RETURN_IF_FAILED(az_json_parser_read_object_member(&parser, &member));
+      // TODO: we should either replace `az_span_eq` with something else or 
+      //       remove `az_json_get_object_member` completely.
       if (az_span_eq(member.name, name)) {
         *out_value = member.value;
         return AZ_OK;
@@ -71,7 +73,7 @@ AZ_NODISCARD az_result az_json_parser_get_by_pointer_token(
           return AZ_OK;
         }
         --i;
-        AZ_RETURN_IF_FAILED(az_json_parser_skip_nested(self, *p_value));
+        AZ_RETURN_IF_FAILED(az_json_parser_skip(self, *p_value));
       }
     }
     case AZ_JSON_VALUE_OBJECT: {
