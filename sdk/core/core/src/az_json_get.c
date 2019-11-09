@@ -15,8 +15,8 @@ AZ_NODISCARD bool az_json_pointer_token_eq_json_string(
   az_span_reader js_reader = az_span_reader_create(json_string);
   while (true) {
     uint8_t pt_c = { 0 };
-    az_result pt_result = az_json_pointer_token_parser_get(&pt_reader, &pt_c);
-    az_result js_result = az_span_reader_get_json_string_char(&js_reader);
+    az_result const pt_result = az_json_pointer_token_parser_get(&pt_reader, &pt_c);
+    az_json_string_char const js_result = az_span_reader_get_json_string_char(&js_reader);
     if (js_result == AZ_ERROR_ITEM_NOT_FOUND && pt_result == AZ_ERROR_ITEM_NOT_FOUND) {
       return true;
     }
