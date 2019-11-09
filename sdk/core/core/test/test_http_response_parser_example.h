@@ -17,7 +17,7 @@ static az_result http_response_parser_example(az_span const response) {
   // make sure it's a known protocol "1.1" and a status code is Ok (200).
   {
     az_http_response_status_line status_line;
-    AZ_RETURN_IF_FAILED(az_http_response_parser_get_status_line(&parser, &status_line));
+    AZ_RETURN_IF_FAILED(az_http_response_parser_read_status_line(&parser, &status_line));
     AZ_RETURN_IF_FAILED(status_line.major_version == 1);
     AZ_RETURN_IF_FAILED(status_line.minor_version == 1);
     AZ_RETURN_IF_FAILED(status_line.status_code == AZ_HTTP_STATUS_CODE_OK);
@@ -30,7 +30,7 @@ static az_result http_response_parser_example(az_span const response) {
       az_pair header;
       // read a header
       {
-        az_result const result = az_http_response_parser_get_next_header(&parser, &header);
+        az_result const result = az_http_response_parser_read_header(&parser, &header);
         if (result == AZ_ERROR_ITEM_NOT_FOUND) {
           break;
         }
@@ -53,7 +53,7 @@ static az_result http_response_parser_example(az_span const response) {
   // reading body
   {
     az_span body;
-    AZ_RETURN_IF_FAILED(az_http_response_parser_get_body(&parser, &body));
+    AZ_RETURN_IF_FAILED(az_http_response_parser_read_body(&parser, &body));
     if (!az_span_eq(body, AZ_STR(EXAMPLE_BODY))) {
       return AZ_ERROR_HTTP_INVALID_STATE;
     }

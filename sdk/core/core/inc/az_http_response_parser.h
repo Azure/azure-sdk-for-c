@@ -50,7 +50,7 @@ az_http_response_parser_init(az_http_response_parser * const out, az_span const 
 /**
  * An HTTP status line.
  */
-AZ_NODISCARD az_result az_http_response_parser_get_status_line(
+AZ_NODISCARD az_result az_http_response_parser_read_status_line(
     az_http_response_parser * const self,
     az_http_response_status_line * const out);
 
@@ -58,13 +58,13 @@ AZ_NODISCARD az_result az_http_response_parser_get_status_line(
  * An HTTP header.
  */
 AZ_NODISCARD az_result
-az_http_response_parser_get_next_header(az_http_response_parser * const self, az_pair * const out);
+az_http_response_parser_read_header(az_http_response_parser * const self, az_pair * const out);
 
 /**
  * An HTTP body.
  */
 AZ_NODISCARD az_result
-az_http_response_parser_get_body(az_http_response_parser * const self, az_span * const out);
+az_http_response_parser_read_body(az_http_response_parser * const self, az_span * const out);
 
 // Get information from HTTP response.
 

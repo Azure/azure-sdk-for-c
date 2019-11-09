@@ -263,7 +263,7 @@ AZ_NODISCARD static az_result az_json_parser_get_value_space(
 }
 
 AZ_NODISCARD az_result
-az_json_parser_get(az_json_parser * const self, az_json_value * const out_value) {
+az_json_parser_read(az_json_parser * const self, az_json_value * const out_value) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(out_value);
 
@@ -339,7 +339,7 @@ AZ_NODISCARD static az_result az_json_parser_check_item_end(
 }
 
 AZ_NODISCARD az_result
-az_json_parser_get_object_member(az_json_parser * const self, az_json_member * const out_member) {
+az_json_parser_read_object_member(az_json_parser * const self, az_json_member * const out_member) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(out_member);
 
@@ -355,7 +355,7 @@ az_json_parser_get_object_member(az_json_parser * const self, az_json_member * c
 }
 
 AZ_NODISCARD az_result
-az_json_parser_get_array_element(az_json_parser * const self, az_json_value * const out_element) {
+az_json_parser_read_array_element(az_json_parser * const self, az_json_value * const out_element) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(out_element);
 
@@ -373,7 +373,7 @@ AZ_NODISCARD az_result az_json_parser_done(az_json_parser const * const self) {
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_json_parser_skip(az_json_parser * const self, az_json_value const value) {
+AZ_NODISCARD az_result az_json_parser_skip_nested(az_json_parser * const self, az_json_value const value) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
   switch (value.kind) {
@@ -391,10 +391,10 @@ AZ_NODISCARD az_result az_json_parser_skip(az_json_parser * const self, az_json_
 
   while (true) {
     // az_json_parser_get_stac
-    switch (az_json_parser_stack_last(self)) { 
+    switch (az_json_parser_stack_last(self)) {
       case AZ_JSON_STACK_OBJECT: {
         az_json_member member = { 0 };
-        az_result const result = az_json_parser_get_object_member(self, &member);
+        az_result const result = az_json_parser_read_object_member(self, &member);
         if (result != AZ_ERROR_ITEM_NOT_FOUND) {
           AZ_RETURN_IF_FAILED(result);
         }
@@ -402,7 +402,7 @@ AZ_NODISCARD az_result az_json_parser_skip(az_json_parser * const self, az_json_
       }
       default: {
         az_json_value element = { 0 };
-        az_result result = az_json_parser_get_array_element(self, &element);
+        az_result result = az_json_parser_read_array_element(self, &element);
         if (result != AZ_ERROR_ITEM_NOT_FOUND) {
           AZ_RETURN_IF_FAILED(result);
         }

@@ -36,17 +36,20 @@ typedef struct {
 AZ_NODISCARD az_json_parser az_json_parser_create(az_span const buffer);
 
 AZ_NODISCARD az_result
-az_json_parser_get(az_json_parser * const self, az_json_value * const out_value);
+az_json_parser_read(az_json_parser * const self, az_json_value * const out_value);
 
 AZ_NODISCARD az_result
-az_json_parser_get_object_member(az_json_parser * const self, az_json_member * const out_member);
+az_json_parser_read_object_member(az_json_parser * const self, az_json_member * const out_member);
 
 AZ_NODISCARD az_result
-az_json_parser_get_array_element(az_json_parser * const self, az_json_value * const out_value);
+az_json_parser_read_array_element(az_json_parser * const self, az_json_value * const out_value);
 
 AZ_NODISCARD az_result az_json_parser_done(az_json_parser const * const self);
 
-AZ_NODISCARD az_result az_json_parser_skip(az_json_parser * const self, az_json_value const value);
+/**
+ * Read all nested values and ignore them.
+ */
+AZ_NODISCARD az_result az_json_parser_skip_nested(az_json_parser * const self, az_json_value const value);
 
 #include <_az_cfg_suffix.h>
 
