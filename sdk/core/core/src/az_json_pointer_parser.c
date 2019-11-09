@@ -44,29 +44,28 @@ AZ_NODISCARD static az_result az_span_reader_get_json_pointer_char(
   }
 }
 
-AZ_NODISCARD az_result az_span_reader_read_json_pointer_token(
-    az_span_reader * const json_pointer_parser,
-    az_span * const out) {
-  AZ_CONTRACT_ARG_NOT_NULL(json_pointer_parser);
+AZ_NODISCARD az_result
+az_span_reader_read_json_pointer_token(az_span_reader * const self, az_span * const out) {
+  AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
   // read `/` if any.
   {
-    az_result const result = az_span_reader_expect_char(json_pointer_parser, '/');
+    az_result const result = az_span_reader_expect_char(self, '/');
     if (result == AZ_ERROR_EOF) {
       return AZ_ERROR_ITEM_NOT_FOUND;
     }
     AZ_RETURN_IF_FAILED(result);
   }
 
-  size_t const begin = json_pointer_parser->i;
+  size_t const begin = self->i;
   while (true) {
     uint8_t c = { 0 };
-    az_result const result = az_span_reader_get_json_pointer_char(json_pointer_parser, &c);
+    az_result const result = az_span_reader_get_json_pointer_char(self, &c);
     switch (result) {
       case AZ_ERROR_ITEM_NOT_FOUND:
       case AZ_ERROR_JSON_POINTER_TOKEN_END: {
-        *out = az_span_sub(json_pointer_parser->span, begin, json_pointer_parser->i);
+        *out = az_span_sub(self->span, begin, self->i);
         return AZ_OK;
       }
       default: {
@@ -76,14 +75,13 @@ AZ_NODISCARD az_result az_span_reader_read_json_pointer_token(
   }
 }
 
-AZ_NODISCARD az_result az_span_reader_read_json_pointer_token_char(
-    az_span_reader * const json_pointer_token_parser,
-    uint8_t * const out) {
-  AZ_CONTRACT_ARG_NOT_NULL(json_pointer_token_parser);
+AZ_NODISCARD az_result
+az_span_reader_read_json_pointer_token_char(az_span_reader * const self, uint8_t * const out) {
+  AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
   uint8_t c;
-  az_result const result = az_span_reader_get_json_pointer_char(json_pointer_token_parser, &c);
+  az_result const result = az_span_reader_get_json_pointer_char(self, &c);
   if (result == AZ_ERROR_JSON_POINTER_TOKEN_END) {
     return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
