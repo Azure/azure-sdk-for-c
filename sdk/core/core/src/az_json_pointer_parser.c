@@ -69,8 +69,10 @@ AZ_NODISCARD az_result az_span_reader_read_json_pointer_token(
         *out = az_span_sub(json_pointer_parser->span, begin, json_pointer_parser->i);
         return AZ_OK;
       }
+      default: {
+        AZ_RETURN_IF_FAILED(result);
+      }
     }
-    AZ_RETURN_IF_FAILED(result);
   }
 }
 
