@@ -5,20 +5,9 @@
 
 #include <_az_cfg.h>
 
-/**
- * - ..-1 errors
- * - 0..255 UTF-8 byte
- * - 256 unescaped "/"
- */
-typedef enum {
-  c = 256,
-} az_json_pointer_char;
-
-// make sure we can store `az_result` in `az_json_pointer_char`.
-AZ_STATIC_ASSERT(sizeof(az_json_pointer_char) == sizeof(az_result))
-
 AZ_NODISCARD static az_result az_span_reader_get_json_pointer_char(
-    az_span_reader * const self, uint8_t * const out) {
+    az_span_reader * const self,
+    uint8_t * const out) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
   az_result_byte const result = az_span_reader_current(self);
@@ -73,7 +62,7 @@ AZ_NODISCARD az_result az_span_reader_read_json_pointer_token(
   size_t const begin = json_pointer_parser->i;
   while (true) {
     uint8_t c = { 0 };
-    az_json_pointer_char const result = az_span_reader_get_json_pointer_char(json_pointer_parser, &c);
+    az_result const result = az_span_reader_get_json_pointer_char(json_pointer_parser, &c);
     switch (result) {
       case AZ_ERROR_ITEM_NOT_FOUND:
       case AZ_ERROR_JSON_POINTER_TOKEN_END: {
@@ -92,8 +81,7 @@ AZ_NODISCARD az_result az_span_reader_read_json_pointer_token_char(
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
   uint8_t c;
-  az_json_pointer_char const result
-      = az_span_reader_get_json_pointer_char(json_pointer_token_parser, &c);
+  az_result const result = az_span_reader_get_json_pointer_char(json_pointer_token_parser, &c);
   if (result == AZ_ERROR_JSON_POINTER_TOKEN_END) {
     return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
