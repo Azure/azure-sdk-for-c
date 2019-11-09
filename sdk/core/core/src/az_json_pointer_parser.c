@@ -11,14 +11,14 @@
  * - 256 unescaped "/"
  */
 typedef enum {
-  AZ_JSON_POINTER_CHAR_SEPARATOR = 256,
+  c = 256,
 } az_json_pointer_char;
 
 // make sure we can store `az_result` in `az_json_pointer_char`.
 AZ_STATIC_ASSERT(sizeof(az_json_pointer_char) == sizeof(az_result))
 
-AZ_NODISCARD static az_json_pointer_char az_span_reader_get_json_pointer_char(
-    az_span_reader * const self) {
+AZ_NODISCARD static az_result az_span_reader_get_json_pointer_char(
+    az_span_reader * const self, uint8_t * const out) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
   az_result_byte const result = az_span_reader_current(self);
@@ -27,7 +27,7 @@ AZ_NODISCARD static az_json_pointer_char az_span_reader_get_json_pointer_char(
       return AZ_ERROR_ITEM_NOT_FOUND;
     }
     case '/': {
-      return AZ_JSON_POINTER_CHAR_SEPARATOR;
+      return AZ_ERROR_JSON_POINTER_TOKEN_END;
     }
     case '~': {
       az_span_reader_next(self);
@@ -35,10 +35,12 @@ AZ_NODISCARD static az_json_pointer_char az_span_reader_get_json_pointer_char(
       az_span_reader_next(self);
       switch (e) {
         case '0': {
-          return '~';
+          *out = '~';
+          return AZ_OK;
         }
         case '1': {
-          return '/';
+          *out = '/';
+          return AZ_OK;
         }
         default: {
           return az_error_unexpected_char(e);
@@ -47,7 +49,8 @@ AZ_NODISCARD static az_json_pointer_char az_span_reader_get_json_pointer_char(
     }
     default: {
       az_span_reader_next(self);
-      return result;
+      *out = (uint8_t)result;
+      return AZ_OK;
     }
   }
 }
@@ -69,10 +72,11 @@ AZ_NODISCARD az_result az_span_reader_read_json_pointer_token(
 
   size_t const begin = json_pointer_parser->i;
   while (true) {
-    az_json_pointer_char const result = az_span_reader_get_json_pointer_char(json_pointer_parser);
+    uint8_t c = { 0 };
+    az_json_pointer_char const result = az_span_reader_get_json_pointer_char(json_pointer_parser, &c);
     switch (result) {
       case AZ_ERROR_ITEM_NOT_FOUND:
-      case AZ_JSON_POINTER_CHAR_SEPARATOR: {
+      case AZ_ERROR_JSON_POINTER_TOKEN_END: {
         *out = az_span_sub(json_pointer_parser->span, begin, json_pointer_parser->i);
         return AZ_OK;
       }
@@ -87,12 +91,13 @@ AZ_NODISCARD az_result az_span_reader_read_json_pointer_token_char(
   AZ_CONTRACT_ARG_NOT_NULL(json_pointer_token_parser);
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
+  uint8_t c;
   az_json_pointer_char const result
-      = az_span_reader_get_json_pointer_char(json_pointer_token_parser);
-  if (result == AZ_JSON_POINTER_CHAR_SEPARATOR) {
+      = az_span_reader_get_json_pointer_char(json_pointer_token_parser, &c);
+  if (result == AZ_ERROR_JSON_POINTER_TOKEN_END) {
     return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
   AZ_RETURN_IF_FAILED(result);
-  *out = (uint8_t)result;
+  *out = (uint8_t)c;
   return AZ_OK;
 }
