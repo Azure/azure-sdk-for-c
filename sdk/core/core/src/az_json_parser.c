@@ -195,9 +195,10 @@ AZ_NODISCARD static az_result az_span_reader_get_json_string_rest(
   // skip '"'
   size_t const begin = self->i;
   while (true) {
-    az_json_string_char const c = az_span_reader_get_json_string_char(self);
-    switch (c) {
-      case AZ_JSON_STRING_CHAR_END: {
+    uint16_t ignore = { 0 };
+    az_result const result = az_span_reader_get_json_string_char(self, &ignore);
+    switch (result) {
+      case AZ_ERROR_JSON_STRING_END: {
         *string = az_span_sub(self->span, begin, self->i);
         az_span_reader_next(self);
         return AZ_OK;
@@ -206,7 +207,7 @@ AZ_NODISCARD static az_result az_span_reader_get_json_string_rest(
         return AZ_ERROR_EOF;
       }
       default: {
-        AZ_RETURN_IF_FAILED(c);
+        AZ_RETURN_IF_FAILED(result);
       }
     }
   }

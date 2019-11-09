@@ -9,20 +9,11 @@
 #include <_az_cfg_prefix.h>
 
 /**
- * - ..-1 is error.
- * - 0..0xFFFFF is a string character. Usually it's 0..0xFF UTF-8 byte but it can be an escape
- *   sequence `\uXXXX`.
- * - 0x10000 is an end of the string `"`.
- */
-typedef enum {
-  AZ_JSON_STRING_CHAR_END = 0x10000,
-} az_json_string_char;
-
-/**
  * TODO: this function and JSON pointer get functions should return proper UNICODE
  *       code-point to be compatible.
  */
-AZ_NODISCARD az_json_string_char az_span_reader_get_json_string_char(az_span_reader * const self);
+AZ_NODISCARD az_result
+az_span_reader_get_json_string_char(az_span_reader * const self, uint16_t * const out);
 
 #include <_az_cfg_suffix.h>
 

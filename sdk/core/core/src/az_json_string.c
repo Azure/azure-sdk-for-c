@@ -50,16 +50,17 @@ AZ_NODISCARD AZ_INLINE az_result_byte az_json_esc_decode(az_result_byte const c)
   }
 }
 
-AZ_NODISCARD az_json_string_char az_span_reader_get_json_string_char(az_span_reader * const self) {
+AZ_NODISCARD az_result
+az_span_reader_get_json_string_char(az_span_reader * const self, uint16_t * const out) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
-  az_result_byte result = az_span_reader_current(self);
+  az_result_byte const result = az_span_reader_current(self);
   switch (result) {
     case AZ_ERROR_EOF: {
       return AZ_ERROR_ITEM_NOT_FOUND;
     }
     case '"': {
-      return AZ_JSON_STRING_CHAR_END;
+      return AZ_ERROR_JSON_STRING_END;
     }
     case '\\': {
       az_span_reader_next(self);
@@ -72,17 +73,21 @@ AZ_NODISCARD az_json_string_char az_span_reader_get_json_string_char(az_span_rea
           AZ_RETURN_IF_FAILED(digit);
           r = (r << 4) + (uint16_t)digit;
         }
-        return r;
+        *out = r;
       } else {
-        return az_json_esc_decode(c);
+        az_result_byte const r = az_json_esc_decode(c);
+        AZ_RETURN_IF_FAILED(r);
+        *out = (uint16_t)r;
       }
+      return AZ_OK;
     }
     default: {
       if (result < 0x20) {
         return az_error_unexpected_char(result);
       }
       az_span_reader_next(self);
-      return result;
+      *out = (uint16_t)result;
+      return AZ_OK;
     }
   }
 }
