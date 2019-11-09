@@ -44,6 +44,8 @@ add_library (
 
 if(MSVC)
   target_compile_options(az_core PRIVATE /Wall /WX /wd5031 /wd4668 /wd4820 /wd4255 /analyze)
+elseif(XCODE)
+  target_compile_options(az_core PRIVATE -Wall -Wextra -pedantic -Werror -Wmissing-field-initializers -Wmissing-braces)
 else()
   target_compile_options(az_core PRIVATE -Wall -Wextra -pedantic -Werror)
 endif()
