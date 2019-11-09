@@ -30,6 +30,9 @@
 
 #endif
 
+#pragma clang diagnostic ignored "-Wmissing-field-initializers"
+#pragma clang diagnostic ignored "-Wmissing-braces"
+
 #ifndef AZ_CFG_H
 #define AZ_CFG_H
 
