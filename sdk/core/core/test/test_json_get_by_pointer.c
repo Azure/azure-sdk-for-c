@@ -29,10 +29,18 @@ void test_json_get_by_pointer() {
   }
   {
     az_json_value value;
-    TEST_ASSERT(az_json_get_by_pointer(AZ_STR(" [  { \"\": true }  ] "), AZ_STR("/0/"), &value) == AZ_OK);
+    TEST_ASSERT(
+        az_json_get_by_pointer(AZ_STR(" [  { \"\": true }  ] "), AZ_STR("/0/"), &value) == AZ_OK);
     TEST_ASSERT(value.kind == AZ_JSON_VALUE_BOOLEAN);
     TEST_ASSERT(value.data.boolean == true);
   }
+  {
+    az_json_value value;
+    TEST_ASSERT(
+        az_json_get_by_pointer(AZ_STR("{ \"2/00\": true } "), AZ_STR("/2~100"), &value) == AZ_OK);
+    TEST_ASSERT(value.kind == AZ_JSON_VALUE_BOOLEAN);
+    TEST_ASSERT(value.data.boolean == true);
+  } 
   {
     static az_span const sample = AZ_CONST_STR( //
         "{\n"
@@ -44,15 +52,15 @@ void test_json_get_by_pointer() {
         "      \"api-version\" : \"2019-04-01\",\n"
         "      \"monitor\" : \"true\",\n"
         "      \"LegalHold\" : {\n"
-        "      \"tags\": [\n"
+        "        \"tags\": [\n"
         "          \"tag1\",\n"
         "          \"tag2\",\n"
         "          \"tag3\"\n"
-        "      ]\n"
-        "    }\n"
+        "        ]\n"
+        "      }\n"
         "  },\n"
         "  \"responses\": {\n"
-        "    \"200\": {\n"
+        "    \"2/00\": {\n"
         "      \"body\": {\n"
         "          \"hasLegalHold\": false,\n"
         "          \"tags\" : []\n"
@@ -60,10 +68,19 @@ void test_json_get_by_pointer() {
         "    }\n"
         "  }\n"
         "}\n");
-    az_json_value value;
-    TEST_ASSERT(
-        az_json_get_by_pointer(sample, AZ_STR("/parameters/tags/2"), &value) == AZ_OK);
-    TEST_ASSERT(value.kind == AZ_JSON_VALUE_STRING);
-    TEST_ASSERT(az_span_eq(value.data.string, AZ_STR("tag3")));
+    {
+      az_json_value value;
+      TEST_ASSERT(az_json_get_by_pointer(sample, AZ_STR("/parameters/LegalHold/tags/2"), &value) == AZ_OK);
+      TEST_ASSERT(value.kind == AZ_JSON_VALUE_STRING);
+      TEST_ASSERT(az_span_eq(value.data.string, AZ_STR("tag3")));
+    }
+    {
+      az_json_value value;
+      TEST_ASSERT(
+          az_json_get_by_pointer(sample, AZ_STR("/responses/2~100/body/hasLegalHold"), &value)
+          == AZ_OK);
+      TEST_ASSERT(value.kind == AZ_JSON_VALUE_BOOLEAN);
+      TEST_ASSERT(value.data.boolean == false);
+    }
   }
 }
