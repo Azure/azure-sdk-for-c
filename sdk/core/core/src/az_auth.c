@@ -7,6 +7,7 @@
 #include <az_http_client.h>
 #include <az_http_request_builder.h>
 #include <az_json_get.h>
+#include <az_span_builder.h>
 #include <az_str.h>
 #include <az_uri.h>
 
@@ -117,76 +118,23 @@ AZ_NODISCARD az_result az_auth_get_token(
   az_span auth_url = { 0 };
   az_span auth_body = { 0 };
   {
-    az_mut_span buf = response_buf;
-    az_mut_span tmp_span = { 0 };
+    az_span_builder builder = az_span_builder_create(response_buf);
 
-    {
-      auth_url.begin = buf.begin;
+    AZ_RETURN_IF_FAILED(az_span_builder_append(&builder, auth_url1));
+    AZ_RETURN_IF_FAILED(az_uri_encode(credentials.tenant_id, &builder));
+    AZ_RETURN_IF_FAILED(az_span_builder_append(&builder, auth_url2));
 
-      AZ_RETURN_IF_FAILED(az_mut_span_copy(buf, auth_url1, &tmp_span));
-      buf = (az_mut_span){
-        .begin = buf.begin + tmp_span.size,
-        .size = buf.size - tmp_span.size,
-      };
+    auth_url = az_span_builder_result(&builder);
+    builder = az_span_builder_create(az_mut_span_take(response_buf, auth_url.size));
 
-      AZ_RETURN_IF_FAILED(az_uri_encode(buf, credentials.tenant_id, &tmp_span));
-      buf = (az_mut_span){
-        .begin = buf.begin + tmp_span.size,
-        .size = buf.size - tmp_span.size,
-      };
+    AZ_RETURN_IF_FAILED(az_span_builder_append(&builder, auth_body1));
+    AZ_RETURN_IF_FAILED(az_uri_encode(credentials.data.client_credentials.client_id, &builder));
+    AZ_RETURN_IF_FAILED(az_span_builder_append(&builder, auth_body2));
+    AZ_RETURN_IF_FAILED(az_uri_encode(credentials.data.client_credentials.client_secret, &builder));
+    AZ_RETURN_IF_FAILED(az_span_builder_append(&builder, auth_body3));
+    AZ_RETURN_IF_FAILED(az_uri_encode(resource_url, &builder));
 
-      AZ_RETURN_IF_FAILED(az_mut_span_copy(buf, auth_url2, &tmp_span));
-      buf = (az_mut_span){
-        .begin = buf.begin + tmp_span.size,
-        .size = buf.size - tmp_span.size,
-      };
-
-      auth_url.size = (buf.begin - auth_url.begin);
-    }
-
-    {
-      auth_body.begin = buf.begin;
-
-      AZ_RETURN_IF_FAILED(az_mut_span_copy(buf, auth_body1, &tmp_span));
-      buf = (az_mut_span){
-        .begin = buf.begin + tmp_span.size,
-        .size = buf.size - tmp_span.size,
-      };
-
-      AZ_RETURN_IF_FAILED(
-          az_uri_encode(buf, credentials.data.client_credentials.client_id, &tmp_span));
-      buf = (az_mut_span){
-        .begin = buf.begin + tmp_span.size,
-        .size = buf.size - tmp_span.size,
-      };
-
-      AZ_RETURN_IF_FAILED(az_mut_span_copy(buf, auth_body2, &tmp_span));
-      buf = (az_mut_span){
-        .begin = buf.begin + tmp_span.size,
-        .size = buf.size - tmp_span.size,
-      };
-
-      AZ_RETURN_IF_FAILED(
-          az_uri_encode(buf, credentials.data.client_credentials.client_secret, &tmp_span));
-      buf = (az_mut_span){
-        .begin = buf.begin + tmp_span.size,
-        .size = buf.size - tmp_span.size,
-      };
-
-      AZ_RETURN_IF_FAILED(az_mut_span_copy(buf, auth_body3, &tmp_span));
-      buf = (az_mut_span){
-        .begin = buf.begin + tmp_span.size,
-        .size = buf.size - tmp_span.size,
-      };
-
-      AZ_RETURN_IF_FAILED(az_uri_encode(buf, resource_url, &tmp_span));
-      buf = (az_mut_span){
-        .begin = buf.begin + tmp_span.size,
-        .size = buf.size - tmp_span.size,
-      };
-
-      auth_body.size = (buf.begin - auth_body.begin);
-    }
+    auth_body = az_span_builder_result(&builder);
   }
 
   {

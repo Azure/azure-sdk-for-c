@@ -58,6 +58,7 @@ typedef enum az_result {
   // HTTP error codes
   AZ_ERROR_HTTP_PAL = AZ_MAKE_ERROR(AZ_HTTP_FACILITY, 1),
   AZ_ERROR_HTTP_INVALID_STATE = AZ_MAKE_ERROR(AZ_HTTP_FACILITY, 2),
+  AZ_ERROR_HTTP_PIPELINE_INVALID_POLICY = AZ_MAKE_ERROR(AZ_HTTP_FACILITY, 3),
 
   // JSON error codes
   AZ_ERROR_JSON_INVALID_STATE = AZ_MAKE_ERROR(AZ_JSON_FACILITY, 1),
@@ -77,6 +78,8 @@ AZ_STATIC_ASSERT(EOF == -1)
 AZ_NODISCARD AZ_INLINE bool az_failed(az_result result) { return (result & AZ_ERROR_FLAG) != 0; }
 
 AZ_NODISCARD AZ_INLINE bool az_succeeded(az_result result) { return (result & AZ_ERROR_FLAG) == 0; }
+
+AZ_INLINE az_result az_nodiscard_cancel(az_result result) { return result; }
 
 #include <_az_cfg_suffix.h>
 
