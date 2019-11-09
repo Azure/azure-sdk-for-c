@@ -72,8 +72,8 @@ AZ_NODISCARD az_result az_json_parser_get_by_pointer_token(
         if (i == 0) {
           return AZ_OK;
         }
-        --i;
         AZ_RETURN_IF_FAILED(az_json_parser_skip(self, *p_value));
+        --i;
       }
     }
     case AZ_JSON_VALUE_OBJECT: {
