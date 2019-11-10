@@ -62,7 +62,7 @@ AZ_NODISCARD az_result az_tmp_span(size_t const size, az_mut_span_action const m
 }
 
 typedef struct {
-  az_span_writer writer;
+  az_span_writer span_writer;
   az_write_str write_str;
 } az_str_action_to_mut_span_action_data;
 
@@ -77,18 +77,18 @@ AZ_NODISCARD az_result az_str_action_to_mut_span_action(
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
   char const * str = NULL;
-  AZ_RETURN_IF_FAILED(az_span_emitter_to_str(self->writer, span, &str));
+  AZ_RETURN_IF_FAILED(az_span_emitter_to_str(self->span_writer, span, &str));
   AZ_RETURN_IF_FAILED(az_write_str_do(self->write_str, str));
   return AZ_OK;
 }
 
 AZ_NODISCARD az_result
-az_span_emitter_to_tmp_str(az_span_writer const writer, az_write_str const write_str) {
+az_span_writer_as_str_writer(az_span_writer const span_writer, az_write_str const write_str) {
   size_t size = 0;
-  AZ_RETURN_IF_FAILED(az_span_writer_size(writer, &size));
+  AZ_RETURN_IF_FAILED(az_span_writer_size(span_writer, &size));
   {
     az_str_action_to_mut_span_action_data data = {
-      .writer = writer,
+      .span_writer = span_writer,
       .write_str = write_str,
     };
     AZ_RETURN_IF_FAILED(az_tmp_span(size, az_str_action_to_mut_span_action_action(&data)));
