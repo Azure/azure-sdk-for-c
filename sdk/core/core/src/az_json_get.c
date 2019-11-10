@@ -84,7 +84,7 @@ AZ_NODISCARD az_result az_json_parser_get_by_pointer_token(
           *p_value = member.value;
           return AZ_OK;
         }
-        AZ_RETURN_IF_FAILED(az_json_parser_skip_nested(self, member.value));
+        AZ_RETURN_IF_FAILED(az_json_parser_skip(self, member.value));
       }
     }
     default:

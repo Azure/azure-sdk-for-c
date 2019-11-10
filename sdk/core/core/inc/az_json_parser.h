@@ -49,7 +49,7 @@ AZ_NODISCARD az_result az_json_parser_done(az_json_parser const * const self);
 /**
  * Read all nested values and ignore them.
  */
-AZ_NODISCARD az_result az_json_parser_skip_nested(az_json_parser * const self, az_json_value const value);
+AZ_NODISCARD az_result az_json_parser_skip(az_json_parser * const self, az_json_value const value);
 
 #include <_az_cfg_suffix.h>
 
