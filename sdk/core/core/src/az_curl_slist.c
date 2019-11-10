@@ -36,5 +36,5 @@ az_curl_slist_append_header(struct curl_slist ** const self, az_pair const heade
 
   // the function creates a temporary dynamic zero-terminated string from `header_span_emitter`
   // and passes it to `curl_slist_append_action`.
-  return az_span_writer_as_str_writer(header_span_emitter, curl_slist_append_action);
+  return az_span_writer_as_dynamic_str_writer(header_span_emitter, curl_slist_append_action);
 }

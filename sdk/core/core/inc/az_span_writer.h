@@ -36,13 +36,12 @@ AZ_ACTION_FUNC(az_span_span_as_writer, az_span_span const, az_span_writer)
 AZ_NODISCARD az_result az_span_writer_size(az_span_writer const self, size_t * const out_size);
 
 /**
- * The function creates a temporary zero-terminated string from @writer in dynamic memory.
- * The string is passed to the given @write_str. 
- * 
- * Note: After @write_str is returned, the temporary string is destroyed.
+ * The function creates a temporary zero-terminated string from @span_writer in dynamic memory.
+ * The string is passed to the given @write_str. After @write_str is returned, the temporary 
+ * string is destroyed.
  */
 AZ_NODISCARD az_result
-az_span_writer_as_str_writer(az_span_writer const span_writer, az_write_str const write_str);
+az_span_writer_as_dynamic_str_writer(az_span_writer const span_writer, az_write_str const write_str);
 
 #include <_az_cfg_suffix.h>
 

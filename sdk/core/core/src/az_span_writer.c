@@ -21,7 +21,7 @@ az_span_span_as_writer(az_span_span const * const context, az_write_span const w
   return AZ_OK;
 }
 
-// az_span_emitter_size() and its utilities
+// az_span_writer_size() and its utilities
 
 AZ_NODISCARD az_result az_span_add_size(size_t * const p_size, az_span const span) {
   *p_size += span.size;
@@ -38,22 +38,22 @@ az_span_writer_size(az_span_writer const writer, size_t * const out_size) {
   return az_span_writer_do(writer, az_span_add_size_action(out_size));
 }
 
-// az_span_emitter_to_tmp_str() and its utilities
+// az_span_writer_as_dynamic_str_writer() and its utilities
 
-AZ_NODISCARD az_result az_span_emitter_to_str(
-    az_span_writer const writer,
+AZ_NODISCARD az_result az_span_writer_to_static_str_writer(
+    az_span_writer const span_writer,
     az_mut_span const span,
     char const ** const out) {
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
   az_span_builder i = az_span_builder_create(span);
-  AZ_RETURN_IF_FAILED(az_span_writer_do(writer, az_span_builder_append_action(&i)));
-  AZ_RETURN_IF_FAILED(az_span_builder_append(&i, AZ_STR("\0")));
+  AZ_RETURN_IF_FAILED(az_span_writer_do(span_writer, az_span_builder_append_action(&i)));
+  AZ_RETURN_IF_FAILED(az_span_builder_append_byte(&i, 0));
   *out = (char const *)span.begin;
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_tmp_span(size_t const size, az_mut_span_action const mut_span_action) {
+AZ_NODISCARD az_result az_dynamic_span(size_t const size, az_mut_span_action const mut_span_action) {
   az_mut_span span;
   AZ_RETURN_IF_FAILED(az_span_malloc(size, &span));
   az_result const result = az_mut_span_action_do(mut_span_action, span);
@@ -77,13 +77,13 @@ AZ_NODISCARD az_result az_str_action_to_mut_span_action(
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
   char const * str = NULL;
-  AZ_RETURN_IF_FAILED(az_span_emitter_to_str(self->span_writer, span, &str));
+  AZ_RETURN_IF_FAILED(az_span_writer_to_static_str_writer(self->span_writer, span, &str));
   AZ_RETURN_IF_FAILED(az_write_str_do(self->write_str, str));
   return AZ_OK;
 }
 
 AZ_NODISCARD az_result
-az_span_writer_as_str_writer(az_span_writer const span_writer, az_write_str const write_str) {
+az_span_writer_as_dynamic_str_writer(az_span_writer const span_writer, az_write_str const write_str) {
   size_t size = 0;
   AZ_RETURN_IF_FAILED(az_span_writer_size(span_writer, &size));
   {
@@ -91,7 +91,7 @@ az_span_writer_as_str_writer(az_span_writer const span_writer, az_write_str cons
       .span_writer = span_writer,
       .write_str = write_str,
     };
-    AZ_RETURN_IF_FAILED(az_tmp_span(size, az_str_action_to_mut_span_action_action(&data)));
+    AZ_RETURN_IF_FAILED(az_dynamic_span(size, az_str_action_to_mut_span_action_action(&data)));
   }
   return AZ_OK;
 }
