@@ -6,7 +6,7 @@
 #include <az_http_request_builder.h>
 #include <az_json_parser.h>
 #include <az_span_builder.h>
-#include <az_span_emitter.h>
+#include <az_span_writer.h>
 #include <az_span_reader.h>
 #include <az_uri.h>
 
@@ -548,9 +548,9 @@ int main() {
       AZ_STR("world!"),
     };
     az_span_span const span = AZ_SPAN_FROM_ARRAY(array);
-    az_span_emitter const emitter = az_span_span_emit_action(&span);
+    az_span_writer const emitter = az_span_span_as_writer_action(&span);
     size_t s = 42;
-    az_result const result = az_span_emitter_size(emitter, &s);
+    az_result const result = az_span_writer_size(emitter, &s);
     TEST_ASSERT(result == AZ_OK);
     TEST_ASSERT(s == 12);
   }

@@ -4,7 +4,7 @@
 #ifndef AZ_HTTP_RESPONSE_ACTION_H
 #define AZ_HTTP_RESPONSE_ACTION_H
 
-#include <az_span_emitter.h>
+#include <az_span_writer.h>
 #include <az_pair.h>
 #include <az_result.h>
 #include <az_span.h>

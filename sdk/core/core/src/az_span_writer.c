@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_span_emitter.h>
+#include <az_span_writer.h>
 
 #include <az_span_malloc.h>
 #include <az_span_builder.h>
@@ -10,7 +10,7 @@
 #include <_az_cfg.h>
 
 AZ_NODISCARD az_result
-az_span_span_emit(az_span_span const * const context, az_write_span const write_span) {
+az_span_span_as_writer(az_span_span const * const context, az_write_span const write_span) {
   AZ_CONTRACT_ARG_NOT_NULL(context);
 
   az_span const * i = context->begin;
@@ -31,23 +31,23 @@ AZ_NODISCARD az_result az_span_add_size(size_t * const p_size, az_span const spa
 AZ_ACTION_FUNC(az_span_add_size, size_t, az_write_span)
 
 AZ_NODISCARD az_result
-az_span_emitter_size(az_span_emitter const emitter, size_t * const out_size) {
+az_span_writer_size(az_span_writer const writer, size_t * const out_size) {
   AZ_CONTRACT_ARG_NOT_NULL(out_size);
 
   *out_size = 0;
-  return az_span_emitter_do(emitter, az_span_add_size_action(out_size));
+  return az_span_writer_do(writer, az_span_add_size_action(out_size));
 }
 
 // az_span_emitter_to_tmp_str() and its utilities
 
 AZ_NODISCARD az_result az_span_emitter_to_str(
-    az_span_emitter const emitter,
+    az_span_writer const writer,
     az_mut_span const span,
     char const ** const out) {
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
   az_span_builder i = az_span_builder_create(span);
-  AZ_RETURN_IF_FAILED(az_span_emitter_do(emitter, az_span_builder_append_action(&i)));
+  AZ_RETURN_IF_FAILED(az_span_writer_do(writer, az_span_builder_append_action(&i)));
   AZ_RETURN_IF_FAILED(az_span_builder_append(&i, AZ_STR("\0")));
   *out = (char const *)span.begin;
   return AZ_OK;
@@ -62,8 +62,8 @@ AZ_NODISCARD az_result az_tmp_span(size_t const size, az_mut_span_action const m
 }
 
 typedef struct {
-  az_span_emitter emitter;
-  az_str_action str_action;
+  az_span_writer writer;
+  az_write_str write_str;
 } az_str_action_to_mut_span_action_data;
 
 AZ_ACTION_FUNC(
@@ -77,19 +77,19 @@ AZ_NODISCARD az_result az_str_action_to_mut_span_action(
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
   char const * str = NULL;
-  AZ_RETURN_IF_FAILED(az_span_emitter_to_str(self->emitter, span, &str));
-  AZ_RETURN_IF_FAILED(az_str_action_do(self->str_action, str));
+  AZ_RETURN_IF_FAILED(az_span_emitter_to_str(self->writer, span, &str));
+  AZ_RETURN_IF_FAILED(az_write_str_do(self->write_str, str));
   return AZ_OK;
 }
 
 AZ_NODISCARD az_result
-az_span_emitter_to_tmp_str(az_span_emitter const emitter, az_str_action const str_action) {
+az_span_emitter_to_tmp_str(az_span_writer const writer, az_write_str const write_str) {
   size_t size = 0;
-  AZ_RETURN_IF_FAILED(az_span_emitter_size(emitter, &size));
+  AZ_RETURN_IF_FAILED(az_span_writer_size(writer, &size));
   {
     az_str_action_to_mut_span_action_data data = {
-      .emitter = emitter,
-      .str_action = str_action,
+      .writer = writer,
+      .write_str = write_str,
     };
     AZ_RETURN_IF_FAILED(az_tmp_span(size, az_str_action_to_mut_span_action_action(&data)));
   }

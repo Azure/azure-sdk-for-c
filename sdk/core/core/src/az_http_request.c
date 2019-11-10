@@ -7,7 +7,7 @@
 #include <az_http_header.h>
 #include <az_contract.h>
 #include <az_span_builder.h>
-#include <az_span_emitter.h>
+#include <az_span_writer.h>
 #include <az_str.h>
 
 #include <stdlib.h>

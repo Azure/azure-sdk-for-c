@@ -34,7 +34,7 @@
 /**
  * A callback that accepts zero-terminated string `char const *`.
  */
-AZ_ACTION_TYPE(az_str_action, char const *)
+AZ_ACTION_TYPE(az_write_str, char const *)
 
 #define AZ_CR '\r'
 
