@@ -41,7 +41,7 @@ az_http_request_emit_span_seq(az_http_request const * const self, az_write_span 
   }
 
   // headers
-  AZ_RETURN_IF_FAILED(az_pair_emitter_do(self->headers, az_http_header_line_action(&write_span)));
+  AZ_RETURN_IF_FAILED(az_pair_writer_do(self->headers, az_http_header_line_action(&write_span)));
 
   // an empty line
   AZ_RETURN_IF_FAILED(az_write_span_do(write_span, az_crlf));

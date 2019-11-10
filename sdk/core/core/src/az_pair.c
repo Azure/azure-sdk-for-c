@@ -6,7 +6,7 @@
 #include <_az_cfg.h>
 
 AZ_NODISCARD az_result
-az_pair_span_emit(
+az_pair_span_as_writer(
     az_pair_span const * const self,
     az_write_pair const write_pair) {
   AZ_CONTRACT_ARG_NOT_NULL(self);

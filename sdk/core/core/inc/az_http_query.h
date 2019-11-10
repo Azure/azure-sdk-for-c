@@ -13,7 +13,7 @@
  * "?param1=value1&param2=value2".
  */
 AZ_NODISCARD az_result
-az_http_query_emit_span_seq(az_pair_emitter const query, az_write_span const write_span);
+az_http_query_emit_span_seq(az_pair_writer const query, az_write_span const write_span);
 
 #include <_az_cfg_suffix.h>
 

@@ -15,7 +15,7 @@
 typedef struct {
   az_span host;
   az_span path;
-  az_pair_emitter query;
+  az_pair_writer query;
 } az_url;
 
 AZ_NODISCARD az_result az_url_emit_span_seq(az_url const * const self, az_write_span const write_span);

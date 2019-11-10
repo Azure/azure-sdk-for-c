@@ -49,10 +49,10 @@ AZ_NODISCARD az_result az_http_query_param(az_http_query_state * const p_state, 
 }
 
 AZ_NODISCARD az_result
-az_http_query_emit_span_seq(az_pair_emitter const query, az_write_span const write_span) {
+az_http_query_emit_span_seq(az_pair_writer const query, az_write_span const write_span) {
   az_http_query_state state = {
     .write_span = write_span,
     .separator = AZ_STR("?"),
   };
-  return az_pair_emitter_do(query, az_http_query_param_action(&state));
+  return az_pair_writer_do(query, az_http_query_param_action(&state));
 }

@@ -14,8 +14,8 @@
 typedef struct {
   az_span method;
   az_span path;
-  az_pair_emitter query;
-  az_pair_emitter headers;
+  az_pair_writer query;
+  az_pair_writer headers;
   az_span body;
 } az_http_request;
 

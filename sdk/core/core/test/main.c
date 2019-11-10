@@ -489,8 +489,8 @@ int main() {
     az_http_request const request = {
       .method = AZ_STR("GET"),
       .path = AZ_STR("/foo"),
-      .query = az_pair_span_emit_action(&query),
-      .headers = az_pair_span_emit_action(&headers),
+      .query = az_pair_span_as_writer_action(&query),
+      .headers = az_pair_span_as_writer_action(&headers),
       .body = AZ_STR("{ \"somejson\": true }"),
     };
     uint8_t buffer[1024];
