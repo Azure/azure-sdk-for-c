@@ -32,12 +32,14 @@ void test_json_pointer() {
       uint8_t buffer[10];
       int i = 0;
       while (true) {
+        uint32_t code_point;
         az_result const result
-            = az_span_reader_read_json_pointer_token_char(&token_parser, buffer + i);
+            = az_span_reader_read_json_pointer_token_char(&token_parser, &code_point);
         if (result == AZ_ERROR_ITEM_NOT_FOUND) {
           break;
         }
         TEST_ASSERT(result == AZ_OK);
+        buffer[i] = code_point;
         ++i;
       }
       az_span const b = { .begin = buffer, .size = i };
@@ -56,12 +58,14 @@ void test_json_pointer() {
       uint8_t buffer[10];
       int i = 0;
       while (true) {
+        uint32_t code_point;
         az_result const result
-            = az_span_reader_read_json_pointer_token_char(&token_parser, buffer + i);
+            = az_span_reader_read_json_pointer_token_char(&token_parser, &code_point);
         if (result == AZ_ERROR_ITEM_NOT_FOUND) {
           break;
         }
         TEST_ASSERT(result == AZ_OK);
+        buffer[i] = code_point;
         ++i;
       }
       az_span const b = { .begin = buffer, .size = i };
@@ -84,12 +88,14 @@ void test_json_pointer() {
       uint8_t buffer[10];
       int i = 0;
       while (true) {
+        uint32_t code_point;
         az_result const result
-            = az_span_reader_read_json_pointer_token_char(&token_parser, buffer + i);
+            = az_span_reader_read_json_pointer_token_char(&token_parser, &code_point);
         if (result == AZ_ERROR_ITEM_NOT_FOUND) {
           break;
         }
         TEST_ASSERT(result == AZ_OK);
+        buffer[i] = code_point;
         ++i;
       }
       az_span const b = { .begin = buffer, .size = i };
@@ -103,12 +109,14 @@ void test_json_pointer() {
       uint8_t buffer[10];
       int i = 0;
       while (true) {
+        uint32_t code_point;
         az_result const result
-            = az_span_reader_read_json_pointer_token_char(&token_parser, buffer + i);
+            = az_span_reader_read_json_pointer_token_char(&token_parser, &code_point);
         if (result == AZ_ERROR_ITEM_NOT_FOUND) {
           break;
         }
         TEST_ASSERT(result == AZ_OK);
+        buffer[i] = code_point;
         ++i;
       }
       az_span const b = { .begin = buffer, .size = i };

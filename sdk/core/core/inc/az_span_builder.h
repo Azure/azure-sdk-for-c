@@ -54,7 +54,7 @@ AZ_NODISCARD az_result az_span_builder_append(az_span_builder * const self, az_s
  */
 AZ_NODISCARD az_result az_span_builder_append_byte(az_span_builder * const self, uint8_t const c);
 
-AZ_ACTION_FUNC(az_span_builder_append, az_span_builder, az_span_action)
+AZ_ACTION_FUNC(az_span_builder_append, az_span_builder, az_write_span)
 
 #include <_az_cfg_suffix.h>
 

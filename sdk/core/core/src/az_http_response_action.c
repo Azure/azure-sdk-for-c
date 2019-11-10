@@ -8,7 +8,7 @@
 #include <_az_cfg.h>
 
 AZ_NODISCARD az_result az_span_action_to_http_response_action(
-    az_span_action const * const self,
+    az_write_span const * const self,
     az_http_response_action * const out) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(out);
@@ -18,7 +18,7 @@ AZ_NODISCARD az_result az_span_action_to_http_response_action(
 
 AZ_NODISCARD az_result az_http_response_action_to_span_action(
     az_http_response_action const * const self,
-    az_span_action * const out) {
+    az_write_span * const out) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(out);
 

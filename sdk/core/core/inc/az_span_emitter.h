@@ -9,7 +9,7 @@
 
 #include <_az_cfg_prefix.h>
 
-AZ_ACTION_TYPE(az_span_emitter, az_span_action)
+AZ_ACTION_TYPE(az_span_emitter, az_write_span)
 
 /**
  * A span of spans of bytes.
@@ -23,7 +23,7 @@ typedef struct {
  * Emits all spans from @self into @action.
  */
 AZ_NODISCARD az_result
-az_span_span_emit(az_span_span const * const self, az_span_action const action);
+az_span_span_emit(az_span_span const * const self, az_write_span const write_span);
 
 /**
  * @az_span_span_emit as an action of type @az_span_emitter.

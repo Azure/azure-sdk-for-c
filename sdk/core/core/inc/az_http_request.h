@@ -23,7 +23,7 @@ typedef struct {
  * Creates a raw HTTP request.
  */
 AZ_NODISCARD az_result
-az_http_request_emit_span_seq(az_http_request const * const self, az_span_action const action);
+az_http_request_emit_span_seq(az_http_request const * const self, az_write_span const write_span);
 
 #include <_az_cfg_suffix.h>
 

@@ -496,7 +496,7 @@ int main() {
     uint8_t buffer[1024];
     {
       az_span_builder wi = az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(buffer));
-      az_span_action sv = az_span_builder_append_action(&wi);
+      az_write_span sv = az_span_builder_append_action(&wi);
       az_span const expected = AZ_STR( //
           "GET /foo?hello=world!&x=42 HTTP/1.1\r\n"
           "some: xml\r\n"

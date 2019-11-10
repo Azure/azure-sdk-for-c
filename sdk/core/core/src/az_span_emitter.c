@@ -10,13 +10,13 @@
 #include <_az_cfg.h>
 
 AZ_NODISCARD az_result
-az_span_span_emit(az_span_span const * const context, az_span_action const action) {
+az_span_span_emit(az_span_span const * const context, az_write_span const write_span) {
   AZ_CONTRACT_ARG_NOT_NULL(context);
 
   az_span const * i = context->begin;
   az_span const * const end = i + context->size;
   for (; i < end; ++i) {
-    AZ_RETURN_IF_FAILED(az_span_action_do(action, *i));
+    AZ_RETURN_IF_FAILED(az_write_span_do(write_span, *i));
   }
   return AZ_OK;
 }
@@ -28,7 +28,7 @@ AZ_NODISCARD az_result az_span_add_size(size_t * const p_size, az_span const spa
   return AZ_OK;
 }
 
-AZ_ACTION_FUNC(az_span_add_size, size_t, az_span_action)
+AZ_ACTION_FUNC(az_span_add_size, size_t, az_write_span)
 
 AZ_NODISCARD az_result
 az_span_emitter_size(az_span_emitter const emitter, size_t * const out_size) {

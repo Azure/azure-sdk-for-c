@@ -12,18 +12,18 @@
 #include <_az_cfg_prefix.h>
 
 typedef struct {
-  az_span_action header_name_part_action;
-  az_span_action header_value_part_action;
-  az_span_action body_part_action;
+  az_write_span header_name_part_action;
+  az_write_span header_value_part_action;
+  az_write_span body_part_action;
 } az_http_response_action;
 
 AZ_ACTION_TYPE(az_http_response_emitter, az_http_response_action)
 
 AZ_NODISCARD az_result
-az_span_action_to_http_response_action(az_span_action const * const self, az_http_response_action * const out);
+az_span_action_to_http_response_action(az_write_span const * const self, az_http_response_action * const out);
 
 AZ_NODISCARD az_result
-az_http_response_action_to_span_action(az_http_response_action const * const self, az_span_action * const out);
+az_http_response_action_to_span_action(az_http_response_action const * const self, az_write_span * const out);
 
 #include <_az_cfg_suffix.h>
 

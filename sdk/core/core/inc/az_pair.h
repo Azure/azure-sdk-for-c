@@ -23,13 +23,13 @@ typedef struct {
 } az_pair_span;
 
 /// @az_pair_visitor is a callback with one argument @az_pair.
-AZ_ACTION_TYPE(az_pair_action, az_pair)
+AZ_ACTION_TYPE(az_write_pair, az_pair)
 
 /// @az_pair_emitter is an emitter of @az_pair sequences.
-AZ_ACTION_TYPE(az_pair_emitter, az_pair_action)
+AZ_ACTION_TYPE(az_pair_emitter, az_write_pair)
 
 AZ_NODISCARD az_result
-az_pair_span_emit(az_pair_span const * const self, az_pair_action const action);
+az_pair_span_emit(az_pair_span const * const self, az_write_pair const write_pair);
 
 /**
  * Creates @az_pair_span_emit_action from @az_pair_span.
