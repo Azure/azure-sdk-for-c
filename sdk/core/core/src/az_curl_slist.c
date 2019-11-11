@@ -31,10 +31,8 @@ AZ_NODISCARD az_result
 az_curl_slist_append_header(struct curl_slist ** const self, az_pair const header) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
-  az_span_emitter const header_span_emitter = az_http_header_emit_span_seq_action(&header);
-  az_str_action const curl_slist_append_action = az_curl_slist_append_action(self);
-
   // the function creates a temporary dynamic zero-terminated string from `header_span_emitter`
   // and passes it to `curl_slist_append_action`.
-  return az_span_emitter_to_tmp_str(header_span_emitter, curl_slist_append_action);
+  return az_span_writer_as_dynamic_str_writer(
+      az_http_header_as_span_writer_action(&header), az_curl_slist_append_action(self));
 }

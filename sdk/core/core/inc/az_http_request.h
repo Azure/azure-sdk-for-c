@@ -6,7 +6,7 @@
 
 #include <az_pair.h>
 #include <az_span.h>
-#include <az_span_emitter.h>
+#include <az_span_writer.h>
 #include <az_str.h>
 
 #include <_az_cfg_prefix.h>
@@ -14,8 +14,8 @@
 typedef struct {
   az_span method;
   az_span path;
-  az_pair_emitter query;
-  az_pair_emitter headers;
+  az_pair_writer query;
+  az_pair_writer headers;
   az_span body;
 } az_http_request;
 
@@ -23,7 +23,7 @@ typedef struct {
  * Creates a raw HTTP request.
  */
 AZ_NODISCARD az_result
-az_http_request_emit_span_seq(az_http_request const * const self, az_span_action const action);
+az_http_request_as_span_writer(az_http_request const * const self, az_span_action const write_span);
 
 #include <_az_cfg_suffix.h>
 

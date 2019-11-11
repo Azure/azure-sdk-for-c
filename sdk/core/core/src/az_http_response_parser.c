@@ -105,7 +105,7 @@ az_http_response_parser_set_kind(az_http_response_parser * const self) {
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_http_response_parser_get_status_line(
+AZ_NODISCARD az_result az_http_response_parser_read_status_line(
     az_http_response_parser * const self,
     az_http_response_status_line * const out) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
@@ -131,7 +131,7 @@ AZ_NODISCARD az_result az_http_response_parser_get_status_line(
 }
 
 AZ_NODISCARD az_result
-az_http_response_parser_get_next_header(az_http_response_parser * const self, az_pair * const out) {
+az_http_response_parser_read_header(az_http_response_parser * const self, az_pair * const out) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
@@ -225,7 +225,7 @@ az_http_response_parser_get_next_header(az_http_response_parser * const self, az
 }
 
 AZ_NODISCARD az_result
-az_http_response_parser_get_body(az_http_response_parser * const self, az_span * const out) {
+az_http_response_parser_read_body(az_http_response_parser * const self, az_span * const out) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
@@ -284,7 +284,7 @@ az_http_response_get_next_header(az_span const self, az_pair * const p_header) {
 
   az_http_response_parser parser;
   AZ_RETURN_IF_FAILED(az_http_response_parser_init_from_header(&parser, self, p_header));
-  AZ_RETURN_IF_FAILED(az_http_response_parser_get_next_header(&parser, p_header));
+  AZ_RETURN_IF_FAILED(az_http_response_parser_read_header(&parser, p_header));
   return AZ_OK;
 }
 
@@ -295,7 +295,7 @@ az_http_response_get_body(az_span const self, az_pair * const p_last_header, az_
 
   az_http_response_parser parser;
   AZ_RETURN_IF_FAILED(az_http_response_parser_init_from_header(&parser, self, p_last_header));
-  AZ_RETURN_IF_FAILED(az_http_response_parser_get_body(&parser, body));
+  AZ_RETURN_IF_FAILED(az_http_response_parser_read_body(&parser, body));
   return AZ_OK;
 }
 
@@ -315,13 +315,13 @@ AZ_NODISCARD az_result az_http_response_get_header_by_name(
 
   {
     az_http_response_status_line status_line;
-    AZ_RETURN_IF_FAILED(az_http_response_parser_get_status_line(&parser, &status_line));
+    AZ_RETURN_IF_FAILED(az_http_response_parser_read_status_line(&parser, &status_line));
   }
 
   while (true) {
     az_pair header;
     // Return if either there is no more items (AZ_ERROR_ITEM_NO_MORE_ITEMS) or an error.
-    AZ_RETURN_IF_FAILED(az_http_response_parser_get_next_header(&parser, &header));
+    AZ_RETURN_IF_FAILED(az_http_response_parser_read_header(&parser, &header));
     if (az_span_eq_ascii_ignore_case(header_name, header.key)) {
       *header_value = header.value;
       return AZ_OK;

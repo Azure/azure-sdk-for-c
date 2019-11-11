@@ -1,13 +1,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_json_pointer_parser.h>
-#include <az_span_reader.h>
+#include <az_json_pointer.h>
 #include <az_str.h>
+#include <az_span_reader.h>
 
 #include "./az_test.h"
 
-static void test_json_pointer_parser() {
+#include <_az_cfg.h>
+
+void test_json_pointer() {
   {
     az_span_reader parser = az_span_reader_create(AZ_STR(""));
     az_span p;
@@ -30,12 +32,14 @@ static void test_json_pointer_parser() {
       uint8_t buffer[10];
       int i = 0;
       while (true) {
+        uint32_t code_point;
         az_result const result
-            = az_span_reader_read_json_pointer_token_char(&token_parser, buffer + i);
+            = az_span_reader_read_json_pointer_token_char(&token_parser, &code_point);
         if (result == AZ_ERROR_ITEM_NOT_FOUND) {
           break;
         }
         TEST_ASSERT(result == AZ_OK);
+        buffer[i] = code_point;
         ++i;
       }
       az_span const b = { .begin = buffer, .size = i };
@@ -54,12 +58,14 @@ static void test_json_pointer_parser() {
       uint8_t buffer[10];
       int i = 0;
       while (true) {
+        uint32_t code_point;
         az_result const result
-            = az_span_reader_read_json_pointer_token_char(&token_parser, buffer + i);
+            = az_span_reader_read_json_pointer_token_char(&token_parser, &code_point);
         if (result == AZ_ERROR_ITEM_NOT_FOUND) {
           break;
         }
         TEST_ASSERT(result == AZ_OK);
+        buffer[i] = code_point;
         ++i;
       }
       az_span const b = { .begin = buffer, .size = i };
@@ -82,12 +88,14 @@ static void test_json_pointer_parser() {
       uint8_t buffer[10];
       int i = 0;
       while (true) {
+        uint32_t code_point;
         az_result const result
-            = az_span_reader_read_json_pointer_token_char(&token_parser, buffer + i);
+            = az_span_reader_read_json_pointer_token_char(&token_parser, &code_point);
         if (result == AZ_ERROR_ITEM_NOT_FOUND) {
           break;
         }
         TEST_ASSERT(result == AZ_OK);
+        buffer[i] = code_point;
         ++i;
       }
       az_span const b = { .begin = buffer, .size = i };
@@ -101,12 +109,14 @@ static void test_json_pointer_parser() {
       uint8_t buffer[10];
       int i = 0;
       while (true) {
+        uint32_t code_point;
         az_result const result
-            = az_span_reader_read_json_pointer_token_char(&token_parser, buffer + i);
+            = az_span_reader_read_json_pointer_token_char(&token_parser, &code_point);
         if (result == AZ_ERROR_ITEM_NOT_FOUND) {
           break;
         }
         TEST_ASSERT(result == AZ_OK);
+        buffer[i] = code_point;
         ++i;
       }
       az_span const b = { .begin = buffer, .size = i };
@@ -132,20 +142,20 @@ static void test_json_pointer_parser() {
   // test az_json_pointer_token_parser_get
   {
     az_span_reader token_parser = az_span_reader_create(AZ_STR("~"));
-    char c;
+    uint32_t c;
     TEST_ASSERT(az_span_reader_read_json_pointer_token_char(&token_parser, &c) == AZ_ERROR_EOF);
   }
   // test az_json_pointer_token_parser_get
   {
     az_span_reader token_parser = az_span_reader_create(AZ_STR(""));
-    char c;
+    uint32_t c;
     TEST_ASSERT(
         az_span_reader_read_json_pointer_token_char(&token_parser, &c) == AZ_ERROR_ITEM_NOT_FOUND);
   }
   // test az_json_pointer_token_parser_get
   {
     az_span_reader token_parser = az_span_reader_create(AZ_STR("/"));
-    char c;
+    uint32_t c;
     TEST_ASSERT(
         az_span_reader_read_json_pointer_token_char(&token_parser, &c)
         == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
@@ -153,7 +163,7 @@ static void test_json_pointer_parser() {
   // test az_json_pointer_token_parser_get
   {
     az_span_reader token_parser = az_span_reader_create(AZ_STR("~2"));
-    char c;
+    uint32_t c;
     TEST_ASSERT(
         az_span_reader_read_json_pointer_token_char(&token_parser, &c)
         == AZ_ERROR_PARSER_UNEXPECTED_CHAR);

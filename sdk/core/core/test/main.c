@@ -6,7 +6,7 @@
 #include <az_http_request_builder.h>
 #include <az_json_parser.h>
 #include <az_span_builder.h>
-#include <az_span_emitter.h>
+#include <az_span_writer.h>
 #include <az_span_reader.h>
 #include <az_uri.h>
 
@@ -19,11 +19,12 @@
 #include "./az_test.h"
 #include "./test_http_response_parser.h"
 #include "./test_json_value.h"
-#include "./test_json_pointer_parser.h"
 
 #include <_az_cfg.h>
 
 void test_json_get_by_pointer();
+void test_json_pointer();
+void test_json_string();
 
 int exit_code = 0;
 
@@ -63,7 +64,7 @@ az_result read_write_value(
       bool need_comma = false;
       while (true) {
         az_json_member member;
-        az_result const result = az_json_parser_get_object_member(state, &member);
+        az_result const result = az_json_parser_read_object_member(state, &member);
         if (result == AZ_ERROR_ITEM_NOT_FOUND) {
           break;
         }
@@ -84,7 +85,7 @@ az_result read_write_value(
       bool need_comma = false;
       while (true) {
         az_json_value element;
-        az_result const result = az_json_parser_get_array_element(state, &element);
+        az_result const result = az_json_parser_read_array_element(state, &element);
         if (result == AZ_ERROR_ITEM_NOT_FOUND) {
           break;
         }
@@ -107,7 +108,7 @@ az_result read_write_value(
 az_result read_write(az_span const input, az_mut_span const output, size_t * const o) {
   az_json_parser parser = az_json_parser_create(input);
   az_json_value value;
-  AZ_RETURN_IF_FAILED(az_json_parser_get(&parser, &value));
+  AZ_RETURN_IF_FAILED(az_json_parser_read(&parser, &value));
   AZ_RETURN_IF_FAILED(read_write_value(output, o, &parser, value));
   return az_json_parser_done(&parser);
 }
@@ -285,33 +286,33 @@ static az_span hrb_header_authorization_value2 = AZ_CONST_STR("Bearer 9988776655
 int main() {
   {
     az_json_parser state = az_json_parser_create(AZ_STR("    "));
-    TEST_ASSERT(az_json_parser_get(&state, NULL) == AZ_ERROR_ARG);
+    TEST_ASSERT(az_json_parser_read(&state, NULL) == AZ_ERROR_ARG);
   }
   {
     az_json_value value;
-    TEST_ASSERT(az_json_parser_get(NULL, &value) == AZ_ERROR_ARG);
+    TEST_ASSERT(az_json_parser_read(NULL, &value) == AZ_ERROR_ARG);
   }
   {
     az_json_parser parser = az_json_parser_create(AZ_STR("    "));
     az_json_value value;
-    TEST_ASSERT(az_json_parser_get(&parser, &value) == AZ_ERROR_EOF);
+    TEST_ASSERT(az_json_parser_read(&parser, &value) == AZ_ERROR_EOF);
   }
   {
     az_json_parser parser = az_json_parser_create(AZ_STR("  null  "));
     az_json_value value;
-    TEST_ASSERT(az_json_parser_get(&parser, &value) == AZ_OK);
+    TEST_ASSERT(az_json_parser_read(&parser, &value) == AZ_OK);
     TEST_ASSERT(value.kind == AZ_JSON_VALUE_NULL);
     TEST_ASSERT(az_json_parser_done(&parser) == AZ_OK);
   }
   {
     az_json_parser state = az_json_parser_create(AZ_STR("  nul"));
     az_json_value value;
-    TEST_ASSERT(az_json_parser_get(&state, &value) == AZ_ERROR_EOF);
+    TEST_ASSERT(az_json_parser_read(&state, &value) == AZ_ERROR_EOF);
   }
   {
     az_json_parser parser = az_json_parser_create(AZ_STR("  false"));
     az_json_value value;
-    TEST_ASSERT(az_json_parser_get(&parser, &value) == AZ_OK);
+    TEST_ASSERT(az_json_parser_read(&parser, &value) == AZ_OK);
     TEST_ASSERT(value.kind == AZ_JSON_VALUE_BOOLEAN);
     TEST_ASSERT(value.data.boolean == false);
     TEST_ASSERT(az_json_parser_done(&parser) == AZ_OK);
@@ -319,12 +320,12 @@ int main() {
   {
     az_json_parser state = az_json_parser_create(AZ_STR("  falsx  "));
     az_json_value value;
-    TEST_ASSERT(az_json_parser_get(&state, &value) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+    TEST_ASSERT(az_json_parser_read(&state, &value) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
   }
   {
     az_json_parser state = az_json_parser_create(AZ_STR("true "));
     az_json_value value;
-    TEST_ASSERT(az_json_parser_get(&state, &value) == AZ_OK);
+    TEST_ASSERT(az_json_parser_read(&state, &value) == AZ_OK);
     TEST_ASSERT(value.kind == AZ_JSON_VALUE_BOOLEAN);
     TEST_ASSERT(value.data.boolean == true);
     TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
@@ -332,13 +333,13 @@ int main() {
   {
     az_json_parser state = az_json_parser_create(AZ_STR("  truem"));
     az_json_value value;
-    TEST_ASSERT(az_json_parser_get(&state, &value) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+    TEST_ASSERT(az_json_parser_read(&state, &value) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
   }
   {
     az_span const s = AZ_STR(" \"tr\\\"ue\\t\" ");
     az_json_parser state = az_json_parser_create(s);
     az_json_value value;
-    TEST_ASSERT(az_json_parser_get(&state, &value) == AZ_OK);
+    TEST_ASSERT(az_json_parser_read(&state, &value) == AZ_OK);
     TEST_ASSERT(value.kind == AZ_JSON_VALUE_STRING);
     TEST_ASSERT(value.data.string.begin == s.begin + 2);
     TEST_ASSERT(value.data.string.size == 8);
@@ -348,7 +349,7 @@ int main() {
     az_span const s = AZ_STR("\"\\uFf0F\"");
     az_json_parser state = az_json_parser_create(s);
     az_json_value value;
-    TEST_ASSERT(az_json_parser_get(&state, &value) == AZ_OK);
+    TEST_ASSERT(az_json_parser_read(&state, &value) == AZ_OK);
     TEST_ASSERT(value.kind == AZ_JSON_VALUE_STRING);
     TEST_ASSERT(value.data.string.begin == s.begin + 1);
     TEST_ASSERT(value.data.string.size == 6);
@@ -358,12 +359,12 @@ int main() {
     az_span const s = AZ_STR("\"\\uFf0\"");
     az_json_parser state = az_json_parser_create(s);
     az_json_value value;
-    TEST_ASSERT(az_json_parser_get(&state, &value) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+    TEST_ASSERT(az_json_parser_read(&state, &value) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
   }
   {
     az_json_parser state = az_json_parser_create(AZ_STR(" 23 "));
     az_json_value value;
-    TEST_ASSERT(az_json_parser_get(&state, &value) == AZ_OK);
+    TEST_ASSERT(az_json_parser_read(&state, &value) == AZ_OK);
     TEST_ASSERT(value.kind == AZ_JSON_VALUE_NUMBER);
     TEST_ASSERT(value.data.number == 23);
     TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
@@ -371,7 +372,7 @@ int main() {
   {
     az_json_parser state = az_json_parser_create(AZ_STR(" -23.56"));
     az_json_value value;
-    TEST_ASSERT(az_json_parser_get(&state, &value) == AZ_OK);
+    TEST_ASSERT(az_json_parser_read(&state, &value) == AZ_OK);
     TEST_ASSERT(value.kind == AZ_JSON_VALUE_NUMBER);
     TEST_ASSERT(value.data.number == -23.56);
     TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
@@ -379,7 +380,7 @@ int main() {
   {
     az_json_parser state = az_json_parser_create(AZ_STR(" -23.56e-3"));
     az_json_value value;
-    TEST_ASSERT(az_json_parser_get(&state, &value) == AZ_OK);
+    TEST_ASSERT(az_json_parser_read(&state, &value) == AZ_OK);
     TEST_ASSERT(value.kind == AZ_JSON_VALUE_NUMBER);
     TEST_ASSERT(value.data.number == -0.02356);
     TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
@@ -387,31 +388,31 @@ int main() {
   {
     az_json_parser state = az_json_parser_create(AZ_STR(" [ true, 0.3 ]"));
     az_json_value value;
-    TEST_ASSERT(az_json_parser_get(&state, &value) == AZ_OK);
+    TEST_ASSERT(az_json_parser_read(&state, &value) == AZ_OK);
     TEST_ASSERT(value.kind == AZ_JSON_VALUE_ARRAY);
-    TEST_ASSERT(az_json_parser_get_array_element(&state, &value) == AZ_OK);
+    TEST_ASSERT(az_json_parser_read_array_element(&state, &value) == AZ_OK);
     TEST_ASSERT(value.kind == AZ_JSON_VALUE_BOOLEAN);
     TEST_ASSERT(value.data.boolean == true);
-    TEST_ASSERT(az_json_parser_get_array_element(&state, &value) == AZ_OK);
+    TEST_ASSERT(az_json_parser_read_array_element(&state, &value) == AZ_OK);
     TEST_ASSERT(value.kind == AZ_JSON_VALUE_NUMBER);
     // TEST_ASSERT(value.val.number == 0.3);
-    TEST_ASSERT(az_json_parser_get_array_element(&state, &value) == AZ_ERROR_ITEM_NOT_FOUND);
+    TEST_ASSERT(az_json_parser_read_array_element(&state, &value) == AZ_ERROR_ITEM_NOT_FOUND);
     TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
   }
   {
     az_span const json = AZ_STR("{\"a\":\"Hello world!\"}");
     az_json_parser state = az_json_parser_create(json);
     az_json_value value;
-    TEST_ASSERT(az_json_parser_get(&state, &value) == AZ_OK);
+    TEST_ASSERT(az_json_parser_read(&state, &value) == AZ_OK);
     TEST_ASSERT(value.kind == AZ_JSON_VALUE_OBJECT);
     az_json_member member;
-    TEST_ASSERT(az_json_parser_get_object_member(&state, &member) == AZ_OK);
+    TEST_ASSERT(az_json_parser_read_object_member(&state, &member) == AZ_OK);
     TEST_ASSERT(member.name.begin == json.begin + 2);
     TEST_ASSERT(member.name.size == 1);
     TEST_ASSERT(member.value.kind == AZ_JSON_VALUE_STRING);
     TEST_ASSERT(member.value.data.string.begin == json.begin + 6);
     TEST_ASSERT(member.value.data.string.size == 12);
-    TEST_ASSERT(az_json_parser_get_object_member(&state, &member) == AZ_ERROR_ITEM_NOT_FOUND);
+    TEST_ASSERT(az_json_parser_read_object_member(&state, &member) == AZ_ERROR_ITEM_NOT_FOUND);
     TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
   }
   uint8_t buffer[1000];
@@ -489,8 +490,8 @@ int main() {
     az_http_request const request = {
       .method = AZ_STR("GET"),
       .path = AZ_STR("/foo"),
-      .query = az_pair_span_emit_action(&query),
-      .headers = az_pair_span_emit_action(&headers),
+      .query = az_pair_span_as_writer_action(&query),
+      .headers = az_pair_span_as_writer_action(&headers),
       .body = AZ_STR("{ \"somejson\": true }"),
     };
     uint8_t buffer[1024];
@@ -503,7 +504,7 @@ int main() {
           "xyz: very_long\r\n"
           "\r\n"
           "{ \"somejson\": true }");
-      az_result const result = az_http_request_emit_span_seq(&request, sv);
+      az_result const result = az_http_request_as_span_writer(&request, sv);
       TEST_ASSERT(result == AZ_OK);
       az_span const out = az_span_builder_result(&wi);
       TEST_ASSERT(az_span_eq(out, expected));
@@ -548,9 +549,9 @@ int main() {
       AZ_STR("world!"),
     };
     az_span_span const span = AZ_SPAN_FROM_ARRAY(array);
-    az_span_emitter const emitter = az_span_span_emit_action(&span);
+    az_span_writer const emitter = az_span_span_as_writer_action(&span);
     size_t s = 42;
-    az_result const result = az_span_emitter_size(emitter, &s);
+    az_result const result = az_span_writer_size(emitter, &s);
     TEST_ASSERT(result == AZ_OK);
     TEST_ASSERT(s == 12);
   }
@@ -728,7 +729,7 @@ int main() {
 
   test_http_response_parser();
   test_json_value();
-  test_json_pointer_parser();
+  test_json_pointer();
   test_json_string();
   test_json_get_by_pointer();
   return exit_code;

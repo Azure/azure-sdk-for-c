@@ -3,7 +3,7 @@
 
 #include <az_json_get.h>
 
-#include <az_json_pointer_parser.h>
+#include <az_json_pointer.h>
 #include <az_json_string.h>
 
 #include <_az_cfg.h>
@@ -14,10 +14,10 @@ AZ_NODISCARD bool az_json_pointer_token_eq_json_string(
   az_span_reader pt_reader = az_span_reader_create(pointer_token);
   az_span_reader js_reader = az_span_reader_create(json_string);
   while (true) {
-    uint8_t pt_c = { 0 };
+    uint32_t pt_c = { 0 };
     az_result const pt_result = az_span_reader_read_json_pointer_token_char(&pt_reader, &pt_c);
-    uint16_t js_c = { 0 };
-    az_result const js_result = az_span_reader_get_json_string_char(&js_reader, &js_c);
+    uint32_t js_c = { 0 };
+    az_result const js_result = az_span_reader_read_json_string_char(&js_reader, &js_c);
     if (js_result == AZ_ERROR_ITEM_NOT_FOUND && pt_result == AZ_ERROR_ITEM_NOT_FOUND) {
       return true;
     }
@@ -38,12 +38,12 @@ az_json_get_object_member(az_span const json, az_span const name, az_json_value 
 
   az_json_parser parser = az_json_parser_create(json);
   az_json_value value = { 0 };
-  AZ_RETURN_IF_FAILED(az_json_parser_get(&parser, &value));
+  AZ_RETURN_IF_FAILED(az_json_parser_read(&parser, &value));
 
   if (value.kind == AZ_JSON_VALUE_OBJECT) {
     while (true) {
       az_json_member member = { 0 };
-      AZ_RETURN_IF_FAILED(az_json_parser_get_object_member(&parser, &member));
+      AZ_RETURN_IF_FAILED(az_json_parser_read_object_member(&parser, &member));
       // TODO: we should either replace `az_span_eq` with something else or 
       //       remove `az_json_get_object_member` completely.
       if (az_span_eq(member.name, name)) {
@@ -68,18 +68,18 @@ AZ_NODISCARD az_result az_json_parser_get_by_pointer_token(
       uint64_t i = { 0 };
       AZ_RETURN_IF_FAILED(az_span_get_uint64(pointer_token, &i));
       while (true) {
-        AZ_RETURN_IF_FAILED(az_json_parser_get_array_element(self, p_value));
+        AZ_RETURN_IF_FAILED(az_json_parser_read_array_element(self, p_value));
         if (i == 0) {
           return AZ_OK;
         }
-        AZ_RETURN_IF_FAILED(az_json_parser_skip(self, *p_value));
         --i;
+        AZ_RETURN_IF_FAILED(az_json_parser_skip(self, *p_value));
       }
     }
     case AZ_JSON_VALUE_OBJECT: {
       while (true) {
         az_json_member member = { 0 };
-        AZ_RETURN_IF_FAILED(az_json_parser_get_object_member(self, &member));
+        AZ_RETURN_IF_FAILED(az_json_parser_read_object_member(self, &member));
         if (az_json_pointer_token_eq_json_string(pointer_token, member.name)) {
           *p_value = member.value;
           return AZ_OK;
@@ -99,7 +99,7 @@ az_json_get_by_pointer(az_span const json, az_span const pointer, az_json_value 
   az_json_parser json_parser = az_json_parser_create(json);
   az_span_reader pointer_parser = az_span_reader_create(pointer);
 
-  AZ_RETURN_IF_FAILED(az_json_parser_get(&json_parser, out_value));
+  AZ_RETURN_IF_FAILED(az_json_parser_read(&json_parser, out_value));
 
   while (true) {
     az_span pointer_token = { 0 };

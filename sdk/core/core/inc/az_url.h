@@ -15,10 +15,10 @@
 typedef struct {
   az_span host;
   az_span path;
-  az_pair_emitter query;
+  az_pair_writer query;
 } az_url;
 
-AZ_NODISCARD az_result az_url_emit_span_seq(az_url const * const self, az_span_action const action);
+AZ_NODISCARD az_result az_url_emit_span_seq(az_url const * const self, az_span_action const write_span);
 
 #include <_az_cfg_suffix.h>
 
