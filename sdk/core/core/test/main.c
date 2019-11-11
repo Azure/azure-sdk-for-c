@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "./test_json_string.h"
 #include "./az_test.h"
 #include "./test_http_response_parser.h"
 #include "./test_json_value.h"

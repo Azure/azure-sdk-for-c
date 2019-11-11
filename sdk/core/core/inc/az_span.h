@@ -120,7 +120,7 @@ AZ_NODISCARD az_result az_span_get_uint64(az_span const self, uint64_t * const o
  *
  * ```c
  * az_span_action const action = ...;
- * az_span_action_do(write, AZ_STR("Something"));
+ * az_span_action_do(action, AZ_STR("Something"));
  * ```
  */
 AZ_ACTION_TYPE(az_span_action, az_span)

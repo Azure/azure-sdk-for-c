@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 #include <az_auth.h>
-#include <az_http_client.h>
 #include <az_http_request_builder.h>
 #include <az_http_response_parser.h>
 #include <az_pair.h>
@@ -91,27 +90,18 @@ int main() {
     return add_header_result;
   }
 
-  // *************************send GET
-  az_result const get_response = az_http_client_send_request(&hrb, &http_buf_response);
-  if (az_failed(get_response)) {
-    printf("Error after request key from KeyVault\n");
-    return get_response;
-  }
+  // *************************launch pipeline
+  az_result const get_response = az_http_pipeline_process(&hrb, &http_buf_response);
 
   if (az_succeeded(get_response)) {
     printf("Response is: \n%s", http_buf_response.begin);
   } else {
     printf("Error during running test\n");
-    printf("Response is: \n%s", http_buf_response.begin);
-    return get_response;
   }
 
   // free the temporal buffer holding auth token
   TEST_EXPECT_SUCCESS(az_mut_span_memset(temp_buf, 0));
   az_span_free(&temp_buf);
-
-  az_result result;
-  result = az_http_pipeline_process(&hrb, &http_buf_response);
 
   return 0;
 }
