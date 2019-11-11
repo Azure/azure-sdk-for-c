@@ -496,14 +496,14 @@ int main() {
     uint8_t buffer[1024];
     {
       az_span_builder wi = az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(buffer));
-      az_write_span sv = az_span_builder_append_action(&wi);
+      az_span_action sv = az_span_builder_append_action(&wi);
       az_span const expected = AZ_STR( //
           "GET /foo?hello=world!&x=42 HTTP/1.1\r\n"
           "some: xml\r\n"
           "xyz: very_long\r\n"
           "\r\n"
           "{ \"somejson\": true }");
-      az_result const result = az_http_request_emit_span_seq(&request, sv);
+      az_result const result = az_http_request_as_span_writer(&request, sv);
       TEST_ASSERT(result == AZ_OK);
       az_span const out = az_span_builder_result(&wi);
       TEST_ASSERT(az_span_eq(out, expected));

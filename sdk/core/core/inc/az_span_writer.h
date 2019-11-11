@@ -9,7 +9,7 @@
 
 #include <_az_cfg_prefix.h>
 
-AZ_ACTION_TYPE(az_span_writer, az_write_span)
+AZ_ACTION_TYPE(az_span_writer, az_span_action)
 
 /**
  * A span of spans of bytes.
@@ -23,7 +23,7 @@ typedef struct {
  * Emits all spans from @self into @action.
  */
 AZ_NODISCARD az_result
-az_span_span_as_writer(az_span_span const * const self, az_write_span const write_span);
+az_span_span_as_writer(az_span_span const * const self, az_span_action const write_span);
 
 /**
  * @az_span_span_emit as an action of type @az_span_emitter.
@@ -41,7 +41,7 @@ AZ_NODISCARD az_result az_span_writer_size(az_span_writer const self, size_t * c
  * string is destroyed.
  */
 AZ_NODISCARD az_result
-az_span_writer_as_dynamic_str_writer(az_span_writer const span_writer, az_write_str const write_str);
+az_span_writer_as_dynamic_str_writer(az_span_writer const span_writer, az_str_action const write_str);
 
 #include <_az_cfg_suffix.h>
 

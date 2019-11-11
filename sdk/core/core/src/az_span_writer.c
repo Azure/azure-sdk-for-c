@@ -10,13 +10,13 @@
 #include <_az_cfg.h>
 
 AZ_NODISCARD az_result
-az_span_span_as_writer(az_span_span const * const context, az_write_span const write_span) {
+az_span_span_as_writer(az_span_span const * const context, az_span_action const write_span) {
   AZ_CONTRACT_ARG_NOT_NULL(context);
 
   az_span const * i = context->begin;
   az_span const * const end = i + context->size;
   for (; i < end; ++i) {
-    AZ_RETURN_IF_FAILED(az_write_span_do(write_span, *i));
+    AZ_RETURN_IF_FAILED(az_span_action_do(write_span, *i));
   }
   return AZ_OK;
 }
@@ -28,7 +28,7 @@ AZ_NODISCARD az_result az_span_add_size(size_t * const p_size, az_span const spa
   return AZ_OK;
 }
 
-AZ_ACTION_FUNC(az_span_add_size, size_t, az_write_span)
+AZ_ACTION_FUNC(az_span_add_size, size_t, az_span_action)
 
 AZ_NODISCARD az_result
 az_span_writer_size(az_span_writer const writer, size_t * const out_size) {
@@ -63,7 +63,7 @@ AZ_NODISCARD az_result az_dynamic_span(size_t const size, az_mut_span_action con
 
 typedef struct {
   az_span_writer span_writer;
-  az_write_str write_str;
+  az_str_action write_str;
 } az_str_action_to_mut_span_action_data;
 
 AZ_ACTION_FUNC(
@@ -78,12 +78,12 @@ AZ_NODISCARD az_result az_str_action_to_mut_span_action(
 
   char const * str = NULL;
   AZ_RETURN_IF_FAILED(az_span_writer_to_static_str_writer(self->span_writer, span, &str));
-  AZ_RETURN_IF_FAILED(az_write_str_do(self->write_str, str));
+  AZ_RETURN_IF_FAILED(az_str_action_do(self->write_str, str));
   return AZ_OK;
 }
 
 AZ_NODISCARD az_result
-az_span_writer_as_dynamic_str_writer(az_span_writer const span_writer, az_write_str const write_str) {
+az_span_writer_as_dynamic_str_writer(az_span_writer const span_writer, az_str_action const write_str) {
   size_t size = 0;
   AZ_RETURN_IF_FAILED(az_span_writer_size(span_writer, &size));
   {

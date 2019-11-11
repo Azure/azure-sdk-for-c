@@ -16,7 +16,7 @@ typedef struct {
    *
    * An immutable field.
    */
-  az_write_span write_span;
+  az_span_action write_span;
   /**
    * A query parameter separator. Usually it's `&` but it is `?` before the first query
    * parameter.
@@ -26,7 +26,7 @@ typedef struct {
   az_span separator;
 } az_http_query_state;
 
-AZ_ACTION_FUNC(az_http_query_param, az_http_query_state, az_write_pair)
+AZ_ACTION_FUNC(az_http_query_param, az_http_query_state, az_pair_action)
 
 /**
  * Creates a span sequence from a query parameter.
@@ -39,17 +39,17 @@ AZ_ACTION_FUNC(az_http_query_param, az_http_query_state, az_write_pair)
 AZ_NODISCARD az_result az_http_query_param(az_http_query_state * const p_state, az_pair const query_param) {
   AZ_CONTRACT_ARG_NOT_NULL(p_state);
 
-  az_write_span const write_span = p_state->write_span;
-  AZ_RETURN_IF_FAILED(az_write_span_do(write_span, p_state->separator));
-  AZ_RETURN_IF_FAILED(az_write_span_do(write_span, query_param.key));
-  AZ_RETURN_IF_FAILED(az_write_span_do(write_span, AZ_STR("=")));
-  AZ_RETURN_IF_FAILED(az_write_span_do(write_span, query_param.value));
+  az_span_action const write_span = p_state->write_span;
+  AZ_RETURN_IF_FAILED(az_span_action_do(write_span, p_state->separator));
+  AZ_RETURN_IF_FAILED(az_span_action_do(write_span, query_param.key));
+  AZ_RETURN_IF_FAILED(az_span_action_do(write_span, AZ_STR("=")));
+  AZ_RETURN_IF_FAILED(az_span_action_do(write_span, query_param.value));
   p_state->separator = AZ_STR("&");
   return AZ_OK;
 }
 
 AZ_NODISCARD az_result
-az_http_query_emit_span_seq(az_pair_writer const query, az_write_span const write_span) {
+az_http_query_as_span_writer(az_pair_writer const query, az_span_action const write_span) {
   az_http_query_state state = {
     .write_span = write_span,
     .separator = AZ_STR("?"),
