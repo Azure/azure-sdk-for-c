@@ -44,12 +44,6 @@ az_span_reader_set_pos(az_span_reader * const p_reader, size_t const i) {
   return AZ_OK;
 }
 
-// Parsing utilities
-
-AZ_NODISCARD AZ_INLINE az_result az_error_unexpected_char(az_result_byte const c) {
-  return az_failed(c) ? c : AZ_ERROR_PARSER_UNEXPECTED_CHAR;
-}
-
 /**
  * Read a span form a reader and compare it with the given @span
  *

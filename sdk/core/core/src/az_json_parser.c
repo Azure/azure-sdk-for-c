@@ -4,6 +4,7 @@
 #include <az_json_parser.h>
 
 #include <az_contract.h>
+#include <az_json_string.h>
 
 #include <ctype.h>
 #include <math.h>
@@ -16,21 +17,6 @@ AZ_NODISCARD AZ_INLINE bool az_json_is_white_space(az_result_byte const c) {
     case '\t':
     case '\n':
     case '\r':
-      return true;
-  }
-  return false;
-}
-
-AZ_NODISCARD AZ_INLINE bool az_json_is_esc(az_result_byte const c) {
-  switch (c) {
-    case '\\':
-    case '"':
-    case '/':
-    case 'b':
-    case 'f':
-    case 'n':
-    case 'r':
-    case 't':
       return true;
   }
   return false;
@@ -49,12 +35,13 @@ AZ_NODISCARD AZ_INLINE bool az_json_parser_stack_is_empty(az_json_parser const *
   return self->stack == 1;
 }
 
-AZ_NODISCARD AZ_INLINE az_json_stack_item az_json_parser_stack_last(az_json_parser const * const self) {
+AZ_NODISCARD AZ_INLINE az_json_stack_item
+az_json_parser_stack_last(az_json_parser const * const self) {
   return self->stack & 1;
 }
 
 AZ_NODISCARD AZ_INLINE az_result
-az_json_parser_stack_push(az_json_parser * const self, az_json_stack const stack) {
+az_json_parser_push_stack(az_json_parser * const self, az_json_stack const stack) {
   if (self->stack >> AZ_JSON_STACK_SIZE != 0) {
     return AZ_ERROR_JSON_STACK_OVERFLOW;
   }
@@ -62,12 +49,16 @@ az_json_parser_stack_push(az_json_parser * const self, az_json_stack const stack
   return AZ_OK;
 }
 
-AZ_NODISCARD AZ_INLINE az_result az_json_parser_stack_pop(az_json_parser * const self) {
-  if (self->stack <= 1) {
+AZ_NODISCARD AZ_INLINE az_result az_json_stack_pop(az_json_stack * const self) {
+  if (*self <= 1) {
     return AZ_ERROR_JSON_INVALID_STATE;
   }
-  self->stack >>= 1;
+  *self >>= 1;
   return AZ_OK;
+}
+
+AZ_NODISCARD AZ_INLINE az_result az_json_parser_pop_stack(az_json_parser * const self) {
+  return az_json_stack_pop(&self->stack);
 }
 
 AZ_NODISCARD az_json_parser az_json_parser_create(az_span const buffer) {
@@ -204,38 +195,19 @@ AZ_NODISCARD static az_result az_span_reader_get_json_string_rest(
   // skip '"'
   size_t const begin = self->i;
   while (true) {
-    az_result_byte c = az_span_reader_current(self);
-    switch (c) {
-        // end of the string
-      case '"': {
+    uint16_t ignore = { 0 };
+    az_result const result = az_span_reader_get_json_string_char(self, &ignore);
+    switch (result) {
+      case AZ_ERROR_JSON_STRING_END: {
         *string = az_span_sub(self->span, begin, self->i);
         az_span_reader_next(self);
         return AZ_OK;
       }
-        // escape sequence
-      case '\\': {
-        az_span_reader_next(self);
-        c = az_span_reader_current(self);
-        if (az_json_is_esc(c)) {
-          az_span_reader_next(self);
-        } else if (c == 'u') {
-          az_span_reader_next(self);
-          for (size_t i = 0; i < 4; ++i, az_span_reader_next(self)) {
-            c = az_span_reader_current(self);
-            if (!isxdigit(c)) {
-              return az_error_unexpected_char(c);
-            }
-          }
-        } else {
-          return az_error_unexpected_char(c);
-        }
-        break;
+      case AZ_ERROR_ITEM_NOT_FOUND: {
+        return AZ_ERROR_EOF;
       }
       default: {
-        if (c < 0x20) {
-          return az_error_unexpected_char(c);
-        }
-        az_span_reader_next(self);
+        AZ_RETURN_IF_FAILED(result);
       }
     }
   }
@@ -273,11 +245,11 @@ AZ_NODISCARD static az_result az_json_parser_get_value(
     case '{':
       out_value->kind = AZ_JSON_VALUE_OBJECT;
       az_span_reader_next(p_reader);
-      return az_json_parser_stack_push(self, AZ_JSON_STACK_OBJECT);
+      return az_json_parser_push_stack(self, AZ_JSON_STACK_OBJECT);
     case '[':
       out_value->kind = AZ_JSON_VALUE_ARRAY;
       az_span_reader_next(p_reader);
-      return az_json_parser_stack_push(self, AZ_JSON_STACK_ARRAY);
+      return az_json_parser_push_stack(self, AZ_JSON_STACK_ARRAY);
   }
   return az_error_unexpected_char(c);
 }
@@ -344,7 +316,7 @@ AZ_NODISCARD static az_result az_json_parser_check_item_begin(
     return AZ_OK;
   }
   // c == close
-  AZ_RETURN_IF_FAILED(az_json_parser_stack_pop(self));
+  AZ_RETURN_IF_FAILED(az_json_parser_pop_stack(self));
   az_span_reader_next(p_reader);
   az_span_reader_skip_json_white_space(p_reader);
   if (!az_json_parser_stack_is_empty(self)) {
@@ -367,9 +339,7 @@ AZ_NODISCARD static az_result az_json_parser_check_item_end(
 }
 
 AZ_NODISCARD az_result
-az_json_parser_get_object_member(
-    az_json_parser * const self,
-    az_json_member * const out_member) {
+az_json_parser_get_object_member(az_json_parser * const self, az_json_member * const out_member) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(out_member);
 
@@ -385,9 +355,7 @@ az_json_parser_get_object_member(
 }
 
 AZ_NODISCARD az_result
-az_json_parser_get_array_element(
-    az_json_parser * const self,
-    az_json_value * const out_element) {
+az_json_parser_get_array_element(az_json_parser * const self, az_json_value * const out_element) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(out_element);
 
@@ -403,4 +371,46 @@ AZ_NODISCARD az_result az_json_parser_done(az_json_parser const * const self) {
     return AZ_ERROR_JSON_INVALID_STATE;
   }
   return AZ_OK;
+}
+
+AZ_NODISCARD az_result az_json_parser_skip(az_json_parser * const self, az_json_value const value) {
+  AZ_CONTRACT_ARG_NOT_NULL(self);
+
+  switch (value.kind) {
+    case AZ_JSON_VALUE_OBJECT:
+    case AZ_JSON_VALUE_ARRAY: {
+      break;
+    }
+    default: {
+      return AZ_OK;
+    }
+  }
+
+  az_json_stack target_stack = self->stack;
+  AZ_RETURN_IF_FAILED(az_json_stack_pop(&target_stack));
+
+  while (true) {
+    // az_json_parser_get_stac
+    switch (az_json_parser_stack_last(self)) { 
+      case AZ_JSON_STACK_OBJECT: {
+        az_json_member member = { 0 };
+        az_result const result = az_json_parser_get_object_member(self, &member);
+        if (result != AZ_ERROR_ITEM_NOT_FOUND) {
+          AZ_RETURN_IF_FAILED(result);
+        }
+        break;
+      }
+      default: {
+        az_json_value element = { 0 };
+        az_result result = az_json_parser_get_array_element(self, &element);
+        if (result != AZ_ERROR_ITEM_NOT_FOUND) {
+          AZ_RETURN_IF_FAILED(result);
+        }
+        break;
+      }
+    }
+    if (self->stack == target_stack) {
+      return AZ_OK;
+    }
+  }
 }

@@ -46,6 +46,8 @@ az_json_parser_get_array_element(az_json_parser * const self, az_json_value * co
 
 AZ_NODISCARD az_result az_json_parser_done(az_json_parser const * const self);
 
+AZ_NODISCARD az_result az_json_parser_skip(az_json_parser * const self, az_json_value const value);
+
 #include <_az_cfg_suffix.h>
 
 #endif
