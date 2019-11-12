@@ -14,9 +14,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "./az_test.h"
-int exit_code = 0;
-
 #include <_az_cfg.h>
 
 static az_span KEY_VAULT_URL
@@ -35,27 +32,6 @@ int main() {
   uint8_t buf_response[1024 * 4];
   az_mut_span const http_buf_response = AZ_SPAN_FROM_ARRAY(buf_response);
 
-  az_auth_credentials creds = { { 0 } };
-  az_result const creds_retcode = az_auth_init_client_credentials(
-      &creds,
-      AZ_STR("72f988bf-86f1-41af-91ab-2d7cd011db47"),
-      AZ_STR("4317a660-6bfb-4585-9ce9-8f222314879c"),
-      AZ_STR("O2CT[Y:dkTqblml5V/T]ZEi9x1W1zoBW"));
-
-  if (!az_succeeded(creds_retcode)) {
-    printf("Error initializing credentials\n");
-    return creds_retcode;
-  }
-
-  az_span auth_token = { 0 };
-  az_result const token_retcode
-      = az_auth_get_token(creds, AZ_STR("https://vault.azure.net"), http_buf_response, &auth_token);
-
-  if (az_failed(token_retcode)) {
-    printf("Error while getting auth token\n");
-    return token_retcode;
-  }
-
   // create request for keyVault
   az_result build_result
       = az_http_request_builder_init(&hrb, http_buf, 100, AZ_HTTP_METHOD_VERB_GET, KEY_VAULT_URL);
@@ -70,38 +46,28 @@ int main() {
     return add_query_result;
   }
 
-  /****** -------------  Create buffer for header auth ---------******/
-  // can't print auth_token right now since it is not 0-terminated
-  size_t const buffer_for_header_size = sizeof("Bearer ") + auth_token.size;
-  az_mut_span temp_buf;
-  TEST_EXPECT_SUCCESS(az_span_malloc(buffer_for_header_size, &temp_buf));
+  // Add auth
+  az_http_policy_data policy_data = { 0 };
 
-  /****** -------------  use Span builder to concatenate ---------******/
-  az_span_builder builder = az_span_builder_create(temp_buf);
-  TEST_EXPECT_SUCCESS(az_span_builder_append(&builder, AZ_STR("Bearer ")));
-  TEST_EXPECT_SUCCESS(az_span_builder_append(&builder, auth_token));
-  TEST_EXPECT_SUCCESS(az_span_builder_append(
-      &builder, AZ_STR_ZERO)); // add a 0 so it can be printed and used by Curl
+  az_result const creds_retcode = az_auth_init_client_credentials(
+      &policy_data.credentials,
+      AZ_STR("72f988bf-86f1-41af-91ab-2d7cd011db47"),
+      AZ_STR("4317a660-6bfb-4585-9ce9-8f222314879c"),
+      AZ_STR("O2CT[Y:dkTqblml5V/T]ZEi9x1W1zoBW"));
 
-  // add auth Header with parsed auth_token
-  az_result const add_header_result = az_http_request_builder_append_header(
-      &hrb, AZ_STR("authorization"), az_mut_span_to_span(temp_buf));
-  if (az_failed(add_header_result)) {
-    return add_header_result;
+  if (!az_succeeded(creds_retcode)) {
+    printf("Error initializing credentials\n");
+    return creds_retcode;
   }
 
   // *************************launch pipeline
-  az_result const get_response = az_http_pipeline_process(&hrb, &http_buf_response);
+  az_result const get_response = az_http_pipeline_process(&hrb, &http_buf_response, &policy_data);
 
   if (az_succeeded(get_response)) {
     printf("Response is: \n%s", http_buf_response.begin);
   } else {
     printf("Error during running test\n");
   }
-
-  // free the temporal buffer holding auth token
-  TEST_EXPECT_SUCCESS(az_mut_span_memset(temp_buf, 0));
-  az_span_free(&temp_buf);
 
   return 0;
 }

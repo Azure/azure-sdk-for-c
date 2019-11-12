@@ -84,7 +84,7 @@ az_auth_get_resource_url(az_span const request_url, az_span_builder * p_builder)
   size_t host_size = url_size - scheme_size;
   for (size_t i = scheme_size; i < url_size; ++i) {
     if (url[i] == '/') {
-      scheme_size = i - scheme_size;
+      host_size = i - scheme_size;
       break;
     }
   }
@@ -101,9 +101,14 @@ az_auth_get_resource_url(az_span const request_url, az_span_builder * p_builder)
         ++dot;
       }
 
-      if (dot == 3 || (dot == 2 && i == scheme_size)) {
-        lvl3domain_size = host_size - (i - scheme_size);
+      if (dot == 3) {
+        lvl3domain_size = host_size - ((i + 1) - scheme_size);
+        break;
       }
+    }
+
+    if (dot == 2) {
+      lvl3domain_size = host_size;
     }
   }
 
