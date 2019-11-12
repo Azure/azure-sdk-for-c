@@ -125,7 +125,7 @@ AZ_NODISCARD az_result az_auth_get_token(
     AZ_RETURN_IF_FAILED(az_span_builder_append(&builder, auth_url2));
 
     auth_url = az_span_builder_result(&builder);
-    builder = az_span_builder_create(az_mut_span_take(response_buf, auth_url.size));
+    builder = az_span_builder_create(az_mut_span_drop(response_buf, auth_url.size));
 
     AZ_RETURN_IF_FAILED(az_span_builder_append(&builder, auth_body1));
     AZ_RETURN_IF_FAILED(az_uri_encode(credentials.data.client_credentials.client_id, &builder));
