@@ -1,9 +1,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include <az_auth.h>
 #include <az_http_client.h>
 #include <az_http_pipeline.h>
 #include <az_http_policy.h>
+#include <az_http_request_builder.h>
+#include <az_mut_span.h>
+#include <az_span.h>
+#include <az_span_builder.h>
+#include <az_str.h>
 
 #include <_az_cfg.h>
 
@@ -56,6 +62,66 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
   return az_http_pipeline_nextpolicy(p_policies, hrb, response);
 }
 
+enum { AZ_HTTP_POLICY_AUTH_BUFFER_SIZE = 2 * 1024 };
+
+static AZ_NODISCARD az_result
+az_auth_get_resource_url(az_span const request_url, az_span_builder * p_builder) {
+  size_t scheme_size = 0;
+
+  uint8_t const * url = request_url.begin;
+  size_t const url_size = request_url.size;
+  for (size_t i = 0; i < url_size; ++i) {
+    if (url[i] == ':' && (i < url_size + 2) && url[i + 1] == '/' && url[i + 2] == '/') {
+      scheme_size = i + 3;
+      break;
+    }
+  }
+
+  if (scheme_size == 0) {
+    return AZ_ERROR_ARG;
+  }
+
+  size_t host_size = url_size - scheme_size;
+  for (size_t i = scheme_size; i < url_size; ++i) {
+    if (url[i] == '/') {
+      scheme_size = i - scheme_size;
+      break;
+    }
+  }
+
+  if (host_size == 0) {
+    return AZ_ERROR_ARG;
+  }
+
+  size_t lvl3domain_size = 0;
+  {
+    uint8_t dot = 0;
+    for (size_t i = scheme_size + host_size; i >= scheme_size; --i) {
+      if (url[i] == '.') {
+        ++dot;
+      }
+
+      if (dot == 3 || (dot == 2 && i == scheme_size)) {
+        lvl3domain_size = host_size - (i - scheme_size);
+      }
+    }
+  }
+
+  if (lvl3domain_size == 0) {
+    return AZ_ERROR_ARG;
+  }
+
+  AZ_RETURN_IF_FAILED(
+      az_span_builder_append(p_builder, (az_span){ .begin = url, .size = scheme_size }));
+
+  AZ_RETURN_IF_FAILED(az_span_builder_append(
+      p_builder,
+      (az_span){ .begin = url + scheme_size + host_size - lvl3domain_size,
+                 .size = lvl3domain_size }));
+
+  return AZ_OK;
+}
+
 AZ_NODISCARD az_result az_http_pipeline_policy_authentication(
     az_http_policy * const p_policies,
     az_http_request_builder * const hrb,
@@ -63,7 +129,37 @@ AZ_NODISCARD az_result az_http_pipeline_policy_authentication(
   AZ_CONTRACT_ARG_NOT_NULL(p_policies);
   AZ_CONTRACT_ARG_NOT_NULL(hrb);
   AZ_CONTRACT_ARG_NOT_NULL(response);
-  // Authentication logic
+
+  if (p_policies->data.credentials.kind == AZ_AUTH_KIND_NONE) {
+    return az_http_pipeline_nextpolicy(p_policies, hrb, response);
+  }
+
+  uint8_t buf[AZ_HTTP_POLICY_AUTH_BUFFER_SIZE] = { 0 };
+  az_mut_span entire_buf = AZ_SPAN_FROM_ARRAY(buf);
+  az_mut_span post_bearer = { 0 };
+  az_mut_span bearer = { 0 };
+  AZ_RETURN_IF_FAILED(az_mut_span_copy(entire_buf, AZ_STR("Bearer "), &bearer));
+  post_bearer = az_mut_span_drop(entire_buf, bearer.size);
+
+  az_span_builder auth_url_builder = az_span_builder_create(post_bearer);
+  AZ_RETURN_IF_FAILED(az_auth_get_resource_url(az_mut_span_to_span(hrb->url), &auth_url_builder));
+  az_span const auth_url = az_span_builder_result(&auth_url_builder);
+
+  az_span token = { 0 };
+  AZ_RETURN_IF_FAILED(az_auth_get_token(
+      p_policies->data.credentials,
+      auth_url,
+      az_mut_span_drop(post_bearer, auth_url.size),
+      &token));
+
+  az_mut_span unused;
+  AZ_RETURN_IF_FAILED(az_mut_span_move(post_bearer, token, &unused));
+
+  AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
+      hrb,
+      AZ_STR("authorization"),
+      (az_span){ .begin = bearer.begin, .size = bearer.size + token.size }));
+
   return az_http_pipeline_nextpolicy(p_policies, hrb, response);
 }
 

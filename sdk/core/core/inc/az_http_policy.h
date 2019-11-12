@@ -4,6 +4,7 @@
 #ifndef AZ_HTTP_POLICY_H
 #define AZ_HTTP_POLICY_H
 
+#include <az_auth.h>
 #include <az_http_request_builder.h>
 #include <az_mut_span.h>
 #include <az_result.h>
@@ -28,6 +29,7 @@
 typedef struct az_http_policy az_http_policy;
 
 typedef struct {
+  az_auth_credentials credentials;
   az_span data;
 } az_http_policy_data;
 

@@ -14,6 +14,7 @@
 #include <_az_cfg_prefix.h>
 
 typedef enum {
+  AZ_AUTH_KIND_NONE = 0,
   AZ_AUTH_KIND_CLIENT_CREDENTIALS = 1,
 } az_auth_kind;
 
