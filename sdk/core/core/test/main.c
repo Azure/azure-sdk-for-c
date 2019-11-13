@@ -22,6 +22,10 @@
 
 #include <_az_cfg.h>
 
+#ifdef __clang__
+#error "Test successful"
+#endif
+
 void test_json_get_by_pointer();
 void test_json_pointer();
 void test_json_string();
