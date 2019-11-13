@@ -30,6 +30,33 @@ az_span_reader_read_url_scheme(az_span_reader * const self, az_span * const out)
 }
 
 /**
+ * https://tools.ietf.org/html/rfc3986#section-3.2.3
+ */
+AZ_NODISCARD az_result
+az_span_reader_read_url_port(az_span_reader * const self, az_span * const port) {
+  { 
+    az_result const c = az_span_reader_current(self);
+    if (c != ':') {
+      *port = (az_span){ 0 };
+    }
+    az_span_reader_next(self);
+  }
+  size_t const begin = self->i;
+  while (true) {
+    az_result_byte const c = az_span_reader_current(self);
+    if (!isdigit(c)) {
+      if (c == AZ_ERROR_EOF) {
+        AZ_RETURN_IF_FAILED(c);
+      }
+      break;
+    }
+    az_span_reader_next(self);
+  }
+  *port = az_span_sub(self->span, begin, self->i);
+  return AZ_OK;
+}
+
+/**
  * https://tools.ietf.org/html/rfc3986#section-3.2
  *
  * authority   = [ userinfo "@" ] host [ ":" port ]
@@ -40,11 +67,10 @@ az_span_reader_read_url_authority(az_span_reader * const self, az_url_authority 
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
   bool has_userinfo = false;
-  *out = (az_url_authority){ 0 };
+  out->userinfo = (az_span){ 0 };
   size_t begin = self->i;
   while (true) {
     az_result_byte c = az_span_reader_current(self);
-    AZ_RETURN_IF_FAILED(c);
     switch (c) {
       case '@': {
         if (has_userinfo) {
@@ -59,32 +85,104 @@ az_span_reader_read_url_authority(az_span_reader * const self, az_url_authority 
       case AZ_ERROR_EOF:
       case '?':
       case '/':
-      case '#': {
-        out->host = az_span_sub(self->span, begin, self->i);
-        return AZ_OK;
-      }
+      case '#':
       case ':': {
         out->host = az_span_sub(self->span, begin, self->i);
-        az_span_reader_next(self);
-        begin = self->i;
-        while (true) {
-          c = az_span_reader_current(self);
-          if (!isdigit(c)) {
-            break;
-          }
-          az_span_reader_next(self);
-        }
-        out->port = az_span_sub(self->span, begin, self->i);
+        AZ_RETURN_IF_FAILED(az_span_reader_read_url_port(self, &out->port));
         return AZ_OK;
       }
       default: {
+        AZ_RETURN_IF_FAILED(c);
         az_span_reader_next(self);
         break;
       }
     }
   }
+}
 
-  return AZ_OK;
+/**
+ * https://tools.ietf.org/html/rfc3986#section-3.3
+ */
+AZ_NODISCARD az_result
+az_span_reader_read_url_path(az_span_reader* const self, az_span* const path) {
+  {
+    az_result const c = az_span_reader_current(self);
+    if (c != '/') {
+      *path = (az_span){ 0 };
+    }
+    az_span_reader_next(self);
+  }
+  size_t const begin = self->i;
+  while (true) {
+    az_result const c = az_span_reader_current(self);
+    switch(c){ 
+      case AZ_ERROR_EOF:
+      case '?':
+      case '#': {
+        *path = az_span_sub(self->span, begin, self->i);
+        return AZ_OK;
+      }
+      default: {
+        AZ_RETURN_IF_FAILED(c);
+        az_span_reader_next(self);
+        break;
+      }
+    }
+  }
+}
+
+/**
+ * https://tools.ietf.org/html/rfc3986#section-3.4
+ */
+AZ_NODISCARD az_result
+az_span_reader_read_url_query(az_span_reader * const self, az_span * const query) {
+  {
+    az_result const c = az_span_reader_current(self);
+    if (c != '?') {
+      *query = (az_span){ 0 };
+    }
+    az_span_reader_next(self);
+  }
+  size_t const begin = self->i;
+  while (true) {
+    az_result const c = az_span_reader_current(self);
+    switch (c) {
+      case AZ_ERROR_EOF:
+      case '#': {
+        *query = az_span_sub(self->span, begin, self->i);
+        return AZ_OK;
+      }
+      default: {
+        AZ_RETURN_IF_FAILED(c);
+        az_span_reader_next(self);
+        break;
+      }
+    }
+  }
+}
+
+/**
+ * https://tools.ietf.org/html/rfc3986#section-3.5
+ */
+AZ_NODISCARD az_result
+az_span_reader_read_url_fragment(az_span_reader * const self, az_span * const fragment) {
+  {
+    az_result const c = az_span_reader_current(self);
+    if (c != '#') {
+      *fragment = (az_span){ 0 };
+    }
+    az_span_reader_next(self);
+  }
+  size_t const begin = self->i;
+  while (true) {
+    az_result const c = az_span_reader_current(self);
+    if (c == AZ_ERROR_EOF) {
+      *fragment = az_span_sub(self->span, begin, self->i);
+      return AZ_OK;
+    }
+    AZ_RETURN_IF_FAILED(c);
+    az_span_reader_next(self);
+  }
 }
 
 AZ_NODISCARD az_result az_url_parse(az_span const url, az_url * const out) {
@@ -93,8 +191,20 @@ AZ_NODISCARD az_result az_url_parse(az_span const url, az_url * const out) {
   az_span_reader reader = az_span_reader_create(url);
 
   AZ_RETURN_IF_FAILED(az_span_reader_read_url_scheme(&reader, &out->scheme));
+  AZ_RETURN_IF_FAILED(az_span_reader_read_url_authority(&reader, &out->autority));
+  AZ_RETURN_IF_FAILED(az_span_reader_read_url_path(&reader, &out->path));
+  AZ_RETURN_IF_FAILED(az_span_reader_read_url_query(&reader, &out->query));
+  AZ_RETURN_IF_FAILED(az_span_reader_read_url_fragment(&reader, &out->fragment));
 
-  return AZ_ERROR_NOT_IMPLEMENTED;
+  {
+    az_result_byte const c = az_span_reader_current(&reader);
+    if (c != AZ_ERROR_EOF) {
+      AZ_RETURN_IF_FAILED(c);
+      return az_error_unexpected_char(c);
+    }
+  }
+
+  return AZ_OK;
 }
 
 AZ_NODISCARD az_result az_host_read_domain(az_span * const host, az_span * const domain) {
