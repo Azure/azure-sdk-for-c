@@ -22,7 +22,7 @@ typedef struct {
  */
 typedef struct {
   az_span scheme;
-  az_url_authority autority;
+  az_url_authority authority;
   az_span path;
   az_span query;
   az_span fragment;
