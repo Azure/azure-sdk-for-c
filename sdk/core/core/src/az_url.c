@@ -20,12 +20,13 @@ az_span_reader_read_url_scheme(az_span_reader * const self, az_span * const out)
   while (true) {
     az_result_byte const c = az_span_reader_current(self);
     AZ_RETURN_IF_FAILED(c);
-    az_span_reader_next(self);
     if (c == ':') {
       *out = az_span_take(self->span, self->i);
+      az_span_reader_next(self);
       AZ_RETURN_IF_FAILED(az_span_reader_expect_span(self, AZ_STR("//")));
       return AZ_OK;
     }
+    az_span_reader_next(self);
   }
 }
 
@@ -38,6 +39,7 @@ az_span_reader_read_url_port(az_span_reader * const self, az_span * const port) 
     az_result const c = az_span_reader_current(self);
     if (c != ':') {
       *port = (az_span){ 0 };
+      return AZ_OK;
     }
     az_span_reader_next(self);
   }
@@ -105,14 +107,15 @@ az_span_reader_read_url_authority(az_span_reader * const self, az_url_authority 
  */
 AZ_NODISCARD az_result
 az_span_reader_read_url_path(az_span_reader* const self, az_span* const path) {
+  size_t const begin = self->i;
   {
     az_result const c = az_span_reader_current(self);
     if (c != '/') {
       *path = (az_span){ 0 };
+      return AZ_OK;
     }
     az_span_reader_next(self);
   }
-  size_t const begin = self->i;
   while (true) {
     az_result const c = az_span_reader_current(self);
     switch(c){ 
@@ -140,6 +143,7 @@ az_span_reader_read_url_query(az_span_reader * const self, az_span * const query
     az_result const c = az_span_reader_current(self);
     if (c != '?') {
       *query = (az_span){ 0 };
+      return AZ_OK;
     }
     az_span_reader_next(self);
   }
@@ -170,6 +174,7 @@ az_span_reader_read_url_fragment(az_span_reader * const self, az_span * const fr
     az_result const c = az_span_reader_current(self);
     if (c != '#') {
       *fragment = (az_span){ 0 };
+      return AZ_OK;
     }
     az_span_reader_next(self);
   }

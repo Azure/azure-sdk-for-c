@@ -1,0 +1,49 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// SPDX-License-Identifier: MIT
+
+#include "./az_test.h"
+
+#include <az_str.h>
+#include <az_url.h>
+
+#include <_az_cfg.h>
+
+void test_url_parse() {
+  {
+    az_url url = { 0 };
+    TEST_ASSERT(
+        az_url_parse(AZ_STR("https://someone@example.com:81/folder/folder?a=b&c=d#Header"), &url)
+        == AZ_OK);
+    TEST_ASSERT(az_span_eq(url.scheme, AZ_STR("https")));
+    TEST_ASSERT(az_span_eq(url.autority.userinfo, AZ_STR("someone")));
+    TEST_ASSERT(az_span_eq(url.autority.host, AZ_STR("example.com")));
+    TEST_ASSERT(az_span_eq(url.autority.port, AZ_STR("81")));
+    TEST_ASSERT(az_span_eq(url.path, AZ_STR("/folder/folder")));
+    TEST_ASSERT(az_span_eq(url.query, AZ_STR("a=b&c=d")));
+    TEST_ASSERT(az_span_eq(url.fragment, AZ_STR("Header")));
+  }
+  {
+    az_url url = { 0 };
+    TEST_ASSERT(
+        az_url_parse(AZ_STR("https://example.com.localhost?a=b"), &url)
+        == AZ_OK);
+    TEST_ASSERT(az_span_eq(url.scheme, AZ_STR("https")));
+    TEST_ASSERT(az_span_eq(url.autority.userinfo, AZ_STR("")));
+    TEST_ASSERT(az_span_eq(url.autority.host, AZ_STR("example.com.localhost")));
+    TEST_ASSERT(az_span_eq(url.autority.port, AZ_STR("")));
+    TEST_ASSERT(az_span_eq(url.path, AZ_STR("")));
+    TEST_ASSERT(az_span_eq(url.query, AZ_STR("a=b")));
+    TEST_ASSERT(az_span_eq(url.fragment, AZ_STR("")));
+  }
+  {
+    az_url url = { 0 };
+    TEST_ASSERT(az_url_parse(AZ_STR("https://sub-domain.example.com/someone#a=b"), &url) == AZ_OK);
+    TEST_ASSERT(az_span_eq(url.scheme, AZ_STR("https")));
+    TEST_ASSERT(az_span_eq(url.autority.userinfo, AZ_STR("")));
+    TEST_ASSERT(az_span_eq(url.autority.host, AZ_STR("sub-domain.example.com")));
+    TEST_ASSERT(az_span_eq(url.autority.port, AZ_STR("")));
+    TEST_ASSERT(az_span_eq(url.path, AZ_STR("/someone")));
+    TEST_ASSERT(az_span_eq(url.query, AZ_STR("")));
+    TEST_ASSERT(az_span_eq(url.fragment, AZ_STR("a=b")));
+  }
+}

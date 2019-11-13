@@ -57,7 +57,8 @@ add_executable (az_core_test
     test/main.c 
     test/test_json_string.c 
     test/test_json_pointer.c 
-    test/test_json_get_by_pointer.c)
+    test/test_json_get_by_pointer.c
+    test/test_url_parse.c)
 
 target_link_libraries(az_core_test PRIVATE az_core)
 
