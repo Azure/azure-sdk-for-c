@@ -8,11 +8,36 @@
 int exit_code = 0;
 
 int main() {
-  // Creates keyvault client and init it
+  // Creates keyvault client
   az_keyvault_keys_client client;
-  az_keyvault_keys_client_options options;
-  az_span uri = { 0 };
 
-  az_result operation_result = az_keyvault_keys_client_init(&client, uri, &options);
+  // create credentials for configuration
+  az_auth_credentials auth = { { 0 } };
+  // Get secrets from ENV
+  char * const TENANT_ID = getenv("tenant_id");
+  char * const CLIENT_ID = getenv("client_id");
+  char * const CLIENT_SECRET = getenv("client_secret");
+  // init auth_credentials struc
+  az_result const creds_retcode = az_auth_init_client_credentials(
+      &auth,
+      (az_span){ .begin = TENANT_ID, .size = strlen(TENANT_ID) },
+      (az_span){ .begin = CLIENT_ID, .size = strlen(CLIENT_ID) },
+      (az_span){ .begin = CLIENT_SECRET, .size = strlen(CLIENT_SECRET) });
+
+  // Create client options
+  az_keyvault_keys_client_options options = { .version = AZ_STR("7.0"), .auth = &auth };
+
+  // Init client
+  az_result operation_result = az_keyvault_keys_client_init(
+      &client, AZ_STR("https://antk-keyvault.vault.azure.net"), &options);
+
+  // Use client to get a key
+  uint8_t key[200];
+  const az_mut_span key_span = AZ_SPAN_FROM_ARRAY(key);
+  az_result get_key_result
+      = az_keyvault_keys_getKey(&client, AZ_STR("test-key"), AZ_KEY_VAULT_KEY, &key_span);
+
+  printf("response: %s", key);
+
   return exit_code;
 }

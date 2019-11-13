@@ -29,4 +29,8 @@ add_executable (az_keyvault_test test/main.c)
 
 target_link_libraries(az_keyvault_test PRIVATE az_keyvault)
 
+if (UNIX)
+  target_link_libraries(az_keyvault PRIVATE m)
+endif()
+
 add_test(NAME az_keyvault_test COMMAND az_keyvault_test)
