@@ -190,6 +190,27 @@ az_span_reader_read_url_fragment(az_span_reader * const self, az_span * const fr
   }
 }
 
+/**
+ * https://tools.ietf.org/html/rfc3986#section-3.2
+ */
+AZ_NODISCARD az_result
+az_span_reader_read_url_authority(az_span_reader * const self, az_url_authority * const out) {
+  AZ_CONTRACT_ARG_NOT_NULL(self);
+  AZ_CONTRACT_ARG_NOT_NULL(out);
+
+  size_t begin = self->i;
+  while (true) {
+    az_result_byte const c = az_span_reader_current(self);
+    switch (c) {
+      case AZ_ERROR_EOF: {
+      }
+      
+    }
+  }
+
+  return AZ_OK;
+}
+
 AZ_NODISCARD az_result az_url_parse(az_span const url, az_url * const out) {
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
