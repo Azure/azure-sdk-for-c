@@ -34,7 +34,7 @@ AZ_NODISCARD az_result az_url_parse(az_span const url, az_url * const out);
  * Read backwards (from right to left) from top-level domain (eg. `.com`) to the lowest subdomain
  * (eg. `www`).
  */
-AZ_NODISCARD az_result az_host_read_domain(az_span * const host, az_span * const subdomain);
+AZ_NODISCARD az_result az_host_read_domain(az_span * const host, az_span * const domain);
 
 #include <_az_cfg_suffix.h>
 
