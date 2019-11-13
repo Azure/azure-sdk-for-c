@@ -19,6 +19,14 @@
             "target": "./Debug/sdk/core/core/az_core_test",
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "build"
+        },
+        {
+            "name": "KeyVault",
+            "type": "gdb",
+            "request": "launch",
+            "target": "./Debug/sdk/keyvault/keyvault/az_keyvault_test",
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "build"
         }
     ]
 }
