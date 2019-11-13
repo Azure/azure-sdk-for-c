@@ -17,6 +17,17 @@ void test_url_parse() {
     TEST_ASSERT(az_span_eq(url.scheme, AZ_STR("https")));
     TEST_ASSERT(az_span_eq(url.autority.userinfo, AZ_STR("someone")));
     TEST_ASSERT(az_span_eq(url.autority.host, AZ_STR("example.com")));
+    { 
+      az_span host = url.autority.host;
+      az_span domain = { 0 };
+      TEST_ASSERT(az_host_read_domain(&host, &domain) == AZ_OK);
+      TEST_ASSERT(az_span_eq(domain, AZ_STR("com")));
+      TEST_ASSERT(az_span_eq(host, AZ_STR("example")));
+      TEST_ASSERT(az_host_read_domain(&host, &domain) == AZ_OK);
+      TEST_ASSERT(az_span_eq(domain, AZ_STR("example")));
+      TEST_ASSERT(az_span_eq(host, AZ_STR("")));
+      TEST_ASSERT(az_host_read_domain(&host, &domain) == AZ_ERROR_ITEM_NOT_FOUND);
+    }
     TEST_ASSERT(az_span_eq(url.autority.port, AZ_STR("81")));
     TEST_ASSERT(az_span_eq(url.path, AZ_STR("/folder/folder")));
     TEST_ASSERT(az_span_eq(url.query, AZ_STR("a=b&c=d")));
@@ -24,9 +35,7 @@ void test_url_parse() {
   }
   {
     az_url url = { 0 };
-    TEST_ASSERT(
-        az_url_parse(AZ_STR("https://example.com.localhost?a=b"), &url)
-        == AZ_OK);
+    TEST_ASSERT(az_url_parse(AZ_STR("https://example.com.localhost?a=b"), &url) == AZ_OK);
     TEST_ASSERT(az_span_eq(url.scheme, AZ_STR("https")));
     TEST_ASSERT(az_span_eq(url.autority.userinfo, AZ_STR("")));
     TEST_ASSERT(az_span_eq(url.autority.host, AZ_STR("example.com.localhost")));

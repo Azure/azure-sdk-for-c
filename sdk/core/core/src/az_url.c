@@ -216,5 +216,21 @@ AZ_NODISCARD az_result az_host_read_domain(az_span * const host, az_span * const
   AZ_CONTRACT_ARG_NOT_NULL(host);
   AZ_CONTRACT_ARG_NOT_NULL(domain);
 
-  return AZ_ERROR_NOT_IMPLEMENTED;
+  size_t const size = host->size;
+  if (size == 0) {
+    return AZ_ERROR_ITEM_NOT_FOUND;
+  }
+  size_t i = size - 1;
+  do {
+    az_result_byte const c = az_span_get(*host, i);
+    if (c == '.') {
+      *domain = az_span_sub(*host, i + 1, size);
+      host->size = i;
+      return AZ_OK;
+    }
+    --i;
+  } while (0 < i);
+  *domain = *host;
+  *host = (az_span){ 0 };
+  return AZ_OK;
 }
