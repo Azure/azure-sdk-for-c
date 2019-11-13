@@ -63,9 +63,7 @@ target_link_libraries(az_core_test PRIVATE az_core)
 
 # curl easy perform POC
 add_executable (curl_easy_perform_poc test/curl_easy_perform_poc.c)
-target_link_libraries(curl_easy_perform_poc PRIVATE 
-  az_core 
-  CURL::libcurl)
+target_link_libraries(curl_easy_perform_poc PRIVATE az_core)
 
 target_link_libraries(az_core PRIVATE CURL::libcurl)
 
