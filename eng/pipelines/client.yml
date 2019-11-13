@@ -22,4 +22,4 @@ pr:
       - eng/
 
 jobs:
-  - template: ./jobs/archetype-sdk-client.yml
+  - template: ./templates/jobs/archetype-sdk-client.yml
