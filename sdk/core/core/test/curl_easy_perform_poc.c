@@ -36,11 +36,15 @@ int main() {
   az_mut_span const http_buf_response = AZ_SPAN_FROM_ARRAY(buf_response);
 
   az_auth_credentials creds = { { 0 } };
+  uint8_t const * TENANT_ID = getenv("tenant_id");
+  uint8_t const * CLIENT_ID = getenv("client_id");
+  uint8_t const * CLIENT_SECRET = getenv("client_secret");
+
   az_result const creds_retcode = az_auth_init_client_credentials(
       &creds,
-      AZ_STR("72f988bf-86f1-41af-91ab-2d7cd011db47"),
-      AZ_STR("4317a660-6bfb-4585-9ce9-8f222314879c"),
-      AZ_STR("O2CT[Y:dkTqblml5V/T]ZEi9x1W1zoBW"));
+      (az_span){ .begin = TENANT_ID, .size = strlen(TENANT_ID) },
+      (az_span){ .begin = CLIENT_ID, .size = strlen(CLIENT_ID) },
+      (az_span){ .begin = CLIENT_SECRET, .size = strlen(CLIENT_SECRET) });
 
   if (!az_succeeded(creds_retcode)) {
     printf("Error initializing credentials\n");
