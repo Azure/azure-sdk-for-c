@@ -196,7 +196,7 @@ AZ_NODISCARD az_result az_url_parse(az_span const url, az_url * const out) {
   az_span_reader reader = az_span_reader_create(url);
 
   AZ_RETURN_IF_FAILED(az_span_reader_read_url_scheme(&reader, &out->scheme));
-  AZ_RETURN_IF_FAILED(az_span_reader_read_url_authority(&reader, &out->autority));
+  AZ_RETURN_IF_FAILED(az_span_reader_read_url_authority(&reader, &out->authority));
   AZ_RETURN_IF_FAILED(az_span_reader_read_url_path(&reader, &out->path));
   AZ_RETURN_IF_FAILED(az_span_reader_read_url_query(&reader, &out->query));
   AZ_RETURN_IF_FAILED(az_span_reader_read_url_fragment(&reader, &out->fragment));
