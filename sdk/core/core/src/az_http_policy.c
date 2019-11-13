@@ -75,13 +75,8 @@ az_auth_get_resource_url(az_span const request_url, az_span_builder * p_builder)
   az_span domains[3] = { 0 };
   size_t const ndomains = sizeof(domains) / sizeof(domains[0]);
   for (size_t i = 0; i < ndomains; ++i) {
-    if (!az_succeeded(az_dns_read_domain(&url.hier_part.authority, &domains[i]))) {
-      return AZ_ERROR_ARG; // if there's going to be less than 3 domain name levels (we need 3; at
-                           // least, currently), az_dns_read_domain is going to exit with "no more
-                           // items" error. Speaking of future extensibility, there theoretically
-                           // cases when we would need 2 or 4 levels, and all that can be done
-                           // depending on the service/url and/or policy, and it is easy to achieve
-                           // when there's such a parser providing all these abstractions.
+    if (!az_succeeded(az_host_read_domain(&url.authority.host, &domains[i]))) {
+      return AZ_ERROR_ARG;
     }
   }
 
