@@ -80,7 +80,8 @@ int main() {
   az_span_builder builder = az_span_builder_create(temp_buf);
   TEST_EXPECT_SUCCESS(az_span_builder_append(&builder, AZ_STR("Bearer ")));
   TEST_EXPECT_SUCCESS(az_span_builder_append(&builder, auth_token));
-  TEST_EXPECT_SUCCESS(az_span_builder_append_byte(&builder, 0)); // add a 0 so it can be printed and used by Curl
+  TEST_EXPECT_SUCCESS(
+      az_span_builder_append_byte(&builder, 0)); // add a 0 so it can be printed and used by Curl
 
   // add auth Header with parsed auth_token
   az_result const add_header_result = az_http_request_builder_append_header(
