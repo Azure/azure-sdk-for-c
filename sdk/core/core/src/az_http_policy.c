@@ -10,6 +10,7 @@
 #include <az_span.h>
 #include <az_span_builder.h>
 #include <az_str.h>
+#include <az_url.h>
 
 #include <_az_cfg.h>
 
@@ -66,63 +67,34 @@ enum { AZ_HTTP_POLICY_AUTH_BUFFER_SIZE = 2 * 1024 };
 
 static AZ_NODISCARD az_result
 az_auth_get_resource_url(az_span const request_url, az_span_builder * p_builder) {
-  size_t scheme_size = 0;
+  az_url url = { 0 };
+  if (!az_succeeded(az_url_parse(request_url, &url))) {
+    return AZ_ERROR_ARG; // Transform whatever the error parser gives us into an argument error
+  }
 
-  uint8_t const * url = request_url.begin;
-  size_t const url_size = request_url.size;
-  for (size_t i = 0; i < url_size; ++i) {
-    if (url[i] == ':' && (i < url_size + 2) && url[i + 1] == '/' && url[i + 2] == '/') {
-      scheme_size = i + 3;
-      break;
+  az_span domains[3] = { 0 };
+  size_t const ndomains = sizeof(domains) / sizeof(domains[0]);
+  for (size_t i = 0; i < ndomains; ++i) {
+    if (!az_succeeded(az_host_read_domain(&url.authority.host, &domains[i]))) {
+      return AZ_ERROR_ARG;
     }
   }
 
-  if (scheme_size == 0) {
-    return AZ_ERROR_ARG;
+  // Add "https://"
+  AZ_RETURN_IF_FAILED(az_span_builder_append(p_builder, url.scheme));
+  AZ_RETURN_IF_FAILED(az_span_builder_append(p_builder, AZ_STR("://")));
+
+  // We need to iterate in backwards order, because az_dns_read_domain() is going to give us domains
+  // in reverse order, i.e. "net, azure, vault" for "vault.azure.net"
+  for (size_t i = ndomains; i > 1;) { // This loop would add "vault.azure."
+    --i;
+    AZ_RETURN_IF_FAILED(az_span_builder_append(p_builder, domains[i]));
+    AZ_RETURN_IF_FAILED(az_span_builder_append(p_builder, AZ_STR(".")));
   }
 
-  size_t host_size = url_size - scheme_size;
-  for (size_t i = scheme_size; i < url_size; ++i) {
-    if (url[i] == '/') {
-      host_size = i - scheme_size;
-      break;
-    }
-  }
-
-  if (host_size == 0) {
-    return AZ_ERROR_ARG;
-  }
-
-  size_t lvl3domain_size = 0;
-  {
-    uint8_t dot = 0;
-    for (size_t i = scheme_size + host_size; i >= scheme_size; --i) {
-      if (url[i] == '.') {
-        ++dot;
-      }
-
-      if (dot == 3) {
-        lvl3domain_size = host_size - ((i + 1) - scheme_size);
-        break;
-      }
-    }
-
-    if (dot == 2) {
-      lvl3domain_size = host_size;
-    }
-  }
-
-  if (lvl3domain_size == 0) {
-    return AZ_ERROR_ARG;
-  }
-
-  AZ_RETURN_IF_FAILED(
-      az_span_builder_append(p_builder, (az_span){ .begin = url, .size = scheme_size }));
-
-  AZ_RETURN_IF_FAILED(az_span_builder_append(
-      p_builder,
-      (az_span){ .begin = url + scheme_size + host_size - lvl3domain_size,
-                 .size = lvl3domain_size }));
+  // We have to do this out of the loop so that we won't append an extra "." at the end.
+  // So this expression is going to add the final "net" to an existing "https://vault.azure."
+  AZ_RETURN_IF_FAILED(az_span_builder_append(p_builder, domains[0]));
 
   return AZ_OK;
 }

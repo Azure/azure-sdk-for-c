@@ -35,7 +35,7 @@ az_span_reader_read_url_scheme(az_span_reader * const self, az_span * const out)
  */
 AZ_NODISCARD az_result
 az_span_reader_read_url_port(az_span_reader * const self, az_span * const port) {
-  { 
+  {
     az_result const c = az_span_reader_current(self);
     if (c != ':') {
       *port = (az_span){ 0 };
@@ -106,7 +106,7 @@ az_span_reader_read_url_authority(az_span_reader * const self, az_url_authority 
  * https://tools.ietf.org/html/rfc3986#section-3.3
  */
 AZ_NODISCARD az_result
-az_span_reader_read_url_path(az_span_reader* const self, az_span* const path) {
+az_span_reader_read_url_path(az_span_reader * const self, az_span * const path) {
   size_t const begin = self->i;
   {
     az_result const c = az_span_reader_current(self);
@@ -118,7 +118,7 @@ az_span_reader_read_url_path(az_span_reader* const self, az_span* const path) {
   }
   while (true) {
     az_result_byte const c = az_span_reader_current(self);
-    switch(c){ 
+    switch (c) {
       case AZ_ERROR_EOF:
       case '?':
       case '#': {
