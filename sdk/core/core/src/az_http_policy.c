@@ -22,7 +22,7 @@ AZ_NODISCARD AZ_INLINE az_result az_http_pipeline_nextpolicy(
     return AZ_ERROR_HTTP_PIPELINE_INVALID_POLICY;
   }
 
-  return p_policies[0].pfnc_process(&(p_policies[1]), hrb, response);
+  return p_policies[0].pfnc_process(p_policies + 1, hrb, response);
 }
 
 static az_span const AZ_MS_CLIENT_REQUESTID = AZ_CONST_STR("x-ms-client-request-id");

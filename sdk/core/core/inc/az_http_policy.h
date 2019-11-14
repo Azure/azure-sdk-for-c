@@ -40,7 +40,6 @@ typedef AZ_NODISCARD az_result (*az_http_policy_pfnc_process)(
 
 struct az_http_policy {
   az_http_policy_pfnc_process pfnc_process;
-  az_http_policy_data data;
 };
 
 AZ_NODISCARD az_result az_http_pipeline_policy_uniquerequestid(
