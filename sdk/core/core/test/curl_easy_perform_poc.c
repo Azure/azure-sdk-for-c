@@ -29,11 +29,11 @@ int main() {
   // create a buffer for request
   uint8_t buf[1024 * 4];
   az_mut_span const http_buf = AZ_SPAN_FROM_ARRAY(buf);
-  az_http_request_builder hrb;
 
   // response buffer
   uint8_t buf_response[1024 * 4];
-  az_mut_span const http_buf_response = AZ_SPAN_FROM_ARRAY(buf_response);
+
+  az_http_policy_arg arg = { .response = AZ_SPAN_FROM_ARRAY(buf_response) };
 
   az_auth_credentials creds = { { 0 } };
   az_result const creds_retcode = az_auth_init_client_credentials(
@@ -49,7 +49,7 @@ int main() {
 
   az_span auth_token = { 0 };
   az_result const token_retcode
-      = az_auth_get_token(creds, AZ_STR("https://vault.azure.net"), http_buf_response, &auth_token);
+      = az_auth_get_token(creds, AZ_STR("https://vault.azure.net"), arg.response, &auth_token);
 
   if (az_failed(token_retcode)) {
     printf("Error while getting auth token\n");
@@ -57,15 +57,15 @@ int main() {
   }
 
   // create request for keyVault
-  az_result build_result
-      = az_http_request_builder_init(&hrb, http_buf, 100, AZ_HTTP_METHOD_VERB_GET, KEY_VAULT_URL);
+  az_result build_result = az_http_request_builder_init(
+      &arg.builder, http_buf, 100, AZ_HTTP_METHOD_VERB_GET, KEY_VAULT_URL);
   if (az_failed(build_result)) {
     return build_result;
   }
 
   // add query param
   az_result add_query_result = az_http_request_builder_set_query_parameter(
-      &hrb, API_VERSION_QUERY_NAME, API_VERSION_QUERY_VALUE);
+      &arg.builder, API_VERSION_QUERY_NAME, API_VERSION_QUERY_VALUE);
   if (az_failed(add_query_result)) {
     return add_query_result;
   }
@@ -85,16 +85,16 @@ int main() {
 
   // add auth Header with parsed auth_token
   az_result const add_header_result = az_http_request_builder_append_header(
-      &hrb, AZ_STR("authorization"), az_mut_span_to_span(temp_buf));
+      &arg.builder, AZ_STR("authorization"), az_mut_span_to_span(temp_buf));
   if (az_failed(add_header_result)) {
     return add_header_result;
   }
 
   // *************************launch pipeline
-  az_result const get_response = az_http_pipeline_process(&hrb, &http_buf_response);
+  az_result const get_response = az_http_pipeline_process(&arg);
 
   if (az_succeeded(get_response)) {
-    printf("Response is: \n%s", http_buf_response.begin);
+    printf("Response is: \n%s", arg.response.begin);
   } else {
     printf("Error during running test\n");
   }
