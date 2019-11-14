@@ -117,7 +117,7 @@ az_span_reader_read_url_path(az_span_reader* const self, az_span* const path) {
     az_span_reader_next(self);
   }
   while (true) {
-    az_result const c = az_span_reader_current(self);
+    az_result_byte const c = az_span_reader_current(self);
     switch(c){ 
       case AZ_ERROR_EOF:
       case '?':
@@ -149,7 +149,7 @@ az_span_reader_read_url_query(az_span_reader * const self, az_span * const query
   }
   size_t const begin = self->i;
   while (true) {
-    az_result const c = az_span_reader_current(self);
+    az_result_byte const c = az_span_reader_current(self);
     switch (c) {
       case AZ_ERROR_EOF:
       case '#': {
