@@ -89,7 +89,7 @@ AZ_NODISCARD az_result az_auth_get_token(
     size_t required_request_size
         = auth_url1.size + auth_url2.size + auth_body1.size + auth_body2.size + auth_body3.size;
 
-    for (size_t i = 0; i < (sizeof(request_elements) / sizeof(request_elements[0])); ++i) {
+    for (size_t i = 0; i < AZ_ARRAY_SIZE(request_elements); ++i) {
       required_request_size += request_elements[i];
       AZ_CONTRACT(required_request_size > request_elements[i], AZ_ERROR_BUFFER_OVERFLOW);
     }
