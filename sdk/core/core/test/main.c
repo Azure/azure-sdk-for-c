@@ -25,6 +25,7 @@
 void test_json_get_by_pointer();
 void test_json_pointer();
 void test_json_string();
+void test_url_parse();
 
 int exit_code = 0;
 
@@ -732,5 +733,6 @@ int main() {
   test_json_pointer();
   test_json_string();
   test_json_get_by_pointer();
+  test_url_parse();
   return exit_code;
 }
