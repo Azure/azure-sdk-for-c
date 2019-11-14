@@ -17,7 +17,7 @@ void test_url_parse() {
     TEST_ASSERT(az_span_eq(url.scheme, AZ_STR("https")));
     TEST_ASSERT(az_span_eq(url.authority.userinfo, AZ_STR("someone")));
     TEST_ASSERT(az_span_eq(url.authority.host, AZ_STR("example.com")));
-    { 
+    {
       az_span host = url.authority.host;
       az_span domain = { 0 };
       TEST_ASSERT(az_host_read_domain(&host, &domain) == AZ_OK);
