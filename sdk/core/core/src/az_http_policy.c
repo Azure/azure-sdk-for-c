@@ -80,7 +80,7 @@ az_auth_get_resource_url(az_span const request_url, az_span_builder * p_builder)
   }
 
   az_span domains[3] = { 0 };
-  size_t const ndomains = sizeof(domains) / sizeof(domains[0]);
+  size_t const ndomains = AZ_ARRAY_SIZE(domains);
   for (size_t i = 0; i < ndomains; ++i) {
     if (!az_succeeded(az_host_read_domain(&url.authority.host, &domains[i]))) {
       return AZ_ERROR_ARG;
