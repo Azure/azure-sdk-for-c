@@ -1,9 +1,16 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include <az_auth.h>
 #include <az_http_client.h>
 #include <az_http_pipeline.h>
 #include <az_http_policy.h>
+#include <az_http_request_builder.h>
+#include <az_mut_span.h>
+#include <az_span.h>
+#include <az_span_builder.h>
+#include <az_str.h>
+#include <az_url.h>
 
 #include <_az_cfg.h>
 
@@ -47,6 +54,42 @@ az_http_pipeline_policy_retry(az_http_policy * const p_policies, az_http_policy_
   AZ_CONTRACT_ARG_NOT_NULL(arg);
   // Retry logic
   return az_http_pipeline_nextpolicy(p_policies, arg);
+}
+
+enum { AZ_HTTP_POLICY_AUTH_BUFFER_SIZE = 2 * 1024 };
+
+// Being given
+// "https://NNNNNNNN.vault.azure.net/secrets/Password/XXXXXXXXXXXXXXXXXXXX?api-version=7.0", gives
+// back "https://vault.azure.net" (needed for authentication).
+static AZ_NODISCARD az_result
+az_auth_get_resource_url(az_span const request_url, az_span_builder * p_builder) {
+  az_url url = { 0 };
+  if (!az_succeeded(az_url_parse(request_url, &url))) {
+    return AZ_ERROR_ARG;
+  }
+
+  az_span domains[3] = { 0 };
+  size_t const ndomains = AZ_ARRAY_SIZE(domains);
+  for (size_t i = 0; i < ndomains; ++i) {
+    if (!az_succeeded(az_host_read_domain(&url.authority.host, &domains[(ndomains - 1) - i]))) {
+      return AZ_ERROR_ARG;
+    }
+  }
+
+  // Add "https://"
+  AZ_RETURN_IF_FAILED(az_span_builder_append(p_builder, url.scheme));
+  AZ_RETURN_IF_FAILED(az_span_builder_append(p_builder, AZ_STR("://")));
+
+  for (size_t i = 0; i < (ndomains - 1); ++i) { // This loop would add "vault.azure."
+    AZ_RETURN_IF_FAILED(az_span_builder_append(p_builder, domains[i]));
+    AZ_RETURN_IF_FAILED(az_span_builder_append(p_builder, AZ_STR(".")));
+  }
+
+  // We have to do this out of the loop so that we won't append an extra "." at the end.
+  // So this expression is going to add the final "net" to an existing "https://vault.azure."
+  AZ_RETURN_IF_FAILED(az_span_builder_append(p_builder, domains[ndomains - 1]));
+
+  return AZ_OK;
 }
 
 AZ_NODISCARD az_result az_http_pipeline_policy_authentication(
