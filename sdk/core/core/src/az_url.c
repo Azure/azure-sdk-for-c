@@ -35,7 +35,7 @@ az_span_reader_read_url_scheme(az_span_reader * const self, az_span * const out)
  */
 AZ_NODISCARD az_result
 az_span_reader_read_url_port(az_span_reader * const self, az_span * const port) {
-  { 
+  {
     az_result const c = az_span_reader_current(self);
     if (c != ':') {
       *port = (az_span){ 0 };
@@ -106,7 +106,7 @@ az_span_reader_read_url_authority(az_span_reader * const self, az_url_authority 
  * https://tools.ietf.org/html/rfc3986#section-3.3
  */
 AZ_NODISCARD az_result
-az_span_reader_read_url_path(az_span_reader* const self, az_span* const path) {
+az_span_reader_read_url_path(az_span_reader * const self, az_span * const path) {
   size_t const begin = self->i;
   {
     az_result const c = az_span_reader_current(self);
@@ -118,7 +118,7 @@ az_span_reader_read_url_path(az_span_reader* const self, az_span* const path) {
   }
   while (true) {
     az_result_byte const c = az_span_reader_current(self);
-    switch(c){ 
+    switch (c) {
       case AZ_ERROR_EOF:
       case '?':
       case '#': {
@@ -188,64 +188,6 @@ az_span_reader_read_url_fragment(az_span_reader * const self, az_span * const fr
     AZ_RETURN_IF_FAILED(c);
     az_span_reader_next(self);
   }
-}
-
-/**
- * https://tools.ietf.org/html/rfc3986#section-3.2
- *
- * authority   = [ userinfo "@" ] host [ ":" port ]
- */
-AZ_NODISCARD az_result
-az_span_reader_read_url_authority(az_span_reader * const self, az_url_authority * const out) {
-  AZ_CONTRACT_ARG_NOT_NULL(self);
-  AZ_CONTRACT_ARG_NOT_NULL(out);
-
-  bool has_userinfo = false;
-  *out = (az_url_authority){ 0 };
-  size_t begin = self->i;
-  while (true) {
-    az_result_byte c = az_span_reader_current(self);
-    AZ_RETURN_IF_FAILED(c);
-    switch (c) {
-      case '@': {
-        if (has_userinfo) {
-          return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
-        }
-        has_userinfo = true;
-        out->userinfo = az_span_sub(self->span, begin, self->i);
-        az_span_reader_next(self);
-        begin = self->i;
-        break;
-      }
-      case AZ_ERROR_EOF:
-      case '?':
-      case '/':
-      case '#': {
-        out->host = az_span_sub(self->span, begin, self->i);
-        return AZ_OK;
-      }
-      case ':': {
-        out->host = az_span_sub(self->span, begin, self->i);
-        az_span_reader_next(self);
-        begin = self->i;
-        while (true) {
-          c = az_span_reader_current(self);
-          if (!isdigit(c)) {
-            break;
-          }
-          az_span_reader_next(self);
-        }
-        out->port = az_span_sub(self->span, begin, self->i);
-        return AZ_OK;
-      }
-      default: {
-        az_span_reader_next(self);
-        break;
-      }
-    }
-  }
-
-  return AZ_OK;
 }
 
 AZ_NODISCARD az_result az_url_parse(az_span const url, az_url * const out) {
