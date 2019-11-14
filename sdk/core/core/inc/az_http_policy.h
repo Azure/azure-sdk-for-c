@@ -29,10 +29,8 @@ typedef struct az_http_policy az_http_policy;
 
 // PipelinePolicies must implement the process function
 //
-typedef AZ_NODISCARD az_result (*az_http_policy_pfnc_process)(
-    az_http_policy * policies,
-    az_http_request_builder * hrb,
-    az_mut_span const * const response);
+typedef AZ_NODISCARD az_result (
+    *az_http_policy_pfnc_process)(az_http_policy * policies, az_http_policy_arg * arg);
 
 struct az_http_policy {
   az_http_policy_pfnc_process pfnc_process;
@@ -40,38 +38,28 @@ struct az_http_policy {
 
 AZ_NODISCARD az_result az_http_pipeline_policy_uniquerequestid(
     az_http_policy * const policies,
-    az_http_request_builder * const hrb,
-    az_mut_span const * const response);
+    az_http_policy_arg * const arg);
 
-AZ_NODISCARD az_result az_http_pipeline_policy_retry(
-    az_http_policy * const policies,
-    az_http_request_builder * const hrb,
-    az_mut_span const * const response);
+AZ_NODISCARD az_result
+az_http_pipeline_policy_retry(az_http_policy * const policies, az_http_policy_arg * const arg);
 
 AZ_NODISCARD az_result az_http_pipeline_policy_authentication(
     az_http_policy * const policies,
-    az_http_request_builder * const hrb,
-    az_mut_span const * const response);
+    az_http_policy_arg * const arg);
 
-AZ_NODISCARD az_result az_http_pipeline_policy_logging(
-    az_http_policy * const policies,
-    az_http_request_builder * const hrb,
-    az_mut_span const * const response);
+AZ_NODISCARD az_result
+az_http_pipeline_policy_logging(az_http_policy * const policies, az_http_policy_arg * const arg);
 
 AZ_NODISCARD az_result az_http_pipeline_policy_bufferresponse(
     az_http_policy * const policies,
-    az_http_request_builder * const hrb,
-    az_mut_span const * const response);
+    az_http_policy_arg * const arg);
 
 AZ_NODISCARD az_result az_http_pipeline_policy_distributedtracing(
     az_http_policy * const policies,
-    az_http_request_builder * const hrb,
-    az_mut_span const * const response);
+    az_http_policy_arg * const arg);
 
-AZ_NODISCARD az_result az_http_pipeline_policy_transport(
-    az_http_policy * const policies,
-    az_http_request_builder * const hrb,
-    az_mut_span const * const response);
+AZ_NODISCARD az_result
+az_http_pipeline_policy_transport(az_http_policy * const policies, az_http_policy_arg * const arg);
 
 #include <_az_cfg_suffix.h>
 

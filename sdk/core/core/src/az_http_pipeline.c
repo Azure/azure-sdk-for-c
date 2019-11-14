@@ -18,9 +18,8 @@ az_http_policy pipeline[] = {
 };
 
 AZ_NODISCARD az_result
-az_http_pipeline_process(az_http_request_builder * const hrb, const az_mut_span * const response) {
-  AZ_CONTRACT_ARG_NOT_NULL(hrb);
-  AZ_CONTRACT_ARG_NOT_NULL(response);
+az_http_pipeline_process(az_http_policy_arg * const arg) {
+  AZ_CONTRACT_ARG_NOT_NULL(arg);
 
-  return pipeline[0].pfnc_process(pipeline + 1, hrb, response);
+  return pipeline->pfnc_process(pipeline + 1, arg);
 }
