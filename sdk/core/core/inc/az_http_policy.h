@@ -27,10 +27,6 @@
 
 typedef struct az_http_policy az_http_policy;
 
-typedef struct {
-  az_span data;
-} az_http_policy_data;
-
 // PipelinePolicies must implement the process function
 //
 typedef AZ_NODISCARD az_result (*az_http_policy_pfnc_process)(
