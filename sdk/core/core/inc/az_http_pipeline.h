@@ -11,11 +11,23 @@
 
 #include <_az_cfg_prefix.h>
 
+typedef struct {
+  az_http_policy uniquerequestid;
+  az_http_policy retry;
+  az_http_policy authentication;
+  az_http_policy logging;
+  az_http_policy bufferresponse;
+  az_http_policy distributedtracing;
+  az_http_policy transport;
+} az_http_policies;
+
+AZ_NODISCARD az_result az_http_policies_init(az_http_policies * const self);
+
 // Start the pipeline
 AZ_NODISCARD az_result az_http_pipeline_process(
     az_http_request_builder * const hrb,
     az_mut_span const * const response,
-    az_http_policy_data * const policy_data);
+    az_http_policies const * const policies);
 
 #include <_az_cfg_suffix.h>
 #endif

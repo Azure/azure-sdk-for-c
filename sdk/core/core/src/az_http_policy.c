@@ -29,15 +29,17 @@ AZ_NODISCARD AZ_INLINE az_result az_http_pipeline_nextpolicy(
     return AZ_ERROR_HTTP_PIPELINE_INVALID_POLICY;
   }
 
-  return p_policies[0].pfnc_process(&(p_policies[1]), hrb, response);
+  return p_policies[0].pfnc_process(&(p_policies[1]), p_policies[0].data, hrb, response);
 }
 
 static az_span const AZ_MS_CLIENT_REQUESTID = AZ_CONST_STR("x-ms-client-request-id");
 
 AZ_NODISCARD az_result az_http_pipeline_policy_uniquerequestid(
     az_http_policy * const p_policies,
+    void * const data,
     az_http_request_builder * const hrb,
     az_mut_span const * const response) {
+  (void)data;
   AZ_CONTRACT_ARG_NOT_NULL(p_policies);
   AZ_CONTRACT_ARG_NOT_NULL(hrb);
   AZ_CONTRACT_ARG_NOT_NULL(response);
@@ -54,8 +56,10 @@ AZ_NODISCARD az_result az_http_pipeline_policy_uniquerequestid(
 
 AZ_NODISCARD az_result az_http_pipeline_policy_retry(
     az_http_policy * const p_policies,
+    void * const data,
     az_http_request_builder * const hrb,
     az_mut_span const * const response) {
+  (void)data;
   AZ_CONTRACT_ARG_NOT_NULL(p_policies);
   AZ_CONTRACT_ARG_NOT_NULL(hrb);
   AZ_CONTRACT_ARG_NOT_NULL(response);
@@ -65,11 +69,14 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
 
 enum { AZ_HTTP_POLICY_AUTH_BUFFER_SIZE = 2 * 1024 };
 
+// Being given
+// "https://NNNNNNNN.vault.azure.net/secrets/Password/XXXXXXXXXXXXXXXXXXXX?api-version=7.0", gives
+// back "https://vault.azure.net" (needed for authentication).
 static AZ_NODISCARD az_result
 az_auth_get_resource_url(az_span const request_url, az_span_builder * p_builder) {
   az_url url = { 0 };
   if (!az_succeeded(az_url_parse(request_url, &url))) {
-    return AZ_ERROR_ARG; // Transform whatever the error parser gives us into an argument error
+    return AZ_ERROR_ARG;
   }
 
   az_span domains[3] = { 0 };
@@ -101,13 +108,15 @@ az_auth_get_resource_url(az_span const request_url, az_span_builder * p_builder)
 
 AZ_NODISCARD az_result az_http_pipeline_policy_authentication(
     az_http_policy * const p_policies,
+    void * const data,
     az_http_request_builder * const hrb,
     az_mut_span const * const response) {
   AZ_CONTRACT_ARG_NOT_NULL(p_policies);
   AZ_CONTRACT_ARG_NOT_NULL(hrb);
   AZ_CONTRACT_ARG_NOT_NULL(response);
 
-  if (p_policies->data.credentials.kind == AZ_AUTH_KIND_NONE) {
+  az_auth_credentials const * const credentials = (az_auth_credentials const *)(data);
+  if (credentials == NULL || credentials->kind == AZ_AUTH_KIND_NONE) {
     return az_http_pipeline_nextpolicy(p_policies, hrb, response);
   }
 
@@ -124,10 +133,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_authentication(
 
   az_span token = { 0 };
   AZ_RETURN_IF_FAILED(az_auth_get_token(
-      p_policies->data.credentials,
-      auth_url,
-      az_mut_span_drop(post_bearer, auth_url.size),
-      &token));
+      *credentials, auth_url, az_mut_span_drop(post_bearer, auth_url.size), &token));
 
   az_mut_span unused;
   AZ_RETURN_IF_FAILED(az_mut_span_move(post_bearer, token, &unused));
@@ -142,8 +148,10 @@ AZ_NODISCARD az_result az_http_pipeline_policy_authentication(
 
 AZ_NODISCARD az_result az_http_pipeline_policy_logging(
     az_http_policy * const p_policies,
+    void * const data,
     az_http_request_builder * const hrb,
     az_mut_span const * const response) {
+  (void)data;
   AZ_CONTRACT_ARG_NOT_NULL(p_policies);
   AZ_CONTRACT_ARG_NOT_NULL(hrb);
   AZ_CONTRACT_ARG_NOT_NULL(response);
@@ -153,8 +161,10 @@ AZ_NODISCARD az_result az_http_pipeline_policy_logging(
 
 AZ_NODISCARD az_result az_http_pipeline_policy_bufferresponse(
     az_http_policy * const p_policies,
+    void * const data,
     az_http_request_builder * const hrb,
     az_mut_span const * const response) {
+  (void)data;
   AZ_CONTRACT_ARG_NOT_NULL(p_policies);
   AZ_CONTRACT_ARG_NOT_NULL(hrb);
   AZ_CONTRACT_ARG_NOT_NULL(response);
@@ -165,8 +175,10 @@ AZ_NODISCARD az_result az_http_pipeline_policy_bufferresponse(
 
 AZ_NODISCARD az_result az_http_pipeline_policy_distributedtracing(
     az_http_policy * const p_policies,
+    void * const data,
     az_http_request_builder * const hrb,
     az_mut_span const * const response) {
+  (void)data;
   AZ_CONTRACT_ARG_NOT_NULL(p_policies);
   AZ_CONTRACT_ARG_NOT_NULL(hrb);
   AZ_CONTRACT_ARG_NOT_NULL(response);
@@ -176,9 +188,10 @@ AZ_NODISCARD az_result az_http_pipeline_policy_distributedtracing(
 
 AZ_NODISCARD az_result az_http_pipeline_policy_transport(
     az_http_policy * const p_policies,
+    void * const data,
     az_http_request_builder * const hrb,
     az_mut_span const * const response) {
-
+  (void)data;
   AZ_CONTRACT_ARG_NOT_NULL(p_policies);
   AZ_CONTRACT_ARG_NOT_NULL(hrb);
   AZ_CONTRACT_ARG_NOT_NULL(response);
