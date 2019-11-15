@@ -116,7 +116,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_authentication(
   uint8_t buf[2 * 1024];
   az_mut_span const token_buf = AZ_SPAN_FROM_ARRAY(buf);
   az_auth_callback * const auth_callback = (az_auth_callback *)(data);
-  AZ_RETURN_IF_FAILED(auth_callback->action(auth_callback->data, token_buf, hrb));
+  AZ_RETURN_IF_FAILED(auth_callback->func(auth_callback->data, token_buf, hrb));
 
   return az_http_pipeline_nextpolicy(p_policies, hrb, response);
 }

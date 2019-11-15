@@ -233,7 +233,7 @@ AZ_NODISCARD az_result az_auth_init_client_credentials(
 
   *out_callback = (az_auth_callback){
     .data = out_data,
-    .action = az_auth_clent_credentials_add_token_header,
+    .func = az_auth_clent_credentials_add_token_header,
   };
 
   return AZ_OK;

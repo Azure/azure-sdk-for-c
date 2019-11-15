@@ -17,14 +17,14 @@ typedef struct {
   az_span client_secret;
 } az_auth_client_credentials;
 
-typedef AZ_NODISCARD az_result (*az_auth_apply)(
+typedef AZ_NODISCARD az_result (*az_auth_func)(
   void * const data,
   az_mut_span const buffer,
   az_http_request_builder * const hrb);
 
 typedef struct {
   void * data;
-  az_auth_apply action;
+  az_auth_func func;
 } az_auth_callback;
 
 AZ_NODISCARD az_result az_auth_init_client_credentials(
