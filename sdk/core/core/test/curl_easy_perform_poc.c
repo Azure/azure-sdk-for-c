@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_auth.h>
+#include <az_client_secret_credential.h>
 #include <az_http_request_builder.h>
 #include <az_http_response_parser.h>
 #include <az_pair.h>
@@ -47,11 +47,9 @@ int main() {
   }
 
   // Add auth
-  az_auth_callback auth_callback = { 0 };
-  az_auth_client_credentials credentials = { 0 };
-  az_result const creds_retcode = az_auth_init_client_credentials(
-      &auth_callback,
-      &credentials,
+  az_client_secret_credential credential = { 0 };
+  az_result const creds_retcode = az_client_secret_credential_init(
+      &credential,
       AZ_STR("72f988bf-86f1-41af-91ab-2d7cd011db47"),
       AZ_STR("4317a660-6bfb-4585-9ce9-8f222314879c"),
       AZ_STR("O2CT[Y:dkTqblml5V/T]ZEi9x1W1zoBW"));
@@ -68,7 +66,7 @@ int main() {
     return policies_retcode;
   }
 
-  policies.authentication.data = &auth_callback;
+  policies.authentication.data = &credential;
 
   // *************************launch pipeline
   az_result const get_response = az_http_pipeline_process(&hrb, &http_buf_response, &policies);

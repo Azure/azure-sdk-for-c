@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_auth.h>
+#include <az_client_secret_credential.h>
 
 #include <az_contract.h>
 #include <az_http_client.h>
@@ -24,25 +24,25 @@ enum {
 };
 
 static AZ_NODISCARD az_result az_auth_get_token(
-    az_auth_client_credentials const * const credentials,
+    az_client_secret_credential const * const credential,
     az_span const resource_url,
     az_mut_span const response_buf,
     az_span * const out_result) {
-  AZ_CONTRACT_ARG_NOT_NULL(credentials);
+  AZ_CONTRACT_ARG_NOT_NULL(credential);
   AZ_CONTRACT_ARG_NOT_NULL(out_result);
   AZ_CONTRACT_ARG_VALID_SPAN(resource_url);
 
   AZ_CONTRACT_ARG_VALID_MUT_SPAN(response_buf);
-  AZ_CONTRACT_ARG_VALID_SPAN(credentials->tenant_id);
+  AZ_CONTRACT_ARG_VALID_SPAN(credential->tenant_id);
 
-  AZ_CONTRACT_ARG_VALID_SPAN(credentials->client_id);
-  AZ_CONTRACT_ARG_VALID_SPAN(credentials->client_secret);
+  AZ_CONTRACT_ARG_VALID_SPAN(credential->client_id);
+  AZ_CONTRACT_ARG_VALID_SPAN(credential->client_secret);
 
   {
     AZ_CONTRACT(resource_url.size >= 12, AZ_ERROR_ARG);
-    AZ_CONTRACT(credentials->tenant_id.size >= 32, AZ_ERROR_ARG);
-    AZ_CONTRACT(credentials->client_id.size >= 32, AZ_ERROR_ARG);
-    AZ_CONTRACT(credentials->client_secret.size >= 32, AZ_ERROR_ARG);
+    AZ_CONTRACT(credential->tenant_id.size >= 32, AZ_ERROR_ARG);
+    AZ_CONTRACT(credential->client_id.size >= 32, AZ_ERROR_ARG);
+    AZ_CONTRACT(credential->client_secret.size >= 32, AZ_ERROR_ARG);
   }
 
   static az_span const auth_url1 = AZ_CONST_STR("https://login.microsoftonline.com/");
@@ -53,7 +53,7 @@ static AZ_NODISCARD az_result az_auth_get_token(
   static az_span const auth_body3 = AZ_CONST_STR("&resource=");
 
   size_t const auth_url_maxsize
-      = auth_url1.size + (credentials->tenant_id.size * AZ_AUTH_URLENCODE_FACTOR) + auth_url2.size;
+      = auth_url1.size + (credential->tenant_id.size * AZ_AUTH_URLENCODE_FACTOR) + auth_url2.size;
 
   AZ_CONTRACT(auth_url_maxsize <= (size_t) ~(uint16_t)0, AZ_ERROR_ARG);
 
@@ -61,9 +61,9 @@ static AZ_NODISCARD az_result az_auth_get_token(
     AZ_CONTRACT(response_buf.size >= AZ_AUTH_GET_TOKEN_MIN_BUFFER, AZ_ERROR_BUFFER_OVERFLOW);
 
     size_t const request_elements[] = {
-      credentials->tenant_id.size * AZ_AUTH_URLENCODE_FACTOR,
-      credentials->client_id.size * AZ_AUTH_URLENCODE_FACTOR,
-      credentials->client_secret.size * AZ_AUTH_URLENCODE_FACTOR,
+      credential->tenant_id.size * AZ_AUTH_URLENCODE_FACTOR,
+      credential->client_id.size * AZ_AUTH_URLENCODE_FACTOR,
+      credential->client_secret.size * AZ_AUTH_URLENCODE_FACTOR,
       resource_url.size * AZ_AUTH_URLENCODE_FACTOR,
       auth_url_maxsize,
     };
@@ -83,15 +83,15 @@ static AZ_NODISCARD az_result az_auth_get_token(
     AZ_CONTRACT(!az_span_is_overlap(az_mut_span_to_span(response_buf), resource_url), AZ_ERROR_ARG);
 
     AZ_CONTRACT(
-        !az_span_is_overlap(az_mut_span_to_span(response_buf), credentials->tenant_id),
+        !az_span_is_overlap(az_mut_span_to_span(response_buf), credential->tenant_id),
         AZ_ERROR_ARG);
 
     AZ_CONTRACT(
-        !az_span_is_overlap(az_mut_span_to_span(response_buf), credentials->client_id),
+        !az_span_is_overlap(az_mut_span_to_span(response_buf), credential->client_id),
         AZ_ERROR_ARG);
 
     AZ_CONTRACT(
-        !az_span_is_overlap(az_mut_span_to_span(response_buf), credentials->client_secret),
+        !az_span_is_overlap(az_mut_span_to_span(response_buf), credential->client_secret),
         AZ_ERROR_ARG);
   }
 
@@ -101,16 +101,16 @@ static AZ_NODISCARD az_result az_auth_get_token(
     az_span_builder builder = az_span_builder_create(response_buf);
 
     AZ_RETURN_IF_FAILED(az_span_builder_append(&builder, auth_url1));
-    AZ_RETURN_IF_FAILED(az_uri_encode(credentials->tenant_id, &builder));
+    AZ_RETURN_IF_FAILED(az_uri_encode(credential->tenant_id, &builder));
     AZ_RETURN_IF_FAILED(az_span_builder_append(&builder, auth_url2));
 
     auth_url = az_span_builder_result(&builder);
     builder = az_span_builder_create(az_mut_span_drop(response_buf, auth_url.size));
 
     AZ_RETURN_IF_FAILED(az_span_builder_append(&builder, auth_body1));
-    AZ_RETURN_IF_FAILED(az_uri_encode(credentials->client_id, &builder));
+    AZ_RETURN_IF_FAILED(az_uri_encode(credential->client_id, &builder));
     AZ_RETURN_IF_FAILED(az_span_builder_append(&builder, auth_body2));
-    AZ_RETURN_IF_FAILED(az_uri_encode(credentials->client_secret, &builder));
+    AZ_RETURN_IF_FAILED(az_uri_encode(credential->client_secret, &builder));
     AZ_RETURN_IF_FAILED(az_span_builder_append(&builder, auth_body3));
     AZ_RETURN_IF_FAILED(az_uri_encode(resource_url, &builder));
 
@@ -180,15 +180,15 @@ az_auth_get_resource_url(az_span const request_url, az_span_builder * p_builder)
 }
 
 static AZ_NODISCARD az_result az_auth_clent_credentials_add_token_header(
-    void * const data,
-    az_mut_span const buffer,
+    az_client_secret_credential * const credential,
     az_http_request_builder * const hrb) {
-  AZ_CONTRACT_ARG_NOT_NULL(data);
+  AZ_CONTRACT_ARG_NOT_NULL(credential);
   AZ_CONTRACT_ARG_NOT_NULL(hrb);
 
-  az_auth_client_credentials const * const credentials = (az_auth_client_credentials const *)(data);
-
-  az_mut_span entire_buf = buffer;
+  az_mut_span entire_buf = (az_mut_span){
+    .begin = credential->token_credential.token,
+    .size = sizeof(credential->token_credential.token),
+  };
   az_mut_span post_bearer = { 0 };
   az_mut_span bearer = { 0 };
   AZ_RETURN_IF_FAILED(az_mut_span_copy(entire_buf, AZ_STR("Bearer "), &bearer));
@@ -200,7 +200,7 @@ static AZ_NODISCARD az_result az_auth_clent_credentials_add_token_header(
 
   az_span token = { 0 };
   AZ_RETURN_IF_FAILED(az_auth_get_token(
-      credentials, auth_url, az_mut_span_drop(post_bearer, auth_url.size), &token));
+      credential, auth_url, az_mut_span_drop(post_bearer, auth_url.size), &token));
 
   az_mut_span unused;
   AZ_RETURN_IF_FAILED(az_mut_span_move(post_bearer, token, &unused));
@@ -213,28 +213,25 @@ static AZ_NODISCARD az_result az_auth_clent_credentials_add_token_header(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_auth_init_client_credentials(
-    az_auth_callback * const out_callback,
-    az_auth_client_credentials * const out_data,
+AZ_NODISCARD az_result az_client_secret_credential_init(
+    az_client_secret_credential * const self,
     az_span const tenant_id,
     az_span const client_id,
     az_span const client_secret) {
-  AZ_CONTRACT_ARG_NOT_NULL(out_callback);
-  AZ_CONTRACT_ARG_NOT_NULL(out_data);
+  AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_VALID_SPAN(tenant_id);
   AZ_CONTRACT_ARG_VALID_SPAN(client_id);
   AZ_CONTRACT_ARG_VALID_SPAN(client_secret);
 
-  *out_data = (az_auth_client_credentials){
+  *self = (az_client_secret_credential){
+    .token_credential = { 0 },
     .tenant_id = tenant_id,
     .client_id = client_id,
     .client_secret = client_secret,
   };
 
-  *out_callback = (az_auth_callback){
-    .data = out_data,
-    .func = az_auth_clent_credentials_add_token_header,
-  };
+  AZ_RETURN_IF_FAILED(az_token_credential_init(
+      &(self->token_credential), az_auth_clent_credentials_add_token_header));
 
   return AZ_OK;
 }
