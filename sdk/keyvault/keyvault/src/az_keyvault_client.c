@@ -5,8 +5,6 @@
 
 #include <_az_cfg.h>
 
-// TODO: Remove clientID from URL and move this to options and let Pipeline to build this
-static az_span const KEY_VAULT_URL = AZ_CONST_STR("https://testingforc99.vault.azure.net");
 static uint16_t const MAX_URL_SIZE = 80;
 
 az_span const AZ_KEY_VAULT_NONE_TYPE = AZ_CONST_STR("");
@@ -14,20 +12,6 @@ az_span const AZ_KEY_VAULT_KEY_TYPE = AZ_CONST_STR("keys");
 az_span const AZ_KEY_VAULT_SECRET_TYPE = AZ_CONST_STR("secrets");
 az_span const AZ_KEY_VAULT_CERTIFICATE_TYPE = AZ_CONST_STR("certificates");
 az_span const AZ_KEY_VAULT_URL_PATH_SEPARATOR = AZ_CONST_STR("/");
-
-// Note: Options can be NULL
-//   results in default options being used
-AZ_NODISCARD az_result az_keyvault_keys_client_init(
-    az_keyvault_keys_client * client,
-    az_span uri,
-    /*Azure Credentials */
-    az_keyvault_keys_client_options * options) {
-  (void)client;
-  (void)uri;
-  (void)options;
-
-  return AZ_OK;
-}
 
 // TODO #define AZ_KEYVAULT_KEYS_KEYTYPE_XXXX
 // Note: Options can be passed as NULL
@@ -46,10 +30,13 @@ AZ_NODISCARD az_result az_keyvault_keys_createKey(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result
-az_keyvault_build_url(az_span const key_type, az_span const key_name, az_mut_span const out) {
+AZ_NODISCARD az_result az_keyvault_build_url(
+    az_span const uri,
+    az_span const key_type,
+    az_span const key_name,
+    az_mut_span const out) {
   az_span_builder s_builder = az_span_builder_create(out);
-  AZ_RETURN_IF_FAILED(az_span_builder_append(&s_builder, KEY_VAULT_URL));
+  AZ_RETURN_IF_FAILED(az_span_builder_append(&s_builder, uri));
   AZ_RETURN_IF_FAILED(az_span_builder_append(&s_builder, AZ_KEY_VAULT_URL_PATH_SEPARATOR));
   AZ_RETURN_IF_FAILED(az_span_builder_append(&s_builder, key_type));
   AZ_RETURN_IF_FAILED(az_span_builder_append(&s_builder, AZ_KEY_VAULT_URL_PATH_SEPARATOR));
@@ -62,26 +49,27 @@ AZ_NODISCARD az_result az_keyvault_keys_getKey(
     az_span const keyname,
     az_key_vault_key_type const keytype,
     const az_mut_span * const out) {
-  (void)client;
-  (void)keyname;
-  (void)keytype;
-
   // create request buffer TODO: define size for a getKey Request
   uint8_t request_buffer[1024 * 4];
   az_mut_span request_buffer_span = AZ_SPAN_FROM_ARRAY(request_buffer);
 
   /* ******** build url for request  ******
-   * add keytype and keyname to url request
+   * add keytype, keyname and version to url request
    */
   az_span const az_key_type_span = az_keyvault_get_key_type_span(keytype);
-  // stack a new buffer to hold url with key name and type
-  uint8_t url_buffer
-      [KEY_VAULT_URL.size + (AZ_KEY_VAULT_URL_PATH_SEPARATOR.size * 2) + az_key_type_span.size
-       + keyname.size];
-  az_mut_span const url_buffer_span = AZ_SPAN_FROM_ARRAY(url_buffer);
-  AZ_RETURN_IF_FAILED(az_keyvault_build_url(az_key_type_span, keyname, url_buffer_span));
 
-  printf("r: %s", url_buffer_span.begin);
+  // make sure we can handle url within the MAX_URL_SIZE
+  AZ_CONTRACT(
+      client->uri.size + (AZ_KEY_VAULT_URL_PATH_SEPARATOR.size * 2) + az_key_type_span.size
+              + keyname.size
+          > MAX_URL_SIZE,
+      AZ_ERROR_BUFFER_OVERFLOW);
+
+  // stack a new buffer to hold url with key name and type
+  uint8_t url_buffer[MAX_URL_SIZE];
+  az_mut_span const url_buffer_span = AZ_SPAN_FROM_ARRAY(url_buffer);
+  AZ_RETURN_IF_FAILED(
+      az_keyvault_build_url(client->uri, az_key_type_span, keyname, url_buffer_span));
 
   // create request
   // TODO: define max URL size
@@ -93,6 +81,16 @@ AZ_NODISCARD az_result az_keyvault_keys_getKey(
       AZ_HTTP_METHOD_VERB_GET,
       az_mut_span_to_span(url_buffer_span)));
 
+  // policies
+  az_http_policies policies = { 0 };
+  az_result policies_retcode = az_http_policies_init(&policies);
+  if (!az_succeeded(policies_retcode)) {
+    printf("Error initializing policies\n");
+    return policies_retcode;
+  }
+
+  policies.authentication.data = client->auth;
+
   // start pipeline
-  return az_http_pipeline_process(&hrb, out);
+  return az_http_pipeline_process(&hrb, out, &policies);
 }

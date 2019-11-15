@@ -11,8 +11,8 @@ int main() {
   // Creates keyvault client
   az_keyvault_keys_client client;
 
-  // create credentials for configuration
-  az_auth_credentials auth = { { 0 } };
+  // create credentials as client_id type
+  az_auth_credentials auth = { 0 };
   // Get secrets from ENV
   char * const TENANT_ID = getenv("tenant_id");
   char * const CLIENT_ID = getenv("client_id");
@@ -25,11 +25,12 @@ int main() {
       (az_span){ .begin = CLIENT_SECRET, .size = strlen(CLIENT_SECRET) });
 
   // Create client options
-  az_keyvault_keys_client_options options = { .version = AZ_STR("7.0"), .auth = &auth };
+  az_keyvault_keys_client_options options = { .version = AZ_STR("7.0") };
 
   // Init client
+  // TODO: introduce init and init_with_options so options can be optional for user
   az_result operation_result = az_keyvault_keys_client_init(
-      &client, AZ_STR("https://antk-keyvault.vault.azure.net"), &options);
+      &client, AZ_STR("https://testingforc99.vault.azure.net"), &auth, &options);
 
   // Use client to get a key
   uint8_t key[200];

@@ -29,15 +29,14 @@ typedef enum {
 } az_key_vault_key_type;
 
 typedef struct {
-  az_span uri;
-  // TODO: Azure Credentials
-} az_keyvault_keys_client;
+  az_span version;
+} az_keyvault_keys_client_options;
 
 typedef struct {
-  az_span version;
-  // Let user build auth credentials and just provide it
-  az_auth_credentials const * const auth;
-} az_keyvault_keys_client_options;
+  az_span uri;
+  az_auth_credentials * auth;
+  az_keyvault_keys_client_options * opts;
+} az_keyvault_keys_client;
 
 typedef struct {
   // key size(size_t, typical default is 4096)
@@ -46,11 +45,16 @@ typedef struct {
   az_span option;
 } az_keyvault_keys_keys_options;
 
-AZ_NODISCARD az_result az_keyvault_keys_client_init(
+AZ_NODISCARD AZ_INLINE az_result az_keyvault_keys_client_init(
     az_keyvault_keys_client * client,
     az_span uri,
-    /*Azure Credentials */
-    az_keyvault_keys_client_options * options);
+    az_auth_credentials * auth,
+    az_keyvault_keys_client_options * options) {
+  client->uri = uri;
+  client->auth = auth;
+  client->opts = options;
+  return AZ_OK;
+}
 
 AZ_NODISCARD az_result az_keyvault_keys_createKey(
     az_keyvault_keys_client * client,

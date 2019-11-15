@@ -10,7 +10,12 @@
             "request": "launch",
             "target": "./Debug/sdk/core/core/curl_easy_perform_poc",
             "cwd": "${workspaceRoot}",
-            "preLaunchTask": "build"
+            "preLaunchTask": "build",
+            "env": {
+                "tenant_id": "72f988bf-86f1-41af-91ab-2d7cd011db47",
+                "client_id": "4317a660-6bfb-4585-9ce9-8f222314879c",
+                "client_secret": "O2CT[Y:dkTqblml5V/T]ZEi9x1W1zoBW"
+            }
         },
         {
             "name": "MainTests",
@@ -26,7 +31,12 @@
             "request": "launch",
             "target": "./Debug/sdk/keyvault/keyvault/az_keyvault_test",
             "cwd": "${workspaceRoot}",
-            "preLaunchTask": "build"
+            "preLaunchTask": "build",
+            "env": {
+                "tenant_id": "72f988bf-86f1-41af-91ab-2d7cd011db47",
+                "client_id": "4317a660-6bfb-4585-9ce9-8f222314879c",
+                "client_secret": "O2CT[Y:dkTqblml5V/T]ZEi9x1W1zoBW"
+            },
         }
     ]
 }
