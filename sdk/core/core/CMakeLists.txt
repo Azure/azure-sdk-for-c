@@ -53,11 +53,14 @@ target_include_directories (az_core PUBLIC inc)
 # make sure that users can consume the project as a library.
 add_library (az::core ALIAS az_core)
 
-add_executable (az_core_test 
+add_executable (
+    az_core_test 
     test/main.c 
-    test/test_json_string.c 
-    test/test_json_pointer.c 
-    test/test_json_get_by_pointer.c)
+    test/test_json_get_by_pointer.c
+    test/test_json_pointer.c
+    test/test_json_string.c  
+    test/test_url_parse.c
+    )
 
 target_link_libraries(az_core_test PRIVATE az_core)
 
