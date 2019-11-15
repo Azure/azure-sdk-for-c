@@ -18,5 +18,5 @@
 ###########
 # Eng Sys
 ###########
-/eng/      @bsiegel
-/**/ci.yml @bsiegel
+/eng/       @danieljurek
+/**/ci.yml  @danieljurek
