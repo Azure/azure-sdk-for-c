@@ -111,34 +111,12 @@ AZ_NODISCARD az_result az_http_pipeline_policy_authentication(
   AZ_CONTRACT_ARG_NOT_NULL(p_policies);
   AZ_CONTRACT_ARG_NOT_NULL(hrb);
   AZ_CONTRACT_ARG_NOT_NULL(response);
+  AZ_CONTRACT_ARG_NOT_NULL(data);
 
-  az_auth_credentials const * const credentials = (az_auth_credentials const *)(data);
-  if (credentials == NULL || credentials->kind == AZ_AUTH_KIND_NONE) {
-    return az_http_pipeline_nextpolicy(p_policies, hrb, response);
-  }
-
-  uint8_t buf[AZ_HTTP_POLICY_AUTH_BUFFER_SIZE] = { 0 };
-  az_mut_span entire_buf = AZ_SPAN_FROM_ARRAY(buf);
-  az_mut_span post_bearer = { 0 };
-  az_mut_span bearer = { 0 };
-  AZ_RETURN_IF_FAILED(az_mut_span_copy(entire_buf, AZ_STR("Bearer "), &bearer));
-  post_bearer = az_mut_span_drop(entire_buf, bearer.size);
-
-  az_span_builder auth_url_builder = az_span_builder_create(post_bearer);
-  AZ_RETURN_IF_FAILED(az_auth_get_resource_url(az_mut_span_to_span(hrb->url), &auth_url_builder));
-  az_span const auth_url = az_span_builder_result(&auth_url_builder);
-
-  az_span token = { 0 };
-  AZ_RETURN_IF_FAILED(az_auth_get_token(
-      *credentials, auth_url, az_mut_span_drop(post_bearer, auth_url.size), &token));
-
-  az_mut_span unused;
-  AZ_RETURN_IF_FAILED(az_mut_span_move(post_bearer, token, &unused));
-
-  AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
-      hrb,
-      AZ_STR("authorization"),
-      (az_span){ .begin = bearer.begin, .size = bearer.size + token.size }));
+  uint8_t buf[2 * 1024];
+  az_mut_span const token_buf = AZ_SPAN_FROM_ARRAY(buf);
+  az_auth_callback * const auth_callback = (az_auth_callback *)(data);
+  AZ_RETURN_IF_FAILED(auth_callback->action(auth_callback->data, token_buf, hrb));
 
   return az_http_pipeline_nextpolicy(p_policies, hrb, response);
 }
