@@ -17,13 +17,14 @@
 #include <_az_cfg.h>
 
 enum {
-  AZ_AUTH_GET_TOKEN_MIN_BUFFER
+  AZ_TOKEN_CREDENTIAL_GET_TOKEN_MIN_BUFFER
   = 1350, // if you measure the length of the login.microsoftonline.com's response, it is
           // around 1324 characters for key vault service.
-  AZ_AUTH_URLENCODE_FACTOR = 3, // maximum characters needed when URL encoding (3x the original)
+  AZ_TOKEN_CREDENTIAL_GET_TOKEN_URLENCODE_FACTOR
+  = 3, // maximum characters needed when URL encoding (3x the original)
 };
 
-static AZ_NODISCARD az_result az_auth_get_token(
+static AZ_NODISCARD az_result az_token_credential_get_token(
     az_client_secret_credential const * const credential,
     az_span const resource_url,
     az_mut_span const response_buf,
@@ -52,19 +53,21 @@ static AZ_NODISCARD az_result az_auth_get_token(
   static az_span const auth_body2 = AZ_CONST_STR("&client_secret=");
   static az_span const auth_body3 = AZ_CONST_STR("&resource=");
 
-  size_t const auth_url_maxsize
-      = auth_url1.size + (credential->tenant_id.size * AZ_AUTH_URLENCODE_FACTOR) + auth_url2.size;
+  size_t const auth_url_maxsize = auth_url1.size
+      + (credential->tenant_id.size * AZ_TOKEN_CREDENTIAL_GET_TOKEN_URLENCODE_FACTOR)
+      + auth_url2.size;
 
   AZ_CONTRACT(auth_url_maxsize <= (size_t) ~(uint16_t)0, AZ_ERROR_ARG);
 
   {
-    AZ_CONTRACT(response_buf.size >= AZ_AUTH_GET_TOKEN_MIN_BUFFER, AZ_ERROR_BUFFER_OVERFLOW);
+    AZ_CONTRACT(
+        response_buf.size >= AZ_TOKEN_CREDENTIAL_GET_TOKEN_MIN_BUFFER, AZ_ERROR_BUFFER_OVERFLOW);
 
     size_t const request_elements[] = {
-      credential->tenant_id.size * AZ_AUTH_URLENCODE_FACTOR,
-      credential->client_id.size * AZ_AUTH_URLENCODE_FACTOR,
-      credential->client_secret.size * AZ_AUTH_URLENCODE_FACTOR,
-      resource_url.size * AZ_AUTH_URLENCODE_FACTOR,
+      credential->tenant_id.size * AZ_TOKEN_CREDENTIAL_GET_TOKEN_URLENCODE_FACTOR,
+      credential->client_id.size * AZ_TOKEN_CREDENTIAL_GET_TOKEN_URLENCODE_FACTOR,
+      credential->client_secret.size * AZ_TOKEN_CREDENTIAL_GET_TOKEN_URLENCODE_FACTOR,
+      resource_url.size * AZ_TOKEN_CREDENTIAL_GET_TOKEN_URLENCODE_FACTOR,
       auth_url_maxsize,
     };
 
@@ -149,7 +152,7 @@ static AZ_NODISCARD az_result az_auth_get_token(
 // "https://NNNNNNNN.vault.azure.net/secrets/Password/XXXXXXXXXXXXXXXXXXXX?api-version=7.0", gives
 // back "https://vault.azure.net" (needed for authentication).
 static AZ_NODISCARD az_result
-az_auth_get_resource_url(az_span const request_url, az_span_builder * p_builder) {
+az_token_credential_get_resource_url(az_span const request_url, az_span_builder * p_builder) {
   az_url url = { 0 };
   if (!az_succeeded(az_url_parse(request_url, &url))) {
     return AZ_ERROR_ARG;
@@ -179,7 +182,7 @@ az_auth_get_resource_url(az_span const request_url, az_span_builder * p_builder)
   return AZ_OK;
 }
 
-static AZ_NODISCARD az_result az_auth_clent_credentials_add_token_header(
+static AZ_NODISCARD az_result az_token_credential_add_token_header(
     az_client_secret_credential * const credential,
     az_http_request_builder * const hrb) {
   AZ_CONTRACT_ARG_NOT_NULL(credential);
@@ -195,11 +198,13 @@ static AZ_NODISCARD az_result az_auth_clent_credentials_add_token_header(
   post_bearer = az_mut_span_drop(entire_buf, bearer.size);
 
   az_span_builder auth_url_builder = az_span_builder_create(post_bearer);
-  AZ_RETURN_IF_FAILED(az_auth_get_resource_url(az_mut_span_to_span(hrb->url), &auth_url_builder));
+  AZ_RETURN_IF_FAILED(
+      az_token_credential_get_resource_url(az_mut_span_to_span(hrb->url), &auth_url_builder));
+
   az_span const auth_url = az_span_builder_result(&auth_url_builder);
 
   az_span token = { 0 };
-  AZ_RETURN_IF_FAILED(az_auth_get_token(
+  AZ_RETURN_IF_FAILED(az_token_credential_get_token(
       credential, auth_url, az_mut_span_drop(post_bearer, auth_url.size), &token));
 
   az_mut_span unused;
@@ -231,7 +236,7 @@ AZ_NODISCARD az_result az_client_secret_credential_init(
   };
 
   AZ_RETURN_IF_FAILED(az_token_credential_init(
-      &(self->token_credential), az_auth_clent_credentials_add_token_header));
+      &(self->token_credential), (az_credential_func)az_token_credential_add_token_header));
 
   return AZ_OK;
 }

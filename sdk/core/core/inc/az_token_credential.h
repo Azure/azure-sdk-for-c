@@ -19,8 +19,16 @@ typedef struct {
   uint8_t token[AZ_TOKEN_CREDENTIAL_TOKEN_BUFFER_SIZE]; // TODO: all updates to this must be thread-safe
 } az_token_credential;
 
-AZ_NODISCARD az_result
-az_token_credential_init(az_token_credential * const self, az_credential_func credential_func);
+AZ_INLINE AZ_NODISCARD az_result
+az_token_credential_init(az_token_credential * const self, az_credential_func credential_func) {
+  AZ_CONTRACT_ARG_NOT_NULL(self);
+
+  *self = (az_token_credential){ 0 };
+  AZ_RETURN_IF_FAILED(az_credential_init(&(self->credential), credential_func));
+
+  return AZ_OK;
+}
+
 
 #include <_az_cfg_suffix.h>
 
