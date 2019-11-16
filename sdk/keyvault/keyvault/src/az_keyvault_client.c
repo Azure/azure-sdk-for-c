@@ -59,15 +59,14 @@ AZ_NODISCARD az_result az_keyvault_keys_getKey(
   az_span const az_key_type_span = az_keyvault_get_key_type_span(keytype);
 
   // make sure we can handle url within the MAX_URL_SIZE
-  AZ_CONTRACT(
-      client->uri.size + (AZ_KEY_VAULT_URL_PATH_SEPARATOR.size * 2) + az_key_type_span.size
-              + keyname.size
-          > MAX_URL_SIZE,
-      AZ_ERROR_BUFFER_OVERFLOW);
+  size_t const url_size_with_path = client->uri.size + (AZ_KEY_VAULT_URL_PATH_SEPARATOR.size * 2)
+      + az_key_type_span.size + keyname.size;
+  AZ_CONTRACT(url_size_with_path < MAX_URL_SIZE, AZ_ERROR_BUFFER_OVERFLOW);
 
   // stack a new buffer to hold url with key name and type
   uint8_t url_buffer[MAX_URL_SIZE];
-  az_mut_span const url_buffer_span = AZ_SPAN_FROM_ARRAY(url_buffer);
+  az_mut_span const url_buffer_span
+      = (az_mut_span){ .begin = url_buffer, .size = url_size_with_path };
   AZ_RETURN_IF_FAILED(
       az_keyvault_build_url(client->uri, az_key_type_span, keyname, url_buffer_span));
 
@@ -81,6 +80,10 @@ AZ_NODISCARD az_result az_keyvault_keys_getKey(
       AZ_HTTP_METHOD_VERB_GET,
       az_mut_span_to_span(url_buffer_span)));
 
+  // add version to request
+  AZ_RETURN_IF_FAILED(
+      az_http_request_builder_set_query_parameter(&hrb, AZ_STR("api-version"), client->version));
+
   // policies
   az_http_policies policies = { 0 };
   az_result policies_retcode = az_http_policies_init(&policies);
@@ -89,7 +92,7 @@ AZ_NODISCARD az_result az_keyvault_keys_getKey(
     return policies_retcode;
   }
 
-  policies.authentication.data = client->auth;
+  policies.authentication.data = client->pipeline_policies.pipeline[2].data;
 
   // start pipeline
   return az_http_pipeline_process(&hrb, out, &policies);

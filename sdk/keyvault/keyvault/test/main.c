@@ -33,7 +33,7 @@ int main() {
       &client, AZ_STR("https://testingforc99.vault.azure.net"), &auth, &options);
 
   // Use client to get a key
-  uint8_t key[200];
+  uint8_t key[1024 * 2];
   const az_mut_span key_span = AZ_SPAN_FROM_ARRAY(key);
   az_result get_key_result
       = az_keyvault_keys_getKey(&client, AZ_STR("test-key"), AZ_KEY_VAULT_KEY, &key_span);

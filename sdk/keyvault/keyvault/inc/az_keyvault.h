@@ -33,9 +33,13 @@ typedef struct {
 } az_keyvault_keys_client_options;
 
 typedef struct {
+  az_http_policy pipeline[8];
+} az_pipeline_policies;
+
+typedef struct {
   az_span uri;
-  az_auth_credentials * auth;
-  az_keyvault_keys_client_options * opts;
+  az_pipeline_policies pipeline_policies;
+  az_span version;
 } az_keyvault_keys_client;
 
 typedef struct {
@@ -51,8 +55,19 @@ AZ_NODISCARD AZ_INLINE az_result az_keyvault_keys_client_init(
     az_auth_credentials * auth,
     az_keyvault_keys_client_options * options) {
   client->uri = uri;
-  client->auth = auth;
-  client->opts = options;
+  client->version = options->version;
+  client->pipeline_policies = (az_pipeline_policies){
+    .pipeline = {
+      { .pfnc_process = az_http_pipeline_policy_uniquerequestid, .data = NULL },
+      { .pfnc_process = az_http_pipeline_policy_retry, .data = NULL },
+      { .pfnc_process = az_http_pipeline_policy_authentication, .data = auth },
+      { .pfnc_process = az_http_pipeline_policy_logging,.data = NULL },
+      { .pfnc_process = az_http_pipeline_policy_bufferresponse,.data = NULL },
+      { .pfnc_process = az_http_pipeline_policy_distributedtracing,.data = NULL },
+      { .pfnc_process = az_http_pipeline_policy_transport,.data = NULL },
+      { .pfnc_process = NULL, .data = NULL },
+    }, 
+    };
   return AZ_OK;
 }
 
