@@ -11,10 +11,11 @@
             "target": "./Debug/sdk/core/core/curl_easy_perform_poc",
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "build",
+            // Add ids and secrets here to use it when debuging CurlPOC
             "env": {
-                "tenant_id": "72f988bf-86f1-41af-91ab-2d7cd011db47",
-                "client_id": "4317a660-6bfb-4585-9ce9-8f222314879c",
-                "client_secret": "O2CT[Y:dkTqblml5V/T]ZEi9x1W1zoBW"
+                "tenant_id": "",
+                "client_id": "",
+                "client_secret": ""
             }
         },
         {
@@ -32,10 +33,11 @@
             "target": "./Debug/sdk/keyvault/keyvault/az_keyvault_test",
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "build",
+            // Add ids and secrets here to use it when debuging KeyVaultPOC
             "env": {
-                "tenant_id": "72f988bf-86f1-41af-91ab-2d7cd011db47",
-                "client_id": "e2b1e3fa-e580-4575-afb7-24f1d61cb8db",
-                "client_secret": "cWu4QU?[EZ1vVy@-iaL5KwnM5XItQVX9"
+                "tenant_id": "",
+                "client_id": "",
+                "client_secret": "",
             },
         }
     ]
