@@ -69,7 +69,7 @@ int main() {
     return policies_retcode;
   }
 
-  policies.authentication.data = &credential;
+  policies.authentication.data = &credentials;
 
   // *************************launch pipeline
   az_result const get_response = az_http_pipeline_process(&hrb, &http_buf_response, &policies);

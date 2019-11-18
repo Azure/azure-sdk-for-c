@@ -138,7 +138,6 @@ AZ_NODISCARD az_result az_http_pipeline_policy_transport(
   if (p_policies[0].pfnc_process != NULL) {
     return AZ_ERROR_HTTP_PIPELINE_INVALID_POLICY;
   }
-  printf("pol: %s", response->begin);
 
   return az_http_client_send_request(hrb, response);
 }

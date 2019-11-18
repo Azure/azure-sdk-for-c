@@ -4,8 +4,8 @@
 #ifndef AZ_KEYVAULT_H
 #define AZ_KEYVAULT_H
 
-#include <az_auth.h>
 #include <az_contract.h>
+#include <az_credential.h>
 #include <az_http_pipeline.h>
 #include <az_http_request_builder.h>
 #include <az_result.h>
@@ -52,7 +52,7 @@ typedef struct {
 AZ_NODISCARD AZ_INLINE az_result az_keyvault_keys_client_init(
     az_keyvault_keys_client * client,
     az_span uri,
-    az_auth_credentials * auth,
+    az_credential * auth,
     az_keyvault_keys_client_options * options) {
   client->uri = uri;
   client->version = options->version;

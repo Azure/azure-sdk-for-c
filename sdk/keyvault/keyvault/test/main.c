@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include <az_client_secret_credential.h>
 #include <az_keyvault.h>
 
 #include <_az_cfg.h>
@@ -12,13 +13,13 @@ int main() {
   az_keyvault_keys_client client;
 
   // create credentials as client_id type
-  az_auth_credentials auth = { 0 };
+  az_client_secret_credential auth = { 0 };
   // Get secrets from ENV
   char * const TENANT_ID = getenv("tenant_id");
   char * const CLIENT_ID = getenv("client_id");
   char * const CLIENT_SECRET = getenv("client_secret");
   // init auth_credentials struc
-  az_result const creds_retcode = az_auth_init_client_credentials(
+  az_result const creds_retcode = az_client_secret_credential_init(
       &auth,
       (az_span){ .begin = TENANT_ID, .size = strlen(TENANT_ID) },
       (az_span){ .begin = CLIENT_ID, .size = strlen(CLIENT_ID) },
@@ -30,7 +31,7 @@ int main() {
   // Init client
   // TODO: introduce init and init_with_options so options can be optional for user
   az_result operation_result = az_keyvault_keys_client_init(
-      &client, AZ_STR("https://testingforc99.vault.azure.net"), &auth, &options);
+      &client, AZ_STR("https://testingforc99.vault.azure.net"), (az_credential *)&auth, &options);
 
   // Use client to get a key
   uint8_t key[1024 * 2];
@@ -38,7 +39,7 @@ int main() {
   az_result get_key_result
       = az_keyvault_keys_getKey(&client, AZ_STR("test-key"), AZ_KEY_VAULT_KEY, &key_span);
 
-  printf("response: %s", key);
+  // printf("response: %s", key);
 
   return exit_code;
 }
