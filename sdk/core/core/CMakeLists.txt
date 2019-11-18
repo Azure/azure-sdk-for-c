@@ -14,8 +14,8 @@ endif()
 add_library (
   az_core
   src/az_assumptions.c
-  src/az_auth.c
   src/az_base64.c
+  src/az_client_secret_credential.c
   src/az_curl_adapter.c
   src/az_curl_slist.c
   src/az_http_header.c

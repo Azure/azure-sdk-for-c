@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_auth.h>
+#include <az_client_secret_credential.h>
 #include <az_http_request_builder.h>
 #include <az_http_response_parser.h>
 #include <az_pair.h>
@@ -47,11 +47,11 @@ int main() {
   }
 
   // Add auth
-  az_auth_credentials credentials = { 0 };
+  az_client_secret_credential credentials = { 0 };
   uint8_t const * TENANT_ID = getenv("tenant_id");
   uint8_t const * CLIENT_ID = getenv("client_id");
   uint8_t const * CLIENT_SECRET = getenv("client_secret");
-  az_result const creds_retcode = az_auth_init_client_credentials(
+  az_result const creds_retcode = az_client_secret_credential_init(
       &credentials,
       (az_span){ .begin = TENANT_ID, .size = strlen(TENANT_ID) },
       (az_span){ .begin = CLIENT_ID, .size = strlen(CLIENT_ID) },
@@ -69,7 +69,7 @@ int main() {
     return policies_retcode;
   }
 
-  policies.authentication.data = &credentials;
+  policies.authentication.data = &credential;
 
   // *************************launch pipeline
   az_result const get_response = az_http_pipeline_process(&hrb, &http_buf_response, &policies);
