@@ -32,7 +32,7 @@ int main() {
   // Init client
   // TODO: introduce init and init_with_options so options can be optional for user
   az_result operation_result = az_keyvault_keys_client_init(
-      &client, az_str_to_span(getenv(URI_ENV)), (az_credential *)&credential, &options);
+      &client, az_str_to_span(getenv(URI_ENV)), &credential, &options);
 
   // Use client to get a key
   uint8_t key[1024 * 2];

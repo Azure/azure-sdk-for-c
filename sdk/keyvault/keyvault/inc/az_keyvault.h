@@ -45,7 +45,7 @@ typedef struct {
 AZ_NODISCARD AZ_INLINE az_result az_keyvault_keys_client_init(
     az_keyvault_keys_client * const client,
     az_span const uri,
-    az_credential * const credential,
+    void * const credential,
     az_keyvault_keys_client_options const * const options) {
   AZ_CONTRACT_ARG_NOT_NULL(client);
 
