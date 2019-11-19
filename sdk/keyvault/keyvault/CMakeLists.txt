@@ -15,7 +15,7 @@ add_library (
 if(MSVC)
   target_compile_options(az_keyvault PRIVATE /Wall /WX /wd5031 /wd4668 /wd4820 /wd4255 /analyze)
 else()
-  target_compile_options(az_keyvault PRIVATE -Wall -Wextra -pedantic -Werror)
+  target_compile_options(az_keyvault PRIVATE -Wall -Wextra -pedantic -Werror -Wno-missing-field-initializers -Wno-missing-braces)
 endif()
 
 target_include_directories (az_keyvault PUBLIC inc)
