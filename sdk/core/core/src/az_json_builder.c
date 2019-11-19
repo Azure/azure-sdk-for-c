@@ -64,15 +64,22 @@ az_json_builder_write(az_json_builder * const self, az_json_value const value) {
   }
 }
 
+AZ_NODISCARD az_result az_json_builder_write_comma(az_json_builder * const self) {
+  AZ_CONTRACT_ARG_NOT_NULL(self);
+
+  if (self->need_comma) {
+    AZ_RETURN_IF_FAILED(az_span_action_do(self->write, AZ_STR(",")));
+  }
+  return AZ_OK;
+}
+
 AZ_NODISCARD az_result az_json_builder_write_object_member(
     az_json_builder * const self,
     az_span const name,
     az_json_value const value) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
-  if (self->need_comma) {
-    AZ_RETURN_IF_FAILED(az_span_action_do(self->write, AZ_STR(",")));
-  }
+  AZ_RETURN_IF_FAILED(az_json_builder_write_comma(self));
   AZ_RETURN_IF_FAILED(az_json_builder_write_str(self, name));
   AZ_RETURN_IF_FAILED(az_span_action_do(self->write, AZ_STR(":")));
   AZ_RETURN_IF_FAILED(az_json_builder_write(self, value));
@@ -91,9 +98,7 @@ AZ_NODISCARD az_result
 az_json_builder_write_array_item(az_json_builder * const self, az_json_value const value) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
-  if (self->need_comma) {
-    AZ_RETURN_IF_FAILED(az_span_action_do(self->write, AZ_STR(",")));
-  }
+  AZ_RETURN_IF_FAILED(az_json_builder_write_comma(self));
   AZ_RETURN_IF_FAILED(az_json_builder_write(self, value));
   return AZ_OK;
 }
