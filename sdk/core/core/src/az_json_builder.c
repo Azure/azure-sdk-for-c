@@ -95,7 +95,7 @@ az_json_builder_write_array_item(az_json_builder * const self, az_json_value con
     AZ_RETURN_IF_FAILED(az_span_action_do(self->write, AZ_STR(",")));
   }
   AZ_RETURN_IF_FAILED(az_json_builder_write(self, value));
-  return AZ_ERROR_NOT_IMPLEMENTED;
+  return AZ_OK;
 }
 
 AZ_NODISCARD az_result az_json_builder_write_array_close(az_json_builder * const self) {

@@ -29,6 +29,10 @@ typedef struct {
   } data;
 } az_json_value;
 
+AZ_NODISCARD AZ_INLINE az_json_value az_json_value_create_null() {
+  return (az_json_value){ .kind = AZ_JSON_VALUE_NULL };
+}
+
 AZ_NODISCARD AZ_INLINE az_json_value az_json_value_create_boolean(bool const value) {
   return (az_json_value){
     .kind = AZ_JSON_VALUE_BOOLEAN,
