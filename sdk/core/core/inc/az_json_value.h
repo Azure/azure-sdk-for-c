@@ -74,6 +74,11 @@ az_json_value_get_string(az_json_value const * const self, az_span * const out);
 AZ_NODISCARD az_result
 az_json_value_get_number(az_json_value const * const self, double * const out);
 
+typedef struct {
+  az_span name;
+  az_json_value value;
+} az_json_member;
+
 #include <_az_cfg_suffix.h>
 
 #endif
