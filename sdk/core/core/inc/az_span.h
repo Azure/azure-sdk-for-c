@@ -125,6 +125,10 @@ AZ_NODISCARD az_result az_span_get_uint64(az_span const self, uint64_t * const o
  */
 AZ_ACTION_TYPE(az_span_action, az_span)
 
+AZ_NODISCARD AZ_INLINE az_span az_str_to_span(char const * str) {
+  return (az_span){ .begin = (uint8_t *)str, .size = strlen(str) };
+}
+
 #include <_az_cfg_suffix.h>
 
 #endif

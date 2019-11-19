@@ -15,7 +15,8 @@
             "env": {
                 "tenant_id": "",
                 "client_id": "",
-                "client_secret": ""
+                "client_secret": "",
+                "test_uri": ""
             }
         },
         {
@@ -38,6 +39,7 @@
                 "tenant_id": "",
                 "client_id": "",
                 "client_secret": "",
+                "test_uri": ""
             },
         }
     ]

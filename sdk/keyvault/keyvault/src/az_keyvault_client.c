@@ -1,33 +1,60 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include <az_credential.h>
 #include <az_keyvault.h>
 
 #include <_az_cfg.h>
 
-static uint16_t const MAX_URL_SIZE = 80;
+/**
+ * @brief Maximum allowed URL size:
+ * url is expected as : [https://]{account_id}[.vault.azure.net]{path}{query}
+ * URL token                       max Len            Total
+ * [https://]                       = 8                 8
+ * {account_id}                     = 30               38
+ * [.vault.azure.net]               = 16               54
+ * {path}                           = 33               87
+ * {query}                          = 33               ** 120 **
+ */
+enum { MAX_URL_SIZE = 120 };
 
-az_span const AZ_KEY_VAULT_NONE_TYPE = AZ_CONST_STR("");
-az_span const AZ_KEY_VAULT_KEY_TYPE = AZ_CONST_STR("keys");
-az_span const AZ_KEY_VAULT_SECRET_TYPE = AZ_CONST_STR("secrets");
-az_span const AZ_KEY_VAULT_CERTIFICATE_TYPE = AZ_CONST_STR("certificates");
-az_span const AZ_KEY_VAULT_URL_PATH_SEPARATOR = AZ_CONST_STR("/");
+static az_span const AZ_KEY_VAULT_KEY_TYPE_KEY_STR = AZ_CONST_STR("keys");
+static az_span const AZ_KEY_VAULT_KEY_TYPE_SECRET_STR = AZ_CONST_STR("secrets");
+static az_span const AZ_KEY_VAULT_KEY_TYPE_CERTIFICATE_STR = AZ_CONST_STR("certificates");
+
+AZ_NODISCARD AZ_INLINE az_span az_keyvault_get_key_type_span(az_key_vault_key_type const key_type) {
+  switch (key_type) {
+    case AZ_KEY_VAULT_KEY_TYPE_KEY: {
+      return AZ_KEY_VAULT_KEY_TYPE_KEY_STR;
+    }
+
+    case AZ_KEY_VAULT_KEY_TYPE_SECRET: {
+      return AZ_KEY_VAULT_KEY_TYPE_SECRET_STR;
+    }
+
+    case AZ_KEY_VAULT_KEY_TYPE_CERTIFICATE: {
+      return AZ_KEY_VAULT_KEY_TYPE_CERTIFICATE_STR;
+    }
+
+    default: { return az_str_to_span(AZ_KEY_VAULT_KEY_TYPE_NONE_STR); }
+  }
+}
 
 // TODO #define AZ_KEYVAULT_KEYS_KEYTYPE_XXXX
 // Note: Options can be passed as NULL
 //   results in default options being used
-AZ_NODISCARD az_result az_keyvault_keys_createKey(
-    az_keyvault_keys_client * client,
-    az_span keyname,
-    az_span keytype,
-    az_keyvault_keys_keys_options * options,
-    const az_mut_span * const out) {
+AZ_NODISCARD az_result az_keyvault_keys_key_create(
+    az_keyvault_keys_client const * const client,
+    az_span const key_name,
+    az_span const key_type,
+    az_keyvault_keys_keys_options const * const options,
+    az_mut_span const * const out) {
   (void)client;
-  (void)keyname;
-  (void)keytype;
+  (void)key_name;
+  (void)key_type;
   (void)options;
   (void)out;
-  return AZ_OK;
+  return AZ_ERROR_NOT_IMPLEMENTED;
 }
 
 AZ_NODISCARD az_result az_keyvault_build_url(
@@ -37,30 +64,30 @@ AZ_NODISCARD az_result az_keyvault_build_url(
     az_mut_span const out) {
   az_span_builder s_builder = az_span_builder_create(out);
   AZ_RETURN_IF_FAILED(az_span_builder_append(&s_builder, uri));
-  AZ_RETURN_IF_FAILED(az_span_builder_append(&s_builder, AZ_KEY_VAULT_URL_PATH_SEPARATOR));
+  AZ_RETURN_IF_FAILED(az_span_builder_append_byte(&s_builder, '/'));
   AZ_RETURN_IF_FAILED(az_span_builder_append(&s_builder, key_type));
-  AZ_RETURN_IF_FAILED(az_span_builder_append(&s_builder, AZ_KEY_VAULT_URL_PATH_SEPARATOR));
+  AZ_RETURN_IF_FAILED(az_span_builder_append_byte(&s_builder, '/'));
   AZ_RETURN_IF_FAILED(az_span_builder_append(&s_builder, key_name));
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_keyvault_keys_getKey(
-    az_keyvault_keys_client const * const client,
-    az_span const keyname,
-    az_key_vault_key_type const keytype,
-    const az_mut_span * const out) {
+AZ_NODISCARD az_result az_keyvault_keys_key_get(
+    az_keyvault_keys_client * client,
+    az_span const key_name,
+    az_key_vault_key_type const key_type,
+    az_mut_span const * const out) {
   // create request buffer TODO: define size for a getKey Request
   uint8_t request_buffer[1024 * 4];
   az_mut_span request_buffer_span = AZ_SPAN_FROM_ARRAY(request_buffer);
 
   /* ******** build url for request  ******
-   * add keytype, keyname and version to url request
+   * add key_type, key_name and version to url request
    */
-  az_span const az_key_type_span = az_keyvault_get_key_type_span(keytype);
+  az_span const az_key_type_span = az_keyvault_get_key_type_span(key_type);
 
   // make sure we can handle url within the MAX_URL_SIZE
-  size_t const url_size_with_path = client->uri.size + (AZ_KEY_VAULT_URL_PATH_SEPARATOR.size * 2)
-      + az_key_type_span.size + keyname.size;
+  size_t const url_size_with_path = client->uri.size + 2 /* 2 path separators '\'*/
+      + az_key_type_span.size + key_name.size;
   AZ_CONTRACT(url_size_with_path < MAX_URL_SIZE, AZ_ERROR_BUFFER_OVERFLOW);
 
   // stack a new buffer to hold url with key name and type
@@ -68,7 +95,7 @@ AZ_NODISCARD az_result az_keyvault_keys_getKey(
   az_mut_span const url_buffer_span
       = (az_mut_span){ .begin = url_buffer, .size = url_size_with_path };
   AZ_RETURN_IF_FAILED(
-      az_keyvault_build_url(client->uri, az_key_type_span, keyname, url_buffer_span));
+      az_keyvault_build_url(client->uri, az_key_type_span, key_name, url_buffer_span));
 
   // create request
   // TODO: define max URL size
@@ -85,15 +112,10 @@ AZ_NODISCARD az_result az_keyvault_keys_getKey(
       az_http_request_builder_set_query_parameter(&hrb, AZ_STR("api-version"), client->version));
 
   // policies
-  az_http_policies policies = { 0 };
-  az_result policies_retcode = az_http_policies_init(&policies);
-  if (!az_succeeded(policies_retcode)) {
-    printf("Error initializing policies\n");
-    return policies_retcode;
-  }
+  // az_http_policy policies = *client->pipeline.policies;
 
-  policies.authentication.data = client->pipeline_policies.pipeline[2].data;
+  // policies.authentication.data = client->pipeline.policies[2].data;
 
   // start pipeline
-  return az_http_pipeline_process(&hrb, out, &policies);
+  return az_http_pipeline_process(&hrb, out, &client->pipeline);
 }
