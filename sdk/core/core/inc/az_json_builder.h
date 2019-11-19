@@ -10,13 +10,12 @@
 #include <_az_cfg_prefix.h>
 
 typedef struct {
-  az_span_builder span_builder;
+  az_span_action write;
+  bool need_comma;
   // TODO: add a JSON stack for validations.
 } az_json_builder;
 
-AZ_NODISCARD az_result az_json_builder_init(az_json_builder * const out, az_mut_span const buffer);
-
-AZ_NODISCARD az_result az_json_builder_result(az_json_builder const self, az_span * const out);
+AZ_NODISCARD az_result az_json_builder_init(az_json_builder * const out, az_span_action const write);
 
 AZ_NODISCARD az_result
 az_json_builder_write(az_json_builder * const self, az_json_value const value);
