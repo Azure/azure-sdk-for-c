@@ -11,12 +11,12 @@
  * url is expected as : [https://]{account_id}[.vault.azure.net]{path}{query}
  * URL token                       max Len            Total
  * [https://]                       = 8                 8
- * {account_id}                     = 30               38
- * [.vault.azure.net]               = 16               54
- * {path}                           = 33               87
- * {query}                          = 33               ** 120 **
+ * {account_id}                     = 52               60
+ * [.vault.azure.net]               = 16               76
+ * {path}                           = 54               130
+ * {query}                          = 70               ** 200 **
  */
-enum { MAX_URL_SIZE = 120 };
+enum { MAX_URL_SIZE = 200 };
 
 static az_span const AZ_KEY_VAULT_KEY_TYPE_KEY_STR = AZ_CONST_STR("keys");
 static az_span const AZ_KEY_VAULT_KEY_TYPE_SECRET_STR = AZ_CONST_STR("secrets");
@@ -88,7 +88,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
   // make sure we can handle url within the MAX_URL_SIZE
   size_t const url_size_with_path = client->uri.size + 2 /* 2 path separators '\'*/
       + az_key_type_span.size + key_name.size;
-  AZ_CONTRACT(url_size_with_path < MAX_URL_SIZE, AZ_ERROR_BUFFER_OVERFLOW);
+  AZ_CONTRACT(url_size_with_path <= MAX_URL_SIZE, AZ_ERROR_BUFFER_OVERFLOW);
 
   // stack a new buffer to hold url with key name and type
   uint8_t url_buffer[MAX_URL_SIZE];
@@ -110,11 +110,6 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
   // add version to request
   AZ_RETURN_IF_FAILED(
       az_http_request_builder_set_query_parameter(&hrb, AZ_STR("api-version"), client->version));
-
-  // policies
-  // az_http_policy policies = *client->pipeline.policies;
-
-  // policies.authentication.data = client->pipeline.policies[2].data;
 
   // start pipeline
   return az_http_pipeline_process(&hrb, out, &client->pipeline);
