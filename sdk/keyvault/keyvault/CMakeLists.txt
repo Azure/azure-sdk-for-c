@@ -26,7 +26,14 @@ target_link_libraries(az_keyvault PUBLIC az_core)
 add_library (az::keyvault ALIAS az_keyvault)
 
 add_executable (az_keyvault_test test/main.c)
-
 target_link_libraries(az_keyvault_test PRIVATE az_keyvault)
+
+# make key vault POC
+add_executable (az_keyvault_POC test/client_key_POC.c)
+target_link_libraries(az_keyvault_POC PRIVATE az_keyvault)
+
+if (UNIX)
+  target_link_libraries(az_keyvault PRIVATE m)
+endif()
 
 add_test(NAME az_keyvault_test COMMAND az_keyvault_test)

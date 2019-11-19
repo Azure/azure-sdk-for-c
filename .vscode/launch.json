@@ -10,7 +10,14 @@
             "request": "launch",
             "target": "./Debug/sdk/core/core/curl_easy_perform_poc",
             "cwd": "${workspaceRoot}",
-            "preLaunchTask": "build"
+            "preLaunchTask": "build",
+            // Add ids and secrets here to use it when debuging CurlPOC
+            "env": {
+                "tenant_id": "",
+                "client_id": "",
+                "client_secret": "",
+                "test_uri": ""
+            }
         },
         {
             "name": "MainTests",
@@ -19,6 +26,21 @@
             "target": "./Debug/sdk/core/core/az_core_test",
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "build"
+        },
+        {
+            "name": "KeyVault",
+            "type": "gdb",
+            "request": "launch",
+            "target": "./Debug/sdk/keyvault/keyvault/az_keyvault_test",
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "build",
+            // Add ids and secrets here to use it when debuging KeyVaultPOC
+            "env": {
+                "tenant_id": "",
+                "client_id": "",
+                "client_secret": "",
+                "test_uri": ""
+            },
         }
     ]
 }
