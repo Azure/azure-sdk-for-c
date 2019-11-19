@@ -16,6 +16,11 @@
 #include <az_span_builder.h>
 #include <az_str.h>
 
+#include <stdbool.h>
+#include <stdint.h>
+
+#include <_az_cfg_prefix.h>
+
 typedef struct {
   int16_t capacity;
   az_pair * headers_start;
@@ -28,11 +33,6 @@ typedef struct {
   int16_t capacity;
   int16_t size;
 } az_http_request_url_info;
-
-#include <stdbool.h>
-#include <stdint.h>
-
-#include <_az_cfg_prefix.h>
 
 typedef struct {
   az_mut_span buffer;
