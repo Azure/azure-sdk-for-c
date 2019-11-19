@@ -50,6 +50,14 @@ AZ_NODISCARD AZ_INLINE az_json_value az_json_value_create_number(double const va
   };
 }
 
+AZ_NODISCARD AZ_INLINE az_json_value az_json_value_create_object() {
+  return (az_json_value){ .kind = AZ_JSON_VALUE_OBJECT };
+}
+
+AZ_NODISCARD AZ_INLINE az_json_value az_json_value_create_array() {
+  return (az_json_value){ .kind = AZ_JSON_VALUE_ARRAY };
+}
+
 /**
  * Copies a boolean value to @out from the given JSON value.
  *
