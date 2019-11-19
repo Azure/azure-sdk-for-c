@@ -11,6 +11,7 @@
 
 typedef struct {
   az_span_builder buffer;
+  // TODO: add a JSON stack for validations.
 } az_json_builder;
 
 AZ_NODISCARD az_result az_json_builder_init(az_json_builder * const out, az_mut_span const buffer);
@@ -20,8 +21,10 @@ AZ_NODISCARD az_result az_json_builder_result(az_json_builder const self, az_spa
 AZ_NODISCARD az_result
 az_json_builder_write(az_json_builder * const self, az_json_value const value);
 
-AZ_NODISCARD az_result
-az_json_builder_write_object_member(az_json_builder * const self, az_json_member const member);
+AZ_NODISCARD az_result az_json_builder_write_object_member(
+    az_json_builder * const self,
+    az_span const name,
+    az_json_value const value);
 
 AZ_NODISCARD az_result az_json_builder_write_object_close(az_json_builder * const self);
 

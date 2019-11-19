@@ -30,11 +30,14 @@ az_json_builder_write(az_json_builder * const self, az_json_value const value) {
   return AZ_ERROR_NOT_IMPLEMENTED;
 }
 
-AZ_NODISCARD az_result
-az_json_builder_write_object_member(az_json_builder * const self, az_json_member const member) {
+AZ_NODISCARD az_result az_json_builder_write_object_member(
+    az_json_builder * const self,
+    az_span const name,
+    az_json_value const value) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
-  (void)member;
+  (void)name;
+  (void)value;
 
   return AZ_ERROR_NOT_IMPLEMENTED;
 }
