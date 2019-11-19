@@ -89,7 +89,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
       + az_key_type_span.size + key_name.size;
   AZ_CONTRACT(url_size_with_path <= MAX_URL_SIZE, AZ_ERROR_BUFFER_OVERFLOW);
 
-  // stack a new buffer to hold url with key name and type
+  // Put a new buffer on the stack to hold a url with the key name and type
   uint8_t url_buffer[MAX_URL_SIZE];
   az_mut_span const url_buffer_span
       = (az_mut_span){ .begin = url_buffer, .size = url_size_with_path };
