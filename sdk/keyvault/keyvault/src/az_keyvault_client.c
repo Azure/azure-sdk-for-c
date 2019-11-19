@@ -57,7 +57,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
   return AZ_ERROR_NOT_IMPLEMENTED;
 }
 
-AZ_NODISCARD az_result az_keyvault_build_url(
+static AZ_NODISCARD az_result az_keyvault_build_url(
     az_span const uri,
     az_span const key_type,
     az_span const key_name,
