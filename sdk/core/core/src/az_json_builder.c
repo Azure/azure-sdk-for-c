@@ -8,7 +8,7 @@
 AZ_NODISCARD az_result az_json_builder_init(az_json_builder * const out, az_mut_span const buffer) {
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
-  (void)buffer;
+  *out = (az_json_builder){ .span_builder = az_span_builder_create(buffer) };
 
   return AZ_ERROR_NOT_IMPLEMENTED;
 }

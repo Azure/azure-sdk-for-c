@@ -10,7 +10,7 @@
 #include <_az_cfg_prefix.h>
 
 typedef struct {
-  az_span_builder buffer;
+  az_span_builder span_builder;
   // TODO: add a JSON stack for validations.
 } az_json_builder;
 
