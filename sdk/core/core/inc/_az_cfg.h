@@ -19,11 +19,15 @@
 // warning C5045: Compiler will insert Spectre mitigation for memory load if /Qspectre switch specified
 #pragma warning(disable : 5045)
 
-#elif defined(__GNUC__)
+#endif
+
+#if defined(__GNUC__)
 
 #pragma GCC diagnostic ignored "-Wmissing-braces"
 
-#elif defined(__clang__)
+#endif
+
+#if defined(__clang__)
 
 #pragma clang diagnostic ignored "-Wmissing-field-initializers"
 #pragma clang diagnostic ignored "-Wmissing-braces"
