@@ -16,8 +16,9 @@ az_json_builder_init(az_json_builder * const out, az_span_action const write) {
   return AZ_OK;
 }
 
-AZ_NODISCARD static az_result
-az_json_builder_write_str(az_json_builder * const self, az_span const value) {
+AZ_NODISCARD static az_result az_json_builder_write_str(
+    az_json_builder * const self,
+    az_span const value) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
   az_span_action const write = self->write;
@@ -25,6 +26,65 @@ az_json_builder_write_str(az_json_builder * const self, az_span const value) {
   AZ_RETURN_IF_FAILED(az_span_action_do(write, value));
   AZ_RETURN_IF_FAILED(az_span_action_do(write, AZ_STR("\"")));
   return AZ_OK;
+}
+
+// 2^53 - 1
+#define AZ_JSON_UINT_MAX 0x1FFFFFFFFFFFFFull
+
+AZ_NODISCARD static az_result az_json_builder_write_double(
+    az_json_builder * const self,
+    double value) {
+  AZ_CONTRACT_ARG_NOT_NULL(self);
+
+  az_span_action const write = self->write;
+
+  if (value == 0) {
+    return az_span_action_do(write, AZ_STR("0"));
+  }
+
+  if (value < 0) {
+    AZ_RETURN_IF_FAILED(az_span_action_do(write, AZ_STR("-")));
+    value = -value;
+  }
+
+  if (value > (double)AZ_JSON_UINT_MAX) {
+    // D.*De+*D
+    // TODO:
+    return AZ_ERROR_NOT_IMPLEMENTED;
+  }
+
+  {
+    uint64_t u = (uint64_t)value;
+    if (value == (double)u) {
+      uint64_t base = 1;
+      {
+        uint64_t i = u;
+        while (10 <= i) {
+          i /= 10;
+          base *= 10;
+        }
+      }
+      do {
+        uint8_t const dec = (uint8_t)(u / base) + '0';
+        u %= base;
+        base /= 10;
+        AZ_RETURN_IF_FAILED(az_span_action_do(write, az_span_from_one(&dec)));
+      } while (1 <= base); 
+      return AZ_OK;
+    }
+  }
+
+  if (value < 1) {
+    // D.*De-*D
+    // TODO:
+    return AZ_ERROR_NOT_IMPLEMENTED;
+  }
+
+  {
+    // *D.*D
+    // TODO:
+    return AZ_ERROR_NOT_IMPLEMENTED;
+  }
 }
 
 AZ_NODISCARD az_result
@@ -47,8 +107,7 @@ az_json_builder_write(az_json_builder * const self, az_json_value const value) {
     }
     case AZ_JSON_VALUE_NUMBER: {
       self->need_comma = true;
-      // TODO:
-      return AZ_ERROR_NOT_IMPLEMENTED;
+      return az_json_builder_write_double(self, value.data.number);
     }
     case AZ_JSON_VALUE_OBJECT: {
       self->need_comma = false;
@@ -68,7 +127,7 @@ AZ_NODISCARD static az_result az_json_builder_write_comma(az_json_builder * cons
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
   if (self->need_comma) {
-    AZ_RETURN_IF_FAILED(az_span_action_do(self->write, AZ_STR(",")));
+    return az_span_action_do(self->write, AZ_STR(","));
   }
   return AZ_OK;
 }
@@ -86,7 +145,9 @@ AZ_NODISCARD az_result az_json_builder_write_object_member(
   return AZ_OK;
 }
 
-AZ_NODISCARD static az_result az_json_builder_write_close(az_json_builder * const self, az_span const close) {
+AZ_NODISCARD static az_result az_json_builder_write_close(
+    az_json_builder * const self,
+    az_span const close) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
   AZ_RETURN_IF_FAILED(az_span_action_do(self->write, close));
