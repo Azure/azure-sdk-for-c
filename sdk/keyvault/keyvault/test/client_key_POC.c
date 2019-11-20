@@ -27,12 +27,13 @@ int main() {
       az_str_to_span(getenv(CLIENT_SECRET_ENV)));
 
   // Create client options
-  az_keyvault_keys_client_options options = { .version = AZ_STR("7.0") };
+  az_keyvault_keys_client_options client_options
+      = { .service_version = AZ_STR("7.0"), .retry = { .max_retry = 3, .delay_in_ms = 10 } };
 
   // Init client
-  // TODO: introduce init and init_with_options so options can be optional for user
+  // TODO: introduce init and init_with_options so client_options can be optional for user
   az_result operation_result = az_keyvault_keys_client_init(
-      &client, az_str_to_span(getenv(URI_ENV)), &credential, &options);
+      &client, az_str_to_span(getenv(URI_ENV)), &credential, &client_options);
 
   // Use client to get a key
   uint8_t key[1024 * 2];
