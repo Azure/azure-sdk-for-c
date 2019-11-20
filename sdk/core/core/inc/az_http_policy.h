@@ -4,6 +4,7 @@
 #ifndef AZ_HTTP_POLICY_H
 #define AZ_HTTP_POLICY_H
 
+#include <az_client_secret_credential.h>
 #include <az_http_request_builder.h>
 #include <az_mut_span.h>
 #include <az_result.h>
@@ -57,6 +58,16 @@ AZ_NODISCARD az_result az_http_pipeline_policy_authentication(
     void * const data,
     az_http_request_builder * const hrb,
     az_mut_span const * const response);
+
+AZ_INLINE AZ_NODISCARD az_result
+az_http_pipeline_policy_authentication_with_secret_credential_build(
+    az_client_secret_credential * credential,
+    az_http_policy * out) {
+  AZ_CONTRACT_ARG_NOT_NULL(out);
+  *out = (az_http_policy){ .pfnc_process = az_http_pipeline_policy_authentication,
+                           .data = credential };
+  return AZ_OK;
+}
 
 AZ_NODISCARD az_result az_http_pipeline_policy_logging(
     az_http_policy * const policies,

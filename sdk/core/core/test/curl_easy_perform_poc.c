@@ -61,11 +61,18 @@ int main() {
     return creds_retcode;
   }
 
+  az_http_policy authentication_policy = { 0 };
+  // use safe policy creator for specific authentication type.
+  // next function will make sure that the right policy implementation is used for a secret
+  // credential
+  AZ_RETURN_IF_FAILED(az_http_pipeline_policy_authentication_with_secret_credential_build(
+      &credential, &authentication_policy));
+
   az_http_pipeline pipeline = (az_http_pipeline){
     .policies = {
       { .pfnc_process = az_http_pipeline_policy_uniquerequestid, .data = NULL },
       { .pfnc_process = az_http_pipeline_policy_retry, .data = NULL },
-      { .pfnc_process = az_http_pipeline_policy_authentication, .data = &credential },
+      authentication_policy,
       { .pfnc_process = az_http_pipeline_policy_logging,.data = NULL },
       { .pfnc_process = az_http_pipeline_policy_bufferresponse,.data = NULL },
       { .pfnc_process = az_http_pipeline_policy_distributedtracing,.data = NULL },
