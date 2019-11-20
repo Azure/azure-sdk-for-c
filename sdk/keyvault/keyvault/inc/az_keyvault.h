@@ -73,13 +73,13 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
     az_span const key_name,
     az_span const key_type,
     az_keyvault_keys_keys_options const * const options,
-    az_mut_span const * const out);
+    az_http_response const * const response);
 
 AZ_NODISCARD az_result az_keyvault_keys_key_get(
     az_keyvault_keys_client * client,
     az_span const key_name,
     az_key_vault_key_type const key_type,
-    az_mut_span const * const out);
+    az_http_response const * const response);
 
 #include <_az_cfg_suffix.h>
 

@@ -37,9 +37,9 @@ int main() {
 
   // Use client to get a key
   uint8_t key[1024 * 2];
-  const az_mut_span key_span = AZ_SPAN_FROM_ARRAY(key);
-  az_result get_key_result
-      = az_keyvault_keys_key_get(&client, AZ_STR("test-key"), AZ_KEY_VAULT_KEY_TYPE_KEY, &key_span);
+  const az_http_response key_response = { .value = AZ_SPAN_FROM_ARRAY(key) };
+  az_result get_key_result = az_keyvault_keys_key_get(
+      &client, AZ_STR("test-key"), AZ_KEY_VAULT_KEY_TYPE_KEY, &key_response);
 
   printf("response: %s", key);
 
