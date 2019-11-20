@@ -71,6 +71,7 @@ static AZ_NODISCARD az_result az_token_credential_get_token(
 
   AZ_CONTRACT(auth_url_maxsize <= (size_t) ~(uint16_t)0, AZ_ERROR_ARG);
 
+  size_t const headers_size = sizeof(az_pair) + 7; // We need 7 because our code aligns at 8 byte boundary
   {
     AZ_CONTRACT(
         response_buf.size >= AZ_TOKEN_CREDENTIAL_GET_TOKEN_MIN_BUFFER, AZ_ERROR_BUFFER_OVERFLOW);
@@ -80,11 +81,10 @@ static AZ_NODISCARD az_result az_token_credential_get_token(
       credential->client_id.size * AZ_TOKEN_CREDENTIAL_GET_TOKEN_URLENCODE_FACTOR,
       credential->client_secret.size * AZ_TOKEN_CREDENTIAL_GET_TOKEN_URLENCODE_FACTOR,
       resource_url.size * AZ_TOKEN_CREDENTIAL_GET_TOKEN_URLENCODE_FACTOR,
-      auth_url_maxsize,
     };
 
-    size_t required_request_size
-        = auth_url1.size + auth_url2.size + auth_body1.size + auth_body2.size + auth_body3.size;
+    size_t required_request_size = auth_url1.size + auth_url2.size + auth_body1.size
+        + auth_body2.size + auth_body3.size + headers_size;
 
     for (size_t i = 0; i < AZ_ARRAY_SIZE(request_elements); ++i) {
       required_request_size += request_elements[i];
@@ -120,7 +120,7 @@ static AZ_NODISCARD az_result az_token_credential_get_token(
     AZ_RETURN_IF_FAILED(az_span_builder_append(&builder, auth_url2));
 
     auth_url = az_span_builder_result(&builder);
-    builder = az_span_builder_create(az_mut_span_drop(response_buf, auth_url.size));
+    builder = az_span_builder_create(az_mut_span_drop(response_buf, auth_url.size + headers_size));
 
     AZ_RETURN_IF_FAILED(az_span_builder_append(&builder, auth_body1));
     AZ_RETURN_IF_FAILED(az_uri_encode(credential->client_id, &builder));
@@ -139,8 +139,8 @@ static AZ_NODISCARD az_result az_token_credential_get_token(
     AZ_RETURN_IF_FAILED(az_http_request_builder_init(
         &hrb,
         (az_mut_span){
-            .begin = response_buf.begin + response_buf.size - auth_url.size,
-            .size = auth_url.size,
+            .begin = response_buf.begin + response_buf.size - (auth_url.size),
+            .size = auth_url.size + headers_size,
         },
         (uint16_t)auth_url.size,
         AZ_HTTP_METHOD_VERB_POST,
@@ -150,12 +150,12 @@ static AZ_NODISCARD az_result az_token_credential_get_token(
 
     static az_http_pipeline pipeline = {
     .policies = {
+      { .pfnc_process = az_http_pipeline_policy_uniquerequestid, .data = NULL },
+      { .pfnc_process = az_http_pipeline_policy_retry, .data = NULL },
       { .pfnc_process = no_op_policy, .data = NULL },
-      { .pfnc_process = no_op_policy, .data = NULL },
-      { .pfnc_process = no_op_policy, .data = NULL },
-      { .pfnc_process = no_op_policy, .data = NULL },
-      { .pfnc_process = no_op_policy, .data = NULL },
-      { .pfnc_process = no_op_policy, .data = NULL },
+      { .pfnc_process = az_http_pipeline_policy_logging, .data = NULL },
+      { .pfnc_process = az_http_pipeline_policy_bufferresponse, .data = NULL },
+      { .pfnc_process = az_http_pipeline_policy_distributedtracing, .data = NULL },
       { .pfnc_process = az_http_pipeline_policy_transport, .data = NULL },
       { .pfnc_process = NULL, .data = NULL },
     },
@@ -176,15 +176,7 @@ static AZ_NODISCARD az_result az_token_credential_get_token(
       return AZ_ERROR_HTTP_PAL;
     }
 
-    while (true) {
-      az_pair header = { 0 };
-      az_result const result = az_http_response_parser_read_header(&parser, &header);
-      if (result == AZ_ERROR_ITEM_NOT_FOUND) {
-        break;
-      }
-      AZ_RETURN_IF_FAILED(result);
-    }
-
+    AZ_RETURN_IF_FAILED(az_http_response_parser_skip_headers(&parser));
     AZ_RETURN_IF_FAILED(az_http_response_parser_read_body(&parser, &body));
   }
 
