@@ -15,10 +15,6 @@ typedef struct {
   az_http_policy policies[8];
 } az_http_pipeline;
 
-typedef struct {
-  az_mut_span value;
-} az_http_response;
-
 // Start the pipeline
 AZ_NODISCARD az_result az_http_pipeline_process(
     az_http_pipeline * pipeline,

@@ -169,7 +169,7 @@ az_curl_send_post_request(CURL * const p_curl, az_http_request_builder const * c
 
   az_span_free(&body);
   AZ_RETURN_IF_FAILED(res_code);
-  
+
   return AZ_OK;
 }
 
@@ -269,14 +269,14 @@ AZ_NODISCARD az_result setup_response_redirect(
  */
 AZ_NODISCARD az_result az_http_client_send_request_impl(
     az_http_request_builder * const p_hrb,
-    az_mut_span const * const response,
+    az_http_response const * const response,
     bool const buildRFC7230) {
   AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
   AZ_CONTRACT_ARG_NOT_NULL(response);
 
   CURL * p_curl = NULL;
   az_result result = AZ_ERROR_ARG;
-  az_span_builder response_builder = az_span_builder_create(*response);
+  az_span_builder response_builder = az_span_builder_create(response->value);
 
   AZ_RETURN_IF_FAILED(az_curl_init(&p_curl));
 

@@ -23,7 +23,7 @@
  */
 AZ_NODISCARD AZ_INLINE az_result az_http_client_send_request(
     az_http_request_builder * const p_hrb,
-    az_mut_span const * const response) {
+    az_http_response const * const response) {
   return az_http_client_send_request_impl(p_hrb, response, true);
 }
 
@@ -37,7 +37,7 @@ AZ_NODISCARD AZ_INLINE az_result az_http_client_send_request(
  */
 AZ_NODISCARD AZ_INLINE az_result az_http_client_send_request_and_get_body(
     az_http_request_builder * const p_hrb,
-    az_mut_span const * const response) {
+    az_http_response const * const response) {
   return az_http_client_send_request_impl(p_hrb, response, false);
 }
 

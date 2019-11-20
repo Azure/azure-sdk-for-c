@@ -15,5 +15,5 @@ AZ_NODISCARD az_result az_http_pipeline_process(
   AZ_CONTRACT_ARG_NOT_NULL(pipeline);
 
   return pipeline->policies[0].pfnc_process(
-      &(pipeline->policies[1]), pipeline->policies[0].data, hrb, &response->value);
+      &(pipeline->policies[1]), pipeline->policies[0].data, hrb, response);
 }

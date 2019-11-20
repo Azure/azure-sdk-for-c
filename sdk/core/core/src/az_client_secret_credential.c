@@ -27,13 +27,13 @@ enum {
 static AZ_NODISCARD az_result az_token_credential_get_token(
     az_client_secret_credential const * const credential,
     az_span const resource_url,
-    az_mut_span const response_buf,
+    az_http_response const response_buf,
     az_span * const out_result) {
   AZ_CONTRACT_ARG_NOT_NULL(credential);
   AZ_CONTRACT_ARG_NOT_NULL(out_result);
   AZ_CONTRACT_ARG_VALID_SPAN(resource_url);
 
-  AZ_CONTRACT_ARG_VALID_MUT_SPAN(response_buf);
+  AZ_CONTRACT_ARG_VALID_MUT_SPAN(response_buf.value);
   AZ_CONTRACT_ARG_VALID_SPAN(credential->tenant_id);
 
   AZ_CONTRACT_ARG_VALID_SPAN(credential->client_id);
@@ -61,7 +61,8 @@ static AZ_NODISCARD az_result az_token_credential_get_token(
 
   {
     AZ_CONTRACT(
-        response_buf.size >= AZ_TOKEN_CREDENTIAL_GET_TOKEN_MIN_BUFFER, AZ_ERROR_BUFFER_OVERFLOW);
+        response_buf.value.size >= AZ_TOKEN_CREDENTIAL_GET_TOKEN_MIN_BUFFER,
+        AZ_ERROR_BUFFER_OVERFLOW);
 
     size_t const request_elements[] = {
       credential->tenant_id.size * AZ_TOKEN_CREDENTIAL_GET_TOKEN_URLENCODE_FACTOR,
@@ -79,36 +80,37 @@ static AZ_NODISCARD az_result az_token_credential_get_token(
       AZ_CONTRACT(required_request_size > request_elements[i], AZ_ERROR_BUFFER_OVERFLOW);
     }
 
-    AZ_CONTRACT(response_buf.size >= required_request_size, AZ_ERROR_BUFFER_OVERFLOW);
+    AZ_CONTRACT(response_buf.value.size >= required_request_size, AZ_ERROR_BUFFER_OVERFLOW);
   }
 
   {
-    AZ_CONTRACT(!az_span_is_overlap(az_mut_span_to_span(response_buf), resource_url), AZ_ERROR_ARG);
+    AZ_CONTRACT(
+        !az_span_is_overlap(az_mut_span_to_span(response_buf.value), resource_url), AZ_ERROR_ARG);
 
     AZ_CONTRACT(
-        !az_span_is_overlap(az_mut_span_to_span(response_buf), credential->tenant_id),
+        !az_span_is_overlap(az_mut_span_to_span(response_buf.value), credential->tenant_id),
         AZ_ERROR_ARG);
 
     AZ_CONTRACT(
-        !az_span_is_overlap(az_mut_span_to_span(response_buf), credential->client_id),
+        !az_span_is_overlap(az_mut_span_to_span(response_buf.value), credential->client_id),
         AZ_ERROR_ARG);
 
     AZ_CONTRACT(
-        !az_span_is_overlap(az_mut_span_to_span(response_buf), credential->client_secret),
+        !az_span_is_overlap(az_mut_span_to_span(response_buf.value), credential->client_secret),
         AZ_ERROR_ARG);
   }
 
   az_span auth_url = { 0 };
   az_span auth_body = { 0 };
   {
-    az_span_builder builder = az_span_builder_create(response_buf);
+    az_span_builder builder = az_span_builder_create(response_buf.value);
 
     AZ_RETURN_IF_FAILED(az_span_builder_append(&builder, auth_url1));
     AZ_RETURN_IF_FAILED(az_uri_encode(credential->tenant_id, &builder));
     AZ_RETURN_IF_FAILED(az_span_builder_append(&builder, auth_url2));
 
     auth_url = az_span_builder_result(&builder);
-    builder = az_span_builder_create(az_mut_span_drop(response_buf, auth_url.size));
+    builder = az_span_builder_create(az_mut_span_drop(response_buf.value, auth_url.size));
 
     AZ_RETURN_IF_FAILED(az_span_builder_append(&builder, auth_body1));
     AZ_RETURN_IF_FAILED(az_uri_encode(credential->client_id, &builder));
@@ -127,7 +129,7 @@ static AZ_NODISCARD az_result az_token_credential_get_token(
     AZ_RETURN_IF_FAILED(az_http_request_builder_init(
         &hrb,
         (az_mut_span){
-            .begin = response_buf.begin + response_buf.size - auth_url.size,
+            .begin = response_buf.value.begin + response_buf.value.size - auth_url.size,
             .size = auth_url.size,
         },
         (uint16_t)auth_url.size,
@@ -141,7 +143,7 @@ static AZ_NODISCARD az_result az_token_credential_get_token(
   {
     az_json_value value;
     AZ_RETURN_IF_FAILED(az_json_get_object_member(
-        az_mut_span_to_span(response_buf), AZ_STR("access_token"), &value));
+        az_mut_span_to_span(response_buf.value), AZ_STR("access_token"), &value));
     AZ_RETURN_IF_FAILED(az_json_value_get_string(&value, out_result));
   }
 
@@ -205,7 +207,10 @@ static AZ_NODISCARD az_result az_token_credential_add_token_header(
 
   az_span token = { 0 };
   AZ_RETURN_IF_FAILED(az_token_credential_get_token(
-      credential, auth_url, az_mut_span_drop(post_bearer, auth_url.size), &token));
+      credential,
+      auth_url,
+      (az_http_response){ .value = az_mut_span_drop(post_bearer, auth_url.size) },
+      &token));
 
   az_mut_span unused;
   AZ_RETURN_IF_FAILED(az_mut_span_move(post_bearer, token, &unused));
