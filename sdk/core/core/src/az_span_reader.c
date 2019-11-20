@@ -31,6 +31,33 @@ AZ_NODISCARD az_result az_span_reader_expect_span(az_span_reader * const self, a
 }
 
 AZ_NODISCARD az_result
+az_span_reader_find_next_char(az_span_reader * const self, uint8_t const needle) {
+  while (true) {
+    AZ_RETURN_IF_FAILED(az_span_reader_current(self));
+    if (az_span_reader_expect_char(self, needle) == AZ_OK) {
+      return AZ_OK;
+    } else {
+      az_span_reader_next(self);
+    }
+  }
+}
+
+AZ_NODISCARD az_result az_span_reader_find_next_chars(
+    az_span_reader * const self,
+    uint8_t const needle1,
+    uint8_t const needle2) {
+  while (true) {
+    AZ_RETURN_IF_FAILED(az_span_reader_current(self));
+    if ((az_span_reader_expect_char(self, needle1) == AZ_OK)
+        || (az_span_reader_expect_char(self, needle2) == AZ_OK)) {
+      return AZ_OK;
+    } else {
+      az_span_reader_next(self);
+    }
+  }
+}
+
+AZ_NODISCARD az_result
 az_span_reader_expect_digit(az_span_reader * const self, uint8_t * const digit) {
   az_result_byte const c = az_span_reader_current(self);
   if (!isdigit(c)) {

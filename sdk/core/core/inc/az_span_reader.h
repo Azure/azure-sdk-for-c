@@ -49,6 +49,25 @@ az_span_reader_set_pos(az_span_reader * const p_reader, size_t const i) {
  */
 AZ_NODISCARD az_result az_span_reader_expect_span(az_span_reader * const self, az_span const span);
 
+/**
+ * Read from the current location of the reader to where the current char equals to needle.
+ *
+ * If it doesn't match the given @needle, the function returns AZ_ERROR_EOF and the reader is at the end of the span.
+ */
+AZ_NODISCARD az_result az_span_reader_find_next_char(az_span_reader * const self, uint8_t const needle);
+
+/**
+ * Read from the current location of the reader to where the current char equals to one of the needles.
+ *
+ * If it doesn't match the given @needle1 or @needle2, the function returns AZ_ERROR_EOF and the reader is at the
+ * end of the span.
+ */
+AZ_NODISCARD az_result az_span_reader_find_next_chars(
+    az_span_reader * const self,
+    uint8_t const needle1,
+    uint8_t const needle2);
+
+
 AZ_NODISCARD az_result
 az_span_reader_expect_digit(az_span_reader * const self, uint8_t * const digit);
 

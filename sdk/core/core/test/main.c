@@ -16,6 +16,7 @@
 #include <stdlib.h>
 
 #include <az_test.h>
+#include "./test_xml_parser.h"
 
 #include <_az_cfg.h>
 
@@ -31,6 +32,7 @@ void test_span_builder_replace();
 void test_span_span();
 void test_pair_span();
 void test_mut_span();
+void test_xml_parser();
 
 int exit_code = 0;
 
@@ -742,5 +744,6 @@ int main() {
   test_span_span();
   test_pair_span();
   test_mut_span();
+  test_xml_parser();
   return exit_code;
 }

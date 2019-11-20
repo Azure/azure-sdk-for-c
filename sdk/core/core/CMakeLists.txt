@@ -32,6 +32,8 @@ add_library (
   src/az_json_string.c
   src/az_json_token.c
   src/az_mut_span.c
+  src/az_xml_parser.c
+  src/az_xml_value.c
   src/az_pair.c
   src/az_span.c
   src/az_span_builder.c
@@ -90,7 +92,7 @@ add_executable (
     test/test_span_builder_replace.c
     test/test_span_span.c
     test/test_url_parse.c
-
+    test/test_xml_parser.c
     )
 
 target_link_libraries(az_core_test PRIVATE az_core az_core_internal)
