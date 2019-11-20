@@ -26,7 +26,8 @@ typedef enum {
 } az_key_vault_key_type;
 
 typedef struct {
-  az_span const version;
+  az_span version;
+  az_keyvault_keys_client_options_retry retry;
 } az_keyvault_keys_client_options;
 
 typedef struct {
@@ -39,7 +40,7 @@ typedef struct {
 typedef struct {
   az_span uri;
   az_http_pipeline pipeline;
-  az_span version;
+  az_keyvault_keys_client_options options;
 } az_keyvault_keys_client;
 
 AZ_NODISCARD AZ_INLINE az_result az_keyvault_keys_client_init(
@@ -50,11 +51,12 @@ AZ_NODISCARD AZ_INLINE az_result az_keyvault_keys_client_init(
   AZ_CONTRACT_ARG_NOT_NULL(client);
 
   client->uri = uri;
-  client->version = options->version;
+  // Copy all client options so user can dispose options but client will keep it
+  client->options = *options;
   client->pipeline = (az_http_pipeline){
     .policies = {
       { .pfnc_process = az_http_pipeline_policy_uniquerequestid, .data = NULL },
-      { .pfnc_process = az_http_pipeline_policy_retry, .data = NULL },
+      { .pfnc_process = az_http_pipeline_policy_retry, .data = &client->options.retry },
       { .pfnc_process = az_http_pipeline_policy_authentication, .data = credential },
       { .pfnc_process = az_http_pipeline_policy_logging,.data = NULL },
       { .pfnc_process = az_http_pipeline_policy_bufferresponse,.data = NULL },
