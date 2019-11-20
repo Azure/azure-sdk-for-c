@@ -4,8 +4,9 @@
 #include <az_client_secret_credential.h>
 
 #include <az_contract.h>
-#include <az_http_client.h>
+#include <az_http_pipeline.h>
 #include <az_http_request_builder.h>
+#include <az_http_response_parser.h>
 #include <az_json_get.h>
 #include <az_span_builder.h>
 #include <az_str.h>
@@ -18,11 +19,22 @@
 
 enum {
   AZ_TOKEN_CREDENTIAL_GET_TOKEN_MIN_BUFFER
-  = 1350, // if you measure the length of the login.microsoftonline.com's response, it is
-          // around 1324 characters for key vault service.
+  = 5 * (1024 / 2), // 2.5KiB. If you measure the length of the login.microsoftonline.com's response
+                    // (body only), it is around 1324 characters for key vault service, but since
+                    // HTTP headers are also there, typical response total is 2056 bytes - slightly
+                    // over 2KiB.
   AZ_TOKEN_CREDENTIAL_GET_TOKEN_URLENCODE_FACTOR
   = 3, // maximum characters needed when URL encoding (3x the original)
 };
+
+static AZ_NODISCARD az_result no_op_policy(
+    az_http_policy * const p_policies,
+    void * const data,
+    az_http_request_builder * const hrb,
+    az_mut_span const * const response) {
+  (void)data;
+  return p_policies[0].pfnc_process(&(p_policies[1]), p_policies[0].data, hrb, response);
+}
 
 static AZ_NODISCARD az_result az_token_credential_get_token(
     az_client_secret_credential const * const credential,
@@ -135,13 +147,50 @@ static AZ_NODISCARD az_result az_token_credential_get_token(
         auth_url));
 
     AZ_RETURN_IF_FAILED(az_http_request_builder_add_body(&hrb, auth_body));
-    AZ_RETURN_IF_FAILED(az_http_client_send_request_and_get_body(&hrb, &response_buf));
+
+    static az_http_pipeline pipeline = {
+    .policies = {
+      { .pfnc_process = no_op_policy, .data = NULL },
+      { .pfnc_process = no_op_policy, .data = NULL },
+      { .pfnc_process = no_op_policy, .data = NULL },
+      { .pfnc_process = no_op_policy, .data = NULL },
+      { .pfnc_process = no_op_policy, .data = NULL },
+      { .pfnc_process = no_op_policy, .data = NULL },
+      { .pfnc_process = az_http_pipeline_policy_transport, .data = NULL },
+      { .pfnc_process = NULL, .data = NULL },
+    },
+    };
+
+    AZ_RETURN_IF_FAILED(az_http_pipeline_process(&hrb, &response_buf, &pipeline));
+  }
+
+  az_span body = { 0 };
+  {
+    az_span const response = az_mut_span_to_span(response_buf);
+    az_http_response_parser parser = { 0 };
+    AZ_RETURN_IF_FAILED(az_http_response_parser_init(&parser, response));
+
+    az_http_response_status_line status_line = { 0 };
+    AZ_RETURN_IF_FAILED(az_http_response_parser_read_status_line(&parser, &status_line));
+    if (status_line.status_code != AZ_HTTP_STATUS_CODE_OK) {
+      return AZ_ERROR_HTTP_PAL;
+    }
+
+    while (true) {
+      az_pair header = { 0 };
+      az_result const result = az_http_response_parser_read_header(&parser, &header);
+      if (result == AZ_ERROR_ITEM_NOT_FOUND) {
+        break;
+      }
+      AZ_RETURN_IF_FAILED(result);
+    }
+
+    AZ_RETURN_IF_FAILED(az_http_response_parser_read_body(&parser, &body));
   }
 
   {
     az_json_value value;
-    AZ_RETURN_IF_FAILED(az_json_get_object_member(
-        az_mut_span_to_span(response_buf), AZ_STR("access_token"), &value));
+    AZ_RETURN_IF_FAILED(az_json_get_object_member(body, AZ_STR("access_token"), &value));
     AZ_RETURN_IF_FAILED(az_json_value_get_string(&value, out_result));
   }
 

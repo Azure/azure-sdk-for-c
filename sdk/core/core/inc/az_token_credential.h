@@ -11,12 +11,14 @@
 #include <_az_cfg_prefix.h>
 
 enum {
-  AZ_TOKEN_CREDENTIAL_TOKEN_BUFFER_SIZE = 2 * 1024,
+  AZ_TOKEN_CREDENTIAL_TOKEN_BUFFER_SIZE = 3 * 1024,
 };
 
 typedef struct {
   az_credential credential; // must be the first field in every credential structure
-  uint8_t token[AZ_TOKEN_CREDENTIAL_TOKEN_BUFFER_SIZE]; // TODO: all updates to this must be thread-safe
+
+  // TODO: all updates to this must be thread-safe
+  uint8_t token[AZ_TOKEN_CREDENTIAL_TOKEN_BUFFER_SIZE];
 } az_token_credential;
 
 AZ_INLINE AZ_NODISCARD az_result
@@ -28,7 +30,6 @@ az_token_credential_init(az_token_credential * const self, az_credential_func cr
 
   return AZ_OK;
 }
-
 
 #include <_az_cfg_suffix.h>
 
