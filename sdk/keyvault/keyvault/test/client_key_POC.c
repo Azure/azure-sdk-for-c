@@ -28,7 +28,7 @@ int main() {
 
   // Create client options
   az_keyvault_keys_client_options client_options
-      = { .version = AZ_STR("7.0"), .retry = { .max_retry = 3, .delay = 10 } };
+      = { .service_version = AZ_STR("7.0"), .retry = { .max_retry = 3, .delay_in_ms = 10 } };
 
   // Init client
   // TODO: introduce init and init_with_options so client_options can be optional for user

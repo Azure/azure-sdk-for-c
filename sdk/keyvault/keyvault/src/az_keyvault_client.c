@@ -108,7 +108,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
 
   // add version to request
   AZ_RETURN_IF_FAILED(az_http_request_builder_set_query_parameter(
-      &hrb, AZ_STR("api-version"), client->options.version));
+      &hrb, AZ_STR("api-version"), client->options.service_version));
 
   // start pipeline
   return az_http_pipeline_process(&hrb, out, &client->pipeline);

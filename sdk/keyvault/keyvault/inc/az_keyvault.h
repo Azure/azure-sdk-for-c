@@ -26,7 +26,7 @@ typedef enum {
 } az_key_vault_key_type;
 
 typedef struct {
-  az_span version;
+  az_span service_version;
   az_keyvault_keys_client_options_retry retry;
 } az_keyvault_keys_client_options;
 
