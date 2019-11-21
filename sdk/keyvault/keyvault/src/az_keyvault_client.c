@@ -21,6 +21,13 @@ static az_span const AZ_KEY_VAULT_KEY_TYPE_KEY_STR = AZ_CONST_STR("keys");
 static az_span const AZ_KEY_VAULT_KEY_TYPE_SECRET_STR = AZ_CONST_STR("secrets");
 static az_span const AZ_KEY_VAULT_KEY_TYPE_CERTIFICATE_STR = AZ_CONST_STR("certificates");
 
+az_keyvault_keys_client_options const AZ_KEYVAULT_CLIENT_DEFAULT_OPTIONS
+    = { .service_version = AZ_CONST_STR("7.0"),
+        .retry = {
+            .max_retry = 3,
+            .delay_in_ms = 30,
+        } };
+
 AZ_NODISCARD AZ_INLINE az_span az_keyvault_get_key_type_span(az_key_vault_key_type const key_type) {
   switch (key_type) {
     case AZ_KEY_VAULT_KEY_TYPE_KEY: {

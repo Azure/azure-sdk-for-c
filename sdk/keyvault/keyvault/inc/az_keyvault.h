@@ -43,6 +43,23 @@ typedef struct {
   az_keyvault_keys_client_options options;
 } az_keyvault_keys_client;
 
+extern az_keyvault_keys_client_options const AZ_KEYVAULT_CLIENT_DEFAULT_OPTIONS;
+
+/**
+ * @brief Init a client with default options
+ * This is convinient method to create a client with basic settings
+ * Options can be updated specifally after this for unique customization
+ *
+ * Use this, for instance, when only caring about setting one option by calling this method and then
+ * overriding that specific option
+ */
+AZ_NODISCARD AZ_INLINE az_result
+az_keyvault_keys_client_options_init(az_keyvault_keys_client_options * const options) {
+  AZ_CONTRACT_ARG_NOT_NULL(options);
+  *options = AZ_KEYVAULT_CLIENT_DEFAULT_OPTIONS;
+  return AZ_OK;
+}
+
 AZ_NODISCARD AZ_INLINE az_result az_keyvault_keys_client_init(
     az_keyvault_keys_client * const client,
     az_span const uri,
