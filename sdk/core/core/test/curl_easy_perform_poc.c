@@ -32,7 +32,7 @@ int main() {
 
   // response buffer
   uint8_t buf_response[1024 * 4];
-  az_mut_span const http_buf_response = AZ_SPAN_FROM_ARRAY(buf_response);
+  az_http_response const http_buf_response = { .value = AZ_SPAN_FROM_ARRAY(buf_response) };
 
   // create request for keyVault
   az_result build_result = az_http_request_builder_init(
@@ -75,10 +75,10 @@ int main() {
     };
 
   // *************************launch pipeline
-  az_result const get_response = az_http_pipeline_process(&hrb, &http_buf_response, &pipeline);
+  az_result const get_response = az_http_pipeline_process(&pipeline, &hrb, &http_buf_response);
 
   if (az_succeeded(get_response)) {
-    printf("Response is: \n%s", http_buf_response.begin);
+    printf("Response is: \n%s", http_buf_response.value.begin);
   } else {
     printf("Error during running test\n");
   }

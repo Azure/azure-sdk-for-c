@@ -47,12 +47,12 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
     az_span const key_name,
     az_span const key_type,
     az_keyvault_keys_keys_options const * const options,
-    az_mut_span const * const out) {
+    az_http_response const * const response) {
   (void)client;
   (void)key_name;
   (void)key_type;
   (void)options;
-  (void)out;
+  (void)response;
   return AZ_ERROR_NOT_IMPLEMENTED;
 }
 
@@ -74,7 +74,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
     az_keyvault_keys_client * client,
     az_span const key_name,
     az_key_vault_key_type const key_type,
-    az_mut_span const * const out) {
+    az_http_response const * const response) {
   // create request buffer TODO: define size for a getKey Request
   uint8_t request_buffer[1024 * 4];
   az_mut_span request_buffer_span = AZ_SPAN_FROM_ARRAY(request_buffer);
@@ -111,5 +111,5 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
       &hrb, AZ_STR("api-version"), client->options.service_version));
 
   // start pipeline
-  return az_http_pipeline_process(&hrb, out, &client->pipeline);
+  return az_http_pipeline_process(&client->pipeline, &hrb, response);
 }

@@ -31,7 +31,7 @@ static AZ_NODISCARD az_result no_op_policy(
     az_http_policy * const p_policies,
     void * const data,
     az_http_request_builder * const hrb,
-    az_mut_span const * const response) {
+    az_http_response const * const response) {
   (void)data;
   return p_policies[0].pfnc_process(&(p_policies[1]), p_policies[0].data, hrb, response);
 }
@@ -39,17 +39,20 @@ static AZ_NODISCARD az_result no_op_policy(
 static AZ_NODISCARD az_result az_token_credential_get_token(
     az_client_secret_credential const * const credential,
     az_span const resource_url,
-    az_mut_span const response_buf,
+    az_http_response const http_response,
     az_span * const out_result) {
   AZ_CONTRACT_ARG_NOT_NULL(credential);
   AZ_CONTRACT_ARG_NOT_NULL(out_result);
+  AZ_CONTRACT_ARG_NOT_NULL(&http_response);
   AZ_CONTRACT_ARG_VALID_SPAN(resource_url);
 
-  AZ_CONTRACT_ARG_VALID_MUT_SPAN(response_buf);
+  AZ_CONTRACT_ARG_VALID_MUT_SPAN(http_response.value);
   AZ_CONTRACT_ARG_VALID_SPAN(credential->tenant_id);
 
   AZ_CONTRACT_ARG_VALID_SPAN(credential->client_id);
   AZ_CONTRACT_ARG_VALID_SPAN(credential->client_secret);
+
+  az_mut_span const response_buf = http_response.value;
 
   {
     AZ_CONTRACT(resource_url.size >= 12, AZ_ERROR_ARG);
@@ -71,7 +74,8 @@ static AZ_NODISCARD az_result az_token_credential_get_token(
 
   AZ_CONTRACT(auth_url_maxsize <= (size_t) ~(uint16_t)0, AZ_ERROR_ARG);
 
-  size_t const headers_size = sizeof(az_pair) + 7; // We need 7 because our code aligns at 8 byte boundary
+  size_t const headers_size
+      = sizeof(az_pair) + 7; // We need 7 because our code aligns at 8 byte boundary
   {
     AZ_CONTRACT(
         response_buf.size >= AZ_TOKEN_CREDENTIAL_GET_TOKEN_MIN_BUFFER, AZ_ERROR_BUFFER_OVERFLOW);
@@ -161,7 +165,7 @@ static AZ_NODISCARD az_result az_token_credential_get_token(
     },
     };
 
-    AZ_RETURN_IF_FAILED(az_http_pipeline_process(&hrb, &response_buf, &pipeline));
+    AZ_RETURN_IF_FAILED(az_http_pipeline_process(&pipeline, &hrb, &http_response));
   }
 
   az_span body = { 0 };
@@ -246,7 +250,10 @@ static AZ_NODISCARD az_result az_token_credential_add_token_header(
 
   az_span token = { 0 };
   AZ_RETURN_IF_FAILED(az_token_credential_get_token(
-      credential, auth_url, az_mut_span_drop(post_bearer, auth_url.size), &token));
+      credential,
+      auth_url,
+      (az_http_response){ .value = az_mut_span_drop(post_bearer, auth_url.size) },
+      &token));
 
   az_mut_span unused;
   AZ_RETURN_IF_FAILED(az_mut_span_move(post_bearer, token, &unused));
