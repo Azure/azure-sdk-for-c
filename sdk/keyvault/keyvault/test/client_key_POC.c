@@ -31,7 +31,6 @@ int main() {
       = { .service_version = AZ_STR("7.0"), .retry = { .max_retry = 3, .delay_in_ms = 10 } };
 
   // Init client
-  // TODO: introduce init and init_with_options so client_options can be optional for user
   az_result operation_result = az_keyvault_keys_client_init(
       &client, az_str_to_span(getenv(URI_ENV)), &credential, &client_options);
 
@@ -42,6 +41,33 @@ int main() {
       &client, AZ_STR("test-key"), AZ_KEY_VAULT_KEY_TYPE_KEY, &key_response);
 
   printf("response: %s", key);
+
+  uint8_t same_key[1024 * 2];
+  const az_mut_span same_key_span = AZ_SPAN_FROM_ARRAY(same_key);
+  // init a new client with default options
+  az_keyvault_keys_client client_default_options;
+  az_keyvault_keys_client_options default_options;
+  operation_result = az_keyvault_keys_client_options_init(&default_options);
+
+  // override one specific value
+  default_options.retry.delay_in_ms = 1000;
+
+  // Creating credential again since we can't currently re-use same credential
+  // https://github.com/Azure/azure-sdk-for-c/issues/211
+  az_client_secret_credential credential2 = { 0 };
+  az_result const creds_retcode2 = az_client_secret_credential_init(
+      &credential2,
+      az_str_to_span(getenv(TENANT_ID_ENV)),
+      az_str_to_span(getenv(CLIENT_ID_ENV)),
+      az_str_to_span(getenv(CLIENT_SECRET_ENV)));
+
+  operation_result = az_keyvault_keys_client_init(
+      &client_default_options, az_str_to_span(getenv(URI_ENV)), &credential2, &default_options);
+
+  get_key_result = az_keyvault_keys_key_get(
+      &client_default_options, AZ_STR("test-key"), AZ_KEY_VAULT_KEY_TYPE_KEY, &same_key_span);
+
+  printf("\n\n same response: %s", same_key);
 
   return exit_code;
 }
