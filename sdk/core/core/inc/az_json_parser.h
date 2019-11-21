@@ -14,11 +14,6 @@
 
 #include <_az_cfg_prefix.h>
 
-typedef struct {
-  az_span name;
-  az_json_value value;
-} az_json_member;
-
 enum { AZ_JSON_STACK_SIZE = 63 };
 
 typedef uint64_t az_json_stack;

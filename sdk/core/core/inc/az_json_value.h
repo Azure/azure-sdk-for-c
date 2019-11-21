@@ -29,6 +29,10 @@ typedef struct {
   } data;
 } az_json_value;
 
+AZ_NODISCARD AZ_INLINE az_json_value az_json_value_create_null() {
+  return (az_json_value){ .kind = AZ_JSON_VALUE_NULL };
+}
+
 AZ_NODISCARD AZ_INLINE az_json_value az_json_value_create_boolean(bool const value) {
   return (az_json_value){
     .kind = AZ_JSON_VALUE_BOOLEAN,
@@ -48,6 +52,14 @@ AZ_NODISCARD AZ_INLINE az_json_value az_json_value_create_number(double const va
     .kind = AZ_JSON_VALUE_NUMBER,
     .data.number = value,
   };
+}
+
+AZ_NODISCARD AZ_INLINE az_json_value az_json_value_create_object() {
+  return (az_json_value){ .kind = AZ_JSON_VALUE_OBJECT };
+}
+
+AZ_NODISCARD AZ_INLINE az_json_value az_json_value_create_array() {
+  return (az_json_value){ .kind = AZ_JSON_VALUE_ARRAY };
 }
 
 /**
@@ -73,6 +85,11 @@ az_json_value_get_string(az_json_value const * const self, az_span * const out);
  */
 AZ_NODISCARD az_result
 az_json_value_get_number(az_json_value const * const self, double * const out);
+
+typedef struct {
+  az_span name;
+  az_json_value value;
+} az_json_member;
 
 #include <_az_cfg_suffix.h>
 
