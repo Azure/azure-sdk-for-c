@@ -43,125 +43,75 @@ static AZ_NODISCARD az_result az_token_credential_get_token(
     az_span * const out_result) {
   AZ_CONTRACT_ARG_NOT_NULL(credential);
   AZ_CONTRACT_ARG_NOT_NULL(out_result);
-  AZ_CONTRACT_ARG_VALID_SPAN(resource_url);
-
-  AZ_CONTRACT_ARG_VALID_MUT_SPAN(response_buf);
-  AZ_CONTRACT_ARG_VALID_SPAN(credential->tenant_id);
-
-  AZ_CONTRACT_ARG_VALID_SPAN(credential->client_id);
-  AZ_CONTRACT_ARG_VALID_SPAN(credential->client_secret);
-
   {
-    AZ_CONTRACT(resource_url.size >= 12, AZ_ERROR_ARG);
-    AZ_CONTRACT(credential->tenant_id.size >= 32, AZ_ERROR_ARG);
-    AZ_CONTRACT(credential->client_id.size >= 32, AZ_ERROR_ARG);
-    AZ_CONTRACT(credential->client_secret.size >= 32, AZ_ERROR_ARG);
-  }
+    uint8_t auth_url_buf[100] = { 0 };
+    az_span auth_url = { 0 };
+    {
+      static az_span const auth_url1 = AZ_CONST_STR("https://login.microsoftonline.com/");
+      static az_span const auth_url2 = AZ_CONST_STR("/oauth2/token");
 
-  static az_span const auth_url1 = AZ_CONST_STR("https://login.microsoftonline.com/");
-  static az_span const auth_url2 = AZ_CONST_STR("/oauth2/token");
+      az_span_builder builder
+          = az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(auth_url_buf));
 
-  static az_span const auth_body1 = AZ_CONST_STR("grant_type=client_credentials&client_id=");
-  static az_span const auth_body2 = AZ_CONST_STR("&client_secret=");
-  static az_span const auth_body3 = AZ_CONST_STR("&resource=");
+      AZ_RETURN_IF_FAILED(az_span_builder_append(&builder, auth_url1));
+      AZ_RETURN_IF_FAILED(az_uri_encode(credential->tenant_id, &builder));
+      AZ_RETURN_IF_FAILED(az_span_builder_append(&builder, auth_url2));
 
-  size_t const auth_url_maxsize = auth_url1.size
-      + (credential->tenant_id.size * AZ_TOKEN_CREDENTIAL_GET_TOKEN_URLENCODE_FACTOR)
-      + auth_url2.size;
-
-  AZ_CONTRACT(auth_url_maxsize <= (size_t) ~(uint16_t)0, AZ_ERROR_ARG);
-
-  size_t const headers_size = sizeof(az_pair) + 7; // We need 7 because our code aligns at 8 byte boundary
-  {
-    AZ_CONTRACT(
-        response_buf.size >= AZ_TOKEN_CREDENTIAL_GET_TOKEN_MIN_BUFFER, AZ_ERROR_BUFFER_OVERFLOW);
-
-    size_t const request_elements[] = {
-      credential->tenant_id.size * AZ_TOKEN_CREDENTIAL_GET_TOKEN_URLENCODE_FACTOR,
-      credential->client_id.size * AZ_TOKEN_CREDENTIAL_GET_TOKEN_URLENCODE_FACTOR,
-      credential->client_secret.size * AZ_TOKEN_CREDENTIAL_GET_TOKEN_URLENCODE_FACTOR,
-      resource_url.size * AZ_TOKEN_CREDENTIAL_GET_TOKEN_URLENCODE_FACTOR,
-    };
-
-    size_t required_request_size = auth_url1.size + auth_url2.size + auth_body1.size
-        + auth_body2.size + auth_body3.size + headers_size;
-
-    for (size_t i = 0; i < AZ_ARRAY_SIZE(request_elements); ++i) {
-      required_request_size += request_elements[i];
-      AZ_CONTRACT(required_request_size > request_elements[i], AZ_ERROR_BUFFER_OVERFLOW);
+      auth_url = az_span_builder_result(&builder);
     }
 
-    AZ_CONTRACT(response_buf.size >= required_request_size, AZ_ERROR_BUFFER_OVERFLOW);
-  }
+    uint8_t auth_body_buf[200] = { 0 };
+    az_span auth_body = { 0 };
 
-  {
-    AZ_CONTRACT(!az_span_is_overlap(az_mut_span_to_span(response_buf), resource_url), AZ_ERROR_ARG);
+    static az_span const auth_body1 = AZ_CONST_STR("grant_type=client_credentials&client_id=");
+    static az_span const auth_body2 = AZ_CONST_STR("&client_secret=");
+    static az_span const auth_body3 = AZ_CONST_STR("&resource=");
 
-    AZ_CONTRACT(
-        !az_span_is_overlap(az_mut_span_to_span(response_buf), credential->tenant_id),
-        AZ_ERROR_ARG);
-
-    AZ_CONTRACT(
-        !az_span_is_overlap(az_mut_span_to_span(response_buf), credential->client_id),
-        AZ_ERROR_ARG);
-
-    AZ_CONTRACT(
-        !az_span_is_overlap(az_mut_span_to_span(response_buf), credential->client_secret),
-        AZ_ERROR_ARG);
-  }
-
-  az_span auth_url = { 0 };
-  az_span auth_body = { 0 };
-  {
-    az_span_builder builder = az_span_builder_create(response_buf);
-
-    AZ_RETURN_IF_FAILED(az_span_builder_append(&builder, auth_url1));
-    AZ_RETURN_IF_FAILED(az_uri_encode(credential->tenant_id, &builder));
-    AZ_RETURN_IF_FAILED(az_span_builder_append(&builder, auth_url2));
-
-    auth_url = az_span_builder_result(&builder);
-    builder = az_span_builder_create(az_mut_span_drop(response_buf, auth_url.size + headers_size));
+    az_span_builder builder
+        = az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(auth_body_buf));
 
     AZ_RETURN_IF_FAILED(az_span_builder_append(&builder, auth_body1));
     AZ_RETURN_IF_FAILED(az_uri_encode(credential->client_id, &builder));
     AZ_RETURN_IF_FAILED(az_span_builder_append(&builder, auth_body2));
-    AZ_RETURN_IF_FAILED(az_uri_encode(credential->client_secret, &builder));
-    AZ_RETURN_IF_FAILED(az_span_builder_append(&builder, auth_body3));
-    AZ_RETURN_IF_FAILED(az_uri_encode(resource_url, &builder));
 
-    auth_body = az_span_builder_result(&builder);
-  }
+    az_mut_span secret_copy = { .begin = builder.buffer.begin + builder.size, .size = 0 };
+    {
+      size_t secret_start = builder.size;
+      AZ_RETURN_IF_FAILED(az_uri_encode(credential->client_secret, &builder));
+      secret_copy.size = builder.size - secret_start;
+    }
 
-  {
-    assert(auth_url.size <= auth_url_maxsize);
+    az_result result = AZ_OK;
+    do {
+      AZ_BREAK_IF_FAILED(az_span_builder_append(&builder, auth_body3), result);
+      AZ_BREAK_IF_FAILED(az_uri_encode(resource_url, &builder), result);
+      auth_body = az_span_builder_result(&builder);
 
-    az_http_request_builder hrb = { 0 };
-    AZ_RETURN_IF_FAILED(az_http_request_builder_init(
-        &hrb,
-        (az_mut_span){
-            .begin = response_buf.begin + response_buf.size - (auth_url.size),
-            .size = auth_url.size + headers_size,
+      az_http_request_builder hrb = { 0 };
+      AZ_BREAK_IF_FAILED(
+          az_http_request_builder_init(
+              &hrb, response_buf, (uint16_t)auth_url.size, AZ_HTTP_METHOD_VERB_POST, auth_url),
+          result);
+
+      AZ_BREAK_IF_FAILED(az_http_request_builder_add_body(&hrb, auth_body), result);
+
+      static az_http_pipeline pipeline = {
+        .policies = {
+          { .pfnc_process = az_http_pipeline_policy_uniquerequestid, .data = NULL },
+          { .pfnc_process = az_http_pipeline_policy_retry, .data = NULL },
+          { .pfnc_process = no_op_policy, .data = NULL },
+          { .pfnc_process = az_http_pipeline_policy_logging, .data = NULL },
+          { .pfnc_process = az_http_pipeline_policy_bufferresponse, .data = NULL },
+          { .pfnc_process = az_http_pipeline_policy_distributedtracing, .data = NULL },
+          { .pfnc_process = az_http_pipeline_policy_transport, .data = NULL },
+          { .pfnc_process = NULL, .data = NULL },
         },
-        (uint16_t)auth_url.size,
-        AZ_HTTP_METHOD_VERB_POST,
-        auth_url));
+      };
 
-    AZ_RETURN_IF_FAILED(az_http_request_builder_add_body(&hrb, auth_body));
-
-    static az_http_pipeline pipeline = {
-    .policies = {
-      { .pfnc_process = az_http_pipeline_policy_uniquerequestid, .data = NULL },
-      { .pfnc_process = az_http_pipeline_policy_retry, .data = NULL },
-      { .pfnc_process = no_op_policy, .data = NULL },
-      { .pfnc_process = az_http_pipeline_policy_logging, .data = NULL },
-      { .pfnc_process = az_http_pipeline_policy_bufferresponse, .data = NULL },
-      { .pfnc_process = az_http_pipeline_policy_distributedtracing, .data = NULL },
-      { .pfnc_process = az_http_pipeline_policy_transport, .data = NULL },
-      { .pfnc_process = NULL, .data = NULL },
-    },
-    };
-
-    AZ_RETURN_IF_FAILED(az_http_pipeline_process(&hrb, &response_buf, &pipeline));
+      AZ_BREAK_IF_FAILED(az_http_pipeline_process(&hrb, &response_buf, &pipeline), result);
+    } while (false);
+    AZ_RETURN_IF_FAILED(az_mut_span_memset(secret_copy, '#')); // TODO: memset_s
+    AZ_RETURN_IF_FAILED(result);
   }
 
   az_span body = { 0 };
@@ -238,15 +188,17 @@ static AZ_NODISCARD az_result az_token_credential_add_token_header(
   AZ_RETURN_IF_FAILED(az_mut_span_copy(entire_buf, AZ_STR("Bearer "), &bearer));
   post_bearer = az_mut_span_drop(entire_buf, bearer.size);
 
-  az_span_builder auth_url_builder = az_span_builder_create(post_bearer);
+  uint8_t auth_url_buf[100] = { 0 };
+  az_span_builder auth_url_builder
+      = az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(auth_url_buf));
+
   AZ_RETURN_IF_FAILED(
       az_token_credential_get_resource_url(az_mut_span_to_span(hrb->url), &auth_url_builder));
 
   az_span const auth_url = az_span_builder_result(&auth_url_builder);
 
   az_span token = { 0 };
-  AZ_RETURN_IF_FAILED(az_token_credential_get_token(
-      credential, auth_url, az_mut_span_drop(post_bearer, auth_url.size), &token));
+  AZ_RETURN_IF_FAILED(az_token_credential_get_token(credential, auth_url, post_bearer, &token));
 
   az_mut_span unused;
   AZ_RETURN_IF_FAILED(az_mut_span_move(post_bearer, token, &unused));

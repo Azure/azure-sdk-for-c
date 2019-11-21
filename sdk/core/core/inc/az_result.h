@@ -34,6 +34,12 @@ enum {
     } \
   } while (0)
 
+#define AZ_BREAK_IF_FAILED(exp, result) \
+  result = (exp); \
+  if (az_failed(result)) { \
+    break; \
+  }
+
 /**
  * The type represents error conditions.
  * Bits:
