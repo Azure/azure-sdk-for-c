@@ -25,6 +25,9 @@ enum {
                     // over 2KiB.
   AZ_TOKEN_CREDENTIAL_GET_TOKEN_URLENCODE_FACTOR
   = 3, // maximum characters needed when URL encoding (3x the original)
+  AZ_TOKEN_CREDENTIAL_AUTH_URL_BUF_SIZE = 100,
+  AZ_TOKEN_CREDENTIAL_AUTH_BODY_BUF_SIZE = 200,
+  AZ_TOKEN_CREDENTIAL_AUTH_RESOURCE_URL_BUF_SIZE = 100,
 };
 
 static AZ_NODISCARD az_result no_op_policy(
@@ -36,82 +39,83 @@ static AZ_NODISCARD az_result no_op_policy(
   return p_policies[0].pfnc_process(&(p_policies[1]), p_policies[0].data, hrb, response);
 }
 
-static AZ_NODISCARD az_result az_token_credential_get_token(
+AZ_INLINE AZ_NODISCARD az_result az_token_credential_send_get_token_request(
+    az_client_secret_credential const * const credential,
+    az_span const resource_url,
+    az_mut_span const response_buf,
+    az_mut_span auth_url_buf,
+    az_mut_span auth_body_buf) {
+  az_span auth_url = { 0 };
+  {
+    az_span_builder builder = az_span_builder_create(auth_url_buf);
+
+    AZ_RETURN_IF_FAILED(
+        az_span_builder_append(&builder, AZ_STR("https://login.microsoftonline.com/")));
+
+    AZ_RETURN_IF_FAILED(az_uri_encode(credential->tenant_id, &builder));
+    AZ_RETURN_IF_FAILED(az_span_builder_append(&builder, AZ_STR("/oauth2/token")));
+
+    auth_url = az_span_builder_result(&builder);
+  }
+
+  az_span auth_body = { 0 };
+  {
+    az_span_builder builder = az_span_builder_create(auth_body_buf);
+
+    AZ_RETURN_IF_FAILED(
+        az_span_builder_append(&builder, AZ_STR("grant_type=client_credentials&client_id=")));
+
+    AZ_RETURN_IF_FAILED(az_uri_encode(credential->client_id, &builder));
+    AZ_RETURN_IF_FAILED(az_span_builder_append(&builder, AZ_STR("&client_secret=")));
+    AZ_RETURN_IF_FAILED(az_uri_encode(credential->client_secret, &builder));
+    AZ_RETURN_IF_FAILED(az_span_builder_append(&builder, AZ_STR("&resource=")));
+    AZ_RETURN_IF_FAILED(az_uri_encode(resource_url, &builder));
+
+    auth_body = az_span_builder_result(&builder);
+  }
+
+  az_http_request_builder hrb = { 0 };
+  AZ_RETURN_IF_FAILED(az_http_request_builder_init(
+      &hrb, response_buf, (uint16_t)auth_url.size, AZ_HTTP_METHOD_VERB_POST, auth_url));
+
+  AZ_RETURN_IF_FAILED(az_http_request_builder_add_body(&hrb, auth_body));
+
+  static az_http_pipeline pipeline = {
+      .policies = {
+        { .pfnc_process = az_http_pipeline_policy_uniquerequestid, .data = NULL },
+        { .pfnc_process = az_http_pipeline_policy_retry, .data = NULL },
+        { .pfnc_process = no_op_policy, .data = NULL },
+        { .pfnc_process = az_http_pipeline_policy_logging, .data = NULL },
+        { .pfnc_process = az_http_pipeline_policy_bufferresponse, .data = NULL },
+        { .pfnc_process = az_http_pipeline_policy_distributedtracing, .data = NULL },
+        { .pfnc_process = az_http_pipeline_policy_transport, .data = NULL },
+        { .pfnc_process = NULL, .data = NULL },
+      },
+    };
+
+  AZ_RETURN_IF_FAILED(az_http_pipeline_process(&hrb, &response_buf, &pipeline));
+
+  return AZ_OK;
+}
+
+AZ_INLINE AZ_NODISCARD az_result az_token_credential_get_token(
     az_client_secret_credential const * const credential,
     az_span const resource_url,
     az_mut_span const response_buf,
     az_span * const out_result) {
-  AZ_CONTRACT_ARG_NOT_NULL(credential);
-  AZ_CONTRACT_ARG_NOT_NULL(out_result);
   {
-    uint8_t auth_url_buf[100] = { 0 };
-    az_span auth_url = { 0 };
-    {
-      static az_span const auth_url1 = AZ_CONST_STR("https://login.microsoftonline.com/");
-      static az_span const auth_url2 = AZ_CONST_STR("/oauth2/token");
+    uint8_t auth_url_buf[AZ_TOKEN_CREDENTIAL_AUTH_URL_BUF_SIZE] = { 0 };
+    uint8_t auth_body_buf[AZ_TOKEN_CREDENTIAL_AUTH_BODY_BUF_SIZE] = { 0 };
 
-      az_span_builder builder
-          = az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(auth_url_buf));
+    az_mut_span const auth_url = AZ_SPAN_FROM_ARRAY(auth_url_buf);
+    az_mut_span const auth_body = AZ_SPAN_FROM_ARRAY(auth_body_buf);
 
-      AZ_RETURN_IF_FAILED(az_span_builder_append(&builder, auth_url1));
-      AZ_RETURN_IF_FAILED(az_uri_encode(credential->tenant_id, &builder));
-      AZ_RETURN_IF_FAILED(az_span_builder_append(&builder, auth_url2));
+    az_result const token_request_result = az_token_credential_send_get_token_request(
+        credential, resource_url, response_buf, auth_url, auth_body);
 
-      auth_url = az_span_builder_result(&builder);
-    }
-
-    uint8_t auth_body_buf[200] = { 0 };
-    az_span auth_body = { 0 };
-
-    static az_span const auth_body1 = AZ_CONST_STR("grant_type=client_credentials&client_id=");
-    static az_span const auth_body2 = AZ_CONST_STR("&client_secret=");
-    static az_span const auth_body3 = AZ_CONST_STR("&resource=");
-
-    az_span_builder builder
-        = az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(auth_body_buf));
-
-    AZ_RETURN_IF_FAILED(az_span_builder_append(&builder, auth_body1));
-    AZ_RETURN_IF_FAILED(az_uri_encode(credential->client_id, &builder));
-    AZ_RETURN_IF_FAILED(az_span_builder_append(&builder, auth_body2));
-
-    az_mut_span secret_copy = { .begin = builder.buffer.begin + builder.size, .size = 0 };
-    {
-      size_t secret_start = builder.size;
-      AZ_RETURN_IF_FAILED(az_uri_encode(credential->client_secret, &builder));
-      secret_copy.size = builder.size - secret_start;
-    }
-
-    az_result result = AZ_OK;
-    do {
-      AZ_BREAK_IF_FAILED(az_span_builder_append(&builder, auth_body3), result);
-      AZ_BREAK_IF_FAILED(az_uri_encode(resource_url, &builder), result);
-      auth_body = az_span_builder_result(&builder);
-
-      az_http_request_builder hrb = { 0 };
-      AZ_BREAK_IF_FAILED(
-          az_http_request_builder_init(
-              &hrb, response_buf, (uint16_t)auth_url.size, AZ_HTTP_METHOD_VERB_POST, auth_url),
-          result);
-
-      AZ_BREAK_IF_FAILED(az_http_request_builder_add_body(&hrb, auth_body), result);
-
-      static az_http_pipeline pipeline = {
-        .policies = {
-          { .pfnc_process = az_http_pipeline_policy_uniquerequestid, .data = NULL },
-          { .pfnc_process = az_http_pipeline_policy_retry, .data = NULL },
-          { .pfnc_process = no_op_policy, .data = NULL },
-          { .pfnc_process = az_http_pipeline_policy_logging, .data = NULL },
-          { .pfnc_process = az_http_pipeline_policy_bufferresponse, .data = NULL },
-          { .pfnc_process = az_http_pipeline_policy_distributedtracing, .data = NULL },
-          { .pfnc_process = az_http_pipeline_policy_transport, .data = NULL },
-          { .pfnc_process = NULL, .data = NULL },
-        },
-      };
-
-      AZ_BREAK_IF_FAILED(az_http_pipeline_process(&hrb, &response_buf, &pipeline), result);
-    } while (false);
-    AZ_RETURN_IF_FAILED(az_mut_span_memset(secret_copy, '#')); // TODO: memset_s
-    AZ_RETURN_IF_FAILED(result);
+    az_mut_span_memset(auth_body, '#');
+    az_mut_span_memset(auth_url, '#');
+    AZ_RETURN_IF_FAILED(token_request_result);
   }
 
   az_span body = { 0 };
@@ -142,7 +146,7 @@ static AZ_NODISCARD az_result az_token_credential_get_token(
 // Being given
 // "https://NNNNNNNN.vault.azure.net/secrets/Password/XXXXXXXXXXXXXXXXXXXX?api-version=7.0", gives
 // back "https://vault.azure.net" (needed for authentication).
-static AZ_NODISCARD az_result
+AZ_INLINE AZ_NODISCARD az_result
 az_token_credential_get_resource_url(az_span const request_url, az_span_builder * p_builder) {
   az_url url = { 0 };
   if (!az_succeeded(az_url_parse(request_url, &url))) {
@@ -188,14 +192,14 @@ static AZ_NODISCARD az_result az_token_credential_add_token_header(
   AZ_RETURN_IF_FAILED(az_mut_span_copy(entire_buf, AZ_STR("Bearer "), &bearer));
   post_bearer = az_mut_span_drop(entire_buf, bearer.size);
 
-  uint8_t auth_url_buf[100] = { 0 };
-  az_span_builder auth_url_builder
-      = az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(auth_url_buf));
+  uint8_t auth_resource_url_buf[AZ_TOKEN_CREDENTIAL_AUTH_RESOURCE_URL_BUF_SIZE] = { 0 };
+  az_span_builder auth_resource_url_builder
+      = az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(auth_resource_url_buf));
 
-  AZ_RETURN_IF_FAILED(
-      az_token_credential_get_resource_url(az_mut_span_to_span(hrb->url), &auth_url_builder));
+  AZ_RETURN_IF_FAILED(az_token_credential_get_resource_url(
+      az_mut_span_to_span(hrb->url), &auth_resource_url_builder));
 
-  az_span const auth_url = az_span_builder_result(&auth_url_builder);
+  az_span const auth_url = az_span_builder_result(&auth_resource_url_builder);
 
   az_span token = { 0 };
   AZ_RETURN_IF_FAILED(az_token_credential_get_token(credential, auth_url, post_bearer, &token));

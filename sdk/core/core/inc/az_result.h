@@ -34,12 +34,6 @@ enum {
     } \
   } while (0)
 
-#define AZ_BREAK_IF_FAILED(exp, result) \
-  result = (exp); \
-  if (az_failed(result)) { \
-    break; \
-  }
-
 /**
  * The type represents error conditions.
  * Bits:
@@ -84,8 +78,6 @@ AZ_STATIC_ASSERT(EOF == -1)
 AZ_NODISCARD AZ_INLINE bool az_failed(az_result result) { return (result & AZ_ERROR_FLAG) != 0; }
 
 AZ_NODISCARD AZ_INLINE bool az_succeeded(az_result result) { return (result & AZ_ERROR_FLAG) == 0; }
-
-AZ_INLINE az_result az_nodiscard_cancel(az_result result) { return result; }
 
 #include <_az_cfg_suffix.h>
 
