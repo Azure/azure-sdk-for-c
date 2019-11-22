@@ -21,5 +21,8 @@ pr:
       - sdk/
       - eng/
 
+variables:
+  skipComponentGovernanceDetection: true
+
 jobs:
   - template: ./templates/jobs/archetype-sdk-client.yml
