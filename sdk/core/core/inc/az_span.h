@@ -108,6 +108,10 @@ AZ_NODISCARD az_result az_span_get_uint64(az_span const self, uint64_t * const o
 #define AZ_SPAN_FROM_ARRAY(ARRAY) \
   { .begin = ARRAY, .size = AZ_ARRAY_SIZE(ARRAY) }
 
+AZ_NODISCARD AZ_INLINE az_span az_span_from_one(uint8_t const * ptr) {
+  return (az_span){ .begin = ptr, .size = 1 };
+}
+
 /**
  * ```c
  * typedef struct {

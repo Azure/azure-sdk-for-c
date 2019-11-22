@@ -25,6 +25,7 @@ add_library (
   src/az_http_request.c
   src/az_http_request_builder.c
   src/az_http_response_parser.c
+  src/az_json_builder.c
   src/az_json_get.c
   src/az_json_parser.c
   src/az_json_pointer.c
@@ -56,6 +57,7 @@ add_library (az::core ALIAS az_core)
 add_executable (
     az_core_test 
     test/main.c 
+    test/test_json_builder.c
     test/test_json_get_by_pointer.c
     test/test_json_pointer.c
     test/test_json_string.c  
