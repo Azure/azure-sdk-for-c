@@ -15,9 +15,8 @@
 AZ_NODISCARD az_result
 az_span_reader_read_json_string_char(az_span_reader * const self, uint32_t * const out);
 
-
 /**
- * Encodes the given character into a JSON escape sequence. The function return an empty span if 
+ * Encodes the given character into a JSON escape sequence. The function returns an empty span if
  * the given character doesn't require to be escaped.
  */
 AZ_NODISCARD az_span az_json_esc_encode(az_result_byte const c);
