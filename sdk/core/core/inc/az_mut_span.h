@@ -100,16 +100,10 @@ AZ_NODISCARD AZ_INLINE az_mut_span az_mut_span_take(az_mut_span const span, size
   return (az_mut_span){ .begin = span.begin, .size = n };
 }
 
-AZ_NODISCARD AZ_INLINE az_result az_mut_span_memset(az_mut_span const span, uint8_t const fill) {
-  if (!az_mut_span_is_valid(span)) {
-    return AZ_ERROR_ARG;
-  }
-
+AZ_INLINE void az_mut_span_memset(az_mut_span const span, uint8_t const fill) {
   if (!az_mut_span_is_empty(span)) {
     memset(span.begin, fill, span.size);
   }
-
-  return AZ_OK;
 }
 
 AZ_NODISCARD AZ_INLINE az_result
