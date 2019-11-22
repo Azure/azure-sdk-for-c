@@ -15,7 +15,11 @@ typedef struct {
   // TODO: add a JSON stack for validations.
 } az_json_builder;
 
-AZ_NODISCARD az_result az_json_builder_init(az_json_builder * const out, az_span_action const write);
+// AZ_NODISCARD az_result
+// az_json_builder_init(az_json_builder * const out, az_span_builder const span);
+
+AZ_NODISCARD az_result
+az_json_builder_init(az_json_builder * const out, az_span_action const write);
 
 AZ_NODISCARD az_result
 az_json_builder_write(az_json_builder * const self, az_json_value const value);

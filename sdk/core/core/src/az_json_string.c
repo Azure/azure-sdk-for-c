@@ -3,12 +3,9 @@
 
 #include <az_json_string.h>
 
-#include <_az_cfg.h>
+#include <az_str.h>
 
-enum {
-  AZ_HEX_LOWER_OFFSET = 'a' - 10,
-  AZ_HEX_UPPER_OFFSET = 'A' - 10,
-};
+#include <_az_cfg.h>
 
 AZ_NODISCARD AZ_INLINE az_result_byte az_hex_to_digit(az_result_byte const c) {
   if (isdigit(c)) {
@@ -47,6 +44,35 @@ AZ_NODISCARD AZ_INLINE az_result_byte az_json_esc_decode(az_result_byte const c)
     }
     default:
       return az_error_unexpected_char(c);
+  }
+}
+
+AZ_NODISCARD az_span az_json_esc_encode(az_result_byte const c) {
+  switch (c) {
+    case '\\': {
+      return AZ_STR("\\\\");
+    }
+    case '"': {
+      return AZ_STR("\\\"");
+    }
+    case '\b': {
+      return AZ_STR("\\b");
+    }
+    case '\f': {
+      return AZ_STR("\\f");
+    }
+    case '\n': {
+      return AZ_STR("\\n");
+    }
+    case '\r': {
+      return AZ_STR("\\r");
+    }
+    case '\t': {
+      return AZ_STR("\\t");
+    }
+    default: {
+      return (az_span){ 0 };
+    }
   }
 }
 

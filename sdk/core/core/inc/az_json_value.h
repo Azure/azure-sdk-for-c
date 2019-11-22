@@ -18,6 +18,9 @@ typedef enum {
   AZ_JSON_VALUE_STRING = 4,
   AZ_JSON_VALUE_OBJECT = 5,
   AZ_JSON_VALUE_ARRAY = 6,
+  // A special case for non-JSON strings. This field is used to serialize `az_span` into JSON
+  // string. Currently, our JSON parser doesn't return this kind of values.
+  AZ_JSON_VALUE_SPAN = 7,
 } az_json_value_kind;
 
 typedef struct {
@@ -26,6 +29,7 @@ typedef struct {
     bool boolean;
     az_span string;
     double number;
+    az_span span;
   } data;
 } az_json_value;
 
@@ -60,6 +64,13 @@ AZ_NODISCARD AZ_INLINE az_json_value az_json_value_create_object() {
 
 AZ_NODISCARD AZ_INLINE az_json_value az_json_value_create_array() {
   return (az_json_value){ .kind = AZ_JSON_VALUE_ARRAY };
+}
+
+AZ_NODISCARD AZ_INLINE az_json_value az_json_value_create_span(az_span const span) {
+  return (az_json_value){
+    .kind = AZ_JSON_VALUE_SPAN,
+    .data.span = span,
+  };
 }
 
 /**
