@@ -20,54 +20,57 @@ int main() {
   // create credentials as client_id type
   az_client_secret_credential credential = { 0 };
   // init credential_credentials struc
-  az_result const creds_retcode = az_client_secret_credential_init(
+  az_result creds_retcode = az_client_secret_credential_init(
       &credential,
       az_str_to_span(getenv(TENANT_ID_ENV)),
       az_str_to_span(getenv(CLIENT_ID_ENV)),
       az_str_to_span(getenv(CLIENT_SECRET_ENV)));
 
   // Create client options
-  az_keyvault_keys_client_options client_options
-      = { .service_version = AZ_STR("7.0"), .retry = { .max_retry = 3, .delay_in_ms = 10 } };
+  az_keyvault_keys_client_options client_options;
+  az_result client_opts = az_keyvault_keys_client_options_init(&client_options);
 
-  // Init client
+  // Init client.
   az_result operation_result = az_keyvault_keys_client_init(
       &client, az_str_to_span(getenv(URI_ENV)), &credential, &client_options);
 
-  // Use client to get a key
-  uint8_t key[1024 * 2];
-  const az_http_response key_response = { .value = AZ_SPAN_FROM_ARRAY(key) };
-  az_result get_key_result = az_keyvault_keys_key_get(
-      &client, AZ_STR("test-key"), AZ_KEY_VAULT_KEY_TYPE_KEY, &key_response);
+  // Create a buffer for response
+  uint8_t key[1024 * 4];
+  az_http_response create_response = { 0 };
+  az_result init_http_response_result
+      = az_http_response_init(&create_response, &((az_mut_span)AZ_SPAN_FROM_ARRAY(key)));
 
-  printf("response: %s", key);
+  az_result create_result = az_keyvault_keys_key_create(
+      &client, AZ_STR("test-new-key"), AZ_KEY_VAULT_JSON_WEB_KEY_TYPE_RSA, NULL, &create_response);
 
-  uint8_t same_key[1024 * 2];
-  const az_mut_span same_key_span = AZ_SPAN_FROM_ARRAY(same_key);
-  // init a new client with default options
-  az_keyvault_keys_client client_default_options;
-  az_keyvault_keys_client_options default_options;
-  operation_result = az_keyvault_keys_client_options_init(&default_options);
+  printf("Key created:\n %s", key);
 
-  // override one specific value
-  default_options.retry.delay_in_ms = 1000;
+  // Creates keyvault client
+  az_keyvault_keys_client get_client;
 
-  // Creating credential again since we can't currently re-use same credential
-  // https://github.com/Azure/azure-sdk-for-c/issues/211
-  az_client_secret_credential credential2 = { 0 };
-  az_result const creds_retcode2 = az_client_secret_credential_init(
-      &credential2,
+  // create credentials as client_id type
+  az_client_secret_credential get_credential = { 0 };
+  // init credential_credentials struc
+  creds_retcode = az_client_secret_credential_init(
+      &get_credential,
       az_str_to_span(getenv(TENANT_ID_ENV)),
       az_str_to_span(getenv(CLIENT_ID_ENV)),
       az_str_to_span(getenv(CLIENT_SECRET_ENV)));
 
+  // Init client with defaults
   operation_result = az_keyvault_keys_client_init(
-      &client_default_options, az_str_to_span(getenv(URI_ENV)), &credential2, &default_options);
+      &get_client, az_str_to_span(getenv(URI_ENV)), &get_credential, NULL);
 
-  get_key_result = az_keyvault_keys_key_get(
-      &client_default_options, AZ_STR("test-key"), AZ_KEY_VAULT_KEY_TYPE_KEY, &same_key_span);
+  // Create a buffer for response
+  uint8_t get_key[1024 * 4];
+  az_http_response get_create_response = { 0 };
+  init_http_response_result
+      = az_http_response_init(&get_create_response, &((az_mut_span)AZ_SPAN_FROM_ARRAY(get_key)));
 
-  printf("\n\n same response: %s", same_key);
+  az_result get_key_result = az_keyvault_keys_key_get(
+      &get_client, AZ_STR("test-new-key"), AZ_KEY_VAULT_KEY_TYPE_KEY, &get_create_response);
+
+  printf("\n\nGet Key Now:\n %s", get_key);
 
   return exit_code;
 }

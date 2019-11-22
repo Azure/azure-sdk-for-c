@@ -25,6 +25,15 @@ typedef enum {
   AZ_KEY_VAULT_KEY_TYPE_CERTIFICATE = 3,
 } az_key_vault_key_type;
 
+typedef enum {
+  AZ_KEY_VAULT_JSON_WEB_KEY_TYPE_NONE = 0,
+  AZ_KEY_VAULT_JSON_WEB_KEY_TYPE_EC = 1,
+  AZ_KEY_VAULT_JSON_WEB_KEY_TYPE_EC_HSM = 2,
+  AZ_KEY_VAULT_JSON_WEB_KEY_TYPE_RSA = 3,
+  AZ_KEY_VAULT_JSON_WEB_KEY_TYPE_RSA_HSM = 4,
+  AZ_KEY_VAULT_JSON_WEB_KEY_TYPE_OCT = 5,
+} az_keyvault_json_web_key_type;
+
 typedef struct {
   az_span service_version;
   az_keyvault_keys_client_options_retry retry;
@@ -68,8 +77,13 @@ AZ_NODISCARD AZ_INLINE az_result az_keyvault_keys_client_init(
   AZ_CONTRACT_ARG_NOT_NULL(client);
 
   client->uri = uri;
-  // Copy all client options so user can dispose options but client will keep it
-  client->options = *options;
+  // use default options if options is null. Or use customer provided one
+  if (options == NULL) {
+    client->options = AZ_KEYVAULT_CLIENT_DEFAULT_OPTIONS;
+  } else {
+    client->options = *options;
+  }
+
   client->pipeline = (az_http_pipeline){
     .policies = {
       { .pfnc_process = az_http_pipeline_policy_uniquerequestid, .data = NULL },
@@ -86,9 +100,9 @@ AZ_NODISCARD AZ_INLINE az_result az_keyvault_keys_client_init(
 }
 
 AZ_NODISCARD az_result az_keyvault_keys_key_create(
-    az_keyvault_keys_client const * const client,
+    az_keyvault_keys_client * client,
     az_span const key_name,
-    az_span const key_type,
+    az_keyvault_json_web_key_type const json_web_key_type,
     az_keyvault_keys_keys_options const * const options,
     az_http_response const * const response);
 

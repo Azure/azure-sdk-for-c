@@ -6,8 +6,8 @@
 #include <az_http_request_builder.h>
 #include <az_json_parser.h>
 #include <az_span_builder.h>
-#include <az_span_writer.h>
 #include <az_span_reader.h>
+#include <az_span_writer.h>
 #include <az_uri.h>
 
 #include <assert.h>
@@ -15,9 +15,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "./test_json_string.h"
 #include "./az_test.h"
 #include "./test_http_response_parser.h"
+#include "./test_json_string.h"
 #include "./test_json_value.h"
 
 #include <_az_cfg.h>
@@ -587,10 +587,12 @@ int main() {
     az_span const zero_terminated = (az_span){ .begin = actual.begin + 24, .size = 15 };
     az_span const strings = (az_span){ .begin = actual.begin + 40, .size = 7 };
 
-    TEST_EXPECT_SUCCESS(az_mut_span_to_str((az_mut_span){ .begin = actual.begin + 48, .size = 10 }, make_some, &result));
+    TEST_EXPECT_SUCCESS(az_mut_span_to_str(
+        (az_mut_span){ .begin = actual.begin + 48, .size = 10 }, make_some, &result));
     TEST_EXPECT_SUCCESS(az_mut_span_to_str(
         (az_mut_span){ .begin = actual.begin + 58, .size = 16 }, zero_terminated, &result));
-    TEST_EXPECT_SUCCESS(az_mut_span_to_str((az_mut_span){ .begin = actual.begin + 74, .size = 8 }, strings, &result));
+    TEST_EXPECT_SUCCESS(az_mut_span_to_str(
+        (az_mut_span){ .begin = actual.begin + 74, .size = 8 }, strings, &result));
 
     result.begin[result.size - 1] = '$';
     TEST_EXPECT_SUCCESS(az_mut_span_to_str(result, strings, &result));
@@ -665,7 +667,8 @@ int main() {
     az_mut_span const http_buf = { .begin = buf, .size = sizeof(buf) };
     az_http_request_builder hrb;
 
-    TEST_EXPECT_SUCCESS(az_http_request_builder_init(&hrb, http_buf, 100, AZ_HTTP_METHOD_VERB_GET, hrb_url));
+    TEST_EXPECT_SUCCESS(az_http_request_builder_init(
+        &hrb, http_buf, 100, AZ_HTTP_METHOD_VERB_GET, hrb_url, (az_span){ 0 }));
     TEST_ASSERT(az_span_eq(hrb.method_verb, AZ_HTTP_METHOD_VERB_GET));
     TEST_ASSERT(az_span_eq(az_mut_span_to_span(hrb.url), hrb_url));
     TEST_ASSERT(hrb.max_url_size == 100);

@@ -148,9 +148,8 @@ static AZ_NODISCARD az_result az_token_credential_get_token(
         },
         (uint16_t)auth_url.size,
         AZ_HTTP_METHOD_VERB_POST,
-        auth_url));
-
-    AZ_RETURN_IF_FAILED(az_http_request_builder_add_body(&hrb, auth_body));
+        auth_url,
+        auth_body));
 
     static az_http_pipeline pipeline = {
     .policies = {
