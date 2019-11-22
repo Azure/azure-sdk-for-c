@@ -3,6 +3,7 @@
 
 #include <az_json_string.h>
 
+#include <az_hex.h>
 #include <az_str.h>
 
 #include <_az_cfg.h>

@@ -3,6 +3,7 @@
 
 #include <az_json_builder.h>
 
+#include <az_hex.h>
 #include <az_json_string.h>
 #include <az_span_reader.h>
 #include <az_str.h>
@@ -89,8 +90,8 @@ az_json_builder_write_span(az_json_builder * const self, az_span const value) {
         'u',
         '0',
         '0',
-        az_digit_to_upper_hex((uint8_t)(c / 16)),
-        az_digit_to_upper_hex((uint8_t)(c % 16)),
+        az_number_to_upper_hex((uint8_t)(c / 16)),
+        az_number_to_upper_hex((uint8_t)(c % 16)),
       };
       AZ_RETURN_IF_FAILED(
           az_json_value_span_state_replace(&state, (az_span)AZ_SPAN_FROM_ARRAY(array)));
