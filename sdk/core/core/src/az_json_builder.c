@@ -77,7 +77,7 @@ az_json_builder_write_span(az_json_builder * const self, az_span const value) {
     // check if the character has to be escaped.
     {
       az_span const esc = az_json_esc_encode(c);
-      if (az_span_is_empty(esc)) {
+      if (!az_span_is_empty(esc)) {
         AZ_RETURN_IF_FAILED(az_json_value_span_state_replace(&state, esc));
         continue;
       }
