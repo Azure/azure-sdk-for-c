@@ -129,6 +129,10 @@ AZ_NODISCARD AZ_INLINE az_span az_span_from_one(uint8_t const * ptr) {
  */
 AZ_ACTION_TYPE(az_span_action, az_span)
 
+AZ_NODISCARD AZ_INLINE az_span az_str_to_span(char const * str) {
+  return (az_span){ .begin = (uint8_t *)str, .size = strlen(str) };
+}
+
 #include <_az_cfg_suffix.h>
 
 #endif

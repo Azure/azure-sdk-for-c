@@ -224,6 +224,17 @@ az_http_response_parser_read_header(az_http_response_parser * const self, az_pai
   return AZ_OK;
 }
 
+AZ_NODISCARD az_result az_http_response_parser_skip_headers(az_http_response_parser * const self) {
+  while (true) {
+    az_pair header = { 0 };
+    az_result const result = az_http_response_parser_read_header(self, &header);
+    if (result == AZ_ERROR_ITEM_NOT_FOUND) {
+      return AZ_OK;
+    }
+    AZ_RETURN_IF_FAILED(result);
+  }
+}
+
 AZ_NODISCARD az_result
 az_http_response_parser_read_body(az_http_response_parser * const self, az_span * const out) {
   AZ_CONTRACT_ARG_NOT_NULL(self);

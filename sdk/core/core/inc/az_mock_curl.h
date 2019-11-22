@@ -12,7 +12,7 @@
 
 AZ_NODISCARD AZ_INLINE az_result az_http_client_send_request_impl(
     az_http_request const * const p_request,
-    az_span * const response,
+    az_http_response * const response,
     bool allow_allocate) {
   return AZ_ERROR_NOT_IMPLEMENTED;
 };

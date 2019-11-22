@@ -4,6 +4,7 @@
 #ifndef AZ_CURL_ADAPTER_H
 #define AZ_CURL_ADAPTER_H
 
+#include <az_http_policy.h>
 #include <az_http_request.h>
 #include <az_http_request_builder.h>
 #include <az_span_builder.h>
@@ -41,7 +42,7 @@ AZ_NODISCARD AZ_INLINE az_result az_curl_done(CURL ** const pp) {
 
 AZ_NODISCARD az_result az_http_client_send_request_impl(
     az_http_request_builder * const p_hrb,
-    az_mut_span const * const response,
+    az_http_response const * const response,
     bool const buildRFC7230);
 
 #include <_az_cfg_suffix.h>

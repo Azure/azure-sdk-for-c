@@ -16,11 +16,13 @@
 
 #include <_az_cfg.h>
 
-static az_span KEY_VAULT_URL
-    = AZ_CONST_STR("https://antk-keyvault.vault.azure.net/secrets/Password");
+#define TENANT_ID_ENV "tenant_id"
+#define CLIENT_ID_ENV "client_id"
+#define CLIENT_SECRET_ENV "client_secret"
+#define URI_ENV "test_uri"
 
-static az_span API_VERSION_QUERY_NAME = AZ_CONST_STR("api-version");
-static az_span API_VERSION_QUERY_VALUE = AZ_CONST_STR("7.0");
+static az_span const API_VERSION_QUERY_NAME = AZ_CONST_STR("api-version");
+static az_span const API_VERSION_QUERY_VALUE = AZ_CONST_STR("7.0");
 
 int main() {
   // create a buffer for request
@@ -30,11 +32,11 @@ int main() {
 
   // response buffer
   uint8_t buf_response[1024 * 4];
-  az_mut_span const http_buf_response = AZ_SPAN_FROM_ARRAY(buf_response);
+  az_http_response const http_buf_response = { .value = AZ_SPAN_FROM_ARRAY(buf_response) };
 
   // create request for keyVault
-  az_result build_result
-      = az_http_request_builder_init(&hrb, http_buf, 100, AZ_HTTP_METHOD_VERB_GET, KEY_VAULT_URL);
+  az_result build_result = az_http_request_builder_init(
+      &hrb, http_buf, 100, AZ_HTTP_METHOD_VERB_GET, az_str_to_span(getenv(URI_ENV)));
   if (az_failed(build_result)) {
     return build_result;
   }
@@ -50,29 +52,33 @@ int main() {
   az_client_secret_credential credential = { 0 };
   az_result const creds_retcode = az_client_secret_credential_init(
       &credential,
-      AZ_STR("72f988bf-86f1-41af-91ab-2d7cd011db47"),
-      AZ_STR("4317a660-6bfb-4585-9ce9-8f222314879c"),
-      AZ_STR("O2CT[Y:dkTqblml5V/T]ZEi9x1W1zoBW"));
+      az_str_to_span(getenv(TENANT_ID_ENV)),
+      az_str_to_span(getenv(CLIENT_ID_ENV)),
+      az_str_to_span(getenv(CLIENT_SECRET_ENV)));
 
   if (!az_succeeded(creds_retcode)) {
-    printf("Error initializing credentials\n");
+    printf("Error initializing credential\n");
     return creds_retcode;
   }
 
-  az_http_policies policies = { 0 };
-  az_result policies_retcode = az_http_policies_init(&policies);
-  if (!az_succeeded(policies_retcode)) {
-    printf("Error initializing policies\n");
-    return policies_retcode;
-  }
-
-  policies.authentication.data = &credential;
+  az_http_pipeline pipeline = (az_http_pipeline){
+      .policies = {
+        { .pfnc_process = az_http_pipeline_policy_uniquerequestid, .data = NULL },
+        { .pfnc_process = az_http_pipeline_policy_retry, .data = NULL },
+        { .pfnc_process = az_http_pipeline_policy_authentication, .data = &credential },
+        { .pfnc_process = az_http_pipeline_policy_logging, .data = NULL },
+        { .pfnc_process = az_http_pipeline_policy_bufferresponse, .data = NULL },
+        { .pfnc_process = az_http_pipeline_policy_distributedtracing, .data = NULL },
+        { .pfnc_process = az_http_pipeline_policy_transport, .data = NULL },
+        { .pfnc_process = NULL, .data = NULL },
+      }, 
+    };
 
   // *************************launch pipeline
-  az_result const get_response = az_http_pipeline_process(&hrb, &http_buf_response, &policies);
+  az_result const get_response = az_http_pipeline_process(&pipeline, &hrb, &http_buf_response);
 
   if (az_succeeded(get_response)) {
-    printf("Response is: \n%s", http_buf_response.begin);
+    printf("Response is: \n%s", http_buf_response.value.begin);
   } else {
     printf("Error during running test\n");
   }
