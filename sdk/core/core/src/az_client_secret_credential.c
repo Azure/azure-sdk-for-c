@@ -87,7 +87,8 @@ AZ_INLINE AZ_NODISCARD az_result az_token_credential_send_get_token_request(
       },
     };
 
-  AZ_RETURN_IF_FAILED(az_http_pipeline_process(&hrb, &response_buf, &pipeline));
+  az_http_response response = { .value = response_buf };
+  AZ_RETURN_IF_FAILED(az_http_pipeline_process(&pipeline, &hrb, &response));
 
   return AZ_OK;
 }
