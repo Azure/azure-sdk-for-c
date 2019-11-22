@@ -1,1 +1,1 @@
-# Core Lirary for Azure SDK for C
+# Core Library for Azure SDK for C
