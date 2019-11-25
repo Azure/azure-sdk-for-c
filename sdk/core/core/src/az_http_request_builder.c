@@ -59,8 +59,7 @@ AZ_NODISCARD az_result az_http_request_builder_init(
     return AZ_ERROR_BUFFER_OVERFLOW;
   }
 
-  AZ_RETURN_IF_FAILED(
-      az_mut_span_memset(buffer, '\0')); // zero the buffer; we don't have to do this
+  az_mut_span_memset(buffer, '\0'); // zero the buffer; we don't have to do this
 
   az_mut_span uri_buf = { 0 };
   AZ_RETURN_IF_FAILED(az_mut_span_copy( // copy URL to buffer

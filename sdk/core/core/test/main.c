@@ -569,8 +569,7 @@ int main() {
     }
 
     az_mut_span actual = { .begin = buf, .size = sizeof(buf) };
-    TEST_EXPECT_SUCCESS(az_mut_span_memset(
-        (az_mut_span){ .begin = actual.begin + 1, .size = actual.size - 2 }, '#'));
+    az_mut_span_memset((az_mut_span){ .begin = actual.begin + 1, .size = actual.size - 2 }, '#');
 
     az_mut_span result;
 

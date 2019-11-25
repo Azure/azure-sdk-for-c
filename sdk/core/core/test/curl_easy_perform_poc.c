@@ -67,16 +67,16 @@ int main() {
   }
 
   az_http_pipeline pipeline = (az_http_pipeline){
-    .policies = {
-      { .pfnc_process = az_http_pipeline_policy_uniquerequestid, .data = NULL },
-      { .pfnc_process = az_http_pipeline_policy_retry, .data = NULL },
-      { .pfnc_process = az_http_pipeline_policy_authentication, .data = &credential },
-      { .pfnc_process = az_http_pipeline_policy_logging, .data = NULL },
-      { .pfnc_process = az_http_pipeline_policy_bufferresponse, .data = NULL },
-      { .pfnc_process = az_http_pipeline_policy_distributedtracing, .data = NULL },
-      { .pfnc_process = az_http_pipeline_policy_transport, .data = NULL },
-      { .pfnc_process = NULL, .data = NULL },
-    }, 
+      .policies = {
+        { .pfnc_process = az_http_pipeline_policy_uniquerequestid, .data = NULL },
+        { .pfnc_process = az_http_pipeline_policy_retry, .data = NULL },
+        { .pfnc_process = az_http_pipeline_policy_authentication, .data = &credential },
+        { .pfnc_process = az_http_pipeline_policy_logging, .data = NULL },
+        { .pfnc_process = az_http_pipeline_policy_bufferresponse, .data = NULL },
+        { .pfnc_process = az_http_pipeline_policy_distributedtracing, .data = NULL },
+        { .pfnc_process = az_http_pipeline_policy_transport, .data = NULL },
+        { .pfnc_process = NULL, .data = NULL },
+      }, 
     };
 
   // *************************launch pipeline

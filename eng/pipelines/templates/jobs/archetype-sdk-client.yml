@@ -2,15 +2,23 @@ jobs:
 - job: BuildTest
   strategy:
     matrix:
-      Linux:
+      Linux_x64:
         vm.image: 'ubuntu-18.04'
         vcpkg.deps: 'curl[ssl]'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-      Win:
+      Win_x86:
+        vm.image: 'windows-2019'
+        vcpkg.deps: 'curl[winssl]'
+        VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
+        CMAKE_GENERATOR: 'Visual Studio 16 2019'
+        CMAKE_GENERATOR_PLATFORM: Win32
+      Win_x64:
         vm.image: 'windows-2019'
         vcpkg.deps: 'curl[winssl]'
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
-      MacOS:
+        CMAKE_GENERATOR: 'Visual Studio 16 2019'
+        CMAKE_GENERATOR_PLATFORM: x64
+      MacOS_x64:
         vm.image: 'macOS-10.14'
         vcpkg.deps: 'curl[ssl]'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
