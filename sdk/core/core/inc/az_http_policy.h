@@ -5,6 +5,7 @@
 #define AZ_HTTP_POLICY_H
 
 #include <az_http_request_builder.h>
+#include <az_http_response.h>
 #include <az_mut_span.h>
 #include <az_result.h>
 #include <az_span.h>
@@ -37,10 +38,6 @@ typedef struct {
   uint16_t max_retry;
   uint16_t delay_in_ms;
 } az_keyvault_keys_client_options_retry;
-
-typedef struct {
-  az_mut_span value;
-} az_http_response;
 
 // PipelinePolicies must implement the process function
 //

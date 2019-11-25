@@ -25,7 +25,7 @@ int main() {
 
     az_span const expected = AZ_STR("http://example.net/keys/name");
 
-    TEST_ASSERT(az_keyvault_build_url(uri, key_type, key_name, out) == AZ_OK);
+    TEST_ASSERT(az_keyvault_build_url_for_get_key(uri, key_type, key_name, out) == AZ_OK);
     TEST_ASSERT(az_span_eq(az_mut_span_to_span(out), expected));
   }
   return exit_code;

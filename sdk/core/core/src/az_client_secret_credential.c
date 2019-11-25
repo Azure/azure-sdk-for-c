@@ -70,9 +70,7 @@ AZ_INLINE AZ_NODISCARD az_result az_token_credential_send_get_token_request(
 
   az_http_request_builder hrb = { 0 };
   AZ_RETURN_IF_FAILED(az_http_request_builder_init(
-      &hrb, response_buf, (uint16_t)auth_url.size, AZ_HTTP_METHOD_VERB_POST, auth_url));
-
-  AZ_RETURN_IF_FAILED(az_http_request_builder_add_body(&hrb, auth_body));
+      &hrb, response_buf, (uint16_t)auth_url.size, AZ_HTTP_METHOD_VERB_POST, auth_url, auth_body));
 
   static az_http_pipeline pipeline = {
       .policies = {
@@ -208,7 +206,7 @@ AZ_INLINE AZ_NODISCARD az_result az_token_credential_get_token(
     az_span const request_url) {
   uint8_t response_buf[AZ_TOKEN_CREDENTIAL_RESPONSE_BUF_SIZE] = { 0 };
   az_mut_span const response = AZ_SPAN_FROM_ARRAY(response_buf);
-  
+
   az_result const credential_update_result
       = az_token_credential_update(credential, request_url, response);
 

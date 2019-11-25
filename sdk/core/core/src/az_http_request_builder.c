@@ -44,7 +44,8 @@ AZ_NODISCARD az_result az_http_request_builder_init(
     az_mut_span const buffer,
     uint16_t const max_url_size,
     az_span const method_verb,
-    az_span const initial_url) {
+    az_span const initial_url,
+    az_span const body) {
   AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
   AZ_CONTRACT_ARG_VALID_MUT_SPAN(buffer);
   AZ_CONTRACT_ARG_VALID_SPAN(method_verb);
@@ -77,6 +78,7 @@ AZ_NODISCARD az_result az_http_request_builder_init(
     .max_headers = max_headers,
     .retry_headers_start = max_headers,
     .headers_end = 0,
+    .body = body,
   };
 
   return AZ_OK;

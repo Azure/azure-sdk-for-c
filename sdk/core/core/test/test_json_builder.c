@@ -3,7 +3,7 @@
 
 #include <az_json_builder.h>
 #include <az_span.h>
-#include <az_span_writer.h>s
+#include <az_span_writer.h>
 
 #include "./az_test.h"
 
@@ -30,7 +30,8 @@ AZ_NODISCARD az_result write_json(void * _, az_span_action const write) {
         az_json_builder_write_array_item(&builder, az_json_value_create_string(AZ_STR("bar"))));
     AZ_RETURN_IF_FAILED(az_json_builder_write_array_item(&builder, az_json_value_create_null()));
     AZ_RETURN_IF_FAILED(az_json_builder_write_array_item(&builder, az_json_value_create_number(0)));
-    AZ_RETURN_IF_FAILED(az_json_builder_write_array_item(&builder, az_json_value_create_number(-12)));
+    AZ_RETURN_IF_FAILED(
+        az_json_builder_write_array_item(&builder, az_json_value_create_number(-12)));
     AZ_RETURN_IF_FAILED(az_json_builder_write_array_close(&builder));
   }
 
@@ -55,6 +56,8 @@ void test_json_builder() {
     az_span_builder builder = az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(array));
     TEST_ASSERT(write_json(NULL, az_span_builder_append_action(&builder)) == AZ_OK);
     az_span const result = az_span_builder_result(&builder);
-    TEST_ASSERT(az_span_eq(result, AZ_STR("{\"name\":true,\"foo\":[\"bar\",null,0,-12],\"int-max\":9007199254740991}")));
+    TEST_ASSERT(az_span_eq(
+        result,
+        AZ_STR("{\"name\":true,\"foo\":[\"bar\",null,0,-12],\"int-max\":9007199254740991}")));
   }
 }

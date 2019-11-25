@@ -25,6 +25,8 @@ typedef struct {
 
 typedef int32_t az_result_byte;
 
+extern az_span const AZ_SPAN_NULL;
+
 AZ_NODISCARD AZ_INLINE bool az_span_is_empty(az_span const span) { return span.size <= 0; }
 
 AZ_NODISCARD AZ_INLINE bool az_span_is_valid(az_span const span) {
