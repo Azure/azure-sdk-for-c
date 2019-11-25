@@ -38,7 +38,7 @@ int main() {
   uint8_t key[1024 * 4];
   az_http_response create_response = { 0 };
   az_result init_http_response_result
-      = az_http_response_init(&create_response, &((az_mut_span)AZ_SPAN_FROM_ARRAY(key)));
+      = az_http_response_init(&create_response, (az_mut_span)AZ_SPAN_FROM_ARRAY(key));
 
   az_result create_result = az_keyvault_keys_key_create(
       &client, AZ_STR("test-new-key"), AZ_KEY_VAULT_JSON_WEB_KEY_TYPE_RSA, NULL, &create_response);
@@ -65,7 +65,7 @@ int main() {
   uint8_t get_key[1024 * 4];
   az_http_response get_create_response = { 0 };
   init_http_response_result
-      = az_http_response_init(&get_create_response, &((az_mut_span)AZ_SPAN_FROM_ARRAY(get_key)));
+      = az_http_response_init(&get_create_response, (az_mut_span)AZ_SPAN_FROM_ARRAY(get_key));
 
   az_result get_key_result = az_keyvault_keys_key_get(
       &get_client, AZ_STR("test-new-key"), AZ_KEY_VAULT_KEY_TYPE_KEY, &get_create_response);

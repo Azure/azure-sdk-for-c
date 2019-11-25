@@ -49,7 +49,7 @@ typedef struct {
 typedef struct {
   az_span uri;
   az_http_pipeline pipeline;
-  az_keyvault_keys_client_options options;
+  az_keyvault_keys_client_options retry_options;
 } az_keyvault_keys_client;
 
 extern az_keyvault_keys_client_options const AZ_KEYVAULT_CLIENT_DEFAULT_OPTIONS;
@@ -79,15 +79,15 @@ AZ_NODISCARD AZ_INLINE az_result az_keyvault_keys_client_init(
   client->uri = uri;
   // use default options if options is null. Or use customer provided one
   if (options == NULL) {
-    client->options = AZ_KEYVAULT_CLIENT_DEFAULT_OPTIONS;
+    client->retry_options = AZ_KEYVAULT_CLIENT_DEFAULT_OPTIONS;
   } else {
-    client->options = *options;
+    client->retry_options = *options;
   }
 
   client->pipeline = (az_http_pipeline){
     .policies = {
       { .pfnc_process = az_http_pipeline_policy_uniquerequestid, .data = NULL },
-      { .pfnc_process = az_http_pipeline_policy_retry, .data = &client->options.retry },
+      { .pfnc_process = az_http_pipeline_policy_retry, .data = &client->retry_options.retry },
       { .pfnc_process = az_http_pipeline_policy_authentication, .data = credential },
       { .pfnc_process = az_http_pipeline_policy_logging, .data = NULL },
       { .pfnc_process = az_http_pipeline_policy_bufferresponse, .data = NULL },

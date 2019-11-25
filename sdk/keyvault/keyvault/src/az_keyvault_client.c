@@ -85,7 +85,7 @@ az_keyvault_get_json_web_key_type_span(az_keyvault_json_web_key_type const key_t
   }
 }
 
-static AZ_NODISCARD az_result az_keyvault_build_url_for_create_key(
+AZ_INLINE AZ_NODISCARD az_result az_keyvault_build_url_for_create_key(
     az_span const uri,
     az_span const key_name,
     az_span_builder * const s_builder) {
@@ -100,7 +100,7 @@ static AZ_NODISCARD az_result az_keyvault_build_url_for_create_key(
   return AZ_OK;
 }
 
-static AZ_NODISCARD az_result
+AZ_INLINE AZ_NODISCARD az_result
 az_keyvault_build_url_body_for_create_key(az_span const kty, az_span_builder * const s_builder) {
   AZ_RETURN_IF_FAILED(az_span_builder_append(s_builder, AZ_KEY_VAULT_CREATE_KEY_BODY_START));
   AZ_RETURN_IF_FAILED(az_span_builder_append_byte(s_builder, '\"'));
@@ -160,7 +160,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
 
   // add version to request
   AZ_RETURN_IF_FAILED(az_http_request_builder_set_query_parameter(
-      &hrb, AZ_STR("api-version"), client->options.service_version));
+      &hrb, AZ_STR("api-version"), client->retry_options.service_version));
 
   // Adding header content-type json
   AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
@@ -172,7 +172,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
   return az_http_pipeline_process(&client->pipeline, &hrb, response);
 }
 
-static AZ_NODISCARD az_result az_keyvault_build_url_for_get_key(
+AZ_INLINE AZ_NODISCARD az_result az_keyvault_build_url_for_get_key(
     az_span const uri,
     az_span const key_type,
     az_span const key_name,
@@ -230,11 +230,11 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
       MAX_URL_SIZE,
       AZ_HTTP_METHOD_VERB_GET,
       az_mut_span_to_span(url_buffer_span),
-      (az_span){ 0 }));
+      AZ_SPAN_NULL));
 
   // add version to request
   AZ_RETURN_IF_FAILED(az_http_request_builder_set_query_parameter(
-      &hrb, AZ_STR("api-version"), client->options.service_version));
+      &hrb, AZ_STR("api-version"), client->retry_options.service_version));
 
   // start pipeline
   return az_http_pipeline_process(&client->pipeline, &hrb, response);

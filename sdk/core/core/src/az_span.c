@@ -11,6 +11,8 @@ enum {
   AZ_ASCII_LOWER_DIF = 'a' - 'A',
 };
 
+az_span const AZ_SPAN_NULL = { .begin = NULL, .size = 0 };
+
 /**
  * ASCII lower case.
  */
@@ -31,7 +33,7 @@ AZ_NODISCARD bool az_span_eq_ascii_ignore_case(az_span const a, az_span const b)
   return true;
 }
 
-AZ_NODISCARD az_result az_span_get_uint64(az_span const self, uint64_t* const out) {
+AZ_NODISCARD az_result az_span_get_uint64(az_span const self, uint64_t * const out) {
   if (self.size <= 0) {
     return AZ_ERROR_EOF;
   }

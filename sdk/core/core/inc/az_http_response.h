@@ -13,8 +13,8 @@ typedef struct {
 } az_http_response;
 
 AZ_NODISCARD AZ_INLINE az_result
-az_http_response_init(az_http_response * const self, az_mut_span const * const value) {
-  self->value = *value;
+az_http_response_init(az_http_response * const self, az_mut_span const value) {
+  self->value = value;
   return AZ_OK;
 }
 
