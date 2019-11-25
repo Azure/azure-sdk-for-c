@@ -37,7 +37,7 @@ typedef struct az_http_policy az_http_policy;
 typedef struct {
   uint16_t max_retry;
   uint16_t delay_in_ms;
-} az_keyvault_keys_client_options_retry;
+} az_key_vault_keys_client_options_retry;
 
 // PipelinePolicies must implement the process function
 //

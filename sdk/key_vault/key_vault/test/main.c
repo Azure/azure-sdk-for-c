@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "../src/az_keyvault_client.c"
+#include "../src/az_key_vault_client.c"
 
 #include <assert.h>
 #include <stdbool.h>
@@ -25,7 +25,7 @@ int main() {
 
     az_span const expected = AZ_STR("http://example.net/keys/name");
 
-    TEST_ASSERT(az_keyvault_build_url_for_get_key(uri, key_type, key_name, out) == AZ_OK);
+    TEST_ASSERT(az_key_vault_build_url_for_get_key(uri, key_type, key_name, out) == AZ_OK);
     TEST_ASSERT(az_span_eq(az_mut_span_to_span(out), expected));
   }
   return exit_code;

@@ -11,7 +11,7 @@
 # Service teams
 /sdk/core/      @sergey-shandar @vhvb1989 @antkmsft @gilbertw
 /sdk/identity/  @antkmsft
-/sdk/keyvault/  @gilbertw
+/sdk/key_vault/  @gilbertw
 /sdk/storage/   @sergey-shandar @gilbertw
 /sdk/tracing/   @antkmsft
 

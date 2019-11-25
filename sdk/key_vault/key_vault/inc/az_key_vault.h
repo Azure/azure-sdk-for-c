@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef AZ_KEYVAULT_H
-#define AZ_KEYVAULT_H
+#ifndef AZ_KEY_VAULT_H
+#define AZ_KEY_VAULT_H
 
 #include <az_credential.h>
 #include <az_http_pipeline.h>
@@ -32,27 +32,27 @@ typedef enum {
   AZ_KEY_VAULT_JSON_WEB_KEY_TYPE_RSA = 3,
   AZ_KEY_VAULT_JSON_WEB_KEY_TYPE_RSA_HSM = 4,
   AZ_KEY_VAULT_JSON_WEB_KEY_TYPE_OCT = 5,
-} az_keyvault_json_web_key_type;
+} az_key_vault_json_web_key_type;
 
 typedef struct {
   az_span service_version;
-  az_keyvault_keys_client_options_retry retry;
-} az_keyvault_keys_client_options;
+  az_key_vault_keys_client_options_retry retry;
+} az_key_vault_keys_client_options;
 
 typedef struct {
   // key size(size_t, typical default is 4096)
   // Expires date
   // All the REST options
   az_span option;
-} az_keyvault_keys_keys_options;
+} az_key_vault_keys_keys_options;
 
 typedef struct {
   az_span uri;
   az_http_pipeline pipeline;
-  az_keyvault_keys_client_options retry_options;
-} az_keyvault_keys_client;
+  az_key_vault_keys_client_options retry_options;
+} az_key_vault_keys_client;
 
-extern az_keyvault_keys_client_options const AZ_KEYVAULT_CLIENT_DEFAULT_OPTIONS;
+extern az_key_vault_keys_client_options const AZ_KEY_VAULT_CLIENT_DEFAULT_OPTIONS;
 
 /**
  * @brief Init a client with default options
@@ -63,23 +63,23 @@ extern az_keyvault_keys_client_options const AZ_KEYVAULT_CLIENT_DEFAULT_OPTIONS;
  * overriding that specific option
  */
 AZ_NODISCARD AZ_INLINE az_result
-az_keyvault_keys_client_options_init(az_keyvault_keys_client_options * const options) {
+az_key_vault_keys_client_options_init(az_key_vault_keys_client_options * const options) {
   AZ_CONTRACT_ARG_NOT_NULL(options);
-  *options = AZ_KEYVAULT_CLIENT_DEFAULT_OPTIONS;
+  *options = AZ_KEY_VAULT_CLIENT_DEFAULT_OPTIONS;
   return AZ_OK;
 }
 
-AZ_NODISCARD AZ_INLINE az_result az_keyvault_keys_client_init(
-    az_keyvault_keys_client * const client,
+AZ_NODISCARD AZ_INLINE az_result az_key_vault_keys_client_init(
+    az_key_vault_keys_client * const client,
     az_span const uri,
     void * const credential,
-    az_keyvault_keys_client_options const * const options) {
+    az_key_vault_keys_client_options const * const options) {
   AZ_CONTRACT_ARG_NOT_NULL(client);
 
   client->uri = uri;
   // use default options if options is null. Or use customer provided one
   if (options == NULL) {
-    client->retry_options = AZ_KEYVAULT_CLIENT_DEFAULT_OPTIONS;
+    client->retry_options = AZ_KEY_VAULT_CLIENT_DEFAULT_OPTIONS;
   } else {
     client->retry_options = *options;
   }
@@ -99,15 +99,15 @@ AZ_NODISCARD AZ_INLINE az_result az_keyvault_keys_client_init(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_keyvault_keys_key_create(
-    az_keyvault_keys_client * client,
+AZ_NODISCARD az_result az_key_vault_keys_key_create(
+    az_key_vault_keys_client * client,
     az_span const key_name,
-    az_keyvault_json_web_key_type const json_web_key_type,
-    az_keyvault_keys_keys_options const * const options,
+    az_key_vault_json_web_key_type const json_web_key_type,
+    az_key_vault_keys_keys_options const * const options,
     az_http_response const * const response);
 
-AZ_NODISCARD az_result az_keyvault_keys_key_get(
-    az_keyvault_keys_client * client,
+AZ_NODISCARD az_result az_key_vault_keys_key_get(
+    az_key_vault_keys_client * client,
     az_span const key_name,
     az_key_vault_key_type const key_type,
     az_http_response const * const response);

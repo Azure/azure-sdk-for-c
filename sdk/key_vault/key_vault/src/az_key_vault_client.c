@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_keyvault.h>
+#include <az_key_vault.h>
 
 #include <_az_cfg.h>
 
@@ -38,14 +38,15 @@ static az_span const AZ_HTTP_REQUEST_BUILDER_HEADER_CONTENT_TYPE_LABEL
 static az_span const AZ_HTTP_REQUEST_BUILDER_HEADER_CONTENT_TYPE_JSON
     = AZ_CONST_STR("application/json");
 
-az_keyvault_keys_client_options const AZ_KEYVAULT_CLIENT_DEFAULT_OPTIONS
+az_key_vault_keys_client_options const AZ_KEY_VAULT_CLIENT_DEFAULT_OPTIONS
     = { .service_version = AZ_CONST_STR("7.0"),
         .retry = {
             .max_retry = 3,
             .delay_in_ms = 30,
         } };
 
-AZ_NODISCARD AZ_INLINE az_span az_keyvault_get_key_type_span(az_key_vault_key_type const key_type) {
+AZ_NODISCARD AZ_INLINE az_span
+az_key_vault_get_key_type_span(az_key_vault_key_type const key_type) {
   switch (key_type) {
     case AZ_KEY_VAULT_KEY_TYPE_KEY: {
       return AZ_KEY_VAULT_KEY_TYPE_KEY_STR;
@@ -64,7 +65,7 @@ AZ_NODISCARD AZ_INLINE az_span az_keyvault_get_key_type_span(az_key_vault_key_ty
 }
 
 AZ_NODISCARD AZ_INLINE az_span
-az_keyvault_get_json_web_key_type_span(az_keyvault_json_web_key_type const key_type) {
+az_key_vault_get_json_web_key_type_span(az_key_vault_json_web_key_type const key_type) {
   switch (key_type) {
     case AZ_KEY_VAULT_JSON_WEB_KEY_TYPE_EC: {
       return AZ_KEY_VAULT_WEB_KEY_TYPE_EC_STR;
@@ -85,7 +86,7 @@ az_keyvault_get_json_web_key_type_span(az_keyvault_json_web_key_type const key_t
   }
 }
 
-AZ_INLINE AZ_NODISCARD az_result az_keyvault_build_url_for_create_key(
+AZ_INLINE AZ_NODISCARD az_result az_key_vault_build_url_for_create_key(
     az_span const uri,
     az_span const key_name,
     az_span_builder * const s_builder) {
@@ -101,7 +102,7 @@ AZ_INLINE AZ_NODISCARD az_result az_keyvault_build_url_for_create_key(
 }
 
 AZ_INLINE AZ_NODISCARD az_result
-az_keyvault_build_url_body_for_create_key(az_span const kty, az_span_builder * const s_builder) {
+az_key_vault_build_url_body_for_create_key(az_span const kty, az_span_builder * const s_builder) {
   AZ_RETURN_IF_FAILED(az_span_builder_append(s_builder, AZ_KEY_VAULT_CREATE_KEY_BODY_START));
   AZ_RETURN_IF_FAILED(az_span_builder_append_byte(s_builder, '\"'));
   AZ_RETURN_IF_FAILED(az_span_builder_append(s_builder, kty));
@@ -113,11 +114,11 @@ az_keyvault_build_url_body_for_create_key(az_span const kty, az_span_builder * c
 
 // Note: Options can be passed as NULL
 //   results in default options being used
-AZ_NODISCARD az_result az_keyvault_keys_key_create(
-    az_keyvault_keys_client * client,
+AZ_NODISCARD az_result az_key_vault_keys_key_create(
+    az_key_vault_keys_client * client,
     az_span const key_name,
-    az_keyvault_json_web_key_type const json_web_key_type,
-    az_keyvault_keys_keys_options const * const options,
+    az_key_vault_json_web_key_type const json_web_key_type,
+    az_key_vault_keys_keys_options const * const options,
     az_http_response const * const response) {
   (void)options;
 
@@ -129,14 +130,14 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
    *
    */
   az_span const az_json_web_key_type_span
-      = az_keyvault_get_json_web_key_type_span(json_web_key_type);
+      = az_key_vault_get_json_web_key_type_span(json_web_key_type);
 
   // buffer in stack for url
   // {vaultBaseUrl}/keys/CreateSoftKeyTest/create
   uint8_t url_buffer[MAX_URL_SIZE];
   az_mut_span const url_buffer_span_temp = AZ_SPAN_FROM_ARRAY(url_buffer);
   az_span_builder s_builder = az_span_builder_create(url_buffer_span_temp);
-  AZ_RETURN_IF_FAILED(az_keyvault_build_url_for_create_key(client->uri, key_name, &s_builder));
+  AZ_RETURN_IF_FAILED(az_key_vault_build_url_for_create_key(client->uri, key_name, &s_builder));
   az_span const url_buffer_span = az_span_builder_result(&s_builder);
 
   // body for request
@@ -144,7 +145,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
   az_mut_span const body_buffer_span = AZ_SPAN_FROM_ARRAY(body_buffer);
   az_span_builder body_builder = az_span_builder_create(body_buffer_span);
   AZ_RETURN_IF_FAILED(
-      az_keyvault_build_url_body_for_create_key(az_json_web_key_type_span, &body_builder));
+      az_key_vault_build_url_body_for_create_key(az_json_web_key_type_span, &body_builder));
   az_span const created_body = az_span_builder_result(&body_builder);
 
   // create request
@@ -172,7 +173,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
   return az_http_pipeline_process(&client->pipeline, &hrb, response);
 }
 
-AZ_INLINE AZ_NODISCARD az_result az_keyvault_build_url_for_get_key(
+AZ_INLINE AZ_NODISCARD az_result az_key_vault_build_url_for_get_key(
     az_span const uri,
     az_span const key_type,
     az_span const key_name,
@@ -193,10 +194,10 @@ AZ_INLINE AZ_NODISCARD az_result az_keyvault_build_url_for_get_key(
  * @param key_name
  * @param key_type
  * @param response
- * @return AZ_NODISCARD az_keyvault_keys_key_get
+ * @return AZ_NODISCARD az_key_vault_keys_key_get
  */
-AZ_NODISCARD az_result az_keyvault_keys_key_get(
-    az_keyvault_keys_client * client,
+AZ_NODISCARD az_result az_key_vault_keys_key_get(
+    az_key_vault_keys_client * client,
     az_span const key_name,
     az_key_vault_key_type const key_type,
     az_http_response const * const response) {
@@ -207,7 +208,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
   /* ******** build url for request  ******
    * add key_type, key_name and version to url request
    */
-  az_span const az_key_type_span = az_keyvault_get_key_type_span(key_type);
+  az_span const az_key_type_span = az_key_vault_get_key_type_span(key_type);
 
   // make sure we can handle url within the MAX_URL_SIZE
   size_t const url_size_with_path = client->uri.size + 2 /* 2 path separators '\'*/
@@ -219,7 +220,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
   az_mut_span const url_buffer_span
       = (az_mut_span){ .begin = url_buffer, .size = url_size_with_path };
   AZ_RETURN_IF_FAILED(
-      az_keyvault_build_url_for_get_key(client->uri, az_key_type_span, key_name, url_buffer_span));
+      az_key_vault_build_url_for_get_key(client->uri, az_key_type_span, key_name, url_buffer_span));
 
   // create request
   // TODO: define max URL size

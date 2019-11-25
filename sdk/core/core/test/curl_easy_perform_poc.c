@@ -34,7 +34,7 @@ int main() {
   uint8_t buf_response[1024 * 4];
   az_http_response const http_buf_response = { .value = AZ_SPAN_FROM_ARRAY(buf_response) };
 
-  // create request for keyVault
+  // create request for key_vault
   az_result build_result = az_http_request_builder_init(
       &hrb, http_buf, 100, AZ_HTTP_METHOD_VERB_GET, az_str_to_span(getenv(URI_ENV)), AZ_SPAN_NULL);
   if (az_failed(build_result)) {
