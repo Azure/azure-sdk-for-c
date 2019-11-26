@@ -99,6 +99,19 @@ AZ_NODISCARD AZ_INLINE az_result az_keyvault_keys_client_init(
   return AZ_OK;
 }
 
+/**
+ * @brief Creates a new key, stores it, then returns key parameters and attributes to the client.
+ * The create key operation can be used to create any key type in Azure Key Vault. If the named key
+ * already exists, Azure Key Vault creates a new version of the key. It requires the keys/create
+ * permission.
+ *
+ * @param client
+ * @param key_name
+ * @param json_web_key_type
+ * @param options
+ * @param response
+ * @return AZ_NODISCARD az_keyvault_keys_key_create
+ */
 AZ_NODISCARD az_result az_keyvault_keys_key_create(
     az_keyvault_keys_client * client,
     az_span const key_name,
@@ -106,10 +119,38 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
     az_keyvault_keys_keys_options const * const options,
     az_http_response const * const response);
 
+/**
+ * @brief Gets the public part of a stored key.
+ * The get key operation is applicable to all key types. If the requested key is symmetric, then no
+ * key material is released in the response. This operation requires the keys/get permission.
+ *
+ * @param client
+ * @param key_name
+ * @param key_type
+ * @param response
+ * @return AZ_NODISCARD az_keyvault_keys_key_get
+ */
 AZ_NODISCARD az_result az_keyvault_keys_key_get(
     az_keyvault_keys_client * client,
     az_span const key_name,
     az_keyvault_key_type const key_type,
+    az_http_response const * const response);
+
+/**
+ * @brief Deletes a key of any type from storage in Azure Key Vault.
+ * The delete key operation cannot be used to remove individual versions of a key. This operation
+ * removes the cryptographic material associated with the key, which means the key is not usable for
+ * Sign/Verify, Wrap/Unwrap or Encrypt/Decrypt operations. This operation requires the keys/delete
+ * permission.
+ *
+ * @param client
+ * @param key_name
+ * @param response
+ * @return AZ_NODISCARD az_keyvault_keys_key_delete
+ */
+AZ_NODISCARD az_result az_keyvault_keys_key_delete(
+    az_keyvault_keys_client * client,
+    az_span const key_name,
     az_http_response const * const response);
 
 #include <_az_cfg_suffix.h>
