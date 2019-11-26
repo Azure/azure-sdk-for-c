@@ -41,7 +41,7 @@ int main() {
       = az_http_response_init(&create_response, (az_mut_span)AZ_SPAN_FROM_ARRAY(key));
 
   az_result create_result = az_keyvault_keys_key_create(
-      &client, AZ_STR("test-new-key"), AZ_KEY_VAULT_JSON_WEB_KEY_TYPE_RSA, NULL, &create_response);
+      &client, AZ_STR("test-new-key"), AZ_KEYVAULT_JSON_WEB_KEY_TYPE_RSA, NULL, &create_response);
 
   printf("Key created:\n %s", key);
 
@@ -68,7 +68,7 @@ int main() {
       = az_http_response_init(&get_create_response, (az_mut_span)AZ_SPAN_FROM_ARRAY(get_key));
 
   az_result get_key_result = az_keyvault_keys_key_get(
-      &get_client, AZ_STR("test-new-key"), AZ_KEY_VAULT_KEY_TYPE_KEY, &get_create_response);
+      &get_client, AZ_STR("test-new-key"), AZ_KEYVAULT_KEY_TYPE_KEY, &get_create_response);
 
   printf("\n\nGet Key Now:\n %s", get_key);
 
