@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include <az_json_builder.h>
 #include <az_keyvault.h>
 
 #include <_az_cfg.h>
@@ -30,8 +31,6 @@ static az_span const AZ_KEY_VAULT_WEB_KEY_TYPE_OCT_STR = AZ_CONST_STR("oct");
 
 static az_span const AZ_KEY_VAULT_CREATE_KEY_URL_KEYS = AZ_CONST_STR("keys");
 static az_span const AZ_KEY_VAULT_CREATE_KEY_URL_CREATE = AZ_CONST_STR("create");
-static az_span const AZ_KEY_VAULT_CREATE_KEY_BODY_START = AZ_CONST_STR("{ \"kty\": ");
-static az_span const AZ_KEY_VAULT_CREATE_KEY_BODY_END = AZ_CONST_STR(" }");
 
 static az_span const AZ_HTTP_REQUEST_BUILDER_HEADER_CONTENT_TYPE_LABEL
     = AZ_CONST_STR("Content-Type");
@@ -100,13 +99,23 @@ AZ_INLINE AZ_NODISCARD az_result az_keyvault_build_url_for_create_key(
   return AZ_OK;
 }
 
-AZ_INLINE AZ_NODISCARD az_result
-az_keyvault_build_url_body_for_create_key(az_span const kty, az_span_builder * const s_builder) {
-  AZ_RETURN_IF_FAILED(az_span_builder_append(s_builder, AZ_KEY_VAULT_CREATE_KEY_BODY_START));
-  AZ_RETURN_IF_FAILED(az_span_builder_append_byte(s_builder, '\"'));
-  AZ_RETURN_IF_FAILED(az_span_builder_append(s_builder, kty));
-  AZ_RETURN_IF_FAILED(az_span_builder_append_byte(s_builder, '\"'));
-  AZ_RETURN_IF_FAILED(az_span_builder_append(s_builder, AZ_KEY_VAULT_CREATE_KEY_BODY_END));
+/**
+ * @brief Action that uses json builder to construct http request body used by create key
+ *
+ * @param kty required value to create a new key
+ * @param write
+ * @return AZ_NODISCARD build_request_json_body
+ */
+AZ_NODISCARD az_result build_request_json_body(az_span const kty, az_span_action const write) {
+  az_json_builder builder = { 0 };
+
+  AZ_RETURN_IF_FAILED(az_json_builder_init(&builder, write));
+
+  AZ_RETURN_IF_FAILED(az_json_builder_write(&builder, az_json_value_create_object()));
+  AZ_RETURN_IF_FAILED(az_json_builder_write_object_member(
+      &builder, AZ_STR("kty"), az_json_value_create_string(kty)));
+
+  AZ_RETURN_IF_FAILED(az_json_builder_write_object_close(&builder));
 
   return AZ_OK;
 }
@@ -125,30 +134,30 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
   uint8_t request_buffer[1024 * 4];
   az_mut_span request_buffer_span = AZ_SPAN_FROM_ARRAY(request_buffer);
 
-  /* ******** build url for request  ******
-   *
-   */
+  /* ******** build url for request  ******/
+
+  // Get Json web key from type that will be used as kty value for creating key
   az_span const az_json_web_key_type_span
       = az_keyvault_get_json_web_key_type_span(json_web_key_type);
 
-  // buffer in stack for url
-  // {vaultBaseUrl}/keys/CreateSoftKeyTest/create
+  // Allocate buffer in stack to create URL like:
+  // {vaultBaseUrl}/keys/{key_name}/create
   uint8_t url_buffer[MAX_URL_SIZE];
   az_mut_span const url_buffer_span_temp = AZ_SPAN_FROM_ARRAY(url_buffer);
   az_span_builder s_builder = az_span_builder_create(url_buffer_span_temp);
   AZ_RETURN_IF_FAILED(az_keyvault_build_url_for_create_key(client->uri, key_name, &s_builder));
+  // take an span from the created URL since url might be shorter than MAX_URL_SIZE
   az_span const url_buffer_span = az_span_builder_result(&s_builder);
 
-  // body for request
+  // Allocate buffer in stack to hold body request
   uint8_t body_buffer[MAX_BODY_SIZE];
-  az_mut_span const body_buffer_span = AZ_SPAN_FROM_ARRAY(body_buffer);
-  az_span_builder body_builder = az_span_builder_create(body_buffer_span);
-  AZ_RETURN_IF_FAILED(
-      az_keyvault_build_url_body_for_create_key(az_json_web_key_type_span, &body_builder));
-  az_span const created_body = az_span_builder_result(&body_builder);
+  az_span_builder json_builder
+      = az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(body_buffer));
+  AZ_RETURN_IF_FAILED(build_request_json_body(
+      az_json_web_key_type_span, az_span_builder_append_action(&json_builder)));
+  az_span const created_body = az_span_builder_result(&json_builder);
 
   // create request
-  // TODO: define max URL size
   az_http_request_builder hrb;
   AZ_RETURN_IF_FAILED(az_http_request_builder_init(
       &hrb,
