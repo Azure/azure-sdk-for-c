@@ -38,7 +38,8 @@ AZ_INLINE AZ_NODISCARD az_result az_token_credential_send_get_token_request(
     az_span const resource_url,
     az_mut_span const auth_url_buf,
     az_mut_span const auth_body_buf,
-    az_mut_span const response_buf) {
+    az_mut_span const response_buf,
+    clock_t * const requested_at) {
   az_span auth_url = { 0 };
   {
     az_span_builder builder = az_span_builder_create(auth_url_buf);
@@ -86,6 +87,7 @@ AZ_INLINE AZ_NODISCARD az_result az_token_credential_send_get_token_request(
     };
 
   az_http_response response = { .value = response_buf };
+  *requested_at = clock();
   AZ_RETURN_IF_FAILED(az_http_pipeline_process(&pipeline, &hrb, &response));
 
   return AZ_OK;
@@ -129,6 +131,7 @@ AZ_INLINE AZ_NODISCARD az_result az_token_credential_update(
     az_client_secret_credential * const credential,
     az_span const request_url,
     az_mut_span const response_buf) {
+  clock_t requested_at = 0;
   {
     uint8_t auth_resource_url_buf[AZ_TOKEN_CREDENTIAL_AUTH_RESOURCE_URL_BUF_SIZE] = { 0 };
     az_mut_span const auth_resource_url = AZ_SPAN_FROM_ARRAY(auth_resource_url_buf);
@@ -153,7 +156,7 @@ AZ_INLINE AZ_NODISCARD az_result az_token_credential_update(
     az_mut_span const auth_body = AZ_SPAN_FROM_ARRAY(auth_body_buf);
 
     az_result const token_request_result = az_token_credential_send_get_token_request(
-        credential, resource_url, auth_url, auth_body, response_buf);
+        credential, resource_url, auth_url, auth_body, response_buf, &requested_at);
 
     az_mut_span_memset(auth_body, '#');
     az_mut_span_memset(auth_url, '#');
@@ -177,9 +180,31 @@ AZ_INLINE AZ_NODISCARD az_result az_token_credential_update(
 
   {
     az_json_value value;
-    AZ_RETURN_IF_FAILED(az_json_get_object_member(body, AZ_STR("access_token"), &value));
+
+    clock_t lifetime_seconds = 0;
+    if (requested_at > 0) {
+      az_span expires_in = { 0 };
+      if (az_succeeded(az_json_get_object_member(body, AZ_STR("expires_in"), &value))
+          && az_succeeded(az_json_value_get_string(&value, &expires_in))) {
+        clock_t number = 0;
+        for (size_t i = 0; i < expires_in.size; ++i) {
+          uint8_t const c = expires_in.begin[i];
+          if (c >= '0' && c <= '9') {
+            number = number * 10 + (c - '0');
+          } else {
+            number = 0;
+            break;
+          }
+        }
+
+        if (number > 0) {
+          lifetime_seconds = (number - (3 * 60)) * CLOCKS_PER_SEC;
+        }
+      }
+    }
 
     az_span token = { 0 };
+    AZ_RETURN_IF_FAILED(az_json_get_object_member(body, AZ_STR("access_token"), &value));
     AZ_RETURN_IF_FAILED(az_json_value_get_string(&value, &token));
 
     az_mut_span const token_buf = AZ_SPAN_FROM_ARRAY(credential->token_credential.token_buf);
@@ -192,6 +217,11 @@ AZ_INLINE AZ_NODISCARD az_result az_token_credential_update(
 
     if (az_succeeded(token_append_result)) {
       credential->token_credential.token = az_span_builder_mut_result(&builder);
+
+      clock_t const expiration = requested_at + lifetime_seconds;
+      if (expiration > 0) {
+        credential->token_credential.expiration = expiration;
+      }
     } else {
       az_mut_span_memset(token_buf, '#');
       return token_append_result;
@@ -204,6 +234,14 @@ AZ_INLINE AZ_NODISCARD az_result az_token_credential_update(
 AZ_INLINE AZ_NODISCARD az_result az_token_credential_get_token(
     az_client_secret_credential * const credential,
     az_span const request_url) {
+  clock_t const expiration = credential->token_credential.expiration;
+  if (expiration > 0) {
+    clock_t const clk = clock();
+    if (clk > 0 && clk < expiration) {
+      return AZ_OK;
+    }
+  }
+
   uint8_t response_buf[AZ_TOKEN_CREDENTIAL_RESPONSE_BUF_SIZE] = { 0 };
   az_mut_span const response = AZ_SPAN_FROM_ARRAY(response_buf);
 
