@@ -17,7 +17,7 @@
 AZ_NODISCARD AZ_INLINE az_result az_http_pipeline_nextpolicy(
     az_http_policy * const p_policies,
     az_http_request_builder * const hrb,
-    az_http_response const * const response) {
+    az_http_response * const response) {
 
   AZ_CONTRACT_ARG_NOT_NULL(p_policies);
   AZ_CONTRACT_ARG_NOT_NULL(hrb);
@@ -38,7 +38,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_uniquerequestid(
     az_http_policy * const p_policies,
     void * const data,
     az_http_request_builder * const hrb,
-    az_http_response const * const response) {
+    az_http_response * const response) {
   (void)data;
   AZ_CONTRACT_ARG_NOT_NULL(p_policies);
   AZ_CONTRACT_ARG_NOT_NULL(hrb);
@@ -58,7 +58,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
     az_http_policy * const p_policies,
     void * const data,
     az_http_request_builder * const hrb,
-    az_http_response const * const response) {
+    az_http_response * const response) {
   (void)data;
   AZ_CONTRACT_ARG_NOT_NULL(p_policies);
   AZ_CONTRACT_ARG_NOT_NULL(hrb);
@@ -71,7 +71,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_authentication(
     az_http_policy * const p_policies,
     void * const data,
     az_http_request_builder * const hrb,
-    az_http_response const * const response) {
+    az_http_response * const response) {
   AZ_CONTRACT_ARG_NOT_NULL(p_policies);
   AZ_CONTRACT_ARG_NOT_NULL(hrb);
   AZ_CONTRACT_ARG_NOT_NULL(response);
@@ -87,7 +87,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_logging(
     az_http_policy * const p_policies,
     void * const data,
     az_http_request_builder * const hrb,
-    az_http_response const * const response) {
+    az_http_response * const response) {
   (void)data;
   AZ_CONTRACT_ARG_NOT_NULL(p_policies);
   AZ_CONTRACT_ARG_NOT_NULL(hrb);
@@ -100,7 +100,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_bufferresponse(
     az_http_policy * const p_policies,
     void * const data,
     az_http_request_builder * const hrb,
-    az_http_response const * const response) {
+    az_http_response * const response) {
   (void)data;
   AZ_CONTRACT_ARG_NOT_NULL(p_policies);
   AZ_CONTRACT_ARG_NOT_NULL(hrb);
@@ -114,7 +114,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_distributedtracing(
     az_http_policy * const p_policies,
     void * const data,
     az_http_request_builder * const hrb,
-    az_http_response const * const response) {
+    az_http_response * const response) {
   (void)data;
   AZ_CONTRACT_ARG_NOT_NULL(p_policies);
   AZ_CONTRACT_ARG_NOT_NULL(hrb);
@@ -127,7 +127,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_transport(
     az_http_policy * const p_policies,
     void * const data,
     az_http_request_builder * const hrb,
-    az_http_response const * const response) {
+    az_http_response * const response) {
   (void)data;
   AZ_CONTRACT_ARG_NOT_NULL(p_policies);
   AZ_CONTRACT_ARG_NOT_NULL(hrb);
