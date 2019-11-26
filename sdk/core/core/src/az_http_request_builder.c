@@ -79,6 +79,7 @@ AZ_NODISCARD az_result az_http_request_builder_init(
     .retry_headers_start = max_headers,
     .headers_end = 0,
     .body = body,
+    .has_query = false,
   };
 
   return AZ_OK;
@@ -122,22 +123,8 @@ AZ_NODISCARD az_result az_http_request_builder_set_query_parameter(
     }
   }
 
-  // Find whether the URL contains '?' or '&' character already.
-  // So that we know if we should append "?text" or "&text".
-  // Scan from the end until the first occurrence of '&', or '?'.
-  bool first_parameter = true;
-  for (size_t i = p_hrb->url.size; first_parameter == true && i > 0;) {
-    --i;
-
-    uint8_t const c = p_hrb->url.begin[i];
-    if (c == '?' || c == '&') {
-      first_parameter = false;
-      break;
-    }
-  }
-
   // Append either '?' or '&'
-  p_hrb->url.begin[p_hrb->url.size] = first_parameter ? '?' : '&';
+  p_hrb->url.begin[p_hrb->url.size] = p_hrb->has_query ? '&' : '?';
   p_hrb->url.size += 1;
 
   // Append parameter name
@@ -152,6 +139,10 @@ AZ_NODISCARD az_result az_http_request_builder_set_query_parameter(
   p_hrb->url.size += value.size;
 
   assert(p_hrb->url.size == new_url_size);
+
+  // Update status request as having query
+  p_hrb->has_query = true;
+
   return AZ_OK;
 }
 
@@ -174,6 +165,39 @@ AZ_NODISCARD az_result az_http_request_builder_append_header(
   az_pair * const headers = get_headers_start(p_hrb->buffer, p_hrb->max_url_size);
   headers[p_hrb->headers_end] = (az_pair){ .key = key, .value = value };
   p_hrb->headers_end += 1;
+
+  return AZ_OK;
+}
+
+AZ_NODISCARD az_result
+az_http_request_builder_append_path(az_http_request_builder * const p_hrb, az_span const path) {
+  AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
+  AZ_CONTRACT_ARG_NOT_NULL(&path);
+
+  // check if there is enough space yet
+  if (p_hrb->url.size + path.size >= p_hrb->max_url_size) {
+    return AZ_ERROR_BUFFER_OVERFLOW;
+  }
+
+  // validate there are no query parameters in url
+  if (p_hrb->has_query) {
+    return AZ_ERROR_ARG;
+  }
+
+  // use span builder to write into URL. That way errors are handled by span builder.
+  az_span_builder url_builder = az_span_builder_create(p_hrb->url);
+  // update builder buffer to the max supported URL
+  url_builder.buffer.size = p_hrb->max_url_size;
+  // update current builder possition to start at current url size
+  url_builder.size = p_hrb->url.size;
+
+  // append separator byte
+  AZ_RETURN_IF_FAILED(az_span_builder_append_byte(&url_builder, '/'));
+  // append path
+  AZ_RETURN_IF_FAILED(az_span_builder_append(&url_builder, path));
+
+  // update request url span
+  p_hrb->url = az_span_builder_mut_result(&url_builder);
 
   return AZ_OK;
 }

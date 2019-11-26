@@ -43,6 +43,7 @@ typedef struct {
   uint16_t retry_headers_start;
   uint16_t headers_end;
   az_span body;
+  bool has_query;
 } az_http_request_builder;
 
 extern az_span const AZ_HTTP_METHOD_VERB_GET;
@@ -122,6 +123,23 @@ AZ_NODISCARD az_result az_http_request_builder_append_header(
     az_http_request_builder * const p_hrb,
     az_span const key,
     az_span const value);
+
+/**
+ * @brief Adds path to url request.
+ * For instance, if url in request is `http://example.net` and this function is called with path
+ * equals to `test`, then request url will be updated to `http://example.net/test`.
+ * Use this function to create a path after url.
+ *
+ * Note: This function will work as long as no query parameter has been added to url. Otherwise
+ * function will return error and url will not be updated. It is not supported appending path after
+ * a query parameter was set.
+ *
+ * @param p_hrb
+ * @param path
+ * @return AZ_NODISCARD az_http_request_builder_append_path
+ */
+AZ_NODISCARD az_result
+az_http_request_builder_append_path(az_http_request_builder * const p_hrb, az_span const path);
 
 /**
  * @brief Mark that the HTTP headers that are gong to be added via
