@@ -19,7 +19,7 @@ typedef struct {
 AZ_NODISCARD az_result az_http_pipeline_process(
     az_http_pipeline * pipeline,
     az_http_request_builder * const hrb,
-    az_http_response const * const response);
+    az_http_response * const response);
 
 #include <_az_cfg_suffix.h>
 #endif

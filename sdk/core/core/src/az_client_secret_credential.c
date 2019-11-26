@@ -28,7 +28,7 @@ static AZ_NODISCARD az_result no_op_policy(
     az_http_policy * const p_policies,
     void * const data,
     az_http_request_builder * const hrb,
-    az_http_response const * const response) {
+    az_http_response * const response) {
   (void)data;
   return p_policies[0].pfnc_process(&(p_policies[1]), p_policies[0].data, hrb, response);
 }

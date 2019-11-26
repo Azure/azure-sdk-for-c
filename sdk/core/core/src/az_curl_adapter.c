@@ -269,7 +269,7 @@ AZ_NODISCARD az_result setup_response_redirect(
  */
 AZ_NODISCARD az_result az_http_client_send_request_impl(
     az_http_request_builder * const p_hrb,
-    az_http_response const * const response,
+    az_http_response * const response,
     bool const buildRFC7230) {
   AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
   AZ_CONTRACT_ARG_NOT_NULL(response);
@@ -296,6 +296,9 @@ AZ_NODISCARD az_result az_http_client_send_request_impl(
   if (az_succeeded(result)) {
     AZ_RETURN_IF_FAILED(az_span_builder_append(&response_builder, AZ_STR_ZERO));
   }
+  // update http_response value with the actual response size to avoid garbage
+  // https://github.com/Azure/azure-sdk-for-c/issues/219
+  response->value = az_span_builder_mut_result(&response_builder);
 
   AZ_RETURN_IF_FAILED(az_curl_done(&p_curl));
   return result;
