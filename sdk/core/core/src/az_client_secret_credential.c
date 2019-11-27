@@ -127,6 +127,20 @@ az_token_credential_get_resource_url(az_span const request_url, az_span_builder 
   return AZ_OK;
 }
 
+AZ_INLINE clock_t span_to_clock_t(az_span const span) {
+  clock_t number = 0;
+  for (size_t i = 0; i < span.size; ++i) {
+    uint8_t const c = span.begin[i];
+    if (c >= '0' && c <= '9') {
+      number = number * 10 + (c - '0');
+    } else {
+      return 0;
+    }
+  }
+
+  return number;
+}
+
 AZ_INLINE AZ_NODISCARD az_result az_token_credential_update(
     az_client_secret_credential * const credential,
     az_span const request_url,
@@ -181,24 +195,15 @@ AZ_INLINE AZ_NODISCARD az_result az_token_credential_update(
   {
     az_json_value value;
 
-    clock_t lifetime_seconds = 0;
+    clock_t expiration_clock = 0;
     if (requested_at > 0) {
       az_span expires_in = { 0 };
       if (az_succeeded(az_json_get_object_member(body, AZ_STR("expires_in"), &value))
           && az_succeeded(az_json_value_get_string(&value, &expires_in))) {
-        clock_t number = 0;
-        for (size_t i = 0; i < expires_in.size; ++i) {
-          uint8_t const c = expires_in.begin[i];
-          if (c >= '0' && c <= '9') {
-            number = number * 10 + (c - '0');
-          } else {
-            number = 0;
-            break;
-          }
-        }
+        clock_t expiration_seconds = span_to_clock_t(expires_in);
 
-        if (number > 0) {
-          lifetime_seconds = (number - (3 * 60)) * CLOCKS_PER_SEC;
+        if (expiration_seconds > 0) {
+          expiration_clock = (expiration_seconds - (3 * 60)) * CLOCKS_PER_SEC;
         }
       }
     }
@@ -218,7 +223,7 @@ AZ_INLINE AZ_NODISCARD az_result az_token_credential_update(
     if (az_succeeded(token_append_result)) {
       credential->token_credential.token = az_span_builder_mut_result(&builder);
 
-      clock_t const expiration = requested_at + lifetime_seconds;
+      clock_t const expiration = requested_at + expiration_clock;
       if (expiration > 0) {
         credential->token_credential.expiration = expiration;
       }
