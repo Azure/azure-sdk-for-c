@@ -117,7 +117,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
     az_span const key_name,
     az_keyvault_json_web_key_type const json_web_key_type,
     az_keyvault_keys_keys_options const * const options,
-    az_http_response const * const response);
+    az_http_response * const response);
 
 /**
  * @brief Gets the public part of a stored key.
@@ -134,7 +134,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
     az_keyvault_keys_client * client,
     az_span const key_name,
     az_keyvault_key_type const key_type,
-    az_http_response const * const response);
+    az_http_response * const response);
 
 /**
  * @brief Deletes a key of any type from storage in Azure Key Vault.

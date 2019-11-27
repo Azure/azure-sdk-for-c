@@ -33,8 +33,8 @@ int main() {
   /******* Create a buffer for response (will be reused for all requests)   *****/
   uint8_t response_buffer[1024 * 4];
   az_http_response http_response = { 0 };
-  az_result init_http_response_result
-      = az_http_response_init(&http_response, (az_mut_span)AZ_SPAN_FROM_ARRAY(response_buffer));
+  az_result init_http_response_result = az_http_response_init(
+      &http_response, az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(response_buffer)));
 
   /******************  CREATE KEY ******************************/
   az_result create_result = az_keyvault_keys_key_create(
@@ -43,8 +43,7 @@ int main() {
   printf("Key created:\n %s", response_buffer);
 
   // Reuse response buffer for create Key by creating a new span from response_buffer
-  init_http_response_result
-      = az_http_response_init(&http_response, (az_mut_span)AZ_SPAN_FROM_ARRAY(response_buffer));
+  az_http_response_reset(&http_response);
 
   /******************  GET KEY ******************************/
   az_result get_key_result = az_keyvault_keys_key_get(
@@ -53,8 +52,7 @@ int main() {
   printf("\n\nGet Key Now:\n %s", response_buffer);
 
   // Reuse response buffer for delete Key by creating a new span from response_buffer
-  init_http_response_result
-      = az_http_response_init(&http_response, (az_mut_span)AZ_SPAN_FROM_ARRAY(response_buffer));
+  az_http_response_reset(&http_response);
 
   /******************  DELETE KEY ******************************/
   az_result delete_key_result
@@ -63,10 +61,9 @@ int main() {
   printf("\n\nDELETED Key :\n %s", response_buffer);
 
   // Reuse response buffer for create Key by creating a new span from response_buffer
-  init_http_response_result
-      = az_http_response_init(&http_response, (az_mut_span)AZ_SPAN_FROM_ARRAY(response_buffer));
+  az_http_response_reset(&http_response);
 
-  /******************  GET KEY (should fail ) ******************************/
+  /******************  GET KEY (should get key w/o settings (kty) ) ******************************/
   az_result get_key_again_result = az_keyvault_keys_key_get(
       &client, AZ_STR("test-new-key"), AZ_KEYVAULT_KEY_TYPE_KEY, &http_response);
 

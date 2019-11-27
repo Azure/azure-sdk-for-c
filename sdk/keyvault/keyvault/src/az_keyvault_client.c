@@ -84,21 +84,6 @@ az_keyvault_get_json_web_key_type_span(az_keyvault_json_web_key_type const key_t
   }
 }
 
-AZ_INLINE AZ_NODISCARD az_result az_keyvault_build_url_for_create_key(
-    az_span const uri,
-    az_span const key_name,
-    az_span_builder * const s_builder) {
-  AZ_RETURN_IF_FAILED(az_span_builder_append(s_builder, uri));
-  AZ_RETURN_IF_FAILED(az_span_builder_append_byte(s_builder, '/'));
-  AZ_RETURN_IF_FAILED(az_span_builder_append(s_builder, AZ_KEYVAULT_REST_KEY_URL_KEYS));
-  AZ_RETURN_IF_FAILED(az_span_builder_append_byte(s_builder, '/'));
-  AZ_RETURN_IF_FAILED(az_span_builder_append(s_builder, key_name));
-  AZ_RETURN_IF_FAILED(az_span_builder_append_byte(s_builder, '/'));
-  AZ_RETURN_IF_FAILED(az_span_builder_append(s_builder, AZ_KEYVAULT_CREATE_KEY_URL_CREATE));
-
-  return AZ_OK;
-}
-
 /**
  * @brief Action that uses json builder to construct http request body used by create key
  *
@@ -106,7 +91,8 @@ AZ_INLINE AZ_NODISCARD az_result az_keyvault_build_url_for_create_key(
  * @param write
  * @return AZ_NODISCARD build_request_json_body
  */
-AZ_NODISCARD az_result build_request_json_body(az_span const kty, az_span_action const write) {
+AZ_NODISCARD AZ_INLINE az_result
+build_request_json_body(az_span const kty, az_span_action const write) {
   az_json_builder builder = { 0 };
 
   AZ_RETURN_IF_FAILED(az_json_builder_init(&builder, write));
@@ -125,7 +111,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
     az_span const key_name,
     az_keyvault_json_web_key_type const json_web_key_type,
     az_keyvault_keys_keys_options const * const options,
-    az_http_response const * const response) {
+    az_http_response * const response) {
   (void)options;
 
   // Request buffer
@@ -137,15 +123,6 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
   // Get Json web key from type that will be used as kty value for creating key
   az_span const az_json_web_key_type_span
       = az_keyvault_get_json_web_key_type_span(json_web_key_type);
-
-  // Allocate buffer in stack to create URL like:
-  // {vaultBaseUrl}/keys/{key_name}/create
-  uint8_t url_buffer[MAX_URL_SIZE];
-  az_mut_span const url_buffer_span_temp = AZ_SPAN_FROM_ARRAY(url_buffer);
-  az_span_builder s_builder = az_span_builder_create(url_buffer_span_temp);
-  AZ_RETURN_IF_FAILED(az_keyvault_build_url_for_create_key(client->uri, key_name, &s_builder));
-  // take an span from the created URL since url might be shorter than MAX_URL_SIZE
-  az_span const url_buffer_span = az_span_builder_result(&s_builder);
 
   // Allocate buffer in stack to hold body request
   uint8_t body_buffer[MAX_BODY_SIZE];
@@ -162,12 +139,23 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
       request_buffer_span,
       MAX_URL_SIZE,
       AZ_HTTP_METHOD_VERB_POST,
-      url_buffer_span,
+      client->uri,
       created_body));
+
+  // add path to request
+  AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, AZ_KEYVAULT_REST_KEY_URL_KEYS));
 
   // add version to request
   AZ_RETURN_IF_FAILED(az_http_request_builder_set_query_parameter(
       &hrb, AZ_STR("api-version"), client->retry_options.service_version));
+
+  AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, key_name));
+
+  // add extra header just for testing append_path after another query
+  AZ_RETURN_IF_FAILED(az_http_request_builder_set_query_parameter(
+      &hrb, AZ_STR("ignore"), client->retry_options.service_version));
+
+  AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, AZ_KEYVAULT_CREATE_KEY_URL_CREATE));
 
   // Adding header content-type json
   AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
@@ -179,60 +167,42 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
   return az_http_pipeline_process(&client->pipeline, &hrb, response);
 }
 
-AZ_INLINE AZ_NODISCARD az_result az_keyvault_build_url_for_get_key(
-    az_span const uri,
-    az_span const key_type,
-    az_span const key_name,
-    az_mut_span const out) {
-  az_span_builder s_builder = az_span_builder_create(out);
-  AZ_RETURN_IF_FAILED(az_span_builder_append(&s_builder, uri));
-  AZ_RETURN_IF_FAILED(az_span_builder_append_byte(&s_builder, '/'));
-  AZ_RETURN_IF_FAILED(az_span_builder_append(&s_builder, key_type));
-  AZ_RETURN_IF_FAILED(az_span_builder_append_byte(&s_builder, '/'));
-  AZ_RETURN_IF_FAILED(az_span_builder_append(&s_builder, key_name));
-  return AZ_OK;
-}
-
+/**
+ * @brief Currently returning last key version. Need to update to get version key
+ *
+ * @param client
+ * @param key_name
+ * @param key_type
+ * @param response
+ * @return AZ_NODISCARD az_keyvault_keys_key_get
+ */
 AZ_NODISCARD az_result az_keyvault_keys_key_get(
     az_keyvault_keys_client * client,
     az_span const key_name,
     az_keyvault_key_type const key_type,
-    az_http_response const * const response) {
+    az_http_response * const response) {
   // create request buffer TODO: define size for a getKey Request
   uint8_t request_buffer[1024 * 4];
   az_mut_span request_buffer_span = AZ_SPAN_FROM_ARRAY(request_buffer);
 
-  /* ******** build url for request  ******
-   * add key_type, key_name and version to url request
-   */
+  // Get the key type name from key type
   az_span const az_key_type_span = az_keyvault_get_key_type_span(key_type);
-
-  // make sure we can handle url within the MAX_URL_SIZE
-  size_t const url_size_with_path = client->uri.size + 2 /* 2 path separators '\'*/
-      + az_key_type_span.size + key_name.size;
-  AZ_CONTRACT(url_size_with_path <= MAX_URL_SIZE, AZ_ERROR_BUFFER_OVERFLOW);
-
-  // Put a new buffer on the stack to hold a url with the key name and type
-  uint8_t url_buffer[MAX_URL_SIZE];
-  az_mut_span const url_buffer_span
-      = (az_mut_span){ .begin = url_buffer, .size = url_size_with_path };
-  AZ_RETURN_IF_FAILED(
-      az_keyvault_build_url_for_get_key(client->uri, az_key_type_span, key_name, url_buffer_span));
 
   // create request
   // TODO: define max URL size
   az_http_request_builder hrb;
   AZ_RETURN_IF_FAILED(az_http_request_builder_init(
-      &hrb,
-      request_buffer_span,
-      MAX_URL_SIZE,
-      AZ_HTTP_METHOD_VERB_GET,
-      az_mut_span_to_span(url_buffer_span),
-      AZ_SPAN_NULL));
+      &hrb, request_buffer_span, MAX_URL_SIZE, AZ_HTTP_METHOD_VERB_GET, client->uri, AZ_SPAN_NULL));
 
-  // add version to request
+  // Add path to request
+  AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, az_key_type_span));
+
+  // add version to request as query parameter
   AZ_RETURN_IF_FAILED(az_http_request_builder_set_query_parameter(
       &hrb, AZ_STR("api-version"), client->retry_options.service_version));
+
+  // Add path to request after adding query parameter
+  AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, key_name));
 
   // start pipeline
   return az_http_pipeline_process(&client->pipeline, &hrb, response);
