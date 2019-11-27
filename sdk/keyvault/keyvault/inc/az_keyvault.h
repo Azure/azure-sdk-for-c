@@ -9,7 +9,7 @@
 
 #include <stdlib.h>
 
-#define AZ_KEY_VAULT_KEY_TYPE_NONE_STR ""
+#define AZ_KEYVAULT_KEY_TYPE_NONE_STR ""
 
 #include <_az_cfg_prefix.h>
 
@@ -19,19 +19,19 @@
  * one of this enum values.
  */
 typedef enum {
-  AZ_KEY_VAULT_KEY_TYPE_NONE = 0,
-  AZ_KEY_VAULT_KEY_TYPE_KEY = 1,
-  AZ_KEY_VAULT_KEY_TYPE_SECRET = 2,
-  AZ_KEY_VAULT_KEY_TYPE_CERTIFICATE = 3,
-} az_key_vault_key_type;
+  AZ_KEYVAULT_KEY_TYPE_NONE = 0,
+  AZ_KEYVAULT_KEY_TYPE_KEY = 1,
+  AZ_KEYVAULT_KEY_TYPE_SECRET = 2,
+  AZ_KEYVAULT_KEY_TYPE_CERTIFICATE = 3,
+} az_keyvault_key_type;
 
 typedef enum {
-  AZ_KEY_VAULT_JSON_WEB_KEY_TYPE_NONE = 0,
-  AZ_KEY_VAULT_JSON_WEB_KEY_TYPE_EC = 1,
-  AZ_KEY_VAULT_JSON_WEB_KEY_TYPE_EC_HSM = 2,
-  AZ_KEY_VAULT_JSON_WEB_KEY_TYPE_RSA = 3,
-  AZ_KEY_VAULT_JSON_WEB_KEY_TYPE_RSA_HSM = 4,
-  AZ_KEY_VAULT_JSON_WEB_KEY_TYPE_OCT = 5,
+  AZ_KEYVAULT_JSON_WEB_KEY_TYPE_NONE = 0,
+  AZ_KEYVAULT_JSON_WEB_KEY_TYPE_EC = 1,
+  AZ_KEYVAULT_JSON_WEB_KEY_TYPE_EC_HSM = 2,
+  AZ_KEYVAULT_JSON_WEB_KEY_TYPE_RSA = 3,
+  AZ_KEYVAULT_JSON_WEB_KEY_TYPE_RSA_HSM = 4,
+  AZ_KEYVAULT_JSON_WEB_KEY_TYPE_OCT = 5,
 } az_keyvault_json_web_key_type;
 
 typedef struct {
@@ -109,8 +109,8 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
 AZ_NODISCARD az_result az_keyvault_keys_key_get(
     az_keyvault_keys_client * client,
     az_span const key_name,
-    az_key_vault_key_type const key_type,
-    az_http_response * const response);
+    az_keyvault_key_type const key_type,
+    az_http_response const * const response);
 
 #include <_az_cfg_suffix.h>
 

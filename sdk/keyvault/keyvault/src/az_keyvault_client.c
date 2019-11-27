@@ -19,18 +19,18 @@
 enum { MAX_URL_SIZE = 200 };
 enum { MAX_BODY_SIZE = 1024 };
 
-static az_span const AZ_KEY_VAULT_KEY_TYPE_KEY_STR = AZ_CONST_STR("keys");
-static az_span const AZ_KEY_VAULT_KEY_TYPE_SECRET_STR = AZ_CONST_STR("secrets");
-static az_span const AZ_KEY_VAULT_KEY_TYPE_CERTIFICATE_STR = AZ_CONST_STR("certificates");
+static az_span const AZ_KEYVAULT_KEY_TYPE_KEY_STR = AZ_CONST_STR("keys");
+static az_span const AZ_KEYVAULT_KEY_TYPE_SECRET_STR = AZ_CONST_STR("secrets");
+static az_span const AZ_KEYVAULT_KEY_TYPE_CERTIFICATE_STR = AZ_CONST_STR("certificates");
 
-static az_span const AZ_KEY_VAULT_WEB_KEY_TYPE_EC_STR = AZ_CONST_STR("EC");
-static az_span const AZ_KEY_VAULT_WEB_KEY_TYPE_EC_HSM_STR = AZ_CONST_STR("EC-HSM");
-static az_span const AZ_KEY_VAULT_WEB_KEY_TYPE_RSA_STR = AZ_CONST_STR("RSA");
-static az_span const AZ_KEY_VAULT_WEB_KEY_TYPE_RSA_HSM_STR = AZ_CONST_STR("RSA-HSM");
-static az_span const AZ_KEY_VAULT_WEB_KEY_TYPE_OCT_STR = AZ_CONST_STR("oct");
+static az_span const AZ_KEYVAULT_WEB_KEY_TYPE_EC_STR = AZ_CONST_STR("EC");
+static az_span const AZ_KEYVAULT_WEB_KEY_TYPE_EC_HSM_STR = AZ_CONST_STR("EC-HSM");
+static az_span const AZ_KEYVAULT_WEB_KEY_TYPE_RSA_STR = AZ_CONST_STR("RSA");
+static az_span const AZ_KEYVAULT_WEB_KEY_TYPE_RSA_HSM_STR = AZ_CONST_STR("RSA-HSM");
+static az_span const AZ_KEYVAULT_WEB_KEY_TYPE_OCT_STR = AZ_CONST_STR("oct");
 
-static az_span const AZ_KEY_VAULT_CREATE_KEY_URL_KEYS = AZ_CONST_STR("keys");
-static az_span const AZ_KEY_VAULT_CREATE_KEY_URL_CREATE = AZ_CONST_STR("create");
+static az_span const AZ_KEYVAULT_CREATE_KEY_URL_KEYS = AZ_CONST_STR("keys");
+static az_span const AZ_KEYVAULT_CREATE_KEY_URL_CREATE = AZ_CONST_STR("create");
 
 static az_span const AZ_HTTP_REQUEST_BUILDER_HEADER_CONTENT_TYPE_LABEL
     = AZ_CONST_STR("Content-Type");
@@ -44,43 +44,43 @@ az_keyvault_keys_client_options const AZ_KEYVAULT_CLIENT_DEFAULT_OPTIONS
             .delay_in_ms = 30,
         } };
 
-AZ_NODISCARD AZ_INLINE az_span az_keyvault_get_key_type_span(az_key_vault_key_type const key_type) {
+AZ_NODISCARD AZ_INLINE az_span az_keyvault_get_key_type_span(az_keyvault_key_type const key_type) {
   switch (key_type) {
-    case AZ_KEY_VAULT_KEY_TYPE_KEY: {
-      return AZ_KEY_VAULT_KEY_TYPE_KEY_STR;
+    case AZ_KEYVAULT_KEY_TYPE_KEY: {
+      return AZ_KEYVAULT_KEY_TYPE_KEY_STR;
     }
 
-    case AZ_KEY_VAULT_KEY_TYPE_SECRET: {
-      return AZ_KEY_VAULT_KEY_TYPE_SECRET_STR;
+    case AZ_KEYVAULT_KEY_TYPE_SECRET: {
+      return AZ_KEYVAULT_KEY_TYPE_SECRET_STR;
     }
 
-    case AZ_KEY_VAULT_KEY_TYPE_CERTIFICATE: {
-      return AZ_KEY_VAULT_KEY_TYPE_CERTIFICATE_STR;
+    case AZ_KEYVAULT_KEY_TYPE_CERTIFICATE: {
+      return AZ_KEYVAULT_KEY_TYPE_CERTIFICATE_STR;
     }
 
-    default: { return az_str_to_span(AZ_KEY_VAULT_KEY_TYPE_NONE_STR); }
+    default: { return az_str_to_span(AZ_KEYVAULT_KEY_TYPE_NONE_STR); }
   }
 }
 
 AZ_NODISCARD AZ_INLINE az_span
 az_keyvault_get_json_web_key_type_span(az_keyvault_json_web_key_type const key_type) {
   switch (key_type) {
-    case AZ_KEY_VAULT_JSON_WEB_KEY_TYPE_EC: {
-      return AZ_KEY_VAULT_WEB_KEY_TYPE_EC_STR;
+    case AZ_KEYVAULT_JSON_WEB_KEY_TYPE_EC: {
+      return AZ_KEYVAULT_WEB_KEY_TYPE_EC_STR;
     }
-    case AZ_KEY_VAULT_JSON_WEB_KEY_TYPE_EC_HSM: {
-      return AZ_KEY_VAULT_WEB_KEY_TYPE_EC_HSM_STR;
+    case AZ_KEYVAULT_JSON_WEB_KEY_TYPE_EC_HSM: {
+      return AZ_KEYVAULT_WEB_KEY_TYPE_EC_HSM_STR;
     }
-    case AZ_KEY_VAULT_JSON_WEB_KEY_TYPE_RSA: {
-      return AZ_KEY_VAULT_WEB_KEY_TYPE_RSA_STR;
+    case AZ_KEYVAULT_JSON_WEB_KEY_TYPE_RSA: {
+      return AZ_KEYVAULT_WEB_KEY_TYPE_RSA_STR;
     }
-    case AZ_KEY_VAULT_JSON_WEB_KEY_TYPE_RSA_HSM: {
-      return AZ_KEY_VAULT_WEB_KEY_TYPE_RSA_HSM_STR;
+    case AZ_KEYVAULT_JSON_WEB_KEY_TYPE_RSA_HSM: {
+      return AZ_KEYVAULT_WEB_KEY_TYPE_RSA_HSM_STR;
     }
-    case AZ_KEY_VAULT_JSON_WEB_KEY_TYPE_OCT: {
-      return AZ_KEY_VAULT_WEB_KEY_TYPE_OCT_STR;
+    case AZ_KEYVAULT_JSON_WEB_KEY_TYPE_OCT: {
+      return AZ_KEYVAULT_WEB_KEY_TYPE_OCT_STR;
     }
-    default: { return az_str_to_span(AZ_KEY_VAULT_KEY_TYPE_NONE_STR); }
+    default: { return az_str_to_span(AZ_KEYVAULT_KEY_TYPE_NONE_STR); }
   }
 }
 
@@ -90,11 +90,11 @@ AZ_INLINE AZ_NODISCARD az_result az_keyvault_build_url_for_create_key(
     az_span_builder * const s_builder) {
   AZ_RETURN_IF_FAILED(az_span_builder_append(s_builder, uri));
   AZ_RETURN_IF_FAILED(az_span_builder_append_byte(s_builder, '/'));
-  AZ_RETURN_IF_FAILED(az_span_builder_append(s_builder, AZ_KEY_VAULT_CREATE_KEY_URL_KEYS));
+  AZ_RETURN_IF_FAILED(az_span_builder_append(s_builder, AZ_KEYVAULT_CREATE_KEY_URL_KEYS));
   AZ_RETURN_IF_FAILED(az_span_builder_append_byte(s_builder, '/'));
   AZ_RETURN_IF_FAILED(az_span_builder_append(s_builder, key_name));
   AZ_RETURN_IF_FAILED(az_span_builder_append_byte(s_builder, '/'));
-  AZ_RETURN_IF_FAILED(az_span_builder_append(s_builder, AZ_KEY_VAULT_CREATE_KEY_URL_CREATE));
+  AZ_RETURN_IF_FAILED(az_span_builder_append(s_builder, AZ_KEYVAULT_CREATE_KEY_URL_CREATE));
 
   return AZ_OK;
 }
@@ -207,8 +207,8 @@ AZ_INLINE AZ_NODISCARD az_result az_keyvault_build_url_for_get_key(
 AZ_NODISCARD az_result az_keyvault_keys_key_get(
     az_keyvault_keys_client * client,
     az_span const key_name,
-    az_key_vault_key_type const key_type,
-    az_http_response * const response) {
+    az_keyvault_key_type const key_type,
+    az_http_response const * const response) {
   // create request buffer TODO: define size for a getKey Request
   uint8_t request_buffer[1024 * 4];
   az_mut_span request_buffer_span = AZ_SPAN_FROM_ARRAY(request_buffer);
