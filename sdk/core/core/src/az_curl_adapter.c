@@ -146,6 +146,22 @@ AZ_NODISCARD az_result az_curl_send_get_request(CURL * const p_curl) {
 }
 
 /**
+ * handles DELETE request
+ */
+AZ_NODISCARD az_result
+az_curl_send_delete_request(CURL * const p_curl, az_http_request_builder const * const p_hrb) {
+  AZ_CONTRACT_ARG_NOT_NULL(p_curl);
+  AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
+
+  AZ_RETURN_IF_FAILED(
+      az_curl_code_to_result(curl_easy_setopt(p_curl, CURLOPT_CUSTOMREQUEST, "DELETE")));
+
+  AZ_RETURN_IF_FAILED(az_curl_code_to_result(curl_easy_perform(p_curl)));
+
+  return AZ_OK;
+}
+
+/**
  * handles POST request. It handles seting up a body for request
  */
 AZ_NODISCARD az_result
@@ -287,6 +303,8 @@ AZ_NODISCARD az_result az_http_client_send_request_impl_process(
     result = az_curl_send_get_request(p_curl);
   } else if (az_span_eq(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_POST)) {
     result = az_curl_send_post_request(p_curl, p_hrb);
+  } else if (az_span_eq(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_DELETE)) {
+    result = az_curl_send_delete_request(p_curl, p_hrb);
   }
 
   // make sure to set the end of the body response as the end of the complete response

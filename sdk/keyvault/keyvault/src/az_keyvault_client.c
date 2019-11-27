@@ -29,7 +29,7 @@ static az_span const AZ_KEYVAULT_WEB_KEY_TYPE_RSA_STR = AZ_CONST_STR("RSA");
 static az_span const AZ_KEYVAULT_WEB_KEY_TYPE_RSA_HSM_STR = AZ_CONST_STR("RSA-HSM");
 static az_span const AZ_KEYVAULT_WEB_KEY_TYPE_OCT_STR = AZ_CONST_STR("oct");
 
-static az_span const AZ_KEYVAULT_CREATE_KEY_URL_KEYS = AZ_CONST_STR("keys");
+static az_span const AZ_KEYVAULT_REST_KEY_URL_KEYS = AZ_CONST_STR("keys");
 static az_span const AZ_KEYVAULT_CREATE_KEY_URL_CREATE = AZ_CONST_STR("create");
 
 static az_span const AZ_HTTP_REQUEST_BUILDER_HEADER_CONTENT_TYPE_LABEL
@@ -106,8 +106,6 @@ build_request_json_body(az_span const kty, az_span_action const write) {
   return AZ_OK;
 }
 
-// Note: Options can be passed as NULL
-//   results in default options being used
 AZ_NODISCARD az_result az_keyvault_keys_key_create(
     az_keyvault_keys_client * client,
     az_span const key_name,
@@ -145,7 +143,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
       created_body));
 
   // add path to request
-  AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, AZ_KEYVAULT_CREATE_KEY_URL_KEYS));
+  AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, AZ_KEYVAULT_REST_KEY_URL_KEYS));
 
   // add version to request
   AZ_RETURN_IF_FAILED(az_http_request_builder_set_query_parameter(
@@ -204,6 +202,36 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
       &hrb, AZ_STR("api-version"), client->retry_options.service_version));
 
   // Add path to request after adding query parameter
+  AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, key_name));
+
+  // start pipeline
+  return az_http_pipeline_process(&client->pipeline, &hrb, response);
+}
+
+AZ_NODISCARD az_result az_keyvault_keys_key_delete(
+    az_keyvault_keys_client * client,
+    az_span const key_name,
+    az_http_response * const response) {
+  // Request buffer
+  uint8_t request_buffer[1024 * 4];
+  az_mut_span request_buffer_span = AZ_SPAN_FROM_ARRAY(request_buffer);
+
+  // create request
+  az_http_request_builder hrb;
+  AZ_RETURN_IF_FAILED(az_http_request_builder_init(
+      &hrb,
+      request_buffer_span,
+      MAX_URL_SIZE,
+      AZ_HTTP_METHOD_VERB_DELETE,
+      client->uri,
+      (az_span){ 0 }));
+
+  // add version to request
+  AZ_RETURN_IF_FAILED(az_http_request_builder_set_query_parameter(
+      &hrb, AZ_STR("api-version"), client->retry_options.service_version));
+
+  // Add path to request
+  AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, AZ_KEYVAULT_REST_KEY_URL_KEYS));
   AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, key_name));
 
   // start pipeline
