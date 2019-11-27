@@ -111,6 +111,10 @@ az_token_credential_get_resource_url(az_span const request_url, az_span_builder 
     }
   }
 
+  if (!az_span_eq_ascii_ignore_case(url.scheme, AZ_STR("https"))) {
+    return AZ_ERROR_ARG; // So that we won't send a token over http
+  }
+
   // Add "https://"
   AZ_RETURN_IF_FAILED(az_span_builder_append(p_builder, url.scheme));
   AZ_RETURN_IF_FAILED(az_span_builder_append(p_builder, AZ_STR("://")));
