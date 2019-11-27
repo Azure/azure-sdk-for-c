@@ -43,7 +43,7 @@ int main() {
   printf("Key created:\n %s", response_buffer);
 
   // Reuse response buffer for create Key by creating a new span from response_buffer
-  az_http_response_reset(&http_response);
+  az_result reset_op = az_http_response_reset(&http_response);
 
   /******************  GET KEY ******************************/
   az_result get_key_result = az_keyvault_keys_key_get(
@@ -52,7 +52,7 @@ int main() {
   printf("\n\nGet Key Now:\n %s", response_buffer);
 
   // Reuse response buffer for delete Key by creating a new span from response_buffer
-  az_http_response_reset(&http_response);
+  reset_op = az_http_response_reset(&http_response);
 
   /******************  DELETE KEY ******************************/
   az_result delete_key_result
@@ -61,7 +61,7 @@ int main() {
   printf("\n\nDELETED Key :\n %s", response_buffer);
 
   // Reuse response buffer for create Key by creating a new span from response_buffer
-  az_http_response_reset(&http_response);
+  reset_op = az_http_response_reset(&http_response);
 
   /******************  GET KEY (should get key w/o settings (kty) ) ******************************/
   az_result get_key_again_result = az_keyvault_keys_key_get(

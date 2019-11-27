@@ -151,7 +151,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
 AZ_NODISCARD az_result az_keyvault_keys_key_delete(
     az_keyvault_keys_client * client,
     az_span const key_name,
-    az_http_response const * const response);
+    az_http_response * const response);
 
 #include <_az_cfg_suffix.h>
 

@@ -211,23 +211,10 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
 AZ_NODISCARD az_result az_keyvault_keys_key_delete(
     az_keyvault_keys_client * client,
     az_span const key_name,
-    az_http_response const * const response) {
+    az_http_response * const response) {
   // Request buffer
   uint8_t request_buffer[1024 * 4];
   az_mut_span request_buffer_span = AZ_SPAN_FROM_ARRAY(request_buffer);
-
-  // Allocate buffer in stack to create URL like:
-  //  {vaultBaseUrl}/keys/{key-name}
-  uint8_t url_buffer[MAX_URL_SIZE];
-  az_mut_span const url_buffer_span_temp = AZ_SPAN_FROM_ARRAY(url_buffer);
-  az_span_builder s_builder = az_span_builder_create(url_buffer_span_temp);
-  AZ_RETURN_IF_FAILED(az_span_builder_append(&s_builder, client->uri));
-  AZ_RETURN_IF_FAILED(az_span_builder_append_byte(&s_builder, '/'));
-  AZ_RETURN_IF_FAILED(az_span_builder_append(&s_builder, AZ_KEYVAULT_REST_KEY_URL_KEYS));
-  AZ_RETURN_IF_FAILED(az_span_builder_append_byte(&s_builder, '/'));
-  AZ_RETURN_IF_FAILED(az_span_builder_append(&s_builder, key_name));
-  // take an span from the created URL since url might be shorter than MAX_URL_SIZE
-  az_span const url_buffer_span = az_span_builder_result(&s_builder);
 
   // create request
   az_http_request_builder hrb;
@@ -236,12 +223,16 @@ AZ_NODISCARD az_result az_keyvault_keys_key_delete(
       request_buffer_span,
       MAX_URL_SIZE,
       AZ_HTTP_METHOD_VERB_DELETE,
-      url_buffer_span,
+      client->uri,
       (az_span){ 0 }));
 
   // add version to request
   AZ_RETURN_IF_FAILED(az_http_request_builder_set_query_parameter(
       &hrb, AZ_STR("api-version"), client->retry_options.service_version));
+
+  // Add path to request
+  AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, AZ_KEYVAULT_REST_KEY_URL_KEYS));
+  AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, key_name));
 
   // start pipeline
   return az_http_pipeline_process(&client->pipeline, &hrb, response);
