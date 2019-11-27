@@ -22,8 +22,10 @@ enum {
   AZ_TOKEN_CREDENTIAL_AUTH_URL_BUF_SIZE = 100,
   AZ_TOKEN_CREDENTIAL_AUTH_BODY_BUF_SIZE = 200,
   AZ_TOKEN_CREDENTIAL_AUTH_RESOURCE_URL_BUF_SIZE = 100,
-  AZ_TOKEN_CREDENTIAL_HRB_BUF_SIZE = (AZ_TOKEN_CREDENTIAL_AUTH_URL_BUF_SIZE / 8)
-      + ((AZ_TOKEN_CREDENTIAL_AUTH_URL_BUF_SIZE % 8) == 0 ? 0 : 8)
+  AZ_TOKEN_CREDENTIAL_HRB_BUF_SIZE
+  = (8
+     * ((AZ_TOKEN_CREDENTIAL_AUTH_URL_BUF_SIZE / 8)
+        + ((AZ_TOKEN_CREDENTIAL_AUTH_URL_BUF_SIZE % 8) == 0 ? 0 : 1)))
       + (1 * sizeof(az_pair)), // to fit auth URL with alignment, and a minimum amount of headers
                                // (1) added by the pipeline_process
 };
@@ -76,7 +78,7 @@ AZ_INLINE AZ_NODISCARD az_result az_token_credential_send_get_token_request(
   az_http_request_builder hrb = { 0 };
   AZ_RETURN_IF_FAILED(az_http_request_builder_init(
       &hrb, hrb_buf, (uint16_t)auth_url.size, AZ_HTTP_METHOD_VERB_POST, auth_url, auth_body));
-  
+
   static az_http_pipeline pipeline = {
       .policies = {
         { .pfnc_process = az_http_pipeline_policy_uniquerequestid, .data = NULL },
