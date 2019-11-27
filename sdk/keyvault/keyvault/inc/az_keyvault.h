@@ -110,7 +110,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
     az_keyvault_keys_client * client,
     az_span const key_name,
     az_keyvault_key_type const key_type,
-    az_http_response const * const response);
+    az_http_response * const response);
 
 #include <_az_cfg_suffix.h>
 

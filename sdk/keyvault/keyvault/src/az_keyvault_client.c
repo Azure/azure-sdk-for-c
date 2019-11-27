@@ -208,7 +208,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
     az_keyvault_keys_client * client,
     az_span const key_name,
     az_keyvault_key_type const key_type,
-    az_http_response const * const response) {
+    az_http_response * const response) {
   // create request buffer TODO: define size for a getKey Request
   uint8_t request_buffer[1024 * 4];
   az_mut_span request_buffer_span = AZ_SPAN_FROM_ARRAY(request_buffer);
