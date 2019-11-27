@@ -16,17 +16,19 @@ int exit_code = 0;
 
 int main() {
   {
-    az_span const uri = AZ_STR("http://example.net");
-    az_span const key_type = AZ_STR("keys");
-    az_span const key_name = AZ_STR("name");
-    uint8_t out_array[50];
-    az_mut_span const out
-        = (az_mut_span){ .begin = out_array, .size = uri.size + key_name.size + key_type.size + 2 };
+    az_span const kty = AZ_STR("RSA");
+    uint8_t body_buffer[1024];
+    az_mut_span const span_to_buffer = (az_mut_span)AZ_SPAN_FROM_ARRAY(body_buffer);
+    az_span_builder json_builder = az_span_builder_create(span_to_buffer);
 
-    az_span const expected = AZ_STR("http://example.net/keys/name");
+    az_span const expected = AZ_STR("{\"kty\":\"RSA\"}");
 
-    TEST_ASSERT(az_keyvault_build_url_for_get_key(uri, key_type, key_name, out) == AZ_OK);
-    TEST_ASSERT(az_span_eq(az_mut_span_to_span(out), expected));
+    TEST_ASSERT(
+        build_request_json_body(kty, az_span_builder_append_action(&json_builder)) == AZ_OK);
+
+    az_span const result = az_span_builder_result(&json_builder);
+
+    TEST_ASSERT(az_span_eq(result, expected));
   }
   return exit_code;
 }

@@ -22,13 +22,19 @@ enum {
   AZ_TOKEN_CREDENTIAL_AUTH_URL_BUF_SIZE = 100,
   AZ_TOKEN_CREDENTIAL_AUTH_BODY_BUF_SIZE = 200,
   AZ_TOKEN_CREDENTIAL_AUTH_RESOURCE_URL_BUF_SIZE = 100,
+  AZ_TOKEN_CREDENTIAL_HRB_BUF_SIZE
+  = (8
+     * ((AZ_TOKEN_CREDENTIAL_AUTH_URL_BUF_SIZE / 8)
+        + ((AZ_TOKEN_CREDENTIAL_AUTH_URL_BUF_SIZE % 8) == 0 ? 0 : 1)))
+      + (1 * sizeof(az_pair)), // to fit auth URL with alignment, and a minimum amount of headers
+                               // (1) added by the pipeline_process
 };
 
 static AZ_NODISCARD az_result no_op_policy(
     az_http_policy * const p_policies,
     void * const data,
     az_http_request_builder * const hrb,
-    az_http_response const * const response) {
+    az_http_response * const response) {
   (void)data;
   return p_policies[0].pfnc_process(&(p_policies[1]), p_policies[0].data, hrb, response);
 }
@@ -38,7 +44,8 @@ AZ_INLINE AZ_NODISCARD az_result az_token_credential_send_get_token_request(
     az_span const resource_url,
     az_mut_span const auth_url_buf,
     az_mut_span const auth_body_buf,
-    az_mut_span const response_buf,
+    az_mut_span const hrb_buf,
+    az_http_response * response,
     clock_t * const requested_at) {
   az_span auth_url = { 0 };
   {
@@ -71,7 +78,7 @@ AZ_INLINE AZ_NODISCARD az_result az_token_credential_send_get_token_request(
 
   az_http_request_builder hrb = { 0 };
   AZ_RETURN_IF_FAILED(az_http_request_builder_init(
-      &hrb, response_buf, (uint16_t)auth_url.size, AZ_HTTP_METHOD_VERB_POST, auth_url, auth_body));
+      &hrb, hrb_buf, (uint16_t)auth_url.size, AZ_HTTP_METHOD_VERB_POST, auth_url, auth_body));
 
   static az_http_pipeline pipeline = {
       .policies = {
@@ -86,9 +93,8 @@ AZ_INLINE AZ_NODISCARD az_result az_token_credential_send_get_token_request(
       },
     };
 
-  az_http_response response = { .value = response_buf };
   *requested_at = clock();
-  AZ_RETURN_IF_FAILED(az_http_pipeline_process(&pipeline, &hrb, &response));
+  AZ_RETURN_IF_FAILED(az_http_pipeline_process(&pipeline, &hrb, response));
 
   return AZ_OK;
 }
@@ -148,7 +154,7 @@ AZ_INLINE clock_t span_to_clock_t(az_span const span) {
 AZ_INLINE AZ_NODISCARD az_result az_token_credential_update(
     az_client_secret_credential * const credential,
     az_span const request_url,
-    az_mut_span const response_buf) {
+    az_http_response * const response) {
   clock_t requested_at = 0;
   {
     uint8_t auth_resource_url_buf[AZ_TOKEN_CREDENTIAL_AUTH_RESOURCE_URL_BUF_SIZE] = { 0 };
@@ -169,13 +175,16 @@ AZ_INLINE AZ_NODISCARD az_result az_token_credential_update(
 
     uint8_t auth_url_buf[AZ_TOKEN_CREDENTIAL_AUTH_URL_BUF_SIZE] = { 0 };
     uint8_t auth_body_buf[AZ_TOKEN_CREDENTIAL_AUTH_BODY_BUF_SIZE] = { 0 };
+    uint8_t hrb_buf[AZ_TOKEN_CREDENTIAL_HRB_BUF_SIZE] = { 0 };
 
     az_mut_span const auth_url = AZ_SPAN_FROM_ARRAY(auth_url_buf);
     az_mut_span const auth_body = AZ_SPAN_FROM_ARRAY(auth_body_buf);
+    az_mut_span const hrb_buf_span = AZ_SPAN_FROM_ARRAY(hrb_buf);
 
     az_result const token_request_result = az_token_credential_send_get_token_request(
-        credential, resource_url, auth_url, auth_body, response_buf, &requested_at);
+        credential, resource_url, auth_url, auth_body, hrb_buf_span, response, &requested_at);
 
+    az_mut_span_memset(hrb_buf_span, '#');
     az_mut_span_memset(auth_body, '#');
     az_mut_span_memset(auth_url, '#');
     az_mut_span_memset(auth_resource_url, '#');
@@ -184,7 +193,8 @@ AZ_INLINE AZ_NODISCARD az_result az_token_credential_update(
   az_span body = { 0 };
   {
     az_http_response_parser parser = { 0 };
-    AZ_RETURN_IF_FAILED(az_http_response_parser_init(&parser, az_mut_span_to_span(response_buf)));
+    AZ_RETURN_IF_FAILED(
+        az_http_response_parser_init(&parser, az_span_builder_result(&response->builder)));
 
     az_http_response_status_line status_line = { 0 };
     AZ_RETURN_IF_FAILED(az_http_response_parser_read_status_line(&parser, &status_line));
@@ -252,12 +262,15 @@ AZ_INLINE AZ_NODISCARD az_result az_token_credential_get_token(
   }
 
   uint8_t response_buf[AZ_TOKEN_CREDENTIAL_RESPONSE_BUF_SIZE] = { 0 };
-  az_mut_span const response = AZ_SPAN_FROM_ARRAY(response_buf);
+
+  az_http_response http_response = { 0 };
+  AZ_RETURN_IF_FAILED(az_http_response_init(
+      &http_response, az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(response_buf))));
 
   az_result const credential_update_result
-      = az_token_credential_update(credential, request_url, response);
+      = az_token_credential_update(credential, request_url, &http_response);
 
-  az_mut_span_memset(response, '#');
+  az_mut_span_memset(http_response.builder.buffer, '#');
   return credential_update_result;
 }
 
