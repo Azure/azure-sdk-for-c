@@ -127,7 +127,7 @@ AZ_NODISCARD az_result az_http_request_builder_set_query_parameter(
   p_hrb->url.begin[p_hrb->url.size] = p_hrb->query_start ? '&' : '?';
   // update QPs starting position when it's 0
   if (!p_hrb->query_start) {
-    p_hrb->query_start = p_hrb->url.size;
+    p_hrb->query_start = (uint16_t)p_hrb->url.size;
   }
   p_hrb->url.size += 1;
 
@@ -176,9 +176,10 @@ az_http_request_builder_append_path(az_http_request_builder * const p_hrb, az_sp
   AZ_CONTRACT_ARG_NOT_NULL(&path);
 
   // check if there is enough space yet
-  uint16_t url_after_path_size = p_hrb->url.size + path.size + 1 /* separator '/' to be added */;
+  uint16_t url_after_path_size
+      = (uint16_t)p_hrb->url.size + (uint16_t)path.size + 1 /* separator '/' to be added */;
   uint16_t query_len
-      = p_hrb->query_start ? p_hrb->url.size - p_hrb->query_start : p_hrb->query_start;
+      = p_hrb->query_start ? (uint16_t)p_hrb->url.size - p_hrb->query_start : p_hrb->query_start;
   if (url_after_path_size >= p_hrb->max_url_size) {
     return AZ_ERROR_BUFFER_OVERFLOW;
   }
@@ -206,7 +207,7 @@ az_http_request_builder_append_path(az_http_request_builder * const p_hrb, az_sp
 
   // update query start
   if (p_hrb->query_start) {
-    p_hrb->query_start = url_builder.size;
+    p_hrb->query_start = (uint16_t)url_builder.size;
     url_builder.size = url_after_path_size;
     url_builder.buffer.size = url_after_path_size;
   }
