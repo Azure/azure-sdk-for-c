@@ -4,17 +4,26 @@
 #ifndef AZ_HTTP_RESPONSE_H
 #define AZ_HTTP_RESPONSE_H
 
-#include <az_mut_span.h>
+#include <az_span_builder.h>
 
 #include <_az_cfg_prefix.h>
 
 typedef struct {
-  az_mut_span value;
+  az_span_builder builder;
 } az_http_response;
 
 AZ_NODISCARD AZ_INLINE az_result
-az_http_response_init(az_http_response * const self, az_mut_span const value) {
-  self->value = value;
+az_http_response_init(az_http_response * const self, az_span_builder const builder) {
+  self->builder = builder;
+  return AZ_OK;
+}
+
+/**
+ * @brief Sets size of builder to zero so builder's buffer can be written from start
+ *
+ */
+AZ_NODISCARD AZ_INLINE az_result az_http_response_reset(az_http_response * const self) {
+  self->builder.size = 0;
   return AZ_OK;
 }
 

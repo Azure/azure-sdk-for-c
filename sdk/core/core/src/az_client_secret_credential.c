@@ -28,7 +28,7 @@ static AZ_NODISCARD az_result no_op_policy(
     az_http_policy * const p_policies,
     void * const data,
     az_http_request_builder * const hrb,
-    az_http_response const * const response) {
+    az_http_response * const response) {
   (void)data;
   return p_policies[0].pfnc_process(&(p_policies[1]), p_policies[0].data, hrb, response);
 }
@@ -38,7 +38,7 @@ AZ_INLINE AZ_NODISCARD az_result az_token_credential_send_get_token_request(
     az_span const resource_url,
     az_mut_span const auth_url_buf,
     az_mut_span const auth_body_buf,
-    az_mut_span const response_buf) {
+    az_http_response * response) {
   az_span auth_url = { 0 };
   {
     az_span_builder builder = az_span_builder_create(auth_url_buf);
@@ -70,7 +70,12 @@ AZ_INLINE AZ_NODISCARD az_result az_token_credential_send_get_token_request(
 
   az_http_request_builder hrb = { 0 };
   AZ_RETURN_IF_FAILED(az_http_request_builder_init(
-      &hrb, response_buf, (uint16_t)auth_url.size, AZ_HTTP_METHOD_VERB_POST, auth_url, auth_body));
+      &hrb,
+      response->builder.buffer, // NOTE: using response buffer as request buffer... is this ok?
+      (uint16_t)auth_url.size,
+      AZ_HTTP_METHOD_VERB_POST,
+      auth_url,
+      auth_body));
 
   static az_http_pipeline pipeline = {
       .policies = {
@@ -85,8 +90,7 @@ AZ_INLINE AZ_NODISCARD az_result az_token_credential_send_get_token_request(
       },
     };
 
-  az_http_response response = { .value = response_buf };
-  AZ_RETURN_IF_FAILED(az_http_pipeline_process(&pipeline, &hrb, &response));
+  AZ_RETURN_IF_FAILED(az_http_pipeline_process(&pipeline, &hrb, response));
 
   return AZ_OK;
 }
@@ -128,7 +132,7 @@ az_token_credential_get_resource_url(az_span const request_url, az_span_builder 
 AZ_INLINE AZ_NODISCARD az_result az_token_credential_update(
     az_client_secret_credential * const credential,
     az_span const request_url,
-    az_mut_span const response_buf) {
+    az_http_response * const response) {
   {
     uint8_t auth_resource_url_buf[AZ_TOKEN_CREDENTIAL_AUTH_RESOURCE_URL_BUF_SIZE] = { 0 };
     az_mut_span const auth_resource_url = AZ_SPAN_FROM_ARRAY(auth_resource_url_buf);
@@ -153,7 +157,7 @@ AZ_INLINE AZ_NODISCARD az_result az_token_credential_update(
     az_mut_span const auth_body = AZ_SPAN_FROM_ARRAY(auth_body_buf);
 
     az_result const token_request_result = az_token_credential_send_get_token_request(
-        credential, resource_url, auth_url, auth_body, response_buf);
+        credential, resource_url, auth_url, auth_body, response);
 
     az_mut_span_memset(auth_body, '#');
     az_mut_span_memset(auth_url, '#');
@@ -163,7 +167,8 @@ AZ_INLINE AZ_NODISCARD az_result az_token_credential_update(
   az_span body = { 0 };
   {
     az_http_response_parser parser = { 0 };
-    AZ_RETURN_IF_FAILED(az_http_response_parser_init(&parser, az_mut_span_to_span(response_buf)));
+    AZ_RETURN_IF_FAILED(
+        az_http_response_parser_init(&parser, az_span_builder_result(&response->builder)));
 
     az_http_response_status_line status_line = { 0 };
     AZ_RETURN_IF_FAILED(az_http_response_parser_read_status_line(&parser, &status_line));
@@ -206,9 +211,11 @@ AZ_INLINE AZ_NODISCARD az_result az_token_credential_get_token(
     az_span const request_url) {
   uint8_t response_buf[AZ_TOKEN_CREDENTIAL_RESPONSE_BUF_SIZE] = { 0 };
   az_mut_span const response = AZ_SPAN_FROM_ARRAY(response_buf);
+  az_http_response http_response;
+  AZ_RETURN_IF_FAILED(az_http_response_init(&http_response, az_span_builder_create(response)));
 
   az_result const credential_update_result
-      = az_token_credential_update(credential, request_url, response);
+      = az_token_credential_update(credential, request_url, &http_response);
 
   az_mut_span_memset(response, '#');
   return credential_update_result;
