@@ -76,7 +76,7 @@ AZ_INLINE AZ_NODISCARD az_result az_token_credential_send_get_token_request(
   az_http_request_builder hrb = { 0 };
   AZ_RETURN_IF_FAILED(az_http_request_builder_init(
       &hrb, hrb_buf, (uint16_t)auth_url.size, AZ_HTTP_METHOD_VERB_POST, auth_url, auth_body));
-
+  
   static az_http_pipeline pipeline = {
       .policies = {
         { .pfnc_process = az_http_pipeline_policy_uniquerequestid, .data = NULL },

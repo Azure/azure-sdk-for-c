@@ -43,6 +43,7 @@ typedef struct {
   uint16_t retry_headers_start;
   uint16_t headers_end;
   az_span body;
+  uint16_t query_start;
 } az_http_request_builder;
 
 extern az_span const AZ_HTTP_METHOD_VERB_GET;
@@ -122,6 +123,19 @@ AZ_NODISCARD az_result az_http_request_builder_append_header(
     az_http_request_builder * const p_hrb,
     az_span const key,
     az_span const value);
+
+/**
+ * @brief Adds path to url request.
+ * For instance, if url in request is `http://example.net?qp=1` and this function is called with
+ * path equals to `test`, then request url will be updated to `http://example.net/test?qp=1`.
+ *
+ *
+ * @param p_hrb
+ * @param path
+ * @return AZ_NODISCARD az_http_request_builder_append_path
+ */
+AZ_NODISCARD az_result
+az_http_request_builder_append_path(az_http_request_builder * const p_hrb, az_span const path);
 
 /**
  * @brief Mark that the HTTP headers that are gong to be added via
