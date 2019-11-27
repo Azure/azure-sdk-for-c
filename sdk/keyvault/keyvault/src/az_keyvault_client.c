@@ -146,12 +146,18 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
 
   // add path to request
   AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, AZ_KEYVAULT_CREATE_KEY_URL_KEYS));
-  AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, key_name));
-  AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, AZ_KEYVAULT_CREATE_KEY_URL_CREATE));
 
   // add version to request
   AZ_RETURN_IF_FAILED(az_http_request_builder_set_query_parameter(
       &hrb, AZ_STR("api-version"), client->retry_options.service_version));
+
+  AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, key_name));
+
+  // add extra header just for testing append_path after another query
+  AZ_RETURN_IF_FAILED(az_http_request_builder_set_query_parameter(
+      &hrb, AZ_STR("ignore"), client->retry_options.service_version));
+
+  AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, AZ_KEYVAULT_CREATE_KEY_URL_CREATE));
 
   // Adding header content-type json
   AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
@@ -192,11 +198,13 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
 
   // Add path to request
   AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, az_key_type_span));
-  AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, key_name));
 
   // add version to request as query parameter
   AZ_RETURN_IF_FAILED(az_http_request_builder_set_query_parameter(
       &hrb, AZ_STR("api-version"), client->retry_options.service_version));
+
+  // Add path to request after adding query parameter
+  AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, key_name));
 
   // start pipeline
   return az_http_pipeline_process(&client->pipeline, &hrb, response);
