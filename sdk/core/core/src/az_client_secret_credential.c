@@ -45,7 +45,8 @@ AZ_INLINE AZ_NODISCARD az_result az_token_credential_send_get_token_request(
     az_mut_span const auth_url_buf,
     az_mut_span const auth_body_buf,
     az_mut_span const hrb_buf,
-    az_http_response * response) {
+    az_http_response * response,
+    clock_t * const requested_at) {
   az_span auth_url = { 0 };
   {
     az_span_builder builder = az_span_builder_create(auth_url_buf);
@@ -92,6 +93,7 @@ AZ_INLINE AZ_NODISCARD az_result az_token_credential_send_get_token_request(
       },
     };
 
+  *requested_at = clock();
   AZ_RETURN_IF_FAILED(az_http_pipeline_process(&pipeline, &hrb, response));
 
   return AZ_OK;
@@ -115,6 +117,10 @@ az_token_credential_get_resource_url(az_span const request_url, az_span_builder 
     }
   }
 
+  if (!az_span_eq_ascii_ignore_case(url.scheme, AZ_STR("https"))) {
+    return AZ_ERROR_ARG; // So that we won't send a token over http
+  }
+
   // Add "https://"
   AZ_RETURN_IF_FAILED(az_span_builder_append(p_builder, url.scheme));
   AZ_RETURN_IF_FAILED(az_span_builder_append(p_builder, AZ_STR("://")));
@@ -131,10 +137,25 @@ az_token_credential_get_resource_url(az_span const request_url, az_span_builder 
   return AZ_OK;
 }
 
+AZ_INLINE clock_t span_to_clock_t(az_span const span) {
+  clock_t number = 0;
+  for (size_t i = 0; i < span.size; ++i) {
+    uint8_t const c = span.begin[i];
+    if (c >= '0' && c <= '9') {
+      number = number * 10 + (c - '0');
+    } else {
+      return 0;
+    }
+  }
+
+  return number;
+}
+
 AZ_INLINE AZ_NODISCARD az_result az_token_credential_update(
     az_client_secret_credential * const credential,
     az_span const request_url,
     az_http_response * const response) {
+  clock_t requested_at = 0;
   {
     uint8_t auth_resource_url_buf[AZ_TOKEN_CREDENTIAL_AUTH_RESOURCE_URL_BUF_SIZE] = { 0 };
     az_mut_span const auth_resource_url = AZ_SPAN_FROM_ARRAY(auth_resource_url_buf);
@@ -161,7 +182,7 @@ AZ_INLINE AZ_NODISCARD az_result az_token_credential_update(
     az_mut_span const hrb_buf_span = AZ_SPAN_FROM_ARRAY(hrb_buf);
 
     az_result const token_request_result = az_token_credential_send_get_token_request(
-        credential, resource_url, auth_url, auth_body, hrb_buf_span, response);
+        credential, resource_url, auth_url, auth_body, hrb_buf_span, response, &requested_at);
 
     az_mut_span_memset(hrb_buf_span, '#');
     az_mut_span_memset(auth_body, '#');
@@ -187,9 +208,22 @@ AZ_INLINE AZ_NODISCARD az_result az_token_credential_update(
 
   {
     az_json_value value;
-    AZ_RETURN_IF_FAILED(az_json_get_object_member(body, AZ_STR("access_token"), &value));
+
+    clock_t expiration_clock = 0;
+    if (requested_at > 0) {
+      az_span expires_in = { 0 };
+      if (az_succeeded(az_json_get_object_member(body, AZ_STR("expires_in"), &value))
+          && az_succeeded(az_json_value_get_string(&value, &expires_in))) {
+        clock_t expiration_seconds = span_to_clock_t(expires_in);
+
+        if (expiration_seconds > 0) {
+          expiration_clock = (expiration_seconds - (3 * 60)) * CLOCKS_PER_SEC;
+        }
+      }
+    }
 
     az_span token = { 0 };
+    AZ_RETURN_IF_FAILED(az_json_get_object_member(body, AZ_STR("access_token"), &value));
     AZ_RETURN_IF_FAILED(az_json_value_get_string(&value, &token));
 
     az_mut_span const token_buf = AZ_SPAN_FROM_ARRAY(credential->token_credential.token_buf);
@@ -202,6 +236,11 @@ AZ_INLINE AZ_NODISCARD az_result az_token_credential_update(
 
     if (az_succeeded(token_append_result)) {
       credential->token_credential.token = az_span_builder_mut_result(&builder);
+
+      clock_t const expiration = requested_at + expiration_clock;
+      if (expiration > 0) {
+        credential->token_credential.expiration = expiration;
+      }
     } else {
       az_mut_span_memset(token_buf, '#');
       return token_append_result;
@@ -214,6 +253,14 @@ AZ_INLINE AZ_NODISCARD az_result az_token_credential_update(
 AZ_INLINE AZ_NODISCARD az_result az_token_credential_get_token(
     az_client_secret_credential * const credential,
     az_span const request_url) {
+  clock_t const expiration = credential->token_credential.expiration;
+  if (expiration > 0) {
+    clock_t const clk = clock();
+    if (clk > 0 && clk < expiration) {
+      return AZ_OK;
+    }
+  }
+
   uint8_t response_buf[AZ_TOKEN_CREDENTIAL_RESPONSE_BUF_SIZE] = { 0 };
 
   az_http_response http_response = { 0 };

@@ -7,6 +7,7 @@
 #include <az_credential.h>
 
 #include <stdint.h>
+#include <time.h>
 
 #include <_az_cfg_prefix.h>
 
@@ -20,6 +21,7 @@ typedef struct {
   // TODO: all updates to this must be thread-safe
   uint8_t token_buf[AZ_TOKEN_CREDENTIAL_TOKEN_BUFFER_SIZE];
   az_mut_span token;
+  clock_t expiration;
 } az_token_credential;
 
 AZ_INLINE AZ_NODISCARD az_result
