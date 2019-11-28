@@ -179,14 +179,11 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
 AZ_NODISCARD az_result az_keyvault_keys_key_get(
     az_keyvault_keys_client * client,
     az_span const key_name,
-    az_keyvault_key_type const key_type,
+    az_span const key_version,
     az_http_response * const response) {
   // create request buffer TODO: define size for a getKey Request
   uint8_t request_buffer[1024 * 4];
   az_mut_span request_buffer_span = AZ_SPAN_FROM_ARRAY(request_buffer);
-
-  // Get the key type name from key type
-  az_span const az_key_type_span = az_keyvault_get_key_type_span(key_type);
 
   // create request
   // TODO: define max URL size
@@ -195,7 +192,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
       &hrb, request_buffer_span, MAX_URL_SIZE, AZ_HTTP_METHOD_VERB_GET, client->uri, AZ_SPAN_NULL));
 
   // Add path to request
-  AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, az_key_type_span));
+  AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, AZ_KEYVAULT_KEY_TYPE_KEY_STR));
 
   // add version to request as query parameter
   AZ_RETURN_IF_FAILED(az_http_request_builder_set_query_parameter(
@@ -203,6 +200,11 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
 
   // Add path to request after adding query parameter
   AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, key_name));
+
+  // Add version if requested
+  if (!az_span_eq(key_version, AZ_SPAN_NULL)) {
+    AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, key_version));
+  }
 
   // start pipeline
   return az_http_pipeline_process(&client->pipeline, &hrb, response);
