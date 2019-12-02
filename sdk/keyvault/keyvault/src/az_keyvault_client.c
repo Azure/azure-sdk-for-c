@@ -20,8 +20,8 @@ enum { MAX_URL_SIZE = 200 };
 enum { MAX_BODY_SIZE = 1024 };
 
 static az_span const AZ_KEYVAULT_KEY_TYPE_KEY_STR = AZ_CONST_STR("keys");
-static az_span const AZ_KEYVAULT_KEY_TYPE_SECRET_STR = AZ_CONST_STR("secrets");
-static az_span const AZ_KEYVAULT_KEY_TYPE_CERTIFICATE_STR = AZ_CONST_STR("certificates");
+// static az_span const AZ_KEYVAULT_KEY_TYPE_SECRET_STR = AZ_CONST_STR("secrets");
+// static az_span const AZ_KEYVAULT_KEY_TYPE_CERTIFICATE_STR = AZ_CONST_STR("certificates");
 
 static az_span const AZ_KEYVAULT_WEB_KEY_TYPE_EC_STR = AZ_CONST_STR("EC");
 static az_span const AZ_KEYVAULT_WEB_KEY_TYPE_EC_HSM_STR = AZ_CONST_STR("EC-HSM");
@@ -102,12 +102,16 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
 
   /* ******** build url for request  ******/
 
+  // Get Json web key from type that will be used as kty value for creating key
+  az_span const az_json_web_key_type_span
+      = az_keyvault_get_json_web_key_type_span(json_web_key_type);
+
   // Allocate buffer in stack to hold body request
   uint8_t body_buffer[MAX_BODY_SIZE];
   az_span_builder json_builder
       = az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(body_buffer));
   AZ_RETURN_IF_FAILED(build_request_json_body(
-      AZ_KEYVAULT_KEY_TYPE_KEY_STR, az_span_builder_append_action(&json_builder)));
+      az_json_web_key_type_span, az_span_builder_append_action(&json_builder)));
   az_span const created_body = az_span_builder_result(&json_builder);
 
   // create request
