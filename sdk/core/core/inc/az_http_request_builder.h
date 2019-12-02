@@ -43,6 +43,7 @@ typedef struct {
   uint16_t retry_headers_start;
   uint16_t headers_end;
   az_span body;
+  uint16_t query_start;
 } az_http_request_builder;
 
 extern az_span const AZ_HTTP_METHOD_VERB_GET;
@@ -77,7 +78,8 @@ AZ_NODISCARD az_result az_http_request_builder_init(
     az_mut_span const buffer,
     uint16_t const max_url_size,
     az_span const method_verb,
-    az_span const initial_url);
+    az_span const initial_url,
+    az_span const body);
 
 /**
  * @brief Set query parameter.
@@ -123,6 +125,19 @@ AZ_NODISCARD az_result az_http_request_builder_append_header(
     az_span const value);
 
 /**
+ * @brief Adds path to url request.
+ * For instance, if url in request is `http://example.net?qp=1` and this function is called with
+ * path equals to `test`, then request url will be updated to `http://example.net/test?qp=1`.
+ *
+ *
+ * @param p_hrb
+ * @param path
+ * @return AZ_NODISCARD az_http_request_builder_append_path
+ */
+AZ_NODISCARD az_result
+az_http_request_builder_append_path(az_http_request_builder * const p_hrb, az_span const path);
+
+/**
  * @brief Mark that the HTTP headers that are gong to be added via
  * `az_http_request_builder_append_header` are going to be considered as retry headers.
  *
@@ -164,20 +179,6 @@ AZ_NODISCARD az_result az_http_request_builder_get_header(
     az_http_request_builder const * const p_hrb,
     uint16_t const index,
     az_pair * const out_result);
-
-/**
- * @brief Adds a body reference for request builder.
- *
- * Returns AZ_ERROR_ARG if builder reference is NULL
- *
- */
-AZ_NODISCARD AZ_INLINE az_result az_http_request_builder_add_body(
-    az_http_request_builder * const p_hrb,
-    az_span const body) {
-  AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
-  p_hrb->body = body;
-  return AZ_OK;
-}
 
 /**
  * @brief utility function for checking if there is at least one header in the request

@@ -146,6 +146,22 @@ AZ_NODISCARD az_result az_curl_send_get_request(CURL * const p_curl) {
 }
 
 /**
+ * handles DELETE request
+ */
+AZ_NODISCARD az_result
+az_curl_send_delete_request(CURL * const p_curl, az_http_request_builder const * const p_hrb) {
+  AZ_CONTRACT_ARG_NOT_NULL(p_curl);
+  AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
+
+  AZ_RETURN_IF_FAILED(
+      az_curl_code_to_result(curl_easy_setopt(p_curl, CURLOPT_CUSTOMREQUEST, "DELETE")));
+
+  AZ_RETURN_IF_FAILED(az_curl_code_to_result(curl_easy_perform(p_curl)));
+
+  return AZ_OK;
+}
+
+/**
  * handles POST request. It handles seting up a body for request
  */
 AZ_NODISCARD az_result
@@ -261,6 +277,44 @@ AZ_NODISCARD az_result setup_response_redirect(
 }
 
 /**
+ * @brief use this method to group all the actions that we do with CURL so we can clean it after it
+ * no matter is there is an error at any step.
+ *
+ * @param p_curl
+ * @param p_hrb
+ * @param response
+ * @param buildRFC7230
+ * @return
+ */
+AZ_NODISCARD az_result az_http_client_send_request_impl_process(
+    CURL * p_curl,
+    az_http_request_builder * const p_hrb,
+    az_http_response * const response,
+    bool const buildRFC7230) {
+  az_result result = AZ_ERROR_ARG;
+
+  AZ_RETURN_IF_CURL_FAILED(setup_headers(p_curl, p_hrb));
+
+  AZ_RETURN_IF_CURL_FAILED(setup_url(p_curl, p_hrb));
+
+  AZ_RETURN_IF_CURL_FAILED(setup_response_redirect(p_curl, &response->builder, buildRFC7230));
+
+  if (az_span_eq(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_GET)) {
+    result = az_curl_send_get_request(p_curl);
+  } else if (az_span_eq(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_POST)) {
+    result = az_curl_send_post_request(p_curl, p_hrb);
+  } else if (az_span_eq(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_DELETE)) {
+    result = az_curl_send_delete_request(p_curl, p_hrb);
+  }
+
+  // make sure to set the end of the body response as the end of the complete response
+  if (az_succeeded(result)) {
+    AZ_RETURN_IF_FAILED(az_span_builder_append(&response->builder, AZ_STR_ZERO));
+  }
+  return AZ_OK;
+}
+
+/**
  * @brief uses AZ_HTTP_BUILDER to set up CURL request and perform it.
  *
  * @param p_hrb
@@ -269,34 +323,22 @@ AZ_NODISCARD az_result setup_response_redirect(
  */
 AZ_NODISCARD az_result az_http_client_send_request_impl(
     az_http_request_builder * const p_hrb,
-    az_http_response const * const response,
+    az_http_response * const response,
     bool const buildRFC7230) {
   AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
   AZ_CONTRACT_ARG_NOT_NULL(response);
 
   CURL * p_curl = NULL;
-  az_result result = AZ_ERROR_ARG;
-  az_span_builder response_builder = az_span_builder_create(response->value);
 
+  // init curl
   AZ_RETURN_IF_FAILED(az_curl_init(&p_curl));
 
-  AZ_RETURN_IF_CURL_FAILED(setup_headers(p_curl, p_hrb));
+  // process request
+  az_result process_result
+      = az_http_client_send_request_impl_process(p_curl, p_hrb, response, buildRFC7230);
 
-  AZ_RETURN_IF_CURL_FAILED(setup_url(p_curl, p_hrb));
-
-  AZ_RETURN_IF_CURL_FAILED(setup_response_redirect(p_curl, &response_builder, buildRFC7230));
-
-  if (az_span_eq(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_GET)) {
-    result = az_curl_send_get_request(p_curl);
-  } else if (az_span_eq(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_POST)) {
-    result = az_curl_send_post_request(p_curl, p_hrb);
-  }
-
-  // make sure to set the end of the body response as the end of the complete response
-  if (az_succeeded(result)) {
-    AZ_RETURN_IF_FAILED(az_span_builder_append(&response_builder, AZ_STR_ZERO));
-  }
-
+  // no matter if error or not, call curl done before returning to let curl clean everything
   AZ_RETURN_IF_FAILED(az_curl_done(&p_curl));
-  return result;
+
+  return process_result;
 }

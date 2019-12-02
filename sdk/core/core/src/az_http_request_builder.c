@@ -44,7 +44,8 @@ AZ_NODISCARD az_result az_http_request_builder_init(
     az_mut_span const buffer,
     uint16_t const max_url_size,
     az_span const method_verb,
-    az_span const initial_url) {
+    az_span const initial_url,
+    az_span const body) {
   AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
   AZ_CONTRACT_ARG_VALID_MUT_SPAN(buffer);
   AZ_CONTRACT_ARG_VALID_SPAN(method_verb);
@@ -77,6 +78,8 @@ AZ_NODISCARD az_result az_http_request_builder_init(
     .max_headers = max_headers,
     .retry_headers_start = max_headers,
     .headers_end = 0,
+    .body = body,
+    .query_start = 0,
   };
 
   return AZ_OK;
@@ -120,22 +123,12 @@ AZ_NODISCARD az_result az_http_request_builder_set_query_parameter(
     }
   }
 
-  // Find whether the URL contains '?' or '&' character already.
-  // So that we know if we should append "?text" or "&text".
-  // Scan from the end until the first occurrence of '&', or '?'.
-  bool first_parameter = true;
-  for (size_t i = p_hrb->url.size; first_parameter == true && i > 0;) {
-    --i;
-
-    uint8_t const c = p_hrb->url.begin[i];
-    if (c == '?' || c == '&') {
-      first_parameter = false;
-      break;
-    }
-  }
-
   // Append either '?' or '&'
-  p_hrb->url.begin[p_hrb->url.size] = first_parameter ? '?' : '&';
+  p_hrb->url.begin[p_hrb->url.size] = p_hrb->query_start ? '&' : '?';
+  // update QPs starting position when it's 0
+  if (!p_hrb->query_start) {
+    p_hrb->query_start = (uint16_t)p_hrb->url.size;
+  }
   p_hrb->url.size += 1;
 
   // Append parameter name
@@ -150,6 +143,7 @@ AZ_NODISCARD az_result az_http_request_builder_set_query_parameter(
   p_hrb->url.size += value.size;
 
   assert(p_hrb->url.size == new_url_size);
+
   return AZ_OK;
 }
 
@@ -172,6 +166,54 @@ AZ_NODISCARD az_result az_http_request_builder_append_header(
   az_pair * const headers = get_headers_start(p_hrb->buffer, p_hrb->max_url_size);
   headers[p_hrb->headers_end] = (az_pair){ .key = key, .value = value };
   p_hrb->headers_end += 1;
+
+  return AZ_OK;
+}
+
+AZ_NODISCARD az_result
+az_http_request_builder_append_path(az_http_request_builder * const p_hrb, az_span const path) {
+  AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
+  AZ_CONTRACT_ARG_NOT_NULL(&path);
+
+  // check if there is enough space yet
+  uint16_t url_after_path_size
+      = (uint16_t)p_hrb->url.size + (uint16_t)path.size + 1 /* separator '/' to be added */;
+  uint16_t query_len
+      = p_hrb->query_start ? (uint16_t)p_hrb->url.size - p_hrb->query_start : p_hrb->query_start;
+  if (url_after_path_size >= p_hrb->max_url_size) {
+    return AZ_ERROR_BUFFER_OVERFLOW;
+  }
+
+  // check if QPs shift is required
+  if (p_hrb->query_start) {
+    // shift right QPs from right to left
+    uint16_t query_end = p_hrb->query_start + query_len;
+    for (uint16_t offset = 0; offset <= query_len; ++offset) {
+      p_hrb->url.begin[url_after_path_size - offset] = p_hrb->url.begin[query_end - offset];
+    }
+  }
+
+  // use span builder to write into URL. That way errors are handled by span builder.
+  az_span_builder url_builder = az_span_builder_create(p_hrb->url);
+  // update builder buffer to the max supported URL
+  url_builder.buffer.size = url_after_path_size - query_len;
+  // update current builder possition to start at current url size
+  url_builder.size = p_hrb->query_start ? p_hrb->query_start : p_hrb->url.size;
+
+  // append separator byte
+  AZ_RETURN_IF_FAILED(az_span_builder_append_byte(&url_builder, '/'));
+  // append path
+  AZ_RETURN_IF_FAILED(az_span_builder_append(&url_builder, path));
+
+  // update query start
+  if (p_hrb->query_start) {
+    p_hrb->query_start = (uint16_t)url_builder.size;
+    url_builder.size = url_after_path_size;
+    url_builder.buffer.size = url_after_path_size;
+  }
+
+  // update request url span
+  p_hrb->url = az_span_builder_mut_result(&url_builder);
 
   return AZ_OK;
 }
