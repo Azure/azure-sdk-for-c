@@ -124,16 +124,18 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
  * The get key operation is applicable to all key types. If the requested key is symmetric, then no
  * key material is released in the response. This operation requires the keys/get permission.
  *
+ * Get latest version by passing az_span_null as value for version
+ *
  * @param client
  * @param key_name
- * @param key_type
+ * @param version
  * @param response
  * @return AZ_NODISCARD az_keyvault_keys_key_get
  */
 AZ_NODISCARD az_result az_keyvault_keys_key_get(
     az_keyvault_keys_client * client,
     az_span const key_name,
-    az_keyvault_key_type const key_type,
+    az_span const version,
     az_http_response * const response);
 
 /**

@@ -27,7 +27,6 @@ AZ_NODISCARD AZ_INLINE az_result az_curl_code_to_result(CURLcode const code) {
 
 AZ_NODISCARD AZ_INLINE az_result az_curl_init(CURL ** const out) {
   *out = curl_easy_init();
-  curl_easy_setopt(*out, CURLOPT_FAILONERROR, 1);
   return AZ_OK;
 }
 
