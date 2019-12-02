@@ -3,8 +3,8 @@
 
 #include <az_uri.h>
 
-#include <az_hex.h>
 #include <az_contract.h>
+#include <az_hex.h>
 
 #include <assert.h>
 #include <ctype.h>
@@ -76,8 +76,8 @@ AZ_NODISCARD az_result az_uri_encode(az_span const input, az_span_builder * cons
 
       uint8_t encoded[3];
       encode(c, encoded);
-      AZ_RETURN_IF_FAILED(az_span_builder_append(
-          span_builder, (az_span){ .begin = encoded, .size = sizeof(encoded) }));
+      AZ_RETURN_IF_FAILED(
+          az_span_builder_append(span_builder, (az_span)AZ_SPAN_FROM_ARRAY(encoded)));
 
       p = input.begin + i + 1;
       s = 0;
