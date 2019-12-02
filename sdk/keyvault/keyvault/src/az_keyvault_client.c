@@ -44,24 +44,6 @@ az_keyvault_keys_client_options const AZ_KEYVAULT_CLIENT_DEFAULT_OPTIONS
             .delay_in_ms = 30,
         } };
 
-AZ_NODISCARD AZ_INLINE az_span az_keyvault_get_key_type_span(az_keyvault_key_type const key_type) {
-  switch (key_type) {
-    case AZ_KEYVAULT_KEY_TYPE_KEY: {
-      return AZ_KEYVAULT_KEY_TYPE_KEY_STR;
-    }
-
-    case AZ_KEYVAULT_KEY_TYPE_SECRET: {
-      return AZ_KEYVAULT_KEY_TYPE_SECRET_STR;
-    }
-
-    case AZ_KEYVAULT_KEY_TYPE_CERTIFICATE: {
-      return AZ_KEYVAULT_KEY_TYPE_CERTIFICATE_STR;
-    }
-
-    default: { return az_str_to_span(AZ_KEYVAULT_KEY_TYPE_NONE_STR); }
-  }
-}
-
 AZ_NODISCARD AZ_INLINE az_span
 az_keyvault_get_json_web_key_type_span(az_keyvault_json_web_key_type const key_type) {
   switch (key_type) {
@@ -120,16 +102,12 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
 
   /* ******** build url for request  ******/
 
-  // Get Json web key from type that will be used as kty value for creating key
-  az_span const az_json_web_key_type_span
-      = az_keyvault_get_json_web_key_type_span(json_web_key_type);
-
   // Allocate buffer in stack to hold body request
   uint8_t body_buffer[MAX_BODY_SIZE];
   az_span_builder json_builder
       = az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(body_buffer));
   AZ_RETURN_IF_FAILED(build_request_json_body(
-      az_json_web_key_type_span, az_span_builder_append_action(&json_builder)));
+      AZ_KEYVAULT_KEY_TYPE_KEY_STR, az_span_builder_append_action(&json_builder)));
   az_span const created_body = az_span_builder_result(&json_builder);
 
   // create request
