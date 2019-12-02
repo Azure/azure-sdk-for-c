@@ -4,6 +4,7 @@
 #include <az_uri.h>
 
 #include <az_contract.h>
+#include <az_hex.h>
 
 #include <assert.h>
 #include <ctype.h>
@@ -38,15 +39,10 @@ AZ_NODISCARD AZ_INLINE uint8_t hex_to_int8(uint8_t const hi, uint8_t const lo) {
   return hex_to_int4(hi) << 4 | hex_to_int4(lo);
 }
 
-AZ_NODISCARD AZ_INLINE uint8_t int4_to_hex(uint8_t const int4) {
-  assert(int4 <= 0x0F);
-  return (int4 < 10) ? ('0' + int4) : ('A' + (int4 - 10));
-}
-
 AZ_INLINE void encode(uint8_t const c, uint8_t * const p) {
   p[0] = '%';
-  p[1] = int4_to_hex(c >> 4);
-  p[2] = int4_to_hex(c & 0x0F);
+  p[1] = az_number_to_upper_hex(c >> 4);
+  p[2] = az_number_to_upper_hex(c & 0x0F);
 }
 
 AZ_NODISCARD az_result az_uri_encode(az_span const input, az_span_builder * const span_builder) {
@@ -80,8 +76,8 @@ AZ_NODISCARD az_result az_uri_encode(az_span const input, az_span_builder * cons
 
       uint8_t encoded[3];
       encode(c, encoded);
-      AZ_RETURN_IF_FAILED(az_span_builder_append(
-          span_builder, (az_span){ .begin = encoded, .size = sizeof(encoded) }));
+      AZ_RETURN_IF_FAILED(
+          az_span_builder_append(span_builder, (az_span)AZ_SPAN_FROM_ARRAY(encoded)));
 
       p = input.begin + i + 1;
       s = 0;
