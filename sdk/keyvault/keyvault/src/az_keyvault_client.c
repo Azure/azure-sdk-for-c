@@ -191,7 +191,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
   AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, key_name));
 
   // Add version if requested
-  if (!az_span_eq(key_version, AZ_SPAN_NULL)) {
+  if (!az_span_is_empty(key_version)) {
     AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, key_version));
   }
 
