@@ -227,7 +227,7 @@ AZ_INLINE AZ_NODISCARD az_result az_token_credential_update(
     AZ_RETURN_IF_FAILED(az_json_value_get_string(&value, &token));
 
     az_mut_span const token_buf = AZ_SPAN_FROM_ARRAY(credential->token_credential.token_buf);
-    credential->token_credential.token = (az_mut_span){ 0 };
+    credential->token_credential.token = az_mut_span_create_empty();
     az_mut_span_memset(token_buf, '\0');
 
     az_span_builder builder = az_span_builder_create(token_buf);

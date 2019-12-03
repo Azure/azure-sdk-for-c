@@ -63,7 +63,7 @@ AZ_NODISCARD AZ_INLINE az_span az_span_take(az_span const span, size_t const n) 
  */
 AZ_NODISCARD AZ_INLINE az_span az_span_drop(az_span const span, size_t const n) {
   if (span.size <= n) {
-    return (az_span){ .begin = NULL, .size = 0 };
+    return az_span_create_empty();
   }
   return (az_span){ .begin = span.begin + n, .size = span.size - n };
 }

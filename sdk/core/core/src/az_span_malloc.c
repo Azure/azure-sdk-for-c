@@ -23,5 +23,5 @@ void az_span_free(az_mut_span * const p) {
     return;
   }
   free(p->begin);
-  *p = (az_mut_span){ .begin = NULL, .size = 0 };
+  *p = az_mut_span_create_empty();
 }

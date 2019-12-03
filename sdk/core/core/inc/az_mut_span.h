@@ -24,6 +24,8 @@ typedef struct {
   size_t size;
 } az_mut_span;
 
+AZ_NODISCARD AZ_INLINE az_mut_span az_mut_span_create_empty() { return (az_mut_span){ 0 }; }
+
 AZ_NODISCARD AZ_INLINE bool az_mut_span_is_empty(az_mut_span const span) { return span.size <= 0; }
 
 AZ_NODISCARD AZ_INLINE bool az_mut_span_is_valid(az_mut_span const span) {
@@ -88,7 +90,7 @@ az_mut_span_move(az_mut_span const buffer, az_span const src, az_mut_span * cons
 
 AZ_NODISCARD AZ_INLINE az_mut_span az_mut_span_drop(az_mut_span const span, size_t const n) {
   if (span.size <= n) {
-    return (az_mut_span){ .begin = NULL, .size = 0 };
+    return az_mut_span_create_empty();
   }
   return (az_mut_span){ .begin = span.begin + n, .size = span.size - n };
 }
