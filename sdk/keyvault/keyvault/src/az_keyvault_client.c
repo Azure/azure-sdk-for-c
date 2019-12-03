@@ -63,7 +63,7 @@ az_keyvault_get_json_web_key_type_span(az_keyvault_json_web_key_type const key_t
       return AZ_KEYVAULT_WEB_KEY_TYPE_OCT_STR;
     }
     default: {
-      return az_str_to_span(AZ_KEYVAULT_KEY_TYPE_NONE_STR);
+      return az_span_create_empty();
     }
   }
 }
