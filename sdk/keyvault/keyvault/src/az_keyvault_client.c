@@ -62,9 +62,7 @@ az_keyvault_get_json_web_key_type_span(az_keyvault_json_web_key_type const key_t
     case AZ_KEYVAULT_JSON_WEB_KEY_TYPE_OCT: {
       return AZ_KEYVAULT_WEB_KEY_TYPE_OCT_STR;
     }
-    default: {
-      return az_span_create_empty();
-    }
+    default: { return az_span_create_empty(); }
   }
 }
 
@@ -75,15 +73,36 @@ az_keyvault_get_json_web_key_type_span(az_keyvault_json_web_key_type const key_t
  * @param write
  * @return AZ_NODISCARD build_request_json_body
  */
-AZ_NODISCARD AZ_INLINE az_result
-build_request_json_body(az_span const kty, az_span_action const write) {
+AZ_NODISCARD AZ_INLINE az_result build_request_json_body(
+    az_keyvault_json_web_key_type const json_web_key_type,
+    az_keyvault_create_key_options const * const options,
+    az_span_action const write) {
+  az_span const az_json_web_key_type_span
+      = az_keyvault_get_json_web_key_type_span(json_web_key_type);
+
   az_json_builder builder = { 0 };
 
   AZ_RETURN_IF_FAILED(az_json_builder_init(&builder, write));
 
   AZ_RETURN_IF_FAILED(az_json_builder_write(&builder, az_json_value_create_object()));
+  // Required fields
   AZ_RETURN_IF_FAILED(az_json_builder_write_object_member(
-      &builder, AZ_STR("kty"), az_json_value_create_string(kty)));
+      &builder, AZ_STR("kty"), az_json_value_create_string(az_json_web_key_type_span)));
+
+  /**************** Non-Required fields ************/
+  if (options != NULL) {
+    // Attributes
+    {
+      az_optional_bool const enabled_field = options->enabled;
+      if (enabled_field.is_present) {
+        AZ_RETURN_IF_FAILED(az_json_builder_write_object_member(
+            &builder, AZ_STR("attributes"), az_json_value_create_object()));
+        AZ_RETURN_IF_FAILED(az_json_builder_write_object_member(
+            &builder, AZ_STR("enabled"), az_json_value_create_boolean(enabled_field.data)));
+        AZ_RETURN_IF_FAILED(az_json_builder_write_object_close(&builder));
+      }
+    }
+  }
 
   AZ_RETURN_IF_FAILED(az_json_builder_write_object_close(&builder));
 
@@ -94,9 +113,8 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
     az_keyvault_keys_client * client,
     az_span const key_name,
     az_keyvault_json_web_key_type const json_web_key_type,
-    az_keyvault_keys_keys_options const * const options,
+    az_keyvault_create_key_options * const options,
     az_http_response * const response) {
-  (void)options;
 
   // Request buffer
   uint8_t request_buffer[1024 * 4];
@@ -104,16 +122,12 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
 
   /* ******** build url for request  ******/
 
-  // Get Json web key from type that will be used as kty value for creating key
-  az_span const az_json_web_key_type_span
-      = az_keyvault_get_json_web_key_type_span(json_web_key_type);
-
   // Allocate buffer in stack to hold body request
   uint8_t body_buffer[MAX_BODY_SIZE];
   az_span_builder json_builder
       = az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(body_buffer));
   AZ_RETURN_IF_FAILED(build_request_json_body(
-      az_json_web_key_type_span, az_span_builder_append_action(&json_builder)));
+      json_web_key_type, options, az_span_builder_append_action(&json_builder)));
   az_span const created_body = az_span_builder_result(&json_builder);
 
   // create request
