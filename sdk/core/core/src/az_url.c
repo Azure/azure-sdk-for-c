@@ -38,7 +38,7 @@ az_span_reader_read_url_port(az_span_reader * const self, az_span * const port) 
   {
     az_result const c = az_span_reader_current(self);
     if (c != ':') {
-      *port = AZ_SPAN_NULL;
+      *port = az_span_create_empty();
       return AZ_OK;
     }
     az_span_reader_next(self);
@@ -69,7 +69,7 @@ az_span_reader_read_url_authority(az_span_reader * const self, az_url_authority 
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
   bool has_userinfo = false;
-  out->userinfo = AZ_SPAN_NULL;
+  out->userinfo = az_span_create_empty();
   size_t begin = self->i;
   while (true) {
     az_result_byte c = az_span_reader_current(self);
@@ -111,7 +111,7 @@ az_span_reader_read_url_path(az_span_reader * const self, az_span * const path) 
   {
     az_result const c = az_span_reader_current(self);
     if (c != '/') {
-      *path = AZ_SPAN_NULL;
+      *path = az_span_create_empty();
       return AZ_OK;
     }
     az_span_reader_next(self);
@@ -142,7 +142,7 @@ az_span_reader_read_url_query(az_span_reader * const self, az_span * const query
   {
     az_result const c = az_span_reader_current(self);
     if (c != '?') {
-      *query = AZ_SPAN_NULL;
+      *query = az_span_create_empty();
       return AZ_OK;
     }
     az_span_reader_next(self);
@@ -173,7 +173,7 @@ az_span_reader_read_url_fragment(az_span_reader * const self, az_span * const fr
   {
     az_result const c = az_span_reader_current(self);
     if (c != '#') {
-      *fragment = AZ_SPAN_NULL;
+      *fragment = az_span_create_empty();
       return AZ_OK;
     }
     az_span_reader_next(self);
@@ -231,6 +231,6 @@ AZ_NODISCARD az_result az_host_read_domain(az_span * const host, az_span * const
     --i;
   } while (0 < i);
   *domain = *host;
-  *host = AZ_SPAN_NULL;
+  *host = az_span_create_empty();
   return AZ_OK;
 }

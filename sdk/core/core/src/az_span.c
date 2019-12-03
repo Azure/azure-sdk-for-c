@@ -11,8 +11,6 @@ enum {
   AZ_ASCII_LOWER_DIF = 'a' - 'A',
 };
 
-az_span const AZ_SPAN_NULL = { .begin = NULL, .size = 0 };
-
 /**
  * ASCII lower case.
  */

@@ -9,8 +9,6 @@
 
 #include <stdlib.h>
 
-#define AZ_KEYVAULT_KEY_TYPE_NONE_STR ""
-
 #include <_az_cfg_prefix.h>
 
 /**

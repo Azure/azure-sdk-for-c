@@ -83,8 +83,8 @@ int main() {
   az_mut_span_memset(http_response.builder.buffer, '.');
 
   /******************  GET KEY latest ver ******************************/
-  az_result get_key_result
-      = az_keyvault_keys_key_get(&client, AZ_STR("test-new-key"), AZ_SPAN_NULL, &http_response);
+  az_result get_key_result = az_keyvault_keys_key_get(
+      &client, AZ_STR("test-new-key"), az_span_create_empty(), &http_response);
 
   printf("\n\n*********************************\nGet Key result: \n%s", response_buffer);
 
@@ -130,8 +130,8 @@ int main() {
   az_mut_span_memset(http_response.builder.buffer, '.');
 
   /******************  GET KEY (should return failed response ) ******************************/
-  az_result get_key_again_result
-      = az_keyvault_keys_key_get(&client, AZ_STR("test-new-key"), AZ_SPAN_NULL, &http_response);
+  az_result get_key_again_result = az_keyvault_keys_key_get(
+      &client, AZ_STR("test-new-key"), az_span_create_empty(), &http_response);
 
   printf(
       "\n\n*********************************\nGet Key again after DELETE result: \n%s\n",

@@ -62,7 +62,9 @@ az_keyvault_get_json_web_key_type_span(az_keyvault_json_web_key_type const key_t
     case AZ_KEYVAULT_JSON_WEB_KEY_TYPE_OCT: {
       return AZ_KEYVAULT_WEB_KEY_TYPE_OCT_STR;
     }
-    default: { return az_str_to_span(AZ_KEYVAULT_KEY_TYPE_NONE_STR); }
+    default: {
+      return az_span_create_empty();
+    }
   }
 }
 
@@ -171,7 +173,12 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
   // TODO: define max URL size
   az_http_request_builder hrb;
   AZ_RETURN_IF_FAILED(az_http_request_builder_init(
-      &hrb, request_buffer_span, MAX_URL_SIZE, AZ_HTTP_METHOD_VERB_GET, client->uri, AZ_SPAN_NULL));
+      &hrb,
+      request_buffer_span,
+      MAX_URL_SIZE,
+      AZ_HTTP_METHOD_VERB_GET,
+      client->uri,
+      az_span_create_empty()));
 
   // Add path to request
   AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, AZ_KEYVAULT_KEY_TYPE_KEY_STR));
@@ -184,7 +191,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
   AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, key_name));
 
   // Add version if requested
-  if (!az_span_eq(key_version, AZ_SPAN_NULL)) {
+  if (!az_span_is_empty(key_version)) {
     AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, key_version));
   }
 
@@ -208,7 +215,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_delete(
       MAX_URL_SIZE,
       AZ_HTTP_METHOD_VERB_DELETE,
       client->uri,
-      (az_span){ 0 }));
+      az_span_create_empty()));
 
   // add version to request
   AZ_RETURN_IF_FAILED(az_http_request_builder_set_query_parameter(

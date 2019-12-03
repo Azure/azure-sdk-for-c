@@ -37,7 +37,7 @@ int main() {
 
   // create request for keyVault
   az_result build_result = az_http_request_builder_init(
-      &hrb, http_buf, 100, AZ_HTTP_METHOD_VERB_GET, az_str_to_span(getenv(URI_ENV)), AZ_SPAN_NULL);
+      &hrb, http_buf, 100, AZ_HTTP_METHOD_VERB_GET, az_str_to_span(getenv(URI_ENV)), az_span_create_empty());
   if (az_failed(build_result)) {
     return build_result;
   }

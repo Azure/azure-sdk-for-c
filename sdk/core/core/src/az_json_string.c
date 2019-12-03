@@ -13,10 +13,10 @@ AZ_NODISCARD AZ_INLINE az_result_byte az_hex_to_digit(az_result_byte const c) {
     return c - '0';
   }
   if ('a' <= c && c <= 'f') {
-    return c - AZ_HEX_LOWER_OFFSET;
+    return c - _az_HEX_LOWER_OFFSET;
   }
   if ('A' <= c && c <= 'F') {
-    return c - AZ_HEX_UPPER_OFFSET;
+    return c - _az_HEX_UPPER_OFFSET;
   }
   return az_error_unexpected_char(c);
 }
@@ -72,7 +72,7 @@ AZ_NODISCARD az_span az_json_esc_encode(az_result_byte const c) {
       return AZ_STR("\\t");
     }
     default: {
-      return (az_span){ 0 };
+      return az_span_create_empty();
     }
   }
 }
