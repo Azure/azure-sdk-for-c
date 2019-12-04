@@ -19,6 +19,7 @@
 #include "./test_http_response_parser.h"
 #include "./test_json_string.h"
 #include "./test_json_value.h"
+#include "./test_span_builder_replace.h"
 
 #include <_az_cfg.h>
 
@@ -738,5 +739,6 @@ int main() {
   test_json_pointer();
   test_json_string();
   test_url_parse();
+  test_span_builder_replace();
   return exit_code;
 }

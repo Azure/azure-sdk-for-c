@@ -176,40 +176,35 @@ az_http_request_builder_append_path(az_http_request_builder * const p_hrb, az_sp
   AZ_CONTRACT_ARG_NOT_NULL(&path);
 
   // check if there is enough space yet
-  uint16_t url_after_path_size
-      = (uint16_t)p_hrb->url.size + (uint16_t)path.size + 1 /* separator '/' to be added */;
-  uint16_t query_len
-      = p_hrb->query_start ? (uint16_t)p_hrb->url.size - p_hrb->query_start : p_hrb->query_start;
+  size_t const current_ulr_size = p_hrb->url.size;
+  uint16_t const url_after_path_size
+      = (uint16_t)current_ulr_size + (uint16_t)path.size + 1 /* separator '/' to be added */;
+  uint16_t query_start = p_hrb->query_start ? p_hrb->query_start : (uint16_t)p_hrb->url.size;
+  uint16_t const query_length = (uint16_t)current_ulr_size - query_start;
+
   if (url_after_path_size >= p_hrb->max_url_size) {
     return AZ_ERROR_BUFFER_OVERFLOW;
   }
 
-  // check if QPs shift is required
-  if (p_hrb->query_start) {
-    // shift right QPs from right to left
-    uint16_t query_end = p_hrb->query_start + query_len;
-    for (uint16_t offset = 0; offset <= query_len; ++offset) {
-      p_hrb->url.begin[url_after_path_size - offset] = p_hrb->url.begin[query_end - offset];
-    }
-  }
-
   // use span builder to write into URL. That way errors are handled by span builder.
   az_span_builder url_builder = az_span_builder_create(p_hrb->url);
-  // update builder buffer to the max supported URL
-  url_builder.buffer.size = url_after_path_size - query_len;
-  // update current builder possition to start at current url size
-  url_builder.size = p_hrb->query_start ? p_hrb->query_start : p_hrb->url.size;
+  // update builder buffer to expected size after adding path
+  url_builder.buffer.size = url_after_path_size;
+  // update current builder possition to current url size
+  url_builder.size = current_ulr_size;
 
-  // append separator byte
-  AZ_RETURN_IF_FAILED(az_span_builder_append_byte(&url_builder, '/'));
-  // append path
-  AZ_RETURN_IF_FAILED(az_span_builder_append(&url_builder, path));
+  /* use replace twice. Yes, we will have 2 right shift (one on each replace), but we rely on
+   * replace functionfor doing this movements only and avoid updating manually. We could also create
+   * a temp buffer to join "/" and path and then use replace. But that will cost us more stack
+   * memory.
+   */
+  AZ_RETURN_IF_FAILED(az_span_builder_replace(&url_builder, query_start, query_start, AZ_STR("/")));
+  ++query_start;
+  AZ_RETURN_IF_FAILED(az_span_builder_replace(&url_builder, query_start, query_start, path));
 
   // update query start
   if (p_hrb->query_start) {
-    p_hrb->query_start = (uint16_t)url_builder.size;
-    url_builder.size = url_after_path_size;
-    url_builder.buffer.size = url_after_path_size;
+    p_hrb->query_start = url_after_path_size - query_length;
   }
 
   // update request url span
