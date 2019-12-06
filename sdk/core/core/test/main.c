@@ -560,7 +560,7 @@ int main() {
   }
 
   {
-    az_span const expected = AZ_STR("@###copy#copy#make some zero-terminated strings#make "
+    az_span const expected = AZ_STR("@#############make some zero-terminated strings#make "
                                     "some\0zero-terminated\0strings\0####@");
 
     uint8_t buf[87];
@@ -573,13 +573,6 @@ int main() {
     az_mut_span_memset((az_mut_span){ .begin = actual.begin + 1, .size = actual.size - 2 }, '#');
 
     az_mut_span result;
-
-    char const phrase1[] = "copy";
-    memcpy(actual.begin + 4, phrase1, sizeof(phrase1) - 1);
-    TEST_EXPECT_SUCCESS(az_mut_span_copy(
-        (az_mut_span){ .begin = actual.begin + 9, .size = 4 },
-        (az_span){ .begin = actual.begin + 4, .size = 4 },
-        &result));
 
     char const phrase2[] = "make some zero-terminated strings";
     memcpy(actual.begin + 14, phrase2, sizeof(phrase2) - 1);
