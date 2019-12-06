@@ -158,7 +158,8 @@ AZ_NODISCARD az_result az_http_request_builder_append_header(
     return AZ_ERROR_BUFFER_OVERFLOW;
   }
 
-  az_pair * const headers = get_headers_start(p_hrb->buffer, p_hrb->url_builder.buffer.size);
+  az_pair * const headers
+      = get_headers_start(p_hrb->buffer, (int16_t)p_hrb->url_builder.buffer.size);
   headers[p_hrb->headers_end] = (az_pair){ .key = key, .value = value };
   p_hrb->headers_end += 1;
 
