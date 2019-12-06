@@ -29,49 +29,40 @@ AZ_NODISCARD az_result az_span_builder_replace(
     size_t end,
     az_span const span) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
-  AZ_CONTRACT_ARG_NOT_NULL(&start);
-  AZ_CONTRACT_ARG_NOT_NULL(&end);
 
-  // Get current builder size
   size_t const current_size = self->size;
+  size_t const replaced_size = end - start;
+  size_t const size_after_replace = current_size - replaced_size + span.size;
 
-  // Start position must be lower than current builder size
-  AZ_CONTRACT(start <= current_size, AZ_ERROR_ARG);
+  // replaced size must be less or equal to current builder size. Can't replace more than what
+  // current is available
+  AZ_CONTRACT(replaced_size <= current_size, AZ_ERROR_ARG);
+  // start and end position must be before the end of current builder size
+  AZ_CONTRACT(start <= current_size && end <= current_size, AZ_ERROR_ARG);
   // Start position must be less or equal than end position
   AZ_CONTRACT(start <= end, AZ_ERROR_ARG);
+  // size after replacing must be less o equal than buffer size
+  AZ_CONTRACT(size_after_replace <= self->buffer.size, AZ_ERROR_ARG);
 
-  // Get the size of the replaced span
-  size_t const replaced_size = end - start;
-
-  // current content must be greater or equal to what we want to replace
-  AZ_CONTRACT(current_size >= replaced_size, AZ_ERROR_ARG);
-
-  size_t const required_shift = current_size - end;
-  size_t const size_after_shift = current_size - replaced_size + span.size;
-
-  // if replace size is different than new content size, shift content
-  if (replaced_size != span.size) {
-    if (replaced_size < span.size) {
-      // validate theres enough space to shift right
-      AZ_CONTRACT(size_after_shift <= self->buffer.size, AZ_ERROR_ARG);
-
-      // shift right
-      for (size_t i = 0; i < required_shift; ++i) {
-        self->buffer.begin[size_after_shift - 1 - i] = self->buffer.begin[current_size - 1 - i];
-      }
-
-    } else {
-      // shift left
-      for (size_t i = 0; i < required_shift; ++i) {
-        self->buffer.begin[start + span.size + i] = self->buffer.begin[end + i];
-      }
-    }
+  // For inserting, we just need append at the end
+  if (self->size == 0 || start == self->size) {
+    return az_span_builder_append(self, span);
   }
 
-  // override content
-  self->size = start;
-  AZ_RETURN_IF_FAILED(az_span_builder_append(self, span));
-  self->size = size_after_shift;
+  // get the span then need to be moved before adding new span
+  az_mut_span const dst = az_mut_span_drop(self->buffer, start + span.size);
+  // get the span where to move content
+  az_span const src = az_span_drop(az_span_builder_result(self), end);
+  {
+    // use a dummy result to use span_move
+    az_mut_span r = { 0 };
+    // move content left or right so new span can be added
+    AZ_RETURN_IF_FAILED(az_mut_span_move(dst, src, &r));
+    // add the new span
+    AZ_RETURN_IF_FAILED(az_mut_span_move(az_mut_span_drop(self->buffer, start), span, &r));
+  }
 
+  // update builder size
+  self->size = size_after_replace;
   return AZ_OK;
 }

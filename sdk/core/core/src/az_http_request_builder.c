@@ -59,13 +59,10 @@ AZ_NODISCARD az_result az_http_request_builder_init(
     return AZ_ERROR_BUFFER_OVERFLOW;
   }
 
-  az_mut_span_memset(buffer, '\0'); // zero the buffer; we don't have to do this
-
-  az_mut_span uri_buf = { 0 };
-  AZ_RETURN_IF_FAILED(az_mut_span_copy( // copy URL to buffer
-      az_mut_span_take(buffer, max_url_size),
-      initial_url,
-      &uri_buf));
+  // Create url builder
+  az_span_builder url_builder = az_span_builder_create(az_mut_span_take(buffer, max_url_size));
+  // write initial url
+  AZ_RETURN_IF_FAILED(az_span_builder_append(&url_builder, initial_url));
 
   az_pair * const headers_start = get_headers_start(buffer, max_url_size);
   uint16_t const max_headers = get_headers_max(buffer, headers_start);
@@ -73,8 +70,7 @@ AZ_NODISCARD az_result az_http_request_builder_init(
   *p_hrb = (az_http_request_builder){
     .buffer = buffer,
     .method_verb = method_verb,
-    .url = uri_buf,
-    .max_url_size = max_url_size,
+    .url_builder = url_builder,
     .max_headers = max_headers,
     .retry_headers_start = max_headers,
     .headers_end = 0,
@@ -104,17 +100,18 @@ AZ_NODISCARD az_result az_http_request_builder_set_query_parameter(
     size_t const name_and_value_size = name.size + value.size;
     size_t const appended_size = name_and_value_size + extra_chars_size;
 
-    new_url_size = p_hrb->url.size + appended_size;
+    new_url_size = p_hrb->url_builder.size + appended_size;
 
     // check for integer overflows, and finally whether the result would fit
     if (name_and_value_size < name.size || name_and_value_size < value.size
         || appended_size < name_and_value_size || appended_size < extra_chars_size
-        || new_url_size < appended_size || new_url_size < p_hrb->url.size
-        || new_url_size > p_hrb->max_url_size) {
+        || new_url_size < appended_size || new_url_size < p_hrb->url_builder.size
+        || new_url_size > p_hrb->url_builder.buffer.size) {
       return AZ_ERROR_BUFFER_OVERFLOW;
     }
 
-    az_mut_span const new_url_span = { .begin = p_hrb->url.begin, .size = new_url_size };
+    az_mut_span const new_url_span
+        = { .begin = p_hrb->url_builder.buffer.begin, .size = new_url_size };
 
     // check whether name or value regions overlap with destination for some reason (unlikely)
     if (az_span_is_overlap(az_mut_span_to_span(new_url_span), name)
@@ -124,25 +121,23 @@ AZ_NODISCARD az_result az_http_request_builder_set_query_parameter(
   }
 
   // Append either '?' or '&'
-  p_hrb->url.begin[p_hrb->url.size] = p_hrb->query_start ? '&' : '?';
+  AZ_RETURN_IF_FAILED(
+      az_span_builder_append_byte(&p_hrb->url_builder, p_hrb->query_start ? '&' : '?'));
   // update QPs starting position when it's 0
   if (!p_hrb->query_start) {
-    p_hrb->query_start = (uint16_t)p_hrb->url.size;
+    p_hrb->query_start = (uint16_t)p_hrb->url_builder.size;
   }
-  p_hrb->url.size += 1;
 
   // Append parameter name
-  memcpy(p_hrb->url.begin + p_hrb->url.size, name.begin, name.size);
-  p_hrb->url.size += name.size;
+  AZ_RETURN_IF_FAILED(az_span_builder_append(&p_hrb->url_builder, name));
 
-  p_hrb->url.begin[p_hrb->url.size] = '=';
-  p_hrb->url.size += 1;
+  // Append equal sym
+  AZ_RETURN_IF_FAILED(az_span_builder_append_byte(&p_hrb->url_builder, '='));
 
   // Parameter value
-  memcpy(p_hrb->url.begin + p_hrb->url.size, value.begin, value.size);
-  p_hrb->url.size += value.size;
+  AZ_RETURN_IF_FAILED(az_span_builder_append(&p_hrb->url_builder, value));
 
-  assert(p_hrb->url.size == new_url_size);
+  assert(p_hrb->url_builder.size == new_url_size);
 
   return AZ_OK;
 }
@@ -163,7 +158,7 @@ AZ_NODISCARD az_result az_http_request_builder_append_header(
     return AZ_ERROR_BUFFER_OVERFLOW;
   }
 
-  az_pair * const headers = get_headers_start(p_hrb->buffer, p_hrb->max_url_size);
+  az_pair * const headers = get_headers_start(p_hrb->buffer, p_hrb->url_builder.buffer.size);
   headers[p_hrb->headers_end] = (az_pair){ .key = key, .value = value };
   p_hrb->headers_end += 1;
 
@@ -176,39 +171,31 @@ az_http_request_builder_append_path(az_http_request_builder * const p_hrb, az_sp
   AZ_CONTRACT_ARG_NOT_NULL(&path);
 
   // check if there is enough space yet
-  size_t const current_ulr_size = p_hrb->url.size;
+  size_t const current_ulr_size = p_hrb->url_builder.size;
   uint16_t const url_after_path_size
       = (uint16_t)current_ulr_size + (uint16_t)path.size + 1 /* separator '/' to be added */;
-  uint16_t query_start = p_hrb->query_start ? p_hrb->query_start : (uint16_t)p_hrb->url.size;
-  uint16_t const query_length = (uint16_t)current_ulr_size - query_start;
+  uint16_t query_start
+      = p_hrb->query_start ? p_hrb->query_start - 1 : (uint16_t)p_hrb->url_builder.size;
 
-  if (url_after_path_size >= p_hrb->max_url_size) {
+  if (url_after_path_size >= p_hrb->url_builder.buffer.size) {
     return AZ_ERROR_BUFFER_OVERFLOW;
   }
-
-  // use span builder to write into URL. That way errors are handled by span builder.
-  az_span_builder url_builder = az_span_builder_create(p_hrb->url);
-  // update builder buffer to expected size after adding path
-  url_builder.buffer.size = url_after_path_size;
-  // update current builder possition to current url size
-  url_builder.size = current_ulr_size;
 
   /* use replace twice. Yes, we will have 2 right shift (one on each replace), but we rely on
    * replace functionfor doing this movements only and avoid updating manually. We could also create
    * a temp buffer to join "/" and path and then use replace. But that will cost us more stack
    * memory.
    */
-  AZ_RETURN_IF_FAILED(az_span_builder_replace(&url_builder, query_start, query_start, AZ_STR("/")));
-  ++query_start;
-  AZ_RETURN_IF_FAILED(az_span_builder_replace(&url_builder, query_start, query_start, path));
+  AZ_RETURN_IF_FAILED(
+      az_span_builder_replace(&p_hrb->url_builder, query_start, query_start, AZ_STR("/")));
+  query_start += 1; // a size of "/"
+  AZ_RETURN_IF_FAILED(az_span_builder_replace(&p_hrb->url_builder, query_start, query_start, path));
+  query_start += (uint16_t)path.size;
 
   // update query start
   if (p_hrb->query_start) {
-    p_hrb->query_start = url_after_path_size - query_length;
+    p_hrb->query_start = query_start + 1;
   }
-
-  // update request url span
-  p_hrb->url = az_span_builder_mut_result(&url_builder);
 
   return AZ_OK;
 }
@@ -242,7 +229,7 @@ AZ_NODISCARD az_result az_http_request_builder_get_header(
     return AZ_ERROR_ARG;
   }
 
-  az_pair * const headers = get_headers_start(p_hrb->buffer, p_hrb->max_url_size);
+  az_pair * const headers = get_headers_start(p_hrb->buffer, p_hrb->url_builder.buffer.size);
   *out_result = headers[index];
   return AZ_OK;
 }

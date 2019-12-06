@@ -37,8 +37,7 @@ typedef struct {
 typedef struct {
   az_mut_span buffer;
   az_span method_verb;
-  az_mut_span url;
-  uint16_t max_url_size;
+  az_span_builder url_builder;
   uint16_t max_headers;
   uint16_t retry_headers_start;
   uint16_t headers_end;
