@@ -230,7 +230,8 @@ AZ_NODISCARD az_result az_http_request_builder_get_header(
     return AZ_ERROR_ARG;
   }
 
-  az_pair * const headers = get_headers_start(p_hrb->buffer, p_hrb->url_builder.buffer.size);
+  az_pair * const headers
+      = get_headers_start(p_hrb->buffer, (int16_t)p_hrb->url_builder.buffer.size);
   *out_result = headers[index];
   return AZ_OK;
 }
