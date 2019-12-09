@@ -130,8 +130,8 @@ AZ_NODISCARD az_result az_http_request_builder_append_header(
  * path equals to `test`, then request url will be updated to `http://example.net/test?qp=1`.
  *
  *
- * @param p_hrb
- * @param path
+ * @param p_hrb http request builder reference
+ * @param path span to a path to be appended into url
  * @return AZ_NODISCARD az_http_request_builder_append_path
  */
 AZ_NODISCARD az_result

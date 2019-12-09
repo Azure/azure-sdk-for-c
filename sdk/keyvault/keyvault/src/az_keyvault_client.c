@@ -62,9 +62,7 @@ az_keyvault_get_json_web_key_type_span(az_keyvault_json_web_key_type const key_t
     case AZ_KEYVAULT_JSON_WEB_KEY_TYPE_OCT: {
       return AZ_KEYVAULT_WEB_KEY_TYPE_OCT_STR;
     }
-    default: {
-      return az_span_create_empty();
-    }
+    default: { return az_span_create_empty(); }
   }
 }
 
@@ -72,7 +70,7 @@ az_keyvault_get_json_web_key_type_span(az_keyvault_json_web_key_type const key_t
  * @brief Action that uses json builder to construct http request body used by create key
  *
  * @param kty required value to create a new key
- * @param write
+ * @param write action to use within json builder
  * @return AZ_NODISCARD build_request_json_body
  */
 AZ_NODISCARD AZ_INLINE az_result
