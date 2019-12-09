@@ -227,7 +227,7 @@ static AZ_NODISCARD az_result _az_client_secret_credential_credential_func(
 
   {
     az_url url = { 0 };
-    AZ_RETURN_IF_FAILED(az_succeeded(az_url_parse(az_span_builder_result(&hrb->url_builder), &url)));
+  AZ_RETURN_IF_FAILED(az_token_credential_get_token(credential, az_span_builder_result(&hrb->url_builder)));
     if (!az_span_eq_ascii_ignore_case(url.scheme, AZ_STR("https"))) {
       return AZ_ERROR_ARG;
     }
