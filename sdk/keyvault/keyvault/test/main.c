@@ -25,7 +25,7 @@ int main() {
       az_span const expected = AZ_STR("{\"kty\":\"RSA\"}");
 
       TEST_ASSERT(
-          build_request_json_body(
+          _az_keyvault_keys_key_create_build_json_body(
               AZ_KEYVAULT_WEB_KEY_TYPE_RSA_STR,
               &options,
               az_span_builder_append_action(&json_builder))
@@ -47,7 +47,7 @@ int main() {
       az_span const expected = AZ_STR("{\"kty\":\"RSA\",\"attributes\":{\"enabled\":true}}");
 
       TEST_ASSERT(
-          build_request_json_body(
+          _az_keyvault_keys_key_create_build_json_body(
               AZ_KEYVAULT_WEB_KEY_TYPE_RSA_STR,
               &options,
               az_span_builder_append_action(&json_builder))
@@ -69,7 +69,7 @@ int main() {
       az_span const expected = AZ_STR("{\"kty\":\"RSA\",\"attributes\":{\"enabled\":false}}");
 
       TEST_ASSERT(
-          build_request_json_body(
+          _az_keyvault_keys_key_create_build_json_body(
               AZ_KEYVAULT_WEB_KEY_TYPE_RSA_STR,
               &options,
               az_span_builder_append_action(&json_builder))
