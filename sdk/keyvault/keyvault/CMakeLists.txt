@@ -13,11 +13,17 @@ add_library (
   )
 
 if(MSVC)
-  target_compile_options(az_keyvault PRIVATE /Wall /WX /wd5031 /wd4668 /wd4820 /wd4255 /analyze)
+  target_compile_options(${PROJECT_NAME} PRIVATE /Wall /WX /wd5031 /wd4668 /wd4820 /wd4255 /analyze)
 elseif(CMAKE_C_COMPILER_ID MATCHES "Clang")
-  target_compile_options(az_keyvault PRIVATE -Wall -Wextra -pedantic -Werror -Wdocumentation  -Wdocumentation-unknown-command)
-else()
-  target_compile_options(az_keyvault PRIVATE -Wall -Wextra -pedantic -Werror)
+  target_compile_options(${PROJECT_NAME} PRIVATE -Weverything -pedantic-errors -Werror)
+elseif(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+  message("GCC compiler version: ${CMAKE_C_COMPILER_VERSION}")
+
+  if(CMAKE_C_COMPILER_VERSION STREQUAL "7.4.0")
+    include("../../../eng/cmake/gcc_compile_flags.txt")
+  else()
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic-errors -Werror)
+  endif()
 endif()
 
 target_include_directories (az_keyvault PUBLIC inc)

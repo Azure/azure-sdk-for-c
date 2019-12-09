@@ -1,0 +1,87 @@
+message("Using warning flags for GCC 7.4.0, project: ${PROJECT_NAME}")
+
+# Flags not enabled by -Wall on GCC 7.4.0, discovered by running
+# gcc -Wall -Wextra -pedantic-errors -Werror -Q --help=warning
+
+target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic-errors -Werror
+  # Flags without settings
+  -Waggregate-return
+  -Walloc-zero
+  -Walloca
+  -Wbad-function-cast
+  -Wc++-compat
+  -Wcast-align
+  -Wcast-qual
+  -Wcomments
+  -Wconversion
+  -Wdate-time
+  -Wdisabled-optimization
+  -Wdouble-promotion
+  -Wduplicated-branches
+  -Wduplicated-cond
+  -Werror-implicit-function-declaration
+  -Wfloat-conversion
+  -Wfloat-equal
+  -Wimplicit-fallthrough
+  -Winit-self
+  -Winline
+  -Winvalid-pch
+  -Wjump-misses-init
+  -Wlogical-op
+  -Wmissing-declarations
+  -Wmissing-format-attribute
+  -Wmissing-include-dirs
+  -Wmissing-noreturn
+  -Wmissing-prototypes
+  -Wmultichar
+  -Wnested-externs
+  -Wnull-dereference
+  -Wold-style-definition
+  -Wpacked
+  -Wpadded
+  -Wredundant-decls
+  -Wrestrict
+  -Wscalar-storage-order
+  -Wsign-conversion
+  -Wstack-protector
+  -Wstrict-prototypes
+  -Wsuggest-final-methods
+  -Wsuggest-final-types
+  -Wswitch-default
+  -Wswitch-enum
+  -Wsystem-headers
+  -Wtraditional
+  -Wtraditional-conversion
+  -Wtrampolines
+  -Wundef
+  -Wunreachable-code
+  -Wunsafe-loop-optimizations
+  -Wunsuffixed-float-constants
+  -Wunused-macros
+  -Wvector-operation-performance
+  -Wwrite-strings
+
+  # Flags with settings
+  -Walloc-size-larger-than=0
+  -Wformat-nonliteral
+  -Wformat-overflow=2
+  -Wformat-security
+  -Wformat-signedness
+  -Wformat-truncation
+  -Wformat-y2k
+  -Wformat=2
+  -Wimplicit-fallthrough=3
+  -Wnormalized=nfc
+  -Wshadow=global
+  -Wshift-overflow=2
+  -Wstrict-overflow=2
+  -Wstringop-overflow=3
+  -Wsuggest-attribute=const
+  -Wsuggest-attribute=format
+  -Wsuggest-attribute=noreturn
+  -Wsuggest-attribute=pure
+  -Wunused-const-variable=2
+
+  # -Wlarger-than=<number> -- Might be worth setting this later
+  # -Wstack-usage=<number> -- Might be worth setting this later
+)
