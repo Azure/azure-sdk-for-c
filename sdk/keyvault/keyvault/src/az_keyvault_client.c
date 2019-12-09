@@ -45,13 +45,14 @@ az_keyvault_keys_client_options const AZ_KEYVAULT_CLIENT_DEFAULT_OPTIONS
         } };
 
 /**
- * @brief Action that uses json builder to construct http request body used by create key
+ * @brief Internal inline function in charge of building json payload for creating a new key
  *
- * @param kty required value to create a new key
- * @param write
- * @return AZ_NODISCARD build_request_json_body
+ * @param json_web_key_type type of the key. It will be always added to json payload
+ * @param options all optional settings that can be inside create key options
+ * @param write action used by json builder to be called while building
+ * @return AZ_NODISCARD _az_keyvault_keys_key_create_build_json_body
  */
-AZ_NODISCARD AZ_INLINE az_result build_request_json_body(
+AZ_NODISCARD AZ_INLINE az_result _az_keyvault_keys_key_create_build_json_body(
     az_span const json_web_key_type,
     az_keyvault_create_key_options const * const options,
     az_span_action const write) {
@@ -102,7 +103,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
   uint8_t body_buffer[MAX_BODY_SIZE];
   az_span_builder json_builder
       = az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(body_buffer));
-  AZ_RETURN_IF_FAILED(build_request_json_body(
+  AZ_RETURN_IF_FAILED(_az_keyvault_keys_key_create_build_json_body(
       json_web_key_type, options, az_span_builder_append_action(&json_builder)));
   az_span const created_body = az_span_builder_result(&json_builder);
 
