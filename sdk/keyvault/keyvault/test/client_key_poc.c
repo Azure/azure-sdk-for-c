@@ -74,7 +74,7 @@ int main() {
 
   /******************  CREATE KEY with options******************************/
   az_keyvault_create_key_options key_options = { 0 };
-  az_result init_key_options_result = az_keyvault_create_key_options_init(&key_options);
+
   // override options values
   key_options.enabled = az_optional_bool_create(false);
 

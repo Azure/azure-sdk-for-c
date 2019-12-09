@@ -18,7 +18,6 @@ int main() {
   {
     {
       az_keyvault_create_key_options options = { 0 };
-      az_result init_options_result = az_keyvault_create_key_options_init(&options);
       uint8_t body_buffer[1024];
       az_mut_span const span_to_buffer = (az_mut_span)AZ_SPAN_FROM_ARRAY(body_buffer);
       az_span_builder json_builder = az_span_builder_create(span_to_buffer);
@@ -38,7 +37,6 @@ int main() {
     }
     {
       az_keyvault_create_key_options options = { 0 };
-      az_result init_options_result = az_keyvault_create_key_options_init(&options);
       options.enabled = az_optional_bool_create(true);
 
       uint8_t body_buffer[1024];
@@ -61,7 +59,6 @@ int main() {
     }
     {
       az_keyvault_create_key_options options = { 0 };
-      az_result init_options_result = az_keyvault_create_key_options_init(&options);
       options.enabled = az_optional_bool_create(false);
 
       uint8_t body_buffer[1024];

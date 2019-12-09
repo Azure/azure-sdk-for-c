@@ -18,17 +18,6 @@ typedef struct {
   */
 } az_keyvault_create_key_options;
 
-/**
- * @brief init an az_keyvault_create_key_options
- *
- */
-AZ_NODISCARD AZ_INLINE az_result
-az_keyvault_create_key_options_init(az_keyvault_create_key_options * const self) {
-  *self = (az_keyvault_create_key_options){ 0 };
-
-  return AZ_OK;
-}
-
 #include <_az_cfg_suffix.h>
 
 #endif
