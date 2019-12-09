@@ -81,7 +81,7 @@ int main() {
   az_result create_result = az_keyvault_keys_key_create(
       &client,
       AZ_STR("test-new-key"),
-      AZ_KEYVAULT_JSON_WEB_KEY_TYPE_RSA,
+      AZ_KEYVAULT_WEB_KEY_TYPE_RSA_STR,
       &key_options,
       &http_response);
 
@@ -112,7 +112,7 @@ int main() {
 
   /*********************  Create a new key version (use default options) *************/
   az_result create_version_result = az_keyvault_keys_key_create(
-      &client, AZ_STR("test-new-key"), AZ_KEYVAULT_JSON_WEB_KEY_TYPE_RSA, NULL, &http_response);
+      &client, AZ_STR("test-new-key"), AZ_KEYVAULT_WEB_KEY_TYPE_RSA_STR, NULL, &http_response);
 
   printf(
       "\n\n*********************************\nKey new version created result: \n%s",

@@ -4,7 +4,6 @@
 #ifndef AZ_KEYVAULT_CREATE_KEY_OPTIONS_H
 #define AZ_KEYVAULT_CREATE_KEY_OPTIONS_H
 
-#include <az_keyvault_json_web_key_type.h>
 #include <az_optional_bool.h>
 
 #include <_az_cfg_prefix.h>

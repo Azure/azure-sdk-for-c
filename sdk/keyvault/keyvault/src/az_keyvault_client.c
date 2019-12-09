@@ -23,11 +23,11 @@ static az_span const AZ_KEYVAULT_KEY_TYPE_KEY_STR = AZ_CONST_STR("keys");
 // static az_span const AZ_KEYVAULT_KEY_TYPE_SECRET_STR = AZ_CONST_STR("secrets");
 // static az_span const AZ_KEYVAULT_KEY_TYPE_CERTIFICATE_STR = AZ_CONST_STR("certificates");
 
-static az_span const AZ_KEYVAULT_WEB_KEY_TYPE_EC_STR = AZ_CONST_STR("EC");
-static az_span const AZ_KEYVAULT_WEB_KEY_TYPE_EC_HSM_STR = AZ_CONST_STR("EC-HSM");
-static az_span const AZ_KEYVAULT_WEB_KEY_TYPE_RSA_STR = AZ_CONST_STR("RSA");
-static az_span const AZ_KEYVAULT_WEB_KEY_TYPE_RSA_HSM_STR = AZ_CONST_STR("RSA-HSM");
-static az_span const AZ_KEYVAULT_WEB_KEY_TYPE_OCT_STR = AZ_CONST_STR("oct");
+az_span const AZ_KEYVAULT_WEB_KEY_TYPE_EC_STR = AZ_CONST_STR("EC");
+az_span const AZ_KEYVAULT_WEB_KEY_TYPE_EC_HSM_STR = AZ_CONST_STR("EC-HSM");
+az_span const AZ_KEYVAULT_WEB_KEY_TYPE_RSA_STR = AZ_CONST_STR("RSA");
+az_span const AZ_KEYVAULT_WEB_KEY_TYPE_RSA_HSM_STR = AZ_CONST_STR("RSA-HSM");
+az_span const AZ_KEYVAULT_WEB_KEY_TYPE_OCT_STR = AZ_CONST_STR("oct");
 
 static az_span const AZ_KEYVAULT_REST_KEY_URL_KEYS = AZ_CONST_STR("keys");
 static az_span const AZ_KEYVAULT_CREATE_KEY_URL_CREATE = AZ_CONST_STR("create");
@@ -44,28 +44,6 @@ az_keyvault_keys_client_options const AZ_KEYVAULT_CLIENT_DEFAULT_OPTIONS
             .delay_in_ms = 30,
         } };
 
-AZ_NODISCARD AZ_INLINE az_span
-az_keyvault_get_json_web_key_type_span(az_keyvault_json_web_key_type const key_type) {
-  switch (key_type) {
-    case AZ_KEYVAULT_JSON_WEB_KEY_TYPE_EC: {
-      return AZ_KEYVAULT_WEB_KEY_TYPE_EC_STR;
-    }
-    case AZ_KEYVAULT_JSON_WEB_KEY_TYPE_EC_HSM: {
-      return AZ_KEYVAULT_WEB_KEY_TYPE_EC_HSM_STR;
-    }
-    case AZ_KEYVAULT_JSON_WEB_KEY_TYPE_RSA: {
-      return AZ_KEYVAULT_WEB_KEY_TYPE_RSA_STR;
-    }
-    case AZ_KEYVAULT_JSON_WEB_KEY_TYPE_RSA_HSM: {
-      return AZ_KEYVAULT_WEB_KEY_TYPE_RSA_HSM_STR;
-    }
-    case AZ_KEYVAULT_JSON_WEB_KEY_TYPE_OCT: {
-      return AZ_KEYVAULT_WEB_KEY_TYPE_OCT_STR;
-    }
-    default: { return az_span_create_empty(); }
-  }
-}
-
 /**
  * @brief Action that uses json builder to construct http request body used by create key
  *
@@ -74,11 +52,9 @@ az_keyvault_get_json_web_key_type_span(az_keyvault_json_web_key_type const key_t
  * @return AZ_NODISCARD build_request_json_body
  */
 AZ_NODISCARD AZ_INLINE az_result build_request_json_body(
-    az_keyvault_json_web_key_type const json_web_key_type,
+    az_span const json_web_key_type,
     az_keyvault_create_key_options const * const options,
     az_span_action const write) {
-  az_span const az_json_web_key_type_span
-      = az_keyvault_get_json_web_key_type_span(json_web_key_type);
 
   az_json_builder builder = { 0 };
 
@@ -87,7 +63,7 @@ AZ_NODISCARD AZ_INLINE az_result build_request_json_body(
   AZ_RETURN_IF_FAILED(az_json_builder_write(&builder, az_json_value_create_object()));
   // Required fields
   AZ_RETURN_IF_FAILED(az_json_builder_write_object_member(
-      &builder, AZ_STR("kty"), az_json_value_create_string(az_json_web_key_type_span)));
+      &builder, AZ_STR("kty"), az_json_value_create_string(json_web_key_type)));
 
   /**************** Non-Required fields ************/
   if (options != NULL) {
@@ -112,7 +88,7 @@ AZ_NODISCARD AZ_INLINE az_result build_request_json_body(
 AZ_NODISCARD az_result az_keyvault_keys_key_create(
     az_keyvault_keys_client * client,
     az_span const key_name,
-    az_keyvault_json_web_key_type const json_web_key_type,
+    az_span const json_web_key_type,
     az_keyvault_create_key_options * const options,
     az_http_response * const response) {
 
