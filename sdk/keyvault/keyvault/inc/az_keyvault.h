@@ -103,11 +103,12 @@ AZ_NODISCARD AZ_INLINE az_result az_keyvault_keys_client_init(
  * already exists, Azure Key Vault creates a new version of the key. It requires the keys/create
  * permission.
  *
- * @param client
- * @param key_name
- * @param json_web_key_type
- * @param options
- * @param response
+ * @param client a keyvault client structure
+ * @param key_name name for key to be created
+ * @param json_web_key_type type of key to create
+ * @param options create options for key. It can be NULL so nothing is added to http request body
+ * and server will use defaults to create key
+ * @param response a pre allocated buffer where to write http response
  * @return AZ_NODISCARD az_keyvault_keys_key_create
  */
 AZ_NODISCARD az_result az_keyvault_keys_key_create(
@@ -124,10 +125,10 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
  *
  * Get latest version by passing az_span_null as value for version
  *
- * @param client
- * @param key_name
- * @param version
- * @param response
+ * @param client a keyvault client structure
+ * @param key_name name of key to be retrieved
+ * @param version specific key version to get. It can be null to get latest version
+ * @param response a pre allocated buffer where to write http response
  * @return AZ_NODISCARD az_keyvault_keys_key_get
  */
 AZ_NODISCARD az_result az_keyvault_keys_key_get(
@@ -143,9 +144,9 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
  * Sign/Verify, Wrap/Unwrap or Encrypt/Decrypt operations. This operation requires the keys/delete
  * permission.
  *
- * @param client
- * @param key_name
- * @param response
+ * @param client a keyvault client structure
+ * @param key_name name of the key to be deleted
+ * @param response a pre allocated buffer where to write http response
  * @return AZ_NODISCARD az_keyvault_keys_key_delete
  */
 AZ_NODISCARD az_result az_keyvault_keys_key_delete(
