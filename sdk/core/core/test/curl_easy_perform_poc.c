@@ -53,6 +53,7 @@ int main() {
   az_client_secret_credential credential = { 0 };
   az_result const creds_retcode = az_client_secret_credential_init(
       &credential,
+      AZ_STR("https://vault.azure.net"),
       az_str_to_span(getenv(TENANT_ID_ENV)),
       az_str_to_span(getenv(CLIENT_ID_ENV)),
       az_str_to_span(getenv(CLIENT_SECRET_ENV)));

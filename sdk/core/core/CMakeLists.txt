@@ -39,6 +39,7 @@ add_library (
   src/az_span_reader.c
   src/az_span_writer.c
   src/az_str.c
+  src/az_token_credential.c
   src/az_uri.c
   src/az_url.c
   )
