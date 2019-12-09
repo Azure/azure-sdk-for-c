@@ -18,7 +18,7 @@ typedef struct {
 } az_credential;
 
 AZ_INLINE AZ_NODISCARD az_result
-az_credential_init(az_credential * const self, az_credential_func credential_func) {
+_az_credential_init(az_credential * const self, az_credential_func const credential_func) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(credential_func);
 

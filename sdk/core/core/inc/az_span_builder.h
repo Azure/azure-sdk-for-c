@@ -41,6 +41,12 @@ AZ_NODISCARD AZ_INLINE az_span_builder az_span_builder_create(az_mut_span const 
   };
 }
 
+AZ_INLINE void az_span_builder_reset(az_span_builder * const self) {
+  az_mut_span const buffer = self->buffer;
+  az_mut_span_memset(buffer, 0);
+  *self = az_span_builder_create(buffer);
+}
+
 /**
  * Returns a mutable span of bytes that were written into the builder's buffer.
  */
