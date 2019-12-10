@@ -66,8 +66,14 @@ AZ_INLINE AZ_NODISCARD az_result _az_client_secret_credential_ms_oauth2_send_get
     AZ_RETURN_IF_FAILED(az_uri_encode(self->client_id, &builder));
     AZ_RETURN_IF_FAILED(az_span_builder_append(&builder, AZ_STR("&client_secret=")));
     AZ_RETURN_IF_FAILED(az_uri_encode(self->client_secret, &builder));
+
     AZ_RETURN_IF_FAILED(az_span_builder_append(&builder, AZ_STR("&resource=")));
-    AZ_RETURN_IF_FAILED(az_uri_encode(self->_token_credential._resource, &builder));
+    AZ_RETURN_IF_FAILED(az_uri_encode(
+        (az_span){
+            .begin = self->_token_credential._resource_buf,
+            .size = self->_token_credential._resource_size,
+        },
+        &builder));
 
     auth_body = az_span_builder_result(&builder);
   }
@@ -284,8 +290,8 @@ static AZ_NODISCARD az_result _az_client_secret_credential_credential_func(
           })) {
     AZ_RETURN_IF_FAILED(_az_client_secret_credential_ensure_token_credential(self));
   } else {
-    resource_builder
-        = az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(self->_token_credential._resource_buf));
+    resource_builder = az_span_builder_create(
+        (az_mut_span)AZ_SPAN_FROM_ARRAY(self->_token_credential._resource_buf));
 
     AZ_RETURN_IF_FAILED(az_span_builder_append(&resource_builder, request_resource));
     self->_token_credential._resource_size = az_span_builder_result(&resource_builder).size;

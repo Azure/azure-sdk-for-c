@@ -20,7 +20,6 @@ enum {
 
 typedef struct {
   az_credential credential;
-  az_span _resource;
   size_t _token_size;
   size_t _resource_size;
   clock_t _token_expiration;
@@ -35,7 +34,6 @@ AZ_INLINE AZ_NODISCARD az_result _az_token_credential_init(
 
   *self = (_az_token_credential){
     .credential = { 0 },
-    ._resource = { 0 },
     ._token_size = 0,
     ._resource_size = 0,
     ._token_expiration = 0,
