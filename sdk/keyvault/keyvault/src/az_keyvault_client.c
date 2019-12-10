@@ -19,23 +19,15 @@
 enum { MAX_URL_SIZE = 200 };
 enum { MAX_BODY_SIZE = 1024 };
 
-static az_span const AZ_KEYVAULT_KEY_TYPE_KEY_STR = AZ_CONST_STR("keys");
-// static az_span const AZ_KEYVAULT_KEY_TYPE_SECRET_STR = AZ_CONST_STR("secrets");
-// static az_span const AZ_KEYVAULT_KEY_TYPE_CERTIFICATE_STR = AZ_CONST_STR("certificates");
+AZ_NODISCARD AZ_INLINE az_span az_keyvault_client_constant_for_keys() { return AZ_STR("keys"); }
+AZ_NODISCARD AZ_INLINE az_span az_keyvault_client_constant_for_create() { return AZ_STR("create"); }
 
-az_span const AZ_KEYVAULT_WEB_KEY_TYPE_EC_STR = AZ_CONST_STR("EC");
-az_span const AZ_KEYVAULT_WEB_KEY_TYPE_EC_HSM_STR = AZ_CONST_STR("EC-HSM");
-az_span const AZ_KEYVAULT_WEB_KEY_TYPE_RSA_STR = AZ_CONST_STR("RSA");
-az_span const AZ_KEYVAULT_WEB_KEY_TYPE_RSA_HSM_STR = AZ_CONST_STR("RSA-HSM");
-az_span const AZ_KEYVAULT_WEB_KEY_TYPE_OCT_STR = AZ_CONST_STR("oct");
-
-static az_span const AZ_KEYVAULT_REST_KEY_URL_KEYS = AZ_CONST_STR("keys");
-static az_span const AZ_KEYVAULT_CREATE_KEY_URL_CREATE = AZ_CONST_STR("create");
-
-static az_span const AZ_HTTP_REQUEST_BUILDER_HEADER_CONTENT_TYPE_LABEL
-    = AZ_CONST_STR("Content-Type");
-static az_span const AZ_HTTP_REQUEST_BUILDER_HEADER_CONTENT_TYPE_JSON
-    = AZ_CONST_STR("application/json");
+AZ_NODISCARD AZ_INLINE az_span az_keyvault_client_constant_for_content_type() {
+  return AZ_STR("Content-Type");
+}
+AZ_NODISCARD AZ_INLINE az_span az_keyvault_client_constant_for_application_json() {
+  return AZ_STR("application/json");
+}
 
 az_keyvault_keys_client_options const AZ_KEYVAULT_CLIENT_DEFAULT_OPTIONS
     = { .service_version = AZ_CONST_STR("7.0"),
@@ -52,7 +44,7 @@ az_keyvault_keys_client_options const AZ_KEYVAULT_CLIENT_DEFAULT_OPTIONS
  * @param write action used by json builder to be called while building
  * @return AZ_NODISCARD _az_keyvault_keys_key_create_build_json_body
  */
-AZ_NODISCARD AZ_INLINE az_result _az_keyvault_keys_key_create_build_json_body(
+static AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
     az_span const json_web_key_type,
     az_keyvault_create_key_options const * const options,
     az_span_action const write) {
@@ -118,7 +110,8 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
       created_body));
 
   // add path to request
-  AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, AZ_KEYVAULT_REST_KEY_URL_KEYS));
+  AZ_RETURN_IF_FAILED(
+      az_http_request_builder_append_path(&hrb, az_keyvault_client_constant_for_keys()));
 
   // add version to request
   AZ_RETURN_IF_FAILED(az_http_request_builder_set_query_parameter(
@@ -130,13 +123,14 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
   AZ_RETURN_IF_FAILED(az_http_request_builder_set_query_parameter(
       &hrb, AZ_STR("ignore"), client->retry_options.service_version));
 
-  AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, AZ_KEYVAULT_CREATE_KEY_URL_CREATE));
+  AZ_RETURN_IF_FAILED(
+      az_http_request_builder_append_path(&hrb, az_keyvault_client_constant_for_create()));
 
   // Adding header content-type json
   AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
       &hrb,
-      AZ_HTTP_REQUEST_BUILDER_HEADER_CONTENT_TYPE_LABEL,
-      AZ_HTTP_REQUEST_BUILDER_HEADER_CONTENT_TYPE_JSON));
+      az_keyvault_client_constant_for_content_type(),
+      az_keyvault_client_constant_for_application_json()));
 
   // start pipeline
   return az_http_pipeline_process(&client->pipeline, &hrb, response);
@@ -172,7 +166,8 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
       az_span_create_empty()));
 
   // Add path to request
-  AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, AZ_KEYVAULT_KEY_TYPE_KEY_STR));
+  AZ_RETURN_IF_FAILED(
+      az_http_request_builder_append_path(&hrb, az_keyvault_client_constant_for_keys()));
 
   // add version to request as query parameter
   AZ_RETURN_IF_FAILED(az_http_request_builder_set_query_parameter(
@@ -213,7 +208,8 @@ AZ_NODISCARD az_result az_keyvault_keys_key_delete(
       &hrb, AZ_STR("api-version"), client->retry_options.service_version));
 
   // Add path to request
-  AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, AZ_KEYVAULT_REST_KEY_URL_KEYS));
+  AZ_RETURN_IF_FAILED(
+      az_http_request_builder_append_path(&hrb, az_keyvault_client_constant_for_keys()));
   AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, key_name));
 
   // start pipeline

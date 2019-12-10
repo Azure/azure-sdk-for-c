@@ -26,7 +26,7 @@ int main() {
 
       TEST_ASSERT(
           _az_keyvault_keys_key_create_build_json_body(
-              AZ_KEYVAULT_WEB_KEY_TYPE_RSA_STR,
+              az_keyvault_web_key_type_RSA(),
               &options,
               az_span_builder_append_action(&json_builder))
           == AZ_OK);
@@ -48,7 +48,7 @@ int main() {
 
       TEST_ASSERT(
           _az_keyvault_keys_key_create_build_json_body(
-              AZ_KEYVAULT_WEB_KEY_TYPE_RSA_STR,
+              az_keyvault_web_key_type_RSA(),
               &options,
               az_span_builder_append_action(&json_builder))
           == AZ_OK);
@@ -70,7 +70,7 @@ int main() {
 
       TEST_ASSERT(
           _az_keyvault_keys_key_create_build_json_body(
-              AZ_KEYVAULT_WEB_KEY_TYPE_RSA_STR,
+              az_keyvault_web_key_type_RSA(),
               &options,
               az_span_builder_append_action(&json_builder))
           == AZ_OK);

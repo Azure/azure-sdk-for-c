@@ -12,12 +12,6 @@
 
 #include <_az_cfg_prefix.h>
 
-extern az_span const AZ_KEYVAULT_WEB_KEY_TYPE_EC_STR;
-extern az_span const AZ_KEYVAULT_WEB_KEY_TYPE_EC_HSM_STR;
-extern az_span const AZ_KEYVAULT_WEB_KEY_TYPE_RSA_STR;
-extern az_span const AZ_KEYVAULT_WEB_KEY_TYPE_RSA_HSM_STR;
-extern az_span const AZ_KEYVAULT_WEB_KEY_TYPE_OCT_STR;
-
 typedef struct {
   az_span service_version;
   az_keyvault_keys_client_options_retry retry;
@@ -140,6 +134,12 @@ AZ_NODISCARD az_result az_keyvault_keys_key_delete(
     az_keyvault_keys_client * client,
     az_span const key_name,
     az_http_response * const response);
+
+AZ_NODISCARD AZ_INLINE az_span az_keyvault_web_key_type_EC() { return AZ_STR("EC"); }
+AZ_NODISCARD AZ_INLINE az_span az_keyvault_web_key_type_EC_HSM() { return AZ_STR("EC-HSM"); }
+AZ_NODISCARD AZ_INLINE az_span az_keyvault_web_key_type_RSA() { return AZ_STR("RSA"); }
+AZ_NODISCARD AZ_INLINE az_span az_keyvault_web_key_type_RSA_HSM() { return AZ_STR("RSA-HSM"); }
+AZ_NODISCARD AZ_INLINE az_span az_keyvault_web_key_type_OCT() { return AZ_STR("oct"); }
 
 #include <_az_cfg_suffix.h>
 
