@@ -16,7 +16,7 @@ AZ_NODISCARD az_result az_span_malloc(size_t const size, az_mut_span * const out
 /**
  * Frees the given span.
  *
- * Precondition: the given span should be previously allocated by @az_span_malloc function.
+ * Precondition: the given span should be previously allocated by @var az_span_malloc function.
  */
 void az_span_free(az_mut_span * const p);
 

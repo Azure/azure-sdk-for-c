@@ -45,9 +45,9 @@ az_span_reader_set_pos(az_span_reader * const p_reader, size_t const i) {
 }
 
 /**
- * Read a span form a reader and compare it with the given @span
+ * Read a span form a reader and compare it with the given @var span
  *
- * If it doesn't match the given @span, the function returns AZ_ERROR_UNEXPECTED_CHAR.
+ * If it doesn't match the given @var span, the function returns AZ_ERROR_UNEXPECTED_CHAR.
  */
 AZ_NODISCARD az_result az_span_reader_expect_span(az_span_reader * const self, az_span const span);
 

@@ -74,7 +74,7 @@ AZ_NODISCARD AZ_INLINE az_json_value az_json_value_create_span(az_span const spa
 }
 
 /**
- * Copies a boolean value to @out from the given JSON value.
+ * Copies a boolean value to @var out from the given JSON value.
  *
  * If the JSON value is not a boolean then the function returns an error.
  */
@@ -82,7 +82,7 @@ AZ_NODISCARD az_result
 az_json_value_get_boolean(az_json_value const * const self, bool * const out);
 
 /**
- * Copies a string span to @out from the given JSON value.
+ * Copies a string span to @var out from the given JSON value.
  *
  * If the JSON value is not a string then the function returns an error.
  */
@@ -90,7 +90,7 @@ AZ_NODISCARD az_result
 az_json_value_get_string(az_json_value const * const self, az_span * const out);
 
 /**
- * Copies a number to @out from the given JSON value.
+ * Copies a number to @var out from the given JSON value.
  *
  * If the JSON value is not a number then the function returns an error.
  */

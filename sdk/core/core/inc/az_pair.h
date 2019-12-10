@@ -25,14 +25,14 @@ typedef struct {
 /// @az_pair_action is a callback with one argument @az_pair.
 AZ_ACTION_TYPE(az_pair_action, az_pair)
 
-/// @az_pair_writer writes @az_pair sequences.
+/// @var az_pair_writer writes @var az_pair sequences.
 AZ_ACTION_TYPE(az_pair_writer, az_pair_action)
 
 AZ_NODISCARD az_result
 az_pair_span_as_writer(az_pair_span const * const self, az_pair_action const write_pair);
 
 /**
- * Creates @az_pair_span_writer from @az_write_pair_span.
+ * Creates @struct az_pair_span_writer from @az_write_pair_span.
  */
 AZ_ACTION_FUNC(az_pair_span_as_writer, az_pair_span const, az_pair_writer)
 
