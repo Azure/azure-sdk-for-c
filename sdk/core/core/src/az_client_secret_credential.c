@@ -249,7 +249,7 @@ AZ_INLINE AZ_NODISCARD az_result _az_client_secret_credential_get_resource(
 
   for (size_t i = 0; i < (ndomains - 1); ++i) { // This loop would add "vault.azure."
     AZ_RETURN_IF_FAILED(az_span_builder_append(p_builder, domains[i]));
-    AZ_RETURN_IF_FAILED(az_span_builder_append(p_builder, AZ_STR(".")));
+    AZ_RETURN_IF_FAILED(az_span_builder_append_byte(p_builder, '.'));
   }
 
   // We have to do this out of the loop so that we won't append an extra "." at the end.
