@@ -19,7 +19,6 @@ enum {
   _az_CLIENT_SECRET_CREDENTIAL_RESPONSE_BUF_SIZE = 5 * (1024 / 2),
   _az_CLIENT_SECRET_CREDENTIAL_AUTH_URL_BUF_SIZE = 100,
   _az_CLIENT_SECRET_CREDENTIAL_AUTH_BODY_BUF_SIZE = 200,
-  _az_CLIENT_SECRET_CREDENTIAL_AUTH_RESOURCE_URL_BUF_SIZE = 100,
   _az_CLIENT_SECRET_CREDENTIAL_HRB_BUF_SIZE
   = (8
      * ((_az_CLIENT_SECRET_CREDENTIAL_AUTH_URL_BUF_SIZE / 8)
@@ -67,8 +66,14 @@ AZ_INLINE AZ_NODISCARD az_result _az_client_secret_credential_ms_oauth2_send_get
     AZ_RETURN_IF_FAILED(az_uri_encode(self->client_id, &builder));
     AZ_RETURN_IF_FAILED(az_span_builder_append(&builder, AZ_STR("&client_secret=")));
     AZ_RETURN_IF_FAILED(az_uri_encode(self->client_secret, &builder));
+
     AZ_RETURN_IF_FAILED(az_span_builder_append(&builder, AZ_STR("&resource=")));
-    AZ_RETURN_IF_FAILED(az_uri_encode(self->_token_credential._resource, &builder));
+    AZ_RETURN_IF_FAILED(az_uri_encode(
+        (az_span){
+            .begin = self->_token_credential._resource_buf,
+            .size = self->_token_credential._resource_size,
+        },
+        &builder));
 
     auth_body = az_span_builder_result(&builder);
   }
@@ -181,7 +186,7 @@ AZ_INLINE AZ_NODISCARD az_result _az_client_secret_credential_ms_oauth2_get_toke
 
       clock_t const expiration = requested_at + expiration_clock;
       if (expiration > 0) {
-        self->_token_credential._expiration = expiration;
+        self->_token_credential._token_expiration = expiration;
       }
     } else {
       az_mut_span_memset(token_buf, 'X');
@@ -208,7 +213,7 @@ _az_client_secret_credential_renew_token_credential(az_client_secret_credential 
 
 AZ_INLINE AZ_NODISCARD az_result
 _az_client_secret_credential_ensure_token_credential(az_client_secret_credential * const self) {
-  clock_t const expiration = self->_token_credential._expiration;
+  clock_t const expiration = self->_token_credential._token_expiration;
   if (expiration > 0) {
     clock_t const clk = clock();
     if (clk > 0 && clk < expiration) {
@@ -219,21 +224,80 @@ _az_client_secret_credential_ensure_token_credential(az_client_secret_credential
   return _az_client_secret_credential_renew_token_credential(self);
 }
 
+// Being given
+// "https://NNNNNNNN.vault.azure.net/secrets/Password/XXXXXXXXXXXXXXXXXXXX?api-version=7.0", gives
+// back "https://vault.azure.net" (needed for authentication).
+AZ_INLINE AZ_NODISCARD az_result _az_client_secret_credential_get_resource(
+    az_span const request_url,
+    az_span_builder * const p_builder) {
+  az_url url = { 0 };
+  if (!az_succeeded(az_url_parse(request_url, &url))) {
+    return AZ_ERROR_ARG;
+  }
+
+  az_span domains[3] = { 0 };
+  size_t const ndomains = AZ_ARRAY_SIZE(domains);
+  for (size_t i = 0; i < ndomains; ++i) {
+    if (!az_succeeded(az_host_read_domain(&url.authority.host, &domains[(ndomains - 1) - i]))) {
+      return AZ_ERROR_ARG;
+    }
+  }
+
+  // Add "https://"
+  AZ_RETURN_IF_FAILED(az_span_builder_append(p_builder, url.scheme));
+  AZ_RETURN_IF_FAILED(az_span_builder_append(p_builder, AZ_STR("://")));
+
+  for (size_t i = 0; i < (ndomains - 1); ++i) { // This loop would add "vault.azure."
+    AZ_RETURN_IF_FAILED(az_span_builder_append(p_builder, domains[i]));
+    AZ_RETURN_IF_FAILED(az_span_builder_append_byte(p_builder, '.'));
+  }
+
+  // We have to do this out of the loop so that we won't append an extra "." at the end.
+  // So this expression is going to add the final "net" to an existing "https://vault.azure."
+  AZ_RETURN_IF_FAILED(az_span_builder_append(p_builder, domains[ndomains - 1]));
+
+  return AZ_OK;
+}
+
 static AZ_NODISCARD az_result _az_client_secret_credential_credential_func(
     az_client_secret_credential * const self,
     az_http_request_builder * const hrb) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(hrb);
 
+  az_span const request_url = az_span_builder_result(&hrb->url_builder);
+
   {
     az_url url = { 0 };
-    AZ_RETURN_IF_FAILED(az_url_parse(az_span_builder_result(&hrb->url_builder), &url));
+    AZ_RETURN_IF_FAILED(az_succeeded(az_url_parse(request_url, &url)));
     if (!az_span_eq_ascii_ignore_case(url.scheme, AZ_STR("https"))) {
       return AZ_ERROR_ARG;
     }
   }
 
-  AZ_RETURN_IF_FAILED(_az_client_secret_credential_ensure_token_credential(self));
+  uint8_t request_resource_buf[_az_TOKEN_CREDENTIAL_AUTH_RESOURCE_BUF_SIZE] = { 0 };
+  az_span_builder resource_builder
+      = az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(request_resource_buf));
+
+  AZ_RETURN_IF_FAILED(_az_client_secret_credential_get_resource(request_url, &resource_builder));
+  az_span const request_resource = az_span_builder_result(&resource_builder);
+
+  if (az_span_eq(
+          request_resource,
+          (az_span){
+              .begin = self->_token_credential._resource_buf,
+              .size = self->_token_credential._resource_size,
+          })) {
+    AZ_RETURN_IF_FAILED(_az_client_secret_credential_ensure_token_credential(self));
+  } else {
+    resource_builder = az_span_builder_create(
+        (az_mut_span)AZ_SPAN_FROM_ARRAY(self->_token_credential._resource_buf));
+
+    AZ_RETURN_IF_FAILED(az_span_builder_append(&resource_builder, request_resource));
+    self->_token_credential._resource_size = az_span_builder_result(&resource_builder).size;
+
+    AZ_RETURN_IF_FAILED(_az_client_secret_credential_renew_token_credential(self));
+  }
 
   return az_http_request_builder_append_header(
       hrb,
@@ -246,12 +310,10 @@ static AZ_NODISCARD az_result _az_client_secret_credential_credential_func(
 
 AZ_NODISCARD az_result az_client_secret_credential_init(
     az_client_secret_credential * const self,
-    az_span const resource,
     az_span const tenant_id,
     az_span const client_id,
     az_span const client_secret) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
-  AZ_CONTRACT_ARG_VALID_SPAN(resource);
   AZ_CONTRACT_ARG_VALID_SPAN(tenant_id);
   AZ_CONTRACT_ARG_VALID_SPAN(client_id);
   AZ_CONTRACT_ARG_VALID_SPAN(client_secret);
@@ -264,7 +326,5 @@ AZ_NODISCARD az_result az_client_secret_credential_init(
   };
 
   return _az_token_credential_init(
-      &(self->_token_credential),
-      resource,
-      (az_credential_func)_az_client_secret_credential_credential_func);
+      &(self->_token_credential), (az_credential_func)_az_client_secret_credential_credential_func);
 }
