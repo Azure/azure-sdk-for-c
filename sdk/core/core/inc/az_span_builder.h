@@ -28,7 +28,7 @@ typedef struct {
 /**
  * Creates a byte span builder.
  *
- * @buffer a buffer for writing.
+ * @param buffer a buffer for writing.
  */
 AZ_NODISCARD AZ_INLINE az_span_builder az_span_builder_create(az_mut_span const buffer) {
   return (az_span_builder){
