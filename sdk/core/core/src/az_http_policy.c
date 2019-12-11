@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_credential.h>
+#include <az_access_token.h>
 #include <az_http_client.h>
 #include <az_http_pipeline.h>
 #include <az_http_policy.h>
@@ -73,7 +73,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_authentication(
   AZ_CONTRACT_ARG_NOT_NULL(data);
 
   az_credential * const credential = (az_credential *)(data);
-  AZ_RETURN_IF_FAILED(credential->func(data, hrb));
+  AZ_RETURN_IF_FAILED(credential->_func(data, hrb));
 
   return az_http_pipeline_nextpolicy(p_policies, hrb, response);
 }

@@ -14,7 +14,7 @@ typedef AZ_NODISCARD az_result (
     *az_credential_func)(void * const data, az_http_request_builder * const hrb);
 
 typedef struct {
-  az_credential_func func; // must be the first field in every credential structure
+  az_credential_func _func; // must be the first field in every credential structure
 } az_credential;
 
 AZ_INLINE AZ_NODISCARD az_result
@@ -22,7 +22,7 @@ _az_credential_init(az_credential * const self, az_credential_func const credent
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(credential_func);
 
-  *self = (az_credential){ .func = credential_func };
+  *self = (az_credential){ ._func = credential_func };
 
   return AZ_OK;
 }
