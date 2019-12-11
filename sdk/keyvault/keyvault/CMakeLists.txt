@@ -15,7 +15,7 @@ add_library (
 if(MSVC)
   target_compile_options(az_keyvault PRIVATE /Wall /WX /wd5031 /wd4668 /wd4820 /wd4255 /analyze)
 elseif(CMAKE_C_COMPILER_ID MATCHES "Clang")
-  target_compile_options(az_keyvault PRIVATE -Wall -Wextra -pedantic -Werror -Wdocumentation)
+  target_compile_options(az_keyvault PRIVATE -Wall -Wextra -pedantic -Werror -Wdocumentation  -Wdocumentation-unknown-command)
 else()
   target_compile_options(az_keyvault PRIVATE -Wall -Wextra -pedantic -Werror)
 endif()
