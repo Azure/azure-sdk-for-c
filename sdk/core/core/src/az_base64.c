@@ -150,7 +150,7 @@ AZ_NODISCARD az_result az_base64_encode(
           octet2 = input.begin[oct + TRIBYTE_OCTET2_INDEX];
 
           buffer.begin[sxt + TRIBYTE_SEXTET3_INDEX]
-              = uint6_as_base64(base64url, octet2 & TRIBYTE_OCTET2_SEXTET3_MASK);
+              = uint6_as_base64(base64url, (uint8_t)(octet2 & TRIBYTE_OCTET2_SEXTET3_MASK));
         } else {
           buffer.begin[sxt + TRIBYTE_SEXTET3_INDEX] = BASE64_PADDING_CHAR;
         }
@@ -160,8 +160,9 @@ AZ_NODISCARD az_result az_base64_encode(
       buffer.begin[sxt + TRIBYTE_SEXTET2_INDEX] = (oct + TRIBYTE_OCTET1_INDEX < input.size)
           ? uint6_as_base64(
               base64url,
-              ((octet1 & TRIBYTE_OCTET1_SEXTET2_MASK) << TRIBYTE_OCTET1_SEXTET2_LSHIFT)
-                  | ((octet2 & TRIBYTE_OCTET2_SEXTET2_MASK) >> TRIBYTE_OCTET2_SEXTET2_RSHIFT))
+              (uint8_t)(
+                  ((octet1 & TRIBYTE_OCTET1_SEXTET2_MASK) << TRIBYTE_OCTET1_SEXTET2_LSHIFT)
+                  | ((octet2 & TRIBYTE_OCTET2_SEXTET2_MASK) >> TRIBYTE_OCTET2_SEXTET2_RSHIFT)))
           : BASE64_PADDING_CHAR;
     }
 
@@ -169,26 +170,26 @@ AZ_NODISCARD az_result az_base64_encode(
     assert(oct + TRIBYTE_OCTET0_INDEX < input.size);
     buffer.begin[sxt + TRIBYTE_SEXTET1_INDEX] = uint6_as_base64(
         base64url,
-        ((input.begin[oct + TRIBYTE_OCTET0_INDEX] & TRIBYTE_OCTET0_SEXTET1_MASK)
-         << TRIBYTE_OCTET0_SEXTET1_LSHIFT)
-            | ((octet1 & TRIBYTE_OCTET1_SEXTET1_MASK) >> TRIBYTE_OCTET1_SEXTET1_RSHIFT));
+        (uint8_t)(
+            ((input.begin[oct + TRIBYTE_OCTET0_INDEX] & TRIBYTE_OCTET0_SEXTET1_MASK)
+             << TRIBYTE_OCTET0_SEXTET1_LSHIFT)
+            | ((octet1 & TRIBYTE_OCTET1_SEXTET1_MASK) >> TRIBYTE_OCTET1_SEXTET1_RSHIFT)));
 
     assert(sxt + TRIBYTE_SEXTET0_INDEX < result_size);
     assert(oct + TRIBYTE_OCTET0_INDEX < input.size);
     buffer.begin[sxt + TRIBYTE_SEXTET0_INDEX] = uint6_as_base64(
         base64url,
-        (input.begin[oct + TRIBYTE_OCTET0_INDEX] & TRIBYTE_OCTET0_SEXTET0_MASK)
-            >> TRIBYTE_OCTET0_SEXTET0_RSHIFT);
+        (uint8_t)(
+            (input.begin[oct + TRIBYTE_OCTET0_INDEX] & TRIBYTE_OCTET0_SEXTET0_MASK)
+            >> TRIBYTE_OCTET0_SEXTET0_RSHIFT));
   }
 
   *out_result = result;
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_base64_decode(
-    az_mut_span const buffer,
-    az_span const input,
-    az_span * const out_result) {
+AZ_NODISCARD az_result
+az_base64_decode(az_mut_span const buffer, az_span const input, az_span * const out_result) {
   AZ_CONTRACT_ARG_NOT_NULL(out_result);
   AZ_CONTRACT_ARG_VALID_MUT_SPAN(buffer);
   AZ_CONTRACT_ARG_VALID_SPAN(input);
@@ -240,25 +241,25 @@ AZ_NODISCARD az_result az_base64_decode(
 
       uint8_t const sextet2 = base64_as_uint6(input.begin[sxt + TRIBYTE_SEXTET2_INDEX]);
 
-      buffer.begin[oct + TRIBYTE_OCTET1_INDEX]
-          = (sextet1 << TRIBYTE_OCTET1_SEXTET1_RSHIFT) | (sextet2 >> TRIBYTE_OCTET1_SEXTET2_LSHIFT);
+      buffer.begin[oct + TRIBYTE_OCTET1_INDEX] = (uint8_t)(
+          (sextet1 << TRIBYTE_OCTET1_SEXTET1_RSHIFT) | (sextet2 >> TRIBYTE_OCTET1_SEXTET2_LSHIFT));
 
       if (noctets == TRIBYTE_OCTETS) {
         assert(oct + TRIBYTE_OCTET2_INDEX < result_size);
         assert(sxt + TRIBYTE_SEXTET3_INDEX < input_size);
 
-        buffer.begin[oct + TRIBYTE_OCTET2_INDEX] = (sextet2 << TRIBYTE_OCTET2_SEXTET2_RSHIFT)
-            | base64_as_uint6(input.begin[sxt + TRIBYTE_SEXTET3_INDEX]);
+        buffer.begin[oct + TRIBYTE_OCTET2_INDEX] = (uint8_t)(
+            (sextet2 << TRIBYTE_OCTET2_SEXTET2_RSHIFT)
+            | base64_as_uint6(input.begin[sxt + TRIBYTE_SEXTET3_INDEX]));
       }
     }
 
     assert(oct + TRIBYTE_OCTET0_INDEX < result_size);
     assert(sxt + TRIBYTE_SEXTET0_INDEX < input_size);
 
-    buffer.begin[oct + TRIBYTE_OCTET0_INDEX]
-        = (base64_as_uint6(input.begin[sxt + TRIBYTE_SEXTET0_INDEX])
-           << TRIBYTE_OCTET0_SEXTET0_RSHIFT)
-        | (sextet1 >> TRIBYTE_OCTET0_SEXTET1_LSHIFT);
+    buffer.begin[oct + TRIBYTE_OCTET0_INDEX] = (uint8_t)(
+        (base64_as_uint6(input.begin[sxt + TRIBYTE_SEXTET0_INDEX]) << TRIBYTE_OCTET0_SEXTET0_RSHIFT)
+        | (sextet1 >> TRIBYTE_OCTET0_SEXTET1_LSHIFT));
   }
 
   *out_result = result;
