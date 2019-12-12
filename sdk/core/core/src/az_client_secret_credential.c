@@ -3,7 +3,7 @@
 
 #include <az_client_secret_credential.h>
 
-#include <az_access_token.h>
+#include <az_access_token_context.h>
 #include <az_contract.h>
 #include <az_http_pipeline.h>
 #include <az_http_request_builder.h>
@@ -38,14 +38,16 @@ static AZ_NODISCARD az_result _az_http_pipeline_no_op(
 }
 
 AZ_INLINE AZ_NODISCARD az_result _az_client_secret_credential_ms_oauth2_send_get_token_request(
-    az_access_token const * const token,
+    az_access_token_context const * const token_context,
     az_mut_span const auth_url_buf,
     az_mut_span const auth_body_buf,
     az_mut_span const hrb_buf,
     az_http_response * response,
     clock_t * const requested_at) {
+  AZ_CONTRACT_ARG_NOT_NULL(token_context->_credential);
   az_client_secret_credential * const credential
-      = (az_client_secret_credential *)(token->_credential);
+      = (az_client_secret_credential *)(token_context->_credential);
+
   az_span auth_url = { 0 };
   {
     az_span_builder builder = az_span_builder_create(auth_url_buf);
@@ -71,12 +73,7 @@ AZ_INLINE AZ_NODISCARD az_result _az_client_secret_credential_ms_oauth2_send_get
     AZ_RETURN_IF_FAILED(az_uri_encode(credential->client_secret, &builder));
 
     AZ_RETURN_IF_FAILED(az_span_builder_append(&builder, AZ_STR("&scope=")));
-    AZ_RETURN_IF_FAILED(az_uri_encode(
-        (az_span){
-            .begin = token->_scope_buf,
-            .size = token->_scope_size,
-        },
-        &builder));
+    AZ_RETURN_IF_FAILED(az_uri_encode(token_context->_scope, &builder));
 
     auth_body = az_span_builder_result(&builder);
   }
@@ -105,7 +102,7 @@ AZ_INLINE AZ_NODISCARD az_result _az_client_secret_credential_ms_oauth2_send_get
 }
 
 AZ_INLINE AZ_NODISCARD az_result _az_client_secret_credential_ms_oauth2_get_token(
-    az_access_token * const token,
+    az_access_token_context const * const token_context,
     az_http_response * const response) {
   clock_t requested_at = 0;
   {
@@ -119,7 +116,7 @@ AZ_INLINE AZ_NODISCARD az_result _az_client_secret_credential_ms_oauth2_get_toke
 
     az_result const token_request_result
         = _az_client_secret_credential_ms_oauth2_send_get_token_request(
-            token, auth_url, auth_body, hrb_buf_span, response, &requested_at);
+            token_context, auth_url, auth_body, hrb_buf_span, response, &requested_at);
 
     az_mut_span_memset(hrb_buf_span, '#');
     az_mut_span_memset(auth_body, '#');
@@ -161,7 +158,7 @@ AZ_INLINE AZ_NODISCARD az_result _az_client_secret_credential_ms_oauth2_get_toke
     AZ_RETURN_IF_FAILED(az_json_get_object_member(body, AZ_STR("access_token"), &value));
     AZ_RETURN_IF_FAILED(az_json_value_get_string(&value, &token_str));
 
-    az_mut_span const token_buf = AZ_SPAN_FROM_ARRAY(token->_token_buf);
+    az_mut_span const token_buf = AZ_SPAN_FROM_ARRAY(token_context->_token->_token_buf);
     az_span_builder builder = az_span_builder_create(token_buf);
     az_mut_span_memset(token_buf, 0);
 
@@ -169,11 +166,11 @@ AZ_INLINE AZ_NODISCARD az_result _az_client_secret_credential_ms_oauth2_get_toke
     az_result const token_append_result = az_span_builder_append(&builder, token_str);
 
     if (az_succeeded(token_append_result)) {
-      token->_token_size = az_span_builder_result(&builder).size;
+      token_context->_token->_token_size = az_span_builder_result(&builder).size;
 
       clock_t const expiration = requested_at + expiration_clock;
       if (expiration > 0) {
-        token->_token_expiration = expiration;
+        token_context->_token->_token_expiration = expiration;
       }
     } else {
       az_mut_span_memset(token_buf, 'X');
@@ -185,22 +182,23 @@ AZ_INLINE AZ_NODISCARD az_result _az_client_secret_credential_ms_oauth2_get_toke
 }
 
 AZ_INLINE AZ_NODISCARD az_result
-_az_client_secret_credential_renew_token_credential(az_access_token * const token) {
+_az_client_secret_credential_renew_token_credential(az_access_token_context const * const token_context) {
   uint8_t response_buf[_az_CLIENT_SECRET_CREDENTIAL_RESPONSE_BUF_SIZE] = { 0 };
 
   az_http_response http_response = { 0 };
   AZ_RETURN_IF_FAILED(az_http_response_init(
       &http_response, az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(response_buf))));
 
-  az_result const result = _az_client_secret_credential_ms_oauth2_get_token(token, &http_response);
+  az_result const result
+      = _az_client_secret_credential_ms_oauth2_get_token(token_context, &http_response);
 
   az_mut_span_memset(http_response.builder.buffer, '#');
   return result;
 }
 
-AZ_INLINE AZ_NODISCARD az_result
-_az_client_secret_credential_ensure_token_credential(az_access_token * const token) {
-  clock_t const expiration = token->_token_expiration;
+AZ_INLINE AZ_NODISCARD az_result _az_client_secret_credential_ensure_token_credential(
+    az_access_token_context const * const token_context) {
+  clock_t const expiration = token_context->_token->_token_expiration;
   if (expiration > 0) {
     clock_t const clk = clock();
     if (clk > 0 && clk < expiration) {
@@ -208,52 +206,14 @@ _az_client_secret_credential_ensure_token_credential(az_access_token * const tok
     }
   }
 
-  return _az_client_secret_credential_renew_token_credential(token);
-}
-
-// Being given
-// "https://NNNNNNNN.vault.azure.net/secrets/Password/XXXXXXXXXXXXXXXXXXXX?api-version=7.0", gives
-// back "https://vault.azure.net/.default" (needed for authentication).
-AZ_INLINE AZ_NODISCARD az_result _az_client_secret_credential_get_scope(
-    az_span const request_url,
-    az_span_builder * const p_builder) {
-  az_url url = { 0 };
-  if (!az_succeeded(az_url_parse(request_url, &url))) {
-    return AZ_ERROR_ARG;
-  }
-
-  az_span domains[3] = { 0 };
-  size_t const ndomains = AZ_ARRAY_SIZE(domains);
-  for (size_t i = 0; i < ndomains; ++i) {
-    if (!az_succeeded(az_host_read_domain(&url.authority.host, &domains[(ndomains - 1) - i]))) {
-      return AZ_ERROR_ARG;
-    }
-  }
-
-  // Add "https://"
-  AZ_RETURN_IF_FAILED(az_span_builder_append(p_builder, url.scheme));
-  AZ_RETURN_IF_FAILED(az_span_builder_append(p_builder, AZ_STR("://")));
-
-  for (size_t i = 0; i < (ndomains - 1); ++i) { // This loop would add "vault.azure."
-    AZ_RETURN_IF_FAILED(az_span_builder_append(p_builder, domains[i]));
-    AZ_RETURN_IF_FAILED(az_span_builder_append_byte(p_builder, '.'));
-  }
-
-  // We have to do this out of the loop so that we won't append an extra "." at the end.
-  // So this expression is going to add the final "net" to an existing "https://vault.azure."
-  AZ_RETURN_IF_FAILED(az_span_builder_append(p_builder, domains[ndomains - 1]));
-
-  // Add the default scope
-  AZ_RETURN_IF_FAILED(az_span_builder_append(p_builder, AZ_STR("/.default")));
-
-  return AZ_OK;
+  return _az_client_secret_credential_renew_token_credential(token_context);
 }
 
 static AZ_NODISCARD az_result _az_client_secret_credential_credential_func(
-    az_access_token * const token,
+    az_access_token_context const * const token_context,
     az_http_request_builder * const hrb) {
-  AZ_CONTRACT_ARG_NOT_NULL(token);
-  AZ_CONTRACT_ARG_NOT_NULL(token->_credential);
+  AZ_CONTRACT_ARG_NOT_NULL(token_context);
+  AZ_CONTRACT_ARG_NOT_NULL(token_context->_token);
   AZ_CONTRACT_ARG_NOT_NULL(hrb);
 
   az_span const request_url = az_span_builder_result(&hrb->url_builder);
@@ -266,35 +226,14 @@ static AZ_NODISCARD az_result _az_client_secret_credential_credential_func(
     }
   }
 
-  uint8_t request_scope_buf[_az_ACCESS_TOKEN_SCOPE_BUF_SIZE] = { 0 };
-  az_span_builder scope_builder
-      = az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(request_scope_buf));
-
-  AZ_RETURN_IF_FAILED(_az_client_secret_credential_get_scope(request_url, &scope_builder));
-  az_span const request_scope = az_span_builder_result(&scope_builder);
-
-  if (az_span_eq(
-          request_scope,
-          (az_span){
-              .begin = token->_scope_buf,
-              .size = token->_scope_size,
-          })) {
-    AZ_RETURN_IF_FAILED(_az_client_secret_credential_ensure_token_credential(token));
-  } else {
-    scope_builder = az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(token->_scope_buf));
-
-    AZ_RETURN_IF_FAILED(az_span_builder_append(&scope_builder, request_scope));
-    token->_scope_size = az_span_builder_result(&scope_builder).size;
-
-    AZ_RETURN_IF_FAILED(_az_client_secret_credential_renew_token_credential(token));
-  }
+  AZ_RETURN_IF_FAILED(_az_client_secret_credential_ensure_token_credential(token_context));
 
   return az_http_request_builder_append_header(
       hrb,
       AZ_STR("authorization"),
       (az_span){
-          .begin = token->_token_buf,
-          .size = token->_token_size,
+          .begin = token_context->_token->_token_buf,
+          .size = token_context->_token->_token_size,
       });
 }
 
