@@ -44,11 +44,26 @@ add_library (
   )
 
 if(MSVC)
-  target_compile_options(az_core PRIVATE /Wall /WX /wd5031 /wd4668 /wd4820 /wd4255 /analyze)
+  if(NOT NO_ERRORS)
+    set(WARNINGS_AS_ERRORS "/WX")
+  endif()
+
+  target_compile_options(az_core PRIVATE /Wall ${WARNINGS_AS_ERRORS} /wd5031 /wd4668 /wd4820 /wd4255 /analyze)
 elseif(CMAKE_C_COMPILER_ID MATCHES "Clang")
-  target_compile_options(az_core PRIVATE -Wall -Wextra -pedantic -Werror -Wdocumentation -Wdocumentation-unknown-command -Wcast-qual)
+  if(NOT NO_ERRORS)
+    set(WARNINGS_AS_ERRORS "-Werror")
+  endif()
+
+  target_compile_options(az_core PRIVATE -Wall -Wextra -pedantic  ${WARNINGS_AS_ERRORS} -Wdocumentation -Wdocumentation-unknown-command -Wcast-qual)
 else()
-  target_compile_options(az_core PRIVATE -Wall -Wextra -pedantic -Werror)
+  if(NOT NO_ERRORS)
+    set(WARNINGS_AS_ERRORS "-Werror")
+  endif()
+
+  message("NO_ERRORS: ${NO_ERRORS}")
+  message("WARNINGS AS ERRORS: ${WARNINGS_AS_ERRORS}")
+
+  target_compile_options(az_core PRIVATE -Wall -Wextra -pedantic  ${WARNINGS_AS_ERRORS})
 endif()
 
 target_include_directories (az_core PUBLIC inc)
