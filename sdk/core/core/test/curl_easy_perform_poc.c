@@ -29,7 +29,7 @@ int main() {
   // create a buffer for request
   uint8_t buf[1024 * 4];
   az_mut_span const http_buf = AZ_SPAN_FROM_ARRAY(buf);
-  az_http_request_builder hrb;
+  az_http_request_builder hrb = { 0 };
 
   // response buffer
   uint8_t buf_response[1024 * 4];
@@ -78,8 +78,11 @@ int main() {
   }
 
   az_access_token_context access_token_context = { 0 };
-  az_result const token_context_retcode
-      = az_access_token_context_init(&access_token_context, &credential, &access_token, AZ_STR("https://vault.azure.net/.default"));
+  az_result const token_context_retcode = az_access_token_context_init(
+      &access_token_context,
+      &credential,
+      &access_token,
+      AZ_STR("https://vault.azure.net/.default"));
 
   if (!az_succeeded(token_retcode)) {
     printf("Error initializing access token context\n");
