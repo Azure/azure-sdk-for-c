@@ -18,6 +18,10 @@ void az_create_key_options_test() {
     TEST_ASSERT(options.key_operations.size == 1)
     TEST_ASSERT(az_span_eq(options.key_operations.operations[0], az_keyvault_key_operation_sign()))
 
+    // check we can't add all if not empty
+    TEST_ASSERT(
+        az_keyvault_create_key_options_append_all_operations(&options) == AZ_ERROR_BUFFER_OVERFLOW)
+
     // clear
     TEST_ASSERT(az_keyvault_create_key_options_clear(&options) == AZ_OK)
     TEST_ASSERT(options.key_operations.size == 0)

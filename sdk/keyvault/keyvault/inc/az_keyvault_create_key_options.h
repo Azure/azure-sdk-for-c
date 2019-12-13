@@ -29,7 +29,6 @@ typedef struct {
   Datetime not_before;
   Datetime expires_on
   List tags
-  List keyOperations
   */
 } az_keyvault_create_key_options;
 
