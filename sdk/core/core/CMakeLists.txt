@@ -44,26 +44,23 @@ add_library (
   )
 
 if(MSVC)
-  if(NOT NO_ERRORS)
-    set(WARNINGS_AS_ERRORS "/WX")
+  if(WARNINGS_AS_ERRORS)
+    set(WARNINGS_AS_ERRORS_FLAG "/WX")
   endif()
 
-  target_compile_options(az_core PRIVATE /Wall ${WARNINGS_AS_ERRORS} /wd5031 /wd4668 /wd4820 /wd4255 /analyze)
+  target_compile_options(az_core PRIVATE /Wall ${WARNINGS_AS_ERRORS_FLAG} /wd5031 /wd4668 /wd4820 /wd4255 /analyze)
 elseif(CMAKE_C_COMPILER_ID MATCHES "Clang")
-  if(NOT NO_ERRORS)
-    set(WARNINGS_AS_ERRORS "-Werror")
+  if(WARNINGS_AS_ERRORS)
+    set(WARNINGS_AS_ERRORS_FLAG "-Werror")
   endif()
 
-  target_compile_options(az_core PRIVATE -Wall -Wextra -pedantic  ${WARNINGS_AS_ERRORS} -Wdocumentation -Wdocumentation-unknown-command -Wcast-qual)
+  target_compile_options(az_core PRIVATE -Wall -Wextra -pedantic  ${WARNINGS_AS_ERRORS_FLAG} -Wdocumentation -Wdocumentation-unknown-command -Wcast-qual)
 else()
-  if(NOT NO_ERRORS)
-    set(WARNINGS_AS_ERRORS "-Werror")
+  if(WARNINGS_AS_ERRORS)
+    set(WARNINGS_AS_ERRORS_FLAG "-Werror")
   endif()
 
-  message("NO_ERRORS: ${NO_ERRORS}")
-  message("WARNINGS AS ERRORS: ${WARNINGS_AS_ERRORS}")
-
-  target_compile_options(az_core PRIVATE -Wall -Wextra -pedantic  ${WARNINGS_AS_ERRORS})
+  target_compile_options(az_core PRIVATE -Wall -Wextra -pedantic  ${WARNINGS_AS_ERRORS_FLAG})
 endif()
 
 target_include_directories (az_core PUBLIC inc)

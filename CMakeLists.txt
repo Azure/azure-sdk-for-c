@@ -3,7 +3,7 @@
 
 cmake_minimum_required (VERSION 3.12)
 
-option(NO_ERRORS "Disable compiler flags that treat warnings as errors")
+option(WARNINGS_AS_ERRORS "Treat compiler warnings as errors" ON)
 
 if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
   set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
