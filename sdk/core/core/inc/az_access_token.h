@@ -25,13 +25,7 @@ typedef struct {
 
 AZ_INLINE AZ_NODISCARD az_result az_access_token_init(az_access_token * const self) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
-
-  *self = (az_access_token){
-    ._token_size = 0,
-    ._token_expiration = 0,
-    ._token_buf = { 0 },
-  };
-
+  *self = (az_access_token){ 0 };
   return AZ_OK;
 }
 
