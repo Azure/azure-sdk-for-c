@@ -9,7 +9,8 @@
 #include <_az_cfg_prefix.h>
 
 /**
- * Returns a next reference token in the JSON pointer. The JSON pointer parser is @az_span_reader.
+ * Returns a next reference token in the JSON pointer. The JSON pointer parser is @var
+ * az_span_reader.
  *
  * See https://tools.ietf.org/html/rfc6901
  */
