@@ -56,7 +56,7 @@ AZ_NODISCARD AZ_INLINE bool az_keyvault_create_key_options_is_full(
  */
 AZ_NODISCARD AZ_INLINE az_result
 az_keyvault_create_key_options_clear(az_keyvault_create_key_options * const self) {
-  self->key_operations.size = 0;
+  self->key_operations = (az_keyvault_create_key_options_key_operation){ 0 };
   return AZ_OK;
 }
 
