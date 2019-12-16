@@ -45,8 +45,8 @@ AZ_INLINE AZ_NODISCARD az_result _az_client_secret_credential_ms_oauth2_send_get
     az_http_response * response,
     clock_t * const requested_at) {
   AZ_CONTRACT_ARG_NOT_NULL(token_context->_credential);
-  az_client_secret_credential * const credential
-      = (az_client_secret_credential *)(token_context->_credential);
+  az_client_secret_credential const * const credential
+      = (az_client_secret_credential const *)(token_context->_credential);
 
   az_span auth_url = { 0 };
   {
