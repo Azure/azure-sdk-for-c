@@ -4,6 +4,8 @@
 #ifndef AZ_KEYVAULT_H
 #define AZ_KEYVAULT_H
 
+#include <az_access_token.h>
+#include <az_access_token_context.h>
 #include <az_contract.h>
 #include <az_http_pipeline.h>
 #include <az_http_response.h>
