@@ -44,11 +44,6 @@ AZ_NODISCARD az_result az_span_builder_replace(
   // size after replacing must be less o equal than buffer size
   AZ_CONTRACT(size_after_replace <= self->buffer.size, AZ_ERROR_ARG);
 
-  // For inserting, we just need append at the end
-  if (self->size == 0 || start == self->size) {
-    return az_span_builder_append(self, span);
-  }
-
   // get the span then need to be moved before adding new span
   az_mut_span const dst = az_mut_span_drop(self->buffer, start + span.size);
   // get the span where to move content
