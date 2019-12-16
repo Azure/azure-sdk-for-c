@@ -19,6 +19,7 @@
 #include "./test_http_response_parser.h"
 #include "./test_json_string.h"
 #include "./test_json_value.h"
+#include "./test_span_builder_replace.h"
 
 #include <_az_cfg.h>
 
@@ -559,7 +560,7 @@ int main() {
   }
 
   {
-    az_span const expected = AZ_STR("@###copy#copy#make some zero-terminated strings#make "
+    az_span const expected = AZ_STR("@#############make some zero-terminated strings#make "
                                     "some\0zero-terminated\0strings\0####@");
 
     uint8_t buf[87];
@@ -572,13 +573,6 @@ int main() {
     az_mut_span_memset((az_mut_span){ .begin = actual.begin + 1, .size = actual.size - 2 }, '#');
 
     az_mut_span result;
-
-    char const phrase1[] = "copy";
-    memcpy(actual.begin + 4, phrase1, sizeof(phrase1) - 1);
-    TEST_EXPECT_SUCCESS(az_mut_span_copy(
-        (az_mut_span){ .begin = actual.begin + 9, .size = 4 },
-        (az_span){ .begin = actual.begin + 4, .size = 4 },
-        &result));
 
     char const phrase2[] = "make some zero-terminated strings";
     memcpy(actual.begin + 14, phrase2, sizeof(phrase2) - 1);
@@ -670,19 +664,19 @@ int main() {
     TEST_EXPECT_SUCCESS(az_http_request_builder_init(
         &hrb, http_buf, 100, AZ_HTTP_METHOD_VERB_GET, hrb_url, az_span_create_empty()));
     TEST_ASSERT(az_span_eq(hrb.method_verb, AZ_HTTP_METHOD_VERB_GET));
-    TEST_ASSERT(az_span_eq(az_mut_span_to_span(hrb.url), hrb_url));
-    TEST_ASSERT(hrb.max_url_size == 100);
+    TEST_ASSERT(az_span_eq(az_span_builder_result(&hrb.url_builder), hrb_url));
+    TEST_ASSERT(hrb.url_builder.buffer.size == 100);
     TEST_ASSERT(hrb.max_headers == 2);
     TEST_ASSERT(hrb.headers_end == 0);
     TEST_ASSERT(hrb.retry_headers_start == 2);
 
     TEST_EXPECT_SUCCESS(az_http_request_builder_set_query_parameter(
         &hrb, hrb_param_api_version_name, hrb_param_api_version_value));
-    TEST_ASSERT(az_span_eq(az_mut_span_to_span(hrb.url), hrb_url2));
+    TEST_ASSERT(az_span_eq(az_span_builder_result(&hrb.url_builder), hrb_url2));
 
     TEST_EXPECT_SUCCESS(az_http_request_builder_set_query_parameter(
         &hrb, hrb_param_test_param_name, hrb_param_test_param_value));
-    TEST_ASSERT(az_span_eq(az_mut_span_to_span(hrb.url), hrb_url3));
+    TEST_ASSERT(az_span_eq(az_span_builder_result(&hrb.url_builder), hrb_url3));
 
     TEST_EXPECT_SUCCESS(az_http_request_builder_append_header(
         &hrb, hrb_header_content_type_name, hrb_header_content_type_value));
@@ -738,5 +732,6 @@ int main() {
   test_json_pointer();
   test_json_string();
   test_url_parse();
+  test_span_builder_replace();
   return exit_code;
 }

@@ -231,13 +231,13 @@ AZ_NODISCARD az_result setup_url(CURL * const p_curl, az_http_request_builder co
   {
     // set URL as 0-terminated str
     size_t const extra_space_for_zero = AZ_STR_ZERO.size;
-    size_t const url_final_size = p_hrb->url.size + extra_space_for_zero;
+    size_t const url_final_size = p_hrb->url_builder.size + extra_space_for_zero;
     // allocate buffer to add \0
     AZ_RETURN_IF_FAILED(az_span_malloc(url_final_size, &writable_buffer));
   }
 
   // write url in buffer (will add \0 at the end)
-  az_result result = az_write_url(writable_buffer, az_mut_span_to_span(p_hrb->url));
+  az_result result = az_write_url(writable_buffer, az_span_builder_result(&p_hrb->url_builder));
 
   if (az_succeeded(result)) {
     char * buffer = (char *)writable_buffer.begin;

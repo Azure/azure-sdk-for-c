@@ -6,31 +6,11 @@
 
 #include <az_credential.h>
 #include <az_http_pipeline.h>
+#include <az_keyvault_create_key_options.h>
 
 #include <stdlib.h>
 
 #include <_az_cfg_prefix.h>
-
-/**
- * @brief Key Type represent the string used in url path.
- * Instead of asking the right string to user, client will map it from
- * one of this enum values.
- */
-typedef enum {
-  AZ_KEYVAULT_KEY_TYPE_NONE = 0,
-  AZ_KEYVAULT_KEY_TYPE_KEY = 1,
-  AZ_KEYVAULT_KEY_TYPE_SECRET = 2,
-  AZ_KEYVAULT_KEY_TYPE_CERTIFICATE = 3,
-} az_keyvault_key_type;
-
-typedef enum {
-  AZ_KEYVAULT_JSON_WEB_KEY_TYPE_NONE = 0,
-  AZ_KEYVAULT_JSON_WEB_KEY_TYPE_EC = 1,
-  AZ_KEYVAULT_JSON_WEB_KEY_TYPE_EC_HSM = 2,
-  AZ_KEYVAULT_JSON_WEB_KEY_TYPE_RSA = 3,
-  AZ_KEYVAULT_JSON_WEB_KEY_TYPE_RSA_HSM = 4,
-  AZ_KEYVAULT_JSON_WEB_KEY_TYPE_OCT = 5,
-} az_keyvault_json_web_key_type;
 
 typedef struct {
   az_span service_version;
@@ -114,8 +94,8 @@ AZ_NODISCARD AZ_INLINE az_result az_keyvault_keys_client_init(
 AZ_NODISCARD az_result az_keyvault_keys_key_create(
     az_keyvault_keys_client * client,
     az_span const key_name,
-    az_keyvault_json_web_key_type const json_web_key_type,
-    az_keyvault_keys_keys_options const * const options,
+    az_span const json_web_key_type,
+    az_keyvault_create_key_options * const options,
     az_http_response * const response);
 
 /**
@@ -153,6 +133,12 @@ AZ_NODISCARD az_result az_keyvault_keys_key_delete(
     az_keyvault_keys_client * client,
     az_span const key_name,
     az_http_response * const response);
+
+AZ_NODISCARD AZ_INLINE az_span az_keyvault_web_key_type_EC() { return AZ_STR("EC"); }
+AZ_NODISCARD AZ_INLINE az_span az_keyvault_web_key_type_EC_HSM() { return AZ_STR("EC-HSM"); }
+AZ_NODISCARD AZ_INLINE az_span az_keyvault_web_key_type_RSA() { return AZ_STR("RSA"); }
+AZ_NODISCARD AZ_INLINE az_span az_keyvault_web_key_type_RSA_HSM() { return AZ_STR("RSA-HSM"); }
+AZ_NODISCARD AZ_INLINE az_span az_keyvault_web_key_type_OCT() { return AZ_STR("oct"); }
 
 #include <_az_cfg_suffix.h>
 

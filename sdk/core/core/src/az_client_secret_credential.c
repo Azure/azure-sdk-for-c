@@ -280,7 +280,8 @@ static AZ_NODISCARD az_result az_token_credential_add_token_header(
   AZ_CONTRACT_ARG_NOT_NULL(credential);
   AZ_CONTRACT_ARG_NOT_NULL(hrb);
 
-  AZ_RETURN_IF_FAILED(az_token_credential_get_token(credential, az_mut_span_to_span(hrb->url)));
+  AZ_RETURN_IF_FAILED(
+      az_token_credential_get_token(credential, az_span_builder_result(&hrb->url_builder)));
   AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
       hrb, AZ_STR("authorization"), az_mut_span_to_span(credential->token_credential.token)));
 

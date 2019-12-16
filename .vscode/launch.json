@@ -28,10 +28,18 @@
             "preLaunchTask": "build"
         },
         {
-            "name": "KeyVault",
+            "name": "KeyVault IT",
             "type": "gdb",
             "request": "launch",
             "target": "./Debug/sdk/keyvault/keyvault/az_keyvault_test",
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "build"
+        },
+        {
+            "name": "KeyVaultPOC",
+            "type": "gdb",
+            "request": "launch",
+            "target": "./Debug/sdk/keyvault/keyvault/az_keyvault_poc",
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "build",
             // Add ids and secrets here to use it when debuging KeyVaultPOC
