@@ -5,11 +5,10 @@
 #define AZ_SPAN_H
 
 #include <az_action.h>
-#include <az_contract.h>
 #include <az_result.h>
-#include <az_static_assert.h>
 
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <string.h>
 

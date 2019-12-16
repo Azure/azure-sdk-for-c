@@ -5,7 +5,10 @@
 #define AZ_JSON_BUILDER_H
 
 #include <az_json_value.h>
-#include <az_span_builder.h>
+#include <az_result.h>
+#include <az_span.h>
+
+#include <stdbool.h>
 
 #include <_az_cfg_prefix.h>
 

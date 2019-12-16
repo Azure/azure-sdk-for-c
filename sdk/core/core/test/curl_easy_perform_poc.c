@@ -2,14 +2,14 @@
 // SPDX-License-Identifier: MIT
 
 #include <az_client_secret_credential.h>
+#include <az_http_pipeline.h>
 #include <az_http_request_builder.h>
 #include <az_http_response_parser.h>
 #include <az_pair.h>
 #include <az_span.h>
 #include <az_span_builder.h>
 #include <az_span_malloc.h>
-
-#include <az_http_pipeline.h>
+#include <az_str.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -37,7 +37,12 @@ int main() {
 
   // create request for keyVault
   az_result build_result = az_http_request_builder_init(
-      &hrb, http_buf, 100, AZ_HTTP_METHOD_VERB_GET, az_str_to_span(getenv(URI_ENV)), az_span_create_empty());
+      &hrb,
+      http_buf,
+      100,
+      AZ_HTTP_METHOD_VERB_GET,
+      az_str_to_span(getenv(URI_ENV)),
+      az_span_create_empty());
   if (az_failed(build_result)) {
     return build_result;
   }

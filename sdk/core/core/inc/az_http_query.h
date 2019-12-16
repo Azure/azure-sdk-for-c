@@ -5,11 +5,13 @@
 #define AZ_HTTP_QUERY_H
 
 #include <az_pair.h>
+#include <az_result.h>
+#include <az_span.h>
 
 #include <_az_cfg_prefix.h>
 
 /**
- * Emits the given query as a sequence of spans. In a format 
+ * Emits the given query as a sequence of spans. In a format
  * "?param1=value1&param2=value2".
  */
 AZ_NODISCARD az_result

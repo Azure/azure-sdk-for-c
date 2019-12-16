@@ -4,7 +4,8 @@
 #ifndef AZ_JSON_GET_H
 #define AZ_JSON_GET_H
 
-#include <az_json_parser.h>
+#include <az_json_value.h>
+#include <az_result.h>
 #include <az_span.h>
 
 #include <_az_cfg_prefix.h>

@@ -4,6 +4,8 @@
 #ifndef AZ_OPTIONAL_BOOL_H
 #define AZ_OPTIONAL_BOOL_H
 
+#include <stdbool.h>
+
 #include <_az_cfg_prefix.h>
 
 typedef struct {

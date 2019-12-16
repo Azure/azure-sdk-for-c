@@ -4,7 +4,10 @@
 #ifndef AZ_TOKEN_CREDENTIAL_H
 #define AZ_TOKEN_CREDENTIAL_H
 
+#include <az_contract.h>
 #include <az_credential.h>
+#include <az_mut_span.h>
+#include <az_result.h>
 
 #include <stdint.h>
 #include <time.h>

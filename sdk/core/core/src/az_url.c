@@ -7,6 +7,8 @@
 #include <az_span_reader.h>
 #include <az_str.h>
 
+#include <ctype.h>
+
 #include <_az_cfg.h>
 
 /**

@@ -6,6 +6,8 @@
 #include <az_hex.h>
 #include <az_str.h>
 
+#include <ctype.h>
+
 #include <_az_cfg.h>
 
 AZ_NODISCARD AZ_INLINE az_result_byte az_hex_to_digit(az_result_byte const c) {

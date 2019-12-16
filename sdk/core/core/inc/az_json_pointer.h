@@ -4,7 +4,11 @@
 #ifndef AZ_JSON_POINTER_H
 #define AZ_JSON_POINTER_H
 
+#include <az_result.h>
+#include <az_span.h>
 #include <az_span_reader.h>
+
+#include <stdint.h>
 
 #include <_az_cfg_prefix.h>
 
