@@ -7,6 +7,8 @@
 #include <az_json_value.h>
 #include <az_keyvault.h>
 
+#include <stdlib.h>
+
 #include <_az_cfg.h>
 
 #define TENANT_ID_ENV "tenant_id"
