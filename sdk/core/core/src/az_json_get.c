@@ -3,6 +3,7 @@
 
 #include <az_json_get.h>
 
+#include <az_json_parser.h>
 #include <az_json_pointer.h>
 #include <az_json_string.h>
 
@@ -44,7 +45,7 @@ az_json_get_object_member(az_span const json, az_span const name, az_json_value 
     while (true) {
       az_json_member member = { 0 };
       AZ_RETURN_IF_FAILED(az_json_parser_read_object_member(&parser, &member));
-      // TODO: we should either replace `az_span_eq` with something else or 
+      // TODO: we should either replace `az_span_eq` with something else or
       //       remove `az_json_get_object_member` completely.
       if (az_span_eq(member.name, name)) {
         *out_value = member.value;

@@ -4,6 +4,7 @@
 #ifndef AZ_HTTP_RESPONSE_H
 #define AZ_HTTP_RESPONSE_H
 
+#include <az_result.h>
 #include <az_span_builder.h>
 
 #include <_az_cfg_prefix.h>

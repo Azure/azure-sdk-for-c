@@ -5,6 +5,7 @@
 
 #include <az_contract.h>
 #include <az_json_string.h>
+#include <az_str.h>
 
 #include <ctype.h>
 #include <math.h>

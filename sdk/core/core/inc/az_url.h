@@ -4,7 +4,6 @@
 #ifndef AZ_URL_H
 #define AZ_URL_H
 
-#include <az_pair.h>
 #include <az_result.h>
 #include <az_span.h>
 

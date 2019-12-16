@@ -5,8 +5,11 @@
 #define AZ_HTTP_RESPONSE_PARSER_H
 
 #include <az_pair.h>
+#include <az_result.h>
 #include <az_span.h>
 #include <az_span_reader.h>
+
+#include <stdint.h>
 
 #include <_az_cfg_prefix.h>
 
@@ -60,8 +63,7 @@ AZ_NODISCARD az_result az_http_response_parser_read_status_line(
 AZ_NODISCARD az_result
 az_http_response_parser_read_header(az_http_response_parser * const self, az_pair * const out);
 
-AZ_NODISCARD az_result
-az_http_response_parser_skip_headers(az_http_response_parser * const self);
+AZ_NODISCARD az_result az_http_response_parser_skip_headers(az_http_response_parser * const self);
 
 /**
  * An HTTP body.
