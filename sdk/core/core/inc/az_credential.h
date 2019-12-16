@@ -6,7 +6,6 @@
 
 #include <az_contract.h>
 #include <az_http_request_builder.h>
-#include <az_mut_span.h>
 #include <az_result.h>
 
 #include <_az_cfg_prefix.h>

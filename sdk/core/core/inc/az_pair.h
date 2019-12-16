@@ -5,8 +5,9 @@
 #define AZ_PAIR_H
 
 #include <az_action.h>
-#include <az_contract.h>
 #include <az_span.h>
+
+#include <stddef.h>
 
 #include <_az_cfg_prefix.h>
 

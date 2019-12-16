@@ -6,8 +6,6 @@
 
 #include <az_pair.h>
 #include <az_span.h>
-#include <az_span_writer.h>
-#include <az_str.h>
 
 #include <_az_cfg_prefix.h>
 

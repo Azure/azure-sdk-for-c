@@ -7,6 +7,8 @@
 #include <az_action.h>
 #include <az_span.h>
 
+#include <stdint.h>
+
 #include <_az_cfg_prefix.h>
 
 // A size of the string literal.

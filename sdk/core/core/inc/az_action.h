@@ -5,6 +5,10 @@
 #define AZ_ACTION_H
 
 #include <az_contract.h>
+#include <az_result.h>
+#include <az_static_assert.h>
+
+#include <stddef.h>
 
 #include <_az_cfg_prefix.h>
 

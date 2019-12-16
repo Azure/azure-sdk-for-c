@@ -8,13 +8,11 @@
 #ifndef AZ_HTTP_REQUEST_BUILDER_H
 #define AZ_HTTP_REQUEST_BUILDER_H
 
-#include <az_contract.h>
 #include <az_mut_span.h>
 #include <az_pair.h>
 #include <az_result.h>
 #include <az_span.h>
 #include <az_span_builder.h>
-#include <az_str.h>
 
 #include <stdbool.h>
 #include <stdint.h>

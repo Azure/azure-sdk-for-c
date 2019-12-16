@@ -3,6 +3,8 @@
 
 #include <az_span_reader.h>
 
+#include <ctype.h>
+
 #include <_az_cfg.h>
 
 AZ_NODISCARD az_result

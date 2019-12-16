@@ -4,10 +4,13 @@
 #ifndef AZ_SPAN_READER_H
 #define AZ_SPAN_READER_H
 
+#include <az_contract.h>
 #include <az_result.h>
 #include <az_span.h>
 
-#include <ctype.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 
 #include <_az_cfg_prefix.h>
 

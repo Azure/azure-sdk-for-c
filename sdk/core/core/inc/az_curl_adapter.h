@@ -4,13 +4,13 @@
 #ifndef AZ_CURL_ADAPTER_H
 #define AZ_CURL_ADAPTER_H
 
-#include <az_http_policy.h>
-#include <az_http_request.h>
 #include <az_http_request_builder.h>
-#include <az_span_builder.h>
-#include <az_str.h>
+#include <az_http_response.h>
+#include <az_result.h>
 
 #include <curl/curl.h>
+#include <stdbool.h>
+#include <stddef.h>
 #include <stdlib.h>
 
 #include <_az_cfg_prefix.h>

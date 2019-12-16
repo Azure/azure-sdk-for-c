@@ -4,8 +4,12 @@
 #ifndef AZ_SPAN_BUILDER_H
 #define AZ_SPAN_BUILDER_H
 
+#include <az_action.h>
 #include <az_mut_span.h>
 #include <az_span.h>
+
+#include <stddef.h>
+#include <stdint.h>
 
 #include <_az_cfg_prefix.h>
 

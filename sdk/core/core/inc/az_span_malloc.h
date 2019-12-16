@@ -5,6 +5,9 @@
 #define AZ_SPAN_MALLOC_H
 
 #include <az_mut_span.h>
+#include <az_result.h>
+
+#include <stddef.h>
 
 #include <_az_cfg_prefix.h>
 

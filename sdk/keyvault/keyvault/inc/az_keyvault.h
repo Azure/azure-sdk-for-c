@@ -4,11 +4,15 @@
 #ifndef AZ_KEYVAULT_H
 #define AZ_KEYVAULT_H
 
-#include <az_credential.h>
+#include <az_contract.h>
 #include <az_http_pipeline.h>
+#include <az_http_response.h>
 #include <az_keyvault_create_key_options.h>
+#include <az_result.h>
+#include <az_span.h>
+#include <az_str.h>
 
-#include <stdlib.h>
+#include <stddef.h>
 
 #include <_az_cfg_prefix.h>
 
