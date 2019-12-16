@@ -26,7 +26,7 @@
     return action.func(action.self, arg); \
   }
 
-AZ_STATIC_ASSERT(sizeof(size_t) == sizeof(void *))
+AZ_STATIC_ASSERT(sizeof(size_t) == sizeof(void *), SIZE_T_SAME_AS_VOID_POINTER)
 
 /**
  * Defines a function @NAME##_action which creates an action of type @ACTION

@@ -8,9 +8,12 @@
 
 #include <_az_cfg_prefix.h>
 
-#define AZ_STATIC_ASSERT(CONDITION) int az_static_assert(int x[(CONDITION) ? 1 : -1]);
+#define AZ_CAT(A, B) A##B
 
-AZ_STATIC_ASSERT(true)
+#define AZ_STATIC_ASSERT(CONDITION, NAME) \
+  int AZ_CAT(az_static_assert_, NAME)(int x[(CONDITION) ? 1 : -1]);
+
+AZ_STATIC_ASSERT(true, TRUE)
 
 #include <_az_cfg_suffix.h>
 

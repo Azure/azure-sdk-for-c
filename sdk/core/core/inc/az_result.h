@@ -70,10 +70,10 @@ typedef enum az_result {
   AZ_ERROR_EOF = AZ_MAKE_ERROR(AZ_STD_FACILITY, 0xFFFF),
 } az_result;
 
-AZ_STATIC_ASSERT(sizeof(az_result) == 4)
+AZ_STATIC_ASSERT(sizeof(az_result) == 4, EXPECTED_AZ_RESULT_SIZE)
 
-AZ_STATIC_ASSERT(AZ_ERROR_EOF == EOF)
-AZ_STATIC_ASSERT(EOF == -1)
+AZ_STATIC_ASSERT(AZ_ERROR_EOF == EOF, EOF_EQUAL_TO_AZ_ERROR_EOF)
+AZ_STATIC_ASSERT(EOF == -1, EXPECTED_EQ_OF_EOF)
 
 AZ_NODISCARD AZ_INLINE bool az_failed(az_result result) { return (result & AZ_ERROR_FLAG) != 0; }
 

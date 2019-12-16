@@ -61,7 +61,7 @@ enum {
   BASE64_PADDING_CHAR = '=',
 };
 
-AZ_STATIC_ASSERT(BASE64_CHAR64_INDEX == 63)
+AZ_STATIC_ASSERT(BASE64_CHAR64_INDEX == 63, BASE_64_REQ_ASSUMPTION)
 
 AZ_INLINE uint8_t uint6_as_base64(bool const base64url, uint8_t const uint6) {
   if (uint6 == BASE64_RANGE1_START
@@ -159,10 +159,10 @@ AZ_NODISCARD az_result az_base64_encode(
       assert(sxt + TRIBYTE_SEXTET2_INDEX < result_size);
       buffer.begin[sxt + TRIBYTE_SEXTET2_INDEX] = (oct + TRIBYTE_OCTET1_INDEX < input.size)
           ? uint6_as_base64(
-              base64url,
-              (uint8_t)(
-                  ((octet1 & TRIBYTE_OCTET1_SEXTET2_MASK) << TRIBYTE_OCTET1_SEXTET2_LSHIFT)
-                  | ((octet2 & TRIBYTE_OCTET2_SEXTET2_MASK) >> TRIBYTE_OCTET2_SEXTET2_RSHIFT)))
+                base64url,
+                (uint8_t)(
+                    ((octet1 & TRIBYTE_OCTET1_SEXTET2_MASK) << TRIBYTE_OCTET1_SEXTET2_LSHIFT)
+                    | ((octet2 & TRIBYTE_OCTET2_SEXTET2_MASK) >> TRIBYTE_OCTET2_SEXTET2_RSHIFT)))
           : BASE64_PADDING_CHAR;
     }
 
