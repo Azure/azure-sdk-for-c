@@ -77,6 +77,8 @@ int main() {
 
   // override options values
   key_options.enabled = az_optional_bool_create(false);
+  az_result append_result = az_keyvault_create_key_options_append_operation(
+      &key_options, az_keyvault_key_operation_sign());
 
   az_result create_result = az_keyvault_keys_key_create(
       &client,
