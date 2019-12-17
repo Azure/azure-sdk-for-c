@@ -69,11 +69,12 @@ AZ_NODISCARD az_result az_http_pipeline_policy_authentication(
     void * const data,
     az_http_request_builder * const hrb,
     az_http_response * const response) {
-
   AZ_CONTRACT_ARG_NOT_NULL(data);
 
-  az_credential * const credential = (az_credential *)(data);
-  AZ_RETURN_IF_FAILED(credential->func(data, hrb));
+  az_credential const * const credential = (az_credential const *)(data);
+  AZ_CONTRACT_ARG_NOT_NULL(credential->_func);
+
+  AZ_RETURN_IF_FAILED(credential->_func(data, hrb));
 
   return az_http_pipeline_nextpolicy(p_policies, hrb, response);
 }

@@ -4,6 +4,8 @@
 #ifndef AZ_KEYVAULT_H
 #define AZ_KEYVAULT_H
 
+#include <az_access_token.h>
+#include <az_access_token_context.h>
 #include <az_contract.h>
 #include <az_http_pipeline.h>
 #include <az_http_response.h>
@@ -32,6 +34,8 @@ typedef struct {
   az_span uri;
   az_http_pipeline pipeline;
   az_keyvault_keys_client_options retry_options;
+  az_access_token _token;
+  az_access_token_context _token_context;
 } az_keyvault_keys_client;
 
 extern az_keyvault_keys_client_options const AZ_KEYVAULT_CLIENT_DEFAULT_OPTIONS;
@@ -52,25 +56,32 @@ az_keyvault_keys_client_options_init(az_keyvault_keys_client_options * const opt
 }
 
 AZ_NODISCARD AZ_INLINE az_result az_keyvault_keys_client_init(
-    az_keyvault_keys_client * const client,
+    az_keyvault_keys_client * const self,
     az_span const uri,
     void * const credential,
     az_keyvault_keys_client_options const * const options) {
-  AZ_CONTRACT_ARG_NOT_NULL(client);
+  AZ_CONTRACT_ARG_NOT_NULL(self);
 
-  client->uri = uri;
-  // use default options if options is null. Or use customer provided one
-  if (options == NULL) {
-    client->retry_options = AZ_KEYVAULT_CLIENT_DEFAULT_OPTIONS;
-  } else {
-    client->retry_options = *options;
-  }
+  *self = (az_keyvault_keys_client){
+    .uri = uri,
+    .pipeline = { 0 },
+    .retry_options = options == NULL ? AZ_KEYVAULT_CLIENT_DEFAULT_OPTIONS : *options,
+    ._token = { 0 },
+    ._token_context = { 0 },
+  };
 
-  client->pipeline = (az_http_pipeline){
+  AZ_RETURN_IF_FAILED(az_access_token_init(&(self->_token)));
+  AZ_RETURN_IF_FAILED(az_access_token_context_init(
+      &(self->_token_context),
+      credential,
+      &(self->_token),
+      AZ_STR("https://vault.azure.net/.default")));
+
+  self->pipeline = (az_http_pipeline){
     .policies = {
       { .pfnc_process = az_http_pipeline_policy_uniquerequestid, .data = NULL },
-      { .pfnc_process = az_http_pipeline_policy_retry, .data = &client->retry_options.retry },
-      { .pfnc_process = az_http_pipeline_policy_authentication, .data = credential },
+      { .pfnc_process = az_http_pipeline_policy_retry, .data = &(self->retry_options.retry) },
+      { .pfnc_process = az_http_pipeline_policy_authentication, .data = &(self->_token_context) },
       { .pfnc_process = az_http_pipeline_policy_logging, .data = NULL },
       { .pfnc_process = az_http_pipeline_policy_bufferresponse, .data = NULL },
       { .pfnc_process = az_http_pipeline_policy_distributedtracing, .data = NULL },
@@ -78,6 +89,7 @@ AZ_NODISCARD AZ_INLINE az_result az_keyvault_keys_client_init(
       { .pfnc_process = NULL, .data = NULL },
     }, 
     };
+
   return AZ_OK;
 }
 
