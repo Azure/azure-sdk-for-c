@@ -15,22 +15,13 @@
 
 #include <_az_cfg_prefix.h>
 
-AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_blob_header_blob_type() {
-  return AZ_STR("x-ms-blob-type");
-}
-AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_blob_header_content_length() {
-  return AZ_STR("Content_Length");
-}
 
-AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_blob_type_append_blob() {
-  return AZ_STR("AppendBlob");
-} /* UnSupported */
-AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_blob_type_block_blob() {
-  return AZ_STR("BlockBlob");
-}
-AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_blob_type_page_blob() {
-  return AZ_STR("PageBlob");
-} /* UnSupported */
+AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_blob_header_blob_type() { return AZ_STR("x-ms-blob-type"); }
+AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_blob_header_Content_Length() { return AZ_STR("Content_Length"); }
+
+AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_blob_type_AppendBlob() { return AZ_STR("AppendBlob");} /* UnSupported */
+AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_blob_type_BlockBlob() { return AZ_STR("BlockBlob");}
+AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_blob_type_PageBlob() { return AZ_STR("PageBlob"); } /* UnSupported */
 
 typedef struct {
   az_span service_version;

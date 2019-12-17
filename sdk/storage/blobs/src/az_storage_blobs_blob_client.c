@@ -54,7 +54,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
   AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
       &hrb, AZ_STR("api-version"), client->client_options.service_version));
 
-  // add blob type to request
+ // add blob type to request
   AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
       &hrb, az_storage_blobs_blob_header_blob_type(), client->blob_type));
 
