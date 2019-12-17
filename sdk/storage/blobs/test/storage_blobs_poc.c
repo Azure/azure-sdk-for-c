@@ -39,13 +39,10 @@ int main() {
   az_result init_http_response_result = az_http_response_init(
       &http_response, az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(response_buffer)));
 
-
-  
   az_result create_result = az_storage_blobs_blob_upload(
       &client,
       AZ_STR("test-new-blob"),
-      az_storage_blobs_blob_type_BlockBlob(),
-      &blob_options,
+      NULL,
       &http_response);
 
   return exit_code;

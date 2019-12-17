@@ -56,8 +56,20 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
       content));
   
   // add version to request
-  AZ_RETURN_IF_FAILED(az_http_request_builder_set_query_parameter(
+  AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
       &hrb, AZ_STR("api-version"), client->client_options.service_version));
+
+ // add blob type to request
+  AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
+      &hrb, az_storage_blobs_blob_header_blob_type(), client->blob_type));
+
+  char str[256];
+  snprintf(str, sizeof str, "%zu", content.size);
+  az_span content_length = (az_span){ .begin = (uint8_t const *)str, .size = strlen(str) };
+
+  // add Content-Length to request
+  AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
+      &hrb, az_storage_blobs_blob_header_Content_Length(), content_length));
 
   // start pipeline
   return az_http_pipeline_process(&client->pipeline, &hrb, response);

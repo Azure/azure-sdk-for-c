@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "../src/az_storage_blobs_client.c"
+#include "../src/az_storage_blobs_blob_client.c"
 
 #include <assert.h>
 #include <stdbool.h>

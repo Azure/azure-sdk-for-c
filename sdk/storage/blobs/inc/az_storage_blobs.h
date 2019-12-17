@@ -9,16 +9,23 @@
 #include <az_http_response.h>
 #include <az_result.h>
 #include <az_span.h>
-#include <az_storage_blobs_create_blob_options.h>
 #include <az_str.h>
 
 #include <stddef.h>
 
 #include <_az_cfg_prefix.h>
 
+
+AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_blob_header_blob_type() { return AZ_STR("x-ms-blob-type"); }
+AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_blob_header_Content_Length() { return AZ_STR("Content_Length"); }
+
+AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_blob_type_AppendBlob() { return AZ_STR("AppendBlob");} /* UnSupported */
+AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_blob_type_BlockBlob() { return AZ_STR("BlockBlob");}
+AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_blob_type_PageBlob() { return AZ_STR("PageBlob"); } /* UnSupported */
+
 typedef struct {
   az_span service_version;
-  az_http_policy_options_retry retry;
+  az_http_policy_retry_options retry;
 } az_storage_blobs_blob_client_options;
 
 typedef struct {
@@ -31,6 +38,7 @@ typedef struct {
 
 typedef struct {
   az_span uri;
+  az_span blob_type;
   az_http_pipeline pipeline;
   az_storage_blobs_blob_client_options client_options;
 } az_storage_blobs_blob_client;
@@ -62,15 +70,15 @@ AZ_NODISCARD AZ_INLINE az_result az_storage_blobs_blob_client_init(
   client->uri = uri;
   // use default options if options is null. Or use customer provided one
   if (options == NULL) {
-    client->retry_options = AZ_STORAGE_BLOBS_BLOB_CLIENT_DEFAULT_OPTIONS;
+    client->client_options = AZ_STORAGE_BLOBS_BLOB_CLIENT_DEFAULT_OPTIONS;
   } else {
-    client->retry_options = *options;
+    client->client_options = *options;
   }
 
   client->pipeline = (az_http_pipeline){
     .policies = {
       { .pfnc_process = az_http_pipeline_policy_uniquerequestid, .data = NULL },
-      { .pfnc_process = az_http_pipeline_policy_retry, .data = &client->retry_options.retry },
+      { .pfnc_process = az_http_pipeline_policy_retry, .data = &client->client_options.retry },
       { .pfnc_process = az_http_pipeline_policy_authentication, .data = credential },
       { .pfnc_process = az_http_pipeline_policy_logging, .data = NULL },
       { .pfnc_process = az_http_pipeline_policy_bufferresponse, .data = NULL },
@@ -79,6 +87,10 @@ AZ_NODISCARD AZ_INLINE az_result az_storage_blobs_blob_client_init(
       { .pfnc_process = NULL, .data = NULL },
     }, 
     };
+
+  //Currently only BlockBlobs are supported
+  client->blob_type = az_storage_blobs_blob_type_BlockBlob();
+
   return AZ_OK;
 }
 
@@ -128,13 +140,6 @@ AZ_NODISCARD az_result az_storage_blobs_blob_download(
 AZ_NODISCARD az_result az_storage_blobs_blob_delete(
     az_storage_blobs_blob_client * client,
     az_http_response * const response);
-
-AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_blob_header_blob_type() { return AZ_STR("x-ms-blob-type"); }
-AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_blob_header_Content_Length() { return AZ_STR("Content_Length"); }
-
-AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_blob_type_AppendBlob() { return AZ_STR("AppendBlob");} /* UnSupported */
-AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_blob_type_BlockBlob() { return AZ_STR("BlockBlob");}
-AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_blob_type_PageBlob() { return AZ_STR("PageBlob"); } /* UnSupported */
 
 #include <_az_cfg_suffix.h>
 

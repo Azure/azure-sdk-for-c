@@ -3,13 +3,13 @@
 
 cmake_minimum_required (VERSION 3.12)
 
-project (az_storage LANGUAGES C)
+project (az_storage_blobs LANGUAGES C)
 
 set(CMAKE_C_STANDARD 99)
 
 add_library (
-  az_storage
-  src/az_storage_blobs_client.c
+  az_storage_blobs
+  src/az_storage_blobs_blob_client.c
   )
 
 if(MSVC)
@@ -32,22 +32,22 @@ else()
   target_compile_options(az_core PRIVATE -Wall -Wextra -pedantic  ${WARNINGS_AS_ERRORS_FLAG})
 endif()
 
-target_include_directories (az_storage PUBLIC inc)
+target_include_directories (az_storage_blobs PUBLIC inc)
 
-target_link_libraries(az_storage PUBLIC az_core)
+target_link_libraries(az_storage_blobs PUBLIC az_core)
 
 # make sure that users can consume the project as a library.
-add_library (az::storage ALIAS az_storage)
+add_library (az::storage::blobs ALIAS az_storage_blobs)
 
-add_executable (az_storage_test test/main.c)
-target_link_libraries(az_storage_test PRIVATE az_storage)
+add_executable (az_storage_blobs_test test/main.c)
+target_link_libraries(az_storage_blobs_test PRIVATE az_storage_blobs)
 
-# make key vault POC
-add_executable (az_storage_poc test/storage_blobs_poc.c)
-target_link_libraries(az_storage_poc PRIVATE az_storage)
+# make Storage POC
+add_executable (az_storage_blobs_poc test/storage_blobs_poc.c)
+target_link_libraries(az_storage_blobs_poc PRIVATE az_storage_blobs)
 
 if (UNIX)
-  target_link_libraries(az_storage PRIVATE m)
+  target_link_libraries(az_storage_blobs PRIVATE m)
 endif()
 
-add_test(NAME az_storage_test COMMAND az_storage_test)
+add_test(NAME az_storage_blobs_test COMMAND az_storage_blobs_test)
