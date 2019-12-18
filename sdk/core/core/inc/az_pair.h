@@ -62,7 +62,7 @@ AZ_NODISCARD az_result
 az_pair_span_as_writer(az_pair_span const * const self, az_pair_action const write_pair);
 
 /**
- * Creates @struct az_pair_span_writer from @az_write_pair_span.
+ * Creates @var az_pair_span_writer from @az_write_pair_span.
  */
 AZ_ACTION_FUNC(az_pair_span_as_writer, az_pair_span const, az_pair_writer)
 
