@@ -55,6 +55,9 @@ int main() {
   az_result append_result = az_keyvault_create_key_options_append_operation(
       &key_options, az_keyvault_key_operation_sign());
 
+  // buffer for tags
+  az_pair tags_buffer[5];
+
   az_result create_result = az_keyvault_keys_key_create(
       &client,
       AZ_STR("test-new-key"),

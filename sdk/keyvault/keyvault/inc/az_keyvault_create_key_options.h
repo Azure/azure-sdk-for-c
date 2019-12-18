@@ -5,6 +5,7 @@
 #define AZ_KEYVAULT_CREATE_KEY_OPTIONS_H
 
 #include <az_optional_bool.h>
+#include <az_pair.h>
 #include <az_result.h>
 #include <az_span.h>
 #include <az_span_span.h>
@@ -25,10 +26,10 @@ AZ_NODISCARD AZ_INLINE az_span az_keyvault_key_operation_wrapKey() { return AZ_S
 typedef struct {
   az_optional_bool enabled;
   az_span_span_builder operations;
+  az_pair_span tags;
   /* TODO: adding next options
   Datetime not_before;
   Datetime expires_on
-  List tags
   */
 } az_keyvault_create_key_options;
 

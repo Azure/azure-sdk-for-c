@@ -13,8 +13,7 @@ az_span_span_builder_append(az_span_span_builder * const self, az_span const spa
     return AZ_ERROR_BUFFER_OVERFLOW;
   }
 
-  az_span * adding_span = (az_span *)self->buffer.begin;
-  adding_span[self->size] = span;
+  self->buffer.begin[self->size] = span;
 
   self->size += 1;
   return AZ_OK;

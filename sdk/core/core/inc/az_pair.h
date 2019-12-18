@@ -23,6 +23,35 @@ typedef struct {
   size_t size;
 } az_pair_span;
 
+typedef struct {
+  az_pair * begin;
+  size_t size;
+} az_mut_pair_span;
+
+typedef struct {
+  az_mut_pair_span buffer;
+  size_t size;
+} az_pair_span_builder;
+
+/**
+ * Creates a span of pair span builder.
+ *
+ * @param buffer a buffer for writing.
+ */
+AZ_NODISCARD AZ_INLINE az_pair_span_builder
+az_pair_span_builder_create(az_mut_pair_span const buffer) {
+  return (az_pair_span_builder){
+    .buffer = buffer,
+    .size = 0,
+  };
+}
+
+/**
+ * Append a given pair.
+ */
+AZ_NODISCARD az_result
+az_pair_span_builder_append(az_pair_span_builder * const self, az_pair const pair);
+
 /// @az_pair_action is a callback with one argument @az_pair.
 AZ_ACTION_TYPE(az_pair_action, az_pair)
 
