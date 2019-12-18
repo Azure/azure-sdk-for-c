@@ -15,13 +15,22 @@
 
 #include <_az_cfg_prefix.h>
 
+AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_blob_header_blob_type() {
+  return AZ_STR("x-ms-blob-type");
+}
+AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_blob_header_content_length() {
+  return AZ_STR("Content_Length");
+}
 
-AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_blob_header_blob_type() { return AZ_STR("x-ms-blob-type"); }
-AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_blob_header_Content_Length() { return AZ_STR("Content_Length"); }
-
-AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_blob_type_AppendBlob() { return AZ_STR("AppendBlob");} /* UnSupported */
-AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_blob_type_BlockBlob() { return AZ_STR("BlockBlob");}
-AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_blob_type_PageBlob() { return AZ_STR("PageBlob"); } /* UnSupported */
+AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_blob_type_append_blob() {
+  return AZ_STR("AppendBlob");
+} /* UnSupported */
+AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_blob_type_block_blob() {
+  return AZ_STR("BlockBlob");
+}
+AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_blob_type_page_blob() {
+  return AZ_STR("PageBlob");
+} /* UnSupported */
 
 typedef struct {
   az_span service_version;
@@ -88,7 +97,7 @@ AZ_NODISCARD AZ_INLINE az_result az_storage_blobs_blob_client_init(
     }, 
     };
 
-  //Currently only BlockBlobs are supported
+  // Currently only BlockBlobs are supported
   client->blob_type = az_storage_blobs_blob_type_BlockBlob();
 
   return AZ_OK;
@@ -99,7 +108,8 @@ AZ_NODISCARD AZ_INLINE az_result az_storage_blobs_blob_client_init(
  *
  * @param client a storage blobs client structure
  * @param content blob content
- * @param options create options for blob. It can be NULL so nothing is added to http request headers
+ * @param options create options for blob. It can be NULL so nothing is added to http request
+ * headers
  * @param response a pre allocated buffer where to write http response
  * @return AZ_NODISCARD az_storage_blobs_blob_create
  */

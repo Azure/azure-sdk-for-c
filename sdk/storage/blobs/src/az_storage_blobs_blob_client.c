@@ -48,18 +48,13 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
   // create request
   az_http_request_builder hrb;
   AZ_RETURN_IF_FAILED(az_http_request_builder_init(
-      &hrb,
-      request_buffer_span,
-      MAX_URL_SIZE,
-      AZ_HTTP_METHOD_VERB_PUT,
-      client->uri,
-      content));
-  
+      &hrb, request_buffer_span, MAX_URL_SIZE, AZ_HTTP_METHOD_VERB_PUT, client->uri, content));
+
   // add version to request
   AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
       &hrb, AZ_STR("api-version"), client->client_options.service_version));
 
- // add blob type to request
+  // add blob type to request
   AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
       &hrb, az_storage_blobs_blob_header_blob_type(), client->blob_type));
 
@@ -89,8 +84,8 @@ AZ_NODISCARD az_result az_storage_blobs_blob_download(
     az_span_builder content,
     az_storage_blobs_blob_download_options options,
     az_http_response * const response) {
-  
-    uint8_t request_buffer[1024 * 4];
+
+  uint8_t request_buffer[1024 * 4];
   az_mut_span request_buffer_span = AZ_SPAN_FROM_ARRAY(request_buffer);
 
   // create request
