@@ -4,11 +4,11 @@
 #ifndef AZ_KEYVAULT_H
 #define AZ_KEYVAULT_H
 
-#include <az_access_token.h>
-#include <az_access_token_context.h>
 #include <az_contract.h>
 #include <az_http_pipeline.h>
 #include <az_http_response.h>
+#include <az_identity_access_token.h>
+#include <az_identity_access_token_context.h>
 #include <az_keyvault_create_key_options.h>
 #include <az_result.h>
 #include <az_span.h>
@@ -34,8 +34,8 @@ typedef struct {
   az_span uri;
   az_http_pipeline pipeline;
   az_keyvault_keys_client_options retry_options;
-  az_access_token _token;
-  az_access_token_context _token_context;
+  az_identity_access_token _token;
+  az_identity_access_token_context _token_context;
 } az_keyvault_keys_client;
 
 extern az_keyvault_keys_client_options const AZ_KEYVAULT_CLIENT_DEFAULT_OPTIONS;
@@ -70,8 +70,8 @@ AZ_NODISCARD AZ_INLINE az_result az_keyvault_keys_client_init(
     ._token_context = { 0 },
   };
 
-  AZ_RETURN_IF_FAILED(az_access_token_init(&(self->_token)));
-  AZ_RETURN_IF_FAILED(az_access_token_context_init(
+  AZ_RETURN_IF_FAILED(az_identity_access_token_init(&(self->_token)));
+  AZ_RETURN_IF_FAILED(az_identity_access_token_context_init(
       &(self->_token_context),
       credential,
       &(self->_token),
