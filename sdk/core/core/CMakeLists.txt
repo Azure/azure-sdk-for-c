@@ -49,7 +49,6 @@ if(MSVC)
 
   target_compile_options(${PROJECT_NAME} PRIVATE /Wall ${WARNINGS_AS_ERRORS_FLAG} /wd5031 /wd4668 /wd4820 /wd4255 /analyze)
 
-
 elseif(CMAKE_C_COMPILER_ID MATCHES "Clang")
   if(WARNINGS_AS_ERRORS)
     set(WARNINGS_AS_ERRORS_FLAG "-Werror")
