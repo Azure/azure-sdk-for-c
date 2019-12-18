@@ -58,7 +58,7 @@ elseif(CMAKE_C_COMPILER_ID MATCHES "Clang")
   if (CI_ALL_WARNINGS)
     set(ENABLED_WARNINGS "-Weverything -pedantic-errors")
   else()
-    set(ENABLED_WARNINGS "-Wall -Wextra -Wdocumentation -Wdocumentation-unknown-command -Wcast-qual")
+    set(ENABLED_WARNINGS "-Wall -Wextra -pedantic -Wdocumentation -Wdocumentation-unknown-command -Wcast-qual")
   endif()
 
   target_compile_options(${PROJECT_NAME} PRIVATE -Xclang ${ENABLED_WARNINGS} ${WARNINGS_AS_ERRORS_FLAG})
