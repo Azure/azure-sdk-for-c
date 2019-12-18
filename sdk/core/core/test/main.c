@@ -19,6 +19,7 @@
 #include "./test_http_response_parser.h"
 #include "./test_json_string.h"
 #include "./test_json_value.h"
+#include "./test_pair_span.h"
 #include "./test_span_builder_replace.h"
 #include "./test_span_span.h"
 
@@ -31,6 +32,7 @@ void test_json_string();
 void test_url_parse();
 void test_span_builder_replace();
 void test_span_span();
+void test_pair_span();
 
 int exit_code = 0;
 
@@ -737,5 +739,6 @@ int main() {
   test_url_parse();
   test_span_builder_replace();
   test_span_span();
+  test_pair_span();
   return exit_code;
 }

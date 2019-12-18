@@ -66,6 +66,10 @@ az_pair_span_as_writer(az_pair_span const * const self, az_pair_action const wri
  */
 AZ_ACTION_FUNC(az_pair_span_as_writer, az_pair_span const, az_pair_writer)
 
+AZ_NODISCARD AZ_INLINE bool az_pair_span_eq(az_pair const a, az_pair const b) {
+  return az_span_eq(a.key, b.key) && az_span_eq(a.value, b.value);
+}
+
 #include <_az_cfg_suffix.h>
 
 #endif

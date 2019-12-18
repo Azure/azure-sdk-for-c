@@ -55,8 +55,17 @@ int main() {
   az_result append_result = az_keyvault_create_key_options_append_operation(
       &key_options, az_keyvault_key_operation_sign());
 
-  // buffer for tags
+  // buffer for tags   ->  adding tags
   az_pair tags_buffer[5];
+  az_pair_span_builder tags_builder
+      = az_pair_span_builder_create((az_mut_pair_span)AZ_SPAN_FROM_ARRAY(tags_buffer));
+
+  az_pair tag_a = { .key = AZ_STR("aKey"), .value = AZ_STR("aValue") };
+  az_pair tag_b = { .key = AZ_STR("bKey"), .value = AZ_STR("bValue") };
+  az_result adding_tag_result = az_pair_span_builder_append(&tags_builder, tag_a);
+  adding_tag_result = az_pair_span_builder_append(&tags_builder, tag_b);
+
+  key_options.tags = tags_builder;
 
   az_result create_result = az_keyvault_keys_key_create(
       &client,

@@ -26,7 +26,7 @@ AZ_NODISCARD AZ_INLINE az_span az_keyvault_key_operation_wrapKey() { return AZ_S
 typedef struct {
   az_optional_bool enabled;
   az_span_span_builder operations;
-  az_pair_span tags;
+  az_pair_span_builder tags;
   /* TODO: adding next options
   Datetime not_before;
   Datetime expires_on
