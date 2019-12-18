@@ -3,8 +3,9 @@ message("Using warning flags for GCC 7.4.0, project: ${PROJECT_NAME}")
 # Flags not enabled by -Wall on GCC 7.4.0, discovered by running
 # gcc -Wall -Wextra -pedantic-errors -Werror -Q --help=warning
 
-target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic-errors -Werror
+add_compile_options(
   # Flags without settings
+  -pedantic-errors
   -Waggregate-return
   -Walloc-zero
   -Walloca
