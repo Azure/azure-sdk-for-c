@@ -47,7 +47,7 @@ jobs:
     displayName: cmake version
   - task: CMake@1
     inputs:
-      cmakeArgs: -Duse_default_uuid=ON ..
+      cmakeArgs: -Duse_default_uuid=ON -DWARNINGS_AS_ERRORS=ON -DCI_ALL_WARNINGS=ON ..
     displayName: cmake generate
   - task: CMake@1
     inputs:
