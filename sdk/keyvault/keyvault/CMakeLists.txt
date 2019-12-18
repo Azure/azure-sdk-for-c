@@ -28,7 +28,7 @@ endif()
 
 target_include_directories (az_keyvault PUBLIC inc)
 
-target_link_libraries(az_keyvault PUBLIC az_core)
+target_link_libraries(az_keyvault PUBLIC az_core az_identity)
 
 # make sure that users can consume the project as a library.
 add_library (az::keyvault ALIAS az_keyvault)

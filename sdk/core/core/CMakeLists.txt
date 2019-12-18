@@ -15,7 +15,6 @@ add_library (
   az_core
   src/az_assumptions.c
   src/az_base64.c
-  src/az_client_secret_credential.c
   src/az_curl_adapter.c
   src/az_curl_slist.c
   src/az_http_header.c
@@ -74,10 +73,6 @@ add_executable (
 
 target_link_libraries(az_core_test PRIVATE az_core)
 
-# curl easy perform POC
-add_executable (curl_easy_perform_poc test/curl_easy_perform_poc.c)
-target_link_libraries(curl_easy_perform_poc PRIVATE az_core)
-
 target_link_libraries(az_core PRIVATE CURL::libcurl)
 
 if (MOCK_CURL)
@@ -87,7 +82,6 @@ endif()
 
 if (UNIX)
   target_link_libraries(az_core_test PRIVATE m)
-  target_link_libraries(curl_easy_perform_poc PRIVATE m)
 endif()
 
 add_test(NAME az_core_test COMMAND az_core_test)

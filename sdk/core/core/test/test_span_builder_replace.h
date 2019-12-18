@@ -145,7 +145,6 @@ static void test_span_builder_replace() {
     uint8_t array[4];
     az_span_builder builder = az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(array));
     az_span initial_state = AZ_STR("1234");
-    az_span expected = AZ_STR("4321");
     az_result ignore = az_span_builder_append(&builder, initial_state);
 
     TEST_ASSERT(az_span_builder_replace(&builder, 0, 4, AZ_STR("4321X")) == AZ_ERROR_ARG);

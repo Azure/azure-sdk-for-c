@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include <az_access_token_context.h>
 #include <az_client_secret_credential.h>
 #include <az_http_pipeline.h>
 #include <az_http_request_builder.h>
@@ -28,7 +29,7 @@ int main() {
   // create a buffer for request
   uint8_t buf[1024 * 4];
   az_mut_span const http_buf = AZ_SPAN_FROM_ARRAY(buf);
-  az_http_request_builder hrb;
+  az_http_request_builder hrb = { 0 };
 
   // response buffer
   uint8_t buf_response[1024 * 4];
@@ -43,6 +44,7 @@ int main() {
       AZ_HTTP_METHOD_VERB_GET,
       az_str_to_span(getenv(URI_ENV)),
       az_span_create_empty());
+
   if (az_failed(build_result)) {
     return build_result;
   }
@@ -67,11 +69,31 @@ int main() {
     return creds_retcode;
   }
 
+  az_access_token access_token = { 0 };
+  az_result const token_retcode = az_access_token_init(&access_token);
+
+  if (!az_succeeded(token_retcode)) {
+    printf("Error initializing access token\n");
+    return token_retcode;
+  }
+
+  az_access_token_context access_token_context = { 0 };
+  az_result const token_context_retcode = az_access_token_context_init(
+      &access_token_context,
+      &credential,
+      &access_token,
+      AZ_STR("https://vault.azure.net/.default"));
+
+  if (!az_succeeded(token_retcode)) {
+    printf("Error initializing access token context\n");
+    return token_context_retcode;
+  }
+
   az_http_pipeline pipeline = (az_http_pipeline){
       .policies = {
         { .pfnc_process = az_http_pipeline_policy_uniquerequestid, .data = NULL },
         { .pfnc_process = az_http_pipeline_policy_retry, .data = NULL },
-        { .pfnc_process = az_http_pipeline_policy_authentication, .data = &credential },
+        { .pfnc_process = az_http_pipeline_policy_authentication, .data = &access_token_context },
         { .pfnc_process = az_http_pipeline_policy_logging, .data = NULL },
         { .pfnc_process = az_http_pipeline_policy_bufferresponse, .data = NULL },
         { .pfnc_process = az_http_pipeline_policy_distributedtracing, .data = NULL },

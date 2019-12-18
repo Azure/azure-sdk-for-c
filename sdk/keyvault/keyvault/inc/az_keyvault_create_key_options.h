@@ -5,10 +5,18 @@
 #define AZ_KEYVAULT_CREATE_KEY_OPTIONS_H
 
 #include <az_optional_bool.h>
+#include <az_result.h>
+#include <az_span.h>
+#include <az_str.h>
+
+#include <stdbool.h>
+#include <stdint.h>
 
 #include <_az_cfg_prefix.h>
 
-static uint8_t const AZ_KEYVAULT_MAX_KEY_OPERATIONS = 6;
+enum {
+  AZ_KEYVAULT_MAX_KEY_OPERATIONS = 6,
+};
 
 AZ_NODISCARD AZ_INLINE az_span az_keyvault_key_operation_decrypt() { return AZ_STR("decrypt"); }
 AZ_NODISCARD AZ_INLINE az_span az_keyvault_key_operation_encrypt() { return AZ_STR("encrypt"); }
