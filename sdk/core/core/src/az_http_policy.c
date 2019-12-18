@@ -64,11 +64,11 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
 }
 
 typedef AZ_NODISCARD az_result (
-    *_az_auth_func)(void * const data, az_http_request_builder * const hrb);
+    *_az_identity_auth_func)(void * const data, az_http_request_builder * const hrb);
 
 typedef struct {
-  _az_auth_func _func;
-} _az_auth;
+  _az_identity_auth_func _func;
+} _az_identity_auth;
 
 AZ_NODISCARD az_result az_http_pipeline_policy_authentication(
     az_http_policy * const p_policies,
@@ -77,7 +77,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_authentication(
     az_http_response * const response) {
   AZ_CONTRACT_ARG_NOT_NULL(data);
 
-  _az_auth const * const auth = (_az_auth const *)(data);
+  _az_identity_auth const * const auth = (_az_identity_auth const *)(data);
   AZ_CONTRACT_ARG_NOT_NULL(auth->_func);
 
   AZ_RETURN_IF_FAILED(auth->_func(data, hrb));
