@@ -48,7 +48,4 @@ target_link_libraries(az_identity_poc PRIVATE az_identity)
 
 if (UNIX)
   target_link_libraries(az_identity PRIVATE m)
-  target_link_libraries(curl_easy_perform_poc PRIVATE m)
 endif()
-
-# add_test(NAME az_identity_test COMMAND az_identity_test)

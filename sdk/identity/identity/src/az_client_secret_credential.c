@@ -181,8 +181,8 @@ AZ_INLINE AZ_NODISCARD az_result _az_client_secret_credential_ms_oauth2_get_toke
   return AZ_OK;
 }
 
-AZ_INLINE AZ_NODISCARD az_result
-_az_client_secret_credential_renew_token_credential(az_access_token_context const * const token_context) {
+AZ_INLINE AZ_NODISCARD az_result _az_client_secret_credential_renew_token_credential(
+    az_access_token_context const * const token_context) {
   uint8_t response_buf[_az_CLIENT_SECRET_CREDENTIAL_RESPONSE_BUF_SIZE] = { 0 };
 
   az_http_response http_response = { 0 };
@@ -216,11 +216,12 @@ static AZ_NODISCARD az_result _az_client_secret_credential_credential_func(
   AZ_CONTRACT_ARG_NOT_NULL(token_context->_token);
   AZ_CONTRACT_ARG_NOT_NULL(hrb);
 
-  az_span const request_url = az_span_builder_result(&hrb->url_builder);
-
   {
     az_url url = { 0 };
-    AZ_RETURN_IF_FAILED(az_succeeded(az_url_parse(request_url, &url)));
+
+    AZ_RETURN_IF_FAILED(
+        az_succeeded(az_url_parse(az_span_builder_result(&hrb->url_builder), &url)));
+
     if (!az_span_eq_ascii_ignore_case(url.scheme, AZ_STR("https"))) {
       return AZ_ERROR_ARG;
     }
