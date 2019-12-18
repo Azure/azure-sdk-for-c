@@ -9,7 +9,7 @@ set(CMAKE_C_STANDARD 99)
 
 add_library (
   az_identity
-  src/az_client_secret_credential.c
+  src/az_identity_client_secret_credential.c
   )
 
 if(MSVC)
