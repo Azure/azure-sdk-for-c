@@ -8,13 +8,11 @@
 #ifndef AZ_HTTP_REQUEST_BUILDER_H
 #define AZ_HTTP_REQUEST_BUILDER_H
 
-#include <az_contract.h>
 #include <az_mut_span.h>
 #include <az_pair.h>
 #include <az_result.h>
 #include <az_span.h>
 #include <az_span_builder.h>
-#include <az_str.h>
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -37,8 +35,7 @@ typedef struct {
 typedef struct {
   az_mut_span buffer;
   az_span method_verb;
-  az_mut_span url;
-  uint16_t max_url_size;
+  az_span_builder url_builder;
   uint16_t max_headers;
   uint16_t retry_headers_start;
   uint16_t headers_end;
@@ -130,8 +127,8 @@ AZ_NODISCARD az_result az_http_request_builder_append_header(
  * path equals to `test`, then request url will be updated to `http://example.net/test?qp=1`.
  *
  *
- * @param p_hrb
- * @param path
+ * @param p_hrb http request builder reference
+ * @param path span to a path to be appended into url
  * @return AZ_NODISCARD az_http_request_builder_append_path
  */
 AZ_NODISCARD az_result

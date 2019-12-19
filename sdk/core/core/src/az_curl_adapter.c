@@ -16,9 +16,9 @@ az_span const AZ_HTTP_REQUEST_BUILDER_HEADER_SEPARATOR = AZ_CONST_STR(": ");
  * @brief writes a header key and value to a buffer as a 0-terminated string and using a separator
  * span in between. Returns error as soon as any of the write operations fails
  *
- * @param writable_buffer
- * @param p_header
- * @param separator
+ * @param writable_buffer pre allocated buffer that will be used to hold header key and value
+ * @param header header as an az_pair containing key and value
+ * @param separator symbol to be used betwwen key and value
  * @return az_result
  */
 AZ_NODISCARD az_result az_write_to_buffer(
@@ -38,9 +38,9 @@ AZ_NODISCARD az_result az_write_to_buffer(
  * uses that buffer to set curl header. Header is set only if write operations were OK. Buffer is
  * free after setting curl header.
  *
- * @param p_header
- * @param p_headers
- * @param separator
+ * @param header a key and value representing an http header
+ * @param p_list list of headers as curl list
+ * @param separator a symbol to be used between key and value for a header
  * @return az_result
  */
 AZ_NODISCARD az_result az_add_header_to_curl_list(
@@ -73,8 +73,8 @@ AZ_NODISCARD az_result az_add_header_to_curl_list(
 /**
  * @brief loop all the headers from a HTTP request and set each header into easy curl
  *
- * @param p_hrb
- * @param p_headers
+ * @param p_hrb an http builder request reference
+ * @param p_headers list of headers in curl specific list
  * @return az_result
  */
 AZ_NODISCARD az_result
@@ -95,8 +95,8 @@ az_build_headers(az_http_request_builder const * const p_hrb, struct curl_slist 
  * @brief writes a url request adds a zero to make it a c-string. Return error if any of the write
  * operations fails.
  *
- * @param writable_buffer
- * @param url_from_request
+ * @param writable_buffer a pre-allocated buffer to write http request
+ * @param url_from_request a url that is not zero terminated
  * @return az_result
  */
 AZ_NODISCARD az_result
@@ -112,10 +112,10 @@ az_write_url(az_mut_span const writable_buffer, az_span const url_from_request) 
  * Function receives the size of the response and must return this same number, otherwise it is
  * consider that function failed
  *
- * @param contents
- * @param size
- * @param nmemb
- * @param userp
+ * @param contents response data from Curl response
+ * @param size size of the curl response data
+ * @param nmemb number of blocks in response
+ * @param userp this represent a structure linked to response by us before
  * @return int
  */
 size_t write_to_span(
@@ -192,8 +192,8 @@ az_curl_send_post_request(CURL * const p_curl, az_http_request_builder const * c
 /**
  * @brief finds out if there are headers in the request and add them to curl header list
  *
- * @param p_curl
- * @param p_hrb
+ * @param p_curl curl specific structure to send a request
+ * @param p_hrb an http request builder
  * @return az_result
  */
 AZ_NODISCARD az_result
@@ -219,8 +219,8 @@ setup_headers(CURL * const p_curl, az_http_request_builder const * const p_hrb) 
 /**
  * @brief set url for the request
  *
- * @param p_curl
- * @param p_hrb
+ * @param p_curl specific curl struct to send a request
+ * @param p_hrb an az http request builder holding all data to send request
  * @return az_result
  */
 AZ_NODISCARD az_result setup_url(CURL * const p_curl, az_http_request_builder const * const p_hrb) {
@@ -231,13 +231,13 @@ AZ_NODISCARD az_result setup_url(CURL * const p_curl, az_http_request_builder co
   {
     // set URL as 0-terminated str
     size_t const extra_space_for_zero = AZ_STR_ZERO.size;
-    size_t const url_final_size = p_hrb->url.size + extra_space_for_zero;
+    size_t const url_final_size = p_hrb->url_builder.size + extra_space_for_zero;
     // allocate buffer to add \0
     AZ_RETURN_IF_FAILED(az_span_malloc(url_final_size, &writable_buffer));
   }
 
   // write url in buffer (will add \0 at the end)
-  az_result result = az_write_url(writable_buffer, az_mut_span_to_span(p_hrb->url));
+  az_result result = az_write_url(writable_buffer, az_span_builder_result(&p_hrb->url_builder));
 
   if (az_succeeded(result)) {
     char * buffer = (char *)writable_buffer.begin;
@@ -254,8 +254,9 @@ AZ_NODISCARD az_result setup_url(CURL * const p_curl, az_http_request_builder co
 /**
  * @brief set url the response redirection to user buffer
  *
- * @param p_curl
- * @param p_hrb
+ * @param p_curl specif curl structure used to send http request
+ * @param response_builder an http request builder holding all http request data
+ * @param buildRFC7230 when it is set to true, response will be parsed following RFC 7230
  * @return az_result
  */
 AZ_NODISCARD az_result setup_response_redirect(
@@ -280,11 +281,11 @@ AZ_NODISCARD az_result setup_response_redirect(
  * @brief use this method to group all the actions that we do with CURL so we can clean it after it
  * no matter is there is an error at any step.
  *
- * @param p_curl
- * @param p_hrb
- * @param response
- * @param buildRFC7230
- * @return
+ * @param p_curl curl specific structure used to send an http request
+ * @param p_hrb http builder with specific data to build an http request
+ * @param response pre-allocated buffer where to write http response
+ * @param buildRFC7230 when true, response will follow RFC 7230
+ * @return AZ_OK if request was sent and a response was received
  */
 AZ_NODISCARD az_result az_http_client_send_request_impl_process(
     CURL * p_curl,
@@ -317,8 +318,8 @@ AZ_NODISCARD az_result az_http_client_send_request_impl_process(
 /**
  * @brief uses AZ_HTTP_BUILDER to set up CURL request and perform it.
  *
- * @param p_hrb
- * @param response
+ * @param p_hrb an internal http builder with data to build and send http request
+ * @param response pre-allocated buffer where http response will be written
  * @return az_result
  */
 AZ_NODISCARD az_result az_http_client_send_request_impl(

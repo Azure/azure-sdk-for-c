@@ -5,8 +5,10 @@
 #define AZ_MOCK_CURL_H
 
 #include <az_http_request.h>
+#include <az_http_response.h>
 #include <az_result.h>
-#include <az_span.h>
+
+#include <stdbool.h>
 
 #include <_az_cfg_prefix.h>
 

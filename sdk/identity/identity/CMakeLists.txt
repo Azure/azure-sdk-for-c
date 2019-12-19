@@ -3,13 +3,13 @@
 
 cmake_minimum_required (VERSION 3.12)
 
-project (az_keyvault LANGUAGES C)
+project (az_identity LANGUAGES C)
 
 set(CMAKE_C_STANDARD 99)
 
 add_library (
-  az_keyvault
-  src/az_keyvault_client.c
+  az_identity
+  src/az_identity_client_secret_credential.c
   )
 
 if(MSVC)
@@ -32,22 +32,20 @@ else()
   target_compile_options(az_core PRIVATE -Wall -Wextra -pedantic  ${WARNINGS_AS_ERRORS_FLAG})
 endif()
 
-target_include_directories (az_keyvault PUBLIC inc)
+target_include_directories (az_identity PUBLIC inc)
 
-target_link_libraries(az_keyvault PUBLIC az_core az_identity)
+target_link_libraries(az_identity PUBLIC az_core)
 
 # make sure that users can consume the project as a library.
-add_library (az::keyvault ALIAS az_keyvault)
+add_library (az::identity ALIAS az_identity)
 
-add_executable (az_keyvault_test test/main.c)
-target_link_libraries(az_keyvault_test PRIVATE az_keyvault)
+# add_executable (az_identity_test test/main.c)
+# target_link_libraries(az_identity_test PRIVATE az_identity)
 
-# make key vault POC
-add_executable (az_keyvault_poc test/client_key_poc.c)
-target_link_libraries(az_keyvault_poc PRIVATE az_keyvault)
+# curl easy perform POC
+add_executable (az_identity_poc test/curl_easy_perform_poc.c)
+target_link_libraries(az_identity_poc PRIVATE az_identity)
 
 if (UNIX)
-  target_link_libraries(az_keyvault PRIVATE m)
+  target_link_libraries(az_identity PRIVATE m)
 endif()
-
-add_test(NAME az_keyvault_test COMMAND az_keyvault_test)

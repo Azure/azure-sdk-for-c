@@ -4,33 +4,19 @@
 #ifndef AZ_KEYVAULT_H
 #define AZ_KEYVAULT_H
 
-#include <az_credential.h>
+#include <az_contract.h>
 #include <az_http_pipeline.h>
+#include <az_http_response.h>
+#include <az_identity_access_token.h>
+#include <az_identity_access_token_context.h>
+#include <az_keyvault_create_key_options.h>
+#include <az_result.h>
+#include <az_span.h>
+#include <az_str.h>
 
-#include <stdlib.h>
+#include <stddef.h>
 
 #include <_az_cfg_prefix.h>
-
-/**
- * @brief Key Type represent the string used in url path.
- * Instead of asking the right string to user, client will map it from
- * one of this enum values.
- */
-typedef enum {
-  AZ_KEYVAULT_KEY_TYPE_NONE = 0,
-  AZ_KEYVAULT_KEY_TYPE_KEY = 1,
-  AZ_KEYVAULT_KEY_TYPE_SECRET = 2,
-  AZ_KEYVAULT_KEY_TYPE_CERTIFICATE = 3,
-} az_keyvault_key_type;
-
-typedef enum {
-  AZ_KEYVAULT_JSON_WEB_KEY_TYPE_NONE = 0,
-  AZ_KEYVAULT_JSON_WEB_KEY_TYPE_EC = 1,
-  AZ_KEYVAULT_JSON_WEB_KEY_TYPE_EC_HSM = 2,
-  AZ_KEYVAULT_JSON_WEB_KEY_TYPE_RSA = 3,
-  AZ_KEYVAULT_JSON_WEB_KEY_TYPE_RSA_HSM = 4,
-  AZ_KEYVAULT_JSON_WEB_KEY_TYPE_OCT = 5,
-} az_keyvault_json_web_key_type;
 
 typedef struct {
   az_span service_version;
@@ -48,6 +34,8 @@ typedef struct {
   az_span uri;
   az_http_pipeline pipeline;
   az_keyvault_keys_client_options retry_options;
+  az_identity_access_token _token;
+  az_identity_access_token_context _token_context;
 } az_keyvault_keys_client;
 
 extern az_keyvault_keys_client_options const AZ_KEYVAULT_CLIENT_DEFAULT_OPTIONS;
@@ -68,25 +56,32 @@ az_keyvault_keys_client_options_init(az_keyvault_keys_client_options * const opt
 }
 
 AZ_NODISCARD AZ_INLINE az_result az_keyvault_keys_client_init(
-    az_keyvault_keys_client * const client,
+    az_keyvault_keys_client * const self,
     az_span const uri,
     void * const credential,
     az_keyvault_keys_client_options const * const options) {
-  AZ_CONTRACT_ARG_NOT_NULL(client);
+  AZ_CONTRACT_ARG_NOT_NULL(self);
 
-  client->uri = uri;
-  // use default options if options is null. Or use customer provided one
-  if (options == NULL) {
-    client->retry_options = AZ_KEYVAULT_CLIENT_DEFAULT_OPTIONS;
-  } else {
-    client->retry_options = *options;
-  }
+  *self = (az_keyvault_keys_client){
+    .uri = uri,
+    .pipeline = { 0 },
+    .retry_options = options == NULL ? AZ_KEYVAULT_CLIENT_DEFAULT_OPTIONS : *options,
+    ._token = { 0 },
+    ._token_context = { 0 },
+  };
 
-  client->pipeline = (az_http_pipeline){
+  AZ_RETURN_IF_FAILED(az_identity_access_token_init(&(self->_token)));
+  AZ_RETURN_IF_FAILED(az_identity_access_token_context_init(
+      &(self->_token_context),
+      credential,
+      &(self->_token),
+      AZ_STR("https://vault.azure.net/.default")));
+
+  self->pipeline = (az_http_pipeline){
     .policies = {
       { .pfnc_process = az_http_pipeline_policy_uniquerequestid, .data = NULL },
-      { .pfnc_process = az_http_pipeline_policy_retry, .data = &client->retry_options.retry },
-      { .pfnc_process = az_http_pipeline_policy_authentication, .data = credential },
+      { .pfnc_process = az_http_pipeline_policy_retry, .data = &(self->retry_options.retry) },
+      { .pfnc_process = az_http_pipeline_policy_authentication, .data = &(self->_token_context) },
       { .pfnc_process = az_http_pipeline_policy_logging, .data = NULL },
       { .pfnc_process = az_http_pipeline_policy_bufferresponse, .data = NULL },
       { .pfnc_process = az_http_pipeline_policy_distributedtracing, .data = NULL },
@@ -94,6 +89,7 @@ AZ_NODISCARD AZ_INLINE az_result az_keyvault_keys_client_init(
       { .pfnc_process = NULL, .data = NULL },
     }, 
     };
+
   return AZ_OK;
 }
 
@@ -103,18 +99,19 @@ AZ_NODISCARD AZ_INLINE az_result az_keyvault_keys_client_init(
  * already exists, Azure Key Vault creates a new version of the key. It requires the keys/create
  * permission.
  *
- * @param client
- * @param key_name
- * @param json_web_key_type
- * @param options
- * @param response
+ * @param client a keyvault client structure
+ * @param key_name name for key to be created
+ * @param json_web_key_type type of key to create
+ * @param options create options for key. It can be NULL so nothing is added to http request body
+ * and server will use defaults to create key
+ * @param response a pre allocated buffer where to write http response
  * @return AZ_NODISCARD az_keyvault_keys_key_create
  */
 AZ_NODISCARD az_result az_keyvault_keys_key_create(
     az_keyvault_keys_client * client,
     az_span const key_name,
-    az_keyvault_json_web_key_type const json_web_key_type,
-    az_keyvault_keys_keys_options const * const options,
+    az_span const json_web_key_type,
+    az_keyvault_create_key_options * const options,
     az_http_response * const response);
 
 /**
@@ -124,10 +121,10 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
  *
  * Get latest version by passing az_span_null as value for version
  *
- * @param client
- * @param key_name
- * @param version
- * @param response
+ * @param client a keyvault client structure
+ * @param key_name name of key to be retrieved
+ * @param version specific key version to get. It can be null to get latest version
+ * @param response a pre allocated buffer where to write http response
  * @return AZ_NODISCARD az_keyvault_keys_key_get
  */
 AZ_NODISCARD az_result az_keyvault_keys_key_get(
@@ -143,15 +140,21 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
  * Sign/Verify, Wrap/Unwrap or Encrypt/Decrypt operations. This operation requires the keys/delete
  * permission.
  *
- * @param client
- * @param key_name
- * @param response
+ * @param client a keyvault client structure
+ * @param key_name name of the key to be deleted
+ * @param response a pre allocated buffer where to write http response
  * @return AZ_NODISCARD az_keyvault_keys_key_delete
  */
 AZ_NODISCARD az_result az_keyvault_keys_key_delete(
     az_keyvault_keys_client * client,
     az_span const key_name,
     az_http_response * const response);
+
+AZ_NODISCARD AZ_INLINE az_span az_keyvault_web_key_type_EC() { return AZ_STR("EC"); }
+AZ_NODISCARD AZ_INLINE az_span az_keyvault_web_key_type_EC_HSM() { return AZ_STR("EC-HSM"); }
+AZ_NODISCARD AZ_INLINE az_span az_keyvault_web_key_type_RSA() { return AZ_STR("RSA"); }
+AZ_NODISCARD AZ_INLINE az_span az_keyvault_web_key_type_RSA_HSM() { return AZ_STR("RSA-HSM"); }
+AZ_NODISCARD AZ_INLINE az_span az_keyvault_web_key_type_OCT() { return AZ_STR("oct"); }
 
 #include <_az_cfg_suffix.h>
 

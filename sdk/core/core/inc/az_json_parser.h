@@ -7,9 +7,7 @@
 #include <az_json_value.h>
 #include <az_result.h>
 #include <az_span_reader.h>
-#include <az_str.h>
 
-#include <stdbool.h>
 #include <stdint.h>
 
 #include <_az_cfg_prefix.h>

@@ -15,7 +15,6 @@ add_library (
   az_core
   src/az_assumptions.c
   src/az_base64.c
-  src/az_client_secret_credential.c
   src/az_curl_adapter.c
   src/az_curl_slist.c
   src/az_http_header.c
@@ -45,9 +44,23 @@ add_library (
   )
 
 if(MSVC)
-  target_compile_options(az_core PRIVATE /Wall /WX /wd5031 /wd4668 /wd4820 /wd4255 /analyze)
+  if(WARNINGS_AS_ERRORS)
+    set(WARNINGS_AS_ERRORS_FLAG "/WX")
+  endif()
+
+  target_compile_options(az_core PRIVATE /Wall ${WARNINGS_AS_ERRORS_FLAG} /wd5031 /wd4668 /wd4820 /wd4255 /analyze)
+elseif(CMAKE_C_COMPILER_ID MATCHES "Clang")
+  if(WARNINGS_AS_ERRORS)
+    set(WARNINGS_AS_ERRORS_FLAG "-Werror")
+  endif()
+
+  target_compile_options(az_core PRIVATE -Xclang -Wall -Wextra -pedantic  ${WARNINGS_AS_ERRORS_FLAG} -Wdocumentation -Wdocumentation-unknown-command -Wcast-qual)
 else()
-  target_compile_options(az_core PRIVATE -Wall -Wextra -pedantic -Werror)
+  if(WARNINGS_AS_ERRORS)
+    set(WARNINGS_AS_ERRORS_FLAG "-Werror")
+  endif()
+
+  target_compile_options(az_core PRIVATE -Wall -Wextra -pedantic  ${WARNINGS_AS_ERRORS_FLAG})
 endif()
 
 target_include_directories (az_core PUBLIC inc)
@@ -67,10 +80,6 @@ add_executable (
 
 target_link_libraries(az_core_test PRIVATE az_core)
 
-# curl easy perform POC
-add_executable (curl_easy_perform_poc test/curl_easy_perform_poc.c)
-target_link_libraries(curl_easy_perform_poc PRIVATE az_core)
-
 target_link_libraries(az_core PRIVATE CURL::libcurl)
 
 if (MOCK_CURL)
@@ -80,7 +89,6 @@ endif()
 
 if (UNIX)
   target_link_libraries(az_core_test PRIVATE m)
-  target_link_libraries(curl_easy_perform_poc PRIVATE m)
 endif()
 
 add_test(NAME az_core_test COMMAND az_core_test)

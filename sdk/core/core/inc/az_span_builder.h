@@ -4,8 +4,12 @@
 #ifndef AZ_SPAN_BUILDER_H
 #define AZ_SPAN_BUILDER_H
 
+#include <az_action.h>
 #include <az_mut_span.h>
 #include <az_span.h>
+
+#include <stddef.h>
+#include <stdint.h>
 
 #include <_az_cfg_prefix.h>
 
@@ -28,13 +32,19 @@ typedef struct {
 /**
  * Creates a byte span builder.
  *
- * @buffer a buffer for writing.
+ * @param buffer a buffer for writing.
  */
 AZ_NODISCARD AZ_INLINE az_span_builder az_span_builder_create(az_mut_span const buffer) {
   return (az_span_builder){
     .buffer = buffer,
     .size = 0,
   };
+}
+
+AZ_INLINE void az_span_builder_reset(az_span_builder * const self) {
+  az_mut_span const buffer = self->buffer;
+  az_mut_span_memset(buffer, 0);
+  *self = az_span_builder_create(buffer);
 }
 
 /**
@@ -65,6 +75,13 @@ AZ_NODISCARD az_result
 az_span_builder_append_zeros(az_span_builder * const self, size_t const size);
 
 AZ_ACTION_FUNC(az_span_builder_append, az_span_builder, az_span_action)
+
+/**
+ * Replace all contents from a starting position to an end position with the content of a provided
+ * span
+ */
+AZ_NODISCARD az_result
+az_span_builder_replace(az_span_builder * const self, size_t start, size_t end, az_span const span);
 
 #include <_az_cfg_suffix.h>
 

@@ -5,11 +5,10 @@
 #define AZ_SPAN_H
 
 #include <az_action.h>
-#include <az_contract.h>
 #include <az_result.h>
-#include <az_static_assert.h>
 
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -45,9 +44,9 @@ AZ_NODISCARD AZ_INLINE az_result_byte az_span_get(az_span const span, size_t con
 }
 
 /**
- * @brief returns a span with the left @n bytes of the given @span.
+ * @brief returns a span with the left @var n bytes of the given @var span.
  *
- * If the @n is greater than the @span.size than the whole @span is returned.
+ * If the @var n is greater than the @span.size than the whole @var span is returned.
  */
 AZ_NODISCARD AZ_INLINE az_span az_span_take(az_span const span, size_t const n) {
   if (span.size <= n) {
@@ -57,9 +56,9 @@ AZ_NODISCARD AZ_INLINE az_span az_span_take(az_span const span, size_t const n) 
 }
 
 /**
- * @brief returns a span with @n positions are dropped.
+ * @brief returns a span with @var n positions are dropped.
  *
- * If the @n is greater than @span.size than an empty span is returned
+ * If the @var n is greater than @span.size than an empty span is returned
  */
 AZ_NODISCARD AZ_INLINE az_span az_span_drop(az_span const span, size_t const n) {
   if (span.size <= n) {
@@ -132,7 +131,7 @@ AZ_NODISCARD AZ_INLINE az_span az_span_from_one(uint8_t const * ptr) {
 AZ_ACTION_TYPE(az_span_action, az_span)
 
 AZ_NODISCARD AZ_INLINE az_span az_str_to_span(char const * str) {
-  return (az_span){ .begin = (uint8_t *)str, .size = strlen(str) };
+  return (az_span){ .begin = (uint8_t const *)str, .size = strlen(str) };
 }
 
 #include <_az_cfg_suffix.h>

@@ -8,9 +8,9 @@
 #include <az_contract.h>
 #include <az_result.h>
 #include <az_span.h>
-#include <az_static_assert.h>
 
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -41,30 +41,6 @@ AZ_NODISCARD AZ_INLINE az_span az_mut_span_to_span(az_mut_span const span) {
 
 AZ_NODISCARD AZ_INLINE bool az_mut_span_is_overlap(az_mut_span const a, az_mut_span const b) {
   return az_span_is_overlap(az_mut_span_to_span(a), az_mut_span_to_span(b));
-}
-
-AZ_NODISCARD AZ_INLINE az_result
-az_mut_span_copy(az_mut_span const buffer, az_span const src, az_mut_span * const out_result) {
-  AZ_CONTRACT_ARG_NOT_NULL(out_result);
-  AZ_CONTRACT_ARG_VALID_SPAN(src);
-  AZ_CONTRACT_ARG_VALID_MUT_SPAN(buffer);
-
-  if (az_span_is_overlap(az_mut_span_to_span(buffer), src)) {
-    return AZ_ERROR_ARG;
-  }
-
-  if (buffer.size < src.size) {
-    return AZ_ERROR_BUFFER_OVERFLOW;
-  }
-
-  if (!az_span_is_empty(src)) {
-    memcpy((void *)buffer.begin, (void const *)src.begin, src.size);
-  }
-
-  out_result->begin = buffer.begin;
-  out_result->size = src.size;
-
-  return AZ_OK;
 }
 
 AZ_NODISCARD AZ_INLINE az_result

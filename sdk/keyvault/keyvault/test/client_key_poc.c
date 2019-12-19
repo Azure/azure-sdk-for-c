@@ -1,11 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_client_secret_credential.h>
 #include <az_http_response_parser.h>
+#include <az_identity_client_secret_credential.h>
 #include <az_json_get.h>
 #include <az_json_value.h>
 #include <az_keyvault.h>
+
+#include <stdlib.h>
 
 #include <_az_cfg.h>
 
@@ -54,9 +56,9 @@ int main() {
   az_keyvault_keys_client client;
 
   /************* create credentials as client_id type   ***********/
-  az_client_secret_credential credential = { 0 };
+  az_identity_client_secret_credential credential = { 0 };
   // init credential_credentials struc
-  az_result creds_retcode = az_client_secret_credential_init(
+  az_result creds_retcode = az_identity_client_secret_credential_init(
       &credential,
       az_str_to_span(getenv(TENANT_ID_ENV)),
       az_str_to_span(getenv(CLIENT_ID_ENV)),
@@ -72,9 +74,20 @@ int main() {
   az_result init_http_response_result = az_http_response_init(
       &http_response, az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(response_buffer)));
 
-  /******************  CREATE KEY ******************************/
+  /******************  CREATE KEY with options******************************/
+  az_keyvault_create_key_options key_options = { 0 };
+
+  // override options values
+  key_options.enabled = az_optional_bool_create(false);
+  az_result append_result = az_keyvault_create_key_options_append_operation(
+      &key_options, az_keyvault_key_operation_sign());
+
   az_result create_result = az_keyvault_keys_key_create(
-      &client, AZ_STR("test-new-key"), AZ_KEYVAULT_JSON_WEB_KEY_TYPE_RSA, NULL, &http_response);
+      &client,
+      AZ_STR("test-new-key"),
+      az_keyvault_web_key_type_RSA(),
+      &key_options,
+      &http_response);
 
   printf("Key created result: \n%s", response_buffer);
 
@@ -101,9 +114,9 @@ int main() {
   reset_op = az_http_response_reset(&http_response);
   az_mut_span_memset(http_response.builder.buffer, '.');
 
-  /*********************  Create a new key version  *************/
+  /*********************  Create a new key version (use default options) *************/
   az_result create_version_result = az_keyvault_keys_key_create(
-      &client, AZ_STR("test-new-key"), AZ_KEYVAULT_JSON_WEB_KEY_TYPE_RSA, NULL, &http_response);
+      &client, AZ_STR("test-new-key"), az_keyvault_web_key_type_RSA(), NULL, &http_response);
 
   printf(
       "\n\n*********************************\nKey new version created result: \n%s",

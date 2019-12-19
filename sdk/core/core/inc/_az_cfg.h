@@ -16,8 +16,13 @@
 // warning C4820: '<unnamed-tag>': '4' bytes padding added after data member '...'
 #pragma warning(disable : 4820)
 
-// warning C5045: Compiler will insert Spectre mitigation for memory load if /Qspectre switch specified
+// warning C5045: Compiler will insert Spectre mitigation for memory load if /Qspectre switch
+// specified
 #pragma warning(disable : 5045)
+
+// warning C4214: nonstandard extension used: bit field types other than int
+// https://stackoverflow.com/questions/2280492/bit-fields-of-type-other-than-int
+#pragma warning(disable : 4214)
 
 #endif
 
@@ -40,9 +45,7 @@
 #ifdef _MSC_VER
 #define AZ_INLINE static __forceinline
 #elif defined(__GNUC__) || defined(__clang__)
-#define AZ_INLINE \
-  __attribute__((always_inline)) \
-  static inline
+#define AZ_INLINE __attribute__((always_inline)) static inline
 #else
 #define AZ_INLINE static inline
 #endif

@@ -4,12 +4,17 @@
 #ifndef AZ_JSON_POINTER_H
 #define AZ_JSON_POINTER_H
 
+#include <az_result.h>
+#include <az_span.h>
 #include <az_span_reader.h>
+
+#include <stdint.h>
 
 #include <_az_cfg_prefix.h>
 
 /**
- * Returns a next reference token in the JSON pointer. The JSON pointer parser is @az_span_reader.
+ * Returns a next reference token in the JSON pointer. The JSON pointer parser is @var
+ * az_span_reader.
  *
  * See https://tools.ietf.org/html/rfc6901
  */
