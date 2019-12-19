@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_client_secret_credential.h>
+#include <az_identity_client_secret_credential.h>
 #include <az_http_response_parser.h>
 #include <az_json_get.h>
 #include <az_json_value.h>
@@ -21,7 +21,7 @@ int main() {
   az_storage_blobs_blob_client client;
 
   /************* create credentials as client_id type   ***********/
-  az_client_secret_credential credential = { 0 };
+  az_identity_client_secret_credential credential = { 0 };
   // init credential_credentials struc
   az_result creds_retcode = az_client_secret_credential_init(
       &credential,

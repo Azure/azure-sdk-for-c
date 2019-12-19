@@ -6,6 +6,7 @@
 
 #include <az_contract.h>
 #include <az_http_pipeline.h>
+#include <az_http_policy.h>
 #include <az_http_response.h>
 #include <az_result.h>
 #include <az_span.h>
@@ -15,13 +16,10 @@
 
 #include <_az_cfg_prefix.h>
 
-
-AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_blob_header_blob_type() { return AZ_STR("x-ms-blob-type"); }
-AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_blob_header_Content_Length() { return AZ_STR("Content_Length"); }
-
-AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_blob_type_AppendBlob() { return AZ_STR("AppendBlob");} /* UnSupported */
-AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_blob_type_BlockBlob() { return AZ_STR("BlockBlob");}
-AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_blob_type_PageBlob() { return AZ_STR("PageBlob"); } /* UnSupported */
+static az_span const AZ_STORAGE_BLOBS_BLOB_HEADER_X_MS_BLOB_TYPE = AZ_CONST_STR("x-ms-blob-type");
+static az_span const AZ_STORAGE_BLOBS_BLOB_TYPE_APPENDBLOB = AZ_CONST_STR("AppendBlob");
+static az_span const AZ_STORAGE_BLOBS_BLOB_TYPE_BLOCKBLOB = AZ_CONST_STR("BlockBlob");
+static az_span const AZ_STORAGE_BLOBS_BLOB_TYPE_PAGEBLOB = AZ_CONST_STR("PageBlob");
 
 typedef struct {
   az_span service_version;
@@ -89,7 +87,7 @@ AZ_NODISCARD AZ_INLINE az_result az_storage_blobs_blob_client_init(
     };
 
   // Currently only BlockBlobs are supported
-  client->blob_type = az_storage_blobs_blob_type_BlockBlob();
+  client->blob_type = AZ_STORAGE_BLOBS_BLOB_TYPE_BLOCKBLOB;
 
   return AZ_OK;
 }

@@ -34,7 +34,7 @@ endif()
 
 target_include_directories (az_storage_blobs PUBLIC inc)
 
-target_link_libraries(az_storage_blobs PUBLIC az_core)
+target_link_libraries(az_storage_blobs PUBLIC az_core az_identity)
 
 # make sure that users can consume the project as a library.
 add_library (az::storage::blobs ALIAS az_storage_blobs)

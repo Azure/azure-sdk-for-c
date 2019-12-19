@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include <az_http_header.h>
 #include <az_json_builder.h>
 #include <az_storage_blobs.h>
 
@@ -20,11 +21,7 @@
 enum { MAX_URL_SIZE = 1211 };
 enum { MAX_BODY_SIZE = 1024 * 10 }; // 10KB buffer  /*TODO, Adjust this to reasonable size for non-stream data.*/
 
-AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_client_constant_date() { return AZ_STR("x-ms-date");}
 AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_client_constant_blob_type() { return AZ_STR("x-ms-blob-type");}
-AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_client_constant_content_length() { return AZ_STR("Content-Length");}
-AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_client_constant_content_type() { return AZ_STR("Content-Type");}
-AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_client_constant_text_plain() { return AZ_STR("text/plain; charset=UTF-8");}
 
 az_storage_blobs_blob_client_options const AZ_STORAGE_BLOBS_BLOB_CLIENT_DEFAULT_OPTIONS
     = { .service_version = AZ_CONST_STR("2015-02-21"),
@@ -56,15 +53,14 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
 
  // add blob type to request
   AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
-      &hrb, az_storage_blobs_blob_header_blob_type(), client->blob_type));
+      &hrb, AZ_STORAGE_BLOBS_BLOB_HEADER_X_MS_BLOB_TYPE, client->blob_type));
 
   char str[256];
   snprintf(str, sizeof str, "%zu", content.size);
   az_span content_length = (az_span){ .begin = (uint8_t const *)str, .size = strlen(str) };
 
   // add Content-Length to request
-  AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
-      &hrb, az_storage_blobs_blob_header_Content_Length(), content_length));
+  AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(&hrb, AZ_HTTP_HEADER_CONTENT_LENGTH, content_length));
 
   // start pipeline
   return az_http_pipeline_process(&client->pipeline, &hrb, response);
