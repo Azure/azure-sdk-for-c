@@ -23,7 +23,7 @@ int main() {
   /************* create credentials as client_id type   ***********/
   az_identity_client_secret_credential credential = { 0 };
   // init credential_credentials struc
-  az_result creds_retcode = az_client_secret_credential_init(
+  az_result creds_retcode = az_identity_client_secret_credential_init(
       &credential,
       az_str_to_span(getenv(TENANT_ID_ENV)),
       az_str_to_span(getenv(CLIENT_ID_ENV)),
