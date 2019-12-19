@@ -26,6 +26,7 @@ add_library (
   src/az_http_request_builder.c
   src/az_http_response_parser.c
   src/az_json_builder.c
+  src/az_json_data.c
   src/az_json_get.c
   src/az_json_parser.c
   src/az_json_pointer.c
