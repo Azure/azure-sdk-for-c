@@ -32,18 +32,18 @@ AZ_NODISCARD bool az_json_pointer_token_eq_json_string(
 }
 
 AZ_NODISCARD az_result
-az_json_get_object_member(az_span const json, az_span const name, az_json_value * const out_value) {
+az_json_get_object_member(az_span const json, az_span const name, az_json_token * const out_value) {
   AZ_CONTRACT_ARG_NOT_NULL(out_value);
   AZ_CONTRACT_ARG_VALID_SPAN(json);
   AZ_CONTRACT_ARG_VALID_SPAN(name);
 
   az_json_parser parser = az_json_parser_create(json);
-  az_json_value value = { 0 };
+  az_json_token value = { 0 };
   AZ_RETURN_IF_FAILED(az_json_parser_read(&parser, &value));
 
-  if (value.kind == AZ_JSON_VALUE_OBJECT) {
+  if (value.kind == AZ_JSON_TOKEN_OBJECT) {
     while (true) {
-      az_json_member member = { 0 };
+      az_json_token_member member = { 0 };
       AZ_RETURN_IF_FAILED(az_json_parser_read_object_member(&parser, &member));
       // TODO: we should either replace `az_span_eq` with something else or
       //       remove `az_json_get_object_member` completely.
@@ -60,12 +60,12 @@ az_json_get_object_member(az_span const json, az_span const name, az_json_value 
 AZ_NODISCARD az_result az_json_parser_get_by_pointer_token(
     az_json_parser * const self,
     az_span const pointer_token,
-    az_json_value * const p_value) {
+    az_json_token * const p_value) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(p_value);
 
   switch (p_value->kind) {
-    case AZ_JSON_VALUE_ARRAY: {
+    case AZ_JSON_TOKEN_ARRAY: {
       uint64_t i = { 0 };
       AZ_RETURN_IF_FAILED(az_span_get_uint64(pointer_token, &i));
       while (true) {
@@ -77,9 +77,9 @@ AZ_NODISCARD az_result az_json_parser_get_by_pointer_token(
         AZ_RETURN_IF_FAILED(az_json_parser_skip(self, *p_value));
       }
     }
-    case AZ_JSON_VALUE_OBJECT: {
+    case AZ_JSON_TOKEN_OBJECT: {
       while (true) {
-        az_json_member member = { 0 };
+        az_json_token_member member = { 0 };
         AZ_RETURN_IF_FAILED(az_json_parser_read_object_member(self, &member));
         if (az_json_pointer_token_eq_json_string(pointer_token, member.name)) {
           *p_value = member.value;
@@ -94,7 +94,7 @@ AZ_NODISCARD az_result az_json_parser_get_by_pointer_token(
 }
 
 AZ_NODISCARD az_result
-az_json_get_by_pointer(az_span const json, az_span const pointer, az_json_value * const out_value) {
+az_json_get_by_pointer(az_span const json, az_span const pointer, az_json_token * const out_value) {
   AZ_CONTRACT_ARG_NOT_NULL(out_value);
 
   az_json_parser json_parser = az_json_parser_create(json);

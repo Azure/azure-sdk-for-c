@@ -143,13 +143,13 @@ AZ_INLINE AZ_NODISCARD az_result _az_identity_client_secret_credential_ms_oauth2
   }
 
   {
-    az_json_value value;
+    az_json_token value;
 
     clock_t expiration_clock = 0;
     if (requested_at > 0) {
       double expiration_seconds = 0;
       if (az_succeeded(az_json_get_object_member(body, AZ_STR("expires_in"), &value))
-          && az_succeeded(az_json_value_get_number(&value, &expiration_seconds))) {
+          && az_succeeded(az_json_token_get_number(value, &expiration_seconds))) {
         if (expiration_seconds > 0) {
           expiration_clock = (((clock_t)expiration_seconds) - (3 * 60)) * CLOCKS_PER_SEC;
         }
@@ -158,7 +158,7 @@ AZ_INLINE AZ_NODISCARD az_result _az_identity_client_secret_credential_ms_oauth2
 
     az_span token_str = { 0 };
     AZ_RETURN_IF_FAILED(az_json_get_object_member(body, AZ_STR("access_token"), &value));
-    AZ_RETURN_IF_FAILED(az_json_value_get_string(&value, &token_str));
+    AZ_RETURN_IF_FAILED(az_json_token_get_string(value, &token_str));
 
     az_mut_span const token_buf = AZ_SPAN_FROM_ARRAY(token_context->_token->_token_buf);
     az_span_builder builder = az_span_builder_create(token_buf);

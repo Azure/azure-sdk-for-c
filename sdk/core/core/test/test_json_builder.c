@@ -16,33 +16,37 @@ AZ_NODISCARD az_result write_json(void * _, az_span_action const write) {
 
   AZ_RETURN_IF_FAILED(az_json_builder_init(&builder, write));
 
-  // 0                                                                                                   1
-  // 0         1         2         3         4         5         6         7         8         9         0
+  // 0 1 0         1         2         3         4         5         6         7         8         9
+  // 0
   // 01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456
   // {"name":true,"foo":["bar",null,0,-12],"int-max":9007199254740991,"esc":"_\"_\\_\b\f\n\r\t_","u":"a\u001Fb"}
-  AZ_RETURN_IF_FAILED(az_json_builder_write(&builder, az_json_value_create_object()));
+  AZ_RETURN_IF_FAILED(az_json_builder_write(&builder, az_json_token_object()));
 
-  AZ_RETURN_IF_FAILED(az_json_builder_write_object_member(
-      &builder, AZ_STR("name"), az_json_value_create_boolean(true)));
+  AZ_RETURN_IF_FAILED(
+      az_json_builder_write_object_member(&builder, AZ_STR("name"), az_json_token_boolean(true)));
 
   {
     AZ_RETURN_IF_FAILED(
-        az_json_builder_write_object_member(&builder, AZ_STR("foo"), az_json_value_create_array()));
+        az_json_builder_write_object_member(&builder, AZ_STR("foo"), az_json_token_array()));
     AZ_RETURN_IF_FAILED(
-        az_json_builder_write_array_item(&builder, az_json_value_create_string(AZ_STR("bar"))));
-    AZ_RETURN_IF_FAILED(az_json_builder_write_array_item(&builder, az_json_value_create_null()));
-    AZ_RETURN_IF_FAILED(az_json_builder_write_array_item(&builder, az_json_value_create_number(0)));
-    AZ_RETURN_IF_FAILED(
-        az_json_builder_write_array_item(&builder, az_json_value_create_number(-12)));
+        az_json_builder_write_array_item(&builder, az_json_token_string(AZ_STR("bar"))));
+    AZ_RETURN_IF_FAILED(az_json_builder_write_array_item(&builder, az_json_token_null()));
+    AZ_RETURN_IF_FAILED(az_json_builder_write_array_item(&builder, az_json_token_number(0)));
+    AZ_RETURN_IF_FAILED(az_json_builder_write_array_item(&builder, az_json_token_number(-12)));
     AZ_RETURN_IF_FAILED(az_json_builder_write_array_close(&builder));
   }
 
   AZ_RETURN_IF_FAILED(az_json_builder_write_object_member(
-      &builder, AZ_STR("int-max"), az_json_value_create_number(9007199254740991ull)));
+      &builder, AZ_STR("int-max"), az_json_token_number(9007199254740991ull)));
   AZ_RETURN_IF_FAILED(az_json_builder_write_object_member(
-      &builder, AZ_STR("esc"), az_json_value_create_span(AZ_STR("_\"_\\_\b\f\n\r\t_"))));
+      &builder, AZ_STR("esc"), az_json_token_span(AZ_STR("_\"_\\_\b\f\n\r\t_"))));
   AZ_RETURN_IF_FAILED(az_json_builder_write_object_member(
-      &builder, AZ_STR("u"), az_json_value_create_span(AZ_STR("a" "\x1f" "b"))));
+      &builder,
+      AZ_STR("u"),
+      az_json_token_span(AZ_STR( //
+          "a"
+          "\x1f"
+          "b"))));
 
   AZ_RETURN_IF_FAILED(az_json_builder_write_object_close(&builder));
 
