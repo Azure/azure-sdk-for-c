@@ -8,23 +8,23 @@
 #include <_az_cfg.h>
 
 /**
- * @brief Maximum allowed URL size:
- * url is expected as : [https://]{account_id}[.blob.core.windows.net]/{container}/{blob}{optional_query}
+ * @brief Example URL syntax, not all URLs will be in this format
+ * Basic url is expected as : [https://]{account_id}[.blob.core.windows.net]/{container}/{blob}{optional_query}
  * URL token                       max Len            Total
  * [https://]                       = 8                 8
  * {account_id}                     = 24               32  // 3-24 lowercase only
  * [.blob.core.windows.net]         = 22               54  //TODO: Support soveriegn clouds
- * /{container}                     = 63              117  // 3-63, lowercase letters/numbers/- (consecutive dash is invalid)
- * /{blob}                          = 1024           1141
- * {optional_query}                 = 70          ** 1211 **
+ * /{container}                     = 64              118  // 1 + 3-63, lowercase letters/numbers/- (consecutive dash is invalid)
+ * /{blob}                          = 1025           1143  // 1 + 1024
+ * {optional_query}                 = 70          ** 1213 **
  */
-enum { MAX_URL_SIZE = 1211 };
+enum { MAX_URL_SIZE = 1280 };       // Padded to 1280
 enum { MAX_BODY_SIZE = 1024 * 10 }; // 10KB buffer  /*TODO, Adjust this to reasonable size for non-stream data.*/
 
 AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_client_constant_blob_type() { return AZ_STR("x-ms-blob-type");}
 
 az_storage_blobs_blob_client_options const AZ_STORAGE_BLOBS_BLOB_CLIENT_DEFAULT_OPTIONS
-    = { .service_version = AZ_CONST_STR("2015-02-21"),
+    = { .service_version = AZ_CONST_STR("2015-02-21"),  //TODO - Standardize handling of Service versions
         .retry = {
             .max_retry = 3,
             .delay_in_ms = 30,
@@ -55,9 +55,9 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
   AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
       &hrb, AZ_STORAGE_BLOBS_BLOB_HEADER_X_MS_BLOB_TYPE, client->blob_type));
 
-  char str[256];
+  uint8_t str[256];
   snprintf(str, sizeof str, "%zu", content.size);
-  az_span content_length = (az_span){ .begin = (uint8_t const *)str, .size = strlen(str) };
+  az_span content_length = az_str_to_span(str);
 
   // add Content-Length to request
   AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(&hrb, AZ_HTTP_HEADER_CONTENT_LENGTH, content_length));
