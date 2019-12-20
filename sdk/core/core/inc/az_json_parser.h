@@ -4,7 +4,7 @@
 #ifndef AZ_JSON_PARSER_H
 #define AZ_JSON_PARSER_H
 
-#include <az_json_value.h>
+#include <az_json_token.h>
 #include <az_result.h>
 #include <az_span_reader.h>
 
@@ -29,20 +29,21 @@ typedef struct {
 AZ_NODISCARD az_json_parser az_json_parser_create(az_span const buffer);
 
 AZ_NODISCARD az_result
-az_json_parser_read(az_json_parser * const self, az_json_value * const out_value);
+az_json_parser_read(az_json_parser * const self, az_json_token * const out_token);
+
+AZ_NODISCARD az_result az_json_parser_read_object_member(
+    az_json_parser * const self,
+    az_json_token_member * const out_token);
 
 AZ_NODISCARD az_result
-az_json_parser_read_object_member(az_json_parser * const self, az_json_member * const out_member);
-
-AZ_NODISCARD az_result
-az_json_parser_read_array_element(az_json_parser * const self, az_json_value * const out_value);
+az_json_parser_read_array_element(az_json_parser * const self, az_json_token * const out_token);
 
 AZ_NODISCARD az_result az_json_parser_done(az_json_parser const * const self);
 
 /**
  * Read all nested values and ignore them.
  */
-AZ_NODISCARD az_result az_json_parser_skip(az_json_parser * const self, az_json_value const value);
+AZ_NODISCARD az_result az_json_parser_skip(az_json_parser * const self, az_json_token const token);
 
 #include <_az_cfg_suffix.h>
 
