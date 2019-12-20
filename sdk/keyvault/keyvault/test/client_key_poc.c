@@ -4,7 +4,7 @@
 #include <az_http_response_parser.h>
 #include <az_identity_client_secret_credential.h>
 #include <az_json_get.h>
-#include <az_json_value.h>
+#include <az_json_token.h>
 #include <az_keyvault.h>
 
 #include <stdlib.h>
@@ -31,11 +31,11 @@ az_span get_key_version(az_http_response * response) {
   r = az_http_response_parser_read_body(&parser, &body);
 
   // get key from body
-  az_json_value value;
+  az_json_token value;
   r = az_json_get_by_pointer(body, AZ_STR("/key/kid"), &value);
 
   az_span k = { 0 };
-  r = az_json_value_get_string(&value, &k);
+  r = az_json_token_get_string(value, &k);
 
   // calculate version
   for (uint8_t index = 0; index < k.size;) {
