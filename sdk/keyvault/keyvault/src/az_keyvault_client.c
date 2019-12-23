@@ -70,14 +70,26 @@ static AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
             &builder, AZ_STR("enabled"), az_json_token_boolean(enabled_field.data)));
         AZ_RETURN_IF_FAILED(az_json_builder_write_object_close(&builder));
       }
+      // operations
       if (!az_keyvault_create_key_options_is_empty(options)) {
         AZ_RETURN_IF_FAILED(az_json_builder_write_object_member(
             &builder, AZ_STR("key_ops"), az_json_token_array()));
-        for (uint8_t op = 0; op < options->key_operations.size; ++op) {
+        for (size_t op = 0; op < options->operations.size; ++op) {
           AZ_RETURN_IF_FAILED(az_json_builder_write_array_item(
-              &builder, az_json_token_string(options->key_operations.operations[op])));
+              &builder, az_json_token_string(options->operations.buffer.begin[op])));
         }
         AZ_RETURN_IF_FAILED(az_json_builder_write_array_close(&builder));
+      }
+      // tags
+      if (options->tags.size > 0) {
+        AZ_RETURN_IF_FAILED(
+            az_json_builder_write_object_member(&builder, AZ_STR("tags"), az_json_token_object()));
+        for (size_t tag_index = 0; tag_index < options->tags.size; ++tag_index) {
+          az_pair const tag = options->tags.buffer.begin[tag_index];
+          AZ_RETURN_IF_FAILED(az_json_builder_write_object_member(
+              &builder, tag.key, az_json_token_string(tag.value)));
+        }
+        AZ_RETURN_IF_FAILED(az_json_builder_write_object_close(&builder));
       }
     }
   }

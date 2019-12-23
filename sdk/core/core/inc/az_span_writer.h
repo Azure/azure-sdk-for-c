@@ -7,6 +7,7 @@
 #include <az_action.h>
 #include <az_result.h>
 #include <az_span.h>
+#include <az_span_span.h>
 #include <az_str.h>
 
 #include <stddef.h>
@@ -14,14 +15,6 @@
 #include <_az_cfg_prefix.h>
 
 AZ_ACTION_TYPE(az_span_writer, az_span_action)
-
-/**
- * A span of spans of bytes.
- */
-typedef struct {
-  az_span const * begin;
-  size_t size;
-} az_span_span;
 
 /**
  * Emits all spans from @var self into @var action.

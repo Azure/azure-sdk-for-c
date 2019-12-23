@@ -18,38 +18,7 @@
 
 int exit_code = 0;
 
-az_span get_key_version(az_http_response * response) {
-  az_http_response_parser parser = { 0 };
-  az_span body = { 0 };
-  az_result r = az_http_response_parser_init(&parser, az_span_builder_result(&response->builder));
-
-  az_http_response_status_line status_line = { 0 };
-  r = az_http_response_parser_read_status_line(&parser, &status_line);
-
-  // Get Body
-  r = az_http_response_parser_skip_headers(&parser);
-  r = az_http_response_parser_read_body(&parser, &body);
-
-  // get key from body
-  az_json_token value;
-  r = az_json_get_by_pointer(body, AZ_STR("/key/kid"), &value);
-
-  az_span k = { 0 };
-  r = az_json_token_get_string(value, &k);
-
-  // calculate version
-  for (uint8_t index = 0; index < k.size;) {
-    ++index;
-    if (*(k.begin + k.size - index) == '/') {
-      --index;
-      k.begin = k.begin + k.size - index;
-      k.size = index;
-      break;
-    }
-  }
-
-  return k;
-}
+az_span get_key_version(az_http_response * response);
 
 int main() {
   /************ Creates keyvault client    ****************/
@@ -79,8 +48,24 @@ int main() {
 
   // override options values
   key_options.enabled = az_optional_bool_create(false);
+  // buffer for operations
+  az_span operation_buffer[6];
+  key_options.operations
+      = az_span_span_builder_create((az_mut_span_span)AZ_SPAN_FROM_ARRAY(operation_buffer));
   az_result append_result = az_keyvault_create_key_options_append_operation(
       &key_options, az_keyvault_key_operation_sign());
+
+  // buffer for tags   ->  adding tags
+  az_pair tags_buffer[5];
+  az_pair_span_builder tags_builder
+      = az_pair_span_builder_create((az_mut_pair_span)AZ_SPAN_FROM_ARRAY(tags_buffer));
+
+  az_pair tag_a = { .key = AZ_STR("aKey"), .value = AZ_STR("aValue") };
+  az_pair tag_b = { .key = AZ_STR("bKey"), .value = AZ_STR("bValue") };
+  az_result adding_tag_result = az_pair_span_builder_append(&tags_builder, tag_a);
+  adding_tag_result = az_pair_span_builder_append(&tags_builder, tag_b);
+
+  key_options.tags = tags_builder;
 
   az_result create_result = az_keyvault_keys_key_create(
       &client,
@@ -151,4 +136,37 @@ int main() {
       response_buffer);
 
   return exit_code;
+}
+
+az_span get_key_version(az_http_response * response) {
+  az_http_response_parser parser = { 0 };
+  az_span body = { 0 };
+  az_result r = az_http_response_parser_init(&parser, az_span_builder_result(&response->builder));
+
+  az_http_response_status_line status_line = { 0 };
+  r = az_http_response_parser_read_status_line(&parser, &status_line);
+
+  // Get Body
+  r = az_http_response_parser_skip_headers(&parser);
+  r = az_http_response_parser_read_body(&parser, &body);
+
+  // get key from body
+  az_json_token value;
+  r = az_json_get_by_pointer(body, AZ_STR("/key/kid"), &value);
+
+  az_span k = { 0 };
+  r = az_json_token_get_string(value, &k);
+
+  // calculate version
+  for (uint8_t index = 0; index < k.size;) {
+    ++index;
+    if (*(k.begin + k.size - index) == '/') {
+      --index;
+      k.begin = k.begin + k.size - index;
+      k.size = index;
+      break;
+    }
+  }
+
+  return k;
 }

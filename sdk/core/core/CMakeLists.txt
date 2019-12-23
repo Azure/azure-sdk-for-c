@@ -35,6 +35,7 @@ add_library (
   src/az_span.c
   src/az_span_builder.c
   src/az_span_malloc.c
+  src/az_span_span.c
   src/az_span_reader.c
   src/az_span_writer.c
   src/az_str.c
