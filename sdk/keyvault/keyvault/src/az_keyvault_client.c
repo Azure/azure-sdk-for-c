@@ -53,10 +53,10 @@ static AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
 
   AZ_RETURN_IF_FAILED(az_json_builder_init(&builder, write));
 
-  AZ_RETURN_IF_FAILED(az_json_builder_write(&builder, az_json_value_create_object()));
+  AZ_RETURN_IF_FAILED(az_json_builder_write(&builder, az_json_token_object()));
   // Required fields
   AZ_RETURN_IF_FAILED(az_json_builder_write_object_member(
-      &builder, AZ_STR("kty"), az_json_value_create_string(json_web_key_type)));
+      &builder, AZ_STR("kty"), az_json_token_string(json_web_key_type)));
 
   /**************** Non-Required fields ************/
   if (options != NULL) {
@@ -65,9 +65,9 @@ static AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
       az_optional_bool const enabled_field = options->enabled;
       if (enabled_field.is_present) {
         AZ_RETURN_IF_FAILED(az_json_builder_write_object_member(
-            &builder, AZ_STR("attributes"), az_json_value_create_object()));
+            &builder, AZ_STR("attributes"), az_json_token_object()));
         AZ_RETURN_IF_FAILED(az_json_builder_write_object_member(
-            &builder, AZ_STR("enabled"), az_json_value_create_boolean(enabled_field.data)));
+            &builder, AZ_STR("enabled"), az_json_token_boolean(enabled_field.data)));
         AZ_RETURN_IF_FAILED(az_json_builder_write_object_close(&builder));
       }
       // operations

@@ -217,38 +217,38 @@ AZ_NODISCARD static az_result az_span_reader_get_json_string_rest(
 // _value_
 AZ_NODISCARD static az_result az_json_parser_get_value(
     az_json_parser * const self,
-    az_json_value * const out_value) {
+    az_json_token * const out_value) {
   az_span_reader * const p_reader = &self->reader;
   az_result_byte const c = az_span_reader_current(p_reader);
   if (isdigit(c)) {
-    out_value->kind = AZ_JSON_VALUE_NUMBER;
+    out_value->kind = AZ_JSON_TOKEN_NUMBER;
     return az_span_reader_get_json_number_digit_rest(p_reader, &out_value->data.number);
   }
   switch (c) {
     case 't':
-      out_value->kind = AZ_JSON_VALUE_BOOLEAN;
+      out_value->kind = AZ_JSON_TOKEN_BOOLEAN;
       out_value->data.boolean = true;
       return az_span_reader_expect_span(p_reader, AZ_STR("true"));
     case 'f':
-      out_value->kind = AZ_JSON_VALUE_BOOLEAN;
+      out_value->kind = AZ_JSON_TOKEN_BOOLEAN;
       out_value->data.boolean = false;
       return az_span_reader_expect_span(p_reader, AZ_STR("false"));
     case 'n':
-      out_value->kind = AZ_JSON_VALUE_NULL;
+      out_value->kind = AZ_JSON_TOKEN_NULL;
       return az_span_reader_expect_span(p_reader, AZ_STR("null"));
     case '"':
-      out_value->kind = AZ_JSON_VALUE_STRING;
+      out_value->kind = AZ_JSON_TOKEN_STRING;
       az_span_reader_next(p_reader);
       return az_span_reader_get_json_string_rest(p_reader, &out_value->data.string);
     case '-':
-      out_value->kind = AZ_JSON_VALUE_NUMBER;
+      out_value->kind = AZ_JSON_TOKEN_NUMBER;
       return az_span_reader_get_json_number_digit_rest(p_reader, &out_value->data.number);
     case '{':
-      out_value->kind = AZ_JSON_VALUE_OBJECT;
+      out_value->kind = AZ_JSON_TOKEN_OBJECT;
       az_span_reader_next(p_reader);
       return az_json_parser_push_stack(self, AZ_JSON_STACK_OBJECT);
     case '[':
-      out_value->kind = AZ_JSON_VALUE_ARRAY;
+      out_value->kind = AZ_JSON_TOKEN_ARRAY;
       az_span_reader_next(p_reader);
       return az_json_parser_push_stack(self, AZ_JSON_STACK_ARRAY);
   }
@@ -257,14 +257,14 @@ AZ_NODISCARD static az_result az_json_parser_get_value(
 
 AZ_NODISCARD static az_result az_json_parser_get_value_space(
     az_json_parser * const p_state,
-    az_json_value * const out_value) {
+    az_json_token * const out_value) {
   AZ_RETURN_IF_FAILED(az_json_parser_get_value(p_state, out_value));
   az_span_reader_skip_json_white_space(&p_state->reader);
   return AZ_OK;
 }
 
 AZ_NODISCARD az_result
-az_json_parser_read(az_json_parser * const self, az_json_value * const out_value) {
+az_json_parser_read(az_json_parser * const self, az_json_token * const out_value) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(out_value);
 
@@ -276,8 +276,8 @@ az_json_parser_read(az_json_parser * const self, az_json_value * const out_value
   AZ_RETURN_IF_FAILED(az_json_parser_get_value_space(self, out_value));
   bool const is_empty = az_span_reader_is_empty(p_reader);
   switch (out_value->kind) {
-    case AZ_JSON_VALUE_ARRAY:
-    case AZ_JSON_VALUE_OBJECT:
+    case AZ_JSON_TOKEN_ARRAY:
+    case AZ_JSON_TOKEN_OBJECT:
       return is_empty ? AZ_ERROR_EOF : AZ_OK;
     default:
       break;
@@ -328,10 +328,10 @@ AZ_NODISCARD static az_result az_json_parser_check_item_begin(
 
 AZ_NODISCARD static az_result az_json_parser_check_item_end(
     az_json_parser * const self,
-    az_json_value const value) {
+    az_json_token const value) {
   switch (value.kind) {
-    case AZ_JSON_VALUE_OBJECT:
-    case AZ_JSON_VALUE_ARRAY:
+    case AZ_JSON_TOKEN_OBJECT:
+    case AZ_JSON_TOKEN_ARRAY:
       return AZ_OK;
     default:
       break;
@@ -340,7 +340,7 @@ AZ_NODISCARD static az_result az_json_parser_check_item_end(
 }
 
 AZ_NODISCARD az_result
-az_json_parser_read_object_member(az_json_parser * const self, az_json_member * const out_member) {
+az_json_parser_read_object_member(az_json_parser * const self, az_json_token_member * const out_member) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(out_member);
 
@@ -356,7 +356,7 @@ az_json_parser_read_object_member(az_json_parser * const self, az_json_member * 
 }
 
 AZ_NODISCARD az_result
-az_json_parser_read_array_element(az_json_parser * const self, az_json_value * const out_element) {
+az_json_parser_read_array_element(az_json_parser * const self, az_json_token * const out_element) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(out_element);
 
@@ -374,12 +374,12 @@ AZ_NODISCARD az_result az_json_parser_done(az_json_parser const * const self) {
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_json_parser_skip(az_json_parser * const self, az_json_value const value) {
+AZ_NODISCARD az_result az_json_parser_skip(az_json_parser * const self, az_json_token const value) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
   switch (value.kind) {
-    case AZ_JSON_VALUE_OBJECT:
-    case AZ_JSON_VALUE_ARRAY: {
+    case AZ_JSON_TOKEN_OBJECT:
+    case AZ_JSON_TOKEN_ARRAY: {
       break;
     }
     default: {
@@ -394,7 +394,7 @@ AZ_NODISCARD az_result az_json_parser_skip(az_json_parser * const self, az_json_
     // az_json_parser_get_stac
     switch (az_json_parser_stack_last(self)) {
       case AZ_JSON_STACK_OBJECT: {
-        az_json_member member = { 0 };
+        az_json_token_member member = { 0 };
         az_result const result = az_json_parser_read_object_member(self, &member);
         if (result != AZ_ERROR_ITEM_NOT_FOUND) {
           AZ_RETURN_IF_FAILED(result);
@@ -402,7 +402,7 @@ AZ_NODISCARD az_result az_json_parser_skip(az_json_parser * const self, az_json_
         break;
       }
       default: {
-        az_json_value element = { 0 };
+        az_json_token element = { 0 };
         az_result result = az_json_parser_read_array_element(self, &element);
         if (result != AZ_ERROR_ITEM_NOT_FOUND) {
           AZ_RETURN_IF_FAILED(result);

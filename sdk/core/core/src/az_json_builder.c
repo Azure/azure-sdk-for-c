@@ -167,36 +167,36 @@ AZ_NODISCARD static az_result az_json_builder_write_double(
 }
 
 AZ_NODISCARD az_result
-az_json_builder_write(az_json_builder * const self, az_json_value const value) {
+az_json_builder_write(az_json_builder * const self, az_json_token const value) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
   az_span_action const write = self->write;
   switch (value.kind) {
-    case AZ_JSON_VALUE_NULL: {
+    case AZ_JSON_TOKEN_NULL: {
       self->need_comma = true;
       return az_span_action_do(write, AZ_STR("null"));
     }
-    case AZ_JSON_VALUE_BOOLEAN: {
+    case AZ_JSON_TOKEN_BOOLEAN: {
       self->need_comma = true;
       return az_span_action_do(write, value.data.boolean ? AZ_STR("true") : AZ_STR("false"));
     }
-    case AZ_JSON_VALUE_STRING: {
+    case AZ_JSON_TOKEN_STRING: {
       self->need_comma = true;
       return az_json_builder_write_str(self, value.data.string);
     }
-    case AZ_JSON_VALUE_NUMBER: {
+    case AZ_JSON_TOKEN_NUMBER: {
       self->need_comma = true;
       return az_json_builder_write_double(self, value.data.number);
     }
-    case AZ_JSON_VALUE_OBJECT: {
+    case AZ_JSON_TOKEN_OBJECT: {
       self->need_comma = false;
       return az_span_action_do(write, AZ_STR("{"));
     }
-    case AZ_JSON_VALUE_ARRAY: {
+    case AZ_JSON_TOKEN_ARRAY: {
       self->need_comma = false;
       return az_span_action_do(write, AZ_STR("["));
     }
-    case AZ_JSON_VALUE_SPAN: {
+    case AZ_JSON_TOKEN_SPAN: {
       self->need_comma = true;
       return az_json_builder_write_span(self, value.data.span);
     }
@@ -218,7 +218,7 @@ AZ_NODISCARD static az_result az_json_builder_write_comma(az_json_builder * cons
 AZ_NODISCARD az_result az_json_builder_write_object_member(
     az_json_builder * const self,
     az_span const name,
-    az_json_value const value) {
+    az_json_token const value) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
   AZ_RETURN_IF_FAILED(az_json_builder_write_comma(self));
@@ -245,7 +245,7 @@ AZ_NODISCARD az_result az_json_builder_write_object_close(az_json_builder * cons
 }
 
 AZ_NODISCARD az_result
-az_json_builder_write_array_item(az_json_builder * const self, az_json_value const value) {
+az_json_builder_write_array_item(az_json_builder * const self, az_json_token const value) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
   AZ_RETURN_IF_FAILED(az_json_builder_write_comma(self));
