@@ -5,8 +5,10 @@
 #define AZ_PAIR_H
 
 #include <az_action.h>
+#include <az_result.h>
 #include <az_span.h>
 
+#include <stdbool.h>
 #include <stddef.h>
 
 #include <_az_cfg_prefix.h>

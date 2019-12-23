@@ -4,8 +4,10 @@
 #ifndef AZ_SPAN_SPAN_H
 #define AZ_SPAN_SPAN_H
 
-#include <az_mut_span.h>
+#include <az_result.h>
 #include <az_span.h>
+
+#include <stddef.h>
 
 #include <_az_cfg_prefix.h>
 
