@@ -50,7 +50,7 @@ az_mut_span_move(az_mut_span const buffer, az_span const src, az_mut_span * cons
   AZ_CONTRACT_ARG_VALID_MUT_SPAN(buffer);
   AZ_CONTRACT_ARG_VALID_SPAN(src);
 
-  AZ_CONTRACT(buffer.size < src.size, AZ_ERROR_BUFFER_OVERFLOW);
+  AZ_CONTRACT(buffer.size >= src.size, AZ_ERROR_BUFFER_OVERFLOW);
 
   if (!az_span_is_empty(src)) {
     memmove((void *)buffer.begin, (void const *)src.begin, src.size);
@@ -76,7 +76,7 @@ AZ_NODISCARD AZ_INLINE az_mut_span az_mut_span_take(az_mut_span const span, size
   return (az_mut_span){ .begin = span.begin, .size = n };
 }
 
-AZ_INLINE void az_mut_span_memset(az_mut_span const span, uint8_t const fill) {
+AZ_INLINE void az_mut_span_fill(az_mut_span const span, uint8_t const fill) {
   if (!az_mut_span_is_empty(span)) {
     memset(span.begin, fill, span.size);
   }
