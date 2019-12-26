@@ -115,12 +115,6 @@ az_mut_span_to_str(az_mut_span const buffer, az_span const src, az_mut_span * co
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_mut_span_replace(
-    az_mut_span const buffer,
-    az_span const src,
-    uint8_t (*const func)(uint8_t const),
-    az_mut_span * const out_result);
-
 /**
  * ```c
  * typedef struct {

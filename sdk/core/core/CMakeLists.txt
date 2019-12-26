@@ -30,7 +30,6 @@ add_library (
   src/az_json_pointer.c
   src/az_json_string.c
   src/az_json_token.c
-  src/az_mut_span.c
   src/az_pair.c
   src/az_span.c
   src/az_span_builder.c
