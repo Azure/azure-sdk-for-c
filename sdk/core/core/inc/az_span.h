@@ -24,9 +24,9 @@ typedef struct {
 
 typedef int32_t az_result_byte;
 
-AZ_NODISCARD AZ_INLINE az_span az_span_create_empty() { return (az_span){ 0 }; }
+AZ_NODISCARD AZ_INLINE az_span az_span_empty() { return (az_span){ 0 }; }
 
-AZ_NODISCARD AZ_INLINE bool az_span_is_empty(az_span const span) { return span.size <= 0; }
+AZ_NODISCARD AZ_INLINE bool az_span_is_empty(az_span const span) { return span.size == 0; }
 
 AZ_NODISCARD AZ_INLINE bool az_span_is_valid(az_span const span) {
   return span.size == 0 || (span.begin != NULL && span.begin <= span.begin + span.size - 1);
@@ -62,7 +62,7 @@ AZ_NODISCARD AZ_INLINE az_span az_span_take(az_span const span, size_t const n) 
  */
 AZ_NODISCARD AZ_INLINE az_span az_span_drop(az_span const span, size_t const n) {
   if (span.size <= n) {
-    return az_span_create_empty();
+    return az_span_empty();
   }
   return (az_span){ .begin = span.begin + n, .size = span.size - n };
 }

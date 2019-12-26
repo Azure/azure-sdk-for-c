@@ -43,7 +43,7 @@ int main() {
       100,
       AZ_HTTP_METHOD_VERB_GET,
       az_str_to_span(getenv(URI_ENV)),
-      az_span_create_empty());
+      az_span_empty());
 
   if (az_failed(build_result)) {
     return build_result;

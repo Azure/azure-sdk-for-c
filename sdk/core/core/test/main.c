@@ -667,7 +667,7 @@ int main() {
     az_http_request_builder hrb;
 
     TEST_EXPECT_SUCCESS(az_http_request_builder_init(
-        &hrb, http_buf, 100, AZ_HTTP_METHOD_VERB_GET, hrb_url, az_span_create_empty()));
+        &hrb, http_buf, 100, AZ_HTTP_METHOD_VERB_GET, hrb_url, az_span_empty()));
     TEST_ASSERT(az_span_eq(hrb.method_verb, AZ_HTTP_METHOD_VERB_GET));
     TEST_ASSERT(az_span_eq(az_span_builder_result(&hrb.url_builder), hrb_url));
     TEST_ASSERT(hrb.url_builder.buffer.size == 100);
