@@ -26,7 +26,7 @@ typedef struct {
 
 typedef struct {
   az_mut_span_span buffer;
-  size_t size;
+  size_t length;
 } az_span_span_builder;
 
 /**
@@ -38,7 +38,7 @@ AZ_NODISCARD AZ_INLINE az_span_span_builder
 az_span_span_builder_create(az_mut_span_span const buffer) {
   return (az_span_span_builder){
     .buffer = buffer,
-    .size = 0,
+    .length = 0,
   };
 }
 
