@@ -104,10 +104,8 @@ AZ_NODISCARD AZ_INLINE az_result az_error_unexpected_char(az_result_byte const c
 
 AZ_NODISCARD az_result az_span_to_uint64(az_span const self, uint64_t * const out);
 
-#define AZ_ARRAY_SIZE(ARRAY) (sizeof(ARRAY) / sizeof(*ARRAY))
-
 #define AZ_SPAN_FROM_ARRAY(ARRAY) \
-  { .begin = ARRAY, .size = AZ_ARRAY_SIZE(ARRAY) }
+  { .begin = ARRAY, .size = (sizeof(ARRAY) / sizeof(*ARRAY)) }
 
 AZ_NODISCARD AZ_INLINE az_span az_span_from_one(uint8_t const * ptr) {
   return (az_span){ .begin = ptr, .size = 1 };
