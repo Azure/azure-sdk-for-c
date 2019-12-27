@@ -8,18 +8,18 @@
 AZ_NODISCARD az_result az_span_builder_append(az_span_builder * const self, az_span const span) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
-  az_mut_span const remainder = az_mut_span_drop(self->buffer, self->size);
+  az_mut_span const remainder = az_mut_span_drop(self->buffer, self->length);
   az_mut_span result;
   AZ_RETURN_IF_FAILED(az_mut_span_move(remainder, span, &result));
-  self->size += result.size;
+  self->length += result.size;
   return AZ_OK;
 }
 
 AZ_NODISCARD az_result az_span_builder_append_byte(az_span_builder * const self, uint8_t const c) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
-  AZ_RETURN_IF_FAILED(az_mut_span_set(self->buffer, self->size, c));
-  self->size += 1;
+  AZ_RETURN_IF_FAILED(az_mut_span_set(self->buffer, self->length, c));
+  self->length += 1;
   return AZ_OK;
 }
 
@@ -30,7 +30,7 @@ AZ_NODISCARD az_result az_span_builder_replace(
     az_span const span) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
-  size_t const current_size = self->size;
+  size_t const current_size = self->length;
   size_t const replaced_size = end - start;
   size_t const size_after_replace = current_size - replaced_size + span.size;
 
@@ -58,6 +58,6 @@ AZ_NODISCARD az_result az_span_builder_replace(
   }
 
   // update builder size
-  self->size = size_after_replace;
+  self->length = size_after_replace;
   return AZ_OK;
 }
