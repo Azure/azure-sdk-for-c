@@ -44,7 +44,7 @@ add_library (
 
 if(MSVC)
   if(WARNINGS_AS_ERRORS)
-    set(WARNINGS_AS_ERRORS_FLAG "/WX")
+    set(WARNINGS_AS_ERRORS_FLAG /WX)
   endif()
 
   target_compile_options(${PROJECT_NAME} PRIVATE /Wall ${WARNINGS_AS_ERRORS_FLAG} /wd5031 /wd4668 /wd4820 /wd4255 /analyze)
@@ -55,15 +55,15 @@ elseif(CMAKE_C_COMPILER_ID MATCHES "Clang")
   endif()
 
   if (CI_ALL_WARNINGS)
-    set(ENABLED_WARNINGS "-Weverything -pedantic-errors")
+    set(ENABLED_WARNINGS -Weverything -pedantic-errors)
   else()
-    set(ENABLED_WARNINGS "-Wall -Wextra -pedantic -Wdocumentation -Wdocumentation-unknown-command -Wcast-qual")
+    set(ENABLED_WARNINGS -Wall -Wextra -pedantic -Wdocumentation -Wdocumentation-unknown-command -Wcast-qual)
   endif()
 
   target_compile_options(${PROJECT_NAME} PRIVATE -Xclang ${ENABLED_WARNINGS} ${WARNINGS_AS_ERRORS_FLAG})
 else()
   if(WARNINGS_AS_ERRORS)
-    set(WARNINGS_AS_ERRORS_FLAG "-Werror -pedantic-errors")
+    set(WARNINGS_AS_ERRORS_FLAG -Werror -pedantic-errors)
   endif()
 
   target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic  ${WARNINGS_AS_ERRORS_FLAG})
@@ -79,7 +79,7 @@ target_include_directories (az_core PUBLIC inc)
 add_library (az::core ALIAS az_core)
 
 add_executable (
-    az_core_test 
+    az_core_test
     test/main.c 
     test/test_json_builder.c
     test/test_json_get_by_pointer.c
