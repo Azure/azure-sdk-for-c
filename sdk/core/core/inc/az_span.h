@@ -102,7 +102,7 @@ AZ_NODISCARD AZ_INLINE az_result az_error_unexpected_char(az_result_byte const c
   return az_failed(c) ? c : AZ_ERROR_PARSER_UNEXPECTED_CHAR;
 }
 
-AZ_NODISCARD az_result az_span_get_uint64(az_span const self, uint64_t * const out);
+AZ_NODISCARD az_result az_span_to_uint64(az_span const self, uint64_t * const out);
 
 #define AZ_ARRAY_SIZE(ARRAY) (sizeof(ARRAY) / sizeof(*ARRAY))
 

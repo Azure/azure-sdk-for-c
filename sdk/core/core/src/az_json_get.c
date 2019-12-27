@@ -67,7 +67,7 @@ AZ_NODISCARD az_result az_json_parser_get_by_pointer_token(
   switch (p_value->kind) {
     case AZ_JSON_TOKEN_ARRAY: {
       uint64_t i = { 0 };
-      AZ_RETURN_IF_FAILED(az_span_get_uint64(pointer_token, &i));
+      AZ_RETURN_IF_FAILED(az_span_to_uint64(pointer_token, &i));
       while (true) {
         AZ_RETURN_IF_FAILED(az_json_parser_read_array_element(self, p_value));
         if (i == 0) {

@@ -31,7 +31,7 @@ AZ_NODISCARD bool az_span_is_ascii_ignore_case(az_span const a, az_span const b)
   return true;
 }
 
-AZ_NODISCARD az_result az_span_get_uint64(az_span const self, uint64_t * const out) {
+AZ_NODISCARD az_result az_span_to_uint64(az_span const self, uint64_t * const out) {
   if (self.size <= 0) {
     return AZ_ERROR_EOF;
   }
