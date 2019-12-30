@@ -9,12 +9,12 @@ AZ_NODISCARD az_result
 az_span_span_builder_append(az_span_span_builder * const self, az_span const span) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
-  if (self->size >= self->buffer.size) {
+  if (self->length >= self->buffer.size) {
     return AZ_ERROR_BUFFER_OVERFLOW;
   }
 
-  self->buffer.begin[self->size] = span;
+  self->buffer.begin[self->length] = span;
 
-  self->size += 1;
+  self->length += 1;
   return AZ_OK;
 }

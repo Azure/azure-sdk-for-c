@@ -32,7 +32,7 @@ typedef struct {
 
 typedef struct {
   az_mut_pair_span buffer;
-  size_t size;
+  size_t length;
 } az_pair_span_builder;
 
 /**
@@ -44,7 +44,7 @@ AZ_NODISCARD AZ_INLINE az_pair_span_builder
 az_pair_span_builder_create(az_mut_pair_span const buffer) {
   return (az_pair_span_builder){
     .buffer = buffer,
-    .size = 0,
+    .length = 0,
   };
 }
 

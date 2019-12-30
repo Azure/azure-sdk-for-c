@@ -39,7 +39,7 @@ typedef struct {
  */
 AZ_NODISCARD AZ_INLINE bool az_keyvault_create_key_options_is_empty(
     az_keyvault_create_key_options const * self) {
-  return self->operations.size == 0;
+  return self->operations.length == 0;
 }
 
 /**
@@ -48,16 +48,17 @@ AZ_NODISCARD AZ_INLINE bool az_keyvault_create_key_options_is_empty(
  */
 AZ_NODISCARD AZ_INLINE bool az_keyvault_create_key_options_is_full(
     az_keyvault_create_key_options * const self) {
-  return self->operations.buffer.size != 0 && self->operations.size == self->operations.buffer.size;
+  return self->operations.buffer.size != 0
+      && self->operations.length == self->operations.buffer.size;
 }
 
 /**
- * @brief set size of operations to 0 so it can be written again
+ * @brief set length of operations to 0 so it can be written again
  *
  */
 AZ_NODISCARD AZ_INLINE az_result
 az_keyvault_create_key_options_clear(az_keyvault_create_key_options * const self) {
-  self->operations.size = 0;
+  self->operations.length = 0;
   return AZ_OK;
 }
 

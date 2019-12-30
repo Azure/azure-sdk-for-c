@@ -12,7 +12,7 @@ static void test_pair_span() {
     az_pair_span_builder pair_span_builder
         = az_pair_span_builder_create((az_mut_pair_span)AZ_SPAN_FROM_ARRAY(src_buffer));
 
-    TEST_ASSERT(pair_span_builder.size == 0);
+    TEST_ASSERT(pair_span_builder.length == 0);
 
     // append span
     az_pair add_this_pair_span = { .key = AZ_STR("key"), .value = AZ_STR("Something to test") };
@@ -31,7 +31,7 @@ static void test_pair_span() {
     TEST_ASSERT(a3 == AZ_OK);
     TEST_ASSERT(a4 == AZ_OK);
 
-    TEST_ASSERT(pair_span_builder.size == 4);
+    TEST_ASSERT(pair_span_builder.length == 4);
 
     TEST_ASSERT(az_pair_span_eq(src_buffer[0], add_this_pair_span));
     TEST_ASSERT(az_pair_span_eq(src_buffer[1], add_this_pair_span2));
