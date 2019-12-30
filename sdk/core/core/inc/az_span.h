@@ -88,7 +88,7 @@ AZ_NODISCARD AZ_INLINE bool az_span_is_equal(az_span const a, az_span const b) {
  * Returns `true` if a content of the @a span is equal to a content of the @b
  * span using case-insensetive compare.
  */
-AZ_NODISCARD bool az_span_is_ascii_ignore_case(az_span const a, az_span const b);
+AZ_NODISCARD bool az_span_is_equal_ignoring_case(az_span const a, az_span const b);
 
 AZ_NODISCARD AZ_INLINE bool az_span_is_overlap(az_span const a, az_span const b) {
   return (!az_span_is_empty(a) && !az_span_is_empty(b))
