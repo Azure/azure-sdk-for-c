@@ -100,12 +100,12 @@ AZ_NODISCARD az_result az_http_request_builder_set_query_parameter(
     size_t const name_and_value_size = name.size + value.size;
     size_t const appended_size = name_and_value_size + extra_chars_size;
 
-    new_url_size = p_hrb->url_builder.size + appended_size;
+    new_url_size = p_hrb->url_builder.length + appended_size;
 
     // check for integer overflows, and finally whether the result would fit
     if (name_and_value_size < name.size || name_and_value_size < value.size
         || appended_size < name_and_value_size || appended_size < extra_chars_size
-        || new_url_size < appended_size || new_url_size < p_hrb->url_builder.size
+        || new_url_size < appended_size || new_url_size < p_hrb->url_builder.length
         || new_url_size > p_hrb->url_builder.buffer.size) {
       return AZ_ERROR_BUFFER_OVERFLOW;
     }
@@ -125,7 +125,7 @@ AZ_NODISCARD az_result az_http_request_builder_set_query_parameter(
       az_span_builder_append_byte(&p_hrb->url_builder, p_hrb->query_start ? '&' : '?'));
   // update QPs starting position when it's 0
   if (!p_hrb->query_start) {
-    p_hrb->query_start = (uint16_t)p_hrb->url_builder.size;
+    p_hrb->query_start = (uint16_t)p_hrb->url_builder.length;
   }
 
   // Append parameter name
@@ -137,7 +137,7 @@ AZ_NODISCARD az_result az_http_request_builder_set_query_parameter(
   // Parameter value
   AZ_RETURN_IF_FAILED(az_span_builder_append(&p_hrb->url_builder, value));
 
-  assert(p_hrb->url_builder.size == new_url_size);
+  assert(p_hrb->url_builder.length == new_url_size);
 
   return AZ_OK;
 }
@@ -172,11 +172,11 @@ az_http_request_builder_append_path(az_http_request_builder * const p_hrb, az_sp
   AZ_CONTRACT_ARG_NOT_NULL(&path);
 
   // check if there is enough space yet
-  size_t const current_ulr_size = p_hrb->url_builder.size;
+  size_t const current_ulr_size = p_hrb->url_builder.length;
   uint16_t const url_after_path_size
       = (uint16_t)current_ulr_size + (uint16_t)path.size + 1 /* separator '/' to be added */;
   uint16_t query_start
-      = p_hrb->query_start ? p_hrb->query_start - 1 : (uint16_t)p_hrb->url_builder.size;
+      = p_hrb->query_start ? p_hrb->query_start - 1 : (uint16_t)p_hrb->url_builder.length;
 
   if (url_after_path_size >= p_hrb->url_builder.buffer.size) {
     return AZ_ERROR_BUFFER_OVERFLOW;

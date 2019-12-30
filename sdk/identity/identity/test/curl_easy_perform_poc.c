@@ -1,11 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_access_token_context.h>
-#include <az_client_secret_credential.h>
 #include <az_http_pipeline.h>
 #include <az_http_request_builder.h>
 #include <az_http_response_parser.h>
+#include <az_identity_access_token_context.h>
+#include <az_identity_client_secret_credential.h>
 #include <az_pair.h>
 #include <az_span.h>
 #include <az_span_builder.h>
@@ -57,8 +57,8 @@ int main() {
   }
 
   // Add auth
-  az_client_secret_credential credential = { 0 };
-  az_result const creds_retcode = az_client_secret_credential_init(
+  az_identity_client_secret_credential credential = { 0 };
+  az_result const creds_retcode = az_identity_client_secret_credential_init(
       &credential,
       az_str_to_span(getenv(TENANT_ID_ENV)),
       az_str_to_span(getenv(CLIENT_ID_ENV)),
@@ -69,16 +69,16 @@ int main() {
     return creds_retcode;
   }
 
-  az_access_token access_token = { 0 };
-  az_result const token_retcode = az_access_token_init(&access_token);
+  az_identity_access_token access_token = { 0 };
+  az_result const token_retcode = az_identity_access_token_init(&access_token);
 
   if (!az_succeeded(token_retcode)) {
     printf("Error initializing access token\n");
     return token_retcode;
   }
 
-  az_access_token_context access_token_context = { 0 };
-  az_result const token_context_retcode = az_access_token_context_init(
+  az_identity_access_token_context access_token_context = { 0 };
+  az_result const token_context_retcode = az_identity_access_token_context_init(
       &access_token_context,
       &credential,
       &access_token,

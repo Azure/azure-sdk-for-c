@@ -29,12 +29,12 @@ add_library (
   src/az_json_parser.c
   src/az_json_pointer.c
   src/az_json_string.c
-  src/az_json_value.c
-  src/az_mut_span.c
+  src/az_json_token.c
   src/az_pair.c
   src/az_span.c
   src/az_span_builder.c
   src/az_span_malloc.c
+  src/az_span_span.c
   src/az_span_reader.c
   src/az_span_writer.c
   src/az_str.c

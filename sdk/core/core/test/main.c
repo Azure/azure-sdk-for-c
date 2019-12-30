@@ -19,7 +19,9 @@
 #include "./test_http_response_parser.h"
 #include "./test_json_string.h"
 #include "./test_json_value.h"
+#include "./test_pair_span.h"
 #include "./test_span_builder_replace.h"
+#include "./test_span_span.h"
 
 #include <_az_cfg.h>
 
@@ -28,6 +30,9 @@ void test_json_get_by_pointer();
 void test_json_pointer();
 void test_json_string();
 void test_url_parse();
+void test_span_builder_replace();
+void test_span_span();
+void test_pair_span();
 
 int exit_code = 0;
 
@@ -52,21 +57,21 @@ az_result read_write_value(
     az_mut_span const output,
     size_t * o,
     az_json_parser * const state,
-    az_json_value const value) {
+    az_json_token const value) {
   switch (value.kind) {
-    case AZ_JSON_VALUE_NULL:
+    case AZ_JSON_TOKEN_NULL:
       return write(output, o, AZ_STR("null"));
-    case AZ_JSON_VALUE_BOOLEAN:
+    case AZ_JSON_TOKEN_BOOLEAN:
       return write(output, o, value.data.boolean ? AZ_STR("true") : AZ_STR("false"));
-    case AZ_JSON_VALUE_NUMBER:
+    case AZ_JSON_TOKEN_NUMBER:
       return write(output, o, AZ_STR("0"));
-    case AZ_JSON_VALUE_STRING:
+    case AZ_JSON_TOKEN_STRING:
       return write_str(output, o, value.data.string);
-    case AZ_JSON_VALUE_OBJECT: {
+    case AZ_JSON_TOKEN_OBJECT: {
       AZ_RETURN_IF_FAILED(write(output, o, AZ_STR("{")));
       bool need_comma = false;
       while (true) {
-        az_json_member member;
+        az_json_token_member member;
         az_result const result = az_json_parser_read_object_member(state, &member);
         if (result == AZ_ERROR_ITEM_NOT_FOUND) {
           break;
@@ -83,11 +88,11 @@ az_result read_write_value(
       }
       return write(output, o, AZ_STR("}"));
     }
-    case AZ_JSON_VALUE_ARRAY: {
+    case AZ_JSON_TOKEN_ARRAY: {
       AZ_RETURN_IF_FAILED(write(output, o, AZ_STR("[")));
       bool need_comma = false;
       while (true) {
-        az_json_value element;
+        az_json_token element;
         az_result const result = az_json_parser_read_array_element(state, &element);
         if (result == AZ_ERROR_ITEM_NOT_FOUND) {
           break;
@@ -110,7 +115,7 @@ az_result read_write_value(
 
 az_result read_write(az_span const input, az_mut_span const output, size_t * const o) {
   az_json_parser parser = az_json_parser_create(input);
-  az_json_value value;
+  az_json_token value;
   AZ_RETURN_IF_FAILED(az_json_parser_read(&parser, &value));
   AZ_RETURN_IF_FAILED(read_write_value(output, o, &parser, value));
   return az_json_parser_done(&parser);
@@ -292,58 +297,58 @@ int main() {
     TEST_ASSERT(az_json_parser_read(&state, NULL) == AZ_ERROR_ARG);
   }
   {
-    az_json_value value;
+    az_json_token value;
     TEST_ASSERT(az_json_parser_read(NULL, &value) == AZ_ERROR_ARG);
   }
   {
     az_json_parser parser = az_json_parser_create(AZ_STR("    "));
-    az_json_value value;
+    az_json_token value;
     TEST_ASSERT(az_json_parser_read(&parser, &value) == AZ_ERROR_EOF);
   }
   {
     az_json_parser parser = az_json_parser_create(AZ_STR("  null  "));
-    az_json_value value;
+    az_json_token value;
     TEST_ASSERT(az_json_parser_read(&parser, &value) == AZ_OK);
-    TEST_ASSERT(value.kind == AZ_JSON_VALUE_NULL);
+    TEST_ASSERT(value.kind == AZ_JSON_TOKEN_NULL);
     TEST_ASSERT(az_json_parser_done(&parser) == AZ_OK);
   }
   {
     az_json_parser state = az_json_parser_create(AZ_STR("  nul"));
-    az_json_value value;
+    az_json_token value;
     TEST_ASSERT(az_json_parser_read(&state, &value) == AZ_ERROR_EOF);
   }
   {
     az_json_parser parser = az_json_parser_create(AZ_STR("  false"));
-    az_json_value value;
+    az_json_token value;
     TEST_ASSERT(az_json_parser_read(&parser, &value) == AZ_OK);
-    TEST_ASSERT(value.kind == AZ_JSON_VALUE_BOOLEAN);
+    TEST_ASSERT(value.kind == AZ_JSON_TOKEN_BOOLEAN);
     TEST_ASSERT(value.data.boolean == false);
     TEST_ASSERT(az_json_parser_done(&parser) == AZ_OK);
   }
   {
     az_json_parser state = az_json_parser_create(AZ_STR("  falsx  "));
-    az_json_value value;
+    az_json_token value;
     TEST_ASSERT(az_json_parser_read(&state, &value) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
   }
   {
     az_json_parser state = az_json_parser_create(AZ_STR("true "));
-    az_json_value value;
+    az_json_token value;
     TEST_ASSERT(az_json_parser_read(&state, &value) == AZ_OK);
-    TEST_ASSERT(value.kind == AZ_JSON_VALUE_BOOLEAN);
+    TEST_ASSERT(value.kind == AZ_JSON_TOKEN_BOOLEAN);
     TEST_ASSERT(value.data.boolean == true);
     TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
   }
   {
     az_json_parser state = az_json_parser_create(AZ_STR("  truem"));
-    az_json_value value;
+    az_json_token value;
     TEST_ASSERT(az_json_parser_read(&state, &value) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
   }
   {
     az_span const s = AZ_STR(" \"tr\\\"ue\\t\" ");
     az_json_parser state = az_json_parser_create(s);
-    az_json_value value;
+    az_json_token value;
     TEST_ASSERT(az_json_parser_read(&state, &value) == AZ_OK);
-    TEST_ASSERT(value.kind == AZ_JSON_VALUE_STRING);
+    TEST_ASSERT(value.kind == AZ_JSON_TOKEN_STRING);
     TEST_ASSERT(value.data.string.begin == s.begin + 2);
     TEST_ASSERT(value.data.string.size == 8);
     TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
@@ -351,9 +356,9 @@ int main() {
   {
     az_span const s = AZ_STR("\"\\uFf0F\"");
     az_json_parser state = az_json_parser_create(s);
-    az_json_value value;
+    az_json_token value;
     TEST_ASSERT(az_json_parser_read(&state, &value) == AZ_OK);
-    TEST_ASSERT(value.kind == AZ_JSON_VALUE_STRING);
+    TEST_ASSERT(value.kind == AZ_JSON_TOKEN_STRING);
     TEST_ASSERT(value.data.string.begin == s.begin + 1);
     TEST_ASSERT(value.data.string.size == 6);
     TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
@@ -361,43 +366,43 @@ int main() {
   {
     az_span const s = AZ_STR("\"\\uFf0\"");
     az_json_parser state = az_json_parser_create(s);
-    az_json_value value;
+    az_json_token value;
     TEST_ASSERT(az_json_parser_read(&state, &value) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
   }
   {
     az_json_parser state = az_json_parser_create(AZ_STR(" 23 "));
-    az_json_value value;
+    az_json_token value;
     TEST_ASSERT(az_json_parser_read(&state, &value) == AZ_OK);
-    TEST_ASSERT(value.kind == AZ_JSON_VALUE_NUMBER);
+    TEST_ASSERT(value.kind == AZ_JSON_TOKEN_NUMBER);
     TEST_ASSERT(value.data.number == 23);
     TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
   }
   {
     az_json_parser state = az_json_parser_create(AZ_STR(" -23.56"));
-    az_json_value value;
+    az_json_token value;
     TEST_ASSERT(az_json_parser_read(&state, &value) == AZ_OK);
-    TEST_ASSERT(value.kind == AZ_JSON_VALUE_NUMBER);
+    TEST_ASSERT(value.kind == AZ_JSON_TOKEN_NUMBER);
     TEST_ASSERT(value.data.number == -23.56);
     TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
   }
   {
     az_json_parser state = az_json_parser_create(AZ_STR(" -23.56e-3"));
-    az_json_value value;
+    az_json_token value;
     TEST_ASSERT(az_json_parser_read(&state, &value) == AZ_OK);
-    TEST_ASSERT(value.kind == AZ_JSON_VALUE_NUMBER);
+    TEST_ASSERT(value.kind == AZ_JSON_TOKEN_NUMBER);
     TEST_ASSERT(value.data.number == -0.02356);
     TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
   }
   {
     az_json_parser state = az_json_parser_create(AZ_STR(" [ true, 0.3 ]"));
-    az_json_value value;
+    az_json_token value;
     TEST_ASSERT(az_json_parser_read(&state, &value) == AZ_OK);
-    TEST_ASSERT(value.kind == AZ_JSON_VALUE_ARRAY);
+    TEST_ASSERT(value.kind == AZ_JSON_TOKEN_ARRAY);
     TEST_ASSERT(az_json_parser_read_array_element(&state, &value) == AZ_OK);
-    TEST_ASSERT(value.kind == AZ_JSON_VALUE_BOOLEAN);
+    TEST_ASSERT(value.kind == AZ_JSON_TOKEN_BOOLEAN);
     TEST_ASSERT(value.data.boolean == true);
     TEST_ASSERT(az_json_parser_read_array_element(&state, &value) == AZ_OK);
-    TEST_ASSERT(value.kind == AZ_JSON_VALUE_NUMBER);
+    TEST_ASSERT(value.kind == AZ_JSON_TOKEN_NUMBER);
     // TEST_ASSERT(value.val.number == 0.3);
     TEST_ASSERT(az_json_parser_read_array_element(&state, &value) == AZ_ERROR_ITEM_NOT_FOUND);
     TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
@@ -405,14 +410,14 @@ int main() {
   {
     az_span const json = AZ_STR("{\"a\":\"Hello world!\"}");
     az_json_parser state = az_json_parser_create(json);
-    az_json_value value;
+    az_json_token value;
     TEST_ASSERT(az_json_parser_read(&state, &value) == AZ_OK);
-    TEST_ASSERT(value.kind == AZ_JSON_VALUE_OBJECT);
-    az_json_member member;
+    TEST_ASSERT(value.kind == AZ_JSON_TOKEN_OBJECT);
+    az_json_token_member member;
     TEST_ASSERT(az_json_parser_read_object_member(&state, &member) == AZ_OK);
     TEST_ASSERT(member.name.begin == json.begin + 2);
     TEST_ASSERT(member.name.size == 1);
-    TEST_ASSERT(member.value.kind == AZ_JSON_VALUE_STRING);
+    TEST_ASSERT(member.value.kind == AZ_JSON_TOKEN_STRING);
     TEST_ASSERT(member.value.data.string.begin == json.begin + 6);
     TEST_ASSERT(member.value.data.string.size == 12);
     TEST_ASSERT(az_json_parser_read_object_member(&state, &member) == AZ_ERROR_ITEM_NOT_FOUND);
@@ -570,7 +575,7 @@ int main() {
     }
 
     az_mut_span actual = { .begin = buf, .size = sizeof(buf) };
-    az_mut_span_memset((az_mut_span){ .begin = actual.begin + 1, .size = actual.size - 2 }, '#');
+    az_mut_span_fill((az_mut_span){ .begin = actual.begin + 1, .size = actual.size - 2 }, '#');
 
     az_mut_span result;
 
@@ -733,5 +738,7 @@ int main() {
   test_json_string();
   test_url_parse();
   test_span_builder_replace();
+  test_span_span();
+  test_pair_span();
   return exit_code;
 }

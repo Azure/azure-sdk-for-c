@@ -11,12 +11,15 @@
 void az_create_key_options_test() {
   {
     az_keyvault_create_key_options options = { 0 };
+    az_span buffer[6];
+    options.operations = az_span_span_builder_create((az_mut_span_span)AZ_SPAN_FROM_ARRAY(buffer));
+
     // Append
     TEST_ASSERT(
         az_keyvault_create_key_options_append_operation(&options, az_keyvault_key_operation_sign())
         == AZ_OK)
-    TEST_ASSERT(options.key_operations.size == 1)
-    TEST_ASSERT(az_span_eq(options.key_operations.operations[0], az_keyvault_key_operation_sign()))
+    TEST_ASSERT(options.operations.length == 1)
+    TEST_ASSERT(az_span_eq(options.operations.buffer.begin[0], az_keyvault_key_operation_sign()))
 
     // check we can't add all if not empty
     TEST_ASSERT(
@@ -24,21 +27,20 @@ void az_create_key_options_test() {
 
     // clear
     TEST_ASSERT(az_keyvault_create_key_options_clear(&options) == AZ_OK)
-    TEST_ASSERT(options.key_operations.size == 0)
+    TEST_ASSERT(options.operations.length == 0)
 
     // Append all
     TEST_ASSERT(az_keyvault_create_key_options_append_all_operations(&options) == AZ_OK)
     TEST_ASSERT(
-        az_span_eq(options.key_operations.operations[0], az_keyvault_key_operation_decrypt()));
+        az_span_eq(options.operations.buffer.begin[0], az_keyvault_key_operation_decrypt()));
     TEST_ASSERT(
-        az_span_eq(options.key_operations.operations[1], az_keyvault_key_operation_encrypt()));
-    TEST_ASSERT(az_span_eq(options.key_operations.operations[2], az_keyvault_key_operation_sign()));
+        az_span_eq(options.operations.buffer.begin[1], az_keyvault_key_operation_encrypt()));
+    TEST_ASSERT(az_span_eq(options.operations.buffer.begin[2], az_keyvault_key_operation_sign()));
     TEST_ASSERT(
-        az_span_eq(options.key_operations.operations[3], az_keyvault_key_operation_unwrapKey()));
+        az_span_eq(options.operations.buffer.begin[3], az_keyvault_key_operation_unwrapKey()));
+    TEST_ASSERT(az_span_eq(options.operations.buffer.begin[4], az_keyvault_key_operation_verify()));
     TEST_ASSERT(
-        az_span_eq(options.key_operations.operations[4], az_keyvault_key_operation_verify()));
-    TEST_ASSERT(
-        az_span_eq(options.key_operations.operations[5], az_keyvault_key_operation_wrapKey()));
+        az_span_eq(options.operations.buffer.begin[5], az_keyvault_key_operation_wrapKey()));
 
     // fail next append, full list
     TEST_ASSERT(
