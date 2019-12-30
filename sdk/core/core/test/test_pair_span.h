@@ -33,10 +33,10 @@ static void test_pair_span() {
 
     TEST_ASSERT(pair_span_builder.size == 4);
 
-    TEST_ASSERT(az_pair_span_eq(src_buffer[0], add_this_pair_span));
-    TEST_ASSERT(az_pair_span_eq(src_buffer[1], add_this_pair_span2));
-    TEST_ASSERT(az_pair_span_eq(src_buffer[2], add_this_pair_span3));
-    TEST_ASSERT(az_pair_span_eq(src_buffer[3], add_this_pair_span4));
+    TEST_ASSERT(az_pair_span_is_equal(src_buffer[0], add_this_pair_span));
+    TEST_ASSERT(az_pair_span_is_equal(src_buffer[1], add_this_pair_span2));
+    TEST_ASSERT(az_pair_span_is_equal(src_buffer[2], add_this_pair_span3));
+    TEST_ASSERT(az_pair_span_is_equal(src_buffer[3], add_this_pair_span4));
 
     az_result a5 = az_pair_span_builder_append(&pair_span_builder, add_this_pair_span5);
 
