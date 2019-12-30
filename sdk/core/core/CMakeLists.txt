@@ -51,7 +51,7 @@ if(MSVC)
 
 elseif(CMAKE_C_COMPILER_ID MATCHES "Clang")
   if(WARNINGS_AS_ERRORS)
-    set(WARNINGS_AS_ERRORS_FLAG "-Werror")
+    set(WARNINGS_AS_ERRORS_FLAG -Werror)
   endif()
 
   if (CI_ALL_WARNINGS)
@@ -63,7 +63,7 @@ elseif(CMAKE_C_COMPILER_ID MATCHES "Clang")
   target_compile_options(${PROJECT_NAME} PRIVATE -Xclang ${ENABLED_WARNINGS} ${WARNINGS_AS_ERRORS_FLAG})
 else()
   if(WARNINGS_AS_ERRORS)
-    set(WARNINGS_AS_ERRORS_FLAG -Werror -pedantic-errors)
+    set(WARNINGS_AS_ERRORS_FLAG -Werror --pedantic-errors)
   endif()
 
   target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic  ${WARNINGS_AS_ERRORS_FLAG})
