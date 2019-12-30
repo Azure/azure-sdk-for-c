@@ -74,9 +74,9 @@ static AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
       if (!az_keyvault_create_key_options_is_empty(options)) {
         AZ_RETURN_IF_FAILED(az_json_builder_write_object_member(
             &builder, AZ_STR("key_ops"), az_json_token_array()));
-        for (uint8_t op = 0; op < options->key_operations.size; ++op) {
+        for (size_t op = 0; op < options->operations.length; ++op) {
           AZ_RETURN_IF_FAILED(az_json_builder_write_array_item(
-              &builder, az_json_token_string(options->key_operations.operations[op])));
+              &builder, az_json_token_string(options->operations.buffer.begin[op])));
         }
         AZ_RETURN_IF_FAILED(az_json_builder_write_array_close(&builder));
       }

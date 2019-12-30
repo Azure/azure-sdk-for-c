@@ -20,31 +20,6 @@ int exit_code = 0;
 
 az_span get_key_version(az_http_response * response);
 
-  // Get Body
-  r = az_http_response_parser_skip_headers(&parser);
-  r = az_http_response_parser_read_body(&parser, &body);
-
-  // get key from body
-  az_json_token value;
-  r = az_json_get_by_pointer(body, AZ_STR("/key/kid"), &value);
-
-  az_span k = { 0 };
-  r = az_json_token_get_string(value, &k);
-
-  // calculate version
-  for (uint8_t index = 0; index < k.size;) {
-    ++index;
-    if (*(k.begin + k.size - index) == '/') {
-      --index;
-      k.begin = k.begin + k.size - index;
-      k.size = index;
-      break;
-    }
-  }
-
-  return k;
-}
-
 int main() {
   /************ Creates keyvault client    ****************/
   az_keyvault_keys_client client;
