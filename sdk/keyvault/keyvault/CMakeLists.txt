@@ -25,7 +25,7 @@ elseif(CMAKE_C_COMPILER_ID MATCHES "Clang")
   endif()
 
   if (CI_ALL_WARNINGS)
-    set(ENABLED_WARNINGS Weverything -pedantic-errors)
+    set(ENABLED_WARNINGS -Weverything -pedantic-errors)
   else()
     set(ENABLED_WARNINGS -Wall -Wextra -pedantic -Wdocumentation -Wdocumentation-unknown-command -Wcast-qual)
   endif()
