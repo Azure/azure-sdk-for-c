@@ -5,18 +5,16 @@
 #define AZ_KEYVAULT_CREATE_KEY_OPTIONS_H
 
 #include <az_optional_bool.h>
+#include <az_pair.h>
 #include <az_result.h>
 #include <az_span.h>
+#include <az_span_span.h>
 #include <az_str.h>
 
 #include <stdbool.h>
 #include <stdint.h>
 
 #include <_az_cfg_prefix.h>
-
-enum {
-  AZ_KEYVAULT_MAX_KEY_OPERATIONS = 6,
-};
 
 AZ_NODISCARD AZ_INLINE az_span az_keyvault_key_operation_decrypt() { return AZ_STR("decrypt"); }
 AZ_NODISCARD AZ_INLINE az_span az_keyvault_key_operation_encrypt() { return AZ_STR("encrypt"); }
@@ -26,17 +24,12 @@ AZ_NODISCARD AZ_INLINE az_span az_keyvault_key_operation_verify() { return AZ_ST
 AZ_NODISCARD AZ_INLINE az_span az_keyvault_key_operation_wrapKey() { return AZ_STR("wrapKey"); }
 
 typedef struct {
-  az_span operations[6];
-  uint8_t size;
-} az_keyvault_create_key_options_key_operation;
-
-typedef struct {
   az_optional_bool enabled;
-  az_keyvault_create_key_options_key_operation key_operations;
+  az_span_span_builder operations;
+  az_pair_span_builder tags;
   /* TODO: adding next options
   Datetime not_before;
   Datetime expires_on
-  List tags
   */
 } az_keyvault_create_key_options;
 
@@ -46,7 +39,7 @@ typedef struct {
  */
 AZ_NODISCARD AZ_INLINE bool az_keyvault_create_key_options_is_empty(
     az_keyvault_create_key_options const * self) {
-  return self->key_operations.size == 0;
+  return self->operations.length == 0;
 }
 
 /**
@@ -55,16 +48,17 @@ AZ_NODISCARD AZ_INLINE bool az_keyvault_create_key_options_is_empty(
  */
 AZ_NODISCARD AZ_INLINE bool az_keyvault_create_key_options_is_full(
     az_keyvault_create_key_options * const self) {
-  return self->key_operations.size >= AZ_KEYVAULT_MAX_KEY_OPERATIONS;
+  return self->operations.buffer.size != 0
+      && self->operations.length == self->operations.buffer.size;
 }
 
 /**
- * @brief set size of operations to 0 so it can be written again
+ * @brief set length of operations to 0 so it can be written again
  *
  */
 AZ_NODISCARD AZ_INLINE az_result
 az_keyvault_create_key_options_clear(az_keyvault_create_key_options * const self) {
-  self->key_operations = (az_keyvault_create_key_options_key_operation){ 0 };
+  self->operations.length = 0;
   return AZ_OK;
 }
 
@@ -76,17 +70,7 @@ AZ_NODISCARD AZ_INLINE az_result az_keyvault_create_key_options_append_operation
     az_keyvault_create_key_options * const self,
     az_span const operation) {
 
-  if (az_keyvault_create_key_options_is_full(self)) {
-    return AZ_ERROR_BUFFER_OVERFLOW;
-  }
-
-  az_keyvault_create_key_options_key_operation * current_operations = &self->key_operations;
-  uint8_t const current_size = current_operations->size;
-
-  current_operations->operations[current_size] = operation;
-  current_operations->size = current_size + 1;
-
-  return AZ_OK;
+  return az_span_span_builder_append(&self->operations, operation);
 }
 
 /**
