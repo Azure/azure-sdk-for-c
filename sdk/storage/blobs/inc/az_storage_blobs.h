@@ -8,6 +8,8 @@
 #include <az_http_pipeline.h>
 #include <az_http_policy.h>
 #include <az_http_response.h>
+#include <az_identity_access_token.h>
+#include <az_identity_access_token_context.h>
 #include <az_result.h>
 #include <az_span.h>
 #include <az_str.h>
@@ -39,6 +41,8 @@ typedef struct {
   az_span blob_type;
   az_http_pipeline pipeline;
   az_storage_blobs_blob_client_options client_options;
+  az_identity_access_token _token;
+  az_identity_access_token_context _token_context;
 } az_storage_blobs_blob_client;
 
 extern az_storage_blobs_blob_client_options const AZ_STORAGE_BLOBS_BLOB_CLIENT_DEFAULT_OPTIONS;
@@ -65,19 +69,26 @@ AZ_NODISCARD AZ_INLINE az_result az_storage_blobs_blob_client_init(
     az_storage_blobs_blob_client_options const * const options) {
   AZ_CONTRACT_ARG_NOT_NULL(client);
 
-  client->uri = uri;
-  // use default options if options is null. Or use customer provided one
-  if (options == NULL) {
-    client->client_options = AZ_STORAGE_BLOBS_BLOB_CLIENT_DEFAULT_OPTIONS;
-  } else {
-    client->client_options = *options;
-  }
+  *client = (az_storage_blobs_blob_client){
+    .uri = uri,
+    .pipeline = { 0 },
+    .client_options = options == NULL ? AZ_STORAGE_BLOBS_BLOB_CLIENT_DEFAULT_OPTIONS : *options,
+    ._token = { 0 },
+    ._token_context = { 0 },
+  };
+
+  AZ_RETURN_IF_FAILED(az_identity_access_token_init(&(client->_token)));
+  AZ_RETURN_IF_FAILED(az_identity_access_token_context_init(
+      &(client->_token_context),
+      credential,
+      &(client->_token),
+      AZ_STR("https://storage.azure.com/.default")));
 
   client->pipeline = (az_http_pipeline){
     .policies = {
       { .pfnc_process = az_http_pipeline_policy_uniquerequestid, .data = NULL },
       { .pfnc_process = az_http_pipeline_policy_retry, .data = &client->client_options.retry },
-      { .pfnc_process = az_http_pipeline_policy_authentication, .data = credential },
+      { .pfnc_process = az_http_pipeline_policy_authentication, .data = &(client->_token_context) },
       { .pfnc_process = az_http_pipeline_policy_logging, .data = NULL },
       { .pfnc_process = az_http_pipeline_policy_bufferresponse, .data = NULL },
       { .pfnc_process = az_http_pipeline_policy_distributedtracing, .data = NULL },

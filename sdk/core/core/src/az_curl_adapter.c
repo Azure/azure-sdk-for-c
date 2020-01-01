@@ -189,6 +189,69 @@ az_curl_send_post_request(CURL * const p_curl, az_http_request_builder const * c
   return AZ_OK;
 }
 
+size_t _az_curl_upload_read_callback(void * ptr, size_t size, size_t nmemb, void * userdata) {
+
+  az_mut_span * mut_span = (az_mut_span *)userdata;
+
+  size_t curl_size = nmemb * size;
+
+  //Nothing to copy
+  if (curl_size < 1 || !(mut_span->size))
+    return 0;
+
+  size_t to_copy = (mut_span->size < curl_size) ? mut_span->size : curl_size;
+  memcpy(ptr, mut_span->begin, to_copy);
+  mut_span->size -= to_copy;
+  mut_span->begin += to_copy;
+
+  return to_copy;
+}
+
+/**
+ * handles POST request. It handles seting up a body for request
+ */
+AZ_NODISCARD az_result
+az_curl_send_upload_request(CURL * const p_curl, az_http_request_builder const * const p_hrb) {
+  AZ_CONTRACT_ARG_NOT_NULL(p_curl);
+  AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
+
+  // Method
+  az_mut_span body = { 0 };
+  AZ_RETURN_IF_FAILED(az_span_malloc(p_hrb->body.size + AZ_STR_ZERO.size, &body));
+
+  az_mut_span zt_buf = { 0 };
+  az_result res_code = az_mut_span_to_str(body, p_hrb->body, &zt_buf);
+
+  if (az_succeeded(res_code)) {
+    res_code = az_curl_code_to_result(curl_easy_setopt(p_curl, CURLOPT_UPLOAD, 1L));
+    if (az_succeeded(res_code)) {
+      res_code = az_curl_code_to_result(
+          curl_easy_setopt(p_curl, CURLOPT_READFUNCTION, _az_curl_upload_read_callback));
+      if (az_succeeded(res_code)) {
+
+        //Setup the request to pass the body in as the data stream to read
+        res_code = az_curl_code_to_result(curl_easy_setopt(p_curl, CURLOPT_READDATA, body));
+        
+        if (az_succeeded(res_code)) {
+
+          //Set the size of the upload
+          res_code = az_curl_code_to_result(curl_easy_setopt(p_curl, CURLOPT_INFILESIZE, (curl_off_t)body.size));
+          
+          // Do the curl work
+          if (az_succeeded(res_code)) {
+            res_code = az_curl_code_to_result(curl_easy_perform(p_curl));
+          }
+        }
+      }
+    }
+  }
+
+  az_span_free(&body);
+  AZ_RETURN_IF_FAILED(res_code);
+
+  return AZ_OK;
+}
+
 /**
  * @brief finds out if there are headers in the request and add them to curl header list
  *
@@ -306,6 +369,10 @@ AZ_NODISCARD az_result az_http_client_send_request_impl_process(
     result = az_curl_send_post_request(p_curl, p_hrb);
   } else if (az_span_eq(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_DELETE)) {
     result = az_curl_send_delete_request(p_curl, p_hrb);
+  } else if (az_span_eq(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_PUT)) {
+    result = az_curl_send_upload_request(p_curl, p_hrb);
+  } else {
+    return AZ_ERROR_HTTP_INVALID_METHOD_VERB;
   }
 
   // make sure to set the end of the body response as the end of the complete response
