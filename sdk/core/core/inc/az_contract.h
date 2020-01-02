@@ -5,6 +5,7 @@
 #define AZ_CONTRACT_H
 
 #include <az_result.h>
+#include <az_span_i.h>
 
 #include <stddef.h>
 
