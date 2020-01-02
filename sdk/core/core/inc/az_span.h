@@ -6,6 +6,7 @@
 
 #include <az_action.h>
 #include <az_result.h>
+#include <az_span_def.h>
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -14,23 +15,11 @@
 
 #include <_az_cfg_prefix.h>
 
-/**
- * An immutable span of bytes (octets).
- */
-typedef struct {
-  uint8_t const * begin;
-  size_t size;
-} az_span;
-
 typedef int32_t az_result_byte;
 
 AZ_NODISCARD AZ_INLINE az_span az_span_create_empty() { return (az_span){ 0 }; }
 
 AZ_NODISCARD AZ_INLINE bool az_span_is_empty(az_span const span) { return span.size <= 0; }
-
-AZ_NODISCARD AZ_INLINE bool az_span_is_valid(az_span const span) {
-  return span.size == 0 || (span.begin != NULL && span.begin <= span.begin + span.size - 1);
-}
 
 /**
  * Returns a byte in `index` position.
