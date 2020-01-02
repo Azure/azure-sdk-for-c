@@ -62,7 +62,7 @@ else()
   target_compile_options(az_core PRIVATE -Wall -Wextra -pedantic  ${WARNINGS_AS_ERRORS_FLAG})
 endif()
 
-target_include_directories (az_core PUBLIC inc)
+target_include_directories (az_core PUBLIC inc inc/internal)
 
 # make sure that users can consume the project as a library.
 add_library (az::core ALIAS az_core)
