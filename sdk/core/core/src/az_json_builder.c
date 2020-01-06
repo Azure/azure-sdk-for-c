@@ -145,7 +145,7 @@ AZ_NODISCARD static az_result az_json_builder_write_double(
         uint8_t const dec = (uint8_t)(u / base) + '0';
         u %= base;
         base /= 10;
-        AZ_RETURN_IF_FAILED(az_span_action_do(write, az_span_from_buffer_range(&dec, 1)));
+        AZ_RETURN_IF_FAILED(az_span_action_do(write, az_span_from_one(&dec)));
       } while (1 <= base);
       return AZ_OK;
     }
