@@ -24,9 +24,9 @@ typedef struct {
    */
   az_mut_span buffer;
   /**
-   * A current size in the resulting span. The field is increased after each write.
+   * A current length in the resulting span. The field is increased after each write.
    */
-  size_t size;
+  size_t length;
 } az_span_builder;
 
 /**
@@ -37,13 +37,13 @@ typedef struct {
 AZ_NODISCARD AZ_INLINE az_span_builder az_span_builder_create(az_mut_span const buffer) {
   return (az_span_builder){
     .buffer = buffer,
-    .size = 0,
+    .length = 0,
   };
 }
 
 AZ_INLINE void az_span_builder_reset(az_span_builder * const self) {
   az_mut_span const buffer = self->buffer;
-  az_mut_span_memset(buffer, 0);
+  az_mut_span_fill(buffer, 0);
   *self = az_span_builder_create(buffer);
 }
 
@@ -51,7 +51,7 @@ AZ_INLINE void az_span_builder_reset(az_span_builder * const self) {
  * Returns a mutable span of bytes that were written into the builder's buffer.
  */
 AZ_NODISCARD AZ_INLINE az_mut_span az_span_builder_mut_result(az_span_builder const * const self) {
-  return az_mut_span_take(self->buffer, self->size);
+  return az_mut_span_take(self->buffer, self->length);
 }
 
 /**

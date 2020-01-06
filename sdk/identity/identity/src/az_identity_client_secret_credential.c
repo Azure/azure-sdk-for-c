@@ -120,9 +120,9 @@ AZ_INLINE AZ_NODISCARD az_result _az_identity_client_secret_credential_ms_oauth2
         = _az_identity_client_secret_credential_ms_oauth2_send_get_token_request(
             token_context, auth_url, auth_body, hrb_buf_span, response, &requested_at);
 
-    az_mut_span_memset(hrb_buf_span, '#');
-    az_mut_span_memset(auth_body, '#');
-    az_mut_span_memset(auth_url, '#');
+    az_mut_span_fill(hrb_buf_span, '#');
+    az_mut_span_fill(auth_body, '#');
+    az_mut_span_fill(auth_url, '#');
     AZ_RETURN_IF_FAILED(token_request_result);
   }
 
@@ -162,7 +162,7 @@ AZ_INLINE AZ_NODISCARD az_result _az_identity_client_secret_credential_ms_oauth2
 
     az_mut_span const token_buf = AZ_SPAN_FROM_ARRAY(token_context->_token->_token_buf);
     az_span_builder builder = az_span_builder_create(token_buf);
-    az_mut_span_memset(token_buf, 0);
+    az_mut_span_fill(token_buf, 0);
 
     AZ_RETURN_IF_FAILED(az_span_builder_append(&builder, AZ_STR("Bearer ")));
     az_result const token_append_result = az_span_builder_append(&builder, token_str);
@@ -175,7 +175,7 @@ AZ_INLINE AZ_NODISCARD az_result _az_identity_client_secret_credential_ms_oauth2
         token_context->_token->_token_expiration = expiration;
       }
     } else {
-      az_mut_span_memset(token_buf, 'X');
+      az_mut_span_fill(token_buf, 'X');
       return token_append_result;
     }
   }
@@ -194,7 +194,7 @@ AZ_INLINE AZ_NODISCARD az_result _az_identity_client_secret_credential_renew_tok
   az_result const result
       = _az_identity_client_secret_credential_ms_oauth2_get_token(token_context, &http_response);
 
-  az_mut_span_memset(http_response.builder.buffer, '#');
+  az_mut_span_fill(http_response.builder.buffer, '#');
   return result;
 }
 
