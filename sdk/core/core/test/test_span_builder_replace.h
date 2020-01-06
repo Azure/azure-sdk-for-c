@@ -19,7 +19,7 @@ static void test_span_builder_replace() {
     TEST_ASSERT(az_span_builder_replace(&builder, 1, 6, AZ_STR("X")) == AZ_OK);
 
     az_span const result = az_span_builder_result(&builder);
-    TEST_ASSERT(az_span_eq(result, expected));
+    TEST_ASSERT(az_span_is_equal(result, expected));
   }
   {
     // Replace inside content with smaller content at one position -> right shift
@@ -32,7 +32,7 @@ static void test_span_builder_replace() {
     TEST_ASSERT(az_span_builder_replace(&builder, 2, 2, AZ_STR("X")) == AZ_OK);
 
     az_span const result = az_span_builder_result(&builder);
-    TEST_ASSERT(az_span_eq(result, expected));
+    TEST_ASSERT(az_span_is_equal(result, expected));
   }
   {
     // Replace inside content with smaller content at one position at the end -> no shift required
@@ -45,7 +45,7 @@ static void test_span_builder_replace() {
     TEST_ASSERT(az_span_builder_replace(&builder, 8, 8, AZ_STR("90")) == AZ_OK);
 
     az_span const result = az_span_builder_result(&builder);
-    TEST_ASSERT(az_span_eq(result, expected));
+    TEST_ASSERT(az_span_is_equal(result, expected));
   }
   {
     // Replace all content with smaller content -> no shift
@@ -58,7 +58,7 @@ static void test_span_builder_replace() {
     TEST_ASSERT(az_span_builder_replace(&builder, 0, 8, AZ_STR("X")) == AZ_OK);
 
     az_span const result = az_span_builder_result(&builder);
-    TEST_ASSERT(az_span_eq(result, expected));
+    TEST_ASSERT(az_span_is_equal(result, expected));
   }
   {
     // Replace all content with bigger content -> no shift
@@ -71,7 +71,7 @@ static void test_span_builder_replace() {
     TEST_ASSERT(az_span_builder_replace(&builder, 0, 8, AZ_STR("X12345678X")) == AZ_OK);
 
     az_span const result = az_span_builder_result(&builder);
-    TEST_ASSERT(az_span_eq(result, expected));
+    TEST_ASSERT(az_span_is_equal(result, expected));
   }
   {
     // Replace content with smaller content at the beggining -> right shift
@@ -84,7 +84,7 @@ static void test_span_builder_replace() {
     TEST_ASSERT(az_span_builder_replace(&builder, 0, 0, AZ_STR("XXX")) == AZ_OK);
 
     az_span const result = az_span_builder_result(&builder);
-    TEST_ASSERT(az_span_eq(result, expected));
+    TEST_ASSERT(az_span_is_equal(result, expected));
   }
   {
     // Replace content with same size content size 1-> no shift
@@ -97,7 +97,7 @@ static void test_span_builder_replace() {
     TEST_ASSERT(az_span_builder_replace(&builder, 0, 1, AZ_STR("2")) == AZ_OK);
 
     az_span const result = az_span_builder_result(&builder);
-    TEST_ASSERT(az_span_eq(result, expected));
+    TEST_ASSERT(az_span_is_equal(result, expected));
   }
   {
     // Replace content with same size content size > 1-> no shift
@@ -110,7 +110,7 @@ static void test_span_builder_replace() {
     TEST_ASSERT(az_span_builder_replace(&builder, 0, 4, AZ_STR("4321")) == AZ_OK);
 
     az_span const result = az_span_builder_result(&builder);
-    TEST_ASSERT(az_span_eq(result, expected));
+    TEST_ASSERT(az_span_is_equal(result, expected));
   }
   {
     // Append another span after replacing -> builder should keep writing at the end
@@ -125,7 +125,7 @@ static void test_span_builder_replace() {
     ignore = az_span_builder_append(&builder, AZ_STR("AB"));
 
     az_span const result = az_span_builder_result(&builder);
-    TEST_ASSERT(az_span_eq(result, expected));
+    TEST_ASSERT(az_span_is_equal(result, expected));
   }
   {
     // Replace at last position -> insert at the end
@@ -138,7 +138,7 @@ static void test_span_builder_replace() {
     TEST_ASSERT(az_span_builder_replace(&builder, 3, 3, AZ_STR("4")) == AZ_OK);
 
     az_span const result = az_span_builder_result(&builder);
-    TEST_ASSERT(az_span_eq(result, expected));
+    TEST_ASSERT(az_span_is_equal(result, expected));
   }
   {
     // Fail on buffer override -> try to replace with something bigger than buffer
@@ -162,7 +162,7 @@ static void test_span_builder_replace() {
     TEST_ASSERT(az_span_builder_replace(&builder, 0, 0, AZ_STR("2")) == AZ_OK);
     az_span const result = az_span_builder_result(&builder);
     az_span const expected = AZ_STR("2");
-    TEST_ASSERT(az_span_eq(result, expected));
+    TEST_ASSERT(az_span_is_equal(result, expected));
   }
   {
     // Fail if trying to replace out of bounds content -> start and end out

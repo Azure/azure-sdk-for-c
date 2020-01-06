@@ -27,7 +27,7 @@ static void test_json_value() {
   {
     az_span string_value = { 0 };
     TEST_ASSERT(az_json_token_get_string(json_string, &string_value) == AZ_OK);
-    TEST_ASSERT(az_span_eq(string_value, AZ_STR("Hello")));
+    TEST_ASSERT(az_span_is_equal(string_value, AZ_STR("Hello")));
   }
   // string from boolean
   {

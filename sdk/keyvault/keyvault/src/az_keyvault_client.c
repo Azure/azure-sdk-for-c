@@ -184,7 +184,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
       MAX_URL_SIZE,
       AZ_HTTP_METHOD_VERB_GET,
       client->uri,
-      az_span_create_empty()));
+      az_span_empty()));
 
   // Add path to request
   AZ_RETURN_IF_FAILED(
@@ -222,7 +222,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_delete(
       MAX_URL_SIZE,
       AZ_HTTP_METHOD_VERB_DELETE,
       client->uri,
-      az_span_create_empty()));
+      az_span_empty()));
 
   // add version to request
   AZ_RETURN_IF_FAILED(az_http_request_builder_set_query_parameter(
