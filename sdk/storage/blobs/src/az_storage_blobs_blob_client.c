@@ -24,14 +24,8 @@ enum {
   MAX_BODY_SIZE = 1024 * 10
 }; // 10KB buffer  /*TODO, Adjust this to reasonable size for non-stream data.*/
 
-AZ_NODISCARD AZ_INLINE az_span az_storage_blobs_client_constant_blob_type() {
-  return AZ_STR("x-ms-blob-type");
-}
-
 az_storage_blobs_blob_client_options const AZ_STORAGE_BLOBS_BLOB_CLIENT_DEFAULT_OPTIONS
-    = { .service_version
-        = AZ_CONST_STR("2017-11-09"), // TODO - Standardize handling of Service versions
-        .retry = {
+    = { .retry = {
             .max_retry = 5,
             .delay_in_ms = 1000,
         } };
@@ -55,7 +49,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
 
   // add version to request
   AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
-      &hrb, AZ_STR("api-version"), client->client_options.service_version));
+      &hrb, AZ_HTTP_HEADER_API_VERSION, AZ_STORAGE_BLOBS_BLOB_API_VERSION));
 
   // add blob type to request
   AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
@@ -101,6 +95,10 @@ AZ_NODISCARD az_result az_storage_blobs_blob_download(
       AZ_HTTP_METHOD_VERB_GET,
       client->uri,
       az_span_create_empty()));
+
+  // add version to request
+  AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
+      &hrb, AZ_HTTP_HEADER_API_VERSION, AZ_STORAGE_BLOBS_BLOB_API_VERSION));
 
   // start pipeline
   return az_http_pipeline_process(&client->pipeline, &hrb, response);

@@ -18,6 +18,8 @@
 
 #include <_az_cfg_prefix.h>
 
+static az_span const AZ_STORAGE_BLOBS_BLOB_API_VERSION = AZ_CONST_STR("2017-11-09");
+
 static az_span const AZ_STORAGE_BLOBS_BLOB_HEADER_X_MS_BLOB_TYPE = AZ_CONST_STR("x-ms-blob-type");
 static az_span const AZ_STORAGE_BLOBS_BLOB_TYPE_APPENDBLOB = AZ_CONST_STR("AppendBlob");
 static az_span const AZ_STORAGE_BLOBS_BLOB_TYPE_BLOCKBLOB = AZ_CONST_STR("BlockBlob");
