@@ -39,7 +39,7 @@ When following previous steps to set up CURL with VCPKG, open project forlder wi
 ##### steps to build
 ```
 mkdir build
-build
+cd build
 cmake ../
 make
 ```
