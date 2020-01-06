@@ -18,7 +18,7 @@ void az_create_key_options_test() {
     TEST_ASSERT(
         az_keyvault_create_key_options_append_operation(&options, az_keyvault_key_operation_sign())
         == AZ_OK)
-    TEST_ASSERT(options.operations.size == 1)
+    TEST_ASSERT(options.operations.length == 1)
     TEST_ASSERT(
         az_span_is_equal(options.operations.buffer.begin[0], az_keyvault_key_operation_sign()))
 
