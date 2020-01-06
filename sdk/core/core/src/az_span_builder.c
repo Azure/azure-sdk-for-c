@@ -66,10 +66,10 @@ AZ_NODISCARD az_result
 az_span_builder_append_zeros(az_span_builder * const self, size_t const size) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
-  az_mut_span const span = az_mut_span_take(az_mut_span_drop(self->buffer, self->size), size);
+  az_mut_span const span = az_mut_span_take(az_mut_span_drop(self->buffer, self->length), size);
   if (span.size != size) {
     return AZ_ERROR_BUFFER_OVERFLOW;
   }
-  az_mut_span_memset(span, 0);
+  az_mut_span_fill(span, 0);
   return AZ_OK;
 }

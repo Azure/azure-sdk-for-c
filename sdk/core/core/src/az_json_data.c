@@ -33,10 +33,10 @@ AZ_NODISCARD az_result _az_span_builder_aligned_append(
     uint8_t ** const out) {
   // alignment.
   {
-    uint8_t * const p = builder->buffer.begin + builder->size;
+    uint8_t * const p = builder->buffer.begin + builder->length;
     AZ_RETURN_IF_FAILED(az_span_builder_append_zeros(builder, _az_align_ceil(p, data.align) - p));
   }
-  *out = builder->buffer.begin + builder->size;
+  *out = builder->buffer.begin + builder->length;
   return az_span_builder_append(builder, data.span);
 }
 
@@ -48,7 +48,7 @@ _az_span_builder_top_aligned_append(az_span_builder * const builder, az_data con
   }
   uint8_t * const begin = builder->buffer.begin;
   uint8_t * const end = _az_align_floor(begin + size - data.span.size, data.align);
-  if (end < begin + builder->size) {
+  if (end < begin + builder->length) {
     return AZ_ERROR_BUFFER_OVERFLOW;
   }
   size_t const new_size = end - begin;
@@ -84,7 +84,7 @@ AZ_NODISCARD az_result _az_span_builder_top_array_revert(
         = az_mut_span_take(az_mut_span_drop(buffer, offset + i * item_size), item_size);
     az_mut_span const b = az_mut_span_take(
         az_mut_span_drop(buffer, offset + (item_count - i - 1) * item_size), item_size);
-    AZ_RETURN_IF_FAILED(az_mut_span_swap(a, b));
+    az_mut_span_swap(a, b);
   }
 
   // 2. move it to front.
@@ -132,7 +132,7 @@ AZ_NODISCARD az_result _az_span_builder_write_json_value(
     case AZ_JSON_TOKEN_STRING: {
       // TODO: escape symbols.
       *out = az_json_data_string(
-          (az_span){ .begin = builder->buffer.begin + builder->size, token.data.string.size });
+          (az_span){ .begin = builder->buffer.begin + builder->length, token.data.string.size });
       AZ_RETURN_IF_FAILED(az_span_builder_append(builder, token.data.string));
       break;
     }
