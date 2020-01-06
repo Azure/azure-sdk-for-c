@@ -12,7 +12,7 @@ static void test_span_span() {
     az_span_span_builder span_span_builder
         = az_span_span_builder_create((az_mut_span_span)AZ_SPAN_FROM_ARRAY(src_buffer));
 
-    TEST_ASSERT(span_span_builder.size == 0);
+    TEST_ASSERT(span_span_builder.length == 0);
 
     // append span
     az_span add_this_span = AZ_STR("Something to test");
@@ -31,7 +31,7 @@ static void test_span_span() {
     TEST_ASSERT(a3 == AZ_OK);
     TEST_ASSERT(a4 == AZ_OK);
 
-    TEST_ASSERT(span_span_builder.size == 4);
+    TEST_ASSERT(span_span_builder.length == 4);
 
     TEST_ASSERT(az_span_is_equal(src_buffer[0], add_this_span));
     TEST_ASSERT(az_span_is_equal(src_buffer[1], add_this_span2));

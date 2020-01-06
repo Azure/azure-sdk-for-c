@@ -78,7 +78,7 @@ int main() {
 
   // Reuse response buffer for create Key by creating a new span from response_buffer
   az_result reset_op = az_http_response_reset(&http_response);
-  az_mut_span_memset(http_response.builder.buffer, '.');
+  az_mut_span_fill(http_response.builder.buffer, '.');
 
   /******************  GET KEY latest ver ******************************/
   az_result get_key_result = az_keyvault_keys_key_get(
@@ -97,7 +97,7 @@ int main() {
 
   // Reuse response buffer for delete Key by creating a new span from response_buffer
   reset_op = az_http_response_reset(&http_response);
-  az_mut_span_memset(http_response.builder.buffer, '.');
+  az_mut_span_fill(http_response.builder.buffer, '.');
 
   /*********************  Create a new key version (use default options) *************/
   az_result create_version_result = az_keyvault_keys_key_create(
@@ -109,7 +109,7 @@ int main() {
 
   // Reuse response buffer for delete Key by creating a new span from response_buffer
   reset_op = az_http_response_reset(&http_response);
-  az_mut_span_memset(http_response.builder.buffer, '.');
+  az_mut_span_fill(http_response.builder.buffer, '.');
 
   /******************  GET KEY previous ver ******************************/
   az_result get_key_prev_ver_result
@@ -125,7 +125,7 @@ int main() {
 
   // Reuse response buffer for create Key by creating a new span from response_buffer
   reset_op = az_http_response_reset(&http_response);
-  az_mut_span_memset(http_response.builder.buffer, '.');
+  az_mut_span_fill(http_response.builder.buffer, '.');
 
   /******************  GET KEY (should return failed response ) ******************************/
   az_result get_key_again_result = az_keyvault_keys_key_get(
