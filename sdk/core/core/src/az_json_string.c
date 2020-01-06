@@ -74,7 +74,7 @@ AZ_NODISCARD az_span az_json_esc_encode(az_result_byte const c) {
       return AZ_STR("\\t");
     }
     default: {
-      return az_span_create_empty();
+      return az_span_empty();
     }
   }
 }

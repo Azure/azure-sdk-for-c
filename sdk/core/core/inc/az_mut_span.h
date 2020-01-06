@@ -26,7 +26,7 @@ typedef struct {
 
 AZ_NODISCARD AZ_INLINE az_mut_span az_mut_span_create_empty() { return (az_mut_span){ 0 }; }
 
-AZ_NODISCARD AZ_INLINE bool az_mut_span_is_empty(az_mut_span const span) { return span.size <= 0; }
+AZ_NODISCARD AZ_INLINE bool az_mut_span_is_empty(az_mut_span const span) { return span.size == 0; }
 
 AZ_NODISCARD AZ_INLINE bool az_mut_span_is_valid(az_mut_span const span) {
   return span.size == 0 || (span.begin != NULL && span.begin <= span.begin + span.size - 1);

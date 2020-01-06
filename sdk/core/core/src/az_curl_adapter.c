@@ -5,6 +5,7 @@
 
 #include <az_curl_slist.h>
 #include <az_http_request.h>
+#include <az_span.h>
 #include <az_span_malloc.h>
 #include <az_str.h>
 
@@ -126,7 +127,7 @@ size_t write_to_span(
   size_t const expected_size = size * nmemb;
   az_span_builder * const user_buffer_builder = (az_span_builder *)userp;
 
-  az_span const span_for_content = (az_span){ .begin = contents, .size = expected_size };
+  az_span const span_for_content = az_span_from_runtime_array(contents, expected_size);
   AZ_RETURN_IF_FAILED(az_span_builder_append(user_buffer_builder, span_for_content));
 
   // This callback needs to return the response size or curl will consider it as it failed
@@ -300,11 +301,11 @@ AZ_NODISCARD az_result az_http_client_send_request_impl_process(
 
   AZ_RETURN_IF_CURL_FAILED(setup_response_redirect(p_curl, &response->builder, buildRFC7230));
 
-  if (az_span_eq(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_GET)) {
+  if (az_span_is_equal(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_GET)) {
     result = az_curl_send_get_request(p_curl);
-  } else if (az_span_eq(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_POST)) {
+  } else if (az_span_is_equal(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_POST)) {
     result = az_curl_send_post_request(p_curl, p_hrb);
-  } else if (az_span_eq(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_DELETE)) {
+  } else if (az_span_is_equal(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_DELETE)) {
     result = az_curl_send_delete_request(p_curl, p_hrb);
   }
 

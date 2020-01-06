@@ -34,7 +34,7 @@ int main() {
 
       az_span result = az_span_builder_result(&json_builder);
 
-      TEST_ASSERT(az_span_eq(result, expected));
+      TEST_ASSERT(az_span_is_equal(result, expected));
     }
     {
       az_keyvault_create_key_options options = { 0 };
@@ -56,7 +56,7 @@ int main() {
 
       az_span result = az_span_builder_result(&json_builder);
 
-      TEST_ASSERT(az_span_eq(result, expected));
+      TEST_ASSERT(az_span_is_equal(result, expected));
     }
     {
       az_keyvault_create_key_options options = { 0 };
@@ -78,7 +78,7 @@ int main() {
 
       az_span result = az_span_builder_result(&json_builder);
 
-      TEST_ASSERT(az_span_eq(result, expected));
+      TEST_ASSERT(az_span_is_equal(result, expected));
     }
   }
   az_create_key_options_test();

@@ -33,10 +33,10 @@ static void test_span_span() {
 
     TEST_ASSERT(span_span_builder.length == 4);
 
-    TEST_ASSERT(az_span_eq(src_buffer[0], add_this_span));
-    TEST_ASSERT(az_span_eq(src_buffer[1], add_this_span2));
-    TEST_ASSERT(az_span_eq(src_buffer[2], add_this_span3));
-    TEST_ASSERT(az_span_eq(src_buffer[3], add_this_span4));
+    TEST_ASSERT(az_span_is_equal(src_buffer[0], add_this_span));
+    TEST_ASSERT(az_span_is_equal(src_buffer[1], add_this_span2));
+    TEST_ASSERT(az_span_is_equal(src_buffer[2], add_this_span3));
+    TEST_ASSERT(az_span_is_equal(src_buffer[3], add_this_span4));
 
     az_result a5 = az_span_span_builder_append(&span_span_builder, add_this_span5);
 

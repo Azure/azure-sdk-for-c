@@ -333,7 +333,7 @@ AZ_NODISCARD az_result az_http_response_get_header_by_name(
     az_pair header;
     // Return if either there is no more items (AZ_ERROR_ITEM_NO_MORE_ITEMS) or an error.
     AZ_RETURN_IF_FAILED(az_http_response_parser_read_header(&parser, &header));
-    if (az_span_eq_ascii_ignore_case(header_name, header.key)) {
+    if (az_span_is_equal_ignoring_case(header_name, header.key)) {
       *header_value = header.value;
       return AZ_OK;
     }
