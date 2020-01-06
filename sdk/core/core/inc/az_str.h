@@ -17,7 +17,7 @@
 #define AZ_STRING_LITERAL_LEN(S) (sizeof(S "") - 1)
 
 /**
- * Creates a span which can be used inside constant initializers. Fro example
+ * Creates a span which can be used inside constant initializers. For example
  *
  * `static az_const_span foo[] = { AZ_CONST_STR("Hello"), AZ_CONST_STR("world!") };`
  */
