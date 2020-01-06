@@ -108,12 +108,22 @@ AZ_NODISCARD az_result az_span_to_uint64(az_span const self, uint64_t * const ou
   { .begin = ARRAY, .size = (sizeof(ARRAY) / sizeof(*ARRAY)) }
 
 /**
+ * @brief Use this function when size for one span is given in runtime
+ * Don't use this function for arrays. Use @var AZ_SPAN_FROM_ARRAY instead.
+ *
+ */
+AZ_NODISCARD AZ_INLINE az_span az_span_from_runtime_array(uint8_t const * ptr, size_t size) {
+  return (az_span){ .begin = ptr, .size = size };
+}
+
+/**
  * @brief Use this only to create a span from uint8_t object.
  * The size of the returned span is always one.
  * Don't use this function for arrays. Use @var AZ_SPAN_FROM_ARRAY instead.
+ * Don't us
  */
-AZ_NODISCARD AZ_INLINE az_span az_span_from_one(uint8_t const * ptr) {
-  return (az_span){ .begin = ptr, .size = 1 };
+AZ_NODISCARD AZ_INLINE az_span az_span_from_single_item(uint8_t const * ptr) {
+  return az_span_from_runtime_array(ptr, 1);
 }
 
 /**
