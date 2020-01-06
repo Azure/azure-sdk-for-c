@@ -75,7 +75,8 @@ add_executable (
     test/test_json_builder.c
     test/test_json_get_by_pointer.c
     test/test_json_pointer.c
-    test/test_json_string.c  
+    test/test_json_string.c
+    test/test_mut_span.c
     test/test_url_parse.c
     )
 

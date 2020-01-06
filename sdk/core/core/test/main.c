@@ -33,6 +33,7 @@ void test_url_parse();
 void test_span_builder_replace();
 void test_span_span();
 void test_pair_span();
+void test_mut_span();
 
 int exit_code = 0;
 
@@ -740,5 +741,6 @@ int main() {
   test_span_builder_replace();
   test_span_span();
   test_pair_span();
+  test_mut_span();
   return exit_code;
 }
