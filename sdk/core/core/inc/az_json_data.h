@@ -4,7 +4,7 @@
 #ifndef AZ_JSON_DATA_H
 #define AZ_JSON_DATA_H
 
-#include <az_json_value.h>
+#include <az_json_token.h>
 
 #include <az_mut_span.h>
 

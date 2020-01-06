@@ -110,36 +110,36 @@ AZ_INLINE AZ_NODISCARD az_result _az_span_builder_append_json_data(
 AZ_NODISCARD az_result _az_span_builder_write_json_value(
     az_span_builder * const builder,
     az_json_parser * const parser,
-    az_json_value const value,
+    az_json_token const token,
     az_json_data * const out) {
   AZ_CONTRACT_ARG_NOT_NULL(builder);
   AZ_CONTRACT_ARG_NOT_NULL(parser);
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
-  switch (value.kind) {
-    case AZ_JSON_VALUE_NULL: {
+  switch (token.kind) {
+    case AZ_JSON_TOKEN_NULL: {
       *out = az_json_data_null();
       break;
     }
-    case AZ_JSON_VALUE_BOOLEAN: {
-      *out = az_json_data_boolean(value.data.boolean);
+    case AZ_JSON_TOKEN_BOOLEAN: {
+      *out = az_json_data_boolean(token.data.boolean);
       break;
     }
-    case AZ_JSON_VALUE_NUMBER: {
-      *out = az_json_data_number(value.data.number);
+    case AZ_JSON_TOKEN_NUMBER: {
+      *out = az_json_data_number(token.data.number);
       break;
     }
-    case AZ_JSON_VALUE_STRING: {
+    case AZ_JSON_TOKEN_STRING: {
       // TODO: escape symbols.
       *out = az_json_data_string(
-          (az_span){ .begin = builder->buffer.begin + builder->size, value.data.string.size });
-      AZ_RETURN_IF_FAILED(az_span_builder_append(builder, value.data.string));
+          (az_span){ .begin = builder->buffer.begin + builder->size, token.data.string.size });
+      AZ_RETURN_IF_FAILED(az_span_builder_append(builder, token.data.string));
       break;
     }
-    case AZ_JSON_VALUE_OBJECT: {
+    case AZ_JSON_TOKEN_OBJECT: {
       size_t const buffer_size = builder->buffer.size;
       while (true) {
-        az_json_member member;
+        az_json_token_member member;
         az_result const result = az_json_parser_read_object_member(parser, &member);
         if (result == AZ_ERROR_ITEM_NOT_FOUND) {
           break;
@@ -152,14 +152,19 @@ AZ_NODISCARD az_result _az_span_builder_write_json_value(
       void * p = { 0 };
       size_t i = 0;
       AZ_RETURN_IF_FAILED(_az_span_builder_top_array_revert(
-          builder, sizeof(az_json_member), AZ_ALIGNOF(az_json_member), buffer_size, &p, &i));
+          builder,
+          sizeof(az_json_object_member),
+          AZ_ALIGNOF(az_json_object_member),
+          buffer_size,
+          &p,
+          &i));
       *out = az_json_data_object((az_json_object){ .begin = p, .size = i });
       break;
     }
-    case AZ_JSON_VALUE_ARRAY: {
+    case AZ_JSON_TOKEN_ARRAY: {
       // TODO: copy array elements.
       *out = az_json_data_array((az_json_array){ .begin = NULL, .size = 0 });
-      AZ_RETURN_IF_FAILED(az_json_parser_skip(parser, value));
+      AZ_RETURN_IF_FAILED(az_json_parser_skip(parser, token));
       break;
     }
     default: {
@@ -175,9 +180,9 @@ az_json_to_data(az_span const json, az_mut_span const buffer, az_json_data const
 
   az_json_parser parser = az_json_parser_create(json);
   az_span_builder builder = az_span_builder_create(buffer);
-  az_json_value value = { 0 };
-  AZ_RETURN_IF_FAILED(az_json_parser_read(&parser, &value));
+  az_json_token token = { 0 };
+  AZ_RETURN_IF_FAILED(az_json_parser_read(&parser, &token));
   az_json_data data = { 0 };
-  AZ_RETURN_IF_FAILED(_az_span_builder_write_json_value(&builder, &parser, value, &data));
+  AZ_RETURN_IF_FAILED(_az_span_builder_write_json_value(&builder, &parser, token, &data));
   return _az_span_builder_append_json_data(&builder, data, out);
 }
