@@ -20,7 +20,7 @@
 
 typedef struct {
   az_span service_version;
-  az_keyvault_keys_client_options_retry retry;
+  az_http_policy_retry_options retry;
 } az_keyvault_keys_client_options;
 
 typedef struct {

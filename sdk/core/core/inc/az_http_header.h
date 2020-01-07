@@ -12,6 +12,13 @@
 
 #include <_az_cfg_prefix.h>
 
+static az_span const AZ_HTTP_HEADER_CONTENT_LENGTH = AZ_CONST_STR("Content-Length");
+static az_span const AZ_HTTP_HEADER_CONTENT_TYPE = AZ_CONST_STR("Content-Type");
+static az_span const AZ_HTTP_HEADER_TEXT_PLAIN_CHARSET_UTF_8 = AZ_CONST_STR("text/plain; charset=UTF-8");
+static az_span const AZ_HTTP_HEADER_X_MS_CLIENT_REQUESTID = AZ_CONST_STR("x-ms-client-request-id");
+static az_span const AZ_HTTP_HEADER_X_MS_DATE = AZ_CONST_STR("x-ms-date");
+static az_span const AZ_HTTP_HEADER_X_MS_VERSION = AZ_CONST_STR("x-ms-version");
+
 /**
  * Emits an HTTP header as a sequence of spans in a format "%{key}: %{value}"
  */
