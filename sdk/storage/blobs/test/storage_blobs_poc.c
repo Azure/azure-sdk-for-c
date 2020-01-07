@@ -6,6 +6,8 @@
 #include <az_json_get.h>
 #include <az_storage_blobs.h>
 
+#include <stdlib.h>
+
 #include <_az_cfg.h>
 
 #define TENANT_ID_ENV "tenant_id"

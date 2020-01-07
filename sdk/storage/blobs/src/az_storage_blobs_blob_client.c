@@ -1,7 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_http_header.h>
+#include "../inc/internal/az_contract.h"
+#include "../inc/internal/az_http_header.h"
 #include <az_json_builder.h>
 #include <az_storage_blobs.h>
 
@@ -56,7 +57,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
       &hrb, AZ_STORAGE_BLOBS_BLOB_HEADER_X_MS_BLOB_TYPE, client->blob_type));
 
   // add date to request
-  //AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
+  // AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
   //    &hrb, AZ_HTTP_HEADER_X_MS_DATE, AZ_STR("Fri, 03 Jan 2020 21:33:15 GMT")));
 
   uint8_t str[256] = { 0 };
@@ -67,7 +68,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
   AZ_RETURN_IF_FAILED(
       az_http_request_builder_append_header(&hrb, AZ_HTTP_HEADER_CONTENT_LENGTH, content_length));
 
-    // add blob type to request
+  // add blob type to request
   AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
       &hrb, AZ_HTTP_HEADER_CONTENT_TYPE, AZ_STR("text/plain")));
 

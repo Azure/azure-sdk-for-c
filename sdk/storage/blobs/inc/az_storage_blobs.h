@@ -4,7 +4,6 @@
 #ifndef AZ_STORAGE_BLOBS_H
 #define AZ_STORAGE_BLOBS_H
 
-#include <az_contract.h>
 #include <az_http_pipeline.h>
 #include <az_http_policy.h>
 #include <az_http_response.h>

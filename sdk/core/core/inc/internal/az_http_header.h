@@ -4,17 +4,20 @@
 #ifndef AZ_HTTP_HEADER_H
 #define AZ_HTTP_HEADER_H
 
+#include "_az_pair.h"
+#include "_az_span.h"
+#include "az_span_writer.h"
 #include <az_action.h>
-#include <az_pair.h>
 #include <az_result.h>
-#include <az_span.h>
-#include <az_span_writer.h>
+#include <az_span_action.h>
+#include <az_str.h>
 
 #include <_az_cfg_prefix.h>
 
 static az_span const AZ_HTTP_HEADER_CONTENT_LENGTH = AZ_CONST_STR("Content-Length");
 static az_span const AZ_HTTP_HEADER_CONTENT_TYPE = AZ_CONST_STR("Content-Type");
-static az_span const AZ_HTTP_HEADER_TEXT_PLAIN_CHARSET_UTF_8 = AZ_CONST_STR("text/plain; charset=UTF-8");
+static az_span const AZ_HTTP_HEADER_TEXT_PLAIN_CHARSET_UTF_8
+    = AZ_CONST_STR("text/plain; charset=UTF-8");
 static az_span const AZ_HTTP_HEADER_X_MS_CLIENT_REQUESTID = AZ_CONST_STR("x-ms-client-request-id");
 static az_span const AZ_HTTP_HEADER_X_MS_DATE = AZ_CONST_STR("x-ms-date");
 static az_span const AZ_HTTP_HEADER_X_MS_VERSION = AZ_CONST_STR("x-ms-version");

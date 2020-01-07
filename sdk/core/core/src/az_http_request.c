@@ -1,11 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_http_request.h>
-
-#include <az_http_query.h>
-#include <az_http_header.h>
-#include <az_contract.h>
+#include "../inc/internal/az_http_request.h"
+#include "../inc/internal/_az_span_builder.h"
+#include "../inc/internal/az_http_header.h"
+#include "../inc/internal/az_http_query.h"
 #include <az_span_builder.h>
 #include <az_span_writer.h>
 #include <az_str.h>
@@ -27,8 +26,9 @@ az_http_header_line(az_span_action const * const write_span, az_pair const heade
 
 AZ_ACTION_FUNC(az_http_header_line, az_span_action const, az_pair_action)
 
-AZ_NODISCARD az_result
-az_http_request_as_span_writer(az_http_request const * const self, az_span_action const write_span) {
+AZ_NODISCARD az_result az_http_request_as_span_writer(
+    az_http_request const * const self,
+    az_span_action const write_span) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
   // a request line
