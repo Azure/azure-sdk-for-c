@@ -26,7 +26,6 @@ static az_span const AZ_STORAGE_BLOBS_BLOB_TYPE_BLOCKBLOB = AZ_CONST_STR("BlockB
 static az_span const AZ_STORAGE_BLOBS_BLOB_TYPE_PAGEBLOB = AZ_CONST_STR("PageBlob");
 
 typedef struct {
-  az_span service_version;
   az_http_policy_retry_options retry;
 } az_storage_blobs_blob_client_options;
 
@@ -119,38 +118,6 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
     az_storage_blobs_blob_client * client,
     az_span content, /* Buffer of content*/
     az_storage_blobs_blob_upload_options * const options,
-    az_http_response * const response);
-
-// TODO: IOT customers want to be able to resume
-
-/**
- * @brief Gets a blob
- *
- * @param client a storage blobs client structure
- * @param blob_name name of blob to be retrieved
- * @param response a pre allocated buffer where to write http response
- * @return AZ_NODISCARD az_storage_blobs_blob_get
- */
-AZ_NODISCARD az_result az_storage_blobs_blob_download(
-    az_storage_blobs_blob_client * client,
-    az_span_builder content,
-    az_storage_blobs_blob_download_options options,
-    az_http_response * const response);
-
-// Http header supported
-//   Range header as option for get
-//
-
-/**
- * @brief Deletes a blob
- *
- * @param client a storage blobs client structure
- * @param blob_name name of the blob to be deleted
- * @param response a pre allocated buffer where to write http response
- * @return AZ_NODISCARD az_storage_blobs_blob_delete
- */
-AZ_NODISCARD az_result az_storage_blobs_blob_delete(
-    az_storage_blobs_blob_client * client,
     az_http_response * const response);
 
 #include <_az_cfg_suffix.h>
