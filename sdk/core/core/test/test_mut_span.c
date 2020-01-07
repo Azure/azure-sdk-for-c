@@ -11,10 +11,21 @@
 void test_mut_span() {
   // swap
   {
-    az_mut_span const a = AZ_CONST_STR("Hello world!");
-    az_mut_span const b = AZ_CONST_STR("Goodbye!");
+    uint8_t a_array[] = "Hello world!";
+    uint8_t b_array[] = "Goodbye!";
+    az_mut_span const a = AZ_SPAN_FROM_ARRAY(a_array);
+    az_mut_span const b = AZ_SPAN_FROM_ARRAY(b_array);
     az_mut_span_swap(a, b);
-    TEST_ASSERT(az_span_is_equal(az_mut_span_to_span(a), AZ_STR("Goodbye!rld!")));
-    TEST_ASSERT(az_span_is_equal(az_mut_span_to_span(b), AZ_STR("Hello wo")));
+    TEST_ASSERT(az_span_is_equal(az_mut_span_to_span(a), AZ_STR("Goodbye!\0ld!\0")));
+    TEST_ASSERT(az_span_is_equal(az_mut_span_to_span(b), AZ_STR("Hello wor")));
+  }
+  // swap an empty span
+  {
+    uint8_t a_array[] = "Hello world!";
+    az_mut_span const a = AZ_SPAN_FROM_ARRAY(a_array);
+    az_mut_span const b = { 0 };
+    az_mut_span_swap(a, b);
+    TEST_ASSERT(az_span_is_equal(az_mut_span_to_span(a), AZ_STR("Hello world!\0")));
+    TEST_ASSERT(az_span_is_equal(az_mut_span_to_span(b), AZ_STR("")));
   }
 }
