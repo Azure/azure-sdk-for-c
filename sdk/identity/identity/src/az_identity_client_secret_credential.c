@@ -3,7 +3,9 @@
 
 #include <az_identity_client_secret_credential.h>
 
-#include <az_contract.h>
+#include "../inc/internal/_az_mut_span.h"
+#include "../inc/internal/_az_span.h"
+#include "../inc/internal/az_contract.h"
 #include <az_http_pipeline.h>
 #include <az_http_request_builder.h>
 #include <az_http_response_parser.h>
@@ -16,6 +18,9 @@
 #include <az_url.h>
 
 #include <_az_cfg.h>
+
+#define AZ_CONTRACT_ARG_VALID_MUT_SPAN(span) AZ_CONTRACT(az_mut_span_is_valid(span), AZ_ERROR_ARG)
+#define AZ_CONTRACT_ARG_VALID_SPAN(span) AZ_CONTRACT(az_span_is_valid(span), AZ_ERROR_ARG)
 
 enum {
   _az_IDENTITY_CLIENT_SECRET_CREDENTIAL_RESPONSE_BUF_SIZE = 5 * (1024 / 2),
@@ -260,4 +265,31 @@ AZ_NODISCARD az_result az_identity_client_secret_credential_init(
   return _az_identity_credential_init(
       &(self->_credential),
       (az_identity_credential_func)_az_identity_client_secret_credential_credential_func);
+}
+
+AZ_NODISCARD az_result az_identity_access_token_context_init(
+    az_identity_access_token_context * const self,
+    void const * const credential,
+    az_identity_access_token * const token,
+    az_span const scope) {
+  AZ_CONTRACT_ARG_NOT_NULL(self);
+  AZ_CONTRACT_ARG_NOT_NULL(credential);
+  AZ_CONTRACT_ARG_NOT_NULL(((az_identity_credential const *)credential)->_func);
+  AZ_CONTRACT_ARG_NOT_NULL(token);
+  AZ_CONTRACT_ARG_VALID_SPAN(scope);
+
+  *self = (az_identity_access_token_context){
+    ._credential_func = ((az_identity_credential const *)credential)->_func,
+    ._credential = credential,
+    ._token = token,
+    ._scope = scope,
+  };
+
+  return AZ_OK;
+}
+
+AZ_NODISCARD az_result az_identity_access_token_init(az_identity_access_token * const self) {
+  AZ_CONTRACT_ARG_NOT_NULL(self);
+  *self = (az_identity_access_token){ 0 };
+  return AZ_OK;
 }

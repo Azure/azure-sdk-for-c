@@ -1,10 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include "../inc/internal/_az_span_builder.h"
+#include "../inc/internal/az_span_writer.h"
 #include <az_json_builder.h>
 #include <az_span.h>
 #include <az_span_builder.h>
-#include <az_span_writer.h>
 
 #include "./az_test.h"
 

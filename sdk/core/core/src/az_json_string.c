@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include "../inc/internal/az_contract.h"
 #include <az_json_string.h>
 
 #include <az_hex.h>
@@ -73,9 +74,7 @@ AZ_NODISCARD az_span az_json_esc_encode(az_result_byte const c) {
     case '\t': {
       return AZ_STR("\\t");
     }
-    default: {
-      return az_span_empty();
-    }
+    default: { return az_span_empty(); }
   }
 }
 

@@ -12,6 +12,7 @@
 #include <_az_cfg.h>
 
 az_span const AZ_HTTP_REQUEST_BUILDER_HEADER_SEPARATOR = AZ_CONST_STR(": ");
+az_span const AZ_STR_ZERO = AZ_CONST_STR("\0");
 
 /**
  * @brief writes a header key and value to a buffer as a 0-terminated string and using a separator
@@ -343,4 +344,13 @@ AZ_NODISCARD az_result az_http_client_send_request_impl(
   AZ_RETURN_IF_FAILED(az_curl_done(&p_curl));
 
   return process_result;
+}
+
+AZ_NODISCARD az_result az_curl_done(CURL ** const pp) {
+  AZ_CONTRACT_ARG_NOT_NULL(pp);
+  AZ_CONTRACT_ARG_NOT_NULL(*pp);
+
+  curl_easy_cleanup(*pp);
+  *pp = NULL;
+  return AZ_OK;
 }

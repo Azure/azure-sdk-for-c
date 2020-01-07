@@ -3,7 +3,8 @@
 
 #include <az_uri.h>
 
-#include <az_contract.h>
+#include "../inc/internal/_az_span.h"
+#include "../inc/internal/az_contract.h"
 #include <az_hex.h>
 
 #include <assert.h>
@@ -11,6 +12,8 @@
 #include <stdbool.h>
 
 #include <_az_cfg.h>
+
+#define AZ_CONTRACT_ARG_VALID_SPAN(span) AZ_CONTRACT(az_span_is_valid(span), AZ_ERROR_ARG)
 
 AZ_NODISCARD AZ_INLINE bool should_encode(uint8_t const c) {
   switch (c) {

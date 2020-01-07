@@ -4,7 +4,7 @@
 #ifndef AZ_IDENTITY_CREDENTIAL_H
 #define AZ_IDENTITY_CREDENTIAL_H
 
-#include <az_contract.h>
+#include "../inc/internal/az_contract.h"
 #include <az_http_request_builder.h>
 #include <az_result.h>
 

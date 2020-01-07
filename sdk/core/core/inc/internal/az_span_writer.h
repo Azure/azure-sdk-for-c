@@ -4,9 +4,11 @@
 #ifndef AZ_SPAN_WRITER_H
 #define AZ_SPAN_WRITER_H
 
-#include <az_action.h>
+#include "_az_span.h"
+#include "_az_str.h"
+#include "az_action.h"
 #include <az_result.h>
-#include <az_span.h>
+#include <az_span_action.h>
 #include <az_span_span.h>
 #include <az_str.h>
 

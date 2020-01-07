@@ -4,7 +4,6 @@
 #ifndef AZ_SPAN_BUILDER_H
 #define AZ_SPAN_BUILDER_H
 
-#include <az_action.h>
 #include <az_mut_span.h>
 #include <az_span.h>
 
@@ -70,8 +69,6 @@ AZ_NODISCARD az_result az_span_builder_append(az_span_builder * const self, az_s
  * Append a single byte.
  */
 AZ_NODISCARD az_result az_span_builder_append_byte(az_span_builder * const self, uint8_t const c);
-
-AZ_ACTION_FUNC(az_span_builder_append, az_span_builder, az_span_action)
 
 /**
  * Replace all contents from a starting position to an end position with the content of a provided

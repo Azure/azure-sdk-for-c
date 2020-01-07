@@ -4,8 +4,9 @@
 #ifndef AZ_HTTP_REQUEST_H
 #define AZ_HTTP_REQUEST_H
 
-#include <az_pair.h>
-#include <az_span.h>
+#include "_az_pair.h"
+#include "_az_span.h"
+#include <az_span_action.h>
 
 #include <_az_cfg_prefix.h>
 

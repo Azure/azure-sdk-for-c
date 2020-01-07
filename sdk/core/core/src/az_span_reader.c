@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include "../inc/internal/az_contract.h"
 #include <az_span_reader.h>
 
 #include <ctype.h>
@@ -17,9 +18,7 @@ az_span_reader_expect_char(az_span_reader * const p_reader, uint8_t const expect
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_span_reader_expect_span(
-    az_span_reader * const self,
-    az_span const span) {
+AZ_NODISCARD az_result az_span_reader_expect_span(az_span_reader * const self, az_span const span) {
   az_span_reader k = az_span_reader_create(span);
   while (true) {
     az_result_byte const ko = az_span_reader_current(&k);
@@ -39,5 +38,12 @@ az_span_reader_expect_digit(az_span_reader * const self, uint8_t * const digit) 
   }
   *digit = (uint8_t)(c - '0');
   az_span_reader_next(self);
+  return AZ_OK;
+}
+
+AZ_NODISCARD az_result az_span_reader_set_pos(az_span_reader * const p_reader, size_t const i) {
+  AZ_CONTRACT(i <= p_reader->span.size, AZ_ERROR_ARG);
+
+  p_reader->i = i;
   return AZ_OK;
 }

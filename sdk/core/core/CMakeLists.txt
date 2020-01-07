@@ -30,6 +30,7 @@ add_library (
   src/az_json_pointer.c
   src/az_json_string.c
   src/az_json_token.c
+  src/az_mut_span.c
   src/az_pair.c
   src/az_span.c
   src/az_span_builder.c
@@ -37,7 +38,6 @@ add_library (
   src/az_span_span.c
   src/az_span_reader.c
   src/az_span_writer.c
-  src/az_str.c
   src/az_uri.c
   src/az_url.c
   )
@@ -63,6 +63,7 @@ else()
 endif()
 
 target_include_directories (az_core PUBLIC inc)
+target_include_directories (az_core PRIVATE inc/internal)
 
 # make sure that users can consume the project as a library.
 add_library (az::core ALIAS az_core)

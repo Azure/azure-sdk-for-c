@@ -3,11 +3,17 @@
 
 #include <az_json_get.h>
 
+#include "../inc/internal/_az_mut_span.h"
+#include "../inc/internal/_az_span.h"
+#include "../inc/internal/az_contract.h"
 #include <az_json_parser.h>
 #include <az_json_pointer.h>
 #include <az_json_string.h>
 
 #include <_az_cfg.h>
+
+#define AZ_CONTRACT_ARG_VALID_MUT_SPAN(span) AZ_CONTRACT(az_mut_span_is_valid(span), AZ_ERROR_ARG)
+#define AZ_CONTRACT_ARG_VALID_SPAN(span) AZ_CONTRACT(az_span_is_valid(span), AZ_ERROR_ARG)
 
 AZ_NODISCARD bool az_json_pointer_token_eq_json_string(
     az_span const pointer_token,

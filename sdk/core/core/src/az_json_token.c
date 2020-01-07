@@ -1,9 +1,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include "../inc/internal/_az_mut_span.h"
+#include "../inc/internal/_az_span.h"
+#include "../inc/internal/az_contract.h"
 #include <az_json_token.h>
 
 #include <_az_cfg.h>
+
+#define AZ_CONTRACT_ARG_VALID_MUT_SPAN(span) AZ_CONTRACT(az_mut_span_is_valid(span), AZ_ERROR_ARG)
+#define AZ_CONTRACT_ARG_VALID_SPAN(span) AZ_CONTRACT(az_span_is_valid(span), AZ_ERROR_ARG)
 
 AZ_NODISCARD az_result az_json_token_get_boolean(az_json_token const self, bool * const out) {
   AZ_CONTRACT_ARG_NOT_NULL(out);
@@ -27,8 +33,7 @@ AZ_NODISCARD az_result az_json_token_get_string(az_json_token const self, az_spa
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result
-az_json_token_get_number(az_json_token const self, double * const out) {
+AZ_NODISCARD az_result az_json_token_get_number(az_json_token const self, double * const out) {
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
   if (self.kind != AZ_JSON_TOKEN_NUMBER) {

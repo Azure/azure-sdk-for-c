@@ -30,14 +30,7 @@ AZ_NODISCARD AZ_INLINE az_result az_curl_init(CURL ** const out) {
   return AZ_OK;
 }
 
-AZ_NODISCARD AZ_INLINE az_result az_curl_done(CURL ** const pp) {
-  AZ_CONTRACT_ARG_NOT_NULL(pp);
-  AZ_CONTRACT_ARG_NOT_NULL(*pp);
-
-  curl_easy_cleanup(*pp);
-  *pp = NULL;
-  return AZ_OK;
-}
+AZ_NODISCARD az_result az_curl_done(CURL ** const pp);
 
 AZ_NODISCARD az_result az_http_client_send_request_impl(
     az_http_request_builder * const p_hrb,

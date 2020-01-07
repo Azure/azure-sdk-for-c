@@ -3,11 +3,16 @@
 
 #include <az_base64.h>
 
-#include <az_contract.h>
+#include "../inc/internal/_az_mut_span.h"
+#include "../inc/internal/_az_span.h"
+#include "../inc/internal/az_contract.h"
 
 #include <assert.h>
 
 #include <_az_cfg.h>
+
+#define AZ_CONTRACT_ARG_VALID_MUT_SPAN(span) AZ_CONTRACT(az_mut_span_is_valid(span), AZ_ERROR_ARG)
+#define AZ_CONTRACT_ARG_VALID_SPAN(span) AZ_CONTRACT(az_span_is_valid(span), AZ_ERROR_ARG)
 
 enum {
   TRIBYTE_OCTETS = 3,
@@ -159,10 +164,10 @@ AZ_NODISCARD az_result az_base64_encode(
       assert(sxt + TRIBYTE_SEXTET2_INDEX < result_size);
       buffer.begin[sxt + TRIBYTE_SEXTET2_INDEX] = (oct + TRIBYTE_OCTET1_INDEX < input.size)
           ? uint6_as_base64(
-              base64url,
-              (uint8_t)(
-                  ((octet1 & TRIBYTE_OCTET1_SEXTET2_MASK) << TRIBYTE_OCTET1_SEXTET2_LSHIFT)
-                  | ((octet2 & TRIBYTE_OCTET2_SEXTET2_MASK) >> TRIBYTE_OCTET2_SEXTET2_RSHIFT)))
+                base64url,
+                (uint8_t)(
+                    ((octet1 & TRIBYTE_OCTET1_SEXTET2_MASK) << TRIBYTE_OCTET1_SEXTET2_LSHIFT)
+                    | ((octet2 & TRIBYTE_OCTET2_SEXTET2_MASK) >> TRIBYTE_OCTET2_SEXTET2_RSHIFT)))
           : BASE64_PADDING_CHAR;
     }
 

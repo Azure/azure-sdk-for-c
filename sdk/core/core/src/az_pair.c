@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include "../inc/internal/_az_pair.h"
 #include <az_pair.h>
 
 #include <_az_cfg.h>

@@ -4,7 +4,6 @@
 #ifndef AZ_IDENTITY_ACCESS_TOKEN_H
 #define AZ_IDENTITY_ACCESS_TOKEN_H
 
-#include <az_contract.h>
 #include <az_result.h>
 
 #include <stddef.h>
@@ -23,12 +22,7 @@ typedef struct {
   uint8_t _token_buf[_az_IDENTITY_ACCESS_TOKEN_TOKEN_BUF_SIZE];
 } az_identity_access_token;
 
-AZ_INLINE AZ_NODISCARD az_result
-az_identity_access_token_init(az_identity_access_token * const self) {
-  AZ_CONTRACT_ARG_NOT_NULL(self);
-  *self = (az_identity_access_token){ 0 };
-  return AZ_OK;
-}
+AZ_NODISCARD az_result az_identity_access_token_init(az_identity_access_token * const self);
 
 #include <_az_cfg_suffix.h>
 

@@ -1,7 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include "../inc/internal/_az_pair.h"
+#include "../inc/internal/_az_span.h"
 #include <az_http_query.h>
+#include <az_span_action.h>
 
 #include <az_str.h>
 
@@ -36,7 +39,8 @@ AZ_ACTION_FUNC(az_http_query_param, az_http_query_state, az_pair_action)
  *
  * Note: currently, the function assumes that pair.key and pair.value encoded into URL format.
  */
-AZ_NODISCARD az_result az_http_query_param(az_http_query_state * const p_state, az_pair const query_param) {
+AZ_NODISCARD az_result
+az_http_query_param(az_http_query_state * const p_state, az_pair const query_param) {
   AZ_CONTRACT_ARG_NOT_NULL(p_state);
 
   az_span_action const write_span = p_state->write_span;

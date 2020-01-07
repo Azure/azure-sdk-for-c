@@ -4,13 +4,21 @@
 #ifndef AZ_ACTION_H
 #define AZ_ACTION_H
 
-#include <az_contract.h>
 #include <az_result.h>
 #include <az_static_assert.h>
 
 #include <stddef.h>
 
 #include <_az_cfg_prefix.h>
+
+#define AZ_CONTRACT(condition, error) \
+  do { \
+    if (!(condition)) { \
+      return error; \
+    } \
+  } while (0)
+
+#define AZ_CONTRACT_ARG_NOT_NULL(arg) AZ_CONTRACT((arg) != NULL, AZ_ERROR_ARG)
 
 #define AZ_CAT(A, B) A##B
 

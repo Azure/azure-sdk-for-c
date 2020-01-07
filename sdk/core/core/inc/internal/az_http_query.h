@@ -4,9 +4,10 @@
 #ifndef AZ_HTTP_QUERY_H
 #define AZ_HTTP_QUERY_H
 
-#include <az_pair.h>
+#include "_az_pair.h"
+#include "_az_span.h"
 #include <az_result.h>
-#include <az_span.h>
+#include <az_span_action.h>
 
 #include <_az_cfg_prefix.h>
 

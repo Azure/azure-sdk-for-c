@@ -3,12 +3,17 @@
 
 #include <az_http_request_builder.h>
 
-#include <az_contract.h>
+#include "../inc/internal/_az_mut_span.h"
+#include "../inc/internal/_az_span.h"
+#include "../inc/internal/az_contract.h"
 #include <az_str.h>
 
 #include <assert.h>
 
 #include <_az_cfg.h>
+
+#define AZ_CONTRACT_ARG_VALID_MUT_SPAN(span) AZ_CONTRACT(az_mut_span_is_valid(span), AZ_ERROR_ARG)
+#define AZ_CONTRACT_ARG_VALID_SPAN(span) AZ_CONTRACT(az_span_is_valid(span), AZ_ERROR_ARG)
 
 az_span const AZ_HTTP_METHOD_VERB_GET = AZ_CONST_STR("GET");
 az_span const AZ_HTTP_METHOD_VERB_HEAD = AZ_CONST_STR("HEAD");
