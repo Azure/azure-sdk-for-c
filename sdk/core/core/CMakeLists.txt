@@ -73,6 +73,7 @@ add_executable (
     az_core_test 
     test/main.c 
     test/test_json_builder.c
+    test/test_json_data.c
     test/test_json_get_by_pointer.c
     test/test_json_pointer.c
     test/test_json_string.c

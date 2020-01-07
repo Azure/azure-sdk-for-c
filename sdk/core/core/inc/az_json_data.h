@@ -44,27 +44,27 @@ struct az_json_data {
   } data;
 };
 
-AZ_NODISCARD az_json_data az_json_data_null() {
+AZ_NODISCARD AZ_INLINE az_json_data az_json_data_null() {
   return (az_json_data){ .kind = AZ_JSON_DATA_NULL };
 }
 
-AZ_NODISCARD az_json_data az_json_data_boolean(bool const data) {
+AZ_NODISCARD AZ_INLINE az_json_data az_json_data_boolean(bool const data) {
   return (az_json_data){ .kind = AZ_JSON_DATA_BOOLEAN, .data.boolean = data };
 }
 
-AZ_NODISCARD az_json_data az_json_data_number(double const data) {
+AZ_NODISCARD AZ_INLINE az_json_data az_json_data_number(double const data) {
   return (az_json_data){ .kind = AZ_JSON_DATA_NUMBER, .data.number = data };
 }
 
-AZ_NODISCARD az_json_data az_json_data_string(az_span const data) {
+AZ_NODISCARD AZ_INLINE az_json_data az_json_data_string(az_span const data) {
   return (az_json_data){ .kind = AZ_JSON_DATA_STRING, .data.string = data };
 }
 
-AZ_NODISCARD az_json_data az_json_data_object(az_json_object const data) {
+AZ_NODISCARD AZ_INLINE az_json_data az_json_data_object(az_json_object const data) {
   return (az_json_data){ .kind = AZ_JSON_DATA_OBJECT, .data.object = data };
 }
 
-AZ_NODISCARD az_json_data az_json_data_array(az_json_array const data) {
+AZ_NODISCARD AZ_INLINE az_json_data az_json_data_array(az_json_array const data) {
   return (az_json_data){ .kind = AZ_JSON_DATA_ARRAY, .data.array = data };
 }
 
