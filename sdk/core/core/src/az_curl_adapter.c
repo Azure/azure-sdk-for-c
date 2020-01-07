@@ -370,7 +370,7 @@ AZ_NODISCARD az_result az_http_client_send_request_impl_process(
     result = az_curl_send_post_request(p_curl, p_hrb);
   } else if (az_span_is_equal(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_DELETE)) {
     result = az_curl_send_delete_request(p_curl, p_hrb);
-  } else if (az_span_eq(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_PUT)) {
+  } else if (az_span_is_equal(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_PUT)) {
     result = az_curl_send_upload_request(p_curl, p_hrb);
   } else {
     return AZ_ERROR_HTTP_INVALID_METHOD_VERB;

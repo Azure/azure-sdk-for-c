@@ -35,12 +35,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_download(
   // TODO: define max URL size
   az_http_request_builder hrb;
   AZ_RETURN_IF_FAILED(az_http_request_builder_init(
-      &hrb,
-      request_buffer_span,
-      1280,
-      AZ_HTTP_METHOD_VERB_GET,
-      client->uri,
-      az_span_create_empty()));
+      &hrb, request_buffer_span, 1280, AZ_HTTP_METHOD_VERB_GET, client->uri, az_span_empty()));
 
   // add version to request
   AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
@@ -60,14 +55,9 @@ AZ_NODISCARD az_result az_storage_blobs_blob_delete(
   // create request
   az_http_request_builder hrb;
   AZ_RETURN_IF_FAILED(az_http_request_builder_init(
-      &hrb,
-      request_buffer_span,
-      1280,
-      AZ_HTTP_METHOD_VERB_DELETE,
-      client->uri,
-      az_span_create_empty()));
+      &hrb, request_buffer_span, 1280, AZ_HTTP_METHOD_VERB_DELETE, client->uri, az_span_empty()));
 
-    // add version to request
+  // add version to request
   AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
       &hrb, AZ_STR("x-ms-version"), AZ_STORAGE_BLOBS_BLOB_API_VERSION));
 
