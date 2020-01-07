@@ -3,9 +3,7 @@
 
 #include <az_identity_client_secret_credential.h>
 
-#include "../inc/internal/_az_mut_span.h"
-#include "../inc/internal/_az_span.h"
-#include "../inc/internal/az_contract.h"
+#include "../inc/internal/az_span_contract.h"
 #include <az_http_pipeline.h>
 #include <az_http_request_builder.h>
 #include <az_http_response_parser.h>
@@ -18,9 +16,6 @@
 #include <az_url.h>
 
 #include <_az_cfg.h>
-
-#define AZ_CONTRACT_ARG_VALID_MUT_SPAN(span) AZ_CONTRACT(az_mut_span_is_valid(span), AZ_ERROR_ARG)
-#define AZ_CONTRACT_ARG_VALID_SPAN(span) AZ_CONTRACT(az_span_is_valid(span), AZ_ERROR_ARG)
 
 enum {
   _az_IDENTITY_CLIENT_SECRET_CREDENTIAL_RESPONSE_BUF_SIZE = 5 * (1024 / 2),

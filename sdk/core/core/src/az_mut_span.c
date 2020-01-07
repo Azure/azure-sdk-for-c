@@ -1,17 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "../inc/internal/_az_mut_span.h"
-#include "../inc/internal/_az_span.h"
-#include "../inc/internal/az_contract.h"
+#include "../inc/internal/az_span_contract.h"
 #include <az_mut_span.h>
 
 #include <ctype.h>
 
 #include <_az_cfg.h>
-
-#define AZ_CONTRACT_ARG_VALID_MUT_SPAN(span) AZ_CONTRACT(az_mut_span_is_valid(span), AZ_ERROR_ARG)
-#define AZ_CONTRACT_ARG_VALID_SPAN(span) AZ_CONTRACT(az_span_is_valid(span), AZ_ERROR_ARG)
 
 AZ_NODISCARD az_result
 az_mut_span_move(az_mut_span const buffer, az_span const src, az_mut_span * const out_result) {

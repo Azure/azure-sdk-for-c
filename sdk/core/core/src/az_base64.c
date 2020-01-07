@@ -3,16 +3,11 @@
 
 #include <az_base64.h>
 
-#include "../inc/internal/_az_mut_span.h"
-#include "../inc/internal/_az_span.h"
-#include "../inc/internal/az_contract.h"
+#include "../inc/internal/az_span_contract.h"
 
 #include <assert.h>
 
 #include <_az_cfg.h>
-
-#define AZ_CONTRACT_ARG_VALID_MUT_SPAN(span) AZ_CONTRACT(az_mut_span_is_valid(span), AZ_ERROR_ARG)
-#define AZ_CONTRACT_ARG_VALID_SPAN(span) AZ_CONTRACT(az_span_is_valid(span), AZ_ERROR_ARG)
 
 enum {
   TRIBYTE_OCTETS = 3,
