@@ -49,11 +49,15 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
 
   // add version to request
   AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
-      &hrb, AZ_HTTP_HEADER_API_VERSION, AZ_STORAGE_BLOBS_BLOB_API_VERSION));
+      &hrb, AZ_HTTP_HEADER_X_MS_VERSION, AZ_STORAGE_BLOBS_BLOB_API_VERSION));
 
   // add blob type to request
   AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
       &hrb, AZ_STORAGE_BLOBS_BLOB_HEADER_X_MS_BLOB_TYPE, client->blob_type));
+
+  // add date to request
+  //AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
+  //    &hrb, AZ_HTTP_HEADER_X_MS_DATE, AZ_STR("Fri, 03 Jan 2020 21:33:15 GMT")));
 
   uint8_t str[256] = { 0 };
   snprintf(str, sizeof str, "%zu", content.size);
@@ -62,6 +66,10 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
   // add Content-Length to request
   AZ_RETURN_IF_FAILED(
       az_http_request_builder_append_header(&hrb, AZ_HTTP_HEADER_CONTENT_LENGTH, content_length));
+
+    // add blob type to request
+  AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
+      &hrb, AZ_HTTP_HEADER_CONTENT_TYPE, AZ_STR("text/plain")));
 
   // start pipeline
   return az_http_pipeline_process(&client->pipeline, &hrb, response);

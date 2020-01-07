@@ -44,7 +44,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_download(
 
   // add version to request
   AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
-      &hrb, AZ_STR("api-version"), AZ_STORAGE_BLOBS_BLOB_API_VERSION));
+      &hrb, AZ_STR("x-ms-version"), AZ_STORAGE_BLOBS_BLOB_API_VERSION));
 
   // start pipeline
   return az_http_pipeline_process(&client->pipeline, &hrb, response);
@@ -66,6 +66,10 @@ AZ_NODISCARD az_result az_storage_blobs_blob_delete(
       AZ_HTTP_METHOD_VERB_DELETE,
       client->uri,
       az_span_create_empty()));
+
+    // add version to request
+  AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
+      &hrb, AZ_STR("x-ms-version"), AZ_STORAGE_BLOBS_BLOB_API_VERSION));
 
   // start pipeline
   return az_http_pipeline_process(&client->pipeline, &hrb, response);
@@ -98,6 +102,8 @@ int main() {
       &client, AZ_STR("Some Test Content for the new blob"), NULL, &http_response);
 
   az_result get_result = az_storage_blobs_blob_download(&client, &http_response);
+
+  az_result delete_result = az_storage_blobs_blob_delete(&client, &http_response);
 
   return exit_code;
 }
