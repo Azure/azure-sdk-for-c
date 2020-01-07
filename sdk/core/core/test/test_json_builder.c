@@ -66,7 +66,7 @@ void test_json_builder() {
     az_span_builder builder = az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(array));
     TEST_ASSERT(write_json(NULL, az_span_builder_append_action(&builder)) == AZ_OK);
     az_span const result = az_span_builder_result(&builder);
-    TEST_ASSERT(az_span_eq(
+    TEST_ASSERT(az_span_is_equal(
         result,
         AZ_STR( //
             "{"

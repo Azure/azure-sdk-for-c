@@ -145,7 +145,7 @@ AZ_NODISCARD static az_result az_json_builder_write_double(
         uint8_t const dec = (uint8_t)(u / base) + '0';
         u %= base;
         base /= 10;
-        AZ_RETURN_IF_FAILED(az_span_action_do(write, az_span_from_one(&dec)));
+        AZ_RETURN_IF_FAILED(az_span_action_do(write, az_span_from_single_item(&dec)));
       } while (1 <= base);
       return AZ_OK;
     }
@@ -200,9 +200,7 @@ az_json_builder_write(az_json_builder * const self, az_json_token const value) {
       self->need_comma = true;
       return az_json_builder_write_span(self, value.data.span);
     }
-    default: {
-      return AZ_ERROR_ARG;
-    }
+    default: { return AZ_ERROR_ARG; }
   }
 }
 

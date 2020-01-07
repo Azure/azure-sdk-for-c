@@ -25,7 +25,7 @@ void test_json_pointer() {
     az_span_reader parser = az_span_reader_create(AZ_STR("/abc"));
     az_span p;
     TEST_ASSERT(az_span_reader_read_json_pointer_token(&parser, &p) == AZ_OK);
-    TEST_ASSERT(az_span_eq(p, AZ_STR("abc")));
+    TEST_ASSERT(az_span_is_equal(p, AZ_STR("abc")));
     // test az_json_pointer_token_parser_get
     {
       az_span_reader token_parser = az_span_reader_create(p);
@@ -43,7 +43,7 @@ void test_json_pointer() {
         ++i;
       }
       az_span const b = { .begin = buffer, .size = i };
-      TEST_ASSERT(az_span_eq(b, AZ_STR("abc")));
+      TEST_ASSERT(az_span_is_equal(b, AZ_STR("abc")));
     }
     TEST_ASSERT(az_span_reader_read_json_pointer_token(&parser, &p) == AZ_ERROR_ITEM_NOT_FOUND);
   }
@@ -51,7 +51,7 @@ void test_json_pointer() {
     az_span_reader parser = az_span_reader_create(AZ_STR("/abc//dffgg21"));
     az_span p;
     TEST_ASSERT(az_span_reader_read_json_pointer_token(&parser, &p) == AZ_OK);
-    TEST_ASSERT(az_span_eq(p, AZ_STR("abc")));
+    TEST_ASSERT(az_span_is_equal(p, AZ_STR("abc")));
     // test az_json_pointer_token_parser_get
     {
       az_span_reader token_parser = az_span_reader_create(p);
@@ -69,19 +69,19 @@ void test_json_pointer() {
         ++i;
       }
       az_span const b = { .begin = buffer, .size = i };
-      TEST_ASSERT(az_span_eq(b, AZ_STR("abc")));
+      TEST_ASSERT(az_span_is_equal(b, AZ_STR("abc")));
     }
     TEST_ASSERT(az_span_reader_read_json_pointer_token(&parser, &p) == AZ_OK);
-    TEST_ASSERT(az_span_eq(p, AZ_STR("")));
+    TEST_ASSERT(az_span_is_equal(p, AZ_STR("")));
     TEST_ASSERT(az_span_reader_read_json_pointer_token(&parser, &p) == AZ_OK);
-    TEST_ASSERT(az_span_eq(p, AZ_STR("dffgg21")));
+    TEST_ASSERT(az_span_is_equal(p, AZ_STR("dffgg21")));
     TEST_ASSERT(az_span_reader_read_json_pointer_token(&parser, &p) == AZ_ERROR_ITEM_NOT_FOUND);
   }
   {
     az_span_reader parser = az_span_reader_create(AZ_STR("/ab~1c/dff~0x"));
     az_span p;
     TEST_ASSERT(az_span_reader_read_json_pointer_token(&parser, &p) == AZ_OK);
-    TEST_ASSERT(az_span_eq(p, AZ_STR("ab~1c")));
+    TEST_ASSERT(az_span_is_equal(p, AZ_STR("ab~1c")));
     // test az_json_pointer_token_parser_get
     {
       az_span_reader token_parser = az_span_reader_create(p);
@@ -99,10 +99,10 @@ void test_json_pointer() {
         ++i;
       }
       az_span const b = { .begin = buffer, .size = i };
-      TEST_ASSERT(az_span_eq(b, AZ_STR("ab/c")));
+      TEST_ASSERT(az_span_is_equal(b, AZ_STR("ab/c")));
     }
     TEST_ASSERT(az_span_reader_read_json_pointer_token(&parser, &p) == AZ_OK);
-    TEST_ASSERT(az_span_eq(p, AZ_STR("dff~0x")));
+    TEST_ASSERT(az_span_is_equal(p, AZ_STR("dff~0x")));
     // test az_json_pointer_token_parser_get
     {
       az_span_reader token_parser = az_span_reader_create(p);
@@ -120,7 +120,7 @@ void test_json_pointer() {
         ++i;
       }
       az_span const b = { .begin = buffer, .size = i };
-      TEST_ASSERT(az_span_eq(b, AZ_STR("dff~x")));
+      TEST_ASSERT(az_span_is_equal(b, AZ_STR("dff~x")));
     }
     TEST_ASSERT(az_span_reader_read_json_pointer_token(&parser, &p) == AZ_ERROR_ITEM_NOT_FOUND);
   }
@@ -128,7 +128,7 @@ void test_json_pointer() {
     az_span_reader parser = az_span_reader_create(AZ_STR("/ab~1c/dff~x"));
     az_span p;
     TEST_ASSERT(az_span_reader_read_json_pointer_token(&parser, &p) == AZ_OK);
-    TEST_ASSERT(az_span_eq(p, AZ_STR("ab~1c")));
+    TEST_ASSERT(az_span_is_equal(p, AZ_STR("ab~1c")));
     TEST_ASSERT(
         az_span_reader_read_json_pointer_token(&parser, &p) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
   }
@@ -136,7 +136,7 @@ void test_json_pointer() {
     az_span_reader parser = az_span_reader_create(AZ_STR("/ab~1c/dff~"));
     az_span p;
     TEST_ASSERT(az_span_reader_read_json_pointer_token(&parser, &p) == AZ_OK);
-    TEST_ASSERT(az_span_eq(p, AZ_STR("ab~1c")));
+    TEST_ASSERT(az_span_is_equal(p, AZ_STR("ab~1c")));
     TEST_ASSERT(az_span_reader_read_json_pointer_token(&parser, &p) == AZ_ERROR_EOF);
   }
   // test az_json_pointer_token_parser_get
