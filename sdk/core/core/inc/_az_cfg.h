@@ -66,15 +66,12 @@
 #define AZ_NODISCARD
 #endif
 
-// C11
-#if __STDC_VERSION__ >= 201112L
-#define AZ_ALIGNOF(T) _Alignof(T)
 // MSVC
-#elif defined(_MSC_VER)
+#if defined(_MSC_VER)
 #define AZ_ALIGNOF(T) __alignof(T)
 // unknown
 #else
-#error "AZ_ALIGNOF(T) is not defined"
+#define AZ_ALIGNOF(T) _Alignof(T)
 #endif
 
 #endif
