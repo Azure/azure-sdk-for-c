@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef AZ_STORAGE_BLOBS_H
-#define AZ_STORAGE_BLOBS_H
+#ifndef _az_STORAGE_BLOBS_H
+#define _az_STORAGE_BLOBS_H
 
 #include <az_contract.h>
 #include <az_http_pipeline.h>
@@ -116,7 +116,7 @@ AZ_NODISCARD AZ_INLINE az_result az_storage_blobs_blob_client_init(
  */
 AZ_NODISCARD az_result az_storage_blobs_blob_upload(
     az_storage_blobs_blob_client * client,
-    az_span content, /* Buffer of content*/
+    az_span const content, /* Buffer of content*/
     az_storage_blobs_blob_upload_options * const options,
     az_http_response * const response);
 

@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef AZ_RESULT_H
-#define AZ_RESULT_H
+#ifndef _az_RESULT_H
+#define _az_RESULT_H
 
 #include <az_static_assert.h>
 

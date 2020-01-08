@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef AZ_HTTP_CLIENT_H
-#define AZ_HTTP_CLIENT_H
+#ifndef _az_HTTP_CLIENT_H
+#define _az_HTTP_CLIENT_H
 
 #include <az_http_request_builder.h>
 #include <az_http_response.h>

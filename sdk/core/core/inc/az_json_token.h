@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef AZ_JSON_TOKEN_H
-#define AZ_JSON_TOKEN_H
+#ifndef _az_JSON_TOKEN_H
+#define _az_JSON_TOKEN_H
 
 #include <az_span.h>
 
@@ -77,24 +77,21 @@ AZ_NODISCARD AZ_INLINE az_json_token az_json_token_span(az_span const span) {
  *
  * If the JSON value is not a boolean then the function returns an error.
  */
-AZ_NODISCARD az_result
-az_json_token_get_boolean(az_json_token const self, bool * const out);
+AZ_NODISCARD az_result az_json_token_get_boolean(az_json_token const self, bool * const out);
 
 /**
  * Copies a string span to @var out from the given JSON value.
  *
  * If the JSON value is not a string then the function returns an error.
  */
-AZ_NODISCARD az_result
-az_json_token_get_string(az_json_token const self, az_span * const out);
+AZ_NODISCARD az_result az_json_token_get_string(az_json_token const self, az_span * const out);
 
 /**
  * Copies a number to @var out from the given JSON value.
  *
  * If the JSON value is not a number then the function returns an error.
  */
-AZ_NODISCARD az_result
-az_json_token_get_number(az_json_token const self, double * const out);
+AZ_NODISCARD az_result az_json_token_get_number(az_json_token const self, double * const out);
 
 typedef struct {
   az_span name;

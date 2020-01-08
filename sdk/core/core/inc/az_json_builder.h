@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef AZ_JSON_BUILDER_H
-#define AZ_JSON_BUILDER_H
+#ifndef _az_JSON_BUILDER_H
+#define _az_JSON_BUILDER_H
 
 #include <az_json_token.h>
 #include <az_result.h>
@@ -41,4 +41,4 @@ AZ_NODISCARD az_result az_json_builder_write_array_close(az_json_builder * const
 
 #include <_az_cfg_suffix.h>
 
-#endif // !AZ_JSON_BUILDER_H
+#endif

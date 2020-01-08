@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef AZ_HTTP_RESPONSE_H
-#define AZ_HTTP_RESPONSE_H
+#ifndef _az_HTTP_RESPONSE_H
+#define _az_HTTP_RESPONSE_H
 
 #include <az_result.h>
 #include <az_span_builder.h>

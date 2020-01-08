@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef AZ_HEX_H
-#define AZ_HEX_H
+#ifndef _az_HEX_H
+#define _az_HEX_H
 
 #include <stdint.h>
 
