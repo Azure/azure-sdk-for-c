@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef AZ_URI_H
-#define AZ_URI_H
+#ifndef _az_URI_H
+#define _az_URI_H
 
 #include <az_result.h>
 #include <az_span.h>

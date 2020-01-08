@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef AZ_IDENTITY_CLIENT_SECRET_CREDENTIAL_H
-#define AZ_IDENTITY_CLIENT_SECRET_CREDENTIAL_H
+#ifndef _az_IDENTITY_CLIENT_SECRET_CREDENTIAL_H
+#define _az_IDENTITY_CLIENT_SECRET_CREDENTIAL_H
 
 #include <az_identity_credential.h>
 #include <az_result.h>
@@ -11,7 +11,9 @@
 #include <_az_cfg_prefix.h>
 
 typedef struct {
-  az_identity_credential _credential;
+  struct {
+    az_identity_credential credential;
+  } _internal;
   az_span tenant_id;
   az_span client_id;
   az_span client_secret;

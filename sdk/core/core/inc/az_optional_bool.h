@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef AZ_OPTIONAL_BOOL_H
-#define AZ_OPTIONAL_BOOL_H
+#ifndef _az_OPTIONAL_BOOL_H
+#define _az_OPTIONAL_BOOL_H
 
 #include <stdbool.h>
 

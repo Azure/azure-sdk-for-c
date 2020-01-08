@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef AZ_KEYVAULT_CREATE_KEY_OPTIONS_H
-#define AZ_KEYVAULT_CREATE_KEY_OPTIONS_H
+#ifndef _az_KEYVAULT_CREATE_KEY_OPTIONS_H
+#define _az_KEYVAULT_CREATE_KEY_OPTIONS_H
 
 #include <az_optional_bool.h>
 #include <az_pair.h>

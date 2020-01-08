@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef AZ_SPAN_BUILDER_H
-#define AZ_SPAN_BUILDER_H
+#ifndef _az_SPAN_BUILDER_H
+#define _az_SPAN_BUILDER_H
 
 #include <az_action.h>
 #include <az_mut_span.h>
