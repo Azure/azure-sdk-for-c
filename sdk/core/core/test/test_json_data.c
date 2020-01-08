@@ -15,3 +15,14 @@ void test_json_data() {
       = az_json_to_data(AZ_STR("true"), (az_mut_span)AZ_SPAN_FROM_ARRAY(buffer), data);
   TEST_ASSERT(result == AZ_OK);
 }
+
+typedef struct {
+  size_t a;
+} foo_data;
+
+void foo(foo_data const ** pp) { *pp = NULL; }
+
+void bar() {
+  foo_data const * p = NULL;
+  foo(p);
+}
