@@ -41,7 +41,7 @@ uint8_t * _az_align_ceil(uint8_t * const p, size_t const align) {
 AZ_NODISCARD az_result _az_span_builder_aligned_append(
     az_span_builder * const builder,
     az_data const data,
-    uint8_t ** const out) {
+    void ** const out) {
   // alignment.
   {
     uint8_t * const p = builder->buffer.begin + builder->length;
@@ -103,8 +103,7 @@ AZ_NODISCARD az_result _az_span_builder_top_array_revert(
     = az_span_take(az_span_drop(az_mut_span_to_span(buffer), offset), item_count * item_type.size),
     .align = item_type.align,
   };
-  AZ_RETURN_IF_FAILED(_az_span_builder_top_aligned_append(builder, data));
-  *out_array_begin = builder->buffer.begin + builder->length - item_count * item_type.size;
+  AZ_RETURN_IF_FAILED(_az_span_builder_aligned_append(builder, data, out_array_begin));
   *out_array_size = item_count;
 
   return AZ_OK;

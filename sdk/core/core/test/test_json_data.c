@@ -42,8 +42,8 @@ void test_json_data() {
   {
     uint8_t buffer[100] = { 0 };
     az_json_data const * data = { 0 };
-    az_result const result
-        = az_json_to_data(AZ_STR("\"Hello world!\""), (az_mut_span)AZ_SPAN_FROM_ARRAY(buffer), &data);
+    az_result const result = az_json_to_data(
+        AZ_STR("\"Hello world!\""), (az_mut_span)AZ_SPAN_FROM_ARRAY(buffer), &data);
     TEST_ASSERT(result == AZ_OK);
     TEST_ASSERT(data->kind == AZ_JSON_DATA_STRING);
     TEST_ASSERT(az_span_is_equal(data->data.string, AZ_STR("Hello world!")));
@@ -62,11 +62,53 @@ void test_json_data() {
   {
     uint8_t buffer[100] = { 0 };
     az_json_data const * data = { 0 };
-    az_result const result
-        = az_json_to_data(AZ_STR("[1,2,3]"), (az_mut_span)AZ_SPAN_FROM_ARRAY(buffer), &data);
+    az_result const result = az_json_to_data(
+        AZ_STR("[0.25,null,false]"), (az_mut_span)AZ_SPAN_FROM_ARRAY(buffer), &data);
     TEST_ASSERT(result == AZ_OK);
     TEST_ASSERT(data->kind == AZ_JSON_DATA_ARRAY);
     az_json_array const a = data->data.array;
     TEST_ASSERT(a.size == 3);
+    {
+      az_json_data const item = a.begin[0];
+      TEST_ASSERT(item.kind == AZ_JSON_DATA_NUMBER);
+      TEST_ASSERT(item.data.number == 0.25);
+    }
+    {
+      az_json_data const item = a.begin[1];
+      TEST_ASSERT(item.kind == AZ_JSON_DATA_NULL);
+    }
+    {
+      az_json_data const item = a.begin[2];
+      TEST_ASSERT(item.kind == AZ_JSON_DATA_BOOLEAN);
+      TEST_ASSERT(item.data.boolean == false);
+    }
+  }
+  // nested array
+  {
+    uint8_t buffer[1000] = { 0 };
+    az_json_data const * data = { 0 };
+    az_result const result = az_json_to_data(
+        AZ_STR("[[1,[]],2,[[],3]]"), (az_mut_span)AZ_SPAN_FROM_ARRAY(buffer), &data);
+    TEST_ASSERT(result == AZ_OK);
+    TEST_ASSERT(data->kind == AZ_JSON_DATA_ARRAY);
+    az_json_array const a = data->data.array;
+    TEST_ASSERT(a.size == 3);
+    {
+      az_json_data const item = a.begin[0];
+      TEST_ASSERT(item.kind == AZ_JSON_DATA_ARRAY);
+      az_json_array const a0 = item.data.array;
+      TEST_ASSERT(a0.size == 2);
+    }
+    {
+      az_json_data const item = a.begin[1];
+      TEST_ASSERT(item.kind == AZ_JSON_DATA_NUMBER);
+      TEST_ASSERT(item.data.number == 2);
+    }
+    {
+      az_json_data const item = a.begin[2];
+      TEST_ASSERT(item.kind == AZ_JSON_DATA_ARRAY);
+      az_json_array const a2 = item.data.array;
+      TEST_ASSERT(a2.size == 2);
+    }
   }
 }
