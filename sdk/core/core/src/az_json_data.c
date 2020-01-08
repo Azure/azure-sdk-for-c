@@ -104,6 +104,8 @@ AZ_NODISCARD az_result _az_span_builder_top_array_revert(
     .align = item_type.align,
   };
   AZ_RETURN_IF_FAILED(_az_span_builder_top_aligned_append(builder, data));
+  *out_array_begin = builder->buffer.begin + builder->length - item_count * item_type.size;
+  *out_array_size = item_count;
 
   return AZ_OK;
 }
