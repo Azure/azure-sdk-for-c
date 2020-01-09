@@ -660,7 +660,6 @@ int main() {
     TEST_ASSERT(az_span_is_equal(az_span_builder_result(&builder), uri_decoded));
   }
   {
-    // int16_t const url_max = 100;
     uint8_t buf[100 + (100 % 8) + (2 * sizeof(az_pair))];
     memset(buf, 0, sizeof(buf));
     az_mut_span const http_buf = { .begin = buf, .size = sizeof(buf) };
