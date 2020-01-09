@@ -16,20 +16,20 @@
 #include <stdlib.h>
 
 #include "./az_test.h"
-#include "./test_http_response_parser.h"
 #include "./test_json_string.h"
 #include "./test_json_value.h"
 
 #include <_az_cfg.h>
 
+void test_http_response_parser();
 void test_json_builder();
 void test_json_get_by_pointer();
 void test_json_pointer();
 void test_json_string();
-void test_url_parse();
+void test_pair_span();
 void test_span_builder_replace();
 void test_span_span();
-void test_pair_span();
+void test_url_parse();
 
 int exit_code = 0;
 
