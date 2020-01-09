@@ -5,8 +5,8 @@
  * @brief Interface declaration for bulding an HTTP Request.
  */
 
-#ifndef AZ_HTTP_REQUEST_BUILDER_H
-#define AZ_HTTP_REQUEST_BUILDER_H
+#ifndef _az_HTTP_REQUEST_BUILDER_H
+#define _az_HTTP_REQUEST_BUILDER_H
 
 #include <az_mut_span.h>
 #include <az_pair.h>

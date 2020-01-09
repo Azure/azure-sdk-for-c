@@ -39,8 +39,8 @@
 
 #endif
 
-#ifndef AZ_CFG_H
-#define AZ_CFG_H
+#ifndef _az_CFG_H
+#define _az_CFG_H
 
 #ifdef _MSC_VER
 #define AZ_INLINE static __forceinline

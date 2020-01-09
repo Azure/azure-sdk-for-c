@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef AZ_KEYVAULT_H
-#define AZ_KEYVAULT_H
+#ifndef _az_KEYVAULT_H
+#define _az_KEYVAULT_H
 
 #include <az_contract.h>
 #include <az_http_pipeline.h>

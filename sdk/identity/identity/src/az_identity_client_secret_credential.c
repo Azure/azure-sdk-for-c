@@ -46,9 +46,9 @@ _az_identity_client_secret_credential_ms_oauth2_send_get_token_request(
     az_mut_span const hrb_buf,
     az_http_response * response,
     clock_t * const requested_at) {
-  AZ_CONTRACT_ARG_NOT_NULL(token_context->_credential);
+  AZ_CONTRACT_ARG_NOT_NULL(token_context->_internal.credential);
   az_identity_client_secret_credential const * const credential
-      = (az_identity_client_secret_credential const *)(token_context->_credential);
+      = (az_identity_client_secret_credential const *)(token_context->_internal.credential);
 
   az_span auth_url = { 0 };
   {
@@ -75,7 +75,7 @@ _az_identity_client_secret_credential_ms_oauth2_send_get_token_request(
     AZ_RETURN_IF_FAILED(az_uri_encode(credential->client_secret, &builder));
 
     AZ_RETURN_IF_FAILED(az_span_builder_append(&builder, AZ_STR("&scope=")));
-    AZ_RETURN_IF_FAILED(az_uri_encode(token_context->_scope, &builder));
+    AZ_RETURN_IF_FAILED(az_uri_encode(token_context->_internal.scope, &builder));
 
     auth_body = az_span_builder_result(&builder);
   }
@@ -160,7 +160,9 @@ AZ_INLINE AZ_NODISCARD az_result _az_identity_client_secret_credential_ms_oauth2
     AZ_RETURN_IF_FAILED(az_json_get_object_member(body, AZ_STR("access_token"), &value));
     AZ_RETURN_IF_FAILED(az_json_token_get_string(value, &token_str));
 
-    az_mut_span const token_buf = AZ_SPAN_FROM_ARRAY(token_context->_token->_token_buf);
+    az_mut_span const token_buf
+        = AZ_SPAN_FROM_ARRAY(token_context->_internal.token->_internal.token_buf);
+
     az_span_builder builder = az_span_builder_create(token_buf);
     az_mut_span_fill(token_buf, 0);
 
@@ -168,11 +170,11 @@ AZ_INLINE AZ_NODISCARD az_result _az_identity_client_secret_credential_ms_oauth2
     az_result const token_append_result = az_span_builder_append(&builder, token_str);
 
     if (az_succeeded(token_append_result)) {
-      token_context->_token->_token_size = az_span_builder_result(&builder).size;
+      token_context->_internal.token->_internal.token_size = az_span_builder_result(&builder).size;
 
       clock_t const expiration = requested_at + expiration_clock;
       if (expiration > 0) {
-        token_context->_token->_token_expiration = expiration;
+        token_context->_internal.token->_internal.token_expiration = expiration;
       }
     } else {
       az_mut_span_fill(token_buf, 'X');
@@ -200,7 +202,7 @@ AZ_INLINE AZ_NODISCARD az_result _az_identity_client_secret_credential_renew_tok
 
 AZ_INLINE AZ_NODISCARD az_result _az_identity_client_secret_credential_ensure_token_credential(
     az_identity_access_token_context const * const token_context) {
-  clock_t const expiration = token_context->_token->_token_expiration;
+  clock_t const expiration = token_context->_internal.token->_internal.token_expiration;
   if (expiration > 0) {
     clock_t const clk = clock();
     if (clk > 0 && clk < expiration) {
@@ -215,7 +217,7 @@ static AZ_NODISCARD az_result _az_identity_client_secret_credential_credential_f
     az_identity_access_token_context const * const token_context,
     az_http_request_builder * const hrb) {
   AZ_CONTRACT_ARG_NOT_NULL(token_context);
-  AZ_CONTRACT_ARG_NOT_NULL(token_context->_token);
+  AZ_CONTRACT_ARG_NOT_NULL(token_context->_internal.token);
   AZ_CONTRACT_ARG_NOT_NULL(hrb);
 
   {
@@ -235,8 +237,8 @@ static AZ_NODISCARD az_result _az_identity_client_secret_credential_credential_f
       hrb,
       AZ_STR("authorization"),
       (az_span){
-          .begin = token_context->_token->_token_buf,
-          .size = token_context->_token->_token_size,
+          .begin = token_context->_internal.token->_internal.token_buf,
+          .size = token_context->_internal.token->_internal.token_size,
       });
 }
 
@@ -251,13 +253,15 @@ AZ_NODISCARD az_result az_identity_client_secret_credential_init(
   AZ_CONTRACT_ARG_VALID_SPAN(client_secret);
 
   *self = (az_identity_client_secret_credential){
-    ._credential = { 0 },
+    ._internal = {
+      .credential = { 0 },
+    },
     .tenant_id = tenant_id,
     .client_id = client_id,
     .client_secret = client_secret,
   };
 
   return _az_identity_credential_init(
-      &(self->_credential),
+      &(self->_internal.credential),
       (az_identity_credential_func)_az_identity_client_secret_credential_credential_func);
 }
