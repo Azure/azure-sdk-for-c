@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef AZ_JSON_DATA_H
-#define AZ_JSON_DATA_H
+#ifndef _az_JSON_DATA_H
+#define _az_JSON_DATA_H
 
 #include <az_json_token.h>
 
@@ -13,16 +13,24 @@
 typedef struct az_json_data az_json_data;
 
 typedef struct {
-  az_json_data const * begin;
-  size_t size;
+  struct {
+    az_json_data const * begin;
+    size_t size;
+  } _detail;
 } az_json_array;
+
+AZ_NODISCARD AZ_INLINE size_t az_json_array_size(az_json_array const a) { return a._detail.size; }
 
 typedef struct az_json_object_member az_json_object_member;
 
 typedef struct {
-  az_json_object_member const * begin;
-  size_t size;
+  struct {
+    az_json_object_member const * begin;
+    size_t size;
+  } _detail;
 } az_json_object;
+
+AZ_NODISCARD AZ_INLINE size_t az_json_object_size(az_json_object const a) { return a._detail.size; }
 
 typedef enum {
   AZ_JSON_DATA_NULL = 0,
@@ -43,6 +51,18 @@ struct az_json_data {
     az_json_object object;
   } data;
 };
+
+typedef struct {
+  bool has;
+  az_json_data data;
+} az_json_data_option;
+
+AZ_NODISCARD AZ_INLINE az_json_data_option
+az_json_array_get(az_json_array const a, size_t const i) {
+  return i < az_json_array_size(a)
+      ? (az_json_data_option){ .has = true, .data = a._detail.begin[i] }
+      : (az_json_data_option){ .has = false };
+}
 
 AZ_NODISCARD AZ_INLINE az_json_data az_json_data_null() {
   return (az_json_data){ .kind = AZ_JSON_DATA_NULL };
@@ -72,6 +92,18 @@ struct az_json_object_member {
   az_span name;
   az_json_data value;
 };
+
+typedef struct {
+  bool has;
+  az_json_object_member data;
+} az_json_object_member_option;
+
+AZ_NODISCARD AZ_INLINE az_json_object_member_option
+az_json_object_get(az_json_object const o, size_t const i) {
+  return i < az_json_object_size(o)
+      ? (az_json_object_member_option){ .has = true, .data = o._detail.begin[i] }
+      : (az_json_object_member_option){ .has = false };
+}
 
 AZ_NODISCARD az_result
 az_json_to_data(az_span const json, az_mut_span const buffer, az_json_data const ** const out);
