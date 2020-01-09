@@ -3,6 +3,8 @@
 
 #include <az_http_response_parser.h>
 
+#include <_az_cfg_prefix.h>
+
 #define EXAMPLE_BODY \
   "{\r\n" \
   "  \"somejson\":45\r" \
@@ -74,7 +76,7 @@ static az_result http_response_getters_example(az_span const response) {
   }
 
   // Last header is used for reading body and must be properly initialized (set to zeros).
-  az_pair header = { { 0 } };
+  az_pair header = { 0 };
 
   // reading headers
   {
@@ -113,3 +115,5 @@ static az_result http_response_getters_example(az_span const response) {
 
   return AZ_OK;
 }
+
+#include <_az_cfg_suffix.h>
