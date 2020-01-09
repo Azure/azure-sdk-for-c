@@ -6,9 +6,13 @@
 
 #include <az_static_assert.h>
 
+#include <_az_cfg_extern_include_prefix.h>
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
+
+#include <_az_cfg_extern_include_suffix.h>
 
 #include <_az_cfg_prefix.h>
 

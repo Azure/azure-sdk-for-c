@@ -8,7 +8,11 @@
 #include <az_result.h>
 #include <az_static_assert.h>
 
+#include <_az_cfg_extern_include_prefix.h>
+
 #include <stddef.h>
+
+#include <_az_cfg_extern_include_suffix.h>
 
 #include <_az_cfg_prefix.h>
 

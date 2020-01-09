@@ -1,7 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include <_az_cfg_extern_include_prefix.h>
+
 #include <assert.h>
+
+#include <_az_cfg_extern_include_suffix.h>
 
 extern int exit_code;
 

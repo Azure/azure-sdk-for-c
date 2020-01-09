@@ -7,8 +7,12 @@
 #include <az_json_string.h>
 #include <az_str.h>
 
+#include <_az_cfg_extern_include_prefix.h>
+
 #include <ctype.h>
 #include <math.h>
+
+#include <_az_cfg_extern_include_suffix.h>
 
 #include <_az_cfg.h>
 

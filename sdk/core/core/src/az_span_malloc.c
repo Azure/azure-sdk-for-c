@@ -3,7 +3,11 @@
 
 #include <az_span_malloc.h>
 
+#include <_az_cfg_extern_include_prefix.h>
+
 #include <stdlib.h>
+
+#include <_az_cfg_extern_include_suffix.h>
 
 #include <_az_cfg.h>
 

@@ -4,7 +4,11 @@
 #ifndef _az_OPTIONAL_BOOL_H
 #define _az_OPTIONAL_BOOL_H
 
+#include <_az_cfg_extern_include_prefix.h>
+
 #include <stdbool.h>
+
+#include <_az_cfg_extern_include_suffix.h>
 
 #include <_az_cfg_prefix.h>
 
