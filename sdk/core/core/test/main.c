@@ -10,14 +10,10 @@
 #include <az_span_writer.h>
 #include <az_uri.h>
 
-#include <_az_cfg_extern_include_prefix.h>
-
 #include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-#include <_az_cfg_extern_include_suffix.h>
 
 #include "./az_test.h"
 #include "./test_http_response_parser.h"

@@ -14,12 +14,8 @@
 #include <az_span.h>
 #include <az_span_builder.h>
 
-#include <_az_cfg_extern_include_prefix.h>
-
 #include <stdbool.h>
 #include <stdint.h>
-
-#include <_az_cfg_extern_include_suffix.h>
 
 #include <_az_cfg_prefix.h>
 
