@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef AZ_JSON_POINTER_H
-#define AZ_JSON_POINTER_H
+#ifndef _az_JSON_POINTER_H
+#define _az_JSON_POINTER_H
 
 #include <az_result.h>
 #include <az_span.h>

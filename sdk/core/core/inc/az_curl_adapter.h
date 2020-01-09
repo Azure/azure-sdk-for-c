@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef AZ_CURL_ADAPTER_H
-#define AZ_CURL_ADAPTER_H
+#ifndef _az_CURL_ADAPTER_H
+#define _az_CURL_ADAPTER_H
 
 #include <az_http_request_builder.h>
 #include <az_http_response.h>
