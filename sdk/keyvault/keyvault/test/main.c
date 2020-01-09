@@ -1,7 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "../src/az_keyvault_client.c"
+#include <az_json_builder.h>
+#include <az_keyvault.h>
+#include <az_mut_span.h>
+#include <az_span_builder.h>
+
+#include <az_keyvault_client_private.h>
 
 #include <assert.h>
 #include <stdbool.h>
