@@ -6,7 +6,9 @@
 
 #include "./az_test.h"
 
-static void test_pair_span() {
+#include <_az_cfg.h>
+
+void test_pair_span() {
   {
     az_pair src_buffer[4];
     az_pair_span_builder pair_span_builder
