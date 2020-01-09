@@ -6,7 +6,7 @@
 
 #include <az_result.h>
 #include <az_span.h>
-#include <az_span_reader.h>
+#include <_internal/az_span_reader.h>
 
 #include <stdint.h>
 

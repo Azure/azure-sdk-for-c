@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_http_response_parser.h>
+#include <_internal/az_http_response_parser.h>
 
 #include <az_str.h>
 

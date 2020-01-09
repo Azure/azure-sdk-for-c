@@ -1,12 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_curl_adapter.h>
+#include <_internal/az_curl_adapter.h>
 
-#include <az_curl_slist.h>
-#include <az_http_request.h>
+#include <_internal/az_curl_slist.h>
+#include <_internal/az_http_request.h>
 #include <az_span.h>
-#include <az_span_malloc.h>
+#include <_internal/az_span_malloc.h>
 #include <az_str.h>
 
 #include <_az_cfg.h>
@@ -196,7 +196,7 @@ size_t _az_curl_upload_read_callback(void * ptr, size_t size, size_t nmemb, void
 
   size_t curl_size = nmemb * size;
 
-  //Nothing to copy
+  // Nothing to copy
   if (curl_size < 1 || !(mut_span->size))
     return 0;
 
@@ -230,14 +230,15 @@ az_curl_send_upload_request(CURL * const p_curl, az_http_request_builder const *
           curl_easy_setopt(p_curl, CURLOPT_READFUNCTION, _az_curl_upload_read_callback));
       if (az_succeeded(res_code)) {
 
-        //Setup the request to pass the body in as the data stream to read
+        // Setup the request to pass the body in as the data stream to read
         res_code = az_curl_code_to_result(curl_easy_setopt(p_curl, CURLOPT_READDATA, body));
-        
+
         if (az_succeeded(res_code)) {
 
-          //Set the size of the upload
-          res_code = az_curl_code_to_result(curl_easy_setopt(p_curl, CURLOPT_INFILESIZE, (curl_off_t)body.size));
-          
+          // Set the size of the upload
+          res_code = az_curl_code_to_result(
+              curl_easy_setopt(p_curl, CURLOPT_INFILESIZE, (curl_off_t)body.size));
+
           // Do the curl work
           if (az_succeeded(res_code)) {
             res_code = az_curl_code_to_result(curl_easy_perform(p_curl));

@@ -3,17 +3,17 @@
 
 #include <az_identity_client_secret_credential.h>
 
+#include <_internal/az_http_pipeline.h>
+#include <_internal/az_http_request_builder.h>
+#include <_internal/az_http_response_parser.h>
+#include <_internal/az_uri.h>
+#include <_internal/az_url.h>
 #include <az_contract.h>
-#include <az_http_pipeline.h>
-#include <az_http_request_builder.h>
-#include <az_http_response_parser.h>
 #include <az_identity_access_token_context.h>
 #include <az_identity_credential.h>
 #include <az_json_get.h>
 #include <az_span_builder.h>
 #include <az_str.h>
-#include <az_uri.h>
-#include <az_url.h>
 
 #include <_az_cfg.h>
 

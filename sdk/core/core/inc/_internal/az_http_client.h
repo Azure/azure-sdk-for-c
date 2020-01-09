@@ -4,13 +4,13 @@
 #ifndef _az_HTTP_CLIENT_H
 #define _az_HTTP_CLIENT_H
 
-#include <az_http_request_builder.h>
-#include <az_http_response.h>
+#include <_internal/az_http_request_builder.h>
+#include <_internal/az_http_response.h>
 
 #ifdef MOCK_CURL
 #include <az_mock_curl.h>
 #else
-#include <az_curl_adapter.h>
+#include <_internal/az_curl_adapter.h>
 #endif
 
 #include <_az_cfg_prefix.h>

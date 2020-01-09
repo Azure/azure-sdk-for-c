@@ -4,11 +4,11 @@
 #ifndef _az_HTTP_HEADER_H
 #define _az_HTTP_HEADER_H
 
+#include <_internal/az_span_writer.h>
 #include <az_action.h>
 #include <az_pair.h>
 #include <az_result.h>
 #include <az_span.h>
-#include <az_span_writer.h>
 
 #include <_az_cfg_prefix.h>
 

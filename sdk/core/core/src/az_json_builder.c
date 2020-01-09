@@ -3,9 +3,9 @@
 
 #include <az_json_builder.h>
 
-#include <az_hex.h>
+#include <_internal/az_hex.h>
+#include <_internal/az_span_reader.h>
 #include <az_json_string.h>
-#include <az_span_reader.h>
 #include <az_str.h>
 
 #include <_az_cfg.h>

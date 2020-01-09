@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_http_response_parser.h>
+#include <_internal/az_http_response_parser.h>
 #include <az_identity_client_secret_credential.h>
 #include <az_json_get.h>
 #include <az_json_token.h>
@@ -81,8 +81,8 @@ int main() {
   az_mut_span_fill(http_response.builder.buffer, '.');
 
   /******************  GET KEY latest ver ******************************/
-  az_result get_key_result = az_keyvault_keys_key_get(
-      &client, AZ_STR("test-new-key"), az_span_empty(), &http_response);
+  az_result get_key_result
+      = az_keyvault_keys_key_get(&client, AZ_STR("test-new-key"), az_span_empty(), &http_response);
 
   printf("\n\n*********************************\nGet Key result: \n%s", response_buffer);
 
@@ -128,8 +128,8 @@ int main() {
   az_mut_span_fill(http_response.builder.buffer, '.');
 
   /******************  GET KEY (should return failed response ) ******************************/
-  az_result get_key_again_result = az_keyvault_keys_key_get(
-      &client, AZ_STR("test-new-key"), az_span_empty(), &http_response);
+  az_result get_key_again_result
+      = az_keyvault_keys_key_get(&client, AZ_STR("test-new-key"), az_span_empty(), &http_response);
 
   printf(
       "\n\n*********************************\nGet Key again after DELETE result: \n%s\n",

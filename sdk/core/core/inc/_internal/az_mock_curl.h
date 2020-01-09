@@ -4,8 +4,8 @@
 #ifndef _az_MOCK_CURL_H
 #define _az_MOCK_CURL_H
 
-#include <az_http_request.h>
-#include <az_http_response.h>
+#include <_internal/az_http_request.h>
+#include <_internal/az_http_response.h>
 #include <az_result.h>
 
 #include <stdbool.h>

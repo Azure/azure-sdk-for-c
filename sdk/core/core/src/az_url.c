@@ -1,10 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_url.h>
+#include <_internal/az_url.h>
 
-#include <az_http_query.h>
-#include <az_span_reader.h>
+#include <_internal/az_http_query.h>
+#include <_internal/az_span_reader.h>
 #include <az_str.h>
 
 #include <ctype.h>
