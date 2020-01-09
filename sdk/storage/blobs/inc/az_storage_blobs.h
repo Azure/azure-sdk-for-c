@@ -4,9 +4,9 @@
 #ifndef _az_STORAGE_BLOBS_H
 #define _az_STORAGE_BLOBS_H
 
-#include <_internal/az_http_pipeline.h>
-#include <_internal/az_http_policy.h>
-#include <_internal/az_http_response.h>
+#include <az_http_pipeline.h>
+#include <az_http_policy.h>
+#include <az_http_response.h>
 #include <az_contract.h>
 #include <az_identity_access_token.h>
 #include <az_identity_access_token_context.h>

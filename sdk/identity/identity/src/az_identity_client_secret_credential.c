@@ -3,8 +3,8 @@
 
 #include <az_identity_client_secret_credential.h>
 
-#include <_internal/az_http_pipeline.h>
-#include <_internal/az_http_request_builder.h>
+#include <az_http_pipeline.h>
+#include <az_http_request_builder.h>
 #include <_internal/az_http_response_parser.h>
 #include <_internal/az_uri.h>
 #include <_internal/az_url.h>

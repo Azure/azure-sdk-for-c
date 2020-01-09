@@ -3,8 +3,8 @@
 
 #include <_internal/az_base64.h>
 #include <_internal/az_http_request.h>
-#include <_internal/az_http_request_builder.h>
-#include <_internal/az_span_reader.h>
+#include <az_http_request_builder.h>
+#include <az_span_reader.h>
 #include <_internal/az_span_writer.h>
 #include <_internal/az_uri.h>
 #include <az_json_parser.h>

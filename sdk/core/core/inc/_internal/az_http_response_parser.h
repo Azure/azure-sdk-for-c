@@ -4,7 +4,7 @@
 #ifndef _az_HTTP_RESPONSE_PARSER_H
 #define _az_HTTP_RESPONSE_PARSER_H
 
-#include <_internal/az_span_reader.h>
+#include <az_span_reader.h>
 #include <az_pair.h>
 #include <az_result.h>
 #include <az_span.h>

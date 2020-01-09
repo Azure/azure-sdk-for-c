@@ -6,7 +6,7 @@
 
 #include <az_json_token.h>
 #include <az_result.h>
-#include <_internal/az_span_reader.h>
+#include <az_span_reader.h>
 
 #include <stdint.h>
 

@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 #include <_internal/az_http_client.h>
-#include <_internal/az_http_pipeline.h>
-#include <_internal/az_http_policy.h>
-#include <_internal/az_http_request_builder.h>
+#include <az_http_pipeline.h>
+#include <az_http_policy.h>
+#include <az_http_request_builder.h>
 #include <_internal/az_url.h>
 #include <az_mut_span.h>
 #include <az_span.h>

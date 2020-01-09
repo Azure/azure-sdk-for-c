@@ -4,7 +4,7 @@
 #include <_internal/az_url.h>
 
 #include <_internal/az_http_query.h>
-#include <_internal/az_span_reader.h>
+#include <az_span_reader.h>
 #include <az_str.h>
 
 #include <ctype.h>
