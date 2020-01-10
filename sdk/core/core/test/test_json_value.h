@@ -6,6 +6,8 @@
 
 #include "./az_test.h"
 
+#include <_az_cfg.h>
+
 static void test_json_value() {
   az_json_token const json_boolean = az_json_token_boolean(true);
   az_json_token const json_number = az_json_token_number(-42.3);
