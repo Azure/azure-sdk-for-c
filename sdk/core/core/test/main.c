@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <_internal/az_base64.h>
+#include <az_base64.h>
 #include <_internal/az_http_request.h>
 #include <az_http_request_builder.h>
 #include <az_span_reader.h>
