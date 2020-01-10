@@ -43,24 +43,8 @@ AZ_NODISCARD AZ_INLINE bool az_mut_spans_overlap(az_mut_span const a, az_mut_spa
   return az_span_is_overlap(az_mut_span_to_span(a), az_mut_span_to_span(b));
 }
 
-AZ_NODISCARD AZ_INLINE az_result
-az_mut_span_move(az_mut_span const buffer, az_span const src, az_mut_span * const out_result) {
-  AZ_CONTRACT_ARG_NOT_NULL(out_result);
-
-  AZ_CONTRACT_ARG_VALID_MUT_SPAN(buffer);
-  AZ_CONTRACT_ARG_VALID_SPAN(src);
-
-  AZ_CONTRACT(buffer.size >= src.size, AZ_ERROR_BUFFER_OVERFLOW);
-
-  if (!az_span_is_empty(src)) {
-    memmove((void *)buffer.begin, (void const *)src.begin, src.size);
-  }
-
-  out_result->begin = buffer.begin;
-  out_result->size = src.size;
-
-  return AZ_OK;
-}
+AZ_NODISCARD az_result
+az_mut_span_move(az_mut_span const buffer, az_span const src, az_mut_span * const out_result);
 
 AZ_NODISCARD AZ_INLINE az_mut_span az_mut_span_drop(az_mut_span const span, size_t const n) {
   if (span.size <= n) {
@@ -92,28 +76,8 @@ az_mut_span_set(az_mut_span const self, size_t const i, uint8_t const value) {
   return AZ_OK;
 }
 
-AZ_NODISCARD AZ_INLINE az_result
-az_mut_span_to_str(az_mut_span const buffer, az_span const src, az_mut_span * const out_result) {
-  AZ_CONTRACT_ARG_NOT_NULL(out_result);
-  AZ_CONTRACT_ARG_VALID_MUT_SPAN(buffer);
-  AZ_CONTRACT_ARG_VALID_SPAN(src);
-
-  if (buffer.size < src.size + 1) {
-    return AZ_ERROR_BUFFER_OVERFLOW;
-  }
-
-  if (!az_span_is_empty(src)) {
-    az_mut_span result = { 0 };
-    AZ_RETURN_IF_FAILED(az_mut_span_move(buffer, src, &result));
-  }
-
-  buffer.begin[src.size] = '\0';
-
-  out_result->begin = buffer.begin;
-  out_result->size = src.size + 1;
-
-  return AZ_OK;
-}
+AZ_NODISCARD az_result
+az_mut_span_to_str(az_mut_span const buffer, az_span const src, az_mut_span * const out_result);
 
 /**
  * ```c

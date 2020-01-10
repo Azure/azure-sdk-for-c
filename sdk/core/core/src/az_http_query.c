@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include <_internal/az_http_query.h>
+#include <az_span_action.h>
 
 #include <az_str.h>
 

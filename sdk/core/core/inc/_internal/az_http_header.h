@@ -4,6 +4,7 @@
 #ifndef _az_HTTP_HEADER_H
 #define _az_HTTP_HEADER_H
 
+#include <_internal/az_span.h>
 #include <_internal/az_span_writer.h>
 #include <az_action.h>
 #include <az_pair.h>
