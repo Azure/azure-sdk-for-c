@@ -53,7 +53,7 @@ AZ_NODISCARD AZ_INLINE az_span _az_data_get_span(_az_data const data) {
 AZ_NODISCARD az_result _az_span_builder_aligned_append(
     az_span_builder * const builder,
     _az_data const data,
-    void ** const out) {
+    void const ** const out) {
   // alignment.
   {
     uint8_t * const p = builder->buffer.begin + builder->length;
@@ -89,7 +89,7 @@ AZ_NODISCARD az_result _az_span_builder_top_array_revert(
     az_span_builder * const builder,
     _az_type const item_type,
     size_t const new_size,
-    void ** const out_array_begin,
+    void const ** const out_array_begin,
     size_t * const out_array_size) {
   AZ_CONTRACT_ARG_NOT_NULL(builder);
   AZ_CONTRACT_ARG_NOT_NULL(out_array_begin);
@@ -127,7 +127,7 @@ AZ_INLINE AZ_NODISCARD az_result _az_span_builder_append_json_data(
     az_span_builder * const builder,
     az_json_data const data,
     az_json_data const ** const out) {
-  uint8_t * p = { 0 };
+  void const * p = { 0 };
   AZ_RETURN_IF_FAILED(_az_span_builder_aligned_append(builder, _AZ_DATA(data), &p));
   *out = (az_json_data const *)p;
   return AZ_OK;
