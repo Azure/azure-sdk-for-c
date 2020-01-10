@@ -1,12 +1,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef _az_FACILITY_H
-#define _az_FACILITY_H
+#ifndef _az_LOG_H
+#define _az_LOG_H
 
 #include <az_facility.h>
 
+#include <stdbool.h>
 #include <stdint.h>
+#include <stdlib.h>
+#include <time.h>
 
 #include <_az_cfg_prefix.h>
 
@@ -20,6 +23,25 @@ typedef enum {
   AZ_LOG_RETRY_POLICY = _az_LOG_MAKE_CLASSIFICATION(AZ_FACILITY_CORE, 4),
   AZ_LOG_SLOW_RESPONSE = _az_LOG_MAKE_CLASSIFICATION(AZ_FACILITY_CORE, 5),
 } az_log_classification;
+
+typedef struct {
+  clock_t slow_response_threshold; // How long should it take the HTTP request to start being
+                                   // considered a slow response (AZ_LOG_SLOW_RESPONSE)
+} az_log_options;
+
+typedef void (*az_log)(az_log_classification const classification, char const * const message);
+
+void az_log_set_classifications(
+    az_log_classification const * const classifications,
+    size_t const classifications_length);
+
+void az_log_reset_classifications();
+
+void az_log_set_listener(az_log * const listener);
+
+void az_log_write(az_log_classification const classification, char const * const message);
+
+bool az_log_should_write(az_log_classification const classification);
 
 #include <_az_cfg_suffix.h>
 
