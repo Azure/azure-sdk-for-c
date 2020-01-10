@@ -77,7 +77,11 @@ add_executable (
     test/test_json_get_by_pointer.c
     test/test_json_pointer.c
     test/test_json_string.c
+    test/test_json_value.c
     test/test_mut_span.c
+    test/test_pair_span.c
+    test/test_span_builder_replace.c
+    test/test_span_span.c
     test/test_url_parse.c
     )
 
@@ -93,5 +97,7 @@ endif()
 if (UNIX)
   target_link_libraries(az_core_test PRIVATE m)
 endif()
+
+target_include_directories (az_core_test PRIVATE test)
 
 add_test(NAME az_core_test COMMAND az_core_test)

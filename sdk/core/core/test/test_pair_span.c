@@ -4,9 +4,9 @@
 #include <az_pair.h>
 #include <az_str.h>
 
-#include "./az_test.h"
+#include <az_test.h>
 
-static void test_pair_span() {
+void test_pair_span() {
   {
     az_pair src_buffer[4];
     az_pair_span_builder pair_span_builder

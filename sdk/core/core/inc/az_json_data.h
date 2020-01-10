@@ -5,8 +5,10 @@
 #define _az_JSON_DATA_H
 
 #include <az_json_token.h>
-
 #include <az_mut_span.h>
+#include <az_span.h>
+
+#include <stdbool.h>
 
 #include <_az_cfg_prefix.h>
 

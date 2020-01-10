@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "./az_test.h"
+#include <az_test.h>
 
 #include <az_mut_span.h>
 #include <az_str.h>

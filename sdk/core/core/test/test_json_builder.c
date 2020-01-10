@@ -6,7 +6,7 @@
 #include <az_span_builder.h>
 #include <az_span_writer.h>
 
-#include "./az_test.h"
+#include <az_test.h>
 
 #include <_az_cfg.h>
 
