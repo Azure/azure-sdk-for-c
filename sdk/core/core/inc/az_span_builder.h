@@ -71,6 +71,9 @@ AZ_NODISCARD az_result az_span_builder_append(az_span_builder * const self, az_s
  */
 AZ_NODISCARD az_result az_span_builder_append_byte(az_span_builder * const self, uint8_t const c);
 
+/**
+ * Append zeros.
+ */
 AZ_NODISCARD az_result
 az_span_builder_append_zeros(az_span_builder * const self, size_t const size);
 
