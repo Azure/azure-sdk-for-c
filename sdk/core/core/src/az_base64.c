@@ -3,6 +3,7 @@
 
 #include <_internal/az_base64.h>
 #include <_internal/az_span.h>
+#include <_internal/az_mut_span.h>
 
 #include <az_contract.h>
 

@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef _az_MUT_SPAN_H
-#define _az_MUT_SPAN_H
+#ifndef AZ_MUT_SPAN_H
+#define AZ_MUT_SPAN_H
 
 #include <az_action.h>
 #include <az_contract.h>
@@ -27,10 +27,6 @@ typedef struct {
 AZ_NODISCARD AZ_INLINE az_mut_span az_mut_span_create_empty() { return (az_mut_span){ 0 }; }
 
 AZ_NODISCARD AZ_INLINE bool az_mut_span_is_empty(az_mut_span const span) { return span.size == 0; }
-
-AZ_NODISCARD AZ_INLINE bool az_mut_span_is_valid(az_mut_span const span) {
-  return span.size == 0 || (span.begin != NULL && span.begin <= span.begin + span.size - 1);
-}
 
 /**
  * Cast the given mutable span to an immutable span.
@@ -78,24 +74,6 @@ az_mut_span_set(az_mut_span const self, size_t const i, uint8_t const value) {
 
 AZ_NODISCARD az_result
 az_mut_span_to_str(az_mut_span const buffer, az_span const src, az_mut_span * const out_result);
-
-/**
- * ```c
- * typedef struct {
- *   az_result (* func)(void *, az_mut_span);
- *   void * self;
- * } az_mut_span_action;
- * ```
- *
- * Example of usage
- *
- * ```c
- * az_mut_span const span = ...;
- * az_mut_span_action const action = ...;
- * az_mut_span_action_do(action, span);
- * ```
- */
-AZ_ACTION_TYPE(az_mut_span_action, az_mut_span)
 
 #include <_az_cfg_suffix.h>
 
