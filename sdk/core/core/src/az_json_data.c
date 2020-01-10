@@ -8,28 +8,6 @@
 
 #include <_az_cfg.h>
 
-typedef struct {
-  az_span span;
-  size_t align;
-} az_data;
-
-#define AZ_DATA(V) \
-  ((az_data){ \
-      .span = (az_span){ .begin = (uint8_t const *)&(V), .size = sizeof(V) }, \
-      .align = AZ_ALIGNOF(V), \
-  })
-
-typedef struct {
-  size_t size;
-  size_t align;
-} _az_type;
-
-#define _AZ_TYPE(T) \
-  ((_az_type){ \
-      .size = sizeof(T), \
-      .align = AZ_ALIGNOF(T), \
-  })
-
 uint8_t * _az_align_floor(uint8_t * const p, size_t const align) {
   return (uint8_t *)(((size_t)p) / align * align);
 }
@@ -38,35 +16,70 @@ uint8_t * _az_align_ceil(uint8_t * const p, size_t const align) {
   return _az_align_floor(p + (align - 1), align);
 }
 
+/**
+ * Run-time type properties.
+ */
+typedef struct {
+  size_t size;
+  size_t align;
+} _az_type;
+
+/**
+ * Creates @_az_type from the given type/variable.
+ */
+#define _AZ_TYPE(DATA_TYPE) \
+  ((_az_type){ \
+      .size = sizeof(DATA_TYPE), \
+      .align = AZ_ALIGNOF(DATA_TYPE), \
+  })
+
+/**
+ * Run-time data properties.
+ */
+typedef struct {
+  void const * p;
+  _az_type type;
+} _az_data;
+
+/**
+ * Creates @_az_data from the given variable.
+ */
+#define _AZ_DATA(DATA) ((_az_data){ .p = &DATA, .type = _AZ_TYPE(DATA) })
+
+AZ_NODISCARD AZ_INLINE az_span _az_data_get_span(_az_data const data) {
+  return (az_span){ .begin = data.p, .size = data.type.size };
+}
+
 AZ_NODISCARD az_result _az_span_builder_aligned_append(
     az_span_builder * const builder,
-    az_data const data,
+    _az_data const data,
     void ** const out) {
   // alignment.
   {
     uint8_t * const p = builder->buffer.begin + builder->length;
-    AZ_RETURN_IF_FAILED(az_span_builder_append_zeros(builder, _az_align_ceil(p, data.align) - p));
+    AZ_RETURN_IF_FAILED(
+        az_span_builder_append_zeros(builder, _az_align_ceil(p, data.type.align) - p));
   }
   *out = builder->buffer.begin + builder->length;
-  return az_span_builder_append(builder, data.span);
+  return az_span_builder_append(builder, _az_data_get_span(data));
 }
 
 AZ_NODISCARD az_result
-_az_span_builder_top_aligned_append(az_span_builder * const builder, az_data const data) {
+_az_span_builder_top_aligned_append(az_span_builder * const builder, _az_data const data) {
   size_t const size = builder->buffer.size;
-  if (size < data.span.size) {
+  if (size < data.type.size) {
     return AZ_ERROR_BUFFER_OVERFLOW;
   }
   uint8_t * const begin = builder->buffer.begin;
-  uint8_t * const end = _az_align_floor(begin + size - data.span.size, data.align);
+  uint8_t * const end = _az_align_floor(begin + size - data.type.size, data.type.align);
   if (end < begin + builder->length) {
     return AZ_ERROR_BUFFER_OVERFLOW;
   }
   size_t const new_size = end - begin;
   {
     az_mut_span result = { 0 };
-    AZ_RETURN_IF_FAILED(
-        az_mut_span_move(az_mut_span_drop(builder->buffer, new_size), data.span, &result));
+    AZ_RETURN_IF_FAILED(az_mut_span_move(
+        az_mut_span_drop(builder->buffer, new_size), _az_data_get_span(data), &result));
   }
   builder->buffer.size = new_size;
   return AZ_OK;
@@ -82,12 +95,12 @@ AZ_NODISCARD az_result _az_span_builder_top_array_revert(
   AZ_CONTRACT_ARG_NOT_NULL(out_array_begin);
   AZ_CONTRACT_ARG_NOT_NULL(out_array_size);
 
-  // 3. restore buffer size
+  // 1. restore buffer size
   size_t const offset = builder->buffer.size;
   builder->buffer.size = new_size;
   az_mut_span const buffer = builder->buffer;
 
-  // 1. revert the array.
+  // 2. revert the array.
   size_t const item_count = (new_size - offset) / item_type.size;
   for (size_t i = 0; i < item_count / 2; ++i) {
     az_mut_span const a
@@ -97,11 +110,12 @@ AZ_NODISCARD az_result _az_span_builder_top_array_revert(
     az_mut_span_swap(a, b);
   }
 
-  // 2. move it to front.
-  az_data const data = {
-    .span
-    = az_span_take(az_span_drop(az_mut_span_to_span(buffer), offset), item_count * item_type.size),
-    .align = item_type.align,
+  // 3. move it to front.
+  az_span const result_array = az_span_take(
+      az_span_drop(az_mut_span_to_span(buffer), offset), item_count * item_type.size);
+  _az_data const data = {
+    .p = result_array.begin,
+    .type = { .size = result_array.size, .align = item_type.align },
   };
   AZ_RETURN_IF_FAILED(_az_span_builder_aligned_append(builder, data, out_array_begin));
   *out_array_size = item_count;
@@ -114,7 +128,7 @@ AZ_INLINE AZ_NODISCARD az_result _az_span_builder_append_json_data(
     az_json_data const data,
     az_json_data const ** const out) {
   uint8_t * p = { 0 };
-  AZ_RETURN_IF_FAILED(_az_span_builder_aligned_append(builder, AZ_DATA(data), &p));
+  AZ_RETURN_IF_FAILED(_az_span_builder_aligned_append(builder, _AZ_DATA(data), &p));
   *out = (az_json_data const *)p;
   return AZ_OK;
 }
@@ -170,7 +184,7 @@ AZ_NODISCARD az_result _az_span_builder_write_json_value(
             _az_span_builder_write_json_string(builder, token_member.name, &data_member.name));
         AZ_RETURN_IF_FAILED(_az_span_builder_write_json_value(
             builder, parser, token_member.value, &data_member.value));
-        AZ_RETURN_IF_FAILED(_az_span_builder_top_aligned_append(builder, AZ_DATA(data_member)));
+        AZ_RETURN_IF_FAILED(_az_span_builder_top_aligned_append(builder, _AZ_DATA(data_member)));
       }
       void * p = { 0 };
       size_t i = 0;
@@ -190,7 +204,7 @@ AZ_NODISCARD az_result _az_span_builder_write_json_value(
         AZ_RETURN_IF_FAILED(result);
         az_json_data value = { 0 };
         AZ_RETURN_IF_FAILED(_az_span_builder_write_json_value(builder, parser, item_token, &value));
-        AZ_RETURN_IF_FAILED(_az_span_builder_top_aligned_append(builder, AZ_DATA(value)));
+        AZ_RETURN_IF_FAILED(_az_span_builder_top_aligned_append(builder, _AZ_DATA(value)));
       }
       void * p = { 0 };
       size_t i = 0;
