@@ -186,7 +186,7 @@ AZ_NODISCARD az_result _az_span_builder_write_json_value(
             builder, parser, token_member.value, &data_member.value));
         AZ_RETURN_IF_FAILED(_az_span_builder_top_aligned_append(builder, _AZ_DATA(data_member)));
       }
-      void * p = { 0 };
+      void const * p = { 0 };
       size_t i = 0;
       AZ_RETURN_IF_FAILED(_az_span_builder_top_array_revert(
           builder, _AZ_TYPE(az_json_object_member), buffer_size, &p, &i));
@@ -206,7 +206,7 @@ AZ_NODISCARD az_result _az_span_builder_write_json_value(
         AZ_RETURN_IF_FAILED(_az_span_builder_write_json_value(builder, parser, item_token, &value));
         AZ_RETURN_IF_FAILED(_az_span_builder_top_aligned_append(builder, _AZ_DATA(value)));
       }
-      void * p = { 0 };
+      void const * p = { 0 };
       size_t i = 0;
       AZ_RETURN_IF_FAILED(
           _az_span_builder_top_array_revert(builder, _AZ_TYPE(az_json_data), buffer_size, &p, &i));
