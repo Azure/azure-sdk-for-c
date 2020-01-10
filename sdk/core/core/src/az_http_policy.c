@@ -5,11 +5,15 @@
 #include <az_http_pipeline.h>
 #include <az_http_policy.h>
 #include <az_http_request_builder.h>
+#include <az_log.h>
 #include <az_mut_span.h>
 #include <az_span.h>
 #include <az_span_builder.h>
 #include <az_str.h>
 #include <az_url_internal.h>
+
+#include <stddef.h>
+#include <time.h>
 
 #include <_az_cfg.h>
 
@@ -92,8 +96,35 @@ AZ_NODISCARD az_result az_http_pipeline_policy_logging(
     az_http_response * const response) {
   (void)data;
 
-  // Authentication logic
-  return az_http_pipeline_nextpolicy(p_policies, hrb, response);
+  if (data == NULL) {
+    return az_http_pipeline_nextpolicy(p_policies, hrb, response);
+  }
+
+  clock_t const threshold
+      = (data == NULL) ? 0 : ((az_log_options const *)data)->slow_response_threshold;
+  clock_t const start = clock();
+
+  az_result const result = az_http_pipeline_nextpolicy(p_policies, hrb, response);
+
+  clock_t const end = clock();
+
+  if (data != NULL) {
+    clock_t const duration = end - start;
+    if (duration >= threshold && az_log_should_write(AZ_LOG_SLOW_RESPONSE)) {
+      uint8_t log_msg_buf[200];
+      az_span_builder log_msg_bldr
+          = az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(log_msg_buf));
+
+      AZ_RETURN_IF_FAILED(az_span_builder_append_unsigned_number(
+          &log_msg_bldr, duration / (CLOCKS_PER_SEC / 1000)));
+
+      AZ_RETURN_IF_FAILED(az_span_builder_append(&log_msg_bldr, AZ_STR(" ms\0")));
+
+      az_log_write(AZ_LOG_SLOW_RESPONSE, (char const *)az_span_builder_result(&log_msg_bldr).begin);
+    }
+  }
+
+  return result;
 }
 
 AZ_NODISCARD az_result az_http_pipeline_policy_bufferresponse(

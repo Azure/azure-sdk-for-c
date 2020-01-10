@@ -80,6 +80,18 @@ AZ_NODISCARD az_result
 az_span_builder_append_zeros(az_span_builder * const self, size_t const size);
 
 /**
+ * Append an unsigned integral number (base 10).
+ */
+AZ_NODISCARD az_result
+az_span_builder_append_unsigned_number(az_span_builder * const self, unsigned long long const n);
+
+/**
+ * Append a signed integral number (base 10).
+ */
+AZ_NODISCARD az_result
+az_span_builder_append_signed_number(az_span_builder * const self, long long const n);
+
+/**
  * Replace all contents from a starting position to an end position with the content of a provided
  * span
  */
