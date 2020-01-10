@@ -30,7 +30,7 @@ AZ_INLINE uint8_t _az_decimal_to_ascii(uint8_t const d) {
   return '0' + d;
 }
 
-AZ_INLINE AZ_NODISCARD az_result
+static AZ_NODISCARD az_result
 _az_span_builder_append_unsigned_number(az_span_builder * const self, unsigned long long const n) {
   if (n == 0) {
     return az_span_builder_append_byte(self, '0');
