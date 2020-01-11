@@ -1,12 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <_internal/az_curl_adapter.h>
+#include <az_curl_adapter_internal.h>
 
-#include <_internal/az_curl_slist.h>
-#include <_internal/az_http_request.h>
+#include <az_curl_slist_internal.h>
+#include <az_http_request_internal.h>
 #include <az_span.h>
-#include <_internal/az_span_malloc.h>
+#include <az_span_malloc_internal.h>
 #include <az_str.h>
 
 #include <_az_cfg.h>

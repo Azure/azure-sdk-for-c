@@ -4,7 +4,7 @@
 #include "./az_test.h"
 
 #include <az_str.h>
-#include <_internal/az_url.h>
+#include <az_url_internal.h>
 
 #include <_az_cfg.h>
 

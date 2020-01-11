@@ -1,10 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <_internal/az_mut_span.h>
-#include <_internal/az_span.h>
 #include <az_contract.h>
 #include <az_http_request_builder.h>
+#include <az_mut_span_internal.h>
+#include <az_span_internal.h>
 #include <az_str.h>
 
 #include <assert.h>

@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: MIT
 
 #include <_az_base64.h>
-#include <_internal/az_http_request.h>
-#include <_internal/az_span_writer.h>
-#include <_internal/az_uri.h>
 #include <az_http_request_builder.h>
+#include <az_http_request_internal.h>
 #include <az_json_parser.h>
 #include <az_span_builder.h>
 #include <az_span_reader.h>
+#include <az_span_writer_internal.h>
+#include <az_uri_internal.h>
 
 #include <assert.h>
 #include <stdbool.h>

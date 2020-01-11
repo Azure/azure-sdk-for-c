@@ -63,8 +63,13 @@ else()
   target_compile_options(az_core PRIVATE -Wall -Wextra -pedantic  ${WARNINGS_AS_ERRORS_FLAG})
 endif()
 
-target_include_directories (az_core PUBLIC inc)
-target_include_directories (az_core PRIVATE src)
+target_include_directories (az_core PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc> $<INSTALL_INTERFACE:include>)
+
+# create interface for internal headers
+add_library(az_core_internal INTERFACE)
+target_include_directories(az_core_internal INTERFACE internal)
+
+target_link_libraries(az_core PRIVATE az_core_internal)
 
 # make sure that users can consume the project as a library.
 add_library (az::core ALIAS az_core)
@@ -79,7 +84,7 @@ add_executable (
     test/test_url_parse.c
     )
 
-target_link_libraries(az_core_test PRIVATE az_core)
+target_link_libraries(az_core_test PRIVATE az_core az_core_internal)
 target_include_directories (az_core_test PRIVATE src)
 
 target_link_libraries(az_core PRIVATE CURL::libcurl)

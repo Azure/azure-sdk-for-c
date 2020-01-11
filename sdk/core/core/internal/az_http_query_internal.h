@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef _az_HTTP_QUERY_H
-#define _az_HTTP_QUERY_H
+#ifndef _az_HTTP_QUERY_INTERNAL_H
+#define _az_HTTP_QUERY_INTERNAL_H
 
 #include <az_pair.h>
 #include <az_result.h>

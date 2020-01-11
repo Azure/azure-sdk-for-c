@@ -1,10 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <_internal/az_curl_slist.h>
+#include <az_curl_slist_internal.h>
 
 #include <az_action.h>
-#include <_internal/az_http_header.h>
+#include <az_http_header_internal.h>
 
 #include <_az_cfg.h>
 

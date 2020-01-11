@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef _az_INTERNAL_MUT_SPAN_H
-#define _az_INTERNAL_MUT_SPAN_H
+#ifndef _az_INTERNAL_MUT_SPAN_INTERNAL_H
+#define _az_INTERNAL_MUT_SPAN_INTERNAL_H
 
 #include <az_action.h>
 #include <az_contract.h>

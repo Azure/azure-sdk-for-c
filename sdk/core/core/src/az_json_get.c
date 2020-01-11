@@ -1,11 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <_internal/az_span.h>
 #include <az_json_get.h>
 #include <az_json_parser.h>
 #include <az_json_pointer.h>
 #include <az_json_string.h>
+#include <az_span_internal.h>
 
 #include <_az_cfg.h>
 

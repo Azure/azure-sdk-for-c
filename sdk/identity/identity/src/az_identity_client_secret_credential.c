@@ -3,8 +3,6 @@
 
 #include <az_identity_client_secret_credential.h>
 
-#include <_internal/az_uri.h>
-#include <_internal/az_url.h>
 #include <az_contract.h>
 #include <az_http_pipeline.h>
 #include <az_http_request_builder.h>
@@ -14,6 +12,8 @@
 #include <az_json_get.h>
 #include <az_span_builder.h>
 #include <az_str.h>
+#include <az_uri_internal.h>
+#include <az_url_internal.h>
 
 #include <_az_cfg.h>
 

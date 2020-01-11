@@ -4,11 +4,11 @@
 #ifndef _az_SPAN_BUILDER_H
 #define _az_SPAN_BUILDER_H
 
-#include <_internal/az_span.h>
 #include <az_action.h>
 #include <az_mut_span.h>
 #include <az_span.h>
 #include <az_span_action.h>
+#include <az_span_internal.h>
 
 #include <stddef.h>
 #include <stdint.h>
