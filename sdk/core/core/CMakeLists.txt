@@ -64,7 +64,7 @@ else()
 endif()
 
 target_include_directories (az_core PUBLIC inc)
-target_include_directories (az_core PRIVATE src/private)
+target_include_directories (az_core PRIVATE src)
 
 # make sure that users can consume the project as a library.
 add_library (az::core ALIAS az_core)
@@ -80,7 +80,7 @@ add_executable (
     )
 
 target_link_libraries(az_core_test PRIVATE az_core)
-target_include_directories (az_core_test PRIVATE src/private)
+target_include_directories (az_core_test PRIVATE src)
 
 target_link_libraries(az_core PRIVATE CURL::libcurl)
 
