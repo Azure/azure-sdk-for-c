@@ -8,6 +8,7 @@
 #include <az_mut_span.h>
 #include <az_span.h>
 
+#include <stdint.h>
 #include <stdbool.h>
 
 #include <_az_cfg_prefix.h>
