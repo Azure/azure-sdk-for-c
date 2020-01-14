@@ -3,7 +3,7 @@
 
 #include <az_json_string.h>
 
-#include <az_hex.h>
+#include <az_hex_internal.h>
 #include <az_str.h>
 
 #include <ctype.h>
@@ -73,9 +73,7 @@ AZ_NODISCARD az_span az_json_esc_encode(az_result_byte const c) {
     case '\t': {
       return AZ_STR("\\t");
     }
-    default: {
-      return az_span_empty();
-    }
+    default: { return az_span_empty(); }
   }
 }
 

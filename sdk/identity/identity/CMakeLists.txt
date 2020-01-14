@@ -35,6 +35,7 @@ endif()
 target_include_directories (az_identity PUBLIC inc)
 
 target_link_libraries(az_identity PUBLIC az_core)
+target_link_libraries(az_identity PRIVATE az_core_internal)
 
 # make sure that users can consume the project as a library.
 add_library (az::identity ALIAS az_identity)
@@ -44,7 +45,7 @@ add_library (az::identity ALIAS az_identity)
 
 # curl easy perform POC
 add_executable (az_identity_poc test/curl_easy_perform_poc.c)
-target_link_libraries(az_identity_poc PRIVATE az_identity)
+target_link_libraries(az_identity_poc PRIVATE az_identity az_core_internal)
 
 if (UNIX)
   target_link_libraries(az_identity PRIVATE m)

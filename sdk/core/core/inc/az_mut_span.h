@@ -4,8 +4,6 @@
 #ifndef _az_MUT_SPAN_H
 #define _az_MUT_SPAN_H
 
-#include <az_action.h>
-#include <az_contract.h>
 #include <az_result.h>
 #include <az_span.h>
 
@@ -28,10 +26,6 @@ AZ_NODISCARD AZ_INLINE az_mut_span az_mut_span_create_empty() { return (az_mut_s
 
 AZ_NODISCARD AZ_INLINE bool az_mut_span_is_empty(az_mut_span const span) { return span.size == 0; }
 
-AZ_NODISCARD AZ_INLINE bool az_mut_span_is_valid(az_mut_span const span) {
-  return span.size == 0 || (span.begin != NULL && span.begin <= span.begin + span.size - 1);
-}
-
 /**
  * Cast the given mutable span to an immutable span.
  */
@@ -43,24 +37,8 @@ AZ_NODISCARD AZ_INLINE bool az_mut_spans_overlap(az_mut_span const a, az_mut_spa
   return az_span_is_overlap(az_mut_span_to_span(a), az_mut_span_to_span(b));
 }
 
-AZ_NODISCARD AZ_INLINE az_result
-az_mut_span_move(az_mut_span const buffer, az_span const src, az_mut_span * const out_result) {
-  AZ_CONTRACT_ARG_NOT_NULL(out_result);
-
-  AZ_CONTRACT_ARG_VALID_MUT_SPAN(buffer);
-  AZ_CONTRACT_ARG_VALID_SPAN(src);
-
-  AZ_CONTRACT(buffer.size >= src.size, AZ_ERROR_BUFFER_OVERFLOW);
-
-  if (!az_span_is_empty(src)) {
-    memmove((void *)buffer.begin, (void const *)src.begin, src.size);
-  }
-
-  out_result->begin = buffer.begin;
-  out_result->size = src.size;
-
-  return AZ_OK;
-}
+AZ_NODISCARD az_result
+az_mut_span_move(az_mut_span const buffer, az_span const src, az_mut_span * const out_result);
 
 /**
  * Swap content of the given spans.
@@ -97,46 +75,8 @@ az_mut_span_set(az_mut_span const self, size_t const i, uint8_t const value) {
   return AZ_OK;
 }
 
-AZ_NODISCARD AZ_INLINE az_result
-az_mut_span_to_str(az_mut_span const buffer, az_span const src, az_mut_span * const out_result) {
-  AZ_CONTRACT_ARG_NOT_NULL(out_result);
-  AZ_CONTRACT_ARG_VALID_MUT_SPAN(buffer);
-  AZ_CONTRACT_ARG_VALID_SPAN(src);
-
-  if (buffer.size < src.size + 1) {
-    return AZ_ERROR_BUFFER_OVERFLOW;
-  }
-
-  if (!az_span_is_empty(src)) {
-    az_mut_span result = { 0 };
-    AZ_RETURN_IF_FAILED(az_mut_span_move(buffer, src, &result));
-  }
-
-  buffer.begin[src.size] = '\0';
-
-  out_result->begin = buffer.begin;
-  out_result->size = src.size + 1;
-
-  return AZ_OK;
-}
-
-/**
- * ```c
- * typedef struct {
- *   az_result (* func)(void *, az_mut_span);
- *   void * self;
- * } az_mut_span_action;
- * ```
- *
- * Example of usage
- *
- * ```c
- * az_mut_span const span = ...;
- * az_mut_span_action const action = ...;
- * az_mut_span_action_do(action, span);
- * ```
- */
-AZ_ACTION_TYPE(az_mut_span_action, az_mut_span)
+AZ_NODISCARD az_result
+az_mut_span_to_str(az_mut_span const buffer, az_span const src, az_mut_span * const out_result);
 
 #include <_az_cfg_suffix.h>
 

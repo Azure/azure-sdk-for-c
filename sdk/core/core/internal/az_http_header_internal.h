@@ -1,14 +1,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef _az_HTTP_HEADER_H
-#define _az_HTTP_HEADER_H
+#ifndef _az_HTTP_HEADER_INTERNAL_H
+#define _az_HTTP_HEADER_INTERNAL_H
 
 #include <az_action.h>
 #include <az_pair.h>
 #include <az_result.h>
 #include <az_span.h>
-#include <az_span_writer.h>
+#include <az_span_internal.h>
+#include <az_span_writer_internal.h>
 
 #include <_az_cfg_prefix.h>
 

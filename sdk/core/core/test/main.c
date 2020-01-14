@@ -1,14 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_base64.h>
-#include <az_http_request.h>
+#include <_az_base64.h>
 #include <az_http_request_builder.h>
+#include <az_http_request_internal.h>
 #include <az_json_parser.h>
 #include <az_span_builder.h>
 #include <az_span_reader.h>
-#include <az_span_writer.h>
-#include <az_uri.h>
+#include <az_span_writer_internal.h>
+#include <az_uri_internal.h>
 
 #include <assert.h>
 #include <stdbool.h>
@@ -634,12 +634,13 @@ int main() {
 
     az_span_builder builder = az_span_builder_create(buffer);
     TEST_EXPECT_SUCCESS(az_uri_encode(AZ_STR("https://vault.azure.net"), &builder));
-    TEST_ASSERT(
-        az_span_is_equal(az_span_builder_result(&builder), AZ_STR("https%3A%2F%2Fvault.azure.net")));
+    TEST_ASSERT(az_span_is_equal(
+        az_span_builder_result(&builder), AZ_STR("https%3A%2F%2Fvault.azure.net")));
 
     builder = az_span_builder_create(buffer);
     TEST_EXPECT_SUCCESS(az_uri_decode(AZ_STR("https%3A%2F%2Fvault.azure.net"), &builder));
-    TEST_ASSERT(az_span_is_equal(az_span_builder_result(&builder), AZ_STR("https://vault.azure.net")));
+    TEST_ASSERT(
+        az_span_is_equal(az_span_builder_result(&builder), AZ_STR("https://vault.azure.net")));
 
     builder = az_span_builder_create(buffer);
     TEST_EXPECT_SUCCESS(az_uri_encode(uri_decoded, &builder));

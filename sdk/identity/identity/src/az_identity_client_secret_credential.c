@@ -12,8 +12,8 @@
 #include <az_json_get.h>
 #include <az_span_builder.h>
 #include <az_str.h>
-#include <az_uri.h>
-#include <az_url.h>
+#include <az_uri_internal.h>
+#include <az_url_internal.h>
 
 #include <_az_cfg.h>
 

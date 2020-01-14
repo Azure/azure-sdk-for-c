@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef _az_CURL_SLIST_H
-#define _az_CURL_SLIST_H
+#ifndef _az_CURL_SLIST_INTERNAL_H
+#define _az_CURL_SLIST_INTERNAL_H
 
 #include <az_pair.h>
 #include <az_result.h>

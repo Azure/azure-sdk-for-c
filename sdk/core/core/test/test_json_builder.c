@@ -4,7 +4,7 @@
 #include <az_json_builder.h>
 #include <az_span.h>
 #include <az_span_builder.h>
-#include <az_span_writer.h>
+#include <az_span_writer_internal.h>
 
 #include <az_test.h>
 
