@@ -4,8 +4,6 @@
 #ifndef _az_MUT_SPAN_H
 #define _az_MUT_SPAN_H
 
-#include <az_action.h>
-#include <az_contract.h>
 #include <az_result.h>
 #include <az_span.h>
 
