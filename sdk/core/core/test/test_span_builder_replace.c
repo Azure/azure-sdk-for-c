@@ -5,9 +5,9 @@
 #include <az_span_builder.h>
 #include <az_str.h>
 
-#include "./az_test.h"
+#include <az_test.h>
 
-static void test_span_builder_replace() {
+void test_span_builder_replace() {
   {
     // Replace inside content with smaller content -> left shift
     uint8_t array[200];

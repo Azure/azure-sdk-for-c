@@ -40,6 +40,11 @@ AZ_NODISCARD AZ_INLINE bool az_mut_spans_overlap(az_mut_span const a, az_mut_spa
 AZ_NODISCARD az_result
 az_mut_span_move(az_mut_span const buffer, az_span const src, az_mut_span * const out_result);
 
+/**
+ * Swap content of the given spans.
+ */
+void az_mut_span_swap(az_mut_span const a, az_mut_span const b);
+
 AZ_NODISCARD AZ_INLINE az_mut_span az_mut_span_drop(az_mut_span const span, size_t const n) {
   if (span.size <= n) {
     return az_mut_span_create_empty();

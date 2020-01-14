@@ -15,24 +15,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "./az_test.h"
+#include <az_test.h>
 #include "./test_http_response_parser.h"
-#include "./test_json_string.h"
-#include "./test_json_value.h"
-#include "./test_pair_span.h"
-#include "./test_span_builder_replace.h"
-#include "./test_span_span.h"
 
 #include <_az_cfg.h>
 
 void test_json_builder();
+void test_json_data();
 void test_json_get_by_pointer();
 void test_json_pointer();
 void test_json_string();
+void test_json_value();
 void test_url_parse();
 void test_span_builder_replace();
 void test_span_span();
 void test_pair_span();
+void test_mut_span();
 
 int exit_code = 0;
 
@@ -733,6 +731,7 @@ int main() {
 
   test_http_response_parser();
   test_json_builder();
+  test_json_data();
   test_json_get_by_pointer();
   test_json_value();
   test_json_pointer();
@@ -741,5 +740,6 @@ int main() {
   test_span_builder_replace();
   test_span_span();
   test_pair_span();
+  test_mut_span();
   return exit_code;
 }

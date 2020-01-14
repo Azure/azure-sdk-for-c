@@ -25,6 +25,7 @@ add_library (
   src/az_http_request_builder.c
   src/az_http_response_parser.c
   src/az_json_builder.c
+  src/az_json_data.c
   src/az_json_get.c
   src/az_json_parser.c
   src/az_json_pointer.c
@@ -78,9 +79,15 @@ add_executable (
     az_core_test 
     test/main.c 
     test/test_json_builder.c
+    test/test_json_data.c
     test/test_json_get_by_pointer.c
     test/test_json_pointer.c
-    test/test_json_string.c  
+    test/test_json_string.c
+    test/test_json_value.c
+    test/test_mut_span.c
+    test/test_pair_span.c
+    test/test_span_builder_replace.c
+    test/test_span_span.c
     test/test_url_parse.c
     )
 
@@ -97,5 +104,7 @@ endif()
 if (UNIX)
   target_link_libraries(az_core_test PRIVATE m)
 endif()
+
+target_include_directories (az_core_test PRIVATE test)
 
 add_test(NAME az_core_test COMMAND az_core_test)
