@@ -1,17 +1,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef _az_INTERNAL_SPAN_INTERNAL_H
-#define _az_INTERNAL_SPAN_INTERNAL_H
+#ifndef _az_SPAN_INTERNAL_H
+#define _az_SPAN_INTERNAL_H
 
-#include <az_action.h>
+#include <az_contract.h>
 #include <az_result.h>
 #include <az_span.h>
 
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
-#include <string.h>
 
 #include <_az_cfg_prefix.h>
 
