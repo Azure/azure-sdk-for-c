@@ -4,9 +4,9 @@
 #include <az_span_span.h>
 #include <az_str.h>
 
-#include "./az_test.h"
+#include <az_test.h>
 
-static void test_span_span() {
+void test_span_span() {
   {
     az_span src_buffer[4];
     az_span_span_builder span_span_builder
