@@ -63,11 +63,11 @@ else()
   target_compile_options(az_core PRIVATE -Wall -Wextra -pedantic  ${WARNINGS_AS_ERRORS_FLAG})
 endif()
 
-target_include_directories (az_core PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc> $<INSTALL_INTERFACE:include>)
+target_include_directories (az_core PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc> $<INSTALL_INTERFACE:include/az>)
 
 # create interface for internal headers
 add_library(az_core_internal INTERFACE)
-target_include_directories(az_core_internal INTERFACE internal)
+target_include_directories(az_core_internal $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/internal> $<INSTALL_INTERFACE:include/az_internal>)
 
 target_link_libraries(az_core PRIVATE az_core_internal)
 
