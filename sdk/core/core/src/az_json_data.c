@@ -190,7 +190,7 @@ AZ_NODISCARD az_result _az_span_builder_write_json_value(
       size_t i = 0;
       AZ_RETURN_IF_FAILED(_az_span_builder_top_array_revert(
           builder, _AZ_TYPE(az_json_object_member), buffer_size, &p, &i));
-      *out = az_json_data_object((az_json_object){ ._detail = { .begin = p, .size = i } });
+      *out = az_json_data_object((az_json_object){ ._internal = { .begin = p, .size = i } });
       break;
     }
     case AZ_JSON_TOKEN_ARRAY: {
@@ -210,7 +210,7 @@ AZ_NODISCARD az_result _az_span_builder_write_json_value(
       size_t i = 0;
       AZ_RETURN_IF_FAILED(
           _az_span_builder_top_array_revert(builder, _AZ_TYPE(az_json_data), buffer_size, &p, &i));
-      *out = az_json_data_array((az_json_array){ ._detail = { .begin = p, .size = i } });
+      *out = az_json_data_array((az_json_array){ ._internal = { .begin = p, .size = i } });
       break;
     }
     default: {

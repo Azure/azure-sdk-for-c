@@ -19,10 +19,10 @@ typedef struct {
   struct {
     az_json_data const * begin;
     size_t size;
-  } _detail;
+  } _internal;
 } az_json_array;
 
-AZ_NODISCARD AZ_INLINE size_t az_json_array_size(az_json_array const a) { return a._detail.size; }
+AZ_NODISCARD AZ_INLINE size_t az_json_array_size(az_json_array const a) { return a._internal.size; }
 
 typedef struct az_json_object_member az_json_object_member;
 
@@ -30,10 +30,10 @@ typedef struct {
   struct {
     az_json_object_member const * begin;
     size_t size;
-  } _detail;
+  } _internal;
 } az_json_object;
 
-AZ_NODISCARD AZ_INLINE size_t az_json_object_size(az_json_object const a) { return a._detail.size; }
+AZ_NODISCARD AZ_INLINE size_t az_json_object_size(az_json_object const a) { return a._internal.size; }
 
 typedef enum {
   AZ_JSON_DATA_NULL = 0,
@@ -63,7 +63,7 @@ typedef struct {
 AZ_NODISCARD AZ_INLINE az_json_data_option
 az_json_array_get(az_json_array const a, size_t const i) {
   return i < az_json_array_size(a)
-      ? (az_json_data_option){ .has = true, .data = a._detail.begin[i] }
+      ? (az_json_data_option){ .has = true, .data = a._internal.begin[i] }
       : (az_json_data_option){ .has = false };
 }
 
@@ -104,7 +104,7 @@ typedef struct {
 AZ_NODISCARD AZ_INLINE az_json_object_member_option
 az_json_object_get(az_json_object const o, size_t const i) {
   return i < az_json_object_size(o)
-      ? (az_json_object_member_option){ .has = true, .data = o._detail.begin[i] }
+      ? (az_json_object_member_option){ .has = true, .data = o._internal.begin[i] }
       : (az_json_object_member_option){ .has = false };
 }
 
