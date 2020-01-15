@@ -13,23 +13,38 @@
 
 #include <_az_cfg_prefix.h>
 
-/// A pair of strings.
+/**
+ * @brief a pair of az_span of bytes as a key and value
+ *
+ */
 typedef struct {
   az_span key;
   az_span value;
 } az_pair;
 
-/// A span of pairs.
+/**
+ * @brief an immutable span of az_pairs where begin points to the first az_pair
+ * and size represents the total number of az_pairs
+ */
 typedef struct {
   az_pair const * begin;
   size_t size;
 } az_pair_span;
 
+/**
+ * @brief a mutable span of az_pairs where begin points to the first az_pair
+ * and size represents the total number of az_pairs
+ */
 typedef struct {
   az_pair * begin;
   size_t size;
 } az_mut_pair_span;
 
+/**
+ * @brief a builder for construnction an az_pair_span.
+ * @var buffer.size represents the maximun size of az_pair_span that can be added
+ * @var size represents the current number of az_pair_span in the buffer
+ */
 typedef struct {
   az_mut_pair_span buffer;
   size_t length;
