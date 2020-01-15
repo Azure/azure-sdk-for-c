@@ -3,6 +3,7 @@
 
 #include <az_json_builder.h>
 #include <az_keyvault.h>
+#include <az_span_builder_internal.h>
 
 #include <_az_cfg.h>
 
