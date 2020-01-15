@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef AZ_HTTP_POLICY_H
-#define AZ_HTTP_POLICY_H
+#ifndef _az_HTTP_POLICY_H
+#define _az_HTTP_POLICY_H
 
 #include <az_http_request_builder.h>
 #include <az_http_response.h>
@@ -37,7 +37,7 @@ typedef struct az_http_policy az_http_policy;
 typedef struct {
   uint16_t max_retry;
   uint16_t delay_in_ms;
-} az_keyvault_keys_client_options_retry;
+} az_http_policy_retry_options;
 
 // PipelinePolicies must implement the process function
 //

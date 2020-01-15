@@ -1,11 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_curl_adapter.h>
+#include <az_curl_adapter_internal.h>
 
-#include <az_curl_slist.h>
-#include <az_http_request.h>
-#include <az_span_malloc.h>
+#include <az_curl_slist_internal.h>
+#include <az_http_request_internal.h>
+#include <az_span.h>
+#include <az_span_malloc_internal.h>
 #include <az_str.h>
 
 #include <_az_cfg.h>
@@ -126,7 +127,7 @@ size_t write_to_span(
   size_t const expected_size = size * nmemb;
   az_span_builder * const user_buffer_builder = (az_span_builder *)userp;
 
-  az_span const span_for_content = (az_span){ .begin = contents, .size = expected_size };
+  az_span const span_for_content = az_span_from_runtime_array(contents, expected_size);
   AZ_RETURN_IF_FAILED(az_span_builder_append(user_buffer_builder, span_for_content));
 
   // This callback needs to return the response size or curl will consider it as it failed
@@ -189,6 +190,70 @@ az_curl_send_post_request(CURL * const p_curl, az_http_request_builder const * c
   return AZ_OK;
 }
 
+size_t _az_curl_upload_read_callback(void * ptr, size_t size, size_t nmemb, void * userdata) {
+
+  az_mut_span * mut_span = (az_mut_span *)userdata;
+
+  size_t curl_size = nmemb * size;
+
+  // Nothing to copy
+  if (curl_size < 1 || !(mut_span->size))
+    return 0;
+
+  size_t to_copy = (mut_span->size < curl_size) ? mut_span->size : curl_size;
+  memcpy(ptr, mut_span->begin, to_copy);
+  mut_span->size -= to_copy;
+  mut_span->begin += to_copy;
+
+  return to_copy;
+}
+
+/**
+ * handles POST request. It handles seting up a body for request
+ */
+AZ_NODISCARD az_result
+az_curl_send_upload_request(CURL * const p_curl, az_http_request_builder const * const p_hrb) {
+  AZ_CONTRACT_ARG_NOT_NULL(p_curl);
+  AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
+
+  // Method
+  az_mut_span body = { 0 };
+  AZ_RETURN_IF_FAILED(az_span_malloc(p_hrb->body.size + AZ_STR_ZERO.size, &body));
+
+  az_mut_span zt_buf = { 0 };
+  az_result res_code = az_mut_span_to_str(body, p_hrb->body, &zt_buf);
+
+  if (az_succeeded(res_code)) {
+    res_code = az_curl_code_to_result(curl_easy_setopt(p_curl, CURLOPT_UPLOAD, 1L));
+    if (az_succeeded(res_code)) {
+      res_code = az_curl_code_to_result(
+          curl_easy_setopt(p_curl, CURLOPT_READFUNCTION, _az_curl_upload_read_callback));
+      if (az_succeeded(res_code)) {
+
+        // Setup the request to pass the body in as the data stream to read
+        res_code = az_curl_code_to_result(curl_easy_setopt(p_curl, CURLOPT_READDATA, body));
+
+        if (az_succeeded(res_code)) {
+
+          // Set the size of the upload
+          res_code = az_curl_code_to_result(
+              curl_easy_setopt(p_curl, CURLOPT_INFILESIZE, (curl_off_t)body.size));
+
+          // Do the curl work
+          if (az_succeeded(res_code)) {
+            res_code = az_curl_code_to_result(curl_easy_perform(p_curl));
+          }
+        }
+      }
+    }
+  }
+
+  az_span_free(&body);
+  AZ_RETURN_IF_FAILED(res_code);
+
+  return AZ_OK;
+}
+
 /**
  * @brief finds out if there are headers in the request and add them to curl header list
  *
@@ -231,7 +296,7 @@ AZ_NODISCARD az_result setup_url(CURL * const p_curl, az_http_request_builder co
   {
     // set URL as 0-terminated str
     size_t const extra_space_for_zero = AZ_STR_ZERO.size;
-    size_t const url_final_size = p_hrb->url_builder.size + extra_space_for_zero;
+    size_t const url_final_size = p_hrb->url_builder.length + extra_space_for_zero;
     // allocate buffer to add \0
     AZ_RETURN_IF_FAILED(az_span_malloc(url_final_size, &writable_buffer));
   }
@@ -245,7 +310,7 @@ AZ_NODISCARD az_result setup_url(CURL * const p_curl, az_http_request_builder co
   }
 
   // free used buffer before anything else
-  az_mut_span_memset(writable_buffer, 0);
+  az_mut_span_fill(writable_buffer, 0);
   az_span_free(&writable_buffer);
 
   return result;
@@ -300,12 +365,16 @@ AZ_NODISCARD az_result az_http_client_send_request_impl_process(
 
   AZ_RETURN_IF_CURL_FAILED(setup_response_redirect(p_curl, &response->builder, buildRFC7230));
 
-  if (az_span_eq(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_GET)) {
+  if (az_span_is_equal(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_GET)) {
     result = az_curl_send_get_request(p_curl);
-  } else if (az_span_eq(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_POST)) {
+  } else if (az_span_is_equal(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_POST)) {
     result = az_curl_send_post_request(p_curl, p_hrb);
-  } else if (az_span_eq(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_DELETE)) {
+  } else if (az_span_is_equal(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_DELETE)) {
     result = az_curl_send_delete_request(p_curl, p_hrb);
+  } else if (az_span_is_equal(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_PUT)) {
+    result = az_curl_send_upload_request(p_curl, p_hrb);
+  } else {
+    return AZ_ERROR_HTTP_INVALID_METHOD_VERB;
   }
 
   // make sure to set the end of the body response as the end of the complete response

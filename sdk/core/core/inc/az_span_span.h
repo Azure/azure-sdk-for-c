@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef AZ_SPAN_SPAN_H
-#define AZ_SPAN_SPAN_H
+#ifndef _az_SPAN_SPAN_H
+#define _az_SPAN_SPAN_H
 
 #include <az_result.h>
 #include <az_span.h>
@@ -26,7 +26,7 @@ typedef struct {
 
 typedef struct {
   az_mut_span_span buffer;
-  size_t size;
+  size_t length;
 } az_span_span_builder;
 
 /**
@@ -38,7 +38,7 @@ AZ_NODISCARD AZ_INLINE az_span_span_builder
 az_span_span_builder_create(az_mut_span_span const buffer) {
   return (az_span_span_builder){
     .buffer = buffer,
-    .size = 0,
+    .length = 0,
   };
 }
 

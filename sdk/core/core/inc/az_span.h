@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef AZ_SPAN_H
-#define AZ_SPAN_H
+#ifndef _az_SPAN_H
+#define _az_SPAN_H
 
 #include <az_action.h>
 #include <az_result.h>
@@ -24,13 +24,9 @@ typedef struct {
 
 typedef int32_t az_result_byte;
 
-AZ_NODISCARD AZ_INLINE az_span az_span_create_empty() { return (az_span){ 0 }; }
+AZ_NODISCARD AZ_INLINE az_span az_span_empty() { return (az_span){ 0 }; }
 
-AZ_NODISCARD AZ_INLINE bool az_span_is_empty(az_span const span) { return span.size <= 0; }
-
-AZ_NODISCARD AZ_INLINE bool az_span_is_valid(az_span const span) {
-  return span.size == 0 || (span.begin != NULL && span.begin <= span.begin + span.size - 1);
-}
+AZ_NODISCARD AZ_INLINE bool az_span_is_empty(az_span const span) { return span.size == 0; }
 
 /**
  * Returns a byte in `index` position.
@@ -62,7 +58,7 @@ AZ_NODISCARD AZ_INLINE az_span az_span_take(az_span const span, size_t const n) 
  */
 AZ_NODISCARD AZ_INLINE az_span az_span_drop(az_span const span, size_t const n) {
   if (span.size <= n) {
-    return az_span_create_empty();
+    return az_span_empty();
   }
   return (az_span){ .begin = span.begin + n, .size = span.size - n };
 }
@@ -80,7 +76,7 @@ az_span_sub(az_span const span, size_t const begin, size_t const end) {
  * Returns `true` if a content of the @a span is equal to a content of the @b
  * span.
  */
-AZ_NODISCARD AZ_INLINE bool az_span_eq(az_span const a, az_span const b) {
+AZ_NODISCARD AZ_INLINE bool az_span_is_equal(az_span const a, az_span const b) {
   return a.size == b.size && memcmp(a.begin, b.begin, a.size) == 0;
 }
 
@@ -88,7 +84,7 @@ AZ_NODISCARD AZ_INLINE bool az_span_eq(az_span const a, az_span const b) {
  * Returns `true` if a content of the @a span is equal to a content of the @b
  * span using case-insensetive compare.
  */
-AZ_NODISCARD bool az_span_eq_ascii_ignore_case(az_span const a, az_span const b);
+AZ_NODISCARD bool az_span_is_equal_ignoring_case(az_span const a, az_span const b);
 
 AZ_NODISCARD AZ_INLINE bool az_span_is_overlap(az_span const a, az_span const b) {
   return (!az_span_is_empty(a) && !az_span_is_empty(b))
@@ -102,33 +98,29 @@ AZ_NODISCARD AZ_INLINE az_result az_error_unexpected_char(az_result_byte const c
   return az_failed(c) ? c : AZ_ERROR_PARSER_UNEXPECTED_CHAR;
 }
 
-AZ_NODISCARD az_result az_span_get_uint64(az_span const self, uint64_t * const out);
-
-#define AZ_ARRAY_SIZE(ARRAY) (sizeof(ARRAY) / sizeof(*ARRAY))
+AZ_NODISCARD az_result az_span_to_uint64(az_span const self, uint64_t * const out);
 
 #define AZ_SPAN_FROM_ARRAY(ARRAY) \
-  { .begin = ARRAY, .size = AZ_ARRAY_SIZE(ARRAY) }
+  { .begin = ARRAY, .size = (sizeof(ARRAY) / sizeof(*ARRAY)) }
 
-AZ_NODISCARD AZ_INLINE az_span az_span_from_one(uint8_t const * ptr) {
-  return (az_span){ .begin = ptr, .size = 1 };
+/**
+ * @brief Use this function when size for one span is given in runtime
+ * Don't use this function for arrays. Use @var AZ_SPAN_FROM_ARRAY instead.
+ *
+ */
+AZ_NODISCARD AZ_INLINE az_span az_span_from_runtime_array(uint8_t const * ptr, size_t size) {
+  return (az_span){ .begin = ptr, .size = size };
 }
 
 /**
- * ```c
- * typedef struct {
- *   az_result (* func)(void *, az_const_span);
- *   void * self;
- * } az_span_action;
- * ```
- *
- * Example of usage
- *
- * ```c
- * az_span_action const action = ...;
- * az_span_action_do(action, AZ_STR("Something"));
- * ```
+ * @brief Use this only to create a span from uint8_t object.
+ * The size of the returned span is always one.
+ * Don't use this function for arrays. Use @var AZ_SPAN_FROM_ARRAY instead.
+ * Don't us
  */
-AZ_ACTION_TYPE(az_span_action, az_span)
+AZ_NODISCARD AZ_INLINE az_span az_span_from_single_item(uint8_t const * ptr) {
+  return az_span_from_runtime_array(ptr, 1);
+}
 
 AZ_NODISCARD AZ_INLINE az_span az_str_to_span(char const * str) {
   return (az_span){ .begin = (uint8_t const *)str, .size = strlen(str) };

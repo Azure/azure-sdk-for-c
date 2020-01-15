@@ -1,12 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef AZ_SPAN_BUILDER_H
-#define AZ_SPAN_BUILDER_H
+#ifndef _az_SPAN_BUILDER_H
+#define _az_SPAN_BUILDER_H
 
 #include <az_action.h>
 #include <az_mut_span.h>
 #include <az_span.h>
+#include <az_span_action.h>
+#include <az_span_internal.h>
 
 #include <stddef.h>
 #include <stdint.h>
@@ -24,9 +26,9 @@ typedef struct {
    */
   az_mut_span buffer;
   /**
-   * A current size in the resulting span. The field is increased after each write.
+   * A current length in the resulting span. The field is increased after each write.
    */
-  size_t size;
+  size_t length;
 } az_span_builder;
 
 /**
@@ -37,13 +39,13 @@ typedef struct {
 AZ_NODISCARD AZ_INLINE az_span_builder az_span_builder_create(az_mut_span const buffer) {
   return (az_span_builder){
     .buffer = buffer,
-    .size = 0,
+    .length = 0,
   };
 }
 
 AZ_INLINE void az_span_builder_reset(az_span_builder * const self) {
   az_mut_span const buffer = self->buffer;
-  az_mut_span_memset(buffer, 0);
+  az_mut_span_fill(buffer, 0);
   *self = az_span_builder_create(buffer);
 }
 
@@ -51,7 +53,7 @@ AZ_INLINE void az_span_builder_reset(az_span_builder * const self) {
  * Returns a mutable span of bytes that were written into the builder's buffer.
  */
 AZ_NODISCARD AZ_INLINE az_mut_span az_span_builder_mut_result(az_span_builder const * const self) {
-  return az_mut_span_take(self->buffer, self->size);
+  return az_mut_span_take(self->buffer, self->length);
 }
 
 /**
@@ -70,6 +72,12 @@ AZ_NODISCARD az_result az_span_builder_append(az_span_builder * const self, az_s
  * Append a single byte.
  */
 AZ_NODISCARD az_result az_span_builder_append_byte(az_span_builder * const self, uint8_t const c);
+
+/**
+ * Append zeros.
+ */
+AZ_NODISCARD az_result
+az_span_builder_append_zeros(az_span_builder * const self, size_t const size);
 
 AZ_ACTION_FUNC(az_span_builder_append, az_span_builder, az_span_action)
 

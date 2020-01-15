@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef AZ_HTTP_CLIENT_H
-#define AZ_HTTP_CLIENT_H
+#ifndef _az_HTTP_CLIENT_INTERNAL_H
+#define _az_HTTP_CLIENT_INTERNAL_H
 
 #include <az_http_request_builder.h>
 #include <az_http_response.h>
@@ -10,7 +10,7 @@
 #ifdef MOCK_CURL
 #include <az_mock_curl.h>
 #else
-#include <az_curl_adapter.h>
+#include <az_curl_adapter_internal.h>
 #endif
 
 #include <_az_cfg_prefix.h>

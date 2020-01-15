@@ -39,8 +39,8 @@
 
 #endif
 
-#ifndef AZ_CFG_H
-#define AZ_CFG_H
+#ifndef _az_CFG_H
+#define _az_CFG_H
 
 #ifdef _MSC_VER
 #define AZ_INLINE static __forceinline
@@ -64,6 +64,17 @@
 #define AZ_NODISCARD __attribute__((warn_unused_result))
 #else
 #define AZ_NODISCARD
+#endif
+
+// MSVC
+#if defined(_MSC_VER)
+#define AZ_ALIGNOF(T) __alignof(T)
+// GCC
+#elif defined(__GNUC__)
+#define AZ_ALIGNOF(T) __alignof__(T)
+// unknown
+#else
+#define AZ_ALIGNOF(T) _Alignof(T)
 #endif
 
 #endif

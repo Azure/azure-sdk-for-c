@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef AZ_SPAN_MALLOC_H
-#define AZ_SPAN_MALLOC_H
+#ifndef _az_SPAN_MALLOC_INTERNAL_H
+#define _az_SPAN_MALLOC_INTERNAL_H
 
 #include <az_mut_span.h>
 #include <az_result.h>

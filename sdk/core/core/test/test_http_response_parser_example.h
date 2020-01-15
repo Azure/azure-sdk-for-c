@@ -37,7 +37,7 @@ static az_result http_response_parser_example(az_span const response) {
         AZ_RETURN_IF_FAILED(result);
       }
       // we expect only one header for now
-      if (az_span_eq(header.key, AZ_STR("Content-Type"))) {
+      if (az_span_is_equal(header.key, AZ_STR("Content-Type"))) {
         contentType = header.value;
       } else {
         return AZ_ERROR_HTTP_INVALID_STATE;
@@ -45,7 +45,7 @@ static az_result http_response_parser_example(az_span const response) {
     }
 
     // make sure we have a Content-Type header and it's what we expect.
-    if (!az_span_eq(contentType, AZ_STR("text/html; charset=UTF-8"))) {
+    if (!az_span_is_equal(contentType, AZ_STR("text/html; charset=UTF-8"))) {
       return AZ_ERROR_HTTP_INVALID_STATE;
     }
   }
@@ -54,7 +54,7 @@ static az_result http_response_parser_example(az_span const response) {
   {
     az_span body;
     AZ_RETURN_IF_FAILED(az_http_response_parser_read_body(&parser, &body));
-    if (!az_span_eq(body, AZ_STR(EXAMPLE_BODY))) {
+    if (!az_span_is_equal(body, AZ_STR(EXAMPLE_BODY))) {
       return AZ_ERROR_HTTP_INVALID_STATE;
     }
   }
@@ -89,7 +89,7 @@ static az_result http_response_getters_example(az_span const response) {
         AZ_RETURN_IF_FAILED(result);
       }
       // we expect only one header for now
-      if (az_span_eq(header.key, AZ_STR("Content-Type"))) {
+      if (az_span_is_equal(header.key, AZ_STR("Content-Type"))) {
         contentType = header.value;
       } else {
         return AZ_ERROR_HTTP_INVALID_STATE;
@@ -97,7 +97,7 @@ static az_result http_response_getters_example(az_span const response) {
     }
 
     // make sure we have a Content-Type header and it's what we expect.
-    if (!az_span_eq(contentType, AZ_STR("text/html; charset=UTF-8"))) {
+    if (!az_span_is_equal(contentType, AZ_STR("text/html; charset=UTF-8"))) {
       return AZ_ERROR_HTTP_INVALID_STATE;
     }
   }
@@ -106,7 +106,7 @@ static az_result http_response_getters_example(az_span const response) {
   {
     az_span body = { 0 };
     AZ_RETURN_IF_FAILED(az_http_response_get_body(response, &header, &body));
-    if (!az_span_eq(body, AZ_STR(EXAMPLE_BODY))) {
+    if (!az_span_is_equal(body, AZ_STR(EXAMPLE_BODY))) {
       return AZ_ERROR_HTTP_INVALID_STATE;
     }
   }

@@ -1,12 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef AZ_KEYVAULT_H
-#define AZ_KEYVAULT_H
+#ifndef _az_KEYVAULT_H
+#define _az_KEYVAULT_H
 
-#include <az_contract.h>
 #include <az_http_pipeline.h>
 #include <az_http_response.h>
+#include <az_contract.h>
 #include <az_identity_access_token.h>
 #include <az_identity_access_token_context.h>
 #include <az_keyvault_create_key_options.h>
@@ -20,7 +20,7 @@
 
 typedef struct {
   az_span service_version;
-  az_keyvault_keys_client_options_retry retry;
+  az_http_policy_retry_options retry;
 } az_keyvault_keys_client_options;
 
 typedef struct {

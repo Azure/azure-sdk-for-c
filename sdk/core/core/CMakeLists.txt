@@ -25,6 +25,7 @@ add_library (
   src/az_http_request_builder.c
   src/az_http_response_parser.c
   src/az_json_builder.c
+  src/az_json_data.c
   src/az_json_get.c
   src/az_json_parser.c
   src/az_json_pointer.c
@@ -63,7 +64,13 @@ else()
   target_compile_options(az_core PRIVATE -Wall -Wextra -pedantic  ${WARNINGS_AS_ERRORS_FLAG})
 endif()
 
-target_include_directories (az_core PUBLIC inc)
+target_include_directories (az_core PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc> $<INSTALL_INTERFACE:include/az>)
+
+# create interface for internal headers
+add_library(az_core_internal INTERFACE)
+target_include_directories(az_core_internal INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/internal> $<INSTALL_INTERFACE:include/az_internal>)
+
+target_link_libraries(az_core PRIVATE az_core_internal)
 
 # make sure that users can consume the project as a library.
 add_library (az::core ALIAS az_core)
@@ -72,13 +79,20 @@ add_executable (
     az_core_test 
     test/main.c 
     test/test_json_builder.c
+    test/test_json_data.c
     test/test_json_get_by_pointer.c
     test/test_json_pointer.c
-    test/test_json_string.c  
+    test/test_json_string.c
+    test/test_json_value.c
+    test/test_mut_span.c
+    test/test_pair_span.c
+    test/test_span_builder_replace.c
+    test/test_span_span.c
     test/test_url_parse.c
     )
 
-target_link_libraries(az_core_test PRIVATE az_core)
+target_link_libraries(az_core_test PRIVATE az_core az_core_internal)
+target_include_directories (az_core_test PRIVATE src)
 
 target_link_libraries(az_core PRIVATE CURL::libcurl)
 
@@ -90,5 +104,7 @@ endif()
 if (UNIX)
   target_link_libraries(az_core_test PRIVATE m)
 endif()
+
+target_include_directories (az_core_test PRIVATE test)
 
 add_test(NAME az_core_test COMMAND az_core_test)

@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_url.h>
+#include <az_url_internal.h>
 
-#include <az_http_query.h>
+#include <az_http_query_internal.h>
 #include <az_span_reader.h>
 #include <az_str.h>
 
@@ -40,7 +40,7 @@ az_span_reader_read_url_port(az_span_reader * const self, az_span * const port) 
   {
     az_result const c = az_span_reader_current(self);
     if (c != ':') {
-      *port = az_span_create_empty();
+      *port = az_span_empty();
       return AZ_OK;
     }
     az_span_reader_next(self);
@@ -71,7 +71,7 @@ az_span_reader_read_url_authority(az_span_reader * const self, az_url_authority 
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
   bool has_userinfo = false;
-  out->userinfo = az_span_create_empty();
+  out->userinfo = az_span_empty();
   size_t begin = self->i;
   while (true) {
     az_result_byte c = az_span_reader_current(self);
@@ -113,7 +113,7 @@ az_span_reader_read_url_path(az_span_reader * const self, az_span * const path) 
   {
     az_result const c = az_span_reader_current(self);
     if (c != '/') {
-      *path = az_span_create_empty();
+      *path = az_span_empty();
       return AZ_OK;
     }
     az_span_reader_next(self);
@@ -144,7 +144,7 @@ az_span_reader_read_url_query(az_span_reader * const self, az_span * const query
   {
     az_result const c = az_span_reader_current(self);
     if (c != '?') {
-      *query = az_span_create_empty();
+      *query = az_span_empty();
       return AZ_OK;
     }
     az_span_reader_next(self);
@@ -175,7 +175,7 @@ az_span_reader_read_url_fragment(az_span_reader * const self, az_span * const fr
   {
     az_result const c = az_span_reader_current(self);
     if (c != '#') {
-      *fragment = az_span_create_empty();
+      *fragment = az_span_empty();
       return AZ_OK;
     }
     az_span_reader_next(self);
@@ -233,6 +233,6 @@ AZ_NODISCARD az_result az_host_read_domain(az_span * const host, az_span * const
     --i;
   } while (0 < i);
   *domain = *host;
-  *host = az_span_create_empty();
+  *host = az_span_empty();
   return AZ_OK;
 }

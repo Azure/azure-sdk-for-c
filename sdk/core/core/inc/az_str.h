@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef AZ_STR_H
-#define AZ_STR_H
+#ifndef _az_STR_H
+#define _az_STR_H
 
 #include <az_action.h>
 #include <az_span.h>
@@ -17,7 +17,7 @@
 #define AZ_STRING_LITERAL_LEN(S) (sizeof(S "") - 1)
 
 /**
- * Creates a span which can be used inside constant initializers. Fro example
+ * Creates a span which can be used inside constant initializers. For example
  *
  * `static az_const_span foo[] = { AZ_CONST_STR("Hello"), AZ_CONST_STR("world!") };`
  */

@@ -8,18 +8,18 @@
 AZ_NODISCARD az_result az_span_builder_append(az_span_builder * const self, az_span const span) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
-  az_mut_span const remainder = az_mut_span_drop(self->buffer, self->size);
+  az_mut_span const remainder = az_mut_span_drop(self->buffer, self->length);
   az_mut_span result;
   AZ_RETURN_IF_FAILED(az_mut_span_move(remainder, span, &result));
-  self->size += result.size;
+  self->length += result.size;
   return AZ_OK;
 }
 
 AZ_NODISCARD az_result az_span_builder_append_byte(az_span_builder * const self, uint8_t const c) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
-  AZ_RETURN_IF_FAILED(az_mut_span_set(self->buffer, self->size, c));
-  self->size += 1;
+  AZ_RETURN_IF_FAILED(az_mut_span_set(self->buffer, self->length, c));
+  self->length += 1;
   return AZ_OK;
 }
 
@@ -30,7 +30,7 @@ AZ_NODISCARD az_result az_span_builder_replace(
     az_span const span) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
-  size_t const current_size = self->size;
+  size_t const current_size = self->length;
   size_t const replaced_size = end - start;
   size_t const size_after_replace = current_size - replaced_size + span.size;
 
@@ -44,7 +44,7 @@ AZ_NODISCARD az_result az_span_builder_replace(
   // size after replacing must be less o equal than buffer size
   AZ_CONTRACT(size_after_replace <= self->buffer.size, AZ_ERROR_ARG);
 
-  // get the span then need to be moved before adding new span
+  // get the span then need to be moved before adding a new span
   az_mut_span const dst = az_mut_span_drop(self->buffer, start + span.size);
   // get the span where to move content
   az_span const src = az_span_drop(az_span_builder_result(self), end);
@@ -58,6 +58,19 @@ AZ_NODISCARD az_result az_span_builder_replace(
   }
 
   // update builder size
-  self->size = size_after_replace;
+  self->length = size_after_replace;
+  return AZ_OK;
+}
+
+AZ_NODISCARD az_result
+az_span_builder_append_zeros(az_span_builder * const self, size_t const size) {
+  AZ_CONTRACT_ARG_NOT_NULL(self);
+
+  az_mut_span const span = az_mut_span_take(az_mut_span_drop(self->buffer, self->length), size);
+  if (span.size != size) {
+    return AZ_ERROR_BUFFER_OVERFLOW;
+  }
+  az_mut_span_fill(span, 0);
+  self->length += size;
   return AZ_OK;
 }

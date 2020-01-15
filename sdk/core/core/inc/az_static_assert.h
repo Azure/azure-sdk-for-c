@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef AZ_STATIC_ASSERT_H
-#define AZ_STATIC_ASSERT_H
+#ifndef _az_STATIC_ASSERT_H
+#define _az_STATIC_ASSERT_H
 
 #include <stdbool.h>
 

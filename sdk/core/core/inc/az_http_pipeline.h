@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef AZ_HTTP_PIPELINE_H
-#define AZ_HTTP_PIPELINE_H
+#ifndef _az_HTTP_PIPELINE_H
+#define _az_HTTP_PIPELINE_H
 
 #include <az_http_policy.h>
 #include <az_http_request_builder.h>

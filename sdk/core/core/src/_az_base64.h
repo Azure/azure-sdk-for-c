@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef AZ_BASE64_H
-#define AZ_BASE64_H
+#ifndef _az_BASE64_H
+#define _az_BASE64_H
 
 #include <az_mut_span.h>
 #include <az_result.h>

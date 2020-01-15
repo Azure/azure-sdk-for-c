@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef AZ_PAIR_H
-#define AZ_PAIR_H
+#ifndef _az_PAIR_H
+#define _az_PAIR_H
 
 #include <az_action.h>
 #include <az_result.h>
@@ -47,7 +47,7 @@ typedef struct {
  */
 typedef struct {
   az_mut_pair_span buffer;
-  size_t size;
+  size_t length;
 } az_pair_span_builder;
 
 /**
@@ -59,7 +59,7 @@ AZ_NODISCARD AZ_INLINE az_pair_span_builder
 az_pair_span_builder_create(az_mut_pair_span const buffer) {
   return (az_pair_span_builder){
     .buffer = buffer,
-    .size = 0,
+    .length = 0,
   };
 }
 
@@ -83,8 +83,8 @@ az_pair_span_as_writer(az_pair_span const * const self, az_pair_action const wri
  */
 AZ_ACTION_FUNC(az_pair_span_as_writer, az_pair_span const, az_pair_writer)
 
-AZ_NODISCARD AZ_INLINE bool az_pair_span_eq(az_pair const a, az_pair const b) {
-  return az_span_eq(a.key, b.key) && az_span_eq(a.value, b.value);
+AZ_NODISCARD AZ_INLINE bool az_pair_span_is_equal(az_pair const a, az_pair const b) {
+  return az_span_is_equal(a.key, b.key) && az_span_is_equal(a.value, b.value);
 }
 
 #include <_az_cfg_suffix.h>
