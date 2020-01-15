@@ -3,6 +3,7 @@
 
 #include <az_json_string.h>
 
+#include "_az_span_reader.h"
 #include <az_hex_internal.h>
 #include <az_str.h>
 

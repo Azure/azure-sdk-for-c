@@ -3,6 +3,7 @@
 
 #include <az_json_parser.h>
 
+#include "_az_span_reader.h"
 #include <az_contract.h>
 #include <az_json_string.h>
 #include <az_str.h>
@@ -207,9 +208,7 @@ AZ_NODISCARD static az_result az_span_reader_get_json_string_rest(
       case AZ_ERROR_ITEM_NOT_FOUND: {
         return AZ_ERROR_EOF;
       }
-      default: {
-        AZ_RETURN_IF_FAILED(result);
-      }
+      default: { AZ_RETURN_IF_FAILED(result); }
     }
   }
 }
@@ -339,8 +338,9 @@ AZ_NODISCARD static az_result az_json_parser_check_item_end(
   return az_json_parser_read_comma_or_close(self);
 }
 
-AZ_NODISCARD az_result
-az_json_parser_read_object_member(az_json_parser * const self, az_json_token_member * const out_member) {
+AZ_NODISCARD az_result az_json_parser_read_object_member(
+    az_json_parser * const self,
+    az_json_token_member * const out_member) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(out_member);
 
@@ -382,9 +382,7 @@ AZ_NODISCARD az_result az_json_parser_skip(az_json_parser * const self, az_json_
     case AZ_JSON_TOKEN_ARRAY: {
       break;
     }
-    default: {
-      return AZ_OK;
-    }
+    default: { return AZ_OK; }
   }
 
   az_json_stack target_stack = self->stack;

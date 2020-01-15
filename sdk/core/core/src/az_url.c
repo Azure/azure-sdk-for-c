@@ -3,6 +3,8 @@
 
 #include <az_url_internal.h>
 
+#include "_az_span.h"
+#include "_az_span_reader.h"
 #include <az_http_query_internal.h>
 #include <az_span_reader.h>
 #include <az_str.h>

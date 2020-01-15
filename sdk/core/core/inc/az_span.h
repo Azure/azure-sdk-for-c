@@ -22,22 +22,9 @@ typedef struct {
   size_t size;
 } az_span;
 
-typedef int32_t az_result_byte;
-
 AZ_NODISCARD AZ_INLINE az_span az_span_empty() { return (az_span){ 0 }; }
 
 AZ_NODISCARD AZ_INLINE bool az_span_is_empty(az_span const span) { return span.size == 0; }
-
-/**
- * Returns a byte in `index` position.
- * Returns `AZ_ERROR_EOF` if the `index` is out of the span range.
- */
-AZ_NODISCARD AZ_INLINE az_result_byte az_span_get(az_span const span, size_t const index) {
-  if (span.size <= index) {
-    return AZ_ERROR_EOF;
-  }
-  return span.begin[index];
-}
 
 /**
  * @brief returns a span with the left @var n bytes of the given @var span.
@@ -90,12 +77,6 @@ AZ_NODISCARD AZ_INLINE bool az_span_is_overlap(az_span const a, az_span const b)
   return (!az_span_is_empty(a) && !az_span_is_empty(b))
       && ((a.begin < b.begin && (a.begin + a.size - 1) >= b.begin)
           || (b.begin < a.begin && (b.begin + b.size - 1) >= a.begin) || (a.begin == b.begin));
-}
-
-// Parsing utilities
-
-AZ_NODISCARD AZ_INLINE az_result az_error_unexpected_char(az_result_byte const c) {
-  return az_failed(c) ? c : AZ_ERROR_PARSER_UNEXPECTED_CHAR;
 }
 
 AZ_NODISCARD az_result az_span_to_uint64(az_span const self, uint64_t * const out);
