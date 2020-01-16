@@ -20,10 +20,10 @@ int exit_code = 0;
 /**
  * @brief Returns blob content in buffer
  *
- * @param client
- * @param content
- * @param options
- * @param response
+ * @param client Client
+ * @param content Content
+ * @param options Options
+ * @param response Response
  * @return AZ_NODISCARD az_storage_blobs_blob_download
  */
 AZ_NODISCARD az_result az_storage_blobs_blob_download(
