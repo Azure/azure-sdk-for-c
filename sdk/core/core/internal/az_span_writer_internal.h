@@ -8,6 +8,7 @@
 #include <az_result.h>
 #include <az_span.h>
 #include <az_span_action.h>
+#include <az_span_builder_internal.h>
 #include <az_span_span.h>
 #include <az_str.h>
 

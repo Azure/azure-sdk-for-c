@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <_az_base64.h>
+#include <az_base64_private.h>
 #include <az_http_request_builder.h>
 #include <az_http_request_internal.h>
 #include <az_json_parser.h>
@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "./test_http_response_parser.h"
 #include <az_test.h>
 
 #include <_az_cfg.h>

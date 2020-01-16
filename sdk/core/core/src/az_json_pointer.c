@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include "az_span_reader_private.h"
 #include <az_json_pointer.h>
 
 #include <_az_cfg.h>
@@ -31,9 +32,7 @@ AZ_NODISCARD static az_result az_span_reader_read_json_pointer_char(
           *out = '/';
           return AZ_OK;
         }
-        default: {
-          return az_error_unexpected_char(e);
-        }
+        default: { return az_error_unexpected_char(e); }
       }
     }
     default: {
@@ -68,9 +67,7 @@ az_span_reader_read_json_pointer_token(az_span_reader * const self, az_span * co
         *out = az_span_sub(self->span, begin, self->i);
         return AZ_OK;
       }
-      default: {
-        AZ_RETURN_IF_FAILED(result);
-      }
+      default: { AZ_RETURN_IF_FAILED(result); }
     }
   }
 }

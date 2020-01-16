@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include "az_span_private.h"
 #include <az_span.h>
 
 #include <ctype.h>
