@@ -23,6 +23,7 @@ add_library (az::keyvault ALIAS az_keyvault)
 
 add_executable (az_keyvault_test test/main.c)
 target_link_libraries(az_keyvault_test PRIVATE az_keyvault az_core_internal)
+target_include_directories (az_keyvault_test PRIVATE src)
 
 # make key vault POC
 add_executable (az_keyvault_poc test/client_key_poc.c)
