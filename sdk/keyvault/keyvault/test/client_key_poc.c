@@ -208,21 +208,38 @@ az_span get_key_version(az_http_response * response) {
   az_http_response_parser parser = { 0 };
   az_span body = { 0 };
   az_result r = az_http_response_parser_init(&parser, az_span_builder_result(&response->builder));
+  if (az_failed(r)) {
+    return az_span_empty();
+  }
 
   az_http_response_status_line status_line = { 0 };
   r = az_http_response_parser_read_status_line(&parser, &status_line);
+  if (az_failed(r)) {
+    return az_span_empty();
+  }
 
   // Get Body
   r = az_http_response_parser_skip_headers(&parser);
-  r = az_http_response_parser_read_body(&parser, &body);
+  if (az_failed(r)) {
+    return az_span_empty();
+  }
 
+  r = az_http_response_parser_read_body(&parser, &body);
+  if (az_failed(r)) {
+    return az_span_empty();
+  }
   // get key from body
   az_json_token value;
   r = az_json_get_by_pointer(body, AZ_STR("/key/kid"), &value);
+  if (az_failed(r)) {
+    return az_span_empty();
+  }
 
   az_span k = { 0 };
   r = az_json_token_get_string(value, &k);
-
+  if (az_failed(r)) {
+    return az_span_empty();
+  }
   // calculate version
   for (uint8_t index = 0; index < k.size;) {
     ++index;
