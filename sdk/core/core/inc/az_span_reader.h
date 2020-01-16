@@ -27,11 +27,6 @@ AZ_NODISCARD AZ_INLINE bool az_span_reader_is_empty(az_span_reader const * const
   return p_reader->span.size <= p_reader->i;
 }
 
-AZ_NODISCARD AZ_INLINE az_result_byte
-az_span_reader_current(az_span_reader const * const p_reader) {
-  return az_span_get(p_reader->span, p_reader->i);
-}
-
 AZ_INLINE void az_span_reader_next(az_span_reader * const p_reader) {
   if (az_span_reader_is_empty(p_reader)) {
     return;

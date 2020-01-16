@@ -79,8 +79,6 @@ AZ_NODISCARD az_result az_span_builder_append_byte(az_span_builder * const self,
 AZ_NODISCARD az_result
 az_span_builder_append_zeros(az_span_builder * const self, size_t const size);
 
-AZ_ACTION_FUNC(az_span_builder_append, az_span_builder, az_span_action)
-
 /**
  * Replace all contents from a starting position to an end position with the content of a provided
  * span
