@@ -110,8 +110,8 @@ int main() {
   az_mut_span_fill(http_response.builder.buffer, '.');
 
   /******************  GET KEY latest ver ******************************/
-  az_result const get_key_result = az_keyvault_keys_key_get(
-      &client, AZ_STR("test-new-key"), az_span_empty(), &http_response);
+  az_result get_key_result
+      = az_keyvault_keys_key_get(&client, AZ_STR("test-new-key"), az_span_empty(), &http_response);
 
   if (az_failed(get_key_result)) {
     printf("Failed to get key");
@@ -190,8 +190,8 @@ int main() {
   az_mut_span_fill(http_response.builder.buffer, '.');
 
   /******************  GET KEY (should return failed response ) ******************************/
-  az_result const get_key_again_result = az_keyvault_keys_key_get(
-      &client, AZ_STR("test-new-key"), az_span_empty(), &http_response);
+  az_result get_key_again_result
+      = az_keyvault_keys_key_get(&client, AZ_STR("test-new-key"), az_span_empty(), &http_response);
 
   if (az_failed(get_key_again_result)) {
     printf("Failed to get key (2)");

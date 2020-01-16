@@ -1,10 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_span_writer.h>
-
-#include <az_span_malloc.h>
+#include <az_mut_span_internal.h>
 #include <az_span_builder.h>
+#include <az_span_malloc_internal.h>
+#include <az_span_writer_internal.h>
 #include <az_str.h>
 
 #include <_az_cfg.h>
@@ -30,8 +30,7 @@ AZ_NODISCARD az_result az_span_add_size(size_t * const p_size, az_span const spa
 
 AZ_ACTION_FUNC(az_span_add_size, size_t, az_span_action)
 
-AZ_NODISCARD az_result
-az_span_writer_size(az_span_writer const writer, size_t * const out_size) {
+AZ_NODISCARD az_result az_span_writer_size(az_span_writer const writer, size_t * const out_size) {
   AZ_CONTRACT_ARG_NOT_NULL(out_size);
 
   *out_size = 0;
@@ -53,7 +52,8 @@ AZ_NODISCARD az_result az_span_writer_to_static_str_writer(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_dynamic_span(size_t const size, az_mut_span_action const mut_span_action) {
+AZ_NODISCARD az_result
+az_dynamic_span(size_t const size, az_mut_span_action const mut_span_action) {
   az_mut_span span;
   AZ_RETURN_IF_FAILED(az_span_malloc(size, &span));
   az_result const result = az_mut_span_action_do(mut_span_action, span);
@@ -82,8 +82,9 @@ AZ_NODISCARD az_result az_str_action_to_mut_span_action(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result
-az_span_writer_as_dynamic_str_writer(az_span_writer const span_writer, az_str_action const write_str) {
+AZ_NODISCARD az_result az_span_writer_as_dynamic_str_writer(
+    az_span_writer const span_writer,
+    az_str_action const write_str) {
   size_t size = 0;
   AZ_RETURN_IF_FAILED(az_span_writer_size(span_writer, &size));
   {

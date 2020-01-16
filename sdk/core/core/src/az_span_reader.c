@@ -17,9 +17,7 @@ az_span_reader_expect_char(az_span_reader * const p_reader, uint8_t const expect
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_span_reader_expect_span(
-    az_span_reader * const self,
-    az_span const span) {
+AZ_NODISCARD az_result az_span_reader_expect_span(az_span_reader * const self, az_span const span) {
   az_span_reader k = az_span_reader_create(span);
   while (true) {
     az_result_byte const ko = az_span_reader_current(&k);

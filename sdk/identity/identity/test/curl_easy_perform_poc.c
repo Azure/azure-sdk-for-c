@@ -9,7 +9,7 @@
 #include <az_pair.h>
 #include <az_span.h>
 #include <az_span_builder.h>
-#include <az_span_malloc.h>
+#include <az_span_malloc_internal.h>
 #include <az_str.h>
 
 #include <stdio.h>

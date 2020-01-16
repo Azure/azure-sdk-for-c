@@ -1,7 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_base64.h>
+#include "_az_base64.h"
+#include <az_mut_span_internal.h>
+#include <az_span_internal.h>
 
 #include <az_contract.h>
 
@@ -159,10 +161,10 @@ AZ_NODISCARD az_result az_base64_encode(
       assert(sxt + TRIBYTE_SEXTET2_INDEX < result_size);
       buffer.begin[sxt + TRIBYTE_SEXTET2_INDEX] = (oct + TRIBYTE_OCTET1_INDEX < input.size)
           ? uint6_as_base64(
-              base64url,
-              (uint8_t)(
-                  ((octet1 & TRIBYTE_OCTET1_SEXTET2_MASK) << TRIBYTE_OCTET1_SEXTET2_LSHIFT)
-                  | ((octet2 & TRIBYTE_OCTET2_SEXTET2_MASK) >> TRIBYTE_OCTET2_SEXTET2_RSHIFT)))
+                base64url,
+                (uint8_t)(
+                    ((octet1 & TRIBYTE_OCTET1_SEXTET2_MASK) << TRIBYTE_OCTET1_SEXTET2_LSHIFT)
+                    | ((octet2 & TRIBYTE_OCTET2_SEXTET2_MASK) >> TRIBYTE_OCTET2_SEXTET2_RSHIFT)))
           : BASE64_PADDING_CHAR;
     }
 

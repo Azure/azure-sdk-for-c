@@ -4,7 +4,7 @@
 #include <az_pair.h>
 #include <az_str.h>
 
-#include "./az_test.h"
+#include <az_test.h>
 
 #include <_az_cfg.h>
 

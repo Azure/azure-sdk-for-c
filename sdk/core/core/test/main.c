@@ -1,35 +1,37 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_base64.h>
-#include <az_http_request.h>
+#include <_az_base64.h>
 #include <az_http_request_builder.h>
+#include <az_http_request_internal.h>
 #include <az_json_parser.h>
 #include <az_span_builder.h>
 #include <az_span_reader.h>
-#include <az_span_writer.h>
-#include <az_uri.h>
+#include <az_span_writer_internal.h>
+#include <az_uri_internal.h>
 
 #include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "./az_test.h"
-#include "./test_json_string.h"
-#include "./test_json_value.h"
+#include <az_test.h>
+#include "./test_http_response_parser.h"
 
 #include <_az_cfg.h>
 
 void test_http_response_parser();
 void test_json_builder();
+void test_json_data();
 void test_json_get_by_pointer();
 void test_json_pointer();
 void test_json_string();
-void test_pair_span();
+void test_json_value();
+void test_url_parse();
 void test_span_builder_replace();
 void test_span_span();
-void test_url_parse();
+void test_pair_span();
+void test_mut_span();
 
 int exit_code = 0;
 
@@ -731,6 +733,7 @@ int main() {
 
   test_http_response_parser();
   test_json_builder();
+  test_json_data();
   test_json_get_by_pointer();
   test_json_value();
   test_json_pointer();
@@ -739,5 +742,6 @@ int main() {
   test_span_builder_replace();
   test_span_span();
   test_pair_span();
+  test_mut_span();
   return exit_code;
 }

@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: MIT
 
 #include <az_json_get.h>
-
 #include <az_json_parser.h>
 #include <az_json_pointer.h>
 #include <az_json_string.h>
+#include <az_span_internal.h>
 
 #include <_az_cfg.h>
 

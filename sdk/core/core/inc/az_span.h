@@ -28,10 +28,6 @@ AZ_NODISCARD AZ_INLINE az_span az_span_empty() { return (az_span){ 0 }; }
 
 AZ_NODISCARD AZ_INLINE bool az_span_is_empty(az_span const span) { return span.size == 0; }
 
-AZ_NODISCARD AZ_INLINE bool az_span_is_valid(az_span const span) {
-  return span.size == 0 || (span.begin != NULL && span.begin <= span.begin + span.size - 1);
-}
-
 /**
  * Returns a byte in `index` position.
  * Returns `AZ_ERROR_EOF` if the `index` is out of the span range.
@@ -125,23 +121,6 @@ AZ_NODISCARD AZ_INLINE az_span az_span_from_runtime_array(uint8_t const * ptr, s
 AZ_NODISCARD AZ_INLINE az_span az_span_from_single_item(uint8_t const * ptr) {
   return az_span_from_runtime_array(ptr, 1);
 }
-
-/**
- * ```c
- * typedef struct {
- *   az_result (* func)(void *, az_const_span);
- *   void * self;
- * } az_span_action;
- * ```
- *
- * Example of usage
- *
- * ```c
- * az_span_action const action = ...;
- * az_span_action_do(action, AZ_STR("Something"));
- * ```
- */
-AZ_ACTION_TYPE(az_span_action, az_span)
 
 AZ_NODISCARD AZ_INLINE az_span az_str_to_span(char const * str) {
   return (az_span){ .begin = (uint8_t const *)str, .size = strlen(str) };
