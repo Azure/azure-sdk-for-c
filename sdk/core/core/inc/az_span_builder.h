@@ -69,17 +69,6 @@ AZ_NODISCARD AZ_INLINE az_span az_span_builder_result(az_span_builder const * co
 AZ_NODISCARD az_result az_span_builder_append(az_span_builder * const self, az_span const span);
 
 /**
- * Append a single byte.
- */
-AZ_NODISCARD az_result az_span_builder_append_byte(az_span_builder * const self, uint8_t const c);
-
-/**
- * Append zeros.
- */
-AZ_NODISCARD az_result
-az_span_builder_append_zeros(az_span_builder * const self, size_t const size);
-
-/**
  * Replace all contents from a starting position to an end position with the content of a provided
  * span
  */

@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include "az_span_builder_private.h"
 #include <az_mut_span_internal.h>
 #include <az_span_builder.h>
 #include <az_span_malloc_internal.h>

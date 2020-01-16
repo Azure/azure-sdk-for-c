@@ -3,6 +3,7 @@
 
 #include <az_uri_internal.h>
 
+#include "az_span_builder_private.h"
 #include <az_contract.h>
 #include <az_hex_internal.h>
 

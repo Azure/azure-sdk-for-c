@@ -3,6 +3,7 @@
 
 #include <az_json_data.h>
 
+#include "az_span_builder_private.h"
 #include <az_json_parser.h>
 #include <az_span_builder.h>
 
@@ -213,9 +214,7 @@ AZ_NODISCARD az_result _az_span_builder_write_json_value(
       *out = az_json_data_array((az_json_array){ ._internal = { .begin = p, .size = i } });
       break;
     }
-    default: {
-      return AZ_ERROR_JSON_INVALID_STATE;
-    }
+    default: { return AZ_ERROR_JSON_INVALID_STATE; }
   }
   return AZ_OK;
 }
