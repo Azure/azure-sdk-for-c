@@ -15,7 +15,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "./test_http_response_parser.h"
 #include <az_test.h>
 
 #include <_az_cfg.h>

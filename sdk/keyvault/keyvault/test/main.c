@@ -5,6 +5,7 @@
 #include <az_keyvault.h>
 #include <az_mut_span.h>
 #include <az_span_builder.h>
+#include <az_span_builder_internal.h>
 
 #include <az_keyvault_client_private.h>
 
