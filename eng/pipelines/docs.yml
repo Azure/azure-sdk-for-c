@@ -16,7 +16,7 @@ jobs:
           --PackageVersion="$(PackageVersion)"
         displayName: Fill in Doxyfile.template
 
-      - pwsh: copy assets/ sdk/$(PackageName)
+      - pwsh: copy eng/docs/assets/ sdk/$(PackageName)
         displayName: Copy assets to Doxyfile location
 
       - pwsh: doxygen Doxyfile
