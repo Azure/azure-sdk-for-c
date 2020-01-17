@@ -5,24 +5,17 @@ jobs:
     steps:
       - pwsh: >-
           choco install doxygen.install;
-          Write-Host 'setting path...';
-          Write-Host "##vso[task.setvariable variable=PATH;]${$env:PATH};";
         displayName: Install Doxygen
 
       - pwsh: >-
-          python eng/docs/fill_docs_template.py
-          --InputFile="eng/docs/Doxyfile.template"
-          --OutputFile="sdk/$(PackageName)/Doxyfile"
+          python eng/docs/generate_docs.py
+          --TemplatePath="eng/docs/Doxyfile.template"
+          --PackagePath="sdk/$(PackageName)"
           --PackageName="$(PackageName)"
           --PackageVersion="$(PackageVersion)"
+          --AssetsPath="eng/docs/assets"
+          --DoxygenPath="c:\\program files\\doxygen\\bin\\doxygen.exe"
         displayName: Fill in Doxyfile.template
-
-      - pwsh: copy eng/docs/assets/ sdk/$(PackageName)
-        displayName: Copy assets to Doxyfile location
-
-      - pwsh: doxygen Doxyfile
-        workingDirectory: sdk/$(PackageName)
-        displayName: Execute Doxygen
 
       - task: PublishPipelineArtifact@1
         inputs:

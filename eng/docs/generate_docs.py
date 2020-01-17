@@ -22,20 +22,31 @@ def fill_template(template_file, package_name, package_version, package_path):
         .replace('${PackageName}', package_name) \
         .replace('${Version}', package_version)
 
-    with open("{}/Doxyfile" % package_path, 'w') as output:
+    output_path = os.path.normpath(os.path.join(package_path, 'Doxyfile'))
+    with open(output_path, 'w') as output:
         output.write(new_content)
 
 def copy_files(source_path, destination_path):
     for file_name in os.listdir(source_path):
-        source_path = os.path.join(source_path, file_name)
-        if os.path.isfile(source_path):
-            shutil.copy(source_path, destination_path)
+        source_file = os.path.normpath(os.path.join(source_path, file_name))
+        if os.path.isfile(source_file):
+            print("copying %s to %s..." % (source_path, destination_path))
+            shutil.copy(source_file, destination_path)
 
 def invoke_doxygen(doxygen_path, working_directory, doxyfile_name='Doxyfile'):
     check_call([doxygen_path, 'Doxyfile'], cwd=working_directory)
 
+def message(message):
+    print("===============")
+    print(message)
+    print("===============")
 
+message('Filling template')
 fill_template(args.TemplateFile, args.PackageName, args.PackageVersion, args.PackagePath)
+
+message('Copying assets')
 copy_files(args.AssetsPath, args.PackagePath)
+
+message('Invoking Doxygen')
 invoke_doxygen(args.DoxygenPath, args.PackagePath)
 
