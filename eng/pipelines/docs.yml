@@ -3,7 +3,9 @@ jobs:
     pool:
       vmImage: windows-latest
     steps:
-      - pwsh: choco install doxygen.install
+      - pwsh: >-
+          choco install doxygen.install;
+          Write-Host "##vso[task.setvariable variable=PATH;]${$env:PATH};";
         displayName: Install Doxygen
 
       - pwsh: >-
@@ -13,6 +15,9 @@ jobs:
           --PackageName="$(PackageName)"
           --PackageVersion="$(PackageVersion)"
         displayName: Fill in Doxyfile.template
+
+      - pwsh: copy assets/ sdk/$(PackageName)
+        displayName: Copy assets to Doxyfile location
 
       - pwsh: doxygen Doxyfile
         workingDirectory: sdk/$(PackageName)
