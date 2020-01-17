@@ -15,11 +15,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "./test_http_response_parser.h"
 #include <az_test.h>
 
 #include <_az_cfg.h>
 
+void test_http_response_parser();
 void test_json_builder();
 void test_json_data();
 void test_json_get_by_pointer();
@@ -421,62 +421,64 @@ int main() {
     TEST_ASSERT(az_json_parser_read_object_member(&state, &member) == AZ_ERROR_ITEM_NOT_FOUND);
     TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
   }
-  uint8_t buffer[1000];
-  az_mut_span const output = { .begin = buffer, .size = 1000 };
   {
-    size_t o = 0;
-    TEST_ASSERT(
-        read_write(AZ_STR("{ \"a\" : [ true, { \"b\": [{}]}, 15 ] }"), output, &o) == AZ_OK);
-    az_span const x = az_span_sub(az_mut_span_to_span(output), 0, o);
-    TEST_ASSERT(az_span_is_equal(x, AZ_STR("{\"a\":[true,{\"b\":[{}]},0]}")));
-  }
-  {
-    size_t o = 0;
-    az_span const json = AZ_STR(
-        // 0           1           2           3           4           5 6
-        // 01234 56789 01234 56678 01234 56789 01234 56789 01234 56789 01234
-        // 56789 0123
-        "[[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ "
-        "[[[[[ [[[[");
-    az_result const result = read_write(json, output, &o);
-    TEST_ASSERT(result == AZ_ERROR_JSON_STACK_OVERFLOW);
-  }
-  {
-    size_t o = 0;
-    az_span const json = AZ_STR(
-        // 0           1           2           3           4           5 6 01234
-        // 56789 01234 56678 01234 56789 01234 56789 01234 56789 01234 56789 012
-        "[[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ "
-        "[[[[[ [[[");
-    az_result const result = read_write(json, output, &o);
-    TEST_ASSERT(result == AZ_ERROR_EOF);
-  }
-  {
-    size_t o = 0;
-    az_span const json = AZ_STR(
-        // 0           1           2           3           4           5 6 01234
-        // 56789 01234 56678 01234 56789 01234 56789 01234 56789 01234 56789 012
-        "[[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ "
-        "[[[[[ [[{"
-        "   \"\\t\\n\": \"\\u0abc\"   "
-        "}]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] "
-        "]]]]] ]]]");
-    az_result const result = read_write(json, output, &o);
-    TEST_ASSERT(result == AZ_OK);
-    az_span const x = az_span_sub(az_mut_span_to_span(output), 0, o);
-    TEST_ASSERT(az_span_is_equal(
-        x,
-        AZ_STR( //
-            "[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[{"
-            "\"\\t\\n\":\"\\u0abc\""
-            "}]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]"
-            "]")));
-  }
-  //
-  {
-    size_t o = 0;
-    az_result const result = read_write(sample1, output, &o);
-    TEST_ASSERT(result == AZ_OK);
+    uint8_t buffer[1000];
+    az_mut_span const output = { .begin = buffer, .size = 1000 };
+    {
+      size_t o = 0;
+      TEST_ASSERT(
+          read_write(AZ_STR("{ \"a\" : [ true, { \"b\": [{}]}, 15 ] }"), output, &o) == AZ_OK);
+      az_span const x = az_span_sub(az_mut_span_to_span(output), 0, o);
+      TEST_ASSERT(az_span_is_equal(x, AZ_STR("{\"a\":[true,{\"b\":[{}]},0]}")));
+    }
+    {
+      size_t o = 0;
+      az_span const json = AZ_STR(
+          // 0           1           2           3           4           5 6
+          // 01234 56789 01234 56678 01234 56789 01234 56789 01234 56789 01234
+          // 56789 0123
+          "[[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ "
+          "[[[[[ [[[[");
+      az_result const result = read_write(json, output, &o);
+      TEST_ASSERT(result == AZ_ERROR_JSON_STACK_OVERFLOW);
+    }
+    {
+      size_t o = 0;
+      az_span const json = AZ_STR(
+          // 0           1           2           3           4           5 6 01234
+          // 56789 01234 56678 01234 56789 01234 56789 01234 56789 01234 56789 012
+          "[[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ "
+          "[[[[[ [[[");
+      az_result const result = read_write(json, output, &o);
+      TEST_ASSERT(result == AZ_ERROR_EOF);
+    }
+    {
+      size_t o = 0;
+      az_span const json = AZ_STR(
+          // 0           1           2           3           4           5 6 01234
+          // 56789 01234 56678 01234 56789 01234 56789 01234 56789 01234 56789 012
+          "[[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ "
+          "[[[[[ [[{"
+          "   \"\\t\\n\": \"\\u0abc\"   "
+          "}]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] "
+          "]]]]] ]]]");
+      az_result const result = read_write(json, output, &o);
+      TEST_ASSERT(result == AZ_OK);
+      az_span const x = az_span_sub(az_mut_span_to_span(output), 0, o);
+      TEST_ASSERT(az_span_is_equal(
+          x,
+          AZ_STR( //
+              "[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[{"
+              "\"\\t\\n\":\"\\u0abc\""
+              "}]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]"
+              "]")));
+    }
+    //
+    {
+      size_t o = 0;
+      az_result const result = read_write(sample1, output, &o);
+      TEST_ASSERT(result == AZ_OK);
+    }
   }
 
   // HTTP Builder
@@ -659,7 +661,6 @@ int main() {
     TEST_ASSERT(az_span_is_equal(az_span_builder_result(&builder), uri_decoded));
   }
   {
-    int16_t const url_max = 100;
     uint8_t buf[100 + (100 % 8) + (2 * sizeof(az_pair))];
     memset(buf, 0, sizeof(buf));
     az_mut_span const http_buf = { .begin = buf, .size = sizeof(buf) };

@@ -78,6 +78,7 @@ add_library (az::core ALIAS az_core)
 add_executable (
     az_core_test 
     test/main.c 
+    test/test_http_response_parser.c
     test/test_json_builder.c
     test/test_json_data.c
     test/test_json_get_by_pointer.c
@@ -89,6 +90,7 @@ add_executable (
     test/test_span_builder_replace.c
     test/test_span_span.c
     test/test_url_parse.c
+
     )
 
 target_link_libraries(az_core_test PRIVATE az_core az_core_internal)

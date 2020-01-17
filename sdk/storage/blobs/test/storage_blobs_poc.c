@@ -20,10 +20,8 @@ int exit_code = 0;
 /**
  * @brief Returns blob content in buffer
  *
- * @param client
- * @param content
- * @param options
- * @param response
+ * @param client Client
+ * @param response Response
  * @return AZ_NODISCARD az_storage_blobs_blob_download
  */
 AZ_NODISCARD az_result az_storage_blobs_blob_download(
@@ -74,28 +72,52 @@ int main() {
   /************* create credentials as client_id type   ***********/
   az_identity_client_secret_credential credential = { 0 };
   // init credential_credentials struc
-  az_result creds_retcode = az_identity_client_secret_credential_init(
+  az_result const creds_retcode = az_identity_client_secret_credential_init(
       &credential,
       az_str_to_span(getenv(TENANT_ID_ENV)),
       az_str_to_span(getenv(CLIENT_ID_ENV)),
       az_str_to_span(getenv(CLIENT_SECRET_ENV)));
 
+  if (az_failed(creds_retcode)) {
+    printf("Failed to init credential");
+  }
+
   // Init client.
-  az_result operation_result = az_storage_blobs_blob_client_init(
+  az_result const operation_result = az_storage_blobs_blob_client_init(
       &client, az_str_to_span(getenv(URI_ENV)), &credential, NULL);
+
+  if (az_failed(operation_result)) {
+    printf("Failed to init blob client");
+  }
 
   /******* Create a buffer for response (will be reused for all requests)   *****/
   uint8_t response_buffer[1024 * 4] = { 0 };
   az_http_response http_response = { 0 };
-  az_result init_http_response_result = az_http_response_init(
+  az_result const init_http_response_result = az_http_response_init(
       &http_response, az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(response_buffer)));
 
-  az_result create_result = az_storage_blobs_blob_upload(
+  if (az_failed(init_http_response_result)) {
+    printf("Failed to init http response");
+  }
+
+  az_result const create_result = az_storage_blobs_blob_upload(
       &client, AZ_STR("Some Test Content for the new blob"), NULL, &http_response);
 
-  az_result get_result = az_storage_blobs_blob_download(&client, &http_response);
+  if (az_failed(create_result)) {
+    printf("Failed to create blob");
+  }
 
-  az_result delete_result = az_storage_blobs_blob_delete(&client, &http_response);
+  az_result const get_result = az_storage_blobs_blob_download(&client, &http_response);
+
+  if (az_failed(get_result)) {
+    printf("Failed to get blob");
+  }
+
+  az_result const delete_result = az_storage_blobs_blob_delete(&client, &http_response);
+
+  if (az_failed(delete_result)) {
+    printf("Failed to delete blob");
+  }
 
   return exit_code;
 }

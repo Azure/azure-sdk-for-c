@@ -15,6 +15,7 @@
 
 typedef enum {
   AZ_HTTP_STATUS_CODE_OK = 200,
+  AZ_HTTP_STATUS_CODE_NOT_FOUND = 404,
 } az_http_status_code;
 
 /**

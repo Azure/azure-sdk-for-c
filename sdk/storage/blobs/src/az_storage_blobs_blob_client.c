@@ -35,6 +35,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
     az_span const content,
     az_storage_blobs_blob_upload_options * const options,
     az_http_response * const response) {
+  (void)options;
 
   // Request buffer
   uint8_t request_buffer[1024 * 4] = { 0 };
@@ -59,7 +60,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
   // AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
   //    &hrb, AZ_HTTP_HEADER_X_MS_DATE, AZ_STR("Fri, 03 Jan 2020 21:33:15 GMT")));
 
-  uint8_t str[256] = { 0 };
+  char str[256] = { 0 };
   snprintf(str, sizeof str, "%zu", content.size);
   az_span content_length = az_str_to_span(str);
 

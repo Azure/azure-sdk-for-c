@@ -6,6 +6,8 @@
 
 #include <az_test.h>
 
+#include <_az_cfg.h>
+
 void test_pair_span() {
   {
     az_pair src_buffer[4];

@@ -39,7 +39,7 @@ void test_json_pointer() {
           break;
         }
         TEST_ASSERT(result == AZ_OK);
-        buffer[i] = code_point;
+        buffer[i] = (uint8_t)code_point;
         ++i;
       }
       az_span const b = { .begin = buffer, .size = i };
@@ -65,7 +65,7 @@ void test_json_pointer() {
           break;
         }
         TEST_ASSERT(result == AZ_OK);
-        buffer[i] = code_point;
+        buffer[i] = (uint8_t)code_point;
         ++i;
       }
       az_span const b = { .begin = buffer, .size = i };
@@ -95,7 +95,7 @@ void test_json_pointer() {
           break;
         }
         TEST_ASSERT(result == AZ_OK);
-        buffer[i] = code_point;
+        buffer[i] = (uint8_t)code_point;
         ++i;
       }
       az_span const b = { .begin = buffer, .size = i };
@@ -116,7 +116,7 @@ void test_json_pointer() {
           break;
         }
         TEST_ASSERT(result == AZ_OK);
-        buffer[i] = code_point;
+        buffer[i] = (uint8_t)code_point;
         ++i;
       }
       az_span const b = { .begin = buffer, .size = i };

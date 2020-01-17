@@ -45,7 +45,7 @@ az_keyvault_keys_client_options const AZ_KEYVAULT_CLIENT_DEFAULT_OPTIONS
  * @param write action used by json builder to be called while building
  * @return AZ_NODISCARD _az_keyvault_keys_key_create_build_json_body
  */
-static AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
+AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
     az_span const json_web_key_type,
     az_keyvault_create_key_options const * const options,
     az_span_action const write) {

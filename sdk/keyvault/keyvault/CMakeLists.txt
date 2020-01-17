@@ -12,27 +12,8 @@ add_library (
   src/az_keyvault_client.c
   )
 
-if(MSVC)
-  if(WARNINGS_AS_ERRORS)
-    set(WARNINGS_AS_ERRORS_FLAG "/WX")
-  endif()
-
-  target_compile_options(az_core PRIVATE /Wall ${WARNINGS_AS_ERRORS_FLAG} /wd5031 /wd4668 /wd4820 /wd4255 /analyze)
-elseif(CMAKE_C_COMPILER_ID MATCHES "Clang")
-  if(WARNINGS_AS_ERRORS)
-    set(WARNINGS_AS_ERRORS_FLAG "-Werror")
-  endif()
-
-  target_compile_options(az_core PRIVATE -Xclang -Wall -Wextra -pedantic  ${WARNINGS_AS_ERRORS_FLAG} -Wdocumentation -Wdocumentation-unknown-command -Wcast-qual)
-else()
-  if(WARNINGS_AS_ERRORS)
-    set(WARNINGS_AS_ERRORS_FLAG "-Werror")
-  endif()
-
-  target_compile_options(az_core PRIVATE -Wall -Wextra -pedantic  ${WARNINGS_AS_ERRORS_FLAG})
-endif()
-
 target_include_directories (az_keyvault PUBLIC inc)
+target_include_directories (az_keyvault PRIVATE src)
 
 target_link_libraries(az_keyvault PUBLIC az_core az_identity)
 target_link_libraries(az_keyvault PRIVATE az_core_internal)
@@ -42,6 +23,7 @@ add_library (az::keyvault ALIAS az_keyvault)
 
 add_executable (az_keyvault_test test/main.c)
 target_link_libraries(az_keyvault_test PRIVATE az_keyvault az_core_internal)
+target_include_directories (az_keyvault_test PRIVATE src)
 
 # make key vault POC
 add_executable (az_keyvault_poc test/client_key_poc.c)

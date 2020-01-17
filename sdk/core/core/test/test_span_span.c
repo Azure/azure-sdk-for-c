@@ -6,6 +6,8 @@
 
 #include <az_test.h>
 
+#include <_az_cfg.h>
+
 void test_span_span() {
   {
     az_span src_buffer[4];
