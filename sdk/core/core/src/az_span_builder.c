@@ -59,8 +59,7 @@ az_span_builder_append_uint64(az_span_builder * const self, uint64_t const n) {
   return _az_span_builder_append_uint64(self, n);
 }
 
-AZ_NODISCARD az_result
-az_span_builder_append_int64(az_span_builder * const self, int64_t const n) {
+AZ_NODISCARD az_result az_span_builder_append_int64(az_span_builder * const self, int64_t const n) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
   if (n < 0) {

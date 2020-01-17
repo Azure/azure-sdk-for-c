@@ -1,12 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "az_log_private.h"
 #include <az_http_response_parser.h>
 #include <az_log.h>
 #include <az_log_internal.h>
 #include <az_span_builder.h>
 #include <az_str.h>
+
+#include <time.h>
 
 #include <_az_cfg.h>
 
@@ -44,6 +45,7 @@ bool az_log_should_write(az_log_classification const classification) {
 }
 
 enum {
+  _az_SLOW_RESPONSE_THRESHOLD_MSEC = 3000,
   _az_LOG_VALUE_MAX_LENGTH = 50,
   _az_LOG_MSG_BUF_SIZE = 1024,
 };
@@ -184,7 +186,7 @@ AZ_INLINE az_result _az_log_error_msg(
   return az_span_builder_append_uint64(log_msg_bldr, result);
 }
 
-void _az_log_request(az_http_request_builder const * const hrb) {
+AZ_INLINE void _az_log_request(az_http_request_builder const * const hrb) {
   uint8_t log_msg_buf[_az_LOG_MSG_BUF_SIZE] = { 0 };
 
   az_span_builder log_msg_bldr
@@ -195,7 +197,7 @@ void _az_log_request(az_http_request_builder const * const hrb) {
   az_log_write(AZ_LOG_REQUEST, az_span_builder_result(&log_msg_bldr));
 }
 
-void _az_log_response(
+AZ_INLINE void _az_log_response(
     az_http_request_builder const * const hrb,
     az_http_response const * const response) {
   uint8_t log_msg_buf[_az_LOG_MSG_BUF_SIZE] = { 0 };
@@ -208,7 +210,7 @@ void _az_log_response(
   az_log_write(AZ_LOG_SLOW_RESPONSE, az_span_builder_result(&log_msg_bldr));
 }
 
-void _az_log_slow_response(
+AZ_INLINE void _az_log_slow_response(
     az_http_request_builder const * const hrb,
     az_http_response const * const response,
     uint32_t duration_msec) {
@@ -222,7 +224,7 @@ void _az_log_slow_response(
   az_log_write(AZ_LOG_SLOW_RESPONSE, az_span_builder_result(&log_msg_bldr));
 }
 
-void _az_log_error(
+AZ_INLINE void _az_log_error(
     az_http_request_builder const * const hrb,
     az_http_response const * const response,
     az_result result) {
@@ -234,4 +236,38 @@ void _az_log_error(
   (void)_az_log_error_msg(&log_msg_bldr, hrb, response, result);
 
   az_log_write(AZ_LOG_ERROR, az_span_builder_result(&log_msg_bldr));
+}
+
+AZ_NODISCARD az_result az_http_policy_log(
+    az_result (*next_policy)(
+        az_http_policy * const p_policies,
+        az_http_request_builder * const hrb,
+        az_http_response * const response),
+    az_http_policy * const p_policies,
+    az_http_request_builder * const hrb,
+    az_http_response * const response) {
+  if (az_log_should_write(AZ_LOG_REQUEST)) {
+    _az_log_request(hrb);
+  }
+
+  clock_t const start = clock();
+
+  az_result const result = next_policy(p_policies, hrb, response);
+
+  clock_t const end = clock();
+
+  if (az_log_should_write(AZ_LOG_RESPONSE)) {
+    _az_log_response(hrb, response);
+  }
+
+  clock_t const duration = end - start;
+  if (duration >= _az_SLOW_RESPONSE_THRESHOLD_MSEC && az_log_should_write(AZ_LOG_SLOW_RESPONSE)) {
+    _az_log_slow_response(hrb, response, duration / (CLOCKS_PER_SEC / 1000));
+  }
+
+  if (az_failed(result) && az_log_should_write(AZ_LOG_ERROR)) {
+    _az_log_error(hrb, response, result);
+  }
+
+  return result;
 }

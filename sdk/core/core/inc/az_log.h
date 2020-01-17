@@ -24,11 +24,6 @@ typedef enum {
   AZ_LOG_SLOW_RESPONSE = _az_LOG_MAKE_CLASSIFICATION(AZ_FACILITY_CORE, 5),
 } az_log_classification;
 
-typedef struct {
-  uint32_t slow_response_threshold_msec; // How long should it take the HTTP request to start being
-                                         // considered a slow response (AZ_LOG_SLOW_RESPONSE)
-} az_log_options;
-
 typedef void (*az_log)(az_log_classification const classification, az_span const message);
 
 void az_log_set_classifications(

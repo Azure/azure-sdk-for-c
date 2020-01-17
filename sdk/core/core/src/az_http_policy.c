@@ -1,12 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "az_log_private.h"
 #include <az_http_client_internal.h>
 #include <az_http_pipeline.h>
 #include <az_http_policy.h>
 #include <az_http_request_builder.h>
-#include <az_log.h>
 #include <az_log_internal.h>
 #include <az_mut_span.h>
 #include <az_span.h>
@@ -15,7 +13,6 @@
 #include <az_url_internal.h>
 
 #include <stddef.h>
-#include <time.h>
 
 #include <_az_cfg.h>
 
@@ -23,7 +20,6 @@ AZ_NODISCARD AZ_INLINE az_result az_http_pipeline_nextpolicy(
     az_http_policy * const p_policies,
     az_http_request_builder * const hrb,
     az_http_response * const response) {
-
   AZ_CONTRACT_ARG_NOT_NULL(p_policies);
   AZ_CONTRACT_ARG_NOT_NULL(hrb);
   AZ_CONTRACT_ARG_NOT_NULL(response);
@@ -35,6 +31,13 @@ AZ_NODISCARD AZ_INLINE az_result az_http_pipeline_nextpolicy(
   }
 
   return p_policies[0].pfnc_process(&(p_policies[1]), p_policies[0].data, hrb, response);
+}
+
+static az_result _az_http_pipeline_nextpolicy(
+    az_http_policy * const p_policies,
+    az_http_request_builder * const hrb,
+    az_http_response * const response) {
+  return az_http_pipeline_nextpolicy(p_policies, hrb, response);
 }
 
 static az_span const AZ_MS_CLIENT_REQUESTID = AZ_CONST_STR("x-ms-client-request-id");
@@ -96,40 +99,11 @@ AZ_NODISCARD az_result az_http_pipeline_policy_logging(
     void * const data,
     az_http_request_builder * const hrb,
     az_http_response * const response) {
-  (void)data;
-
-  clock_t slow_response_threshold = 0;
   if (data != NULL) {
-    az_log_options const * const log_options = (az_log_options const *)data;
-    slow_response_threshold = (log_options->slow_response_threshold_msec * CLOCKS_PER_SEC) / 1000;
+    return (*((az_log_policy *)data))(&_az_http_pipeline_nextpolicy, p_policies, hrb, response);
   }
 
-  if (az_log_should_write(AZ_LOG_REQUEST)) {
-    _az_log_request(hrb);
-  }
-
-  clock_t const start = slow_response_threshold > 0 ? clock() : 0;
-
-  az_result const result = az_http_pipeline_nextpolicy(p_policies, hrb, response);
-
-  clock_t const end = slow_response_threshold > 0 ? clock() : 0;
-
-  if (az_log_should_write(AZ_LOG_RESPONSE)) {
-    _az_log_response(hrb, response);
-  }
-
-  if (slow_response_threshold > 0) {
-    clock_t const duration = end - start;
-    if (duration >= slow_response_threshold && az_log_should_write(AZ_LOG_SLOW_RESPONSE)) {
-      _az_log_slow_response(hrb, response, duration / (CLOCKS_PER_SEC / 1000));
-    }
-  }
-
-  if (az_failed(result) && az_log_should_write(AZ_LOG_ERROR)) {
-    _az_log_error(hrb, response, result);
-  }
-
-  return result;
+  return az_http_pipeline_nextpolicy(p_policies, hrb, response);
 }
 
 AZ_NODISCARD az_result az_http_pipeline_policy_bufferresponse(
