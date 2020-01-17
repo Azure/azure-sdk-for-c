@@ -7,7 +7,7 @@ jobs:
         displayName: Install Doxygen
 
       - pwsh: >-
-          python /eng/docs/fill_docs_template.py
+          python eng/docs/fill_docs_template.py
           --InputFile="eng/docs/Doxyfile.template"
           --OutputFile="sdk/$(PackageName)/Doxyfile"
           --PackageName="$(PackageName)"
