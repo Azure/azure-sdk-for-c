@@ -1,21 +1,22 @@
-job Generate:
-  steps:
-    - pwsh: choco install doxygen.install
-      displayName: Install Doxygen
+jobs:
+  - job: Generate
+    steps:
+      - pwsh: choco install doxygen.install
+        displayName: Install Doxygen
 
-    - pwsh: >-
-        python eng/docs/fill_template.py
-        --InputFile="./Doxyfile.template"
-        --OutputFile="sdk/$(PackageName)/Doxyfile"
-        --PackageName="$(PackageName)"
-        --PackageVersion="$(PackageVersion)"
-      displayName: Fill in Doxyfile.template
+      - pwsh: >-
+          python eng/docs/fill_template.py
+          --InputFile="./Doxyfile.template"
+          --OutputFile="sdk/$(PackageName)/Doxyfile"
+          --PackageName="$(PackageName)"
+          --PackageVersion="$(PackageVersion)"
+        displayName: Fill in Doxyfile.template
 
-    - pwsh: doxygen Doxyfile
-      workingDirectory: sdk/$(PackageName)
-      displayName: Execute Doxygen
+      - pwsh: doxygen Doxyfile
+        workingDirectory: sdk/$(PackageName)
+        displayName: Execute Doxygen
 
-    - task: PublishPipelineArtifact@1
-      inputs:
-        targetPath: sdk/$(PackageName)/html
-        artifactName: drop
+      - task: PublishPipelineArtifact@1
+        inputs:
+          targetPath: sdk/$(PackageName)/html
+          artifactName: drop
