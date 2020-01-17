@@ -1,6 +1,7 @@
 jobs:
   - job: Generate
-    pool: window-latest
+    pool:
+      vmImage: window-latest
     steps:
       - pwsh: choco install doxygen.install
         displayName: Install Doxygen
