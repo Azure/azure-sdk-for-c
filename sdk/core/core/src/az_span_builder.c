@@ -31,20 +31,13 @@ AZ_INLINE uint8_t _az_decimal_to_ascii(uint8_t const d) {
 }
 
 static AZ_NODISCARD az_result
-_az_span_builder_append_unsigned_number(az_span_builder * const self, unsigned long long const n) {
+_az_span_builder_append_uint64(az_span_builder * const self, uint64_t const n) {
   if (n == 0) {
     return az_span_builder_append_byte(self, '0');
   }
 
-  static unsigned long long div_max = 1;
-  if (div_max == 1) {
-    for (unsigned long long next = 10; next > div_max; next *= 10) {
-      div_max = next;
-    }
-  }
-
-  unsigned long long div = div_max;
-  unsigned long long nn = n;
+  uint64_t div = 10000000000000000000ull;
+  uint64_t nn = n;
   while (nn / div == 0) {
     div /= 10;
   }
@@ -61,21 +54,21 @@ _az_span_builder_append_unsigned_number(az_span_builder * const self, unsigned l
 }
 
 AZ_NODISCARD az_result
-az_span_builder_append_unsigned_number(az_span_builder * const self, unsigned long long const n) {
+az_span_builder_append_uint64(az_span_builder * const self, uint64_t const n) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
-  return _az_span_builder_append_unsigned_number(self, n);
+  return _az_span_builder_append_uint64(self, n);
 }
 
 AZ_NODISCARD az_result
-az_span_builder_append_signed_number(az_span_builder * const self, long long const n) {
+az_span_builder_append_int64(az_span_builder * const self, int64_t const n) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
   if (n < 0) {
     AZ_RETURN_IF_FAILED(az_span_builder_append_byte(self, '-'));
-    return _az_span_builder_append_unsigned_number(self, -n);
+    return _az_span_builder_append_uint64(self, -n);
   }
 
-  return _az_span_builder_append_unsigned_number(self, n);
+  return _az_span_builder_append_uint64(self, n);
 }
 
 AZ_NODISCARD az_result az_span_builder_replace(

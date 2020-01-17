@@ -80,16 +80,16 @@ AZ_NODISCARD az_result
 az_span_builder_append_zeros(az_span_builder * const self, size_t const size);
 
 /**
- * Append an unsigned integral number (base 10).
+ * Append an unsigned 64-bit integer (base 10).
  */
 AZ_NODISCARD az_result
-az_span_builder_append_unsigned_number(az_span_builder * const self, unsigned long long const n);
+az_span_builder_append_uint64(az_span_builder * const self, uint64_t const n);
 
 /**
- * Append a signed integral number (base 10).
+ * AppendAppend a signed 64-bit integer (base 10).
  */
 AZ_NODISCARD az_result
-az_span_builder_append_signed_number(az_span_builder * const self, long long const n);
+az_span_builder_append_int64(az_span_builder * const self, int64_t const n);
 
 AZ_ACTION_FUNC(az_span_builder_append, az_span_builder, az_span_action)
 

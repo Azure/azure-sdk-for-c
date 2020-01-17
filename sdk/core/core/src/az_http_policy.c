@@ -1,11 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include "az_log_private.h"
 #include <az_http_client_internal.h>
 #include <az_http_pipeline.h>
 #include <az_http_policy.h>
 #include <az_http_request_builder.h>
 #include <az_log.h>
+#include <az_log_internal.h>
 #include <az_mut_span.h>
 #include <az_span.h>
 #include <az_span_builder.h>
@@ -96,32 +98,35 @@ AZ_NODISCARD az_result az_http_pipeline_policy_logging(
     az_http_response * const response) {
   (void)data;
 
-  if (data == NULL) {
-    return az_http_pipeline_nextpolicy(p_policies, hrb, response);
+  clock_t slow_response_threshold = 0;
+  if (data != NULL) {
+    az_log_options const * const log_options = (az_log_options const *)data;
+    slow_response_threshold = (log_options->slow_response_threshold_msec * CLOCKS_PER_SEC) / 1000;
   }
 
-  clock_t const threshold
-      = (data == NULL) ? 0 : ((az_log_options const *)data)->slow_response_threshold;
-  clock_t const start = clock();
+  if (az_log_should_write(AZ_LOG_REQUEST)) {
+    _az_log_request(hrb);
+  }
+
+  clock_t const start = slow_response_threshold > 0 ? clock() : 0;
 
   az_result const result = az_http_pipeline_nextpolicy(p_policies, hrb, response);
 
-  clock_t const end = clock();
+  clock_t const end = slow_response_threshold > 0 ? clock() : 0;
 
-  if (data != NULL) {
+  if (az_log_should_write(AZ_LOG_RESPONSE)) {
+    _az_log_response(hrb, response);
+  }
+
+  if (slow_response_threshold > 0) {
     clock_t const duration = end - start;
-    if (duration >= threshold && az_log_should_write(AZ_LOG_SLOW_RESPONSE)) {
-      uint8_t log_msg_buf[200];
-      az_span_builder log_msg_bldr
-          = az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(log_msg_buf));
-
-      AZ_RETURN_IF_FAILED(az_span_builder_append_unsigned_number(
-          &log_msg_bldr, duration / (CLOCKS_PER_SEC / 1000)));
-
-      AZ_RETURN_IF_FAILED(az_span_builder_append(&log_msg_bldr, AZ_STR(" ms\0")));
-
-      az_log_write(AZ_LOG_SLOW_RESPONSE, (char const *)az_span_builder_result(&log_msg_bldr).begin);
+    if (duration >= slow_response_threshold && az_log_should_write(AZ_LOG_SLOW_RESPONSE)) {
+      _az_log_slow_response(hrb, response, duration / (CLOCKS_PER_SEC / 1000));
     }
+  }
+
+  if (az_failed(result) && az_log_should_write(AZ_LOG_ERROR)) {
+    _az_log_error(hrb, response, result);
   }
 
   return result;
