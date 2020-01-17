@@ -123,9 +123,10 @@ AZ_NODISCARD az_result az_http_request_builder_set_query_parameter(
 
   // Append either '?' or '&'
   AZ_RETURN_IF_FAILED(
-      az_span_builder_append_byte(&p_hrb->url_builder, p_hrb->query_start ? '&' : '?'));
+      az_span_builder_append_byte(&p_hrb->url_builder, p_hrb->query_start != 0 ? '&' : '?'));
+
   // update QPs starting position when it's 0
-  if (!p_hrb->query_start) {
+  if (p_hrb->query_start == 0) {
     p_hrb->query_start = (uint16_t)p_hrb->url_builder.length;
   }
 
@@ -139,7 +140,6 @@ AZ_NODISCARD az_result az_http_request_builder_set_query_parameter(
   AZ_RETURN_IF_FAILED(az_span_builder_append(&p_hrb->url_builder, value));
 
   assert(p_hrb->url_builder.length == new_url_size);
-
   return AZ_OK;
 }
 
@@ -174,23 +174,25 @@ az_http_request_builder_append_path(az_http_request_builder * const p_hrb, az_sp
 
   // check if there is enough space yet
   size_t const current_ulr_size = p_hrb->url_builder.length;
+
   uint16_t const url_after_path_size
       = (uint16_t)current_ulr_size + (uint16_t)path.size + 1 /* separator '/' to be added */;
+
   uint16_t query_start
-      = p_hrb->query_start ? p_hrb->query_start - 1 : (uint16_t)p_hrb->url_builder.length;
+      = p_hrb->query_start != 0 ? p_hrb->query_start - 1 : (uint16_t)p_hrb->url_builder.length;
 
   if (url_after_path_size >= p_hrb->url_builder.buffer.size) {
     return AZ_ERROR_BUFFER_OVERFLOW;
   }
 
-  /* use replace twice. Yes, we will have 2 right shift (one on each replace), but we rely on
-   * replace functionfor doing this movements only and avoid updating manually. We could also create
-   * a temp buffer to join "/" and path and then use replace. But that will cost us more stack
-   * memory.
-   */
+  // Use replace twice. Yes, we will have 2 right shift (one on each replace), but we rely on
+  // replace function for doing this movements only and avoid updating manually. We could also
+  // create a temp buffer to join "/" and path and then use replace. But that will cost us more
+  // stack memory.
   AZ_RETURN_IF_FAILED(
       az_span_builder_replace(&p_hrb->url_builder, query_start, query_start, AZ_STR("/")));
   query_start += 1; // a size of "/"
+
   AZ_RETURN_IF_FAILED(az_span_builder_replace(&p_hrb->url_builder, query_start, query_start, path));
   query_start += (uint16_t)path.size;
 
