@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "./az_json_parse.c"
 #include "./az_keyvault_create_key_options_test.c"
 #include "./az_test.h"
 
@@ -82,5 +83,6 @@ int main() {
     }
   }
   az_create_key_options_test();
+  az_tags_test();
   return exit_code;
 }

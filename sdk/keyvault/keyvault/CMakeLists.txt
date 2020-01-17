@@ -10,6 +10,7 @@ set(CMAKE_C_STANDARD 99)
 add_library (
   az_keyvault
   src/az_keyvault_client.c
+  src/az_keyvault_key_bundle.c
   )
 
 if(MSVC)

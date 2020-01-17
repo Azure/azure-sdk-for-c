@@ -16,43 +16,13 @@ uint8_t * _az_align_ceil(uint8_t * const p, size_t const align) {
   return _az_align_floor(p + (align - 1), align);
 }
 
-/**
- * Run-time type properties.
- */
-typedef struct {
-  size_t size;
-  size_t align;
-} _az_type;
-
-/**
- * Creates @_az_type from the given type/variable.
- */
-#define _AZ_TYPE(DATA_TYPE) \
-  ((_az_type){ \
-      .size = sizeof(DATA_TYPE), \
-      .align = AZ_ALIGNOF(DATA_TYPE), \
-  })
-
-/**
- * Run-time data properties.
- */
-typedef struct {
-  void const * p;
-  _az_type type;
-} _az_data;
-
-/**
- * Creates @_az_data from the given variable.
- */
-#define _AZ_DATA(DATA) ((_az_data){ .p = &DATA, .type = _AZ_TYPE(DATA) })
-
-AZ_NODISCARD AZ_INLINE az_span _az_data_get_span(_az_data const data) {
+AZ_NODISCARD AZ_INLINE az_span _az_data_get_span(az_data const data) {
   return (az_span){ .begin = data.p, .size = data.type.size };
 }
 
-AZ_NODISCARD az_result _az_span_builder_aligned_append(
+AZ_NODISCARD az_result az_span_builder_aligned_append(
     az_span_builder * const builder,
-    _az_data const data,
+    az_data const data,
     void const ** const out) {
   // alignment.
   {
@@ -65,7 +35,7 @@ AZ_NODISCARD az_result _az_span_builder_aligned_append(
 }
 
 AZ_NODISCARD az_result
-_az_span_builder_top_aligned_append(az_span_builder * const builder, _az_data const data) {
+az_span_builder_top_aligned_append(az_span_builder * const builder, az_data const data) {
   size_t const size = builder->buffer.size;
   if (size < data.type.size) {
     return AZ_ERROR_BUFFER_OVERFLOW;
@@ -85,9 +55,9 @@ _az_span_builder_top_aligned_append(az_span_builder * const builder, _az_data co
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result _az_span_builder_top_array_revert(
+AZ_NODISCARD az_result az_span_builder_top_array_revert(
     az_span_builder * const builder,
-    _az_type const item_type,
+    az_type const item_type,
     size_t const new_size,
     void const ** const out_array_begin,
     size_t * const out_array_size) {
@@ -113,11 +83,11 @@ AZ_NODISCARD az_result _az_span_builder_top_array_revert(
   // 3. move it to front.
   az_span const result_array = az_span_take(
       az_span_drop(az_mut_span_to_span(buffer), offset), item_count * item_type.size);
-  _az_data const data = {
+  az_data const data = {
     .p = result_array.begin,
     .type = { .size = result_array.size, .align = item_type.align },
   };
-  AZ_RETURN_IF_FAILED(_az_span_builder_aligned_append(builder, data, out_array_begin));
+  AZ_RETURN_IF_FAILED(az_span_builder_aligned_append(builder, data, out_array_begin));
   *out_array_size = item_count;
 
   return AZ_OK;
@@ -128,12 +98,12 @@ AZ_INLINE AZ_NODISCARD az_result _az_span_builder_append_json_data(
     az_json_data const data,
     az_json_data const ** const out) {
   void const * p = { 0 };
-  AZ_RETURN_IF_FAILED(_az_span_builder_aligned_append(builder, _AZ_DATA(data), &p));
+  AZ_RETURN_IF_FAILED(az_span_builder_aligned_append(builder, _AZ_DATA(data), &p));
   *out = (az_json_data const *)p;
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result _az_span_builder_write_json_string(
+AZ_NODISCARD az_result az_span_builder_write_json_string(
     az_span_builder * const builder,
     az_span const json_string,
     az_span * const out) {
@@ -166,7 +136,7 @@ AZ_NODISCARD az_result _az_span_builder_write_json_value(
     }
     case AZ_JSON_TOKEN_STRING: {
       az_span s = { 0 };
-      AZ_RETURN_IF_FAILED(_az_span_builder_write_json_string(builder, token.data.string, &s));
+      AZ_RETURN_IF_FAILED(az_span_builder_write_json_string(builder, token.data.string, &s));
       *out = az_json_data_string(s);
       break;
     }
@@ -181,14 +151,14 @@ AZ_NODISCARD az_result _az_span_builder_write_json_value(
         AZ_RETURN_IF_FAILED(result);
         az_json_object_member data_member = { 0 };
         AZ_RETURN_IF_FAILED(
-            _az_span_builder_write_json_string(builder, token_member.name, &data_member.name));
+            az_span_builder_write_json_string(builder, token_member.name, &data_member.name));
         AZ_RETURN_IF_FAILED(_az_span_builder_write_json_value(
             builder, parser, token_member.value, &data_member.value));
-        AZ_RETURN_IF_FAILED(_az_span_builder_top_aligned_append(builder, _AZ_DATA(data_member)));
+        AZ_RETURN_IF_FAILED(az_span_builder_top_aligned_append(builder, _AZ_DATA(data_member)));
       }
       void const * p = { 0 };
       size_t i = 0;
-      AZ_RETURN_IF_FAILED(_az_span_builder_top_array_revert(
+      AZ_RETURN_IF_FAILED(az_span_builder_top_array_revert(
           builder, _AZ_TYPE(az_json_object_member), buffer_size, &p, &i));
       *out = az_json_data_object((az_json_object){ ._internal = { .begin = p, .size = i } });
       break;
@@ -204,18 +174,16 @@ AZ_NODISCARD az_result _az_span_builder_write_json_value(
         AZ_RETURN_IF_FAILED(result);
         az_json_data value = { 0 };
         AZ_RETURN_IF_FAILED(_az_span_builder_write_json_value(builder, parser, item_token, &value));
-        AZ_RETURN_IF_FAILED(_az_span_builder_top_aligned_append(builder, _AZ_DATA(value)));
+        AZ_RETURN_IF_FAILED(az_span_builder_top_aligned_append(builder, _AZ_DATA(value)));
       }
       void const * p = { 0 };
       size_t i = 0;
       AZ_RETURN_IF_FAILED(
-          _az_span_builder_top_array_revert(builder, _AZ_TYPE(az_json_data), buffer_size, &p, &i));
+          az_span_builder_top_array_revert(builder, _AZ_TYPE(az_json_data), buffer_size, &p, &i));
       *out = az_json_data_array((az_json_array){ ._internal = { .begin = p, .size = i } });
       break;
     }
-    default: {
-      return AZ_ERROR_JSON_INVALID_STATE;
-    }
+    default: { return AZ_ERROR_JSON_INVALID_STATE; }
   }
   return AZ_OK;
 }

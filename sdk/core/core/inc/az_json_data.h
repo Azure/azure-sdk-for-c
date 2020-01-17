@@ -7,13 +7,44 @@
 #include <az_json_token.h>
 #include <az_mut_span.h>
 #include <az_span.h>
+#include <az_span_builder.h>
 
-#include <stddef.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 #include <_az_cfg_prefix.h>
 
 typedef struct az_json_data az_json_data;
+
+/**
+ * Creates @_az_type from the given type/variable.
+ */
+#define _AZ_TYPE(DATA_TYPE) \
+  ((az_type){ \
+      .size = sizeof(DATA_TYPE), \
+      .align = AZ_ALIGNOF(DATA_TYPE), \
+  })
+
+/**
+ * Creates @az_data from the given variable.
+ */
+#define _AZ_DATA(DATA) ((az_data){ .p = &DATA, .type = _AZ_TYPE(DATA) })
+
+/**
+ * Run-time type properties.
+ */
+typedef struct {
+  size_t size;
+  size_t align;
+} az_type;
+
+/**
+ * Run-time data properties.
+ */
+typedef struct {
+  void const * p;
+  az_type type;
+} az_data;
 
 typedef struct {
   struct {
@@ -33,7 +64,9 @@ typedef struct {
   } _internal;
 } az_json_object;
 
-AZ_NODISCARD AZ_INLINE size_t az_json_object_size(az_json_object const a) { return a._internal.size; }
+AZ_NODISCARD AZ_INLINE size_t az_json_object_size(az_json_object const a) {
+  return a._internal.size;
+}
 
 typedef enum {
   AZ_JSON_DATA_NULL = 0,
@@ -110,6 +143,26 @@ az_json_object_get(az_json_object const o, size_t const i) {
 
 AZ_NODISCARD az_result
 az_json_to_data(az_span const json, az_mut_span const buffer, az_json_data const ** const out);
+
+AZ_NODISCARD az_result az_span_builder_write_json_string(
+    az_span_builder * const builder,
+    az_span const json_string,
+    az_span * const out);
+
+AZ_NODISCARD az_result
+az_span_builder_top_aligned_append(az_span_builder * const builder, az_data const data);
+
+AZ_NODISCARD az_result az_span_builder_top_array_revert(
+    az_span_builder * const builder,
+    az_type const item_type,
+    size_t const new_size,
+    void const ** const out_array_begin,
+    size_t * const out_array_size);
+
+AZ_NODISCARD az_result az_span_builder_aligned_append(
+    az_span_builder * const builder,
+    az_data const data,
+    void const ** const out);
 
 #include <_az_cfg_suffix.h>
 
