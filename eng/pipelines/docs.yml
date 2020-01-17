@@ -9,7 +9,7 @@ jobs:
 
       - pwsh: >-
           python eng/docs/generate_docs.py
-          --TemplatePath="eng/docs/Doxyfile.template"
+          --TemplateFile="eng/docs/Doxyfile.template"
           --PackagePath="sdk/$(PackageName)"
           --PackageName="$(PackageName)"
           --PackageVersion="$(PackageVersion)"
