@@ -5,6 +5,7 @@ jobs:
     steps:
       - pwsh: >-
           choco install doxygen.install;
+          Write-Host 'setting path...';
           Write-Host "##vso[task.setvariable variable=PATH;]${$env:PATH};";
         displayName: Install Doxygen
 
