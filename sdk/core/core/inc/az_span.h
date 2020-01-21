@@ -25,7 +25,7 @@ typedef struct {
   } _internal;
 } az_span;
 
-/********************************  SPAN GETTERS */
+/********************************  SPAN GETTERS / SETTERS */
 
 /**
  * @brief convenient way to get the capacity from one span
@@ -33,6 +33,14 @@ typedef struct {
  */
 AZ_NODISCARD AZ_INLINE int32_t az_span_capacity_get(az_span const span) {
   return span._internal.capacity;
+}
+
+/**
+ * @brief convenient way to set the capacity from one span
+ *
+ */
+AZ_NODISCARD AZ_INLINE void az_span_capacity_set(az_span span, int32_t const capacity) {
+  span._internal.capacity = capacity;
 }
 
 /**
@@ -44,11 +52,27 @@ AZ_NODISCARD AZ_INLINE int32_t az_span_length_get(az_span const span) {
 }
 
 /**
+ * @brief convenient way to set the length from one span
+ *
+ */
+AZ_NODISCARD AZ_INLINE void az_span_length_get(az_span span, int32_t const length) {
+  span._internal.length = length;
+}
+
+/**
  * @brief convenient way to get the pointer from one span
  *
  */
 AZ_NODISCARD AZ_INLINE uint8_t * az_span_ptr_get(az_span const span) {
   return span._internal.begin;
+}
+
+/**
+ * @brief convenient way to set the pointer from one span
+ *
+ */
+AZ_NODISCARD AZ_INLINE void az_span_ptr_set(az_span span, uint8_t const * ptr) {
+  span._internal.begin = ptr;
 }
 
 /********************************  CONSTRUCTORS */
@@ -163,14 +187,14 @@ AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span const a, az_spa
 AZ_NODISCARD az_result az_span_to_uint64(az_span const self, uint64_t * const out);
 
 /**
- * @brief move the content of span @b src to @buffer and make @b out_result point to it
+ * @brief move the content of span @b src to @b dst
  *
  * @param buffer
  * @param src
  * @param out_result
  * @return AZ_NODISCARD az_mut_span_move
  */
-AZ_NODISCARD az_result az_span_copy(az_span const dst, az_span const src, int32_t * out_result);
+AZ_NODISCARD az_result az_span_copy(az_span const dst, az_span const src);
 
 /**
  * @brief append az_span if there is enough capacity for it
@@ -179,16 +203,7 @@ AZ_NODISCARD az_result az_span_copy(az_span const dst, az_span const src, int32_
  * @param span content to be appended
  * @return AZ_NODISCARD az_span_append
  */
-AZ_NODISCARD az_result az_span_append(az_span * const self, az_span const span);
-
-/**
- * @brief Append only only byte if there is available capacity for it
- *
- * @param self src span where to append
- * @param c byte to be appended
- * @return AZ_NODISCARD az_span_append_byte
- */
-AZ_NODISCARD az_result az_span_append_byte(az_span * const self, uint8_t const c);
+AZ_NODISCARD az_result az_span_append(az_span * self, az_span const span);
 
 /**
  * @brief converts @b src span to zero-terminated srt. Content is copied to @b buffer and then \0 is
