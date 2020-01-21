@@ -19,10 +19,10 @@ typedef int32_t az_result_byte;
  * Returns `AZ_ERROR_EOF` if the `index` is out of the span range.
  */
 AZ_NODISCARD AZ_INLINE az_result_byte az_span_get(az_span const span, size_t const index) {
-  if (span.size <= index) {
+  if (span._internal.length <= index) {
     return AZ_ERROR_EOF;
   }
-  return span.begin[index];
+  return span._internal.begin[index];
 }
 
 // Parsing utilities
