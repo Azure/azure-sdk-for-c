@@ -17,19 +17,25 @@ static az_log * _az_log_listener = NULL;
 void az_log_set_classifications(
     az_log_classification const * const classifications,
     size_t const classifications_length) {
+  // TODO: thread safety
   _az_log_classifications = classifications;
   _az_log_classifications_length = classifications_length;
 }
 
-void az_log_set_listener(az_log * const listener) { _az_log_listener = listener; }
+void az_log_set_listener(az_log * const listener) {
+  // TODO: thread safety
+  _az_log_listener = listener;
+}
 
 void az_log_write(az_log_classification const classification, az_span const message) {
+  // TODO: thread safety
   if (_az_log_listener != NULL && az_log_should_write(classification)) {
     (*_az_log_listener)(classification, message);
   }
 }
 
 bool az_log_should_write(az_log_classification const classification) {
+  // TODO: thread safety
   if (_az_log_classifications == NULL || _az_log_classifications_length == 0) {
     return true;
   }

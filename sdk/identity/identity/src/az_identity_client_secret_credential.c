@@ -216,6 +216,7 @@ AZ_INLINE AZ_NODISCARD az_result _az_identity_client_secret_credential_ensure_to
 static AZ_NODISCARD az_result _az_identity_client_secret_credential_credential_func(
     az_identity_access_token_context const * const token_context,
     az_http_request_builder * const hrb) {
+  // TODO: thread safety
   AZ_CONTRACT_ARG_NOT_NULL(token_context);
   AZ_CONTRACT_ARG_NOT_NULL(token_context->_internal.token);
   AZ_CONTRACT_ARG_NOT_NULL(hrb);
