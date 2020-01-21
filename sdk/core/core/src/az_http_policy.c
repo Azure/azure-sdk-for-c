@@ -91,38 +91,32 @@ AZ_NODISCARD az_result az_http_pipeline_policy_authentication(
   return az_http_pipeline_nextpolicy(p_policies, hrb, response);
 }
 
+enum {
+  _az_LOG_SLOW_RESPONSE_THRESHOLD_MSEC = 3000,
+};
+
 AZ_NODISCARD az_result az_http_pipeline_policy_logging(
     az_http_policy * const p_policies,
     void * const data,
     az_http_request_builder * const hrb,
     az_http_response * const response) {
   (void)data;
-
-  clock_t slow_response_threshold = 0;
-  if (data != NULL) {
-    az_log_options const * const log_options = (az_log_options const *)data;
-    slow_response_threshold = (log_options->slow_response_threshold_msec * CLOCKS_PER_SEC) / 1000;
-  }
-
   if (az_log_should_write(AZ_LOG_REQUEST)) {
     _az_log_request(hrb);
   }
 
-  clock_t const start = slow_response_threshold > 0 ? clock() : 0;
-
+  clock_t const start = clock();
   az_result const result = az_http_pipeline_nextpolicy(p_policies, hrb, response);
-
-  clock_t const end = slow_response_threshold > 0 ? clock() : 0;
+  clock_t const end = clock();
 
   if (az_log_should_write(AZ_LOG_RESPONSE)) {
     _az_log_response(hrb, response);
   }
 
-  if (slow_response_threshold > 0) {
-    clock_t const duration = end - start;
-    if (duration >= slow_response_threshold && az_log_should_write(AZ_LOG_SLOW_RESPONSE)) {
-      _az_log_slow_response(hrb, response, duration / (CLOCKS_PER_SEC / 1000));
-    }
+  clock_t const duration = end - start;
+  if (duration >= _az_LOG_SLOW_RESPONSE_THRESHOLD_MSEC
+      && az_log_should_write(AZ_LOG_SLOW_RESPONSE)) {
+    _az_log_slow_response(hrb, response, duration / (CLOCKS_PER_SEC / 1000));
   }
 
   if (az_failed(result) && az_log_should_write(AZ_LOG_ERROR)) {
