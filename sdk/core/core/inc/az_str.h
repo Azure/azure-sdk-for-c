@@ -17,23 +17,6 @@
 #define AZ_STRING_LITERAL_LEN(S) (sizeof(S "") - 1)
 
 /**
- * Creates a span which can be used inside constant initializers. For example
- *
- * `static az_const_span foo[] = { AZ_CONST_STR("Hello"), AZ_CONST_STR("world!") };`
- */
-#define AZ_CONST_STR(STRING_LITERAL) \
-  { .begin = (uint8_t const *)STRING_LITERAL, .size = AZ_STRING_LITERAL_LEN(STRING_LITERAL), }
-
-// Creates a span which can be passed as a paramater. For example,
-//
-// `some_function(AZ_STR("Hello world"));`
-//
-// where
-//
-// `void some_function(az_span const span);`
-#define AZ_STR(STRING_LITERAL) (az_span) AZ_CONST_STR(STRING_LITERAL)
-
-/**
  * A callback that accepts zero-terminated string `char const *`.
  */
 AZ_ACTION_TYPE(az_str_action, char const *)
