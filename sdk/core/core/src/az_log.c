@@ -37,6 +37,7 @@ void az_log_write(az_log_classification const classification, az_span const mess
 bool az_log_should_write(az_log_classification const classification) {
   // TODO: thread safety
   if (_az_log_classifications == NULL || _az_log_classifications_length == 0) {
+    // If the user hasn't registered any classifications, then we log everything.
     return true;
   }
 
