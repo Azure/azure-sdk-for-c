@@ -12,6 +12,19 @@ enum {
   AZ_ASCII_LOWER_DIF = 'a' - 'A',
 };
 
+AZ_NODISCARD az_result az_span_sub(
+    az_span const span,
+    int32_t const low_index,
+    int32_t high_index,
+    az_span * out_sub_span) {
+  // left part
+  az_span const left = az_span_take(span, high_index);
+  az_span const right = az_span_drop(left, low_index);
+  AZ_RETURN_IF_FAILED(az_span_init(out_sub_span, right));
+
+  return AZ_OK;
+}
+
 /**
  * ASCII lower case.
  */
@@ -19,12 +32,12 @@ AZ_NODISCARD AZ_INLINE az_result_byte az_ascii_lower(az_result_byte const value)
   return 'A' <= value && value <= 'Z' ? value + AZ_ASCII_LOWER_DIF : value;
 }
 
-AZ_NODISCARD bool az_span_is_equal_content_ignoring_case(az_span const a, az_span const b) {
-  size_t const size = a._internal.length;
+AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span const a, az_span const b) {
+  int32_t const size = a._internal.length;
   if (size != b._internal.length) {
     return false;
   }
-  for (size_t i = 0; i < size; ++i) {
+  for (int32_t i = 0; i < size; ++i) {
     if (az_ascii_lower(az_span_get(a, i)) != az_ascii_lower(az_span_get(b, i))) {
       return false;
     }
@@ -37,7 +50,7 @@ AZ_NODISCARD az_result az_span_to_uint64(az_span const self, uint64_t * const ou
     return AZ_ERROR_EOF;
   }
   uint64_t value = 0;
-  size_t i = 0;
+  int32_t i = 0;
   while (true) {
     az_result_byte const result = az_span_get(self, i);
     if (result == AZ_ERROR_EOF) {
@@ -66,18 +79,17 @@ AZ_NODISCARD az_result az_span_to_uint64(az_span const self, uint64_t * const ou
  * @param out_result
  * @return AZ_NODISCARD az_mut_span_move
  */
-AZ_NODISCARD az_result
-az_span_move(az_span const buffer, az_span const src, az_span * const out_result) {
+AZ_NODISCARD az_result az_span_copy(az_span const dst, az_span const src, int32_t * out_result) {
   AZ_CONTRACT_ARG_NOT_NULL(out_result);
 
   AZ_CONTRACT_ARG_VALID_SPAN(buffer);
   AZ_CONTRACT_ARG_VALID_SPAN(src);
+  int32_t src_len = az_span_length_get(src);
 
-  AZ_CONTRACT(buffer._internal.capacity >= src._internal.length, AZ_ERROR_BUFFER_OVERFLOW);
+  AZ_CONTRACT(az_span_capacity_get(dst) >= src_len, AZ_ERROR_BUFFER_OVERFLOW);
 
   if (!az_span_is_empty(src)) {
-    memmove(
-        (void *)buffer._internal.begin, (void const *)src._internal.begin, src._internal.length);
+    memmove((void *)az_span_prt_get(dst), (void const *)az_span_ptr_get(src), src_len);
   }
 
   out_result->_internal.begin = buffer._internal.begin;
@@ -87,7 +99,9 @@ az_span_move(az_span const buffer, az_span const src, az_span * const out_result
   return AZ_OK;
 }
 
-AZ_NODISCARD AZ_INLINE size_t _az_size_min(size_t const a, size_t const b) { return a < b ? a : b; }
+AZ_NODISCARD AZ_INLINE int32_t _az_size_min(int32_t const a, int32_t const b) {
+  return a < b ? a : b;
+}
 
 AZ_INLINE void _az_uint8_swap(uint8_t * const a, uint8_t * const b) {
   uint8_t const c = *a;
@@ -110,7 +124,7 @@ AZ_INLINE void _az_uint8_swap(uint8_t * const a, uint8_t * const b) {
 void az_span_swap(az_span const a, az_span const b) {
   uint8_t * pa = a._internal.begin;
   uint8_t * pb = b._internal.begin;
-  for (size_t i = _az_size_min(a._internal.length, b._internal.length); i > 0; ++pa, ++pb) {
+  for (int32_t i = _az_size_min(a._internal.length, b._internal.length); i > 0; ++pa, ++pb) {
     --i;
     _az_uint8_swap(pa, pb);
   }
@@ -190,7 +204,7 @@ AZ_NODISCARD az_result az_span_append_byte(az_span * const self, uint8_t const c
  * @param size number of zeros to be appended
  * @return AZ_NODISCARD az_span_append_zeros
  */
-AZ_NODISCARD az_result az_span_append_zeros(az_span * const self, size_t const size) {
+AZ_NODISCARD az_result az_span_append_zeros(az_span * const self, int32_t const size) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
   az_span const span = az_span_take(az_span_drop(*self, self->_internal.length), size);
@@ -213,12 +227,12 @@ AZ_NODISCARD az_result az_span_append_zeros(az_span * const self, size_t const s
  * @return AZ_NODISCARD az_span_replace
  */
 AZ_NODISCARD az_result
-az_span_replace(az_span * const self, size_t start, size_t end, az_span const span) {
+az_span_replace(az_span * const self, int32_t start, int32_t end, az_span const span) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
-  size_t const current_size = self->_internal.length;
-  size_t const replaced_size = end - start;
-  size_t const size_after_replace = current_size - replaced_size + span._internal.length;
+  int32_t const current_size = self->_internal.length;
+  int32_t const replaced_size = end - start;
+  int32_t const size_after_replace = current_size - replaced_size + span._internal.length;
 
   // replaced size must be less or equal to current builder size. Can't replace more than what
   // current is available
