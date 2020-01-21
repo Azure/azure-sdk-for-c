@@ -11,6 +11,7 @@
 
 void az_log_write(az_log_classification const classification, az_span const message);
 
+// If the user hasn't registered any classifications, then we log everything.
 bool az_log_should_write(az_log_classification const classification);
 
 #include <_az_cfg_suffix.h>
