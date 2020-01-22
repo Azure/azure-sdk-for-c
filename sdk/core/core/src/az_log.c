@@ -157,8 +157,11 @@ static az_result _az_log_response_msg(
     do {
       AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, AZ_STR("\n\t\t")));
       AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, header.key));
-      AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, AZ_STR(" : ")));
-      AZ_RETURN_IF_FAILED(_az_log_value_msg(log_msg_bldr, header.value));
+
+      if (!az_span_is_empty(header.value)) {
+        AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, AZ_STR(" : ")));
+        AZ_RETURN_IF_FAILED(_az_log_value_msg(log_msg_bldr, header.value));
+      }
     } while (az_http_response_parser_read_header(&parser, &header) == AZ_OK);
   }
 

@@ -56,7 +56,7 @@ static void _log_listener(az_log_classification const classification, az_span co
                  "\tHeaders: \n"
                  "\t\tHeader11 : Value11\n"
                  "\t\tHeader22 : NNNNOOOOPPPPQQQQRRRRSS ... UUUVVVVWWWWXXXXYYYYZZZZ\n"
-                 "\t\tHeader33 : \n"
+                 "\t\tHeader33\n"
                  "\t\tHeader44 : cba8888887777776666665 ... 44444333333222222111111\n"
                  "\tBody: KKKKKJJJJJIIIIIHHHHHGG ... EEEDDDDDCCCCCBBBBBAAAAA")));
       break;
@@ -79,7 +79,7 @@ static void _log_listener(az_log_classification const classification, az_span co
                  "\tHeaders: \n"
                  "\t\tHeader11 : Value11\n"
                  "\t\tHeader22 : NNNNOOOOPPPPQQQQRRRRSS ... UUUVVVVWWWWXXXXYYYYZZZZ\n"
-                 "\t\tHeader33 : \n"
+                 "\t\tHeader33\n"
                  "\t\tHeader44 : cba8888887777776666665 ... 44444333333222222111111\n"
                  "\tBody: KKKKKJJJJJIIIIIHHHHHGG ... EEEDDDDDCCCCCBBBBBAAAAA\n"
                  "\n"
@@ -104,7 +104,7 @@ static void _log_listener(az_log_classification const classification, az_span co
                  "\tHeaders: \n"
                  "\t\tHeader11 : Value11\n"
                  "\t\tHeader22 : NNNNOOOOPPPPQQQQRRRRSS ... UUUVVVVWWWWXXXXYYYYZZZZ\n"
-                 "\t\tHeader33 : \n"
+                 "\t\tHeader33\n"
                  "\t\tHeader44 : cba8888887777776666665 ... 44444333333222222111111\n"
                  "\tBody: KKKKKJJJJJIIIIIHHHHHGG ... EEEDDDDDCCCCCBBBBBAAAAA\n"
                  "\n"
