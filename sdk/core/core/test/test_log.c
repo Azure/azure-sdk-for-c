@@ -139,7 +139,7 @@ void test_log() {
       &hrb, AZ_STR("Header3"), AZ_STR("111111222222333333444444555555666666777777888888abc")));
 
   uint8_t response_buf[1024] = { 0 };
-  az_span_builder response_builder
+  az_span_builder const response_builder
       = az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(response_buf));
 
   TEST_EXPECT_SUCCESS(az_span_builder_append(
@@ -221,7 +221,7 @@ void test_log() {
       TEST_ASSERT(az_log_should_write(AZ_LOG_ERROR) == true);
     }
 
-    az_log_classification classifications[] = { AZ_LOG_ERROR, AZ_LOG_SLOW_RESPONSE };
+    az_log_classification const classifications[] = { AZ_LOG_ERROR, AZ_LOG_SLOW_RESPONSE };
     az_log_set_classifications(classifications, 2);
 
     TEST_ASSERT(az_log_should_write(AZ_LOG_REQUEST) == false);
