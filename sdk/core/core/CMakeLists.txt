@@ -86,6 +86,7 @@ add_executable (
     test/test_json_pointer.c
     test/test_json_string.c
     test/test_json_value.c
+    test/test_log.c
     test/test_mut_span.c
     test/test_pair_span.c
     test/test_span_builder_replace.c

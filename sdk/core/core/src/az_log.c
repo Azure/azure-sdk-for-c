@@ -2,17 +2,21 @@
 // SPDX-License-Identifier: MIT
 
 #include "az_log_private.h"
+#include <az_contract.h>
 #include <az_http_response_parser.h>
 #include <az_log.h>
 #include <az_log_internal.h>
 #include <az_span_builder.h>
 #include <az_str.h>
 
+#include <stdbool.h>
+#include <stddef.h>
+
 #include <_az_cfg.h>
 
 static az_log_classification const * _az_log_classifications = NULL;
 static size_t _az_log_classifications_length = 0;
-static az_log * _az_log_listener = NULL;
+static az_log _az_log_listener = NULL;
 
 void az_log_set_classifications(
     az_log_classification const * const classifications,
@@ -22,7 +26,7 @@ void az_log_set_classifications(
   _az_log_classifications_length = classifications_length;
 }
 
-void az_log_set_listener(az_log * const listener) {
+void az_log_set_listener(az_log const listener) {
   // TODO: thread safety
   _az_log_listener = listener;
 }
@@ -188,7 +192,7 @@ AZ_INLINE az_result _az_log_error_msg(
     az_result result) {
   AZ_RETURN_IF_FAILED(_az_log_response_msg(log_msg_bldr, hrb, response));
   AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, AZ_STR("\n\nError: ")));
-  return az_span_builder_append_uint64(log_msg_bldr, result);
+  return az_span_builder_append_uint64(log_msg_bldr, (uint32_t)result);
 }
 
 void _az_log_request(az_http_request_builder const * const hrb) {
@@ -212,7 +216,7 @@ void _az_log_response(
 
   (void)_az_log_response_msg(&log_msg_bldr, hrb, response);
 
-  az_log_write(AZ_LOG_SLOW_RESPONSE, az_span_builder_result(&log_msg_bldr));
+  az_log_write(AZ_LOG_RESPONSE, az_span_builder_result(&log_msg_bldr));
 }
 
 void _az_log_slow_response(

@@ -31,6 +31,7 @@ void test_span_builder_replace();
 void test_span_span();
 void test_pair_span();
 void test_mut_span();
+void test_log();
 
 int exit_code = 0;
 
@@ -742,5 +743,6 @@ int main() {
   test_span_span();
   test_pair_span();
   test_mut_span();
+  test_log();
   return exit_code;
 }

@@ -30,7 +30,7 @@ void az_log_set_classifications(
     az_log_classification const * const classifications,
     size_t const classifications_length);
 
-void az_log_set_listener(az_log * const listener);
+void az_log_set_listener(az_log const listener);
 
 #include <_az_cfg_suffix.h>
 
