@@ -97,11 +97,11 @@ AZ_NODISCARD az_result az_http_pipeline_policy_logging(
     az_http_request_builder * const hrb,
     az_http_response * const response) {
   (void)data;
-  if (az_log_should_write(AZ_LOG_REQUEST)) {
+  if (az_log_should_write(AZ_LOG_HTTP_REQUEST)) {
     _az_log_http_request(hrb);
   }
 
-  if (!az_log_should_write(AZ_LOG_RESPONSE)) {
+  if (!az_log_should_write(AZ_LOG_HTTP_RESPONSE)) {
     // If no logging is needed, do not even measure the response time.
     return az_http_pipeline_nextpolicy(p_policies, hrb, response);
   }

@@ -184,7 +184,7 @@ void _az_log_http_request(az_http_request_builder const * const hrb) {
 
   (void)_az_log_http_request_msg(&log_msg_bldr, hrb, 0);
 
-  az_log_write(AZ_LOG_REQUEST, az_span_builder_result(&log_msg_bldr));
+  az_log_write(AZ_LOG_HTTP_REQUEST, az_span_builder_result(&log_msg_bldr));
 }
 
 void _az_log_http_response(
@@ -198,5 +198,5 @@ void _az_log_http_response(
 
   (void)_az_log_http_response_msg(&log_msg_bldr, response, duration_msec, hrb);
 
-  az_log_write(AZ_LOG_RESPONSE, az_span_builder_result(&log_msg_bldr));
+  az_log_write(AZ_LOG_HTTP_RESPONSE, az_span_builder_result(&log_msg_bldr));
 }
