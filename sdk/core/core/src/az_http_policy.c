@@ -1,15 +1,21 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include "az_log_private.h"
+#include <az_clock_internal.h>
 #include <az_http_client_internal.h>
 #include <az_http_pipeline.h>
 #include <az_http_policy.h>
 #include <az_http_request_builder.h>
+#include <az_log.h>
+#include <az_log_internal.h>
 #include <az_mut_span.h>
 #include <az_span.h>
 #include <az_span_builder.h>
 #include <az_str.h>
 #include <az_url_internal.h>
+
+#include <stddef.h>
 
 #include <_az_cfg.h>
 
@@ -91,9 +97,22 @@ AZ_NODISCARD az_result az_http_pipeline_policy_logging(
     az_http_request_builder * const hrb,
     az_http_response * const response) {
   (void)data;
+  if (az_log_should_write(AZ_LOG_HTTP_REQUEST)) {
+    _az_log_http_request(hrb);
+  }
 
-  // Authentication logic
-  return az_http_pipeline_nextpolicy(p_policies, hrb, response);
+  if (!az_log_should_write(AZ_LOG_HTTP_RESPONSE)) {
+    // If no logging is needed, do not even measure the response time.
+    return az_http_pipeline_nextpolicy(p_policies, hrb, response);
+  }
+
+  uint64_t const start = _az_clock_msec();
+  az_result const result = az_http_pipeline_nextpolicy(p_policies, hrb, response);
+  uint64_t const end = _az_clock_msec();
+
+  _az_log_http_response(response, end - start, hrb);
+
+  return result;
 }
 
 AZ_NODISCARD az_result az_http_pipeline_policy_bufferresponse(

@@ -3,6 +3,8 @@
 
 #include <az_span_builder.h>
 
+#include <assert.h>
+
 #include <_az_cfg.h>
 
 AZ_NODISCARD az_result az_span_builder_append(az_span_builder * const self, az_span const span) {
@@ -21,6 +23,52 @@ AZ_NODISCARD az_result az_span_builder_append_byte(az_span_builder * const self,
   AZ_RETURN_IF_FAILED(az_mut_span_set(self->buffer, self->length, c));
   self->length += 1;
   return AZ_OK;
+}
+
+AZ_INLINE uint8_t _az_decimal_to_ascii(uint8_t const d) {
+  assert(d < 10);
+  return '0' + d;
+}
+
+static AZ_NODISCARD az_result
+_az_span_builder_append_uint64(az_span_builder * const self, uint64_t const n) {
+  if (n == 0) {
+    return az_span_builder_append_byte(self, '0');
+  }
+
+  uint64_t div = 10000000000000000000ull;
+  uint64_t nn = n;
+  while (nn / div == 0) {
+    div /= 10;
+  }
+
+  while (div > 1) {
+    AZ_RETURN_IF_FAILED(
+        az_span_builder_append_byte(self, _az_decimal_to_ascii((uint8_t)(nn / div))));
+
+    nn %= div;
+    div /= 10;
+  }
+
+  return az_span_builder_append_byte(self, _az_decimal_to_ascii((uint8_t)nn));
+}
+
+AZ_NODISCARD az_result
+az_span_builder_append_uint64(az_span_builder * const self, uint64_t const n) {
+  AZ_CONTRACT_ARG_NOT_NULL(self);
+  return _az_span_builder_append_uint64(self, n);
+}
+
+AZ_NODISCARD az_result
+az_span_builder_append_int64(az_span_builder * const self, int64_t const n) {
+  AZ_CONTRACT_ARG_NOT_NULL(self);
+
+  if (n < 0) {
+    AZ_RETURN_IF_FAILED(az_span_builder_append_byte(self, '-'));
+    return _az_span_builder_append_uint64(self, -n);
+  }
+
+  return _az_span_builder_append_uint64(self, n);
 }
 
 AZ_NODISCARD az_result az_span_builder_replace(

@@ -31,6 +31,7 @@ add_library (
   src/az_json_pointer.c
   src/az_json_string.c
   src/az_json_token.c
+  src/az_log.c
   src/az_mut_span.c
   src/az_pair.c
   src/az_span.c
@@ -85,6 +86,7 @@ add_executable (
     test/test_json_pointer.c
     test/test_json_string.c
     test/test_json_value.c
+    test/test_log.c
     test/test_mut_span.c
     test/test_pair_span.c
     test/test_span_builder_replace.c

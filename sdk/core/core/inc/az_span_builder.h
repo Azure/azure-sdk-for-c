@@ -80,6 +80,18 @@ AZ_NODISCARD az_result
 az_span_builder_append_zeros(az_span_builder * const self, size_t const size);
 
 /**
+ * Append an unsigned 64-bit integer (base 10).
+ */
+AZ_NODISCARD az_result
+az_span_builder_append_uint64(az_span_builder * const self, uint64_t const n);
+
+/**
+ * AppendAppend a signed 64-bit integer (base 10).
+ */
+AZ_NODISCARD az_result
+az_span_builder_append_int64(az_span_builder * const self, int64_t const n);
+
+/**
  * Replace all contents from a starting position to an end position with the content of a provided
  * span
  */
