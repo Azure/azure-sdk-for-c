@@ -13,7 +13,7 @@ AZ_INLINE uint64_t _az_clock_msec() {
   // Convert clock_t to milliseconds
   // Floating point arithmetic is used to cover CLOCKS_PER_SEC all values
   // including 12000, 2000, 1500, 300, 500, 100, 2
-  return clock() / (CLOCKS_PER_SEC / 1000.0);
+  return (uint64_t)(clock() / (CLOCKS_PER_SEC / 1000.0));
 }
 
 #include <_az_cfg_suffix.h>
