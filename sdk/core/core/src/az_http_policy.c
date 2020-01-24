@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "az_log_private.h"
+#include <az_clock_internal.h>
 #include <az_http_client_internal.h>
 #include <az_http_pipeline.h>
 #include <az_http_policy.h>
@@ -15,7 +16,6 @@
 #include <az_url_internal.h>
 
 #include <stddef.h>
-#include <time.h>
 
 #include <_az_cfg.h>
 
@@ -91,10 +91,6 @@ AZ_NODISCARD az_result az_http_pipeline_policy_authentication(
   return az_http_pipeline_nextpolicy(p_policies, hrb, response);
 }
 
-enum {
-  _az_LOG_SLOW_RESPONSE_THRESHOLD_MSEC = 3000,
-};
-
 AZ_NODISCARD az_result az_http_pipeline_policy_logging(
     az_http_policy * const p_policies,
     void * const data,
@@ -102,26 +98,19 @@ AZ_NODISCARD az_result az_http_pipeline_policy_logging(
     az_http_response * const response) {
   (void)data;
   if (az_log_should_write(AZ_LOG_REQUEST)) {
-    _az_log_request(hrb);
+    _az_log_http_request(hrb);
   }
 
-  clock_t const start = clock();
+  if (!az_log_should_write(AZ_LOG_RESPONSE)) {
+    // If no logging is needed, do not even measure the response time.
+    return az_http_pipeline_nextpolicy(p_policies, hrb, response);
+  }
+
+  uint64_t const start = _az_clock_msec();
   az_result const result = az_http_pipeline_nextpolicy(p_policies, hrb, response);
-  clock_t const end = clock();
+  uint64_t const end = _az_clock_msec();
 
-  if (az_log_should_write(AZ_LOG_RESPONSE)) {
-    _az_log_response(hrb, response);
-  }
-
-  clock_t const duration = end - start;
-  if (duration >= _az_LOG_SLOW_RESPONSE_THRESHOLD_MSEC
-      && az_log_should_write(AZ_LOG_SLOW_RESPONSE)) {
-    _az_log_slow_response(hrb, response, duration / (CLOCKS_PER_SEC / 1000));
-  }
-
-  if (az_failed(result) && az_log_should_write(AZ_LOG_ERROR)) {
-    _az_log_error(hrb, response, result);
-  }
+  _az_log_http_response(response, end - start, hrb);
 
   return result;
 }

@@ -14,6 +14,16 @@
 
 #include <_az_cfg.h>
 
+enum {
+  _az_LOG_VALUE_MAX_LENGTH
+  = 50, // When we print values, such as header vaules, if they are longer than
+        // _az_LOG_VALUE_MAX_LENGTH, we trim their contents (decorate with ellipsis in the middle)
+        // to make sure each individual header value does not exceed _az_LOG_VALUE_MAX_LENGTH so
+        // that they don't blow up the logs.
+  _az_LOG_MSG_BUF_SIZE = 1024, // Size (in bytes) of the buffer to allocate on stack when building a
+                               // log message => the maximum size of the log message.
+};
+
 static az_log_classification const * _az_log_classifications = NULL;
 static size_t _az_log_classifications_length = 0;
 static az_log _az_log_listener = NULL;
@@ -40,24 +50,25 @@ void az_log_write(az_log_classification const classification, az_span const mess
 
 bool az_log_should_write(az_log_classification const classification) {
   // TODO: thread safety
+  if (_az_log_listener == NULL) {
+    // If no one is listening, don't attempt to log.
+    return false;
+  }
   if (_az_log_classifications == NULL || _az_log_classifications_length == 0) {
     // If the user hasn't registered any classifications, then we log everything.
     return true;
   }
 
   for (size_t i = 0; i < _az_log_classifications_length; ++i) {
+    // Return true if a classification is in the customer-provided whitelist.
     if (_az_log_classifications[i] == classification) {
       return true;
     }
   }
 
+  // Classification is not in the whitelist - return false.
   return false;
 }
-
-enum {
-  _az_LOG_VALUE_MAX_LENGTH = 50,
-  _az_LOG_MSG_BUF_SIZE = 1024,
-};
 
 static az_result _az_log_value_msg(az_span_builder * const log_msg_bldr, az_span const value) {
   size_t value_size = value.size;
@@ -80,59 +91,59 @@ static az_result _az_log_value_msg(az_span_builder * const log_msg_bldr, az_span
   }
 }
 
-static az_result _az_log_hrb_msg(
+static az_result _az_log_http_request_msg(
     az_span_builder * const log_msg_bldr,
-    az_http_request_builder const * const hrb) {
+    az_http_request_builder const * const hrb,
+    uint8_t const indent) {
+  for (uint8_t ntabs = 0; ntabs < indent; ++ntabs) {
+    AZ_RETURN_IF_FAILED(az_span_builder_append_byte(log_msg_bldr, '\t'));
+  }
+
   AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, AZ_STR("HTTP Request : ")));
   if (hrb == NULL) {
     return az_span_builder_append(log_msg_bldr, AZ_STR("NULL"));
   }
 
-  AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, AZ_STR("\n\tVerb: ")));
   AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, hrb->method_verb));
 
-  AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, AZ_STR("\n\tURL: ")));
+  AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, AZ_STR(" ")));
+
   AZ_RETURN_IF_FAILED(
       az_span_builder_append(log_msg_bldr, az_span_builder_result(&hrb->url_builder)));
 
-  AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, AZ_STR("\n\tHeaders: ")));
-
   uint16_t const headers_end = hrb->headers_end;
-  if (headers_end == 0) {
-    AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, AZ_STR("none")));
-  } else {
-    uint16_t const retry_hdr = hrb->retry_headers_start;
-    for (uint16_t i = 0; i < headers_end; ++i) {
-      if (i == retry_hdr) {
-        AZ_RETURN_IF_FAILED(
-            az_span_builder_append(log_msg_bldr, AZ_STR("\n\t\t-- Retry Headers --")));
-      }
-      AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, AZ_STR("\n\t\t")));
+  for (uint16_t i = 0; i < headers_end; ++i) {
+    AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, AZ_STR("\n\t\t")));
+    for (uint8_t ntabs = 0; ntabs < indent; ++ntabs) {
+      AZ_RETURN_IF_FAILED(az_span_builder_append_byte(log_msg_bldr, '\t'));
+    }
 
-      az_pair header = { 0 };
-      AZ_RETURN_IF_FAILED(az_http_request_builder_get_header(hrb, i, &header));
+    az_pair header = { 0 };
+    AZ_RETURN_IF_FAILED(az_http_request_builder_get_header(hrb, i, &header));
+    AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, header.key));
 
-      AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, header.key));
-
-      if (!az_span_is_empty(header.value)) {
-        AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, AZ_STR(" : ")));
-        AZ_RETURN_IF_FAILED(_az_log_value_msg(log_msg_bldr, header.value));
-      }
+    if (!az_span_is_empty(header.value)) {
+      AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, AZ_STR(" : ")));
+      AZ_RETURN_IF_FAILED(_az_log_value_msg(log_msg_bldr, header.value));
     }
   }
 
   return AZ_OK;
 }
 
-static az_result _az_log_response_msg(
+static az_result _az_log_http_response_msg(
     az_span_builder * const log_msg_bldr,
-    az_http_request_builder const * const hrb,
-    az_http_response const * const response) {
-  AZ_RETURN_IF_FAILED(_az_log_hrb_msg(log_msg_bldr, hrb));
+    az_http_response const * const response,
+    uint64_t const duration_msec,
+    az_http_request_builder const * const hrb) {
+  AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, AZ_STR("HTTP Response (")));
+  AZ_RETURN_IF_FAILED(az_span_builder_append_uint64(log_msg_bldr, duration_msec));
+  AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, AZ_STR("ms) ")));
 
-  AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, AZ_STR("\n\nHTTP Response : ")));
-  if (response == NULL) {
-    return az_span_builder_append(log_msg_bldr, AZ_STR("NULL"));
+  if (response == NULL || response->builder.length == 0) {
+    return az_span_builder_append(log_msg_bldr, AZ_STR("is empty"));
+  } else {
+    AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, AZ_STR(": ")));
   }
 
   az_http_response_parser parser = { 0 };
@@ -142,18 +153,14 @@ static az_result _az_log_response_msg(
   az_http_response_status_line status_line = { 0 };
   AZ_RETURN_IF_FAILED(az_http_response_parser_read_status_line(&parser, &status_line));
 
-  AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, AZ_STR("\n\tStatus Code: ")));
   AZ_RETURN_IF_FAILED(
       az_span_builder_append_uint64(log_msg_bldr, (uint64_t)status_line.status_code));
 
-  AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, AZ_STR("\n\tStatus Line: ")));
+  AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, AZ_STR(" ")));
   AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, status_line.reason_phrase));
 
-  AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, AZ_STR("\n\tHeaders: ")));
   az_pair header = { 0 };
-  if (az_http_response_parser_read_header(&parser, &header) != AZ_OK) {
-    AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, AZ_STR("none")));
-  } else {
+  if (az_http_response_parser_read_header(&parser, &header) == AZ_OK) {
     do {
       AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, AZ_STR("\n\t\t")));
       AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, header.key));
@@ -165,87 +172,31 @@ static az_result _az_log_response_msg(
     } while (az_http_response_parser_read_header(&parser, &header) == AZ_OK);
   }
 
-  AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, AZ_STR("\n\tBody: ")));
-  az_span body = { 0 };
-  AZ_RETURN_IF_FAILED(az_http_response_parser_read_body(&parser, &body));
-  if (az_span_is_empty(body)) {
-    AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, AZ_STR("none")));
-  } else {
-    AZ_RETURN_IF_FAILED(_az_log_value_msg(log_msg_bldr, body));
-  }
-
-  return AZ_OK;
+  AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, AZ_STR("\n\n")));
+  return _az_log_http_request_msg(log_msg_bldr, hrb, 1);
 }
 
-AZ_INLINE az_result _az_log_slow_response_msg(
-    az_span_builder * const log_msg_bldr,
-    az_http_request_builder const * const hrb,
-    az_http_response const * const response,
-    uint32_t duration_msec) {
-  AZ_RETURN_IF_FAILED(_az_log_response_msg(log_msg_bldr, hrb, response));
-  AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, AZ_STR("\n\nResponse Duration: ")));
-  AZ_RETURN_IF_FAILED(az_span_builder_append_uint64(log_msg_bldr, duration_msec));
-  return az_span_builder_append(log_msg_bldr, AZ_STR("ms"));
-}
-
-AZ_INLINE az_result _az_log_error_msg(
-    az_span_builder * const log_msg_bldr,
-    az_http_request_builder const * const hrb,
-    az_http_response const * const response,
-    az_result result) {
-  AZ_RETURN_IF_FAILED(_az_log_response_msg(log_msg_bldr, hrb, response));
-  AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, AZ_STR("\n\nError: ")));
-  return az_span_builder_append_uint64(log_msg_bldr, (uint32_t)result);
-}
-
-void _az_log_request(az_http_request_builder const * const hrb) {
+void _az_log_http_request(az_http_request_builder const * const hrb) {
   uint8_t log_msg_buf[_az_LOG_MSG_BUF_SIZE] = { 0 };
 
   az_span_builder log_msg_bldr
       = az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(log_msg_buf));
 
-  (void)_az_log_hrb_msg(&log_msg_bldr, hrb);
+  (void)_az_log_http_request_msg(&log_msg_bldr, hrb, 0);
 
   az_log_write(AZ_LOG_REQUEST, az_span_builder_result(&log_msg_bldr));
 }
 
-void _az_log_response(
-    az_http_request_builder const * const hrb,
-    az_http_response const * const response) {
+void _az_log_http_response(
+    az_http_response const * const response,
+    uint64_t const duration_msec,
+    az_http_request_builder const * const hrb) {
   uint8_t log_msg_buf[_az_LOG_MSG_BUF_SIZE] = { 0 };
 
   az_span_builder log_msg_bldr
       = az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(log_msg_buf));
 
-  (void)_az_log_response_msg(&log_msg_bldr, hrb, response);
+  (void)_az_log_http_response_msg(&log_msg_bldr, response, duration_msec, hrb);
 
   az_log_write(AZ_LOG_RESPONSE, az_span_builder_result(&log_msg_bldr));
-}
-
-void _az_log_slow_response(
-    az_http_request_builder const * const hrb,
-    az_http_response const * const response,
-    uint32_t duration_msec) {
-  uint8_t log_msg_buf[_az_LOG_MSG_BUF_SIZE] = { 0 };
-
-  az_span_builder log_msg_bldr
-      = az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(log_msg_buf));
-
-  (void)_az_log_slow_response_msg(&log_msg_bldr, hrb, response, duration_msec);
-
-  az_log_write(AZ_LOG_SLOW_RESPONSE, az_span_builder_result(&log_msg_bldr));
-}
-
-void _az_log_error(
-    az_http_request_builder const * const hrb,
-    az_http_response const * const response,
-    az_result result) {
-  uint8_t log_msg_buf[_az_LOG_MSG_BUF_SIZE] = { 0 };
-
-  az_span_builder log_msg_bldr
-      = az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(log_msg_buf));
-
-  (void)_az_log_error_msg(&log_msg_bldr, hrb, response, result);
-
-  az_log_write(AZ_LOG_ERROR, az_span_builder_result(&log_msg_bldr));
 }

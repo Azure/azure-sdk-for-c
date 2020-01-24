@@ -12,21 +12,12 @@
 
 #include <_az_cfg_prefix.h>
 
-void _az_log_request(az_http_request_builder const * const hrb);
+void _az_log_http_request(az_http_request_builder const * const hrb);
 
-void _az_log_response(
-    az_http_request_builder const * const hrb,
-    az_http_response const * const response);
-
-void _az_log_slow_response(
-    az_http_request_builder const * const hrb,
+void _az_log_http_response(
     az_http_response const * const response,
-    uint32_t duration_msec);
-
-void _az_log_error(
-    az_http_request_builder const * const hrb,
-    az_http_response const * const response,
-    az_result result);
+    uint64_t const duration_msec,
+    az_http_request_builder const * const hrb);
 
 #include <_az_cfg_suffix.h>
 

@@ -12,103 +12,38 @@
 
 static bool _log_invoked_for_request = false;
 static bool _log_invoked_for_response = false;
-static bool _log_invoked_for_slow_response = false;
-static bool _log_invoked_for_error = false;
 
 static inline void _reset_log_invocation_status() {
   _log_invoked_for_request = false;
   _log_invoked_for_response = false;
-  _log_invoked_for_slow_response = false;
-  _log_invoked_for_error = false;
 }
 
 static void _log_listener(az_log_classification const classification, az_span const message) {
+  //fprintf(stderr, "%.*s\n", (unsigned int)message.size, message.begin);
   switch (classification) {
     case AZ_LOG_REQUEST:
       _log_invoked_for_request = true;
       TEST_ASSERT(az_span_is_equal(
           message,
-          AZ_STR("HTTP Request : \n"
-                 "\tVerb: GET\n"
-                 "\tURL: https://www.example.com\n"
-                 "\tHeaders: \n"
+          AZ_STR("HTTP Request : GET https://www.example.com\n"
                  "\t\tHeader1 : Value1\n"
                  "\t\tHeader2 : ZZZZYYYYXXXXWWWWVVVVUU ... SSSRRRRQQQQPPPPOOOONNNN\n"
-                 "\t\t-- Retry Headers --\n"
                  "\t\tHeader3 : 1111112222223333334444 ... 55666666777777888888abc")));
       break;
     case AZ_LOG_RESPONSE:
       _log_invoked_for_response = true;
       TEST_ASSERT(az_span_is_equal(
           message,
-          AZ_STR("HTTP Request : \n"
-                 "\tVerb: GET\n"
-                 "\tURL: https://www.example.com\n"
-                 "\tHeaders: \n"
-                 "\t\tHeader1 : Value1\n"
-                 "\t\tHeader2 : ZZZZYYYYXXXXWWWWVVVVUU ... SSSRRRRQQQQPPPPOOOONNNN\n"
-                 "\t\t-- Retry Headers --\n"
-                 "\t\tHeader3 : 1111112222223333334444 ... 55666666777777888888abc\n"
-                 "\n"
-                 "HTTP Response : \n"
-                 "\tStatus Code: 451\n"
-                 "\tStatus Line: Fahrenheit\n"
-                 "\tHeaders: \n"
+          AZ_STR("HTTP Response (3456ms) : 404 Not Found\n"
                  "\t\tHeader11 : Value11\n"
                  "\t\tHeader22 : NNNNOOOOPPPPQQQQRRRRSS ... UUUVVVVWWWWXXXXYYYYZZZZ\n"
                  "\t\tHeader33\n"
                  "\t\tHeader44 : cba8888887777776666665 ... 44444333333222222111111\n"
-                 "\tBody: KKKKKJJJJJIIIIIHHHHHGG ... EEEDDDDDCCCCCBBBBBAAAAA")));
-      break;
-    case AZ_LOG_SLOW_RESPONSE:
-      _log_invoked_for_slow_response = true;
-      TEST_ASSERT(az_span_is_equal(
-          message,
-          AZ_STR("HTTP Request : \n"
-                 "\tVerb: GET\n"
-                 "\tURL: https://www.example.com\n"
-                 "\tHeaders: \n"
-                 "\t\tHeader1 : Value1\n"
-                 "\t\tHeader2 : ZZZZYYYYXXXXWWWWVVVVUU ... SSSRRRRQQQQPPPPOOOONNNN\n"
-                 "\t\t-- Retry Headers --\n"
-                 "\t\tHeader3 : 1111112222223333334444 ... 55666666777777888888abc\n"
                  "\n"
-                 "HTTP Response : \n"
-                 "\tStatus Code: 451\n"
-                 "\tStatus Line: Fahrenheit\n"
-                 "\tHeaders: \n"
-                 "\t\tHeader11 : Value11\n"
-                 "\t\tHeader22 : NNNNOOOOPPPPQQQQRRRRSS ... UUUVVVVWWWWXXXXYYYYZZZZ\n"
-                 "\t\tHeader33\n"
-                 "\t\tHeader44 : cba8888887777776666665 ... 44444333333222222111111\n"
-                 "\tBody: KKKKKJJJJJIIIIIHHHHHGG ... EEEDDDDDCCCCCBBBBBAAAAA\n"
-                 "\n"
-                 "Response Duration: 3456ms")));
-      break;
-    case AZ_LOG_ERROR:
-      _log_invoked_for_error = true;
-      TEST_ASSERT(az_span_is_equal(
-          message,
-          AZ_STR("HTTP Request : \n"
-                 "\tVerb: GET\n"
-                 "\tURL: https://www.example.com\n"
-                 "\tHeaders: \n"
-                 "\t\tHeader1 : Value1\n"
-                 "\t\tHeader2 : ZZZZYYYYXXXXWWWWVVVVUU ... SSSRRRRQQQQPPPPOOOONNNN\n"
-                 "\t\t-- Retry Headers --\n"
-                 "\t\tHeader3 : 1111112222223333334444 ... 55666666777777888888abc\n"
-                 "\n"
-                 "HTTP Response : \n"
-                 "\tStatus Code: 451\n"
-                 "\tStatus Line: Fahrenheit\n"
-                 "\tHeaders: \n"
-                 "\t\tHeader11 : Value11\n"
-                 "\t\tHeader22 : NNNNOOOOPPPPQQQQRRRRSS ... UUUVVVVWWWWXXXXYYYYZZZZ\n"
-                 "\t\tHeader33\n"
-                 "\t\tHeader44 : cba8888887777776666665 ... 44444333333222222111111\n"
-                 "\tBody: KKKKKJJJJJIIIIIHHHHHGG ... EEEDDDDDCCCCCBBBBBAAAAA\n"
-                 "\n"
-                 "Error: 2147680257")));
+                 "\tHTTP Request : GET https://www.example.com\n"
+                 "\t\t\tHeader1 : Value1\n"
+                 "\t\t\tHeader2 : ZZZZYYYYXXXXWWWWVVVVUU ... SSSRRRRQQQQPPPPOOOONNNN\n"
+                 "\t\t\tHeader3 : 1111112222223333334444 ... 55666666777777888888abc")));
       break;
     default:
       TEST_ASSERT(false);
@@ -117,6 +52,7 @@ static void _log_listener(az_log_classification const classification, az_span co
 }
 
 void test_log() {
+  // Set up test values etc.
   uint8_t hrb_buf[4 * 1024] = { 0 };
   az_http_request_builder hrb = { 0 };
   TEST_EXPECT_SUCCESS(az_http_request_builder_init(
@@ -139,12 +75,12 @@ void test_log() {
       &hrb, AZ_STR("Header3"), AZ_STR("111111222222333333444444555555666666777777888888abc")));
 
   uint8_t response_buf[1024] = { 0 };
-  az_span_builder const response_builder
+  az_span_builder response_builder
       = az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(response_buf));
 
   TEST_EXPECT_SUCCESS(az_span_builder_append(
       &response_builder,
-      AZ_STR("HTTP/1.1 451 Fahrenheit\r\n"
+      AZ_STR("HTTP/1.1 404 Not Found\r\n"
              "Header11: Value11\r\n"
              "Header22: NNNNOOOOPPPPQQQQRRRRSSSSTTTTUUUUVVVVWWWWXXXXYYYYZZZZ\r\n"
              "Header33:\r\n"
@@ -154,90 +90,68 @@ void test_log() {
 
   az_http_response response = { 0 };
   TEST_EXPECT_SUCCESS(az_http_response_init(&response, response_builder));
+  // Finish setting up
 
+  // Actual test below
   {
+    // Verify that log callback gets invoked, and with the correct classification type.
+    // Also, our callback function does the verification for the message content.
     _reset_log_invocation_status();
-    az_log_set_listener(&_log_listener);
+    az_log_set_listener(_log_listener);
     TEST_ASSERT(_log_invoked_for_request == false);
     TEST_ASSERT(_log_invoked_for_response == false);
-    TEST_ASSERT(_log_invoked_for_slow_response == false);
-    TEST_ASSERT(_log_invoked_for_error == false);
 
-    _az_log_request(&hrb);
+    _az_log_http_request(&hrb);
     TEST_ASSERT(_log_invoked_for_request == true);
     TEST_ASSERT(_log_invoked_for_response == false);
-    TEST_ASSERT(_log_invoked_for_slow_response == false);
-    TEST_ASSERT(_log_invoked_for_error == false);
 
-    _az_log_response(&hrb, &response);
+    _az_log_http_response(&response, 3456, &hrb);
     TEST_ASSERT(_log_invoked_for_request == true);
     TEST_ASSERT(_log_invoked_for_response == true);
-    TEST_ASSERT(_log_invoked_for_slow_response == false);
-    TEST_ASSERT(_log_invoked_for_error == false);
-
-    _az_log_slow_response(&hrb, &response, 3456);
-    TEST_ASSERT(_log_invoked_for_request == true);
-    TEST_ASSERT(_log_invoked_for_response == true);
-    TEST_ASSERT(_log_invoked_for_slow_response == true);
-    TEST_ASSERT(_log_invoked_for_error == false);
-
-    _az_log_error(&hrb, &response, AZ_ERROR_HTTP_PAL);
-    TEST_ASSERT(_log_invoked_for_request == true);
-    TEST_ASSERT(_log_invoked_for_response == true);
-    TEST_ASSERT(_log_invoked_for_slow_response == true);
-    TEST_ASSERT(_log_invoked_for_error == true);
   }
 
   {
     _reset_log_invocation_status();
     az_log_set_listener(NULL);
 
+    // Verify that user can unset log callback, and we are not going to call the previously set one.
     TEST_ASSERT(_log_invoked_for_request == false);
     TEST_ASSERT(_log_invoked_for_response == false);
-    TEST_ASSERT(_log_invoked_for_slow_response == false);
-    TEST_ASSERT(_log_invoked_for_error == false);
 
-    _az_log_request(&hrb);
-    _az_log_response(&hrb, &response);
-    _az_log_slow_response(&hrb, &response, 3456);
-    _az_log_error(&hrb, &response, AZ_ERROR_HTTP_PAL);
+    _az_log_http_request(&hrb);
+    _az_log_http_response(&response, 3456, &hrb);
 
     TEST_ASSERT(_log_invoked_for_request == false);
     TEST_ASSERT(_log_invoked_for_response == false);
-    TEST_ASSERT(_log_invoked_for_slow_response == false);
-    TEST_ASSERT(_log_invoked_for_error == false);
 
     {
+      // Verify that our internal should_write() function would return false if noone is listening.
+      TEST_ASSERT(az_log_should_write(AZ_LOG_REQUEST) == false);
+      TEST_ASSERT(az_log_should_write(AZ_LOG_RESPONSE) == false);
+
+      // If a callback is set, and no classificaions are specified, we are going to log all of them
+      // (and customer is going to get all of them).
+      az_log_set_listener(_log_listener);
+
       TEST_ASSERT(az_log_should_write(AZ_LOG_REQUEST) == true);
       TEST_ASSERT(az_log_should_write(AZ_LOG_RESPONSE) == true);
-      TEST_ASSERT(az_log_should_write(AZ_LOG_SLOW_RESPONSE) == true);
-      TEST_ASSERT(az_log_should_write(AZ_LOG_ERROR) == true);
-
-      az_log_set_listener(&_log_listener);
-
-      TEST_ASSERT(az_log_should_write(AZ_LOG_REQUEST) == true);
-      TEST_ASSERT(az_log_should_write(AZ_LOG_RESPONSE) == true);
-      TEST_ASSERT(az_log_should_write(AZ_LOG_SLOW_RESPONSE) == true);
-      TEST_ASSERT(az_log_should_write(AZ_LOG_ERROR) == true);
     }
 
-    az_log_classification const classifications[] = { AZ_LOG_ERROR, AZ_LOG_SLOW_RESPONSE };
-    az_log_set_classifications(classifications, 2);
+    // Verify that if customer specifies the classifications, we'll only invoking the logging
+    // callback with the classification that's in the whitelist, and nothing is going to happen when
+    // our code attempts to log a classification that's not in the customer's whitelist.
+    az_log_classification const classifications[] = { AZ_LOG_REQUEST };
+    az_log_set_classifications(
+        classifications, sizeof(classifications) / sizeof(classifications[0]));
 
-    TEST_ASSERT(az_log_should_write(AZ_LOG_REQUEST) == false);
+    TEST_ASSERT(az_log_should_write(AZ_LOG_REQUEST) == true);
     TEST_ASSERT(az_log_should_write(AZ_LOG_RESPONSE) == false);
-    TEST_ASSERT(az_log_should_write(AZ_LOG_SLOW_RESPONSE) == true);
-    TEST_ASSERT(az_log_should_write(AZ_LOG_ERROR) == true);
 
-    _az_log_request(&hrb);
-    _az_log_response(&hrb, &response);
-    _az_log_slow_response(&hrb, &response, 3456);
-    _az_log_error(&hrb, &response, AZ_ERROR_HTTP_PAL);
+    _az_log_http_request(&hrb);
+    _az_log_http_response(&response, 3456, &hrb);
 
-    TEST_ASSERT(_log_invoked_for_request == false);
+    TEST_ASSERT(_log_invoked_for_request == true);
     TEST_ASSERT(_log_invoked_for_response == false);
-    TEST_ASSERT(_log_invoked_for_slow_response == true);
-    TEST_ASSERT(_log_invoked_for_error == true);
   }
 
   az_log_set_classifications(NULL, 0);

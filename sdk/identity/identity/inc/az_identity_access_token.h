@@ -9,7 +9,6 @@
 
 #include <stddef.h>
 #include <stdint.h>
-#include <time.h>
 
 #include <_az_cfg_prefix.h>
 
@@ -21,7 +20,7 @@ enum {
 typedef struct {
   struct {
     size_t token_size;
-    clock_t token_expiration;
+    uint64_t token_refresh_after_msec;
     uint8_t token_buf[_az_IDENTITY_ACCESS_TOKEN_TOKEN_BUF_SIZE];
   } _internal;
 } az_identity_access_token;

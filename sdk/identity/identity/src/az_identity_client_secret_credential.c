@@ -3,6 +3,7 @@
 
 #include <az_identity_client_secret_credential.h>
 
+#include <az_clock_internal.h>
 #include <az_contract.h>
 #include <az_http_pipeline.h>
 #include <az_http_request_builder.h>
@@ -45,7 +46,7 @@ _az_identity_client_secret_credential_ms_oauth2_send_get_token_request(
     az_mut_span const auth_body_buf,
     az_mut_span const hrb_buf,
     az_http_response * response,
-    clock_t * const requested_at) {
+    uint64_t * const requested_at_msec) {
   AZ_CONTRACT_ARG_NOT_NULL(token_context->_internal.credential);
   az_identity_client_secret_credential const * const credential
       = (az_identity_client_secret_credential const *)(token_context->_internal.credential);
@@ -97,7 +98,7 @@ _az_identity_client_secret_credential_ms_oauth2_send_get_token_request(
       },
     };
 
-  *requested_at = clock();
+  *requested_at_msec = _az_clock_msec();
   AZ_RETURN_IF_FAILED(az_http_pipeline_process(&pipeline, &hrb, response));
 
   return AZ_OK;
@@ -106,7 +107,7 @@ _az_identity_client_secret_credential_ms_oauth2_send_get_token_request(
 AZ_INLINE AZ_NODISCARD az_result _az_identity_client_secret_credential_ms_oauth2_get_token(
     az_identity_access_token_context const * const token_context,
     az_http_response * const response) {
-  clock_t requested_at = 0;
+  uint64_t requested_at_msec = 0;
   {
     uint8_t auth_url_buf[_az_IDENTITY_CLIENT_SECRET_CREDENTIAL_AUTH_URL_BUF_SIZE] = { 0 };
     uint8_t auth_body_buf[_az_IDENTITY_CLIENT_SECRET_CREDENTIAL_AUTH_BODY_BUF_SIZE] = { 0 };
@@ -118,7 +119,7 @@ AZ_INLINE AZ_NODISCARD az_result _az_identity_client_secret_credential_ms_oauth2
 
     az_result const token_request_result
         = _az_identity_client_secret_credential_ms_oauth2_send_get_token_request(
-            token_context, auth_url, auth_body, hrb_buf_span, response, &requested_at);
+            token_context, auth_url, auth_body, hrb_buf_span, response, &requested_at_msec);
 
     az_mut_span_fill(hrb_buf_span, '#');
     az_mut_span_fill(auth_body, '#');
@@ -145,13 +146,15 @@ AZ_INLINE AZ_NODISCARD az_result _az_identity_client_secret_credential_ms_oauth2
   {
     az_json_token value;
 
-    clock_t expiration_clock = 0;
-    if (requested_at > 0) {
-      double expiration_seconds = 0;
+    uint64_t expires_in_msec = 0;
+    if (requested_at_msec > 0) {
+      double expires_in_seconds = 0;
       if (az_succeeded(az_json_get_object_member(body, AZ_STR("expires_in"), &value))
-          && az_succeeded(az_json_token_get_number(value, &expiration_seconds))) {
-        if (expiration_seconds > 0) {
-          expiration_clock = (((clock_t)expiration_seconds) - (3 * 60)) * CLOCKS_PER_SEC;
+          && az_succeeded(az_json_token_get_number(value, &expires_in_seconds))
+          && expires_in_seconds > 0) {
+        double const norefresh_period_msec = (expires_in_seconds - (double)(3 * 60)) * 1000;
+        if (((int64_t)norefresh_period_msec) > 0) {
+          expires_in_msec = (uint64_t)norefresh_period_msec;
         }
       }
     }
@@ -172,9 +175,9 @@ AZ_INLINE AZ_NODISCARD az_result _az_identity_client_secret_credential_ms_oauth2
     if (az_succeeded(token_append_result)) {
       token_context->_internal.token->_internal.token_size = az_span_builder_result(&builder).size;
 
-      clock_t const expiration = requested_at + expiration_clock;
-      if (expiration > 0) {
-        token_context->_internal.token->_internal.token_expiration = expiration;
+      uint64_t const refresh_after_msec = requested_at_msec + expires_in_msec;
+      if (refresh_after_msec > 0) {
+        token_context->_internal.token->_internal.token_refresh_after_msec = refresh_after_msec;
       }
     } else {
       az_mut_span_fill(token_buf, 'X');
@@ -202,10 +205,12 @@ AZ_INLINE AZ_NODISCARD az_result _az_identity_client_secret_credential_renew_tok
 
 AZ_INLINE AZ_NODISCARD az_result _az_identity_client_secret_credential_ensure_token_credential(
     az_identity_access_token_context const * const token_context) {
-  clock_t const expiration = token_context->_internal.token->_internal.token_expiration;
-  if (expiration > 0) {
-    clock_t const clk = clock();
-    if (clk > 0 && clk < expiration) {
+  uint64_t const token_refresh_after_msec
+      = token_context->_internal.token->_internal.token_refresh_after_msec;
+
+  if (token_refresh_after_msec > 0) {
+    uint64_t const current_msec = _az_clock_msec();
+    if (current_msec > 0 && current_msec < token_refresh_after_msec) {
       return AZ_OK;
     }
   }
