@@ -274,3 +274,53 @@ az_span_replace(az_span * const self, int32_t start, int32_t end, az_span const 
 
   return AZ_OK;
 }
+
+AZ_NODISCARD az_result az_span_append_double(az_span span, double value, az_span * out) {
+  AZ_CONTRACT_ARG_NOT_NULL(out);
+
+  if (value == 0) {
+    AZ_RETURN_IF_FAILED(az_span_append(span, AZ_SPAN_FROM_STR("0"), out));
+    return AZ_OK;
+  }
+  *out = span;
+
+  if (value < 0) {
+    AZ_RETURN_IF_FAILED(az_span_append(*out, AZ_SPAN_FROM_STR("-"), out));
+    value = -value;
+  }
+
+  {
+    uint64_t u = (uint64_t)value;
+    if (value == (double)u) {
+      uint64_t base = 1;
+      {
+        uint64_t i = u;
+        while (10 <= i) {
+          i /= 10;
+          base *= 10;
+        }
+      }
+      do {
+        uint8_t dec = (uint8_t)(u / base) + '0';
+        u %= base;
+        base /= 10;
+        AZ_RETURN_IF_FAILED(az_span_append(*out, az_span_from_single_item(&dec), out));
+      } while (1 <= base);
+      return AZ_OK;
+    }
+  }
+
+  // eg. 0.0012
+  if (value < 0.001) {
+    // D.*De-*D
+    // TODO:
+    return AZ_ERROR_NOT_IMPLEMENTED;
+  }
+
+  // eg. 1.2e-4
+  {
+    // *D.*D
+    // TODO:
+    return AZ_ERROR_NOT_IMPLEMENTED;
+  }
+}

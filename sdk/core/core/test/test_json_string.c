@@ -8,7 +8,7 @@
 
 #include <_az_cfg.h>
 
-/* void test_json_string() {
+void test_json_string() {
   {
     az_span const s = AZ_SPAN_FROM_STR("tr\\\"ue\\t");
     az_span_reader reader = az_span_reader_create(s);
@@ -42,4 +42,3 @@
     TEST_ASSERT(az_span_reader_read_json_string_char(&reader, &c) == AZ_ERROR_EOF);
   }
 }
- */

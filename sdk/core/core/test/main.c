@@ -3,14 +3,11 @@
 
 #include <az_base64_private.h>
 #include <az_http.h>
-#include <az_http_request_internal.h>
 #include <az_json_parser.h>
-#include <az_span_builder_internal.h>
 
 #include <az_pair.h>
 #include <az_span.h>
 #include <az_span_reader.h>
-#include <az_span_writer_internal.h>
 #include <az_uri_internal.h>
 
 #include <assert.h>
@@ -23,12 +20,12 @@
 #include <_az_cfg.h>
 
 void test_http_response_parser();
-/* void test_json_builder();
+void test_json_builder();
 void test_json_data();
 void test_json_get_by_pointer();
 void test_json_pointer();
 void test_json_string();
-void test_json_value(); */
+void test_json_value();
 void test_url_parse();
 void test_span_builder_replace();
 void test_mut_span();
@@ -487,35 +484,15 @@ int main() {
     }
   }
 
+  /*
   // HTTP Builder
   az_pair * query = (az_pair[]){ az_pair_from_str("hello", "world!"), az_pair_from_str("x", "42") };
   //
   az_pair * headers
       = (az_pair[]){ az_pair_from_str("some", "xml"), az_pair_from_str("xyz", "very_long") };
   //
-  az_http_request request = {
-    .method = AZ_SPAN_FROM_STR("GET"),
-    .path = AZ_SPAN_FROM_STR("/foo"),
-    .query = az_pair_as_writer_action(query),
-    .headers = az_pair_as_writer_action(headers),
-    .body = AZ_SPAN_FROM_STR("{ \"somejson\": true }"),
-  };
+
   uint8_t buffer[1024];
-  {
-    az_span wi = AZ_SPAN_FROM_BUFFER(buffer);
-    az_span_action sv = az_span_append_action(&wi);
-    az_span const expected = AZ_SPAN_FROM_STR( //
-        "GET /foo?hello=world!&x=42 HTTP/1.1\r\n"
-        "some: xml\r\n"
-        "xyz: very_long\r\n"
-        "\r\n"
-        "{ \"somejson\": true }");
-    az_result const result = az_http_request_as_span_writer(request, sv, &request);
-    TEST_ASSERT(result == AZ_OK);
-    az_span const out = wi;
-    TEST_ASSERT(az_span_is_equal(out, expected));
-  }
-  /*
   {
     printf("----Test: az_http_request_to_url_span\n");
     az_span wi = az_span_create((az_span)AZ_SPAN(buffer));
@@ -713,12 +690,12 @@ int main() {
     }*/
 
   test_http_response_parser();
-  /*   test_json_builder();
-    test_json_data();
-    test_json_get_by_pointer();
-    test_json_value();
-    test_json_pointer();
-    test_json_string(); */
+  test_json_builder();
+  test_json_data();
+  test_json_get_by_pointer();
+  test_json_value();
+  test_json_pointer();
+  test_json_string();
   test_url_parse();
   test_span_builder_replace();
   test_mut_span();

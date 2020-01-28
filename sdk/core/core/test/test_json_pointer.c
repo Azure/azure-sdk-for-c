@@ -8,7 +8,7 @@
 
 #include <_az_cfg.h>
 
-/* void test_json_pointer() {
+void test_json_pointer() {
   {
     az_span_reader parser = az_span_reader_create(AZ_SPAN_FROM_STR(""));
     az_span p;
@@ -41,7 +41,7 @@
         buffer[i] = (uint8_t)code_point;
         ++i;
       }
-      az_span const b = { .begin = buffer, .size = i };
+      az_span const b = az_span_init(buffer, i, i);
       TEST_ASSERT(az_span_is_equal(b, AZ_SPAN_FROM_STR("abc")));
     }
     TEST_ASSERT(az_span_reader_read_json_pointer_token(&parser, &p) == AZ_ERROR_ITEM_NOT_FOUND);
@@ -67,7 +67,7 @@
         buffer[i] = (uint8_t)code_point;
         ++i;
       }
-      az_span const b = { .begin = buffer, .size = i };
+      az_span const b = az_span_init(buffer, i, i);
       TEST_ASSERT(az_span_is_equal(b, AZ_SPAN_FROM_STR("abc")));
     }
     TEST_ASSERT(az_span_reader_read_json_pointer_token(&parser, &p) == AZ_OK);
@@ -97,7 +97,7 @@
         buffer[i] = (uint8_t)code_point;
         ++i;
       }
-      az_span const b = { .begin = buffer, .size = i };
+      az_span const b = az_span_init(buffer, i, i);
       TEST_ASSERT(az_span_is_equal(b, AZ_SPAN_FROM_STR("ab/c")));
     }
     TEST_ASSERT(az_span_reader_read_json_pointer_token(&parser, &p) == AZ_OK);
@@ -118,7 +118,7 @@
         buffer[i] = (uint8_t)code_point;
         ++i;
       }
-      az_span const b = { .begin = buffer, .size = i };
+      az_span const b = az_span_init(buffer, i, i);
       TEST_ASSERT(az_span_is_equal(b, AZ_SPAN_FROM_STR("dff~x")));
     }
     TEST_ASSERT(az_span_reader_read_json_pointer_token(&parser, &p) == AZ_ERROR_ITEM_NOT_FOUND);
@@ -168,4 +168,3 @@
         == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
   }
 }
- */

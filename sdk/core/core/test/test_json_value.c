@@ -7,7 +7,7 @@
 
 #include <_az_cfg.h>
 
-/* void test_json_value() {
+void test_json_value() {
   az_json_token const json_boolean = az_json_token_boolean(true);
   az_json_token const json_number = az_json_token_number(-42.3);
   az_json_token const json_string = az_json_token_string(AZ_SPAN_FROM_STR("Hello"));
@@ -47,4 +47,4 @@
     double number_value = 0.79;
     TEST_ASSERT(az_json_token_get_number(json_string, &number_value) == AZ_ERROR_ITEM_NOT_FOUND);
   }
-} */
+}

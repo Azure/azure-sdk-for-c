@@ -4,7 +4,6 @@
 #ifndef _az_SPAN_READER_H
 #define _az_SPAN_READER_H
 
-#include <az_contract_internal.h>
 #include <az_result.h>
 #include <az_span.h>
 

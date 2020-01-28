@@ -4,7 +4,6 @@
 #ifndef _az_SPAN_PRIVATE_H
 #define _az_SPAN_PRIVATE_H
 
-#include <az_action.h>
 #include <az_result.h>
 #include <az_span.h>
 #include <az_span_internal.h>

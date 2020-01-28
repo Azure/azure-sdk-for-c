@@ -7,13 +7,13 @@
 
 #include <_az_cfg.h>
 
-/* void test_json_data() {
+void test_json_data() {
   // null
   {
     uint8_t buffer[100] = { 0 };
     az_json_data const * data = { 0 };
     az_result const result
-        = az_json_to_data(AZ_SPAN_FROM_STR("null"), (az_span)AZ_SPAN_FROM_ARRAY(buffer), &data);
+        = az_json_to_data(AZ_SPAN_FROM_STR("null"), AZ_SPAN_FROM_BUFFER(buffer), &data);
     TEST_ASSERT(result == AZ_OK);
     TEST_ASSERT(data->kind == AZ_JSON_DATA_NULL);
   }
@@ -22,7 +22,7 @@
     uint8_t buffer[100] = { 0 };
     az_json_data const * data = { 0 };
     az_result const result
-        = az_json_to_data(AZ_SPAN_FROM_STR("true"), (az_span)AZ_SPAN_FROM_ARRAY(buffer), &data);
+        = az_json_to_data(AZ_SPAN_FROM_STR("true"), AZ_SPAN_FROM_BUFFER(buffer), &data);
     TEST_ASSERT(result == AZ_OK);
     TEST_ASSERT(data->kind == AZ_JSON_DATA_BOOLEAN);
     TEST_ASSERT(data->data.boolean == true);
@@ -32,7 +32,7 @@
     uint8_t buffer[100] = { 0 };
     az_json_data const * data = { 0 };
     az_result const result
-        = az_json_to_data(AZ_SPAN_FROM_STR("false"), (az_span)AZ_SPAN_FROM_ARRAY(buffer), &data);
+        = az_json_to_data(AZ_SPAN_FROM_STR("false"), AZ_SPAN_FROM_BUFFER(buffer), &data);
     TEST_ASSERT(result == AZ_OK);
     TEST_ASSERT(data->kind == AZ_JSON_DATA_BOOLEAN);
     TEST_ASSERT(data->data.boolean == false);
@@ -41,8 +41,8 @@
   {
     uint8_t buffer[100] = { 0 };
     az_json_data const * data = { 0 };
-    az_result const result = az_json_to_data(
-        AZ_SPAN_FROM_STR("\"Hello world!\""), (az_span)AZ_SPAN_FROM_ARRAY(buffer), &data);
+    az_result const result
+        = az_json_to_data(AZ_SPAN_FROM_STR("\"Hello world!\""), AZ_SPAN_FROM_BUFFER(buffer), &data);
     TEST_ASSERT(result == AZ_OK);
     TEST_ASSERT(data->kind == AZ_JSON_DATA_STRING);
     TEST_ASSERT(az_span_is_equal(data->data.string, AZ_SPAN_FROM_STR("Hello world!")));
@@ -51,8 +51,8 @@
   {
     uint8_t buffer[100] = { 0 };
     az_json_data const * data = { 0 };
-    az_result const result = az_json_to_data(
-        AZ_SPAN_FROM_STR("-42.25e+1"), (az_span)AZ_SPAN_FROM_ARRAY(buffer), &data);
+    az_result const result
+        = az_json_to_data(AZ_SPAN_FROM_STR("-42.25e+1"), AZ_SPAN_FROM_BUFFER(buffer), &data);
     TEST_ASSERT(result == AZ_OK);
     TEST_ASSERT(data->kind == AZ_JSON_DATA_NUMBER);
     TEST_ASSERT(data->data.number == -422.5);
@@ -62,7 +62,7 @@
     uint8_t buffer[100] = { 0 };
     az_json_data const * data = { 0 };
     az_result const result = az_json_to_data(
-        AZ_SPAN_FROM_STR("[0.25,null,false]"), (az_span)AZ_SPAN_FROM_ARRAY(buffer), &data);
+        AZ_SPAN_FROM_STR("[0.25,null,false]"), AZ_SPAN_FROM_BUFFER(buffer), &data);
     TEST_ASSERT(result == AZ_OK);
     TEST_ASSERT(data->kind == AZ_JSON_DATA_ARRAY);
     az_json_array const a = data->data.array;
@@ -90,7 +90,7 @@
     uint8_t buffer[1000] = { 0 };
     az_json_data const * data = { 0 };
     az_result const result = az_json_to_data(
-        AZ_SPAN_FROM_STR("[[1,[]],2,[[],3]]"), (az_span)AZ_SPAN_FROM_ARRAY(buffer), &data);
+        AZ_SPAN_FROM_STR("[[1,[]],2,[[],3]]"), AZ_SPAN_FROM_BUFFER(buffer), &data);
     TEST_ASSERT(result == AZ_OK);
     TEST_ASSERT(data->kind == AZ_JSON_DATA_ARRAY);
     az_json_array const a = data->data.array;
@@ -133,7 +133,7 @@
     uint8_t buffer[200] = { 0 };
     az_json_data const * data = { 0 };
     az_result const result = az_json_to_data(
-        AZ_SPAN_FROM_STR("{\"foo\":45,\"bar\":true}"), (az_span)AZ_SPAN_FROM_ARRAY(buffer), &data);
+        AZ_SPAN_FROM_STR("{\"foo\":45,\"bar\":true}"), AZ_SPAN_FROM_BUFFER(buffer), &data);
     TEST_ASSERT(result == AZ_OK);
     TEST_ASSERT(data->kind == AZ_JSON_DATA_OBJECT);
     az_json_object const o = data->data.object;
@@ -159,7 +159,7 @@
     az_json_data const * data = { 0 };
     az_result const result = az_json_to_data(
         AZ_SPAN_FROM_STR("{\"foo\":{\"bar2\":\"hello\"},\"bar\":[\"world\"]}"),
-        (az_span)AZ_SPAN_FROM_ARRAY(buffer),
+        AZ_SPAN_FROM_BUFFER(buffer),
         &data);
     TEST_ASSERT(result == AZ_OK);
     TEST_ASSERT(data->kind == AZ_JSON_DATA_OBJECT);
@@ -196,4 +196,3 @@
     }
   }
 }
- */

@@ -207,6 +207,8 @@ AZ_NODISCARD az_result az_span_append(az_span self, az_span span, az_span * out)
  */
 AZ_NODISCARD az_result az_span_to_str(char * s, int32_t max_size, az_span span);
 
+AZ_NODISCARD az_result az_span_append_double(az_span span, double value, az_span * out);
+
 #include <_az_cfg_suffix.h>
 
 #endif
