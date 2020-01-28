@@ -1,17 +1,17 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_mut_span.h>
-#include <az_mut_span_internal.h>
+#include <az_span.h>
+
 #include <az_span_internal.h>
 
 #include <_az_cfg.h>
 
 AZ_NODISCARD az_result
-az_mut_span_move(az_mut_span const buffer, az_span const src, az_mut_span * const out_result) {
+az_span_move(az_span const buffer, az_span const src, az_span * const out_result) {
   AZ_CONTRACT_ARG_NOT_NULL(out_result);
 
-  AZ_CONTRACT_ARG_VALID_MUT_SPAN(buffer);
+  AZ_CONTRACT_ARG_VALID_SPAN(buffer);
   AZ_CONTRACT_ARG_VALID_SPAN(src);
 
   AZ_CONTRACT(buffer.size >= src.size, AZ_ERROR_BUFFER_OVERFLOW);
@@ -27,9 +27,9 @@ az_mut_span_move(az_mut_span const buffer, az_span const src, az_mut_span * cons
 }
 
 AZ_NODISCARD az_result
-az_mut_span_to_str(az_mut_span const buffer, az_span const src, az_mut_span * const out_result) {
+az_span_to_str(az_span const buffer, az_span const src, az_span * const out_result) {
   AZ_CONTRACT_ARG_NOT_NULL(out_result);
-  AZ_CONTRACT_ARG_VALID_MUT_SPAN(buffer);
+  AZ_CONTRACT_ARG_VALID_SPAN(buffer);
   AZ_CONTRACT_ARG_VALID_SPAN(src);
 
   if (buffer.size < src.size + 1) {
@@ -37,8 +37,8 @@ az_mut_span_to_str(az_mut_span const buffer, az_span const src, az_mut_span * co
   }
 
   if (!az_span_is_empty(src)) {
-    az_mut_span result = { 0 };
-    AZ_RETURN_IF_FAILED(az_mut_span_move(buffer, src, &result));
+    az_span result = { 0 };
+    AZ_RETURN_IF_FAILED(az_span_move(buffer, src, &result));
   }
 
   buffer.begin[src.size] = '\0';
@@ -57,7 +57,7 @@ AZ_INLINE void _az_uint8_swap(uint8_t * const a, uint8_t * const b) {
   *b = c;
 }
 
-void az_mut_span_swap(az_mut_span const a, az_mut_span const b) {
+void az_span_swap(az_span const a, az_span const b) {
   uint8_t * pa = a.begin;
   uint8_t * pb = b.begin;
   for (size_t i = _az_size_min(a.size, b.size); i > 0; ++pa, ++pb) {

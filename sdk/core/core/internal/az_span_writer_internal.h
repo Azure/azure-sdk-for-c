@@ -8,9 +8,7 @@
 #include <az_result.h>
 #include <az_span.h>
 #include <az_span_action.h>
-#include <az_span_builder_internal.h>
-#include <az_span_span.h>
-#include <az_str.h>
+#include <az_span_internal.h>
 
 #include <stddef.h>
 
@@ -19,20 +17,14 @@
 AZ_ACTION_TYPE(az_span_writer, az_span_action)
 
 /**
- * Emits all spans from @var self into @var action.
+ * A callback that accepts zero-terminated string `char const *`.
  */
-AZ_NODISCARD az_result
-az_span_span_as_writer(az_span_span const * const self, az_span_action const write_span);
-
-/**
- * @var az_span_span_emit as an action of type @var az_span_emitter.
- */
-AZ_ACTION_FUNC(az_span_span_as_writer, az_span_span const, az_span_writer)
+AZ_ACTION_TYPE(az_str_action, char const *)
 
 /**
  * Calculates a size of a contiguous buffer to store all spans from @var self.
  */
-AZ_NODISCARD az_result az_span_writer_size(az_span_writer const self, size_t * const out_size);
+AZ_NODISCARD az_result az_span_writer_size(az_span_writer const self, int32_t * out_size);
 
 /**
  * The function creates a temporary zero-terminated string from @var span_writer in dynamic memory.

@@ -31,43 +31,17 @@ typedef struct {
   size_t size;
 } az_pair_span;
 
-/**
- * @brief a mutable span of az_pairs where begin points to the first az_pair
- * and size represents the total number of az_pairs
- */
-typedef struct {
-  az_pair * begin;
-  size_t size;
-} az_mut_pair_span;
-
-/**
- * @brief a builder for construnction an az_pair_span.
- * @var buffer.size represents the maximun size of az_pair_span that can be added
- * @var size represents the current number of az_pair_span in the buffer
- */
-typedef struct {
-  az_mut_pair_span buffer;
-  size_t length;
-} az_pair_span_builder;
-
-/**
- * Creates a span of pair span builder.
- *
- * @param buffer a buffer for writing.
- */
-AZ_NODISCARD AZ_INLINE az_pair_span_builder
-az_pair_span_builder_create(az_mut_pair_span const buffer) {
-  return (az_pair_span_builder){
-    .buffer = buffer,
-    .length = 0,
-  };
+AZ_NODISCARD AZ_INLINE az_pair az_pair_init(az_span key, az_span value) {
+  return (az_pair){ .key = key, .value = value };
 }
 
-/**
- * Append a given pair.
- */
-AZ_NODISCARD az_result
-az_pair_span_builder_append(az_pair_span_builder * const self, az_pair const pair);
+AZ_NODISCARD AZ_INLINE az_pair az_pair_null() {
+  return az_pair_init(az_span_null(), az_span_null());
+}
+
+AZ_NODISCARD AZ_INLINE az_pair az_pair_from_str(char * key, char * value) {
+  return az_pair_init(az_span_from_str(key), az_span_from_str(value));
+}
 
 /// @az_pair_action is a callback with one argument @az_pair.
 AZ_ACTION_TYPE(az_pair_action, az_pair)
@@ -75,17 +49,12 @@ AZ_ACTION_TYPE(az_pair_action, az_pair)
 /// @var az_pair_writer writes @var az_pair sequences.
 AZ_ACTION_TYPE(az_pair_writer, az_pair_action)
 
-AZ_NODISCARD az_result
-az_pair_span_as_writer(az_pair_span const * const self, az_pair_action const write_pair);
+AZ_NODISCARD az_result az_pair_as_writer(az_pair self, az_pair_action write_pair, az_pair * out);
 
 /**
  * Creates @var az_pair_span_writer from @az_write_pair_span.
  */
-AZ_ACTION_FUNC(az_pair_span_as_writer, az_pair_span const, az_pair_writer)
-
-AZ_NODISCARD AZ_INLINE bool az_pair_span_is_equal(az_pair const a, az_pair const b) {
-  return az_span_is_equal(a.key, b.key) && az_span_is_equal(a.value, b.value);
-}
+AZ_ACTION_FUNC(az_pair_as_writer, az_pair, az_pair_writer)
 
 #include <_az_cfg_suffix.h>
 
