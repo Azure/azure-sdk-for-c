@@ -3,8 +3,11 @@
 
 #include <az_uri_internal.h>
 
-#include <az_contract.h>
+#include "az_span_private.h"
+#include <az_contract_internal.h>
 #include <az_hex_internal.h>
+#include <az_span.h>
+#include <az_span_internal.h>
 
 #include <assert.h>
 #include <ctype.h>
@@ -45,41 +48,40 @@ AZ_INLINE void encode(uint8_t const c, uint8_t * const p) {
   p[2] = az_number_to_upper_hex(c & 0x0F);
 }
 
-AZ_NODISCARD az_result az_uri_encode(az_span const input, az_span_builder * const span_builder) {
+AZ_NODISCARD az_result az_uri_encode(az_span const input, az_span * const span_builder) {
   AZ_CONTRACT_ARG_NOT_NULL(span_builder);
   AZ_CONTRACT_ARG_VALID_SPAN(input);
 
-  size_t const input_size = input.size;
+  int32_t const input_size = az_span_length(input);
 
-  size_t result_size = 0;
-  for (size_t i = 0; i < input_size; ++i) {
-    result_size += should_encode(input.begin[i]) ? 3 : 1;
+  int32_t result_size = 0;
+  for (int32_t i = 0; i < input_size; ++i) {
+    result_size += should_encode(az_span_ptr(input)[i]) ? 3 : 1;
   }
 
-  if (az_span_is_overlap(input, az_mut_span_to_span(span_builder->buffer))) {
+  if (az_span_is_overlap(input, *span_builder)) {
     return AZ_ERROR_ARG;
   }
 
-  if (span_builder->buffer.size < result_size) {
+  if (az_span_capacity(*span_builder) < result_size) {
     return AZ_ERROR_BUFFER_OVERFLOW;
   }
 
-  uint8_t const * p = input.begin;
-  size_t s = 0;
-  for (size_t i = 0; i < input_size; ++i) {
-    uint8_t const c = input.begin[i];
+  uint8_t * p = az_span_ptr(input);
+  int32_t s = 0;
+  for (int32_t i = 0; i < input_size; ++i) {
+    uint8_t c = az_span_ptr(input)[i];
     if (should_encode(c)) {
       if (s > 0) {
-        AZ_RETURN_IF_FAILED(
-            az_span_builder_append(span_builder, (az_span){ .begin = p, .size = s }));
+        AZ_RETURN_IF_FAILED(az_span_append(*span_builder, az_span_init(p, s, s), span_builder));
       }
 
       uint8_t encoded[3];
       encode(c, encoded);
       AZ_RETURN_IF_FAILED(
-          az_span_builder_append(span_builder, (az_span)AZ_SPAN_FROM_ARRAY(encoded)));
+          az_span_append(*span_builder, AZ_SPAN_FROM_BUFFER(encoded), span_builder));
 
-      p = input.begin + i + 1;
+      p = az_span_ptr(input) + i + 1;
       s = 0;
     } else {
       ++s;
@@ -87,24 +89,25 @@ AZ_NODISCARD az_result az_uri_encode(az_span const input, az_span_builder * cons
   }
 
   if (s > 0) {
-    AZ_RETURN_IF_FAILED(az_span_builder_append(span_builder, (az_span){ .begin = p, .size = s }));
+    AZ_RETURN_IF_FAILED(az_span_append(*span_builder, az_span_init(p, s, s), span_builder));
   }
 
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_uri_decode(az_span const input, az_span_builder * const span_builder) {
+AZ_NODISCARD az_result az_uri_decode(az_span const input, az_span * const span_builder) {
   AZ_CONTRACT_ARG_NOT_NULL(span_builder);
   AZ_CONTRACT_ARG_VALID_SPAN(input);
 
-  size_t const input_size = input.size;
+  int32_t const input_size = az_span_length(input);
 
-  size_t result_size = 0;
-  for (size_t i = 0; i < input_size; ++i) {
-    uint8_t c = input.begin[i];
+  int32_t result_size = 0;
+  for (int32_t i = 0; i < input_size; ++i) {
+    uint8_t c = az_span_ptr(input)[i];
     if (c == '%') {
-      if (i + 2 < i || i + 2 >= input_size || !isxdigit(input.begin[i + 1])
-          || !isxdigit(input.begin[i + 2])) {
+      if (i + 2 < i || i + 2 >= input_size || !isxdigit(az_span_ptr(input)[i + 1])
+          || !isxdigit(az_span_ptr(input)[i + 2])) {
+
         return AZ_ERROR_ARG;
       }
       i += 2;
@@ -112,40 +115,40 @@ AZ_NODISCARD az_result az_uri_decode(az_span const input, az_span_builder * cons
     ++result_size;
   }
 
-  if (az_span_is_overlap(input, az_mut_span_to_span(span_builder->buffer))) {
+  if (az_span_is_overlap(input, *span_builder)) {
     return AZ_ERROR_ARG;
   }
 
-  if (span_builder->buffer.size < result_size) {
+  if (az_span_capacity(*span_builder) < result_size) {
     return AZ_ERROR_BUFFER_OVERFLOW;
   }
 
-  uint8_t const * p = input.begin;
-  size_t s = 0;
-  for (size_t i = 0; i < input_size; ++i) {
-    uint8_t c = input.begin[i];
+  uint8_t * p = az_span_ptr(input);
+  int32_t s = 0;
+  for (int32_t i = 0; i < input_size; ++i) {
+    uint8_t c = az_span_ptr(input)[i];
     if (c == '%') {
       if (s > 0) {
-        AZ_RETURN_IF_FAILED(
-            az_span_builder_append(span_builder, (az_span){ .begin = p, .size = s }));
+        AZ_RETURN_IF_FAILED(az_span_append(*span_builder, az_span_init(p, s, s), span_builder));
       }
 
-      assert(i + 1 < input.size);
-      assert(i + 2 < input.size);
+      assert(i + 1 < az_span_length(input));
+      assert(i + 2 < az_span_length(input));
 
-      AZ_RETURN_IF_FAILED(az_span_builder_append_byte(
-          span_builder, hex_to_int8(input.begin[i + 1], input.begin[i + 2])));
+      uint8_t * const ptr = az_span_ptr(input);
+      uint8_t b = hex_to_int8(ptr[i + 1], ptr[i + 2]);
+      AZ_RETURN_IF_FAILED(az_span_append(*span_builder, az_span_init(&b, 1, 1), span_builder));
 
       i += 2;
-      p = input.begin + i + 1;
-      s = 0;
+      p = az_span_ptr(input) + 1;
+
     } else {
       ++s;
     }
   }
 
   if (s > 0) {
-    AZ_RETURN_IF_FAILED(az_span_builder_append(span_builder, (az_span){ .begin = p, .size = s }));
+    AZ_RETURN_IF_FAILED(az_span_append(*span_builder, az_span_init(p, s, s), span_builder));
   }
 
   return AZ_OK;

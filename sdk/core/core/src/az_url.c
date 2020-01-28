@@ -5,9 +5,9 @@
 
 #include "az_span_private.h"
 #include "az_span_reader_private.h"
+#include "az_str_private.h"
 #include <az_http_query_internal.h>
 #include <az_span_reader.h>
-#include <az_str.h>
 
 #include <ctype.h>
 
@@ -27,7 +27,7 @@ az_span_reader_read_url_scheme(az_span_reader * const self, az_span * const out)
     if (c == ':') {
       *out = az_span_take(self->span, self->i);
       az_span_reader_next(self);
-      AZ_RETURN_IF_FAILED(az_span_reader_expect_span(self, AZ_STR("//")));
+      AZ_RETURN_IF_FAILED(az_span_reader_expect_span(self, AZ_SPAN_FROM_STR("//")));
       return AZ_OK;
     }
     az_span_reader_next(self);
@@ -42,7 +42,7 @@ az_span_reader_read_url_port(az_span_reader * const self, az_span * const port) 
   {
     az_result const c = az_span_reader_current(self);
     if (c != ':') {
-      *port = az_span_empty();
+      *port = az_span_null();
       return AZ_OK;
     }
     az_span_reader_next(self);
@@ -58,7 +58,7 @@ az_span_reader_read_url_port(az_span_reader * const self, az_span * const port) 
     }
     az_span_reader_next(self);
   }
-  *port = az_span_sub(self->span, begin, self->i);
+  AZ_RETURN_IF_FAILED(az_span_slice(self->span, begin, self->i, port));
   return AZ_OK;
 }
 
@@ -73,7 +73,7 @@ az_span_reader_read_url_authority(az_span_reader * const self, az_url_authority 
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
   bool has_userinfo = false;
-  out->userinfo = az_span_empty();
+  out->userinfo = az_span_null();
   size_t begin = self->i;
   while (true) {
     az_result_byte c = az_span_reader_current(self);
@@ -83,7 +83,7 @@ az_span_reader_read_url_authority(az_span_reader * const self, az_url_authority 
           return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
         }
         has_userinfo = true;
-        out->userinfo = az_span_sub(self->span, begin, self->i);
+        AZ_RETURN_IF_FAILED(az_span_slice(self->span, begin, self->i, &out->userinfo));
         az_span_reader_next(self);
         begin = self->i;
         break;
@@ -93,7 +93,7 @@ az_span_reader_read_url_authority(az_span_reader * const self, az_url_authority 
       case '/':
       case '#':
       case ':': {
-        out->host = az_span_sub(self->span, begin, self->i);
+        AZ_RETURN_IF_FAILED(az_span_slice(self->span, begin, self->i, &out->host));
         AZ_RETURN_IF_FAILED(az_span_reader_read_url_port(self, &out->port));
         return AZ_OK;
       }
@@ -115,7 +115,7 @@ az_span_reader_read_url_path(az_span_reader * const self, az_span * const path) 
   {
     az_result const c = az_span_reader_current(self);
     if (c != '/') {
-      *path = az_span_empty();
+      *path = az_span_null();
       return AZ_OK;
     }
     az_span_reader_next(self);
@@ -126,7 +126,7 @@ az_span_reader_read_url_path(az_span_reader * const self, az_span * const path) 
       case AZ_ERROR_EOF:
       case '?':
       case '#': {
-        *path = az_span_sub(self->span, begin, self->i);
+        AZ_RETURN_IF_FAILED(az_span_slice(self->span, begin, self->i, path));
         return AZ_OK;
       }
       default: {
@@ -146,7 +146,7 @@ az_span_reader_read_url_query(az_span_reader * const self, az_span * const query
   {
     az_result const c = az_span_reader_current(self);
     if (c != '?') {
-      *query = az_span_empty();
+      *query = az_span_null();
       return AZ_OK;
     }
     az_span_reader_next(self);
@@ -157,7 +157,7 @@ az_span_reader_read_url_query(az_span_reader * const self, az_span * const query
     switch (c) {
       case AZ_ERROR_EOF:
       case '#': {
-        *query = az_span_sub(self->span, begin, self->i);
+        AZ_RETURN_IF_FAILED(az_span_slice(self->span, begin, self->i, query));
         return AZ_OK;
       }
       default: {
@@ -177,7 +177,7 @@ az_span_reader_read_url_fragment(az_span_reader * const self, az_span * const fr
   {
     az_result const c = az_span_reader_current(self);
     if (c != '#') {
-      *fragment = az_span_empty();
+      *fragment = az_span_null();
       return AZ_OK;
     }
     az_span_reader_next(self);
@@ -186,7 +186,7 @@ az_span_reader_read_url_fragment(az_span_reader * const self, az_span * const fr
   while (true) {
     az_result const c = az_span_reader_current(self);
     if (c == AZ_ERROR_EOF) {
-      *fragment = az_span_sub(self->span, begin, self->i);
+      AZ_RETURN_IF_FAILED(az_span_slice(self->span, begin, self->i, fragment));
       return AZ_OK;
     }
     AZ_RETURN_IF_FAILED(c);
@@ -220,7 +220,7 @@ AZ_NODISCARD az_result az_host_read_domain(az_span * const host, az_span * const
   AZ_CONTRACT_ARG_NOT_NULL(host);
   AZ_CONTRACT_ARG_NOT_NULL(domain);
 
-  size_t const size = host->size;
+  size_t const size = az_span_length(*host);
   if (size == 0) {
     return AZ_ERROR_ITEM_NOT_FOUND;
   }
@@ -228,13 +228,13 @@ AZ_NODISCARD az_result az_host_read_domain(az_span * const host, az_span * const
   do {
     az_result_byte const c = az_span_get(*host, i);
     if (c == '.') {
-      *domain = az_span_sub(*host, i + 1, size);
-      host->size = i;
+      AZ_RETURN_IF_FAILED(az_span_slice(*host, i + 1, size, domain));
+      host->_internal.length = i;
       return AZ_OK;
     }
     --i;
   } while (0 < i);
   *domain = *host;
-  *host = az_span_empty();
+  *host = az_span_null();
   return AZ_OK;
 }
