@@ -4,8 +4,7 @@
 #ifndef _az_HTTP_CLIENT_INTERNAL_H
 #define _az_HTTP_CLIENT_INTERNAL_H
 
-#include <az_http_request_builder.h>
-#include <az_http_response.h>
+#include <az_http.h>
 
 #ifdef MOCK_CURL
 #include <az_mock_curl.h>

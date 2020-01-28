@@ -1,14 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef _az_HTTP_POLICY_H
-#define _az_HTTP_POLICY_H
+#ifndef _az_HTTP_PIPELINE_INTERNAL_H
+#define _az_HTTP_PIPELINE_INTERNAL_H
 
-#include <az_http_request_builder.h>
-#include <az_http_response.h>
+#include <az_http.h>
 #include <az_result.h>
-
-#include <stdint.h>
 
 #include <_az_cfg_prefix.h>
 
@@ -25,32 +22,32 @@
 //    Distributed Tracing
 //    TransportPolicy
 //  ===Transport Layer===
-
-typedef struct az_http_policy az_http_policy;
-
-/**
- * @brief options for retry policy
- * max_retry = maximun number of retry intents before returning error
- * delay_in_ms = waiting time before retrying in miliseconds
- *
- */
-typedef struct {
-  uint16_t max_retry;
-  uint16_t delay_in_ms;
-} az_http_policy_retry_options;
-
 // PipelinePolicies must implement the process function
 //
-typedef AZ_NODISCARD az_result (*az_http_policy_pfnc_process)(
+
+// Required to define az_http_policy for using it to create policy process definition
+typedef struct az_http_policy az_http_policy;
+
+typedef AZ_NODISCARD az_result (*az_http_policy_process)(
     az_http_policy * policies,
     void * const data,
     az_http_request_builder * hrb,
     az_http_response * const response);
 
 struct az_http_policy {
-  az_http_policy_pfnc_process pfnc_process;
+  az_http_policy_process process;
   void * data;
 };
+
+typedef struct {
+  az_http_policy policies[8];
+} az_http_pipeline;
+
+// Start the pipeline
+AZ_NODISCARD az_result az_http_pipeline_process(
+    az_http_pipeline * pipeline,
+    az_http_request_builder * const hrb,
+    az_http_response * const response);
 
 AZ_NODISCARD az_result az_http_pipeline_policy_uniquerequestid(
     az_http_policy * const policies,
@@ -95,5 +92,4 @@ AZ_NODISCARD az_result az_http_pipeline_policy_transport(
     az_http_response * const response);
 
 #include <_az_cfg_suffix.h>
-
 #endif

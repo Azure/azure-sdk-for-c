@@ -1,14 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include "az_str_private.h"
+#include <az_http.h>
 #include <az_http_client_internal.h>
-#include <az_http_pipeline.h>
-#include <az_http_policy.h>
-#include <az_http_request_builder.h>
-#include <az_mut_span.h>
+#include <az_http_pipeline_internal.h>
 #include <az_span.h>
-#include <az_span_builder.h>
-#include <az_str.h>
 #include <az_url_internal.h>
 
 #include <_az_cfg.h>
@@ -24,14 +21,14 @@ AZ_NODISCARD AZ_INLINE az_result az_http_pipeline_nextpolicy(
 
   // Transport Policy is the last policy in the pipeline
   //  it returns without calling nextpolicy
-  if (p_policies[0].pfnc_process == NULL) {
+  if (p_policies[0].process == NULL) {
     return AZ_ERROR_HTTP_PIPELINE_INVALID_POLICY;
   }
 
-  return p_policies[0].pfnc_process(&(p_policies[1]), p_policies[0].data, hrb, response);
+  return p_policies[0].process(&(p_policies[1]), p_policies[0].data, hrb, response);
 }
 
-static az_span const AZ_MS_CLIENT_REQUESTID = AZ_CONST_STR("x-ms-client-request-id");
+static az_span const AZ_MS_CLIENT_REQUESTID = AZ_SPAN_LITERAL_FROM_STR("x-ms-client-request-id");
 
 AZ_NODISCARD az_result az_http_pipeline_policy_uniquerequestid(
     az_http_policy * const p_policies,
@@ -41,7 +38,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_uniquerequestid(
   (void)data;
 
   // TODO - add a UUID create implementation
-  az_span const uniqueid = AZ_CONST_STR("123e4567-e89b-12d3-a456-426655440000");
+  az_span const uniqueid = AZ_SPAN_LITERAL_FROM_STR("123e4567-e89b-12d3-a456-426655440000");
 
   // Append the Unique GUID into the headers
   //  x-ms-client-request-id
@@ -128,7 +125,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_transport(
 
   // Transport policy is the last policy
   //  If a policy exists after the transport policy
-  if (p_policies[0].pfnc_process != NULL) {
+  if (p_policies[0].process != NULL) {
     return AZ_ERROR_HTTP_PIPELINE_INVALID_POLICY;
   }
 
