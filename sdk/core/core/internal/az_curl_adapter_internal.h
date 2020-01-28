@@ -4,8 +4,7 @@
 #ifndef _az_CURL_ADAPTER_INTERNAL_H
 #define _az_CURL_ADAPTER_INTERNAL_H
 
-#include <az_http_request_builder.h>
-#include <az_http_response.h>
+#include <az_http.h>
 #include <az_result.h>
 
 #include <curl/curl.h>

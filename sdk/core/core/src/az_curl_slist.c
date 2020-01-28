@@ -3,6 +3,7 @@
 
 #include <az_curl_slist_internal.h>
 
+#include "az_str_private.h"
 #include <az_action.h>
 #include <az_http_header_internal.h>
 
@@ -25,10 +26,9 @@ az_curl_slist_append(struct curl_slist ** const self, char const * const str) {
  * Creates a function `az_curl_slist_append_action(struct curl_slist **)`
  * that returns a value of type `az_str_action`.
  */
-AZ_ACTION_FUNC(az_curl_slist_append, struct curl_slist *, az_str_action)
+AZ_ACTION_FUNC_2(az_curl_slist_append, struct curl_slist *, az_str_action)
 
-AZ_NODISCARD az_result
-az_curl_slist_append_header(struct curl_slist ** const self, az_pair const header) {
+AZ_NODISCARD az_result az_curl_slist_append_header(struct curl_slist ** self, az_pair header) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
   // the function creates a temporary dynamic zero-terminated string from `header_span_emitter`
