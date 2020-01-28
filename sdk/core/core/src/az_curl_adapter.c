@@ -5,8 +5,6 @@
 
 #include "az_span_private.h"
 #include "az_str_private.h"
-#include <az_curl_slist_internal.h>
-#include <az_http_request_internal.h>
 #include <az_span.h>
 #include <az_span_internal.h>
 #include <az_span_malloc_internal.h>
@@ -31,6 +29,19 @@ az_write_to_buffer(az_span writable_buffer, az_pair const header, az_span const 
   AZ_RETURN_IF_FAILED(az_span_append(writable_buffer, separator, &writable_buffer));
   AZ_RETURN_IF_FAILED(az_span_append(writable_buffer, header.value, &writable_buffer));
   AZ_RETURN_IF_FAILED(az_span_append(writable_buffer, AZ_SPAN_ZEROBYTE, &writable_buffer));
+  return AZ_OK;
+}
+
+AZ_NODISCARD az_result
+az_curl_slist_append(struct curl_slist ** const self, char const * const str) {
+  AZ_CONTRACT_ARG_NOT_NULL(self);
+  AZ_CONTRACT_ARG_NOT_NULL(str);
+
+  struct curl_slist * const p_list = curl_slist_append(*self, str);
+  if (p_list == NULL) {
+    return AZ_ERROR_HTTP_PAL;
+  }
+  *self = p_list;
   return AZ_OK;
 }
 

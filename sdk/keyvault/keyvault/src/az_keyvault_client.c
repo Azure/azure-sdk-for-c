@@ -5,7 +5,7 @@
 #include <az_http_pipeline_internal.h>
 #include <az_json_builder.h>
 #include <az_keyvault.h>
-#include <az_span_builder_internal.h>
+
 #include <az_span_internal.h>
 
 #include <_az_cfg.h>
@@ -53,13 +53,13 @@ az_keyvault_keys_client_options const AZ_KEYVAULT_CLIENT_DEFAULT_OPTIONS
  * @return AZ_NODISCARD _az_keyvault_keys_key_create_build_json_body
  */
 AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
-    az_span const json_web_key_type,
-    az_keyvault_create_key_options const * const options,
-    az_span_action const write) {
+    az_span json_web_key_type,
+    az_keyvault_create_key_options * options,
+    az_span http_body) {
 
   az_json_builder builder = { 0 };
 
-  AZ_RETURN_IF_FAILED(az_json_builder_init(&builder, write));
+  AZ_RETURN_IF_FAILED(az_json_builder_init(&builder, http_body));
 
   AZ_RETURN_IF_FAILED(az_json_builder_write(&builder, az_json_token_object()));
   // Required fields
@@ -129,8 +129,8 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
   // Allocate buffer in stack to hold body request
   uint8_t body_buffer[MAX_BODY_SIZE];
   az_span json_builder = AZ_SPAN_FROM_BUFFER(body_buffer);
-  AZ_RETURN_IF_FAILED(_az_keyvault_keys_key_create_build_json_body(
-      json_web_key_type, options, az_span_append_action(&json_builder)));
+  AZ_RETURN_IF_FAILED(
+      _az_keyvault_keys_key_create_build_json_body(json_web_key_type, options, json_builder));
   az_span const created_body = json_builder;
 
   // create request

@@ -1,7 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_http_header_internal.h>
+#include <az_http.h>
+#include <az_http_pipeline_internal.h>
 #include <az_json_builder.h>
 #include <az_storage_blobs.h>
 

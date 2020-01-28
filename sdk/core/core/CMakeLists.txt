@@ -15,12 +15,8 @@ add_library (
   az_core
   src/az_base64.c
   src/az_curl_adapter.c
-  src/az_curl_slist.c
-  src/az_http_header.c
   src/az_http_pipeline.c
   src/az_http_policy.c
-  src/az_http_query.c
-  src/az_http_request.c
   src/az_http_request_builder.c
   src/az_http_response_parser.c
   src/az_json_builder.c
@@ -31,11 +27,9 @@ add_library (
   src/az_json_string.c
   src/az_json_token.c
   src/az_log.c
-  src/az_pair.c
   src/az_span.c
   src/az_span_malloc.c
   src/az_span_reader.c
-  src/az_span_writer.c
   src/az_str.c
   src/az_uri.c
   src/az_url.c

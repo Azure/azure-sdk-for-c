@@ -8,7 +8,7 @@
 
 #include <_az_cfg.h>
 
-/* void test_json_get_by_pointer() {
+void test_json_get_by_pointer() {
   {
     az_json_token value;
     TEST_ASSERT(
@@ -95,4 +95,3 @@
     }
   }
 }
- */
