@@ -4,9 +4,8 @@
 #ifndef _az_ACTION_H
 #define _az_ACTION_H
 
-#include <az_contract.h>
+#include <az_contract_internal.h>
 #include <az_result.h>
-#include <az_static_assert.h>
 
 #include <stddef.h>
 
@@ -30,8 +29,6 @@
     return action.func(action.self, arg); \
   }
 
-AZ_STATIC_ASSERT(sizeof(size_t) == sizeof(void *))
-
 /**
  * Defines a function @NAME##_action which creates an action of type @ACTION
  * using the given @NAME function.
@@ -40,6 +37,15 @@ AZ_STATIC_ASSERT(sizeof(size_t) == sizeof(void *))
  * the first argument of the function @NAME and @ACTION.self.
  */
 #define AZ_ACTION_FUNC(NAME, SELF, ACTION) \
+  AZ_NODISCARD az_result NAME(SELF, AZ_ACTION_ARG(ACTION) const, SELF * out); \
+  AZ_NODISCARD AZ_INLINE ACTION AZ_CAT(NAME, _action)(SELF * const self) { \
+    return (ACTION){ \
+      .func = (az_result(*)(void *, AZ_ACTION_ARG(ACTION)))NAME, \
+      .self = (void *)(size_t)self, \
+    }; \
+  }
+
+#define AZ_ACTION_FUNC_2(NAME, SELF, ACTION) \
   AZ_NODISCARD az_result NAME(SELF * const, AZ_ACTION_ARG(ACTION) const); \
   AZ_NODISCARD AZ_INLINE ACTION AZ_CAT(NAME, _action)(SELF * const self) { \
     return (ACTION){ \
