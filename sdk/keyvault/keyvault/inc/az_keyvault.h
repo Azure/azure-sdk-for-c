@@ -4,15 +4,14 @@
 #ifndef _az_KEYVAULT_H
 #define _az_KEYVAULT_H
 
-#include <az_http_pipeline.h>
-#include <az_http_response.h>
-#include <az_contract.h>
+#include <az_contract_internal.h>
+#include <az_http.h>
+#include <az_http_pipeline_internal.h>
 #include <az_identity_access_token.h>
 #include <az_identity_access_token_context.h>
 #include <az_keyvault_create_key_options.h>
 #include <az_result.h>
 #include <az_span.h>
-#include <az_str.h>
 
 #include <stddef.h>
 
@@ -75,18 +74,18 @@ AZ_NODISCARD AZ_INLINE az_result az_keyvault_keys_client_init(
       &(self->_token_context),
       credential,
       &(self->_token),
-      AZ_STR("https://vault.azure.net/.default")));
+      AZ_SPAN_FROM_STR("https://vault.azure.net/.default")));
 
   self->pipeline = (az_http_pipeline){
     .policies = {
-      { .pfnc_process = az_http_pipeline_policy_uniquerequestid, .data = NULL },
-      { .pfnc_process = az_http_pipeline_policy_retry, .data = &(self->retry_options.retry) },
-      { .pfnc_process = az_http_pipeline_policy_authentication, .data = &(self->_token_context) },
-      { .pfnc_process = az_http_pipeline_policy_logging, .data = NULL },
-      { .pfnc_process = az_http_pipeline_policy_bufferresponse, .data = NULL },
-      { .pfnc_process = az_http_pipeline_policy_distributedtracing, .data = NULL },
-      { .pfnc_process = az_http_pipeline_policy_transport, .data = NULL },
-      { .pfnc_process = NULL, .data = NULL },
+      { .process = az_http_pipeline_policy_uniquerequestid, .data = NULL },
+      { .process = az_http_pipeline_policy_retry, .data = &(self->retry_options.retry) },
+      { .process = az_http_pipeline_policy_authentication, .data = &(self->_token_context) },
+      { .process = az_http_pipeline_policy_logging, .data = NULL },
+      { .process = az_http_pipeline_policy_bufferresponse, .data = NULL },
+      { .process = az_http_pipeline_policy_distributedtracing, .data = NULL },
+      { .process = az_http_pipeline_policy_transport, .data = NULL },
+      { .process = NULL, .data = NULL },
     }, 
     };
 
@@ -150,11 +149,15 @@ AZ_NODISCARD az_result az_keyvault_keys_key_delete(
     az_span const key_name,
     az_http_response * const response);
 
-AZ_NODISCARD AZ_INLINE az_span az_keyvault_web_key_type_EC() { return AZ_STR("EC"); }
-AZ_NODISCARD AZ_INLINE az_span az_keyvault_web_key_type_EC_HSM() { return AZ_STR("EC-HSM"); }
-AZ_NODISCARD AZ_INLINE az_span az_keyvault_web_key_type_RSA() { return AZ_STR("RSA"); }
-AZ_NODISCARD AZ_INLINE az_span az_keyvault_web_key_type_RSA_HSM() { return AZ_STR("RSA-HSM"); }
-AZ_NODISCARD AZ_INLINE az_span az_keyvault_web_key_type_OCT() { return AZ_STR("oct"); }
+AZ_NODISCARD AZ_INLINE az_span az_keyvault_web_key_type_EC() { return AZ_SPAN_FROM_STR("EC"); }
+AZ_NODISCARD AZ_INLINE az_span az_keyvault_web_key_type_EC_HSM() {
+  return AZ_SPAN_FROM_STR("EC-HSM");
+}
+AZ_NODISCARD AZ_INLINE az_span az_keyvault_web_key_type_RSA() { return AZ_SPAN_FROM_STR("RSA"); }
+AZ_NODISCARD AZ_INLINE az_span az_keyvault_web_key_type_RSA_HSM() {
+  return AZ_SPAN_FROM_STR("RSA-HSM");
+}
+AZ_NODISCARD AZ_INLINE az_span az_keyvault_web_key_type_OCT() { return AZ_SPAN_FROM_STR("oct"); }
 
 #include <_az_cfg_suffix.h>
 

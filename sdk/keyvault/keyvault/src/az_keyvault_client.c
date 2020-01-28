@@ -1,9 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include <az_http.h>
+#include <az_http_pipeline_internal.h>
 #include <az_json_builder.h>
 #include <az_keyvault.h>
 #include <az_span_builder_internal.h>
+#include <az_span_internal.h>
 
 #include <_az_cfg.h>
 
@@ -20,18 +23,22 @@
 enum { MAX_URL_SIZE = 200 };
 enum { MAX_BODY_SIZE = 1024 };
 
-AZ_NODISCARD AZ_INLINE az_span az_keyvault_client_constant_for_keys() { return AZ_STR("keys"); }
-AZ_NODISCARD AZ_INLINE az_span az_keyvault_client_constant_for_create() { return AZ_STR("create"); }
+AZ_NODISCARD AZ_INLINE az_span az_keyvault_client_constant_for_keys() {
+  return AZ_SPAN_FROM_STR("keys");
+}
+AZ_NODISCARD AZ_INLINE az_span az_keyvault_client_constant_for_create() {
+  return AZ_SPAN_FROM_STR("create");
+}
 
 AZ_NODISCARD AZ_INLINE az_span az_keyvault_client_constant_for_content_type() {
-  return AZ_STR("Content-Type");
+  return AZ_SPAN_FROM_STR("Content-Type");
 }
 AZ_NODISCARD AZ_INLINE az_span az_keyvault_client_constant_for_application_json() {
-  return AZ_STR("application/json");
+  return AZ_SPAN_FROM_STR("application/json");
 }
 
 az_keyvault_keys_client_options const AZ_KEYVAULT_CLIENT_DEFAULT_OPTIONS
-    = { .service_version = AZ_CONST_STR("7.0"),
+    = { .service_version = AZ_SPAN_LITERAL_FROM_STR("7.0"),
         .retry = {
             .max_retry = 3,
             .delay_in_ms = 30,
@@ -57,7 +64,7 @@ AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
   AZ_RETURN_IF_FAILED(az_json_builder_write(&builder, az_json_token_object()));
   // Required fields
   AZ_RETURN_IF_FAILED(az_json_builder_write_object_member(
-      &builder, AZ_STR("kty"), az_json_token_string(json_web_key_type)));
+      &builder, AZ_SPAN_FROM_STR("kty"), az_json_token_string(json_web_key_type)));
 
   /**************** Non-Required fields ************/
   if (options != NULL) {
@@ -66,27 +73,33 @@ AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
       az_optional_bool const enabled_field = options->enabled;
       if (enabled_field.is_present) {
         AZ_RETURN_IF_FAILED(az_json_builder_write_object_member(
-            &builder, AZ_STR("attributes"), az_json_token_object()));
+            &builder, AZ_SPAN_FROM_STR("attributes"), az_json_token_object()));
         AZ_RETURN_IF_FAILED(az_json_builder_write_object_member(
-            &builder, AZ_STR("enabled"), az_json_token_boolean(enabled_field.data)));
+            &builder, AZ_SPAN_FROM_STR("enabled"), az_json_token_boolean(enabled_field.data)));
         AZ_RETURN_IF_FAILED(az_json_builder_write_object_close(&builder));
       }
       // operations
-      if (!az_keyvault_create_key_options_is_empty(options)) {
+      if (options->operations != NULL) {
         AZ_RETURN_IF_FAILED(az_json_builder_write_object_member(
-            &builder, AZ_STR("key_ops"), az_json_token_array()));
-        for (size_t op = 0; op < options->operations.length; ++op) {
-          AZ_RETURN_IF_FAILED(az_json_builder_write_array_item(
-              &builder, az_json_token_string(options->operations.buffer.begin[op])));
+            &builder, AZ_SPAN_FROM_STR("key_ops"), az_json_token_array()));
+        for (size_t op = 0; true; ++op) {
+          az_span s = options->operations[op];
+          if (az_span_is_equal(s, az_span_null())) {
+            break;
+          }
+          AZ_RETURN_IF_FAILED(az_json_builder_write_array_item(&builder, az_json_token_string(s)));
         }
         AZ_RETURN_IF_FAILED(az_json_builder_write_array_close(&builder));
       }
       // tags
-      if (options->tags.length > 0) {
-        AZ_RETURN_IF_FAILED(
-            az_json_builder_write_object_member(&builder, AZ_STR("tags"), az_json_token_object()));
-        for (size_t tag_index = 0; tag_index < options->tags.length; ++tag_index) {
-          az_pair const tag = options->tags.buffer.begin[tag_index];
+      if (options->tags != NULL) {
+        AZ_RETURN_IF_FAILED(az_json_builder_write_object_member(
+            &builder, AZ_SPAN_FROM_STR("tags"), az_json_token_object()));
+        for (size_t tag_index = 0; true; ++tag_index) {
+          az_pair const tag = options->tags[tag_index];
+          if (az_span_is_equal(tag.key, az_span_null())) {
+            break;
+          }
           AZ_RETURN_IF_FAILED(az_json_builder_write_object_member(
               &builder, tag.key, az_json_token_string(tag.value)));
         }
@@ -109,17 +122,16 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
 
   // Request buffer
   uint8_t request_buffer[1024 * 4];
-  az_mut_span request_buffer_span = AZ_SPAN_FROM_ARRAY(request_buffer);
+  az_span request_buffer_span = AZ_SPAN_FROM_BUFFER(request_buffer);
 
   /* ******** build url for request  ******/
 
   // Allocate buffer in stack to hold body request
   uint8_t body_buffer[MAX_BODY_SIZE];
-  az_span_builder json_builder
-      = az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(body_buffer));
+  az_span json_builder = AZ_SPAN_FROM_BUFFER(body_buffer);
   AZ_RETURN_IF_FAILED(_az_keyvault_keys_key_create_build_json_body(
-      json_web_key_type, options, az_span_builder_append_action(&json_builder)));
-  az_span const created_body = az_span_builder_result(&json_builder);
+      json_web_key_type, options, az_span_append_action(&json_builder)));
+  az_span const created_body = json_builder;
 
   // create request
   az_http_request_builder hrb;
@@ -137,13 +149,13 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
 
   // add version to request
   AZ_RETURN_IF_FAILED(az_http_request_builder_set_query_parameter(
-      &hrb, AZ_STR("api-version"), client->retry_options.service_version));
+      &hrb, AZ_SPAN_FROM_STR("api-version"), client->retry_options.service_version));
 
   AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, key_name));
 
   // add extra header just for testing append_path after another query
   AZ_RETURN_IF_FAILED(az_http_request_builder_set_query_parameter(
-      &hrb, AZ_STR("ignore"), client->retry_options.service_version));
+      &hrb, AZ_SPAN_FROM_STR("ignore"), client->retry_options.service_version));
 
   AZ_RETURN_IF_FAILED(
       az_http_request_builder_append_path(&hrb, az_keyvault_client_constant_for_create()));
@@ -174,7 +186,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
     az_http_response * const response) {
   // create request buffer TODO: define size for a getKey Request
   uint8_t request_buffer[1024 * 4];
-  az_mut_span request_buffer_span = AZ_SPAN_FROM_ARRAY(request_buffer);
+  az_span request_buffer_span = AZ_SPAN_FROM_BUFFER(request_buffer);
 
   // create request
   // TODO: define max URL size
@@ -185,7 +197,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
       MAX_URL_SIZE,
       AZ_HTTP_METHOD_VERB_GET,
       client->uri,
-      az_span_empty()));
+      az_span_null()));
 
   // Add path to request
   AZ_RETURN_IF_FAILED(
@@ -193,13 +205,13 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
 
   // add version to request as query parameter
   AZ_RETURN_IF_FAILED(az_http_request_builder_set_query_parameter(
-      &hrb, AZ_STR("api-version"), client->retry_options.service_version));
+      &hrb, AZ_SPAN_FROM_STR("api-version"), client->retry_options.service_version));
 
   // Add path to request after adding query parameter
   AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, key_name));
 
   // Add version if requested
-  if (!az_span_is_empty(key_version)) {
+  if (az_span_length(key_version) > 0) {
     AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, key_version));
   }
 
@@ -213,7 +225,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_delete(
     az_http_response * const response) {
   // Request buffer
   uint8_t request_buffer[1024 * 4];
-  az_mut_span request_buffer_span = AZ_SPAN_FROM_ARRAY(request_buffer);
+  az_span request_buffer_span = AZ_SPAN_FROM_BUFFER(request_buffer);
 
   // create request
   az_http_request_builder hrb;
@@ -223,11 +235,11 @@ AZ_NODISCARD az_result az_keyvault_keys_key_delete(
       MAX_URL_SIZE,
       AZ_HTTP_METHOD_VERB_DELETE,
       client->uri,
-      az_span_empty()));
+      az_span_null()));
 
   // add version to request
   AZ_RETURN_IF_FAILED(az_http_request_builder_set_query_parameter(
-      &hrb, AZ_STR("api-version"), client->retry_options.service_version));
+      &hrb, AZ_SPAN_FROM_STR("api-version"), client->retry_options.service_version));
 
   // Add path to request
   AZ_RETURN_IF_FAILED(
