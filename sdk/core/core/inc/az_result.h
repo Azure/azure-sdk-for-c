@@ -4,7 +4,6 @@
 #ifndef _az_RESULT_H
 #define _az_RESULT_H
 
-#include <az_static_assert.h>
 #include <az_facility.h>
 
 #include <stdbool.h>
@@ -64,11 +63,6 @@ typedef enum {
   // C standard errors
   AZ_ERROR_EOF = _az_RESULT_MAKE_ERROR(AZ_FACILITY_STD, 0xFFFF),
 } az_result;
-
-AZ_STATIC_ASSERT(sizeof(az_result) == 4)
-
-AZ_STATIC_ASSERT(AZ_ERROR_EOF == EOF)
-AZ_STATIC_ASSERT(EOF == -1)
 
 AZ_NODISCARD AZ_INLINE bool az_failed(az_result result) { return (result & AZ_ERROR_FLAG) != 0; }
 
