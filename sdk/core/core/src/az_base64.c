@@ -2,10 +2,11 @@
 // SPDX-License-Identifier: MIT
 
 #include "az_base64_private.h"
-#include <az_mut_span_internal.h>
+
+#include "az_span_private.h"
 #include <az_span_internal.h>
 
-#include <az_contract.h>
+#include <az_contract_internal.h>
 
 #include <assert.h>
 
@@ -63,8 +64,6 @@ enum {
   BASE64_PADDING_CHAR = '=',
 };
 
-AZ_STATIC_ASSERT(BASE64_CHAR64_INDEX == 63)
-
 AZ_INLINE uint8_t uint6_as_base64(bool const base64url, uint8_t const uint6) {
   if (uint6 == BASE64_RANGE1_START
       || (BASE64_RANGE1_START < uint6 && uint6 < BASE64_RANGE2_START)) {
@@ -109,57 +108,59 @@ AZ_INLINE uint8_t base64_as_uint6(uint8_t const base64) {
 
 AZ_NODISCARD az_result az_base64_encode(
     bool const base64url,
-    az_mut_span const buffer,
+    az_span const buffer,
     az_span const input,
     az_span * const out_result) {
   AZ_CONTRACT_ARG_NOT_NULL(out_result);
-  AZ_CONTRACT_ARG_VALID_MUT_SPAN(buffer);
+  AZ_CONTRACT_ARG_VALID_SPAN(buffer);
   AZ_CONTRACT_ARG_VALID_SPAN(input);
 
-  size_t const result_size = (TRIBYTE_SEXTETS * (input.size / TRIBYTE_OCTETS))
-      + ((input.size % TRIBYTE_OCTETS == 0)
+  int32_t const result_size = (TRIBYTE_SEXTETS * (az_span_length(input) / TRIBYTE_OCTETS))
+      + ((az_span_length(input) % TRIBYTE_OCTETS == 0)
              ? 0
-             : (base64url ? 1 + (input.size % TRIBYTE_OCTETS) : TRIBYTE_SEXTETS));
+             : (base64url ? 1 + (az_span_length(input) % TRIBYTE_OCTETS) : TRIBYTE_SEXTETS));
 
-  az_span const result = (az_span){ .begin = buffer.begin, .size = result_size };
+  az_span const result = az_span_init(az_span_ptr(buffer), result_size, result_size);
 
   if (az_span_is_overlap(input, result)) {
     return AZ_ERROR_ARG;
   }
 
-  if (buffer.size < result_size) {
+  if (az_span_length(buffer) < result_size) {
     return AZ_ERROR_BUFFER_OVERFLOW;
   }
 
-  for (size_t oct = 0, sxt = 0; oct < input.size; oct += TRIBYTE_OCTETS, sxt += TRIBYTE_SEXTETS) {
-    size_t const nsextets
+  for (int32_t oct = 0, sxt = 0; oct < az_span_length(input);
+       oct += TRIBYTE_OCTETS, sxt += TRIBYTE_SEXTETS) {
+    int32_t const nsextets
         = ((result_size - sxt) < TRIBYTE_SEXTETS) ? (result_size - sxt) : TRIBYTE_SEXTETS;
 
     uint8_t octet1 = 0;
     if (nsextets >= TRIBYTE_SEXTETS - 1) {
-      if (oct + TRIBYTE_OCTET1_INDEX < input.size) {
-        assert(oct + TRIBYTE_OCTET1_INDEX < input.size);
-        octet1 = input.begin[oct + TRIBYTE_OCTET1_INDEX];
+      if (oct + TRIBYTE_OCTET1_INDEX < az_span_length(input)) {
+        assert(oct + TRIBYTE_OCTET1_INDEX < az_span_length(input));
+        octet1 = az_span_ptr(input)[oct + TRIBYTE_OCTET1_INDEX];
       }
 
       uint8_t octet2 = 0;
       if (nsextets == TRIBYTE_SEXTETS) {
         assert(sxt + TRIBYTE_SEXTET3_INDEX < result_size);
 
-        if (oct + 2 < input.size) {
-          assert(oct + TRIBYTE_OCTET2_INDEX < input.size);
+        if (oct + 2 < az_span_length(input)) {
+          assert(oct + TRIBYTE_OCTET2_INDEX < az_span_length(input));
 
-          octet2 = input.begin[oct + TRIBYTE_OCTET2_INDEX];
+          octet2 = az_span_ptr(input)[oct + TRIBYTE_OCTET2_INDEX];
 
-          buffer.begin[sxt + TRIBYTE_SEXTET3_INDEX]
+          az_span_ptr(buffer)[sxt + TRIBYTE_SEXTET3_INDEX]
               = uint6_as_base64(base64url, (uint8_t)(octet2 & TRIBYTE_OCTET2_SEXTET3_MASK));
         } else {
-          buffer.begin[sxt + TRIBYTE_SEXTET3_INDEX] = BASE64_PADDING_CHAR;
+          az_span_ptr(buffer)[sxt + TRIBYTE_SEXTET3_INDEX] = BASE64_PADDING_CHAR;
         }
       }
 
       assert(sxt + TRIBYTE_SEXTET2_INDEX < result_size);
-      buffer.begin[sxt + TRIBYTE_SEXTET2_INDEX] = (oct + TRIBYTE_OCTET1_INDEX < input.size)
+      az_span_ptr(buffer)[sxt + TRIBYTE_SEXTET2_INDEX]
+          = (oct + TRIBYTE_OCTET1_INDEX < az_span_length(input))
           ? uint6_as_base64(
                 base64url,
                 (uint8_t)(
@@ -169,20 +170,20 @@ AZ_NODISCARD az_result az_base64_encode(
     }
 
     assert(sxt + TRIBYTE_SEXTET1_INDEX < result_size);
-    assert(oct + TRIBYTE_OCTET0_INDEX < input.size);
-    buffer.begin[sxt + TRIBYTE_SEXTET1_INDEX] = uint6_as_base64(
+    assert(oct + TRIBYTE_OCTET0_INDEX < az_span_length(input));
+    az_span_ptr(buffer)[sxt + TRIBYTE_SEXTET1_INDEX] = uint6_as_base64(
         base64url,
         (uint8_t)(
-            ((input.begin[oct + TRIBYTE_OCTET0_INDEX] & TRIBYTE_OCTET0_SEXTET1_MASK)
+            ((az_span_ptr(input)[oct + TRIBYTE_OCTET0_INDEX] & TRIBYTE_OCTET0_SEXTET1_MASK)
              << TRIBYTE_OCTET0_SEXTET1_LSHIFT)
             | ((octet1 & TRIBYTE_OCTET1_SEXTET1_MASK) >> TRIBYTE_OCTET1_SEXTET1_RSHIFT)));
 
     assert(sxt + TRIBYTE_SEXTET0_INDEX < result_size);
-    assert(oct + TRIBYTE_OCTET0_INDEX < input.size);
-    buffer.begin[sxt + TRIBYTE_SEXTET0_INDEX] = uint6_as_base64(
+    assert(oct + TRIBYTE_OCTET0_INDEX < az_span_length(input));
+    az_span_ptr(buffer)[sxt + TRIBYTE_SEXTET0_INDEX] = uint6_as_base64(
         base64url,
         (uint8_t)(
-            (input.begin[oct + TRIBYTE_OCTET0_INDEX] & TRIBYTE_OCTET0_SEXTET0_MASK)
+            (az_span_ptr(input)[oct + TRIBYTE_OCTET0_INDEX] & TRIBYTE_OCTET0_SEXTET0_MASK)
             >> TRIBYTE_OCTET0_SEXTET0_RSHIFT));
   }
 
@@ -191,18 +192,18 @@ AZ_NODISCARD az_result az_base64_encode(
 }
 
 AZ_NODISCARD az_result
-az_base64_decode(az_mut_span const buffer, az_span const input, az_span * const out_result) {
+az_base64_decode(az_span const buffer, az_span const input, az_span * const out_result) {
   AZ_CONTRACT_ARG_NOT_NULL(out_result);
-  AZ_CONTRACT_ARG_VALID_MUT_SPAN(buffer);
+  AZ_CONTRACT_ARG_VALID_SPAN(buffer);
   AZ_CONTRACT_ARG_VALID_SPAN(input);
 
-  size_t padding = 0;
-  for (size_t ri = input.size; ri > 0; --ri) {
-    if (input.begin[ri - 1] == BASE64_PADDING_CHAR) {
+  int32_t padding = 0;
+  for (int32_t ri = az_span_length(input); ri > 0; --ri) {
+    if (az_span_ptr(input)[ri - 1] == BASE64_PADDING_CHAR) {
       ++padding;
     } else {
       for (; ri > 0; --ri) {
-        if (base64_as_uint6(input.begin[ri - 1]) == BASE64_INVALID_VALUE) {
+        if (base64_as_uint6(az_span_ptr(input)[ri - 1]) == BASE64_INVALID_VALUE) {
           return AZ_ERROR_ARG;
         }
       }
@@ -210,57 +211,58 @@ az_base64_decode(az_mut_span const buffer, az_span const input, az_span * const 
     }
   }
 
-  size_t const input_size = input.size - padding;
+  int32_t const input_size = az_span_length(input) - padding;
 
-  size_t const remainder = input_size % TRIBYTE_SEXTETS;
+  int32_t const remainder = input_size % TRIBYTE_SEXTETS;
   if (remainder == 1) {
     return AZ_ERROR_ARG;
   }
 
-  size_t const result_size
+  int32_t const result_size
       = (TRIBYTE_OCTETS * (input_size / TRIBYTE_SEXTETS)) + (remainder == 0 ? 0 : remainder - 1);
 
-  az_span const result = (az_span){ .begin = buffer.begin, .size = result_size };
+  az_span const result = az_span_init(az_span_ptr(buffer), result_size, result_size);
 
   if (az_span_is_overlap(input, result)) {
     return AZ_ERROR_ARG;
   }
 
-  if (buffer.size < result_size) {
+  if (az_span_length(buffer) < result_size) {
     return AZ_ERROR_BUFFER_OVERFLOW;
   }
 
-  for (size_t oct = 0, sxt = 0; oct < result_size; oct += TRIBYTE_OCTETS, sxt += TRIBYTE_SEXTETS) {
-    size_t const noctets
+  for (int32_t oct = 0, sxt = 0; oct < result_size; oct += TRIBYTE_OCTETS, sxt += TRIBYTE_SEXTETS) {
+    int32_t const noctets
         = ((result_size - oct) < TRIBYTE_OCTETS) ? (result_size - oct) : TRIBYTE_OCTETS;
 
     assert(sxt + TRIBYTE_SEXTET1_INDEX < input_size);
-    uint8_t const sextet1 = base64_as_uint6(input.begin[sxt + TRIBYTE_SEXTET1_INDEX]);
+    uint8_t const sextet1 = base64_as_uint6(az_span_ptr(input)[sxt + TRIBYTE_SEXTET1_INDEX]);
 
     if (noctets >= TRIBYTE_OCTETS - 1) {
       assert(sxt + TRIBYTE_SEXTET2_INDEX < input_size);
       assert(oct + TRIBYTE_OCTET1_INDEX < result_size);
 
-      uint8_t const sextet2 = base64_as_uint6(input.begin[sxt + TRIBYTE_SEXTET2_INDEX]);
+      uint8_t const sextet2 = base64_as_uint6(az_span_ptr(input)[sxt + TRIBYTE_SEXTET2_INDEX]);
 
-      buffer.begin[oct + TRIBYTE_OCTET1_INDEX] = (uint8_t)(
+      az_span_ptr(buffer)[oct + TRIBYTE_OCTET1_INDEX] = (uint8_t)(
           (sextet1 << TRIBYTE_OCTET1_SEXTET1_RSHIFT) | (sextet2 >> TRIBYTE_OCTET1_SEXTET2_LSHIFT));
 
       if (noctets == TRIBYTE_OCTETS) {
         assert(oct + TRIBYTE_OCTET2_INDEX < result_size);
         assert(sxt + TRIBYTE_SEXTET3_INDEX < input_size);
 
-        buffer.begin[oct + TRIBYTE_OCTET2_INDEX] = (uint8_t)(
+        az_span_ptr(buffer)[oct + TRIBYTE_OCTET2_INDEX] = (uint8_t)(
             (sextet2 << TRIBYTE_OCTET2_SEXTET2_RSHIFT)
-            | base64_as_uint6(input.begin[sxt + TRIBYTE_SEXTET3_INDEX]));
+            | base64_as_uint6(az_span_ptr(input)[sxt + TRIBYTE_SEXTET3_INDEX]));
       }
     }
 
     assert(oct + TRIBYTE_OCTET0_INDEX < result_size);
     assert(sxt + TRIBYTE_SEXTET0_INDEX < input_size);
 
-    buffer.begin[oct + TRIBYTE_OCTET0_INDEX] = (uint8_t)(
-        (base64_as_uint6(input.begin[sxt + TRIBYTE_SEXTET0_INDEX]) << TRIBYTE_OCTET0_SEXTET0_RSHIFT)
+    az_span_ptr(buffer)[oct + TRIBYTE_OCTET0_INDEX] = (uint8_t)(
+        (base64_as_uint6(az_span_ptr(input)[sxt + TRIBYTE_SEXTET0_INDEX])
+         << TRIBYTE_OCTET0_SEXTET0_RSHIFT)
         | (sextet1 >> TRIBYTE_OCTET0_SEXTET1_LSHIFT));
   }
 

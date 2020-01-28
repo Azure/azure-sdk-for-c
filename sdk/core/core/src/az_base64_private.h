@@ -4,7 +4,6 @@
 #ifndef _az_BASE64_PRIVATE_H
 #define _az_BASE64_PRIVATE_H
 
-#include <az_mut_span.h>
 #include <az_result.h>
 #include <az_span.h>
 
@@ -32,7 +31,7 @@
  */
 AZ_NODISCARD az_result az_base64_encode(
     bool const base64url,
-    az_mut_span const buffer,
+    az_span const buffer,
     az_span const input,
     az_span * const out_result);
 
@@ -55,7 +54,7 @@ AZ_NODISCARD az_result az_base64_encode(
  *     - `out_result` would overlap `input`.
  */
 AZ_NODISCARD az_result
-az_base64_decode(az_mut_span const buffer, az_span const input, az_span * const out_result);
+az_base64_decode(az_span const buffer, az_span const input, az_span * const out_result);
 
 #include <_az_cfg_suffix.h>
 
