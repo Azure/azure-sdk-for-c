@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include <az_contract_internal.h>
 #include <az_json_token.h>
 
 #include <_az_cfg.h>
@@ -27,8 +28,7 @@ AZ_NODISCARD az_result az_json_token_get_string(az_json_token const self, az_spa
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result
-az_json_token_get_number(az_json_token const self, double * const out) {
+AZ_NODISCARD az_result az_json_token_get_number(az_json_token const self, double * const out) {
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
   if (self.kind != AZ_JSON_TOKEN_NUMBER) {

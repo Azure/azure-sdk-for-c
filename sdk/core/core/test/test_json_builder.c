@@ -3,33 +3,38 @@
 
 #include <az_json_builder.h>
 #include <az_span.h>
-#include <az_span_builder.h>
+
 #include <az_span_writer_internal.h>
 
 #include <az_test.h>
 
 #include <_az_cfg.h>
 
-AZ_NODISCARD az_result write_json(void * _, az_span_action const write) {
+/* AZ_NODISCARD az_result write_json(void * _, az_span_action const write) {
   (void)_;
   az_json_builder builder = { 0 };
 
   AZ_RETURN_IF_FAILED(az_json_builder_init(&builder, write));
 
-  // 0___________________________________________________________________________________________________1
-  // 0_________1_________2_________3_________4_________5_________6_________7_________8_________9_________0
-  // 01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456
-  // {"name":true,"foo":["bar",null,0,-12],"int-max":9007199254740991,"esc":"_\"_\\_\b\f\n\r\t_","u":"a\u001Fb"}
+  //
+0___________________________________________________________________________________________________1
+  //
+0_________1_________2_________3_________4_________5_________6_________7_________8_________9_________0
+  //
+01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456
+  //
+{"name":true,"foo":["bar",null,0,-12],"int-max":9007199254740991,"esc":"_\"_\\_\b\f\n\r\t_","u":"a\u001Fb"}
   AZ_RETURN_IF_FAILED(az_json_builder_write(&builder, az_json_token_object()));
 
   AZ_RETURN_IF_FAILED(
-      az_json_builder_write_object_member(&builder, AZ_STR("name"), az_json_token_boolean(true)));
+      az_json_builder_write_object_member(&builder, AZ_SPAN_FROM_STR("name"),
+az_json_token_boolean(true)));
 
   {
     AZ_RETURN_IF_FAILED(
-        az_json_builder_write_object_member(&builder, AZ_STR("foo"), az_json_token_array()));
-    AZ_RETURN_IF_FAILED(
-        az_json_builder_write_array_item(&builder, az_json_token_string(AZ_STR("bar"))));
+        az_json_builder_write_object_member(&builder, AZ_SPAN_FROM_STR("foo"),
+az_json_token_array())); AZ_RETURN_IF_FAILED( az_json_builder_write_array_item(&builder,
+az_json_token_string(AZ_SPAN_FROM_STR("bar"))));
     AZ_RETURN_IF_FAILED(az_json_builder_write_array_item(&builder, az_json_token_null()));
     AZ_RETURN_IF_FAILED(az_json_builder_write_array_item(&builder, az_json_token_number(0)));
     AZ_RETURN_IF_FAILED(az_json_builder_write_array_item(&builder, az_json_token_number(-12)));
@@ -37,13 +42,14 @@ AZ_NODISCARD az_result write_json(void * _, az_span_action const write) {
   }
 
   AZ_RETURN_IF_FAILED(az_json_builder_write_object_member(
-      &builder, AZ_STR("int-max"), az_json_token_number(9007199254740991ull)));
+      &builder, AZ_SPAN_FROM_STR("int-max"), az_json_token_number(9007199254740991ull)));
   AZ_RETURN_IF_FAILED(az_json_builder_write_object_member(
-      &builder, AZ_STR("esc"), az_json_token_span(AZ_STR("_\"_\\_\b\f\n\r\t_"))));
+      &builder, AZ_SPAN_FROM_STR("esc"),
+az_json_token_span(AZ_SPAN_FROM_STR("_\"_\\_\b\f\n\r\t_"))));
   AZ_RETURN_IF_FAILED(az_json_builder_write_object_member(
       &builder,
-      AZ_STR("u"),
-      az_json_token_span(AZ_STR( //
+      AZ_SPAN_FROM_STR("u"),
+      az_json_token_span(AZ_SPAN_FROM_STR( //
           "a"
           "\x1f"
           "b"))));
@@ -63,12 +69,12 @@ void test_json_builder() {
   }
   {
     uint8_t array[200];
-    az_span_builder builder = az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(array));
-    TEST_ASSERT(write_json(NULL, az_span_builder_append_action(&builder)) == AZ_OK);
-    az_span const result = az_span_builder_result(&builder);
+    az_span builder = az_span_create((az_span)AZ_SPAN_FROM_ARRAY(array));
+    TEST_ASSERT(write_json(NULL, az_span_append_action(&builder)) == AZ_OK);
+    az_span const result = az_span_result(&builder);
     TEST_ASSERT(az_span_is_equal(
         result,
-        AZ_STR( //
+        AZ_SPAN_FROM_STR( //
             "{"
             "\"name\":true,"
             "\"foo\":[\"bar\",null,0,-12],"
@@ -77,4 +83,4 @@ void test_json_builder() {
             "\"u\":\"a\\u001Fb\""
             "}")));
   }
-}
+} */

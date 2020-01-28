@@ -4,8 +4,8 @@
 #include <az_json_string.h>
 
 #include "az_span_reader_private.h"
+#include "az_str_private.h"
 #include <az_hex_internal.h>
-#include <az_str.h>
 
 #include <ctype.h>
 
@@ -54,27 +54,27 @@ AZ_NODISCARD AZ_INLINE az_result_byte az_json_esc_decode(az_result_byte const c)
 AZ_NODISCARD az_span az_json_esc_encode(az_result_byte const c) {
   switch (c) {
     case '\\': {
-      return AZ_STR("\\\\");
+      return AZ_SPAN_FROM_STR("\\\\");
     }
     case '"': {
-      return AZ_STR("\\\"");
+      return AZ_SPAN_FROM_STR("\\\"");
     }
     case '\b': {
-      return AZ_STR("\\b");
+      return AZ_SPAN_FROM_STR("\\b");
     }
     case '\f': {
-      return AZ_STR("\\f");
+      return AZ_SPAN_FROM_STR("\\f");
     }
     case '\n': {
-      return AZ_STR("\\n");
+      return AZ_SPAN_FROM_STR("\\n");
     }
     case '\r': {
-      return AZ_STR("\\r");
+      return AZ_SPAN_FROM_STR("\\r");
     }
     case '\t': {
-      return AZ_STR("\\t");
+      return AZ_SPAN_FROM_STR("\\t");
     }
-    default: { return az_span_empty(); }
+    default: { return az_span_null(); }
   }
 }
 
