@@ -4,7 +4,7 @@
 #ifndef _az_SPAN_READER_H
 #define _az_SPAN_READER_H
 
-#include <az_contract.h>
+#include <az_contract_internal.h>
 #include <az_result.h>
 #include <az_span.h>
 
@@ -16,7 +16,7 @@
 
 typedef struct {
   az_span span;
-  size_t i;
+  int32_t i;
 } az_span_reader;
 
 AZ_NODISCARD AZ_INLINE az_span_reader az_span_reader_create(az_span const span) {
@@ -24,7 +24,7 @@ AZ_NODISCARD AZ_INLINE az_span_reader az_span_reader_create(az_span const span) 
 }
 
 AZ_NODISCARD AZ_INLINE bool az_span_reader_is_empty(az_span_reader const * const p_reader) {
-  return p_reader->span.size <= p_reader->i;
+  return az_span_length(p_reader->span) <= p_reader->i;
 }
 
 AZ_INLINE void az_span_reader_next(az_span_reader * const p_reader) {
@@ -35,8 +35,8 @@ AZ_INLINE void az_span_reader_next(az_span_reader * const p_reader) {
 }
 
 AZ_NODISCARD AZ_INLINE az_result
-az_span_reader_set_pos(az_span_reader * const p_reader, size_t const i) {
-  AZ_CONTRACT(i <= p_reader->span.size, AZ_ERROR_ARG);
+az_span_reader_set_pos(az_span_reader * const p_reader, int32_t i) {
+  AZ_CONTRACT(i <= az_span_length(p_reader->span), AZ_ERROR_ARG);
 
   p_reader->i = i;
   return AZ_OK;

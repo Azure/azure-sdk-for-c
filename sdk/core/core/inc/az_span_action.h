@@ -21,7 +21,7 @@
  *
  * ```c
  * az_span_action const action = ...;
- * az_span_action_do(action, AZ_STR("Something"));
+ * az_span_action_do(action, AZ_SPAN_FROM_STR("Something"));
  * ```
  */
 AZ_ACTION_TYPE(az_span_action, az_span)
