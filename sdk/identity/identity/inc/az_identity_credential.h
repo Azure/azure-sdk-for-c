@@ -4,8 +4,8 @@
 #ifndef _az_IDENTITY_CREDENTIAL_H
 #define _az_IDENTITY_CREDENTIAL_H
 
-#include <az_contract.h>
-#include <az_http_request_builder.h>
+#include <az_contract_internal.h>
+#include <az_http.h>
 #include <az_result.h>
 
 #include <_az_cfg_prefix.h>
