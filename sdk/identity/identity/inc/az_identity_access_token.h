@@ -4,7 +4,7 @@
 #ifndef _az_IDENTITY_ACCESS_TOKEN_H
 #define _az_IDENTITY_ACCESS_TOKEN_H
 
-#include <az_contract.h>
+#include <az_contract_internal.h>
 #include <az_result.h>
 
 #include <stddef.h>
