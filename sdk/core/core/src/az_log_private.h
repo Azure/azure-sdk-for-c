@@ -19,6 +19,10 @@ void _az_log_http_response(
     uint64_t const duration_msec,
     az_http_request_builder const * const hrb);
 
+void _az_log_http_retry(
+    int16_t const attempt,
+    int32_t const delay_msec);
+
 #include <_az_cfg_suffix.h>
 
 #endif

@@ -42,7 +42,8 @@ int main() {
       http_buf,
       100,
       AZ_HTTP_METHOD_VERB_GET,
-      az_str_to_span(getenv(URI_ENV)),
+      //az_str_to_span(getenv(URI_ENV)),
+      AZ_STR("https://site.web"),
       az_span_empty());
 
   if (az_failed(build_result)) {
@@ -106,7 +107,8 @@ int main() {
   az_result const get_response = az_http_pipeline_process(&pipeline, &hrb, &http_buf_response);
 
   if (az_succeeded(get_response)) {
-    printf("Response is: \n%s", buf_response);
+    az_span const response = az_span_builder_result(&http_buf_response.builder);
+    printf("Response is: \n%.*s", (unsigned int)response.size, response.begin);
   } else {
     printf("Error during running test\n");
   }

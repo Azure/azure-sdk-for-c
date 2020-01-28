@@ -176,6 +176,29 @@ static az_result _az_log_http_response_msg(
   return _az_log_http_request_msg(log_msg_bldr, hrb, 1);
 }
 
+static az_result _az_log_http_retry_msg(
+    az_span_builder * const log_msg_bldr,
+    int16_t const attempt,
+    int32_t const delay_msec)
+{
+  AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, AZ_STR("HTTP Retry attempt")));
+
+  if (attempt >= 0) {
+    AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, AZ_STR(" #")));
+    AZ_RETURN_IF_FAILED(az_span_builder_append_uint64(log_msg_bldr, (uint64_t)attempt));
+  }
+
+  AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, AZ_STR(" will be made")));
+
+  if (delay_msec >= 0) {
+    AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, AZ_STR(" in ")));
+    AZ_RETURN_IF_FAILED(az_span_builder_append_uint64(log_msg_bldr, (uint64_t)delay_msec));
+    AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, AZ_STR("ms")));
+  }
+
+  return az_span_builder_append_byte(log_msg_bldr, '.');
+}
+
 void _az_log_http_request(az_http_request_builder const * const hrb) {
   uint8_t log_msg_buf[_az_LOG_MSG_BUF_SIZE] = { 0 };
 
@@ -199,4 +222,15 @@ void _az_log_http_response(
   (void)_az_log_http_response_msg(&log_msg_bldr, response, duration_msec, hrb);
 
   az_log_write(AZ_LOG_HTTP_RESPONSE, az_span_builder_result(&log_msg_bldr));
+}
+
+void _az_log_http_retry(int16_t const attempt, int32_t const delay_msec) {
+  uint8_t log_msg_buf[_az_LOG_MSG_BUF_SIZE] = { 0 };
+
+  az_span_builder log_msg_bldr
+      = az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(log_msg_buf));
+
+  (void)_az_log_http_retry_msg(&log_msg_bldr, attempt, delay_msec);
+
+  az_log_write(AZ_LOG_HTTP_RETRY, az_span_builder_result(&log_msg_bldr));
 }

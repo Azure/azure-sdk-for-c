@@ -19,6 +19,7 @@
 typedef enum {
   AZ_LOG_HTTP_REQUEST = _az_LOG_MAKE_CLASSIFICATION(AZ_FACILITY_HTTP, 1),
   AZ_LOG_HTTP_RESPONSE = _az_LOG_MAKE_CLASSIFICATION(AZ_FACILITY_HTTP, 2),
+  AZ_LOG_HTTP_RETRY = _az_LOG_MAKE_CLASSIFICATION(AZ_FACILITY_HTTP, 3),
 } az_log_classification;
 
 typedef void (*az_log)(az_log_classification const classification, az_span const message);
