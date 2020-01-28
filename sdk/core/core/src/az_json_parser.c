@@ -4,9 +4,9 @@
 #include <az_json_parser.h>
 
 #include "az_span_reader_private.h"
-#include <az_contract.h>
+#include <az_contract_internal.h>
 #include <az_json_string.h>
-#include <az_str.h>
+#include "az_str_private.h"
 
 #include <ctype.h>
 #include <math.h>
@@ -201,7 +201,7 @@ AZ_NODISCARD static az_result az_span_reader_get_json_string_rest(
     az_result const result = az_span_reader_read_json_string_char(self, &ignore);
     switch (result) {
       case AZ_ERROR_JSON_STRING_END: {
-        *string = az_span_sub(self->span, begin, self->i);
+        AZ_RETURN_IF_FAILED(az_span_slice(self->span, begin, self->i, string));
         az_span_reader_next(self);
         return AZ_OK;
       }
@@ -227,14 +227,14 @@ AZ_NODISCARD static az_result az_json_parser_get_value(
     case 't':
       out_value->kind = AZ_JSON_TOKEN_BOOLEAN;
       out_value->data.boolean = true;
-      return az_span_reader_expect_span(p_reader, AZ_STR("true"));
+      return az_span_reader_expect_span(p_reader, AZ_SPAN_FROM_STR("true"));
     case 'f':
       out_value->kind = AZ_JSON_TOKEN_BOOLEAN;
       out_value->data.boolean = false;
-      return az_span_reader_expect_span(p_reader, AZ_STR("false"));
+      return az_span_reader_expect_span(p_reader, AZ_SPAN_FROM_STR("false"));
     case 'n':
       out_value->kind = AZ_JSON_TOKEN_NULL;
-      return az_span_reader_expect_span(p_reader, AZ_STR("null"));
+      return az_span_reader_expect_span(p_reader, AZ_SPAN_FROM_STR("null"));
     case '"':
       out_value->kind = AZ_JSON_TOKEN_STRING;
       az_span_reader_next(p_reader);

@@ -64,7 +64,7 @@ az_span_reader_read_json_pointer_token(az_span_reader * const self, az_span * co
     switch (result) {
       case AZ_ERROR_ITEM_NOT_FOUND:
       case AZ_ERROR_JSON_POINTER_TOKEN_END: {
-        *out = az_span_sub(self->span, begin, self->i);
+        AZ_RETURN_IF_FAILED(az_span_slice(self->span, begin, self->i, out));
         return AZ_OK;
       }
       default: { AZ_RETURN_IF_FAILED(result); }

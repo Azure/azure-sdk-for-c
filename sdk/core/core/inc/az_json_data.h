@@ -5,11 +5,10 @@
 #define _az_JSON_DATA_H
 
 #include <az_json_token.h>
-#include <az_mut_span.h>
 #include <az_span.h>
 
-#include <stddef.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 #include <_az_cfg_prefix.h>
 
@@ -33,7 +32,9 @@ typedef struct {
   } _internal;
 } az_json_object;
 
-AZ_NODISCARD AZ_INLINE size_t az_json_object_size(az_json_object const a) { return a._internal.size; }
+AZ_NODISCARD AZ_INLINE size_t az_json_object_size(az_json_object const a) {
+  return a._internal.size;
+}
 
 typedef enum {
   AZ_JSON_DATA_NULL = 0,
@@ -109,7 +110,7 @@ az_json_object_get(az_json_object const o, size_t const i) {
 }
 
 AZ_NODISCARD az_result
-az_json_to_data(az_span const json, az_mut_span const buffer, az_json_data const ** const out);
+az_json_to_data(az_span json, az_span buffer, az_json_data const ** const out);
 
 #include <_az_cfg_suffix.h>
 
