@@ -3,9 +3,9 @@
 
 #include "az_span_private.h"
 #include "az_span_reader_private.h"
-#include <az_http_response_parser.h>
+#include <az_http.h>
 
-#include <az_str.h>
+#include "az_str_private.h"
 
 #include <_az_cfg.h>
 
@@ -39,7 +39,7 @@ AZ_NODISCARD az_result az_span_reader_get_http_status_line(
 
   // HTTP-version = HTTP-name "/" DIGIT "." DIGIT
   // https://tools.ietf.org/html/rfc7230#section-2.6
-  AZ_RETURN_IF_FAILED(az_span_reader_expect_span(self, AZ_STR("HTTP/")));
+  AZ_RETURN_IF_FAILED(az_span_reader_expect_span(self, AZ_SPAN_FROM_STR("HTTP/")));
   AZ_RETURN_IF_FAILED(az_span_reader_expect_digit(self, &out->major_version));
   AZ_RETURN_IF_FAILED(az_span_reader_expect_char(self, '.'));
   AZ_RETURN_IF_FAILED(az_span_reader_expect_digit(self, &out->minor_version));
@@ -71,7 +71,7 @@ AZ_NODISCARD az_result az_span_reader_get_http_status_line(
     az_span_reader_next(self);
   }
 
-  out->reason_phrase = az_span_sub(self->span, begin, self->i);
+  AZ_RETURN_IF_FAILED(az_span_slice(self->span, begin, self->i, &out->reason_phrase));
   return AZ_OK;
 }
 
@@ -82,8 +82,7 @@ AZ_NODISCARD az_result az_span_reader_get_http_status_line(
 //
 // Note: no other functions are used to access the response buffer.
 
-AZ_NODISCARD az_result
-az_http_response_parser_init(az_http_response_parser * const out, az_span const buffer) {
+AZ_NODISCARD az_result az_http_response_parser_init(az_http_response_parser * out, az_span buffer) {
   *out = (az_http_response_parser){
     .reader = az_span_reader_create(buffer),
     .kind = AZ_HTTP_RESPONSE_STATUS_LINE,
@@ -108,8 +107,8 @@ az_http_response_parser_set_kind(az_http_response_parser * const self) {
 }
 
 AZ_NODISCARD az_result az_http_response_parser_read_status_line(
-    az_http_response_parser * const self,
-    az_http_response_status_line * const out) {
+    az_http_response_parser * self,
+    az_http_response_status_line * out) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
@@ -124,7 +123,7 @@ AZ_NODISCARD az_result az_http_response_parser_read_status_line(
   AZ_RETURN_IF_FAILED(az_span_reader_get_http_status_line(p_reader, out));
 
   // CR LF
-  AZ_RETURN_IF_FAILED(az_span_reader_expect_span(p_reader, AZ_STR(AZ_CRLF)));
+  AZ_RETURN_IF_FAILED(az_span_reader_expect_span(p_reader, AZ_SPAN_FROM_STR(AZ_CRLF)));
 
   // set state.kind of the next HTTP response value.
   AZ_RETURN_IF_FAILED(az_http_response_parser_set_kind(self));
@@ -133,7 +132,7 @@ AZ_NODISCARD az_result az_http_response_parser_read_status_line(
 }
 
 AZ_NODISCARD az_result
-az_http_response_parser_read_header(az_http_response_parser * const self, az_pair * const out) {
+az_http_response_parser_read_header(az_http_response_parser * self, az_pair * out) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
@@ -177,7 +176,8 @@ az_http_response_parser_read_header(az_http_response_parser * const self, az_pai
 
     // form a header name. In the current position, p_reader->i points on the next character after
     // `:` so we subtract 1.
-    out->key = az_span_sub(p_reader->span, field_name_begin, p_reader->i - 1);
+    AZ_RETURN_IF_FAILED(
+        az_span_slice(p_reader->span, field_name_begin, p_reader->i - 1, &out->key));
   }
 
   // OWS
@@ -215,7 +215,8 @@ az_http_response_parser_read_header(az_http_response_parser * const self, az_pai
       }
       field_value_end = p_reader->i;
     }
-    out->value = az_span_sub(p_reader->span, field_value_begin, field_value_end);
+    AZ_RETURN_IF_FAILED(
+        az_span_slice(p_reader->span, field_value_begin, field_value_end, &out->value));
   }
 
   AZ_RETURN_IF_FAILED(az_span_reader_expect_char(p_reader, AZ_LF));
@@ -226,7 +227,7 @@ az_http_response_parser_read_header(az_http_response_parser * const self, az_pai
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_http_response_parser_skip_headers(az_http_response_parser * const self) {
+AZ_NODISCARD az_result az_http_response_parser_skip_headers(az_http_response_parser * self) {
   while (true) {
     az_pair header = { 0 };
     az_result const result = az_http_response_parser_read_header(self, &header);
@@ -238,7 +239,7 @@ AZ_NODISCARD az_result az_http_response_parser_skip_headers(az_http_response_par
 }
 
 AZ_NODISCARD az_result
-az_http_response_parser_read_body(az_http_response_parser * const self, az_span * const out) {
+az_http_response_parser_read_body(az_http_response_parser * self, az_span * out) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
@@ -255,7 +256,7 @@ az_http_response_parser_read_body(az_http_response_parser * const self, az_span 
 // HTTP Response get functions
 
 AZ_NODISCARD az_result
-az_http_response_get_status_line(az_span const self, az_http_response_status_line * const out) {
+az_http_response_get_status_line(az_span self, az_http_response_status_line * out) {
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
   az_span_reader reader = az_span_reader_create(self);
@@ -272,18 +273,19 @@ AZ_NODISCARD az_result az_http_response_parser_init_from_header(
 
   az_span_reader * const p_reader = &out->reader;
   az_span const value = p_header->value;
-  if (value.size == 0 || value.begin == NULL) {
+  int32_t const value_length = az_span_length(value);
+  if (value_length == 0 || az_span_ptr(value) == NULL) {
     // read a status line and ignore it
     az_http_response_status_line status_line;
     AZ_RETURN_IF_FAILED(az_span_reader_get_http_status_line(p_reader, &status_line));
   } else {
     // change a reader position.
-    size_t const i = value.begin + value.size - p_reader->span.begin;
+    int32_t const i = az_span_ptr(value) + value_length - az_span_ptr(p_reader->span);
     AZ_RETURN_IF_FAILED(az_span_reader_set_pos(p_reader, i));
   }
 
   // read CRLF.
-  AZ_RETURN_IF_FAILED(az_span_reader_expect_span(p_reader, AZ_STR(AZ_CRLF)));
+  AZ_RETURN_IF_FAILED(az_span_reader_expect_span(p_reader, AZ_SPAN_FROM_STR(AZ_CRLF)));
 
   // set kind of the next HTTP response value.
   AZ_RETURN_IF_FAILED(az_http_response_parser_set_kind(out));
@@ -292,7 +294,7 @@ AZ_NODISCARD az_result az_http_response_parser_init_from_header(
 }
 
 AZ_NODISCARD az_result
-az_http_response_get_next_header(az_span const self, az_pair * const p_header) {
+az_http_response_get_next_header(az_span  self, az_pair *  p_header) {
   AZ_CONTRACT_ARG_NOT_NULL(p_header);
 
   az_http_response_parser parser;
@@ -302,7 +304,7 @@ az_http_response_get_next_header(az_span const self, az_pair * const p_header) {
 }
 
 AZ_NODISCARD az_result
-az_http_response_get_body(az_span const self, az_pair * const p_last_header, az_span * const body) {
+az_http_response_get_body(az_span  self, az_pair *  p_last_header, az_span *  body) {
   AZ_CONTRACT_ARG_NOT_NULL(p_last_header);
   AZ_CONTRACT_ARG_NOT_NULL(body);
 
@@ -318,9 +320,9 @@ az_http_response_get_body(az_span const self, az_pair * const p_last_header, az_
  * Returns an error if the header is not found.
  */
 AZ_NODISCARD az_result az_http_response_get_header_by_name(
-    az_span const self,
-    az_span const header_name,
-    az_span * const header_value) {
+    az_span  self,
+    az_span  header_name,
+    az_span *  header_value) {
   AZ_CONTRACT_ARG_NOT_NULL(header_value);
 
   az_http_response_parser parser;
@@ -335,7 +337,7 @@ AZ_NODISCARD az_result az_http_response_get_header_by_name(
     az_pair header;
     // Return if either there is no more items (AZ_ERROR_ITEM_NO_MORE_ITEMS) or an error.
     AZ_RETURN_IF_FAILED(az_http_response_parser_read_header(&parser, &header));
-    if (az_span_is_equal_ignoring_case(header_name, header.key)) {
+    if (az_span_is_content_equal_ignoring_case(header_name, header.key)) {
       *header_value = header.value;
       return AZ_OK;
     }

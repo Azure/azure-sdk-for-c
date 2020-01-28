@@ -21,8 +21,10 @@ typedef struct {
 /**
  * Creates a raw HTTP request.
  */
-AZ_NODISCARD az_result
-az_http_request_as_span_writer(az_http_request const * const self, az_span_action const write_span);
+AZ_NODISCARD az_result az_http_request_as_span_writer(
+    az_http_request self,
+    az_span_action write_span,
+    az_http_request * out);
 
 #include <_az_cfg_suffix.h>
 
