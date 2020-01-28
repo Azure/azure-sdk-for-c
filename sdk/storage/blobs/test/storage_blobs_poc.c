@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_http_response_parser.h>
+#include <az_http.h>
 #include <az_identity_client_secret_credential.h>
 #include <az_json_get.h>
 #include <az_storage_blobs.h>
@@ -29,17 +29,17 @@ AZ_NODISCARD az_result az_storage_blobs_blob_download(
     az_http_response * const response) {
 
   uint8_t request_buffer[1024 * 4] = { 0 };
-  az_mut_span request_buffer_span = AZ_SPAN_FROM_ARRAY(request_buffer);
+  az_span request_buffer_span = AZ_SPAN_FROM_BUFFER(request_buffer);
 
   // create request
   // TODO: define max URL size
   az_http_request_builder hrb;
   AZ_RETURN_IF_FAILED(az_http_request_builder_init(
-      &hrb, request_buffer_span, 1280, AZ_HTTP_METHOD_VERB_GET, client->uri, az_span_empty()));
+      &hrb, request_buffer_span, 1280, AZ_HTTP_METHOD_VERB_GET, client->uri, az_span_null()));
 
   // add version to request
   AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
-      &hrb, AZ_STR("x-ms-version"), AZ_STORAGE_BLOBS_BLOB_API_VERSION));
+      &hrb, AZ_SPAN_FROM_STR("x-ms-version"), AZ_STORAGE_BLOBS_BLOB_API_VERSION));
 
   // start pipeline
   return az_http_pipeline_process(&client->pipeline, &hrb, response);
@@ -50,16 +50,16 @@ AZ_NODISCARD az_result az_storage_blobs_blob_delete(
     az_http_response * const response) {
   // Request buffer
   uint8_t request_buffer[1024 * 4] = { 0 };
-  az_mut_span request_buffer_span = AZ_SPAN_FROM_ARRAY(request_buffer);
+  az_span request_buffer_span = AZ_SPAN_FROM_BUFFER(request_buffer);
 
   // create request
   az_http_request_builder hrb;
   AZ_RETURN_IF_FAILED(az_http_request_builder_init(
-      &hrb, request_buffer_span, 1280, AZ_HTTP_METHOD_VERB_DELETE, client->uri, az_span_empty()));
+      &hrb, request_buffer_span, 1280, AZ_HTTP_METHOD_VERB_DELETE, client->uri, az_span_null()));
 
   // add version to request
   AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
-      &hrb, AZ_STR("x-ms-version"), AZ_STORAGE_BLOBS_BLOB_API_VERSION));
+      &hrb, AZ_SPAN_FROM_STR("x-ms-version"), AZ_STORAGE_BLOBS_BLOB_API_VERSION));
 
   // start pipeline
   return az_http_pipeline_process(&client->pipeline, &hrb, response);
@@ -74,9 +74,9 @@ int main() {
   // init credential_credentials struc
   az_result const creds_retcode = az_identity_client_secret_credential_init(
       &credential,
-      az_str_to_span(getenv(TENANT_ID_ENV)),
-      az_str_to_span(getenv(CLIENT_ID_ENV)),
-      az_str_to_span(getenv(CLIENT_SECRET_ENV)));
+      az_span_from_str(getenv(TENANT_ID_ENV)),
+      az_span_from_str(getenv(CLIENT_ID_ENV)),
+      az_span_from_str(getenv(CLIENT_SECRET_ENV)));
 
   if (az_failed(creds_retcode)) {
     printf("Failed to init credential");
@@ -84,7 +84,7 @@ int main() {
 
   // Init client.
   az_result const operation_result = az_storage_blobs_blob_client_init(
-      &client, az_str_to_span(getenv(URI_ENV)), &credential, NULL);
+      &client, az_span_from_str(getenv(URI_ENV)), &credential, NULL);
 
   if (az_failed(operation_result)) {
     printf("Failed to init blob client");
@@ -93,15 +93,15 @@ int main() {
   /******* Create a buffer for response (will be reused for all requests)   *****/
   uint8_t response_buffer[1024 * 4] = { 0 };
   az_http_response http_response = { 0 };
-  az_result const init_http_response_result = az_http_response_init(
-      &http_response, az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(response_buffer)));
+  az_result const init_http_response_result
+      = az_http_response_init(&http_response, AZ_SPAN_FROM_BUFFER(response_buffer));
 
   if (az_failed(init_http_response_result)) {
     printf("Failed to init http response");
   }
 
   az_result const create_result = az_storage_blobs_blob_upload(
-      &client, AZ_STR("Some Test Content for the new blob"), NULL, &http_response);
+      &client, AZ_SPAN_FROM_STR("Some Test Content for the new blob"), NULL, &http_response);
 
   if (az_failed(create_result)) {
     printf("Failed to create blob");

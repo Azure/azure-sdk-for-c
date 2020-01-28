@@ -39,7 +39,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
 
   // Request buffer
   uint8_t request_buffer[1024 * 4] = { 0 };
-  az_mut_span request_buffer_span = AZ_SPAN_FROM_ARRAY(request_buffer);
+  az_span request_buffer_span = AZ_SPAN_FROM_BUFFER(request_buffer);
 
   /* ******** build url for request  ******/
 
@@ -58,11 +58,12 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
 
   // add date to request
   // AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
-  //    &hrb, AZ_HTTP_HEADER_X_MS_DATE, AZ_STR("Fri, 03 Jan 2020 21:33:15 GMT")));
+  //    &hrb, AZ_HTTP_HEADER_X_MS_DATE, AZ_SPAN_FROM_STR("Fri, 03 Jan 2020 21:33:15 GMT")));
 
   char str[256] = { 0 };
-  snprintf(str, sizeof str, "%zu", content.size);
-  az_span content_length = az_str_to_span(str);
+  // TODO: remove snprintf
+  snprintf(str, sizeof str, "%d", az_span_length(content));
+  az_span content_length = az_span_from_str(str);
 
   // add Content-Length to request
   AZ_RETURN_IF_FAILED(
@@ -70,7 +71,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
 
   // add blob type to request
   AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
-      &hrb, AZ_HTTP_HEADER_CONTENT_TYPE, AZ_STR("text/plain")));
+      &hrb, AZ_HTTP_HEADER_CONTENT_TYPE, AZ_SPAN_FROM_STR("text/plain")));
 
   // start pipeline
   return az_http_pipeline_process(&client->pipeline, &hrb, response);

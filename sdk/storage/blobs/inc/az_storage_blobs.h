@@ -4,26 +4,25 @@
 #ifndef _az_STORAGE_BLOBS_H
 #define _az_STORAGE_BLOBS_H
 
-#include <az_http_pipeline.h>
-#include <az_http_policy.h>
-#include <az_http_response.h>
-#include <az_contract.h>
+#include <az_contract_internal.h>
+#include <az_http.h>
+#include <az_http_pipeline_internal.h>
 #include <az_identity_access_token.h>
 #include <az_identity_access_token_context.h>
 #include <az_result.h>
 #include <az_span.h>
-#include <az_str.h>
 
 #include <stddef.h>
 
 #include <_az_cfg_prefix.h>
 
-static az_span const AZ_STORAGE_BLOBS_BLOB_API_VERSION = AZ_CONST_STR("2019-02-02");
+static az_span const AZ_STORAGE_BLOBS_BLOB_API_VERSION = AZ_SPAN_LITERAL_FROM_STR("2019-02-02");
 
-static az_span const AZ_STORAGE_BLOBS_BLOB_HEADER_X_MS_BLOB_TYPE = AZ_CONST_STR("x-ms-blob-type");
-static az_span const AZ_STORAGE_BLOBS_BLOB_TYPE_APPENDBLOB = AZ_CONST_STR("AppendBlob");
-static az_span const AZ_STORAGE_BLOBS_BLOB_TYPE_BLOCKBLOB = AZ_CONST_STR("BlockBlob");
-static az_span const AZ_STORAGE_BLOBS_BLOB_TYPE_PAGEBLOB = AZ_CONST_STR("PageBlob");
+static az_span const AZ_STORAGE_BLOBS_BLOB_HEADER_X_MS_BLOB_TYPE
+    = AZ_SPAN_LITERAL_FROM_STR("x-ms-blob-type");
+static az_span const AZ_STORAGE_BLOBS_BLOB_TYPE_APPENDBLOB = AZ_SPAN_LITERAL_FROM_STR("AppendBlob");
+static az_span const AZ_STORAGE_BLOBS_BLOB_TYPE_BLOCKBLOB = AZ_SPAN_LITERAL_FROM_STR("BlockBlob");
+static az_span const AZ_STORAGE_BLOBS_BLOB_TYPE_PAGEBLOB = AZ_SPAN_LITERAL_FROM_STR("PageBlob");
 
 typedef struct {
   az_http_policy_retry_options retry;
@@ -83,18 +82,18 @@ AZ_NODISCARD AZ_INLINE az_result az_storage_blobs_blob_client_init(
       &(client->_token_context),
       credential,
       &(client->_token),
-      AZ_STR("https://storage.azure.com/.default")));
+      AZ_SPAN_FROM_STR("https://storage.azure.com/.default")));
 
   client->pipeline = (az_http_pipeline){
     .policies = {
-      { .pfnc_process = az_http_pipeline_policy_uniquerequestid, .data = NULL },
-      { .pfnc_process = az_http_pipeline_policy_retry, .data = &client->client_options.retry },
-      { .pfnc_process = az_http_pipeline_policy_authentication, .data = &(client->_token_context) },
-      { .pfnc_process = az_http_pipeline_policy_logging, .data = NULL },
-      { .pfnc_process = az_http_pipeline_policy_bufferresponse, .data = NULL },
-      { .pfnc_process = az_http_pipeline_policy_distributedtracing, .data = NULL },
-      { .pfnc_process = az_http_pipeline_policy_transport, .data = NULL },
-      { .pfnc_process = NULL, .data = NULL },
+      { .process = az_http_pipeline_policy_uniquerequestid, .data = NULL },
+      { .process = az_http_pipeline_policy_retry, .data = &client->client_options.retry },
+      { .process = az_http_pipeline_policy_authentication, .data = &(client->_token_context) },
+      { .process = az_http_pipeline_policy_logging, .data = NULL },
+      { .process = az_http_pipeline_policy_bufferresponse, .data = NULL },
+      { .process = az_http_pipeline_policy_distributedtracing, .data = NULL },
+      { .process = az_http_pipeline_policy_transport, .data = NULL },
+      { .process = NULL, .data = NULL },
     }, 
     };
 
