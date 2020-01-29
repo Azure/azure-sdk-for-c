@@ -20,7 +20,7 @@ AZ_NODISCARD az_result az_span_slice(
     int32_t high_index,
     az_span * out_sub_span) {
   // left part
-  az_span left;
+  az_span left = { 0 };
   if (high_index > 0) {
     left = az_span_take(span, high_index);
   }

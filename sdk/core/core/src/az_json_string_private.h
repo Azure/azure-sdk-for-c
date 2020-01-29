@@ -24,6 +24,20 @@ AZ_NODISCARD az_span az_json_esc_encode(az_result_byte c);
  */
 AZ_NODISCARD az_result az_span_reader_read_json_string_char(az_span_reader * self, uint32_t * out);
 
+/**
+ * Returns a next reference token in the JSON pointer. The JSON pointer parser is @var
+ * az_span_reader.
+ *
+ * See https://tools.ietf.org/html/rfc6901
+ */
+AZ_NODISCARD az_result az_span_reader_read_json_pointer_token(az_span_reader * self, az_span * out);
+
+/**
+ * Returns a next character in the given span reader of JSON pointer reference token.
+ */
+AZ_NODISCARD az_result
+az_span_reader_read_json_pointer_token_char(az_span_reader * self, uint32_t * out);
+
 #include <_az_cfg_suffix.h>
 
 #endif

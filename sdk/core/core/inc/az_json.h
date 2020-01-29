@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef _az_JSON_BUILDER_H
-#define _az_JSON_BUILDER_H
+#ifndef _az_JSON_H
+#define _az_JSON_H
 
 #include <az_result.h>
 #include <az_span.h>
@@ -127,73 +127,45 @@ az_json_builder_append_array_item(az_json_builder * self, az_json_token token);
 
 AZ_NODISCARD az_result az_json_builder_append_array_close(az_json_builder * self);
 
-/************************************ JSON POINTER ******************/
-
-/**
- * Returns a next reference token in the JSON pointer. The JSON pointer parser is @var
- * az_span_reader.
- *
- * See https://tools.ietf.org/html/rfc6901
- */
-AZ_NODISCARD az_result
-az_span_reader_read_json_pointer_token(az_span_reader * const self, az_span * const out);
-
-/**
- * Returns a next character in the given span reader of JSON pointer reference token.
- */
-AZ_NODISCARD az_result
-az_span_reader_read_json_pointer_token_char(az_span_reader * const self, uint32_t * const out);
-
-/************************************ JSON GET ******************/
-
-AZ_NODISCARD az_result
-az_json_get_object_member(az_span const json, az_span const name, az_json_token * const out_token);
-
-/**
- * Get JSON value by JSON pointer https://tools.ietf.org/html/rfc6901.
- */
-AZ_NODISCARD az_result
-az_json_get_by_pointer(az_span const json, az_span const pointer, az_json_token * const out_token);
-
 /************************************ JSON PARSER ******************/
 
-enum { AZ_JSON_STACK_SIZE = 63 };
-
 typedef uint64_t az_json_stack;
+typedef struct {
+  struct {
+    az_span_reader reader;
+    az_json_stack stack;
+  } _internal;
+} az_json_parser;
 
 typedef struct {
   az_span name;
   az_json_token token;
 } az_json_token_member;
 
-typedef enum {
-  AZ_JSON_STACK_OBJECT = 0,
-  AZ_JSON_STACK_ARRAY = 1,
-} az_json_stack_item;
+AZ_NODISCARD az_result az_json_parser_init(az_json_parser * self, az_span json_buffer);
 
-typedef struct {
-  az_span_reader reader;
-  az_json_stack stack;
-} az_json_parser;
-
-AZ_NODISCARD az_json_parser az_json_parser_create(az_span const buffer);
+AZ_NODISCARD az_result az_json_parser_parse_token(az_json_parser * self, az_json_token * out_token);
 
 AZ_NODISCARD az_result
-az_json_parser_read(az_json_parser * const self, az_json_token * const out_token);
-
-AZ_NODISCARD az_result az_json_parser_read_object_member(
-    az_json_parser * const self,
-    az_json_token_member * const out_token);
+az_json_parser_parse_token_member(az_json_parser * self, az_json_token_member * out_token_member);
 
 AZ_NODISCARD az_result
-az_json_parser_read_array_element(az_json_parser * const self, az_json_token * const out_token);
+az_json_parser_parse_array_item(az_json_parser * self, az_json_token * out_token);
 
-AZ_NODISCARD az_result az_json_parser_done(az_json_parser const * const self);
+AZ_NODISCARD az_result az_json_parser_done(az_json_parser * self);
 
 /**
  * Read all nested values and ignore them.
  */
-AZ_NODISCARD az_result az_json_parser_skip(az_json_parser * const self, az_json_token const token);
+AZ_NODISCARD az_result az_json_parser_skip_children(az_json_parser * self, az_json_token token);
+
+/************************************ JSON POINTER ******************/
+
+/**
+ * Get JSON value by JSON pointer https://tools.ietf.org/html/rfc6901.
+ */
+AZ_NODISCARD az_result
+az_json_parse_by_pointer(az_span json, az_span pointer, az_json_token * out_token);
 
 #include <_az_cfg_suffix.h>
 
