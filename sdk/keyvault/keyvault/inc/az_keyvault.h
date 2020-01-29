@@ -4,14 +4,14 @@
 #ifndef _az_KEYVAULT_H
 #define _az_KEYVAULT_H
 
-#include <az_http_pipeline.h>
-#include <az_http_response.h>
 #include <az_contract.h>
+#include <az_http_pipeline.h>
+#include <az_http_policy_retry_options.h>
+#include <az_http_response.h>
 #include <az_identity_access_token.h>
 #include <az_identity_access_token_context.h>
 #include <az_keyvault_create_key_options.h>
 #include <az_result.h>
-#include <az_http_policy_retry_options.h>
 #include <az_span.h>
 #include <az_str.h>
 

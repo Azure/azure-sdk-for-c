@@ -179,8 +179,7 @@ static az_result _az_log_http_response_msg(
 static az_result _az_log_http_retry_msg(
     az_span_builder * const log_msg_bldr,
     int16_t const attempt,
-    int32_t const delay_msec)
-{
+    int32_t const delay_msec) {
   AZ_RETURN_IF_FAILED(az_span_builder_append(log_msg_bldr, AZ_STR("HTTP Retry attempt")));
 
   if (attempt >= 0) {

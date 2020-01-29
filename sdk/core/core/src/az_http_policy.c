@@ -6,13 +6,13 @@
 #include <az_http_client_internal.h>
 #include <az_http_pipeline.h>
 #include <az_http_policy.h>
+#include <az_http_policy_retry_options.h>
 #include <az_http_request_builder.h>
 #include <az_http_response_parser.h>
 #include <az_log.h>
 #include <az_log_internal.h>
 #include <az_mut_span.h>
 #include <az_pal.h>
-#include <az_http_policy_retry_options.h>
 #include <az_span.h>
 #include <az_span_builder.h>
 #include <az_str.h>
@@ -88,6 +88,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
       ? retry_policy->max_retry_delay_msec
       : _az_HTTP_POLICY_RETRY_OPTIONS_DEFAULT_MAX_RETRY_DELAY_MSEC;
 
+  bool const should_log = az_log_should_write(AZ_LOG_HTTP_RETRY);
   az_result result = AZ_OK;
   int16_t attempt = 1;
   while (true) {
@@ -160,7 +161,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
                                                                         : retry_after_msec;
     }
 
-    if (az_log_should_write(AZ_LOG_HTTP_RETRY)) {
+    if (should_log) {
       _az_log_http_retry(attempt, retry_after_msec);
     }
 
