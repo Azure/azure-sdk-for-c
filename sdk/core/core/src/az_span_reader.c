@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "az_span_reader_private.h"
+#include <az_contract_internal.h>
 #include <az_span_reader.h>
 
 #include <ctype.h>
@@ -38,5 +39,12 @@ az_span_reader_expect_digit(az_span_reader * const self, uint8_t * const digit) 
   }
   *digit = (uint8_t)(c - '0');
   az_span_reader_next(self);
+  return AZ_OK;
+}
+
+AZ_NODISCARD az_result az_span_reader_set_pos(az_span_reader * p_reader, int32_t i) {
+  AZ_CONTRACT(i <= az_span_length(p_reader->span), AZ_ERROR_ARG);
+
+  p_reader->i = i;
   return AZ_OK;
 }

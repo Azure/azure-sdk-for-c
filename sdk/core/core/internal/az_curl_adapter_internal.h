@@ -4,8 +4,10 @@
 #ifndef _az_CURL_ADAPTER_INTERNAL_H
 #define _az_CURL_ADAPTER_INTERNAL_H
 
+#include <az_contract_internal.h>
 #include <az_http.h>
 #include <az_result.h>
+#include <az_span.h>
 
 #include <curl/curl.h>
 #include <stdbool.h>

@@ -4,7 +4,6 @@
 #ifndef _az_STR_PRIVATE_H
 #define _az_STR_PRIVATE_H
 
-
 #include <az_span.h>
 
 #include <stdint.h>

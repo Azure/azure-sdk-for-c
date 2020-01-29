@@ -3,7 +3,7 @@
 
 #include <az_http.h>
 #include <az_http_pipeline_internal.h>
-#include <az_json_builder.h>
+#include <az_json.h>
 #include <az_keyvault.h>
 
 #include <az_span_internal.h>
@@ -61,9 +61,9 @@ AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
 
   AZ_RETURN_IF_FAILED(az_json_builder_init(&builder, http_body));
 
-  AZ_RETURN_IF_FAILED(az_json_builder_write(&builder, az_json_token_object()));
+  AZ_RETURN_IF_FAILED(az_json_builder_append_token(&builder, az_json_token_object()));
   // Required fields
-  AZ_RETURN_IF_FAILED(az_json_builder_write_object_member(
+  AZ_RETURN_IF_FAILED(az_json_builder_append_object(
       &builder, AZ_SPAN_FROM_STR("kty"), az_json_token_string(json_web_key_type)));
 
   /**************** Non-Required fields ************/
@@ -72,43 +72,43 @@ AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
     {
       az_optional_bool const enabled_field = options->enabled;
       if (enabled_field.is_present) {
-        AZ_RETURN_IF_FAILED(az_json_builder_write_object_member(
+        AZ_RETURN_IF_FAILED(az_json_builder_append_object(
             &builder, AZ_SPAN_FROM_STR("attributes"), az_json_token_object()));
-        AZ_RETURN_IF_FAILED(az_json_builder_write_object_member(
+        AZ_RETURN_IF_FAILED(az_json_builder_append_object(
             &builder, AZ_SPAN_FROM_STR("enabled"), az_json_token_boolean(enabled_field.data)));
-        AZ_RETURN_IF_FAILED(az_json_builder_write_object_close(&builder));
+        AZ_RETURN_IF_FAILED(az_json_builder_append_object_close(&builder));
       }
       // operations
       if (options->operations != NULL) {
-        AZ_RETURN_IF_FAILED(az_json_builder_write_object_member(
+        AZ_RETURN_IF_FAILED(az_json_builder_append_object(
             &builder, AZ_SPAN_FROM_STR("key_ops"), az_json_token_array()));
         for (size_t op = 0; true; ++op) {
           az_span s = options->operations[op];
           if (az_span_is_equal(s, az_span_null())) {
             break;
           }
-          AZ_RETURN_IF_FAILED(az_json_builder_write_array_item(&builder, az_json_token_string(s)));
+          AZ_RETURN_IF_FAILED(az_json_builder_append_array_item(&builder, az_json_token_string(s)));
         }
-        AZ_RETURN_IF_FAILED(az_json_builder_write_array_close(&builder));
+        AZ_RETURN_IF_FAILED(az_json_builder_append_array_close(&builder));
       }
       // tags
       if (options->tags != NULL) {
-        AZ_RETURN_IF_FAILED(az_json_builder_write_object_member(
+        AZ_RETURN_IF_FAILED(az_json_builder_append_object(
             &builder, AZ_SPAN_FROM_STR("tags"), az_json_token_object()));
         for (size_t tag_index = 0; true; ++tag_index) {
           az_pair const tag = options->tags[tag_index];
           if (az_span_is_equal(tag.key, az_span_null())) {
             break;
           }
-          AZ_RETURN_IF_FAILED(az_json_builder_write_object_member(
-              &builder, tag.key, az_json_token_string(tag.value)));
+          AZ_RETURN_IF_FAILED(
+              az_json_builder_append_object(&builder, tag.key, az_json_token_string(tag.value)));
         }
-        AZ_RETURN_IF_FAILED(az_json_builder_write_object_close(&builder));
+        AZ_RETURN_IF_FAILED(az_json_builder_append_object_close(&builder));
       }
     }
   }
 
-  AZ_RETURN_IF_FAILED(az_json_builder_write_object_close(&builder));
+  AZ_RETURN_IF_FAILED(az_json_builder_append_object_close(&builder));
 
   return AZ_OK;
 }

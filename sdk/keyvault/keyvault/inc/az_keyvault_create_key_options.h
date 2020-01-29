@@ -5,7 +5,7 @@
 #define _az_KEYVAULT_CREATE_KEY_OPTIONS_H
 
 #include <az_optional_types.h>
-#include <az_pair.h>
+
 #include <az_result.h>
 #include <az_span.h>
 

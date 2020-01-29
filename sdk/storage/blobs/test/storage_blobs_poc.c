@@ -3,7 +3,7 @@
 
 #include <az_http.h>
 #include <az_identity_client_secret_credential.h>
-#include <az_json_get.h>
+#include <az_json.h>
 #include <az_storage_blobs.h>
 
 #include <stdlib.h>

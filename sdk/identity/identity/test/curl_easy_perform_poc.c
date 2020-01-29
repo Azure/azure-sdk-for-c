@@ -5,7 +5,7 @@
 #include <az_http_pipeline_internal.h>
 #include <az_identity_access_token_context.h>
 #include <az_identity_client_secret_credential.h>
-#include <az_pair.h>
+
 #include <az_span.h>
 
 #include <az_span_malloc_internal.h>
