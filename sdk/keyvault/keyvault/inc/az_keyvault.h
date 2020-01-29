@@ -18,8 +18,9 @@
 
 #include <_az_cfg_prefix.h>
 
+static az_span const AZ_KEYVAULT_API_VERSION = AZ_CONST_STR("7.0");
+
 typedef struct {
-  az_span service_version;
   az_http_policy_retry_options retry;
 } az_keyvault_keys_client_options;
 
