@@ -112,12 +112,12 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
 
       switch (status_line.status_code) {
         // Keep retrying on the HTTP response codes below, return immediately otherwise.
-        case 408:
-        case 429:
-        case 500:
-        case 502:
-        case 503:
-        case 504: {
+        case AZ_HTTP_STATUS_CODE_REQUEST_TIMEOUT:
+        case AZ_HTTP_STATUS_CODE_TOO_MANY_REQUESTS:
+        case AZ_HTTP_STATUS_CODE_INTERNAL_SERVER_ERROR:
+        case AZ_HTTP_STATUS_CODE_BAD_GATEWAY:
+        case AZ_HTTP_STATUS_CODE_SERVICE_UNAVAILABLE:
+        case AZ_HTTP_STATUS_CODE_GATEWAY_TIMEOUT: {
           // Try to get the value of retry-after header, if there's one.
           az_pair header = { 0 };
           while (az_http_response_parser_read_header(&response_parser, &header) == AZ_OK) {
@@ -165,7 +165,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
       _az_log_http_retry(attempt, retry_after_msec);
     }
 
-    az_pal_wait(retry_after_msec);
+    az_pal_sleep(retry_after_msec);
   }
 
   return result;

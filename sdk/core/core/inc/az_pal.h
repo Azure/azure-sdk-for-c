@@ -8,7 +8,7 @@
 
 #include <_az_cfg_prefix.h>
 
-void az_pal_wait(int32_t milliseconds);
+void az_pal_sleep(int32_t milliseconds);
 
 #include <_az_cfg_suffix.h>
 
