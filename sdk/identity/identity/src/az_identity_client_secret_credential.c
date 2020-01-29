@@ -6,6 +6,7 @@
 #include <az_clock_internal.h>
 #include <az_contract.h>
 #include <az_http_pipeline.h>
+#include <az_http_policy_retry_options.h>
 #include <az_http_request_builder.h>
 #include <az_http_response_parser.h>
 #include <az_identity_access_token_context.h>
@@ -85,10 +86,16 @@ _az_identity_client_secret_credential_ms_oauth2_send_get_token_request(
   AZ_RETURN_IF_FAILED(az_http_request_builder_init(
       &hrb, hrb_buf, (uint16_t)auth_url.size, AZ_HTTP_METHOD_VERB_POST, auth_url, auth_body));
 
+  static az_http_policy_retry_options default_retry_policy = {
+    .max_tries = 7,
+    .retry_delay_msec = 1000,
+    .max_retry_delay_msec = 60 * 1000,
+  };
+
   static az_http_pipeline pipeline = {
       .policies = {
         { .pfnc_process = az_http_pipeline_policy_uniquerequestid, .data = NULL },
-        { .pfnc_process = az_http_pipeline_policy_retry, .data = NULL },
+        { .pfnc_process = az_http_pipeline_policy_retry, .data = &default_retry_policy },
         { .pfnc_process = _az_http_pipeline_no_op, .data = NULL },
         { .pfnc_process = az_http_pipeline_policy_logging, .data = NULL },
         { .pfnc_process = az_http_pipeline_policy_bufferresponse, .data = NULL },

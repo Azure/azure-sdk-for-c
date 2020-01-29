@@ -33,8 +33,9 @@ AZ_NODISCARD AZ_INLINE az_span az_keyvault_client_constant_for_application_json(
 az_keyvault_keys_client_options const AZ_KEYVAULT_CLIENT_DEFAULT_OPTIONS
     = { .service_version = AZ_CONST_STR("7.0"),
         .retry = {
-            .max_retry = 3,
-            .delay_in_ms = 30,
+            .max_tries = 3,
+            .retry_delay_msec = 1000,
+            .max_retry_delay_msec = 30 * 1000,
         } };
 
 /**

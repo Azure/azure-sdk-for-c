@@ -12,7 +12,7 @@
 #include <az_log_internal.h>
 #include <az_mut_span.h>
 #include <az_pal.h>
-#include <az_retry_policy_internal.h>
+#include <az_http_policy_retry_options.h>
 #include <az_span.h>
 #include <az_span_builder.h>
 #include <az_str.h>
@@ -71,7 +71,9 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
     return az_http_pipeline_nextpolicy(p_policies, hrb, response);
   }
 
-  az_retry_policy const * const retry_policy = (az_retry_policy const *)data;
+  az_http_policy_retry_options const * const retry_policy
+      = (az_http_policy_retry_options const *)data;
+
   int16_t const max_tries = retry_policy->max_tries;
 
   bool const custom_retry_delay_limits = retry_policy->retry_delay_msec > 0
@@ -80,11 +82,11 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
 
   int32_t const retry_delay_msec = custom_retry_delay_limits
       ? retry_policy->retry_delay_msec
-      : _az_RETRY_POLICY_DEFAULT_RETRY_DELAY_MSEC;
+      : _az_HTTP_POLICY_RETRY_OPTIONS_DEFAULT_RETRY_DELAY_MSEC;
 
   int32_t const max_retry_delay_msec = custom_retry_delay_limits
       ? retry_policy->max_retry_delay_msec
-      : _az_RETRY_POLICY_DEFAULT_MAX_RETRY_DELAY_MSEC;
+      : _az_HTTP_POLICY_RETRY_OPTIONS_DEFAULT_MAX_RETRY_DELAY_MSEC;
 
   az_result result = AZ_OK;
   int16_t attempt = 1;

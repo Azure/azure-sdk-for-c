@@ -26,8 +26,9 @@ enum {
 
 az_storage_blobs_blob_client_options const AZ_STORAGE_BLOBS_BLOB_CLIENT_DEFAULT_OPTIONS
     = { .retry = {
-            .max_retry = 5,
-            .delay_in_ms = 1000,
+            .max_tries = 5,
+            .retry_delay_msec = 1000,
+            .max_retry_delay_msec = 30 * 1000,
         } };
 
 AZ_NODISCARD az_result az_storage_blobs_blob_upload(

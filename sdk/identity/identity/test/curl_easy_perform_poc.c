@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include <az_http_pipeline.h>
+#include <az_http_policy_retry_options.h>
 #include <az_http_request_builder.h>
 #include <az_http_response_parser.h>
 #include <az_identity_access_token_context.h>
@@ -42,8 +43,7 @@ int main() {
       http_buf,
       100,
       AZ_HTTP_METHOD_VERB_GET,
-      //az_str_to_span(getenv(URI_ENV)),
-      AZ_STR("https://site.web"),
+       az_str_to_span(getenv(URI_ENV)),
       az_span_empty());
 
   if (az_failed(build_result)) {
@@ -90,10 +90,11 @@ int main() {
     return token_context_retcode;
   }
 
+  az_http_policy_retry_options retry_options = az_http_policy_retry_options_create();
   az_http_pipeline pipeline = (az_http_pipeline){
       .policies = {
         { .pfnc_process = az_http_pipeline_policy_uniquerequestid, .data = NULL },
-        { .pfnc_process = az_http_pipeline_policy_retry, .data = NULL },
+        { .pfnc_process = az_http_pipeline_policy_retry, .data = &retry_options },
         { .pfnc_process = az_http_pipeline_policy_authentication, .data = &access_token_context },
         { .pfnc_process = az_http_pipeline_policy_logging, .data = NULL },
         { .pfnc_process = az_http_pipeline_policy_bufferresponse, .data = NULL },

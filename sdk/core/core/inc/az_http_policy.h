@@ -28,17 +28,6 @@
 
 typedef struct az_http_policy az_http_policy;
 
-/**
- * @brief options for retry policy
- * max_retry = maximun number of retry intents before returning error
- * delay_in_ms = waiting time before retrying in miliseconds
- *
- */
-typedef struct {
-  uint16_t max_retry;
-  uint16_t delay_in_ms;
-} az_http_policy_retry_options;
-
 // PipelinePolicies must implement the process function
 //
 typedef AZ_NODISCARD az_result (*az_http_policy_pfnc_process)(
