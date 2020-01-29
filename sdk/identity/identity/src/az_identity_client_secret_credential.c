@@ -8,7 +8,7 @@
 #include <az_http_pipeline_internal.h>
 #include <az_identity_access_token_context.h>
 #include <az_identity_credential.h>
-#include <az_json_get.h>
+#include <az_json.h>
 #include <az_span_internal.h>
 
 #include <az_uri_internal.h>

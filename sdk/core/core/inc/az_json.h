@@ -22,7 +22,7 @@ typedef enum {
   AZ_JSON_TOKEN_OBJECT = 4,
   AZ_JSON_TOKEN_ARRAY = 5,
   // A special case for non-JSON strings. This field is used to serialize `az_span` into JSON
-  // string. Currently, our JSON parser doesn't return this kind of values.
+  // string. Currently, our JSON parser doesn't return this kind of value.
   AZ_JSON_TOKEN_SPAN = 6,
 } az_json_token_kind;
 
@@ -30,50 +30,50 @@ typedef struct {
   az_json_token_kind kind;
   union {
     bool boolean;
-    az_span string;
     double number;
+    az_span string;
     az_span span;
-  } data;
+  } value;
 } az_json_token;
 
 AZ_NODISCARD AZ_INLINE az_json_token az_json_token_null() {
-  return (az_json_token){ .kind = AZ_JSON_TOKEN_NULL };
+  return (az_json_token){ .kind = AZ_JSON_TOKEN_NULL, .value = { 0 } };
 }
 
-AZ_NODISCARD AZ_INLINE az_json_token az_json_token_boolean(bool const value) {
+AZ_NODISCARD AZ_INLINE az_json_token az_json_token_boolean(bool value) {
   return (az_json_token){
     .kind = AZ_JSON_TOKEN_BOOLEAN,
-    .data.boolean = value,
+    .value.boolean = value,
   };
 }
 
-AZ_NODISCARD AZ_INLINE az_json_token az_json_token_string(az_span const value) {
-  return (az_json_token){
-    .kind = AZ_JSON_TOKEN_STRING,
-    .data.string = value,
-  };
-}
-
-AZ_NODISCARD AZ_INLINE az_json_token az_json_token_number(double const value) {
+AZ_NODISCARD AZ_INLINE az_json_token az_json_token_number(double value) {
   return (az_json_token){
     .kind = AZ_JSON_TOKEN_NUMBER,
-    .data.number = value,
+    .value.number = value,
+  };
+}
+
+AZ_NODISCARD AZ_INLINE az_json_token az_json_token_string(az_span value) {
+  return (az_json_token){
+    .kind = AZ_JSON_TOKEN_STRING,
+    .value.string = value,
+  };
+}
+
+AZ_NODISCARD AZ_INLINE az_json_token az_json_token_span(az_span span) {
+  return (az_json_token){
+    .kind = AZ_JSON_TOKEN_SPAN,
+    .value.span = span,
   };
 }
 
 AZ_NODISCARD AZ_INLINE az_json_token az_json_token_object() {
-  return (az_json_token){ .kind = AZ_JSON_TOKEN_OBJECT };
+  return (az_json_token){ .kind = AZ_JSON_TOKEN_OBJECT, .value = { 0 } };
 }
 
 AZ_NODISCARD AZ_INLINE az_json_token az_json_token_array() {
-  return (az_json_token){ .kind = AZ_JSON_TOKEN_ARRAY };
-}
-
-AZ_NODISCARD AZ_INLINE az_json_token az_json_token_span(az_span const span) {
-  return (az_json_token){
-    .kind = AZ_JSON_TOKEN_SPAN,
-    .data.span = span,
-  };
+  return (az_json_token){ .kind = AZ_JSON_TOKEN_ARRAY, .value = { 0 } };
 }
 
 /**
@@ -81,28 +81,23 @@ AZ_NODISCARD AZ_INLINE az_json_token az_json_token_span(az_span const span) {
  *
  * If the JSON value is not a boolean then the function returns an error.
  */
-AZ_NODISCARD az_result az_json_token_get_boolean(az_json_token const self, bool * const out);
-
-/**
- * Copies a string span to @var out from the given JSON value.
- *
- * If the JSON value is not a string then the function returns an error.
- */
-AZ_NODISCARD az_result az_json_token_get_string(az_json_token const self, az_span * const out);
+AZ_NODISCARD az_result az_json_token_get_boolean(az_json_token self, bool * out);
 
 /**
  * Copies a number to @var out from the given JSON value.
  *
  * If the JSON value is not a number then the function returns an error.
  */
-AZ_NODISCARD az_result az_json_token_get_number(az_json_token const self, double * const out);
+AZ_NODISCARD az_result az_json_token_get_number(az_json_token self, double * out);
+
+/**
+ * Copies a string span to @var out from the given JSON value.
+ *
+ * If the JSON value is not a string then the function returns an error.
+ */
+AZ_NODISCARD az_result az_json_token_get_string(az_json_token self, az_span * out);
 
 /************************************ JSON BUILDER ******************/
-
-typedef struct {
-  az_span name;
-  az_json_token value;
-} az_json_token_member;
 
 typedef struct {
   struct {
@@ -120,24 +115,17 @@ AZ_NODISCARD AZ_INLINE az_span az_json_builder_span_get(az_json_builder self) {
   return self._internal.json;
 }
 
-AZ_NODISCARD az_result az_json_builder_write(az_json_builder * self, az_json_token token);
+AZ_NODISCARD az_result az_json_builder_append_token(az_json_builder * self, az_json_token token);
 
 AZ_NODISCARD az_result
-az_json_builder_write_object_member(az_json_builder * self, az_span name, az_json_token value);
+az_json_builder_append_object(az_json_builder * self, az_span name, az_json_token token);
 
-AZ_NODISCARD az_result az_json_builder_write_object_close(az_json_builder * self);
+AZ_NODISCARD az_result az_json_builder_append_object_close(az_json_builder * self);
 
 AZ_NODISCARD az_result
-az_json_builder_write_array_item(az_json_builder * self, az_json_token value);
+az_json_builder_append_array_item(az_json_builder * self, az_json_token token);
 
-AZ_NODISCARD az_result az_json_builder_write_array_close(az_json_builder * self);
-
-/**
- * TODO: this function and JSON pointer read functions should return proper UNICODE
- *       code-point to be compatible.
- */
-AZ_NODISCARD az_result
-az_span_reader_read_json_string_char(az_span_reader * const self, uint32_t * const out);
+AZ_NODISCARD az_result az_json_builder_append_array_close(az_json_builder * self);
 
 /************************************ JSON POINTER ******************/
 
@@ -172,6 +160,11 @@ az_json_get_by_pointer(az_span const json, az_span const pointer, az_json_token 
 enum { AZ_JSON_STACK_SIZE = 63 };
 
 typedef uint64_t az_json_stack;
+
+typedef struct {
+  az_span name;
+  az_json_token token;
+} az_json_token_member;
 
 typedef enum {
   AZ_JSON_STACK_OBJECT = 0,

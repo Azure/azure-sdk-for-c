@@ -1,10 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_json_get.h>
-#include <az_json_parser.h>
-#include <az_json_pointer.h>
-#include <az_json_string.h>
+#include "az_json_string_private.h"
+#include <az_json.h>
 #include <az_span_internal.h>
 
 #include <_az_cfg.h>
@@ -32,8 +30,8 @@ AZ_NODISCARD bool az_json_pointer_token_eq_json_string(
 }
 
 AZ_NODISCARD az_result
-az_json_get_object_member(az_span const json, az_span const name, az_json_token * const out_value) {
-  AZ_CONTRACT_ARG_NOT_NULL(out_value);
+az_json_get_object_member(az_span const json, az_span const name, az_json_token * const out_token) {
+  AZ_CONTRACT_ARG_NOT_NULL(out_token);
   AZ_CONTRACT_ARG_VALID_SPAN(json);
   AZ_CONTRACT_ARG_VALID_SPAN(name);
 
@@ -43,12 +41,12 @@ az_json_get_object_member(az_span const json, az_span const name, az_json_token 
 
   if (value.kind == AZ_JSON_TOKEN_OBJECT) {
     while (true) {
-      az_json_token_member member = { 0 };
-      AZ_RETURN_IF_FAILED(az_json_parser_read_object_member(&parser, &member));
+      az_json_token_member member_token = { 0 };
+      AZ_RETURN_IF_FAILED(az_json_parser_read_object_member(&parser, &member_token));
       // TODO: we should either replace `az_span_is_equal` with something else or
       //       remove `az_json_get_object_member` completely.
-      if (az_span_is_equal(member.name, name)) {
-        *out_value = member.value;
+      if (az_span_is_equal(member_token.name, name)) {
+        *out_token = member_token.token;
         return AZ_OK;
       }
     }
@@ -60,32 +58,32 @@ az_json_get_object_member(az_span const json, az_span const name, az_json_token 
 AZ_NODISCARD az_result az_json_parser_get_by_pointer_token(
     az_json_parser * const self,
     az_span const pointer_token,
-    az_json_token * const p_value) {
+    az_json_token * const out_token) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
-  AZ_CONTRACT_ARG_NOT_NULL(p_value);
+  AZ_CONTRACT_ARG_NOT_NULL(out_token);
 
-  switch (p_value->kind) {
+  switch (out_token->kind) {
     case AZ_JSON_TOKEN_ARRAY: {
       uint64_t i = { 0 };
       AZ_RETURN_IF_FAILED(az_span_to_uint64(pointer_token, &i));
       while (true) {
-        AZ_RETURN_IF_FAILED(az_json_parser_read_array_element(self, p_value));
+        AZ_RETURN_IF_FAILED(az_json_parser_read_array_element(self, out_token));
         if (i == 0) {
           return AZ_OK;
         }
         --i;
-        AZ_RETURN_IF_FAILED(az_json_parser_skip(self, *p_value));
+        AZ_RETURN_IF_FAILED(az_json_parser_skip(self, *out_token));
       }
     }
     case AZ_JSON_TOKEN_OBJECT: {
       while (true) {
-        az_json_token_member member = { 0 };
-        AZ_RETURN_IF_FAILED(az_json_parser_read_object_member(self, &member));
-        if (az_json_pointer_token_eq_json_string(pointer_token, member.name)) {
-          *p_value = member.value;
+        az_json_token_member token_member = { 0 };
+        AZ_RETURN_IF_FAILED(az_json_parser_read_object_member(self, &token_member));
+        if (az_json_pointer_token_eq_json_string(pointer_token, token_member.name)) {
+          *out_token = token_member.token;
           return AZ_OK;
         }
-        AZ_RETURN_IF_FAILED(az_json_parser_skip(self, member.value));
+        AZ_RETURN_IF_FAILED(az_json_parser_skip(self, token_member.token));
       }
     }
     default:

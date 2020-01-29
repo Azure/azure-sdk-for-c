@@ -3,7 +3,7 @@
 
 #include <az_http.h>
 #include <az_http_pipeline_internal.h>
-#include <az_json_builder.h>
+#include <az_json.h>
 #include <az_storage_blobs.h>
 
 #include <_az_cfg.h>

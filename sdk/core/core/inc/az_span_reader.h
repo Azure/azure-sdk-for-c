@@ -33,13 +33,7 @@ AZ_INLINE void az_span_reader_next(az_span_reader * const p_reader) {
   p_reader->i += 1;
 }
 
-AZ_NODISCARD AZ_INLINE az_result
-az_span_reader_set_pos(az_span_reader * const p_reader, int32_t i) {
-  AZ_CONTRACT(i <= az_span_length(p_reader->span), AZ_ERROR_ARG);
-
-  p_reader->i = i;
-  return AZ_OK;
-}
+AZ_NODISCARD az_result az_span_reader_set_pos(az_span_reader * p_reader, int32_t i);
 
 /**
  * Read a span form a reader and compare it with the given @var span

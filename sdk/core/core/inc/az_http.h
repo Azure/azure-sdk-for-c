@@ -4,7 +4,6 @@
 #ifndef _az_HTTP_H
 #define _az_HTTP_H
 
-#include <az_pair.h>
 #include <az_result.h>
 #include <az_span.h>
 #include <az_span_reader.h>
