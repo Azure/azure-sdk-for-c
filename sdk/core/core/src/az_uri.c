@@ -79,7 +79,7 @@ AZ_NODISCARD az_result az_uri_encode(az_span const input, az_span * const span_b
       uint8_t encoded[3];
       encode(c, encoded);
       AZ_RETURN_IF_FAILED(
-          az_span_append(*span_builder, AZ_SPAN_FROM_BUFFER(encoded), span_builder));
+          az_span_append(*span_builder, AZ_SPAN_FROM_INITIALIZED_BUFFER(encoded), span_builder));
 
       p = az_span_ptr(input) + i + 1;
       s = 0;
@@ -140,8 +140,8 @@ AZ_NODISCARD az_result az_uri_decode(az_span const input, az_span * const span_b
       AZ_RETURN_IF_FAILED(az_span_append(*span_builder, az_span_init(&b, 1, 1), span_builder));
 
       i += 2;
-      p = az_span_ptr(input) + 1;
-
+      p = az_span_ptr(input) + i + 1;
+      s = 0;
     } else {
       ++s;
     }

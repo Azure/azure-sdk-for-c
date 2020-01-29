@@ -31,7 +31,6 @@ AZ_NODISCARD AZ_INLINE bool az_span_is_empty(az_span const span) {
  *
  * @param span source span
  * @param fill byte to use for filling span
- * @return AZ_INLINE az_span_fill
  */
 AZ_INLINE void az_span_fill(az_span span, uint8_t fill) {
   memset(az_span_ptr(span), fill, az_span_capacity(span));

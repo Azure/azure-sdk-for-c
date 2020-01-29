@@ -13,7 +13,6 @@ endif()
 
 add_library (
   az_core
-  src/az_base64.c
   src/az_curl_adapter.c
   src/az_http_pipeline.c
   src/az_http_policy.c

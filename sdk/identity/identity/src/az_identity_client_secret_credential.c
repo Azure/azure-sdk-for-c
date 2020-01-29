@@ -140,13 +140,13 @@ AZ_INLINE AZ_NODISCARD az_result _az_identity_client_secret_credential_ms_oauth2
   }
 
   {
-    az_json_token value;
+    az_json_token token;
 
     uint64_t expires_in_msec = 0;
     if (requested_at_msec > 0) {
       double expires_in_seconds = 0;
-      if (az_succeeded(az_json_get_object_member(body, AZ_SPAN_FROM_STR("expires_in"), &value))
-          && az_succeeded(az_json_token_get_number(value, &expires_in_seconds))
+      if (az_succeeded(az_json_parse_by_pointer(body, AZ_SPAN_FROM_STR("/expires_in"), &token))
+          && az_succeeded(az_json_token_get_number(token, &expires_in_seconds))) {
           && expires_in_seconds > 0) {
         double const norefresh_period_msec = (expires_in_seconds - (double)(3 * 60)) * 1000;
         if (((int64_t)norefresh_period_msec) > 0) {
@@ -156,8 +156,8 @@ AZ_INLINE AZ_NODISCARD az_result _az_identity_client_secret_credential_ms_oauth2
     }
 
     az_span token_str = { 0 };
-    AZ_RETURN_IF_FAILED(az_json_get_object_member(body, AZ_SPAN_FROM_STR("access_token"), &value));
-    AZ_RETURN_IF_FAILED(az_json_token_get_string(value, &token_str));
+    AZ_RETURN_IF_FAILED(az_json_parse_by_pointer(body, AZ_SPAN_FROM_STR("/access_token"), &token));
+    AZ_RETURN_IF_FAILED(az_json_token_get_string(token, &token_str));
 
     az_span token_buf = AZ_SPAN_FROM_BUFFER(token_context->_internal.token->_internal.token_buf);
 

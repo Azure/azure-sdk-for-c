@@ -175,7 +175,7 @@ AZ_NODISCARD az_result _az_span_write_json_value(
       size_t const buffer_size = az_span_capacity(*builder);
       while (true) {
         az_json_token_member token_member;
-        az_result const result = az_json_parser_read_object_member(parser, &token_member);
+        az_result const result = az_json_parser_parse_token_member(parser, &token_member);
         if (result == AZ_ERROR_ITEM_NOT_FOUND) {
           break;
         }
@@ -198,7 +198,7 @@ AZ_NODISCARD az_result _az_span_write_json_value(
       int32_t const buffer_size = az_span_capacity(*builder);
       while (true) {
         az_json_token item_token;
-        az_result const result = az_json_parser_read_array_element(parser, &item_token);
+        az_result const result = az_json_parser_parse_array_item(parser, &item_token);
         if (result == AZ_ERROR_ITEM_NOT_FOUND) {
           break;
         }
@@ -223,7 +223,7 @@ AZ_NODISCARD az_result
 az_json_to_data(az_span json, az_span buffer, az_json_data const ** const out) {
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
-  az_json_parser parser = az_json_parser_create(json);
+  az_json_parser parser = az_json_parser_init(json);
 
   az_json_token token = { 0 };
   AZ_RETURN_IF_FAILED(az_json_parser_read(&parser, &token));

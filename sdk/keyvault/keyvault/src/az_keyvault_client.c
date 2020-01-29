@@ -49,7 +49,7 @@ az_keyvault_keys_client_options const AZ_KEYVAULT_CLIENT_DEFAULT_OPTIONS
  *
  * @param json_web_key_type type of the key. It will be always added to json payload
  * @param options all optional settings that can be inside create key options
- * @param write action used by json builder to be called while building
+ * @param http_body action used by json builder to be called while building
  * @return AZ_NODISCARD _az_keyvault_keys_key_create_build_json_body
  */
 AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(

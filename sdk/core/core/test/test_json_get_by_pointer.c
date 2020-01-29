@@ -12,20 +12,21 @@ void test_json_get_by_pointer() {
   {
     az_json_token token;
     TEST_ASSERT(
-        az_json_get_by_pointer(AZ_SPAN_FROM_STR("   57  "), AZ_SPAN_FROM_STR(""), &token) == AZ_OK);
+        az_json_parse_by_pointer(AZ_SPAN_FROM_STR("   57  "), AZ_SPAN_FROM_STR(""), &token)
+        == AZ_OK);
     TEST_ASSERT(token.kind == AZ_JSON_TOKEN_NUMBER);
     TEST_ASSERT(token.value.number == 57);
   }
   {
     az_json_token token;
     TEST_ASSERT(
-        az_json_get_by_pointer(AZ_SPAN_FROM_STR("   57  "), AZ_SPAN_FROM_STR("/"), &token)
+        az_json_parse_by_pointer(AZ_SPAN_FROM_STR("   57  "), AZ_SPAN_FROM_STR("/"), &token)
         == AZ_ERROR_ITEM_NOT_FOUND);
   }
   {
     az_json_token token;
     TEST_ASSERT(
-        az_json_get_by_pointer(
+        az_json_parse_by_pointer(
             AZ_SPAN_FROM_STR(" {  \"\": true  } "), AZ_SPAN_FROM_STR("/"), &token)
         == AZ_OK);
     TEST_ASSERT(token.kind == AZ_JSON_TOKEN_BOOLEAN);
@@ -34,7 +35,7 @@ void test_json_get_by_pointer() {
   {
     az_json_token token;
     TEST_ASSERT(
-        az_json_get_by_pointer(
+        az_json_parse_by_pointer(
             AZ_SPAN_FROM_STR(" [  { \"\": true }  ] "), AZ_SPAN_FROM_STR("/0/"), &token)
         == AZ_OK);
     TEST_ASSERT(token.kind == AZ_JSON_TOKEN_BOOLEAN);
@@ -43,7 +44,7 @@ void test_json_get_by_pointer() {
   {
     az_json_token token;
     TEST_ASSERT(
-        az_json_get_by_pointer(
+        az_json_parse_by_pointer(
             AZ_SPAN_FROM_STR("{ \"2/00\": true } "), AZ_SPAN_FROM_STR("/2~100"), &token)
         == AZ_OK);
     TEST_ASSERT(token.kind == AZ_JSON_TOKEN_BOOLEAN);
@@ -79,7 +80,7 @@ void test_json_get_by_pointer() {
     {
       az_json_token token;
       TEST_ASSERT(
-          az_json_get_by_pointer(sample, AZ_SPAN_FROM_STR("/parameters/LegalHold/tags/2"), &token)
+          az_json_parse_by_pointer(sample, AZ_SPAN_FROM_STR("/parameters/LegalHold/tags/2"), &token)
           == AZ_OK);
       TEST_ASSERT(token.kind == AZ_JSON_TOKEN_STRING);
       TEST_ASSERT(az_span_is_equal(token.value.string, AZ_SPAN_FROM_STR("tag3")));
@@ -87,7 +88,7 @@ void test_json_get_by_pointer() {
     {
       az_json_token token;
       TEST_ASSERT(
-          az_json_get_by_pointer(
+          az_json_parse_by_pointer(
               sample, AZ_SPAN_FROM_STR("/responses/2~100/body/hasLegalHold"), &token)
           == AZ_OK);
       TEST_ASSERT(token.kind == AZ_JSON_TOKEN_BOOLEAN);

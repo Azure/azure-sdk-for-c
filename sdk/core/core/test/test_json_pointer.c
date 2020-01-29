@@ -3,6 +3,7 @@
 
 #include <az_json.h>
 #include <az_span_reader.h>
+#include "az_json_string_private.h"
 
 #include <az_test.h>
 

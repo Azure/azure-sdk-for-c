@@ -23,7 +23,9 @@ AZ_NODISCARD AZ_INLINE az_span az_span_take(az_span span, int32_t n) {
   if (az_span_capacity(span) <= n) {
     return span;
   }
-  return az_span_init(az_span_ptr(span), n, n);
+  int32_t current_length = az_span_length(span);
+  int32_t new_length = current_length > n ? n : current_length;
+  return az_span_init(az_span_ptr(span), new_length < 0 ? 0 : new_length, n);
 }
 
 /**

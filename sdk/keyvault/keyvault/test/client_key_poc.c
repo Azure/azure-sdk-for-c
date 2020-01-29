@@ -186,13 +186,6 @@ int main() {
   return exit_code;
 }
 
-/**
- * @brief Get the key version object. Parse the response key and get field `kid`.
- * Then read kid from right to left to get first `/` as the beginning of key version
- *
- * @param response
- * @return az_span
- */
 az_span get_key_version(az_http_response * response) {
   az_http_response_parser parser = { 0 };
   az_span body = { 0 };
@@ -219,7 +212,7 @@ az_span get_key_version(az_http_response * response) {
   }
   // get key from body
   az_json_token value;
-  r = az_json_get_by_pointer(body, AZ_SPAN_FROM_STR("/key/kid"), &value);
+  r = az_json_parse_by_pointer(body, AZ_SPAN_FROM_STR("/key/kid"), &value);
   if (az_failed(r)) {
     return az_span_null();
   }
