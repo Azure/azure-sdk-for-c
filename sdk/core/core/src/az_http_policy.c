@@ -47,7 +47,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_apiversion(
 
   _az_http_policy_apiversion_options * options = (_az_http_policy_apiversion_options *)(data);
 
-  if (options->header) {
+  if (options->add_as_header) {
     // Add the version as a header
     AZ_RETURN_IF_FAILED(
         az_http_request_builder_append_header(hrb, options->name, options->version));
