@@ -78,7 +78,7 @@ AZ_NODISCARD AZ_INLINE az_result az_storage_blobs_blob_client_init(
     .pipeline = { 0 },
     .client_options = options == NULL ? AZ_STORAGE_BLOBS_BLOB_CLIENT_DEFAULT_OPTIONS : *options,
     ._apiversion_options
-    = (_az_http_policy_apiversion_options){ .header = true,
+    = (_az_http_policy_apiversion_options){ .add_as_header = true,
                                             .name = AZ_HTTP_HEADER_X_MS_VERSION,
                                             .version = AZ_STORAGE_BLOBS_BLOB_API_VERSION },
     ._token = { 0 },

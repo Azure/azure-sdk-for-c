@@ -35,7 +35,10 @@ typedef struct az_http_policy az_http_policy;
  *
  */
 typedef struct {
-  bool header;
+  // Services pass API versions in the header or in query parameters
+  //   true: api version is passed via headers
+  //   false: api version is passed via query parameters
+  bool add_as_header;
   az_span name;
   az_span version;
 } _az_http_policy_apiversion_options;

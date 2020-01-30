@@ -71,7 +71,7 @@ AZ_NODISCARD AZ_INLINE az_result az_keyvault_keys_client_init(
 
   *self = (az_keyvault_keys_client){
     ._apiversion_options
-    = (_az_http_policy_apiversion_options){ .header = false,
+    = (_az_http_policy_apiversion_options){ .add_as_header = false,
                                             .name = AZ_HTTP_HEADER_API_VERSION,
                                             .version = AZ_KEYVAULT_API_VERSION },
     .uri = uri,
