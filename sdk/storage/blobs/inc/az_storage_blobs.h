@@ -4,10 +4,11 @@
 #ifndef _az_STORAGE_BLOBS_H
 #define _az_STORAGE_BLOBS_H
 
+#include <az_contract.h>
+#include <az_http_header_internal.h>
 #include <az_http_pipeline.h>
 #include <az_http_policy.h>
 #include <az_http_response.h>
-#include <az_contract.h>
 #include <az_identity_access_token.h>
 #include <az_identity_access_token_context.h>
 #include <az_result.h>
@@ -38,12 +39,14 @@ typedef struct {
 } az_storage_blobs_blob_download_options;
 
 typedef struct {
+  _az_http_policy_apiversion_options _apiversion_options;
+  az_identity_access_token _token;
+  az_identity_access_token_context _token_context;
+
   az_span uri;
   az_span blob_type;
   az_http_pipeline pipeline;
   az_storage_blobs_blob_client_options client_options;
-  az_identity_access_token _token;
-  az_identity_access_token_context _token_context;
 } az_storage_blobs_blob_client;
 
 extern az_storage_blobs_blob_client_options const AZ_STORAGE_BLOBS_BLOB_CLIENT_DEFAULT_OPTIONS;
@@ -74,6 +77,10 @@ AZ_NODISCARD AZ_INLINE az_result az_storage_blobs_blob_client_init(
     .uri = uri,
     .pipeline = { 0 },
     .client_options = options == NULL ? AZ_STORAGE_BLOBS_BLOB_CLIENT_DEFAULT_OPTIONS : *options,
+    ._apiversion_options
+    = (_az_http_policy_apiversion_options){ .header = true,
+                                            .name = AZ_HTTP_HEADER_X_MS_VERSION,
+                                            .version = AZ_STORAGE_BLOBS_BLOB_API_VERSION },
     ._token = { 0 },
     ._token_context = { 0 },
   };
@@ -87,6 +94,7 @@ AZ_NODISCARD AZ_INLINE az_result az_storage_blobs_blob_client_init(
 
   client->pipeline = (az_http_pipeline){
     .policies = {
+      { .pfnc_process = az_http_pipeline_policy_apiversion, .data = &client->_apiversion_options },
       { .pfnc_process = az_http_pipeline_policy_uniquerequestid, .data = NULL },
       { .pfnc_process = az_http_pipeline_policy_retry, .data = &client->client_options.retry },
       { .pfnc_process = az_http_pipeline_policy_authentication, .data = &(client->_token_context) },

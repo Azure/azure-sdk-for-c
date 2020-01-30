@@ -13,6 +13,8 @@
 
 #include <_az_cfg_prefix.h>
 
+static az_span const AZ_HTTP_HEADER_API_VERSION = AZ_CONST_STR("api-version");
+
 static az_span const AZ_HTTP_HEADER_CONTENT_LENGTH = AZ_CONST_STR("Content-Length");
 static az_span const AZ_HTTP_HEADER_CONTENT_TYPE = AZ_CONST_STR("Content-Type");
 
