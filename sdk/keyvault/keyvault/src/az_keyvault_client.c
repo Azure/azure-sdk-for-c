@@ -30,12 +30,10 @@ AZ_NODISCARD AZ_INLINE az_span az_keyvault_client_constant_for_application_json(
   return AZ_STR("application/json");
 }
 
-az_keyvault_keys_client_options const AZ_KEYVAULT_CLIENT_DEFAULT_OPTIONS
-    = { .service_version = AZ_CONST_STR("7.0"),
-        .retry = {
-            .max_retry = 3,
-            .delay_in_ms = 30,
-        } };
+az_keyvault_keys_client_options const AZ_KEYVAULT_CLIENT_DEFAULT_OPTIONS = { .retry = {
+                                                                                 .max_retry = 3,
+                                                                                 .delay_in_ms = 30,
+                                                                             } };
 
 /**
  * @brief Internal inline function in charge of building json payload for creating a new key
@@ -137,13 +135,13 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
 
   // add version to request
   AZ_RETURN_IF_FAILED(az_http_request_builder_set_query_parameter(
-      &hrb, AZ_STR("api-version"), client->retry_options.service_version));
+      &hrb, AZ_STR("api-version"), AZ_KEYVAULT_API_VERSION));
 
   AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, key_name));
 
   // add extra header just for testing append_path after another query
-  AZ_RETURN_IF_FAILED(az_http_request_builder_set_query_parameter(
-      &hrb, AZ_STR("ignore"), client->retry_options.service_version));
+  AZ_RETURN_IF_FAILED(
+      az_http_request_builder_set_query_parameter(&hrb, AZ_STR("ignore"), AZ_KEYVAULT_API_VERSION));
 
   AZ_RETURN_IF_FAILED(
       az_http_request_builder_append_path(&hrb, az_keyvault_client_constant_for_create()));
@@ -193,7 +191,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
 
   // add version to request as query parameter
   AZ_RETURN_IF_FAILED(az_http_request_builder_set_query_parameter(
-      &hrb, AZ_STR("api-version"), client->retry_options.service_version));
+      &hrb, AZ_STR("api-version"), AZ_KEYVAULT_API_VERSION));
 
   // Add path to request after adding query parameter
   AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, key_name));
@@ -227,7 +225,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_delete(
 
   // add version to request
   AZ_RETURN_IF_FAILED(az_http_request_builder_set_query_parameter(
-      &hrb, AZ_STR("api-version"), client->retry_options.service_version));
+      &hrb, AZ_STR("api-version"), AZ_KEYVAULT_API_VERSION));
 
   // Add path to request
   AZ_RETURN_IF_FAILED(
