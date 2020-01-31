@@ -15,11 +15,11 @@
 
 typedef struct {
   az_span span;
-  //int32_t i;
+  int32_t i;
 } az_span_reader;
 
 AZ_NODISCARD AZ_INLINE az_span_reader az_span_reader_create(az_span span) {
-  return (az_span_reader){ .span = span/* , .i = 0  */};
+  return (az_span_reader){ .span = span, .i = 0 };
 }
 
 AZ_NODISCARD AZ_INLINE bool az_span_reader_is_empty(az_span_reader * p_reader) {

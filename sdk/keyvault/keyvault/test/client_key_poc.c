@@ -46,9 +46,9 @@ int main() {
 
   /******* Create a buffer for response (will be reused for all requests)   *****/
   uint8_t response_buffer[1024 * 4];
+  az_span response_span = AZ_SPAN_FROM_BUFFER(response_buffer);
   az_http_response http_response = { 0 };
-  az_result const init_http_response_result
-      = az_http_response_init(&http_response, AZ_SPAN_FROM_BUFFER(response_buffer));
+  az_result const init_http_response_result = az_http_response_init(&http_response, response_span);
 
   if (az_failed(init_http_response_result)) {
     printf("Failed to init http response");
@@ -86,7 +86,7 @@ int main() {
     printf("Failed to reset http response (1)");
   }
 
-  az_span_fill(http_response.builder, '.');
+  az_span_fill(http_response._internal.http_response, '.');
 
   /******************  GET KEY latest ver ******************************/
   az_result get_key_result = az_keyvault_keys_key_get(
@@ -117,7 +117,7 @@ int main() {
     printf("Failed to reset http response (2)");
   }
 
-  az_span_fill(http_response.builder, '.');
+  az_span_fill(response_span, '.');
 
   /*********************  Create a new key version (use default options) *************/
   az_result const create_version_result = az_keyvault_keys_key_create(
@@ -141,7 +141,7 @@ int main() {
     printf("Failed to reset http response (3)");
   }
 
-  az_span_fill(http_response.builder, '.');
+  az_span_fill(response_span, '.');
 
   /******************  GET KEY previous ver ******************************/
   az_result const get_key_prev_ver_result = az_keyvault_keys_key_get(
@@ -169,7 +169,7 @@ int main() {
     printf("Failed to reset http response (4)");
   }
 
-  az_span_fill(http_response.builder, '.');
+  az_span_fill(response_span, '.');
 
   /******************  GET KEY (should return failed response ) ******************************/
   az_result get_key_again_result = az_keyvault_keys_key_get(
@@ -187,26 +187,15 @@ int main() {
 }
 
 az_span get_key_version(az_http_response * response) {
-  az_http_response_parser parser = { 0 };
   az_span body = { 0 };
-  az_result r = az_http_response_parser_init(&parser, response->builder);
-  if (az_failed(r)) {
-    return az_span_null();
-  }
 
   az_http_response_status_line status_line = { 0 };
-  r = az_http_response_parser_read_status_line(&parser, &status_line);
+  az_result r = az_http_response_get_status_line(response, &status_line);
   if (az_failed(r)) {
     return az_span_null();
   }
 
-  // Get Body
-  r = az_http_response_parser_skip_headers(&parser);
-  if (az_failed(r)) {
-    return az_span_null();
-  }
-
-  r = az_http_response_parser_read_body(&parser, &body);
+  r = az_http_response_get_body(response, &body);
   if (az_failed(r)) {
     return az_span_null();
   }

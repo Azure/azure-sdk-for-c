@@ -103,7 +103,7 @@ _az_identity_client_secret_credential_ms_oauth2_send_get_token_request(
 
 AZ_INLINE AZ_NODISCARD az_result _az_identity_client_secret_credential_ms_oauth2_get_token(
     az_identity_access_token_context const * const token_context,
-    az_http_response * const response) {
+    az_http_response * response) {
   uint64_t requested_at_msec = 0;
   {
     uint8_t auth_url_buf[_az_IDENTITY_CLIENT_SECRET_CREDENTIAL_AUTH_URL_BUF_SIZE] = { 0 };
@@ -126,17 +126,12 @@ AZ_INLINE AZ_NODISCARD az_result _az_identity_client_secret_credential_ms_oauth2
 
   az_span body = { 0 };
   {
-    az_http_response_parser parser = { 0 };
-    AZ_RETURN_IF_FAILED(az_http_response_parser_init(&parser, response->builder));
-
     az_http_response_status_line status_line = { 0 };
-    AZ_RETURN_IF_FAILED(az_http_response_parser_read_status_line(&parser, &status_line));
+    AZ_RETURN_IF_FAILED(az_http_response_get_status_line(response, &status_line));
     if (status_line.status_code != AZ_HTTP_STATUS_CODE_OK) {
       return AZ_ERROR_HTTP_PAL;
     }
-
-    AZ_RETURN_IF_FAILED(az_http_response_parser_skip_headers(&parser));
-    AZ_RETURN_IF_FAILED(az_http_response_parser_read_body(&parser, &body));
+    AZ_RETURN_IF_FAILED(az_http_response_get_body(response, &body));
   }
 
   {
@@ -192,7 +187,7 @@ AZ_INLINE AZ_NODISCARD az_result _az_identity_client_secret_credential_renew_tok
   az_result const result
       = _az_identity_client_secret_credential_ms_oauth2_get_token(token_context, &http_response);
 
-  az_span_fill(http_response.builder, '#');
+  az_span_fill(http_response._internal.http_response, '#');
   return result;
 }
 

@@ -375,7 +375,8 @@ AZ_NODISCARD az_result az_http_client_send_request_impl_process(
 
   AZ_RETURN_IF_CURL_FAILED(setup_url(p_curl, p_hrb));
 
-  AZ_RETURN_IF_CURL_FAILED(setup_response_redirect(p_curl, &response->builder, buildRFC7230));
+  AZ_RETURN_IF_CURL_FAILED(
+      setup_response_redirect(p_curl, &response->_internal.http_response, buildRFC7230));
 
   if (az_span_is_equal(p_hrb->method_verb, AZ_HTTP_METHOD_VERB_GET)) {
     result = az_curl_send_get_request(p_curl);
@@ -391,7 +392,8 @@ AZ_NODISCARD az_result az_http_client_send_request_impl_process(
 
   // make sure to set the end of the body response as the end of the complete response
   if (az_succeeded(result)) {
-    AZ_RETURN_IF_FAILED(az_span_append(response->builder, AZ_SPAN_ZEROBYTE, &response->builder));
+    AZ_RETURN_IF_FAILED(az_span_append(
+        response->_internal.http_response, AZ_SPAN_ZEROBYTE, &response->_internal.http_response));
   }
   return AZ_OK;
 }

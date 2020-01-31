@@ -12,12 +12,6 @@
 
 #include <_az_cfg_prefix.h>
 
-/**
- * @brief options for retry policy
- * max_retry = maximun number of retry intents before returning error
- * delay_in_ms = waiting time before retrying in miliseconds
- *
- */
 typedef struct {
   uint16_t max_retry;
   uint16_t delay_in_ms;
@@ -27,48 +21,12 @@ typedef struct {
   az_span buffer;
   az_span method_verb;
   az_span url_builder;
-  uint16_t max_headers;
-  uint16_t retry_headers_start;
-  uint16_t headers_end;
+  int16_t max_headers;
+  int32_t retry_headers_start;
+  int32_t headers_end;
   az_span body;
-  uint16_t query_start;
+  int32_t query_start;
 } az_http_request_builder;
-
-typedef enum {
-  AZ_HTTP_STATUS_CODE_OK = 200,
-  AZ_HTTP_STATUS_CODE_NOT_FOUND = 404,
-} az_http_status_code;
-
-/**
- * An HTTP response status line
- *
- * See https://tools.ietf.org/html/rfc7230#section-3.1.2
- */
-typedef struct {
-  uint8_t major_version;
-  uint8_t minor_version;
-  az_http_status_code status_code;
-  az_span reason_phrase;
-} az_http_response_status_line;
-
-typedef enum {
-  AZ_HTTP_RESPONSE_NONE = 0,
-  AZ_HTTP_RESPONSE_STATUS_LINE = 1,
-  AZ_HTTP_RESPONSE_HEADER = 2,
-  AZ_HTTP_RESPONSE_BODY = 3,
-} az_http_response_kind;
-
-/**
- * An HTTP response parser.
- */
-typedef struct {
-  az_span_reader reader;
-  az_http_response_kind kind;
-} az_http_response_parser;
-
-typedef struct {
-  az_span builder;
-} az_http_response;
 
 extern az_span const AZ_HTTP_METHOD_VERB_GET;
 extern az_span const AZ_HTTP_METHOD_VERB_HEAD;
@@ -210,73 +168,91 @@ AZ_NODISCARD AZ_INLINE bool az_http_request_builder_has_headers(az_http_request_
   return p_hrb->headers_end > 0;
 }
 
-/**
- * Initializes an HTTP response parser.
- */
-AZ_NODISCARD az_result az_http_response_parser_init(az_http_response_parser * out, az_span buffer);
+typedef enum {
+  AZ_HTTP_RESPONSE_KIND_NONE = 0,
+  AZ_HTTP_RESPONSE_KIND_STATUS_LINE = 1,
+  AZ_HTTP_RESPONSE_KIND_HEADER = 2,
+  AZ_HTTP_RESPONSE_KIND_BODY = 3,
+} az_http_response_kind;
+
+typedef struct {
+  struct {
+    az_span http_response;
+
+    az_span reader; //  index into http_response   //az_span_reader reader;
+    az_http_response_kind kind;
+  } _internal;
+} az_http_response;
+
+///////////////////////////////////////////////
+
+typedef enum {
+  AZ_HTTP_STATUS_CODE_OK = 200,
+  AZ_HTTP_STATUS_CODE_NOT_FOUND = 404,
+} az_http_status_code;
 
 /**
- * An HTTP status line.
- */
-AZ_NODISCARD az_result az_http_response_parser_read_status_line(
-    az_http_response_parser * self,
-    az_http_response_status_line * out);
-
-/**
- * An HTTP header.
- */
-AZ_NODISCARD az_result
-az_http_response_parser_read_header(az_http_response_parser * self, az_pair * out);
-
-AZ_NODISCARD az_result az_http_response_parser_skip_headers(az_http_response_parser * self);
-
-/**
- * An HTTP body.
- */
-AZ_NODISCARD az_result
-az_http_response_parser_read_body(az_http_response_parser * self, az_span * out);
-
-// Get information from HTTP response.
-
-/**
- * Get an HTTP status line.
- */
-AZ_NODISCARD az_result
-az_http_response_get_status_line(az_span self, az_http_response_status_line * out);
-
-/**
- * Get the next HTTP header.
+ * An HTTP response status line
  *
- * @p_header has to be either a previous header or an empty one for the first header.
+ * See https://tools.ietf.org/html/rfc7230#section-3.1.2
  */
-AZ_NODISCARD az_result az_http_response_get_next_header(az_span self, az_pair * p_header);
+typedef struct {
+  uint8_t major_version;
+  uint8_t minor_version;
+  az_http_status_code status_code;
+  az_span reason_phrase;
+} az_http_response_status_line;
 
-/**
- * Get an HTTP body.
- *
- * @p_header has to be the last header!
- */
-AZ_NODISCARD az_result
-az_http_response_get_body(az_span self, az_pair * p_last_header, az_span * body);
-
-/**
- * Get an HTTP header by name.
- */
-AZ_NODISCARD az_result
-az_http_response_get_header_by_name(az_span self, az_span header_name, az_span * header_value);
-
-AZ_NODISCARD AZ_INLINE az_result az_http_response_init(az_http_response * self, az_span builder) {
-  self->builder = builder;
+AZ_NODISCARD AZ_INLINE az_result
+az_http_response_init(az_http_response * self, az_span http_response) {
+  *self = (az_http_response){ ._internal = { .http_response = http_response,
+                                             .reader = az_span_null(),
+                                             .kind = AZ_HTTP_RESPONSE_KIND_NONE } };
   return AZ_OK;
 }
 
 /**
- * @brief Sets length of builder to zero so builder's buffer can be written from start
+ * @brief Set the az_http_response_parser to index zero inside az_http_response and tries to get
+ * status line from it.
  *
+ * @param response az_http_response with an http response
+ * @param out inline code from http response
+ * @return AZ_OK when inline code is parsed and returned. AZ_ERROR if http response was not parsed
  */
-AZ_NODISCARD AZ_INLINE az_result az_http_response_reset(az_http_response * self) {
-  self->builder = az_span_init(az_span_ptr(self->builder), 0, az_span_capacity(self->builder));
+AZ_NODISCARD az_result
+az_http_response_get_status_line(az_http_response * response, az_http_response_status_line * out);
 
+/**
+ * @brief parse a header based on the last http response parsed.
+ * If called right after parsin status line, this function will try to get the first header from
+ * http response.
+ * If called right after parsing a header, this function will try to get
+ * another header from http response or will return AZ_ERROR_ITEM_NOT_FOUND if there are no more
+ * headers.
+ * If called after parsing http body or before parsing status line, this function will return
+ * AZ_ERROR_INVALID_STATE
+ *
+ * @param self an HTTP response
+ * @param out an az_pair containing a header when az_result is AZ_OK
+ * @return AZ_OK if a header was parsed. See above for returned Errors.
+ */
+AZ_NODISCARD az_result az_http_response_get_next_header(az_http_response * self, az_pair * out);
+
+/**
+ * @brief parses http response body and make out_body point to it.
+ * This function can be called directly and status line and headers are parsed and ignored first
+ *
+ * @param self an http response
+ * @param out_body out parameter to point to http response body
+ * @return AZ_NODISCARD az_http_response_get_body
+ */
+AZ_NODISCARD az_result az_http_response_get_body(az_http_response * self, az_span * out_body);
+
+AZ_NODISCARD AZ_INLINE az_result az_http_response_reset(az_http_response * const self) {
+  self->_internal.http_response = az_span_init(
+      az_span_ptr(self->_internal.http_response),
+      0,
+      az_span_capacity(self->_internal.http_response));
   return AZ_OK;
 }
 

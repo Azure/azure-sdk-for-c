@@ -67,7 +67,6 @@ add_library (az::core ALIAS az_core)
  add_executable (
      az_core_test 
      test/main.c 
-     test/test_http_response_parser.c
      test/test_json_builder.c
      test/test_json_get_by_pointer.c
      test/test_json_pointer.c
