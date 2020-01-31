@@ -33,7 +33,10 @@ AZ_NODISCARD az_result az_json_builder_write_span(az_json_builder * self, az_spa
     // check if the character has to be escaped.
     {
       az_span const esc = az_json_esc_encode(c);
-      AZ_RETURN_IF_FAILED(az_span_append(*json, esc, json));
+      if (az_span_length(esc)) {
+        AZ_RETURN_IF_FAILED(az_span_append(*json, esc, json));
+        continue;
+      }
     }
     // check if the character has to be escaped as a UNICODE escape sequence.
     if (0 <= c && c < 0x20) {
@@ -46,7 +49,9 @@ AZ_NODISCARD az_result az_json_builder_write_span(az_json_builder * self, az_spa
         az_number_to_upper_hex((uint8_t)(c % 16)),
       };
       AZ_RETURN_IF_FAILED(az_span_append(*json, AZ_SPAN_FROM_INITIALIZED_BUFFER(array), json));
+      continue;
     }
+    AZ_RETURN_IF_FAILED(az_span_append(*json, az_span_init(&az_span_ptr(value)[i], 1, 1), json));
   }
   return az_span_append(*json, AZ_SPAN_FROM_STR("\""), json);
 }

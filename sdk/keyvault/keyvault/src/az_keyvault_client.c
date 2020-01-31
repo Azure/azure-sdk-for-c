@@ -55,11 +55,11 @@ az_keyvault_keys_client_options const AZ_KEYVAULT_CLIENT_DEFAULT_OPTIONS
 AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
     az_span json_web_key_type,
     az_keyvault_create_key_options * options,
-    az_span http_body) {
+    az_span * http_body) {
 
   az_json_builder builder = { 0 };
 
-  AZ_RETURN_IF_FAILED(az_json_builder_init(&builder, http_body));
+  AZ_RETURN_IF_FAILED(az_json_builder_init(&builder, *http_body));
 
   AZ_RETURN_IF_FAILED(az_json_builder_append_token(&builder, az_json_token_object()));
   // Required fields
@@ -109,6 +109,7 @@ AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
   }
 
   AZ_RETURN_IF_FAILED(az_json_builder_append_object_close(&builder));
+  *http_body = builder._internal.json;
 
   return AZ_OK;
 }
@@ -130,7 +131,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
   uint8_t body_buffer[MAX_BODY_SIZE];
   az_span json_builder = AZ_SPAN_FROM_BUFFER(body_buffer);
   AZ_RETURN_IF_FAILED(
-      _az_keyvault_keys_key_create_build_json_body(json_web_key_type, options, json_builder));
+      _az_keyvault_keys_key_create_build_json_body(json_web_key_type, options, &json_builder));
   az_span const created_body = json_builder;
 
   // create request

@@ -21,21 +21,17 @@ az_span const AZ_HTTP_METHOD_VERB_OPTIONS = AZ_SPAN_LITERAL_FROM_STR("OPTIONS");
 az_span const AZ_HTTP_METHOD_VERB_CONNECT = AZ_SPAN_LITERAL_FROM_STR("CONNECT");
 az_span const AZ_HTTP_METHOD_VERB_PATCH = AZ_SPAN_LITERAL_FROM_STR("PATCH");
 
-AZ_INLINE az_pair * get_headers_start(az_span buffer, int32_t max_url_size) {
+AZ_INLINE az_pair * get_headers_start(az_span buffer, int16_t max_url_size) {
   // 8-byte address alignment
   return (az_pair *)((uintptr_t)(az_span_ptr(buffer) + max_url_size + 7) & ~(uintptr_t)7);
 }
 
-AZ_INLINE int32_t get_headers_max(az_span const buffer, az_pair * const headers_start) {
+AZ_INLINE int16_t get_headers_max(az_span const buffer, az_pair * const headers_start) {
   // We need to compare both pointers as pointers to the same type (uint8_t*)
-  uint8_t * const buffer_end = az_span_ptr(buffer) + az_span_length(buffer);
+  uint8_t * const buffer_end = az_span_ptr(buffer) + az_span_capacity(buffer);
   uint8_t * const headers_start_uint8ptr = (uint8_t *)headers_start;
 
-  int32_t const max_headers = (buffer_end - headers_start_uint8ptr) / sizeof(az_pair);
-
-  // If there's enough space in the buffer, return the max number of elements it can fit (capped to
-  // uint16_t's max)
-  return buffer_end > headers_start_uint8ptr ? (max_headers > ~0 ? ~0 : max_headers) : 0;
+  return (buffer_end - headers_start_uint8ptr) / sizeof(az_pair);
 }
 
 AZ_NODISCARD az_result az_http_request_builder_init(
@@ -60,11 +56,12 @@ AZ_NODISCARD az_result az_http_request_builder_init(
 
   // Create url builder
   az_span url_builder = az_span_take(buffer, max_url_size);
+
   // write initial url
   AZ_RETURN_IF_FAILED(az_span_append(url_builder, initial_url, &url_builder));
 
   az_pair * const headers_start = get_headers_start(buffer, max_url_size);
-  uint16_t const max_headers = get_headers_max(buffer, headers_start);
+  int16_t const max_headers = get_headers_max(buffer, headers_start);
 
   *p_hrb = (az_http_request_builder){
     .buffer = buffer,
@@ -144,7 +141,7 @@ az_http_request_builder_append_header(az_http_request_builder * p_hrb, az_span k
   AZ_CONTRACT_ARG_VALID_SPAN(key);
   AZ_CONTRACT_ARG_VALID_SPAN(value);
 
-  AZ_CONTRACT(az_span_length(key) == 0 || az_span_length(value) == 0, AZ_ERROR_ARG);
+  AZ_CONTRACT(az_span_length(key) > 0 || az_span_length(value) > 0, AZ_ERROR_ARG);
 
   if (p_hrb->headers_end >= p_hrb->max_headers) {
     return AZ_ERROR_BUFFER_OVERFLOW;
