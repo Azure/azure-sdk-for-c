@@ -14,6 +14,7 @@
 #include <az_json_get.h>
 #include <az_span_builder.h>
 #include <az_str.h>
+#include <az_time_internal.h>
 #include <az_uri_internal.h>
 #include <az_url_internal.h>
 
@@ -88,8 +89,8 @@ _az_identity_client_secret_credential_ms_oauth2_send_get_token_request(
 
   static az_http_policy_retry_options default_retry_policy = {
     .max_tries = 7,
-    .retry_delay_msec = 1000,
-    .max_retry_delay_msec = 60 * 1000,
+    .retry_delay_msec = 1 * _az_TIME_MILLISECONDS_PER_SECOND,
+    .max_retry_delay_msec = 1 * _az_TIME_SECONDS_PER_MINUTE * _az_TIME_MILLISECONDS_PER_SECOND,
   };
 
   static az_http_pipeline pipeline = {
@@ -159,7 +160,7 @@ AZ_INLINE AZ_NODISCARD az_result _az_identity_client_secret_credential_ms_oauth2
       if (az_succeeded(az_json_get_object_member(body, AZ_STR("expires_in"), &value))
           && az_succeeded(az_json_token_get_number(value, &expires_in_seconds))
           && expires_in_seconds > 0) {
-        double const norefresh_period_msec = (expires_in_seconds - (double)(3 * 60)) * 1000;
+        double const norefresh_period_msec = (expires_in_seconds - (double)(3 * _az_TIME_SECONDS_PER_MINUTE)) * _az_TIME_MILLISECONDS_PER_SECOND;
         if (((int64_t)norefresh_period_msec) > 0) {
           expires_in_msec = (uint64_t)norefresh_period_msec;
         }

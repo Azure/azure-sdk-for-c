@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include <az_http_policy_logging_private.h>
 #include <az_log.h>
 #include <az_log_internal.h>
-#include <az_log_private.h>
 #include <az_str.h>
 
 #include <az_test.h>
@@ -101,11 +101,11 @@ void test_log() {
     TEST_ASSERT(_log_invoked_for_http_request == false);
     TEST_ASSERT(_log_invoked_for_http_response == false);
 
-    _az_log_http_request(&hrb);
+    _az_http_policy_logging_log_http_request(&hrb);
     TEST_ASSERT(_log_invoked_for_http_request == true);
     TEST_ASSERT(_log_invoked_for_http_response == false);
 
-    _az_log_http_response(&response, 3456, &hrb);
+    _az_http_policy_logging_log_http_response(&response, 3456, &hrb);
     TEST_ASSERT(_log_invoked_for_http_request == true);
     TEST_ASSERT(_log_invoked_for_http_response == true);
   }
@@ -118,8 +118,8 @@ void test_log() {
     TEST_ASSERT(_log_invoked_for_http_request == false);
     TEST_ASSERT(_log_invoked_for_http_response == false);
 
-    _az_log_http_request(&hrb);
-    _az_log_http_response(&response, 3456, &hrb);
+    _az_http_policy_logging_log_http_request(&hrb);
+    _az_http_policy_logging_log_http_response(&response, 3456, &hrb);
 
     TEST_ASSERT(_log_invoked_for_http_request == false);
     TEST_ASSERT(_log_invoked_for_http_response == false);
@@ -147,8 +147,8 @@ void test_log() {
     TEST_ASSERT(az_log_should_write(AZ_LOG_HTTP_REQUEST) == true);
     TEST_ASSERT(az_log_should_write(AZ_LOG_HTTP_RESPONSE) == false);
 
-    _az_log_http_request(&hrb);
-    _az_log_http_response(&response, 3456, &hrb);
+    _az_http_policy_logging_log_http_request(&hrb);
+    _az_http_policy_logging_log_http_response(&response, 3456, &hrb);
 
     TEST_ASSERT(_log_invoked_for_http_request == true);
     TEST_ASSERT(_log_invoked_for_http_response == false);

@@ -10,11 +10,6 @@
 
 #include <_az_cfg_prefix.h>
 
-enum {
-  _az_HTTP_POLICY_RETRY_OPTIONS_DEFAULT_RETRY_DELAY_MSEC = 4 * 1000, // 4 seconds
-  _az_HTTP_POLICY_RETRY_OPTIONS_DEFAULT_MAX_RETRY_DELAY_MSEC = 2 * 60 * 1000, // 2 minutes
-};
-
 /**
  * @brief options for retry policy
  *
@@ -38,13 +33,7 @@ typedef struct {
   int32_t max_retry_delay_msec;
 } az_http_policy_retry_options;
 
-AZ_INLINE az_http_policy_retry_options az_http_policy_retry_options_create() {
-  return (az_http_policy_retry_options){
-    .max_tries = 4,
-    .retry_delay_msec = _az_HTTP_POLICY_RETRY_OPTIONS_DEFAULT_RETRY_DELAY_MSEC,
-    .max_retry_delay_msec = _az_HTTP_POLICY_RETRY_OPTIONS_DEFAULT_MAX_RETRY_DELAY_MSEC,
-  };
-}
+az_http_policy_retry_options az_http_policy_retry_options_create();
 
 #include <_az_cfg_suffix.h>
 

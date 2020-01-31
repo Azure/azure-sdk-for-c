@@ -4,6 +4,7 @@
 #include <az_http_header_internal.h>
 #include <az_json_builder.h>
 #include <az_storage_blobs.h>
+#include <az_time_internal.h>
 
 #include <_az_cfg.h>
 
@@ -27,8 +28,8 @@ enum {
 az_storage_blobs_blob_client_options const AZ_STORAGE_BLOBS_BLOB_CLIENT_DEFAULT_OPTIONS
     = { .retry = {
             .max_tries = 5,
-            .retry_delay_msec = 1000,
-            .max_retry_delay_msec = 30 * 1000,
+            .retry_delay_msec = 1 * _az_TIME_MILLISECONDS_PER_SECOND,
+            .max_retry_delay_msec = 30 * _az_TIME_MILLISECONDS_PER_SECOND,
         } };
 
 AZ_NODISCARD az_result az_storage_blobs_blob_upload(

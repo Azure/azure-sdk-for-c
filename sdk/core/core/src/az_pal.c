@@ -1,4 +1,5 @@
 #include <az_pal.h>
+#include <az_time_internal.h>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -17,7 +18,7 @@ void az_pal_sleep(int32_t milliseconds) {
 #else
 void az_pal_sleep(int32_t milliseconds) {
   if (milliseconds > 0) {
-    (void)usleep(milliseconds * 1000);
+    (void)usleep(milliseconds * _az_TIME_MICROSECONDS_PER_MILLISECOND);
   }
 }
 #endif

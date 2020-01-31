@@ -1,22 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include "az_http_policy_logging_private.h"
+#include "az_http_policy_retry_private.h"
 #include "az_log_private.h"
-#include <az_clock_internal.h>
 #include <az_http_client_internal.h>
 #include <az_http_pipeline.h>
-#include <az_http_policy.h>
-#include <az_http_policy_retry_options.h>
-#include <az_http_request_builder.h>
-#include <az_http_response_parser.h>
-#include <az_log.h>
-#include <az_log_internal.h>
-#include <az_mut_span.h>
-#include <az_pal.h>
 #include <az_span.h>
-#include <az_span_builder.h>
 #include <az_str.h>
-#include <az_url_internal.h>
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -39,6 +30,14 @@ AZ_NODISCARD AZ_INLINE az_result az_http_pipeline_nextpolicy(
   }
 
   return p_policies[0].pfnc_process(&(p_policies[1]), p_policies[0].data, hrb, response);
+}
+
+// Non-inlinable version to create function pointers to
+static AZ_NODISCARD az_result _az_http_pipeline_nextpolicy(
+    az_http_policy * const p_policies,
+    az_http_request_builder * const hrb,
+    az_http_response * const response) {
+  return az_http_pipeline_nextpolicy(p_policies, hrb, response);
 }
 
 static az_span const AZ_MS_CLIENT_REQUESTID = AZ_CONST_STR("x-ms-client-request-id");
@@ -65,110 +64,14 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
     void * const data,
     az_http_request_builder * const hrb,
     az_http_response * const response) {
-  // reset response to be written from the start
-  if (data == NULL) {
-    AZ_RETURN_IF_FAILED(az_http_response_reset(response));
-    return az_http_pipeline_nextpolicy(p_policies, hrb, response);
-  }
-
-  az_http_policy_retry_options const * const retry_policy
-      = (az_http_policy_retry_options const *)data;
-
-  int16_t const max_tries = retry_policy->max_tries;
-
-  bool const custom_retry_delay_limits = retry_policy->retry_delay_msec > 0
-      && retry_policy->max_retry_delay_msec > 0
-      && (retry_policy->retry_delay_msec <= retry_policy->max_retry_delay_msec);
-
-  int32_t const retry_delay_msec = custom_retry_delay_limits
-      ? retry_policy->retry_delay_msec
-      : _az_HTTP_POLICY_RETRY_OPTIONS_DEFAULT_RETRY_DELAY_MSEC;
-
-  int32_t const max_retry_delay_msec = custom_retry_delay_limits
-      ? retry_policy->max_retry_delay_msec
-      : _az_HTTP_POLICY_RETRY_OPTIONS_DEFAULT_MAX_RETRY_DELAY_MSEC;
-
-  bool const should_log = az_log_should_write(AZ_LOG_HTTP_RETRY);
-  az_result result = AZ_OK;
-  int16_t attempt = 1;
-  while (true) {
-    AZ_RETURN_IF_FAILED(az_http_response_reset(response));
-    result = az_http_pipeline_nextpolicy(p_policies, hrb, response);
-
-    // Even HTTP 429, or 502 are expected to be AZ_OK, so the failed result is not retriable.
-    if (attempt > max_tries || az_failed(result) || response == NULL
-        || response->builder.length == 0) {
-      return result;
-    }
-
-    int32_t retry_after_msec = -1;
-    {
-      az_http_response_parser response_parser = { 0 };
-      AZ_RETURN_IF_FAILED(az_http_response_parser_init(
-          &response_parser, az_span_builder_result(&response->builder)));
-
-      az_http_response_status_line status_line = { 0 };
-      AZ_RETURN_IF_FAILED(az_http_response_parser_read_status_line(&response_parser, &status_line));
-
-      switch (status_line.status_code) {
-        // Keep retrying on the HTTP response codes below, return immediately otherwise.
-        case AZ_HTTP_STATUS_CODE_REQUEST_TIMEOUT:
-        case AZ_HTTP_STATUS_CODE_TOO_MANY_REQUESTS:
-        case AZ_HTTP_STATUS_CODE_INTERNAL_SERVER_ERROR:
-        case AZ_HTTP_STATUS_CODE_BAD_GATEWAY:
-        case AZ_HTTP_STATUS_CODE_SERVICE_UNAVAILABLE:
-        case AZ_HTTP_STATUS_CODE_GATEWAY_TIMEOUT: {
-          // Try to get the value of retry-after header, if there's one.
-          az_pair header = { 0 };
-          while (az_http_response_parser_read_header(&response_parser, &header) == AZ_OK) {
-            if (az_span_is_equal(header.key, AZ_STR("retry-after-ms"))
-                || az_span_is_equal(header.key, AZ_STR("x-ms-retry-after-ms"))) {
-              // The value is in milliseconds.
-              uint64_t msec;
-              if (az_succeeded(az_span_to_uint64(header.value, &msec))) {
-                retry_after_msec
-                    = msec < INT32_MAX ? (int32_t)msec : INT32_MAX; // int32_t max == ~24 days
-                break;
-              }
-            } else if (az_span_is_equal(header.key, AZ_STR("Retry-After"))) {
-              // The vaule is either seconds or date.
-              uint64_t seconds;
-              if (az_succeeded(az_span_to_uint64(header.value, &seconds))) {
-                retry_after_msec = seconds < INT32_MAX / 1000 ? (int32_t)seconds * 1000 : INT32_MAX;
-                break;
-              }
-              // TODO: Other possible value is HTTP Date. For that, we'll need to parse date, get
-              // current date, subtract one from another, get seconds. And the device should have a
-              // sense of calendar clock.
-            }
-          }
-        } break;
-        default:
-          // None of the retriable HTTP codes above
-          return result;
-      }
-    }
-
-    ++attempt;
-
-    if (retry_after_msec < 0) { // there wasn't any kind of "retry-after" response header
-      int32_t const exponential_retry_after = (int32_t)(
-          (double)retry_delay_msec
-          * (double)(attempt <= 30 ? (1 << attempt) : INT32_MAX) // scale exponentially
-          * (((1.0 / RAND_MAX) * rand()) / 2 + 0.8)); // add jitter factor from 0.8 to 1.3
-
-      retry_after_msec = exponential_retry_after > max_retry_delay_msec ? max_retry_delay_msec
-                                                                        : retry_after_msec;
-    }
-
-    if (should_log) {
-      _az_log_http_retry(attempt, retry_after_msec);
-    }
-
-    az_pal_sleep(retry_after_msec);
-  }
-
-  return result;
+  return _az_http_policy_retry(
+      (az_http_policy_retry_options *)data,
+      (az_http_policy_callback){ .func = _az_http_pipeline_nextpolicy,
+        .params = {
+            .p_policies = p_policies,
+            .hrb = hrb,
+            .response = response,
+        }, });
 }
 
 typedef AZ_NODISCARD az_result (
@@ -199,22 +102,13 @@ AZ_NODISCARD az_result az_http_pipeline_policy_logging(
     az_http_request_builder * const hrb,
     az_http_response * const response) {
   (void)data;
-  if (az_log_should_write(AZ_LOG_HTTP_REQUEST)) {
-    _az_log_http_request(hrb);
-  }
-
-  if (!az_log_should_write(AZ_LOG_HTTP_RESPONSE)) {
-    // If no logging is needed, do not even measure the response time.
-    return az_http_pipeline_nextpolicy(p_policies, hrb, response);
-  }
-
-  uint64_t const start = _az_clock_msec();
-  az_result const result = az_http_pipeline_nextpolicy(p_policies, hrb, response);
-  uint64_t const end = _az_clock_msec();
-
-  _az_log_http_response(response, end - start, hrb);
-
-  return result;
+  return _az_http_policy_logging(
+      (az_http_policy_callback){ .func = _az_http_pipeline_nextpolicy,
+        .params = {
+            .p_policies = p_policies,
+            .hrb = hrb,
+            .response = response,
+        }, });
 }
 
 AZ_NODISCARD az_result az_http_pipeline_policy_bufferresponse(

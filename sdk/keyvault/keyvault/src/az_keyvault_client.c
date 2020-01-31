@@ -4,6 +4,7 @@
 #include <az_json_builder.h>
 #include <az_keyvault.h>
 #include <az_span_builder_internal.h>
+#include <az_time_internal.h>
 
 #include <_az_cfg.h>
 
@@ -34,8 +35,8 @@ az_keyvault_keys_client_options const AZ_KEYVAULT_CLIENT_DEFAULT_OPTIONS
     = { .service_version = AZ_CONST_STR("7.0"),
         .retry = {
             .max_tries = 3,
-            .retry_delay_msec = 1000,
-            .max_retry_delay_msec = 30 * 1000,
+            .retry_delay_msec = 1 * _az_TIME_MILLISECONDS_PER_SECOND,
+            .max_retry_delay_msec = 30 * _az_TIME_MILLISECONDS_PER_SECOND,
         } };
 
 /**

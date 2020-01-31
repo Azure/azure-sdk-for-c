@@ -20,6 +20,8 @@ add_library (
   src/az_http_header.c
   src/az_http_pipeline.c
   src/az_http_policy.c
+  src/az_http_policy_logging.c
+  src/az_http_policy_retry.c
   src/az_http_query.c
   src/az_http_request.c
   src/az_http_request_builder.c
