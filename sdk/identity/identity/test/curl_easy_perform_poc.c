@@ -31,7 +31,8 @@ int main() {
 
   // response buffer
   uint8_t buf_response[1024 * 4];
-  az_http_response http_buf_response = { .builder = AZ_SPAN_FROM_BUFFER(buf_response) };
+  az_http_response http_buf_response = { 0 };
+  AZ_RETURN_IF_FAILED(az_http_response_init(&http_buf_response, AZ_SPAN_FROM_BUFFER(buf_response)));
 
   // create request for keyVault
   az_result build_result = az_http_request_builder_init(
