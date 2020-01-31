@@ -122,8 +122,10 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
     az_http_response * const response) {
 
   // Request buffer
-  uint8_t request_buffer[1024 * 4];
-  az_span request_buffer_span = AZ_SPAN_FROM_BUFFER(request_buffer);
+  uint8_t url_buffer[1024 * 2];
+  uint8_t headers_buffer[4 * sizeof(az_pair)];
+  az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
+  az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
 
   /* ******** build url for request  ******/
 
@@ -135,34 +137,27 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
   az_span const created_body = json_builder;
 
   // create request
-  az_http_request_builder hrb;
-  AZ_RETURN_IF_FAILED(az_http_request_builder_init(
-      &hrb,
-      request_buffer_span,
-      MAX_URL_SIZE,
-      AZ_HTTP_METHOD_VERB_POST,
-      client->uri,
-      created_body));
+  az_http_request hrb;
+  AZ_RETURN_IF_FAILED(az_http_request_init(
+      &hrb, AZ_HTTP_METHOD_POST, request_url_span, request_headers_span, created_body));
 
   // add path to request
-  AZ_RETURN_IF_FAILED(
-      az_http_request_builder_append_path(&hrb, az_keyvault_client_constant_for_keys()));
+  AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, az_keyvault_client_constant_for_keys()));
 
   // add version to request
-  AZ_RETURN_IF_FAILED(az_http_request_builder_set_query_parameter(
+  AZ_RETURN_IF_FAILED(az_http_request_set_query_parameter(
       &hrb, AZ_SPAN_FROM_STR("api-version"), client->retry_options.service_version));
 
-  AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, key_name));
+  AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, key_name));
 
   // add extra header just for testing append_path after another query
-  AZ_RETURN_IF_FAILED(az_http_request_builder_set_query_parameter(
+  AZ_RETURN_IF_FAILED(az_http_request_set_query_parameter(
       &hrb, AZ_SPAN_FROM_STR("ignore"), client->retry_options.service_version));
 
-  AZ_RETURN_IF_FAILED(
-      az_http_request_builder_append_path(&hrb, az_keyvault_client_constant_for_create()));
+  AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, az_keyvault_client_constant_for_create()));
 
   // Adding header content-type json
-  AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
+  AZ_RETURN_IF_FAILED(az_http_request_append_header(
       &hrb,
       az_keyvault_client_constant_for_content_type(),
       az_keyvault_client_constant_for_application_json()));
@@ -186,34 +181,30 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
     az_span const key_version,
     az_http_response * const response) {
   // create request buffer TODO: define size for a getKey Request
-  uint8_t request_buffer[1024 * 4];
-  az_span request_buffer_span = AZ_SPAN_FROM_BUFFER(request_buffer);
+  uint8_t url_buffer[1024 * 4];
+  az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
+  uint8_t headers_buffer[4 * sizeof(az_pair)];
+  az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
 
   // create request
   // TODO: define max URL size
-  az_http_request_builder hrb;
-  AZ_RETURN_IF_FAILED(az_http_request_builder_init(
-      &hrb,
-      request_buffer_span,
-      MAX_URL_SIZE,
-      AZ_HTTP_METHOD_VERB_GET,
-      client->uri,
-      az_span_null()));
+  az_http_request hrb;
+  AZ_RETURN_IF_FAILED(az_http_request_init(
+      &hrb, AZ_HTTP_METHOD_GET, request_url_span, request_headers_span, az_span_null()));
 
   // Add path to request
-  AZ_RETURN_IF_FAILED(
-      az_http_request_builder_append_path(&hrb, az_keyvault_client_constant_for_keys()));
+  AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, az_keyvault_client_constant_for_keys()));
 
   // add version to request as query parameter
-  AZ_RETURN_IF_FAILED(az_http_request_builder_set_query_parameter(
+  AZ_RETURN_IF_FAILED(az_http_request_set_query_parameter(
       &hrb, AZ_SPAN_FROM_STR("api-version"), client->retry_options.service_version));
 
   // Add path to request after adding query parameter
-  AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, key_name));
+  AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, key_name));
 
   // Add version if requested
   if (az_span_length(key_version) > 0) {
-    AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, key_version));
+    AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, key_version));
   }
 
   // start pipeline
@@ -224,28 +215,26 @@ AZ_NODISCARD az_result az_keyvault_keys_key_delete(
     az_keyvault_keys_client * client,
     az_span const key_name,
     az_http_response * const response) {
-  // Request buffer
-  uint8_t request_buffer[1024 * 4];
-  az_span request_buffer_span = AZ_SPAN_FROM_BUFFER(request_buffer);
+
+  // create request buffer TODO: define size for a getKey Request
+  uint8_t url_buffer[1024 * 4];
+  az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
+  uint8_t headers_buffer[4 * sizeof(az_pair)];
+  az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
 
   // create request
-  az_http_request_builder hrb;
-  AZ_RETURN_IF_FAILED(az_http_request_builder_init(
-      &hrb,
-      request_buffer_span,
-      MAX_URL_SIZE,
-      AZ_HTTP_METHOD_VERB_DELETE,
-      client->uri,
-      az_span_null()));
+  // TODO: define max URL size
+  az_http_request hrb;
+  AZ_RETURN_IF_FAILED(az_http_request_init(
+      &hrb, AZ_HTTP_METHOD_GET, request_url_span, request_headers_span, az_span_null()));
 
   // add version to request
-  AZ_RETURN_IF_FAILED(az_http_request_builder_set_query_parameter(
+  AZ_RETURN_IF_FAILED(az_http_request_set_query_parameter(
       &hrb, AZ_SPAN_FROM_STR("api-version"), client->retry_options.service_version));
 
   // Add path to request
-  AZ_RETURN_IF_FAILED(
-      az_http_request_builder_append_path(&hrb, az_keyvault_client_constant_for_keys()));
-  AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, key_name));
+  AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, az_keyvault_client_constant_for_keys()));
+  AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, key_name));
 
   // start pipeline
   return az_http_pipeline_process(&client->pipeline, &hrb, response);

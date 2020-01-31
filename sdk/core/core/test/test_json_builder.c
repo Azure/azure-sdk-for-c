@@ -28,8 +28,9 @@ void test_json_builder() {
     {
       TEST_EXPECT_SUCCESS(
           az_json_builder_append_object(&builder, AZ_SPAN_FROM_STR("foo"), az_json_token_array()));
-      TEST_EXPECT_SUCCESS(az_json_builder_append_array_item(
-          &builder, az_json_token_string(AZ_SPAN_FROM_STR("bar"))));
+      az_result e = az_json_builder_append_array_item(
+          &builder, az_json_token_string(AZ_SPAN_FROM_STR("bar")));
+      TEST_EXPECT_SUCCESS(e);
       TEST_EXPECT_SUCCESS(az_json_builder_append_array_item(&builder, az_json_token_null()));
       TEST_EXPECT_SUCCESS(az_json_builder_append_array_item(&builder, az_json_token_number(0)));
       TEST_EXPECT_SUCCESS(az_json_builder_append_array_item(&builder, az_json_token_number(-12)));

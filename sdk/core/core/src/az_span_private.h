@@ -135,6 +135,12 @@ AZ_NODISCARD az_result az_span_append_zeros(az_span * const self, int32_t const 
 AZ_NODISCARD az_result
 az_span_replace(az_span * const self, int32_t start, int32_t end, az_span const span);
 
+typedef az_result (*_az_predicate)(az_span slice);
+
+// PRIVATE. read until condition is true on character.
+// Then return number of positions read with output parameter
+AZ_NODISCARD az_result _az_scan_until(az_span self, _az_predicate predicate, int32_t * out_index);
+
 #include <_az_cfg_suffix.h>
 
 #endif

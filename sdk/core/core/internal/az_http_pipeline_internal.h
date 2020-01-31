@@ -31,7 +31,7 @@ typedef struct az_http_policy az_http_policy;
 typedef AZ_NODISCARD az_result (*az_http_policy_process)(
     az_http_policy * policies,
     void * const data,
-    az_http_request_builder * hrb,
+    az_http_request * hrb,
     az_http_response * const response);
 
 struct az_http_policy {
@@ -46,49 +46,49 @@ typedef struct {
 // Start the pipeline
 AZ_NODISCARD az_result az_http_pipeline_process(
     az_http_pipeline * pipeline,
-    az_http_request_builder * const hrb,
+    az_http_request * const hrb,
     az_http_response * const response);
 
 AZ_NODISCARD az_result az_http_pipeline_policy_uniquerequestid(
     az_http_policy * const policies,
     void * const data,
-    az_http_request_builder * const hrb,
+    az_http_request * const hrb,
     az_http_response * const response);
 
 AZ_NODISCARD az_result az_http_pipeline_policy_retry(
     az_http_policy * const policies,
     void * const data,
-    az_http_request_builder * const hrb,
+    az_http_request * const hrb,
     az_http_response * const response);
 
 AZ_NODISCARD az_result az_http_pipeline_policy_authentication(
     az_http_policy * const policies,
     void * const data,
-    az_http_request_builder * const hrb,
+    az_http_request * const hrb,
     az_http_response * const response);
 
 AZ_NODISCARD az_result az_http_pipeline_policy_logging(
     az_http_policy * const policies,
     void * const data,
-    az_http_request_builder * const hrb,
+    az_http_request * const hrb,
     az_http_response * const response);
 
 AZ_NODISCARD az_result az_http_pipeline_policy_bufferresponse(
     az_http_policy * const policies,
     void * const data,
-    az_http_request_builder * const hrb,
+    az_http_request * const hrb,
     az_http_response * const response);
 
 AZ_NODISCARD az_result az_http_pipeline_policy_distributedtracing(
     az_http_policy * const policies,
     void * const data,
-    az_http_request_builder * const hrb,
+    az_http_request * const hrb,
     az_http_response * const response);
 
 AZ_NODISCARD az_result az_http_pipeline_policy_transport(
     az_http_policy * const policies,
     void * const data,
-    az_http_request_builder * const hrb,
+    az_http_request * const hrb,
     az_http_response * const response);
 
 #include <_az_cfg_suffix.h>

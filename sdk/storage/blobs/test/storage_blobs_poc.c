@@ -28,17 +28,21 @@ AZ_NODISCARD az_result az_storage_blobs_blob_download(
     az_storage_blobs_blob_client * client,
     az_http_response * const response) {
 
-  uint8_t request_buffer[1024 * 4] = { 0 };
-  az_span request_buffer_span = AZ_SPAN_FROM_BUFFER(request_buffer);
+  // Request buffer
+  // create request buffer TODO: define size for a getKey Request
+  uint8_t url_buffer[1024 * 4];
+  az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
+  uint8_t headers_buffer[4 * sizeof(az_pair)];
+  az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
 
   // create request
   // TODO: define max URL size
-  az_http_request_builder hrb;
-  AZ_RETURN_IF_FAILED(az_http_request_builder_init(
-      &hrb, request_buffer_span, 1280, AZ_HTTP_METHOD_VERB_GET, client->uri, az_span_null()));
+  az_http_request hrb;
+  AZ_RETURN_IF_FAILED(az_http_request_init(
+      &hrb, AZ_HTTP_METHOD_GET, request_url_span, request_headers_span, az_span_null()));
 
   // add version to request
-  AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
+  AZ_RETURN_IF_FAILED(az_http_request_append_header(
       &hrb, AZ_SPAN_FROM_STR("x-ms-version"), AZ_STORAGE_BLOBS_BLOB_API_VERSION));
 
   // start pipeline
@@ -49,16 +53,20 @@ AZ_NODISCARD az_result az_storage_blobs_blob_delete(
     az_storage_blobs_blob_client * client,
     az_http_response * const response) {
   // Request buffer
-  uint8_t request_buffer[1024 * 4] = { 0 };
-  az_span request_buffer_span = AZ_SPAN_FROM_BUFFER(request_buffer);
+  // create request buffer TODO: define size for blob delete
+  uint8_t url_buffer[1024 * 4];
+  az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
+  uint8_t headers_buffer[4 * sizeof(az_pair)];
+  az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
 
   // create request
-  az_http_request_builder hrb;
-  AZ_RETURN_IF_FAILED(az_http_request_builder_init(
-      &hrb, request_buffer_span, 1280, AZ_HTTP_METHOD_VERB_DELETE, client->uri, az_span_null()));
+  // TODO: define max URL size
+  az_http_request hrb;
+  AZ_RETURN_IF_FAILED(az_http_request_init(
+      &hrb, AZ_HTTP_METHOD_GET, request_url_span, request_headers_span, az_span_null()));
 
   // add version to request
-  AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
+  AZ_RETURN_IF_FAILED(az_http_request_append_header(
       &hrb, AZ_SPAN_FROM_STR("x-ms-version"), AZ_STORAGE_BLOBS_BLOB_API_VERSION));
 
   // start pipeline
