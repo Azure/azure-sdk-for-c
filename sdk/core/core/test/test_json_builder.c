@@ -12,10 +12,9 @@
 void test_json_builder() {
   {
     uint8_t array[200];
-    az_span span = AZ_SPAN_FROM_BUFFER(array);
     az_json_builder builder = { 0 };
 
-    TEST_EXPECT_SUCCESS(az_json_builder_init(&builder, span));
+    TEST_EXPECT_SUCCESS(az_json_builder_init(&builder, AZ_SPAN_FROM_BUFFER(array)));
 
     // 0___________________________________________________________________________________________________1
     // 0_________1_________2_________3_________4_________5_________6_________7_________8_________9_________0
@@ -54,7 +53,7 @@ void test_json_builder() {
     TEST_EXPECT_SUCCESS(az_json_builder_append_object_close(&builder));
 
     TEST_ASSERT(az_span_is_equal(
-        span,
+        builder._internal.json,
         AZ_SPAN_FROM_STR( //
             "{"
             "\"name\":true,"
