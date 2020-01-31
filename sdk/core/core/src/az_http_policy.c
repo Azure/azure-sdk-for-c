@@ -39,6 +39,26 @@ AZ_NODISCARD AZ_INLINE az_result az_http_pipeline_nextpolicy(
 
 static az_span const AZ_MS_CLIENT_REQUESTID = AZ_CONST_STR("x-ms-client-request-id");
 
+AZ_NODISCARD az_result az_http_pipeline_policy_apiversion(
+    az_http_policy * const p_policies,
+    void * const data,
+    az_http_request_builder * const hrb,
+    az_http_response * const response) {
+
+  _az_http_policy_apiversion_options * options = (_az_http_policy_apiversion_options *)(data);
+
+  if (options->add_as_header) {
+    // Add the version as a header
+    AZ_RETURN_IF_FAILED(
+        az_http_request_builder_append_header(hrb, options->name, options->version));
+  } else {
+    // Add the version as a query parameter
+    AZ_RETURN_IF_FAILED(
+        az_http_request_builder_set_query_parameter(hrb, options->name, options->version));
+  }
+  return az_http_pipeline_nextpolicy(p_policies, hrb, response);
+}
+
 AZ_NODISCARD az_result az_http_pipeline_policy_uniquerequestid(
     az_http_policy * const p_policies,
     void * const data,

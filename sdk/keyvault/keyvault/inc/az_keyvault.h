@@ -4,9 +4,10 @@
 #ifndef _az_KEYVAULT_H
 #define _az_KEYVAULT_H
 
+#include <az_contract.h>
+#include <az_http_header_internal.h>
 #include <az_http_pipeline.h>
 #include <az_http_response.h>
-#include <az_contract.h>
 #include <az_identity_access_token.h>
 #include <az_identity_access_token_context.h>
 #include <az_keyvault_create_key_options.h>
@@ -18,6 +19,9 @@
 
 #include <_az_cfg_prefix.h>
 
+/**
+ * @brief SDKs are specific to a fixed version of the KeyVault service
+ */
 static az_span const AZ_KEYVAULT_API_VERSION = AZ_CONST_STR("7.0");
 
 typedef struct {
@@ -32,11 +36,13 @@ typedef struct {
 } az_keyvault_keys_keys_options;
 
 typedef struct {
+  _az_http_policy_apiversion_options _apiversion_options;
+  az_identity_access_token _token;
+  az_identity_access_token_context _token_context;
+
   az_span uri;
   az_http_pipeline pipeline;
   az_keyvault_keys_client_options retry_options;
-  az_identity_access_token _token;
-  az_identity_access_token_context _token_context;
 } az_keyvault_keys_client;
 
 extern az_keyvault_keys_client_options const AZ_KEYVAULT_CLIENT_DEFAULT_OPTIONS;
@@ -64,6 +70,10 @@ AZ_NODISCARD AZ_INLINE az_result az_keyvault_keys_client_init(
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
   *self = (az_keyvault_keys_client){
+    ._apiversion_options
+    = (_az_http_policy_apiversion_options){ .add_as_header = false,
+                                            .name = AZ_HTTP_HEADER_API_VERSION,
+                                            .version = AZ_KEYVAULT_API_VERSION },
     .uri = uri,
     .pipeline = { 0 },
     .retry_options = options == NULL ? AZ_KEYVAULT_CLIENT_DEFAULT_OPTIONS : *options,
@@ -80,6 +90,7 @@ AZ_NODISCARD AZ_INLINE az_result az_keyvault_keys_client_init(
 
   self->pipeline = (az_http_pipeline){
     .policies = {
+      { .pfnc_process = az_http_pipeline_policy_apiversion, .data = &self->_apiversion_options },
       { .pfnc_process = az_http_pipeline_policy_uniquerequestid, .data = NULL },
       { .pfnc_process = az_http_pipeline_policy_retry, .data = &(self->retry_options.retry) },
       { .pfnc_process = az_http_pipeline_policy_authentication, .data = &(self->_token_context) },
