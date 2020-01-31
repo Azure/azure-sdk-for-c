@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 #include "az_log_private.h"
-#include "az_str_private.h"
 #include <az_clock_internal.h>
 #include <az_http.h>
 #include <az_http_client_internal.h>
@@ -18,7 +17,7 @@
 
 AZ_NODISCARD AZ_INLINE az_result az_http_pipeline_nextpolicy(
     az_http_policy * const p_policies,
-    az_http_request_builder * const hrb,
+    az_http_request * const hrb,
     az_http_response * const response) {
 
   AZ_CONTRACT_ARG_NOT_NULL(p_policies);
@@ -39,7 +38,7 @@ static az_span const AZ_MS_CLIENT_REQUESTID = AZ_SPAN_LITERAL_FROM_STR("x-ms-cli
 AZ_NODISCARD az_result az_http_pipeline_policy_uniquerequestid(
     az_http_policy * const p_policies,
     void * const data,
-    az_http_request_builder * const hrb,
+    az_http_request * const hrb,
     az_http_response * const response) {
   (void)data;
 
@@ -48,7 +47,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_uniquerequestid(
 
   // Append the Unique GUID into the headers
   //  x-ms-client-request-id
-  AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(hrb, AZ_MS_CLIENT_REQUESTID, uniqueid));
+  AZ_RETURN_IF_FAILED(az_http_request_append_header(hrb, AZ_MS_CLIENT_REQUESTID, uniqueid));
 
   return az_http_pipeline_nextpolicy(p_policies, hrb, response);
 }
@@ -56,7 +55,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_uniquerequestid(
 AZ_NODISCARD az_result az_http_pipeline_policy_retry(
     az_http_policy * const p_policies,
     void * const data,
-    az_http_request_builder * const hrb,
+    az_http_request * const hrb,
     az_http_response * const response) {
   (void)data;
 
@@ -67,7 +66,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
 }
 
 typedef AZ_NODISCARD az_result (
-    *_az_identity_auth_func)(void * const data, az_http_request_builder * const hrb);
+    *_az_identity_auth_func)(void * const data, az_http_request * const hrb);
 
 typedef struct {
   _az_identity_auth_func _func;
@@ -76,7 +75,7 @@ typedef struct {
 AZ_NODISCARD az_result az_http_pipeline_policy_authentication(
     az_http_policy * const p_policies,
     void * const data,
-    az_http_request_builder * const hrb,
+    az_http_request * const hrb,
     az_http_response * const response) {
   AZ_CONTRACT_ARG_NOT_NULL(data);
 
@@ -91,7 +90,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_authentication(
 AZ_NODISCARD az_result az_http_pipeline_policy_logging(
     az_http_policy * const p_policies,
     void * const data,
-    az_http_request_builder * const hrb,
+    az_http_request * const hrb,
     az_http_response * const response) {
   (void)data;
   if (az_log_should_write(AZ_LOG_HTTP_REQUEST)) {
@@ -115,7 +114,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_logging(
 AZ_NODISCARD az_result az_http_pipeline_policy_bufferresponse(
     az_http_policy * const p_policies,
     void * const data,
-    az_http_request_builder * const hrb,
+    az_http_request * const hrb,
     az_http_response * const response) {
   (void)data;
 
@@ -127,7 +126,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_bufferresponse(
 AZ_NODISCARD az_result az_http_pipeline_policy_distributedtracing(
     az_http_policy * const p_policies,
     void * const data,
-    az_http_request_builder * const hrb,
+    az_http_request * const hrb,
     az_http_response * const response) {
   (void)data;
 
@@ -138,7 +137,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_distributedtracing(
 AZ_NODISCARD az_result az_http_pipeline_policy_transport(
     az_http_policy * const p_policies,
     void * const data,
-    az_http_request_builder * const hrb,
+    az_http_request * const hrb,
     az_http_response * const response) {
   (void)data;
 

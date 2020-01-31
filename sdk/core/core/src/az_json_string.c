@@ -4,7 +4,7 @@
 #include <az_json.h>
 
 #include "az_span_reader_private.h"
-#include "az_str_private.h"
+
 #include <az_hex_internal.h>
 
 #include <ctype.h>

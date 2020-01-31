@@ -18,34 +18,36 @@ typedef struct {
 } az_http_policy_retry_options;
 
 typedef struct {
-  az_span buffer;
-  az_span method_verb;
-  az_span url_builder;
-  int16_t max_headers;
-  int32_t retry_headers_start;
-  int32_t headers_end;
-  az_span body;
-  int32_t query_start;
-} az_http_request_builder;
+  struct {
+    az_span method;
+    az_span url;
+    int32_t query_start;
+    az_span headers;
+    int32_t max_headers;
+    int32_t retry_headers_start_byte_offset;
+    // int32_t headers_end;
+    az_span body;
+  } _internal;
+} az_http_request;
 
-extern az_span const AZ_HTTP_METHOD_VERB_GET;
-extern az_span const AZ_HTTP_METHOD_VERB_HEAD;
-extern az_span const AZ_HTTP_METHOD_VERB_POST;
-extern az_span const AZ_HTTP_METHOD_VERB_PUT;
-extern az_span const AZ_HTTP_METHOD_VERB_DELETE;
-extern az_span const AZ_HTTP_METHOD_VERB_TRACE;
-extern az_span const AZ_HTTP_METHOD_VERB_OPTIONS;
-extern az_span const AZ_HTTP_METHOD_VERB_CONNECT;
-extern az_span const AZ_HTTP_METHOD_VERB_PATCH;
+extern az_span AZ_HTTP_METHOD_GET;
+extern az_span AZ_HTTP_METHOD_HEAD;
+extern az_span AZ_HTTP_METHOD_POST;
+extern az_span AZ_HTTP_METHOD_PUT;
+extern az_span AZ_HTTP_METHOD_DELETE;
+extern az_span AZ_HTTP_METHOD_TRACE;
+extern az_span AZ_HTTP_METHOD_OPTIONS;
+extern az_span AZ_HTTP_METHOD_CONNECT;
+extern az_span AZ_HTTP_METHOD_PATCH;
 
 /**
  * @brief Format buffer as a http request containing URL and header spans.
  *
  * @param p_hrb HTTP request builder to initialize.
- * @param buffer Buffer to store URL and header spans in.
- * @param max_url_size Maximum URL length (see @ref az_http_request_builder_set_query_parameter).
- * @param method_verb HTTP verb: `"GET"`, `"POST"`, etc.
- * @param initial_url URL.
+ * @param method HTTP verb: `"GET"`, `"POST"`, etc.
+ * @param url Maximum URL length (see @ref az_http_request_builder_set_query_parameter).
+ * @param headers_buffer HTTP verb: `"GET"`, `"POST"`, etc.
+ * @param body URL.
  *
  * @return
  *   - *`AZ_OK`* success.
@@ -55,13 +57,24 @@ extern az_span const AZ_HTTP_METHOD_VERB_PATCH;
  *     - `buffer`, `method_verb`, or `initial_url` are invalid spans (see @ref az_span_is_valid).
  *     - `max_url_size` is less than `initial_url.size`.
  */
-AZ_NODISCARD az_result az_http_request_builder_init(
-    az_http_request_builder * p_hrb,
-    az_span buffer,
-    int32_t max_url_size,
-    az_span method_verb,
-    az_span initial_url,
+AZ_NODISCARD az_result az_http_request_init(
+    az_http_request * p_hrb,
+    az_span method,
+    az_span url,
+    az_span headers_buffer,
     az_span body);
+
+/**
+ * @brief Adds path to url request.
+ * For instance, if url in request is `http://example.net?qp=1` and this function is called with
+ * path equals to `test`, then request url will be updated to `http://example.net/test?qp=1`.
+ *
+ *
+ * @param p_hrb http request builder reference
+ * @param path span to a path to be appended into url
+ * @return AZ_NODISCARD az_http_request_builder_append_path
+ */
+AZ_NODISCARD az_result az_http_request_append_path(az_http_request * p_hrb, az_span path);
 
 /**
  * @brief Set query parameter.
@@ -80,10 +93,8 @@ AZ_NODISCARD az_result az_http_request_builder_init(
  *     - `name` or `value` are empty.
  *     - `name`'s or `value`'s buffer overlap resulting `url`'s buffer.
  */
-AZ_NODISCARD az_result az_http_request_builder_set_query_parameter(
-    az_http_request_builder * p_hrb,
-    az_span name,
-    az_span value);
+AZ_NODISCARD az_result
+az_http_request_set_query_parameter(az_http_request * p_hrb, az_span name, az_span value);
 
 /**
  * @brief Add a new HTTP header for the request.
@@ -102,45 +113,7 @@ AZ_NODISCARD az_result az_http_request_builder_set_query_parameter(
  *     - `name`'s or `value`'s buffer overlap resulting `url`'s buffer.
  */
 AZ_NODISCARD az_result
-az_http_request_builder_append_header(az_http_request_builder * p_hrb, az_span key, az_span value);
-
-/**
- * @brief Adds path to url request.
- * For instance, if url in request is `http://example.net?qp=1` and this function is called with
- * path equals to `test`, then request url will be updated to `http://example.net/test?qp=1`.
- *
- *
- * @param p_hrb http request builder reference
- * @param path span to a path to be appended into url
- * @return AZ_NODISCARD az_http_request_builder_append_path
- */
-AZ_NODISCARD az_result
-az_http_request_builder_append_path(az_http_request_builder * p_hrb, az_span path);
-
-/**
- * @brief Mark that the HTTP headers that are gong to be added via
- * `az_http_request_builder_append_header` are going to be considered as retry headers.
- *
- * @param p_hrb HTTP request builder.
- *
- * @return
- *   - *`AZ_OK`* success.
- *   - *`AZ_ERROR_ARG`* `p_hrb` is _NULL_.
- */
-AZ_NODISCARD az_result
-az_http_request_builder_mark_retry_headers_start(az_http_request_builder * p_hrb);
-
-/**
- * @brief Drop all the HTTP headers that were marked as retry headers. No-op if none were marked.
- *
- * @param p_hrb HTTP request builder.
- *
- * @return
- *   - *`AZ_OK`* success.
- *   - *`AZ_ERROR_ARG`* `p_hrb` is _NULL_.
- */
-AZ_NODISCARD az_result
-az_http_request_builder_remove_retry_headers(az_http_request_builder * p_hrb);
+az_http_request_append_header(az_http_request * p_hrb, az_span key, az_span value);
 
 /**
  * @brief Get the HTTP header by index.
@@ -155,18 +128,8 @@ az_http_request_builder_remove_retry_headers(az_http_request_builder * p_hrb);
  *     - `p_hrb` or `out_result` are _NULL_.
  *     - `index` is out of range.
  */
-AZ_NODISCARD az_result az_http_request_builder_get_header(
-    az_http_request_builder * p_hrb,
-    uint16_t index,
-    az_pair * out_result);
-
-/**
- * @brief utility function for checking if there is at least one header in the request
- *
- */
-AZ_NODISCARD AZ_INLINE bool az_http_request_builder_has_headers(az_http_request_builder * p_hrb) {
-  return p_hrb->headers_end > 0;
-}
+AZ_NODISCARD az_result
+az_http_request_get_header(az_http_request * p_hrb, int32_t index, az_pair * out_result);
 
 typedef enum {
   AZ_HTTP_RESPONSE_KIND_NONE = 0,
@@ -187,8 +150,83 @@ typedef struct {
 ///////////////////////////////////////////////
 
 typedef enum {
+  // 1xx (information) Status Codes:
+  AZ_HTTP_STATUS_CODE_CONTINUE = 100,
+  AZ_HTTP_STATUS_CODE_SWITCHING_PROTOCOLS = 101,
+  AZ_HTTP_STATUS_CODE_PROCESSING = 102,
+  AZ_HTTP_STATUS_CODE_EARLYPROCESSING = 103,
+
+  // 2xx (successful) Status Codes:
   AZ_HTTP_STATUS_CODE_OK = 200,
+  AZ_HTTP_STATUS_CODE_CREATED = 201,
+  AZ_HTTP_STATUS_CODE_ACCEPTED = 202,
+  AZ_HTTP_STATUS_CODE_NON_AUTHORITATIVE_INFORMATION = 203,
+  AZ_HTTP_STATUS_CODE_NO_CONTENT = 204,
+  AZ_HTTP_STATUS_CODE_RESET_CONTENT = 205,
+  AZ_HTTP_STATUS_CODE_PARTIAL_CONTENT = 206,
+  AZ_HTTP_STATUS_CODE_MULTI_STATUS = 207,
+  AZ_HTTP_STATUS_CODE_ALREADY_REPORTED = 208,
+  AZ_HTTP_STATUS_CODE_IM_USED = 226,
+
+  // 3xx (redirection) Status Codes:
+  AZ_HTTP_STATUS_CODE_MULTIPLE_CHOICES = 300,
+  AZ_HTTP_STATUS_CODE_MOVED_PERMANENTLY = 301,
+  AZ_HTTP_STATUS_CODE_FOUND = 302,
+  AZ_HTTP_STATUS_CODE_SEE_OTHER = 303,
+  AZ_HTTP_STATUS_CODE_NOT_MODIFIED = 304,
+  AZ_HTTP_STATUS_CODE_USE_PROXY = 305,
+  AZ_HTTP_STATUS_CODE_TEMPORARY_REDIRECT = 307,
+  AZ_HTTP_STATUS_CODE_PERMANENT_REDIRECT = 308,
+
+  // 4xx (client error) Status Codes:
+  AZ_HTTP_STATUS_CODE_BAD_REQUEST = 400,
+  AZ_HTTP_STATUS_CODE_UNAUTHORIZED = 401,
+  AZ_HTTP_STATUS_CODE_PAYMENT_REQUIRED = 402,
+  AZ_HTTP_STATUS_CODE_FORBIDDEN = 403,
   AZ_HTTP_STATUS_CODE_NOT_FOUND = 404,
+  AZ_HTTP_STATUS_CODE_METHOD_NOT_ALLOWED = 405,
+  AZ_HTTP_STATUS_CODE_NOT_ACCEPTABLE = 406,
+  AZ_HTTP_STATUS_CODE_PROXY_AUTHENTICATIOPN_REQUIRED = 407,
+  AZ_HTTP_STATUS_CODE_REQUEST_TIMEOUT = 408,
+  AZ_HTTP_STATUS_CODE_CONFLICT = 409,
+  AZ_HTTP_STATUS_CODE_GONE = 410,
+  AZ_HTTP_STATUS_CODE_LENGTH_REQUIRED = 411,
+  AZ_HTTP_STATUS_CODE_PRECONDITION_FAILED = 412,
+  AZ_HTTP_STATUS_CODE_REQUEST_ENTITY_TOO_LARGE = 413,
+  AZ_HTTP_STATUS_CODE_REQUEST_URI_TOO_LONG = 414,
+  AZ_HTTP_STATUS_CODE_UNSUPPORTED_MEDIA_TYPE = 415,
+  AZ_HTTP_STATUS_CODE_REQUESTED_RANGE_NOT_SATISFIABLE = 416,
+  AZ_HTTP_STATUS_CODE_EXPECTATION_FAILED = 417,
+  AZ_HTTP_STATUS_CODE_IM_A_TEAPOT = 418,
+  AZ_HTTP_STATUS_CODE_ENHANCE_YOUR_CALM = 420,
+  AZ_HTTP_STATUS_CODE_UNPROCESSABLE_ENTITY = 422,
+  AZ_HTTP_STATUS_CODE_LOCKED = 423,
+  AZ_HTTP_STATUS_CODE_FAILED_DEPENDENCY = 424,
+  AZ_HTTP_STATUS_CODE_UPGRADE_REQUIRED = 426,
+  AZ_HTTP_STATUS_CODEPRECONDITION_REQUIRED_ = 428,
+  AZ_HTTP_STATUS_CODE_TOO_MANY_REQUESTS = 429,
+  AZ_HTTP_STATUS_CODE_REQUEST_HEADER_FIELDS_TOO_LARGE = 431,
+  AZ_HTTP_STATUS_CODE_NO_RESPONSE = 444,
+  AZ_HTTP_STATUS_CODE_RETRY_WITH = 449,
+  AZ_HTTP_STATUS_CODE_BLOCKED_BY_wINDOWS_PARENTAL_cONTROLS = 450,
+  AZ_HTTP_STATUS_CODE_UNAVAILABLE_FOR_LEGAL_REASONS = 451,
+  AZ_HTTP_STATUS_CODE_CLIENT_CLOSED_REQUEST = 499,
+
+  // 5xx (SERVER error) Status Codes:
+  AZ_HTTP_STATUS_CODE_INTERLAN_SERVER_ERROR = 500,
+  AZ_HTTP_STATUS_CODE_NOT_IMPLEMENTED = 501,
+  AZ_HTTP_STATUS_CODE_BAD_GATEWAY = 502,
+  AZ_HTTP_STATUS_CODE_SERVICE_UNAVAILABLE = 503,
+  AZ_HTTP_STATUS_CODE_GATEWAY_TIMEOUT = 504,
+  AZ_HTTP_STATUS_CODE_HTTP_VERSION_NOT_SUPPORTED = 505,
+  AZ_HTTP_STATUS_CODE_VARIANT_ALSO_NEGOTIATES = 506,
+  AZ_HTTP_STATUS_CODE_INSUFFICIENT_STORAGE = 507,
+  AZ_HTTP_STATUS_CODE_LOOP_DETECTED = 508,
+  AZ_HTTP_STATUS_CODE_BANDWIDTH_LIMIT_EXCEEDED = 509,
+  AZ_HTTP_STATUS_CODE_NOT_EXTENDED = 510,
+  AZ_HTTP_STATUS_CODE_NETWORK_AUTHENTICATION_REQUIRED = 511,
+  AZ_HTTP_STATUS_CODE_NETWORK_READ_TIMEOUT_ERROR = 598,
+  AZ_HTTP_STATUS_CODE_NETWORK_CONNECT_TIMEOUT_ERROR = 599,
 } az_http_status_code;
 
 /**

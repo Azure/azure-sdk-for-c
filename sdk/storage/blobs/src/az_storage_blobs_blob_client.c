@@ -39,26 +39,28 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
   (void)options;
 
   // Request buffer
-  uint8_t request_buffer[1024 * 4] = { 0 };
-  az_span request_buffer_span = AZ_SPAN_FROM_BUFFER(request_buffer);
-
-  /* ******** build url for request  ******/
+  // create request buffer TODO: define size for a blob upload
+  uint8_t url_buffer[1024 * 4];
+  az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
+  uint8_t headers_buffer[4 * sizeof(az_pair)];
+  az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
 
   // create request
-  az_http_request_builder hrb;
-  AZ_RETURN_IF_FAILED(az_http_request_builder_init(
-      &hrb, request_buffer_span, MAX_URL_SIZE, AZ_HTTP_METHOD_VERB_PUT, client->uri, content));
+  // TODO: define max URL size
+  az_http_request hrb;
+  AZ_RETURN_IF_FAILED(az_http_request_init(
+      &hrb, AZ_HTTP_METHOD_GET, request_url_span, request_headers_span, content));
 
   // add version to request
-  AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
+  AZ_RETURN_IF_FAILED(az_http_request_append_header(
       &hrb, AZ_HTTP_HEADER_X_MS_VERSION, AZ_STORAGE_BLOBS_BLOB_API_VERSION));
 
   // add blob type to request
-  AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
+  AZ_RETURN_IF_FAILED(az_http_request_append_header(
       &hrb, AZ_STORAGE_BLOBS_BLOB_HEADER_X_MS_BLOB_TYPE, client->blob_type));
 
   // add date to request
-  // AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
+  // AZ_RETURN_IF_FAILED(az_http_request_append_header(
   //    &hrb, AZ_HTTP_HEADER_X_MS_DATE, AZ_SPAN_FROM_STR("Fri, 03 Jan 2020 21:33:15 GMT")));
 
   char str[256] = { 0 };
@@ -68,10 +70,10 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
 
   // add Content-Length to request
   AZ_RETURN_IF_FAILED(
-      az_http_request_builder_append_header(&hrb, AZ_HTTP_HEADER_CONTENT_LENGTH, content_length));
+      az_http_request_append_header(&hrb, AZ_HTTP_HEADER_CONTENT_LENGTH, content_length));
 
   // add blob type to request
-  AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
+  AZ_RETURN_IF_FAILED(az_http_request_append_header(
       &hrb, AZ_HTTP_HEADER_CONTENT_TYPE, AZ_SPAN_FROM_STR("text/plain")));
 
   // start pipeline

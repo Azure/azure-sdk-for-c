@@ -5,7 +5,7 @@
 
 #include "az_span_private.h"
 #include "az_span_reader_private.h"
-#include "az_str_private.h"
+
 #include <az_span_reader.h>
 
 #include <ctype.h>

@@ -19,6 +19,9 @@ enum {
 #define _az_RESULT_MAKE_ERROR(facility, code) \
   ((int32_t)(0x80000000 | ((uint32_t)(facility) << 16) | (uint32_t)(code)))
 
+#define _az_RESULT_MAKE_SUCCESS(facility, code) \
+  ((int32_t)(0x00000000 | ((uint32_t)(facility) << 16) | (uint32_t)(code)))
+
 #define AZ_RETURN_IF_FAILED(exp) \
   do { \
     az_result const _result = (exp); \
@@ -37,8 +40,9 @@ enum {
  * - otherwise
  *   -  0..30 Value
  */
-typedef enum {
-  AZ_OK = 0,
+typedef enum az_result {
+  AZ_OK = _az_RESULT_MAKE_SUCCESS(AZ_CORE_FACILITY, 0),
+  AZ_CONTINUE = _az_RESULT_MAKE_SUCCESS(AZ_CORE_FACILITY, 1),
 
   // Core
   AZ_ERROR_ARG = _az_RESULT_MAKE_ERROR(AZ_FACILITY_CORE, 1),

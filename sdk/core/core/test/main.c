@@ -4,6 +4,7 @@
 #include <az_http.h>
 #include <az_json.h>
 
+#include <az_http_private.h>
 #include <az_span.h>
 #include <az_span_reader.h>
 #include <az_uri_internal.h>
@@ -522,70 +523,74 @@ int main() {
       TEST_ASSERT(az_span_is_equal(builder, uri_decoded));
     }
     {
-      uint8_t buf[100 + (100 % 8) + (2 * sizeof(az_pair))];
+      uint8_t buf[100];
+      uint8_t header_buf[(2 * sizeof(az_pair))];
       memset(buf, 0, sizeof(buf));
-      az_span http_buf = AZ_SPAN_FROM_BUFFER(buf);
-      az_http_request_builder hrb;
+      memset(header_buf, 0, sizeof(header_buf));
 
-      TEST_EXPECT_SUCCESS(az_http_request_builder_init(
-          &hrb, http_buf, 100, AZ_HTTP_METHOD_VERB_GET, hrb_url, az_span_null()));
-      TEST_ASSERT(az_span_is_equal(hrb.method_verb, AZ_HTTP_METHOD_VERB_GET));
-      TEST_ASSERT(az_span_is_equal(hrb.url_builder, hrb_url));
-      TEST_ASSERT(az_span_capacity(hrb.url_builder) == 100);
-      TEST_ASSERT(hrb.max_headers == 2);
-      TEST_ASSERT(hrb.headers_end == 0);
-      TEST_ASSERT(hrb.retry_headers_start == 2);
+      az_span url_span = AZ_SPAN_FROM_BUFFER(buf);
+      TEST_EXPECT_SUCCESS(az_span_append(url_span, hrb_url, &url_span));
+      az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
+      az_http_request hrb;
 
-      TEST_EXPECT_SUCCESS(az_http_request_builder_set_query_parameter(
+      TEST_EXPECT_SUCCESS(
+          az_http_request_init(&hrb, AZ_HTTP_METHOD_GET, url_span, header_span, az_span_null()));
+      TEST_ASSERT(az_span_is_equal(hrb._internal.method, AZ_HTTP_METHOD_GET));
+      TEST_ASSERT(az_span_is_equal(hrb._internal.url, url_span));
+      TEST_ASSERT(az_span_capacity(hrb._internal.url) == 100);
+      TEST_ASSERT(hrb._internal.max_headers == 2);
+      TEST_ASSERT(hrb._internal.retry_headers_start_byte_offset == 0);
+
+      TEST_EXPECT_SUCCESS(az_http_request_set_query_parameter(
           &hrb, hrb_param_api_version_name, hrb_param_api_version_token));
-      TEST_ASSERT(az_span_is_equal(hrb.url_builder, hrb_url2));
+      TEST_ASSERT(az_span_is_equal(hrb._internal.url, hrb_url2));
 
-      TEST_EXPECT_SUCCESS(az_http_request_builder_set_query_parameter(
+      TEST_EXPECT_SUCCESS(az_http_request_set_query_parameter(
           &hrb, hrb_param_test_param_name, hrb_param_test_param_token));
-      TEST_ASSERT(az_span_is_equal(hrb.url_builder, hrb_url3));
+      TEST_ASSERT(az_span_is_equal(hrb._internal.url, hrb_url3));
 
-      TEST_EXPECT_SUCCESS(az_http_request_builder_append_header(
+      TEST_EXPECT_SUCCESS(az_http_request_append_header(
           &hrb, hrb_header_content_type_name, hrb_header_content_type_token));
 
-      TEST_ASSERT(hrb.headers_end == 1);
-      TEST_ASSERT(hrb.retry_headers_start == 2);
+      TEST_ASSERT(hrb._internal.retry_headers_start_byte_offset == 0);
 
-      TEST_EXPECT_SUCCESS(az_http_request_builder_mark_retry_headers_start(&hrb));
-      TEST_ASSERT(hrb.retry_headers_start == 1);
+      TEST_EXPECT_SUCCESS(_az_http_request_mark_retry_headers_start(&hrb));
+      TEST_ASSERT(hrb._internal.retry_headers_start_byte_offset == sizeof(az_pair));
 
-      TEST_EXPECT_SUCCESS(az_http_request_builder_append_header(
+      TEST_EXPECT_SUCCESS(az_http_request_append_header(
           &hrb, hrb_header_authorization_name, hrb_header_authorization_token1));
-      TEST_ASSERT(hrb.headers_end == 2);
-      TEST_ASSERT(hrb.retry_headers_start == 1);
+
+      TEST_ASSERT(az_span_length(hrb._internal.headers) / sizeof(az_pair) == 2);
+      TEST_ASSERT(hrb._internal.retry_headers_start_byte_offset == sizeof(az_pair));
 
       az_pair expected_headers1[2] = {
         { .key = hrb_header_content_type_name, .value = hrb_header_content_type_token },
         { .key = hrb_header_authorization_name, .value = hrb_header_authorization_token1 },
       };
-      for (uint16_t i = 0; i < hrb.headers_end; ++i) {
+      for (uint16_t i = 0; i < az_span_length(hrb._internal.headers) / sizeof(az_pair); ++i) {
         az_pair header = { 0 };
-        TEST_EXPECT_SUCCESS(az_http_request_builder_get_header(&hrb, i, &header));
+        TEST_EXPECT_SUCCESS(az_http_request_get_header(&hrb, i, &header));
 
         TEST_ASSERT(az_span_is_equal(header.key, expected_headers1[i].key));
         TEST_ASSERT(az_span_is_equal(header.value, expected_headers1[i].value));
       }
 
-      TEST_EXPECT_SUCCESS(az_http_request_builder_remove_retry_headers(&hrb));
-      TEST_ASSERT(hrb.headers_end == 1);
-      TEST_ASSERT(hrb.retry_headers_start == 1);
+      TEST_EXPECT_SUCCESS(az_http_request_remove_retry_headers(&hrb));
+      TEST_ASSERT(hrb._internal.retry_headers_start_byte_offset == sizeof(az_pair));
 
-      TEST_EXPECT_SUCCESS(az_http_request_builder_append_header(
+      TEST_EXPECT_SUCCESS(az_http_request_append_header(
           &hrb, hrb_header_authorization_name, hrb_header_authorization_token2));
-      TEST_ASSERT(hrb.headers_end == 2);
-      TEST_ASSERT(hrb.retry_headers_start == 1);
+      TEST_ASSERT(az_span_length(hrb._internal.headers) / sizeof(az_pair) == 2);
+      TEST_ASSERT(hrb._internal.retry_headers_start_byte_offset == sizeof(az_pair));
 
       az_pair expected_headers2[2] = {
         { .key = hrb_header_content_type_name, .value = hrb_header_content_type_token },
         { .key = hrb_header_authorization_name, .value = hrb_header_authorization_token2 },
       };
-      for (uint16_t i = 0; i < hrb.headers_end; ++i) {
+      for (uint16_t i = 0; i < az_span_length(hrb._internal.headers) / sizeof(az_pair); ++i) {
         az_pair header = { 0 };
-        TEST_EXPECT_SUCCESS(az_http_request_builder_get_header(&hrb, i, &header));
+        TEST_EXPECT_SUCCESS(az_http_request_get_header(&hrb, i, &header));
+
         TEST_ASSERT(az_span_is_equal(header.key, expected_headers2[i].key));
         TEST_ASSERT(az_span_is_equal(header.value, expected_headers2[i].value));
       }

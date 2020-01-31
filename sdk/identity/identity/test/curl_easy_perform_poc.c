@@ -24,10 +24,12 @@ static az_span const API_VERSION_QUERY_NAME = AZ_SPAN_LITERAL_FROM_STR("api-vers
 static az_span const API_VERSION_QUERY_VALUE = AZ_SPAN_LITERAL_FROM_STR("7.0");
 
 int main() {
-  // create a buffer for request
-  uint8_t buf[1024 * 4];
-  az_span const http_buf = AZ_SPAN_FROM_BUFFER(buf);
-  az_http_request_builder hrb = { 0 };
+  // create a buffer for url request
+  uint8_t buf[1024 * 2];
+  uint8_t buf_headers[2 * sizeof(az_pair)];
+  az_span const http_url = AZ_SPAN_FROM_BUFFER(buf);
+  az_span const http_headers = AZ_SPAN_FROM_BUFFER(buf_headers);
+  az_http_request hrb = { 0 };
 
   // response buffer
   uint8_t buf_response[1024 * 4];
@@ -35,21 +37,16 @@ int main() {
   AZ_RETURN_IF_FAILED(az_http_response_init(&http_buf_response, AZ_SPAN_FROM_BUFFER(buf_response)));
 
   // create request for keyVault
-  az_result build_result = az_http_request_builder_init(
-      &hrb,
-      http_buf,
-      100,
-      AZ_HTTP_METHOD_VERB_GET,
-      az_span_from_str(getenv(URI_ENV)),
-      az_span_null());
+  az_result build_result
+      = az_http_request_init(&hrb, AZ_HTTP_METHOD_GET, http_url, http_headers, az_span_null());
 
   if (az_failed(build_result)) {
     return build_result;
   }
 
   // add query param
-  az_result add_query_result = az_http_request_builder_set_query_parameter(
-      &hrb, API_VERSION_QUERY_NAME, API_VERSION_QUERY_VALUE);
+  az_result add_query_result
+      = az_http_request_set_query_parameter(&hrb, API_VERSION_QUERY_NAME, API_VERSION_QUERY_VALUE);
   if (az_failed(add_query_result)) {
     return add_query_result;
   }
