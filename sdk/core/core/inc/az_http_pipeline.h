@@ -12,7 +12,7 @@
 #include <_az_cfg_prefix.h>
 
 typedef struct {
-  az_http_policy policies[9];
+  az_http_policy policies[10];
 } az_http_pipeline;
 
 // Start the pipeline
