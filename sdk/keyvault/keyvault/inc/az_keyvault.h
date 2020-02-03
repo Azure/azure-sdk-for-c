@@ -37,6 +37,7 @@ typedef struct {
 
 typedef struct {
   _az_http_policy_apiversion_options _apiversion_options;
+  _az_http_policy_telemetry_options _telemetry_options;
   az_identity_access_token _token;
   az_identity_access_token_context _token_context;
 
@@ -74,12 +75,15 @@ AZ_NODISCARD AZ_INLINE az_result az_keyvault_keys_client_init(
     = (_az_http_policy_apiversion_options){ .add_as_header = false,
                                             .name = AZ_HTTP_HEADER_API_VERSION,
                                             .version = AZ_KEYVAULT_API_VERSION },
+    ._telemetry_options = { 0 },
     .uri = uri,
     .pipeline = { 0 },
     .retry_options = options == NULL ? AZ_KEYVAULT_CLIENT_DEFAULT_OPTIONS : *options,
     ._token = { 0 },
     ._token_context = { 0 },
   };
+
+  AZ_RETURN_IF_FAILED(_az_http_policy_telemetry_options_init(&(self->_telemetry_options)));
 
   AZ_RETURN_IF_FAILED(az_identity_access_token_init(&(self->_token)));
   AZ_RETURN_IF_FAILED(az_identity_access_token_context_init(
@@ -92,6 +96,7 @@ AZ_NODISCARD AZ_INLINE az_result az_keyvault_keys_client_init(
     .policies = {
       { .pfnc_process = az_http_pipeline_policy_apiversion, .data = &self->_apiversion_options },
       { .pfnc_process = az_http_pipeline_policy_uniquerequestid, .data = NULL },
+      { .pfnc_process = az_http_pipeline_policy_telemetry, .data = &self->_telemetry_options },
       { .pfnc_process = az_http_pipeline_policy_retry, .data = &(self->retry_options.retry) },
       { .pfnc_process = az_http_pipeline_policy_authentication, .data = &(self->_token_context) },
       { .pfnc_process = az_http_pipeline_policy_logging, .data = NULL },

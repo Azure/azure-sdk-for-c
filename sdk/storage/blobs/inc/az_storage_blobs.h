@@ -40,6 +40,7 @@ typedef struct {
 
 typedef struct {
   _az_http_policy_apiversion_options _apiversion_options;
+  _az_http_policy_telemetry_options _telemetry_options;
   az_identity_access_token _token;
   az_identity_access_token_context _token_context;
 
@@ -81,9 +82,12 @@ AZ_NODISCARD AZ_INLINE az_result az_storage_blobs_blob_client_init(
     = (_az_http_policy_apiversion_options){ .add_as_header = true,
                                             .name = AZ_HTTP_HEADER_X_MS_VERSION,
                                             .version = AZ_STORAGE_BLOBS_BLOB_API_VERSION },
+    ._telemetry_options = { 0 },
     ._token = { 0 },
     ._token_context = { 0 },
   };
+
+  AZ_RETURN_IF_FAILED(_az_http_policy_telemetry_options_init(&(client->_telemetry_options)));
 
   AZ_RETURN_IF_FAILED(az_identity_access_token_init(&(client->_token)));
   AZ_RETURN_IF_FAILED(az_identity_access_token_context_init(
@@ -96,6 +100,7 @@ AZ_NODISCARD AZ_INLINE az_result az_storage_blobs_blob_client_init(
     .policies = {
       { .pfnc_process = az_http_pipeline_policy_apiversion, .data = &client->_apiversion_options },
       { .pfnc_process = az_http_pipeline_policy_uniquerequestid, .data = NULL },
+      { .pfnc_process = az_http_pipeline_policy_telemetry, .data = &client->_telemetry_options },
       { .pfnc_process = az_http_pipeline_policy_retry, .data = &client->client_options.retry },
       { .pfnc_process = az_http_pipeline_policy_authentication, .data = &(client->_token_context) },
       { .pfnc_process = az_http_pipeline_policy_logging, .data = NULL },

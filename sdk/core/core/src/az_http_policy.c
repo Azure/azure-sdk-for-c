@@ -4,6 +4,7 @@
 #include "az_log_private.h"
 #include <az_clock_internal.h>
 #include <az_http_client_internal.h>
+#include <az_http_header_internal.h>
 #include <az_http_pipeline.h>
 #include <az_http_policy.h>
 #include <az_http_request_builder.h>
@@ -37,8 +38,6 @@ AZ_NODISCARD AZ_INLINE az_result az_http_pipeline_nextpolicy(
   return p_policies[0].pfnc_process(&(p_policies[1]), p_policies[0].data, hrb, response);
 }
 
-static az_span const AZ_MS_CLIENT_REQUESTID = AZ_CONST_STR("x-ms-client-request-id");
-
 AZ_NODISCARD az_result az_http_pipeline_policy_apiversion(
     az_http_policy * const p_policies,
     void * const data,
@@ -71,7 +70,30 @@ AZ_NODISCARD az_result az_http_pipeline_policy_uniquerequestid(
 
   // Append the Unique GUID into the headers
   //  x-ms-client-request-id
-  AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(hrb, AZ_MS_CLIENT_REQUESTID, uniqueid));
+  AZ_RETURN_IF_FAILED(
+      az_http_request_builder_append_header(hrb, AZ_HTTP_HEADER_X_MS_CLIENT_REQUESTID, uniqueid));
+
+  return az_http_pipeline_nextpolicy(p_policies, hrb, response);
+}
+
+AZ_NODISCARD az_result
+_az_http_policy_telemetry_options_init(_az_http_policy_telemetry_options * const self) {
+  AZ_CONTRACT_ARG_NOT_NULL(self);
+  *self = (_az_http_policy_telemetry_options){ 0 };
+  self->os = AZ_STR("Unknown OS");
+  return AZ_OK;
+}
+
+AZ_NODISCARD az_result az_http_pipeline_policy_telemetry(
+    az_http_policy * const p_policies,
+    void * const data,
+    az_http_request_builder * const hrb,
+    az_http_response * const response) {
+
+  _az_http_policy_telemetry_options * options = (_az_http_policy_telemetry_options *)(data);
+
+  AZ_RETURN_IF_FAILED(
+      az_http_request_builder_append_header(hrb, AZ_HTTP_HEADER_USER_AGENT, options->os));
 
   return az_http_pipeline_nextpolicy(p_policies, hrb, response);
 }
