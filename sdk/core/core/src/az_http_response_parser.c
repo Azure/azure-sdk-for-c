@@ -19,12 +19,24 @@ AZ_NODISCARD az_result _az_is_new_line(az_span slice) { return _az_is_char(slice
 
 AZ_NODISCARD az_result _az_is_a_colon(az_span slice) { return _az_is_char(slice, ':'); }
 
-AZ_NODISCARD az_result _az_is_cr(az_span slice) {
+AZ_NODISCARD az_result _az_is_valid_header_value(az_span slice) {
   uint8_t * ptr = az_span_ptr(slice);
-  if (ptr[0] <= ' ') {
-    return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
+  az_result r = _az_is_char(slice, '\r');
+
+  if (r == AZ_OK) {
+    return r; // found what we need
   }
-  return _az_is_char(slice, '\r');
+
+  // check valid or not char (only ASCII or one single space)
+  if (ptr[0] <= ' ') {
+    if ((ptr[0] == ' ' || ptr[0] == '\t') && az_span_length(slice) > 1
+        && ptr[1] > ' ') { // two spaces not allowed
+      return AZ_CONTINUE; // one space allowed between
+    } else {
+      return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
+    }
+  }
+  return r;
 }
 
 AZ_NODISCARD az_result _az_is_not_http_whitespace(az_span slice) {
@@ -109,12 +121,12 @@ _az_get_http_status_line(az_span * const self, az_http_response_status_line * co
   int32_t offset = 0;
   AZ_RETURN_IF_FAILED(_az_scan_until(*self, _az_is_new_line, &offset));
 
-  // save reason-phrase in status line now that we got the offset
-  AZ_RETURN_IF_FAILED(az_span_slice(*self, 0, offset, &out->reason_phrase));
+  // save reason-phrase in status line now that we got the offset. Remove 1 last chars(\r)
+  AZ_RETURN_IF_FAILED(az_span_slice(*self, 0, offset - 1, &out->reason_phrase));
   // move position of reader after reason-phrase (parsed done)
-  AZ_RETURN_IF_FAILED(az_span_slice(*self, offset, -1, self));
+  AZ_RETURN_IF_FAILED(az_span_slice(*self, offset + 1, -1, self));
   // CR LF
-  AZ_RETURN_IF_FAILED(_az_is_expected_span(self, AZ_SPAN_FROM_STR("\r\n")));
+  // AZ_RETURN_IF_FAILED(_az_is_expected_span(self, AZ_SPAN_FROM_STR("\r\n")));
 
   return AZ_OK;
 }
@@ -155,6 +167,14 @@ AZ_NODISCARD az_result az_http_response_get_next_header(az_http_response * self,
     }
   }
 
+  // check if we are at the end of all headers to change state to Body.
+  // We keep state to Headers if current char is not '\r' (there is another header)
+  if (az_span_ptr(self->_internal.reader)[0] == '\r') {
+    AZ_RETURN_IF_FAILED(_az_is_expected_span(reader, AZ_SPAN_FROM_STR("\r\n")));
+    self->_internal.kind = AZ_HTTP_RESPONSE_KIND_BODY;
+    return AZ_ERROR_ITEM_NOT_FOUND;
+  }
+
   // https://tools.ietf.org/html/rfc7230#section-3.2
   // header-field   = field-name ":" OWS field-value OWS
   // field-name     = token
@@ -176,7 +196,7 @@ AZ_NODISCARD az_result az_http_response_get_next_header(az_http_response * self,
     // OWS
     int32_t ows_len = 0;
     AZ_RETURN_IF_FAILED(_az_scan_until(*reader, _az_is_not_http_whitespace, &ows_len));
-    AZ_RETURN_IF_FAILED(az_span_slice(*reader, 0, ows_len, reader));
+    AZ_RETURN_IF_FAILED(az_span_slice(*reader, ows_len, -1, reader));
   }
   // field-value    = *( field-content / obs-fold )
   // field-content  = field-vchar [ 1*( SP / HTAB ) field-vchar ]
@@ -189,20 +209,13 @@ AZ_NODISCARD az_result az_http_response_get_next_header(az_http_response * self,
   // Note: obs-fold is not implemented.
   {
     int32_t value_length = 0;
-    AZ_RETURN_IF_FAILED(_az_scan_until(*reader, _az_is_cr, &value_length));
+    AZ_RETURN_IF_FAILED(_az_scan_until(*reader, _az_is_valid_header_value, &value_length));
 
     AZ_RETURN_IF_FAILED(az_span_slice(*reader, 0, value_length, &out->value));
     // moving reader one extra position to jump '\r'
     AZ_RETURN_IF_FAILED(az_span_slice(*reader, value_length + 1, -1, reader));
   }
   AZ_RETURN_IF_FAILED(_az_is_expected_span(reader, AZ_SPAN_FROM_STR("\n")));
-
-  // check if we are at the end of all headers to change state to Body.
-  // We keep maintain state to Headers if current char is not '\r' (there is another header)
-  if (az_span_ptr(self->_internal.reader)[0] == '\r') {
-    AZ_RETURN_IF_FAILED(_az_is_expected_span(reader, AZ_SPAN_FROM_STR("\n")));
-    self->_internal.kind = AZ_HTTP_RESPONSE_KIND_BODY;
-  }
 
   return AZ_OK;
 }
