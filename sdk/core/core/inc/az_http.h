@@ -17,9 +17,11 @@ typedef struct {
   uint16_t delay_in_ms;
 } az_http_policy_retry_options;
 
+typedef az_span az_http_method;
+
 typedef struct {
   struct {
-    az_span method;
+    az_http_method method;
     az_span url;
     int32_t query_start;
     az_span headers;
@@ -30,15 +32,15 @@ typedef struct {
   } _internal;
 } az_http_request;
 
-extern az_span AZ_HTTP_METHOD_GET;
-extern az_span AZ_HTTP_METHOD_HEAD;
-extern az_span AZ_HTTP_METHOD_POST;
-extern az_span AZ_HTTP_METHOD_PUT;
-extern az_span AZ_HTTP_METHOD_DELETE;
-extern az_span AZ_HTTP_METHOD_TRACE;
-extern az_span AZ_HTTP_METHOD_OPTIONS;
-extern az_span AZ_HTTP_METHOD_CONNECT;
-extern az_span AZ_HTTP_METHOD_PATCH;
+extern az_http_method AZ_HTTP_METHOD_GET;
+extern az_http_method AZ_HTTP_METHOD_HEAD;
+extern az_http_method AZ_HTTP_METHOD_POST;
+extern az_http_method AZ_HTTP_METHOD_PUT;
+extern az_http_method AZ_HTTP_METHOD_DELETE;
+extern az_http_method AZ_HTTP_METHOD_TRACE;
+extern az_http_method AZ_HTTP_METHOD_OPTIONS;
+extern az_http_method AZ_HTTP_METHOD_CONNECT;
+extern az_http_method AZ_HTTP_METHOD_PATCH;
 
 /**
  * @brief Format buffer as a http request containing URL and header spans.
@@ -59,7 +61,7 @@ extern az_span AZ_HTTP_METHOD_PATCH;
  */
 AZ_NODISCARD az_result az_http_request_init(
     az_http_request * p_hrb,
-    az_span method,
+    az_http_method method,
     az_span url,
     az_span headers_buffer,
     az_span body);

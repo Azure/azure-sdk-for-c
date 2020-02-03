@@ -64,7 +64,7 @@ AZ_NODISCARD az_result _az_get_digit(az_span * self, uint8_t * save_here) {
   *save_here = (uint8_t)(c_ptr - '0');
 
   // move reader after the expected digit (means it was parsed as expected)
-  AZ_RETURN_IF_FAILED(az_span_slice(*self, 0, 1, self));
+  AZ_RETURN_IF_FAILED(az_span_slice(*self, 1, -1, self));
 
   return AZ_OK;
 }
@@ -93,13 +93,11 @@ _az_get_http_status_line(az_span * const self, az_http_response_status_line * co
 
   // status-code = 3DIGIT
   {
-    uint16_t status_code = 0;
-    for (int i = 0; i < 3; ++i) {
-      uint8_t digit = 0;
-      AZ_RETURN_IF_FAILED(_az_get_digit(self, &digit));
-      status_code = status_code * 10 + digit;
-    }
-    out->status_code = status_code;
+    uint64_t code = 0;
+    AZ_RETURN_IF_FAILED(az_span_to_uint64(az_span_init(az_span_ptr(*self), 3, 3), &code));
+    out->status_code = (az_http_status_code)code;
+    // move reader
+    AZ_RETURN_IF_FAILED(az_span_slice(*self, 3, -1, self));
   }
 
   // SP
@@ -114,7 +112,7 @@ _az_get_http_status_line(az_span * const self, az_http_response_status_line * co
   // save reason-phrase in status line now that we got the offset
   AZ_RETURN_IF_FAILED(az_span_slice(*self, 0, offset, &out->reason_phrase));
   // move position of reader after reason-phrase (parsed done)
-  AZ_RETURN_IF_FAILED(az_span_slice(*self, offset, -1, &out->reason_phrase));
+  AZ_RETURN_IF_FAILED(az_span_slice(*self, offset, -1, self));
   // CR LF
   AZ_RETURN_IF_FAILED(_az_is_expected_span(self, AZ_SPAN_FROM_STR("\r\n")));
 

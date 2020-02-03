@@ -18,6 +18,7 @@
 
 #include <_az_cfg.h>
 
+void test_http_response();
 void test_json_builder();
 void test_json_get_by_pointer();
 void test_json_pointer();
@@ -596,6 +597,7 @@ int main() {
     }
   }
 
+  test_http_response();
   test_json_builder();
   test_json_get_by_pointer();
   test_json_pointer();
