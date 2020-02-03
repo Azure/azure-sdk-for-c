@@ -1,11 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_http.h>
-#include <az_http_pipeline_internal.h>
 #include <az_json.h>
 #include <az_keyvault.h>
-
+#include <az_span.h>
 #include <az_span_internal.h>
 
 #include <_az_cfg.h>
@@ -22,6 +20,7 @@
  */
 enum { MAX_URL_SIZE = 200 };
 enum { MAX_BODY_SIZE = 1024 };
+static az_span const AZ_HTTP_HEADER_API_VERSION = AZ_SPAN_LITERAL_FROM_STR("api-version");
 
 AZ_NODISCARD AZ_INLINE az_span az_keyvault_client_constant_for_keys() {
   return AZ_SPAN_FROM_STR("keys");
@@ -37,19 +36,77 @@ AZ_NODISCARD AZ_INLINE az_span az_keyvault_client_constant_for_application_json(
   return AZ_SPAN_FROM_STR("application/json");
 }
 
-az_keyvault_keys_client_options const AZ_KEYVAULT_CLIENT_DEFAULT_OPTIONS
-    = { .service_version = AZ_SPAN_LITERAL_FROM_STR("7.0"),
-        .retry = {
-            .max_retry = 3,
-            .delay_in_ms = 30,
-        } };
+AZ_NODISCARD az_keyvault_keys_client_options az_keyvault_keys_client_default_options() {
+  return (az_keyvault_keys_client_options){ .retry = {
+                                                .max_retry = 3,
+                                                .delay_in_ms = 30,
+                                            } };
+}
+
+AZ_NODISCARD az_result az_keyvault_keys_client_init(
+    az_keyvault_keys_client * self,
+    az_span uri,
+    void * credential,
+    az_keyvault_keys_client_options * options) {
+  AZ_CONTRACT_ARG_NOT_NULL(self);
+
+  *self
+      = (az_keyvault_keys_client){ ._internal
+                                   = { ._apiversion_options
+                                       = (_az_http_policy_apiversion_options){ .add_as_header
+                                                                               = false,
+                                                                               .name
+                                                                               = AZ_HTTP_HEADER_API_VERSION,
+                                                                               .version
+                                                                               = AZ_KEYVAULT_API_VERSION },
+                                       .uri = uri,
+                                       .retry_options = options == NULL
+                                           ? az_keyvault_keys_client_default_options()
+                                           : *options,
+                                       ._token = { 0 },
+                                       ._token_context = { 0 },
+                                       .pipeline = (az_http_pipeline){
+                                           .policies = {
+                                               { .process = az_http_pipeline_policy_apiversion,
+                                                 .data = &self->_internal._apiversion_options },
+                                               { .process = az_http_pipeline_policy_uniquerequestid,
+                                                 .data = NULL },
+                                               { .process = az_http_pipeline_policy_retry,
+                                                 .data = &(self->_internal.retry_options.retry) },
+                                               { .process = az_http_pipeline_policy_authentication,
+                                                 .data = &(self->_internal._token_context) },
+                                               { .process = az_http_pipeline_policy_logging,
+                                                 .data = NULL },
+                                               { .process = az_http_pipeline_policy_bufferresponse,
+                                                 .data = NULL },
+                                               { .process
+                                                 = az_http_pipeline_policy_distributedtracing,
+                                                 .data = NULL },
+                                               { .process = az_http_pipeline_policy_transport,
+                                                 .data = NULL },
+                                               { .process = NULL, .data = NULL },
+                                           } } } };
+
+  AZ_RETURN_IF_FAILED(az_identity_access_token_init(&(self->_internal._token)));
+  AZ_RETURN_IF_FAILED(az_identity_access_token_context_init(
+      &(self->_internal._token_context),
+      credential,
+      &(self->_internal._token),
+      AZ_SPAN_FROM_STR("https://vault.azure.net/.default")));
+
+  return AZ_OK;
+}
+
+AZ_NODISCARD az_keyvault_create_key_options az_keyvault_create_key_options_default() {
+  return (az_keyvault_create_key_options){ .enabled = false, .operations = NULL, .tags = NULL };
+}
 
 /**
  * @brief Internal inline function in charge of building json payload for creating a new key
  *
  * @param json_web_key_type type of the key. It will be always added to json payload
  * @param options all optional settings that can be inside create key options
- * @param http_body action used by json builder to be called while building
+ * @param write action used by json builder to be called while building
  * @return AZ_NODISCARD _az_keyvault_keys_key_create_build_json_body
  */
 AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
@@ -116,10 +173,10 @@ AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
 
 AZ_NODISCARD az_result az_keyvault_keys_key_create(
     az_keyvault_keys_client * client,
-    az_span const key_name,
-    az_span const json_web_key_type,
-    az_keyvault_create_key_options * const options,
-    az_http_response * const response) {
+    az_span key_name,
+    json_web_key_type json_web_key_type,
+    az_keyvault_create_key_options * options,
+    az_http_response * response) {
 
   // Request buffer
   uint8_t url_buffer[1024 * 2];
@@ -144,15 +201,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
   // add path to request
   AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, az_keyvault_client_constant_for_keys()));
 
-  // add version to request
-  AZ_RETURN_IF_FAILED(az_http_request_set_query_parameter(
-      &hrb, AZ_SPAN_FROM_STR("api-version"), client->retry_options.service_version));
-
   AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, key_name));
-
-  // add extra header just for testing append_path after another query
-  AZ_RETURN_IF_FAILED(az_http_request_set_query_parameter(
-      &hrb, AZ_SPAN_FROM_STR("ignore"), client->retry_options.service_version));
 
   AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, az_keyvault_client_constant_for_create()));
 
@@ -163,7 +212,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
       az_keyvault_client_constant_for_application_json()));
 
   // start pipeline
-  return az_http_pipeline_process(&client->pipeline, &hrb, response);
+  return az_http_pipeline_process(&client->_internal.pipeline, &hrb, response);
 }
 
 /**
@@ -177,9 +226,9 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
  */
 AZ_NODISCARD az_result az_keyvault_keys_key_get(
     az_keyvault_keys_client * client,
-    az_span const key_name,
-    az_span const key_version,
-    az_http_response * const response) {
+    az_span key_name,
+    az_span key_version,
+    az_http_response * response) {
   // create request buffer TODO: define size for a getKey Request
   uint8_t url_buffer[1024 * 4];
   az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
@@ -187,7 +236,6 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
   az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
 
   // create request
-  // TODO: define max URL size
   az_http_request hrb;
   AZ_RETURN_IF_FAILED(az_http_request_init(
       &hrb, AZ_HTTP_METHOD_GET, request_url_span, request_headers_span, az_span_null()));
@@ -195,26 +243,22 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
   // Add path to request
   AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, az_keyvault_client_constant_for_keys()));
 
-  // add version to request as query parameter
-  AZ_RETURN_IF_FAILED(az_http_request_set_query_parameter(
-      &hrb, AZ_SPAN_FROM_STR("api-version"), client->retry_options.service_version));
-
   // Add path to request after adding query parameter
   AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, key_name));
 
-  // Add version if requested
+  // Add key_version if requested
   if (az_span_length(key_version) > 0) {
     AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, key_version));
   }
 
   // start pipeline
-  return az_http_pipeline_process(&client->pipeline, &hrb, response);
+  return az_http_pipeline_process(&client->_internal.pipeline, &hrb, response);
 }
 
 AZ_NODISCARD az_result az_keyvault_keys_key_delete(
     az_keyvault_keys_client * client,
-    az_span const key_name,
-    az_http_response * const response) {
+    az_span key_name,
+    az_http_response * response) {
 
   // create request buffer TODO: define size for a getKey Request
   uint8_t url_buffer[1024 * 4];
@@ -228,14 +272,10 @@ AZ_NODISCARD az_result az_keyvault_keys_key_delete(
   AZ_RETURN_IF_FAILED(az_http_request_init(
       &hrb, AZ_HTTP_METHOD_GET, request_url_span, request_headers_span, az_span_null()));
 
-  // add version to request
-  AZ_RETURN_IF_FAILED(az_http_request_set_query_parameter(
-      &hrb, AZ_SPAN_FROM_STR("api-version"), client->retry_options.service_version));
-
   // Add path to request
   AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, az_keyvault_client_constant_for_keys()));
   AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, key_name));
 
   // start pipeline
-  return az_http_pipeline_process(&client->pipeline, &hrb, response);
+  return az_http_pipeline_process(&client->_internal.pipeline, &hrb, response);
 }

@@ -21,7 +21,7 @@ AZ_NODISCARD az_result az_span_slice(
     az_span * out_sub_span) {
   // left part
   az_span left = span;
-  if (high_index > 0) {
+  if (high_index >= 0) {
     left = az_span_take(span, high_index);
   }
   az_span const right = az_span_drop(left, low_index);

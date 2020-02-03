@@ -40,12 +40,27 @@ struct az_http_policy {
 };
 
 typedef struct {
-  az_http_policy policies[8];
+  az_http_policy policies[9];
 } az_http_pipeline;
+
+typedef struct {
+  // Services pass API versions in the header or in query parameters
+  //   true: api version is passed via headers
+  //   false: api version is passed via query parameters
+  bool add_as_header;
+  az_span name;
+  az_span version;
+} _az_http_policy_apiversion_options;
 
 // Start the pipeline
 AZ_NODISCARD az_result az_http_pipeline_process(
     az_http_pipeline * pipeline,
+    az_http_request * const hrb,
+    az_http_response * const response);
+
+AZ_NODISCARD az_result az_http_pipeline_policy_apiversion(
+    az_http_policy * const p_policies,
+    void * const data,
     az_http_request * const hrb,
     az_http_response * const response);
 
