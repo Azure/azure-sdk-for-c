@@ -5,7 +5,7 @@
 
 #include "az_span_reader_private.h"
 
-#include <az_hex_internal.h>
+#include "az_hex_private.h"
 
 #include <ctype.h>
 

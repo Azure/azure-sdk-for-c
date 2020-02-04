@@ -5,7 +5,7 @@
 
 #include "az_span_private.h"
 #include <az_contract_internal.h>
-#include <az_hex_internal.h>
+#include "az_hex_private.h"
 #include <az_span.h>
 #include <az_span_internal.h>
 
@@ -44,8 +44,8 @@ AZ_NODISCARD AZ_INLINE uint8_t hex_to_int8(uint8_t const hi, uint8_t const lo) {
 
 AZ_INLINE void encode(uint8_t const c, uint8_t * const p) {
   p[0] = '%';
-  p[1] = az_number_to_upper_hex(c >> 4);
-  p[2] = az_number_to_upper_hex(c & 0x0F);
+  p[1] = _az_number_to_upper_hex(c >> 4);
+  p[2] = _az_number_to_upper_hex(c & 0x0F);
 }
 
 AZ_NODISCARD az_result az_uri_encode(az_span const input, az_span * const span_builder) {

@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef _az_HEX_INTERNAL_H
-#define _az_HEX_INTERNAL_H
+#ifndef _az_HEX_PRIVATE_H
+#define _az_HEX_PRIVATE_H
 
 #include <stdint.h>
 
@@ -16,7 +16,7 @@ enum {
 /**
  * Converts a number [0..15] into uppercase hexadecimal digit character (base16).
  */
-AZ_NODISCARD AZ_INLINE uint8_t az_number_to_upper_hex(uint8_t const number) {
+AZ_NODISCARD AZ_INLINE uint8_t _az_number_to_upper_hex(uint8_t const number) {
   return number + (number < 10 ? '0' : _az_HEX_UPPER_OFFSET);
 }
 

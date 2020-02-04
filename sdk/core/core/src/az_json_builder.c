@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include "az_hex_private.h"
 #include "az_json_string_private.h"
 #include "az_span_private.h"
-#include <az_hex_internal.h>
 #include <az_json.h>
 
 #include <_az_cfg.h>
@@ -44,8 +44,8 @@ AZ_NODISCARD az_result az_json_builder_write_span(az_json_builder * self, az_spa
         'u',
         '0',
         '0',
-        az_number_to_upper_hex((uint8_t)(c / 16)),
-        az_number_to_upper_hex((uint8_t)(c % 16)),
+        _az_number_to_upper_hex((uint8_t)(c / 16)),
+        _az_number_to_upper_hex((uint8_t)(c % 16)),
       };
       AZ_RETURN_IF_FAILED(az_span_append(*json, AZ_SPAN_FROM_INITIALIZED_BUFFER(array), json));
       continue;
