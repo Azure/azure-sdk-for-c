@@ -5,7 +5,6 @@
 #include "az_span_private.h"
 #include <az_hex_internal.h>
 #include <az_json.h>
-#include <az_span_reader.h>
 
 #include <_az_cfg.h>
 

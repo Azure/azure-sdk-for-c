@@ -16,102 +16,39 @@
 
 #include <_az_cfg_prefix.h>
 
-static az_span const AZ_HTTP_HEADER_CONTENT_LENGTH = AZ_SPAN_LITERAL_FROM_STR("Content-Length");
-static az_span const AZ_HTTP_HEADER_CONTENT_TYPE = AZ_SPAN_LITERAL_FROM_STR("Content-Type");
-
-static az_span const AZ_HTTP_HEADER_TEXT_PLAIN_CHARSET_UTF_8
-    = AZ_SPAN_LITERAL_FROM_STR("text/plain; charset=UTF-8");
-
-static az_span const AZ_HTTP_HEADER_X_MS_CLIENT_REQUESTID
-    = AZ_SPAN_LITERAL_FROM_STR("x-ms-client-request-id");
-static az_span const AZ_HTTP_HEADER_X_MS_DATE = AZ_SPAN_LITERAL_FROM_STR("x-ms-date");
-static az_span const AZ_HTTP_HEADER_X_MS_VERSION = AZ_SPAN_LITERAL_FROM_STR("x-ms-version");
-
-static az_span const AZ_STORAGE_BLOBS_BLOB_API_VERSION = AZ_SPAN_LITERAL_FROM_STR("2019-02-02");
-
-static az_span const AZ_STORAGE_BLOBS_BLOB_HEADER_X_MS_BLOB_TYPE
-    = AZ_SPAN_LITERAL_FROM_STR("x-ms-blob-type");
-static az_span const AZ_STORAGE_BLOBS_BLOB_TYPE_APPENDBLOB = AZ_SPAN_LITERAL_FROM_STR("AppendBlob");
-static az_span const AZ_STORAGE_BLOBS_BLOB_TYPE_BLOCKBLOB = AZ_SPAN_LITERAL_FROM_STR("BlockBlob");
-static az_span const AZ_STORAGE_BLOBS_BLOB_TYPE_PAGEBLOB = AZ_SPAN_LITERAL_FROM_STR("PageBlob");
-
+static az_span const AZ_STORAGE_API_VERSION = AZ_SPAN_LITERAL_FROM_STR("2019-02-02");
 typedef struct {
   az_http_policy_retry_options retry;
+  struct {
+    _az_http_policy_apiversion_options api_version;
+  } _internal;
 } az_storage_blobs_blob_client_options;
+
+AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_options_default();
+typedef struct {
+  struct {
+    az_span uri;
+    az_http_pipeline pipeline;
+    az_storage_blobs_blob_client_options options;
+
+    az_identity_access_token _token;
+    az_identity_access_token_context _token_context;
+  } _internal;
+} az_storage_blobs_blob_client;
+
+AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
+    az_storage_blobs_blob_client * client,
+    az_span uri,
+    void * credential,
+    az_storage_blobs_blob_client_options * options);
 
 typedef struct {
   az_span option;
 } az_storage_blobs_blob_upload_options;
 
-typedef struct {
-  az_span option;
-} az_storage_blobs_blob_download_options;
-
-typedef struct {
-  az_span uri;
-  az_span blob_type;
-  az_http_pipeline pipeline;
-  az_storage_blobs_blob_client_options client_options;
-  az_identity_access_token _token;
-  az_identity_access_token_context _token_context;
-} az_storage_blobs_blob_client;
-
-extern az_storage_blobs_blob_client_options const AZ_STORAGE_BLOBS_BLOB_CLIENT_DEFAULT_OPTIONS;
-
-/**
- * @brief Init a client with default options
- * This is convinient method to create a client with basic settings
- * Options can be updated specifally after this for unique customization
- *
- * Use this, for instance, when only caring about setting one option by calling this method and then
- * overriding that specific option
- */
-AZ_NODISCARD AZ_INLINE az_result
-az_storage_blobs_blob_client_options_init(az_storage_blobs_blob_client_options * const options) {
-  AZ_CONTRACT_ARG_NOT_NULL(options);
-  *options = AZ_STORAGE_BLOBS_BLOB_CLIENT_DEFAULT_OPTIONS;
-  return AZ_OK;
-}
-
-AZ_NODISCARD AZ_INLINE az_result az_storage_blobs_blob_client_init(
-    az_storage_blobs_blob_client * const client,
-    az_span const uri,
-    void * const credential,
-    az_storage_blobs_blob_client_options const * const options) {
-  AZ_CONTRACT_ARG_NOT_NULL(client);
-
-  *client = (az_storage_blobs_blob_client){
-    .uri = uri,
-    .pipeline = { 0 },
-    .client_options = options == NULL ? AZ_STORAGE_BLOBS_BLOB_CLIENT_DEFAULT_OPTIONS : *options,
-    ._token = { 0 },
-    ._token_context = { 0 },
-  };
-
-  AZ_RETURN_IF_FAILED(az_identity_access_token_init(&(client->_token)));
-  AZ_RETURN_IF_FAILED(az_identity_access_token_context_init(
-      &(client->_token_context),
-      credential,
-      &(client->_token),
-      AZ_SPAN_FROM_STR("https://storage.azure.com/.default")));
-
-  client->pipeline = (az_http_pipeline){
-    .policies = {
-      { .process = az_http_pipeline_policy_uniquerequestid, .data = NULL },
-      { .process = az_http_pipeline_policy_retry, .data = &client->client_options.retry },
-      { .process = az_http_pipeline_policy_authentication, .data = &(client->_token_context) },
-      { .process = az_http_pipeline_policy_logging, .data = NULL },
-      { .process = az_http_pipeline_policy_bufferresponse, .data = NULL },
-      { .process = az_http_pipeline_policy_distributedtracing, .data = NULL },
-      { .process = az_http_pipeline_policy_transport, .data = NULL },
-      { .process = NULL, .data = NULL },
-    }, 
-    };
-
-  // Currently only BlockBlobs are supported
-  client->blob_type = AZ_STORAGE_BLOBS_BLOB_TYPE_BLOCKBLOB;
-
-  return AZ_OK;
+AZ_NODISCARD AZ_INLINE az_storage_blobs_blob_upload_options
+az_storage_blobs_blob_upload_options_default() {
+  return (az_storage_blobs_blob_upload_options){ .option = az_span_null() };
 }
 
 /**
@@ -126,9 +63,9 @@ AZ_NODISCARD AZ_INLINE az_result az_storage_blobs_blob_client_init(
  */
 AZ_NODISCARD az_result az_storage_blobs_blob_upload(
     az_storage_blobs_blob_client * client,
-    az_span const content, /* Buffer of content*/
-    az_storage_blobs_blob_upload_options * const options,
-    az_http_response * const response);
+    az_span content, /* Buffer of content*/
+    az_storage_blobs_blob_upload_options * options,
+    az_http_response * response);
 
 #include <_az_cfg_suffix.h>
 

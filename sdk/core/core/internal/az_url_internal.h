@@ -25,6 +25,9 @@ typedef struct {
   az_span path;
   az_span query;
   az_span fragment;
+  struct {
+    az_span reader;
+  } _internal;
 } az_url;
 
 AZ_NODISCARD az_result az_url_parse(az_span const url, az_url * const out);

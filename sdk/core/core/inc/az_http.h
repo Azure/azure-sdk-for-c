@@ -6,16 +6,39 @@
 
 #include <az_result.h>
 #include <az_span.h>
-#include <az_span_reader.h>
 
 #include <stdint.h>
 
 #include <_az_cfg_prefix.h>
 
 typedef struct {
-  uint16_t max_retry;
+  // Services pass API versions in the header or in query parameters
+  //   true: api version is passed via headers
+  //   false: api version is passed via query parameters
+  bool add_as_header;
+  az_span name;
+  az_span version;
+} _az_http_policy_apiversion_options;
+
+AZ_NODISCARD AZ_INLINE _az_http_policy_apiversion_options
+az_http_policy_apiversion_options_default() {
+  return (_az_http_policy_apiversion_options){ 0 };
+}
+
+typedef struct {
+  uint16_t max_retries;
   uint16_t delay_in_ms;
+  uint16_t max_delay_in_ms; // TODO: review naming for this
+  // TODO: List of HTTP status code to be added
 } az_http_policy_retry_options;
+
+AZ_NODISCARD AZ_INLINE az_http_policy_retry_options az_http_policy_retry_options_default() {
+  return (az_http_policy_retry_options){
+    .max_retries = 3,
+    .delay_in_ms = 10,
+    .max_delay_in_ms = 30, // TODO: adjust this numbers
+  };
+}
 
 typedef az_span az_http_method;
 
@@ -144,7 +167,7 @@ typedef struct {
   struct {
     az_span http_response;
 
-    az_span reader; //  index into http_response   //az_span_reader reader;
+    az_span reader;
     az_http_response_kind kind;
   } _internal;
 } az_http_response;
@@ -188,7 +211,7 @@ typedef enum {
   AZ_HTTP_STATUS_CODE_NOT_FOUND = 404,
   AZ_HTTP_STATUS_CODE_METHOD_NOT_ALLOWED = 405,
   AZ_HTTP_STATUS_CODE_NOT_ACCEPTABLE = 406,
-  AZ_HTTP_STATUS_CODE_PROXY_AUTHENTICATIOPN_REQUIRED = 407,
+  AZ_HTTP_STATUS_CODE_PROXY_AUTHENTICATION_REQUIRED = 407,
   AZ_HTTP_STATUS_CODE_REQUEST_TIMEOUT = 408,
   AZ_HTTP_STATUS_CODE_CONFLICT = 409,
   AZ_HTTP_STATUS_CODE_GONE = 410,

@@ -32,6 +32,8 @@ AZ_NODISCARD az_result az_storage_blobs_blob_download(
   // create request buffer TODO: define size for a getKey Request
   uint8_t url_buffer[1024 * 4];
   az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
+  AZ_RETURN_IF_FAILED(az_span_append(request_url_span, client->_internal.uri, &request_url_span));
+
   uint8_t headers_buffer[4 * sizeof(az_pair)];
   az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
 
@@ -41,12 +43,8 @@ AZ_NODISCARD az_result az_storage_blobs_blob_download(
   AZ_RETURN_IF_FAILED(az_http_request_init(
       &hrb, AZ_HTTP_METHOD_GET, request_url_span, request_headers_span, az_span_null()));
 
-  // add version to request
-  AZ_RETURN_IF_FAILED(az_http_request_append_header(
-      &hrb, AZ_SPAN_FROM_STR("x-ms-version"), AZ_STORAGE_BLOBS_BLOB_API_VERSION));
-
   // start pipeline
-  return az_http_pipeline_process(&client->pipeline, &hrb, response);
+  return az_http_pipeline_process(&client->_internal.pipeline, &hrb, response);
 }
 
 AZ_NODISCARD az_result az_storage_blobs_blob_delete(
@@ -56,6 +54,8 @@ AZ_NODISCARD az_result az_storage_blobs_blob_delete(
   // create request buffer TODO: define size for blob delete
   uint8_t url_buffer[1024 * 4];
   az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
+  AZ_RETURN_IF_FAILED(az_span_append(request_url_span, client->_internal.uri, &request_url_span));
+
   uint8_t headers_buffer[4 * sizeof(az_pair)];
   az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
 
@@ -65,12 +65,8 @@ AZ_NODISCARD az_result az_storage_blobs_blob_delete(
   AZ_RETURN_IF_FAILED(az_http_request_init(
       &hrb, AZ_HTTP_METHOD_GET, request_url_span, request_headers_span, az_span_null()));
 
-  // add version to request
-  AZ_RETURN_IF_FAILED(az_http_request_append_header(
-      &hrb, AZ_SPAN_FROM_STR("x-ms-version"), AZ_STORAGE_BLOBS_BLOB_API_VERSION));
-
   // start pipeline
-  return az_http_pipeline_process(&client->pipeline, &hrb, response);
+  return az_http_pipeline_process(&client->_internal.pipeline, &hrb, response);
 }
 
 int main() {

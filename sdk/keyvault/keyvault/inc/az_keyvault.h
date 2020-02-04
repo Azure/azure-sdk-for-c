@@ -26,6 +26,9 @@ static az_span const AZ_KEYVAULT_API_VERSION = AZ_SPAN_LITERAL_FROM_STR("7.0");
 
 typedef struct {
   az_http_policy_retry_options retry;
+  struct {
+    _az_http_policy_apiversion_options api_version;
+  } _internal;
 } az_keyvault_keys_client_options;
 
 /**
@@ -36,17 +39,16 @@ typedef struct {
  * Use this, for instance, when only caring about setting one option by calling this method and then
  * overriding that specific option
  */
-AZ_NODISCARD az_keyvault_keys_client_options az_keyvault_keys_client_default_options();
+AZ_NODISCARD az_keyvault_keys_client_options az_keyvault_keys_client_options_default();
 
 typedef struct {
   struct {
-    _az_http_policy_apiversion_options _apiversion_options;
-    az_identity_access_token _token;
-    az_identity_access_token_context _token_context;
-
     az_span uri;
     az_http_pipeline pipeline;
-    az_keyvault_keys_client_options retry_options;
+    az_keyvault_keys_client_options options;
+
+    az_identity_access_token _token;
+    az_identity_access_token_context _token_context;
   } _internal;
 } az_keyvault_keys_client;
 

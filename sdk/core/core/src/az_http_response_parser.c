@@ -4,7 +4,6 @@
 #include <az_http.h>
 
 #include "az_span_private.h"
-#include "az_span_reader_private.h"
 
 #include <_az_cfg.h>
 #include <ctype.h>
@@ -15,39 +14,22 @@ AZ_NODISCARD AZ_INLINE az_result _az_is_char(az_span slice, uint8_t c) {
   return az_span_ptr(slice)[0] == c ? AZ_OK : AZ_CONTINUE;
 }
 
+AZ_NODISCARD az_result _az_is_a_colon(az_span slice) { return _az_is_char(slice, ':'); }
 AZ_NODISCARD az_result _az_is_new_line(az_span slice) { return _az_is_char(slice, '\n'); }
 
-AZ_NODISCARD az_result _az_is_a_colon(az_span slice) { return _az_is_char(slice, ':'); }
-
-AZ_NODISCARD az_result _az_is_valid_header_value(az_span slice) {
-  uint8_t * ptr = az_span_ptr(slice);
-  az_result r = _az_is_char(slice, '\r');
-
-  if (r == AZ_OK) {
-    return r; // found what we need
-  }
-
-  // check valid or not char (only ASCII or one single space)
-  if (ptr[0] <= ' ') {
-    if ((ptr[0] == ' ' || ptr[0] == '\t') && az_span_length(slice) > 1
-        && ptr[1] > ' ') { // two spaces not allowed
-      return AZ_CONTINUE; // one space allowed between
-    } else {
-      return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
-    }
-  }
-  return r;
-}
-
-AZ_NODISCARD az_result _az_is_not_http_whitespace(az_span slice) {
-  switch (az_span_ptr(slice)[0]) {
+AZ_NODISCARD bool _az_is_http_whitespace(uint8_t c) {
+  switch (c) {
     case ' ':
     case '\t':
-      return AZ_CONTINUE;
+      return true;
       ;
     default:
-      return AZ_OK;
+      return false;
   }
+}
+
+AZ_NODISCARD az_result _az_slice_is_not_http_whitespace(az_span slice) {
+  return _az_is_http_whitespace(az_span_ptr(slice)[0]) == true ? AZ_CONTINUE : AZ_OK;
 }
 
 AZ_NODISCARD az_result _az_is_expected_span(az_span * self, az_span expected) {
@@ -195,7 +177,7 @@ AZ_NODISCARD az_result az_http_response_get_next_header(az_http_response * self,
 
     // OWS
     int32_t ows_len = 0;
-    AZ_RETURN_IF_FAILED(_az_scan_until(*reader, _az_is_not_http_whitespace, &ows_len));
+    AZ_RETURN_IF_FAILED(_az_scan_until(*reader, _az_slice_is_not_http_whitespace, &ows_len));
     AZ_RETURN_IF_FAILED(az_span_slice(*reader, ows_len, -1, reader));
   }
   // field-value    = *( field-content / obs-fold )
@@ -208,13 +190,27 @@ AZ_NODISCARD az_result az_http_response_get_next_header(az_http_response * self,
   //
   // Note: obs-fold is not implemented.
   {
-    int32_t value_length = 0;
-    AZ_RETURN_IF_FAILED(_az_scan_until(*reader, _az_is_valid_header_value, &value_length));
-
-    AZ_RETURN_IF_FAILED(az_span_slice(*reader, 0, value_length, &out->value));
-    // moving reader one extra position to jump '\r'
-    AZ_RETURN_IF_FAILED(az_span_slice(*reader, value_length + 1, -1, reader));
+    int32_t offset = 0;
+    int32_t offset_value_end = offset;
+    while (true) {
+      uint8_t c = reader->_internal.ptr[offset];
+      offset += 1;
+      if (c == '\r') {
+        break; // break as soon as end of value char is found
+      }
+      if (_az_is_http_whitespace(c)) {
+        continue; // white space or tab is accepted. It can be any number after value (OWS)
+      }
+      if (c <= ' ') {
+        return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
+      }
+      offset_value_end = offset; // increasing index only for valid chars,
+    }
+    AZ_RETURN_IF_FAILED(az_span_slice(*reader, 0, offset_value_end, &out->value));
+    // moving reader. It is currently after \r was found
+    AZ_RETURN_IF_FAILED(az_span_slice(*reader, offset, -1, reader));
   }
+
   AZ_RETURN_IF_FAILED(_az_is_expected_span(reader, AZ_SPAN_FROM_STR("\n")));
 
   return AZ_OK;
@@ -233,7 +229,7 @@ AZ_NODISCARD az_result az_http_response_get_body(az_http_response * self, az_spa
       az_http_response_status_line ignore = { 0 };
       AZ_RETURN_IF_FAILED(az_http_response_get_status_line(self, &ignore));
     }
-    if (current_parsing_section == AZ_HTTP_RESPONSE_KIND_HEADER) {
+    if (self->_internal.kind == AZ_HTTP_RESPONSE_KIND_HEADER) {
       // Parse and ignore all remaining headers
       for (az_pair h; az_http_response_get_next_header(self, &h) == AZ_OK;) {
         // ignoring header
