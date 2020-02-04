@@ -98,12 +98,10 @@ AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_null(
   return az_span_null();
 }
 
-typedef az_pair az_keyvault_key_tag;
-
 typedef struct {
   az_optional_bool enabled;
   az_keyvault_key_operation * operations;
-  az_keyvault_key_tag * tags;
+  az_pair * tags;
   /* TODO: adding next options
   Datetime not_before;
   Datetime expires_on
