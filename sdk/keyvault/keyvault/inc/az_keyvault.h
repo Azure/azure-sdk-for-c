@@ -142,7 +142,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
  *
  * @param client a keyvault client structure
  * @param key_name name of key to be retrieved
- * @param version specific key version to get. It can be null to get latest version
+ * @param key_version specific key version to get. It can be null to get latest version
  * @param response a pre allocated buffer where to write http response
  * @return AZ_NODISCARD az_keyvault_keys_key_get
  */
