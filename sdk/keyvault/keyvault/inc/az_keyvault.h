@@ -28,6 +28,7 @@ typedef struct {
   az_http_policy_retry_options retry;
   struct {
     _az_http_policy_apiversion_options api_version;
+    az_http_client http_client;
   } _internal;
 } az_keyvault_keys_client_options;
 
@@ -39,7 +40,8 @@ typedef struct {
  * Use this, for instance, when only caring about setting one option by calling this method and then
  * overriding that specific option
  */
-AZ_NODISCARD az_keyvault_keys_client_options az_keyvault_keys_client_options_default();
+AZ_NODISCARD az_keyvault_keys_client_options
+az_keyvault_keys_client_options_default(az_http_client http_client);
 
 typedef struct {
   struct {

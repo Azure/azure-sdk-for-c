@@ -1,14 +1,67 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_curl_adapter_internal.h>
+#include <az_curl.h>
 
-#include "az_span_private.h"
 #include <az_span.h>
-#include <az_span_internal.h>
-#include <az_span_malloc_internal.h>
+#include <curl/curl.h>
 
-#include <_az_cfg.h>
+#include <stddef.h>
+#include <stdlib.h>
+
+/*Copying AZ_CONTRACT on purpose from AZ_CORE because 3rd parties can define this and should not
+ * depend on internal CORE headers */
+#define AZ_CONTRACT(condition, error) \
+  do { \
+    if (!(condition)) { \
+      return error; \
+    } \
+  } while (0)
+
+#define AZ_CONTRACT_ARG_NOT_NULL(arg) AZ_CONTRACT((arg) != NULL, AZ_ERROR_ARG)
+
+AZ_NODISCARD az_result az_span_malloc(size_t size, az_span * out) {
+  AZ_CONTRACT_ARG_NOT_NULL(out);
+
+  uint8_t * const p = (uint8_t *)malloc(size);
+  if (p == NULL) {
+    return AZ_ERROR_OUT_OF_MEMORY;
+  }
+  *out = az_span_init(p, 0, size);
+  return AZ_OK;
+}
+
+void az_span_free(az_span * p) {
+  if (p == NULL) {
+    return;
+  }
+  free(az_span_ptr(*p));
+  *p = az_span_null();
+}
+
+/**
+ * Converts CURLcode to az_result.
+ */
+AZ_NODISCARD AZ_INLINE az_result az_curl_code_to_result(CURLcode const code) {
+  return code == CURLE_OK ? AZ_OK : AZ_ERROR_HTTP_PAL;
+}
+
+// returning AZ error on CURL Error
+#define AZ_RETURN_IF_CURL_FAILED(exp) AZ_RETURN_IF_FAILED(az_curl_code_to_result(exp))
+
+AZ_NODISCARD AZ_INLINE az_result az_curl_init(CURL ** const out) {
+  *out = curl_easy_init();
+  return AZ_OK;
+}
+
+AZ_NODISCARD AZ_INLINE az_result az_curl_done(CURL ** const pp) {
+  AZ_CONTRACT_ARG_NOT_NULL(pp);
+  AZ_CONTRACT_ARG_NOT_NULL(*pp);
+
+  curl_easy_cleanup(*pp);
+  *pp = NULL;
+  return AZ_OK;
+}
 
 uint8_t zerobyte[] = { 0 };
 az_span const AZ_SPAN_ZEROBYTE = AZ_SPAN_LITERAL_FROM_INITIALIZED_BUFFER(zerobyte);
@@ -88,18 +141,19 @@ AZ_NODISCARD az_result az_add_header_to_curl_list(
 /**
  * @brief loop all the headers from a HTTP request and set each header into easy curl
  *
- * @param p_hrb an http builder request reference
+ * @param p_request an http builder request reference
  * @param p_headers list of headers in curl specific list
  * @return az_result
  */
-AZ_NODISCARD az_result az_build_headers(az_http_request * p_hrb, struct curl_slist ** p_headers) {
-  AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
+AZ_NODISCARD az_result
+az_build_headers(az_http_request * p_request, struct curl_slist ** p_headers) {
+  AZ_CONTRACT_ARG_NOT_NULL(p_request);
 
   az_pair header;
   for (int32_t offset = 0;
-       offset < (int32_t)(az_span_length(p_hrb->_internal.headers) / sizeof(az_pair));
+       offset < (int32_t)(az_span_length(p_request->_internal.headers) / sizeof(az_pair));
        ++offset) {
-    AZ_RETURN_IF_FAILED(az_http_request_get_header(p_hrb, offset, &header));
+    AZ_RETURN_IF_FAILED(az_http_request_get_header(p_request, offset, &header));
     AZ_RETURN_IF_FAILED(
         az_add_header_to_curl_list(header, p_headers, AZ_HTTP_REQUEST_BUILDER_HEADER_SEPARATOR));
   }
@@ -164,9 +218,9 @@ AZ_NODISCARD az_result az_curl_send_get_request(CURL * const p_curl) {
  * handles DELETE request
  */
 AZ_NODISCARD az_result
-az_curl_send_delete_request(CURL * const p_curl, az_http_request const * const p_hrb) {
+az_curl_send_delete_request(CURL * const p_curl, az_http_request const * const p_request) {
   AZ_CONTRACT_ARG_NOT_NULL(p_curl);
-  AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
+  AZ_CONTRACT_ARG_NOT_NULL(p_request);
 
   AZ_RETURN_IF_FAILED(
       az_curl_code_to_result(curl_easy_setopt(p_curl, CURLOPT_CUSTOMREQUEST, "DELETE")));
@@ -180,18 +234,18 @@ az_curl_send_delete_request(CURL * const p_curl, az_http_request const * const p
  * handles POST request. It handles seting up a body for request
  */
 AZ_NODISCARD az_result
-az_curl_send_post_request(CURL * const p_curl, az_http_request const * const p_hrb) {
+az_curl_send_post_request(CURL * const p_curl, az_http_request const * const p_request) {
   AZ_CONTRACT_ARG_NOT_NULL(p_curl);
-  AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
+  AZ_CONTRACT_ARG_NOT_NULL(p_request);
 
   // Method
   az_span body = { 0 };
   int32_t required_length
-      = az_span_length(p_hrb->_internal.body) + az_span_length(AZ_SPAN_ZEROBYTE);
+      = az_span_length(p_request->_internal.body) + az_span_length(AZ_SPAN_ZEROBYTE);
   AZ_RETURN_IF_FAILED(az_span_malloc(required_length, &body));
 
   char * b = (char *)az_span_ptr(body);
-  az_result res_code = az_span_to_str(b, required_length, p_hrb->_internal.body);
+  az_result res_code = az_span_to_str(b, required_length, p_request->_internal.body);
 
   if (az_succeeded(res_code)) {
     res_code = az_curl_code_to_result(curl_easy_setopt(p_curl, CURLOPT_POSTFIELDS, b));
@@ -228,17 +282,18 @@ int32_t _az_curl_upload_read_callback(void * ptr, size_t size, size_t nmemb, voi
  * handles POST request. It handles seting up a body for request
  */
 AZ_NODISCARD az_result
-az_curl_send_upload_request(CURL * const p_curl, az_http_request const * const p_hrb) {
+az_curl_send_upload_request(CURL * const p_curl, az_http_request const * const p_request) {
   AZ_CONTRACT_ARG_NOT_NULL(p_curl);
-  AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
+  AZ_CONTRACT_ARG_NOT_NULL(p_request);
 
   // Method
   az_span body = { 0 };
-  int32_t required_size = az_span_length(p_hrb->_internal.body) + az_span_length(AZ_SPAN_ZEROBYTE);
+  int32_t required_size
+      = az_span_length(p_request->_internal.body) + az_span_length(AZ_SPAN_ZEROBYTE);
   AZ_RETURN_IF_FAILED(az_span_malloc(required_size, &body));
 
   char * b = (char *)az_span_ptr(body);
-  az_result res_code = az_span_to_str(b, required_size, p_hrb->_internal.body);
+  az_result res_code = az_span_to_str(b, required_size, p_request->_internal.body);
 
   if (az_succeeded(res_code)) {
     res_code = az_curl_code_to_result(curl_easy_setopt(p_curl, CURLOPT_UPLOAD, 1L));
@@ -275,14 +330,14 @@ az_curl_send_upload_request(CURL * const p_curl, az_http_request const * const p
  * @brief finds out if there are headers in the request and add them to curl header list
  *
  * @param p_curl curl specific structure to send a request
- * @param p_hrb an http request builder
+ * @param p_request an http request builder
  * @return az_result
  */
-AZ_NODISCARD az_result setup_headers(CURL * const p_curl, az_http_request * p_hrb) {
+AZ_NODISCARD az_result setup_headers(CURL * const p_curl, az_http_request * p_request) {
   AZ_CONTRACT_ARG_NOT_NULL(p_curl);
-  AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
+  AZ_CONTRACT_ARG_NOT_NULL(p_request);
 
-  if (az_span_length(p_hrb->_internal.headers) == 0) {
+  if (az_span_length(p_request->_internal.headers) == 0) {
     // no headers, no need to set it up
     return AZ_OK;
   }
@@ -290,7 +345,7 @@ AZ_NODISCARD az_result setup_headers(CURL * const p_curl, az_http_request * p_hr
   // creates a slist for bulding curl headers
   struct curl_slist * p_list = NULL;
   // build headers into a slist as curl is expecting
-  AZ_RETURN_IF_FAILED(az_build_headers(p_hrb, &p_list));
+  AZ_RETURN_IF_FAILED(az_build_headers(p_request, &p_list));
   // set all headers from slist
   AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl, CURLOPT_HTTPHEADER, p_list));
 
@@ -301,24 +356,24 @@ AZ_NODISCARD az_result setup_headers(CURL * const p_curl, az_http_request * p_hr
  * @brief set url for the request
  *
  * @param p_curl specific curl struct to send a request
- * @param p_hrb an az http request builder holding all data to send request
+ * @param p_request an az http request builder holding all data to send request
  * @return az_result
  */
-AZ_NODISCARD az_result setup_url(CURL * const p_curl, az_http_request const * const p_hrb) {
+AZ_NODISCARD az_result setup_url(CURL * const p_curl, az_http_request const * const p_request) {
   AZ_CONTRACT_ARG_NOT_NULL(p_curl);
-  AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
+  AZ_CONTRACT_ARG_NOT_NULL(p_request);
 
   az_span writable_buffer;
   {
     // set URL as 0-terminated str
     size_t const extra_space_for_zero = az_span_length(AZ_SPAN_ZEROBYTE);
-    size_t const url_final_size = az_span_length(p_hrb->_internal.url) + extra_space_for_zero;
+    size_t const url_final_size = az_span_length(p_request->_internal.url) + extra_space_for_zero;
     // allocate buffer to add \0
     AZ_RETURN_IF_FAILED(az_span_malloc(url_final_size, &writable_buffer));
   }
 
   // write url in buffer (will add \0 at the end)
-  az_result result = az_write_url(writable_buffer, p_hrb->_internal.url);
+  az_result result = az_write_url(writable_buffer, p_request->_internal.url);
 
   if (az_succeeded(result)) {
     char * buffer = (char *)az_span_ptr(writable_buffer);
@@ -326,7 +381,7 @@ AZ_NODISCARD az_result setup_url(CURL * const p_curl, az_http_request const * co
   }
 
   // free used buffer before anything else
-  az_span_fill(writable_buffer, 0);
+  memset(az_span_ptr(writable_buffer), 0, az_span_capacity(writable_buffer));
   az_span_free(&writable_buffer);
 
   return result;
@@ -337,20 +392,14 @@ AZ_NODISCARD az_result setup_url(CURL * const p_curl, az_http_request const * co
  *
  * @param p_curl specif curl structure used to send http request
  * @param response_builder an http request builder holding all http request data
- * @param buildRFC7230 when it is set to true, response will be parsed following RFC 7230
  * @return az_result
  */
-AZ_NODISCARD az_result setup_response_redirect(
-    CURL * const p_curl,
-    az_span * const response_builder,
-    bool const buildRFC7230) {
+AZ_NODISCARD az_result
+setup_response_redirect(CURL * const p_curl, az_span * const response_builder) {
   AZ_CONTRACT_ARG_NOT_NULL(p_curl);
 
-  if (buildRFC7230) {
-    AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl, CURLOPT_HEADERFUNCTION, write_to_span));
-    AZ_RETURN_IF_CURL_FAILED(
-        curl_easy_setopt(p_curl, CURLOPT_HEADERDATA, (void *)response_builder));
-  }
+  AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl, CURLOPT_HEADERFUNCTION, write_to_span));
+  AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl, CURLOPT_HEADERDATA, (void *)response_builder));
 
   AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl, CURLOPT_WRITEFUNCTION, write_to_span));
   AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl, CURLOPT_WRITEDATA, (void *)response_builder));
@@ -363,33 +412,31 @@ AZ_NODISCARD az_result setup_response_redirect(
  * no matter is there is an error at any step.
  *
  * @param p_curl curl specific structure used to send an http request
- * @param p_hrb http builder with specific data to build an http request
+ * @param p_request http builder with specific data to build an http request
  * @param response pre-allocated buffer where to write http response
- * @param buildRFC7230 when true, response will follow RFC 7230
+
  * @return AZ_OK if request was sent and a response was received
  */
 AZ_NODISCARD az_result az_http_client_send_request_impl_process(
     CURL * p_curl,
-    az_http_request * const p_hrb,
-    az_http_response * const response,
-    bool const buildRFC7230) {
+    az_http_request * const p_request,
+    az_http_response * const response) {
   az_result result = AZ_ERROR_ARG;
 
-  AZ_RETURN_IF_CURL_FAILED(setup_headers(p_curl, p_hrb));
+  AZ_RETURN_IF_CURL_FAILED(setup_headers(p_curl, p_request));
 
-  AZ_RETURN_IF_CURL_FAILED(setup_url(p_curl, p_hrb));
+  AZ_RETURN_IF_CURL_FAILED(setup_url(p_curl, p_request));
 
-  AZ_RETURN_IF_CURL_FAILED(
-      setup_response_redirect(p_curl, &response->_internal.http_response, buildRFC7230));
+  AZ_RETURN_IF_CURL_FAILED(setup_response_redirect(p_curl, &response->_internal.http_response));
 
-  if (az_span_is_equal(p_hrb->_internal.method, AZ_HTTP_METHOD_GET)) {
+  if (az_span_is_equal(p_request->_internal.method, AZ_HTTP_METHOD_GET)) {
     result = az_curl_send_get_request(p_curl);
-  } else if (az_span_is_equal(p_hrb->_internal.method, AZ_HTTP_METHOD_POST)) {
-    result = az_curl_send_post_request(p_curl, p_hrb);
-  } else if (az_span_is_equal(p_hrb->_internal.method, AZ_HTTP_METHOD_DELETE)) {
-    result = az_curl_send_delete_request(p_curl, p_hrb);
-  } else if (az_span_is_equal(p_hrb->_internal.method, AZ_HTTP_METHOD_PUT)) {
-    result = az_curl_send_upload_request(p_curl, p_hrb);
+  } else if (az_span_is_equal(p_request->_internal.method, AZ_HTTP_METHOD_POST)) {
+    result = az_curl_send_post_request(p_curl, p_request);
+  } else if (az_span_is_equal(p_request->_internal.method, AZ_HTTP_METHOD_DELETE)) {
+    result = az_curl_send_delete_request(p_curl, p_request);
+  } else if (az_span_is_equal(p_request->_internal.method, AZ_HTTP_METHOD_PUT)) {
+    result = az_curl_send_upload_request(p_curl, p_request);
   } else {
     return AZ_ERROR_HTTP_INVALID_METHOD_VERB;
   }
@@ -405,16 +452,14 @@ AZ_NODISCARD az_result az_http_client_send_request_impl_process(
 /**
  * @brief uses AZ_HTTP_BUILDER to set up CURL request and perform it.
  *
- * @param p_hrb an internal http builder with data to build and send http request
- * @param response pre-allocated buffer where http response will be written
+ * @param p_request an internal http builder with data to build and send http request
+ * @param p_response pre-allocated buffer where http response will be written
  * @return az_result
  */
-AZ_NODISCARD az_result az_http_client_send_request_impl(
-    az_http_request * const p_hrb,
-    az_http_response * const response,
-    bool const buildRFC7230) {
-  AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
-  AZ_CONTRACT_ARG_NOT_NULL(response);
+AZ_NODISCARD az_result
+az_http_client_curl(az_http_request * p_request, az_http_response * p_response) {
+  AZ_CONTRACT_ARG_NOT_NULL(p_request);
+  AZ_CONTRACT_ARG_NOT_NULL(p_response);
 
   CURL * p_curl = NULL;
 
@@ -423,7 +468,7 @@ AZ_NODISCARD az_result az_http_client_send_request_impl(
 
   // process request
   az_result process_result
-      = az_http_client_send_request_impl_process(p_curl, p_hrb, response, buildRFC7230);
+      = az_http_client_send_request_impl_process(p_curl, p_request, p_response);
 
   // no matter if error or not, call curl done before returning to let curl clean everything
   AZ_RETURN_IF_FAILED(az_curl_done(&p_curl));

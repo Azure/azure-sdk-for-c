@@ -23,7 +23,6 @@ void test_json_builder();
 void test_json_get_by_pointer();
 void test_json_pointer();
 void test_json_string();
-void test_url_parse();
 void test_span_builder_replace();
 void test_mut_span();
 
@@ -602,7 +601,6 @@ int main() {
   test_json_get_by_pointer();
   test_json_pointer();
   test_json_string();
-  test_url_parse();
   test_span_builder_replace();
   test_mut_span();
   return exit_code;

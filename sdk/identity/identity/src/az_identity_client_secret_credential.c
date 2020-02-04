@@ -12,7 +12,6 @@
 #include <az_span_internal.h>
 
 #include <az_uri_internal.h>
-#include <az_url_internal.h>
 
 #include <_az_cfg.h>
 
@@ -34,7 +33,7 @@ static AZ_NODISCARD az_result _az_http_pipeline_no_op(
     az_http_request * const hrb,
     az_http_response * const response) {
   (void)data;
-  return p_policies[0].process(&(p_policies[1]), p_policies[0].data, hrb, response);
+  return p_policies[0].process(&(p_policies[1]), p_policies[0].p_options, hrb, response);
 }
 
 AZ_INLINE AZ_NODISCARD az_result
@@ -81,15 +80,14 @@ _az_identity_client_secret_credential_ms_oauth2_send_get_token_request(
       &hrb, AZ_HTTP_METHOD_POST, auth_url_buf, AZ_SPAN_FROM_BUFFER(header_buff), auth_body_buf));
 
   static az_http_pipeline pipeline = {
-      .policies = {
-        { .process = az_http_pipeline_policy_uniquerequestid, .data = NULL },
-        { .process = az_http_pipeline_policy_retry, .data = NULL },
-        { .process = _az_http_pipeline_no_op, .data = NULL },
-        { .process = az_http_pipeline_policy_logging, .data = NULL },
-        { .process = az_http_pipeline_policy_bufferresponse, .data = NULL },
-        { .process = az_http_pipeline_policy_distributedtracing, .data = NULL },
-        { .process = az_http_pipeline_policy_transport, .data = NULL },
-        { .process = NULL, .data = NULL },
+      .p_policies = {
+        { .process = az_http_pipeline_policy_uniquerequestid, .p_options = NULL },
+        { .process = az_http_pipeline_policy_retry, .p_options = NULL },
+        { .process = _az_http_pipeline_no_op, .p_options = NULL },
+        { .process = az_http_pipeline_policy_logging, .p_options = NULL },
+        { .process = az_http_pipeline_policy_bufferresponse, .p_options = NULL },
+        { .process = az_http_pipeline_policy_distributedtracing, .p_options = NULL },
+        { .process = az_http_pipeline_policy_transport, .p_options = NULL }, // TODO: We need to provide transport implementation here
       },
     };
 
@@ -207,15 +205,7 @@ static AZ_NODISCARD az_result _az_identity_client_secret_credential_credential_f
   AZ_CONTRACT_ARG_NOT_NULL(token_context->_internal.token);
   AZ_CONTRACT_ARG_NOT_NULL(hrb);
 
-  {
-    az_url url = { 0 };
-
-    AZ_RETURN_IF_FAILED(az_succeeded(az_url_parse(hrb->_internal.url, &url)));
-
-    if (!az_span_is_content_equal_ignoring_case(url.scheme, AZ_SPAN_FROM_STR("https"))) {
-      return AZ_ERROR_ARG;
-    }
-  }
+  // Assume https without validating. I/O request will fail if not
 
   AZ_RETURN_IF_FAILED(_az_identity_client_secret_credential_ensure_token_credential(token_context));
   int32_t token_length = token_context->_internal.token->_internal.token_size;

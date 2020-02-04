@@ -20,6 +20,7 @@ static az_span const AZ_STORAGE_API_VERSION = AZ_SPAN_LITERAL_FROM_STR("2019-02-
 typedef struct {
   az_http_policy_retry_options retry;
   struct {
+    az_http_client http_client;
     _az_http_policy_apiversion_options api_version;
   } _internal;
 } az_storage_blobs_blob_client_options;

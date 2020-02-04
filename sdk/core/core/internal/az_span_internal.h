@@ -13,18 +13,6 @@
 
 #include <_az_cfg_prefix.h>
 
-AZ_NODISCARD AZ_INLINE bool az_span_is_valid(az_span const span) {
-  return az_span_length(span) == 0
-      || (az_span_ptr(span) != NULL
-          && az_span_ptr(span) <= az_span_ptr(span) + az_span_length(span) - 1);
-}
-
-#define AZ_CONTRACT_ARG_VALID_SPAN(span) AZ_CONTRACT(az_span_is_valid(span), AZ_ERROR_ARG)
-
-AZ_NODISCARD AZ_INLINE bool az_span_is_empty(az_span const span) {
-  return az_span_length(span) == 0;
-}
-
 /**
  * @brief Set all the content of the span to @b fill without updating the length of the span.
  * This is util to set memory to zero before using span or make sure span is clean before use

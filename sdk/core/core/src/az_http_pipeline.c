@@ -15,6 +15,6 @@ AZ_NODISCARD az_result az_http_pipeline_process(
   AZ_CONTRACT_ARG_NOT_NULL(response);
   AZ_CONTRACT_ARG_NOT_NULL(pipeline);
 
-  return pipeline->policies[0].process(
-      &(pipeline->policies[1]), pipeline->policies[0].data, hrb, response);
+  return pipeline->p_policies[0].process(
+      &(pipeline->p_policies[1]), pipeline->p_policies[0].p_options, hrb, response);
 }

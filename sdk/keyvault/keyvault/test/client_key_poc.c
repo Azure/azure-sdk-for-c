@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include <az_curl.h>
 #include <az_http.h>
 #include <az_identity_client_secret_credential.h>
 #include <az_json.h>
@@ -37,8 +38,11 @@ int main() {
   }
 
   // Init client.
-  az_result const operation_result
-      = az_keyvault_keys_client_init(&client, az_span_from_str(getenv(URI_ENV)), &credential, NULL);
+  az_keyvault_keys_client_options options
+      = az_keyvault_keys_client_options_default(az_http_client_curl);
+
+  az_result const operation_result = az_keyvault_keys_client_init(
+      &client, az_span_from_str(getenv(URI_ENV)), &credential, &options);
 
   if (az_failed(operation_result)) {
     printf("Failed to init keys client");

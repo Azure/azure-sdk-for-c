@@ -16,9 +16,11 @@ static az_span const AZ_STORAGE_BLOBS_BLOB_TYPE_BLOCKBLOB = AZ_SPAN_LITERAL_FROM
 static az_span const AZ_HTTP_HEADER_CONTENT_LENGTH = AZ_SPAN_LITERAL_FROM_STR("Content-Length");
 static az_span const AZ_HTTP_HEADER_CONTENT_TYPE = AZ_SPAN_LITERAL_FROM_STR("Content-Type");
 
-AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_options_default() {
+AZ_NODISCARD az_storage_blobs_blob_client_options
+az_storage_blobs_blob_client_options_default(az_http_client http_client) {
   az_storage_blobs_blob_client_options options = {
-    ._internal = { .api_version = az_http_policy_apiversion_options_default() },
+    ._internal
+    = { .http_client = http_client, .api_version = az_http_policy_apiversion_options_default() },
     .retry = az_http_policy_retry_options_default(),
   };
 
@@ -35,23 +37,24 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
     void * credential,
     az_storage_blobs_blob_client_options * options) {
   AZ_CONTRACT_ARG_NOT_NULL(client);
+  AZ_CONTRACT_ARG_NOT_NULL(options);
 
   *client = (az_storage_blobs_blob_client){ ._internal = {
     .uri = uri,
-    .options = options == NULL ? az_storage_blobs_blob_client_options_default() : *options,
+    .options = *options,
     ._token = { 0 },
     ._token_context = { 0 },
     .pipeline = (az_http_pipeline){
-        .policies = {
-            { .process = az_http_pipeline_policy_apiversion,.data = &client->_internal.options._internal.api_version },
-            { .process = az_http_pipeline_policy_uniquerequestid, .data = NULL },
-            { .process = az_http_pipeline_policy_retry, .data = &client->_internal.options.retry },
-            { .process = az_http_pipeline_policy_authentication, .data = &(client->_internal._token_context) },
-            { .process = az_http_pipeline_policy_logging, .data = NULL },
-            { .process = az_http_pipeline_policy_bufferresponse, .data = NULL },
-            { .process = az_http_pipeline_policy_distributedtracing, .data = NULL },
-            { .process = az_http_pipeline_policy_transport, .data = NULL },
-            { .process = NULL, .data = NULL },
+        .p_policies = {
+            { .process = az_http_pipeline_policy_apiversion,.p_options = &client->_internal.options._internal.api_version },
+            { .process = az_http_pipeline_policy_uniquerequestid, .p_options = NULL },
+            { .process = az_http_pipeline_policy_retry, .p_options = &client->_internal.options.retry },
+            { .process = az_http_pipeline_policy_authentication, .p_options = &(client->_internal._token_context) },
+            { .process = az_http_pipeline_policy_logging, .p_options = NULL },
+            { .process = az_http_pipeline_policy_bufferresponse, .p_options = NULL },
+            { .process = az_http_pipeline_policy_distributedtracing, .p_options = NULL },
+            { .process = az_http_pipeline_policy_transport, .p_options = &client->_internal.options._internal.http_client },
+            { .process = NULL, .p_options = NULL },
         }, 
     }}};
 

@@ -36,10 +36,12 @@ AZ_NODISCARD AZ_INLINE az_span az_keyvault_client_constant_for_application_json(
   return AZ_SPAN_FROM_STR("application/json");
 }
 
-AZ_NODISCARD az_keyvault_keys_client_options az_keyvault_keys_client_options_default() {
+AZ_NODISCARD az_keyvault_keys_client_options
+az_keyvault_keys_client_options_default(az_http_client http_client) {
 
   az_keyvault_keys_client_options options = (az_keyvault_keys_client_options){
-    ._internal = { .api_version = az_http_policy_apiversion_options_default() },
+    ._internal
+    = { .http_client = http_client, .api_version = az_http_policy_apiversion_options_default() },
     .retry = az_http_policy_retry_options_default(),
   };
 
@@ -56,36 +58,35 @@ AZ_NODISCARD az_result az_keyvault_keys_client_init(
     void * credential,
     az_keyvault_keys_client_options * options) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
+  AZ_CONTRACT_ARG_NOT_NULL(options);
 
   *self
       = (az_keyvault_keys_client){ ._internal
                                    = { .uri = uri,
-                                       .options = options == NULL
-                                           ? az_keyvault_keys_client_options_default()
-                                           : *options,
+                                       .options = *options,
                                        ._token = { 0 },
                                        ._token_context = { 0 },
                                        .pipeline = (az_http_pipeline){
-                                           .policies = {
+                                           .p_policies = {
                                                { .process = az_http_pipeline_policy_apiversion,
-                                                 .data
+                                                 .p_options
                                                  = &self->_internal.options._internal.api_version },
                                                { .process = az_http_pipeline_policy_uniquerequestid,
-                                                 .data = NULL },
+                                                 .p_options = NULL },
                                                { .process = az_http_pipeline_policy_retry,
-                                                 .data = &(self->_internal.options.retry) },
+                                                 .p_options = &(self->_internal.options.retry) },
                                                { .process = az_http_pipeline_policy_authentication,
-                                                 .data = &(self->_internal._token_context) },
+                                                 .p_options = &(self->_internal._token_context) },
                                                { .process = az_http_pipeline_policy_logging,
-                                                 .data = NULL },
+                                                 .p_options = NULL },
                                                { .process = az_http_pipeline_policy_bufferresponse,
-                                                 .data = NULL },
+                                                 .p_options = NULL },
                                                { .process
                                                  = az_http_pipeline_policy_distributedtracing,
-                                                 .data = NULL },
+                                                 .p_options = NULL },
                                                { .process = az_http_pipeline_policy_transport,
-                                                 .data = NULL },
-                                               { .process = NULL, .data = NULL },
+                                                 .p_options
+                                                 = &self->_internal.options._internal.http_client },
                                            } } } };
 
   AZ_RETURN_IF_FAILED(az_identity_access_token_init(&(self->_internal._token)));

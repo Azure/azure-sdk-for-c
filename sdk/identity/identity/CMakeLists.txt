@@ -23,9 +23,6 @@ add_library (az::identity ALIAS az_identity)
 # add_executable (az_identity_test test/main.c)
 # target_link_libraries(az_identity_test PRIVATE az_identity)
 
-# curl easy perform POC
-add_executable (az_identity_poc test/curl_easy_perform_poc.c)
-target_link_libraries(az_identity_poc PRIVATE az_identity az_core_internal)
 
 if (UNIX)
   target_link_libraries(az_identity PRIVATE m)

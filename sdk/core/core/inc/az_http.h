@@ -68,7 +68,7 @@ extern az_http_method AZ_HTTP_METHOD_PATCH;
 /**
  * @brief Format buffer as a http request containing URL and header spans.
  *
- * @param p_hrb HTTP request builder to initialize.
+ * @param p_request HTTP request builder to initialize.
  * @param method HTTP verb: `"GET"`, `"POST"`, etc.
  * @param url Maximum URL length (see @ref az_http_request_builder_set_query_parameter).
  * @param headers_buffer HTTP verb: `"GET"`, `"POST"`, etc.
@@ -78,12 +78,12 @@ extern az_http_method AZ_HTTP_METHOD_PATCH;
  *   - *`AZ_OK`* success.
  *   - *`AZ_ERROR_BUFFER_OVERFLOW`* `buffer` does not have enough space to fit the `max_url_size`.
  *   - *`AZ_ERROR_ARG`*
- *     - `p_hrb` is _NULL_.
+ *     - `p_request` is _NULL_.
  *     - `buffer`, `method_verb`, or `initial_url` are invalid spans (see @ref az_span_is_valid).
  *     - `max_url_size` is less than `initial_url.size`.
  */
 AZ_NODISCARD az_result az_http_request_init(
-    az_http_request * p_hrb,
+    az_http_request * p_request,
     az_http_method method,
     az_span url,
     az_span headers_buffer,
@@ -95,16 +95,16 @@ AZ_NODISCARD az_result az_http_request_init(
  * path equals to `test`, then request url will be updated to `http://example.net/test?qp=1`.
  *
  *
- * @param p_hrb http request builder reference
+ * @param p_request http request builder reference
  * @param path span to a path to be appended into url
  * @return AZ_NODISCARD az_http_request_builder_append_path
  */
-AZ_NODISCARD az_result az_http_request_append_path(az_http_request * p_hrb, az_span path);
+AZ_NODISCARD az_result az_http_request_append_path(az_http_request * p_request, az_span path);
 
 /**
  * @brief Set query parameter.
  *
- * @param p_hrb HTTP request builder that holds the URL to set the query parameter to.
+ * @param p_request HTTP request builder that holds the URL to set the query parameter to.
  * @param name URL parameter name.
  * @param value URL parameter value.
  *
@@ -113,48 +113,49 @@ AZ_NODISCARD az_result az_http_request_append_path(az_http_request * p_hrb, az_s
  *   - *`AZ_ERROR_BUFFER_OVERFLOW`* the `URL` would grow past the `max_url_size`, should the
  * parameter gets set.
  *   - *`AZ_ERROR_ARG`*
- *     - `p_hrb` is _NULL_.
+ *     - `p_request` is _NULL_.
  *     - `name` or `value` are invalid spans (see @ref az_span_is_valid).
  *     - `name` or `value` are empty.
  *     - `name`'s or `value`'s buffer overlap resulting `url`'s buffer.
  */
 AZ_NODISCARD az_result
-az_http_request_set_query_parameter(az_http_request * p_hrb, az_span name, az_span value);
+az_http_request_set_query_parameter(az_http_request * p_request, az_span name, az_span value);
 
 /**
  * @brief Add a new HTTP header for the request.
  *
- * @param p_hrb HTTP request builder that holds the URL to set the query parameter to.
+ * @param p_request HTTP request builder that holds the URL to set the query parameter to.
  * @param key Header name (e.g. `"Content-Type"`).
  * @param value Header value (e.g. `"application/x-www-form-urlencoded"`).
  *
  * @return
  *   - *`AZ_OK`* success.
- *   - *`AZ_ERROR_BUFFER_OVERFLOW`* there isn't enough space in the `p_hrb->buffer` to add a header.
+ *   - *`AZ_ERROR_BUFFER_OVERFLOW`* there isn't enough space in the `p_request->buffer` to add a
+ * header.
  *   - *`AZ_ERROR_ARG`*
- *     - `p_hrb` is _NULL_.
+ *     - `p_request` is _NULL_.
  *     - `key` or `value` are invalid spans (see @ref az_span_is_valid).
  *     - `key` or `value` are empty.
  *     - `name`'s or `value`'s buffer overlap resulting `url`'s buffer.
  */
 AZ_NODISCARD az_result
-az_http_request_append_header(az_http_request * p_hrb, az_span key, az_span value);
+az_http_request_append_header(az_http_request * p_request, az_span key, az_span value);
 
 /**
  * @brief Get the HTTP header by index.
  *
- * @param p_hrb HTTP request builder.
+ * @param p_request HTTP request builder.
  * @param index Index of the HTTP header to get from the builder.
  * @param out_result Pointer to write the result to.
  *
  * @return
  *   - *`AZ_OK`* success.
  *   - *`AZ_ERROR_ARG`*
- *     - `p_hrb` or `out_result` are _NULL_.
+ *     - `p_request` or `out_result` are _NULL_.
  *     - `index` is out of range.
  */
 AZ_NODISCARD az_result
-az_http_request_get_header(az_http_request * p_hrb, int32_t index, az_pair * out_result);
+az_http_request_get_header(az_http_request * p_request, int32_t index, az_pair * out_result);
 
 typedef enum {
   AZ_HTTP_RESPONSE_KIND_NONE = 0,
@@ -318,6 +319,9 @@ AZ_NODISCARD AZ_INLINE az_result az_http_response_reset(az_http_response * const
       az_span_capacity(self->_internal.http_response));
   return AZ_OK;
 }
+
+typedef AZ_NODISCARD az_result (
+    *az_http_client)(az_http_request * p_request, az_http_response * p_response);
 
 #include <_az_cfg_suffix.h>
 
