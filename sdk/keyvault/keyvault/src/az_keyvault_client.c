@@ -36,11 +36,18 @@ AZ_NODISCARD AZ_INLINE az_span az_keyvault_client_constant_for_application_json(
   return AZ_SPAN_FROM_STR("application/json");
 }
 
-AZ_NODISCARD az_keyvault_keys_client_options az_keyvault_keys_client_default_options() {
-  return (az_keyvault_keys_client_options){ .retry = {
-                                                .max_retry = 3,
-                                                .delay_in_ms = 30,
-                                            } };
+AZ_NODISCARD az_keyvault_keys_client_options az_keyvault_keys_client_options_default() {
+
+  az_keyvault_keys_client_options options = (az_keyvault_keys_client_options){
+    ._internal = { .api_version = az_http_policy_apiversion_options_default() },
+    .retry = az_http_policy_retry_options_default(),
+  };
+
+  options._internal.api_version.add_as_header = false;
+  options._internal.api_version.name = AZ_HTTP_HEADER_API_VERSION;
+  options._internal.api_version.version = AZ_KEYVAULT_API_VERSION;
+
+  return options;
 }
 
 AZ_NODISCARD az_result az_keyvault_keys_client_init(
@@ -52,27 +59,21 @@ AZ_NODISCARD az_result az_keyvault_keys_client_init(
 
   *self
       = (az_keyvault_keys_client){ ._internal
-                                   = { ._apiversion_options
-                                       = (_az_http_policy_apiversion_options){ .add_as_header
-                                                                               = false,
-                                                                               .name
-                                                                               = AZ_HTTP_HEADER_API_VERSION,
-                                                                               .version
-                                                                               = AZ_KEYVAULT_API_VERSION },
-                                       .uri = uri,
-                                       .retry_options = options == NULL
-                                           ? az_keyvault_keys_client_default_options()
+                                   = { .uri = uri,
+                                       .options = options == NULL
+                                           ? az_keyvault_keys_client_options_default()
                                            : *options,
                                        ._token = { 0 },
                                        ._token_context = { 0 },
                                        .pipeline = (az_http_pipeline){
                                            .policies = {
                                                { .process = az_http_pipeline_policy_apiversion,
-                                                 .data = &self->_internal._apiversion_options },
+                                                 .data
+                                                 = &self->_internal.options._internal.api_version },
                                                { .process = az_http_pipeline_policy_uniquerequestid,
                                                  .data = NULL },
                                                { .process = az_http_pipeline_policy_retry,
-                                                 .data = &(self->_internal.retry_options.retry) },
+                                                 .data = &(self->_internal.options.retry) },
                                                { .process = az_http_pipeline_policy_authentication,
                                                  .data = &(self->_internal._token_context) },
                                                { .process = az_http_pipeline_policy_logging,
