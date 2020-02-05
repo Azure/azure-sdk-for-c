@@ -50,7 +50,7 @@ _az_identity_client_secret_credential_ms_oauth2_send_get_token_request(
     az_identity_access_token_context const * const token_context,
     az_span auth_url_buf,
     az_span auth_body_buf,
-    az_span hrb_buf,
+    az_span headers_span,
     az_http_response * response,
     uint64_t * const requested_at_msec) {
   AZ_CONTRACT_ARG_NOT_NULL(token_context->_internal.credential);
@@ -90,10 +90,8 @@ _az_identity_client_secret_credential_ms_oauth2_send_get_token_request(
   }
 
   az_http_request hrb = { 0 };
-  // Adding small buffer for 2 headers in case pipeline  needs to add a header or 2
-  uint8_t header_buff[2 * sizeof(az_span)];
-  AZ_RETURN_IF_FAILED(az_http_request_init(
-      &hrb, az_http_method_post(), auth_url_buf, AZ_SPAN_FROM_BUFFER(header_buff), auth_body_buf));
+  AZ_RETURN_IF_FAILED(
+      az_http_request_init(&hrb, az_http_method_post(), auth_url_buf, headers_span, auth_body_buf));
 
   static az_http_pipeline pipeline = {
       .p_policies = {
@@ -119,17 +117,17 @@ AZ_INLINE AZ_NODISCARD az_result _az_identity_client_secret_credential_ms_oauth2
   {
     uint8_t auth_url_buf[_az_IDENTITY_CLIENT_SECRET_CREDENTIAL_AUTH_URL_BUF_SIZE] = { 0 };
     uint8_t auth_body_buf[_az_IDENTITY_CLIENT_SECRET_CREDENTIAL_AUTH_BODY_BUF_SIZE] = { 0 };
-    uint8_t hrb_buf[_az_IDENTITY_CLIENT_SECRET_CREDENTIAL_HRB_BUF_SIZE] = { 0 };
+    uint8_t headers_buffer[_az_IDENTITY_CLIENT_SECRET_CREDENTIAL_HRB_BUF_SIZE] = { 0 };
 
     az_span const auth_url = AZ_SPAN_FROM_BUFFER(auth_url_buf);
     az_span const auth_body = AZ_SPAN_FROM_BUFFER(auth_body_buf);
-    az_span const hrb_buf_span = AZ_SPAN_FROM_BUFFER(hrb_buf);
+    az_span const headers_buf_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
 
     az_result const token_request_result
         = _az_identity_client_secret_credential_ms_oauth2_send_get_token_request(
-            token_context, auth_url, auth_body, hrb_buf_span, response, &requested_at_msec);
+            token_context, auth_url, auth_body, headers_buf_span, response, &requested_at_msec);
 
-    az_span_set(hrb_buf_span, '#');
+    az_span_set(headers_buf_span, '#');
     az_span_set(auth_body, '#');
     az_span_set(auth_url, '#');
     AZ_RETURN_IF_FAILED(token_request_result);
@@ -151,8 +149,8 @@ AZ_INLINE AZ_NODISCARD az_result _az_identity_client_secret_credential_ms_oauth2
     uint64_t expires_in_msec = 0;
     if (requested_at_msec > 0) {
       double expires_in_seconds = 0;
-      if (az_succeeded(az_json_get_object_member(body, AZ_STR("expires_in"), &value))
-          && az_succeeded(az_json_token_get_number(value, &expires_in_seconds))
+      if (az_succeeded(az_json_parse_by_pointer(body, AZ_SPAN_FROM_STR("/expires_in"), &token))
+          && az_succeeded(az_json_token_get_number(token, &expires_in_seconds))
           && expires_in_seconds > 0) {
         double const norefresh_period_msec = (expires_in_seconds - (double)(3 * 60)) * 1000;
         if (((int64_t)norefresh_period_msec) > 0) {

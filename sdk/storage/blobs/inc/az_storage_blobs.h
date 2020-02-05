@@ -22,10 +22,12 @@ typedef struct {
   struct {
     az_http_client http_client;
     _az_http_policy_apiversion_options api_version;
+    _az_http_policy_telemetry_options _telemetry_options;
   } _internal;
 } az_storage_blobs_blob_client_options;
 
-AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_options_default();
+AZ_NODISCARD az_storage_blobs_blob_client_options
+az_storage_blobs_blob_client_options_default(az_http_client http_client);
 typedef struct {
   struct {
     az_span uri;

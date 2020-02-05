@@ -211,6 +211,10 @@ AZ_NODISCARD az_result az_span_to_str(char * s, int32_t max_size, az_span span);
 
 AZ_NODISCARD az_result az_span_append_double(az_span span, double value, az_span * out);
 
+AZ_NODISCARD az_result az_span_append_uint64(az_span * self, uint64_t n);
+
+AZ_NODISCARD az_result az_span_append_int64(az_span * self, int64_t n);
+
 /**
  * @brief a pair of az_span of bytes as a key and value
  *

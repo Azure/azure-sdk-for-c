@@ -4,6 +4,7 @@
 #ifndef _az_RESULT_H
 #define _az_RESULT_H
 
+#include <az_facility.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -39,8 +40,8 @@ enum {
  *   -  0..30 Value
  */
 typedef enum az_result {
-  AZ_OK = AZ_MAKE_SUCCESS(AZ_CORE_FACILITY, 0),
-  AZ_CONTINUE = AZ_MAKE_SUCCESS(AZ_CORE_FACILITY, 1),
+  AZ_OK = AZ_MAKE_SUCCESS(AZ_FACILITY_CORE, 0),
+  AZ_CONTINUE = AZ_MAKE_SUCCESS(AZ_FACILITY_CORE, 1),
 
   // Core
   AZ_ERROR_ARG = _az_RESULT_MAKE_ERROR(AZ_FACILITY_CORE, 1),

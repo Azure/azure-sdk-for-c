@@ -33,23 +33,23 @@ AZ_NODISCARD AZ_INLINE az_result az_http_pipeline_nextpolicy(
 }
 
 static az_span AZ_MS_CLIENT_REQUESTID = AZ_SPAN_LITERAL_FROM_STR("x-ms-client-request-id");
+static az_span AZ_HTTP_HEADER_USER_AGENT = AZ_SPAN_LITERAL_FROM_STR("User-Agent");
 
 AZ_NODISCARD az_result az_http_pipeline_policy_apiversion(
     az_http_policy * p_policies,
     void * p_options,
-    az_http_request_builder * p_request,
+    az_http_request * p_request,
     az_http_response * p_response) {
 
   _az_http_policy_apiversion_options * options = (_az_http_policy_apiversion_options *)(p_options);
 
   if (options->add_as_header) {
     // Add the version as a header
-    AZ_RETURN_IF_FAILED(
-        az_http_request_builder_append_header(p_request, options->name, options->version));
+    AZ_RETURN_IF_FAILED(az_http_request_append_header(p_request, options->name, options->version));
   } else {
     // Add the version as a query parameter
     AZ_RETURN_IF_FAILED(
-        az_http_request_builder_set_query_parameter(p_request, options->name, options->version));
+        az_http_request_set_query_parameter(p_request, options->name, options->version));
   }
   return az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
 }
@@ -68,21 +68,13 @@ AZ_NODISCARD az_result az_http_pipeline_policy_uniquerequestid(
   //  x-ms-client-request-id
   AZ_RETURN_IF_FAILED(az_http_request_append_header(p_request, AZ_MS_CLIENT_REQUESTID, uniqueid));
 
-  return az_http_pipeline_nextpolicy(p_policies, hrb, response);
-}
-
-AZ_NODISCARD az_result
-_az_http_policy_telemetry_options_init(_az_http_policy_telemetry_options * self) {
-  AZ_CONTRACT_ARG_NOT_NULL(self);
-  *self = (_az_http_policy_telemetry_options){ 0 };
-  self->os = AZ_STR("Unknown OS");
-  return AZ_OK;
+  return az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
 }
 
 AZ_NODISCARD az_result az_http_pipeline_policy_telemetry(
     az_http_policy * p_policies,
     void * p_options,
-    az_http_request_builder * p_request,
+    az_http_request * p_request,
     az_http_response * p_response) {
 
   _az_http_policy_telemetry_options * options = (_az_http_policy_telemetry_options *)(p_options);
@@ -90,25 +82,6 @@ AZ_NODISCARD az_result az_http_pipeline_policy_telemetry(
   AZ_RETURN_IF_FAILED(
       az_http_request_append_header(p_request, AZ_HTTP_HEADER_USER_AGENT, options->os));
 
-  return az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
-}
-
-AZ_NODISCARD az_result az_http_pipeline_policy_apiversion(
-    az_http_policy * p_policies,
-    void * p_options,
-    az_http_request * p_request,
-    az_http_response * p_response) {
-
-  _az_http_policy_apiversion_options * options = (_az_http_policy_apiversion_options *)(p_options);
-
-  if (options->add_as_header) {
-    // Add the version as a header
-    AZ_RETURN_IF_FAILED(az_http_request_append_header(p_request, options->name, options->version));
-  } else {
-    // Add the version as a query parameter
-    AZ_RETURN_IF_FAILED(
-        az_http_request_set_query_parameter(p_request, options->name, options->version));
-  }
   return az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
 }
 
@@ -152,7 +125,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_logging(
     void * p_options,
     az_http_request * p_request,
     az_http_response * p_response) {
-
+  (void)p_options;
   if (az_log_should_write(AZ_LOG_HTTP_REQUEST)) {
     _az_log_http_request(p_request);
   }

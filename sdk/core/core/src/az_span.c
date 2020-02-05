@@ -358,6 +358,46 @@ AZ_NODISCARD az_result az_span_append_double(az_span span, double value, az_span
   }
 }
 
+AZ_INLINE uint8_t _az_decimal_to_ascii(uint8_t const d) { return '0' + d; }
+
+static AZ_NODISCARD az_result _az_span_builder_append_uint64(az_span * self, uint64_t const n) {
+  if (n == 0) {
+    return az_span_append(*self, AZ_SPAN_FROM_STR("0"), self);
+  }
+
+  uint64_t div = 10000000000000000000ull;
+  uint64_t nn = n;
+  while (nn / div == 0) {
+    div /= 10;
+  }
+
+  while (div > 1) {
+    uint8_t value_to_append = _az_decimal_to_ascii((uint8_t)(nn / div));
+    AZ_RETURN_IF_FAILED(az_span_append(*self, az_span_init(&value_to_append, 1, 1), self));
+
+    nn %= div;
+    div /= 10;
+  }
+  uint8_t value_to_append = _az_decimal_to_ascii((uint8_t)nn);
+  return az_span_append(*self, az_span_init(&value_to_append, 1, 1), self);
+}
+
+AZ_NODISCARD az_result az_span_append_uint64(az_span * self, uint64_t n) {
+  AZ_CONTRACT_ARG_NOT_NULL(self);
+  return _az_span_builder_append_uint64(self, n);
+}
+
+AZ_NODISCARD az_result az_span_append_int64(az_span * self, int64_t n) {
+  AZ_CONTRACT_ARG_NOT_NULL(self);
+
+  if (n < 0) {
+    AZ_RETURN_IF_FAILED(az_span_append(*self, AZ_SPAN_FROM_STR("-"), self));
+    return _az_span_builder_append_uint64(self, -n);
+  }
+
+  return _az_span_builder_append_uint64(self, n);
+}
+
 // PRIVATE. read until condition is true on character.
 // Then return number of positions read with output parameter
 AZ_NODISCARD az_result _az_scan_until(az_span self, _az_predicate predicate, int32_t * out_index) {

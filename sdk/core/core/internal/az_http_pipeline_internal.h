@@ -40,7 +40,7 @@ struct az_http_policy {
 };
 
 typedef struct {
-  az_http_policy p_policies[9];
+  az_http_policy p_policies[10];
 } az_http_pipeline;
 
 // Start the pipeline
@@ -58,6 +58,12 @@ AZ_NODISCARD az_result az_http_pipeline_policy_apiversion(
 AZ_NODISCARD az_result az_http_pipeline_policy_uniquerequestid(
     az_http_policy * p_policies,
     void * p_data,
+    az_http_request * p_request,
+    az_http_response * p_response);
+
+AZ_NODISCARD az_result az_http_pipeline_policy_telemetry(
+    az_http_policy * p_policies,
+    void * p_options,
     az_http_request * p_request,
     az_http_response * p_response);
 

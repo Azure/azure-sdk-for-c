@@ -36,7 +36,7 @@ typedef struct {
 
 AZ_NODISCARD AZ_INLINE _az_http_policy_telemetry_options
 _az_http_policy_apiversion_options_default() {
-  return (_az_http_policy_telemetry_options){ .os = AZ_STR("Unknown OS") };
+  return (_az_http_policy_telemetry_options){ .os = AZ_SPAN_FROM_STR("Unknown OS") };
 }
 
 typedef struct {
