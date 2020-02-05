@@ -24,6 +24,7 @@ void test_json_pointer();
 void test_json_string();
 void test_span_builder_replace();
 void test_mut_span();
+void test_log();
 
 int exit_code = 0;
 
@@ -399,7 +400,6 @@ int main() {
       TEST_ASSERT(result == AZ_OK);
     }
 
-
     {
       uint8_t buf[256 * 3];
       az_span builder = AZ_SPAN_FROM_BUFFER(buf);
@@ -494,5 +494,6 @@ int main() {
   test_json_get_by_pointer();
   test_json_pointer();
   test_json_string();
+  test_log();
   return exit_code;
 }

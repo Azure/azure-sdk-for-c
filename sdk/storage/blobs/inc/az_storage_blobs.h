@@ -52,6 +52,10 @@ az_storage_blobs_blob_upload_options_default() {
   return (az_storage_blobs_blob_upload_options){ .option = az_span_null() };
 }
 
+typedef struct {
+  az_span option;
+} az_storage_blobs_blob_download_options;
+
 /**
  * @brief Creates a new blob
  *

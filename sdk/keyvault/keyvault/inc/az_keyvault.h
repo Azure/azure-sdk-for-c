@@ -28,6 +28,7 @@ typedef struct {
   az_http_policy_retry_options retry;
   struct {
     _az_http_policy_apiversion_options api_version;
+    _az_http_policy_telemetry_options _telemetry_options;
     az_http_client http_client;
   } _internal;
 } az_keyvault_keys_client_options;

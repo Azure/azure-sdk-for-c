@@ -25,6 +25,20 @@ az_http_policy_apiversion_options_default() {
   return (_az_http_policy_apiversion_options){ 0 };
 }
 
+/**
+ * @brief options for the telemetry policy
+ * os = string representation of currently executing Operating System
+ *
+ */
+typedef struct {
+  az_span os;
+} _az_http_policy_telemetry_options;
+
+AZ_NODISCARD AZ_INLINE _az_http_policy_telemetry_options
+_az_http_policy_apiversion_options_default() {
+  return (_az_http_policy_telemetry_options){ .os = AZ_STR("Unknown OS") };
+}
+
 typedef struct {
   uint16_t max_retries;
   uint16_t delay_in_ms;
