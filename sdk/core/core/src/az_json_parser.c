@@ -207,7 +207,7 @@ AZ_NODISCARD static az_result az_span_reader_get_json_string_rest(
     az_result const result = az_span_reader_read_json_string_char(self, &ignore);
     switch (result) {
       case AZ_ERROR_JSON_STRING_END: {
-        AZ_RETURN_IF_FAILED(az_span_slice(self->span, begin, self->i, string));
+        AZ_RETURN_IF_FAILED(az_span_slice(self->span, (int32_t)begin, (int32_t)self->i, string));
         az_span_reader_next(self);
         return AZ_OK;
       }

@@ -226,7 +226,7 @@ static AZ_NODISCARD az_result _az_identity_client_secret_credential_credential_f
   // Assume https without validating. I/O request will fail if not
 
   AZ_RETURN_IF_FAILED(_az_identity_client_secret_credential_ensure_token_credential(token_context));
-  int32_t token_length = token_context->_internal.token->_internal.token_size;
+  int32_t token_length = (int32_t)token_context->_internal.token->_internal.token_size;
   return az_http_request_append_header(
       hrb,
       AZ_SPAN_FROM_STR("authorization"),

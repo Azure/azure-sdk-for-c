@@ -27,7 +27,7 @@ AZ_NODISCARD az_result az_span_malloc(size_t size, az_span * out) {
   if (p == NULL) {
     return AZ_ERROR_OUT_OF_MEMORY;
   }
-  *out = az_span_init(p, 0, size);
+  *out = az_span_init(p, 0, (int32_t)size);
   return AZ_OK;
 }
 
@@ -195,7 +195,8 @@ size_t write_to_span(
   size_t const expected_size = size * nmemb;
   az_span * const user_buffer_builder = (az_span *)userp;
 
-  az_span const span_for_content = az_span_init((uint8_t *)contents, expected_size, expected_size);
+  az_span const span_for_content
+      = az_span_init((uint8_t *)contents, (int32_t)expected_size, (int32_t)expected_size);
   AZ_RETURN_IF_FAILED(az_span_append(*user_buffer_builder, span_for_content, user_buffer_builder));
 
   // This callback needs to return the response size or curl will consider it as it failed
@@ -264,7 +265,7 @@ int32_t _az_curl_upload_read_callback(void * ptr, size_t size, size_t nmemb, voi
 
   az_span * mut_span = (az_span *)userdata;
 
-  int32_t curl_size = nmemb * size;
+  int32_t curl_size = (int32_t)(nmemb * size);
 
   // Nothing to copy
   if (curl_size < 1 || !(az_span_length(*mut_span)))

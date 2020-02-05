@@ -15,8 +15,8 @@ enum {
 };
 
 AZ_NODISCARD az_result az_span_slice(
-    az_span const span,
-    int32_t const low_index,
+    az_span span,
+    int32_t low_index,
     int32_t high_index,
     az_span * out_sub_span) {
   // left part
@@ -38,7 +38,7 @@ AZ_NODISCARD AZ_INLINE az_result_byte az_ascii_lower(az_result_byte const value)
   return 'A' <= value && value <= 'Z' ? value + AZ_ASCII_LOWER_DIF : value;
 }
 
-AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span const a, az_span const b) {
+AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span a, az_span b) {
   int32_t const size = az_span_length(a);
   if (size != az_span_length(b)) {
     return false;
@@ -51,7 +51,7 @@ AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span const a, az_spa
   return true;
 }
 
-AZ_NODISCARD az_result az_span_to_uint64(az_span const self, uint64_t * const out) {
+AZ_NODISCARD az_result az_span_to_uint64(az_span self, uint64_t * out) {
   if (az_span_length(self) <= 0) {
     return AZ_ERROR_EOF;
   }

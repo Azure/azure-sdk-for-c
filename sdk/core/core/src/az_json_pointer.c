@@ -57,7 +57,7 @@ az_span_reader_read_json_pointer_token(az_span_reader * self, az_span * out) {
     AZ_RETURN_IF_FAILED(result);
   }
 
-  size_t const begin = self->i;
+  int32_t const begin = self->i;
   while (true) {
     uint32_t ignore = { 0 };
     az_result const result = az_span_reader_read_json_pointer_char(self, &ignore);

@@ -51,7 +51,7 @@ AZ_NODISCARD az_result az_http_request_append_path(az_http_request * p_hrb, az_s
 
   // get the query starting point.
   bool url_with_question_mark = p_hrb->_internal.query_start > 0;
-  uint16_t query_start = url_with_question_mark ? p_hrb->_internal.query_start - 1
+  int32_t query_start = url_with_question_mark ? p_hrb->_internal.query_start - 1
                                                 : az_span_length(p_hrb->_internal.url);
 
   /* use replace twice. Yes, we will have 2 right shift (one on each replace), but we rely on
