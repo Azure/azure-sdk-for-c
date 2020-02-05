@@ -27,10 +27,11 @@ target_include_directories (az_keyvault_test PRIVATE src)
 
 # make key vault POC
 add_executable (az_keyvault_poc test/client_key_poc.c)
-target_link_libraries(az_keyvault_poc PRIVATE az_keyvault az_core_internal az_curl)
+target_link_libraries(az_keyvault_poc PRIVATE az_keyvault az_core az_core_internal az_curl)
 
 if (UNIX)
   target_link_libraries(az_keyvault PRIVATE m)
+  target_link_libraries(az_keyvault_poc PRIVATE m)
 endif()
 
 add_test(NAME az_keyvault_test COMMAND az_keyvault_test)

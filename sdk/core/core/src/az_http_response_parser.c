@@ -119,10 +119,8 @@ az_http_response_get_status_line(az_http_response * response, az_http_response_s
   AZ_CONTRACT_ARG_NOT_NULL(response);
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
-  // set http response to initial state if it is at any other state
-  if (response->_internal.parser.next_kind != AZ_HTTP_RESPONSE_KIND_STATUS_LINE) {
-    response->_internal.parser.remaining = response->_internal.http_response;
-  }
+  // Restart parser to the beggining
+  response->_internal.parser.remaining = response->_internal.http_response;
 
   // read an HTTP status line.
   AZ_RETURN_IF_FAILED(_az_get_http_status_line(&response->_internal.parser.remaining, out));
@@ -227,7 +225,8 @@ AZ_NODISCARD az_result az_http_response_get_body(az_http_response * self, az_spa
   // directly and ignore headers and status line
   az_http_response_kind current_parsing_section = self->_internal.parser.next_kind;
   if (current_parsing_section != AZ_HTTP_RESPONSE_KIND_BODY) {
-    if (current_parsing_section == AZ_HTTP_RESPONSE_KIND_EOF) {
+    if (current_parsing_section == AZ_HTTP_RESPONSE_KIND_EOF
+        || current_parsing_section == AZ_HTTP_RESPONSE_KIND_STATUS_LINE) {
       // Reset parser and get status line
       az_http_response_status_line ignore = { 0 };
       AZ_RETURN_IF_FAILED(az_http_response_get_status_line(self, &ignore));

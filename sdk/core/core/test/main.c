@@ -398,77 +398,7 @@ int main() {
       az_result const result = read_write(sample1, &output, &o);
       TEST_ASSERT(result == AZ_OK);
     }
-    /*
-    {
-      az_span const expected
-          = AZ_SPAN_FROM_STR("@#############make some zero-terminated strings#make "
-                             "some\0zero-terminated\0strings\0####@");
 
-      uint8_t buf[87];
-      assert(expected.size == sizeof(buf));
-      for (int32_t i = 0; i < sizeof(buf); ++i) {
-        buf[i] = '@';
-      }
-
-      az_span actual = { .begin = buf, .size = sizeof(buf) };
-      az_span_set((az_span){ .begin = actual.begin + 1, .size = actual.size - 2 }, '#');
-
-      az_span result;
-
-      char const phrase2[] = "make some zero-terminated strings";
-      memcpy(actual.begin + 14, phrase2, sizeof(phrase2) - 1);
-
-      az_span const make_some = (az_span){ .begin = actual.begin + 14, .size = 9 };
-      az_span const zero_terminated = (az_span){ .begin = actual.begin + 24, .size = 15 };
-      az_span const strings = (az_span){ .begin = actual.begin + 40, .size = 7 };
-
-      TEST_EXPECT_SUCCESS(
-          az_span_to_str((az_span){ .begin = actual.begin + 48, .size = 10 }, make_some, &result));
-      TEST_EXPECT_SUCCESS(az_span_to_str(
-          (az_span){ .begin = actual.begin + 58, .size = 16 }, zero_terminated, &result));
-      TEST_EXPECT_SUCCESS(
-          az_span_to_str((az_span){ .begin = actual.begin + 74, .size = 8 }, strings, &result));
-
-      result.begin[result.size - 1] = '$';
-      TEST_EXPECT_SUCCESS(az_span_to_str(result, strings, &result));
-
-      TEST_ASSERT(az_span_is_equal(az_span_to_span(actual), expected));
-    }
-    {
-      uint8_t buf[68];
-      az_span const buffer = { .begin = buf, .size = sizeof(buf) };
-      az_span result;
-
-      az_span const * const decoded_input[] = {
-        &b64_decoded0, &b64_decoded1, &b64_decoded2,     &b64_decoded3,     &b64_decoded4,
-        &b64_decoded5, &b64_decoded6, &b64_decoded_bin1, &b64_decoded_bin2, &b64_decoded_bin3
-      };
-
-      az_span const * const encoded_input[] = {
-        &b64_encoded0, &b64_encoded1, &b64_encoded2,     &b64_encoded3,     &b64_encoded4,
-        &b64_encoded5, &b64_encoded6, &b64_encoded_bin1, &b64_encoded_bin2, &b64_encoded_bin3
-      };
-
-      az_span const * const url_encoded_input[]
-          = { &b64_encoded0u,     &b64_encoded1u,    &b64_encoded2u, &b64_encoded3u,
-              &b64_encoded4u,     &b64_encoded5u,    &b64_encoded6u, &b64_encoded_bin1u,
-              &b64_encoded_bin2u, &b64_encoded_bin3u };
-
-      for (int32_t i = 0; i < 10; ++i) {
-        TEST_EXPECT_SUCCESS(az_base64_encode(false, buffer, *decoded_input[i], &result));
-        TEST_ASSERT(az_span_is_equal(result, *encoded_input[i]));
-
-        TEST_EXPECT_SUCCESS(az_base64_decode(buffer, *encoded_input[i], &result));
-        TEST_ASSERT(az_span_is_equal(result, *decoded_input[i]));
-
-        TEST_EXPECT_SUCCESS(az_base64_encode(true, buffer, *decoded_input[i], &result));
-        TEST_ASSERT(az_span_is_equal(result, *url_encoded_input[i]));
-
-        TEST_EXPECT_SUCCESS(az_base64_decode(buffer, *url_encoded_input[i], &result));
-        TEST_ASSERT(az_span_is_equal(result, *decoded_input[i]));
-      }
-    }
-    */
 
     {
       uint8_t buf[256 * 3];
@@ -558,11 +488,11 @@ int main() {
   }
 
   test_http_response();
+  test_span_builder_replace();
+  test_mut_span();
   test_json_builder();
   test_json_get_by_pointer();
   test_json_pointer();
   test_json_string();
-  test_span_builder_replace();
-  test_mut_span();
   return exit_code;
 }
