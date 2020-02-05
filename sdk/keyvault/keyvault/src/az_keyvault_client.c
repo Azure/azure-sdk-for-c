@@ -63,7 +63,6 @@ AZ_NODISCARD az_result az_keyvault_keys_client_init(
   *self
       = (az_keyvault_keys_client){ ._internal
                                    = { .uri = AZ_SPAN_FROM_BUFFER(self->_internal.url_buffer),
-                                       .initial_url_length = az_span_length(uri),
                                        .options = *options,
                                        ._token = { 0 },
                                        ._token_context = { 0 },
@@ -180,17 +179,6 @@ AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
   return AZ_OK;
 }
 
-AZ_NODISCARD static az_result _az_reset_url_to_initial_state(az_keyvault_keys_client * client) {
-  if (client->_internal.initial_url_length != az_span_length(client->_internal.uri)) {
-    // Can't use slice here because we would lost original capacity
-    client->_internal.uri = az_span_init(
-        az_span_ptr(client->_internal.uri),
-        client->_internal.initial_url_length,
-        az_span_capacity(client->_internal.uri));
-  }
-  return AZ_OK;
-}
-
 AZ_NODISCARD az_result az_keyvault_keys_key_create(
     az_keyvault_keys_client * client,
     az_span key_name,
@@ -198,12 +186,15 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
     az_keyvault_create_key_options * options,
     az_http_response * response) {
 
+  // Url buffer
+  uint8_t url_buffer[1024];
+  az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
+  // copy url from client
+  AZ_RETURN_IF_FAILED(az_span_copy(request_url_span, client->_internal.uri, &request_url_span));
+
   // Headers buffer
   uint8_t headers_buffer[4 * sizeof(az_pair)];
   az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
-
-  // check if url needs to be reset to initial state
-  AZ_RETURN_IF_FAILED(_az_reset_url_to_initial_state(client));
 
   // Allocate buffer in stack to hold body request
   uint8_t body_buffer[MAX_BODY_SIZE];
@@ -215,7 +206,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
   // create request
   az_http_request hrb;
   AZ_RETURN_IF_FAILED(az_http_request_init(
-      &hrb, az_http_method_post(), client->_internal.uri, request_headers_span, created_body));
+      &hrb, az_http_method_post(), request_url_span, request_headers_span, created_body));
 
   // add path to request
   AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, az_keyvault_client_constant_for_keys()));
@@ -252,14 +243,16 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
 
   uint8_t headers_buffer[4 * sizeof(az_pair)];
   az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
-
-  // check if url needs to be reset to initial state
-  AZ_RETURN_IF_FAILED(_az_reset_url_to_initial_state(client));
+  // Url buffer
+  uint8_t url_buffer[1024];
+  az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
+  // copy url from client
+  AZ_RETURN_IF_FAILED(az_span_copy(request_url_span, client->_internal.uri, &request_url_span));
 
   // create request
   az_http_request hrb;
   AZ_RETURN_IF_FAILED(az_http_request_init(
-      &hrb, az_http_method_get(), client->_internal.uri, request_headers_span, az_span_null()));
+      &hrb, az_http_method_get(), request_url_span, request_headers_span, az_span_null()));
 
   // Add path to request
   AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, az_keyvault_client_constant_for_keys()));
@@ -281,14 +274,13 @@ AZ_NODISCARD az_result az_keyvault_keys_key_delete(
     az_span key_name,
     az_http_response * response) {
 
-  // create request buffer TODO: define size for a getKey Request
-  uint8_t url_buffer[1024 * 4];
+  // Url buffer
+  uint8_t url_buffer[1024];
   az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
+  // copy url from client
+  AZ_RETURN_IF_FAILED(az_span_copy(request_url_span, client->_internal.uri, &request_url_span));
   uint8_t headers_buffer[4 * sizeof(az_pair)];
   az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
-
-  // check if url needs to be reset to initial state
-  AZ_RETURN_IF_FAILED(_az_reset_url_to_initial_state(client));
 
   // create request
   // TODO: define max URL size

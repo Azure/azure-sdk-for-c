@@ -30,8 +30,9 @@ AZ_NODISCARD az_storage_blobs_blob_client_options
 az_storage_blobs_blob_client_options_default(az_http_client http_client);
 typedef struct {
   struct {
+    // buffer to copy customer url. Then it stays immutable
     uint8_t url_buffer[AZ_HTTP_URL_MAX_SIZE];
-    int32_t initial_url_length;
+    // this url will point to url_buffer
     az_span uri;
     az_http_pipeline pipeline;
     az_storage_blobs_blob_client_options options;

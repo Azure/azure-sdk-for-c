@@ -29,10 +29,12 @@ AZ_NODISCARD static az_result _az_span_append_with_url_encode(
     az_span dst,
     az_span src,
     az_span * out) {
-  az_span span_from_current_length_to_capacity = { 0 };
   int32_t dst_length = az_span_length(dst);
+  uint8_t * p_dst = az_span_ptr(dst);
+  int32_t remaining = az_span_capacity(dst) - dst_length;
   // get remaining from dst
-  AZ_RETURN_IF_FAILED(az_span_slice(dst, dst_length, -1, &span_from_current_length_to_capacity));
+  az_span span_from_current_length_to_capacity = az_span_init(p_dst + dst_length, 0, remaining);
+
   // Copy src into remaining with encoded (copy handles overflow)
   AZ_RETURN_IF_FAILED(az_span_copy_url_encode(
       span_from_current_length_to_capacity, src, &span_from_current_length_to_capacity));
@@ -86,7 +88,6 @@ _az_identity_client_secret_credential_ms_oauth2_send_get_token_request(
 
     AZ_RETURN_IF_FAILED(_az_span_append_with_url_encode(
         auth_body_buf, token_context->_internal.scope, &auth_body_buf));
-    // don't forget to update length
   }
 
   az_http_request hrb = { 0 };

@@ -12,7 +12,7 @@
 #include <_az_cfg_prefix.h>
 
 enum {
-  AZ_HTTP_URL_MAX_SIZE = 1024 * 2,
+  AZ_HTTP_URL_MAX_SIZE = 1024,
 };
 
 typedef struct {
