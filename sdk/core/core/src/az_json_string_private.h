@@ -6,6 +6,7 @@
 
 #include "az_span_private.h"
 #include <az_span.h>
+#include <az_span_reader.h>
 
 #include <stdint.h>
 
@@ -15,7 +16,27 @@
  * Encodes the given character into a JSON escape sequence. The function returns an empty span if
  * the given character doesn't require to be escaped.
  */
-AZ_NODISCARD az_span az_json_esc_encode(az_result_byte const c);
+AZ_NODISCARD az_span az_json_esc_encode(az_result_byte c);
+
+/**
+ * TODO: this function and JSON pointer read functions should return proper UNICODE
+ *       code-point to be compatible.
+ */
+AZ_NODISCARD az_result az_span_reader_read_json_string_char(az_span_reader * self, uint32_t * out);
+
+/**
+ * Returns a next reference token in the JSON pointer. The JSON pointer parser is @var
+ * az_span_reader.
+ *
+ * See https://tools.ietf.org/html/rfc6901
+ */
+AZ_NODISCARD az_result az_span_reader_read_json_pointer_token(az_span_reader * self, az_span * out);
+
+/**
+ * Returns a next character in the given span reader of JSON pointer reference token.
+ */
+AZ_NODISCARD az_result
+az_span_reader_read_json_pointer_token_char(az_span_reader * self, uint32_t * out);
 
 #include <_az_cfg_suffix.h>
 

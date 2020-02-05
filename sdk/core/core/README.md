@@ -55,5 +55,5 @@ typedef struct {
 A string is a span of UTF-8 characters. It's not a zero-terminated string. Defined in [inc/az_str.h](inc/az_str.h).
 
 ```c
-az_const_span const hello_world = AZ_STR("Hello world!");
+az_const_span const hello_world = AZ_SPAN_FROM_STR("Hello world!");
 ```

@@ -1,14 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_base64_private.h>
-#include <az_http_request_builder.h>
-#include <az_http_request_internal.h>
-#include <az_json_parser.h>
-#include <az_span_builder.h>
+#include <az_http.h>
+#include <az_json.h>
+
+#include <az_http_private.h>
+#include <az_span.h>
 #include <az_span_reader.h>
-#include <az_span_writer_internal.h>
-#include <az_uri_internal.h>
 
 #include <assert.h>
 #include <stdbool.h>
@@ -19,92 +17,81 @@
 
 #include <_az_cfg.h>
 
-void test_http_response_parser();
+void test_http_response();
 void test_json_builder();
-void test_json_data();
 void test_json_get_by_pointer();
 void test_json_pointer();
 void test_json_string();
-void test_json_value();
-void test_url_parse();
 void test_span_builder_replace();
-void test_span_span();
-void test_pair_span();
 void test_mut_span();
 void test_log();
 
 int exit_code = 0;
 
-az_result write(az_mut_span const output, size_t * const o, az_span const s) {
-  for (size_t i = 0; i != s.size; ++i, ++*o) {
-    if (*o == output.size) {
-      return 1;
-    }
-    output.begin[*o] = s.begin[i];
-  }
-  return 0;
-}
-
-az_result write_str(az_mut_span const output, size_t * o, az_span const s) {
-  AZ_RETURN_IF_FAILED(write(output, o, AZ_STR("\"")));
-  AZ_RETURN_IF_FAILED(write(output, o, s));
-  AZ_RETURN_IF_FAILED(write(output, o, AZ_STR("\"")));
+az_result write_str(az_span span, az_span s, az_span * out) {
+  *out = span;
+  AZ_RETURN_IF_FAILED(az_span_append(*out, AZ_SPAN_FROM_STR("\""), out));
+  AZ_RETURN_IF_FAILED(az_span_append(*out, s, out));
+  AZ_RETURN_IF_FAILED(az_span_append(*out, AZ_SPAN_FROM_STR("\""), out));
   return AZ_OK;
 }
 
-az_result read_write_value(
-    az_mut_span const output,
-    size_t * o,
+az_result read_write_token(
+    az_span * output,
+    int32_t * o,
     az_json_parser * const state,
-    az_json_token const value) {
-  switch (value.kind) {
+    az_json_token const token) {
+  switch (token.kind) {
     case AZ_JSON_TOKEN_NULL:
-      return write(output, o, AZ_STR("null"));
+      return az_span_append(*output, AZ_SPAN_FROM_STR("null"), output);
     case AZ_JSON_TOKEN_BOOLEAN:
-      return write(output, o, value.data.boolean ? AZ_STR("true") : AZ_STR("false"));
+      return az_span_append(
+          *output,
+          token.value.boolean ? AZ_SPAN_FROM_STR("true") : AZ_SPAN_FROM_STR("false"),
+          output);
     case AZ_JSON_TOKEN_NUMBER:
-      return write(output, o, AZ_STR("0"));
+      return az_span_append(*output, AZ_SPAN_FROM_STR("0"), output);
     case AZ_JSON_TOKEN_STRING:
-      return write_str(output, o, value.data.string);
+      return write_str(*output, token.value.string, output);
     case AZ_JSON_TOKEN_OBJECT: {
-      AZ_RETURN_IF_FAILED(write(output, o, AZ_STR("{")));
+      AZ_RETURN_IF_FAILED(az_span_append(*output, AZ_SPAN_FROM_STR("{"), output));
       bool need_comma = false;
       while (true) {
         az_json_token_member member;
-        az_result const result = az_json_parser_read_object_member(state, &member);
+        az_result const result = az_json_parser_parse_token_member(state, &member);
         if (result == AZ_ERROR_ITEM_NOT_FOUND) {
           break;
         }
         AZ_RETURN_IF_FAILED(result);
         if (need_comma) {
-          AZ_RETURN_IF_FAILED(write(output, o, AZ_STR(",")));
+          AZ_RETURN_IF_FAILED(az_span_append(*output, AZ_SPAN_FROM_STR(","), output));
         } else {
           need_comma = true;
         }
-        AZ_RETURN_IF_FAILED(write_str(output, o, member.name));
-        AZ_RETURN_IF_FAILED(write(output, o, AZ_STR(":")));
-        AZ_RETURN_IF_FAILED(read_write_value(output, o, state, member.value));
+        AZ_RETURN_IF_FAILED(write_str(*output, member.name, output));
+        AZ_RETURN_IF_FAILED(az_span_append(*output, AZ_SPAN_FROM_STR(":"), output));
+        AZ_RETURN_IF_FAILED(read_write_token(output, o, state, member.token));
       }
-      return write(output, o, AZ_STR("}"));
+      return az_span_append(*output, AZ_SPAN_FROM_STR("}"), output);
     }
     case AZ_JSON_TOKEN_ARRAY: {
-      AZ_RETURN_IF_FAILED(write(output, o, AZ_STR("[")));
+      AZ_RETURN_IF_FAILED(az_span_append(*output, AZ_SPAN_FROM_STR("["), output));
       bool need_comma = false;
       while (true) {
         az_json_token element;
-        az_result const result = az_json_parser_read_array_element(state, &element);
+        az_result const result = az_json_parser_parse_array_item(state, &element);
         if (result == AZ_ERROR_ITEM_NOT_FOUND) {
           break;
         }
         AZ_RETURN_IF_FAILED(result);
         if (need_comma) {
-          AZ_RETURN_IF_FAILED(write(output, o, AZ_STR(",")));
+          AZ_RETURN_IF_FAILED(az_span_append(*output, AZ_SPAN_FROM_STR(","), output));
         } else {
           need_comma = true;
         }
-        AZ_RETURN_IF_FAILED(read_write_value(output, o, state, element));
+        AZ_RETURN_IF_FAILED(read_write_token(output, o, state, element));
       }
-      return write(output, o, AZ_STR("]"));
+      return az_span_append(*output, AZ_SPAN_FROM_STR("]"), output);
     }
     default:
       break;
@@ -112,15 +99,16 @@ az_result read_write_value(
   return AZ_ERROR_JSON_INVALID_STATE;
 }
 
-az_result read_write(az_span const input, az_mut_span const output, size_t * const o) {
-  az_json_parser parser = az_json_parser_create(input);
-  az_json_token value;
-  AZ_RETURN_IF_FAILED(az_json_parser_read(&parser, &value));
-  AZ_RETURN_IF_FAILED(read_write_value(output, o, &parser, value));
+az_result read_write(az_span const input, az_span * output, int32_t * const o) {
+  az_json_parser parser = { 0 };
+  TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, input));
+  az_json_token token;
+  AZ_RETURN_IF_FAILED(az_json_parser_parse_token(&parser, &token));
+  AZ_RETURN_IF_FAILED(read_write_token(output, o, &parser, token));
   return az_json_parser_done(&parser);
 }
 
-static az_span const sample1 = AZ_CONST_STR( //
+static az_span const sample1 = AZ_SPAN_LITERAL_FROM_STR( //
     "{\n"
     "  \"parameters\": {\n"
     "    \"subscriptionId\": \"{subscription-id}\",\n"
@@ -147,76 +135,7 @@ static az_span const sample1 = AZ_CONST_STR( //
     "  }\n"
     "}\n");
 
-static az_span const b64_decoded0 = AZ_CONST_STR("");
-static az_span const b64_decoded1 = AZ_CONST_STR("1");
-static az_span const b64_decoded2 = AZ_CONST_STR("12");
-static az_span const b64_decoded3 = AZ_CONST_STR("123");
-static az_span const b64_decoded4 = AZ_CONST_STR("1234");
-static az_span const b64_decoded5 = AZ_CONST_STR("12345");
-static az_span const b64_decoded6 = AZ_CONST_STR("123456");
-
-static az_span const b64_encoded0 = AZ_CONST_STR("");
-static az_span const b64_encoded1 = AZ_CONST_STR("MQ==");
-static az_span const b64_encoded2 = AZ_CONST_STR("MTI=");
-static az_span const b64_encoded3 = AZ_CONST_STR("MTIz");
-static az_span const b64_encoded4 = AZ_CONST_STR("MTIzNA==");
-static az_span const b64_encoded5 = AZ_CONST_STR("MTIzNDU=");
-static az_span const b64_encoded6 = AZ_CONST_STR("MTIzNDU2");
-
-static az_span const b64_encoded0u = AZ_CONST_STR("");
-static az_span const b64_encoded1u = AZ_CONST_STR("MQ");
-static az_span const b64_encoded2u = AZ_CONST_STR("MTI");
-static az_span const b64_encoded3u = AZ_CONST_STR("MTIz");
-static az_span const b64_encoded4u = AZ_CONST_STR("MTIzNA");
-static az_span const b64_encoded5u = AZ_CONST_STR("MTIzNDU");
-static az_span const b64_encoded6u = AZ_CONST_STR("MTIzNDU2");
-
-static az_span const b64_encoded_bin1
-    = AZ_CONST_STR("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/");
-
-static az_span const b64_encoded_bin1u
-    = AZ_CONST_STR("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_");
-
-static uint8_t const b64_decoded_bin1_buf[]
-    = { 0x00, 0x10, 0x83, 0x10, 0x51, 0x87, 0x20, 0x92, 0x8B, 0x30, 0xD3, 0x8F,
-        0x41, 0x14, 0x93, 0x51, 0x55, 0x97, 0x61, 0x96, 0x9B, 0x71, 0xD7, 0x9F,
-        0x82, 0x18, 0xA3, 0x92, 0x59, 0xA7, 0xA2, 0x9A, 0xAB, 0xB2, 0xDB, 0xAF,
-        0xC3, 0x1C, 0xB3, 0xD3, 0x5D, 0xB7, 0xE3, 0x9E, 0xBB, 0xF3, 0xDF, 0xBF };
-
-static az_span const b64_decoded_bin1
-    = { .begin = b64_decoded_bin1_buf, .size = sizeof(b64_decoded_bin1_buf) };
-
-static az_span const b64_encoded_bin2
-    = AZ_CONST_STR("/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+zQ==");
-
-static az_span const b64_encoded_bin2u
-    = AZ_CONST_STR("_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-zQ");
-
-static uint8_t const b64_decoded_bin2_buf[]
-    = { 0xFC, 0x00, 0x42, 0x0C, 0x41, 0x46, 0x1C, 0x82, 0x4A, 0x2C, 0xC3, 0x4E, 0x3D,
-        0x04, 0x52, 0x4D, 0x45, 0x56, 0x5D, 0x86, 0x5A, 0x6D, 0xC7, 0x5E, 0x7E, 0x08,
-        0x62, 0x8E, 0x49, 0x66, 0x9E, 0x8A, 0x6A, 0xAE, 0xCB, 0x6E, 0xBF, 0x0C, 0x72,
-        0xCF, 0x4D, 0x76, 0xDF, 0x8E, 0x7A, 0xEF, 0xCF, 0x7E, 0xCD };
-
-static az_span const b64_decoded_bin2
-    = { .begin = b64_decoded_bin2_buf, .size = sizeof(b64_decoded_bin2_buf) };
-
-static az_span const b64_encoded_bin3
-    = AZ_CONST_STR("V/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+zQ=");
-
-static az_span const b64_encoded_bin3u
-    = AZ_CONST_STR("V_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-zQ");
-
-static uint8_t const b64_decoded_bin3_buf[]
-    = { 0x57, 0xF0, 0x01, 0x08, 0x31, 0x05, 0x18, 0x72, 0x09, 0x28, 0xB3, 0x0D, 0x38,
-        0xF4, 0x11, 0x49, 0x35, 0x15, 0x59, 0x76, 0x19, 0x69, 0xB7, 0x1D, 0x79, 0xF8,
-        0x21, 0x8A, 0x39, 0x25, 0x9A, 0x7A, 0x29, 0xAA, 0xBB, 0x2D, 0xBA, 0xFC, 0x31,
-        0xCB, 0x3D, 0x35, 0xDB, 0x7E, 0x39, 0xEB, 0xBF, 0x3D, 0xFB, 0x34 };
-
-static az_span const b64_decoded_bin3
-    = { .begin = b64_decoded_bin3_buf, .size = sizeof(b64_decoded_bin3_buf) };
-
-static az_span const uri_encoded = AZ_CONST_STR(
+static az_span uri_encoded = AZ_SPAN_LITERAL_FROM_STR(
     "%00%01%02%03%04%05%06%07%08%09%0A%0B%0C%0D%0E%0F%10%11%12%13%14%15%16%17%18%19%1A%1B%1C%1D%1E%"
     "1F%20%21%22%23%24%25%26%27%28%29%2A%2B%2C-.%2F0123456789%3A%3B%3C%3D%3E%3F%"
     "40ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~%7F%80%81%82%"
@@ -226,29 +145,7 @@ static az_span const uri_encoded = AZ_CONST_STR(
     "E0%E1%E2%E3%E4%E5%E6%E7%E8%E9%EA%EB%EC%ED%EE%EF%F0%F1%F2%F3%F4%F5%F6%F7%F8%F9%FA%FB%FC%FD%FE%"
     "FF");
 
-static az_span const uri_encoded2 = AZ_CONST_STR(
-    "%00%01%02%03%04%05%06%07%08%09%0A%0B%0C%0D%0E%0F%10%11%12%13%14%15%16%17%18%19%1A%1B%1C%1D%1E%"
-    "1F%20%21%22%23%24%25%26%27%28%29%2A%2B%2C%2D%2E%2F%30%31%32%33%34%35%36%37%38%39%3A%3B%3C%3D%"
-    "3E%3F%40%41%42%43%44%45%46%47%48%49%4A%4B%4C%4D%4E%4F%50%51%52%53%54%55%56%57%58%59%5A%5B%5C%"
-    "5D%5E%5F%60%61%62%63%64%65%66%67%68%69%6A%6B%6C%6D%6E%6F%70%71%72%73%74%75%76%77%78%79%7A%7B%"
-    "7C%7D%7E%7F%80%81%82%83%84%85%86%87%88%89%8A%8B%8C%8D%8E%8F%90%91%92%93%94%95%96%97%98%99%9A%"
-    "9B%9C%9D%9E%9F%A0%A1%A2%A3%A4%A5%A6%A7%A8%A9%AA%AB%AC%AD%AE%AF%B0%B1%B2%B3%B4%B5%B6%B7%B8%B9%"
-    "BA%BB%BC%BD%BE%BF%C0%C1%C2%C3%C4%C5%C6%C7%C8%C9%CA%CB%CC%CD%CE%CF%D0%D1%D2%D3%D4%D5%D6%D7%D8%"
-    "D9%DA%DB%DC%DD%DE%DF%E0%E1%E2%E3%E4%E5%E6%E7%E8%E9%EA%EB%EC%ED%EE%EF%F0%F1%F2%F3%F4%F5%F6%F7%"
-    "F8%F9%FA%FB%FC%FD%FE%FF");
-
-static az_span const uri_encoded3 = AZ_CONST_STR(
-    "%00%01%02%03%04%05%06%07%08%09%0a%0b%0c%0d%0e%0f%10%11%12%13%14%15%16%17%18%19%1a%1b%1c%1d%1e%"
-    "1f%20%21%22%23%24%25%26%27%28%29%2a%2b%2c%2d%2e%2f%30%31%32%33%34%35%36%37%38%39%3a%3b%3c%3d%"
-    "3e%3f%40%41%42%43%44%45%46%47%48%49%4a%4b%4c%4d%4e%4f%50%51%52%53%54%55%56%57%58%59%5a%5b%5c%"
-    "5d%5e%5f%60%61%62%63%64%65%66%67%68%69%6a%6b%6c%6d%6e%6f%70%71%72%73%74%75%76%77%78%79%7a%7b%"
-    "7c%7d%7e%7f%80%81%82%83%84%85%86%87%88%89%8a%8b%8c%8d%8e%8f%90%91%92%93%94%95%96%97%98%99%9a%"
-    "9b%9c%9d%9e%9f%a0%a1%a2%a3%a4%a5%a6%a7%a8%a9%aa%ab%ac%ad%ae%af%b0%b1%b2%b3%b4%b5%b6%b7%b8%b9%"
-    "ba%bb%bc%bd%be%bf%c0%c1%c2%c3%c4%c5%c6%c7%c8%c9%ca%cb%cc%cd%ce%cf%d0%d1%d2%d3%d4%d5%d6%d7%d8%"
-    "d9%da%db%dc%dd%de%df%e0%e1%e2%e3%e4%e5%e6%e7%e8%e9%ea%eb%ec%ed%ee%ef%f0%f1%f2%f3%f4%f5%f6%f7%"
-    "f8%f9%fa%fb%fc%fd%fe%ff");
-
-static uint8_t const uri_decoded_buf[] = {
+static uint8_t uri_decoded_buf[] = {
   0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
   0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F,
   0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F,
@@ -267,195 +164,216 @@ static uint8_t const uri_decoded_buf[] = {
   0xF0, 0xF1, 0xF2, 0xF3, 0xF4, 0xF5, 0xF6, 0xF7, 0xF8, 0xF9, 0xFA, 0xFB, 0xFC, 0xFD, 0xFE, 0xFF
 };
 
-static az_span const uri_decoded = { .begin = uri_decoded_buf, .size = sizeof(uri_decoded_buf) };
+static az_span uri_decoded = AZ_SPAN_LITERAL_FROM_INITIALIZED_BUFFER(uri_decoded_buf);
 
-static az_span hrb_url = AZ_CONST_STR("https://antk-keyvault.vault.azure.net/secrets/Password");
+static az_span hrb_url
+    = AZ_SPAN_LITERAL_FROM_STR("https://antk-keyvault.vault.azure.net/secrets/Password");
 
-static az_span hrb_param_api_version_name = AZ_CONST_STR("api-version");
-static az_span hrb_param_api_version_value = AZ_CONST_STR("7.0");
+static az_span hrb_param_api_version_name = AZ_SPAN_LITERAL_FROM_STR("api-version");
+static az_span hrb_param_api_version_token = AZ_SPAN_LITERAL_FROM_STR("7.0");
 
-static az_span hrb_url2
-    = AZ_CONST_STR("https://antk-keyvault.vault.azure.net/secrets/Password?api-version=7.0");
+static az_span hrb_url2 = AZ_SPAN_LITERAL_FROM_STR(
+    "https://antk-keyvault.vault.azure.net/secrets/Password?api-version=7.0");
 
-static az_span hrb_param_test_param_name = AZ_CONST_STR("test-param");
-static az_span hrb_param_test_param_value = AZ_CONST_STR("value");
+static az_span hrb_param_test_param_name = AZ_SPAN_LITERAL_FROM_STR("test-param");
+static az_span hrb_param_test_param_token = AZ_SPAN_LITERAL_FROM_STR("token");
 
-static az_span hrb_url3 = AZ_CONST_STR(
-    "https://antk-keyvault.vault.azure.net/secrets/Password?api-version=7.0&test-param=value");
+static az_span hrb_url3 = AZ_SPAN_LITERAL_FROM_STR(
+    "https://antk-keyvault.vault.azure.net/secrets/Password?api-version=7.0&test-param=token");
 
-static az_span hrb_header_content_type_name = AZ_CONST_STR("Content-Type");
-static az_span hrb_header_content_type_value = AZ_CONST_STR("application/x-www-form-urlencoded");
+static az_span hrb_header_content_type_name = AZ_SPAN_LITERAL_FROM_STR("Content-Type");
+static az_span hrb_header_content_type_token
+    = AZ_SPAN_LITERAL_FROM_STR("application/x-www-form-urlencoded");
 
-static az_span hrb_header_authorization_name = AZ_CONST_STR("authorization");
-static az_span hrb_header_authorization_value1 = AZ_CONST_STR("Bearer 123456789");
-static az_span hrb_header_authorization_value2 = AZ_CONST_STR("Bearer 99887766554433221100");
+static az_span hrb_header_authorization_name = AZ_SPAN_LITERAL_FROM_STR("authorization");
+static az_span hrb_header_authorization_token1 = AZ_SPAN_LITERAL_FROM_STR("Bearer 123456789");
+static az_span hrb_header_authorization_token2
+    = AZ_SPAN_LITERAL_FROM_STR("Bearer 99887766554433221100");
 
 int main() {
   {
-    az_json_parser state = az_json_parser_create(AZ_STR("    "));
-    TEST_ASSERT(az_json_parser_read(&state, NULL) == AZ_ERROR_ARG);
+    az_json_parser parser = { 0 };
+    TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR("    ")));
+    TEST_ASSERT(az_json_parser_parse_token(&parser, NULL) == AZ_ERROR_ARG);
   }
   {
-    az_json_token value;
-    TEST_ASSERT(az_json_parser_read(NULL, &value) == AZ_ERROR_ARG);
+    az_json_token token;
+    TEST_ASSERT(az_json_parser_parse_token(NULL, &token) == AZ_ERROR_ARG);
   }
   {
-    az_json_parser parser = az_json_parser_create(AZ_STR("    "));
-    az_json_token value;
-    TEST_ASSERT(az_json_parser_read(&parser, &value) == AZ_ERROR_EOF);
+    az_json_parser parser = { 0 };
+    TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR("    ")));
+    az_json_token token;
+    TEST_ASSERT(az_json_parser_parse_token(&parser, &token) == AZ_ERROR_EOF);
   }
   {
-    az_json_parser parser = az_json_parser_create(AZ_STR("  null  "));
-    az_json_token value;
-    TEST_ASSERT(az_json_parser_read(&parser, &value) == AZ_OK);
-    TEST_ASSERT(value.kind == AZ_JSON_TOKEN_NULL);
+    az_json_parser parser = { 0 };
+    TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR("  null  ")));
+    az_json_token token;
+    TEST_ASSERT(az_json_parser_parse_token(&parser, &token) == AZ_OK);
+    TEST_ASSERT(token.kind == AZ_JSON_TOKEN_NULL);
     TEST_ASSERT(az_json_parser_done(&parser) == AZ_OK);
   }
   {
-    az_json_parser state = az_json_parser_create(AZ_STR("  nul"));
-    az_json_token value;
-    TEST_ASSERT(az_json_parser_read(&state, &value) == AZ_ERROR_EOF);
+    az_json_parser state = { 0 };
+    TEST_EXPECT_SUCCESS(az_json_parser_init(&state, AZ_SPAN_FROM_STR("  nul")));
+    az_json_token token;
+    TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_ERROR_EOF);
   }
   {
-    az_json_parser parser = az_json_parser_create(AZ_STR("  false"));
-    az_json_token value;
-    TEST_ASSERT(az_json_parser_read(&parser, &value) == AZ_OK);
-    TEST_ASSERT(value.kind == AZ_JSON_TOKEN_BOOLEAN);
-    TEST_ASSERT(value.data.boolean == false);
+    az_json_parser parser = { 0 };
+    TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR("  false")));
+    az_json_token token;
+    TEST_ASSERT(az_json_parser_parse_token(&parser, &token) == AZ_OK);
+    TEST_ASSERT(token.kind == AZ_JSON_TOKEN_BOOLEAN);
+    TEST_ASSERT(token.value.boolean == false);
     TEST_ASSERT(az_json_parser_done(&parser) == AZ_OK);
   }
   {
-    az_json_parser state = az_json_parser_create(AZ_STR("  falsx  "));
-    az_json_token value;
-    TEST_ASSERT(az_json_parser_read(&state, &value) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+    az_json_parser state = { 0 };
+    TEST_EXPECT_SUCCESS(az_json_parser_init(&state, AZ_SPAN_FROM_STR("  falsx  ")));
+    az_json_token token;
+    TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
   }
   {
-    az_json_parser state = az_json_parser_create(AZ_STR("true "));
-    az_json_token value;
-    TEST_ASSERT(az_json_parser_read(&state, &value) == AZ_OK);
-    TEST_ASSERT(value.kind == AZ_JSON_TOKEN_BOOLEAN);
-    TEST_ASSERT(value.data.boolean == true);
+    az_json_parser state = { 0 };
+    TEST_EXPECT_SUCCESS(az_json_parser_init(&state, AZ_SPAN_FROM_STR("true ")));
+    az_json_token token;
+    TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_OK);
+    TEST_ASSERT(token.kind == AZ_JSON_TOKEN_BOOLEAN);
+    TEST_ASSERT(token.value.boolean == true);
     TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
   }
   {
-    az_json_parser state = az_json_parser_create(AZ_STR("  truem"));
-    az_json_token value;
-    TEST_ASSERT(az_json_parser_read(&state, &value) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+    az_json_parser state = { 0 };
+    TEST_EXPECT_SUCCESS(az_json_parser_init(&state, AZ_SPAN_FROM_STR("  truem")));
+    az_json_token token;
+    TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
   }
   {
-    az_span const s = AZ_STR(" \"tr\\\"ue\\t\" ");
-    az_json_parser state = az_json_parser_create(s);
-    az_json_token value;
-    TEST_ASSERT(az_json_parser_read(&state, &value) == AZ_OK);
-    TEST_ASSERT(value.kind == AZ_JSON_TOKEN_STRING);
-    TEST_ASSERT(value.data.string.begin == s.begin + 2);
-    TEST_ASSERT(value.data.string.size == 8);
+    az_span const s = AZ_SPAN_FROM_STR(" \"tr\\\"ue\\t\" ");
+    az_json_parser state = { 0 };
+    TEST_EXPECT_SUCCESS(az_json_parser_init(&state, s));
+    az_json_token token;
+    TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_OK);
+    TEST_ASSERT(token.kind == AZ_JSON_TOKEN_STRING);
+    TEST_ASSERT(az_span_ptr(token.value.string) == (az_span_ptr(s) + 2));
+    TEST_ASSERT(az_span_length(token.value.string) == 8);
     TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
   }
   {
-    az_span const s = AZ_STR("\"\\uFf0F\"");
-    az_json_parser state = az_json_parser_create(s);
-    az_json_token value;
-    TEST_ASSERT(az_json_parser_read(&state, &value) == AZ_OK);
-    TEST_ASSERT(value.kind == AZ_JSON_TOKEN_STRING);
-    TEST_ASSERT(value.data.string.begin == s.begin + 1);
-    TEST_ASSERT(value.data.string.size == 6);
+    az_span const s = AZ_SPAN_FROM_STR("\"\\uFf0F\"");
+    az_json_parser state = { 0 };
+    TEST_EXPECT_SUCCESS(az_json_parser_init(&state, s));
+    az_json_token token;
+    TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_OK);
+    TEST_ASSERT(token.kind == AZ_JSON_TOKEN_STRING);
+    TEST_ASSERT(az_span_ptr(token.value.string) == az_span_ptr(s) + 1);
+    TEST_ASSERT(az_span_length(token.value.string) == 6);
     TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
   }
   {
-    az_span const s = AZ_STR("\"\\uFf0\"");
-    az_json_parser state = az_json_parser_create(s);
-    az_json_token value;
-    TEST_ASSERT(az_json_parser_read(&state, &value) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+    az_span const s = AZ_SPAN_FROM_STR("\"\\uFf0\"");
+    az_json_parser state = { 0 };
+    TEST_EXPECT_SUCCESS(az_json_parser_init(&state, s));
+    az_json_token token;
+    TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
   }
   {
-    az_json_parser state = az_json_parser_create(AZ_STR(" 23 "));
-    az_json_token value;
-    TEST_ASSERT(az_json_parser_read(&state, &value) == AZ_OK);
-    TEST_ASSERT(value.kind == AZ_JSON_TOKEN_NUMBER);
-    TEST_ASSERT(value.data.number == 23);
+    az_json_parser state = { 0 };
+    TEST_EXPECT_SUCCESS(az_json_parser_init(&state, AZ_SPAN_FROM_STR(" 23 ")));
+    az_json_token token;
+    TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_OK);
+    TEST_ASSERT(token.kind == AZ_JSON_TOKEN_NUMBER);
+    TEST_ASSERT(token.value.number == 23);
     TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
   }
   {
-    az_json_parser state = az_json_parser_create(AZ_STR(" -23.56"));
-    az_json_token value;
-    TEST_ASSERT(az_json_parser_read(&state, &value) == AZ_OK);
-    TEST_ASSERT(value.kind == AZ_JSON_TOKEN_NUMBER);
-    TEST_ASSERT(value.data.number == -23.56);
+    az_json_parser state = { 0 };
+    TEST_EXPECT_SUCCESS(az_json_parser_init(&state, AZ_SPAN_FROM_STR(" -23.56")));
+    az_json_token token;
+    TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_OK);
+    TEST_ASSERT(token.kind == AZ_JSON_TOKEN_NUMBER);
+    TEST_ASSERT(token.value.number == -23.56);
     TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
   }
   {
-    az_json_parser state = az_json_parser_create(AZ_STR(" -23.56e-3"));
-    az_json_token value;
-    TEST_ASSERT(az_json_parser_read(&state, &value) == AZ_OK);
-    TEST_ASSERT(value.kind == AZ_JSON_TOKEN_NUMBER);
-    TEST_ASSERT(value.data.number == -0.02356);
+    az_json_parser state = { 0 };
+    TEST_EXPECT_SUCCESS(az_json_parser_init(&state, AZ_SPAN_FROM_STR(" -23.56e-3")));
+    az_json_token token;
+    TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_OK);
+    TEST_ASSERT(token.kind == AZ_JSON_TOKEN_NUMBER);
+    TEST_ASSERT(token.value.number == -0.02356);
     TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
   }
   {
-    az_json_parser state = az_json_parser_create(AZ_STR(" [ true, 0.3 ]"));
-    az_json_token value;
-    TEST_ASSERT(az_json_parser_read(&state, &value) == AZ_OK);
-    TEST_ASSERT(value.kind == AZ_JSON_TOKEN_ARRAY);
-    TEST_ASSERT(az_json_parser_read_array_element(&state, &value) == AZ_OK);
-    TEST_ASSERT(value.kind == AZ_JSON_TOKEN_BOOLEAN);
-    TEST_ASSERT(value.data.boolean == true);
-    TEST_ASSERT(az_json_parser_read_array_element(&state, &value) == AZ_OK);
-    TEST_ASSERT(value.kind == AZ_JSON_TOKEN_NUMBER);
-    // TEST_ASSERT(value.val.number == 0.3);
-    TEST_ASSERT(az_json_parser_read_array_element(&state, &value) == AZ_ERROR_ITEM_NOT_FOUND);
+    az_json_parser state = { 0 };
+    TEST_EXPECT_SUCCESS(az_json_parser_init(&state, AZ_SPAN_FROM_STR(" [ true, 0.3 ]")));
+    az_json_token token = { 0 };
+    TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_OK);
+    TEST_ASSERT(token.kind == AZ_JSON_TOKEN_ARRAY);
+    TEST_ASSERT(az_json_parser_parse_array_item(&state, &token) == AZ_OK);
+    TEST_ASSERT(token.kind == AZ_JSON_TOKEN_BOOLEAN);
+    TEST_ASSERT(token.value.boolean == true);
+    TEST_ASSERT(az_json_parser_parse_array_item(&state, &token) == AZ_OK);
+    TEST_ASSERT(token.kind == AZ_JSON_TOKEN_NUMBER);
+    // TEST_ASSERT(token.value.number == 0.3);  TODO:  why do we get 0.30000004 ??
+    TEST_ASSERT(az_json_parser_parse_array_item(&state, &token) == AZ_ERROR_ITEM_NOT_FOUND);
     TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
   }
   {
-    az_span const json = AZ_STR("{\"a\":\"Hello world!\"}");
-    az_json_parser state = az_json_parser_create(json);
-    az_json_token value;
-    TEST_ASSERT(az_json_parser_read(&state, &value) == AZ_OK);
-    TEST_ASSERT(value.kind == AZ_JSON_TOKEN_OBJECT);
-    az_json_token_member member;
-    TEST_ASSERT(az_json_parser_read_object_member(&state, &member) == AZ_OK);
-    TEST_ASSERT(member.name.begin == json.begin + 2);
-    TEST_ASSERT(member.name.size == 1);
-    TEST_ASSERT(member.value.kind == AZ_JSON_TOKEN_STRING);
-    TEST_ASSERT(member.value.data.string.begin == json.begin + 6);
-    TEST_ASSERT(member.value.data.string.size == 12);
-    TEST_ASSERT(az_json_parser_read_object_member(&state, &member) == AZ_ERROR_ITEM_NOT_FOUND);
+    az_span const json = AZ_SPAN_FROM_STR("{\"a\":\"Hello world!\"}");
+    az_json_parser state = { 0 };
+    TEST_EXPECT_SUCCESS(az_json_parser_init(&state, json));
+    az_json_token token;
+    TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_OK);
+    TEST_ASSERT(token.kind == AZ_JSON_TOKEN_OBJECT);
+    az_json_token_member token_member;
+    TEST_ASSERT(az_json_parser_parse_token_member(&state, &token_member) == AZ_OK);
+    TEST_ASSERT(az_span_ptr(token_member.name) == az_span_ptr(json) + 2);
+    TEST_ASSERT(az_span_length(token_member.name) == 1);
+    TEST_ASSERT(token_member.token.kind == AZ_JSON_TOKEN_STRING);
+    TEST_ASSERT(az_span_ptr(token_member.token.value.string) == az_span_ptr(json) + 6);
+    TEST_ASSERT(az_span_length(token_member.token.value.string) == 12);
+    TEST_ASSERT(
+        az_json_parser_parse_token_member(&state, &token_member) == AZ_ERROR_ITEM_NOT_FOUND);
     TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
   }
   {
     uint8_t buffer[1000];
-    az_mut_span const output = { .begin = buffer, .size = 1000 };
+    az_span output = AZ_SPAN_FROM_BUFFER(buffer);
     {
-      size_t o = 0;
+      int32_t o = 0;
       TEST_ASSERT(
-          read_write(AZ_STR("{ \"a\" : [ true, { \"b\": [{}]}, 15 ] }"), output, &o) == AZ_OK);
-      az_span const x = az_span_sub(az_mut_span_to_span(output), 0, o);
-      TEST_ASSERT(az_span_is_equal(x, AZ_STR("{\"a\":[true,{\"b\":[{}]},0]}")));
+          read_write(AZ_SPAN_FROM_STR("{ \"a\" : [ true, { \"b\": [{}]}, 15 ] }"), &output, &o)
+          == AZ_OK);
+
+      TEST_ASSERT(az_span_is_equal(output, AZ_SPAN_FROM_STR("{\"a\":[true,{\"b\":[{}]},0]}")));
     }
     {
-      size_t o = 0;
-      az_span const json = AZ_STR(
+      int32_t o = 0;
+      az_span const json = AZ_SPAN_FROM_STR(
           // 0           1           2           3           4           5 6
           // 01234 56789 01234 56678 01234 56789 01234 56789 01234 56789 01234
           // 56789 0123
           "[[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ "
           "[[[[[ [[[[");
-      az_result const result = read_write(json, output, &o);
+      az_result const result = read_write(json, &output, &o);
       TEST_ASSERT(result == AZ_ERROR_JSON_STACK_OVERFLOW);
     }
     {
-      size_t o = 0;
-      az_span const json = AZ_STR(
+      int32_t o = 0;
+      az_span const json = AZ_SPAN_FROM_STR(
           // 0           1           2           3           4           5 6 01234
           // 56789 01234 56678 01234 56789 01234 56789 01234 56789 01234 56789 012
           "[[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ "
           "[[[[[ [[[");
-      az_result const result = read_write(json, output, &o);
+      az_result const result = read_write(json, &output, &o);
       TEST_ASSERT(result == AZ_ERROR_EOF);
     }
     {
-      size_t o = 0;
-      az_span const json = AZ_STR(
+      int32_t o = 0;
+      az_span const json = AZ_SPAN_FROM_STR(
           // 0           1           2           3           4           5 6 01234
           // 56789 01234 56678 01234 56789 01234 56789 01234 56789 01234 56789 012
           "[[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ "
@@ -463,12 +381,13 @@ int main() {
           "   \"\\t\\n\": \"\\u0abc\"   "
           "}]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] "
           "]]]]] ]]]");
-      az_result const result = read_write(json, output, &o);
+      output._internal.length = 0;
+      az_result const result = read_write(json, &output, &o);
       TEST_ASSERT(result == AZ_OK);
-      az_span const x = az_span_sub(az_mut_span_to_span(output), 0, o);
+
       TEST_ASSERT(az_span_is_equal(
-          x,
-          AZ_STR( //
+          output,
+          AZ_SPAN_FROM_STR( //
               "[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[{"
               "\"\\t\\n\":\"\\u0abc\""
               "}]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]"
@@ -476,273 +395,105 @@ int main() {
     }
     //
     {
-      size_t o = 0;
-      az_result const result = read_write(sample1, output, &o);
+      int32_t o = 0;
+      az_result const result = read_write(sample1, &output, &o);
       TEST_ASSERT(result == AZ_OK);
     }
-  }
 
-  // HTTP Builder
-  {
-    az_pair const query_array[] = {
-      { .key = AZ_STR("hello"), .value = AZ_STR("world!") },
-      { .key = AZ_STR("x"), .value = AZ_STR("42") },
-    };
-    az_pair_span const query = AZ_SPAN_FROM_ARRAY(query_array);
-    //
-    az_pair const headers_array[] = {
-      { .key = AZ_STR("some"), .value = AZ_STR("xml") },
-      { .key = AZ_STR("xyz"), .value = AZ_STR("very_long") },
-    };
-    az_pair_span const headers = AZ_SPAN_FROM_ARRAY(headers_array);
-    //
-    az_http_request const request = {
-      .method = AZ_STR("GET"),
-      .path = AZ_STR("/foo"),
-      .query = az_pair_span_as_writer_action(&query),
-      .headers = az_pair_span_as_writer_action(&headers),
-      .body = AZ_STR("{ \"somejson\": true }"),
-    };
-    uint8_t buffer[1024];
     {
-      az_span_builder wi = az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(buffer));
-      az_span_action sv = az_span_builder_append_action(&wi);
-      az_span const expected = AZ_STR( //
-          "GET /foo?hello=world!&x=42 HTTP/1.1\r\n"
-          "some: xml\r\n"
-          "xyz: very_long\r\n"
-          "\r\n"
-          "{ \"somejson\": true }");
-      az_result const result = az_http_request_as_span_writer(&request, sv);
-      TEST_ASSERT(result == AZ_OK);
-      az_span const out = az_span_builder_result(&wi);
-      TEST_ASSERT(az_span_is_equal(out, expected));
+      uint8_t buf[256 * 3];
+      az_span builder = AZ_SPAN_FROM_BUFFER(buf);
+
+      TEST_EXPECT_SUCCESS(
+          az_span_copy_url_encode(builder, AZ_SPAN_FROM_STR("https://vault.azure.net"), &builder));
+      TEST_ASSERT(az_span_is_equal(builder, AZ_SPAN_FROM_STR("https%3A%2F%2Fvault.azure.net")));
+
+      builder = AZ_SPAN_FROM_BUFFER(buffer);
+      TEST_EXPECT_SUCCESS(az_span_copy_url_encode(builder, uri_decoded, &builder));
+      TEST_ASSERT(az_span_is_equal(builder, uri_encoded));
     }
-    /*
     {
-      printf("----Test: az_http_request_to_url_span\n");
-      az_span_builder wi = az_span_builder_create((az_mut_span)AZ_SPAN(buffer));
-      az_span_action sv = az_span_builder_append_action(&wi);
-      az_const_span const expected = AZ_STR("/foo?hello=world!&x=42");
-      az_result const result = az_build_url(&request, sv);
-      TEST_ASSERT(result == AZ_OK);
-      az_mut_span out = az_span_builder_result(&wi);
-      TEST_ASSERT(az_const_span_eq(az_mut_span_to_const_span(out), expected));
-    }
-    // url size
-    {
-      printf("----Test: az_http_get_url_size\n");
-      size_t x = 0;
-      size_t const expected = 22;
-      az_result const result = az_http_get_url_size(&request, &x);
-      TEST_ASSERT(result == AZ_OK);
-      TEST_ASSERT(expected == x);
-    }
-    // url to str
-    {
-      printf("----Test: az_http_url_to_new_str\n");
-      char * p;
-      az_result const result = az_http_url_to_new_str(&request, &p);
-      TEST_ASSERT(result == AZ_OK);
-      TEST_ASSERT(strcmp(p, "/foo?hello=world!&x=42") == 0);
-      free(p);
-    }
-    */
-  }
+      uint8_t buf[100];
+      uint8_t header_buf[(2 * sizeof(az_pair))];
+      memset(buf, 0, sizeof(buf));
+      memset(header_buf, 0, sizeof(header_buf));
 
-  // span emitter size
-  {
-    az_span const array[] = {
-      AZ_STR("Hello"),
-      AZ_STR(" "),
-      AZ_STR("world!"),
-    };
-    az_span_span const span = AZ_SPAN_FROM_ARRAY(array);
-    az_span_writer const emitter = az_span_span_as_writer_action(&span);
-    size_t s = 42;
-    az_result const result = az_span_writer_size(emitter, &s);
-    TEST_ASSERT(result == AZ_OK);
-    TEST_ASSERT(s == 12);
-  }
+      az_span url_span = AZ_SPAN_FROM_BUFFER(buf);
+      TEST_EXPECT_SUCCESS(az_span_append(url_span, hrb_url, &url_span));
+      az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
+      az_http_request hrb;
 
-  {
-    az_span const expected = AZ_STR("@#############make some zero-terminated strings#make "
-                                    "some\0zero-terminated\0strings\0####@");
+      TEST_EXPECT_SUCCESS(
+          az_http_request_init(&hrb, az_http_method_get(), url_span, header_span, az_span_null()));
+      TEST_ASSERT(az_span_is_equal(hrb._internal.method, az_http_method_get()));
+      TEST_ASSERT(az_span_is_equal(hrb._internal.url, url_span));
+      TEST_ASSERT(az_span_capacity(hrb._internal.url) == 100);
+      TEST_ASSERT(hrb._internal.max_headers == 2);
+      TEST_ASSERT(hrb._internal.retry_headers_start_byte_offset == 0);
 
-    uint8_t buf[87];
-    assert(expected.size == sizeof(buf));
-    for (size_t i = 0; i < sizeof(buf); ++i) {
-      buf[i] = '@';
-    }
+      TEST_EXPECT_SUCCESS(az_http_request_set_query_parameter(
+          &hrb, hrb_param_api_version_name, hrb_param_api_version_token));
+      TEST_ASSERT(az_span_is_equal(hrb._internal.url, hrb_url2));
 
-    az_mut_span actual = { .begin = buf, .size = sizeof(buf) };
-    az_mut_span_fill((az_mut_span){ .begin = actual.begin + 1, .size = actual.size - 2 }, '#');
+      TEST_EXPECT_SUCCESS(az_http_request_set_query_parameter(
+          &hrb, hrb_param_test_param_name, hrb_param_test_param_token));
+      TEST_ASSERT(az_span_is_equal(hrb._internal.url, hrb_url3));
 
-    az_mut_span result;
+      TEST_EXPECT_SUCCESS(az_http_request_append_header(
+          &hrb, hrb_header_content_type_name, hrb_header_content_type_token));
 
-    char const phrase2[] = "make some zero-terminated strings";
-    memcpy(actual.begin + 14, phrase2, sizeof(phrase2) - 1);
+      TEST_ASSERT(hrb._internal.retry_headers_start_byte_offset == 0);
 
-    az_span const make_some = (az_span){ .begin = actual.begin + 14, .size = 9 };
-    az_span const zero_terminated = (az_span){ .begin = actual.begin + 24, .size = 15 };
-    az_span const strings = (az_span){ .begin = actual.begin + 40, .size = 7 };
+      TEST_EXPECT_SUCCESS(_az_http_request_mark_retry_headers_start(&hrb));
+      TEST_ASSERT(hrb._internal.retry_headers_start_byte_offset == sizeof(az_pair));
 
-    TEST_EXPECT_SUCCESS(az_mut_span_to_str(
-        (az_mut_span){ .begin = actual.begin + 48, .size = 10 }, make_some, &result));
-    TEST_EXPECT_SUCCESS(az_mut_span_to_str(
-        (az_mut_span){ .begin = actual.begin + 58, .size = 16 }, zero_terminated, &result));
-    TEST_EXPECT_SUCCESS(az_mut_span_to_str(
-        (az_mut_span){ .begin = actual.begin + 74, .size = 8 }, strings, &result));
+      TEST_EXPECT_SUCCESS(az_http_request_append_header(
+          &hrb, hrb_header_authorization_name, hrb_header_authorization_token1));
 
-    result.begin[result.size - 1] = '$';
-    TEST_EXPECT_SUCCESS(az_mut_span_to_str(result, strings, &result));
+      TEST_ASSERT(az_span_length(hrb._internal.headers) / sizeof(az_pair) == 2);
+      TEST_ASSERT(hrb._internal.retry_headers_start_byte_offset == sizeof(az_pair));
 
-    TEST_ASSERT(az_span_is_equal(az_mut_span_to_span(actual), expected));
-  }
-  {
-    uint8_t buf[68];
-    az_mut_span const buffer = { .begin = buf, .size = sizeof(buf) };
-    az_span result;
+      az_pair expected_headers1[2] = {
+        { .key = hrb_header_content_type_name, .value = hrb_header_content_type_token },
+        { .key = hrb_header_authorization_name, .value = hrb_header_authorization_token1 },
+      };
+      for (uint16_t i = 0; i < az_span_length(hrb._internal.headers) / sizeof(az_pair); ++i) {
+        az_pair header = { 0 };
+        TEST_EXPECT_SUCCESS(az_http_request_get_header(&hrb, i, &header));
 
-    az_span const * const decoded_input[]
-        = { &b64_decoded0, &b64_decoded1, &b64_decoded2,     &b64_decoded3,     &b64_decoded4,
-            &b64_decoded5, &b64_decoded6, &b64_decoded_bin1, &b64_decoded_bin2, &b64_decoded_bin3 };
+        TEST_ASSERT(az_span_is_equal(header.key, expected_headers1[i].key));
+        TEST_ASSERT(az_span_is_equal(header.value, expected_headers1[i].value));
+      }
 
-    az_span const * const encoded_input[]
-        = { &b64_encoded0, &b64_encoded1, &b64_encoded2,     &b64_encoded3,     &b64_encoded4,
-            &b64_encoded5, &b64_encoded6, &b64_encoded_bin1, &b64_encoded_bin2, &b64_encoded_bin3 };
+      TEST_EXPECT_SUCCESS(az_http_request_remove_retry_headers(&hrb));
+      TEST_ASSERT(hrb._internal.retry_headers_start_byte_offset == sizeof(az_pair));
 
-    az_span const * const url_encoded_input[]
-        = { &b64_encoded0u,     &b64_encoded1u,    &b64_encoded2u, &b64_encoded3u,
-            &b64_encoded4u,     &b64_encoded5u,    &b64_encoded6u, &b64_encoded_bin1u,
-            &b64_encoded_bin2u, &b64_encoded_bin3u };
+      TEST_EXPECT_SUCCESS(az_http_request_append_header(
+          &hrb, hrb_header_authorization_name, hrb_header_authorization_token2));
+      TEST_ASSERT(az_span_length(hrb._internal.headers) / sizeof(az_pair) == 2);
+      TEST_ASSERT(hrb._internal.retry_headers_start_byte_offset == sizeof(az_pair));
 
-    for (size_t i = 0; i < 10; ++i) {
-      TEST_EXPECT_SUCCESS(az_base64_encode(false, buffer, *decoded_input[i], &result));
-      TEST_ASSERT(az_span_is_equal(result, *encoded_input[i]));
+      az_pair expected_headers2[2] = {
+        { .key = hrb_header_content_type_name, .value = hrb_header_content_type_token },
+        { .key = hrb_header_authorization_name, .value = hrb_header_authorization_token2 },
+      };
+      for (uint16_t i = 0; i < az_span_length(hrb._internal.headers) / sizeof(az_pair); ++i) {
+        az_pair header = { 0 };
+        TEST_EXPECT_SUCCESS(az_http_request_get_header(&hrb, i, &header));
 
-      TEST_EXPECT_SUCCESS(az_base64_decode(buffer, *encoded_input[i], &result));
-      TEST_ASSERT(az_span_is_equal(result, *decoded_input[i]));
-
-      TEST_EXPECT_SUCCESS(az_base64_encode(true, buffer, *decoded_input[i], &result));
-      TEST_ASSERT(az_span_is_equal(result, *url_encoded_input[i]));
-
-      TEST_EXPECT_SUCCESS(az_base64_decode(buffer, *url_encoded_input[i], &result));
-      TEST_ASSERT(az_span_is_equal(result, *decoded_input[i]));
-    }
-  }
-  {
-    uint8_t buf[256 * 3];
-    az_mut_span const buffer = { .begin = buf, .size = sizeof(buf) };
-
-    az_span_builder builder = az_span_builder_create(buffer);
-    TEST_EXPECT_SUCCESS(az_uri_encode(AZ_STR("https://vault.azure.net"), &builder));
-    TEST_ASSERT(az_span_is_equal(
-        az_span_builder_result(&builder), AZ_STR("https%3A%2F%2Fvault.azure.net")));
-
-    builder = az_span_builder_create(buffer);
-    TEST_EXPECT_SUCCESS(az_uri_decode(AZ_STR("https%3A%2F%2Fvault.azure.net"), &builder));
-    TEST_ASSERT(
-        az_span_is_equal(az_span_builder_result(&builder), AZ_STR("https://vault.azure.net")));
-
-    builder = az_span_builder_create(buffer);
-    TEST_EXPECT_SUCCESS(az_uri_encode(uri_decoded, &builder));
-    TEST_ASSERT(az_span_is_equal(az_span_builder_result(&builder), uri_encoded));
-
-    builder = az_span_builder_create(buffer);
-    TEST_EXPECT_SUCCESS(az_uri_decode(uri_encoded, &builder));
-    TEST_ASSERT(az_span_is_equal(az_span_builder_result(&builder), uri_decoded));
-
-    builder = az_span_builder_create(buffer);
-    TEST_EXPECT_SUCCESS(az_uri_decode(uri_encoded2, &builder));
-    TEST_ASSERT(az_span_is_equal(az_span_builder_result(&builder), uri_decoded));
-
-    builder = az_span_builder_create(buffer);
-    TEST_EXPECT_SUCCESS(az_uri_decode(uri_encoded3, &builder));
-    TEST_ASSERT(az_span_is_equal(az_span_builder_result(&builder), uri_decoded));
-  }
-  {
-    uint8_t buf[100 + (100 % 8) + (2 * sizeof(az_pair))];
-    memset(buf, 0, sizeof(buf));
-    az_mut_span const http_buf = { .begin = buf, .size = sizeof(buf) };
-    az_http_request_builder hrb;
-
-    TEST_EXPECT_SUCCESS(az_http_request_builder_init(
-        &hrb, http_buf, 100, AZ_HTTP_METHOD_VERB_GET, hrb_url, az_span_empty()));
-    TEST_ASSERT(az_span_is_equal(hrb.method_verb, AZ_HTTP_METHOD_VERB_GET));
-    TEST_ASSERT(az_span_is_equal(az_span_builder_result(&hrb.url_builder), hrb_url));
-    TEST_ASSERT(hrb.url_builder.buffer.size == 100);
-    TEST_ASSERT(hrb.max_headers == 2);
-    TEST_ASSERT(hrb.headers_end == 0);
-    TEST_ASSERT(hrb.retry_headers_start == 2);
-
-    TEST_EXPECT_SUCCESS(az_http_request_builder_set_query_parameter(
-        &hrb, hrb_param_api_version_name, hrb_param_api_version_value));
-    TEST_ASSERT(az_span_is_equal(az_span_builder_result(&hrb.url_builder), hrb_url2));
-
-    TEST_EXPECT_SUCCESS(az_http_request_builder_set_query_parameter(
-        &hrb, hrb_param_test_param_name, hrb_param_test_param_value));
-    TEST_ASSERT(az_span_is_equal(az_span_builder_result(&hrb.url_builder), hrb_url3));
-
-    TEST_EXPECT_SUCCESS(az_http_request_builder_append_header(
-        &hrb, hrb_header_content_type_name, hrb_header_content_type_value));
-
-    TEST_ASSERT(hrb.headers_end == 1);
-    TEST_ASSERT(hrb.retry_headers_start == 2);
-
-    TEST_EXPECT_SUCCESS(az_http_request_builder_mark_retry_headers_start(&hrb));
-    TEST_ASSERT(hrb.retry_headers_start == 1);
-
-    TEST_EXPECT_SUCCESS(az_http_request_builder_append_header(
-        &hrb, hrb_header_authorization_name, hrb_header_authorization_value1));
-    TEST_ASSERT(hrb.headers_end == 2);
-    TEST_ASSERT(hrb.retry_headers_start == 1);
-
-    az_pair expected_headers1[2] = {
-      { .key = hrb_header_content_type_name, .value = hrb_header_content_type_value },
-      { .key = hrb_header_authorization_name, .value = hrb_header_authorization_value1 },
-    };
-    for (uint16_t i = 0; i < hrb.headers_end; ++i) {
-      az_pair header = { 0 };
-      TEST_EXPECT_SUCCESS(az_http_request_builder_get_header(&hrb, i, &header));
-
-      TEST_ASSERT(az_span_is_equal(header.key, expected_headers1[i].key));
-      TEST_ASSERT(az_span_is_equal(header.value, expected_headers1[i].value));
-    }
-
-    TEST_EXPECT_SUCCESS(az_http_request_builder_remove_retry_headers(&hrb));
-    TEST_ASSERT(hrb.headers_end == 1);
-    TEST_ASSERT(hrb.retry_headers_start == 1);
-
-    TEST_EXPECT_SUCCESS(az_http_request_builder_append_header(
-        &hrb, hrb_header_authorization_name, hrb_header_authorization_value2));
-    TEST_ASSERT(hrb.headers_end == 2);
-    TEST_ASSERT(hrb.retry_headers_start == 1);
-
-    az_pair expected_headers2[2] = {
-      { .key = hrb_header_content_type_name, .value = hrb_header_content_type_value },
-      { .key = hrb_header_authorization_name, .value = hrb_header_authorization_value2 },
-    };
-    for (uint16_t i = 0; i < hrb.headers_end; ++i) {
-      az_pair header = { 0 };
-      TEST_EXPECT_SUCCESS(az_http_request_builder_get_header(&hrb, i, &header));
-      TEST_ASSERT(az_span_is_equal(header.key, expected_headers2[i].key));
-      TEST_ASSERT(az_span_is_equal(header.value, expected_headers2[i].value));
+        TEST_ASSERT(az_span_is_equal(header.key, expected_headers2[i].key));
+        TEST_ASSERT(az_span_is_equal(header.value, expected_headers2[i].value));
+      }
     }
   }
 
-  test_http_response_parser();
+  test_http_response();
+  test_span_builder_replace();
+  test_mut_span();
   test_json_builder();
-  test_json_data();
   test_json_get_by_pointer();
-  test_json_value();
   test_json_pointer();
   test_json_string();
-  test_url_parse();
-  test_span_builder_replace();
-  test_span_span();
-  test_pair_span();
-  test_mut_span();
   test_log();
   return exit_code;
 }

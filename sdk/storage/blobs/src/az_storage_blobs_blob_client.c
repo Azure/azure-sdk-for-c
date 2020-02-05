@@ -1,77 +1,122 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_http_header_internal.h>
-#include <az_json_builder.h>
+#include <az_http.h>
+#include <az_http_pipeline_internal.h>
+#include <az_json.h>
 #include <az_storage_blobs.h>
 
 #include <_az_cfg.h>
 
-/**
- * @brief Example URL syntax, not all URLs will be in this format
- * Basic url is expected as :
- * [https://]{account_id}[.blob.core.windows.net]/{container}/{blob}{optional_query} URL token max
- * Len            Total [https://]                       = 8                 8 {account_id} = 24 32
- * // 3-24 lowercase only
- * [.blob.core.windows.net]         = 22               54  //TODO: Support soveriegn clouds
- * /{container}                     = 64              118  // 1 + 3-63, lowercase letters/numbers/-
- * (consecutive dash is invalid)
- * /{blob}                          = 1025           1143  // 1 + 1024
- * {optional_query}                 = 70          ** 1213 **
- */
-enum { MAX_URL_SIZE = 1280 }; // Padded to 1280
-enum {
-  MAX_BODY_SIZE = 1024 * 10
-}; // 10KB buffer  /*TODO, Adjust this to reasonable size for non-stream data.*/
+static az_span const AZ_STORAGE_BLOBS_BLOB_HEADER_X_MS_BLOB_TYPE
+    = AZ_SPAN_LITERAL_FROM_STR("x-ms-blob-type");
 
-az_storage_blobs_blob_client_options const AZ_STORAGE_BLOBS_BLOB_CLIENT_DEFAULT_OPTIONS
-    = { .retry = {
-            .max_retry = 5,
-            .delay_in_ms = 1000,
-        } };
+static az_span const AZ_STORAGE_BLOBS_BLOB_TYPE_BLOCKBLOB = AZ_SPAN_LITERAL_FROM_STR("BlockBlob");
+
+static az_span const AZ_HTTP_HEADER_CONTENT_LENGTH = AZ_SPAN_LITERAL_FROM_STR("Content-Length");
+static az_span const AZ_HTTP_HEADER_CONTENT_TYPE = AZ_SPAN_LITERAL_FROM_STR("Content-Type");
+
+AZ_NODISCARD az_storage_blobs_blob_client_options
+az_storage_blobs_blob_client_options_default(az_http_client http_client) {
+  az_storage_blobs_blob_client_options options = {
+    ._internal = { .http_client = http_client,
+                   .api_version = az_http_policy_apiversion_options_default(),
+                   ._telemetry_options = _az_http_policy_apiversion_options_default() },
+    .retry = az_http_policy_retry_options_default(),
+  };
+
+  options._internal.api_version.add_as_header = false;
+  options._internal.api_version.name = AZ_SPAN_FROM_STR("x-ms-version");
+  options._internal.api_version.version = AZ_STORAGE_API_VERSION;
+
+  return options;
+}
+
+AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
+    az_storage_blobs_blob_client * client,
+    az_span uri,
+    void * credential,
+    az_storage_blobs_blob_client_options * options) {
+  AZ_CONTRACT_ARG_NOT_NULL(client);
+  AZ_CONTRACT_ARG_NOT_NULL(options);
+
+  *client = (az_storage_blobs_blob_client){ ._internal = {
+    .uri = uri,
+    .options = *options,
+    ._token = { 0 },
+    ._token_context = { 0 },
+    .pipeline = (az_http_pipeline){
+        .p_policies = {
+            { .process = az_http_pipeline_policy_apiversion,.p_options = &client->_internal.options._internal.api_version },
+            { .process = az_http_pipeline_policy_uniquerequestid, .p_options = NULL },
+            { .process = az_http_pipeline_policy_telemetry, .p_options = &client->_internal.options._internal._telemetry_options },
+            { .process = az_http_pipeline_policy_retry, .p_options = &client->_internal.options.retry },
+            { .process = az_http_pipeline_policy_credential, .p_options = &(client->_internal._token_context) },
+            { .process = az_http_pipeline_policy_logging, .p_options = NULL },
+            { .process = az_http_pipeline_policy_bufferresponse, .p_options = NULL },
+            { .process = az_http_pipeline_policy_distributedtracing, .p_options = NULL },
+            { .process = az_http_pipeline_policy_transport, .p_options = &client->_internal.options._internal.http_client },
+        }, 
+    }}};
+
+  AZ_RETURN_IF_FAILED(az_identity_access_token_init(&(client->_internal._token)));
+  AZ_RETURN_IF_FAILED(az_identity_access_token_context_init(
+      &(client->_internal._token_context),
+      credential,
+      &(client->_internal._token),
+      AZ_SPAN_FROM_STR("https://storage.azure.com/.default")));
+
+  return AZ_OK;
+}
 
 AZ_NODISCARD az_result az_storage_blobs_blob_upload(
     az_storage_blobs_blob_client * client,
-    az_span const content,
-    az_storage_blobs_blob_upload_options * const options,
-    az_http_response * const response) {
-  (void)options;
+    az_span content, /* Buffer of content*/
+    az_storage_blobs_blob_upload_options * options,
+    az_http_response * response) {
+
+  az_storage_blobs_blob_upload_options opt;
+  if (options == NULL) {
+    opt = az_storage_blobs_blob_upload_options_default();
+  } else {
+    opt = *options;
+  }
+  (void)opt;
 
   // Request buffer
-  uint8_t request_buffer[1024 * 4] = { 0 };
-  az_mut_span request_buffer_span = AZ_SPAN_FROM_ARRAY(request_buffer);
-
-  /* ******** build url for request  ******/
+  // create request buffer TODO: define size for a blob upload
+  uint8_t url_buffer[1024 * 4];
+  az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
+  uint8_t headers_buffer[4 * sizeof(az_pair)];
+  az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
 
   // create request
-  az_http_request_builder hrb;
-  AZ_RETURN_IF_FAILED(az_http_request_builder_init(
-      &hrb, request_buffer_span, MAX_URL_SIZE, AZ_HTTP_METHOD_VERB_PUT, client->uri, content));
-
-  // add version to request
-  AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
-      &hrb, AZ_HTTP_HEADER_X_MS_VERSION, AZ_STORAGE_BLOBS_BLOB_API_VERSION));
+  // TODO: define max URL size
+  az_http_request hrb;
+  AZ_RETURN_IF_FAILED(az_http_request_init(
+      &hrb, az_http_method_get(), request_url_span, request_headers_span, content));
 
   // add blob type to request
-  AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
-      &hrb, AZ_STORAGE_BLOBS_BLOB_HEADER_X_MS_BLOB_TYPE, client->blob_type));
+  AZ_RETURN_IF_FAILED(az_http_request_append_header(
+      &hrb, AZ_STORAGE_BLOBS_BLOB_HEADER_X_MS_BLOB_TYPE, AZ_STORAGE_BLOBS_BLOB_TYPE_BLOCKBLOB));
 
   // add date to request
-  // AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
-  //    &hrb, AZ_HTTP_HEADER_X_MS_DATE, AZ_STR("Fri, 03 Jan 2020 21:33:15 GMT")));
+  // AZ_RETURN_IF_FAILED(az_http_request_append_header(
+  //    &hrb, AZ_HTTP_HEADER_X_MS_DATE, AZ_SPAN_FROM_STR("Fri, 03 Jan 2020 21:33:15 GMT")));
 
   char str[256] = { 0 };
-  snprintf(str, sizeof str, "%zu", content.size);
-  az_span content_length = az_str_to_span(str);
+  // TODO: remove snprintf
+  snprintf(str, sizeof str, "%d", az_span_length(content));
+  az_span content_length = az_span_from_str(str);
 
   // add Content-Length to request
   AZ_RETURN_IF_FAILED(
-      az_http_request_builder_append_header(&hrb, AZ_HTTP_HEADER_CONTENT_LENGTH, content_length));
+      az_http_request_append_header(&hrb, AZ_HTTP_HEADER_CONTENT_LENGTH, content_length));
 
   // add blob type to request
-  AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
-      &hrb, AZ_HTTP_HEADER_CONTENT_TYPE, AZ_STR("text/plain")));
+  AZ_RETURN_IF_FAILED(az_http_request_append_header(
+      &hrb, AZ_HTTP_HEADER_CONTENT_TYPE, AZ_SPAN_FROM_STR("text/plain")));
 
   // start pipeline
-  return az_http_pipeline_process(&client->pipeline, &hrb, response);
+  return az_http_pipeline_process(&client->_internal.pipeline, &hrb, response);
 }

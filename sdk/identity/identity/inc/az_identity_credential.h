@@ -4,14 +4,14 @@
 #ifndef _az_IDENTITY_CREDENTIAL_H
 #define _az_IDENTITY_CREDENTIAL_H
 
-#include <az_contract.h>
-#include <az_http_request_builder.h>
+#include <az_contract_internal.h>
+#include <az_http.h>
 #include <az_result.h>
 
 #include <_az_cfg_prefix.h>
 
 typedef AZ_NODISCARD az_result (
-    *az_identity_credential_func)(void * const data, az_http_request_builder * const hrb);
+    *az_identity_credential_func)(void * const data, az_http_request * const hrb);
 
 typedef struct {
   struct {

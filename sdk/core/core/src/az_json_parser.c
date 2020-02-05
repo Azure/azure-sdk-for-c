@@ -1,17 +1,24 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_json_parser.h>
+#include <az_json.h>
 
+#include "az_json_string_private.h"
 #include "az_span_reader_private.h"
-#include <az_contract.h>
-#include <az_json_string.h>
-#include <az_str.h>
+
+#include <az_contract_internal.h>
 
 #include <ctype.h>
 #include <math.h>
 
 #include <_az_cfg.h>
+
+enum { AZ_JSON_STACK_SIZE = 63 };
+
+typedef enum {
+  AZ_JSON_STACK_OBJECT = 0,
+  AZ_JSON_STACK_ARRAY = 1,
+} az_json_stack_item;
 
 AZ_NODISCARD AZ_INLINE bool az_json_is_white_space(az_result_byte const c) {
   switch (c) {
@@ -34,20 +41,20 @@ AZ_NODISCARD AZ_INLINE bool az_json_is_e(az_result_byte const c) {
 }
 
 AZ_NODISCARD AZ_INLINE bool az_json_parser_stack_is_empty(az_json_parser const * const self) {
-  return self->stack == 1;
+  return self->_internal.stack == 1;
 }
 
 AZ_NODISCARD AZ_INLINE az_json_stack_item
 az_json_parser_stack_last(az_json_parser const * const self) {
-  return self->stack & 1;
+  return self->_internal.stack & 1;
 }
 
 AZ_NODISCARD AZ_INLINE az_result
 az_json_parser_push_stack(az_json_parser * const self, az_json_stack const stack) {
-  if (self->stack >> AZ_JSON_STACK_SIZE != 0) {
+  if (self->_internal.stack >> AZ_JSON_STACK_SIZE != 0) {
     return AZ_ERROR_JSON_STACK_OVERFLOW;
   }
-  self->stack = (self->stack << 1) | stack;
+  self->_internal.stack = (self->_internal.stack << 1) | stack;
   return AZ_OK;
 }
 
@@ -60,14 +67,13 @@ AZ_NODISCARD AZ_INLINE az_result az_json_stack_pop(az_json_stack * const self) {
 }
 
 AZ_NODISCARD AZ_INLINE az_result az_json_parser_pop_stack(az_json_parser * const self) {
-  return az_json_stack_pop(&self->stack);
+  return az_json_stack_pop(&self->_internal.stack);
 }
 
-AZ_NODISCARD az_json_parser az_json_parser_create(az_span const buffer) {
-  return (az_json_parser){
-    .reader = az_span_reader_create(buffer),
-    .stack = 1,
-  };
+AZ_NODISCARD az_result az_json_parser_init(az_json_parser * self, az_span json_buffer) {
+  *self = (az_json_parser){ ._internal
+                            = { .reader = az_span_reader_create(json_buffer), .stack = 1 } };
+  return AZ_OK;
 }
 
 static void az_span_reader_skip_json_white_space(az_span_reader * const self) {
@@ -201,7 +207,7 @@ AZ_NODISCARD static az_result az_span_reader_get_json_string_rest(
     az_result const result = az_span_reader_read_json_string_char(self, &ignore);
     switch (result) {
       case AZ_ERROR_JSON_STRING_END: {
-        *string = az_span_sub(self->span, begin, self->i);
+        AZ_RETURN_IF_FAILED(az_span_slice(self->span, (int32_t)begin, (int32_t)self->i, string));
         az_span_reader_next(self);
         return AZ_OK;
       }
@@ -215,39 +221,39 @@ AZ_NODISCARD static az_result az_span_reader_get_json_string_rest(
 
 // _value_
 AZ_NODISCARD static az_result az_json_parser_get_value(
-    az_json_parser * const self,
-    az_json_token * const out_value) {
-  az_span_reader * const p_reader = &self->reader;
+    az_json_parser * self,
+    az_json_token * out_token) {
+  az_span_reader * const p_reader = &self->_internal.reader;
   az_result_byte const c = az_span_reader_current(p_reader);
   if (isdigit(c)) {
-    out_value->kind = AZ_JSON_TOKEN_NUMBER;
-    return az_span_reader_get_json_number_digit_rest(p_reader, &out_value->data.number);
+    out_token->kind = AZ_JSON_TOKEN_NUMBER;
+    return az_span_reader_get_json_number_digit_rest(p_reader, &out_token->value.number);
   }
   switch (c) {
     case 't':
-      out_value->kind = AZ_JSON_TOKEN_BOOLEAN;
-      out_value->data.boolean = true;
-      return az_span_reader_expect_span(p_reader, AZ_STR("true"));
+      out_token->kind = AZ_JSON_TOKEN_BOOLEAN;
+      out_token->value.boolean = true;
+      return az_span_reader_expect_span(p_reader, AZ_SPAN_FROM_STR("true"));
     case 'f':
-      out_value->kind = AZ_JSON_TOKEN_BOOLEAN;
-      out_value->data.boolean = false;
-      return az_span_reader_expect_span(p_reader, AZ_STR("false"));
+      out_token->kind = AZ_JSON_TOKEN_BOOLEAN;
+      out_token->value.boolean = false;
+      return az_span_reader_expect_span(p_reader, AZ_SPAN_FROM_STR("false"));
     case 'n':
-      out_value->kind = AZ_JSON_TOKEN_NULL;
-      return az_span_reader_expect_span(p_reader, AZ_STR("null"));
+      out_token->kind = AZ_JSON_TOKEN_NULL;
+      return az_span_reader_expect_span(p_reader, AZ_SPAN_FROM_STR("null"));
     case '"':
-      out_value->kind = AZ_JSON_TOKEN_STRING;
+      out_token->kind = AZ_JSON_TOKEN_STRING;
       az_span_reader_next(p_reader);
-      return az_span_reader_get_json_string_rest(p_reader, &out_value->data.string);
+      return az_span_reader_get_json_string_rest(p_reader, &out_token->value.string);
     case '-':
-      out_value->kind = AZ_JSON_TOKEN_NUMBER;
-      return az_span_reader_get_json_number_digit_rest(p_reader, &out_value->data.number);
+      out_token->kind = AZ_JSON_TOKEN_NUMBER;
+      return az_span_reader_get_json_number_digit_rest(p_reader, &out_token->value.number);
     case '{':
-      out_value->kind = AZ_JSON_TOKEN_OBJECT;
+      out_token->kind = AZ_JSON_TOKEN_OBJECT;
       az_span_reader_next(p_reader);
       return az_json_parser_push_stack(self, AZ_JSON_STACK_OBJECT);
     case '[':
-      out_value->kind = AZ_JSON_TOKEN_ARRAY;
+      out_token->kind = AZ_JSON_TOKEN_ARRAY;
       az_span_reader_next(p_reader);
       return az_json_parser_push_stack(self, AZ_JSON_STACK_ARRAY);
   }
@@ -255,26 +261,26 @@ AZ_NODISCARD static az_result az_json_parser_get_value(
 }
 
 AZ_NODISCARD static az_result az_json_parser_get_value_space(
-    az_json_parser * const p_state,
-    az_json_token * const out_value) {
-  AZ_RETURN_IF_FAILED(az_json_parser_get_value(p_state, out_value));
-  az_span_reader_skip_json_white_space(&p_state->reader);
+    az_json_parser * p_state,
+    az_json_token * out_token) {
+  AZ_RETURN_IF_FAILED(az_json_parser_get_value(p_state, out_token));
+  az_span_reader_skip_json_white_space(&p_state->_internal.reader);
   return AZ_OK;
 }
 
 AZ_NODISCARD az_result
-az_json_parser_read(az_json_parser * const self, az_json_token * const out_value) {
+az_json_parser_parse_token(az_json_parser * self, az_json_token * out_token) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
-  AZ_CONTRACT_ARG_NOT_NULL(out_value);
+  AZ_CONTRACT_ARG_NOT_NULL(out_token);
 
   if (!az_json_parser_stack_is_empty(self)) {
     return AZ_ERROR_JSON_INVALID_STATE;
   }
-  az_span_reader * const p_reader = &self->reader;
+  az_span_reader * const p_reader = &self->_internal.reader;
   az_span_reader_skip_json_white_space(p_reader);
-  AZ_RETURN_IF_FAILED(az_json_parser_get_value_space(self, out_value));
+  AZ_RETURN_IF_FAILED(az_json_parser_get_value_space(self, out_token));
   bool const is_empty = az_span_reader_is_empty(p_reader);
-  switch (out_value->kind) {
+  switch (out_token->kind) {
     case AZ_JSON_TOKEN_ARRAY:
     case AZ_JSON_TOKEN_OBJECT:
       return is_empty ? AZ_ERROR_EOF : AZ_OK;
@@ -289,7 +295,7 @@ AZ_NODISCARD AZ_INLINE uint8_t az_json_stack_item_to_close(az_json_stack_item co
 }
 
 AZ_NODISCARD static az_result az_json_parser_read_comma_or_close(az_json_parser * const self) {
-  az_span_reader * const p_reader = &self->reader;
+  az_span_reader * const p_reader = &self->_internal.reader;
   az_result_byte const c = az_span_reader_current(p_reader);
   if (c == ',') {
     // skip ',' and read all whitespaces.
@@ -310,7 +316,7 @@ AZ_NODISCARD static az_result az_json_parser_check_item_begin(
   if (az_json_parser_stack_is_empty(self) || az_json_parser_stack_last(self) != stack_item) {
     return AZ_ERROR_JSON_INVALID_STATE;
   }
-  az_span_reader * const p_reader = &self->reader;
+  az_span_reader * const p_reader = &self->_internal.reader;
   az_result_byte const c = az_span_reader_current(p_reader);
   if (c != az_json_stack_item_to_close(stack_item)) {
     return AZ_OK;
@@ -338,46 +344,45 @@ AZ_NODISCARD static az_result az_json_parser_check_item_end(
   return az_json_parser_read_comma_or_close(self);
 }
 
-AZ_NODISCARD az_result az_json_parser_read_object_member(
-    az_json_parser * const self,
-    az_json_token_member * const out_member) {
+AZ_NODISCARD az_result
+az_json_parser_parse_token_member(az_json_parser * self, az_json_token_member * out_token_member) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
-  AZ_CONTRACT_ARG_NOT_NULL(out_member);
+  AZ_CONTRACT_ARG_NOT_NULL(out_token_member);
 
-  az_span_reader * const p_reader = &self->reader;
+  az_span_reader * const p_reader = &self->_internal.reader;
   AZ_RETURN_IF_FAILED(az_json_parser_check_item_begin(self, AZ_JSON_STACK_OBJECT));
   AZ_RETURN_IF_FAILED(az_span_reader_expect_char(p_reader, '"'));
-  AZ_RETURN_IF_FAILED(az_span_reader_get_json_string_rest(p_reader, &out_member->name));
+  AZ_RETURN_IF_FAILED(az_span_reader_get_json_string_rest(p_reader, &out_token_member->name));
   az_span_reader_skip_json_white_space(p_reader);
   AZ_RETURN_IF_FAILED(az_span_reader_expect_char(p_reader, ':'));
   az_span_reader_skip_json_white_space(p_reader);
-  AZ_RETURN_IF_FAILED(az_json_parser_get_value_space(self, &out_member->value));
-  return az_json_parser_check_item_end(self, out_member->value);
+  AZ_RETURN_IF_FAILED(az_json_parser_get_value_space(self, &out_token_member->token));
+  return az_json_parser_check_item_end(self, out_token_member->token);
 }
 
 AZ_NODISCARD az_result
-az_json_parser_read_array_element(az_json_parser * const self, az_json_token * const out_element) {
+az_json_parser_parse_array_item(az_json_parser * self, az_json_token * out_token) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
-  AZ_CONTRACT_ARG_NOT_NULL(out_element);
+  AZ_CONTRACT_ARG_NOT_NULL(out_token);
 
   AZ_RETURN_IF_FAILED(az_json_parser_check_item_begin(self, AZ_JSON_STACK_ARRAY));
-  AZ_RETURN_IF_FAILED(az_json_parser_get_value_space(self, out_element));
-  return az_json_parser_check_item_end(self, *out_element);
+  AZ_RETURN_IF_FAILED(az_json_parser_get_value_space(self, out_token));
+  return az_json_parser_check_item_end(self, *out_token);
 }
 
-AZ_NODISCARD az_result az_json_parser_done(az_json_parser const * const self) {
+AZ_NODISCARD az_result az_json_parser_done(az_json_parser * self) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
-  if (!az_span_reader_is_empty(&self->reader) || !az_json_parser_stack_is_empty(self)) {
+  if (!az_span_reader_is_empty(&self->_internal.reader) || !az_json_parser_stack_is_empty(self)) {
     return AZ_ERROR_JSON_INVALID_STATE;
   }
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_json_parser_skip(az_json_parser * const self, az_json_token const value) {
+AZ_NODISCARD az_result az_json_parser_skip_children(az_json_parser * self, az_json_token token) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
-  switch (value.kind) {
+  switch (token.kind) {
     case AZ_JSON_TOKEN_OBJECT:
     case AZ_JSON_TOKEN_ARRAY: {
       break;
@@ -385,7 +390,7 @@ AZ_NODISCARD az_result az_json_parser_skip(az_json_parser * const self, az_json_
     default: { return AZ_OK; }
   }
 
-  az_json_stack target_stack = self->stack;
+  az_json_stack target_stack = self->_internal.stack;
   AZ_RETURN_IF_FAILED(az_json_stack_pop(&target_stack));
 
   while (true) {
@@ -393,7 +398,7 @@ AZ_NODISCARD az_result az_json_parser_skip(az_json_parser * const self, az_json_
     switch (az_json_parser_stack_last(self)) {
       case AZ_JSON_STACK_OBJECT: {
         az_json_token_member member = { 0 };
-        az_result const result = az_json_parser_read_object_member(self, &member);
+        az_result const result = az_json_parser_parse_token_member(self, &member);
         if (result != AZ_ERROR_ITEM_NOT_FOUND) {
           AZ_RETURN_IF_FAILED(result);
         }
@@ -401,14 +406,14 @@ AZ_NODISCARD az_result az_json_parser_skip(az_json_parser * const self, az_json_
       }
       default: {
         az_json_token element = { 0 };
-        az_result result = az_json_parser_read_array_element(self, &element);
+        az_result result = az_json_parser_parse_array_item(self, &element);
         if (result != AZ_ERROR_ITEM_NOT_FOUND) {
           AZ_RETURN_IF_FAILED(result);
         }
         break;
       }
     }
-    if (self->stack == target_stack) {
+    if (self->_internal.stack == target_stack) {
       return AZ_OK;
     }
   }

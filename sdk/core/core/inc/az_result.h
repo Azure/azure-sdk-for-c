@@ -4,9 +4,7 @@
 #ifndef _az_RESULT_H
 #define _az_RESULT_H
 
-#include <az_static_assert.h>
 #include <az_facility.h>
-
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -19,6 +17,9 @@ enum {
 
 #define _az_RESULT_MAKE_ERROR(facility, code) \
   ((int32_t)(0x80000000 | ((uint32_t)(facility) << 16) | (uint32_t)(code)))
+
+#define AZ_MAKE_SUCCESS(facility, code) \
+  ((int32_t)(0x00000000 | ((uint32_t)(facility) << 16) | (uint32_t)(code)))
 
 #define AZ_RETURN_IF_FAILED(exp) \
   do { \
@@ -38,8 +39,9 @@ enum {
  * - otherwise
  *   -  0..30 Value
  */
-typedef enum {
-  AZ_OK = 0,
+typedef enum az_result {
+  AZ_OK = AZ_MAKE_SUCCESS(AZ_FACILITY_CORE, 0),
+  AZ_CONTINUE = AZ_MAKE_SUCCESS(AZ_FACILITY_CORE, 1),
 
   // Core
   AZ_ERROR_ARG = _az_RESULT_MAKE_ERROR(AZ_FACILITY_CORE, 1),
@@ -64,11 +66,6 @@ typedef enum {
   // C standard errors
   AZ_ERROR_EOF = _az_RESULT_MAKE_ERROR(AZ_FACILITY_STD, 0xFFFF),
 } az_result;
-
-AZ_STATIC_ASSERT(sizeof(az_result) == 4)
-
-AZ_STATIC_ASSERT(AZ_ERROR_EOF == EOF)
-AZ_STATIC_ASSERT(EOF == -1)
 
 AZ_NODISCARD AZ_INLINE bool az_failed(az_result result) { return (result & AZ_ERROR_FLAG) != 0; }
 

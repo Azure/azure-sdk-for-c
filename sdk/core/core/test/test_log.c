@@ -1,10 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include <az_http.h>
+#include <az_http_private.h>
 #include <az_log.h>
 #include <az_log_internal.h>
 #include <az_log_private.h>
-#include <az_str.h>
 
 #include <az_test.h>
 
@@ -25,25 +26,25 @@ static void _log_listener(az_log_classification const classification, az_span co
       _log_invoked_for_http_request = true;
       TEST_ASSERT(az_span_is_equal(
           message,
-          AZ_STR("HTTP Request : GET https://www.example.com\n"
-                 "\t\tHeader1 : Value1\n"
-                 "\t\tHeader2 : ZZZZYYYYXXXXWWWWVVVVUU ... SSSRRRRQQQQPPPPOOOONNNN\n"
-                 "\t\tHeader3 : 1111112222223333334444 ... 55666666777777888888abc")));
+          AZ_SPAN_FROM_STR("HTTP Request : GET https://www.example.com\n"
+                           "\t\tHeader1 : Value1\n"
+                           "\t\tHeader2 : ZZZZYYYYXXXXWWWWVVVVUU ... SSSRRRRQQQQPPPPOOOONNNN\n"
+                           "\t\tHeader3 : 1111112222223333334444 ... 55666666777777888888abc")));
       break;
     case AZ_LOG_HTTP_RESPONSE:
       _log_invoked_for_http_response = true;
       TEST_ASSERT(az_span_is_equal(
           message,
-          AZ_STR("HTTP Response (3456ms) : 404 Not Found\n"
-                 "\t\tHeader11 : Value11\n"
-                 "\t\tHeader22 : NNNNOOOOPPPPQQQQRRRRSS ... UUUVVVVWWWWXXXXYYYYZZZZ\n"
-                 "\t\tHeader33\n"
-                 "\t\tHeader44 : cba8888887777776666665 ... 44444333333222222111111\n"
-                 "\n"
-                 "\tHTTP Request : GET https://www.example.com\n"
-                 "\t\t\tHeader1 : Value1\n"
-                 "\t\t\tHeader2 : ZZZZYYYYXXXXWWWWVVVVUU ... SSSRRRRQQQQPPPPOOOONNNN\n"
-                 "\t\t\tHeader3 : 1111112222223333334444 ... 55666666777777888888abc")));
+          AZ_SPAN_FROM_STR("HTTP Response (3456ms) : 404 Not Found\n"
+                           "\t\tHeader11 : Value11\n"
+                           "\t\tHeader22 : NNNNOOOOPPPPQQQQRRRRSS ... UUUVVVVWWWWXXXXYYYYZZZZ\n"
+                           "\t\tHeader33\n"
+                           "\t\tHeader44 : cba8888887777776666665 ... 44444333333222222111111\n"
+                           "\n"
+                           "\tHTTP Request : GET https://www.example.com\n"
+                           "\t\t\tHeader1 : Value1\n"
+                           "\t\t\tHeader2 : ZZZZYYYYXXXXWWWWVVVVUU ... SSSRRRRQQQQPPPPOOOONNNN\n"
+                           "\t\t\tHeader3 : 1111112222223333334444 ... 55666666777777888888abc")));
       break;
     default:
       TEST_ASSERT(false);
@@ -53,40 +54,44 @@ static void _log_listener(az_log_classification const classification, az_span co
 
 void test_log() {
   // Set up test values etc.
-  uint8_t hrb_buf[4 * 1024] = { 0 };
-  az_http_request_builder hrb = { 0 };
-  TEST_EXPECT_SUCCESS(az_http_request_builder_init(
+  //  uint8_t hrb_buf[4 * 1024] = { 0 };
+  uint8_t headers[4 * 1024] = { 0 };
+  az_http_request hrb = { 0 };
+  TEST_EXPECT_SUCCESS(az_http_request_init(
       &hrb,
-      (az_mut_span)AZ_SPAN_FROM_ARRAY(hrb_buf),
-      200,
-      AZ_HTTP_METHOD_VERB_GET,
-      AZ_STR("https://www.example.com"),
-      AZ_STR("AAAAABBBBBCCCCCDDDDDEEEEEFFFFFGGGGGHHHHHIIIIIJJJJJKKKKK")));
+      az_http_method_get(),
+      AZ_SPAN_FROM_STR("https://www.example.com"),
+      AZ_SPAN_FROM_BUFFER(headers),
+      AZ_SPAN_FROM_STR("AAAAABBBBBCCCCCDDDDDEEEEEFFFFFGGGGGHHHHHIIIIIJJJJJKKKKK")));
 
   TEST_EXPECT_SUCCESS(
-      az_http_request_builder_append_header(&hrb, AZ_STR("Header1"), AZ_STR("Value1")));
+      az_http_request_append_header(&hrb, AZ_SPAN_FROM_STR("Header1"), AZ_SPAN_FROM_STR("Value1")));
 
-  TEST_EXPECT_SUCCESS(az_http_request_builder_append_header(
-      &hrb, AZ_STR("Header2"), AZ_STR("ZZZZYYYYXXXXWWWWVVVVUUUUTTTTSSSSRRRRQQQQPPPPOOOONNNN")));
+  TEST_EXPECT_SUCCESS(az_http_request_append_header(
+      &hrb,
+      AZ_SPAN_FROM_STR("Header2"),
+      AZ_SPAN_FROM_STR("ZZZZYYYYXXXXWWWWVVVVUUUUTTTTSSSSRRRRQQQQPPPPOOOONNNN")));
 
-  TEST_EXPECT_SUCCESS(az_http_request_builder_mark_retry_headers_start(&hrb));
+  TEST_EXPECT_SUCCESS(_az_http_request_mark_retry_headers_start(&hrb));
 
-  TEST_EXPECT_SUCCESS(az_http_request_builder_append_header(
-      &hrb, AZ_STR("Header3"), AZ_STR("111111222222333333444444555555666666777777888888abc")));
+  TEST_EXPECT_SUCCESS(az_http_request_append_header(
+      &hrb,
+      AZ_SPAN_FROM_STR("Header3"),
+      AZ_SPAN_FROM_STR("111111222222333333444444555555666666777777888888abc")));
 
   uint8_t response_buf[1024] = { 0 };
-  az_span_builder response_builder
-      = az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(response_buf));
+  az_span response_builder = AZ_SPAN_FROM_BUFFER(response_buf);
 
-  TEST_EXPECT_SUCCESS(az_span_builder_append(
-      &response_builder,
-      AZ_STR("HTTP/1.1 404 Not Found\r\n"
-             "Header11: Value11\r\n"
-             "Header22: NNNNOOOOPPPPQQQQRRRRSSSSTTTTUUUUVVVVWWWWXXXXYYYYZZZZ\r\n"
-             "Header33:\r\n"
-             "Header44: cba888888777777666666555555444444333333222222111111\r\n"
-             "\r\n"
-             "KKKKKJJJJJIIIIIHHHHHGGGGGFFFFFEEEEEDDDDDCCCCCBBBBBAAAAA")));
+  TEST_EXPECT_SUCCESS(az_span_append(
+      response_builder,
+      AZ_SPAN_FROM_STR("HTTP/1.1 404 Not Found\r\n"
+                       "Header11: Value11\r\n"
+                       "Header22: NNNNOOOOPPPPQQQQRRRRSSSSTTTTUUUUVVVVWWWWXXXXYYYYZZZZ\r\n"
+                       "Header33:\r\n"
+                       "Header44: cba888888777777666666555555444444333333222222111111\r\n"
+                       "\r\n"
+                       "KKKKKJJJJJIIIIIHHHHHGGGGGFFFFFEEEEEDDDDDCCCCCBBBBBAAAAA"),
+      &response_builder));
 
   az_http_response response = { 0 };
   TEST_EXPECT_SUCCESS(az_http_response_init(&response, response_builder));

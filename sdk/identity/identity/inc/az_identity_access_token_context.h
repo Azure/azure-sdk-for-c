@@ -4,11 +4,12 @@
 #ifndef _az_IDENTITY_ACCESS_TOKEN_CONTEXT_H
 #define _az_IDENTITY_ACCESS_TOKEN_CONTEXT_H
 
-#include <az_contract.h>
+#include <az_contract_internal.h>
 #include <az_identity_access_token.h>
 #include <az_identity_credential.h>
 #include <az_result.h>
 #include <az_span.h>
+
 
 #include <_az_cfg_prefix.h>
 
