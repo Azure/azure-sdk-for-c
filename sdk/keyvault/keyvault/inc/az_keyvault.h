@@ -46,7 +46,13 @@ az_keyvault_keys_client_options_default(az_http_client http_client);
 
 typedef struct {
   struct {
+    uint8_t url_buffer[AZ_HTTP_URL_MAX_SIZE];
     az_span uri;
+    // used to save the length of the initial url that is used to init client. We need it
+    // to restore uri to original state if using client for more than one operation (create, delete,
+    // etc). Each operation can append or add query parameters to url so we need it with it's
+    // initial state
+    int32_t initial_url_length;
     az_http_pipeline pipeline;
     az_keyvault_keys_client_options options;
 
