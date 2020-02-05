@@ -4,7 +4,7 @@
 #include <az_json.h>
 #include <az_keyvault.h>
 #include <az_span.h>
-#include <az_span_internal.h>
+
 
 #include <_az_cfg.h>
 
@@ -75,7 +75,7 @@ AZ_NODISCARD az_result az_keyvault_keys_client_init(
                                                  .p_options = NULL },
                                                { .process = az_http_pipeline_policy_retry,
                                                  .p_options = &(self->_internal.options.retry) },
-                                               { .process = az_http_pipeline_policy_authentication,
+                                               { .process = az_http_pipeline_policy_credential,
                                                  .p_options = &(self->_internal._token_context) },
                                                { .process = az_http_pipeline_policy_logging,
                                                  .p_options = NULL },
@@ -198,7 +198,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
   // create request
   az_http_request hrb;
   AZ_RETURN_IF_FAILED(az_http_request_init(
-      &hrb, AZ_HTTP_METHOD_POST, request_url_span, request_headers_span, created_body));
+      &hrb, az_http_method_post(), request_url_span, request_headers_span, created_body));
 
   // add path to request
   AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, az_keyvault_client_constant_for_keys()));
@@ -240,7 +240,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
   // create request
   az_http_request hrb;
   AZ_RETURN_IF_FAILED(az_http_request_init(
-      &hrb, AZ_HTTP_METHOD_GET, request_url_span, request_headers_span, az_span_null()));
+      &hrb, az_http_method_get(), request_url_span, request_headers_span, az_span_null()));
 
   // Add path to request
   AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, az_keyvault_client_constant_for_keys()));
@@ -272,7 +272,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_delete(
   // TODO: define max URL size
   az_http_request hrb;
   AZ_RETURN_IF_FAILED(az_http_request_init(
-      &hrb, AZ_HTTP_METHOD_GET, request_url_span, request_headers_span, az_span_null()));
+      &hrb, az_http_method_get(), request_url_span, request_headers_span, az_span_null()));
 
   // Add path to request
   AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, az_keyvault_client_constant_for_keys()));

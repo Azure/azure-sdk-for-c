@@ -4,6 +4,7 @@
 #include <az_http.h>
 
 #include "az_span_private.h"
+#include <az_contract_internal.h>
 
 #include <_az_cfg.h>
 #include <ctype.h>
@@ -118,17 +119,16 @@ az_http_response_get_status_line(az_http_response * response, az_http_response_s
   AZ_CONTRACT_ARG_NOT_NULL(response);
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
-  // set http response to initial state
-  response->_internal.reader = response->_internal.http_response;
-
-  // parse status line
-  response->_internal.kind = AZ_HTTP_RESPONSE_KIND_STATUS_LINE;
+  // set http response to initial state if it is at any other state
+  if (response->_internal.parser.next_kind != AZ_HTTP_RESPONSE_KIND_STATUS_LINE) {
+    response->_internal.parser.remaining = response->_internal.http_response;
+  }
 
   // read an HTTP status line.
-  AZ_RETURN_IF_FAILED(_az_get_http_status_line(&response->_internal.reader, out));
+  AZ_RETURN_IF_FAILED(_az_get_http_status_line(&response->_internal.parser.remaining, out));
 
   // set state.kind of the next HTTP response value.
-  response->_internal.kind = AZ_HTTP_RESPONSE_KIND_HEADER;
+  response->_internal.parser.next_kind = AZ_HTTP_RESPONSE_KIND_HEADER;
 
   return AZ_OK;
 }
@@ -136,14 +136,17 @@ az_http_response_get_status_line(az_http_response * response, az_http_response_s
 AZ_NODISCARD az_result az_http_response_get_next_header(az_http_response * self, az_pair * out) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(out);
-  az_span * reader = &self->_internal.reader;
+  az_span * reader = &self->_internal.parser.remaining;
   {
-    az_http_response_kind const kind = self->_internal.kind;
+    az_http_response_kind const kind = self->_internal.parser.next_kind;
     // if reader is expecting to read body (all headers were read), return ITEM_NOT_FOUND so we
     // know we reach end of headers
     if (kind == AZ_HTTP_RESPONSE_KIND_BODY) {
       return AZ_ERROR_ITEM_NOT_FOUND;
     }
+    // Can't read a header if status line was not previously called,
+    // User needs to call az_http_response_status_line() witch would reset parser and set kind to
+    // headers
     if (kind != AZ_HTTP_RESPONSE_KIND_HEADER) {
       return AZ_ERROR_HTTP_INVALID_STATE;
     }
@@ -151,9 +154,9 @@ AZ_NODISCARD az_result az_http_response_get_next_header(az_http_response * self,
 
   // check if we are at the end of all headers to change state to Body.
   // We keep state to Headers if current char is not '\r' (there is another header)
-  if (az_span_ptr(self->_internal.reader)[0] == '\r') {
+  if (az_span_ptr(self->_internal.parser.remaining)[0] == '\r') {
     AZ_RETURN_IF_FAILED(_az_is_expected_span(reader, AZ_SPAN_FROM_STR("\r\n")));
-    self->_internal.kind = AZ_HTTP_RESPONSE_KIND_BODY;
+    self->_internal.parser.next_kind = AZ_HTTP_RESPONSE_KIND_BODY;
     return AZ_ERROR_ITEM_NOT_FOUND;
   }
 
@@ -222,14 +225,17 @@ AZ_NODISCARD az_result az_http_response_get_body(az_http_response * self, az_spa
 
   // Make sure get body works no matter where is the current parsing. Allow users to call get body
   // directly and ignore headers and status line
-  az_http_response_kind current_parsing_section = self->_internal.kind;
+  az_http_response_kind current_parsing_section = self->_internal.parser.next_kind;
   if (current_parsing_section != AZ_HTTP_RESPONSE_KIND_BODY) {
-    if (current_parsing_section == AZ_HTTP_RESPONSE_KIND_NONE) {
-      // Parse and ignore status line
+    if (current_parsing_section == AZ_HTTP_RESPONSE_KIND_EOF) {
+      // Reset parser and get status line
       az_http_response_status_line ignore = { 0 };
       AZ_RETURN_IF_FAILED(az_http_response_get_status_line(self, &ignore));
+      // update current parsing section
+      current_parsing_section = self->_internal.parser.next_kind;
     }
-    if (self->_internal.kind == AZ_HTTP_RESPONSE_KIND_HEADER) {
+    // parse any remaining header
+    if (current_parsing_section == AZ_HTTP_RESPONSE_KIND_HEADER) {
       // Parse and ignore all remaining headers
       for (az_pair h; az_http_response_get_next_header(self, &h) == AZ_OK;) {
         // ignoring header
@@ -238,8 +244,8 @@ AZ_NODISCARD az_result az_http_response_get_body(az_http_response * self, az_spa
   }
 
   // take all the remaining content from reader as body
-  AZ_RETURN_IF_FAILED(az_span_slice(self->_internal.reader, 0, -1, out_body));
+  AZ_RETURN_IF_FAILED(az_span_slice(self->_internal.parser.remaining, 0, -1, out_body));
 
-  self->_internal.kind = AZ_HTTP_RESPONSE_KIND_NONE;
+  self->_internal.parser.next_kind = AZ_HTTP_RESPONSE_KIND_EOF;
   return AZ_OK;
 }

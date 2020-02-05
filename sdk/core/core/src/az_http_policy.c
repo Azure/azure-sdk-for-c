@@ -84,7 +84,7 @@ typedef struct {
   _az_identity_auth_func _func;
 } _az_identity_auth;
 
-AZ_NODISCARD az_result az_http_pipeline_policy_authentication(
+AZ_NODISCARD az_result az_http_pipeline_policy_credential(
     az_http_policy * p_policies,
     void * p_options,
     az_http_request * p_request,

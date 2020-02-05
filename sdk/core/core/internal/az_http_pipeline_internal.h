@@ -67,7 +67,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
     az_http_request * p_request,
     az_http_response * p_response);
 
-AZ_NODISCARD az_result az_http_pipeline_policy_authentication(
+AZ_NODISCARD az_result az_http_pipeline_policy_credential(
     az_http_policy * p_policies,
     void * p_data,
     az_http_request * p_request,

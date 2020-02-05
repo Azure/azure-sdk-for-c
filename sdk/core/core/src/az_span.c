@@ -1,10 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include "az_hex_private.h"
 #include "az_span_private.h"
 #include <az_contract_internal.h>
 #include <az_span.h>
-#include <az_span_internal.h>
 
 #include <ctype.h>
 
@@ -103,6 +103,56 @@ AZ_NODISCARD az_result az_span_copy(az_span dst, az_span src, az_span * out) {
   return AZ_OK;
 }
 
+AZ_NODISCARD AZ_INLINE bool should_encode(uint8_t const c) {
+  switch (c) {
+    case '-':
+    case '_':
+    case '.':
+    case '~':
+      return false;
+    default:
+      return !(('0' <= c && c <= '9') || ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z'));
+  }
+}
+
+AZ_NODISCARD az_result az_span_copy_url_encode(az_span dst, az_span src, az_span * out) {
+  AZ_CONTRACT_ARG_NOT_NULL(out);
+  AZ_CONTRACT_ARG_VALID_SPAN(dst);
+  AZ_CONTRACT_ARG_VALID_SPAN(src);
+
+  int32_t const input_size = az_span_length(src);
+
+  int32_t result_size = 0;
+  for (int32_t i = 0; i < input_size; ++i) {
+    result_size += should_encode(az_span_ptr(src)[i]) ? 3 : 1;
+  }
+
+  if (az_span_capacity(dst) < result_size) {
+    return AZ_ERROR_BUFFER_OVERFLOW;
+  }
+
+  uint8_t * p_s = az_span_ptr(src);
+  uint8_t * p_d = az_span_ptr(dst);
+  int32_t s = 0;
+  for (int32_t i = 0; i < input_size; ++i) {
+    uint8_t c = p_s[i];
+    if (!should_encode(c)) {
+      *p_d = c;
+      p_d += 1;
+      s += 1;
+    } else {
+      p_d[0] = '%';
+      p_d[1] = _az_number_to_upper_hex(c >> 4);
+      p_d[2] = _az_number_to_upper_hex(c & 0x0F);
+      p_d += 3;
+      s += 3;
+    }
+  }
+  *out = az_span_init(az_span_ptr(dst), s, az_span_capacity(dst));
+
+  return AZ_OK;
+}
+
 AZ_NODISCARD AZ_INLINE int32_t _az_size_min(int32_t const a, int32_t const b) {
   return a < b ? a : b;
 }
@@ -191,23 +241,6 @@ AZ_NODISCARD az_result az_span_append(az_span self, az_span span, az_span * out)
 }
 
 /**
- * @brief Append only only byte if there is available capacity for it
- *
- * @param self src span where to append
- * @param c byte to be appended
- * @return AZ_NODISCARD az_span_append_byte
- */
-/* AZ_NODISCARD az_result az_span_append_byte(az_span * const self, uint8_t const c) {
-  AZ_CONTRACT_ARG_NOT_NULL(self);
-
-  int32_t const current_size = az_span_length(*self);
-  AZ_RETURN_IF_FAILED(az_span_set(*self, current_size, c));
-  AZ_RETURN_IF_FAILED(az_span_length_set(*self, current_size + 1));
-
-  return AZ_OK;
-} */
-
-/**
  * @brief Append @b size number of zeros to @b self if there is enough capacity for it
  *
  * @param self src span where to append
@@ -222,7 +255,7 @@ AZ_NODISCARD az_result az_span_append_zeros(az_span * const self, int32_t const 
   if (az_span_capacity(span) < size) {
     return AZ_ERROR_BUFFER_OVERFLOW;
   }
-  az_span_fill(span, 0);
+  az_span_set(span, 0);
 
   self->_internal.length = current_size + size;
   return AZ_OK;

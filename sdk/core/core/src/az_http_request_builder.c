@@ -6,21 +6,10 @@
 
 #include <az_contract_internal.h>
 #include <az_http.h>
-#include <az_span_internal.h>
 
 #include <assert.h>
 
 #include <_az_cfg.h>
-
-az_span AZ_HTTP_METHOD_GET = AZ_SPAN_LITERAL_FROM_STR("GET");
-az_span AZ_HTTP_METHOD_HEAD = AZ_SPAN_LITERAL_FROM_STR("HEAD");
-az_span AZ_HTTP_METHOD_POST = AZ_SPAN_LITERAL_FROM_STR("POST");
-az_span AZ_HTTP_METHOD_PUT = AZ_SPAN_LITERAL_FROM_STR("PUT");
-az_span AZ_HTTP_METHOD_DELETE = AZ_SPAN_LITERAL_FROM_STR("DELETE");
-az_span AZ_HTTP_METHOD_TRACE = AZ_SPAN_LITERAL_FROM_STR("TRACE");
-az_span AZ_HTTP_METHOD_OPTIONS = AZ_SPAN_LITERAL_FROM_STR("OPTIONS");
-az_span AZ_HTTP_METHOD_CONNECT = AZ_SPAN_LITERAL_FROM_STR("CONNECT");
-az_span AZ_HTTP_METHOD_PATCH = AZ_SPAN_LITERAL_FROM_STR("PATCH");
 
 AZ_NODISCARD az_result _az_is_question_mark(az_span slice) {
   return az_span_ptr(slice)[0] == '?' ? AZ_OK : AZ_CONTINUE;

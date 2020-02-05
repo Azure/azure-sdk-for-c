@@ -4,9 +4,9 @@
 #ifndef _az_SPAN_PRIVATE_H
 #define _az_SPAN_PRIVATE_H
 
+#include <az_contract_internal.h>
 #include <az_result.h>
 #include <az_span.h>
-#include <az_span_internal.h>
 
 #include <stdbool.h>
 
@@ -98,20 +98,6 @@ AZ_NODISCARD AZ_INLINE az_span az_span_from_single_item(uint8_t * ptr) {
  * @param b destination/source span
  */
 void az_span_swap(az_span const a, az_span const b);
-
-/**
- * @brief Set one specific index of az_span from span content only
- *
- */
-AZ_NODISCARD AZ_INLINE az_result
-az_span_set(az_span const self, int32_t const i, uint8_t const value) {
-  if (self._internal.length <= i) {
-    return AZ_ERROR_BUFFER_OVERFLOW;
-  }
-
-  az_span_ptr(self)[i] = value;
-  return AZ_OK;
-}
 
 /**
  * @brief Append @b size number of zeros to @b self if there is enough capacity for it

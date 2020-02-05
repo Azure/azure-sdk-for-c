@@ -55,15 +55,12 @@ typedef struct {
   } _internal;
 } az_http_request;
 
-extern az_http_method AZ_HTTP_METHOD_GET;
-extern az_http_method AZ_HTTP_METHOD_HEAD;
-extern az_http_method AZ_HTTP_METHOD_POST;
-extern az_http_method AZ_HTTP_METHOD_PUT;
-extern az_http_method AZ_HTTP_METHOD_DELETE;
-extern az_http_method AZ_HTTP_METHOD_TRACE;
-extern az_http_method AZ_HTTP_METHOD_OPTIONS;
-extern az_http_method AZ_HTTP_METHOD_CONNECT;
-extern az_http_method AZ_HTTP_METHOD_PATCH;
+AZ_INLINE az_http_method az_http_method_get() { return AZ_SPAN_FROM_STR("GET"); }
+AZ_INLINE az_http_method az_http_method_head() { return AZ_SPAN_FROM_STR("HEAD"); }
+AZ_INLINE az_http_method az_http_method_post() { return AZ_SPAN_FROM_STR("POST"); }
+AZ_INLINE az_http_method az_http_method_put() { return AZ_SPAN_FROM_STR("PUT"); }
+AZ_INLINE az_http_method az_http_method_delete() { return AZ_SPAN_FROM_STR("DELETE"); }
+AZ_INLINE az_http_method az_http_method_patch() { return AZ_SPAN_FROM_STR("PATCH"); }
 
 /**
  * @brief Format buffer as a http request containing URL and header spans.
@@ -158,21 +155,22 @@ AZ_NODISCARD az_result
 az_http_request_get_header(az_http_request * p_request, int32_t index, az_pair * out_result);
 
 typedef enum {
-  AZ_HTTP_RESPONSE_KIND_NONE = 0,
-  AZ_HTTP_RESPONSE_KIND_STATUS_LINE = 1,
-  AZ_HTTP_RESPONSE_KIND_HEADER = 2,
-  AZ_HTTP_RESPONSE_KIND_BODY = 3,
+  AZ_HTTP_RESPONSE_KIND_STATUS_LINE = 0,
+  AZ_HTTP_RESPONSE_KIND_HEADER = 1,
+  AZ_HTTP_RESPONSE_KIND_BODY = 2,
+  AZ_HTTP_RESPONSE_KIND_EOF = 3,
 } az_http_response_kind;
 
 typedef struct {
   struct {
     az_span http_response;
-
-    az_span reader;
-    az_http_response_kind kind;
+    struct {
+      az_span remaining; // the remaining un-parsed portion of the original http_response.
+      az_http_response_kind next_kind; // after parsing an element, this is set to the next kind of
+                                       // thing we will be parsing.
+    } parser;
   } _internal;
 } az_http_response;
-
 ///////////////////////////////////////////////
 
 typedef enum {
@@ -269,9 +267,10 @@ typedef struct {
 
 AZ_NODISCARD AZ_INLINE az_result
 az_http_response_init(az_http_response * self, az_span http_response) {
-  *self = (az_http_response){ ._internal = { .http_response = http_response,
-                                             .reader = az_span_null(),
-                                             .kind = AZ_HTTP_RESPONSE_KIND_NONE } };
+  *self = (az_http_response){ ._internal
+                              = { .http_response = http_response,
+                                  .parser = { .remaining = az_span_null(),
+                                              .next_kind = AZ_HTTP_RESPONSE_KIND_STATUS_LINE } } };
   return AZ_OK;
 }
 

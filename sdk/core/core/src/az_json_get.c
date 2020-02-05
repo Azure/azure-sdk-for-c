@@ -3,7 +3,7 @@
 
 #include "az_json_string_private.h"
 #include <az_json.h>
-#include <az_span_internal.h>
+
 
 #include <_az_cfg.h>
 

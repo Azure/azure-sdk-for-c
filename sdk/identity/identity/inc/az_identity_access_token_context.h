@@ -9,7 +9,7 @@
 #include <az_identity_credential.h>
 #include <az_result.h>
 #include <az_span.h>
-#include <az_span_internal.h>
+
 
 #include <_az_cfg_prefix.h>
 

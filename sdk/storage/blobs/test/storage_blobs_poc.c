@@ -41,7 +41,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_download(
   // TODO: define max URL size
   az_http_request hrb;
   AZ_RETURN_IF_FAILED(az_http_request_init(
-      &hrb, AZ_HTTP_METHOD_GET, request_url_span, request_headers_span, az_span_null()));
+      &hrb, az_http_method_get(), request_url_span, request_headers_span, az_span_null()));
 
   // start pipeline
   return az_http_pipeline_process(&client->_internal.pipeline, &hrb, response);
@@ -63,7 +63,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_delete(
   // TODO: define max URL size
   az_http_request hrb;
   AZ_RETURN_IF_FAILED(az_http_request_init(
-      &hrb, AZ_HTTP_METHOD_GET, request_url_span, request_headers_span, az_span_null()));
+      &hrb, az_http_method_get(), request_url_span, request_headers_span, az_span_null()));
 
   // start pipeline
   return az_http_pipeline_process(&client->_internal.pipeline, &hrb, response);

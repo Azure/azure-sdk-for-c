@@ -49,7 +49,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
             { .process = az_http_pipeline_policy_apiversion,.p_options = &client->_internal.options._internal.api_version },
             { .process = az_http_pipeline_policy_uniquerequestid, .p_options = NULL },
             { .process = az_http_pipeline_policy_retry, .p_options = &client->_internal.options.retry },
-            { .process = az_http_pipeline_policy_authentication, .p_options = &(client->_internal._token_context) },
+            { .process = az_http_pipeline_policy_credential, .p_options = &(client->_internal._token_context) },
             { .process = az_http_pipeline_policy_logging, .p_options = NULL },
             { .process = az_http_pipeline_policy_bufferresponse, .p_options = NULL },
             { .process = az_http_pipeline_policy_distributedtracing, .p_options = NULL },
@@ -93,7 +93,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
   // TODO: define max URL size
   az_http_request hrb;
   AZ_RETURN_IF_FAILED(az_http_request_init(
-      &hrb, AZ_HTTP_METHOD_GET, request_url_span, request_headers_span, content));
+      &hrb, az_http_method_get(), request_url_span, request_headers_span, content));
 
   // add blob type to request
   AZ_RETURN_IF_FAILED(az_http_request_append_header(

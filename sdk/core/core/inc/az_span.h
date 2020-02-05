@@ -176,6 +176,8 @@ AZ_NODISCARD az_result az_span_to_uint64(az_span self, uint64_t * out);
  */
 AZ_NODISCARD az_result az_span_copy(az_span dst, az_span src, az_span * out);
 
+AZ_NODISCARD az_result az_span_copy_url_encode(az_span dst, az_span src, az_span * out);
+
 // TODO: this will become az_span_append once we remove actions ....
 /**
  * @brief append az_span if there is enough capacity for it
@@ -228,6 +230,17 @@ AZ_NODISCARD AZ_INLINE az_pair az_pair_null() {
 
 AZ_NODISCARD AZ_INLINE az_pair az_pair_from_str(char * key, char * value) {
   return az_pair_init(az_span_from_str(key), az_span_from_str(value));
+}
+
+/**
+ * @brief Set all the content of the span to @b fill without updating the length of the span.
+ * This is util to set memory to zero before using span or make sure span is clean before use
+ *
+ * @param span source span
+ * @param fill byte to use for filling span
+ */
+AZ_INLINE void az_span_set(az_span span, uint8_t fill) {
+  memset(az_span_ptr(span), fill, az_span_capacity(span));
 }
 
 #include <_az_cfg_suffix.h>

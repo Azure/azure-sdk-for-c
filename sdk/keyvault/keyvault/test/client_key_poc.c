@@ -90,7 +90,7 @@ int main() {
     printf("Failed to reset http response (1)");
   }
 
-  az_span_fill(http_response._internal.http_response, '.');
+  az_span_set(http_response._internal.http_response, '.');
 
   /******************  GET KEY latest ver ******************************/
   az_result get_key_result = az_keyvault_keys_key_get(
@@ -121,7 +121,7 @@ int main() {
     printf("Failed to reset http response (2)");
   }
 
-  az_span_fill(response_span, '.');
+  az_span_set(response_span, '.');
 
   /*********************  Create a new key version (use default options) *************/
   az_result const create_version_result = az_keyvault_keys_key_create(
@@ -145,7 +145,7 @@ int main() {
     printf("Failed to reset http response (3)");
   }
 
-  az_span_fill(response_span, '.');
+  az_span_set(response_span, '.');
 
   /******************  GET KEY previous ver ******************************/
   az_result const get_key_prev_ver_result = az_keyvault_keys_key_get(
@@ -173,7 +173,7 @@ int main() {
     printf("Failed to reset http response (4)");
   }
 
-  az_span_fill(response_span, '.');
+  az_span_set(response_span, '.');
 
   /******************  GET KEY (should return failed response ) ******************************/
   az_result get_key_again_result = az_keyvault_keys_key_get(
