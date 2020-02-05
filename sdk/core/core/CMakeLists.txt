@@ -13,6 +13,8 @@ endif()
 
 add_library (
   az_core
+  src/az_aad.c
+  src/az_credentials.c
   src/az_curl_adapter.c
   src/az_http_pipeline.c
   src/az_http_policy.c

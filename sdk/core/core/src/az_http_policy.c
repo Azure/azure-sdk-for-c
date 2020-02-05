@@ -19,11 +19,6 @@ AZ_NODISCARD AZ_INLINE az_result az_http_pipeline_nextpolicy(
     az_http_policy * const p_policies,
     az_http_request * const hrb,
     az_http_response * const response) {
-
-  AZ_CONTRACT_ARG_NOT_NULL(p_policies);
-  AZ_CONTRACT_ARG_NOT_NULL(hrb);
-  AZ_CONTRACT_ARG_NOT_NULL(response);
-
   // Transport Policy is the last policy in the pipeline
   //  it returns without calling nextpolicy
   if (p_policies[0].process == NULL) {
@@ -83,26 +78,18 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
   return az_http_pipeline_nextpolicy(p_policies, hrb, response);
 }
 
-typedef AZ_NODISCARD az_result (
-    *_az_identity_auth_func)(void * const data, az_http_request * const hrb);
+AZ_INLINE AZ_NODISCARD az_result
+_az_apply_credential(_az_credential_vtbl * credential, az_http_request * ref_request) {
+  return (credential->_internal.apply_credential)(credential, ref_request);
+}
 
-typedef struct {
-  _az_identity_auth_func _func;
-} _az_identity_auth;
-
-AZ_NODISCARD az_result az_http_pipeline_policy_authentication(
-    az_http_policy * const p_policies,
-    void * const data,
-    az_http_request * const hrb,
-    az_http_response * const response) {
-  AZ_CONTRACT_ARG_NOT_NULL(data);
-
-  _az_identity_auth const * const auth = (_az_identity_auth const *)(data);
-  AZ_CONTRACT_ARG_NOT_NULL(auth->_func);
-
-  AZ_RETURN_IF_FAILED(auth->_func(data, hrb));
-
-  return az_http_pipeline_nextpolicy(p_policies, hrb, response);
+AZ_NODISCARD az_result az_http_pipeline_policy_credential(
+    az_http_policy * policies,
+    void * const options,
+    az_http_request * ref_request,
+    az_http_response * out_response) {
+  AZ_RETURN_IF_FAILED(_az_apply_credential((_az_credential_vtbl *)options, ref_request));
+  return az_http_pipeline_nextpolicy(policies, ref_request, out_response);
 }
 
 AZ_NODISCARD az_result az_http_pipeline_policy_logging(

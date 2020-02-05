@@ -88,7 +88,7 @@ int main() {
       .policies = {
         { .process = az_http_pipeline_policy_uniquerequestid, .data = NULL },
         { .process = az_http_pipeline_policy_retry, .data = NULL },
-        { .process = az_http_pipeline_policy_authentication, .data = &access_token_context },
+        { .process = az_http_pipeline_policy_credential, .data = &access_token_context },
         { .process = az_http_pipeline_policy_logging, .data = NULL },
         { .process = az_http_pipeline_policy_bufferresponse, .data = NULL },
         { .process = az_http_pipeline_policy_distributedtracing, .data = NULL },

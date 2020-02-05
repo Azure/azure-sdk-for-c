@@ -67,7 +67,13 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
     az_http_request * const hrb,
     az_http_response * const response);
 
-AZ_NODISCARD az_result az_http_pipeline_policy_authentication(
+AZ_INLINE AZ_NODISCARD az_result _az_set_scopes(_az_credential_vtbl * credential, az_span scopes) {
+  return (credential->_internal.set_scopes == NULL)
+      ? AZ_OK
+      : (credential->_internal.set_scopes)(credential, scopes);
+}
+
+AZ_NODISCARD az_result az_http_pipeline_policy_credential(
     az_http_policy * const policies,
     void * const data,
     az_http_request * const hrb,
