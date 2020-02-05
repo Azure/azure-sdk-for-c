@@ -41,7 +41,8 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
   AZ_CONTRACT_ARG_NOT_NULL(options);
 
   *client = (az_storage_blobs_blob_client){ ._internal = {
-    .uri = uri,
+    .uri = AZ_SPAN_FROM_BUFFER(client->_internal.url_buffer),
+    .initial_url_length = az_span_length(uri),
     .options = *options,
     ._token = { 0 },
     ._token_context = { 0 },
@@ -59,6 +60,9 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
         }, 
     }}};
 
+  // Copy url to client buffer so customer can re-use buffer on his/her side
+  AZ_RETURN_IF_FAILED(az_span_copy(client->_internal.uri, uri, &client->_internal.uri));
+
   AZ_RETURN_IF_FAILED(az_identity_access_token_init(&(client->_internal._token)));
   AZ_RETURN_IF_FAILED(az_identity_access_token_context_init(
       &(client->_internal._token_context),
@@ -66,6 +70,18 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
       &(client->_internal._token),
       AZ_SPAN_FROM_STR("https://storage.azure.com/.default")));
 
+  return AZ_OK;
+}
+
+AZ_NODISCARD static az_result _az_reset_url_to_initial_state(
+    az_storage_blobs_blob_client * client) {
+  if (client->_internal.initial_url_length != az_span_length(client->_internal.uri)) {
+    // Can't use slice here because we would lost original capacity
+    client->_internal.uri = az_span_init(
+        az_span_ptr(client->_internal.uri),
+        client->_internal.initial_url_length,
+        az_span_capacity(client->_internal.uri));
+  }
   return AZ_OK;
 }
 
@@ -82,6 +98,9 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
     opt = *options;
   }
   (void)opt;
+
+  // check if url needs to be reset to initial state
+  AZ_RETURN_IF_FAILED(_az_reset_url_to_initial_state(client));
 
   // Request buffer
   // create request buffer TODO: define size for a blob upload

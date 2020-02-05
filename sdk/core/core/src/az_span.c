@@ -14,11 +14,8 @@ enum {
   AZ_ASCII_LOWER_DIF = 'a' - 'A',
 };
 
-AZ_NODISCARD az_result az_span_slice(
-    az_span span,
-    int32_t low_index,
-    int32_t high_index,
-    az_span * out_sub_span) {
+AZ_NODISCARD az_result
+az_span_slice(az_span span, int32_t low_index, int32_t high_index, az_span * out_sub_span) {
   // left part
   az_span left = span;
   if (high_index >= 0) {
@@ -98,7 +95,7 @@ AZ_NODISCARD az_result az_span_copy(az_span dst, az_span src, az_span * out) {
     memmove((void *)ptr, (void const *)az_span_ptr(src), src_len);
   }
 
-  *out = az_span_init(ptr, src_len, src_len);
+  *out = az_span_init(ptr, src_len, az_span_capacity(dst));
 
   return AZ_OK;
 }

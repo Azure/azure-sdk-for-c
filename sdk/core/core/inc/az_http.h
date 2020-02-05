@@ -11,6 +11,10 @@
 
 #include <_az_cfg_prefix.h>
 
+enum {
+  AZ_HTTP_URL_MAX_SIZE = 1024 * 2,
+};
+
 typedef struct {
   // Services pass API versions in the header or in query parameters
   //   true: api version is passed via headers

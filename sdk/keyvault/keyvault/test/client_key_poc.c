@@ -42,6 +42,8 @@ int main() {
   az_keyvault_keys_client_options options
       = az_keyvault_keys_client_options_default(az_http_client_curl);
 
+  // URL will be copied to client's internal buffer. So we don't need to keep the content of URL
+  // buffer immutable  on client's side
   az_result const operation_result = az_keyvault_keys_client_init(
       &client, az_span_from_str(getenv(URI_ENV)), &credential, &options);
 
