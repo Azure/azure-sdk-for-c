@@ -51,7 +51,7 @@ make
   the `azure` and `c` tags.
 
 ## Contributing
-For details on contributing to this repository, see the [contributing guide](CONTRIBUTING.md).
+For details on contributing to this repository, see the [contributing guide](https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md).
 
 This project welcomes contributions and suggestions. Most contributions require you to agree to a Contributor License
 Agreement (CLA) declaring that you have the right to, and actually do, grant us the rights to use your contribution. For
@@ -72,7 +72,7 @@ Many people all over the world have helped make this project better.  You'll wan
 * [What are some good first issues for new contributors to the repo?](https://github.com/azure/azure-sdk-for-c/issues?q=is%3Aopen+is%3Aissue+label%3A%22up+for+grabs%22)
 * [How to build and test your change](CONTRIBUTING.md#developer-guide)
 * [How you can make a change happen!](CONTRIBUTING.md#pull-requests)
-* Frequently Asked Questions (FAQ) and Conceptual Topics in the detailed [Azure SDK for C wiki](https://github.com/azure/azure-sdk-for-c/wiki).
+* Frequently Asked Questions (FAQ) and Conceptual Topics in the detailed [Azure SDK for C wiki][azure_sdk_for_c_wiki].
 
 ### Community
 
@@ -87,3 +87,7 @@ Security issues and bugs should be reported privately, via email, to the Microso
 Azure SDK for C is licensed under the [MIT](LICENSE) license.
 
 ![Impressions](https://azure-sdk-impressions.azurewebsites.net/api/impressions/azure-sdk-for-c%2FREADME.png)
+
+<!-- LINKS -->
+[azure_sdk_for_c_wiki]: https://github.com/azure/azure-sdk-for-c/wiki
+[c_compiler]: https://visualstudio.microsoft.com/vs/features/cplusplus/
