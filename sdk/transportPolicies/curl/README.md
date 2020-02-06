@@ -94,5 +94,6 @@ Azure SDK for C is licensed under the [MIT](LICENSE) license.
 [azure_pattern_retry]: https://docs.microsoft.com/azure/architecture/patterns/retry
 [azure_portal]: https://portal.azure.com
 [azure_sub]: https://azure.microsoft.com/free/
+[c_compiler]: https://visualstudio.microsoft.com/vs/features/cplusplus/
 [cloud_shell]: https://docs.microsoft.com/azure/cloud-shell/overview
 [cloud_shell_bash]: https://shell.azure.com/bash

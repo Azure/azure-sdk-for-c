@@ -8,7 +8,7 @@ Azure Identity library (`az_identity`) provides primitives, abstractions, and he
 
 TODO link to the vcpkg
 
-**Prerequisites**: You must have an [Azure subscription][azure_sub] and [C++ compiler][cpp_compiler] to use this package.
+**Prerequisites**: You must have an [Azure subscription][azure_sub] and [C compiler][c_compiler] to use this package.
 
 ### Authenticate the client
 
@@ -94,6 +94,7 @@ Azure SDK for C is licensed under the [MIT](LICENSE) license.
 [azure_pattern_retry]: https://docs.microsoft.com/azure/architecture/patterns/retry
 [azure_portal]: https://portal.azure.com
 [azure_sub]: https://azure.microsoft.com/free/
+[c_compiler]: https://visualstudio.microsoft.com/vs/features/cplusplus/
 [cloud_shell]: https://docs.microsoft.com/azure/cloud-shell/overview
 [cloud_shell_bash]: https://shell.azure.com/bash
 [identity_docs]: https://docs.microsoft.com/en-us/azure/active-directory/

@@ -2,7 +2,7 @@
 
 Azure Storage Blobs library (`az_storage_blobs`) provides abstractions, and helpers for communicating with Azure Storage Blobs in the C programming language. This library follows the Azure SDK Design Guidelines for Embedded C.
 
-Use the Azure SDK Storage Blobs library for C to communicate with Azure Storage Blobs.
+Use the Azure SDK Storage Blobs library for C to work with Azure Storage Blobs.
 
 * Upload blobs
 * Create and modify blob metadata
@@ -12,14 +12,6 @@ Use the Azure SDK Storage Blobs library for C to communicate with Azure Storage 
 ### Install the package
 
 TODO link to the vcpkg
-
-**Prerequisites**: You must have an [Azure subscription][azure_sub], [Azure Storage account][storage_account] (Storage Blobs), and [C++ compiler][cpp_compiler] to use this package.
-
-If you need a Storage account, you can use the Azure [Cloud Shell][cloud_shell_bash] to create one with this Azure CLI command:
-
-```Bash
-az storage create --resource-group <resource-group-name> --name <storage-account-name>
-```
 
 ### Authenticate the client
 
@@ -105,6 +97,7 @@ Azure SDK for C is licensed under the [MIT](LICENSE) license.
 [azure_pattern_retry]: https://docs.microsoft.com/azure/architecture/patterns/retry
 [azure_portal]: https://portal.azure.com
 [azure_sub]: https://azure.microsoft.com/free/
+[c_compiler]: https://visualstudio.microsoft.com/vs/features/cplusplus/
 [cloud_shell]: https://docs.microsoft.com/azure/cloud-shell/overview
 [cloud_shell_bash]: https://shell.azure.com/bash
 [storage_account_create]: https://docs.microsoft.com/en-us/azure/storage/common/storage-account-create?tabs=azure-portal

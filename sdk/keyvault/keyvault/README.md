@@ -1,8 +1,8 @@
-# Azure SDK KeyVault Library for C
+# Azure SDK KeyVault Keys Library for C
 
-Azure KeyVault library (`az_keyvault`) provides abstractions, and helpers for communicating with Azure KeyVault in the C programming language. This library follows the Azure SDK Design Guidelines for Embedded C.
+Azure KeyVault Keys library (`az_keyvault_keys`) provides abstractions, and helpers for communicating with Azure KeyVault in the C programming language. This library follows the Azure SDK Design Guidelines for Embedded C.
 
-Use the library to communicate with Azure KeyVault.
+Use the Azure KeyVault Keys library to work with Azure KeyVault Keys.
 
 * Create Key
 * Get Key
@@ -10,13 +10,11 @@ Use the library to communicate with Azure KeyVault.
 
 ## Getting started
 
-### Install the package
+### Download the sample
 
-TODO link to the vcpkg
+**Prerequisites**: You must have an [Azure subscription][azure_sub], [Azure KeyVault account][keyvault_account] (KeyVault), and [C compiler][c_compiler] to use this package.
 
-**Prerequisites**: You must have an [Azure subscription][azure_sub], [Azure KeyVault account][keyvault_account] (KeyVault), and [C++ compiler][cpp_compiler] to use this package.
-
-If you need a KeyVault account, you can use the Azure [Cloud Shell][cloud_shell_bash] to create one with this Azure CLI command:
+If you need a KeyVault vault, you can use the Azure [Cloud Shell][cloud_shell_bash] to create one with this Azure CLI command:
 
 ```Bash
 az keyvault create --resource-group <resource-group-name> --name <keyvault-account-name>  --location <azure-region>
@@ -106,6 +104,7 @@ Azure SDK for C is licensed under the [MIT](LICENSE) license.
 [azure_pattern_retry]: https://docs.microsoft.com/azure/architecture/patterns/retry
 [azure_portal]: https://portal.azure.com
 [azure_sub]: https://azure.microsoft.com/free/
+[c_compiler]: https://visualstudio.microsoft.com/vs/features/cplusplus/
 [cloud_shell]: https://docs.microsoft.com/azure/cloud-shell/overview
 [cloud_shell_bash]: https://shell.azure.com/bash
 [keyvault_account]: https://docs.microsoft.com/en-us/azure/key-vault/key-vault-manage-with-cli2
