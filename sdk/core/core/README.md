@@ -46,22 +46,20 @@ Defined in [inc/az_span.h](inc/az_span.h).
 
 ```c
 typedef struct {
-  uint8_t const *begin;
-  size_t size;
-} az_const_span;
-
-typedef struct {
-  uint8_t *begin;
-  size_t size;
+  struct {
+    uint8_t * ptr;
+    int32_t length;
+    int32_t capacity;
+  } _internal;
 } az_span;
 ```
 
 ### Strings
 
-A string is a span of UTF-8 characters. It's not a zero-terminated string. Defined in [inc/az_str.h](inc/az_str.h).
+A string is a span of UTF-8 characters. It's not a zero-terminated string. Defined in [inc/az_span.h](inc/az_span.h).
 
 ```c
-az_const_span const hello_world = AZ_SPAN_FROM_STR("Hello world!");
+az_span hello_world = AZ_SPAN_FROM_STR("Hello world!");
 ```
 
 ## Examples
@@ -132,5 +130,6 @@ Azure SDK for C is licensed under the [MIT](LICENSE) license.
 [azure_pattern_retry]: https://docs.microsoft.com/azure/architecture/patterns/retry
 [azure_portal]: https://portal.azure.com
 [azure_sub]: https://azure.microsoft.com/free/
+[c_compiler]: https://visualstudio.microsoft.com/vs/features/cplusplus/
 [cloud_shell]: https://docs.microsoft.com/azure/cloud-shell/overview
 [cloud_shell_bash]: https://shell.azure.com/bash
