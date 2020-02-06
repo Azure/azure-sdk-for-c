@@ -17,18 +17,6 @@
 
 int exit_code = 0;
 
-AZ_NODISCARD static az_result _az_reset_url_to_initial_state(
-    az_storage_blobs_blob_client * client) {
-  if (client->_internal.initial_url_length != az_span_length(client->_internal.uri)) {
-    // Can't use slice here because we would lost original capacity
-    client->_internal.uri = az_span_init(
-        az_span_ptr(client->_internal.uri),
-        client->_internal.initial_url_length,
-        az_span_capacity(client->_internal.uri));
-  }
-  return AZ_OK;
-}
-
 /**
  * @brief Returns blob content in buffer
  *
@@ -39,9 +27,6 @@ AZ_NODISCARD static az_result _az_reset_url_to_initial_state(
 AZ_NODISCARD az_result az_storage_blobs_blob_download(
     az_storage_blobs_blob_client * client,
     az_http_response * const response) {
-
-  // check if url needs to be reset to initial state
-  AZ_RETURN_IF_FAILED(_az_reset_url_to_initial_state(client));
 
   // Request buffer
   // create request buffer TODO: define size for a getKey Request
@@ -65,9 +50,6 @@ AZ_NODISCARD az_result az_storage_blobs_blob_download(
 AZ_NODISCARD az_result az_storage_blobs_blob_delete(
     az_storage_blobs_blob_client * client,
     az_http_response * const response) {
-
-  // check if url needs to be reset to initial state
-  AZ_RETURN_IF_FAILED(_az_reset_url_to_initial_state(client));
 
   // Request buffer
   // create request buffer TODO: define size for blob delete

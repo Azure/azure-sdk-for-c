@@ -42,7 +42,6 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
 
   *client = (az_storage_blobs_blob_client){ ._internal = {
     .uri = AZ_SPAN_FROM_BUFFER(client->_internal.url_buffer),
-    .initial_url_length = az_span_length(uri),
     .options = *options,
     ._token = { 0 },
     ._token_context = { 0 },
@@ -73,18 +72,6 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
   return AZ_OK;
 }
 
-AZ_NODISCARD static az_result _az_reset_url_to_initial_state(
-    az_storage_blobs_blob_client * client) {
-  if (client->_internal.initial_url_length != az_span_length(client->_internal.uri)) {
-    // Can't use slice here because we would lost original capacity
-    client->_internal.uri = az_span_init(
-        az_span_ptr(client->_internal.uri),
-        client->_internal.initial_url_length,
-        az_span_capacity(client->_internal.uri));
-  }
-  return AZ_OK;
-}
-
 AZ_NODISCARD az_result az_storage_blobs_blob_upload(
     az_storage_blobs_blob_client * client,
     az_span content, /* Buffer of content*/
@@ -99,13 +86,12 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
   }
   (void)opt;
 
-  // check if url needs to be reset to initial state
-  AZ_RETURN_IF_FAILED(_az_reset_url_to_initial_state(client));
-
   // Request buffer
   // create request buffer TODO: define size for a blob upload
-  uint8_t url_buffer[1024 * 4];
+  uint8_t url_buffer[1024];
   az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
+  // copy url from client
+  AZ_RETURN_IF_FAILED(az_span_copy(request_url_span, client->_internal.uri, &request_url_span));
   uint8_t headers_buffer[4 * sizeof(az_pair)];
   az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
 
