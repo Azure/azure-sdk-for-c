@@ -65,36 +65,37 @@ target_link_libraries(az_core PRIVATE az_core_internal)
 # make sure that users can consume the project as a library.
 add_library (az::core ALIAS az_core)
 
- add_executable (
-     az_core_test 
-     test/main.c 
-     test/test_http_response_read_and_parse.c
-     test/test_json_builder.c
-     test/test_json_get_by_pointer.c
-     test/test_json_pointer.c
-     test/test_json_string.c
-     test/test_json_value.c
-     test/test_log.c
-     test/test_mut_span.c
-     test/test_span_builder_replace.c
-     test/test_url_parse.c
+add_executable (
+    az_core_test 
+    test/main.c 
+    test/test_http_response_parser.c
+    test/test_json_builder.c
+    test/test_json_data.c
+    test/test_json_get_by_pointer.c
+    test/test_json_pointer.c
+    test/test_json_string.c
+    test/test_json_value.c
+    test/test_log.c
+    test/test_mut_span.c
+    test/test_pair_span.c
+    test/test_span_builder_replace.c
+    test/test_span_span.c
+    test/test_url_parse.c
+    )
 
-     )
-
- target_link_libraries(az_core_test PRIVATE az_core az_core_internal)
- target_include_directories (az_core_test PRIVATE src)
-
- if (UNIX)
-   target_link_libraries(az_core_test PRIVATE m)
- endif()
-
- target_include_directories (az_core_test PRIVATE test)
-
- add_test(NAME az_core_test COMMAND az_core_test)
-
+target_link_libraries(az_core_test PRIVATE az_core az_core_internal)
+target_include_directories (az_core_test PRIVATE src)
 target_link_libraries(az_core PRIVATE CURL::libcurl)
 
 if (MOCK_CURL)
   MESSAGE("Will mock all calls to http client with static responses")
   add_definitions(-DMOCK_CURL="MOCK")
 endif()
+
+if (UNIX)
+  target_link_libraries(az_core_test PRIVATE m)
+endif()
+
+target_include_directories (az_core_test PRIVATE test)
+
+add_test(NAME az_core_test COMMAND az_core_test)
