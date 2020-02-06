@@ -9,6 +9,8 @@
 #include <stddef.h>
 #include <stdlib.h>
 
+#include <_az_cfg.h>
+
 /*Copying AZ_CONTRACT on purpose from AZ_CORE because 3rd parties can define this and should not
  * depend on internal CORE headers */
 #define AZ_CONTRACT(condition, error) \
