@@ -311,7 +311,7 @@ AZ_NODISCARD az_result az_http_response_get_next_header(az_http_response * self,
  */
 AZ_NODISCARD az_result az_http_response_get_body(az_http_response * self, az_span * out_body);
 
-AZ_NODISCARD AZ_INLINE az_result az_http_response_reset(az_http_response * const self) {
+AZ_NODISCARD AZ_INLINE az_result az_http_response_reset(az_http_response * self) {
   self->_internal.http_response = az_span_init(
       az_span_ptr(self->_internal.http_response),
       0,
@@ -320,7 +320,7 @@ AZ_NODISCARD AZ_INLINE az_result az_http_response_reset(az_http_response * const
 }
 
 typedef AZ_NODISCARD az_result (
-    *_az_apply_credential)(void * credential_options, az_http_request * ref_request); //FIXME: ref_, out_
+    *_az_apply_credential)(void * credential_options, az_http_request * ref_request);
 
 typedef AZ_NODISCARD az_result (*_az_set_scopes)(void * credential, az_span scopes);
 
@@ -328,7 +328,6 @@ typedef struct {
   struct {
     _az_apply_credential apply_credential;
     _az_set_scopes set_scopes; // NULL if this credential doesn't support scopes.
-    // FIXME: if we add get_token as virtual, all the token credential implementations can reuse apply_credential implementation
   } _internal;
 } _az_credential_vtbl;
 

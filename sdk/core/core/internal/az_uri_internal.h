@@ -24,7 +24,7 @@
  *     - `input` is invalid span (see @ref az_span_is_valid).
  *     - `span_builder`'s buffer would overlap `input`.
  */
-AZ_NODISCARD az_result az_uri_encode(az_span const input, az_span * const span_builder);
+AZ_NODISCARD az_result az_uri_encode(az_span input, az_span * const span_builder);
 
 /**
  * @brief _URI-Decode_ (a.k.a. _URL-Decode_): `this%20text` becomes `this text`.
@@ -43,7 +43,7 @@ AZ_NODISCARD az_result az_uri_encode(az_span const input, az_span * const span_b
  * (_`%[0-9A-Fa-f]{2}`_) characters: `%XZ`.
  *     - `span_builder`'s buffer would overlap `input`.
  */
-AZ_NODISCARD az_result az_uri_decode(az_span const input, az_span * const span_builder);
+AZ_NODISCARD az_result az_uri_decode(az_span input, az_span * const span_builder);
 
 #include <_az_cfg_suffix.h>
 

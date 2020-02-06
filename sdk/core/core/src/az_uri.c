@@ -15,7 +15,7 @@
 
 #include <_az_cfg.h>
 
-AZ_NODISCARD AZ_INLINE bool should_encode(uint8_t const c) {
+AZ_NODISCARD AZ_INLINE bool should_encode(uint8_t c) {
   switch (c) {
     case '-':
     case '_':
@@ -27,7 +27,7 @@ AZ_NODISCARD AZ_INLINE bool should_encode(uint8_t const c) {
   }
 }
 
-AZ_NODISCARD AZ_INLINE int8_t hex_to_int4(uint8_t const c) {
+AZ_NODISCARD AZ_INLINE int8_t hex_to_int4(uint8_t c) {
   if ('0' <= c && c <= '9') {
     return c - '0';
   } else if ('A' <= c && c <= 'F') {
@@ -38,17 +38,17 @@ AZ_NODISCARD AZ_INLINE int8_t hex_to_int4(uint8_t const c) {
   return c - 'a' + ('9' - '0' + 1);
 }
 
-AZ_NODISCARD AZ_INLINE uint8_t hex_to_int8(uint8_t const hi, uint8_t const lo) {
+AZ_NODISCARD AZ_INLINE uint8_t hex_to_int8(uint8_t hi, uint8_t lo) {
   return hex_to_int4(hi) << 4 | hex_to_int4(lo);
 }
 
-AZ_INLINE void encode(uint8_t const c, uint8_t * const p) {
+AZ_INLINE void encode(uint8_t const c, uint8_t * p) {
   p[0] = '%';
   p[1] = az_number_to_upper_hex(c >> 4);
   p[2] = az_number_to_upper_hex(c & 0x0F);
 }
 
-AZ_NODISCARD az_result az_uri_encode(az_span const input, az_span * const span_builder) {
+AZ_NODISCARD az_result az_uri_encode(az_span const input, az_span * span_builder) {
   AZ_CONTRACT_ARG_NOT_NULL(span_builder);
   AZ_CONTRACT_ARG_VALID_SPAN(input);
 
@@ -95,7 +95,7 @@ AZ_NODISCARD az_result az_uri_encode(az_span const input, az_span * const span_b
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_uri_decode(az_span const input, az_span * const span_builder) {
+AZ_NODISCARD az_result az_uri_decode(az_span const input, az_span * span_builder) {
   AZ_CONTRACT_ARG_NOT_NULL(span_builder);
   AZ_CONTRACT_ARG_VALID_SPAN(input);
 

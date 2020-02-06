@@ -7,8 +7,7 @@
 
 #include <_az_cfg.h>
 
-AZ_NODISCARD az_result
-az_span_move(az_span const buffer, az_span const src, az_span * const out_result) {
+AZ_NODISCARD az_result az_span_move(az_span const buffer, az_span const src, az_span * out_result) {
   AZ_CONTRACT_ARG_NOT_NULL(out_result);
 
   AZ_CONTRACT_ARG_VALID_SPAN(buffer);
@@ -27,7 +26,7 @@ az_span_move(az_span const buffer, az_span const src, az_span * const out_result
 }
 
 AZ_NODISCARD az_result
-az_span_to_str(az_span const buffer, az_span const src, az_span * const out_result) {
+az_span_to_str(az_span const buffer, az_span const src, az_span * out_result) {
   AZ_CONTRACT_ARG_NOT_NULL(out_result);
   AZ_CONTRACT_ARG_VALID_SPAN(buffer);
   AZ_CONTRACT_ARG_VALID_SPAN(src);
@@ -49,15 +48,15 @@ az_span_to_str(az_span const buffer, az_span const src, az_span * const out_resu
   return AZ_OK;
 }
 
-AZ_NODISCARD AZ_INLINE size_t _az_size_min(size_t const a, size_t const b) { return a < b ? a : b; }
+AZ_NODISCARD AZ_INLINE size_t _az_size_min(size_t const a, size_t b) { return a < b ? a : b; }
 
-AZ_INLINE void _az_uint8_swap(uint8_t * const a, uint8_t * const b) {
+AZ_INLINE void _az_uint8_swap(uint8_t * const a, uint8_t * b) {
   uint8_t const c = *a;
   *a = *b;
   *b = c;
 }
 
-void az_span_swap(az_span const a, az_span const b) {
+void az_span_swap(az_span const a, az_span b) {
   uint8_t * pa = a.begin;
   uint8_t * pb = b.begin;
   for (size_t i = _az_size_min(a.size, b.size); i > 0; ++pa, ++pb) {

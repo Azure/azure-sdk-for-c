@@ -24,7 +24,7 @@ AZ_ACTION_TYPE(az_str_action, char const *)
 /**
  * Calculates a size of a contiguous buffer to store all spans from @var self.
  */
-AZ_NODISCARD az_result az_span_writer_size(az_span_writer const self, int32_t * out_size);
+AZ_NODISCARD az_result az_span_writer_size(az_span_writer self, int32_t * out_size);
 
 /**
  * The function creates a temporary zero-terminated string from @var span_writer in dynamic memory.
@@ -32,7 +32,7 @@ AZ_NODISCARD az_result az_span_writer_size(az_span_writer const self, int32_t * 
  * string is destroyed.
  */
 AZ_NODISCARD az_result az_span_writer_as_dynamic_str_writer(
-    az_span_writer const span_writer,
+    az_span_writer span_writer,
     az_str_action const write_str);
 
 #include <_az_cfg_suffix.h>

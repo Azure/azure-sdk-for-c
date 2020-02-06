@@ -40,6 +40,15 @@ AZ_NODISCARD az_result az_client_secret_credential_init(
     az_span client_id,
     az_span client_secret);
 
+typedef AZ_NODISCARD az_result (*_az_credential_set_scopes_fn)(void * credential, az_span scopes);
+
+typedef struct {
+  _az_apply_credential apply_credential;
+  // NULL if this credential doesn't support scopes.
+  _az_credential_set_scopes
+      set_scopes;
+} _az_credential_vtbl;
+
 #include <_az_cfg_suffix.h>
 
 #endif

@@ -41,8 +41,8 @@ az_result write_str(az_span span, az_span s, az_span * out) {
 az_result read_write_token(
     az_span * output,
     int32_t * o,
-    az_json_parser * const state,
-    az_json_token const token) {
+    az_json_parser * state,
+    az_json_token token) {
   switch (token.kind) {
     case AZ_JSON_TOKEN_NULL:
       return az_span_append(*output, AZ_SPAN_FROM_STR("null"), output);
@@ -60,7 +60,7 @@ az_result read_write_token(
       bool need_comma = false;
       while (true) {
         az_json_token_member member;
-        az_result const result = az_json_parser_parse_token_member(state, &member);
+        az_result result = az_json_parser_parse_token_member(state, &member);
         if (result == AZ_ERROR_ITEM_NOT_FOUND) {
           break;
         }
@@ -81,7 +81,7 @@ az_result read_write_token(
       bool need_comma = false;
       while (true) {
         az_json_token element;
-        az_result const result = az_json_parser_parse_array_item(state, &element);
+        az_result result = az_json_parser_parse_array_item(state, &element);
         if (result == AZ_ERROR_ITEM_NOT_FOUND) {
           break;
         }
@@ -101,7 +101,7 @@ az_result read_write_token(
   return AZ_ERROR_JSON_INVALID_STATE;
 }
 
-az_result read_write(az_span const input, az_span * output, int32_t * const o) {
+az_result read_write(az_span const input, az_span * output, int32_t * o) {
   az_json_parser parser = { 0 };
   TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, input));
   az_json_token token;
@@ -382,7 +382,7 @@ int main() {
           // 56789 0123
           "[[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ "
           "[[[[[ [[[[");
-      az_result const result = read_write(json, &output, &o);
+      az_result result = read_write(json, &output, &o);
       TEST_ASSERT(result == AZ_ERROR_JSON_STACK_OVERFLOW);
     }
     {
@@ -392,7 +392,7 @@ int main() {
           // 56789 01234 56678 01234 56789 01234 56789 01234 56789 01234 56789 012
           "[[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ "
           "[[[[[ [[[");
-      az_result const result = read_write(json, &output, &o);
+      az_result result = read_write(json, &output, &o);
       TEST_ASSERT(result == AZ_ERROR_EOF);
     }
     {
@@ -406,7 +406,7 @@ int main() {
           "}]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] "
           "]]]]] ]]]");
       output._internal.length = 0;
-      az_result const result = read_write(json, &output, &o);
+      az_result result = read_write(json, &output, &o);
       TEST_ASSERT(result == AZ_OK);
 
       TEST_ASSERT(az_span_is_equal(
@@ -420,7 +420,7 @@ int main() {
     //
     {
       int32_t o = 0;
-      az_result const result = read_write(sample1, &output, &o);
+      az_result result = read_write(sample1, &output, &o);
       TEST_ASSERT(result == AZ_OK);
     }
     /*
@@ -443,9 +443,9 @@ int main() {
       char const phrase2[] = "make some zero-terminated strings";
       memcpy(actual.begin + 14, phrase2, sizeof(phrase2) - 1);
 
-      az_span const make_some = (az_span){ .begin = actual.begin + 14, .size = 9 };
-      az_span const zero_terminated = (az_span){ .begin = actual.begin + 24, .size = 15 };
-      az_span const strings = (az_span){ .begin = actual.begin + 40, .size = 7 };
+      az_span make_some = (az_span){ .begin = actual.begin + 14, .size = 9 };
+      az_span zero_terminated = (az_span){ .begin = actual.begin + 24, .size = 15 };
+      az_span strings = (az_span){ .begin = actual.begin + 40, .size = 7 };
 
       TEST_EXPECT_SUCCESS(
           az_span_to_str((az_span){ .begin = actual.begin + 48, .size = 10 }, make_some, &result));
@@ -461,7 +461,7 @@ int main() {
     }
     {
       uint8_t buf[68];
-      az_span const buffer = { .begin = buf, .size = sizeof(buf) };
+      az_span buffer = { .begin = buf, .size = sizeof(buf) };
       az_span result;
 
       az_span const * const decoded_input[] = {

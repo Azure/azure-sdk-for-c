@@ -15,8 +15,7 @@
 /**
  * https://tools.ietf.org/html/rfc3986#section-3.1
  */
-AZ_NODISCARD az_result
-az_span_reader_read_url_scheme(az_span_reader * const self, az_span * const out) {
+AZ_NODISCARD az_result az_span_reader_read_url_scheme(az_span_reader * const self, az_span * out) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
@@ -36,8 +35,7 @@ az_span_reader_read_url_scheme(az_span_reader * const self, az_span * const out)
 /**
  * https://tools.ietf.org/html/rfc3986#section-3.2.3
  */
-AZ_NODISCARD az_result
-az_span_reader_read_url_port(az_span_reader * const self, az_span * const port) {
+AZ_NODISCARD az_result az_span_reader_read_url_port(az_span_reader * self, az_span * port) {
   {
     az_result const c = az_span_reader_current(self);
     if (c != ':') {
@@ -67,7 +65,7 @@ az_span_reader_read_url_port(az_span_reader * const self, az_span * const port) 
  * authority   = [ userinfo "@" ] host [ ":" port ]
  */
 AZ_NODISCARD az_result
-az_span_reader_read_url_authority(az_span_reader * const self, az_url_authority * const out) {
+az_span_reader_read_url_authority(az_span_reader * self, az_url_authority * out) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
@@ -108,8 +106,7 @@ az_span_reader_read_url_authority(az_span_reader * const self, az_url_authority 
 /**
  * https://tools.ietf.org/html/rfc3986#section-3.3
  */
-AZ_NODISCARD az_result
-az_span_reader_read_url_path(az_span_reader * const self, az_span * const path) {
+AZ_NODISCARD az_result az_span_reader_read_url_path(az_span_reader * self, az_span * path) {
   size_t const begin = self->i;
   {
     az_result const c = az_span_reader_current(self);
@@ -140,8 +137,7 @@ az_span_reader_read_url_path(az_span_reader * const self, az_span * const path) 
 /**
  * https://tools.ietf.org/html/rfc3986#section-3.4
  */
-AZ_NODISCARD az_result
-az_span_reader_read_url_query(az_span_reader * const self, az_span * const query) {
+AZ_NODISCARD az_result az_span_reader_read_url_query(az_span_reader * self, az_span * query) {
   {
     az_result const c = az_span_reader_current(self);
     if (c != '?') {
@@ -171,8 +167,7 @@ az_span_reader_read_url_query(az_span_reader * const self, az_span * const query
 /**
  * https://tools.ietf.org/html/rfc3986#section-3.5
  */
-AZ_NODISCARD az_result
-az_span_reader_read_url_fragment(az_span_reader * const self, az_span * const fragment) {
+AZ_NODISCARD az_result az_span_reader_read_url_fragment(az_span_reader * self, az_span * fragment) {
   {
     az_result const c = az_span_reader_current(self);
     if (c != '#') {
@@ -193,7 +188,7 @@ az_span_reader_read_url_fragment(az_span_reader * const self, az_span * const fr
   }
 }
 
-AZ_NODISCARD az_result az_url_parse(az_span const url, az_url * const out) {
+AZ_NODISCARD az_result az_url_parse(az_span const url, az_url * out) {
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
   az_span_reader reader = az_span_reader_create(url);
@@ -215,7 +210,7 @@ AZ_NODISCARD az_result az_url_parse(az_span const url, az_url * const out) {
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_host_read_domain(az_span * const host, az_span * const domain) {
+AZ_NODISCARD az_result az_host_read_domain(az_span * host, az_span * domain) {
   AZ_CONTRACT_ARG_NOT_NULL(host);
   AZ_CONTRACT_ARG_NOT_NULL(domain);
 

@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include "az_json_string_private.h"
 #include <az_json.h>
 #include <az_span_reader.h>
-#include "az_json_string_private.h"
 
 #include <az_test.h>
 
@@ -42,7 +42,7 @@ void test_json_pointer() {
         buffer[i] = (uint8_t)code_point;
         ++i;
       }
-      az_span const b = az_span_init(buffer, i, i);
+      az_span b = az_span_init(buffer, i, i);
       TEST_ASSERT(az_span_is_equal(b, AZ_SPAN_FROM_STR("abc")));
     }
     TEST_ASSERT(az_span_reader_read_json_pointer_token(&parser, &p) == AZ_ERROR_ITEM_NOT_FOUND);
@@ -68,7 +68,7 @@ void test_json_pointer() {
         buffer[i] = (uint8_t)code_point;
         ++i;
       }
-      az_span const b = az_span_init(buffer, i, i);
+      az_span b = az_span_init(buffer, i, i);
       TEST_ASSERT(az_span_is_equal(b, AZ_SPAN_FROM_STR("abc")));
     }
     TEST_ASSERT(az_span_reader_read_json_pointer_token(&parser, &p) == AZ_OK);
@@ -98,7 +98,7 @@ void test_json_pointer() {
         buffer[i] = (uint8_t)code_point;
         ++i;
       }
-      az_span const b = az_span_init(buffer, i, i);
+      az_span b = az_span_init(buffer, i, i);
       TEST_ASSERT(az_span_is_equal(b, AZ_SPAN_FROM_STR("ab/c")));
     }
     TEST_ASSERT(az_span_reader_read_json_pointer_token(&parser, &p) == AZ_OK);
@@ -119,7 +119,7 @@ void test_json_pointer() {
         buffer[i] = (uint8_t)code_point;
         ++i;
       }
-      az_span const b = az_span_init(buffer, i, i);
+      az_span b = az_span_init(buffer, i, i);
       TEST_ASSERT(az_span_is_equal(b, AZ_SPAN_FROM_STR("dff~x")));
     }
     TEST_ASSERT(az_span_reader_read_json_pointer_token(&parser, &p) == AZ_ERROR_ITEM_NOT_FOUND);

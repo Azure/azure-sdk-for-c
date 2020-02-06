@@ -13,7 +13,7 @@
 
 #include <_az_cfg_prefix.h>
 
-AZ_NODISCARD AZ_INLINE bool az_span_is_valid(az_span const span) {
+AZ_NODISCARD AZ_INLINE bool az_span_is_valid(az_span span) {
   return az_span_length(span) == 0
       || (az_span_ptr(span) != NULL
           && az_span_ptr(span) <= az_span_ptr(span) + az_span_length(span) - 1);
@@ -21,7 +21,7 @@ AZ_NODISCARD AZ_INLINE bool az_span_is_valid(az_span const span) {
 
 #define AZ_CONTRACT_ARG_VALID_SPAN(span) AZ_CONTRACT(az_span_is_valid(span), AZ_ERROR_ARG)
 
-AZ_NODISCARD AZ_INLINE bool az_span_is_empty(az_span const span) {
+AZ_NODISCARD AZ_INLINE bool az_span_is_empty(az_span span) {
   return az_span_length(span) == 0;
 }
 

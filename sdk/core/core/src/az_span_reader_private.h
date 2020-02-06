@@ -12,8 +12,7 @@
 
 #include <_az_cfg_prefix.h>
 
-AZ_NODISCARD AZ_INLINE az_result_byte
-az_span_reader_current(az_span_reader const * const p_reader) {
+AZ_NODISCARD AZ_INLINE az_result_byte az_span_reader_current(az_span_reader const * p_reader) {
   return az_span_get(p_reader->span, p_reader->i);
 }
 

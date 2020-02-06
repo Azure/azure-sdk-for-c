@@ -48,7 +48,7 @@ int main() {
   uint8_t response_buffer[1024 * 4];
   az_span response_span = AZ_SPAN_FROM_BUFFER(response_buffer);
   az_http_response http_response = { 0 };
-  az_result const init_http_response_result = az_http_response_init(&http_response, response_span);
+  az_result init_http_response_result = az_http_response_init(&http_response, response_span);
 
   if (az_failed(init_http_response_result)) {
     printf("Failed to init http response");
@@ -103,7 +103,7 @@ int main() {
   // version is still at http_response. Let's copy it to a new buffer
   uint8_t version_buf[40];
   az_span version_builder = AZ_SPAN_FROM_BUFFER(version_buf);
-  az_result const ap_res = az_span_append(version_builder, version, &version_builder);
+  az_result ap_res = az_span_append(version_builder, version, &version_builder);
 
   if (az_failed(ap_res)) {
     printf("Failed to append key version");

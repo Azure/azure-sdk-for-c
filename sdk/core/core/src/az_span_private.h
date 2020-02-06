@@ -53,7 +53,7 @@ AZ_NODISCARD AZ_INLINE az_span az_span_drop(az_span span, int32_t n) {
  * Returns a byte in `index` position.
  * Returns `AZ_ERROR_EOF` if the `index` is out of the span range.
  */
-AZ_NODISCARD AZ_INLINE az_result_byte az_span_get(az_span const span, int32_t const index) {
+AZ_NODISCARD AZ_INLINE az_result_byte az_span_get(az_span span, int32_t index) {
   if (az_span_length(span) <= index) {
     return AZ_ERROR_EOF;
   }
@@ -61,11 +61,11 @@ AZ_NODISCARD AZ_INLINE az_result_byte az_span_get(az_span const span, int32_t co
 }
 
 // Parsing utilities
-AZ_NODISCARD AZ_INLINE az_result az_error_unexpected_char(az_result_byte const c) {
+AZ_NODISCARD AZ_INLINE az_result az_error_unexpected_char(az_result_byte c) {
   return az_failed(c) ? c : AZ_ERROR_PARSER_UNEXPECTED_CHAR;
 }
 
-AZ_NODISCARD AZ_INLINE bool az_span_is_overlap(az_span const a, az_span const b) {
+AZ_NODISCARD AZ_INLINE bool az_span_is_overlap(az_span a, az_span b) {
   uint8_t * a_ptr = az_span_ptr(a);
   uint8_t * b_ptr = az_span_ptr(b);
   int32_t a_length = az_span_length(a);
@@ -97,14 +97,13 @@ AZ_NODISCARD AZ_INLINE az_span az_span_from_single_item(uint8_t * ptr) {
  * @param a source/destination span
  * @param b destination/source span
  */
-void az_span_swap(az_span const a, az_span const b);
+void az_span_swap(az_span a, az_span b);
 
 /**
  * @brief Set one specific index of az_span from span content only
  *
  */
-AZ_NODISCARD AZ_INLINE az_result
-az_span_set(az_span const self, int32_t const i, uint8_t const value) {
+AZ_NODISCARD AZ_INLINE az_result az_span_set(az_span self, int32_t i, uint8_t value) {
   if (self._internal.length <= i) {
     return AZ_ERROR_BUFFER_OVERFLOW;
   }
@@ -120,7 +119,7 @@ az_span_set(az_span const self, int32_t const i, uint8_t const value) {
  * @param size number of zeros to be appended
  * @return AZ_NODISCARD az_span_append_zeros
  */
-AZ_NODISCARD az_result az_span_append_zeros(az_span * const self, int32_t const size);
+AZ_NODISCARD az_result az_span_append_zeros(az_span * self, int32_t size);
 
 /**
  * @brief Replace all contents from a starting position to an end position with the content of a
@@ -132,8 +131,7 @@ AZ_NODISCARD az_result az_span_append_zeros(az_span * const self, int32_t const 
  * @param span content to use for replacement
  * @return AZ_NODISCARD az_span_replace
  */
-AZ_NODISCARD az_result
-az_span_replace(az_span * const self, int32_t start, int32_t end, az_span const span);
+AZ_NODISCARD az_result az_span_replace(az_span * self, int32_t start, int32_t end, az_span span);
 
 typedef az_result (*_az_predicate)(az_span slice);
 

@@ -30,7 +30,7 @@ typedef struct az_http_policy az_http_policy;
 
 typedef AZ_NODISCARD az_result (*az_http_policy_process)(
     az_http_policy * policies,
-    void * const data,
+    void * data,
     az_http_request * hrb,
     az_http_response * const response);
 
@@ -46,61 +46,61 @@ typedef struct {
 // Start the pipeline
 AZ_NODISCARD az_result az_http_pipeline_process(
     az_http_pipeline * pipeline,
-    az_http_request * const hrb,
+    az_http_request * hrb,
     az_http_response * const response);
 
 AZ_NODISCARD az_result az_http_pipeline_policy_apiversion(
-    az_http_policy * const p_policies,
-    void * const data,
-    az_http_request * const hrb,
+    az_http_policy * p_policies,
+    void * data,
+    az_http_request * hrb,
     az_http_response * const response);
 
 AZ_NODISCARD az_result az_http_pipeline_policy_uniquerequestid(
-    az_http_policy * const policies,
-    void * const data,
-    az_http_request * const hrb,
+    az_http_policy * policies,
+    void * data,
+    az_http_request * hrb,
     az_http_response * const response);
 
 AZ_NODISCARD az_result az_http_pipeline_policy_retry(
-    az_http_policy * const policies,
-    void * const data,
-    az_http_request * const hrb,
+    az_http_policy * policies,
+    void * data,
+    az_http_request * hrb,
     az_http_response * const response);
 
-AZ_INLINE AZ_NODISCARD az_result _az_set_scopes(_az_credential_vtbl * credential, az_span scopes) {
+AZ_INLINE AZ_NODISCARD az_result _az_credential_set_scopes(_az_credential_vtbl * credential, az_span scopes) {
   return (credential->_internal.set_scopes == NULL)
       ? AZ_OK
       : (credential->_internal.set_scopes)(credential, scopes);
 }
 
 AZ_NODISCARD az_result az_http_pipeline_policy_credential(
-    az_http_policy * const policies,
-    void * const data,
-    az_http_request * const hrb,
+    az_http_policy * policies,
+    void * data,
+    az_http_request * hrb,
     az_http_response * const response);
 
 AZ_NODISCARD az_result az_http_pipeline_policy_logging(
-    az_http_policy * const policies,
-    void * const data,
-    az_http_request * const hrb,
+    az_http_policy * policies,
+    void * data,
+    az_http_request * hrb,
     az_http_response * const response);
 
 AZ_NODISCARD az_result az_http_pipeline_policy_bufferresponse(
-    az_http_policy * const policies,
-    void * const data,
-    az_http_request * const hrb,
+    az_http_policy * policies,
+    void * data,
+    az_http_request * hrb,
     az_http_response * const response);
 
 AZ_NODISCARD az_result az_http_pipeline_policy_distributedtracing(
-    az_http_policy * const policies,
-    void * const data,
-    az_http_request * const hrb,
+    az_http_policy * policies,
+    void * data,
+    az_http_request * hrb,
     az_http_response * const response);
 
 AZ_NODISCARD az_result az_http_pipeline_policy_transport(
-    az_http_policy * const policies,
-    void * const data,
-    az_http_request * const hrb,
+    az_http_policy * policies,
+    void * data,
+    az_http_request * hrb,
     az_http_response * const response);
 
 #include <_az_cfg_suffix.h>

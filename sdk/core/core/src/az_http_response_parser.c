@@ -68,7 +68,7 @@ AZ_NODISCARD az_result _az_get_digit(az_span * self, uint8_t * save_here) {
  * HTTP-version SP status-code SP reason-phrase CRLF
  */
 AZ_NODISCARD az_result
-_az_get_http_status_line(az_span * const self, az_http_response_status_line * const out) {
+_az_get_http_status_line(az_span * const self, az_http_response_status_line * out) {
 
   // HTTP-version = HTTP-name "/" DIGIT "." DIGIT
   // https://tools.ietf.org/html/rfc7230#section-2.6

@@ -6,13 +6,12 @@
 ###########
 
 # Catch all
-/sdk/ @joshfree @sergey-shandar @jeffreyrichter
+/sdk/ @joshfree @jeffreyrichter
 
 # Service teams
-/sdk/core/      @sergey-shandar @vhvb1989 @antkmsft @gilbertw
-/sdk/identity/  @antkmsft
-/sdk/keyvault/  @gilbertw
-/sdk/storage/   @sergey-shandar @gilbertw
+/sdk/core/      @vhvb1989 @antkmsft @gilbertw
+/sdk/keyvault/  @vhvb1989 @gilbertw
+/sdk/storage/   @gilbertw
 /sdk/tracing/   @antkmsft
 
 ###########

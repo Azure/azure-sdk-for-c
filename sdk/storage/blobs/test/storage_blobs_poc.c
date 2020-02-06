@@ -26,7 +26,7 @@ int exit_code = 0;
  */
 AZ_NODISCARD az_result az_storage_blobs_blob_download(
     az_storage_blobs_blob_client * client,
-    az_http_response * const response) {
+    az_http_response * response) {
 
   // Request buffer
   // create request buffer TODO: define size for a getKey Request
@@ -49,7 +49,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_download(
 
 AZ_NODISCARD az_result az_storage_blobs_blob_delete(
     az_storage_blobs_blob_client * client,
-    az_http_response * const response) {
+    az_http_response * response) {
   // Request buffer
   // create request buffer TODO: define size for blob delete
   uint8_t url_buffer[1024 * 4];
@@ -111,13 +111,13 @@ int main() {
     printf("Failed to create blob");
   }
 
-  az_result const get_result = az_storage_blobs_blob_download(&client, &http_response);
+  az_result get_result = az_storage_blobs_blob_download(&client, &http_response);
 
   if (az_failed(get_result)) {
     printf("Failed to get blob");
   }
 
-  az_result const delete_result = az_storage_blobs_blob_delete(&client, &http_response);
+  az_result delete_result = az_storage_blobs_blob_delete(&client, &http_response);
 
   if (az_failed(delete_result)) {
     printf("Failed to delete blob");

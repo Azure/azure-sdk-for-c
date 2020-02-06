@@ -78,7 +78,7 @@ static const char* const blob_type_enum_to_string(AZSTORAGE_BLOB_TYPE blob_type)
  *          @retval     AZSTORAGE_SERVICE_ERROR              If there is an error thrown by the server.
  */
 static AZSTORAGE_RESULT send_request(AZSTORAGE_BLOB_STORAGE_CLIENT* blob_storage_client,
-        HTTPAPI_REQUEST_TYPE request_type, const char* const blob_path, HTTP_HEADERS_HANDLE request_header,
+        HTTPAPI_REQUEST_TYPE request_type, const char* blob_path, HTTP_HEADERS_HANDLE request_header,
         const unsigned char* content, size_t content_length, HTTP_HEADERS_HANDLE response_headers,
         BUFFER_HANDLE response_content)
 {
@@ -200,7 +200,7 @@ void azstorage_blob_storage_client_destroy(AZSTORAGE_BLOB_HANDLE blob_storage_cl
 }
 
 AZSTORAGE_RESULT azstorage_blob_put(AZSTORAGE_BLOB_HANDLE blob_storage_client, AZSTORAGE_BLOB_TYPE blob_type,
-                                    const char* const blob_path, const unsigned char* buffer, size_t buffer_len)
+                                    const char* blob_path, const unsigned char* buffer, size_t buffer_len)
 {
     #ifdef AZSTORAGE_BLOB_VALIDATE_ARGUMENTS
     UCONTRACT
@@ -287,7 +287,7 @@ AZSTORAGE_RESULT azstorage_blob_put(AZSTORAGE_BLOB_HANDLE blob_storage_client, A
 }
 
 AZSTORAGE_RESULT azstorage_blob_append_block(AZSTORAGE_BLOB_HANDLE blob_storage_client,
-                                    const char* const blob_path, const unsigned char* buffer, size_t buffer_len)
+                                    const char* blob_path, const unsigned char* buffer, size_t buffer_len)
 {
     #ifdef AZSTORAGE_BLOB_VALIDATE_ARGUMENTS
     UCONTRACT
@@ -357,7 +357,7 @@ AZSTORAGE_RESULT azstorage_blob_append_block(AZSTORAGE_BLOB_HANDLE blob_storage_
 }
 
 AZSTORAGE_RESULT azstorage_blob_get_metadata(AZSTORAGE_BLOB_HANDLE blob_storage_client,
-                                    const char* const blob_path, HTTP_HEADERS_HANDLE response_headers)
+                                    const char* blob_path, HTTP_HEADERS_HANDLE response_headers)
 {
     #ifdef AZSTORAGE_BLOB_VALIDATE_ARGUMENTS
     UCONTRACT
@@ -406,7 +406,7 @@ AZSTORAGE_RESULT azstorage_blob_get_metadata(AZSTORAGE_BLOB_HANDLE blob_storage_
 }
 
 AZSTORAGE_RESULT azstorage_blob_get_bytes(AZSTORAGE_BLOB_HANDLE blob_storage_client,
-                                    const char* const blob_path, unsigned char* buffer, size_t buffer_len,
+                                    const char* blob_path, unsigned char* buffer, size_t buffer_len,
                                     offset_t start_offset)
 {
     #ifdef AZSTORAGE_BLOB_VALIDATE_ARGUMENTS
