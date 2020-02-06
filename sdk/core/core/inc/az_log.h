@@ -21,13 +21,13 @@ typedef enum {
   AZ_LOG_HTTP_RESPONSE = _az_LOG_MAKE_CLASSIFICATION(AZ_FACILITY_HTTP, 2),
 } az_log_classification;
 
-typedef void (*az_log)(az_log_classification const classification, az_span const message);
+typedef void (*az_log)(az_log_classification classification, az_span message);
 
 void az_log_set_classifications(
-    az_log_classification const * const classifications,
-    size_t const classifications_length);
+    az_log_classification const * classifications,
+    size_t classifications_length);
 
-void az_log_set_listener(az_log const listener);
+void az_log_set_listener(az_log listener);
 
 #include <_az_cfg_suffix.h>
 

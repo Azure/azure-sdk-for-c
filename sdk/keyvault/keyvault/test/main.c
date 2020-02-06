@@ -5,8 +5,6 @@
 #include <az_keyvault.h>
 #include <az_span.h>
 
-
-
 #include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>

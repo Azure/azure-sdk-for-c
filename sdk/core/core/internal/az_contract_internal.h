@@ -5,7 +5,6 @@
 #define _az_CONTRACT_INTERNAL_H
 
 #include <az_result.h>
-#include <az_span.h>
 
 #include <stddef.h>
 
@@ -19,18 +18,6 @@
   } while (0)
 
 #define AZ_CONTRACT_ARG_NOT_NULL(arg) AZ_CONTRACT((arg) != NULL, AZ_ERROR_ARG)
-
-AZ_NODISCARD AZ_INLINE bool az_span_is_valid(az_span const span) {
-  return az_span_length(span) == 0
-      || (az_span_ptr(span) != NULL
-          && az_span_ptr(span) <= az_span_ptr(span) + az_span_length(span) - 1);
-}
-
-#define AZ_CONTRACT_ARG_VALID_SPAN(span) AZ_CONTRACT(az_span_is_valid(span), AZ_ERROR_ARG)
-
-AZ_NODISCARD AZ_INLINE bool az_span_is_empty(az_span const span) {
-  return az_span_length(span) == 0;
-}
 
 #include <_az_cfg_suffix.h>
 

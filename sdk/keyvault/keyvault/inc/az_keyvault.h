@@ -65,19 +65,19 @@ AZ_NODISCARD az_result az_keyvault_keys_client_init(
     az_keyvault_keys_client_options * options);
 
 typedef az_span json_web_key_type;
-AZ_NODISCARD AZ_INLINE json_web_key_type az_keyvault_web_key_type_EC() {
+AZ_NODISCARD AZ_INLINE json_web_key_type az_keyvault_web_key_type_ec() {
   return AZ_SPAN_FROM_STR("EC");
 }
-AZ_NODISCARD AZ_INLINE json_web_key_type az_keyvault_web_key_type_EC_HSM() {
+AZ_NODISCARD AZ_INLINE json_web_key_type az_keyvault_web_key_type_ec_hsm() {
   return AZ_SPAN_FROM_STR("EC-HSM");
 }
-AZ_NODISCARD AZ_INLINE json_web_key_type az_keyvault_web_key_type_RSA() {
+AZ_NODISCARD AZ_INLINE json_web_key_type az_keyvault_web_key_type_rsa() {
   return AZ_SPAN_FROM_STR("RSA");
 }
-AZ_NODISCARD AZ_INLINE json_web_key_type az_keyvault_web_key_type_RSA_HSM() {
+AZ_NODISCARD AZ_INLINE json_web_key_type az_keyvault_web_key_type_rsa_hsm() {
   return AZ_SPAN_FROM_STR("RSA-HSM");
 }
-AZ_NODISCARD AZ_INLINE json_web_key_type az_keyvault_web_key_type_OCT() {
+AZ_NODISCARD AZ_INLINE json_web_key_type az_keyvault_web_key_type_oct() {
   return AZ_SPAN_FROM_STR("oct");
 }
 
@@ -91,13 +91,13 @@ AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_encry
 AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_sign() {
   return AZ_SPAN_FROM_STR("sign");
 }
-AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_unwrapKey() {
+AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_unwrap_key() {
   return AZ_SPAN_FROM_STR("unwrapKey");
 }
 AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_verify() {
   return AZ_SPAN_FROM_STR("verify");
 }
-AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_wrapKey() {
+AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_wrap_key() {
   return AZ_SPAN_FROM_STR("wrapKey");
 }
 AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_null() {

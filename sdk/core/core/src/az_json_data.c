@@ -8,11 +8,11 @@
 
 #include <_az_cfg.h>
 
-uint8_t * _az_align_floor(uint8_t * const p, size_t const align) {
+uint8_t * _az_align_floor(uint8_t * const p, size_t align) {
   return (uint8_t *)(((size_t)p) / align * align);
 }
 
-uint8_t * _az_align_ceil(uint8_t * const p, size_t const align) {
+uint8_t * _az_align_ceil(uint8_t * const p, size_t align) {
   return _az_align_floor(p + (align - 1), align);
 }
 
@@ -24,13 +24,24 @@ typedef struct {
   int32_t align;
 } _az_type;
 
+// MSVC
+#if defined(_MSC_VER)
+#define _az_ALIGNOF(T) __alignof(T)
+// GCC
+#elif defined(__GNUC__)
+#define _az_ALIGNOF(T) __alignof__(T)
+// unknown
+#else
+#define _az_ALIGNOF(T) _Alignof(T)
+#endif
+
 /**
  * Creates @_az_type from the given type/variable.
  */
-#define _AZ_TYPE(DATA_TYPE) \
+#define _az_TYPE(DATA_TYPE) \
   ((_az_type){ \
       .size = sizeof(DATA_TYPE), \
-      .align = AZ_ALIGNOF(DATA_TYPE), \
+      .align = _az_ALIGNOF(DATA_TYPE), \
   })
 
 /**
@@ -44,14 +55,14 @@ typedef struct {
 /**
  * Creates @_az_data from the given variable.
  */
-#define _AZ_DATA(DATA) ((_az_data){ .p = &DATA, .type = _AZ_TYPE(DATA) })
+#define _az_DATA(DATA) ((_az_data){ .p = &DATA, .type = _az_TYPE(DATA) })
 
 AZ_NODISCARD AZ_INLINE az_span _az_data_get_span(_az_data data) {
   return az_span_init(data.p, data.type.size, data.type.size);
 }
 
 AZ_NODISCARD az_result
-_az_span_aligned_append(az_span * const builder, _az_data const data, void const ** const out) {
+_az_span_aligned_append(az_span * builder, _az_data const data, void const ** out) {
   // alignment.
   {
     uint8_t * const p = az_span_ptr(*builder) + az_span_length(*builder);
@@ -61,7 +72,7 @@ _az_span_aligned_append(az_span * const builder, _az_data const data, void const
   return az_span_append(*builder, _az_data_get_span(data), builder);
 }
 
-AZ_NODISCARD az_result _az_span_top_aligned_append(az_span * const builder, _az_data const data) {
+AZ_NODISCARD az_result _az_span_top_aligned_append(az_span * const builder, _az_data data) {
   int32_t const size = az_span_capacity(*builder);
   if (size < data.type.size) {
     return AZ_ERROR_BUFFER_OVERFLOW;
@@ -83,11 +94,11 @@ AZ_NODISCARD az_result _az_span_top_aligned_append(az_span * const builder, _az_
 }
 
 AZ_NODISCARD az_result _az_span_top_array_revert(
-    az_span * const builder,
-    _az_type const item_type,
-    int32_t const new_size,
-    void const ** const out_array_begin,
-    int32_t * const out_array_size) {
+    az_span * builder,
+    _az_type item_type,
+    int32_t new_size,
+    void const ** out_array_begin,
+    int32_t * out_array_size) {
   AZ_CONTRACT_ARG_NOT_NULL(builder);
   AZ_CONTRACT_ARG_NOT_NULL(out_array_begin);
   AZ_CONTRACT_ARG_NOT_NULL(out_array_size);
@@ -121,20 +132,16 @@ AZ_NODISCARD az_result _az_span_top_array_revert(
   return AZ_OK;
 }
 
-AZ_INLINE AZ_NODISCARD az_result _az_span_append_json_data(
-    az_span * const builder,
-    az_json_data data,
-    az_json_data const ** const out) {
+AZ_INLINE AZ_NODISCARD az_result
+_az_span_append_json_data(az_span * builder, az_json_data data, az_json_data const ** out) {
   void const * p = { 0 };
-  AZ_RETURN_IF_FAILED(_az_span_aligned_append(builder, _AZ_DATA(data), &p));
+  AZ_RETURN_IF_FAILED(_az_span_aligned_append(builder, _az_DATA(data), &p));
   *out = (az_json_data const *)p;
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result _az_span_write_json_string(
-    az_span * const builder,
-    az_span const json_string,
-    az_span * const out) {
+AZ_NODISCARD az_result
+_az_span_write_json_string(az_span * builder, az_span json_string, az_span * out) {
   // TODO: escape symbols.
   int32_t const json_string_length = az_span_length(json_string);
   *out = az_span_init(
@@ -144,10 +151,10 @@ AZ_NODISCARD az_result _az_span_write_json_string(
 }
 
 AZ_NODISCARD az_result _az_span_write_json_value(
-    az_span * const builder,
-    az_json_parser * const parser,
-    az_json_token const token,
-    az_json_data * const out) {
+    az_span * builder,
+    az_json_parser * parser,
+    az_json_token token,
+    az_json_data * out) {
   AZ_CONTRACT_ARG_NOT_NULL(builder);
   AZ_CONTRACT_ARG_NOT_NULL(parser);
   AZ_CONTRACT_ARG_NOT_NULL(out);
@@ -185,12 +192,12 @@ AZ_NODISCARD az_result _az_span_write_json_value(
             _az_span_write_json_string(builder, token_member.name, &data_member.name));
         AZ_RETURN_IF_FAILED(
             _az_span_write_json_value(builder, parser, token_member.value, &data_member.value));
-        AZ_RETURN_IF_FAILED(_az_span_top_aligned_append(builder, _AZ_DATA(data_member)));
+        AZ_RETURN_IF_FAILED(_az_span_top_aligned_append(builder, _az_DATA(data_member)));
       }
       void const * p = { 0 };
       int32_t i = 0;
       AZ_RETURN_IF_FAILED(
-          _az_span_top_array_revert(builder, _AZ_TYPE(az_json_object_member), buffer_size, &p, &i));
+          _az_span_top_array_revert(builder, _az_TYPE(az_json_object_member), buffer_size, &p, &i));
       *out = az_json_data_object((az_json_object){ ._internal = { .begin = p, .size = i } });
       break;
     }
@@ -205,22 +212,23 @@ AZ_NODISCARD az_result _az_span_write_json_value(
         AZ_RETURN_IF_FAILED(result);
         az_json_data value = { 0 };
         AZ_RETURN_IF_FAILED(_az_span_write_json_value(builder, parser, item_token, &value));
-        AZ_RETURN_IF_FAILED(_az_span_top_aligned_append(builder, _AZ_DATA(value)));
+        AZ_RETURN_IF_FAILED(_az_span_top_aligned_append(builder, _az_DATA(value)));
       }
       void const * p = { 0 };
       int32_t i = 0;
       AZ_RETURN_IF_FAILED(
-          _az_span_top_array_revert(builder, _AZ_TYPE(az_json_data), buffer_size, &p, &i));
+          _az_span_top_array_revert(builder, _az_TYPE(az_json_data), buffer_size, &p, &i));
       *out = az_json_data_array((az_json_array){ ._internal = { .begin = p, .size = i } });
       break;
     }
-    default: { return AZ_ERROR_JSON_INVALID_STATE; }
+    default: {
+      return AZ_ERROR_JSON_INVALID_STATE;
+    }
   }
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result
-az_json_to_data(az_span json, az_span buffer, az_json_data const ** const out) {
+AZ_NODISCARD az_result az_json_to_data(az_span json, az_span buffer, az_json_data const ** out) {
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
   az_json_parser parser = az_json_parser_init(json);

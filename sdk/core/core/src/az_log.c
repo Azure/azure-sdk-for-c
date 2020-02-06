@@ -28,14 +28,14 @@ static size_t _az_log_classifications_length = 0;
 static az_log _az_log_listener = NULL;
 
 void az_log_set_classifications(
-    az_log_classification const * const classifications,
-    size_t const classifications_length) {
+    az_log_classification const * classifications,
+    size_t classifications_length) {
   // TODO: thread safety
   _az_log_classifications = classifications;
   _az_log_classifications_length = classifications_length;
 }
 
-void az_log_set_listener(az_log const listener) {
+void az_log_set_listener(az_log listener) {
   // TODO: thread safety
   _az_log_listener = listener;
 }

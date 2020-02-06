@@ -3,7 +3,6 @@
 
 #include "az_log_private.h"
 #include <az_clock_internal.h>
-#include <az_contract_internal.h>
 #include <az_http.h>
 #include <az_http_pipeline_internal.h>
 #include <az_log.h>
@@ -18,11 +17,6 @@ AZ_NODISCARD AZ_INLINE az_result az_http_pipeline_nextpolicy(
     az_http_policy * p_policies,
     az_http_request * p_request,
     az_http_response * p_response) {
-
-  AZ_CONTRACT_ARG_NOT_NULL(p_policies);
-  AZ_CONTRACT_ARG_NOT_NULL(p_request);
-  AZ_CONTRACT_ARG_NOT_NULL(p_response);
-
   // Transport Policy is the last policy in the pipeline
   //  it returns without calling nextpolicy
   if (p_policies[0].process == NULL) {
@@ -32,8 +26,8 @@ AZ_NODISCARD AZ_INLINE az_result az_http_pipeline_nextpolicy(
   return p_policies[0].process(&(p_policies[1]), p_policies[0].p_options, p_request, p_response);
 }
 
-static az_span AZ_MS_CLIENT_REQUESTID = AZ_SPAN_LITERAL_FROM_STR("x-ms-client-request-id");
-static az_span AZ_HTTP_HEADER_USER_AGENT = AZ_SPAN_LITERAL_FROM_STR("User-Agent");
+static const az_span AZ_MS_CLIENT_REQUESTID = AZ_SPAN_LITERAL_FROM_STR("x-ms-client-request-id");
+static const az_span AZ_HTTP_HEADER_USER_AGENT = AZ_SPAN_LITERAL_FROM_STR("User-Agent");
 
 AZ_NODISCARD az_result az_http_pipeline_policy_apiversion(
     az_http_policy * p_policies,
@@ -62,7 +56,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_uniquerequestid(
   (void)p_options;
 
   // TODO - add a UUID create implementation
-  az_span uniqueid = AZ_SPAN_LITERAL_FROM_STR("123e4567-e89b-12d3-a456-426655440000");
+  az_span const uniqueid = AZ_SPAN_LITERAL_FROM_STR("123e4567-e89b-12d3-a456-426655440000");
 
   // Append the Unique GUID into the headers
   //  x-ms-client-request-id
@@ -98,26 +92,18 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
   return az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
 }
 
-typedef AZ_NODISCARD az_result (
-    *_az_identity_auth_func)(void * p_options, az_http_request * p_request);
-
-typedef struct {
-  _az_identity_auth_func _func;
-} _az_identity_auth;
+AZ_INLINE AZ_NODISCARD az_result
+_az_apply_credential(_az_credential_vtbl * credential, az_http_request * ref_request) {
+  return (credential->_internal.apply_credential)(credential, ref_request);
+}
 
 AZ_NODISCARD az_result az_http_pipeline_policy_credential(
-    az_http_policy * p_policies,
-    void * p_options,
-    az_http_request * p_request,
-    az_http_response * p_response) {
-  AZ_CONTRACT_ARG_NOT_NULL(p_options);
-
-  _az_identity_auth * auth = (_az_identity_auth *)(p_options);
-  AZ_CONTRACT_ARG_NOT_NULL(auth->_func);
-
-  AZ_RETURN_IF_FAILED(auth->_func(p_options, p_request));
-
-  return az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
+    az_http_policy * policies,
+    void * options,
+    az_http_request * ref_request,
+    az_http_response * out_response) {
+  AZ_RETURN_IF_FAILED(_az_apply_credential((_az_credential_vtbl *)options, ref_request));
+  return az_http_pipeline_nextpolicy(policies, ref_request, out_response);
 }
 
 AZ_NODISCARD az_result az_http_pipeline_policy_logging(
