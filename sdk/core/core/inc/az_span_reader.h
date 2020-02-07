@@ -40,13 +40,11 @@ AZ_NODISCARD az_result az_span_reader_set_pos(az_span_reader * p_reader, int32_t
  *
  * If it doesn't match the given @var span, the function returns AZ_ERROR_UNEXPECTED_CHAR.
  */
-AZ_NODISCARD az_result az_span_reader_expect_span(az_span_reader * const self, az_span const span);
+AZ_NODISCARD az_result az_span_reader_expect_span(az_span_reader * self, az_span span);
 
-AZ_NODISCARD az_result
-az_span_reader_expect_digit(az_span_reader * const self, uint8_t * const digit);
+AZ_NODISCARD az_result az_span_reader_expect_digit(az_span_reader * self, uint8_t * digit);
 
-AZ_NODISCARD az_result
-az_span_reader_expect_char(az_span_reader * const p_reader, uint8_t const expected);
+AZ_NODISCARD az_result az_span_reader_expect_char(az_span_reader * p_reader, uint8_t expected);
 
 #include <_az_cfg_suffix.h>
 

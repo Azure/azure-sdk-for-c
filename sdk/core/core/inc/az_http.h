@@ -12,7 +12,7 @@
 #include <_az_cfg_prefix.h>
 
 enum {
-  AZ_HTTP_URL_MAX_SIZE = 1024,
+  AZ_HTTP_URL_MAX_SIZE = 1024 * 2,
 };
 
 typedef struct {
@@ -329,7 +329,7 @@ AZ_NODISCARD az_result az_http_response_get_next_header(az_http_response * self,
  */
 AZ_NODISCARD az_result az_http_response_get_body(az_http_response * self, az_span * out_body);
 
-AZ_NODISCARD AZ_INLINE az_result az_http_response_reset(az_http_response * const self) {
+AZ_NODISCARD AZ_INLINE az_result az_http_response_reset(az_http_response * self) {
   self->_internal.http_response = az_span_init(
       az_span_ptr(self->_internal.http_response),
       0,
@@ -338,7 +338,7 @@ AZ_NODISCARD AZ_INLINE az_result az_http_response_reset(az_http_response * const
 }
 
 typedef AZ_NODISCARD az_result (
-    *az_http_client)(az_http_request * p_request, az_http_response * p_response);
+    *az_http_client_fn)(az_http_request * p_request, az_http_response * p_response);
 
 #include <_az_cfg_suffix.h>
 

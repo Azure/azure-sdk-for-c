@@ -11,7 +11,7 @@
 
 #include <_az_cfg.h>
 
-AZ_NODISCARD AZ_INLINE az_result_byte az_hex_to_digit(az_result_byte const c) {
+AZ_NODISCARD AZ_INLINE az_result_byte az_hex_to_digit(az_result_byte c) {
   if (isdigit(c)) {
     return c - '0';
   }
@@ -24,7 +24,7 @@ AZ_NODISCARD AZ_INLINE az_result_byte az_hex_to_digit(az_result_byte const c) {
   return az_error_unexpected_char(c);
 }
 
-AZ_NODISCARD AZ_INLINE az_result_byte az_json_esc_decode(az_result_byte const c) {
+AZ_NODISCARD AZ_INLINE az_result_byte az_json_esc_decode(az_result_byte c) {
   switch (c) {
     case '\\':
     case '"':
@@ -74,7 +74,9 @@ AZ_NODISCARD az_span az_json_esc_encode(az_result_byte c) {
     case '\t': {
       return AZ_SPAN_FROM_STR("\\t");
     }
-    default: { return az_span_null(); }
+    default: {
+      return az_span_null();
+    }
   }
 }
 

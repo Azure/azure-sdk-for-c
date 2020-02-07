@@ -89,7 +89,9 @@ AZ_NODISCARD az_result az_json_builder_append_token(az_json_builder * self, az_j
       self->_internal.need_comma = true;
       return az_json_builder_write_span(self, token.value.span);
     }
-    default: { return AZ_ERROR_ARG; }
+    default: {
+      return AZ_ERROR_ARG;
+    }
   }
 }
 

@@ -7,8 +7,8 @@
 #include <_az_cfg.h>
 
 AZ_NODISCARD static az_result az_span_reader_read_json_pointer_char(
-    az_span_reader * const self,
-    uint32_t * const out) {
+    az_span_reader * self,
+    uint32_t * out) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
   az_result_byte const result = az_span_reader_current(self);
@@ -32,7 +32,9 @@ AZ_NODISCARD static az_result az_span_reader_read_json_pointer_char(
           *out = '/';
           return AZ_OK;
         }
-        default: { return az_error_unexpected_char(e); }
+        default: {
+          return az_error_unexpected_char(e);
+        }
       }
     }
     default: {
@@ -67,7 +69,9 @@ az_span_reader_read_json_pointer_token(az_span_reader * self, az_span * out) {
         AZ_RETURN_IF_FAILED(az_span_slice(self->span, begin, self->i, out));
         return AZ_OK;
       }
-      default: { AZ_RETURN_IF_FAILED(result); }
+      default: {
+        AZ_RETURN_IF_FAILED(result);
+      }
     }
   }
 }
