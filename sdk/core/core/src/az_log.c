@@ -25,7 +25,7 @@ enum {
 
 static az_log_classification const * _az_log_classifications = NULL;
 static size_t _az_log_classifications_length = 0;
-static az_log _az_log_listener = NULL;
+static az_log_fn _az_log_listener = NULL;
 
 void az_log_set_classifications(
     az_log_classification const * classifications,
@@ -35,7 +35,7 @@ void az_log_set_classifications(
   _az_log_classifications_length = classifications_length;
 }
 
-void az_log_set_listener(az_log listener) {
+void az_log_set_listener(az_log_fn listener) {
   // TODO: thread safety
   _az_log_listener = listener;
 }
@@ -134,11 +134,11 @@ static az_result _az_log_http_request_msg(
 static az_result _az_log_http_response_msg(
     az_span * log_msg_bldr,
     az_http_response * response,
-    uint64_t duration_msec,
+    int64_t duration_msec,
     az_http_request * hrb) {
   AZ_RETURN_IF_FAILED(
       az_span_append(*log_msg_bldr, AZ_SPAN_FROM_STR("HTTP Response ("), log_msg_bldr));
-  AZ_RETURN_IF_FAILED(az_span_append_uint64(log_msg_bldr, duration_msec));
+  AZ_RETURN_IF_FAILED(az_span_append_int64(log_msg_bldr, duration_msec));
   AZ_RETURN_IF_FAILED(az_span_append(*log_msg_bldr, AZ_SPAN_FROM_STR("ms) "), log_msg_bldr));
 
   if (response == NULL || az_span_length(response->_internal.http_response) == 0) {
@@ -182,7 +182,7 @@ void _az_log_http_request(az_http_request * hrb) {
 
 void _az_log_http_response(
     az_http_response * response,
-    uint64_t duration_msec,
+    int64_t duration_msec,
     az_http_request * hrb) {
   uint8_t log_msg_buf[_az_LOG_MSG_BUF_SIZE] = { 0 };
 

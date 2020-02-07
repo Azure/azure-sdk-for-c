@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include <az_credentials.h>
 #include <az_curl.h>
 #include <az_http.h>
-#include <az_identity_client_secret_credential.h>
 #include <az_json.h>
 #include <az_keyvault.h>
 
@@ -26,9 +26,9 @@ int main() {
   az_keyvault_keys_client client;
 
   /************* create credentials as client_id type   ***********/
-  az_identity_client_secret_credential credential = { 0 };
+  az_client_secret_credential credential = { 0 };
   // init credential_credentials struc
-  az_result const creds_retcode = az_identity_client_secret_credential_init(
+  az_result const creds_retcode = az_client_secret_credential_init(
       &credential,
       az_span_from_str(getenv(TENANT_ID_ENV)),
       az_span_from_str(getenv(CLIENT_ID_ENV)),
@@ -77,7 +77,7 @@ int main() {
   az_result const create_result = az_keyvault_keys_key_create(
       &client,
       AZ_SPAN_FROM_STR("test-new-key"),
-      az_keyvault_web_key_type_RSA(),
+      az_keyvault_web_key_type_rsa(),
       &key_options,
       &http_response);
 
@@ -130,7 +130,7 @@ int main() {
   az_result const create_version_result = az_keyvault_keys_key_create(
       &client,
       AZ_SPAN_FROM_STR("test-new-key"),
-      az_keyvault_web_key_type_RSA(),
+      az_keyvault_web_key_type_rsa(),
       NULL,
       &http_response);
 

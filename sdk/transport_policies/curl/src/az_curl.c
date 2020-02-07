@@ -121,8 +121,9 @@ AZ_NODISCARD az_result az_add_header_to_curl_list(
   // allocate a buffer for header
   az_span writable_buffer;
   {
-    size_t const buffer_size
-        = az_span_length(header.key) + az_span_length(separator) + az_span_length(header.value) + 1;
+    size_t const buffer_size = (size_t)az_span_length(header.key)
+        + (size_t)az_span_length(separator) + (size_t)az_span_length(header.value) + 1;
+
     AZ_RETURN_IF_FAILED(az_span_malloc(buffer_size, &writable_buffer));
   }
 

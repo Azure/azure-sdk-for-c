@@ -33,7 +33,7 @@ int main() {
 
       TEST_ASSERT(
           _az_keyvault_keys_key_create_build_json_body(
-              az_keyvault_web_key_type_RSA(), &options, &http_body)
+              az_keyvault_web_key_type_rsa(), &options, &http_body)
           == AZ_OK);
 
       TEST_ASSERT(az_span_is_equal(http_body, expected));
@@ -51,7 +51,7 @@ int main() {
 
       TEST_ASSERT(
           _az_keyvault_keys_key_create_build_json_body(
-              az_keyvault_web_key_type_RSA(), &options, &http_body)
+              az_keyvault_web_key_type_rsa(), &options, &http_body)
           == AZ_OK);
 
       TEST_ASSERT(az_span_is_equal(http_body, expected));
@@ -69,7 +69,7 @@ int main() {
 
       TEST_ASSERT(
           _az_keyvault_keys_key_create_build_json_body(
-              az_keyvault_web_key_type_RSA(), &options, &http_body)
+              az_keyvault_web_key_type_rsa(), &options, &http_body)
           == AZ_OK);
 
       TEST_ASSERT(az_span_is_equal(http_body, expected));

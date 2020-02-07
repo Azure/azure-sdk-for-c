@@ -4,6 +4,7 @@
 #ifndef _az_CREDENTIALS_H
 #define _az_CREDENTIALS_H
 
+#include <az_http.h>
 #include <az_result.h>
 #include <az_span.h>
 
@@ -23,6 +24,18 @@ typedef struct {
   } _internal;
 } _az_token;
 
+typedef AZ_NODISCARD az_result (
+    *_az_apply_credential_fn)(void * credential_options, az_http_request * ref_request);
+
+typedef AZ_NODISCARD az_result (*_az_set_scopes_fn)(void * credential, az_span scopes);
+
+typedef struct {
+  struct {
+    _az_apply_credential_fn apply_credential;
+    _az_set_scopes_fn set_scopes; // NULL if this credential doesn't support scopes.
+  } _internal;
+} _az_credential_vtbl;
+
 typedef struct {
   struct {
     _az_credential_vtbl vtbl; // must be the first field in every credential structure
@@ -39,14 +52,6 @@ AZ_NODISCARD az_result az_client_secret_credential_init(
     az_span tenant_id,
     az_span client_id,
     az_span client_secret);
-
-typedef AZ_NODISCARD az_result (*_az_credential_set_scopes_fn)(void * credential, az_span scopes);
-
-typedef struct {
-  _az_apply_credential apply_credential;
-  // NULL if this credential doesn't support scopes.
-  _az_credential_set_scopes set_scopes;
-} _az_credential_vtbl;
 
 #include <_az_cfg_suffix.h>
 

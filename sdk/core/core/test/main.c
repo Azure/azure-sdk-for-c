@@ -359,7 +359,7 @@ int main() {
           "[[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ "
           "[[[[[ [[[[");
       az_result const result = read_write(json, &output, &o);
-      TEST_ASSERT(result == AZ_ERROR_JSON_STACK_OVERFLOW);
+      TEST_ASSERT(result == AZ_ERROR_JSON_NESTING_OVERFLOW);
     }
     {
       int32_t o = 0;

@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include <az_credentials_internal.h>
 #include <az_http_pipeline_internal.h>
 #include <az_json.h>
 #include <az_keyvault.h>
@@ -37,7 +38,7 @@ AZ_NODISCARD AZ_INLINE az_span az_keyvault_client_constant_for_application_json(
 }
 
 AZ_NODISCARD az_keyvault_keys_client_options
-az_keyvault_keys_client_options_default(az_http_client http_client) {
+az_keyvault_keys_client_options_default(az_http_client_fn http_client) {
 
   az_keyvault_keys_client_options options = (az_keyvault_keys_client_options){
     ._internal
@@ -60,12 +61,13 @@ AZ_NODISCARD az_result az_keyvault_keys_client_init(
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(options);
 
+  _az_credential_vtbl * const cred = (_az_credential_vtbl *)credential;
+
   *self
       = (az_keyvault_keys_client){ ._internal
                                    = { .uri = AZ_SPAN_FROM_BUFFER(self->_internal.url_buffer),
                                        .options = *options,
-                                       ._token = { 0 },
-                                       ._token_context = { 0 },
+                                       .credential = cred,
                                        .pipeline = (az_http_pipeline){
                                            .p_policies = {
                                                { .process = az_http_pipeline_policy_apiversion,
@@ -79,7 +81,7 @@ AZ_NODISCARD az_result az_keyvault_keys_client_init(
                                                { .process = az_http_pipeline_policy_retry,
                                                  .p_options = &(self->_internal.options.retry) },
                                                { .process = az_http_pipeline_policy_credential,
-                                                 .p_options = &(self->_internal._token_context) },
+                                                 .p_options = cred },
                                                { .process = az_http_pipeline_policy_logging,
                                                  .p_options = NULL },
                                                { .process = az_http_pipeline_policy_bufferresponse,
@@ -95,12 +97,8 @@ AZ_NODISCARD az_result az_keyvault_keys_client_init(
   // Copy url to client buffer so customer can re-use buffer on his/her side
   AZ_RETURN_IF_FAILED(az_span_copy(self->_internal.uri, uri, &self->_internal.uri));
 
-  AZ_RETURN_IF_FAILED(az_identity_access_token_init(&(self->_internal._token)));
-  AZ_RETURN_IF_FAILED(az_identity_access_token_context_init(
-      &(self->_internal._token_context),
-      credential,
-      &(self->_internal._token),
-      AZ_SPAN_FROM_STR("https://vault.azure.net/.default")));
+  AZ_RETURN_IF_FAILED(
+      _az_credential_set_scopes(cred, AZ_SPAN_FROM_STR("https://vault.azure.net/.default")));
 
   return AZ_OK;
 }

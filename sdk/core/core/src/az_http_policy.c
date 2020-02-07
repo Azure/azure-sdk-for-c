@@ -2,11 +2,12 @@
 // SPDX-License-Identifier: MIT
 
 #include "az_log_private.h"
-#include <az_clock_internal.h>
+#include <az_credentials.h>
 #include <az_http.h>
 #include <az_http_pipeline_internal.h>
 #include <az_log.h>
 #include <az_log_internal.h>
+#include <az_pal_clock_internal.h>
 #include <az_span.h>
 
 #include <stddef.h>
@@ -121,9 +122,9 @@ AZ_NODISCARD az_result az_http_pipeline_policy_logging(
     return az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
   }
 
-  uint64_t const start = _az_clock_msec();
+  int64_t const start = _az_pal_clock_msec();
   az_result const result = az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
-  uint64_t const end = _az_clock_msec();
+  int64_t const end = _az_pal_clock_msec();
 
   _az_log_http_response(p_response, end - start, p_request);
 
@@ -160,6 +161,6 @@ AZ_NODISCARD az_result az_http_pipeline_policy_transport(
     az_http_response * p_response) {
   (void)p_policies; // this is the last policy in the pipeline, we just void it
 
-  az_http_client client = *(az_http_client *)p_options;
+  az_http_client_fn client = *(az_http_client_fn *)p_options;
   return client(p_request, p_response);
 }
