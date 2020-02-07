@@ -99,7 +99,7 @@ az_result read_write_token(
   return AZ_ERROR_JSON_INVALID_STATE;
 }
 
-az_result read_write(az_span const input, az_span * output, int32_t * o) {
+az_result read_write(az_span input, az_span * output, int32_t * o) {
   az_json_parser parser = { 0 };
   TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, input));
   az_json_token token;

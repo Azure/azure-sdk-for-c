@@ -62,7 +62,7 @@ AZ_NODISCARD AZ_INLINE az_span _az_data_get_span(_az_data data) {
 }
 
 AZ_NODISCARD az_result
-_az_span_aligned_append(az_span * builder, _az_data const data, void const ** out) {
+_az_span_aligned_append(az_span * builder, _az_data data, void const ** out) {
   // alignment.
   {
     uint8_t * const p = az_span_ptr(*builder) + az_span_length(*builder);
@@ -72,7 +72,7 @@ _az_span_aligned_append(az_span * builder, _az_data const data, void const ** ou
   return az_span_append(*builder, _az_data_get_span(data), builder);
 }
 
-AZ_NODISCARD az_result _az_span_top_aligned_append(az_span * const builder, _az_data data) {
+AZ_NODISCARD az_result _az_span_top_aligned_append(az_span * builder, _az_data data) {
   int32_t const size = az_span_capacity(*builder);
   if (size < data.type.size) {
     return AZ_ERROR_BUFFER_OVERFLOW;

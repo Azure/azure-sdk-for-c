@@ -19,7 +19,7 @@ static inline void _reset_log_invocation_status() {
   _log_invoked_for_http_response = false;
 }
 
-static void _log_listener(az_log_classification const classification, az_span message) {
+static void _log_listener(az_log_classification classification, az_span message) {
   // fprintf(stderr, "%.*s\n", (unsigned int)message.size, message.begin);
   switch (classification) {
     case AZ_LOG_HTTP_REQUEST:

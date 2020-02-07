@@ -44,8 +44,7 @@ AZ_NODISCARD az_result az_span_reader_expect_span(az_span_reader * self, az_span
 
 AZ_NODISCARD az_result az_span_reader_expect_digit(az_span_reader * self, uint8_t * digit);
 
-AZ_NODISCARD az_result
-az_span_reader_expect_char(az_span_reader * p_reader, uint8_t const expected);
+AZ_NODISCARD az_result az_span_reader_expect_char(az_span_reader * p_reader, uint8_t expected);
 
 #include <_az_cfg_suffix.h>
 

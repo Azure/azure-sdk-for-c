@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_http.h>
 #include <az_credentials.h>
+#include <az_http.h>
 #include <az_json.h>
 #include <az_storage_blobs.h>
 
@@ -24,9 +24,8 @@ int exit_code = 0;
  * @param response Response
  * @return AZ_NODISCARD az_storage_blobs_blob_download
  */
-AZ_NODISCARD az_result az_storage_blobs_blob_download(
-    az_storage_blobs_blob_client * client,
-    az_http_response * const response) {
+AZ_NODISCARD az_result
+az_storage_blobs_blob_download(az_storage_blobs_blob_client * client, az_http_response * response) {
 
   // Request buffer
   // create request buffer TODO: define size for a getKey Request
@@ -47,9 +46,8 @@ AZ_NODISCARD az_result az_storage_blobs_blob_download(
   return az_http_pipeline_process(&client->_internal.pipeline, &hrb, response);
 }
 
-AZ_NODISCARD az_result az_storage_blobs_blob_delete(
-    az_storage_blobs_blob_client * client,
-    az_http_response * const response) {
+AZ_NODISCARD az_result
+az_storage_blobs_blob_delete(az_storage_blobs_blob_client * client, az_http_response * response) {
 
   // Request buffer
   // create request buffer TODO: define size for blob delete
