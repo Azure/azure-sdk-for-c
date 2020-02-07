@@ -51,7 +51,7 @@ typedef struct {
     az_span uri;
     az_http_pipeline pipeline;
     az_keyvault_keys_client_options options;
-    _az_credential_vtbl * credential;
+    _az_credential * credential;
   } _internal;
 } az_keyvault_keys_client;
 

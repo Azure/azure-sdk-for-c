@@ -41,7 +41,8 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
   AZ_CONTRACT_ARG_NOT_NULL(client);
   AZ_CONTRACT_ARG_NOT_NULL(options);
 
-  _az_credential_vtbl * const cred = (_az_credential_vtbl *)credential;
+  _az_credential * const cred = (_az_credential *)credential;
+  cred->_internal.http_client = &client->_internal.options._internal.http_client;
 
   *client = (az_storage_blobs_blob_client){ ._internal = {
     .uri = AZ_SPAN_FROM_BUFFER(client->_internal.url_buffer),

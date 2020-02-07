@@ -94,7 +94,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
 }
 
 AZ_INLINE AZ_NODISCARD az_result
-_az_apply_credential(_az_credential_vtbl * credential, az_http_request * ref_request) {
+_az_apply_credential(_az_credential * credential, az_http_request * ref_request) {
   return (credential->_internal.apply_credential)(credential, ref_request);
 }
 
@@ -103,7 +103,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_credential(
     void * options,
     az_http_request * ref_request,
     az_http_response * out_response) {
-  AZ_RETURN_IF_FAILED(_az_apply_credential((_az_credential_vtbl *)options, ref_request));
+  AZ_RETURN_IF_FAILED(_az_apply_credential((_az_credential *)options, ref_request));
   return az_http_pipeline_nextpolicy(policies, ref_request, out_response);
 }
 
