@@ -51,7 +51,7 @@ AZ_NODISCARD AZ_INLINE az_json_stack_item az_json_parser_stack_last(az_json_pars
 AZ_NODISCARD AZ_INLINE az_result
 az_json_parser_push_stack(az_json_parser * const self, az_json_stack stack) {
   if (self->_internal.stack >> AZ_JSON_STACK_SIZE != 0) {
-    return AZ_ERROR_JSON_STACK_OVERFLOW;
+    return AZ_ERROR_JSON_NESTING_OVERFLOW;
   }
   self->_internal.stack = (self->_internal.stack << 1) | stack;
   return AZ_OK;

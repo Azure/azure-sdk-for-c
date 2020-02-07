@@ -4,7 +4,6 @@
 #include "az_json_string_private.h"
 #include <az_json.h>
 
-
 #include <_az_cfg.h>
 
 AZ_NODISCARD bool az_json_pointer_token_eq_json_string(az_span pointer_token, az_span json_string) {

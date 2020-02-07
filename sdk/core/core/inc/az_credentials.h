@@ -45,8 +45,7 @@ typedef AZ_NODISCARD az_result (*_az_credential_set_scopes_fn)(void * credential
 typedef struct {
   _az_apply_credential apply_credential;
   // NULL if this credential doesn't support scopes.
-  _az_credential_set_scopes
-      set_scopes;
+  _az_credential_set_scopes set_scopes;
 } _az_credential_vtbl;
 
 #include <_az_cfg_suffix.h>

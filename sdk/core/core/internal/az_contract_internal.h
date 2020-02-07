@@ -28,9 +28,7 @@ AZ_NODISCARD AZ_INLINE bool az_span_is_valid(az_span span) {
 
 #define AZ_CONTRACT_ARG_VALID_SPAN(span) AZ_CONTRACT(az_span_is_valid(span), AZ_ERROR_ARG)
 
-AZ_NODISCARD AZ_INLINE bool az_span_is_empty(az_span span) {
-  return az_span_length(span) == 0;
-}
+AZ_NODISCARD AZ_INLINE bool az_span_is_empty(az_span span) { return az_span_length(span) == 0; }
 
 #include <_az_cfg_suffix.h>
 
