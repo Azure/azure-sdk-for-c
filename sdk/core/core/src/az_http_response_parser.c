@@ -33,21 +33,6 @@ AZ_NODISCARD az_result _az_slice_is_not_http_whitespace(az_span slice) {
   return _az_is_http_whitespace(az_span_ptr(slice)[0]) == true ? AZ_CONTINUE : AZ_OK;
 }
 
-AZ_NODISCARD az_result _az_is_expected_span(az_span * self, az_span expected) {
-  az_span actual_span = { 0 };
-
-  int32_t expected_length = az_span_length(expected);
-  AZ_RETURN_IF_FAILED(az_span_slice(*self, 0, expected_length, &actual_span));
-
-  if (!az_span_is_equal(actual_span, expected)) {
-    return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
-  }
-  // move reader after the expected span (means it was parsed as expected)
-  AZ_RETURN_IF_FAILED(az_span_slice(*self, expected_length, -1, self));
-
-  return AZ_OK;
-}
-
 /* PRIVATE Function. parse next  */
 AZ_NODISCARD az_result _az_get_digit(az_span * self, uint8_t * save_here) {
 

@@ -12,8 +12,6 @@
 
 #include <_az_cfg_prefix.h>
 
-typedef int32_t az_result_byte;
-
 /**
  * @brief returns a span with the left @var n bytes of the given @var span.
  *
@@ -47,22 +45,6 @@ AZ_NODISCARD AZ_INLINE az_span az_span_drop(az_span span, int32_t n) {
   int32_t new_length = current_length < n ? 0 : current_length - n;
 
   return az_span_init(az_span_ptr(span) + n, new_length, current_capacity - n);
-}
-
-/**
- * Returns a byte in `index` position.
- * Returns `AZ_ERROR_EOF` if the `index` is out of the span range.
- */
-AZ_NODISCARD AZ_INLINE az_result_byte az_span_get(az_span const span, int32_t const index) {
-  if (az_span_length(span) <= index) {
-    return AZ_ERROR_EOF;
-  }
-  return az_span_ptr(span)[index];
-}
-
-// Parsing utilities
-AZ_NODISCARD AZ_INLINE az_result az_error_unexpected_char(az_result_byte const c) {
-  return az_failed(c) ? c : AZ_ERROR_PARSER_UNEXPECTED_CHAR;
 }
 
 AZ_NODISCARD AZ_INLINE bool az_span_is_overlap(az_span const a, az_span const b) {
@@ -126,6 +108,8 @@ typedef az_result (*_az_predicate)(az_span slice);
 // PRIVATE. read until condition is true on character.
 // Then return number of positions read with output parameter
 AZ_NODISCARD az_result _az_scan_until(az_span self, _az_predicate predicate, int32_t * out_index);
+
+AZ_NODISCARD az_result _az_is_expected_span(az_span * self, az_span expected);
 
 #include <_az_cfg_suffix.h>
 

@@ -6,7 +6,6 @@
 
 #include <az_http_private.h>
 #include <az_span.h>
-#include <az_span_reader.h>
 
 #include <assert.h>
 #include <stdbool.h>

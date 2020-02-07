@@ -1,28 +1,36 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "az_span_reader_private.h"
+#include <az_contract_internal.h>
 #include <az_json.h>
 
 #include <_az_cfg.h>
 
 AZ_NODISCARD static az_result az_span_reader_read_json_pointer_char(
-    az_span_reader * const self,
+    az_span * const self,
     uint32_t * const out) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
+  int32_t reader_current_length = az_span_length(*self);
 
-  az_result_byte const result = az_span_reader_current(self);
+  // check for EOF (all span was read so length is same as capacity)
+  if (reader_current_length == az_span_capacity(*self)) {
+    return AZ_ERROR_ITEM_NOT_FOUND;
+  }
+
+  uint8_t const result = az_span_ptr(*self)[0];
   switch (result) {
-    case AZ_ERROR_EOF: {
-      return AZ_ERROR_ITEM_NOT_FOUND;
-    }
     case '/': {
       return AZ_ERROR_JSON_POINTER_TOKEN_END;
     }
     case '~': {
-      az_span_reader_next(self);
-      az_result_byte const e = az_span_reader_current(self);
-      az_span_reader_next(self);
+      // move reader to next position
+      reader_current_length += 1;
+      AZ_RETURN_IF_FAILED(az_span_slice(*self, reader_current_length, -1, self));
+      // get char
+      uint8_t const e = self->_internal.ptr[0];
+      // move to next position again
+      reader_current_length += 1;
+      AZ_RETURN_IF_FAILED(az_span_slice(*self, reader_current_length, -1, self));
       switch (e) {
         case '0': {
           *out = '~';
@@ -32,48 +40,60 @@ AZ_NODISCARD static az_result az_span_reader_read_json_pointer_char(
           *out = '/';
           return AZ_OK;
         }
-        default: { return az_error_unexpected_char(e); }
+        default: { return AZ_ERROR_PARSER_UNEXPECTED_CHAR; }
       }
     }
     default: {
-      az_span_reader_next(self);
+      // move reader to next position
+      reader_current_length += 1;
+      AZ_RETURN_IF_FAILED(az_span_slice(*self, reader_current_length, -1, self));
+
       *out = (uint8_t)result;
       return AZ_OK;
     }
   }
 }
 
-AZ_NODISCARD az_result
-az_span_reader_read_json_pointer_token(az_span_reader * self, az_span * out) {
+AZ_NODISCARD az_result az_span_reader_read_json_pointer_token(az_span * self, az_span * out) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
   // read `/` if any.
   {
-    az_result const result = az_span_reader_expect_char(self, '/');
-    if (result == AZ_ERROR_EOF) {
+    // check there is something still to read
+    if (az_span_length(*self) == az_span_capacity(*self)) {
       return AZ_ERROR_ITEM_NOT_FOUND;
     }
-    AZ_RETURN_IF_FAILED(result);
+    // ensure first char of pointer is `/`
+    if (az_span_ptr(*self)[0] != '/') {
+      return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
+    }
   }
 
-  int32_t const begin = self->i;
+  // What's happening below: Keep reading/scaning until POINTER_TOKEN_END is found or we get to the
+  // end of a Json token. var begin will record the number of bytes read until token_end or
+  // pointer_end. TODO: We might be able to implement _az_span_scan_until() here, since we ignore
+  // the out of az_span_reader_read_json_pointer_char()
+  int32_t begin = 0;
+  uint8_t * p_reader = az_span_ptr(*self);
   while (true) {
     uint32_t ignore = { 0 };
     az_result const result = az_span_reader_read_json_pointer_char(self, &ignore);
     switch (result) {
       case AZ_ERROR_ITEM_NOT_FOUND:
       case AZ_ERROR_JSON_POINTER_TOKEN_END: {
-        AZ_RETURN_IF_FAILED(az_span_slice(self->span, begin, self->i, out));
+        *out = az_span_init(p_reader, begin, az_span_capacity(*self));
         return AZ_OK;
       }
-      default: { AZ_RETURN_IF_FAILED(result); }
+      default: {
+        AZ_RETURN_IF_FAILED(result);
+        begin += 1;
+      }
     }
   }
 }
 
-AZ_NODISCARD az_result
-az_span_reader_read_json_pointer_token_char(az_span_reader * self, uint32_t * out) {
+AZ_NODISCARD az_result az_span_reader_read_json_pointer_token_char(az_span * self, uint32_t * out) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(out);
 

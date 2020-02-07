@@ -6,7 +6,6 @@
 
 #include <az_result.h>
 #include <az_span.h>
-#include <az_span_reader.h>
 
 #include <stdbool.h>
 
@@ -132,7 +131,7 @@ AZ_NODISCARD az_result az_json_builder_append_array_close(az_json_builder * self
 typedef uint64_t az_json_stack;
 typedef struct {
   struct {
-    az_span_reader reader;
+    az_span reader;
     az_json_stack stack;
   } _internal;
 } az_json_parser;
