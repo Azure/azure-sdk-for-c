@@ -8,11 +8,11 @@
 
 #include <_az_cfg.h>
 
-uint8_t * _az_align_floor(uint8_t * const p, size_t align) {
+uint8_t * _az_align_floor(uint8_t * p, size_t align) {
   return (uint8_t *)(((size_t)p) / align * align);
 }
 
-uint8_t * _az_align_ceil(uint8_t * const p, size_t align) {
+uint8_t * _az_align_ceil(uint8_t * p, size_t align) {
   return _az_align_floor(p + (align - 1), align);
 }
 
