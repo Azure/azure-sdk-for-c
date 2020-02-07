@@ -6,14 +6,11 @@
 
 #include <az_result.h>
 #include <az_span.h>
+#include <az_config.h>
 
 #include <stdint.h>
 
 #include <_az_cfg_prefix.h>
-
-enum {
-  AZ_HTTP_URL_MAX_SIZE = 1024 * 2,
-};
 
 typedef struct {
   // Services pass API versions in the header or in query parameters

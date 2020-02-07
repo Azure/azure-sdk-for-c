@@ -7,14 +7,11 @@
 #include <az_http.h>
 #include <az_result.h>
 #include <az_span.h>
+#include <az_constants_internal.h>
 
 #include <stdint.h>
 
 #include <_az_cfg_prefix.h>
-
-enum {
-  _az_TOKEN_MAX_LENGTH = 2 * 1024,
-};
 
 typedef struct {
   struct {
