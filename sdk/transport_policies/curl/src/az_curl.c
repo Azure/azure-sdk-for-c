@@ -148,7 +148,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_add_header_to_curl_list(
  * @param p_headers list of headers in curl specific list
  * @return az_result
  */
-AZ_NODISCARD az_result static _az_http_client_curl_build_headers(
+static AZ_NODISCARD az_result _az_http_client_curl_build_headers(
     az_http_request * p_request,
     struct curl_slist ** p_headers) {
   AZ_CONTRACT_ARG_NOT_NULL(p_request);
