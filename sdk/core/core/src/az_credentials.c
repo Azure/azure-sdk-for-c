@@ -31,9 +31,9 @@ _az_client_secret_credential_request_token(az_client_secret_credential * credent
 }
 
 // This gets called from the http credential policy
-static AZ_NODISCARD az_result _az_client_secret_credential_apply_credential(
+static AZ_NODISCARD az_result _az_client_secret_credential_apply(
     az_client_secret_credential * credential,
-    az_http_request * request) {
+    az_http_request * ref_request) {
 
   if (_az_token_expired(&(credential->_internal.token))) {
     AZ_RETURN_IF_FAILED(_az_client_secret_credential_request_token(credential));
@@ -42,7 +42,7 @@ static AZ_NODISCARD az_result _az_client_secret_credential_apply_credential(
   int16_t const token_length = credential->_internal.token._internal.token_length;
 
   AZ_RETURN_IF_FAILED(az_http_request_append_header(
-      request,
+      ref_request,
       AZ_SPAN_FROM_STR("authorization"),
       az_span_init(credential->_internal.token._internal.token, token_length, token_length)));
 
@@ -64,8 +64,8 @@ AZ_NODISCARD az_result az_client_secret_credential_init(
     ._internal = {
       .vtbl = {
         ._internal = {
-          .apply_credential = _az_client_secret_credential_apply_credential,
-          .set_scopes = _az_client_secret_credential_set_scopes,
+          .apply_credential = (_az_credential_apply_fn)_az_client_secret_credential_apply,
+          .set_scopes = (_az_credential_set_scopes_fn)_az_client_secret_credential_set_scopes,
           },
         },
         .tenant_id = tenant_id,

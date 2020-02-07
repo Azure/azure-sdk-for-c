@@ -13,26 +13,26 @@
 #include <_az_cfg_prefix.h>
 
 enum {
-  _az_MAX_TOKEN_LENGTH = 2 * 1024,
+  _az_TOKEN_MAX_LENGTH = 2 * 1024,
 };
 
 typedef struct {
   struct {
-    uint8_t token[_az_MAX_TOKEN_LENGTH]; // Base64-encoded token
+    uint8_t token[_az_TOKEN_MAX_LENGTH]; // Base64-encoded token
     int16_t token_length;
     int64_t expires_at_msec;
   } _internal;
 } _az_token;
 
 typedef AZ_NODISCARD az_result (
-    *_az_apply_credential_fn)(void * credential_options, az_http_request * ref_request);
+    *_az_credential_apply_fn)(void * credential_options, az_http_request * ref_request);
 
-typedef AZ_NODISCARD az_result (*_az_set_scopes_fn)(void * credential, az_span scopes);
+typedef AZ_NODISCARD az_result (*_az_credential_set_scopes_fn)(void * credential, az_span scopes);
 
 typedef struct {
   struct {
-    _az_apply_credential_fn apply_credential;
-    _az_set_scopes_fn set_scopes; // NULL if this credential doesn't support scopes.
+    _az_credential_apply_fn apply_credential;
+    _az_credential_set_scopes_fn set_scopes; // NULL if this credential doesn't support scopes.
   } _internal;
 } _az_credential_vtbl;
 
