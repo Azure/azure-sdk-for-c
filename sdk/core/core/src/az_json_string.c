@@ -100,12 +100,19 @@ AZ_NODISCARD az_result az_span_reader_read_json_string_char(az_span * self, uint
     case '\\': {
       // moving reader fw
       AZ_RETURN_IF_FAILED(az_span_slice(*self, 1, -1, self));
+      if (az_span_length(*self) == 0) {
+        return AZ_ERROR_EOF;
+      }
       uint8_t const c = az_span_ptr(*self)[0];
       AZ_RETURN_IF_FAILED(az_span_slice(*self, 1, -1, self));
+      
       if (c == 'u') {
         uint32_t r = 0;
         for (size_t i = 0; i < 4; ++i) {
           uint8_t digit = 0;
+          if (az_span_length(*self) == 0) {
+            return AZ_ERROR_EOF;
+          }
           AZ_RETURN_IF_FAILED(az_hex_to_digit(az_span_ptr(*self)[0], &digit));
           r = (r << 4) + digit;
           AZ_RETURN_IF_FAILED(az_span_slice(*self, 1, -1, self));

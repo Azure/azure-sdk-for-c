@@ -191,6 +191,7 @@ static az_span hrb_header_authorization_token2
 
 int main() {
   test_json_get_by_pointer();
+  test_json_pointer();
   test_json_builder();
   {
     az_json_parser parser = { 0 };
@@ -496,7 +497,7 @@ int main() {
   test_http_response();
   test_span_builder_replace();
   test_mut_span();
-  test_json_pointer();
+
   test_json_string();
   test_log();
   return exit_code;

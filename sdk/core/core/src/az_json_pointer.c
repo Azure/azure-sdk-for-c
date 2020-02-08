@@ -12,7 +12,7 @@ AZ_NODISCARD static az_result az_span_reader_read_json_pointer_char(
   AZ_CONTRACT_ARG_NOT_NULL(self);
   int32_t reader_current_length = az_span_length(*self);
 
-  // check for EOF (all span was read so length is same as capacity)
+  // check for EOF
   if (reader_current_length == 0) {
     return AZ_ERROR_ITEM_NOT_FOUND;
   }
@@ -24,13 +24,15 @@ AZ_NODISCARD static az_result az_span_reader_read_json_pointer_char(
     }
     case '~': {
       // move reader to next position
-      reader_current_length += 1;
-      AZ_RETURN_IF_FAILED(az_span_slice(*self, reader_current_length, -1, self));
+      AZ_RETURN_IF_FAILED(az_span_slice(*self, 1, -1, self));
+      // check for EOF
+      if (az_span_length(*self) == 0) {
+        return AZ_ERROR_EOF;
+      }
       // get char
       uint8_t const e = self->_internal.ptr[0];
       // move to next position again
-      reader_current_length += 1;
-      AZ_RETURN_IF_FAILED(az_span_slice(*self, reader_current_length, -1, self));
+      AZ_RETURN_IF_FAILED(az_span_slice(*self, 1, -1, self));
       switch (e) {
         case '0': {
           *out = '~';
@@ -45,8 +47,7 @@ AZ_NODISCARD static az_result az_span_reader_read_json_pointer_char(
     }
     default: {
       // move reader to next position
-      reader_current_length += 1;
-      AZ_RETURN_IF_FAILED(az_span_slice(*self, reader_current_length, -1, self));
+      AZ_RETURN_IF_FAILED(az_span_slice(*self, 1, -1, self));
 
       *out = (uint8_t)result;
       return AZ_OK;
@@ -69,12 +70,18 @@ AZ_NODISCARD az_result az_span_reader_read_json_pointer_token(az_span * self, az
       return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
     }
   }
+  // move forward
+  AZ_RETURN_IF_FAILED(az_span_slice(*self, 1, -1, self));
+  if (az_span_length(*self) == 0) {
+    *out = *self;
+    return AZ_OK;
+  }
 
   // What's happening below: Keep reading/scaning until POINTER_TOKEN_END is found or we get to the
   // end of a Json token. var begin will record the number of bytes read until token_end or
   // pointer_end. TODO: We might be able to implement _az_span_scan_until() here, since we ignore
   // the out of az_span_reader_read_json_pointer_char()
-  int32_t begin = 0;
+  int32_t initial_capacity = az_span_capacity(*self);
   uint8_t * p_reader = az_span_ptr(*self);
   while (true) {
     uint32_t ignore = { 0 };
@@ -82,13 +89,11 @@ AZ_NODISCARD az_result az_span_reader_read_json_pointer_token(az_span * self, az
     switch (result) {
       case AZ_ERROR_ITEM_NOT_FOUND:
       case AZ_ERROR_JSON_POINTER_TOKEN_END: {
-        *out = az_span_init(p_reader, begin, az_span_capacity(*self));
+        int32_t current_capacity = initial_capacity - az_span_capacity(*self);
+        *out = az_span_init(p_reader, current_capacity, current_capacity);
         return AZ_OK;
       }
-      default: {
-        AZ_RETURN_IF_FAILED(result);
-        begin += 1;
-      }
+      default: { AZ_RETURN_IF_FAILED(result); }
     }
   }
 }
