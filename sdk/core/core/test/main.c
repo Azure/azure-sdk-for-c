@@ -190,6 +190,8 @@ static az_span hrb_header_authorization_token2
     = AZ_SPAN_LITERAL_FROM_STR("Bearer 99887766554433221100");
 
 int main() {
+  test_json_get_by_pointer();
+  test_json_builder();
   {
     az_json_parser parser = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR("    ")));
@@ -351,6 +353,7 @@ int main() {
     }
     {
       int32_t o = 0;
+      output = AZ_SPAN_FROM_BUFFER(buffer);
       az_span const json = AZ_SPAN_FROM_STR(
           // 0           1           2           3           4           5 6
           // 01234 56789 01234 56678 01234 56789 01234 56789 01234 56789 01234
@@ -362,6 +365,7 @@ int main() {
     }
     {
       int32_t o = 0;
+      output = AZ_SPAN_FROM_BUFFER(buffer);
       az_span const json = AZ_SPAN_FROM_STR(
           // 0           1           2           3           4           5 6 01234
           // 56789 01234 56678 01234 56789 01234 56789 01234 56789 01234 56789 012
@@ -372,6 +376,7 @@ int main() {
     }
     {
       int32_t o = 0;
+      output = AZ_SPAN_FROM_BUFFER(buffer);
       az_span const json = AZ_SPAN_FROM_STR(
           // 0           1           2           3           4           5 6 01234
           // 56789 01234 56678 01234 56789 01234 56789 01234 56789 01234 56789 012
@@ -381,6 +386,7 @@ int main() {
           "}]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] "
           "]]]]] ]]]");
       output._internal.length = 0;
+      output = AZ_SPAN_FROM_BUFFER(buffer);
       az_result const result = read_write(json, &output, &o);
       TEST_ASSERT(result == AZ_OK);
 
@@ -395,6 +401,7 @@ int main() {
     //
     {
       int32_t o = 0;
+      output = AZ_SPAN_FROM_BUFFER(buffer);
       az_result const result = read_write(sample1, &output, &o);
       TEST_ASSERT(result == AZ_OK);
     }
@@ -489,8 +496,6 @@ int main() {
   test_http_response();
   test_span_builder_replace();
   test_mut_span();
-  test_json_builder();
-  test_json_get_by_pointer();
   test_json_pointer();
   test_json_string();
   test_log();

@@ -13,7 +13,7 @@ AZ_NODISCARD static az_result az_span_reader_read_json_pointer_char(
   int32_t reader_current_length = az_span_length(*self);
 
   // check for EOF (all span was read so length is same as capacity)
-  if (reader_current_length == az_span_capacity(*self)) {
+  if (reader_current_length == 0) {
     return AZ_ERROR_ITEM_NOT_FOUND;
   }
 
@@ -61,7 +61,7 @@ AZ_NODISCARD az_result az_span_reader_read_json_pointer_token(az_span * self, az
   // read `/` if any.
   {
     // check there is something still to read
-    if (az_span_length(*self) == az_span_capacity(*self)) {
+    if (az_span_length(*self) == 0) {
       return AZ_ERROR_ITEM_NOT_FOUND;
     }
     // ensure first char of pointer is `/`

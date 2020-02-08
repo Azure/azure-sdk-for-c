@@ -398,6 +398,12 @@ AZ_NODISCARD az_result _az_is_expected_span(az_span * self, az_span expected) {
   az_span actual_span = { 0 };
 
   int32_t expected_length = az_span_length(expected);
+
+  // EOF because self is smaller than the expected span
+  if (expected_length > az_span_length(*self)) {
+    return AZ_ERROR_EOF;
+  }
+
   AZ_RETURN_IF_FAILED(az_span_slice(*self, 0, expected_length, &actual_span));
 
   if (!az_span_is_equal(actual_span, expected)) {

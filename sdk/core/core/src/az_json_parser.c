@@ -77,8 +77,14 @@ AZ_NODISCARD az_result az_json_parser_init(az_json_parser * self, az_span json_b
 }
 
 static az_result az_span_reader_skip_json_white_space(az_span * self) {
+  if (az_span_length(*self) == 0) {
+    return AZ_OK;
+  }
   while (az_json_is_white_space(az_span_ptr(*self)[0])) {
     AZ_RETURN_IF_FAILED(az_span_slice(*self, 1, -1, self));
+    if (az_span_length(*self) == 0) {
+      return AZ_OK;
+    }
   }
   return AZ_OK;
 }
@@ -118,6 +124,9 @@ AZ_NODISCARD static az_result az_span_reader_get_json_number_int(
       p_n->exp += e_offset + 1;
     }
     AZ_RETURN_IF_FAILED(az_span_slice(*self, 1, -1, self));
+    if (az_span_length(*self) == 0) {
+      return AZ_OK; // end of reader is fine. Means int number is over
+    }
     c = az_span_ptr(*self)[0];
     if (!isdigit(c)) {
       return AZ_OK;
@@ -141,6 +150,9 @@ AZ_NODISCARD static az_result az_span_reader_get_json_number_digit_rest(
     if (o == '-') {
       i.sign = -1;
       AZ_RETURN_IF_FAILED(az_span_slice(*self, 1, -1, self));
+      if (az_span_length(*self) == 0) {
+        return AZ_ERROR_EOF;
+      }
       o = az_span_ptr(*self)[0];
       if (!isdigit(o)) {
         return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
@@ -152,10 +164,17 @@ AZ_NODISCARD static az_result az_span_reader_get_json_number_digit_rest(
       AZ_RETURN_IF_FAILED(az_span_slice(*self, 1, -1, self));
     }
   }
+  if (az_span_length(*self) == 0) {
+    *out_value = az_json_number_to_double(&i);
+    return AZ_OK; // it's fine is int finish here (no fraction or something else)
+  }
 
   // fraction
   if (az_span_ptr(*self)[0] == '.') {
     AZ_RETURN_IF_FAILED(az_span_slice(*self, 1, -1, self));
+    if (az_span_length(*self) == 0) {
+      return AZ_ERROR_EOF; // uncompleted number
+    }
     uint8_t o = az_span_ptr(*self)[0];
     if (!isdigit(o)) {
       return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
@@ -163,10 +182,18 @@ AZ_NODISCARD static az_result az_span_reader_get_json_number_digit_rest(
     AZ_RETURN_IF_FAILED(az_span_reader_get_json_number_int(self, &i, -1, o));
   }
 
+  if (az_span_length(*self) == 0) {
+    *out_value = az_json_number_to_double(&i);
+    return AZ_OK; // fine if number ends after a fraction
+  }
+
   // exp
   if (az_json_is_e(az_span_ptr(*self)[0])) {
     // skip 'e' or 'E'
     AZ_RETURN_IF_FAILED(az_span_slice(*self, 1, -1, self));
+    if (az_span_length(*self) == 0) {
+      return AZ_ERROR_EOF; // mising expo info
+    }
     uint8_t c = az_span_ptr(*self)[0];
 
     // read sign, if any.
@@ -177,6 +204,9 @@ AZ_NODISCARD static az_result az_span_reader_get_json_number_digit_rest(
         AZ_FALLTHROUGH;
       case '+':
         AZ_RETURN_IF_FAILED(az_span_slice(*self, 1, -1, self));
+        if (az_span_length(*self) == 0) {
+          return AZ_ERROR_EOF; // uncompleted exp data
+        }
         c = az_span_ptr(*self)[0];
     }
 
@@ -189,6 +219,9 @@ AZ_NODISCARD static az_result az_span_reader_get_json_number_digit_rest(
     do {
       e_int = e_int * 10 + (int16_t)(c - '0');
       AZ_RETURN_IF_FAILED(az_span_slice(*self, 1, -1, self));
+      if (az_span_length(*self) == 0) {
+        break; // nothing more to read
+      }
       c = az_span_ptr(*self)[0];
     } while (isdigit(c));
     i.exp += e_int * e_sign;
@@ -202,14 +235,15 @@ AZ_NODISCARD static az_result az_span_reader_get_json_string_rest(
     az_span * self,
     az_span * string) {
   // skip '"'
-  int32_t begin = 0;
+  int32_t reader_initial_length = az_span_capacity(*self);
   uint8_t * p_reader = az_span_ptr(*self);
   while (true) {
     uint32_t ignore = { 0 };
     az_result const result = az_span_reader_read_json_string_char(self, &ignore);
     switch (result) {
       case AZ_ERROR_JSON_STRING_END: {
-        *string = az_span_init(p_reader, begin, az_span_capacity(*self));
+        int32_t read_count = reader_initial_length - az_span_capacity(*self);
+        *string = az_span_init(p_reader, read_count, read_count);
         AZ_RETURN_IF_FAILED(az_span_slice(*self, 1, -1, self));
         return AZ_OK;
       }
@@ -226,6 +260,11 @@ AZ_NODISCARD static az_result az_json_parser_get_value(
     az_json_parser * self,
     az_json_token * out_token) {
   az_span * p_reader = &self->_internal.reader;
+
+  if (az_span_length(*p_reader) <= 0) {
+    return AZ_ERROR_EOF;
+  }
+
   uint8_t c = az_span_ptr(*p_reader)[0];
   if (isdigit(c)) {
     out_token->kind = AZ_JSON_TOKEN_NUMBER;
@@ -266,7 +305,9 @@ AZ_NODISCARD static az_result az_json_parser_get_value_space(
     az_json_parser * p_state,
     az_json_token * out_token) {
   AZ_RETURN_IF_FAILED(az_json_parser_get_value(p_state, out_token));
-  AZ_RETURN_IF_FAILED(az_span_reader_skip_json_white_space(&p_state->_internal.reader));
+  if (az_span_length(p_state->_internal.reader) > 0) {
+    AZ_RETURN_IF_FAILED(az_span_reader_skip_json_white_space(&p_state->_internal.reader));
+  }
   return AZ_OK;
 }
 
@@ -279,10 +320,9 @@ az_json_parser_parse_token(az_json_parser * self, az_json_token * out_token) {
     return AZ_ERROR_JSON_INVALID_STATE;
   }
   az_span * p_reader = &self->_internal.reader;
-  int32_t reader_length = az_span_length(*p_reader);
   AZ_RETURN_IF_FAILED(az_span_reader_skip_json_white_space(p_reader));
   AZ_RETURN_IF_FAILED(az_json_parser_get_value_space(self, out_token));
-  bool const is_empty = reader_length == az_span_length(*p_reader); // nothing read
+  bool const is_empty = az_span_length(*p_reader) <= 0; // everything was read
   switch (out_token->kind) {
     case AZ_JSON_TOKEN_ARRAY:
     case AZ_JSON_TOKEN_OBJECT:
@@ -320,6 +360,9 @@ AZ_NODISCARD static az_result az_json_parser_check_item_begin(
     return AZ_ERROR_JSON_INVALID_STATE;
   }
   az_span * p_reader = &self->_internal.reader;
+  if (az_span_length(*p_reader) == 0) {
+    return AZ_ERROR_EOF;
+  }
   uint8_t const c = az_span_ptr(*p_reader)[0];
   if (c != az_json_stack_item_to_close(stack_item)) {
     return AZ_OK;
