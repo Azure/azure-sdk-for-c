@@ -12,11 +12,14 @@
 
 #include <_az_cfg_prefix.h>
 
+typedef enum {
+  az_http_policy_apiversion_option_location_header,
+  az_http_policy_apiversion_option_location_queryparameter
+} az_http_policy_apiversion_option_location;
+
 typedef struct {
   // Services pass API versions in the header or in query parameters
-  //   true: api version is passed via headers
-  //   false: api version is passed via query parameters
-  bool add_as_header;
+  az_http_policy_apiversion_option_location option_location;
   az_span name;
   az_span version;
 } _az_http_policy_apiversion_options;

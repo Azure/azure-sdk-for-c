@@ -38,14 +38,21 @@ AZ_NODISCARD az_result az_http_pipeline_policy_apiversion(
 
   _az_http_policy_apiversion_options * options = (_az_http_policy_apiversion_options *)(p_options);
 
-  if (options->add_as_header) {
-    // Add the version as a header
-    AZ_RETURN_IF_FAILED(az_http_request_append_header(p_request, options->name, options->version));
-  } else {
-    // Add the version as a query parameter
-    AZ_RETURN_IF_FAILED(
-        az_http_request_set_query_parameter(p_request, options->name, options->version));
+  switch (options->option_location) { 
+    case az_http_policy_apiversion_option_location_header:
+      // Add the version as a header
+      AZ_RETURN_IF_FAILED(
+          az_http_request_append_header(p_request, options->name, options->version));
+      break;
+    case az_http_policy_apiversion_option_location_queryparameter:
+      // Add the version as a query parameter
+      AZ_RETURN_IF_FAILED(
+          az_http_request_set_query_parameter(p_request, options->name, options->version));
+      break;
+    default:
+      return AZ_ERROR_ARG;
   }
+
   return az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
 }
 

@@ -15,11 +15,10 @@
 /*
 * 
 */
-enum {
-  AZ_HTTP_URL_MAX_SIZE = 1024 * 2,
+enum { 
+    AZ_HTTP_URL_MAX_SIZE = 1024 * 2, 
+    AZ_HTTP_MAX_BODY_SIZE = 1024 
 };
-
-
 
 #include <_az_cfg_suffix.h>
 

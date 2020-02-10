@@ -26,7 +26,7 @@ az_storage_blobs_blob_client_options_default(az_http_client_fn http_client) {
     .retry = az_http_policy_retry_options_default(),
   };
 
-  options._internal.api_version.add_as_header = false;
+  options._internal.api_version.option_location = az_http_policy_apiversion_option_location_queryparameter;
   options._internal.api_version.name = AZ_SPAN_FROM_STR("x-ms-version");
   options._internal.api_version.version = AZ_STORAGE_API_VERSION;
 
@@ -86,7 +86,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
 
   // Request buffer
   // create request buffer TODO: define size for a blob upload
-  uint8_t url_buffer[1024];
+  uint8_t url_buffer[AZ_HTTP_URL_MAX_SIZE];
   az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
   // copy url from client
   AZ_RETURN_IF_FAILED(az_span_copy(request_url_span, client->_internal.uri, &request_url_span));
@@ -103,18 +103,14 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
   AZ_RETURN_IF_FAILED(az_http_request_append_header(
       &hrb, AZ_STORAGE_BLOBS_BLOB_HEADER_X_MS_BLOB_TYPE, AZ_STORAGE_BLOBS_BLOB_TYPE_BLOCKBLOB));
 
-  // add date to request
-  // AZ_RETURN_IF_FAILED(az_http_request_append_header(
-  //    &hrb, AZ_HTTP_HEADER_X_MS_DATE, AZ_SPAN_FROM_STR("Fri, 03 Jan 2020 21:33:15 GMT")));
-
-  char str[256] = { 0 };
-  // TODO: remove snprintf
-  snprintf(str, sizeof str, "%d", az_span_length(content));
-  az_span content_length = az_span_from_str(str);
+  //
+  uint8_t content_length[_az_INT64_AS_STR_MAX_SIZE] = { 0 };
+  az_span content_length_builder = AZ_SPAN_FROM_BUFFER(content_length);
+  AZ_RETURN_IF_FAILED(az_span_append_int64(&content_length_builder, az_span_length(content)));
 
   // add Content-Length to request
   AZ_RETURN_IF_FAILED(
-      az_http_request_append_header(&hrb, AZ_HTTP_HEADER_CONTENT_LENGTH, content_length));
+      az_http_request_append_header(&hrb, AZ_HTTP_HEADER_CONTENT_LENGTH, content_length_builder));
 
   // add blob type to request
   AZ_RETURN_IF_FAILED(az_http_request_append_header(
