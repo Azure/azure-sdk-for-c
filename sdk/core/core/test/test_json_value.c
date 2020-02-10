@@ -1,15 +1,16 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_json_token.h>
-#include <az_str.h>
+#include <az_json.h>
 
 #include <az_test.h>
+
+#include <_az_cfg.h>
 
 void test_json_value() {
   az_json_token const json_boolean = az_json_token_boolean(true);
   az_json_token const json_number = az_json_token_number(-42.3);
-  az_json_token const json_string = az_json_token_string(AZ_STR("Hello"));
+  az_json_token const json_string = az_json_token_string(AZ_SPAN_FROM_STR("Hello"));
 
   // boolean from boolean
   {
@@ -27,7 +28,7 @@ void test_json_value() {
   {
     az_span string_value = { 0 };
     TEST_ASSERT(az_json_token_get_string(json_string, &string_value) == AZ_OK);
-    TEST_ASSERT(az_span_is_equal(string_value, AZ_STR("Hello")));
+    TEST_ASSERT(az_span_is_equal(string_value, AZ_SPAN_FROM_STR("Hello")));
   }
   // string from boolean
   {

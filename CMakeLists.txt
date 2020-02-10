@@ -19,8 +19,11 @@ endif()
 
 project(az LANGUAGES C)
 enable_testing ()
+
+include(eng/cmake/global_compile_options.txt)
+
 add_subdirectory(sdk/core/core)
-add_subdirectory(sdk/identity/identity)
+add_subdirectory(sdk/transport_policies/curl)
 add_subdirectory(sdk/keyvault/keyvault)
 add_subdirectory(sdk/storage/blobs)
 # add_subdirectory(sdk/storage/ustorageclient)

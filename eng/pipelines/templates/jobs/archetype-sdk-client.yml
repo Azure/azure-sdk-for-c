@@ -27,16 +27,37 @@ jobs:
   steps:
   - checkout: self
     submodules: recursive
-  - script: |
-      sudo xcode-select --switch /Applications/Xcode_9.4.1.app
-      brew install gcc6
-      git clone https://github.com/Microsoft/vcpkg.git
-      cd vcpkg
-      ./bootstrap-vcpkg.sh
-      echo "##vso[task.prependpath]$(pwd)"
-      echo "##vso[task.setvariable variable=VCPKG_INSTALLATION_ROOT;]$(pwd)"
+
+  # Mac OS specific requirements
+  - task: Bash@3
+    inputs:
+      targetType: inline
+      script: |
+        sudo xcode-select --switch /Applications/Xcode_9.4.1.app
+        echo "xcode path:"
+        sudo xcode-select --print-path
+
+        # Expect failure:
+        brew install gcc
+        git clone https://github.com/Microsoft/vcpkg.git
+        cd vcpkg
+        ./bootstrap-vcpkg.sh
+
+        # Validate that vcpkg bootstrap succeeded
+        ./vcpkg version
+        if [ $? -ne 0 ]
+        then
+          echo "./bootstrap-vcpkg.sh FAILED"
+          exit 1
+        fi
+
+        echo "##vso[task.prependpath]$(pwd)"
+        echo "##vso[task.setvariable variable=VCPKG_INSTALLATION_ROOT;]$(pwd)"
+
     condition: contains(variables['vm.image'], 'macOS')
     displayName: vcpkg bootstrap
+
+
   - script: |
       vcpkg install $(vcpkg.deps)
     displayName: vcpkg install dependencies

@@ -1,7 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "../src/az_keyvault_client.c"
+#include <az_json.h>
+#include <az_keyvault.h>
+#include <az_span.h>
 
 #include <assert.h>
 #include <stdbool.h>
@@ -15,26 +17,26 @@
 
 int exit_code = 0;
 
+AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
+    az_span json_web_key_type,
+    az_keyvault_create_key_options * options,
+    az_span * http_body);
+
 int main() {
   {
     {
       az_keyvault_create_key_options options = { 0 };
       uint8_t body_buffer[1024];
-      az_mut_span const span_to_buffer = (az_mut_span)AZ_SPAN_FROM_ARRAY(body_buffer);
-      az_span_builder json_builder = az_span_builder_create(span_to_buffer);
+      az_span http_body = AZ_SPAN_FROM_BUFFER(body_buffer);
 
-      az_span const expected = AZ_STR("{\"kty\":\"RSA\"}");
+      az_span const expected = AZ_SPAN_FROM_STR("{\"kty\":\"RSA\"}");
 
       TEST_ASSERT(
           _az_keyvault_keys_key_create_build_json_body(
-              az_keyvault_web_key_type_RSA(),
-              &options,
-              az_span_builder_append_action(&json_builder))
+              az_keyvault_web_key_type_rsa(), &options, &http_body)
           == AZ_OK);
 
-      az_span result = az_span_builder_result(&json_builder);
-
-      TEST_ASSERT(az_span_is_equal(result, expected));
+      TEST_ASSERT(az_span_is_equal(http_body, expected));
     }
     {
       az_keyvault_create_key_options options = { 0 };
@@ -42,21 +44,17 @@ int main() {
 
       uint8_t body_buffer[1024];
 
-      az_mut_span const span_to_buffer = (az_mut_span)AZ_SPAN_FROM_ARRAY(body_buffer);
-      az_span_builder json_builder = az_span_builder_create(span_to_buffer);
+      az_span http_body = AZ_SPAN_FROM_BUFFER(body_buffer);
 
-      az_span const expected = AZ_STR("{\"kty\":\"RSA\",\"attributes\":{\"enabled\":true}}");
+      az_span const expected
+          = AZ_SPAN_FROM_STR("{\"kty\":\"RSA\",\"attributes\":{\"enabled\":true}}");
 
       TEST_ASSERT(
           _az_keyvault_keys_key_create_build_json_body(
-              az_keyvault_web_key_type_RSA(),
-              &options,
-              az_span_builder_append_action(&json_builder))
+              az_keyvault_web_key_type_rsa(), &options, &http_body)
           == AZ_OK);
 
-      az_span result = az_span_builder_result(&json_builder);
-
-      TEST_ASSERT(az_span_is_equal(result, expected));
+      TEST_ASSERT(az_span_is_equal(http_body, expected));
     }
     {
       az_keyvault_create_key_options options = { 0 };
@@ -64,21 +62,17 @@ int main() {
 
       uint8_t body_buffer[1024];
 
-      az_mut_span const span_to_buffer = (az_mut_span)AZ_SPAN_FROM_ARRAY(body_buffer);
-      az_span_builder json_builder = az_span_builder_create(span_to_buffer);
+      az_span http_body = AZ_SPAN_FROM_BUFFER(body_buffer);
 
-      az_span const expected = AZ_STR("{\"kty\":\"RSA\",\"attributes\":{\"enabled\":false}}");
+      az_span const expected
+          = AZ_SPAN_FROM_STR("{\"kty\":\"RSA\",\"attributes\":{\"enabled\":false}}");
 
       TEST_ASSERT(
           _az_keyvault_keys_key_create_build_json_body(
-              az_keyvault_web_key_type_RSA(),
-              &options,
-              az_span_builder_append_action(&json_builder))
+              az_keyvault_web_key_type_rsa(), &options, &http_body)
           == AZ_OK);
 
-      az_span result = az_span_builder_result(&json_builder);
-
-      TEST_ASSERT(az_span_is_equal(result, expected));
+      TEST_ASSERT(az_span_is_equal(http_body, expected));
     }
   }
   az_create_key_options_test();

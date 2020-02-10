@@ -1,8 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_json_builder.h>
+#include <az_credentials_internal.h>
+#include <az_http_pipeline_internal.h>
+#include <az_json.h>
 #include <az_keyvault.h>
+#include <az_span.h>
 
 #include <_az_cfg.h>
 
@@ -18,45 +21,113 @@
  */
 enum { MAX_URL_SIZE = 200 };
 enum { MAX_BODY_SIZE = 1024 };
+static az_span const AZ_HTTP_HEADER_API_VERSION = AZ_SPAN_LITERAL_FROM_STR("api-version");
 
-AZ_NODISCARD AZ_INLINE az_span az_keyvault_client_constant_for_keys() { return AZ_STR("keys"); }
-AZ_NODISCARD AZ_INLINE az_span az_keyvault_client_constant_for_create() { return AZ_STR("create"); }
+AZ_NODISCARD AZ_INLINE az_span az_keyvault_client_constant_for_keys() {
+  return AZ_SPAN_FROM_STR("keys");
+}
+AZ_NODISCARD AZ_INLINE az_span az_keyvault_client_constant_for_create() {
+  return AZ_SPAN_FROM_STR("create");
+}
 
 AZ_NODISCARD AZ_INLINE az_span az_keyvault_client_constant_for_content_type() {
-  return AZ_STR("Content-Type");
+  return AZ_SPAN_FROM_STR("Content-Type");
 }
 AZ_NODISCARD AZ_INLINE az_span az_keyvault_client_constant_for_application_json() {
-  return AZ_STR("application/json");
+  return AZ_SPAN_FROM_STR("application/json");
 }
 
-az_keyvault_keys_client_options const AZ_KEYVAULT_CLIENT_DEFAULT_OPTIONS
-    = { .service_version = AZ_CONST_STR("7.0"),
-        .retry = {
-            .max_retry = 3,
-            .delay_in_ms = 30,
-        } };
+AZ_NODISCARD az_keyvault_keys_client_options
+az_keyvault_keys_client_options_default(az_http_client_fn http_client) {
+
+  az_keyvault_keys_client_options options = (az_keyvault_keys_client_options){
+    ._internal
+    = { .http_client = http_client, .api_version = az_http_policy_apiversion_options_default() },
+    .retry = az_http_policy_retry_options_default(),
+  };
+
+  options._internal.api_version.add_as_header = false;
+  options._internal.api_version.name = AZ_HTTP_HEADER_API_VERSION;
+  options._internal.api_version.version = AZ_KEYVAULT_API_VERSION;
+
+  return options;
+}
+
+AZ_NODISCARD az_result az_keyvault_keys_client_init(
+    az_keyvault_keys_client * self,
+    az_span uri,
+    void * credential,
+    az_keyvault_keys_client_options * options) {
+  AZ_CONTRACT_ARG_NOT_NULL(self);
+  AZ_CONTRACT_ARG_NOT_NULL(options);
+
+  _az_credential_vtbl * const cred = (_az_credential_vtbl *)credential;
+
+  *self
+      = (az_keyvault_keys_client){ ._internal
+                                   = { .uri = AZ_SPAN_FROM_BUFFER(self->_internal.url_buffer),
+                                       .options = *options,
+                                       .credential = cred,
+                                       .pipeline = (az_http_pipeline){
+                                           .p_policies = {
+                                               { .process = az_http_pipeline_policy_apiversion,
+                                                 .p_options
+                                                 = &self->_internal.options._internal.api_version },
+                                               { .process = az_http_pipeline_policy_uniquerequestid,
+                                                 .p_options = NULL },
+                                               { .process = az_http_pipeline_policy_telemetry,
+                                                 .p_options = &self->_internal.options._internal
+                                                                   ._telemetry_options },
+                                               { .process = az_http_pipeline_policy_retry,
+                                                 .p_options = &(self->_internal.options.retry) },
+                                               { .process = az_http_pipeline_policy_credential,
+                                                 .p_options = cred },
+                                               { .process = az_http_pipeline_policy_logging,
+                                                 .p_options = NULL },
+                                               { .process = az_http_pipeline_policy_bufferresponse,
+                                                 .p_options = NULL },
+                                               { .process
+                                                 = az_http_pipeline_policy_distributedtracing,
+                                                 .p_options = NULL },
+                                               { .process = az_http_pipeline_policy_transport,
+                                                 .p_options
+                                                 = &self->_internal.options._internal.http_client },
+                                           } } } };
+
+  // Copy url to client buffer so customer can re-use buffer on his/her side
+  AZ_RETURN_IF_FAILED(az_span_copy(self->_internal.uri, uri, &self->_internal.uri));
+
+  AZ_RETURN_IF_FAILED(
+      _az_credential_set_scopes(cred, AZ_SPAN_FROM_STR("https://vault.azure.net/.default")));
+
+  return AZ_OK;
+}
+
+AZ_NODISCARD az_keyvault_create_key_options az_keyvault_create_key_options_default() {
+  return (az_keyvault_create_key_options){ .enabled = false, .operations = NULL, .tags = NULL };
+}
 
 /**
  * @brief Internal inline function in charge of building json payload for creating a new key
  *
  * @param json_web_key_type type of the key. It will be always added to json payload
  * @param options all optional settings that can be inside create key options
- * @param write action used by json builder to be called while building
+ * @param http_body action used by json builder to be called while building
  * @return AZ_NODISCARD _az_keyvault_keys_key_create_build_json_body
  */
-static AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
-    az_span const json_web_key_type,
-    az_keyvault_create_key_options const * const options,
-    az_span_action const write) {
+AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
+    az_span json_web_key_type,
+    az_keyvault_create_key_options * options,
+    az_span * http_body) {
 
   az_json_builder builder = { 0 };
 
-  AZ_RETURN_IF_FAILED(az_json_builder_init(&builder, write));
+  AZ_RETURN_IF_FAILED(az_json_builder_init(&builder, *http_body));
 
-  AZ_RETURN_IF_FAILED(az_json_builder_write(&builder, az_json_token_object()));
+  AZ_RETURN_IF_FAILED(az_json_builder_append_token(&builder, az_json_token_object()));
   // Required fields
-  AZ_RETURN_IF_FAILED(az_json_builder_write_object_member(
-      &builder, AZ_STR("kty"), az_json_token_string(json_web_key_type)));
+  AZ_RETURN_IF_FAILED(az_json_builder_append_object(
+      &builder, AZ_SPAN_FROM_STR("kty"), az_json_token_string(json_web_key_type)));
 
   /**************** Non-Required fields ************/
   if (options != NULL) {
@@ -64,97 +135,92 @@ static AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
     {
       az_optional_bool const enabled_field = options->enabled;
       if (enabled_field.is_present) {
-        AZ_RETURN_IF_FAILED(az_json_builder_write_object_member(
-            &builder, AZ_STR("attributes"), az_json_token_object()));
-        AZ_RETURN_IF_FAILED(az_json_builder_write_object_member(
-            &builder, AZ_STR("enabled"), az_json_token_boolean(enabled_field.data)));
-        AZ_RETURN_IF_FAILED(az_json_builder_write_object_close(&builder));
+        AZ_RETURN_IF_FAILED(az_json_builder_append_object(
+            &builder, AZ_SPAN_FROM_STR("attributes"), az_json_token_object()));
+        AZ_RETURN_IF_FAILED(az_json_builder_append_object(
+            &builder, AZ_SPAN_FROM_STR("enabled"), az_json_token_boolean(enabled_field.data)));
+        AZ_RETURN_IF_FAILED(az_json_builder_append_object_close(&builder));
       }
       // operations
-      if (!az_keyvault_create_key_options_is_empty(options)) {
-        AZ_RETURN_IF_FAILED(az_json_builder_write_object_member(
-            &builder, AZ_STR("key_ops"), az_json_token_array()));
-        for (size_t op = 0; op < options->operations.length; ++op) {
-          AZ_RETURN_IF_FAILED(az_json_builder_write_array_item(
-              &builder, az_json_token_string(options->operations.buffer.begin[op])));
+      if (options->operations != NULL) {
+        AZ_RETURN_IF_FAILED(az_json_builder_append_object(
+            &builder, AZ_SPAN_FROM_STR("key_ops"), az_json_token_array()));
+        for (size_t op = 0; true; ++op) {
+          az_span s = options->operations[op];
+          if (az_span_is_equal(s, az_span_null())) {
+            break;
+          }
+          AZ_RETURN_IF_FAILED(az_json_builder_append_array_item(&builder, az_json_token_string(s)));
         }
-        AZ_RETURN_IF_FAILED(az_json_builder_write_array_close(&builder));
+        AZ_RETURN_IF_FAILED(az_json_builder_append_array_close(&builder));
       }
       // tags
-      if (options->tags.length > 0) {
-        AZ_RETURN_IF_FAILED(
-            az_json_builder_write_object_member(&builder, AZ_STR("tags"), az_json_token_object()));
-        for (size_t tag_index = 0; tag_index < options->tags.length; ++tag_index) {
-          az_pair const tag = options->tags.buffer.begin[tag_index];
-          AZ_RETURN_IF_FAILED(az_json_builder_write_object_member(
-              &builder, tag.key, az_json_token_string(tag.value)));
+      if (options->tags != NULL) {
+        AZ_RETURN_IF_FAILED(az_json_builder_append_object(
+            &builder, AZ_SPAN_FROM_STR("tags"), az_json_token_object()));
+        for (size_t tag_index = 0; true; ++tag_index) {
+          az_pair const tag = options->tags[tag_index];
+          if (az_span_is_equal(tag.key, az_span_null())) {
+            break;
+          }
+          AZ_RETURN_IF_FAILED(
+              az_json_builder_append_object(&builder, tag.key, az_json_token_string(tag.value)));
         }
-        AZ_RETURN_IF_FAILED(az_json_builder_write_object_close(&builder));
+        AZ_RETURN_IF_FAILED(az_json_builder_append_object_close(&builder));
       }
     }
   }
 
-  AZ_RETURN_IF_FAILED(az_json_builder_write_object_close(&builder));
+  AZ_RETURN_IF_FAILED(az_json_builder_append_object_close(&builder));
+  *http_body = builder._internal.json;
 
   return AZ_OK;
 }
 
 AZ_NODISCARD az_result az_keyvault_keys_key_create(
     az_keyvault_keys_client * client,
-    az_span const key_name,
-    az_span const json_web_key_type,
-    az_keyvault_create_key_options * const options,
-    az_http_response * const response) {
+    az_span key_name,
+    json_web_key_type json_web_key_type,
+    az_keyvault_create_key_options * options,
+    az_http_response * response) {
 
-  // Request buffer
-  uint8_t request_buffer[1024 * 4];
-  az_mut_span request_buffer_span = AZ_SPAN_FROM_ARRAY(request_buffer);
+  // Url buffer
+  uint8_t url_buffer[1024];
+  az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
+  // copy url from client
+  AZ_RETURN_IF_FAILED(az_span_copy(request_url_span, client->_internal.uri, &request_url_span));
 
-  /* ******** build url for request  ******/
+  // Headers buffer
+  uint8_t headers_buffer[4 * sizeof(az_pair)];
+  az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
 
   // Allocate buffer in stack to hold body request
   uint8_t body_buffer[MAX_BODY_SIZE];
-  az_span_builder json_builder
-      = az_span_builder_create((az_mut_span)AZ_SPAN_FROM_ARRAY(body_buffer));
-  AZ_RETURN_IF_FAILED(_az_keyvault_keys_key_create_build_json_body(
-      json_web_key_type, options, az_span_builder_append_action(&json_builder)));
-  az_span const created_body = az_span_builder_result(&json_builder);
+  az_span json_builder = AZ_SPAN_FROM_BUFFER(body_buffer);
+  AZ_RETURN_IF_FAILED(
+      _az_keyvault_keys_key_create_build_json_body(json_web_key_type, options, &json_builder));
+  az_span const created_body = json_builder;
 
   // create request
-  az_http_request_builder hrb;
-  AZ_RETURN_IF_FAILED(az_http_request_builder_init(
-      &hrb,
-      request_buffer_span,
-      MAX_URL_SIZE,
-      AZ_HTTP_METHOD_VERB_POST,
-      client->uri,
-      created_body));
+  az_http_request hrb;
+  AZ_RETURN_IF_FAILED(az_http_request_init(
+      &hrb, az_http_method_post(), request_url_span, request_headers_span, created_body));
 
   // add path to request
-  AZ_RETURN_IF_FAILED(
-      az_http_request_builder_append_path(&hrb, az_keyvault_client_constant_for_keys()));
+  AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, az_keyvault_client_constant_for_keys()));
 
-  // add version to request
-  AZ_RETURN_IF_FAILED(az_http_request_builder_set_query_parameter(
-      &hrb, AZ_STR("api-version"), client->retry_options.service_version));
+  AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, key_name));
 
-  AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, key_name));
-
-  // add extra header just for testing append_path after another query
-  AZ_RETURN_IF_FAILED(az_http_request_builder_set_query_parameter(
-      &hrb, AZ_STR("ignore"), client->retry_options.service_version));
-
-  AZ_RETURN_IF_FAILED(
-      az_http_request_builder_append_path(&hrb, az_keyvault_client_constant_for_create()));
+  AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, az_keyvault_client_constant_for_create()));
 
   // Adding header content-type json
-  AZ_RETURN_IF_FAILED(az_http_request_builder_append_header(
+  AZ_RETURN_IF_FAILED(az_http_request_append_header(
       &hrb,
       az_keyvault_client_constant_for_content_type(),
       az_keyvault_client_constant_for_application_json()));
 
   // start pipeline
-  return az_http_pipeline_process(&client->pipeline, &hrb, response);
+  return az_http_pipeline_process(&client->_internal.pipeline, &hrb, response);
 }
 
 /**
@@ -168,71 +234,62 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
  */
 AZ_NODISCARD az_result az_keyvault_keys_key_get(
     az_keyvault_keys_client * client,
-    az_span const key_name,
-    az_span const key_version,
-    az_http_response * const response) {
+    az_span key_name,
+    az_span key_version,
+    az_http_response * response) {
   // create request buffer TODO: define size for a getKey Request
-  uint8_t request_buffer[1024 * 4];
-  az_mut_span request_buffer_span = AZ_SPAN_FROM_ARRAY(request_buffer);
+
+  uint8_t headers_buffer[4 * sizeof(az_pair)];
+  az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
+  // Url buffer
+  uint8_t url_buffer[1024];
+  az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
+  // copy url from client
+  AZ_RETURN_IF_FAILED(az_span_copy(request_url_span, client->_internal.uri, &request_url_span));
 
   // create request
-  // TODO: define max URL size
-  az_http_request_builder hrb;
-  AZ_RETURN_IF_FAILED(az_http_request_builder_init(
-      &hrb,
-      request_buffer_span,
-      MAX_URL_SIZE,
-      AZ_HTTP_METHOD_VERB_GET,
-      client->uri,
-      az_span_empty()));
+  az_http_request hrb;
+  AZ_RETURN_IF_FAILED(az_http_request_init(
+      &hrb, az_http_method_get(), request_url_span, request_headers_span, az_span_null()));
 
   // Add path to request
-  AZ_RETURN_IF_FAILED(
-      az_http_request_builder_append_path(&hrb, az_keyvault_client_constant_for_keys()));
-
-  // add version to request as query parameter
-  AZ_RETURN_IF_FAILED(az_http_request_builder_set_query_parameter(
-      &hrb, AZ_STR("api-version"), client->retry_options.service_version));
+  AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, az_keyvault_client_constant_for_keys()));
 
   // Add path to request after adding query parameter
-  AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, key_name));
+  AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, key_name));
 
-  // Add version if requested
-  if (!az_span_is_empty(key_version)) {
-    AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, key_version));
+  // Add key_version if requested
+  if (az_span_length(key_version) > 0) {
+    AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, key_version));
   }
 
   // start pipeline
-  return az_http_pipeline_process(&client->pipeline, &hrb, response);
+  return az_http_pipeline_process(&client->_internal.pipeline, &hrb, response);
 }
 
 AZ_NODISCARD az_result az_keyvault_keys_key_delete(
     az_keyvault_keys_client * client,
-    az_span const key_name,
-    az_http_response * const response) {
-  // Request buffer
-  uint8_t request_buffer[1024 * 4];
-  az_mut_span request_buffer_span = AZ_SPAN_FROM_ARRAY(request_buffer);
+    az_span key_name,
+    az_http_response * response) {
+
+  // Url buffer
+  uint8_t url_buffer[1024];
+  az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
+  // copy url from client
+  AZ_RETURN_IF_FAILED(az_span_copy(request_url_span, client->_internal.uri, &request_url_span));
+  uint8_t headers_buffer[4 * sizeof(az_pair)];
+  az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
 
   // create request
-  az_http_request_builder hrb;
-  AZ_RETURN_IF_FAILED(az_http_request_builder_init(
-      &hrb,
-      request_buffer_span,
-      MAX_URL_SIZE,
-      AZ_HTTP_METHOD_VERB_DELETE,
-      client->uri,
-      az_span_empty()));
-
-  // add version to request
-  AZ_RETURN_IF_FAILED(az_http_request_builder_set_query_parameter(
-      &hrb, AZ_STR("api-version"), client->retry_options.service_version));
+  // TODO: define max URL size
+  az_http_request hrb;
+  AZ_RETURN_IF_FAILED(az_http_request_init(
+      &hrb, az_http_method_get(), request_url_span, request_headers_span, az_span_null()));
 
   // Add path to request
-  AZ_RETURN_IF_FAILED(
-      az_http_request_builder_append_path(&hrb, az_keyvault_client_constant_for_keys()));
-  AZ_RETURN_IF_FAILED(az_http_request_builder_append_path(&hrb, key_name));
+  AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, az_keyvault_client_constant_for_keys()));
+  AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, key_name));
 
   // start pipeline
-  return az_http_pipeline_process(&client->pipeline, &hrb, response);
+  return az_http_pipeline_process(&client->_internal.pipeline, &hrb, response);
 }

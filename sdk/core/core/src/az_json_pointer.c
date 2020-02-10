@@ -1,13 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_json_pointer.h>
+#include "az_span_reader_private.h"
+#include <az_json.h>
 
 #include <_az_cfg.h>
 
 AZ_NODISCARD static az_result az_span_reader_read_json_pointer_char(
-    az_span_reader * const self,
-    uint32_t * const out) {
+    az_span_reader * self,
+    uint32_t * out) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
   az_result_byte const result = az_span_reader_current(self);
@@ -45,7 +46,7 @@ AZ_NODISCARD static az_result az_span_reader_read_json_pointer_char(
 }
 
 AZ_NODISCARD az_result
-az_span_reader_read_json_pointer_token(az_span_reader * const self, az_span * const out) {
+az_span_reader_read_json_pointer_token(az_span_reader * self, az_span * out) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
@@ -58,14 +59,14 @@ az_span_reader_read_json_pointer_token(az_span_reader * const self, az_span * co
     AZ_RETURN_IF_FAILED(result);
   }
 
-  size_t const begin = self->i;
+  int32_t const begin = self->i;
   while (true) {
     uint32_t ignore = { 0 };
     az_result const result = az_span_reader_read_json_pointer_char(self, &ignore);
     switch (result) {
       case AZ_ERROR_ITEM_NOT_FOUND:
       case AZ_ERROR_JSON_POINTER_TOKEN_END: {
-        *out = az_span_sub(self->span, begin, self->i);
+        AZ_RETURN_IF_FAILED(az_span_slice(self->span, begin, self->i, out));
         return AZ_OK;
       }
       default: {
@@ -76,7 +77,7 @@ az_span_reader_read_json_pointer_token(az_span_reader * const self, az_span * co
 }
 
 AZ_NODISCARD az_result
-az_span_reader_read_json_pointer_token_char(az_span_reader * const self, uint32_t * const out) {
+az_span_reader_read_json_pointer_token_char(az_span_reader * self, uint32_t * out) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(out);
 

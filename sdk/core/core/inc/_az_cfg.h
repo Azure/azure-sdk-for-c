@@ -3,6 +3,9 @@
 
 #ifdef _MSC_VER
 
+// warning C4710: '...': function not inlined
+#pragma warning(error : 4710)
+
 // warning C4204: nonstandard extension used: non-constant aggregate initializer
 #pragma warning(disable : 4204)
 
@@ -64,17 +67,6 @@
 #define AZ_NODISCARD __attribute__((warn_unused_result))
 #else
 #define AZ_NODISCARD
-#endif
-
-// MSVC
-#if defined(_MSC_VER)
-#define AZ_ALIGNOF(T) __alignof(T)
-// GCC
-#elif defined(__GNUC__)
-#define AZ_ALIGNOF(T) __alignof__(T)
-// unknown
-#else
-#define AZ_ALIGNOF(T) _Alignof(T)
 #endif
 
 #endif
