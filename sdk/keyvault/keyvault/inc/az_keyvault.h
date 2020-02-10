@@ -5,10 +5,9 @@
 #define _az_KEYVAULT_H
 
 #include <az_contract_internal.h>
+#include <az_credentials.h>
 #include <az_http.h>
 #include <az_http_pipeline_internal.h>
-#include <az_identity_access_token.h>
-#include <az_identity_access_token_context.h>
 #include <az_optional_types.h>
 #include <az_result.h>
 #include <az_span.h>
@@ -29,7 +28,7 @@ typedef struct {
   struct {
     _az_http_policy_apiversion_options api_version;
     _az_http_policy_telemetry_options _telemetry_options;
-    az_http_client http_client;
+    az_http_client_fn http_client;
   } _internal;
 } az_keyvault_keys_client_options;
 
@@ -42,7 +41,7 @@ typedef struct {
  * overriding that specific option
  */
 AZ_NODISCARD az_keyvault_keys_client_options
-az_keyvault_keys_client_options_default(az_http_client http_client);
+az_keyvault_keys_client_options_default(az_http_client_fn http_client);
 
 typedef struct {
   struct {
@@ -52,9 +51,7 @@ typedef struct {
     az_span uri;
     az_http_pipeline pipeline;
     az_keyvault_keys_client_options options;
-
-    az_identity_access_token _token;
-    az_identity_access_token_context _token_context;
+    _az_credential_vtbl * credential;
   } _internal;
 } az_keyvault_keys_client;
 
@@ -65,19 +62,19 @@ AZ_NODISCARD az_result az_keyvault_keys_client_init(
     az_keyvault_keys_client_options * options);
 
 typedef az_span json_web_key_type;
-AZ_NODISCARD AZ_INLINE json_web_key_type az_keyvault_web_key_type_EC() {
+AZ_NODISCARD AZ_INLINE json_web_key_type az_keyvault_web_key_type_ec() {
   return AZ_SPAN_FROM_STR("EC");
 }
-AZ_NODISCARD AZ_INLINE json_web_key_type az_keyvault_web_key_type_EC_HSM() {
+AZ_NODISCARD AZ_INLINE json_web_key_type az_keyvault_web_key_type_ec_hsm() {
   return AZ_SPAN_FROM_STR("EC-HSM");
 }
-AZ_NODISCARD AZ_INLINE json_web_key_type az_keyvault_web_key_type_RSA() {
+AZ_NODISCARD AZ_INLINE json_web_key_type az_keyvault_web_key_type_rsa() {
   return AZ_SPAN_FROM_STR("RSA");
 }
-AZ_NODISCARD AZ_INLINE json_web_key_type az_keyvault_web_key_type_RSA_HSM() {
+AZ_NODISCARD AZ_INLINE json_web_key_type az_keyvault_web_key_type_rsa_hsm() {
   return AZ_SPAN_FROM_STR("RSA-HSM");
 }
-AZ_NODISCARD AZ_INLINE json_web_key_type az_keyvault_web_key_type_OCT() {
+AZ_NODISCARD AZ_INLINE json_web_key_type az_keyvault_web_key_type_oct() {
   return AZ_SPAN_FROM_STR("oct");
 }
 
@@ -91,13 +88,13 @@ AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_encry
 AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_sign() {
   return AZ_SPAN_FROM_STR("sign");
 }
-AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_unwrapKey() {
+AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_unwrap_key() {
   return AZ_SPAN_FROM_STR("unwrapKey");
 }
 AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_verify() {
   return AZ_SPAN_FROM_STR("verify");
 }
-AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_wrapKey() {
+AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_wrap_key() {
   return AZ_SPAN_FROM_STR("wrapKey");
 }
 AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_null() {

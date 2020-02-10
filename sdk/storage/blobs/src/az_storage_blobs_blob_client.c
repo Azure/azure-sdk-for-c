@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include <az_credentials_internal.h>
 #include <az_http.h>
 #include <az_http_pipeline_internal.h>
 #include <az_json.h>
@@ -17,7 +18,7 @@ static az_span const AZ_HTTP_HEADER_CONTENT_LENGTH = AZ_SPAN_LITERAL_FROM_STR("C
 static az_span const AZ_HTTP_HEADER_CONTENT_TYPE = AZ_SPAN_LITERAL_FROM_STR("Content-Type");
 
 AZ_NODISCARD az_storage_blobs_blob_client_options
-az_storage_blobs_blob_client_options_default(az_http_client http_client) {
+az_storage_blobs_blob_client_options_default(az_http_client_fn http_client) {
   az_storage_blobs_blob_client_options options = {
     ._internal = { .http_client = http_client,
                    .api_version = az_http_policy_apiversion_options_default(),
@@ -40,18 +41,19 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
   AZ_CONTRACT_ARG_NOT_NULL(client);
   AZ_CONTRACT_ARG_NOT_NULL(options);
 
+  _az_credential_vtbl * const cred = (_az_credential_vtbl *)credential;
+
   *client = (az_storage_blobs_blob_client){ ._internal = {
     .uri = AZ_SPAN_FROM_BUFFER(client->_internal.url_buffer),
     .options = *options,
-    ._token = { 0 },
-    ._token_context = { 0 },
+    .credential = cred,
     .pipeline = (az_http_pipeline){
         .p_policies = {
             { .process = az_http_pipeline_policy_apiversion,.p_options = &client->_internal.options._internal.api_version },
             { .process = az_http_pipeline_policy_uniquerequestid, .p_options = NULL },
             { .process = az_http_pipeline_policy_telemetry, .p_options = &client->_internal.options._internal._telemetry_options },
             { .process = az_http_pipeline_policy_retry, .p_options = &client->_internal.options.retry },
-            { .process = az_http_pipeline_policy_credential, .p_options = &(client->_internal._token_context) },
+            { .process = az_http_pipeline_policy_credential, .p_options = cred },
             { .process = az_http_pipeline_policy_logging, .p_options = NULL },
             { .process = az_http_pipeline_policy_bufferresponse, .p_options = NULL },
             { .process = az_http_pipeline_policy_distributedtracing, .p_options = NULL },
@@ -62,12 +64,8 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
   // Copy url to client buffer so customer can re-use buffer on his/her side
   AZ_RETURN_IF_FAILED(az_span_copy(client->_internal.uri, uri, &client->_internal.uri));
 
-  AZ_RETURN_IF_FAILED(az_identity_access_token_init(&(client->_internal._token)));
-  AZ_RETURN_IF_FAILED(az_identity_access_token_context_init(
-      &(client->_internal._token_context),
-      credential,
-      &(client->_internal._token),
-      AZ_SPAN_FROM_STR("https://storage.azure.com/.default")));
+  AZ_RETURN_IF_FAILED(
+      _az_credential_set_scopes(cred, AZ_SPAN_FROM_STR("https://storage.azure.net/.default")));
 
   return AZ_OK;
 }

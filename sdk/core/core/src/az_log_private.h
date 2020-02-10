@@ -15,7 +15,7 @@ void _az_log_http_request(az_http_request * hrb);
 
 void _az_log_http_response(
     az_http_response * response,
-    uint64_t duration_msec,
+    int64_t duration_msec,
     az_http_request * hrb);
 
 #include <_az_cfg_suffix.h>

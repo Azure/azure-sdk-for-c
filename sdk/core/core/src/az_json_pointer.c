@@ -7,8 +7,8 @@
 #include <_az_cfg.h>
 
 AZ_NODISCARD static az_result az_span_reader_read_json_pointer_char(
-    az_span * const self,
-    uint32_t * const out) {
+    az_span * self,
+    uint32_t * out) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
   int32_t reader_current_length = az_span_length(*self);
 

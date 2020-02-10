@@ -31,7 +31,7 @@ az_span_slice(az_span span, int32_t low_index, int32_t high_index, az_span * out
 /**
  * ASCII lower case.
  */
-AZ_NODISCARD AZ_INLINE uint8_t az_ascii_lower(uint8_t const value) {
+AZ_NODISCARD AZ_INLINE uint8_t az_ascii_lower(uint8_t value) {
   return 'A' <= value && value <= 'Z' ? value + AZ_ASCII_LOWER_DIF : value;
 }
 
@@ -99,7 +99,7 @@ AZ_NODISCARD az_result az_span_copy(az_span dst, az_span src, az_span * out) {
   return AZ_OK;
 }
 
-AZ_NODISCARD AZ_INLINE bool should_encode(uint8_t const c) {
+AZ_NODISCARD AZ_INLINE bool should_encode(uint8_t c) {
   switch (c) {
     case '-':
     case '_':
@@ -149,11 +149,9 @@ AZ_NODISCARD az_result az_span_copy_url_encode(az_span dst, az_span src, az_span
   return AZ_OK;
 }
 
-AZ_NODISCARD AZ_INLINE int32_t _az_size_min(int32_t const a, int32_t const b) {
-  return a < b ? a : b;
-}
+AZ_NODISCARD AZ_INLINE int32_t _az_size_min(int32_t a, int32_t b) { return a < b ? a : b; }
 
-AZ_INLINE void _az_uint8_swap(uint8_t * const a, uint8_t * const b) {
+AZ_INLINE void _az_uint8_swap(uint8_t * a, uint8_t * b) {
   uint8_t const c = *a;
   *a = *b;
   *b = c;
@@ -171,7 +169,7 @@ AZ_INLINE void _az_uint8_swap(uint8_t * const a, uint8_t * const b) {
  * @param a source/destination span
  * @param b destination/source span
  */
-void az_span_swap(az_span const a, az_span const b) {
+void az_span_swap(az_span a, az_span b) {
   uint8_t * pa = az_span_ptr(a);
   uint8_t * pb = az_span_ptr(b);
   for (int32_t i = _az_size_min(az_span_length(a), az_span_length(b)); i > 0; ++pa, ++pb) {
@@ -213,7 +211,7 @@ AZ_NODISCARD az_result az_span_to_str(char * s, int32_t max_size, az_span span) 
  * @param span content to be appended
  * @return AZ_NODISCARD az_span_append
  */
-/* AZ_NODISCARD az_result az_span_append_(az_span * const self, az_span const span) {
+/* AZ_NODISCARD az_result az_span_append_(az_span * self, az_span span) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
   int32_t const current_size = az_span_length(*self);
@@ -243,7 +241,7 @@ AZ_NODISCARD az_result az_span_append(az_span self, az_span span, az_span * out)
  * @param size number of zeros to be appended
  * @return AZ_NODISCARD az_span_append_zeros
  */
-AZ_NODISCARD az_result az_span_append_zeros(az_span * const self, int32_t const size) {
+AZ_NODISCARD az_result az_span_append_zeros(az_span * self, int32_t size) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
   int32_t current_size = az_span_length(*self);
@@ -267,8 +265,7 @@ AZ_NODISCARD az_result az_span_append_zeros(az_span * const self, int32_t const 
  * @param span content to use for replacement
  * @return AZ_NODISCARD az_span_replace
  */
-AZ_NODISCARD az_result
-az_span_replace(az_span * const self, int32_t start, int32_t end, az_span const span) {
+AZ_NODISCARD az_result az_span_replace(az_span * self, int32_t start, int32_t end, az_span span) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
   int32_t const current_size = az_span_length(*self);
@@ -354,9 +351,9 @@ AZ_NODISCARD az_result az_span_append_double(az_span span, double value, az_span
   }
 }
 
-AZ_INLINE uint8_t _az_decimal_to_ascii(uint8_t const d) { return '0' + d; }
+AZ_INLINE uint8_t _az_decimal_to_ascii(uint8_t d) { return '0' + d; }
 
-static AZ_NODISCARD az_result _az_span_builder_append_uint64(az_span * self, uint64_t const n) {
+static AZ_NODISCARD az_result _az_span_builder_append_uint64(az_span * self, uint64_t n) {
   if (n == 0) {
     return az_span_append(*self, AZ_SPAN_FROM_STR("0"), self);
   }

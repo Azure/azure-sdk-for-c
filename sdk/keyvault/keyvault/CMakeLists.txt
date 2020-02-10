@@ -15,7 +15,7 @@ add_library (
 target_include_directories (az_keyvault PUBLIC inc)
 target_include_directories (az_keyvault PRIVATE src)
 
-target_link_libraries(az_keyvault PUBLIC az_core az_identity)
+target_link_libraries(az_keyvault PUBLIC az_core)
 target_link_libraries(az_keyvault PRIVATE az_core_internal)
 
 # make sure that users can consume the project as a library.

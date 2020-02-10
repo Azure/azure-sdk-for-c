@@ -28,14 +28,14 @@
 // Required to define az_http_policy for using it to create policy process definition
 typedef struct az_http_policy az_http_policy;
 
-typedef AZ_NODISCARD az_result (*az_http_policy_process)(
+typedef AZ_NODISCARD az_result (*az_http_policy_process_fn)(
     az_http_policy * p_policies,
     void * p_options,
     az_http_request * p_request,
     az_http_response * p_response);
 
 struct az_http_policy {
-  az_http_policy_process process;
+  az_http_policy_process_fn process;
   void * p_options;
 };
 

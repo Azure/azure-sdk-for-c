@@ -14,7 +14,7 @@ add_library (
 
 target_include_directories (az_storage_blobs PUBLIC inc)
 
-target_link_libraries(az_storage_blobs PUBLIC az_core az_identity az_core_internal)
+target_link_libraries(az_storage_blobs PUBLIC az_core az_core_internal)
 target_link_libraries(az_storage_blobs PRIVATE az_core_internal)
 
 # make sure that users can consume the project as a library.

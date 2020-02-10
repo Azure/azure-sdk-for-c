@@ -10,7 +10,7 @@
 
 #include <_az_cfg.h>
 
-AZ_NODISCARD AZ_INLINE az_result az_hex_to_digit(uint8_t const c, uint8_t * out) {
+AZ_NODISCARD AZ_INLINE az_result az_hex_to_digit(uint8_t c, uint8_t * out) {
   if (isdigit(c)) {
     *out = c - '0';
   } else if ('a' <= c && c <= 'f') {
@@ -23,7 +23,7 @@ AZ_NODISCARD AZ_INLINE az_result az_hex_to_digit(uint8_t const c, uint8_t * out)
   return AZ_OK;
 }
 
-AZ_NODISCARD AZ_INLINE az_result az_json_esc_decode(uint8_t const c, uint8_t * out) {
+AZ_NODISCARD AZ_INLINE az_result az_json_esc_decode(uint8_t c, uint8_t * out) {
   switch (c) {
     case '\\':
     case '"':
@@ -105,7 +105,7 @@ AZ_NODISCARD az_result az_span_reader_read_json_string_char(az_span * self, uint
       }
       uint8_t const c = az_span_ptr(*self)[0];
       AZ_RETURN_IF_FAILED(az_span_slice(*self, 1, -1, self));
-      
+
       if (c == 'u') {
         uint32_t r = 0;
         for (size_t i = 0; i < 4; ++i) {

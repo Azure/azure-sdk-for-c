@@ -38,8 +38,8 @@ az_result write_str(az_span span, az_span s, az_span * out) {
 az_result read_write_token(
     az_span * output,
     int32_t * o,
-    az_json_parser * const state,
-    az_json_token const token) {
+    az_json_parser * state,
+    az_json_token token) {
   switch (token.kind) {
     case AZ_JSON_TOKEN_NULL:
       return az_span_append(*output, AZ_SPAN_FROM_STR("null"), output);
@@ -98,7 +98,7 @@ az_result read_write_token(
   return AZ_ERROR_JSON_INVALID_STATE;
 }
 
-az_result read_write(az_span const input, az_span * output, int32_t * const o) {
+az_result read_write(az_span input, az_span * output, int32_t * o) {
   az_json_parser parser = { 0 };
   TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, input));
   az_json_token token;
@@ -362,7 +362,7 @@ int main() {
           "[[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ "
           "[[[[[ [[[[");
       az_result const result = read_write(json, &output, &o);
-      TEST_ASSERT(result == AZ_ERROR_JSON_STACK_OVERFLOW);
+      TEST_ASSERT(result == AZ_ERROR_JSON_NESTING_OVERFLOW);
     }
     {
       int32_t o = 0;
