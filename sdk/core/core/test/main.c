@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include <az_http.h>
+#include <az_http_internal.h>
 #include <az_json.h>
 
 #include <az_http_private.h>

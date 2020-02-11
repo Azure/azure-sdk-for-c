@@ -38,7 +38,7 @@ endif()
 
 target_include_directories (az_curl PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc> $<INSTALL_INTERFACE:include/az>)
 
-target_link_libraries(az_curl PUBLIC az_core)
+target_link_libraries(az_curl PUBLIC az_core az_core_internal)
 
 # make sure that users can consume the project as a library.
 add_library (az::curl ALIAS az_curl)

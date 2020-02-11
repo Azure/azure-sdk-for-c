@@ -13,8 +13,8 @@ add_library (
   src/az_credentials.c
   src/az_http_pipeline.c
   src/az_http_policy.c
-  src/az_http_request_builder.c
-  src/az_http_response_parser.c
+  src/az_http_request.c
+  src/az_http_response.c
   src/az_json_builder.c
   src/az_json_get.c
   src/az_json_parser.c

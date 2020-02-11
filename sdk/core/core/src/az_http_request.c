@@ -6,6 +6,7 @@
 
 #include <az_contract_internal.h>
 #include <az_http.h>
+#include <az_http_internal.h>
 
 #include <assert.h>
 

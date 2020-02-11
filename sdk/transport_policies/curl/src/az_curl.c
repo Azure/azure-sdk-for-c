@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include <az_curl.h>
+#include <az_http_internal.h>
 
 #include <az_span.h>
 #include <curl/curl.h>
@@ -230,7 +231,8 @@ az_curl_send_delete_request(CURL * p_curl, _az_http_request const * p_request) {
 /**
  * handles POST request. It handles seting up a body for request
  */
-AZ_NODISCARD az_result az_curl_send_post_request(CURL * p_curl, _az_http_request const * p_request) {
+AZ_NODISCARD az_result
+az_curl_send_post_request(CURL * p_curl, _az_http_request const * p_request) {
   AZ_CONTRACT_ARG_NOT_NULL(p_curl);
   AZ_CONTRACT_ARG_NOT_NULL(p_request);
 

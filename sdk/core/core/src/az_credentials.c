@@ -4,6 +4,7 @@
 #include "az_aad_private.h"
 #include <az_credentials.h>
 #include <az_http.h>
+#include <az_http_internal.h>
 
 #include <_az_cfg.h>
 
