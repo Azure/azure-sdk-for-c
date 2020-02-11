@@ -4,7 +4,7 @@
 #include "az_log_private.h"
 #include <az_credentials.h>
 #include <az_http.h>
-#include <az_http_pipeline_internal.h>
+#include <az_http_internal.h>
 #include <az_log.h>
 #include <az_log_internal.h>
 #include <az_pal_clock_internal.h>
@@ -15,25 +15,26 @@
 #include <_az_cfg.h>
 
 AZ_NODISCARD AZ_INLINE az_result az_http_pipeline_nextpolicy(
-    az_http_policy * p_policies,
-    az_http_request * p_request,
+    _az_http_policy * p_policies,
+    _az_http_request * p_request,
     az_http_response * p_response) {
   // Transport Policy is the last policy in the pipeline
   //  it returns without calling nextpolicy
-  if (p_policies[0].process == NULL) {
+  if (p_policies[0]._internal.process == NULL) {
     return AZ_ERROR_HTTP_PIPELINE_INVALID_POLICY;
   }
 
-  return p_policies[0].process(&(p_policies[1]), p_policies[0].p_options, p_request, p_response);
+  return p_policies[0]._internal.process(
+      &(p_policies[1]), p_policies[0]._internal.p_options, p_request, p_response);
 }
 
 static const az_span AZ_MS_CLIENT_REQUESTID = AZ_SPAN_LITERAL_FROM_STR("x-ms-client-request-id");
 static const az_span AZ_HTTP_HEADER_USER_AGENT = AZ_SPAN_LITERAL_FROM_STR("User-Agent");
 
 AZ_NODISCARD az_result az_http_pipeline_policy_apiversion(
-    az_http_policy * p_policies,
+    _az_http_policy * p_policies,
     void * p_options,
-    az_http_request * p_request,
+    _az_http_request * p_request,
     az_http_response * p_response) {
 
   _az_http_policy_apiversion_options * options = (_az_http_policy_apiversion_options *)(p_options);
@@ -50,9 +51,9 @@ AZ_NODISCARD az_result az_http_pipeline_policy_apiversion(
 }
 
 AZ_NODISCARD az_result az_http_pipeline_policy_uniquerequestid(
-    az_http_policy * p_policies,
+    _az_http_policy * p_policies,
     void * p_options,
-    az_http_request * p_request,
+    _az_http_request * p_request,
     az_http_response * p_response) {
   (void)p_options;
 
@@ -67,9 +68,9 @@ AZ_NODISCARD az_result az_http_pipeline_policy_uniquerequestid(
 }
 
 AZ_NODISCARD az_result az_http_pipeline_policy_telemetry(
-    az_http_policy * p_policies,
+    _az_http_policy * p_policies,
     void * p_options,
-    az_http_request * p_request,
+    _az_http_request * p_request,
     az_http_response * p_response) {
 
   _az_http_policy_telemetry_options * options = (_az_http_policy_telemetry_options *)(p_options);
@@ -81,9 +82,9 @@ AZ_NODISCARD az_result az_http_pipeline_policy_telemetry(
 }
 
 AZ_NODISCARD az_result az_http_pipeline_policy_retry(
-    az_http_policy * p_policies,
+    _az_http_policy * p_policies,
     void * p_options,
-    az_http_request * p_request,
+    _az_http_request * p_request,
     az_http_response * p_response) {
   (void)p_options;
 
@@ -94,23 +95,23 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
 }
 
 AZ_INLINE AZ_NODISCARD az_result
-_az_apply_credential(_az_credential_vtbl * credential, az_http_request * ref_request) {
+_az_apply_credential(_az_credential_vtbl * credential, _az_http_request * ref_request) {
   return (credential->_internal.apply_credential)(credential, ref_request);
 }
 
 AZ_NODISCARD az_result az_http_pipeline_policy_credential(
-    az_http_policy * policies,
+    _az_http_policy * policies,
     void * options,
-    az_http_request * ref_request,
+    _az_http_request * ref_request,
     az_http_response * out_response) {
   AZ_RETURN_IF_FAILED(_az_apply_credential((_az_credential_vtbl *)options, ref_request));
   return az_http_pipeline_nextpolicy(policies, ref_request, out_response);
 }
 
 AZ_NODISCARD az_result az_http_pipeline_policy_logging(
-    az_http_policy * p_policies,
+    _az_http_policy * p_policies,
     void * p_options,
-    az_http_request * p_request,
+    _az_http_request * p_request,
     az_http_response * p_response) {
   (void)p_options;
   if (az_log_should_write(AZ_LOG_HTTP_REQUEST)) {
@@ -132,9 +133,9 @@ AZ_NODISCARD az_result az_http_pipeline_policy_logging(
 }
 
 AZ_NODISCARD az_result az_http_pipeline_policy_bufferresponse(
-    az_http_policy * p_policies,
+    _az_http_policy * p_policies,
     void * p_options,
-    az_http_request * p_request,
+    _az_http_request * p_request,
     az_http_response * p_response) {
   (void)p_options;
 
@@ -144,9 +145,9 @@ AZ_NODISCARD az_result az_http_pipeline_policy_bufferresponse(
 }
 
 AZ_NODISCARD az_result az_http_pipeline_policy_distributedtracing(
-    az_http_policy * p_policies,
+    _az_http_policy * p_policies,
     void * p_options,
-    az_http_request * p_request,
+    _az_http_request * p_request,
     az_http_response * p_response) {
   (void)p_options;
 
@@ -155,9 +156,9 @@ AZ_NODISCARD az_result az_http_pipeline_policy_distributedtracing(
 }
 
 AZ_NODISCARD az_result az_http_pipeline_policy_transport(
-    az_http_policy * p_policies,
+    _az_http_policy * p_policies,
     void * p_options,
-    az_http_request * p_request,
+    _az_http_request * p_request,
     az_http_response * p_response) {
   (void)p_policies; // this is the last policy in the pipeline, we just void it
 

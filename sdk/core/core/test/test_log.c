@@ -56,7 +56,7 @@ void test_log() {
   // Set up test values etc.
   //  uint8_t hrb_buf[4 * 1024] = { 0 };
   uint8_t headers[4 * 1024] = { 0 };
-  az_http_request hrb = { 0 };
+  _az_http_request hrb = { 0 };
   TEST_EXPECT_SUCCESS(az_http_request_init(
       &hrb,
       az_http_method_get(),

@@ -29,7 +29,7 @@ AZ_NODISCARD az_result _az_aad_build_body(
     az_span client_secret,
     az_span * out_body);
 
-AZ_NODISCARD az_result _az_aad_request_token(az_http_request * request, _az_token * out_token);
+AZ_NODISCARD az_result _az_aad_request_token(_az_http_request * request, _az_token * out_token);
 
 AZ_NODISCARD bool _az_token_expired(_az_token const * token);
 AZ_NODISCARD _az_token _az_token_get(_az_token const * self);

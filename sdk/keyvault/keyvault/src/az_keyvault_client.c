@@ -1,8 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include <az_contract_internal.h>
 #include <az_credentials_internal.h>
-#include <az_http_pipeline_internal.h>
+#include <az_http_internal.h>
 #include <az_json.h>
 #include <az_keyvault.h>
 #include <az_span.h>
@@ -63,36 +64,28 @@ AZ_NODISCARD az_result az_keyvault_keys_client_init(
 
   _az_credential_vtbl * const cred = (_az_credential_vtbl *)credential;
 
-  *self
-      = (az_keyvault_keys_client){ ._internal
-                                   = { .uri = AZ_SPAN_FROM_BUFFER(self->_internal.url_buffer),
-                                       .options = *options,
-                                       .credential = cred,
-                                       .pipeline = (az_http_pipeline){
-                                           .p_policies = {
-                                               { .process = az_http_pipeline_policy_apiversion,
-                                                 .p_options
-                                                 = &self->_internal.options._internal.api_version },
-                                               { .process = az_http_pipeline_policy_uniquerequestid,
-                                                 .p_options = NULL },
-                                               { .process = az_http_pipeline_policy_telemetry,
-                                                 .p_options = &self->_internal.options._internal
-                                                                   ._telemetry_options },
-                                               { .process = az_http_pipeline_policy_retry,
-                                                 .p_options = &(self->_internal.options.retry) },
-                                               { .process = az_http_pipeline_policy_credential,
-                                                 .p_options = cred },
-                                               { .process = az_http_pipeline_policy_logging,
-                                                 .p_options = NULL },
-                                               { .process = az_http_pipeline_policy_bufferresponse,
-                                                 .p_options = NULL },
-                                               { .process
-                                                 = az_http_pipeline_policy_distributedtracing,
-                                                 .p_options = NULL },
-                                               { .process = az_http_pipeline_policy_transport,
-                                                 .p_options
-                                                 = &self->_internal.options._internal.http_client },
-                                           } } } };
+  *self = (az_keyvault_keys_client) { ._internal
+  = {
+    .uri = AZ_SPAN_FROM_BUFFER(self->_internal.url_buffer),
+    .options = *options,
+    .credential = cred,
+    .pipeline = 
+      (_az_http_pipeline){ ._internal = {
+        .p_policies = {
+          {._internal = {.process = az_http_pipeline_policy_apiversion, .p_options= &self->_internal.options._internal.api_version}},
+          {._internal = {.process = az_http_pipeline_policy_uniquerequestid, .p_options = NULL }},
+          {._internal = {.process = az_http_pipeline_policy_telemetry, .p_options = &self->_internal.options._internal._telemetry_options}},
+          {._internal = {.process = az_http_pipeline_policy_retry, .p_options = &self->_internal.options.retry}},
+          {._internal = {.process = az_http_pipeline_policy_credential, .p_options = cred}},
+          {._internal = {.process = az_http_pipeline_policy_logging, .p_options = NULL}},
+          {._internal = {.process = az_http_pipeline_policy_bufferresponse, .p_options = NULL}},
+          {._internal = {.process= az_http_pipeline_policy_distributedtracing, .p_options = NULL}},
+          {._internal = {.process = az_http_pipeline_policy_transport, .p_options= &self->_internal.options._internal.http_client}},
+        },
+      }
+    }
+   }
+  };
 
   // Copy url to client buffer so customer can re-use buffer on his/her side
   AZ_RETURN_IF_FAILED(az_span_copy(self->_internal.uri, uri, &self->_internal.uri));
@@ -202,7 +195,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
   az_span const created_body = json_builder;
 
   // create request
-  az_http_request hrb;
+  _az_http_request hrb;
   AZ_RETURN_IF_FAILED(az_http_request_init(
       &hrb, az_http_method_post(), request_url_span, request_headers_span, created_body));
 
@@ -248,7 +241,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
   AZ_RETURN_IF_FAILED(az_span_copy(request_url_span, client->_internal.uri, &request_url_span));
 
   // create request
-  az_http_request hrb;
+  _az_http_request hrb;
   AZ_RETURN_IF_FAILED(az_http_request_init(
       &hrb, az_http_method_get(), request_url_span, request_headers_span, az_span_null()));
 
@@ -282,7 +275,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_delete(
 
   // create request
   // TODO: define max URL size
-  az_http_request hrb;
+  _az_http_request hrb;
   AZ_RETURN_IF_FAILED(az_http_request_init(
       &hrb, az_http_method_get(), request_url_span, request_headers_span, az_span_null()));
 

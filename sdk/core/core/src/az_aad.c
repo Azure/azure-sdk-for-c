@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 #include "az_aad_private.h"
-#include <az_http_pipeline_internal.h>
+#include <az_http.h>
+#include <az_http_internal.h>
 #include <az_json.h>
 #include <az_pal_clock_internal.h>
 #include <az_time_internal.h>
@@ -81,7 +82,8 @@ AZ_NODISCARD az_result _az_aad_build_body(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result _az_aad_request_token(az_http_request * ref_request, _az_token * out_token) {
+AZ_NODISCARD az_result
+_az_aad_request_token(_az_http_request * ref_request, _az_token * out_token) {
   AZ_RETURN_IF_FAILED(az_http_request_append_header(
       ref_request,
       AZ_SPAN_FROM_STR("Content-Type"),
@@ -92,12 +94,13 @@ AZ_NODISCARD az_result _az_aad_request_token(az_http_request * ref_request, _az_
   AZ_RETURN_IF_FAILED(az_http_response_init(&response, AZ_SPAN_FROM_BUFFER(response_buf)));
 
   // Make a HTTP request to get token
-  az_http_pipeline pipeline = {
+  _az_http_pipeline pipeline = (_az_http_pipeline){ ._internal ={
       .p_policies = {
-        { .process = az_http_pipeline_policy_retry, .p_options = NULL },
-        { .process = az_http_pipeline_policy_logging, .p_options = NULL },
-        { .process = az_http_pipeline_policy_transport, .p_options = NULL },
+        {._internal = { .process = az_http_pipeline_policy_retry, .p_options = NULL }},
+        {._internal = { .process = az_http_pipeline_policy_logging, .p_options = NULL }},
+        {._internal = { .process = az_http_pipeline_policy_transport, .p_options = NULL }},
       },
+      }
     };
   AZ_RETURN_IF_FAILED(az_http_pipeline_process(&pipeline, ref_request, &response));
 

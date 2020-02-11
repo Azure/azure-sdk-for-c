@@ -25,82 +25,64 @@
 // PipelinePolicies must implement the process function
 //
 
-// Required to define az_http_policy for using it to create policy process definition
-typedef struct az_http_policy az_http_policy;
-
-typedef AZ_NODISCARD az_result (*az_http_policy_process_fn)(
-    az_http_policy * p_policies,
-    void * p_options,
-    az_http_request * p_request,
-    az_http_response * p_response);
-
-struct az_http_policy {
-  az_http_policy_process_fn process;
-  void * p_options;
-};
-
-typedef struct {
-  az_http_policy p_policies[10];
-} az_http_pipeline;
-
 // Start the pipeline
 AZ_NODISCARD az_result az_http_pipeline_process(
-    az_http_pipeline * pipeline,
-    az_http_request * p_request,
+    _az_http_pipeline * pipeline,
+    _az_http_request * p_request,
     az_http_response * p_response);
 
 AZ_NODISCARD az_result az_http_pipeline_policy_apiversion(
-    az_http_policy * p_policies,
+    _az_http_policy * p_policies,
     void * p_data,
-    az_http_request * p_request,
+    _az_http_request * p_request,
     az_http_response * p_response);
 
 AZ_NODISCARD az_result az_http_pipeline_policy_uniquerequestid(
-    az_http_policy * p_policies,
+    _az_http_policy * p_policies,
     void * p_data,
-    az_http_request * p_request,
+    _az_http_request * p_request,
     az_http_response * p_response);
 
 AZ_NODISCARD az_result az_http_pipeline_policy_telemetry(
-    az_http_policy * p_policies,
+    _az_http_policy * p_policies,
     void * p_options,
-    az_http_request * p_request,
+    _az_http_request * p_request,
     az_http_response * p_response);
 
 AZ_NODISCARD az_result az_http_pipeline_policy_retry(
-    az_http_policy * p_policies,
+    _az_http_policy * p_policies,
     void * p_data,
-    az_http_request * p_request,
+    _az_http_request * p_request,
     az_http_response * p_response);
 
 AZ_NODISCARD az_result az_http_pipeline_policy_credential(
-    az_http_policy * p_policies,
+    _az_http_policy * p_policies,
     void * p_data,
-    az_http_request * p_request,
+    _az_http_request * p_request,
     az_http_response * p_response);
 
 AZ_NODISCARD az_result az_http_pipeline_policy_logging(
-    az_http_policy * p_policies,
+    _az_http_policy * p_policies,
     void * p_data,
-    az_http_request * p_request,
+    _az_http_request * p_request,
     az_http_response * p_response);
 
 AZ_NODISCARD az_result az_http_pipeline_policy_bufferresponse(
-    az_http_policy * p_policies,
+    _az_http_policy * p_policies,
     void * p_data,
-    az_http_request * p_request,
+    _az_http_request * p_request,
     az_http_response * p_response);
 
 AZ_NODISCARD az_result az_http_pipeline_policy_distributedtracing(
-    az_http_policy * p_policies,
+    _az_http_policy * p_policies,
     void * p_data,
-    az_http_request * p_request,
+    _az_http_request * p_request,
     az_http_response * p_response);
 
 AZ_NODISCARD az_result az_http_pipeline_policy_transport(
-    az_http_policy * p_policies,
+    _az_http_policy * p_policies,
     void * p_data,
-    az_http_request * p_request,
+    _az_http_request * p_request,
     az_http_response * p_response);
 
 #include <_az_cfg_suffix.h>

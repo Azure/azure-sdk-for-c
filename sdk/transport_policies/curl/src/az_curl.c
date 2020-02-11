@@ -146,7 +146,7 @@ az_add_header_to_curl_list(az_pair header, struct curl_slist ** p_list, az_span 
  * @return az_result
  */
 AZ_NODISCARD az_result
-az_build_headers(az_http_request * p_request, struct curl_slist ** p_headers) {
+az_build_headers(_az_http_request * p_request, struct curl_slist ** p_headers) {
   AZ_CONTRACT_ARG_NOT_NULL(p_request);
 
   az_pair header;
@@ -215,7 +215,7 @@ AZ_NODISCARD az_result az_curl_send_get_request(CURL * p_curl) {
  * handles DELETE request
  */
 AZ_NODISCARD az_result
-az_curl_send_delete_request(CURL * p_curl, az_http_request const * p_request) {
+az_curl_send_delete_request(CURL * p_curl, _az_http_request const * p_request) {
   AZ_CONTRACT_ARG_NOT_NULL(p_curl);
   AZ_CONTRACT_ARG_NOT_NULL(p_request);
 
@@ -230,7 +230,7 @@ az_curl_send_delete_request(CURL * p_curl, az_http_request const * p_request) {
 /**
  * handles POST request. It handles seting up a body for request
  */
-AZ_NODISCARD az_result az_curl_send_post_request(CURL * p_curl, az_http_request const * p_request) {
+AZ_NODISCARD az_result az_curl_send_post_request(CURL * p_curl, _az_http_request const * p_request) {
   AZ_CONTRACT_ARG_NOT_NULL(p_curl);
   AZ_CONTRACT_ARG_NOT_NULL(p_request);
 
@@ -278,7 +278,7 @@ int32_t _az_curl_upload_read_callback(void * ptr, size_t size, size_t nmemb, voi
  * handles POST request. It handles seting up a body for request
  */
 AZ_NODISCARD az_result
-az_curl_send_upload_request(CURL * p_curl, az_http_request const * p_request) {
+az_curl_send_upload_request(CURL * p_curl, _az_http_request const * p_request) {
   AZ_CONTRACT_ARG_NOT_NULL(p_curl);
   AZ_CONTRACT_ARG_NOT_NULL(p_request);
 
@@ -329,7 +329,7 @@ az_curl_send_upload_request(CURL * p_curl, az_http_request const * p_request) {
  * @param p_request an http request builder
  * @return az_result
  */
-AZ_NODISCARD az_result setup_headers(CURL * p_curl, az_http_request * p_request) {
+AZ_NODISCARD az_result setup_headers(CURL * p_curl, _az_http_request * p_request) {
   AZ_CONTRACT_ARG_NOT_NULL(p_curl);
   AZ_CONTRACT_ARG_NOT_NULL(p_request);
 
@@ -355,7 +355,7 @@ AZ_NODISCARD az_result setup_headers(CURL * p_curl, az_http_request * p_request)
  * @param p_request an az http request builder holding all data to send request
  * @return az_result
  */
-AZ_NODISCARD az_result setup_url(CURL * p_curl, az_http_request const * p_request) {
+AZ_NODISCARD az_result setup_url(CURL * p_curl, _az_http_request const * p_request) {
   AZ_CONTRACT_ARG_NOT_NULL(p_curl);
   AZ_CONTRACT_ARG_NOT_NULL(p_request);
 
@@ -414,7 +414,7 @@ AZ_NODISCARD az_result setup_response_redirect(CURL * p_curl, az_span * response
  */
 AZ_NODISCARD az_result az_http_client_send_request_impl_process(
     CURL * p_curl,
-    az_http_request * p_request,
+    _az_http_request * p_request,
     az_http_response * response) {
   az_result result = AZ_ERROR_ARG;
 
@@ -452,7 +452,7 @@ AZ_NODISCARD az_result az_http_client_send_request_impl_process(
  * @return az_result
  */
 AZ_NODISCARD az_result
-az_http_client_curl(az_http_request * p_request, az_http_response * p_response) {
+az_http_client_curl(_az_http_request * p_request, az_http_response * p_response) {
   AZ_CONTRACT_ARG_NOT_NULL(p_request);
   AZ_CONTRACT_ARG_NOT_NULL(p_response);
 

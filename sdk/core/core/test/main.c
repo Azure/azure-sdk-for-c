@@ -421,7 +421,7 @@ int main() {
       az_span url_span = AZ_SPAN_FROM_BUFFER(buf);
       TEST_EXPECT_SUCCESS(az_span_append(url_span, hrb_url, &url_span));
       az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-      az_http_request hrb;
+      _az_http_request hrb;
 
       TEST_EXPECT_SUCCESS(
           az_http_request_init(&hrb, az_http_method_get(), url_span, header_span, az_span_null()));

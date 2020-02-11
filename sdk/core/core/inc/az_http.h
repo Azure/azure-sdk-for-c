@@ -15,6 +15,61 @@ enum {
   AZ_HTTP_URL_MAX_SIZE = 1024 * 2,
 };
 
+typedef az_span az_http_method;
+
+typedef struct {
+  struct {
+    az_http_method method;
+    az_span url;
+    int32_t query_start;
+    az_span headers;
+    int32_t max_headers;
+    int32_t retry_headers_start_byte_offset;
+    // int32_t headers_end;
+    az_span body;
+  } _internal;
+} _az_http_request;
+
+typedef enum {
+  AZ_HTTP_RESPONSE_KIND_STATUS_LINE = 0,
+  AZ_HTTP_RESPONSE_KIND_HEADER = 1,
+  AZ_HTTP_RESPONSE_KIND_BODY = 2,
+  AZ_HTTP_RESPONSE_KIND_EOF = 3,
+} az_http_response_kind;
+
+typedef struct {
+  struct {
+    az_span http_response;
+    struct {
+      az_span remaining; // the remaining un-parsed portion of the original http_response.
+      az_http_response_kind next_kind; // after parsing an element, this is set to the next kind of
+                                       // thing we will be parsing.
+    } parser;
+  } _internal;
+} az_http_response;
+
+// Required to define az_http_policy for using it to create policy process definition
+typedef struct _az_http_policy _az_http_policy;
+
+typedef AZ_NODISCARD az_result (*_az_http_policy_process_fn)(
+    _az_http_policy * p_policies,
+    void * p_options,
+    _az_http_request * p_request,
+    az_http_response * p_response);
+
+struct _az_http_policy {
+  struct {
+    _az_http_policy_process_fn process;
+    void * p_options;
+  } _internal;
+};
+
+typedef struct {
+  struct {
+    _az_http_policy p_policies[10];
+  } _internal;
+} _az_http_pipeline;
+
 typedef struct {
   // Services pass API versions in the header or in query parameters
   //   true: api version is passed via headers
@@ -58,21 +113,6 @@ AZ_NODISCARD AZ_INLINE az_http_policy_retry_options az_http_policy_retry_options
   };
 }
 
-typedef az_span az_http_method;
-
-typedef struct {
-  struct {
-    az_http_method method;
-    az_span url;
-    int32_t query_start;
-    az_span headers;
-    int32_t max_headers;
-    int32_t retry_headers_start_byte_offset;
-    // int32_t headers_end;
-    az_span body;
-  } _internal;
-} az_http_request;
-
 AZ_INLINE az_http_method az_http_method_get() { return AZ_SPAN_FROM_STR("GET"); }
 AZ_INLINE az_http_method az_http_method_head() { return AZ_SPAN_FROM_STR("HEAD"); }
 AZ_INLINE az_http_method az_http_method_post() { return AZ_SPAN_FROM_STR("POST"); }
@@ -98,7 +138,7 @@ AZ_INLINE az_http_method az_http_method_patch() { return AZ_SPAN_FROM_STR("PATCH
  *     - `max_url_size` is less than `initial_url.size`.
  */
 AZ_NODISCARD az_result az_http_request_init(
-    az_http_request * p_request,
+    _az_http_request * p_request,
     az_http_method method,
     az_span url,
     az_span headers_buffer,
@@ -114,7 +154,7 @@ AZ_NODISCARD az_result az_http_request_init(
  * @param path span to a path to be appended into url
  * @return AZ_NODISCARD az_http_request_builder_append_path
  */
-AZ_NODISCARD az_result az_http_request_append_path(az_http_request * p_request, az_span path);
+AZ_NODISCARD az_result az_http_request_append_path(_az_http_request * p_request, az_span path);
 
 /**
  * @brief Set query parameter.
@@ -134,7 +174,7 @@ AZ_NODISCARD az_result az_http_request_append_path(az_http_request * p_request, 
  *     - `name`'s or `value`'s buffer overlap resulting `url`'s buffer.
  */
 AZ_NODISCARD az_result
-az_http_request_set_query_parameter(az_http_request * p_request, az_span name, az_span value);
+az_http_request_set_query_parameter(_az_http_request * p_request, az_span name, az_span value);
 
 /**
  * @brief Add a new HTTP header for the request.
@@ -154,7 +194,7 @@ az_http_request_set_query_parameter(az_http_request * p_request, az_span name, a
  *     - `name`'s or `value`'s buffer overlap resulting `url`'s buffer.
  */
 AZ_NODISCARD az_result
-az_http_request_append_header(az_http_request * p_request, az_span key, az_span value);
+az_http_request_append_header(_az_http_request * p_request, az_span key, az_span value);
 
 /**
  * @brief Get the HTTP header by index.
@@ -170,25 +210,8 @@ az_http_request_append_header(az_http_request * p_request, az_span key, az_span 
  *     - `index` is out of range.
  */
 AZ_NODISCARD az_result
-az_http_request_get_header(az_http_request * p_request, int32_t index, az_pair * out_result);
+az_http_request_get_header(_az_http_request * p_request, int32_t index, az_pair * out_result);
 
-typedef enum {
-  AZ_HTTP_RESPONSE_KIND_STATUS_LINE = 0,
-  AZ_HTTP_RESPONSE_KIND_HEADER = 1,
-  AZ_HTTP_RESPONSE_KIND_BODY = 2,
-  AZ_HTTP_RESPONSE_KIND_EOF = 3,
-} az_http_response_kind;
-
-typedef struct {
-  struct {
-    az_span http_response;
-    struct {
-      az_span remaining; // the remaining un-parsed portion of the original http_response.
-      az_http_response_kind next_kind; // after parsing an element, this is set to the next kind of
-                                       // thing we will be parsing.
-    } parser;
-  } _internal;
-} az_http_response;
 ///////////////////////////////////////////////
 
 typedef enum {
@@ -338,7 +361,7 @@ AZ_NODISCARD AZ_INLINE az_result az_http_response_reset(az_http_response * self)
 }
 
 typedef AZ_NODISCARD az_result (
-    *az_http_client_fn)(az_http_request * p_request, az_http_response * p_response);
+    *az_http_client_fn)(_az_http_request * p_request, az_http_response * p_response);
 
 #include <_az_cfg_suffix.h>
 
