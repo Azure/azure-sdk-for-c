@@ -7,6 +7,8 @@
 #include <az_pal_clock_internal.h>
 #include <az_time_internal.h>
 
+#include <stddef.h>
+
 #include <_az_cfg.h>
 
 AZ_NODISCARD bool _az_token_expired(_az_token const * token) {
@@ -82,7 +84,7 @@ AZ_NODISCARD az_result _az_aad_build_body(
 }
 
 AZ_NODISCARD az_result _az_aad_request_token(
-    az_http_client_fn * http_client,
+    az_http_transport_options * http_transport_options,
     az_http_request * ref_request,
     _az_token * out_token) {
   // FIXME: If you uncomment the line below, we'll start getting HTTP 400 Bad Request instead of 200
@@ -102,7 +104,7 @@ AZ_NODISCARD az_result _az_aad_request_token(
       .p_policies = {
         { .process = az_http_pipeline_policy_retry, .p_options = NULL },
         { .process = az_http_pipeline_policy_logging, .p_options = NULL },
-        { .process = az_http_pipeline_policy_transport, .p_options = http_client },
+        { .process = az_http_pipeline_policy_transport, .p_options = http_transport_options },
       },
     };
   AZ_RETURN_IF_FAILED(az_http_pipeline_process(&pipeline, ref_request, &response));

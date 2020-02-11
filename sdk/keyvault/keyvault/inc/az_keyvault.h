@@ -28,7 +28,7 @@ typedef struct {
   struct {
     _az_http_policy_apiversion_options api_version;
     _az_http_policy_telemetry_options _telemetry_options;
-    az_http_client_fn http_client;
+    az_http_transport_options http_transport_options;
   } _internal;
 } az_keyvault_keys_client_options;
 
@@ -41,7 +41,7 @@ typedef struct {
  * overriding that specific option
  */
 AZ_NODISCARD az_keyvault_keys_client_options
-az_keyvault_keys_client_options_default(az_http_client_fn http_client);
+az_keyvault_keys_client_options_default(az_http_transport_options const * http_transport_options);
 
 typedef struct {
   struct {

@@ -7,6 +7,8 @@
 #include <az_json.h>
 #include <az_storage_blobs.h>
 
+#include <stddef.h>
+
 #include <_az_cfg.h>
 
 static az_span const AZ_STORAGE_BLOBS_BLOB_HEADER_X_MS_BLOB_TYPE
@@ -18,9 +20,9 @@ static az_span const AZ_HTTP_HEADER_CONTENT_LENGTH = AZ_SPAN_LITERAL_FROM_STR("C
 static az_span const AZ_HTTP_HEADER_CONTENT_TYPE = AZ_SPAN_LITERAL_FROM_STR("Content-Type");
 
 AZ_NODISCARD az_storage_blobs_blob_client_options
-az_storage_blobs_blob_client_options_default(az_http_client_fn http_client) {
+az_storage_blobs_blob_client_options_default(az_http_transport_options const * http_transport_options) {
   az_storage_blobs_blob_client_options options = {
-    ._internal = { .http_client = http_client,
+    ._internal = { .http_transport_options = *http_transport_options,
                    .api_version = az_http_policy_apiversion_options_default(),
                    ._telemetry_options = _az_http_policy_apiversion_options_default() },
     .retry = az_http_policy_retry_options_default(),
@@ -42,25 +44,56 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
   AZ_CONTRACT_ARG_NOT_NULL(options);
 
   _az_credential * const cred = (_az_credential *)credential;
-  cred->_internal.http_client = &client->_internal.options._internal.http_client;
+  cred->_internal.http_transport_options
+      = client->_internal.options._internal.http_transport_options;
 
-  *client = (az_storage_blobs_blob_client){ ._internal = {
-    .uri = AZ_SPAN_FROM_BUFFER(client->_internal.url_buffer),
-    .options = *options,
-    .credential = cred,
-    .pipeline = (az_http_pipeline){
+  *client = (az_storage_blobs_blob_client) {
+    ._internal = {
+      .uri = AZ_SPAN_FROM_BUFFER(client->_internal.url_buffer),
+      .options = *options,
+      .credential = cred,
+      .pipeline = (az_http_pipeline) {
         .p_policies = {
-            { .process = az_http_pipeline_policy_apiversion,.p_options = &client->_internal.options._internal.api_version },
-            { .process = az_http_pipeline_policy_uniquerequestid, .p_options = NULL },
-            { .process = az_http_pipeline_policy_telemetry, .p_options = &client->_internal.options._internal._telemetry_options },
-            { .process = az_http_pipeline_policy_retry, .p_options = &client->_internal.options.retry },
-            { .process = az_http_pipeline_policy_credential, .p_options = cred },
-            { .process = az_http_pipeline_policy_logging, .p_options = NULL },
-            { .process = az_http_pipeline_policy_bufferresponse, .p_options = NULL },
-            { .process = az_http_pipeline_policy_distributedtracing, .p_options = NULL },
-            { .process = az_http_pipeline_policy_transport, .p_options = &client->_internal.options._internal.http_client },
+          {
+            .process = az_http_pipeline_policy_apiversion,
+            .p_options = &client->_internal.options._internal.api_version,
+          },
+          {
+            .process = az_http_pipeline_policy_uniquerequestid,
+            .p_options = NULL,
+          },
+          {
+            .process = az_http_pipeline_policy_telemetry,
+            .p_options = &client->_internal.options._internal._telemetry_options,
+          },
+          {
+            .process = az_http_pipeline_policy_retry,
+            .p_options = &client->_internal.options.retry,
+          },
+          {
+            .process = az_http_pipeline_policy_credential,
+            .p_options = cred,
+          },
+          {
+            .process = az_http_pipeline_policy_logging,
+            .p_options = NULL,
+          },
+          {
+            .process = az_http_pipeline_policy_bufferresponse,
+            .p_options = NULL,
+          },
+          {
+            .process = az_http_pipeline_policy_distributedtracing,
+            .p_options = NULL,
+          },
+          {
+            .process = az_http_pipeline_policy_transport,
+            .p_options = &client->_internal.options._internal.http_transport_options,
+          },
         }, 
-    }}};
+      },
+    },
+  };
 
   // Copy url to client buffer so customer can re-use buffer on his/her side
   AZ_RETURN_IF_FAILED(az_span_copy(client->_internal.uri, uri, &client->_internal.uri));

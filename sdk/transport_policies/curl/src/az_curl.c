@@ -65,11 +65,6 @@ AZ_NODISCARD AZ_INLINE az_result _az_http_client_curl_done(CURL ** pp) {
   return AZ_OK;
 }
 
-static uint8_t zerobyte[] = { 0 };
-static az_span const AZ_SPAN_ZEROBYTE = AZ_SPAN_LITERAL_FROM_INITIALIZED_BUFFER(zerobyte);
-
-static az_span const AZ_HTTP_REQUEST_BUILDER_HEADER_SEPARATOR = AZ_SPAN_LITERAL_FROM_STR(": ");
-
 /**
  * @brief writes a header key and value to a buffer as a 0-terminated string and using a separator
  * span in between. Returns error as soon as any of the write operations fails
@@ -80,12 +75,12 @@ static az_span const AZ_HTTP_REQUEST_BUILDER_HEADER_SEPARATOR = AZ_SPAN_LITERAL_
  * @return az_result
  */
 static AZ_NODISCARD az_result
-_az_span_write_to_buffer(az_span writable_buffer, az_pair header, az_span separator) {
-
+_az_span_append_header_to_buffer(az_span writable_buffer, az_pair header, az_span separator) {
   AZ_RETURN_IF_FAILED(az_span_append(writable_buffer, header.key, &writable_buffer));
   AZ_RETURN_IF_FAILED(az_span_append(writable_buffer, separator, &writable_buffer));
   AZ_RETURN_IF_FAILED(az_span_append(writable_buffer, header.value, &writable_buffer));
-  AZ_RETURN_IF_FAILED(az_span_append(writable_buffer, AZ_SPAN_ZEROBYTE, &writable_buffer));
+  AZ_RETURN_IF_FAILED(az_span_append(writable_buffer, AZ_SPAN_FROM_STR("\0"), &writable_buffer));
+
   return AZ_OK;
 }
 
@@ -122,13 +117,14 @@ static AZ_NODISCARD az_result _az_http_client_curl_add_header_to_curl_list(
   az_span writable_buffer;
   {
     size_t const buffer_size = (size_t)az_span_length(header.key)
-        + (size_t)az_span_length(separator) + (size_t)az_span_length(header.value) + 1;
+        + (size_t)az_span_length(separator) + (size_t)az_span_length(header.value)
+        + (size_t)az_span_length(AZ_SPAN_FROM_STR("\0"));
 
     AZ_RETURN_IF_FAILED(_az_span_malloc(buffer_size, &writable_buffer));
   }
 
   // write buffer
-  az_result result = _az_span_write_to_buffer(writable_buffer, header, separator);
+  az_result result = _az_span_append_header_to_buffer(writable_buffer, header, separator);
 
   // attach header only when write was OK
   if (az_succeeded(result)) {
@@ -148,9 +144,8 @@ static AZ_NODISCARD az_result _az_http_client_curl_add_header_to_curl_list(
  * @param p_headers list of headers in curl specific list
  * @return az_result
  */
-static AZ_NODISCARD az_result _az_http_client_curl_build_headers(
-    az_http_request * p_request,
-    struct curl_slist ** p_headers) {
+static AZ_NODISCARD az_result
+_az_http_client_curl_build_headers(az_http_request * p_request, struct curl_slist ** p_headers) {
   AZ_CONTRACT_ARG_NOT_NULL(p_request);
 
   az_pair header;
@@ -158,8 +153,8 @@ static AZ_NODISCARD az_result _az_http_client_curl_build_headers(
        offset < (int32_t)(az_span_length(p_request->_internal.headers) / sizeof(az_pair));
        ++offset) {
     AZ_RETURN_IF_FAILED(az_http_request_get_header(p_request, offset, &header));
-    AZ_RETURN_IF_FAILED(_az_http_client_curl_add_header_to_curl_list(
-        header, p_headers, AZ_HTTP_REQUEST_BUILDER_HEADER_SEPARATOR));
+    AZ_RETURN_IF_FAILED(
+        _az_http_client_curl_add_header_to_curl_list(header, p_headers, AZ_SPAN_FROM_STR(": ")));
   }
 
   return AZ_OK;
@@ -174,10 +169,11 @@ static AZ_NODISCARD az_result _az_http_client_curl_build_headers(
  * @return az_result
  */
 static AZ_NODISCARD az_result
-_az_http_client_curl_write_url(az_span writable_buffer, az_span url_from_request) {
+_az_http_client_curl_append_url(az_span writable_buffer, az_span url_from_request) {
 
   AZ_RETURN_IF_FAILED(az_span_append(writable_buffer, url_from_request, &writable_buffer));
-  AZ_RETURN_IF_FAILED(az_span_append(writable_buffer, AZ_SPAN_ZEROBYTE, &writable_buffer));
+  AZ_RETURN_IF_FAILED(az_span_append(writable_buffer, AZ_SPAN_FROM_STR("\0"), &writable_buffer));
+
   return AZ_OK;
 }
 
@@ -246,8 +242,9 @@ _az_http_client_curl_send_post_request(CURL * p_curl, az_http_request const * p_
 
   // Method
   az_span body = { 0 };
-  int32_t required_length
-      = az_span_length(p_request->_internal.body) + az_span_length(AZ_SPAN_ZEROBYTE);
+  int32_t const required_length
+      = az_span_length(p_request->_internal.body) + az_span_length(AZ_SPAN_FROM_STR("\0"));
+
   AZ_RETURN_IF_FAILED(_az_span_malloc(required_length, &body));
 
   char * b = (char *)az_span_ptr(body);
@@ -298,8 +295,9 @@ _az_http_client_curl_send_upload_request(CURL * p_curl, az_http_request const * 
 
   // Method
   az_span body = { 0 };
-  int32_t required_size
-      = az_span_length(p_request->_internal.body) + az_span_length(AZ_SPAN_ZEROBYTE);
+  int32_t const required_size
+      = az_span_length(p_request->_internal.body) + az_span_length(AZ_SPAN_FROM_STR("\0"));
+
   AZ_RETURN_IF_FAILED(_az_span_malloc(required_size, &body));
 
   char * b = (char *)az_span_ptr(body);
@@ -379,14 +377,15 @@ _az_http_client_curl_setup_url(CURL * p_curl, az_http_request const * p_request)
   az_span writable_buffer;
   {
     // set URL as 0-terminated str
-    size_t const extra_space_for_zero = az_span_length(AZ_SPAN_ZEROBYTE);
-    size_t const url_final_size = az_span_length(p_request->_internal.url) + extra_space_for_zero;
+    size_t const url_final_size
+        = az_span_length(p_request->_internal.url) + az_span_length(AZ_SPAN_FROM_STR("\0"));
+
     // allocate buffer to add \0
     AZ_RETURN_IF_FAILED(_az_span_malloc(url_final_size, &writable_buffer));
   }
 
   // write url in buffer (will add \0 at the end)
-  az_result result = _az_http_client_curl_write_url(writable_buffer, p_request->_internal.url);
+  az_result result = _az_http_client_curl_append_url(writable_buffer, p_request->_internal.url);
 
   if (az_succeeded(result)) {
     char * buffer = (char *)az_span_ptr(writable_buffer);
@@ -462,7 +461,9 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
   // make sure to set the end of the body response as the end of the complete response
   if (az_succeeded(result)) {
     AZ_RETURN_IF_FAILED(az_span_append(
-        response->_internal.http_response, AZ_SPAN_ZEROBYTE, &response->_internal.http_response));
+        response->_internal.http_response,
+        AZ_SPAN_FROM_STR("\0"),
+        &response->_internal.http_response));
   }
   return AZ_OK;
 }
@@ -474,8 +475,8 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
  * @param p_response pre-allocated buffer where http response will be written
  * @return az_result
  */
-AZ_NODISCARD az_result
-az_http_client_curl(az_http_request * p_request, az_http_response * p_response) {
+static AZ_NODISCARD az_result
+_az_http_client_curl_send_request(az_http_request * p_request, az_http_response * p_response) {
   AZ_CONTRACT_ARG_NOT_NULL(p_request);
   AZ_CONTRACT_ARG_NOT_NULL(p_response);
 
@@ -492,4 +493,14 @@ az_http_client_curl(az_http_request * p_request, az_http_response * p_response) 
   AZ_RETURN_IF_FAILED(_az_http_client_curl_done(&p_curl));
 
   return process_result;
+}
+
+AZ_NODISCARD az_result az_http_transport_options_init(az_http_transport_options * out_options) {
+  *out_options = (az_http_transport_options) {
+    ._internal = {
+      .send_request = _az_http_client_curl_send_request,
+    },
+  };
+
+  return AZ_OK;
 }

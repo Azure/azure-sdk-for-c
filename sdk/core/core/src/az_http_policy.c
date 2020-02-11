@@ -161,6 +161,8 @@ AZ_NODISCARD az_result az_http_pipeline_policy_transport(
     az_http_response * p_response) {
   (void)p_policies; // this is the last policy in the pipeline, we just void it
 
-  az_http_client_fn client = *(az_http_client_fn *)p_options;
-  return client(p_request, p_response);
+  az_http_client_send_request_fn const send_request
+      = ((az_http_transport_options const *)p_options)->_internal.send_request;
+
+  return send_request(p_request, p_response);
 }

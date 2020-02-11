@@ -30,7 +30,7 @@ AZ_NODISCARD az_result _az_aad_build_body(
     az_span * out_body);
 
 AZ_NODISCARD az_result _az_aad_request_token(
-    az_http_client_fn * http_client,
+    az_http_transport_options * http_transport_options,
     az_http_request * request,
     _az_token * out_token);
 
