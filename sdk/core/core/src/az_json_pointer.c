@@ -30,7 +30,7 @@ AZ_NODISCARD static az_result az_span_reader_read_json_pointer_char(
         return AZ_ERROR_EOF;
       }
       // get char
-      uint8_t const e = self->_internal.ptr[0];
+      uint8_t const e = az_span_ptr(*self)[0];
       // move to next position again
       AZ_RETURN_IF_FAILED(az_span_slice(*self, 1, -1, self));
       switch (e) {

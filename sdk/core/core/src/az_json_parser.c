@@ -21,6 +21,11 @@ typedef enum {
   AZ_JSON_STACK_ARRAY = 1,
 } az_json_stack_item;
 
+/**
+ * @brief check if input @p c is a white space. Utility function that help discarding empty spaces
+ * from tokens
+ *
+ */
 AZ_NODISCARD AZ_INLINE bool az_json_is_white_space(uint8_t c) {
   switch (c) {
     case ' ':
@@ -32,6 +37,11 @@ AZ_NODISCARD AZ_INLINE bool az_json_is_white_space(uint8_t c) {
   return false;
 }
 
+/**
+ * @brief check if @p c is either an 'e' or an 'E'. This is a helper function to handle exponential
+ * numbers like 10e10
+ *
+ */
 AZ_NODISCARD AZ_INLINE bool az_json_is_e(uint8_t c) {
   switch (c) {
     case 'e':
@@ -260,7 +270,7 @@ AZ_NODISCARD static az_result az_json_parser_get_value(
     az_json_token * out_token) {
   az_span * p_reader = &self->_internal.reader;
 
-  if (az_span_length(*p_reader) <= 0) {
+  if (az_span_length(*p_reader) == 0) {
     return AZ_ERROR_EOF;
   }
 
@@ -321,7 +331,7 @@ az_json_parser_parse_token(az_json_parser * self, az_json_token * out_token) {
   az_span * p_reader = &self->_internal.reader;
   AZ_RETURN_IF_FAILED(az_span_reader_skip_json_white_space(p_reader));
   AZ_RETURN_IF_FAILED(az_json_parser_get_value_space(self, out_token));
-  bool const is_empty = az_span_length(*p_reader) <= 0; // everything was read
+  bool const is_empty = az_span_length(*p_reader) == 0; // everything was read
   switch (out_token->kind) {
     case AZ_JSON_TOKEN_ARRAY:
     case AZ_JSON_TOKEN_OBJECT:

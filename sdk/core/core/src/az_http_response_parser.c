@@ -179,7 +179,7 @@ AZ_NODISCARD az_result az_http_response_get_next_header(az_http_response * self,
     int32_t offset = 0;
     int32_t offset_value_end = offset;
     while (true) {
-      uint8_t c = reader->_internal.ptr[offset];
+      uint8_t c = az_span_ptr(*reader)[offset];
       offset += 1;
       if (c == '\r') {
         break; // break as soon as end of value char is found
