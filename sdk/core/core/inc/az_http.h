@@ -260,7 +260,13 @@ AZ_NODISCARD AZ_INLINE az_result az_http_response_reset(az_http_response * self)
 }
 
 typedef AZ_NODISCARD az_result (
-    *az_http_client_fn)(_az_http_request * p_request, az_http_response * p_response);
+    *az_http_client_send_request_fn)(_az_http_request * p_request, az_http_response * p_response);
+
+typedef struct {
+  struct {
+    az_http_client_send_request_fn send_request;
+  } _internal;
+} az_http_transport_options;
 
 #include <_az_cfg_suffix.h>
 

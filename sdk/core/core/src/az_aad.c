@@ -8,6 +8,8 @@
 #include <az_pal_clock_internal.h>
 #include <az_time_internal.h>
 
+#include <stddef.h>
+
 #include <_az_cfg.h>
 
 AZ_NODISCARD bool _az_token_expired(_az_token const * token) {
@@ -82,12 +84,17 @@ AZ_NODISCARD az_result _az_aad_build_body(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result
-_az_aad_request_token(_az_http_request * ref_request, _az_token * out_token) {
-  AZ_RETURN_IF_FAILED(az_http_request_append_header(
+AZ_NODISCARD az_result _az_aad_request_token(
+    az_http_transport_options * http_transport_options,
+    _az_http_request * ref_request,
+    _az_token * out_token) {
+  // FIXME: If you uncomment the line below, we'll start getting HTTP 400 Bad Request instead of 200
+  // OK. I suspect, it is because there's a bug in the code that adds headers. Could be something
+  // else, of course.
+  /*AZ_RETURN_IF_FAILED(az_http_request_append_header(
       ref_request,
       AZ_SPAN_FROM_STR("Content-Type"),
-      AZ_SPAN_FROM_STR("application/x-www-url-form-urlencoded")));
+      AZ_SPAN_FROM_STR("application/x-www-url-form-urlencoded")));*/
 
   uint8_t response_buf[_az_AAD_RESPONSE_BUF_SIZE] = { 0 };
   az_http_response response = { 0 };
@@ -98,7 +105,7 @@ _az_aad_request_token(_az_http_request * ref_request, _az_token * out_token) {
       .p_policies = {
         {._internal = { .process = az_http_pipeline_policy_retry, .p_options = NULL }},
         {._internal = { .process = az_http_pipeline_policy_logging, .p_options = NULL }},
-        {._internal = { .process = az_http_pipeline_policy_transport, .p_options = NULL }},
+        {._internal = { .process = az_http_pipeline_policy_transport, .p_options = http_transport_options }},
       },
       }
     };
