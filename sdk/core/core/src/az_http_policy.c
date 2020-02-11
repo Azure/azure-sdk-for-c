@@ -94,7 +94,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
 }
 
 AZ_INLINE AZ_NODISCARD az_result
-_az_apply_credential(_az_credential_vtbl * credential, az_http_request * ref_request) {
+_az_apply_credential(_az_credential * credential, az_http_request * ref_request) {
   return (credential->_internal.apply_credential)(credential, ref_request);
 }
 
@@ -103,7 +103,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_credential(
     void * options,
     az_http_request * ref_request,
     az_http_response * out_response) {
-  AZ_RETURN_IF_FAILED(_az_apply_credential((_az_credential_vtbl *)options, ref_request));
+  AZ_RETURN_IF_FAILED(_az_apply_credential((_az_credential *)options, ref_request));
   return az_http_pipeline_nextpolicy(policies, ref_request, out_response);
 }
 
@@ -161,6 +161,8 @@ AZ_NODISCARD az_result az_http_pipeline_policy_transport(
     az_http_response * p_response) {
   (void)p_policies; // this is the last policy in the pipeline, we just void it
 
-  az_http_client_fn client = *(az_http_client_fn *)p_options;
-  return client(p_request, p_response);
+  az_http_client_send_request_fn const send_request
+      = ((az_http_transport_options const *)p_options)->_internal.send_request;
+
+  return send_request(p_request, p_response);
 }
