@@ -27,7 +27,7 @@ AZ_NODISCARD az_result az_json_builder_write_span(az_json_builder * self, az_spa
   AZ_RETURN_IF_FAILED(az_span_append(*json, AZ_SPAN_FROM_STR("\""), json));
 
   for (int32_t i = 0; i < az_span_length(value); ++i) {
-    az_result_byte const c = az_span_ptr(value)[i];
+    uint8_t const c = az_span_ptr(value)[i];
 
     // check if the character has to be escaped.
     {
@@ -38,7 +38,7 @@ AZ_NODISCARD az_result az_json_builder_write_span(az_json_builder * self, az_spa
       }
     }
     // check if the character has to be escaped as a UNICODE escape sequence.
-    if (0 <= c && c < 0x20) {
+    if (c < 0x20) {
       uint8_t array[6] = {
         '\\',
         'u',

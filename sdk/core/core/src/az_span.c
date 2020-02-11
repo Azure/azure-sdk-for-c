@@ -31,7 +31,7 @@ az_span_slice(az_span span, int32_t low_index, int32_t high_index, az_span * out
 /**
  * ASCII lower case.
  */
-AZ_NODISCARD AZ_INLINE az_result_byte az_ascii_lower(az_result_byte value) {
+AZ_NODISCARD AZ_INLINE uint8_t az_ascii_lower(uint8_t value) {
   return 'A' <= value && value <= 'Z' ? value + AZ_ASCII_LOWER_DIF : value;
 }
 
@@ -41,7 +41,7 @@ AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span a, az_span b) {
     return false;
   }
   for (int32_t i = 0; i < size; ++i) {
-    if (az_ascii_lower(az_span_get(a, i)) != az_ascii_lower(az_span_get(b, i))) {
+    if (az_ascii_lower(az_span_ptr(a)[i]) != az_ascii_lower(az_span_ptr(b)[i])) {
       return false;
     }
   }
@@ -49,27 +49,26 @@ AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span a, az_span b) {
 }
 
 AZ_NODISCARD az_result az_span_to_uint64(az_span self, uint64_t * out) {
-  if (az_span_length(self) <= 0) {
+  int32_t self_length = az_span_length(self);
+  if (self_length <= 0) {
     return AZ_ERROR_EOF;
   }
+
   uint64_t value = 0;
-  int32_t i = 0;
-  while (true) {
-    az_result_byte const result = az_span_get(self, i);
-    if (result == AZ_ERROR_EOF) {
-      *out = value;
-      return AZ_OK;
-    }
+  for (int32_t i = 0; i < self_length; i++) {
+    uint8_t result = az_span_ptr(self)[i];
     if (!isdigit(result)) {
-      return az_error_unexpected_char(result);
+      return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
     }
     uint64_t const d = (uint64_t)result - '0';
     if ((UINT64_MAX - d) / 10 < value) {
       return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
     }
     value = value * 10 + d;
-    i += 1;
   }
+
+  *out = value;
+  return AZ_OK;
 }
 
 /****************** Mutating az_span (used to be az_span in the origins)     ******/
@@ -392,6 +391,27 @@ AZ_NODISCARD az_result az_span_append_int64(az_span * self, int64_t n) {
   return _az_span_builder_append_uint64(self, n);
 }
 
+AZ_NODISCARD az_result _az_is_expected_span(az_span * self, az_span expected) {
+  az_span actual_span = { 0 };
+
+  int32_t expected_length = az_span_length(expected);
+
+  // EOF because self is smaller than the expected span
+  if (expected_length > az_span_length(*self)) {
+    return AZ_ERROR_EOF;
+  }
+
+  AZ_RETURN_IF_FAILED(az_span_slice(*self, 0, expected_length, &actual_span));
+
+  if (!az_span_is_equal(actual_span, expected)) {
+    return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
+  }
+  // move reader after the expected span (means it was parsed as expected)
+  AZ_RETURN_IF_FAILED(az_span_slice(*self, expected_length, -1, self));
+
+  return AZ_OK;
+}
+
 // PRIVATE. read until condition is true on character.
 // Then return number of positions read with output parameter
 AZ_NODISCARD az_result _az_scan_until(az_span self, _az_predicate predicate, int32_t * out_index) {
@@ -407,9 +427,7 @@ AZ_NODISCARD az_result _az_scan_until(az_span self, _az_predicate predicate, int
       case AZ_CONTINUE: {
         break;
       }
-      default: {
-        return predicate_result;
-      }
+      default: { return predicate_result; }
     }
   }
   return AZ_ERROR_ITEM_NOT_FOUND;
