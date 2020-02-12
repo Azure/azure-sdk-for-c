@@ -305,7 +305,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_delete(
   // TODO: define max URL size
   az_http_request hrb;
   AZ_RETURN_IF_FAILED(az_http_request_init(
-      &hrb, az_http_method_get(), request_url_span, request_headers_span, az_span_null()));
+      &hrb, az_http_method_delete(), request_url_span, request_headers_span, az_span_null()));
 
   // Add path to request
   AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, az_keyvault_client_constant_for_keys()));
