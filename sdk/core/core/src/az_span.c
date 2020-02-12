@@ -197,7 +197,7 @@ AZ_NODISCARD az_result az_span_to_str(char * s, int32_t max_size, az_span span) 
 
   memmove((void *)s, (void const *)az_span_ptr(span), span_length);
 
-  s[span_length] = '\0';
+  s[span_length] = 0;
 
   return AZ_OK;
 }
