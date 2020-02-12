@@ -6,6 +6,7 @@
 #include <az_http_pipeline_internal.h>
 #include <az_json.h>
 #include <az_storage_blobs.h>
+#include <az_config_internal.h>
 
 #include <_az_cfg.h>
 
@@ -86,15 +87,14 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
 
   // Request buffer
   // create request buffer TODO: define size for a blob upload
-  uint8_t url_buffer[AZ_HTTP_URL_MAX_SIZE];
+  uint8_t url_buffer[AZ_HTTP_REQUEST_URL_BUF_SIZE];
   az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
   // copy url from client
   AZ_RETURN_IF_FAILED(az_span_copy(request_url_span, client->_internal.uri, &request_url_span));
-  uint8_t headers_buffer[4 * sizeof(az_pair)];
+  uint8_t headers_buffer[AZ_HTTP_REQUEST_HEADER_BUF_SIZE];
   az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
 
   // create request
-  // TODO: define max URL size
   az_http_request hrb;
   AZ_RETURN_IF_FAILED(az_http_request_init(
       &hrb, az_http_method_get(), request_url_span, request_headers_span, content));
@@ -104,7 +104,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
       &hrb, AZ_STORAGE_BLOBS_BLOB_HEADER_X_MS_BLOB_TYPE, AZ_STORAGE_BLOBS_BLOB_TYPE_BLOCKBLOB));
 
   //
-  uint8_t content_length[_az_INT64_AS_STR_MAX_SIZE] = { 0 };
+  uint8_t content_length[_az_INT64_AS_STR_BUF_SIZE] = { 0 };
   az_span content_length_builder = AZ_SPAN_FROM_BUFFER(content_length);
   AZ_RETURN_IF_FAILED(az_span_append_int64(&content_length_builder, az_span_length(content)));
 

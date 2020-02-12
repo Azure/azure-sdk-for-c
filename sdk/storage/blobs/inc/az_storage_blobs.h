@@ -4,6 +4,7 @@
 #ifndef _az_STORAGE_BLOBS_H
 #define _az_STORAGE_BLOBS_H
 
+#include <az_config.h>
 #include <az_contract_internal.h>
 #include <az_credentials.h>
 #include <az_http.h>
@@ -30,7 +31,7 @@ az_storage_blobs_blob_client_options_default(az_http_client_fn http_client);
 typedef struct {
   struct {
     // buffer to copy customer url. Then it stays immutable
-    uint8_t url_buffer[AZ_HTTP_URL_MAX_SIZE];
+    uint8_t url_buffer[AZ_HTTP_REQUEST_URL_BUF_SIZE];
     // this url will point to url_buffer
     az_span uri;
     az_http_pipeline pipeline;

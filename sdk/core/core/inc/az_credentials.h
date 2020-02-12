@@ -7,15 +7,18 @@
 #include <az_http.h>
 #include <az_result.h>
 #include <az_span.h>
-#include <az_constants_internal.h>
 
 #include <stdint.h>
 
 #include <_az_cfg_prefix.h>
 
+enum {
+  _az_TOKEN_BUF_SIZE = 2 * 1024,
+};
+
 typedef struct {
   struct {
-    uint8_t token[_az_TOKEN_MAX_LENGTH]; // Base64-encoded token
+    uint8_t token[_az_TOKEN_BUF_SIZE]; // Base64-encoded token
     int16_t token_length;
     int64_t expires_at_msec;
   } _internal;

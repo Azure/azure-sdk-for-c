@@ -5,6 +5,7 @@
 #include <az_http_pipeline_internal.h>
 #include <az_json.h>
 #include <az_pal_clock_internal.h>
+#include <az_config_internal.h>
 
 #include <_az_cfg.h>
 

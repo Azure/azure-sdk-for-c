@@ -183,17 +183,17 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
     az_http_response * response) {
 
   // Url buffer
-  uint8_t url_buffer[AZ_HTTP_URL_MAX_SIZE];
+  uint8_t url_buffer[AZ_HTTP_REQUEST_URL_BUF_SIZE];
   az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
   // copy url from client
   AZ_RETURN_IF_FAILED(az_span_copy(request_url_span, client->_internal.uri, &request_url_span));
 
   // Headers buffer
-  uint8_t headers_buffer[4 * sizeof(az_pair)];
+  uint8_t headers_buffer[AZ_HTTP_REQUEST_HEADER_BUF_SIZE];
   az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
 
   // Allocate buffer in stack to hold body request
-  uint8_t body_buffer[AZ_HTTP_MAX_BODY_SIZE];
+  uint8_t body_buffer[AZ_HTTP_REQUEST_BODY_BUF_SIZE];
   az_span json_builder = AZ_SPAN_FROM_BUFFER(body_buffer);
   AZ_RETURN_IF_FAILED(
       _az_keyvault_keys_key_create_build_json_body(json_web_key_type, options, &json_builder));
@@ -237,10 +237,10 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
     az_http_response * response) {
   // create request buffer TODO: define size for a getKey Request
 
-  uint8_t headers_buffer[4 * sizeof(az_pair)];
+  uint8_t headers_buffer[AZ_HTTP_REQUEST_HEADER_BUF_SIZE];
   az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
   // Url buffer
-  uint8_t url_buffer[AZ_HTTP_URL_MAX_SIZE];
+  uint8_t url_buffer[AZ_HTTP_REQUEST_URL_BUF_SIZE];
   az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
   // copy url from client
   AZ_RETURN_IF_FAILED(az_span_copy(request_url_span, client->_internal.uri, &request_url_span));
@@ -271,11 +271,11 @@ AZ_NODISCARD az_result az_keyvault_keys_key_delete(
     az_http_response * response) {
 
   // Url buffer
-  uint8_t url_buffer[AZ_HTTP_URL_MAX_SIZE];
+  uint8_t url_buffer[AZ_HTTP_REQUEST_URL_BUF_SIZE];
   az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
   // copy url from client
   AZ_RETURN_IF_FAILED(az_span_copy(request_url_span, client->_internal.uri, &request_url_span));
-  uint8_t headers_buffer[4 * sizeof(az_pair)];
+  uint8_t headers_buffer[AZ_HTTP_REQUEST_HEADER_BUF_SIZE];
   az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
 
   // create request

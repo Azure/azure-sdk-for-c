@@ -4,20 +4,19 @@
 #ifndef _az_CONFIG_H
 #define _az_CONFIG_H
 
-#include <az_http.h>
-#include <az_result.h>
 #include <az_span.h>
-
-#include <stdint.h>
 
 #include <_az_cfg_prefix.h>
 
 /*
-* 
-*/
-enum { 
-    AZ_HTTP_URL_MAX_SIZE = 1024 * 2, 
-    AZ_HTTP_MAX_BODY_SIZE = 1024 
+ *
+ */
+enum {
+  AZ_HTTP_REQUEST_URL_BUF_SIZE = 2* 1024,
+  AZ_HTTP_REQUEST_BODY_BUF_SIZE = 1024,
+  AZ_HTTP_REQUEST_HEADER_COUNT = 10,
+  AZ_HTTP_REQUEST_HEADER_BUF_SIZE = AZ_HTTP_REQUEST_HEADER_COUNT * sizeof(az_pair),
+  AZ_HTTP_RESPONSE_BUF_SIZE = 3 * 1024
 };
 
 #include <_az_cfg_suffix.h>
