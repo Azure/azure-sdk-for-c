@@ -7,7 +7,7 @@
 #include <az_json.h>
 #include <az_keyvault.h>
 
-#include <math.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #include <_az_cfg.h>

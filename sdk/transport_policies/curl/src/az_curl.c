@@ -377,8 +377,8 @@ _az_http_client_curl_setup_url(CURL * p_curl, az_http_request const * p_request)
   az_span writable_buffer;
   {
     // set URL as 0-terminated str
-    size_t const url_final_size
-        = az_span_length(p_request->_internal.url) + az_span_length(AZ_SPAN_FROM_STR("\0"));
+    size_t const url_final_size = (size_t)az_span_length(p_request->_internal.url)
+        + (size_t)az_span_length(AZ_SPAN_FROM_STR("\0"));
 
     // allocate buffer to add \0
     AZ_RETURN_IF_FAILED(_az_span_malloc(url_final_size, &writable_buffer));

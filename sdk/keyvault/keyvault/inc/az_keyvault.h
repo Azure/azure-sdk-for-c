@@ -4,7 +4,6 @@
 #ifndef _az_KEYVAULT_H
 #define _az_KEYVAULT_H
 
-#include <az_contract_internal.h>
 #include <az_credentials.h>
 #include <az_http.h>
 #include <az_http_pipeline_internal.h>
@@ -12,8 +11,6 @@
 #include <az_result.h>
 #include <az_span.h>
 
-#include <stdbool.h>
-#include <stddef.h>
 #include <stdint.h>
 
 #include <_az_cfg_prefix.h>
@@ -62,6 +59,7 @@ AZ_NODISCARD az_result az_keyvault_keys_client_init(
     az_keyvault_keys_client_options * options);
 
 typedef az_span json_web_key_type;
+
 AZ_NODISCARD AZ_INLINE json_web_key_type az_keyvault_web_key_type_ec() {
   return AZ_SPAN_FROM_STR("EC");
 }
