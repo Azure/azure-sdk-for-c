@@ -8,6 +8,7 @@
 #include <az_span.h>
 
 #include <stdbool.h>
+#include <stdint.h>
 
 #include <_az_cfg_prefix.h>
 
@@ -110,8 +111,8 @@ AZ_NODISCARD AZ_INLINE az_result az_json_builder_init(az_json_builder * self, az
   return AZ_OK;
 }
 
-AZ_NODISCARD AZ_INLINE az_span az_json_builder_span_get(az_json_builder self) {
-  return self._internal.json;
+AZ_NODISCARD AZ_INLINE az_span az_json_builder_span_get(az_json_builder const * self) {
+  return self->_internal.json;
 }
 
 AZ_NODISCARD az_result az_json_builder_append_token(az_json_builder * self, az_json_token token);

@@ -22,14 +22,14 @@
 
 #define AZ_CONTRACT_ARG_NOT_NULL(arg) AZ_CONTRACT((arg) != NULL, AZ_ERROR_ARG)
 
-static AZ_NODISCARD az_result _az_span_malloc(size_t size, az_span * out) {
+static AZ_NODISCARD az_result _az_span_malloc(int32_t size, az_span * out) {
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
-  uint8_t * const p = (uint8_t *)malloc(size);
+  uint8_t * const p = (uint8_t *)malloc((size_t)size);
   if (p == NULL) {
     return AZ_ERROR_OUT_OF_MEMORY;
   }
-  *out = az_span_init(p, 0, (int32_t)size);
+  *out = az_span_init(p, 0, size);
   return AZ_OK;
 }
 
@@ -116,9 +116,8 @@ static AZ_NODISCARD az_result _az_http_client_curl_add_header_to_curl_list(
   // allocate a buffer for header
   az_span writable_buffer;
   {
-    size_t const buffer_size = (size_t)az_span_length(header.key)
-        + (size_t)az_span_length(separator) + (size_t)az_span_length(header.value)
-        + (size_t)az_span_length(AZ_SPAN_FROM_STR("\0"));
+    int32_t const buffer_size = az_span_length(header.key) + az_span_length(separator)
+        + az_span_length(header.value) + az_span_length(AZ_SPAN_FROM_STR("\0"));
 
     AZ_RETURN_IF_FAILED(_az_span_malloc(buffer_size, &writable_buffer));
   }
@@ -376,9 +375,8 @@ _az_http_client_curl_setup_url(CURL * p_curl, az_http_request const * p_request)
 
   az_span writable_buffer;
   {
-    // set URL as 0-terminated str
-    size_t const url_final_size
-        = az_span_length(p_request->_internal.url) + az_span_length(AZ_SPAN_FROM_STR("\0"));
+    // Add 1 for 0-terminated str
+    int32_t const url_final_size = az_span_length(p_request->_internal.url) + 1;
 
     // allocate buffer to add \0
     AZ_RETURN_IF_FAILED(_az_span_malloc(url_final_size, &writable_buffer));

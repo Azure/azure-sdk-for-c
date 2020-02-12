@@ -7,6 +7,7 @@
 #include <az_result.h>
 #include <az_span.h>
 
+#include <stdbool.h>
 #include <stdint.h>
 
 #include <_az_cfg_prefix.h>
@@ -170,7 +171,7 @@ az_http_request_append_header(az_http_request * p_request, az_span key, az_span 
  *     - `index` is out of range.
  */
 AZ_NODISCARD az_result
-az_http_request_get_header(az_http_request * p_request, int32_t index, az_pair * out_result);
+az_http_request_get_header(az_http_request const * p_request, int32_t index, az_pair * out_result);
 
 typedef enum {
   AZ_HTTP_RESPONSE_KIND_STATUS_LINE = 0,
@@ -189,6 +190,7 @@ typedef struct {
     } parser;
   } _internal;
 } az_http_response;
+
 ///////////////////////////////////////////////
 
 typedef enum {
@@ -196,7 +198,7 @@ typedef enum {
   AZ_HTTP_STATUS_CODE_CONTINUE = 100,
   AZ_HTTP_STATUS_CODE_SWITCHING_PROTOCOLS = 101,
   AZ_HTTP_STATUS_CODE_PROCESSING = 102,
-  AZ_HTTP_STATUS_CODE_EARLYPROCESSING = 103,
+  AZ_HTTP_STATUS_CODE_EARLY_HINTS = 103,
 
   // 2xx (successful) Status Codes:
   AZ_HTTP_STATUS_CODE_OK = 200,
@@ -234,28 +236,24 @@ typedef enum {
   AZ_HTTP_STATUS_CODE_GONE = 410,
   AZ_HTTP_STATUS_CODE_LENGTH_REQUIRED = 411,
   AZ_HTTP_STATUS_CODE_PRECONDITION_FAILED = 412,
-  AZ_HTTP_STATUS_CODE_REQUEST_ENTITY_TOO_LARGE = 413,
-  AZ_HTTP_STATUS_CODE_REQUEST_URI_TOO_LONG = 414,
+  AZ_HTTP_STATUS_CODE_PAYLOAD_TOO_LARGE = 413,
+  AZ_HTTP_STATUS_CODE_URI_TOO_LONG = 414,
   AZ_HTTP_STATUS_CODE_UNSUPPORTED_MEDIA_TYPE = 415,
-  AZ_HTTP_STATUS_CODE_REQUESTED_RANGE_NOT_SATISFIABLE = 416,
+  AZ_HTTP_STATUS_CODE_RANGE_NOT_SATISFIABLE = 416,
   AZ_HTTP_STATUS_CODE_EXPECTATION_FAILED = 417,
-  AZ_HTTP_STATUS_CODE_IM_A_TEAPOT = 418,
-  AZ_HTTP_STATUS_CODE_ENHANCE_YOUR_CALM = 420,
+  AZ_HTTP_STATUS_CODE_MISDIRECTED_REQUEST = 421,
   AZ_HTTP_STATUS_CODE_UNPROCESSABLE_ENTITY = 422,
   AZ_HTTP_STATUS_CODE_LOCKED = 423,
   AZ_HTTP_STATUS_CODE_FAILED_DEPENDENCY = 424,
+  AZ_HTTP_STATUS_CODE_TOO_EARLY = 425,
   AZ_HTTP_STATUS_CODE_UPGRADE_REQUIRED = 426,
-  AZ_HTTP_STATUS_CODEPRECONDITION_REQUIRED_ = 428,
+  AZ_HTTP_STATUS_CODE_PRECONDITION_REQUIRED = 428,
   AZ_HTTP_STATUS_CODE_TOO_MANY_REQUESTS = 429,
   AZ_HTTP_STATUS_CODE_REQUEST_HEADER_FIELDS_TOO_LARGE = 431,
-  AZ_HTTP_STATUS_CODE_NO_RESPONSE = 444,
-  AZ_HTTP_STATUS_CODE_RETRY_WITH = 449,
-  AZ_HTTP_STATUS_CODE_BLOCKED_BY_wINDOWS_PARENTAL_cONTROLS = 450,
   AZ_HTTP_STATUS_CODE_UNAVAILABLE_FOR_LEGAL_REASONS = 451,
-  AZ_HTTP_STATUS_CODE_CLIENT_CLOSED_REQUEST = 499,
 
-  // 5xx (SERVER error) Status Codes:
-  AZ_HTTP_STATUS_CODE_INTERLAN_SERVER_ERROR = 500,
+  // 5xx (server error) Status Codes:
+  AZ_HTTP_STATUS_CODE_INTERNAL_SERVER_ERROR = 500,
   AZ_HTTP_STATUS_CODE_NOT_IMPLEMENTED = 501,
   AZ_HTTP_STATUS_CODE_BAD_GATEWAY = 502,
   AZ_HTTP_STATUS_CODE_SERVICE_UNAVAILABLE = 503,
@@ -264,11 +262,8 @@ typedef enum {
   AZ_HTTP_STATUS_CODE_VARIANT_ALSO_NEGOTIATES = 506,
   AZ_HTTP_STATUS_CODE_INSUFFICIENT_STORAGE = 507,
   AZ_HTTP_STATUS_CODE_LOOP_DETECTED = 508,
-  AZ_HTTP_STATUS_CODE_BANDWIDTH_LIMIT_EXCEEDED = 509,
   AZ_HTTP_STATUS_CODE_NOT_EXTENDED = 510,
   AZ_HTTP_STATUS_CODE_NETWORK_AUTHENTICATION_REQUIRED = 511,
-  AZ_HTTP_STATUS_CODE_NETWORK_READ_TIMEOUT_ERROR = 598,
-  AZ_HTTP_STATUS_CODE_NETWORK_CONNECT_TIMEOUT_ERROR = 599,
 } az_http_status_code;
 
 /**
@@ -285,10 +280,16 @@ typedef struct {
 
 AZ_NODISCARD AZ_INLINE az_result
 az_http_response_init(az_http_response * self, az_span http_response) {
-  *self = (az_http_response){ ._internal
-                              = { .http_response = http_response,
-                                  .parser = { .remaining = az_span_null(),
-                                              .next_kind = AZ_HTTP_RESPONSE_KIND_STATUS_LINE } } };
+  *self = (az_http_response){
+    ._internal = {
+      .http_response = http_response,
+      .parser = {
+        .remaining = az_span_null(),
+        .next_kind = AZ_HTTP_RESPONSE_KIND_STATUS_LINE,
+      },
+    },
+  };
+
   return AZ_OK;
 }
 
@@ -334,6 +335,7 @@ AZ_NODISCARD AZ_INLINE az_result az_http_response_reset(az_http_response * self)
       az_span_ptr(self->_internal.http_response),
       0,
       az_span_capacity(self->_internal.http_response));
+
   return AZ_OK;
 }
 
