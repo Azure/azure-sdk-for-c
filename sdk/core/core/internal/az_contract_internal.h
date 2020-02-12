@@ -4,9 +4,9 @@
 #ifndef _az_CONTRACT_INTERNAL_H
 #define _az_CONTRACT_INTERNAL_H
 
-#include <az_result.h>
 #include <az_span.h>
 
+#include <stdbool.h>
 #include <stddef.h>
 
 #include <_az_cfg_prefix.h>

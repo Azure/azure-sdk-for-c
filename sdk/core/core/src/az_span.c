@@ -179,7 +179,7 @@ void az_span_swap(az_span a, az_span b) {
 }
 
 /**
- * @brief converts @b src span to zero-terminated srt. Content is copied to @b buffer and then \0 is
+ * @brief converts @b src span to zero-terminated str. Content is copied to @b buffer and then \0 is
  * addeed at the end. Then out_result will be created out of buffer
  *
  * @param buffer

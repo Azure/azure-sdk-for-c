@@ -4,12 +4,13 @@
 #ifndef _az_STORAGE_BLOBS_H
 #define _az_STORAGE_BLOBS_H
 
-#include <az_contract_internal.h>
 #include <az_credentials.h>
 #include <az_http.h>
 #include <az_http_pipeline_internal.h>
 #include <az_result.h>
 #include <az_span.h>
+
+#include <stdint.h>
 
 #include <_az_cfg_prefix.h>
 

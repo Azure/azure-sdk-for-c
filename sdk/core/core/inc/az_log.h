@@ -7,7 +7,6 @@
 #include <az_result.h>
 #include <az_span.h>
 
-#include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 
