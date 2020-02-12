@@ -114,7 +114,7 @@ AZ_NODISCARD az_result _az_aad_request_token(
   // If we failed to get the token, we return failure/
   az_http_response_status_line status_line = { 0 };
   AZ_RETURN_IF_FAILED(az_http_response_get_status_line(&response, &status_line));
-  if (status_line.status_code != AZ_HTTP_STATUS_CODE_OK) {
+  if (status_line.status_code != _AZ_HTTP_STATUS_CODE_OK) {
     return AZ_ERROR_HTTP_AUTHENTICATION_FAILED;
   }
 
