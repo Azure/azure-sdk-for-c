@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include <assert.h>
+#include <stdio.h>
 
 extern int exit_code;
 

@@ -9,6 +9,8 @@
 #include <az_result.h>
 #include <az_span.h>
 
+#include <stdint.h>
+
 #include <_az_cfg_prefix.h>
 
 static az_span const AZ_STORAGE_API_VERSION = AZ_SPAN_LITERAL_FROM_STR("2019-02-02");

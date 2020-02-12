@@ -4,10 +4,9 @@
 #ifndef _az_LOG_H
 #define _az_LOG_H
 
-#include <az_facility.h>
+#include <az_result.h>
 #include <az_span.h>
 
-#include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 

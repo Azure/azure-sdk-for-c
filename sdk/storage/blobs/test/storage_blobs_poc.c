@@ -7,6 +7,7 @@
 #include <az_json.h>
 #include <az_storage_blobs.h>
 
+#include <stdio.h>
 #include <stdlib.h>
 
 #include <_az_cfg.h>

@@ -161,14 +161,14 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
   // AZ_RETURN_IF_FAILED(az_http_request_append_header(
   //    &hrb, AZ_HTTP_HEADER_X_MS_DATE, AZ_SPAN_FROM_STR("Fri, 03 Jan 2020 21:33:15 GMT")));
 
-  char str[256] = { 0 };
-  // TODO: remove snprintf
-  snprintf(str, sizeof str, "%d", az_span_length(content));
-  az_span content_length = az_span_from_str(str);
+  // Longest span (excluding 0 terminator) for any int32_t decimal value to be represented.
+  uint8_t content_length_buf[sizeof("-2147483648") - 1] = { 0 };
+  az_span content_length_span = AZ_SPAN_FROM_BUFFER(content_length_buf);
+  AZ_RETURN_IF_FAILED(az_span_append_int64(&content_length_span, az_span_length(content)));
 
   // add Content-Length to request
   AZ_RETURN_IF_FAILED(
-      az_http_request_append_header(&hrb, AZ_HTTP_HEADER_CONTENT_LENGTH, content_length));
+      az_http_request_append_header(&hrb, AZ_HTTP_HEADER_CONTENT_LENGTH, content_length_span));
 
   // add blob type to request
   AZ_RETURN_IF_FAILED(az_http_request_append_header(

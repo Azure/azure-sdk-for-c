@@ -23,7 +23,6 @@ add_library (
   src/az_json_token.c
   src/az_log.c
   src/az_span.c
-  src/az_span_reader.c
   )
 
 if(MSVC)
