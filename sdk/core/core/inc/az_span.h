@@ -57,7 +57,7 @@ AZ_NODISCARD AZ_INLINE az_span az_span_null() { return (az_span){ 0 }; }
 #define _az_STRING_LITERAL_LEN(S) (sizeof(S "") - 1)
 
 /**
- * Creates a az_span literal which can be used to initialize a constant. For example
+ * Creates an az_span literal which can be used to initialize a constant. For example
  *
  * `static const az_span foo = AZ_SPAN_LITERAL_FROM_STR("Hello world");`
  */
@@ -96,7 +96,7 @@ AZ_NODISCARD AZ_INLINE az_span az_span_from_str(char * str) {
 }
 
 /**
- * Creates a az_span literal which can be used to initialize a constant. For example
+ * Creates an az_span literal which can be used to initialize a constant. For example
  *
  * uint8_t buffer[2 * 1024];
  * const az_span foo = AZ_SPAN_LITERAL_FROM_BUFFER(buffer);

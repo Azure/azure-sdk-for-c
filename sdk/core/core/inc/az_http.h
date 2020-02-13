@@ -6,15 +6,17 @@
 
 #include <az_result.h>
 #include <az_span.h>
+#include <az_config.h>
 
 #include <stdbool.h>
 #include <stdint.h>
 
 #include <_az_cfg_prefix.h>
 
-enum {
-  AZ_HTTP_URL_MAX_SIZE = 1024 * 2,
-};
+typedef enum {
+  _az_http_policy_apiversion_option_location_header,
+  _az_http_policy_apiversion_option_location_queryparameter
+} _az_http_policy_apiversion_option_location;
 
 typedef az_span az_http_method;
 
@@ -72,17 +74,12 @@ typedef struct {
 
 typedef struct {
   // Services pass API versions in the header or in query parameters
-  //   true: api version is passed via headers
-  //   false: api version is passed via query parameters
-  bool add_as_header;
-  az_span name;
-  az_span version;
+  struct {
+    _az_http_policy_apiversion_option_location option_location;
+    az_span name;
+    az_span version;
+  } _internal;
 } _az_http_policy_apiversion_options;
-
-AZ_NODISCARD AZ_INLINE _az_http_policy_apiversion_options
-az_http_policy_apiversion_options_default() {
-  return (_az_http_policy_apiversion_options){ 0 };
-}
 
 /**
  * @brief options for the telemetry policy
@@ -94,7 +91,7 @@ typedef struct {
 } _az_http_policy_telemetry_options;
 
 AZ_NODISCARD AZ_INLINE _az_http_policy_telemetry_options
-_az_http_policy_apiversion_options_default() {
+_az_http_policy_telemetry_options_default() {
   return (_az_http_policy_telemetry_options){ .os = AZ_SPAN_FROM_STR("Unknown OS") };
 }
 

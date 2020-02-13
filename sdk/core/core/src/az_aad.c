@@ -6,7 +6,7 @@
 #include <az_http_internal.h>
 #include <az_json.h>
 #include <az_pal_clock_internal.h>
-#include <az_time_internal.h>
+#include <az_config_internal.h>
 
 #include <stddef.h>
 

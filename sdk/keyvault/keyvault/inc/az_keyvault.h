@@ -42,7 +42,7 @@ az_keyvault_keys_client_options_default(az_http_transport_options const * http_t
 typedef struct {
   struct {
     // buffer to copy customer url. Then it stays immutable
-    uint8_t url_buffer[AZ_HTTP_URL_MAX_SIZE];
+    uint8_t url_buffer[AZ_HTTP_REQUEST_URL_BUF_SIZE];
     // this url will point to url_buffer
     az_span uri;
     _az_http_pipeline pipeline;

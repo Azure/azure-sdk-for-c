@@ -9,6 +9,7 @@
 #include <az_json.h>
 #include <az_keyvault.h>
 #include <az_span.h>
+#include <az_config_internal.h>
 
 #include <stddef.h>
 
@@ -24,8 +25,6 @@
  * {path}                           = 54               130
  * {query}                          = 70               ** 200 **
  */
-enum { MAX_URL_SIZE = 200 };
-enum { MAX_BODY_SIZE = 1024 };
 static az_span const AZ_HTTP_HEADER_API_VERSION = AZ_SPAN_LITERAL_FROM_STR("api-version");
 
 AZ_NODISCARD AZ_INLINE az_span az_keyvault_client_constant_for_keys() {
@@ -47,13 +46,13 @@ az_keyvault_keys_client_options_default(az_http_transport_options const * http_t
 
   az_keyvault_keys_client_options options = (az_keyvault_keys_client_options){
     ._internal = { .http_transport_options = *http_transport_options,
-                   .api_version = az_http_policy_apiversion_options_default() },
+                   .api_version = _az_http_policy_apiversion_options_default() },
     .retry = az_http_policy_retry_options_default(),
   };
 
-  options._internal.api_version.add_as_header = false;
-  options._internal.api_version.name = AZ_HTTP_HEADER_API_VERSION;
-  options._internal.api_version.version = AZ_KEYVAULT_API_VERSION;
+  options._internal.api_version._internal.option_location = _az_http_policy_apiversion_option_location_queryparameter;
+  options._internal.api_version._internal.name = AZ_HTTP_HEADER_API_VERSION;
+  options._internal.api_version._internal.version = AZ_KEYVAULT_API_VERSION;
 
   return options;
 }
@@ -228,17 +227,17 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
     az_http_response * response) {
 
   // Url buffer
-  uint8_t url_buffer[1024];
+  uint8_t url_buffer[AZ_HTTP_REQUEST_URL_BUF_SIZE];
   az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
   // copy url from client
   AZ_RETURN_IF_FAILED(az_span_copy(request_url_span, client->_internal.uri, &request_url_span));
 
   // Headers buffer
-  uint8_t headers_buffer[4 * sizeof(az_pair)];
+  uint8_t headers_buffer[AZ_HTTP_REQUEST_HEADER_BUF_SIZE];
   az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
 
   // Allocate buffer in stack to hold body request
-  uint8_t body_buffer[MAX_BODY_SIZE];
+  uint8_t body_buffer[AZ_HTTP_REQUEST_BODY_BUF_SIZE];
   az_span json_builder = AZ_SPAN_FROM_BUFFER(body_buffer);
   AZ_RETURN_IF_FAILED(
       _az_keyvault_keys_key_create_build_json_body(json_web_key_type, options, &json_builder));
@@ -282,10 +281,10 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
     az_http_response * response) {
   // create request buffer TODO: define size for a getKey Request
 
-  uint8_t headers_buffer[4 * sizeof(az_pair)];
+  uint8_t headers_buffer[AZ_HTTP_REQUEST_HEADER_BUF_SIZE];
   az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
   // Url buffer
-  uint8_t url_buffer[1024];
+  uint8_t url_buffer[AZ_HTTP_REQUEST_URL_BUF_SIZE];
   az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
   // copy url from client
   AZ_RETURN_IF_FAILED(az_span_copy(request_url_span, client->_internal.uri, &request_url_span));
@@ -316,11 +315,11 @@ AZ_NODISCARD az_result az_keyvault_keys_key_delete(
     az_http_response * response) {
 
   // Url buffer
-  uint8_t url_buffer[1024];
+  uint8_t url_buffer[AZ_HTTP_REQUEST_URL_BUF_SIZE];
   az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
   // copy url from client
   AZ_RETURN_IF_FAILED(az_span_copy(request_url_span, client->_internal.uri, &request_url_span));
-  uint8_t headers_buffer[4 * sizeof(az_pair)];
+  uint8_t headers_buffer[AZ_HTTP_REQUEST_HEADER_BUF_SIZE];
   az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
 
   // create request
