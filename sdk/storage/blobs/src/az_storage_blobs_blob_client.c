@@ -4,7 +4,8 @@
 #include <az_contract_internal.h>
 #include <az_credentials_internal.h>
 #include <az_http.h>
-#include <az_http_pipeline_internal.h>
+#include <az_http_internal.h>
+#include <az_http_transport.h>
 #include <az_json.h>
 #include <az_storage_blobs.h>
 
@@ -37,67 +38,86 @@ AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_o
 }
 
 AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
-    az_storage_blobs_blob_client * client,
+    az_storage_blobs_blob_client * self,
     az_span uri,
     void * credential,
     az_storage_blobs_blob_client_options * options) {
-  AZ_CONTRACT_ARG_NOT_NULL(client);
+  AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(options);
 
   _az_credential * const cred = (_az_credential *)credential;
-  cred->_internal.http_transport_options
-      = client->_internal.options._internal.http_transport_options;
+  cred->_internal.http_transport_options = self->_internal.options._internal.http_transport_options;
 
-  *client = (az_storage_blobs_blob_client) {
+  *self = (az_storage_blobs_blob_client) {
     ._internal = {
-      .uri = AZ_SPAN_FROM_BUFFER(client->_internal.url_buffer),
+      .uri = AZ_SPAN_FROM_BUFFER(self->_internal.url_buffer),
       .options = *options,
       .credential = cred,
-      .pipeline = (az_http_pipeline) {
-        .p_policies = {
-          {
-            .process = az_http_pipeline_policy_apiversion,
-            .p_options = &client->_internal.options._internal.api_version,
+      .pipeline = (_az_http_pipeline){
+        ._internal = {
+          .p_policies = {
+            {
+              ._internal = {
+                .process = az_http_pipeline_policy_apiversion,
+                .p_options= &self->_internal.options._internal.api_version,
+              },
+            },
+            {
+              ._internal = {
+                .process = az_http_pipeline_policy_uniquerequestid,
+                .p_options = NULL,
+              },
+            },
+            {
+              ._internal = {
+                .process = az_http_pipeline_policy_telemetry,
+                .p_options = &self->_internal.options._internal._telemetry_options,
+              },
+            },
+            {
+              ._internal = {
+                .process = az_http_pipeline_policy_retry,
+                .p_options = &self->_internal.options.retry,
+              },
+            },
+            {
+              ._internal = {
+                .process = az_http_pipeline_policy_credential,
+                .p_options = cred,
+              },
+            },
+            {
+              ._internal = {
+                .process = az_http_pipeline_policy_logging,
+                .p_options = NULL,
+              },
+            },
+            {
+              ._internal = {
+                .process = az_http_pipeline_policy_bufferresponse,
+                .p_options = NULL,
+              },
+            },
+            {
+              ._internal = {
+                .process= az_http_pipeline_policy_distributedtracing,
+                .p_options = NULL,
+              },
+            },
+            {
+              ._internal = {
+                .process = az_http_pipeline_policy_transport,
+                .p_options= &self->_internal.options._internal.http_transport_options,
+              },
+            },
           },
-          {
-            .process = az_http_pipeline_policy_uniquerequestid,
-            .p_options = NULL,
-          },
-          {
-            .process = az_http_pipeline_policy_telemetry,
-            .p_options = &client->_internal.options._internal._telemetry_options,
-          },
-          {
-            .process = az_http_pipeline_policy_retry,
-            .p_options = &client->_internal.options.retry,
-          },
-          {
-            .process = az_http_pipeline_policy_credential,
-            .p_options = cred,
-          },
-          {
-            .process = az_http_pipeline_policy_logging,
-            .p_options = NULL,
-          },
-          {
-            .process = az_http_pipeline_policy_bufferresponse,
-            .p_options = NULL,
-          },
-          {
-            .process = az_http_pipeline_policy_distributedtracing,
-            .p_options = NULL,
-          },
-          {
-            .process = az_http_pipeline_policy_transport,
-            .p_options = &client->_internal.options._internal.http_transport_options,
-          },
-        }, 
-      },
-    },
+        }
+      }
+    }
   };
 
   // Copy url to client buffer so customer can re-use buffer on his/her side
-  AZ_RETURN_IF_FAILED(az_span_copy(client->_internal.uri, uri, &client->_internal.uri));
+  AZ_RETURN_IF_FAILED(az_span_copy(self->_internal.uri, uri, &self->_internal.uri));
 
   AZ_RETURN_IF_FAILED(
       _az_credential_set_scopes(cred, AZ_SPAN_FROM_STR("https://storage.azure.net/.default")));
@@ -130,7 +150,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
 
   // create request
   // TODO: define max URL size
-  az_http_request hrb;
+  _az_http_request hrb;
   AZ_RETURN_IF_FAILED(az_http_request_init(
       &hrb, az_http_method_get(), request_url_span, request_headers_span, content));
 

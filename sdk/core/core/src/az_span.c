@@ -169,7 +169,7 @@ AZ_INLINE void _az_uint8_swap(uint8_t * a, uint8_t * b) {
  * @param a source/destination span
  * @param b destination/source span
  */
-void az_span_swap(az_span a, az_span b) {
+void _az_span_swap(az_span a, az_span b) {
   uint8_t * pa = az_span_ptr(a);
   uint8_t * pb = az_span_ptr(b);
   for (int32_t i = _az_size_min(az_span_length(a), az_span_length(b)); i > 0; ++pa, ++pb) {
@@ -241,7 +241,7 @@ AZ_NODISCARD az_result az_span_append(az_span self, az_span span, az_span * out)
  * @param size number of zeros to be appended
  * @return AZ_NODISCARD az_span_append_zeros
  */
-AZ_NODISCARD az_result az_span_append_zeros(az_span * self, int32_t size) {
+AZ_NODISCARD az_result _az_span_append_zeros(az_span * self, int32_t size) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
   int32_t current_size = az_span_length(*self);
@@ -265,7 +265,7 @@ AZ_NODISCARD az_result az_span_append_zeros(az_span * self, int32_t size) {
  * @param span content to use for replacement
  * @return AZ_NODISCARD az_span_replace
  */
-AZ_NODISCARD az_result az_span_replace(az_span * self, int32_t start, int32_t end, az_span span) {
+AZ_NODISCARD az_result _az_span_replace(az_span * self, int32_t start, int32_t end, az_span span) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
   int32_t const current_size = az_span_length(*self);

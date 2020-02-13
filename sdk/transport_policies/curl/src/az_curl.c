@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: MIT
 
 #include <az_curl.h>
+#include <az_http_transport.h>
 
 #include <az_span.h>
 #include <curl/curl.h>
 
-#include <stddef.h>
 #include <stdlib.h>
 
 #include <_az_cfg.h>
@@ -144,7 +144,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_add_header_to_curl_list(
  * @return az_result
  */
 static AZ_NODISCARD az_result
-_az_http_client_curl_build_headers(az_http_request * p_request, struct curl_slist ** p_headers) {
+_az_http_client_curl_build_headers(_az_http_request * p_request, struct curl_slist ** p_headers) {
   AZ_CONTRACT_ARG_NOT_NULL(p_request);
 
   az_pair header;
@@ -219,7 +219,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_get_request(CURL * p_cur
  * handles DELETE request
  */
 static AZ_NODISCARD az_result
-_az_http_client_curl_send_delete_request(CURL * p_curl, az_http_request const * p_request) {
+_az_http_client_curl_send_delete_request(CURL * p_curl, _az_http_request const * p_request) {
   AZ_CONTRACT_ARG_NOT_NULL(p_curl);
   AZ_CONTRACT_ARG_NOT_NULL(p_request);
 
@@ -235,7 +235,7 @@ _az_http_client_curl_send_delete_request(CURL * p_curl, az_http_request const * 
  * handles POST request. It handles seting up a body for request
  */
 static AZ_NODISCARD az_result
-_az_http_client_curl_send_post_request(CURL * p_curl, az_http_request const * p_request) {
+_az_http_client_curl_send_post_request(CURL * p_curl, _az_http_request const * p_request) {
   AZ_CONTRACT_ARG_NOT_NULL(p_curl);
   AZ_CONTRACT_ARG_NOT_NULL(p_request);
 
@@ -288,7 +288,7 @@ static int32_t _az_http_client_curl_upload_read_callback(
  * handles POST request. It handles seting up a body for request
  */
 static AZ_NODISCARD az_result
-_az_http_client_curl_send_upload_request(CURL * p_curl, az_http_request const * p_request) {
+_az_http_client_curl_send_upload_request(CURL * p_curl, _az_http_request const * p_request) {
   AZ_CONTRACT_ARG_NOT_NULL(p_curl);
   AZ_CONTRACT_ARG_NOT_NULL(p_request);
 
@@ -342,7 +342,7 @@ _az_http_client_curl_send_upload_request(CURL * p_curl, az_http_request const * 
  * @return az_result
  */
 static AZ_NODISCARD az_result
-_az_http_client_curl_setup_headers(CURL * p_curl, az_http_request * p_request) {
+_az_http_client_curl_setup_headers(CURL * p_curl, _az_http_request * p_request) {
   AZ_CONTRACT_ARG_NOT_NULL(p_curl);
   AZ_CONTRACT_ARG_NOT_NULL(p_request);
 
@@ -369,7 +369,7 @@ _az_http_client_curl_setup_headers(CURL * p_curl, az_http_request * p_request) {
  * @return az_result
  */
 static AZ_NODISCARD az_result
-_az_http_client_curl_setup_url(CURL * p_curl, az_http_request const * p_request) {
+_az_http_client_curl_setup_url(CURL * p_curl, _az_http_request const * p_request) {
   AZ_CONTRACT_ARG_NOT_NULL(p_curl);
   AZ_CONTRACT_ARG_NOT_NULL(p_request);
 
@@ -433,7 +433,7 @@ _az_http_client_curl_setup_response_redirect(CURL * p_curl, az_span * response_b
  */
 static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
     CURL * p_curl,
-    az_http_request * p_request,
+    _az_http_request * p_request,
     az_http_response * response) {
   az_result result = AZ_ERROR_ARG;
 
@@ -474,7 +474,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
  * @return az_result
  */
 static AZ_NODISCARD az_result
-_az_http_client_curl_send_request(az_http_request * p_request, az_http_response * p_response) {
+_az_http_client_curl_send_request(_az_http_request * p_request, az_http_response * p_response) {
   AZ_CONTRACT_ARG_NOT_NULL(p_request);
   AZ_CONTRACT_ARG_NOT_NULL(p_response);
 

@@ -248,7 +248,7 @@ AZ_NODISCARD static az_result az_span_reader_get_json_string_rest(
   uint8_t * p_reader = az_span_ptr(*self);
   while (true) {
     uint32_t ignore = { 0 };
-    az_result const result = az_span_reader_read_json_string_char(self, &ignore);
+    az_result const result = _az_span_reader_read_json_string_char(self, &ignore);
     switch (result) {
       case AZ_ERROR_JSON_STRING_END: {
         int32_t read_count = reader_initial_length - az_span_capacity(*self);

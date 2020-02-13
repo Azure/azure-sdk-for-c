@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 #include <az_http.h>
+#include <az_http_internal.h>
 #include <az_http_private.h>
+#include <az_http_transport.h>
 #include <az_log.h>
 #include <az_log_internal.h>
 #include <az_log_private.h>
@@ -56,7 +58,7 @@ void test_log() {
   // Set up test values etc.
   //  uint8_t hrb_buf[4 * 1024] = { 0 };
   uint8_t headers[4 * 1024] = { 0 };
-  az_http_request hrb = { 0 };
+  _az_http_request hrb = { 0 };
   TEST_EXPECT_SUCCESS(az_http_request_init(
       &hrb,
       az_http_method_get(),

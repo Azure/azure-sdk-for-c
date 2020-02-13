@@ -75,7 +75,7 @@ _az_get_http_status_line(az_span * self, az_http_response_status_line * out) {
   {
     uint64_t code = 0;
     AZ_RETURN_IF_FAILED(az_span_to_uint64(az_span_init(az_span_ptr(*self), 3, 3), &code));
-    out->status_code = (az_http_status_code)code;
+    out->status_code = (_az_http_status_code)code;
     // move reader
     AZ_RETURN_IF_FAILED(az_span_slice(*self, 3, -1, self));
   }
