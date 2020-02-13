@@ -7,8 +7,9 @@
 #include <_az_cfg.h>
 
 AZ_NODISCARD bool az_json_pointer_token_eq_json_string(az_span pointer_token, az_span json_string) {
-  az_span_reader pt_reader = az_span_reader_create(pointer_token);
-  az_span_reader js_reader = az_span_reader_create(json_string);
+  // copy spans to read them
+  az_span pt_reader = pointer_token;
+  az_span js_reader = json_string;
   while (true) {
     uint32_t pt_c = { 0 };
     az_result const pt_result = az_span_reader_read_json_pointer_token_char(&pt_reader, &pt_c);
@@ -68,7 +69,7 @@ az_json_parse_by_pointer(az_span json, az_span pointer, az_json_token * out_toke
 
   az_json_parser json_parser = { 0 };
   AZ_RETURN_IF_FAILED(az_json_parser_init(&json_parser, json));
-  az_span_reader pointer_parser = az_span_reader_create(pointer);
+  az_span pointer_parser = pointer;
 
   AZ_RETURN_IF_FAILED(az_json_parser_parse_token(&json_parser, out_token));
 

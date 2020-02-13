@@ -4,7 +4,6 @@
 #ifndef _az_KEYVAULT_H
 #define _az_KEYVAULT_H
 
-#include <az_contract_internal.h>
 #include <az_credentials.h>
 #include <az_http.h>
 #include <az_http_pipeline_internal.h>
@@ -12,8 +11,6 @@
 #include <az_result.h>
 #include <az_span.h>
 
-#include <stdbool.h>
-#include <stddef.h>
 #include <stdint.h>
 
 #include <_az_cfg_prefix.h>
@@ -28,7 +25,7 @@ typedef struct {
   struct {
     _az_http_policy_apiversion_options api_version;
     _az_http_policy_telemetry_options _telemetry_options;
-    az_http_client_fn http_client;
+    az_http_transport_options http_transport_options;
   } _internal;
 } az_keyvault_keys_client_options;
 
@@ -41,7 +38,7 @@ typedef struct {
  * overriding that specific option
  */
 AZ_NODISCARD az_keyvault_keys_client_options
-az_keyvault_keys_client_options_default(az_http_client_fn http_client);
+az_keyvault_keys_client_options_default(az_http_transport_options const * http_transport_options);
 
 typedef struct {
   struct {
@@ -51,7 +48,7 @@ typedef struct {
     az_span uri;
     az_http_pipeline pipeline;
     az_keyvault_keys_client_options options;
-    _az_credential_vtbl * credential;
+    _az_credential * credential;
   } _internal;
 } az_keyvault_keys_client;
 
@@ -62,6 +59,7 @@ AZ_NODISCARD az_result az_keyvault_keys_client_init(
     az_keyvault_keys_client_options * options);
 
 typedef az_span json_web_key_type;
+
 AZ_NODISCARD AZ_INLINE json_web_key_type az_keyvault_web_key_type_ec() {
   return AZ_SPAN_FROM_STR("EC");
 }
