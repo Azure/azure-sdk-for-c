@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include <az_credentials.h>
+#include <az_curl.h>
 #include <az_http.h>
 #include <az_http_internal.h>
 #include <az_http_transport.h>
@@ -88,9 +89,21 @@ int main() {
     printf("Failed to init credential");
   }
 
+  az_http_transport_options http_transport_options = { 0 };
+  az_result const http_transport_options_init_status
+      = az_http_transport_options_init(&http_transport_options);
+
+  if (az_failed(http_transport_options_init_status)) {
+    printf("Failed to init http transport options");
+  }
+
+  // Init client.
+  az_storage_blobs_blob_client_options options
+      = az_storage_blobs_blob_client_options_default(&http_transport_options);
+
   // Init client.
   az_result const operation_result = az_storage_blobs_blob_client_init(
-      &client, az_span_from_str(getenv(URI_ENV)), &credential, NULL);
+      &client, az_span_from_str(getenv(URI_ENV)), &credential, &options);
 
   if (az_failed(operation_result)) {
     printf("Failed to init blob client");
