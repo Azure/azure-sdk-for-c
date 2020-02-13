@@ -25,7 +25,7 @@ typedef struct {
 } _az_token;
 
 typedef AZ_NODISCARD az_result (
-    *_az_credential_apply_fn)(void * credential_options, az_http_request * ref_request);
+    *_az_credential_apply_fn)(void * credential_options, _az_http_request * ref_request);
 
 typedef AZ_NODISCARD az_result (*_az_credential_set_scopes_fn)(void * credential, az_span scopes);
 

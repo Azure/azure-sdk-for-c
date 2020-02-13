@@ -4,6 +4,8 @@
 #include "az_aad_private.h"
 #include <az_credentials.h>
 #include <az_http.h>
+#include <az_http_internal.h>
+#include <az_http_transport.h>
 
 #include <stddef.h>
 
@@ -25,7 +27,7 @@ _az_client_secret_credential_request_token(az_client_secret_credential * credent
       &body));
 
   uint8_t header_buf[_az_AAD_REQUEST_HEADER_BUF_SIZE];
-  az_http_request request = { 0 };
+  _az_http_request request = { 0 };
   AZ_RETURN_IF_FAILED(az_http_request_init(
       &request, az_http_method_post(), url, AZ_SPAN_FROM_BUFFER(header_buf), body));
 
@@ -38,7 +40,7 @@ _az_client_secret_credential_request_token(az_client_secret_credential * credent
 // This gets called from the http credential policy
 static AZ_NODISCARD az_result _az_client_secret_credential_apply(
     az_client_secret_credential * credential,
-    az_http_request * ref_request) {
+    _az_http_request * ref_request) {
 
   if (_az_token_expired(&(credential->_internal.token))) {
     AZ_RETURN_IF_FAILED(_az_client_secret_credential_request_token(credential));

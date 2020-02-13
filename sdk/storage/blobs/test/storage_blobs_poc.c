@@ -3,6 +3,8 @@
 
 #include <az_credentials.h>
 #include <az_http.h>
+#include <az_http_internal.h>
+#include <az_http_transport.h>
 #include <az_json.h>
 #include <az_storage_blobs.h>
 
@@ -39,7 +41,7 @@ az_storage_blobs_blob_download(az_storage_blobs_blob_client * client, az_http_re
 
   // create request
   // TODO: define max URL size
-  az_http_request hrb;
+  _az_http_request hrb;
   AZ_RETURN_IF_FAILED(az_http_request_init(
       &hrb, az_http_method_get(), request_url_span, request_headers_span, az_span_null()));
 
@@ -61,7 +63,7 @@ az_storage_blobs_blob_delete(az_storage_blobs_blob_client * client, az_http_resp
 
   // create request
   // TODO: define max URL size
-  az_http_request hrb;
+  _az_http_request hrb;
   AZ_RETURN_IF_FAILED(az_http_request_init(
       &hrb, az_http_method_get(), request_url_span, request_headers_span, az_span_null()));
 

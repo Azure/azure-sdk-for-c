@@ -31,7 +31,7 @@ AZ_NODISCARD az_result _az_aad_build_body(
 
 AZ_NODISCARD az_result _az_aad_request_token(
     az_http_transport_options * http_transport_options,
-    az_http_request * request,
+    _az_http_request * request,
     _az_token * out_token);
 
 AZ_NODISCARD bool _az_token_expired(_az_token const * token);

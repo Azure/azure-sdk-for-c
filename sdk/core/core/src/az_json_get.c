@@ -12,9 +12,9 @@ AZ_NODISCARD bool az_json_pointer_token_eq_json_string(az_span pointer_token, az
   az_span js_reader = json_string;
   while (true) {
     uint32_t pt_c = { 0 };
-    az_result const pt_result = az_span_reader_read_json_pointer_token_char(&pt_reader, &pt_c);
+    az_result const pt_result = _az_span_reader_read_json_pointer_token_char(&pt_reader, &pt_c);
     uint32_t js_c = { 0 };
-    az_result const js_result = az_span_reader_read_json_string_char(&js_reader, &js_c);
+    az_result const js_result = _az_span_reader_read_json_string_char(&js_reader, &js_c);
     if (js_result == AZ_ERROR_ITEM_NOT_FOUND && pt_result == AZ_ERROR_ITEM_NOT_FOUND) {
       return true;
     }
@@ -78,7 +78,7 @@ az_json_parse_by_pointer(az_span json, az_span pointer, az_json_token * out_toke
     // read the pointer token.
     {
       az_result const result
-          = az_span_reader_read_json_pointer_token(&pointer_parser, &pointer_token);
+          = _az_span_reader_read_json_pointer_token(&pointer_parser, &pointer_token);
       // no more pointer tokens so we found the JSON value.
       if (result == AZ_ERROR_ITEM_NOT_FOUND) {
         return AZ_OK;

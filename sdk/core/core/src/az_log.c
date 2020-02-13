@@ -4,6 +4,7 @@
 #include "az_log_private.h"
 #include "az_span_private.h"
 #include <az_http.h>
+#include <az_http_transport.h>
 #include <az_log.h>
 #include <az_log_internal.h>
 #include <az_span.h>
@@ -93,7 +94,7 @@ static az_result _az_log_value_msg(az_span * log_msg_bldr, az_span value) {
 
 static az_result _az_log_http_request_msg(
     az_span * log_msg_bldr,
-    az_http_request * hrb,
+    _az_http_request * hrb,
     uint8_t indent) {
   for (uint8_t ntabs = 0; ntabs < indent; ++ntabs) {
     AZ_RETURN_IF_FAILED(az_span_append(*log_msg_bldr, AZ_SPAN_FROM_STR("\t"), log_msg_bldr));
@@ -135,7 +136,7 @@ static az_result _az_log_http_response_msg(
     az_span * log_msg_bldr,
     az_http_response * response,
     int64_t duration_msec,
-    az_http_request * hrb) {
+    _az_http_request * hrb) {
   AZ_RETURN_IF_FAILED(
       az_span_append(*log_msg_bldr, AZ_SPAN_FROM_STR("HTTP Response ("), log_msg_bldr));
   AZ_RETURN_IF_FAILED(az_span_append_int64(log_msg_bldr, duration_msec));
@@ -170,7 +171,7 @@ static az_result _az_log_http_response_msg(
   return _az_log_http_request_msg(log_msg_bldr, hrb, 1);
 }
 
-void _az_log_http_request(az_http_request * hrb) {
+void _az_log_http_request(_az_http_request * hrb) {
   uint8_t log_msg_buf[_az_LOG_MSG_BUF_SIZE] = { 0 };
 
   az_span log_msg_bldr = AZ_SPAN_FROM_BUFFER(log_msg_buf);
@@ -183,7 +184,7 @@ void _az_log_http_request(az_http_request * hrb) {
 void _az_log_http_response(
     az_http_response * response,
     int64_t duration_msec,
-    az_http_request * hrb) {
+    _az_http_request * hrb) {
   uint8_t log_msg_buf[_az_LOG_MSG_BUF_SIZE] = { 0 };
 
   az_span log_msg_bldr = AZ_SPAN_FROM_BUFFER(log_msg_buf);
