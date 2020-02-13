@@ -150,7 +150,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
   az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
 
   // create request
-  az_http_request hrb;
+  _az_http_request hrb;
   AZ_RETURN_IF_FAILED(az_http_request_init(
       &hrb, az_http_method_get(), request_url_span, request_headers_span, content));
 

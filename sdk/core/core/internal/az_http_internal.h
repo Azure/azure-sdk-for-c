@@ -9,6 +9,11 @@
 
 #include <_az_cfg_prefix.h>
 
+AZ_NODISCARD AZ_INLINE _az_http_policy_apiversion_options
+_az_http_policy_apiversion_options_default() {
+  return (_az_http_policy_apiversion_options){ 0 };
+}
+
 // PipelinePolicies
 //   Policies are non-allocating caveat the TransportPolicy
 //   Transport p_policies can only allocate if the transport layer they call allocates
