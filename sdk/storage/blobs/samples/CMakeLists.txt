@@ -16,4 +16,4 @@ if (UNIX)
 endif()
 
 # TODO, Add tests for samples
-# add_test(NAME az_keyvault_test COMMAND az_keyvault_test)
+# add_test(NAME az_storage_blobs_samples_test COMMAND az_storage_blobs_samples_test)
