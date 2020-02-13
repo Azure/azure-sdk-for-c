@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 #include "az_aad_private.h"
-#include <az_http_pipeline_internal.h>
+#include <az_http.h>
+#include <az_http_internal.h>
 #include <az_json.h>
 #include <az_pal_clock_internal.h>
 #include <az_config_internal.h>
@@ -85,7 +86,7 @@ AZ_NODISCARD az_result _az_aad_build_body(
 
 AZ_NODISCARD az_result _az_aad_request_token(
     az_http_transport_options * http_transport_options,
-    az_http_request * ref_request,
+    _az_http_request * ref_request,
     _az_token * out_token) {
   // FIXME: If you uncomment the line below, we'll start getting HTTP 400 Bad Request instead of 200
   // OK. I suspect, it is because there's a bug in the code that adds headers. Could be something
@@ -100,19 +101,20 @@ AZ_NODISCARD az_result _az_aad_request_token(
   AZ_RETURN_IF_FAILED(az_http_response_init(&response, AZ_SPAN_FROM_BUFFER(response_buf)));
 
   // Make a HTTP request to get token
-  az_http_pipeline pipeline = {
+  _az_http_pipeline pipeline = (_az_http_pipeline){ ._internal ={
       .p_policies = {
-        { .process = az_http_pipeline_policy_retry, .p_options = NULL },
-        { .process = az_http_pipeline_policy_logging, .p_options = NULL },
-        { .process = az_http_pipeline_policy_transport, .p_options = http_transport_options },
+        {._internal = { .process = az_http_pipeline_policy_retry, .p_options = NULL }},
+        {._internal = { .process = az_http_pipeline_policy_logging, .p_options = NULL }},
+        {._internal = { .process = az_http_pipeline_policy_transport, .p_options = http_transport_options }},
       },
+      }
     };
   AZ_RETURN_IF_FAILED(az_http_pipeline_process(&pipeline, ref_request, &response));
 
   // If we failed to get the token, we return failure/
   az_http_response_status_line status_line = { 0 };
   AZ_RETURN_IF_FAILED(az_http_response_get_status_line(&response, &status_line));
-  if (status_line.status_code != AZ_HTTP_STATUS_CODE_OK) {
+  if (status_line.status_code != _AZ_HTTP_STATUS_CODE_OK) {
     return AZ_ERROR_HTTP_AUTHENTICATION_FAILED;
   }
 

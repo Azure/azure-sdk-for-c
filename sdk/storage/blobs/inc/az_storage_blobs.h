@@ -8,7 +8,6 @@
 #include <az_contract_internal.h>
 #include <az_credentials.h>
 #include <az_http.h>
-#include <az_http_pipeline_internal.h>
 #include <az_result.h>
 #include <az_span.h>
 
@@ -33,7 +32,7 @@ typedef struct {
     uint8_t url_buffer[AZ_HTTP_REQUEST_URL_BUF_SIZE];
     // this url will point to url_buffer
     az_span uri;
-    az_http_pipeline pipeline;
+    _az_http_pipeline pipeline;
     az_storage_blobs_blob_client_options options;
     _az_credential * credential;
   } _internal;

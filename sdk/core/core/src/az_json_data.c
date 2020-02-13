@@ -66,7 +66,7 @@ _az_span_aligned_append(az_span * builder, _az_data data, void const ** out) {
   // alignment.
   {
     uint8_t * const p = az_span_ptr(*builder) + az_span_length(*builder);
-    AZ_RETURN_IF_FAILED(az_span_append_zeros(builder, _az_align_ceil(p, data.type.align) - p));
+    AZ_RETURN_IF_FAILED(_az_span_append_zeros(builder, _az_align_ceil(p, data.type.align) - p));
   }
   *out = az_span_ptr(*builder) + az_span_length(*builder);
   return az_span_append(*builder, _az_data_get_span(data), builder);
@@ -116,7 +116,7 @@ AZ_NODISCARD az_result _az_span_top_array_revert(
         = az_span_take(az_span_drop(buffer, offset + i * item_type.size), item_type.size);
     az_span const b = az_span_take(
         az_span_drop(buffer, offset + (item_count - i - 1) * item_type.size), item_type.size);
-    az_span_swap(a, b);
+    _az_span_swap(a, b);
   }
 
   // 3. move it to front.
@@ -221,11 +221,7 @@ AZ_NODISCARD az_result _az_span_write_json_value(
       *out = az_json_data_array((az_json_array){ ._internal = { .begin = p, .size = i } });
       break;
     }
-    default: {
-      return AZ_ERROR_JSON_INVALID_STATE;
-    }
-  }
-  return AZ_OK;
+    default: { return AZ_ERROR_JSON_INVALID_STATE; }
 }
 
 AZ_NODISCARD az_result az_json_to_data(az_span json, az_span buffer, az_json_data const ** out) {

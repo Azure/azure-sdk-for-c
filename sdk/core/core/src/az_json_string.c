@@ -57,7 +57,7 @@ AZ_NODISCARD AZ_INLINE az_result az_json_esc_decode(uint8_t c, uint8_t * out) {
   return AZ_OK;
 }
 
-AZ_NODISCARD az_span az_json_esc_encode(uint8_t c) {
+AZ_NODISCARD az_span _az_json_esc_encode(uint8_t c) {
   switch (c) {
     case '\\': {
       return AZ_SPAN_FROM_STR("\\\\");
@@ -84,7 +84,7 @@ AZ_NODISCARD az_span az_json_esc_encode(uint8_t c) {
   }
 }
 
-AZ_NODISCARD az_result az_span_reader_read_json_string_char(az_span * self, uint32_t * out) {
+AZ_NODISCARD az_result _az_span_reader_read_json_string_char(az_span * self, uint32_t * out) {
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
   int32_t reader_length = az_span_length(*self);

@@ -31,7 +31,7 @@ AZ_NODISCARD az_result az_json_builder_write_span(az_json_builder * self, az_spa
 
     // check if the character has to be escaped.
     {
-      az_span const esc = az_json_esc_encode(c);
+      az_span const esc = _az_json_esc_encode(c);
       if (az_span_length(esc)) {
         AZ_RETURN_IF_FAILED(az_span_append(*json, esc, json));
         continue;
@@ -89,9 +89,7 @@ AZ_NODISCARD az_result az_json_builder_append_token(az_json_builder * self, az_j
       self->_internal.need_comma = true;
       return az_json_builder_write_span(self, token.value.span);
     }
-    default: {
-      return AZ_ERROR_ARG;
-    }
+    default: { return AZ_ERROR_ARG; }
   }
 }
 
