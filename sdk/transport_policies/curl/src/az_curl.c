@@ -7,7 +7,6 @@
 #include <az_span.h>
 #include <curl/curl.h>
 
-#include <stddef.h>
 #include <stdlib.h>
 
 #include <_az_cfg.h>
