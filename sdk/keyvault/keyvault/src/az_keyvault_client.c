@@ -79,7 +79,7 @@ AZ_NODISCARD az_result az_keyvault_keys_client_init(
             {
               ._internal = {
                 .process = az_http_pipeline_policy_apiversion,
-                .p_options= &self->_internal.options._internal.api_version,
+                .p_options= &options->_internal.api_version,
               },
             },
             {
@@ -91,13 +91,13 @@ AZ_NODISCARD az_result az_keyvault_keys_client_init(
             {
               ._internal = {
                 .process = az_http_pipeline_policy_telemetry,
-                .p_options = &self->_internal.options._internal._telemetry_options,
+                .p_options = &options->_internal._telemetry_options,
               },
             },
             {
               ._internal = {
                 .process = az_http_pipeline_policy_retry,
-                .p_options = &self->_internal.options.retry,
+                .p_options = &options->retry,
               },
             },
             {
@@ -127,7 +127,7 @@ AZ_NODISCARD az_result az_keyvault_keys_client_init(
             {
               ._internal = {
                 .process = az_http_pipeline_policy_transport,
-                .p_options= &self->_internal.options._internal.http_transport_options,
+                .p_options= &options->_internal.http_transport_options,
               },
             },
           },
