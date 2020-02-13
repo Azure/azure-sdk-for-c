@@ -145,7 +145,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
 
   // add Content-Length to request
   AZ_RETURN_IF_FAILED(
-      az_http_request_append_header(&hrb, AZ_HTTP_HEADER_CONTENT_LENGTH, content_length_span));
+      az_http_request_append_header(&hrb, AZ_HTTP_HEADER_CONTENT_LENGTH, content_length_builder));
 
   // add blob type to request
   AZ_RETURN_IF_FAILED(az_http_request_append_header(
