@@ -9,16 +9,17 @@
 #include <az_http.h>
 #include <az_result.h>
 #include <az_span.h>
+#include <az_config_internal.h>
 
 #include <stdbool.h>
 
 #include <_az_cfg_prefix.h>
 
 enum {
-  _az_AAD_REQUEST_URL_BUF_SIZE = AZ_HTTP_REQUEST_URL_BUF_SIZE,       // Minimum 200
-  _az_AAD_REQUEST_HEADER_BUF_SIZE = AZ_HTTP_REQUEST_HEADER_BUF_SIZE, // Minimum 2 * sizeof(az_span)
-  _az_AAD_REQUEST_BODY_BUF_SIZE = AZ_HTTP_REQUEST_BODY_BUF_SIZE,     // Minimum 500
-  _az_AAD_RESPONSE_BUF_SIZE = 3 * 1024,                              // Minimum 3 * 1024
+  _az_AAD_REQUEST_URL_BUF_SIZE = AZ_HTTP_REQUEST_URL_BUF_SIZE,
+  _az_AAD_REQUEST_HEADER_BUF_SIZE = AZ_HTTP_REQUEST_HEADER_BUF_SIZE,
+  _az_AAD_REQUEST_BODY_BUF_SIZE = AZ_HTTP_REQUEST_BODY_BUF_SIZE,
+  _az_AAD_RESPONSE_BUF_SIZE = 3 * 1024,
 };
 
 AZ_NODISCARD az_result _az_aad_build_url(az_span url, az_span tenant_id, az_span * out_url);

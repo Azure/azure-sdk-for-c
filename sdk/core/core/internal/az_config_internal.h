@@ -4,14 +4,18 @@
 #ifndef _az_CONFIG_INTERNAL_H
 #define _az_CONFIG_INTERNAL_H
 
-#include <az_http.h>
-#include <az_result.h>
+#include <az_config.h>
 #include <az_span.h>
 
 #include <stdint.h>
 
 #include <_az_cfg_prefix.h>
+enum {
+  AZ_HTTP_REQUEST_HEADER_BUF_SIZE = AZ_HTTP_REQUEST_HEADER_COUNT * sizeof(az_pair),
+};
 /*
+
+
 
 */
 enum {
@@ -20,9 +24,9 @@ enum {
 };
 
 /*
-*  Int64 is max value 9223372036854775808   (19 characters)
-*           min value -9223372036854775808  (20 characters)
-*/
+ *  Int64 is max value 9223372036854775808   (19 characters)
+ *           min value -9223372036854775808  (20 characters)
+ */
 enum {
   _az_INT64_AS_STR_BUF_SIZE = 20,
 };

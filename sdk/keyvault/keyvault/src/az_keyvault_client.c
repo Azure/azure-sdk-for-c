@@ -6,6 +6,7 @@
 #include <az_json.h>
 #include <az_keyvault.h>
 #include <az_span.h>
+#include <az_config_internal.h>
 
 #include <_az_cfg.h>
 
