@@ -14,21 +14,18 @@
 #include <_az_cfg_prefix.h>
 
 typedef enum {
-  az_http_policy_apiversion_option_location_header,
-  az_http_policy_apiversion_option_location_queryparameter
-} az_http_policy_apiversion_option_location;
+  _az_http_policy_apiversion_option_location_header,
+  _az_http_policy_apiversion_option_location_queryparameter
+} _az_http_policy_apiversion_option_location;
 
 typedef struct {
   // Services pass API versions in the header or in query parameters
-  az_http_policy_apiversion_option_location option_location;
-  az_span name;
-  az_span version;
+  struct {
+    _az_http_policy_apiversion_option_location option_location;
+    az_span name;
+    az_span version;
+  } _internal;
 } _az_http_policy_apiversion_options;
-
-AZ_NODISCARD AZ_INLINE _az_http_policy_apiversion_options
-az_http_policy_apiversion_options_default() {
-  return (_az_http_policy_apiversion_options){ 0 };
-}
 
 /**
  * @brief options for the telemetry policy
@@ -40,7 +37,7 @@ typedef struct {
 } _az_http_policy_telemetry_options;
 
 AZ_NODISCARD AZ_INLINE _az_http_policy_telemetry_options
-_az_http_policy_apiversion_options_default() {
+_az_http_policy_telemetry_options_default() {
   return (_az_http_policy_telemetry_options){ .os = AZ_SPAN_FROM_STR("Unknown OS") };
 }
 

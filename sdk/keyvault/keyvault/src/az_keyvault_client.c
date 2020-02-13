@@ -44,13 +44,13 @@ az_keyvault_keys_client_options_default(az_http_transport_options const * http_t
 
   az_keyvault_keys_client_options options = (az_keyvault_keys_client_options){
     ._internal = { .http_transport_options = *http_transport_options,
-                   .api_version = az_http_policy_apiversion_options_default() },
+                   .api_version = _az_http_policy_apiversion_options_default() },
     .retry = az_http_policy_retry_options_default(),
   };
 
-  options._internal.api_version.option_location = az_http_policy_apiversion_option_location_queryparameter;
-  options._internal.api_version.name = AZ_HTTP_HEADER_API_VERSION;
-  options._internal.api_version.version = AZ_KEYVAULT_API_VERSION;
+  options._internal.api_version._internal.option_location = _az_http_policy_apiversion_option_location_queryparameter;
+  options._internal.api_version._internal.name = AZ_HTTP_HEADER_API_VERSION;
+  options._internal.api_version._internal.version = AZ_KEYVAULT_API_VERSION;
 
   return options;
 }
