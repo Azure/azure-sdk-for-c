@@ -29,7 +29,7 @@ _az_http_request_mark_retry_headers_start(_az_http_request * p_hrb) {
   return AZ_OK;
 }
 
-AZ_NODISCARD AZ_INLINE az_result az_http_request_remove_retry_headers(_az_http_request * p_hrb) {
+AZ_NODISCARD AZ_INLINE az_result _az_http_request_remove_retry_headers(_az_http_request * p_hrb) {
   AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
 
   az_span * headers_ptr = &p_hrb->_internal.headers;

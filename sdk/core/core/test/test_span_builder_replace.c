@@ -17,7 +17,7 @@ void test_span_builder_replace() {
     az_span expected = AZ_SPAN_FROM_STR("1X78");
     TEST_EXPECT_SUCCESS(az_span_append(builder, initial_state, &builder));
 
-    TEST_ASSERT(az_span_replace(&builder, 1, 6, AZ_SPAN_FROM_STR("X")) == AZ_OK);
+    TEST_ASSERT(_az_span_replace(&builder, 1, 6, AZ_SPAN_FROM_STR("X")) == AZ_OK);
 
     az_span const result = builder;
     TEST_ASSERT(az_span_is_equal(result, expected));
@@ -30,7 +30,7 @@ void test_span_builder_replace() {
     az_span expected = AZ_SPAN_FROM_STR("12X345678");
     TEST_EXPECT_SUCCESS(az_span_append(builder, initial_state, &builder));
 
-    TEST_ASSERT(az_span_replace(&builder, 2, 2, AZ_SPAN_FROM_STR("X")) == AZ_OK);
+    TEST_ASSERT(_az_span_replace(&builder, 2, 2, AZ_SPAN_FROM_STR("X")) == AZ_OK);
 
     az_span const result = builder;
     TEST_ASSERT(az_span_is_equal(result, expected));
@@ -43,7 +43,7 @@ void test_span_builder_replace() {
     az_span expected = AZ_SPAN_FROM_STR("1234567890");
     TEST_EXPECT_SUCCESS(az_span_append(builder, initial_state, &builder));
 
-    TEST_ASSERT(az_span_replace(&builder, 8, 8, AZ_SPAN_FROM_STR("90")) == AZ_OK);
+    TEST_ASSERT(_az_span_replace(&builder, 8, 8, AZ_SPAN_FROM_STR("90")) == AZ_OK);
 
     az_span const result = builder;
     TEST_ASSERT(az_span_is_equal(result, expected));
@@ -56,7 +56,7 @@ void test_span_builder_replace() {
     az_span expected = AZ_SPAN_FROM_STR("X");
     TEST_EXPECT_SUCCESS(az_span_append(builder, initial_state, &builder));
 
-    TEST_ASSERT(az_span_replace(&builder, 0, 8, AZ_SPAN_FROM_STR("X")) == AZ_OK);
+    TEST_ASSERT(_az_span_replace(&builder, 0, 8, AZ_SPAN_FROM_STR("X")) == AZ_OK);
 
     az_span const result = builder;
     TEST_ASSERT(az_span_is_equal(result, expected));
@@ -69,7 +69,7 @@ void test_span_builder_replace() {
     az_span expected = AZ_SPAN_FROM_STR("X12345678X");
     TEST_EXPECT_SUCCESS(az_span_append(builder, initial_state, &builder));
 
-    TEST_ASSERT(az_span_replace(&builder, 0, 8, AZ_SPAN_FROM_STR("X12345678X")) == AZ_OK);
+    TEST_ASSERT(_az_span_replace(&builder, 0, 8, AZ_SPAN_FROM_STR("X12345678X")) == AZ_OK);
 
     az_span const result = builder;
     TEST_ASSERT(az_span_is_equal(result, expected));
@@ -82,7 +82,7 @@ void test_span_builder_replace() {
     az_span expected = AZ_SPAN_FROM_STR("XXX12345678");
     TEST_EXPECT_SUCCESS(az_span_append(builder, initial_state, &builder));
 
-    TEST_ASSERT(az_span_replace(&builder, 0, 0, AZ_SPAN_FROM_STR("XXX")) == AZ_OK);
+    TEST_ASSERT(_az_span_replace(&builder, 0, 0, AZ_SPAN_FROM_STR("XXX")) == AZ_OK);
 
     az_span const result = builder;
     TEST_ASSERT(az_span_is_equal(result, expected));
@@ -95,7 +95,7 @@ void test_span_builder_replace() {
     az_span expected = AZ_SPAN_FROM_STR("2");
     TEST_EXPECT_SUCCESS(az_span_append(builder, initial_state, &builder));
 
-    TEST_ASSERT(az_span_replace(&builder, 0, 1, AZ_SPAN_FROM_STR("2")) == AZ_OK);
+    TEST_ASSERT(_az_span_replace(&builder, 0, 1, AZ_SPAN_FROM_STR("2")) == AZ_OK);
 
     az_span const result = builder;
     TEST_ASSERT(az_span_is_equal(result, expected));
@@ -108,7 +108,7 @@ void test_span_builder_replace() {
     az_span expected = AZ_SPAN_FROM_STR("4321");
     TEST_EXPECT_SUCCESS(az_span_append(builder, initial_state, &builder));
 
-    TEST_ASSERT(az_span_replace(&builder, 0, 4, AZ_SPAN_FROM_STR("4321")) == AZ_OK);
+    TEST_ASSERT(_az_span_replace(&builder, 0, 4, AZ_SPAN_FROM_STR("4321")) == AZ_OK);
 
     az_span const result = builder;
     TEST_ASSERT(az_span_is_equal(result, expected));
@@ -121,7 +121,7 @@ void test_span_builder_replace() {
     az_span expected = AZ_SPAN_FROM_STR("1X34AB");
     TEST_EXPECT_SUCCESS(az_span_append(builder, initial_state, &builder));
 
-    TEST_EXPECT_SUCCESS(az_span_replace(&builder, 1, 2, AZ_SPAN_FROM_STR("X")));
+    TEST_EXPECT_SUCCESS(_az_span_replace(&builder, 1, 2, AZ_SPAN_FROM_STR("X")));
 
     TEST_EXPECT_SUCCESS(az_span_append(builder, AZ_SPAN_FROM_STR("AB"), &builder));
 
@@ -136,7 +136,7 @@ void test_span_builder_replace() {
     az_span expected = AZ_SPAN_FROM_STR("1234");
 
     TEST_EXPECT_SUCCESS(az_span_append(builder, initial_state, &builder));
-    TEST_EXPECT_SUCCESS(az_span_replace(&builder, 3, 3, AZ_SPAN_FROM_STR("4")));
+    TEST_EXPECT_SUCCESS(_az_span_replace(&builder, 3, 3, AZ_SPAN_FROM_STR("4")));
 
     az_span const result = builder;
     TEST_ASSERT(az_span_is_equal(result, expected));
@@ -148,19 +148,19 @@ void test_span_builder_replace() {
     az_span initial_state = AZ_SPAN_FROM_STR("1234");
     TEST_EXPECT_SUCCESS(az_span_append(builder, initial_state, &builder));
 
-    TEST_ASSERT(az_span_replace(&builder, 0, 4, AZ_SPAN_FROM_STR("4321X")) == AZ_ERROR_ARG);
+    TEST_ASSERT(_az_span_replace(&builder, 0, 4, AZ_SPAN_FROM_STR("4321X")) == AZ_ERROR_ARG);
   }
   {
     // Fail on builder empty -> try to replace content from empty builder
     uint8_t array[200];
     az_span builder = AZ_SPAN_FROM_BUFFER(array);
-    TEST_ASSERT(az_span_replace(&builder, 0, 1, AZ_SPAN_FROM_STR("2")) == AZ_ERROR_ARG);
+    TEST_ASSERT(_az_span_replace(&builder, 0, 1, AZ_SPAN_FROM_STR("2")) == AZ_ERROR_ARG);
   }
   {
     // Replace content on empty builder -> insert at the end
     uint8_t array[200];
     az_span builder = AZ_SPAN_FROM_BUFFER(array);
-    TEST_ASSERT(az_span_replace(&builder, 0, 0, AZ_SPAN_FROM_STR("2")) == AZ_OK);
+    TEST_ASSERT(_az_span_replace(&builder, 0, 0, AZ_SPAN_FROM_STR("2")) == AZ_OK);
     az_span const result = builder;
     az_span const expected = AZ_SPAN_FROM_STR("2");
     TEST_ASSERT(az_span_is_equal(result, expected));
@@ -172,7 +172,7 @@ void test_span_builder_replace() {
     az_span initial_state = AZ_SPAN_FROM_STR("1234");
     TEST_EXPECT_SUCCESS(az_span_append(builder, initial_state, &builder));
 
-    TEST_ASSERT(az_span_replace(&builder, 30, 31, AZ_SPAN_FROM_STR("4321X")) == AZ_ERROR_ARG);
+    TEST_ASSERT(_az_span_replace(&builder, 30, 31, AZ_SPAN_FROM_STR("4321X")) == AZ_ERROR_ARG);
   }
   {
     // Fail when trying to replace out of bounds -> end position out
@@ -181,7 +181,7 @@ void test_span_builder_replace() {
     az_span initial_state = AZ_SPAN_FROM_STR("1234");
     TEST_EXPECT_SUCCESS(az_span_append(builder, initial_state, &builder));
 
-    TEST_ASSERT(az_span_replace(&builder, 4, 5, AZ_SPAN_FROM_STR("4321X")) == AZ_ERROR_ARG);
+    TEST_ASSERT(_az_span_replace(&builder, 4, 5, AZ_SPAN_FROM_STR("4321X")) == AZ_ERROR_ARG);
   }
   {
     // Fail when start is greater than end
@@ -190,6 +190,6 @@ void test_span_builder_replace() {
     az_span initial_state = AZ_SPAN_FROM_STR("1234");
     TEST_EXPECT_SUCCESS(az_span_append(builder, initial_state, &builder));
 
-    TEST_ASSERT(az_span_replace(&builder, 3, 1, AZ_SPAN_FROM_STR("4321X")) == AZ_ERROR_ARG);
+    TEST_ASSERT(_az_span_replace(&builder, 3, 1, AZ_SPAN_FROM_STR("4321X")) == AZ_ERROR_ARG);
   }
 }

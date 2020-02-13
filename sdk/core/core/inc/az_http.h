@@ -26,7 +26,6 @@ typedef struct {
     az_span headers;
     int32_t max_headers;
     int32_t retry_headers_start_byte_offset;
-    // int32_t headers_end;
     az_span body;
   } _internal;
 } _az_http_request;

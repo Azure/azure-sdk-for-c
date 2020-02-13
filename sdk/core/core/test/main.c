@@ -3,6 +3,7 @@
 
 #include <az_http.h>
 #include <az_http_internal.h>
+#include <az_http_transport.h>
 #include <az_json.h>
 
 #include <az_http_private.h>
@@ -473,7 +474,7 @@ int main() {
         TEST_ASSERT(az_span_is_equal(header.value, expected_headers1[i].value));
       }
 
-      TEST_EXPECT_SUCCESS(az_http_request_remove_retry_headers(&hrb));
+      TEST_EXPECT_SUCCESS(_az_http_request_remove_retry_headers(&hrb));
       TEST_ASSERT(hrb._internal.retry_headers_start_byte_offset == sizeof(az_pair));
 
       TEST_EXPECT_SUCCESS(az_http_request_append_header(

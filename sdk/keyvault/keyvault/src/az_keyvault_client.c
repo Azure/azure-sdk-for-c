@@ -3,7 +3,9 @@
 
 #include <az_contract_internal.h>
 #include <az_credentials_internal.h>
+#include <az_http.h>
 #include <az_http_internal.h>
+#include <az_http_transport.h>
 #include <az_json.h>
 #include <az_keyvault.h>
 #include <az_span.h>

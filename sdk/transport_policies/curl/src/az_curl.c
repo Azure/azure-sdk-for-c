@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include <az_curl.h>
-#include <az_http_internal.h>
+#include <az_http_transport.h>
 
 #include <az_span.h>
 #include <curl/curl.h>

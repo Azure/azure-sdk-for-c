@@ -4,6 +4,7 @@
 #include <az_http.h>
 #include <az_http_internal.h>
 #include <az_http_private.h>
+#include <az_http_transport.h>
 #include <az_log.h>
 #include <az_log_internal.h>
 #include <az_log_private.h>

@@ -62,9 +62,9 @@ AZ_NODISCARD az_result az_http_request_append_path(_az_http_request * p_hrb, az_
    * memory.
    */
   AZ_RETURN_IF_FAILED(
-      az_span_replace(&p_hrb->_internal.url, query_start, query_start, AZ_SPAN_FROM_STR("/")));
+      _az_span_replace(&p_hrb->_internal.url, query_start, query_start, AZ_SPAN_FROM_STR("/")));
   query_start += 1; // a size of "/"
-  AZ_RETURN_IF_FAILED(az_span_replace(&p_hrb->_internal.url, query_start, query_start, path));
+  AZ_RETURN_IF_FAILED(_az_span_replace(&p_hrb->_internal.url, query_start, query_start, path));
   query_start += az_span_length(path);
 
   // update query start
@@ -134,5 +134,16 @@ az_http_request_get_header(_az_http_request * p_hrb, int32_t index, az_pair * ou
   }
 
   *out_result = ((az_pair *)az_span_ptr(p_hrb->_internal.headers))[index];
+  return AZ_OK;
+}
+
+AZ_NODISCARD az_result az_http_request_get_parts(
+    _az_http_request * p_request,
+    az_http_method * out_method,
+    az_span * out_url,
+    az_span * body) {
+  *out_method = p_request->_internal.method;
+  *out_url = p_request->_internal.url;
+  *body = p_request->_internal.body;
   return AZ_OK;
 }
