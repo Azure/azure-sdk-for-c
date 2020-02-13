@@ -41,11 +41,11 @@ For more extensive documentation on Azure Storage blob, see the [API reference d
 This project welcomes contributions and suggestions. Find [more contributing][SDK_README_CONTRIBUTING] details here.
 
 <!-- LINKS -->
-[BLOB_SDK_README]: ../../README.md
-[SDK_README_CONTRIBUTING]:../../README.md#contributing
-[SDK_README_GETTING_STARTED]: ../../README.md#getting-started
-[SDK_README_KEY_CONCEPTS]: ../../README.md#key-concepts
-[samples_basic]: src/BasicExample.c
+[BLOB_SDK_README]: ../README.md
+[SDK_README_CONTRIBUTING]:../README.md#contributing
+[SDK_README_GETTING_STARTED]: ../README.md#getting-started
+[SDK_README_KEY_CONCEPTS]: ../README.md#key-concepts
+[samples_basic]: src/blobs_client_example.c
 [storageblob_rest]: https://docs.microsoft.com/en-us/rest/api/storageservices/blob-service-rest-api
 [error_codes]: https://docs.microsoft.com/rest/api/storageservices/blob-service-error-codes
 

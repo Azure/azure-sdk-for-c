@@ -39,10 +39,10 @@ Getting started explained in detail [here][SDK_README_GETTING_STARTED].
 This project welcomes contributions and suggestions. Find [more contributing][SDK_README_CONTRIBUTING] details here.
 
 <!-- LINKS -->
-[BLOB_SDK_README]: ../../README.md
-[SDK_README_CONTRIBUTING]:../../README.md#contributing
-[SDK_README_GETTING_STARTED]: ../../README.md#getting-started
-[SDK_README_KEY_CONCEPTS]: ../../README.md#key-concepts
-[samples_basic]: src/BasicExample.c
+[BLOB_SDK_README]: https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/storage/blobs/README.md
+[SDK_README_CONTRIBUTING]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md
+[SDK_README_GETTING_STARTED]: https://github.com/Azure/azure-sdk-for-c/blob/master/README.md#getting-started
+[SDK_README_KEY_CONCEPTS]: ../README.md#key-concepts
+[samples_basic]: src/keys_client_example.c
 
 ![Impressions](https://azure-sdk-impressions.azurewebsites.net/api/impressions/azure-sdk-for-c%2Fsdk%2Fkeyvault%2Fkeys%2Fsamples%2FREADME.png)
