@@ -86,8 +86,5 @@ Security issues and bugs should be reported privately, via email, to the Microso
 
 Azure SDK for C is licensed under the [MIT](LICENSE) license.
 
-![Impressions](https://azure-sdk-impressions.azurewebsites.net/api/impressions/azure-sdk-for-c%2FREADME.png)
-
 <!-- LINKS -->
 [azure_sdk_for_c_wiki]: https://github.com/azure/azure-sdk-for-c/wiki
-[c_compiler]: https://visualstudio.microsoft.com/vs/features/cplusplus/
