@@ -90,6 +90,7 @@ jobs:
   - script: |
       vcpkg install $(vcpkg.deps)
     displayName: vcpkg install dependencies
+    condition: contains(variables['vcpkg.dep'], 'curl')
 
   - task: CMake@1
     inputs:
