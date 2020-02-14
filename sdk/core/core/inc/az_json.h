@@ -1,6 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+/**
+ * @file az_json.h
+ *
+ * @brief non allocating utilities for reading/parsing and building json
+ */
+
 #ifndef _az_JSON_H
 #define _az_JSON_H
 

@@ -1,6 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+/**
+ * @file az_http_transport.h
+ *
+ * @brief Utilities to be used by transport policy implementations
+ */
+
 #ifndef _az_HTTP_TRANSPORT_H
 #define _az_HTTP_TRANSPORT_H
 
