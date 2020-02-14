@@ -22,6 +22,7 @@ add_library (
   src/az_json_string.c
   src/az_json_token.c
   src/az_log.c
+  src/az_platform_impl.c
   src/az_span.c
   )
 
@@ -51,7 +52,15 @@ target_include_directories (az_core PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOU
 add_library(az_core_internal INTERFACE)
 target_include_directories(az_core_internal INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/internal> $<INSTALL_INTERFACE:include/az_internal>)
 
-target_link_libraries(az_core PRIVATE az_core_internal)
+target_link_libraries(az_core PRIVATE az_core_internal
+if (WIN32)
+    az_win32
+elseif (APPLE)
+    az_c11
+else
+    az_posix
+endif
+)
 
 # make sure that users can consume the project as a library.
 add_library (az::core ALIAS az_core)

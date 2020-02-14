@@ -5,7 +5,7 @@
 #include <az_http.h>
 #include <az_http_internal.h>
 #include <az_json.h>
-#include <az_pal_clock_internal.h>
+#include <az_platform_internal.h>
 #include <az_config_internal.h>
 
 #include <stddef.h>
@@ -14,7 +14,7 @@
 
 AZ_NODISCARD bool _az_token_expired(_az_token const * token) {
   int64_t const expires_at_msec = token->_internal.expires_at_msec;
-  return expires_at_msec <= 0 || _az_pal_clock_msec() > expires_at_msec;
+  return expires_at_msec <= 0 || az_platform_clock_msec() > expires_at_msec;
 }
 
 AZ_NODISCARD _az_token _az_token_get(_az_token const * self) {
@@ -145,7 +145,7 @@ AZ_NODISCARD az_result _az_aad_request_token(
     ._internal = {
       .token = { 0 },
       .token_length = 0,
-      .expires_at_msec = _az_pal_clock_msec() + expires_in_msec,
+      .expires_at_msec = az_platform_clock_msec() + expires_in_msec,
     },
   };
 

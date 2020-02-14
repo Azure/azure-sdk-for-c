@@ -7,7 +7,7 @@
 #include <az_http_internal.h>
 #include <az_log.h>
 #include <az_log_internal.h>
-#include <az_pal_clock_internal.h>
+#include <az_platform_internal.h>
 #include <az_span.h>
 
 #include <stddef.h>
@@ -130,9 +130,9 @@ AZ_NODISCARD az_result az_http_pipeline_policy_logging(
     return az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
   }
 
-  int64_t const start = _az_pal_clock_msec();
+  int64_t const start = az_platform_clock_msec();
   az_result const result = az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
-  int64_t const end = _az_pal_clock_msec();
+  int64_t const end = az_platform_clock_msec();
 
   _az_log_http_response(p_response, end - start, p_request);
 

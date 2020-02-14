@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include <az_platform.h>
+#include <az_platform_internal.h>
 
 #include <_az_cfg.h>
 

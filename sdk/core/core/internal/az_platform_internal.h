@@ -1,9 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef _az_PLATFORM_H
-#define _az_PLATFORM_H
+#ifndef _az_PLATFORM_INTERNAL_H
+#define _az_PLATFORM_INTERNAL_H
 
+#include <az_platform.h>
 #include <az_result.h>
 
 #include <stdint.h>
