@@ -1,6 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+/**
+ * @file _az_cfg.h
+ *
+ * @brief disabling warnings
+ */
+
 #ifdef _MSC_VER
 
 // warning C4710: '...': function not inlined

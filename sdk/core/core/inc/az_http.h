@@ -1,12 +1,19 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+/**
+ * @file az_http.h
+ *
+ * @brief Definition and functionality for az_http_response and related http utilities that allows
+ * customer to create required component for sdk clients
+ */
+
 #ifndef _az_HTTP_H
 #define _az_HTTP_H
 
+#include <az_config.h>
 #include <az_result.h>
 #include <az_span.h>
-#include <az_config.h>
 
 #include <stdbool.h>
 #include <stdint.h>

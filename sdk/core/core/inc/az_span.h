@@ -1,6 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+/**
+ * @file az_span.h
+ *
+ * @brief az_span and utilities definition
+ */
+
 #ifndef _az_SPAN_H
 #define _az_SPAN_H
 
