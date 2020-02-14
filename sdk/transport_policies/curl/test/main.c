@@ -88,7 +88,6 @@ int main() {
 
     TEST_ASSERT(send_req_result == AZ_OK);
 
-    // printf("%s", az_span_ptr(sample_response._internal.http_response));
     az_http_response_status_line status_line;
     TEST_ASSERT(az_http_response_get_status_line(&sample_response, &status_line) == AZ_OK);
 
@@ -125,8 +124,8 @@ int main() {
     TEST_ASSERT(send_req_result == AZ_ERROR_HTTP_RESPONSE_OVERFLOW);
   }
   {
-    // send a basic GET request and expect OVERFLOW (Response too big for response buffer)
-    az_span sample_url = AZ_SPAN_FROM_STR("https://noserverfornoreachresponse/");
+    // send a basic GET request and expect HOST not resolved error
+    az_span sample_url = AZ_SPAN_FROM_STR("https://noServerForNoResolvedResponse/");
 
     // Response buffer
     uint8_t response_buffer[1024 * 5];
