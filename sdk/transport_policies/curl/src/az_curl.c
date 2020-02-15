@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include <az_curl.h>
+#include <az_http.h>
 #include <az_http_transport.h>
 
 #include <az_span.h>
@@ -278,9 +279,10 @@ static int32_t _az_http_client_curl_upload_read_callback(
 
   int32_t data_length = az_span_length(*mut_span);
   int32_t to_copy = (data_length < curl_size) ? data_length : curl_size;
-  AZ_RETURN_IF_FAILED(
-      az_span_append(*mut_span, az_span_init((uint8_t *)ptr, to_copy, to_copy), mut_span));
-
+  memcpy(ptr, mut_span->_internal.ptr, to_copy);
+  mut_span->_internal.capacity -= to_copy;
+  mut_span->_internal.ptr += to_copy;
+  
   return to_copy;
 }
 
@@ -301,6 +303,7 @@ _az_http_client_curl_send_upload_request(CURL * p_curl, _az_http_request const *
 
   char * b = (char *)az_span_ptr(body);
   az_result res_code = az_span_to_str(b, required_size, p_request->_internal.body);
+  body._internal.length = required_size;
 
   if (az_succeeded(res_code)) {
     res_code = _az_http_client_curl_code_to_result(curl_easy_setopt(p_curl, CURLOPT_UPLOAD, 1L));
@@ -473,7 +476,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
  * @param p_response pre-allocated buffer where http response will be written
  * @return az_result
  */
-static AZ_NODISCARD az_result
+AZ_NODISCARD az_result
 _az_http_client_curl_send_request(_az_http_request * p_request, az_http_response * p_response) {
   AZ_CONTRACT_ARG_NOT_NULL(p_request);
   AZ_CONTRACT_ARG_NOT_NULL(p_response);
@@ -491,14 +494,4 @@ _az_http_client_curl_send_request(_az_http_request * p_request, az_http_response
   AZ_RETURN_IF_FAILED(_az_http_client_curl_done(&p_curl));
 
   return process_result;
-}
-
-AZ_NODISCARD az_result az_http_transport_options_init(az_http_transport_options * out_options) {
-  *out_options = (az_http_transport_options) {
-    ._internal = {
-      .send_request = _az_http_client_curl_send_request,
-    },
-  };
-
-  return AZ_OK;
 }

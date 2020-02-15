@@ -8,6 +8,7 @@
 #include <az_http_transport.h>
 #include <az_json.h>
 #include <az_storage_blobs.h>
+#include <az_log.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -66,15 +67,26 @@ az_storage_blobs_blob_delete(az_storage_blobs_blob_client * client, az_http_resp
   // TODO: define max URL size
   _az_http_request hrb;
   AZ_RETURN_IF_FAILED(az_http_request_init(
-      &hrb, az_http_method_get(), request_url_span, request_headers_span, az_span_null()));
+      &hrb, az_http_method_delete(), request_url_span, request_headers_span, az_span_null()));
 
   // start pipeline
   return az_http_pipeline_process(&client->_internal.pipeline, &hrb, response);
 }
 
+static void _log_listener(az_log_classification classification, az_span message) {
+  (void)classification;
+  fprintf(stderr, "%.*s\n", (unsigned int)message._internal.capacity, message._internal.ptr);
+}
+
 int main() {
+  //Uncomment the following line to get log output on the console
+  //az_log_set_listener(_log_listener);
 
   az_storage_blobs_blob_client client;
+
+  /*  */
+  az_http_transport_options http_transport_options
+      = az_http_transport_options_default(_az_http_client_curl_send_request);
 
   /************* create credentials as client_id type   ***********/
   az_client_secret_credential credential = { 0 };
@@ -83,18 +95,12 @@ int main() {
       &credential,
       az_span_from_str(getenv(TENANT_ID_ENV)),
       az_span_from_str(getenv(CLIENT_ID_ENV)),
-      az_span_from_str(getenv(CLIENT_SECRET_ENV)));
+      az_span_from_str(getenv(CLIENT_SECRET_ENV)),
+      &http_transport_options
+     );
 
   if (az_failed(creds_retcode)) {
     printf("Failed to init credential");
-  }
-
-  az_http_transport_options http_transport_options = { 0 };
-  az_result const http_transport_options_init_status
-      = az_http_transport_options_init(&http_transport_options);
-
-  if (az_failed(http_transport_options_init_status)) {
-    printf("Failed to init http transport options");
   }
 
   // Init client.

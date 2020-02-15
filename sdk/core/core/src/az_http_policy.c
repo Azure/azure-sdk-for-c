@@ -174,3 +174,12 @@ AZ_NODISCARD az_result az_http_pipeline_policy_transport(
 
   return send_request(p_request, p_response);
 }
+
+AZ_NODISCARD az_http_transport_options
+az_http_transport_options_default(az_http_client_send_request_fn send_request) {
+  return (az_http_transport_options) {
+    ._internal = {
+      .send_request = send_request,
+    },
+  };
+}

@@ -52,7 +52,8 @@ AZ_NODISCARD az_result az_client_secret_credential_init(
     az_client_secret_credential * self,
     az_span tenant_id,
     az_span client_id,
-    az_span client_secret);
+    az_span client_secret,
+    az_http_transport_options * http_transport_options);
 
 #include <_az_cfg_suffix.h>
 

@@ -25,6 +25,9 @@ int main() {
   /************ Creates keyvault client    ****************/
   az_keyvault_keys_client client;
 
+  az_http_transport_options http_transport_options
+      = az_http_transport_options_default(_az_http_client_curl_send_request);
+  
   /************* create credentials as client_id type   ***********/
   az_client_secret_credential credential = { 0 };
   // init credential_credentials struc
@@ -32,18 +35,11 @@ int main() {
       &credential,
       az_span_from_str(getenv(TENANT_ID_ENV)),
       az_span_from_str(getenv(CLIENT_ID_ENV)),
-      az_span_from_str(getenv(CLIENT_SECRET_ENV)));
+      az_span_from_str(getenv(CLIENT_SECRET_ENV)),
+      &http_transport_options);
 
   if (az_failed(creds_retcode)) {
     printf("Failed to init credential");
-  }
-
-  az_http_transport_options http_transport_options = { 0 };
-  az_result const http_transport_options_init_status
-      = az_http_transport_options_init(&http_transport_options);
-
-  if (az_failed(http_transport_options_init_status)) {
-    printf("Failed to init http transport options");
   }
 
   // Init client.
