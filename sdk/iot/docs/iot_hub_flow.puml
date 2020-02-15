@@ -1,0 +1,145 @@
+@startuml
+
+skinparam state {
+    BackgroundColor<<APP>> APPLICATION
+    BackgroundColor<<STRUCT>> Lavender
+}
+
+state color_coding {
+    state SDK_API
+    state SDK_DATA_OBJECT <<STRUCT>>
+    state APPLICATION_CODE <<APP>>
+}
+
+' Init
+[*] --> az_iot_hub_client_init: START
+az_iot_hub_client_init -> az_iot_hub_get_connect_information : X509 auth
+az_iot_hub_get_connect_information -> az_iot_mqtt_connect
+az_iot_mqtt_connect -> application_mqtt_connect
+state application_mqtt_connect <<APP>>
+
+' Optional SAS token generation:
+az_iot_hub_client_init -> az_iot_hub_sas_get : SAS auth
+az_iot_hub_sas_get -> application_hmac256
+application_hmac256 -> az_iot_hub_sas_update
+az_iot_hub_sas_update --> az_iot_mqtt_connect : password
+state application_hmac256 <<APP>>
+
+' Telemetry
+application_mqtt_connect --> az_iot_hub_telemetry_property_init : Telemetry can be used w/o subscribing to any topic.
+az_iot_hub_telemetry_property_init --> az_iot_hub_telemetry_properties : CRUD operations
+az_iot_hub_telemetry_properties --> az_iot_hub_telemetry_send
+az_iot_hub_telemetry_send --> az_iot_mqtt_publish
+
+' C2D
+application_mqtt_connect --> az_iot_hub_get_c2d_subscribe_topic
+az_iot_hub_get_c2d_subscribe_topic --> az_iot_topic
+
+' Methods
+application_mqtt_connect --> az_iot_hub_get_methods_subscribe_topic
+az_iot_hub_get_methods_subscribe_topic --> az_iot_topic
+
+az_iot_hub_methods_send_response --> az_iot_mqtt_publish
+
+' Twin
+application_mqtt_connect --> az_iot_hub_get_twin_subscribe_topic
+az_iot_hub_get_twin_subscribe_topic --> az_iot_topic : RESPONSE and PATCH topics
+
+application_mqtt_subscribe --> az_iot_hub_twin_get
+az_iot_hub_twin_get --> az_iot_mqtt_publish
+
+application_mqtt_subscribe --> az_iot_hub_twin_patch
+az_iot_hub_twin_patch --> az_iot_mqtt_publish
+
+' Common subscribe
+az_iot_topic --> application_mqtt_subscribe
+state application_mqtt_subscribe <<APP>>
+application_mqtt_subscribe -> application_mqtt_receive : MQTT lib subscribed
+
+az_iot_mqtt_publish --> application_mqtt_publish
+state application_mqtt_publish <<APP>>
+
+state application_mqtt_receive <<APP>> { 
+' Callback delegating handler:
+    [*] --> recv_pub : Received PUBLISH message
+    recv_pub --> az_iot_hub_c2d_handle
+    az_iot_hub_c2d_handle --> az_iot_hub_methods_handle : not c2d related
+    az_iot_hub_methods_handle --> az_iot_hub_twin_get_handle : not methods related
+    az_iot_hub_twin_get_handle --> az_iot_hub_twin_patch_handle : not methods related
+    az_iot_hub_twin_patch_handle --> [*] : not twin related
+
+' C2D
+    az_iot_hub_c2d_handle -> az_iot_hub_c2d_request : c2d call received
+    
+' Methods:
+    az_iot_hub_methods_handle -> az_iot_hub_method_request : method call received
+    az_iot_hub_method_request -> application_method_handle
+    state application_method_handle <<APP>>
+    application_method_handle -> az_iot_hub_methods_send_response
+    
+' Twin
+    az_iot_hub_twin_get_handle -> az_iot_hub_twin_response : twin GET or PATCH received
+    az_iot_hub_twin_patch_handle -> az_iot_hub_twin_response : twin GET or PATCH received
+}
+
+' Common MQTT data objects
+state az_iot_mqtt_connect <<STRUCT>>
+az_iot_mqtt_connect : - client_id
+az_iot_mqtt_connect : - user
+az_iot_mqtt_connect : - password
+
+state az_iot_topic <<STRUCT>>
+az_iot_topic : - topic_filter
+az_iot_topic : - qos
+
+state az_iot_mqtt_publish <<STRUCT>>
+az_iot_mqtt_publish : - az_iot_topic
+az_iot_mqtt_publish : - payload
+
+' Just for diagram purposes:
+state "Received az_iot_mqtt_publish" as recv_pub <<STRUCT>>
+recv_pub : - az_iot_topic
+recv_pub : - payload
+
+' IoT Hub client:
+az_iot_hub_client_init : - device_id
+
+az_iot_hub_get_connect_information : - iot_hub
+
+' SAS Tokens
+az_iot_hub_sas_get : - id_scope
+az_iot_hub_sas_get : - unix_time
+az_iot_hub_sas_update : - signature
+
+az_iot_hub_telemetry_send : - payload
+az_iot_hub_telemetry_send : - az_iot_hub_telemetry_properties
+
+state az_iot_hub_method_request <<STRUCT>>
+az_iot_hub_method_request: - request_id
+az_iot_hub_method_request: - name
+az_iot_hub_method_request: - payload
+az_iot_hub_method_request: - response_timeout
+az_iot_hub_method_request: - connection_timeout
+az_iot_hub_methods_send_response : - request_id
+az_iot_hub_methods_send_response : - payload
+az_iot_hub_methods_send_response : - status
+
+state az_iot_hub_c2d_request <<STRUCT>>
+az_iot_hub_c2d_request : - payload
+az_iot_hub_c2d_request : - properties[]
+
+az_iot_hub_twin_get : - request_id
+
+az_iot_hub_twin_patch : - request_id
+az_iot_hub_twin_patch : - etag
+
+az_iot_hub_twin_response : - payload
+az_iot_hub_twin_response : - request_id
+az_iot_hub_twin_response : - etag
+
+' Application interfaces
+application_mqtt_connect : - server_x509_trusted_root
+application_mqtt_connect : - [client_x509_certificate]
+application_hmac256 : - key (may be within an HSM)
+
+@enduml

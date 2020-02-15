@@ -1,0 +1,112 @@
+@startuml
+
+skinparam state {
+    BackgroundColor<<APP>> APPLICATION
+    BackgroundColor<<STRUCT>> Lavender
+}
+
+state color_coding {
+    state SDK_API
+    state SDK_DATA_OBJECT <<STRUCT>>
+    state APPLICATION_CODE <<APP>>
+}
+
+' Init
+[*] --> az_iot_provisioning_client_init: START
+az_iot_provisioning_client_init -> az_iot_provisioning_get_connect_information : X509 auth
+az_iot_provisioning_get_connect_information -> az_iot_mqtt_connect
+state application_mqtt_connect <<APP>>
+az_iot_mqtt_connect --> application_mqtt_connect
+
+' Optional SAS token generation:
+az_iot_provisioning_client_init -> az_iot_provisioning_sas_get : SAS auth
+az_iot_provisioning_sas_get -> application_hmac256
+application_hmac256 -> az_iot_provisioning_sas_update
+az_iot_provisioning_sas_update --> az_iot_mqtt_connect : password
+state application_hmac256 <<APP>>
+
+' Subscribe
+application_mqtt_connect --> az_iot_provisioning_register_get_subscribe_topic
+az_iot_provisioning_register_get_subscribe_topic --> az_iot_topic
+az_iot_topic --> application_mqtt_subscribe
+state application_mqtt_subscribe <<APP>>
+application_mqtt_subscribe -> application_mqtt_receive : MQTT lib subscribed
+
+' Register
+application_mqtt_subscribe --> az_iot_provisioning_register
+az_iot_provisioning_register --> az_iot_mqtt_publish
+az_iot_mqtt_publish --> application_mqtt_publish
+state application_mqtt_publish <<APP>>
+
+state application_mqtt_receive <<APP>> { 
+' MQTT PUB received
+    state "Received az_iot_mqtt_publish" as recv_pub
+    [*] --> recv_pub: MQTT PUB received from broker (cloud or Edge)
+    recv_pub -> az_iot_provisioning_register_handle : provisioning related
+    az_iot_provisioning_register_handle --> az_iot_provisioning_register_result
+    az_iot_provisioning_register_handle --> [*] : not provisioning related
+
+    az_iot_provisioning_register_result --> [*] : status == assigned
+    az_iot_provisioning_register_result --> application_delay : status != assigned (including errors)
+    state application_delay <<APP>>
+    application_delay --> az_iot_provisioning_query
+    az_iot_provisioning_query --> az_iot_mqtt_publish
+}
+
+' Common MQTT data objects
+state az_iot_mqtt_connect <<STRUCT>>
+az_iot_mqtt_connect : - client_id
+az_iot_mqtt_connect : - user
+az_iot_mqtt_connect : - password
+
+state az_iot_topic <<STRUCT>>
+az_iot_topic : - topic_filter
+az_iot_topic : - qos
+
+state az_iot_mqtt_publish <<STRUCT>>
+az_iot_mqtt_publish : - az_iot_topic
+az_iot_mqtt_publish : - payload
+
+' Just for diagram purposes:
+state "Received az_iot_mqtt_publish" as recv_pub <<STRUCT>>
+recv_pub : - az_iot_topic
+recv_pub : - payload
+
+' Provisioning client:
+az_iot_provisioning_client_init : - registration_id
+
+az_iot_provisioning_get_connect_information : - id_scope
+
+' SAS Tokens
+az_iot_provisioning_sas_get : - id_scope
+az_iot_provisioning_sas_get : - unix_time
+az_iot_provisioning_sas_update : - signature
+
+' Subscribe
+az_iot_provisioning_register_get_subscribe_topic : - topic_filter
+
+az_iot_provisioning_register : - registration_id
+az_iot_provisioning_register : - json_data
+
+az_iot_provisioning_register_handle : - az_iot_mqtt_publish
+
+state az_iot_provisioning_register_result <<STRUCT>>
+az_iot_provisioning_register_result : - operation_id
+az_iot_provisioning_register_result : - status
+az_iot_provisioning_register_result : - retry_after
+az_iot_provisioning_register_result : - registration_state
+az_iot_provisioning_register_result : ..- assigned_hub
+az_iot_provisioning_register_result : ..- device_id
+az_iot_provisioning_register_result : ..- json_payload
+az_iot_provisioning_register_result : ..- error_code
+az_iot_provisioning_register_result : ..- error_message
+
+az_iot_provisioning_query : - operation_id
+
+' Application interfaces
+application_mqtt_connect : - server_x509_trusted_root
+application_mqtt_connect : - [client_x509_certificate]
+application_delay : - retry_after
+application_hmac256 : - key (may be within an HSM)
+
+@enduml
