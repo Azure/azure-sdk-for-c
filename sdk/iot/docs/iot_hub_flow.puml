@@ -32,18 +32,18 @@ az_iot_hub_telemetry_properties --> az_iot_hub_telemetry_send
 az_iot_hub_telemetry_send --> az_iot_mqtt_publish
 
 ' C2D
-application_mqtt_connect --> az_iot_hub_get_c2d_subscribe_topic
-az_iot_hub_get_c2d_subscribe_topic --> az_iot_topic
+application_mqtt_connect --> az_iot_hub_c2d_get_subscribe_topic
+az_iot_hub_c2d_get_subscribe_topic --> az_iot_topic
 
 ' Methods
-application_mqtt_connect --> az_iot_hub_get_methods_subscribe_topic
-az_iot_hub_get_methods_subscribe_topic --> az_iot_topic
+application_mqtt_connect --> az_iot_hub_methods_get_subscribe_topic
+az_iot_hub_methods_get_subscribe_topic --> az_iot_topic
 
 az_iot_hub_methods_send_response --> az_iot_mqtt_publish
 
 ' Twin
-application_mqtt_connect --> az_iot_hub_get_twin_subscribe_topic
-az_iot_hub_get_twin_subscribe_topic --> az_iot_topic : RESPONSE and PATCH topics
+application_mqtt_connect --> az_iot_hub_twin_get_subscribe_topic
+az_iot_hub_twin_get_subscribe_topic --> az_iot_topic : RESPONSE and PATCH topics
 
 application_mqtt_subscribe --> az_iot_hub_twin_get
 az_iot_hub_twin_get --> az_iot_mqtt_publish
