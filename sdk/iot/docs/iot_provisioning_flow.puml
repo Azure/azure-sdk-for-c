@@ -79,7 +79,8 @@ az_iot_provisioning_get_connect_information : - id_scope
 
 ' SAS Tokens
 az_iot_provisioning_sas_get : - id_scope
-az_iot_provisioning_sas_get : - unix_time
+az_iot_provisioning_sas_get : - key_name
+az_iot_provisioning_sas_update : - unix_time
 az_iot_provisioning_sas_update : - signature
 
 ' Subscribe

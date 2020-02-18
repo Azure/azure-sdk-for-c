@@ -107,8 +107,9 @@ az_iot_hub_client_init : - device_id
 az_iot_hub_get_connect_information : - iot_hub
 
 ' SAS Tokens
-az_iot_hub_sas_get : - id_scope
-az_iot_hub_sas_get : - unix_time
+az_iot_hub_sas_get : - hub_name
+az_iot_hub_sas_get : - key_name
+az_iot_hub_sas_update : - unix_time
 az_iot_hub_sas_update : - signature
 
 az_iot_hub_telemetry_send : - payload

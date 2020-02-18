@@ -98,14 +98,40 @@ Two authentication schemes are currently supported: _X509 Client Certificate Aut
 
 ```C
 // Provisioning
-az_result az_provisioning_get_connect_information(az_provisioning_client* client, az_span id_scope, az_iot_mqtt_connect* mqtt_connect);
+az_result az_iot_provisioning_client_init(az_provisioning_client* client, az_span id_scope, az_iot_mqtt_connect* mqtt_connect);
+az_result az_iot_provisioning_get_connect_information(az_iot_hub_client* client, az_span id_scope, az_iot_mqtt_connect* mqtt_connect);
 
 // IoT Hub
-az_result az_iot_get_connect_information(az_iot_hub_client* client, az_span hub_hostname, az_iot_mqtt_connect* mqtt_connect);
-
-// If X509 Client authenticaiton is not used, mqtt_connect.password must contain a valid SAS Token.
-// --> TODO SAS token APIs.
+az_result az_iot_hub_client_init(az_iot_hub_client* client, az_iot_mqtt_connect* mqtt_connect);
+az_result az_iot_hub_get_connect_information(az_iot_hub_client* client, az_span hub_hostname, az_iot_mqtt_connect* mqtt_connect);
 ```
+
+If X509 Client authenticaiton is not used, `mqtt_connect.password` must contain a valid SAS Token. The password is obtained by using 2 function calls: one to initialize a SAS token and another to sign and update it.
+
+```C
+// Provisioning
+typedef struct az_iot_provisioning_sas {
+    struct {
+        az_span audience; // URLENC("<id_scope>/registrations/<registration_id>"). This is HMAC256-ed together with expiration_time.
+        az_span key_name; // Can be empty.
+    } _internal;
+} az_iot_provisioning_sas;
+
+az_result az_iot_provisioning_sas_init(az_iot_provisioning_sas* sas, az_provisioning_client* client, az_span id_scope, az_span key_name);
+az_result az_iot_provisioning_sas_update(az_iot_provisioning_sas* sas, time_t expiration_time, az_span base64_hmac256_signature, az_iot_mqtt_connect* mqtt_connect);
+
+// IoT Hub
+typedef struct az_iot_hub_sas {
+    struct {
+        az_span audience;
+        az_span key_name;
+    } _internal;
+} az_iot_hub_sas;
+
+az_result az_iot_hub_sas_init(az_iot_hub_sas* sas, az_iot_hub_client* client, az_span hub_name, az_span key_name);
+az_result az_iot_hub_sas_update(az_iot_hub_sas* sas, time_t expiration_time, az_span base64_hmac256_signature, az_iot_mqtt_connect* mqtt_connect);
+```
+
 
 ### Subscribe topic information
 Note: All services (Device Provisioning, IoT Hub) require either no subscription (Telemetry) or _a single_ subscription to a topic _filter_.
@@ -116,7 +142,7 @@ Each service requiring subscriptions is componentized and must implement a funct
 // Examples:
 az_result az_provisioning_register_get_subscribe_topic(az_provisioning_client* client, az_iot_topic* mqtt_topic_filter);
 
-az_result az_iot_methods_get_subscribe_topic(az_iot_client* client, az_iot_topic* mqtt_topic_filter);
+az_result az_iot_hub_methods_get_subscribe_topic(az_iot_client* client, az_iot_topic* mqtt_topic_filter);
 ```
 
 ### Sending APIs
@@ -128,12 +154,17 @@ _Examples:_
 
 ```C
 // Telemetry:
-typedef struct az_iot_telemetry_property {
-    az_span name;
-    az_span value;
-} az_iot_telemetry_property;
 
-az_result az_iot_sendtelemetry(az_iot_client* client, az_span payload, az_iot_telemetry_property* properties, size_t properties_count, az_iot_mqtt_pub *mqtt_pub); // TODO: telemetry should include an overload with a destination_device_id parameter in order to allow Module 2 Module communication.
+// Note: CRUD operations are available to add / change / remove properties.
+typedef struct az_iot_telemetry_properties {
+    struct {
+        az_span property_string;   // "URIENCODED(name1=val1&name2=val2&...)"
+    } _internal;
+} az_iot_telemetry_properties;
+
+az_result az_iot_sendtelemetry(az_iot_client* client, az_span payload, az_iot_telemetry_properties* properties, az_iot_mqtt_pub *mqtt_pub);
+// Module to module:
+az_result az_iot_sendtelemetry(az_iot_client* client, az_span destination, az_span payload, az_iot_telemetry_properties* properties, az_iot_mqtt_pub *mqtt_pub);
 
 // Method response:
 typedef struct az_iot_method_response {
@@ -179,12 +210,8 @@ Example MQTT PUB handler implementation:
 
 ## Sample Application
 
-### Using ThreadX
-[ TODO ]
-
-### Using the Paho synchronous C MQTT library
-* [Paho Device Provisioning Sample](dps_paho_sample.c)
-* [Paho IoT Hub Sample](iot_paho_sample.c)
+* [Paho Device Provisioning Sample](iot_provisioning_paho_sample.c)
+* [Paho IoT Hub Sample](iot_hub_paho_sample.c)
 
 ## Test plan
 
