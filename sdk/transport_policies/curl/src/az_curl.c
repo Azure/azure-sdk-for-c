@@ -45,8 +45,21 @@ static void _az_span_free(az_span * p) {
 /**
  * Converts CURLcode to az_result.
  */
-AZ_NODISCARD AZ_INLINE az_result _az_http_client_curl_code_to_result(CURLcode code) {
-  return code == CURLE_OK ? AZ_OK : AZ_ERROR_HTTP_PAL;
+AZ_NODISCARD az_result _az_http_client_curl_code_to_result(CURLcode code) {
+  switch (code) {
+    case CURLE_OK:
+      return AZ_OK;
+
+    case CURLE_WRITE_ERROR:
+      return AZ_ERROR_HTTP_RESPONSE_OVERFLOW;
+
+    case CURLE_COULDNT_RESOLVE_HOST:
+      return AZ_ERROR_HTTP_RESPONSE_COULDNT_RESOLVE_HOST;
+
+    default:
+      // let any other error code be an HTTP PAL ERROR
+      return AZ_ERROR_HTTP_PAL;
+  }
 }
 
 // returning AZ error on CURL Error
@@ -466,7 +479,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
         AZ_SPAN_FROM_STR("\0"),
         &response->_internal.http_response));
   }
-  return AZ_OK;
+  return result;
 }
 
 /**

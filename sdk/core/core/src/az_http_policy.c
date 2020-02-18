@@ -39,16 +39,16 @@ AZ_NODISCARD az_result az_http_pipeline_policy_apiversion(
 
   _az_http_policy_apiversion_options * options = (_az_http_policy_apiversion_options *)(p_options);
 
-  switch (options->_internal.option_location) { 
+  switch (options->_internal.option_location) {
     case _az_http_policy_apiversion_option_location_header:
       // Add the version as a header
-      AZ_RETURN_IF_FAILED(
-          az_http_request_append_header(p_request, options->_internal.name, options->_internal.version));
+      AZ_RETURN_IF_FAILED(az_http_request_append_header(
+          p_request, options->_internal.name, options->_internal.version));
       break;
     case _az_http_policy_apiversion_option_location_queryparameter:
       // Add the version as a query parameter
-      AZ_RETURN_IF_FAILED(
-          az_http_request_set_query_parameter(p_request, options->_internal.name, options->_internal.version));
+      AZ_RETURN_IF_FAILED(az_http_request_set_query_parameter(
+          p_request, options->_internal.name, options->_internal.version));
       break;
     default:
       return AZ_ERROR_ARG;
@@ -96,7 +96,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
   (void)p_options;
 
   // reset p_response to be written from the start
-  AZ_RETURN_IF_FAILED(az_http_response_reset(p_response));
+  AZ_RETURN_IF_FAILED(az_http_response_init(p_response, p_response->_internal.http_response));
 
   return az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
 }

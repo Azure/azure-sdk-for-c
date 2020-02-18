@@ -45,3 +45,8 @@ add_library (az::curl ALIAS az_curl)
 
 
 target_link_libraries(az_curl PRIVATE CURL::libcurl)
+
+# curl transport tests
+add_executable (az_transport_curl_test test/main.c)
+target_link_libraries(az_transport_curl_test PRIVATE az_curl az_core az_core_internal)
+add_test(NAME az_transport_curl_test COMMAND az_transport_curl_test)

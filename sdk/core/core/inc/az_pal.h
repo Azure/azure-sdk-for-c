@@ -1,6 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+/**
+ * @file az_pal.h
+ *
+ * @brief Platform Abstract Layer
+ */
+
 #ifndef _az_PAL_H
 #define _az_PAL_H
 
