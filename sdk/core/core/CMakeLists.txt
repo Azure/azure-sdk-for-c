@@ -1,9 +1,9 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # SPDX-License-Identifier: MIT
 
-cmake_minimum_required (VERSION 3.12)
+cmake_minimum_required(VERSION 3.12)
 
-project (az_core LANGUAGES C)
+project(az_core LANGUAGES C)
 
 set(CMAKE_C_STANDARD 99)
 
@@ -27,71 +27,95 @@ add_library (
   )
 
 if(MSVC)
-  if(WARNINGS_AS_ERRORS)
-    set(WARNINGS_AS_ERRORS_FLAG "/WX")
-  endif()
+    if(WARNINGS_AS_ERRORS)
+        set(WARNINGS_AS_ERRORS_FLAG "/WX")
+    endif()
 
-  target_compile_options(az_core PRIVATE /Wall ${WARNINGS_AS_ERRORS_FLAG} /wd5031 /wd4668 /wd4820 /wd4255 /analyze)
+    target_compile_options(
+        az_core
+        PRIVATE
+            /Wall
+            ${WARNINGS_AS_ERRORS_FLAG}
+            /wd5031
+            /wd4668
+            /wd4820
+            /wd4255
+            /analyze
+        )
 elseif(CMAKE_C_COMPILER_ID MATCHES "Clang")
-  if(WARNINGS_AS_ERRORS)
-    set(WARNINGS_AS_ERRORS_FLAG "-Werror")
-  endif()
+    if(WARNINGS_AS_ERRORS)
+        set(WARNINGS_AS_ERRORS_FLAG "-Werror")
+    endif()
 
-  target_compile_options(az_core PRIVATE -Xclang -Wall -Wextra -pedantic  ${WARNINGS_AS_ERRORS_FLAG} -Wdocumentation -Wdocumentation-unknown-command -Wcast-qual)
+    target_compile_options(
+        az_core
+            PRIVATE
+                -Xclang
+                -Wall
+                -Wextra
+                -pedantic
+                ${WARNINGS_AS_ERRORS_FLAG}
+                -Wdocumentation
+                -Wdocumentation-unknown-command
+                -Wcast-qual
+        )
 else()
-  if(WARNINGS_AS_ERRORS)
-    set(WARNINGS_AS_ERRORS_FLAG "-Werror")
-  endif()
+    if(WARNINGS_AS_ERRORS)
+        set(WARNINGS_AS_ERRORS_FLAG "-Werror")
+    endif()
 
-  target_compile_options(az_core PRIVATE -Wall -Wextra -pedantic  ${WARNINGS_AS_ERRORS_FLAG})
+    target_compile_options(
+        az_core
+            PRIVATE
+                -Wall
+                -Wextra
+                -pedantic
+                ${WARNINGS_AS_ERRORS_FLAG}
+        )
 endif()
 
-target_include_directories (az_core PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc> $<INSTALL_INTERFACE:include/az>)
+target_include_directories (
+    az_core
+        PUBLIC
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc
+            #$<INSTALL_INTERFACE:include/az>
+    )
 
 # create interface for internal headers
 add_library(az_core_internal INTERFACE)
-target_include_directories(az_core_internal INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/internal> $<INSTALL_INTERFACE:include/az_internal>)
+target_include_directories(
+    az_core_internal
+        INTERFACE
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/internal>
+            #$<INSTALL_INTERFACE:include/az_internal>
+    )
 
-target_link_libraries(az_core PRIVATE az_core_internal
-if (WIN32)
-    az_win32
-elseif (APPLE)
-    az_c11
-else
-    az_posix
-endif
-)
+target_link_libraries(az_core PRIVATE az_core_internal)
 
 # make sure that users can consume the project as a library.
 add_library (az::core ALIAS az_core)
 
- add_executable (
-     az_core_test 
-     test/main.c 
-     test/test_http_response_read_and_parse.c
-     test/test_json_builder.c
-     test/test_json_get_by_pointer.c
-     test/test_json_pointer.c
-     test/test_json_string.c
-     test/test_json_value.c
-     test/test_log.c
-     test/test_mut_span.c
-     test/test_span_builder_replace.c
-     )
+add_executable (
+    az_core_test 
+        test/main.c 
+        test/test_http_response_read_and_parse.c
+        test/test_json_builder.c
+        test/test_json_get_by_pointer.c
+        test/test_json_pointer.c
+        test/test_json_string.c
+        test/test_json_value.c
+        test/test_log.c
+        test/test_mut_span.c
+        test/test_span_builder_replace.c
+    )
 
- target_link_libraries(az_core_test PRIVATE az_core az_core_internal)
- target_include_directories (az_core_test PRIVATE src)
+target_link_libraries(az_core_test PRIVATE az_core az_core_internal)
+target_include_directories (az_core_test PRIVATE src)
 
- if (UNIX)
-   target_link_libraries(az_core_test PRIVATE m)
- endif()
-
- target_include_directories (az_core_test PRIVATE test)
-
- add_test(NAME az_core_test COMMAND az_core_test)
-
-
-if (MOCK_CURL)
-  MESSAGE("Will mock all calls to http client with static responses")
-  add_definitions(-DMOCK_CURL="MOCK")
+if (UNIX)
+    target_link_libraries(az_core_test PRIVATE m)
 endif()
+
+target_include_directories (az_core_test PRIVATE test)
+
+add_test(NAME az_core_test COMMAND az_core_test)
