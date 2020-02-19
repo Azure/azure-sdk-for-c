@@ -19,7 +19,7 @@ typedef struct az_iot_hub_c2d_request {
     az_iot_hub_properties properties;
 } az_iot_hub_c2d_request;
 
-az_result az_iot_c2d_handle(az_iot_hub_client* client, az_iot_mqtt_pub* pub_received, az_iot_hub_c2d_request* request);
+az_result az_iot_c2d_handle(az_iot_hub_client* client, az_iot_mqtt_publish* pub_received, az_iot_hub_c2d_request* request);
 
 #include <_az_cfg_suffix.h>
 

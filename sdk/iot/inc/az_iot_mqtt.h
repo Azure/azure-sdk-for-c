@@ -19,10 +19,10 @@ typedef struct az_iot_topic {
     uint8_t qos;
 } az_iot_topic;
 
-typedef struct az_iot_mqtt_pub {
+typedef struct az_iot_mqtt_publish {
     az_iot_topic topic;
     az_span payload;
-} az_iot_mqtt_pub;
+} az_iot_mqtt_publish;
 
 #include <_az_cfg_suffix.h>
 

@@ -28,11 +28,11 @@ typedef struct az_iot_method_response {
     az_span payload;
 } az_iot_method_response;
 
-az_result az_iot_methods_send_response(az_iot_hub_client* client, az_iot_method_response* response, az_iot_mqtt_pub *mqtt_pub);
+az_result az_iot_methods_send_response(az_iot_hub_client* client, az_iot_method_response* response, az_iot_mqtt_publish *mqtt_pub);
 
-az_result az_iot_methods_handle(az_iot_hub_client* client, az_iot_mqtt_pub* pub_received, az_iot_method_request* method_request);
+az_result az_iot_methods_handle(az_iot_hub_client* client, az_iot_mqtt_publish* pub_received, az_iot_method_request* method_request);
 
-az_result az_iot_hub_methods_send_response(az_iot_hub_client* client, az_iot_mqtt_pub* pub_received, az_iot_method_response* method_request);
+az_result az_iot_hub_methods_send_response(az_iot_hub_client* client, az_iot_mqtt_publish* pub_received, az_iot_method_response* method_request);
 
 #include <_az_cfg_suffix.h>
 

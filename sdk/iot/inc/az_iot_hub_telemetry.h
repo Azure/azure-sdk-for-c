@@ -12,9 +12,9 @@
 
 #include <_az_cfg_prefix.h>
 
-az_result az_iot_sendtelemetry(az_iot_hub_client* client, az_span payload, az_iot_hub_properties* properties, az_iot_mqtt_pub *mqtt_pub);
+az_result az_iot_sendtelemetry(az_iot_hub_client* client, az_span payload, az_iot_hub_properties* properties, az_iot_mqtt_publish *mqtt_pub);
 // Module to module:
-az_result az_iot_sendtelemetry(az_iot_hub_client* client, az_span destination, az_span payload, az_iot_hub_properties* properties, az_iot_mqtt_pub *mqtt_pub);
+az_result az_iot_sendtelemetry(az_iot_hub_client* client, az_span destination, az_span payload, az_iot_hub_properties* properties, az_iot_mqtt_publish *mqtt_pub);
 
 #include <_az_cfg_suffix.h>
 
