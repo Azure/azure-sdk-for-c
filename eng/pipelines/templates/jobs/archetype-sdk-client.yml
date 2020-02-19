@@ -6,51 +6,47 @@ jobs:
         vm.image: 'ubuntu-18.04'
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        buid.args: ''
       Win_x86:
         vm.image: 'windows-2019'
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: Win32
-        buid.args: ''
       Win_x64:
         vm.image: 'windows-2019'
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: x64
-        buid.args: ''
       MacOS_x64:
         vm.image: 'macOS-10.14'
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
-        buid.args: ''
-      
+        
       Linux_x64_with_samples:
         vm.image: 'ubuntu-18.04'
         vcpkg.deps: 'curl[ssl]'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        buid.args: ' -DBUILD_CURL_TRANSPORT=ON'
+        build.args: ' -DBUILD_CURL_TRANSPORT=ON'
       Win_x86_with_samples:
         vm.image: 'windows-2019'
         vcpkg.deps: 'curl[winssl]'
         VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: Win32
-        buid.args: ' -DBUILD_CURL_TRANSPORT=ON'
+        build.args: ' -DBUILD_CURL_TRANSPORT=ON'
       Win_x64_with_samples:
         vm.image: 'windows-2019'
         vcpkg.deps: 'curl[winssl]'
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: x64
-        buid.args: ' -DBUILD_CURL_TRANSPORT=ON'
+        build.args: ' -DBUILD_CURL_TRANSPORT=ON'
       MacOS_x64_with_samples:
         vm.image: 'macOS-10.14'
         vcpkg.deps: 'curl[ssl]'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
-        buid.args: ' -DBUILD_CURL_TRANSPORT=ON'
+        build.args: ' -DBUILD_CURL_TRANSPORT=ON'
   pool:
     vmImage: $(vm.image)
   steps:
@@ -83,14 +79,16 @@ jobs:
         echo "##vso[task.prependpath]$(pwd)"
         echo "##vso[task.setvariable variable=VCPKG_INSTALLATION_ROOT;]$(pwd)"
 
-    condition: and(contains(variables['vm.image'], 'macOS'), contains(variables['vcpkg.dep'], 'curl'))
+    # Execute only for Mac and if there is at least one dependency to be installed
+    condition: and(succeeded(), contains(variables['vm.image']), 'macOS', not(eq(variables['vcpkg.dep'], '')))
     displayName: vcpkg bootstrap
 
 
   - script: |
       vcpkg install $(vcpkg.deps)
     displayName: vcpkg install dependencies
-    condition: contains(variables['vcpkg.dep'], 'curl')
+    # Execute only if there is at least one dependency to be installed
+    condition: and(succeeded(), not(eq(variables['vcpkg.dep'], '')))
 
   - task: CMake@1
     inputs:
@@ -98,7 +96,7 @@ jobs:
     displayName: cmake version
   - task: CMake@1
     inputs:
-      cmakeArgs: $(vcpkg.deps) ..
+      cmakeArgs: $(build.args) ..
     displayName: cmake generate
   - task: CMake@1
     inputs:
