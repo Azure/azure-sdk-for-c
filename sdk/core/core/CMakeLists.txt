@@ -6,6 +6,7 @@ cmake_minimum_required (VERSION 3.12)
 project (az_core LANGUAGES C)
 
 set(CMAKE_C_STANDARD 99)
+include(CodeCoverage)
 
 add_library (
   az_core
@@ -80,9 +81,15 @@ add_library (az::core ALIAS az_core)
  target_include_directories (az_core_test PRIVATE test)
 
  add_test(NAME az_core_test COMMAND az_core_test)
-
-
-if (MOCK_CURL)
-  MESSAGE("Will mock all calls to http client with static responses")
-  add_definitions(-DMOCK_CURL="MOCK")
-endif()
+ 
+ if(NOT CMAKE_C_COMPILER_ID MATCHES "Clang")
+  APPEND_COVERAGE_COMPILER_FLAGS()
+  
+  # Basic coverage using lcov (gcc integrated)
+  setup_target_for_coverage_lcov(NAME az_core_test_cov EXECUTABLE az_core_test)
+  
+  # HTML and XML - Coverage using gcovr (Needs to be installed into system)
+  setup_target_for_coverage_gcovr_html(NAME az_core_test_cov_html EXECUTABLE az_core_test)
+  setup_target_for_coverage_gcovr_xml(NAME az_core_test_cov_xml EXECUTABLE az_core_test)
+  
+ endif()

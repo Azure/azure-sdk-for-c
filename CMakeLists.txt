@@ -3,6 +3,12 @@
 
 cmake_minimum_required (VERSION 3.12)
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake-modules")
+if(NOT CMAKE_C_COMPILER_ID MATCHES "Clang")
+  #include code cov cmake module
+  include(CodeCoverage) 
+endif()
+
 option(WARNINGS_AS_ERRORS "Treat compiler warnings as errors" ON)
 
 if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)

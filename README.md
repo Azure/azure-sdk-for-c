@@ -37,7 +37,7 @@ When following previous steps to set up CURL with VCPKG, open project forlder wi
   - ```sudo apt-get install uuid-dev```
 
 ##### steps to build
-```
+```bash
 mkdir build
 cd build
 cmake ../
@@ -48,8 +48,36 @@ make
 ## Build Docs
 Running below command from root folder will create a new folder `docs` containing html file with documentation about CORE headers.
 > doxygen needs to be installed in the system
-```
+```bash
 doxygen Doxyfile
+```
+
+## Code Coverage Reports
+Code coverage reports can be generated following below instructions.
+### Requirements
+- <b>gcc</b>. Clang is not yet supported.<br>
+- <b>Debug</b>. Build files for debug `cmake -DCMAKE_BUILD_TYPE=Debug ..`
+
+```bash
+# from source code root, create a new folder to build project:
+mkdir build
+cd build
+
+# generate cmake files with Debug enabled
+cmake -DCMAKE_BUILD_TYPE=Debug ..
+
+## There are 3 available reports to generate:
+# 1. using lcov. Html files grouped by folders. Make sure lcov
+# is installed.
+make az_core_test_cov
+
+# 2. using gcov. Html page with all results in one page. Make sure
+# gcov is installed.
+make az_core_test_cov_html
+
+# 3. using gcov. XML file with all results. Make sure
+# gcov is installed.
+make az_core_test_cov_xml
 ```
 
 ## Need help?
