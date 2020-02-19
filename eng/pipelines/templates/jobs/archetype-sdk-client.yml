@@ -6,26 +6,22 @@ jobs:
         vm.image: 'ubuntu-18.04'
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        build.args: ''
       Win_x86:
         vm.image: 'windows-2019'
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: Win32
-        build.args: ''
       Win_x64:
         vm.image: 'windows-2019'
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: x64
-        build.args: ''
       MacOS_x64:
         vm.image: 'macOS-10.14'
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
-        build.args: ''
         
       Linux_x64_with_samples:
         vm.image: 'ubuntu-18.04'
@@ -84,7 +80,7 @@ jobs:
         echo "##vso[task.setvariable variable=VCPKG_INSTALLATION_ROOT;]$(pwd)"
 
     # Execute only for Mac and if there is at least one dependency to be installed
-    condition: and(succeeded(), contains(variables['vm.image'], 'macOS'), not(eq(variables['vcpkg.dep'], '')))
+    condition: and(succeeded(), contains(variables['vm.image'], 'macOS'), not(eq(variables['vcpkg.deps'], '')))
     displayName: vcpkg bootstrap
 
 
@@ -92,7 +88,7 @@ jobs:
       vcpkg install $(vcpkg.deps)
     displayName: vcpkg install dependencies
     # Execute only if there is at least one dependency to be installed
-    condition: and(succeeded(), not(eq(variables['vcpkg.dep'], '')))
+    condition: and(succeeded(), not(eq(variables['vcpkg.deps'], '')))
 
   - task: CMake@1
     inputs:
