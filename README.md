@@ -57,12 +57,15 @@ Code coverage reports can be generated following below instructions.
 ### Requirements
 - <b>gcc</b>. Clang is not yet supported.<br>
 - <b>Debug</b>. Build files for debug `cmake -DCMAKE_BUILD_TYPE=Debug ..`
+- <b>environment variable</b>. `export AZ_SDK_CODE_COV=1`
 
 ```bash
 # from source code root, create a new folder to build project:
 mkdir build
 cd build
 
+# set env variable to enable building code coverage
+export AZ_SDK_CODE_COV=1
 # generate cmake files with Debug enabled
 cmake -DCMAKE_BUILD_TYPE=Debug ..
 
