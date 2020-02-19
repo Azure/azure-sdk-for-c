@@ -31,3 +31,5 @@ if(NOT DEFINED ENV{AZ_SDK_C_NO_SAMPLES})
     add_subdirectory(sdk/keyvault/keyvault/samples)
     add_subdirectory(sdk/storage/blobs/samples)
 endif()
+
+add_subdirectory(sdk/storage/ustorageclient)
