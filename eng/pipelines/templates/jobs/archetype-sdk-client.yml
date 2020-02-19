@@ -80,7 +80,7 @@ jobs:
         echo "##vso[task.setvariable variable=VCPKG_INSTALLATION_ROOT;]$(pwd)"
 
     # Execute only for Mac and if there is at least one dependency to be installed
-    condition: and(succeeded(), contains(variables['vm.image']), 'macOS', not(eq(variables['vcpkg.dep'], '')))
+    condition: and(succeeded(), contains(variables['vm.image']), 'macOS'), not(eq(variables['vcpkg.dep'], '')))
     displayName: vcpkg bootstrap
 
 
