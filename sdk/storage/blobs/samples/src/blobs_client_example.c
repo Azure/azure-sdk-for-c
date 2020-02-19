@@ -73,14 +73,7 @@ az_storage_blobs_blob_delete(az_storage_blobs_blob_client * client, az_http_resp
   return az_http_pipeline_process(&client->_internal.pipeline, &hrb, response);
 }
 
-static void _log_listener(az_log_classification classification, az_span message) {
-  (void)classification;
-  fprintf(stderr, "%.*s\n", (unsigned int)message._internal.capacity, message._internal.ptr);
-}
-
 int main() {
-  //Uncomment the following line to get log output on the console
-  //az_log_set_listener(_log_listener);
 
   az_storage_blobs_blob_client client;
 
