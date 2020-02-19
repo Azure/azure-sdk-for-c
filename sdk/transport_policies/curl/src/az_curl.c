@@ -276,76 +276,85 @@ _az_http_client_curl_send_post_request(CURL * p_curl, _az_http_request const * p
   return AZ_OK;
 }
 
+/**
+* @brief UPLOAD requests are done via callbacks.  The callback is passed in a buffer address which is filled with the userdata content.
+* The callback will occur until the callback returns 0 (no more data).
+* The callback will return CURL_READFUNC_ABORT should an error occur.  This in turn terminates the POST request.
+* 
+* @param dst Destination address buffer
+* @param size Size of an item
+* @param nmemb Number of items to copy
+* @param userdata Source data to upload
+*                 Passed as the pointer to an az_span
+* @return int
+*/
 static int32_t _az_http_client_curl_upload_read_callback(
-    void * ptr,
+    void * dst,
     size_t size,
     size_t nmemb,
     void * userdata) {
 
-  az_span * mut_span = (az_span *)userdata;
+  az_span * upload_content = (az_span *)userdata;
 
-  int32_t curl_size = (int32_t)(nmemb * size);
+  //Calculate the size of the *dst buffer
+  int32_t dst_buffer_size = (int32_t)(nmemb * size);
 
-  // Nothing to copy
-  if (curl_size < 1 || !(az_span_length(*mut_span)))
-    return 0;
+  //Terminate the upload if the destination buffer is too small
+  if (dst_buffer_size < 1)
+    return CURL_READFUNC_ABORT;
 
-  int32_t data_length = az_span_length(*mut_span);
-  int32_t to_copy = (data_length < curl_size) ? data_length : curl_size;
-  memcpy(ptr, mut_span->_internal.ptr, to_copy);
-  mut_span->_internal.capacity -= to_copy;
-  mut_span->_internal.ptr += to_copy;
+  int32_t userdata_length = az_span_length(*upload_content);
+
+  //Return if nothing to copy
+  if (userdata_length < 1)
+    return CURLE_OK;  //Success, all bytes copied
+
+  int32_t size_of_copy = (userdata_length < dst_buffer_size) ? userdata_length : dst_buffer_size;
+
+  memcpy(dst, az_span_ptr(*upload_content), size_of_copy);
+
+  //Update the userdata span
+  //  ptr will point to remaining data to be copied
+  //  length and capacity are set to the size of the remaining content
+  az_result result = az_span_slice(*upload_content, dst_buffer_size, -1, upload_content);
   
-  return to_copy;
+  // Upon failure terminate the upload
+  // per CURL documentation, "The read callback may return CURL_READFUNC_ABORT to stop the current operation immediately, 
+  //          resulting in a CURLE_ABORTED_BY_CALLBACK error code from the transfer."
+  //
+  if (az_failed(result)) {
+    return CURL_READFUNC_ABORT;
+  }
+
+  return size_of_copy;
 }
 
 /**
- * handles POST request. It handles seting up a body for request
+ * Perform an UPLOAD or PUT request.
+ * As of CURL 7.12.1 CURLOPT_PUT is deprecated.  PUT requests should be made using CURLOPT_UPLOAD
  */
 static AZ_NODISCARD az_result
 _az_http_client_curl_send_upload_request(CURL * p_curl, _az_http_request const * p_request) {
   AZ_CONTRACT_ARG_NOT_NULL(p_curl);
   AZ_CONTRACT_ARG_NOT_NULL(p_request);
 
-  // Method
-  az_span body = { 0 };
-  int32_t const required_size
-      = az_span_length(p_request->_internal.body) + az_span_length(AZ_SPAN_FROM_STR("\0"));
+  az_span body = p_request->_internal.body;
 
-  AZ_RETURN_IF_FAILED(_az_span_malloc(required_size, &body));
+  AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl, CURLOPT_UPLOAD, 1L));
+  AZ_RETURN_IF_CURL_FAILED(
+      curl_easy_setopt(p_curl, CURLOPT_READFUNCTION, _az_http_client_curl_upload_read_callback));
 
-  char * b = (char *)az_span_ptr(body);
-  az_result res_code = az_span_to_str(b, required_size, p_request->_internal.body);
-  body._internal.length = required_size;
+  // Setup the request to pass body into the read callback
+  // The read callback receives the address of body
+  AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl, CURLOPT_READDATA, &body));
 
-  if (az_succeeded(res_code)) {
-    res_code = _az_http_client_curl_code_to_result(curl_easy_setopt(p_curl, CURLOPT_UPLOAD, 1L));
-    if (az_succeeded(res_code)) {
-      res_code = _az_http_client_curl_code_to_result(curl_easy_setopt(
-          p_curl, CURLOPT_READFUNCTION, _az_http_client_curl_upload_read_callback));
-      if (az_succeeded(res_code)) {
+  // Set the size of the upload
+  AZ_RETURN_IF_CURL_FAILED(
+      curl_easy_setopt(p_curl, CURLOPT_INFILESIZE, (curl_off_t)az_span_length(body)));
 
-        // Setup the request to pass the body in as the data stream to read
-        res_code
-            = _az_http_client_curl_code_to_result(curl_easy_setopt(p_curl, CURLOPT_READDATA, body));
-
-        if (az_succeeded(res_code)) {
-
-          // Set the size of the upload
-          res_code = _az_http_client_curl_code_to_result(
-              curl_easy_setopt(p_curl, CURLOPT_INFILESIZE, (curl_off_t)az_span_length(body)));
-
-          // Do the curl work
-          if (az_succeeded(res_code)) {
-            res_code = _az_http_client_curl_code_to_result(curl_easy_perform(p_curl));
-          }
-        }
-      }
-    }
-  }
-
-  _az_span_free(&body);
-  AZ_RETURN_IF_FAILED(res_code);
+  // Do the curl work
+  // curl_easy_perform does not return until the CURLOPT_READFUNCTION callbacks complete.
+  AZ_RETURN_IF_CURL_FAILED(curl_easy_perform(p_curl));
 
   return AZ_OK;
 }
@@ -451,6 +460,9 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
     CURL * p_curl,
     _az_http_request * p_request,
     az_http_response * response) {
+  AZ_CONTRACT_ARG_NOT_NULL(p_curl);
+  AZ_CONTRACT_ARG_NOT_NULL(p_request);
+  
   az_result result = AZ_ERROR_ARG;
 
   AZ_RETURN_IF_FAILED(_az_http_client_curl_setup_headers(p_curl, p_request));
@@ -467,6 +479,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
   } else if (az_span_is_equal(p_request->_internal.method, az_http_method_delete())) {
     result = _az_http_client_curl_send_delete_request(p_curl, p_request);
   } else if (az_span_is_equal(p_request->_internal.method, az_http_method_put())) {
+    // As of CURL 7.12.1 CURLOPT_PUT is deprecated.  PUT requests should be made using CURLOPT_UPLOAD
     result = _az_http_client_curl_send_upload_request(p_curl, p_request);
   } else {
     return AZ_ERROR_HTTP_INVALID_METHOD_VERB;
