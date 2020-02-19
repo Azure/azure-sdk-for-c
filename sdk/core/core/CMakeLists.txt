@@ -6,7 +6,11 @@ cmake_minimum_required (VERSION 3.12)
 project (az_core LANGUAGES C)
 
 set(CMAKE_C_STANDARD 99)
-include(CodeCoverage)
+if(DEFINED ENV{AZ_SDK_CODE_COV} AND NOT CMAKE_C_COMPILER_ID MATCHES "Clang")
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        include(CodeCoverage)
+    endif()
+endif()
 
 add_library (
   az_core
@@ -82,7 +86,7 @@ add_library (az::core ALIAS az_core)
 
  add_test(NAME az_core_test COMMAND az_core_test)
  
- if(NOT CMAKE_C_COMPILER_ID MATCHES "Clang")
+ if(DEFINED ENV{AZ_SDK_CODE_COV} AND NOT CMAKE_C_COMPILER_ID MATCHES "Clang")
   APPEND_COVERAGE_COMPILER_FLAGS()
   
   # Basic coverage using lcov (gcc integrated)
