@@ -66,7 +66,6 @@ AZ_NODISCARD az_result az_keyvault_keys_client_init(
   AZ_CONTRACT_ARG_NOT_NULL(options);
 
   _az_credential * const cred = (_az_credential *)credential;
-  cred->_internal.http_transport_options = options->_internal.http_transport_options;
 
   *self = (az_keyvault_keys_client) {
     ._internal = {

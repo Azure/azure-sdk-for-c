@@ -362,6 +362,9 @@ typedef struct {
   } _internal;
 } az_http_transport_options;
 
+AZ_NODISCARD az_http_transport_options
+az_http_transport_options_default(az_http_client_send_request_fn send_request);
+
 #include <_az_cfg_suffix.h>
 
 #endif
