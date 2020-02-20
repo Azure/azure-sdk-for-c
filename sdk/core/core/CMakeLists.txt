@@ -22,7 +22,6 @@ add_library (
   src/az_json_string.c
   src/az_json_token.c
   src/az_log.c
-  src/az_platform_impl.c
   src/az_span.c
   )
 
@@ -90,7 +89,43 @@ target_include_directories(
             #$<INSTALL_INTERFACE:include/az_internal>
     )
 
+set(AZ_PLATFORM_IMPL "" CACHE STRING "Platform implementation to use")
+
+set_property(
+    CACHE
+        AZ_PLATFORM_IMPL
+            PROPERTY
+                STRINGS
+                    WIN32
+                    POSIX
+                    USER
+)
+
+set(AZ_USER_PLATFORM_IMPL_NAME "" CACHE STRING "Name of the implementation target")
+
+if(AZ_PLATFORM_IMPL STREQUAL "WIN32")
+  set(AZ_PLATFORM_IMPL_WIN32 ON)
+elseif(AZ_PLATFORM_IMPL STREQUAL "POSIX")
+  set(AZ_PLATFORM_IMPL_POSIX ON)
+elseif(AZ_PLATFORM_IMPL STREQUAL "USER")
+  set(AZ_PLATFORM_IMPL_USER ON)
+else()
+    if(WIN32)
+        set(AZ_PLATFORM_IMPL_WIN32 ON)
+    else()
+        set(AZ_PLATFORM_IMPL_POSIX ON)
+    endif()
+endif()
+
 target_link_libraries(az_core PRIVATE az_core_internal)
+
+if(AZ_PLATFORM_IMPL_WIN32)
+    target_link_libraries(az_core PRIVATE az_win32)
+elseif(AZ_PLATFORM_IMPL_POSIX)
+    target_link_libraries(az_core PRIVATE az_posix)
+elseif(AZ_PLATFORM_IMPL_USER)
+    target_link_libraries(az_core PRIVATE ${AZ_USER_PLATFORM_IMPL_NAME})
+endif()
 
 # make sure that users can consume the project as a library.
 add_library (az::core ALIAS az_core)

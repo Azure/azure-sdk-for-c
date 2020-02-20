@@ -4,7 +4,7 @@
 #ifndef _az_PLATFORM_INTERNAL_H
 #define _az_PLATFORM_INTERNAL_H
 
-#include <az_platform.h>
+#include <az_platform_impl.h>
 #include <az_result.h>
 
 #include <stdint.h>

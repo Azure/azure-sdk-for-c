@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_platform.h>
+#include <az_platform_impl.h>
 #include <az_platform_internal.h>
 
 #include <_az_cfg.h>
