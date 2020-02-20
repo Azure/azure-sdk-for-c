@@ -44,7 +44,7 @@ static void _az_span_free(az_span* p)
     return;
   }
   free(az_span_ptr(*p));
-  *p = az_span_null();
+  *p = AZ_SPAN_NULL;
 }
 
 /**

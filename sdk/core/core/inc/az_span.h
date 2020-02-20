@@ -231,9 +231,8 @@ AZ_NODISCARD AZ_INLINE az_pair az_pair_init(az_span key, az_span value)
   return (az_pair){ .key = key, .value = value };
 }
 
-AZ_NODISCARD AZ_INLINE az_pair az_pair_null()
-{
-  return az_pair_init(az_span_null(), az_span_null());
+AZ_NODISCARD AZ_INLINE az_pair az_pair_null() {
+  return az_pair_init(AZ_SPAN_NULL, AZ_SPAN_NULL);
 }
 
 AZ_NODISCARD AZ_INLINE az_pair az_pair_from_str(char* key, char* value)

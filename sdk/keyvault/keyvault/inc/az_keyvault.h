@@ -109,7 +109,7 @@ AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_wrap_
 }
 AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_null()
 {
-  return az_span_null();
+  return AZ_SPAN_NULL;
 }
 
 typedef struct
@@ -152,7 +152,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
  * The get key operation is applicable to all key types. If the requested key is symmetric, then no
  * key material is released in the response. This operation requires the keys/get permission.
  *
- * Get latest version by passing az_span_null as value for version
+ * Get latest version by passing AZ_SPAN_NULL as value for version
  *
  * @param client a keyvault client structure
  * @param key_name name of key to be retrieved

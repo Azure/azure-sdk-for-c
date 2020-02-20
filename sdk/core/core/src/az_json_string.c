@@ -107,7 +107,7 @@ AZ_NODISCARD az_span _az_json_esc_encode(uint8_t c)
     }
     default:
     {
-      return az_span_null();
+      return AZ_SPAN_NULL;
     }
   }
 }
