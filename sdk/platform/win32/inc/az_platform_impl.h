@@ -7,6 +7,8 @@
 // Include windows.h with WIN32_LEAN_AND_MEAN and NOMINMAX defined, but restore the ifdef state
 // afterwards.
 #ifndef WIN32_LEAN_AND_MEAN
+
+
 #define WIN32_LEAN_AND_MEAN
 #ifndef NOMINMAX
 #define NOMINMAX

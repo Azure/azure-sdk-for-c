@@ -9,7 +9,7 @@
 * @gilbertw @jeffreyrichter @joshfree
 
 # SDK team
-/sdk/ @antkmsft @gilbertw @jeffreyrichter @joshfree @vhvb1989
+/sdk/ @antkmsft @gilbertw @jeffreyrichter @vhvb1989
 
 # Samples
 /samples/ @gilbertw @jeffreyrichter
@@ -17,10 +17,9 @@
 # Service teams
 /sdk/core/                  @antkmsft @gilbertw @jeffreyrichter @vhvb1989
 /sdk/keyvault/              @vhvb1989
-/sdk/platfrom/c11/          @antkmsft @jeffreyrichter
-/sdk/platfrom/posix/        @antkmsft @jeffreyrichter
-/sdk/platfrom/http_client/  @vhvb1989
-/sdk/platfrom/win32/        @antkmsft @jeffreyrichter
+/sdk/platform/posix/        @antkmsft @jeffreyrichter
+/sdk/platform/http_client/  @vhvb1989
+/sdk/platform/win32/        @antkmsft @jeffreyrichter
 /sdk/storage/               @gilbertw
 
 ###########

@@ -3,25 +3,17 @@
 
 if(WIN32)
 
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required (VERSION 3.12)
 
-project(az_win32 LANGUAGES C)
+project (az_win32 LANGUAGES C)
 set(CMAKE_C_STANDARD 99)
 
 add_library(az_win32 STATIC)
 
-target_link_libraries(az_win32 PRIVATE az_core)
+target_link_libraries(az_win32 PRIVATE az_core az_core_internal)
 
-target_sources(
-    az_win32
-        PRIVATE
-            src/az_win32.c
-    )
+target_sources(az_win32 PRIVATE src/az_win32.c)
 
-target_include_directories(
-    az_win32
-        PUBLIC
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc>
-    )
+target_include_directories(az_win32 PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc>)
 
 endif()

@@ -1,9 +1,9 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # SPDX-License-Identifier: MIT
 
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required (VERSION 3.12)
 
-project(az_core LANGUAGES C)
+project (az_core LANGUAGES C)
 
 set(CMAKE_C_STANDARD 99)
 
@@ -26,80 +26,33 @@ add_library (
   )
 
 if(MSVC)
-    if(WARNINGS_AS_ERRORS)
-        set(WARNINGS_AS_ERRORS_FLAG "/WX")
-    endif()
+  if(WARNINGS_AS_ERRORS)
+    set(WARNINGS_AS_ERRORS_FLAG "/WX")
+  endif()
 
-    target_compile_options(
-        az_core
-        PRIVATE
-            /Wall
-            ${WARNINGS_AS_ERRORS_FLAG}
-            /wd5031
-            /wd4668
-            /wd4820
-            /wd4255
-            /analyze
-        )
+  target_compile_options(az_core PRIVATE /Wall ${WARNINGS_AS_ERRORS_FLAG} /wd5031 /wd4668 /wd4820 /wd4255 /analyze)
 elseif(CMAKE_C_COMPILER_ID MATCHES "Clang")
-    if(WARNINGS_AS_ERRORS)
-        set(WARNINGS_AS_ERRORS_FLAG "-Werror")
-    endif()
+  if(WARNINGS_AS_ERRORS)
+      set(WARNINGS_AS_ERRORS_FLAG "-Werror")
+  endif()
 
-    target_compile_options(
-        az_core
-            PRIVATE
-                -Xclang
-                -Wall
-                -Wextra
-                -pedantic
-                ${WARNINGS_AS_ERRORS_FLAG}
-                -Wdocumentation
-                -Wdocumentation-unknown-command
-                -Wcast-qual
-        )
+  target_compile_options(az_core PRIVATE -Xclang -Wall -Wextra -pedantic ${WARNINGS_AS_ERRORS_FLAG} -Wdocumentation -Wdocumentation-unknown-command -Wcast-qual)
 else()
-    if(WARNINGS_AS_ERRORS)
-        set(WARNINGS_AS_ERRORS_FLAG "-Werror")
-    endif()
+  if(WARNINGS_AS_ERRORS)
+      set(WARNINGS_AS_ERRORS_FLAG "-Werror")
+  endif()
 
-    target_compile_options(
-        az_core
-            PRIVATE
-                -Wall
-                -Wextra
-                -pedantic
-                ${WARNINGS_AS_ERRORS_FLAG}
-        )
+  target_compile_options(az_core PRIVATE -Wall -Wextra -pedantic ${WARNINGS_AS_ERRORS_FLAG})
 endif()
 
-target_include_directories (
-    az_core
-        PUBLIC
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc
-            #$<INSTALL_INTERFACE:include/az>
-    )
+target_include_directories (az_core PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc> $<INSTALL_INTERFACE:include/az>)
 
 # create interface for internal headers
 add_library(az_core_internal INTERFACE)
-target_include_directories(
-    az_core_internal
-        INTERFACE
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/internal>
-            #$<INSTALL_INTERFACE:include/az_internal>
-    )
+target_include_directories(az_core_internal INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/internal> $<INSTALL_INTERFACE:include/az_internal>)
 
 set(AZ_PLATFORM_IMPL "" CACHE STRING "Platform implementation to use")
-
-set_property(
-    CACHE
-        AZ_PLATFORM_IMPL
-            PROPERTY
-                STRINGS
-                    WIN32
-                    POSIX
-                    USER
-)
+set_property(CACHE AZ_PLATFORM_IMPL PROPERTY STRINGS WIN32 POSIX USER)
 
 set(AZ_USER_PLATFORM_IMPL_NAME "" CACHE STRING "Name of the implementation target")
 
@@ -132,16 +85,16 @@ add_library (az::core ALIAS az_core)
 
 add_executable (
     az_core_test 
-        test/main.c 
-        test/test_http_response_read_and_parse.c
-        test/test_json_builder.c
-        test/test_json_get_by_pointer.c
-        test/test_json_pointer.c
-        test/test_json_string.c
-        test/test_json_value.c
-        test/test_log.c
-        test/test_mut_span.c
-        test/test_span_builder_replace.c
+    test/main.c 
+    test/test_http_response_read_and_parse.c
+    test/test_json_builder.c
+    test/test_json_get_by_pointer.c
+    test/test_json_pointer.c
+    test/test_json_string.c
+    test/test_json_value.c
+    test/test_log.c
+    test/test_mut_span.c
+    test/test_span_builder_replace.c
     )
 
 target_link_libraries(az_core_test PRIVATE az_core az_core_internal)

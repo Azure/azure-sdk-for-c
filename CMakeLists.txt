@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # SPDX-License-Identifier: MIT
 
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required (VERSION 3.12)
 
 option(WARNINGS_AS_ERRORS "Treat compiler warnings as errors" ON)
 option(BUILD_CURL_TRANSPORT "Build internal http transport implementation with CURL for HTTP Pipeline" OFF)
@@ -32,9 +32,8 @@ endif()
 
 add_subdirectory(sdk/keyvault/keyvault)
 #add_subdirectory(sdk/platform/posix)
-#add_subdirectory(sdk/platform/win32)
+add_subdirectory(sdk/platform/win32)
 add_subdirectory(sdk/storage/blobs)
-
 
 if(NOT DEFINED ENV{AZ_SDK_C_NO_SAMPLES})
   # current samples require an HTTP transport implementation.
