@@ -25,6 +25,7 @@ void test_json_string();
 void test_span_builder_replace();
 void test_mut_span();
 void test_log();
+void test_az_span();
 
 int exit_code = 0;
 
@@ -495,5 +496,7 @@ int main() {
   test_json_pointer();
   test_json_string();
   test_log();
+  test_az_span();
+
   return exit_code;
 }

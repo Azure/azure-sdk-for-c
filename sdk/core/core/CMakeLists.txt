@@ -69,6 +69,7 @@ add_library (az::core ALIAS az_core)
      test/test_log.c
      test/test_mut_span.c
      test/test_span_builder_replace.c
+     test/test_az_span.c
      )
 
  target_link_libraries(az_core_test PRIVATE az_core az_core_internal)
