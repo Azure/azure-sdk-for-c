@@ -1,8 +1,6 @@
-# Azure SDK Transport Policy for Curl
+# Azure Platform abstraction layer implemented with POSIX APIs
 
-Azure HTTP Client curl (`az_curl`) provides abstractions, and helpers for communicating with Azure using libcurl in the C programming language. This library follows the Azure SDK Design Guidelines for Embedded C.
-
-The library allows clients to communicate with Azure.
+Azure POSIX Platform abstraction layer (`az_posix`) provides platform-specific implementation for the small set of features that Azure SDK needs, yet they are not available as a part of the C99 standard library. This library follows the Azure SDK Design Guidelines for Embedded C.
 
 ## Getting started
 
