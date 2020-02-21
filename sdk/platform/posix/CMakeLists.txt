@@ -1,9 +1,9 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # SPDX-License-Identifier: MIT
 
-if(NOT WIN32)
+if (NOT WIN32)
 
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required (VERSION 3.12)
 
 project(az_posix LANGUAGES C)
 set(CMAKE_C_STANDARD 99)

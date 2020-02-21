@@ -31,7 +31,7 @@ if(BUILD_CURL_TRANSPORT)
 endif()
 
 add_subdirectory(sdk/keyvault/keyvault)
-#add_subdirectory(sdk/platform/posix)
+add_subdirectory(sdk/platform/posix)
 add_subdirectory(sdk/platform/win32)
 add_subdirectory(sdk/storage/blobs)
 
