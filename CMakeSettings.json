@@ -10,13 +10,7 @@
       "cmakeCommandArgs": "",
       "buildCommandArgs": "-v",
       "ctestCommandArgs": "",
-      "variables": [
-        {
-          "name": "BUILD_CURL_TRANSPORT",
-          "value": "True",
-          "type": "BOOL"
-        }
-      ]
+      "variables": []
     }
   ]
 }
