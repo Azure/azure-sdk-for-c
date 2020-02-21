@@ -5,6 +5,7 @@
 #include <az_platform_impl.h>
 #include <az_platform_internal.h>
 
+#include <stddef.h>
 #include <time.h>
 
 #include <unistd.h>
@@ -33,9 +34,9 @@ AZ_NODISCARD az_result az_platform_mtx_init(az_platform_mtx * mtx) {
 }
 
 AZ_NODISCARD az_result az_platform_mtx_lock(az_platform_mtx * mtx) {
-  return pthread_mutex_lock(&mtx->mutex, NULL) == 0 ? AZ_OK : AZ_ERROR_MUTEX;
+  return pthread_mutex_lock(&mtx->mutex) == 0 ? AZ_OK : AZ_ERROR_MUTEX;
 }
 
 AZ_NODISCARD az_result az_platform_mtx_unlock(az_platform_mtx * mtx) {
-  return pthread_mutex_unlock(&mtx->mutex, NULL) == 0 ? AZ_OK : AZ_ERROR_MUTEX;
+  return pthread_mutex_unlock(&mtx->mutex) == 0 ? AZ_OK : AZ_ERROR_MUTEX;
 }

@@ -14,4 +14,4 @@ struct az_platform_mtx {
 
 #include <_az_cfg_suffix.h>
 
-#endif // _az_PLATFORM_H
+#endif // _az_PLATFORM_IMPL_H
