@@ -10,18 +10,10 @@ set(CMAKE_C_STANDARD 99)
 
 add_library(az_posix STATIC)
 
-target_link_libraries(az_posix PRIVATE az_core)
+target_link_libraries(az_posix PRIVATE az_core az_core_internal)
 
-target_sources(
-    az_posix
-        PRIVATE
-            src/az_posix.c
-    )
+target_sources(az_posix PRIVATE src/az_posix.c)
 
-target_include_directories(
-    az_posix
-        PUBLIC
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc>
-    )
+target_include_directories(az_posix PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc>)
 
 endif()
