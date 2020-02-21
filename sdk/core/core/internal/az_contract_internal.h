@@ -4,9 +4,9 @@
 #ifndef _az_CONTRACT_INTERNAL_H
 #define _az_CONTRACT_INTERNAL_H
 
-#include <az_result.h>
 #include <az_span.h>
 
+#include <stdbool.h>
 #include <stddef.h>
 
 #include <_az_cfg_prefix.h>
@@ -35,4 +35,4 @@ AZ_NODISCARD AZ_INLINE bool az_span_is_empty(az_span span) { return az_span_leng
 
 #include <_az_cfg_suffix.h>
 
-#endif
+#endif /* _az_CONTRACT_INTERNAL_H */

@@ -10,7 +10,7 @@
 #include <_az_cfg_prefix.h>
 
 AZ_NODISCARD az_result
-az_http_client_curl(az_http_request * p_request, az_http_response * p_response);
+_az_http_client_curl_send_request(_az_http_request * p_request, az_http_response * p_response);
 
 #include <_az_cfg_suffix.h>
 

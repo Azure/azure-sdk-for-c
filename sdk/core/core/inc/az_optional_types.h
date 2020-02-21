@@ -1,6 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+/**
+ * @file az_optional_types.h
+ *
+ * @brief definition for and utilities to use types as an optional type
+ */
+
 #ifndef _az_OPTIONAL_TYPES_H
 #define _az_OPTIONAL_TYPES_H
 

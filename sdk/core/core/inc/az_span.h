@@ -1,13 +1,18 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+/**
+ * @file az_span.h
+ *
+ * @brief az_span and utilities definition
+ */
+
 #ifndef _az_SPAN_H
 #define _az_SPAN_H
 
 #include <az_result.h>
 
 #include <stdbool.h>
-#include <stddef.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -55,20 +60,20 @@ AZ_NODISCARD AZ_INLINE az_span az_span_null() { return (az_span){ 0 }; }
 // A size of the string literal.
 // Details: to make sure that `S` is a `string literal`, we are appending `""`
 // to `S`.
-#define AZ_STRING_LITERAL_LEN(S) (sizeof(S "") - 1)
+#define _az_STRING_LITERAL_LEN(S) (sizeof(S "") - 1)
 
 /**
- * Creates a az_span literal which can be used to initialize a constant. For example
+ * Creates an az_span literal which can be used to initialize a constant. For example
  *
  * `static const az_span foo = AZ_SPAN_LITERAL_FROM_STR("Hello world");`
  */
 #define AZ_SPAN_LITERAL_FROM_STR(STRING_LITERAL) \
   { \
-    ._internal \
-        = {.ptr = (uint8_t *)STRING_LITERAL, \
-           .length = AZ_STRING_LITERAL_LEN(STRING_LITERAL), \
-           .capacity = AZ_STRING_LITERAL_LEN(STRING_LITERAL), \
-          } \
+    ._internal = { \
+      .ptr = (uint8_t *)STRING_LITERAL, \
+      .length = _az_STRING_LITERAL_LEN(STRING_LITERAL), \
+      .capacity = _az_STRING_LITERAL_LEN(STRING_LITERAL), \
+    }, \
   }
 
 /**
@@ -84,7 +89,7 @@ AZ_NODISCARD AZ_INLINE az_span az_span_null() { return (az_span){ 0 }; }
  *
  */
 AZ_NODISCARD AZ_INLINE az_span az_span_init(uint8_t * ptr, int32_t length, int32_t capacity) {
-  return (az_span){ ._internal = { .ptr = ptr, .length = length, .capacity = capacity } };
+  return (az_span){ ._internal = { .ptr = ptr, .length = length, .capacity = capacity, }, };
 }
 
 /**
@@ -97,17 +102,18 @@ AZ_NODISCARD AZ_INLINE az_span az_span_from_str(char * str) {
 }
 
 /**
- * Creates a az_span literal which can be used to initialize a constant. For example
+ * Creates an az_span literal which can be used to initialize a constant. For example
  *
  * uint8_t buffer[2 * 1024];
  * const az_span foo = AZ_SPAN_LITERAL_FROM_BUFFER(buffer);
  */
 #define AZ_SPAN_LITERAL_FROM_BUFFER(BYTE_BUFFER) \
   { \
-    ._internal \
-        = {.ptr = BYTE_BUFFER, \
-           .length = 0, \
-           .capacity = (sizeof(BYTE_BUFFER) / sizeof(BYTE_BUFFER[0])) } \
+    ._internal = { \
+      .ptr = BYTE_BUFFER, \
+      .length = 0, \
+      .capacity = (sizeof(BYTE_BUFFER) / sizeof(BYTE_BUFFER[0])), \
+    }, \
   }
 
 #define AZ_SPAN_FROM_BUFFER(BYTE_BUFFER) (az_span) AZ_SPAN_LITERAL_FROM_BUFFER(BYTE_BUFFER)
@@ -120,10 +126,11 @@ AZ_NODISCARD AZ_INLINE az_span az_span_from_str(char * str) {
  */
 #define AZ_SPAN_LITERAL_FROM_INITIALIZED_BUFFER(BYTE_BUFFER) \
   { \
-    ._internal \
-        = {.ptr = BYTE_BUFFER, \
-           .length = (sizeof(BYTE_BUFFER) / sizeof(BYTE_BUFFER[0])), \
-           .capacity = (sizeof(BYTE_BUFFER) / sizeof(BYTE_BUFFER[0])) } \
+    ._internal = { \
+      .ptr = BYTE_BUFFER, \
+      .length = (sizeof(BYTE_BUFFER) / sizeof(BYTE_BUFFER[0])), \
+      .capacity = (sizeof(BYTE_BUFFER) / sizeof(BYTE_BUFFER[0])), \
+    }, \
   }
 
 #define AZ_SPAN_FROM_INITIALIZED_BUFFER(BYTE_BUFFER) \
@@ -178,7 +185,6 @@ AZ_NODISCARD az_result az_span_copy(az_span dst, az_span src, az_span * out);
 
 AZ_NODISCARD az_result az_span_copy_url_encode(az_span dst, az_span src, az_span * out);
 
-// TODO: this will become az_span_append once we remove actions ....
 /**
  * @brief append az_span if there is enough capacity for it
  *
@@ -188,18 +194,8 @@ AZ_NODISCARD az_result az_span_copy_url_encode(az_span dst, az_span src, az_span
  */
 AZ_NODISCARD az_result az_span_append(az_span self, az_span span, az_span * out);
 
-// TODO: remove this signature/function once actions are GONE
 /**
- * @brief append az_span if there is enough capacity for it
- *
- * @param self src span where to append
- * @param span content to be appended
- * @return AZ_NODISCARD az_span_append_
- */
-// AZ_NODISCARD az_result az_span_append_(az_span * self, az_span span);
-
-/**
- * @brief converts @b src span to zero-terminated srt. Content is copied to @b buffer and then \0 is
+ * @brief converts @b src span to zero-terminated str. Content is copied to @b buffer and then \0 is
  * addeed at the end. Then out_result will be created out of buffer
  *
  * @param s buffer where to write str

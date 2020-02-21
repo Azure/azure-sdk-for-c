@@ -4,38 +4,37 @@
 #ifndef _az_STORAGE_BLOBS_H
 #define _az_STORAGE_BLOBS_H
 
+#include <az_config.h>
 #include <az_contract_internal.h>
 #include <az_credentials.h>
 #include <az_http.h>
-#include <az_http_pipeline_internal.h>
 #include <az_result.h>
 #include <az_span.h>
 
-#include <stddef.h>
+#include <stdint.h>
 
 #include <_az_cfg_prefix.h>
 
 static az_span const AZ_STORAGE_API_VERSION = AZ_SPAN_LITERAL_FROM_STR("2019-02-02");
+
 typedef struct {
   az_http_policy_retry_options retry;
   struct {
-    az_http_client_fn http_client;
+    az_http_transport_options http_transport_options;
     _az_http_policy_apiversion_options api_version;
     _az_http_policy_telemetry_options _telemetry_options;
   } _internal;
 } az_storage_blobs_blob_client_options;
 
-AZ_NODISCARD az_storage_blobs_blob_client_options
-az_storage_blobs_blob_client_options_default(az_http_client_fn http_client);
 typedef struct {
   struct {
     // buffer to copy customer url. Then it stays immutable
-    uint8_t url_buffer[AZ_HTTP_URL_MAX_SIZE];
+    uint8_t url_buffer[AZ_HTTP_REQUEST_URL_BUF_SIZE];
     // this url will point to url_buffer
     az_span uri;
-    az_http_pipeline pipeline;
+    _az_http_pipeline pipeline;
     az_storage_blobs_blob_client_options options;
-    _az_credential_vtbl * credential;
+    _az_credential * credential;
   } _internal;
 } az_storage_blobs_blob_client;
 
@@ -48,6 +47,9 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
 typedef struct {
   az_span option;
 } az_storage_blobs_blob_upload_options;
+
+AZ_NODISCARD az_storage_blobs_blob_client_options
+az_storage_blobs_blob_client_options_default(az_http_transport_options const * http_transport_options);
 
 AZ_NODISCARD AZ_INLINE az_storage_blobs_blob_upload_options
 az_storage_blobs_blob_upload_options_default() {

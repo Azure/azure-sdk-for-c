@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 #include <az_http.h>
+#include <az_http_internal.h>
 #include <az_http_private.h>
+#include <az_http_transport.h>
 #include <az_log.h>
 #include <az_log_internal.h>
 #include <az_log_private.h>
@@ -20,7 +22,7 @@ static inline void _reset_log_invocation_status() {
 }
 
 static void _log_listener(az_log_classification classification, az_span message) {
-  // fprintf(stderr, "%.*s\n", (unsigned int)message.size, message.begin);
+  // fprintf(stderr, "%.*s\n", (unsigned int)az_span_length(message), az_span_ptr(message));
   switch (classification) {
     case AZ_LOG_HTTP_REQUEST:
       _log_invoked_for_http_request = true;
@@ -56,7 +58,7 @@ void test_log() {
   // Set up test values etc.
   //  uint8_t hrb_buf[4 * 1024] = { 0 };
   uint8_t headers[4 * 1024] = { 0 };
-  az_http_request hrb = { 0 };
+  _az_http_request hrb = { 0 };
   TEST_EXPECT_SUCCESS(az_http_request_init(
       &hrb,
       az_http_method_get(),

@@ -4,6 +4,10 @@
 #include "az_aad_private.h"
 #include <az_credentials.h>
 #include <az_http.h>
+#include <az_http_internal.h>
+#include <az_http_transport.h>
+
+#include <stddef.h>
 
 #include <_az_cfg.h>
 
@@ -23,17 +27,20 @@ _az_client_secret_credential_request_token(az_client_secret_credential * credent
       &body));
 
   uint8_t header_buf[_az_AAD_REQUEST_HEADER_BUF_SIZE];
-  az_http_request request = { 0 };
+  _az_http_request request = { 0 };
   AZ_RETURN_IF_FAILED(az_http_request_init(
       &request, az_http_method_post(), url, AZ_SPAN_FROM_BUFFER(header_buf), body));
 
-  return _az_aad_request_token(&request, &credential->_internal.token);
+  return _az_aad_request_token(
+      &credential->_internal.credential._internal.http_transport_options,
+      &request,
+      &credential->_internal.token);
 }
 
 // This gets called from the http credential policy
 static AZ_NODISCARD az_result _az_client_secret_credential_apply(
     az_client_secret_credential * credential,
-    az_http_request * ref_request) {
+    _az_http_request * ref_request) {
 
   if (_az_token_expired(&(credential->_internal.token))) {
     AZ_RETURN_IF_FAILED(_az_client_secret_credential_request_token(credential));
@@ -59,11 +66,13 @@ AZ_NODISCARD az_result az_client_secret_credential_init(
     az_client_secret_credential * self,
     az_span tenant_id,
     az_span client_id,
-    az_span client_secret) {
+    az_span client_secret,
+    az_http_transport_options * http_transport_options) {
   *self = (az_client_secret_credential){
     ._internal = {
-      .vtbl = {
+      .credential = {
         ._internal = {
+          .http_transport_options = *http_transport_options,  //Make a by-value copy of the options
           .apply_credential = (_az_credential_apply_fn)_az_client_secret_credential_apply,
           .set_scopes = (_az_credential_set_scopes_fn)_az_client_secret_credential_set_scopes,
           },

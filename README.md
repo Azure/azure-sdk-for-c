@@ -45,6 +45,13 @@ make
 ```
 > Note: use `cmake -Duse_default_uuid=ON ../` if no uuid-dev is installed in system
 
+## Build Docs
+Running below command from root folder will create a new folder `docs` containing html file with documentation about CORE headers.
+> doxygen needs to be installed in the system
+```
+doxygen Doxyfile
+```
+
 ## Need help?
 * File an issue via [Github Issues](https://github.com/Azure/azure-sdk-for-c/issues/new/choose).
 * Check [previous questions](https://stackoverflow.com/questions/tagged/azure+c) or ask new ones on StackOverflow using
@@ -86,8 +93,5 @@ Security issues and bugs should be reported privately, via email, to the Microso
 
 Azure SDK for C is licensed under the [MIT](LICENSE) license.
 
-![Impressions](https://azure-sdk-impressions.azurewebsites.net/api/impressions/azure-sdk-for-c%2FREADME.png)
-
 <!-- LINKS -->
 [azure_sdk_for_c_wiki]: https://github.com/azure/azure-sdk-for-c/wiki
-[c_compiler]: https://visualstudio.microsoft.com/vs/features/cplusplus/
