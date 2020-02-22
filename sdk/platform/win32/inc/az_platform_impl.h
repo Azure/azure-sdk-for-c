@@ -12,16 +12,16 @@
 #define NOMINMAX
 #include <windows.h>
 #undef NOMINMAX
-#else // NOMINMAX
+#else // !NOMINMAX
 #include <windows.h>
 #endif // NOMINMAX
 #undef WIN32_LEAN_AND_MEAN
-#else // WIN32_LEAN_AND_MEAN
+#else // !WIN32_LEAN_AND_MEAN
 #ifndef NOMINMAX
 #define NOMINMAX
 #include <windows.h>
 #undef NOMINMAX
-#else // NOMINMAX
+#else // !NOMINMAX
 #include <windows.h>
 #endif // NOMINMAX
 #endif // WIN32_LEAN_AND_MEAN
@@ -38,4 +38,4 @@ struct az_platform_mtx
 
 #include <_az_cfg_suffix.h>
 
-#endif // _az_PLATFORM_H
+#endif // _az_PLATFORM_IMPL_H

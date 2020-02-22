@@ -45,4 +45,4 @@ AZ_NODISCARD az_result az_http_request_get_parts(
 
 #include <_az_cfg_suffix.h>
 
-#endif
+#endif // _az_HTTP_TRANSPORT_H

@@ -38,4 +38,4 @@ AZ_NODISCARD az_result _az_span_reader_read_json_pointer_token_char(az_span* sel
 
 #include <_az_cfg_suffix.h>
 
-#endif
+#endif // _az_JSON_STRING_PRIVATE_H

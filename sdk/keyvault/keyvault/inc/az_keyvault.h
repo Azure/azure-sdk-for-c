@@ -184,4 +184,4 @@ AZ_NODISCARD az_result az_keyvault_keys_key_delete(
 
 #include <_az_cfg_suffix.h>
 
-#endif
+#endif // _az_KEYVAULT_H

@@ -43,4 +43,4 @@ AZ_NODISCARD AZ_INLINE az_result _az_http_request_remove_retry_headers(_az_http_
 
 #include <_az_cfg_suffix.h>
 
-#endif
+#endif // _az_HTTP_PRIVATE_H

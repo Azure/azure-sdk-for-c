@@ -20,4 +20,4 @@ void _az_log_http_response(
 
 #include <_az_cfg_suffix.h>
 
-#endif
+#endif // _az_LOG_PRIVATE_H

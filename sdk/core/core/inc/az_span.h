@@ -255,4 +255,4 @@ AZ_INLINE void az_span_set(az_span span, uint8_t fill)
 
 #include <_az_cfg_suffix.h>
 
-#endif
+#endif // _az_SPAN_H

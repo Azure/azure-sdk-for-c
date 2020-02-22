@@ -159,4 +159,5 @@ AZ_NODISCARD az_result
 az_http_request_append_header(_az_http_request* p_request, az_span key, az_span value);
 
 #include <_az_cfg_suffix.h>
-#endif
+
+#endif // _az_HTTP_INTERNAL_H

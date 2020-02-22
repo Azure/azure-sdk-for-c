@@ -24,4 +24,4 @@ AZ_NODISCARD az_result az_platform_mtx_unlock(az_platform_mtx* mtx);
 
 #include <_az_cfg_suffix.h>
 
-#endif
+#endif // _az_PLATFORM_INTERNAL_H

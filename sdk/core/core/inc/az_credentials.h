@@ -103,4 +103,4 @@ AZ_NODISCARD az_result az_client_secret_credential_init(
 
 #include <_az_cfg_suffix.h>
 
-#endif
+#endif // _az_CREDENTIALS_H

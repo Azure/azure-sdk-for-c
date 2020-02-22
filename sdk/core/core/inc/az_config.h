@@ -24,4 +24,4 @@ enum
 
 #include <_az_cfg_suffix.h>
 
-#endif /* _az_CONFIG_H */
+#endif // _az_CONFIG_H

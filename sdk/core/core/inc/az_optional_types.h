@@ -35,4 +35,4 @@ AZ_NODISCARD AZ_INLINE az_optional_bool az_optional_bool_create_no_data()
 
 #include <_az_cfg_suffix.h>
 
-#endif
+#endif // _az_OPTIONAL_TYPES_H

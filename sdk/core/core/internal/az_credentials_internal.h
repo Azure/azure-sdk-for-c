@@ -22,4 +22,4 @@ _az_credential_set_scopes(_az_credential* credential, az_span scopes)
 
 #include <_az_cfg_suffix.h>
 
-#endif
+#endif // _az_CREDENTIALS_INTERNAL_H

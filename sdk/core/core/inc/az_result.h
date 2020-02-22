@@ -98,4 +98,4 @@ AZ_NODISCARD AZ_INLINE bool az_succeeded(az_result result) { return (result & AZ
 
 #include <_az_cfg_suffix.h>
 
-#endif
+#endif // _az_RESULT_H

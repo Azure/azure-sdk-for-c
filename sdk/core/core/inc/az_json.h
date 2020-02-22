@@ -191,4 +191,4 @@ az_json_parse_by_pointer(az_span json, az_span pointer, az_json_token* out_token
 
 #include <_az_cfg_suffix.h>
 
-#endif
+#endif // _az_JSON_H

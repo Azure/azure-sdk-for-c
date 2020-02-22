@@ -118,4 +118,4 @@ AZ_NODISCARD az_result _az_is_expected_span(az_span* self, az_span expected);
 
 #include <_az_cfg_suffix.h>
 
-#endif
+#endif // _az_SPAN_PRIVATE_H

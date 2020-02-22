@@ -41,4 +41,4 @@ AZ_NODISCARD az_result _az_token_set(_az_token* self, _az_token const* new_token
 
 #include <_az_cfg_suffix.h>
 
-#endif
+#endif // _az_AAD_PRIVATE_H

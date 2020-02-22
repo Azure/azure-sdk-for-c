@@ -361,4 +361,4 @@ AZ_NODISCARD az_result az_http_response_get_body(az_http_response* self, az_span
 
 #include <_az_cfg_suffix.h>
 
-#endif
+#endif // _az_HTTP_H

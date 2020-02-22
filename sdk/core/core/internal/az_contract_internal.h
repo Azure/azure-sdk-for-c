@@ -35,4 +35,4 @@ AZ_NODISCARD AZ_INLINE bool az_span_is_empty(az_span span) { return az_span_leng
 
 #include <_az_cfg_suffix.h>
 
-#endif /* _az_CONTRACT_INTERNAL_H */
+#endif // _az_CONTRACT_INTERNAL_H

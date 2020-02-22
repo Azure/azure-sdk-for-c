@@ -37,4 +37,4 @@ void az_log_set_listener(az_log_fn listener);
 
 #include <_az_cfg_suffix.h>
 
-#endif
+#endif // _az_LOG_H

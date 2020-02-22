@@ -28,15 +28,15 @@ typedef struct
 } _az_type;
 
 // MSVC
-#if defined(_MSC_VER)
+#ifdef _MSC_VER
 #define _az_ALIGNOF(T) __alignof(T)
 // GCC
-#elif defined(__GNUC__)
+#elif defined(__GNUC__) // !_MSC_VER
 #define _az_ALIGNOF(T) __alignof__(T)
 // unknown
-#else
+#else // !_MSC_VER !__GNUC__
 #define _az_ALIGNOF(T) _Alignof(T)
-#endif
+#endif // _MSC_VER
 
 /**
  * Creates @_az_type from the given type/variable.
