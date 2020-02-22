@@ -27,18 +27,18 @@ AZ_NODISCARD az_result az_json_builder_write_span(az_json_builder * self, az_spa
   AZ_RETURN_IF_FAILED(az_span_append(*json, AZ_SPAN_FROM_STR("\""), json));
 
   for (int32_t i = 0; i < az_span_length(value); ++i) {
-    az_result_byte const c = az_span_ptr(value)[i];
+    uint8_t const c = az_span_ptr(value)[i];
 
     // check if the character has to be escaped.
     {
-      az_span const esc = az_json_esc_encode(c);
+      az_span const esc = _az_json_esc_encode(c);
       if (az_span_length(esc)) {
         AZ_RETURN_IF_FAILED(az_span_append(*json, esc, json));
         continue;
       }
     }
     // check if the character has to be escaped as a UNICODE escape sequence.
-    if (0 <= c && c < 0x20) {
+    if (c < 0x20) {
       uint8_t array[6] = {
         '\\',
         'u',
@@ -89,9 +89,7 @@ AZ_NODISCARD az_result az_json_builder_append_token(az_json_builder * self, az_j
       self->_internal.need_comma = true;
       return az_json_builder_write_span(self, token.value.span);
     }
-    default: {
-      return AZ_ERROR_ARG;
-    }
+    default: { return AZ_ERROR_ARG; }
   }
 }
 
