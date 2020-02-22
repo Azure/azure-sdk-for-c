@@ -12,7 +12,7 @@ if(NOT CURL_FOUND)
 endif()
 
 add_library (
-  az_curl
+  az_curl STATIC
   src/az_curl.c
   )
 

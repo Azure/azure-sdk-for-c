@@ -8,7 +8,7 @@ project (az_core LANGUAGES C)
 set(CMAKE_C_STANDARD 99)
 
 add_library (
-  az_core
+  az_core STATIC
   src/az_aad.c
   src/az_credentials.c
   src/az_http_pipeline.c
@@ -33,13 +33,13 @@ if(MSVC)
   target_compile_options(az_core PRIVATE /Wall ${WARNINGS_AS_ERRORS_FLAG} /wd5031 /wd4668 /wd4820 /wd4255 /analyze)
 elseif(CMAKE_C_COMPILER_ID MATCHES "Clang")
   if(WARNINGS_AS_ERRORS)
-      set(WARNINGS_AS_ERRORS_FLAG "-Werror")
+    set(WARNINGS_AS_ERRORS_FLAG "-Werror")
   endif()
 
   target_compile_options(az_core PRIVATE -Xclang -Wall -Wextra -pedantic ${WARNINGS_AS_ERRORS_FLAG} -Wdocumentation -Wdocumentation-unknown-command -Wcast-qual)
 else()
   if(WARNINGS_AS_ERRORS)
-      set(WARNINGS_AS_ERRORS_FLAG "-Werror")
+    set(WARNINGS_AS_ERRORS_FLAG "-Werror")
   endif()
 
   target_compile_options(az_core PRIVATE -Wall -Wextra -pedantic ${WARNINGS_AS_ERRORS_FLAG})
@@ -63,39 +63,39 @@ elseif(AZ_PLATFORM_IMPL STREQUAL "POSIX")
 elseif(AZ_PLATFORM_IMPL STREQUAL "USER")
   set(AZ_PLATFORM_IMPL_USER ON)
 else()
-    if(WIN32)
-        set(AZ_PLATFORM_IMPL_WIN32 ON)
-    else()
-        set(AZ_PLATFORM_IMPL_POSIX ON)
-    endif()
+  if(WIN32)
+    set(AZ_PLATFORM_IMPL_WIN32 ON)
+  else()
+    set(AZ_PLATFORM_IMPL_POSIX ON)
+  endif()
 endif()
 
 target_link_libraries(az_core PRIVATE az_core_internal)
 
 if(AZ_PLATFORM_IMPL_WIN32)
-    target_link_libraries(az_core PRIVATE az_win32)
+  target_link_libraries(az_core PRIVATE az_win32)
 elseif(AZ_PLATFORM_IMPL_POSIX)
-    target_link_libraries(az_core PRIVATE az_posix)
+  target_link_libraries(az_core PRIVATE az_posix)
 elseif(AZ_PLATFORM_IMPL_USER)
-    target_link_libraries(az_core PRIVATE ${AZ_USER_PLATFORM_IMPL_NAME})
+  target_link_libraries(az_core PRIVATE ${AZ_USER_PLATFORM_IMPL_NAME})
 endif()
 
 # make sure that users can consume the project as a library.
 add_library (az::core ALIAS az_core)
 
 add_executable (
-    az_core_test 
-    test/main.c 
-    test/test_http_response_read_and_parse.c
-    test/test_json_builder.c
-    test/test_json_get_by_pointer.c
-    test/test_json_pointer.c
-    test/test_json_string.c
-    test/test_json_value.c
-    test/test_log.c
-    test/test_mut_span.c
-    test/test_span_builder_replace.c
-    )
+  az_core_test 
+  test/main.c 
+  test/test_http_response_read_and_parse.c
+  test/test_json_builder.c
+  test/test_json_get_by_pointer.c
+  test/test_json_pointer.c
+  test/test_json_string.c
+  test/test_json_value.c
+  test/test_log.c
+  test/test_mut_span.c
+  test/test_span_builder_replace.c
+  )
 
 target_link_libraries(az_core_test PRIVATE az_core az_core_internal)
 target_include_directories (az_core_test PRIVATE src)
