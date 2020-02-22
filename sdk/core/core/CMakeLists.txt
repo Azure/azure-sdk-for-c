@@ -84,18 +84,18 @@ endif()
 add_library (az::core ALIAS az_core)
 
 add_executable (
-  az_core_test 
-  test/main.c 
-  test/test_http_response_read_and_parse.c
-  test/test_json_builder.c
-  test/test_json_get_by_pointer.c
-  test/test_json_pointer.c
-  test/test_json_string.c
-  test/test_json_value.c
-  test/test_log.c
-  test/test_mut_span.c
-  test/test_span_builder_replace.c
-  )
+    az_core_test 
+    test/main.c 
+    test/test_http_response_read_and_parse.c
+    test/test_json_builder.c
+    test/test_json_get_by_pointer.c
+    test/test_json_pointer.c
+    test/test_json_string.c
+    test/test_json_value.c
+    test/test_log.c
+    test/test_mut_span.c
+    test/test_span_builder_replace.c
+    )
 
 target_link_libraries(az_core_test PRIVATE az_core az_core_internal)
 target_include_directories (az_core_test PRIVATE src)
