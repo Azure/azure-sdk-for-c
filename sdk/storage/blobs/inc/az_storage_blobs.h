@@ -20,7 +20,6 @@ static az_span const AZ_STORAGE_API_VERSION = AZ_SPAN_LITERAL_FROM_STR("2019-02-
 typedef struct {
   az_http_policy_retry_options retry;
   struct {
-    az_http_transport_options http_transport_options;
     _az_http_policy_apiversion_options api_version;
     _az_http_policy_telemetry_options _telemetry_options;
   } _internal;
@@ -48,8 +47,7 @@ typedef struct {
   az_span option;
 } az_storage_blobs_blob_upload_options;
 
-AZ_NODISCARD az_storage_blobs_blob_client_options
-az_storage_blobs_blob_client_options_default(az_http_transport_options const * http_transport_options);
+AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_options_default();
 
 AZ_NODISCARD AZ_INLINE az_storage_blobs_blob_upload_options
 az_storage_blobs_blob_upload_options_default() {

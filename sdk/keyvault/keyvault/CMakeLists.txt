@@ -8,7 +8,7 @@ project (az_keyvault LANGUAGES C)
 set(CMAKE_C_STANDARD 99)
 
 add_library (
-  az_keyvault
+  az_keyvault STATIC
   src/az_keyvault_client.c
   )
 
@@ -22,7 +22,7 @@ target_link_libraries(az_keyvault PRIVATE az_core_internal)
 add_library (az::keyvault ALIAS az_keyvault)
 
 add_executable (az_keyvault_test test/main.c)
-target_link_libraries(az_keyvault_test PRIVATE az_keyvault az_core_internal)
+target_link_libraries(az_keyvault_test PUBLIC az_keyvault az_core_internal)
 target_include_directories (az_keyvault_test PRIVATE src)
 
 if (UNIX)

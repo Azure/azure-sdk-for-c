@@ -1,14 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_curl.h>
 #include <az_http.h>
+#include <az_http_internal.h>
 #include <az_http_transport.h>
 
-#include <az_span.h>
-#include <curl/curl.h>
-
 #include <stdlib.h>
+
+#include <curl/curl.h>
 
 #include <_az_cfg.h>
 
@@ -277,17 +276,18 @@ _az_http_client_curl_send_post_request(CURL * p_curl, _az_http_request const * p
 }
 
 /**
-* @brief UPLOAD requests are done via callbacks.  The callback is passed in a buffer address which is filled with the userdata content.
-* The callback will occur until the callback returns 0 (no more data).
-* The callback will return CURL_READFUNC_ABORT should an error occur.  This in turn terminates the POST request.
-* 
-* @param dst Destination address buffer
-* @param size Size of an item
-* @param nmemb Number of items to copy
-* @param userdata Source data to upload
-*                 Passed as the pointer to an az_span
-* @return int
-*/
+ * @brief UPLOAD requests are done via callbacks.  The callback is passed in a buffer address which
+ * is filled with the userdata content. The callback will occur until the callback returns 0 (no
+ * more data). The callback will return CURL_READFUNC_ABORT should an error occur.  This in turn
+ * terminates the POST request.
+ *
+ * @param dst Destination address buffer
+ * @param size Size of an item
+ * @param nmemb Number of items to copy
+ * @param userdata Source data to upload
+ *                 Passed as the pointer to an az_span
+ * @return int
+ */
 static int32_t _az_http_client_curl_upload_read_callback(
     void * dst,
     size_t size,
@@ -296,30 +296,31 @@ static int32_t _az_http_client_curl_upload_read_callback(
 
   az_span * upload_content = (az_span *)userdata;
 
-  //Calculate the size of the *dst buffer
+  // Calculate the size of the *dst buffer
   int32_t dst_buffer_size = (int32_t)(nmemb * size);
 
-  //Terminate the upload if the destination buffer is too small
+  // Terminate the upload if the destination buffer is too small
   if (dst_buffer_size < 1)
     return CURL_READFUNC_ABORT;
 
   int32_t userdata_length = az_span_length(*upload_content);
 
-  //Return if nothing to copy
+  // Return if nothing to copy
   if (userdata_length < 1)
-    return CURLE_OK;  //Success, all bytes copied
+    return CURLE_OK; // Success, all bytes copied
 
   int32_t size_of_copy = (userdata_length < dst_buffer_size) ? userdata_length : dst_buffer_size;
 
   memcpy(dst, az_span_ptr(*upload_content), size_of_copy);
 
-  //Update the userdata span
+  // Update the userdata span
   //  ptr will point to remaining data to be copied
   //  length and capacity are set to the size of the remaining content
   az_result result = az_span_slice(*upload_content, dst_buffer_size, -1, upload_content);
-  
+
   // Upon failure terminate the upload
-  // per CURL documentation, "The read callback may return CURL_READFUNC_ABORT to stop the current operation immediately, 
+  // per CURL documentation, "The read callback may return CURL_READFUNC_ABORT to stop the current
+  // operation immediately,
   //          resulting in a CURLE_ABORTED_BY_CALLBACK error code from the transfer."
   //
   if (az_failed(result)) {
@@ -462,7 +463,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
     az_http_response * response) {
   AZ_CONTRACT_ARG_NOT_NULL(p_curl);
   AZ_CONTRACT_ARG_NOT_NULL(p_request);
-  
+
   az_result result = AZ_ERROR_ARG;
 
   AZ_RETURN_IF_FAILED(_az_http_client_curl_setup_headers(p_curl, p_request));
@@ -479,7 +480,8 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
   } else if (az_span_is_equal(p_request->_internal.method, az_http_method_delete())) {
     result = _az_http_client_curl_send_delete_request(p_curl, p_request);
   } else if (az_span_is_equal(p_request->_internal.method, az_http_method_put())) {
-    // As of CURL 7.12.1 CURLOPT_PUT is deprecated.  PUT requests should be made using CURLOPT_UPLOAD
+    // As of CURL 7.12.1 CURLOPT_PUT is deprecated.  PUT requests should be made using
+    // CURLOPT_UPLOAD
     result = _az_http_client_curl_send_upload_request(p_curl, p_request);
   } else {
     return AZ_ERROR_HTTP_INVALID_METHOD_VERB;
@@ -503,7 +505,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
  * @return az_result
  */
 AZ_NODISCARD az_result
-_az_http_client_curl_send_request(_az_http_request * p_request, az_http_response * p_response) {
+az_http_client_send_request(_az_http_request * p_request, az_http_response * p_response) {
   AZ_CONTRACT_ARG_NOT_NULL(p_request);
   AZ_CONTRACT_ARG_NOT_NULL(p_response);
 

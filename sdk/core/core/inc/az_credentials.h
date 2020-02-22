@@ -56,7 +56,6 @@ typedef AZ_NODISCARD az_result (*_az_credential_set_scopes_fn)(void * credential
  */
 typedef struct {
   struct {
-    az_http_transport_options http_transport_options;
     _az_credential_apply_fn apply_credential;
     _az_credential_set_scopes_fn set_scopes; // NULL if this credential doesn't support scopes.
   } _internal;
@@ -93,8 +92,7 @@ AZ_NODISCARD az_result az_client_secret_credential_init(
     az_client_secret_credential * self,
     az_span tenant_id,
     az_span client_id,
-    az_span client_secret,
-    az_http_transport_options * http_transport_options);
+    az_span client_secret);
 
 #include <_az_cfg_suffix.h>
 

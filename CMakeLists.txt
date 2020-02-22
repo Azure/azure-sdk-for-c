@@ -24,13 +24,18 @@ enable_testing ()
 include(eng/cmake/global_compile_options.txt)
 
 add_subdirectory(sdk/core/core)
+
+add_subdirectory(sdk/platform/http_client/nohttp)
 # Adding trasnport implementation for curl
 # Users can still build Core and SDK client without depending on a HTPP transport implementation
 if(BUILD_CURL_TRANSPORT)
-  add_subdirectory(sdk/transport_policies/curl)
+  add_subdirectory(sdk/platform/http_client/curl)
 endif()
 
 add_subdirectory(sdk/keyvault/keyvault)
+add_subdirectory(sdk/platform/noplatform)
+add_subdirectory(sdk/platform/posix)
+add_subdirectory(sdk/platform/win32)
 add_subdirectory(sdk/storage/blobs)
 
 if(NOT DEFINED ENV{AZ_SDK_C_NO_SAMPLES})

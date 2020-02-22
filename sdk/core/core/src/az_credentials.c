@@ -31,10 +31,7 @@ _az_client_secret_credential_request_token(az_client_secret_credential * credent
   AZ_RETURN_IF_FAILED(az_http_request_init(
       &request, az_http_method_post(), url, AZ_SPAN_FROM_BUFFER(header_buf), body));
 
-  return _az_aad_request_token(
-      &credential->_internal.credential._internal.http_transport_options,
-      &request,
-      &credential->_internal.token);
+  return _az_aad_request_token(&request, &credential->_internal.token);
 }
 
 // This gets called from the http credential policy
@@ -66,13 +63,11 @@ AZ_NODISCARD az_result az_client_secret_credential_init(
     az_client_secret_credential * self,
     az_span tenant_id,
     az_span client_id,
-    az_span client_secret,
-    az_http_transport_options * http_transport_options) {
+    az_span client_secret) {
   *self = (az_client_secret_credential){
     ._internal = {
       .credential = {
         ._internal = {
-          .http_transport_options = *http_transport_options,  //Make a by-value copy of the options
           .apply_credential = (_az_credential_apply_fn)_az_client_secret_credential_apply,
           .set_scopes = (_az_credential_set_scopes_fn)_az_client_secret_credential_set_scopes,
           },

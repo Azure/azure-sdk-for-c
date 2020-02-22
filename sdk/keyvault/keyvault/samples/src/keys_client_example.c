@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 #include <az_credentials.h>
-#include <az_curl.h>
 #include <az_http.h>
+#include <az_http_internal.h>
 #include <az_json.h>
 #include <az_keyvault.h>
 
@@ -22,12 +22,6 @@ int exit_code = 0;
 az_span get_key_version(az_http_response * response);
 
 int main() {
-  /************ Creates keyvault client    ****************/
-  az_keyvault_keys_client client;
-
-  az_http_transport_options http_transport_options
-      = az_http_transport_options_default(_az_http_client_curl_send_request);
-  
   /************* create credentials as client_id type   ***********/
   az_client_secret_credential credential = { 0 };
   // init credential_credentials struc
@@ -35,16 +29,15 @@ int main() {
       &credential,
       az_span_from_str(getenv(TENANT_ID_ENV)),
       az_span_from_str(getenv(CLIENT_ID_ENV)),
-      az_span_from_str(getenv(CLIENT_SECRET_ENV)),
-      &http_transport_options);
+      az_span_from_str(getenv(CLIENT_SECRET_ENV)));
 
   if (az_failed(creds_retcode)) {
     printf("Failed to init credential");
   }
 
-  // Init client.
-  az_keyvault_keys_client_options options
-      = az_keyvault_keys_client_options_default(&http_transport_options);
+  /************ Creates keyvault client    ****************/
+  az_keyvault_keys_client client = { 0 };
+  az_keyvault_keys_client_options options = az_keyvault_keys_client_options_default();
 
   // URL will be copied to client's internal buffer. So we don't need to keep the content of URL
   // buffer immutable  on client's side

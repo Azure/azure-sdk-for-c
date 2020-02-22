@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # SPDX-License-Identifier: MIT
 
+if (BUILD_CURL_TRANSPORT)
+
 cmake_minimum_required (VERSION 3.12)
 
 project (az_curl LANGUAGES C)
@@ -12,7 +14,7 @@ if(NOT CURL_FOUND)
 endif()
 
 add_library (
-  az_curl
+  az_curl STATIC
   src/az_curl.c
   )
 
@@ -36,9 +38,7 @@ else()
   target_compile_options(az_curl PRIVATE -Wall -Wextra -pedantic  ${WARNINGS_AS_ERRORS_FLAG})
 endif()
 
-target_include_directories (az_curl PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc> $<INSTALL_INTERFACE:include/az>)
-
-target_link_libraries(az_curl PUBLIC az_core az_core_internal)
+target_link_libraries(az_curl PRIVATE az_core az_core_internal)
 
 # make sure that users can consume the project as a library.
 add_library (az::curl ALIAS az_curl)
@@ -46,7 +46,4 @@ add_library (az::curl ALIAS az_curl)
 
 target_link_libraries(az_curl PRIVATE CURL::libcurl)
 
-# curl transport tests
-add_executable (az_transport_curl_test test/main.c)
-target_link_libraries(az_transport_curl_test PRIVATE az_curl az_core az_core_internal)
-add_test(NAME az_transport_curl_test COMMAND az_transport_curl_test)
+endif()

@@ -2,13 +2,12 @@
 // SPDX-License-Identifier: MIT
 
 #include <az_credentials.h>
-#include <az_curl.h>
 #include <az_http.h>
 #include <az_http_internal.h>
 #include <az_http_transport.h>
 #include <az_json.h>
-#include <az_storage_blobs.h>
 #include <az_log.h>
+#include <az_storage_blobs.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -74,13 +73,6 @@ az_storage_blobs_blob_delete(az_storage_blobs_blob_client * client, az_http_resp
 }
 
 int main() {
-
-  az_storage_blobs_blob_client client;
-
-  /*  */
-  az_http_transport_options http_transport_options
-      = az_http_transport_options_default(_az_http_client_curl_send_request);
-
   /************* create credentials as client_id type   ***********/
   az_client_secret_credential credential = { 0 };
   // init credential_credentials struc
@@ -88,19 +80,15 @@ int main() {
       &credential,
       az_span_from_str(getenv(TENANT_ID_ENV)),
       az_span_from_str(getenv(CLIENT_ID_ENV)),
-      az_span_from_str(getenv(CLIENT_SECRET_ENV)),
-      &http_transport_options
-     );
+      az_span_from_str(getenv(CLIENT_SECRET_ENV)));
 
   if (az_failed(creds_retcode)) {
     printf("Failed to init credential");
   }
 
   // Init client.
-  az_storage_blobs_blob_client_options options
-      = az_storage_blobs_blob_client_options_default(&http_transport_options);
-
-  // Init client.
+  az_storage_blobs_blob_client client = { 0 };
+  az_storage_blobs_blob_client_options options = az_storage_blobs_blob_client_options_default();
   az_result const operation_result = az_storage_blobs_blob_client_init(
       &client, az_span_from_str(getenv(URI_ENV)), &credential, &options);
 
