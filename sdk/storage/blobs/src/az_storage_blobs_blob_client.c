@@ -22,7 +22,8 @@ static az_span const AZ_STORAGE_BLOBS_BLOB_TYPE_BLOCKBLOB = AZ_SPAN_LITERAL_FROM
 static az_span const AZ_HTTP_HEADER_CONTENT_LENGTH = AZ_SPAN_LITERAL_FROM_STR("Content-Length");
 static az_span const AZ_HTTP_HEADER_CONTENT_TYPE = AZ_SPAN_LITERAL_FROM_STR("Content-Type");
 
-AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_options_default() {
+AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_options_default()
+{
 
   return (az_storage_blobs_blob_client_options) {
     ._internal = {
@@ -40,14 +41,15 @@ AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_o
 }
 
 AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
-    az_storage_blobs_blob_client * self,
+    az_storage_blobs_blob_client* self,
     az_span uri,
-    void * credential,
-    az_storage_blobs_blob_client_options * options) {
+    void* credential,
+    az_storage_blobs_blob_client_options* options)
+{
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(options);
 
-  _az_credential * const cred = (_az_credential *)credential;
+  _az_credential* const cred = (_az_credential*)credential;
 
   *self = (az_storage_blobs_blob_client) {
     ._internal = {
@@ -115,15 +117,19 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
 }
 
 AZ_NODISCARD az_result az_storage_blobs_blob_upload(
-    az_storage_blobs_blob_client * client,
+    az_storage_blobs_blob_client* client,
     az_span content, /* Buffer of content*/
-    az_storage_blobs_blob_upload_options * options,
-    az_http_response * response) {
+    az_storage_blobs_blob_upload_options* options,
+    az_http_response* response)
+{
 
   az_storage_blobs_blob_upload_options opt;
-  if (options == NULL) {
+  if (options == NULL)
+  {
     opt = az_storage_blobs_blob_upload_options_default();
-  } else {
+  }
+  else
+  {
     opt = *options;
   }
   (void)opt;

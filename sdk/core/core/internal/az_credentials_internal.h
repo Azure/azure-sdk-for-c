@@ -13,7 +13,8 @@
 #include <_az_cfg_prefix.h>
 
 AZ_INLINE AZ_NODISCARD az_result
-_az_credential_set_scopes(_az_credential * credential, az_span scopes) {
+_az_credential_set_scopes(_az_credential* credential, az_span scopes)
+{
   return (credential->_internal.set_scopes == NULL)
       ? AZ_OK
       : (credential->_internal.set_scopes)(credential, scopes);
@@ -21,4 +22,4 @@ _az_credential_set_scopes(_az_credential * credential, az_span scopes) {
 
 #include <_az_cfg_suffix.h>
 
-#endif
+#endif // _az_CREDENTIALS_INTERNAL_H

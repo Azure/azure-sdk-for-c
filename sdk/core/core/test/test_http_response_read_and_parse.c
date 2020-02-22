@@ -13,7 +13,8 @@
   "  \"somejson\":45\r" \
   "}\n"
 
-void test_http_response() {
+void test_http_response()
+{
   // no headers
   {
     az_span response_span = AZ_SPAN_FROM_STR( //

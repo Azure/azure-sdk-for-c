@@ -7,7 +7,8 @@
 
 #include <_az_cfg.h>
 
-void test_json_string() {
+void test_json_string()
+{
   {
     az_span const s = AZ_SPAN_FROM_STR("tr\\\"ue\\t");
     az_span reader = s;

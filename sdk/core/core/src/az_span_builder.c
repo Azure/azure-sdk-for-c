@@ -7,7 +7,8 @@
 
 #include <_az_cfg.h>
 
-AZ_NODISCARD az_result az_span_builder_append(az_span_builder * self, az_span span) {
+AZ_NODISCARD az_result az_span_builder_append(az_span_builder* self, az_span span)
+{
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
   az_mut_span const remainder = az_mut_span_drop(self->buffer, self->length);
@@ -17,7 +18,8 @@ AZ_NODISCARD az_result az_span_builder_append(az_span_builder * self, az_span sp
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_span_builder_append_byte(az_span_builder * self, uint8_t c) {
+AZ_NODISCARD az_result az_span_builder_append_byte(az_span_builder* self, uint8_t c)
+{
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
   AZ_RETURN_IF_FAILED(az_mut_span_set(self->buffer, self->length, c));
@@ -25,23 +27,28 @@ AZ_NODISCARD az_result az_span_builder_append_byte(az_span_builder * self, uint8
   return AZ_OK;
 }
 
-AZ_INLINE uint8_t _az_decimal_to_ascii(uint8_t d) {
+AZ_INLINE uint8_t _az_decimal_to_ascii(uint8_t d)
+{
   assert(d < 10);
   return '0' + d;
 }
 
-static AZ_NODISCARD az_result _az_span_builder_append_uint64(az_span_builder * self, uint64_t n) {
-  if (n == 0) {
+static AZ_NODISCARD az_result _az_span_builder_append_uint64(az_span_builder* self, uint64_t n)
+{
+  if (n == 0)
+  {
     return az_span_builder_append_byte(self, '0');
   }
 
   uint64_t div = 10000000000000000000ull;
   uint64_t nn = n;
-  while (nn / div == 0) {
+  while (nn / div == 0)
+  {
     div /= 10;
   }
 
-  while (div > 1) {
+  while (div > 1)
+  {
     AZ_RETURN_IF_FAILED(
         az_span_builder_append_byte(self, _az_decimal_to_ascii((uint8_t)(nn / div))));
 
@@ -52,15 +59,18 @@ static AZ_NODISCARD az_result _az_span_builder_append_uint64(az_span_builder * s
   return az_span_builder_append_byte(self, _az_decimal_to_ascii((uint8_t)nn));
 }
 
-AZ_NODISCARD az_result az_span_builder_append_uint64(az_span_builder * self, uint64_t n) {
+AZ_NODISCARD az_result az_span_builder_append_uint64(az_span_builder* self, uint64_t n)
+{
   AZ_CONTRACT_ARG_NOT_NULL(self);
   return _az_span_builder_append_uint64(self, n);
 }
 
-AZ_NODISCARD az_result az_span_builder_append_int64(az_span_builder * self, int64_t n) {
+AZ_NODISCARD az_result az_span_builder_append_int64(az_span_builder* self, int64_t n)
+{
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
-  if (n < 0) {
+  if (n < 0)
+  {
     AZ_RETURN_IF_FAILED(az_span_builder_append_byte(self, '-'));
     return _az_span_builder_append_uint64(self, -n);
   }
@@ -69,7 +79,8 @@ AZ_NODISCARD az_result az_span_builder_append_int64(az_span_builder * self, int6
 }
 
 AZ_NODISCARD az_result
-az_span_builder_replace(az_span_builder * self, size_t start, size_t end, az_span span) {
+az_span_builder_replace(az_span_builder* self, size_t start, size_t end, az_span span)
+{
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
   size_t const current_size = self->length;
@@ -104,11 +115,13 @@ az_span_builder_replace(az_span_builder * self, size_t start, size_t end, az_spa
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_span_builder_append_zeros(az_span_builder * self, size_t size) {
+AZ_NODISCARD az_result az_span_builder_append_zeros(az_span_builder* self, size_t size)
+{
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
   az_mut_span const span = az_mut_span_take(az_mut_span_drop(self->buffer, self->length), size);
-  if (span.size != size) {
+  if (span.size != size)
+  {
     return AZ_ERROR_BUFFER_OVERFLOW;
   }
   az_mut_span_fill(span, 0);

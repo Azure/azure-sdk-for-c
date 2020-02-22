@@ -16,15 +16,18 @@
 static bool _log_invoked_for_http_request = false;
 static bool _log_invoked_for_http_response = false;
 
-static inline void _reset_log_invocation_status() {
+static inline void _reset_log_invocation_status()
+{
   _log_invoked_for_http_request = false;
   _log_invoked_for_http_response = false;
 }
 
-static void _log_listener(az_log_classification classification, az_span message) {
+static void _log_listener(az_log_classification classification, az_span message)
+{
   // (void)classification;
   // fprintf(stderr, "%.*s\n", (unsigned int)az_span_length(message), az_span_ptr(message));
-  switch (classification) {
+  switch (classification)
+  {
     case AZ_LOG_HTTP_REQUEST:
       _log_invoked_for_http_request = true;
       TEST_ASSERT(az_span_is_equal(
@@ -55,7 +58,8 @@ static void _log_listener(az_log_classification classification, az_span message)
   }
 }
 
-void test_log() {
+void test_log()
+{
   // Set up test values etc.
   //  uint8_t hrb_buf[4 * 1024] = { 0 };
   uint8_t headers[4 * 1024] = { 0 };
