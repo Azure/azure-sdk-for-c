@@ -1,8 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # SPDX-License-Identifier: MIT
 
-if(WIN32)
-
 cmake_minimum_required (VERSION 3.12)
 
 project (az_storage_blobs LANGUAGES C)
@@ -30,5 +28,3 @@ if (UNIX)
 endif()
 
 add_test(NAME az_storage_blobs_test COMMAND az_storage_blobs_test)
-
-endif()
