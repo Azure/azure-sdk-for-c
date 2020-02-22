@@ -1,6 +1,6 @@
-# Azure SDK Transport Policy for Curl
+# Azure SDK Empty Transport Policy
 
-Azure Transport Policy Curl (`az_curl`) provides abstractions, and helpers for communicating with Azure using libcurl in the C programming language. This library follows the Azure SDK Design Guidelines for Embedded C.
+Azure Empty Transport Policy (`az_nohttp`) provides an empty stub for the HTTP transport implementation. This library follows the Azure SDK Design Guidelines for Embedded C.
 
 The library allows clients to communicate with Azure.
 

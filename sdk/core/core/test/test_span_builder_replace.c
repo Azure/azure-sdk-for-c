@@ -8,7 +8,8 @@
 
 #include <_az_cfg.h>
 
-void test_span_builder_replace() {
+void test_span_builder_replace()
+{
   {
     // Replace inside content with smaller content -> left shift
     uint8_t array[200];

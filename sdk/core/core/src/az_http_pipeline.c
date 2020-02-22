@@ -8,9 +8,10 @@
 #include <_az_cfg.h>
 
 AZ_NODISCARD az_result az_http_pipeline_process(
-    _az_http_pipeline * pipeline,
-    _az_http_request * p_request,
-    az_http_response * p_response) {
+    _az_http_pipeline* pipeline,
+    _az_http_request* p_request,
+    az_http_response* p_response)
+{
   AZ_CONTRACT_ARG_NOT_NULL(p_request);
   AZ_CONTRACT_ARG_NOT_NULL(p_response);
   AZ_CONTRACT_ARG_NOT_NULL(pipeline);

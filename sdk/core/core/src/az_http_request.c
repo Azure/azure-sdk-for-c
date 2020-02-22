@@ -12,16 +12,18 @@
 
 #include <_az_cfg.h>
 
-AZ_NODISCARD az_result _az_is_question_mark(az_span slice) {
+AZ_NODISCARD az_result _az_is_question_mark(az_span slice)
+{
   return az_span_ptr(slice)[0] == '?' ? AZ_OK : AZ_CONTINUE;
 }
 
 AZ_NODISCARD az_result az_http_request_init(
-    _az_http_request * p_hrb,
+    _az_http_request* p_hrb,
     az_span method,
     az_span url,
     az_span headers_buffer,
-    az_span body) {
+    az_span body)
+{
   AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
   AZ_CONTRACT_ARG_VALID_SPAN(method);
   AZ_CONTRACT_ARG_VALID_SPAN(url);
@@ -48,7 +50,8 @@ AZ_NODISCARD az_result az_http_request_init(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_http_request_append_path(_az_http_request * p_hrb, az_span path) {
+AZ_NODISCARD az_result az_http_request_append_path(_az_http_request* p_hrb, az_span path)
+{
   AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
 
   // get the query starting point.
@@ -68,7 +71,8 @@ AZ_NODISCARD az_result az_http_request_append_path(_az_http_request * p_hrb, az_
   query_start += az_span_length(path);
 
   // update query start
-  if (url_with_question_mark) {
+  if (url_with_question_mark)
+  {
     p_hrb->_internal.query_start = query_start + 1;
   }
 
@@ -76,7 +80,8 @@ AZ_NODISCARD az_result az_http_request_append_path(_az_http_request * p_hrb, az_
 }
 
 AZ_NODISCARD az_result
-az_http_request_set_query_parameter(_az_http_request * p_hrb, az_span name, az_span value) {
+az_http_request_set_query_parameter(_az_http_request* p_hrb, az_span name, az_span value)
+{
   AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
   AZ_CONTRACT_ARG_VALID_SPAN(name);
   AZ_CONTRACT_ARG_VALID_SPAN(value);
@@ -90,7 +95,8 @@ az_http_request_set_query_parameter(_az_http_request * p_hrb, az_span name, az_s
       p_hrb->_internal.query_start == 0 ? AZ_SPAN_FROM_STR("?") : AZ_SPAN_FROM_STR("&"),
       &p_hrb->_internal.url));
   // update QPs starting position when it's 0
-  if (p_hrb->_internal.query_start == 0) {
+  if (p_hrb->_internal.query_start == 0)
+  {
     p_hrb->_internal.query_start = az_span_length(p_hrb->_internal.url);
   }
 
@@ -108,40 +114,44 @@ az_http_request_set_query_parameter(_az_http_request * p_hrb, az_span name, az_s
 }
 
 AZ_NODISCARD az_result
-az_http_request_append_header(_az_http_request * p_hrb, az_span key, az_span value) {
+az_http_request_append_header(_az_http_request* p_hrb, az_span key, az_span value)
+{
   AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
   AZ_CONTRACT_ARG_VALID_SPAN(key);
   AZ_CONTRACT_ARG_VALID_SPAN(value);
 
   AZ_CONTRACT(az_span_length(key) > 0 || az_span_length(value) > 0, AZ_ERROR_ARG);
 
-  az_span * headers_ptr = &p_hrb->_internal.headers;
+  az_span* headers_ptr = &p_hrb->_internal.headers;
 
   az_pair header_to_append = az_pair_init(key, value);
   return az_span_append(
       *headers_ptr,
-      az_span_init((uint8_t *)&header_to_append, sizeof header_to_append, sizeof header_to_append),
+      az_span_init((uint8_t*)&header_to_append, sizeof header_to_append, sizeof header_to_append),
       headers_ptr);
 }
 
 AZ_NODISCARD az_result
-az_http_request_get_header(_az_http_request * p_hrb, int32_t index, az_pair * out_result) {
+az_http_request_get_header(_az_http_request* p_hrb, int32_t index, az_pair* out_result)
+{
   AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
   AZ_CONTRACT_ARG_NOT_NULL(out_result);
 
-  if (index >= az_span_length(p_hrb->_internal.headers) / (int32_t)sizeof(az_pair)) {
+  if (index >= az_span_length(p_hrb->_internal.headers) / (int32_t)sizeof(az_pair))
+  {
     return AZ_ERROR_ARG;
   }
 
-  *out_result = ((az_pair *)az_span_ptr(p_hrb->_internal.headers))[index];
+  *out_result = ((az_pair*)az_span_ptr(p_hrb->_internal.headers))[index];
   return AZ_OK;
 }
 
 AZ_NODISCARD az_result az_http_request_get_parts(
-    _az_http_request * p_request,
-    az_http_method * out_method,
-    az_span * out_url,
-    az_span * body) {
+    _az_http_request* p_request,
+    az_http_method* out_method,
+    az_span* out_url,
+    az_span* body)
+{
   *out_method = p_request->_internal.method;
   *out_url = p_request->_internal.url;
   *body = p_request->_internal.body;

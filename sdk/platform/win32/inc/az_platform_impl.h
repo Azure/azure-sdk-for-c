@@ -28,8 +28,10 @@
 
 #include <_az_cfg_prefix.h>
 
-struct az_platform_mtx {
-  struct {
+struct az_platform_mtx
+{
+  struct
+  {
     CRITICAL_SECTION cs;
   } _internal;
 };

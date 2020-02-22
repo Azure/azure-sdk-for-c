@@ -5,7 +5,7 @@ TabWidth: 2
 IndentWidth: 2
 IncludeBlocks: Preserve
 NamespaceIndentation: None
-PointerAlignment: Middle
+PointerAlignment: Left
 AlignAfterOpenBracket: AlwaysBreak
 AlignEscapedNewlines: DontAlign
 AllowAllParametersOfDeclarationOnNextLine: false
@@ -15,6 +15,7 @@ BinPackParameters: false
 IndentCaseLabels: true
 BreakBeforeTernaryOperators: true
 BreakBeforeBinaryOperators: All
+BreakBeforeBraces: Allman
 Cpp11BracedListStyle: false
 AlignConsecutiveAssignments: false
 AlignConsecutiveDeclarations: false

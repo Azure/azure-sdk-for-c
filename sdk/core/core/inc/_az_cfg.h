@@ -63,7 +63,8 @@
 #define AZ_FALLTHROUGH __attribute__((fallthrough))
 #else
 #define AZ_FALLTHROUGH \
-  do { \
+  do \
+  { \
   } while (0)
 #endif
 

@@ -8,7 +8,8 @@
 
 #include <_az_cfg.h>
 
-void test_json_pointer() {
+void test_json_pointer()
+{
   {
     az_span parser = AZ_SPAN_FROM_STR("");
     az_span p;
@@ -30,11 +31,13 @@ void test_json_pointer() {
       az_span token_parser = p;
       uint8_t buffer[10];
       int i = 0;
-      while (true) {
+      while (true)
+      {
         uint32_t code_point;
         az_result const result
             = _az_span_reader_read_json_pointer_token_char(&token_parser, &code_point);
-        if (result == AZ_ERROR_ITEM_NOT_FOUND) {
+        if (result == AZ_ERROR_ITEM_NOT_FOUND)
+        {
           break;
         }
         TEST_ASSERT(result == AZ_OK);
@@ -56,11 +59,13 @@ void test_json_pointer() {
       az_span token_parser = p;
       uint8_t buffer[10];
       int i = 0;
-      while (true) {
+      while (true)
+      {
         uint32_t code_point;
         az_result const result
             = _az_span_reader_read_json_pointer_token_char(&token_parser, &code_point);
-        if (result == AZ_ERROR_ITEM_NOT_FOUND) {
+        if (result == AZ_ERROR_ITEM_NOT_FOUND)
+        {
           break;
         }
         TEST_ASSERT(result == AZ_OK);
@@ -86,11 +91,13 @@ void test_json_pointer() {
       az_span token_parser = p;
       uint8_t buffer[10];
       int i = 0;
-      while (true) {
+      while (true)
+      {
         uint32_t code_point;
         az_result const result
             = _az_span_reader_read_json_pointer_token_char(&token_parser, &code_point);
-        if (result == AZ_ERROR_ITEM_NOT_FOUND) {
+        if (result == AZ_ERROR_ITEM_NOT_FOUND)
+        {
           break;
         }
         TEST_ASSERT(result == AZ_OK);
@@ -107,11 +114,13 @@ void test_json_pointer() {
       az_span token_parser = p;
       uint8_t buffer[10];
       int i = 0;
-      while (true) {
+      while (true)
+      {
         uint32_t code_point;
         az_result const result
             = _az_span_reader_read_json_pointer_token_char(&token_parser, &code_point);
-        if (result == AZ_ERROR_ITEM_NOT_FOUND) {
+        if (result == AZ_ERROR_ITEM_NOT_FOUND)
+        {
           break;
         }
         TEST_ASSERT(result == AZ_OK);

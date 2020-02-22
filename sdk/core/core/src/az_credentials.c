@@ -12,7 +12,8 @@
 #include <_az_cfg.h>
 
 static AZ_NODISCARD az_result
-_az_client_secret_credential_request_token(az_client_secret_credential * credential) {
+_az_client_secret_credential_request_token(az_client_secret_credential* credential)
+{
   uint8_t url_buf[_az_AAD_REQUEST_URL_BUF_SIZE] = { 0 };
   az_span url = AZ_SPAN_FROM_BUFFER(url_buf);
   AZ_RETURN_IF_FAILED(_az_aad_build_url(url, credential->_internal.tenant_id, &url));
@@ -36,10 +37,12 @@ _az_client_secret_credential_request_token(az_client_secret_credential * credent
 
 // This gets called from the http credential policy
 static AZ_NODISCARD az_result _az_client_secret_credential_apply(
-    az_client_secret_credential * credential,
-    _az_http_request * ref_request) {
+    az_client_secret_credential* credential,
+    _az_http_request* ref_request)
+{
 
-  if (_az_token_expired(&(credential->_internal.token))) {
+  if (_az_token_expired(&(credential->_internal.token)))
+  {
     AZ_RETURN_IF_FAILED(_az_client_secret_credential_request_token(credential));
   }
 
@@ -54,16 +57,18 @@ static AZ_NODISCARD az_result _az_client_secret_credential_apply(
 }
 
 static AZ_NODISCARD az_result
-_az_client_secret_credential_set_scopes(az_client_secret_credential * self, az_span scopes) {
+_az_client_secret_credential_set_scopes(az_client_secret_credential* self, az_span scopes)
+{
   self->_internal.scopes = scopes;
   return AZ_OK;
 }
 
 AZ_NODISCARD az_result az_client_secret_credential_init(
-    az_client_secret_credential * self,
+    az_client_secret_credential* self,
     az_span tenant_id,
     az_span client_id,
-    az_span client_secret) {
+    az_span client_secret)
+{
   *self = (az_client_secret_credential){
     ._internal = {
       .credential = {

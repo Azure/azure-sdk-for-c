@@ -15,7 +15,8 @@
 
 #include <_az_cfg_prefix.h>
 
-enum {
+enum
+{
   AZ_FACILITY_CORE = 0x1,
   AZ_FACILITY_PLATFORM = 0x2,
   AZ_FACILITY_JSON = 0x3,
@@ -23,7 +24,8 @@ enum {
   AZ_FACILITY_STD = 0x7FFF,
 };
 
-enum {
+enum
+{
   AZ_ERROR_FLAG = (int32_t)0x80000000,
 };
 
@@ -34,9 +36,11 @@ enum {
   ((int32_t)(0x00000000 | ((uint32_t)(facility) << 16) | (uint32_t)(code)))
 
 #define AZ_RETURN_IF_FAILED(exp) \
-  do { \
+  do \
+  { \
     az_result const _result = (exp); \
-    if (az_failed(_result)) { \
+    if (az_failed(_result)) \
+    { \
       return _result; \
     } \
   } while (0)
@@ -51,7 +55,8 @@ enum {
  * - otherwise
  *   -  0..30 Value
  */
-typedef enum az_result {
+typedef enum az_result
+{
   AZ_OK = _az_RESULT_MAKE_SUCCESS(AZ_FACILITY_CORE, 0),
   AZ_CONTINUE = _az_RESULT_MAKE_SUCCESS(AZ_FACILITY_CORE, 1),
 

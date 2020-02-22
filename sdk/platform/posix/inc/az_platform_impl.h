@@ -8,8 +8,10 @@
 
 #include <_az_cfg_prefix.h>
 
-struct az_platform_mtx {
-  struct {
+struct az_platform_mtx
+{
+  struct
+  {
     pthread_mutex_t mutex;
   } _internal;
 };
