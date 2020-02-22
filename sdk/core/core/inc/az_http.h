@@ -340,31 +340,6 @@ AZ_NODISCARD az_result az_http_response_get_next_header(az_http_response * self,
  */
 AZ_NODISCARD az_result az_http_response_get_body(az_http_response * self, az_span * out_body);
 
-/**
- * @brief Callback function signature for transport policy options.
- *
- * An implementation for this definition is required for HTTP pipeline to send HTTP request through
- * netwok
- *
- */
-typedef AZ_NODISCARD az_result (
-    *az_http_client_send_request_fn)(_az_http_request * p_request, az_http_response * p_response);
-
-/**
- * @brief options for transport policy.
- *
- * User @b should @b not access _internal field directly.
- *
- */
-typedef struct {
-  struct {
-    az_http_client_send_request_fn send_request;
-  } _internal;
-} az_http_transport_options;
-
-AZ_NODISCARD az_http_transport_options
-az_http_transport_options_default(az_http_client_send_request_fn send_request);
-
 #include <_az_cfg_suffix.h>
 
 #endif

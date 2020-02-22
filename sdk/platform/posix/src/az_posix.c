@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 #include <az_config_internal.h>
-#include <az_platform_impl.h>
 #include <az_platform_internal.h>
 
 #include <stddef.h>
@@ -24,19 +23,19 @@ void az_platform_sleep_msec(int32_t milliseconds) {
 }
 
 void az_platform_mtx_destroy(az_platform_mtx * mtx) {
-  if (pthread_mutex_destroy(&mtx->mutex) == 0) {
-    mtx->mutex = (pthread_mutex_t){ 0 };
+  if (pthread_mutex_destroy(&mtx->_internal.mutex) == 0) {
+    *mtx = (az_platform_mtx){ 0 };
   }
 }
 
 AZ_NODISCARD az_result az_platform_mtx_init(az_platform_mtx * mtx) {
-  return pthread_mutex_init(&mtx->mutex, NULL) == 0 ? AZ_OK : AZ_ERROR_MUTEX;
+  return pthread_mutex_init(&mtx->_internal.mutex, NULL) == 0 ? AZ_OK : AZ_ERROR_MUTEX;
 }
 
 AZ_NODISCARD az_result az_platform_mtx_lock(az_platform_mtx * mtx) {
-  return pthread_mutex_lock(&mtx->mutex) == 0 ? AZ_OK : AZ_ERROR_MUTEX;
+  return pthread_mutex_lock(&mtx->_internal.mutex) == 0 ? AZ_OK : AZ_ERROR_MUTEX;
 }
 
 AZ_NODISCARD az_result az_platform_mtx_unlock(az_platform_mtx * mtx) {
-  return pthread_mutex_unlock(&mtx->mutex) == 0 ? AZ_OK : AZ_ERROR_MUTEX;
+  return pthread_mutex_unlock(&mtx->_internal.mutex) == 0 ? AZ_OK : AZ_ERROR_MUTEX;
 }

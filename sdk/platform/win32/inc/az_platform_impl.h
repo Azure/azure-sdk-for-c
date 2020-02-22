@@ -7,8 +7,6 @@
 // Include windows.h with WIN32_LEAN_AND_MEAN and NOMINMAX defined, but restore the ifdef state
 // afterwards.
 #ifndef WIN32_LEAN_AND_MEAN
-
-
 #define WIN32_LEAN_AND_MEAN
 #ifndef NOMINMAX
 #define NOMINMAX
@@ -31,7 +29,9 @@
 #include <_az_cfg_prefix.h>
 
 struct az_platform_mtx {
-  CRITICAL_SECTION cs;
+  struct {
+    CRITICAL_SECTION cs;
+  } _internal;
 };
 
 #include <_az_cfg_suffix.h>

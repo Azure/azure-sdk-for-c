@@ -139,47 +139,13 @@ AZ_NODISCARD az_result az_http_pipeline_policy_logging(
   return result;
 }
 
-AZ_NODISCARD az_result az_http_pipeline_policy_bufferresponse(
-    _az_http_policy * p_policies,
-    void * p_options,
-    _az_http_request * p_request,
-    az_http_response * p_response) {
-  (void)p_options;
-
-  // buffer p_response logic
-  //  this might be uStream
-  return az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
-}
-
-AZ_NODISCARD az_result az_http_pipeline_policy_distributedtracing(
-    _az_http_policy * p_policies,
-    void * p_options,
-    _az_http_request * p_request,
-    az_http_response * p_response) {
-  (void)p_options;
-
-  // Distributed tracing logic
-  return az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
-}
-
 AZ_NODISCARD az_result az_http_pipeline_policy_transport(
     _az_http_policy * p_policies,
     void * p_options,
     _az_http_request * p_request,
     az_http_response * p_response) {
   (void)p_policies; // this is the last policy in the pipeline, we just void it
+  (void)p_options;
 
-  az_http_client_send_request_fn const send_request
-      = ((az_http_transport_options const *)p_options)->_internal.send_request;
-
-  return send_request(p_request, p_response);
-}
-
-AZ_NODISCARD az_http_transport_options
-az_http_transport_options_default(az_http_client_send_request_fn send_request) {
-  return (az_http_transport_options) {
-    ._internal = {
-      .send_request = send_request,
-    },
-  };
+  return az_http_client_send_request(p_request, p_response);
 }

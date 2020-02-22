@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include <az_config_internal.h>
 #include <az_contract_internal.h>
 #include <az_credentials_internal.h>
 #include <az_http.h>
@@ -9,7 +10,6 @@
 #include <az_json.h>
 #include <az_keyvault.h>
 #include <az_span.h>
-#include <az_config_internal.h>
 
 #include <stddef.h>
 
@@ -41,16 +41,14 @@ AZ_NODISCARD AZ_INLINE az_span az_keyvault_client_constant_for_application_json(
   return AZ_SPAN_FROM_STR("application/json");
 }
 
-AZ_NODISCARD az_keyvault_keys_client_options
-az_keyvault_keys_client_options_default(az_http_transport_options const * http_transport_options) {
-
+AZ_NODISCARD az_keyvault_keys_client_options az_keyvault_keys_client_options_default() {
   az_keyvault_keys_client_options options = (az_keyvault_keys_client_options){
-    ._internal = { .http_transport_options = *http_transport_options,
-                   .api_version = _az_http_policy_apiversion_options_default() },
+    ._internal = { .api_version = _az_http_policy_apiversion_options_default(), },
     .retry = az_http_policy_retry_options_default(),
   };
 
-  options._internal.api_version._internal.option_location = _az_http_policy_apiversion_option_location_queryparameter;
+  options._internal.api_version._internal.option_location
+      = _az_http_policy_apiversion_option_location_queryparameter;
   options._internal.api_version._internal.name = AZ_HTTP_HEADER_API_VERSION;
   options._internal.api_version._internal.version = AZ_KEYVAULT_API_VERSION;
 
@@ -113,20 +111,8 @@ AZ_NODISCARD az_result az_keyvault_keys_client_init(
             },
             {
               ._internal = {
-                .process = az_http_pipeline_policy_bufferresponse,
-                .p_options = NULL,
-              },
-            },
-            {
-              ._internal = {
-                .process= az_http_pipeline_policy_distributedtracing,
-                .p_options = NULL,
-              },
-            },
-            {
-              ._internal = {
                 .process = az_http_pipeline_policy_transport,
-                .p_options= &options->_internal.http_transport_options,
+                .p_options= NULL,
               },
             },
           },

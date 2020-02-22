@@ -4,13 +4,11 @@
 #ifndef _az_PLATFORM_IMPL_H
 #define _az_PLATFORM_IMPL_H
 
-#include <pthread.h>
-
 #include <_az_cfg_prefix.h>
 
 struct az_platform_mtx {
   struct {
-    pthread_mutex_t mutex;
+    char unused;
   } _internal;
 };
 

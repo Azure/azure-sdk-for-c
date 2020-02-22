@@ -72,23 +72,14 @@ AZ_NODISCARD az_result az_http_pipeline_policy_logging(
     _az_http_request * p_request,
     az_http_response * p_response);
 
-AZ_NODISCARD az_result az_http_pipeline_policy_bufferresponse(
-    _az_http_policy * p_policies,
-    void * p_data,
-    _az_http_request * p_request,
-    az_http_response * p_response);
-
-AZ_NODISCARD az_result az_http_pipeline_policy_distributedtracing(
-    _az_http_policy * p_policies,
-    void * p_data,
-    _az_http_request * p_request,
-    az_http_response * p_response);
-
 AZ_NODISCARD az_result az_http_pipeline_policy_transport(
     _az_http_policy * p_policies,
     void * p_data,
     _az_http_request * p_request,
     az_http_response * p_response);
+
+AZ_NODISCARD az_result
+az_http_client_send_request(_az_http_request * p_request, az_http_response * p_response);
 
 /**
  * @brief Format buffer as a http request containing URL and header spans.
