@@ -35,7 +35,7 @@ enum
   ((uint32_t)(_az_ERROR_FLAG | ((uint32_t)(facility) << 16) | (uint32_t)(code)))
 
 #define _az_RESULT_MAKE_SUCCESS(facility, code) \
-  ((uint32_t)((uint32_t)(facility) << 16) | (uint32_t)(code))
+  ((uint32_t)(((uint32_t)(facility) << 16) | (uint32_t)(code)))
 
 #define AZ_RETURN_IF_FAILED(exp) \
   do \
