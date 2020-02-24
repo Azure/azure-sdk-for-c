@@ -32,7 +32,7 @@ endif()
 
 add_subdirectory(sdk/keyvault/keyvault)
 add_subdirectory(sdk/storage/blobs)
-add_subdirectory(sdk/iot)
+add_subdirectory(sdk/iot/core)
 
 if(NOT DEFINED ENV{AZ_SDK_C_NO_SAMPLES})
   # current samples require an HTTP transport implementation.
