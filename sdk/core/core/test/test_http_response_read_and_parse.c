@@ -31,7 +31,7 @@ void test_http_response()
       TEST_ASSERT(result == AZ_OK);
       TEST_ASSERT(status_line.major_version == 1);
       TEST_ASSERT(status_line.minor_version == 2);
-      TEST_ASSERT(status_line.status_code == _AZ_HTTP_STATUS_CODE_NOT_FOUND);
+      TEST_ASSERT(status_line.status_code == _az_HTTP_STATUS_CODE_NOT_FOUND);
       TEST_ASSERT(
           az_span_is_equal(status_line.reason_phrase, AZ_SPAN_FROM_STR("We removed the\tpage!")));
     }
@@ -69,7 +69,7 @@ void test_http_response()
       TEST_ASSERT(result == AZ_OK);
       TEST_ASSERT(status_line.major_version == 2);
       TEST_ASSERT(status_line.minor_version == 0);
-      TEST_ASSERT(status_line.status_code == _AZ_HTTP_STATUS_CODE_RESET_CONTENT);
+      TEST_ASSERT(status_line.status_code == _az_HTTP_STATUS_CODE_RESET_CONTENT);
       TEST_ASSERT(az_span_is_equal(status_line.reason_phrase, AZ_SPAN_FROM_STR("")));
     }
     // read a header1
