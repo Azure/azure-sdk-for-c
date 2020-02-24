@@ -11,13 +11,13 @@
 
 #include <_az_cfg_prefix.h>
 
-void _az_log_http_request(az_http_request * hrb);
+void _az_log_http_request(_az_http_request* hrb);
 
 void _az_log_http_response(
-    az_http_response * response,
+    az_http_response* response,
     int64_t duration_msec,
-    az_http_request * hrb);
+    _az_http_request* hrb);
 
 #include <_az_cfg_suffix.h>
 
-#endif
+#endif // _az_LOG_PRIVATE_H

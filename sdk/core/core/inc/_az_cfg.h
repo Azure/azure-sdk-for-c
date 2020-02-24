@@ -1,6 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+/**
+ * @file _az_cfg.h
+ *
+ * @brief disabling warnings.
+ */
+
 #ifdef _MSC_VER
 
 // warning C4710: '...': function not inlined
@@ -27,46 +33,47 @@
 // https://stackoverflow.com/questions/2280492/bit-fields-of-type-other-than-int
 #pragma warning(disable : 4214)
 
-#endif
+#endif // _MSC_VER
 
-#if defined(__GNUC__)
+#ifdef __GNUC__
 
 #pragma GCC diagnostic ignored "-Wmissing-braces"
 
-#endif
+#endif // __GNUC__
 
-#if defined(__clang__)
+#ifdef __clang__
 
 #pragma clang diagnostic ignored "-Wmissing-field-initializers"
 #pragma clang diagnostic ignored "-Wmissing-braces"
 
-#endif
+#endif // __clang__ 
 
 #ifndef _az_CFG_H
 #define _az_CFG_H
 
 #ifdef _MSC_VER
 #define AZ_INLINE static __forceinline
-#elif defined(__GNUC__) || defined(__clang__)
+#elif defined(__GNUC__) || defined(__clang__) // !_MSC_VER
 #define AZ_INLINE __attribute__((always_inline)) static inline
-#else
+#else // !_MSC_VER !__GNUC__ !__clang__
 #define AZ_INLINE static inline
-#endif
+#endif // _MSC_VER
 
 #if defined(__GNUC__) && __GNUC__ >= 7
 #define AZ_FALLTHROUGH __attribute__((fallthrough))
-#else
+#else // !__GNUC__ >= 7
 #define AZ_FALLTHROUGH \
-  do { \
+  do \
+  { \
   } while (0)
-#endif
+#endif // __GNUC__ >= 7
 
 #ifdef _MSC_VER
 #define AZ_NODISCARD _Check_return_
-#elif defined(__GNUC__) || defined(__clang__)
+#elif defined(__GNUC__) || defined(__clang__) // !_MSC_VER
 #define AZ_NODISCARD __attribute__((warn_unused_result))
-#else
+#else // !_MSC_VER !__GNUC__ !__clang__
 #define AZ_NODISCARD
-#endif
+#endif // _MSC_VER
 
-#endif
+#endif // _az_CFG_H

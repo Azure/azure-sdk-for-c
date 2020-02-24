@@ -22,17 +22,18 @@
  *   - *`AZ_OK`* success.
  *   - *`AZ_ERROR_ARG`* `p_hrb` is _NULL_.
  */
-AZ_NODISCARD AZ_INLINE az_result
-_az_http_request_mark_retry_headers_start(az_http_request * p_hrb) {
+AZ_NODISCARD AZ_INLINE az_result _az_http_request_mark_retry_headers_start(_az_http_request* p_hrb)
+{
   AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
   p_hrb->_internal.retry_headers_start_byte_offset = az_span_length(p_hrb->_internal.headers);
   return AZ_OK;
 }
 
-AZ_NODISCARD AZ_INLINE az_result az_http_request_remove_retry_headers(az_http_request * p_hrb) {
+AZ_NODISCARD AZ_INLINE az_result _az_http_request_remove_retry_headers(_az_http_request* p_hrb)
+{
   AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
 
-  az_span * headers_ptr = &p_hrb->_internal.headers;
+  az_span* headers_ptr = &p_hrb->_internal.headers;
   *headers_ptr = az_span_init(
       az_span_ptr(*headers_ptr),
       p_hrb->_internal.retry_headers_start_byte_offset,
@@ -42,4 +43,4 @@ AZ_NODISCARD AZ_INLINE az_result az_http_request_remove_retry_headers(az_http_re
 
 #include <_az_cfg_suffix.h>
 
-#endif
+#endif // _az_HTTP_PRIVATE_H

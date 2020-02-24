@@ -1,9 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include <az_contract_internal.h>
 #include <az_json.h>
-
-#include "az_span_reader_private.h"
 
 #include "az_hex_private.h"
 
@@ -11,110 +10,167 @@
 
 #include <_az_cfg.h>
 
-AZ_NODISCARD AZ_INLINE az_result_byte az_hex_to_digit(az_result_byte c) {
-  if (isdigit(c)) {
-    return c - '0';
+AZ_NODISCARD AZ_INLINE az_result az_hex_to_digit(uint8_t c, uint8_t* out)
+{
+  if (isdigit(c))
+  {
+    *out = c - '0';
   }
-  if ('a' <= c && c <= 'f') {
-    return c - _az_HEX_LOWER_OFFSET;
+  else if ('a' <= c && c <= 'f')
+  {
+    *out = c - _az_HEX_LOWER_OFFSET;
   }
-  if ('A' <= c && c <= 'F') {
-    return c - _az_HEX_UPPER_OFFSET;
+  else if ('A' <= c && c <= 'F')
+  {
+    *out = c - _az_HEX_UPPER_OFFSET;
   }
-  return az_error_unexpected_char(c);
+  else
+  {
+    return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
+  }
+  return AZ_OK;
 }
 
-AZ_NODISCARD AZ_INLINE az_result_byte az_json_esc_decode(az_result_byte c) {
-  switch (c) {
+AZ_NODISCARD AZ_INLINE az_result az_json_esc_decode(uint8_t c, uint8_t* out)
+{
+  switch (c)
+  {
     case '\\':
     case '"':
-    case '/': {
-      return c;
+    case '/':
+    {
+      *out = c;
+      break;
     }
-    case 'b': {
-      return '\b';
+    case 'b':
+    {
+      *out = '\b';
+      break;
     }
-    case 'f': {
-      return '\f';
+    case 'f':
+    {
+      *out = '\f';
+      break;
     }
-    case 'n': {
-      return '\n';
+    case 'n':
+    {
+      *out = '\n';
+      break;
     }
-    case 'r': {
-      return '\r';
+    case 'r':
+    {
+      *out = '\r';
+      break;
     }
-    case 't': {
-      return '\t';
+    case 't':
+    {
+      *out = '\t';
+      break;
     }
     default:
-      return az_error_unexpected_char(c);
+      return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
+  return AZ_OK;
 }
 
-AZ_NODISCARD az_span az_json_esc_encode(az_result_byte c) {
-  switch (c) {
-    case '\\': {
+AZ_NODISCARD az_span _az_json_esc_encode(uint8_t c)
+{
+  switch (c)
+  {
+    case '\\':
+    {
       return AZ_SPAN_FROM_STR("\\\\");
     }
-    case '"': {
+    case '"':
+    {
       return AZ_SPAN_FROM_STR("\\\"");
     }
-    case '\b': {
+    case '\b':
+    {
       return AZ_SPAN_FROM_STR("\\b");
     }
-    case '\f': {
+    case '\f':
+    {
       return AZ_SPAN_FROM_STR("\\f");
     }
-    case '\n': {
+    case '\n':
+    {
       return AZ_SPAN_FROM_STR("\\n");
     }
-    case '\r': {
+    case '\r':
+    {
       return AZ_SPAN_FROM_STR("\\r");
     }
-    case '\t': {
+    case '\t':
+    {
       return AZ_SPAN_FROM_STR("\\t");
     }
-    default: {
+    default:
+    {
       return az_span_null();
     }
   }
 }
 
-AZ_NODISCARD az_result az_span_reader_read_json_string_char(az_span_reader * self, uint32_t * out) {
+AZ_NODISCARD az_result _az_span_reader_read_json_string_char(az_span* self, uint32_t* out)
+{
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
-  az_result_byte const result = az_span_reader_current(self);
-  switch (result) {
-    case AZ_ERROR_EOF: {
-      return AZ_ERROR_ITEM_NOT_FOUND;
-    }
-    case '"': {
+  int32_t reader_length = az_span_length(*self);
+  if (reader_length == 0)
+  {
+    return AZ_ERROR_ITEM_NOT_FOUND;
+  }
+
+  uint8_t const result = az_span_ptr(*self)[0];
+  switch (result)
+  {
+    case '"':
+    {
       return AZ_ERROR_JSON_STRING_END;
     }
-    case '\\': {
-      az_span_reader_next(self);
-      az_result const c = az_span_reader_current(self);
-      az_span_reader_next(self);
-      if (c == 'u') {
+    case '\\':
+    {
+      // moving reader fw
+      AZ_RETURN_IF_FAILED(az_span_slice(*self, 1, -1, self));
+      if (az_span_length(*self) == 0)
+      {
+        return AZ_ERROR_EOF;
+      }
+      uint8_t const c = az_span_ptr(*self)[0];
+      AZ_RETURN_IF_FAILED(az_span_slice(*self, 1, -1, self));
+
+      if (c == 'u')
+      {
         uint32_t r = 0;
-        for (size_t i = 0; i < 4; ++i, az_span_reader_next(self)) {
-          az_result_byte const digit = az_hex_to_digit(az_span_reader_current(self));
-          AZ_RETURN_IF_FAILED(digit);
+        for (size_t i = 0; i < 4; ++i)
+        {
+          uint8_t digit = 0;
+          if (az_span_length(*self) == 0)
+          {
+            return AZ_ERROR_EOF;
+          }
+          AZ_RETURN_IF_FAILED(az_hex_to_digit(az_span_ptr(*self)[0], &digit));
           r = (r << 4) + digit;
+          AZ_RETURN_IF_FAILED(az_span_slice(*self, 1, -1, self));
         }
         *out = r;
-      } else {
-        az_result_byte const r = az_json_esc_decode(c);
-        AZ_RETURN_IF_FAILED(r);
+      }
+      else
+      {
+        uint8_t r = 0;
+        AZ_RETURN_IF_FAILED(az_json_esc_decode(c, &r));
         *out = r;
       }
       return AZ_OK;
     }
-    default: {
-      if (result < 0x20) {
-        return az_error_unexpected_char(result);
+    default:
+    {
+      if (result < 0x20)
+      {
+        return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
       }
-      az_span_reader_next(self);
+      AZ_RETURN_IF_FAILED(az_span_slice(*self, 1, -1, self));
       *out = (uint16_t)result;
       return AZ_OK;
     }

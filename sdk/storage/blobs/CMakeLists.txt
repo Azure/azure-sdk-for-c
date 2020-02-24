@@ -23,10 +23,6 @@ add_library (az::storage::blobs ALIAS az_storage_blobs)
 add_executable (az_storage_blobs_test test/main.c)
 target_link_libraries(az_storage_blobs_test PRIVATE az_storage_blobs az_core_internal)
 
-# make Storage POC
-add_executable (az_storage_blobs_poc test/storage_blobs_poc.c)
-target_link_libraries(az_storage_blobs_poc PRIVATE az_storage_blobs)
-
 if (UNIX)
   target_link_libraries(az_storage_blobs PRIVATE m)
 endif()

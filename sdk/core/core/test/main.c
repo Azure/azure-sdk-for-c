@@ -2,11 +2,12 @@
 // SPDX-License-Identifier: MIT
 
 #include <az_http.h>
+#include <az_http_internal.h>
+#include <az_http_transport.h>
 #include <az_json.h>
 
 #include <az_http_private.h>
 #include <az_span.h>
-#include <az_span_reader.h>
 
 #include <assert.h>
 #include <stdbool.h>
@@ -28,7 +29,8 @@ void test_log();
 
 int exit_code = 0;
 
-az_result write_str(az_span span, az_span s, az_span * out) {
+az_result write_str(az_span span, az_span s, az_span* out)
+{
   *out = span;
   AZ_RETURN_IF_FAILED(az_span_append(*out, AZ_SPAN_FROM_STR("\""), out));
   AZ_RETURN_IF_FAILED(az_span_append(*out, s, out));
@@ -36,12 +38,10 @@ az_result write_str(az_span span, az_span s, az_span * out) {
   return AZ_OK;
 }
 
-az_result read_write_token(
-    az_span * output,
-    int32_t * o,
-    az_json_parser * state,
-    az_json_token token) {
-  switch (token.kind) {
+az_result read_write_token(az_span* output, int32_t* o, az_json_parser* state, az_json_token token)
+{
+  switch (token.kind)
+  {
     case AZ_JSON_TOKEN_NULL:
       return az_span_append(*output, AZ_SPAN_FROM_STR("null"), output);
     case AZ_JSON_TOKEN_BOOLEAN:
@@ -53,19 +53,25 @@ az_result read_write_token(
       return az_span_append(*output, AZ_SPAN_FROM_STR("0"), output);
     case AZ_JSON_TOKEN_STRING:
       return write_str(*output, token.value.string, output);
-    case AZ_JSON_TOKEN_OBJECT: {
+    case AZ_JSON_TOKEN_OBJECT:
+    {
       AZ_RETURN_IF_FAILED(az_span_append(*output, AZ_SPAN_FROM_STR("{"), output));
       bool need_comma = false;
-      while (true) {
+      while (true)
+      {
         az_json_token_member member;
         az_result const result = az_json_parser_parse_token_member(state, &member);
-        if (result == AZ_ERROR_ITEM_NOT_FOUND) {
+        if (result == AZ_ERROR_ITEM_NOT_FOUND)
+        {
           break;
         }
         AZ_RETURN_IF_FAILED(result);
-        if (need_comma) {
+        if (need_comma)
+        {
           AZ_RETURN_IF_FAILED(az_span_append(*output, AZ_SPAN_FROM_STR(","), output));
-        } else {
+        }
+        else
+        {
           need_comma = true;
         }
         AZ_RETURN_IF_FAILED(write_str(*output, member.name, output));
@@ -74,19 +80,25 @@ az_result read_write_token(
       }
       return az_span_append(*output, AZ_SPAN_FROM_STR("}"), output);
     }
-    case AZ_JSON_TOKEN_ARRAY: {
+    case AZ_JSON_TOKEN_ARRAY:
+    {
       AZ_RETURN_IF_FAILED(az_span_append(*output, AZ_SPAN_FROM_STR("["), output));
       bool need_comma = false;
-      while (true) {
+      while (true)
+      {
         az_json_token element;
         az_result const result = az_json_parser_parse_array_item(state, &element);
-        if (result == AZ_ERROR_ITEM_NOT_FOUND) {
+        if (result == AZ_ERROR_ITEM_NOT_FOUND)
+        {
           break;
         }
         AZ_RETURN_IF_FAILED(result);
-        if (need_comma) {
+        if (need_comma)
+        {
           AZ_RETURN_IF_FAILED(az_span_append(*output, AZ_SPAN_FROM_STR(","), output));
-        } else {
+        }
+        else
+        {
           need_comma = true;
         }
         AZ_RETURN_IF_FAILED(read_write_token(output, o, state, element));
@@ -99,7 +111,8 @@ az_result read_write_token(
   return AZ_ERROR_JSON_INVALID_STATE;
 }
 
-az_result read_write(az_span input, az_span * output, int32_t * o) {
+az_result read_write(az_span input, az_span* output, int32_t* o)
+{
   az_json_parser parser = { 0 };
   TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, input));
   az_json_token token;
@@ -190,7 +203,11 @@ static az_span hrb_header_authorization_token1 = AZ_SPAN_LITERAL_FROM_STR("Beare
 static az_span hrb_header_authorization_token2
     = AZ_SPAN_LITERAL_FROM_STR("Bearer 99887766554433221100");
 
-int main() {
+int main()
+{
+  test_json_get_by_pointer();
+  test_json_pointer();
+  test_json_builder();
   {
     az_json_parser parser = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR("    ")));
@@ -352,6 +369,7 @@ int main() {
     }
     {
       int32_t o = 0;
+      output = AZ_SPAN_FROM_BUFFER(buffer);
       az_span const json = AZ_SPAN_FROM_STR(
           // 0           1           2           3           4           5 6
           // 01234 56789 01234 56678 01234 56789 01234 56789 01234 56789 01234
@@ -363,6 +381,7 @@ int main() {
     }
     {
       int32_t o = 0;
+      output = AZ_SPAN_FROM_BUFFER(buffer);
       az_span const json = AZ_SPAN_FROM_STR(
           // 0           1           2           3           4           5 6 01234
           // 56789 01234 56678 01234 56789 01234 56789 01234 56789 01234 56789 012
@@ -373,6 +392,7 @@ int main() {
     }
     {
       int32_t o = 0;
+      output = AZ_SPAN_FROM_BUFFER(buffer);
       az_span const json = AZ_SPAN_FROM_STR(
           // 0           1           2           3           4           5 6 01234
           // 56789 01234 56678 01234 56789 01234 56789 01234 56789 01234 56789 012
@@ -382,6 +402,7 @@ int main() {
           "}]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] "
           "]]]]] ]]]");
       output._internal.length = 0;
+      output = AZ_SPAN_FROM_BUFFER(buffer);
       az_result const result = read_write(json, &output, &o);
       TEST_ASSERT(result == AZ_OK);
 
@@ -396,6 +417,7 @@ int main() {
     //
     {
       int32_t o = 0;
+      output = AZ_SPAN_FROM_BUFFER(buffer);
       az_result const result = read_write(sample1, &output, &o);
       TEST_ASSERT(result == AZ_OK);
     }
@@ -421,7 +443,7 @@ int main() {
       az_span url_span = AZ_SPAN_FROM_BUFFER(buf);
       TEST_EXPECT_SUCCESS(az_span_append(url_span, hrb_url, &url_span));
       az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-      az_http_request hrb;
+      _az_http_request hrb;
 
       TEST_EXPECT_SUCCESS(
           az_http_request_init(&hrb, az_http_method_get(), url_span, header_span, az_span_null()));
@@ -457,7 +479,8 @@ int main() {
         { .key = hrb_header_content_type_name, .value = hrb_header_content_type_token },
         { .key = hrb_header_authorization_name, .value = hrb_header_authorization_token1 },
       };
-      for (uint16_t i = 0; i < az_span_length(hrb._internal.headers) / sizeof(az_pair); ++i) {
+      for (uint16_t i = 0; i < az_span_length(hrb._internal.headers) / sizeof(az_pair); ++i)
+      {
         az_pair header = { 0 };
         TEST_EXPECT_SUCCESS(az_http_request_get_header(&hrb, i, &header));
 
@@ -465,7 +488,7 @@ int main() {
         TEST_ASSERT(az_span_is_equal(header.value, expected_headers1[i].value));
       }
 
-      TEST_EXPECT_SUCCESS(az_http_request_remove_retry_headers(&hrb));
+      TEST_EXPECT_SUCCESS(_az_http_request_remove_retry_headers(&hrb));
       TEST_ASSERT(hrb._internal.retry_headers_start_byte_offset == sizeof(az_pair));
 
       TEST_EXPECT_SUCCESS(az_http_request_append_header(
@@ -477,7 +500,8 @@ int main() {
         { .key = hrb_header_content_type_name, .value = hrb_header_content_type_token },
         { .key = hrb_header_authorization_name, .value = hrb_header_authorization_token2 },
       };
-      for (uint16_t i = 0; i < az_span_length(hrb._internal.headers) / sizeof(az_pair); ++i) {
+      for (uint16_t i = 0; i < az_span_length(hrb._internal.headers) / sizeof(az_pair); ++i)
+      {
         az_pair header = { 0 };
         TEST_EXPECT_SUCCESS(az_http_request_get_header(&hrb, i, &header));
 
@@ -490,9 +514,7 @@ int main() {
   test_http_response();
   test_span_builder_replace();
   test_mut_span();
-  test_json_builder();
-  test_json_get_by_pointer();
-  test_json_pointer();
+
   test_json_string();
   test_log();
   return exit_code;

@@ -19,10 +19,11 @@ int exit_code = 0;
 
 AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
     az_span json_web_key_type,
-    az_keyvault_create_key_options * options,
-    az_span * http_body);
+    az_keyvault_create_key_options* options,
+    az_span* http_body);
 
-int main() {
+int main()
+{
   {
     {
       az_keyvault_create_key_options options = { 0 };

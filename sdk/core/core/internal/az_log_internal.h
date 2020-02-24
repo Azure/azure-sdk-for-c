@@ -7,6 +7,8 @@
 #include <az_log.h>
 #include <az_span.h>
 
+#include <stdbool.h>
+
 #include <_az_cfg_prefix.h>
 
 void az_log_write(az_log_classification classification, az_span message);
@@ -16,4 +18,4 @@ bool az_log_should_write(az_log_classification classification);
 
 #include <_az_cfg_suffix.h>
 
-#endif
+#endif // _az_LOG_INTERNAL_H

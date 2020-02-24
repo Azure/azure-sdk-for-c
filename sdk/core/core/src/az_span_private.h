@@ -12,15 +12,15 @@
 
 #include <_az_cfg_prefix.h>
 
-typedef int32_t az_result_byte;
-
 /**
  * @brief returns a span with the left @var n bytes of the given @var span.
  *
  * If the @var n is greater than the span capacity then the whole @var span is returned.
  */
-AZ_NODISCARD AZ_INLINE az_span az_span_take(az_span span, int32_t n) {
-  if (az_span_capacity(span) <= n) {
+AZ_NODISCARD AZ_INLINE az_span az_span_take(az_span span, int32_t n)
+{
+  if (az_span_capacity(span) <= n)
+  {
     return span;
   }
   int32_t current_length = az_span_length(span);
@@ -37,8 +37,10 @@ AZ_NODISCARD AZ_INLINE az_span az_span_take(az_span span, int32_t n) {
  *
  * If the @b n is greater than span capacity then an empty span is returned
  */
-AZ_NODISCARD AZ_INLINE az_span az_span_drop(az_span span, int32_t n) {
-  if (az_span_capacity(span) <= n) {
+AZ_NODISCARD AZ_INLINE az_span az_span_drop(az_span span, int32_t n)
+{
+  if (az_span_capacity(span) <= n)
+  {
     return az_span_null();
   }
   int32_t current_length = az_span_length(span);
@@ -49,25 +51,10 @@ AZ_NODISCARD AZ_INLINE az_span az_span_drop(az_span span, int32_t n) {
   return az_span_init(az_span_ptr(span) + n, new_length, current_capacity - n);
 }
 
-/**
- * Returns a byte in `index` position.
- * Returns `AZ_ERROR_EOF` if the `index` is out of the span range.
- */
-AZ_NODISCARD AZ_INLINE az_result_byte az_span_get(az_span span, int32_t index) {
-  if (az_span_length(span) <= index) {
-    return AZ_ERROR_EOF;
-  }
-  return az_span_ptr(span)[index];
-}
-
-// Parsing utilities
-AZ_NODISCARD AZ_INLINE az_result az_error_unexpected_char(az_result_byte c) {
-  return az_failed(c) ? c : AZ_ERROR_PARSER_UNEXPECTED_CHAR;
-}
-
-AZ_NODISCARD AZ_INLINE bool az_span_is_overlap(az_span a, az_span b) {
-  uint8_t * a_ptr = az_span_ptr(a);
-  uint8_t * b_ptr = az_span_ptr(b);
+AZ_NODISCARD AZ_INLINE bool az_span_is_overlap(az_span const a, az_span const b)
+{
+  uint8_t* a_ptr = az_span_ptr(a);
+  uint8_t* b_ptr = az_span_ptr(b);
   int32_t a_length = az_span_length(a);
   int32_t b_length = az_span_length(b);
   return (!az_span_is_empty(a) && !az_span_is_empty(b))
@@ -81,7 +68,8 @@ AZ_NODISCARD AZ_INLINE bool az_span_is_overlap(az_span a, az_span b) {
  * Don't use this function for arrays. Use @var AZ_SPAN_FROM_ARRAY instead.
  * Don't us
  */
-AZ_NODISCARD AZ_INLINE az_span az_span_from_single_item(uint8_t * ptr) {
+AZ_NODISCARD AZ_INLINE az_span az_span_from_single_item(uint8_t* ptr)
+{
   return az_span_init(ptr, 1, 1);
 }
 
@@ -97,7 +85,7 @@ AZ_NODISCARD AZ_INLINE az_span az_span_from_single_item(uint8_t * ptr) {
  * @param a source/destination span
  * @param b destination/source span
  */
-void az_span_swap(az_span a, az_span b);
+void _az_span_swap(az_span a, az_span b);
 
 /**
  * @brief Append @b size number of zeros to @b self if there is enough capacity for it
@@ -106,7 +94,7 @@ void az_span_swap(az_span a, az_span b);
  * @param size number of zeros to be appended
  * @return AZ_NODISCARD az_span_append_zeros
  */
-AZ_NODISCARD az_result az_span_append_zeros(az_span * self, int32_t size);
+AZ_NODISCARD az_result _az_span_append_zeros(az_span* self, int32_t size);
 
 /**
  * @brief Replace all contents from a starting position to an end position with the content of a
@@ -118,14 +106,16 @@ AZ_NODISCARD az_result az_span_append_zeros(az_span * self, int32_t size);
  * @param span content to use for replacement
  * @return AZ_NODISCARD az_span_replace
  */
-AZ_NODISCARD az_result az_span_replace(az_span * self, int32_t start, int32_t end, az_span span);
+AZ_NODISCARD az_result _az_span_replace(az_span* self, int32_t start, int32_t end, az_span span);
 
 typedef az_result (*_az_predicate)(az_span slice);
 
 // PRIVATE. read until condition is true on character.
 // Then return number of positions read with output parameter
-AZ_NODISCARD az_result _az_scan_until(az_span self, _az_predicate predicate, int32_t * out_index);
+AZ_NODISCARD az_result _az_scan_until(az_span self, _az_predicate predicate, int32_t* out_index);
+
+AZ_NODISCARD az_result _az_is_expected_span(az_span* self, az_span expected);
 
 #include <_az_cfg_suffix.h>
 
-#endif
+#endif // _az_SPAN_PRIVATE_H
