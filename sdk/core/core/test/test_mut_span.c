@@ -8,7 +8,8 @@
 
 #include <_az_cfg.h>
 
-void test_mut_span() {
+void test_mut_span()
+{
   // swap
   {
     uint8_t a_array[] = "Hello world!";

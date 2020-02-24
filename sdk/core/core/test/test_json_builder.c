@@ -9,7 +9,8 @@
 
 #include <_az_cfg.h>
 
-void test_json_builder() {
+void test_json_builder()
+{
   {
     uint8_t array[200];
     az_json_builder builder = { 0 };

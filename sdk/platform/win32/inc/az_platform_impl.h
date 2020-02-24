@@ -12,28 +12,30 @@
 #define NOMINMAX
 #include <windows.h>
 #undef NOMINMAX
-#else // NOMINMAX
+#else // !NOMINMAX
 #include <windows.h>
 #endif // NOMINMAX
 #undef WIN32_LEAN_AND_MEAN
-#else // WIN32_LEAN_AND_MEAN
+#else // !WIN32_LEAN_AND_MEAN
 #ifndef NOMINMAX
 #define NOMINMAX
 #include <windows.h>
 #undef NOMINMAX
-#else // NOMINMAX
+#else // !NOMINMAX
 #include <windows.h>
 #endif // NOMINMAX
 #endif // WIN32_LEAN_AND_MEAN
 
 #include <_az_cfg_prefix.h>
 
-struct az_platform_mtx {
-  struct {
+struct az_platform_mtx
+{
+  struct
+  {
     CRITICAL_SECTION cs;
   } _internal;
 };
 
 #include <_az_cfg_suffix.h>
 
-#endif // _az_PLATFORM_H
+#endif // _az_PLATFORM_IMPL_H
