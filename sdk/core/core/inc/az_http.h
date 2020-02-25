@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
 /**
@@ -20,7 +20,8 @@
 
 #include <_az_cfg_prefix.h>
 
-typedef enum {
+typedef enum
+{
   _az_http_policy_apiversion_option_location_header,
   _az_http_policy_apiversion_option_location_queryparameter
 } _az_http_policy_apiversion_option_location;
@@ -37,8 +38,10 @@ typedef az_span az_http_method;
  * utility variables. User should never access field _internal directly
  *
  */
-typedef struct {
-  struct {
+typedef struct
+{
+  struct
+  {
     az_http_method method;
     az_span url;
     int32_t query_start;
@@ -49,7 +52,8 @@ typedef struct {
   } _internal;
 } _az_http_request;
 
-typedef enum {
+typedef enum
+{
   AZ_HTTP_RESPONSE_KIND_STATUS_LINE = 0,
   AZ_HTTP_RESPONSE_KIND_HEADER = 1,
   AZ_HTTP_RESPONSE_KIND_BODY = 2,
@@ -69,10 +73,13 @@ typedef enum {
  * az_http_response_get_body() as utilities for parsing http response.
  *
  */
-typedef struct {
-  struct {
+typedef struct
+{
+  struct
+  {
     az_span http_response;
-    struct {
+    struct
+    {
       az_span remaining; // the remaining un-parsed portion of the original http_response.
       az_http_response_kind next_kind; // after parsing an element, this is set to the next kind of
                                        // thing we will be parsing.
@@ -96,10 +103,10 @@ typedef struct _az_http_policy _az_http_policy;
  *
  */
 typedef AZ_NODISCARD az_result (*_az_http_policy_process_fn)(
-    _az_http_policy * p_policies,
-    void * p_options,
-    _az_http_request * p_request,
-    az_http_response * p_response);
+    _az_http_policy* p_policies,
+    void* p_options,
+    _az_http_request* p_request,
+    az_http_response* p_response);
 
 /**
  * @brief Definition for an HTTP policy.
@@ -109,10 +116,12 @@ typedef AZ_NODISCARD az_result (*_az_http_policy_process_fn)(
  * Users @b should @b not access _internal field where process callback and options are defined.
  *
  */
-struct _az_http_policy {
-  struct {
+struct _az_http_policy
+{
+  struct
+  {
     _az_http_policy_process_fn process;
-    void * p_options;
+    void* p_options;
   } _internal;
 };
 
@@ -124,8 +133,10 @@ struct _az_http_policy {
  * Users @b should @b not access _internal field.
  *
  */
-typedef struct {
-  struct {
+typedef struct
+{
+  struct
+  {
     _az_http_policy p_policies[10];
   } _internal;
 } _az_http_pipeline;
@@ -136,9 +147,11 @@ typedef struct {
  * Users @b should @b not access _internal field.
  *
  */
-typedef struct {
+typedef struct
+{
   // Services pass API versions in the header or in query parameters
-  struct {
+  struct
+  {
     _az_http_policy_apiversion_option_location option_location;
     az_span name;
     az_span version;
@@ -150,7 +163,8 @@ typedef struct {
  * os = string representation of currently executing Operating System
  *
  */
-typedef struct {
+typedef struct
+{
   az_span os;
 } _az_http_policy_telemetry_options;
 
@@ -158,8 +172,8 @@ typedef struct {
  * @brief Initialize _az_http_policy_telemetry_options with default values
  *
  */
-AZ_NODISCARD AZ_INLINE _az_http_policy_telemetry_options
-_az_http_policy_telemetry_options_default() {
+AZ_NODISCARD AZ_INLINE _az_http_policy_telemetry_options _az_http_policy_telemetry_options_default()
+{
   return (_az_http_policy_telemetry_options){ .os = AZ_SPAN_FROM_STR("Unknown OS") };
 }
 
@@ -167,7 +181,8 @@ _az_http_policy_telemetry_options_default() {
  * @brief Retry configuration for an HTTP pipeline
  *
  */
-typedef struct {
+typedef struct
+{
   uint16_t max_retries;
   uint16_t delay_in_ms;
   uint16_t max_delay_in_ms;
@@ -177,7 +192,8 @@ typedef struct {
  * @brief Initialize az_http_policy_retry_options with default values
  *
  */
-AZ_NODISCARD AZ_INLINE az_http_policy_retry_options az_http_policy_retry_options_default() {
+AZ_NODISCARD AZ_INLINE az_http_policy_retry_options az_http_policy_retry_options_default()
+{
   return (az_http_policy_retry_options){
     .max_retries = 3,
     .delay_in_ms = 10,
@@ -185,88 +201,90 @@ AZ_NODISCARD AZ_INLINE az_http_policy_retry_options az_http_policy_retry_options
   };
 }
 
-typedef enum {
+typedef enum
+{
   // 1xx (information) Status Codes:
-  _AZ_HTTP_STATUS_CODE_CONTINUE = 100,
-  _AZ_HTTP_STATUS_CODE_SWITCHING_PROTOCOLS = 101,
-  _AZ_HTTP_STATUS_CODE_PROCESSING = 102,
-  _AZ_HTTP_STATUS_CODE_EARLY_HINTS = 103,
+  AZ_HTTP_STATUS_CODE_CONTINUE = 100,
+  AZ_HTTP_STATUS_CODE_SWITCHING_PROTOCOLS = 101,
+  AZ_HTTP_STATUS_CODE_PROCESSING = 102,
+  AZ_HTTP_STATUS_CODE_EARLY_HINTS = 103,
 
   // 2xx (successful) Status Codes:
-  _AZ_HTTP_STATUS_CODE_OK = 200,
-  _AZ_HTTP_STATUS_CODE_CREATED = 201,
-  _AZ_HTTP_STATUS_CODE_ACCEPTED = 202,
-  _AZ_HTTP_STATUS_CODE_NON_AUTHORITATIVE_INFORMATION = 203,
-  _AZ_HTTP_STATUS_CODE_NO_CONTENT = 204,
-  _AZ_HTTP_STATUS_CODE_RESET_CONTENT = 205,
-  _AZ_HTTP_STATUS_CODE_PARTIAL_CONTENT = 206,
-  _AZ_HTTP_STATUS_CODE_MULTI_STATUS = 207,
-  _AZ_HTTP_STATUS_CODE_ALREADY_REPORTED = 208,
-  _AZ_HTTP_STATUS_CODE_IM_USED = 226,
+  AZ_HTTP_STATUS_CODE_OK = 200,
+  AZ_HTTP_STATUS_CODE_CREATED = 201,
+  AZ_HTTP_STATUS_CODE_ACCEPTED = 202,
+  AZ_HTTP_STATUS_CODE_NON_AUTHORITATIVE_INFORMATION = 203,
+  AZ_HTTP_STATUS_CODE_NO_CONTENT = 204,
+  AZ_HTTP_STATUS_CODE_RESET_CONTENT = 205,
+  AZ_HTTP_STATUS_CODE_PARTIAL_CONTENT = 206,
+  AZ_HTTP_STATUS_CODE_MULTI_STATUS = 207,
+  AZ_HTTP_STATUS_CODE_ALREADY_REPORTED = 208,
+  AZ_HTTP_STATUS_CODE_IM_USED = 226,
 
   // 3xx (redirection) Status Codes:
-  _AZ_HTTP_STATUS_CODE_MULTIPLE_CHOICES = 300,
-  _AZ_HTTP_STATUS_CODE_MOVED_PERMANENTLY = 301,
-  _AZ_HTTP_STATUS_CODE_FOUND = 302,
-  _AZ_HTTP_STATUS_CODE_SEE_OTHER = 303,
-  _AZ_HTTP_STATUS_CODE_NOT_MODIFIED = 304,
-  _AZ_HTTP_STATUS_CODE_USE_PROXY = 305,
-  _AZ_HTTP_STATUS_CODE_TEMPORARY_REDIRECT = 307,
-  _AZ_HTTP_STATUS_CODE_PERMANENT_REDIRECT = 308,
+  AZ_HTTP_STATUS_CODE_MULTIPLE_CHOICES = 300,
+  AZ_HTTP_STATUS_CODE_MOVED_PERMANENTLY = 301,
+  AZ_HTTP_STATUS_CODE_FOUND = 302,
+  AZ_HTTP_STATUS_CODE_SEE_OTHER = 303,
+  AZ_HTTP_STATUS_CODE_NOT_MODIFIED = 304,
+  AZ_HTTP_STATUS_CODE_USE_PROXY = 305,
+  AZ_HTTP_STATUS_CODE_TEMPORARY_REDIRECT = 307,
+  AZ_HTTP_STATUS_CODE_PERMANENT_REDIRECT = 308,
 
   // 4xx (client error) Status Codes:
-  _AZ_HTTP_STATUS_CODE_BAD_REQUEST = 400,
-  _AZ_HTTP_STATUS_CODE_UNAUTHORIZED = 401,
-  _AZ_HTTP_STATUS_CODE_PAYMENT_REQUIRED = 402,
-  _AZ_HTTP_STATUS_CODE_FORBIDDEN = 403,
-  _AZ_HTTP_STATUS_CODE_NOT_FOUND = 404,
-  _AZ_HTTP_STATUS_CODE_METHOD_NOT_ALLOWED = 405,
-  _AZ_HTTP_STATUS_CODE_NOT_ACCEPTABLE = 406,
-  _AZ_HTTP_STATUS_CODE_PROXY_AUTHENTICATION_REQUIRED = 407,
-  _AZ_HTTP_STATUS_CODE_REQUEST_TIMEOUT = 408,
-  _AZ_HTTP_STATUS_CODE_CONFLICT = 409,
-  _AZ_HTTP_STATUS_CODE_GONE = 410,
-  _AZ_HTTP_STATUS_CODE_LENGTH_REQUIRED = 411,
-  _AZ_HTTP_STATUS_CODE_PRECONDITION_FAILED = 412,
-  _AZ_HTTP_STATUS_CODE_PAYLOAD_TOO_LARGE = 413,
-  _AZ_HTTP_STATUS_CODE_URI_TOO_LONG = 414,
-  _AZ_HTTP_STATUS_CODE_UNSUPPORTED_MEDIA_TYPE = 415,
-  _AZ_HTTP_STATUS_CODE_RANGE_NOT_SATISFIABLE = 416,
-  _AZ_HTTP_STATUS_CODE_EXPECTATION_FAILED = 417,
-  _AZ_HTTP_STATUS_CODE_MISDIRECTED_REQUEST = 421,
-  _AZ_HTTP_STATUS_CODE_UNPROCESSABLE_ENTITY = 422,
-  _AZ_HTTP_STATUS_CODE_LOCKED = 423,
-  _AZ_HTTP_STATUS_CODE_FAILED_DEPENDENCY = 424,
-  _AZ_HTTP_STATUS_CODE_TOO_EARLY = 425,
-  _AZ_HTTP_STATUS_CODE_UPGRADE_REQUIRED = 426,
-  _AZ_HTTP_STATUS_CODE_PRECONDITION_REQUIRED = 428,
-  _AZ_HTTP_STATUS_CODE_TOO_MANY_REQUESTS = 429,
-  _AZ_HTTP_STATUS_CODE_REQUEST_HEADER_FIELDS_TOO_LARGE = 431,
-  _AZ_HTTP_STATUS_CODE_UNAVAILABLE_FOR_LEGAL_REASONS = 451,
+  AZ_HTTP_STATUS_CODE_BAD_REQUEST = 400,
+  AZ_HTTP_STATUS_CODE_UNAUTHORIZED = 401,
+  AZ_HTTP_STATUS_CODE_PAYMENT_REQUIRED = 402,
+  AZ_HTTP_STATUS_CODE_FORBIDDEN = 403,
+  AZ_HTTP_STATUS_CODE_NOT_FOUND = 404,
+  AZ_HTTP_STATUS_CODE_METHOD_NOT_ALLOWED = 405,
+  AZ_HTTP_STATUS_CODE_NOT_ACCEPTABLE = 406,
+  AZ_HTTP_STATUS_CODE_PROXY_AUTHENTICATION_REQUIRED = 407,
+  AZ_HTTP_STATUS_CODE_REQUEST_TIMEOUT = 408,
+  AZ_HTTP_STATUS_CODE_CONFLICT = 409,
+  AZ_HTTP_STATUS_CODE_GONE = 410,
+  AZ_HTTP_STATUS_CODE_LENGTH_REQUIRED = 411,
+  AZ_HTTP_STATUS_CODE_PRECONDITION_FAILED = 412,
+  AZ_HTTP_STATUS_CODE_PAYLOAD_TOO_LARGE = 413,
+  AZ_HTTP_STATUS_CODE_URI_TOO_LONG = 414,
+  AZ_HTTP_STATUS_CODE_UNSUPPORTED_MEDIA_TYPE = 415,
+  AZ_HTTP_STATUS_CODE_RANGE_NOT_SATISFIABLE = 416,
+  AZ_HTTP_STATUS_CODE_EXPECTATION_FAILED = 417,
+  AZ_HTTP_STATUS_CODE_MISDIRECTED_REQUEST = 421,
+  AZ_HTTP_STATUS_CODE_UNPROCESSABLE_ENTITY = 422,
+  AZ_HTTP_STATUS_CODE_LOCKED = 423,
+  AZ_HTTP_STATUS_CODE_FAILED_DEPENDENCY = 424,
+  AZ_HTTP_STATUS_CODE_TOO_EARLY = 425,
+  AZ_HTTP_STATUS_CODE_UPGRADE_REQUIRED = 426,
+  AZ_HTTP_STATUS_CODE_PRECONDITION_REQUIRED = 428,
+  AZ_HTTP_STATUS_CODE_TOO_MANY_REQUESTS = 429,
+  AZ_HTTP_STATUS_CODE_REQUEST_HEADER_FIELDS_TOO_LARGE = 431,
+  AZ_HTTP_STATUS_CODE_UNAVAILABLE_FOR_LEGAL_REASONS = 451,
 
   // 5xx (server error) Status Codes:
-  _AZ_HTTP_STATUS_CODE_INTERNAL_SERVER_ERROR = 500,
-  _AZ_HTTP_STATUS_CODE_NOT_IMPLEMENTED = 501,
-  _AZ_HTTP_STATUS_CODE_BAD_GATEWAY = 502,
-  _AZ_HTTP_STATUS_CODE_SERVICE_UNAVAILABLE = 503,
-  _AZ_HTTP_STATUS_CODE_GATEWAY_TIMEOUT = 504,
-  _AZ_HTTP_STATUS_CODE_HTTP_VERSION_NOT_SUPPORTED = 505,
-  _AZ_HTTP_STATUS_CODE_VARIANT_ALSO_NEGOTIATES = 506,
-  _AZ_HTTP_STATUS_CODE_INSUFFICIENT_STORAGE = 507,
-  _AZ_HTTP_STATUS_CODE_LOOP_DETECTED = 508,
-  _AZ_HTTP_STATUS_CODE_NOT_EXTENDED = 510,
-  _AZ_HTTP_STATUS_CODE_NETWORK_AUTHENTICATION_REQUIRED = 511,
-} _az_http_status_code;
+  AZ_HTTP_STATUS_CODE_INTERNAL_SERVER_ERROR = 500,
+  AZ_HTTP_STATUS_CODE_NOT_IMPLEMENTED = 501,
+  AZ_HTTP_STATUS_CODE_BAD_GATEWAY = 502,
+  AZ_HTTP_STATUS_CODE_SERVICE_UNAVAILABLE = 503,
+  AZ_HTTP_STATUS_CODE_GATEWAY_TIMEOUT = 504,
+  AZ_HTTP_STATUS_CODE_HTTP_VERSION_NOT_SUPPORTED = 505,
+  AZ_HTTP_STATUS_CODE_VARIANT_ALSO_NEGOTIATES = 506,
+  AZ_HTTP_STATUS_CODE_INSUFFICIENT_STORAGE = 507,
+  AZ_HTTP_STATUS_CODE_LOOP_DETECTED = 508,
+  AZ_HTTP_STATUS_CODE_NOT_EXTENDED = 510,
+  AZ_HTTP_STATUS_CODE_NETWORK_AUTHENTICATION_REQUIRED = 511,
+} az_http_status_code;
 
 /**
  * An HTTP response status line
  *
  * @see https://tools.ietf.org/html/rfc7230#section-3.1.2
  */
-typedef struct {
+typedef struct
+{
   uint8_t major_version;
   uint8_t minor_version;
-  _az_http_status_code status_code;
+  az_http_status_code status_code;
   az_span reason_phrase;
 } az_http_response_status_line;
 
@@ -278,7 +296,8 @@ typedef struct {
  *
  */
 AZ_NODISCARD AZ_INLINE az_result
-az_http_response_init(az_http_response * self, az_span http_response) {
+az_http_response_init(az_http_response* self, az_span http_response)
+{
   *self = (az_http_response){
     ._internal = {
       .http_response = http_response,
@@ -302,7 +321,7 @@ az_http_response_init(az_http_response * self, az_span http_response) {
  * Other value =  http response was not parsed
  */
 AZ_NODISCARD az_result
-az_http_response_get_status_line(az_http_response * response, az_http_response_status_line * out);
+az_http_response_get_status_line(az_http_response* response, az_http_response_status_line* out);
 
 /**
  * @brief parse a header based on the last http response parsed.
@@ -324,7 +343,7 @@ az_http_response_get_status_line(az_http_response * response, az_http_response_s
  * AZ_ERROR_INVALID_STATE = Can't read a header from current state. Maybe call
  * az_http_response_get_status_line first.
  */
-AZ_NODISCARD az_result az_http_response_get_next_header(az_http_response * self, az_pair * out);
+AZ_NODISCARD az_result az_http_response_get_next_header(az_http_response* self, az_pair* out);
 
 /**
  * @brief parses http response body and make out_body point to it.
@@ -338,33 +357,8 @@ AZ_NODISCARD az_result az_http_response_get_next_header(az_http_response * self,
  * @return AZ_OK = Body parsed and referenced by out_body<br>
  * Other value = Error while trying to read and parse body
  */
-AZ_NODISCARD az_result az_http_response_get_body(az_http_response * self, az_span * out_body);
-
-/**
- * @brief Callback function signature for transport policy options.
- *
- * An implementation for this definition is required for HTTP pipeline to send HTTP request through
- * netwok
- *
- */
-typedef AZ_NODISCARD az_result (
-    *az_http_client_send_request_fn)(_az_http_request * p_request, az_http_response * p_response);
-
-/**
- * @brief options for transport policy.
- *
- * User @b should @b not access _internal field directly.
- *
- */
-typedef struct {
-  struct {
-    az_http_client_send_request_fn send_request;
-  } _internal;
-} az_http_transport_options;
-
-AZ_NODISCARD az_http_transport_options
-az_http_transport_options_default(az_http_client_send_request_fn send_request);
+AZ_NODISCARD az_result az_http_response_get_body(az_http_response* self, az_span* out_body);
 
 #include <_az_cfg_suffix.h>
 
-#endif
+#endif // _az_HTTP_H

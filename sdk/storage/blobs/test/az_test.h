@@ -6,10 +6,14 @@
 extern int exit_code;
 
 #define TEST_ASSERT(c) \
-  do { \
-    if (c) { \
+  do \
+  { \
+    if (c) \
+    { \
       printf("  - `%s`: succeeded\n", #c); \
-    } else { \
+    } \
+    else \
+    { \
       fprintf(stderr, "  - `%s`: failed\n", #c); \
       assert(false); \
       exit_code = 1; \

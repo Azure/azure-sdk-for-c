@@ -21,9 +21,11 @@
 /**
  * An immutable span of bytes (octets).
  */
-typedef struct {
-  struct {
-    uint8_t * ptr;
+typedef struct
+{
+  struct
+  {
+    uint8_t* ptr;
     int32_t length;
     int32_t capacity;
   } _internal;
@@ -35,7 +37,7 @@ typedef struct {
  * @brief convenient way to get the pointer from one span
  *
  */
-AZ_NODISCARD AZ_INLINE uint8_t * az_span_ptr(az_span span) { return span._internal.ptr; }
+AZ_NODISCARD AZ_INLINE uint8_t* az_span_ptr(az_span span) { return span._internal.ptr; }
 
 /**
  * @brief convenient way to get the length from one span
@@ -70,7 +72,7 @@ AZ_NODISCARD AZ_INLINE az_span az_span_null() { return (az_span){ 0 }; }
 #define AZ_SPAN_LITERAL_FROM_STR(STRING_LITERAL) \
   { \
     ._internal = { \
-      .ptr = (uint8_t *)STRING_LITERAL, \
+      .ptr = (uint8_t*)STRING_LITERAL, \
       .length = _az_STRING_LITERAL_LEN(STRING_LITERAL), \
       .capacity = _az_STRING_LITERAL_LEN(STRING_LITERAL), \
     }, \
@@ -88,7 +90,8 @@ AZ_NODISCARD AZ_INLINE az_span az_span_null() { return (az_span){ 0 }; }
  * @brief Init span
  *
  */
-AZ_NODISCARD AZ_INLINE az_span az_span_init(uint8_t * ptr, int32_t length, int32_t capacity) {
+AZ_NODISCARD AZ_INLINE az_span az_span_init(uint8_t* ptr, int32_t length, int32_t capacity)
+{
   return (az_span){ ._internal = { .ptr = ptr, .length = length, .capacity = capacity, }, };
 }
 
@@ -96,9 +99,10 @@ AZ_NODISCARD AZ_INLINE az_span az_span_init(uint8_t * ptr, int32_t length, int32
  * @brief Creates a span from zero terminated string
  *
  */
-AZ_NODISCARD AZ_INLINE az_span az_span_from_str(char * str) {
+AZ_NODISCARD AZ_INLINE az_span az_span_from_str(char* str)
+{
   int32_t length = (int32_t)strlen(str);
-  return az_span_init((uint8_t *)str, length, length);
+  return az_span_init((uint8_t*)str, length, length);
 }
 
 /**
@@ -143,13 +147,14 @@ AZ_NODISCARD AZ_INLINE az_span az_span_from_str(char * str) {
  *
  */
 AZ_NODISCARD az_result
-az_span_slice(az_span span, int32_t low_index, int32_t high_index, az_span * out_sub_span);
+az_span_slice(az_span span, int32_t low_index, int32_t high_index, az_span* out_sub_span);
 
 /**
  * @brief Returns `true` if a content of the @a span is equal to a content of the @b
  * span.
  */
-AZ_NODISCARD AZ_INLINE bool az_span_is_equal(az_span a, az_span b) {
+AZ_NODISCARD AZ_INLINE bool az_span_is_equal(az_span a, az_span b)
+{
   return az_span_length(a) == az_span_length(b)
       && memcmp(az_span_ptr(a), az_span_ptr(b), az_span_length(a)) == 0;
 }
@@ -171,7 +176,7 @@ AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span a, az_span b);
  * @param out result span
  * @return AZ_NODISCARD az_span_to_uint64
  */
-AZ_NODISCARD az_result az_span_to_uint64(az_span self, uint64_t * out);
+AZ_NODISCARD az_result az_span_to_uint64(az_span self, uint64_t* out);
 
 /**
  * @brief move the content of span @b src to @b dst
@@ -181,9 +186,9 @@ AZ_NODISCARD az_result az_span_to_uint64(az_span self, uint64_t * out);
  * @param out span resulting after copy
  * @return AZ_NODISCARD az_span_move
  */
-AZ_NODISCARD az_result az_span_copy(az_span dst, az_span src, az_span * out);
+AZ_NODISCARD az_result az_span_copy(az_span dst, az_span src, az_span* out);
 
-AZ_NODISCARD az_result az_span_copy_url_encode(az_span dst, az_span src, az_span * out);
+AZ_NODISCARD az_result az_span_copy_url_encode(az_span dst, az_span src, az_span* out);
 
 /**
  * @brief append az_span if there is enough capacity for it
@@ -192,7 +197,7 @@ AZ_NODISCARD az_result az_span_copy_url_encode(az_span dst, az_span src, az_span
  * @param span content to be appended
  * @return AZ_NODISCARD az_span_append_
  */
-AZ_NODISCARD az_result az_span_append(az_span self, az_span span, az_span * out);
+AZ_NODISCARD az_result az_span_append(az_span self, az_span span, az_span* out);
 
 /**
  * @brief converts @b src span to zero-terminated str. Content is copied to @b buffer and then \0 is
@@ -203,32 +208,36 @@ AZ_NODISCARD az_result az_span_append(az_span self, az_span span, az_span * out)
  * @param span span with zero terminated str
  * @return AZ_NODISCARD az_span_to_str
  */
-AZ_NODISCARD az_result az_span_to_str(char * s, int32_t max_size, az_span span);
+AZ_NODISCARD az_result az_span_to_str(char* s, int32_t max_size, az_span span);
 
-AZ_NODISCARD az_result az_span_append_double(az_span span, double value, az_span * out);
+AZ_NODISCARD az_result az_span_append_double(az_span span, double value, az_span* out);
 
-AZ_NODISCARD az_result az_span_append_uint64(az_span * self, uint64_t n);
+AZ_NODISCARD az_result az_span_append_uint64(az_span* self, uint64_t n);
 
-AZ_NODISCARD az_result az_span_append_int64(az_span * self, int64_t n);
+AZ_NODISCARD az_result az_span_append_int64(az_span* self, int64_t n);
 
 /**
  * @brief a pair of az_span of bytes as a key and value
  *
  */
-typedef struct {
+typedef struct
+{
   az_span key;
   az_span value;
 } az_pair;
 
-AZ_NODISCARD AZ_INLINE az_pair az_pair_init(az_span key, az_span value) {
+AZ_NODISCARD AZ_INLINE az_pair az_pair_init(az_span key, az_span value)
+{
   return (az_pair){ .key = key, .value = value };
 }
 
-AZ_NODISCARD AZ_INLINE az_pair az_pair_null() {
+AZ_NODISCARD AZ_INLINE az_pair az_pair_null()
+{
   return az_pair_init(az_span_null(), az_span_null());
 }
 
-AZ_NODISCARD AZ_INLINE az_pair az_pair_from_str(char * key, char * value) {
+AZ_NODISCARD AZ_INLINE az_pair az_pair_from_str(char* key, char* value)
+{
   return az_pair_init(az_span_from_str(key), az_span_from_str(value));
 }
 
@@ -239,7 +248,8 @@ AZ_NODISCARD AZ_INLINE az_pair az_pair_from_str(char * key, char * value) {
  * @param span source span
  * @param fill byte to use for filling span
  */
-AZ_INLINE void az_span_set(az_span span, uint8_t fill) {
+AZ_INLINE void az_span_set(az_span span, uint8_t fill)
+{
   memset(az_span_ptr(span), fill, az_span_capacity(span));
 }
 
@@ -278,4 +288,4 @@ AZ_NODISCARD az_result az_span_append_i32toa(az_span span, int32_t n, az_span * 
 
 #include <_az_cfg_suffix.h>
 
-#endif
+#endif // _az_SPAN_H

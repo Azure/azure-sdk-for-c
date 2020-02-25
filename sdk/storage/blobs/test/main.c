@@ -12,6 +12,4 @@
 
 int exit_code = 0;
 
-int main() {
-  return exit_code;
-}
+int main() { return exit_code; }

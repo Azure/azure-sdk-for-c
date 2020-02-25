@@ -6,19 +6,21 @@
 ###########
 
 # Catch all for non-code project files
-* @joshfree @gilbertw @jeffreyrichter
+* @gilbertw @jeffreyrichter @joshfree
 
 # SDK team
-/sdk/ @gilbertw @jeffreyrichter @antkmsft @vhvb1989
+/sdk/ @ahsonkhan @antkmsft @gilbertw @jeffreyrichter @vhvb1989
 
 # Samples
 /samples/ @gilbertw @jeffreyrichter
 
 # Service teams
-/sdk/core/      @vhvb1989 @antkmsft @gilbertw @jeffreyrichter
-/sdk/keyvault/  @vhvb1989
-/sdk/storage/   @gilbertw
-/sdk/transport_policies/   @vhvb1989
+/sdk/core/                  @antkmsft @gilbertw @jeffreyrichter @vhvb1989
+/sdk/keyvault/              @vhvb1989
+/sdk/platform/posix/        @antkmsft @jeffreyrichter
+/sdk/platform/http_client/  @vhvb1989
+/sdk/platform/win32/        @antkmsft @jeffreyrichter
+/sdk/storage/               @gilbertw
 
 ###########
 # Eng Sys

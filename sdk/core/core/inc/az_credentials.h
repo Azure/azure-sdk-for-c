@@ -18,7 +18,8 @@
 
 #include <_az_cfg_prefix.h>
 
-enum {
+enum
+{
   _az_TOKEN_BUF_SIZE = 2 * 1024,
 };
 
@@ -27,8 +28,10 @@ enum {
  * provided credential. User should not access _internal field.
  *
  */
-typedef struct {
-  struct {
+typedef struct
+{
+  struct
+  {
     uint8_t token[_az_TOKEN_BUF_SIZE]; // Base64-encoded token
     int16_t token_length;
     int64_t expires_at_msec;
@@ -40,23 +43,24 @@ typedef struct {
  *
  */
 typedef AZ_NODISCARD az_result (
-    *_az_credential_apply_fn)(void * credential_options, _az_http_request * ref_request);
+    *_az_credential_apply_fn)(void* credential_options, _az_http_request* ref_request);
 
 /**
  * @brief function callback definition as a contract to be implemented for a credential to set
  * credential scopes when it supports it
  *
  */
-typedef AZ_NODISCARD az_result (*_az_credential_set_scopes_fn)(void * credential, az_span scopes);
+typedef AZ_NODISCARD az_result (*_az_credential_set_scopes_fn)(void* credential, az_span scopes);
 
 /**
  * @brief Definition of an az_credential. Its is used internally to authenticate an SDK client with
  * Azure. All types of credentials must contain this structure as it's first type.
  *
  */
-typedef struct {
-  struct {
-    az_http_transport_options http_transport_options;
+typedef struct
+{
+  struct
+  {
     _az_credential_apply_fn apply_credential;
     _az_credential_set_scopes_fn set_scopes; // NULL if this credential doesn't support scopes.
   } _internal;
@@ -67,8 +71,10 @@ typedef struct {
  * authenticated with Azure
  *
  */
-typedef struct {
-  struct {
+typedef struct
+{
+  struct
+  {
     _az_credential credential; // must be the first field in every credential structure
     az_span tenant_id;
     az_span client_id;
@@ -90,12 +96,11 @@ typedef struct {
  * Other value = Initialization failed
  */
 AZ_NODISCARD az_result az_client_secret_credential_init(
-    az_client_secret_credential * self,
+    az_client_secret_credential* self,
     az_span tenant_id,
     az_span client_id,
-    az_span client_secret,
-    az_http_transport_options * http_transport_options);
+    az_span client_secret);
 
 #include <_az_cfg_suffix.h>
 
-#endif
+#endif // _az_CREDENTIALS_H

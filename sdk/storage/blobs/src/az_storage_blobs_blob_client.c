@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include <az_config_internal.h>
 #include <az_contract_internal.h>
 #include <az_credentials_internal.h>
 #include <az_http.h>
@@ -8,7 +9,6 @@
 #include <az_http_transport.h>
 #include <az_json.h>
 #include <az_storage_blobs.h>
-#include <az_config_internal.h>
 
 #include <stddef.h>
 
@@ -22,33 +22,34 @@ static az_span const AZ_STORAGE_BLOBS_BLOB_TYPE_BLOCKBLOB = AZ_SPAN_LITERAL_FROM
 static az_span const AZ_HTTP_HEADER_CONTENT_LENGTH = AZ_SPAN_LITERAL_FROM_STR("Content-Length");
 static az_span const AZ_HTTP_HEADER_CONTENT_TYPE = AZ_SPAN_LITERAL_FROM_STR("Content-Type");
 
-AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_options_default(
-    az_http_transport_options const * http_transport_options) {
+AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_options_default()
+{
 
-    return (az_storage_blobs_blob_client_options) {
-    ._internal = { .http_transport_options = *http_transport_options,
-                   .api_version = (_az_http_policy_apiversion_options) { 
-                        ._internal = { 
-                            .option_location = _az_http_policy_apiversion_option_location_header,
-                            .name = AZ_SPAN_FROM_STR("x-ms-version"),
-                            .version = AZ_STORAGE_API_VERSION,
-                            }
-                        },
-                   ._telemetry_options = _az_http_policy_telemetry_options_default() },
+  return (az_storage_blobs_blob_client_options) {
+    ._internal = {
+      .api_version = { 
+        ._internal = { 
+          .option_location = _az_http_policy_apiversion_option_location_header,
+          .name = AZ_SPAN_FROM_STR("x-ms-version"),
+          .version = AZ_STORAGE_API_VERSION,
+        },
+      },
+      ._telemetry_options = _az_http_policy_telemetry_options_default(),
+    },
     .retry = az_http_policy_retry_options_default(),
   };
-
 }
 
 AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
-    az_storage_blobs_blob_client * self,
+    az_storage_blobs_blob_client* self,
     az_span uri,
-    void * credential,
-    az_storage_blobs_blob_client_options * options) {
+    void* credential,
+    az_storage_blobs_blob_client_options* options)
+{
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(options);
 
-  _az_credential * const cred = (_az_credential *)credential;
+  _az_credential* const cred = (_az_credential*)credential;
 
   *self = (az_storage_blobs_blob_client) {
     ._internal = {
@@ -96,20 +97,8 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
             },
             {
               ._internal = {
-                .process = az_http_pipeline_policy_bufferresponse,
-                .p_options = NULL,
-              },
-            },
-            {
-              ._internal = {
-                .process= az_http_pipeline_policy_distributedtracing,
-                .p_options = NULL,
-              },
-            },
-            {
-              ._internal = {
                 .process = az_http_pipeline_policy_transport,
-                .p_options= &self->_internal.options._internal.http_transport_options,
+                .p_options = NULL,
               },
             },
           },
@@ -128,15 +117,19 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
 }
 
 AZ_NODISCARD az_result az_storage_blobs_blob_upload(
-    az_storage_blobs_blob_client * client,
+    az_storage_blobs_blob_client* client,
     az_span content, /* Buffer of content*/
-    az_storage_blobs_blob_upload_options * options,
-    az_http_response * response) {
+    az_storage_blobs_blob_upload_options* options,
+    az_http_response* response)
+{
 
   az_storage_blobs_blob_upload_options opt;
-  if (options == NULL) {
+  if (options == NULL)
+  {
     opt = az_storage_blobs_blob_upload_options_default();
-  } else {
+  }
+  else
+  {
     opt = *options;
   }
   (void)opt;
