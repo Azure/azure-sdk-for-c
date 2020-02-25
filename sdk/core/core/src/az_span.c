@@ -536,7 +536,7 @@ AZ_NODISCARD az_result _az_scan_until(az_span self, _az_predicate predicate, int
   return AZ_ERROR_ITEM_NOT_FOUND;
 }
 
-AZ_NODISCARD az_result az_span_append_uint8(az_span self, uint8_t c, az_span* out)
+AZ_NODISCARD az_result az_span_append_uint8(az_span span, uint8_t c, az_span* span_out)
 {
-    return az_span_append(self, az_span_init(&c, 1, 1), out);
+    return az_span_append(span, az_span_init(&c, 1, 1), span_out);
 }
