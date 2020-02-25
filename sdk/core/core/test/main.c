@@ -326,6 +326,21 @@ int main()
   }
   {
     az_json_parser state = { 0 };
+    TEST_EXPECT_SUCCESS(az_json_parser_init(&state, AZ_SPAN_FROM_STR("1e19")));
+    az_json_token token;
+    TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_ERROR_BUFFER_OVERFLOW);
+  }
+  {
+    az_json_parser state = { 0 };
+    TEST_EXPECT_SUCCESS(az_json_parser_init(&state, AZ_SPAN_FROM_STR("1e18")));
+    az_json_token token;
+    TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_OK);
+    TEST_ASSERT(token.kind == AZ_JSON_TOKEN_NUMBER);
+    TEST_ASSERT(token.value.number == 1000000000000000000);
+    TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
+  }
+  {
+    az_json_parser state = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&state, AZ_SPAN_FROM_STR(" [ true, 0.3 ]")));
     az_json_token token = { 0 };
     TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_OK);
