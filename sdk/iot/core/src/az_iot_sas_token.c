@@ -6,6 +6,7 @@
 #include <az_iot_sas_token.h>
 #include <az_contract_internal.h>
 #include <az_span.h>
+#include <_az_cfg.h>
 
 #define LF                      '\n'
 #define AMPERSAND               '&'

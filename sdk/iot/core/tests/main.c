@@ -5,6 +5,8 @@
 #include "az_test.h"
 #include "az_iot_sas_token_tests.c"
 
+int exit_code = 0;
+
 int main()
 {
     az_iot_sas_token_get_document_NULL_document_fails();
@@ -22,5 +24,5 @@ int main()
     az_iot_sas_token_generate_succeeds();
     az_iot_sas_token_generate_with_keyname_succeeds();
 
-    return 0;
+    return exit_code;
 }
