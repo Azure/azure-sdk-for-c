@@ -16,7 +16,6 @@ target_include_directories (az_iot PUBLIC inc)
 target_include_directories (az_iot PRIVATE src)
 
 target_link_libraries(az_iot PUBLIC az_core)
-target_link_libraries(az_iot PRIVATE az_core_internal)
 
 add_library (az::iot ALIAS az_iot)
 

@@ -1,11 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <stdlib.h>
-#include <stdio.h>
 #include <az_iot_sas_token.h>
 #include <az_test.h>
 #include <az_span.h>
+
+#include <stdio.h>
 
 #define TEST_DEVICEID          "mytest_deviceid"
 #define TEST_FQDN              "myiothub.azure-devices.net"

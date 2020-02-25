@@ -10,7 +10,7 @@ add_executable (
     main.c
 )
 
-target_link_libraries(az_iot_tests PRIVATE az_iot az_core_internal)
+target_link_libraries(az_iot_tests PRIVATE az_iot)
 target_include_directories (az_iot_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 if (UNIX)

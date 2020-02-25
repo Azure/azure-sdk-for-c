@@ -1,12 +1,13 @@
-// Copyright (c) Microsoft. All rights reserved.
-// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// SPDX-License-Identifier: MIT
 
-#ifndef AZ_IOT_SAS_TOKEN_H
-#define AZ_IOT_SAS_TOKEN_H
+#ifndef _az_IOT_SAS_TOKEN_H
+#define _az_IOT_SAS_TOKEN_H
 
-#include <stdlib.h>
 #include <az_result.h>
 #include <az_span.h>
+
+#include <stdlib.h>
 
 #include <_az_cfg_prefix.h>
 
@@ -47,4 +48,4 @@ az_result az_iot_sas_token_generate(az_span iothub_fqdn, az_span device_id, az_s
 
 #include <_az_cfg_suffix.h>
 
-#endif // AZ_IOT_SAS_TOKEN_H
+#endif // _az_IOT_SAS_TOKEN_H

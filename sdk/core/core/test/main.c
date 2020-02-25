@@ -535,7 +535,6 @@ int main()
   test_json_string();
   test_json_value();
   test_log();
-  test_az_span();
 
   return exit_code;
 }
