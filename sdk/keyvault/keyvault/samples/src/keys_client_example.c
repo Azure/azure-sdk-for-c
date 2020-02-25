@@ -82,6 +82,15 @@ int main()
       &key_options,
       &http_response);
 
+  // validate sample running with no_op http client
+  if (create_result == AZ_ERROR_NOT_IMPLEMENTED)
+  {
+    printf("Running sample with no_op HTTP implementation.\nRecompile az_core with an HTTP client "
+           "implementation like CURL to see sample sending network requests.\n\n"
+           "i.e. cmake -DBUILD_CURL_TRANSPORT=ON ..\n\n");
+    return 0;
+  }
+
   if (az_failed(create_result))
   {
     printf("Failed to create key");

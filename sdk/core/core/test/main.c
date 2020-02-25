@@ -23,8 +23,9 @@ void test_json_builder();
 void test_json_get_by_pointer();
 void test_json_pointer();
 void test_json_string();
+void test_json_value();
 void test_span_builder_replace();
-void test_mut_span();
+void test_span();
 void test_log();
 void test_az_span();
 
@@ -326,6 +327,21 @@ int main()
   }
   {
     az_json_parser state = { 0 };
+    TEST_EXPECT_SUCCESS(az_json_parser_init(&state, AZ_SPAN_FROM_STR("1e19")));
+    az_json_token token;
+    TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_ERROR_BUFFER_OVERFLOW);
+  }
+  {
+    az_json_parser state = { 0 };
+    TEST_EXPECT_SUCCESS(az_json_parser_init(&state, AZ_SPAN_FROM_STR("1e18")));
+    az_json_token token;
+    TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_OK);
+    TEST_ASSERT(token.kind == AZ_JSON_TOKEN_NUMBER);
+    TEST_ASSERT(token.value.number == 1000000000000000000);
+    TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
+  }
+  {
+    az_json_parser state = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&state, AZ_SPAN_FROM_STR(" [ true, 0.3 ]")));
     az_json_token token = { 0 };
     TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_OK);
@@ -514,9 +530,10 @@ int main()
 
   test_http_response();
   test_span_builder_replace();
-  test_mut_span();
+  test_span();
 
   test_json_string();
+  test_json_value();
   test_log();
   test_az_span();
 

@@ -131,9 +131,34 @@ typedef struct
   int16_t exp;
 } az_dec_number;
 
-AZ_NODISCARD static double az_json_number_to_double(az_dec_number const* p)
+// try to convert a number to double
+// Return OVERFLOW when exp goes higher than 19 (double can hold 2 ^ 64 / 2, so 10 ^ 19 would be the
+// max exp supported)
+AZ_NODISCARD az_result az_json_number_to_double(az_dec_number const* p, double* out)
 {
-  return p->value * pow(10, p->exp) * p->sign;
+  if (p->exp >= 19)
+  {
+    return AZ_ERROR_BUFFER_OVERFLOW;
+  }
+
+  double calculated_pow = 1;
+  if (p->exp > 0)
+  {
+    for (int i = 0; i < p->exp; i++)
+    {
+      calculated_pow *= 10;
+    }
+  }
+  else
+  {
+    for (int i = 0; i < -p->exp; i++)
+    {
+      calculated_pow /= 10;
+    }
+  }
+
+  *out = p->value * calculated_pow * p->sign;
+  return AZ_OK;
 }
 
 AZ_NODISCARD static az_result az_span_reader_get_json_number_int(
@@ -212,7 +237,7 @@ AZ_NODISCARD static az_result az_span_reader_get_json_number_digit_rest(
   }
   if (az_span_length(*self) == 0)
   {
-    *out_value = az_json_number_to_double(&i);
+    AZ_RETURN_IF_FAILED(az_json_number_to_double(&i, out_value));
     return AZ_OK; // it's fine is int finish here (no fraction or something else)
   }
 
@@ -234,7 +259,7 @@ AZ_NODISCARD static az_result az_span_reader_get_json_number_digit_rest(
 
   if (az_span_length(*self) == 0)
   {
-    *out_value = az_json_number_to_double(&i);
+    AZ_RETURN_IF_FAILED(az_json_number_to_double(&i, out_value));
     return AZ_OK; // fine if number ends after a fraction
   }
 
@@ -285,7 +310,7 @@ AZ_NODISCARD static az_result az_span_reader_get_json_number_digit_rest(
     i.exp += e_int * e_sign;
   }
 
-  *out_value = az_json_number_to_double(&i);
+  AZ_RETURN_IF_FAILED(az_json_number_to_double(&i, out_value));
   return AZ_OK;
 }
 

@@ -16,10 +16,6 @@ pr:
       - feature/*
       - release/*
       - hotfix/*
-  paths:
-    include:
-      - sdk/
-      - eng/
 
 jobs:
   - template: ./templates/jobs/archetype-sdk-client.yml
