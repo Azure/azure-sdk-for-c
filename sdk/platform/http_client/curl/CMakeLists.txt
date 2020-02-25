@@ -29,7 +29,7 @@ elseif(CMAKE_C_COMPILER_ID MATCHES "Clang")
     set(WARNINGS_AS_ERRORS_FLAG "-Werror")
   endif()
 
-  target_compile_options(az_curl PRIVATE -Xclang -Wall -Wextra -pedantic  ${WARNINGS_AS_ERRORS_FLAG} -Wdocumentation -Wdocumentation-unknown-command -Wcast-qual)
+  target_compile_options(az_curl PRIVATE -Xclang -Wall -Wextra -pedantic  ${WARNINGS_AS_ERRORS_FLAG} -Wdocumentation -Wdocumentation-unknown-command -fcomment-block-commands=retval -Wcast-qual)
 else()
   if(WARNINGS_AS_ERRORS)
     set(WARNINGS_AS_ERRORS_FLAG "-Werror")
