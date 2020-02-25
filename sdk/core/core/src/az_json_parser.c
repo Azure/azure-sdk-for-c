@@ -133,7 +133,22 @@ typedef struct
 
 AZ_NODISCARD static double az_json_number_to_double(az_dec_number const* p)
 {
-  return p->value * pow(10, p->exp) * p->sign;
+  double calculated_pow = 1;
+  if (p->exp > 0)
+  {
+    for (int i = 0; i < p->exp; i++)
+    {
+      calculated_pow *= 10;
+    }
+  }
+  else
+  {
+    for (int i = 0; i < -p->exp; i++)
+    {
+      calculated_pow /= 10;
+    }
+  }
+  return p->value * calculated_pow * p->sign;
 }
 
 AZ_NODISCARD static az_result az_span_reader_get_json_number_int(

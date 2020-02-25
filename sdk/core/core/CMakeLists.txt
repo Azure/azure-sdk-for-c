@@ -8,7 +8,7 @@ project (az_core LANGUAGES C)
 set(CMAKE_C_STANDARD 99)
 
 add_library (
-  az_core STATIC
+  az_core
   src/az_aad.c
   src/az_credentials.c
   src/az_http_pipeline.c
@@ -46,10 +46,8 @@ else()
 endif()
 
 target_include_directories (az_core PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc> $<INSTALL_INTERFACE:include/az>)
-
-# create interface for internal headers
-add_library(az_core_internal INTERFACE)
-target_include_directories(az_core_internal INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/internal> $<INSTALL_INTERFACE:include/az_internal>)
+# include internal headers
+target_include_directories(az_core PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/internal> $<INSTALL_INTERFACE:include/az_internal>)
 
 set(AZ_PLATFORM_IMPL "NONE" CACHE STRING "Platform implementation to use")
 set_property(CACHE AZ_PLATFORM_IMPL PROPERTY STRINGS NONE WIN32 POSIX USER)
@@ -65,8 +63,6 @@ elseif(AZ_PLATFORM_IMPL STREQUAL "WIN32")
 else()
   set(AZ_PLATFORM_IMPL_NONE ON)
 endif()
-
-target_link_libraries(az_core PRIVATE az_core_internal)
 
 if(AZ_PLATFORM_IMPL_USER)
   target_link_libraries(az_core PRIVATE ${AZ_USER_PLATFORM_IMPL_NAME})
@@ -86,28 +82,3 @@ endif()
 
 # make sure that users can consume the project as a library.
 add_library (az::core ALIAS az_core)
-
-add_executable (
-    az_core_test 
-    test/main.c 
-    test/test_http_response_read_and_parse.c
-    test/test_json_builder.c
-    test/test_json_get_by_pointer.c
-    test/test_json_pointer.c
-    test/test_json_string.c
-    test/test_json_value.c
-    test/test_log.c
-    test/test_mut_span.c
-    test/test_span_builder_replace.c
-    )
-
-target_link_libraries(az_core_test PRIVATE az_core az_core_internal)
-target_include_directories (az_core_test PRIVATE src)
-
-if (UNIX)
-    target_link_libraries(az_core_test PRIVATE m)
-endif()
-
-target_include_directories (az_core_test PRIVATE test)
-
-add_test(NAME az_core_test COMMAND az_core_test)

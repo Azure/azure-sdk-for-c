@@ -10,7 +10,7 @@ set(CMAKE_C_STANDARD 99)
 # make keys client example
 add_executable (keys_client_example src/keys_client_example.c)
 
-target_link_libraries(keys_client_example PRIVATE az_keyvault az_core az_core_internal)
+target_link_libraries(keys_client_example PRIVATE az_keyvault az_core)
 
 if (UNIX)
   target_link_libraries(keys_client_example PRIVATE m)
