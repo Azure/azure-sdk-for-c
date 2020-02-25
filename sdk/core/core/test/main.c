@@ -23,6 +23,7 @@ void test_json_builder();
 void test_json_get_by_pointer();
 void test_json_pointer();
 void test_json_string();
+void test_json_value();
 void test_span_builder_replace();
 void test_mut_span();
 void test_log();
@@ -516,6 +517,7 @@ int main()
   test_mut_span();
 
   test_json_string();
+  test_json_value();
   test_log();
   return exit_code;
 }

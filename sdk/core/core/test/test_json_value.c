@@ -3,6 +3,7 @@
 
 #include <az_json.h>
 
+#include "../src/az_json_parser.c"
 #include <az_test.h>
 
 #include <_az_cfg.h>
@@ -47,5 +48,26 @@ void test_json_value()
   {
     double number_value = 0.79;
     TEST_ASSERT(az_json_token_get_number(json_string, &number_value) == AZ_ERROR_ITEM_NOT_FOUND);
+  }
+  {
+    az_dec_number number = {
+      .sign = 1,
+      .value = 1,
+      .remainder = false,
+      .exp = 19,
+    };
+    double result;
+    TEST_ASSERT(AZ_ERROR_BUFFER_OVERFLOW == az_json_number_to_double(&number, &result));
+  }
+  {
+    az_dec_number number = {
+      .sign = 1,
+      .value = 1,
+      .remainder = false,
+      .exp = 18,
+    };
+    double result;
+    TEST_ASSERT(AZ_OK == az_json_number_to_double(&number, &result));
+    TEST_ASSERT(result == 1000000000000000000);
   }
 }
