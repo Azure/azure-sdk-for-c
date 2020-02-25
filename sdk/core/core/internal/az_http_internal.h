@@ -101,6 +101,7 @@ az_http_client_send_request(_az_http_request* p_request, az_http_response* p_res
  */
 AZ_NODISCARD az_result az_http_request_init(
     _az_http_request* p_request,
+    az_context* context,
     az_http_method method,
     az_span url,
     az_span headers_buffer,

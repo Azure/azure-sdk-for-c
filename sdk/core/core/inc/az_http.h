@@ -12,6 +12,7 @@
 #define _az_HTTP_H
 
 #include <az_config.h>
+#include <az_context.h>
 #include <az_result.h>
 #include <az_span.h>
 
@@ -42,6 +43,7 @@ typedef struct
 {
   struct
   {
+    az_context* context;
     az_http_method method;
     az_span url;
     int32_t query_start;
