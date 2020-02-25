@@ -28,14 +28,14 @@ enum
 
 enum
 {
-  AZ_ERROR_FLAG = (int32_t)0x80000000,
+  _az_ERROR_FLAG = (int32_t)0x80000000,
 };
 
 #define _az_RESULT_MAKE_ERROR(facility, code) \
-  ((int32_t)(0x80000000 | ((uint32_t)(facility) << 16) | (uint32_t)(code)))
+  ((int32_t)(_az_ERROR_FLAG | ((int32_t)(facility) << 16) | (int32_t)(code)))
 
 #define _az_RESULT_MAKE_SUCCESS(facility, code) \
-  ((int32_t)(0x00000000 | ((uint32_t)(facility) << 16) | (uint32_t)(code)))
+  ((int32_t)(((int32_t)(facility) << 16) | (int32_t)(code)))
 
 #define AZ_RETURN_IF_FAILED(exp) \
   do \
@@ -92,9 +92,15 @@ typedef enum az_result
   AZ_ERROR_HTTP_RESPONSE_COULDNT_RESOLVE_HOST = _az_RESULT_MAKE_ERROR(AZ_FACILITY_HTTP, 7),
 } az_result;
 
-AZ_NODISCARD AZ_INLINE bool az_failed(az_result result) { return (result & AZ_ERROR_FLAG) != 0; }
+AZ_NODISCARD AZ_INLINE bool az_failed(az_result result)
+{
+  return ((int32_t)result & (int32_t)_az_ERROR_FLAG) != 0;
+}
 
-AZ_NODISCARD AZ_INLINE bool az_succeeded(az_result result) { return (result & AZ_ERROR_FLAG) == 0; }
+AZ_NODISCARD AZ_INLINE bool az_succeeded(az_result result)
+{
+  return ((int32_t)result & (int32_t)_az_ERROR_FLAG) == 0;
+}
 
 #include <_az_cfg_suffix.h>
 
