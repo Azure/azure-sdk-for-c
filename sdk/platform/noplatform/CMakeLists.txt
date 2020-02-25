@@ -8,7 +8,7 @@ set(CMAKE_C_STANDARD 99)
 
 add_library(az_noplatform STATIC)
 
-target_link_libraries(az_noplatform PRIVATE az_core az_core_internal)
+target_link_libraries(az_noplatform PRIVATE az_core)
 
 target_sources(az_noplatform PRIVATE src/az_noplatform.c)
 

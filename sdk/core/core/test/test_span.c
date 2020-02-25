@@ -8,7 +8,7 @@
 
 #include <_az_cfg.h>
 
-void test_mut_span()
+void test_span()
 {
   // swap
   {

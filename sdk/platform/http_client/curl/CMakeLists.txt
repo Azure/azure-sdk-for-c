@@ -38,7 +38,7 @@ else()
   target_compile_options(az_curl PRIVATE -Wall -Wextra -pedantic  ${WARNINGS_AS_ERRORS_FLAG})
 endif()
 
-target_link_libraries(az_curl PRIVATE az_core az_core_internal)
+target_link_libraries(az_curl PRIVATE az_core)
 
 # make sure that users can consume the project as a library.
 add_library (az::curl ALIAS az_curl)

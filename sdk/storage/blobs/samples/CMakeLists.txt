@@ -9,7 +9,7 @@ set(CMAKE_C_STANDARD 99)
 
 # make keys client example
 add_executable (blobs_client_example src/blobs_client_example.c)
-target_link_libraries(blobs_client_example PRIVATE az_storage_blobs az_core az_core_internal az_curl)
+target_link_libraries(blobs_client_example PRIVATE az_storage_blobs az_core)
 
 if (UNIX)
   target_link_libraries(blobs_client_example PRIVATE m)
