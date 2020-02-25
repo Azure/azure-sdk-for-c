@@ -142,7 +142,7 @@ static az_span const sample1 = AZ_SPAN_LITERAL_FROM_STR( //
     "    \"200\": {\n"
     "      \"body\": {\n"
     "        \"hasLegalHold\": false,\n"
-    "          \"tags\" : []\n"
+    "          \"tags\" : -01\n"
     "      }\n"
     "    }\n"
     "  }\n"
