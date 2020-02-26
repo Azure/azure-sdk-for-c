@@ -332,6 +332,12 @@ int main()
   }
   {
     az_json_parser state = { 0 };
+    TEST_EXPECT_SUCCESS(az_json_parser_init(&state, AZ_SPAN_FROM_STR("10000000000000000000000e17")));
+    az_json_token token;
+    TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_ERROR_BUFFER_OVERFLOW);
+  }
+  {
+    az_json_parser state = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&state, AZ_SPAN_FROM_STR("1e18")));
     az_json_token token;
     TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_OK);
