@@ -38,6 +38,7 @@ add_subdirectory(sdk/keyvault/keyvault)
 add_subdirectory(sdk/keyvault/keyvault/test)
 add_subdirectory(sdk/storage/blobs)
 add_subdirectory(sdk/storage/blobs/test)
+add_subdirectory(sdk/iot/core)
 
 # PAL
 add_subdirectory(sdk/platform/noplatform)
@@ -49,3 +50,4 @@ if(NOT DEFINED ENV{AZ_SDK_C_NO_SAMPLES})
   add_subdirectory(sdk/keyvault/keyvault/samples)
   add_subdirectory(sdk/storage/blobs/samples)
 endif()
+
