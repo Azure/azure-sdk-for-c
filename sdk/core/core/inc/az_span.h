@@ -23,12 +23,14 @@
  */
 typedef struct
 {
+  /// @internal
   struct
   {
     uint8_t* ptr;
     int32_t length;
     int32_t capacity;
   } _internal;
+  /// @endinternal
 } az_span;
 
 /********************************  SPAN GETTERS */
@@ -59,10 +61,12 @@ AZ_NODISCARD AZ_INLINE int32_t az_span_capacity(az_span span) { return span._int
  */
 AZ_NODISCARD AZ_INLINE az_span az_span_null() { return (az_span){ 0 }; }
 
+/// @internal
 // A size of the string literal.
 // Details: to make sure that `S` is a `string literal`, we are appending `""`
 // to `S`.
 #define _az_STRING_LITERAL_LEN(S) (sizeof(S "") - 1)
+/// @endinternal
 
 /**
  * Creates an az_span literal which can be used to initialize a constant. For example

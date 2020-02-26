@@ -18,8 +18,10 @@
 
 #include <_az_cfg_prefix.h>
 
+/// @internal
 #define _az_LOG_MAKE_CLASSIFICATION(facility, code) \
   ((int32_t)((uint32_t)(facility) << 16) | (uint32_t)(code))
+/// @endinternal
 
 typedef enum
 {
