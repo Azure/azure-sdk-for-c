@@ -21,15 +21,18 @@ static az_span const AZ_STORAGE_API_VERSION = AZ_SPAN_LITERAL_FROM_STR("2019-02-
 typedef struct
 {
   az_http_policy_retry_options retry;
+  /// @internal
   struct
   {
     _az_http_policy_apiversion_options api_version;
     _az_http_policy_telemetry_options _telemetry_options;
   } _internal;
+  /// @endinternal
 } az_storage_blobs_blob_client_options;
 
 typedef struct
 {
+  /// @internal
   struct
   {
     // buffer to copy customer url. Then it stays immutable
@@ -40,6 +43,7 @@ typedef struct
     az_storage_blobs_blob_client_options options;
     _az_credential* credential;
   } _internal;
+  /// @endinternal
 } az_storage_blobs_blob_client;
 
 AZ_NODISCARD az_result az_storage_blobs_blob_client_init(

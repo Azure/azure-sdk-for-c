@@ -8,10 +8,12 @@
 
 struct az_platform_mtx
 {
+  /// @internal
   struct
   {
     char unused;
   } _internal;
+  /// @endinternal
 };
 
 #include <_az_cfg_suffix.h>
