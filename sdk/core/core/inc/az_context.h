@@ -87,4 +87,4 @@ AZ_NODISCARD az_result az_context_get_value(az_context const* context, void* key
 
 #include <_az_cfg_suffix.h>
 
-#endif
+#endif // _az_CONTEXT_H
