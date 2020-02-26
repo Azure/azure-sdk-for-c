@@ -21,7 +21,7 @@ elseif(CMAKE_C_COMPILER_ID MATCHES "Clang")
     set(WARNINGS_AS_ERRORS_FLAG "-Werror")
   endif()
 
-  target_compile_options(az_nohttp PRIVATE -Xclang -Wall -Wextra -pedantic  ${WARNINGS_AS_ERRORS_FLAG} -Wdocumentation -Wdocumentation-unknown-command -Wcast-qual)
+  target_compile_options(az_nohttp PRIVATE -Xclang -Wall -Wextra -pedantic  ${WARNINGS_AS_ERRORS_FLAG} -Wdocumentation -Wdocumentation-unknown-command -fcomment-block-commands=retval -Wcast-qual)
 else()
   if(WARNINGS_AS_ERRORS)
     set(WARNINGS_AS_ERRORS_FLAG "-Werror")
@@ -30,7 +30,7 @@ else()
   target_compile_options(az_nohttp PRIVATE -Wall -Wextra -pedantic  ${WARNINGS_AS_ERRORS_FLAG})
 endif()
 
-target_link_libraries(az_nohttp PRIVATE az_core az_core_internal)
+target_link_libraries(az_nohttp PRIVATE az_core)
 
 # make sure that users can consume the project as a library.
 add_library (az::nohttp ALIAS az_nohttp)

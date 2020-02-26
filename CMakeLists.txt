@@ -24,26 +24,30 @@ enable_testing ()
 include(eng/cmake/global_compile_options.txt)
 
 add_subdirectory(sdk/core/core)
+add_subdirectory(sdk/core/core/test)
 
 add_subdirectory(sdk/platform/http_client/nohttp)
-# Adding trasnport implementation for curl
+# Adding transport implementation for curl
 # Users can still build Core and SDK client without depending on a HTPP transport implementation
 if(BUILD_CURL_TRANSPORT)
   add_subdirectory(sdk/platform/http_client/curl)
 endif()
 
+# SDK Clients and tests
 add_subdirectory(sdk/keyvault/keyvault)
+add_subdirectory(sdk/keyvault/keyvault/test)
+add_subdirectory(sdk/storage/blobs)
+add_subdirectory(sdk/storage/blobs/test)
+add_subdirectory(sdk/iot/core)
+
+# PAL
 add_subdirectory(sdk/platform/noplatform)
 add_subdirectory(sdk/platform/posix)
 add_subdirectory(sdk/platform/win32)
-add_subdirectory(sdk/storage/blobs)
 
+# User can disable samples generation by setting env variable AZ_SDK_C_NO_SAMPLES
 if(NOT DEFINED ENV{AZ_SDK_C_NO_SAMPLES})
-  # current samples require an HTTP transport implementation.
-  # disable adding samples if building CURL transport is disabled
-  # Remove this condition if implementing another http transport and link that with samples
-  if(BUILD_CURL_TRANSPORT)
-    add_subdirectory(sdk/keyvault/keyvault/samples)
-    add_subdirectory(sdk/storage/blobs/samples)
-  endif()
+  add_subdirectory(sdk/keyvault/keyvault/samples)
+  add_subdirectory(sdk/storage/blobs/samples)
 endif()
+

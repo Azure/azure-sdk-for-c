@@ -10,7 +10,7 @@ set(CMAKE_C_STANDARD 99)
 
 add_library(az_posix STATIC)
 
-target_link_libraries(az_posix PRIVATE az_core az_core_internal)
+target_link_libraries(az_posix PRIVATE az_core)
 
 target_sources(az_posix PRIVATE src/az_posix.c)
 
