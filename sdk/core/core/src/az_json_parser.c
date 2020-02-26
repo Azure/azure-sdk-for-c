@@ -140,7 +140,7 @@ AZ_NODISCARD static double _ten_to_exp(int16_t exp)
 
   while (abs_exp > 0)
   {
-    // non even exp would update result to current incremented base
+    // odd exp would update result to current incremented base
     if (abs_exp & 1)
     {
       result = exp < 0 ? result / incrementing_base : result * incrementing_base;
