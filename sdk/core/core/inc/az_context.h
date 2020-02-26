@@ -30,11 +30,12 @@ struct az_context
   {
     az_context const* parent; // Pointer to parent context (or NULL); immutable after creation
     int64_t expiration; // Time when context expires
-    void *key, *value; // Pointers to the key & value (usually NULL)
+    void* key;
+    void* value; // Pointers to the key & value (usually NULL)
   } _internal;
 };
 
-#define _az_context_max_expiration 0x7FFFFFFFFFFFFFFF
+#define _az_CONTEXT_MAX_EXPIRATION 0x7FFFFFFFFFFFFFFF
 
 extern az_context az_context_app;
 
@@ -51,18 +52,17 @@ az_context_with_value(az_context const* parent, void* key, void* value)
 {
   return (az_context){
     ._internal
-    = { .parent = parent, .expiration = _az_context_max_expiration, .key = key, .value = value }
+    = { .parent = parent, .expiration = _az_CONTEXT_MAX_EXPIRATION, .key = key, .value = value }
   };
 }
 
 // Cancels an az_context node in the tree; this effectively cancels all the child nodes as well.
 AZ_INLINE void az_context_cancel(az_context* context)
 {
-  if (context == NULL)
+  if (context != NULL)
   {
-    return;
+    context->_internal.expiration = 0; // The beginning of time
   }
-  context->_internal.expiration = 0; // The beginning of time
 }
 
 /**
