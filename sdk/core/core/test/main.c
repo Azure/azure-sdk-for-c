@@ -27,6 +27,7 @@ void test_json_value();
 void test_span_builder_replace();
 void test_span();
 void test_log();
+void test_az_span();
 
 int exit_code = 0;
 
@@ -540,5 +541,6 @@ int main()
   test_json_string();
   test_json_value();
   test_log();
+
   return exit_code;
 }

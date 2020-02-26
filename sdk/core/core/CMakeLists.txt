@@ -82,3 +82,4 @@ endif()
 
 # make sure that users can consume the project as a library.
 add_library (az::core ALIAS az_core)
+
