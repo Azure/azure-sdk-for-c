@@ -130,7 +130,9 @@ void test_json_parser()
     az_json_token token;
     TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
   }
+  /* Testing parsing number and converting to double (az_json_number_to_double) */
   {
+    // no exp number, decimal only
     az_json_parser state = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&state, AZ_SPAN_FROM_STR(" 23 ")));
     az_json_token token;
@@ -140,6 +142,7 @@ void test_json_parser()
     TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
   }
   {
+    // negative number with decimals
     az_json_parser state = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&state, AZ_SPAN_FROM_STR(" -23.56")));
     az_json_token token;
@@ -148,8 +151,8 @@ void test_json_parser()
     TEST_ASSERT(token.value.number == -23.56);
     TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
   }
-  /* Testing parsing number and converting to double (az_json_number_to_double) */
   {
+    // negative + decimals + exp
     az_json_parser state = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&state, AZ_SPAN_FROM_STR(" -23.56e-3")));
     az_json_token token;
@@ -159,25 +162,55 @@ void test_json_parser()
     TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
   }
   {
+    // exp
     az_json_parser state = { 0 };
-    TEST_EXPECT_SUCCESS(az_json_parser_init(&state, AZ_SPAN_FROM_STR("1e19")));
+    TEST_EXPECT_SUCCESS(az_json_parser_init(&state, AZ_SPAN_FROM_STR("1e50")));
     az_json_token token;
-    TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_ERROR_BUFFER_OVERFLOW);
+    TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_OK);
+    TEST_ASSERT(token.kind == AZ_JSON_TOKEN_NUMBER);
   }
   {
+    // big decimal + exp
     az_json_parser state = { 0 };
     TEST_EXPECT_SUCCESS(
         az_json_parser_init(&state, AZ_SPAN_FROM_STR("10000000000000000000000e17")));
     az_json_token token;
-    TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_ERROR_BUFFER_OVERFLOW);
+    TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_OK);
+    TEST_ASSERT(token.kind == AZ_JSON_TOKEN_NUMBER);
   }
   {
+    // exp inf -> Any value above double MAX range would be translated to positive inf
     az_json_parser state = { 0 };
-    TEST_EXPECT_SUCCESS(az_json_parser_init(&state, AZ_SPAN_FROM_STR("1e18")));
+    TEST_EXPECT_SUCCESS(az_json_parser_init(&state, AZ_SPAN_FROM_STR("1e309")));
+    az_json_token token;
+    TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_OK);
+    // Create inf number with  IEEE 754 standard
+    // floating point number containing all zeroes in the mantissa (first twenty-three bits), and
+    // all ones in the exponent (next eight bits)
+    unsigned int p = 0x7F800000; // 0xFF << 23
+    float positiveInfinity = *(float*)&p;
+    TEST_ASSERT(token.kind == AZ_JSON_TOKEN_NUMBER);
+    TEST_ASSERT(token.value.number == positiveInfinity);
+    TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
+  }
+  {
+    // exp inf -> Any value below double MIN range would be translated 0
+    az_json_parser state = { 0 };
+    TEST_EXPECT_SUCCESS(az_json_parser_init(&state, AZ_SPAN_FROM_STR("1e-400")));
     az_json_token token;
     TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_OK);
     TEST_ASSERT(token.kind == AZ_JSON_TOKEN_NUMBER);
-    TEST_ASSERT(token.value.number == 1000000000000000000);
+    TEST_ASSERT(token.value.number == 0);
+    TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
+  }
+  {
+    // negative exp
+    az_json_parser state = { 0 };
+    TEST_EXPECT_SUCCESS(az_json_parser_init(&state, AZ_SPAN_FROM_STR("1e-18")));
+    az_json_token token;
+    TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_OK);
+    TEST_ASSERT(token.kind == AZ_JSON_TOKEN_NUMBER);
+    TEST_ASSERT(token.value.number == 0.000000000000000001);
     TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
   }
   /* end of Testing parsing number and converting to double */
@@ -282,6 +315,7 @@ void test_json_parser()
   }
 }
 
+// Aux funtions
 az_result read_write(az_span input, az_span* output, int32_t* o)
 {
   az_json_parser parser = { 0 };

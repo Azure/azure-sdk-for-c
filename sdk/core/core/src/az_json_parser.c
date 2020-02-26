@@ -131,7 +131,11 @@ typedef struct
   int16_t exp;
 } az_dec_number;
 
-// calculate 10 ^ exp with O(log exp) by doing incremental multiplication
+/* Calculate 10 ^ exp with O(log exp) by doing incremental multiplication
+ If result goes beyone double limits (Overflow), infinite is returned based on standard IEEE_754
+ https://en.wikipedia.org/wiki/IEEE_754.
+ If Underflow, 0 is returned
+*/
 AZ_NODISCARD static double _ten_to_exp(int16_t exp)
 {
   double result = 1;
@@ -146,23 +150,15 @@ AZ_NODISCARD static double _ten_to_exp(int16_t exp)
       result = exp < 0 ? result / incrementing_base : result * incrementing_base;
     }
 
-    abs_exp = abs_exp >> 1;
+    abs_exp /= 2;
     incrementing_base = incrementing_base * incrementing_base;
   }
   return result;
 }
 
-// try to convert a number to double
-// Return OVERFLOW when exp goes higher than 19 (double can hold 2 ^ 64 / 2, so 10 ^ 19 would be the
-// max exp supported)
+// double result follows IEEE_754 https://en.wikipedia.org/wiki/IEEE_754
 AZ_NODISCARD az_result az_json_number_to_double(az_dec_number const* p, double* out)
 {
-  if (p->exp >= 19)
-  {
-    // Can't hold more than 10^18 into double
-    return AZ_ERROR_BUFFER_OVERFLOW;
-  }
-
   *out = p->value * _ten_to_exp(p->exp) * p->sign;
   return AZ_OK;
 }

@@ -18,33 +18,38 @@
 
 #include <_az_cfg.h>
 
-void test_http_response();
+// Defining functions that should be defined in some other .c file
 void test_json_builder();
 void test_json_get_by_pointer();
+void test_json_parser();
 void test_json_pointer();
 void test_json_string();
 void test_json_value();
-void test_span_builder_replace();
-void test_span();
-void test_log();
-void test_az_span();
-void test_json_pointer();
-void test_url_encode();
+
+void test_http_response();
 void test_http_request();
+
+void test_span();
+void test_span_builder_replace();
+
+void test_log();
+
+void test_url_encode();
+// end of Defining functions that should be defined in some other .c file
 
 int exit_code = 0;
 
 int main()
 {
-  test_json_get_by_pointer();
-  test_json_pointer();
   test_json_builder();
+  test_json_get_by_pointer();
+  test_json_parser();
+  test_json_pointer();
   test_json_string();
   test_json_value();
-  test_json_pointer();
 
-  test_http_response();
   test_http_request();
+  test_http_response();
 
   test_span();
   test_span_builder_replace();
