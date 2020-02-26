@@ -5,6 +5,7 @@
 #define _az_STORAGE_BLOBS_H
 
 #include <az_config.h>
+#include <az_context.h>
 #include <az_contract_internal.h>
 #include <az_credentials.h>
 #include <az_http.h>
@@ -77,6 +78,7 @@ typedef struct
  */
 AZ_NODISCARD az_result az_storage_blobs_blob_upload(
     az_storage_blobs_blob_client* client,
+    az_context* context,
     az_span content, /* Buffer of content*/
     az_storage_blobs_blob_upload_options* options,
     az_http_response* response);

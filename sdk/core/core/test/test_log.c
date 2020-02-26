@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include <az_context.h>
 #include <az_http.h>
 #include <az_http_internal.h>
 #include <az_http_private.h>
@@ -66,6 +67,7 @@ void test_log()
   _az_http_request hrb = { 0 };
   TEST_EXPECT_SUCCESS(az_http_request_init(
       &hrb,
+      &az_context_app,
       az_http_method_get(),
       AZ_SPAN_FROM_STR("https://www.example.com"),
       AZ_SPAN_FROM_BUFFER(headers),

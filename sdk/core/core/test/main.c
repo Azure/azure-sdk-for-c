@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include <az_context.h>
 #include <az_http.h>
 #include <az_http_internal.h>
 #include <az_http_transport.h>
@@ -27,6 +28,7 @@ void test_json_value();
 void test_span_builder_replace();
 void test_span();
 void test_log();
+void test_az_context();
 void test_az_span();
 
 int exit_code = 0;
@@ -207,6 +209,7 @@ static az_span hrb_header_authorization_token2
 
 int main()
 {
+  test_az_context();
   test_json_get_by_pointer();
   test_json_pointer();
   test_json_builder();
@@ -462,8 +465,8 @@ int main()
       az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
       _az_http_request hrb;
 
-      TEST_EXPECT_SUCCESS(
-          az_http_request_init(&hrb, az_http_method_get(), url_span, header_span, az_span_null()));
+      TEST_EXPECT_SUCCESS(az_http_request_init(
+          &hrb, &az_context_app, az_http_method_get(), url_span, header_span, az_span_null()));
       TEST_ASSERT(az_span_is_equal(hrb._internal.method, az_http_method_get()));
       TEST_ASSERT(az_span_is_equal(hrb._internal.url, url_span));
       TEST_ASSERT(az_span_capacity(hrb._internal.url) == 100);

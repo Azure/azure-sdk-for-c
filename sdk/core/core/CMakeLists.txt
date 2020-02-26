@@ -11,6 +11,7 @@ add_library (
   az_core
   src/az_aad.c
   src/az_credentials.c
+  src/az_context.c
   src/az_http_pipeline.c
   src/az_http_policy.c
   src/az_http_request.c
