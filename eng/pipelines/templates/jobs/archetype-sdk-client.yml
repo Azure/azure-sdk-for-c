@@ -160,6 +160,12 @@ jobs:
       ctest -C Debug
     workingDirectory: build
     displayName: ctest
+- task: Bash@3
+    inputs:
+      targetType: inline
+      script: |        
+        echo "##vso[task.setvariable variable=CMOCKA_XML_FILE;]%g-test-results.xml"
+        echo "##vso[task.setvariable variable=CMOCKA_MESSAGE_OUTPUT;]xml"
   # Publish Test Results
   # Publish test results to Azure Pipelines
   - task: PublishTestResults@2
