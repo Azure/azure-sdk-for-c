@@ -74,7 +74,7 @@ int main()
   // buffer for tags   ->  adding tags
   key_options.tags = (az_pair[]){ az_pair_from_str("aKey", "aValue"),
                                   az_pair_from_str("bKey", "bValue"),
-                                  az_pair_null() };
+                                  AZ_PAIR_NULL };
 
   az_result const create_result = az_keyvault_keys_key_create(
       &client,
