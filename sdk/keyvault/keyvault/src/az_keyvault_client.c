@@ -186,7 +186,7 @@ AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
         for (size_t op = 0; true; ++op)
         {
           az_span s = options->operations[op];
-          if (az_span_is_equal(s, az_span_null()))
+          if (az_span_is_equal(s, AZ_SPAN_NULL))
           {
             break;
           }
@@ -202,7 +202,7 @@ AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
         for (size_t tag_index = 0; true; ++tag_index)
         {
           az_pair const tag = options->tags[tag_index];
-          if (az_span_is_equal(tag.key, az_span_null()))
+          if (az_span_is_equal(tag.key, AZ_SPAN_NULL))
           {
             break;
           }
@@ -297,7 +297,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
   // create request
   _az_http_request hrb;
   AZ_RETURN_IF_FAILED(az_http_request_init(
-      &hrb, context, az_http_method_get(), request_url_span, request_headers_span, az_span_null()));
+      &hrb, context, az_http_method_get(), request_url_span, request_headers_span, AZ_SPAN_NULL));
 
   // Add path to request
   AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, az_keyvault_client_constant_for_keys()));
@@ -339,7 +339,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_delete(
       az_http_method_delete(),
       request_url_span,
       request_headers_span,
-      az_span_null()));
+      AZ_SPAN_NULL));
 
   // Add path to request
   AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, az_keyvault_client_constant_for_keys()));

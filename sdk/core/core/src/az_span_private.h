@@ -41,7 +41,7 @@ AZ_NODISCARD AZ_INLINE az_span az_span_drop(az_span span, int32_t n)
 {
   if (az_span_capacity(span) <= n)
   {
-    return az_span_null();
+    return AZ_SPAN_NULL;
   }
   int32_t current_length = az_span_length(span);
   int32_t current_capacity = az_span_capacity(span);
