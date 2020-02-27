@@ -67,5 +67,5 @@ int main(void)
     cmocka_unit_test(test_json_token_number),
   };
 
-  return cmocka_run_group_tests(tests, NULL, NULL);
+  return cmocka_run_group_tests_name("az_json", tests, NULL, NULL);
 }

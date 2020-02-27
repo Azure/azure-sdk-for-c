@@ -27,5 +27,5 @@ int main(void)
     cmocka_unit_test(test_az_span_getters),
   };
 
-  return cmocka_run_group_tests(tests, NULL, NULL);
+  return cmocka_run_group_tests_name("az_span", tests, NULL, NULL);
 }
