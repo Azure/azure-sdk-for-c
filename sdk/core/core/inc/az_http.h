@@ -304,7 +304,7 @@ az_http_response_init(az_http_response* self, az_span http_response)
     ._internal = {
       .http_response = http_response,
       .parser = {
-        .remaining = az_span_null(),
+        .remaining = AZ_SPAN_NULL,
         .next_kind = AZ_HTTP_RESPONSE_KIND_STATUS_LINE,
       },
     },

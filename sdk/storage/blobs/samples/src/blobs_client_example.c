@@ -51,7 +51,7 @@ az_storage_blobs_blob_download(az_storage_blobs_blob_client* client, az_http_res
       az_http_method_get(),
       request_url_span,
       request_headers_span,
-      az_span_null()));
+      AZ_SPAN_NULL));
 
   // start pipeline
   return az_http_pipeline_process(&client->_internal.pipeline, &hrb, response);
@@ -79,7 +79,7 @@ az_storage_blobs_blob_delete(az_storage_blobs_blob_client* client, az_http_respo
       az_http_method_delete(),
       request_url_span,
       request_headers_span,
-      az_span_null()));
+      AZ_SPAN_NULL));
 
   // start pipeline
   return az_http_pipeline_process(&client->_internal.pipeline, &hrb, response);
