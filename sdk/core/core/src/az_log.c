@@ -8,6 +8,7 @@
 #include <az_log.h>
 #include <az_log_internal.h>
 #include <az_span.h>
+#include <az_config.h>
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -21,8 +22,6 @@ enum
         // _az_LOG_VALUE_MAX_LENGTH, we trim their contents (decorate with ellipsis in the middle)
         // to make sure each individual header value does not exceed _az_LOG_VALUE_MAX_LENGTH so
         // that they don't blow up the logs.
-  _az_LOG_MSG_BUF_SIZE = 1024, // Size (in bytes) of the buffer to allocate on stack when building a
-                               // log message => the maximum size of the log message.
 };
 
 static az_log_classification const* _az_log_classifications = NULL;
@@ -194,7 +193,7 @@ static az_result _az_log_http_response_msg(
 
 void _az_log_http_request(_az_http_request* hrb)
 {
-  uint8_t log_msg_buf[_az_LOG_MSG_BUF_SIZE] = { 0 };
+  uint8_t log_msg_buf[AZ_LOG_MSG_BUF_SIZE] = { 0 };
   az_span log_msg_bldr = AZ_SPAN_FROM_BUFFER(log_msg_buf);
   (void)_az_log_http_request_msg(&log_msg_bldr, hrb);
   az_log_write(AZ_LOG_HTTP_REQUEST, log_msg_bldr);
@@ -202,7 +201,7 @@ void _az_log_http_request(_az_http_request* hrb)
 
 void _az_log_http_response(az_http_response* response, int64_t duration_msec, _az_http_request* hrb)
 {
-  uint8_t log_msg_buf[_az_LOG_MSG_BUF_SIZE] = { 0 };
+  uint8_t log_msg_buf[AZ_LOG_MSG_BUF_SIZE] = { 0 };
   az_span log_msg_bldr = AZ_SPAN_FROM_BUFFER(log_msg_buf);
   (void)_az_log_http_response_msg(&log_msg_bldr, response, duration_msec, hrb);
   az_log_write(AZ_LOG_HTTP_RESPONSE, log_msg_bldr);
