@@ -103,6 +103,13 @@ jobs:
       cmakeArgs: --build .
     displayName: cmake build
   - script: |
-      ctest -C Debug
+      ctest -O test_output.txt
     workingDirectory: build
     displayName: ctest
+  # Publish Test Results
+  # Publish test results to Azure Pipelines
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: 'cTest'
+      testResultsFiles: '**/test_output.txt' 
+      publishRunAttachments: true
