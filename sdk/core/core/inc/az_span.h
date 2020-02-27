@@ -13,6 +13,7 @@
 #include <az_result.h>
 
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -57,7 +58,7 @@ AZ_NODISCARD AZ_INLINE int32_t az_span_capacity(az_span span) { return span._int
  * @brief Creates an empty span
  *
  */
-#define AZ_SPAN_NULL (az_span){ ._internal.ptr = NULL, ._internal.length = 0, ._internal.capacity = 0 }
+#define AZ_SPAN_NULL (az_span){ ._internal = {.ptr = NULL, .length = 0, .capacity = 0} }
 
 // A size of the string literal.
 // Details: to make sure that `S` is a `string literal`, we are appending `""`
