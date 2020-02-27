@@ -160,3 +160,10 @@ jobs:
       ctest -C Debug
     workingDirectory: build
     displayName: ctest
+  # Publish Test Results
+  # Publish test results to Azure Pipelines
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: 'cTest'
+      testResultsFiles: 'sdk/core/core/unit_test_with_cmocka/*test-results.xml' 
+      publishRunAttachments: true
