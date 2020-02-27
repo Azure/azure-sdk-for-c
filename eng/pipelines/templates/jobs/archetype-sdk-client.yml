@@ -103,6 +103,10 @@ jobs:
         build.args: ' -DUNIT_TESTING=ON'
   pool:
     vmImage: $(vm.image)
+  variables:
+    CMOCKA_XML_FILE: "%g-test-results.xml"
+    CMOCKA_MESSAGE_OUTPUT: "xml"
+
   steps:
   - checkout: self
     submodules: recursive
@@ -160,16 +164,12 @@ jobs:
       ctest -C Debug
     workingDirectory: build
     displayName: ctest
-- task: Bash@3
-    inputs:
-      targetType: inline
-      script: |        
-        echo "##vso[task.setvariable variable=CMOCKA_XML_FILE;]%g-test-results.xml"
-        echo "##vso[task.setvariable variable=CMOCKA_MESSAGE_OUTPUT;]xml"
   # Publish Test Results
   # Publish test results to Azure Pipelines
   - task: PublishTestResults@2
     inputs:
-      testResultsFormat: 'cTest'
-      testResultsFiles: 'sdk/core/core/unit_test_with_cmocka/*test-results.xml' 
-      publishRunAttachments: true
+      testResultsFormat: 'JUnit'
+      testResultsFiles: '**/*-test-results.xml' 
+      mergeTestResults: true
+      testRunTitle: 'Azure SDK C99 - $(vm.image)_$(VCPKG_DEFAULT_TRIPLET)'
+    condition: contains(variables['vcpkg.deps'], 'cmocka')
