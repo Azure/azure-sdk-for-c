@@ -125,7 +125,7 @@ int main()
 }
 ```
 
-Here the classifications are set to `AZ_LOG_HTTP_REQUEST` and `AZ_LOG_RESPONSE`. Should the `AZ_LOG_HTTP_REQUEST` be omitted from the set of classifications, the log message in `some_http_request_code()` will not be logged.
+Here the classifications are set to `AZ_LOG_HTTP_REQUEST` and `AZ_LOG_HTTP_RESPONSE`. Should the `AZ_LOG_HTTP_REQUEST` be omitted from the set of classifications, the log message in `some_http_request_code()` will not be logged.
 
 If no classifications are set then all messages are logged.
 
