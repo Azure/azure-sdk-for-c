@@ -28,7 +28,7 @@ Use PowerShell to run {projectDir}/build.ps1
 <br> - Add windows system variable: VCPKG_ROOT=[PATH_TO_VCPKG] (replace PATH_TO_VCPKG for where vcpkg is installed)
 
 ##### Visual Studio 2019
-When following previous steps to set up CURL with VCPKG, open project forlder with Visual Studio and everything will be ready to build and run tests.
+When following previous steps to set up CURL with VCPKG, open project folder with Visual Studio and everything will be ready to build and run tests.
 
 #### Linux
 - Install `openssl version 1.1.1`
