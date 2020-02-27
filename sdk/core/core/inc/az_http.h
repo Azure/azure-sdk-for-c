@@ -21,13 +21,13 @@
 
 #include <_az_cfg_prefix.h>
 
-/// @internal
+/// @internal <a></a>
 typedef enum
 {
   _az_http_policy_apiversion_option_location_header,
   _az_http_policy_apiversion_option_location_queryparameter
 } _az_http_policy_apiversion_option_location;
-/// @endinternal
+/// @endinternal <a></a>
 
 /**
  * @brief Define az_http_method as an az_span so it is limited to that type and not to any az_span
@@ -41,7 +41,7 @@ typedef az_span az_http_method;
  * utility variables. User should never access field _internal directly
  *
  */
-/// @internal
+/// @internal <a></a>
 typedef struct
 {
   struct
@@ -56,7 +56,7 @@ typedef struct
     az_span body;
   } _internal;
 } _az_http_request;
-/// @endinternal
+/// @endinternal <a></a>
 
 typedef enum
 {
@@ -81,7 +81,7 @@ typedef enum
  */
 typedef struct
 {
-  /// @internal
+  /// @internal <a></a>
   struct
   {
     az_span http_response;
@@ -92,10 +92,10 @@ typedef struct
                                        // thing we will be parsing.
     } parser;
   } _internal;
-  /// @endinternal
+  /// @endinternal <a></a>
 } az_http_response;
 
-/// @internal
+/// @internal <a></a>
 /**
  * @brief Declaring az_http_policy for using it to create policy process callback
  * _az_http_policy_process_fn definition. Definition is added below after it.
@@ -185,7 +185,7 @@ AZ_NODISCARD AZ_INLINE _az_http_policy_telemetry_options _az_http_policy_telemet
 {
   return (_az_http_policy_telemetry_options){ .os = AZ_SPAN_FROM_STR("Unknown OS") };
 }
-/// @endinternal
+/// @endinternal <a></a>
 
 /**
  * @brief Retry configuration for an HTTP pipeline
