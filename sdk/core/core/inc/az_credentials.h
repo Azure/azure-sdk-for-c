@@ -18,7 +18,7 @@
 
 #include <_az_cfg_prefix.h>
 
-/// @internal
+/// @internal <a></a>
 enum
 {
   _az_TOKEN_BUF_SIZE = 2 * 1024,
@@ -66,7 +66,7 @@ typedef struct
     _az_credential_set_scopes_fn set_scopes; // NULL if this credential doesn't support scopes.
   } _internal;
 } _az_credential;
-/// @endinternal
+/// @endinternal <a></a>
 
 /**
  * @brief a type of az_credential that uses tentant, client and client secret inputs to get
@@ -75,7 +75,7 @@ typedef struct
  */
 typedef struct
 {
-  /// @internal
+  /// @internal <a></a>
   struct
   {
     _az_credential credential; // must be the first field in every credential structure
@@ -85,7 +85,7 @@ typedef struct
     az_span scopes;
     _az_token token;
   } _internal;
-  /// @endinternal
+  /// @endinternal <a></a>
 } az_client_secret_credential;
 
 /**

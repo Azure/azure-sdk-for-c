@@ -30,12 +30,12 @@
 
 struct az_platform_mtx
 {
-  /// @internal
+  /// @internal <a></a>
   struct
   {
     CRITICAL_SECTION cs;
   } _internal;
-  /// @endinternal
+  /// @endinternal <a></a>
 };
 
 #include <_az_cfg_suffix.h>

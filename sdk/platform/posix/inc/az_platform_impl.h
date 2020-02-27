@@ -10,12 +10,12 @@
 
 struct az_platform_mtx
 {
-  /// @internal
+  /// @internal <a></a>
   struct
   {
     pthread_mutex_t mutex;
   } _internal;
-  /// @endinternal
+  /// @endinternal <a></a>
 };
 
 #include <_az_cfg_suffix.h>

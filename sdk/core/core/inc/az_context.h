@@ -26,7 +26,7 @@ typedef struct az_context az_context;
  */
 struct az_context
 {
-  /// @internal
+  /// @internal <a></a>
   struct
   {
     az_context const* parent; // Pointer to parent context (or NULL); immutable after creation
@@ -34,12 +34,12 @@ struct az_context
     void* key;
     void* value; // Pointers to the key & value (usually NULL)
   } _internal;
-  /// @endinternal
+  /// @endinternal <a></a>
 };
 
-/// @internal
+/// @internal <a></a>
 #define _az_CONTEXT_MAX_EXPIRATION 0x7FFFFFFFFFFFFFFF
-/// @endinternal
+/// @endinternal <a></a>
 
 extern az_context az_context_app;
 

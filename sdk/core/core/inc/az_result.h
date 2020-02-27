@@ -26,7 +26,7 @@ enum
   AZ_FACILITY_STD = 0x7FFF,
 };
 
-/// @internal
+/// @internal <a></a>
 enum
 {
   _az_ERROR_FLAG = (int32_t)0x80000000,
@@ -37,7 +37,7 @@ enum
 
 #define _az_RESULT_MAKE_SUCCESS(facility, code) \
   ((int32_t)(((int32_t)(facility) << 16) | (int32_t)(code)))
-/// @endinternal
+/// @endinternal <a></a>
 
 #define AZ_RETURN_IF_FAILED(exp) \
   do \

@@ -116,13 +116,13 @@ AZ_NODISCARD az_result az_json_token_get_string(az_json_token self, az_span* out
 
 typedef struct
 {
-  /// @internal
+  /// @internal <a></a>
   struct
   {
     az_span json;
     bool need_comma;
   } _internal;
-  /// @endinternal
+  /// @endinternal <a></a>
 } az_json_builder;
 
 AZ_NODISCARD AZ_INLINE az_result az_json_builder_init(az_json_builder* self, az_span json_buffer)
@@ -153,13 +153,13 @@ AZ_NODISCARD az_result az_json_builder_append_array_close(az_json_builder* self)
 typedef uint64_t az_json_stack;
 typedef struct
 {
-  /// @internal
+  /// @internal <a></a>
   struct
   {
     az_span reader;
     az_json_stack stack;
   } _internal;
-  /// @endinternal
+  /// @endinternal <a></a>
 } az_json_parser;
 
 typedef struct
