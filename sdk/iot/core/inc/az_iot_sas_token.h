@@ -7,7 +7,7 @@
 #include <az_result.h>
 #include <az_span.h>
 
-#include <stdlib.h>
+#include <stdint.h>
 
 #include <_az_cfg_prefix.h>
 
@@ -34,7 +34,7 @@ az_result az_iot_sas_token_get_document(az_span iothub_fqdn, az_span device_id, 
  *                                 @note If using a device key as encryption key, it must be Base64 decoded.
  *                               - Base64 encode, then URL encode the encrypted document.
  * @param[in]  expiry_time_secs   The expiry time of the SAS token, in number of seconds since UNIX epoch (1970).
- * @param[in]  key_name           A #az_span containing the key name to be encoded in the sas token (optional, use az_span_null() if not needed).
+ * @param[in]  key_name           A #az_span containing the key name to be encoded in the sas token (optional, use AZ_SPAN_NULL if not needed).
  * @param[in]  sas_token          An #az_span to use as base for `out_sas_token`.
  * @param[out] out_sas_token      An pointer to #az_span where to write the SAS token.
  * @returns                       An #az_result with the result of the operation.

@@ -466,7 +466,7 @@ int main()
       _az_http_request hrb;
 
       TEST_EXPECT_SUCCESS(az_http_request_init(
-          &hrb, &az_context_app, az_http_method_get(), url_span, header_span, az_span_null()));
+          &hrb, &az_context_app, az_http_method_get(), url_span, header_span, AZ_SPAN_NULL));
       TEST_ASSERT(az_span_is_equal(hrb._internal.method, az_http_method_get()));
       TEST_ASSERT(az_span_is_equal(hrb._internal.url, url_span));
       TEST_ASSERT(az_span_capacity(hrb._internal.url) == 100);
