@@ -3,6 +3,8 @@
 
 cmake_minimum_required (VERSION 3.12)
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake-modules")
+
 option(WARNINGS_AS_ERRORS "Treat compiler warnings as errors" ON)
 option(BUILD_CURL_TRANSPORT "Build internal http transport implementation with CURL for HTTP Pipeline" OFF)
 option(UNIT_TESTING "Build unit test projects" OFF)
@@ -55,5 +57,5 @@ endif()
 # default for Unit testing with cmocka is OFF, however, this will be ON on CI and tests must
 # past before commiting changes
 if (UNIT_TESTING)
-  add_subdirectory(sdk/core/core/unit_test_with_cmocka)
+  add_subdirectory(sdk/core/core/test/cmocka)
 endif()
