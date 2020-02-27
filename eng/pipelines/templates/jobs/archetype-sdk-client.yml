@@ -171,5 +171,5 @@ jobs:
       testResultsFormat: 'JUnit'
       testResultsFiles: '**/*-test-results.xml' 
       mergeTestResults: true
-      testRunTitle: 'Azure SDK C99 - $(vm.image)_$(VCPKG_DEFAULT_TRIPLET)'
+      testRunTitle: 'C99 - $(Agent.JobName)'
     condition: contains(variables['vcpkg.deps'], 'cmocka')
