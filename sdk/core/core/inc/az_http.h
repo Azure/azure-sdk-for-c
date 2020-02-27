@@ -320,17 +320,6 @@ az_http_response_init(az_http_response* self, az_span http_response)
 }
 
 /**
- * @brief Returns the count of headers on the request
- *        Each header is an az_pair
- *
- */
-AZ_NODISCARD AZ_INLINE int32_t _az_http_request_headers_count(_az_http_request* request)
-{
-  // Cast the unsigned sizeof result to ensure the divsion is signed/signed
-  return az_span_length(request->_internal.headers) / (int32_t)sizeof(az_pair);
-}
-
-/**
  * @brief Set the az_http_response internal parser to index zero and tries
  * to get status line from it.
  *
