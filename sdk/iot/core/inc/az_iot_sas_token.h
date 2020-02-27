@@ -7,7 +7,7 @@
 #include <az_result.h>
 #include <az_span.h>
 
-#include <stdlib.h>
+#include <stdint.h>
 
 #include <_az_cfg_prefix.h>
 
