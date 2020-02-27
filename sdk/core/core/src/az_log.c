@@ -3,13 +3,13 @@
 
 #include "az_log_private.h"
 #include "az_span_private.h"
+#include <az_config.h>
 #include <az_http.h>
 #include <az_http_internal.h>
 #include <az_http_transport.h>
 #include <az_log.h>
 #include <az_log_internal.h>
 #include <az_span.h>
-#include <az_config.h>
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -22,7 +22,7 @@ enum
   = 50, // When we print values, such as header values, if they are longer than
         // _az_LOG_VALUE_MAX_LENGTH, we trim their contents (decorate with ellipsis in the middle)
         // to make sure each individual header value does not exceed _az_LOG_VALUE_MAX_LENGTH so
-        // that they don't blow up the logs.
+        // that they don't blow up the logs. 
 };
 
 static az_log_classification const* _az_log_classifications = NULL;
