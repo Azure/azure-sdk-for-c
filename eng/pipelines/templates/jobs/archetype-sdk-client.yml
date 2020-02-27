@@ -1,6 +1,7 @@
 parameters:
   Artifacts: []
   ServiceDirectory: not-specified
+  BuildReleaseArtifacts: true
 
 jobs:
 - job: Validate
