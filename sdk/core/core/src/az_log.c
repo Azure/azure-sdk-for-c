@@ -125,7 +125,7 @@ static az_result _az_log_http_request_msg(az_span* log_msg_bldr, _az_http_reques
 
   AZ_RETURN_IF_FAILED(az_span_append(*log_msg_bldr, hrb->_internal.url, log_msg_bldr));
 
-  int32_t const headers_count = az_span_length(hrb->_internal.headers) / sizeof(az_pair);
+  int32_t const headers_count = _az_http_request_headers_count(hrb);
   for (int32_t index = 0; index < headers_count; ++index)
   {
     AZ_RETURN_IF_FAILED(az_span_append(*log_msg_bldr, AZ_SPAN_FROM_STR("\n\t"), log_msg_bldr));

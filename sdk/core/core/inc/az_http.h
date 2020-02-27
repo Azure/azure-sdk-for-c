@@ -34,6 +34,12 @@ typedef enum
 typedef az_span az_http_method;
 
 /**
+ * @brief Define az_http_headers as an az_span so it is limited to that type and not to any az_span
+ *
+ */
+typedef az_span az_http_headers;
+
+/**
  * @brief Defines an az_http_request. This is an internal structure that is used to perform an http
  * request to Azure. It contains an HTTP method, url, headers and body. It also contains another
  * utility variables. User should never access field _internal directly
@@ -47,7 +53,7 @@ typedef struct
     az_http_method method;
     az_span url;
     int32_t query_start;
-    az_span headers;
+    az_http_headers headers; // Contains az_pairs
     int32_t max_headers;
     int32_t retry_headers_start_byte_offset;
     az_span body;
@@ -311,6 +317,17 @@ az_http_response_init(az_http_response* self, az_span http_response)
   };
 
   return AZ_OK;
+}
+
+/**
+ * @brief Returns the count of headers on the request
+ *        Each header is an az_pair
+ *
+ */
+AZ_NODISCARD AZ_INLINE int32_t _az_http_request_headers_count(_az_http_request* request)
+{
+  // Cast the unsigned sizeof result to ensure the divsion is signed/signed
+  return az_span_length(request->_internal.headers) / (int32_t)sizeof(az_pair);
 }
 
 /**

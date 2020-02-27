@@ -139,7 +139,7 @@ az_http_request_get_header(_az_http_request* p_hrb, int32_t index, az_pair* out_
   AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
   AZ_CONTRACT_ARG_NOT_NULL(out_result);
 
-  if (index >= az_span_length(p_hrb->_internal.headers) / (int32_t)sizeof(az_pair))
+  if (index >= _az_http_request_headers_count(p_hrb))
   {
     return AZ_ERROR_ARG;
   }
