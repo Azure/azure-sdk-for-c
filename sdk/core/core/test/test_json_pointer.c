@@ -5,6 +5,7 @@
 #include <az_json.h>
 
 #include <az_test.h>
+#include <stdio.h>
 
 #include <_az_cfg.h>
 
