@@ -5,25 +5,22 @@
 #include <az_keyvault.h>
 #include <az_span.h>
 
-#include <assert.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <setjmp.h>
+#include <stdarg.h>
+#include <stdint.h>
 
-#include "./az_keyvault_create_key_options_test.c"
-#include "./az_test.h"
+#include <cmocka.h>
 
 #include <_az_cfg.h>
-
-int exit_code = 0;
 
 AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
     az_span json_web_key_type,
     az_keyvault_create_key_options* options,
     az_span* http_body);
 
-int main()
+void test_keyvault(void** state)
 {
+  (void)state;
   {
     {
       az_keyvault_create_key_options options = { 0 };
@@ -32,12 +29,12 @@ int main()
 
       az_span const expected = AZ_SPAN_FROM_STR("{\"kty\":\"RSA\"}");
 
-      TEST_ASSERT(
+      assert_true(
           _az_keyvault_keys_key_create_build_json_body(
               az_keyvault_web_key_type_rsa(), &options, &http_body)
           == AZ_OK);
 
-      TEST_ASSERT(az_span_is_equal(http_body, expected));
+      assert_true(az_span_is_equal(http_body, expected));
     }
     {
       az_keyvault_create_key_options options = { 0 };
@@ -50,12 +47,12 @@ int main()
       az_span const expected
           = AZ_SPAN_FROM_STR("{\"kty\":\"RSA\",\"attributes\":{\"enabled\":true}}");
 
-      TEST_ASSERT(
+      assert_true(
           _az_keyvault_keys_key_create_build_json_body(
               az_keyvault_web_key_type_rsa(), &options, &http_body)
           == AZ_OK);
 
-      TEST_ASSERT(az_span_is_equal(http_body, expected));
+      assert_true(az_span_is_equal(http_body, expected));
     }
     {
       az_keyvault_create_key_options options = { 0 };
@@ -68,14 +65,21 @@ int main()
       az_span const expected
           = AZ_SPAN_FROM_STR("{\"kty\":\"RSA\",\"attributes\":{\"enabled\":false}}");
 
-      TEST_ASSERT(
+      assert_true(
           _az_keyvault_keys_key_create_build_json_body(
               az_keyvault_web_key_type_rsa(), &options, &http_body)
           == AZ_OK);
 
-      TEST_ASSERT(az_span_is_equal(http_body, expected));
+      assert_true(az_span_is_equal(http_body, expected));
     }
   }
-  az_create_key_options_test();
-  return exit_code;
+}
+
+int main(void)
+{
+  const struct CMUnitTest tests[] = {
+    cmocka_unit_test(test_keyvault),
+  };
+
+  return cmocka_run_group_tests_name("az_keyvault", tests, NULL, NULL);
 }
