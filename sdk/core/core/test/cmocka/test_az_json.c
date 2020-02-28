@@ -1,11 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <setjmp.h>
-#include <stdarg.h>
-
 #include <az_json.h>
 #include <az_span.h>
+
+#include <setjmp.h>
+#include <stdarg.h>
 
 #include <cmocka.h>
 

@@ -13,6 +13,9 @@
 
 #include <_az_cfg.h>
 
+void test_az_span(void** state);
+void test_az_span_replace(void** state);
+
 static void test_az_span_getters(void** state)
 {
   (void)state;
@@ -28,6 +31,8 @@ int main(void)
 {
   const struct CMUnitTest tests[] = {
     cmocka_unit_test(test_az_span_getters),
+    cmocka_unit_test(test_az_span),
+    cmocka_unit_test(test_az_span_replace),
   };
 
   return cmocka_run_group_tests_name("az_span", tests, NULL, NULL);
