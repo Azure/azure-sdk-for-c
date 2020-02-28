@@ -3,8 +3,11 @@
 
 cmake_minimum_required (VERSION 3.12)
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake-modules")
+
 option(WARNINGS_AS_ERRORS "Treat compiler warnings as errors" ON)
 option(BUILD_CURL_TRANSPORT "Build internal http transport implementation with CURL for HTTP Pipeline" OFF)
+option(UNIT_TESTING "Build unit test projects" OFF)
 
 if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
   set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
@@ -51,3 +54,8 @@ if(NOT DEFINED ENV{AZ_SDK_C_NO_SAMPLES})
   add_subdirectory(sdk/storage/blobs/samples)
 endif()
 
+# default for Unit testing with cmocka is OFF, however, this will be ON on CI and tests must
+# past before commiting changes
+if (UNIT_TESTING)
+  add_subdirectory(sdk/core/core/test/cmocka)
+endif()
