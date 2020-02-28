@@ -1,8 +1,8 @@
-#include <stdarg.h>
-#include <stddef.h>
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// SPDX-License-Identifier: MIT
 
 #include <setjmp.h>
-#include <stdint.h>
+#include <stdarg.h>
 
 #include <az_json.h>
 #include <az_span.h>
@@ -10,6 +10,13 @@
 #include <cmocka.h>
 
 #include <_az_cfg.h>
+
+void test_json_value(void** state);
+void test_json_string(void** state);
+void test_json_pointer(void** state);
+void test_json_parser(void** state);
+void test_json_get_by_pointer(void** state);
+void test_json_builder(void** state);
 
 static void test_json_token_null(void** state)
 {
@@ -61,10 +68,11 @@ static void test_json_parser_init(void** state)
 int main(void)
 {
   const struct CMUnitTest tests[] = {
-    cmocka_unit_test(test_json_token_null),
-    cmocka_unit_test(test_json_parser_init),
-    cmocka_unit_test(test_json_token_boolean),
-    cmocka_unit_test(test_json_token_number),
+    cmocka_unit_test(test_json_token_null),     cmocka_unit_test(test_json_parser_init),
+    cmocka_unit_test(test_json_token_boolean),  cmocka_unit_test(test_json_token_number),
+    cmocka_unit_test(test_json_value),          cmocka_unit_test(test_json_string),
+    cmocka_unit_test(test_json_pointer),        cmocka_unit_test(test_json_parser),
+    cmocka_unit_test(test_json_get_by_pointer), cmocka_unit_test(test_json_builder),
   };
 
   return cmocka_run_group_tests_name("az_json", tests, NULL, NULL);

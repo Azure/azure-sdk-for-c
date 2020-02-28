@@ -4,10 +4,14 @@
 #include "az_json_string_private.h"
 #include <az_json.h>
 
-#include <az_test.h>
-#include <stdio.h>
+#include <setjmp.h>
+#include <stdarg.h>
+
+#include <cmocka.h>
 
 #include <_az_cfg.h>
+
+#define TEST_EXPECT_SUCCESS(exp) assert_true(az_succeeded(exp))
 
 az_result read_write(az_span input, az_span* output, int32_t* o);
 az_result read_write_token(az_span* output, int32_t* o, az_json_parser* state, az_json_token token);
@@ -40,95 +44,96 @@ static az_span const sample1 = AZ_SPAN_LITERAL_FROM_STR( //
     "  }\n"
     "}\n");
 
-void test_json_parser()
+void test_json_parser(void** state)
 {
+  (void)state;
   {
     az_json_parser parser = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR("    ")));
-    TEST_ASSERT(az_json_parser_parse_token(&parser, NULL) == AZ_ERROR_ARG);
+    assert_true(az_json_parser_parse_token(&parser, NULL) == AZ_ERROR_ARG);
   }
   {
     az_json_token token;
-    TEST_ASSERT(az_json_parser_parse_token(NULL, &token) == AZ_ERROR_ARG);
+    assert_true(az_json_parser_parse_token(NULL, &token) == AZ_ERROR_ARG);
   }
   {
     az_json_parser parser = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR("    ")));
     az_json_token token;
-    TEST_ASSERT(az_json_parser_parse_token(&parser, &token) == AZ_ERROR_EOF);
+    assert_true(az_json_parser_parse_token(&parser, &token) == AZ_ERROR_EOF);
   }
   {
     az_json_parser parser = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR("  null  ")));
     az_json_token token;
-    TEST_ASSERT(az_json_parser_parse_token(&parser, &token) == AZ_OK);
-    TEST_ASSERT(token.kind == AZ_JSON_TOKEN_NULL);
-    TEST_ASSERT(az_json_parser_done(&parser) == AZ_OK);
+    assert_true(az_json_parser_parse_token(&parser, &token) == AZ_OK);
+    assert_true(token.kind == AZ_JSON_TOKEN_NULL);
+    assert_true(az_json_parser_done(&parser) == AZ_OK);
   }
   {
     az_json_parser state = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&state, AZ_SPAN_FROM_STR("  nul")));
     az_json_token token;
-    TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_ERROR_EOF);
+    assert_true(az_json_parser_parse_token(&state, &token) == AZ_ERROR_EOF);
   }
   {
     az_json_parser parser = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR("  false")));
     az_json_token token;
-    TEST_ASSERT(az_json_parser_parse_token(&parser, &token) == AZ_OK);
-    TEST_ASSERT(token.kind == AZ_JSON_TOKEN_BOOLEAN);
-    TEST_ASSERT(token.value.boolean == false);
-    TEST_ASSERT(az_json_parser_done(&parser) == AZ_OK);
+    assert_true(az_json_parser_parse_token(&parser, &token) == AZ_OK);
+    assert_true(token.kind == AZ_JSON_TOKEN_BOOLEAN);
+    assert_true(token.value.boolean == false);
+    assert_true(az_json_parser_done(&parser) == AZ_OK);
   }
   {
     az_json_parser state = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&state, AZ_SPAN_FROM_STR("  falsx  ")));
     az_json_token token;
-    TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+    assert_true(az_json_parser_parse_token(&state, &token) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
   }
   {
     az_json_parser state = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&state, AZ_SPAN_FROM_STR("true ")));
     az_json_token token;
-    TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_OK);
-    TEST_ASSERT(token.kind == AZ_JSON_TOKEN_BOOLEAN);
-    TEST_ASSERT(token.value.boolean == true);
-    TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
+    assert_true(az_json_parser_parse_token(&state, &token) == AZ_OK);
+    assert_true(token.kind == AZ_JSON_TOKEN_BOOLEAN);
+    assert_true(token.value.boolean == true);
+    assert_true(az_json_parser_done(&state) == AZ_OK);
   }
   {
     az_json_parser state = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&state, AZ_SPAN_FROM_STR("  truem")));
     az_json_token token;
-    TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+    assert_true(az_json_parser_parse_token(&state, &token) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
   }
   {
     az_span const s = AZ_SPAN_FROM_STR(" \"tr\\\"ue\\t\" ");
     az_json_parser state = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&state, s));
     az_json_token token;
-    TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_OK);
-    TEST_ASSERT(token.kind == AZ_JSON_TOKEN_STRING);
-    TEST_ASSERT(az_span_ptr(token.value.string) == (az_span_ptr(s) + 2));
-    TEST_ASSERT(az_span_length(token.value.string) == 8);
-    TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
+    assert_true(az_json_parser_parse_token(&state, &token) == AZ_OK);
+    assert_true(token.kind == AZ_JSON_TOKEN_STRING);
+    assert_true(az_span_ptr(token.value.string) == (az_span_ptr(s) + 2));
+    assert_true(az_span_length(token.value.string) == 8);
+    assert_true(az_json_parser_done(&state) == AZ_OK);
   }
   {
     az_span const s = AZ_SPAN_FROM_STR("\"\\uFf0F\"");
     az_json_parser state = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&state, s));
     az_json_token token;
-    TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_OK);
-    TEST_ASSERT(token.kind == AZ_JSON_TOKEN_STRING);
-    TEST_ASSERT(az_span_ptr(token.value.string) == az_span_ptr(s) + 1);
-    TEST_ASSERT(az_span_length(token.value.string) == 6);
-    TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
+    assert_true(az_json_parser_parse_token(&state, &token) == AZ_OK);
+    assert_true(token.kind == AZ_JSON_TOKEN_STRING);
+    assert_true(az_span_ptr(token.value.string) == az_span_ptr(s) + 1);
+    assert_true(az_span_length(token.value.string) == 6);
+    assert_true(az_json_parser_done(&state) == AZ_OK);
   }
   {
     az_span const s = AZ_SPAN_FROM_STR("\"\\uFf0\"");
     az_json_parser state = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&state, s));
     az_json_token token;
-    TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+    assert_true(az_json_parser_parse_token(&state, &token) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
   }
   /* Testing parsing number and converting to double (az_json_number_to_double) */
   {
@@ -136,38 +141,38 @@ void test_json_parser()
     az_json_parser state = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&state, AZ_SPAN_FROM_STR(" 23 ")));
     az_json_token token;
-    TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_OK);
-    TEST_ASSERT(token.kind == AZ_JSON_TOKEN_NUMBER);
-    TEST_ASSERT(token.value.number == 23);
-    TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
+    assert_true(az_json_parser_parse_token(&state, &token) == AZ_OK);
+    assert_true(token.kind == AZ_JSON_TOKEN_NUMBER);
+    assert_true(token.value.number == 23);
+    assert_true(az_json_parser_done(&state) == AZ_OK);
   }
   {
     // negative number with decimals
     az_json_parser state = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&state, AZ_SPAN_FROM_STR(" -23.56")));
     az_json_token token;
-    TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_OK);
-    TEST_ASSERT(token.kind == AZ_JSON_TOKEN_NUMBER);
-    TEST_ASSERT(token.value.number == -23.56);
-    TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
+    assert_true(az_json_parser_parse_token(&state, &token) == AZ_OK);
+    assert_true(token.kind == AZ_JSON_TOKEN_NUMBER);
+    assert_true(token.value.number == -23.56);
+    assert_true(az_json_parser_done(&state) == AZ_OK);
   }
   {
     // negative + decimals + exp
     az_json_parser state = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&state, AZ_SPAN_FROM_STR(" -23.56e-3")));
     az_json_token token;
-    TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_OK);
-    TEST_ASSERT(token.kind == AZ_JSON_TOKEN_NUMBER);
-    TEST_ASSERT(token.value.number == -0.02356);
-    TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
+    assert_true(az_json_parser_parse_token(&state, &token) == AZ_OK);
+    assert_true(token.kind == AZ_JSON_TOKEN_NUMBER);
+    assert_true(token.value.number == -0.02356);
+    assert_true(az_json_parser_done(&state) == AZ_OK);
   }
   {
     // exp
     az_json_parser state = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&state, AZ_SPAN_FROM_STR("1e50")));
     az_json_token token;
-    TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_OK);
-    TEST_ASSERT(token.kind == AZ_JSON_TOKEN_NUMBER);
+    assert_true(az_json_parser_parse_token(&state, &token) == AZ_OK);
+    assert_true(token.kind == AZ_JSON_TOKEN_NUMBER);
   }
   {
     // big decimal + exp
@@ -175,88 +180,88 @@ void test_json_parser()
     TEST_EXPECT_SUCCESS(
         az_json_parser_init(&state, AZ_SPAN_FROM_STR("10000000000000000000000e17")));
     az_json_token token;
-    TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_OK);
-    TEST_ASSERT(token.kind == AZ_JSON_TOKEN_NUMBER);
+    assert_true(az_json_parser_parse_token(&state, &token) == AZ_OK);
+    assert_true(token.kind == AZ_JSON_TOKEN_NUMBER);
   }
   {
     // exp inf -> Any value above double MAX range would be translated to positive inf
     az_json_parser state = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&state, AZ_SPAN_FROM_STR("1e309")));
     az_json_token token;
-    TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_OK);
+    assert_true(az_json_parser_parse_token(&state, &token) == AZ_OK);
     // Create inf number with  IEEE 754 standard
     // floating point number containing all zeroes in the mantissa (first twenty-three bits), and
     // all ones in the exponent (next eight bits)
     unsigned int p = 0x7F800000; // 0xFF << 23
     float positiveInfinity = *(float*)&p;
-    TEST_ASSERT(token.kind == AZ_JSON_TOKEN_NUMBER);
-    TEST_ASSERT(token.value.number == positiveInfinity);
-    TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
+    assert_true(token.kind == AZ_JSON_TOKEN_NUMBER);
+    assert_true(token.value.number == positiveInfinity);
+    assert_true(az_json_parser_done(&state) == AZ_OK);
   }
   {
     // exp inf -> Any value below double MIN range would be translated 0
     az_json_parser state = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&state, AZ_SPAN_FROM_STR("1e-400")));
     az_json_token token;
-    TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_OK);
-    TEST_ASSERT(token.kind == AZ_JSON_TOKEN_NUMBER);
-    TEST_ASSERT(token.value.number == 0);
-    TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
+    assert_true(az_json_parser_parse_token(&state, &token) == AZ_OK);
+    assert_true(token.kind == AZ_JSON_TOKEN_NUMBER);
+    assert_true(token.value.number == 0);
+    assert_true(az_json_parser_done(&state) == AZ_OK);
   }
   {
     // negative exp
     az_json_parser state = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&state, AZ_SPAN_FROM_STR("1e-18")));
     az_json_token token;
-    TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_OK);
-    TEST_ASSERT(token.kind == AZ_JSON_TOKEN_NUMBER);
-    TEST_ASSERT(token.value.number == 0.000000000000000001);
-    TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
+    assert_true(az_json_parser_parse_token(&state, &token) == AZ_OK);
+    assert_true(token.kind == AZ_JSON_TOKEN_NUMBER);
+    assert_true(token.value.number == 0.000000000000000001);
+    assert_true(az_json_parser_done(&state) == AZ_OK);
   }
   /* end of Testing parsing number and converting to double */
   {
     az_json_parser state = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&state, AZ_SPAN_FROM_STR(" [ true, 0.3 ]")));
     az_json_token token = { 0 };
-    TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_OK);
-    TEST_ASSERT(token.kind == AZ_JSON_TOKEN_ARRAY);
-    TEST_ASSERT(az_json_parser_parse_array_item(&state, &token) == AZ_OK);
-    TEST_ASSERT(token.kind == AZ_JSON_TOKEN_BOOLEAN);
-    TEST_ASSERT(token.value.boolean == true);
-    TEST_ASSERT(az_json_parser_parse_array_item(&state, &token) == AZ_OK);
-    TEST_ASSERT(token.kind == AZ_JSON_TOKEN_NUMBER);
-    // TEST_ASSERT(token.value.number == 0.3);  TODO:  why do we get 0.30000004 ??
-    TEST_ASSERT(az_json_parser_parse_array_item(&state, &token) == AZ_ERROR_ITEM_NOT_FOUND);
-    TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
+    assert_true(az_json_parser_parse_token(&state, &token) == AZ_OK);
+    assert_true(token.kind == AZ_JSON_TOKEN_ARRAY);
+    assert_true(az_json_parser_parse_array_item(&state, &token) == AZ_OK);
+    assert_true(token.kind == AZ_JSON_TOKEN_BOOLEAN);
+    assert_true(token.value.boolean == true);
+    assert_true(az_json_parser_parse_array_item(&state, &token) == AZ_OK);
+    assert_true(token.kind == AZ_JSON_TOKEN_NUMBER);
+    // assert_true(token.value.number == 0.3);  TODO:  why do we get 0.30000004 ??
+    assert_true(az_json_parser_parse_array_item(&state, &token) == AZ_ERROR_ITEM_NOT_FOUND);
+    assert_true(az_json_parser_done(&state) == AZ_OK);
   }
   {
     az_span const json = AZ_SPAN_FROM_STR("{\"a\":\"Hello world!\"}");
     az_json_parser state = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&state, json));
     az_json_token token;
-    TEST_ASSERT(az_json_parser_parse_token(&state, &token) == AZ_OK);
-    TEST_ASSERT(token.kind == AZ_JSON_TOKEN_OBJECT);
+    assert_true(az_json_parser_parse_token(&state, &token) == AZ_OK);
+    assert_true(token.kind == AZ_JSON_TOKEN_OBJECT);
     az_json_token_member token_member;
-    TEST_ASSERT(az_json_parser_parse_token_member(&state, &token_member) == AZ_OK);
-    TEST_ASSERT(az_span_ptr(token_member.name) == az_span_ptr(json) + 2);
-    TEST_ASSERT(az_span_length(token_member.name) == 1);
-    TEST_ASSERT(token_member.token.kind == AZ_JSON_TOKEN_STRING);
-    TEST_ASSERT(az_span_ptr(token_member.token.value.string) == az_span_ptr(json) + 6);
-    TEST_ASSERT(az_span_length(token_member.token.value.string) == 12);
-    TEST_ASSERT(
+    assert_true(az_json_parser_parse_token_member(&state, &token_member) == AZ_OK);
+    assert_true(az_span_ptr(token_member.name) == az_span_ptr(json) + 2);
+    assert_true(az_span_length(token_member.name) == 1);
+    assert_true(token_member.token.kind == AZ_JSON_TOKEN_STRING);
+    assert_true(az_span_ptr(token_member.token.value.string) == az_span_ptr(json) + 6);
+    assert_true(az_span_length(token_member.token.value.string) == 12);
+    assert_true(
         az_json_parser_parse_token_member(&state, &token_member) == AZ_ERROR_ITEM_NOT_FOUND);
-    TEST_ASSERT(az_json_parser_done(&state) == AZ_OK);
+    assert_true(az_json_parser_done(&state) == AZ_OK);
   }
   {
     uint8_t buffer[1000];
     az_span output = AZ_SPAN_FROM_BUFFER(buffer);
     {
       int32_t o = 0;
-      TEST_ASSERT(
+      assert_true(
           read_write(AZ_SPAN_FROM_STR("{ \"a\" : [ true, { \"b\": [{}]}, 15 ] }"), &output, &o)
           == AZ_OK);
 
-      TEST_ASSERT(az_span_is_equal(output, AZ_SPAN_FROM_STR("{\"a\":[true,{\"b\":[{}]},0]}")));
+      assert_true(az_span_is_equal(output, AZ_SPAN_FROM_STR("{\"a\":[true,{\"b\":[{}]},0]}")));
     }
     {
       int32_t o = 0;
@@ -268,7 +273,7 @@ void test_json_parser()
           "[[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ "
           "[[[[[ [[[[");
       az_result const result = read_write(json, &output, &o);
-      TEST_ASSERT(result == AZ_ERROR_JSON_NESTING_OVERFLOW);
+      assert_true(result == AZ_ERROR_JSON_NESTING_OVERFLOW);
     }
     {
       int32_t o = 0;
@@ -279,7 +284,7 @@ void test_json_parser()
           "[[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ "
           "[[[[[ [[[");
       az_result const result = read_write(json, &output, &o);
-      TEST_ASSERT(result == AZ_ERROR_EOF);
+      assert_true(result == AZ_ERROR_EOF);
     }
     {
       int32_t o = 0;
@@ -295,9 +300,9 @@ void test_json_parser()
       output._internal.length = 0;
       output = AZ_SPAN_FROM_BUFFER(buffer);
       az_result const result = read_write(json, &output, &o);
-      TEST_ASSERT(result == AZ_OK);
+      assert_true(result == AZ_OK);
 
-      TEST_ASSERT(az_span_is_equal(
+      assert_true(az_span_is_equal(
           output,
           AZ_SPAN_FROM_STR( //
               "[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[{"
@@ -310,7 +315,7 @@ void test_json_parser()
       int32_t o = 0;
       output = AZ_SPAN_FROM_BUFFER(buffer);
       az_result const result = read_write(sample1, &output, &o);
-      TEST_ASSERT(result == AZ_OK);
+      assert_true(result == AZ_OK);
     }
   }
 }

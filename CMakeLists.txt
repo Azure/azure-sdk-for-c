@@ -27,7 +27,6 @@ enable_testing ()
 include(eng/cmake/global_compile_options.txt)
 
 add_subdirectory(sdk/core/core)
-add_subdirectory(sdk/core/core/test)
 
 add_subdirectory(sdk/platform/http_client/nohttp)
 # Adding transport implementation for curl
