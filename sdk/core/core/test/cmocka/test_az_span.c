@@ -1,10 +1,6 @@
-#include <stdarg.h>
-#include <stddef.h>
-
-#include <setjmp.h>
-#include <stdint.h>
-
 #include <az_span.h>
+
+#include <stddef.h>
 
 #include <cmocka.h>
 
