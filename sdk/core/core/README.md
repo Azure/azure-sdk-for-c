@@ -112,7 +112,7 @@ az_log_classification const classifications[] = { AZ_LOG_HTTP_REQUEST, AZ_LOG_HT
 
 void test_log_func(az_log_classification classification, az_span message)
 {
-    printf("%.*s", az_span_length(message), az_span_ptr(message));
+    printf("%.*s\n", az_span_length(message), az_span_ptr(message));
 }
 
 int main()
