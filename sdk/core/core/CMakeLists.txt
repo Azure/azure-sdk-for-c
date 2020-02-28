@@ -46,9 +46,9 @@ else()
   target_compile_options(az_core PRIVATE -Wall -Wextra -pedantic ${WARNINGS_AS_ERRORS_FLAG})
 endif()
 
-target_include_directories (az_core PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc> $<INSTALL_INTERFACE:include/az>)
+target_include_directories (az_core PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc> $<INSTALL_INTERFACE:include/az_core>)
 # include internal headers
-target_include_directories(az_core PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/internal> $<INSTALL_INTERFACE:include/az_internal>)
+target_include_directories(az_core PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/internal> $<INSTALL_INTERFACE:include/az_core_internal>)
 
 set(AZ_PLATFORM_IMPL "NONE" CACHE STRING "Platform implementation to use")
 set_property(CACHE AZ_PLATFORM_IMPL PROPERTY STRINGS NONE WIN32 POSIX USER)

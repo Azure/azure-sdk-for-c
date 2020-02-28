@@ -15,8 +15,9 @@ add_library (
 target_include_directories (az_keyvault PUBLIC inc)
 target_include_directories (az_keyvault PRIVATE src)
 
-target_include_directories (az_keyvault PRIVATE ../../core/core/inc)
-target_include_directories (az_keyvault PRIVATE ../../core/core/internal)
+target_include_directories (az_keyvault PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/sdk/core/core/inc> $<INSTALL_INTERFACE:include/az_core>)
+# include internal headers
+target_include_directories(az_keyvault PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/sdk/core/core/internal> $<INSTALL_INTERFACE:include/az_core_internal>)
 
 # make sure that users can consume the project as a library.
 add_library (az::keyvault ALIAS az_keyvault)
