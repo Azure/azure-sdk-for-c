@@ -3,7 +3,9 @@
 
 #include "az_log_private.h"
 #include "az_span_private.h"
+#include <az_config.h>
 #include <az_http.h>
+#include <az_http_internal.h>
 #include <az_http_transport.h>
 #include <az_log.h>
 #include <az_log_internal.h>
@@ -21,8 +23,6 @@ enum
         // _az_LOG_VALUE_MAX_LENGTH, we trim their contents (decorate with ellipsis in the middle)
         // to make sure each individual header value does not exceed _az_LOG_VALUE_MAX_LENGTH so
         // that they don't blow up the logs.
-  _az_LOG_MSG_BUF_SIZE = 1024, // Size (in bytes) of the buffer to allocate on stack when building a
-                               // log message => the maximum size of the log message.
 };
 
 static az_log_classification const* _az_log_classifications = NULL;
@@ -125,7 +125,7 @@ static az_result _az_log_http_request_msg(az_span* log_msg_bldr, _az_http_reques
 
   AZ_RETURN_IF_FAILED(az_span_append(*log_msg_bldr, hrb->_internal.url, log_msg_bldr));
 
-  int32_t const headers_count = az_span_length(hrb->_internal.headers) / sizeof(az_pair);
+  int32_t const headers_count = _az_http_request_headers_count(hrb);
   for (int32_t index = 0; index < headers_count; ++index)
   {
     AZ_RETURN_IF_FAILED(az_span_append(*log_msg_bldr, AZ_SPAN_FROM_STR("\n\t"), log_msg_bldr));
@@ -194,7 +194,7 @@ static az_result _az_log_http_response_msg(
 
 void _az_log_http_request(_az_http_request* hrb)
 {
-  uint8_t log_msg_buf[_az_LOG_MSG_BUF_SIZE] = { 0 };
+  uint8_t log_msg_buf[AZ_LOG_MSG_BUF_SIZE] = { 0 };
   az_span log_msg_bldr = AZ_SPAN_FROM_BUFFER(log_msg_buf);
   (void)_az_log_http_request_msg(&log_msg_bldr, hrb);
   az_log_write(AZ_LOG_HTTP_REQUEST, log_msg_bldr);
@@ -202,7 +202,7 @@ void _az_log_http_request(_az_http_request* hrb)
 
 void _az_log_http_response(az_http_response* response, int64_t duration_msec, _az_http_request* hrb)
 {
-  uint8_t log_msg_buf[_az_LOG_MSG_BUF_SIZE] = { 0 };
+  uint8_t log_msg_buf[AZ_LOG_MSG_BUF_SIZE] = { 0 };
   az_span log_msg_bldr = AZ_SPAN_FROM_BUFFER(log_msg_buf);
   (void)_az_log_http_response_msg(&log_msg_bldr, response, duration_msec, hrb);
   az_log_write(AZ_LOG_HTTP_RESPONSE, log_msg_bldr);

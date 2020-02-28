@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include <az_context.h>
 #include <az_credentials.h>
 #include <az_http.h>
 #include <az_http_internal.h>
@@ -68,15 +69,16 @@ int main()
   // override options values
   key_options.enabled = az_optional_bool_create(false);
   // buffer for operations
-  key_options.operations = (az_span[]){ az_keyvault_key_operation_sign(), az_span_null() };
+  key_options.operations = (az_span[]){ az_keyvault_key_operation_sign(), AZ_SPAN_NULL };
 
   // buffer for tags   ->  adding tags
   key_options.tags = (az_pair[]){ az_pair_from_str("aKey", "aValue"),
                                   az_pair_from_str("bKey", "bValue"),
-                                  az_pair_null() };
+                                  AZ_PAIR_NULL };
 
   az_result const create_result = az_keyvault_keys_key_create(
       &client,
+      &az_context_app,
       AZ_SPAN_FROM_STR("test-new-key"),
       az_keyvault_web_key_type_rsa(),
       &key_options,
@@ -109,7 +111,7 @@ int main()
 
   /******************  GET KEY latest ver ******************************/
   az_result get_key_result = az_keyvault_keys_key_get(
-      &client, AZ_SPAN_FROM_STR("test-new-key"), az_span_null(), &http_response);
+      &client, &az_context_app, AZ_SPAN_FROM_STR("test-new-key"), AZ_SPAN_NULL, &http_response);
 
   if (az_failed(get_key_result))
   {
@@ -144,6 +146,7 @@ int main()
   /*********************  Create a new key version (use default options) *************/
   az_result const create_version_result = az_keyvault_keys_key_create(
       &client,
+      &az_context_app,
       AZ_SPAN_FROM_STR("test-new-key"),
       az_keyvault_web_key_type_rsa(),
       NULL,
@@ -169,7 +172,7 @@ int main()
 
   /******************  GET KEY previous ver ******************************/
   az_result const get_key_prev_ver_result = az_keyvault_keys_key_get(
-      &client, AZ_SPAN_FROM_STR("test-new-key"), version, &http_response);
+      &client, &az_context_app, AZ_SPAN_FROM_STR("test-new-key"), version, &http_response);
 
   if (az_failed(get_key_prev_ver_result))
   {
@@ -179,8 +182,8 @@ int main()
   printf("\n\n*********************************\nGet Key previous Ver: \n%s", response_buffer);
 
   /******************  DELETE KEY ******************************/
-  az_result const delete_key_result
-      = az_keyvault_keys_key_delete(&client, AZ_SPAN_FROM_STR("test-new-key"), &http_response);
+  az_result const delete_key_result = az_keyvault_keys_key_delete(
+      &client, &az_context_app, AZ_SPAN_FROM_STR("test-new-key"), &http_response);
 
   if (az_failed(delete_key_result))
   {
@@ -200,7 +203,7 @@ int main()
 
   /******************  GET KEY (should return failed response ) ******************************/
   az_result get_key_again_result = az_keyvault_keys_key_get(
-      &client, AZ_SPAN_FROM_STR("test-new-key"), az_span_null(), &http_response);
+      &client, &az_context_app, AZ_SPAN_FROM_STR("test-new-key"), AZ_SPAN_NULL, &http_response);
 
   if (az_failed(get_key_again_result))
   {
@@ -222,27 +225,27 @@ az_span get_key_version(az_http_response* response)
   az_result r = az_http_response_get_status_line(response, &status_line);
   if (az_failed(r))
   {
-    return az_span_null();
+    return AZ_SPAN_NULL;
   }
 
   r = az_http_response_get_body(response, &body);
   if (az_failed(r))
   {
-    return az_span_null();
+    return AZ_SPAN_NULL;
   }
   // get key from body
   az_json_token value;
   r = az_json_parse_by_pointer(body, AZ_SPAN_FROM_STR("/key/kid"), &value);
   if (az_failed(r))
   {
-    return az_span_null();
+    return AZ_SPAN_NULL;
   }
 
   az_span k = { 0 };
   r = az_json_token_get_string(value, &k);
   if (az_failed(r))
   {
-    return az_span_null();
+    return AZ_SPAN_NULL;
   }
   // calculate version
   int32_t kid_length = az_span_length(k);

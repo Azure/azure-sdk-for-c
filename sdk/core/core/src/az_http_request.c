@@ -19,6 +19,7 @@ AZ_NODISCARD az_result _az_is_question_mark(az_span slice)
 
 AZ_NODISCARD az_result az_http_request_init(
     _az_http_request* p_hrb,
+    az_context* context,
     az_span method,
     az_span url,
     az_span headers_buffer,
@@ -34,6 +35,7 @@ AZ_NODISCARD az_result az_http_request_init(
 
   *p_hrb
       = (_az_http_request){ ._internal = {
+                                .context = context,
                                 .method = method,
                                 .url = url,
                                 /* query start is set to 0 if there is not a question mark so the
@@ -137,7 +139,7 @@ az_http_request_get_header(_az_http_request* p_hrb, int32_t index, az_pair* out_
   AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
   AZ_CONTRACT_ARG_NOT_NULL(out_result);
 
-  if (index >= az_span_length(p_hrb->_internal.headers) / (int32_t)sizeof(az_pair))
+  if (index >= _az_http_request_headers_count(p_hrb))
   {
     return AZ_ERROR_ARG;
   }

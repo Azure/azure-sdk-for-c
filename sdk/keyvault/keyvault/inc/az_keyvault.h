@@ -109,7 +109,7 @@ AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_wrap_
 }
 AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_null()
 {
-  return az_span_null();
+  return AZ_SPAN_NULL;
 }
 
 typedef struct
@@ -141,6 +141,7 @@ AZ_NODISCARD az_keyvault_create_key_options az_keyvault_create_key_options_defau
  */
 AZ_NODISCARD az_result az_keyvault_keys_key_create(
     az_keyvault_keys_client* client,
+    az_context* context,
     az_span key_name,
     json_web_key_type json_web_key_type,
     az_keyvault_create_key_options* options,
@@ -151,7 +152,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
  * The get key operation is applicable to all key types. If the requested key is symmetric, then no
  * key material is released in the response. This operation requires the keys/get permission.
  *
- * Get latest version by passing az_span_null as value for version
+ * Get latest version by passing AZ_SPAN_NULL as value for version
  *
  * @param client a keyvault client structure
  * @param key_name name of key to be retrieved
@@ -161,6 +162,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
  */
 AZ_NODISCARD az_result az_keyvault_keys_key_get(
     az_keyvault_keys_client* client,
+    az_context* context,
     az_span key_name,
     az_span key_version,
     az_http_response* response);
@@ -179,6 +181,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
  */
 AZ_NODISCARD az_result az_keyvault_keys_key_delete(
     az_keyvault_keys_client* client,
+    az_context* context,
     az_span key_name,
     az_http_response* response);
 

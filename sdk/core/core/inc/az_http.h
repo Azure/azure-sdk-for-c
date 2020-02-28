@@ -12,6 +12,7 @@
 #define _az_HTTP_H
 
 #include <az_config.h>
+#include <az_context.h>
 #include <az_result.h>
 #include <az_span.h>
 
@@ -33,6 +34,12 @@ typedef enum
 typedef az_span az_http_method;
 
 /**
+ * @brief Define _az_http_headers as an az_span so it is limited to that type and not to any az_span
+ *
+ */
+typedef az_span _az_http_headers;
+
+/**
  * @brief Defines an az_http_request. This is an internal structure that is used to perform an http
  * request to Azure. It contains an HTTP method, url, headers and body. It also contains another
  * utility variables. User should never access field _internal directly
@@ -42,10 +49,11 @@ typedef struct
 {
   struct
   {
+    az_context* context;
     az_http_method method;
     az_span url;
     int32_t query_start;
-    az_span headers;
+    _az_http_headers headers; // Contains az_pairs
     int32_t max_headers;
     int32_t retry_headers_start_byte_offset;
     az_span body;
@@ -302,7 +310,7 @@ az_http_response_init(az_http_response* self, az_span http_response)
     ._internal = {
       .http_response = http_response,
       .parser = {
-        .remaining = az_span_null(),
+        .remaining = AZ_SPAN_NULL,
         .next_kind = AZ_HTTP_RESPONSE_KIND_STATUS_LINE,
       },
     },

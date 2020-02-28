@@ -44,7 +44,7 @@ static void _az_span_free(az_span* p)
     return;
   }
   free(az_span_ptr(*p));
-  *p = az_span_null();
+  *p = AZ_SPAN_NULL;
 }
 
 /**
@@ -177,9 +177,7 @@ _az_http_client_curl_build_headers(_az_http_request* p_request, struct curl_slis
   AZ_CONTRACT_ARG_NOT_NULL(p_request);
 
   az_pair header;
-  for (int32_t offset = 0;
-       offset < (int32_t)(az_span_length(p_request->_internal.headers) / sizeof(az_pair));
-       ++offset)
+  for (int32_t offset = 0; offset < _az_http_request_headers_count(p_request); ++offset)
   {
     AZ_RETURN_IF_FAILED(az_http_request_get_header(p_request, offset, &header));
     AZ_RETURN_IF_FAILED(
@@ -400,7 +398,7 @@ _az_http_client_curl_setup_headers(CURL* p_curl, _az_http_request* p_request)
   AZ_CONTRACT_ARG_NOT_NULL(p_curl);
   AZ_CONTRACT_ARG_NOT_NULL(p_request);
 
-  if (az_span_length(p_request->_internal.headers) == 0)
+  if (_az_http_request_headers_count(p_request) == 0)
   {
     // no headers, no need to set it up
     return AZ_OK;

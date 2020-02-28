@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include <az_context.h>
 #include <az_http.h>
 #include <az_http_internal.h>
 #include <az_http_transport.h>
@@ -29,6 +30,7 @@ void test_json_value();
 void test_http_response();
 void test_http_request();
 
+void test_az_context();
 void test_span();
 void test_span_builder_replace();
 
@@ -41,6 +43,7 @@ int exit_code = 0;
 
 int main()
 {
+  test_az_context();
   test_json_builder();
   test_json_get_by_pointer();
   test_json_parser();

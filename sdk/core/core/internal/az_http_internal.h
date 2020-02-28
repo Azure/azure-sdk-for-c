@@ -15,6 +15,17 @@ _az_http_policy_apiversion_options_default()
   return (_az_http_policy_apiversion_options){ 0 };
 }
 
+/**
+ * @brief Returns the count of headers on the request
+ *        Each header is an az_pair
+ *
+ */
+AZ_NODISCARD AZ_INLINE int32_t _az_http_request_headers_count(_az_http_request* request)
+{
+  // Cast the unsigned sizeof result to ensure the divsion is signed/signed
+  return az_span_length(request->_internal.headers) / (int32_t)sizeof(az_pair);
+}
+
 // PipelinePolicies
 //   Policies are non-allocating caveat the TransportPolicy
 //   Transport p_policies can only allocate if the transport layer they call allocates
@@ -101,6 +112,7 @@ az_http_client_send_request(_az_http_request* p_request, az_http_response* p_res
  */
 AZ_NODISCARD az_result az_http_request_init(
     _az_http_request* p_request,
+    az_context* context,
     az_http_method method,
     az_span url,
     az_span headers_buffer,

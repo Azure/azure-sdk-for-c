@@ -10,6 +10,7 @@ set(CMAKE_C_STANDARD 99)
 add_executable (
     az_core_test 
     main.c 
+    test_az_context.c
     test_http_request.c
     test_http_response_read_and_parse.c    
     test_json_builder.c
