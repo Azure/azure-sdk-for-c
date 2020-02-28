@@ -64,7 +64,71 @@ az_span hello_world = AZ_SPAN_FROM_STR("Hello world!");
 
 ## Examples
 
-TODO
+### az_log.h
+The various components of the SDK are broken up into "classifications". Log messages are filtered with these classification enums so that the user can decide which log messages they want. Classifications are derived from higher level groupings called "facilities". At the beginning of the user's code, they can initialize the logging by optionally setting the classifications they want, setting their logging listener, and then logging any messages they desire. 
+
+*Basic Code Snippet*
+
+Relevant components for logging are located in [az_result.h](./inc/az_result.h) and [az_log.h](./inc/az_log.h). The `az_log_classification` enum will be used to choose features to log.
+
+```c
+/* az_result.h */
+enum
+{
+  AZ_FACILITY_CORE = 0x1,
+  AZ_FACILITY_PLATFORM = 0x2,
+  AZ_FACILITY_JSON = 0x3,
+  AZ_FACILITY_HTTP = 0x4,
+  AZ_FACILITY_MQTT = 0x5,
+  AZ_FACILITY_IOT = 0x6,
+  AZ_FACILITY_STD = 0x7FFF,
+};
+
+/* az_log.h */
+typedef enum {
+  AZ_LOG_HTTP_REQUEST  = _az_LOG_MAKE_CLASSIFICATION(AZ_FACILITY_HTTP, 1),
+  AZ_LOG_HTTP_RESPONSE = _az_LOG_MAKE_CLASSIFICATION(AZ_FACILITY_HTTP, 2),
+} az_log_classification;
+```
+
+Here is an example of what basic sdk and user code might look like working together.
+The user needs to do two things as exemplified below:
+1. Set the classifications you wish to log.
+2. Set your logging function that follows the `az_log_fn` prototype. In this case, the logging function uses a basic `printf()`.
+
+```c
+/* INTERNAL sdk http code */
+static az_span test_log_message = AZ_SPAN_LITERAL_FROM_STR("HTTP Request Success");
+
+void some_http_request_code()
+{
+  /* Some http code */
+  az_log_write(AZ_LOG_HTTP_REQUEST, test_log_message);
+}
+
+
+/* User Application Code */
+az_log_classification const classifications[] = { AZ_LOG_HTTP_REQUEST, AZ_LOG_HTTP_RESPONSE };
+
+void test_log_func(az_log_classification classification, az_span message)
+{
+    printf("%.*s\n", az_span_length(message), az_span_ptr(message));
+}
+
+int main()
+{
+  az_log_set_classifications(classifications, 
+           sizeof(classifications)/sizeof(classifications[0]));
+  az_log_set_listener(&test_log_func);
+
+  some_http_request_code();
+}
+```
+
+Here the classifications are set to `AZ_LOG_HTTP_REQUEST` and `AZ_LOG_HTTP_RESPONSE`. Should the `AZ_LOG_HTTP_REQUEST` be omitted from the set of classifications, the log message in `some_http_request_code()` will not be logged.
+
+If no classifications are set then all messages are logged.
+
 
 ## Troubleshooting
 
