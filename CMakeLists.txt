@@ -27,7 +27,6 @@ enable_testing ()
 include(eng/cmake/global_compile_options.txt)
 
 add_subdirectory(sdk/core/core)
-add_subdirectory(sdk/core/core/test)
 
 add_subdirectory(sdk/platform/http_client/nohttp)
 # Adding transport implementation for curl
@@ -38,9 +37,7 @@ endif()
 
 # SDK Clients and tests
 add_subdirectory(sdk/keyvault/keyvault)
-add_subdirectory(sdk/keyvault/keyvault/test)
 add_subdirectory(sdk/storage/blobs)
-add_subdirectory(sdk/storage/blobs/test)
 add_subdirectory(sdk/iot/core)
 
 # PAL
@@ -58,4 +55,7 @@ endif()
 # past before commiting changes
 if (UNIT_TESTING)
   add_subdirectory(sdk/core/core/test/cmocka)
+  add_subdirectory(sdk/keyvault/keyvault/test/cmocka)
+  add_subdirectory(sdk/storage/blobs/test/cmocka)
+  add_subdirectory(sdk/iot/core/tests/cmocka)
 endif()

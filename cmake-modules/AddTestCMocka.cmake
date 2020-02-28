@@ -49,6 +49,8 @@ function(ADD_CMOCKA_TEST _TARGET_NAME)
         SOURCES
         COMPILE_OPTIONS
         LINK_OPTIONS
+        PRIVATE_ACCESS
+        LINK_TARGETS
     )
 
     cmake_parse_arguments(_add_cmocka_test
@@ -70,10 +72,17 @@ function(ADD_CMOCKA_TEST _TARGET_NAME)
         )
     endif()
 
-    
-    target_link_libraries(${_TARGET_NAME}
-        PRIVATE ${CMOCKA_LIBRARIES} az_core ${MATH_LIB_UNIX}
-    )
+    if (DEFINED _add_cmocka_test_LINK_TARGETS)
+        # link to user defined
+        target_link_libraries(${_TARGET_NAME}
+            PRIVATE ${CMOCKA_LIBRARIES} ${_add_cmocka_test_LINK_TARGETS} ${MATH_LIB_UNIX}
+        )
+    else()
+        # link against az_core by default
+        target_link_libraries(${_TARGET_NAME}
+            PRIVATE ${CMOCKA_LIBRARIES} az_core ${MATH_LIB_UNIX}
+        )
+    endif()
     
 
     if (DEFINED _add_cmocka_test_LINK_OPTIONS)
@@ -84,6 +93,10 @@ function(ADD_CMOCKA_TEST _TARGET_NAME)
     endif()
 
     target_include_directories(${_TARGET_NAME} PRIVATE ${CMOCKA_INCLUDE_DIR})
+    
+    if (DEFINED _add_cmocka_test_PRIVATE_ACCESS)
+        target_include_directories(${_TARGET_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/sdk/core/core/src)
+    endif()
 
     add_test(${_TARGET_NAME}
         ${TARGET_SYSTEM_EMULATOR} ${_TARGET_NAME}

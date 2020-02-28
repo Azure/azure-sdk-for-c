@@ -10,9 +10,14 @@
 #include <az_log_internal.h>
 #include <az_log_private.h>
 
-#include <az_test.h>
+#include <setjmp.h>
+#include <stdarg.h>
+
+#include <cmocka.h>
 
 #include <_az_cfg.h>
+
+#define TEST_EXPECT_SUCCESS(exp) assert_true(az_succeeded(exp))
 
 static bool _log_invoked_for_http_request = false;
 static bool _log_invoked_for_http_response = false;
@@ -31,7 +36,7 @@ static void _log_listener(az_log_classification classification, az_span message)
   {
     case AZ_LOG_HTTP_REQUEST:
       _log_invoked_for_http_request = true;
-      TEST_ASSERT(az_span_is_equal(
+      assert_true(az_span_is_equal(
           message,
           AZ_SPAN_FROM_STR("HTTP Request : GET https://www.example.com\n"
                            "\tHeader1 : Value1\n"
@@ -40,7 +45,7 @@ static void _log_listener(az_log_classification classification, az_span message)
       break;
     case AZ_LOG_HTTP_RESPONSE:
       _log_invoked_for_http_response = true;
-      TEST_ASSERT(az_span_is_equal(
+      assert_true(az_span_is_equal(
           message,
           AZ_SPAN_FROM_STR("HTTP Response (3456ms) : 404 Not Found\n"
                            "\tHeader11 : Value11\n"
@@ -54,13 +59,14 @@ static void _log_listener(az_log_classification classification, az_span message)
                            "\tHeader3 : 1111112222223333334444 ... 55666666777777888888abc")));
       break;
     default:
-      TEST_ASSERT(false);
+      assert_true(false);
       break;
   }
 }
 
-void test_log()
+void test_az_log(void** state)
 {
+  (void)state;
   // Set up test values etc.
   //  uint8_t hrb_buf[4 * 1024] = { 0 };
   uint8_t headers[4 * 1024] = { 0 };
@@ -112,16 +118,16 @@ void test_log()
     // Also, our callback function does the verification for the message content.
     _reset_log_invocation_status();
     az_log_set_listener(_log_listener);
-    TEST_ASSERT(_log_invoked_for_http_request == false);
-    TEST_ASSERT(_log_invoked_for_http_response == false);
+    assert_true(_log_invoked_for_http_request == false);
+    assert_true(_log_invoked_for_http_response == false);
 
     _az_log_http_request(&hrb);
-    TEST_ASSERT(_log_invoked_for_http_request == true);
-    TEST_ASSERT(_log_invoked_for_http_response == false);
+    assert_true(_log_invoked_for_http_request == true);
+    assert_true(_log_invoked_for_http_response == false);
 
     _az_log_http_response(&response, 3456, &hrb);
-    TEST_ASSERT(_log_invoked_for_http_request == true);
-    TEST_ASSERT(_log_invoked_for_http_response == true);
+    assert_true(_log_invoked_for_http_request == true);
+    assert_true(_log_invoked_for_http_response == true);
   }
 
   {
@@ -129,26 +135,26 @@ void test_log()
     az_log_set_listener(NULL);
 
     // Verify that user can unset log callback, and we are not going to call the previously set one.
-    TEST_ASSERT(_log_invoked_for_http_request == false);
-    TEST_ASSERT(_log_invoked_for_http_response == false);
+    assert_true(_log_invoked_for_http_request == false);
+    assert_true(_log_invoked_for_http_response == false);
 
     _az_log_http_request(&hrb);
     _az_log_http_response(&response, 3456, &hrb);
 
-    TEST_ASSERT(_log_invoked_for_http_request == false);
-    TEST_ASSERT(_log_invoked_for_http_response == false);
+    assert_true(_log_invoked_for_http_request == false);
+    assert_true(_log_invoked_for_http_response == false);
 
     {
       // Verify that our internal should_write() function would return false if noone is listening.
-      TEST_ASSERT(az_log_should_write(AZ_LOG_HTTP_REQUEST) == false);
-      TEST_ASSERT(az_log_should_write(AZ_LOG_HTTP_RESPONSE) == false);
+      assert_true(az_log_should_write(AZ_LOG_HTTP_REQUEST) == false);
+      assert_true(az_log_should_write(AZ_LOG_HTTP_RESPONSE) == false);
 
       // If a callback is set, and no classificaions are specified, we are going to log all of them
       // (and customer is going to get all of them).
       az_log_set_listener(_log_listener);
 
-      TEST_ASSERT(az_log_should_write(AZ_LOG_HTTP_REQUEST) == true);
-      TEST_ASSERT(az_log_should_write(AZ_LOG_HTTP_RESPONSE) == true);
+      assert_true(az_log_should_write(AZ_LOG_HTTP_REQUEST) == true);
+      assert_true(az_log_should_write(AZ_LOG_HTTP_RESPONSE) == true);
     }
 
     // Verify that if customer specifies the classifications, we'll only invoking the logging
@@ -158,16 +164,25 @@ void test_log()
     az_log_set_classifications(
         classifications, sizeof(classifications) / sizeof(classifications[0]));
 
-    TEST_ASSERT(az_log_should_write(AZ_LOG_HTTP_REQUEST) == true);
-    TEST_ASSERT(az_log_should_write(AZ_LOG_HTTP_RESPONSE) == false);
+    assert_true(az_log_should_write(AZ_LOG_HTTP_REQUEST) == true);
+    assert_true(az_log_should_write(AZ_LOG_HTTP_RESPONSE) == false);
 
     _az_log_http_request(&hrb);
     _az_log_http_response(&response, 3456, &hrb);
 
-    TEST_ASSERT(_log_invoked_for_http_request == true);
-    TEST_ASSERT(_log_invoked_for_http_response == false);
+    assert_true(_log_invoked_for_http_request == true);
+    assert_true(_log_invoked_for_http_response == false);
   }
 
   az_log_set_classifications(NULL, 0);
   az_log_set_listener(NULL);
+}
+
+int main(void)
+{
+  const struct CMUnitTest tests[] = {
+    cmocka_unit_test(test_az_log),
+  };
+
+  return cmocka_run_group_tests_name("az_log", tests, NULL, NULL);
 }
