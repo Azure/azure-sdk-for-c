@@ -15,8 +15,10 @@ add_library (
 target_include_directories (az_iot PUBLIC inc)
 target_include_directories (az_iot PRIVATE src)
 
-target_link_libraries(az_iot PUBLIC az_core)
+# Get only headers from core. Do not link. Customers is expected to link
+# with az_iot and az_core. This allows sharing az_core with more clients
+target_include_directories (az_iot PRIVATE ../../core/core/inc)
+target_include_directories (az_iot PRIVATE ../../core/core/internal)
 
 add_library (az::iot ALIAS az_iot)
 
-add_subdirectory(tests)
