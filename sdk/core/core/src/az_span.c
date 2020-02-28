@@ -438,20 +438,25 @@ AZ_NODISCARD az_result az_span_append_int64(az_span* self, int64_t n)
   return _az_span_builder_append_uint64(self, n);
 }
 
-static AZ_NODISCARD az_result _az_span_builder_append_u32toa(az_span self, uint32_t n, az_span* out_span) {
-  if (n == 0) {
+static AZ_NODISCARD az_result
+_az_span_builder_append_u32toa(az_span self, uint32_t n, az_span* out_span)
+{
+  if (n == 0)
+  {
     return az_span_append_uint8(self, '0', out_span);
   }
 
   uint32_t div = 1000000000;
   uint32_t nn = n;
-  while (nn / div == 0) {
+  while (nn / div == 0)
+  {
     div /= 10;
   }
 
   *out_span = self;
 
-  while (div > 1) {
+  while (div > 1)
+  {
     uint8_t value_to_append = _az_decimal_to_ascii((uint8_t)(nn / div));
     AZ_RETURN_IF_FAILED(az_span_append_uint8(*out_span, value_to_append, out_span));
 
@@ -475,7 +480,8 @@ AZ_NODISCARD az_result az_span_append_i32toa(az_span span, int32_t n, az_span* o
 
   *out_span = span;
 
-  if (n < 0) {
+  if (n < 0)
+  {
     AZ_RETURN_IF_FAILED(az_span_append_uint8(*out_span, '-', out_span));
     n = -n;
   }
@@ -538,5 +544,5 @@ AZ_NODISCARD az_result _az_scan_until(az_span self, _az_predicate predicate, int
 
 AZ_NODISCARD az_result az_span_append_uint8(az_span span, uint8_t c, az_span* span_out)
 {
-    return az_span_append(span, az_span_init(&c, 1, 1), span_out);
+  return az_span_append(span, az_span_init(&c, 1, 1), span_out);
 }
