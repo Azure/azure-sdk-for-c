@@ -38,7 +38,6 @@ endif()
 # SDK Clients and tests
 add_subdirectory(sdk/keyvault/keyvault)
 add_subdirectory(sdk/storage/blobs)
-add_subdirectory(sdk/storage/blobs/test)
 add_subdirectory(sdk/iot/core)
 
 # PAL
@@ -57,4 +56,5 @@ endif()
 if (UNIT_TESTING)
   add_subdirectory(sdk/core/core/test/cmocka)
   add_subdirectory(sdk/keyvault/keyvault/test/cmocka)
+  add_subdirectory(sdk/storage/blobs/test/cmocka)
 endif()
