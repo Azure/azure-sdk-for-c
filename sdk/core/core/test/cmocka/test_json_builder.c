@@ -2,15 +2,20 @@
 // SPDX-License-Identifier: MIT
 
 #include <az_json.h>
-#include <az_result.h>
 #include <az_span.h>
 
-#include <az_test.h>
+#include <setjmp.h>
+#include <stdarg.h>
+
+#include <cmocka.h>
 
 #include <_az_cfg.h>
 
-void test_json_builder()
+#define TEST_EXPECT_SUCCESS(exp) assert_true(az_succeeded(exp))
+
+void test_json_builder(void** state)
 {
+  (void)state;
   {
     uint8_t array[200];
     az_json_builder builder = { 0 };
@@ -54,7 +59,7 @@ void test_json_builder()
 
     TEST_EXPECT_SUCCESS(az_json_builder_append_object_close(&builder));
 
-    TEST_ASSERT(az_span_is_equal(
+    assert_true(az_span_is_equal(
         builder._internal.json,
         AZ_SPAN_FROM_STR( //
             "{"

@@ -15,8 +15,8 @@ add_library (
 target_include_directories (az_iot PUBLIC inc)
 target_include_directories (az_iot PRIVATE src)
 
-target_link_libraries(az_iot PUBLIC az_core)
+# TODO: Follow up with team about the linking/including strategy for SDK-clients on top of az_core
+target_link_libraries(az_iot PRIVATE az_core)
 
 add_library (az::iot ALIAS az_iot)
 
-add_subdirectory(tests)

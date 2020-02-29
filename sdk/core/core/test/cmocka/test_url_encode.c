@@ -4,10 +4,14 @@
 #include "az_json_string_private.h"
 #include <az_json.h>
 
-#include <az_test.h>
-#include <stdio.h>
+#include <setjmp.h>
+#include <stdarg.h>
+
+#include <cmocka.h>
 
 #include <_az_cfg.h>
+
+#define TEST_EXPECT_SUCCESS(exp) assert_true(az_succeeded(exp))
 
 static az_span uri_encoded = AZ_SPAN_LITERAL_FROM_STR(
     "%00%01%02%03%04%05%06%07%08%09%0A%0B%0C%0D%0E%0F%10%11%12%13%14%15%16%17%18%19%1A%1B%1C%1D%1E%"
@@ -40,8 +44,9 @@ static uint8_t uri_decoded_buf[] = {
 
 static az_span uri_decoded = AZ_SPAN_LITERAL_FROM_INITIALIZED_BUFFER(uri_decoded_buf);
 
-void test_url_encode()
+void test_url_encode(void** state)
 {
+  (void)state;
   uint8_t buffer[1000];
   {
     uint8_t buf[256 * 3];
@@ -49,10 +54,19 @@ void test_url_encode()
 
     TEST_EXPECT_SUCCESS(
         az_span_copy_url_encode(builder, AZ_SPAN_FROM_STR("https://vault.azure.net"), &builder));
-    TEST_ASSERT(az_span_is_equal(builder, AZ_SPAN_FROM_STR("https%3A%2F%2Fvault.azure.net")));
+    assert_true(az_span_is_equal(builder, AZ_SPAN_FROM_STR("https%3A%2F%2Fvault.azure.net")));
 
     builder = AZ_SPAN_FROM_BUFFER(buffer);
     TEST_EXPECT_SUCCESS(az_span_copy_url_encode(builder, uri_decoded, &builder));
-    TEST_ASSERT(az_span_is_equal(builder, uri_encoded));
+    assert_true(az_span_is_equal(builder, uri_encoded));
   }
+}
+
+int main(void)
+{
+  const struct CMUnitTest tests[] = {
+    cmocka_unit_test(test_url_encode),
+  };
+
+  return cmocka_run_group_tests_name("az_url_encode", tests, NULL, NULL);
 }
