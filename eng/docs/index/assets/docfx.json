@@ -1,13 +1,7 @@
 {
   "metadata": [
     {
-      "src": [
-        {
-          "files": [
-            "src/**.csproj"
-          ]
-        }
-      ],
+      "src": [],
       "dest": "api",
       "disableGitFeatures": false,
       "disableDefaultFilter": false
@@ -65,8 +59,8 @@
     "cleanupCacheHistory": false,
     "disableGitFeatures": false,
     "globalMetadata": {
-      "_appTitle": "Azure SDK for Net",
-      "_appFooter": "Azure SDK for Net",
+      "_appTitle": "Azure SDK for C",
+      "_appFooter": "Azure SDK for C",
       "_appFaviconPath": "https://c.s-microsoft.com/favicon.ico?v2",
       "_enableSearch": true,
       "_enableNewTab": true
