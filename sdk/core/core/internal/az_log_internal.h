@@ -18,4 +18,4 @@ bool az_log_should_write(az_log_classification classification);
 
 #include <_az_cfg_suffix.h>
 
-#endif
+#endif // _az_LOG_INTERNAL_H

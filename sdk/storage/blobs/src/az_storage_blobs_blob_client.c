@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include <az_config_internal.h>
 #include <az_contract_internal.h>
 #include <az_credentials_internal.h>
 #include <az_http.h>
@@ -8,7 +9,6 @@
 #include <az_http_transport.h>
 #include <az_json.h>
 #include <az_storage_blobs.h>
-#include <az_config_internal.h>
 
 #include <stddef.h>
 
@@ -22,32 +22,34 @@ static az_span const AZ_STORAGE_BLOBS_BLOB_TYPE_BLOCKBLOB = AZ_SPAN_LITERAL_FROM
 static az_span const AZ_HTTP_HEADER_CONTENT_LENGTH = AZ_SPAN_LITERAL_FROM_STR("Content-Length");
 static az_span const AZ_HTTP_HEADER_CONTENT_TYPE = AZ_SPAN_LITERAL_FROM_STR("Content-Type");
 
-AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_options_default(
-    az_http_transport_options const * http_transport_options) {
-  az_storage_blobs_blob_client_options options = {
-    ._internal = { .http_transport_options = *http_transport_options,
-                   .api_version = _az_http_policy_apiversion_options_default(),
-                   ._telemetry_options = _az_http_policy_telemetry_options_default() },
+AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_options_default()
+{
+
+  return (az_storage_blobs_blob_client_options) {
+    ._internal = {
+      .api_version = { 
+        ._internal = { 
+          .option_location = _az_http_policy_apiversion_option_location_header,
+          .name = AZ_SPAN_FROM_STR("x-ms-version"),
+          .version = AZ_STORAGE_API_VERSION,
+        },
+      },
+      ._telemetry_options = _az_http_policy_telemetry_options_default(),
+    },
     .retry = az_http_policy_retry_options_default(),
   };
-
-  options._internal.api_version._internal.option_location = _az_http_policy_apiversion_option_location_queryparameter;
-  options._internal.api_version._internal.name = AZ_SPAN_FROM_STR("x-ms-version");
-  options._internal.api_version._internal.version = AZ_STORAGE_API_VERSION;
-
-  return options;
 }
 
 AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
-    az_storage_blobs_blob_client * self,
+    az_storage_blobs_blob_client* self,
     az_span uri,
-    void * credential,
-    az_storage_blobs_blob_client_options * options) {
+    void* credential,
+    az_storage_blobs_blob_client_options* options)
+{
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(options);
 
-  _az_credential * const cred = (_az_credential *)credential;
-  cred->_internal.http_transport_options = options->_internal.http_transport_options;
+  _az_credential* const cred = (_az_credential*)credential;
 
   *self = (az_storage_blobs_blob_client) {
     ._internal = {
@@ -60,7 +62,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
             {
               ._internal = {
                 .process = az_http_pipeline_policy_apiversion,
-                .p_options= &options->_internal.api_version,
+                .p_options= &self->_internal.options._internal.api_version,
               },
             },
             {
@@ -72,13 +74,13 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
             {
               ._internal = {
                 .process = az_http_pipeline_policy_telemetry,
-                .p_options = &options->_internal._telemetry_options,
+                .p_options = &self->_internal.options._internal._telemetry_options,
               },
             },
             {
               ._internal = {
                 .process = az_http_pipeline_policy_retry,
-                .p_options = &options->retry,
+                .p_options = &self->_internal.options.retry,
               },
             },
             {
@@ -95,20 +97,8 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
             },
             {
               ._internal = {
-                .process = az_http_pipeline_policy_bufferresponse,
-                .p_options = NULL,
-              },
-            },
-            {
-              ._internal = {
-                .process= az_http_pipeline_policy_distributedtracing,
-                .p_options = NULL,
-              },
-            },
-            {
-              ._internal = {
                 .process = az_http_pipeline_policy_transport,
-                .p_options= &options->_internal.http_transport_options,
+                .p_options = NULL,
               },
             },
           },
@@ -121,21 +111,26 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
   AZ_RETURN_IF_FAILED(az_span_copy(self->_internal.uri, uri, &self->_internal.uri));
 
   AZ_RETURN_IF_FAILED(
-      _az_credential_set_scopes(cred, AZ_SPAN_FROM_STR("https://storage.azure.net/.default")));
+      _az_credential_set_scopes(cred, AZ_SPAN_FROM_STR("https://storage.azure.com/.default")));
 
   return AZ_OK;
 }
 
 AZ_NODISCARD az_result az_storage_blobs_blob_upload(
-    az_storage_blobs_blob_client * client,
+    az_storage_blobs_blob_client* client,
+    az_context* context,
     az_span content, /* Buffer of content*/
-    az_storage_blobs_blob_upload_options * options,
-    az_http_response * response) {
+    az_storage_blobs_blob_upload_options* options,
+    az_http_response* response)
+{
 
   az_storage_blobs_blob_upload_options opt;
-  if (options == NULL) {
+  if (options == NULL)
+  {
     opt = az_storage_blobs_blob_upload_options_default();
-  } else {
+  }
+  else
+  {
     opt = *options;
   }
   (void)opt;
@@ -152,7 +147,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
   // create request
   _az_http_request hrb;
   AZ_RETURN_IF_FAILED(az_http_request_init(
-      &hrb, az_http_method_get(), request_url_span, request_headers_span, content));
+      &hrb, context, az_http_method_put(), request_url_span, request_headers_span, content));
 
   // add blob type to request
   AZ_RETURN_IF_FAILED(az_http_request_append_header(

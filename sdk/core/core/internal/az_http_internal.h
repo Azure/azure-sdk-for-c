@@ -10,8 +10,20 @@
 #include <_az_cfg_prefix.h>
 
 AZ_NODISCARD AZ_INLINE _az_http_policy_apiversion_options
-_az_http_policy_apiversion_options_default() {
+_az_http_policy_apiversion_options_default()
+{
   return (_az_http_policy_apiversion_options){ 0 };
+}
+
+/**
+ * @brief Returns the count of headers on the request
+ *        Each header is an az_pair
+ *
+ */
+AZ_NODISCARD AZ_INLINE int32_t _az_http_request_headers_count(_az_http_request* request)
+{
+  // Cast the unsigned sizeof result to ensure the divsion is signed/signed
+  return az_span_length(request->_internal.headers) / (int32_t)sizeof(az_pair);
 }
 
 // PipelinePolicies
@@ -32,63 +44,54 @@ _az_http_policy_apiversion_options_default() {
 
 // Start the pipeline
 AZ_NODISCARD az_result az_http_pipeline_process(
-    _az_http_pipeline * pipeline,
-    _az_http_request * p_request,
-    az_http_response * p_response);
+    _az_http_pipeline* pipeline,
+    _az_http_request* p_request,
+    az_http_response* p_response);
 
 AZ_NODISCARD az_result az_http_pipeline_policy_apiversion(
-    _az_http_policy * p_policies,
-    void * p_data,
-    _az_http_request * p_request,
-    az_http_response * p_response);
+    _az_http_policy* p_policies,
+    void* p_data,
+    _az_http_request* p_request,
+    az_http_response* p_response);
 
 AZ_NODISCARD az_result az_http_pipeline_policy_uniquerequestid(
-    _az_http_policy * p_policies,
-    void * p_data,
-    _az_http_request * p_request,
-    az_http_response * p_response);
+    _az_http_policy* p_policies,
+    void* p_data,
+    _az_http_request* p_request,
+    az_http_response* p_response);
 
 AZ_NODISCARD az_result az_http_pipeline_policy_telemetry(
-    _az_http_policy * p_policies,
-    void * p_options,
-    _az_http_request * p_request,
-    az_http_response * p_response);
+    _az_http_policy* p_policies,
+    void* p_options,
+    _az_http_request* p_request,
+    az_http_response* p_response);
 
 AZ_NODISCARD az_result az_http_pipeline_policy_retry(
-    _az_http_policy * p_policies,
-    void * p_data,
-    _az_http_request * p_request,
-    az_http_response * p_response);
+    _az_http_policy* p_policies,
+    void* p_data,
+    _az_http_request* p_request,
+    az_http_response* p_response);
 
 AZ_NODISCARD az_result az_http_pipeline_policy_credential(
-    _az_http_policy * p_policies,
-    void * p_data,
-    _az_http_request * p_request,
-    az_http_response * p_response);
+    _az_http_policy* p_policies,
+    void* p_data,
+    _az_http_request* p_request,
+    az_http_response* p_response);
 
 AZ_NODISCARD az_result az_http_pipeline_policy_logging(
-    _az_http_policy * p_policies,
-    void * p_data,
-    _az_http_request * p_request,
-    az_http_response * p_response);
-
-AZ_NODISCARD az_result az_http_pipeline_policy_bufferresponse(
-    _az_http_policy * p_policies,
-    void * p_data,
-    _az_http_request * p_request,
-    az_http_response * p_response);
-
-AZ_NODISCARD az_result az_http_pipeline_policy_distributedtracing(
-    _az_http_policy * p_policies,
-    void * p_data,
-    _az_http_request * p_request,
-    az_http_response * p_response);
+    _az_http_policy* p_policies,
+    void* p_data,
+    _az_http_request* p_request,
+    az_http_response* p_response);
 
 AZ_NODISCARD az_result az_http_pipeline_policy_transport(
-    _az_http_policy * p_policies,
-    void * p_data,
-    _az_http_request * p_request,
-    az_http_response * p_response);
+    _az_http_policy* p_policies,
+    void* p_data,
+    _az_http_request* p_request,
+    az_http_response* p_response);
+
+AZ_NODISCARD az_result
+az_http_client_send_request(_az_http_request* p_request, az_http_response* p_response);
 
 /**
  * @brief Format buffer as a http request containing URL and header spans.
@@ -108,7 +111,8 @@ AZ_NODISCARD az_result az_http_pipeline_policy_transport(
  *     - `max_url_size` is less than `initial_url.size`.
  */
 AZ_NODISCARD az_result az_http_request_init(
-    _az_http_request * p_request,
+    _az_http_request* p_request,
+    az_context* context,
     az_http_method method,
     az_span url,
     az_span headers_buffer,
@@ -124,7 +128,7 @@ AZ_NODISCARD az_result az_http_request_init(
  * @param path span to a path to be appended into url
  * @return AZ_NODISCARD az_http_request_builder_append_path
  */
-AZ_NODISCARD az_result az_http_request_append_path(_az_http_request * p_request, az_span path);
+AZ_NODISCARD az_result az_http_request_append_path(_az_http_request* p_request, az_span path);
 
 /**
  * @brief Set query parameter.
@@ -144,7 +148,7 @@ AZ_NODISCARD az_result az_http_request_append_path(_az_http_request * p_request,
  *     - `name`'s or `value`'s buffer overlap resulting `url`'s buffer.
  */
 AZ_NODISCARD az_result
-az_http_request_set_query_parameter(_az_http_request * p_request, az_span name, az_span value);
+az_http_request_set_query_parameter(_az_http_request* p_request, az_span name, az_span value);
 
 /**
  * @brief Add a new HTTP header for the request.
@@ -164,7 +168,8 @@ az_http_request_set_query_parameter(_az_http_request * p_request, az_span name, 
  *     - `name`'s or `value`'s buffer overlap resulting `url`'s buffer.
  */
 AZ_NODISCARD az_result
-az_http_request_append_header(_az_http_request * p_request, az_span key, az_span value);
+az_http_request_append_header(_az_http_request* p_request, az_span key, az_span value);
 
 #include <_az_cfg_suffix.h>
-#endif
+
+#endif // _az_HTTP_INTERNAL_H

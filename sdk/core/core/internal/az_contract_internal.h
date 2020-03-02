@@ -12,15 +12,18 @@
 #include <_az_cfg_prefix.h>
 
 #define AZ_CONTRACT(condition, error) \
-  do { \
-    if (!(condition)) { \
+  do \
+  { \
+    if (!(condition)) \
+    { \
       return error; \
     } \
   } while (0)
 
 #define AZ_CONTRACT_ARG_NOT_NULL(arg) AZ_CONTRACT((arg) != NULL, AZ_ERROR_ARG)
 
-AZ_NODISCARD AZ_INLINE bool az_span_is_valid(az_span span) {
+AZ_NODISCARD AZ_INLINE bool az_span_is_valid(az_span span)
+{
   return az_span_length(span) == 0
       || (az_span_ptr(span) != NULL
           && az_span_ptr(span) <= az_span_ptr(span) + az_span_length(span) - 1);
@@ -30,6 +33,9 @@ AZ_NODISCARD AZ_INLINE bool az_span_is_valid(az_span span) {
 
 AZ_NODISCARD AZ_INLINE bool az_span_is_empty(az_span span) { return az_span_length(span) == 0; }
 
+#define AZ_CONTRACT_ARG_VALID_NON_EMPTY_SPAN(span) \
+    AZ_CONTRACT(az_span_ptr(span) != NULL && az_span_capacity(span) > 0 && az_span_length(span) > 0 && az_span_length(span) <= az_span_capacity(span), AZ_ERROR_ARG)
+
 #include <_az_cfg_suffix.h>
 
-#endif /* _az_CONTRACT_INTERNAL_H */
+#endif // _az_CONTRACT_INTERNAL_H

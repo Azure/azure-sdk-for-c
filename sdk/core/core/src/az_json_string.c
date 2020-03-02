@@ -10,44 +10,60 @@
 
 #include <_az_cfg.h>
 
-AZ_NODISCARD AZ_INLINE az_result az_hex_to_digit(uint8_t c, uint8_t * out) {
-  if (isdigit(c)) {
+AZ_NODISCARD AZ_INLINE az_result az_hex_to_digit(uint8_t c, uint8_t* out)
+{
+  if (isdigit(c))
+  {
     *out = c - '0';
-  } else if ('a' <= c && c <= 'f') {
+  }
+  else if ('a' <= c && c <= 'f')
+  {
     *out = c - _az_HEX_LOWER_OFFSET;
-  } else if ('A' <= c && c <= 'F') {
+  }
+  else if ('A' <= c && c <= 'F')
+  {
     *out = c - _az_HEX_UPPER_OFFSET;
-  } else {
+  }
+  else
+  {
     return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
   return AZ_OK;
 }
 
-AZ_NODISCARD AZ_INLINE az_result az_json_esc_decode(uint8_t c, uint8_t * out) {
-  switch (c) {
+AZ_NODISCARD AZ_INLINE az_result az_json_esc_decode(uint8_t c, uint8_t* out)
+{
+  switch (c)
+  {
     case '\\':
     case '"':
-    case '/': {
+    case '/':
+    {
       *out = c;
       break;
     }
-    case 'b': {
+    case 'b':
+    {
       *out = '\b';
       break;
     }
-    case 'f': {
+    case 'f':
+    {
       *out = '\f';
       break;
     }
-    case 'n': {
+    case 'n':
+    {
       *out = '\n';
       break;
     }
-    case 'r': {
+    case 'r':
+    {
       *out = '\r';
       break;
     }
-    case 't': {
+    case 't':
+    {
       *out = '\t';
       break;
     }
@@ -57,60 +73,81 @@ AZ_NODISCARD AZ_INLINE az_result az_json_esc_decode(uint8_t c, uint8_t * out) {
   return AZ_OK;
 }
 
-AZ_NODISCARD az_span _az_json_esc_encode(uint8_t c) {
-  switch (c) {
-    case '\\': {
+AZ_NODISCARD az_span _az_json_esc_encode(uint8_t c)
+{
+  switch (c)
+  {
+    case '\\':
+    {
       return AZ_SPAN_FROM_STR("\\\\");
     }
-    case '"': {
+    case '"':
+    {
       return AZ_SPAN_FROM_STR("\\\"");
     }
-    case '\b': {
+    case '\b':
+    {
       return AZ_SPAN_FROM_STR("\\b");
     }
-    case '\f': {
+    case '\f':
+    {
       return AZ_SPAN_FROM_STR("\\f");
     }
-    case '\n': {
+    case '\n':
+    {
       return AZ_SPAN_FROM_STR("\\n");
     }
-    case '\r': {
+    case '\r':
+    {
       return AZ_SPAN_FROM_STR("\\r");
     }
-    case '\t': {
+    case '\t':
+    {
       return AZ_SPAN_FROM_STR("\\t");
     }
-    default: { return az_span_null(); }
+    default:
+    {
+      return AZ_SPAN_NULL;
+    }
   }
 }
 
-AZ_NODISCARD az_result _az_span_reader_read_json_string_char(az_span * self, uint32_t * out) {
+AZ_NODISCARD az_result _az_span_reader_read_json_string_char(az_span* self, uint32_t* out)
+{
   AZ_CONTRACT_ARG_NOT_NULL(self);
 
   int32_t reader_length = az_span_length(*self);
-  if (reader_length == 0) {
+  if (reader_length == 0)
+  {
     return AZ_ERROR_ITEM_NOT_FOUND;
   }
 
   uint8_t const result = az_span_ptr(*self)[0];
-  switch (result) {
-    case '"': {
+  switch (result)
+  {
+    case '"':
+    {
       return AZ_ERROR_JSON_STRING_END;
     }
-    case '\\': {
+    case '\\':
+    {
       // moving reader fw
       AZ_RETURN_IF_FAILED(az_span_slice(*self, 1, -1, self));
-      if (az_span_length(*self) == 0) {
+      if (az_span_length(*self) == 0)
+      {
         return AZ_ERROR_EOF;
       }
       uint8_t const c = az_span_ptr(*self)[0];
       AZ_RETURN_IF_FAILED(az_span_slice(*self, 1, -1, self));
 
-      if (c == 'u') {
+      if (c == 'u')
+      {
         uint32_t r = 0;
-        for (size_t i = 0; i < 4; ++i) {
+        for (size_t i = 0; i < 4; ++i)
+        {
           uint8_t digit = 0;
-          if (az_span_length(*self) == 0) {
+          if (az_span_length(*self) == 0)
+          {
             return AZ_ERROR_EOF;
           }
           AZ_RETURN_IF_FAILED(az_hex_to_digit(az_span_ptr(*self)[0], &digit));
@@ -118,15 +155,19 @@ AZ_NODISCARD az_result _az_span_reader_read_json_string_char(az_span * self, uin
           AZ_RETURN_IF_FAILED(az_span_slice(*self, 1, -1, self));
         }
         *out = r;
-      } else {
+      }
+      else
+      {
         uint8_t r = 0;
         AZ_RETURN_IF_FAILED(az_json_esc_decode(c, &r));
         *out = r;
       }
       return AZ_OK;
     }
-    default: {
-      if (result < 0x20) {
+    default:
+    {
+      if (result < 0x20)
+      {
         return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
       }
       AZ_RETURN_IF_FAILED(az_span_slice(*self, 1, -1, self));

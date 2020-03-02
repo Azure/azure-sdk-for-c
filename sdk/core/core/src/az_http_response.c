@@ -11,15 +11,18 @@
 
 // HTTP Response utility functions
 
-AZ_NODISCARD AZ_INLINE az_result _az_is_char(az_span slice, uint8_t c) {
+AZ_NODISCARD AZ_INLINE az_result _az_is_char(az_span slice, uint8_t c)
+{
   return az_span_ptr(slice)[0] == c ? AZ_OK : AZ_CONTINUE;
 }
 
 AZ_NODISCARD az_result _az_is_a_colon(az_span slice) { return _az_is_char(slice, ':'); }
 AZ_NODISCARD az_result _az_is_new_line(az_span slice) { return _az_is_char(slice, '\n'); }
 
-AZ_NODISCARD bool _az_is_http_whitespace(uint8_t c) {
-  switch (c) {
+AZ_NODISCARD bool _az_is_http_whitespace(uint8_t c)
+{
+  switch (c)
+  {
     case ' ':
     case '\t':
       return true;
@@ -29,15 +32,18 @@ AZ_NODISCARD bool _az_is_http_whitespace(uint8_t c) {
   }
 }
 
-AZ_NODISCARD az_result _az_slice_is_not_http_whitespace(az_span slice) {
+AZ_NODISCARD az_result _az_slice_is_not_http_whitespace(az_span slice)
+{
   return _az_is_http_whitespace(az_span_ptr(slice)[0]) == true ? AZ_CONTINUE : AZ_OK;
 }
 
 /* PRIVATE Function. parse next  */
-AZ_NODISCARD az_result _az_get_digit(az_span * self, uint8_t * save_here) {
+AZ_NODISCARD az_result _az_get_digit(az_span* self, uint8_t* save_here)
+{
 
   uint8_t c_ptr = az_span_ptr(*self)[0];
-  if (!isdigit(c_ptr)) {
+  if (!isdigit(c_ptr))
+  {
     return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
   //
@@ -53,8 +59,8 @@ AZ_NODISCARD az_result _az_get_digit(az_span * self, uint8_t * save_here) {
  * Status line https://tools.ietf.org/html/rfc7230#section-3.1.2
  * HTTP-version SP status-code SP reason-phrase CRLF
  */
-AZ_NODISCARD az_result
-_az_get_http_status_line(az_span * self, az_http_response_status_line * out) {
+AZ_NODISCARD az_result _az_get_http_status_line(az_span* self, az_http_response_status_line* out)
+{
 
   // HTTP-version = HTTP-name "/" DIGIT "." DIGIT
   // https://tools.ietf.org/html/rfc7230#section-2.6
@@ -75,7 +81,7 @@ _az_get_http_status_line(az_span * self, az_http_response_status_line * out) {
   {
     uint64_t code = 0;
     AZ_RETURN_IF_FAILED(az_span_to_uint64(az_span_init(az_span_ptr(*self), 3, 3), &code));
-    out->status_code = (_az_http_status_code)code;
+    out->status_code = (az_http_status_code)code;
     // move reader
     AZ_RETURN_IF_FAILED(az_span_slice(*self, 3, -1, self));
   }
@@ -100,7 +106,8 @@ _az_get_http_status_line(az_span * self, az_http_response_status_line * out) {
 }
 
 AZ_NODISCARD az_result
-az_http_response_get_status_line(az_http_response * response, az_http_response_status_line * out) {
+az_http_response_get_status_line(az_http_response* response, az_http_response_status_line* out)
+{
   AZ_CONTRACT_ARG_NOT_NULL(response);
   AZ_CONTRACT_ARG_NOT_NULL(out);
 
@@ -116,28 +123,32 @@ az_http_response_get_status_line(az_http_response * response, az_http_response_s
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_http_response_get_next_header(az_http_response * self, az_pair * out) {
+AZ_NODISCARD az_result az_http_response_get_next_header(az_http_response* self, az_pair* out)
+{
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(out);
-  az_span * reader = &self->_internal.parser.remaining;
+  az_span* reader = &self->_internal.parser.remaining;
   {
     az_http_response_kind const kind = self->_internal.parser.next_kind;
     // if reader is expecting to read body (all headers were read), return ITEM_NOT_FOUND so we
     // know we reach end of headers
-    if (kind == AZ_HTTP_RESPONSE_KIND_BODY) {
+    if (kind == AZ_HTTP_RESPONSE_KIND_BODY)
+    {
       return AZ_ERROR_ITEM_NOT_FOUND;
     }
     // Can't read a header if status line was not previously called,
     // User needs to call az_http_response_status_line() witch would reset parser and set kind to
     // headers
-    if (kind != AZ_HTTP_RESPONSE_KIND_HEADER) {
+    if (kind != AZ_HTTP_RESPONSE_KIND_HEADER)
+    {
       return AZ_ERROR_HTTP_INVALID_STATE;
     }
   }
 
   // check if we are at the end of all headers to change state to Body.
   // We keep state to Headers if current char is not '\r' (there is another header)
-  if (az_span_ptr(self->_internal.parser.remaining)[0] == '\r') {
+  if (az_span_ptr(self->_internal.parser.remaining)[0] == '\r')
+  {
     AZ_RETURN_IF_FAILED(_az_is_expected_span(reader, AZ_SPAN_FROM_STR("\r\n")));
     self->_internal.parser.next_kind = AZ_HTTP_RESPONSE_KIND_BODY;
     return AZ_ERROR_ITEM_NOT_FOUND;
@@ -178,16 +189,20 @@ AZ_NODISCARD az_result az_http_response_get_next_header(az_http_response * self,
   {
     int32_t offset = 0;
     int32_t offset_value_end = offset;
-    while (true) {
+    while (true)
+    {
       uint8_t c = az_span_ptr(*reader)[offset];
       offset += 1;
-      if (c == '\r') {
+      if (c == '\r')
+      {
         break; // break as soon as end of value char is found
       }
-      if (_az_is_http_whitespace(c)) {
+      if (_az_is_http_whitespace(c))
+      {
         continue; // white space or tab is accepted. It can be any number after value (OWS)
       }
-      if (c <= ' ') {
+      if (c <= ' ')
+      {
         return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
       }
       offset_value_end = offset; // increasing index only for valid chars,
@@ -202,16 +217,19 @@ AZ_NODISCARD az_result az_http_response_get_next_header(az_http_response * self,
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_http_response_get_body(az_http_response * self, az_span * out_body) {
+AZ_NODISCARD az_result az_http_response_get_body(az_http_response* self, az_span* out_body)
+{
   AZ_CONTRACT_ARG_NOT_NULL(self);
   AZ_CONTRACT_ARG_NOT_NULL(out_body);
 
   // Make sure get body works no matter where is the current parsing. Allow users to call get body
   // directly and ignore headers and status line
   az_http_response_kind current_parsing_section = self->_internal.parser.next_kind;
-  if (current_parsing_section != AZ_HTTP_RESPONSE_KIND_BODY) {
+  if (current_parsing_section != AZ_HTTP_RESPONSE_KIND_BODY)
+  {
     if (current_parsing_section == AZ_HTTP_RESPONSE_KIND_EOF
-        || current_parsing_section == AZ_HTTP_RESPONSE_KIND_STATUS_LINE) {
+        || current_parsing_section == AZ_HTTP_RESPONSE_KIND_STATUS_LINE)
+    {
       // Reset parser and get status line
       az_http_response_status_line ignore = { 0 };
       AZ_RETURN_IF_FAILED(az_http_response_get_status_line(self, &ignore));
@@ -219,9 +237,11 @@ AZ_NODISCARD az_result az_http_response_get_body(az_http_response * self, az_spa
       current_parsing_section = self->_internal.parser.next_kind;
     }
     // parse any remaining header
-    if (current_parsing_section == AZ_HTTP_RESPONSE_KIND_HEADER) {
+    if (current_parsing_section == AZ_HTTP_RESPONSE_KIND_HEADER)
+    {
       // Parse and ignore all remaining headers
-      for (az_pair h; az_http_response_get_next_header(self, &h) == AZ_OK;) {
+      for (az_pair h; az_http_response_get_next_header(self, &h) == AZ_OK;)
+      {
         // ignoring header
       }
     }

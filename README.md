@@ -28,7 +28,7 @@ Use PowerShell to run {projectDir}/build.ps1
 <br> - Add windows system variable: VCPKG_ROOT=[PATH_TO_VCPKG] (replace PATH_TO_VCPKG for where vcpkg is installed)
 
 ##### Visual Studio 2019
-When following previous steps to set up CURL with VCPKG, open project forlder with Visual Studio and everything will be ready to build and run tests.
+When following previous steps to set up CURL with VCPKG, open project folder with Visual Studio and everything will be ready to build and run tests.
 
 #### Linux
 - Install `openssl version 1.1.1`
@@ -87,6 +87,17 @@ make az_core_test_cov_xml
 * File an issue via [Github Issues](https://github.com/Azure/azure-sdk-for-c/issues/new/choose).
 * Check [previous questions](https://stackoverflow.com/questions/tagged/azure+c) or ask new ones on StackOverflow using
   the `azure` and `c` tags.
+
+## Navigating the repository
+
+### Master branch
+
+The master branch has the most recent code with new features and bug fixes. It does **not** represent latest released **GA** SDK.
+
+### Release branches (Release tagging)
+
+For each package we release there will be a unique git tag created that contains the name and the version of the package to mark the commit of the code that produced the package. This tag will be used for servicing via hotfix branches as well as debugging the code for a particular preview or stable release version.
+Format of the release tags are `<package-name>_<package-version>`. For more information please see [our branching strategy](https://github.com/Azure/azure-sdk/blob/master/docs/policies/repobranching.md#release-tagging).
 
 ## Contributing
 For details on contributing to this repository, see the [contributing guide](https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md).

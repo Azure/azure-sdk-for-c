@@ -19,12 +19,13 @@
  */
 static az_span const AZ_KEYVAULT_API_VERSION = AZ_SPAN_LITERAL_FROM_STR("7.0");
 
-typedef struct {
+typedef struct
+{
   az_http_policy_retry_options retry;
-  struct {
+  struct
+  {
     _az_http_policy_apiversion_options api_version;
     _az_http_policy_telemetry_options _telemetry_options;
-    az_http_transport_options http_transport_options;
   } _internal;
 } az_keyvault_keys_client_options;
 
@@ -36,72 +37,86 @@ typedef struct {
  * Use this, for instance, when only caring about setting one option by calling this method and then
  * overriding that specific option
  */
-AZ_NODISCARD az_keyvault_keys_client_options
-az_keyvault_keys_client_options_default(az_http_transport_options const * http_transport_options);
+AZ_NODISCARD az_keyvault_keys_client_options az_keyvault_keys_client_options_default();
 
-typedef struct {
-  struct {
+typedef struct
+{
+  struct
+  {
     // buffer to copy customer url. Then it stays immutable
     uint8_t url_buffer[AZ_HTTP_REQUEST_URL_BUF_SIZE];
     // this url will point to url_buffer
     az_span uri;
     _az_http_pipeline pipeline;
     az_keyvault_keys_client_options options;
-    _az_credential * credential;
+    _az_credential* credential;
   } _internal;
 } az_keyvault_keys_client;
 
 AZ_NODISCARD az_result az_keyvault_keys_client_init(
-    az_keyvault_keys_client * self,
+    az_keyvault_keys_client* self,
     az_span uri,
-    void * credential,
-    az_keyvault_keys_client_options * options);
+    void* credential,
+    az_keyvault_keys_client_options* options);
 
 typedef az_span json_web_key_type;
 
-AZ_NODISCARD AZ_INLINE json_web_key_type az_keyvault_web_key_type_ec() {
+AZ_NODISCARD AZ_INLINE json_web_key_type az_keyvault_web_key_type_ec()
+{
   return AZ_SPAN_FROM_STR("EC");
 }
-AZ_NODISCARD AZ_INLINE json_web_key_type az_keyvault_web_key_type_ec_hsm() {
+AZ_NODISCARD AZ_INLINE json_web_key_type az_keyvault_web_key_type_ec_hsm()
+{
   return AZ_SPAN_FROM_STR("EC-HSM");
 }
-AZ_NODISCARD AZ_INLINE json_web_key_type az_keyvault_web_key_type_rsa() {
+AZ_NODISCARD AZ_INLINE json_web_key_type az_keyvault_web_key_type_rsa()
+{
   return AZ_SPAN_FROM_STR("RSA");
 }
-AZ_NODISCARD AZ_INLINE json_web_key_type az_keyvault_web_key_type_rsa_hsm() {
+AZ_NODISCARD AZ_INLINE json_web_key_type az_keyvault_web_key_type_rsa_hsm()
+{
   return AZ_SPAN_FROM_STR("RSA-HSM");
 }
-AZ_NODISCARD AZ_INLINE json_web_key_type az_keyvault_web_key_type_oct() {
+AZ_NODISCARD AZ_INLINE json_web_key_type az_keyvault_web_key_type_oct()
+{
   return AZ_SPAN_FROM_STR("oct");
 }
 
 typedef az_span az_keyvault_key_operation;
-AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_decrypt() {
+AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_decrypt()
+{
   return AZ_SPAN_FROM_STR("decrypt");
 }
-AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_encrypt() {
+AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_encrypt()
+{
   return AZ_SPAN_FROM_STR("encrypt");
 }
-AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_sign() {
+AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_sign()
+{
   return AZ_SPAN_FROM_STR("sign");
 }
-AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_unwrap_key() {
+AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_unwrap_key()
+{
   return AZ_SPAN_FROM_STR("unwrapKey");
 }
-AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_verify() {
+AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_verify()
+{
   return AZ_SPAN_FROM_STR("verify");
 }
-AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_wrap_key() {
+AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_wrap_key()
+{
   return AZ_SPAN_FROM_STR("wrapKey");
 }
-AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_null() {
-  return az_span_null();
+AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_null()
+{
+  return AZ_SPAN_NULL;
 }
 
-typedef struct {
+typedef struct
+{
   az_optional_bool enabled;
-  az_keyvault_key_operation * operations;
-  az_pair * tags;
+  az_keyvault_key_operation* operations;
+  az_pair* tags;
   /* TODO: adding next options
   Datetime not_before;
   Datetime expires_on
@@ -125,18 +140,19 @@ AZ_NODISCARD az_keyvault_create_key_options az_keyvault_create_key_options_defau
  * @return AZ_NODISCARD az_keyvault_keys_key_create
  */
 AZ_NODISCARD az_result az_keyvault_keys_key_create(
-    az_keyvault_keys_client * client,
+    az_keyvault_keys_client* client,
+    az_context* context,
     az_span key_name,
     json_web_key_type json_web_key_type,
-    az_keyvault_create_key_options * options,
-    az_http_response * response);
+    az_keyvault_create_key_options* options,
+    az_http_response* response);
 
 /**
  * @brief Gets the public part of a stored key.
  * The get key operation is applicable to all key types. If the requested key is symmetric, then no
  * key material is released in the response. This operation requires the keys/get permission.
  *
- * Get latest version by passing az_span_null as value for version
+ * Get latest version by passing AZ_SPAN_NULL as value for version
  *
  * @param client a keyvault client structure
  * @param key_name name of key to be retrieved
@@ -145,10 +161,11 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
  * @return AZ_NODISCARD az_keyvault_keys_key_get
  */
 AZ_NODISCARD az_result az_keyvault_keys_key_get(
-    az_keyvault_keys_client * client,
+    az_keyvault_keys_client* client,
+    az_context* context,
     az_span key_name,
     az_span key_version,
-    az_http_response * response);
+    az_http_response* response);
 
 /**
  * @brief Deletes a key of any type from storage in Azure Key Vault.
@@ -163,10 +180,11 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
  * @return AZ_NODISCARD az_keyvault_keys_key_delete
  */
 AZ_NODISCARD az_result az_keyvault_keys_key_delete(
-    az_keyvault_keys_client * client,
+    az_keyvault_keys_client* client,
+    az_context* context,
     az_span key_name,
-    az_http_response * response);
+    az_http_response* response);
 
 #include <_az_cfg_suffix.h>
 
-#endif
+#endif // _az_KEYVAULT_H

@@ -15,27 +15,34 @@
 
 #include <_az_cfg_prefix.h>
 
-enum {
+enum
+{
   AZ_FACILITY_CORE = 0x1,
-  AZ_FACILITY_JSON = 0x2,
-  AZ_FACILITY_HTTP = 0x3,
+  AZ_FACILITY_PLATFORM = 0x2,
+  AZ_FACILITY_JSON = 0x3,
+  AZ_FACILITY_HTTP = 0x4,
+  AZ_FACILITY_MQTT = 0x5,
+  AZ_FACILITY_IOT = 0x6,
   AZ_FACILITY_STD = 0x7FFF,
 };
 
-enum {
-  AZ_ERROR_FLAG = (int32_t)0x80000000,
+enum
+{
+  _az_ERROR_FLAG = (int32_t)0x80000000,
 };
 
 #define _az_RESULT_MAKE_ERROR(facility, code) \
-  ((int32_t)(0x80000000 | ((uint32_t)(facility) << 16) | (uint32_t)(code)))
+  ((int32_t)(_az_ERROR_FLAG | ((int32_t)(facility) << 16) | (int32_t)(code)))
 
 #define _az_RESULT_MAKE_SUCCESS(facility, code) \
-  ((int32_t)(0x00000000 | ((uint32_t)(facility) << 16) | (uint32_t)(code)))
+  ((int32_t)(((int32_t)(facility) << 16) | (int32_t)(code)))
 
 #define AZ_RETURN_IF_FAILED(exp) \
-  do { \
+  do \
+  { \
     az_result const _result = (exp); \
-    if (az_failed(_result)) { \
+    if (az_failed(_result)) \
+    { \
       return _result; \
     } \
   } while (0)
@@ -50,7 +57,8 @@ enum {
  * - otherwise
  *   -  0..30 Value
  */
-typedef enum az_result {
+typedef enum az_result
+{
   AZ_OK = _az_RESULT_MAKE_SUCCESS(AZ_FACILITY_CORE, 0),
   AZ_CONTINUE = _az_RESULT_MAKE_SUCCESS(AZ_FACILITY_CORE, 1),
 
@@ -61,6 +69,9 @@ typedef enum az_result {
   AZ_ERROR_NOT_IMPLEMENTED = _az_RESULT_MAKE_ERROR(AZ_FACILITY_CORE, 4),
   AZ_ERROR_ITEM_NOT_FOUND = _az_RESULT_MAKE_ERROR(AZ_FACILITY_CORE, 5),
   AZ_ERROR_PARSER_UNEXPECTED_CHAR = _az_RESULT_MAKE_ERROR(AZ_FACILITY_CORE, 6),
+
+  // Platform
+  AZ_ERROR_MUTEX = _az_RESULT_MAKE_ERROR(AZ_FACILITY_PLATFORM, 1),
 
   // C standard errors
   AZ_ERROR_EOF = _az_RESULT_MAKE_ERROR(AZ_FACILITY_STD, 0xFFFF),
@@ -81,10 +92,16 @@ typedef enum az_result {
   AZ_ERROR_HTTP_RESPONSE_COULDNT_RESOLVE_HOST = _az_RESULT_MAKE_ERROR(AZ_FACILITY_HTTP, 7),
 } az_result;
 
-AZ_NODISCARD AZ_INLINE bool az_failed(az_result result) { return (result & AZ_ERROR_FLAG) != 0; }
+AZ_NODISCARD AZ_INLINE bool az_failed(az_result result)
+{
+  return ((int32_t)result & (int32_t)_az_ERROR_FLAG) != 0;
+}
 
-AZ_NODISCARD AZ_INLINE bool az_succeeded(az_result result) { return (result & AZ_ERROR_FLAG) == 0; }
+AZ_NODISCARD AZ_INLINE bool az_succeeded(az_result result)
+{
+  return ((int32_t)result & (int32_t)_az_ERROR_FLAG) == 0;
+}
 
 #include <_az_cfg_suffix.h>
 
-#endif
+#endif // _az_RESULT_H
