@@ -1,0 +1,5 @@
+if(DEFINED ENV{AZ_SDK_CODE_COV} AND CMAKE_C_COMPILER_ID MATCHES "GNU")
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        include(CodeCoverage)
+    endif()
+endif()
