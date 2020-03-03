@@ -53,10 +53,11 @@ doxygen Doxyfile
 ```
 
 ## Code Coverage Reports
-Code coverage reports can be generated following below instructions.
+Code coverage reports can be generated after running unit tests for each project. Follow below instructions will generate code coverage reports.
 ### Requirements
-- <b>gcc</b>. Clang is not yet supported.<br>
+- <b>gcc</b>. clang/MSVC not supported<br>
 - <b>Debug</b>. Build files for debug `cmake -DCMAKE_BUILD_TYPE=Debug ..`
+- <b>cmocka / Unit Test Enabled</b>. Build cmocka unit tests `cmake --DUNIT_TESTING=ON ..`
 - <b>environment variable</b>. `export AZ_SDK_CODE_COV=1`
 
 ```bash
@@ -66,21 +67,27 @@ cd build
 
 # set env variable to enable building code coverage
 export AZ_SDK_CODE_COV=1
-# generate cmake files with Debug enabled
-cmake -DCMAKE_BUILD_TYPE=Debug ..
+# generate cmake files with Debug and cmocka unit tests enabled 
+cmake -DUNIT_TESTING=ON -DCMAKE_BUILD_TYPE=Debug ..
 
-## There are 3 available reports to generate:
+## There are 3 available reports to generate for each project:
 # 1. using lcov. Html files grouped by folders. Make sure lcov
 # is installed.
-make az_core_test_cov
+make ${project_name}_cov //i.e. az_core_cov or az_iot_cov
 
 # 2. using gcov. Html page with all results in one page. Make sure
 # gcov is installed.
-make az_core_test_cov_html
+make ${project_name}_cov_html //i.e. az_core_cov_html or az_iot_cov_html
 
 # 3. using gcov. XML file with all results. Make sure
 # gcov is installed.
-make az_core_test_cov_xml
+make ${project_name}_cov_xml //i.e. az_core_cov_xml or az_iot_cov_xml
+
+## Code Coverage is available for this projects:
+#  az_core
+#  az_iot
+#  az_keyvault
+#  az_storage_blobs
 ```
 
 ## Need help?
