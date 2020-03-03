@@ -187,6 +187,7 @@ jobs:
       make az_iot_cov_xml
       make az_keyvault_cov_xml
       make az_storage_blobs_cov_xml
+      reportgenerator "-reports:sdk/core/core/az_core_cov_xml.xml;sdk/iot/core/az_iot_cov_xml.xml" "-targetdir:." "-reporttypes:Cobertura"
     workingDirectory: build
     displayName: Generate Code Coverage Data
     condition: eq(variables['AZ_SDK_CODE_COV'], 1)
@@ -194,6 +195,6 @@ jobs:
   - task: PublishCodeCoverageResults@1
     inputs:
         codeCoverageTool: Cobertura
-        summaryFileLocation: '$(Build.SourcesDirectory)/**/*_cov_xml.xml'
+        summaryFileLocation: '$(Build.SourcesDirectory)/**/Cobertura.xml'
     displayName: Publish Code Coverage to DevOps
     condition: eq(variables['AZ_SDK_CODE_COV'], 1)
