@@ -170,12 +170,14 @@ jobs:
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: 'JUnit'
-      testResultsFiles: '**/*-test-results.xml' 
+      testResultsFiles: '**/*-test-results.xml'
       mergeTestResults: true
       testRunTitle: 'C99 - $(Agent.JobName)'
     condition: contains(variables['vcpkg.deps'], 'cmocka')
 
   - script: |
+      sudo apt install -y gcovr lcov
+
       make az_core_cov_xml
       make az_iot_cov_xml
       make az_keyvault_cov_xml
