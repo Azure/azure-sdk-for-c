@@ -185,6 +185,7 @@ jobs:
       make az_iot_cov_xml
       make az_keyvault_cov_xml
       make az_storage_blobs_cov_xml
+    workingDirectory: build
     displayName: Generate Code Coverage Data
     condition: eq(variables['AZ_SDK_CODE_COV'], 1)
 
