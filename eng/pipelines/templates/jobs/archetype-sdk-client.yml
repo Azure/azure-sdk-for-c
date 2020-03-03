@@ -153,6 +153,8 @@ jobs:
       sudo apt install -y gcovr lcov
       dotnet tool install -g dotnet-reportgenerator-globaltool
       dotnet tool install dotnet-reportgenerator-globaltool --tool-path tools
+      ls
+      pwd
     displayName: Install coverage tools
     condition: eq(variables['AZ_SDK_CODE_COV'], 1)
 
@@ -187,6 +189,8 @@ jobs:
       make az_iot_cov_xml
       make az_keyvault_cov_xml
       make az_storage_blobs_cov_xml
+      ls
+      pwd
       reportgenerator "-reports:sdk/core/core/az_core_cov_xml.xml;sdk/iot/core/az_iot_cov_xml.xml" "-targetdir:." "-reporttypes:Cobertura"
     workingDirectory: build
     displayName: Generate Code Coverage Data
