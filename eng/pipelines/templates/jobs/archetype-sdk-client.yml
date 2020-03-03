@@ -187,8 +187,6 @@ jobs:
       make az_iot_cov_xml
       make az_keyvault_cov_xml
       make az_storage_blobs_cov_xml
-      ls
-      pwd
       ../tools/reportgenerator "-reports:sdk/*/*/*cov_xml.xml" "-targetdir:." "-reporttypes:Cobertura"
     workingDirectory: build
     displayName: Generate Code Coverage Data
