@@ -1,13 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "az_log_private.h"
+#include "az_http_policy_logging_private.h"
+#include "az_http_policy_retry_private.h"
 #include <az_credentials.h>
 #include <az_http.h>
 #include <az_http_internal.h>
-#include <az_log.h>
-#include <az_log_internal.h>
-#include <az_platform_internal.h>
 #include <az_span.h>
 
 #include <stddef.h>
@@ -28,6 +26,14 @@ AZ_NODISCARD AZ_INLINE az_result az_http_pipeline_nextpolicy(
 
   return p_policies[0]._internal.process(
       &(p_policies[1]), p_policies[0]._internal.p_options, p_request, p_response);
+}
+
+static AZ_NODISCARD az_result _az_http_pipeline_nextpolicy(
+    _az_http_policy* policies,
+    _az_http_request* ref_request,
+    az_http_response* ref_response)
+{
+  return az_http_pipeline_nextpolicy(policies, ref_request, ref_response);
 }
 
 static const az_span AZ_MS_CLIENT_REQUESTID = AZ_SPAN_LITERAL_FROM_STR("x-ms-client-request-id");
@@ -100,12 +106,16 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
     _az_http_request* p_request,
     az_http_response* p_response)
 {
-  (void)p_options;
-
-  // reset p_response to be written from the start
-  AZ_RETURN_IF_FAILED(az_http_response_init(p_response, p_response->_internal.http_response));
-
-  return az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
+  return _az_http_policy_retry(
+    (az_http_policy_retry_options*)p_options,
+    (az_http_policy_callback) {
+      .func = _az_http_pipeline_nextpolicy,
+      .params = {
+        .policies = p_policies,
+        .ref_request = p_request,
+        .ref_response = p_response,
+      },
+    });
 }
 
 AZ_INLINE AZ_NODISCARD az_result
@@ -131,24 +141,16 @@ AZ_NODISCARD az_result az_http_pipeline_policy_logging(
     az_http_response* p_response)
 {
   (void)p_options;
-  if (az_log_should_write(AZ_LOG_HTTP_REQUEST))
-  {
-    _az_log_http_request(p_request);
-  }
 
-  if (!az_log_should_write(AZ_LOG_HTTP_RESPONSE))
-  {
-    // If no logging is needed, do not even measure the response time.
-    return az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
-  }
-
-  int64_t const start = az_platform_clock_msec();
-  az_result const result = az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
-  int64_t const end = az_platform_clock_msec();
-
-  _az_log_http_response(p_response, end - start, p_request);
-
-  return result;
+  return _az_http_policy_logging(
+    (az_http_policy_callback) {
+      .func = _az_http_pipeline_nextpolicy,
+      .params = {
+        .policies = p_policies,
+        .ref_request = p_request,
+        .ref_response = p_response,
+      },
+    });
 }
 
 AZ_NODISCARD az_result az_http_pipeline_policy_transport(

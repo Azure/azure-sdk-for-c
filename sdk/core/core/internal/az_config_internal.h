@@ -12,7 +12,7 @@
 #include <_az_cfg_prefix.h>
 enum
 {
-  AZ_HTTP_REQUEST_HEADER_BUF_SIZE = AZ_HTTP_REQUEST_HEADER_COUNT * sizeof(az_pair),
+  _az_HTTP_REQUEST_HEADER_BUF_SIZE = AZ_HTTP_REQUEST_HEADER_COUNT * sizeof(az_pair),
 };
 /*
 

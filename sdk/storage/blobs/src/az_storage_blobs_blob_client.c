@@ -25,7 +25,7 @@ static az_span const AZ_HTTP_HEADER_CONTENT_TYPE = AZ_SPAN_LITERAL_FROM_STR("Con
 AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_options_default()
 {
 
-  return (az_storage_blobs_blob_client_options) {
+  az_storage_blobs_blob_client_options options = (az_storage_blobs_blob_client_options) {
     ._internal = {
       .api_version = { 
         ._internal = { 
@@ -38,6 +38,12 @@ AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_o
     },
     .retry = az_http_policy_retry_options_default(),
   };
+
+  options.retry.max_retries = 5;
+  options.retry.retry_delay_msec = 1 * _az_TIME_MILLISECONDS_PER_SECOND;
+  options.retry.max_retry_delay_msec = 30 * _az_TIME_MILLISECONDS_PER_SECOND;
+
+  return options;
 }
 
 AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
@@ -107,6 +113,11 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
     }
   };
 
+  if (!az_http_policy_retry_options_validate(&self->_internal.options.retry))
+  {
+    return AZ_ERROR_ARG;
+  }
+
   // Copy url to client buffer so customer can re-use buffer on his/her side
   AZ_RETURN_IF_FAILED(az_span_copy(self->_internal.uri, uri, &self->_internal.uri));
 
@@ -141,7 +152,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
   az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
   // copy url from client
   AZ_RETURN_IF_FAILED(az_span_copy(request_url_span, client->_internal.uri, &request_url_span));
-  uint8_t headers_buffer[AZ_HTTP_REQUEST_HEADER_BUF_SIZE];
+  uint8_t headers_buffer[_az_HTTP_REQUEST_HEADER_BUF_SIZE];
   az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
 
   // create request
