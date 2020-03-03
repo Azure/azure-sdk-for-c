@@ -101,7 +101,7 @@ AZ_NODISCARD AZ_INLINE az_span az_span_init(uint8_t* ptr, int32_t length, int32_
  */
 AZ_NODISCARD AZ_INLINE az_span az_span_from_str(char* str)
 {
-  int32_t length = (int32_t)strlen_s(str);
+  int32_t length = (int32_t)strlen(str);
   return az_span_init((uint8_t*)str, length, length);
 }
 
