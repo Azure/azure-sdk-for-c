@@ -7,6 +7,12 @@ project (az_core LANGUAGES C)
 
 set(CMAKE_C_STANDARD 99)
 
+if(DEFINED ENV{AZ_SDK_CODE_COV} AND CMAKE_C_COMPILER_ID MATCHES "GNU")
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        include(CodeCoverage)
+    endif()
+endif()
+
 add_library (
   az_core
   src/az_aad.c
@@ -83,3 +89,18 @@ endif()
 
 # make sure that users can consume the project as a library.
 add_library (az::core ALIAS az_core)
+
+# codeCoverage
+if(DEFINED ENV{AZ_SDK_CODE_COV} AND CMAKE_C_COMPILER_ID MATCHES "GNU")
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        APPEND_COVERAGE_COMPILER_FLAGS()
+
+        # Basic coverage using lcov (gcc integrated)
+        setup_target_for_coverage_lcov(NAME az_core_cov EXECUTABLE az_core_test)
+        
+        # HTML and XML - Coverage using gcovr (Needs to be installed into system)
+        setup_target_for_coverage_gcovr_html(NAME az_core_cov_html EXECUTABLE az_core_test)
+        setup_target_for_coverage_gcovr_xml(NAME az_core_cov_xml EXECUTABLE az_core_test)
+    endif() 
+endif()
+
