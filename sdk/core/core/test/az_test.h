@@ -1,6 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#ifndef az_TEST_H
+#define az_TEST_H
+
 #include <assert.h>
 #include <stdio.h>
 
@@ -22,3 +25,5 @@ extern int exit_code;
   } while (false);
 
 #define TEST_EXPECT_SUCCESS(exp) TEST_ASSERT(az_succeeded(exp))
+
+#endif // az_TEST_H
