@@ -55,7 +55,8 @@ jobs:
         vm.image: 'ubuntu-18.04'
         vcpkg.deps: 'curl[ssl] cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        build.args: ' -DBUILD_CURL_TRANSPORT=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON'
+        build.args: ' -DBUILD_CURL_TRANSPORT=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON -DCMAKE_BUILD_TYPE=Debug'
+        AZ_SDK_CODE_COV: 1
       Win_x86_with_samples_and_unit_test:
         vm.image: 'windows-2019'
         vcpkg.deps: 'curl[winssl] cmocka'
@@ -173,3 +174,18 @@ jobs:
       mergeTestResults: true
       testRunTitle: 'C99 - $(Agent.JobName)'
     condition: contains(variables['vcpkg.deps'], 'cmocka')
+
+  - script: |
+      make az_core_cov_xml
+      make az_iot_cov_xml
+      make az_keyvault_cov_xml
+      make az_storage_blobs_cov_xml
+    displayName: Generate Code Coverage Data
+    condition: eq(variables['AZ_SDK_CODE_COV'], 1)
+
+  - task: PublishCodeCoverageResults@1
+    inputs:
+        codeCoverageTool: Cobertura
+        summaryFileLocation: '$(Build.SourcesDirectory)/**/*_cov.xml'
+    displayName: Publish Code Coverage to DevOps
+    condition: eq(variables['AZ_SDK_CODE_COV'], 1)
