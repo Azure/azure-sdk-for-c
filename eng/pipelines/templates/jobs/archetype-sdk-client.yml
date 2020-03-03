@@ -192,6 +192,6 @@ jobs:
   - task: PublishCodeCoverageResults@1
     inputs:
         codeCoverageTool: Cobertura
-        summaryFileLocation: '$(Build.SourcesDirectory)/**/*_cov.xml'
+        summaryFileLocation: '$(Build.SourcesDirectory)/**/*_cov_xml.xml'
     displayName: Publish Code Coverage to DevOps
     condition: eq(variables['AZ_SDK_CODE_COV'], 1)
