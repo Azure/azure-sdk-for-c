@@ -6,11 +6,6 @@ cmake_minimum_required (VERSION 3.12)
 project (az_core LANGUAGES C)
 
 set(CMAKE_C_STANDARD 99)
-if(DEFINED ENV{AZ_SDK_CODE_COV} AND CMAKE_C_COMPILER_ID MATCHES "GNU")
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        include(CodeCoverage)
-    endif()
-endif()
 
 add_library (
   az_core

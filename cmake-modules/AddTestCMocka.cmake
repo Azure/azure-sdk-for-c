@@ -104,18 +104,4 @@ function(ADD_CMOCKA_TEST _TARGET_NAME)
 
     add_cmocka_test_environment(${_TARGET_NAME})
 
-    # codeCoverage
-    if(DEFINED ENV{AZ_SDK_CODE_COV} AND CMAKE_C_COMPILER_ID MATCHES "GNU")
-        if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-            APPEND_COVERAGE_COMPILER_FLAGS()
-    
-            # Basic coverage using lcov (gcc integrated)
-            setup_target_for_coverage_lcov(NAME ${_TARGET_NAME}_cov EXECUTABLE ${_TARGET_NAME})
-            
-            # HTML and XML - Coverage using gcovr (Needs to be installed into system)
-            setup_target_for_coverage_gcovr_html(NAME ${_TARGET_NAME}_cov_html EXECUTABLE ${_TARGET_NAME})
-            setup_target_for_coverage_gcovr_xml(NAME ${_TARGET_NAME}_cov_xml EXECUTABLE ${_TARGET_NAME})
-        endif() 
-    endif()
-
 endfunction (ADD_CMOCKA_TEST)
