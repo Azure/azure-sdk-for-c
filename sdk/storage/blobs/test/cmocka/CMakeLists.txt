@@ -12,6 +12,7 @@ include(AddTestCMocka)
 
 add_cmocka_test(${TARGET_NAME} SOURCES
                 main.c
+                az_storage_blobs_unit_tests.c
                 COMPILE_OPTIONS ${DEFAULT_C_COMPILE_FLAGS}
                 LINK_TARGETS
                     az_core
