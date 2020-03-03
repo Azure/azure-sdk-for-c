@@ -151,7 +151,8 @@ jobs:
 
   - script: |
       sudo apt install -y gcovr lcov
-      dotnet --version
+      dotnet tool install -g dotnet-reportgenerator-globaltool
+      dotnet tool install dotnet-reportgenerator-globaltool --tool-path tools
     displayName: Install coverage tools
     condition: eq(variables['AZ_SDK_CODE_COV'], 1)
 
