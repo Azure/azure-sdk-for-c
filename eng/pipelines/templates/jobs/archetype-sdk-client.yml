@@ -81,7 +81,8 @@ jobs:
         vm.image: 'ubuntu-18.04'
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        build.args: ' -DUNIT_TESTING=ON'
+        build.args: ' -DUNIT_TESTING=ON -DCMAKE_BUILD_TYPE=Debug'
+        AZ_SDK_CODE_COV: 1
       Win_x86_with_unit_test:
         vm.image: 'windows-2019'
         vcpkg.deps: 'cmocka'
@@ -148,6 +149,13 @@ jobs:
     # Execute only if there is at least one dependency to be installed
     condition: and(succeeded(), not(eq(variables['vcpkg.deps'], '')))
 
+  - script: |
+      sudo apt install -y gcovr lcov
+      dotnet tool install -g dotnet-reportgenerator-globaltool
+      dotnet tool install dotnet-reportgenerator-globaltool --tool-path tools
+    displayName: Install coverage tools
+    condition: eq(variables['AZ_SDK_CODE_COV'], 1)
+
   - task: CMake@1
     inputs:
       cmakeArgs: --version
@@ -169,7 +177,24 @@ jobs:
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: 'JUnit'
-      testResultsFiles: '**/*-test-results.xml' 
+      testResultsFiles: '**/*-test-results.xml'
       mergeTestResults: true
       testRunTitle: 'C99 - $(Agent.JobName)'
     condition: contains(variables['vcpkg.deps'], 'cmocka')
+
+  - script: |
+      make az_core_cov_xml
+      make az_iot_cov_xml
+      make az_keyvault_cov_xml
+      make az_storage_blobs_cov_xml
+      ../tools/reportgenerator "-reports:sdk/*/*/*cov_xml.xml" "-targetdir:." "-reporttypes:Cobertura"
+    workingDirectory: build
+    displayName: Generate Code Coverage Data
+    condition: eq(variables['AZ_SDK_CODE_COV'], 1)
+
+  - task: PublishCodeCoverageResults@1
+    inputs:
+        codeCoverageTool: Cobertura
+        summaryFileLocation: '$(Build.SourcesDirectory)/**/Cobertura.xml'
+    displayName: Publish Code Coverage to DevOps
+    condition: eq(variables['AZ_SDK_CODE_COV'], 1)

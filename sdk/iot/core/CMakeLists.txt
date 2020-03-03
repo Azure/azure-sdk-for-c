@@ -3,20 +3,29 @@
 
 cmake_minimum_required (VERSION 3.12)
 
-project (az_iot LANGUAGES C)
+set(TARGET_NAME "az_iot")
+
+project (${TARGET_NAME} LANGUAGES C)
 
 set(CMAKE_C_STANDARD 99)
 
+include(CheckAndIncludeCodeCov)
+
 add_library (
-    az_iot
+    ${TARGET_NAME}
     src/az_iot_sas_token.c
 )
 
-target_include_directories (az_iot PUBLIC inc)
-target_include_directories (az_iot PRIVATE src)
+target_include_directories (${TARGET_NAME} PUBLIC inc)
+target_include_directories (${TARGET_NAME} PRIVATE src)
 
 # TODO: Follow up with team about the linking/including strategy for SDK-clients on top of az_core
-target_link_libraries(az_iot PRIVATE az_core)
+target_link_libraries(${TARGET_NAME} PRIVATE az_core)
 
-add_library (az::iot ALIAS az_iot)
+add_library (az::iot ALIAS ${TARGET_NAME})
 
+# set coverage excluding for az_core. Don't show coverage outside iot
+set(COV_EXCLUDE
+    ${CMAKE_SOURCE_DIR}/sdk/core/core/inc/*
+    ${CMAKE_SOURCE_DIR}/sdk/core/core/internal/*)
+include(CreateCodeCoverageTargets)
