@@ -55,8 +55,7 @@ jobs:
         vm.image: 'ubuntu-18.04'
         vcpkg.deps: 'curl[ssl] cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        build.args: ' -DBUILD_CURL_TRANSPORT=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON -DCMAKE_BUILD_TYPE=Debug'
-        AZ_SDK_CODE_COV: 1
+        build.args: ' -DBUILD_CURL_TRANSPORT=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON'
       Win_x86_with_samples_and_unit_test:
         vm.image: 'windows-2019'
         vcpkg.deps: 'curl[winssl] cmocka'
@@ -82,7 +81,8 @@ jobs:
         vm.image: 'ubuntu-18.04'
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        build.args: ' -DUNIT_TESTING=ON'
+        build.args: ' -DUNIT_TESTING=ON -DCMAKE_BUILD_TYPE=Debug'
+        AZ_SDK_CODE_COV: 1
       Win_x86_with_unit_test:
         vm.image: 'windows-2019'
         vcpkg.deps: 'cmocka'
