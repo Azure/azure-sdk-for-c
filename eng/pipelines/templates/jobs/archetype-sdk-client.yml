@@ -149,6 +149,11 @@ jobs:
     # Execute only if there is at least one dependency to be installed
     condition: and(succeeded(), not(eq(variables['vcpkg.deps'], '')))
 
+  - script: |
+      sudo apt install -y gcovr lcov
+    displayName: Install coverage tools
+    condition: eq(variables['AZ_SDK_CODE_COV'], 1)
+
   - task: CMake@1
     inputs:
       cmakeArgs: --version
@@ -176,8 +181,6 @@ jobs:
     condition: contains(variables['vcpkg.deps'], 'cmocka')
 
   - script: |
-      sudo apt install -y gcovr lcov
-
       make az_core_cov_xml
       make az_iot_cov_xml
       make az_keyvault_cov_xml
