@@ -151,7 +151,7 @@ jobs:
 
   - script: |
       sudo apt install -y gcovr lcov
-      npm i -D xml2js
+      dotnet --version
     displayName: Install coverage tools
     condition: eq(variables['AZ_SDK_CODE_COV'], 1)
 
