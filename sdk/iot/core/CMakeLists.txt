@@ -24,4 +24,8 @@ target_link_libraries(${TARGET_NAME} PRIVATE az_core)
 
 add_library (az::iot ALIAS ${TARGET_NAME})
 
+# set coverage excluding for az_core. Don't show coverage outside iot
+set(COV_EXCLUDE
+    ${CMAKE_SOURCE_DIR}/sdk/core/core/inc/*
+    ${CMAKE_SOURCE_DIR}/sdk/core/core/internal/*)
 include(CreateCodeCoverageTargets)
