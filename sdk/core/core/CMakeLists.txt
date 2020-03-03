@@ -25,8 +25,7 @@ add_library (
   src/az_json_string.c
   src/az_json_token.c
   src/az_log.c
-  src/az_span.c
-   "src/az_http_policy_retry.c" "src/az_http_policy_logging.c")
+  src/az_span.c)
 
 if(MSVC)
   if(WARNINGS_AS_ERRORS)
