@@ -46,10 +46,11 @@ AZ_NODISCARD az_span az_span_from_str(char* str)
 
 AZ_NODISCARD az_span az_span_slice(az_span span, int32_t low_index, int32_t high_index)
 {
-  AZ_PRECONDITION_RANGE(-1, high_index, az_span_length(span));
-  AZ_PRECONDITION(high_index >= 0 && low_index <= high_index);
+  AZ_PRECONDITION_RANGE(-1, high_index, az_span_capacity(span));
+  AZ_PRECONDITION(high_index == -1 || (high_index >= 0 && low_index <= high_index));
 
   int32_t capacity = az_span_capacity(span);
+
   high_index = high_index == -1 ? capacity : high_index;
   return az_span_init(az_span_ptr(span) + low_index, high_index - low_index, capacity - low_index);
 }
@@ -119,11 +120,14 @@ AZ_NODISCARD az_result az_span_to_uint64(az_span self, uint64_t* out)
  */
 AZ_NODISCARD az_result az_span_copy(az_span dst, az_span src, az_span* out)
 {
-  AZ_PRECONDITION_VALID_SPAN(dst, 1);
-  AZ_PRECONDITION_VALID_SPAN(src, 1);
+  AZ_PRECONDITION_VALID_SPAN(dst, 0);
+  AZ_PRECONDITION_VALID_SPAN(src, 0);
   int32_t src_len = az_span_length(src);
 
-  AZ_CONTRACT(az_span_capacity(dst) >= src_len, AZ_ERROR_BUFFER_OVERFLOW);
+  if (az_span_capacity(dst) < src_len)
+  {
+    return AZ_ERROR_BUFFER_OVERFLOW;
+  };
 
   uint8_t* ptr = az_span_ptr(dst);
 
@@ -151,8 +155,8 @@ AZ_NODISCARD AZ_INLINE bool should_encode(uint8_t c)
 AZ_NODISCARD az_result az_span_copy_url_encode(az_span dst, az_span src, az_span* out)
 {
   AZ_PRECONDITION_NOT_NULL(out);
-  AZ_PRECONDITION_VALID_SPAN(dst, 1);
-  AZ_PRECONDITION_VALID_SPAN(src, 1);
+  AZ_PRECONDITION_VALID_SPAN(dst, 0);
+  AZ_PRECONDITION_VALID_SPAN(src, 0);
 
   int32_t const input_size = az_span_length(src);
 
@@ -236,7 +240,7 @@ void _az_span_swap(az_span a, az_span b)
  */
 AZ_NODISCARD az_result az_span_to_str(char* s, int32_t max_size, az_span span)
 {
-  AZ_PRECONDITION_VALID_SPAN(span, 1);
+  AZ_PRECONDITION_VALID_SPAN(span, 0);
 
   int32_t span_length = az_span_length(span);
   if (span_length + 1 > max_size)
@@ -296,18 +300,41 @@ AZ_NODISCARD az_result _az_span_replace(az_span* self, int32_t start, int32_t en
 
   // replaced size must be less or equal to current builder size. Can't replace more than what
   // current is available
-  AZ_CONTRACT(replaced_size <= current_size, AZ_ERROR_ARG);
+  if (replaced_size > current_size)
+  {
+    return AZ_ERROR_ARG;
+  };
   // start and end position must be before the end of current builder size
-  AZ_CONTRACT(start <= current_size && end <= current_size, AZ_ERROR_ARG);
+  if (start > current_size || end > current_size)
+  {
+    return AZ_ERROR_ARG;
+  };
   // Start position must be less or equal than end position
-  AZ_CONTRACT(start <= end, AZ_ERROR_ARG);
+  if (start > end)
+  {
+    return AZ_ERROR_ARG;
+  };
   // size after replacing must be less o equal than buffer size
-  AZ_CONTRACT(size_after_replace <= az_span_capacity(*self), AZ_ERROR_ARG);
+  if (size_after_replace > az_span_capacity(*self))
+  {
+    return AZ_ERROR_ARG;
+  };
+
+  // insert at the end case (no need to make left or right shift)
+  if (start == current_size)
+  {
+    return az_span_append(*self, span, self);
+  }
+  // replace all content case (no need to make left or right shift, only copy)
+  if (current_size == replaced_size)
+  {
+    return az_span_copy(*self, span, self);
+  }
 
   // get the span needed to be moved before adding a new span
-  az_span dst = az_span_slice(*self, start + span_length, -1);
+  az_span dst = az_span_slice(*self, start + span_length, current_size);
   // get the span where to move content
-  az_span src = az_span_slice(*self, end, -1);
+  az_span src = az_span_slice(*self, end, current_size);
   {
     // move content left or right so new span can be added
     AZ_RETURN_IF_FAILED(az_span_copy(dst, src, &dst));

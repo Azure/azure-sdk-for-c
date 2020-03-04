@@ -14,7 +14,7 @@
 
 /*Copying AZ_CONTRACT on purpose from AZ_CORE because 3rd parties can define this and should not
  * depend on internal CORE headers */
-#define AZ_CONTRACT(condition, error) \
+#define AZ_PRECONDITION(condition, error) \
   do \
   { \
     if (!(condition)) \
@@ -23,7 +23,7 @@
     } \
   } while (0)
 
-#define AZ_PRECONDITION_NOT_NULL(arg) AZ_CONTRACT((arg) != NULL, AZ_ERROR_ARG)
+#define AZ_PRECONDITION_NOT_NULL(arg) AZ_PRECONDITION((arg) != NULL, AZ_ERROR_ARG)
 
 static AZ_NODISCARD az_result _az_span_malloc(int32_t size, az_span* out)
 {

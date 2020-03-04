@@ -132,7 +132,7 @@ int main()
     printf("Failed to append key version");
   }
 
-  AZ_RETURN_IF_FAILED(az_span_slice(version_builder, 0, az_span_length(version_builder), &version));
+  version = az_span_slice(version_builder, 0, az_span_length(version_builder));
 
   // Reuse response buffer for delete Key by creating a new span from response_buffer
   az_result const reset2_op = az_http_response_init(&http_response, response_span);
@@ -256,9 +256,7 @@ az_span get_key_version(az_http_response* response)
 
     if (az_span_ptr(k)[index] == '/')
     {
-      az_result get_slice_result = az_span_slice(k, index + 1, -1, &version);
-      (void)get_slice_result; // if above line fails, version will be a returned empty span (what we
-                              // want)
+      version = az_span_slice(k, index + 1, -1);
       break;
     }
   }

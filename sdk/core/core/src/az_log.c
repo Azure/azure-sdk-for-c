@@ -102,8 +102,8 @@ static az_result _az_log_value_msg(az_span* log_msg_bldr, az_span value)
 
   AZ_RETURN_IF_FAILED(az_span_append(*log_msg_bldr, ellipsis, log_msg_bldr));
 
-  AZ_RETURN_IF_FAILED(
-      az_span_append(*log_msg_bldr, az_span_slice(value, value_size - last, -1), log_msg_bldr));
+  AZ_RETURN_IF_FAILED(az_span_append(
+      *log_msg_bldr, az_span_slice(value, value_size - last, value_size), log_msg_bldr));
 
   return AZ_OK;
 }

@@ -47,7 +47,7 @@ static az_span const sample1 = AZ_SPAN_LITERAL_FROM_STR( //
 void test_json_parser(void** state)
 {
   (void)state;
-  {
+  /* {
     az_json_parser parser = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR("    ")));
     assert_true(az_json_parser_parse_token(&parser, NULL) == AZ_ERROR_ARG);
@@ -55,7 +55,7 @@ void test_json_parser(void** state)
   {
     az_json_token token;
     assert_true(az_json_parser_parse_token(NULL, &token) == AZ_ERROR_ARG);
-  }
+  } */
   {
     az_json_parser parser = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR("    ")));

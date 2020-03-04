@@ -26,10 +26,8 @@ az_result az_iot_sas_token_get_document(
     az_span* out_document)
 {
   AZ_PRECONDITION_VALID_SPAN(device_id, 1);
-  AZ_PRECONDITION_VALID_SPAN(device_id, 1);
   AZ_PRECONDITION_VALID_SPAN(iothub_fqdn, 1);
-  AZ_PRECONDITION_VALID_SPAN(iothub_fqdn, 1);
-  AZ_PRECONDITION_VALID_SPAN(document, 1);
+  AZ_PRECONDITION_VALID_SPAN(document, 0);
   AZ_PRECONDITION_NOT_NULL(out_document);
 
   az_result result;
@@ -64,13 +62,10 @@ az_result az_iot_sas_token_generate(
   az_result result;
 
   AZ_PRECONDITION_VALID_SPAN(device_id, 1);
-  AZ_PRECONDITION_VALID_SPAN(device_id, 1);
-  AZ_PRECONDITION_VALID_SPAN(iothub_fqdn, 1);
   AZ_PRECONDITION_VALID_SPAN(iothub_fqdn, 1);
   AZ_PRECONDITION_VALID_SPAN(signature, 1);
-  AZ_PRECONDITION_VALID_SPAN(signature, 1);
-  AZ_CONTRACT(expiry_time_secs > 0, AZ_ERROR_ARG);
-  AZ_PRECONDITION_VALID_SPAN(sas_token, 1);
+  AZ_PRECONDITION(expiry_time_secs > 0);
+  AZ_PRECONDITION_VALID_SPAN(sas_token, 0);
   AZ_PRECONDITION_NOT_NULL(out_sas_token);
 
   // Concatenates: "SharedAccessSignature sr=" scope "&sig=" sig  "&se=" expiration_time_secs
