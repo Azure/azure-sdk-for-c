@@ -5,7 +5,7 @@ containers.addClass("container-fluid");
 
 WINDOW_CONTENTS = window.location.href.split('/');
 SELECTED_LANGUAGE = 'c';
-STORAGE_ACCOUNT_NAME = 'azuresdkdocsdev'; // 'azuresdkdocs';
+STORAGE_ACCOUNT_NAME = 'azuresdkdocs';
 BLOB_URI_PREFIX = "https://" + STORAGE_ACCOUNT_NAME + ".blob.core.windows.net/$web?restype=container&comp=list&prefix=" + SELECTED_LANGUAGE + "/";
 
 ATTR1 = '[<span class="hljs-meta">System.ComponentModel.EditorBrowsable</span>]\n<';
