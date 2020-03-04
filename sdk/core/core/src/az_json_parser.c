@@ -7,7 +7,7 @@
 #include "az_span_private.h"
 #include <az_span.h>
 
-#include <az_precondition_failed.h>
+#include <az_precondition.h>
 
 #include <ctype.h>
 #include <math.h>

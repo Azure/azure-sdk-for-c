@@ -4,11 +4,11 @@
 #include "az_hex_private.h"
 #include "az_span_private.h"
 #include <az_platform_internal.h>
-#include <az_precondition_failed.h>
+#include <az_precondition.h>
 #include <az_span.h>
-#include <stdint.h>
 
 #include <ctype.h>
+#include <stdint.h>
 
 #include <_az_cfg.h>
 
@@ -16,17 +16,6 @@ enum
 {
   AZ_ASCII_LOWER_DIF = 'a' - 'A',
 };
-
-void az_precondition_failed_default()
-{
-  /* By default, when a precondition fails the calling thread is suspended forever */
-  while (true)
-  {
-    az_platform_sleep_msec(INT32_MAX);
-  }
-}
-
-az_precondition_failed az_precondition_failed_callback = az_precondition_failed_default;
 
 AZ_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t length, int32_t capacity)
 {

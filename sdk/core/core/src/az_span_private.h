@@ -4,7 +4,7 @@
 #ifndef _az_SPAN_PRIVATE_H
 #define _az_SPAN_PRIVATE_H
 
-#include <az_precondition_failed.h>
+#include <az_precondition.h>
 #include <az_result.h>
 #include <az_span.h>
 

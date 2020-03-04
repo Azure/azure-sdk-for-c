@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include <az_iot_sas_token.h>
-#include <az_precondition_failed.h>
+#include <az_precondition.h>
 #include <az_span.h>
 
 #include <stdint.h>

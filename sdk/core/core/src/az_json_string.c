@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include <az_json.h>
-#include <az_precondition_failed.h>
+#include <az_precondition.h>
 
 #include "az_hex_private.h"
 

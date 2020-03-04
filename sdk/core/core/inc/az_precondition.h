@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef _az_PRECONDITION_INTERNAL_H
-#define _az_PRECONDITION_INTERNAL_H
+#ifndef _az_PRECONDITION_H
+#define _az_PRECONDITION_H
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -48,4 +48,4 @@ AZ_NODISCARD AZ_INLINE bool az_span_is_valid(az_span span, int32_t min_length)
 
 #include <_az_cfg_suffix.h>
 
-#endif // _az_PRECONDITION_INTERNAL_H
+#endif // _az_PRECONDITION_H

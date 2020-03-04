@@ -8,7 +8,7 @@
 #include <az_http_transport.h>
 #include <az_json.h>
 #include <az_keyvault.h>
-#include <az_precondition_failed.h>
+#include <az_precondition.h>
 #include <az_span.h>
 
 #include <stddef.h>

@@ -8,7 +8,7 @@
 #include <az_context.h>
 #include <az_credentials.h>
 #include <az_http.h>
-#include <az_precondition_failed.h>
+#include <az_precondition.h>
 #include <az_result.h>
 #include <az_span.h>
 
