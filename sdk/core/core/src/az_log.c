@@ -98,12 +98,12 @@ static az_result _az_log_value_msg(az_span* log_msg_bldr, az_span value)
   int32_t const last
       = ((_az_LOG_VALUE_MAX_LENGTH / 2) + (_az_LOG_VALUE_MAX_LENGTH % 2)) - (ellipsis_len / 2);
 
-  AZ_RETURN_IF_FAILED(az_span_append(*log_msg_bldr, az_span_take(value, first), log_msg_bldr));
+  AZ_RETURN_IF_FAILED(az_span_append(*log_msg_bldr, az_span_slice(value, 0, first), log_msg_bldr));
 
   AZ_RETURN_IF_FAILED(az_span_append(*log_msg_bldr, ellipsis, log_msg_bldr));
 
   AZ_RETURN_IF_FAILED(
-      az_span_append(*log_msg_bldr, az_span_drop(value, value_size - last), log_msg_bldr));
+      az_span_append(*log_msg_bldr, az_span_slice(value, value_size - last, -1), log_msg_bldr));
 
   return AZ_OK;
 }

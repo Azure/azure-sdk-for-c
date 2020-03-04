@@ -1,14 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_contract_internal.h>
 #include <az_json.h>
+#include <az_precondition_failed.h>
 
 #include <_az_cfg.h>
 
 AZ_NODISCARD static az_result az_span_reader_read_json_pointer_char(az_span* self, uint32_t* out)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(self);
+  AZ_PRECONDITION_NOT_NULL(self);
   int32_t reader_current_length = az_span_length(*self);
 
   // check for EOF
@@ -27,7 +27,7 @@ AZ_NODISCARD static az_result az_span_reader_read_json_pointer_char(az_span* sel
     case '~':
     {
       // move reader to next position
-      AZ_RETURN_IF_FAILED(az_span_slice(*self, 1, -1, self));
+      *self = az_span_slice(*self, 1, -1);
       // check for EOF
       if (az_span_length(*self) == 0)
       {
@@ -36,7 +36,7 @@ AZ_NODISCARD static az_result az_span_reader_read_json_pointer_char(az_span* sel
       // get char
       uint8_t const e = az_span_ptr(*self)[0];
       // move to next position again
-      AZ_RETURN_IF_FAILED(az_span_slice(*self, 1, -1, self));
+      *self = az_span_slice(*self, 1, -1);
       switch (e)
       {
         case '0':
@@ -58,7 +58,7 @@ AZ_NODISCARD static az_result az_span_reader_read_json_pointer_char(az_span* sel
     default:
     {
       // move reader to next position
-      AZ_RETURN_IF_FAILED(az_span_slice(*self, 1, -1, self));
+      *self = az_span_slice(*self, 1, -1);
 
       *out = (uint8_t)result;
       return AZ_OK;
@@ -68,8 +68,8 @@ AZ_NODISCARD static az_result az_span_reader_read_json_pointer_char(az_span* sel
 
 AZ_NODISCARD az_result _az_span_reader_read_json_pointer_token(az_span* self, az_span* out)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(self);
-  AZ_CONTRACT_ARG_NOT_NULL(out);
+  AZ_PRECONDITION_NOT_NULL(self);
+  AZ_PRECONDITION_NOT_NULL(out);
 
   // read `/` if any.
   {
@@ -85,7 +85,7 @@ AZ_NODISCARD az_result _az_span_reader_read_json_pointer_token(az_span* self, az
     }
   }
   // move forward
-  AZ_RETURN_IF_FAILED(az_span_slice(*self, 1, -1, self));
+  *self = az_span_slice(*self, 1, -1);
   if (az_span_length(*self) == 0)
   {
     *out = *self;
@@ -121,8 +121,8 @@ AZ_NODISCARD az_result _az_span_reader_read_json_pointer_token(az_span* self, az
 
 AZ_NODISCARD az_result _az_span_reader_read_json_pointer_token_char(az_span* self, uint32_t* out)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(self);
-  AZ_CONTRACT_ARG_NOT_NULL(out);
+  AZ_PRECONDITION_NOT_NULL(self);
+  AZ_PRECONDITION_NOT_NULL(out);
 
   uint32_t c;
   az_result const result = az_span_reader_read_json_pointer_char(self, &c);

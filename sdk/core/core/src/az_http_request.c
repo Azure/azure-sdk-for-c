@@ -4,9 +4,9 @@
 #include "az_http_private.h"
 #include "az_span_private.h"
 
-#include <az_contract_internal.h>
 #include <az_http.h>
 #include <az_http_internal.h>
+#include <az_precondition_failed.h>
 
 #include <assert.h>
 
@@ -25,10 +25,10 @@ AZ_NODISCARD az_result az_http_request_init(
     az_span headers_buffer,
     az_span body)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
-  AZ_CONTRACT_ARG_VALID_SPAN(method);
-  AZ_CONTRACT_ARG_VALID_SPAN(url);
-  AZ_CONTRACT_ARG_VALID_SPAN(headers_buffer);
+  AZ_PRECONDITION_NOT_NULL(p_hrb);
+  AZ_PRECONDITION_VALID_SPAN(method, 1);
+  AZ_PRECONDITION_VALID_SPAN(url, 1);
+  AZ_PRECONDITION_VALID_SPAN(headers_buffer, 1);
 
   int32_t query_start = 0;
   az_result url_with_query = _az_scan_until(url, _az_is_question_mark, &query_start);
@@ -54,7 +54,7 @@ AZ_NODISCARD az_result az_http_request_init(
 
 AZ_NODISCARD az_result az_http_request_append_path(_az_http_request* p_hrb, az_span path)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
+  AZ_PRECONDITION_NOT_NULL(p_hrb);
 
   // get the query starting point.
   bool url_with_question_mark = p_hrb->_internal.query_start > 0;
@@ -84,9 +84,9 @@ AZ_NODISCARD az_result az_http_request_append_path(_az_http_request* p_hrb, az_s
 AZ_NODISCARD az_result
 az_http_request_set_query_parameter(_az_http_request* p_hrb, az_span name, az_span value)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
-  AZ_CONTRACT_ARG_VALID_SPAN(name);
-  AZ_CONTRACT_ARG_VALID_SPAN(value);
+  AZ_PRECONDITION_NOT_NULL(p_hrb);
+  AZ_PRECONDITION_VALID_SPAN(name, 1);
+  AZ_PRECONDITION_VALID_SPAN(value, 1);
 
   // name or value can't be empty
   AZ_CONTRACT(az_span_length(name) > 0 && az_span_length(value) > 0, AZ_ERROR_ARG);
@@ -118,9 +118,9 @@ az_http_request_set_query_parameter(_az_http_request* p_hrb, az_span name, az_sp
 AZ_NODISCARD az_result
 az_http_request_append_header(_az_http_request* p_hrb, az_span key, az_span value)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
-  AZ_CONTRACT_ARG_VALID_SPAN(key);
-  AZ_CONTRACT_ARG_VALID_SPAN(value);
+  AZ_PRECONDITION_NOT_NULL(p_hrb);
+  AZ_PRECONDITION_VALID_SPAN(key, 1);
+  AZ_PRECONDITION_VALID_SPAN(value, 1);
 
   AZ_CONTRACT(az_span_length(key) > 0 || az_span_length(value) > 0, AZ_ERROR_ARG);
 
@@ -136,8 +136,8 @@ az_http_request_append_header(_az_http_request* p_hrb, az_span key, az_span valu
 AZ_NODISCARD az_result
 az_http_request_get_header(_az_http_request* p_hrb, int32_t index, az_pair* out_result)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
-  AZ_CONTRACT_ARG_NOT_NULL(out_result);
+  AZ_PRECONDITION_NOT_NULL(p_hrb);
+  AZ_PRECONDITION_NOT_NULL(out_result);
 
   if (index >= _az_http_request_headers_count(p_hrb))
   {

@@ -4,8 +4,8 @@
 #ifndef _az_HTTP_PRIVATE_H
 #define _az_HTTP_PRIVATE_H
 
-#include <az_contract_internal.h>
 #include <az_http.h>
+#include <az_precondition_failed.h>
 #include <az_span.h>
 
 #include <stdbool.h>
@@ -24,14 +24,14 @@
  */
 AZ_NODISCARD AZ_INLINE az_result _az_http_request_mark_retry_headers_start(_az_http_request* p_hrb)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
+  AZ_PRECONDITION_NOT_NULL(p_hrb);
   p_hrb->_internal.retry_headers_start_byte_offset = az_span_length(p_hrb->_internal.headers);
   return AZ_OK;
 }
 
 AZ_NODISCARD AZ_INLINE az_result _az_http_request_remove_retry_headers(_az_http_request* p_hrb)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
+  AZ_PRECONDITION_NOT_NULL(p_hrb);
 
   az_span* headers_ptr = &p_hrb->_internal.headers;
   *headers_ptr = az_span_init(
