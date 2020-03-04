@@ -33,6 +33,13 @@
 // https://stackoverflow.com/questions/2280492/bit-fields-of-type-other-than-int
 #pragma warning(disable : 4214)
 
+// warning C6011: Dereferencing NULL pointer. Using AZ_PRECONDITION_NOT_NULL
+#pragma warning(disable : 6011)
+
+// warning C6387: 'str' could be '0':  this does not adhere to the specification for the function
+// 'strlen' Using AZ_PRECONDITION_NOT_NULL
+#pragma warning(disable : 6387)
+
 #endif // _MSC_VER
 
 #ifdef __GNUC__
@@ -46,7 +53,7 @@
 #pragma clang diagnostic ignored "-Wmissing-field-initializers"
 #pragma clang diagnostic ignored "-Wmissing-braces"
 
-#endif // __clang__ 
+#endif // __clang__
 
 #ifndef _az_CFG_H
 #define _az_CFG_H
