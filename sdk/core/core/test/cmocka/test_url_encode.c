@@ -61,12 +61,3 @@ void test_url_encode(void** state)
     assert_true(az_span_is_equal(builder, uri_encoded));
   }
 }
-
-int main(void)
-{
-  const struct CMUnitTest tests[] = {
-    cmocka_unit_test(test_url_encode),
-  };
-
-  return cmocka_run_group_tests_name("az_url_encode", tests, NULL, NULL);
-}
