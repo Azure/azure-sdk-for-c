@@ -39,7 +39,7 @@ AZ_NODISCARD AZ_INLINE bool az_span_is_valid(az_span span, int32_t min_length)
      or span length is greater than 0 and pointer is not NULL, and greater or equal to min_length
   */
   return (
-      (span_length == 0
+      ((az_span_ptr(span) != NULL && az_span_length(span) == 0 && az_span_capacity(span) > 0)
        || (az_span_ptr(span) != NULL && az_span_ptr(span) <= az_span_ptr(span) + span_length - 1))
       && min_length <= span_length);
 }
