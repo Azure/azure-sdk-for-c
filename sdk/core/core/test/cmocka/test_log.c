@@ -136,7 +136,7 @@ void test_az_log(void** state)
     // null request
     _reset_log_invocation_status();
     az_log_set_listener(_log_listener_NULL);
-    _az_log_http_request(NULL);
+    _az_http_policy_logging_log_http_request(NULL);
     assert_true(_log_invoked_for_http_request == true);
     assert_true(_log_invoked_for_http_response == false);
   }
