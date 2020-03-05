@@ -140,14 +140,17 @@ AZ_INLINE AZ_NODISCARD az_result _az_http_policy_retry_get_retry_after(
 
 AZ_NODISCARD az_result az_http_pipeline_policy_retry(
     _az_http_policy* policies,
-    az_http_policy_retry_options* options,
+    void* options,
     _az_http_request* ref_request,
     az_http_response* ref_response)
 {
-  int16_t const max_retries = options->max_retries;
-  int32_t const retry_delay_msec = options->retry_delay_msec;
-  int32_t const max_retry_delay_msec = options->max_retry_delay_msec;
-  az_http_status_code const* const status_codes = options->status_codes;
+  az_http_policy_retry_options const* const retry_options
+      = (az_http_policy_retry_options const*)options;
+
+  int16_t const max_retries = retry_options->max_retries;
+  int32_t const retry_delay_msec = retry_options->retry_delay_msec;
+  int32_t const max_retry_delay_msec = retry_options->max_retry_delay_msec;
+  az_http_status_code const* const status_codes = retry_options->status_codes;
 
   az_context* const context = ref_request->_internal.context;
 
