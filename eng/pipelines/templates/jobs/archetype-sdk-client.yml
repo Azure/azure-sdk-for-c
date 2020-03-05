@@ -122,6 +122,7 @@ jobs:
     inputs:
       targetType: inline
       script: |
+        sudo xcode-select --switch /Applications/Xcode_11.app
         echo "xcode path:"
         sudo xcode-select --print-path
 
