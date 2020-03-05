@@ -10,40 +10,133 @@ To get started with a specific library, see the **README.md** file located in th
 
 ### Prerequisites
 - CMake version 3.12 is required to use these libraries.
+- C compiler. MSVC, gcc or clang are recommended.
+- cmocka. For building and running unit tests. By default building unit tests is disabled, so, unless you want to add unit test or run it, you don't need to install this. See below how vcpkg can be used to install dependencies
+- curl. Curl is used a http stack and it is required for building and running service samples (keyvault and storage). You don't need to install curl if not building samples.
 
 ### Development Environment
-Project contains files to work on Windows or Linux based OS.
+Project contains files to work on Windows, Mac or Linux based OS.
 
-> Note: Project contains git submodules required to build. Before building run `git submodule update --init --recursive`
+### VCPKG
+vcpkg is the easiest way to have dependencies installed. It downloads packages sources, headers and build libraries for whatever TRIPLET is set up (platform/arq).
+VCPKG maintains any installed package inside its own folder, allowing to have multiple vcpkg folder with different dependencies installed on each. This is also great because you don't have to install dependencies globally on your system.
 
-#### Windows
-Use PowerShell to run {projectDir}/build.ps1
-
-> Note: Cmake will look for CURL within windows. Follow next steps to set up CURL using VCPKG:
-<br> - Clone vcpgk: `git clone https://github.com/Microsoft/vcpkg.git`
-<br> - cd vcpkg (consider this path as PATH_TO_VCPKG)
-<br> - .\bootstrap-vcpkg.bat
-<br> - vcpkg.exe install --triplet x64-windows-static curl[winssl]
-<br> - Add windows system variable: VCPKG_DEFAULT_TRIPLET=x64-windows-static
-<br> - Add windows system variable: VCPKG_ROOT=[PATH_TO_VCPKG] (replace PATH_TO_VCPKG for where vcpkg is installed)
-
-##### Visual Studio 2019
-When following previous steps to set up CURL with VCPKG, open project folder with Visual Studio and everything will be ready to build and run tests.
-
-#### Linux
-- Install `openssl version 1.1.1`
-  - For ubuntu: ```sudo apt-get install libssl-dev```
-- Install `uuid`
-  - ```sudo apt-get install uuid-dev```
-
-##### steps to build
+Follow next steps to install VCPKG and have it linked to cmake
+```bash
+# Clone vcpgk:
+git clone https://github.com/Microsoft/vcpkg.git
+# (consider this path as PATH_TO_VCPKG)
+cd vcpkg
+# build vcpkg (remove .bat on Linux/Mac)
+.\bootstrap-vcpkg.bat
+# install dependencies (remove .exe in Linux/Mac) and update triplet
+vcpkg.exe install --triplet x64-windows-static curl[winssl] cmocka
+# Add environment variables:
+# VCPKG_DEFAULT_TRIPLET=x64-windows-static
+# VCPKG_ROOT=[PATH_TO_VCPKG] (replace PATH_TO_VCPKG for where vcpkg is installed)
 ```
+
+### Windows
+Follow next steps to build project from command prompt
+```bash
+# cd to project folder
+cd azure_sdk_for_c
+# create a new folder to generate cmake files for building (i.e. build)
 mkdir build
 cd build
-cmake ../
+# generate files
+# cmake will automatically detect what C compiler is used by system by default and will generate files for it
+cmake ..
+# compile files. Cmake would call compiler and linker to generate libs
+cmake --build .
+```
+
+> Note: The steps above would compile and generate the default output for azure-sdk-for-c witch includes static libraries only. See below section [Compiler Options](#compiler-options)
+
+
+#### Visual Studio 2019
+Open project folder with Visual Studio. If VCPKG has been previously installed and set up like mentioned [above](#VCPKG). Everything will be ready to build.
+Right after opening project, Visual Studio will read cmake files and generate cache files automatically.
+
+### Linux / Mac
+VCPKG can also be used in Linux to avoid installing libraries globally. Follow instructions [here](#vcpkg) to use VCPKG in Linux.
+
+```bash
+# cd to project folder
+cd azure_sdk_for_c
+# create a new folder to generate cmake files for building (i.e. build)
+mkdir build
+cd build
+# generate files
+# cmake will automatically detect what C compiler is used by system by default and will generate files for it
+cmake ..
+# compile files. Cmake would call compiler and linker to generate libs
 make
 ```
-> Note: use `cmake -Duse_default_uuid=ON ../` if no uuid-dev is installed in system
+
+> Note: The steps above would compile and generate the default output for azure-sdk-for-c witch includes static libraries only. See below section [Compiler Options](#compiler-options)
+
+
+### Compiler Options
+By default, when building project with no options, next static libraries are generated
+- ``Libraries``:
+  - az_core
+  - az_iot
+  - az_keyvault
+  - az_storage_blobs
+- ``Platform Abstraction Layer``: Default empty implementation for platform functions like time and http stack. This default implementation is used to compile only but will return ERROR NOT IMPLEMENTED when running it.
+  - az_noplatform
+  - az_nohttp
+  - az_posix (on Lin/Mac)
+  - az_win32 (on Windows)
+- ``Samples``: By default, samples are built using the default PAL (see [running samples section](#running-samples)). This means that running samples would throw errors like:
+```bash
+./keys_client_example
+Running sample with no_op HTTP implementation.
+Recompile az_core with an HTTP client implementation like CURL to see sample sending network requests.
+
+i.e. cmake -DBUILD_CURL_TRANSPORT=ON ..
+```
+  - keys_client_example
+  - blobs_client_example
+
+When running cmake, next options can be used to change the output libraries/Pal/Samples:
+- `BUILD_CURL_TRANSPORT`: This option would build an HTTP transport library using CURL. It requires libcurl to be installed (vcpkg or globally). This option will make samples to be linked with this HTTP and be functional to send HTTP requests<br>
+use it as
+```bash
+cmake -DBUILD_CURL_TRANSPORT ..
+cmake --build .
+```
+- `UNIT_TESTING`: This option requires cmocka to be installed and it will generate unit tests for each project.<br>
+use it as
+```bash
+cmake -DUNIT_TESTING ..
+cmake --build .
+# ctest will call and run tests
+# -V runs tests in verbose mode to show more info about tests
+ctest -V
+```
+
+## Running Test and Samples
+### Unit test
+See [compiler options section](#compiler-options) to learn about how to build and run unit tests.
+
+### Running samples
+See [compiler options section](#compiler-options) to learn about how to build samples with HTTP implementation in order to be runnable.
+
+After building samples with HTTP stack, set next environment variables to set log in credentials. Samples will read this values from env an use it to log in to Azure Service like Storage or KeyVault. Learn about the supported authentication [client secret here](https://docs.microsoft.com/en-us/azure/active-directory/azuread-dev/v1-oauth2-on-behalf-of-flow#service-to-service-access-token-request).
+```bash
+# On linux, set env var like this. For Windows, do it from advanced settings/ env variables
+
+# replace question marks for your id
+export tenant_id=????????-????-????-????-????????????
+export client_id=????????-????-????-????-????????????
+export client_secret=????????????
+# set uri depending on Azure Service
+export test_uri=https://????.????.azure.net
+```
+
+
 
 ## Build Docs
 Running below command from root folder will create a new folder `docs` containing html file with documentation about CORE headers.
