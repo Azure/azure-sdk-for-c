@@ -10,17 +10,12 @@
 
 #include <_az_cfg.h>
 
-void test_storage_blobs(void** state)
-{
-  (void)state;
-  // TODO: add storage blobs unit tests
-  assert_true(1);
-}
+void test_storage_blobs_init(void** state);
 
 int main(void)
 {
   const struct CMUnitTest tests[] = {
-    cmocka_unit_test(test_storage_blobs),
+    cmocka_unit_test(test_storage_blobs_init),
   };
 
   return cmocka_run_group_tests_name("az_storage_blobs", tests, NULL, NULL);

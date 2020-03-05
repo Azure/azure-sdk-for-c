@@ -18,7 +18,7 @@ void test_json_parser(void** state);
 void test_json_get_by_pointer(void** state);
 void test_json_builder(void** state);
 
-static void test_json_token_null(void** state)
+void test_json_token_null(void** state)
 {
   (void)state;
   az_json_token token = az_json_token_null();
@@ -35,7 +35,7 @@ static void test_json_token_null(void** state)
   assert_int_equal(az_span_length(token.value.span), 0);
 }
 
-static void test_json_token_boolean(void** state)
+void test_json_token_boolean(void** state)
 {
   (void)state;
   az_json_token token = az_json_token_boolean(true);
@@ -43,7 +43,7 @@ static void test_json_token_boolean(void** state)
   assert_true(token.value.boolean);
 }
 
-static void test_json_token_number(void** state)
+void test_json_token_number(void** state)
 {
   (void)state;
   az_json_token token = az_json_token_number(10);
@@ -57,23 +57,10 @@ static void test_json_token_number(void** state)
   assert_int_equal(token.value.number, expected);
 }
 
-static void test_json_parser_init(void** state)
+void test_json_parser_init(void** state)
 {
   (void)state;
   az_span span = AZ_SPAN_FROM_STR("");
   az_json_parser parser;
   assert_int_equal(az_json_parser_init(&parser, span), AZ_OK);
-}
-
-int main(void)
-{
-  const struct CMUnitTest tests[] = {
-    cmocka_unit_test(test_json_token_null),     cmocka_unit_test(test_json_parser_init),
-    cmocka_unit_test(test_json_token_boolean),  cmocka_unit_test(test_json_token_number),
-    cmocka_unit_test(test_json_value),          cmocka_unit_test(test_json_string),
-    cmocka_unit_test(test_json_pointer),        cmocka_unit_test(test_json_parser),
-    cmocka_unit_test(test_json_get_by_pointer), cmocka_unit_test(test_json_builder),
-  };
-
-  return cmocka_run_group_tests_name("az_json", tests, NULL, NULL);
 }
