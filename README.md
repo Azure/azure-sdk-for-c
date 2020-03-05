@@ -162,6 +162,8 @@ cd build
 export AZ_SDK_CODE_COV=1
 # generate cmake files with Debug and cmocka unit tests enabled 
 cmake -DUNIT_TESTING=ON -DCMAKE_BUILD_TYPE=Debug ..
+# build
+cmake --build .
 
 ## There are 3 available reports to generate for each project:
 # 1. using lcov. Html files grouped by folders. Make sure lcov
