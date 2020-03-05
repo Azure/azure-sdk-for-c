@@ -71,18 +71,23 @@ function(ADD_CMOCKA_TEST _TARGET_NAME)
         )
     endif()
 
+    if(DEFINED ENV{VCPKG_ROOT} OR DEFINED ENV{VCPKG_INSTALLATION_ROOT})
+        set(CMOCKA_LIB ${CMOCKA_LIBRARIES})
+    else()
+        set(CMOCKA_LIB cmocka)
+    endif()
+
     if (DEFINED _add_cmocka_test_LINK_TARGETS)
         # link to user defined
         target_link_libraries(${_TARGET_NAME}
-            PRIVATE cmocka ${_add_cmocka_test_LINK_TARGETS} ${MATH_LIB_UNIX}
-        )
+            PRIVATE ${CMOCKA_LIB} ${_add_cmocka_test_LINK_TARGETS} ${MATH_LIB_UNIX}
+        )   
     else()
         # link against az_core by default
         target_link_libraries(${_TARGET_NAME}
-            PRIVATE cmocka az_core ${MATH_LIB_UNIX}
+            PRIVATE ${CMOCKA_LIB} az_core ${MATH_LIB_UNIX}
         )
     endif()
-    
 
     if (DEFINED _add_cmocka_test_LINK_OPTIONS)
         set_target_properties(${_TARGET_NAME}
