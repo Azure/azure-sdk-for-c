@@ -13,10 +13,7 @@
 
 #include <_az_cfg.h>
 
-void test_az_span(void** state);
-void test_az_span_replace(void** state);
-
-static void test_az_span_getters(void** state)
+void test_az_span_getters(void** state)
 {
   (void)state;
 
@@ -25,15 +22,4 @@ static void test_az_span_getters(void** state)
   assert_int_equal(az_span_capacity(span), 8);
   assert_int_equal(az_span_length(span), 8);
   assert_ptr_equal(az_span_ptr(span), &example);
-}
-
-int main(void)
-{
-  const struct CMUnitTest tests[] = {
-    cmocka_unit_test(test_az_span_getters),
-    cmocka_unit_test(test_az_span),
-    cmocka_unit_test(test_az_span_replace),
-  };
-
-  return cmocka_run_group_tests_name("az_span", tests, NULL, NULL);
 }

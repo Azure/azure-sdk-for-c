@@ -39,10 +39,3 @@ void test_az_context(void** state)
 
   assert_true(expiration == 0);
 }
-
-int main(void)
-{
-  const struct CMUnitTest tests[] = { cmocka_unit_test(test_az_context) };
-
-  return cmocka_run_group_tests_name("az_context", tests, NULL, NULL);
-}

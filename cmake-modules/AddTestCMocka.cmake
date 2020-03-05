@@ -1,4 +1,3 @@
-message(STATUS "Looking for CMocka which is required for unit testing")
 find_package(cmocka CONFIG REQUIRED)
 
 enable_testing()

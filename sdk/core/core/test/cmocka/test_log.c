@@ -64,6 +64,26 @@ static void _log_listener(az_log_classification classification, az_span message)
   }
 }
 
+static void _log_listener_NULL(az_log_classification classification, az_span message)
+{
+  // (void)classification;
+  // fprintf(stderr, "%.*s\n", (unsigned int)az_span_length(message), az_span_ptr(message));
+  switch (classification)
+  {
+    case AZ_LOG_HTTP_REQUEST:
+      _log_invoked_for_http_request = true;
+      assert_true(az_span_is_equal(message, AZ_SPAN_FROM_STR("HTTP Request : NULL")));
+      break;
+    case AZ_LOG_HTTP_RESPONSE:
+      _log_invoked_for_http_response = true;
+      assert_true(az_span_is_equal(message, AZ_SPAN_FROM_STR("")));
+      break;
+    default:
+      assert_true(false);
+      break;
+  }
+}
+
 void test_az_log(void** state)
 {
   (void)state;
@@ -112,6 +132,14 @@ void test_az_log(void** state)
   TEST_EXPECT_SUCCESS(az_http_response_init(&response, response_builder));
   // Finish setting up
 
+  {
+    // null request
+    _reset_log_invocation_status();
+    az_log_set_listener(_log_listener_NULL);
+    _az_log_http_request(NULL);
+    assert_true(_log_invoked_for_http_request == true);
+    assert_true(_log_invoked_for_http_response == false);
+  }
   // Actual test below
   {
     // Verify that log callback gets invoked, and with the correct classification type.
@@ -129,7 +157,6 @@ void test_az_log(void** state)
     assert_true(_log_invoked_for_http_request == true);
     assert_true(_log_invoked_for_http_response == true);
   }
-
   {
     _reset_log_invocation_status();
     az_log_set_listener(NULL);
@@ -176,13 +203,4 @@ void test_az_log(void** state)
 
   az_log_set_classifications(NULL, 0);
   az_log_set_listener(NULL);
-}
-
-int main(void)
-{
-  const struct CMUnitTest tests[] = {
-    cmocka_unit_test(test_az_log),
-  };
-
-  return cmocka_run_group_tests_name("az_log", tests, NULL, NULL);
 }
