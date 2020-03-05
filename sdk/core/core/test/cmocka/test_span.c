@@ -159,6 +159,29 @@ void az_span_append_u32toa_overflow_fails()
   assert_true(az_span_append_u32toa(buffer, v, &out_span) == AZ_ERROR_BUFFER_OVERFLOW);
 }
 
+void az_span_to_lower_test()
+{
+  az_span a = AZ_SPAN_FROM_STR("one");
+  az_span b = AZ_SPAN_FROM_STR("One");
+  az_span c = AZ_SPAN_FROM_STR("ones");
+  az_span d = AZ_SPAN_FROM_STR("ona");
+  assert_true(az_span_is_content_equal_ignoring_case(a, b));
+  assert_false(az_span_is_content_equal_ignoring_case(a, c));
+  assert_false(az_span_is_content_equal_ignoring_case(a, d));
+}
+
+void az_span_to_uint64_return_errors()
+{
+  // sample span
+  az_span sample = AZ_SPAN_FROM_STR("test");
+  // non valid span with negative len
+  az_span negative = az_span_init(az_span_ptr(sample), -1, 0);
+  uint64_t out = 0;
+
+  assert_return_code(az_span_to_uint64(negative, &out), AZ_ERROR_ARG);
+  assert_return_code(az_span_to_uint64(sample, &out), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+}
+
 void test_az_span(void** state)
 {
   (void)state;
@@ -198,4 +221,6 @@ void test_az_span(void** state)
   az_span_append_u32toa_max_uint_succeeds();
   az_span_append_u32toa_NULL_span_fails();
   az_span_append_u32toa_overflow_fails();
+
+  az_span_to_lower_test();
 }
