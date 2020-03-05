@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 #include "az_aad_private.h"
-#include <az_credentials.h>
+#include <az_credential.h>
+#include <az_credential_client_secret.h>
 #include <az_http.h>
 #include <az_http_internal.h>
 #include <az_http_transport.h>
@@ -11,8 +12,8 @@
 
 #include <_az_cfg.h>
 
-static AZ_NODISCARD az_result _az_client_secret_credential_request_token(
-    az_client_secret_credential* credential,
+static AZ_NODISCARD az_result _az_credential_client_secret_request_token(
+    az_credential_client_secret* credential,
     az_context* context)
 {
   uint8_t url_buf[_az_AAD_REQUEST_URL_BUF_SIZE] = { 0 };
@@ -37,15 +38,15 @@ static AZ_NODISCARD az_result _az_client_secret_credential_request_token(
 }
 
 // This gets called from the http credential policy
-static AZ_NODISCARD az_result _az_client_secret_credential_apply(
-    az_client_secret_credential* credential,
+static AZ_NODISCARD az_result _az_credential_client_secret_apply(
+    az_credential_client_secret* credential,
     _az_http_request* ref_request)
 {
 
   if (_az_token_expired(&(credential->_internal.token)))
   {
     AZ_RETURN_IF_FAILED(
-        _az_client_secret_credential_request_token(credential, ref_request->_internal.context));
+        _az_credential_client_secret_request_token(credential, ref_request->_internal.context));
   }
 
   int16_t const token_length = credential->_internal.token._internal.token_length;
@@ -59,24 +60,24 @@ static AZ_NODISCARD az_result _az_client_secret_credential_apply(
 }
 
 static AZ_NODISCARD az_result
-_az_client_secret_credential_set_scopes(az_client_secret_credential* self, az_span scopes)
+_az_credential_client_secret_set_scopes(az_credential_client_secret* self, az_span scopes)
 {
   self->_internal.scopes = scopes;
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_client_secret_credential_init(
-    az_client_secret_credential* self,
+AZ_NODISCARD az_result az_credential_client_secret_init(
+    az_credential_client_secret* self,
     az_span tenant_id,
     az_span client_id,
     az_span client_secret)
 {
-  *self = (az_client_secret_credential){
+  *self = (az_credential_client_secret){
     ._internal = {
       .credential = {
         ._internal = {
-          .apply_credential = (_az_credential_apply_fn)_az_client_secret_credential_apply,
-          .set_scopes = (_az_credential_set_scopes_fn)_az_client_secret_credential_set_scopes,
+          .apply_credential = (_az_credential_apply_fn)_az_credential_client_secret_apply,
+          .set_scopes = (_az_credential_set_scopes_fn)_az_credential_client_secret_set_scopes,
           },
         },
         .tenant_id = tenant_id,

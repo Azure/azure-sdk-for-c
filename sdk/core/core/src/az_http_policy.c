@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "az_log_private.h"
-#include <az_credentials.h>
+#include <az_credential.h>
 #include <az_http.h>
 #include <az_http_internal.h>
 #include <az_log.h>
@@ -111,7 +111,10 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
 AZ_INLINE AZ_NODISCARD az_result
 _az_apply_credential(_az_credential* credential, _az_http_request* ref_request)
 {
-  return (credential->_internal.apply_credential)(credential, ref_request);
+  //Only apply the credential if the apply_credential method exists
+  return (credential->_internal.apply_credential == NULL)
+      ? AZ_OK
+      : (credential->_internal.apply_credential)(credential, ref_request);
 }
 
 AZ_NODISCARD az_result az_http_pipeline_policy_credential(

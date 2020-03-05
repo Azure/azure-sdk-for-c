@@ -3,7 +3,7 @@
 
 #include <az_config_internal.h>
 #include <az_contract_internal.h>
-#include <az_credentials_internal.h>
+#include <az_credential_internal.h>
 #include <az_http.h>
 #include <az_http_internal.h>
 #include <az_http_transport.h>
