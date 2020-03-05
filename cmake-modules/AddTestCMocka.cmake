@@ -74,12 +74,12 @@ function(ADD_CMOCKA_TEST _TARGET_NAME)
     if (DEFINED _add_cmocka_test_LINK_TARGETS)
         # link to user defined
         target_link_libraries(${_TARGET_NAME}
-            PRIVATE ${CMOCKA_LIBRARIES} ${_add_cmocka_test_LINK_TARGETS} ${MATH_LIB_UNIX}
+            PRIVATE cmocka ${_add_cmocka_test_LINK_TARGETS} ${MATH_LIB_UNIX}
         )
     else()
         # link against az_core by default
         target_link_libraries(${_TARGET_NAME}
-            PRIVATE ${CMOCKA_LIBRARIES} az_core ${MATH_LIB_UNIX}
+            PRIVATE cmocka az_core ${MATH_LIB_UNIX}
         )
     endif()
     
