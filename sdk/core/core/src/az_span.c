@@ -78,13 +78,7 @@ AZ_NODISCARD az_result az_span_to_uint64(az_span self, uint64_t* out)
       return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
     }
 
-    uint64_t const new_value = value * 10 + d;
-    if (new_value < value)
-    {
-      return AZ_ERROR_ARITHMETIC_OVERFLOW;
-    }
-
-    value = new_value;
+    value = value * 10 + d;
   }
 
   *out = value;
@@ -113,13 +107,7 @@ AZ_NODISCARD az_result az_span_to_uint32(az_span self, uint32_t* out)
       return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
     }
 
-    uint32_t const new_value = value * 10 + d;
-    if (new_value < value)
-    {
-      return AZ_ERROR_ARITHMETIC_OVERFLOW;
-    }
-
-    value = new_value;
+    value = value * 10 + d;
   }
 
   *out = value;

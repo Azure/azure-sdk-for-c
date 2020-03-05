@@ -19,6 +19,8 @@ AZ_NODISCARD int64_t az_platform_clock_msec()
   return (int64_t)(clock() / (CLOCKS_PER_SEC / (double)_az_TIME_MILLISECONDS_PER_SECOND));
 }
 
+az_clock_t milliseconds_to_az_clock( int miliseconds )
+
 void az_platform_sleep_msec(int32_t milliseconds)
 {
   (void)usleep(milliseconds * _az_TIME_MICROSECONDS_PER_MILLISECOND);

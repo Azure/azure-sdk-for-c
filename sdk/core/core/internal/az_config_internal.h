@@ -10,15 +10,7 @@
 #include <stdint.h>
 
 #include <_az_cfg_prefix.h>
-enum
-{
-  _az_HTTP_REQUEST_HEADER_BUF_SIZE = AZ_HTTP_REQUEST_HEADER_COUNT * sizeof(az_pair),
-};
-/*
 
-
-
-*/
 enum
 {
   _az_TIME_SECONDS_PER_MINUTE = 60,

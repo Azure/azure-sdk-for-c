@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "az_http_policy_logging_private.h"
+#include "az_http_policy_private.h"
 #include "az_span_private.h"
 #include <az_http_internal.h>
 #include <az_http_transport.h>
@@ -153,12 +154,14 @@ void _az_http_policy_logging_log_http_response(
   az_log_write(AZ_LOG_HTTP_RESPONSE, log_msg);
 }
 
-AZ_NODISCARD az_result _az_http_policy_logging(az_http_policy_callback const next_policy)
+AZ_NODISCARD az_result az_http_pipeline_policy_logging(
+    _az_http_policy* policies,
+    void* options,
+    _az_http_request* ref_request,
+    az_http_response* ref_response
+  )
 {
-  _az_http_pipeline_policy_fn const next_http_policy = next_policy.func;
-  _az_http_policy* const policies = next_policy.params.policies;
-  _az_http_request* const ref_request = next_policy.params.ref_request;
-  az_http_response* const ref_response = next_policy.params.ref_response;
+  (void)options;
 
   if (az_log_should_write(AZ_LOG_HTTP_REQUEST))
   {
@@ -168,11 +171,11 @@ AZ_NODISCARD az_result _az_http_policy_logging(az_http_policy_callback const nex
   if (!az_log_should_write(AZ_LOG_HTTP_RESPONSE))
   {
     // If no logging is needed, do not even measure the response time.
-    return next_http_policy(policies, ref_request, ref_response);
+    return az_http_pipeline_nextpolicy(policies, ref_request, ref_response);
   }
 
   int64_t const start = az_platform_clock_msec();
-  az_result const result = next_http_policy(policies, ref_request, ref_response);
+  az_result const result = az_http_pipeline_nextpolicy(policies, ref_request, ref_response);
   int64_t const end = az_platform_clock_msec();
 
   _az_http_policy_logging_log_http_response(ref_response, end - start, ref_request);

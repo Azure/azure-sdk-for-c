@@ -4,26 +4,25 @@
 #ifndef _az_HTTP_POLICY_PRIVATE_H
 #define _az_HTTP_POLICY_PRIVATE_H
 
-#include <az_http.h>
-#include <az_result.h>
+#include <az_http_internal.h>
 
 #include <_az_cfg_prefix.h>
 
-typedef AZ_NODISCARD az_result (*_az_http_pipeline_policy_fn)(
-    _az_http_policy* policies,
-    _az_http_request* ref_request,
-    az_http_response* ref_response);
-
-typedef struct
+AZ_NODISCARD AZ_INLINE az_result az_http_pipeline_nextpolicy(
+    _az_http_policy* p_policies,
+    _az_http_request* p_request,
+    az_http_response* p_response)
 {
-  _az_http_pipeline_policy_fn const func;
-  struct
+  // Transport Policy is the last policy in the pipeline
+  //  it returns without calling nextpolicy
+  if (p_policies[0]._internal.process == NULL)
   {
-    _az_http_policy* policies;
-    _az_http_request* ref_request;
-    az_http_response* ref_response;
-  } params;
-} az_http_policy_callback;
+    return AZ_ERROR_HTTP_PIPELINE_INVALID_POLICY;
+  }
+
+  return p_policies[0]._internal.process(
+      &(p_policies[1]), p_policies[0]._internal.p_options, p_request, p_response);
+}
 
 #include <_az_cfg_suffix.h>
 

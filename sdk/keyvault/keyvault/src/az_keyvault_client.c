@@ -15,6 +15,11 @@
 
 #include <_az_cfg.h>
 
+enum
+{
+  _az_KEYVAULT_HTTP_REQUEST_HEADER_BUF_SIZE = 10 * sizeof(az_pair),
+};
+
 /**
  * @brief Maximum allowed URL size:
  * url is expected as : [https://]{account_id}[.vault.azure.net]{path}{query}
@@ -131,11 +136,6 @@ AZ_NODISCARD az_result az_keyvault_keys_client_init(
     }
   };
 
-  if (!az_http_policy_retry_options_validate(&self->_internal.options.retry))
-  {
-    return AZ_ERROR_ARG;
-  }
-
   // Copy url to client buffer so customer can re-use buffer on his/her side
   AZ_RETURN_IF_FAILED(az_span_copy(self->_internal.uri, uri, &self->_internal.uri));
 
@@ -245,7 +245,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
   AZ_RETURN_IF_FAILED(az_span_copy(request_url_span, client->_internal.uri, &request_url_span));
 
   // Headers buffer
-  uint8_t headers_buffer[_az_HTTP_REQUEST_HEADER_BUF_SIZE];
+  uint8_t headers_buffer[_az_KEYVAULT_HTTP_REQUEST_HEADER_BUF_SIZE];
   az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
 
   // Allocate buffer in stack to hold body request
@@ -295,7 +295,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
 {
   // create request buffer TODO: define size for a getKey Request
 
-  uint8_t headers_buffer[_az_HTTP_REQUEST_HEADER_BUF_SIZE];
+  uint8_t headers_buffer[_az_KEYVAULT_HTTP_REQUEST_HEADER_BUF_SIZE];
   az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
   // Url buffer
   uint8_t url_buffer[AZ_HTTP_REQUEST_URL_BUF_SIZE];
@@ -336,7 +336,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_delete(
   az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
   // copy url from client
   AZ_RETURN_IF_FAILED(az_span_copy(request_url_span, client->_internal.uri, &request_url_span));
-  uint8_t headers_buffer[_az_HTTP_REQUEST_HEADER_BUF_SIZE];
+  uint8_t headers_buffer[_az_KEYVAULT_HTTP_REQUEST_HEADER_BUF_SIZE];
   az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
 
   // create request

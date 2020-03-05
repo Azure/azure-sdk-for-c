@@ -4,13 +4,11 @@
 #ifndef _az_HTTP_POLICY_LOGGING_PRIVATE_H
 #define _az_HTTP_POLICY_LOGGING_PRIVATE_H
 
-#include "az_http_policy_private.h"
+#include <az_http.h>
 
 #include <stdint.h>
 
 #include <_az_cfg_prefix.h>
-
-AZ_NODISCARD az_result _az_http_policy_logging(az_http_policy_callback const next_policy);
 
 void _az_http_policy_logging_log_http_request(_az_http_request const* request);
 

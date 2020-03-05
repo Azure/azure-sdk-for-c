@@ -7,8 +7,6 @@
 #include <az_http.h>
 #include <az_result.h>
 
-#include <stdbool.h>
-
 #include <_az_cfg_prefix.h>
 
 AZ_NODISCARD AZ_INLINE _az_http_policy_apiversion_options
@@ -171,15 +169,6 @@ az_http_request_set_query_parameter(_az_http_request* p_request, az_span name, a
  */
 AZ_NODISCARD az_result
 az_http_request_append_header(_az_http_request* p_request, az_span key, az_span value);
-
-/**
- * @brief Validate HTTP retry options.
- *
- * @param retry_options HTTP retry options to validate.
- * @return true if return options are valid, false if invalid.
- */
-AZ_NODISCARD bool az_http_policy_retry_options_validate(
-    az_http_policy_retry_options const* retry_options);
 
 #include <_az_cfg_suffix.h>
 

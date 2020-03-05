@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "az_http_policy_retry_private.h"
+#include "az_http_policy_private.h"
 #include "az_http_private.h"
 #include <az_config.h>
 #include <az_config_internal.h>
@@ -37,23 +37,6 @@ AZ_NODISCARD az_http_policy_retry_options az_http_policy_retry_options_default()
   };
 }
 
-AZ_NODISCARD bool az_http_policy_retry_options_validate(
-    az_http_policy_retry_options const* retry_options)
-{
-  if (retry_options == NULL || retry_options->max_retries < 0
-      || retry_options->status_codes == NULL)
-  {
-    return false;
-  }
-
-  if (retry_options->retry_delay_msec < 0 || retry_options->max_retry_delay_msec < 0)
-  {
-    return false;
-  }
-
-  return (retry_options->retry_delay_msec <= retry_options->max_retry_delay_msec);
-}
-
 AZ_INLINE az_result _az_http_policy_retry_append_http_retry_msg(
     int16_t attempt,
     int32_t delay_msec,
@@ -84,15 +67,9 @@ AZ_INLINE void _az_http_policy_retry_log(int16_t attempt, int32_t delay_msec)
 AZ_INLINE AZ_NODISCARD int32_t _az_uint32_span_to_int32(az_span span)
 {
   uint32_t value = 0;
-  az_result const itoa_result = az_span_to_uint32(span, &value);
-  bool const itoa_succeeded = az_succeeded(itoa_result);
-  if (itoa_result == AZ_ERROR_ARITHMETIC_OVERFLOW || (itoa_succeeded && value > INT32_MAX))
+  if (az_succeeded(az_span_to_uint32(span, &value)))
   {
-    return INT32_MAX;
-  }
-  else if (itoa_succeeded)
-  {
-    return value;
+    return value < INT32_MAX ? value : INT32_MAX;
   }
 
   return -1;
@@ -161,19 +138,16 @@ AZ_INLINE AZ_NODISCARD az_result _az_http_policy_retry_get_retry_after(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result _az_http_policy_retry(
+AZ_NODISCARD az_result az_http_pipeline_policy_retry(
+    _az_http_policy* policies,
     az_http_policy_retry_options* options,
-    az_http_policy_callback const next_policy)
+    _az_http_request* ref_request,
+    az_http_response* ref_response)
 {
   int16_t const max_retries = options->max_retries;
   int32_t const retry_delay_msec = options->retry_delay_msec;
   int32_t const max_retry_delay_msec = options->max_retry_delay_msec;
   az_http_status_code const* const status_codes = options->status_codes;
-
-  _az_http_pipeline_policy_fn const next_http_policy = next_policy.func;
-  _az_http_policy* const policies = next_policy.params.policies;
-  _az_http_request* const ref_request = next_policy.params.ref_request;
-  az_http_response* const ref_response = next_policy.params.ref_response;
 
   az_context* const context = ref_request->_internal.context;
 
@@ -185,7 +159,7 @@ AZ_NODISCARD az_result _az_http_policy_retry(
     AZ_RETURN_IF_FAILED(az_http_response_init(ref_response, ref_response->_internal.http_response));
     AZ_RETURN_IF_FAILED(_az_http_request_remove_retry_headers(ref_request));
 
-    result = next_http_policy(policies, ref_request, ref_response);
+    result = az_http_pipeline_nextpolicy(policies, ref_request, ref_response);
 
     // Even HTTP 429, or 502 are expected to be AZ_OK, so the failed result is not retriable.
     if (attempt > max_retries || az_failed(result))
@@ -220,7 +194,7 @@ AZ_NODISCARD az_result _az_http_policy_retry(
 
     if (context != NULL && az_context_has_expired(context, az_platform_clock_msec()))
     {
-      return AZ_CANCELED;
+      return AZ_ERROR_CANCELED;
     }
   }
 
