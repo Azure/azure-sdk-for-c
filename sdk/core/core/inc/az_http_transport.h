@@ -35,7 +35,7 @@ AZ_INLINE az_http_method az_http_method_patch() { return AZ_SPAN_FROM_STR("PATCH
  *     - `index` is out of range.
  */
 AZ_NODISCARD az_result
-az_http_request_get_header(_az_http_request* p_request, int32_t index, az_pair* out_result);
+az_http_request_get_header(_az_http_request const* p_request, int32_t index, az_pair* out_result);
 
 AZ_NODISCARD az_result az_http_request_get_parts(
     _az_http_request* p_request,

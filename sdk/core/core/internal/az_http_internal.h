@@ -20,7 +20,7 @@ _az_http_policy_apiversion_options_default()
  *        Each header is an az_pair
  *
  */
-AZ_NODISCARD AZ_INLINE int32_t _az_http_request_headers_count(_az_http_request* request)
+AZ_NODISCARD AZ_INLINE int32_t _az_http_request_headers_count(_az_http_request const* request)
 {
   // Cast the unsigned sizeof result to ensure the divsion is signed/signed
   return az_span_length(request->_internal.headers) / (int32_t)sizeof(az_pair);
