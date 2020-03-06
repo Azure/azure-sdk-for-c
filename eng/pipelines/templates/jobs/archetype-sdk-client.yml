@@ -7,7 +7,7 @@ jobs:
 - job: Validate
   strategy:
     matrix:
-      Build with no dependencies at all (No samples)
+      # Build with no dependencies at all (No samples)
       Linux_x64:
         vm.image: 'ubuntu-18.04'
         vcpkg.deps: ''
