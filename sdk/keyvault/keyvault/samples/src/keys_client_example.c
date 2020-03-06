@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include <az_context.h>
-#include <az_credentials.h>
+#include <az_credential.h>
 #include <az_http.h>
 #include <az_http_internal.h>
 #include <az_json.h>
@@ -25,9 +25,9 @@ az_span get_key_version(az_http_response* response);
 int main()
 {
   /************* create credentials as client_id type   ***********/
-  az_client_secret_credential credential = { 0 };
+  az_credential_client_secret credential = { 0 };
   // init credential_credentials struc
-  az_result const creds_retcode = az_client_secret_credential_init(
+  az_result const creds_retcode = az_credential_client_secret_init(
       &credential,
       az_span_from_str(getenv(TENANT_ID_ENV)),
       az_span_from_str(getenv(CLIENT_ID_ENV)),
