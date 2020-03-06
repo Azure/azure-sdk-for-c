@@ -224,7 +224,7 @@ az_iot_hub_client_properties_next(az_iot_hub_client_properties* properties, az_p
  * @note Telemetry MQTT Publish messages must have QoS At Least Once (1).
  *
  * @param[in] client
- * @param[in] properties An optional properties object (can be NULL).
+ * @param[in] properties An optional #az_iot_hub_client_properties object (can be NULL).
  * @param[in] mqtt_topic An empty #az_span with sufficient capacity to hold the MQTT topic.
  * @param[out] out_mqtt_topic The output #az_span containing the MQTT topic.
  * @return #az_result
