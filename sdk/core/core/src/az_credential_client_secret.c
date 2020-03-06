@@ -3,7 +3,6 @@
 
 #include "az_aad_private.h"
 #include <az_credential.h>
-#include <az_credential_client_secret.h>
 #include <az_http.h>
 #include <az_http_internal.h>
 #include <az_http_transport.h>

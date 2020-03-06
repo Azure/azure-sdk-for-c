@@ -32,7 +32,7 @@ typedef struct
 {
   struct
   {
-    uint8_t token[_az_TOKEN_BUF_SIZE]; // Base64-encoded token
+    uint8_t token[_az_TOKEN_BUF_SIZE]; /*!< Base64-encoded token */
     int16_t token_length;
     int64_t expires_at_msec;
   } _internal;
@@ -66,13 +66,46 @@ typedef struct
   } _internal;
 } _az_credential;
 
-#define _az_CREDENTIAL_NULL \
-  { \
-    ._internal = { \
-      .apply_credential = NULL, \
-      .set_scopes = NULL, \
-    }, \
-  }
+/**
+ * @brief Anonymous is equivallent to no credential (NULL).
+ *
+ */
+#define AZ_CREDENTIAL_ANONYMOUS NULL
+
+/**
+ * @brief a type of az_credential that uses tenant, client and client secret inputs to get
+ * authenticated with Azure
+ *
+ */
+typedef struct
+{
+  struct
+  {
+    _az_credential credential; /// must be the first field in every credential structure
+    az_span tenant_id;
+    az_span client_id;
+    az_span client_secret;
+    az_span scopes;
+    _az_token token;
+  } _internal;
+} az_credential_client_secret;
+
+/**
+ * @brief Initialize a client secret credential with input tenant, client and client secret
+ * parameters
+ *
+ * @param self reference to a client secret credential to initialize
+ * @param tenant_id an Azure tenant id
+ * @param client_id an Azure client id
+ * @param client_secret an Azure client secret
+ * @return AZ_OK = Successfull initialization <br>
+ * Other value = Initialization failed
+ */
+AZ_NODISCARD az_result az_credential_client_secret_init(
+    az_credential_client_secret* self,
+    az_span tenant_id,
+    az_span client_id,
+    az_span client_secret);
 
 #include <_az_cfg_suffix.h>
 

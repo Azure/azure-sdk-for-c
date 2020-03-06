@@ -3,7 +3,6 @@
 
 #include <az_context.h>
 #include <az_credential.h>
-#include <az_credential_anonymous.h>
 #include <az_http.h>
 #include <az_http_internal.h>
 #include <az_http_transport.h>
@@ -85,15 +84,12 @@ az_storage_blobs_blob_delete(az_storage_blobs_blob_client* client, az_http_respo
 
 int main()
 {
-  /************* create credentials as client_id type   ***********/
-  az_credential_anonymous credential = AZ_CREDENTIAL_ANONYMOUS;
-
   // Init client.
   //  Example expects the URI_ENV to be a URL w/ SAS token
   az_storage_blobs_blob_client client = { 0 };
   az_storage_blobs_blob_client_options options = az_storage_blobs_blob_client_options_default();
   az_result const operation_result = az_storage_blobs_blob_client_init(
-      &client, az_span_from_str(getenv(URI_ENV)), &credential, &options);
+      &client, az_span_from_str(getenv(URI_ENV)), AZ_CREDENTIAL_ANONYMOUS, &options);
 
   if (az_failed(operation_result))
   {
