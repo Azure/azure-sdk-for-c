@@ -180,6 +180,15 @@ AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span a, az_span b);
 AZ_NODISCARD az_result az_span_to_uint64(az_span self, uint64_t* out);
 
 /**
+ * @brief convert all the span content to uint32
+ *
+ * @param self source span
+ * @param out result span
+ * @return AZ_NODISCARD az_span_to_uint32
+ */
+AZ_NODISCARD az_result az_span_to_uint32(az_span self, uint32_t* out);
+
+/**
  * @brief move the content of span @b src to @b dst
  *
  * @param dst buffer where to copy span
