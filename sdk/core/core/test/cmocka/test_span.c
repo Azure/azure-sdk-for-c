@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include <az_result.h>
 #include <az_span.h>
 #include <az_span_private.h>
 
@@ -178,9 +179,29 @@ void az_span_to_uint64_return_errors()
   az_span negative = az_span_init(az_span_ptr(sample), -1, 0);
   uint64_t out = 0;
 
-  assert_return_code(az_span_to_uint64(negative, &out), AZ_ERROR_ARG);
-  assert_return_code(az_span_to_uint64(sample, &out), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_true(az_span_to_uint64(negative, &out) == AZ_ERROR_EOF);
+  assert_true(az_span_to_uint64(sample, &out) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
 }
+
+void az_span_to_uint32_test()
+{
+  az_span number = AZ_SPAN_FROM_STR("1024");
+  uint32_t value = 0;
+
+  assert_return_code(az_span_to_uint32(number, &value), AZ_OK);
+  assert_int_equal(value, 1024);
+}
+
+void az_span_to_str_test()
+{
+  az_span sample = AZ_SPAN_FROM_STR("hello World!");
+  char str[20];
+
+  assert_return_code(az_span_to_str(str, 20, sample), AZ_OK);
+  assert_string_equal(str, "hello World!");
+}
+
+
 
 void test_az_span(void** state)
 {
@@ -223,4 +244,7 @@ void test_az_span(void** state)
   az_span_append_u32toa_overflow_fails();
 
   az_span_to_lower_test();
+  az_span_to_uint32_test();
+  az_span_to_str_test();
+  az_span_to_uint64_return_errors();
 }

@@ -295,29 +295,6 @@ AZ_NODISCARD az_result az_span_append(az_span self, az_span span, az_span* out)
 }
 
 /**
- * @brief Append @b size number of zeros to @b self if there is enough capacity for it
- *
- * @param self src span where to append
- * @param size number of zeros to be appended
- * @return AZ_NODISCARD az_span_append_zeros
- */
-AZ_NODISCARD az_result _az_span_append_zeros(az_span* self, int32_t size)
-{
-  AZ_CONTRACT_ARG_NOT_NULL(self);
-
-  int32_t current_size = az_span_length(*self);
-  az_span const span = az_span_take(az_span_drop(*self, current_size), size);
-  if (az_span_capacity(span) < size)
-  {
-    return AZ_ERROR_BUFFER_OVERFLOW;
-  }
-  az_span_set(span, 0);
-
-  self->_internal.length = current_size + size;
-  return AZ_OK;
-}
-
-/**
  * @brief Replace all contents from a starting position to an end position with the content of a
  * provided span
  *

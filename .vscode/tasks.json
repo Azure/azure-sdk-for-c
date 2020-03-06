@@ -4,7 +4,7 @@
         {
             "label": "build",
             "type": "shell",
-            "command": "cd Debug && rm -rf * && cmake -DCMAKE_BUILD_TYPE=Debug  .. && make"
+            "command": "cd Debug && rm -rf * && cmake -DUNIT_TESTING=ON -DCMAKE_BUILD_TYPE=Debug  .. && make"
         }
     ]
 }

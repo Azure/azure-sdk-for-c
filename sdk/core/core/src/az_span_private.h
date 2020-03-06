@@ -88,15 +88,6 @@ AZ_NODISCARD AZ_INLINE az_span az_span_from_single_item(uint8_t* ptr)
 void _az_span_swap(az_span a, az_span b);
 
 /**
- * @brief Append @b size number of zeros to @b self if there is enough capacity for it
- *
- * @param self src span where to append
- * @param size number of zeros to be appended
- * @return AZ_NODISCARD az_span_append_zeros
- */
-AZ_NODISCARD az_result _az_span_append_zeros(az_span* self, int32_t size);
-
-/**
  * @brief Replace all contents from a starting position to an end position with the content of a
  * provided span
  *
