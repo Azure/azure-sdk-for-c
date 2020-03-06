@@ -140,13 +140,13 @@ When running cmake, next options can be used to change the output libraries/Pal/
 - `BUILD_CURL_TRANSPORT`: This option would build an HTTP transport library using CURL. It requires libcurl to be installed (vcpkg or globally). This option will make samples to be linked with this HTTP and be functional to send HTTP requests<br>
 use it as
 ```bash
-cmake -DBUILD_CURL_TRANSPORT ..
+cmake -DBUILD_CURL_TRANSPORT=ON ..
 cmake --build .
 ```
 - `UNIT_TESTING`: This option requires cmocka to be installed and it will generate unit tests for each project.<br>
 use it as
 ```bash
-cmake -DUNIT_TESTING ..
+cmake -DUNIT_TESTING=ON ..
 cmake --build .
 # ctest will call and run tests
 # -V runs tests in verbose mode to show more info about tests
