@@ -4,11 +4,11 @@
 #include <az_context.h>
 #include <az_http.h>
 #include <az_http_internal.h>
+#include <az_http_policy_logging_private.h>
 #include <az_http_private.h>
 #include <az_http_transport.h>
 #include <az_log.h>
 #include <az_log_internal.h>
-#include <az_log_private.h>
 
 #include <setjmp.h>
 #include <stdarg.h>
@@ -136,7 +136,7 @@ void test_az_log(void** state)
     // null request
     _reset_log_invocation_status();
     az_log_set_listener(_log_listener_NULL);
-    _az_log_http_request(NULL);
+    _az_http_policy_logging_log_http_request(NULL);
     assert_true(_log_invoked_for_http_request == true);
     assert_true(_log_invoked_for_http_response == false);
   }
@@ -149,11 +149,11 @@ void test_az_log(void** state)
     assert_true(_log_invoked_for_http_request == false);
     assert_true(_log_invoked_for_http_response == false);
 
-    _az_log_http_request(&hrb);
+    _az_http_policy_logging_log_http_request(&hrb);
     assert_true(_log_invoked_for_http_request == true);
     assert_true(_log_invoked_for_http_response == false);
 
-    _az_log_http_response(&response, 3456, &hrb);
+    _az_http_policy_logging_log_http_response(&response, 3456, &hrb);
     assert_true(_log_invoked_for_http_request == true);
     assert_true(_log_invoked_for_http_response == true);
   }
@@ -165,8 +165,8 @@ void test_az_log(void** state)
     assert_true(_log_invoked_for_http_request == false);
     assert_true(_log_invoked_for_http_response == false);
 
-    _az_log_http_request(&hrb);
-    _az_log_http_response(&response, 3456, &hrb);
+    _az_http_policy_logging_log_http_request(&hrb);
+    _az_http_policy_logging_log_http_response(&response, 3456, &hrb);
 
     assert_true(_log_invoked_for_http_request == false);
     assert_true(_log_invoked_for_http_response == false);
@@ -194,8 +194,8 @@ void test_az_log(void** state)
     assert_true(az_log_should_write(AZ_LOG_HTTP_REQUEST) == true);
     assert_true(az_log_should_write(AZ_LOG_HTTP_RESPONSE) == false);
 
-    _az_log_http_request(&hrb);
-    _az_log_http_response(&response, 3456, &hrb);
+    _az_http_policy_logging_log_http_request(&hrb);
+    _az_http_policy_logging_log_http_response(&response, 3456, &hrb);
 
     assert_true(_log_invoked_for_http_request == true);
     assert_true(_log_invoked_for_http_response == false);

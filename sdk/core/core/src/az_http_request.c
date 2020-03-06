@@ -134,7 +134,7 @@ az_http_request_append_header(_az_http_request* p_hrb, az_span key, az_span valu
 }
 
 AZ_NODISCARD az_result
-az_http_request_get_header(_az_http_request* p_hrb, int32_t index, az_pair* out_result)
+az_http_request_get_header(_az_http_request const* p_hrb, int32_t index, az_pair* out_result)
 {
   AZ_CONTRACT_ARG_NOT_NULL(p_hrb);
   AZ_CONTRACT_ARG_NOT_NULL(out_result);

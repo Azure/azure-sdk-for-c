@@ -105,11 +105,17 @@ AZ_NODISCARD az_result _az_aad_request_token(_az_http_request* ref_request, _az_
   az_http_response response = { 0 };
   AZ_RETURN_IF_FAILED(az_http_response_init(&response, AZ_SPAN_FROM_BUFFER(response_buf)));
 
+  az_http_policy_retry_options retry_options = az_http_policy_retry_options_default();
+  retry_options.max_retries = 7;
+  retry_options.retry_delay_msec = 1 * _az_TIME_MILLISECONDS_PER_SECOND;
+  retry_options.max_retry_delay_msec
+      = 1 * _az_TIME_SECONDS_PER_MINUTE * _az_TIME_MILLISECONDS_PER_SECOND;
+
   // Make a HTTP request to get token
   _az_http_pipeline pipeline = (_az_http_pipeline){
     ._internal = {
       .p_policies = {
-        {._internal = { .process = az_http_pipeline_policy_retry, .p_options = NULL, }, },
+        {._internal = { .process = az_http_pipeline_policy_retry, .p_options = &retry_options, }, },
         {._internal = { .process = az_http_pipeline_policy_logging, .p_options = NULL, }, },
         {._internal = { .process = az_http_pipeline_policy_transport, .p_options = NULL, }, },
       },
