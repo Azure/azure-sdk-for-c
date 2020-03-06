@@ -24,10 +24,10 @@ jobs:
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: x64
-      #MacOS_x64:
-      #  vm.image: 'macOS-10.14'
-      #  vcpkg.deps: ''
-      #  VCPKG_DEFAULT_TRIPLET: 'x64-osx'
+      MacOS_x64:
+       vm.image: 'macOS-10.14'
+       vcpkg.deps: ''
+       VCPKG_DEFAULT_TRIPLET: 'x64-osx'
 
       # Build with sample dependencies [curl for transport]
       Linux_x64_with_samples:
