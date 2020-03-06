@@ -17,6 +17,8 @@ add_library (
   src/az_context.c
   src/az_http_pipeline.c
   src/az_http_policy.c
+  src/az_http_policy_logging.c
+  src/az_http_policy_retry.c
   src/az_http_request.c
   src/az_http_response.c
   src/az_json_builder.c
