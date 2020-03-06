@@ -53,7 +53,7 @@ void az_span_from_string_non_ascii_roundtrip()
 void az_span_from_string_non_ascii_latin_roundtrip()
 {
   az_span span = AZ_SPAN_FROM_STR("è");
-  char arr[3] = "";
+  char arr[3] = {0, 0, 0};
 
   assert_int_equal(0, arr[0]);
   assert_int_equal(0, arr[1]);
