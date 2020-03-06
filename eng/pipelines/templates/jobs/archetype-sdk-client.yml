@@ -140,6 +140,7 @@ jobs:
 
         git clone https://github.com/Microsoft/vcpkg.git
         cd vcpkg
+        git checkout $(VcpkgCommit)
         git rev-parse --verify HEAD
         git status
 
