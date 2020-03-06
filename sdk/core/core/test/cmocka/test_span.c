@@ -11,6 +11,61 @@
 
 #include <_az_cfg.h>
 
+void az_span_from_string_non_ascii()
+{
+  az_span span = AZ_SPAN_FROM_STR("12汉字345");
+  assert_int_equal(11, az_span_length(span));
+}
+
+void az_span_from_string_non_ascii_latin()
+{
+  az_span span = AZ_SPAN_FROM_STR("è");
+  assert_int_equal(2, az_span_length(span));
+}
+
+void az_span_from_string_non_ascii_roundtrip()
+{
+  az_span span = AZ_SPAN_FROM_STR("12汉字345");
+  char label2[20] = "abcdefghijklmnopq";
+  char* labelPtr = label2;
+
+  assert_int_equal(AZ_OK, az_span_to_str(labelPtr, 20, span));
+  assert_int_equal(0x31, label2[0]); // '1'
+  assert_int_equal(0x32, label2[1]); // '2'
+  assert_int_equal(0x3F, label2[2]); // '?' - this is unexpected
+  assert_int_equal(0x3F, label2[3]); // '?' - this is unexpected
+  assert_int_equal(0x33, label2[4]); // '3'
+  assert_int_equal(0x34, label2[5]); // '4'
+  assert_int_equal(0x35, label2[6]); // '5'
+  assert_int_equal(0, label2[7]);
+  assert_int_equal(105, label2[8]); // 'i'
+  assert_int_equal(106, label2[9]);
+  assert_int_equal(107, label2[10]);
+  assert_int_equal(108, label2[11]);
+  assert_int_equal(109, label2[12]);
+  assert_int_equal(110, label2[13]);
+  assert_int_equal(111, label2[14]);
+  assert_int_equal(112, label2[15]);
+  assert_int_equal(113, label2[16]); // 'q'
+  assert_int_equal(0, label2[17]);
+}
+
+void az_span_from_string_non_ascii_latin_roundtrip()
+{
+  az_span span = AZ_SPAN_FROM_STR("è");
+  char arr[3] = "";
+
+  assert_int_equal(0, arr[0]);
+  assert_int_equal(0, arr[1]);
+  assert_int_equal(0, arr[2]);
+
+  assert_int_equal(AZ_OK, az_span_to_str(arr, 3, span));
+
+  assert_int_equal(0xC3, arr[0]);
+  assert_int_equal(0xA8, arr[1]);
+  assert_int_equal(0, arr[2]);
+}
+
 void az_span_append_uint8_NULL_out_span_fails()
 {
   uint8_t raw_buffer[15];
