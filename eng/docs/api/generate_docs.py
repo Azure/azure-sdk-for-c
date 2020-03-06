@@ -41,14 +41,12 @@ def message(message):
     print(message)
     print("===============")
 
-package_path = os.path.join(args.PackagePath, args.PackageName)
-
 message('Filling template')
-fill_template(args.TemplateFile, args.PackageName, args.PackageVersion, package_path)
+fill_template(args.TemplateFile, args.PackageName, args.PackageVersion, args.PackagePath)
 
 message('Copying assets')
-copy_files(args.AssetsPath, package_path)
+copy_files(args.AssetsPath, args.PackagePath)
 
 message('Invoking Doxygen')
-invoke_doxygen(args.DoxygenPath, package_path)
+invoke_doxygen(args.DoxygenPath, args.PackagePath)
 
