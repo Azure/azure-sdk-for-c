@@ -21,9 +21,9 @@
 #define TEST_PARAMS "key=value&key_two=value2"
 #define TEST_MQTT_SPAN_BUFFER_SIZE 100
 
-#define TEST_NULL_PTR_SPAN \
+#define TEST_BAD_SPAN \
   { \
-    ._internal = { .ptr = NULL, .length = 1, .capacity = 1 }, \
+    ._internal = { .ptr = (uint8_t*)0xabcd0000, .length = 1, .capacity = 1 }, \
   }
 #define TEST_EMPTY_OPTIONS \
   { \
@@ -97,7 +97,7 @@ void az_iot_hub_client_telemetry_publish_topic_get_NULL_client_fails(void** stat
 void az_iot_hub_client_telemetry_publish_topic_get_NULL_mqtt_topic_fails(void** state)
 {
   (void)state;
-  az_span null_mqtt_topic = TEST_NULL_PTR_SPAN;
+  az_span null_mqtt_topic = TEST_BAD_SPAN;
 
   assert_true(
       az_iot_hub_client_telemetry_publish_topic_get(
