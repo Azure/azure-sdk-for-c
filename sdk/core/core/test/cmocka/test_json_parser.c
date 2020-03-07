@@ -89,7 +89,7 @@ void test_json_parser(void** state)
     az_json_parser json_state = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&json_state, AZ_SPAN_FROM_STR("  falsx  ")));
     az_json_token token;
-    assert_true(az_json_parser_parse_token(&json_state, &token) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+    assert_true(az_json_parser_parse_token(&json_state, &token) == AZ_ERROR_PARSING);
   }
   {
     az_json_parser json_state = { 0 };
@@ -104,7 +104,7 @@ void test_json_parser(void** state)
     az_json_parser json_state = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&json_state, AZ_SPAN_FROM_STR("  truem")));
     az_json_token token;
-    assert_true(az_json_parser_parse_token(&json_state, &token) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+    assert_true(az_json_parser_parse_token(&json_state, &token) == AZ_ERROR_PARSING);
   }
   {
     az_span const s = AZ_SPAN_FROM_STR(" \"tr\\\"ue\\t\" ");
@@ -133,7 +133,7 @@ void test_json_parser(void** state)
     az_json_parser json_state = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&json_state, s));
     az_json_token token;
-    assert_true(az_json_parser_parse_token(&json_state, &token) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+    assert_true(az_json_parser_parse_token(&json_state, &token) == AZ_ERROR_PARSING);
   }
   /* Testing parsing number and converting to double (az_json_number_to_double) */
   {

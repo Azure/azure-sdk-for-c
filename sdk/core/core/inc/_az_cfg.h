@@ -4,7 +4,7 @@
 /**
  * @file _az_cfg.h
  *
- * @brief disabling warnings.
+ * @brief Disable warnings.
  */
 
 #ifdef _MSC_VER
@@ -46,7 +46,7 @@
 #pragma clang diagnostic ignored "-Wmissing-field-initializers"
 #pragma clang diagnostic ignored "-Wmissing-braces"
 
-#endif // __clang__ 
+#endif // __clang__
 
 #ifndef _az_CFG_H
 #define _az_CFG_H

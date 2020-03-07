@@ -4,7 +4,7 @@
 /**
  * @file _az_cfg_prefix.h
  *
- * @brief adding extern C and pragma
+ * @brief adding extern C and save warnings state.
  */
 
 #ifdef __cplusplus

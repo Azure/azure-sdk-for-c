@@ -4,7 +4,7 @@
 /**
  * @file az_credential.h
  *
- * @brief definition for az_credential and functionality
+ * @brief Credentials for authentication.
  */
 
 #ifndef _az_CREDENTIAL_H

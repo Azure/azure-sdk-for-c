@@ -4,8 +4,7 @@
 /**
  * @file az_http.h
  *
- * @brief Definition and functionality for az_http_response and related http utilities that allows
- * customer to create required component for sdk clients
+ * @brief HTTP-related functionality.
  */
 
 #ifndef _az_HTTP_H
@@ -29,13 +28,11 @@ typedef enum
 
 /**
  * @brief Define az_http_method as an az_span so it is limited to that type and not to any az_span
- *
  */
 typedef az_span az_http_method;
 
 /**
  * @brief Define _az_http_headers as an az_span so it is limited to that type and not to any az_span
- *
  */
 typedef az_span _az_http_headers;
 

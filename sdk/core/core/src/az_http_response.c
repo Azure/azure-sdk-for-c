@@ -44,7 +44,7 @@ AZ_NODISCARD az_result _az_get_digit(az_span* self, uint8_t* save_here)
   uint8_t c_ptr = az_span_ptr(*self)[0];
   if (!isdigit(c_ptr))
   {
-    return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
+    return AZ_ERROR_PARSING;
   }
   //
   *save_here = (uint8_t)(c_ptr - '0');
@@ -203,7 +203,7 @@ AZ_NODISCARD az_result az_http_response_get_next_header(az_http_response* self, 
       }
       if (c <= ' ')
       {
-        return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
+        return AZ_ERROR_PARSING;
       }
       offset_value_end = offset; // increasing index only for valid chars,
     }

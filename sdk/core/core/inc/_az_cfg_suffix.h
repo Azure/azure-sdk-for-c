@@ -4,7 +4,7 @@
 /**
  * @file _az_cfg_suffix.h
  *
- * @brief close extern C and remove pragma
+ * @brief close extern C and restore warnings state.
  */
 
 #ifdef _MSC_VER

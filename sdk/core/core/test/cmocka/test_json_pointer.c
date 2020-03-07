@@ -22,8 +22,7 @@ void test_json_pointer(void** state)
   {
     az_span parser = AZ_SPAN_FROM_STR("Hello");
     az_span p;
-    assert_true(
-        _az_span_reader_read_json_pointer_token(&parser, &p) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+    assert_true(_az_span_reader_read_json_pointer_token(&parser, &p) == AZ_ERROR_PARSING);
   }
   {
     az_span parser = AZ_SPAN_FROM_STR("/abc");
@@ -141,8 +140,7 @@ void test_json_pointer(void** state)
     az_span p;
     assert_true(_az_span_reader_read_json_pointer_token(&parser, &p) == AZ_OK);
     assert_true(az_span_is_equal(p, AZ_SPAN_FROM_STR("ab~1c")));
-    assert_true(
-        _az_span_reader_read_json_pointer_token(&parser, &p) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+    assert_true(_az_span_reader_read_json_pointer_token(&parser, &p) == AZ_ERROR_PARSING);
   }
   {
     az_span parser = AZ_SPAN_FROM_STR("/ab~1c/dff~");
@@ -169,15 +167,13 @@ void test_json_pointer(void** state)
     az_span token_parser = AZ_SPAN_FROM_STR("/");
     uint32_t c;
     assert_true(
-        _az_span_reader_read_json_pointer_token_char(&token_parser, &c)
-        == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+        _az_span_reader_read_json_pointer_token_char(&token_parser, &c) == AZ_ERROR_PARSING);
   }
   // test az_json_pointer_token_parser_get
   {
     az_span token_parser = AZ_SPAN_FROM_STR("~2");
     uint32_t c;
     assert_true(
-        _az_span_reader_read_json_pointer_token_char(&token_parser, &c)
-        == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+        _az_span_reader_read_json_pointer_token_char(&token_parser, &c) == AZ_ERROR_PARSING);
   }
 }
