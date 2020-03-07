@@ -70,12 +70,12 @@ AZ_NODISCARD az_result az_span_to_uint64(az_span self, uint64_t* out)
     uint8_t result = az_span_ptr(self)[i];
     if (!isdigit(result))
     {
-      return AZ_ERROR_PARSING;
+      return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
     }
     uint64_t const d = (uint64_t)result - '0';
     if ((UINT64_MAX - d) / 10 < value)
     {
-      return AZ_ERROR_PARSING;
+      return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
     }
 
     value = value * 10 + d;
@@ -99,12 +99,12 @@ AZ_NODISCARD az_result az_span_to_uint32(az_span self, uint32_t* out)
     uint8_t result = az_span_ptr(self)[i];
     if (!isdigit(result))
     {
-      return AZ_ERROR_PARSING;
+      return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
     }
     uint32_t const d = (uint32_t)result - '0';
     if ((UINT32_MAX - d) / 10 < value)
     {
-      return AZ_ERROR_PARSING;
+      return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
     }
 
     value = value * 10 + d;
@@ -535,7 +535,7 @@ AZ_NODISCARD az_result _az_is_expected_span(az_span* self, az_span expected)
 
   if (!az_span_is_equal(actual_span, expected))
   {
-    return AZ_ERROR_PARSING;
+    return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
   // move reader after the expected span (means it was parsed as expected)
   AZ_RETURN_IF_FAILED(az_span_slice(*self, expected_length, -1, self));

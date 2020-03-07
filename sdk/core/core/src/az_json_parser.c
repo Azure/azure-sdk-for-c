@@ -225,7 +225,7 @@ AZ_NODISCARD static az_result az_span_reader_get_json_number_digit_rest(
       o = az_span_ptr(*self)[0];
       if (!isdigit(o))
       {
-        return AZ_ERROR_PARSING;
+        return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
       }
     }
     if (o != '0')
@@ -254,7 +254,7 @@ AZ_NODISCARD static az_result az_span_reader_get_json_number_digit_rest(
     uint8_t o = az_span_ptr(*self)[0];
     if (!isdigit(o))
     {
-      return AZ_ERROR_PARSING;
+      return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
     }
     AZ_RETURN_IF_FAILED(az_span_reader_get_json_number_int(self, &i, -1, o));
   }
@@ -295,7 +295,7 @@ AZ_NODISCARD static az_result az_span_reader_get_json_number_digit_rest(
     // expect at least one digit.
     if (!isdigit(c))
     {
-      return AZ_ERROR_PARSING;
+      return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
     }
 
     int16_t e_int = 0;
@@ -393,7 +393,7 @@ AZ_NODISCARD static az_result az_json_parser_get_value(
       AZ_RETURN_IF_FAILED(az_span_slice(*p_reader, 1, -1, p_reader));
       return az_json_parser_push_stack(self, AZ_JSON_STACK_ARRAY);
   }
-  return AZ_ERROR_PARSING;
+  return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
 }
 
 AZ_NODISCARD static az_result az_json_parser_get_value_space(
@@ -429,7 +429,7 @@ AZ_NODISCARD az_result az_json_parser_parse_token(az_json_parser* self, az_json_
     default:
       break;
   }
-  return is_empty ? AZ_OK : AZ_ERROR_PARSING;
+  return is_empty ? AZ_OK : AZ_ERROR_PARSER_UNEXPECTED_CHAR;
 }
 
 AZ_NODISCARD AZ_INLINE uint8_t az_json_stack_item_to_close(az_json_stack_item item)
@@ -451,7 +451,7 @@ AZ_NODISCARD static az_result az_json_parser_read_comma_or_close(az_json_parser*
   uint8_t const close = az_json_stack_item_to_close(az_json_parser_stack_last(self));
   if (c != close)
   {
-    return AZ_ERROR_PARSING;
+    return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
   return AZ_OK;
 }

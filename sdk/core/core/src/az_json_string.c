@@ -26,7 +26,7 @@ AZ_NODISCARD AZ_INLINE az_result az_hex_to_digit(uint8_t c, uint8_t* out)
   }
   else
   {
-    return AZ_ERROR_PARSING;
+    return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
   return AZ_OK;
 }
@@ -68,7 +68,7 @@ AZ_NODISCARD AZ_INLINE az_result az_json_esc_decode(uint8_t c, uint8_t* out)
       break;
     }
     default:
-      return AZ_ERROR_PARSING;
+      return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
   return AZ_OK;
 }
@@ -168,7 +168,7 @@ AZ_NODISCARD az_result _az_span_reader_read_json_string_char(az_span* self, uint
     {
       if (result < 0x20)
       {
-        return AZ_ERROR_PARSING;
+        return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
       }
       AZ_RETURN_IF_FAILED(az_span_slice(*self, 1, -1, self));
       *out = (uint16_t)result;

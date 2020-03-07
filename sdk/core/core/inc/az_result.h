@@ -85,7 +85,7 @@ typedef enum
   AZ_ERROR_ITEM_NOT_FOUND
   = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 5), ///< Requestewd item was not found.
 
-  AZ_ERROR_PARSING
+  AZ_ERROR_PARSER_UNEXPECTED_CHAR
   = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 6), ///< Input can't be successfully parsed.
 
   AZ_ERROR_EOF = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 7), ///< Unexpected end of the input data.

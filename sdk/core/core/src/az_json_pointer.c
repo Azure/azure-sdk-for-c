@@ -51,7 +51,7 @@ AZ_NODISCARD static az_result az_span_reader_read_json_pointer_char(az_span* sel
         }
         default:
         {
-          return AZ_ERROR_PARSING;
+          return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
         }
       }
     }
@@ -81,7 +81,7 @@ AZ_NODISCARD az_result _az_span_reader_read_json_pointer_token(az_span* self, az
     // ensure first char of pointer is `/`
     if (az_span_ptr(*self)[0] != '/')
     {
-      return AZ_ERROR_PARSING;
+      return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
     }
   }
   // move forward
@@ -128,7 +128,7 @@ AZ_NODISCARD az_result _az_span_reader_read_json_pointer_token_char(az_span* sel
   az_result const result = az_span_reader_read_json_pointer_char(self, &c);
   if (result == AZ_ERROR_JSON_POINTER_TOKEN_END)
   {
-    return AZ_ERROR_PARSING;
+    return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
   AZ_RETURN_IF_FAILED(result);
   *out = c;
