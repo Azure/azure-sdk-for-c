@@ -15,7 +15,7 @@ static const az_span telemetry_topic_prefix = AZ_SPAN_LITERAL_FROM_STR("devices/
 static const az_span telemetry_topic_modules_mid = AZ_SPAN_LITERAL_FROM_STR("/modules/");
 static const az_span telemetry_topic_suffix = AZ_SPAN_LITERAL_FROM_STR("/messages/events/");
 
-az_result az_iot_hub_client_telemetry_publish_topic_get(
+AZ_NODISCARD az_result az_iot_hub_client_telemetry_publish_topic_get(
     az_iot_hub_client const* client,
     az_iot_hub_client_properties const* properties,
     az_span mqtt_topic,
