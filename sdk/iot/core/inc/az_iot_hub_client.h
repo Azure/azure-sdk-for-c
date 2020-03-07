@@ -397,7 +397,7 @@ AZ_NODISCARD bool az_iot_hub_client_is_retriable_status(az_iot_hub_client_status
 /**
  * @brief Gets the MQTT topic filter to subscribe to twin operation responses.
  *
- * @param[in] client
+ * @param[in] client The #az_iot_hub_client to use for this call
  * @param[in] mqtt_topic_filter An empty #az_span with sufficient capacity to hold the MQTT topic
  *                              filter.
  * @param[out] out_mqtt_topic_filter The output #az_span containing the MQTT topic filter.
@@ -412,7 +412,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_response_subscribe_topic_filter_ge
  * @brief Gets the MQTT topic filter to subscribe to twin desired property changes.
  * @note The payload will contain only changes made to the desired properties.
  *
- * @param[in] client
+ * @param[in] client The #az_iot_hub_client to use for this call
  * @param[in] mqtt_topic_filter An empty #az_span with sufficient capacity to hold the MQTT topic
  *                              filter.
  * @param[out] out_mqtt_topic_filter The output #az_span containing the MQTT topic filter.
@@ -454,9 +454,9 @@ typedef struct az_iot_hub_client_twin_response
 /**
  * @brief Attempts to parse a received message's topic.
  *
- * @param[in] client
+ * @param[in] client The #az_iot_hub_client to use for this call
  * @param[in] received_topic An #az_span containing the received topic.
- * @param[out] out_request If the message is twin-operation related, this will contain the
+ * @param[out] out_twin_response If the message is twin-operation related, this will contain the
  *                         #az_iot_hub_client_twin_response.
  * @return #az_result
  */
@@ -486,7 +486,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_get_publish_topic_get(
  * @note The payload of the MQTT publish message should contain a JSON document
  *       formatted according to the Twin specification.
  *
- * @param[in] client
+ * @param[in] client The #az_iot_hub_client to use for this call
  * @param[in] request_id The request id.
  * @param[in] if_match_version Can be either "*" to overwrite or the twin version to limit the
  *                             reported properties patch to that version only. The version is
