@@ -469,7 +469,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_received_topic_parse(
  * @brief Gets the MQTT topic that must be used to submit a Twin GET request.
  * @note The payload of the MQTT publish message should be empty.
  *
- * @param[in] client
+ * @param[in] client The #az_iot_hub_client to use for this call
  * @param[in] request_id The request id.
  * @param[in] mqtt_topic An empty #az_span with sufficient capacity to hold the MQTT topic.
  * @param[out] out_mqtt_topic The output #az_span containing the MQTT topic.
