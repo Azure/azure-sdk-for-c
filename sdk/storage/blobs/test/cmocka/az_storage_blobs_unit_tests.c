@@ -9,7 +9,7 @@
 #include <cmocka.h>
 
 #include <az_storage_blobs.h>
-#include <az_credential.h>
+#include <az_credentials.h>
 
 #include <_az_cfg.h>
 
