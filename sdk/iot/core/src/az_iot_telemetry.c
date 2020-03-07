@@ -10,7 +10,7 @@
 
 static const uint8_t telemetry_prop_delim = '?';
 static const uint8_t telemetry_prop_separator = '&';
-static const uint8_t telemetry_null_terminator = 0;
+static const uint8_t telemetry_null_terminator = '\0';
 static const az_span telemetry_topic_prefix = AZ_SPAN_LITERAL_FROM_STR("devices/");
 static const az_span telemetry_topic_modules_mid = AZ_SPAN_LITERAL_FROM_STR("/modules/");
 static const az_span telemetry_topic_suffix = AZ_SPAN_LITERAL_FROM_STR("/messages/events/");
@@ -25,12 +25,8 @@ az_result az_iot_hub_client_telemetry_publish_topic_get(
   AZ_CONTRACT_ARG_VALID_SPAN(mqtt_topic);
   AZ_CONTRACT_ARG_NOT_NULL(out_mqtt_topic);
 
-  az_result result;
-
-  int32_t required_size = 0;
-
   // Required topic parts
-  required_size = az_span_length(telemetry_topic_prefix)
+  int32_t required_size = az_span_length(telemetry_topic_prefix)
       + az_span_length(client->_internal.device_id) + az_span_length(telemetry_topic_suffix)
       + sizeof(telemetry_null_terminator);
 
@@ -40,11 +36,13 @@ az_result az_iot_hub_client_telemetry_publish_topic_get(
     required_size += az_span_length(telemetry_topic_modules_mid);
     required_size += az_span_length(client->_internal.options.module_id);
   }
+
   if (properties != NULL)
   {
     required_size
         += az_span_length(properties->_internal.properties) + sizeof(telemetry_prop_delim);
   }
+
   if (!az_span_is_empty(client->_internal.options.user_agent))
   {
     required_size += az_span_length(client->_internal.options.user_agent)
@@ -54,7 +52,7 @@ az_result az_iot_hub_client_telemetry_publish_topic_get(
   // Only build topic if the span has the capacity
   if (az_span_capacity(mqtt_topic) < required_size)
   {
-    result = AZ_ERROR_OUT_OF_MEMORY;
+    return AZ_ERROR_OUT_OF_MEMORY;
   }
   else
   {
@@ -78,6 +76,7 @@ az_result az_iot_hub_client_telemetry_publish_topic_get(
       AZ_RETURN_IF_FAILED(
           az_span_append(*out_mqtt_topic, properties->_internal.properties, out_mqtt_topic));
     }
+
     if (az_span_length(client->_internal.options.user_agent) != 0)
     {
       AZ_RETURN_IF_FAILED(
@@ -87,9 +86,9 @@ az_result az_iot_hub_client_telemetry_publish_topic_get(
       AZ_RETURN_IF_FAILED(
           az_span_append(*out_mqtt_topic, client->_internal.options.user_agent, out_mqtt_topic));
     }
+
     AZ_RETURN_IF_FAILED(az_span_append_uint8(*out_mqtt_topic, telemetry_null_terminator, out_mqtt_topic));
-    result = AZ_OK;
   }
 
-  return result;
+  return AZ_OK;
 }

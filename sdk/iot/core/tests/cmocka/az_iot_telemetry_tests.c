@@ -23,7 +23,7 @@
 
 #define TEST_BAD_SPAN \
   { \
-    ._internal = { .ptr = (uint8_t*)0xabcd0000, .length = 1, .capacity = 1 }, \
+    ._internal = { .ptr = (uint8_t*)0x7FFFFFFF, .length = -1, .capacity = 10  }, \
   }
 #define TEST_EMPTY_OPTIONS \
   { \
