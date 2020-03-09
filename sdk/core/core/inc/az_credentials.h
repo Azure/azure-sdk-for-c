@@ -4,7 +4,7 @@
 /**
  * @file az_credentials.h
  *
- * @brief definition for az_credential and functionality
+ * @brief Credentials for authentication.
  */
 
 #ifndef _az_CREDENTIALS_H
@@ -14,6 +14,7 @@
 #include <az_result.h>
 #include <az_span.h>
 
+#include <stddef.h>
 #include <stdint.h>
 
 #include <_az_cfg_prefix.h>
@@ -32,7 +33,7 @@ typedef struct
 {
   struct
   {
-    uint8_t token[_az_TOKEN_BUF_SIZE]; // Base64-encoded token
+    uint8_t token[_az_TOKEN_BUF_SIZE]; /*!< Base64-encoded token */
     int16_t token_length;
     int64_t expires_at_msec;
   } _internal;
@@ -67,7 +68,13 @@ typedef struct
 } _az_credential;
 
 /**
- * @brief a type of az_credential that uses tentant, client and client secret inputs to get
+ * @brief Anonymous is equivallent to no credential (NULL).
+ *
+ */
+#define AZ_CREDENTIAL_ANONYMOUS NULL
+
+/**
+ * @brief a type of az_credential that uses tenant, client and client secret inputs to get
  * authenticated with Azure
  *
  */
@@ -75,14 +82,14 @@ typedef struct
 {
   struct
   {
-    _az_credential credential; // must be the first field in every credential structure
+    _az_credential credential; /// must be the first field in every credential structure
     az_span tenant_id;
     az_span client_id;
     az_span client_secret;
     az_span scopes;
     _az_token token;
   } _internal;
-} az_client_secret_credential;
+} az_credential_client_secret;
 
 /**
  * @brief Initialize a client secret credential with input tenant, client and client secret
@@ -95,8 +102,8 @@ typedef struct
  * @return AZ_OK = Successfull initialization <br>
  * Other value = Initialization failed
  */
-AZ_NODISCARD az_result az_client_secret_credential_init(
-    az_client_secret_credential* self,
+AZ_NODISCARD az_result az_credential_client_secret_init(
+    az_credential_client_secret* self,
     az_span tenant_id,
     az_span client_id,
     az_span client_secret);

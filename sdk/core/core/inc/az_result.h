@@ -17,13 +17,12 @@
 
 enum
 {
-  AZ_FACILITY_CORE = 0x1,
-  AZ_FACILITY_PLATFORM = 0x2,
-  AZ_FACILITY_JSON = 0x3,
-  AZ_FACILITY_HTTP = 0x4,
-  AZ_FACILITY_MQTT = 0x5,
-  AZ_FACILITY_IOT = 0x6,
-  AZ_FACILITY_STD = 0x7FFF,
+  _az_FACILITY_CORE = 0x1,
+  _az_FACILITY_PLATFORM = 0x2,
+  _az_FACILITY_JSON = 0x3,
+  _az_FACILITY_HTTP = 0x4,
+  _az_FACILITY_MQTT = 0x5,
+  _az_FACILITY_IOT = 0x6,
 };
 
 enum
@@ -57,53 +56,80 @@ enum
  * - otherwise
  *   -  0..30 Value
  */
-typedef enum az_result
+typedef enum
 {
   // Core: Success results
-  AZ_OK = _az_RESULT_MAKE_SUCCESS(AZ_FACILITY_CORE, 0),
-  AZ_CONTINUE = _az_RESULT_MAKE_SUCCESS(AZ_FACILITY_CORE, 1),
+  AZ_OK = _az_RESULT_MAKE_SUCCESS(_az_FACILITY_CORE, 0), ///< Success.
+  AZ_CONTINUE = _az_RESULT_MAKE_SUCCESS(_az_FACILITY_CORE, 1),
 
   // Core: Error results
-  AZ_ERROR_CANCELED = _az_RESULT_MAKE_ERROR(AZ_FACILITY_CORE, 0),
+  AZ_ERROR_CANCELED = _az_RESULT_MAKE_ERROR(
+      _az_FACILITY_CORE,
+      0), ///< A context was canceled, and a function had to return before result was ready.
 
-  AZ_ERROR_ARG = _az_RESULT_MAKE_ERROR(AZ_FACILITY_CORE, 1),
-  AZ_ERROR_BUFFER_OVERFLOW = _az_RESULT_MAKE_ERROR(AZ_FACILITY_CORE,2),
-  AZ_ERROR_OUT_OF_MEMORY = _az_RESULT_MAKE_ERROR(AZ_FACILITY_CORE, 3),
-  AZ_ERROR_NOT_IMPLEMENTED = _az_RESULT_MAKE_ERROR(AZ_FACILITY_CORE, 4),
-  AZ_ERROR_ITEM_NOT_FOUND = _az_RESULT_MAKE_ERROR(AZ_FACILITY_CORE, 5),
-  AZ_ERROR_PARSER_UNEXPECTED_CHAR = _az_RESULT_MAKE_ERROR(AZ_FACILITY_CORE, 6),
+  AZ_ERROR_ARG = _az_RESULT_MAKE_ERROR(
+      _az_FACILITY_CORE,
+      1), ///< Input argument does not comply with the requested range of values.
+
+  AZ_ERROR_BUFFER_OVERFLOW = _az_RESULT_MAKE_ERROR(
+      _az_FACILITY_CORE,
+      2), ///< There is not enough space in the buffer provided.
+
+  AZ_ERROR_OUT_OF_MEMORY = _az_RESULT_MAKE_ERROR(
+      _az_FACILITY_CORE,
+      3), ///< Dynamic memory allocation request was not successful.
+
+  AZ_ERROR_NOT_IMPLEMENTED
+  = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 4), ///< Requested functionality is not implemented.
+
+  AZ_ERROR_ITEM_NOT_FOUND
+  = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 5), ///< Requestewd item was not found.
+
+  AZ_ERROR_PARSER_UNEXPECTED_CHAR
+  = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 6), ///< Input can't be successfully parsed.
+
+  AZ_ERROR_EOF = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 7), ///< Unexpected end of the input data.
 
   // Platform
-  AZ_ERROR_MUTEX = _az_RESULT_MAKE_ERROR(AZ_FACILITY_PLATFORM, 1),
-
-  // C standard errors
-  AZ_ERROR_EOF = _az_RESULT_MAKE_ERROR(AZ_FACILITY_STD, 0xFFFF),
+  AZ_ERROR_MUTEX = _az_RESULT_MAKE_ERROR(_az_FACILITY_PLATFORM, 1), ///< Mutex operation error.
 
   // JSON error codes
-  AZ_ERROR_JSON_INVALID_STATE = _az_RESULT_MAKE_ERROR(AZ_FACILITY_JSON, 1),
-  AZ_ERROR_JSON_NESTING_OVERFLOW = _az_RESULT_MAKE_ERROR(AZ_FACILITY_JSON, 2),
-  AZ_ERROR_JSON_STRING_END = _az_RESULT_MAKE_ERROR(AZ_FACILITY_JSON, 3),
-  AZ_ERROR_JSON_POINTER_TOKEN_END = _az_RESULT_MAKE_ERROR(AZ_FACILITY_JSON, 4),
+  AZ_ERROR_JSON_INVALID_STATE = _az_RESULT_MAKE_ERROR(_az_FACILITY_JSON, 1),
+  AZ_ERROR_JSON_NESTING_OVERFLOW = _az_RESULT_MAKE_ERROR(_az_FACILITY_JSON, 2),
+  AZ_ERROR_JSON_STRING_END = _az_RESULT_MAKE_ERROR(_az_FACILITY_JSON, 3),
+  AZ_ERROR_JSON_POINTER_TOKEN_END = _az_RESULT_MAKE_ERROR(_az_FACILITY_JSON, 4),
 
   // HTTP error codes
-  AZ_ERROR_HTTP_PAL = _az_RESULT_MAKE_ERROR(AZ_FACILITY_HTTP, 1),
-  AZ_ERROR_HTTP_INVALID_STATE = _az_RESULT_MAKE_ERROR(AZ_FACILITY_HTTP, 2),
-  AZ_ERROR_HTTP_PIPELINE_INVALID_POLICY = _az_RESULT_MAKE_ERROR(AZ_FACILITY_HTTP, 3),
-  AZ_ERROR_HTTP_INVALID_METHOD_VERB = _az_RESULT_MAKE_ERROR(AZ_FACILITY_HTTP, 4),
-  AZ_ERROR_HTTP_AUTHENTICATION_FAILED = _az_RESULT_MAKE_ERROR(AZ_FACILITY_HTTP, 5),
-  AZ_ERROR_HTTP_RESPONSE_OVERFLOW = _az_RESULT_MAKE_ERROR(AZ_FACILITY_HTTP, 6),
-  AZ_ERROR_HTTP_RESPONSE_COULDNT_RESOLVE_HOST = _az_RESULT_MAKE_ERROR(AZ_FACILITY_HTTP, 7),
+  AZ_ERROR_HTTP_PAL = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 1),
+  AZ_ERROR_HTTP_INVALID_STATE = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 2),
+  AZ_ERROR_HTTP_PIPELINE_INVALID_POLICY = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 3),
+  AZ_ERROR_HTTP_INVALID_METHOD_VERB = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 4),
+
+  AZ_ERROR_HTTP_AUTHENTICATION_FAILED
+  = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 5), ///< Authentication failed.
+
+  AZ_ERROR_HTTP_RESPONSE_OVERFLOW = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 6),
+  AZ_ERROR_HTTP_RESPONSE_COULDNT_RESOLVE_HOST = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 7),
 } az_result;
 
+/// Checks wheteher the \a result provided indicates a failure.
+///
+/// @param result Result value to check for failure.
+///
+/// @retval true \a result indicates a failure.
+/// @retval false \a result is successful.
 AZ_NODISCARD AZ_INLINE bool az_failed(az_result result)
 {
   return ((int32_t)result & (int32_t)_az_ERROR_FLAG) != 0;
 }
 
-AZ_NODISCARD AZ_INLINE bool az_succeeded(az_result result)
-{
-  return ((int32_t)result & (int32_t)_az_ERROR_FLAG) == 0;
-}
+/// Checks wheteher the \a result provided indicates a success.
+///
+/// @param result Result value to check for success.
+///
+/// @retval true \a result indicates success.
+/// @retval false \a result is a failure.
+AZ_NODISCARD AZ_INLINE bool az_succeeded(az_result result) { return !az_failed(result); }
 
 #include <_az_cfg_suffix.h>
 
