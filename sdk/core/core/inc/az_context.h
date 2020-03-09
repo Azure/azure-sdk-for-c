@@ -4,7 +4,7 @@
 /**
  * @file az_context.h
  *
- * @brief az_context for cancelling execution
+ * @brief Context for cancelling long running operations.
  */
 
 #ifndef _az_CONTEXT_H
