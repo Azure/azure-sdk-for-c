@@ -11,59 +11,53 @@
 
 #include <_az_cfg.h>
 
-void az_span_from_string_non_ascii()
-{
-  az_span span = AZ_SPAN_FROM_STR("12汉字345");
-  assert_int_equal(11, az_span_length(span));
-}
-
-void az_span_from_string_non_ascii_latin()
-{
-  az_span span = AZ_SPAN_FROM_STR("è");
-  assert_int_equal(2, az_span_length(span));
-}
-
 void az_span_from_string_non_ascii_roundtrip()
 {
   az_span span = AZ_SPAN_FROM_STR("12汉字345");
-  char label2[20] = "abcdefghijklmnopq";
-  char* labelPtr = label2;
+  assert_int_equal(11, az_span_length(span));
 
-  assert_int_equal(AZ_OK, az_span_to_str(labelPtr, 20, span));
-  assert_int_equal(0x31, label2[0]); // '1'
-  assert_int_equal(0x32, label2[1]); // '2'
-  assert_int_equal(0x3F, label2[2]); // '?' - this is unexpected
-  assert_int_equal(0x3F, label2[3]); // '?' - this is unexpected
-  assert_int_equal(0x33, label2[4]); // '3'
-  assert_int_equal(0x34, label2[5]); // '4'
-  assert_int_equal(0x35, label2[6]); // '5'
-  assert_int_equal(0, label2[7]);
-  assert_int_equal(105, label2[8]); // 'i'
-  assert_int_equal(106, label2[9]);
-  assert_int_equal(107, label2[10]);
-  assert_int_equal(108, label2[11]);
-  assert_int_equal(109, label2[12]);
-  assert_int_equal(110, label2[13]);
-  assert_int_equal(111, label2[14]);
-  assert_int_equal(112, label2[15]);
-  assert_int_equal(113, label2[16]); // 'q'
-  assert_int_equal(0, label2[17]);
+  char roundTripBuffer[20] = "abcdefghijklmnopq";
+
+  assert_return_code(az_span_to_str(roundTripBuffer, 20, span), AZ_OK);
+
+  assert_int_equal(11, az_span_length(span));
+  assert_int_equal(0x31, roundTripBuffer[0]); // '1'
+  assert_int_equal(0x32, roundTripBuffer[1]); // '2'
+  assert_int_equal(0xffffffffffffffe6, roundTripBuffer[2]);
+  assert_int_equal(0xffffffffffffffb1, roundTripBuffer[3]);
+  assert_int_equal(0xffffffffffffff89, roundTripBuffer[4]);
+  assert_int_equal(0xffffffffffffffe5, roundTripBuffer[5]);
+  assert_int_equal(0xffffffffffffffad, roundTripBuffer[6]);
+  assert_int_equal(0xffffffffffffff97, roundTripBuffer[7]);
+  assert_int_equal(0x33, roundTripBuffer[8]); // '3'
+  assert_int_equal(0x34, roundTripBuffer[9]); // '4'
+  assert_int_equal(0x35, roundTripBuffer[10]); // '5'
+  assert_int_equal(0, roundTripBuffer[11]);     // Verify only 11 bytes are overwritten
+  assert_int_equal(0x6d, roundTripBuffer[12]); // 'm'
+  assert_int_equal(0x6e, roundTripBuffer[13]);
+  assert_int_equal(0x6f, roundTripBuffer[14]);
+  assert_int_equal(0x70, roundTripBuffer[15]);
+  assert_int_equal(0x71, roundTripBuffer[16]); // 'q'
+  assert_int_equal(0, roundTripBuffer[17]);
 }
 
 void az_span_from_string_non_ascii_latin_roundtrip()
 {
   az_span span = AZ_SPAN_FROM_STR("è");
-  char arr[3] = {0, 0, 0};
+  assert_int_equal(2, az_span_length(span));
 
-  assert_int_equal(0, arr[0]);
-  assert_int_equal(0, arr[1]);
-  assert_int_equal(0, arr[2]);
+  char roundTripBuffer[3] = { 0, 0, 0 };
 
-  assert_int_equal(AZ_OK, az_span_to_str(arr, 3, span));
+  assert_int_equal(0, roundTripBuffer[0]);
+  assert_int_equal(0, roundTripBuffer[1]);
+  assert_int_equal(0, roundTripBuffer[2]);
 
-  assert_int_equal(0xC3, arr[0]);
-  assert_int_equal(0xA8, arr[1]);
-  assert_int_equal(0, arr[2]);
+  assert_return_code(az_span_to_str(roundTripBuffer, 3, span), AZ_OK);
+
+  assert_int_equal(2, az_span_length(span));
+  assert_int_equal(0xffffffffffffffc3, roundTripBuffer[0]);
+  assert_int_equal(0xffffffffffffffa8, roundTripBuffer[1]);
+  assert_int_equal(0, roundTripBuffer[2]);
 }
 
 void az_span_append_uint8_NULL_out_span_fails()
@@ -253,4 +247,7 @@ void test_az_span(void** state)
   az_span_append_u32toa_max_uint_succeeds();
   az_span_append_u32toa_NULL_span_fails();
   az_span_append_u32toa_overflow_fails();
+
+  az_span_from_string_non_ascii_roundtrip();
+  az_span_from_string_non_ascii_latin_roundtrip();
 }
