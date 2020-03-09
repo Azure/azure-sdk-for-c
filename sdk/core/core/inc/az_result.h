@@ -71,27 +71,26 @@ typedef enum
       _az_FACILITY_CORE,
       1), ///< Input argument does not comply with the requested range of values.
 
-  AZ_ERROR_BUFFER_OVERFLOW = _az_RESULT_MAKE_ERROR(
+  AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY = _az_RESULT_MAKE_ERROR(
       _az_FACILITY_CORE,
-      2), ///< There is not enough space in the buffer provided.
-
-  AZ_ERROR_OUT_OF_MEMORY = _az_RESULT_MAKE_ERROR(
-      _az_FACILITY_CORE,
-      3), ///< Dynamic memory allocation request was not successful.
+      2), ///< There is not enough capacity in the span provided.
 
   AZ_ERROR_NOT_IMPLEMENTED
-  = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 4), ///< Requested functionality is not implemented.
+  = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 3), ///< Requested functionality is not implemented.
 
   AZ_ERROR_ITEM_NOT_FOUND
-  = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 5), ///< Requestewd item was not found.
+  = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 4), ///< Requested item was not found.
 
   AZ_ERROR_PARSER_UNEXPECTED_CHAR
-  = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 6), ///< Input can't be successfully parsed.
+  = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 5), ///< Input can't be successfully parsed.
 
-  AZ_ERROR_EOF = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 7), ///< Unexpected end of the input data.
+  AZ_ERROR_EOF = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 6), ///< Unexpected end of the input data.
 
   // Platform
   AZ_ERROR_MUTEX = _az_RESULT_MAKE_ERROR(_az_FACILITY_PLATFORM, 1), ///< Mutex operation error.
+  AZ_ERROR_OUT_OF_MEMORY = _az_RESULT_MAKE_ERROR(
+      _az_FACILITY_PLATFORM,
+      2), ///< Dynamic memory allocation request was not successful
 
   // JSON error codes
   AZ_ERROR_JSON_INVALID_STATE = _az_RESULT_MAKE_ERROR(_az_FACILITY_JSON, 1),
@@ -100,16 +99,15 @@ typedef enum
   AZ_ERROR_JSON_POINTER_TOKEN_END = _az_RESULT_MAKE_ERROR(_az_FACILITY_JSON, 4),
 
   // HTTP error codes
-  AZ_ERROR_HTTP_PAL = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 1),
-  AZ_ERROR_HTTP_INVALID_STATE = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 2),
-  AZ_ERROR_HTTP_PIPELINE_INVALID_POLICY = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 3),
-  AZ_ERROR_HTTP_INVALID_METHOD_VERB = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 4),
+  AZ_ERROR_HTTP_INVALID_STATE = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 1),
+  AZ_ERROR_HTTP_PIPELINE_INVALID_POLICY = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 2),
+  AZ_ERROR_HTTP_INVALID_METHOD_VERB = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 3),
 
   AZ_ERROR_HTTP_AUTHENTICATION_FAILED
-  = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 5), ///< Authentication failed.
+  = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 4), ///< Authentication failed.
 
-  AZ_ERROR_HTTP_RESPONSE_OVERFLOW = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 6),
-  AZ_ERROR_HTTP_RESPONSE_COULDNT_RESOLVE_HOST = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 7),
+  AZ_ERROR_HTTP_RESPONSE_OVERFLOW = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 5),
+  AZ_ERROR_HTTP_RESPONSE_COULDNT_RESOLVE_HOST = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 6),
 } az_result;
 
 /// Checks wheteher the \a result provided indicates a failure.
