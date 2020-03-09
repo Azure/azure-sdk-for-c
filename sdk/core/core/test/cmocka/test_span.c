@@ -13,7 +13,18 @@
 
 void az_span_from_string_non_ascii_roundtrip()
 {
-  az_span span = AZ_SPAN_FROM_STR("12汉字345");
+  // Some non-ASCII characters (Chinese) in the middle of ascii text.
+  // Explicitly escaping them to avoid changing file encoding in IDEs like VS.
+  // Concatening strings together to be able to use escaped character sequence:
+  // https://en.cppreference.com/w/cpp/language/string_literal
+  az_span span = AZ_SPAN_FROM_STR("12"
+                                  "\xE6"
+                                  "\xB1"
+                                  "\x89"
+                                  "\xE5"
+                                  "\xAD"
+                                  "\x97"
+                                  "345");
   assert_int_equal(11, az_span_length(span));
 
   char roundTripBuffer[20] = "abcdefghijklmnopq";
@@ -21,6 +32,9 @@ void az_span_from_string_non_ascii_roundtrip()
   assert_return_code(az_span_to_str(roundTripBuffer, 20, span), AZ_OK);
 
   assert_int_equal(11, az_span_length(span));
+
+  // Verify only 11 bytes are overwritten
+  // and the remaining characters are left as is
   assert_int_equal(0x31, roundTripBuffer[0]); // '1'
   assert_int_equal(0x32, roundTripBuffer[1]); // '2'
   assert_int_equal(0xffffffffffffffe6, roundTripBuffer[2]);
@@ -32,7 +46,7 @@ void az_span_from_string_non_ascii_roundtrip()
   assert_int_equal(0x33, roundTripBuffer[8]); // '3'
   assert_int_equal(0x34, roundTripBuffer[9]); // '4'
   assert_int_equal(0x35, roundTripBuffer[10]); // '5'
-  assert_int_equal(0, roundTripBuffer[11]);     // Verify only 11 bytes are overwritten
+  assert_int_equal(0, roundTripBuffer[11]);
   assert_int_equal(0x6d, roundTripBuffer[12]); // 'm'
   assert_int_equal(0x6e, roundTripBuffer[13]);
   assert_int_equal(0x6f, roundTripBuffer[14]);
@@ -43,7 +57,10 @@ void az_span_from_string_non_ascii_roundtrip()
 
 void az_span_from_string_non_ascii_latin_roundtrip()
 {
-  az_span span = AZ_SPAN_FROM_STR("è");
+  // Creating a span from a non-ASCII character: 'LATIN SMALL LETTER E WITH GRAVE'
+  // Explicitly escaping them to avoid changing file encoding in IDEs like VS.
+  az_span span = AZ_SPAN_FROM_STR("\xC3"
+                                  "\xA8");
   assert_int_equal(2, az_span_length(span));
 
   char roundTripBuffer[3] = { 0, 0, 0 };
