@@ -52,7 +52,7 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_publish_topic_get(
   // Only build topic if the span has the capacity
   if (az_span_capacity(mqtt_topic) < required_size)
   {
-    return AZ_ERROR_OUT_OF_MEMORY;
+    return AZ_ERROR_BUFFER_OVERFLOW;
   }
   else
   {

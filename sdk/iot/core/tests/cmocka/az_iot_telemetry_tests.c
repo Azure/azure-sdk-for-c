@@ -181,7 +181,7 @@ void az_iot_hub_client_telemetry_publish_topic_get_with_options_with_params_smal
   assert_true(
       az_iot_hub_client_telemetry_publish_topic_get(
           &g_test_valid_client_with_options_both, &g_test_params, mqtt_topic, &mqtt_topic)
-      == AZ_ERROR_OUT_OF_MEMORY);
+      == AZ_ERROR_BUFFER_OVERFLOW);
 }
 
 void az_iot_hub_client_telemetry_publish_topic_get_no_options_with_params_succeed(void** state)
@@ -213,7 +213,7 @@ void az_iot_hub_client_telemetry_publish_topic_get_no_options_with_params_small_
   assert_true(
       az_iot_hub_client_telemetry_publish_topic_get(
           &g_test_valid_client_no_options, &g_test_params, mqtt_topic, &mqtt_topic)
-      == AZ_ERROR_OUT_OF_MEMORY);
+      == AZ_ERROR_BUFFER_OVERFLOW);
 }
 
 void az_iot_hub_client_telemetry_publish_topic_get_with_options_module_id_with_params_succeed(
@@ -246,7 +246,7 @@ void az_iot_hub_client_telemetry_publish_topic_get_with_options_module_id_with_p
   assert_true(
       az_iot_hub_client_telemetry_publish_topic_get(
           &g_test_valid_client_with_options_module_id, &g_test_params, mqtt_topic, &mqtt_topic)
-      == AZ_ERROR_OUT_OF_MEMORY);
+      == AZ_ERROR_BUFFER_OVERFLOW);
 }
 
 void az_iot_hub_client_telemetry_publish_topic_get_with_options_user_agent_with_params_succeed(
@@ -279,5 +279,5 @@ void az_iot_hub_client_telemetry_publish_topic_get_with_options_user_agent_with_
   assert_true(
       az_iot_hub_client_telemetry_publish_topic_get(
           &g_test_valid_client_with_options_user_agent, &g_test_params, mqtt_topic, &mqtt_topic)
-      == AZ_ERROR_OUT_OF_MEMORY);
+      == AZ_ERROR_BUFFER_OVERFLOW);
 }
