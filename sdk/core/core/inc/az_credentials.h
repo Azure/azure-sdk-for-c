@@ -2,18 +2,19 @@
 // SPDX-License-Identifier: MIT
 
 /**
- * @file az_credential.h
+ * @file az_credentials.h
  *
- * @brief definition for az_credential and functionality
+ * @brief Credentials for authentication.
  */
 
-#ifndef _az_CREDENTIAL_H
-#define _az_CREDENTIAL_H
+#ifndef _az_CREDENTIALS_H
+#define _az_CREDENTIALS_H
 
 #include <az_http.h>
 #include <az_result.h>
 #include <az_span.h>
 
+#include <stddef.h>
 #include <stdint.h>
 
 #include <_az_cfg_prefix.h>
@@ -109,4 +110,4 @@ AZ_NODISCARD az_result az_credential_client_secret_init(
 
 #include <_az_cfg_suffix.h>
 
-#endif // _az_CREDENTIAL_H
+#endif // _az_CREDENTIALS_H

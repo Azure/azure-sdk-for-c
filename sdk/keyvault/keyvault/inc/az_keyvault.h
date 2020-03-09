@@ -4,7 +4,7 @@
 #ifndef _az_KEYVAULT_H
 #define _az_KEYVAULT_H
 
-#include <az_credential.h>
+#include <az_credentials.h>
 #include <az_http.h>
 #include <az_optional_types.h>
 #include <az_result.h>
