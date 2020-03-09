@@ -31,7 +31,7 @@ extern az_precondition_failed az_precondition_failed_callback;
 
 #define AZ_PRECONDITION_NOT_NULL(arg) AZ_PRECONDITION((arg != NULL))
 
-AZ_NODISCARD AZ_INLINE bool az_span_is_valid(az_span span, int32_t min_length)
+AZ_NODISCARD AZ_INLINE bool az_span_is_valid(az_span span, int32_t min_length, bool null_is_valid)
 {
   int32_t span_length = az_span_length(span);
   /* Valid Span is:
@@ -39,12 +39,15 @@ AZ_NODISCARD AZ_INLINE bool az_span_is_valid(az_span span, int32_t min_length)
      or span length is greater than 0 and pointer is not NULL, and greater or equal to min_length
   */
   return (
-      (span_length == 0
-       || (az_span_ptr(span) != NULL && az_span_ptr(span) <= az_span_ptr(span) + span_length - 1))
-      && min_length <= span_length);
+      (null_is_valid && (az_span_ptr(span) == NULL) && (az_span_length(span) == 0)
+       && (az_span_capacity(span) == 0))
+      || ((az_span_ptr(span) != NULL && (az_span_length(span) >= 0)
+           && (az_span_capacity(span) >= az_span_length(span)))
+          && min_length <= span_length));
 }
 
-#define AZ_PRECONDITION_VALID_SPAN(span, min) AZ_PRECONDITION(az_span_is_valid(span, min))
+#define AZ_PRECONDITION_VALID_SPAN(span, min, null_is_valid) \
+  AZ_PRECONDITION(az_span_is_valid(span, min, null_is_valid))
 
 #include <_az_cfg_suffix.h>
 
