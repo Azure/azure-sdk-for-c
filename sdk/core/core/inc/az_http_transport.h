@@ -50,7 +50,7 @@ az_http_request_get_header(_az_http_request const* request, int32_t index, az_pa
  *
  * @param request HTTP request to get parts from.
  * @param out_method Pointer to write HTTP method to.
- * @param out_method Pointer to write URL to.
+ * @param out_url Pointer to write URL to.
  * @param out_body Pointer to write HTTP request body to.
  *
  * @retval AZ_OK Success.
