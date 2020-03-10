@@ -145,7 +145,7 @@ AZ_NODISCARD az_result az_span_copy(az_span dst, az_span src, az_span* out)
 
   if (az_span_capacity(dst) < src_len)
   {
-    return AZ_ERROR_BUFFER_OVERFLOW;
+    return AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY;
   };
 
   uint8_t* ptr = az_span_ptr(dst);
@@ -187,7 +187,7 @@ AZ_NODISCARD az_result az_span_copy_url_encode(az_span dst, az_span src, az_span
 
   if (az_span_capacity(dst) < result_size)
   {
-    return AZ_ERROR_BUFFER_OVERFLOW;
+    return AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY;
   }
 
   uint8_t* p_s = az_span_ptr(src);
@@ -264,7 +264,7 @@ AZ_NODISCARD az_result az_span_to_str(char* s, int32_t max_size, az_span span)
   int32_t span_length = az_span_length(span);
   if (span_length + 1 > max_size)
   {
-    return AZ_ERROR_BUFFER_OVERFLOW;
+    return AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY;
   }
 
   memmove((void*)s, (void const*)az_span_ptr(span), span_length);
