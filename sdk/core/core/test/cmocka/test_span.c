@@ -175,11 +175,11 @@ void az_span_to_uint64_return_errors()
 {
   // sample span
   az_span sample = AZ_SPAN_FROM_STR("test");
-  // non valid span with negative len
-  az_span negative = az_span_init(az_span_ptr(sample), -1, 0);
+  // zero len span
+  az_span zero = az_span_init(az_span_ptr(sample), 0, 0);
   uint64_t out = 0;
 
-  assert_true(az_span_to_uint64(negative, &out) == AZ_ERROR_EOF);
+  assert_true(az_span_to_uint64(zero, &out) == AZ_ERROR_EOF);
   assert_true(az_span_to_uint64(sample, &out) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
 }
 
@@ -224,7 +224,7 @@ void test_az_span(void** state)
     assert_true(az_span_is_equal(b, AZ_SPAN_FROM_STR("")));
   }
 
-  //az_span_append_uint8_NULL_out_span_fails();
+  // az_span_append_uint8_NULL_out_span_fails();
   az_span_append_uint8_overflow_fails();
   az_span_append_uint8_succeeds();
 
