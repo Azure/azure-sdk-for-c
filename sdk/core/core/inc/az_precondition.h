@@ -36,17 +36,16 @@ AZ_NODISCARD AZ_INLINE bool az_span_is_valid(az_span span, int32_t min_length, b
   int32_t span_length = az_span_length(span);
   int32_t span_capacity = az_span_capacity(span);
   /* Valid Span is:
-     If null_is_valid is true and the pointer in the span is null, the length and capacity must also be 0.
-     In the case of the pointer not being NULL, two conditions must be met:
-        - The length is greater than or equal to zero and the capactity is greater than or equal to the length.
-        - The length is greater than or equal to a user defined minimum value.
+      If the length is greater than or equal to a user defined minimum value AND one of the following:
+        - If null_is_valid is true and the pointer in the span is null, the length and capacity must also
+          be 0. In the case of the pointer not being NULL, two conditions must be met:
+        - The length is greater than or equal to zero and the capacity is greater than or equal to
+          the length.
   */
   return (
-      (null_is_valid && (az_span_ptr(span) == NULL) && (span_length == 0)
-       && (span_capacity == 0))
-      || ((az_span_ptr(span) != NULL && (span_length >= 0)
-           && (span_capacity >= span_length))
-          && min_length <= span_length));
+      (((null_is_valid && (az_span_ptr(span) == NULL) && (span_length == 0) && (span_capacity == 0))
+        || (az_span_ptr(span) != NULL && (span_length >= 0) && (span_capacity >= span_length)))
+       && min_length <= span_length));
 }
 
 #define AZ_PRECONDITION_VALID_SPAN(span, min, null_is_valid) \

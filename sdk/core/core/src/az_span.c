@@ -139,8 +139,8 @@ AZ_NODISCARD az_result az_span_to_uint32(az_span self, uint32_t* out)
  */
 AZ_NODISCARD az_result az_span_copy(az_span dst, az_span src, az_span* out)
 {
-  AZ_PRECONDITION_VALID_SPAN(dst, 0, false);
-  AZ_PRECONDITION_VALID_SPAN(src, 0, false);
+  AZ_PRECONDITION_VALID_SPAN(dst, 0, true);
+  AZ_PRECONDITION_VALID_SPAN(src, 0, true);
   int32_t src_len = az_span_length(src);
 
   if (az_span_capacity(dst) < src_len)
@@ -174,8 +174,8 @@ AZ_NODISCARD AZ_INLINE bool should_encode(uint8_t c)
 AZ_NODISCARD az_result az_span_copy_url_encode(az_span dst, az_span src, az_span* out)
 {
   AZ_PRECONDITION_NOT_NULL(out);
-  AZ_PRECONDITION_VALID_SPAN(dst, 0, false);
-  AZ_PRECONDITION_VALID_SPAN(src, 0, false);
+  AZ_PRECONDITION_VALID_SPAN(dst, 0, true);
+  AZ_PRECONDITION_VALID_SPAN(src, 0, true);
 
   int32_t const input_size = az_span_length(src);
 
@@ -259,7 +259,7 @@ void _az_span_swap(az_span a, az_span b)
  */
 AZ_NODISCARD az_result az_span_to_str(char* s, int32_t max_size, az_span span)
 {
-  AZ_PRECONDITION_VALID_SPAN(span, 0, false);
+  AZ_PRECONDITION_VALID_SPAN(span, 0, true);
 
   int32_t span_length = az_span_length(span);
   if (span_length + 1 > max_size)
