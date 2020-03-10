@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: MIT
 
 #include <az_config_internal.h>
-#include <az_contract_internal.h>
 #include <az_credential_internal.h>
 #include <az_http.h>
 #include <az_http_internal.h>
 #include <az_http_transport.h>
 #include <az_json.h>
+#include <az_precondition.h>
 #include <az_storage_blobs.h>
 
 #include <stddef.h>
@@ -57,8 +57,8 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
     void* credential,
     az_storage_blobs_blob_client_options* options)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(self);
-  AZ_CONTRACT_ARG_NOT_NULL(options);
+  AZ_PRECONDITION_NOT_NULL(self);
+  AZ_PRECONDITION_NOT_NULL(options);
 
   _az_credential* const cred = (_az_credential*)credential;
 

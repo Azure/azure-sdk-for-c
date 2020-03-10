@@ -39,10 +39,10 @@ static az_result _az_http_policy_logging_append_lengthy_value(az_span value, az_
       = ((_az_LOG_LENGTHY_VALUE_MAX_LENGTH / 2) + (_az_LOG_LENGTHY_VALUE_MAX_LENGTH % 2))
       - (ellipsis_len / 2);
 
-  AZ_RETURN_IF_FAILED(az_span_append(*ref_log_msg, az_span_take(value, first), ref_log_msg));
+  AZ_RETURN_IF_FAILED(az_span_append(*ref_log_msg, az_span_slice(value, 0, first), ref_log_msg));
   AZ_RETURN_IF_FAILED(az_span_append(*ref_log_msg, ellipsis, ref_log_msg));
-  AZ_RETURN_IF_FAILED(
-      az_span_append(*ref_log_msg, az_span_drop(value, value_size - last), ref_log_msg));
+  AZ_RETURN_IF_FAILED(az_span_append(
+      *ref_log_msg, az_span_slice(value, value_size - last, value_size), ref_log_msg));
 
   return AZ_OK;
 }
@@ -158,8 +158,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_logging(
     _az_http_policy* policies,
     void* options,
     _az_http_request* ref_request,
-    az_http_response* ref_response
-  )
+    az_http_response* ref_response)
 {
   (void)options;
 
