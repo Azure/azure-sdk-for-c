@@ -86,7 +86,7 @@ void az_iot_sas_token_get_document_document_overflow_fails(void** state)
 
   assert_true(
       az_iot_sas_token_get_document(iothub_fqdn, device_id, expiry_time_secs, document, &document)
-      == AZ_ERROR_BUFFER_OVERFLOW);
+      == AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY);
 }
 
 void az_iot_sas_token_get_document_succeeds(void** state)
@@ -211,7 +211,7 @@ void az_iot_sas_token_generate_sas_token_overflow_fails(void** state)
   assert_true(
       az_iot_sas_token_generate(
           iothub_fqdn, device_id, signature, expiry_time_secs, key_name, sas_token, &sas_token)
-      == AZ_ERROR_BUFFER_OVERFLOW);
+      == AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY);
 }
 
 void az_iot_sas_token_generate_succeeds(void** state)
