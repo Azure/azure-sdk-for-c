@@ -53,16 +53,16 @@ AZ_NODISCARD AZ_INLINE int32_t az_span_length(az_span span) { return span._inter
 AZ_NODISCARD AZ_INLINE int32_t az_span_capacity(az_span span) { return span._internal.capacity; }
 
 /********************************  CONSTRUCTORS */
+/**
+ * @brief Creates an empty span literal
+ */
+#define AZ_SPAN_LITERAL_NULL { ._internal = {.ptr = NULL, .length = 0, .capacity = 0} }
 
 /**
  * @brief Creates an empty span
  *
  */
-#define AZ_SPAN_NULL \
-  (az_span) \
-  { \
-    ._internal = {.ptr = NULL, .length = 0, .capacity = 0 } \
-  }
+#define AZ_SPAN_NULL (az_span)AZ_SPAN_LITERAL_NULL
 
 // A size of the string literal.
 // Details: to make sure that `S` is a `string literal`, we are appending `""`
@@ -265,8 +265,7 @@ AZ_INLINE void az_span_set(az_span span, uint8_t fill)
  * @param[out] out_span    #az_span returned as result of the concatenation.
  * @return                 An #az_result value indicating the result of the operation.
  *                         #AZ_OK                      If no errors occurs.
- *                         #AZ_ERROR_BUFFER_OVERFLOW   If there is not enough capacity left to
- * append the `c`.
+ *                         #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY   If there is not enough capacity left to append the `c`.
  */
 AZ_NODISCARD az_result az_span_append_uint8(az_span span, uint8_t c, az_span* out_span);
 
@@ -277,8 +276,7 @@ AZ_NODISCARD az_result az_span_append_uint8(az_span span, uint8_t c, az_span* ou
  * @param[out] out_span   Pointer where to store the resulting #az_span.
  * @return                An #az_result value indicating the result of the operation.
  *                        #AZ_OK                      If no errors occurs.
- *                        #AZ_ERROR_BUFFER_OVERFLOW   If there is not enough capacity left to append
- * the `n`.
+ *                        #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY   If there is not enough capacity left to append the `n`.
  */
 AZ_NODISCARD az_result az_span_append_u32toa(az_span span, uint32_t n, az_span* out_span);
 
@@ -289,8 +287,7 @@ AZ_NODISCARD az_result az_span_append_u32toa(az_span span, uint32_t n, az_span* 
  * @param[out] out_span   Pointer where to store the resulting #az_span.
  * @return                An #az_result value indicating the result of the operation.
  *                        #AZ_OK                      If no errors occurs.
- *                        #AZ_ERROR_BUFFER_OVERFLOW   If there is not enough capacity left to append
- * the `n`.
+ *                        #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY   If there is not enough capacity left to append the `n`.
  */
 AZ_NODISCARD az_result az_span_append_i32toa(az_span span, int32_t n, az_span* out_span);
 

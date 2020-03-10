@@ -103,7 +103,7 @@ void az_span_append_i32toa_overflow_fails()
   az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer);
   az_span out_span;
 
-  assert_true(az_span_append_i32toa(buffer, v, &out_span) == AZ_ERROR_BUFFER_OVERFLOW);
+  assert_true(az_span_append_i32toa(buffer, v, &out_span) == AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY);
 }
 
 void az_span_append_u32toa_succeeds()
@@ -157,7 +157,7 @@ void az_span_append_u32toa_overflow_fails()
   az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer);
   az_span out_span;
 
-  assert_true(az_span_append_u32toa(buffer, v, &out_span) == AZ_ERROR_BUFFER_OVERFLOW);
+  assert_true(az_span_append_u32toa(buffer, v, &out_span) == AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY);
 }
 
 void az_span_to_lower_test()

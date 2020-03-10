@@ -10,7 +10,30 @@ TBD
 
 TBD
 
+## Examples
 
+### Telemetry
+
+Telemetry functionality can be achieved by sending a user payload to a specific topic. In order to get the appropriate topic to which to send, use the `az_iot_hub_client_telemetry_publish_topic_get()` API. An example use case is below.
+
+```C
+static az_iot_hub_client my_client;
+static az_span my_iothub_hostname = AZ_SPAN_LITERAL_FROM_STR("constoso.azure-devices.net");
+static az_span my_device_id = AZ_SPAN_LITERAL_FROM_STR("contoso_device");
+
+void my_telemetry_func()
+{
+  //Initialize the client to then pass to the telemetry API
+  az_iot_hub_client_init(&my_client, my_iothub_hostname, my_device_id, NULL);
+
+  //Allocate a span to put the telemetry topic
+  uint8_t telemetry_topic_buffer[64];
+  az_span topic_span = AZ_SPAN_FROM_BUFFER(telemetry_topic_buffer);
+
+  //Get the NULL terminated topic and put in topic_span to send the telemetry
+  az_iot_hub_client_telemetry_publish_topic_get(&client, NULL, topic_span, &topic_span);
+}
+```
 
 ## Need help?
 * File an issue via [Github Issues](https://github.com/Azure/azure-sdk-for-c/issues/new/choose).

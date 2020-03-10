@@ -24,7 +24,7 @@
             "name": "KeyVault IT",
             "type": "gdb",
             "request": "launch",
-            "target": "./Debug/sdk/keyvault/keyvault/az_keyvault_test",
+            "target": "./Debug/sdk/samples/keyvault/keyvault/az_keyvault_test",
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "build"
         },
@@ -32,7 +32,7 @@
             "name": "KeyVaultPOC",
             "type": "gdb",
             "request": "launch",
-            "target": "./Debug/sdk/keyvault/keyvault/samples/keys_client_example",
+            "target": "./Debug/sdk/samples/keyvault/keyvault/samples/keys_client_example",
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "build",
             // Add ids and secrets here to use it when debuging KeyVaultPOC
