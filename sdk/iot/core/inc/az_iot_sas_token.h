@@ -26,7 +26,7 @@
  * @param[out] out_document       A pointer to #az_span where to write the SAS token document to be encrypted.
  * @return                        An #az_result with the result of the operation.
  *   @retval                      #AZ_OK                       If no failures occur. 
- *   @retval                      #AZ_ERROR_BUFFER_OVERFLOW    If the buffer provided in #az_iot_sas_params or `document` are insufficient in size.
+ *   @retval                      #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY    If the buffer provided in #az_iot_sas_params or `document` are insufficient in size.
  *   @retval                      #AZ_ERROR_ARG                If `params` is NULL or any of its components are NULL or a NULL #az_span, or 
  *                                                          if `document` is a NULL pointer or a NULL #az_span.
  */
@@ -47,7 +47,7 @@ az_result az_iot_sas_token_get_document(az_span iothub_fqdn, az_span device_id, 
  * @param[out] out_sas_token      An pointer to #az_span where to write the SAS token.
  * @return                        An #az_result with the result of the operation.
  *   @retval                      #AZ_OK                       If no failures occur. 
- *   @retval                      #AZ_ERROR_BUFFER_OVERFLOW    If the buffer provided in #az_iot_sas_params or `sas_token` are insufficient in size.
+ *   @retval                      #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY    If the buffer provided in #az_iot_sas_params or `sas_token` are insufficient in size.
  *   @retval                      #AZ_ERROR_ARG                If `params` is NULL or any of its components are NULL or a NULL #az_span, or
  *                                                             if `signature` is a NULL #az_span, or
  *                                                             if `document` is a NULL pointer or a NULL #az_span.
