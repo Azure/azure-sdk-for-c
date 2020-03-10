@@ -201,8 +201,6 @@ void az_span_to_str_test()
   assert_string_equal(str, "hello World!");
 }
 
-
-
 void test_az_span(void** state)
 {
   (void)state;

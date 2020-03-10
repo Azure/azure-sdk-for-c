@@ -48,6 +48,9 @@ void test_az_log(void** state);
 /* URL encode tests */
 void test_url_encode(void** state);
 
+/* az pipeline tests */
+void test_az_pipeline(void** state);
+
 const struct CMUnitTest tests[] = {
   /* URL encode tests */
   cmocka_unit_test(test_url_encode),
