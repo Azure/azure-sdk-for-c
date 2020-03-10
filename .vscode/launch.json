@@ -13,6 +13,14 @@
             "preLaunchTask": "build"
         },
         {
+            "name": "iotTests",
+            "type": "gdb",
+            "request": "launch",
+            "target": "./Debug/sdk/iot/core/test/cmocka/az_iot_test",
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "build"
+        },
+        {
             "name": "KeyVault IT",
             "type": "gdb",
             "request": "launch",

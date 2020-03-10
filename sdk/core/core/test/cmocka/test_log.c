@@ -172,11 +172,11 @@ void test_az_log(void** state)
     assert_true(_log_invoked_for_http_response == false);
 
     {
-      // Verify that our internal should_write() function would return false if noone is listening.
+      // Verify that our internal should_write() function would return false if none is listening.
       assert_true(az_log_should_write(AZ_LOG_HTTP_REQUEST) == false);
       assert_true(az_log_should_write(AZ_LOG_HTTP_RESPONSE) == false);
 
-      // If a callback is set, and no classificaions are specified, we are going to log all of them
+      // If a callback is set, and no classifications are specified, we are going to log all of them
       // (and customer is going to get all of them).
       az_log_set_listener(_log_listener);
 

@@ -12,13 +12,13 @@
 
 #include <_az_cfg.h>
 
-void az_span_append_uint8_NULL_out_span_fails()
+/* void az_span_append_uint8_NULL_out_span_fails()
 {
   uint8_t raw_buffer[15];
   az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer);
 
   assert_true(az_span_append_uint8(buffer, 'a', NULL) == AZ_ERROR_ARG);
-}
+} */
 
 void az_span_append_uint8_overflow_fails()
 {
@@ -224,7 +224,7 @@ void test_az_span(void** state)
     assert_true(az_span_is_equal(b, AZ_SPAN_FROM_STR("")));
   }
 
-  az_span_append_uint8_NULL_out_span_fails();
+  //az_span_append_uint8_NULL_out_span_fails();
   az_span_append_uint8_overflow_fails();
   az_span_append_uint8_succeeds();
 

@@ -10,7 +10,7 @@
 
 AZ_NODISCARD static az_result az_json_builder_append_str(az_json_builder* self, az_span value)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(self);
+  AZ_PRECONDITION_NOT_NULL(self);
 
   az_span* json = &self->_internal.json;
 
@@ -22,7 +22,7 @@ AZ_NODISCARD static az_result az_json_builder_append_str(az_json_builder* self, 
 
 AZ_NODISCARD az_result az_json_builder_write_span(az_json_builder* self, az_span value)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(self);
+  AZ_PRECONDITION_NOT_NULL(self);
 
   az_span* json = &self->_internal.json;
 
@@ -62,7 +62,7 @@ AZ_NODISCARD az_result az_json_builder_write_span(az_json_builder* self, az_span
 
 AZ_NODISCARD az_result az_json_builder_append_token(az_json_builder* self, az_json_token token)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(self);
+  AZ_PRECONDITION_NOT_NULL(self);
   az_span* json = &self->_internal.json;
 
   switch (token.kind)
@@ -112,7 +112,7 @@ AZ_NODISCARD az_result az_json_builder_append_token(az_json_builder* self, az_js
 
 AZ_NODISCARD static az_result az_json_builder_write_comma(az_json_builder* self)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(self);
+  AZ_PRECONDITION_NOT_NULL(self);
 
   if (self->_internal.need_comma)
   {
@@ -124,7 +124,7 @@ AZ_NODISCARD static az_result az_json_builder_write_comma(az_json_builder* self)
 AZ_NODISCARD az_result
 az_json_builder_append_object(az_json_builder* self, az_span name, az_json_token token)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(self);
+  AZ_PRECONDITION_NOT_NULL(self);
 
   AZ_RETURN_IF_FAILED(az_json_builder_write_comma(self));
   AZ_RETURN_IF_FAILED(az_json_builder_append_str(self, name));
@@ -136,7 +136,7 @@ az_json_builder_append_object(az_json_builder* self, az_span name, az_json_token
 
 AZ_NODISCARD static az_result az_json_builder_write_close(az_json_builder* self, az_span close)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(self);
+  AZ_PRECONDITION_NOT_NULL(self);
 
   AZ_RETURN_IF_FAILED(az_span_append(self->_internal.json, close, &self->_internal.json));
   self->_internal.need_comma = true;
@@ -145,14 +145,14 @@ AZ_NODISCARD static az_result az_json_builder_write_close(az_json_builder* self,
 
 AZ_NODISCARD az_result az_json_builder_append_object_close(az_json_builder* self)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(self);
+  AZ_PRECONDITION_NOT_NULL(self);
 
   return az_json_builder_write_close(self, AZ_SPAN_FROM_STR("}"));
 }
 
 AZ_NODISCARD az_result az_json_builder_append_array_item(az_json_builder* self, az_json_token token)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(self);
+  AZ_PRECONDITION_NOT_NULL(self);
 
   AZ_RETURN_IF_FAILED(az_json_builder_write_comma(self));
   AZ_RETURN_IF_FAILED(az_json_builder_append_token(self, token));
@@ -161,7 +161,7 @@ AZ_NODISCARD az_result az_json_builder_append_array_item(az_json_builder* self, 
 
 AZ_NODISCARD az_result az_json_builder_append_array_close(az_json_builder* self)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(self);
+  AZ_PRECONDITION_NOT_NULL(self);
 
   return az_json_builder_write_close(self, AZ_SPAN_FROM_STR("]"));
 }

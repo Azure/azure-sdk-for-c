@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+
 #include "az_http_policy_private.h"
 #include <az_credentials.h>
 #include <az_http.h>
@@ -76,7 +77,10 @@ AZ_NODISCARD az_result az_http_pipeline_policy_telemetry(
 AZ_INLINE AZ_NODISCARD az_result
 _az_apply_credential(_az_credential* credential, _az_http_request* ref_request)
 {
-  return (credential->_internal.apply_credential)(credential, ref_request);
+  //Only apply the credential if the apply_credential method exists
+  return (credential->_internal.apply_credential == NULL)
+      ? AZ_OK
+      : (credential->_internal.apply_credential)(credential, ref_request);
 }
 
 AZ_NODISCARD az_result az_http_pipeline_policy_credential(
@@ -85,7 +89,10 @@ AZ_NODISCARD az_result az_http_pipeline_policy_credential(
     _az_http_request* ref_request,
     az_http_response* out_response)
 {
-  AZ_RETURN_IF_FAILED(_az_apply_credential((_az_credential*)options, ref_request));
+  if (options != AZ_CREDENTIAL_ANONYMOUS)
+  {
+    AZ_RETURN_IF_FAILED(_az_apply_credential((_az_credential*)options, ref_request));
+  }
   return az_http_pipeline_nextpolicy(policies, ref_request, out_response);
 }
 

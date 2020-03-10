@@ -13,7 +13,7 @@ include(CheckAndIncludeCodeCov)
 add_library (
   ${TARGET_NAME}
   src/az_aad.c
-  src/az_credentials.c
+  src/az_credential_client_secret.c
   src/az_context.c
   src/az_http_pipeline.c
   src/az_http_policy.c
@@ -28,6 +28,7 @@ add_library (
   src/az_json_string.c
   src/az_json_token.c
   src/az_log.c
+  src/az_precondition.c
   src/az_span.c
   )
 

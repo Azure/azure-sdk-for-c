@@ -75,19 +75,19 @@ Relevant components for logging are located in [az_result.h](./inc/az_result.h) 
 /* az_result.h */
 enum
 {
-  AZ_FACILITY_CORE = 0x1,
-  AZ_FACILITY_PLATFORM = 0x2,
-  AZ_FACILITY_JSON = 0x3,
-  AZ_FACILITY_HTTP = 0x4,
-  AZ_FACILITY_MQTT = 0x5,
-  AZ_FACILITY_IOT = 0x6,
-  AZ_FACILITY_STD = 0x7FFF,
+  _az_FACILITY_CORE = 0x1,
+  _az_FACILITY_PLATFORM = 0x2,
+  _az_FACILITY_JSON = 0x3,
+  _az_FACILITY_HTTP = 0x4,
+  _az_FACILITY_MQTT = 0x5,
+  _az_FACILITY_IOT = 0x6,
+  _az_FACILITY_STD = 0x7FFF,
 };
 
 /* az_log.h */
 typedef enum {
-  AZ_LOG_HTTP_REQUEST  = _az_LOG_MAKE_CLASSIFICATION(AZ_FACILITY_HTTP, 1),
-  AZ_LOG_HTTP_RESPONSE = _az_LOG_MAKE_CLASSIFICATION(AZ_FACILITY_HTTP, 2),
+  AZ_LOG_HTTP_REQUEST  = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_HTTP, 1),
+  AZ_LOG_HTTP_RESPONSE = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_HTTP, 2),
 } az_log_classification;
 ```
 
