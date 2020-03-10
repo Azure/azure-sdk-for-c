@@ -30,6 +30,6 @@ add_cmocka_test(${TARGET_NAME} SOURCES
                 test_url_encode.c
                 test_az_aad.c
                 COMPILE_OPTIONS ${DEFAULT_C_COMPILE_FLAGS}
-                LINK_OPTIONS "-Wl,--wrap=az_platform_clock_msec"
+                LINK_OPTIONS "-Wl,--wrap=az_platform_clock_msec -Wl,--wrap=az_http_client_send_request"
                 # grant access to Private functions to test az_json_private
                 PRIVATE_ACCESS ON)
