@@ -78,7 +78,7 @@ AZ_NODISCARD az_result az_span_to_uint64(az_span self, uint64_t* out)
   }
 
   uint64_t value = 0;
-  for (int32_t i = 0; i < self_length; i++)
+  for (int32_t i = 0; i < self_length; ++i)
   {
     uint8_t result = az_span_ptr(self)[i];
     if (!isdigit(result))
@@ -90,6 +90,36 @@ AZ_NODISCARD az_result az_span_to_uint64(az_span self, uint64_t* out)
     {
       return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
     }
+
+    value = value * 10 + d;
+  }
+
+  *out = value;
+  return AZ_OK;
+}
+
+AZ_NODISCARD az_result az_span_to_uint32(az_span self, uint32_t* out)
+{
+  int32_t self_length = az_span_length(self);
+  if (self_length <= 0)
+  {
+    return AZ_ERROR_EOF;
+  }
+
+  uint32_t value = 0;
+  for (int32_t i = 0; i < self_length; ++i)
+  {
+    uint8_t result = az_span_ptr(self)[i];
+    if (!isdigit(result))
+    {
+      return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
+    }
+    uint32_t const d = (uint32_t)result - '0';
+    if ((UINT32_MAX - d) / 10 < value)
+    {
+      return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
+    }
+
     value = value * 10 + d;
   }
 
@@ -522,7 +552,7 @@ AZ_NODISCARD az_result _az_is_expected_span(az_span* self, az_span expected)
 // Then return number of positions read with output parameter
 AZ_NODISCARD az_result _az_scan_until(az_span self, _az_predicate predicate, int32_t* out_index)
 {
-  for (int32_t index = 0; index < az_span_length(self); index++)
+  for (int32_t index = 0; index < az_span_length(self); ++index)
   {
     az_span s = az_span_slice(self, index, -1);
     az_result predicate_result = predicate(s);

@@ -25,9 +25,9 @@ jobs:
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: x64
       MacOS_x64:
-        vm.image: 'macOS-10.14'
-        vcpkg.deps: ''
-        VCPKG_DEFAULT_TRIPLET: 'x64-osx'
+       vm.image: 'macOS-10.14'
+       vcpkg.deps: ''
+       VCPKG_DEFAULT_TRIPLET: 'x64-osx'
 
       # Build with sample dependencies [curl for transport]
       Linux_x64_with_samples:
@@ -50,10 +50,10 @@ jobs:
         CMAKE_GENERATOR_PLATFORM: x64
         build.args: ' -DBUILD_CURL_TRANSPORT=ON -DAZ_PLATFORM_IMPL=WIN32'
       MacOS_x64_with_samples:
-        vm.image: 'macOS-10.14'
-        vcpkg.deps: 'curl[ssl]'
-        VCPKG_DEFAULT_TRIPLET: 'x64-osx'
-        build.args: ' -DBUILD_CURL_TRANSPORT=ON -DAZ_PLATFORM_IMPL=POSIX'
+       vm.image: 'macOS-10.14'
+       vcpkg.deps: 'curl[ssl]'
+       VCPKG_DEFAULT_TRIPLET: 'x64-osx'
+       build.args: ' -DBUILD_CURL_TRANSPORT=ON -DAZ_PLATFORM_IMPL=POSIX'
 
       # Build with sample dependencies and unit testing [curl for transport and cmoka]
       Linux_x64_with_samples_and_unit_test:
@@ -76,10 +76,10 @@ jobs:
         CMAKE_GENERATOR_PLATFORM: x64
         build.args: ' -DBUILD_CURL_TRANSPORT=ON -DAZ_PLATFORM_IMPL=WIN32 -DUNIT_TESTING=ON'
       MacOS_x64_with_samples_and_unit_test:
-        vm.image: 'macOS-10.14'
-        vcpkg.deps: 'curl[ssl] cmocka'
-        VCPKG_DEFAULT_TRIPLET: 'x64-osx'
-        build.args: ' -DBUILD_CURL_TRANSPORT=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON'
+       vm.image: 'macOS-10.14'
+       vcpkg.deps: 'curl[ssl] cmocka'
+       VCPKG_DEFAULT_TRIPLET: 'x64-osx'
+       build.args: ' -DBUILD_CURL_TRANSPORT=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON'
 
       # Build with unit testing only. No samples [cmoka]
       Linux_x64_with_unit_test:
@@ -103,10 +103,10 @@ jobs:
         CMAKE_GENERATOR_PLATFORM: x64
         build.args: ' -DUNIT_TESTING=ON'
       MacOS_x64_with_unit_test:
-        vm.image: 'macOS-10.14'
-        vcpkg.deps: 'cmocka'
-        VCPKG_DEFAULT_TRIPLET: 'x64-osx'
-        build.args: ' -DUNIT_TESTING=ON'
+       vm.image: 'macOS-10.14'
+       vcpkg.deps: 'cmocka'
+       VCPKG_DEFAULT_TRIPLET: 'x64-osx'
+       build.args: ' -DUNIT_TESTING=ON'
   pool:
     vmImage: $(vm.image)
   variables:
@@ -122,14 +122,19 @@ jobs:
     inputs:
       targetType: inline
       script: |
-        sudo xcode-select --switch /Applications/Xcode_9.4.1.app
+        sudo xcode-select --switch /Applications/Xcode_11.3.1.app
         echo "xcode path:"
         sudo xcode-select --print-path
 
-        # Expect failure:
-        brew install gcc
+        # Install gcc 9
+        brew install gcc@9
+        gcc --version
+
         git clone https://github.com/Microsoft/vcpkg.git
         cd vcpkg
+        git rev-parse --verify HEAD
+        git status
+
         ./bootstrap-vcpkg.sh
 
         # Validate that vcpkg bootstrap succeeded

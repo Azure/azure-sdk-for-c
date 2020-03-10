@@ -4,8 +4,7 @@
 /**
  * @file az_http.h
  *
- * @brief Definition and functionality for az_http_response and related http utilities that allows
- * customer to create required component for sdk clients
+ * @brief HTTP-related functionality.
  */
 
 #ifndef _az_HTTP_H
@@ -29,13 +28,11 @@ typedef enum
 
 /**
  * @brief Define az_http_method as an az_span so it is limited to that type and not to any az_span
- *
  */
 typedef az_span az_http_method;
 
 /**
  * @brief Define _az_http_headers as an az_span so it is limited to that type and not to any az_span
- *
  */
 typedef az_span _az_http_headers;
 
@@ -185,32 +182,10 @@ AZ_NODISCARD AZ_INLINE _az_http_policy_telemetry_options _az_http_policy_telemet
   return (_az_http_policy_telemetry_options){ .os = AZ_SPAN_FROM_STR("Unknown OS") };
 }
 
-/**
- * @brief Retry configuration for an HTTP pipeline
- *
- */
-typedef struct
-{
-  uint16_t max_retries;
-  uint16_t delay_in_ms;
-  uint16_t max_delay_in_ms;
-} az_http_policy_retry_options;
-
-/**
- * @brief Initialize az_http_policy_retry_options with default values
- *
- */
-AZ_NODISCARD AZ_INLINE az_http_policy_retry_options az_http_policy_retry_options_default()
-{
-  return (az_http_policy_retry_options){
-    .max_retries = 3,
-    .delay_in_ms = 10,
-    .max_delay_in_ms = 30, // TODO: adjust this numbers
-  };
-}
-
 typedef enum
 {
+  AZ_HTTP_STATUS_CODE_NONE = 0,
+
   // 1xx (information) Status Codes:
   AZ_HTTP_STATUS_CODE_CONTINUE = 100,
   AZ_HTTP_STATUS_CODE_SWITCHING_PROTOCOLS = 101,
@@ -282,6 +257,24 @@ typedef enum
   AZ_HTTP_STATUS_CODE_NOT_EXTENDED = 510,
   AZ_HTTP_STATUS_CODE_NETWORK_AUTHENTICATION_REQUIRED = 511,
 } az_http_status_code;
+
+/**
+ * @brief Retry configuration for an HTTP pipeline
+ *
+ */
+typedef struct
+{
+  int16_t max_retries;
+  int32_t retry_delay_msec;
+  int32_t max_retry_delay_msec;
+  az_http_status_code const* status_codes;
+} az_http_policy_retry_options;
+
+/**
+ * @brief Initialize az_http_policy_retry_options with default values
+ *
+ */
+AZ_NODISCARD az_http_policy_retry_options az_http_policy_retry_options_default();
 
 /**
  * An HTTP response status line

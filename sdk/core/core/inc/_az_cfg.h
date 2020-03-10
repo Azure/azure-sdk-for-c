@@ -4,7 +4,7 @@
 /**
  * @file _az_cfg.h
  *
- * @brief disabling warnings.
+ * @brief Disable warnings.
  */
 
 #ifdef _MSC_VER

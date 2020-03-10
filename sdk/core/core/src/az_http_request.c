@@ -134,28 +134,28 @@ az_http_request_append_header(_az_http_request* p_hrb, az_span key, az_span valu
 }
 
 AZ_NODISCARD az_result
-az_http_request_get_header(_az_http_request* p_hrb, int32_t index, az_pair* out_result)
+az_http_request_get_header(_az_http_request const* request, int32_t index, az_pair* out_result)
 {
-  AZ_PRECONDITION_NOT_NULL(p_hrb);
+  AZ_PRECONDITION_NOT_NULL(request);
   AZ_PRECONDITION_NOT_NULL(out_result);
 
-  if (index >= _az_http_request_headers_count(p_hrb))
+  if (index >= _az_http_request_headers_count(request))
   {
     return AZ_ERROR_ARG;
   }
 
-  *out_result = ((az_pair*)az_span_ptr(p_hrb->_internal.headers))[index];
+  *out_result = ((az_pair*)az_span_ptr(request->_internal.headers))[index];
   return AZ_OK;
 }
 
 AZ_NODISCARD az_result az_http_request_get_parts(
-    _az_http_request* p_request,
+    _az_http_request const* request,
     az_http_method* out_method,
     az_span* out_url,
-    az_span* body)
+    az_span* out_body)
 {
-  *out_method = p_request->_internal.method;
-  *out_url = p_request->_internal.url;
-  *body = p_request->_internal.body;
+  *out_method = request->_internal.method;
+  *out_url = request->_internal.url;
+  *out_body = request->_internal.body;
   return AZ_OK;
 }
