@@ -23,11 +23,8 @@ static az_span my_device_id = AZ_SPAN_LITERAL_FROM_STR("contoso_device");
 
 void my_telemetry_func()
 {
-  //Get the default options for the client
-  az_iot_hub_options my_options = az_iot_hub_client_options_default();
-
   //Initialize the client to then pass to the telemetry API
-  az_iot_hub_client_init(&my_client, my_iothub_hostname, my_device_id, &my_options);
+  az_iot_hub_client_init(&my_client, my_iothub_hostname, my_device_id, NULL);
 
   //Allocate a span to put the telemetry topic
   uint8_t telemetry_topic_buffer[64];
