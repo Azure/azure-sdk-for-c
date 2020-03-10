@@ -181,7 +181,7 @@ void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_with_params
   assert_true(
       az_iot_hub_client_telemetry_publish_topic_get(
           &g_test_valid_client_with_options_both, &g_test_params, mqtt_topic, &mqtt_topic)
-      == AZ_ERROR_BUFFER_OVERFLOW);
+      == AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY);
 }
 
 void test_az_iot_hub_client_telemetry_publish_topic_get_no_options_with_params_succeed(void** state)
@@ -213,7 +213,7 @@ void test_az_iot_hub_client_telemetry_publish_topic_get_no_options_with_params_s
   assert_true(
       az_iot_hub_client_telemetry_publish_topic_get(
           &g_test_valid_client_no_options, &g_test_params, mqtt_topic, &mqtt_topic)
-      == AZ_ERROR_BUFFER_OVERFLOW);
+      == AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY);
 }
 
 void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_module_id_with_params_succeed(
@@ -246,7 +246,7 @@ void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_module_id_w
   assert_true(
       az_iot_hub_client_telemetry_publish_topic_get(
           &g_test_valid_client_with_options_module_id, &g_test_params, mqtt_topic, &mqtt_topic)
-      == AZ_ERROR_BUFFER_OVERFLOW);
+      == AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY);
 }
 
 void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_user_agent_with_params_succeed(
@@ -279,5 +279,5 @@ void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_user_agent_
   assert_true(
       az_iot_hub_client_telemetry_publish_topic_get(
           &g_test_valid_client_with_options_user_agent, &g_test_params, mqtt_topic, &mqtt_topic)
-      == AZ_ERROR_BUFFER_OVERFLOW);
+      == AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY);
 }
