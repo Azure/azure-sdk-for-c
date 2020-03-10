@@ -8,7 +8,7 @@
 #include <az_result.h>
 #include <az_span.h>
 
-#include <_az_cfg_prefix.h>
+#include <_az_cfg.h>
 
 static const uint8_t telemetry_prop_delim = '?';
 static const uint8_t telemetry_prop_separator = '&';
@@ -94,5 +94,3 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_publish_topic_get(
 
   return AZ_OK;
 }
-
-#include <_az_cfg_suffix.h>
