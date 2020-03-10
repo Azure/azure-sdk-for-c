@@ -53,16 +53,16 @@ AZ_NODISCARD AZ_INLINE int32_t az_span_length(az_span span) { return span._inter
 AZ_NODISCARD AZ_INLINE int32_t az_span_capacity(az_span span) { return span._internal.capacity; }
 
 /********************************  CONSTRUCTORS */
+/**
+ * @brief Creates an empty span literal
+ */
+#define AZ_SPAN_LITERAL_NULL { ._internal = {.ptr = NULL, .length = 0, .capacity = 0} }
 
 /**
  * @brief Creates an empty span
  *
  */
-#define AZ_SPAN_NULL \
-  (az_span) \
-  { \
-    ._internal = {.ptr = NULL, .length = 0, .capacity = 0 } \
-  }
+#define AZ_SPAN_NULL (az_span)AZ_SPAN_LITERAL_NULL
 
 // A size of the string literal.
 // Details: to make sure that `S` is a `string literal`, we are appending `""`
