@@ -45,8 +45,8 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_publish_topic_get(
 
   if (!az_span_is_empty(client->_internal.options.user_agent))
   {
-    required_size += az_span_length(client->_internal.options.user_agent)
-        + sizeof(telemetry_prop_delim);
+    required_size
+        += az_span_length(client->_internal.options.user_agent) + sizeof(telemetry_prop_delim);
   }
 
   // Only build topic if the span has the capacity
@@ -54,41 +54,41 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_publish_topic_get(
   {
     return AZ_ERROR_BUFFER_OVERFLOW;
   }
-  else
+
+  // Build topic string
+  AZ_RETURN_IF_FAILED(az_span_append(mqtt_topic, telemetry_topic_prefix, out_mqtt_topic));
+  AZ_RETURN_IF_FAILED(az_span_append(*out_mqtt_topic, client->_internal.device_id, out_mqtt_topic));
+
+  if (az_span_length(client->_internal.options.module_id) != 0)
   {
-    AZ_RETURN_IF_FAILED(az_span_append(mqtt_topic, telemetry_topic_prefix, out_mqtt_topic));
     AZ_RETURN_IF_FAILED(
-        az_span_append(*out_mqtt_topic, client->_internal.device_id, out_mqtt_topic));
-
-    if (az_span_length(client->_internal.options.module_id) != 0)
-    {
-      AZ_RETURN_IF_FAILED(
-          az_span_append(*out_mqtt_topic, telemetry_topic_modules_mid, out_mqtt_topic));
-      AZ_RETURN_IF_FAILED(
-          az_span_append(*out_mqtt_topic, client->_internal.options.module_id, out_mqtt_topic));
-    }
-
-    AZ_RETURN_IF_FAILED(az_span_append(*out_mqtt_topic, telemetry_topic_suffix, out_mqtt_topic));
-
-    if (properties != NULL)
-    {
-      AZ_RETURN_IF_FAILED(az_span_append_uint8(*out_mqtt_topic, telemetry_prop_delim, out_mqtt_topic));
-      AZ_RETURN_IF_FAILED(
-          az_span_append(*out_mqtt_topic, properties->_internal.properties, out_mqtt_topic));
-    }
-
-    if (az_span_length(client->_internal.options.user_agent) != 0)
-    {
-      AZ_RETURN_IF_FAILED(
-          properties == NULL
-              ? az_span_append_uint8(*out_mqtt_topic, telemetry_prop_delim, out_mqtt_topic)
-              : az_span_append_uint8(*out_mqtt_topic, telemetry_prop_separator, out_mqtt_topic));
-      AZ_RETURN_IF_FAILED(
-          az_span_append(*out_mqtt_topic, client->_internal.options.user_agent, out_mqtt_topic));
-    }
-
-    AZ_RETURN_IF_FAILED(az_span_append_uint8(*out_mqtt_topic, telemetry_null_terminator, out_mqtt_topic));
+        az_span_append(*out_mqtt_topic, telemetry_topic_modules_mid, out_mqtt_topic));
+    AZ_RETURN_IF_FAILED(
+        az_span_append(*out_mqtt_topic, client->_internal.options.module_id, out_mqtt_topic));
   }
+
+  AZ_RETURN_IF_FAILED(az_span_append(*out_mqtt_topic, telemetry_topic_suffix, out_mqtt_topic));
+
+  if (properties != NULL)
+  {
+    AZ_RETURN_IF_FAILED(
+        az_span_append_uint8(*out_mqtt_topic, telemetry_prop_delim, out_mqtt_topic));
+    AZ_RETURN_IF_FAILED(
+        az_span_append(*out_mqtt_topic, properties->_internal.properties, out_mqtt_topic));
+  }
+
+  if (az_span_length(client->_internal.options.user_agent) != 0)
+  {
+    AZ_RETURN_IF_FAILED(
+        properties == NULL
+            ? az_span_append_uint8(*out_mqtt_topic, telemetry_prop_delim, out_mqtt_topic)
+            : az_span_append_uint8(*out_mqtt_topic, telemetry_prop_separator, out_mqtt_topic));
+    AZ_RETURN_IF_FAILED(
+        az_span_append(*out_mqtt_topic, client->_internal.options.user_agent, out_mqtt_topic));
+  }
+
+  AZ_RETURN_IF_FAILED(
+      az_span_append_uint8(*out_mqtt_topic, telemetry_null_terminator, out_mqtt_topic));
 
   return AZ_OK;
 }
