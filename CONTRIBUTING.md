@@ -41,7 +41,7 @@ Merging Pull Requests (for project contributors with write access)
 ## Developer Guide
 
 ### Prerequisites
-- CMake version 3.12 is required to use these libraries.
+- CMake version 3.10 is required to use these libraries.
 - C compiler. MSVC, gcc or clang are recommended.
 - cmocka. For building and running unit tests. By default building unit tests is disabled, so, unless you want to add unit test or run it, you don't need to install this. See below how vcpkg can be used to install dependencies
 - curl. Curl is used a http stack and it is required for building and running service samples (keyvault and storage). You don't need to install curl if not building samples.
