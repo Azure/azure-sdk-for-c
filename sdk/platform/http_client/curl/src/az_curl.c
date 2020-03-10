@@ -66,7 +66,7 @@ AZ_NODISCARD az_result _az_http_client_curl_code_to_result(CURLcode code)
 
     default:
       // let any other error code be an HTTP PAL ERROR
-      return AZ_ERROR_HTTP_PAL;
+      return AZ_ERROR_HTTP_PLATFORM;
   }
 }
 
@@ -118,7 +118,7 @@ _az_http_client_curl_slist_append(struct curl_slist** self, char const* str)
   struct curl_slist* const p_list = curl_slist_append(*self, str);
   if (p_list == NULL)
   {
-    return AZ_ERROR_HTTP_PAL;
+    return AZ_ERROR_HTTP_PLATFORM;
   }
   *self = p_list;
   return AZ_OK;
