@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 #include "az_iot_hub_client.h"
-#include <az_contract_internal.h>
+#include <az_precondition.h>
 #include <az_result.h>
 #include <az_span.h>
 
@@ -21,9 +21,9 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_publish_topic_get(
     az_span mqtt_topic,
     az_span* out_mqtt_topic)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(client);
-  AZ_CONTRACT_ARG_VALID_SPAN(mqtt_topic);
-  AZ_CONTRACT_ARG_NOT_NULL(out_mqtt_topic);
+  AZ_PRECONDITION_NOT_NULL(client);
+  AZ_PRECONDITION_VALID_SPAN(mqtt_topic, 0);
+  AZ_PRECONDITION_NOT_NULL(out_mqtt_topic);
 
   // Required topic parts
   int32_t required_size = az_span_length(telemetry_topic_prefix)
@@ -31,7 +31,7 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_publish_topic_get(
       + sizeof(telemetry_null_terminator);
 
   // Optional parts
-  if (!az_span_is_empty(client->_internal.options.module_id))
+  if (az_span_ptr(client->_internal.options.module_id) != NULL)
   {
     required_size += az_span_length(telemetry_topic_modules_mid);
     required_size += az_span_length(client->_internal.options.module_id);
@@ -43,7 +43,7 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_publish_topic_get(
         += az_span_length(properties->_internal.properties) + sizeof(telemetry_prop_delim);
   }
 
-  if (!az_span_is_empty(client->_internal.options.user_agent))
+  if (az_span_ptr(client->_internal.options.user_agent) != NULL)
   {
     required_size
         += az_span_length(client->_internal.options.user_agent) + sizeof(telemetry_prop_delim);
