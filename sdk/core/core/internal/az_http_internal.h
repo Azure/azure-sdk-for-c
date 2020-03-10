@@ -104,7 +104,7 @@ az_http_client_send_request(_az_http_request* p_request, az_http_response* p_res
  *
  * @return
  *   - *`AZ_OK`* success.
- *   - *`AZ_ERROR_BUFFER_OVERFLOW`* `buffer` does not have enough space to fit the `max_url_size`.
+ *   - *`AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY`* `buffer` does not have enough space to fit the `max_url_size`.
  *   - *`AZ_ERROR_ARG`*
  *     - `p_request` is _NULL_.
  *     - `buffer`, `method_verb`, or `initial_url` are invalid spans (see @ref az_span_is_valid).
@@ -139,7 +139,7 @@ AZ_NODISCARD az_result az_http_request_append_path(_az_http_request* p_request, 
  *
  * @return
  *   - *`AZ_OK`* success.
- *   - *`AZ_ERROR_BUFFER_OVERFLOW`* the `URL` would grow past the `max_url_size`, should the
+ *   - *`AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY`* the `URL` would grow past the `max_url_size`, should the
  * parameter gets set.
  *   - *`AZ_ERROR_ARG`*
  *     - `p_request` is _NULL_.
@@ -159,7 +159,7 @@ az_http_request_set_query_parameter(_az_http_request* p_request, az_span name, a
  *
  * @return
  *   - *`AZ_OK`* success.
- *   - *`AZ_ERROR_BUFFER_OVERFLOW`* there isn't enough space in the `p_request->buffer` to add a
+ *   - *`AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY`* there isn't enough space in the `p_request->buffer` to add a
  * header.
  *   - *`AZ_ERROR_ARG`*
  *     - `p_request` is _NULL_.

@@ -1,0 +1,85 @@
+@startuml
+
+skinparam state {
+    BackgroundColor<<APP>> APPLICATION
+    BackgroundColor<<STRUCT>> Lavender
+}
+
+state color_coding {
+    state SDK_API
+    state SDK_DATA_OBJECT <<STRUCT>>
+    state APPLICATION_CODE <<APP>>
+}
+
+' Init
+[*] --> az_iot_provisioning_client_init: START
+az_iot_provisioning_client_init --> az_iot_provisioning_client_user_name_get
+az_iot_provisioning_client_user_name_get --> az_iot_provisioning_client_id_get : X509 auth
+state application_mqtt_connect <<APP>>
+az_iot_provisioning_client_id_get --> application_mqtt_connect
+
+' Optional SAS token generation:
+az_iot_provisioning_client_id_get -> az_iot_provisioning_client_sas_signature_get : SAS auth
+az_iot_provisioning_client_sas_signature_get -> application_hmac256
+application_hmac256 -> az_iot_provisioning_client_sas_password_get
+az_iot_provisioning_client_sas_password_get --> application_mqtt_connect : password
+state application_hmac256 <<APP>>
+
+' Subscribe
+application_mqtt_connect --> az_iot_provisioning_client_register_subscribe_topic_filter_get
+az_iot_provisioning_client_register_subscribe_topic_filter_get --> application_mqtt_subscribe
+state application_mqtt_subscribe <<APP>>
+application_mqtt_subscribe -> application_mqtt_receive : MQTT lib subscribed
+
+' Register
+application_mqtt_subscribe --> az_iot_provisioning_client_register_publish_topic_get
+az_iot_provisioning_client_register_publish_topic_get --> application_mqtt_publish
+state application_mqtt_publish <<APP>>
+
+state application_mqtt_receive <<APP>> { 
+' MQTT PUB received
+    [*] --> az_iot_provisioning_client_received_topic_payload_parse: MQTT PUB received from broker (cloud or Edge)
+    az_iot_provisioning_client_received_topic_payload_parse --> az_iot_provisioning_client_register_response
+    az_iot_provisioning_client_received_topic_payload_parse --> [*] : not provisioning related
+
+    az_iot_provisioning_client_register_response --> [*] : status == assigned
+    az_iot_provisioning_client_register_response --> application_delay : status != assigned (including errors)
+    state application_delay <<APP>>
+    application_delay --> az_iot_provisioning_client_get_operation_status_publish_topic_get
+    az_iot_provisioning_client_get_operation_status_publish_topic_get --> application_mqtt_publish
+}
+
+' Provisioning client:
+az_iot_provisioning_client_init : - global_endpoint_hostname
+az_iot_provisioning_client_init : - id_scope
+az_iot_provisioning_client_init : - registration_id
+
+' SAS Tokens
+az_iot_provisioning_client_sas_signature_get : - token_expiration_unix_time
+
+az_iot_provisioning_client_received_topic_payload_parse : - topic
+az_iot_provisioning_client_received_topic_payload_parse : - payload
+
+state az_iot_provisioning_client_register_response <<STRUCT>>
+az_iot_provisioning_client_register_response : - status
+az_iot_provisioning_client_register_response : - request_id
+az_iot_provisioning_client_register_response : - retry_after
+az_iot_provisioning_client_register_response : - registration_state
+az_iot_provisioning_client_register_response : - registration_information:
+az_iot_provisioning_client_register_response : ..- assigned_hub_hostname
+az_iot_provisioning_client_register_response : ..- device_id
+az_iot_provisioning_client_register_response : ..- json_payload
+az_iot_provisioning_client_register_response : ..- error_code
+az_iot_provisioning_client_register_response : ..- error_message
+
+az_iot_provisioning_client_sas_password_get: - Base64(HMAC-SHA256(signature, SharedAccessKey))
+
+az_iot_provisioning_client_get_operation_status_publish_topic_get : - request_id
+
+' Application interfaces
+application_mqtt_connect : - server_x509_trusted_root
+application_mqtt_connect : - [client_x509_certificate]
+application_delay : - retry_after
+application_hmac256 : - key (may be within an HSM)
+
+@enduml

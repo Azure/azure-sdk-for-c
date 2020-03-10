@@ -14,6 +14,7 @@ include(CheckAndIncludeCodeCov)
 add_library (
     ${TARGET_NAME}
     src/az_iot_sas_token.c
+    src/az_iot_telemetry.c
 )
 
 target_include_directories (${TARGET_NAME} PUBLIC inc)

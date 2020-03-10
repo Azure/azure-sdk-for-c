@@ -4,7 +4,7 @@
 #ifndef _az_CREDENTIAL_INTERNAL_H
 #define _az_CREDENTIAL_INTERNAL_H
 
-#include <az_credential.h>
+#include <az_credentials.h>
 #include <az_result.h>
 #include <az_span.h>
 

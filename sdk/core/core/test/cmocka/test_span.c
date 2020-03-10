@@ -11,13 +11,13 @@
 
 #include <_az_cfg.h>
 
-void az_span_append_uint8_NULL_out_span_fails()
+/* void az_span_append_uint8_NULL_out_span_fails()
 {
   uint8_t raw_buffer[15];
   az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer);
 
   assert_true(az_span_append_uint8(buffer, 'a', NULL) == AZ_ERROR_ARG);
-}
+} */
 
 void az_span_append_uint8_overflow_fails()
 {
@@ -102,7 +102,7 @@ void az_span_append_i32toa_overflow_fails()
   az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer);
   az_span out_span;
 
-  assert_true(az_span_append_i32toa(buffer, v, &out_span) == AZ_ERROR_BUFFER_OVERFLOW);
+  assert_true(az_span_append_i32toa(buffer, v, &out_span) == AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY);
 }
 
 void az_span_append_u32toa_succeeds()
@@ -156,7 +156,7 @@ void az_span_append_u32toa_overflow_fails()
   az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer);
   az_span out_span;
 
-  assert_true(az_span_append_u32toa(buffer, v, &out_span) == AZ_ERROR_BUFFER_OVERFLOW);
+  assert_true(az_span_append_u32toa(buffer, v, &out_span) == AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY);
 }
 
 void test_az_span(void** state)
@@ -182,7 +182,7 @@ void test_az_span(void** state)
     assert_true(az_span_is_equal(b, AZ_SPAN_FROM_STR("")));
   }
 
-  az_span_append_uint8_NULL_out_span_fails();
+  //az_span_append_uint8_NULL_out_span_fails();
   az_span_append_uint8_overflow_fails();
   az_span_append_uint8_succeeds();
 

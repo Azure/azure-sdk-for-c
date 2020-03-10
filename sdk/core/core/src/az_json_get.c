@@ -37,8 +37,8 @@ AZ_NODISCARD az_result az_json_parser_get_by_pointer_token(
     az_span pointer_token,
     az_json_token* out_token)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(self);
-  AZ_CONTRACT_ARG_NOT_NULL(out_token);
+  AZ_PRECONDITION_NOT_NULL(self);
+  AZ_PRECONDITION_NOT_NULL(out_token);
 
   switch (out_token->kind)
   {
@@ -79,7 +79,7 @@ AZ_NODISCARD az_result az_json_parser_get_by_pointer_token(
 AZ_NODISCARD az_result
 az_json_parse_by_pointer(az_span json, az_span pointer, az_json_token* out_token)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(out_token);
+  AZ_PRECONDITION_NOT_NULL(out_token);
 
   az_json_parser json_parser = { 0 };
   AZ_RETURN_IF_FAILED(az_json_parser_init(&json_parser, json));

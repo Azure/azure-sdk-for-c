@@ -3,10 +3,12 @@
 
 #include "az_hex_private.h"
 #include "az_span_private.h"
-#include <az_contract_internal.h>
+#include <az_platform_internal.h>
+#include <az_precondition.h>
 #include <az_span.h>
 
 #include <ctype.h>
+#include <stdint.h>
 
 #include <_az_cfg.h>
 
@@ -15,20 +17,31 @@ enum
   AZ_ASCII_LOWER_DIF = 'a' - 'A',
 };
 
-AZ_NODISCARD az_result
-az_span_slice(az_span span, int32_t low_index, int32_t high_index, az_span* out_sub_span)
+AZ_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t length, int32_t capacity)
 {
-  // left part
-  az_span left = span;
-  if (high_index >= 0)
-  {
-    left = az_span_take(span, high_index);
-  }
-  az_span const right = az_span_drop(left, low_index);
-  int32_t new_length = az_span_length(right);
-  *out_sub_span = az_span_init(az_span_ptr(right), new_length, new_length);
+  AZ_PRECONDITION_RANGE(0, capacity, INT32_MAX);
+  AZ_PRECONDITION_RANGE(0, length, capacity);
 
-  return AZ_OK;
+  return (az_span){ ._internal = { .ptr = ptr, .length = length, .capacity = capacity, }, };
+}
+
+AZ_NODISCARD az_span az_span_from_str(char* str)
+{
+  AZ_PRECONDITION_NOT_NULL(str);
+
+  int32_t length = (int32_t)strlen(str);
+  return az_span_init((uint8_t*)str, length, length);
+}
+
+AZ_NODISCARD az_span az_span_slice(az_span span, int32_t low_index, int32_t high_index)
+{
+  AZ_PRECONDITION_RANGE(-1, high_index, az_span_capacity(span));
+  AZ_PRECONDITION(high_index == -1 || (high_index >= 0 && low_index <= high_index));
+
+  int32_t capacity = az_span_capacity(span);
+
+  high_index = high_index == -1 ? capacity : high_index;
+  return az_span_init(az_span_ptr(span) + low_index, high_index - low_index, capacity - low_index);
 }
 
 /**
@@ -126,18 +139,18 @@ AZ_NODISCARD az_result az_span_to_uint32(az_span self, uint32_t* out)
  */
 AZ_NODISCARD az_result az_span_copy(az_span dst, az_span src, az_span* out)
 {
-  AZ_CONTRACT_ARG_VALID_SPAN(dst);
-  AZ_CONTRACT_ARG_VALID_SPAN(src);
+  AZ_PRECONDITION_VALID_SPAN(dst, 0);
+  AZ_PRECONDITION_VALID_SPAN(src, 0);
   int32_t src_len = az_span_length(src);
 
-  AZ_CONTRACT(az_span_capacity(dst) >= src_len, AZ_ERROR_BUFFER_OVERFLOW);
+  if (az_span_capacity(dst) < src_len)
+  {
+    return AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY;
+  };
 
   uint8_t* ptr = az_span_ptr(dst);
 
-  if (!az_span_is_empty(src))
-  {
-    memmove((void*)ptr, (void const*)az_span_ptr(src), src_len);
-  }
+  memmove((void*)ptr, (void const*)az_span_ptr(src), src_len);
 
   *out = az_span_init(ptr, src_len, az_span_capacity(dst));
 
@@ -160,9 +173,9 @@ AZ_NODISCARD AZ_INLINE bool should_encode(uint8_t c)
 
 AZ_NODISCARD az_result az_span_copy_url_encode(az_span dst, az_span src, az_span* out)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(out);
-  AZ_CONTRACT_ARG_VALID_SPAN(dst);
-  AZ_CONTRACT_ARG_VALID_SPAN(src);
+  AZ_PRECONDITION_NOT_NULL(out);
+  AZ_PRECONDITION_VALID_SPAN(dst, 0);
+  AZ_PRECONDITION_VALID_SPAN(src, 0);
 
   int32_t const input_size = az_span_length(src);
 
@@ -174,7 +187,7 @@ AZ_NODISCARD az_result az_span_copy_url_encode(az_span dst, az_span src, az_span
 
   if (az_span_capacity(dst) < result_size)
   {
-    return AZ_ERROR_BUFFER_OVERFLOW;
+    return AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY;
   }
 
   uint8_t* p_s = az_span_ptr(src);
@@ -236,8 +249,8 @@ void _az_span_swap(az_span a, az_span b)
 }
 
 /**
- * @brief converts @b src span to zero-terminated str. Content is copied to @b buffer and then \0 is
- * addeed at the end. Then out_result will be created out of buffer
+ * @brief converts @b src span to zero-terminated str. Content is copied to @b buffer and then \0
+ * is addeed at the end. Then out_result will be created out of buffer
  *
  * @param buffer
  * @param src
@@ -246,12 +259,12 @@ void _az_span_swap(az_span a, az_span b)
  */
 AZ_NODISCARD az_result az_span_to_str(char* s, int32_t max_size, az_span span)
 {
-  AZ_CONTRACT_ARG_VALID_SPAN(span);
+  AZ_PRECONDITION_VALID_SPAN(span, 0);
 
   int32_t span_length = az_span_length(span);
   if (span_length + 1 > max_size)
   {
-    return AZ_ERROR_BUFFER_OVERFLOW;
+    return AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY;
   }
 
   memmove((void*)s, (void const*)az_span_ptr(span), span_length);
@@ -268,52 +281,20 @@ AZ_NODISCARD az_result az_span_to_str(char* s, int32_t max_size, az_span span)
  *
  * @param self src span where to append
  * @param span content to be appended
- * @return AZ_NODISCARD az_span_append
+ * @param out result span
+ * @return az_result
  */
-/* AZ_NODISCARD az_result az_span_append_(az_span * self, az_span span) {
-  AZ_CONTRACT_ARG_NOT_NULL(self);
-
-  int32_t const current_size = az_span_length(*self);
-  az_span remainder = az_span_drop(*self, current_size);
-  AZ_RETURN_IF_FAILED(az_span_copy(remainder, span, &remainder));
-  AZ_RETURN_IF_FAILED(az_span_length_set(*self, current_size + az_span_length(span)));
-  return AZ_OK;
-} */
-
 AZ_NODISCARD az_result az_span_append(az_span self, az_span span, az_span* out)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(out);
+  AZ_PRECONDITION_NOT_NULL(out);
 
   int32_t const current_size = az_span_length(self);
-  az_span remainder = az_span_drop(self, current_size);
+  az_span remainder = az_span_slice(self, current_size, -1);
   AZ_RETURN_IF_FAILED(az_span_copy(remainder, span, &remainder));
 
   *out = az_span_init(
       az_span_ptr(self), current_size + az_span_length(span), az_span_capacity(self));
 
-  return AZ_OK;
-}
-
-/**
- * @brief Append @b size number of zeros to @b self if there is enough capacity for it
- *
- * @param self src span where to append
- * @param size number of zeros to be appended
- * @return AZ_NODISCARD az_span_append_zeros
- */
-AZ_NODISCARD az_result _az_span_append_zeros(az_span* self, int32_t size)
-{
-  AZ_CONTRACT_ARG_NOT_NULL(self);
-
-  int32_t current_size = az_span_length(*self);
-  az_span const span = az_span_take(az_span_drop(*self, current_size), size);
-  if (az_span_capacity(span) < size)
-  {
-    return AZ_ERROR_BUFFER_OVERFLOW;
-  }
-  az_span_set(span, 0);
-
-  self->_internal.length = current_size + size;
   return AZ_OK;
 }
 
@@ -329,7 +310,7 @@ AZ_NODISCARD az_result _az_span_append_zeros(az_span* self, int32_t size)
  */
 AZ_NODISCARD az_result _az_span_replace(az_span* self, int32_t start, int32_t end, az_span span)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(self);
+  AZ_PRECONDITION_NOT_NULL(self);
 
   int32_t const current_size = az_span_length(*self);
   int32_t const span_length = az_span_length(span);
@@ -338,23 +319,46 @@ AZ_NODISCARD az_result _az_span_replace(az_span* self, int32_t start, int32_t en
 
   // replaced size must be less or equal to current builder size. Can't replace more than what
   // current is available
-  AZ_CONTRACT(replaced_size <= current_size, AZ_ERROR_ARG);
+  if (replaced_size > current_size)
+  {
+    return AZ_ERROR_ARG;
+  };
   // start and end position must be before the end of current builder size
-  AZ_CONTRACT(start <= current_size && end <= current_size, AZ_ERROR_ARG);
+  if (start > current_size || end > current_size)
+  {
+    return AZ_ERROR_ARG;
+  };
   // Start position must be less or equal than end position
-  AZ_CONTRACT(start <= end, AZ_ERROR_ARG);
+  if (start > end)
+  {
+    return AZ_ERROR_ARG;
+  };
   // size after replacing must be less o equal than buffer size
-  AZ_CONTRACT(size_after_replace <= az_span_capacity(*self), AZ_ERROR_ARG);
+  if (size_after_replace > az_span_capacity(*self))
+  {
+    return AZ_ERROR_ARG;
+  };
+
+  // insert at the end case (no need to make left or right shift)
+  if (start == current_size)
+  {
+    return az_span_append(*self, span, self);
+  }
+  // replace all content case (no need to make left or right shift, only copy)
+  if (current_size == replaced_size)
+  {
+    return az_span_copy(*self, span, self);
+  }
 
   // get the span needed to be moved before adding a new span
-  az_span dst = az_span_drop(*self, start + span_length);
+  az_span dst = az_span_slice(*self, start + span_length, current_size);
   // get the span where to move content
-  az_span src = az_span_drop(*self, end);
+  az_span src = az_span_slice(*self, end, current_size);
   {
     // move content left or right so new span can be added
     AZ_RETURN_IF_FAILED(az_span_copy(dst, src, &dst));
     // add the new span
-    az_span copy = az_span_drop(*self, start);
+    az_span copy = az_span_slice(*self, start, -1);
     AZ_RETURN_IF_FAILED(az_span_copy(copy, span, &copy));
   }
 
@@ -366,7 +370,7 @@ AZ_NODISCARD az_result _az_span_replace(az_span* self, int32_t start, int32_t en
 
 AZ_NODISCARD az_result az_span_append_double(az_span span, double value, az_span* out)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(out);
+  AZ_PRECONDITION_NOT_NULL(out);
 
   if (value == 0)
   {
@@ -451,13 +455,13 @@ static AZ_NODISCARD az_result _az_span_builder_append_uint64(az_span* self, uint
 
 AZ_NODISCARD az_result az_span_append_uint64(az_span* self, uint64_t n)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(self);
+  AZ_PRECONDITION_NOT_NULL(self);
   return _az_span_builder_append_uint64(self, n);
 }
 
 AZ_NODISCARD az_result az_span_append_int64(az_span* self, int64_t n)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(self);
+  AZ_PRECONDITION_NOT_NULL(self);
 
   if (n < 0)
   {
@@ -500,13 +504,13 @@ _az_span_builder_append_u32toa(az_span self, uint32_t n, az_span* out_span)
 
 AZ_NODISCARD az_result az_span_append_u32toa(az_span span, uint32_t n, az_span* out_span)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(out_span);
+  AZ_PRECONDITION_NOT_NULL(out_span);
   return _az_span_builder_append_u32toa(span, n, out_span);
 }
 
 AZ_NODISCARD az_result az_span_append_i32toa(az_span span, int32_t n, az_span* out_span)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(out_span);
+  AZ_PRECONDITION_NOT_NULL(out_span);
 
   *out_span = span;
 
@@ -519,6 +523,7 @@ AZ_NODISCARD az_result az_span_append_i32toa(az_span span, int32_t n, az_span* o
   return _az_span_builder_append_u32toa(*out_span, n, out_span);
 }
 
+// TODO: pass az_span by value
 AZ_NODISCARD az_result _az_is_expected_span(az_span* self, az_span expected)
 {
   az_span actual_span = { 0 };
@@ -531,14 +536,14 @@ AZ_NODISCARD az_result _az_is_expected_span(az_span* self, az_span expected)
     return AZ_ERROR_EOF;
   }
 
-  AZ_RETURN_IF_FAILED(az_span_slice(*self, 0, expected_length, &actual_span));
+  actual_span = az_span_slice(*self, 0, expected_length);
 
   if (!az_span_is_equal(actual_span, expected))
   {
     return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
   // move reader after the expected span (means it was parsed as expected)
-  AZ_RETURN_IF_FAILED(az_span_slice(*self, expected_length, -1, self));
+  *self = az_span_slice(*self, expected_length, -1);
 
   return AZ_OK;
 }
@@ -549,8 +554,7 @@ AZ_NODISCARD az_result _az_scan_until(az_span self, _az_predicate predicate, int
 {
   for (int32_t index = 0; index < az_span_length(self); ++index)
   {
-    az_span s = { 0 };
-    AZ_RETURN_IF_FAILED(az_span_slice(self, index, -1, &s));
+    az_span s = az_span_slice(self, index, -1);
     az_result predicate_result = predicate(s);
     switch (predicate_result)
     {

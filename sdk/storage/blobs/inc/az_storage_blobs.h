@@ -6,9 +6,9 @@
 
 #include <az_config.h>
 #include <az_context.h>
-#include <az_contract_internal.h>
-#include <az_credential.h>
+#include <az_credentials.h>
 #include <az_http.h>
+#include <az_precondition.h>
 #include <az_result.h>
 #include <az_span.h>
 
