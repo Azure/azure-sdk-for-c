@@ -10,6 +10,13 @@ set(CMAKE_C_STANDARD 99)
 
 include(AddTestCMocka)
 
+# -ld link option is only available for gcc
+if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+    set(WRAP_FUNCTIONS "-Wl,--wrap=az_platform_clock_msec -Wl,--wrap=az_http_client_send_request")
+else()
+    set(WRAP_FUNCTIONS "")
+endif()
+
 add_cmocka_test(${TARGET_NAME} SOURCES
                 main.c
                 test_az_json.c
@@ -30,6 +37,6 @@ add_cmocka_test(${TARGET_NAME} SOURCES
                 test_url_encode.c
                 test_az_aad.c
                 COMPILE_OPTIONS ${DEFAULT_C_COMPILE_FLAGS}
-                LINK_OPTIONS "-Wl,--wrap=az_platform_clock_msec -Wl,--wrap=az_http_client_send_request"
+                LINK_OPTIONS ${WRAP_FUNCTIONS}
                 # grant access to Private functions to test az_json_private
                 PRIVATE_ACCESS ON)
