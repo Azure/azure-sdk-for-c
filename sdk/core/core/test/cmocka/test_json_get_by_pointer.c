@@ -88,7 +88,7 @@ void test_json_get_by_pointer(void** state)
           az_json_parse_by_pointer(sample, AZ_SPAN_FROM_STR("/parameters/LegalHold/tags/2"), &token)
           == AZ_OK);
       assert_true(token.kind == AZ_JSON_TOKEN_STRING);
-      assert_true(az_span_is_equal(token.value.string, AZ_SPAN_FROM_STR("tag3")));
+      assert_true(az_span_is_content_equal(token.value.string, AZ_SPAN_FROM_STR("tag3")));
     }
     {
       az_json_token token;

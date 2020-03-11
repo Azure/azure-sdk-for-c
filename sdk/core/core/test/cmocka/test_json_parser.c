@@ -261,7 +261,8 @@ void test_json_parser(void** state)
           read_write(AZ_SPAN_FROM_STR("{ \"a\" : [ true, { \"b\": [{}]}, 15 ] }"), &output, &o)
           == AZ_OK);
 
-      assert_true(az_span_is_equal(output, AZ_SPAN_FROM_STR("{\"a\":[true,{\"b\":[{}]},0]}")));
+      assert_true(
+          az_span_is_content_equal(output, AZ_SPAN_FROM_STR("{\"a\":[true,{\"b\":[{}]},0]}")));
     }
     {
       int32_t o = 0;
@@ -302,7 +303,7 @@ void test_json_parser(void** state)
       az_result const result = read_write(json, &output, &o);
       assert_true(result == AZ_OK);
 
-      assert_true(az_span_is_equal(
+      assert_true(az_span_is_content_equal(
           output,
           AZ_SPAN_FROM_STR( //
               "[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[{"
