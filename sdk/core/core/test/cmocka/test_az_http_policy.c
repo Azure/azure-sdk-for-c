@@ -29,7 +29,7 @@ void test_az_http_policy(void** state)
 
 /* Tests using wrap to mock. Only suported by gcc */
 #ifdef __GNUC__
-  void test_az_http_pipeline_policy_credential();
+  test_az_http_pipeline_policy_credential();
 #endif // __GNUC__
 }
 
@@ -60,13 +60,7 @@ void test_az_http_pipeline_policy_credential()
           AZ_SPAN_FROM_STR("secret")),
       AZ_OK);
 
-  _az_http_policy policies[2] = {
-            {
-              ._internal = {
-                .process = az_http_pipeline_policy_credential,
-                .p_options= &credential,
-              },
-            },
+  _az_http_policy policies[1] = {            
             {
               ._internal = {
                 .process = test_policy_transport,
