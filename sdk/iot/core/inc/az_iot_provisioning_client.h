@@ -55,7 +55,7 @@ az_iot_provisioning_client_options az_iot_provisioning_client_options_default();
 /**
  * @brief Initializes an Azure IoT Provisioning Client.
  *
- * @param[in] client
+ * @param[in] client The #az_iot_provisioning_client to use for this call.
  * @param[in] global_device_endpoint The global device endpoint.
  * @param[in] id_scope The ID Scope.
  * @param[in] registration_id The Registration ID. This must match the client certificate name (CN
@@ -73,7 +73,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_init(
 /**
  * @brief Gets the MQTT client id.
  *
- * @param[in] client
+ * @param[in] client The #az_iot_provisioning_client to use for this call.
  * @param[in] mqtt_client_id An empty #az_span with sufficient capacity to hold the MQTT client id.
  * @param[out] out_mqtt_client_id The output #az_span containing the MQTT client id.
  * @return #az_result
@@ -86,7 +86,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_user_name_get(
 /**
  * @brief Gets the MQTT client id.
  *
- * @param[in] client
+ * @param[in] client The #az_iot_provisioning_client to use for this call.
  * @param[in] mqtt_client_id An empty #az_span with sufficient capacity to hold the MQTT client id.
  * @param[out] out_mqtt_client_id The output #az_span containing the MQTT client id.
  * @return #az_result
@@ -114,7 +114,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_id_get(
  *          this API, sign it using HMAC-SHA256 using the Shared Access Key as password then Base64
  *          encode the result.
  *
- * @param[in] client
+ * @param[in] client The #az_iot_provisioning_client to use for this call.
  * @param[in] token_expiration_epoch_time The time, in seconds, from 1/1/1970.
  * @param[in] signature An empty #az_span with sufficient capacity to hold the SAS signature.
  * @param[out] out_signature The output #az_span containing the SAS signature.
@@ -131,7 +131,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_sas_signature_get(
  * @note The MQTT password must be an empty string if X509 Client certificates are used. Use this
  *       API only when authenticating with SAS tokens.
  *
- * @param[in] client
+ * @param[in] client The #az_iot_provisioning_client to use for this call.
  * @param[in] base64_hmac_sha256_signature The Base64 encoded value of the HMAC-SHA256(signature,
  *                                         SharedAccessKey). The signature is obtained by using
  *                                         #az_iot_hub_client_sas_signature_get.
@@ -208,7 +208,7 @@ AZ_NODISCARD bool az_iot_provisioning_client_is_retriable_status(
 /**
  * @brief Gets the MQTT topic filter to subscribe to register responses.
  *
- * @param[in] client
+ * @param[in] client The #az_iot_provisioning_client to use for this call.
  * @param[in] mqtt_topic_filter An empty #az_span with sufficient capacity to hold the MQTT topic
  *                              filter.
  * @param[out] out_mqtt_topic_filter The output #az_span containing the MQTT topic filter.
@@ -260,7 +260,7 @@ typedef struct az_iot_provisioning_client_register_response
 /**
  * @brief Attempts to parse a received message's topic.
  *
- * @param[in] client
+ * @param[in] client The #az_iot_provisioning_client to use for this call.
  * @param[in] received_topic An #az_span containing the received topic.
  * @param[in] received_payload An #az_span containing the received topic.
  * @param[out] out_response If the message is register-operation related, this will contain the
@@ -278,7 +278,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_received_topic_payload_parse(
  * @note The payload of the MQTT publish message may contain a JSON document formatted according to
  * the Provisioning Service's Register Device specification.
  *
- * @param[in] client
+ * @param[in] client The #az_iot_provisioning_client to use for this call.
  * @param[in] mqtt_topic An empty #az_span with sufficient capacity to hold the MQTT topic.
  * @param[out] out_mqtt_topic The output #az_span containing the MQTT topic.
  * @return #az_result
@@ -292,7 +292,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_register_publish_topic_get(
  * @brief Gets the MQTT topic that must be used to submit a Register Status request.
  * @note The payload of the MQTT publish message should be empty.
  *
- * @param[in] client
+ * @param[in] client The #az_iot_provisioning_client to use for this call.
  * @param[in] request_id The request id. Must match a received
  *                       #az_iot_provisioning_client_register_response request_id.
  * @param[in] mqtt_topic An empty #az_span with sufficient capacity to hold the MQTT topic.
