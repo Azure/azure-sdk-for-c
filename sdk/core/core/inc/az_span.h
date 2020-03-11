@@ -228,7 +228,7 @@ az_span_to_str(char* destination, int32_t destination_max_size, az_span source);
  * @brief az_span_to_uint64 parses an az_span containing ASCII digits into a uint64 number
  *
  * @param[in] span The az_span containing the ASCII digits to be parsed.
- * @param[in] out The pointer to the variable that is to receive the number
+ * @param[in] out_number The pointer to the variable that is to receive the number
  * @return  #AZ_OK if successful
  *          #AZ_ERROR_PARSER_UNEXPECTED_CHAR if a non-ASCII digit is found within the span.
  */
@@ -239,7 +239,7 @@ AZ_NODISCARD az_result az_span_to_uint64(az_span span, uint64_t* out_number);
  * @brief az_span_to_uint32 parses an az_span containing ASCII digits into a uint32 number
  *
  * @param span The az_span containing the ASCII digits to be parsed.
- * @param out The pointer to the variable that is to receive the number
+ * @param out_number The pointer to the variable that is to receive the number
  * @return Returns AZ_OK if successful; AZ_ERROR_PARSER_UNEXPECTED_CHAR if a non-ASCII digit
  * is found within the span.
  */
