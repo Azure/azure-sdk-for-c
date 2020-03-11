@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # SPDX-License-Identifier: MIT
 
-cmake_minimum_required (VERSION 3.12)
+cmake_minimum_required (VERSION 3.10)
 set(TARGET_NAME "az_keyvault_test")
 
 project (${TARGET_NAME} LANGUAGES C)

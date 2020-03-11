@@ -4,6 +4,7 @@
 #include <az_http.h>
 #include <az_http_internal.h>
 #include <az_http_transport.h>
+#include <az_span.h>
 
 #include <stdlib.h>
 
@@ -13,7 +14,7 @@
 
 /*Copying AZ_CONTRACT on purpose from AZ_CORE because 3rd parties can define this and should not
  * depend on internal CORE headers */
-#define AZ_CONTRACT(condition, error) \
+#define AZ_PRECONDITION(condition, error) \
   do \
   { \
     if (!(condition)) \
@@ -22,11 +23,11 @@
     } \
   } while (0)
 
-#define AZ_CONTRACT_ARG_NOT_NULL(arg) AZ_CONTRACT((arg) != NULL, AZ_ERROR_ARG)
+#define AZ_PRECONDITION_NOT_NULL(arg) AZ_PRECONDITION((arg) != NULL, AZ_ERROR_ARG)
 
 static AZ_NODISCARD az_result _az_span_malloc(int32_t size, az_span* out)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(out);
+  AZ_PRECONDITION_NOT_NULL(out);
 
   uint8_t* const p = (uint8_t*)malloc((size_t)size);
   if (p == NULL)
@@ -65,7 +66,7 @@ AZ_NODISCARD az_result _az_http_client_curl_code_to_result(CURLcode code)
 
     default:
       // let any other error code be an HTTP PAL ERROR
-      return AZ_ERROR_HTTP_PAL;
+      return AZ_ERROR_HTTP_PLATFORM;
   }
 }
 
@@ -80,8 +81,8 @@ AZ_NODISCARD AZ_INLINE az_result _az_http_client_curl_init(CURL** out)
 
 AZ_NODISCARD AZ_INLINE az_result _az_http_client_curl_done(CURL** pp)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(pp);
-  AZ_CONTRACT_ARG_NOT_NULL(*pp);
+  AZ_PRECONDITION_NOT_NULL(pp);
+  AZ_PRECONDITION_NOT_NULL(*pp);
 
   curl_easy_cleanup(*pp);
   *pp = NULL;
@@ -111,13 +112,13 @@ _az_span_append_header_to_buffer(az_span writable_buffer, az_pair header, az_spa
 static AZ_NODISCARD az_result
 _az_http_client_curl_slist_append(struct curl_slist** self, char const* str)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(self);
-  AZ_CONTRACT_ARG_NOT_NULL(str);
+  AZ_PRECONDITION_NOT_NULL(self);
+  AZ_PRECONDITION_NOT_NULL(str);
 
   struct curl_slist* const p_list = curl_slist_append(*self, str);
   if (p_list == NULL)
   {
-    return AZ_ERROR_HTTP_PAL;
+    return AZ_ERROR_HTTP_PLATFORM;
   }
   *self = p_list;
   return AZ_OK;
@@ -138,7 +139,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_add_header_to_curl_list(
     struct curl_slist** p_list,
     az_span separator)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(p_list);
+  AZ_PRECONDITION_NOT_NULL(p_list);
 
   // allocate a buffer for header
   az_span writable_buffer;
@@ -174,7 +175,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_add_header_to_curl_list(
 static AZ_NODISCARD az_result
 _az_http_client_curl_build_headers(_az_http_request* p_request, struct curl_slist** p_headers)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(p_request);
+  AZ_PRECONDITION_NOT_NULL(p_request);
 
   az_pair header;
   for (int32_t offset = 0; offset < _az_http_request_headers_count(p_request); ++offset)
@@ -238,7 +239,7 @@ static size_t _az_http_client_curl_write_to_span(
  */
 static AZ_NODISCARD az_result _az_http_client_curl_send_get_request(CURL* p_curl)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(p_curl);
+  AZ_PRECONDITION_NOT_NULL(p_curl);
 
   // send
   AZ_RETURN_IF_CURL_FAILED(curl_easy_perform(p_curl));
@@ -252,8 +253,8 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_get_request(CURL* p_curl
 static AZ_NODISCARD az_result
 _az_http_client_curl_send_delete_request(CURL* p_curl, _az_http_request const* p_request)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(p_curl);
-  AZ_CONTRACT_ARG_NOT_NULL(p_request);
+  AZ_PRECONDITION_NOT_NULL(p_curl);
+  AZ_PRECONDITION_NOT_NULL(p_request);
 
   AZ_RETURN_IF_FAILED(_az_http_client_curl_code_to_result(
       curl_easy_setopt(p_curl, CURLOPT_CUSTOMREQUEST, "DELETE")));
@@ -269,8 +270,8 @@ _az_http_client_curl_send_delete_request(CURL* p_curl, _az_http_request const* p
 static AZ_NODISCARD az_result
 _az_http_client_curl_send_post_request(CURL* p_curl, _az_http_request const* p_request)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(p_curl);
-  AZ_CONTRACT_ARG_NOT_NULL(p_request);
+  AZ_PRECONDITION_NOT_NULL(p_curl);
+  AZ_PRECONDITION_NOT_NULL(p_request);
 
   // Method
   az_span body = { 0 };
@@ -339,17 +340,7 @@ static int32_t _az_http_client_curl_upload_read_callback(
   // Update the userdata span
   //  ptr will point to remaining data to be copied
   //  length and capacity are set to the size of the remaining content
-  az_result result = az_span_slice(*upload_content, dst_buffer_size, -1, upload_content);
-
-  // Upon failure terminate the upload
-  // per CURL documentation, "The read callback may return CURL_READFUNC_ABORT to stop the current
-  // operation immediately,
-  //          resulting in a CURLE_ABORTED_BY_CALLBACK error code from the transfer."
-  //
-  if (az_failed(result))
-  {
-    return CURL_READFUNC_ABORT;
-  }
+  *upload_content = az_span_slice(*upload_content, dst_buffer_size, -1);
 
   return size_of_copy;
 }
@@ -361,8 +352,8 @@ static int32_t _az_http_client_curl_upload_read_callback(
 static AZ_NODISCARD az_result
 _az_http_client_curl_send_upload_request(CURL* p_curl, _az_http_request const* p_request)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(p_curl);
-  AZ_CONTRACT_ARG_NOT_NULL(p_request);
+  AZ_PRECONDITION_NOT_NULL(p_curl);
+  AZ_PRECONDITION_NOT_NULL(p_request);
 
   az_span body = p_request->_internal.body;
 
@@ -395,8 +386,8 @@ _az_http_client_curl_send_upload_request(CURL* p_curl, _az_http_request const* p
 static AZ_NODISCARD az_result
 _az_http_client_curl_setup_headers(CURL* p_curl, _az_http_request* p_request)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(p_curl);
-  AZ_CONTRACT_ARG_NOT_NULL(p_request);
+  AZ_PRECONDITION_NOT_NULL(p_curl);
+  AZ_PRECONDITION_NOT_NULL(p_request);
 
   if (_az_http_request_headers_count(p_request) == 0)
   {
@@ -424,8 +415,8 @@ _az_http_client_curl_setup_headers(CURL* p_curl, _az_http_request* p_request)
 static AZ_NODISCARD az_result
 _az_http_client_curl_setup_url(CURL* p_curl, _az_http_request const* p_request)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(p_curl);
-  AZ_CONTRACT_ARG_NOT_NULL(p_request);
+  AZ_PRECONDITION_NOT_NULL(p_curl);
+  AZ_PRECONDITION_NOT_NULL(p_request);
 
   az_span writable_buffer;
   {
@@ -462,7 +453,7 @@ _az_http_client_curl_setup_url(CURL* p_curl, _az_http_request const* p_request)
 static AZ_NODISCARD az_result
 _az_http_client_curl_setup_response_redirect(CURL* p_curl, az_span* response_builder)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(p_curl);
+  AZ_PRECONDITION_NOT_NULL(p_curl);
 
   AZ_RETURN_IF_CURL_FAILED(
       curl_easy_setopt(p_curl, CURLOPT_HEADERFUNCTION, _az_http_client_curl_write_to_span));
@@ -492,8 +483,8 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
     _az_http_request* p_request,
     az_http_response* response)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(p_curl);
-  AZ_CONTRACT_ARG_NOT_NULL(p_request);
+  AZ_PRECONDITION_NOT_NULL(p_curl);
+  AZ_PRECONDITION_NOT_NULL(p_request);
 
   az_result result = AZ_ERROR_ARG;
 
@@ -548,8 +539,8 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
 AZ_NODISCARD az_result
 az_http_client_send_request(_az_http_request* p_request, az_http_response* p_response)
 {
-  AZ_CONTRACT_ARG_NOT_NULL(p_request);
-  AZ_CONTRACT_ARG_NOT_NULL(p_response);
+  AZ_PRECONDITION_NOT_NULL(p_request);
+  AZ_PRECONDITION_NOT_NULL(p_response);
 
   CURL* p_curl = NULL;
 

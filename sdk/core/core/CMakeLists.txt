@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # SPDX-License-Identifier: MIT
 
-cmake_minimum_required (VERSION 3.12)
+cmake_minimum_required (VERSION 3.10)
 set(TARGET_NAME "az_core")
 
 project (${TARGET_NAME} LANGUAGES C)
@@ -28,6 +28,7 @@ add_library (
   src/az_json_string.c
   src/az_json_token.c
   src/az_log.c
+  src/az_precondition.c
   src/az_span.c
   )
 

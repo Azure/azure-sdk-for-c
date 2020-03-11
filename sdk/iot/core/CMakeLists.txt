@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # SPDX-License-Identifier: MIT
 
-cmake_minimum_required (VERSION 3.12)
+cmake_minimum_required (VERSION 3.10)
 
 set(TARGET_NAME "az_iot")
 
@@ -14,6 +14,7 @@ include(CheckAndIncludeCodeCov)
 add_library (
     ${TARGET_NAME}
     src/az_iot_sas_token.c
+    src/az_iot_telemetry.c
 )
 
 target_include_directories (${TARGET_NAME} PUBLIC inc)
