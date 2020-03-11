@@ -17,6 +17,8 @@ The following aspects need to be handled by the application or convenience layer
 1. Delay execution for retry purposes.
 1. (Optional) Provide real-time clock information and perform HMAC-SHA256 operations for SAS token generation.
 
+For more information about Azure IoT services using MQTT see https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-mqtt-support.
+
 ## Components
 
 ### IoT Hub
@@ -136,3 +138,120 @@ _Example:_
         }
     }
 ```
+
+### Retrying Operations
+
+The IoT Core SDK documents and provides APIs for the error policy and timing policies separately. We are also supplying optional APIs for error classification and retry timing.
+
+#### Error policy
+
+Our SDK will not handle protocol-level (WebSocket, MQTT, TLS or TCP) errors. The application-developer is expected to classify and handle errors the following way:
+
+- Authentication errors should not be retried.
+- Communication-related errors other than ones security-related should be considered retriable.
+
+Both IoT Hub and Provisioning services will use `MQTT CONNACK` as described in Section 3.2.2.3 of the [MQTT v3 specification](http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Table_3.1_-).
+
+##### IoT Hub Service Errors
+
+APIs using `az_iot_hub_client_status` report service-side errors to the client through the IoT Hub protocols. (At the time of writing, only Twin responses may return errors.)
+
+The following APIs may be used to determine if the status indicates error and if the error should be retried:
+
+```C
+az_iot_hub_client_status status = response.status;
+if (az_iot_hub_client_is_success_status(status))
+{
+    // success case 
+}
+else
+{
+    if (az_iot_hub_client_is_retriable_status(status))
+    {
+        // retry
+    }
+    else
+    {
+        // fail
+    }
+}
+```
+
+##### Provisioning Service Errors
+
+Each Provisioning operation will return a status encoded as `az_iot_provisioning_client_status`.
+After the register operation is complete the `az_iot_provisioning_client_registration_state registration_information` field will contain the `az_iot_provisioning_client_status error_code` that represents the overall status of the registration operation.  
+
+The following APIs may be used to determine if the status indicates error and if the error should be retried:
+
+```C
+az_iot_provisioning_client_status status = result.registration_information.error_code;
+if (az_iot_provisioning_client_is_success_status(status))
+{
+    // success case 
+}
+else
+{
+    if (az_iot_provisioning_client_is_retriable_status(status))
+    {
+        // retry
+    }
+    else
+    {
+        // fail
+    }
+}
+```
+
+#### Retry timing
+
+Network timeouts and the MQTT keep-alive interval should be configured considering tradeoffs between how fast network issues are detected vs traffic overheads. [This document](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-mqtt-support#default-keep-alive-timeout) describes the recommended keep-alive timeouts as well as the minimum idle timeout supported by Azure IoT services.
+
+For connectivity issues at all layers (TCP, TLS, MQTT) as well as cases where there is no `retry-after` sent by the service, we suggest using an exponential back-off with random jitter function. `_az_retry_calc_delay` is available in Azure SDK Core:
+
+```C
+// random_ms is a random value between 0 and max_jitter_msec
+// The previous operation took operation_msec
+
+int32_t total_delay_msec =  random_msec + _az_retry_calc_delay(attempt, min_retry_delay_msec, max_retry_delay_msec);
+int32_t delay_msec = max(operation_msec - total_delay_msec, 0); 
+```
+
+_Note 1_: The network stack may have used more time than the recommended delay before timing out. (e.g. The operation timed out after 2 minutes while the delay between operations is 1 second). In this case there is no need to delay the next operation.
+
+_Note 2_: To determine the parameters of the exponential with back-off retry strategy we recommend modeling the network characteristics (including failure-modes). Compare the results with defined SLAs for device connectivity (e.g. 1M devices must be connected in under 30 minutes) and with the available IoT Azure scale (especially consider _throttling_, _quotas_ and maximum _requests/connects per second_).
+
+In the absence of modeling, we recommend the following default:
+```C
+    min_retry_delay_msec =   1000;
+    max_retry_delay_msec = 100000;
+    max_jitter_msec      =   5000;
+```
+
+For service-level errors, the Provisioning Service is providing a `retry-after` (in seconds) parameter:
+
+```C
+// az_iot_provisioning_client_received_topic_payload_parse was successful and created a az_iot_provisioning_client_register_response response
+
+int32_t delay_ms;
+if ( response.retry_after_seconds > 0 )
+{
+    delay_ms = response.retry_after_seconds;
+}
+else
+{
+    delay_ms = random_ms + _az_retry_calc_delay(attempt, min_retry_delay_msec, max_retry_delay_msec);
+}
+```
+
+#### Suggested Retry Strategy
+
+Combining the functions above we recommend the following flow:
+
+![image](resources/iot_retry_flow.png "IoT MQTT Retry Flow")
+
+When devices are using IoT Hub without Provisioning Service we recommend attempting to rotate the IoT Credentials (SAS Token or X509 Certificate) on authentication issues.
+
+_Note:_ Authentication issues observed in the following cases do not require credentials to be rotated and require further user actions:
+- DNS issues (such as WiFi Captive Portal redirects)
+- WebSockets Proxy server authentication

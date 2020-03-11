@@ -230,6 +230,7 @@ az_iot_hub_client_properties_next(az_iot_hub_client_properties* properties, az_p
 /**
  * @brief Gets the MQTT topic that must be used for device to cloud telemetry messages.
  * @note Telemetry MQTT Publish messages must have QoS At Least Once (1).
+ * @note This topic can also be used to set the MQTT Will message in the Connect message.
  * 
  * Should the user want a null terminated topic string, they may allocate a buffer large enough
  * to fit the topic plus a null terminator. They must set the last byte themselves or zero initialize
