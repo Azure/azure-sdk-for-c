@@ -127,6 +127,11 @@ div.navtab {
 	margin-right: 15px;
 }
 
+.navbrand {
+        float: left;
+        margin-right: 15px;
+}
+
 /* @group Link Styling */
 
 a {
@@ -1286,9 +1291,10 @@ dl.section dd {
 
 #projectname
 {
-	font: 300% Tahoma, Arial,sans-serif;
+	font: 250% Tahoma, Arial,sans-serif;
 	margin: 0px;
 	padding: 2px 0px;
+	color: rgb(255, 255, 255)
 }
     
 #projectbrief
@@ -1311,6 +1317,9 @@ dl.section dd {
 	margin: 0px;
 	width: 100%;
 	border-bottom: 1px solid #5373B4;
+	background-color: rgb(0, 113, 197);
+	border-color: rgb(0, 113, 197);
+	opacity: 0.95;
 }
 
 .image
