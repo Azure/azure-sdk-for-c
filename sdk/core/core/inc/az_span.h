@@ -4,7 +4,7 @@
 /**
  * @file az_span.h
  *
- * @brief An az_span represents a byte buffer and is used for string manipulations,
+ * @brief An az_span represents a contiguous byte buffer and is used for string manipulations,
  * HTTP requests/responses, building/parsing JSON payloads, and more.
  */
 
@@ -72,12 +72,12 @@ AZ_NODISCARD AZ_INLINE int32_t az_span_capacity(az_span span) { return span._int
  */
 #define AZ_SPAN_NULL (az_span) AZ_SPAN_LITERAL_NULL
 
-// Returns the size (in bytes) of a liternal string
+// Returns the size (in bytes) of a literal string
 // Note: Concatenating "" to S produces a compiler error if S is not a literal string
 #define _az_STRING_LITERAL_LEN(S) (sizeof(S "") - 1)
 
 /**
- * @brief The AZ_SPAN_LITERAL_FROM_STR macro returns a literal az_span over a liternal string. For
+ * @brief The AZ_SPAN_LITERAL_FROM_STR macro returns a literal az_span over a literal string. For
  * example:
  *
  * `static const az_span hw = AZ_SPAN_LITERAL_FROM_STR("Hello world");`
@@ -159,7 +159,7 @@ AZ_NODISCARD az_span az_span_from_str(char* str);
   }
 
 /**
- * @brief AZ_SPAN_FROM_INITIALIZED_BUFFER returns an az_span expression over an inittialized byte
+ * @brief AZ_SPAN_FROM_INITIALIZED_BUFFER returns an az_span expression over an initialized byte
  * buffer. For example
  *
  * uint8_t buffer[] = { 1, 2, 3 };
@@ -425,12 +425,12 @@ typedef struct
   (az_pair) { .key = AZ_SPAN_NULL, .value = AZ_SPAN_NULL }
 
 /**
- * @brief az_pair_init returns an az_pair with its key and value fields initialied to the specified
+ * @brief az_pair_init returns an az_pair with its key and value fields initialized to the specified
  * key and value parameters.
  *
  * @param[in] key A span whose bytes represent the key
  * @param[in] value A span whose bytes represent the key's value
- * @return  An az_pair with the field initialied to the parameters' values
+ * @return  An az_pair with the field initialized to the parameters' values
  */
 AZ_NODISCARD AZ_INLINE az_pair az_pair_init(az_span key, az_span value)
 {
@@ -438,12 +438,12 @@ AZ_NODISCARD AZ_INLINE az_pair az_pair_init(az_span key, az_span value)
 }
 
 /**
- * @brief az_pair_from_str returns an az_pair with its key and value fields initialied to span's
+ * @brief az_pair_from_str returns an az_pair with its key and value fields initialized to span's
  * over the specified key and value 0-terminated string parameters.
  *
  * @param[in] key A string representing the key
  * @param[in] value A string representing the key's value
- * @return  An az_pair with the field initialied to the az_span instances over the passed-in strings
+ * @return  An az_pair with the field initialized to the az_span instances over the passed-in strings
  */
 AZ_NODISCARD AZ_INLINE az_pair az_pair_from_str(char* key, char* value)
 {
