@@ -68,7 +68,7 @@ AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1, az_span 
 
 AZ_NODISCARD az_result az_span_to_uint64(az_span span, uint64_t* out_number)
 {
-  AZ_PRECONDITION_VALID_SPAN(span, 1);
+  AZ_PRECONDITION_VALID_SPAN(span, 1, false);
   AZ_PRECONDITION_NOT_NULL(out_number);
 
   int32_t self_length = az_span_length(span);
@@ -96,7 +96,7 @@ AZ_NODISCARD az_result az_span_to_uint64(az_span span, uint64_t* out_number)
 
 AZ_NODISCARD az_result az_span_to_uint32(az_span span, uint32_t* out_number)
 {
-  AZ_PRECONDITION_VALID_SPAN(span, 1);
+  AZ_PRECONDITION_VALID_SPAN(span, 1, false);
   AZ_PRECONDITION_NOT_NULL(out_number);
 
   int32_t self_length = az_span_length(span);
