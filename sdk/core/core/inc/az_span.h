@@ -59,14 +59,18 @@ AZ_NODISCARD AZ_INLINE int32_t az_span_capacity(az_span span) { return span._int
 /********************************  CONSTRUCTORS */
 
 /**
- * @brief The AZ_SPAN_NULL macro returns a NULL (or empty) az_span
- *
+ * @brief Creates an empty span literal
  */
-#define AZ_SPAN_NULL \
-  (az_span) \
+#define AZ_SPAN_LITERAL_NULL \
   { \
     ._internal = {.ptr = NULL, .length = 0, .capacity = 0 } \
   }
+
+/**
+ * @brief The AZ_SPAN_NULL macro returns a NULL (or empty) az_span
+ *
+ */
+#define AZ_SPAN_NULL (az_span) AZ_SPAN_LITERAL_NULL
 
 // Returns the size (in bytes) of a liternal string
 // Note: Concatenating "" to S produces a compiler error if S is not a literal string
