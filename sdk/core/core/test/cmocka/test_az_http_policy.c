@@ -28,9 +28,9 @@ void test_az_http_policy(void** state)
   (void)state;
 
 /* Tests using wrap to mock. Only suported by gcc */
-#ifdef __GNUC__
+#ifdef MOCK_ENABLED
   test_az_http_pipeline_policy_credential();
-#endif // __GNUC__
+#endif // MOCK_ENABLED
 }
 
 void test_az_http_pipeline_policy_credential()

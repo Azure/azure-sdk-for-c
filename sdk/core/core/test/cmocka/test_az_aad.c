@@ -45,10 +45,10 @@ void test_az_aad(void** state)
   (void)state;
 
 /* Tests using wrap to mock. Only suported by gcc */
-#ifdef __GNUC__
+#ifdef MOCK_ENABLED
   test_az_token_expired();
   test_az_aad_request_token();
-#endif // __GNUC__
+#endif // MOCK_ENABLED
 
   test_az_aad_build_body();
   test_az_aad_build_url();
