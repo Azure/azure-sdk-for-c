@@ -100,7 +100,7 @@ AZ_NODISCARD AZ_INLINE int32_t az_span_capacity(az_span span) { return span._int
  * @param[in] ptr The memory address of the 1st byte in the byte buffer
  * @param[in] length The number of bytes initialized in the byte buffer
  * @param[in] capacity The number of total bytes in the byte buffer
- * @return az_span The az_span "view" over the byte buffer
+ * @return az_span The "view" over the byte buffer.
  */
 AZ_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t length, int32_t capacity);
 
