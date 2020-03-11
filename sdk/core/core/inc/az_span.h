@@ -184,8 +184,8 @@ AZ_NODISCARD az_span az_span_from_str(char* str);
 AZ_NODISCARD az_span az_span_slice(az_span span, int32_t low_index, int32_t high_index);
 
 /**
- * @brief az_span_is_content_equal returns `true` if the lengths and bytes refered by @span1 and
- * @span2 are identical.
+ * @brief az_span_is_content_equal returns `true` if the lengths and bytes refered by \p span1 and
+ * \p span2 are identical.
  *
  * @return Returns true if the lengths of both spans are identical and the bytes in both spans are
  * also identical.
@@ -198,7 +198,7 @@ AZ_NODISCARD AZ_INLINE bool az_span_is_content_equal(az_span span1, az_span span
 
 /**
  * @brief az_span_is_content_equal_ignoring_case returns `true` if the lengths and characters
- * refered to by @span1 and @span2 are identical except for case. This function assumes the bytes in
+ * refered to by \p span1 and \p span2 are identical except for case. This function assumes the bytes in
  * both spans are ASCII characters.
  *
  * @return Returns true if the lengths of both spans are identical and the ASCII characters in both
@@ -212,7 +212,7 @@ AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1, az_span 
 
  * The buffer refered to by destination must have a max_size that is at least 1 byte bigger
  than the source az_span
- *  the string in converts @b src span to zero-terminated str. Content is copied to @b
+ *  the string in converts \p destination span to zero-terminated str. Content is copied to \p source
  buffer and then \0 is
  * addeed at the end. Then out_result will be created out of buffer
  *
@@ -365,10 +365,10 @@ AZ_NODISCARD az_result az_span_append_dtoa(az_span destination, double source, a
 /******************************  SPAN COPYING */
 
 /**
- * @brief az_span_set sets all the bytes of the destination span (up to its capacity) to @b
+ * @brief az_span_set sets all the bytes of the destination span (up to its capacity) to \p
  * fill.
  *
- * @param[in] destination The span whose bytes will be set to @b fill
+ * @param[in] destination The span whose bytes will be set to \p fill
  * @param[in] fill The byte to be replicated within the destination span
  */
 AZ_INLINE void az_span_set(az_span destination, uint8_t fill)
