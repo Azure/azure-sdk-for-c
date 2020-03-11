@@ -36,6 +36,7 @@ add_cmocka_test(${TARGET_NAME} SOURCES
                 test_az_pipeline.c
                 test_url_encode.c
                 test_az_aad.c
+                test_az_http_policy.c
                 COMPILE_OPTIONS ${DEFAULT_C_COMPILE_FLAGS}
                 LINK_OPTIONS ${WRAP_FUNCTIONS}
                 # grant access to Private functions to test az_json_private
