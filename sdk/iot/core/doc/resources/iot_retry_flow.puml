@@ -16,7 +16,7 @@ Provisioning_calculate_delay --> Provisioning_app_delay
 state Provisioning_app_delay<<APP>>
 Provisioning_app_delay --> IoT_Provisioning_Register
 Provisioning_calculate_delay: - _az_retry_calc_delay
-Provisioning_calculate_delay: - _az_retry_calc_delay
+Provisioning_calculate_delay: - retry-after
 
 ' Provisioning Non-retriable 
 IoT_Provisioning_Register --> Provisioning_not_retriable_failure
@@ -36,7 +36,6 @@ Hub_retriable_failure --> Hub_calculate_delay
 Hub_calculate_delay --> Hub_app_delay
 state Hub_app_delay<<APP>>
 Hub_app_delay --> IoT_Hub_Operation
-Hub_calculate_delay: - _az_retry_calc_delay
 Hub_calculate_delay: - _az_retry_calc_delay
 
 ' Hub Non-retriable 
