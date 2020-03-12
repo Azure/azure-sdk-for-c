@@ -175,11 +175,8 @@ void az_span_to_uint64_return_errors()
 {
   // sample span
   az_span sample = AZ_SPAN_FROM_STR("test");
-  // zero len span
-  az_span zero = az_span_init(az_span_ptr(sample), 0, 0);
   uint64_t out = 0;
 
-  assert_true(az_span_to_uint64(zero, &out) == AZ_ERROR_EOF);
   assert_true(az_span_to_uint64(sample, &out) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
 }
 
