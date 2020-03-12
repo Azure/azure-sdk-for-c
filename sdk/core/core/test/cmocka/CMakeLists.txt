@@ -11,7 +11,7 @@ set(CMAKE_C_STANDARD 99)
 include(AddTestCMocka)
 
 # -ld link option is only available for gcc
-if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+if(UNIT_TESTING_MOCK_ENABLED)
     set(WRAP_FUNCTIONS "-Wl,--wrap=az_platform_clock_msec -Wl,--wrap=az_http_client_send_request")
 else()
     set(WRAP_FUNCTIONS "")
