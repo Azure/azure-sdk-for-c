@@ -59,13 +59,13 @@ bool az_log_should_write(az_log_classification classification)
 
   for (size_t i = 0; i < _az_log_classifications_length; ++i)
   {
-    // Return true if a classification is in the customer-provided whitelist.
+    // Return true if a classification is in the customer-provided allow list.
     if (_az_log_classifications[i] == classification)
     {
       return true;
     }
   }
 
-  // Classification is not in the whitelist - return false.
+  // Classification is not in the allow list - return false.
   return false;
 }
