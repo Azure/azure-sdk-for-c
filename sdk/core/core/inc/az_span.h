@@ -176,7 +176,7 @@ AZ_NODISCARD az_span az_span_from_str(char* str);
  * @param[in] span The original az_span
  * @param[in] low_index An index into the original az_span indicating where the returned az_span
  * will start
- * @param[in] high_index An index into the original az_span indicting where the returned az_span
+ * @param[in] high_index An index into the original az_span indicating where the returned az_span
  * should stop. The byte at the high_index is NOT included in the returned az_span.
  * @return An az_span (view) into a portion (from low_index to high_index - 1) of the original
  * az_span.
