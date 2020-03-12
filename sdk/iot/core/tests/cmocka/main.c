@@ -34,15 +34,29 @@ void az_iot_sas_token_generate_with_keyname_succeeds(void** state);
 // void test_az_iot_hub_client_telemetry_publish_topic_get_NULL_mqtt_topic_fails(void** state);
 // void test_az_iot_hub_client_telemetry_publish_topic_get_NULL_out_mqtt_topic_fails(void** state);
 void test_az_iot_hub_client_telemetry_publish_topic_get_no_options_no_params_succeed(void** state);
-void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_no_params_succeed(void** state);
-void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_with_params_succeed(void** state);
-void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_with_params_small_buffer_fails(void** state);
-void test_az_iot_hub_client_telemetry_publish_topic_get_no_options_with_params_succeed(void** state);
-void test_az_iot_hub_client_telemetry_publish_topic_get_no_options_with_params_small_buffer_fails(void** state);
-void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_module_id_with_params_succeed(void** state);
-void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_module_id_with_params_small_buffer_fails(void** state);
-void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_user_agent_with_params_succeed(void** state);
-void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_user_agent_with_params_small_buffer_fails(void** state);
+void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_no_params_succeed(
+    void** state);
+void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_with_params_succeed(
+    void** state);
+void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_with_params_small_buffer_fails(
+    void** state);
+void test_az_iot_hub_client_telemetry_publish_topic_get_no_options_with_params_succeed(
+    void** state);
+void test_az_iot_hub_client_telemetry_publish_topic_get_no_options_with_params_small_buffer_fails(
+    void** state);
+void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_module_id_with_params_succeed(
+    void** state);
+void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_module_id_with_params_small_buffer_fails(
+    void** state);
+void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_user_agent_with_params_succeed(
+    void** state);
+void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_user_agent_with_params_small_buffer_fails(
+    void** state);
+
+/*
+ * IoT Hub Client Unit Tests
+ */
+void test_az_iot_hub_client_get_default_options_succeed(void** state);
 
 int main()
 {
@@ -67,16 +81,29 @@ int main()
     // cmocka_unit_test(test_az_iot_hub_client_telemetry_publish_topic_get_NULL_client_fails),
     // cmocka_unit_test(test_az_iot_hub_client_telemetry_publish_topic_get_NULL_mqtt_topic_fails),
     // cmocka_unit_test(test_az_iot_hub_client_telemetry_publish_topic_get_NULL_out_mqtt_topic_fails),
-    cmocka_unit_test(test_az_iot_hub_client_telemetry_publish_topic_get_no_options_no_params_succeed),
-    cmocka_unit_test(test_az_iot_hub_client_telemetry_publish_topic_get_with_options_no_params_succeed),
-    cmocka_unit_test(test_az_iot_hub_client_telemetry_publish_topic_get_with_options_with_params_succeed),
-    cmocka_unit_test(test_az_iot_hub_client_telemetry_publish_topic_get_with_options_with_params_small_buffer_fails),
-    cmocka_unit_test(test_az_iot_hub_client_telemetry_publish_topic_get_no_options_with_params_succeed),
-    cmocka_unit_test(test_az_iot_hub_client_telemetry_publish_topic_get_no_options_with_params_small_buffer_fails),
-    cmocka_unit_test(test_az_iot_hub_client_telemetry_publish_topic_get_with_options_module_id_with_params_succeed),
-    cmocka_unit_test(test_az_iot_hub_client_telemetry_publish_topic_get_with_options_module_id_with_params_small_buffer_fails),
-    cmocka_unit_test(test_az_iot_hub_client_telemetry_publish_topic_get_with_options_user_agent_with_params_succeed),
-    cmocka_unit_test(test_az_iot_hub_client_telemetry_publish_topic_get_with_options_user_agent_with_params_small_buffer_fails),
+    cmocka_unit_test(
+        test_az_iot_hub_client_telemetry_publish_topic_get_no_options_no_params_succeed),
+    cmocka_unit_test(
+        test_az_iot_hub_client_telemetry_publish_topic_get_with_options_no_params_succeed),
+    cmocka_unit_test(
+        test_az_iot_hub_client_telemetry_publish_topic_get_with_options_with_params_succeed),
+    cmocka_unit_test(
+        test_az_iot_hub_client_telemetry_publish_topic_get_with_options_with_params_small_buffer_fails),
+    cmocka_unit_test(
+        test_az_iot_hub_client_telemetry_publish_topic_get_no_options_with_params_succeed),
+    cmocka_unit_test(
+        test_az_iot_hub_client_telemetry_publish_topic_get_no_options_with_params_small_buffer_fails),
+    cmocka_unit_test(
+        test_az_iot_hub_client_telemetry_publish_topic_get_with_options_module_id_with_params_succeed),
+    cmocka_unit_test(
+        test_az_iot_hub_client_telemetry_publish_topic_get_with_options_module_id_with_params_small_buffer_fails),
+    cmocka_unit_test(
+        test_az_iot_hub_client_telemetry_publish_topic_get_with_options_user_agent_with_params_succeed),
+    cmocka_unit_test(
+        test_az_iot_hub_client_telemetry_publish_topic_get_with_options_user_agent_with_params_small_buffer_fails),
+
+    // IoT Hub Client
+    cmocka_unit_test(test_az_iot_hub_client_get_default_options_succeed),
   };
 
   return cmocka_run_group_tests_name("az_iot", tests, NULL, NULL);
