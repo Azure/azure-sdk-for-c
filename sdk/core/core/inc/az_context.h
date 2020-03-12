@@ -121,10 +121,10 @@ AZ_NODISCARD AZ_INLINE bool az_context_has_expired(az_context const* context, in
  *
  * @param[in] context The az_context node in the tree where checking starts.
  * @param[in] key A pointer to the key to be scanned for
- * @param[in] value A pointer to a 'void*' that will receive the key's associated value if the key
+ * @param[in] out_value A pointer to a 'void*' that will receive the key's associated value if the key
  * is found
- * @return  AZ_OK if the key is found
- *          AZ_ERROR_ITEM_NOT_FOUND if no nodes are found with the specified key.
+ * @return  #AZ_OK if the key is found
+ *          #AZ_ERROR_ITEM_NOT_FOUND if no nodes are found with the specified key.
  */
 AZ_NODISCARD az_result az_context_get_value(az_context const* context, void* key, void** out_value);
 
