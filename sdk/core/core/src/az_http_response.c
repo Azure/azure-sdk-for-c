@@ -137,7 +137,7 @@ AZ_NODISCARD az_result az_http_response_get_next_header(az_http_response* self, 
       return AZ_ERROR_ITEM_NOT_FOUND;
     }
     // Can't read a header if status line was not previously called,
-    // User needs to call az_http_response_status_line() witch would reset parser and set kind to
+    // User needs to call az_http_response_status_line() which would reset parser and set kind to
     // headers
     if (kind != AZ_HTTP_RESPONSE_KIND_HEADER)
     {
