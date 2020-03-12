@@ -118,7 +118,7 @@ AZ_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t length, int32_t capacity
 AZ_NODISCARD az_span az_span_from_str(char* str);
 
 /**
- * @brief AZ_SPAN_LITERAL_FROM_BUFFER returns a literal az_span over an unitialized byte buffer. For
+ * @brief AZ_SPAN_LITERAL_FROM_BUFFER returns a literal az_span over an uninitialized byte buffer. For
  * example:
  *
  * uint8_t buffer[1024];
@@ -184,7 +184,7 @@ AZ_NODISCARD az_span az_span_from_str(char* str);
 AZ_NODISCARD az_span az_span_slice(az_span span, int32_t low_index, int32_t high_index);
 
 /**
- * @brief az_span_is_content_equal returns `true` if the lengths and bytes refered by \p span1 and
+ * @brief az_span_is_content_equal returns `true` if the lengths and bytes referred by \p span1 and
  * \p span2 are identical.
  *
  * @return Returns true if the lengths of both spans are identical and the bytes in both spans are
@@ -198,7 +198,7 @@ AZ_NODISCARD AZ_INLINE bool az_span_is_content_equal(az_span span1, az_span span
 
 /**
  * @brief az_span_is_content_equal_ignoring_case returns `true` if the lengths and characters
- * refered to by \p span1 and \p span2 are identical except for case. This function assumes the bytes in
+ * referred to by \p span1 and \p span2 are identical except for case. This function assumes the bytes in
  * both spans are ASCII characters.
  *
  * @return Returns true if the lengths of both spans are identical and the ASCII characters in both
@@ -210,7 +210,7 @@ AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1, az_span 
  * @brief az_span_to_str copies a source span containing a string (not 0-terminated) to a
  destination char buffer and appends the 0-terminating byte.
 
- * The buffer refered to by destination must have a max_size that is at least 1 byte bigger
+ * The buffer referred to by destination must have a max_size that is at least 1 byte bigger
  than the source az_span
  *  the string in converts \p destination span to zero-terminated str. Content is copied to \p source
  buffer and then \0 is
@@ -219,8 +219,9 @@ AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1, az_span 
  * @param[in] destination A pointer to a buffer where the string should be copied
  * @param[in] destination_max_size The maximum available space within the buffer referred to by destination.
  * @param[in] source The az_span containing the not-0-terminated string
- * @return #AZ_OK if the span's string is copied sucessfully to the destination.
- *         #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the destination buffer is too small to
+ * @return An #az_result value indicating the result of the operation.
+ *          #AZ_OK If /p source span's content is successfully copied to the destination.
+ *          #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the /p destination buffer is too small to
  copy the string and 0-terminate it
  */
 AZ_NODISCARD az_result
@@ -233,7 +234,8 @@ az_span_to_str(char* destination, int32_t destination_max_size, az_span source);
  *
  * @param[in] span The az_span containing the ASCII digits to be parsed.
  * @param[in] out_number The pointer to the variable that is to receive the number
- * @return  #AZ_OK if successful
+ * @return An #az_result value indicating the result of the operation.
+ *          #AZ_OK if successful
  *          #AZ_ERROR_PARSER_UNEXPECTED_CHAR if a non-ASCII digit is found within the span.
  */
 
@@ -244,7 +246,9 @@ AZ_NODISCARD az_result az_span_to_uint64(az_span span, uint64_t* out_number);
  *
  * @param span The az_span containing the ASCII digits to be parsed.
  * @param out_number The pointer to the variable that is to receive the number
- * @return Returns AZ_OK if successful; AZ_ERROR_PARSER_UNEXPECTED_CHAR if a non-ASCII digit
+ * @return An #az_result value indicating the result of the operation.
+ *          #AZ_OK if successful
+ *          #AZ_ERROR_PARSER_UNEXPECTED_CHAR if a non-ASCII digit
  * is found within the span.
  */
 AZ_NODISCARD az_result az_span_to_uint32(az_span span, uint32_t* out_number);
@@ -259,7 +263,8 @@ AZ_NODISCARD az_result az_span_to_uint32(az_span span, uint32_t* out_number);
  * @param[in] byte The uint8 to append to the destination span
  * @param[out] out_span A pointer to an az_span that receives the span referring to the
  * destination span with its length increased by 1
- * @return  #AZ_OK if successful
+ * @return An #az_result value indicating the result of the operation.
+ *          #AZ_OK if successful
  *          #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the destination is not big enough to
  * contain the appended byte
  */
@@ -273,8 +278,10 @@ AZ_NODISCARD az_result az_span_append_uint8(az_span destination, uint8_t byte, a
  * @param[in] source Refers to the bytes to be appended to the destination
  * @param[out] out_span A pointer to an az_span that receives the span referring to the
  * destination span with its length updated.
- * @return AZ_OK if sucessful; AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the destination is not
- * big enough to contain the appended bytes.
+ * @return An #az_result value indicating the result of the operation.
+ *          #AZ_OK if successful
+ *          #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the /p destination is not big enough to
+ *  contain the appended bytes.
  */
 AZ_NODISCARD az_result az_span_append(az_span destination, az_span source, az_span* out_span);
 
@@ -289,7 +296,7 @@ AZ_NODISCARD az_result az_span_append(az_span destination, az_span source, az_sp
  * destination span with its length updated
  * @return An #az_result value indicating the result of the operation.
  *          #AZ_OK if successful
- *          #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the destination is not big enough to
+ *          #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the /p destination is not big enough to
  * contain the appended bytes
  */
 AZ_NODISCARD az_result
@@ -383,8 +390,9 @@ AZ_INLINE void az_span_set(az_span destination, uint8_t fill)
  * @param[in] source The span containing the bytes to copy to the destination
  * @param[out] out_span A pointer to an az_span that receives the span referring to the destination
  * span with its length updated
- * @return  #AZ_OK if successful
- *          #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the destination is not big enough to hold the
+ * @return An #az_result value indicating the result of the operation.
+ *          #AZ_OK if successful
+ *          #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the /p destination is not big enough to hold the
  * source's length
  */
 AZ_NODISCARD az_result az_span_copy(az_span destination, az_span source, az_span* out_span);
@@ -397,8 +405,9 @@ AZ_NODISCARD az_result az_span_copy(az_span destination, az_span source, az_span
  * @param[in] source The span containing the non-url-encoded bytes
  * @param[out] out_span A pointer to an az_span that receives the span referring to the
  * destination span with its length updated
- * @return  #AZ_OK if successful
- *          #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the destination is not big enough to
+ * @return An #az_result value indicating the result of the operation.
+ *          #AZ_OK if successful
+ *          #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the /p destination is not big enough to
  * hold the source's length
  */
 AZ_NODISCARD az_result
