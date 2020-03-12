@@ -148,7 +148,7 @@ AZ_NODISCARD az_result az_keyvault_keys_client_init(
 
 AZ_NODISCARD az_keyvault_create_key_options az_keyvault_create_key_options_default()
 {
-  return (az_keyvault_create_key_options){ .enabled = false, .operations = NULL, .tags = NULL };
+  return (az_keyvault_create_key_options){ .operations = NULL, .tags = NULL };
 }
 
 /**
@@ -179,15 +179,6 @@ AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
   {
     // Attributes
     {
-      az_optional_bool const enabled_field = options->enabled;
-      if (enabled_field.is_present)
-      {
-        AZ_RETURN_IF_FAILED(az_json_builder_append_object(
-            &builder, AZ_SPAN_FROM_STR("attributes"), az_json_token_object()));
-        AZ_RETURN_IF_FAILED(az_json_builder_append_object(
-            &builder, AZ_SPAN_FROM_STR("enabled"), az_json_token_boolean(enabled_field.data)));
-        AZ_RETURN_IF_FAILED(az_json_builder_append_object_close(&builder));
-      }
       // operations
       if (options->operations != NULL)
       {
