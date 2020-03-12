@@ -86,7 +86,7 @@ AZ_NODISCARD az_result az_json_builder_append_token(az_json_builder* self, az_js
     case AZ_JSON_TOKEN_NUMBER:
     {
       self->_internal.need_comma = true;
-      return az_span_append_double(*json, token.value.number, json);
+      return az_span_append_dtoa(*json, token.value.number, json);
     }
     case AZ_JSON_TOKEN_OBJECT:
     {

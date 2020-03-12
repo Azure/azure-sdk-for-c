@@ -15,6 +15,6 @@ void test_az_iot_hub_client_get_default_options_succeed(void** state)
   (void)state;
 
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
-  assert_true(az_span_is_equal(options.module_id, AZ_SPAN_NULL));
-  assert_true(az_span_is_equal(options.user_agent, AZ_SPAN_NULL));
+  assert_true(az_span_is_content_equal(options.module_id, AZ_SPAN_NULL));
+  assert_true(az_span_is_content_equal(options.user_agent, AZ_SPAN_NULL));
 }

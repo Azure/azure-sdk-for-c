@@ -36,7 +36,7 @@ static void _log_listener(az_log_classification classification, az_span message)
   {
     case AZ_LOG_HTTP_REQUEST:
       _log_invoked_for_http_request = true;
-      assert_true(az_span_is_equal(
+      assert_true(az_span_is_content_equal(
           message,
           AZ_SPAN_FROM_STR("HTTP Request : GET https://www.example.com\n"
                            "\tHeader1 : Value1\n"
@@ -45,7 +45,7 @@ static void _log_listener(az_log_classification classification, az_span message)
       break;
     case AZ_LOG_HTTP_RESPONSE:
       _log_invoked_for_http_response = true;
-      assert_true(az_span_is_equal(
+      assert_true(az_span_is_content_equal(
           message,
           AZ_SPAN_FROM_STR("HTTP Response (3456ms) : 404 Not Found\n"
                            "\tHeader11 : Value11\n"
@@ -72,11 +72,11 @@ static void _log_listener_NULL(az_log_classification classification, az_span mes
   {
     case AZ_LOG_HTTP_REQUEST:
       _log_invoked_for_http_request = true;
-      assert_true(az_span_is_equal(message, AZ_SPAN_FROM_STR("HTTP Request : NULL")));
+      assert_true(az_span_is_content_equal(message, AZ_SPAN_FROM_STR("HTTP Request : NULL")));
       break;
     case AZ_LOG_HTTP_RESPONSE:
       _log_invoked_for_http_response = true;
-      assert_true(az_span_is_equal(message, AZ_SPAN_FROM_STR("")));
+      assert_true(az_span_is_content_equal(message, AZ_SPAN_FROM_STR("")));
       break;
     default:
       assert_true(false);

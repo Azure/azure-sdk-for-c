@@ -92,7 +92,7 @@ static az_result _az_http_policy_logging_append_http_response_msg(
   AZ_RETURN_IF_FAILED(
       az_span_append(*ref_log_msg, AZ_SPAN_FROM_STR("HTTP Response ("), ref_log_msg));
 
-  AZ_RETURN_IF_FAILED(az_span_append_int64(ref_log_msg, duration_msec));
+  AZ_RETURN_IF_FAILED(az_span_append_i64toa(*ref_log_msg, duration_msec, ref_log_msg));
   AZ_RETURN_IF_FAILED(az_span_append(*ref_log_msg, AZ_SPAN_FROM_STR("ms) "), ref_log_msg));
 
   if (ref_response == NULL || az_span_length(ref_response->_internal.http_response) == 0)
@@ -106,7 +106,7 @@ static az_result _az_http_policy_logging_append_http_response_msg(
   az_http_response_status_line status_line = { 0 };
   AZ_RETURN_IF_FAILED(az_http_response_get_status_line(ref_response, &status_line));
 
-  AZ_RETURN_IF_FAILED(az_span_append_uint64(ref_log_msg, (uint64_t)status_line.status_code));
+  AZ_RETURN_IF_FAILED(az_span_append_u64toa(*ref_log_msg, (uint64_t)status_line.status_code, ref_log_msg));
 
   AZ_RETURN_IF_FAILED(az_span_append(*ref_log_msg, AZ_SPAN_FROM_STR(" "), ref_log_msg));
   AZ_RETURN_IF_FAILED(az_span_append(*ref_log_msg, status_line.reason_phrase, ref_log_msg));
