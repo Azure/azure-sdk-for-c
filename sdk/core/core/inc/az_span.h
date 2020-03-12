@@ -217,7 +217,7 @@ AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1, az_span 
  * addeed at the end. Then out_result will be created out of buffer
  *
  * @param[in] destination A pointer to a buffer where the string should be copied
- * @param[in] destination_max_size The maximum size of the buffer refered to by destination
+ * @param[in] destination_max_size The maximum available space within the buffer referred to by destination.
  * @param[in] source The az_span containing the not-0-terminated string
  * @return #AZ_OK if the span's string is copied sucessfully to the destination.
  *         #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the destination buffer is too small to
