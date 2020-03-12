@@ -15,6 +15,7 @@ add_library (
     ${TARGET_NAME}
     src/az_iot_sas_token.c
     src/az_iot_telemetry.c
+    src/az_iot_hub_client.c
 )
 
 target_include_directories (${TARGET_NAME} PUBLIC inc)
