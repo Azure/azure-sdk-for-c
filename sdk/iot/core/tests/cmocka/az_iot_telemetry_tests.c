@@ -10,10 +10,6 @@
 
 #include <cmocka.h>
 
-#define TEST_CORRECT_TOPIC_PREFIX "devices/"
-#define TEST_CORRECT_TOPIC_SUFFIX "/messages/events/"
-#define TEST_CORRECT_TOPIC_MODULES_MID "/modules/"
-
 #define TEST_FQDN "myiothub.azure-devices.net"
 #define TEST_DEVICE_ID "my_device"
 #define TEST_MODULE_ID "my_module_id"
