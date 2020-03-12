@@ -134,7 +134,7 @@ AZ_NODISCARD az_span az_span_from_str(char* str);
   }
 
 /**
- * @brief AZ_SPAN_FROM_BUFFER returns an az_span expression over an unitialized byte buffer. For
+ * @brief AZ_SPAN_FROM_BUFFER returns an az_span expression over an uninitialized byte buffer. For
  * example:
  *
  * uint8_t buffer[1024];
