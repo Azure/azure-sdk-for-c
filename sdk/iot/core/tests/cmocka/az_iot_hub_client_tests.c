@@ -77,7 +77,8 @@ void test_az_iot_hub_client_user_name_get_succeed(void** state)
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, &options) == AZ_OK);
 
   uint8_t test_span_buffer[sizeof(test_correct_user_name)];
-  az_span test_span = AZ_SPAN_FROM_BUFFER(test_span_buffer);
+  az_span test_span
+      = az_span_init(test_span_buffer, 0, sizeof(test_span_buffer) / sizeof(test_span_buffer[0]));
   assert_true(az_iot_hub_client_user_name_get(&client, test_span, &test_span) == AZ_OK);
 
   assert_string_equal(test_correct_user_name, az_span_ptr(test_span));
@@ -93,7 +94,8 @@ void test_az_iot_hub_client_user_name_get_small_buffer_fail(void** state)
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, &options) == AZ_OK);
 
   uint8_t test_span_buffer[sizeof(test_correct_user_name) - 1];
-  az_span test_span = AZ_SPAN_FROM_BUFFER(test_span_buffer);
+  az_span test_span
+      = az_span_init(test_span_buffer, 0, sizeof(test_span_buffer) / sizeof(test_span_buffer[0]));
   assert_true(
       az_iot_hub_client_user_name_get(&client, test_span, &test_span)
       == AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY);
@@ -111,7 +113,8 @@ void test_az_iot_hub_client_user_name_get_user_options_succeed(void** state)
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, &options) == AZ_OK);
 
   uint8_t test_span_buffer[sizeof(test_correct_user_name_with_module_id)];
-  az_span test_span = AZ_SPAN_FROM_BUFFER(test_span_buffer);
+  az_span test_span
+      = az_span_init(test_span_buffer, 0, sizeof(test_span_buffer) / sizeof(test_span_buffer[0]));
   assert_true(az_iot_hub_client_user_name_get(&client, test_span, &test_span) == AZ_OK);
 
   assert_string_equal(test_correct_user_name_with_module_id, az_span_ptr(test_span));
@@ -129,7 +132,8 @@ void test_az_iot_hub_client_user_name_get_user_options_small_buffer_fail(void** 
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, &options) == AZ_OK);
 
   uint8_t test_span_buffer[sizeof(test_correct_user_name_with_module_id) - 1];
-  az_span test_span = AZ_SPAN_FROM_BUFFER(test_span_buffer);
+  az_span test_span
+      = az_span_init(test_span_buffer, 0, sizeof(test_span_buffer) / sizeof(test_span_buffer[0]));
   assert_true(
       az_iot_hub_client_user_name_get(&client, test_span, &test_span)
       == AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY);
@@ -145,7 +149,8 @@ void test_az_iot_hub_client_client_id_get_succeed(void** state)
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, &options) == AZ_OK);
 
   uint8_t test_span_buffer[sizeof(test_correct_client_id)];
-  az_span test_span = AZ_SPAN_FROM_BUFFER(test_span_buffer);
+  az_span test_span
+      = az_span_init(test_span_buffer, 0, sizeof(test_span_buffer) / sizeof(test_span_buffer[0]));
   assert_true(az_iot_hub_client_id_get(&client, test_span, &test_span) == AZ_OK);
 
   assert_string_equal(test_correct_client_id, az_span_ptr(test_span));
@@ -161,7 +166,8 @@ void test_az_iot_hub_client_client_id_get_small_buffer_fail(void** state)
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, &options) == AZ_OK);
 
   uint8_t test_span_buffer[sizeof(test_correct_client_id) - 1];
-  az_span test_span = AZ_SPAN_FROM_BUFFER(test_span_buffer);
+  az_span test_span
+      = az_span_init(test_span_buffer, 0, sizeof(test_span_buffer) / sizeof(test_span_buffer[0]));
   assert_true(
       az_iot_hub_client_id_get(&client, test_span, &test_span)
       == AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY);
@@ -177,8 +183,9 @@ void test_az_iot_hub_client_client_id_module_get_succeed(void** state)
   assert_true(
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, &options) == AZ_OK);
 
-  uint8_t test_span_buffer[sizeof(test_correct_client_id_with_module_id)];
-  az_span test_span = AZ_SPAN_FROM_BUFFER(test_span_buffer);
+  uint8_t test_span_buffer[sizeof(test_correcet_client_id_with_module_id)];
+  az_span test_span
+      = az_span_init(test_span_buffer, 0, sizeof(test_span_buffer) / sizeof(test_span_buffer[0]));
   assert_true(az_iot_hub_client_id_get(&client, test_span, &test_span) == AZ_OK);
 
   assert_string_equal(test_correct_client_id_with_module_id, az_span_ptr(test_span));
@@ -194,8 +201,9 @@ void test_az_iot_hub_client_client_id_module_get_small_buffer_fail(void** state)
   assert_true(
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, &options) == AZ_OK);
 
-  uint8_t test_span_buffer[sizeof(test_correct_client_id_with_module_id) - 1];
-  az_span test_span = AZ_SPAN_FROM_BUFFER(test_span_buffer);
+  uint8_t test_span_buffer[sizeof(test_correcet_client_id_with_module_id) - 1];
+  az_span test_span
+      = az_span_init(test_span_buffer, 0, sizeof(test_span_buffer) / sizeof(test_span_buffer[0]));
   assert_true(
       az_iot_hub_client_id_get(&client, test_span, &test_span)
       == AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY);
