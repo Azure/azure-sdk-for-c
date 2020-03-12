@@ -34,7 +34,7 @@ void test_json_value(void** state)
   {
     az_span string_value = { 0 };
     assert_true(az_json_token_get_string(json_string, &string_value) == AZ_OK);
-    assert_true(az_span_is_equal(string_value, AZ_SPAN_FROM_STR("Hello")));
+    assert_true(az_span_is_content_equal(string_value, AZ_SPAN_FROM_STR("Hello")));
   }
   // string from boolean
   {

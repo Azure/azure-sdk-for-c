@@ -54,10 +54,11 @@ void test_url_encode(void** state)
 
     TEST_EXPECT_SUCCESS(
         az_span_copy_url_encode(builder, AZ_SPAN_FROM_STR("https://vault.azure.net"), &builder));
-    assert_true(az_span_is_equal(builder, AZ_SPAN_FROM_STR("https%3A%2F%2Fvault.azure.net")));
+    assert_true(
+        az_span_is_content_equal(builder, AZ_SPAN_FROM_STR("https%3A%2F%2Fvault.azure.net")));
 
     builder = AZ_SPAN_FROM_BUFFER(buffer);
     TEST_EXPECT_SUCCESS(az_span_copy_url_encode(builder, uri_decoded, &builder));
-    assert_true(az_span_is_equal(builder, uri_encoded));
+    assert_true(az_span_is_content_equal(builder, uri_encoded));
   }
 }
