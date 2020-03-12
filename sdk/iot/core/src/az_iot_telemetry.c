@@ -27,8 +27,8 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_publish_topic_get(
   AZ_PRECONDITION_VALID_SPAN(mqtt_topic, 0, false);
   AZ_PRECONDITION_NOT_NULL(out_mqtt_topic);
 
-  az_span* user_agent = (az_span*)&(client->_internal.options.user_agent);
-  az_span* module_id = (az_span*)&(client->_internal.options.module_id);
+  const az_span* user_agent = &(client->_internal.options.user_agent);
+  const az_span* module_id = &(client->_internal.options.module_id);
 
   // Required topic parts
   int32_t required_size = az_span_length(telemetry_topic_prefix)
