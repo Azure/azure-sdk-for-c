@@ -185,8 +185,8 @@ void test_az_log(void** state)
     }
 
     // Verify that if customer specifies the classifications, we'll only invoking the logging
-    // callback with the classification that's in the whitelist, and nothing is going to happen when
-    // our code attempts to log a classification that's not in the customer's whitelist.
+    // callback with the classification that's in the allow list, and nothing is going to happen when
+    // our code attempts to log a classification that's not in the customer's allow list.
     az_log_classification const classifications[] = { AZ_LOG_HTTP_REQUEST };
     az_log_set_classifications(
         classifications, sizeof(classifications) / sizeof(classifications[0]));
