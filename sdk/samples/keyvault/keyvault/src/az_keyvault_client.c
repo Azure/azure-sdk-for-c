@@ -10,6 +10,7 @@
 #include <az_json.h>
 #include <az_keyvault.h>
 #include <az_precondition.h>
+#include <az_precondition_internal.h>
 #include <az_span.h>
 
 #include <stddef.h>
