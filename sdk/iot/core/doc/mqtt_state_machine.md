@@ -30,12 +30,12 @@ For more information about Azure IoT services using MQTT see https://docs.micros
 ## Design Decisions
 Porting requirements:
 - The target platform C99 compiler is generating reentrant code. The target platform supports a stack of several kB.
-- Our SDK relies on types such as `uint8_t` existing. If a platform doesn't already have them defined, they should be added to the application code using `typedef` statements.
+- The SDK relies on types such as `uint8_t` existing. If a platform doesn't already have them defined, they should be added to the application code using `typedef` statements.
 
 The SDK is provided only for the MQTT protocol. Support for WebSocket/WebProxy tunneling as well as TLS security is not handled by the SDK.
 
 Assumptions and recommendations for the application:
-- Our API does not support unsubscribing from any of the previously subscribed topics. We assume that the device will only set-up topics that must be used.
+- The SDK does not support unsubscribing from any of the previously subscribed topics. We assume that the device will only set-up topics that must be used.
 
 ## API
 
@@ -44,7 +44,7 @@ Assumptions and recommendations for the application:
 The application code is required to initialize the TLS and MQTT stacks.
 Two authentication schemes are currently supported: _X509 Client Certificate Authentication_ and _Shared Access Signature_ authentication. 
 
-When X509 client authenticaiton is used, the MQTT password field should be an empty string.
+When X509 client authentication is used, the MQTT password field should be an empty string.
 
 If SAS tokens are used the following APIs provide a way to create as well as refresh the lifetime of the used token upon reconnect.
 
@@ -141,11 +141,11 @@ _Example:_
 
 ### Retrying Operations
 
-The IoT Core SDK documents and provides APIs for the error policy and timing policies separately. We are also supplying optional APIs for error classification and retry timing.
+Retrying operations requires understanding two aspects: error evaluation (did the operation fail, should the operation be retried) and retry timing (how long to delay before retrying the operation). The IoT Embedded Devices SDK is supplying optional APIs for error classification and retry timing.
 
 #### Error policy
 
-Our SDK will not handle protocol-level (WebSocket, MQTT, TLS or TCP) errors. The application-developer is expected to classify and handle errors the following way:
+The SDK will not handle protocol-level (WebSocket, MQTT, TLS or TCP) errors. The application-developer is expected to classify and handle errors the following way:
 
 - Authentication errors should not be retried.
 - Communication-related errors other than ones security-related should be considered retriable.
@@ -156,7 +156,7 @@ Both IoT Hub and Provisioning services will use `MQTT CONNACK` as described in S
 
 APIs using `az_iot_hub_client_status` report service-side errors to the client through the IoT Hub protocols. (At the time of writing, only Twin responses may return errors.)
 
-The following APIs may be used to determine if the status indicates error and if the error should be retried:
+The following APIs may be used to determine if the status indicates an error and if the operation should be retried:
 
 ```C
 az_iot_hub_client_status status = response.status;
@@ -180,7 +180,7 @@ else
 ##### Provisioning Service Errors
 
 Each Provisioning operation will return a status encoded as `az_iot_provisioning_client_status`.
-After the register operation is complete the `az_iot_provisioning_client_registration_state registration_information` field will contain the `az_iot_provisioning_client_status error_code` that represents the overall status of the registration operation.  
+After the register operation is complete, the `az_iot_provisioning_client_registration_state registration_information` field will contain the `az_iot_provisioning_client_status error_code` that represents the overall status of the registration operation.  
 
 The following APIs may be used to determine if the status indicates error and if the error should be retried:
 
@@ -219,7 +219,7 @@ int32_t delay_msec = max(operation_msec - total_delay_msec, 0);
 
 _Note 1_: The network stack may have used more time than the recommended delay before timing out. (e.g. The operation timed out after 2 minutes while the delay between operations is 1 second). In this case there is no need to delay the next operation.
 
-_Note 2_: To determine the parameters of the exponential with back-off retry strategy we recommend modeling the network characteristics (including failure-modes). Compare the results with defined SLAs for device connectivity (e.g. 1M devices must be connected in under 30 minutes) and with the available IoT Azure scale (especially consider _throttling_, _quotas_ and maximum _requests/connects per second_).
+_Note 2_: To determine the parameters of the exponential with back-off retry strategy, we recommend modeling the network characteristics (including failure-modes). Compare the results with defined SLAs for device connectivity (e.g. 1M devices must be connected in under 30 minutes) and with the available IoT Azure scale (especially consider _throttling_, _quotas_ and maximum _requests/connects per second_).
 
 In the absence of modeling, we recommend the following default:
 ```C
@@ -250,7 +250,7 @@ Combining the functions above we recommend the following flow:
 
 ![image](resources/iot_retry_flow.png "IoT MQTT Retry Flow")
 
-When devices are using IoT Hub without Provisioning Service we recommend attempting to rotate the IoT Credentials (SAS Token or X509 Certificate) on authentication issues.
+When devices are using IoT Hub without Provisioning Service, we recommend attempting to rotate the IoT Credentials (SAS Token or X509 Certificate) on authentication issues.
 
 _Note:_ Authentication issues observed in the following cases do not require credentials to be rotated and require further user actions:
 - DNS issues (such as WiFi Captive Portal redirects)
