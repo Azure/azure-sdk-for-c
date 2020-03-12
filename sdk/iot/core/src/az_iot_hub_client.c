@@ -57,9 +57,9 @@ AZ_NODISCARD az_result az_iot_hub_client_user_name_get(
             az_span_length(client->_internal.iot_hub_hostname) + sizeof(hub_client_forward_slash)
             + az_span_length(client->_internal.device_id) + sizeof(hub_client_forward_slash)
             + az_span_length(*module_id)
-            + (az_span_length(*module_id) != 0 ? sizeof(hub_client_forward_slash) : 0)
+            + (az_span_length(*module_id) > 0 ? sizeof(hub_client_forward_slash) : 0)
             + az_span_length(*user_agent)
-            + (az_span_length(*user_agent) != 0 ? sizeof(hub_client_param_separator) : 0)
+            + (az_span_length(*user_agent) > 0 ? sizeof(hub_client_param_separator) : 0)
             + az_span_length(hub_client_api_version) + sizeof(hub_client_null_terminate)))
   {
     return AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY;
