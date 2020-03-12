@@ -8,6 +8,12 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake-modules")
 option(WARNINGS_AS_ERRORS "Treat compiler warnings as errors" ON)
 option(BUILD_CURL_TRANSPORT "Build internal http transport implementation with CURL for HTTP Pipeline" OFF)
 option(UNIT_TESTING "Build unit test projects" OFF)
+option(UNIT_TESTING_MOCK_ENABLED "wrap PAL functions with mock implementation for tests" OFF)
+
+#enable mock functions with link option -ld
+if(UNIT_TESTING_MOCK_ENABLED)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DMOCK_ENABLED")
+endif()
 
 if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
   set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
