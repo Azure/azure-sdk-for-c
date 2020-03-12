@@ -10,6 +10,8 @@ struct az_platform_mtx
 {
   struct
   {
+    // We can't have an empty struct because C
+    // requires that a struct or union have at least one member.
     char unused;
   } _internal;
 };
