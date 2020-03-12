@@ -55,4 +55,6 @@ typedef void (*az_precondition_failed_fn)();
  */
 void az_precondition_failed_set_callback(az_precondition_failed_fn az_precondition_failed_callback);
 
+#include <_az_cfg_suffix.h>
+
 #endif // _az_PRECONDITION_H
