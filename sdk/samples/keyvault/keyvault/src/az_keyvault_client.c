@@ -196,7 +196,7 @@ AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
         for (size_t op = 0; true; ++op)
         {
           az_span s = options->operations[op];
-          if (az_span_is_equal(s, AZ_SPAN_NULL))
+          if (az_span_is_content_equal(s, AZ_SPAN_NULL))
           {
             break;
           }
@@ -212,7 +212,7 @@ AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
         for (size_t tag_index = 0; true; ++tag_index)
         {
           az_pair const tag = options->tags[tag_index];
-          if (az_span_is_equal(tag.key, AZ_SPAN_NULL))
+          if (az_span_is_content_equal(tag.key, AZ_SPAN_NULL))
           {
             break;
           }

@@ -38,7 +38,7 @@ void az_span_append_uint8_succeeds()
   assert_true(az_succeeded(az_span_append_uint8(buffer, 'a', &buffer)));
   assert_true(az_succeeded(az_span_append_uint8(buffer, 'b', &buffer)));
   assert_true(az_succeeded(az_span_append_uint8(buffer, 'c', &buffer)));
-  assert_true(az_span_is_equal(buffer, AZ_SPAN_FROM_STR("abc")));
+  assert_true(az_span_is_content_equal(buffer, AZ_SPAN_FROM_STR("abc")));
 }
 
 void az_span_append_i32toa_succeeds()
@@ -49,7 +49,7 @@ void az_span_append_i32toa_succeeds()
   az_span out_span;
 
   assert_true(az_succeeded(az_span_append_i32toa(buffer, v, &out_span)));
-  assert_true(az_span_is_equal(out_span, AZ_SPAN_FROM_STR("12345")));
+  assert_true(az_span_is_content_equal(out_span, AZ_SPAN_FROM_STR("12345")));
 }
 
 void az_span_append_i32toa_negative_succeeds()
@@ -60,7 +60,7 @@ void az_span_append_i32toa_negative_succeeds()
   az_span out_span;
 
   assert_true(az_succeeded(az_span_append_i32toa(buffer, v, &out_span)));
-  assert_true(az_span_is_equal(out_span, AZ_SPAN_FROM_STR("-12345")));
+  assert_true(az_span_is_content_equal(out_span, AZ_SPAN_FROM_STR("-12345")));
 }
 
 void az_span_append_i32toa_zero_succeeds()
@@ -71,7 +71,7 @@ void az_span_append_i32toa_zero_succeeds()
   az_span out_span;
 
   assert_true(az_succeeded(az_span_append_i32toa(buffer, v, &out_span)));
-  assert_true(az_span_is_equal(out_span, AZ_SPAN_FROM_STR("0")));
+  assert_true(az_span_is_content_equal(out_span, AZ_SPAN_FROM_STR("0")));
 }
 
 void az_span_append_i32toa_max_int_succeeds()
@@ -82,7 +82,7 @@ void az_span_append_i32toa_max_int_succeeds()
   az_span out_span;
 
   assert_true(az_succeeded(az_span_append_i32toa(buffer, v, &out_span)));
-  assert_true(az_span_is_equal(out_span, AZ_SPAN_FROM_STR("2147483647")));
+  assert_true(az_span_is_content_equal(out_span, AZ_SPAN_FROM_STR("2147483647")));
 }
 
 void az_span_append_i32toa_NULL_span_fails()
@@ -93,7 +93,7 @@ void az_span_append_i32toa_NULL_span_fails()
   az_span out_span;
 
   assert_true(az_succeeded(az_span_append_i32toa(buffer, v, &out_span)));
-  assert_true(az_span_is_equal(out_span, AZ_SPAN_FROM_STR("2147483647")));
+  assert_true(az_span_is_content_equal(out_span, AZ_SPAN_FROM_STR("2147483647")));
 }
 
 void az_span_append_i32toa_overflow_fails()
@@ -114,7 +114,7 @@ void az_span_append_u32toa_succeeds()
   az_span out_span;
 
   assert_true(az_succeeded(az_span_append_u32toa(buffer, v, &out_span)));
-  assert_true(az_span_is_equal(out_span, AZ_SPAN_FROM_STR("12345")));
+  assert_true(az_span_is_content_equal(out_span, AZ_SPAN_FROM_STR("12345")));
 }
 
 void az_span_append_u32toa_zero_succeeds()
@@ -125,7 +125,7 @@ void az_span_append_u32toa_zero_succeeds()
   az_span out_span;
 
   assert_true(az_succeeded(az_span_append_u32toa(buffer, v, &out_span)));
-  assert_true(az_span_is_equal(out_span, AZ_SPAN_FROM_STR("0")));
+  assert_true(az_span_is_content_equal(out_span, AZ_SPAN_FROM_STR("0")));
 }
 
 void az_span_append_u32toa_max_uint_succeeds()
@@ -136,7 +136,7 @@ void az_span_append_u32toa_max_uint_succeeds()
   az_span out_span;
 
   assert_true(az_succeeded(az_span_append_u32toa(buffer, v, &out_span)));
-  assert_true(az_span_is_equal(out_span, AZ_SPAN_FROM_STR("4294967295")));
+  assert_true(az_span_is_content_equal(out_span, AZ_SPAN_FROM_STR("4294967295")));
 }
 
 void az_span_append_u32toa_NULL_span_fails()
@@ -147,7 +147,7 @@ void az_span_append_u32toa_NULL_span_fails()
   az_span out_span;
 
   assert_true(az_succeeded(az_span_append_u32toa(buffer, v, &out_span)));
-  assert_true(az_span_is_equal(out_span, AZ_SPAN_FROM_STR("2147483647")));
+  assert_true(az_span_is_content_equal(out_span, AZ_SPAN_FROM_STR("2147483647")));
 }
 
 void az_span_append_u32toa_overflow_fails()
@@ -211,8 +211,8 @@ void test_az_span(void** state)
     az_span const a = AZ_SPAN_FROM_INITIALIZED_BUFFER(a_array);
     az_span const b = AZ_SPAN_FROM_INITIALIZED_BUFFER(b_array);
     _az_span_swap(a, b);
-    assert_true(az_span_is_equal(a, AZ_SPAN_FROM_STR("Goodbye!\0ld!\0")));
-    assert_true(az_span_is_equal(b, AZ_SPAN_FROM_STR("Hello wor")));
+    assert_true(az_span_is_content_equal(a, AZ_SPAN_FROM_STR("Goodbye!\0ld!\0")));
+    assert_true(az_span_is_content_equal(b, AZ_SPAN_FROM_STR("Hello wor")));
   }
   // swap an empty span
   {
@@ -220,8 +220,8 @@ void test_az_span(void** state)
     az_span const a = AZ_SPAN_FROM_INITIALIZED_BUFFER(a_array);
     az_span const b = { 0 };
     _az_span_swap(a, b);
-    assert_true(az_span_is_equal(a, AZ_SPAN_FROM_STR("Hello world!\0")));
-    assert_true(az_span_is_equal(b, AZ_SPAN_FROM_STR("")));
+    assert_true(az_span_is_content_equal(a, AZ_SPAN_FROM_STR("Hello world!\0")));
+    assert_true(az_span_is_content_equal(b, AZ_SPAN_FROM_STR("")));
   }
 
   // az_span_append_uint8_NULL_out_span_fails();
