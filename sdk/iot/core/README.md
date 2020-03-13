@@ -12,11 +12,54 @@ TBD
 
 ## Examples
 
+### IoT Hub Client
+
+To use IoT Hub connectivity, the first action by a developer should be to initialize the
+client with the `az_iot_hub_client_init()` API. Once that is initialized, you may use the
+`az_iot_hub_client_user_name_get()` and `az_iot_hub_client_client_id_get()` to get the
+user name and client id to establish a connection with IoT Hub. An example use case is below.
+
+```C
+//FOR SIMPLICITY THIS DOES NOT HAVE ERROR CHECKING. IN PRODUCTION ENSURE PROPER ERROR CHECKING.
+
+az_iot_hub_client my_client;
+static az_span my_iothub_hostname = AZ_SPAN_LITERAL_FROM_STR("constoso.azure-devices.net");
+static az_span my_device_id = AZ_SPAN_LITERAL_FROM_STR("contoso_device");
+
+//Make sure to size the buffer to fit the user name (100 is an example)
+static uint8_t my_mqtt_user_name_buffer[100];
+static az_span my_mqtt_user_name = AZ_SPAN_LITERAL_FROM_BUFFER(my_mqtt_user_name_buffer);
+
+//Make sure to size the buffer to fit the client id (16 is an example)
+static uint8_t my_mqtt_client_id_buffer[16];
+static az_span my_mqtt_client_id = AZ_SPAN_LITERAL_FROM_BUFFER(my_mqtt_client_id_buffer);
+
+int main()
+{
+  //Get the default IoT Hub options
+  az_iot_hub_client_options options = az_iot_hub_client_options_default();
+
+  //Initialize the client with hostname, device id, and options
+  az_iot_hub_client_init(&my_client, my_iothub_hostname, my_device_id, &options);
+
+  //Get the MQTT user name to connect
+  az_iot_hub_client_user_name_get(&my_client, my_mqtt_user_name, &my_mqtt_user_name)
+
+  //Get the MQTT client id to connect
+  az_iot_hub_client_client_id_get(&my_client, my_mqtt_client_id, &my_mqtt_client_id);
+
+  //At this point you are free to use my_mqtt_client_id and my_mqtt_user_name to connect using
+  //your MQTT client.
+}
+```
+
 ### Telemetry
 
 Telemetry functionality can be achieved by sending a user payload to a specific topic. In order to get the appropriate topic to which to send, use the `az_iot_hub_client_telemetry_publish_topic_get()` API. An example use case is below.
 
 ```C
+//FOR SIMPLICITY THIS DOES NOT HAVE ERROR CHECKING. IN PRODUCTION ENSURE PROPER ERROR CHECKING.
+
 static az_iot_hub_client my_client;
 static az_span my_iothub_hostname = AZ_SPAN_LITERAL_FROM_STR("constoso.azure-devices.net");
 static az_span my_device_id = AZ_SPAN_LITERAL_FROM_STR("contoso_device");
@@ -30,7 +73,8 @@ void my_telemetry_func()
   //Optionally, the size can include space for a null terminator.
   //Here, the buffer is zero initialized to null terminate the topic.
   uint8_t telemetry_topic_buffer[64] = { 0 };
-  az_span topic_span = AZ_SPAN_FROM_BUFFER(telemetry_topic_buffer);
+  az_span topic_span = az_span_init(telemetry_topic_buffer, 0,
+                sizeof(telemetry_topic_buffer) / sizeof(telemetry_topic_buffer[0]));
 
   //Get the NULL terminated topic and put in topic_span to send the telemetry
   az_iot_hub_client_telemetry_publish_topic_get(&client, NULL, topic_span, &topic_span);

@@ -69,6 +69,10 @@ AZ_NODISCARD az_result az_iot_hub_client_init(
 
 /**
  * @brief Gets the MQTT user name.
+ * 
+ * The user name will be of the following format:
+ * [Format without module id] {iothubhostname}/{device_id}/?api-version=2018-06-30
+ * [Format with module id] {iothubhostname}/{device_id}/{module_id}/?api-version=2018-06-30
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
  * @param[in] mqtt_user_name An empty #az_span with sufficient capacity to hold the MQTT user name.
@@ -82,6 +86,10 @@ AZ_NODISCARD az_result az_iot_hub_client_user_name_get(
 
 /**
  * @brief Gets the MQTT client id.
+ * 
+ * The client id will be of the following format:
+ * [Format without module id] {device_id}
+ * [Format with module id] {device_id}/{module_id}
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
  * @param[in] mqtt_client_id An empty #az_span with sufficient capacity to hold the MQTT client id.
