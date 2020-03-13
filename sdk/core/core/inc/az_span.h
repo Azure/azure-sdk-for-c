@@ -87,7 +87,7 @@ AZ_NODISCARD AZ_INLINE int32_t az_span_capacity(az_span span) { return span._int
     ._internal = { \
       .ptr = (uint8_t*)STRING_LITERAL, \
       .length = _az_STRING_LITERAL_LEN(STRING_LITERAL), \
-      .capacity = _az_STRING_LITERAL_LEN(STRING_LITERAL), \
+      .capacity = _az_STRING_LITERAL_LEN(STRING_LITERAL) + 1, \
     }, \
   }
 
