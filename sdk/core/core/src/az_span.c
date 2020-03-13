@@ -202,15 +202,6 @@ AZ_NODISCARD az_result az_span_copy_url_encode(az_span destination, az_span sour
   return AZ_OK;
 }
 
-AZ_NODISCARD AZ_INLINE int32_t _az_size_min(int32_t a, int32_t b) { return a < b ? a : b; }
-
-AZ_INLINE void _az_uint8_swap(uint8_t* a, uint8_t* b)
-{
-  uint8_t const c = *a;
-  *a = *b;
-  *b = c;
-}
-
 AZ_NODISCARD az_result az_span_to_str(char* destination, int32_t destination_max_size, az_span source)
 {
   AZ_PRECONDITION_VALID_SPAN(source, 0, true);
