@@ -6,6 +6,7 @@
 
 #include <setjmp.h>
 #include <stdarg.h>
+#include <limits.h>
 
 #include <cmocka.h>
 
@@ -18,6 +19,52 @@
 
   assert_true(az_span_append_uint8(buffer, 'a', NULL) == AZ_ERROR_ARG);
 } */
+
+void az_single_char_ascii_lower_test()
+{
+  for (uint8_t i = 0; i <= SCHAR_MAX; i++)
+  {
+    uint8_t buffer[1] = { i };
+    az_span span = AZ_SPAN_LITERAL_FROM_INITIALIZED_BUFFER(buffer);
+
+    // Comparison to itself should return true for all values in the range.
+    assert_true(az_span_is_content_equal_ignoring_case(span, span));
+
+    // For ASCII letters, verify that comparing upper and lower case return true.
+    if (i >= 'A' && i <= 'Z')
+    {
+      uint8_t lower[1] = { i + 32 };
+      az_span lowerSpan = AZ_SPAN_LITERAL_FROM_INITIALIZED_BUFFER(lower);
+      assert_true(az_span_is_content_equal_ignoring_case(span, lowerSpan));
+      assert_true(az_span_is_content_equal_ignoring_case(lowerSpan, span));
+    }
+    else if (i >= 'a' && i <= 'z')
+    {
+      uint8_t upper[1] = { i - 32 };
+      az_span upperSpan = AZ_SPAN_LITERAL_FROM_INITIALIZED_BUFFER(upper);
+      assert_true(az_span_is_content_equal_ignoring_case(span, upperSpan));
+      assert_true(az_span_is_content_equal_ignoring_case(upperSpan, span));
+    }
+    else
+    {
+      // Make sure that no other comparison returns true.
+      for (uint8_t j = 0; j <= SCHAR_MAX; j++)
+      {
+        uint8_t other[1] = { j };
+        az_span otherSpan = AZ_SPAN_LITERAL_FROM_INITIALIZED_BUFFER(other);
+
+        if (i == j)
+        {
+          assert_true(az_span_is_content_equal_ignoring_case(span, otherSpan));
+        }
+        else
+        {
+          assert_false(az_span_is_content_equal_ignoring_case(span, otherSpan));
+        }
+      }
+    }
+  }
+}
 
 void az_span_append_uint8_overflow_fails()
 {
@@ -198,4 +245,6 @@ void test_az_span(void** state)
   az_span_append_u32toa_max_uint_succeeds();
   az_span_append_u32toa_NULL_span_fails();
   az_span_append_u32toa_overflow_fails();
+
+  az_single_char_ascii_lower_test();
 }
