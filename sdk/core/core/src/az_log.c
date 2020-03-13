@@ -27,27 +27,11 @@ void az_log_set_callback(az_log_message_fn az_log_message_callback)
   _az_log_message_callback = az_log_message_callback;
 }
 
-void az_log_write(az_log_classification classification, az_span message)
+void az_log_write(az_log_classification classification, char const* message, int32_t message_length)
 {
   if (_az_log_message_callback != NULL && az_log_should_write(classification))
   {
-    int32_t const length = az_span_length(message);
-    int32_t const capacity = az_span_capacity(message);
-    // Do nothing if span is empty or if truncating it with zero would result in empty span.
-    if (length > 0 && capacity > 1)
-    {
-      int32_t const z_pos = length < capacity ? length + 1 : capacity - 1;
-      char* const buf = (char*)az_span_ptr(message);
-
-      // Don't write 0 if it's already there, for instance when the code logs a string literal span,
-      // don't try to modify it as there is a chance it resides in .text.
-      if (buf[z_pos] != 0)
-      {
-        buf[z_pos] = 0;
-      }
-
-      _az_log_message_callback(classification, buf, z_pos - 1);
-    }
+    _az_log_message_callback(classification, message, message_length);
   }
 }
 
