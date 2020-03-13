@@ -210,29 +210,6 @@ AZ_INLINE void _az_uint8_swap(uint8_t* a, uint8_t* b)
   *b = c;
 }
 
-/**
- * @brief move the content from span @span1 to span @span2 and viceverse.
- * The smallest span (less content) is swapped only. Example
- * span1 = 111
- * span2 = 22
- * after swaping
- * span1 = 221
- * span2 = 11
- *
- * @param a source/destination span
- * @param b destination/source span
- */
-void _az_span_swap(az_span span1, az_span span2)
-{
-  uint8_t* pa = az_span_ptr(span1);
-  uint8_t* pb = az_span_ptr(span2);
-  for (int32_t i = _az_size_min(az_span_length(span1), az_span_length(span2)); i > 0; ++pa, ++pb)
-  {
-    --i;
-    _az_uint8_swap(pa, pb);
-  }
-}
-
 AZ_NODISCARD az_result az_span_to_str(char* destination, int32_t destination_max_size, az_span source)
 {
   AZ_PRECONDITION_VALID_SPAN(source, 0, true);

@@ -24,20 +24,6 @@ AZ_NODISCARD AZ_INLINE az_span az_span_from_single_item(uint8_t* ptr)
 }
 
 /**
- * @brief move the content from span @b a to span @b b and viceverse.
- * The smallest span (less content) is swapped only. Example
- * a = 111
- * b = 22
- * after swaping
- * a = 221
- * b = 11
- *
- * @param a source/destination span
- * @param b destination/source span
- */
-void _az_span_swap(az_span a, az_span b);
-
-/**
  * @brief Replace all contents from a starting position to an end position with the content of a
  * provided span
  *
