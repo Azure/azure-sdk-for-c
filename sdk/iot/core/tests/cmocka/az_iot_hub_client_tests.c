@@ -139,7 +139,7 @@ void test_az_iot_hub_client_user_name_get_user_options_small_buffer_fail(void** 
       == AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY);
 }
 
-void test_az_iot_hub_client_client_id_get_succeed(void** state)
+void test_az_iot_hub_client_id_get_succeed(void** state)
 {
   (void)state;
 
@@ -156,7 +156,7 @@ void test_az_iot_hub_client_client_id_get_succeed(void** state)
   assert_string_equal(test_correct_client_id, az_span_ptr(test_span));
 }
 
-void test_az_iot_hub_client_client_id_get_small_buffer_fail(void** state)
+void test_az_iot_hub_client_id_get_small_buffer_fail(void** state)
 {
   (void)state;
 
@@ -173,7 +173,7 @@ void test_az_iot_hub_client_client_id_get_small_buffer_fail(void** state)
       == AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY);
 }
 
-void test_az_iot_hub_client_client_id_module_get_succeed(void** state)
+void test_az_iot_hub_client_id_module_get_succeed(void** state)
 {
   (void)state;
 
@@ -191,7 +191,7 @@ void test_az_iot_hub_client_client_id_module_get_succeed(void** state)
   assert_string_equal(test_correct_client_id_with_module_id, az_span_ptr(test_span));
 }
 
-void test_az_iot_hub_client_client_id_module_get_small_buffer_fail(void** state)
+void test_az_iot_hub_client_id_module_get_small_buffer_fail(void** state)
 {
   (void)state;
 
