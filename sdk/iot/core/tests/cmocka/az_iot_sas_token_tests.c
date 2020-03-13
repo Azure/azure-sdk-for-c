@@ -54,7 +54,7 @@ void az_iot_sas_token_get_document_empty_device_id_fails(void** state)
   int32_t expiry_time_secs = TEST_EXPIRATION;
 
   uint8_t raw_document[256];
-  az_span document = az_span_init(raw_document, 0, sizeof(raw_document) / sizeof(raw_document[0]));
+  az_span document = az_span_init(raw_document, 0, _az_countof(raw_document));
 
   assert_true(az_failed(az_iot_sas_token_get_document(
       iothub_fqdn, device_id, expiry_time_secs, document, &document)));
@@ -68,7 +68,7 @@ void az_iot_sas_token_get_document_empty_iothub_fqdn_fails(void** state)
   int32_t expiry_time_secs = TEST_EXPIRATION;
 
   uint8_t raw_document[256];
-  az_span document = az_span_init(raw_document, 0, sizeof(raw_document) / sizeof(raw_document[0]));
+  az_span document = az_span_init(raw_document, 0, _az_countof(raw_document));
 
   assert_true(az_failed(az_iot_sas_token_get_document(
       iothub_fqdn, device_id, expiry_time_secs, document, &document)));
@@ -82,7 +82,7 @@ void az_iot_sas_token_get_document_document_overflow_fails(void** state)
   int32_t expiry_time_secs = TEST_EXPIRATION;
 
   uint8_t raw_document[32];
-  az_span document = az_span_init(raw_document, 0, sizeof(raw_document) / sizeof(raw_document[0]));
+  az_span document = az_span_init(raw_document, 0, _az_countof(raw_document));
 
   assert_true(
       az_iot_sas_token_get_document(iothub_fqdn, device_id, expiry_time_secs, document, &document)
@@ -99,7 +99,7 @@ void az_iot_sas_token_get_document_succeeds(void** state)
   int32_t expiry_time_secs = TEST_EXPIRATION;
 
   uint8_t raw_document[256];
-  az_span document = az_span_init(raw_document, 0, sizeof(raw_document) / sizeof(raw_document[0]));
+  az_span document = az_span_init(raw_document, 0, _az_countof(raw_document));
 
   assert_true(az_succeeded(az_iot_sas_token_get_document(
       iothub_fqdn, device_id, expiry_time_secs, document, &document)));
@@ -117,7 +117,7 @@ void az_iot_sas_token_generate_empty_device_id_fails(void** state)
 
   uint8_t raw_sas_token[256];
   az_span sas_token
-      = az_span_init(raw_sas_token, 0, sizeof(raw_sas_token) / sizeof(raw_sas_token[0]));
+      = az_span_init(raw_sas_token, 0, _az_countof(raw_sas_token));
 
   assert_true(
       az_iot_sas_token_generate(
@@ -136,7 +136,7 @@ void az_iot_sas_token_generate_empty_iothub_fqdn_fails(void** state)
 
   uint8_t raw_sas_token[256];
   az_span sas_token
-      = az_span_init(raw_sas_token, 0, sizeof(raw_sas_token) / sizeof(raw_sas_token[0]));
+      = az_span_init(raw_sas_token, 0, _az_countof(raw_sas_token));
 
   assert_true(
       az_iot_sas_token_generate(
@@ -155,7 +155,7 @@ void az_iot_sas_token_generate_EMPTY_signature_fails(void** state)
 
   uint8_t raw_sas_token[256];
   az_span sas_token
-      = az_span_init(raw_sas_token, 0, sizeof(raw_sas_token) / sizeof(raw_sas_token[0]));
+      = az_span_init(raw_sas_token, 0, _az_countof(raw_sas_token));
 
   assert_true(
       az_iot_sas_token_generate(
@@ -206,7 +206,7 @@ void az_iot_sas_token_generate_sas_token_overflow_fails(void** state)
 
   uint8_t raw_sas_token[32];
   az_span sas_token
-      = az_span_init(raw_sas_token, 0, sizeof(raw_sas_token) / sizeof(raw_sas_token[0]));
+      = az_span_init(raw_sas_token, 0, _az_countof(raw_sas_token));
 
   assert_true(
       az_iot_sas_token_generate(
@@ -228,7 +228,7 @@ void az_iot_sas_token_generate_succeeds(void** state)
 
   uint8_t raw_sas_token[256];
   az_span sas_token
-      = az_span_init(raw_sas_token, 0, sizeof(raw_sas_token) / sizeof(raw_sas_token[0]));
+      = az_span_init(raw_sas_token, 0, _az_countof(raw_sas_token));
 
   assert_true(az_succeeded(az_iot_sas_token_generate(
       iothub_fqdn, device_id, signature, expiry_time_secs, key_name, sas_token, &sas_token)));
@@ -250,7 +250,7 @@ void az_iot_sas_token_generate_with_keyname_succeeds(void** state)
 
   uint8_t raw_sas_token[256];
   az_span sas_token
-      = az_span_init(raw_sas_token, 0, sizeof(raw_sas_token) / sizeof(raw_sas_token[0]));
+      = az_span_init(raw_sas_token, 0, _az_countof(raw_sas_token));
 
   assert_true(az_succeeded(az_iot_sas_token_generate(
       iothub_fqdn, device_id, signature, expiry_time_secs, key_name, sas_token, &sas_token)));
