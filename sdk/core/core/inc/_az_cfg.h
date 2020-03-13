@@ -84,6 +84,6 @@
 #endif // _MSC_VER
 
 // Get the number of elements in an array
-#define _az_countof(array) (sizeof(array) / sizeof(array[0]))
+#define _az_COUNTOF(array) (sizeof(array) / sizeof(array[0]))
 
 #endif // _az_CFG_H

@@ -189,7 +189,7 @@ void test_az_log(void** state)
     // our code attempts to log a classification that's not in the customer's allow list.
     az_log_classification const classifications[] = { AZ_LOG_HTTP_REQUEST };
     az_log_set_classifications(
-        classifications, _az_countof(classifications));
+        classifications, _az_COUNTOF(classifications));
 
     assert_true(az_log_should_write(AZ_LOG_HTTP_REQUEST) == true);
     assert_true(az_log_should_write(AZ_LOG_HTTP_RESPONSE) == false);
