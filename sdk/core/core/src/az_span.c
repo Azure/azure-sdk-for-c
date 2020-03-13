@@ -49,7 +49,13 @@ AZ_NODISCARD az_span az_span_slice(az_span span, int32_t low_index, int32_t high
  */
 AZ_NODISCARD AZ_INLINE uint8_t az_ascii_lower(uint8_t value)
 {
-  return 'A' <= value && value <= 'Z' ? value + AZ_ASCII_LOWER_DIF : value;
+  // This is equivalent to the following but with fewer conditions.
+  // return 'A' <= value && value <= 'Z' ? value + AZ_ASCII_LOWER_DIF : value;
+  if ((uint8_t)(int8_t)(value - 'A') <= ('Z' - 'A'))
+  {
+    value += AZ_ASCII_LOWER_DIF;
+  }
+  return value;
 }
 
 AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span a, az_span b)
