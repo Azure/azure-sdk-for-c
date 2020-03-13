@@ -34,8 +34,7 @@ AZ_NODISCARD az_result az_iot_hub_client_init(
 
   client->_internal.iot_hub_hostname = iot_hub_hostname;
   client->_internal.device_id = device_id;
-  client->_internal.options.module_id = options->module_id;
-  client->_internal.options.user_agent = options->user_agent;
+  memcpy(&client->_internal.options, options, sizeof(az_iot_hub_client_options));
 
   return AZ_OK;
 }
@@ -73,20 +72,24 @@ AZ_NODISCARD az_result az_iot_hub_client_user_name_get(
       az_span_append(*out_mqtt_user_name, client->_internal.device_id, out_mqtt_user_name));
   AZ_RETURN_IF_FAILED(
       az_span_append_uint8(*out_mqtt_user_name, hub_client_forward_slash, out_mqtt_user_name));
+
   if (az_span_length(*module_id) > 0)
   {
     AZ_RETURN_IF_FAILED(az_span_append(*out_mqtt_user_name, *module_id, out_mqtt_user_name));
     AZ_RETURN_IF_FAILED(
         az_span_append_uint8(*out_mqtt_user_name, hub_client_forward_slash, out_mqtt_user_name));
   }
+
   AZ_RETURN_IF_FAILED(
       az_span_append(*out_mqtt_user_name, hub_client_api_version, out_mqtt_user_name));
+
   if (az_span_length(*user_agent) > 0)
   {
     AZ_RETURN_IF_FAILED(
         az_span_append_uint8(*out_mqtt_user_name, hub_client_param_separator, out_mqtt_user_name));
     AZ_RETURN_IF_FAILED(az_span_append(*out_mqtt_user_name, *user_agent, out_mqtt_user_name));
   }
+
   AZ_RETURN_IF_FAILED(
       az_span_append_uint8(*out_mqtt_user_name, hub_client_null_terminate, out_mqtt_user_name));
 
@@ -115,12 +118,14 @@ AZ_NODISCARD az_result az_iot_hub_client_id_get(
 
   AZ_RETURN_IF_FAILED(
       az_span_append(mqtt_client_id, client->_internal.device_id, out_mqtt_client_id));
+
   if (az_span_length(*module_id) > 0)
   {
     AZ_RETURN_IF_FAILED(
         az_span_append_uint8(*out_mqtt_client_id, hub_client_forward_slash, out_mqtt_client_id));
     AZ_RETURN_IF_FAILED(az_span_append(*out_mqtt_client_id, *module_id, out_mqtt_client_id));
   }
+
   AZ_RETURN_IF_FAILED(
       az_span_append_uint8(*out_mqtt_client_id, hub_client_null_terminate, out_mqtt_client_id));
 
