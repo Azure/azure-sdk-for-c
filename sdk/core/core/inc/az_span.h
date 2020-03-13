@@ -118,8 +118,8 @@ AZ_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t length, int32_t capacity
 AZ_NODISCARD az_span az_span_from_str(char* str);
 
 /**
- * @brief AZ_SPAN_LITERAL_FROM_BUFFER returns a literal az_span over an uninitialized byte buffer. For
- * example:
+ * @brief AZ_SPAN_LITERAL_FROM_BUFFER returns a literal az_span over an uninitialized byte buffer.
+ * For example:
  *
  * uint8_t buffer[1024];
  * const az_span buf = AZ_SPAN_LITERAL_FROM_BUFFER(buffer);  // Len=0, Cap=1024
@@ -198,8 +198,8 @@ AZ_NODISCARD AZ_INLINE bool az_span_is_content_equal(az_span span1, az_span span
 
 /**
  * @brief az_span_is_content_equal_ignoring_case returns `true` if the lengths and characters
- * referred to by \p span1 and \p span2 are identical except for case. This function assumes the bytes in
- * both spans are ASCII characters.
+ * referred to by \p span1 and \p span2 are identical except for case. This function assumes the
+ * bytes in both spans are ASCII characters.
  *
  * @return Returns true if the lengths of both spans are identical and the ASCII characters in both
  * spans are also identical except for case.
@@ -209,19 +209,19 @@ AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1, az_span 
 /**
  * @brief az_span_to_str copies a source span containing a string (not 0-terminated) to a
  destination char buffer and appends the 0-terminating byte.
-
- * The buffer referred to by destination must have a max_size that is at least 1 byte bigger
- than the source az_span
- *  the string in converts \p destination span to zero-terminated str. Content is copied to \p source
- buffer and then \0 is
- * addeed at the end. Then out_result will be created out of buffer
+ *
+ * The buffer referred to by destination must have a size that is at least 1 byte bigger
+ * than the \p source az_span. The string \p destination is converted to a zero-terminated str. Content
+ * is copied to \p source buffer and then \0 is added at the end. Then out_result will be created out
+ * of buffer
  *
  * @param[in] destination A pointer to a buffer where the string should be copied
- * @param[in] destination_max_size The maximum available space within the buffer referred to by destination.
+ * @param[in] destination_max_size The maximum available space within the buffer referred to by
+ destination.
  * @param[in] source The az_span containing the not-0-terminated string
  * @return An #az_result value indicating the result of the operation.
- *          #AZ_OK If /p source span's content is successfully copied to the destination.
- *          #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the /p destination buffer is too small to
+ *          #AZ_OK If \p source span's content is successfully copied to the destination.
+ *          #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the \p destination buffer is too small to
  copy the string and 0-terminate it
  */
 AZ_NODISCARD az_result
@@ -256,7 +256,7 @@ AZ_NODISCARD az_result az_span_to_uint32(az_span span, uint32_t* out_number);
 /******************************  SPAN APPENDING */
 
 /**
- * @brief az_span_append_uint8 appends the uint8 a to the destination starting at the
+ * @brief az_span_append_uint8 appends the uint8 \p byte to the \p destination starting at the
  * destination span's length.
  *
  * @param[in] destination The az_span where the byte should be appended to.
@@ -280,7 +280,7 @@ AZ_NODISCARD az_result az_span_append_uint8(az_span destination, uint8_t byte, a
  * destination span with its length updated.
  * @return An #az_result value indicating the result of the operation.
  *          #AZ_OK if successful
- *          #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the /p destination is not big enough to
+ *          #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the \p destination is not big enough to
  *  contain the appended bytes.
  */
 AZ_NODISCARD az_result az_span_append(az_span destination, az_span source, az_span* out_span);
@@ -296,7 +296,7 @@ AZ_NODISCARD az_result az_span_append(az_span destination, az_span source, az_sp
  * destination span with its length updated
  * @return An #az_result value indicating the result of the operation.
  *          #AZ_OK if successful
- *          #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the /p destination is not big enough to
+ *          #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the \p destination is not big enough to
  * contain the appended bytes
  */
 AZ_NODISCARD az_result
@@ -392,7 +392,7 @@ AZ_INLINE void az_span_set(az_span destination, uint8_t fill)
  * span with its length updated
  * @return An #az_result value indicating the result of the operation.
  *          #AZ_OK if successful
- *          #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the /p destination is not big enough to hold the
+ *          #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the \p destination is not big enough to hold the
  * source's length
  */
 AZ_NODISCARD az_result az_span_copy(az_span destination, az_span source, az_span* out_span);
@@ -407,7 +407,7 @@ AZ_NODISCARD az_result az_span_copy(az_span destination, az_span source, az_span
  * destination span with its length updated
  * @return An #az_result value indicating the result of the operation.
  *          #AZ_OK if successful
- *          #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the /p destination is not big enough to
+ *          #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the \p destination is not big enough to
  * hold the source's length
  */
 AZ_NODISCARD az_result
@@ -417,7 +417,7 @@ az_span_copy_url_encode(az_span destination, az_span source, az_span* out_span);
 
 /**
  * An az_pair represents a key/value pair of az_span instances.
- *  This is typically used for HTTP query parameters and headers.
+ * This is typically used for HTTP query parameters and headers.
  */
 typedef struct
 {
@@ -452,7 +452,8 @@ AZ_NODISCARD AZ_INLINE az_pair az_pair_init(az_span key, az_span value)
  *
  * @param[in] key A string representing the key
  * @param[in] value A string representing the key's value
- * @return  An az_pair with the field initialized to the az_span instances over the passed-in strings
+ * @return  An az_pair with the field initialized to the az_span instances over the passed-in
+ * strings
  */
 AZ_NODISCARD AZ_INLINE az_pair az_pair_from_str(char* key, char* value)
 {
