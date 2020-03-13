@@ -38,8 +38,8 @@ void test_http_response(void** state)
       assert_true(status_line.major_version == 1);
       assert_true(status_line.minor_version == 2);
       assert_true(status_line.status_code == AZ_HTTP_STATUS_CODE_NOT_FOUND);
-      assert_true(
-          az_span_is_equal(status_line.reason_phrase, AZ_SPAN_FROM_STR("We removed the\tpage!")));
+      assert_true(az_span_is_content_equal(
+          status_line.reason_phrase, AZ_SPAN_FROM_STR("We removed the\tpage!")));
     }
     // try to read a header
     {
@@ -52,7 +52,7 @@ void test_http_response(void** state)
       az_span body = { 0 };
       result = az_http_response_get_body(&response, &body);
       assert_true(result == AZ_OK);
-      assert_true(az_span_is_equal(body, AZ_SPAN_FROM_STR("But there is somebody. :-)")));
+      assert_true(az_span_is_content_equal(body, AZ_SPAN_FROM_STR("But there is somebody. :-)")));
     }
   }
 
@@ -76,23 +76,23 @@ void test_http_response(void** state)
       assert_true(status_line.major_version == 2);
       assert_true(status_line.minor_version == 0);
       assert_true(status_line.status_code == AZ_HTTP_STATUS_CODE_RESET_CONTENT);
-      assert_true(az_span_is_equal(status_line.reason_phrase, AZ_SPAN_FROM_STR("")));
+      assert_true(az_span_is_content_equal(status_line.reason_phrase, AZ_SPAN_FROM_STR("")));
     }
     // read a header1
     {
       az_pair header = { 0 };
       result = az_http_response_get_next_header(&response, &header);
       assert_true(result == AZ_OK);
-      assert_true(az_span_is_equal(header.key, AZ_SPAN_FROM_STR("header1")));
-      assert_true(az_span_is_equal(header.value, AZ_SPAN_FROM_STR("some value")));
+      assert_true(az_span_is_content_equal(header.key, AZ_SPAN_FROM_STR("header1")));
+      assert_true(az_span_is_content_equal(header.value, AZ_SPAN_FROM_STR("some value")));
     }
     // read a Header2
     {
       az_pair header = { 0 };
       result = az_http_response_get_next_header(&response, &header);
       assert_true(result == AZ_OK);
-      assert_true(az_span_is_equal(header.key, AZ_SPAN_FROM_STR("Header2")));
-      assert_true(az_span_is_equal(header.value, AZ_SPAN_FROM_STR("something")));
+      assert_true(az_span_is_content_equal(header.key, AZ_SPAN_FROM_STR("Header2")));
+      assert_true(az_span_is_content_equal(header.value, AZ_SPAN_FROM_STR("something")));
     }
     // try to read a header
     {
@@ -105,7 +105,7 @@ void test_http_response(void** state)
       az_span body = { 0 };
       result = az_http_response_get_body(&response, &body);
       assert_true(result == AZ_OK);
-      assert_true(az_span_is_equal(body, AZ_SPAN_FROM_STR("")));
+      assert_true(az_span_is_content_equal(body, AZ_SPAN_FROM_STR("")));
     }
   }
 
@@ -124,6 +124,6 @@ void test_http_response(void** state)
   {
     az_span body;
     TEST_EXPECT_SUCCESS(az_http_response_get_body(&response, &body));
-    assert_true(az_span_is_equal(body, AZ_SPAN_FROM_STR(EXAMPLE_BODY)));
+    assert_true(az_span_is_content_equal(body, AZ_SPAN_FROM_STR(EXAMPLE_BODY)));
   }
 }

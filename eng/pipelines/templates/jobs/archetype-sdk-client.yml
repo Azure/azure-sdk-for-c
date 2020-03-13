@@ -86,7 +86,8 @@ jobs:
         vm.image: 'ubuntu-18.04'
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        build.args: ' -DUNIT_TESTING=ON -DCMAKE_BUILD_TYPE=Debug'
+        # This is the only platform where we run mocking functions and generate CodeCoverage
+        build.args: ' -DUNIT_TESTING=ON -DCMAKE_BUILD_TYPE=Debug -DUNIT_TESTING_MOCK_ENABLED=ON'
         AZ_SDK_CODE_COV: 1
       Win_x86_with_unit_test:
         vm.image: 'windows-2019'
@@ -179,7 +180,7 @@ jobs:
       cmakeArgs: --build .
     displayName: cmake build
   - script: |
-      ctest -C Debug
+      ctest -V
     workingDirectory: build
     displayName: ctest
 

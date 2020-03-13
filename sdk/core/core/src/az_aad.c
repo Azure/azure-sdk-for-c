@@ -18,13 +18,6 @@ AZ_NODISCARD bool _az_token_expired(_az_token const* token)
   return expires_at_msec <= 0 || az_platform_clock_msec() > expires_at_msec;
 }
 
-AZ_NODISCARD _az_token _az_token_get(_az_token const* self)
-{
-  // TODO: thread sync
-  _az_token token = *self;
-  return token;
-}
-
 AZ_NODISCARD az_result _az_token_set(_az_token* self, _az_token const* new_token)
 {
   // TODO: thread sync

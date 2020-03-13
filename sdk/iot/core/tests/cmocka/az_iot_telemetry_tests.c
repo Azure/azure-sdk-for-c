@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// SPDX-License-Identifier: MIT
+
 #include <az_iot_hub_client.h>
 #include <az_span.h>
 
@@ -10,10 +13,6 @@
 
 #include <cmocka.h>
 
-#define TEST_CORRECT_TOPIC_PREFIX "devices/"
-#define TEST_CORRECT_TOPIC_SUFFIX "/messages/events/"
-#define TEST_CORRECT_TOPIC_MODULES_MID "/modules/"
-
 #define TEST_FQDN "myiothub.azure-devices.net"
 #define TEST_DEVICE_ID "my_device"
 #define TEST_MODULE_ID "my_module_id"
@@ -23,7 +22,7 @@
 
 #define TEST_BAD_SPAN \
   { \
-    ._internal = { .ptr = (uint8_t*)0x7FFFFFFF, .length = -1, .capacity = 10  }, \
+    ._internal = { .ptr = (uint8_t*)0x7FFFFFFF, .length = -1, .capacity = 10 }, \
   }
 #define TEST_EMPTY_OPTIONS \
   { \
@@ -48,21 +47,21 @@ static const az_iot_hub_client_properties g_test_params
         = { .properties = AZ_SPAN_LITERAL_FROM_STR(TEST_PARAMS), .current_property = 0 } };
 
 static const char g_test_correct_topic_no_options_no_params[]
-    = TEST_CORRECT_TOPIC_PREFIX "" TEST_DEVICE_ID "" TEST_CORRECT_TOPIC_SUFFIX;
+    = "devices/my_device/messages/events/";
 static const char g_test_correct_topic_with_options_no_params[]
-    = TEST_CORRECT_TOPIC_PREFIX "" TEST_DEVICE_ID "" TEST_CORRECT_TOPIC_MODULES_MID
-                                "" TEST_MODULE_ID "" TEST_CORRECT_TOPIC_SUFFIX "?" TEST_USER_AGENT;
-static const char g_test_correct_topic_with_options_with_params[] = TEST_CORRECT_TOPIC_PREFIX
-    "" TEST_DEVICE_ID "" TEST_CORRECT_TOPIC_MODULES_MID "" TEST_MODULE_ID
-    "" TEST_CORRECT_TOPIC_SUFFIX "?" TEST_PARAMS "&" TEST_USER_AGENT;
+    = "devices/my_device/modules/my_module_id/messages/events/"
+      "?api-version=2017-11-08-preview&DeviceClientType=iothubclient";
+static const char g_test_correct_topic_with_options_with_params[]
+    = "devices/my_device/modules/my_module_id/messages/events/"
+      "?key=value&key_two=value2&api-version=2017-11-08-preview&DeviceClientType=iothubclient";
 static const char g_test_correct_topic_no_options_with_params[]
-    = TEST_CORRECT_TOPIC_PREFIX "" TEST_DEVICE_ID "" TEST_CORRECT_TOPIC_SUFFIX "?" TEST_PARAMS;
+    = "devices/my_device/messages/events/"
+      "?key=value&key_two=value2";
 static const char g_test_correct_topic_with_options_module_id_with_params[]
-    = TEST_CORRECT_TOPIC_PREFIX "" TEST_DEVICE_ID "" TEST_CORRECT_TOPIC_MODULES_MID
-                                "" TEST_MODULE_ID "" TEST_CORRECT_TOPIC_SUFFIX "?" TEST_PARAMS;
+    = "devices/my_device/modules/my_module_id/messages/events/?key=value&key_two=value2";
 static const char g_test_correct_topic_with_options_user_agent_with_params[]
-    = TEST_CORRECT_TOPIC_PREFIX "" TEST_DEVICE_ID "" TEST_CORRECT_TOPIC_SUFFIX "?" TEST_PARAMS
-                                "&" TEST_USER_AGENT;
+    = "devices/my_device/messages/events/"
+      "?key=value&key_two=value2&api-version=2017-11-08-preview&DeviceClientType=iothubclient";
 
 static const az_iot_hub_client g_test_valid_client_no_options
     = { ._internal = { .iot_hub_hostname = AZ_SPAN_LITERAL_FROM_STR(TEST_FQDN),
@@ -87,7 +86,8 @@ void test_az_iot_hub_client_telemetry_publish_topic_get_NULL_client_fails(void**
 
   uint8_t mqtt_topic_buf[TEST_MQTT_SPAN_BUFFER_SIZE];
 
-  az_span mqtt_topic = az_span_init(mqtt_topic_buf, 0, sizeof(mqtt_topic_buf) / sizeof(mqtt_topic_buf[0]));
+  az_span mqtt_topic
+      = az_span_init(mqtt_topic_buf, 0, _az_COUNTOF(mqtt_topic_buf));
 
   assert_true(
       az_iot_hub_client_telemetry_publish_topic_get(NULL, NULL, mqtt_topic, &mqtt_topic)
@@ -110,7 +110,8 @@ void test_az_iot_hub_client_telemetry_publish_topic_get_NULL_out_mqtt_topic_fail
   (void)state;
   uint8_t mqtt_topic_buf[TEST_MQTT_SPAN_BUFFER_SIZE];
 
-  az_span mqtt_topic = az_span_init(mqtt_topic_buf, 0, sizeof(mqtt_topic_buf) / sizeof(mqtt_topic_buf[0]));
+  az_span mqtt_topic
+      = az_span_init(mqtt_topic_buf, 0, _az_COUNTOF(mqtt_topic_buf));
 
   assert_true(
       az_iot_hub_client_telemetry_publish_topic_get(
@@ -124,15 +125,14 @@ void test_az_iot_hub_client_telemetry_publish_topic_get_no_options_no_params_suc
 
   uint8_t mqtt_topic_buf[sizeof(g_test_correct_topic_no_options_no_params)];
 
-  az_span mqtt_topic = az_span_init(mqtt_topic_buf, 0, sizeof(mqtt_topic_buf) / sizeof(mqtt_topic_buf[0]));
+  az_span mqtt_topic
+      = az_span_init(mqtt_topic_buf, 0, _az_COUNTOF(mqtt_topic_buf));
 
   assert_true(
       az_iot_hub_client_telemetry_publish_topic_get(
           &g_test_valid_client_no_options, NULL, mqtt_topic, &mqtt_topic)
       == AZ_OK);
-  assert_string_equal(
-          g_test_correct_topic_no_options_no_params,
-          (char*)az_span_ptr(mqtt_topic));
+  assert_string_equal(g_test_correct_topic_no_options_no_params, (char*)az_span_ptr(mqtt_topic));
 }
 
 void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_no_params_succeed(void** state)
@@ -141,32 +141,32 @@ void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_no_params_s
 
   uint8_t mqtt_topic_buf[sizeof(g_test_correct_topic_with_options_no_params)];
 
-  az_span mqtt_topic = az_span_init(mqtt_topic_buf, 0, sizeof(mqtt_topic_buf) / sizeof(mqtt_topic_buf[0]));
+  az_span mqtt_topic
+      = az_span_init(mqtt_topic_buf, 0, _az_COUNTOF(mqtt_topic_buf));
 
   assert_true(
       az_iot_hub_client_telemetry_publish_topic_get(
           &g_test_valid_client_with_options_both, NULL, mqtt_topic, &mqtt_topic)
       == AZ_OK);
-  assert_string_equal(
-          g_test_correct_topic_with_options_no_params,
-          (char*)az_span_ptr(mqtt_topic));
+  assert_string_equal(g_test_correct_topic_with_options_no_params, (char*)az_span_ptr(mqtt_topic));
 }
 
-void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_with_params_succeed(void** state)
+void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_with_params_succeed(
+    void** state)
 {
   (void)state;
 
   uint8_t mqtt_topic_buf[sizeof(g_test_correct_topic_with_options_with_params)];
 
-  az_span mqtt_topic = az_span_init(mqtt_topic_buf, 0, sizeof(mqtt_topic_buf) / sizeof(mqtt_topic_buf[0]));
+  az_span mqtt_topic
+      = az_span_init(mqtt_topic_buf, 0, _az_COUNTOF(mqtt_topic_buf));
 
   assert_true(
       az_iot_hub_client_telemetry_publish_topic_get(
           &g_test_valid_client_with_options_both, &g_test_params, mqtt_topic, &mqtt_topic)
       == AZ_OK);
   assert_string_equal(
-          g_test_correct_topic_with_options_with_params,
-          (char*)az_span_ptr(mqtt_topic));
+      g_test_correct_topic_with_options_with_params, (char*)az_span_ptr(mqtt_topic));
 }
 
 void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_with_params_small_buffer_fails(
@@ -176,7 +176,8 @@ void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_with_params
 
   uint8_t mqtt_topic_buf[sizeof(g_test_correct_topic_with_options_with_params) - 1];
 
-  az_span mqtt_topic = az_span_init(mqtt_topic_buf, 0, sizeof(mqtt_topic_buf) / sizeof(mqtt_topic_buf[0]));
+  az_span mqtt_topic
+      = az_span_init(mqtt_topic_buf, 0, _az_COUNTOF(mqtt_topic_buf));
 
   assert_true(
       az_iot_hub_client_telemetry_publish_topic_get(
@@ -190,15 +191,14 @@ void test_az_iot_hub_client_telemetry_publish_topic_get_no_options_with_params_s
 
   uint8_t mqtt_topic_buf[sizeof(g_test_correct_topic_no_options_with_params)];
 
-  az_span mqtt_topic = az_span_init(mqtt_topic_buf, 0, sizeof(mqtt_topic_buf) / sizeof(mqtt_topic_buf[0]));
+  az_span mqtt_topic
+      = az_span_init(mqtt_topic_buf, 0, _az_COUNTOF(mqtt_topic_buf));
 
   assert_true(
       az_iot_hub_client_telemetry_publish_topic_get(
           &g_test_valid_client_no_options, &g_test_params, mqtt_topic, &mqtt_topic)
       == AZ_OK);
-  assert_string_equal(
-          g_test_correct_topic_no_options_with_params,
-          (char*)az_span_ptr(mqtt_topic));
+  assert_string_equal(g_test_correct_topic_no_options_with_params, (char*)az_span_ptr(mqtt_topic));
 }
 
 void test_az_iot_hub_client_telemetry_publish_topic_get_no_options_with_params_small_buffer_fails(
@@ -208,7 +208,8 @@ void test_az_iot_hub_client_telemetry_publish_topic_get_no_options_with_params_s
 
   uint8_t mqtt_topic_buf[sizeof(g_test_correct_topic_no_options_with_params) - 1];
 
-  az_span mqtt_topic = az_span_init(mqtt_topic_buf, 0, sizeof(mqtt_topic_buf) / sizeof(mqtt_topic_buf[0]));
+  az_span mqtt_topic
+      = az_span_init(mqtt_topic_buf, 0, _az_COUNTOF(mqtt_topic_buf));
 
   assert_true(
       az_iot_hub_client_telemetry_publish_topic_get(
@@ -223,15 +224,15 @@ void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_module_id_w
 
   uint8_t mqtt_topic_buf[sizeof(g_test_correct_topic_with_options_module_id_with_params)];
 
-  az_span mqtt_topic = az_span_init(mqtt_topic_buf, 0, sizeof(mqtt_topic_buf) / sizeof(mqtt_topic_buf[0]));
+  az_span mqtt_topic
+      = az_span_init(mqtt_topic_buf, 0, _az_COUNTOF(mqtt_topic_buf));
 
   assert_true(
       az_iot_hub_client_telemetry_publish_topic_get(
           &g_test_valid_client_with_options_module_id, &g_test_params, mqtt_topic, &mqtt_topic)
       == AZ_OK);
   assert_string_equal(
-          g_test_correct_topic_with_options_module_id_with_params,
-          (char*)az_span_ptr(mqtt_topic));
+      g_test_correct_topic_with_options_module_id_with_params, (char*)az_span_ptr(mqtt_topic));
 }
 
 void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_module_id_with_params_small_buffer_fails(
@@ -241,7 +242,8 @@ void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_module_id_w
 
   uint8_t mqtt_topic_buf[sizeof(g_test_correct_topic_with_options_module_id_with_params) - 1];
 
-  az_span mqtt_topic = az_span_init(mqtt_topic_buf, 0, sizeof(mqtt_topic_buf) / sizeof(mqtt_topic_buf[0]));
+  az_span mqtt_topic
+      = az_span_init(mqtt_topic_buf, 0, _az_COUNTOF(mqtt_topic_buf));
 
   assert_true(
       az_iot_hub_client_telemetry_publish_topic_get(
@@ -256,15 +258,15 @@ void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_user_agent_
 
   uint8_t mqtt_topic_buf[sizeof(g_test_correct_topic_with_options_user_agent_with_params)];
 
-  az_span mqtt_topic = az_span_init(mqtt_topic_buf, 0, sizeof(mqtt_topic_buf) / sizeof(mqtt_topic_buf[0]));
+  az_span mqtt_topic
+      = az_span_init(mqtt_topic_buf, 0, _az_COUNTOF(mqtt_topic_buf));
 
   assert_true(
       az_iot_hub_client_telemetry_publish_topic_get(
           &g_test_valid_client_with_options_user_agent, &g_test_params, mqtt_topic, &mqtt_topic)
       == AZ_OK);
   assert_string_equal(
-          g_test_correct_topic_with_options_user_agent_with_params,
-          (char*)az_span_ptr(mqtt_topic));
+      g_test_correct_topic_with_options_user_agent_with_params, (char*)az_span_ptr(mqtt_topic));
 }
 
 void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_user_agent_with_params_small_buffer_fails(
@@ -274,7 +276,8 @@ void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_user_agent_
 
   uint8_t mqtt_topic_buf[sizeof(g_test_correct_topic_with_options_user_agent_with_params) - 1];
 
-  az_span mqtt_topic = az_span_init(mqtt_topic_buf, 0, sizeof(mqtt_topic_buf) / sizeof(mqtt_topic_buf[0]));
+  az_span mqtt_topic
+      = az_span_init(mqtt_topic_buf, 0, _az_COUNTOF(mqtt_topic_buf));
 
   assert_true(
       az_iot_hub_client_telemetry_publish_topic_get(

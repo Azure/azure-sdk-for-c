@@ -48,6 +48,15 @@ void test_az_log(void** state);
 /* URL encode tests */
 void test_url_encode(void** state);
 
+/* az pipeline tests */
+void test_az_pipeline(void** state);
+
+/* az aad tests */
+void test_az_aad(void** state);
+
+/* az http policy tests */
+void test_az_http_policy(void** state);
+
 const struct CMUnitTest tests[] = {
   /* URL encode tests */
   cmocka_unit_test(test_url_encode),
@@ -73,4 +82,11 @@ const struct CMUnitTest tests[] = {
   cmocka_unit_test(test_az_span_getters),
   /* AZ_context tests */
   cmocka_unit_test(test_az_context),
+  /* az_pipeline tests */
+  cmocka_unit_test(test_az_pipeline),
+  /* az_aad tests */
+  cmocka_unit_test(test_az_aad),
+  /* az_http_policy tests */
+  cmocka_unit_test(test_az_http_policy),
+
 };

@@ -495,19 +495,19 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
   AZ_RETURN_IF_FAILED(
       _az_http_client_curl_setup_response_redirect(p_curl, &response->_internal.http_response));
 
-  if (az_span_is_equal(p_request->_internal.method, az_http_method_get()))
+  if (az_span_is_content_equal(p_request->_internal.method, az_http_method_get()))
   {
     result = _az_http_client_curl_send_get_request(p_curl);
   }
-  else if (az_span_is_equal(p_request->_internal.method, az_http_method_post()))
+  else if (az_span_is_content_equal(p_request->_internal.method, az_http_method_post()))
   {
     result = _az_http_client_curl_send_post_request(p_curl, p_request);
   }
-  else if (az_span_is_equal(p_request->_internal.method, az_http_method_delete()))
+  else if (az_span_is_content_equal(p_request->_internal.method, az_http_method_delete()))
   {
     result = _az_http_client_curl_send_delete_request(p_curl, p_request);
   }
-  else if (az_span_is_equal(p_request->_internal.method, az_http_method_put()))
+  else if (az_span_is_content_equal(p_request->_internal.method, az_http_method_put()))
   {
     // As of CURL 7.12.1 CURLOPT_PUT is deprecated.  PUT requests should be made using
     // CURLOPT_UPLOAD

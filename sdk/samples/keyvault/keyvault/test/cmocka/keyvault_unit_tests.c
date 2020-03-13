@@ -34,7 +34,7 @@ void test_keyvault(void** state)
               az_keyvault_web_key_type_rsa(), &options, &http_body)
           == AZ_OK);
 
-      assert_true(az_span_is_equal(http_body, expected));
+      assert_true(az_span_is_content_equal(http_body, expected));
     }
     {
       az_keyvault_create_key_options options = az_keyvault_create_key_options_default();
@@ -50,7 +50,7 @@ void test_keyvault(void** state)
               az_keyvault_web_key_type_rsa(), &options, &http_body)
           == AZ_OK);
 
-      assert_true(az_span_is_equal(http_body, expected));
+      assert_true(az_span_is_content_equal(http_body, expected));
     }
     {
       az_keyvault_create_key_options options = az_keyvault_create_key_options_default();
@@ -66,7 +66,7 @@ void test_keyvault(void** state)
               az_keyvault_web_key_type_rsa(), &options, &http_body)
           == AZ_OK);
 
-      assert_true(az_span_is_equal(http_body, expected));
+      assert_true(az_span_is_content_equal(http_body, expected));
     }
   }
 }

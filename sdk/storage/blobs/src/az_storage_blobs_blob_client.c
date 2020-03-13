@@ -168,7 +168,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
   //
   uint8_t content_length[_az_INT64_AS_STR_BUF_SIZE] = { 0 };
   az_span content_length_builder = AZ_SPAN_FROM_BUFFER(content_length);
-  AZ_RETURN_IF_FAILED(az_span_append_int64(&content_length_builder, az_span_length(content)));
+  AZ_RETURN_IF_FAILED(az_span_append_i64toa(content_length_builder, az_span_length(content), &content_length_builder));
 
   // add Content-Length to request
   AZ_RETURN_IF_FAILED(
