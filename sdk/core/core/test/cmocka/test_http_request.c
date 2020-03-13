@@ -58,19 +58,19 @@ void test_http_request(void** state)
 
     TEST_EXPECT_SUCCESS(az_http_request_init(
         &hrb, &az_context_app, az_http_method_get(), url_span, header_span, AZ_SPAN_NULL));
-    assert_true(az_span_is_equal(hrb._internal.method, az_http_method_get()));
-    assert_true(az_span_is_equal(hrb._internal.url, url_span));
+    assert_true(az_span_is_content_equal(hrb._internal.method, az_http_method_get()));
+    assert_true(az_span_is_content_equal(hrb._internal.url, url_span));
     assert_true(az_span_capacity(hrb._internal.url) == 100);
     assert_true(hrb._internal.max_headers == 2);
     assert_true(hrb._internal.retry_headers_start_byte_offset == 0);
 
     TEST_EXPECT_SUCCESS(az_http_request_set_query_parameter(
         &hrb, hrb_param_api_version_name, hrb_param_api_version_token));
-    assert_true(az_span_is_equal(hrb._internal.url, hrb_url2));
+    assert_true(az_span_is_content_equal(hrb._internal.url, hrb_url2));
 
     TEST_EXPECT_SUCCESS(az_http_request_set_query_parameter(
         &hrb, hrb_param_test_param_name, hrb_param_test_param_token));
-    assert_true(az_span_is_equal(hrb._internal.url, hrb_url3));
+    assert_true(az_span_is_content_equal(hrb._internal.url, hrb_url3));
 
     TEST_EXPECT_SUCCESS(az_http_request_append_header(
         &hrb, hrb_header_content_type_name, hrb_header_content_type_token));
@@ -95,8 +95,8 @@ void test_http_request(void** state)
       az_pair header = { 0 };
       TEST_EXPECT_SUCCESS(az_http_request_get_header(&hrb, i, &header));
 
-      assert_true(az_span_is_equal(header.key, expected_headers1[i].key));
-      assert_true(az_span_is_equal(header.value, expected_headers1[i].value));
+      assert_true(az_span_is_content_equal(header.key, expected_headers1[i].key));
+      assert_true(az_span_is_content_equal(header.value, expected_headers1[i].value));
     }
 
     TEST_EXPECT_SUCCESS(_az_http_request_remove_retry_headers(&hrb));
@@ -116,8 +116,8 @@ void test_http_request(void** state)
       az_pair header = { 0 };
       TEST_EXPECT_SUCCESS(az_http_request_get_header(&hrb, i, &header));
 
-      assert_true(az_span_is_equal(header.key, expected_headers2[i].key));
-      assert_true(az_span_is_equal(header.value, expected_headers2[i].value));
+      assert_true(az_span_is_content_equal(header.key, expected_headers2[i].key));
+      assert_true(az_span_is_content_equal(header.value, expected_headers2[i].value));
     }
   }
 }

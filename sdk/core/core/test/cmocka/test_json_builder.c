@@ -59,7 +59,7 @@ void test_json_builder(void** state)
 
     TEST_EXPECT_SUCCESS(az_json_builder_append_object_close(&builder));
 
-    assert_true(az_span_is_equal(
+    assert_true(az_span_is_content_equal(
         builder._internal.json,
         AZ_SPAN_FROM_STR( //
             "{"

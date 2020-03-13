@@ -51,7 +51,7 @@ cmake ..
 cmake --build .
 ```
 
-> Note: The steps above would compile and generate the default output for azure-sdk-for-c witch includes static libraries only. See below section [Compiler Options](#compiler-options)
+> Note: The steps above would compile and generate the default output for azure-sdk-for-c which includes static libraries only. See below section [Compiler Options](#compiler-options)
 
 
 #### Visual Studio 2019
@@ -74,7 +74,7 @@ cmake ..
 make
 ```
 
-> Note: The steps above would compile and generate the default output for azure-sdk-for-c witch includes static libraries only. See below section [Compiler Options](#compiler-options)
+> Note: The steps above would compile and generate the default output for azure-sdk-for-c which includes static libraries only. See below section [Compiler Options](#compiler-options)
 
 
 ### Compiler Options
@@ -120,6 +120,16 @@ ctest -V
 ## Running Test and Samples
 ### Unit test
 See [compiler options section](#compiler-options) to learn about how to build and run unit tests.
+
+### Test with mocked functions
+Some test uses linker option ld to wrap functions and mock the implementation for it to do unit testing. Specially for PAL-related functions, mocking functions becomes a convenient way to break dependency between functions.
+
+In order to run this tests, GCC is required (or any compiler that supports -ld linker flag).
+
+To enable building project and linking with this option, as well as adding tests using mocked functions, add option `-DUNIT_TESTING_MOCK_ENABLED=ON` next to `-DUNIT_TESTING=ON` to cmake cache generation (see below example)
+```cmake
+cmake -DUNIT_TESTING=ON -DUNIT_TESTING_MOCK_ENABLED=ON ..
+```
 
 ### Running samples
 See [compiler options section](#compiler-options) to learn about how to build samples with HTTP implementation in order to be runnable.
