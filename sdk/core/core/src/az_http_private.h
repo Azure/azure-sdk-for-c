@@ -6,6 +6,7 @@
 
 #include <az_http.h>
 #include <az_precondition.h>
+#include <az_precondition_internal.h>
 #include <az_span.h>
 
 #include <stdbool.h>
