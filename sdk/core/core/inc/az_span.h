@@ -210,18 +210,17 @@ AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1, az_span 
  * @brief az_span_to_str copies a source span containing a string (not 0-terminated) to a
  destination char buffer and appends the 0-terminating byte.
 
- * The buffer referred to by destination must have a max_size that is at least 1 byte bigger
+ * The buffer referred to by destination must have a size that is at least 1 byte bigger
  than the source az_span
  *  the string in converts \p destination span to zero-terminated str. Content is copied to \p source
- buffer and then \0 is
- * addeed at the end. Then out_result will be created out of buffer
+ buffer and then \0 is added at the end. Then out_result will be created out of buffer
  *
  * @param[in] destination A pointer to a buffer where the string should be copied
  * @param[in] destination_max_size The maximum available space within the buffer referred to by destination.
  * @param[in] source The az_span containing the not-0-terminated string
  * @return An #az_result value indicating the result of the operation.
- *          #AZ_OK If /p source span's content is successfully copied to the destination.
- *          #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the /p destination buffer is too small to
+ *          #AZ_OK If \p source span's content is successfully copied to the destination.
+ *          #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the \p destination buffer is too small to
  copy the string and 0-terminate it
  */
 AZ_NODISCARD az_result
@@ -280,7 +279,7 @@ AZ_NODISCARD az_result az_span_append_uint8(az_span destination, uint8_t byte, a
  * destination span with its length updated.
  * @return An #az_result value indicating the result of the operation.
  *          #AZ_OK if successful
- *          #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the /p destination is not big enough to
+ *          #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the \p destination is not big enough to
  *  contain the appended bytes.
  */
 AZ_NODISCARD az_result az_span_append(az_span destination, az_span source, az_span* out_span);
@@ -296,7 +295,7 @@ AZ_NODISCARD az_result az_span_append(az_span destination, az_span source, az_sp
  * destination span with its length updated
  * @return An #az_result value indicating the result of the operation.
  *          #AZ_OK if successful
- *          #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the /p destination is not big enough to
+ *          #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the \p destination is not big enough to
  * contain the appended bytes
  */
 AZ_NODISCARD az_result
@@ -392,7 +391,7 @@ AZ_INLINE void az_span_set(az_span destination, uint8_t fill)
  * span with its length updated
  * @return An #az_result value indicating the result of the operation.
  *          #AZ_OK if successful
- *          #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the /p destination is not big enough to hold the
+ *          #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the \p destination is not big enough to hold the
  * source's length
  */
 AZ_NODISCARD az_result az_span_copy(az_span destination, az_span source, az_span* out_span);
@@ -407,7 +406,7 @@ AZ_NODISCARD az_result az_span_copy(az_span destination, az_span source, az_span
  * destination span with its length updated
  * @return An #az_result value indicating the result of the operation.
  *          #AZ_OK if successful
- *          #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the /p destination is not big enough to
+ *          #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the \p destination is not big enough to
  * hold the source's length
  */
 AZ_NODISCARD az_result
