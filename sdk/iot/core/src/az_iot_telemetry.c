@@ -5,6 +5,7 @@
 
 #include "az_iot_hub_client.h"
 #include <az_precondition.h>
+#include <az_precondition_internal.h>
 #include <az_result.h>
 #include <az_span.h>
 
@@ -50,8 +51,7 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_publish_topic_get(
 
   if (az_span_ptr(*user_agent) != NULL)
   {
-    required_size
-        += az_span_length(*user_agent) + sizeof(telemetry_prop_delim);
+    required_size += az_span_length(*user_agent) + sizeof(telemetry_prop_delim);
   }
 
   // Only build topic if the span has the capacity
@@ -68,8 +68,7 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_publish_topic_get(
   {
     AZ_RETURN_IF_FAILED(
         az_span_append(*out_mqtt_topic, telemetry_topic_modules_mid, out_mqtt_topic));
-    AZ_RETURN_IF_FAILED(
-        az_span_append(*out_mqtt_topic, *module_id, out_mqtt_topic));
+    AZ_RETURN_IF_FAILED(az_span_append(*out_mqtt_topic, *module_id, out_mqtt_topic));
   }
 
   AZ_RETURN_IF_FAILED(az_span_append(*out_mqtt_topic, telemetry_topic_suffix, out_mqtt_topic));
@@ -88,8 +87,7 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_publish_topic_get(
         properties == NULL
             ? az_span_append_uint8(*out_mqtt_topic, telemetry_prop_delim, out_mqtt_topic)
             : az_span_append_uint8(*out_mqtt_topic, telemetry_prop_separator, out_mqtt_topic));
-    AZ_RETURN_IF_FAILED(
-        az_span_append(*out_mqtt_topic, *user_agent, out_mqtt_topic));
+    AZ_RETURN_IF_FAILED(az_span_append(*out_mqtt_topic, *user_agent, out_mqtt_topic));
   }
 
   AZ_RETURN_IF_FAILED(
