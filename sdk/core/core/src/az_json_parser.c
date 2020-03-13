@@ -8,6 +8,7 @@
 #include <az_span.h>
 
 #include <az_precondition.h>
+#include <az_precondition_internal.h>
 
 #include <ctype.h>
 #include <math.h>

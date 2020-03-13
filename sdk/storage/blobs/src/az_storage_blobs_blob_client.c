@@ -8,6 +8,7 @@
 #include <az_http_transport.h>
 #include <az_json.h>
 #include <az_precondition.h>
+#include <az_precondition_internal.h>
 #include <az_storage_blobs.h>
 
 #include <stddef.h>
