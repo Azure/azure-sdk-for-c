@@ -1,183 +1,214 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "az_http_policy_logging_private.h"
-#include "az_http_policy_private.h"
-#include "az_span_private.h"
+#include <az_context.h>
+#include <az_http.h>
 #include <az_http_internal.h>
+#include <az_http_policy_logging_private.h>
+#include <az_http_private.h>
 #include <az_http_transport.h>
+#include <az_log.h>
 #include <az_log_internal.h>
-#include <az_platform_internal.h>
+
+#include <setjmp.h>
+#include <stdarg.h>
+
+#include <cmocka.h>
 
 #include <_az_cfg.h>
 
-enum
+#define TEST_EXPECT_SUCCESS(exp) assert_true(az_succeeded(exp))
+
+static bool _log_invoked_for_http_request = false;
+static bool _log_invoked_for_http_response = false;
+
+static inline void _reset_log_invocation_status()
 {
-  _az_LOG_LENGTHY_VALUE_MAX_LENGTH
-  = 50, // When we print values, such as header values, if they are longer than
-        // _az_LOG_VALUE_MAX_LENGTH, we trim their contents (decorate with ellipsis in the middle)
-        // to make sure each individual header value does not exceed _az_LOG_VALUE_MAX_LENGTH so
-        // that they don't blow up the logs.
-};
-
-static az_result _az_http_policy_logging_append_lengthy_value(az_span value, az_span* ref_log_msg)
-{
-  int32_t value_size = az_span_length(value);
-  if (value_size <= _az_LOG_LENGTHY_VALUE_MAX_LENGTH)
-  {
-    AZ_RETURN_IF_FAILED(az_span_append(*ref_log_msg, value, ref_log_msg));
-    return AZ_OK;
-  }
-
-  az_span const ellipsis = AZ_SPAN_FROM_STR(" ... ");
-  int32_t const ellipsis_len = az_span_length(ellipsis);
-
-  int32_t const first
-      = (_az_LOG_LENGTHY_VALUE_MAX_LENGTH / 2) - ((ellipsis_len / 2) + (ellipsis_len % 2));
-
-  int32_t const last
-      = ((_az_LOG_LENGTHY_VALUE_MAX_LENGTH / 2) + (_az_LOG_LENGTHY_VALUE_MAX_LENGTH % 2))
-      - (ellipsis_len / 2);
-
-  AZ_RETURN_IF_FAILED(az_span_append(*ref_log_msg, az_span_slice(value, 0, first), ref_log_msg));
-  AZ_RETURN_IF_FAILED(az_span_append(*ref_log_msg, ellipsis, ref_log_msg));
-  AZ_RETURN_IF_FAILED(az_span_append(
-      *ref_log_msg, az_span_slice(value, value_size - last, value_size), ref_log_msg));
-
-  return AZ_OK;
+  _log_invoked_for_http_request = false;
+  _log_invoked_for_http_response = false;
 }
 
-static az_result _az_http_policy_logging_append_http_request_msg(
-    _az_http_request const* request,
-    az_span* ref_log_msg)
+static void _log_listener(
+    az_log_classification classification,
+    char const* message,
+    int32_t message_length)
 {
-  AZ_RETURN_IF_FAILED(
-      az_span_append(*ref_log_msg, AZ_SPAN_FROM_STR("HTTP Request : "), ref_log_msg));
+  az_span const msg_span = az_span_from_str((char*)(size_t)message);
+  assert_int_equal(az_span_length(msg_span), message_length);
 
-  if (request == NULL)
+  switch (classification)
   {
-    AZ_RETURN_IF_FAILED(az_span_append(*ref_log_msg, AZ_SPAN_FROM_STR("NULL"), ref_log_msg));
-    return AZ_OK;
+    case AZ_LOG_HTTP_REQUEST:
+      _log_invoked_for_http_request = true;
+      assert_true(az_span_is_content_equal(
+          msg_span,
+          AZ_SPAN_FROM_STR("HTTP Request : GET https://www.example.com\n"
+                           "\tHeader1 : Value1\n"
+                           "\tHeader2 : ZZZZYYYYXXXXWWWWVVVVUU ... SSSRRRRQQQQPPPPOOOONNNN\n"
+                           "\tHeader3 : 1111112222223333334444 ... 55666666777777888888abc")));
+      break;
+    case AZ_LOG_HTTP_RESPONSE:
+      _log_invoked_for_http_response = true;
+      assert_true(az_span_is_content_equal(
+          msg_span,
+          AZ_SPAN_FROM_STR("HTTP Response (3456ms) : 404 Not Found\n"
+                           "\tHeader11 : Value11\n"
+                           "\tHeader22 : NNNNOOOOPPPPQQQQRRRRSS ... UUUVVVVWWWWXXXXYYYYZZZZ\n"
+                           "\tHeader33\n"
+                           "\tHeader44 : cba8888887777776666665 ... 44444333333222222111111\n"
+                           "\n"
+                           " -> HTTP Request : GET https://www.example.com\n"
+                           "\tHeader1 : Value1\n"
+                           "\tHeader2 : ZZZZYYYYXXXXWWWWVVVVUU ... SSSRRRRQQQQPPPPOOOONNNN\n"
+                           "\tHeader3 : 1111112222223333334444 ... 55666666777777888888abc")));
+      break;
+    default:
+      assert_true(false);
+      break;
   }
+}
 
-  AZ_RETURN_IF_FAILED(az_span_append(*ref_log_msg, request->_internal.method, ref_log_msg));
-  AZ_RETURN_IF_FAILED(az_span_append(*ref_log_msg, AZ_SPAN_FROM_STR(" "), ref_log_msg));
-  AZ_RETURN_IF_FAILED(az_span_append(*ref_log_msg, request->_internal.url, ref_log_msg));
+static void _log_listener_NULL(
+    az_log_classification classification,
+    char const* message,
+    int32_t message_length)
+{
+  az_span const msg_span = az_span_from_str((char*)(size_t)message);
+  assert_int_equal(az_span_length(msg_span), message_length);
 
-  int32_t const headers_count = _az_http_request_headers_count(request);
-  for (int32_t index = 0; index < headers_count; ++index)
+  switch (classification)
   {
-    AZ_RETURN_IF_FAILED(az_span_append(*ref_log_msg, AZ_SPAN_FROM_STR("\n\t"), ref_log_msg));
+    case AZ_LOG_HTTP_REQUEST:
+      _log_invoked_for_http_request = true;
+      assert_true(az_span_is_content_equal(msg_span, AZ_SPAN_FROM_STR("HTTP Request : NULL")));
+      break;
+    case AZ_LOG_HTTP_RESPONSE:
+      _log_invoked_for_http_response = true;
+      assert_true(az_span_is_content_equal(msg_span, AZ_SPAN_FROM_STR("")));
+      break;
+    default:
+      assert_true(false);
+      break;
+  }
+}
 
-    az_pair header = { 0 };
-    AZ_RETURN_IF_FAILED(az_http_request_get_header(request, index, &header));
-    AZ_RETURN_IF_FAILED(az_span_append(*ref_log_msg, header.key, ref_log_msg));
+void test_az_log(void** state)
+{
+  (void)state;
+  // Set up test values etc.
+  //  uint8_t hrb_buf[4 * 1024] = { 0 };
+  uint8_t headers[4 * 1024] = { 0 };
+  _az_http_request hrb = { 0 };
+  TEST_EXPECT_SUCCESS(az_http_request_init(
+      &hrb,
+      &az_context_app,
+      az_http_method_get(),
+      AZ_SPAN_FROM_STR("https://www.example.com"),
+      AZ_SPAN_FROM_BUFFER(headers),
+      AZ_SPAN_FROM_STR("AAAAABBBBBCCCCCDDDDDEEEEEFFFFFGGGGGHHHHHIIIIIJJJJJKKKKK")));
 
-    if (az_span_length(header.value) > 0)
+  TEST_EXPECT_SUCCESS(
+      az_http_request_append_header(&hrb, AZ_SPAN_FROM_STR("Header1"), AZ_SPAN_FROM_STR("Value1")));
+
+  TEST_EXPECT_SUCCESS(az_http_request_append_header(
+      &hrb,
+      AZ_SPAN_FROM_STR("Header2"),
+      AZ_SPAN_FROM_STR("ZZZZYYYYXXXXWWWWVVVVUUUUTTTTSSSSRRRRQQQQPPPPOOOONNNN")));
+
+  TEST_EXPECT_SUCCESS(_az_http_request_mark_retry_headers_start(&hrb));
+
+  TEST_EXPECT_SUCCESS(az_http_request_append_header(
+      &hrb,
+      AZ_SPAN_FROM_STR("Header3"),
+      AZ_SPAN_FROM_STR("111111222222333333444444555555666666777777888888abc")));
+
+  uint8_t response_buf[1024] = { 0 };
+  az_span response_builder = AZ_SPAN_FROM_BUFFER(response_buf);
+
+  TEST_EXPECT_SUCCESS(az_span_append(
+      response_builder,
+      AZ_SPAN_FROM_STR("HTTP/1.1 404 Not Found\r\n"
+                       "Header11: Value11\r\n"
+                       "Header22: NNNNOOOOPPPPQQQQRRRRSSSSTTTTUUUUVVVVWWWWXXXXYYYYZZZZ\r\n"
+                       "Header33:\r\n"
+                       "Header44: cba888888777777666666555555444444333333222222111111\r\n"
+                       "\r\n"
+                       "KKKKKJJJJJIIIIIHHHHHGGGGGFFFFFEEEEEDDDDDCCCCCBBBBBAAAAA"),
+      &response_builder));
+
+  az_http_response response = { 0 };
+  TEST_EXPECT_SUCCESS(az_http_response_init(&response, response_builder));
+  // Finish setting up
+
+  {
+    // null request
+    _reset_log_invocation_status();
+    az_log_set_callback(_log_listener_NULL);
+    _az_http_policy_logging_log_http_request(NULL);
+    assert_true(_log_invoked_for_http_request == true);
+    assert_true(_log_invoked_for_http_response == false);
+  }
+  // Actual test below
+  {
+    // Verify that log callback gets invoked, and with the correct classification type.
+    // Also, our callback function does the verification for the message content.
+    _reset_log_invocation_status();
+    az_log_set_callback(_log_listener);
+    assert_true(_log_invoked_for_http_request == false);
+    assert_true(_log_invoked_for_http_response == false);
+
+    _az_http_policy_logging_log_http_request(&hrb);
+    assert_true(_log_invoked_for_http_request == true);
+    assert_true(_log_invoked_for_http_response == false);
+
+    _az_http_policy_logging_log_http_response(&response, 3456, &hrb);
+    assert_true(_log_invoked_for_http_request == true);
+    assert_true(_log_invoked_for_http_response == true);
+  }
+  {
+    _reset_log_invocation_status();
+    az_log_set_callback(NULL);
+
+    // Verify that user can unset log callback, and we are not going to call the previously set one.
+    assert_true(_log_invoked_for_http_request == false);
+    assert_true(_log_invoked_for_http_response == false);
+
+    _az_http_policy_logging_log_http_request(&hrb);
+    _az_http_policy_logging_log_http_response(&response, 3456, &hrb);
+
+    assert_true(_log_invoked_for_http_request == false);
+    assert_true(_log_invoked_for_http_response == false);
+
     {
-      AZ_RETURN_IF_FAILED(az_span_append(*ref_log_msg, AZ_SPAN_FROM_STR(" : "), ref_log_msg));
-      AZ_RETURN_IF_FAILED(_az_http_policy_logging_append_lengthy_value(header.value, ref_log_msg));
+      // Verify that our internal should_write() function would return false if none is listening.
+      assert_true(az_log_should_write(AZ_LOG_HTTP_REQUEST) == false);
+      assert_true(az_log_should_write(AZ_LOG_HTTP_RESPONSE) == false);
+
+      // If a callback is set, and no classifications are specified, we are going to log all of them
+      // (and customer is going to get all of them).
+      az_log_set_callback(_log_listener);
+
+      assert_true(az_log_should_write(AZ_LOG_HTTP_REQUEST) == true);
+      assert_true(az_log_should_write(AZ_LOG_HTTP_RESPONSE) == true);
     }
+
+    // Verify that if customer specifies the classifications, we'll only invoking the logging
+    // callback with the classification that's in the list of customer-provided classifications, and
+    // nothing is going to happen when our code attempts to log a classification that's not in that
+    // list.
+    az_log_classification const classifications[] = { AZ_LOG_HTTP_REQUEST, AZ_LOG_END_OF_LIST };
+    az_log_set_classifications(classifications);
+
+    assert_true(az_log_should_write(AZ_LOG_HTTP_REQUEST) == true);
+    assert_true(az_log_should_write(AZ_LOG_HTTP_RESPONSE) == false);
+
+    _az_http_policy_logging_log_http_request(&hrb);
+    _az_http_policy_logging_log_http_response(&response, 3456, &hrb);
+
+    assert_true(_log_invoked_for_http_request == true);
+    assert_true(_log_invoked_for_http_response == false);
   }
 
-  return AZ_OK;
-}
-
-static az_result _az_http_policy_logging_append_http_response_msg(
-    az_http_response* ref_response,
-    int64_t duration_msec,
-    _az_http_request const* request,
-    az_span* ref_log_msg)
-{
-  AZ_RETURN_IF_FAILED(
-      az_span_append(*ref_log_msg, AZ_SPAN_FROM_STR("HTTP Response ("), ref_log_msg));
-
-  AZ_RETURN_IF_FAILED(az_span_append_i64toa(*ref_log_msg, duration_msec, ref_log_msg));
-  AZ_RETURN_IF_FAILED(az_span_append(*ref_log_msg, AZ_SPAN_FROM_STR("ms) "), ref_log_msg));
-
-  if (ref_response == NULL || az_span_length(ref_response->_internal.http_response) == 0)
-  {
-    AZ_RETURN_IF_FAILED(az_span_append(*ref_log_msg, AZ_SPAN_FROM_STR("is empty"), ref_log_msg));
-    return AZ_OK;
-  }
-
-  AZ_RETURN_IF_FAILED(az_span_append(*ref_log_msg, AZ_SPAN_FROM_STR(": "), ref_log_msg));
-
-  az_http_response_status_line status_line = { 0 };
-  AZ_RETURN_IF_FAILED(az_http_response_get_status_line(ref_response, &status_line));
-
-  AZ_RETURN_IF_FAILED(az_span_append_u64toa(*ref_log_msg, (uint64_t)status_line.status_code, ref_log_msg));
-
-  AZ_RETURN_IF_FAILED(az_span_append(*ref_log_msg, AZ_SPAN_FROM_STR(" "), ref_log_msg));
-  AZ_RETURN_IF_FAILED(az_span_append(*ref_log_msg, status_line.reason_phrase, ref_log_msg));
-
-  for (az_pair header;
-       az_http_response_get_next_header(ref_response, &header) != AZ_ERROR_ITEM_NOT_FOUND;)
-  {
-    AZ_RETURN_IF_FAILED(az_span_append(*ref_log_msg, AZ_SPAN_FROM_STR("\n\t"), ref_log_msg));
-    AZ_RETURN_IF_FAILED(az_span_append(*ref_log_msg, header.key, ref_log_msg));
-
-    if (az_span_length(header.value) > 0)
-    {
-      AZ_RETURN_IF_FAILED(az_span_append(*ref_log_msg, AZ_SPAN_FROM_STR(" : "), ref_log_msg));
-      AZ_RETURN_IF_FAILED(_az_http_policy_logging_append_lengthy_value(header.value, ref_log_msg));
-    }
-  }
-
-  AZ_RETURN_IF_FAILED(az_span_append(*ref_log_msg, AZ_SPAN_FROM_STR("\n\n"), ref_log_msg));
-  AZ_RETURN_IF_FAILED(az_span_append(*ref_log_msg, AZ_SPAN_FROM_STR(" -> "), ref_log_msg));
-  AZ_RETURN_IF_FAILED(_az_http_policy_logging_append_http_request_msg(request, ref_log_msg));
-
-  return AZ_OK;
-}
-
-void _az_http_policy_logging_log_http_request(_az_http_request const* request)
-{
-  uint8_t log_msg_buf[AZ_LOG_MSG_BUF_SIZE] = { 0 };
-  az_span log_msg = AZ_SPAN_FROM_BUFFER(log_msg_buf);
-  (void)_az_http_policy_logging_append_http_request_msg(request, &log_msg);
-  az_log_write(AZ_LOG_HTTP_REQUEST, log_msg);
-}
-
-void _az_http_policy_logging_log_http_response(
-    az_http_response const* response,
-    int64_t duration_msec,
-    _az_http_request const* request)
-{
-  uint8_t log_msg_buf[AZ_LOG_MSG_BUF_SIZE] = { 0 };
-  az_span log_msg = AZ_SPAN_FROM_BUFFER(log_msg_buf);
-
-  az_http_response response_copy = *response;
-  (void)_az_http_policy_logging_append_http_response_msg(
-      &response_copy, duration_msec, request, &log_msg);
-
-  az_log_write(AZ_LOG_HTTP_RESPONSE, log_msg);
-}
-
-AZ_NODISCARD az_result az_http_pipeline_policy_logging(
-    _az_http_policy* policies,
-    void* options,
-    _az_http_request* ref_request,
-    az_http_response* ref_response)
-{
-  (void)options;
-
-  if (az_log_should_write(AZ_LOG_HTTP_REQUEST))
-  {
-    _az_http_policy_logging_log_http_request(ref_request);
-  }
-
-  if (!az_log_should_write(AZ_LOG_HTTP_RESPONSE))
-  {
-    // If no logging is needed, do not even measure the response time.
-    return az_http_pipeline_nextpolicy(policies, ref_request, ref_response);
-  }
-
-  int64_t const start = az_platform_clock_msec();
-  az_result const result = az_http_pipeline_nextpolicy(policies, ref_request, ref_response);
-  int64_t const end = az_platform_clock_msec();
-
-  _az_http_policy_logging_log_http_response(ref_response, end - start, ref_request);
-
-  return result;
+  az_log_set_classifications(NULL);
+  az_log_set_callback(NULL);
 }

@@ -108,17 +108,16 @@ void some_http_request_code()
 
 
 /* User Application Code */
-az_log_classification const classifications[] = { AZ_LOG_HTTP_REQUEST, AZ_LOG_HTTP_RESPONSE };
+az_log_classification const classifications[] = { AZ_LOG_HTTP_REQUEST, AZ_LOG_HTTP_RESPONSE, AZ_LOG_END_OF_LIST };
 
-void test_log_func(az_log_classification classification, az_span message)
+void test_log_func(az_log_classification classification, char const* message, int32_t message_length)
 {
-    printf("%.*s\n", az_span_length(message), az_span_ptr(message));
+    printf("%s\n", message);
 }
 
 int main()
 {
-  az_log_set_classifications(classifications, 
-           sizeof(classifications)/sizeof(classifications[0]));
+  az_log_set_classifications(classifications);
   az_log_set_listener(&test_log_func);
 
   some_http_request_code();
