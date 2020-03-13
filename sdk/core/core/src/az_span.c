@@ -29,8 +29,8 @@ AZ_NODISCARD az_span az_span_from_str(char* str)
 {
   AZ_PRECONDITION_NOT_NULL(str);
 
-  int32_t length = (int32_t)strlen(str);
-  return az_span_init((uint8_t*)str, length, length);
+  int32_t const length = (int32_t)strlen(str);
+  return az_span_init((uint8_t*)str, length, length + 1);
 }
 
 AZ_NODISCARD az_span az_span_slice(az_span span, int32_t low_index, int32_t high_index)
@@ -38,7 +38,7 @@ AZ_NODISCARD az_span az_span_slice(az_span span, int32_t low_index, int32_t high
   AZ_PRECONDITION_RANGE(-1, high_index, az_span_capacity(span));
   AZ_PRECONDITION(high_index == -1 || (high_index >= 0 && low_index <= high_index));
 
-  int32_t capacity = az_span_capacity(span);
+  int32_t const capacity = az_span_capacity(span);
 
   high_index = high_index == -1 ? capacity : high_index;
   return az_span_init(az_span_ptr(span) + low_index, high_index - low_index, capacity - low_index);

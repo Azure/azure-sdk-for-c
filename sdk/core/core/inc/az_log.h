@@ -48,8 +48,8 @@ typedef enum
  *
  * @param classification The log message's az_log_classification.
  * @param message The 0-terminated log message.
- * @param message_length The length of the 0-terminated log message (so you don't have to call
- strlen).
+ * @param message_length The length of the 0-terminated log message
+ *                       (so you don't have to call strlen).
 */
 typedef void (*az_log_message_fn)(
     az_log_classification classification,

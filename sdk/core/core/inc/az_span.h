@@ -208,17 +208,16 @@ AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1, az_span 
 
 /**
  * @brief az_span_to_str copies a source span containing a string (not 0-terminated) to a
- destination char buffer and appends the 0-terminating byte.
-
- * The buffer referred to by destination must have a max_size that is at least 1 byte bigger
- than the source az_span
- *  the string in converts \p destination span to zero-terminated str. Content is copied to \p
- source buffer and then \0 is
- * addeed at the end. Then out_result will be created out of buffer
+ * destination char buffer and appends the 0-terminating byte.
+ *
+ * The buffer referred to by destination must have a max_size that is at least 1 byte
+ * bigger than the source az_span the string in converts \p destination span to zero-terminated str.
+ * Content is copied to \p source buffer and then \0 is addeed at the end. Then out_result will be
+ * created out of buffer
  *
  * @param[in] destination A pointer to a buffer where the string should be copied
  * @param[in] destination_max_size The maximum available space within the buffer referred to by
- destination.
+ * destination.
  * @param[in] source The az_span containing the not-0-terminated string
  * @return An #az_result value indicating the result of the operation.
  *          #AZ_OK If /p source span's content is successfully copied to the destination.
@@ -453,8 +452,7 @@ AZ_NODISCARD AZ_INLINE az_pair az_pair_init(az_span key, az_span value)
  *
  * @param[in] key A string representing the key
  * @param[in] value A string representing the key's value
- * @return  An az_pair with the field initialized to the az_span instances over the passed-in
- * strings
+ * @return An az_pair with the field initialized to the az_span instances over the passed-in strings
  */
 AZ_NODISCARD AZ_INLINE az_pair az_pair_from_str(char* key, char* value)
 {
