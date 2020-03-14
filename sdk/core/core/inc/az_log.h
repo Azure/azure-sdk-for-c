@@ -47,14 +47,9 @@ typedef enum
  * must write in order to receive Azure SDK log messages.
  *
  * @param classification The log message's az_log_classification.
- * @param message The 0-terminated log message.
- * @param message_length The length of the 0-terminated log message
- *                       (so you don't have to call strlen).
+ * @param message The log message.
 */
-typedef void (*az_log_message_fn)(
-    az_log_classification classification,
-    char const* message,
-    int32_t message_length);
+typedef void (*az_log_message_fn)(az_log_classification classification, az_span message);
 
 /**
  * @brief az_log_set_classifications allows the application to specify which

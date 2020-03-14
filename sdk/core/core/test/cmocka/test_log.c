@@ -28,20 +28,14 @@ static inline void _reset_log_invocation_status()
   _log_invoked_for_http_response = false;
 }
 
-static void _log_listener(
-    az_log_classification classification,
-    char const* message,
-    int32_t message_length)
+static void _log_listener(az_log_classification classification, az_span message)
 {
-  az_span const msg_span = az_span_from_str((char*)(size_t)message);
-  assert_int_equal(az_span_length(msg_span), message_length);
-
   switch (classification)
   {
     case AZ_LOG_HTTP_REQUEST:
       _log_invoked_for_http_request = true;
       assert_true(az_span_is_content_equal(
-          msg_span,
+          message,
           AZ_SPAN_FROM_STR("HTTP Request : GET https://www.example.com\n"
                            "\tHeader1 : Value1\n"
                            "\tHeader2 : ZZZZYYYYXXXXWWWWVVVVUU ... SSSRRRRQQQQPPPPOOOONNNN\n"
@@ -50,7 +44,7 @@ static void _log_listener(
     case AZ_LOG_HTTP_RESPONSE:
       _log_invoked_for_http_response = true;
       assert_true(az_span_is_content_equal(
-          msg_span,
+          message,
           AZ_SPAN_FROM_STR("HTTP Response (3456ms) : 404 Not Found\n"
                            "\tHeader11 : Value11\n"
                            "\tHeader22 : NNNNOOOOPPPPQQQQRRRRSS ... UUUVVVVWWWWXXXXYYYYZZZZ\n"
@@ -68,23 +62,17 @@ static void _log_listener(
   }
 }
 
-static void _log_listener_NULL(
-    az_log_classification classification,
-    char const* message,
-    int32_t message_length)
+static void _log_listener_NULL(az_log_classification classification, az_span message)
 {
-  az_span const msg_span = az_span_from_str((char*)(size_t)message);
-  assert_int_equal(az_span_length(msg_span), message_length);
-
   switch (classification)
   {
     case AZ_LOG_HTTP_REQUEST:
       _log_invoked_for_http_request = true;
-      assert_true(az_span_is_content_equal(msg_span, AZ_SPAN_FROM_STR("HTTP Request : NULL")));
+      assert_true(az_span_is_content_equal(message, AZ_SPAN_FROM_STR("HTTP Request : NULL")));
       break;
     case AZ_LOG_HTTP_RESPONSE:
       _log_invoked_for_http_response = true;
-      assert_true(az_span_is_content_equal(msg_span, AZ_SPAN_FROM_STR("")));
+      assert_true(az_span_is_content_equal(msg_messagespan, AZ_SPAN_FROM_STR("")));
       break;
     default:
       assert_true(false);

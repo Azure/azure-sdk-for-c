@@ -27,11 +27,11 @@ void az_log_set_callback(az_log_message_fn az_log_message_callback)
   _az_log_message_callback = az_log_message_callback;
 }
 
-void az_log_write(az_log_classification classification, char const* message, int32_t message_length)
+void az_log_write(az_log_classification classification, az_span message)
 {
   if (_az_log_message_callback != NULL && az_log_should_write(classification))
   {
-    _az_log_message_callback(classification, message, message_length);
+    _az_log_message_callback(classification, message);
   }
 }
 

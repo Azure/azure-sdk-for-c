@@ -138,11 +138,7 @@ void _az_http_policy_logging_log_http_request(_az_http_request const* request)
 
   (void)_az_http_policy_logging_append_http_request_msg(request, &log_msg);
 
-  char const* msg_str = { 0 };
-  int32_t msg_len = { 0 };
-  az_log_ensure_span_is_str(log_msg, &msg_str, &msg_len);
-
-  az_log_write(AZ_LOG_HTTP_REQUEST, msg_str, msg_len);
+  az_log_write(AZ_LOG_HTTP_REQUEST, log_msg);
 }
 
 void _az_http_policy_logging_log_http_response(
@@ -157,11 +153,7 @@ void _az_http_policy_logging_log_http_response(
   (void)_az_http_policy_logging_append_http_response_msg(
       &response_copy, duration_msec, request, &log_msg);
 
-  char const* msg_str = { 0 };
-  int32_t msg_len = { 0 };
-  az_log_ensure_span_is_str(log_msg, &msg_str, &msg_len);
-
-  az_log_write(AZ_LOG_HTTP_RESPONSE, msg_str, msg_len);
+  az_log_write(AZ_LOG_HTTP_RESPONSE, log_msg);
 }
 
 AZ_NODISCARD az_result az_http_pipeline_policy_logging(

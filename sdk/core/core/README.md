@@ -94,7 +94,7 @@ typedef enum {
 Here is an example of what basic sdk and user code might look like working together.
 The user needs to do two things as exemplified below:
 1. Set the classifications you wish to log.
-2. Set your logging function that follows the `az_log_fn` prototype. In this case, the logging function uses a basic `printf()`.
+2. Set your logging function that follows the `az_log_message_fn` prototype. In this case, the logging function uses a basic `printf()`.
 
 ```c
 /* INTERNAL sdk http code */
@@ -110,15 +110,15 @@ void some_http_request_code()
 /* User Application Code */
 az_log_classification const classifications[] = { AZ_LOG_HTTP_REQUEST, AZ_LOG_HTTP_RESPONSE, AZ_LOG_END_OF_LIST };
 
-void test_log_func(az_log_classification classification, char const* message, int32_t message_length)
+void test_log_func(az_log_classification classification, az_span message)
 {
-    printf("%s\n", message);
+    printf("%.*s\n", az_span_length(message), az_span_ptr(message));
 }
 
 int main()
 {
   az_log_set_classifications(classifications);
-  az_log_set_listener(&test_log_func);
+  az_log_set_callback(&test_log_func);
 
   some_http_request_code();
 }
