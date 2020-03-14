@@ -3,6 +3,7 @@
 
 #include "az_json_string_private.h"
 #include <az_json.h>
+#include <az_precondition_internal.h>
 
 #include <_az_cfg.h>
 
