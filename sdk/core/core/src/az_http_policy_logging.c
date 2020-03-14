@@ -148,6 +148,7 @@ void _az_http_policy_logging_log_http_response(
 {
   uint8_t log_msg_buf[AZ_LOG_MSG_BUF_SIZE] = { 0 };
   az_span log_msg = AZ_SPAN_FROM_BUFFER(log_msg_buf);
+
   az_http_response response_copy = *response;
 
   (void)_az_http_policy_logging_append_http_response_msg(

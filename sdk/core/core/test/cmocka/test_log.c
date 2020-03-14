@@ -72,7 +72,7 @@ static void _log_listener_NULL(az_log_classification classification, az_span mes
       break;
     case AZ_LOG_HTTP_RESPONSE:
       _log_invoked_for_http_response = true;
-      assert_true(az_span_is_content_equal(msg_messagespan, AZ_SPAN_FROM_STR("")));
+      assert_true(az_span_is_content_equal(message, AZ_SPAN_FROM_STR("")));
       break;
     default:
       assert_true(false);
