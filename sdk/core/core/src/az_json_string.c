@@ -117,7 +117,7 @@ AZ_NODISCARD az_result _az_span_reader_read_json_string_char(az_span* self, uint
 {
   AZ_PRECONDITION_NOT_NULL(self);
 
-  int32_t reader_length = az_span_length(*self);
+  int32_t const reader_length = az_span_length(*self);
   if (reader_length == 0)
   {
     return AZ_ERROR_ITEM_NOT_FOUND;

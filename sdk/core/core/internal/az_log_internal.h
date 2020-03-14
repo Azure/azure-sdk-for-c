@@ -11,10 +11,10 @@
 
 #include <_az_cfg_prefix.h>
 
-void az_log_write(az_log_classification classification, az_span message);
-
 // If the user hasn't registered any classifications, then we log everything.
 bool az_log_should_write(az_log_classification classification);
+
+void az_log_write(az_log_classification classification, az_span message);
 
 #include <_az_cfg_suffix.h>
 
