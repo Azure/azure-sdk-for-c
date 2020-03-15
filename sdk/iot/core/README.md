@@ -92,7 +92,7 @@ void my_telemetry_func()
                 sizeof(telemetry_topic_buffer) / sizeof(telemetry_topic_buffer[0]));
 
   //Get the NULL terminated topic and put in topic_span to send the telemetry
-  az_iot_hub_client_telemetry_publish_topic_get(&client, NULL, topic_span, &topic_span);
+  az_iot_hub_client_telemetry_publish_topic_get(&my_client, NULL, topic_span, &topic_span);
 }
 ```
 
