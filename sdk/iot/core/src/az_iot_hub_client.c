@@ -34,7 +34,8 @@ AZ_NODISCARD az_result az_iot_hub_client_init(
 
   client->_internal.iot_hub_hostname = iot_hub_hostname;
   client->_internal.device_id = device_id;
-  memcpy(&client->_internal.options, options, sizeof(az_iot_hub_client_options));
+  client->_internal.options.module_id = options->module_id;
+  client->_internal.options.user_agent = options->user_agent;
 
   return AZ_OK;
 }
