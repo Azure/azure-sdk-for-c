@@ -105,8 +105,8 @@ static az_result _az_http_policy_logging_append_http_response_msg(
 
   az_http_response_status_line status_line = { 0 };
   AZ_RETURN_IF_FAILED(az_http_response_get_status_line(ref_response, &status_line));
-
-  AZ_RETURN_IF_FAILED(az_span_append_u64toa(*ref_log_msg, (uint64_t)status_line.status_code, ref_log_msg));
+  AZ_RETURN_IF_FAILED(
+      az_span_append_u64toa(*ref_log_msg, (uint64_t)status_line.status_code, ref_log_msg));
 
   AZ_RETURN_IF_FAILED(az_span_append(*ref_log_msg, AZ_SPAN_FROM_STR(" "), ref_log_msg));
   AZ_RETURN_IF_FAILED(az_span_append(*ref_log_msg, status_line.reason_phrase, ref_log_msg));
@@ -135,7 +135,9 @@ void _az_http_policy_logging_log_http_request(_az_http_request const* request)
 {
   uint8_t log_msg_buf[AZ_LOG_MSG_BUF_SIZE] = { 0 };
   az_span log_msg = AZ_SPAN_FROM_BUFFER(log_msg_buf);
+
   (void)_az_http_policy_logging_append_http_request_msg(request, &log_msg);
+
   az_log_write(AZ_LOG_HTTP_REQUEST, log_msg);
 }
 
@@ -148,6 +150,7 @@ void _az_http_policy_logging_log_http_response(
   az_span log_msg = AZ_SPAN_FROM_BUFFER(log_msg_buf);
 
   az_http_response response_copy = *response;
+
   (void)_az_http_policy_logging_append_http_response_msg(
       &response_copy, duration_msec, request, &log_msg);
 
