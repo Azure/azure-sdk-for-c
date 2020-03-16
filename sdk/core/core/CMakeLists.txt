@@ -49,7 +49,7 @@ else()
     set(WARNINGS_AS_ERRORS_FLAG "-Werror")
   endif()
 
-  target_compile_options(${TARGET_NAME} PRIVATE -Wall -Wextra -pedantic ${WARNINGS_AS_ERRORS_FLAG})
+  target_compile_options(${TARGET_NAME} PRIVATE -Wall -Wextra -pedantic ${WARNINGS_AS_ERRORS_FLAG} -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Waggregate-return -Wfloat-equal)
 endif()
 
 target_include_directories (${TARGET_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc> $<INSTALL_INTERFACE:include/${TARGET_NAME}>)
