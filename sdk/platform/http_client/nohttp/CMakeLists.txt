@@ -27,7 +27,7 @@ else()
     set(WARNINGS_AS_ERRORS_FLAG "-Werror")
   endif()
 
-  target_compile_options(az_nohttp PRIVATE -Wall -Wextra -pedantic  ${WARNINGS_AS_ERRORS_FLAG} -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Waggregate-return -Wfloat-equal)
+  target_compile_options(az_nohttp PRIVATE -Wall -Wextra -pedantic  ${WARNINGS_AS_ERRORS_FLAG} -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal)
 endif()
 
 target_link_libraries(az_nohttp PRIVATE az_core)
