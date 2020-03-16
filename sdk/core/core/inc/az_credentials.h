@@ -92,7 +92,7 @@ typedef struct
 
 /**
  * @brief az_credential_client_secret_init initializes an az_credential_client_secret instance
- * withthe specified tenant ID, client ID and client secret.
+ * with the specified tenant ID, client ID and client secret.
  *
  * @param self reference to a az_credential_client_secret instance to initialize
  * @param tenant_id an Azure tenant ID
