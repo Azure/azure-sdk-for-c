@@ -49,11 +49,11 @@ AZ_NODISCARD az_result az_http_pipeline_policy_uniquerequestid(
   (void)p_options;
 
   // TODO - add a UUID create implementation
-  az_span const uniqueid = AZ_SPAN_LITERAL_FROM_STR("123e4567-e89b-12d3-a456-426655440000");
+  //az_span const uniqueid = AZ_SPAN_LITERAL_FROM_STR("123e4567-e89b-12d3-a456-426655440000");
 
   // Append the Unique GUID into the headers
   //  x-ms-client-request-id
-  AZ_RETURN_IF_FAILED(az_http_request_append_header(p_request, AZ_MS_CLIENT_REQUESTID, uniqueid));
+  //AZ_RETURN_IF_FAILED(az_http_request_append_header(p_request, AZ_MS_CLIENT_REQUESTID, uniqueid));
 
   return az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
 }
