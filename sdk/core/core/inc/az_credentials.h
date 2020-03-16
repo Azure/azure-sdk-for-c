@@ -11,6 +11,7 @@
 #define _az_CREDENTIALS_H
 
 #include <az_http.h>
+#include <az_http_transport.h>
 #include <az_result.h>
 #include <az_span.h>
 
