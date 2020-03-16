@@ -122,7 +122,7 @@ static az_result az_span_reader_skip_json_white_space(az_span* self)
 // 18 decimal digits. 10^18 - 1.
 //                        0         1
 //                        012345678901234567
-#define AZ_DEC_NUMBER_MAX 999999999999999999ull
+#define AZ_DEC_NUMBER_MAX ((uint64_t)999999999999999999ull)
 
 typedef struct
 {
@@ -179,7 +179,7 @@ AZ_NODISCARD static az_result az_span_reader_get_json_number_int(
         <= (d < 0 ? AZ_DEC_NUMBER_MAX + ((uint64_t)-d) : AZ_DEC_NUMBER_MAX - (uint64_t)d) / 10)
     {
       p_n->value = d < 0 ? p_n->value * 10 - ((uint64_t)-d) : p_n->value * 10 + (uint64_t)d;
-      p_n->exp = p_n->exp + e_offset;
+      p_n->exp = (int16_t)p_n->exp + (int16_t)e_offset;
     }
     else
     {
@@ -187,7 +187,7 @@ AZ_NODISCARD static az_result az_span_reader_get_json_number_int(
       {
         p_n->remainder = true;
       }
-      p_n->exp = p_n->exp + (e_offset + 1);
+      p_n->exp = (int16_t)p_n->exp + (e_offset + 1);
     }
     *self = az_span_slice(*self, 1, -1);
     if (az_span_length(*self) == 0)
@@ -311,7 +311,7 @@ AZ_NODISCARD static az_result az_span_reader_get_json_number_digit_rest(
       }
       c = az_span_ptr(*self)[0];
     } while (isdigit(c));
-    i.exp += (int16_t)(e_int * e_sign);
+    i.exp += (int16_t)e_int * (int16_t)e_sign;
   }
 
   AZ_RETURN_IF_FAILED(_az_json_number_to_double(&i, out_value));
