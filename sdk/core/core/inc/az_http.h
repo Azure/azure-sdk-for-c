@@ -193,8 +193,8 @@ typedef struct
  * information within an HTTP response.
  *
  * @param response The az_http_response with an http response.
- * @param out The pointer to an az_http_response_status_line structure to be filled in by this
- * function.
+ * @param out_status_line The pointer to an az_http_response_status_line structure to be filled in
+ * by this function.
  * @return AZ_OK = inline code is parsed and returned.<br>
  * Other value =  http response was not parsed
  */
