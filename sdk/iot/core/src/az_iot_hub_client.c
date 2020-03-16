@@ -68,33 +68,35 @@ AZ_NODISCARD az_result az_iot_hub_client_user_name_get(
   }
 
   AZ_RETURN_IF_FAILED(
-      az_span_append(mqtt_user_name, client->_internal.iot_hub_hostname, out_mqtt_user_name));
+      az_span_append(mqtt_user_name, client->_internal.iot_hub_hostname, &mqtt_user_name));
   AZ_RETURN_IF_FAILED(
-      az_span_append_uint8(*out_mqtt_user_name, hub_client_forward_slash, out_mqtt_user_name));
+      az_span_append_uint8(mqtt_user_name, hub_client_forward_slash, &mqtt_user_name));
   AZ_RETURN_IF_FAILED(
-      az_span_append(*out_mqtt_user_name, client->_internal.device_id, out_mqtt_user_name));
+      az_span_append(mqtt_user_name, client->_internal.device_id, &mqtt_user_name));
   AZ_RETURN_IF_FAILED(
-      az_span_append_uint8(*out_mqtt_user_name, hub_client_forward_slash, out_mqtt_user_name));
+      az_span_append_uint8(mqtt_user_name, hub_client_forward_slash, &mqtt_user_name));
 
   if (az_span_length(*module_id) > 0)
   {
-    AZ_RETURN_IF_FAILED(az_span_append(*out_mqtt_user_name, *module_id, out_mqtt_user_name));
+    AZ_RETURN_IF_FAILED(az_span_append(mqtt_user_name, *module_id, &mqtt_user_name));
     AZ_RETURN_IF_FAILED(
-        az_span_append_uint8(*out_mqtt_user_name, hub_client_forward_slash, out_mqtt_user_name));
+        az_span_append_uint8(mqtt_user_name, hub_client_forward_slash, &mqtt_user_name));
   }
 
   AZ_RETURN_IF_FAILED(
-      az_span_append(*out_mqtt_user_name, hub_client_api_version, out_mqtt_user_name));
+      az_span_append(mqtt_user_name, hub_client_api_version, &mqtt_user_name));
 
   if (az_span_length(*user_agent) > 0)
   {
     AZ_RETURN_IF_FAILED(
-        az_span_append_uint8(*out_mqtt_user_name, hub_client_param_separator, out_mqtt_user_name));
-    AZ_RETURN_IF_FAILED(az_span_append(*out_mqtt_user_name, *user_agent, out_mqtt_user_name));
+        az_span_append_uint8(mqtt_user_name, hub_client_param_separator, &mqtt_user_name));
+    AZ_RETURN_IF_FAILED(az_span_append(mqtt_user_name, *user_agent, &mqtt_user_name));
   }
 
   AZ_RETURN_IF_FAILED(
-      az_span_append_uint8(*out_mqtt_user_name, hub_client_null_terminate, out_mqtt_user_name));
+      az_span_append_uint8(mqtt_user_name, hub_client_null_terminate, &mqtt_user_name));
+
+  *out_mqtt_user_name = mqtt_user_name;
 
   return AZ_OK;
 }
@@ -122,17 +124,19 @@ AZ_NODISCARD az_result az_iot_hub_client_id_get(
   }
 
   AZ_RETURN_IF_FAILED(
-      az_span_append(mqtt_client_id, client->_internal.device_id, out_mqtt_client_id));
+      az_span_append(mqtt_client_id, client->_internal.device_id, &mqtt_client_id));
 
   if (az_span_length(*module_id) > 0)
   {
     AZ_RETURN_IF_FAILED(
-        az_span_append_uint8(*out_mqtt_client_id, hub_client_forward_slash, out_mqtt_client_id));
-    AZ_RETURN_IF_FAILED(az_span_append(*out_mqtt_client_id, *module_id, out_mqtt_client_id));
+        az_span_append_uint8(mqtt_client_id, hub_client_forward_slash, &mqtt_client_id));
+    AZ_RETURN_IF_FAILED(az_span_append(mqtt_client_id, *module_id, &mqtt_client_id));
   }
 
   AZ_RETURN_IF_FAILED(
-      az_span_append_uint8(*out_mqtt_client_id, hub_client_null_terminate, out_mqtt_client_id));
+      az_span_append_uint8(mqtt_client_id, hub_client_null_terminate, &mqtt_client_id));
+
+  *out_mqtt_client_id = mqtt_client_id;
 
   return AZ_OK;
 }
