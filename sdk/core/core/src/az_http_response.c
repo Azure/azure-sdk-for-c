@@ -17,10 +17,10 @@ AZ_NODISCARD AZ_INLINE az_result _az_is_char(az_span slice, uint8_t c)
   return az_span_ptr(slice)[0] == c ? AZ_OK : AZ_CONTINUE;
 }
 
-AZ_NODISCARD az_result _az_is_a_colon(az_span slice) { return _az_is_char(slice, ':'); }
-AZ_NODISCARD az_result _az_is_new_line(az_span slice) { return _az_is_char(slice, '\n'); }
+static AZ_NODISCARD az_result _az_is_a_colon(az_span slice) { return _az_is_char(slice, ':'); }
+static AZ_NODISCARD az_result _az_is_new_line(az_span slice) { return _az_is_char(slice, '\n'); }
 
-AZ_NODISCARD bool _az_is_http_whitespace(uint8_t c)
+static AZ_NODISCARD bool _az_is_http_whitespace(uint8_t c)
 {
   switch (c)
   {
@@ -33,13 +33,13 @@ AZ_NODISCARD bool _az_is_http_whitespace(uint8_t c)
   }
 }
 
-AZ_NODISCARD az_result _az_slice_is_not_http_whitespace(az_span slice)
+static AZ_NODISCARD az_result _az_slice_is_not_http_whitespace(az_span slice)
 {
   return _az_is_http_whitespace(az_span_ptr(slice)[0]) == true ? AZ_CONTINUE : AZ_OK;
 }
 
 /* PRIVATE Function. parse next  */
-AZ_NODISCARD az_result _az_get_digit(az_span* self, uint8_t* save_here)
+static AZ_NODISCARD az_result _az_get_digit(az_span* self, uint8_t* save_here)
 {
 
   uint8_t c_ptr = az_span_ptr(*self)[0];
@@ -60,7 +60,7 @@ AZ_NODISCARD az_result _az_get_digit(az_span* self, uint8_t* save_here)
  * Status line https://tools.ietf.org/html/rfc7230#section-3.1.2
  * HTTP-version SP status-code SP reason-phrase CRLF
  */
-AZ_NODISCARD az_result _az_get_http_status_line(az_span* self, az_http_response_status_line* out)
+static AZ_NODISCARD az_result _az_get_http_status_line(az_span* self, az_http_response_status_line* out)
 {
 
   // HTTP-version = HTTP-name "/" DIGIT "." DIGIT

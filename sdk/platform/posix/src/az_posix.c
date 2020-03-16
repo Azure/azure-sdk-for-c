@@ -13,15 +13,12 @@
 
 AZ_NODISCARD int64_t az_platform_clock_msec()
 {
-  // Convert clock_t to milliseconds
-  // Floating point arithmetic is used to cover CLOCKS_PER_SEC all values
-  // including 12000, 2000, 1500, 300, 500, 100, 2
-  return (int64_t)(clock() / (CLOCKS_PER_SEC / (double)_az_TIME_MILLISECONDS_PER_SECOND));
+  return (int64_t)((clock() / (CLOCKS_PER_SEC) * _az_TIME_MILLISECONDS_PER_SECOND);
 }
 
 void az_platform_sleep_msec(int32_t milliseconds)
 {
-  (void)usleep(milliseconds * _az_TIME_MICROSECONDS_PER_MILLISECOND);
+  (void)usleep((useconds_t)milliseconds * _az_TIME_MICROSECONDS_PER_MILLISECOND);
 }
 
 void az_platform_mtx_destroy(az_platform_mtx* mtx)
