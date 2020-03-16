@@ -43,7 +43,7 @@
 az_precondition_failed_fn az_precondition_failed_get_callback();
 
 #ifdef NO_PRECONDITION_CHECKING
-#define AZ_PRECONDITION(condition) void()
+#define AZ_PRECONDITION(condition)
 #else
 #define AZ_PRECONDITION(condition) \
   do \
