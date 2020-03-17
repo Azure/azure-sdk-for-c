@@ -42,6 +42,7 @@ Thank you for your interest in contributing to Azure SDK for C.
 - [git](https://git-scm.com/downloads) to clone our Azure SDK repository with the desired tag
 - [cmocka](https://cmocka.org/) for building and running unit tests. By default, building unit tests is disabled, so, unless you want to add unit tests or run then, you don't need to install this. See how `vcpkg` can be used to install dependencies, [below](#VCPKG).
 - [curl](https://curl.haxx.se/download.html) which is used as an http stack, and is required for building and running service samples (keyvault and storage). You don't need to install curl if you are not building samples.
+- [doxygen](http://www.doxygen.nl/download.html) if you need to generate and view documentation.
 
 ### Development Environment
 
