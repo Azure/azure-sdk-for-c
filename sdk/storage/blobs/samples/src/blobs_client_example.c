@@ -24,10 +24,10 @@ int exit_code = 0;
  *
  * @param client Client
  * @param response Response
- * @return AZ_NODISCARD az_storage_blobs_blob_download
+ * @return AZ_NODISCARD _az_storage_blobs_blob_download
  */
-AZ_NODISCARD az_result
-az_storage_blobs_blob_download(az_storage_blobs_blob_client* client, az_http_response* response)
+static AZ_NODISCARD az_result
+_az_storage_blobs_blob_download(az_storage_blobs_blob_client* client, az_http_response* response)
 {
 
   // Request buffer
@@ -128,7 +128,7 @@ int main()
     printf("Failed to create blob");
   }
 
-  az_result const get_result = az_storage_blobs_blob_download(&client, &http_response);
+  az_result const get_result = _az_storage_blobs_blob_download(&client, &http_response);
 
   if (az_failed(get_result))
   {
