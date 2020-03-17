@@ -5,6 +5,7 @@
 #define _az_HTTP_POLICY_LOGGING_PRIVATE_H
 
 #include <az_http.h>
+#include <az_http_transport.h>
 
 #include <stdint.h>
 
