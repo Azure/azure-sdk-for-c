@@ -82,8 +82,6 @@ AZ_NODISCARD az_result az_iot_hub_client_user_name_get(
   return AZ_OK;
 }
 
-//[Format without module id] {device_id}
-//[Format with module id] {device_id}/{module_id}
 AZ_NODISCARD az_result az_iot_hub_client_id_get(
     az_iot_hub_client const* client,
     az_span mqtt_client_id,
