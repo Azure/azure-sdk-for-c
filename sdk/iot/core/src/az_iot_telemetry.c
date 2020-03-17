@@ -30,35 +30,6 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_publish_topic_get(
   const az_span* user_agent = &(client->_internal.options.user_agent);
   const az_span* module_id = &(client->_internal.options.module_id);
 
-  // Required topic parts
-  int32_t required_size = az_span_length(telemetry_topic_prefix)
-      + az_span_length(client->_internal.device_id) + az_span_length(telemetry_topic_suffix);
-
-  // Optional parts
-  if (az_span_ptr(*module_id) != NULL)
-  {
-    required_size += az_span_length(telemetry_topic_modules_mid);
-    required_size += az_span_length(*module_id);
-  }
-
-  if (properties != NULL)
-  {
-    required_size
-        += az_span_length(properties->_internal.properties) + sizeof(telemetry_prop_delim);
-  }
-
-  if (az_span_ptr(*user_agent) != NULL)
-  {
-    required_size += az_span_length(*user_agent) + sizeof(telemetry_prop_delim);
-  }
-
-  // Only build topic if the span has the capacity
-  if (az_span_capacity(mqtt_topic) < required_size)
-  {
-    return AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY;
-  }
-
-  // Build topic string
   AZ_RETURN_IF_FAILED(az_span_append(mqtt_topic, telemetry_topic_prefix, out_mqtt_topic));
   AZ_RETURN_IF_FAILED(az_span_append(*out_mqtt_topic, client->_internal.device_id, out_mqtt_topic));
 
