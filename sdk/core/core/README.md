@@ -144,7 +144,7 @@ Log classifications allow your application to select which specific log messages
 
 ### SDK Function Argument Validation
 
-The public SDK functions validate the arguments passed to them in an effort to ensure that the calling code is passing valid values. The valid value is called a contract precondition. If an SDK function detects a precondition failure (invalid argument value), then by default, it calls a function that places the calling thread into an infinite sleep state; other threads continue to run.
+The public SDK functions validate the arguments passed to them to ensure that the calling code is passing valid values. The valid value is called a contract precondition. If an SDK function detects a precondition failure (invalid argument value), then by default, it calls a function that places the calling thread into an infinite sleep state; other threads continue to run.
 
 To override the default behavior, implement a function matching the `az_precondition_failed_fn` function signature and then, in your application's initialization (before calling any Azure SDK function), call `az_precondition_failed_set_callback` passing it the address of your function. Now, when any Azure SDK function detects a precondition failure, it will invoke your callback instead. You might override the callback to attach a debugger or perhaps to reboot the device rather than allowing it to continue running with unpredictable behavior.
 
