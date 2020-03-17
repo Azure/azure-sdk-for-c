@@ -311,7 +311,9 @@ AZ_NODISCARD az_result az_span_append_dtoa(az_span destination, double source, a
 {
   AZ_PRECONDITION_NOT_NULL(out_span);
 
-  if (source == 0)
+  uint64_t const* const source_bin_rep_view = (uint64_t*)&source;
+
+  if (*source_bin_rep_view == 0)
   {
     AZ_RETURN_IF_FAILED(az_span_append(destination, AZ_SPAN_FROM_STR("0"), out_span));
     return AZ_OK;
@@ -326,7 +328,7 @@ AZ_NODISCARD az_result az_span_append_dtoa(az_span destination, double source, a
 
   {
     uint64_t u = (uint64_t)source;
-    if (source == (double)u)
+    if (*source_bin_rep_view == (double)u)
     {
       uint64_t base = 1;
       {
