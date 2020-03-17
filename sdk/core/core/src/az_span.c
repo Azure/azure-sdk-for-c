@@ -15,7 +15,7 @@
 
 enum
 {
-  AZ_ASCII_LOWER_DIF = 'a' - 'A',
+  _az_ASCII_LOWER_DIF = 'a' - 'A',
 };
 
 AZ_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t length, int32_t capacity)
@@ -45,9 +45,15 @@ AZ_NODISCARD az_span az_span_slice(az_span span, int32_t low_index, int32_t high
   return az_span_init(az_span_ptr(span) + low_index, high_index - low_index, capacity - low_index);
 }
 
-AZ_NODISCARD AZ_INLINE uint8_t az_ascii_lower(uint8_t value)
+AZ_NODISCARD AZ_INLINE uint8_t _az_tolower(uint8_t value)
 {
-  return 'A' <= value && value <= 'Z' ? value + AZ_ASCII_LOWER_DIF : value;
+  // This is equivalent to the following but with fewer conditions.
+  // return 'A' <= value && value <= 'Z' ? value + AZ_ASCII_LOWER_DIF : value;
+  if ((uint8_t)(int8_t)(value - 'A') <= ('Z' - 'A'))
+  {
+    value += _az_ASCII_LOWER_DIF;
+  }
+  return value;
 }
 
 AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1, az_span span2)
@@ -59,7 +65,7 @@ AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1, az_span 
   }
   for (int32_t i = 0; i < size; ++i)
   {
-    if (az_ascii_lower(az_span_ptr(span1)[i]) != az_ascii_lower(az_span_ptr(span2)[i]))
+    if (_az_tolower(az_span_ptr(span1)[i]) != _az_tolower(az_span_ptr(span2)[i]))
     {
       return false;
     }
