@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include "az_http_policy_private.h"
 #include <az_json.h>
 
 #include <setjmp.h>
@@ -45,8 +46,14 @@ void test_json_value(void** state)
   // number from number
   {
     double number_value = 0.79;
+    uint64_t const* const number_value_bin_rep_view = (uint64_t*)&number_value;
+
     assert_true(az_json_token_get_number(json_number, &number_value) == AZ_OK);
-    assert_true(number_value == -42.3);
+
+    double const expected_value = -42.3;
+    uint64_t const* const expected_value_bin_rep_view = (uint64_t*)&expected_value;
+
+    assert_true(*number_value_bin_rep_view == *expected_value_bin_rep_view);
   }
   // number from string
   {
