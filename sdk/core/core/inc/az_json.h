@@ -29,15 +29,17 @@
  */
 typedef enum
 {
-  AZ_JSON_TOKEN_NULL = 0,
-  AZ_JSON_TOKEN_BOOLEAN = 1,
-  AZ_JSON_TOKEN_NUMBER = 2,
-  AZ_JSON_TOKEN_STRING = 3,
-  AZ_JSON_TOKEN_OBJECT_START = 4,
-  AZ_JSON_TOKEN_ARRAY_START = 5,
+  AZ_JSON_TOKEN_NULL,
+  AZ_JSON_TOKEN_BOOLEAN,
+  AZ_JSON_TOKEN_NUMBER,
+  AZ_JSON_TOKEN_STRING,
+  AZ_JSON_TOKEN_OBJECT_START,
+  AZ_JSON_TOKEN_OBJECT_END,
+  AZ_JSON_TOKEN_ARRAY_START,
+  AZ_JSON_TOKEN_ARRAY_END,
   // AZ_JSON_TOKEN_SPAN represents a token consisting of nested JSON; the JSON parser never returns
   // a token of this type.
-  AZ_JSON_TOKEN_SPAN = 6,
+  AZ_JSON_TOKEN_SPAN,
 } az_json_token_kind;
 
 /*
@@ -111,11 +113,27 @@ AZ_NODISCARD AZ_INLINE az_json_token az_json_token_object_start()
 }
 
 /*
+ * @brief az_json_token_object_end returns a az_json_token representing the end of an object.
+ */
+AZ_NODISCARD AZ_INLINE az_json_token az_json_token_object_end()
+{
+  return (az_json_token){ .kind = AZ_JSON_TOKEN_OBJECT_END, ._internal = { 0 } };
+}
+
+/*
  * @brief az_json_token_array_start returns a az_json_token representing the start of an array.
  */
 AZ_NODISCARD AZ_INLINE az_json_token az_json_token_array_start()
 {
   return (az_json_token){ .kind = AZ_JSON_TOKEN_ARRAY_START, ._internal = { 0 } };
+}
+
+/*
+ * @brief az_json_token_array_end returns a az_json_token representing the end of an array.
+ */
+AZ_NODISCARD AZ_INLINE az_json_token az_json_token_array_end()
+{
+  return (az_json_token){ .kind = AZ_JSON_TOKEN_ARRAY_END, ._internal = { 0 } };
 }
 
 /*
@@ -213,16 +231,6 @@ AZ_NODISCARD az_result
 az_json_builder_append_object(az_json_builder* json_builder, az_span name, az_json_token token);
 
 /*
- * @brief az_json_builder_append_object_close appends a close brace (}) to the JSON buffer.
- *
- * @param json_builder A pointer to an az_json_builder instance containing the buffer to append the
- * close brace to.
- * @return AZ_OK if the token was appended successfully.<br>
- * AZ_ERROR_BUFFER_OVERFLOW if the buffer is too small.
- */
-AZ_NODISCARD az_result az_json_builder_append_object_close(az_json_builder* json_builder);
-
-/*
  * @brief az_json_builder_append_array_item appends an array item to the JSON buffer.
  *
  * @param json_builder A pointer to an az_json_builder instance containing the buffer to append the
@@ -233,16 +241,6 @@ AZ_NODISCARD az_result az_json_builder_append_object_close(az_json_builder* json
  */
 AZ_NODISCARD az_result
 az_json_builder_append_array_item(az_json_builder* json_builder, az_json_token token);
-
-/*
- * @brief az_json_builder_append_array_close appends an close square bracket (]) to the JSON buffer.
- *
- * @param json_builder A pointer to an az_json_builder instance containing the buffer to append the
- * close brace to.
- * @return AZ_OK if the token was appended successfully.<br>
- * AZ_ERROR_BUFFER_OVERFLOW if the buffer is too small.
- */
-AZ_NODISCARD az_result az_json_builder_append_array_close(az_json_builder* json_builder);
 
 /************************************ JSON PARSER ******************/
 

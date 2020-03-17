@@ -41,7 +41,7 @@ void test_json_builder(void** state)
       TEST_EXPECT_SUCCESS(az_json_builder_append_array_item(&builder, az_json_token_null()));
       TEST_EXPECT_SUCCESS(az_json_builder_append_array_item(&builder, az_json_token_number(0)));
       TEST_EXPECT_SUCCESS(az_json_builder_append_array_item(&builder, az_json_token_number(-12)));
-      TEST_EXPECT_SUCCESS(az_json_builder_append_array_close(&builder));
+      TEST_EXPECT_SUCCESS(az_json_builder_append_token(&builder, az_json_token_array_end()));
     }
 
     TEST_EXPECT_SUCCESS(az_json_builder_append_object(
@@ -58,7 +58,7 @@ void test_json_builder(void** state)
             "\x1f"
             "b"))));
 
-    TEST_EXPECT_SUCCESS(az_json_builder_append_object_close(&builder));
+    TEST_EXPECT_SUCCESS(az_json_builder_append_token(&builder, az_json_token_object_end()));
 
     assert_true(az_span_is_content_equal(
         builder._internal.json,

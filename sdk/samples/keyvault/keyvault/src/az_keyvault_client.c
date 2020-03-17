@@ -194,7 +194,7 @@ AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
           }
           AZ_RETURN_IF_FAILED(az_json_builder_append_array_item(&builder, az_json_token_string(s)));
         }
-        AZ_RETURN_IF_FAILED(az_json_builder_append_array_close(&builder));
+        AZ_RETURN_IF_FAILED(az_json_builder_append_token(&builder, az_json_token_array_end()));
       }
       // tags
       if (options->tags != NULL)
@@ -211,12 +211,12 @@ AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
           AZ_RETURN_IF_FAILED(
               az_json_builder_append_object(&builder, tag.key, az_json_token_string(tag.value)));
         }
-        AZ_RETURN_IF_FAILED(az_json_builder_append_object_close(&builder));
+        AZ_RETURN_IF_FAILED(az_json_builder_append_token(&builder, az_json_token_object_end()));
       }
     }
   }
 
-  AZ_RETURN_IF_FAILED(az_json_builder_append_object_close(&builder));
+  AZ_RETURN_IF_FAILED(az_json_builder_append_token(&builder, az_json_token_object_end()));
   *http_body = builder._internal.json;
 
   return AZ_OK;

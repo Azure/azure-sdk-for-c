@@ -60,6 +60,13 @@ AZ_NODISCARD az_result az_json_builder_write_span(az_json_builder* self, az_span
   return az_span_append(*json, AZ_SPAN_FROM_STR("\""), json);
 }
 
+AZ_NODISCARD static az_result az_json_builder_write_close(az_json_builder* self, az_span close)
+{
+  AZ_RETURN_IF_FAILED(az_span_append(self->_internal.json, close, &self->_internal.json));
+  self->_internal.need_comma = true;
+  return AZ_OK;
+}
+
 AZ_NODISCARD az_result
 az_json_builder_append_token(az_json_builder* json_builder, az_json_token token)
 {
@@ -96,10 +103,18 @@ az_json_builder_append_token(az_json_builder* json_builder, az_json_token token)
       json_builder->_internal.need_comma = false;
       return az_span_append(*json, AZ_SPAN_FROM_STR("{"), json);
     }
+    case AZ_JSON_TOKEN_OBJECT_END:
+    {
+      return az_json_builder_write_close(json_builder, AZ_SPAN_FROM_STR("}"));
+    }
     case AZ_JSON_TOKEN_ARRAY_START:
     {
       json_builder->_internal.need_comma = false;
       return az_span_append(*json, AZ_SPAN_FROM_STR("["), json);
+    }
+    case AZ_JSON_TOKEN_ARRAY_END:
+    {
+      return az_json_builder_write_close(json_builder, AZ_SPAN_FROM_STR("]"));
     }
     case AZ_JSON_TOKEN_SPAN:
     {
@@ -137,22 +152,6 @@ az_json_builder_append_object(az_json_builder* json_builder, az_span name, az_js
   return AZ_OK;
 }
 
-AZ_NODISCARD static az_result az_json_builder_write_close(az_json_builder* self, az_span close)
-{
-  AZ_PRECONDITION_NOT_NULL(self);
-
-  AZ_RETURN_IF_FAILED(az_span_append(self->_internal.json, close, &self->_internal.json));
-  self->_internal.need_comma = true;
-  return AZ_OK;
-}
-
-AZ_NODISCARD az_result az_json_builder_append_object_close(az_json_builder* self)
-{
-  AZ_PRECONDITION_NOT_NULL(self);
-
-  return az_json_builder_write_close(self, AZ_SPAN_FROM_STR("}"));
-}
-
 AZ_NODISCARD az_result
 az_json_builder_append_array_item(az_json_builder* json_builder, az_json_token token)
 {
@@ -161,11 +160,4 @@ az_json_builder_append_array_item(az_json_builder* json_builder, az_json_token t
   AZ_RETURN_IF_FAILED(az_json_builder_write_comma(json_builder));
   AZ_RETURN_IF_FAILED(az_json_builder_append_token(json_builder, token));
   return AZ_OK;
-}
-
-AZ_NODISCARD az_result az_json_builder_append_array_close(az_json_builder* self)
-{
-  AZ_PRECONDITION_NOT_NULL(self);
-
-  return az_json_builder_write_close(self, AZ_SPAN_FROM_STR("]"));
 }
