@@ -57,7 +57,7 @@ int main()
 
 ### Properties
 
-Included in the IoT SDK are helper functions to form and manage properties for IoT Hub services. Functionality starts by using the `az_iot_hub_client_properties_init()` API. The user is free to intitialize using an empty but appropriately sized span to later append properties or an already populated span containing a properly formated property buffer. "Properly formatted" properties follow the form `{key}={value}&{key}={value}`.
+Included in the IoT SDK are helper functions to form and manage properties for IoT Hub services. Implementation starts by using the `az_iot_hub_client_properties_init()` API. The user is free to intitialize using an empty, but appropriately sized, span to later append properties or an already populated span containing a properly formated property buffer. "Properly formatted" properties follow the form `{key}={value}&{key}={value}`.
 
 Below is an example use case of appending properties.
 
@@ -74,7 +74,7 @@ void my_property_func()
   az_iot_hub_client_properties_init(&props, property_span);
   //Append properties
   az_iot_hub_client_properties_append(&props, AZ_SPAN_FROM_STR("key"), AZ_SPAN_FROM_STR("value"));
-  //At this point, you are free to pass the `props` to other API's with property parameters.
+  //At this point, you are able to pass the `props` to other API's with property parameters.
 }
 ```
 
@@ -88,7 +88,7 @@ void my_property_func()
   //Initialize the property struct with the span
   az_iot_hub_client_properties props;
   az_iot_hub_client_properties_init(&props, my_prop_span);
-  //At this point, you are free to pass the `props` to other API's with property parameters.
+  //At this point, you are able to pass the `props` to other API's with property parameters.
 }
 ```
 

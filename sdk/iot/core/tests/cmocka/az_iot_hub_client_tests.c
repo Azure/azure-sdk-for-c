@@ -32,6 +32,7 @@ static const char test_correct_client_id_with_module_id[] = "my_device/my_module
 #define TEST_KEY_TWO "key_two"
 #define TEST_VALUE_ONE "value_one"
 #define TEST_VALUE_TWO "value_two"
+#define TEST_KEY_VALUE_ONE "key_one=value_one"
 
 static const az_span test_key_one = AZ_SPAN_LITERAL_FROM_STR(TEST_KEY_ONE);
 static const az_span test_key_two = AZ_SPAN_LITERAL_FROM_STR(TEST_KEY_TWO);
@@ -309,7 +310,7 @@ void test_az_iot_hub_client_properties_init_user_set_params_succeed(void** state
 {
   (void)state;
 
-  az_span test_span = az_span_from_str((char*)test_correct_one_key_value);
+  az_span test_span = az_span_from_str(TEST_KEY_VALUE_ONE);
   az_iot_hub_client_properties props;
 
   assert_int_equal(az_iot_hub_client_properties_init(&props, test_span), AZ_OK);
