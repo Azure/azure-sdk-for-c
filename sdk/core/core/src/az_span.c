@@ -328,7 +328,9 @@ AZ_NODISCARD az_result az_span_append_dtoa(az_span destination, double source, a
 
   {
     uint64_t u = (uint64_t)source;
-    if (*source_bin_rep_view == (double)u)
+    uint64_t const* const u_bin_rep_view = (uint64_t*)&source;
+
+    if (*source_bin_rep_view == *u_bin_rep_view)
     {
       uint64_t base = 1;
       {
