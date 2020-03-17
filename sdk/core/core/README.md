@@ -8,6 +8,10 @@ The library allows client libraries to expose common functionality in a consiste
 
 TODO
 
+## Porting the Azure SDK to Another Platform
+
+The `Azure Core` library requires you to implement a few functions to provide platform-specific features such as a clock, a thread sleep, a mutual-exclusive thread synchronization lock, and an HTTP stack. By default, `Azure Core` ships with no-op versions of these functions, all of which return `AZ_RESULT_NOT_IMPLEMENTED`.
+
 ## Key concepts
 
 ### Error Structure
@@ -40,19 +44,83 @@ inline bool az_succeeded(az_result result) {
 
 Additional information could be passed using output parameters.
 
-### Span of bytes
+### Working with Spans
 
-Defined in [inc/az_span.h](inc/az_span.h).
+An `az_span` is a small data structure (defined in our [az_span.h](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/core/core/inc/az_span.h) file) wrapping a byte buffer. Specifically, an `az_span` instance contains:
 
-```c
-typedef struct {
-  struct {
-    uint8_t * ptr;
-    int32_t length;
-    int32_t capacity;
-  } _internal;
-} az_span;
+- a byte pointer
+- an integer capacity
+- an integer length
+
+Our SDK passes `az_span` instances to functions to ensure that a buffer’s address capacity, and length are always passed together; this reduces the chance of bugs. And, since we have the length and capacity, operations are fast; for example, we never need to call `strlen` to find the length of a string in order to append to it. Furthermore, when our SDK functions write or append to an `az_span`, our functions ensure that we never write beyond the capacity of the buffer; this prevents data corruption. And finally, when reading from an `az_span`, we never read past the `az_span`’s length ensuring that we don’t process uninitialized data.
+
+Since many of our SDK functions require `az_span` parameters, customers must know how to create `az_span` instances so that you can call functions in our SDK. Here are some examples.
+
+Create an empty (or NULL) `az_span`:
+
+```C
+az_span span_null = AZ_SPAN_NULL; // cap = 0, len = 0
 ```
+
+Create an `az_span` literal from an uninitialized byte buffer:
+
+```C
+uint8_t buffer[1024];
+az_span span_over_buffer = AZ_SPAN_LITERAL_FROM_BUFFER(buffer); // cap = 1024, len = 0
+```
+
+Create an `az_span` literal from an initialized bytes buffer:
+
+```C
+uint8_t buffer[] = { 1, 2, 3, 4, 5 };
+az_span span_over_buffer = AZ_SPAN_LITERAL_FROM_INITIALIZED_BUFFER(buffer); // cap = 5, len = 5
+```
+
+Create an `az_span` expression from an uninitialized byte buffer:
+
+```C
+uint8_t buffer[1024];
+some_function(AZ_SPAN_FROM_BUFFER(buffer));  // cap = 1024, len = 0
+```
+
+Create an `az_span` expression from an initialized bytes buffer:
+
+```C
+uint8_t buffer[] = { 1, 2, 3, 4, 5 };
+some_function(AZ_SPAN_FROM_INITIALIZED_BUFFER(buffer));  // cap = 5, len = 5
+```
+
+Create an `az_span` literal from a string (the span does NOT include the 0-terminating byte):
+
+```C
+az_span span_over_str = AZ_SPAN_LITERAL_FROM_STR("Hello");  // cap = 5, len = 5
+```
+
+Create an `az_span` expression from a string (the span does NOT include the 0-terminating byte):
+
+```C
+some_function(AZ_SPAN_FROM_STR("Hello"));  // cap = 5, len = 5
+```
+
+As shown above, an `az_span` over a string does not include the 0-terminator. If you need to 0-terminate the string, you can call this function to append a 0 byte (if the string’s length is less than its capacity):
+
+```C
+az_result az_span_append_uint8(az_span destination, uint8_t byte, az_span* out_span);
+```
+
+and then call this function to get the address of the 0-terminated string:
+
+```C
+char* str = (char*) az_span_ptr(span); // str points to a 0-terminated string
+```
+
+Or, you can call this function to copy the string in the `az_span` to your own `char*` buffer; this function will 0-termiante the string in the `char*` buffer:
+
+```C
+az_result az_span_to_str(char* destination, int32_t destination_max_size, az_span source);
+```
+
+There are many functions to manipulate `az_span` instances. You can slice (subset an `az_span`), parse an `az_span` containing a string into an number, append a number as a string to the end of an `az_span`, check if two `az_span` instances are equal or the contents of two `az_span` instances are equal, and more.
 
 ### Strings
 
@@ -62,12 +130,64 @@ A string is a span of UTF-8 characters. It's not a zero-terminated string. Defin
 az_span hello_world = AZ_SPAN_FROM_STR("Hello world!");
 ```
 
+### Logging SDK Operations
+
+As our SDK performs operations, it can send log messages to a customer-defined callback. Customers can enable this to assist with debugging and diagnosing issues when leveraging our SDK code.
+
+To enable logging, you must first write a callback function that our logging mechanism will invoke periodically with messages. The function signature must match this type definition (defined in the [az_log.h](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/core/core/inc/az_log.h) file):
+
+   ```C
+   typedef void (*az_log_fn)(az_log_classification classification, az_span message);
+   ```
+
+And then, during your application’s initialization, you must register your function with our SDK by calling this function:
+
+   ```C
+   void az_log_set_listener(az_log_fn listener);
+   ```
+
+Now, whenever our SDK wants to send a log message, it will invoke your callback function passing it the log classification and an `az_span` containing the message string (not 0-terminated). Your callback method can now do whatever it wants to with this message such as append it to a file or write it to the console. **Note:** in a multi-threaded application, multiple threads may invoke this callback function simultaneously; if your function requires any kind of thread synchronization, then you must provide it.
+
+Log classifications allow your application to select which specific log messages it wants to receive. For example, to log just HTTP response messages (and not HTTP request messages), initialize your application by calling this:
+
+   ```C
+   az_log_classification const classifications[] = { AZ_LOG_HTTP_REQUEST };
+   az_log_set_classifications(classifications, sizeof(classifications) / sizeof(classifications[0]));
+   ```
+
+### Canceling an Operation
+
+`Azure Core` provides a rich cancellation mechanism by way of its `az_context` type (defined in the [az_context.h](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/core/core/inc/az_context.h) file). As your code executes and functions call other functions, a pointer to an `az_context` is passed as an argument through the functions. At any point, a function can create a new `az_context` specifying a parent `az_context` and a timeout period and then, this new `az_context` is passed down to more functions. When a parent `az_context` instance expires or is canceled, all of its children are canceled as well.
+
+There is a special singleton instance of the `az_context` type called `az_context_app`. This instance represents your entire application and this `az_context` instance never expires. It is common to use this instance as the ultimate root of all `az_context` instances. So then, as functions call other functions, these functions can create child `az_context` instances and pass the child down through the call tree. Imagine you have the following `az_context` tree:
+
+- `az_context_app`; never expires
+  - `az_context_child`; expires in 10 seconds
+    - `az_context_grandchild`; expires in 60 seconds
+
+Any code using `az_context_grandchild` expires in 10 seconds (not 60 seconds) because it has a parent that expires in 10 seconds. In other words, each child can specify its own expiration time but when a parent expires, all its children also expire. While `az_context_app` never expires, your code can explicitly cancel it thereby canceling all the children `az_context` instances. This is a great way to cleanly cancel all operations in your application allowing it to terminate quickly.
+
+Note however that cancellation is performed as a best effort; it is not guaranteed to work in a timely fashion. For example, the HTTP stack that you use may not support cancellation. In this case, cancellation will be detected only after the I/O operation completes or before the next I/O operation starts.
+
+   ```C
+   // Some function creates a child with a 10-second expiration:
+   az_context child = az_context_with_expiration(&az_context_app, 10);
+
+   // Some function creates a grandchild with a 60-second expiration:
+   az_context grandchild = az_context_with_expiration(&child, 60);
+
+   // Some other function (perhaps in response to a SIGINT) cancels the application root:
+   az_context_cancel(&az_context_app);
+   // All children are now in the canceled state & the threads will start unwinding
+   ```
+
 ## Examples
 
 ### az_log.h
-The various components of the SDK are broken up into "classifications". Log messages are filtered with these classification enums so that the user can decide which log messages they want. Classifications are derived from higher level groupings called "facilities". At the beginning of the user's code, they can initialize the logging by optionally setting the classifications they want, setting their logging listener, and then logging any messages they desire. 
 
-*Basic Code Snippet*
+The various components of the SDK are broken up into "classifications". Log messages are filtered with these classification enums so that the user can decide which log messages they want. Classifications are derived from higher level groupings called "facilities". At the beginning of the user's code, they can initialize the logging by optionally setting the classifications they want, setting their logging listener, and then logging any messages they desire.
+
+#### Basic Code Snippet
 
 Relevant components for logging are located in [az_result.h](./inc/az_result.h) and [az_log.h](./inc/az_log.h). The `az_log_classification` enum will be used to choose features to log.
 
@@ -93,6 +213,7 @@ typedef enum {
 
 Here is an example of what basic sdk and user code might look like working together.
 The user needs to do two things as exemplified below:
+
 1. Set the classifications you wish to log.
 2. Set your logging function that follows the `az_log_message_fn` prototype. In this case, the logging function uses a basic `printf()`.
 
@@ -128,7 +249,6 @@ Here the classifications are set to `AZ_LOG_HTTP_REQUEST` and `AZ_LOG_HTTP_RESPO
 
 If no classifications are set then all messages are logged.
 
-
 ## Troubleshooting
 
 ### General
@@ -148,41 +268,6 @@ TODO
 ### Additional documentation
 
 TODO
-
-## Contributing
-For details on contributing to this repository, see the [contributing guide][azure_sdk_for_c_contributing].
-
-This project welcomes contributions and suggestions.  Most contributions require you to agree to a
-Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit https://cla.microsoft.com.
-
-When you submit a pull request, a CLA-bot will automatically determine whether you need to provide
-a CLA and decorate the PR appropriately (e.g., label, comment). Simply follow the instructions
-provided by the bot. You will only need to do this once across all repos using our CLA.
-
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
-For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
-contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
-
-### Additional Helpful Links for Contributors  
-Many people all over the world have helped make this project better.  You'll want to check out:
-
-* [What are some good first issues for new contributors to the repo?](https://github.com/azure/azure-sdk-for-c/issues?q=is%3Aopen+is%3Aissue+label%3A%22up+for+grabs%22)
-* [How to build and test your change][azure_sdk_for_c_contributing_developer_guide]
-* [How you can make a change happen!][azure_sdk_for_c_contributing_pull_requests]
-* Frequently Asked Questions (FAQ) and Conceptual Topics in the detailed [Azure SDK for C wiki](https://github.com/azure/azure-sdk-for-c/wiki).
-
-### Community
-
-* Chat with other community members [![Join the chat at https://gitter.im/azure/azure-sdk-for-c](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/azure/azure-sdk-for-c?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
-### Reporting security issues and security bugs
-
-Security issues and bugs should be reported privately, via email, to the Microsoft Security Response Center (MSRC) <secure@microsoft.com>. You should receive a response within 24 hours. If for some reason you do not, please follow up via email to ensure we received your original message. Further information, including the MSRC PGP key, can be found in the [Security TechCenter](https://www.microsoft.com/msrc/faqs-report-an-issue).
-
-### License
-
-Azure SDK for C is licensed under the [MIT](LICENSE) license.
 
 <!-- LINKS -->
 [azure_sdk_for_c_contributing]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md
