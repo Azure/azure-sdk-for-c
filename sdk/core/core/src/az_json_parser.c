@@ -313,7 +313,7 @@ AZ_NODISCARD static az_result az_span_reader_get_json_number_digit_rest(
     i.exp += e_int * e_sign;
   }
 
-  AZ_RETURN_IF_FAILED(az_json_number_to_double(&i, out_value));
+  AZ_RETURN_IF_FAILED(_az_json_number_to_double(&i, out_value));
   return AZ_OK;
 }
 
