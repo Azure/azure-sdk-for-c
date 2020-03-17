@@ -4,13 +4,19 @@
 /**
  * @file az_credentials.h
  *
- * @brief Credentials for authentication.
+ * @brief Credentials used for authentication with many (not all) Azure SDK client libraries.
+ *
+ * NOTE: You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
+ * prefixed with an underscore ('_') directly in your application code. These symbols
+ * are part of Azure SDK's internal implementation; we do not document these symbols
+ * and they are subject to change in future versions of the SDK which would break your code.
  */
 
 #ifndef _az_CREDENTIALS_H
 #define _az_CREDENTIALS_H
 
 #include <az_http.h>
+#include <az_http_transport.h>
 #include <az_result.h>
 #include <az_span.h>
 
@@ -18,6 +24,12 @@
 #include <stdint.h>
 
 #include <_az_cfg_prefix.h>
+
+/**
+ * @brief AZ_CREDENTIAL_ANONYMOUS is equivallent to no credential (NULL).
+ *
+ */
+#define AZ_CREDENTIAL_ANONYMOUS NULL
 
 enum
 {
@@ -68,15 +80,8 @@ typedef struct
 } _az_credential;
 
 /**
- * @brief Anonymous is equivallent to no credential (NULL).
- *
- */
-#define AZ_CREDENTIAL_ANONYMOUS NULL
-
-/**
- * @brief a type of az_credential that uses tenant, client and client secret inputs to get
- * authenticated with Azure
- *
+ * @brief az_credential_client_secret is used by an Azure SDK client to authenticate with its
+ * Azure service using a tenant ID, client ID and client secret.
  */
 typedef struct
 {
@@ -92,12 +97,12 @@ typedef struct
 } az_credential_client_secret;
 
 /**
- * @brief Initialize a client secret credential with input tenant, client and client secret
- * parameters
+ * @brief az_credential_client_secret_init initializes an az_credential_client_secret instance
+ * with the specified tenant ID, client ID and client secret.
  *
- * @param self reference to a client secret credential to initialize
- * @param tenant_id an Azure tenant id
- * @param client_id an Azure client id
+ * @param self reference to a az_credential_client_secret instance to initialize
+ * @param tenant_id an Azure tenant ID
+ * @param client_id an Azure client ID
  * @param client_secret an Azure client secret
  * @return AZ_OK = Successfull initialization <br>
  * Other value = Initialization failed

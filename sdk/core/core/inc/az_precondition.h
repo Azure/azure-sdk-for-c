@@ -26,6 +26,11 @@
  *        Also, if you define the NO_PRECONDITION_CHECKING symbol when compiling the SDK
  *        code, all of the Azure SDK precondition checking will be excluding making the
  *        binary code smaller and faster. We recommend doing this before you ship your code.
+ *
+ * NOTE: You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
+ * prefixed with an underscore ('_') directly in your application code. These symbols
+ * are part of Azure SDK's internal implementation; we do not document these symbols
+ * and they are subject to change in future versions of the SDK which would break your code.
  */
 
 #ifndef _az_PRECONDITION_H

@@ -56,7 +56,7 @@ AZ_NODISCARD az_keyvault_keys_client_options az_keyvault_keys_client_options_def
 {
   az_keyvault_keys_client_options options = (az_keyvault_keys_client_options){
     ._internal = { .api_version = _az_http_policy_apiversion_options_default(), },
-    .retry = az_http_policy_retry_options_default(),
+    .retry = _az_http_policy_retry_options_default(),
   };
 
   options._internal.api_version._internal.option_location
