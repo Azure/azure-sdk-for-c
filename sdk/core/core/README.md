@@ -124,13 +124,42 @@ Now, whenever our SDK wants to send a log message, it will invoke your callback 
 
 **Note:** In a multi-threaded application, multiple threads may invoke this callback function simultaneously; if your function requires any kind of thread synchronization, then you must provide it.
 
-Log classifications allow your application to select which specific log messages it wants to receive. For example, to log just HTTP response messages (and not HTTP request messages), initialize your application by calling this:
+Log classifications allow your application to select which specific log messages it wants to receive. Here is a complete example that logs HTTP request and response messages to standard output:
 
    ```C
-   az_log_classification const classifications[] = { AZ_LOG_HTTP_REQUEST };
-   az_log_set_classifications(classifications, sizeof(classifications) / sizeof(classifications[0]));
+   void test_log_func(az_log_classification classification, az_span message)
+   {
+      printf("%.*s\n", az_span_length(message), az_span_ptr(message));
+   }
+
+   int main()
+   {
+      az_log_classification const classifications[] = { AZ_LOG_HTTP_REQUEST, AZ_LOG_HTTP_RESPONSE, AZ_LOG_END_OF_LIST };
+      az_log_set_classifications(classifications);
+      az_log_set_callback(test_log_func);
+
+      // More code goes here...
+   }
    ```
 
+### SDK Function Argument Validation
+
+Public SDK functions validate the arguments passed to them in an effort to ensure that calling code is 
+passing valid values. The valid value is called a contract precondition. If an SDK function detects a
+precondition failure (invalid argument value), then by default, it calls a function that places the 
+calling thread into an infinite sleep state; other threads continue to run.
+
+To override the default behavior, implement a function matching the az_precondition_failed_fn function
+signature and then, in your application's initialization (before calling any Azure SDK function), call
+az_precondition_failed_set_callback passing it the address of your function. Now, when any Azure SDK
+function detects a precondition failure, it will invoke your callback instead. You might override the 
+callback to attach a debugger or perhaps to reboot the device rather than allowing it to continue running 
+with unpredictable behavior.
+
+Also, if you define the NO_PRECONDITION_CHECKING symbol when compiling the SDK code, all of the Azure SDK 
+precondition checking will be excluding making the binary code smaller and faster. We recommend doing 
+this before you ship your code.
+ 
 ### Canceling an Operation
 
 `Azure Core` provides a rich cancellation mechanism by way of its `az_context` type (defined in the [az_context.h](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/core/core/inc/az_context.h) file). As your code executes and functions call other functions, a pointer to an `az_context` is passed as an argument through the functions. At any point, a function can create a new `az_context` specifying a parent `az_context` and a timeout period and then, this new `az_context` is passed down to more functions. When a parent `az_context` instance expires or is canceled, all of its children are canceled as well.
@@ -156,95 +185,6 @@ Note however that cancellation is performed as a best effort; it is not guarante
    az_context_cancel(&az_context_app);
    // All children are now in the canceled state & the threads will start unwinding
    ```
-
-## Examples
-
-### az_log.h
-
-The various components of the SDK are broken up into "classifications". Log messages are filtered with these classification enums so that the user can decide which log messages they want. Classifications are derived from higher level groupings called "facilities". At the beginning of the user's code, they can initialize the logging by optionally setting the classifications they want, setting their logging listener, and then logging any messages they desire.
-
-#### Basic Code Snippet
-
-Relevant components for logging are located in [az_result.h](./inc/az_result.h) and [az_log.h](./inc/az_log.h). The `az_log_classification` enum will be used to choose features to log.
-
-```c
-/* az_result.h */
-enum
-{
-  _az_FACILITY_CORE = 0x1,
-  _az_FACILITY_PLATFORM = 0x2,
-  _az_FACILITY_JSON = 0x3,
-  _az_FACILITY_HTTP = 0x4,
-  _az_FACILITY_MQTT = 0x5,
-  _az_FACILITY_IOT = 0x6,
-  _az_FACILITY_STD = 0x7FFF,
-};
-
-/* az_log.h */
-typedef enum {
-  AZ_LOG_HTTP_REQUEST  = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_HTTP, 1),
-  AZ_LOG_HTTP_RESPONSE = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_HTTP, 2),
-} az_log_classification;
-```
-
-Here is an example of what basic sdk and user code might look like working together.
-The user needs to do two things as exemplified below:
-
-1. Set the classifications you wish to log.
-2. Set your logging function that follows the `az_log_message_fn` prototype. In this case, the logging function uses a basic `printf()`.
-
-```c
-/* INTERNAL sdk http code */
-static az_span test_log_message = AZ_SPAN_LITERAL_FROM_STR("HTTP Request Success");
-
-void some_http_request_code()
-{
-  /* Some http code */
-  az_log_write(AZ_LOG_HTTP_REQUEST, test_log_message);
-}
-
-
-/* User Application Code */
-az_log_classification const classifications[] = { AZ_LOG_HTTP_REQUEST, AZ_LOG_HTTP_RESPONSE, AZ_LOG_END_OF_LIST };
-
-void test_log_func(az_log_classification classification, az_span message)
-{
-    printf("%.*s\n", az_span_length(message), az_span_ptr(message));
-}
-
-int main()
-{
-  az_log_set_classifications(classifications);
-  az_log_set_callback(&test_log_func);
-
-  some_http_request_code();
-}
-```
-
-Here the classifications are set to `AZ_LOG_HTTP_REQUEST` and `AZ_LOG_HTTP_RESPONSE`. Should the `AZ_LOG_HTTP_REQUEST` be omitted from the set of classifications, the log message in `some_http_request_code()` will not be logged.
-
-If no classifications are set then all messages are logged.
-
-## Troubleshooting
-
-### General
-
-TODO
-
-### Retry policy
-
-While working with Azure you might encounter transient failures. For information about handling these types of failures, see [Retry pattern][azure_pattern_retry] in the Cloud Design Patterns guide, and the related [Circuit Breaker pattern][azure_pattern_circuit_breaker].
-
-## Next steps
-
-### More sample code
-
-TODO
-
-### Additional documentation
-
-TODO
-
 <!-- LINKS -->
 [azure_sdk_for_c_contributing]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md
 [azure_sdk_for_c_contributing_developer_guide]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md#developer-guide
