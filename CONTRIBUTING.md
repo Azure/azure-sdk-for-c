@@ -37,7 +37,7 @@ Thank you for your interest in contributing to Azure SDK for C.
 
 ### Prerequisites
 
-- [CMake](https://cmake.org/download/) version 3.12 or later
+- [CMake](https://cmake.org/download/) version 3.10 or later
 - C compiler: [MSVC](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2019), [gcc](https://gcc.gnu.org/) or [clang](https://clang.llvm.org/) are recommended
 - [git](https://git-scm.com/downloads) to clone our Azure SDK repository with the desired tag
 - [cmocka](https://cmocka.org/) for building and running unit tests. By default, building unit tests is disabled, so, unless you want to add unit tests or run then, you don't need to install this. See how `vcpkg` can be used to install dependencies, [below](#VCPKG).

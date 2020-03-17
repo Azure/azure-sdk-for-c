@@ -40,7 +40,7 @@ When we make an official release, we will create a unique git tag containing the
 ## Getting Started Using the SDK
 
 1. Install the required prerequisites:
-   - [CMake](https://cmake.org/download/) version 3.12 or later
+   - [CMake](https://cmake.org/download/) version 3.10 or later
    - C compiler: [MSVC](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2019), [gcc](https://gcc.gnu.org/) or [clang](https://clang.llvm.org/) are recommended
    - [git](https://git-scm.com/downloads) to clone our Azure SDK repository with the desired tag
 
