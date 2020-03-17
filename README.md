@@ -82,12 +82,6 @@ When we make an official release, we will create a unique git tag containing the
     cmake --build .
     ```
 
-   You could run these set of commands together using `&&`:
-
-    ```bash
-    mkdir build && cd build && cmake .. && cmake --build .
-    ```
-
    This results in building each library as a static library file, placed in the output directory you created (for example `build\sdk\core\core\Debug`). At a minimum, you must have an `Azure Core` library, a `Platform` library, and an `HTTP` library. Then, you can build any additional Azure service client library you intend to use from within your application (for example `build\sdk\storage\blobs\Debug`). To use our client libraries in your application, just `#include` our public header files and then link your application's object files with our libray files.
 
 4. Provide platform-specific implementations for functionality required by `Azure Core`. For more information, see the [Azure Core Porting Guide](sdk/core/core/README.md#Porting-the-Azure-SDK-to-Another-Platform).
