@@ -127,8 +127,8 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_append(
     az_span value)
 {
   AZ_PRECONDITION_NOT_NULL(properties);
-  AZ_PRECONDITION_VALID_SPAN(name, 0, false);
-  AZ_PRECONDITION_VALID_SPAN(value, 0, false);
+  AZ_PRECONDITION_VALID_SPAN(name, 1, false);
+  AZ_PRECONDITION_VALID_SPAN(value, 1, false);
 
   az_span prop_span = properties->_internal.properties;
 
