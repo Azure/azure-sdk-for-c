@@ -10,39 +10,13 @@ TODO
 
 ## Porting the Azure SDK to Another Platform
 
-The `Azure Core` library requires you to implement a few functions to provide platform-specific features such as a clock, a thread sleep, a mutual-exclusive thread synchronization lock, and an HTTP stack. By default, `Azure Core` ships with no-op versions of these functions, all of which return `AZ_RESULT_NOT_IMPLEMENTED`.
+The `Azure Core` library requires you to implement a few functions to provide platform-specific features such as a clock, a thread sleep, a mutual-exclusive thread synchronization lock, and an HTTP stack. By default, `Azure Core` ships with no-op versions of these functions, all of which return `AZ_RESULT_NOT_IMPLEMENTED`. The no-op versions allow the Azure SDK to compile successfully so you can verify that your build tool chain is working properly; however, failures occur if you execute the code. 
 
 ## Key concepts
 
-### Error Structure
+### Function Results
 
-Defined in [inc/az_result.h](inc/az_result.h).
-
-```c
-// az_core.h
-enum {
-  AZ_OK              =          0,
-  AZ_ERROR_FLAG      = 0x80000000,
-
-  AZ_CORE_FACILITY   =    0x10000,
-};
-
-typedef int32_t az_result;
-
-#define AZ_MAKE_ERROR(facility, code) ((az_result)(0x80000000 | ((uint32_t)(facility) << 16)) | (uint32_t)(code))
-
-#define AZ_MAKE_RESULT(facility, code) ((az_result)(((uint32_t)(facility) << 16)) | (uint32_t)(code))
-
-inline bool az_failed(az_result result) {
-  return (result & AZ_ERROR_FLAG) != 0;
-}
-
-inline bool az_succeeded(az_result result) {
-  return (result & AZ_ERROR_FLAG) == 0;
-}
-```
-
-Additional information could be passed using output parameters.
+Maybe SDK functions return an az_result as defined in [inc/az_result.h](inc/az_result.h) header file. An az_result is a 32-bit enum value. If a function fails to excute as intended, the az_result symbol returned will be prefixed with AZ_ERROR_. Most functions return AZ_OK to indicate success. Howver, some functions return a reason for success; these symbols with be prefixed with AZ_ but will not have ERROR in the symbol. Some functions return an az_result and some other value; the othe value is returned via an output parameter.
 
 ### Working with Spans
 
