@@ -30,8 +30,8 @@ typedef struct
   struct
   {
     uint8_t* ptr;
-    int32_t length;
-    int32_t capacity;
+    int32_t length; //< length must be >= 0
+    int32_t capacity; //< capacity must be >= 0
   } _internal;
 } az_span;
 
@@ -44,14 +44,14 @@ typedef struct
 AZ_NODISCARD AZ_INLINE uint8_t* az_span_ptr(az_span span) { return span._internal.ptr; }
 
 /**
- * @brief az_span_length returns the span byte buffer's length (number of bytes in use from the
- * buffer's start)
+ * @brief az_span_length Returns the number of bytes within the span.
  *
  */
 AZ_NODISCARD AZ_INLINE int32_t az_span_length(az_span span) { return span._internal.length; }
 
 /**
- * @brief az_span_capacity returns the span byte buffer's capacity (in bytes)
+ * @brief az_span_capacity Returns the maxiumum number of bytes.
+ * Capacity will always be greater than or equal to length.
  *
  */
 AZ_NODISCARD AZ_INLINE int32_t az_span_capacity(az_span span) { return span._internal.capacity; }
@@ -60,6 +60,10 @@ AZ_NODISCARD AZ_INLINE int32_t az_span_capacity(az_span span) { return span._int
 
 /**
  * @brief Creates an empty span literal
+ * ptr is NULL
+ * length is initialized to 0
+ * capacity is initialized to 0
+ * 
  */
 #define AZ_SPAN_LITERAL_NULL \
   { \
@@ -67,18 +71,21 @@ AZ_NODISCARD AZ_INLINE int32_t az_span_capacity(az_span span) { return span._int
   }
 
 /**
- * @brief The AZ_SPAN_NULL macro returns a NULL (or empty) az_span
+ * @brief The AZ_SPAN_NULL macro returns an empty az_span \see AZ_SPAN_LITERAL_NULL.
  *
  */
 #define AZ_SPAN_NULL (az_span) AZ_SPAN_LITERAL_NULL
 
 // Returns the size (in bytes) of a literal string
 // Note: Concatenating "" to S produces a compiler error if S is not a literal string
+//       The stored string's length does not include the \0 terminator.
 #define _az_STRING_LITERAL_LEN(S) (sizeof(S "") - 1)
 
 /**
- * @brief The AZ_SPAN_LITERAL_FROM_STR macro returns a literal az_span over a literal string. For
- * example:
+ * @brief The AZ_SPAN_LITERAL_FROM_STR macro returns a literal az_span over a literal string. 
+ * An empty ("") literal string results in a span with length/capacity set to 0.
+ * The length and capacity of the span is equal to the length of the string.
+ * For example:
  *
  * `static const az_span hw = AZ_SPAN_LITERAL_FROM_STR("Hello world");`
  */
@@ -113,12 +120,13 @@ AZ_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t length, int32_t capacity
  *
  * @param[in] str The pointer to the 0-terminated array of bytes (chars)
  * @return az_span An az_span over the byte buffer; length & capacity are set to the string's
- * length.
+ * length not including the \0 terminator.
  */
 AZ_NODISCARD az_span az_span_from_str(char* str);
 
 /**
- * @brief AZ_SPAN_LITERAL_FROM_BUFFER returns a literal az_span over an uninitialized byte buffer.
+ * @brief AZ_SPAN_LITERAL_FROM_BUFFER returns a literal az_span over a byte buffer.
+ * The length of the resulting az_span is set to 0.
  * For example:
  *
  * uint8_t buffer[1024];
@@ -173,15 +181,15 @@ AZ_NODISCARD az_span az_span_from_str(char* str);
 /**
  * @brief az_span_slice returns a new az_span which is a sub-span of the specified span.
  *
- * @param[in] span The original az_span
- * @param[in] low_index An index into the original az_span indicating where the returned az_span
- * will start
- * @param[in] high_index An index into the original az_span indicating where the returned az_span
+ * @param[in] span The original az_span.
+ * @param[in] start_index An index into the original az_span indicating where the returned az_span
+ * will start.
+ * @param[in] end_index An index into the original az_span indicating where the returned az_span
  * should stop. The byte at the high_index is NOT included in the returned az_span.
- * @return An az_span (view) into a portion (from low_index to high_index - 1) of the original
+ * @return An az_span into a portion (from \p start_index to \p end_index - 1) of the original
  * az_span.
  */
-AZ_NODISCARD az_span az_span_slice(az_span span, int32_t low_index, int32_t high_index);
+AZ_NODISCARD az_span az_span_slice(az_span span, int32_t start_index, int32_t end_index);
 
 /**
  * @brief az_span_is_content_equal returns `true` if the lengths and bytes referred by \p span1 and
@@ -220,7 +228,7 @@ AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1, az_span 
  destination.
  * @param[in] source The az_span containing the not-0-terminated string
  * @return An #az_result value indicating the result of the operation.
- *          #AZ_OK If \p source span's content is successfully copied to the destination.
+ *          #AZ_OK If \p source span content is successfully copied to the destination.
  *          #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the \p destination buffer is too small to
  copy the string and 0-terminate it
  */
@@ -257,7 +265,7 @@ AZ_NODISCARD az_result az_span_to_uint32(az_span span, uint32_t* out_number);
 
 /**
  * @brief az_span_append_uint8 appends the uint8 \p byte to the \p destination starting at the
- * destination span's length.
+ * destination span length.
  *
  * @param[in] destination The az_span where the byte should be appended to.
  * @param[in] byte The uint8 to append to the destination span
@@ -272,7 +280,7 @@ AZ_NODISCARD az_result az_span_append_uint8(az_span destination, uint8_t byte, a
 
 /**
  * @brief az_span_append appends the bytes referred to by the source span into the
- * destination span starting at the destination span's length.
+ * destination span starting at the destination span length.
  *
  * @param[in] destination The az_span where the bytes should be appended to.
  * @param[in] source Refers to the bytes to be appended to the destination
@@ -287,7 +295,7 @@ AZ_NODISCARD az_result az_span_append(az_span destination, az_span source, az_sp
 
 /**
  * @brief az_span_append_i32toa appends an int32 as digit characters to the destination
- * starting at the destination span's length.
+ * starting at the destination span length.
  *
  * @param[in] destination The az_span where the bytes should be appended to
  * @param[in] source The int32 whose number is appended to the destination span as ASCII
@@ -304,7 +312,7 @@ az_span_append_i32toa(az_span destination, int32_t source, az_span* out_span);
 
 /**
  * @brief az_span_append_u32toa appends a uint32 as digit characters to the destination
- * starting at the destination span's length.
+ * starting at the destination span length.
  *
  * @param[in] destination The az_span where the bytes should be appended to
  * @param[in] source The uint32 whose number is appended to the destination span as ASCII
@@ -321,7 +329,7 @@ az_span_append_u32toa(az_span destination, uint32_t source, az_span* out_span);
 
 /**
  * @brief az_span_append_i64toa appends an int64 as digit characters to the destination
- * starting at the destination span's length.
+ * starting at the destination span length.
  *
  * @param[in] destination The az_span where the bytes should be appended to
  * @param[in] source The int64 whose number is appended to the destination span as ASCII
@@ -338,7 +346,7 @@ az_span_append_i64toa(az_span destination, int64_t source, az_span* out_span);
 
 /**
  * @brief az_span_append_u64toa appends a uint64 as digit characters to the destination
- * starting at the destination span's length.
+ * starting at the destination span length.
  *
  * @param[in] destination The az_span where the bytes should be appended to
  * @param[in] source The uint64 whose number is appended to the destination span as ASCII
@@ -355,7 +363,7 @@ az_span_append_u64toa(az_span destination, uint64_t source, az_span* out_span);
 
 /**
  * @brief az_span_append_dtoa appends a double as digit characters to the destination
- * starting at the destination span's length
+ * starting at the destination span length
  *
  * @param[in] destination The az_span where the bytes should be appended to
  * @param[in] source The double whose number is appended to the destination span as ASCII
@@ -398,8 +406,8 @@ AZ_INLINE void az_span_set(az_span destination, uint8_t fill)
 AZ_NODISCARD az_result az_span_copy(az_span destination, az_span source, az_span* out_span);
 
 /**
- * @brief az_span_copy_url_encode copies a URL in the source span to the destination span by
- * url-encoding the source span's characters
+ * @brief az_span_copy_url_encode Copies a URL in the source span to the destination span by
+ * url-encoding the source span characters.
  *
  * @param[in] destination The span whose bytes will receive the url-encoded source
  * @param[in] source The span containing the non-url-encoded bytes
