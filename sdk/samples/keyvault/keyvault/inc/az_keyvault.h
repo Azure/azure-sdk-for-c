@@ -6,6 +6,7 @@
 
 #include <az_credentials.h>
 #include <az_http.h>
+#include <az_http_internal.h>
 #include <az_result.h>
 #include <az_span.h>
 
