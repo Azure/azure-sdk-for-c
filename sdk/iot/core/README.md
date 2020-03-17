@@ -19,19 +19,6 @@ client with the `az_iot_hub_client_init()` API. Once that is initialized, you ma
 `az_iot_hub_client_user_name_get()` and `az_iot_hub_client_client_id_get()` to get the
 user name and client id to establish a connection with IoT Hub. 
 
-The user name will be of the following form:
-```C
-//[Format without module id] {iothubhostname}/{device_id}/?api-version=2018-06-30
-//[Format with module id] {iothubhostname}/{device_id}/{module_id}/?api-version=2018-06-30
-```
-
-The client id will be of the following form:
-```C
-//[Format without module id] {device_id}
-//[Format with module id] {device_id}/{module_id}
-```
-
-
 An example use case is below.
 
 ```C
