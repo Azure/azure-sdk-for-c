@@ -141,7 +141,7 @@ AZ_NODISCARD static double _ten_to_exp(int16_t exp)
 {
   double result = 1;
   double incrementing_base = 10;
-  int16_t abs_exp = exp < 0 ? -exp : exp;
+  int16_t abs_exp = (int16_t)(exp < 0 ? -exp : exp);
 
   while (abs_exp > 0)
   {
@@ -158,7 +158,7 @@ AZ_NODISCARD static double _ten_to_exp(int16_t exp)
 }
 
 // double result follows IEEE_754 https://en.wikipedia.org/wiki/IEEE_754
-AZ_NODISCARD az_result az_json_number_to_double(az_dec_number const* p, double* out)
+static AZ_NODISCARD az_result _az_json_number_to_double(az_dec_number const* p, double* out)
 {
   *out = p->value * _ten_to_exp(p->exp) * p->sign;
   return AZ_OK;
@@ -240,7 +240,7 @@ AZ_NODISCARD static az_result az_span_reader_get_json_number_digit_rest(
   }
   if (az_span_length(*self) == 0)
   {
-    AZ_RETURN_IF_FAILED(az_json_number_to_double(&i, out_value));
+    AZ_RETURN_IF_FAILED(_az_json_number_to_double(&i, out_value));
     return AZ_OK; // it's fine is int finish here (no fraction or something else)
   }
 
@@ -262,7 +262,7 @@ AZ_NODISCARD static az_result az_span_reader_get_json_number_digit_rest(
 
   if (az_span_length(*self) == 0)
   {
-    AZ_RETURN_IF_FAILED(az_json_number_to_double(&i, out_value));
+    AZ_RETURN_IF_FAILED(_az_json_number_to_double(&i, out_value));
     return AZ_OK; // fine if number ends after a fraction
   }
 
@@ -313,7 +313,7 @@ AZ_NODISCARD static az_result az_span_reader_get_json_number_digit_rest(
     i.exp += e_int * e_sign;
   }
 
-  AZ_RETURN_IF_FAILED(az_json_number_to_double(&i, out_value));
+  AZ_RETURN_IF_FAILED(_az_json_number_to_double(&i, out_value));
   return AZ_OK;
 }
 

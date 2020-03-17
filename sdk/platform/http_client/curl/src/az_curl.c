@@ -51,7 +51,7 @@ static void _az_span_free(az_span* p)
 /**
  * Converts CURLcode to az_result.
  */
-AZ_NODISCARD az_result _az_http_client_curl_code_to_result(CURLcode code)
+static AZ_NODISCARD az_result _az_http_client_curl_code_to_result(CURLcode code)
 {
   switch (code)
   {
@@ -335,7 +335,7 @@ static int32_t _az_http_client_curl_upload_read_callback(
 
   int32_t size_of_copy = (userdata_length < dst_buffer_size) ? userdata_length : dst_buffer_size;
 
-  memcpy(dst, az_span_ptr(*upload_content), size_of_copy);
+  memcpy(dst, az_span_ptr(*upload_content), (size_t)size_of_copy);
 
   // Update the userdata span
   //  ptr will point to remaining data to be copied
@@ -437,7 +437,7 @@ _az_http_client_curl_setup_url(CURL* p_curl, _az_http_request const* p_request)
   }
 
   // free used buffer before anything else
-  memset(az_span_ptr(writable_buffer), 0, az_span_capacity(writable_buffer));
+  memset(az_span_ptr(writable_buffer), 0, (size_t)az_span_capacity(writable_buffer));
   _az_span_free(&writable_buffer);
 
   return result;
