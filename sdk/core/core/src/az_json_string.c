@@ -2,10 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 #include <az_json.h>
-#include <az_precondition.h>
-#include <az_precondition_internal.h>
-
-#include "az_hex_private.h"
 
 #include <ctype.h>
 
@@ -19,11 +15,11 @@ AZ_NODISCARD AZ_INLINE az_result az_hex_to_digit(uint8_t c, uint8_t* out)
   }
   else if ('a' <= c && c <= 'f')
   {
-    *out = c - _az_HEX_LOWER_OFFSET;
+    *out = c - ('a' - 10);
   }
   else if ('A' <= c && c <= 'F')
   {
-    *out = c - _az_HEX_UPPER_OFFSET;
+    *out = c - ('A' - 10);
   }
   else
   {
@@ -74,6 +70,10 @@ AZ_NODISCARD AZ_INLINE az_result az_json_esc_decode(uint8_t c, uint8_t* out)
   return AZ_OK;
 }
 
+/**
+ * Encodes the given character into a JSON escape sequence. The function returns an empty span if
+ * the given character doesn't require to be escaped.
+ */
 AZ_NODISCARD az_span _az_json_esc_encode(uint8_t c)
 {
   switch (c)
@@ -113,17 +113,19 @@ AZ_NODISCARD az_span _az_json_esc_encode(uint8_t c)
   }
 }
 
-AZ_NODISCARD az_result _az_span_reader_read_json_string_char(az_span* self, uint32_t* out)
+/**
+ * TODO: this function and JSON pointer read functions should return proper UNICODE
+ *       code-point to be compatible.
+ */
+AZ_NODISCARD az_result _az_span_reader_read_json_string_char(az_span* json_string, uint32_t* out)
 {
-  AZ_PRECONDITION_NOT_NULL(self);
-
-  int32_t const reader_length = az_span_length(*self);
+  int32_t reader_length = az_span_length(*json_string);
   if (reader_length == 0)
   {
     return AZ_ERROR_ITEM_NOT_FOUND;
   }
 
-  uint8_t const result = az_span_ptr(*self)[0];
+  uint8_t const result = az_span_ptr(*json_string)[0];
   switch (result)
   {
     case '"':
@@ -133,13 +135,13 @@ AZ_NODISCARD az_result _az_span_reader_read_json_string_char(az_span* self, uint
     case '\\':
     {
       // moving reader fw
-      *self = az_span_slice(*self, 1, -1);
-      if (az_span_length(*self) == 0)
+      *json_string = az_span_slice(*json_string, 1, -1);
+      if (az_span_length(*json_string) == 0)
       {
         return AZ_ERROR_EOF;
       }
-      uint8_t const c = az_span_ptr(*self)[0];
-      *self = az_span_slice(*self, 1, -1);
+      uint8_t const c = az_span_ptr(*json_string)[0];
+      *json_string = az_span_slice(*json_string, 1, -1);
 
       if (c == 'u')
       {
@@ -147,13 +149,13 @@ AZ_NODISCARD az_result _az_span_reader_read_json_string_char(az_span* self, uint
         for (size_t i = 0; i < 4; ++i)
         {
           uint8_t digit = 0;
-          if (az_span_length(*self) == 0)
+          if (az_span_length(*json_string) == 0)
           {
             return AZ_ERROR_EOF;
           }
-          AZ_RETURN_IF_FAILED(az_hex_to_digit(az_span_ptr(*self)[0], &digit));
+          AZ_RETURN_IF_FAILED(az_hex_to_digit(az_span_ptr(*json_string)[0], &digit));
           r = (r << 4) + digit;
-          *self = az_span_slice(*self, 1, -1);
+          *json_string = az_span_slice(*json_string, 1, -1);
         }
         *out = r;
       }
@@ -171,7 +173,7 @@ AZ_NODISCARD az_result _az_span_reader_read_json_string_char(az_span* self, uint
       {
         return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
       }
-      *self = az_span_slice(*self, 1, -1);
+      *json_string = az_span_slice(*json_string, 1, -1);
       *out = (uint16_t)result;
       return AZ_OK;
     }

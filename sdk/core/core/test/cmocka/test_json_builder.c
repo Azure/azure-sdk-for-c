@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include "az_json_string_private.h"
 #include <az_json.h>
 #include <az_span.h>
 
@@ -26,14 +27,14 @@ void test_json_builder(void** state)
     // 0_________1_________2_________3_________4_________5_________6_________7_________8_________9_________0
     // 01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456
     // {"name":true,"foo":["bar",null,0,-12],"int-max":9007199254740991,"esc":"_\"_\\_\b\f\n\r\t_","u":"a\u001Fb"}
-    TEST_EXPECT_SUCCESS(az_json_builder_append_token(&builder, az_json_token_object()));
+    TEST_EXPECT_SUCCESS(az_json_builder_append_token(&builder, az_json_token_object_start()));
 
     TEST_EXPECT_SUCCESS(az_json_builder_append_object(
         &builder, AZ_SPAN_FROM_STR("name"), az_json_token_boolean(true)));
 
     {
-      TEST_EXPECT_SUCCESS(
-          az_json_builder_append_object(&builder, AZ_SPAN_FROM_STR("foo"), az_json_token_array()));
+      TEST_EXPECT_SUCCESS(az_json_builder_append_object(
+          &builder, AZ_SPAN_FROM_STR("foo"), az_json_token_array_start()));
       az_result e = az_json_builder_append_array_item(
           &builder, az_json_token_string(AZ_SPAN_FROM_STR("bar")));
       TEST_EXPECT_SUCCESS(e);

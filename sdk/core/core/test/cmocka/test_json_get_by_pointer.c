@@ -20,7 +20,7 @@ void test_json_get_by_pointer(void** state)
         az_json_parse_by_pointer(AZ_SPAN_FROM_STR("   57  "), AZ_SPAN_FROM_STR(""), &token)
         == AZ_OK);
     assert_true(token.kind == AZ_JSON_TOKEN_NUMBER);
-    assert_true(token.value.number == 57);
+    assert_true(token._internal.number == 57);
   }
   {
     az_json_token token;
@@ -35,7 +35,7 @@ void test_json_get_by_pointer(void** state)
             AZ_SPAN_FROM_STR(" {  \"\": true  } "), AZ_SPAN_FROM_STR("/"), &token)
         == AZ_OK);
     assert_true(token.kind == AZ_JSON_TOKEN_BOOLEAN);
-    assert_true(token.value.boolean == true);
+    assert_true(token._internal.boolean == true);
   }
   {
     az_json_token token;
@@ -44,7 +44,7 @@ void test_json_get_by_pointer(void** state)
             AZ_SPAN_FROM_STR(" [  { \"\": true }  ] "), AZ_SPAN_FROM_STR("/0/"), &token)
         == AZ_OK);
     assert_true(token.kind == AZ_JSON_TOKEN_BOOLEAN);
-    assert_true(token.value.boolean == true);
+    assert_true(token._internal.boolean == true);
   }
   {
     az_json_token token;
@@ -53,7 +53,7 @@ void test_json_get_by_pointer(void** state)
             AZ_SPAN_FROM_STR("{ \"2/00\": true } "), AZ_SPAN_FROM_STR("/2~100"), &token)
         == AZ_OK);
     assert_true(token.kind == AZ_JSON_TOKEN_BOOLEAN);
-    assert_true(token.value.boolean == true);
+    assert_true(token._internal.boolean == true);
   }
   {
     static az_span const sample = AZ_SPAN_LITERAL_FROM_STR( //
@@ -88,7 +88,7 @@ void test_json_get_by_pointer(void** state)
           az_json_parse_by_pointer(sample, AZ_SPAN_FROM_STR("/parameters/LegalHold/tags/2"), &token)
           == AZ_OK);
       assert_true(token.kind == AZ_JSON_TOKEN_STRING);
-      assert_true(az_span_is_content_equal(token.value.string, AZ_SPAN_FROM_STR("tag3")));
+      assert_true(az_span_is_content_equal(token._internal.string, AZ_SPAN_FROM_STR("tag3")));
     }
     {
       az_json_token token;
@@ -97,7 +97,7 @@ void test_json_get_by_pointer(void** state)
               sample, AZ_SPAN_FROM_STR("/responses/2~100/body/hasLegalHold"), &token)
           == AZ_OK);
       assert_true(token.kind == AZ_JSON_TOKEN_BOOLEAN);
-      assert_true(token.value.boolean == false);
+      assert_true(token._internal.boolean == false);
     }
   }
 }

@@ -170,7 +170,7 @@ AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
 
   AZ_RETURN_IF_FAILED(az_json_builder_init(&builder, *http_body));
 
-  AZ_RETURN_IF_FAILED(az_json_builder_append_token(&builder, az_json_token_object()));
+  AZ_RETURN_IF_FAILED(az_json_builder_append_token(&builder, az_json_token_object_start()));
   // Required fields
   AZ_RETURN_IF_FAILED(az_json_builder_append_object(
       &builder, AZ_SPAN_FROM_STR("kty"), az_json_token_string(json_web_key_type)));
@@ -184,7 +184,7 @@ AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
       if (options->operations != NULL)
       {
         AZ_RETURN_IF_FAILED(az_json_builder_append_object(
-            &builder, AZ_SPAN_FROM_STR("key_ops"), az_json_token_array()));
+            &builder, AZ_SPAN_FROM_STR("key_ops"), az_json_token_array_start()));
         for (size_t op = 0; true; ++op)
         {
           az_span s = options->operations[op];
@@ -200,7 +200,7 @@ AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
       if (options->tags != NULL)
       {
         AZ_RETURN_IF_FAILED(az_json_builder_append_object(
-            &builder, AZ_SPAN_FROM_STR("tags"), az_json_token_object()));
+            &builder, AZ_SPAN_FROM_STR("tags"), az_json_token_object_start()));
         for (size_t tag_index = 0; true; ++tag_index)
         {
           az_pair const tag = options->tags[tag_index];
