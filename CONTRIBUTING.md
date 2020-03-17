@@ -15,7 +15,7 @@ Thank you for your interest in contributing to Azure SDK for C.
 - **DO** submit all code changes via pull requests (PRs) rather than through a direct commit. PRs will be reviewed and potentially merged by the repo maintainers after a peer review that includes at least one maintainer.
 - **DO NOT** submit "work in progress" PRs.  A PR should only be submitted when it is considered ready for review and subsequent merging by the contributor.
 - **DO** give PRs short-but-descriptive names (e.g. "Improve code coverage for Azure.Core by 10%", not "Fix #1234")
-- **DO** refer to any relevant issues, and include [keywords](https://help.github.com/articles/closing-issues-via-commit-messages/) that automatically close issues when the PR is merged.
+- **DO** refer to any relevant issues and include [keywords](https://help.github.com/articles/closing-issues-via-commit-messages/) that automatically close issues when the PR is merged.
 - **DO** tag any users that should know about and/or review the change.
 - **DO** ensure each commit successfully builds.  The entire PR must pass all tests in the Continuous Integration (CI) system before it'll be merged.
 - **DO** address PR feedback in an additional commit(s) rather than amending the existing commits, and only rebase/squash them when necessary.  This makes it easier for reviewers to track changes.
@@ -41,7 +41,7 @@ Thank you for your interest in contributing to Azure SDK for C.
 - C compiler: [MSVC](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2019), [gcc](https://gcc.gnu.org/) or [clang](https://clang.llvm.org/) are recommended
 - [git](https://git-scm.com/downloads) to clone our Azure SDK repository with the desired tag
 - [cmocka](https://cmocka.org/) for building and running unit tests. By default, building unit tests is disabled, so, unless you want to add unit tests or run then, you don't need to install this. See how `vcpkg` can be used to install dependencies, [below](#VCPKG).
-- [curl](https://curl.haxx.se/download.html) which is used as an http stack and is required for building and running service samples (keyvault and storage). You don't need to install curl if you are not building samples.
+- [curl](https://curl.haxx.se/download.html) which is used as an http stack, and is required for building and running service samples (keyvault and storage). You don't need to install curl if you are not building samples.
 
 ### Development Environment
 
@@ -69,7 +69,7 @@ vcpkg.exe install --triplet x64-windows-static curl[winssl] cmocka
 ```
 
 > Note: On macOS, `.\bootstrap-vcpkg` may fail if your version of the C++ toolchain is not new enough to support vcpkg. To resolve
-this, vcpkg recommends to install `gcc@6` from Homebrew (`brew install gcc@6`), then re-run the bootstrapping script.
+this, vcpkg recommends installing `gcc@6` from Homebrew (`brew install gcc@6`), then re-run the bootstrapping script.
 
 ### Windows
 
@@ -167,7 +167,7 @@ See [compiler options section](#compiler-options) to learn about how to build an
 
 See [compiler options section](#compiler-options) to learn about how to build samples with HTTP implementation in order to be runnable.
 
-After building samples with HTTP stack, set next environment variables to set log in credentials. Samples will read this values from env an use it to log in to Azure Service like Storage or KeyVault. Learn about the supported authentication [client secret here](https://docs.microsoft.com/en-us/azure/active-directory/azuread-dev/v1-oauth2-on-behalf-of-flow#service-to-service-access-token-request).
+After building samples with HTTP stack, set next environment variables to set log in credentials. Samples will read these values from env and use it to log in to Azure Service like Storage or KeyVault. Learn about the supported authentication [client secret here](https://docs.microsoft.com/en-us/azure/active-directory/azuread-dev/v1-oauth2-on-behalf-of-flow#service-to-service-access-token-request).
 
 ```bash
 # On linux, set env var like this. For Windows, do it from advanced settings/ env variables
@@ -224,7 +224,7 @@ make ${project_name}_cov_html //i.e. az_core_cov_html or az_iot_cov_html
 # gcov is installed.
 make ${project_name}_cov_xml //i.e. az_core_cov_xml or az_iot_cov_xml
 
-## Code Coverage is available for this projects:
+## Code Coverage is available for these projects:
 #  az_core
 #  az_iot
 #  az_keyvault

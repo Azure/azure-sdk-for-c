@@ -146,7 +146,9 @@ And then, during your application’s initialization, you must register your fun
    void az_log_set_listener(az_log_fn listener);
    ```
 
-Now, whenever our SDK wants to send a log message, it will invoke your callback function passing it the log classification and an `az_span` containing the message string (not 0-terminated). Your callback method can now do whatever it wants to with this message such as append it to a file or write it to the console. **Note:** in a multi-threaded application, multiple threads may invoke this callback function simultaneously; if your function requires any kind of thread synchronization, then you must provide it.
+Now, whenever our SDK wants to send a log message, it will invoke your callback function passing it the log classification and an `az_span` containing the message string (not 0-terminated). Your callback method can now do whatever it wants to with this message such as append it to a file or write it to the console. 
+
+**Note:** In a multi-threaded application, multiple threads may invoke this callback function simultaneously; if your function requires any kind of thread synchronization, then you must provide it.
 
 Log classifications allow your application to select which specific log messages it wants to receive. For example, to log just HTTP response messages (and not HTTP request messages), initialize your application by calling this:
 
