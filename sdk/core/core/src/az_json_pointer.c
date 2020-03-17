@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include "az_json_string_private.h"
 #include <az_json.h>
 #include <az_precondition.h>
 #include <az_precondition_internal.h>
@@ -67,7 +68,7 @@ static AZ_NODISCARD az_result _az_span_reader_read_json_pointer_char(az_span* se
   }
 }
 
-static AZ_NODISCARD az_result _az_span_reader_read_json_pointer_token(az_span* self, az_span* out)
+AZ_NODISCARD az_result _az_span_reader_read_json_pointer_token(az_span* self, az_span* out)
 {
   AZ_PRECONDITION_NOT_NULL(self);
   AZ_PRECONDITION_NOT_NULL(out);
@@ -120,8 +121,7 @@ static AZ_NODISCARD az_result _az_span_reader_read_json_pointer_token(az_span* s
   }
 }
 
-static AZ_NODISCARD az_result
-_az_span_reader_read_json_pointer_token_char(az_span* self, uint32_t* out)
+AZ_NODISCARD az_result _az_span_reader_read_json_pointer_token_char(az_span* self, uint32_t* out)
 {
   AZ_PRECONDITION_NOT_NULL(self);
   AZ_PRECONDITION_NOT_NULL(out);

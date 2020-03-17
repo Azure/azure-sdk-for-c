@@ -1,11 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include "az_hex_private.h"
+#include "az_json_string_private.h"
 #include <az_json.h>
 #include <az_precondition.h>
 #include <az_precondition_internal.h>
-
-#include "az_hex_private.h"
 
 #include <ctype.h>
 
