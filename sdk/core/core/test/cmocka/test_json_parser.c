@@ -135,7 +135,7 @@ void test_json_parser(void** state)
     az_json_token token;
     assert_true(az_json_parser_parse_token(&json_state, &token) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
   }
-  /* Testing parsing number and converting to double (az_json_number_to_double) */
+  /* Testing parsing number and converting to double (_az_json_number_to_double) */
   {
     // no exp number, decimal only
     az_json_parser json_state = { 0 };
