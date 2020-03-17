@@ -23,7 +23,7 @@
 
 void az_single_char_ascii_lower_test()
 {
-  for (uint8_t i = 0; i <= SCHAR_MAX; i++)
+  for (uint8_t i = 0; i <= SCHAR_MAX; ++i)
   {
     uint8_t buffer[1] = { i };
     az_span span = AZ_SPAN_LITERAL_FROM_INITIALIZED_BUFFER(buffer);
@@ -49,7 +49,7 @@ void az_single_char_ascii_lower_test()
     else
     {
       // Make sure that no other comparison returns true.
-      for (uint8_t j = 0; j <= SCHAR_MAX; j++)
+      for (uint8_t j = 0; j <= SCHAR_MAX; ++j)
       {
         uint8_t other[1] = { j };
         az_span otherSpan = AZ_SPAN_LITERAL_FROM_INITIALIZED_BUFFER(other);
