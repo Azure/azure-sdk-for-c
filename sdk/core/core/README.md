@@ -10,13 +10,13 @@ TODO
 
 ## Porting the Azure SDK to Another Platform
 
-The `Azure Core` library requires you to implement a few functions to provide platform-specific features such as a clock, a thread sleep, a mutual-exclusive thread synchronization lock, and an HTTP stack. By default, `Azure Core` ships with no-op versions of these functions, all of which return `AZ_RESULT_NOT_IMPLEMENTED`. The no-op versions allow the Azure SDK to compile successfully so you can verify that your build tool chain is working properly; however, failures occur if you execute the code. 
+The `Azure Core` library requires you to implement a few functions to provide platform-specific features such as a clock, a thread sleep, a mutual-exclusive thread synchronization lock, and an HTTP stack. By default, `Azure Core` ships with no-op versions of these functions, all of which return `AZ_RESULT_NOT_IMPLEMENTED`. The no-op versions allow the Azure SDK to compile successfully so you can verify that your build tool chain is working properly; however, failures occur if you execute the code.
 
 ## Key concepts
 
 ### Function Results
 
-Maybe SDK functions return an az_result as defined in [inc/az_result.h](inc/az_result.h) header file. An az_result is a 32-bit enum value. If a function fails to excute as intended, the az_result symbol returned will be prefixed with AZ_ERROR_. Most functions return AZ_OK to indicate success. Howver, some functions return a reason for success; these symbols with be prefixed with AZ_ but will not have ERROR in the symbol. Some functions return an az_result and some other value; the othe value is returned via an output parameter.
+Many SDK functions return an `az_result` as defined in [inc/az_result.h](inc/az_result.h) header file. An `az_result` is a 32-bit enum value. If a function fails to execute as intended, the `az_result` symbol returned will be prefixed with `AZ_ERROR_`. Most functions return `AZ_OK` to indicate success. However, some functions return a reason for success; these symbols with be prefixed with `AZ_` but will **not** contain `ERROR` in the symbol. Some functions return an `az_result` and some other value; the other value is returned via an output parameter.
 
 ### Working with Spans
 
@@ -120,7 +120,7 @@ And then, during your application’s initialization, you must register your fun
    void az_log_set_listener(az_log_fn listener);
    ```
 
-Now, whenever our SDK wants to send a log message, it will invoke your callback function passing it the log classification and an `az_span` containing the message string (not 0-terminated). Your callback method can now do whatever it wants to with this message such as append it to a file or write it to the console. 
+Now, whenever our SDK wants to send a log message, it will invoke your callback function passing it the log classification and an `az_span` containing the message string (not 0-terminated). Your callback method can now do whatever it wants to with this message such as append it to a file or write it to the console.
 
 **Note:** In a multi-threaded application, multiple threads may invoke this callback function simultaneously; if your function requires any kind of thread synchronization, then you must provide it.
 
@@ -144,22 +144,12 @@ Log classifications allow your application to select which specific log messages
 
 ### SDK Function Argument Validation
 
-Public SDK functions validate the arguments passed to them in an effort to ensure that calling code is 
-passing valid values. The valid value is called a contract precondition. If an SDK function detects a
-precondition failure (invalid argument value), then by default, it calls a function that places the 
-calling thread into an infinite sleep state; other threads continue to run.
+The public SDK functions validate the arguments passed to them in an effort to ensure that the calling code is passing valid values. The valid value is called a contract precondition. If an SDK function detects a precondition failure (invalid argument value), then by default, it calls a function that places the calling thread into an infinite sleep state; other threads continue to run.
 
-To override the default behavior, implement a function matching the az_precondition_failed_fn function
-signature and then, in your application's initialization (before calling any Azure SDK function), call
-az_precondition_failed_set_callback passing it the address of your function. Now, when any Azure SDK
-function detects a precondition failure, it will invoke your callback instead. You might override the 
-callback to attach a debugger or perhaps to reboot the device rather than allowing it to continue running 
-with unpredictable behavior.
+To override the default behavior, implement a function matching the `az_precondition_failed_fn` function signature and then, in your application's initialization (before calling any Azure SDK function), call `az_precondition_failed_set_callback` passing it the address of your function. Now, when any Azure SDK function detects a precondition failure, it will invoke your callback instead. You might override the callback to attach a debugger or perhaps to reboot the device rather than allowing it to continue running with unpredictable behavior.
 
-Also, if you define the NO_PRECONDITION_CHECKING symbol when compiling the SDK code, all of the Azure SDK 
-precondition checking will be excluding making the binary code smaller and faster. We recommend doing 
-this before you ship your code.
- 
+Also, if you define the `NO_PRECONDITION_CHECKING` symbol when compiling the SDK code, all of the Azure SDK precondition checking will be excluded, making the binary code smaller and faster. We recommend doing this before you ship your code.
+
 ### Canceling an Operation
 
 `Azure Core` provides a rich cancellation mechanism by way of its `az_context` type (defined in the [az_context.h](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/core/core/inc/az_context.h) file). As your code executes and functions call other functions, a pointer to an `az_context` is passed as an argument through the functions. At any point, a function can create a new `az_context` specifying a parent `az_context` and a timeout period and then, this new `az_context` is passed down to more functions. When a parent `az_context` instance expires or is canceled, all of its children are canceled as well.
