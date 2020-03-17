@@ -203,7 +203,8 @@ az_span_copy_url_encode(az_span destination, az_span source, az_span* out_span)
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_span_to_str(char* destination, int32_t destination_max_size, az_span source)
+AZ_NODISCARD az_result
+az_span_to_str(char* destination, int32_t destination_max_size, az_span source)
 {
   AZ_PRECONDITION_VALID_SPAN(source, 0, true);
 

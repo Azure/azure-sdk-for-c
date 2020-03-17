@@ -5,12 +5,18 @@
  * @file az_credentials.h
  *
  * @brief Credentials used for authentication with many (not all) Azure SDK client libraries.
+ *
+ * NOTE: You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
+ * prefixed with an underscore ('_') directly in your application code. These symbols
+ * are part of Azure SDK's internal implementation; we do not document these symbols
+ * and they are subject to change in future versions of the SDK which would break your code.
  */
 
 #ifndef _az_CREDENTIALS_H
 #define _az_CREDENTIALS_H
 
 #include <az_http.h>
+#include <az_http_transport.h>
 #include <az_result.h>
 #include <az_span.h>
 
