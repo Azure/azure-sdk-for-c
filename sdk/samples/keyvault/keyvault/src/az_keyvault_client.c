@@ -162,7 +162,7 @@ AZ_NODISCARD az_keyvault_create_key_options az_keyvault_create_key_options_defau
  * @return AZ_NODISCARD _az_keyvault_keys_key_create_build_json_body
  */
 AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
-    az_span json_web_key_type,
+    az_json_web_key_type json_web_key_type,
     az_keyvault_create_key_options* options,
     az_span* http_body)
 {
@@ -227,7 +227,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
     az_keyvault_keys_client* client,
     az_context* context,
     az_span key_name,
-    json_web_key_type json_web_key_type,
+    az_json_web_key_type json_web_key_type,
     az_keyvault_create_key_options* options,
     az_http_response* response)
 {
