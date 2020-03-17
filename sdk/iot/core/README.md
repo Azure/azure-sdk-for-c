@@ -26,8 +26,10 @@ void my_telemetry_func()
   //Initialize the client to then pass to the telemetry API
   az_iot_hub_client_init(&my_client, my_iothub_hostname, my_device_id, NULL);
 
-  //Allocate a span to put the telemetry topic
-  uint8_t telemetry_topic_buffer[64];
+  //Allocate a span with capacity large enough to put the telemetry topic.
+  //Optionally, the size can include space for a null terminator.
+  //Here, the buffer is zero initialized to null terminate the topic.
+  uint8_t telemetry_topic_buffer[64] = { 0 };
   az_span topic_span = AZ_SPAN_FROM_BUFFER(telemetry_topic_buffer);
 
   //Get the NULL terminated topic and put in topic_span to send the telemetry
