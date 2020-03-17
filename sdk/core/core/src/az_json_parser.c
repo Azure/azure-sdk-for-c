@@ -122,7 +122,7 @@ static az_result az_span_reader_skip_json_white_space(az_span* self)
 // 18 decimal digits. 10^18 - 1.
 //                        0         1
 //                        012345678901234567
-#define AZ_DEC_NUMBER_MAX ((uint64_t)999999999999999999ull)
+#define AZ_DEC_NUMBER_MAX 999999999999999999ull
 
 typedef struct
 {
@@ -160,7 +160,7 @@ AZ_NODISCARD static double _ten_to_exp(int16_t exp)
 // double result follows IEEE_754 https://en.wikipedia.org/wiki/IEEE_754
 static AZ_NODISCARD az_result _az_json_number_to_double(az_dec_number const* p, double* out)
 {
-  *out = (double)p->value * _ten_to_exp(p->exp) * (double)p->sign;
+  *out = p->value * _ten_to_exp(p->exp) * p->sign;
   return AZ_OK;
 }
 
@@ -175,11 +175,10 @@ AZ_NODISCARD static az_result az_span_reader_get_json_number_int(
   while (true)
   {
     int d = c - '0';
-    if (p_n->value
-        <= (d < 0 ? AZ_DEC_NUMBER_MAX + ((uint64_t)-d) : AZ_DEC_NUMBER_MAX - (uint64_t)d) / 10)
+    if (p_n->value <= (AZ_DEC_NUMBER_MAX - d) / 10)
     {
-      p_n->value = d < 0 ? p_n->value * 10 - ((uint64_t)-d) : p_n->value * 10 + (uint64_t)d;
-      p_n->exp = (int16_t)p_n->exp + (int16_t)e_offset;
+      p_n->value = p_n->value * 10 + d;
+      p_n->exp += e_offset;
     }
     else
     {
@@ -187,7 +186,7 @@ AZ_NODISCARD static az_result az_span_reader_get_json_number_int(
       {
         p_n->remainder = true;
       }
-      p_n->exp = (int16_t)p_n->exp + (e_offset + 1);
+      p_n->exp += e_offset + 1;
     }
     *self = az_span_slice(*self, 1, -1);
     if (az_span_length(*self) == 0)
@@ -303,7 +302,7 @@ AZ_NODISCARD static az_result az_span_reader_get_json_number_digit_rest(
     int16_t e_int = 0;
     do
     {
-      e_int = (int16_t)(e_int * 10 + (c - '0'));
+      e_int = e_int * 10 + (int16_t)(c - '0');
       *self = az_span_slice(*self, 1, -1);
       if (az_span_length(*self) == 0)
       {
@@ -311,10 +310,10 @@ AZ_NODISCARD static az_result az_span_reader_get_json_number_digit_rest(
       }
       c = az_span_ptr(*self)[0];
     } while (isdigit(c));
-    i.exp += (int16_t)e_int * (int16_t)e_sign;
+    i.exp += e_int * e_sign;
   }
 
-  AZ_RETURN_IF_FAILED(_az_json_number_to_double(&i, out_value));
+  AZ_RETURN_IF_FAILED(az_json_number_to_double(&i, out_value));
   return AZ_OK;
 }
 
