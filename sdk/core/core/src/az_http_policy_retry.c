@@ -26,7 +26,7 @@ static az_http_status_code const _default_status_codes[] = {
   AZ_HTTP_STATUS_CODE_NONE,
 };
 
-AZ_NODISCARD az_http_policy_retry_options az_http_policy_retry_options_default()
+AZ_NODISCARD az_http_policy_retry_options _az_http_policy_retry_options_default()
 {
   return (az_http_policy_retry_options){
     .max_retries = 4,
@@ -60,7 +60,9 @@ AZ_INLINE void _az_http_policy_retry_log(int16_t attempt, int32_t delay_msec)
 {
   uint8_t log_msg_buf[AZ_LOG_MSG_BUF_SIZE] = { 0 };
   az_span log_msg = AZ_SPAN_FROM_BUFFER(log_msg_buf);
+
   (void)_az_http_policy_retry_append_http_retry_msg(attempt, delay_msec, &log_msg);
+
   az_log_write(AZ_LOG_HTTP_RETRY, log_msg);
 }
 
@@ -100,7 +102,7 @@ AZ_INLINE AZ_NODISCARD az_result _az_http_policy_retry_get_retry_after(
     {
       if (az_span_is_content_equal_ignoring_case(header.key, AZ_SPAN_FROM_STR("retry-after-ms"))
           || az_span_is_content_equal_ignoring_case(
-              header.key, AZ_SPAN_FROM_STR("x-ms-retry-after-ms")))
+                 header.key, AZ_SPAN_FROM_STR("x-ms-retry-after-ms")))
       {
         // The value is in milliseconds.
         int32_t const msec = _az_uint32_span_to_int32(header.value);

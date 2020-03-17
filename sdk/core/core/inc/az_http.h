@@ -4,7 +4,13 @@
 /**
  * @file az_http.h
  *
- * @brief HTTP-related functionality.
+ * @brief This header defines the types and functions your application uses
+ *        to leverage HTTP request and response functionality.
+ *
+ * NOTE: You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
+ * prefixed with an underscore ('_') directly in your application code. These symbols
+ * are part of Azure SDK's internal implementation; we do not document these symbols
+ * and they are subject to change in future versions of the SDK which would break your code.
  */
 
 #ifndef _az_HTTP_H
@@ -20,168 +26,9 @@
 
 #include <_az_cfg_prefix.h>
 
-typedef enum
-{
-  _az_http_policy_apiversion_option_location_header,
-  _az_http_policy_apiversion_option_location_queryparameter
-} _az_http_policy_apiversion_option_location;
-
 /**
- * @brief Define az_http_method as an az_span so it is limited to that type and not to any az_span
+ * @brief The  az_http_status_code enum defines the possible HTTP status codes.
  */
-typedef az_span az_http_method;
-
-/**
- * @brief Define _az_http_headers as an az_span so it is limited to that type and not to any az_span
- */
-typedef az_span _az_http_headers;
-
-/**
- * @brief Defines an az_http_request. This is an internal structure that is used to perform an http
- * request to Azure. It contains an HTTP method, url, headers and body. It also contains another
- * utility variables. User should never access field _internal directly
- *
- */
-typedef struct
-{
-  struct
-  {
-    az_context* context;
-    az_http_method method;
-    az_span url;
-    int32_t query_start;
-    _az_http_headers headers; // Contains az_pairs
-    int32_t max_headers;
-    int32_t retry_headers_start_byte_offset;
-    az_span body;
-  } _internal;
-} _az_http_request;
-
-typedef enum
-{
-  AZ_HTTP_RESPONSE_KIND_STATUS_LINE = 0,
-  AZ_HTTP_RESPONSE_KIND_HEADER = 1,
-  AZ_HTTP_RESPONSE_KIND_BODY = 2,
-  AZ_HTTP_RESPONSE_KIND_EOF = 3,
-} az_http_response_kind;
-
-/**
- * @brief An HTTP response where SDK client will write Azure services response.
- *
- * Users can access http_response as an az_span to get the http raw response from Netwok. It also
- * contains utilities variables inside _internal to parse response and allow users to get specific
- * response's seccions like status line, headers or body.
- *
- * User @b should @b not access _internal field directly.
- *
- * Use functions az_http_response_get_status_line(), az_http_response_get_next_header() or
- * az_http_response_get_body() as utilities for parsing http response.
- *
- */
-typedef struct
-{
-  struct
-  {
-    az_span http_response;
-    struct
-    {
-      az_span remaining; // the remaining un-parsed portion of the original http_response.
-      az_http_response_kind next_kind; // after parsing an element, this is set to the next kind of
-                                       // thing we will be parsing.
-    } parser;
-  } _internal;
-} az_http_response;
-
-/**
- * @brief Declaring az_http_policy for using it to create policy process callback
- * _az_http_policy_process_fn definition. Definition is added below after it.
- *
- */
-typedef struct _az_http_policy _az_http_policy;
-
-/**
- * @brief Defines the callback signature of a policy process which should receive an
- * _az_http_policy, options reference (as void *), an _az_http_request and az_http_response.
- *
- * void * is used as polymorphic solution for any policy. Each policy implementation would know the
- * specif pointer type to cast options to.
- *
- */
-typedef AZ_NODISCARD az_result (*_az_http_policy_process_fn)(
-    _az_http_policy* p_policies,
-    void* p_options,
-    _az_http_request* p_request,
-    az_http_response* p_response);
-
-/**
- * @brief Definition for an HTTP policy.
- *
- * An HTTP pipeline inside SDK clients is made of an array of this http policies.
- *
- * Users @b should @b not access _internal field where process callback and options are defined.
- *
- */
-struct _az_http_policy
-{
-  struct
-  {
-    _az_http_policy_process_fn process;
-    void* p_options;
-  } _internal;
-};
-
-/**
- * @brief Internal definition of an HTTP pipeline.
- *
- * Defines the number of policies inside a pipeline.
- *
- * Users @b should @b not access _internal field.
- *
- */
-typedef struct
-{
-  struct
-  {
-    _az_http_policy p_policies[10];
-  } _internal;
-} _az_http_pipeline;
-
-/**
- * @brief Defines the options structure used by the api version policy
- *
- * Users @b should @b not access _internal field.
- *
- */
-typedef struct
-{
-  // Services pass API versions in the header or in query parameters
-  struct
-  {
-    _az_http_policy_apiversion_option_location option_location;
-    az_span name;
-    az_span version;
-  } _internal;
-} _az_http_policy_apiversion_options;
-
-/**
- * @brief options for the telemetry policy
- * os = string representation of currently executing Operating System
- *
- */
-typedef struct
-{
-  az_span os;
-} _az_http_policy_telemetry_options;
-
-/**
- * @brief Initialize _az_http_policy_telemetry_options with default values
- *
- */
-AZ_NODISCARD AZ_INLINE _az_http_policy_telemetry_options _az_http_policy_telemetry_options_default()
-{
-  return (_az_http_policy_telemetry_options){ .os = AZ_SPAN_FROM_STR("Unknown OS") };
-}
-
 typedef enum
 {
   AZ_HTTP_STATUS_CODE_NONE = 0,
@@ -259,8 +106,11 @@ typedef enum
 } az_http_status_code;
 
 /**
- * @brief Retry configuration for an HTTP pipeline
- *
+ * @brief An az_http_policy_retry_options instance allows you to customize the retry policy
+ * used by an XxxClient type whenever it performs an I/O operation. Applications should
+ * acquire an initialized instance of this struct by calling az_http_policy_retry_options_default
+ * first and then modify any fields you desire before passing a pointer to this struct
+ * when initializing the XxxClient.
  */
 typedef struct
 {
@@ -270,14 +120,63 @@ typedef struct
   az_http_status_code const* status_codes;
 } az_http_policy_retry_options;
 
-/**
- * @brief Initialize az_http_policy_retry_options with default values
- *
- */
-AZ_NODISCARD az_http_policy_retry_options az_http_policy_retry_options_default();
+typedef enum
+{
+  _az_HTTP_RESPONSE_KIND_STATUS_LINE = 0,
+  _az_HTTP_RESPONSE_KIND_HEADER = 1,
+  _az_HTTP_RESPONSE_KIND_BODY = 2,
+  _az_HTTP_RESPONSE_KIND_EOF = 3,
+} _az_http_response_kind;
 
 /**
- * An HTTP response status line
+ * @brief az_http_response represents an HTTP response.
+ *
+ * Users create an instance of this and pass it in to an Azure service client's operation function.
+ * The function initializes the az_http_response and application code can query the response after
+ * the operation completes by calling the az_http_response_get_status_line,
+ * az_http_response_get_next_header and az_http_response_get_body functions.
+ *
+ */
+typedef struct
+{
+  struct
+  {
+    az_span http_response;
+    struct
+    {
+      az_span remaining; // the remaining un-parsed portion of the original http_response.
+      _az_http_response_kind next_kind;
+      // After parsing an element, next_kind refers to the next expected element
+    } parser;
+  } _internal;
+} az_http_response;
+
+/**
+ * @brief az_http_response_init initializes an az_http_response instance over a byte buffer (span)
+ * which will be filled with the HTTP response data as it comes in from the network.
+ *
+ * @param response The pointer to an az_http_response instance which is to be initialized.
+ * @param buffer A span over the byte buffer that is to be filled with the HTTP response data. This
+ * buffer must be large enough to hold the entire response.
+ */
+AZ_NODISCARD AZ_INLINE az_result az_http_response_init(az_http_response* response, az_span buffer)
+{
+  *response = (az_http_response){
+    ._internal = {
+      .http_response = buffer,
+      .parser = {
+        .remaining = AZ_SPAN_NULL,
+        .next_kind = _az_HTTP_RESPONSE_KIND_STATUS_LINE,
+      },
+    },
+  };
+
+  return AZ_OK;
+}
+
+/**
+ * @brief az_http_response_status_line represents the result of making an HTTP request.
+ * An application obtains this initialed structured by calling az_http_response_get_status_line.
  *
  * @see https://tools.ietf.org/html/rfc7230#section-3.1.2
  */
@@ -290,75 +189,48 @@ typedef struct
 } az_http_response_status_line;
 
 /**
- * @brief Initialize az_http_response with a required http_response az_span.
+ * @brief az_http_response_get_status_line returns the az_http_response_status_line
+ * information within an HTTP response.
  *
- * The capacity of http_response is the total capacity of the HTTP response that can be written from
- * Network
- *
- */
-AZ_NODISCARD AZ_INLINE az_result
-az_http_response_init(az_http_response* self, az_span http_response)
-{
-  *self = (az_http_response){
-    ._internal = {
-      .http_response = http_response,
-      .parser = {
-        .remaining = AZ_SPAN_NULL,
-        .next_kind = AZ_HTTP_RESPONSE_KIND_STATUS_LINE,
-      },
-    },
-  };
-
-  return AZ_OK;
-}
-
-/**
- * @brief Set the az_http_response internal parser to index zero and tries
- * to get status line from it.
- *
- * @param response az_http_response with an http response
- * @param out inline code from http response
+ * @param response The az_http_response with an http response.
+ * @param out_status_line The pointer to an az_http_response_status_line structure to be filled in
+ * by this function.
  * @return AZ_OK = inline code is parsed and returned.<br>
  * Other value =  http response was not parsed
  */
-AZ_NODISCARD az_result
-az_http_response_get_status_line(az_http_response* response, az_http_response_status_line* out);
+AZ_NODISCARD az_result az_http_response_get_status_line(
+    az_http_response* response,
+    az_http_response_status_line* out_status_line);
 
 /**
- * @brief parse a header based on the last http response parsed.
+ * @brief az_http_response_get_next_header returns the next HTTP response header.
  *
- * If called right after parsing status line, this function will try to get the first header from
- * http response.
- *
- * If called right after parsing a header, this function will try to get
- * another header (next one) from http response or will return AZ_ERROR_ITEM_NOT_FOUND if there are
- * no more headers.
+ * When called right after az_http_response_get_status_line, this function returns the first header.
+ * When called after calling az_http_response_get_next_header, this function returns the next
+ * header.
  *
  * If called after parsing http body or before parsing status line, this function
  * will return AZ_ERROR_INVALID_STATE
  *
- * @param self an HTTP response
- * @param out an az_pair containing a header when az_result is AZ_OK
- * @return AZ_OK = Header was parsed<br>
- * AZ_ERROR_ITEM_NOT_FOUND = No more headers<br>
- * AZ_ERROR_INVALID_STATE = Can't read a header from current state. Maybe call
- * az_http_response_get_status_line first.
+ * @param response A pointer to an az_http_response instance.
+ * @param out_header A pointer to an az_pair to receive the header's key & value.
+ * @return AZ_OK = A header was returned<br>
+ * AZ_ERROR_ITEM_NOT_FOUND = There are no more headers<br>
+ * AZ_ERROR_INVALID_STATE = The az_http_response instance is in an invalid state; consider calling
+ * az_http_response_get_status_line to reset its state.
  */
-AZ_NODISCARD az_result az_http_response_get_next_header(az_http_response* self, az_pair* out);
+AZ_NODISCARD az_result
+az_http_response_get_next_header(az_http_response* response, az_pair* out_header);
 
 /**
- * @brief parses http response body and make out_body point to it.
+ * @brief az_http_response_get_body returns a span over the HTTP body within an HTTP response.
  *
- * This function can be called directly (no need to call az_http_response_get_status_line and/or
- * az_http_response_get_next_header before). status line and headers are parsed and ignored if this
- * function is called before the others
- *
- * @param self an http response
- * @param out_body out parameter to point to http response body
- * @return AZ_OK = Body parsed and referenced by out_body<br>
+ * @param response A pointer to an az_http_response instance.
+ * @param out_body A pointer to an az_span to receive the HTTP response's body.
+ * @return AZ_OK = An az_span over the reponse body was returned<br>
  * Other value = Error while trying to read and parse body
  */
-AZ_NODISCARD az_result az_http_response_get_body(az_http_response* self, az_span* out_body);
+AZ_NODISCARD az_result az_http_response_get_body(az_http_response* response, az_span* out_body);
 
 #include <_az_cfg_suffix.h>
 

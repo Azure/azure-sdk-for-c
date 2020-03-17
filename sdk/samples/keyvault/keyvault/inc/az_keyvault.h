@@ -6,7 +6,7 @@
 
 #include <az_credentials.h>
 #include <az_http.h>
-#include <az_optional_types.h>
+#include <az_http_internal.h>
 #include <az_result.h>
 #include <az_span.h>
 
@@ -114,10 +114,10 @@ AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_null(
 
 typedef struct
 {
-  az_optional_bool enabled;
   az_keyvault_key_operation* operations;
   az_pair* tags;
   /* TODO: adding next options
+  bool enabled // need to suport optional value
   Datetime not_before;
   Datetime expires_on
   */

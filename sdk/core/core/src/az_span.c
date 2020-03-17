@@ -5,6 +5,7 @@
 #include "az_span_private.h"
 #include <az_platform_internal.h>
 #include <az_precondition.h>
+#include <az_precondition_internal.h>
 #include <az_span.h>
 
 #include <ctype.h>
@@ -29,7 +30,7 @@ AZ_NODISCARD az_span az_span_from_str(char* str)
 {
   AZ_PRECONDITION_NOT_NULL(str);
 
-  int32_t length = (int32_t)strlen(str);
+  int32_t const length = (int32_t)strlen(str);
   return az_span_init((uint8_t*)str, length, length);
 }
 
@@ -38,7 +39,7 @@ AZ_NODISCARD az_span az_span_slice(az_span span, int32_t low_index, int32_t high
   AZ_PRECONDITION_RANGE(-1, high_index, az_span_capacity(span));
   AZ_PRECONDITION(high_index == -1 || (high_index >= 0 && low_index <= high_index));
 
-  int32_t capacity = az_span_capacity(span);
+  int32_t const capacity = az_span_capacity(span);
 
   high_index = high_index == -1 ? capacity : high_index;
   return az_span_init(az_span_ptr(span) + low_index, high_index - low_index, capacity - low_index);
@@ -162,7 +163,8 @@ AZ_NODISCARD AZ_INLINE bool should_encode(uint8_t c)
   }
 }
 
-AZ_NODISCARD az_result az_span_copy_url_encode(az_span destination, az_span source, az_span* out_span)
+AZ_NODISCARD az_result
+az_span_copy_url_encode(az_span destination, az_span source, az_span* out_span)
 {
   AZ_PRECONDITION_NOT_NULL(out_span);
   AZ_PRECONDITION_VALID_SPAN(destination, 0, true);
@@ -207,39 +209,8 @@ AZ_NODISCARD az_result az_span_copy_url_encode(az_span destination, az_span sour
   return AZ_OK;
 }
 
-AZ_NODISCARD AZ_INLINE int32_t _az_size_min(int32_t a, int32_t b) { return a < b ? a : b; }
-
-AZ_INLINE void _az_uint8_swap(uint8_t* a, uint8_t* b)
-{
-  uint8_t const c = *a;
-  *a = *b;
-  *b = c;
-}
-
-/**
- * @brief move the content from span @span1 to span @span2 and viceverse.
- * The smallest span (less content) is swapped only. Example
- * span1 = 111
- * span2 = 22
- * after swaping
- * span1 = 221
- * span2 = 11
- *
- * @param a source/destination span
- * @param b destination/source span
- */
-void _az_span_swap(az_span span1, az_span span2)
-{
-  uint8_t* pa = az_span_ptr(span1);
-  uint8_t* pb = az_span_ptr(span2);
-  for (int32_t i = _az_size_min(az_span_length(span1), az_span_length(span2)); i > 0; ++pa, ++pb)
-  {
-    --i;
-    _az_uint8_swap(pa, pb);
-  }
-}
-
-AZ_NODISCARD az_result az_span_to_str(char* destination, int32_t destination_max_size, az_span source)
+AZ_NODISCARD az_result
+az_span_to_str(char* destination, int32_t destination_max_size, az_span source)
 {
   AZ_PRECONDITION_VALID_SPAN(source, 0, true);
 
@@ -265,7 +236,9 @@ AZ_NODISCARD az_result az_span_append(az_span destination, az_span source, az_sp
   AZ_RETURN_IF_FAILED(az_span_copy(remainder, source, &remainder));
 
   *out_span = az_span_init(
-      az_span_ptr(destination), current_size + az_span_length(source), az_span_capacity(destination));
+      az_span_ptr(destination),
+      current_size + az_span_length(source),
+      az_span_capacity(destination));
 
   return AZ_OK;
 }
@@ -477,7 +450,8 @@ _az_span_builder_append_u32toa(az_span self, uint32_t n, az_span* out_span)
   return az_span_append_uint8(*out_span, value_to_append, out_span);
 }
 
-AZ_NODISCARD az_result az_span_append_u32toa(az_span destination, uint32_t source, az_span* out_span)
+AZ_NODISCARD az_result
+az_span_append_u32toa(az_span destination, uint32_t source, az_span* out_span)
 {
   AZ_PRECONDITION_NOT_NULL(out_span);
   return _az_span_builder_append_u32toa(destination, source, out_span);

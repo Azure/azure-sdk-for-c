@@ -5,6 +5,11 @@
  * @file _az_cfg.h
  *
  * @brief Disable warnings.
+ *
+ * NOTE: You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
+ * prefixed with an underscore ('_') directly in your application code. These symbols
+ * are part of Azure SDK's internal implementation; we do not document these symbols
+ * and they are subject to change in future versions of the SDK which would break your code.
  */
 
 #ifdef _MSC_VER
@@ -82,5 +87,8 @@
 #else // !_MSC_VER !__GNUC__ !__clang__
 #define AZ_NODISCARD
 #endif // _MSC_VER
+
+// Get the number of elements in an array
+#define _az_COUNTOF(array) (sizeof(array) / sizeof(array[0]))
 
 #endif // _az_CFG_H

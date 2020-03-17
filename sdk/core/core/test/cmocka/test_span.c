@@ -248,25 +248,6 @@ void az_span_to_str_test()
 void test_az_span(void** state)
 {
   (void)state;
-  // swap
-  {
-    uint8_t a_array[] = "Hello world!";
-    uint8_t b_array[] = "Goodbye!";
-    az_span const a = AZ_SPAN_FROM_INITIALIZED_BUFFER(a_array);
-    az_span const b = AZ_SPAN_FROM_INITIALIZED_BUFFER(b_array);
-    _az_span_swap(a, b);
-    assert_true(az_span_is_content_equal(a, AZ_SPAN_FROM_STR("Goodbye!\0ld!\0")));
-    assert_true(az_span_is_content_equal(b, AZ_SPAN_FROM_STR("Hello wor")));
-  }
-  // swap an empty span
-  {
-    uint8_t a_array[] = "Hello world!";
-    az_span const a = AZ_SPAN_FROM_INITIALIZED_BUFFER(a_array);
-    az_span const b = { 0 };
-    _az_span_swap(a, b);
-    assert_true(az_span_is_content_equal(a, AZ_SPAN_FROM_STR("Hello world!\0")));
-    assert_true(az_span_is_content_equal(b, AZ_SPAN_FROM_STR("")));
-  }
 
   // az_span_append_uint8_NULL_out_span_fails();
   az_span_append_uint8_overflow_fails();

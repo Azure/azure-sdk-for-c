@@ -5,6 +5,11 @@
  * @file az_context.h
  *
  * @brief Context for cancelling long running operations.
+ *
+ * NOTE: You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
+ * prefixed with an underscore ('_') directly in your application code. These symbols
+ * are part of Azure SDK's internal implementation; we do not document these symbols
+ * and they are subject to change in future versions of the SDK which would break your code.
  */
 
 #ifndef _az_CONTEXT_H
@@ -121,8 +126,8 @@ AZ_NODISCARD AZ_INLINE bool az_context_has_expired(az_context const* context, in
  *
  * @param[in] context The az_context node in the tree where checking starts.
  * @param[in] key A pointer to the key to be scanned for
- * @param[in] out_value A pointer to a 'void*' that will receive the key's associated value if the key
- * is found
+ * @param[in] out_value A pointer to a 'void*' that will receive the key's associated value if the
+ * key is found
  * @return  #AZ_OK if the key is found
  *          #AZ_ERROR_ITEM_NOT_FOUND if no nodes are found with the specified key.
  */

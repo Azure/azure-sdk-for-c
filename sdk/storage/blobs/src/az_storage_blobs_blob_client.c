@@ -8,6 +8,7 @@
 #include <az_http_transport.h>
 #include <az_json.h>
 #include <az_precondition.h>
+#include <az_precondition_internal.h>
 #include <az_storage_blobs.h>
 
 #include <stddef.h>
@@ -41,7 +42,7 @@ AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_o
       },
       ._telemetry_options = _az_http_policy_telemetry_options_default(),
     },
-    .retry = az_http_policy_retry_options_default(),
+    .retry = _az_http_policy_retry_options_default(),
   };
 
   options.retry.max_retries = 5;
@@ -167,7 +168,8 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
   //
   uint8_t content_length[_az_INT64_AS_STR_BUF_SIZE] = { 0 };
   az_span content_length_builder = AZ_SPAN_FROM_BUFFER(content_length);
-  AZ_RETURN_IF_FAILED(az_span_append_i64toa(content_length_builder, az_span_length(content), &content_length_builder));
+  AZ_RETURN_IF_FAILED(az_span_append_i64toa(
+      content_length_builder, az_span_length(content), &content_length_builder));
 
   // add Content-Length to request
   AZ_RETURN_IF_FAILED(
