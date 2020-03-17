@@ -60,7 +60,8 @@ static AZ_NODISCARD az_result _az_get_digit(az_span* self, uint8_t* save_here)
  * Status line https://tools.ietf.org/html/rfc7230#section-3.1.2
  * HTTP-version SP status-code SP reason-phrase CRLF
  */
-static AZ_NODISCARD az_result _az_get_http_status_line(az_span* self, az_http_response_status_line* out)
+static AZ_NODISCARD az_result
+_az_get_http_status_line(az_span* self, az_http_response_status_line* out_status_line)
 {
 
   // HTTP-version = HTTP-name "/" DIGIT "." DIGIT
@@ -71,9 +72,9 @@ static AZ_NODISCARD az_result _az_get_http_status_line(az_span* self, az_http_re
 
   // parse and move reader if success
   AZ_RETURN_IF_FAILED(_az_is_expected_span(self, start));
-  AZ_RETURN_IF_FAILED(_az_get_digit(self, &out->major_version));
+  AZ_RETURN_IF_FAILED(_az_get_digit(self, &out_status_line->major_version));
   AZ_RETURN_IF_FAILED(_az_is_expected_span(self, dot));
-  AZ_RETURN_IF_FAILED(_az_get_digit(self, &out->minor_version));
+  AZ_RETURN_IF_FAILED(_az_get_digit(self, &out_status_line->minor_version));
 
   // SP = " "
   AZ_RETURN_IF_FAILED(_az_is_expected_span(self, space));
@@ -82,7 +83,7 @@ static AZ_NODISCARD az_result _az_get_http_status_line(az_span* self, az_http_re
   {
     uint64_t code = 0;
     AZ_RETURN_IF_FAILED(az_span_to_uint64(az_span_init(az_span_ptr(*self), 3, 3), &code));
-    out->status_code = (az_http_status_code)code;
+    out_status_line->status_code = (az_http_status_code)code;
     // move reader
     *self = az_span_slice(*self, 3, -1);
   }
@@ -97,50 +98,53 @@ static AZ_NODISCARD az_result _az_get_http_status_line(az_span* self, az_http_re
   AZ_RETURN_IF_FAILED(_az_scan_until(*self, _az_is_new_line, &offset));
 
   // save reason-phrase in status line now that we got the offset. Remove 1 last chars(\r)
-  out->reason_phrase = az_span_slice(*self, 0, offset - 1);
+  out_status_line->reason_phrase = az_span_slice(*self, 0, offset - 1);
   // move position of reader after reason-phrase (parsed done)
   *self = az_span_slice(*self, offset + 1, -1);
   // CR LF
-  // AZ_RETURN_IF_FAILED(_az_is_expected_span(self, AZ_SPAN_FROM_STR("\r\n")));
+  // AZ_RETURN_IF_FAILED(_az_is_expected_span(response, AZ_SPAN_FROM_STR("\r\n")));
 
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result
-az_http_response_get_status_line(az_http_response* response, az_http_response_status_line* out)
+AZ_NODISCARD az_result az_http_response_get_status_line(
+    az_http_response* response,
+    az_http_response_status_line* out_status_line)
 {
   AZ_PRECONDITION_NOT_NULL(response);
-  AZ_PRECONDITION_NOT_NULL(out);
+  AZ_PRECONDITION_NOT_NULL(out_status_line);
 
   // Restart parser to the beggining
   response->_internal.parser.remaining = response->_internal.http_response;
 
   // read an HTTP status line.
-  AZ_RETURN_IF_FAILED(_az_get_http_status_line(&response->_internal.parser.remaining, out));
+  AZ_RETURN_IF_FAILED(
+      _az_get_http_status_line(&response->_internal.parser.remaining, out_status_line));
 
   // set state.kind of the next HTTP response value.
-  response->_internal.parser.next_kind = AZ_HTTP_RESPONSE_KIND_HEADER;
+  response->_internal.parser.next_kind = _az_HTTP_RESPONSE_KIND_HEADER;
 
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_http_response_get_next_header(az_http_response* self, az_pair* out)
+AZ_NODISCARD az_result
+az_http_response_get_next_header(az_http_response* response, az_pair* out_header)
 {
-  AZ_PRECONDITION_NOT_NULL(self);
-  AZ_PRECONDITION_NOT_NULL(out);
-  az_span* reader = &self->_internal.parser.remaining;
+  AZ_PRECONDITION_NOT_NULL(response);
+  AZ_PRECONDITION_NOT_NULL(out_header);
+  az_span* reader = &response->_internal.parser.remaining;
   {
-    az_http_response_kind const kind = self->_internal.parser.next_kind;
+    _az_http_response_kind const kind = response->_internal.parser.next_kind;
     // if reader is expecting to read body (all headers were read), return ITEM_NOT_FOUND so we
     // know we reach end of headers
-    if (kind == AZ_HTTP_RESPONSE_KIND_BODY)
+    if (kind == _az_HTTP_RESPONSE_KIND_BODY)
     {
       return AZ_ERROR_ITEM_NOT_FOUND;
     }
     // Can't read a header if status line was not previously called,
     // User needs to call az_http_response_status_line() which would reset parser and set kind to
     // headers
-    if (kind != AZ_HTTP_RESPONSE_KIND_HEADER)
+    if (kind != _az_HTTP_RESPONSE_KIND_HEADER)
     {
       return AZ_ERROR_HTTP_INVALID_STATE;
     }
@@ -148,10 +152,10 @@ AZ_NODISCARD az_result az_http_response_get_next_header(az_http_response* self, 
 
   // check if we are at the end of all headers to change state to Body.
   // We keep state to Headers if current char is not '\r' (there is another header)
-  if (az_span_ptr(self->_internal.parser.remaining)[0] == '\r')
+  if (az_span_ptr(response->_internal.parser.remaining)[0] == '\r')
   {
     AZ_RETURN_IF_FAILED(_az_is_expected_span(reader, AZ_SPAN_FROM_STR("\r\n")));
-    self->_internal.parser.next_kind = AZ_HTTP_RESPONSE_KIND_BODY;
+    response->_internal.parser.next_kind = _az_HTTP_RESPONSE_KIND_BODY;
     return AZ_ERROR_ITEM_NOT_FOUND;
   }
 
@@ -169,7 +173,7 @@ AZ_NODISCARD az_result az_http_response_get_next_header(az_http_response* self, 
     AZ_RETURN_IF_FAILED(_az_scan_until(*reader, _az_is_a_colon, &field_name_length));
 
     // form a header name. Reader is currently at char ':'
-    out->key = az_span_slice(*reader, 0, field_name_length);
+    out_header->key = az_span_slice(*reader, 0, field_name_length);
     // update reader to next position after colon (add one)
     *reader = az_span_slice(*reader, field_name_length + 1, -1);
 
@@ -208,7 +212,7 @@ AZ_NODISCARD az_result az_http_response_get_next_header(az_http_response* self, 
       }
       offset_value_end = offset; // increasing index only for valid chars,
     }
-    out->value = az_span_slice(*reader, 0, offset_value_end);
+    out_header->value = az_span_slice(*reader, 0, offset_value_end);
     // moving reader. It is currently after \r was found
     *reader = az_span_slice(*reader, offset, -1);
   }
@@ -218,30 +222,30 @@ AZ_NODISCARD az_result az_http_response_get_next_header(az_http_response* self, 
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_http_response_get_body(az_http_response* self, az_span* out_body)
+AZ_NODISCARD az_result az_http_response_get_body(az_http_response* response, az_span* out_body)
 {
-  AZ_PRECONDITION_NOT_NULL(self);
+  AZ_PRECONDITION_NOT_NULL(response);
   AZ_PRECONDITION_NOT_NULL(out_body);
 
   // Make sure get body works no matter where is the current parsing. Allow users to call get body
   // directly and ignore headers and status line
-  az_http_response_kind current_parsing_section = self->_internal.parser.next_kind;
-  if (current_parsing_section != AZ_HTTP_RESPONSE_KIND_BODY)
+  _az_http_response_kind current_parsing_section = response->_internal.parser.next_kind;
+  if (current_parsing_section != _az_HTTP_RESPONSE_KIND_BODY)
   {
-    if (current_parsing_section == AZ_HTTP_RESPONSE_KIND_EOF
-        || current_parsing_section == AZ_HTTP_RESPONSE_KIND_STATUS_LINE)
+    if (current_parsing_section == _az_HTTP_RESPONSE_KIND_EOF
+        || current_parsing_section == _az_HTTP_RESPONSE_KIND_STATUS_LINE)
     {
       // Reset parser and get status line
       az_http_response_status_line ignore = { 0 };
-      AZ_RETURN_IF_FAILED(az_http_response_get_status_line(self, &ignore));
+      AZ_RETURN_IF_FAILED(az_http_response_get_status_line(response, &ignore));
       // update current parsing section
-      current_parsing_section = self->_internal.parser.next_kind;
+      current_parsing_section = response->_internal.parser.next_kind;
     }
     // parse any remaining header
-    if (current_parsing_section == AZ_HTTP_RESPONSE_KIND_HEADER)
+    if (current_parsing_section == _az_HTTP_RESPONSE_KIND_HEADER)
     {
       // Parse and ignore all remaining headers
-      for (az_pair h; az_http_response_get_next_header(self, &h) == AZ_OK;)
+      for (az_pair h; az_http_response_get_next_header(response, &h) == AZ_OK;)
       {
         // ignoring header
       }
@@ -249,8 +253,8 @@ AZ_NODISCARD az_result az_http_response_get_body(az_http_response* self, az_span
   }
 
   // take all the remaining content from reader as body
-  *out_body = az_span_slice(self->_internal.parser.remaining, 0, -1);
+  *out_body = az_span_slice(response->_internal.parser.remaining, 0, -1);
 
-  self->_internal.parser.next_kind = AZ_HTTP_RESPONSE_KIND_EOF;
+  response->_internal.parser.next_kind = _az_HTTP_RESPONSE_KIND_EOF;
   return AZ_OK;
 }

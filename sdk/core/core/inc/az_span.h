@@ -6,6 +6,11 @@
  *
  * @brief An az_span represents a contiguous byte buffer and is used for string manipulations,
  * HTTP requests/responses, building/parsing JSON payloads, and more.
+ *
+ * NOTE: You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
+ * prefixed with an underscore ('_') directly in your application code. These symbols
+ * are part of Azure SDK's internal implementation; we do not document these symbols
+ * and they are subject to change in future versions of the SDK which would break your code.
  */
 
 #ifndef _az_SPAN_H
@@ -211,8 +216,10 @@ AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1, az_span 
  destination char buffer and appends the 0-terminating byte.
  *
  * The buffer referred to by destination must have a size that is at least 1 byte bigger
- * than the \p source az_span. The string \p destination is converted to a zero-terminated str. Content
- * is copied to \p source buffer and then \0 is added at the end. Then out_result will be created out
+ * than the \p source az_span. The string \p destination is converted to a zero-terminated str.
+ Content
+ * is copied to \p source buffer and then \0 is added at the end. Then out_result will be created
+ out
  * of buffer
  *
  * @param[in] destination A pointer to a buffer where the string should be copied

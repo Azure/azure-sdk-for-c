@@ -136,17 +136,17 @@ az_http_request_append_header(_az_http_request* p_hrb, az_span key, az_span valu
 }
 
 AZ_NODISCARD az_result
-az_http_request_get_header(_az_http_request const* request, int32_t index, az_pair* out_result)
+az_http_request_get_header(_az_http_request const* request, int32_t index, az_pair* out_header)
 {
   AZ_PRECONDITION_NOT_NULL(request);
-  AZ_PRECONDITION_NOT_NULL(out_result);
+  AZ_PRECONDITION_NOT_NULL(out_header);
 
   if (index >= _az_http_request_headers_count(request))
   {
     return AZ_ERROR_ARG;
   }
 
-  *out_result = ((az_pair*)az_span_ptr(request->_internal.headers))[index];
+  *out_header = ((az_pair*)az_span_ptr(request->_internal.headers))[index];
   return AZ_OK;
 }
 
