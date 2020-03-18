@@ -54,7 +54,7 @@ typedef struct
     double number;
     az_span string;
     az_span span;
-  } _internal; // was 'value'
+  } _internal;
 } az_json_token;
 
 /*

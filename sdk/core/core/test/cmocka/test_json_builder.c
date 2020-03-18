@@ -71,4 +71,51 @@ void test_json_builder(void** state)
             "\"u\":\"a\\u001Fb\""
             "}")));
   }
+  {
+    // json with AZ_JSON_TOKEN_SPAN
+    uint8_t array[200];
+    az_json_builder builder = { 0 };
+    TEST_EXPECT_SUCCESS(az_json_builder_init(&builder, AZ_SPAN_FROM_BUFFER(array)));
+
+    // this json { "span": "\" } would be scaped to { "span": "\\"" }
+    uint8_t single_char[1] = { '\\' }; // char = '\'
+    az_span single_span = AZ_SPAN_FROM_INITIALIZED_BUFFER(single_char);
+
+    TEST_EXPECT_SUCCESS(az_json_builder_append_token(&builder, az_json_token_object_start()));
+
+    TEST_EXPECT_SUCCESS(az_json_builder_append_object(
+        &builder, AZ_SPAN_FROM_STR("span"), az_json_token_span(single_span)));
+
+    TEST_EXPECT_SUCCESS(az_json_builder_append_token(&builder, az_json_token_object_end()));
+
+    az_span expected = AZ_SPAN_FROM_STR("{"
+                                        "\"span\":\"\\\\\""
+                                        "}");
+
+    assert_true(az_span_is_content_equal(builder._internal.json, expected));
+  }
+  {
+    // json with AZ_JSON_TOKEN_STRING
+    uint8_t array[200];
+    az_json_builder builder = { 0 };
+    TEST_EXPECT_SUCCESS(az_json_builder_init(&builder, AZ_SPAN_FROM_BUFFER(array)));
+
+    // this json { "span": "\" } would be written as { "span": \"" } with no extra scaping
+    uint8_t single_char[1] = { 92 }; // char = '\'
+    az_span single_span = AZ_SPAN_FROM_INITIALIZED_BUFFER(single_char);
+
+    TEST_EXPECT_SUCCESS(az_json_builder_append_token(&builder, az_json_token_object_start()));
+
+    TEST_EXPECT_SUCCESS(az_json_builder_append_object(
+        &builder, AZ_SPAN_FROM_STR("span"), az_json_token_string(single_span)));
+
+    TEST_EXPECT_SUCCESS(az_json_builder_append_token(&builder, az_json_token_object_end()));
+
+    assert_true(az_span_is_content_equal(
+        builder._internal.json,
+        AZ_SPAN_FROM_STR( //
+            "{"
+            "\"span\":\"\\\""
+            "}")));
+  }
 }
