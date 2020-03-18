@@ -55,6 +55,43 @@ int main()
 }
 ```
 
+### Properties
+
+Included in the IoT SDK are helper functions to form and manage properties for IoT Hub services. Implementation starts by using the `az_iot_hub_client_properties_init()` API. The user is free to intitialize using an empty, but appropriately sized, span to later append properties or an already populated span containing a properly formated property buffer. "Properly formatted" properties follow the form `{key}={value}&{key}={value}`.
+
+Below is an example use case of appending properties.
+
+```C
+//FOR SIMPLICITY THIS DOES NOT HAVE ERROR CHECKING. IN PRODUCTION ENSURE PROPER ERROR CHECKING.
+void my_property_func()
+{
+  //Allocate a span to put the properties
+  uint8_t property_buffer[64];
+  az_span property_span = az_span_init(property_buffer, 0, sizeof(property_buffer));
+  
+  //Initialize the property struct with the span
+  az_iot_hub_client_properties props;
+  az_iot_hub_client_properties_init(&props, property_span);
+  //Append properties
+  az_iot_hub_client_properties_append(&props, AZ_SPAN_FROM_STR("key"), AZ_SPAN_FROM_STR("value"));
+  //At this point, you are able to pass the `props` to other API's with property parameters.
+}
+```
+
+Below is an example use case of initializing an already populated property span.
+
+```C
+//FOR SIMPLICITY THIS DOES NOT HAVE ERROR CHECKING. IN PRODUCTION ENSURE PROPER ERROR CHECKING.
+static az_span my_prop_span = AZ_SPAN_LITERAL_FROM_STR("my_device=contoso&my_key=my_value");
+void my_property_func()
+{
+  //Initialize the property struct with the span
+  az_iot_hub_client_properties props;
+  az_iot_hub_client_properties_init(&props, my_prop_span);
+  //At this point, you are able to pass the `props` to other API's with property parameters.
+}
+```
+
 ### Telemetry
 
 Telemetry functionality can be achieved by sending a user payload to a specific topic. In order to get the appropriate topic to which to send, use the `az_iot_hub_client_telemetry_publish_topic_get()` API. An example use case is below.
