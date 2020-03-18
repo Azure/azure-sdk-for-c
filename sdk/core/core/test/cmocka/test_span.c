@@ -35,14 +35,14 @@ static void az_single_char_ascii_lower_test()
     // For ASCII letters, verify that comparing upper and lower case return true.
     if (i >= 'A' && i <= 'Z')
     {
-      uint8_t lower[1] = { i + 32 };
+      uint8_t lower[1] = { (uint8_t)(i + 32) };
       az_span lowerSpan = AZ_SPAN_LITERAL_FROM_INITIALIZED_BUFFER(lower);
       assert_true(az_span_is_content_equal_ignoring_case(span, lowerSpan));
       assert_true(az_span_is_content_equal_ignoring_case(lowerSpan, span));
     }
     else if (i >= 'a' && i <= 'z')
     {
-      uint8_t upper[1] = { i - 32 };
+      uint8_t upper[1] = { (uint8_t)(i - 32) };
       az_span upperSpan = AZ_SPAN_LITERAL_FROM_INITIALIZED_BUFFER(upper);
       assert_true(az_span_is_content_equal_ignoring_case(span, upperSpan));
       assert_true(az_span_is_content_equal_ignoring_case(upperSpan, span));
