@@ -1,6 +1,6 @@
-# Azure IoT SDK for Embedded C
+# Azure IoT Clients for Embedded C
 
-Official Embedded C libraries for Azure IoT.
+Official Embedded C clients for Azure IoT Hub and Device Provisioning Service.
 
 ## Getting started
 
@@ -121,6 +121,7 @@ void my_telemetry_func()
 ```
 
 ## Need help?
+
 * File an issue via [Github Issues](https://github.com/Azure/azure-sdk-for-c/issues/new/choose).
 * Check [previous questions](https://stackoverflow.com/questions/tagged/azure+c) or ask new ones on StackOverflow using
   the `azure` and `c` tags.
@@ -141,7 +142,8 @@ For more information see the [Code of Conduct FAQ](https://opensource.microsoft.
 [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
 
-### Additional Helpful Links for Contributors  
+### Additional Helpful Links for Contributors
+
 Many people all over the world have helped make this project better.  You'll want to check out:
 
 * [What are some good first issues for new contributors to the repo?](https://github.com/azure/azure-sdk-for-c/issues?q=is%3Aopen+is%3Aissue+label%3A%22up+for+grabs%22)
