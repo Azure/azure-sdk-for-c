@@ -18,6 +18,7 @@
 #define TEST_EXPIRATION_STR "1578941692"
 #define TEST_KEY_NAME "iothubowner"
 
+/*
 static void az_iot_sas_token_get_document_NULL_document_fails(void** state)
 {
   (void)state;
@@ -86,6 +87,7 @@ static void az_iot_sas_token_get_document_document_overflow_fails(void** state)
       az_iot_sas_token_get_document(iothub_fqdn, device_id, expiry_time_secs, document, &document),
       AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY);
 }
+*/
 
 static void az_iot_sas_token_get_document_succeeds(void** state)
 {
@@ -104,6 +106,7 @@ static void az_iot_sas_token_get_document_succeeds(void** state)
   assert_memory_equal(expected_document, (char*)raw_document, sizeof(expected_document) - 1);
 }
 
+/*
 static void az_iot_sas_token_generate_empty_device_id_fails(void** state)
 {
   (void)state;
@@ -207,6 +210,7 @@ static void az_iot_sas_token_generate_sas_token_overflow_fails(void** state)
           iothub_fqdn, device_id, signature, expiry_time_secs, key_name, sas_token, &sas_token),
       AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY);
 }
+*/
 
 static void az_iot_sas_token_generate_succeeds(void** state)
 {
