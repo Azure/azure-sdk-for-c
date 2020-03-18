@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef _az_AAD_PRIVATE_H
-#define _az_AAD_PRIVATE_H
+#ifndef _az_TEST_DEFINITIONS_H
+#define _az_TEST_DEFINITIONS_H
 
 /**
  * How to add tests:
@@ -94,4 +94,4 @@ const struct CMUnitTest tests[] = {
 
 };
 
-#endif // _az_AAD_PRIVATE_H
+#endif // _az_TEST_DEFINITIONS_H
