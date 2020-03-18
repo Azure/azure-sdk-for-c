@@ -58,7 +58,7 @@ typedef struct
 } az_json_token;
 
 /*
- * @brief az_json_token_null returns NULL az_json_token.
+ * @brief az_json_token_null Returns the "null" JSON token.
  */
 AZ_NODISCARD AZ_INLINE az_json_token az_json_token_null()
 {
