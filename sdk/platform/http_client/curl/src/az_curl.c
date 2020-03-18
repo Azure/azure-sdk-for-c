@@ -228,7 +228,11 @@ static size_t _az_http_client_curl_write_to_span(
 
   az_span const span_for_content
       = az_span_init((uint8_t*)contents, (int32_t)expected_size, (int32_t)expected_size);
-  AZ_RETURN_IF_FAILED(az_span_append(*user_buffer_builder, span_for_content, user_buffer_builder));
+
+  if (az_failed(az_span_append(*user_buffer_builder, span_for_content, user_buffer_builder)))
+  {
+    return expected_size + 1;
+  }
 
   // This callback needs to return the response size or curl will consider it as it failed
   return expected_size;
