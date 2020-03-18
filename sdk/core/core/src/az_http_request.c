@@ -14,7 +14,7 @@
 
 #include <_az_cfg.h>
 
-AZ_NODISCARD az_result _az_is_question_mark(az_span slice)
+static AZ_NODISCARD az_result _az_is_question_mark(az_span slice)
 {
   return az_span_ptr(slice)[0] == '?' ? AZ_OK : AZ_CONTINUE;
 }
@@ -46,7 +46,7 @@ AZ_NODISCARD az_result az_http_request_init(
                                 .query_start
                                 = url_with_query == AZ_ERROR_ITEM_NOT_FOUND ? 0 : query_start,
                                 .headers = headers_buffer,
-                                .max_headers = az_span_capacity(headers_buffer) / sizeof(az_pair),
+                                .max_headers = az_span_capacity(headers_buffer) / (int32_t)sizeof(az_pair),
                                 .retry_headers_start_byte_offset = 0,
                                 .body = body,
                             } };

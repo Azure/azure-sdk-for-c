@@ -8,7 +8,7 @@
 
 #include <_az_cfg.h>
 
-void az_precondition_failed_default()
+static void az_precondition_failed_default()
 {
   /* By default, when a precondition fails the calling thread is suspended forever */
   while (true)
