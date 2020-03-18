@@ -9,11 +9,11 @@ elseif(CMAKE_C_COMPILER_ID MATCHES "Clang")
     set(WARNINGS_AS_ERRORS_FLAG "-Werror")
   endif()
 
-  add_compile_options(-Xclang -Wall -Wextra -pedantic  ${WARNINGS_AS_ERRORS_FLAG} -Wdocumentation -Wdocumentation-unknown-command -fcomment-block-commands=retval -Wcast-qual)
+  add_compile_options(-Xclang -Wall -Wextra -pedantic  ${WARNINGS_AS_ERRORS_FLAG} -Wdocumentation -Wdocumentation-unknown-command -fcomment-block-commands=retval -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal)
 else()
   if(WARNINGS_AS_ERRORS)
     set(WARNINGS_AS_ERRORS_FLAG "-Werror")
   endif()
 
-  add_compile_options(-Wall -Wextra -pedantic  ${WARNINGS_AS_ERRORS_FLAG} -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal)
+  add_compile_options(-Wall -Wextra -pedantic  ${WARNINGS_AS_ERRORS_FLAG} -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal)
 endif()
