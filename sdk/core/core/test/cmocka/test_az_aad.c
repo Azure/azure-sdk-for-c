@@ -42,6 +42,7 @@ az_result __wrap_az_http_client_send_request(
   return AZ_OK;
 }
 
+#ifdef MOCK_ENABLED
 static void test_az_token_expired()
 {
   _az_token token = { 0 };
@@ -57,7 +58,6 @@ static void test_az_token_expired()
   assert_true(_az_token_expired(&token));
 }
 
-#ifdef MOCK_ENABLED
 static void test_az_aad_request_token()
 {
   // Calling az_aad_request_token(_az_http_request* ref_request, _az_token* out_token);
@@ -67,6 +67,7 @@ static void test_az_aad_request_token()
   assert_return_code(_az_aad_request_token(&r, &t), AZ_OK);
   assert_string_equal(t._internal.token, "Bearer fakeToken");
 }
+#endif // MOCK_ENABLED
 
 static void test_az_aad_build_body()
 {
@@ -81,7 +82,6 @@ static void test_az_aad_build_body()
           &body),
       AZ_OK);
 }
-#endif // MOCK_ENABLED
 
 static void test_az_aad_build_url()
 {
