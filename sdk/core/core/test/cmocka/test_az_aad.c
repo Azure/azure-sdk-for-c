@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include "az_test_definitions.h"
 #include <az_aad_private.h>
 #include <az_credentials.h>
 #include <az_span.h>
@@ -34,11 +35,6 @@ az_result __wrap_az_http_client_send_request(
   AZ_RETURN_IF_FAILED(az_http_response_init(p_response, http_response_span));
   return AZ_OK;
 }
-
-void test_az_token_expired();
-void test_az_aad_request_token();
-void test_az_aad_build_body();
-void test_az_aad_build_url();
 
 void test_az_aad(void** state)
 {

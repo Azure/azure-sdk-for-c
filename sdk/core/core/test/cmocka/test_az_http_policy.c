@@ -15,14 +15,6 @@
 
 #include <_az_cfg.h>
 
-az_result test_policy_transport(
-    _az_http_policy* p_policies,
-    void* p_options,
-    _az_http_request* p_request,
-    az_http_response* p_response);
-
-void test_az_http_pipeline_policy_credential();
-
 void test_az_http_policy(void** state)
 {
   (void)state;
