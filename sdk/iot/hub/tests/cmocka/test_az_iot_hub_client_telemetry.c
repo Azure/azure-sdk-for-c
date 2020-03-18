@@ -47,12 +47,12 @@ static const char g_test_correct_topic_with_options_no_params[]
     = "devices/my_device/modules/my_module_id/messages/events/";
 static const char g_test_correct_topic_with_options_with_params[]
     = "devices/my_device/modules/my_module_id/messages/events/"
-      "?key=value&key_two=value2";
+      "key=value&key_two=value2";
 static const char g_test_correct_topic_no_options_with_params[]
     = "devices/my_device/messages/events/"
-      "?key=value&key_two=value2";
+      "key=value&key_two=value2";
 static const char g_test_correct_topic_with_options_module_id_with_params[]
-    = "devices/my_device/modules/my_module_id/messages/events/?key=value&key_two=value2";
+    = "devices/my_device/modules/my_module_id/messages/events/key=value&key_two=value2";
 
 static const az_iot_hub_client g_test_valid_client_no_options
     = { ._internal = { .iot_hub_hostname = AZ_SPAN_LITERAL_FROM_STR(TEST_FQDN),
