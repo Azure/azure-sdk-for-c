@@ -42,20 +42,6 @@ az_result __wrap_az_http_client_send_request(
   return AZ_OK;
 }
 
-void test_az_aad(void** state)
-{
-  (void)state;
-
-/* Tests using wrap to mock. Only suported by gcc */
-#ifdef MOCK_ENABLED
-  test_az_token_expired();
-  test_az_aad_request_token();
-#endif // MOCK_ENABLED
-
-  test_az_aad_build_body();
-  test_az_aad_build_url();
-}
-
 static void test_az_token_expired()
 {
   _az_token token = { 0 };
@@ -100,4 +86,18 @@ static void test_az_aad_build_url()
   uint8_t buffer[500];
   az_span url = AZ_SPAN_FROM_BUFFER(buffer);
   assert_return_code(_az_aad_build_url(url, AZ_SPAN_FROM_STR("tenant"), &url), AZ_OK);
+}
+
+void test_az_aad(void** state)
+{
+  (void)state;
+
+/* Tests using wrap to mock. Only suported by gcc */
+#ifdef MOCK_ENABLED
+  test_az_token_expired();
+  test_az_aad_request_token();
+#endif // MOCK_ENABLED
+
+  test_az_aad_build_body();
+  test_az_aad_build_url();
 }
