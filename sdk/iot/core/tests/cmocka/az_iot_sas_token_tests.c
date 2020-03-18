@@ -5,6 +5,9 @@
 #include <az_iot_sas_token.h>
 #include <az_span.h>
 
+#include <az_precondition_internal.h>
+#include <az_precondition.h>
+
 #include <setjmp.h>
 #include <stdarg.h>
 #include <stddef.h>
@@ -19,7 +22,38 @@
 #define TEST_EXPIRATION_STR "1578941692"
 #define TEST_KEY_NAME "iothubowner"
 
-/*
+#ifndef NO_PRECONDITION_CHECKING
+
+// This block defines the resources needed to verify precondition checking.
+// The macro assert_precondition_checked(func) alone shall be used to assert if a precondition is verified.
+// If a precondition is not verified within a function the result will be either:
+// - A crash in the test, as the the target function will continue to execute with an invalid argument, or
+// - An assert failure indicating a precondition was not tested.
+// Notice that:
+// - If assert_precondition_checked(func) is used, the module must include <setjmp.h>;
+// - If a function has two precondition checks and both are supposed to fail on a given test, assert_precondition_checked(func)
+//   is unable to distinguish which precondition has failed first. Testing precondition checking separately is advised.
+// - Tests using assert_precondition_checked(func) must not be run in parallel (!).
+
+static jmp_buf g_jmp_buf; 
+static unsigned int precondition_test_count = 0;
+static void az_precondition_test_failed_fn()
+{
+  precondition_test_count++;
+  longjmp(g_jmp_buf, 0);
+} 
+
+#define assert_precondition_checked(fn) \
+  precondition_test_count = 0; \
+  (void)setjmp(g_jmp_buf); \
+  if (precondition_test_count == 0) { \
+    fn; \
+  } \
+  assert_int_equal(1, precondition_test_count);
+
+
+// Tests
+
 static void az_iot_sas_token_get_document_NULL_document_fails(void** state)
 {
   (void)state;
@@ -28,9 +62,9 @@ static void az_iot_sas_token_get_document_NULL_document_fails(void** state)
   int32_t expiry_time_secs = TEST_EXPIRATION;
   az_span document = AZ_SPAN_NULL;
 
-  assert_int_equal(
-      az_iot_sas_token_get_document(iothub_fqdn, device_id, expiry_time_secs, document, NULL),
-      AZ_ERROR_ARG);
+  assert_precondition_checked(
+    az_iot_sas_token_get_document(iothub_fqdn, device_id, expiry_time_secs, document, NULL)
+  );
 }
 
 static void az_iot_sas_token_get_document_NULL_document_span_fails(void** state)
@@ -42,8 +76,9 @@ static void az_iot_sas_token_get_document_NULL_document_span_fails(void** state)
 
   az_span document = AZ_SPAN_NULL;
 
-  assert_true(az_failed(az_iot_sas_token_get_document(
-      iothub_fqdn, device_id, expiry_time_secs, document, &document)));
+  assert_precondition_checked(
+    az_iot_sas_token_get_document(iothub_fqdn, device_id, expiry_time_secs, document, &document)
+  );
 }
 
 static void az_iot_sas_token_get_document_empty_device_id_fails(void** state)
@@ -56,8 +91,9 @@ static void az_iot_sas_token_get_document_empty_device_id_fails(void** state)
   uint8_t raw_document[256];
   az_span document = az_span_init(raw_document, 0, _az_COUNTOF(raw_document));
 
-  assert_true(az_failed(az_iot_sas_token_get_document(
-      iothub_fqdn, device_id, expiry_time_secs, document, &document)));
+  assert_precondition_checked(
+    az_iot_sas_token_get_document(iothub_fqdn, device_id, expiry_time_secs, document, &document)
+  );
 }
 
 static void az_iot_sas_token_get_document_empty_iothub_fqdn_fails(void** state)
@@ -70,25 +106,96 @@ static void az_iot_sas_token_get_document_empty_iothub_fqdn_fails(void** state)
   uint8_t raw_document[256];
   az_span document = az_span_init(raw_document, 0, _az_COUNTOF(raw_document));
 
-  assert_true(az_failed(az_iot_sas_token_get_document(
-      iothub_fqdn, device_id, expiry_time_secs, document, &document)));
+  assert_precondition_checked(
+    az_iot_sas_token_get_document(iothub_fqdn, device_id, expiry_time_secs, document, &document)
+  );
 }
 
-static void az_iot_sas_token_get_document_document_overflow_fails(void** state)
+static void az_iot_sas_token_generate_empty_device_id_fails(void** state)
+{
+  (void)state;
+  az_span iothub_fqdn = AZ_SPAN_FROM_STR(TEST_FQDN);
+  az_span device_id = AZ_SPAN_NULL;
+  int32_t expiry_time_secs = TEST_EXPIRATION;
+  az_span key_name = AZ_SPAN_NULL;
+  az_span signature = AZ_SPAN_FROM_STR(TEST_SIG);
+
+  uint8_t raw_sas_token[256];
+  az_span sas_token = az_span_init(raw_sas_token, 0, _az_COUNTOF(raw_sas_token));
+
+  assert_precondition_checked(
+    az_iot_sas_token_generate(iothub_fqdn, device_id, signature, expiry_time_secs, key_name, sas_token, &sas_token)
+  );
+}
+
+static void az_iot_sas_token_generate_empty_iothub_fqdn_fails(void** state)
+{
+  (void)state;
+  az_span iothub_fqdn = AZ_SPAN_NULL;
+  az_span device_id = AZ_SPAN_FROM_STR(TEST_DEVICEID);
+  int32_t expiry_time_secs = TEST_EXPIRATION;
+  az_span key_name = AZ_SPAN_NULL;
+  az_span signature = AZ_SPAN_FROM_STR(TEST_SIG);
+
+  uint8_t raw_sas_token[256];
+  az_span sas_token = az_span_init(raw_sas_token, 0, _az_COUNTOF(raw_sas_token));
+
+  assert_precondition_checked(
+    az_iot_sas_token_generate(iothub_fqdn, device_id, signature, expiry_time_secs, key_name, sas_token, &sas_token)
+  );
+}
+
+static void az_iot_sas_token_generate_EMPTY_signature_fails(void** state)
 {
   (void)state;
   az_span iothub_fqdn = AZ_SPAN_FROM_STR(TEST_FQDN);
   az_span device_id = AZ_SPAN_FROM_STR(TEST_DEVICEID);
   int32_t expiry_time_secs = TEST_EXPIRATION;
+  az_span key_name = AZ_SPAN_NULL;
+  az_span signature = AZ_SPAN_NULL;
 
-  uint8_t raw_document[32];
-  az_span document = az_span_init(raw_document, 0, _az_COUNTOF(raw_document));
+  uint8_t raw_sas_token[256];
+  az_span sas_token = az_span_init(raw_sas_token, 0, _az_COUNTOF(raw_sas_token));
 
-  assert_int_equal(
-      az_iot_sas_token_get_document(iothub_fqdn, device_id, expiry_time_secs, document, &document),
-      AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY);
+  assert_precondition_checked(
+    az_iot_sas_token_generate(iothub_fqdn, device_id, signature, expiry_time_secs, key_name, sas_token, &sas_token)
+  );
 }
-*/
+
+static void az_iot_sas_token_generate_NULL_sas_token_span_fails(void** state)
+{
+  (void)state;
+  az_span iothub_fqdn = AZ_SPAN_FROM_STR(TEST_FQDN);
+  az_span device_id = AZ_SPAN_FROM_STR(TEST_DEVICEID);
+  int32_t expiry_time_secs = TEST_EXPIRATION;
+  az_span key_name = AZ_SPAN_NULL;
+  az_span signature = AZ_SPAN_FROM_STR(TEST_SIG);
+
+  az_span sas_token = AZ_SPAN_NULL;
+
+  assert_precondition_checked(
+    az_iot_sas_token_generate(iothub_fqdn, device_id, signature, expiry_time_secs, key_name, sas_token, &sas_token)
+  );
+}
+
+static void az_iot_sas_token_generate_NULL_out_sas_token_fails(void** state)
+{
+  (void)state;
+  az_span iothub_fqdn = AZ_SPAN_FROM_STR(TEST_FQDN);
+  az_span device_id = AZ_SPAN_FROM_STR(TEST_DEVICEID);
+  int32_t expiry_time_secs = TEST_EXPIRATION;
+  az_span key_name = AZ_SPAN_NULL;
+  az_span signature = AZ_SPAN_FROM_STR(TEST_SIG);
+
+  uint8_t raw_sas_token[256];
+  az_span sas_token = az_span_init(raw_sas_token, 0, _az_COUNTOF(raw_sas_token));
+
+  assert_precondition_checked(
+       az_iot_sas_token_generate(iothub_fqdn, device_id, signature, expiry_time_secs, key_name, sas_token, NULL)
+  );
+}
+
+#endif // NO_PRECONDITION_CHECKING
 
 static void az_iot_sas_token_get_document_succeeds(void** state)
 {
@@ -106,112 +213,6 @@ static void az_iot_sas_token_get_document_succeeds(void** state)
       iothub_fqdn, device_id, expiry_time_secs, document, &document)));
   assert_memory_equal(expected_document, (char*)raw_document, sizeof(expected_document) - 1);
 }
-
-/*
-static void az_iot_sas_token_generate_empty_device_id_fails(void** state)
-{
-  (void)state;
-  az_span iothub_fqdn = AZ_SPAN_FROM_STR(TEST_FQDN);
-  az_span device_id = AZ_SPAN_NULL;
-  int32_t expiry_time_secs = TEST_EXPIRATION;
-  az_span key_name = AZ_SPAN_NULL;
-  az_span signature = AZ_SPAN_FROM_STR(TEST_SIG);
-
-  uint8_t raw_sas_token[256];
-  az_span sas_token = az_span_init(raw_sas_token, 0, _az_COUNTOF(raw_sas_token));
-
-  assert_int_equal(
-      az_iot_sas_token_generate(
-          iothub_fqdn, device_id, signature, expiry_time_secs, key_name, sas_token, &sas_token),
-      AZ_ERROR_ARG);
-}
-
-static void az_iot_sas_token_generate_empty_iothub_fqdn_fails(void** state)
-{
-  (void)state;
-  az_span iothub_fqdn = AZ_SPAN_NULL;
-  az_span device_id = AZ_SPAN_FROM_STR(TEST_DEVICEID);
-  int32_t expiry_time_secs = TEST_EXPIRATION;
-  az_span key_name = AZ_SPAN_NULL;
-  az_span signature = AZ_SPAN_FROM_STR(TEST_SIG);
-
-  uint8_t raw_sas_token[256];
-  az_span sas_token = az_span_init(raw_sas_token, 0, _az_COUNTOF(raw_sas_token));
-
-  assert_int_equal(
-      az_iot_sas_token_generate(
-          iothub_fqdn, device_id, signature, expiry_time_secs, key_name, sas_token, &sas_token),
-      AZ_ERROR_ARG);
-}
-
-static void az_iot_sas_token_generate_EMPTY_signature_fails(void** state)
-{
-  (void)state;
-  az_span iothub_fqdn = AZ_SPAN_FROM_STR(TEST_FQDN);
-  az_span device_id = AZ_SPAN_FROM_STR(TEST_DEVICEID);
-  int32_t expiry_time_secs = TEST_EXPIRATION;
-  az_span key_name = AZ_SPAN_NULL;
-  az_span signature = AZ_SPAN_NULL;
-
-  uint8_t raw_sas_token[256];
-  az_span sas_token = az_span_init(raw_sas_token, 0, _az_COUNTOF(raw_sas_token));
-
-  assert_int_equal(
-      az_iot_sas_token_generate(
-          iothub_fqdn, device_id, signature, expiry_time_secs, key_name, sas_token, &sas_token),
-      AZ_ERROR_ARG);
-}
-
-static void az_iot_sas_token_generate_NULL_sas_token_fails(void** state)
-{
-  (void)state;
-  az_span iothub_fqdn = AZ_SPAN_FROM_STR(TEST_FQDN);
-  az_span device_id = AZ_SPAN_FROM_STR(TEST_DEVICEID);
-  int32_t expiry_time_secs = TEST_EXPIRATION;
-  az_span key_name = AZ_SPAN_NULL;
-  az_span signature = AZ_SPAN_FROM_STR(TEST_SIG);
-
-  az_span sas_token = AZ_SPAN_NULL;
-
-  assert_int_equal(
-      az_iot_sas_token_generate(
-          iothub_fqdn, device_id, signature, expiry_time_secs, key_name, sas_token, NULL),
-      AZ_ERROR_ARG);
-}
-
-static void az_iot_sas_token_generate_NULL_sas_token_span_fails(void** state)
-{
-  (void)state;
-  az_span iothub_fqdn = AZ_SPAN_FROM_STR(TEST_FQDN);
-  az_span device_id = AZ_SPAN_FROM_STR(TEST_DEVICEID);
-  int32_t expiry_time_secs = TEST_EXPIRATION;
-  az_span key_name = AZ_SPAN_NULL;
-  az_span signature = AZ_SPAN_FROM_STR(TEST_SIG);
-
-  az_span sas_token = AZ_SPAN_NULL;
-
-  assert_true(az_failed(az_iot_sas_token_generate(
-      iothub_fqdn, device_id, signature, expiry_time_secs, key_name, sas_token, &sas_token)));
-}
-
-static void az_iot_sas_token_generate_sas_token_overflow_fails(void** state)
-{
-  (void)state;
-  az_span iothub_fqdn = AZ_SPAN_FROM_STR(TEST_FQDN);
-  az_span device_id = AZ_SPAN_FROM_STR(TEST_DEVICEID);
-  int32_t expiry_time_secs = TEST_EXPIRATION;
-  az_span key_name = AZ_SPAN_NULL;
-  az_span signature = AZ_SPAN_FROM_STR(TEST_SIG);
-
-  uint8_t raw_sas_token[32];
-  az_span sas_token = az_span_init(raw_sas_token, 0, _az_COUNTOF(raw_sas_token));
-
-  assert_int_equal(
-      az_iot_sas_token_generate(
-          iothub_fqdn, device_id, signature, expiry_time_secs, key_name, sas_token, &sas_token),
-      AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY);
-}
-*/
 
 static void az_iot_sas_token_generate_succeeds(void** state)
 {
@@ -254,24 +255,64 @@ static void az_iot_sas_token_generate_with_keyname_succeeds(void** state)
   assert_memory_equal(expected_sas_token, (char*)raw_sas_token, sizeof(expected_sas_token) - 1);
 }
 
+// Conditions like buffer (i.e., az_span) capacity are not covered by pre-conditions, so these tests are always mandatory.
+static void az_iot_sas_token_generate_sas_token_overflow_fails(void** state)
+{
+  (void)state;
+  az_span iothub_fqdn = AZ_SPAN_FROM_STR(TEST_FQDN);
+  az_span device_id = AZ_SPAN_FROM_STR(TEST_DEVICEID);
+  int32_t expiry_time_secs = TEST_EXPIRATION;
+  az_span key_name = AZ_SPAN_NULL;
+  az_span signature = AZ_SPAN_FROM_STR(TEST_SIG);
+
+  uint8_t raw_sas_token[32];
+  az_span sas_token = az_span_init(raw_sas_token, 0, _az_COUNTOF(raw_sas_token));
+
+  assert_int_equal(
+      az_iot_sas_token_generate(
+          iothub_fqdn, device_id, signature, expiry_time_secs, key_name, sas_token, &sas_token),
+      AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY);
+}
+
+// Conditions like buffer (i.e., az_span) capacity are not covered by pre-conditions, so these tests are always mandatory.
+static void az_iot_sas_token_get_document_document_overflow_fails(void** state)
+{
+  (void)state;
+  az_span iothub_fqdn = AZ_SPAN_FROM_STR(TEST_FQDN);
+  az_span device_id = AZ_SPAN_FROM_STR(TEST_DEVICEID);
+  int32_t expiry_time_secs = TEST_EXPIRATION;
+
+  uint8_t raw_document[32];
+  az_span document = az_span_init(raw_document, 0, _az_COUNTOF(raw_document));
+
+  assert_int_equal(
+      az_iot_sas_token_get_document(iothub_fqdn, device_id, expiry_time_secs, document, &document),
+      AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY);
+}
+
 int test_iot_sas_token()
 {
+#ifndef NO_PRECONDITION_CHECKING
+  az_precondition_failed_set_callback(az_precondition_test_failed_fn);
+#endif // NO_PRECONDITION_CHECKING
+
   const struct CMUnitTest tests[] = {
-    // SAS Token
-    /*cmocka_unit_test(az_iot_sas_token_get_document_NULL_document_fails),
+#ifndef NO_PRECONDITION_CHECKING
+    cmocka_unit_test(az_iot_sas_token_get_document_NULL_document_fails),
     cmocka_unit_test(az_iot_sas_token_get_document_NULL_document_span_fails),
     cmocka_unit_test(az_iot_sas_token_get_document_empty_device_id_fails),
     cmocka_unit_test(az_iot_sas_token_get_document_empty_iothub_fqdn_fails),
-    cmocka_unit_test(az_iot_sas_token_get_document_document_overflow_fails), */
-    cmocka_unit_test(az_iot_sas_token_get_document_succeeds),
-    /*cmocka_unit_test(az_iot_sas_token_generate_empty_device_id_fails),
+    cmocka_unit_test(az_iot_sas_token_generate_empty_device_id_fails),
     cmocka_unit_test(az_iot_sas_token_generate_empty_iothub_fqdn_fails),
     cmocka_unit_test(az_iot_sas_token_generate_EMPTY_signature_fails),
-    cmocka_unit_test(az_iot_sas_token_generate_NULL_sas_token_fails),
     cmocka_unit_test(az_iot_sas_token_generate_NULL_sas_token_span_fails),
-    cmocka_unit_test(az_iot_sas_token_generate_sas_token_overflow_fails),*/
+    cmocka_unit_test(az_iot_sas_token_generate_NULL_out_sas_token_fails),
+#endif // NO_PRECONDITION_CHECKING
+    cmocka_unit_test(az_iot_sas_token_get_document_succeeds),
     cmocka_unit_test(az_iot_sas_token_generate_succeeds),
     cmocka_unit_test(az_iot_sas_token_generate_with_keyname_succeeds),
+    cmocka_unit_test(az_iot_sas_token_generate_sas_token_overflow_fails),
+    cmocka_unit_test(az_iot_sas_token_get_document_document_overflow_fails)
   };
   return cmocka_run_group_tests_name("az_iot_sas_token", tests, NULL, NULL);
 }
