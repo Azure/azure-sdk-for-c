@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "az_keyvault_client_private.h"
 #include <az_config_internal.h>
 #include <az_credential_internal.h>
 #include <az_credentials.h>
@@ -161,6 +160,11 @@ AZ_NODISCARD az_keyvault_create_key_options az_keyvault_create_key_options_defau
  * @param http_body action used by json builder to be called while building
  * @return AZ_NODISCARD _az_keyvault_keys_key_create_build_json_body
  */
+AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
+    az_span json_web_key_type,
+    az_keyvault_create_key_options* options,
+    az_span* http_body);
+
 AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
     az_json_web_key_type json_web_key_type,
     az_keyvault_create_key_options* options,
