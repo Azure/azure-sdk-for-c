@@ -247,7 +247,7 @@ az_json_builder_append_array_item(az_json_builder* json_builder, az_json_token t
 typedef uint64_t _az_json_stack;
 
 /*
- * @brief An az_json_parser return the JSON tokens contained within a JSON object buffer.
+ * @brief An az_json_parser returns the JSON tokens contained within a JSON buffer.
  */
 typedef struct
 {
