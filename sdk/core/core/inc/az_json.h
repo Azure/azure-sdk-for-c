@@ -259,7 +259,7 @@ typedef struct
 } az_json_parser;
 
 /*
- * @brief An az_json_token_member represents a JSON element's name and token.
+ * @brief An az_json_token_member represents a JSON element's name and value.
  */
 typedef struct
 {
