@@ -1,40 +1,46 @@
-# Azure IoT SDK MQTT State Machine
+# Azure IoT Client MQTT State Machine
 
 ## High-level architecture
 
-Device Provisioning and IoT Hub service protocols require additional state management on top of the MQTT protocol. The Azure IoT SDK for C provides a common programming model layered on an MQTT client selected by the application developer.
+Device Provisioning and IoT Hub service protocols require additional state management on top of the MQTT protocol. The Azure IoT Hub and Provisioning clients for C provide a common programming model. The clients must be layered on top of an MQTT client selected by the application developer.
 
 The following aspects are being handled by the SDK:
+
 1. Generate MQTT CONNECT credentials.
 1. Obtain SUBSCRIBE topic filters and PUBLISH topic strings required by various service features.
-1. Parse service errors and output an uniform error object model. 
-1. Provide the correct sequence of events required to perform an operation. 
+1. Parse service errors and output an uniform error object model.
+1. Provide the correct sequence of events required to perform an operation.
 1. Provide suggested timing information when retrying operations.
 
 The following aspects need to be handled by the application or convenience layers:
+
 1. Ensure secure TLS communication using either server or mutual X509 authentication.
 1. Perform MQTT transport-level operations.
 1. Delay execution for retry purposes.
 1. (Optional) Provide real-time clock information and perform HMAC-SHA256 operations for SAS token generation.
 
-For more information about Azure IoT services using MQTT see https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-mqtt-support.
+For more information about Azure IoT services using MQTT see [this article](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-mqtt-support).
 
 ## Components
 
 ### IoT Hub
+
 ![image](resources/iot_hub_flow.png "IoT MQTT State Machine")
 
 ### Device Provisioning Service
+
 ![image](resources/iot_provisioning_flow.png "Device Provisioning MQTT State Machine")
 
-## Design Decisions
-Porting requirements:
-- The target platform C99 compiler is generating reentrant code. The target platform supports a stack of several kB.
-- The SDK relies on types such as `uint8_t` existing. If a platform doesn't already have them defined, they should be added to the application code using `typedef` statements.
+## Porting the IoT Clients
 
-The SDK is provided only for the MQTT protocol. Support for WebSocket/WebProxy tunneling as well as TLS security is not handled by the SDK.
+Requirements:
 
-Assumptions and recommendations for the application:
+- C99 compiler.
+- The target platform supports a stack of several kB.
+- Types such as `uint8_t` must be defined.
+
+The IoT clients provide adaptation from IoT concepts to the MQTT protocol. The IoT services support MQTT tunneling over WebSocket Secure which also enables WebProxy scenarios. Application developers are responsible with setting up the wss:// tunnel if they require this functionality.
+
 - The SDK does not support unsubscribing from any of the previously subscribed topics. We assume that the device will only set-up topics that must be used.
 
 ## API
