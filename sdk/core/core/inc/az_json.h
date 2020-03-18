@@ -66,7 +66,7 @@ AZ_NODISCARD AZ_INLINE az_json_token az_json_token_null()
 }
 
 /*
- * @brief az_json_token_boolean returns a az_json_token containing a boolean.
+ * @brief az_json_token_boolean Returns a boolean JSON token representing either "true" or "false".
  *
  * @param value A boolean indicating how the az_json_token should be initialized.
  */
