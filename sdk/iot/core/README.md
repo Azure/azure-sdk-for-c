@@ -17,7 +17,7 @@ TBD
 To use IoT Hub connectivity, the first action by a developer should be to initialize the
 client with the `az_iot_hub_client_init()` API. Once that is initialized, you may use the
 `az_iot_hub_client_user_name_get()` and `az_iot_hub_client_client_id_get()` to get the
-user name and client id to establish a connection with IoT Hub. 
+user name and client id to establish a connection with IoT Hub.
 
 An example use case is below.
 
@@ -127,6 +127,7 @@ void my_telemetry_func()
   the `azure` and `c` tags.
 
 ## Contributing
+
 For details on contributing to this repository, see the [contributing guide](https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md).
 
 This project welcomes contributions and suggestions. Most contributions require you to agree to a Contributor License
