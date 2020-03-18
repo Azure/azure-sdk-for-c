@@ -58,7 +58,7 @@ typedef struct
 } az_json_token;
 
 /*
- * @brief az_json_token_null returns NULL az_json_token.
+ * @brief az_json_token_null Returns the "null" JSON token.
  */
 AZ_NODISCARD AZ_INLINE az_json_token az_json_token_null()
 {
@@ -66,7 +66,7 @@ AZ_NODISCARD AZ_INLINE az_json_token az_json_token_null()
 }
 
 /*
- * @brief az_json_token_boolean returns a az_json_token containing a boolean.
+ * @brief az_json_token_boolean Returns a boolean JSON token representing either "true" or "false".
  *
  * @param value A boolean indicating how the az_json_token should be initialized.
  */
@@ -247,7 +247,7 @@ az_json_builder_append_array_item(az_json_builder* json_builder, az_json_token t
 typedef uint64_t _az_json_stack;
 
 /*
- * @brief An az_json_parser return the JSON tokens contained within a JSON object buffer.
+ * @brief An az_json_parser returns the JSON tokens contained within a JSON buffer.
  */
 typedef struct
 {
@@ -259,7 +259,7 @@ typedef struct
 } az_json_parser;
 
 /*
- * @brief An az_json_token_member represents a JSON element's name and token.
+ * @brief An az_json_token_member represents a JSON element's name and value.
  */
 typedef struct
 {
@@ -268,7 +268,7 @@ typedef struct
 } az_json_token_member;
 
 /*
- * @brief az_json_parser_init initializes an az_json_parser to parse the JSON object contained in a
+ * @brief az_json_parser_init initializes an az_json_parser to parse the JSON payload contained within the passed in buffer.
  * JSON buffer.
  *
  * @param json_parser A pointer to an az_json_parser instance to initialize.
