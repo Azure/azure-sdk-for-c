@@ -4,8 +4,6 @@
 #include <az_iot_sas_token.h>
 #include <az_span.h>
 
-#include <stdio.h>
-
 #include <setjmp.h>
 #include <stdarg.h>
 #include <stddef.h>
