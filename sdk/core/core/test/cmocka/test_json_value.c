@@ -52,7 +52,7 @@ void test_json_value(void** state)
     assert_true(az_json_token_get_number(json_number, &number_value) == AZ_OK);
 
     double const expected_value = -42.3;
-    uint64_t const* const expected_value_bin_rep_view = (uint64_t*)&expected_value;
+    uint64_t const* const expected_value_bin_rep_view = (uint64_t const*)&expected_value;
 
     assert_true(*number_value_bin_rep_view == *expected_value_bin_rep_view);
   }

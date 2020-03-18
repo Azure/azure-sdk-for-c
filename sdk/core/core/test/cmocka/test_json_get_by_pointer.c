@@ -23,7 +23,7 @@ void test_json_get_by_pointer(void** state)
     assert_true(token.kind == AZ_JSON_TOKEN_NUMBER);
 
     double const expected = 57;
-    uint64_t const* const expected_bin_rep_view = (uint64_t*)&expected;
+    uint64_t const* const expected_bin_rep_view = (uint64_t const*)&expected;
     uint64_t const* const token_value_number_bin_rep_view = (uint64_t*)&token.value.number;
 
     assert_true(*token_value_number_bin_rep_view == *expected_bin_rep_view);
