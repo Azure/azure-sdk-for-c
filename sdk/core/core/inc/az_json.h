@@ -268,7 +268,7 @@ typedef struct
 } az_json_token_member;
 
 /*
- * @brief az_json_parser_init initializes an az_json_parser to parse the JSON object contained in a
+ * @brief az_json_parser_init initializes an az_json_parser to parse the JSON payload contained within the passed in buffer.
  * JSON buffer.
  *
  * @param json_parser A pointer to an az_json_parser instance to initialize.
