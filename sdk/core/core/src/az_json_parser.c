@@ -174,12 +174,11 @@ AZ_NODISCARD static az_result az_span_reader_get_json_number_int(
   // read an integer part of the number
   while (true)
   {
-    int d = c - '0';
-    if (p_n->value
-        <= (d >= 0 ? AZ_DEC_NUMBER_MAX - (uint64_t)d : AZ_DEC_NUMBER_MAX + (uint64_t)-d) / 10)
+    uint64_t d = c - '0';
+    if (p_n->value <= (AZ_DEC_NUMBER_MAX - d) / 10)
     {
-      p_n->value = d >= 0 ? p_n->value * 10 + (uint64_t)d : p_n->value * 10 - (uint64_t)-d;
-      p_n->exp += e_offset;
+      p_n->value = p_n->value * 10 + d;
+      p_n->exp = (int16_t)((p_n->exp + e_offset) & 0xFFFF);
     }
     else
     {
