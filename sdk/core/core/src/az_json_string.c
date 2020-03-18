@@ -15,15 +15,15 @@ AZ_NODISCARD AZ_INLINE az_result az_hex_to_digit(uint8_t c, uint8_t* out)
 {
   if (isdigit(c))
   {
-    *out = c - '0';
+    *out = (uint8_t)(c - '0');
   }
   else if ('a' <= c && c <= 'f')
   {
-    *out = c - _az_HEX_LOWER_OFFSET;
+    *out = (uint8_t)(c - _az_HEX_LOWER_OFFSET);
   }
   else if ('A' <= c && c <= 'F')
   {
-    *out = c - _az_HEX_UPPER_OFFSET;
+    *out = (uint8_t)(c - _az_HEX_UPPER_OFFSET);
   }
   else
   {
