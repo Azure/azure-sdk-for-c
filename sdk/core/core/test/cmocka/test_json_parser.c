@@ -146,7 +146,7 @@ void test_json_parser(void** state)
     assert_true(token.kind == AZ_JSON_TOKEN_NUMBER);
 
     double const expected = 23;
-    uint64_t const* const expected_bin_rep_view = (uint64_t)&expected;
+    uint64_t const* const expected_bin_rep_view = (uint64_t*)&expected;
     uint64_t const* const token_value_number_bin_rep_view = &token.value.number;
 
     assert_true(*token_value_number_bin_rep_view == *expected_bin_rep_view);
@@ -161,7 +161,7 @@ void test_json_parser(void** state)
     assert_true(token.kind == AZ_JSON_TOKEN_NUMBER);
 
     double const expected = -23.56;
-    uint64_t const* const expected_bin_rep_view = (uint64_t)&expected;
+    uint64_t const* const expected_bin_rep_view = (uint64_t*)&expected;
     uint64_t const* const token_value_number_bin_rep_view = &token.value.number;
 
     assert_true(*token_value_number_bin_rep_view == *expected_bin_rep_view);
@@ -176,7 +176,7 @@ void test_json_parser(void** state)
     assert_true(token.kind == AZ_JSON_TOKEN_NUMBER);
 
     double const expected = -0.02356;
-    uint64_t const* const expected_bin_rep_view = (uint64_t)&expected;
+    uint64_t const* const expected_bin_rep_view = (uint64_t*)&expected;
     uint64_t const* const token_value_number_bin_rep_view = &token.value.number;
 
     assert_true(*token_value_number_bin_rep_view == *expected_bin_rep_view);
@@ -214,7 +214,7 @@ void test_json_parser(void** state)
     float positiveInfinity = *(float*)&p;
 
     double const expected = positiveInfinity;
-    uint64_t const* const expected_bin_rep_view = (uint64_t)&expected;
+    uint64_t const* const expected_bin_rep_view = (uint64_t*)&expected;
     uint64_t const* const token_value_number_bin_rep_view = &token.value.number;
 
     assert_true(*token_value_number_bin_rep_view == *expected_bin_rep_view);
@@ -230,7 +230,7 @@ void test_json_parser(void** state)
     assert_true(token.kind == AZ_JSON_TOKEN_NUMBER);
 
     double const expected = 0;
-    uint64_t const* const expected_bin_rep_view = (uint64_t)&expected;
+    uint64_t const* const expected_bin_rep_view = (uint64_t*)&expected;
     uint64_t const* const token_value_number_bin_rep_view = &token.value.number;
 
     assert_true(*token_value_number_bin_rep_view == *expected_bin_rep_view);
@@ -245,7 +245,7 @@ void test_json_parser(void** state)
     assert_true(token.kind == AZ_JSON_TOKEN_NUMBER);
 
     double const expected = 0.000000000000000001;
-    uint64_t const* const expected_bin_rep_view = (uint64_t)&expected;
+    uint64_t const* const expected_bin_rep_view = (uint64_t*)&expected;
     uint64_t const* const token_value_number_bin_rep_view = &token.value.number;
 
     assert_true(*token_value_number_bin_rep_view == *expected_bin_rep_view);
@@ -265,7 +265,7 @@ void test_json_parser(void** state)
     assert_true(token.kind == AZ_JSON_TOKEN_NUMBER);
 
     double const expected = 0.25;
-    uint64_t const* const expected_bin_rep_view = (uint64_t)&expected;
+    uint64_t const* const expected_bin_rep_view = (uint64_t*)&expected;
     uint64_t const* const token_value_number_bin_rep_view = &token.value.number;
 
     assert_true(*token_value_number_bin_rep_view == *expected_bin_rep_view);
