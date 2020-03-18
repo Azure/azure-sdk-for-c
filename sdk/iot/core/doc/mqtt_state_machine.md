@@ -156,8 +156,8 @@ Retrying operations requires understanding two aspects: error evaluation (did th
 
 The SDK will not handle protocol-level (WebSocket, MQTT, TLS or TCP) errors. The application-developer is expected to classify and handle errors the following way:
 
-- Authentication errors should not be retried.
-- Communication-related errors other than ones security-related should be considered retriable.
+- Operations failing due to authentication errors should not be retried.
+- Operations failing due to communication-related errors other than ones security-related (e.g. TLS Alert) may be retried.
 
 Both IoT Hub and Provisioning services will use `MQTT CONNACK` as described in Section 3.2.2.3 of the [MQTT v3 specification](http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Table_3.1_-).
 
@@ -193,14 +193,15 @@ Network timeouts and the MQTT keep-alive interval should be configured consideri
 For connectivity issues at all layers (TCP, TLS, MQTT) as well as cases where there is no `retry-after` sent by the service, we suggest using an exponential back-off with random jitter function. `az_iot_retry_calc_delay` is available in Azure IoT Common:
 
 ```C
-// The previous operation took operation_msec
+// The previous operation took operation_msec.
+// The application calculates random_msec between 0 and max_random_msec.
 
 int32_t delay_msec = az_iot_retry_calc_delay(operation_msec, attempt, min_retry_delay_msec, max_retry_delay_msec, random_msec);
 ```
 
 _Note 1_: The network stack may have used more time than the recommended delay before timing out. (e.g. The operation timed out after 2 minutes while the delay between operations is 1 second). In this case there is no need to delay the next operation.
 
-_Note 2_: To determine the parameters of the exponential with back-off retry strategy, we recommend modeling the network characteristics (including failure-modes). Compare the results with defined SLAs for device connectivity (e.g. 1M devices must be connected in under 30 minutes) and with the available IoT Azure scale (especially consider _throttling_, _quotas_ and maximum _requests/connects per second_).
+_Note 2_: To determine the parameters of the exponential with back-off retry strategy, we recommend modeling the network characteristics (including failure-modes). Compare the results with defined SLAs for device connectivity (e.g. 1M devices must be connected in under 30 minutes) and with the available [IoT Azure scale](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-devguide-quotas-throttling) (especially consider _throttling_, _quotas_ and maximum _requests/connects per second_).
 
 In the absence of modeling, we recommend the following default:
 
@@ -234,7 +235,7 @@ Combining the functions above we recommend the following flow:
 
 When devices are using IoT Hub without Provisioning Service, we recommend attempting to rotate the IoT Credentials (SAS Token or X509 Certificate) on authentication issues.
 
-_Note:_ Authentication issues observed in the following cases do not require credentials to be rotated and require further user actions:
+_Note:_ Authentication issues observed in the following cases do not require credentials to be rotated:
 
 - DNS issues (such as WiFi Captive Portal redirects)
 - WebSockets Proxy server authentication
