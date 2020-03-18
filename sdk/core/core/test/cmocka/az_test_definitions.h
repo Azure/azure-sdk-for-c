@@ -1,6 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#ifndef _az_AAD_PRIVATE_H
+#define _az_AAD_PRIVATE_H
+
 /**
  * How to add tests:
  * 1. Add tests definition to az_test_definitions.h. All tests must follow the signature `void
@@ -90,3 +93,5 @@ const struct CMUnitTest tests[] = {
   cmocka_unit_test(test_az_http_policy),
 
 };
+
+#endif // _az_AAD_PRIVATE_H
