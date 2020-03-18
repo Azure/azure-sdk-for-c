@@ -57,6 +57,7 @@ static void test_az_token_expired()
   assert_true(_az_token_expired(&token));
 }
 
+#ifdef MOCK_ENABLED
 static void test_az_aad_request_token()
 {
   // Calling az_aad_request_token(_az_http_request* ref_request, _az_token* out_token);
@@ -80,6 +81,7 @@ static void test_az_aad_build_body()
           &body),
       AZ_OK);
 }
+#endif // MOCK_ENABLED
 
 static void test_az_aad_build_url()
 {

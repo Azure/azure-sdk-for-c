@@ -16,17 +16,21 @@
 
 #include <_az_cfg.h>
 
-void test_az_http_policy(void** state)
-{
-  (void)state;
-
-/* Tests using wrap to mock. Only suported by gcc */
 #ifdef MOCK_ENABLED
-  test_az_http_pipeline_policy_credential();
-#endif // MOCK_ENABLED
+static az_result test_policy_transport(
+    _az_http_policy* p_policies,
+    void* p_options,
+    _az_http_request* p_request,
+    az_http_response* p_response)
+{
+  (void)p_policies;
+  (void)p_options;
+  (void)p_request;
+  (void)p_response;
+  return AZ_OK;
 }
 
-void test_az_http_pipeline_policy_credential()
+static void test_az_http_pipeline_policy_credential()
 {
   uint8_t buf[100];
   uint8_t header_buf[(2 * sizeof(az_pair))];
@@ -66,16 +70,14 @@ void test_az_http_pipeline_policy_credential()
   will_return(__wrap_az_platform_clock_msec, 0);
   assert_return_code(az_http_pipeline_policy_credential(policies, &credential, &hrb, NULL), AZ_OK);
 }
+#endif // MOCK_ENABLED
 
-az_result test_policy_transport(
-    _az_http_policy* p_policies,
-    void* p_options,
-    _az_http_request* p_request,
-    az_http_response* p_response)
+void test_az_http_policy(void** state)
 {
-  (void)p_policies;
-  (void)p_options;
-  (void)p_request;
-  (void)p_response;
-  return AZ_OK;
+  (void)state;
+
+/* Tests using wrap to mock. Only suported by gcc */
+#ifdef MOCK_ENABLED
+  test_az_http_pipeline_policy_credential();
+#endif // MOCK_ENABLED
 }
