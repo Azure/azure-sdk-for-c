@@ -131,21 +131,17 @@ AZ_NODISCARD az_result az_span_to_uint32(az_span span, uint32_t* out_number)
 
 AZ_NODISCARD az_result az_span_copy(az_span destination, az_span source, az_span* out_span)
 {
-  AZ_PRECONDITION_VALID_SPAN(destination, 0, true);
-  AZ_PRECONDITION_VALID_SPAN(source, 0, true);
-  int32_t src_len = az_span_length(source);
+  AZ_PRECONDITION_NOT_NULL(out_span);
 
+  int32_t src_len = az_span_length(source);
   if (az_span_capacity(destination) < src_len)
   {
     return AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY;
-  };
+  }
 
   uint8_t* ptr = az_span_ptr(destination);
-
   memmove((void*)ptr, (void const*)az_span_ptr(source), (size_t)src_len);
-
   *out_span = az_span_init(ptr, src_len, az_span_capacity(destination));
-
   return AZ_OK;
 }
 
@@ -231,15 +227,16 @@ AZ_NODISCARD az_result az_span_append(az_span destination, az_span source, az_sp
 {
   AZ_PRECONDITION_NOT_NULL(out_span);
 
-  int32_t const current_size = az_span_length(destination);
-  az_span remainder = az_span_slice(destination, current_size, -1);
-  AZ_RETURN_IF_FAILED(az_span_copy(remainder, source, &remainder));
-
-  *out_span = az_span_init(
-      az_span_ptr(destination),
-      current_size + az_span_length(source),
-      az_span_capacity(destination));
-
+  int32_t const dest_length = az_span_length(destination);
+  int32_t const dest_capacity = az_span_capacity(destination);
+  int32_t const src_length = az_span_length(source);
+  if ((dest_capacity - dest_length) < src_length)
+  {
+    return AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY;
+  }
+  uint8_t* ptr = az_span_ptr(destination);
+  memmove((void*)(&ptr[dest_length]), (void const*)az_span_ptr(source), (size_t)src_length);
+  *out_span = az_span_init(ptr, dest_length + src_length, dest_capacity);
   return AZ_OK;
 }
 
