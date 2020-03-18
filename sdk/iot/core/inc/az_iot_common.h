@@ -67,11 +67,13 @@ AZ_NODISCARD bool az_iot_is_retriable_status(az_iot_status status);
 /**
  * @brief Calculates the recommended delay before retrying an operation that failed.
  *
- * @param[in] operation_msec The time it took to perform the operation that failed.
- * @param[in] attempt The retry attempt.
- * @param[in] retry_delay_msec The minimum time to wait before a retry.
- * @param[in] max_retry_delay_msec The maximum time to wait before a retry.
- * @param[in] random_msec A random value between 0 and the maximum allowed jitter.
+ * @param[in] operation_msec The time it took, in milliseconds, to perform the operation that
+ *                           failed.
+ * @param[in] attempt The number of failed retry attempts.
+ * @param[in] retry_delay_msec The minimum time, in milliseconds, to wait before a retry.
+ * @param[in] max_retry_delay_msec The maximum time, in milliseconds, to wait before a retry.
+ * @param[in] random_msec A random value between 0 and the maximum allowed jitter, in milliseconds.
+ * @return The recommended delay in milliseconds.
  */
 AZ_NODISCARD AZ_INLINE int32_t az_iot_retry_calc_delay(
     int32_t operation_msec,
