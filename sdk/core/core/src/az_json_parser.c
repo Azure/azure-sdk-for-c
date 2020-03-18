@@ -311,7 +311,7 @@ AZ_NODISCARD static az_result az_span_reader_get_json_number_digit_rest(
       }
       c = az_span_ptr(*self)[0];
     } while (isdigit(c));
-    i.exp += e_int * e_sign;
+    i.exp = (int16_t)((i.exp + (e_int * e_sign)) & 0xFFFF);
   }
 
   AZ_RETURN_IF_FAILED(_az_json_number_to_double(&i, out_value));
