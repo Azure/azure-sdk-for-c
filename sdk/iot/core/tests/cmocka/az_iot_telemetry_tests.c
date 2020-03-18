@@ -79,6 +79,7 @@ static const az_iot_hub_client g_test_valid_client_with_options_user_agent
                        .device_id = AZ_SPAN_LITERAL_FROM_STR(TEST_DEVICE_ID),
                        .options = TEST_VALID_OPTIONS_USER_AGENT } };
 
+/*
 static void test_az_iot_hub_client_telemetry_publish_topic_get_NULL_client_fails(void** state)
 {
   (void)state;
@@ -115,6 +116,7 @@ static void test_az_iot_hub_client_telemetry_publish_topic_get_NULL_out_mqtt_top
           &g_test_valid_client_no_options, NULL, mqtt_topic, NULL),
       AZ_ERROR_ARG);
 }
+*/
 
 static void test_az_iot_hub_client_telemetry_publish_topic_get_no_options_no_params_succeed(void** state)
 {
