@@ -13,6 +13,7 @@ include(CheckAndIncludeCodeCov)
 
 add_library (
     ${TARGET_NAME}
+    src/az_iot_c2d.c
     src/az_iot_sas_token.c
     src/az_iot_telemetry.c
     src/az_iot_hub_client.c
