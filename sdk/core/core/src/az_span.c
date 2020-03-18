@@ -349,7 +349,7 @@ AZ_NODISCARD az_result az_span_append_dtoa(az_span destination, double source, a
       }
       do
       {
-        uint8_t dec = (uint8_t)(u / base) + '0';
+        uint8_t dec = (uint8_t)((u / base) + '0');
         u %= base;
         base /= 10;
         AZ_RETURN_IF_FAILED(az_span_append(*out_span, az_span_from_single_item(&dec), out_span));
@@ -418,10 +418,10 @@ AZ_NODISCARD az_result az_span_append_i64toa(az_span destination, int64_t source
   if (source < 0)
   {
     AZ_RETURN_IF_FAILED(az_span_append(destination, AZ_SPAN_FROM_STR("-"), out_span));
-    return _az_span_builder_append_uint64(out_span, -source);
+    return _az_span_builder_append_uint64(out_span, (uint64_t)-source);
   }
 
-  return _az_span_builder_append_uint64(out_span, source);
+  return _az_span_builder_append_uint64(out_span, (uint64_t)source);
 }
 
 static AZ_NODISCARD az_result
