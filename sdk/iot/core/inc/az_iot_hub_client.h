@@ -4,7 +4,7 @@
 /**
  * @file az_iot_hub_client.h
  *
- * @brief definition for the Azure IoT Hub device SDK.
+ * @brief definition for the Azure IoT Hub client.
  */
 
 #ifndef _az_IOT_HUB_CLIENT_H
@@ -12,6 +12,7 @@
 
 #include <az_result.h>
 #include <az_span.h>
+#include <az_iot_common.h>
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -230,6 +231,7 @@ az_iot_hub_client_properties_next(az_iot_hub_client_properties* properties, az_p
 /**
  * @brief Gets the MQTT topic that must be used for device to cloud telemetry messages.
  * @note Telemetry MQTT Publish messages must have QoS At Least Once (1).
+ * @note This topic can also be used to set the MQTT Will message in the Connect message.
  * 
  * Should the user want a null terminated topic string, they may allocate a buffer large enough
  * to fit the topic plus a null terminator. They must set the last byte themselves or zero initialize
@@ -361,52 +363,6 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_response_publish_topic_get(
  */
 
 /**
- * @brief Azure IoT Hub status codes.
- *
- */
-typedef enum
-{
-  // Service success codes
-  AZ_IOT_HUB_CLIENT_STATUS_OK = 200,
-  AZ_IOT_HUB_CLIENT_STATUS_ACCEPTED = 202,
-  AZ_IOT_HUB_CLIENT_STATUS_NO_CONTENT = 204,
-
-  // Service error codes
-  AZ_IOT_HUB_CLIENT_STATUS_BAD_REQUEST = 400,
-  AZ_IOT_HUB_CLIENT_STATUS_UNAUTHORIZED = 401,
-  AZ_IOT_HUB_CLIENT_STATUS_FORBIDDEN = 403,
-  AZ_IOT_HUB_CLIENT_STATUS_NOT_FOUND = 404,
-  AZ_IOT_HUB_CLIENT_STATUS_NOT_ALLOWED = 405,
-  AZ_IOT_HUB_CLIENT_STATUS_NOT_CONFLICT = 409,
-  AZ_IOT_HUB_CLIENT_STATUS_PRECONDITION_FAILED = 412,
-  AZ_IOT_HUB_CLIENT_STATUS_REQUEST_TOO_LARGE = 413,
-  AZ_IOT_HUB_CLIENT_STATUS_UNSUPPORTED_TYPE = 415,
-  AZ_IOT_HUB_CLIENT_STATUS_THROTTLED = 429,
-  AZ_IOT_HUB_CLIENT_STATUS_CLIENT_CLOSED = 499,
-  AZ_IOT_HUB_CLIENT_STATUS_SERVER_ERROR = 500,
-  AZ_IOT_HUB_CLIENT_STATUS_BAD_GATEWAY = 502,
-  AZ_IOT_HUB_CLIENT_STATUS_SERVICE_UNAVAILABLE = 503,
-  AZ_IOT_HUB_CLIENT_STATUS_TIMEOUT = 504,
-} az_iot_hub_client_status;
-
-/**
- * @brief Checks if the status indicates a successful operation.
- *
- * @param[in] status The #az_iot_hub_client_status to verify.
- * @return True if the status indicates success. False otherwise.
- */
-AZ_NODISCARD bool az_iot_hub_client_is_success_status(az_iot_hub_client_status status);
-
-/**
- * @brief Checks if the status indicates a retriable error occurred during the
- *        operation.
- *
- * @param[in] status The #az_iot_hub_client_status to verify.
- * @return True if the operation should be retried. False otherwise.
- */
-AZ_NODISCARD bool az_iot_hub_client_is_retriable_status(az_iot_hub_client_status status);
-
-/**
  * @brief Gets the MQTT topic filter to subscribe to twin operation responses.
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
@@ -453,7 +409,7 @@ typedef enum
 typedef struct az_iot_hub_client_twin_response
 {
   az_iot_hub_client_twin_response_type response_type; /**< Twin response type. */
-  az_iot_hub_client_status status; /**< The operation status. */
+  az_iot_status status; /**< The operation status. */
   az_span
       request_id; /**< Request ID matches the ID specified when issuing a Get or Patch command. */
   az_span version; /**< The Twin object version.
