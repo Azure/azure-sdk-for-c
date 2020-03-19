@@ -48,7 +48,7 @@ Thank you for your interest in contributing to Azure SDK for C.
 
 Project contains files to work on Windows, Mac or Linux based OS.
 
-### VCPKG
+### Windows
 
 vcpkg is the easiest way to have dependencies installed. It downloads packages sources, headers and build libraries for whatever TRIPLET is set up (platform/arq).
 VCPKG maintains any installed package inside its own folder, allowing to have multiple vcpkg folder with different dependencies installed on each. This is also great because you don't have to install dependencies globally on your system.
@@ -66,15 +66,10 @@ cd vcpkg
 vcpkg.exe install --triplet x64-windows-static curl[winssl] cmocka
 # Add this environment variables to link this VCPKG folder with cmake:
 # VCPKG_DEFAULT_TRIPLET=x64-windows-static
-# VCPKG_ROOT=[PATH_TO_VCPKG] (replace PATH_TO_VCPKG for where vcpkg is installed)
+# VCPKG_ROOT=PATH_TO_VCPKG (replace PATH_TO_VCPKG for where vcpkg is installed)
 ```
 
-> Note: On macOS, `.\bootstrap-vcpkg` may fail if your version of the C++ toolchain is not new enough to support vcpkg. To resolve
-this, vcpkg recommends installing `gcc@6` from Homebrew (`brew install gcc@6`), then re-run the bootstrapping script.
-
-### Windows
-
-Follow next steps to build project from command prompt
+Follow next steps to build project from command prompt:
 
 ```bash
 # cd to project folder
@@ -98,7 +93,42 @@ Right after opening project, Visual Studio will read cmake files and generate ca
 
 ### Linux / Mac
 
-VCPKG can also be used in Linux to avoid installing libraries globally. Follow instructions [here](#vcpkg) to use VCPKG in Linux.
+#### VCPKG
+
+VCPKG can be used to download packages sources, headers and build libraries for whatever TRIPLET is set up (platform/arq).
+VCPKG maintains any installed package inside its own folder, allowing to have multiple vcpkg folder with different dependencies installed on each. This is also great because you don't have to install dependencies globally on your system.
+
+Follow next steps to install VCPKG and have it linked to cmake
+
+```bash
+# Clone vcpgk:
+git clone https://github.com/Microsoft/vcpkg.git
+# (consider this path as PATH_TO_VCPKG)
+cd vcpkg
+# build vcpkg (remove .bat on Linux/Mac)
+./bootstrap-vcpkg.sh
+
+# Linux:
+./vcpkg install --triplet x64-linux curl cmocka
+export VCPKG_DEFAULT_TRIPLET=x64-linux
+export VCPKG_ROOT=PATH_TO_VCPKG #replace PATH_TO_VCPKG for where vcpkg is installed
+
+# Mac:
+./vcpkg install --triplet x64-osx curl cmocka
+export VCPKG_DEFAULT_TRIPLET=x64-osx
+export VCPKG_ROOT=PATH_TO_VCPKG #replace PATH_TO_VCPKG for where vcpkg is installed
+```
+
+> Note: On macOS, `.\bootstrap-vcpkg` may fail if your version of the C++ toolchain is not new enough to support vcpkg. To resolve
+this, vcpkg recommends installing `gcc@6` from Homebrew (`brew install gcc@6`), then re-run the bootstrapping script.
+
+#### Debian
+
+Alternatively, for Ubuntu 18.04 you can use:
+
+`sudo apt install build-essential cmake libcmocka-dev libcmocka0 gcovr lcov doxygen curl libcurl4-openssl-dev libssl-dev`
+
+#### Build
 
 ```bash
 # cd to project folder
@@ -144,14 +174,14 @@ When running cmake, next options can be used to change the output libraries/Pal/
 - `BUILD_CURL_TRANSPORT`: This option would build an HTTP transport library using CURL. It requires libcurl to be installed (vcpkg or globally). This option will make samples to be linked with this HTTP and be functional to send HTTP requests.
 
 ```bash
-cmake -DBUILD_CURL_TRANSPORT ..
+cmake -DBUILD_CURL_TRANSPORT=ON ..
 cmake --build .
 ```
 
 - `UNIT_TESTING`: This option requires cmocka to be installed and it will generate unit tests for each project.
 
 ```bash
-cmake -DUNIT_TESTING ..
+cmake -DUNIT_TESTING=ON ..
 cmake --build .
 # ctest will call and run tests
 # -V runs tests in verbose mode to show more info about tests
@@ -242,4 +272,6 @@ make ${project_name}_cov_xml //i.e. az_core_cov_xml or az_iot_cov_xml
 #  az_iot
 #  az_keyvault
 #  az_storage_blobs
+
+> Note: If `make` fails with "project not found" it's likely you are not using `gcc`. Use `sudo update-alternatives --config c+++` and `sudo update-alternatives --config cc` to switch to gcc.
 ```
