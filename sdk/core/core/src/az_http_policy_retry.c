@@ -71,7 +71,7 @@ AZ_INLINE AZ_NODISCARD int32_t _az_uint32_span_to_int32(az_span span)
   uint32_t value = 0;
   if (az_succeeded(az_span_to_uint32(span, &value)))
   {
-    return value < INT32_MAX ? value : INT32_MAX;
+    return value < INT32_MAX ? (int32_t)value : INT32_MAX;
   }
 
   return -1;

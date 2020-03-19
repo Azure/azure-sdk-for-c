@@ -7,7 +7,7 @@
 
 #include <_az_cfg.h>
 
-AZ_NODISCARD bool az_json_pointer_token_eq_json_string(az_span pointer_token, az_span json_string)
+static AZ_NODISCARD bool _az_json_pointer_token_eq_json_string(az_span pointer_token, az_span json_string)
 {
   // copy spans to read them
   az_span pt_reader = pointer_token;
@@ -33,7 +33,7 @@ AZ_NODISCARD bool az_json_pointer_token_eq_json_string(az_span pointer_token, az
   }
 }
 
-AZ_NODISCARD az_result az_json_parser_get_by_pointer_token(
+static AZ_NODISCARD az_result _az_json_parser_get_by_pointer_token(
     az_json_parser* self,
     az_span pointer_token,
     az_json_token* out_token)
@@ -64,7 +64,7 @@ AZ_NODISCARD az_result az_json_parser_get_by_pointer_token(
       {
         az_json_token_member token_member = { 0 };
         AZ_RETURN_IF_FAILED(az_json_parser_parse_token_member(self, &token_member));
-        if (az_json_pointer_token_eq_json_string(pointer_token, token_member.name))
+        if (_az_json_pointer_token_eq_json_string(pointer_token, token_member.name))
         {
           *out_token = token_member.token;
           return AZ_OK;
@@ -103,6 +103,6 @@ az_json_parse_by_pointer(az_span json, az_span pointer, az_json_token* out_token
       AZ_RETURN_IF_FAILED(result);
     }
     AZ_RETURN_IF_FAILED(
-        az_json_parser_get_by_pointer_token(&json_parser, pointer_token, out_token));
+        _az_json_parser_get_by_pointer_token(&json_parser, pointer_token, out_token));
   }
 }

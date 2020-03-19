@@ -18,6 +18,7 @@ AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
     az_keyvault_create_key_options* options,
     az_span* http_body);
 
+void test_keyvault(void** state);
 void test_keyvault(void** state)
 {
   (void)state;
