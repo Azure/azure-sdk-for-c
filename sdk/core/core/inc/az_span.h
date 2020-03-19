@@ -141,7 +141,7 @@ AZ_NODISCARD az_span az_span_from_str(char* str);
 #define AZ_SPAN_LITERAL_FROM_BUFFER(BYTE_BUFFER) \
   { \
     ._internal = { \
-      .ptr = BYTE_BUFFER, \
+      .ptr = (uint8_t*)BYTE_BUFFER, \
       .length = 0, \
       .capacity = (sizeof(BYTE_BUFFER) / sizeof(BYTE_BUFFER[0])), \
     }, \

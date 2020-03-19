@@ -14,7 +14,7 @@ static const uint8_t hub_client_forward_slash = '/';
 static const uint8_t hub_client_param_separator = '&';
 static const uint8_t hub_client_param_equals = '=';
 
-static const az_span hub_client_api_version = AZ_SPAN_LITERAL_FROM_STR("?api-version=2018-06-30");
+static const az_span hub_service_api_version = AZ_SPAN_LITERAL_FROM_STR("/?api-version=2018-06-30");
 
 AZ_NODISCARD az_iot_hub_client_options az_iot_hub_client_options_default()
 {
@@ -55,17 +55,16 @@ AZ_NODISCARD az_result az_iot_hub_client_user_name_get(
   AZ_RETURN_IF_FAILED(
       az_span_append_uint8(mqtt_user_name, hub_client_forward_slash, &mqtt_user_name));
   AZ_RETURN_IF_FAILED(az_span_append(mqtt_user_name, client->_internal.device_id, &mqtt_user_name));
-  AZ_RETURN_IF_FAILED(
-      az_span_append_uint8(mqtt_user_name, hub_client_forward_slash, &mqtt_user_name));
 
   if (az_span_length(*module_id) > 0)
   {
-    AZ_RETURN_IF_FAILED(az_span_append(mqtt_user_name, *module_id, &mqtt_user_name));
     AZ_RETURN_IF_FAILED(
         az_span_append_uint8(mqtt_user_name, hub_client_forward_slash, &mqtt_user_name));
+    AZ_RETURN_IF_FAILED(az_span_append(mqtt_user_name, *module_id, &mqtt_user_name));
   }
 
-  AZ_RETURN_IF_FAILED(az_span_append(mqtt_user_name, hub_client_api_version, &mqtt_user_name));
+  AZ_RETURN_IF_FAILED(
+      az_span_append(mqtt_user_name, hub_service_api_version, &mqtt_user_name));
 
   if (az_span_length(*user_agent) > 0)
   {
