@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "az_json_string_private.h"
+#include "az_test_definitions.h"
 #include <az_json.h>
 
 #include <setjmp.h>
@@ -135,7 +136,7 @@ void test_json_parser(void** state)
     az_json_token token;
     assert_true(az_json_parser_parse_token(&json_state, &token) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
   }
-  /* Testing parsing number and converting to double (az_json_number_to_double) */
+  /* Testing parsing number and converting to double (_az_json_number_to_double) */
   {
     // no exp number, decimal only
     az_json_parser json_state = { 0 };
@@ -143,7 +144,12 @@ void test_json_parser(void** state)
     az_json_token token;
     assert_true(az_json_parser_parse_token(&json_state, &token) == AZ_OK);
     assert_true(token.kind == AZ_JSON_TOKEN_NUMBER);
-    assert_true(token._internal.number == 23);
+
+    double const expected = 23;
+    uint64_t const* const expected_bin_rep_view = (uint64_t const*)&expected;
+    uint64_t const* const token_value_number_bin_rep_view = (uint64_t*)&token._internal.number;
+
+    assert_true(*token_value_number_bin_rep_view == *expected_bin_rep_view);
     assert_true(az_json_parser_done(&json_state) == AZ_OK);
   }
   {
@@ -153,7 +159,12 @@ void test_json_parser(void** state)
     az_json_token token;
     assert_true(az_json_parser_parse_token(&json_state, &token) == AZ_OK);
     assert_true(token.kind == AZ_JSON_TOKEN_NUMBER);
-    assert_true(token._internal.number == -23.56);
+
+    double const expected = -23.56;
+    uint64_t const* const expected_bin_rep_view = (uint64_t const*)&expected;
+    uint64_t const* const token_value_number_bin_rep_view = (uint64_t*)&token._internal.number;
+
+    assert_true(*token_value_number_bin_rep_view == *expected_bin_rep_view);
     assert_true(az_json_parser_done(&json_state) == AZ_OK);
   }
   {
@@ -163,7 +174,12 @@ void test_json_parser(void** state)
     az_json_token token;
     assert_true(az_json_parser_parse_token(&json_state, &token) == AZ_OK);
     assert_true(token.kind == AZ_JSON_TOKEN_NUMBER);
-    assert_true(token._internal.number == -0.02356);
+
+    double const expected = -0.02356;
+    uint64_t const* const expected_bin_rep_view = (uint64_t const*)&expected;
+    uint64_t const* const token_value_number_bin_rep_view = (uint64_t*)&token._internal.number;
+
+    assert_true(*token_value_number_bin_rep_view == *expected_bin_rep_view);
     assert_true(az_json_parser_done(&json_state) == AZ_OK);
   }
   {
@@ -192,10 +208,17 @@ void test_json_parser(void** state)
     // Create inf number with  IEEE 754 standard
     // floating point number containing all zeroes in the mantissa (first twenty-three bits), and
     // all ones in the exponent (next eight bits)
+    assert_true(token.kind == AZ_JSON_TOKEN_NUMBER);
+
     unsigned int p = 0x7F800000; // 0xFF << 23
     float positiveInfinity = *(float*)&p;
-    assert_true(token.kind == AZ_JSON_TOKEN_NUMBER);
-    assert_true(token._internal.number == positiveInfinity);
+
+    double const expected = positiveInfinity;
+    uint64_t const* const expected_bin_rep_view = (uint64_t const*)&expected;
+    uint64_t const* const token_value_number_bin_rep_view = (uint64_t*)&token._internal.number;
+
+    assert_true(*token_value_number_bin_rep_view == *expected_bin_rep_view);
+
     assert_true(az_json_parser_done(&json_state) == AZ_OK);
   }
   {
@@ -205,7 +228,12 @@ void test_json_parser(void** state)
     az_json_token token;
     assert_true(az_json_parser_parse_token(&json_state, &token) == AZ_OK);
     assert_true(token.kind == AZ_JSON_TOKEN_NUMBER);
-    assert_true(token._internal.number == 0);
+
+    double const expected = 0;
+    uint64_t const* const expected_bin_rep_view = (uint64_t const*)&expected;
+    uint64_t const* const token_value_number_bin_rep_view = (uint64_t*)&token._internal.number;
+
+    assert_true(*token_value_number_bin_rep_view == *expected_bin_rep_view);
     assert_true(az_json_parser_done(&json_state) == AZ_OK);
   }
   {
@@ -215,13 +243,18 @@ void test_json_parser(void** state)
     az_json_token token;
     assert_true(az_json_parser_parse_token(&json_state, &token) == AZ_OK);
     assert_true(token.kind == AZ_JSON_TOKEN_NUMBER);
-    assert_true(token._internal.number == 0.000000000000000001);
+
+    double const expected = 0.000000000000000001;
+    uint64_t const* const expected_bin_rep_view = (uint64_t const*)&expected;
+    uint64_t const* const token_value_number_bin_rep_view = (uint64_t*)&token._internal.number;
+
+    assert_true(*token_value_number_bin_rep_view == *expected_bin_rep_view);
     assert_true(az_json_parser_done(&json_state) == AZ_OK);
   }
   /* end of Testing parsing number and converting to double */
   {
     az_json_parser json_state = { 0 };
-    TEST_EXPECT_SUCCESS(az_json_parser_init(&json_state, AZ_SPAN_FROM_STR(" [ true, 0.3 ]")));
+    TEST_EXPECT_SUCCESS(az_json_parser_init(&json_state, AZ_SPAN_FROM_STR(" [ true, 0.25 ]")));
     az_json_token token = { 0 };
     assert_true(az_json_parser_parse_token(&json_state, &token) == AZ_OK);
     assert_true(token.kind == AZ_JSON_TOKEN_ARRAY_START);
@@ -230,7 +263,12 @@ void test_json_parser(void** state)
     assert_true(token._internal.boolean == true);
     assert_true(az_json_parser_parse_array_item(&json_state, &token) == AZ_OK);
     assert_true(token.kind == AZ_JSON_TOKEN_NUMBER);
-    // assert_true(token._internal.number == 0.3);  TODO:  why do we get 0.30000004 ??
+
+    double const expected = 0.25;
+    uint64_t const* const expected_bin_rep_view = (uint64_t const*)&expected;
+    uint64_t const* const token_value_number_bin_rep_view = (uint64_t*)&token._internal.number;
+
+    assert_true(*token_value_number_bin_rep_view == *expected_bin_rep_view);
     assert_true(az_json_parser_parse_array_item(&json_state, &token) == AZ_ERROR_ITEM_NOT_FOUND);
     assert_true(az_json_parser_done(&json_state) == AZ_OK);
   }

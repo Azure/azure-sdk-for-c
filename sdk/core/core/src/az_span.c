@@ -51,7 +51,7 @@ AZ_NODISCARD AZ_INLINE uint8_t _az_tolower(uint8_t value)
   // return 'A' <= value && value <= 'Z' ? value + AZ_ASCII_LOWER_DIF : value;
   if ((uint8_t)(int8_t)(value - 'A') <= ('Z' - 'A'))
   {
-    value += _az_ASCII_LOWER_DIF;
+    value = (uint8_t)((value + _az_ASCII_LOWER_DIF) & 0xFF);
   }
   return value;
 }
@@ -142,7 +142,7 @@ AZ_NODISCARD az_result az_span_copy(az_span destination, az_span source, az_span
 
   uint8_t* ptr = az_span_ptr(destination);
 
-  memmove((void*)ptr, (void const*)az_span_ptr(source), src_len);
+  memmove((void*)ptr, (void const*)az_span_ptr(source), (size_t)src_len);
 
   *out_span = az_span_init(ptr, src_len, az_span_capacity(destination));
 
@@ -220,7 +220,7 @@ az_span_to_str(char* destination, int32_t destination_max_size, az_span source)
     return AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY;
   }
 
-  memmove((void*)destination, (void const*)az_span_ptr(source), span_length);
+  memmove((void*)destination, (void const*)az_span_ptr(source), (size_t)span_length);
 
   destination[span_length] = 0;
 
@@ -317,7 +317,9 @@ AZ_NODISCARD az_result az_span_append_dtoa(az_span destination, double source, a
 {
   AZ_PRECONDITION_NOT_NULL(out_span);
 
-  if (source == 0)
+  uint64_t const* const source_bin_rep_view = (uint64_t*)&source;
+
+  if (*source_bin_rep_view == 0)
   {
     AZ_RETURN_IF_FAILED(az_span_append(destination, AZ_SPAN_FROM_STR("0"), out_span));
     return AZ_OK;
@@ -332,7 +334,9 @@ AZ_NODISCARD az_result az_span_append_dtoa(az_span destination, double source, a
 
   {
     uint64_t u = (uint64_t)source;
-    if (source == (double)u)
+    uint64_t const* const u_bin_rep_view = (uint64_t*)&source;
+
+    if (*source_bin_rep_view == *u_bin_rep_view)
     {
       uint64_t base = 1;
       {
@@ -345,7 +349,7 @@ AZ_NODISCARD az_result az_span_append_dtoa(az_span destination, double source, a
       }
       do
       {
-        uint8_t dec = (uint8_t)(u / base) + '0';
+        uint8_t dec = (uint8_t)((u / base) + '0');
         u %= base;
         base /= 10;
         AZ_RETURN_IF_FAILED(az_span_append(*out_span, az_span_from_single_item(&dec), out_span));
@@ -370,7 +374,7 @@ AZ_NODISCARD az_result az_span_append_dtoa(az_span destination, double source, a
   }
 }
 
-AZ_INLINE uint8_t _az_decimal_to_ascii(uint8_t d) { return '0' + d; }
+AZ_INLINE uint8_t _az_decimal_to_ascii(uint8_t d) { return (uint8_t)(('0' + d) & 0xFF); }
 
 static AZ_NODISCARD az_result _az_span_builder_append_uint64(az_span* self, uint64_t n)
 {
@@ -414,10 +418,10 @@ AZ_NODISCARD az_result az_span_append_i64toa(az_span destination, int64_t source
   if (source < 0)
   {
     AZ_RETURN_IF_FAILED(az_span_append(destination, AZ_SPAN_FROM_STR("-"), out_span));
-    return _az_span_builder_append_uint64(out_span, -source);
+    return _az_span_builder_append_uint64(out_span, (uint64_t)-source);
   }
 
-  return _az_span_builder_append_uint64(out_span, source);
+  return _az_span_builder_append_uint64(out_span, (uint64_t)source);
 }
 
 static AZ_NODISCARD az_result
@@ -469,7 +473,7 @@ AZ_NODISCARD az_result az_span_append_i32toa(az_span destination, int32_t source
     source = -source;
   }
 
-  return _az_span_builder_append_u32toa(*out_span, source, out_span);
+  return _az_span_builder_append_u32toa(*out_span, (uint32_t)source, out_span);
 }
 
 // TODO: pass az_span by value

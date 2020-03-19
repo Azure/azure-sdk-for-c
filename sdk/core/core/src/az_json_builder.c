@@ -20,7 +20,7 @@ AZ_NODISCARD static az_result az_json_builder_append_str(az_json_builder* self, 
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_json_builder_write_span(az_json_builder* self, az_span value)
+static AZ_NODISCARD az_result _az_json_builder_write_span(az_json_builder* self, az_span value)
 {
   AZ_PRECONDITION_NOT_NULL(self);
 
@@ -119,7 +119,7 @@ az_json_builder_append_token(az_json_builder* json_builder, az_json_token token)
     case AZ_JSON_TOKEN_SPAN:
     {
       json_builder->_internal.need_comma = true;
-      return az_json_builder_write_span(json_builder, token._internal.span);
+      return _az_json_builder_write_span(json_builder, token._internal.span);
     }
     default:
     {

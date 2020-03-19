@@ -5,28 +5,42 @@ skinparam state {
     BackgroundColor<<FAIL>> Orange
 }
 
-[*] --> az_retry_init
-az_retry_init -> application_mqtt_connect
-state application_mqtt_connect <<APP>>
-application_mqtt_connect --> network_failure
-application_mqtt_connect --> service_failure
-state network_failure<<FAIL>>
-state service_failure<<FAIL>>
-network_failure --> application_mqtt_disconnect
-service_failure --> application_mqtt_disconnect
+[*] --> IoT_Provisioning_Register
+state IoT_Provisioning_Register <<APP>>
 
-state application_mqtt_disconnect<<APP>> {
-    [*] --> application_get_az_iot_result
-    state application_get_az_iot_result <<APP>>
-    application_get_az_iot_result --> az_retry_get_delay : az_iot_result
-    az_retry_get_delay --> application_delay : az_retry_needed
-    state application_delay <<APP>>
-    application_delay --> application_mqtt_connect
-    az_retry_get_delay --> [*] : az_failed
-}
+' Provisioning Retriable errors
+IoT_Provisioning_Register --> Provisioning_retriable_failure
+state Provisioning_retriable_failure<<FAIL>>
+Provisioning_retriable_failure --> Provisioning_calculate_delay
+Provisioning_calculate_delay --> Provisioning_app_delay
+state Provisioning_app_delay<<APP>>
+Provisioning_app_delay --> IoT_Provisioning_Register
+Provisioning_calculate_delay: - az_iot_retry_calc_delay
+Provisioning_calculate_delay: - retry-after
 
-application_get_az_iot_result : - transport_error
-az_retry_get_delay : - az_result
-az_retry_get_delay : - random_int
+' Provisioning Non-retriable 
+IoT_Provisioning_Register --> Provisioning_not_retriable_failure
+state Provisioning_not_retriable_failure<<FAIL>>
+Provisioning_not_retriable_failure --> Provisioning_Rotate_Credentials
+state Provisioning_Rotate_Credentials <<APP>>
+Provisioning_Rotate_Credentials --> IoT_Provisioning_Register
+Provisioning_Rotate_Credentials --> [*] : no other credential
+
+IoT_Provisioning_Register --> IoT_Hub_Operation : Successful Provisioning
+state IoT_Hub_Operation <<APP>>
+
+' Hub Retriable errors
+IoT_Hub_Operation --> Hub_retriable_failure
+state Hub_retriable_failure<<FAIL>>
+Hub_retriable_failure --> Hub_calculate_delay
+Hub_calculate_delay --> Hub_app_delay
+state Hub_app_delay<<APP>>
+Hub_app_delay --> IoT_Hub_Operation
+Hub_calculate_delay: - az_iot_retry_calc_delay
+
+' Hub Non-retriable 
+IoT_Hub_Operation --> Hub_not_retriable_failure
+state Hub_not_retriable_failure<<FAIL>>
+Hub_not_retriable_failure --> IoT_Provisioning_Register : Re-provision
 
 @enduml

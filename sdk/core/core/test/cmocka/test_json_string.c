@@ -1,7 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include "az_http_policy_private.h"
 #include "az_json_string_private.h"
+#include "az_test_definitions.h"
 #include <az_json.h>
 
 #include <setjmp.h>

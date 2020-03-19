@@ -31,26 +31,6 @@ add_library (
   src/az_span.c
   )
 
-if(MSVC)
-  if(WARNINGS_AS_ERRORS)
-    set(WARNINGS_AS_ERRORS_FLAG "/WX")
-  endif()
-
-  target_compile_options(${TARGET_NAME} PRIVATE /Wall ${WARNINGS_AS_ERRORS_FLAG} /wd5031 /wd4668 /wd4820 /wd4255 /analyze)
-elseif(CMAKE_C_COMPILER_ID MATCHES "Clang")
-  if(WARNINGS_AS_ERRORS)
-    set(WARNINGS_AS_ERRORS_FLAG "-Werror")
-  endif()
-
-  target_compile_options(${TARGET_NAME} PRIVATE -Xclang -Wall -Wextra -pedantic ${WARNINGS_AS_ERRORS_FLAG} -Wdocumentation -Wdocumentation-unknown-command -fcomment-block-commands=retval -Wcast-qual)
-else()
-  if(WARNINGS_AS_ERRORS)
-    set(WARNINGS_AS_ERRORS_FLAG "-Werror")
-  endif()
-
-  target_compile_options(${TARGET_NAME} PRIVATE -Wall -Wextra -pedantic ${WARNINGS_AS_ERRORS_FLAG})
-endif()
-
 target_include_directories (${TARGET_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc> $<INSTALL_INTERFACE:include/${TARGET_NAME}>)
 # include internal headers
 target_include_directories(${TARGET_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/internal> $<INSTALL_INTERFACE:include/az_core_internal>)

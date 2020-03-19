@@ -1,7 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include "az_hex_private.h"
+#include "az_json_string_private.h"
 #include <az_json.h>
+#include <az_precondition.h>
+#include <az_precondition_internal.h>
 
 #include <ctype.h>
 
@@ -11,15 +15,15 @@ AZ_NODISCARD AZ_INLINE az_result az_hex_to_digit(uint8_t c, uint8_t* out)
 {
   if (isdigit(c))
   {
-    *out = c - '0';
+    *out = (uint8_t)(c - '0');
   }
   else if ('a' <= c && c <= 'f')
   {
-    *out = c - ('a' - 10);
+    *out = (uint8_t)(c - ('a' - 10));
   }
   else if ('A' <= c && c <= 'F')
   {
-    *out = c - ('A' - 10);
+    *out = (uint8_t)(c - ('A' - 10));
   }
   else
   {

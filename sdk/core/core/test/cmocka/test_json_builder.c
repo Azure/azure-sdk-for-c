@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "az_json_string_private.h"
+#include "az_test_definitions.h"
 #include <az_json.h>
 #include <az_span.h>
 

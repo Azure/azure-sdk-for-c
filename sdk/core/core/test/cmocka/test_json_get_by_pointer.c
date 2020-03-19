@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include "az_test_definitions.h"
 #include <az_json.h>
 #include <az_span.h>
 
@@ -20,7 +21,12 @@ void test_json_get_by_pointer(void** state)
         az_json_parse_by_pointer(AZ_SPAN_FROM_STR("   57  "), AZ_SPAN_FROM_STR(""), &token)
         == AZ_OK);
     assert_true(token.kind == AZ_JSON_TOKEN_NUMBER);
-    assert_true(token._internal.number == 57);
+
+    double const expected = 57;
+    uint64_t const* const expected_bin_rep_view = (uint64_t const*)&expected;
+    uint64_t const* const token_value_number_bin_rep_view = (uint64_t*)&token._internal.number;
+
+    assert_true(*token_value_number_bin_rep_view == *expected_bin_rep_view);
   }
   {
     az_json_token token;

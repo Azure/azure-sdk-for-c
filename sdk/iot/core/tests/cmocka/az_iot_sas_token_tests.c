@@ -1,10 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include "az_iot_tests.h"
 #include <az_iot_sas_token.h>
 #include <az_span.h>
-
-#include <stdio.h>
 
 #include <setjmp.h>
 #include <stdarg.h>
@@ -20,7 +19,8 @@
 #define TEST_EXPIRATION_STR "1578941692"
 #define TEST_KEY_NAME "iothubowner"
 
-void az_iot_sas_token_get_document_NULL_document_fails(void** state)
+/*
+static void az_iot_sas_token_get_document_NULL_document_fails(void** state)
 {
   (void)state;
   az_span iothub_fqdn = AZ_SPAN_FROM_STR(TEST_FQDN);
@@ -33,7 +33,7 @@ void az_iot_sas_token_get_document_NULL_document_fails(void** state)
       AZ_ERROR_ARG);
 }
 
-void az_iot_sas_token_get_document_NULL_document_span_fails(void** state)
+static void az_iot_sas_token_get_document_NULL_document_span_fails(void** state)
 {
   (void)state;
   az_span iothub_fqdn = AZ_SPAN_FROM_STR(TEST_FQDN);
@@ -46,7 +46,7 @@ void az_iot_sas_token_get_document_NULL_document_span_fails(void** state)
       iothub_fqdn, device_id, expiry_time_secs, document, &document)));
 }
 
-void az_iot_sas_token_get_document_empty_device_id_fails(void** state)
+static void az_iot_sas_token_get_document_empty_device_id_fails(void** state)
 {
   (void)state;
   az_span iothub_fqdn = AZ_SPAN_FROM_STR(TEST_FQDN);
@@ -60,7 +60,7 @@ void az_iot_sas_token_get_document_empty_device_id_fails(void** state)
       iothub_fqdn, device_id, expiry_time_secs, document, &document)));
 }
 
-void az_iot_sas_token_get_document_empty_iothub_fqdn_fails(void** state)
+static void az_iot_sas_token_get_document_empty_iothub_fqdn_fails(void** state)
 {
   (void)state;
   az_span iothub_fqdn = AZ_SPAN_NULL;
@@ -74,7 +74,7 @@ void az_iot_sas_token_get_document_empty_iothub_fqdn_fails(void** state)
       iothub_fqdn, device_id, expiry_time_secs, document, &document)));
 }
 
-void az_iot_sas_token_get_document_document_overflow_fails(void** state)
+static void az_iot_sas_token_get_document_document_overflow_fails(void** state)
 {
   (void)state;
   az_span iothub_fqdn = AZ_SPAN_FROM_STR(TEST_FQDN);
@@ -88,8 +88,9 @@ void az_iot_sas_token_get_document_document_overflow_fails(void** state)
       az_iot_sas_token_get_document(iothub_fqdn, device_id, expiry_time_secs, document, &document),
       AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY);
 }
+*/
 
-void az_iot_sas_token_get_document_succeeds(void** state)
+static void az_iot_sas_token_get_document_succeeds(void** state)
 {
   (void)state;
   const char* expected_document = TEST_FQDN "/devices/" TEST_DEVICEID "\n" TEST_EXPIRATION_STR;
@@ -106,7 +107,8 @@ void az_iot_sas_token_get_document_succeeds(void** state)
   assert_memory_equal(expected_document, (char*)raw_document, sizeof(expected_document) - 1);
 }
 
-void az_iot_sas_token_generate_empty_device_id_fails(void** state)
+/*
+static void az_iot_sas_token_generate_empty_device_id_fails(void** state)
 {
   (void)state;
   az_span iothub_fqdn = AZ_SPAN_FROM_STR(TEST_FQDN);
@@ -124,7 +126,7 @@ void az_iot_sas_token_generate_empty_device_id_fails(void** state)
       AZ_ERROR_ARG);
 }
 
-void az_iot_sas_token_generate_empty_iothub_fqdn_fails(void** state)
+static void az_iot_sas_token_generate_empty_iothub_fqdn_fails(void** state)
 {
   (void)state;
   az_span iothub_fqdn = AZ_SPAN_NULL;
@@ -142,7 +144,7 @@ void az_iot_sas_token_generate_empty_iothub_fqdn_fails(void** state)
       AZ_ERROR_ARG);
 }
 
-void az_iot_sas_token_generate_EMPTY_signature_fails(void** state)
+static void az_iot_sas_token_generate_EMPTY_signature_fails(void** state)
 {
   (void)state;
   az_span iothub_fqdn = AZ_SPAN_FROM_STR(TEST_FQDN);
@@ -160,7 +162,7 @@ void az_iot_sas_token_generate_EMPTY_signature_fails(void** state)
       AZ_ERROR_ARG);
 }
 
-void az_iot_sas_token_generate_NULL_sas_token_fails(void** state)
+static void az_iot_sas_token_generate_NULL_sas_token_fails(void** state)
 {
   (void)state;
   az_span iothub_fqdn = AZ_SPAN_FROM_STR(TEST_FQDN);
@@ -177,7 +179,7 @@ void az_iot_sas_token_generate_NULL_sas_token_fails(void** state)
       AZ_ERROR_ARG);
 }
 
-void az_iot_sas_token_generate_NULL_sas_token_span_fails(void** state)
+static void az_iot_sas_token_generate_NULL_sas_token_span_fails(void** state)
 {
   (void)state;
   az_span iothub_fqdn = AZ_SPAN_FROM_STR(TEST_FQDN);
@@ -192,7 +194,7 @@ void az_iot_sas_token_generate_NULL_sas_token_span_fails(void** state)
       iothub_fqdn, device_id, signature, expiry_time_secs, key_name, sas_token, &sas_token)));
 }
 
-void az_iot_sas_token_generate_sas_token_overflow_fails(void** state)
+static void az_iot_sas_token_generate_sas_token_overflow_fails(void** state)
 {
   (void)state;
   az_span iothub_fqdn = AZ_SPAN_FROM_STR(TEST_FQDN);
@@ -209,8 +211,9 @@ void az_iot_sas_token_generate_sas_token_overflow_fails(void** state)
           iothub_fqdn, device_id, signature, expiry_time_secs, key_name, sas_token, &sas_token),
       AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY);
 }
+*/
 
-void az_iot_sas_token_generate_succeeds(void** state)
+static void az_iot_sas_token_generate_succeeds(void** state)
 {
   (void)state;
   const char* expected_sas_token = "SharedAccessSignature sr=" TEST_FQDN "/devices/" TEST_DEVICEID
@@ -230,7 +233,7 @@ void az_iot_sas_token_generate_succeeds(void** state)
   assert_memory_equal(expected_sas_token, (char*)raw_sas_token, sizeof(expected_sas_token) - 1);
 }
 
-void az_iot_sas_token_generate_with_keyname_succeeds(void** state)
+static void az_iot_sas_token_generate_with_keyname_succeeds(void** state)
 {
   (void)state;
   const char* expected_sas_token

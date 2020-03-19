@@ -198,7 +198,7 @@ AZ_NODISCARD az_span az_span_slice(az_span span, int32_t low_index, int32_t high
 AZ_NODISCARD AZ_INLINE bool az_span_is_content_equal(az_span span1, az_span span2)
 {
   return az_span_length(span1) == az_span_length(span2)
-      && memcmp(az_span_ptr(span1), az_span_ptr(span2), az_span_length(span1)) == 0;
+      && memcmp(az_span_ptr(span1), az_span_ptr(span2), (size_t)az_span_length(span1)) == 0;
 }
 
 /**
@@ -387,7 +387,7 @@ AZ_NODISCARD az_result az_span_append_dtoa(az_span destination, double source, a
  */
 AZ_INLINE void az_span_set(az_span destination, uint8_t fill)
 {
-  memset(az_span_ptr(destination), fill, az_span_capacity(destination));
+  memset(az_span_ptr(destination), fill, (size_t)az_span_capacity(destination));
 }
 
 /**
