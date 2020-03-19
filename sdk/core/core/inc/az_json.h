@@ -142,7 +142,7 @@ AZ_NODISCARD AZ_INLINE az_json_token az_json_token_array_end()
  * @param token A pointer to an az_json_token instance.
  * @param out_value A pointer to a variable to receive the value.
  * @return AZ_OK if the boolean is returned.<br>
- * AZ_ERROR_ITEM_NOT_FOUND if the kind != AZ_JSON_TOKEN_BOOLEAN.
+ * AZ_ERROR_ITEM_NOT_FOUND if the kind is not AZ_JSON_TOKEN_BOOLEAN.
  */
 AZ_NODISCARD az_result az_json_token_get_boolean(az_json_token const* token, bool* out_value);
 
