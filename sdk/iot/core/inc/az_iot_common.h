@@ -75,7 +75,7 @@ AZ_NODISCARD bool az_iot_is_retriable_status(az_iot_status status);
  * @param[in] random_msec A random value between 0 and the maximum allowed jitter, in milliseconds.
  * @return The recommended delay in milliseconds.
  */
-AZ_NODISCARD AZ_INLINE int32_t az_iot_retry_calc_delay(
+AZ_NODISCARD int32_t az_iot_retry_calc_delay(
     int32_t operation_msec,
     int16_t attempt,
     int32_t retry_delay_msec,
