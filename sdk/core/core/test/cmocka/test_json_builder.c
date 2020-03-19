@@ -119,4 +119,35 @@ void test_json_builder(void** state)
             "\"span\":\"\\\""
             "}")));
   }
+  {
+    // json with array and object inside
+    uint8_t array[200];
+    az_json_builder builder = { 0 };
+    TEST_EXPECT_SUCCESS(az_json_builder_init(&builder, AZ_SPAN_FROM_BUFFER(array)));
+
+    // this json { "array": [1, 2, "sd": {}, 3 ] }
+    TEST_EXPECT_SUCCESS(az_json_builder_append_token(&builder, az_json_token_object_start()));
+
+    TEST_EXPECT_SUCCESS(az_json_builder_append_object(
+        &builder, AZ_SPAN_FROM_STR("array"), az_json_token_array_start()));
+
+    TEST_EXPECT_SUCCESS(az_json_builder_append_array_item(&builder, az_json_token_number(1)));
+    TEST_EXPECT_SUCCESS(az_json_builder_append_array_item(&builder, az_json_token_number(2)));
+
+    TEST_EXPECT_SUCCESS(az_json_builder_append_object(
+        &builder, AZ_SPAN_FROM_STR("sd"), az_json_token_object_start()));
+    TEST_EXPECT_SUCCESS(az_json_builder_append_token(&builder, az_json_token_object_end()));
+
+    TEST_EXPECT_SUCCESS(az_json_builder_append_array_item(&builder, az_json_token_number(3)));
+
+    TEST_EXPECT_SUCCESS(az_json_builder_append_token(&builder, az_json_token_array_end()));
+    TEST_EXPECT_SUCCESS(az_json_builder_append_token(&builder, az_json_token_object_end()));
+
+    assert_true(az_span_is_content_equal(
+        builder._internal.json,
+        AZ_SPAN_FROM_STR( //
+            "{"
+            "\"array\":[1,2,\"sd\":{},3]"
+            "}")));
+  }
 }
