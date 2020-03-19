@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include "az_test_definitions.h"
 #include <az_json.h>
 #include <az_span.h>
 
@@ -10,13 +11,6 @@
 #include <cmocka.h>
 
 #include <_az_cfg.h>
-
-void test_json_value(void** state);
-void test_json_string(void** state);
-void test_json_pointer(void** state);
-void test_json_parser(void** state);
-void test_json_get_by_pointer(void** state);
-void test_json_builder(void** state);
 
 void test_json_token_null(void** state)
 {
