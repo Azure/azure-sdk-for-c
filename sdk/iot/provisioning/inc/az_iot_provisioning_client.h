@@ -12,7 +12,7 @@
 
 #include <az_result.h>
 #include <az_span.h>
-#include <az_iot_common.h>
+#include <az_iot_core.h>
 
 #include <stdbool.h>
 #include <stdint.h>

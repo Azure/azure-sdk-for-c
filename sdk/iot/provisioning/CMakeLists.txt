@@ -3,7 +3,7 @@
 
 cmake_minimum_required (VERSION 3.10)
 
-set(TARGET_NAME "az_iot_core")
+set(TARGET_NAME "az_iot_provisioning_client")
 
 project (${TARGET_NAME} LANGUAGES C)
 
@@ -13,13 +13,14 @@ include(CheckAndIncludeCodeCov)
 
 add_library (
     ${TARGET_NAME}
-    src/az_iot_core.c
+    src/az_iot_provisioning_client.c
 )
 
 target_include_directories (${TARGET_NAME} PUBLIC inc)
 target_include_directories (${TARGET_NAME} PRIVATE src)
 
 target_link_libraries(${TARGET_NAME} PRIVATE az_core)
+target_link_libraries(${TARGET_NAME} PRIVATE az_iot_core)
 
 add_library (az::iot ALIAS ${TARGET_NAME})
 

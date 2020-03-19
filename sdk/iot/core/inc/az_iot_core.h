@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: MIT
 
 /**
- * @file az_iot_common.h
+ * @file az_iot_core.h
  *
  * @brief Azure IoT common definitions.
  */
 
-#ifndef _az_IOT_COMMON_H
-#define _az_IOT_COMMON_H
+#ifndef _az_IOT_CORE_H
+#define _az_IOT_CORE_H
 
 #include <az_result.h>
 #include <az_span.h>
@@ -84,4 +84,4 @@ AZ_NODISCARD int32_t az_iot_retry_calc_delay(
 
 #include <_az_cfg_suffix.h>
 
-#endif //!_az_IOT_COMMON_H
+#endif //!_az_IOT_CORE_H
