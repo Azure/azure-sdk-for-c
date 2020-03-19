@@ -53,19 +53,19 @@ AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_o
 }
 
 AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
-    az_storage_blobs_blob_client* self,
+    az_storage_blobs_blob_client* client,
     az_span uri,
     void* credential,
     az_storage_blobs_blob_client_options* options)
 {
-  AZ_PRECONDITION_NOT_NULL(self);
+  AZ_PRECONDITION_NOT_NULL(client);
   AZ_PRECONDITION_NOT_NULL(options);
 
   _az_credential* const cred = (_az_credential*)credential;
 
-  *self = (az_storage_blobs_blob_client) {
+  *client = (az_storage_blobs_blob_client) {
     ._internal = {
-      .uri = AZ_SPAN_FROM_BUFFER(self->_internal.url_buffer),
+      .uri = AZ_SPAN_FROM_BUFFER(client->_internal.url_buffer),
       .options = *options,
       .credential = cred,
       .pipeline = (_az_http_pipeline){
@@ -74,7 +74,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
             {
               ._internal = {
                 .process = az_http_pipeline_policy_apiversion,
-                .p_options= &self->_internal.options._internal.api_version,
+                .p_options= &client->_internal.options._internal.api_version,
               },
             },
             {
@@ -86,13 +86,13 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
             {
               ._internal = {
                 .process = az_http_pipeline_policy_telemetry,
-                .p_options = &self->_internal.options._internal._telemetry_options,
+                .p_options = &client->_internal.options._internal._telemetry_options,
               },
             },
             {
               ._internal = {
                 .process = az_http_pipeline_policy_retry,
-                .p_options = &self->_internal.options.retry,
+                .p_options = &client->_internal.options.retry,
               },
             },
             {
@@ -120,7 +120,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
   };
 
   // Copy url to client buffer so customer can re-use buffer on his/her side
-  AZ_RETURN_IF_FAILED(az_span_copy(self->_internal.uri, uri, &self->_internal.uri));
+  AZ_RETURN_IF_FAILED(az_span_copy(client->_internal.uri, uri, &client->_internal.uri));
 
   AZ_RETURN_IF_FAILED(
       _az_credential_set_scopes(cred, AZ_SPAN_FROM_STR("https://storage.azure.com/.default")));

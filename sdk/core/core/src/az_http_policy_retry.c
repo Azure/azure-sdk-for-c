@@ -102,7 +102,7 @@ AZ_INLINE AZ_NODISCARD az_result _az_http_policy_retry_get_retry_after(
     {
       if (az_span_is_content_equal_ignoring_case(header.key, AZ_SPAN_FROM_STR("retry-after-ms"))
           || az_span_is_content_equal_ignoring_case(
-                 header.key, AZ_SPAN_FROM_STR("x-ms-retry-after-ms")))
+              header.key, AZ_SPAN_FROM_STR("x-ms-retry-after-ms")))
       {
         // The value is in milliseconds.
         int32_t const msec = _az_uint32_span_to_int32(header.value);
@@ -141,30 +141,30 @@ AZ_INLINE AZ_NODISCARD az_result _az_http_policy_retry_get_retry_after(
 }
 
 AZ_NODISCARD az_result az_http_pipeline_policy_retry(
-    _az_http_policy* policies,
-    void* options,
-    _az_http_request* ref_request,
-    az_http_response* ref_response)
+    _az_http_policy* p_policies,
+    void* p_data,
+    _az_http_request* p_request,
+    az_http_response* p_response)
 {
   az_http_policy_retry_options const* const retry_options
-      = (az_http_policy_retry_options const*)options;
+      = (az_http_policy_retry_options const*)p_data;
 
   int16_t const max_retries = retry_options->max_retries;
   int32_t const retry_delay_msec = retry_options->retry_delay_msec;
   int32_t const max_retry_delay_msec = retry_options->max_retry_delay_msec;
   az_http_status_code const* const status_codes = retry_options->status_codes;
 
-  az_context* const context = ref_request->_internal.context;
+  az_context* const context = p_request->_internal.context;
 
   bool const should_log = az_log_should_write(AZ_LOG_HTTP_RETRY);
   az_result result = AZ_OK;
   int16_t attempt = 1;
   while (true)
   {
-    AZ_RETURN_IF_FAILED(az_http_response_init(ref_response, ref_response->_internal.http_response));
-    AZ_RETURN_IF_FAILED(_az_http_request_remove_retry_headers(ref_request));
+    AZ_RETURN_IF_FAILED(az_http_response_init(p_response, p_response->_internal.http_response));
+    AZ_RETURN_IF_FAILED(_az_http_request_remove_retry_headers(p_request));
 
-    result = az_http_pipeline_nextpolicy(policies, ref_request, ref_response);
+    result = az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
 
     // Even HTTP 429, or 502 are expected to be AZ_OK, so the failed result is not retriable.
     if (attempt > max_retries || az_failed(result))
@@ -174,7 +174,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
 
     int32_t retry_after_msec = -1;
     bool should_retry = false;
-    az_http_response response_copy = *ref_response;
+    az_http_response response_copy = *p_response;
     AZ_RETURN_IF_FAILED(_az_http_policy_retry_get_retry_after(
         &response_copy, status_codes, &should_retry, &retry_after_msec));
 
