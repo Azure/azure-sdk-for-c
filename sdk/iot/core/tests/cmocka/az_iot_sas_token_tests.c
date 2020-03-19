@@ -14,6 +14,7 @@
 #include <stdint.h>
 
 #include <cmocka.h>
+#include "az_precondition_testing.h"
 
 #define TEST_DEVICEID "mytest_deviceid"
 #define TEST_FQDN "myiothub.azure-devices.net"
@@ -24,33 +25,7 @@
 
 #ifndef NO_PRECONDITION_CHECKING
 
-// This block defines the resources needed to verify precondition checking.
-// The macro assert_precondition_checked(func) alone shall be used to assert if a precondition is verified.
-// If a precondition is not verified within a function the result will be either:
-// - A crash in the test, as the the target function will continue to execute with an invalid argument, or
-// - An assert failure indicating a precondition was not tested.
-// Notice that:
-// - If assert_precondition_checked(func) is used, the module must include <setjmp.h>;
-// - If a function has two precondition checks and both are supposed to fail on a given test, assert_precondition_checked(func)
-//   is unable to distinguish which precondition has failed first. Testing precondition checking separately is advised.
-// - Tests using assert_precondition_checked(func) must not be run in parallel (!).
-
-static jmp_buf g_jmp_buf; 
-static unsigned int precondition_test_count = 0;
-static void az_precondition_test_failed_fn()
-{
-  precondition_test_count++;
-  longjmp(g_jmp_buf, 0);
-} 
-
-#define assert_precondition_checked(fn) \
-  precondition_test_count = 0; \
-  (void)setjmp(g_jmp_buf); \
-  if (precondition_test_count == 0) { \
-    fn; \
-  } \
-  assert_int_equal(1, precondition_test_count);
-
+enable_precondition_check_tests()
 
 // Tests
 
@@ -293,7 +268,7 @@ static void az_iot_sas_token_get_document_document_overflow_fails(void** state)
 int test_iot_sas_token()
 {
 #ifndef NO_PRECONDITION_CHECKING
-  az_precondition_failed_set_callback(az_precondition_test_failed_fn);
+  setup_precondition_check_tests();
 #endif // NO_PRECONDITION_CHECKING
 
   const struct CMUnitTest tests[] = {
