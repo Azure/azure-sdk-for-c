@@ -68,8 +68,7 @@ static AZ_NODISCARD az_result _az_span_reader_read_json_pointer_char(az_span* se
 }
 
 /**
- * Returns a next reference token in the JSON pointer. The JSON pointer parser is @var
- * az_span_reader.
+ * Returns a next reference token in the JSON pointer.
  *
  * See https://tools.ietf.org/html/rfc6901
  */
