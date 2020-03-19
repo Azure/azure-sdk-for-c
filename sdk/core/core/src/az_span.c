@@ -21,11 +21,22 @@ enum
 AZ_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t length, int32_t capacity)
 {
   // This precondition validates that:
-  //    0 <= capacity <= INT32_MAX
-  // And
-  //    0 <= length <= capacity
-  AZ_PRECONDITION(capacity >= 0 && (uint32_t)length <= (uint32_t)capacity);
+  //    If ptr is not null, then:
+  //       0 <= capacity <= INT32_MAX
+  //    And
+  //       0 <= length <= capacity
+  //    Otherwise
+  //      length == capacity == 0
+  AZ_PRECONDITION(
+      (ptr != NULL && length >= 0 && length <= capacity)
+      || (ptr + (uint32_t)span_length + (uint32_t)span_capacity == 0));
 
+  return (az_span){ ._internal = { .ptr = ptr, .length = length, .capacity = capacity, }, };
+}
+
+AZ_NODISCARD AZ_INLINE az_span
+_az_span_init_unchecked(uint8_t* ptr, int32_t length, int32_t capacity)
+{
   return (az_span){ ._internal = { .ptr = ptr, .length = length, .capacity = capacity, }, };
 }
 
@@ -34,7 +45,7 @@ AZ_NODISCARD az_span az_span_from_str(char* str)
   AZ_PRECONDITION_NOT_NULL(str);
 
   int32_t const length = (int32_t)strlen(str);
-  return az_span_init((uint8_t*)str, length, length);
+  return _az_span_init_unchecked((uint8_t*)str, length, length);
 }
 
 AZ_NODISCARD az_span az_span_slice(az_span span, int32_t low_index, int32_t high_index)
@@ -56,7 +67,8 @@ AZ_NODISCARD az_span az_span_slice(az_span span, int32_t low_index, int32_t high
   int32_t const capacity = az_span_capacity(span);
 
   high_index = high_index == -1 ? capacity : high_index;
-  return az_span_init(az_span_ptr(span) + low_index, high_index - low_index, capacity - low_index);
+  return _az_span_init_unchecked(
+      az_span_ptr(span) + low_index, high_index - low_index, capacity - low_index);
 }
 
 AZ_NODISCARD az_span az_span_slice_start(az_span span, int32_t low_index)
@@ -65,7 +77,7 @@ AZ_NODISCARD az_span az_span_slice_start(az_span span, int32_t low_index)
 
   int32_t const new_capacity = az_span_capacity(span) - low_index;
 
-  return az_span_init(az_span_ptr(span) + low_index, new_capacity, new_capacity);
+  return _az_span_init_unchecked(az_span_ptr(span) + low_index, new_capacity, new_capacity);
 }
 
 AZ_NODISCARD az_span az_span_slice_start_end(az_span span, int32_t low_index, int32_t high_index)
@@ -73,7 +85,7 @@ AZ_NODISCARD az_span az_span_slice_start_end(az_span span, int32_t low_index, in
   AZ_PRECONDITION_INT32_RANGE(0, high_index, az_span_capacity(span));
   AZ_PRECONDITION_INT32_RANGE(0, low_index, high_index);
 
-  return az_span_init(
+  return _az_span_init_unchecked(
       az_span_ptr(span) + low_index, high_index - low_index, az_span_capacity(span) - low_index);
 }
 
@@ -107,7 +119,7 @@ AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1, az_span 
 
 AZ_NODISCARD az_result az_span_to_uint64(az_span span, uint64_t* out_number)
 {
-  AZ_PRECONDITION_VALID_SPAN(span, 1, false);
+  AZ_PRECONDITION_MINIMUM_SPAN_LENGTH(span, 1);
   AZ_PRECONDITION_NOT_NULL(out_number);
 
   int32_t self_length = az_span_length(span);
@@ -135,7 +147,7 @@ AZ_NODISCARD az_result az_span_to_uint64(az_span span, uint64_t* out_number)
 
 AZ_NODISCARD az_result az_span_to_uint32(az_span span, uint32_t* out_number)
 {
-  AZ_PRECONDITION_VALID_SPAN(span, 1, false);
+  AZ_PRECONDITION_MINIMUM_SPAN_LENGTH(span, 1);
   AZ_PRECONDITION_NOT_NULL(out_number);
 
   int32_t self_length = az_span_length(span);
@@ -163,69 +175,96 @@ AZ_NODISCARD az_result az_span_to_uint32(az_span span, uint32_t* out_number)
 
 AZ_NODISCARD az_result az_span_copy(az_span destination, az_span source, az_span* out_span)
 {
-  AZ_PRECONDITION_VALID_SPAN(destination, 0, true);
-  AZ_PRECONDITION_VALID_SPAN(source, 0, true);
-  int32_t src_len = az_span_length(source);
+  AZ_PRECONDITION_NOT_NULL(out_span);
 
-  if (az_span_capacity(destination) < src_len)
+  int32_t src_len = az_span_length(source);
+  int32_t dest_capacity = az_span_capacity(destination);
+
+  if (dest_capacity < src_len)
   {
     return AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY;
-  };
+  }
 
   uint8_t* ptr = az_span_ptr(destination);
+  if (ptr == NULL)
+  {
+    *out_span = AZ_SPAN_NULL;
+  }
+  else
+  {
+    memmove((void*)ptr, (void const*)az_span_ptr(source), (size_t)src_len);
 
-  memmove((void*)ptr, (void const*)az_span_ptr(source), (size_t)src_len);
-
-  *out_span = az_span_init(ptr, src_len, az_span_capacity(destination));
-
+    *out_span = _az_span_init_unchecked(ptr, src_len, dest_capacity);
+  }
   return AZ_OK;
 }
 
-AZ_NODISCARD AZ_INLINE bool should_encode(uint8_t c)
-{
-  switch (c)
-  {
-    case '-':
-    case '_':
-    case '.':
-    case '~':
-      return false;
-    default:
-      return !(('0' <= c && c <= '9') || ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z'));
-  }
-}
+static const uint8_t _is_ascii_byte_url[256] = {
+  3, 3, 3, 3, 3, 3, 3, 3, // U+00..U+07
+  3, 3, 3, 3, 3, 3, 3, 3, // U+08..U+0F
+  3, 3, 3, 3, 3, 3, 3, 3, // U+10..U+17
+  3, 3, 3, 3, 3, 3, 3, 3, // U+18..U+1F
+  3, 3, 3, 3, 3, 3, 3, 3, // U+20..U+27
+  3, 3, 3, 3, 3, 1, 1, 3, // U+28..U+2F
+  1, 1, 1, 1, 1, 1, 1, 1, // U+30..U+37
+  1, 1, 3, 3, 3, 3, 3, 3, // U+38..U+3F
+  3, 1, 1, 1, 1, 1, 1, 1, // U+40..U+47
+  1, 1, 1, 1, 1, 1, 1, 1, // U+48..U+4F
+  1, 1, 1, 1, 1, 1, 1, 1, // U+50..U+57
+  1, 1, 1, 3, 3, 3, 3, 1, // U+58..U+5F
+  3, 1, 1, 1, 1, 1, 1, 1, // U+60..U+67
+  1, 1, 1, 1, 1, 1, 1, 1, // U+68..U+6F
+  1, 1, 1, 1, 1, 1, 1, 1, // U+70..U+77
+  1, 1, 1, 3, 3, 3, 1, 3, // U+78..U+7F
+  3, 3, 3, 3, 3, 3, 3, 3, // U+80..U+87
+  3, 3, 3, 3, 3, 3, 3, 3, // U+88..U+8F
+  3, 3, 3, 3, 3, 3, 3, 3, // U+90..U+97
+  3, 3, 3, 3, 3, 3, 3, 3, // U+98..U+9F
+  3, 3, 3, 3, 3, 3, 3, 3, // U+A0..U+A7
+  3, 3, 3, 3, 3, 3, 3, 3, // U+A8..U+AF
+  3, 3, 3, 3, 3, 3, 3, 3, // U+B0..U+B7
+  3, 3, 3, 3, 3, 3, 3, 3, // U+B8..U+BF
+  3, 3, 3, 3, 3, 3, 3, 3, // U+C0..U+C7
+  3, 3, 3, 3, 3, 3, 3, 3, // U+C8..U+CF
+  3, 3, 3, 3, 3, 3, 3, 3, // U+D0..U+D7
+  3, 3, 3, 3, 3, 3, 3, 3, // U+D8..U+DF
+  3, 3, 3, 3, 3, 3, 3, 3, // U+E0..U+E7
+  3, 3, 3, 3, 3, 3, 3, 3, // U+E8..U+EF
+  3, 3, 3, 3, 3, 3, 3, 3, // U+F0..U+F7
+  3, 3, 3, 3, 3, 3, 3, 3, // U+F8..U+FF
+};
+
+AZ_NODISCARD AZ_INLINE bool _should_url_encode(uint8_t c) { return _is_ascii_byte_url[c] == 3; }
 
 AZ_NODISCARD az_result
 az_span_copy_url_encode(az_span destination, az_span source, az_span* out_span)
 {
   AZ_PRECONDITION_NOT_NULL(out_span);
-  AZ_PRECONDITION_VALID_SPAN(destination, 0, true);
-  AZ_PRECONDITION_VALID_SPAN(source, 0, true);
 
   int32_t const input_size = az_span_length(source);
 
+  uint8_t* p_s = az_span_ptr(source);
   int32_t result_size = 0;
   for (int32_t i = 0; i < input_size; ++i)
   {
-    result_size += should_encode(az_span_ptr(source)[i]) ? 3 : 1;
+    uint8_t c = p_s[i];
+    result_size += _is_ascii_byte_url[c];
   }
 
-  if (az_span_capacity(destination) < result_size)
+  int32_t dest_capacity = az_span_capacity(destination);
+  if (dest_capacity < result_size)
   {
     return AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY;
   }
 
-  uint8_t* p_s = az_span_ptr(source);
   uint8_t* p_d = az_span_ptr(destination);
-  int32_t s = 0;
   for (int32_t i = 0; i < input_size; ++i)
   {
     uint8_t c = p_s[i];
-    if (!should_encode(c))
+    if (!_should_url_encode(c))
     {
       *p_d = c;
       p_d += 1;
-      s += 1;
     }
     else
     {
@@ -233,10 +272,9 @@ az_span_copy_url_encode(az_span destination, az_span source, az_span* out_span)
       p_d[1] = _az_number_to_upper_hex(c >> 4);
       p_d[2] = _az_number_to_upper_hex(c & 0x0F);
       p_d += 3;
-      s += 3;
     }
   }
-  *out_span = az_span_init(az_span_ptr(destination), s, az_span_capacity(destination));
+  *out_span = _az_span_init_unchecked(az_span_ptr(destination), result_size, dest_capacity);
 
   return AZ_OK;
 }
@@ -244,10 +282,13 @@ az_span_copy_url_encode(az_span destination, az_span source, az_span* out_span)
 AZ_NODISCARD az_result
 az_span_to_str(char* destination, int32_t destination_max_size, az_span source)
 {
-  AZ_PRECONDITION_VALID_SPAN(source, 0, true);
+  AZ_PRECONDITION_NOT_NULL(destination);
+  AZ_PRECONDITION(destination_max_size >= 0);
 
   int32_t span_length = az_span_length(source);
-  if (span_length + 1 > destination_max_size)
+
+  // Subtract from destination_max_size to avoid integer overflow.
+  if (span_length > destination_max_size - 1)
   {
     return AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY;
   }

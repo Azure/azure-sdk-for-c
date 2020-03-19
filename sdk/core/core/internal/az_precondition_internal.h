@@ -70,6 +70,8 @@ AZ_NODISCARD AZ_INLINE bool az_span_is_valid(az_span span, int32_t min_length, b
 {
   int32_t span_length = az_span_length(span);
   int32_t span_capacity = az_span_capacity(span);
+  uint8_t* ptr = az_span_ptr(span);
+
   /* Valid Span is:
       If the length is greater than or equal to a user defined minimum value AND one of the
      following:
@@ -79,13 +81,16 @@ AZ_NODISCARD AZ_INLINE bool az_span_is_valid(az_span span, int32_t min_length, b
           the length.
   */
   return (
-      (((null_is_valid && (az_span_ptr(span) == NULL) && (span_length == 0) && (span_capacity == 0))
-        || (az_span_ptr(span) != NULL && (span_length >= 0) && (span_capacity >= span_length)))
-       && min_length <= span_length));
+      ((null_is_valid && (ptr + span_length + span_capacity == 0))
+        || (ptr != NULL && (span_length >= 0) && (span_capacity >= span_length)))
+       && min_length <= span_length);
 }
 
 #define AZ_PRECONDITION_VALID_SPAN(span, min, null_is_valid) \
   AZ_PRECONDITION(az_span_is_valid(span, min, null_is_valid))
+
+#define AZ_PRECONDITION_MINIMUM_SPAN_LENGTH(span, min_length) \
+  AZ_PRECONDITION(az_span_length(span) >= min_length)
 
 #include <_az_cfg_suffix.h>
 

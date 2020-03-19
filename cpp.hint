@@ -4,3 +4,5 @@
 
 // Workaround for https://developercommunity.visualstudio.com/content/problem/284851/msvc-nagging-about-adding-macros-to-hint-file-afte.html
 #define bool
+#define AZ_INLINE
+#define AZ_INLINE __attribute__((always_inline)) static inline
