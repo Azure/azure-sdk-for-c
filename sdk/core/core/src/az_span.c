@@ -192,6 +192,7 @@ AZ_NODISCARD az_result az_span_copy(az_span destination, az_span source, az_span
   }
   else
   {
+    //TODO: What should be the behavior if source.ptr is NULL?
     memmove((void*)ptr, (void const*)az_span_ptr(source), (size_t)src_len);
 
     *out_span = _az_span_init_unchecked(ptr, src_len, dest_capacity);
@@ -261,6 +262,8 @@ az_span_copy_url_encode(az_span destination, az_span source, az_span* out_span)
   for (int32_t i = 0; i < input_size; ++i)
   {
     uint8_t c = p_s[i];
+
+    // TODO: What should be the behavior for c outside the ASCII range (128-255)?
     if (!_should_url_encode(c))
     {
       *p_d = c;
@@ -293,6 +296,7 @@ az_span_to_str(char* destination, int32_t destination_max_size, az_span source)
     return AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY;
   }
 
+  // TODO: What should be the behavior if source.ptr is NULL?
   memmove((void*)destination, (void const*)az_span_ptr(source), (size_t)span_length);
 
   destination[span_length] = 0;
@@ -308,7 +312,7 @@ AZ_NODISCARD az_result az_span_append(az_span destination, az_span source, az_sp
   az_span remainder = az_span_slice_start(destination, current_size);
   AZ_RETURN_IF_FAILED(az_span_copy(remainder, source, &remainder));
 
-  *out_span = az_span_init(
+  *out_span = _az_span_init_unchecked(
       az_span_ptr(destination),
       current_size + az_span_length(source),
       az_span_capacity(destination));
