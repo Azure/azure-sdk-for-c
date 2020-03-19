@@ -254,7 +254,7 @@ az_span get_key_version(az_http_response* response)
 
     if (az_span_ptr(k)[index] == '/')
     {
-      version = az_span_slice(k, index + 1, -1);
+      version = az_span_slice_start(k, index + 1);
       break;
     }
   }

@@ -133,13 +133,13 @@ AZ_NODISCARD az_result _az_span_reader_read_json_string_char(az_span* self, uint
     case '\\':
     {
       // moving reader fw
-      *self = az_span_slice(*self, 1, -1);
+      *self = az_span_slice_start(*self, 1);
       if (az_span_length(*self) == 0)
       {
         return AZ_ERROR_EOF;
       }
       uint8_t const c = az_span_ptr(*self)[0];
-      *self = az_span_slice(*self, 1, -1);
+      *self = az_span_slice_start(*self, 1);
 
       if (c == 'u')
       {
@@ -153,7 +153,7 @@ AZ_NODISCARD az_result _az_span_reader_read_json_string_char(az_span* self, uint
           }
           AZ_RETURN_IF_FAILED(az_hex_to_digit(az_span_ptr(*self)[0], &digit));
           r = (r << 4) + digit;
-          *self = az_span_slice(*self, 1, -1);
+          *self = az_span_slice_start(*self, 1);
         }
         *out = r;
       }
@@ -171,7 +171,7 @@ AZ_NODISCARD az_result _az_span_reader_read_json_string_char(az_span* self, uint
       {
         return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
       }
-      *self = az_span_slice(*self, 1, -1);
+      *self = az_span_slice_start(*self, 1);
       *out = (uint16_t)result;
       return AZ_OK;
     }

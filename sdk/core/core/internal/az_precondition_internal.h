@@ -42,7 +42,7 @@
 
 az_precondition_failed_fn az_precondition_failed_get_callback();
 
-#ifdef NO_PRECONDITION_CHECKING
+#ifndef NO_PRECONDITION_CHECKING
 #define AZ_PRECONDITION(condition)
 #else
 #define AZ_PRECONDITION(condition) \
@@ -56,6 +56,13 @@ az_precondition_failed_fn az_precondition_failed_get_callback();
 #endif
 
 #define AZ_PRECONDITION_RANGE(low, arg, max) AZ_PRECONDITION((low <= arg && arg <= max))
+
+/*
+* @brief This precondition is identical to AZ_PRECONDITION_RANGE but must only be called
+* with int32_t arguments since it uses the unsigned int32 range to reduce the number of checks needed.
+*/
+#define AZ_PRECONDITION_INT32_RANGE(low, arg, max) \
+  AZ_PRECONDITION((uint32_t)(arg - low) <= (uint32_t)(max - low))
 
 #define AZ_PRECONDITION_NOT_NULL(arg) AZ_PRECONDITION((arg != NULL))
 

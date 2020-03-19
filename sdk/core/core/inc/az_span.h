@@ -189,6 +189,17 @@ AZ_NODISCARD az_span az_span_from_str(char* str);
 AZ_NODISCARD az_span az_span_slice(az_span span, int32_t low_index, int32_t high_index);
 
 /**
+ * @brief az_span_slice_start returns a new az_span which is a sub-span of the specified span.
+ *
+ * @param[in] span The original az_span
+ * @param[in] low_index An index into the original az_span indicating where the returned az_span
+ * will start.
+ * @return An az_span (view) into a portion (from low_index to the capacity) of the original
+ * az_span.
+ */
+AZ_NODISCARD az_span az_span_slice_start(az_span span, int32_t low_index);
+
+/**
  * @brief az_span_is_content_equal returns `true` if the lengths and bytes referred by \p span1 and
  * \p span2 are identical.
  *

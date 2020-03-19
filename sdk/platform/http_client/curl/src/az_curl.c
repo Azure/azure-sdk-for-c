@@ -344,7 +344,7 @@ static int32_t _az_http_client_curl_upload_read_callback(
   // Update the userdata span
   //  ptr will point to remaining data to be copied
   //  length and capacity are set to the size of the remaining content
-  *upload_content = az_span_slice(*upload_content, dst_buffer_size, -1);
+  *upload_content = az_span_slice_start(*upload_content, dst_buffer_size);
 
   return size_of_copy;
 }

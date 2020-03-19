@@ -1,0 +1,6 @@
+// Hint files help the Visual Studio IDE interpret Visual C++ identifiers
+// such as names of functions and macros.
+// For more information see https://go.microsoft.com/fwlink/?linkid=865984
+
+// Workaround for https://developercommunity.visualstudio.com/content/problem/284851/msvc-nagging-about-adding-macros-to-hint-file-afte.html
+#define bool

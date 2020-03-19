@@ -20,8 +20,11 @@ enum
 
 AZ_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t length, int32_t capacity)
 {
-  AZ_PRECONDITION_RANGE(0, capacity, INT32_MAX);
-  AZ_PRECONDITION_RANGE(0, length, capacity);
+  // This precondition validates that:
+  //    0 <= capacity <= INT32_MAX
+  // And
+  //    0 <= length <= capacity
+  AZ_PRECONDITION(capacity >= 0 && (uint32_t)length <= (uint32_t)capacity);
 
   return (az_span){ ._internal = { .ptr = ptr, .length = length, .capacity = capacity, }, };
 }
@@ -36,13 +39,42 @@ AZ_NODISCARD az_span az_span_from_str(char* str)
 
 AZ_NODISCARD az_span az_span_slice(az_span span, int32_t low_index, int32_t high_index)
 {
-  AZ_PRECONDITION_RANGE(-1, high_index, az_span_capacity(span));
-  AZ_PRECONDITION(high_index == -1 || (high_index >= 0 && low_index <= high_index));
+  // The following set of preconditions validate that:
+  //    -1 <= high_index <= span.capacity
+  // And
+  //    If high_index == -1:
+  //        0 <= low_index <= span.capacity
+  //    Otherwise
+  //        0 <= low_index <= high_index
+  AZ_PRECONDITION_INT32_RANGE(-1, high_index, az_span_capacity(span));
+
+  // Do not reorder the OR conditions, since we are relying on short-circuiting
+  AZ_PRECONDITION(
+      (high_index == -1 && ((uint32_t)low_index <= (uint32_t)az_span_capacity(span)))
+      || ((uint32_t)low_index <= (uint32_t)high_index));
 
   int32_t const capacity = az_span_capacity(span);
 
   high_index = high_index == -1 ? capacity : high_index;
   return az_span_init(az_span_ptr(span) + low_index, high_index - low_index, capacity - low_index);
+}
+
+AZ_NODISCARD az_span az_span_slice_start(az_span span, int32_t low_index)
+{
+  AZ_PRECONDITION_INT32_RANGE(0, low_index, az_span_capacity(span));
+
+  int32_t const new_capacity = az_span_capacity(span) - low_index;
+
+  return az_span_init(az_span_ptr(span) + low_index, new_capacity, new_capacity);
+}
+
+AZ_NODISCARD az_span az_span_slice_start_end(az_span span, int32_t low_index, int32_t high_index)
+{
+  AZ_PRECONDITION_INT32_RANGE(0, high_index, az_span_capacity(span));
+  AZ_PRECONDITION_INT32_RANGE(0, low_index, high_index);
+
+  return az_span_init(
+      az_span_ptr(span) + low_index, high_index - low_index, az_span_capacity(span) - low_index);
 }
 
 AZ_NODISCARD AZ_INLINE uint8_t _az_tolower(uint8_t value)
@@ -232,7 +264,7 @@ AZ_NODISCARD az_result az_span_append(az_span destination, az_span source, az_sp
   AZ_PRECONDITION_NOT_NULL(out_span);
 
   int32_t const current_size = az_span_length(destination);
-  az_span remainder = az_span_slice(destination, current_size, -1);
+  az_span remainder = az_span_slice_start(destination, current_size);
   AZ_RETURN_IF_FAILED(az_span_copy(remainder, source, &remainder));
 
   *out_span = az_span_init(
@@ -303,7 +335,7 @@ AZ_NODISCARD az_result _az_span_replace(az_span* self, int32_t start, int32_t en
     // move content left or right so new span can be added
     AZ_RETURN_IF_FAILED(az_span_copy(dst, src, &dst));
     // add the new span
-    az_span copy = az_span_slice(*self, start, -1);
+    az_span copy = az_span_slice_start(*self, start);
     AZ_RETURN_IF_FAILED(az_span_copy(copy, span, &copy));
   }
 
@@ -496,7 +528,7 @@ AZ_NODISCARD az_result _az_is_expected_span(az_span* self, az_span expected)
     return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
   // move reader after the expected span (means it was parsed as expected)
-  *self = az_span_slice(*self, expected_length, -1);
+  *self = az_span_slice_start(*self, expected_length);
 
   return AZ_OK;
 }
@@ -507,7 +539,7 @@ AZ_NODISCARD az_result _az_scan_until(az_span self, _az_predicate predicate, int
 {
   for (int32_t index = 0; index < az_span_length(self); ++index)
   {
-    az_span s = az_span_slice(self, index, -1);
+    az_span s = az_span_slice_start(self, index);
     az_result predicate_result = predicate(s);
     switch (predicate_result)
     {
