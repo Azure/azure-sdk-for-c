@@ -139,7 +139,9 @@ AZ_NODISCARD az_result _az_span_reader_read_json_pointer_token_char(az_span* sel
   return AZ_OK;
 }
 
-AZ_NODISCARD bool az_json_pointer_token_eq_json_string(az_span pointer_token, az_span json_string)
+AZ_NODISCARD static bool az_json_pointer_token_eq_json_string(
+    az_span pointer_token,
+    az_span json_string)
 {
   while (true)
   {
@@ -162,7 +164,7 @@ AZ_NODISCARD bool az_json_pointer_token_eq_json_string(az_span pointer_token, az
   }
 }
 
-AZ_NODISCARD az_result az_json_parser_get_by_pointer_token(
+AZ_NODISCARD static az_result az_json_parser_get_by_pointer_token(
     az_json_parser* json_parser,
     az_span pointer_token,
     az_json_token* inout_token)
