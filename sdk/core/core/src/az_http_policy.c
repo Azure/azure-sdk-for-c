@@ -14,12 +14,12 @@ static const az_span AZ_HTTP_HEADER_USER_AGENT = AZ_SPAN_LITERAL_FROM_STR("User-
 
 AZ_NODISCARD az_result az_http_pipeline_policy_apiversion(
     _az_http_policy* p_policies,
-    void* p_options,
+    void* p_data,
     _az_http_request* p_request,
     az_http_response* p_response)
 {
 
-  _az_http_policy_apiversion_options* options = (_az_http_policy_apiversion_options*)(p_options);
+  _az_http_policy_apiversion_options* options = (_az_http_policy_apiversion_options*)(p_data);
 
   switch (options->_internal.option_location)
   {
