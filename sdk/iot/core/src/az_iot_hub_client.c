@@ -33,14 +33,7 @@ AZ_NODISCARD az_result az_iot_hub_client_init(
 
   client->_internal.iot_hub_hostname = iot_hub_hostname;
   client->_internal.device_id = device_id;
-  if (options == NULL)
-  {
-    client->_internal.options = az_iot_hub_client_options_default();
-  }
-  else
-  {
-    client->_internal.options = *options;
-  }
+  client->_internal.options = options == NULL ? az_iot_hub_client_options_default() : *options;
 
   return AZ_OK;
 }
