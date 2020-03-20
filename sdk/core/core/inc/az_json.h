@@ -37,9 +37,6 @@ typedef enum
   AZ_JSON_TOKEN_OBJECT_END,
   AZ_JSON_TOKEN_ARRAY_START,
   AZ_JSON_TOKEN_ARRAY_END,
-  // AZ_JSON_TOKEN_SPAN represents a token consisting of nested JSON; the JSON parser never returns
-  // a token of this type.
-  AZ_JSON_TOKEN_SPAN,
 } az_json_token_kind;
 
 /*
@@ -268,8 +265,8 @@ typedef struct
 } az_json_token_member;
 
 /*
- * @brief az_json_parser_init initializes an az_json_parser to parse the JSON payload contained within the passed in buffer.
- * JSON buffer.
+ * @brief az_json_parser_init initializes an az_json_parser to parse the JSON payload contained
+ * within the passed in buffer. JSON buffer.
  *
  * @param json_parser A pointer to an az_json_parser instance to initialize.
  * @param json_buffer A pointer to a buffer containing the JSON document to parse.

@@ -27,7 +27,7 @@ void test_json_builder(void** state)
     // 0___________________________________________________________________________________________________1
     // 0_________1_________2_________3_________4_________5_________6_________7_________8_________9_________0
     // 01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456
-    // {"name":true,"foo":["bar",null,0,-12],"int-max":9007199254740991,"esc":"_\"_\\_\b\f\n\r\t_","u":"a\u001Fb"}
+    // {"name":true,"foo":["bar",null,0,-12],"int-max":9007199254740991}
     TEST_EXPECT_SUCCESS(az_json_builder_append_token(&builder, az_json_token_object_start()));
 
     TEST_EXPECT_SUCCESS(az_json_builder_append_object(
@@ -47,17 +47,6 @@ void test_json_builder(void** state)
 
     TEST_EXPECT_SUCCESS(az_json_builder_append_object(
         &builder, AZ_SPAN_FROM_STR("int-max"), az_json_token_number(9007199254740991ull)));
-    TEST_EXPECT_SUCCESS(az_json_builder_append_object(
-        &builder,
-        AZ_SPAN_FROM_STR("esc"),
-        az_json_token_span(AZ_SPAN_FROM_STR("_\"_\\_\b\f\n\r\t_"))));
-    TEST_EXPECT_SUCCESS(az_json_builder_append_object(
-        &builder,
-        AZ_SPAN_FROM_STR("u"),
-        az_json_token_span(AZ_SPAN_FROM_STR( //
-            "a"
-            "\x1f"
-            "b"))));
 
     TEST_EXPECT_SUCCESS(az_json_builder_append_token(&builder, az_json_token_object_end()));
 
@@ -67,33 +56,8 @@ void test_json_builder(void** state)
             "{"
             "\"name\":true,"
             "\"foo\":[\"bar\",null,0,-12],"
-            "\"int-max\":9007199254740991,"
-            "\"esc\":\"_\\\"_\\\\_\\b\\f\\n\\r\\t_\","
-            "\"u\":\"a\\u001Fb\""
+            "\"int-max\":9007199254740991"
             "}")));
-  }
-  {
-    // json with AZ_JSON_TOKEN_SPAN
-    uint8_t array[200];
-    az_json_builder builder = { 0 };
-    TEST_EXPECT_SUCCESS(az_json_builder_init(&builder, AZ_SPAN_FROM_BUFFER(array)));
-
-    // this json { "span": "\" } would be scaped to { "span": "\\"" }
-    uint8_t single_char[1] = { '\\' }; // char = '\'
-    az_span single_span = AZ_SPAN_FROM_INITIALIZED_BUFFER(single_char);
-
-    TEST_EXPECT_SUCCESS(az_json_builder_append_token(&builder, az_json_token_object_start()));
-
-    TEST_EXPECT_SUCCESS(az_json_builder_append_object(
-        &builder, AZ_SPAN_FROM_STR("span"), az_json_token_span(single_span)));
-
-    TEST_EXPECT_SUCCESS(az_json_builder_append_token(&builder, az_json_token_object_end()));
-
-    az_span expected = AZ_SPAN_FROM_STR("{"
-                                        "\"span\":\"\\\\\""
-                                        "}");
-
-    assert_true(az_span_is_content_equal(builder._internal.json, expected));
   }
   {
     // json with AZ_JSON_TOKEN_STRING
