@@ -55,7 +55,10 @@ AZ_NODISCARD AZ_INLINE az_span az_keyvault_client_constant_for_application_json(
 AZ_NODISCARD az_keyvault_keys_client_options az_keyvault_keys_client_options_default()
 {
   az_keyvault_keys_client_options options = (az_keyvault_keys_client_options){
-    ._internal = { .api_version = _az_http_policy_apiversion_options_default(), },
+    ._internal = {
+      .api_version = _az_http_policy_apiversion_options_default(),
+      ._telemetry_options = _az_http_policy_telemetry_options_default(),
+    },
     .retry = _az_http_policy_retry_options_default(),
   };
 
@@ -67,8 +70,6 @@ AZ_NODISCARD az_keyvault_keys_client_options az_keyvault_keys_client_options_def
   options.retry.max_retries = 3;
   options.retry.retry_delay_msec = 1 * _az_TIME_MILLISECONDS_PER_SECOND;
   options.retry.max_retry_delay_msec = 30 * _az_TIME_MILLISECONDS_PER_SECOND;
-
-  options._internal._telemetry_options = _az_http_policy_telemetry_options_default();
 
   return options;
 }
