@@ -230,13 +230,14 @@ AZ_NODISCARD az_result az_span_append(az_span destination, az_span source, az_sp
   int32_t const dest_length = az_span_length(destination);
   int32_t const dest_capacity = az_span_capacity(destination);
   int32_t const src_length = az_span_length(source);
-  if ((dest_capacity - dest_length) < src_length)
+  int32_t const dest_length_after_appending = dest_length + src_length;
+  if (dest_length_after_appending > dest_capacity)
   {
     return AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY;
   }
   uint8_t* ptr = az_span_ptr(destination);
   memmove((void*)(&ptr[dest_length]), (void const*)az_span_ptr(source), (size_t)src_length);
-  *out_span = az_span_init(ptr, dest_length + src_length, dest_capacity);
+  *out_span = az_span_init(ptr, dest_length_after_appending, dest_capacity);
   return AZ_OK;
 }
 
