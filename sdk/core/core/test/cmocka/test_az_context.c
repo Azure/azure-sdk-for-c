@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include "az_test_definitions.h"
 #include <az_context.h>
 #include <az_result.h>
 
