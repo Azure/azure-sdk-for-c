@@ -68,6 +68,8 @@ AZ_NODISCARD az_keyvault_keys_client_options az_keyvault_keys_client_options_def
   options.retry.retry_delay_msec = 1 * _az_TIME_MILLISECONDS_PER_SECOND;
   options.retry.max_retry_delay_msec = 30 * _az_TIME_MILLISECONDS_PER_SECOND;
 
+  options._internal._telemetry_options = _az_http_policy_telemetry_options_default();
+
   return options;
 }
 
