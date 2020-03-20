@@ -1,9 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include "az_http_private.h"
 #include "az_test_definitions.h"
 #include <az_aad_private.h>
+#include <az_context.h>
 #include <az_credentials.h>
+#include <az_http.h>
+#include <az_http_internal.h>
 #include <az_span.h>
 
 #include <setjmp.h>
@@ -63,6 +67,19 @@ static void test_az_aad_request_token()
   // Calling az_aad_request_token(_az_http_request* ref_request, _az_token* out_token);
   _az_token t = { 0 };
   _az_http_request r = { 0 };
+
+  uint8_t headers[400];
+  uint8_t body[400];
+  assert_return_code(
+      az_http_request_init(
+          &r,
+          &az_context_app,
+          az_http_method_get(),
+          AZ_SPAN_FROM_STR("url"),
+          AZ_SPAN_FROM_BUFFER(headers),
+          AZ_SPAN_FROM_BUFFER(body)),
+      AZ_OK);
+
   will_return(__wrap_az_platform_clock_msec, 0);
   assert_return_code(_az_aad_request_token(&r, &t), AZ_OK);
   assert_string_equal(t._internal.token, "Bearer fakeToken");
