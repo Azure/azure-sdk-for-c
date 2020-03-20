@@ -340,7 +340,7 @@ static void test_az_iot_hub_client_properties_append_small_buffer_fail(void** st
   assert_int_equal(
       az_iot_hub_client_properties_append(&props, test_key_one, test_value_one),
       AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY);
-  assert_int_equal(az_span_length(props._internal.properties), 0);
+  assert_int_equal(az_span_length(props.properties), 0);
 }
 
 static void test_az_iot_hub_client_properties_append_twice_succeed(void** state)
@@ -375,7 +375,7 @@ static void test_az_iot_hub_client_properties_append_twice_small_buffer_fail(voi
       az_iot_hub_client_properties_append(&props, test_key_two, test_value_two),
       AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY);
   assert_int_equal(
-      az_span_length(props._internal.properties), sizeof(test_correct_one_key_value) - 1);
+      az_span_length(props.properties), sizeof(test_correct_one_key_value) - 1);
 }
 
 int test_iot_hub_client()

@@ -38,8 +38,8 @@
   }
 
 static const az_iot_hub_client_properties g_test_params
-    = { ._internal
-        = { .properties = AZ_SPAN_LITERAL_FROM_STR(TEST_PARAMS), .current_property = 0 } };
+    = { .properties = AZ_SPAN_LITERAL_FROM_STR(TEST_PARAMS),
+        ._internal = { .current_property = 0 } };
 
 static const char g_test_correct_topic_no_options_no_params[]
     = "devices/my_device/messages/events/";

@@ -167,9 +167,9 @@ AZ_NODISCARD az_result az_iot_hub_client_sas_password_get(
  */
 typedef struct az_iot_hub_client_properties
 {
+  az_span properties;
   struct
   {
-    az_span properties;
     uint8_t* current_property;
   } _internal;
 } az_iot_hub_client_properties;

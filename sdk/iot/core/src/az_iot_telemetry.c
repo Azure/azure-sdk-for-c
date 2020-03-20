@@ -45,7 +45,7 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_publish_topic_get(
     AZ_RETURN_IF_FAILED(
         az_span_append_uint8(*out_mqtt_topic, telemetry_prop_delim, out_mqtt_topic));
     AZ_RETURN_IF_FAILED(
-        az_span_append(*out_mqtt_topic, properties->_internal.properties, out_mqtt_topic));
+        az_span_append(*out_mqtt_topic, properties->properties, out_mqtt_topic));
   }
 
   return AZ_OK;
