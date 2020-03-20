@@ -105,8 +105,8 @@ static az_result _az_http_policy_logging_append_http_response_msg(
 
   az_http_response_status_line status_line = { 0 };
   AZ_RETURN_IF_FAILED(az_http_response_get_status_line(ref_response, &status_line));
-
-  AZ_RETURN_IF_FAILED(az_span_append_u64toa(*ref_log_msg, (uint64_t)status_line.status_code, ref_log_msg));
+  AZ_RETURN_IF_FAILED(
+      az_span_append_u64toa(*ref_log_msg, (uint64_t)status_line.status_code, ref_log_msg));
 
   AZ_RETURN_IF_FAILED(az_span_append(*ref_log_msg, AZ_SPAN_FROM_STR(" "), ref_log_msg));
   AZ_RETURN_IF_FAILED(az_span_append(*ref_log_msg, status_line.reason_phrase, ref_log_msg));
@@ -135,7 +135,9 @@ void _az_http_policy_logging_log_http_request(_az_http_request const* request)
 {
   uint8_t log_msg_buf[AZ_LOG_MSG_BUF_SIZE] = { 0 };
   az_span log_msg = AZ_SPAN_FROM_BUFFER(log_msg_buf);
+
   (void)_az_http_policy_logging_append_http_request_msg(request, &log_msg);
+
   az_log_write(AZ_LOG_HTTP_REQUEST, log_msg);
 }
 
@@ -148,6 +150,7 @@ void _az_http_policy_logging_log_http_response(
   az_span log_msg = AZ_SPAN_FROM_BUFFER(log_msg_buf);
 
   az_http_response response_copy = *response;
+
   (void)_az_http_policy_logging_append_http_response_msg(
       &response_copy, duration_msec, request, &log_msg);
 
@@ -155,29 +158,29 @@ void _az_http_policy_logging_log_http_response(
 }
 
 AZ_NODISCARD az_result az_http_pipeline_policy_logging(
-    _az_http_policy* policies,
-    void* options,
-    _az_http_request* ref_request,
-    az_http_response* ref_response)
+    _az_http_policy* p_policies,
+    void* p_data,
+    _az_http_request* p_request,
+    az_http_response* p_response)
 {
-  (void)options;
+  (void)p_data;
 
   if (az_log_should_write(AZ_LOG_HTTP_REQUEST))
   {
-    _az_http_policy_logging_log_http_request(ref_request);
+    _az_http_policy_logging_log_http_request(p_request);
   }
 
   if (!az_log_should_write(AZ_LOG_HTTP_RESPONSE))
   {
     // If no logging is needed, do not even measure the response time.
-    return az_http_pipeline_nextpolicy(policies, ref_request, ref_response);
+    return az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
   }
 
   int64_t const start = az_platform_clock_msec();
-  az_result const result = az_http_pipeline_nextpolicy(policies, ref_request, ref_response);
+  az_result const result = az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
   int64_t const end = az_platform_clock_msec();
 
-  _az_http_policy_logging_log_http_response(ref_response, end - start, ref_request);
+  _az_http_policy_logging_log_http_response(p_response, end - start, p_request);
 
   return result;
 }

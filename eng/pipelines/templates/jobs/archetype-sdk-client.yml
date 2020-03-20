@@ -25,7 +25,7 @@ jobs:
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: x64
       MacOS_x64:
-       vm.image: 'macOS-10.14'
+       vm.image: 'macOS-10.15'
        vcpkg.deps: ''
        VCPKG_DEFAULT_TRIPLET: 'x64-osx'
 
@@ -50,10 +50,10 @@ jobs:
         CMAKE_GENERATOR_PLATFORM: x64
         build.args: ' -DBUILD_CURL_TRANSPORT=ON -DAZ_PLATFORM_IMPL=WIN32'
       MacOS_x64_with_samples:
-       vm.image: 'macOS-10.14'
-       vcpkg.deps: 'curl[ssl]'
-       VCPKG_DEFAULT_TRIPLET: 'x64-osx'
-       build.args: ' -DBUILD_CURL_TRANSPORT=ON -DAZ_PLATFORM_IMPL=POSIX'
+        vm.image: 'macOS-10.15'
+        vcpkg.deps: 'curl[ssl]'
+        VCPKG_DEFAULT_TRIPLET: 'x64-osx'
+        build.args: ' -DBUILD_CURL_TRANSPORT=ON -DAZ_PLATFORM_IMPL=POSIX'
 
       # Build with sample dependencies and unit testing [curl for transport and cmoka]
       Linux_x64_with_samples_and_unit_test:
@@ -76,10 +76,10 @@ jobs:
         CMAKE_GENERATOR_PLATFORM: x64
         build.args: ' -DBUILD_CURL_TRANSPORT=ON -DAZ_PLATFORM_IMPL=WIN32 -DUNIT_TESTING=ON'
       MacOS_x64_with_samples_and_unit_test:
-       vm.image: 'macOS-10.14'
-       vcpkg.deps: 'curl[ssl] cmocka'
-       VCPKG_DEFAULT_TRIPLET: 'x64-osx'
-       build.args: ' -DBUILD_CURL_TRANSPORT=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON'
+        vm.image: 'macOS-10.15'
+        vcpkg.deps: 'curl[ssl] cmocka'
+        VCPKG_DEFAULT_TRIPLET: 'x64-osx'
+        build.args: ' -DBUILD_CURL_TRANSPORT=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON'
 
       # Build with unit testing only. No samples [cmoka]
       Linux_x64_with_unit_test:
@@ -104,10 +104,10 @@ jobs:
         CMAKE_GENERATOR_PLATFORM: x64
         build.args: ' -DUNIT_TESTING=ON'
       MacOS_x64_with_unit_test:
-       vm.image: 'macOS-10.14'
-       vcpkg.deps: 'cmocka'
-       VCPKG_DEFAULT_TRIPLET: 'x64-osx'
-       build.args: ' -DUNIT_TESTING=ON'
+        vm.image: 'macOS-10.15'
+        vcpkg.deps: 'cmocka'
+        VCPKG_DEFAULT_TRIPLET: 'x64-osx'
+        build.args: ' -DUNIT_TESTING=ON'
   pool:
     vmImage: $(vm.image)
   variables:
@@ -251,9 +251,12 @@ jobs:
               path: $(Build.ArtifactStagingDirectory)/packages
 
       # Generate Documentation
-      - pwsh: >-
-          choco install doxygen.install
-        displayName: Install Doxygen
+      - pwsh: |
+          $setupFile="doxygen-1.8.15-setup.exe";
+          Invoke-WebRequest -MaximumRetryCount 10 -Uri "https://azuresdktooling.blob.core.windows.net/dependencies/doxygen-1.8.15-setup.exe" `
+          -OutFile $setupFile | Wait-Process; Start-Process -Filepath .\$setupFile -ArgumentList @("/VERYSILENT") -Wait
+        workingDirectory: $(Agent.TempDirectory)
+        displayName: Download and Install Doxygen
 
       - ${{ each artifact in parameters.Artifacts }}:
         - pwsh: Write-Host "##vso[task.setvariable variable=PackageVersion]$(Get-Content .\sdk\${{ parameters.ServiceDirectory }}\${{ artifact.Path }}\version.txt)"

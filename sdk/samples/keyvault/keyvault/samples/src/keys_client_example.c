@@ -67,8 +67,6 @@ int main()
   az_keyvault_create_key_options key_options = { 0 };
 
   // override options values
-  key_options.enabled = az_optional_bool_create(false);
-  // buffer for operations
   key_options.operations = (az_span[]){ az_keyvault_key_operation_sign(), AZ_SPAN_NULL };
 
   // buffer for tags   ->  adding tags
@@ -242,7 +240,7 @@ az_span get_key_version(az_http_response* response)
   }
 
   az_span k = { 0 };
-  r = az_json_token_get_string(value, &k);
+  r = az_json_token_get_string(&value, &k);
   if (az_failed(r))
   {
     return AZ_SPAN_NULL;

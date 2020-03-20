@@ -3,6 +3,7 @@
 
 #include <az_iot_sas_token.h>
 #include <az_precondition.h>
+#include <az_precondition_internal.h>
 #include <az_span.h>
 
 #include <stdint.h>
