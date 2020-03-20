@@ -1,6 +1,6 @@
-# Azure IoT SDK for Embedded C
+# Azure IoT Clients for Embedded C
 
-Official Embedded C libraries for Azure IoT.
+Official Embedded C clients for Azure IoT Hub and Device Provisioning Service.
 
 ## Getting started
 
@@ -17,7 +17,7 @@ TBD
 To use IoT Hub connectivity, the first action by a developer should be to initialize the
 client with the `az_iot_hub_client_init()` API. Once that is initialized, you may use the
 `az_iot_hub_client_user_name_get()` and `az_iot_hub_client_client_id_get()` to get the
-user name and client id to establish a connection with IoT Hub. 
+user name and client id to establish a connection with IoT Hub.
 
 An example use case is below.
 
@@ -121,11 +121,13 @@ void my_telemetry_func()
 ```
 
 ## Need help?
+
 * File an issue via [Github Issues](https://github.com/Azure/azure-sdk-for-c/issues/new/choose).
 * Check [previous questions](https://stackoverflow.com/questions/tagged/azure+c) or ask new ones on StackOverflow using
   the `azure` and `c` tags.
 
 ## Contributing
+
 For details on contributing to this repository, see the [contributing guide](https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md).
 
 This project welcomes contributions and suggestions. Most contributions require you to agree to a Contributor License
@@ -140,8 +142,8 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact
 [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
+### Additional Helpful Links for Contributors
 
-### Additional Helpful Links for Contributors  
 Many people all over the world have helped make this project better.  You'll want to check out:
 
 * [What are some good first issues for new contributors to the repo?](https://github.com/azure/azure-sdk-for-c/issues?q=is%3Aopen+is%3Aissue+label%3A%22up+for+grabs%22)

@@ -84,13 +84,13 @@ AZ_NODISCARD az_result _az_aad_build_body(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result _az_aad_request_token(_az_http_request* ref_request, _az_token* out_token)
+AZ_NODISCARD az_result _az_aad_request_token(_az_http_request* request, _az_token* out_token)
 {
   // FIXME: If you uncomment the line below, we'll start getting HTTP 400 Bad Request instead of 200
   // OK. I suspect, it is because there's a bug in the code that adds headers. Could be something
   // else, of course.
   /*AZ_RETURN_IF_FAILED(az_http_request_append_header(
-      ref_request,
+      request,
       AZ_SPAN_FROM_STR("Content-Type"),
       AZ_SPAN_FROM_STR("application/x-www-url-form-urlencoded")));*/
 
@@ -115,7 +115,7 @@ AZ_NODISCARD az_result _az_aad_request_token(_az_http_request* ref_request, _az_
     },
   };
 
-  AZ_RETURN_IF_FAILED(az_http_pipeline_process(&pipeline, ref_request, &response));
+  AZ_RETURN_IF_FAILED(az_http_pipeline_process(&pipeline, request, &response));
 
   // If we failed to get the token, we return failure/
   az_http_response_status_line status_line = { 0 };
@@ -134,7 +134,7 @@ AZ_NODISCARD az_result _az_aad_request_token(_az_http_request* ref_request, _az_
   AZ_RETURN_IF_FAILED(az_json_parse_by_pointer(body, AZ_SPAN_FROM_STR("/expires_in"), &json_token));
 
   double expires_in_seconds = 0;
-  AZ_RETURN_IF_FAILED(az_json_token_get_number(json_token, &expires_in_seconds));
+  AZ_RETURN_IF_FAILED(az_json_token_get_number(&json_token, &expires_in_seconds));
 
   // We'll assume the token expires 3 minutes prior to its actual expiration.
   int64_t const expires_in_msec
@@ -146,7 +146,7 @@ AZ_NODISCARD az_result _az_aad_request_token(_az_http_request* ref_request, _az_
       az_json_parse_by_pointer(body, AZ_SPAN_FROM_STR("/access_token"), &json_token));
 
   az_span access_token = { 0 };
-  AZ_RETURN_IF_FAILED(az_json_token_get_string(json_token, &access_token));
+  AZ_RETURN_IF_FAILED(az_json_token_get_string(&json_token, &access_token));
 
   _az_token new_token = {
     ._internal = {

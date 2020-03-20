@@ -158,29 +158,29 @@ void _az_http_policy_logging_log_http_response(
 }
 
 AZ_NODISCARD az_result az_http_pipeline_policy_logging(
-    _az_http_policy* policies,
-    void* options,
-    _az_http_request* ref_request,
-    az_http_response* ref_response)
+    _az_http_policy* p_policies,
+    void* p_data,
+    _az_http_request* p_request,
+    az_http_response* p_response)
 {
-  (void)options;
+  (void)p_data;
 
   if (az_log_should_write(AZ_LOG_HTTP_REQUEST))
   {
-    _az_http_policy_logging_log_http_request(ref_request);
+    _az_http_policy_logging_log_http_request(p_request);
   }
 
   if (!az_log_should_write(AZ_LOG_HTTP_RESPONSE))
   {
     // If no logging is needed, do not even measure the response time.
-    return az_http_pipeline_nextpolicy(policies, ref_request, ref_response);
+    return az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
   }
 
   int64_t const start = az_platform_clock_msec();
-  az_result const result = az_http_pipeline_nextpolicy(policies, ref_request, ref_response);
+  az_result const result = az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
   int64_t const end = az_platform_clock_msec();
 
-  _az_http_policy_logging_log_http_response(ref_response, end - start, ref_request);
+  _az_http_policy_logging_log_http_response(p_response, end - start, p_request);
 
   return result;
 }

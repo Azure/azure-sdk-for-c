@@ -4,7 +4,7 @@
 /**
  * @file az_iot_provisioning_client.h
  *
- * @brief definition for the Azure Device Provisioning Service device SDK.
+ * @brief definition for the Azure Device Provisioning client.
  */
 
 #ifndef _az_IOT_PROVISIONING_CLIENT_H
@@ -12,6 +12,7 @@
 
 #include <az_result.h>
 #include <az_span.h>
+#include <az_iot_common.h>
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -159,53 +160,6 @@ AZ_NODISCARD az_result az_iot_hub_client_sas_password_get(
  */
 
 /**
- * @brief Azure IoT Provisioning status codes.
- *
- */
-typedef enum
-{
-  // Service success codes
-  AZ_IOT_PROVISIONING_CLIENT_STATUS_OK = 200,
-  AZ_IOT_PROVISIONING_CLIENT_STATUS_ACCEPTED = 202,
-  AZ_IOT_PROVISIONING_CLIENT_STATUS_NO_CONTENT = 204,
-
-  // Service error codes
-  AZ_IOT_PROVISIONING_CLIENT_STATUS_BAD_REQUEST = 400,
-  AZ_IOT_PROVISIONING_CLIENT_STATUS_UNAUTHORIZED = 401,
-  AZ_IOT_PROVISIONING_CLIENT_STATUS_FORBIDDEN = 403,
-  AZ_IOT_PROVISIONING_CLIENT_STATUS_NOT_FOUND = 404,
-  AZ_IOT_PROVISIONING_CLIENT_STATUS_NOT_ALLOWED = 405,
-  AZ_IOT_PROVISIONING_CLIENT_STATUS_NOT_CONFLICT = 409,
-  AZ_IOT_PROVISIONING_CLIENT_STATUS_PRECONDITION_FAILED = 412,
-  AZ_IOT_PROVISIONING_CLIENT_STATUS_REQUEST_TOO_LARGE = 413,
-  AZ_IOT_PROVISIONING_CLIENT_STATUS_UNSUPPORTED_TYPE = 415,
-  AZ_IOT_PROVISIONING_CLIENT_STATUS_THROTTLED = 429,
-  AZ_IOT_PROVISIONING_CLIENT_STATUS_CLIENT_CLOSED = 499,
-  AZ_IOT_PROVISIONING_CLIENT_STATUS_SERVER_ERROR = 500,
-  AZ_IOT_PROVISIONING_CLIENT_STATUS_BAD_GATEWAY = 502,
-  AZ_IOT_PROVISIONING_CLIENT_STATUS_SERVICE_UNAVAILABLE = 503,
-  AZ_IOT_PROVISIONING_CLIENT_STATUS_TIMEOUT = 504,
-} az_iot_provisioning_client_status;
-
-/**
- * @brief Checks if the status indicates a successful operation.
- *
- * @param status The #az_iot_hub_client_status to verify.
- * @return True if the status indicates success. False otherwise.
- */
-AZ_NODISCARD bool az_iot_provisioning_client_is_success_status(
-    az_iot_provisioning_client_status status);
-
-/**
- * @brief Checks if the status indicates a retriable error occurred during the operation.
- *
- * @param[in] status The #az_iot_hub_client_status to verify.
- * @return True if the operation should be retried. False otherwise.
- */
-AZ_NODISCARD bool az_iot_provisioning_client_is_retriable_status(
-    az_iot_provisioning_client_status status);
-
-/**
  * @brief Gets the MQTT topic filter to subscribe to register responses.
  *
  * @param[in] client The #az_iot_provisioning_client to use for this call.
@@ -230,7 +184,7 @@ typedef struct az_iot_provisioning_client_registration_state
                                     available if error_code is success. */
   az_span device_id; /**< Assigned device ID. */
   az_span json_payload; /**< Additional JSON payload. */
-  az_iot_provisioning_client_status error_code; /**< The register operation status. */
+  az_iot_status error_code; /**< The register operation status. */
   uint32_t extended_error_code; /**< The extended, 6 digit error code. */
   az_span error_message; /**< Error description. */
 } az_iot_provisioning_client_registration_state;
@@ -241,7 +195,7 @@ typedef struct az_iot_provisioning_client_registration_state
  */
 typedef struct az_iot_provisioning_client_register_response
 {
-  az_iot_provisioning_client_status status; /**< The current request status.
+  az_iot_status status; /**< The current request status.
                                              * @note The response for the register operation is
                                              * available through #registration_state only. */
   az_span request_id; /**< Request ID for the register operation.
