@@ -16,6 +16,103 @@ $search
 $mathjax
 <link href="$relpath^$stylesheet" rel="stylesheet" type="text/css" />
 $extrastylesheet
+
+
+<script>
+WINDOW_CONTENTS = window.location.href.split("/");
+
+// language specific
+SELECTED_LANGUAGE = "c";
+populateOptions("#versionSelector", [
+  "#versionSelector",
+  "#versionSelectorHeader"
+]);
+
+function currentVersion() {
+  // Filled in by Doxygen template
+  return "$projectnumber";
+}
+
+function currentPackage() {
+  // Filled in by Doxygen template
+  return "$projectname";
+}
+
+function httpGetAsync(targetUrl, callback) {
+  var xmlHttp = new XMLHttpRequest();
+  xmlHttp.onreadystatechange = function() {
+    if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+      callback(xmlHttp.responseText);
+  };
+  xmlHttp.open("GET", targetUrl, true); // true for asynchronous
+  xmlHttp.send(null);
+}
+
+function showSelectors(selectors) {
+  selectors.forEach(function(item, index) {
+    $(item).show();
+  });
+}
+
+function hideSelectors(selectors) {
+  selectors.forEach(function(item, index) {
+    $(item).hide();
+  });
+}
+
+function populateOptions(optionSelector, otherSelectors) {
+  if (currentPackage()) {
+    var versionRequestUrl =
+      "https://azuresdkdocs.blob.core.windows.net/$web/" +
+      SELECTED_LANGUAGE +
+      "/" +
+      currentPackage() +
+      "/versioning/versions";
+
+    httpGetAsync(versionRequestUrl, function(responseText) {
+      if (responseText) {
+        let options = responseText.match(/[^\r\n]+/g);
+
+        populateVersionDropDown(optionSelector, options);
+        showSelectors(otherSelectors);
+
+        $(optionSelector).change(function() {
+          targetVersion = $(this).val();
+
+          url = WINDOW_CONTENTS.slice();
+          url[6] = targetVersion;
+          window.location.href = url.join("/");
+        });
+      }
+    });
+  }
+}
+
+function populateVersionDropDown(selector, values) {
+  var select = $(selector);
+
+  $("option", select).remove();
+
+  $.each(values, function(index, text) {
+    $("<option/>", { value: text, text: text }).appendTo(select);
+  });
+  select.val(currentVersion());
+}
+
+function getPackageUrl(language, package, version) {
+  return (
+    "https://azuresdkdocs.blob.core.windows.net/$web/" +
+    language +
+    "/" +
+    package +
+    "/" +
+    version +
+    "/index.html"
+  );
+}
+
+</script>
+
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -60,7 +157,17 @@ $extrastylesheet
 
     Azure SDK for Embedded C - $projectname
 
-    <!--BEGIN PROJECT_NUMBER-->&#160;<span id="projectnumber">$projectnumber</span><!--END PROJECT_NUMBER-->
+    <!--BEGIN PROJECT_NUMBER-->
+        <span id="projectnumber">
+            <span id="versionSelectorHeader">
+                <span>
+                    <select id="versionSelector">
+                        <option>$projectnumber</option>
+                    </select>
+                </span>
+            </span>
+        </span>
+    <!--END PROJECT_NUMBER-->
    </div>
    <!--BEGIN PROJECT_BRIEF--><div id="projectbrief">$projectbrief</div><!--END PROJECT_BRIEF-->
   </td>
@@ -68,7 +175,7 @@ $extrastylesheet
   <!--BEGIN !PROJECT_NAME-->
    <!--BEGIN PROJECT_BRIEF-->
     <td style="padding-left: 0.5em;">
-    <div id="projectbrief">$projectbrief</div>
+        <div id="projectbrief">$projectbrief</div>
     </td>
    <!--END PROJECT_BRIEF-->
   <!--END !PROJECT_NAME-->

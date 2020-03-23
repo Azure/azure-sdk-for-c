@@ -88,15 +88,20 @@ az_json_builder_append_token(az_json_builder* json_builder, az_json_token token)
           token._internal.boolean ? AZ_SPAN_FROM_STR("true") : AZ_SPAN_FROM_STR("false"),
           json);
     }
+    case AZ_JSON_TOKEN_NUMBER:
+    {
+      json_builder->_internal.need_comma = true;
+      return az_span_append_dtoa(*json, token._internal.number, json);
+    }
     case AZ_JSON_TOKEN_STRING:
     {
       json_builder->_internal.need_comma = true;
       return az_json_builder_append_str(json_builder, token._internal.string);
     }
-    case AZ_JSON_TOKEN_NUMBER:
+    case AZ_JSON_TOKEN_OBJECT:
     {
-      json_builder->_internal.need_comma = true;
-      return az_span_append_dtoa(*json, token._internal.number, json);
+      json_builder->_internal.need_comma = false;
+      return az_span_append(*json, token._internal.span, json);
     }
     case AZ_JSON_TOKEN_OBJECT_START:
     {
