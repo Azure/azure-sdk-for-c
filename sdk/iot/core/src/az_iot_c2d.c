@@ -12,7 +12,8 @@
 
 static const uint8_t c2d_null_terminator = '\0';
 static const az_span c2d_topic_prefix = AZ_SPAN_LITERAL_FROM_STR("devices/");
-static const az_span c2d_topic_suffix = AZ_SPAN_LITERAL_FROM_STR("/messages/devicebound/#");
+static const az_span c2d_topic_suffix = AZ_SPAN_LITERAL_FROM_STR("/messages/devicebound/");
+static const az_span hash_tag = AZ_SPAN_LITERAL_FROM_STR("#");
 
 AZ_NODISCARD az_result az_iot_hub_client_c2d_subscribe_topic_filter_get(
     az_iot_hub_client const* client,
@@ -29,6 +30,8 @@ AZ_NODISCARD az_result az_iot_hub_client_c2d_subscribe_topic_filter_get(
   AZ_RETURN_IF_FAILED(
       az_span_append(*out_mqtt_topic_filter, c2d_topic_suffix, out_mqtt_topic_filter));
   AZ_RETURN_IF_FAILED(
+      az_span_append(*out_mqtt_topic_filter, hash_tag, out_mqtt_topic_filter));
+  AZ_RETURN_IF_FAILED(
       az_span_append_uint8(*out_mqtt_topic_filter, c2d_null_terminator, out_mqtt_topic_filter));
 
   return AZ_OK;
@@ -39,8 +42,14 @@ AZ_NODISCARD az_result az_iot_hub_client_c2d_received_topic_parse(
     az_span received_topic,
     az_iot_hub_client_c2d_request* out_request)
 {
-  (void)client;
-  (void)received_topic;
-  (void)out_request;
+  AZ_PRECONDITION_NOT_NULL(client);
+  AZ_PRECONDITION_VALID_SPAN(received_topic, 1, false);
+  AZ_PRECONDITION_NOT_NULL(out_request);
+
+  az_span token;
+  AZ_RETURN_IF_FAILED(az_span_token_next(received_topic, c2d_topic_suffix, &token, &received_topic));
+  AZ_RETURN_IF_FAILED(az_span_token_next(received_topic, c2d_topic_suffix, &token, &received_topic));
+  AZ_RETURN_IF_FAILED(az_iot_hub_client_properties_init(&out_request->properties, token));
+
   return AZ_OK;
 }

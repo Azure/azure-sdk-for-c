@@ -129,6 +129,82 @@ AZ_NODISCARD az_result az_span_to_uint32(az_span span, uint32_t* out_number)
   return AZ_OK;
 }
 
+AZ_NODISCARD az_result az_span_find(az_span span, az_span target, az_span* out_span)
+{
+  AZ_PRECONDITION_VALID_SPAN(span, 1, false);
+  AZ_PRECONDITION_VALID_SPAN(target, 1, false);
+  AZ_PRECONDITION_NOT_NULL(out_span);
+
+  uint8_t* span_ptr = az_span_ptr(span);
+  int32_t span_length = az_span_length(span);
+  uint8_t* target_ptr = az_span_ptr(target);
+  int32_t target_length = az_span_length(target);
+
+  for (int i = 0; i < span_length; i++)
+  {
+    if (span_ptr[i] == target_ptr[0])
+    {
+      int j;
+      for (j = 1; j < target_length; j++)
+      {
+        if (span_ptr[i + j] != target_ptr[j])
+        {
+            break;
+        }
+      }
+
+      if (j == target_length)
+      {
+        out_span->_internal.ptr = span_ptr + i;
+        out_span->_internal.length = target_length;
+        out_span->_internal.capacity = target_length;
+
+        return AZ_OK;
+      }
+    }
+  }
+
+  return AZ_ERROR_EOF;
+}
+
+AZ_NODISCARD az_result az_span_token_next(az_span span, az_span delim, az_span* token, az_span* out_span)
+{
+  AZ_PRECONDITION_VALID_SPAN(span, 1, false);
+  AZ_PRECONDITION_VALID_SPAN(delim, 1, false);
+  AZ_PRECONDITION_NOT_NULL(token);
+  AZ_PRECONDITION_NOT_NULL(out_span);
+
+  az_span instance;
+
+  token->_internal.ptr = span._internal.ptr;
+
+  if (az_span_find(span, delim, &instance) == AZ_OK)
+  {
+    uint8_t* instance_ptr = az_span_ptr(instance);
+    int32_t instance_length = az_span_length(instance);
+
+    token->_internal.length = (int32_t)(instance._internal.ptr - span._internal.ptr);
+    token->_internal.capacity = token->_internal.length;
+
+    out_span->_internal.ptr = instance._internal.ptr + instance._internal.length;
+    out_span->_internal.length = (int32_t)(span._internal.length - instance_length - (instance_ptr - span._internal.ptr));
+    out_span->_internal.capacity = (int32_t)(span._internal.capacity - instance_length - (instance_ptr - span._internal.ptr));
+  }
+  else
+  {
+    token->_internal.length = span._internal.length;
+    token->_internal.capacity = span._internal.length;
+
+    out_span->_internal.ptr = NULL;
+    out_span->_internal.length = 0;
+    out_span->_internal.capacity = 0;
+  }
+
+  return AZ_OK;
+}
+
+
+
 AZ_NODISCARD az_result az_span_copy(az_span destination, az_span source, az_span* out_span)
 {
   AZ_PRECONDITION_NOT_NULL(out_span);

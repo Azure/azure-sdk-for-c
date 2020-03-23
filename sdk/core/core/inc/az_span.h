@@ -260,6 +260,10 @@ AZ_NODISCARD az_result az_span_to_uint64(az_span span, uint64_t* out_number);
  */
 AZ_NODISCARD az_result az_span_to_uint32(az_span span, uint32_t* out_number);
 
+AZ_NODISCARD az_result az_span_find(az_span span, az_span target, az_span* out_span);
+
+AZ_NODISCARD az_result az_span_token_next(az_span span, az_span delim, az_span* token, az_span* out_span);
+
 /******************************  SPAN APPENDING */
 
 /**
