@@ -41,7 +41,7 @@ typedef struct az_iot_pnp_client
   struct
   {
     az_iot_hub_client iot_hub_client;
-	az_span root_interface_name;
+    az_span root_interface_name;
   } _internal;
 } az_iot_pnp_client;
 
@@ -62,7 +62,7 @@ AZ_NODISCARD az_iot_pnp_client_options az_iot_pnp_client_options_default();
  * @param[in] device_id The Device ID.
  * @param[in] root_interface_name The root interface of the #az_iot_pnp_client.
  * @param[in] options A reference to an #az_iot_pnp_client_options structure. Can be NULL.
- * @return #az_result.
+ * @return #az_result
  */
 AZ_NODISCARD az_result az_iot_pnp_client_init(
     az_iot_pnp_client* client,
@@ -75,12 +75,12 @@ AZ_NODISCARD az_result az_iot_pnp_client_init(
  * @brief Gets the MQTT user name.
  *
  * The user name will be of the following format:
- * {iothubhostname}/{device_id}/?api-version=2018-06-30&{user_agent}?digital-twin-model-id={root_interface_name}
+ * {iothubhostname}/{device_id}/?api-version=2018-06-30&{user_agent}&digital-twin-model-id={root_interface_name}
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in] mqtt_user_name An empty #az_span with sufficient capacity to hold the MQTT user name.
  * @param[out] out_mqtt_user_name The output #az_span containing the MQTT user name.
- * @return #az_result.
+ * @return #az_result
  */
 AZ_NODISCARD az_result az_iot_pnp_client_user_name_get(
     az_iot_pnp_client const* client,
@@ -103,7 +103,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_id_get(
     az_span mqtt_client_id,
     az_span* out_mqtt_client_id);
 
-/**
+/*
  *
  * SAS Token APIs
  *
@@ -143,7 +143,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_sas_signature_get(
  *                     policy key.
  * @param[in] mqtt_password An empty #az_span with sufficient capacity to hold the MQTT password.
  * @param[out] out_mqtt_password The output #az_span containing the MQTT password.
- * @return #az_result.
+ * @return #az_result
  */
 AZ_NODISCARD az_result az_iot_pnp_client_sas_password_get(
     az_iot_pnp_client const* client,
@@ -194,7 +194,9 @@ AZ_NODISCARD az_iot_pnp_client_telemetry_options az_iot_pnp_client_telemetry_opt
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in] component_name An #az_span specifying the component name to publish telemetry on.
  * @param[in] content_type An #az_span specifying the content type of the message payload.
+                           Only AZ_SPAN_FROM_STR("application/json") is currently supported.
  * @param[in] encoding_type An #az_span specifying the encoding type of the message payload.
+                           Only AZ_SPAN_FROM_STR("utf-8") is currently supported.
  * @param[in] options A reference to an #az_iot_pnp_client_telemetry_options structure. Can be NULL.
  * @param[in] mqtt_topic An empty #az_span with sufficient capacity to hold the MQTT topic.
  * @param[out] out_mqtt_topic The output #az_span containing the MQTT topic.
@@ -263,7 +265,7 @@ typedef struct az_iot_pnp_client_command_request
   az_span request_id; /**< The request id.
                        * @note The application must match the method request and method response. */
   az_span component; /**< The component the command is targeted towards. */
-  az_span command_name; /**< The name of command to invoke */
+  az_span command_name; /**< The name of the command to invoke */
   az_span payload; /**< The body of the request for the command, stripped of any envelope data from
                         MQTT payload */
 } az_iot_pnp_client_command_request;
