@@ -150,31 +150,32 @@ void test_json_builder(void** state)
             "\"array\":[1,2,\"sd\":{},3]"
             "}")));
   }
-
-  (void)state;
   {
     uint8_t array[200];
     az_json_builder builder = { 0 };
 
-
     uint8_t nested_object_array[200];
     az_json_builder nested_object_builder = { 0 };
     {
-        // 0___________________________________________________________________________________________________1
-        // 0_________1_________2_________3_________4_________5_________6_________7_________8_________9_________0
-        // 01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456
-        // {"bar":true}
-        TEST_EXPECT_SUCCESS(az_json_builder_init(&nested_object_builder, AZ_SPAN_FROM_BUFFER(nested_object_array)));
-        TEST_EXPECT_SUCCESS(az_json_builder_append_token(&nested_object_builder, az_json_token_object_start()));
-        TEST_EXPECT_SUCCESS(az_json_builder_append_object(&nested_object_builder, AZ_SPAN_FROM_STR("bar"), az_json_token_boolean(true)));
-        TEST_EXPECT_SUCCESS(az_json_builder_append_token(&nested_object_builder, az_json_token_object_end()));
+      // 0___________________________________________________________________________________________________1
+      // 0_________1_________2_________3_________4_________5_________6_________7_________8_________9_________0
+      // 01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456
+      // {"bar":true}
+      TEST_EXPECT_SUCCESS(
+          az_json_builder_init(&nested_object_builder, AZ_SPAN_FROM_BUFFER(nested_object_array)));
+      TEST_EXPECT_SUCCESS(
+          az_json_builder_append_token(&nested_object_builder, az_json_token_object_start()));
+      TEST_EXPECT_SUCCESS(az_json_builder_append_object(
+          &nested_object_builder, AZ_SPAN_FROM_STR("bar"), az_json_token_boolean(true)));
+      TEST_EXPECT_SUCCESS(
+          az_json_builder_append_token(&nested_object_builder, az_json_token_object_end()));
 
-        assert_true(az_span_is_content_equal(
-        nested_object_builder._internal.json,
-        AZ_SPAN_FROM_STR( //
-            "{"
-                "\"bar\":true"
-            "}")));
+      assert_true(az_span_is_content_equal(
+          nested_object_builder._internal.json,
+          AZ_SPAN_FROM_STR( //
+              "{"
+              "\"bar\":true"
+              "}")));
     }
 
     TEST_EXPECT_SUCCESS(az_json_builder_init(&builder, AZ_SPAN_FROM_BUFFER(array)));
@@ -185,8 +186,10 @@ void test_json_builder(void** state)
     // {"foo":[{"bar":true}]}
     TEST_EXPECT_SUCCESS(az_json_builder_append_token(&builder, az_json_token_object_start()));
     {
-      TEST_EXPECT_SUCCESS(az_json_builder_append_object(&builder, AZ_SPAN_FROM_STR("foo"), az_json_token_array_start()));
-      TEST_EXPECT_SUCCESS(az_json_builder_append_array_item(&builder, az_json_token_object(nested_object_builder._internal.json)));
+      TEST_EXPECT_SUCCESS(az_json_builder_append_object(
+          &builder, AZ_SPAN_FROM_STR("foo"), az_json_token_array_start()));
+      TEST_EXPECT_SUCCESS(az_json_builder_append_array_item(
+          &builder, az_json_token_object(nested_object_builder._internal.json)));
       TEST_EXPECT_SUCCESS(az_json_builder_append_token(&builder, az_json_token_array_end()));
     }
 
@@ -196,11 +199,70 @@ void test_json_builder(void** state)
         builder._internal.json,
         AZ_SPAN_FROM_STR( //
             "{"
-                "\"foo\":["
-                    "{"
-                        "\"bar\":true"
-                    "}"
-                "]"
+            "\"foo\":["
+            "{"
+            "\"bar\":true"
+            "}"
+            "]"
+            "}")));
+  }
+  {
+    uint8_t array[200];
+    az_json_builder builder = { 0 };
+
+    uint8_t nested_object_array[200];
+    az_json_builder nested_object_builder = { 0 };
+    {
+      // 0___________________________________________________________________________________________________1
+      // 0_________1_________2_________3_________4_________5_________6_________7_________8_________9_________0
+      // 01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456
+      // {"bar":true}
+      TEST_EXPECT_SUCCESS(
+          az_json_builder_init(&nested_object_builder, AZ_SPAN_FROM_BUFFER(nested_object_array)));
+      TEST_EXPECT_SUCCESS(
+          az_json_builder_append_token(&nested_object_builder, az_json_token_object_start()));
+      TEST_EXPECT_SUCCESS(az_json_builder_append_object(
+          &nested_object_builder, AZ_SPAN_FROM_STR("bar"), az_json_token_boolean(true)));
+      TEST_EXPECT_SUCCESS(
+          az_json_builder_append_token(&nested_object_builder, az_json_token_object_end()));
+
+      assert_true(az_span_is_content_equal(
+          nested_object_builder._internal.json,
+          AZ_SPAN_FROM_STR( //
+              "{"
+              "\"bar\":true"
+              "}")));
+    }
+
+    TEST_EXPECT_SUCCESS(az_json_builder_init(&builder, AZ_SPAN_FROM_BUFFER(array)));
+
+    // 0___________________________________________________________________________________________________1
+    // 0_________1_________2_________3_________4_________5_________6_________7_________8_________9_________0
+    // 01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456
+    // {"foo":[{"bar":true}]}
+    TEST_EXPECT_SUCCESS(az_json_builder_append_token(&builder, az_json_token_object_start()));
+    {
+      TEST_EXPECT_SUCCESS(az_json_builder_append_object(
+          &builder, AZ_SPAN_FROM_STR("foo"), az_json_token_array_start()));
+      TEST_EXPECT_SUCCESS(az_json_builder_append_array_item(
+          &builder, az_json_token_object(nested_object_builder._internal.json)));
+      TEST_EXPECT_SUCCESS(az_json_builder_append_array_item(
+          &builder, az_json_token_object(nested_object_builder._internal.json)));
+      TEST_EXPECT_SUCCESS(az_json_builder_append_token(&builder, az_json_token_array_end()));
+    }
+
+    TEST_EXPECT_SUCCESS(az_json_builder_append_token(&builder, az_json_token_object_end()));
+
+    assert_true(az_span_is_content_equal(
+        builder._internal.json,
+        AZ_SPAN_FROM_STR( //
+            "{"
+            "\"foo\":["
+            "{"
+            "\"bar\":true"
+            "},{"
+            "\"bar\":true}"
+            "]"
             "}")));
   }
 }
