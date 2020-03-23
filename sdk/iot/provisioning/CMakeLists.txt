@@ -3,7 +3,7 @@
 
 cmake_minimum_required (VERSION 3.10)
 
-set(TARGET_NAME "az_iot_provisioning_client")
+set(TARGET_NAME "az_iot_provisioning")
 
 project (${TARGET_NAME} LANGUAGES C)
 
