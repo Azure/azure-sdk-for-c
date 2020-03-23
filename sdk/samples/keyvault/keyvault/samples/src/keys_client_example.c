@@ -240,7 +240,7 @@ az_span get_key_version(az_http_response* response)
   }
 
   az_span k = { 0 };
-  r = az_json_token_get_string(value, &k);
+  r = az_json_token_get_string(&value, &k);
   if (az_failed(r))
   {
     return AZ_SPAN_NULL;

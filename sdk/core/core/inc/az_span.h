@@ -6,6 +6,11 @@
  *
  * @brief An az_span represents a contiguous byte buffer and is used for string manipulations,
  * HTTP requests/responses, building/parsing JSON payloads, and more.
+ *
+ * NOTE: You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
+ * prefixed with an underscore ('_') directly in your application code. These symbols
+ * are part of Azure SDK's internal implementation; we do not document these symbols
+ * and they are subject to change in future versions of the SDK which would break your code.
  */
 
 #ifndef _az_SPAN_H
@@ -193,7 +198,7 @@ AZ_NODISCARD az_span az_span_slice(az_span span, int32_t low_index, int32_t high
 AZ_NODISCARD AZ_INLINE bool az_span_is_content_equal(az_span span1, az_span span2)
 {
   return az_span_length(span1) == az_span_length(span2)
-      && memcmp(az_span_ptr(span1), az_span_ptr(span2), az_span_length(span1)) == 0;
+      && memcmp(az_span_ptr(span1), az_span_ptr(span2), (size_t)az_span_length(span1)) == 0;
 }
 
 /**
@@ -211,8 +216,10 @@ AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1, az_span 
  destination char buffer and appends the 0-terminating byte.
  *
  * The buffer referred to by destination must have a size that is at least 1 byte bigger
- * than the \p source az_span. The string \p destination is converted to a zero-terminated str. Content
- * is copied to \p source buffer and then \0 is added at the end. Then out_result will be created out
+ * than the \p source az_span. The string \p destination is converted to a zero-terminated str.
+ Content
+ * is copied to \p source buffer and then \0 is added at the end. Then out_result will be created
+ out
  * of buffer
  *
  * @param[in] destination A pointer to a buffer where the string should be copied
@@ -380,7 +387,7 @@ AZ_NODISCARD az_result az_span_append_dtoa(az_span destination, double source, a
  */
 AZ_INLINE void az_span_set(az_span destination, uint8_t fill)
 {
-  memset(az_span_ptr(destination), fill, az_span_capacity(destination));
+  memset(az_span_ptr(destination), fill, (size_t)az_span_capacity(destination));
 }
 
 /**

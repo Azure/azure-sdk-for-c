@@ -55,8 +55,11 @@ AZ_NODISCARD AZ_INLINE az_span az_keyvault_client_constant_for_application_json(
 AZ_NODISCARD az_keyvault_keys_client_options az_keyvault_keys_client_options_default()
 {
   az_keyvault_keys_client_options options = (az_keyvault_keys_client_options){
-    ._internal = { .api_version = _az_http_policy_apiversion_options_default(), },
-    .retry = az_http_policy_retry_options_default(),
+    ._internal = {
+      .api_version = _az_http_policy_apiversion_options_default(),
+      ._telemetry_options = _az_http_policy_telemetry_options_default(),
+    },
+    .retry = _az_http_policy_retry_options_default(),
   };
 
   options._internal.api_version._internal.option_location
@@ -163,6 +166,11 @@ AZ_NODISCARD az_keyvault_create_key_options az_keyvault_create_key_options_defau
 AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
     az_span json_web_key_type,
     az_keyvault_create_key_options* options,
+    az_span* http_body);
+
+AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
+    az_json_web_key_type json_web_key_type,
+    az_keyvault_create_key_options* options,
     az_span* http_body)
 {
 
@@ -170,7 +178,7 @@ AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
 
   AZ_RETURN_IF_FAILED(az_json_builder_init(&builder, *http_body));
 
-  AZ_RETURN_IF_FAILED(az_json_builder_append_token(&builder, az_json_token_object()));
+  AZ_RETURN_IF_FAILED(az_json_builder_append_token(&builder, az_json_token_object_start()));
   // Required fields
   AZ_RETURN_IF_FAILED(az_json_builder_append_object(
       &builder, AZ_SPAN_FROM_STR("kty"), az_json_token_string(json_web_key_type)));
@@ -184,7 +192,7 @@ AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
       if (options->operations != NULL)
       {
         AZ_RETURN_IF_FAILED(az_json_builder_append_object(
-            &builder, AZ_SPAN_FROM_STR("key_ops"), az_json_token_array()));
+            &builder, AZ_SPAN_FROM_STR("key_ops"), az_json_token_array_start()));
         for (size_t op = 0; true; ++op)
         {
           az_span s = options->operations[op];
@@ -194,13 +202,13 @@ AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
           }
           AZ_RETURN_IF_FAILED(az_json_builder_append_array_item(&builder, az_json_token_string(s)));
         }
-        AZ_RETURN_IF_FAILED(az_json_builder_append_array_close(&builder));
+        AZ_RETURN_IF_FAILED(az_json_builder_append_token(&builder, az_json_token_array_end()));
       }
       // tags
       if (options->tags != NULL)
       {
         AZ_RETURN_IF_FAILED(az_json_builder_append_object(
-            &builder, AZ_SPAN_FROM_STR("tags"), az_json_token_object()));
+            &builder, AZ_SPAN_FROM_STR("tags"), az_json_token_object_start()));
         for (size_t tag_index = 0; true; ++tag_index)
         {
           az_pair const tag = options->tags[tag_index];
@@ -211,12 +219,12 @@ AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
           AZ_RETURN_IF_FAILED(
               az_json_builder_append_object(&builder, tag.key, az_json_token_string(tag.value)));
         }
-        AZ_RETURN_IF_FAILED(az_json_builder_append_object_close(&builder));
+        AZ_RETURN_IF_FAILED(az_json_builder_append_token(&builder, az_json_token_object_end()));
       }
     }
   }
 
-  AZ_RETURN_IF_FAILED(az_json_builder_append_object_close(&builder));
+  AZ_RETURN_IF_FAILED(az_json_builder_append_token(&builder, az_json_token_object_end()));
   *http_body = builder._internal.json;
 
   return AZ_OK;
@@ -226,7 +234,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
     az_keyvault_keys_client* client,
     az_context* context,
     az_span key_name,
-    json_web_key_type json_web_key_type,
+    az_json_web_key_type json_web_key_type,
     az_keyvault_create_key_options* options,
     az_http_response* response)
 {
