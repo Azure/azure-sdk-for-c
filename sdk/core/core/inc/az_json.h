@@ -33,6 +33,7 @@ typedef enum
   AZ_JSON_TOKEN_BOOLEAN,
   AZ_JSON_TOKEN_NUMBER,
   AZ_JSON_TOKEN_STRING,
+  AZ_JSON_TOKEN_OBJECT,
   AZ_JSON_TOKEN_OBJECT_START,
   AZ_JSON_TOKEN_OBJECT_END,
   AZ_JSON_TOKEN_ARRAY_START,
@@ -101,6 +102,19 @@ AZ_NODISCARD AZ_INLINE az_json_token az_json_token_string(az_span value)
   return (az_json_token){
     .kind = AZ_JSON_TOKEN_STRING,
     ._internal.string = value,
+  };
+}
+
+/*
+ * @brief az_json_token_string returns a az_json_token containing an object.
+ *
+ * @param value A span over an object indicating how the az_json_token should be initialized.
+ */
+AZ_NODISCARD AZ_INLINE az_json_token az_json_token_object(az_span value)
+{
+  return (az_json_token){
+    .kind = AZ_JSON_TOKEN_OBJECT,
+    ._internal.span = value,
   };
 }
 
