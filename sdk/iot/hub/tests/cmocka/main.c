@@ -9,13 +9,15 @@
 
 #include <cmocka.h>
 
-#include "test_az_iot_core.h"
+#include "test_az_iot_hub_client.h"
 
 int main()
 {
   int result = 0;
-  
-  // Placeholder for result += test_iot_common_();
-  
+
+  result += test_iot_sas_token();
+  result += test_iot_hub_telemetry();
+  result += test_iot_hub_client();
+
   return result;
 }
