@@ -59,7 +59,8 @@ AZ_NODISCARD az_iot_hub_client_options az_iot_hub_client_options_default();
  * @param[out] client The #az_iot_hub_client to use for this call.
  * @param[in] iot_hub_hostname The IoT Hub Hostname.
  * @param[in] device_id The Device ID.
- * @param[in] options A reference to an #az_iot_hub_client_options structure. Can be NULL.
+ * @param[in] options A reference to an #az_iot_hub_client_options structure. If `NULL` is passed,
+ * `az_iot_hub_client_init()` will use the default options.
  * @return #az_result.
  */
 AZ_NODISCARD az_result az_iot_hub_client_init(
