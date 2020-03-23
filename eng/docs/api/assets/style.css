@@ -1289,14 +1289,31 @@ dl.section dd {
         vertical-align: middle;
 }
 
-#projectname
-{
-	font: 250% Tahoma, Arial,sans-serif;
-	margin: 0px;
-	padding: 2px 0px;
-	color: rgb(255, 255, 255)
-}
-    
+@media only screen and (min-width: 300px) {
+	/* For mobile: */
+	#projectname {
+		font: 130% Tahoma, Arial,sans-serif;
+		margin: 0px;
+		padding: 2px 0px;
+		color: rgb(255, 255, 255);
+	}
+  }
+  @media only screen and (min-width: 768px) {
+	/* For desktop: */
+	#projectname {
+		font: 250% Tahoma, Arial,sans-serif;
+		margin: 0px;
+		padding: 2px 0px;
+		color: rgb(255, 255, 255);
+        }
+
+        #versionSelector {
+                font-size: 24px;
+        }
+  }
+
+
+
 #projectbrief
 {
 	font: 120% Tahoma, Arial,sans-serif;
