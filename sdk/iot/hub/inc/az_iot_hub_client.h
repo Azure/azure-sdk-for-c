@@ -237,6 +237,9 @@ az_iot_hub_client_properties_next(az_iot_hub_client_properties* properties, az_p
  * Should the user want a null terminated topic string, they may allocate a buffer large enough
  * to fit the topic plus a null terminator. They must set the last byte themselves or zero initialize
  * the buffer.
+ * 
+ * The telemetry topic will be of the following format:
+ * `devices/{device_id}/messages/events/{property_bag}`
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
  * @param[in] properties An optional #az_iot_hub_client_properties object (can be NULL).
