@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 cmake_minimum_required (VERSION 3.10)
-set(TARGET_NAME "az_iot_core_test")
+set(TARGET_NAME "az_iot_provisioning_test")
 
 project (${TARGET_NAME} LANGUAGES C)
 
@@ -16,4 +16,5 @@ add_cmocka_test(${TARGET_NAME} SOURCES
                 LINK_TARGETS
                     az_core
                     az_iot_core
+                    az_iot_provisioning
                 )

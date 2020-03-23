@@ -12,7 +12,7 @@
 
 #include <az_result.h>
 #include <az_span.h>
-#include <az_iot_common.h>
+#include <az_iot_core.h>
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -75,8 +75,8 @@ AZ_NODISCARD az_result az_iot_provisioning_client_init(
  * @brief Gets the MQTT client id.
  *
  * @param[in] client The #az_iot_provisioning_client to use for this call.
- * @param[in] mqtt_client_id An empty #az_span with sufficient capacity to hold the MQTT client id.
- * @param[out] out_mqtt_client_id The output #az_span containing the MQTT client id.
+ * @param[in] mqtt_user_name An empty #az_span with sufficient capacity to hold the MQTT client id.
+ * @param[out] out_mqtt_user_name The output #az_span containing the MQTT client id.
  * @return #az_result
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_user_name_get(
