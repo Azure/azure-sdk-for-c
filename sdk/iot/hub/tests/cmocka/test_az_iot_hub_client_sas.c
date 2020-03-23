@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "az_iot_tests.h"
+#include "test_az_iot_hub_client.h"
 #include <az_iot_sas_token.h>
 #include <az_span.h>
 
@@ -14,7 +14,7 @@
 #include <stdint.h>
 
 #include <cmocka.h>
-#include "az_precondition_testing.h"
+#include <az_test_precondition.h>
 
 #define TEST_DEVICEID "mytest_deviceid"
 #define TEST_FQDN "myiothub.azure-devices.net"
@@ -289,5 +289,5 @@ int test_iot_sas_token()
     cmocka_unit_test(az_iot_sas_token_generate_sas_token_overflow_fails),
     cmocka_unit_test(az_iot_sas_token_get_document_document_overflow_fails)
   };
-  return cmocka_run_group_tests_name("az_iot_sas_token", tests, NULL, NULL);
+  return cmocka_run_group_tests_name("az_iot_hub_client_sas", tests, NULL, NULL);
 }

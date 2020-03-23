@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "az_iot_tests.h"
+#include "test_az_iot_hub_client.h"
 #include <az_iot_hub_client.h>
 #include <az_span.h>
 
@@ -285,5 +285,5 @@ int test_iot_hub_telemetry()
         test_az_iot_hub_client_telemetry_publish_topic_get_with_options_module_id_with_params_small_buffer_fails),
   };
 
-  return cmocka_run_group_tests_name("az_iot_telemetry", tests, NULL, NULL);
+  return cmocka_run_group_tests_name("az_iot_hub_client_telemetry", tests, NULL, NULL);
 }
