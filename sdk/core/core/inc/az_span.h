@@ -260,9 +260,33 @@ AZ_NODISCARD az_result az_span_to_uint64(az_span span, uint64_t* out_number);
  */
 AZ_NODISCARD az_result az_span_to_uint32(az_span span, uint32_t* out_number);
 
-AZ_NODISCARD az_result az_span_find(az_span span, az_span target, az_span* out_span);
+/**
+ * @brief az_span_find searches for `target` in `source`, returning an az_span if it finds it.
+ *
+ * @param[in] source The az_span containing the ASCII digits to be searched on.
+ * @param[in] target The az_span containing the token to be searched in `source`.
+ * @param[out] out_span The az_span pointing to the first occurrence of `target` in `source`, if it is found.
+ * @return An #az_result value indicating the result of the operation.
+ *          #AZ_OK if `target` is found in `source`
+ *          #AZ_ERROR_EOF if `target` is not found in `source`
+ * is found within the span.
+ */
+AZ_NODISCARD az_result az_span_find(az_span source, az_span target, az_span* out_span);
 
-AZ_NODISCARD az_result az_span_token_next(az_span span, az_span delim, az_span* token, az_span* out_span);
+/**
+ * @brief az_span_token_next is a string tokenizer for az_span.
+ *
+ * @param[in] source The az_span containing the ASCII digits to be searched on.
+ * @param[in] delimiter The az_span containing the delimiter to "split" `source` into tokens.
+ * @param[out] out_token The az_span pointing to the token delimited by the beginning of `source` 
+ *                       up to the first occurrence of `delimiter`, or the end of `source` 
+ *                       if `delimiter` is not found.
+ * @param[out] out_source The az_span pointing to the next token in `source`, starting after the occurrence of `delimiter`.
+ *                        If the position after `delimiter` is the end of `source`, `out_source` is set to a NULL/empty az_span.
+ * @return An #az_result value indicating the result of the operation.
+ *          #AZ_OK is always returned. Use `out_token`'s ptr to indentify if a token was identified (NULL ptr means no tokens left in `source`).
+ */
+AZ_NODISCARD az_result az_span_token_next(az_span source, az_span delimiter, az_span* out_token, az_span* out_source);
 
 /******************************  SPAN APPENDING */
 

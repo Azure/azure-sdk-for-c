@@ -10,10 +10,9 @@
 
 #include <_az_cfg.h>
 
-static const uint8_t c2d_null_terminator = '\0';
 static const az_span c2d_topic_prefix = AZ_SPAN_LITERAL_FROM_STR("devices/");
 static const az_span c2d_topic_suffix = AZ_SPAN_LITERAL_FROM_STR("/messages/devicebound/");
-static const az_span hash_tag = AZ_SPAN_LITERAL_FROM_STR("#");
+static const uint8_t hash_tag = '#';
 
 AZ_NODISCARD az_result az_iot_hub_client_c2d_subscribe_topic_filter_get(
     az_iot_hub_client const* client,
@@ -24,15 +23,15 @@ AZ_NODISCARD az_result az_iot_hub_client_c2d_subscribe_topic_filter_get(
   AZ_PRECONDITION_VALID_SPAN(mqtt_topic_filter, 0, false);
   AZ_PRECONDITION_NOT_NULL(out_mqtt_topic_filter);
 
-  AZ_RETURN_IF_FAILED(az_span_append(mqtt_topic_filter, c2d_topic_prefix, out_mqtt_topic_filter));
+  AZ_RETURN_IF_FAILED(az_span_append(mqtt_topic_filter, c2d_topic_prefix, &mqtt_topic_filter));
   AZ_RETURN_IF_FAILED(
-      az_span_append(*out_mqtt_topic_filter, client->_internal.device_id, out_mqtt_topic_filter));
+      az_span_append(mqtt_topic_filter, client->_internal.device_id, &mqtt_topic_filter));
   AZ_RETURN_IF_FAILED(
-      az_span_append(*out_mqtt_topic_filter, c2d_topic_suffix, out_mqtt_topic_filter));
+      az_span_append(mqtt_topic_filter, c2d_topic_suffix, &mqtt_topic_filter));
   AZ_RETURN_IF_FAILED(
-      az_span_append(*out_mqtt_topic_filter, hash_tag, out_mqtt_topic_filter));
-  AZ_RETURN_IF_FAILED(
-      az_span_append_uint8(*out_mqtt_topic_filter, c2d_null_terminator, out_mqtt_topic_filter));
+      az_span_append_uint8(mqtt_topic_filter, hash_tag, &mqtt_topic_filter));
+
+  *out_mqtt_topic_filter = mqtt_topic_filter;
 
   return AZ_OK;
 }

@@ -129,25 +129,25 @@ AZ_NODISCARD az_result az_span_to_uint32(az_span span, uint32_t* out_number)
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_span_find(az_span span, az_span target, az_span* out_span)
+AZ_NODISCARD az_result az_span_find(az_span source, az_span target, az_span* out_span)
 {
-  AZ_PRECONDITION_VALID_SPAN(span, 1, false);
+  AZ_PRECONDITION_VALID_SPAN(source, 1, false);
   AZ_PRECONDITION_VALID_SPAN(target, 1, false);
   AZ_PRECONDITION_NOT_NULL(out_span);
 
-  uint8_t* span_ptr = az_span_ptr(span);
-  int32_t span_length = az_span_length(span);
+  uint8_t* source_ptr = az_span_ptr(source);
+  int32_t source_length = az_span_length(source);
   uint8_t* target_ptr = az_span_ptr(target);
   int32_t target_length = az_span_length(target);
 
-  for (int i = 0; i < span_length; i++)
+  for (int i = 0; i < source_length; i++)
   {
-    if (span_ptr[i] == target_ptr[0])
+    if (source_ptr[i] == target_ptr[0])
     {
       int j;
-      for (j = 1; j < target_length; j++)
+      for (j = 1; j < target_length && (i + j) < source_length; j++)
       {
-        if (span_ptr[i + j] != target_ptr[j])
+        if (source_ptr[i + j] != target_ptr[j])
         {
             break;
         }
@@ -155,9 +155,7 @@ AZ_NODISCARD az_result az_span_find(az_span span, az_span target, az_span* out_s
 
       if (j == target_length)
       {
-        out_span->_internal.ptr = span_ptr + i;
-        out_span->_internal.length = target_length;
-        out_span->_internal.capacity = target_length;
+        *out_span = az_span_init(source_ptr + i, target_length, target_length);
 
         return AZ_OK;
       }
@@ -167,43 +165,41 @@ AZ_NODISCARD az_result az_span_find(az_span span, az_span target, az_span* out_s
   return AZ_ERROR_EOF;
 }
 
-AZ_NODISCARD az_result az_span_token_next(az_span span, az_span delim, az_span* token, az_span* out_span)
+AZ_NODISCARD az_result az_span_token_next(az_span source, az_span delimiter, az_span* out_token, az_span* out_span)
 {
-  AZ_PRECONDITION_VALID_SPAN(span, 1, false);
-  AZ_PRECONDITION_VALID_SPAN(delim, 1, false);
-  AZ_PRECONDITION_NOT_NULL(token);
+  AZ_PRECONDITION_VALID_SPAN(source, 1, false);
+  AZ_PRECONDITION_VALID_SPAN(delimiter, 1, false);
+  AZ_PRECONDITION_NOT_NULL(out_token);
   AZ_PRECONDITION_NOT_NULL(out_span);
 
   az_span instance;
+  uint8_t* source_ptr = az_span_ptr(source);
+  int32_t source_length = az_span_length(source);
+  int32_t source_capacity = az_span_capacity(source);
 
-  token->_internal.ptr = span._internal.ptr;
-
-  if (az_span_find(span, delim, &instance) == AZ_OK)
+  if (az_span_find(source, delimiter, &instance) == AZ_OK)
   {
     uint8_t* instance_ptr = az_span_ptr(instance);
     int32_t instance_length = az_span_length(instance);
 
-    token->_internal.length = (int32_t)(instance._internal.ptr - span._internal.ptr);
-    token->_internal.capacity = token->_internal.length;
+    *out_token = az_span_init(
+      source_ptr, 
+      (int32_t)(instance_ptr - source_ptr), 
+      (int32_t)(instance_ptr - source_ptr));
 
-    out_span->_internal.ptr = instance._internal.ptr + instance._internal.length;
-    out_span->_internal.length = (int32_t)(span._internal.length - instance_length - (instance_ptr - span._internal.ptr));
-    out_span->_internal.capacity = (int32_t)(span._internal.capacity - instance_length - (instance_ptr - span._internal.ptr));
+    *out_span = az_span_init(
+      instance_ptr + instance_length, 
+      (int32_t)(source_length - instance_length - (instance_ptr - source_ptr)),
+      (int32_t)(source_capacity - instance_length - (instance_ptr - source_ptr)));
   }
   else
   {
-    token->_internal.length = span._internal.length;
-    token->_internal.capacity = span._internal.length;
-
-    out_span->_internal.ptr = NULL;
-    out_span->_internal.length = 0;
-    out_span->_internal.capacity = 0;
+    *out_token = az_span_init(source_ptr, source_length, source_capacity);
+    *out_span = AZ_SPAN_NULL;
   }
 
   return AZ_OK;
 }
-
-
 
 AZ_NODISCARD az_result az_span_copy(az_span destination, az_span source, az_span* out_span)
 {
