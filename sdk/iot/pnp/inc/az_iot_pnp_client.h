@@ -44,7 +44,7 @@ typedef struct az_iot_pnp_client
     az_iot_hub_client iot_hub_client;
     az_span root_interface_name;
     az_span content_type;
-    az_span encoding_type;
+    az_span content_encoding;
   } _internal;
 } az_iot_pnp_client;
 
