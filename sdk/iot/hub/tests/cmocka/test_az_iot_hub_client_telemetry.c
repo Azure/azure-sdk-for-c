@@ -60,7 +60,7 @@ static void test_az_iot_hub_client_telemetry_publish_topic_get_NULL_mqtt_topic_f
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL), AZ_OK);
 
   uint8_t test_buf[1];
-  az_span bad_mqtt_topic = AZ_SPAN_FROM_INITIALIZED_BUFFER(test_buf);
+  az_span bad_mqtt_topic = az_span_init(test_buf, 0, _az_COUNTOF(test_buf));
   bad_mqtt_topic._internal.ptr = NULL;
 
   assert_precondition_checked(az_iot_hub_client_telemetry_publish_topic_get(
