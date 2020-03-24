@@ -11,7 +11,6 @@
 
 #include <_az_cfg.h>
 
-static const uint8_t telemetry_prop_delim = '?';
 static const az_span telemetry_topic_prefix = AZ_SPAN_LITERAL_FROM_STR("devices/");
 static const az_span telemetry_topic_modules_mid = AZ_SPAN_LITERAL_FROM_STR("/modules/");
 static const az_span telemetry_topic_suffix = AZ_SPAN_LITERAL_FROM_STR("/messages/events/");
@@ -28,25 +27,25 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_publish_topic_get(
 
   const az_span* const module_id = &(client->_internal.options.module_id);
 
-  AZ_RETURN_IF_FAILED(az_span_append(mqtt_topic, telemetry_topic_prefix, out_mqtt_topic));
-  AZ_RETURN_IF_FAILED(az_span_append(*out_mqtt_topic, client->_internal.device_id, out_mqtt_topic));
+  AZ_RETURN_IF_FAILED(az_span_append(mqtt_topic, telemetry_topic_prefix, &mqtt_topic));
+  AZ_RETURN_IF_FAILED(az_span_append(mqtt_topic, client->_internal.device_id, &mqtt_topic));
 
   if (az_span_length(*module_id) != 0)
   {
     AZ_RETURN_IF_FAILED(
-        az_span_append(*out_mqtt_topic, telemetry_topic_modules_mid, out_mqtt_topic));
-    AZ_RETURN_IF_FAILED(az_span_append(*out_mqtt_topic, *module_id, out_mqtt_topic));
+        az_span_append(mqtt_topic, telemetry_topic_modules_mid, &mqtt_topic));
+    AZ_RETURN_IF_FAILED(az_span_append(mqtt_topic, *module_id, &mqtt_topic));
   }
 
-  AZ_RETURN_IF_FAILED(az_span_append(*out_mqtt_topic, telemetry_topic_suffix, out_mqtt_topic));
+  AZ_RETURN_IF_FAILED(az_span_append(mqtt_topic, telemetry_topic_suffix, &mqtt_topic));
 
   if (properties != NULL)
   {
     AZ_RETURN_IF_FAILED(
-        az_span_append_uint8(*out_mqtt_topic, telemetry_prop_delim, out_mqtt_topic));
-    AZ_RETURN_IF_FAILED(
-        az_span_append(*out_mqtt_topic, properties->_internal.properties, out_mqtt_topic));
+        az_span_append(mqtt_topic, properties->_internal.properties, &mqtt_topic));
   }
+
+  *out_mqtt_topic = mqtt_topic;
 
   return AZ_OK;
 }
