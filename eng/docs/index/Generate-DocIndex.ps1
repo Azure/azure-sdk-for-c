@@ -53,9 +53,9 @@ foreach ($Dir in $TargetServices)
     # Generate a new md file for each package in the service
     foreach ($Pkg in $PkgList)
     {
-        if (Test-Path "$($pkg.FullName)\src")
+        if (Test-Path "$($pkg.FullName)\package.txt")
         {
-            $ProjectName = Split-Path "$($pkg.FullName)" -Leaf
+            $ProjectName = Get-Content "$($pkg.FullName)\package.txt"
             Add-Content -Path "$($YmlPath)/$($Dir.Name).md" -Value "#### $($ProjectName)"
         }
     }

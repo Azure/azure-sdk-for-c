@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "az_iot_tests.h"
+#include "test_az_iot_hub_client.h"
 #include <az_iot_hub_client.h>
 #include <az_span.h>
 
@@ -14,7 +14,7 @@
 #include <stdint.h>
 
 #include <cmocka.h>
-#include "az_precondition_testing.h"
+#include <az_test_precondition.h>
 
 #define TEST_DEVICE_ID_STR "my_device"
 #define TEST_DEVICE_HOSTNAME_STR "myiothub.azure-devices.net"
@@ -39,8 +39,7 @@ static void test_az_iot_hub_client_c2d_received_topic_parse_NULL_client_fail(voi
   az_iot_hub_client_c2d_request out_request;
 
   assert_precondition_checked(
-    az_result res = az_iot_hub_client_c2d_received_topic_parse(NULL, received_topic, &out_request);
-    (void)res;
+    az_iot_hub_client_c2d_received_topic_parse(NULL, received_topic, &out_request)
   );
 }
 
@@ -57,8 +56,7 @@ static void test_az_iot_hub_client_c2d_received_topic_parse_AZ_SPAN_NULL_receive
   az_iot_hub_client_c2d_request out_request;
 
   assert_precondition_checked(
-    az_result res = az_iot_hub_client_c2d_received_topic_parse(&client, received_topic, &out_request);
-    (void)res;
+    az_iot_hub_client_c2d_received_topic_parse(&client, received_topic, &out_request)
   );
 }
 
@@ -73,8 +71,7 @@ static void test_az_iot_hub_client_c2d_received_topic_parse_NULL_out_request_fai
   az_span received_topic = AZ_SPAN_FROM_STR("a/b/c=1&d=2");
 
   assert_precondition_checked(
-    az_result res = az_iot_hub_client_c2d_received_topic_parse(&client, received_topic, NULL);
-    (void)res;
+    az_iot_hub_client_c2d_received_topic_parse(&client, received_topic, NULL)
   );
 }
 
@@ -114,23 +111,6 @@ static void test_az_iot_hub_client_c2d_subscribe_topic_filter_get_small_buffer_f
       az_iot_hub_client_c2d_subscribe_topic_filter_get(&client, mqtt_sub_topic, &mqtt_sub_topic)
       == AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY);
 }
-
-// void az_iot_hub_client_c2d_received_topic_parse_succeed(void* state)
-// {
-//   (void)state;
-
-//   az_iot_hub_client client;
-//   az_iot_hub_client_options options = az_iot_hub_client_options_default();
-//   (void)az_iot_hub_client_init(&client, test_device_hostname, test_device_id, &options);
-
-//   az_span received_topic = AZ_SPAN_FROM_STR("a/b/c=1&d=2");
-
-//   az_iot_hub_client_c2d_request out_request;
-
-//   assert_precondition_checked(
-//     az_iot_hub_client_c2d_received_topic_parse(&client, received_topic, &out_request)
-//   );
-// }
 
 static void test_az_iot_hub_client_c2d_received_topic_parse_succeed(void** state)
 {

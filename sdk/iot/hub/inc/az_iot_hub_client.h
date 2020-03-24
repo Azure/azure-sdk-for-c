@@ -12,7 +12,7 @@
 
 #include <az_result.h>
 #include <az_span.h>
-#include <az_iot_common.h>
+#include <az_iot_core.h>
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -59,7 +59,8 @@ AZ_NODISCARD az_iot_hub_client_options az_iot_hub_client_options_default();
  * @param[out] client The #az_iot_hub_client to use for this call.
  * @param[in] iot_hub_hostname The IoT Hub Hostname.
  * @param[in] device_id The Device ID.
- * @param[in] options A reference to an #az_iot_hub_client_options structure. Can be NULL.
+ * @param[in] options A reference to an #az_iot_hub_client_options structure. If `NULL` is passed,
+ * `az_iot_hub_client_init()` will use the default options.
  * @return #az_result.
  */
 AZ_NODISCARD az_result az_iot_hub_client_init(
@@ -236,6 +237,9 @@ az_iot_hub_client_properties_next(az_iot_hub_client_properties* properties, az_p
  * Should the user want a null terminated topic string, they may allocate a buffer large enough
  * to fit the topic plus a null terminator. They must set the last byte themselves or zero initialize
  * the buffer.
+ * 
+ * The telemetry topic will be of the following format:
+ * `devices/{device_id}/messages/events/{property_bag}`
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
  * @param[in] properties An optional #az_iot_hub_client_properties object (can be NULL).
