@@ -125,7 +125,8 @@ void test_json_builder(void** state)
     az_json_builder builder = { 0 };
     TEST_EXPECT_SUCCESS(az_json_builder_init(&builder, AZ_SPAN_FROM_BUFFER(array)));
 
-    // this json { "array": [1, 2, "sd": {}, 3 ] } // FIXME this is not a valid json
+    // this json { "array": [1, 2, "sd": {}, 3 ] } Note that this is not a valid standard Json.
+    // This test is to demostrate that json builder is not validating json under any standard
     TEST_EXPECT_SUCCESS(az_json_builder_append_token(&builder, az_json_token_object_start()));
 
     TEST_EXPECT_SUCCESS(az_json_builder_append_object(
