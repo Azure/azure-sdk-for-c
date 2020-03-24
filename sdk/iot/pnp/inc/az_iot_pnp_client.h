@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-
 /**
  * @file az_iot_pnp_client.h
  *
@@ -30,6 +29,8 @@ typedef struct az_iot_pnp_client_options
 {
   az_span user_agent; /**< The user-agent is a formatted string that will be used for Azure IoT
                          usage statistics. */
+  az_span content_tye; /**< Content type specified in MQTT topic of telemetry messages */
+  az_span content_encoding; /**< Content encoding specified in MQTT topic of telemetry messages */
 } az_iot_pnp_client_options;
 
 /**
@@ -42,6 +43,8 @@ typedef struct az_iot_pnp_client
   {
     az_iot_hub_client iot_hub_client;
     az_span root_interface_name;
+    az_span content_type;
+    az_span encoding_type;
   } _internal;
 } az_iot_pnp_client;
 
@@ -82,7 +85,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_init(
  * @param[out] out_mqtt_user_name The output #az_span containing the MQTT user name.
  * @return #az_result
  */
-AZ_NODISCARD az_result az_iot_pnp_client_user_name_get(
+AZ_NODISCARD az_result az_iot_pnp_client_get_user_name(
     az_iot_pnp_client const* client,
     az_span mqtt_user_name,
     az_span* out_mqtt_user_name);
@@ -98,7 +101,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_user_name_get(
  * @param[out] out_mqtt_client_id The output #az_span containing the MQTT client id.
  * @return #az_result
  */
-AZ_NODISCARD az_result az_iot_pnp_client_id_get(
+AZ_NODISCARD az_result az_iot_pnp_client_get_id(
     az_iot_pnp_client const* client,
     az_span mqtt_client_id,
     az_span* out_mqtt_client_id);
@@ -123,7 +126,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_id_get(
  * @param[out] out_signature The output #az_span containing the SAS signature.
  * @return #az_result
  */
-AZ_NODISCARD az_result az_iot_pnp_client_sas_signature_get(
+AZ_NODISCARD az_result az_iot_pnp_client_get_sas_signature(
     az_iot_pnp_client const* client,
     uint32_t token_expiration_epoch_time,
     az_span signature,
@@ -145,7 +148,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_sas_signature_get(
  * @param[out] out_mqtt_password The output #az_span containing the MQTT password.
  * @return #az_result
  */
-AZ_NODISCARD az_result az_iot_pnp_client_sas_password_get(
+AZ_NODISCARD az_result az_iot_pnp_client_get_sas_password(
     az_iot_pnp_client const* client,
     az_span base64_hmac_sha256_signature,
     az_span key_name,
@@ -159,30 +162,6 @@ AZ_NODISCARD az_result az_iot_pnp_client_sas_password_get(
  */
 
 /**
- * @brief Azure IoT PnP telemetry options.
- *
- */
-typedef struct az_iot_pnp_client_telemetry_options
-{
-  struct
-  {
-    // OPEN: I can't find samples in Azure SDK modeling this.  Closest is
-    // sdk\storage\blobs\inc\az_storage_blobs.h where it has 'az_span option" in
-    // az_storage_blobs_blob_download_options that's ignored in practice.
-    int _not_used;
-  } _internal;
-} az_iot_pnp_client_telemetry_options;
-
-/**
- * @brief Gets the default Azure IoT PnP telemetry options.
- * @details Call this to obtain an initialized #az_iot_pnp_client_telemetry_options structure that
- * can be afterwards modified and passed to #az_iot_pnp_client_telemetry_publish_topic_get.
- *
- * @return #az_iot_pnp_client_telemetry_options.
- */
-AZ_NODISCARD az_iot_pnp_client_telemetry_options az_iot_pnp_client_telemetry_options_default();
-
-/**
  * @brief Gets the MQTT topic that must be used for device to cloud telemetry messages.
  * @note Telemetry MQTT Publish messages must have QoS At Least Once (1).
  * @note This topic can also be used to set the MQTT Will message in the Connect message.
@@ -193,22 +172,16 @@ AZ_NODISCARD az_iot_pnp_client_telemetry_options az_iot_pnp_client_telemetry_opt
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in] component_name An #az_span specifying the component name to publish telemetry on.
- * @param[in] content_type An #az_span specifying the content type of the message payload.
-                           Only AZ_SPAN_FROM_STR("application/json") is currently supported.
- * @param[in] encoding_type An #az_span specifying the encoding type of the message payload.
-                           Only AZ_SPAN_FROM_STR("utf-8") is currently supported.
- * @param[in] options A reference to an #az_iot_pnp_client_telemetry_options structure. Can be NULL.
  * @param[in] mqtt_topic An empty #az_span with sufficient capacity to hold the MQTT topic.
+ * @param[in] reserved Reserved for future use.  Must be NULL.
  * @param[out] out_mqtt_topic The output #az_span containing the MQTT topic.
  * @return #az_result
  */
-AZ_NODISCARD az_result az_iot_pnp_client_telemetry_publish_topic_get(
+AZ_NODISCARD az_result az_iot_pnp_client_telemetry_get_publish_topic(
     az_iot_pnp_client const* client,
     az_span component_name,
-    az_span content_type,
-    az_span encoding_type,
-    az_iot_pnp_client_telemetry_options const* options,
     az_span mqtt_topic,
+    void* reserved,
     az_span* out_mqtt_topic);
 
 /*
@@ -218,42 +191,19 @@ AZ_NODISCARD az_result az_iot_pnp_client_telemetry_publish_topic_get(
  */
 
 /**
- * @brief Azure IoT PnP command subscription options.
- *
- */
-typedef struct az_iot_pnp_client_command_subscription_options
-{
-  struct
-  {
-    int _not_used;
-  } _internal;
-} az_iot_pnp_client_command_subscription_options;
-
-/**
- * @brief Gets the default Azure IoT PnP command subscription options.
- * @details Call this to obtain an initialized #az_iot_pnp_client_command_subscription_options
- * structure that can be afterwards modified and passed to
- * #az_iot_pnp_client_commands_subscribe_topic_filter_get.
- *
- * @return #az_iot_pnp_client_command_subscription_options.
- */
-AZ_NODISCARD az_iot_pnp_client_command_subscription_options az_iot_pnp_client_command_subscription_options_default();
-
-/**
  * @brief Gets the MQTT topic filter to subscribe to PnP commands.
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
- * @param[in] options A reference to an #az_iot_pnp_client_command_subscription_options structure.
- * Can be NULL.
  * @param[in] mqtt_topic_filter An empty #az_span with sufficient capacity to hold the MQTT topic
  *                              filter.
+ * @param[in] reserved Reserved for future use.  Must be NULL.
  * @param[out] out_mqtt_topic_filter The output #az_span containing the MQTT topic filter.
  * @return #az_result
  */
-AZ_NODISCARD az_result az_iot_pnp_client_commands_subscribe_topic_filter_get(
+AZ_NODISCARD az_result az_iot_pnp_client_command_get_subscribe_topic_filter(
     az_iot_pnp_client const* client,
-    az_iot_pnp_client_command_subscription_options const* options,
     az_span mqtt_topic_filter,
+    void* reserved,
     az_span* out_mqtt_topic_filter);
 
 /**
@@ -280,33 +230,11 @@ typedef struct az_iot_pnp_client_command_request
  *                         #az_iot_pnp_client_command_request.
  * @return #az_result
  */
-AZ_NODISCARD az_result az_iot_pnp_client_command_received_topic_parse(
+AZ_NODISCARD az_result az_iot_pnp_client_command_parse_received_topic(
     az_iot_pnp_client const* client,
     az_span received_topic,
     az_span received_payload,
     az_iot_pnp_client_command_request* out_command_request);
-
-/**
- * @brief Azure IoT PnP command response options.
- *
- */
-typedef struct az_iot_pnp_client_command_response_options
-{
-  struct
-  {
-    int _not_used;
-  } _internal;
-} az_iot_pnp_client_command_response_options;
-
-/**
- * @brief Gets the default Azure IoT PnP command response options.
- * @details Call this to obtain an initialized #az_iot_pnp_client_command_response_options structure
- * that can be afterwards modified and passed to
- * #az_iot_pnp_client_commands_response_publish_topic_get.
- *
- * @return #az_iot_pnp_client_command_response_options.
- */
-AZ_NODISCARD az_iot_pnp_client_command_response_options az_iot_pnp_client_command_response_options_default();
 
 /**
  * @brief Gets the MQTT topic that must be used to respond to command requests.
@@ -315,18 +243,17 @@ AZ_NODISCARD az_iot_pnp_client_command_response_options az_iot_pnp_client_comman
  * @param[in] request_id The request id. Must match a received #az_iot_pnp_client_command_request
  *                       request_id.
  * @param[in] status The status. (E.g. 200 for success.)
- * @param[in] options A reference to an #az_iot_pnp_client_command_response_options structure. Can
- * be NULL.
  * @param[in] mqtt_topic An empty #az_span with sufficient capacity to hold the MQTT topic.
+ * @param[in] reserved Reserved for future use.  Must be NULL.
  * @param[out] out_mqtt_topic The output #az_span containing the MQTT topic.
  * @return #az_result
  */
-AZ_NODISCARD az_result az_iot_pnp_client_commands_response_publish_topic_get(
+AZ_NODISCARD az_result az_iot_pnp_client_command_get_response_publish_topic(
     az_iot_pnp_client const* client,
     az_span request_id,
     uint16_t status,
-    az_iot_pnp_client_command_response_options const* options,
     az_span mqtt_topic,
+    void* reserved,
     az_span* out_mqtt_topic);
 
 #include <_az_cfg_suffix.h>
