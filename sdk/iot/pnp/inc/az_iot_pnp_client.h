@@ -29,7 +29,7 @@ typedef struct az_iot_pnp_client_options
 {
   az_span user_agent; /**< The user-agent is a formatted string that will be used for Azure IoT
                          usage statistics. */
-  az_span content_tye; /**< Content type specified in MQTT topic of telemetry messages */
+  az_span content_type; /**< Content type specified in MQTT topic of telemetry messages */
   az_span content_encoding; /**< Content encoding specified in MQTT topic of telemetry messages */
 } az_iot_pnp_client_options;
 
