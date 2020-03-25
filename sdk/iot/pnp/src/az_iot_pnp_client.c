@@ -4,8 +4,6 @@
 #include <stdint.h>
 
 #include "az_iot_pnp_client.h"
-
-#include <az_iot_hub_client.h>
 #include <az_precondition_internal.h>
 #include <az_result.h>
 #include <az_span.h>
@@ -16,8 +14,6 @@ static const uint8_t pnp_client_param_separator = '&';
 static const uint8_t pnp_client_param_equals = '=';
 
 static const az_span pnp_model_id = AZ_SPAN_LITERAL_FROM_STR("digital-twin-model-id");
-
-
 
 AZ_NODISCARD az_iot_pnp_client_options az_iot_pnp_client_options_default()
 {
@@ -38,26 +34,23 @@ AZ_NODISCARD az_result az_iot_pnp_client_init(
 {
   AZ_PRECONDITION_NOT_NULL(client);
   AZ_PRECONDITION_VALID_SPAN(root_interface_name, 1, false);
-  // TODO: options eventually will be allowed to be non-NULL.  Follow pattern from rest of SDK once established.
-  
   AZ_PRECONDITION_VALID_SPAN(iot_hub_hostname, 1, false);
   AZ_PRECONDITION_VALID_SPAN(device_id, 1, false);
   
   az_iot_hub_client_options hub_options = az_iot_hub_client_options_default();
   hub_options.user_agent = (options != NULL) ? options->user_agent : AZ_SPAN_NULL;
-  
+
   AZ_RETURN_IF_FAILED(
     az_iot_hub_client_init(&client->_internal.iot_hub_client, iot_hub_hostname, device_id, &hub_options));
 
   client->_internal.root_interface_name = root_interface_name;
-  client->_internal.content_type = (options != NULL) ? options->content_type : AZ_SPAN_NULL;
-  client->_internal.content_encoding = (options != NULL) ? options->content_encoding : AZ_SPAN_NULL;
+  client->_internal.options = options == NULL ? az_iot_pnp_client_options_default() : *options;
 
   return AZ_OK;
 }
 
 
-AZ_NODISCARD az_result az_iot_pnp_client_user_name_get(
+AZ_NODISCARD az_result az_iot_pnp_client_get_user_name(
     az_iot_pnp_client const* client,
     az_span mqtt_user_name,
     az_span* out_mqtt_user_name)
@@ -81,6 +74,3 @@ AZ_NODISCARD az_result az_iot_pnp_client_user_name_get(
 
   return AZ_OK;
 }
-
-
-
