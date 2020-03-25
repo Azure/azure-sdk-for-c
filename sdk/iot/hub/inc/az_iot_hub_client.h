@@ -460,10 +460,6 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_get_publish_topic_get(
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
  * @param[in] request_id The request id.
- * @param[in] if_match_version Can be either "*" to overwrite or the twin version to limit the
- *                             reported properties patch to that version only. The version is
- *                             available from the JSON document or from
- *                             #az_iot_hub_client_twin_response::version.
  * @param[in] mqtt_topic An empty #az_span with sufficient capacity to hold the MQTT topic.
  * @param[out] out_mqtt_topic The output #az_span containing the MQTT topic.
  * @return #az_result
@@ -471,7 +467,6 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_get_publish_topic_get(
 AZ_NODISCARD az_result az_iot_hub_client_twin_patch_publish_topic_get(
     az_iot_hub_client const* client,
     az_span request_id,
-    az_span if_match_version,
     az_span mqtt_topic,
     az_span* out_mqtt_topic);
 
