@@ -100,7 +100,7 @@ az_json_builder_append_token(az_json_builder* json_builder, az_json_token token)
     }
     case AZ_JSON_TOKEN_OBJECT:
     {
-      json_builder->_internal.need_comma = false;
+      json_builder->_internal.need_comma = true;
       return az_span_append(*json, token._internal.span, json);
     }
     case AZ_JSON_TOKEN_OBJECT_START:
