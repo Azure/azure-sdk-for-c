@@ -336,7 +336,11 @@ static void az_span_token_success()
   assert_true(az_span_length(out_span) == 0);
   assert_true(az_span_capacity(out_span) == 0);
 
-  // No more trying. out_span is empty.
+  // Out_span is empty.
+  span = out_span;
+  
+  token = az_span_token(span, delim, &out_span);
+  assert_true(az_span_is_content_equal(token, AZ_SPAN_NULL));
 }
 
 void test_az_span(void** state)
