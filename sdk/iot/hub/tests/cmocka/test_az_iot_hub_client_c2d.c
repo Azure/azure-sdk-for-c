@@ -26,6 +26,7 @@ static char g_test_correct_subscribe_topic[] = "devices/my_device/messages/devic
 static const az_span test_URL_DECODED_topic = AZ_SPAN_LITERAL_FROM_STR("devices/useragent_c/messages/devicebound/$.mid=79eadb01-bd0d-472d-bd35-ccb76e70eab8&$.to=/devices/useragent_c/messages/deviceBound&abc=123");
 static const az_span test_URL_ENCODED_topic = AZ_SPAN_LITERAL_FROM_STR("devices/useragent_c/messages/devicebound/%24.to=%2Fdevices%2Fuseragent_c%2Fmessages%2FdeviceBound&abc=123&ghi=%2Fsome%2Fthing&jkl=%2Fsome%2Fthing%2F%3Fbla%3Dbla");
 
+
 #ifndef NO_PRECONDITION_CHECKING
 
 enable_precondition_check_tests()
@@ -72,6 +73,45 @@ static void test_az_iot_hub_client_c2d_received_topic_parse_NULL_out_request_fai
 
   assert_precondition_checked(
     az_iot_hub_client_c2d_received_topic_parse(&client, received_topic, NULL)
+  );
+}
+
+// Note: c2d messages ALWAYS contain propeties (at least $.to).
+static void test_az_iot_hub_client_c2d_received_topic_parse_no_properties_fail(void** state)
+{
+  (void)state;
+
+  // az_pair pair;
+  az_iot_hub_client client;
+  az_iot_hub_client_options options = az_iot_hub_client_options_default();
+  assert_true(
+      az_iot_hub_client_init(&client, test_device_hostname, test_device_id, &options) == AZ_OK);
+
+  az_span received_topic = AZ_SPAN_FROM_STR("devices/useragent_c/messages/devicebound/");
+
+  az_iot_hub_client_c2d_request out_request;
+
+  assert_precondition_checked(
+    az_iot_hub_client_c2d_received_topic_parse(&client, received_topic, &out_request)
+  );
+}
+
+static void test_az_iot_hub_client_c2d_received_topic_parse_MALFORMED_fail(void** state)
+{
+  (void)state;
+
+  // az_pair pair;
+  az_iot_hub_client client;
+  az_iot_hub_client_options options = az_iot_hub_client_options_default();
+  assert_true(
+      az_iot_hub_client_init(&client, test_device_hostname, test_device_id, &options) == AZ_OK);
+
+  az_span received_topic = AZ_SPAN_FROM_STR("devices/useragent_c/message#$vicebound/a=1");
+
+  az_iot_hub_client_c2d_request out_request;
+
+  assert_precondition_checked(
+    az_iot_hub_client_c2d_received_topic_parse(&client, received_topic, &out_request)
   );
 }
 
@@ -175,45 +215,6 @@ static void test_az_iot_hub_client_c2d_received_topic_parse_URL_ENCODED_succeed(
   // assert_return_code(az_iot_hub_client_properties_next(&out_request.properties, &pair), AZ_OK);
   // assert_true(az_span_is_content_equal(pair.key, AZ_SPAN_FROM_STR("jkl")));
   // assert_true(az_span_is_content_equal(pair.value, AZ_SPAN_FROM_STR("%2Fsome%2Fthing%2F%3Fbla%3Dbla")));
-}
-
-// Note: c2d messages ALWAYS contain propeties (at least $.to).
-static void test_az_iot_hub_client_c2d_received_topic_parse_no_properties_fail(void** state)
-{
-  (void)state;
-
-  // az_pair pair;
-  az_iot_hub_client client;
-  az_iot_hub_client_options options = az_iot_hub_client_options_default();
-  assert_true(
-      az_iot_hub_client_init(&client, test_device_hostname, test_device_id, &options) == AZ_OK);
-
-  az_span received_topic = AZ_SPAN_FROM_STR("devices/useragent_c/messages/devicebound/");
-
-  az_iot_hub_client_c2d_request out_request;
-
-  assert_precondition_checked(
-    az_iot_hub_client_c2d_received_topic_parse(&client, received_topic, &out_request)
-  );
-}
-
-static void test_az_iot_hub_client_c2d_received_topic_parse_MALFORMED_fail(void** state)
-{
-  (void)state;
-
-  // az_pair pair;
-  az_iot_hub_client client;
-  az_iot_hub_client_options options = az_iot_hub_client_options_default();
-  assert_true(
-      az_iot_hub_client_init(&client, test_device_hostname, test_device_id, &options) == AZ_OK);
-
-  az_span received_topic = AZ_SPAN_FROM_STR("devices/useragent_c/message#$vicebound/a=1");
-
-  az_iot_hub_client_c2d_request out_request;
-
-  assert_precondition_checked(
-    az_iot_hub_client_c2d_received_topic_parse(&client, received_topic, &out_request)
-  );
 }
 
 int test_iot_hub_c2d()
