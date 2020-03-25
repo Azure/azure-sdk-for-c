@@ -22,7 +22,7 @@
 
 static const az_span test_device_hostname = AZ_SPAN_LITERAL_FROM_STR(TEST_DEVICE_HOSTNAME_STR);
 static const az_span test_device_id = AZ_SPAN_LITERAL_FROM_STR(TEST_DEVICE_ID_STR);
-static uint8_t g_test_correct_subscribe_topic[] = {'d','e','v','i','c','e','s','/','m','y','_','d','e','v','i','c','e','/','m','e','s','s','a','g','e','s','/','d','e','v','i','c','e','b','o','u','n','d','/', '#'};
+static char g_test_correct_subscribe_topic[] = "devices/my_device/messages/devicebound/#";
 static const az_span test_URL_DECODED_topic = AZ_SPAN_LITERAL_FROM_STR("devices/useragent_c/messages/devicebound/$.mid=79eadb01-bd0d-472d-bd35-ccb76e70eab8&$.to=/devices/useragent_c/messages/deviceBound&abc=123");
 static const az_span test_URL_ENCODED_topic = AZ_SPAN_LITERAL_FROM_STR("devices/useragent_c/messages/devicebound/%24.to=%2Fdevices%2Fuseragent_c%2Fmessages%2FdeviceBound&abc=123&ghi=%2Fsome%2Fthing&jkl=%2Fsome%2Fthing%2F%3Fbla%3Dbla");
 
@@ -81,7 +81,7 @@ static void test_az_iot_hub_client_c2d_subscribe_topic_filter_get_succeed(void**
 {
   (void)state;
 
-  uint8_t mqtt_sub_topic_buf[sizeof(g_test_correct_subscribe_topic)];
+  uint8_t mqtt_sub_topic_buf[_az_COUNTOF(g_test_correct_subscribe_topic)];
   az_span mqtt_sub_topic = az_span_init(mqtt_sub_topic_buf, 0, _az_COUNTOF(mqtt_sub_topic_buf));
 
   az_iot_hub_client client;
@@ -93,19 +93,14 @@ static void test_az_iot_hub_client_c2d_subscribe_topic_filter_get_succeed(void**
       az_iot_hub_client_c2d_subscribe_topic_filter_get(&client, mqtt_sub_topic, &mqtt_sub_topic)
       == AZ_OK);
 
-  az_span expected = az_span_init(
-    g_test_correct_subscribe_topic, 
-    sizeof(g_test_correct_subscribe_topic)/sizeof(g_test_correct_subscribe_topic[0]),
-    sizeof(g_test_correct_subscribe_topic)/sizeof(g_test_correct_subscribe_topic[0]));
-
-  assert_true(az_span_is_content_equal(expected, mqtt_sub_topic));
+  assert_memory_equal(g_test_correct_subscribe_topic, az_span_ptr(mqtt_sub_topic), (size_t)az_span_length(mqtt_sub_topic));
 }
 
 static void test_az_iot_hub_client_c2d_subscribe_topic_filter_get_small_buffer_fail(void** state)
 {
   (void)state;
 
-  uint8_t mqtt_sub_topic_buf[sizeof(g_test_correct_subscribe_topic) - 1];
+  uint8_t mqtt_sub_topic_buf[_az_COUNTOF(g_test_correct_subscribe_topic) - 2];
   az_span mqtt_sub_topic = az_span_init(mqtt_sub_topic_buf, 0, _az_COUNTOF(mqtt_sub_topic_buf));
 
   az_iot_hub_client client;
