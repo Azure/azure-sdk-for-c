@@ -285,10 +285,10 @@ static void az_span_find_not_found_fail()
   az_span target = AZ_SPAN_FROM_STR("abd");
   az_span instance;
 
-  assert_true(az_span_find(span, target, &instance) == AZ_ERROR_EOF);
+  assert_true(az_span_find(span, target, &instance) == AZ_ERROR_ITEM_NOT_FOUND);
 }
 
-static void az_span_token_next_success()
+static void az_span_token_success()
 {
   az_span span = AZ_SPAN_FROM_STR("abcdefgabcdefgabcdefg");
   az_span delim = AZ_SPAN_FROM_STR("abc");
@@ -296,7 +296,7 @@ static void az_span_token_next_success()
   az_span out_span;
 
   // token: ""
-  assert_return_code(az_span_token_next(span, delim, &token, &out_span), AZ_OK);
+  assert_return_code(az_span_token(span, delim, &token, &out_span), AZ_OK);
   assert_true(az_span_length(token) == 0);
   assert_true(az_span_ptr(out_span) == (az_span_ptr(span) + az_span_length(delim)));
   assert_true(az_span_length(out_span) == (az_span_length(span) - az_span_length(delim)));
@@ -305,7 +305,7 @@ static void az_span_token_next_success()
   // token: "defg" (span+3)
   span = out_span;
 
-  assert_return_code(az_span_token_next(span, delim, &token, &out_span), AZ_OK);
+  assert_return_code(az_span_token(span, delim, &token, &out_span), AZ_OK);
   assert_true(az_span_ptr(token) == az_span_ptr(span));
   assert_true(az_span_length(token) == 4);
   assert_true(az_span_capacity(token) == az_span_length(token));
@@ -316,7 +316,7 @@ static void az_span_token_next_success()
   // token: "defg" (span+10)
   span = out_span;
 
-  assert_return_code(az_span_token_next(span, delim, &token, &out_span), AZ_OK);
+  assert_return_code(az_span_token(span, delim, &token, &out_span), AZ_OK);
   assert_true(az_span_ptr(token) == az_span_ptr(span));
   assert_true(az_span_length(token) == 4);
   assert_true(az_span_capacity(token) == az_span_length(token));
@@ -327,7 +327,7 @@ static void az_span_token_next_success()
   // token: "defg" (span+17)
   span = out_span;
 
-  assert_return_code(az_span_token_next(span, delim, &token, &out_span), AZ_OK);
+  assert_return_code(az_span_token(span, delim, &token, &out_span), AZ_OK);
   assert_true(az_span_ptr(token) == az_span_ptr(span));
   assert_true(az_span_length(token) == 4);
   assert_true(az_span_capacity(token) == az_span_length(token));
@@ -370,5 +370,5 @@ void test_az_span(void** state)
   az_span_find_end_success();
   az_span_find_not_found_fail();
 
-  az_span_token_next_success();
+  az_span_token_success();
 }
