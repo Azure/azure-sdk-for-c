@@ -189,41 +189,44 @@ AZ_NODISCARD az_result az_span_find(az_span source, az_span target, az_span* out
   return AZ_ERROR_ITEM_NOT_FOUND;
 }
 
-AZ_NODISCARD az_result az_span_token(az_span source, az_span delimiter, az_span* out_token, az_span* out_span)
+AZ_NODISCARD az_span az_span_token(az_span source, az_span delimiter, az_span* out_remainder)
 {
-  AZ_PRECONDITION_VALID_SPAN(source, 1, false);
   AZ_PRECONDITION_VALID_SPAN(delimiter, 1, false);
-  AZ_PRECONDITION_NOT_NULL(out_token);
-  AZ_PRECONDITION_NOT_NULL(out_span);
+  AZ_PRECONDITION_NOT_NULL(out_remainder);
 
-  uint8_t* source_ptr = az_span_ptr(source);
-  int32_t source_length = az_span_length(source);
-  int32_t source_capacity = az_span_capacity(source);
-
-  az_span instance;
-  if (az_span_find(source, delimiter, &instance) == AZ_OK)
+  if (az_span_is_content_equal(source, AZ_SPAN_NULL))
   {
-    uint8_t* instance_ptr = az_span_ptr(instance);
-
-    *out_token = az_span_init(
-      source_ptr, 
-      (int32_t)(instance_ptr - source_ptr), 
-      (int32_t)(instance_ptr - source_ptr));
-
-    int32_t instance_length = az_span_length(instance);
-
-    *out_span = az_span_init(
-      instance_ptr + instance_length, 
-      (int32_t)(source_length - instance_length - (instance_ptr - source_ptr)),
-      (int32_t)(source_capacity - instance_length - (instance_ptr - source_ptr)));
+    return AZ_SPAN_NULL;
   }
   else
   {
-    *out_token = az_span_init(source_ptr, source_length, source_capacity);
-    *out_span = AZ_SPAN_NULL;
-  }
+    uint8_t* source_ptr = az_span_ptr(source);
+    int32_t source_length = az_span_length(source);
+    int32_t source_capacity = az_span_capacity(source);
 
-  return AZ_OK;
+    az_span instance;
+    if (az_span_find(source, delimiter, &instance) == AZ_OK)
+    {
+      uint8_t* instance_ptr = az_span_ptr(instance);
+      int32_t instance_length = az_span_length(instance);
+
+      *out_remainder = az_span_init(
+        instance_ptr + instance_length, 
+        (int32_t)(source_length - instance_length - (instance_ptr - source_ptr)),
+        (int32_t)(source_capacity - instance_length - (instance_ptr - source_ptr)));
+
+      return az_span_init(
+        source_ptr, 
+        (int32_t)(instance_ptr - source_ptr), 
+        (int32_t)(instance_ptr - source_ptr));
+    }
+    else
+    {
+      *out_remainder = AZ_SPAN_NULL;
+
+      return az_span_init(source_ptr, source_length, source_capacity);
+    } 
+  }
 }
 
 AZ_NODISCARD az_result az_span_copy(az_span destination, az_span source, az_span* out_span)
