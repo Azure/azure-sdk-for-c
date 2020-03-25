@@ -59,6 +59,9 @@ az_precondition_failed_fn az_precondition_failed_get_callback();
 
 #define AZ_PRECONDITION_NOT_NULL(arg) AZ_PRECONDITION((arg != NULL))
 
+#define AZ_PRECONDITION_IS_NULL(arg) AZ_PRECONDITION((arg == NULL))
+
+
 AZ_NODISCARD AZ_INLINE bool az_span_is_valid(az_span span, int32_t min_length, bool null_is_valid)
 {
   int32_t span_length = az_span_length(span);
