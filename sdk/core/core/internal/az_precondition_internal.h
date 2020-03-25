@@ -58,7 +58,6 @@ az_precondition_failed_fn az_precondition_failed_get_callback();
 #define AZ_PRECONDITION_RANGE(low, arg, max) AZ_PRECONDITION((low <= arg && arg <= max))
 
 #define AZ_PRECONDITION_NOT_NULL(arg) AZ_PRECONDITION((arg != NULL))
-
 #define AZ_PRECONDITION_IS_NULL(arg) AZ_PRECONDITION((arg == NULL))
 
 
