@@ -19,6 +19,7 @@ int main()
   result += test_iot_hub_telemetry();
   result += test_iot_hub_c2d();
   result += test_iot_hub_client();
+  result += test_az_iot_hub_client_twin();
 
   return result;
 }

@@ -16,6 +16,7 @@ add_cmocka_test(${TARGET_NAME} SOURCES
                 test_az_iot_hub_client_telemetry.c
                 test_az_iot_hub_client_c2d.c
                 test_az_iot_hub_client.c
+                test_az_iot_hub_client_twin.c
                 COMPILE_OPTIONS ${DEFAULT_C_COMPILE_FLAGS}
                 LINK_TARGETS
                     az_core
