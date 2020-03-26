@@ -6,7 +6,7 @@ containers.addClass("container-fluid");
 WINDOW_CONTENTS = window.location.href.split('/');
 SELECTED_LANGUAGE = 'c';
 STORAGE_ACCOUNT_NAME = 'azuresdkdocs';
-BLOB_URI_PREFIX = "https://" + STORAGE_ACCOUNT_NAME + ".blob.core.windows.net/$web?restype=container&comp=list&prefix=" + SELECTED_LANGUAGE + "/";
+BLOB_URI_PREFIX = "https://" + STORAGE_ACCOUNT_NAME + ".blob.core.windows.net/$web/" + SELECTED_LANGUAGE + "/";
 
 ATTR1 = '[<span class="hljs-meta">System.ComponentModel.EditorBrowsable</span>]\n<';
 
@@ -64,24 +64,6 @@ $(function () {
 })
 
 
-$(function () {
-    // Inject line breaks and spaces into the code sections
-    $(".lang-csharp").each(function () {
-        var text = $(this).html();
-        text = text.replace(/, /g, ",</br>&#09;&#09");
-        text = text.replace(ATTR1, '<');
-        $(this).html(text);
-    });
-
-    // Add text to empty links
-    $("p > a").each(function () {
-        var link = $(this).attr('href')
-        if ($(this).text() === "") {
-            $(this).html(link)
-        }
-    });
-})
-
 function httpGetAsync(targetUrl, callback) {
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.onreadystatechange = function () {
@@ -93,21 +75,13 @@ function httpGetAsync(targetUrl, callback) {
 }
 
 function populateOptions(selector, packageName) {
-    var versionRequestUrl = BLOB_URI_PREFIX + packageName + "/versions/"
+    var versionRequestUrl = BLOB_URI_PREFIX + packageName + "/versioning/versions"
 
     httpGetAsync(versionRequestUrl, function (responseText) {
         var versionselector = document.createElement("select")
         versionselector.className = 'navbar-version-select'
         if (responseText) {
-            parser = new DOMParser();
-            xmlDoc = parser.parseFromString(responseText, "text/xml");
-
-            nameElements = Array.from(xmlDoc.getElementsByTagName('Name'))
-            options = []
-
-            for (var i in nameElements) {
-                options.push(nameElements[i].textContent.split('/')[3])
-            }
+            options = responseText.match(/[^\r\n]+/g)
 
             for (var i in options) {
                 $(versionselector).append('<option value="' + options[i] + '">' + options[i] + '</option>')
@@ -128,21 +102,13 @@ function populateOptions(selector, packageName) {
 
 
 function populateIndexList(selector, packageName) {
-    url = BLOB_URI_PREFIX + packageName + "/versions/"
+    url = BLOB_URI_PREFIX + packageName + "/versioning/versions"
 
     httpGetAsync(url, function (responseText) {
 
         var publishedversions = document.createElement("ul")
         if (responseText) {
-            parser = new DOMParser();
-            xmlDoc = parser.parseFromString(responseText, "text/xml");
-
-            nameElements = Array.from(xmlDoc.getElementsByTagName('Name'))
-            options = []
-
-            for (var i in nameElements) {
-                options.push(nameElements[i].textContent.split('/')[3])
-            }
+            options = responseText.match(/[^\r\n]+/g)
 
             for (var i in options) {
                 $(publishedversions).append('<li><a href="' + getPackageUrl(SELECTED_LANGUAGE, packageName, options[i]) + '" target="_blank">' + options[i] + '</a></li>')

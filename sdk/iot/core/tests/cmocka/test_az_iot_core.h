@@ -1,6 +1,4 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-int test_iot_sas_token();
-int test_iot_hub_telemetry();
-int test_iot_hub_client();
+// Placeholder for int test_iot_common_(); declarations
