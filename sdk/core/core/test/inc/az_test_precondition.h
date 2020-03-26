@@ -40,7 +40,8 @@ static void az_precondition_test_failed_fn() \
   if (precondition_test_count == 0) { \
     assert(fn); \
   } \
-  assert_int_equal(1, precondition_test_count);
+  assert_int_equal(1, precondition_test_count); \
+  
 
 
 #endif // _az_PRECONDITION_TESTING_H
