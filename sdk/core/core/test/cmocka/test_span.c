@@ -246,6 +246,103 @@ static void az_span_to_str_test()
   assert_string_equal(str, "hello World!");
 }
 
+static void az_span_find_beginning_success()
+{
+  az_span span = AZ_SPAN_FROM_STR("abcdefgabcdefg");
+  az_span target = AZ_SPAN_FROM_STR("abc");
+  az_span instance;
+
+  assert_return_code(az_span_find(span, target, &instance), AZ_OK);
+  assert_true(az_span_length(target) == az_span_length(instance));
+  assert_true(az_span_ptr(span) == az_span_ptr(instance));
+}
+
+static void az_span_find_middle_success()
+{
+  az_span span = AZ_SPAN_FROM_STR("abcdefgabcdefg");
+  az_span target = AZ_SPAN_FROM_STR("gab");
+  az_span instance;
+
+  assert_return_code(az_span_find(span, target, &instance), AZ_OK);
+  assert_true(az_span_length(target) == az_span_length(instance));
+  assert_true((az_span_ptr(span) + 6) == az_span_ptr(instance));
+}
+
+static void az_span_find_end_success()
+{
+  az_span span = AZ_SPAN_FROM_STR("abcdefgabcdefgh");
+  az_span target = AZ_SPAN_FROM_STR("efgh");
+  az_span instance;
+
+  assert_return_code(az_span_find(span, target, &instance), AZ_OK);
+  assert_true(az_span_length(target) == az_span_length(instance));
+  assert_true((az_span_ptr(span) + 11) == az_span_ptr(instance));
+}
+
+static void az_span_find_not_found_fail()
+{
+  az_span span = AZ_SPAN_FROM_STR("abcdefgabcdefg");
+  az_span target = AZ_SPAN_FROM_STR("abd");
+  az_span instance;
+
+  assert_true(az_span_find(span, target, &instance) == AZ_ERROR_ITEM_NOT_FOUND);
+}
+
+static void az_span_token_success()
+{
+  az_span span = AZ_SPAN_FROM_STR("abcdefgabcdefgabcdefg");
+  az_span delim = AZ_SPAN_FROM_STR("abc");
+  az_span token;
+  az_span out_span;
+
+  // token: ""
+  token = az_span_token(span, delim, &out_span);
+  assert_non_null(az_span_ptr(token));
+  assert_true(az_span_length(token) == 0);
+  assert_true(az_span_ptr(out_span) == (az_span_ptr(span) + az_span_length(delim)));
+  assert_true(az_span_length(out_span) == (az_span_length(span) - az_span_length(delim)));
+  assert_true(az_span_capacity(out_span) == (az_span_capacity(span) - az_span_capacity(delim)));
+
+  // token: "defg" (span+3)
+  span = out_span;
+
+  token = az_span_token(span, delim, &out_span);
+  assert_true(az_span_ptr(token) == az_span_ptr(span));
+  assert_true(az_span_length(token) == 4);
+  assert_true(az_span_capacity(token) == az_span_length(token));
+  assert_true(az_span_ptr(out_span) == (az_span_ptr(span) + az_span_length(token) + az_span_length(delim)));
+  assert_true(az_span_length(out_span) == (az_span_length(span) - az_span_length(token) - az_span_length(delim)));
+  assert_true(az_span_capacity(out_span) == (az_span_capacity(span) - az_span_capacity(token) - az_span_capacity(delim)));
+
+  // token: "defg" (span+10)
+  span = out_span;
+
+  token = az_span_token(span, delim, &out_span);
+  assert_true(az_span_ptr(token) == az_span_ptr(span));
+  assert_true(az_span_length(token) == 4);
+  assert_true(az_span_capacity(token) == az_span_length(token));
+  assert_true(az_span_ptr(out_span) == (az_span_ptr(span) + az_span_length(token) + az_span_length(delim)));
+  assert_true(az_span_length(out_span) == (az_span_length(span) - az_span_length(token) - az_span_length(delim)));
+  assert_true(az_span_capacity(out_span) == (az_span_capacity(span) - az_span_capacity(token) - az_span_capacity(delim)));
+
+  // token: "defg" (span+17)
+  span = out_span;
+
+  token = az_span_token(span, delim, &out_span);
+  assert_true(az_span_ptr(token) == az_span_ptr(span));
+  assert_true(az_span_length(token) == 4);
+  assert_true(az_span_capacity(token) == az_span_length(token));
+  assert_true(az_span_ptr(out_span) == NULL);
+  assert_true(az_span_length(out_span) == 0);
+  assert_true(az_span_capacity(out_span) == 0);
+
+  // Out_span is empty.
+  span = out_span;
+  
+  token = az_span_token(span, delim, &out_span);
+  assert_true(az_span_is_content_equal(token, AZ_SPAN_NULL));
+}
+
 void test_az_span(void** state)
 {
   (void)state;
@@ -272,4 +369,11 @@ void test_az_span(void** state)
   az_span_to_uint32_test();
   az_span_to_str_test();
   az_span_to_uint64_return_errors();
+
+  az_span_find_beginning_success();
+  az_span_find_middle_success();
+  az_span_find_end_success();
+  az_span_find_not_found_fail();
+
+  az_span_token_success();
 }

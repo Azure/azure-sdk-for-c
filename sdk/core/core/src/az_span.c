@@ -129,6 +129,106 @@ AZ_NODISCARD az_result az_span_to_uint32(az_span span, uint32_t* out_number)
   return AZ_OK;
 }
 
+AZ_NODISCARD az_result az_span_find(az_span source, az_span target, az_span* out_span)
+{
+/* This function implements the Naive string-search algorithm.
+ * The rationale to use this algorithm instead of other potentialy more 
+ * performing ones (Rabin-Karp, e.g.) is due to no additional space needed.
+ * The logic:
+ * 1. The function will look into each position of `source` if it contains the same value as the first position of `target`.
+ * 2. If it does, it could be that the next bytes in `source` are a perfect match of the remaining bytes of `target`.
+ * 3. Being so, it loops through the remaining bytes of `target` and see if they match exactly the next bytes of `source`.
+ * 4. If the loop gets to the end (all bytes of `target` are evaluated), it means `target` indeed occurs in that position of `source`.
+ * 5. If the loop gets interrupted before cruising through the entire `target`, the function must go back to step 1. from  the next position in `source`.
+ *    The loop in 5. gets interrupted if
+ *    - a byte in `target` is different than `source`, in the expected corresponding position;
+ *    - the loop has reached the end of `source` (and there are still remaing bytes of `target` to be checked).
+ */
+  AZ_PRECONDITION_VALID_SPAN(source, 1, false);
+  AZ_PRECONDITION_VALID_SPAN(target, 1, false);
+  AZ_PRECONDITION_NOT_NULL(out_span);
+
+  uint8_t* source_ptr = az_span_ptr(source);
+  int32_t source_length = az_span_length(source);
+  uint8_t* target_ptr = az_span_ptr(target);
+  int32_t target_length = az_span_length(target);
+
+  // This loop traverses `source` position by position (step 1.)
+  for (int i = 0; i < source_length; i++)
+  {
+    // This is the check done in step 1. above.
+    if (source_ptr[i] == target_ptr[0])
+    {
+      // The condition in step 2. has been satisfied.
+      int j;
+      // This is the loop defined in step 3.
+      // The loop must be broken if it reaches the ends of `target` (step 3.) OR `source` (step 5.).
+      for (j = 1; j < target_length && (i + j) < source_length; j++)
+      {
+        // Condition defined in step 5.
+        if (source_ptr[i + j] != target_ptr[j])
+        {
+            break;
+        }
+      }
+ 
+      if (j == target_length)
+      {
+        // All bytes in `target` have been checked and matched the corresponding bytes in `source` (from the start point `i`),
+        // so this is indeed an instance of `target` in that position of `source` (step 4.).
+        // Here we create a span in `source` to map the occurrence of `target` in `source` (pardon the redundancy of words, done for explicit clarity).
+        *out_span = az_span_init(source_ptr + i, target_length, target_length);
+
+        return AZ_OK;
+      }
+    }
+  }
+
+  // If the function hasn't returned before, all positions 
+  // of `source` have been evaluated but `target` could not be found.
+  return AZ_ERROR_ITEM_NOT_FOUND;
+}
+
+AZ_NODISCARD az_span az_span_token(az_span source, az_span delimiter, az_span* out_remainder)
+{
+  AZ_PRECONDITION_VALID_SPAN(delimiter, 1, false);
+  AZ_PRECONDITION_NOT_NULL(out_remainder);
+
+  if (az_span_is_content_equal(source, AZ_SPAN_NULL))
+  {
+    return AZ_SPAN_NULL;
+  }
+  else
+  {
+    uint8_t* source_ptr = az_span_ptr(source);
+    int32_t source_length = az_span_length(source);
+    int32_t source_capacity = az_span_capacity(source);
+
+    az_span instance;
+    if (az_span_find(source, delimiter, &instance) == AZ_OK)
+    {
+      uint8_t* instance_ptr = az_span_ptr(instance);
+      int32_t instance_length = az_span_length(instance);
+
+      *out_remainder = az_span_init(
+        instance_ptr + instance_length, 
+        (int32_t)(source_length - instance_length - (instance_ptr - source_ptr)),
+        (int32_t)(source_capacity - instance_length - (instance_ptr - source_ptr)));
+
+      return az_span_init(
+        source_ptr, 
+        (int32_t)(instance_ptr - source_ptr), 
+        (int32_t)(instance_ptr - source_ptr));
+    }
+    else
+    {
+      *out_remainder = AZ_SPAN_NULL;
+
+      return az_span_init(source_ptr, source_length, source_capacity);
+    } 
+  }
+}
+
 AZ_NODISCARD az_result az_span_copy(az_span destination, az_span source, az_span* out_span)
 {
   AZ_PRECONDITION_NOT_NULL(out_span);
