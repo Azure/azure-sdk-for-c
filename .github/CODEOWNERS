@@ -26,5 +26,5 @@
 ###########
 # Eng Sys
 ###########
-/eng/       @danieljurek
-/**/ci.yml  @danieljurek
+/eng/       @danieljurek @damirault @azure/azure-sdk-eng
+/**/ci.yml  @danieljurek @damirault @azure/azure-sdk-eng
