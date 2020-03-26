@@ -236,8 +236,8 @@ typedef struct az_iot_pnp_client_command_request
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in] received_topic An #az_span containing the received topic.
  * @param[in] received_payload An #az_span containing the received payload.
- * @param[out] out_request If the message is a command request, this will contain the
- *                         #az_iot_pnp_client_command_request.
+ * @param[out] out_command_request If the message is a command request, this will contain the
+ *                                 #az_iot_pnp_client_command_request.
  * @return #az_result
  */
 AZ_NODISCARD az_result az_iot_pnp_client_command_parse_received_topic(

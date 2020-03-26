@@ -44,7 +44,7 @@ static const char test_correct_pnp_user_name_with_user_agent[]
 
 enable_precondition_check_tests()
 
-    static void test_az_iot_pnp_client_init_NULL_client_fails(void** state)
+static void test_az_iot_pnp_client_init_NULL_client_fails(void** state)
 {
   (void)state;
 
@@ -139,30 +139,13 @@ static void test_az_iot_pnp_client_get_user_name_succeed(void** state)
           &client, test_device_hostname, test_device_id, test_root_interface_name, NULL),
       AZ_OK);
 
-  uint8_t test_span_buffer[sizeof(test_correct_pnp_user_name) - 1];
+  uint8_t test_span_buffer[_az_COUNTOF(test_correct_pnp_user_name) - 1];
   az_span test_span = az_span_init(test_span_buffer, 0, _az_COUNTOF(test_span_buffer));
   assert_int_equal(az_iot_pnp_client_get_user_name(&client, test_span, &test_span), AZ_OK);
 
+  assert_int_equal(az_span_length(test_span), _az_COUNTOF(test_correct_pnp_user_name) - 1);
   assert_memory_equal(
-      test_correct_pnp_user_name, az_span_ptr(test_span), sizeof(test_correct_pnp_user_name) - 1);
-}
-
-static void test_az_iot_pnp_client_get_user_name_as_string_succeed(void** state)
-{
-  (void)state;
-
-  az_iot_pnp_client client;
-  assert_int_equal(
-      az_iot_pnp_client_init(
-          &client, test_device_hostname, test_device_id, test_root_interface_name, NULL),
-      AZ_OK);
-
-  uint8_t test_span_buffer[sizeof(test_correct_pnp_user_name)] = { 0 };
-  az_span test_span = az_span_init(test_span_buffer, 0, _az_COUNTOF(test_span_buffer));
-  assert_int_equal(az_iot_pnp_client_get_user_name(&client, test_span, &test_span), AZ_OK);
-
-  assert_int_equal(az_span_length(test_span), sizeof(test_correct_pnp_user_name) - 1);
-  assert_string_equal(test_correct_pnp_user_name, az_span_ptr(test_span));
+      test_correct_pnp_user_name, az_span_ptr(test_span), _az_COUNTOF(test_correct_pnp_user_name) - 1);
 }
 
 static void test_az_iot_pnp_client_get_user_name_small_buffer_fail(void** state)
@@ -175,7 +158,7 @@ static void test_az_iot_pnp_client_get_user_name_small_buffer_fail(void** state)
           &client, test_device_hostname, test_device_id, test_root_interface_name, NULL),
       AZ_OK);
 
-  uint8_t test_span_buffer[sizeof(test_correct_pnp_user_name) - 2];
+  uint8_t test_span_buffer[_az_COUNTOF(test_correct_pnp_user_name) - 2];
   az_span test_span = az_span_init(test_span_buffer, 0, _az_COUNTOF(test_span_buffer));
   assert_int_equal(
       az_iot_pnp_client_get_user_name(&client, test_span, &test_span),
@@ -197,38 +180,16 @@ static void test_az_iot_pnp_client_get_user_name_user_options_succeed(void** sta
           &client, test_device_hostname, test_device_id, test_root_interface_name, &options),
       AZ_OK);
 
-  uint8_t test_span_buffer[sizeof(test_correct_pnp_user_name_with_user_agent) - 1];
+  uint8_t test_span_buffer[_az_COUNTOF(test_correct_pnp_user_name_with_user_agent) - 1];
   az_span test_span = az_span_init(test_span_buffer, 0, _az_COUNTOF(test_span_buffer));
   assert_int_equal(az_iot_pnp_client_get_user_name(&client, test_span, &test_span), AZ_OK);
 
+  assert_int_equal(
+      az_span_length(test_span), _az_COUNTOF(test_correct_pnp_user_name_with_user_agent) - 1);
   assert_memory_equal(
       test_correct_pnp_user_name_with_user_agent,
       az_span_ptr(test_span),
-      sizeof(test_correct_pnp_user_name_with_user_agent) - 1);
-}
-
-static void test_az_iot_pnp_client_get_user_name_user_options_as_string_succeed(void** state)
-{
-  (void)state;
-
-  az_iot_pnp_client client;
-  az_iot_pnp_client_options options;
-  options.user_agent = test_user_agent;
-  options.content_type = test_content_type;
-  options.content_encoding = test_content_encoding;
-
-  assert_int_equal(
-      az_iot_pnp_client_init(
-          &client, test_device_hostname, test_device_id, test_root_interface_name, &options),
-      AZ_OK);
-
-  uint8_t test_span_buffer[sizeof(test_correct_pnp_user_name_with_user_agent)] = { 0 };
-  az_span test_span = az_span_init(test_span_buffer, 0, _az_COUNTOF(test_span_buffer));
-  assert_int_equal(az_iot_pnp_client_get_user_name(&client, test_span, &test_span), AZ_OK);
-
-  assert_int_equal(
-      az_span_length(test_span), sizeof(test_correct_pnp_user_name_with_user_agent) - 1);
-  assert_string_equal(test_correct_pnp_user_name_with_user_agent, az_span_ptr(test_span));
+      _az_COUNTOF(test_correct_pnp_user_name_with_user_agent) - 1);
 }
 
 static void test_az_iot_pnp_client_get_user_name_user_options_small_buffer_fail(void** state)
@@ -246,7 +207,7 @@ static void test_az_iot_pnp_client_get_user_name_user_options_small_buffer_fail(
           &client, test_device_hostname, test_device_id, test_root_interface_name, &options),
       AZ_OK);
 
-  uint8_t test_span_buffer[sizeof(test_correct_pnp_user_name_with_user_agent) - 2];
+  uint8_t test_span_buffer[_az_COUNTOF(test_correct_pnp_user_name_with_user_agent) - 2];
   az_span test_span = az_span_init(test_span_buffer, 0, _az_COUNTOF(test_span_buffer));
   assert_int_equal(
       az_iot_pnp_client_get_user_name(&client, test_span, &test_span),
@@ -274,11 +235,10 @@ int test_iot_pnp_client()
     cmocka_unit_test(test_az_iot_pnp_client_init_succeed),
     cmocka_unit_test(test_az_iot_pnp_client_init_custom_options_succeed),
     cmocka_unit_test(test_az_iot_pnp_client_get_user_name_succeed),
-    cmocka_unit_test(test_az_iot_pnp_client_get_user_name_as_string_succeed),
     cmocka_unit_test(test_az_iot_pnp_client_get_user_name_small_buffer_fail),
     cmocka_unit_test(test_az_iot_pnp_client_get_user_name_user_options_succeed),
-    cmocka_unit_test(test_az_iot_pnp_client_get_user_name_user_options_as_string_succeed),
     cmocka_unit_test(test_az_iot_pnp_client_get_user_name_user_options_small_buffer_fail),
   };
   return cmocka_run_group_tests_name("az_iot_pnp_client", tests, NULL, NULL);
 }
+
