@@ -5,11 +5,15 @@
 #include <az_iot_pnp_client.h>
 #include <az_span.h>
 
+#include <az_precondition_internal.h>
+#include <az_precondition.h>
+
 #include <setjmp.h>
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdint.h>
 
+#include <az_test_precondition.h>
 #include <cmocka.h>
 
 // PnP Client
@@ -33,6 +37,50 @@ static const char test_correct_pnp_user_name[]
 
 static const char test_correct_pnp_user_name_with_user_agent[]
 = "myiothub.azure-devices.net/my_device/?api-version=2018-06-30&" TEST_USER_AGENT "&digital-twin-model-id=" TEST_ROOT_INTERFACE_NAME;
+
+
+#ifndef NO_PRECONDITION_CHECKING
+
+enable_precondition_check_tests()
+
+static void test_az_iot_pnp_client_init_NULL_client_fails(void** state)
+{
+    (void)state;
+    
+    assert_precondition_checked(
+        az_iot_pnp_client_init(NULL, test_device_hostname, test_device_id, test_root_interface_name, NULL));
+}
+
+static void test_az_iot_pnp_client_init_empty_iot_hub_hostname_fails(void** state)
+{
+    (void)state;
+
+    az_iot_pnp_client client;
+    assert_precondition_checked(
+        az_iot_pnp_client_init(&client, AZ_SPAN_NULL, test_device_id, test_root_interface_name, NULL));
+}
+
+static void test_az_iot_pnp_client_init_empty_device_id_fails(void** state)
+{
+    (void)state;
+
+    az_iot_pnp_client client;
+    assert_precondition_checked(
+        az_iot_pnp_client_init(&client, test_device_hostname, AZ_SPAN_NULL, test_root_interface_name, NULL));
+}
+
+static void test_az_iot_pnp_client_init_empty_root_interface_name_fails(void** state)
+{
+    (void)state;
+
+    az_iot_pnp_client client;
+    assert_precondition_checked(
+        az_iot_pnp_client_init(&client, test_device_hostname, test_device_id, AZ_SPAN_NULL, NULL));
+}
+
+
+
+#endif // NO_PRECONDITION_CHECKING
 
 
 static void test_az_iot_pnp_client_get_default_options_succeed(void** state)
@@ -194,7 +242,17 @@ static void test_az_iot_pnp_client_get_user_name_user_options_small_buffer_fail(
 
 int test_iot_pnp_client()
 {
+#ifndef NO_PRECONDITION_CHECKING
+    setup_precondition_check_tests();
+#endif // NO_PRECONDITION_CHECKING
+
   const struct CMUnitTest tests[] = {
+#ifndef NO_PRECONDITION_CHECKING
+    cmocka_unit_test(test_az_iot_pnp_client_init_NULL_client_fails),
+    cmocka_unit_test(test_az_iot_pnp_client_init_empty_iot_hub_hostname_fails),
+    cmocka_unit_test(test_az_iot_pnp_client_init_empty_device_id_fails),
+    cmocka_unit_test(test_az_iot_pnp_client_init_empty_root_interface_name_fails),
+#endif // NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_az_iot_pnp_client_get_default_options_succeed),
     cmocka_unit_test(test_az_iot_pnp_client_init_succeed),
     cmocka_unit_test(test_az_iot_pnp_client_init_custom_options_succeed),
