@@ -6,6 +6,7 @@
 
 #include <az_credentials.h>
 #include <az_http.h>
+#include <az_http_internal.h>
 #include <az_result.h>
 #include <az_span.h>
 
@@ -58,25 +59,25 @@ AZ_NODISCARD az_result az_keyvault_keys_client_init(
     void* credential,
     az_keyvault_keys_client_options* options);
 
-typedef az_span json_web_key_type;
+typedef az_span az_json_web_key_type;
 
-AZ_NODISCARD AZ_INLINE json_web_key_type az_keyvault_web_key_type_ec()
+AZ_NODISCARD AZ_INLINE az_json_web_key_type az_keyvault_web_key_type_ec()
 {
   return AZ_SPAN_FROM_STR("EC");
 }
-AZ_NODISCARD AZ_INLINE json_web_key_type az_keyvault_web_key_type_ec_hsm()
+AZ_NODISCARD AZ_INLINE az_json_web_key_type az_keyvault_web_key_type_ec_hsm()
 {
   return AZ_SPAN_FROM_STR("EC-HSM");
 }
-AZ_NODISCARD AZ_INLINE json_web_key_type az_keyvault_web_key_type_rsa()
+AZ_NODISCARD AZ_INLINE az_json_web_key_type az_keyvault_web_key_type_rsa()
 {
   return AZ_SPAN_FROM_STR("RSA");
 }
-AZ_NODISCARD AZ_INLINE json_web_key_type az_keyvault_web_key_type_rsa_hsm()
+AZ_NODISCARD AZ_INLINE az_json_web_key_type az_keyvault_web_key_type_rsa_hsm()
 {
   return AZ_SPAN_FROM_STR("RSA-HSM");
 }
-AZ_NODISCARD AZ_INLINE json_web_key_type az_keyvault_web_key_type_oct()
+AZ_NODISCARD AZ_INLINE az_json_web_key_type az_keyvault_web_key_type_oct()
 {
   return AZ_SPAN_FROM_STR("oct");
 }
@@ -142,7 +143,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
     az_keyvault_keys_client* client,
     az_context* context,
     az_span key_name,
-    json_web_key_type json_web_key_type,
+    az_json_web_key_type json_web_key_type,
     az_keyvault_create_key_options* options,
     az_http_response* response);
 

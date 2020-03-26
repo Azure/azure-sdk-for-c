@@ -13,6 +13,7 @@
 
 #include <_az_cfg.h>
 
+void test_storage_blobs_init(void** state);
 void test_storage_blobs_init(void** state)
 {
   (void)state;

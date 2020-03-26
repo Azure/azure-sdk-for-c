@@ -26,7 +26,7 @@ int exit_code = 0;
  * @param response Response
  * @return AZ_NODISCARD az_storage_blobs_blob_download
  */
-AZ_NODISCARD az_result
+static AZ_NODISCARD az_result
 az_storage_blobs_blob_download(az_storage_blobs_blob_client* client, az_http_response* response)
 {
 
@@ -54,7 +54,7 @@ az_storage_blobs_blob_download(az_storage_blobs_blob_client* client, az_http_res
   return az_http_pipeline_process(&client->_internal.pipeline, &hrb, response);
 }
 
-AZ_NODISCARD az_result
+static AZ_NODISCARD az_result
 az_storage_blobs_blob_delete(az_storage_blobs_blob_client* client, az_http_response* response)
 {
 

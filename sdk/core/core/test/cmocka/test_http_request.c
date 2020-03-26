@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "az_json_string_private.h"
+#include "az_test_definitions.h"
 #include <az_http.h>
 #include <az_http_internal.h>
 #include <az_http_private.h>
@@ -57,7 +58,12 @@ void test_http_request(void** state)
     _az_http_request hrb;
 
     TEST_EXPECT_SUCCESS(az_http_request_init(
-        &hrb, &az_context_app, az_http_method_get(), url_span, header_span, AZ_SPAN_NULL));
+        &hrb,
+        &az_context_app,
+        az_http_method_get(),
+        url_span,
+        header_span,
+        AZ_SPAN_FROM_STR("body")));
     assert_true(az_span_is_content_equal(hrb._internal.method, az_http_method_get()));
     assert_true(az_span_is_content_equal(hrb._internal.url, url_span));
     assert_true(az_span_capacity(hrb._internal.url) == 100);
@@ -83,14 +89,14 @@ void test_http_request(void** state)
     TEST_EXPECT_SUCCESS(az_http_request_append_header(
         &hrb, hrb_header_authorization_name, hrb_header_authorization_token1));
 
-    assert_true(az_span_length(hrb._internal.headers) / sizeof(az_pair) == 2);
+    assert_true(az_span_length(hrb._internal.headers) / (int32_t)sizeof(az_pair) == 2);
     assert_true(hrb._internal.retry_headers_start_byte_offset == sizeof(az_pair));
 
     az_pair expected_headers1[2] = {
       { .key = hrb_header_content_type_name, .value = hrb_header_content_type_token },
       { .key = hrb_header_authorization_name, .value = hrb_header_authorization_token1 },
     };
-    for (uint16_t i = 0; i < az_span_length(hrb._internal.headers) / sizeof(az_pair); ++i)
+    for (uint16_t i = 0; i < az_span_length(hrb._internal.headers) / (int32_t)sizeof(az_pair); ++i)
     {
       az_pair header = { 0 };
       TEST_EXPECT_SUCCESS(az_http_request_get_header(&hrb, i, &header));
@@ -104,14 +110,14 @@ void test_http_request(void** state)
 
     TEST_EXPECT_SUCCESS(az_http_request_append_header(
         &hrb, hrb_header_authorization_name, hrb_header_authorization_token2));
-    assert_true(az_span_length(hrb._internal.headers) / sizeof(az_pair) == 2);
+    assert_true(az_span_length(hrb._internal.headers) / (int32_t)sizeof(az_pair) == 2);
     assert_true(hrb._internal.retry_headers_start_byte_offset == sizeof(az_pair));
 
     az_pair expected_headers2[2] = {
       { .key = hrb_header_content_type_name, .value = hrb_header_content_type_token },
       { .key = hrb_header_authorization_name, .value = hrb_header_authorization_token2 },
     };
-    for (uint16_t i = 0; i < az_span_length(hrb._internal.headers) / sizeof(az_pair); ++i)
+    for (uint16_t i = 0; i < az_span_length(hrb._internal.headers) / (int32_t)sizeof(az_pair); ++i)
     {
       az_pair header = { 0 };
       TEST_EXPECT_SUCCESS(az_http_request_get_header(&hrb, i, &header));
@@ -119,5 +125,18 @@ void test_http_request(void** state)
       assert_true(az_span_is_content_equal(header.key, expected_headers2[i].key));
       assert_true(az_span_is_content_equal(header.value, expected_headers2[i].value));
     }
+
+    assert_return_code(az_http_request_append_path(&hrb, AZ_SPAN_FROM_STR("path")), AZ_OK);
+
+    az_http_method method;
+    az_span body;
+    az_span url;
+    assert_return_code(az_http_request_get_parts(&hrb, &method, &url, &body), AZ_OK);
+    assert_string_equal(az_span_ptr(method), az_span_ptr(az_http_method_get()));
+    assert_string_equal(az_span_ptr(body), az_span_ptr(AZ_SPAN_FROM_STR("body")));
+    assert_string_equal(
+        az_span_ptr(url),
+        az_span_ptr(AZ_SPAN_FROM_STR("https://antk-keyvault.vault.azure.net/secrets/Password/"
+                                     "path?api-version=7.0&test-param=token")));
   }
 }

@@ -6,6 +6,11 @@
  *
  * @brief An az_span represents a contiguous byte buffer and is used for string manipulations,
  * HTTP requests/responses, building/parsing JSON payloads, and more.
+ *
+ * NOTE: You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
+ * prefixed with an underscore ('_') directly in your application code. These symbols
+ * are part of Azure SDK's internal implementation; we do not document these symbols
+ * and they are subject to change in future versions of the SDK which would break your code.
  */
 
 #ifndef _az_SPAN_H
@@ -201,7 +206,7 @@ AZ_NODISCARD az_span az_span_slice(az_span span, int32_t start_index, int32_t en
 AZ_NODISCARD AZ_INLINE bool az_span_is_content_equal(az_span span1, az_span span2)
 {
   return az_span_length(span1) == az_span_length(span2)
-      && memcmp(az_span_ptr(span1), az_span_ptr(span2), az_span_length(span1)) == 0;
+      && memcmp(az_span_ptr(span1), az_span_ptr(span2), (size_t)az_span_length(span1)) == 0;
 }
 
 /**
@@ -219,8 +224,10 @@ AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1, az_span 
  destination char buffer and appends the 0-terminating byte.
  *
  * The buffer referred to by destination must have a size that is at least 1 byte bigger
- * than the \p source az_span. The string \p destination is converted to a zero-terminated str. Content
- * is copied to \p source buffer and then \0 is added at the end. Then out_result will be created out
+ * than the \p source az_span. The string \p destination is converted to a zero-terminated str.
+ Content
+ * is copied to \p source buffer and then \0 is added at the end. Then out_result will be created
+ out
  * of buffer
  *
  * @param[in] destination A pointer to a buffer where the string should be copied
@@ -260,6 +267,32 @@ AZ_NODISCARD az_result az_span_to_uint64(az_span span, uint64_t* out_number);
  * is found within the span.
  */
 AZ_NODISCARD az_result az_span_to_uint32(az_span span, uint32_t* out_number);
+
+/**
+ * @brief az_span_find searches for `target` in `source`, returning an #az_span within `source` if it finds it.
+ *
+ * @param[in] source The #az_span with the content to be searched on.
+ * @param[in] target The #az_span containing the token to be searched in `source`.
+ * @param[out] out_span The #az_span pointing to the first occurrence of `target` in `source`, if it is found.
+ * @return An #az_result value indicating the result of the operation.
+ *          #AZ_OK if `target` is found in `source`
+ *          #AZ_ERROR_ITEM_NOT_FOUND if `target` is not found in `source`
+ * is found within the span.
+ */
+AZ_NODISCARD az_result az_span_find(az_span source, az_span target, az_span* out_span);
+
+/**
+ * @brief az_span_token is a string tokenizer for az_span.
+ *
+ * @param[in] source The #az_span with the content to be searched on. It must be a non-empty #az_span.
+ * @param[in] delimiter The #az_span containing the delimiter to "split" `source` into tokens.  It must be a non-empty #az_span.
+ * @param[out] out_remainder The #az_span pointing to the remaining bytes in `source`, starting after the occurrence of `delimiter`.
+ *                        If the position after `delimiter` is the end of `source`, `out_remainder` is set to a NULL/empty #az_span.
+ * @return The #az_span pointing to the token delimited by the beginning of `source` up to the first occurrence 
+ *         of (but not including the) `delimiter`, or the end of `source` if `delimiter` is not found.
+ *         If `source` or `delimiter` is empty, AZ_SPAN_NULL is returned instead.
+ */
+AZ_NODISCARD az_span az_span_token(az_span source, az_span delimiter, az_span* out_remainder);
 
 /******************************  SPAN APPENDING */
 
@@ -388,7 +421,7 @@ AZ_NODISCARD az_result az_span_append_dtoa(az_span destination, double source, a
  */
 AZ_INLINE void az_span_set(az_span destination, uint8_t fill)
 {
-  memset(az_span_ptr(destination), fill, az_span_capacity(destination));
+  memset(az_span_ptr(destination), fill, (size_t)az_span_capacity(destination));
 }
 
 /**
