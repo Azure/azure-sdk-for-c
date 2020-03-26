@@ -43,8 +43,7 @@ typedef struct az_iot_pnp_client
   {
     az_iot_hub_client iot_hub_client;
     az_span root_interface_name;
-    az_span content_type;
-    az_span encoding_type;
+    az_iot_pnp_client_options options;
   } _internal;
 } az_iot_pnp_client;
 
@@ -101,10 +100,13 @@ AZ_NODISCARD az_result az_iot_pnp_client_get_user_name(
  * @param[out] out_mqtt_client_id The output #az_span containing the MQTT client id.
  * @return #az_result
  */
-AZ_NODISCARD az_result az_iot_pnp_client_get_id(
+AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_id(
     az_iot_pnp_client const* client,
     az_span mqtt_client_id,
-    az_span* out_mqtt_client_id);
+    az_span* out_mqtt_client_id)
+{
+  return az_iot_hub_client_id_get(&client->_internal.iot_hub_client, mqtt_client_id, out_mqtt_client_id);
+}
 
 /*
  *
@@ -126,11 +128,15 @@ AZ_NODISCARD az_result az_iot_pnp_client_get_id(
  * @param[out] out_signature The output #az_span containing the SAS signature.
  * @return #az_result
  */
-AZ_NODISCARD az_result az_iot_pnp_client_get_sas_signature(
+AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_sas_signature(
     az_iot_pnp_client const* client,
     uint32_t token_expiration_epoch_time,
     az_span signature,
-    az_span* out_signature);
+    az_span* out_signature)
+{
+  return az_iot_hub_client_sas_signature_get(&client->_internal.iot_hub_client, 
+      token_expiration_epoch_time, signature, out_signature);
+}
 
 /**
  * @brief Gets the MQTT password.
@@ -148,12 +154,16 @@ AZ_NODISCARD az_result az_iot_pnp_client_get_sas_signature(
  * @param[out] out_mqtt_password The output #az_span containing the MQTT password.
  * @return #az_result
  */
-AZ_NODISCARD az_result az_iot_pnp_client_get_sas_password(
+AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_sas_password(
     az_iot_pnp_client const* client,
     az_span base64_hmac_sha256_signature,
     az_span key_name,
     az_span mqtt_password,
-    az_span* out_mqtt_password);
+    az_span* out_mqtt_password)
+{
+  return az_iot_hub_client_sas_password_get(&client->_internal.iot_hub_client, 
+      base64_hmac_sha256_signature, key_name, mqtt_password, out_mqtt_password);
+}
 
 /*
  *
@@ -226,8 +236,8 @@ typedef struct az_iot_pnp_client_command_request
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in] received_topic An #az_span containing the received topic.
  * @param[in] received_payload An #az_span containing the received payload.
- * @param[out] out_request If the message is a command request, this will contain the
- *                         #az_iot_pnp_client_command_request.
+ * @param[out] out_command_request If the message is a command request, this will contain the
+ *                                 #az_iot_pnp_client_command_request.
  * @return #az_result
  */
 AZ_NODISCARD az_result az_iot_pnp_client_command_parse_received_topic(
