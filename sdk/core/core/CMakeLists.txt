@@ -22,7 +22,6 @@ add_library (
   src/az_http_request.c
   src/az_http_response.c
   src/az_json_builder.c
-  src/az_json_get.c
   src/az_json_parser.c
   src/az_json_pointer.c
   src/az_json_string.c
@@ -35,6 +34,9 @@ add_library (
 target_include_directories (${TARGET_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc> $<INSTALL_INTERFACE:include/${TARGET_NAME}>)
 # include internal headers
 target_include_directories(${TARGET_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/internal> $<INSTALL_INTERFACE:include/az_core_internal>)
+
+# include test internal headers
+target_include_directories(${TARGET_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/test/inc>)
 
 set(AZ_PLATFORM_IMPL "NONE" CACHE STRING "Platform implementation to use")
 set_property(CACHE AZ_PLATFORM_IMPL PROPERTY STRINGS NONE WIN32 POSIX USER)

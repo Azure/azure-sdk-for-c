@@ -30,12 +30,10 @@ AZ_NODISCARD az_result az_iot_hub_client_init(
   AZ_PRECONDITION_NOT_NULL(client);
   AZ_PRECONDITION_VALID_SPAN(iot_hub_hostname, 1, false);
   AZ_PRECONDITION_VALID_SPAN(device_id, 1, false);
-  AZ_PRECONDITION_NOT_NULL(options);
 
   client->_internal.iot_hub_hostname = iot_hub_hostname;
   client->_internal.device_id = device_id;
-  client->_internal.options.module_id = options->module_id;
-  client->_internal.options.user_agent = options->user_agent;
+  client->_internal.options = options == NULL ? az_iot_hub_client_options_default() : *options;
 
   return AZ_OK;
 }
@@ -56,8 +54,7 @@ AZ_NODISCARD az_result az_iot_hub_client_user_name_get(
       az_span_append(mqtt_user_name, client->_internal.iot_hub_hostname, &mqtt_user_name));
   AZ_RETURN_IF_FAILED(
       az_span_append_uint8(mqtt_user_name, hub_client_forward_slash, &mqtt_user_name));
-  AZ_RETURN_IF_FAILED(
-      az_span_append(mqtt_user_name, client->_internal.device_id, &mqtt_user_name));
+  AZ_RETURN_IF_FAILED(az_span_append(mqtt_user_name, client->_internal.device_id, &mqtt_user_name));
   AZ_RETURN_IF_FAILED(
       az_span_append_uint8(mqtt_user_name, hub_client_forward_slash, &mqtt_user_name));
 
@@ -68,8 +65,7 @@ AZ_NODISCARD az_result az_iot_hub_client_user_name_get(
         az_span_append_uint8(mqtt_user_name, hub_client_forward_slash, &mqtt_user_name));
   }
 
-  AZ_RETURN_IF_FAILED(
-      az_span_append(mqtt_user_name, hub_client_api_version, &mqtt_user_name));
+  AZ_RETURN_IF_FAILED(az_span_append(mqtt_user_name, hub_client_api_version, &mqtt_user_name));
 
   if (az_span_length(*user_agent) > 0)
   {
@@ -94,8 +90,7 @@ AZ_NODISCARD az_result az_iot_hub_client_id_get(
 
   const az_span* const module_id = &(client->_internal.options.module_id);
 
-  AZ_RETURN_IF_FAILED(
-      az_span_append(mqtt_client_id, client->_internal.device_id, &mqtt_client_id));
+  AZ_RETURN_IF_FAILED(az_span_append(mqtt_client_id, client->_internal.device_id, &mqtt_client_id));
 
   if (az_span_length(*module_id) > 0)
   {
