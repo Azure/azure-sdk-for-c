@@ -15,7 +15,7 @@
 /samples/ @gilbertw @jeffreyrichter
 
 # Service teams
-/sdk/core/                  @antkmsft @gilbertw @jeffreyrichter @vhvb1989
+/sdk/core/                  @ahsonkhan @antkmsft @gilbertw @jeffreyrichter @vhvb1989
 /sdk/keyvault/              @vhvb1989
 /sdk/platform/posix/        @antkmsft @jeffreyrichter
 /sdk/platform/http_client/  @vhvb1989
