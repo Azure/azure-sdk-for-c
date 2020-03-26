@@ -60,8 +60,8 @@ static void test_az_iot_hub_client_init_succeed(void** state)
   assert_int_equal(
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL), AZ_OK);
 
-  assert_string_equal(TEST_DEVICE_ID_STR, az_span_ptr(client._internal.device_id));
-  assert_string_equal(TEST_DEVICE_HOSTNAME_STR, az_span_ptr(client._internal.iot_hub_hostname));
+  assert_memory_equal(TEST_DEVICE_ID_STR, az_span_ptr(client._internal.device_id), _az_COUNTOF(TEST_DEVICE_ID_STR) - 1);
+  assert_memory_equal(TEST_DEVICE_HOSTNAME_STR, az_span_ptr(client._internal.iot_hub_hostname), _az_COUNTOF(TEST_DEVICE_HOSTNAME_STR) - 1);
 }
 
 static void test_az_iot_hub_client_init_custom_options_succeed(void** state)
@@ -75,10 +75,10 @@ static void test_az_iot_hub_client_init_custom_options_succeed(void** state)
   assert_int_equal(
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, &options), AZ_OK);
 
-  assert_string_equal(TEST_DEVICE_ID_STR, az_span_ptr(client._internal.device_id));
-  assert_string_equal(TEST_DEVICE_HOSTNAME_STR, az_span_ptr(client._internal.iot_hub_hostname));
-  assert_string_equal(TEST_MODULE_ID, az_span_ptr(client._internal.options.module_id));
-  assert_string_equal(TEST_USER_AGENT, az_span_ptr(client._internal.options.user_agent));
+  assert_memory_equal(TEST_DEVICE_ID_STR, az_span_ptr(client._internal.device_id), _az_COUNTOF(TEST_DEVICE_ID_STR) - 1);
+  assert_memory_equal(TEST_DEVICE_HOSTNAME_STR, az_span_ptr(client._internal.iot_hub_hostname), _az_COUNTOF(TEST_DEVICE_HOSTNAME_STR) - 1);
+  assert_memory_equal(TEST_MODULE_ID, az_span_ptr(client._internal.options.module_id), _az_COUNTOF(TEST_MODULE_ID) - 1);
+  assert_memory_equal(TEST_USER_AGENT, az_span_ptr(client._internal.options.user_agent), _az_COUNTOF(TEST_USER_AGENT) - 1);
 }
 
 static void test_az_iot_hub_client_user_name_get_succeed(void** state)
