@@ -176,10 +176,17 @@ typedef struct az_iot_hub_client_properties
 
 /**
  * @brief Initializes the Telemetry or C2D properties.
+ * 
+ * @note The properties functionality will not encode properties. In order to support
+ *       the following characters: 
+ *          `/ % # &`
+ *       the onus is on the user to properly url encode them (RFC 2396). Only these characters
+ *       would have to be encoded. If you would like to avoid the need to encode the keys/values, 
+ *       avoid using the previously mentioned characters.
  *
  * @param[in] properties The #az_iot_hub_client_properties to initialize
  * @param[in] buffer Can either be an empty #az_span or an #az_span containing properly formatted,
- *                   RFC 2396-encoded properties with the following format: {key}={value}&{key}={value}.
+ *                   properties with the following format: {key}={value}&{key}={value}.
  * @return #az_result
  */
 AZ_NODISCARD az_result
@@ -187,6 +194,13 @@ az_iot_hub_client_properties_init(az_iot_hub_client_properties* properties, az_s
 
 /**
  * @brief Appends a key-value property to the list of properties.
+ * 
+ * @note The append functionality will not encode properties. In order to support
+ *       the following characters:
+ *          `/ % # &`
+ *       the onus is on the user to properly url encode them (RFC 2396). Only these characters
+ *       would have to be encoded. If you would like to avoid the need to encode the keys/values, 
+ *       avoid using the previously mentioned characters.
  *
  * @param[in] properties The #az_iot_hub_client_properties to use for this call
  * @param[in] name The name of the property.
