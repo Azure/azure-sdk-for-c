@@ -181,8 +181,8 @@ typedef struct az_iot_hub_client_properties
  *       the following characters: 
  *          `/ % # &`
  *       the onus is on the application to properly url encode them (RFC 2396). Only these characters
- *       would have to be encoded. If you would like to avoid the need to encode the keys/values, 
- *       avoid using the previously mentioned characters.
+ *       would have to be encoded. If you would like to avoid the need to encode the names/values, 
+ *       avoid using these characters in names and values.
  *
  * @param[in] properties The #az_iot_hub_client_properties to initialize
  * @param[in] buffer Can either be an empty #az_span or an #az_span containing properly formatted
