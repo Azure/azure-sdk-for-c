@@ -35,8 +35,8 @@ typedef struct
   struct
   {
     uint8_t* ptr;
-    int32_t length; //< length must be >= 0
-    int32_t capacity; //< capacity must be >= 0
+    int32_t length; ///< length must be >= 0
+    int32_t capacity; ///< capacity must be >= 0
   } _internal;
 } az_span;
 
