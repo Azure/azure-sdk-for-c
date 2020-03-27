@@ -46,6 +46,7 @@ add_subdirectory(sdk/storage/blobs)
 add_subdirectory(sdk/iot/core)
 add_subdirectory(sdk/iot/hub)
 add_subdirectory(sdk/iot/provisioning)
+add_subdirectory(sdk/iot/pnp)
 
 # PAL
 add_subdirectory(sdk/platform/noplatform)
@@ -66,6 +67,7 @@ if (UNIT_TESTING)
   add_subdirectory(sdk/storage/blobs/test/cmocka)
   add_subdirectory(sdk/iot/hub/tests/cmocka)
   add_subdirectory(sdk/iot/provisioning/tests/cmocka)
+  add_subdirectory(sdk/iot/pnp/tests/cmocka)
 
   if(NOT DEFINED ENV{AZ_SDK_C_NO_SAMPLES})
     add_subdirectory(sdk/samples/keyvault/keyvault/test/cmocka)
