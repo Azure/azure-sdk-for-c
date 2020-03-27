@@ -110,28 +110,6 @@ static void test_az_iot_hub_client_telemetry_publish_topic_get_no_options_no_pro
   assert_int_equal(mqtt_topic_buf[az_span_length(mqtt_topic)], 0xFF);
 }
 
-static void
-test_az_iot_hub_client_telemetry_publish_topic_get_as_string_no_options_no_props_succeed(
-    void** state)
-{
-  (void)state;
-
-  az_iot_hub_client client;
-  assert_int_equal(
-      az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL), AZ_OK);
-
-  uint8_t mqtt_topic_buf[TEST_SPAN_BUFFER_SIZE] = { 0 };
-  az_span mqtt_topic = az_span_init(mqtt_topic_buf, 0, _az_COUNTOF(mqtt_topic_buf));
-
-  assert_true(
-      az_iot_hub_client_telemetry_publish_topic_get(&client, NULL, mqtt_topic, &mqtt_topic)
-      == AZ_OK);
-  assert_int_equal(
-      az_span_length(mqtt_topic), _az_COUNTOF(g_test_correct_topic_no_options_no_props) - 1);
-  assert_int_equal(az_span_capacity(mqtt_topic), TEST_SPAN_BUFFER_SIZE);
-  assert_string_equal(g_test_correct_topic_no_options_no_props, (char*)az_span_ptr(mqtt_topic));
-}
-
 static void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_no_props_succeed(
     void** state)
 {
@@ -348,8 +326,6 @@ int test_iot_hub_telemetry()
 #endif // NO_PRECONDITION_CHECKING
     cmocka_unit_test(
         test_az_iot_hub_client_telemetry_publish_topic_get_no_options_no_props_succeed),
-    cmocka_unit_test(
-        test_az_iot_hub_client_telemetry_publish_topic_get_as_string_no_options_no_props_succeed),
     cmocka_unit_test(
         test_az_iot_hub_client_telemetry_publish_topic_get_with_options_no_props_succeed),
     cmocka_unit_test(
