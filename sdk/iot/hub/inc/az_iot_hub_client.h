@@ -185,8 +185,9 @@ typedef struct az_iot_hub_client_properties
  *       avoid using the previously mentioned characters.
  *
  * @param[in] properties The #az_iot_hub_client_properties to initialize
- * @param[in] buffer Can either be an empty #az_span or an #az_span containing properly formatted,
- *                   properties with the following format: {key}={value}&{key}={value}.
+ * @param[in] buffer Can either be an empty #az_span or an #az_span containing properly formatted
+ *                   (with above mentioned characters encoded if applicable) properties with the 
+ *                   following format: {key}={value}&{key}={value}.
  * @return #az_result
  */
 AZ_NODISCARD az_result
