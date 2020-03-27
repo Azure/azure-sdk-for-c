@@ -19,7 +19,6 @@
 // PnP Client
 #define TEST_DEVICE_ID_STR "my_device"
 #define TEST_DEVICE_HOSTNAME_STR "myiothub.azure-devices.net"
-#define TEST_MODULE_ID "my_module_id"
 #define TEST_ROOT_INTERFACE_NAME "my_root_interface_name"
 #define TEST_USER_AGENT "os=azrtos"
 #define TEST_CONTENT_TYPE "my_content_type"
@@ -39,6 +38,8 @@ static const char test_correct_pnp_user_name[]
 static const char test_correct_pnp_user_name_with_user_agent[]
     = "myiothub.azure-devices.net/my_device/?api-version=2018-06-30&" TEST_USER_AGENT
       "&digital-twin-model-id=" TEST_ROOT_INTERFACE_NAME;
+
+static const char test_pnp_correct_topic_no_options_no_props[] = "devices/my_device/messages/events/";
 
 #ifndef NO_PRECONDITION_CHECKING
 

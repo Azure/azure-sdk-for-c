@@ -41,19 +41,16 @@ AZ_NODISCARD az_result az_iot_pnp_client_telemetry_get_publish_topic(
     az_span* out_mqtt_topic)
 {
   AZ_PRECONDITION_NOT_NULL(client);
+  AZ_PRECONDITION_VALID_SPAN(component_name, 1, false);
   AZ_PRECONDITION_VALID_SPAN(mqtt_topic, 0, false);
+  AZ_PRECONDITION_IS_NULL(reserved);
   AZ_PRECONDITION_NOT_NULL(out_mqtt_topic);
-
-  // TODO: Once approved
-  (void)reserved;
-  // AZ_PRECONDITION_IS_NULL(reserved)
 
   AZ_RETURN_IF_FAILED(az_iot_hub_client_telemetry_publish_topic_get(
     &client->_internal.iot_hub_client, NULL, mqtt_topic, &mqtt_topic));
 
-  AZ_RETURN_IF_FAILED(
-    az_add_telemetry_property(mqtt_topic, pnp_telemetry_component_name_param, component_name,
-                             &mqtt_topic));
+  AZ_RETURN_IF_FAILED(az_add_telemetry_property(
+    mqtt_topic, pnp_telemetry_component_name_param, component_name,&mqtt_topic));
 
   if (az_span_ptr(client->_internal.options.content_type) != NULL)
   {
