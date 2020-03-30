@@ -21,7 +21,7 @@
 
 
 /**
- * @brief Azure IoT service MQTT properties for telemetry publish messages.
+ * @brief Azure IoT service MQTT bit field properties for telemetry publish messages.
  *
  */
 enum
