@@ -19,6 +19,17 @@
 #include <_az_cfg_prefix.h>
 
 /**
+ * @brief Azure IoT service MQTT connection properties.
+ *
+ */
+enum
+{
+  AZ_CLIENT_DEFAULT_MQTT_CONNECT_PORT = 8883,
+  AZ_CLIENT_DEFAULT_MQTT_CONNECT_CLEAN_SESSION = 0x20,
+  AZ_CLIENT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS = 240
+};
+
+/**
  * @brief Azure IoT service status codes.
  *
  */
