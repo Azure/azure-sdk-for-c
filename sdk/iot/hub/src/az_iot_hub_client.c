@@ -7,6 +7,7 @@
 #include <az_precondition_internal.h>
 #include <az_result.h>
 #include <az_span.h>
+#include <az_span_internal.h>
 
 #include <_az_cfg.h>
 
@@ -46,6 +47,8 @@ AZ_NODISCARD az_result az_iot_hub_client_user_name_get(
   AZ_PRECONDITION_NOT_NULL(client);
   AZ_PRECONDITION_VALID_SPAN(mqtt_user_name, 0, false);
   AZ_PRECONDITION_NOT_NULL(out_mqtt_user_name);
+
+  mqtt_user_name = _az_span_set_length(mqtt_user_name, 0);
 
   const az_span* const module_id = &(client->_internal.options.module_id);
   const az_span* const user_agent = &(client->_internal.options.user_agent);
@@ -87,6 +90,8 @@ AZ_NODISCARD az_result az_iot_hub_client_id_get(
   AZ_PRECONDITION_NOT_NULL(client);
   AZ_PRECONDITION_VALID_SPAN(mqtt_client_id, 0, false);
   AZ_PRECONDITION_NOT_NULL(out_mqtt_client_id);
+
+  mqtt_client_id = _az_span_set_length(mqtt_client_id, 0);
 
   const az_span* const module_id = &(client->_internal.options.module_id);
 
