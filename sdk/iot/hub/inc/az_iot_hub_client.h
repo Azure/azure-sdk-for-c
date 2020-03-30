@@ -19,6 +19,18 @@
 
 #include <_az_cfg_prefix.h>
 
+
+/**
+ * @brief Azure IoT service MQTT properties for telemetry publish messages.
+ *
+ */
+enum
+{
+  AZ_HUB_CLIENT_DEFAULT_MQTT_TELEMETRY_QOS = 0,
+  AZ_HUB_CLIENT_DEFAULT_MQTT_TELEMETRY_DUPLICATE = 0,
+  AZ_HUB_CLIENT_DEFAULT_MQTT_TELEMETRY_RETAIN = 1
+};  
+
 /**
  * @brief Azure IoT Hub Client options.
  *
