@@ -43,12 +43,17 @@ AZ_NODISCARD AZ_INLINE az_span az_span_for_test_init(uint8_t* ptr, int32_t lengt
  * The function will assert on any unexpected results.
  *
  * @param[in] result_span Span that has the result of the test run.
- * @param[in] buffer_expected Buffer that contains expected results of the test and that result_span will match on success.
+ * @param[in] buffer_expected Buffer that contains expected results of the test and that result_span
+ * will match on success.
  * @param[in] length_expected The expected length of result_span.
  * @param[in] capacity_expected The expected capacity of result_span.
  * @return az_span The "view" over the byte buffer, with the buffer filled with 0xFF.
  */
-AZ_INLINE void az_span_for_test_verify(az_span result_span, const void* const buffer_expected, int32_t length_expected, int32_t capacity_expected)
+AZ_INLINE void az_span_for_test_verify(
+    az_span result_span,
+    const void* const buffer_expected,
+    int32_t length_expected,
+    int32_t capacity_expected)
 {
   assert_int_equal(az_span_length(result_span), length_expected);
   assert_int_equal(az_span_capacity(result_span), capacity_expected);
