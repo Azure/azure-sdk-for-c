@@ -217,6 +217,7 @@ jobs:
       coverageFailOption: fixed
       coverageType: line
       coverageThreshold: 99
+    condition: eq(variables['AZ_SDK_CODE_COV'], 1)
 
 
 # Disable build for c - client 
