@@ -210,7 +210,7 @@ jobs:
     displayName: Publish Code Coverage to DevOps
     condition: eq(variables['AZ_SDK_CODE_COV'], 1)
 
-  - task: mspremier.BuildQualityChecks.QualityChecks-task.BuildQualityChecks@5
+  - task: mspremier.BuildQualityChecks.QualityChecks-task.BuildQualityChecks@6
     displayName: Check coverage
     inputs:
       checkCoverage: true
