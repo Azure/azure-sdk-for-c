@@ -210,6 +210,14 @@ jobs:
     displayName: Publish Code Coverage to DevOps
     condition: eq(variables['AZ_SDK_CODE_COV'], 1)
 
+  - task: mspremier.BuildQualityChecks.QualityChecks-task.BuildQualityChecks@5
+    displayName: Check coverage
+    inputs:
+      checkCoverage: true
+      coverageFailOption: fixed
+      coverageType: line
+      coverageThreshold: 99
+
 
 # Disable build for c - client 
 - ${{ if ne(parameters.ServiceDirectory, 'not-specified' )}}:
