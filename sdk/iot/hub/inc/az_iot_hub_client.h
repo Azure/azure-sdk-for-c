@@ -19,6 +19,18 @@
 
 #include <_az_cfg_prefix.h>
 
+
+/**
+ * @brief Azure IoT service MQTT bit field properties for telemetry publish messages.
+ *
+ */
+enum
+{
+  AZ_HUB_CLIENT_DEFAULT_MQTT_TELEMETRY_QOS = 0,
+  AZ_HUB_CLIENT_DEFAULT_MQTT_TELEMETRY_DUPLICATE = 0,
+  AZ_HUB_CLIENT_DEFAULT_MQTT_TELEMETRY_RETAIN = 1
+};  
+
 /**
  * @brief Azure IoT Hub Client options.
  *
@@ -176,10 +188,18 @@ typedef struct az_iot_hub_client_properties
 
 /**
  * @brief Initializes the Telemetry or C2D properties.
+ * 
+ * @note The properties init API will not encode properties. In order to support
+ *       the following characters: 
+ *          `/ % # &`
+ *       the onus is on the application to properly url encode them (RFC 2396). Only these characters
+ *       would have to be encoded. If you would like to avoid the need to encode the names/values, 
+ *       avoid using these characters in names and values.
  *
  * @param[in] properties The #az_iot_hub_client_properties to initialize
- * @param[in] buffer Can either be an empty #az_span or an #az_span containing properly formatted,
- *                   RFC 2396-encoded properties with the following format: {key}={value}&{key}={value}.
+ * @param[in] buffer Can either be an empty #az_span or an #az_span containing properly formatted
+ *                   (with above mentioned characters encoded if applicable) properties with the 
+ *                   following format: {key}={value}&{key}={value}.
  * @return #az_result
  */
 AZ_NODISCARD az_result
@@ -187,6 +207,13 @@ az_iot_hub_client_properties_init(az_iot_hub_client_properties* properties, az_s
 
 /**
  * @brief Appends a key-value property to the list of properties.
+ * 
+ * @note The properties append API will not encode properties. In order to support
+ *       the following characters:
+ *          `/ % # &`
+ *       the onus is on the application to properly url encode them (RFC 2396). Only these characters
+ *       would have to be encoded. If you would like to avoid the need to encode the names/values, 
+ *       avoid using these characters in names and values.
  *
  * @param[in] properties The #az_iot_hub_client_properties to use for this call
  * @param[in] name The name of the property.
@@ -460,10 +487,6 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_get_publish_topic_get(
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
  * @param[in] request_id The request id.
- * @param[in] if_match_version Can be either "*" to overwrite or the twin version to limit the
- *                             reported properties patch to that version only. The version is
- *                             available from the JSON document or from
- *                             #az_iot_hub_client_twin_response::version.
  * @param[in] mqtt_topic An empty #az_span with sufficient capacity to hold the MQTT topic.
  * @param[out] out_mqtt_topic The output #az_span containing the MQTT topic.
  * @return #az_result
@@ -471,7 +494,6 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_get_publish_topic_get(
 AZ_NODISCARD az_result az_iot_hub_client_twin_patch_publish_topic_get(
     az_iot_hub_client const* client,
     az_span request_id,
-    az_span if_match_version,
     az_span mqtt_topic,
     az_span* out_mqtt_topic);
 
