@@ -3,7 +3,7 @@
 
 #include "test_az_iot_hub_client.h"
 #include <az_iot_hub_client.h>
-#include <az_span.h>
+#include <az_test_span.h>
 
 #include <az_precondition.h>
 #include <az_precondition_internal.h>
@@ -96,18 +96,13 @@ static void test_az_iot_hub_client_telemetry_publish_topic_get_no_options_no_pro
 
   uint8_t mqtt_topic_buf[TEST_SPAN_BUFFER_SIZE];
   memset(mqtt_topic_buf, 0xFF, _az_COUNTOF(mqtt_topic_buf));
-  az_span mqtt_topic = az_span_init(mqtt_topic_buf, 0, _az_COUNTOF(mqtt_topic_buf));
+  az_span mqtt_topic = az_span_for_test_init(mqtt_topic_buf, 0, _az_COUNTOF(mqtt_topic_buf));
 
   assert_int_equal(
       az_iot_hub_client_telemetry_publish_topic_get(&client, NULL, mqtt_topic, &mqtt_topic), AZ_OK);
-  assert_memory_equal(
-      g_test_correct_topic_no_options_no_props,
-      (char*)az_span_ptr(mqtt_topic),
-      _az_COUNTOF(g_test_correct_topic_no_options_no_props) - 1);
-  assert_int_equal(
-      az_span_length(mqtt_topic), _az_COUNTOF(g_test_correct_topic_no_options_no_props) - 1);
-  assert_int_equal(az_span_capacity(mqtt_topic), TEST_SPAN_BUFFER_SIZE);
-  assert_int_equal(mqtt_topic_buf[az_span_length(mqtt_topic)], 0xFF);
+
+  az_span_for_test_verify(mqtt_topic, g_test_correct_topic_no_options_no_props, 
+      _az_COUNTOF(g_test_correct_topic_no_options_no_props) - 1, TEST_SPAN_BUFFER_SIZE);
 }
 
 static void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_no_props_succeed(
@@ -128,14 +123,9 @@ static void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_no_p
 
   assert_int_equal(
       az_iot_hub_client_telemetry_publish_topic_get(&client, NULL, mqtt_topic, &mqtt_topic), AZ_OK);
-  assert_memory_equal(
-      g_test_correct_topic_with_options_no_props,
-      (char*)az_span_ptr(mqtt_topic),
-      _az_COUNTOF(g_test_correct_topic_with_options_no_props) - 1);
-  assert_int_equal(
-      az_span_length(mqtt_topic), _az_COUNTOF(g_test_correct_topic_with_options_no_props) - 1);
-  assert_int_equal(az_span_capacity(mqtt_topic), TEST_SPAN_BUFFER_SIZE);
-  assert_int_equal(mqtt_topic_buf[az_span_length(mqtt_topic)], 0xFF);
+
+  az_span_for_test_verify(mqtt_topic, g_test_correct_topic_with_options_no_props,
+      _az_COUNTOF(g_test_correct_topic_with_options_no_props) - 1, TEST_SPAN_BUFFER_SIZE);
 }
 
 static void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_with_props_succeed(
@@ -160,14 +150,9 @@ static void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_with
   assert_int_equal(
       az_iot_hub_client_telemetry_publish_topic_get(&client, &props, mqtt_topic, &mqtt_topic),
       AZ_OK);
-  assert_memory_equal(
-      g_test_correct_topic_with_options_with_props,
-      (char*)az_span_ptr(mqtt_topic),
-      _az_COUNTOF(g_test_correct_topic_with_options_with_props) - 1);
-  assert_int_equal(
-      az_span_length(mqtt_topic), _az_COUNTOF(g_test_correct_topic_with_options_with_props) - 1);
-  assert_int_equal(az_span_capacity(mqtt_topic), TEST_SPAN_BUFFER_SIZE);
-  assert_int_equal(mqtt_topic_buf[az_span_length(mqtt_topic)], 0xFF);
+
+  az_span_for_test_verify(mqtt_topic, g_test_correct_topic_with_options_with_props,
+      _az_COUNTOF(g_test_correct_topic_with_options_with_props) - 1, TEST_SPAN_BUFFER_SIZE);
 }
 
 static void
@@ -216,14 +201,9 @@ static void test_az_iot_hub_client_telemetry_publish_topic_get_no_options_with_p
   assert_int_equal(
       az_iot_hub_client_telemetry_publish_topic_get(&client, &props, mqtt_topic, &mqtt_topic),
       AZ_OK);
-  assert_memory_equal(
-      g_test_correct_topic_no_options_with_props,
-      (char*)az_span_ptr(mqtt_topic),
-      _az_COUNTOF(g_test_correct_topic_no_options_with_props) - 1);
-  assert_int_equal(
-      az_span_length(mqtt_topic), _az_COUNTOF(g_test_correct_topic_no_options_with_props) - 1);
-  assert_int_equal(az_span_capacity(mqtt_topic), TEST_SPAN_BUFFER_SIZE);
-  assert_int_equal(mqtt_topic_buf[az_span_length(mqtt_topic)], 0xFF);
+
+  az_span_for_test_verify(mqtt_topic, g_test_correct_topic_no_options_with_props, 
+      _az_COUNTOF(g_test_correct_topic_no_options_with_props) - 1, TEST_SPAN_BUFFER_SIZE);
 }
 
 static void
@@ -273,15 +253,10 @@ test_az_iot_hub_client_telemetry_publish_topic_get_with_options_module_id_with_p
   assert_int_equal(
       az_iot_hub_client_telemetry_publish_topic_get(&client, &props, mqtt_topic, &mqtt_topic),
       AZ_OK);
-  assert_memory_equal(
+
+  az_span_for_test_verify(mqtt_topic,
       g_test_correct_topic_with_options_module_id_with_props,
-      (char*)az_span_ptr(mqtt_topic),
-      _az_COUNTOF(g_test_correct_topic_with_options_module_id_with_props) - 1);
-  assert_int_equal(
-      az_span_length(mqtt_topic),
-      _az_COUNTOF(g_test_correct_topic_with_options_module_id_with_props) - 1);
-  assert_int_equal(az_span_capacity(mqtt_topic), TEST_SPAN_BUFFER_SIZE);
-  assert_int_equal(mqtt_topic_buf[az_span_length(mqtt_topic)], 0xFF);
+      _az_COUNTOF(g_test_correct_topic_with_options_module_id_with_props) - 1, TEST_SPAN_BUFFER_SIZE);
 }
 
 static void
