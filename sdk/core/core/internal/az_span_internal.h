@@ -5,7 +5,6 @@
 #define _az_SPAN_INTERNAL_H
 
 #include <az_span.h>
-
 #include <stdint.h>
 
 #include <_az_cfg_prefix.h>
