@@ -216,7 +216,8 @@ jobs:
       checkCoverage: true
       coverageFailOption: fixed
       coverageType: line
-      coverageThreshold: 99
+      # 85% minimum line coverage
+      coverageThreshold: 85
     condition: eq(variables['AZ_SDK_CODE_COV'], 1)
 
 
