@@ -52,7 +52,6 @@ AZ_NODISCARD AZ_INLINE az_span az_span_for_test_init(uint8_t* ptr, int32_t lengt
  * will match on success.
  * @param[in] length_expected The expected length of result_span.
  * @param[in] capacity_expected The expected capacity of result_span.
- * @return az_span The "view" over the byte buffer, with the buffer filled with 0xFF.
  */
 AZ_INLINE void az_span_for_test_verify(
     az_span result_span,
