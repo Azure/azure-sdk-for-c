@@ -12,6 +12,8 @@
 
 #include <assert.h>
 #include <setjmp.h>
+#include <stdarg.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <cmocka.h>
 
@@ -19,6 +21,9 @@
 #include <az_span.h>
 
 #include <stdio.h>
+
+#include <_az_cfg_prefix.h>
+
 
 /**
  * @brief az_span_for_test_init returns a span over a byte buffer, directly invoking
@@ -32,7 +37,7 @@
 AZ_NODISCARD AZ_INLINE az_span az_span_for_test_init(uint8_t* ptr, int32_t length, int32_t capacity)
 {
   az_span new_span = az_span_init(ptr, length, capacity);
-  az_span_set(new_span, 0xff);
+  az_span_set(new_span, 0xcc);
   return new_span;
 }
 
@@ -57,12 +62,14 @@ AZ_INLINE void az_span_for_test_verify(
 {
   assert_int_equal(az_span_length(result_span), length_expected);
   assert_int_equal(az_span_capacity(result_span), capacity_expected);
-  assert_memory_equal(az_span_ptr(result_span), buffer_expected, length_expected);
+  assert_memory_equal(az_span_ptr(result_span), (size_t)buffer_expected, (size_t)length_expected);
 
   for (int32_t i = az_span_length(result_span); i < az_span_capacity(result_span); i++)
   {
-    assert_true(*(uint8_t*)(az_span_ptr(result_span) + i) == 0xff);
+    assert_true(*(uint8_t*)(az_span_ptr(result_span) + i) == 0xcc);
   }
 }
+
+#include <_az_cfg_suffix.h>
 
 #endif // _az_SPAN_TESTING_H
