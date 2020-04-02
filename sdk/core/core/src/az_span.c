@@ -34,15 +34,15 @@ AZ_NODISCARD az_span az_span_from_str(char* str)
   return az_span_init((uint8_t*)str, length, length);
 }
 
-AZ_NODISCARD az_span az_span_slice(az_span span, int32_t low_index, int32_t high_index)
+AZ_NODISCARD az_span az_span_slice(az_span span, int32_t start_index, int32_t end_index)
 {
-  AZ_PRECONDITION_RANGE(-1, high_index, az_span_capacity(span));
-  AZ_PRECONDITION(high_index == -1 || (high_index >= 0 && low_index <= high_index));
+  AZ_PRECONDITION_RANGE(-1, end_index, az_span_capacity(span));
+  AZ_PRECONDITION(end_index == -1 || (end_index >= 0 && start_index <= end_index));
 
   int32_t const capacity = az_span_capacity(span);
 
-  high_index = high_index == -1 ? capacity : high_index;
-  return az_span_init(az_span_ptr(span) + low_index, high_index - low_index, capacity - low_index);
+  end_index = end_index == -1 ? capacity : end_index;
+  return az_span_init(az_span_ptr(span) + start_index, end_index - start_index, capacity - start_index);
 }
 
 AZ_NODISCARD AZ_INLINE uint8_t _az_tolower(uint8_t value)
