@@ -129,8 +129,6 @@ AZ_NODISCARD az_result az_span_to_uint32(az_span span, uint32_t* out_number)
   return AZ_OK;
 }
 
-#define AZ_SPAN_FIND_TARGET_NOT_FOUND -1
-
 AZ_NODISCARD int32_t az_span_find(az_span source, az_span target)
 {
 /* This function implements the Naive string-search algorithm.
@@ -185,7 +183,9 @@ AZ_NODISCARD int32_t az_span_find(az_span source, az_span target)
 
   // If the function hasn't returned before, all positions 
   // of `source` have been evaluated but `target` could not be found.
-  return AZ_SPAN_FIND_TARGET_NOT_FOUND;
+  const int32_t TARGET_NOT_FOUND = -1;
+
+  return TARGET_NOT_FOUND;
 }
 
 AZ_NODISCARD az_span az_span_token(az_span source, az_span delimiter, az_span* out_remainder)
