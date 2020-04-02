@@ -210,8 +210,8 @@ static void test_az_iot_pnp_client_telemetry_publish_topic_get_content_encoding_
 
   az_span_for_test_verify(
       mqtt_topic,
-      g_test_correct_pnp_topic_content_type,
-      _az_COUNTOF(g_test_correct_pnp_topic_content_type) - 1,
+      g_test_correct_pnp_topic_content_encoding,
+      _az_COUNTOF(g_test_correct_pnp_topic_content_encoding) - 1,
       TEST_SPAN_BUFFER_SIZE);
 }
 
@@ -352,6 +352,7 @@ int test_iot_pnp_telemetry()
 #endif // NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_az_iot_pnp_client_telemetry_publish_topic_get_no_options_succeed),
     cmocka_unit_test(test_az_iot_pnp_client_telemetry_publish_topic_get_content_type_succeed),
+    cmocka_unit_test(test_az_iot_pnp_client_telemetry_publish_topic_get_content_encoding_succeed),
     cmocka_unit_test(
         test_az_iot_pnp_client_telemetry_publish_topic_get_content_type_and_encoding_succeed),
     cmocka_unit_test(test_az_iot_pnp_client_telemetry_publish_topic_get_with_small_buffer_fails),
