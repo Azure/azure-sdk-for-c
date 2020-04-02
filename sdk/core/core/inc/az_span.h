@@ -275,14 +275,10 @@ AZ_NODISCARD az_result az_span_to_uint32(az_span span, uint32_t* out_number);
  *
  * @param[in] source The #az_span with the content to be searched on.
  * @param[in] target The #az_span containing the token to be searched in `source`.
- * @param[out] out_span The #az_span pointing to the first occurrence of `target` in `source`, if it
- * is found.
- * @return An #az_result value indicating the result of the operation.
- *          #AZ_OK if `target` is found in `source`
- *          #AZ_ERROR_ITEM_NOT_FOUND if `target` is not found in `source`
- * is found within the span.
+ * @return The position of `target` in `source` if `source` contains `target`.
+ *         -1 if `target` is not found in `source`.
  */
-AZ_NODISCARD az_result az_span_find(az_span source, az_span target, az_span* out_span);
+AZ_NODISCARD int32_t az_span_find(az_span source, az_span target);
 
 /**
  * @brief az_span_token is a string tokenizer for az_span.
