@@ -193,12 +193,10 @@ jobs:
       testRunTitle: 'C99 - $(Agent.JobName)'
     condition: contains(variables['vcpkg.deps'], 'cmocka')
 
-  - script: |
-      make az_core_cov_xml
-      make az_iot_hub_cov_xml
-      make az_iot_pnp_cov_xml
-      make az_keyvault_cov_xml
-      make az_storage_blobs_cov_xml
+  # Make coverage targets (specified in coverage_targets.txt) and assemble
+  # coverage report
+  - bash: |
+      make `cat coverage_targets.txt`
       ../tools/reportgenerator "-reports:sdk/*/*/*cov_xml.xml" "-targetdir:." "-reporttypes:Cobertura"
     workingDirectory: build
     displayName: Generate Code Coverage Data
