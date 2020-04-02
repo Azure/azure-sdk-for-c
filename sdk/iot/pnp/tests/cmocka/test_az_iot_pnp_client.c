@@ -39,13 +39,11 @@ static const char test_correct_pnp_user_name_with_user_agent[]
     = "myiothub.azure-devices.net/my_device/?api-version=2018-06-30&" TEST_USER_AGENT
       "&digital-twin-model-id=" TEST_ROOT_INTERFACE_NAME;
 
-static const char test_pnp_correct_topic_no_options_no_props[] = "devices/my_device/messages/events/";
-
 #ifndef NO_PRECONDITION_CHECKING
 
 enable_precondition_check_tests()
 
-static void test_az_iot_pnp_client_init_NULL_client_fails(void** state)
+    static void test_az_iot_pnp_client_init_NULL_client_fails(void** state)
 {
   (void)state;
 

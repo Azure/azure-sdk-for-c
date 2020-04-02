@@ -33,6 +33,7 @@ static az_result az_add_telemetry_property(az_span mqtt_topic, az_span property_
     az_span_append(mqtt_topic, property_value, &mqtt_topic));
 
   *out_mqtt_topic = mqtt_topic;
+
   return AZ_OK;
 }
 
