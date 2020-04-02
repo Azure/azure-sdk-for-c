@@ -55,7 +55,7 @@ AZ_NODISCARD AZ_INLINE uint8_t* az_span_ptr(az_span span) { return span._interna
 AZ_NODISCARD AZ_INLINE int32_t az_span_length(az_span span) { return span._internal.length; }
 
 /**
- * @brief az_span_capacity Returns the maxiumum number of bytes.
+ * @brief az_span_capacity Returns the maximum number of bytes.
  * Capacity will always be greater than or equal to length.
  *
  */
