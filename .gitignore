@@ -338,3 +338,4 @@ build/
 
 # VS Code Files
 .vscode
+coverage_targets.txt

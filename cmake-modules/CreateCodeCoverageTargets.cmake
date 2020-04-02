@@ -11,5 +11,8 @@ if(DEFINED ENV{AZ_SDK_CODE_COV} AND CMAKE_C_COMPILER_ID MATCHES "GNU")
         # HTML and XML - Coverage using gcovr (Needs to be installed into system)
         setup_target_for_coverage_gcovr_html(NAME ${TARGET_NAME}_cov_html EXECUTABLE ${TARGET_NAME}_test)
         setup_target_for_coverage_gcovr_xml(NAME ${TARGET_NAME}_cov_xml EXECUTABLE ${TARGET_NAME}_test)
+
+        # add project to coverage projects for printing
+        file(APPEND ${CMAKE_SOURCE_DIR}/coverage_targets.txt "${TARGET_NAME}_cov_xml\n")
     endif() 
 endif()
