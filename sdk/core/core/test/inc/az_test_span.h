@@ -27,12 +27,12 @@
 
 /**
  * @brief az_span_for_test_init returns a span over a byte buffer, directly invoking
- * #az_span_init.  The buffer is initialized with 0xFF to help tests check against buffer overflow.
+ * #az_span_init.  The buffer is initialized with 0xcc to help tests check against buffer overflow.
  *
  * @param[in] ptr The memory address of the 1st byte in the byte buffer.
  * @param[in] length The number of bytes initialized in the byte buffer.
  * @param[in] capacity The number of total bytes in the byte buffer.
- * @return az_span The "view" over the byte buffer, with the buffer filled with 0xFF.
+ * @return az_span The "view" over the byte buffer, with the buffer filled with 0xcc.
  */
 AZ_NODISCARD AZ_INLINE az_span az_span_for_test_init(uint8_t* ptr, int32_t length, int32_t capacity)
 {
