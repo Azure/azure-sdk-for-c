@@ -36,7 +36,7 @@ include(eng/cmake/global_compile_options.txt)
 # This write empty makes sure that if file is already there, we replace it for an empty one
 # Then each project will APPEND to this file
 # At the end of cmake generate, this file will list the targets for code cov
-file(WRITE coverage_targets.txt "")
+file(WRITE ${CMAKE_BINARY_DIR}/coverage_targets.txt "")
 
 add_subdirectory(sdk/core/core)
 
