@@ -227,7 +227,7 @@ jobs:
       coverageFailOption: fixed
       coverageType: branch
       # 60% minimum branch coverage
-      coverageThreshold: 99
+      coverageThreshold: 60
     condition: eq(variables['AZ_SDK_CODE_COV'], 1)
 
 # Disable build for c - client 
