@@ -29,7 +29,13 @@ static const az_span test_device_id = AZ_SPAN_LITERAL_FROM_STR("my_device");
 static const az_span test_device_hostname = AZ_SPAN_LITERAL_FROM_STR("myiothub.azure-devices.net");
 static const az_span test_root_interface_name = AZ_SPAN_LITERAL_FROM_STR(TEST_ROOT_INTERFACE_NAME);
 static const az_span test_component_name = AZ_SPAN_LITERAL_FROM_STR(TEST_COMPONENT_NAME);
-static const char g_test_correct_pnp_topic_no_options_no_props[] = "devices/my_device/messages/events/%24.ifname=" TEST_COMPONENT_NAME;
+static const az_span test_content_type = AZ_SPAN_LITERAL_FROM_STR(TEST_CONTENT_TYPE);
+static const az_span test_content_encoding = AZ_SPAN_LITERAL_FROM_STR(TEST_CONTENT_ENCODING);
+
+static const char g_test_correct_pnp_topic_no_options[] = "devices/my_device/messages/events/%24.ifname=" TEST_COMPONENT_NAME;
+static const char g_test_correct_pnp_topic_content_type[] = "devices/my_device/messages/events/%24.ifname=" TEST_COMPONENT_NAME "&%24.ct=" TEST_CONTENT_TYPE;
+static const char g_test_correct_pnp_topic_content_encoding[] = "devices/my_device/messages/events/%24.ifname=" TEST_COMPONENT_NAME "&%24.ce=" TEST_CONTENT_ENCODING;
+static const char g_test_correct_pnp_topic_content_type_and_encoding[] = "devices/my_device/messages/events/%24.ifname=" TEST_COMPONENT_NAME "&%24.ct=" TEST_CONTENT_TYPE "&%24.ce=" TEST_CONTENT_ENCODING;
 
 #ifndef NO_PRECONDITION_CHECKING
 
@@ -118,7 +124,7 @@ static void test_az_iot_pnp_client_telemetry_get_publish_topic_non_NULL_reserved
 
 #endif // NO_PRECONDITION_CHECKING
 
-static void test_az_iot_pnp_client_telemetry_publish_topic_get_no_options_no_props_succeed(
+static void test_az_iot_pnp_client_telemetry_publish_topic_get_no_options_succeed(
     void** state)
 {
   (void)state;
@@ -129,15 +135,172 @@ static void test_az_iot_pnp_client_telemetry_publish_topic_get_no_options_no_pro
         &client, test_device_hostname, test_device_id, test_root_interface_name, NULL), AZ_OK);
 
   uint8_t mqtt_topic_buf[TEST_SPAN_BUFFER_SIZE];
-  az_span mqtt_topic = az_span_for_test_init(mqtt_topic_buf, 0, TEST_SPAN_BUFFER_SIZE);
+  az_span mqtt_topic = az_span_for_test_init(mqtt_topic_buf, 0, _az_COUNTOF(mqtt_topic_buf));
 
   assert_int_equal(
       az_iot_pnp_client_telemetry_get_publish_topic(&client, test_component_name, mqtt_topic, NULL, &mqtt_topic), AZ_OK);
 
   az_span_for_test_verify(mqtt_topic, 
-      g_test_correct_pnp_topic_no_options_no_props,
-      _az_COUNTOF(g_test_correct_pnp_topic_no_options_no_props) - 1);
+      g_test_correct_pnp_topic_no_options,
+      _az_COUNTOF(g_test_correct_pnp_topic_no_options) - 1,
+      TEST_SPAN_BUFFER_SIZE);
 }
+
+static void test_az_iot_pnp_client_telemetry_publish_topic_get_content_type_succeed(
+    void** state)
+{
+  (void)state;
+
+  az_iot_pnp_client_options options = az_iot_pnp_client_options_default();
+  options.content_type = test_content_type;
+
+  az_iot_pnp_client client;
+  assert_int_equal(
+      az_iot_pnp_client_init(
+        &client, test_device_hostname, test_device_id, test_root_interface_name, &options), AZ_OK);
+
+  uint8_t mqtt_topic_buf[TEST_SPAN_BUFFER_SIZE];
+  az_span mqtt_topic = az_span_for_test_init(mqtt_topic_buf, 0, _az_COUNTOF(mqtt_topic_buf));
+
+  assert_int_equal(
+      az_iot_pnp_client_telemetry_get_publish_topic(&client, test_component_name, mqtt_topic, NULL, &mqtt_topic), AZ_OK);
+
+  az_span_for_test_verify(mqtt_topic, 
+      g_test_correct_pnp_topic_content_type,
+      _az_COUNTOF(g_test_correct_pnp_topic_content_type) - 1,
+      TEST_SPAN_BUFFER_SIZE);
+}
+
+static void test_az_iot_pnp_client_telemetry_publish_topic_get_content_encoding_succeed(
+    void** state)
+{
+  (void)state;
+
+  az_iot_pnp_client_options options = az_iot_pnp_client_options_default();
+  options.content_encoding = test_content_encoding;
+
+  az_iot_pnp_client client;
+  assert_int_equal(
+      az_iot_pnp_client_init(
+        &client, test_device_hostname, test_device_id, test_root_interface_name, &options), AZ_OK);
+
+  uint8_t mqtt_topic_buf[TEST_SPAN_BUFFER_SIZE];
+  az_span mqtt_topic = az_span_for_test_init(mqtt_topic_buf, 0, _az_COUNTOF(mqtt_topic_buf));
+
+  assert_int_equal(
+      az_iot_pnp_client_telemetry_get_publish_topic(&client, test_component_name, mqtt_topic, NULL, &mqtt_topic), AZ_OK);
+
+  az_span_for_test_verify(mqtt_topic, 
+      g_test_correct_pnp_topic_content_type,
+      _az_COUNTOF(g_test_correct_pnp_topic_content_type) - 1,
+      TEST_SPAN_BUFFER_SIZE);
+}
+
+static void test_az_iot_pnp_client_telemetry_publish_topic_get_content_type_and_encoding_succeed(
+    void** state)
+{
+  (void)state;
+
+  az_iot_pnp_client_options options = az_iot_pnp_client_options_default();
+  options.content_type = test_content_type;
+  options.content_encoding = test_content_encoding;
+
+  az_iot_pnp_client client;
+  assert_int_equal(
+      az_iot_pnp_client_init(
+        &client, test_device_hostname, test_device_id, test_root_interface_name, &options), AZ_OK);
+
+  uint8_t mqtt_topic_buf[TEST_SPAN_BUFFER_SIZE];
+  az_span mqtt_topic = az_span_for_test_init(mqtt_topic_buf, 0, _az_COUNTOF(mqtt_topic_buf));
+
+  assert_int_equal(
+      az_iot_pnp_client_telemetry_get_publish_topic(&client, test_component_name, mqtt_topic, NULL, &mqtt_topic), AZ_OK);
+
+  az_span_for_test_verify(mqtt_topic, 
+      g_test_correct_pnp_topic_content_type_and_encoding,
+      _az_COUNTOF(g_test_correct_pnp_topic_content_type_and_encoding) - 1,
+      TEST_SPAN_BUFFER_SIZE);
+}
+
+static void test_az_iot_pnp_client_telemetry_publish_topic_get_with_small_buffer_fails(
+    void** state)
+{
+  (void)state;
+
+  az_iot_pnp_client client;
+  assert_int_equal(
+      az_iot_pnp_client_init(
+        &client, test_device_hostname, test_device_id, test_root_interface_name, NULL), AZ_OK);
+
+  uint8_t mqtt_topic_buf[_az_COUNTOF(g_test_correct_pnp_topic_no_options) - 2];
+  az_span mqtt_topic = az_span_for_test_init(mqtt_topic_buf, 0, _az_COUNTOF(mqtt_topic_buf));
+
+  assert_int_equal(
+      az_iot_pnp_client_telemetry_get_publish_topic(&client, test_component_name, mqtt_topic, NULL, &mqtt_topic), AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY);
+}
+
+
+static void test_az_iot_pnp_client_telemetry_publish_topic_get_content_type_with_small_buffer_fails(
+    void** state)
+{
+  (void)state;
+
+  az_iot_pnp_client_options options = az_iot_pnp_client_options_default();
+  options.content_type = test_content_type;
+
+  az_iot_pnp_client client;
+  assert_int_equal(
+      az_iot_pnp_client_init(
+        &client, test_device_hostname, test_device_id, test_root_interface_name, &options), AZ_OK);
+
+  uint8_t mqtt_topic_buf[_az_COUNTOF(g_test_correct_pnp_topic_content_type) - 2];
+  az_span mqtt_topic = az_span_for_test_init(mqtt_topic_buf, 0, _az_COUNTOF(mqtt_topic_buf));
+
+  assert_int_equal(
+      az_iot_pnp_client_telemetry_get_publish_topic(&client, test_component_name, mqtt_topic, NULL, &mqtt_topic), AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY);
+}
+
+static void test_az_iot_pnp_client_telemetry_publish_topic_get_content_encoding_with_small_buffer_fails(
+    void** state)
+{
+  (void)state;
+
+  az_iot_pnp_client_options options = az_iot_pnp_client_options_default();
+  options.content_encoding = test_content_encoding;
+
+  az_iot_pnp_client client;
+  assert_int_equal(
+      az_iot_pnp_client_init(
+        &client, test_device_hostname, test_device_id, test_root_interface_name, &options), AZ_OK);
+
+  uint8_t mqtt_topic_buf[_az_COUNTOF(g_test_correct_pnp_topic_content_type) - 2];
+  az_span mqtt_topic = az_span_for_test_init(mqtt_topic_buf, 0, _az_COUNTOF(mqtt_topic_buf));
+
+  assert_int_equal(
+      az_iot_pnp_client_telemetry_get_publish_topic(&client, test_component_name, mqtt_topic, NULL, &mqtt_topic), AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY);
+}
+
+static void test_az_iot_pnp_client_telemetry_publish_topic_get_content_type_and_encoding_with_small_buffer_fails(
+    void** state)
+{
+  (void)state;
+
+  az_iot_pnp_client_options options = az_iot_pnp_client_options_default();
+  options.content_type = test_content_type;
+  options.content_encoding = test_content_encoding;
+
+  az_iot_pnp_client client;
+  assert_int_equal(
+      az_iot_pnp_client_init(
+        &client, test_device_hostname, test_device_id, test_root_interface_name, &options), AZ_OK);
+
+  uint8_t mqtt_topic_buf[_az_COUNTOF(g_test_correct_pnp_topic_content_type_and_encoding) - 2];
+  az_span mqtt_topic = az_span_for_test_init(mqtt_topic_buf, 0, _az_COUNTOF(mqtt_topic_buf));
+
+  assert_int_equal(
+      az_iot_pnp_client_telemetry_get_publish_topic(&client, test_component_name, mqtt_topic, NULL, &mqtt_topic), AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY);
+}
+
 
 int test_iot_pnp_telemetry()
 {
@@ -153,7 +316,13 @@ int test_iot_pnp_telemetry()
       cmocka_unit_test(test_az_iot_pnp_client_telemetry_get_publish_topic_NULL_component_name_fails),
       cmocka_unit_test(test_az_iot_pnp_client_telemetry_get_publish_topic_non_NULL_reserved_fails),
 #endif // NO_PRECONDITION_CHECKING
-      cmocka_unit_test(test_az_iot_pnp_client_telemetry_publish_topic_get_no_options_no_props_succeed),      
+      cmocka_unit_test(test_az_iot_pnp_client_telemetry_publish_topic_get_no_options_succeed),
+      cmocka_unit_test(test_az_iot_pnp_client_telemetry_publish_topic_get_content_type_succeed),
+      cmocka_unit_test(test_az_iot_pnp_client_telemetry_publish_topic_get_content_type_and_encoding_succeed),
+      cmocka_unit_test(test_az_iot_pnp_client_telemetry_publish_topic_get_with_small_buffer_fails),
+      cmocka_unit_test(test_az_iot_pnp_client_telemetry_publish_topic_get_content_type_with_small_buffer_fails),
+      cmocka_unit_test(test_az_iot_pnp_client_telemetry_publish_topic_get_content_encoding_with_small_buffer_fails),
+      cmocka_unit_test(test_az_iot_pnp_client_telemetry_publish_topic_get_content_type_and_encoding_with_small_buffer_fails),
     };
     return cmocka_run_group_tests_name("az_iot_pnp_client", tests, NULL, NULL);
 }
