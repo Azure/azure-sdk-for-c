@@ -18,7 +18,7 @@ static const az_span pnp_telemetry_component_name_param = AZ_SPAN_LITERAL_FROM_S
 static const az_span pnp_telemetry_content_type_param = AZ_SPAN_LITERAL_FROM_STR("%24.ct");
 static const az_span pnp_telemetry_content_encoding_param = AZ_SPAN_LITERAL_FROM_STR("%24.ce");
 
-static az_result az_add_telemetry_property(
+static az_result _az_add_telemetry_property(
     az_span mqtt_topic,
     az_span property_name,
     az_span property_value,
@@ -55,12 +55,12 @@ AZ_NODISCARD az_result az_iot_pnp_client_telemetry_get_publish_topic(
   AZ_RETURN_IF_FAILED(az_iot_hub_client_telemetry_publish_topic_get(
       &client->_internal.iot_hub_client, NULL, mqtt_topic, &mqtt_topic));
 
-  AZ_RETURN_IF_FAILED(az_add_telemetry_property(
+  AZ_RETURN_IF_FAILED(_az_add_telemetry_property(
       mqtt_topic, pnp_telemetry_component_name_param, component_name, false, &mqtt_topic));
 
   if (az_span_ptr(client->_internal.options.content_type) != NULL)
   {
-    AZ_RETURN_IF_FAILED(az_add_telemetry_property(
+    AZ_RETURN_IF_FAILED(_az_add_telemetry_property(
         mqtt_topic,
         pnp_telemetry_content_type_param,
         client->_internal.options.content_type,
@@ -70,7 +70,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_telemetry_get_publish_topic(
 
   if (az_span_ptr(client->_internal.options.content_encoding) != NULL)
   {
-    AZ_RETURN_IF_FAILED(az_add_telemetry_property(
+    AZ_RETURN_IF_FAILED(_az_add_telemetry_property(
         mqtt_topic,
         pnp_telemetry_content_encoding_param,
         client->_internal.options.content_encoding,

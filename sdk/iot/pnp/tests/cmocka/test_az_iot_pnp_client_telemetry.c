@@ -25,8 +25,8 @@
 #define TEST_CONTENT_ENCODING "my_content_encoding"
 #define TEST_COMPONENT_NAME "my_component_name"
 
-static const az_span test_device_id = AZ_SPAN_LITERAL_FROM_STR("my_device");
-static const az_span test_device_hostname = AZ_SPAN_LITERAL_FROM_STR("myiothub.azure-devices.net");
+static const az_span test_device_id = AZ_SPAN_LITERAL_FROM_STR(TEST_DEVICE_ID_STR);
+static const az_span test_device_hostname = AZ_SPAN_LITERAL_FROM_STR(TEST_DEVICE_HOSTNAME_STR);
 static const az_span test_root_interface_name = AZ_SPAN_LITERAL_FROM_STR(TEST_ROOT_INTERFACE_NAME);
 static const az_span test_component_name = AZ_SPAN_LITERAL_FROM_STR(TEST_COMPONENT_NAME);
 static const az_span test_content_type = AZ_SPAN_LITERAL_FROM_STR(TEST_CONTENT_TYPE);
