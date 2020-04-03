@@ -2,3 +2,4 @@
 // SPDX-License-Identifier: MIT
 
 int test_iot_pnp_client();
+int test_iot_pnp_telemetry();

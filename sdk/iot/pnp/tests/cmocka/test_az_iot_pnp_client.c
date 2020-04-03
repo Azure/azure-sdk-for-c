@@ -19,7 +19,6 @@
 // PnP Client
 #define TEST_DEVICE_ID_STR "my_device"
 #define TEST_DEVICE_HOSTNAME_STR "myiothub.azure-devices.net"
-#define TEST_MODULE_ID "my_module_id"
 #define TEST_ROOT_INTERFACE_NAME "my_root_interface_name"
 #define TEST_USER_AGENT "os=azrtos"
 #define TEST_CONTENT_TYPE "my_content_type"
@@ -44,7 +43,7 @@ static const char test_correct_pnp_user_name_with_user_agent[]
 
 enable_precondition_check_tests()
 
-static void test_az_iot_pnp_client_init_NULL_client_fails(void** state)
+    static void test_az_iot_pnp_client_init_NULL_client_fails(void** state)
 {
   (void)state;
 
