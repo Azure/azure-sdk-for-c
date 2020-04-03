@@ -32,7 +32,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_response_subscribe_topic_filter_ge
   AZ_PRECONDITION_NOT_NULL(out_mqtt_topic_filter);
 
   AZ_RETURN_IF_FAILED(
-      az_span_append(mqtt_topic_filter, az_iot_hub_twin_response_sub_topic, &mqtt_topic_filter));
+      az_span_copy(mqtt_topic_filter, az_iot_hub_twin_response_sub_topic, &mqtt_topic_filter));
   AZ_RETURN_IF_FAILED(
       az_span_append_uint8(mqtt_topic_filter, az_iot_hub_client_twin_hashtag, &mqtt_topic_filter));
 
@@ -51,7 +51,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_patch_subscribe_topic_filter_get(
   AZ_PRECONDITION_NOT_NULL(out_mqtt_topic_filter);
 
   AZ_RETURN_IF_FAILED(
-      az_span_append(mqtt_topic_filter, az_iot_hub_twin_patch_sub_topic, &mqtt_topic_filter));
+      az_span_copy(mqtt_topic_filter, az_iot_hub_twin_patch_sub_topic, &mqtt_topic_filter));
 
   *out_mqtt_topic_filter = mqtt_topic_filter;
 
@@ -69,7 +69,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_get_publish_topic_get(
   AZ_PRECONDITION_VALID_SPAN(mqtt_topic, 0, false);
   AZ_PRECONDITION_NOT_NULL(out_mqtt_topic);
 
-  AZ_RETURN_IF_FAILED(az_span_append(mqtt_topic, az_iot_hub_twin_get_pub_topic, &mqtt_topic));
+  AZ_RETURN_IF_FAILED(az_span_copy(mqtt_topic, az_iot_hub_twin_get_pub_topic, &mqtt_topic));
   AZ_RETURN_IF_FAILED(az_span_append(mqtt_topic, az_iot_hub_client_twin_request_id_suffix, &mqtt_topic));
   AZ_RETURN_IF_FAILED(az_span_append(mqtt_topic, request_id, &mqtt_topic));
 
@@ -89,7 +89,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_patch_publish_topic_get(
   AZ_PRECONDITION_VALID_SPAN(mqtt_topic, 0, false);
   AZ_PRECONDITION_NOT_NULL(out_mqtt_topic);
 
-  AZ_RETURN_IF_FAILED(az_span_append(mqtt_topic, az_iot_hub_twin_patch_pub_topic, &mqtt_topic));
+  AZ_RETURN_IF_FAILED(az_span_copy(mqtt_topic, az_iot_hub_twin_patch_pub_topic, &mqtt_topic));
   AZ_RETURN_IF_FAILED(az_span_append(mqtt_topic, az_iot_hub_client_twin_request_id_suffix, &mqtt_topic));
   AZ_RETURN_IF_FAILED(az_span_append(mqtt_topic, request_id, &mqtt_topic));
 

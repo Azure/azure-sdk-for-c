@@ -27,7 +27,7 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_publish_topic_get(
 
   const az_span* const module_id = &(client->_internal.options.module_id);
 
-  AZ_RETURN_IF_FAILED(az_span_append(mqtt_topic, telemetry_topic_prefix, &mqtt_topic));
+  AZ_RETURN_IF_FAILED(az_span_copy(mqtt_topic, telemetry_topic_prefix, &mqtt_topic));
   AZ_RETURN_IF_FAILED(az_span_append(mqtt_topic, client->_internal.device_id, &mqtt_topic));
 
   if (az_span_length(*module_id) != 0)
