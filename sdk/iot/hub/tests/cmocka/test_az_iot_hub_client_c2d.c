@@ -34,10 +34,8 @@ static const az_span test_URL_ENCODED_topic = AZ_SPAN_LITERAL_FROM_STR("devices/
 
 enable_precondition_check_tests()
 
-static void test_az_iot_hub_client_c2d_received_topic_parse_NULL_client_fail(void** state)
+static void test_az_iot_hub_client_c2d_received_topic_parse_NULL_client_fail()
 {
-  (void)state;
-
   az_span received_topic = AZ_SPAN_FROM_STR("devices/useragent_c/messages/devicebound/$.mid=79eadb01-bd0d-472d-bd35-ccb76e70eab8&$.to=/devices/useragent_c/messages/deviceBound&iothub-ack=full");
 
   az_iot_hub_client_c2d_request out_request;
@@ -47,10 +45,8 @@ static void test_az_iot_hub_client_c2d_received_topic_parse_NULL_client_fail(voi
   );
 }
 
-static void test_az_iot_hub_client_c2d_received_topic_parse_AZ_SPAN_NULL_received_topic_fail(void** state)
+static void test_az_iot_hub_client_c2d_received_topic_parse_AZ_SPAN_NULL_received_topic_fail()
 {
-  (void)state;
-
   az_iot_hub_client client;
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, &options) == AZ_OK);
@@ -64,10 +60,8 @@ static void test_az_iot_hub_client_c2d_received_topic_parse_AZ_SPAN_NULL_receive
   );
 }
 
-static void test_az_iot_hub_client_c2d_received_topic_parse_NULL_out_request_fail(void** state)
+static void test_az_iot_hub_client_c2d_received_topic_parse_NULL_out_request_fail()
 {
-  (void)state;
-
   az_iot_hub_client client;
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, &options) == AZ_OK);
@@ -80,10 +74,8 @@ static void test_az_iot_hub_client_c2d_received_topic_parse_NULL_out_request_fai
 }
 
 // Note: c2d messages ALWAYS contain propeties (at least $.to).
-static void test_az_iot_hub_client_c2d_received_topic_parse_no_properties_fail(void** state)
+static void test_az_iot_hub_client_c2d_received_topic_parse_no_properties_fail()
 {
-  (void)state;
-
   // az_pair pair;
   az_iot_hub_client client;
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
@@ -99,10 +91,8 @@ static void test_az_iot_hub_client_c2d_received_topic_parse_no_properties_fail(v
   );
 }
 
-static void test_az_iot_hub_client_c2d_received_topic_parse_MALFORMED_fail(void** state)
+static void test_az_iot_hub_client_c2d_received_topic_parse_MALFORMED_fail()
 {
-  (void)state;
-
   // az_pair pair;
   az_iot_hub_client client;
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
@@ -120,10 +110,8 @@ static void test_az_iot_hub_client_c2d_received_topic_parse_MALFORMED_fail(void*
 
 #endif // NO_PRECONDITION_CHECKING
 
-static void test_az_iot_hub_client_c2d_subscribe_topic_filter_get_succeed(void** state)
+static void test_az_iot_hub_client_c2d_subscribe_topic_filter_get_succeed()
 {
-  (void)state;
-
   uint8_t mqtt_sub_topic_buf[TEST_SPAN_BUFFER_SIZE];
   az_span mqtt_sub_topic = az_span_for_test_init(mqtt_sub_topic_buf, 0, _az_COUNTOF(mqtt_sub_topic_buf));
 
@@ -143,10 +131,8 @@ static void test_az_iot_hub_client_c2d_subscribe_topic_filter_get_succeed(void**
       TEST_SPAN_BUFFER_SIZE);
 }
 
-static void test_az_iot_hub_client_c2d_subscribe_topic_filter_get_twice_succeed(void** state)
+static void test_az_iot_hub_client_c2d_subscribe_topic_filter_get_twice_succeed()
 {
-  (void)state;
-
   uint8_t mqtt_sub_topic_buf[TEST_SPAN_BUFFER_SIZE];
   memset(mqtt_sub_topic_buf, 0xFF, _az_COUNTOF(mqtt_sub_topic_buf));
   az_span mqtt_sub_topic = az_span_init(mqtt_sub_topic_buf, 0, _az_COUNTOF(mqtt_sub_topic_buf));
@@ -179,10 +165,8 @@ static void test_az_iot_hub_client_c2d_subscribe_topic_filter_get_twice_succeed(
   assert_int_equal(mqtt_sub_topic_buf[az_span_length(mqtt_sub_topic)], 0xFF);
 }
 
-static void test_az_iot_hub_client_c2d_subscribe_topic_filter_get_small_buffer_fail(void** state)
+static void test_az_iot_hub_client_c2d_subscribe_topic_filter_get_small_buffer_fail()
 {
-  (void)state;
-
   uint8_t mqtt_sub_topic_buf[_az_COUNTOF(g_test_correct_subscribe_topic) - 2];
   az_span mqtt_sub_topic = az_span_init(mqtt_sub_topic_buf, 0, _az_COUNTOF(mqtt_sub_topic_buf));
 
@@ -198,10 +182,8 @@ static void test_az_iot_hub_client_c2d_subscribe_topic_filter_get_small_buffer_f
   assert_int_equal(az_span_capacity(mqtt_sub_topic), _az_COUNTOF(g_test_correct_subscribe_topic) - 2);
 }
 
-static void test_az_iot_hub_client_c2d_received_topic_parse_URL_DECODED_succeed(void** state)
+static void test_az_iot_hub_client_c2d_received_topic_parse_URL_DECODED_succeed()
 {
-  (void)state;
-
   // az_pair pair;
   az_iot_hub_client client;
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
@@ -228,10 +210,8 @@ static void test_az_iot_hub_client_c2d_received_topic_parse_URL_DECODED_succeed(
   // assert_true(az_span_is_content_equal(pair.value, AZ_SPAN_FROM_STR("123")));
 }
 
-static void test_az_iot_hub_client_c2d_received_topic_parse_URL_ENCODED_succeed(void** state)
+static void test_az_iot_hub_client_c2d_received_topic_parse_URL_ENCODED_succeed()
 {
-  (void)state;
-
   // az_pair pair;
   az_iot_hub_client client;
   az_iot_hub_client_options options = az_iot_hub_client_options_default();

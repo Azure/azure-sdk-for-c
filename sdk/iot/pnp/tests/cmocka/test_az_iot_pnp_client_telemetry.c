@@ -48,10 +48,8 @@ static const char g_test_correct_pnp_topic_content_type_and_encoding[]
 
 enable_precondition_check_tests()
 
-    static void test_az_iot_pnp_client_telemetry_get_publish_topic_NULL_client_fails(void** state)
+    static void test_az_iot_pnp_client_telemetry_get_publish_topic_NULL_client_fails()
 {
-  (void)state;
-
   uint8_t mqtt_topic_buf[TEST_SPAN_BUFFER_SIZE];
 
   az_span mqtt_topic = az_span_init(mqtt_topic_buf, 0, _az_COUNTOF(mqtt_topic_buf));
@@ -60,10 +58,8 @@ enable_precondition_check_tests()
       NULL, test_component_name, mqtt_topic, NULL, &mqtt_topic));
 }
 
-static void test_az_iot_pnp_client_telemetry_get_publish_topic_NULL_mqtt_topic_fails(void** state)
+static void test_az_iot_pnp_client_telemetry_get_publish_topic_NULL_mqtt_topic_fails()
 {
-  (void)state;
-
   az_iot_pnp_client client;
   assert_int_equal(
       az_iot_pnp_client_init(
@@ -78,11 +74,8 @@ static void test_az_iot_pnp_client_telemetry_get_publish_topic_NULL_mqtt_topic_f
       &client, test_component_name, bad_mqtt_topic, NULL, &bad_mqtt_topic));
 }
 
-static void test_az_iot_pnp_client_telemetry_get_publish_topic_NULL_out_mqtt_topic_fails(
-    void** state)
+static void test_az_iot_pnp_client_telemetry_get_publish_topic_NULL_out_mqtt_topic_fails()
 {
-  (void)state;
-
   az_iot_pnp_client client;
   assert_int_equal(
       az_iot_pnp_client_init(
@@ -96,11 +89,8 @@ static void test_az_iot_pnp_client_telemetry_get_publish_topic_NULL_out_mqtt_top
       &client, test_component_name, mqtt_topic, NULL, NULL));
 }
 
-static void test_az_iot_pnp_client_telemetry_get_publish_topic_NULL_component_name_fails(
-    void** state)
+static void test_az_iot_pnp_client_telemetry_get_publish_topic_NULL_component_name_fails()
 {
-  (void)state;
-
   az_iot_pnp_client client;
   assert_int_equal(
       az_iot_pnp_client_init(
@@ -114,10 +104,8 @@ static void test_az_iot_pnp_client_telemetry_get_publish_topic_NULL_component_na
       &client, AZ_SPAN_NULL, mqtt_topic, NULL, &mqtt_topic));
 }
 
-static void test_az_iot_pnp_client_telemetry_get_publish_topic_non_NULL_reserved_fails(void** state)
+static void test_az_iot_pnp_client_telemetry_get_publish_topic_non_NULL_reserved_fails()
 {
-  (void)state;
-
   az_iot_pnp_client client;
   assert_int_equal(
       az_iot_pnp_client_init(
@@ -133,10 +121,8 @@ static void test_az_iot_pnp_client_telemetry_get_publish_topic_non_NULL_reserved
 
 #endif // NO_PRECONDITION_CHECKING
 
-static void test_az_iot_pnp_client_telemetry_publish_topic_get_no_options_succeed(void** state)
+static void test_az_iot_pnp_client_telemetry_publish_topic_get_no_options_succeed()
 {
-  (void)state;
-
   az_iot_pnp_client client;
   assert_int_equal(
       az_iot_pnp_client_init(
@@ -158,10 +144,8 @@ static void test_az_iot_pnp_client_telemetry_publish_topic_get_no_options_succee
       TEST_SPAN_BUFFER_SIZE);
 }
 
-static void test_az_iot_pnp_client_telemetry_publish_topic_get_content_type_succeed(void** state)
+static void test_az_iot_pnp_client_telemetry_publish_topic_get_content_type_succeed()
 {
-  (void)state;
-
   az_iot_pnp_client_options options = az_iot_pnp_client_options_default();
   options.content_type = test_content_type;
 
@@ -186,11 +170,8 @@ static void test_az_iot_pnp_client_telemetry_publish_topic_get_content_type_succ
       TEST_SPAN_BUFFER_SIZE);
 }
 
-static void test_az_iot_pnp_client_telemetry_publish_topic_get_content_encoding_succeed(
-    void** state)
+static void test_az_iot_pnp_client_telemetry_publish_topic_get_content_encoding_succeed()
 {
-  (void)state;
-
   az_iot_pnp_client_options options = az_iot_pnp_client_options_default();
   options.content_encoding = test_content_encoding;
 
@@ -215,11 +196,8 @@ static void test_az_iot_pnp_client_telemetry_publish_topic_get_content_encoding_
       TEST_SPAN_BUFFER_SIZE);
 }
 
-static void test_az_iot_pnp_client_telemetry_publish_topic_get_content_type_and_encoding_succeed(
-    void** state)
+static void test_az_iot_pnp_client_telemetry_publish_topic_get_content_type_and_encoding_succeed()
 {
-  (void)state;
-
   az_iot_pnp_client_options options = az_iot_pnp_client_options_default();
   options.content_type = test_content_type;
   options.content_encoding = test_content_encoding;
@@ -245,10 +223,8 @@ static void test_az_iot_pnp_client_telemetry_publish_topic_get_content_type_and_
       TEST_SPAN_BUFFER_SIZE);
 }
 
-static void test_az_iot_pnp_client_telemetry_publish_topic_get_with_small_buffer_fails(void** state)
+static void test_az_iot_pnp_client_telemetry_publish_topic_get_with_small_buffer_fails()
 {
-  (void)state;
-
   az_iot_pnp_client client;
   assert_int_equal(
       az_iot_pnp_client_init(
@@ -264,11 +240,8 @@ static void test_az_iot_pnp_client_telemetry_publish_topic_get_with_small_buffer
       AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY);
 }
 
-static void test_az_iot_pnp_client_telemetry_publish_topic_get_content_type_with_small_buffer_fails(
-    void** state)
+static void test_az_iot_pnp_client_telemetry_publish_topic_get_content_type_with_small_buffer_fails()
 {
-  (void)state;
-
   az_iot_pnp_client_options options = az_iot_pnp_client_options_default();
   options.content_type = test_content_type;
 
@@ -288,11 +261,8 @@ static void test_az_iot_pnp_client_telemetry_publish_topic_get_content_type_with
 }
 
 static void
-test_az_iot_pnp_client_telemetry_publish_topic_get_content_encoding_with_small_buffer_fails(
-    void** state)
+test_az_iot_pnp_client_telemetry_publish_topic_get_content_encoding_with_small_buffer_fails()
 {
-  (void)state;
-
   az_iot_pnp_client_options options = az_iot_pnp_client_options_default();
   options.content_encoding = test_content_encoding;
 
@@ -312,11 +282,8 @@ test_az_iot_pnp_client_telemetry_publish_topic_get_content_encoding_with_small_b
 }
 
 static void
-test_az_iot_pnp_client_telemetry_publish_topic_get_content_type_and_encoding_with_small_buffer_fails(
-    void** state)
+test_az_iot_pnp_client_telemetry_publish_topic_get_content_type_and_encoding_with_small_buffer_fails()
 {
-  (void)state;
-
   az_iot_pnp_client_options options = az_iot_pnp_client_options_default();
   options.content_type = test_content_type;
   options.content_encoding = test_content_encoding;

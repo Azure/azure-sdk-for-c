@@ -39,10 +39,8 @@ static const char g_test_correct_topic_with_options_module_id_with_props[]
 
 enable_precondition_check_tests()
 
-    static void test_az_iot_hub_client_telemetry_publish_topic_get_NULL_client_fails(void** state)
+    static void test_az_iot_hub_client_telemetry_publish_topic_get_NULL_client_fails()
 {
-  (void)state;
-
   uint8_t mqtt_topic_buf[TEST_SPAN_BUFFER_SIZE];
 
   az_span mqtt_topic = az_span_init(mqtt_topic_buf, 0, _az_COUNTOF(mqtt_topic_buf));
@@ -51,10 +49,8 @@ enable_precondition_check_tests()
       az_iot_hub_client_telemetry_publish_topic_get(NULL, NULL, mqtt_topic, &mqtt_topic));
 }
 
-static void test_az_iot_hub_client_telemetry_publish_topic_get_NULL_mqtt_topic_fails(void** state)
+static void test_az_iot_hub_client_telemetry_publish_topic_get_NULL_mqtt_topic_fails()
 {
-  (void)state;
-
   az_iot_hub_client client;
   assert_int_equal(
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL), AZ_OK);
@@ -67,11 +63,8 @@ static void test_az_iot_hub_client_telemetry_publish_topic_get_NULL_mqtt_topic_f
       &client, NULL, bad_mqtt_topic, &bad_mqtt_topic));
 }
 
-static void test_az_iot_hub_client_telemetry_publish_topic_get_NULL_out_mqtt_topic_fails(
-    void** state)
+static void test_az_iot_hub_client_telemetry_publish_topic_get_NULL_out_mqtt_topic_fails()
 {
-  (void)state;
-
   az_iot_hub_client client;
   assert_int_equal(
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL), AZ_OK);
@@ -86,11 +79,8 @@ static void test_az_iot_hub_client_telemetry_publish_topic_get_NULL_out_mqtt_top
 #endif // NO_PRECONDITION_CHECKING
 
 static void
-test_az_iot_hub_client_telemetry_publish_topic_get_no_options_no_props_succeed(
-    void** state)
+test_az_iot_hub_client_telemetry_publish_topic_get_no_options_no_props_succeed()
 {
-  (void)state;
-
   az_iot_hub_client client;
   assert_int_equal(
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL), AZ_OK);
@@ -112,11 +102,8 @@ test_az_iot_hub_client_telemetry_publish_topic_get_no_options_no_props_succeed(
   assert_int_equal(mqtt_topic_buf[az_span_length(mqtt_topic)], 0xFF);
 }
 
-static void test_az_iot_hub_client_telemetry_publish_topic_get_no_options_no_props_twice_succeed(
-    void** state)
+static void test_az_iot_hub_client_telemetry_publish_topic_get_no_options_no_props_twice_succeed()
 {
-  (void)state;
-
   az_iot_hub_client client;
   assert_int_equal(
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL), AZ_OK);
@@ -141,11 +128,8 @@ static void test_az_iot_hub_client_telemetry_publish_topic_get_no_options_no_pro
       TEST_SPAN_BUFFER_SIZE);
 }
 
-static void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_no_props_succeed(
-    void** state)
+static void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_no_props_succeed()
 {
-  (void)state;
-
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.module_id = test_module_id;
 
@@ -166,11 +150,8 @@ static void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_no_p
       TEST_SPAN_BUFFER_SIZE);
 }
 
-static void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_with_props_succeed(
-    void** state)
+static void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_with_props_succeed()
 {
-  (void)state;
-
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.module_id = test_module_id;
 
@@ -196,11 +177,8 @@ static void test_az_iot_hub_client_telemetry_publish_topic_get_with_options_with
 }
 
 static void
-test_az_iot_hub_client_telemetry_publish_topic_get_with_options_with_props_small_buffer_fails(
-    void** state)
+test_az_iot_hub_client_telemetry_publish_topic_get_with_options_with_props_small_buffer_fails()
 {
-  (void)state;
-
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.module_id = test_module_id;
 
@@ -222,11 +200,8 @@ test_az_iot_hub_client_telemetry_publish_topic_get_with_options_with_props_small
       az_span_capacity(mqtt_topic), _az_COUNTOF(g_test_correct_topic_with_options_with_props) - 2);
 }
 
-static void test_az_iot_hub_client_telemetry_publish_topic_get_no_options_with_props_succeed(
-    void** state)
+static void test_az_iot_hub_client_telemetry_publish_topic_get_no_options_with_props_succeed()
 {
-  (void)state;
-
   az_iot_hub_client client;
   assert_int_equal(
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL), AZ_OK);
@@ -249,11 +224,8 @@ static void test_az_iot_hub_client_telemetry_publish_topic_get_no_options_with_p
 }
 
 static void
-test_az_iot_hub_client_telemetry_publish_topic_get_no_options_with_props_small_buffer_fails(
-    void** state)
+test_az_iot_hub_client_telemetry_publish_topic_get_no_options_with_props_small_buffer_fails()
 {
-  (void)state;
-
   az_iot_hub_client client;
   assert_int_equal(
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL), AZ_OK);
@@ -273,11 +245,8 @@ test_az_iot_hub_client_telemetry_publish_topic_get_no_options_with_props_small_b
 }
 
 static void
-test_az_iot_hub_client_telemetry_publish_topic_get_with_options_module_id_with_props_succeed(
-    void** state)
+test_az_iot_hub_client_telemetry_publish_topic_get_with_options_module_id_with_props_succeed()
 {
-  (void)state;
-
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.module_id = test_module_id;
 
@@ -303,11 +272,8 @@ test_az_iot_hub_client_telemetry_publish_topic_get_with_options_module_id_with_p
 }
 
 static void
-test_az_iot_hub_client_telemetry_publish_topic_get_with_options_module_id_with_props_small_buffer_fails(
-    void** state)
+test_az_iot_hub_client_telemetry_publish_topic_get_with_options_module_id_with_props_small_buffer_fails()
 {
-  (void)state;
-
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.module_id = test_module_id;
 

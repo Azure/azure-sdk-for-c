@@ -32,9 +32,8 @@ enable_precondition_check_tests()
 
 // Tests
 
-static void az_iot_sas_token_get_document_NULL_document_fails(void** state)
+static void az_iot_sas_token_get_document_NULL_document_fails()
 {
-  (void)state;
   az_span iothub_fqdn = AZ_SPAN_FROM_STR(TEST_FQDN);
   az_span device_id = AZ_SPAN_FROM_STR(TEST_DEVICEID);
   int32_t expiry_time_secs = TEST_EXPIRATION;
@@ -45,9 +44,8 @@ static void az_iot_sas_token_get_document_NULL_document_fails(void** state)
   );
 }
 
-static void az_iot_sas_token_get_document_NULL_document_span_fails(void** state)
+static void az_iot_sas_token_get_document_NULL_document_span_fails()
 {
-  (void)state;
   az_span iothub_fqdn = AZ_SPAN_FROM_STR(TEST_FQDN);
   az_span device_id = AZ_SPAN_FROM_STR(TEST_DEVICEID);
   int32_t expiry_time_secs = TEST_EXPIRATION;
@@ -59,9 +57,8 @@ static void az_iot_sas_token_get_document_NULL_document_span_fails(void** state)
   );
 }
 
-static void az_iot_sas_token_get_document_empty_device_id_fails(void** state)
+static void az_iot_sas_token_get_document_empty_device_id_fails()
 {
-  (void)state;
   az_span iothub_fqdn = AZ_SPAN_FROM_STR(TEST_FQDN);
   az_span device_id = AZ_SPAN_NULL;
   int32_t expiry_time_secs = TEST_EXPIRATION;
@@ -74,9 +71,8 @@ static void az_iot_sas_token_get_document_empty_device_id_fails(void** state)
   );
 }
 
-static void az_iot_sas_token_get_document_empty_iothub_fqdn_fails(void** state)
+static void az_iot_sas_token_get_document_empty_iothub_fqdn_fails()
 {
-  (void)state;
   az_span iothub_fqdn = AZ_SPAN_NULL;
   az_span device_id = AZ_SPAN_FROM_STR(TEST_DEVICEID);
   int32_t expiry_time_secs = TEST_EXPIRATION;
@@ -89,9 +85,8 @@ static void az_iot_sas_token_get_document_empty_iothub_fqdn_fails(void** state)
   );
 }
 
-static void az_iot_sas_token_generate_empty_device_id_fails(void** state)
+static void az_iot_sas_token_generate_empty_device_id_fails()
 {
-  (void)state;
   az_span iothub_fqdn = AZ_SPAN_FROM_STR(TEST_FQDN);
   az_span device_id = AZ_SPAN_NULL;
   int32_t expiry_time_secs = TEST_EXPIRATION;
@@ -106,9 +101,8 @@ static void az_iot_sas_token_generate_empty_device_id_fails(void** state)
   );
 }
 
-static void az_iot_sas_token_generate_empty_iothub_fqdn_fails(void** state)
+static void az_iot_sas_token_generate_empty_iothub_fqdn_fails()
 {
-  (void)state;
   az_span iothub_fqdn = AZ_SPAN_NULL;
   az_span device_id = AZ_SPAN_FROM_STR(TEST_DEVICEID);
   int32_t expiry_time_secs = TEST_EXPIRATION;
@@ -123,9 +117,8 @@ static void az_iot_sas_token_generate_empty_iothub_fqdn_fails(void** state)
   );
 }
 
-static void az_iot_sas_token_generate_EMPTY_signature_fails(void** state)
+static void az_iot_sas_token_generate_EMPTY_signature_fails()
 {
-  (void)state;
   az_span iothub_fqdn = AZ_SPAN_FROM_STR(TEST_FQDN);
   az_span device_id = AZ_SPAN_FROM_STR(TEST_DEVICEID);
   int32_t expiry_time_secs = TEST_EXPIRATION;
@@ -140,9 +133,8 @@ static void az_iot_sas_token_generate_EMPTY_signature_fails(void** state)
   );
 }
 
-static void az_iot_sas_token_generate_NULL_sas_token_span_fails(void** state)
+static void az_iot_sas_token_generate_NULL_sas_token_span_fails()
 {
-  (void)state;
   az_span iothub_fqdn = AZ_SPAN_FROM_STR(TEST_FQDN);
   az_span device_id = AZ_SPAN_FROM_STR(TEST_DEVICEID);
   int32_t expiry_time_secs = TEST_EXPIRATION;
@@ -156,9 +148,8 @@ static void az_iot_sas_token_generate_NULL_sas_token_span_fails(void** state)
   );
 }
 
-static void az_iot_sas_token_generate_NULL_out_sas_token_fails(void** state)
+static void az_iot_sas_token_generate_NULL_out_sas_token_fails()
 {
-  (void)state;
   az_span iothub_fqdn = AZ_SPAN_FROM_STR(TEST_FQDN);
   az_span device_id = AZ_SPAN_FROM_STR(TEST_DEVICEID);
   int32_t expiry_time_secs = TEST_EXPIRATION;
@@ -175,9 +166,8 @@ static void az_iot_sas_token_generate_NULL_out_sas_token_fails(void** state)
 
 #endif // NO_PRECONDITION_CHECKING
 
-static void az_iot_sas_token_get_document_succeeds(void** state)
+static void az_iot_sas_token_get_document_succeeds()
 {
-  (void)state;
   const char* expected_document = TEST_FQDN "/devices/" TEST_DEVICEID "\n" TEST_EXPIRATION_STR;
 
   az_span iothub_fqdn = AZ_SPAN_FROM_STR(TEST_FQDN);
@@ -193,9 +183,8 @@ static void az_iot_sas_token_get_document_succeeds(void** state)
       document, expected_document,(int32_t)strlen(expected_document), TEST_SPAN_BUFFER_SIZE);
 }
 
-static void az_iot_sas_token_generate_succeeds(void** state)
+static void az_iot_sas_token_generate_succeeds()
 {
-  (void)state;
   const char* expected_sas_token = "SharedAccessSignature sr=" TEST_FQDN "/devices/" TEST_DEVICEID
                                    "&sig=" TEST_SIG "&se=" TEST_EXPIRATION_STR;
 
@@ -214,9 +203,8 @@ static void az_iot_sas_token_generate_succeeds(void** state)
       sas_token, expected_sas_token, (int32_t)strlen(expected_sas_token), TEST_SPAN_BUFFER_SIZE);
 }
 
-static void az_iot_sas_token_generate_with_keyname_succeeds(void** state)
+static void az_iot_sas_token_generate_with_keyname_succeeds()
 {
-  (void)state;
   const char* expected_sas_token
       = "SharedAccessSignature sr=" TEST_FQDN "/devices/" TEST_DEVICEID "&sig=" TEST_SIG
         "&se=" TEST_EXPIRATION_STR "&skn=" TEST_KEY_NAME;
@@ -237,9 +225,8 @@ static void az_iot_sas_token_generate_with_keyname_succeeds(void** state)
 }
 
 // Conditions like buffer (i.e., az_span) capacity are not covered by pre-conditions, so these tests are always mandatory.
-static void az_iot_sas_token_generate_sas_token_overflow_fails(void** state)
+static void az_iot_sas_token_generate_sas_token_overflow_fails()
 {
-  (void)state;
   az_span iothub_fqdn = AZ_SPAN_FROM_STR(TEST_FQDN);
   az_span device_id = AZ_SPAN_FROM_STR(TEST_DEVICEID);
   int32_t expiry_time_secs = TEST_EXPIRATION;
@@ -256,9 +243,8 @@ static void az_iot_sas_token_generate_sas_token_overflow_fails(void** state)
 }
 
 // Conditions like buffer (i.e., az_span) capacity are not covered by pre-conditions, so these tests are always mandatory.
-static void az_iot_sas_token_get_document_document_overflow_fails(void** state)
+static void az_iot_sas_token_get_document_document_overflow_fails()
 {
-  (void)state;
   az_span iothub_fqdn = AZ_SPAN_FROM_STR(TEST_FQDN);
   az_span device_id = AZ_SPAN_FROM_STR(TEST_DEVICEID);
   int32_t expiry_time_secs = TEST_EXPIRATION;
