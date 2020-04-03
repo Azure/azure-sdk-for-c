@@ -7,7 +7,6 @@
 #include <az_precondition_internal.h>
 #include <az_result.h>
 #include <az_span.h>
-#include <az_span_internal.h>
 
 #include <_az_cfg.h>
 
@@ -48,13 +47,11 @@ AZ_NODISCARD az_result az_iot_hub_client_user_name_get(
   AZ_PRECONDITION_VALID_SPAN(mqtt_user_name, 0, false);
   AZ_PRECONDITION_NOT_NULL(out_mqtt_user_name);
 
-  mqtt_user_name = _az_span_set_length(mqtt_user_name, 0);
-
   const az_span* const module_id = &(client->_internal.options.module_id);
   const az_span* const user_agent = &(client->_internal.options.user_agent);
 
   AZ_RETURN_IF_FAILED(
-      az_span_append(mqtt_user_name, client->_internal.iot_hub_hostname, &mqtt_user_name));
+      az_span_copy(mqtt_user_name, client->_internal.iot_hub_hostname, &mqtt_user_name));
   AZ_RETURN_IF_FAILED(
       az_span_append_uint8(mqtt_user_name, hub_client_forward_slash, &mqtt_user_name));
   AZ_RETURN_IF_FAILED(az_span_append(mqtt_user_name, client->_internal.device_id, &mqtt_user_name));
@@ -91,11 +88,9 @@ AZ_NODISCARD az_result az_iot_hub_client_id_get(
   AZ_PRECONDITION_VALID_SPAN(mqtt_client_id, 0, false);
   AZ_PRECONDITION_NOT_NULL(out_mqtt_client_id);
 
-  mqtt_client_id = _az_span_set_length(mqtt_client_id, 0);
-
   const az_span* const module_id = &(client->_internal.options.module_id);
 
-  AZ_RETURN_IF_FAILED(az_span_append(mqtt_client_id, client->_internal.device_id, &mqtt_client_id));
+  AZ_RETURN_IF_FAILED(az_span_copy(mqtt_client_id, client->_internal.device_id, &mqtt_client_id));
 
   if (az_span_length(*module_id) > 0)
   {

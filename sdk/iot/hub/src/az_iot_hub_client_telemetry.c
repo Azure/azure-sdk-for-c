@@ -8,7 +8,6 @@
 #include <az_precondition_internal.h>
 #include <az_result.h>
 #include <az_span.h>
-#include <az_span_internal.h>
 
 #include <_az_cfg.h>
 
@@ -26,11 +25,9 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_publish_topic_get(
   AZ_PRECONDITION_VALID_SPAN(mqtt_topic, 0, false);
   AZ_PRECONDITION_NOT_NULL(out_mqtt_topic);
 
-  mqtt_topic = _az_span_set_length(mqtt_topic, 0);
-
   const az_span* const module_id = &(client->_internal.options.module_id);
 
-  AZ_RETURN_IF_FAILED(az_span_append(mqtt_topic, telemetry_topic_prefix, &mqtt_topic));
+  AZ_RETURN_IF_FAILED(az_span_copy(mqtt_topic, telemetry_topic_prefix, &mqtt_topic));
   AZ_RETURN_IF_FAILED(az_span_append(mqtt_topic, client->_internal.device_id, &mqtt_topic));
 
   if (az_span_length(*module_id) != 0)
