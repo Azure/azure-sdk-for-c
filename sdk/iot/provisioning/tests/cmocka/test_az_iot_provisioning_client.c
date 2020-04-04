@@ -140,7 +140,7 @@ static void test_az_iot_provisioning_client_get_operation_status_publish_topic_f
   response.operation_id = operation_id;
 
   az_result ret = az_iot_provisioning_client_get_operation_status_publish_topic_get(
-      &client, response, topic, &topic);
+      &client, &response, topic, &topic);
 
   assert_int_equal(AZ_OK, ret);
   assert_memory_equal(

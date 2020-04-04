@@ -10,9 +10,9 @@
 #ifndef _az_IOT_PROVISIONING_CLIENT_H
 #define _az_IOT_PROVISIONING_CLIENT_H
 
+#include <az_iot_core.h>
 #include <az_result.h>
 #include <az_span.h>
-#include <az_iot_core.h>
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -53,7 +53,7 @@ typedef struct az_iot_provisioning_client
  *
  * @return #az_iot_provisioning_client_options.
  */
-az_iot_provisioning_client_options az_iot_provisioning_client_options_default();
+AZ_NODISCARD az_iot_provisioning_client_options az_iot_provisioning_client_options_default();
 
 /**
  * @brief Initializes an Azure IoT Provisioning Client.
@@ -198,8 +198,8 @@ typedef struct az_iot_provisioning_client_registration_state
 typedef struct az_iot_provisioning_client_register_response
 {
   az_iot_status status; /**< The current request status.
-                                             * @note The response for the register operation is
-                                             * available through #registration_state only. */
+                         * @note The response for the register operation is
+                         * available through #registration_state only. */
   az_span operation_id; /**< Operation ID of the register operation. */
   az_span registration_state; /**< An #az_span containing the state of the register operation.
                                * @details This can be one of the following: 'unassigned',
@@ -247,15 +247,14 @@ AZ_NODISCARD az_result az_iot_provisioning_client_register_publish_topic_get(
  * @note The payload of the MQTT publish message should be empty.
  *
  * @param[in] client The #az_iot_provisioning_client to use for this call.
- * @param[in] request_id The request id. Must match a received
- *                       #az_iot_provisioning_client_register_response request_id.
+ * @param[in] register_response The received response.
  * @param[in] mqtt_topic An empty #az_span with sufficient capacity to hold the MQTT topic.
  * @param[out] out_mqtt_topic The output #az_span containing the MQTT topic.
  * @return #az_result
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_get_operation_status_publish_topic_get(
     az_iot_provisioning_client const* client,
-    az_iot_provisioning_client_register_response register_response,
+    az_iot_provisioning_client_register_response const* register_response,
     az_span mqtt_topic,
     az_span* out_mqtt_topic);
 

@@ -15,8 +15,10 @@ static const az_span provisioning_service_api_version
 
 static const az_span str_dps = AZ_SPAN_LITERAL_FROM_STR("$dps");
 static const az_span str_registrations = AZ_SPAN_LITERAL_FROM_STR("/registrations/");
-static const az_span str_put_iotdps_register = AZ_SPAN_LITERAL_FROM_STR("PUT/iotdps-register/?$rid=1");
-static const az_span str_get_iotdps_get_operationstatus = AZ_SPAN_LITERAL_FROM_STR("GET/iotdps-get-operationstatus/?$rid=1&operationId=");
+static const az_span str_put_iotdps_register
+    = AZ_SPAN_LITERAL_FROM_STR("PUT/iotdps-register/?$rid=1");
+static const az_span str_get_iotdps_get_operationstatus
+    = AZ_SPAN_LITERAL_FROM_STR("GET/iotdps-get-operationstatus/?$rid=1&operationId=");
 static const az_span str_res = AZ_SPAN_LITERAL_FROM_STR("res/");
 
 AZ_NODISCARD az_iot_provisioning_client_options az_iot_provisioning_client_options_default()
@@ -64,10 +66,8 @@ AZ_NODISCARD az_result az_iot_provisioning_client_user_name_get(
 
   const az_span* const user_agent = &(client->_internal.options.user_agent);
 
-  AZ_RETURN_IF_FAILED(
-      az_span_copy(mqtt_user_name, client->_internal.id_scope, &mqtt_user_name));
-  AZ_RETURN_IF_FAILED(
-      az_span_append(mqtt_user_name, str_registrations, &mqtt_user_name));
+  AZ_RETURN_IF_FAILED(az_span_copy(mqtt_user_name, client->_internal.id_scope, &mqtt_user_name));
+  AZ_RETURN_IF_FAILED(az_span_append(mqtt_user_name, str_registrations, &mqtt_user_name));
   AZ_RETURN_IF_FAILED(
       az_span_append(mqtt_user_name, client->_internal.registration_id, &mqtt_user_name));
   AZ_RETURN_IF_FAILED(
@@ -122,7 +122,8 @@ AZ_NODISCARD az_result az_iot_provisioning_client_register_subscribe_topic_filte
 }
 
 // topic: $dps/registrations/res/202/?$rid=1&retry-after=3
-// payload: {"operationId":"4.d0a671905ea5b2c8.42d78160-4c78-479e-8be7-61d5e55dac0d","status":"assigning"}
+// payload:
+// {"operationId":"4.d0a671905ea5b2c8.42d78160-4c78-479e-8be7-61d5e55dac0d","status":"assigning"}
 AZ_NODISCARD az_result az_iot_provisioning_client_received_topic_payload_parse(
     az_iot_provisioning_client const* client,
     az_span received_topic,
@@ -160,7 +161,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_register_publish_topic_get(
 // Topic: $dps/registrations/GET/iotdps-get-operationstatus/?$rid={%s}&operationId=%s
 AZ_NODISCARD az_result az_iot_provisioning_client_get_operation_status_publish_topic_get(
     az_iot_provisioning_client const* client,
-    az_iot_provisioning_client_register_response register_response,
+    az_iot_provisioning_client_register_response const* register_response,
     az_span mqtt_topic,
     az_span* out_mqtt_topic)
 {
@@ -169,12 +170,13 @@ AZ_NODISCARD az_result az_iot_provisioning_client_get_operation_status_publish_t
   AZ_PRECONDITION_NOT_NULL(client);
   AZ_PRECONDITION_VALID_SPAN(mqtt_topic, 0, false);
   AZ_PRECONDITION_NOT_NULL(out_mqtt_topic);
-  AZ_PRECONDITION_VALID_SPAN(register_response.operation_id, 1, false);
+  AZ_PRECONDITION_NOT_NULL(register_response);
+  AZ_PRECONDITION_VALID_SPAN(register_response->operation_id, 1, false);
 
   AZ_RETURN_IF_FAILED(az_span_copy(mqtt_topic, str_dps, &mqtt_topic));
   AZ_RETURN_IF_FAILED(az_span_append(mqtt_topic, str_registrations, &mqtt_topic));
   AZ_RETURN_IF_FAILED(az_span_append(mqtt_topic, str_get_iotdps_get_operationstatus, &mqtt_topic));
-  AZ_RETURN_IF_FAILED(az_span_append(mqtt_topic, register_response.operation_id, &mqtt_topic));
+  AZ_RETURN_IF_FAILED(az_span_append(mqtt_topic, register_response->operation_id, &mqtt_topic));
 
   *out_mqtt_topic = mqtt_topic;
 
