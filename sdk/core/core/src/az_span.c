@@ -147,7 +147,7 @@ AZ_NODISCARD int32_t az_span_find(az_span source, az_span target)
 
   int32_t source_length = az_span_length(source);
   int32_t target_length = az_span_length(target);
-  const int32_t TARGET_NOT_FOUND = -1;
+  const int32_t target_not_found = -1;
 
   if (target_length == 0)
   { 
@@ -155,7 +155,7 @@ AZ_NODISCARD int32_t az_span_find(az_span source, az_span target)
   }
   else if (source_length == 0) 
   {
-    return TARGET_NOT_FOUND;
+    return target_not_found;
   }
   else
   {
@@ -194,7 +194,7 @@ AZ_NODISCARD int32_t az_span_find(az_span source, az_span target)
 
   // If the function hasn't returned before, all positions 
   // of `source` have been evaluated but `target` could not be found.
-  return TARGET_NOT_FOUND;
+  return target_not_found;
 }
 
 AZ_NODISCARD az_result az_span_copy(az_span destination, az_span source, az_span* out_span)
