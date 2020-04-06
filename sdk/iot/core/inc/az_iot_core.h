@@ -93,6 +93,22 @@ AZ_NODISCARD int32_t az_iot_retry_calc_delay(
     int32_t max_retry_delay_msec,
     int32_t random_msec);
 
+/**
+ * @brief az_span_token is a string tokenizer for az_span.
+ *
+ * @param[in] source The #az_span with the content to be searched on. It must be a non-empty
+ * #az_span.
+ * @param[in] delimiter The #az_span containing the delimiter to "split" `source` into tokens.  It
+ * must be a non-empty #az_span.
+ * @param[out] out_remainder The #az_span pointing to the remaining bytes in `source`, starting
+ * after the occurrence of `delimiter`. If the position after `delimiter` is the end of `source`,
+ * `out_remainder` is set to a NULL/empty #az_span.
+ * @return The #az_span pointing to the token delimited by the beginning of `source` up to the first
+ * occurrence of (but not including the) `delimiter`, or the end of `source` if `delimiter` is not
+ * found. If `source` or `delimiter` is empty, AZ_SPAN_NULL is returned instead.
+ */
+AZ_NODISCARD az_span az_span_token(az_span source, az_span delimiter, az_span* out_remainder);
+
 #include <_az_cfg_suffix.h>
 
 #endif //!_az_IOT_CORE_H

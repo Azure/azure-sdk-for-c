@@ -144,76 +144,57 @@ AZ_NODISCARD int32_t az_span_find(az_span source, az_span target)
  *    - a byte in `target` is different than `source`, in the expected corresponding position;
  *    - the loop has reached the end of `source` (and there are still remaing bytes of `target` to be checked).
  */
-  AZ_PRECONDITION_VALID_SPAN(source, 1, false);
-  AZ_PRECONDITION_VALID_SPAN(target, 1, false);
 
-  uint8_t* source_ptr = az_span_ptr(source);
   int32_t source_length = az_span_length(source);
-  uint8_t* target_ptr = az_span_ptr(target);
   int32_t target_length = az_span_length(target);
+  const int32_t TARGET_NOT_FOUND = -1;
 
-  // This loop traverses `source` position by position (step 1.)
-  for (int32_t i = 0; i < source_length; i++)
+  if (target_length == 0)
+  { 
+    return 0;
+  }
+  else if (source_length == 0) 
   {
-    // This is the check done in step 1. above.
-    if (source_ptr[i] == target_ptr[0])
+    return TARGET_NOT_FOUND;
+  }
+  else
+  {
+    uint8_t* source_ptr = az_span_ptr(source);
+    uint8_t* target_ptr = az_span_ptr(target);
+
+    // This loop traverses `source` position by position (step 1.)
+    for (int32_t i = 0; i < source_length; i++)
     {
-      // The condition in step 2. has been satisfied.
-      int32_t j;
-      // This is the loop defined in step 3.
-      // The loop must be broken if it reaches the ends of `target` (step 3.) OR `source` (step 5.).
-      for (j = 1; j < target_length && (i + j) < source_length; j++)
+      // This is the check done in step 1. above.
+      if (source_ptr[i] == target_ptr[0])
       {
-        // Condition defined in step 5.
-        if (source_ptr[i + j] != target_ptr[j])
+        // The condition in step 2. has been satisfied.
+        int32_t j;
+        // This is the loop defined in step 3.
+        // The loop must be broken if it reaches the ends of `target` (step 3.) OR `source` (step 5.).
+        for (j = 1; j < target_length && (i + j) < source_length; j++)
         {
-            break;
+          // Condition defined in step 5.
+          if (source_ptr[i + j] != target_ptr[j])
+          {
+              break;
+          }
+        }
+  
+        if (j == target_length)
+        {
+          // All bytes in `target` have been checked and matched the corresponding bytes in `source` (from the start point `i`),
+          // so this is indeed an instance of `target` in that position of `source` (step 4.).
+
+          return i;
         }
       }
- 
-      if (j == target_length)
-      {
-        // All bytes in `target` have been checked and matched the corresponding bytes in `source` (from the start point `i`),
-        // so this is indeed an instance of `target` in that position of `source` (step 4.).
-
-        return i;
-      }
-    }
+    } 
   }
 
   // If the function hasn't returned before, all positions 
   // of `source` have been evaluated but `target` could not be found.
-  const int32_t TARGET_NOT_FOUND = -1;
-
   return TARGET_NOT_FOUND;
-}
-
-AZ_NODISCARD az_span az_span_token(az_span source, az_span delimiter, az_span* out_remainder)
-{
-  AZ_PRECONDITION_VALID_SPAN(delimiter, 1, false);
-  AZ_PRECONDITION_NOT_NULL(out_remainder);
-
-  if (az_span_length(source) == 0)
-  {
-    return AZ_SPAN_NULL;
-  }
-  else
-  {
-    int32_t index = az_span_find(source, delimiter);
-
-    if (index != -1)
-    {
-      *out_remainder = az_span_slice(source, index + az_span_length(delimiter), az_span_length(source));
-
-      return az_span_slice(source, 0, index);
-    }
-    else
-    {
-      *out_remainder = AZ_SPAN_NULL;
-
-      return source;
-    } 
-  }
 }
 
 AZ_NODISCARD az_result az_span_copy(az_span destination, az_span source, az_span* out_span)
