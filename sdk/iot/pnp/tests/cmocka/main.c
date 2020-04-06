@@ -16,6 +16,7 @@ int main()
   int result = 0;
 
   result += test_iot_pnp_client();
+  result += test_iot_pnp_telemetry();
 
   return result;
 }

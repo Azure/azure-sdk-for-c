@@ -4,6 +4,7 @@
 #include "test_az_iot_hub_client.h"
 #include <az_iot_sas_token.h>
 #include <az_span.h>
+#include <az_test_span.h>
 
 #include <az_precondition_internal.h>
 #include <az_precondition.h>
@@ -184,15 +185,12 @@ static void az_iot_sas_token_get_document_succeeds(void** state)
   int32_t expiry_time_secs = TEST_EXPIRATION;
 
   uint8_t raw_document[TEST_SPAN_BUFFER_SIZE];
-  memset(raw_document, 0xFF, _az_COUNTOF(raw_document));
-  az_span document = az_span_init(raw_document, 0, _az_COUNTOF(raw_document));
+  az_span document = az_span_for_test_init(raw_document, 0, _az_COUNTOF(raw_document));
 
   assert_true(az_succeeded(az_iot_sas_token_get_document(
       iothub_fqdn, device_id, expiry_time_secs, document, &document)));
-  assert_memory_equal(az_span_ptr(document), expected_document, strlen(expected_document));
-  assert_int_equal(az_span_length(document), strlen(expected_document));
-  assert_int_equal(az_span_capacity(document), TEST_SPAN_BUFFER_SIZE);
-  assert_int_equal(raw_document[az_span_length(document)], 0xFF);
+  az_span_for_test_verify(
+      document, expected_document,(int32_t)strlen(expected_document), TEST_SPAN_BUFFER_SIZE);
 }
 
 static void az_iot_sas_token_generate_succeeds(void** state)
@@ -208,15 +206,12 @@ static void az_iot_sas_token_generate_succeeds(void** state)
   az_span signature = AZ_SPAN_FROM_STR(TEST_SIG);
 
   uint8_t raw_sas_token[TEST_SPAN_BUFFER_SIZE];
-  memset(raw_sas_token, 0xFF, _az_COUNTOF(raw_sas_token));
-  az_span sas_token = az_span_init(raw_sas_token, 0, _az_COUNTOF(raw_sas_token));
+  az_span sas_token = az_span_for_test_init(raw_sas_token, 0, _az_COUNTOF(raw_sas_token));
 
   assert_true(az_succeeded(az_iot_sas_token_generate(
       iothub_fqdn, device_id, signature, expiry_time_secs, key_name, sas_token, &sas_token)));
-  assert_memory_equal(az_span_ptr(sas_token), expected_sas_token, strlen(expected_sas_token));
-  assert_int_equal(az_span_length(sas_token), strlen(expected_sas_token));
-  assert_int_equal(az_span_capacity(sas_token), TEST_SPAN_BUFFER_SIZE);
-  assert_int_equal(raw_sas_token[az_span_length(sas_token)], 0xFF);
+  az_span_for_test_verify(
+      sas_token, expected_sas_token, (int32_t)strlen(expected_sas_token), TEST_SPAN_BUFFER_SIZE);
 }
 
 static void az_iot_sas_token_generate_with_keyname_succeeds(void** state)
@@ -233,15 +228,12 @@ static void az_iot_sas_token_generate_with_keyname_succeeds(void** state)
   az_span signature = AZ_SPAN_FROM_STR(TEST_SIG);
 
   uint8_t raw_sas_token[TEST_SPAN_BUFFER_SIZE];
-  memset(raw_sas_token, 0xFF, _az_COUNTOF(raw_sas_token));
-  az_span sas_token = az_span_init(raw_sas_token, 0, _az_COUNTOF(raw_sas_token));
+  az_span sas_token = az_span_for_test_init(raw_sas_token, 0, _az_COUNTOF(raw_sas_token));
 
   assert_true(az_succeeded(az_iot_sas_token_generate(
       iothub_fqdn, device_id, signature, expiry_time_secs, key_name, sas_token, &sas_token)));
-  assert_memory_equal(az_span_ptr(sas_token), expected_sas_token, strlen(expected_sas_token));
-  assert_int_equal(az_span_length(sas_token), strlen(expected_sas_token));
-  assert_int_equal(az_span_capacity(sas_token), TEST_SPAN_BUFFER_SIZE);
-  assert_int_equal(raw_sas_token[az_span_length(sas_token)], 0xFF);
+  az_span_for_test_verify(
+      sas_token, expected_sas_token, (int32_t)strlen(expected_sas_token), TEST_SPAN_BUFFER_SIZE);
 }
 
 // Conditions like buffer (i.e., az_span) capacity are not covered by pre-conditions, so these tests are always mandatory.
