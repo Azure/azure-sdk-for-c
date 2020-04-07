@@ -312,7 +312,7 @@ static void az_span_find_target_overlap_continuation_of_source_fails()
   assert_int_equal(az_span_find(span, target), -1);
 }
 
-static void az_span_find_target_more_chars_than_preffix_of_source_fails()
+static void az_span_find_target_more_chars_than_prefix_of_source_fails()
 {
   az_span span = AZ_SPAN_FROM_STR("abcd");
   az_span target = AZ_SPAN_FROM_STR("zab");
@@ -320,7 +320,7 @@ static void az_span_find_target_more_chars_than_preffix_of_source_fails()
   assert_int_equal(az_span_find(span, target), -1);
 }
 
-static void az_span_find_overlaping_target_success()
+static void az_span_find_overlapping_target_success()
 {
   az_span span = AZ_SPAN_FROM_STR("abcdefghij");
   az_span target = az_span_slice(span, 6, 9);
@@ -344,6 +344,16 @@ static void az_span_find_capacity_checks_success()
   assert_int_equal(az_span_find(az_span_init(buffer, 2, 3), az_span_init(buffer, 2, 4)), 0);
   assert_int_equal(az_span_find(az_span_init(buffer, 2, 3), az_span_init(buffer, 0, 2)), 0);
   assert_int_equal(az_span_find(az_span_init(buffer, 0, 2), az_span_init(buffer, 0, 2)), 0);
+}
+
+static void az_span_find_overlapping_checks_success()
+{
+  az_span span = AZ_SPAN_FROM_STR("abcdefghij");
+  az_span source = az_span_slice(span, 1, 4);
+  az_span target = az_span_slice(span, 6, 9);
+  assert_int_equal(az_span_find(source, target), -1);
+  assert_int_equal(az_span_find(source, az_span_slice(span, 1, 5)), -1);
+  assert_int_equal(az_span_find(source, az_span_slice(span, 2, 4)), 1);
 }
 
 void test_az_span(void** state)
@@ -381,8 +391,9 @@ void test_az_span(void** state)
   az_span_find_error_cases_fail();
   az_span_find_target_longer_than_source_fails();
   az_span_find_target_overlap_continuation_of_source_fails();
-  az_span_find_target_more_chars_than_preffix_of_source_fails();
-  az_span_find_overlaping_target_success();
+  az_span_find_target_more_chars_than_prefix_of_source_fails();
+  az_span_find_overlapping_target_success();
   az_span_find_embedded_NULLs_success();
   az_span_find_capacity_checks_success();
+  az_span_find_overlapping_checks_success();
 }

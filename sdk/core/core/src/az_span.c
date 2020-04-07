@@ -153,7 +153,7 @@ AZ_NODISCARD int32_t az_span_find(az_span source, az_span target)
   { 
     return 0;
   }
-  else if (source_length == 0 || source_length < target_length) 
+  else if (source_length < target_length) 
   {
     return target_not_found;
   }
