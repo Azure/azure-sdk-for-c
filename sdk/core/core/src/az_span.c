@@ -485,11 +485,11 @@ static AZ_NODISCARD az_result _az_span_builder_append_uint64(az_span* self, uint
 
   uint64_t div = 10000000000000000000ull;
   uint64_t nn = n;
-  int32_t digit_count = 1;
+  int32_t digit_count = 20;
   while (nn / div == 0)
   {
     div /= 10;
-    digit_count++;
+    digit_count--;
   }
 
   AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*self, digit_count);
@@ -542,11 +542,11 @@ _az_span_builder_append_u32toa(az_span self, uint32_t n, az_span* out_span)
 
   uint32_t div = 1000000000;
   uint32_t nn = n;
-  int32_t digit_count = 1;
+  int32_t digit_count = 10;
   while (nn / div == 0)
   {
     div /= 10;
-    digit_count++;
+    digit_count--;
   }
 
   AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(self, digit_count);

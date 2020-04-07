@@ -46,7 +46,7 @@ void test_az_http_pipeline_process()
 
   az_span url_span = AZ_SPAN_FROM_BUFFER(buf);
   url_span = az_span_append(url_span, AZ_SPAN_FROM_STR("url"));
-  assert_true(az_span_capacity(url_span) + 3 == 100);
+  assert_int_equal(az_span_length(url_span), 3);
   az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
   _az_http_request hrb;
 

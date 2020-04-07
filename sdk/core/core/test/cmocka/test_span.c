@@ -10,38 +10,9 @@
 #include <setjmp.h>
 #include <stdarg.h>
 
-#include <az_test_precondition.h>
 #include <cmocka.h>
 
 #include <_az_cfg.h>
-
-#ifndef NO_PRECONDITION_CHECKING
-
-enable_precondition_check_tests();
-
-void az_span_append_uint8_NULL_destination_fails(void** state)
-{
-  (void)state;
-  az_span buffer = AZ_SPAN_NULL;
-
-  assert_precondition_checked(az_span_append_uint8(buffer, 'a'));
-}
-
-void az_span_append_uint8_overflow_fails(void** state)
-{
-  (void)state;
-  uint8_t raw_buffer[2];
-  az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer);
-
-  buffer = az_span_append_uint8(buffer, 'a');
-  assert_int_equals(az_span_capacity(buffer), 1);
-  buffer = az_span_append_uint8(buffer, 'b');
-  assert_int_equals(az_span_capacity(buffer), 0);
-
-  assert_precondition_checked(az_span_append_uint8(buffer, 'c'));
-}
-
-#endif // NO_PRECONDITION_CHECKING
 
 static void az_single_char_ascii_lower_test()
 {
@@ -95,11 +66,11 @@ static void az_span_append_uint8_succeeds()
   az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer);
 
   buffer = az_span_append_uint8(buffer, 'a');
-  assert_int_equals(az_span_capacity(buffer), 14);
+  assert_int_equal(az_span_length(buffer), 1);
   buffer = az_span_append_uint8(buffer, 'b');
-  assert_int_equals(az_span_capacity(buffer), 13);
+  assert_int_equal(az_span_length(buffer), 2);
   buffer = az_span_append_uint8(buffer, 'c');
-  assert_int_equals(az_span_capacity(buffer), 12);
+  assert_int_equal(az_span_length(buffer), 3);
 
   assert_true(az_span_is_content_equal(buffer, AZ_SPAN_FROM_STR("abc")));
 }

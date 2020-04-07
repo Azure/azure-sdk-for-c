@@ -5,7 +5,6 @@
 #include <setjmp.h>
 #include <stdarg.h>
 
-#include <az_test_precondition.h>
 #include <cmocka.h>
 
 #include <az_json.h>
@@ -25,17 +24,7 @@
 
 int main(void)
 {
-#ifndef NO_PRECONDITION_CHECKING
-  setup_precondition_check_tests();
-#endif // NO_PRECONDITION_CHECKING
-
   const struct CMUnitTest tests[] = {
-
-#ifndef NO_PRECONDITION_CHECKING
-    cmocka_unit_test(az_span_append_uint8_NULL_destination_fails),
-    cmocka_unit_test(az_span_append_uint8_overflow_fails),
-#endif // NO_PRECONDITION_CHECKING
-
     /* URL encode tests */
     cmocka_unit_test(test_url_encode),
     /* AZ_Log Tests */

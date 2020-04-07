@@ -123,7 +123,7 @@ void test_az_log(void** state)
                          "\r\n"
                          "KKKKKJJJJJIIIIIHHHHHGGGGGFFFFFEEEEEDDDDDCCCCCBBBBBAAAAA");
   response_builder = az_span_append(response_builder, response_span);
-  assert_int_equal(az_span_capacity(response_builder) + az_span_length(response_span), 1024);
+  assert_int_equal(az_span_length(response_builder), az_span_length(response_span));
 
   az_http_response response = { 0 };
   TEST_EXPECT_SUCCESS(az_http_response_init(&response, response_builder));

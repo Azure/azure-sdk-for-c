@@ -375,20 +375,29 @@ az_result read_write_token(az_span* output, int32_t* o, az_json_parser* state, a
   switch (token.kind)
   {
     case AZ_JSON_TOKEN_NULL:
+    {
       AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*output, 4);
       *output = az_span_append(*output, AZ_SPAN_FROM_STR("null"));
       return AZ_OK;
+    }
     case AZ_JSON_TOKEN_BOOLEAN:
-      AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*output, token._internal.boolean ? 4 : 5);
+    {
+      int32_t required_length = token._internal.boolean ? 4 : 5;
+      AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*output, required_length);
       *output = az_span_append(
           *output, token._internal.boolean ? AZ_SPAN_FROM_STR("true") : AZ_SPAN_FROM_STR("false"));
       return AZ_OK;
+    }
     case AZ_JSON_TOKEN_NUMBER:
+    {
       AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*output, 1);
       *output = az_span_append_uint8(*output, '0');
       return AZ_OK;
+    }
     case AZ_JSON_TOKEN_STRING:
+    {
       return write_str(*output, token._internal.string, output);
+    }
     case AZ_JSON_TOKEN_OBJECT_START:
     {
       AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*output, 1);
@@ -460,8 +469,8 @@ az_result write_str(az_span span, az_span s, az_span* out)
 {
   *out = span;
   AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*out, az_span_length(s) + 2);
-  *out = az_span_append(*out, AZ_SPAN_FROM_STR("\""));
+  *out = az_span_append_uint8(*out, '"');
   *out = az_span_append(*out, s);
-  *out = az_span_append(*out, AZ_SPAN_FROM_STR("\""));
+  *out = az_span_append_uint8(*out, '"');
   return AZ_OK;
 }
