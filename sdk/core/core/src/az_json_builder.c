@@ -60,7 +60,7 @@ static AZ_NODISCARD az_result _az_json_builder_write_span(az_json_builder* self,
         _az_number_to_upper_hex((uint8_t)(c % 16)),
       };
 
-      AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*json, sizeof(array));
+      AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*json, (int32_t)sizeof(array));
       *json = az_span_append(*json, AZ_SPAN_FROM_INITIALIZED_BUFFER(array));
       continue;
     }
