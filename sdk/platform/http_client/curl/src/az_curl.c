@@ -101,10 +101,15 @@ AZ_NODISCARD AZ_INLINE az_result _az_http_client_curl_done(CURL** pp)
 static AZ_NODISCARD az_result
 _az_span_append_header_to_buffer(az_span writable_buffer, az_pair header, az_span separator)
 {
-  AZ_RETURN_IF_FAILED(az_span_append(writable_buffer, header.key, &writable_buffer));
-  AZ_RETURN_IF_FAILED(az_span_append(writable_buffer, separator, &writable_buffer));
-  AZ_RETURN_IF_FAILED(az_span_append(writable_buffer, header.value, &writable_buffer));
-  AZ_RETURN_IF_FAILED(az_span_append(writable_buffer, AZ_SPAN_FROM_STR("\0"), &writable_buffer));
+  int32_t required_length
+      = az_span_length(header.key) + az_span_length(separator) + az_span_length(header.value) + 1;
+
+  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(writable_buffer, required_length);
+
+  writable_buffer = az_span_append(writable_buffer, header.key);
+  writable_buffer = az_span_append(writable_buffer, separator);
+  writable_buffer = az_span_append(writable_buffer, header.value);
+  writable_buffer = az_span_append_uint8(writable_buffer, '0');
 
   return AZ_OK;
 }
@@ -199,9 +204,12 @@ _az_http_client_curl_build_headers(_az_http_request* p_request, struct curl_slis
 static AZ_NODISCARD az_result
 _az_http_client_curl_append_url(az_span writable_buffer, az_span url_from_request)
 {
+  int32_t required_length = az_span_length(url_from_request) + 1;
 
-  AZ_RETURN_IF_FAILED(az_span_append(writable_buffer, url_from_request, &writable_buffer));
-  AZ_RETURN_IF_FAILED(az_span_append(writable_buffer, AZ_SPAN_FROM_STR("\0"), &writable_buffer));
+  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(writable_buffer, required_length);
+
+  writable_buffer = az_span_append(writable_buffer, url_from_request);
+  writable_buffer = az_span_append_uint8(writable_buffer, '0');
 
   return AZ_OK;
 }
@@ -229,10 +237,13 @@ static size_t _az_http_client_curl_write_to_span(
   az_span const span_for_content
       = az_span_init((uint8_t*)contents, (int32_t)expected_size, (int32_t)expected_size);
 
-  if (az_failed(az_span_append(*user_buffer_builder, span_for_content, user_buffer_builder)))
+  if ((az_span_capacity(*user_buffer_builder) - az_span_length(*user_buffer_builder))
+      < az_span_length(span_for_content))
   {
     return expected_size + 1;
   }
+
+  *user_buffer_builder = az_span_append(*user_buffer_builder, span_for_content);
 
   // This callback needs to return the response size or curl will consider it as it failed
   return expected_size;
@@ -525,10 +536,10 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
   // make sure to set the end of the body response as the end of the complete response
   if (az_succeeded(result))
   {
-    AZ_RETURN_IF_FAILED(az_span_append(
-        response->_internal.http_response,
-        AZ_SPAN_FROM_STR("\0"),
-        &response->_internal.http_response));
+    AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(response->_internal.http_response, 1);
+
+    response->_internal.http_response
+        = az_span_append_uint8(response->_internal.http_response, '0');
   }
   return result;
 }

@@ -5,6 +5,7 @@
 #include <setjmp.h>
 #include <stdarg.h>
 
+#include <az_test_precondition.h>
 #include <cmocka.h>
 
 #include <az_json.h>
@@ -22,38 +23,50 @@
  *
  */
 
-const struct CMUnitTest tests[] = {
-  /* URL encode tests */
-  cmocka_unit_test(test_url_encode),
-  /* AZ_Log Tests */
-  cmocka_unit_test(test_az_log),
-  /* HTTP Tests */
-  cmocka_unit_test(test_http_request),
-  cmocka_unit_test(test_http_response),
-  /*JSON tests*/
-  cmocka_unit_test(test_json_token_null),
-  cmocka_unit_test(test_json_parser_init),
-  cmocka_unit_test(test_json_token_boolean),
-  cmocka_unit_test(test_json_token_number),
-  cmocka_unit_test(test_json_value),
-  cmocka_unit_test(test_json_string),
-  cmocka_unit_test(test_json_pointer),
-  cmocka_unit_test(test_json_parser),
-  cmocka_unit_test(test_json_get_by_pointer),
-  cmocka_unit_test(test_json_builder),
-  /*AZ_SPAN tests*/
-  cmocka_unit_test(test_az_span),
-  cmocka_unit_test(test_az_span_replace),
-  cmocka_unit_test(test_az_span_getters),
-  /* AZ_context tests */
-  cmocka_unit_test(test_az_context),
-  /* az_pipeline tests */
-  cmocka_unit_test(test_az_pipeline),
-  /* az_aad tests */
-  cmocka_unit_test(test_az_aad),
-  /* az_http_policy tests */
-  cmocka_unit_test(test_az_http_policy),
+int main(void)
+{
+#ifndef NO_PRECONDITION_CHECKING
+  setup_precondition_check_tests();
+#endif // NO_PRECONDITION_CHECKING
 
-};
+  const struct CMUnitTest tests[] = {
 
-int main(void) { return cmocka_run_group_tests_name("az_core", tests, NULL, NULL); }
+#ifndef NO_PRECONDITION_CHECKING
+    cmocka_unit_test(az_span_append_uint8_NULL_destination_fails),
+    cmocka_unit_test(az_span_append_uint8_overflow_fails),
+#endif // NO_PRECONDITION_CHECKING
+
+    /* URL encode tests */
+    cmocka_unit_test(test_url_encode),
+    /* AZ_Log Tests */
+    cmocka_unit_test(test_az_log),
+    /* HTTP Tests */
+    cmocka_unit_test(test_http_request),
+    cmocka_unit_test(test_http_response),
+    /*JSON tests*/
+    cmocka_unit_test(test_json_token_null),
+    cmocka_unit_test(test_json_parser_init),
+    cmocka_unit_test(test_json_token_boolean),
+    cmocka_unit_test(test_json_token_number),
+    cmocka_unit_test(test_json_value),
+    cmocka_unit_test(test_json_string),
+    cmocka_unit_test(test_json_pointer),
+    cmocka_unit_test(test_json_parser),
+    cmocka_unit_test(test_json_get_by_pointer),
+    cmocka_unit_test(test_json_builder),
+    /*AZ_SPAN tests*/
+    cmocka_unit_test(test_az_span),
+    cmocka_unit_test(test_az_span_replace),
+    cmocka_unit_test(test_az_span_getters),
+    /* AZ_context tests */
+    cmocka_unit_test(test_az_context),
+    /* az_pipeline tests */
+    cmocka_unit_test(test_az_pipeline),
+    /* az_aad tests */
+    cmocka_unit_test(test_az_aad),
+    /* az_http_policy tests */
+    cmocka_unit_test(test_az_http_policy),
+  };
+
+  return cmocka_run_group_tests_name("az_core", tests, NULL, NULL);
+}

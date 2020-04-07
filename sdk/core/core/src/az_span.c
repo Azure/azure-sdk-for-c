@@ -376,12 +376,15 @@ AZ_NODISCARD az_result _az_span_replace(az_span* self, int32_t start, int32_t en
   // insert at the end case (no need to make left or right shift)
   if (start == current_size)
   {
-    return az_span_append(*self, span, self);
+    *self = az_span_append(*self, span);
+    return AZ_OK;
   }
   // replace all content case (no need to make left or right shift, only copy)
+  // TODO: Verify and fix this check, if needed.
   if (current_size == replaced_size)
   {
-    return az_span_copy(*self, span, self);
+    *self = az_span_copy(*self, span);
+    return AZ_OK;
   }
 
   // get the span needed to be moved before adding a new span
@@ -390,10 +393,9 @@ AZ_NODISCARD az_result _az_span_replace(az_span* self, int32_t start, int32_t en
   az_span src = az_span_slice(*self, end, current_size);
   {
     // move content left or right so new span can be added
-    AZ_RETURN_IF_FAILED(az_span_copy(dst, src, &dst));
+    dst = az_span_copy(dst, src);
     // add the new span
-    az_span copy = az_span_slice(*self, start, -1);
-    AZ_RETURN_IF_FAILED(az_span_copy(copy, span, &copy));
+    az_span_copy(az_span_slice(*self, start, -1), span);
   }
 
   // update builder size
@@ -405,19 +407,20 @@ AZ_NODISCARD az_result _az_span_replace(az_span* self, int32_t start, int32_t en
 AZ_NODISCARD az_result az_span_append_dtoa(az_span destination, double source, az_span* out_span)
 {
   AZ_PRECONDITION_NOT_NULL(out_span);
+  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(destination, 1);
 
   uint64_t const* const source_bin_rep_view = (uint64_t*)&source;
 
   if (*source_bin_rep_view == 0)
   {
-    AZ_RETURN_IF_FAILED(az_span_append(destination, AZ_SPAN_FROM_STR("0"), out_span));
+    *out_span = az_span_append(destination, AZ_SPAN_FROM_STR("0"));
     return AZ_OK;
   }
   *out_span = destination;
 
   if (source < 0)
   {
-    AZ_RETURN_IF_FAILED(az_span_append(*out_span, AZ_SPAN_FROM_STR("-"), out_span));
+    *out_span = az_span_append(*out_span, AZ_SPAN_FROM_STR("-"));
     source = -source;
   }
 
@@ -428,20 +431,25 @@ AZ_NODISCARD az_result az_span_append_dtoa(az_span destination, double source, a
     if (*source_bin_rep_view == *u_bin_rep_view)
     {
       uint64_t base = 1;
+      int32_t digit_count = 1;
       {
         uint64_t i = u;
         while (10 <= i)
         {
           i /= 10;
           base *= 10;
+          digit_count++;
         }
       }
+
+      AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*out_span, digit_count);
+
       do
       {
         uint8_t dec = (uint8_t)((u / base) + '0');
         u %= base;
         base /= 10;
-        AZ_RETURN_IF_FAILED(az_span_append(*out_span, az_span_from_single_item(&dec), out_span));
+        *out_span = az_span_append_uint8(*out_span, dec);
       } while (1 <= base);
       return AZ_OK;
     }
@@ -467,28 +475,35 @@ AZ_INLINE uint8_t _az_decimal_to_ascii(uint8_t d) { return (uint8_t)(('0' + d) &
 
 static AZ_NODISCARD az_result _az_span_builder_append_uint64(az_span* self, uint64_t n)
 {
+  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*self, 1);
+
   if (n == 0)
   {
-    return az_span_append(*self, AZ_SPAN_FROM_STR("0"), self);
+    *self = az_span_append(*self, AZ_SPAN_FROM_STR("0"));
+    return AZ_OK;
   }
 
   uint64_t div = 10000000000000000000ull;
   uint64_t nn = n;
+  int32_t digit_count = 1;
   while (nn / div == 0)
   {
     div /= 10;
+    digit_count++;
   }
+
+  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*self, digit_count);
 
   while (div > 1)
   {
     uint8_t value_to_append = _az_decimal_to_ascii((uint8_t)(nn / div));
-    AZ_RETURN_IF_FAILED(az_span_append(*self, az_span_init(&value_to_append, 1, 1), self));
-
+    *self = az_span_append_uint8(*self, value_to_append);
     nn %= div;
     div /= 10;
   }
   uint8_t value_to_append = _az_decimal_to_ascii((uint8_t)nn);
-  return az_span_append(*self, az_span_init(&value_to_append, 1, 1), self);
+  *self = az_span_append_uint8(*self, value_to_append);
+  return AZ_OK;
 }
 
 AZ_NODISCARD az_result
@@ -506,7 +521,8 @@ AZ_NODISCARD az_result az_span_append_i64toa(az_span destination, int64_t source
 
   if (source < 0)
   {
-    AZ_RETURN_IF_FAILED(az_span_append(destination, AZ_SPAN_FROM_STR("-"), out_span));
+    AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(destination, 1);
+    *out_span = az_span_append(destination, AZ_SPAN_FROM_STR("-"));
     return _az_span_builder_append_uint64(out_span, (uint64_t)-source);
   }
 
@@ -516,31 +532,39 @@ AZ_NODISCARD az_result az_span_append_i64toa(az_span destination, int64_t source
 static AZ_NODISCARD az_result
 _az_span_builder_append_u32toa(az_span self, uint32_t n, az_span* out_span)
 {
+  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(self, 1);
+
   if (n == 0)
   {
-    return az_span_append_uint8(self, '0', out_span);
+    *out_span = az_span_append_uint8(self, '0');
+    return AZ_OK;
   }
 
   uint32_t div = 1000000000;
   uint32_t nn = n;
+  int32_t digit_count = 1;
   while (nn / div == 0)
   {
     div /= 10;
+    digit_count++;
   }
+
+  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(self, digit_count);
 
   *out_span = self;
 
   while (div > 1)
   {
     uint8_t value_to_append = _az_decimal_to_ascii((uint8_t)(nn / div));
-    AZ_RETURN_IF_FAILED(az_span_append_uint8(*out_span, value_to_append, out_span));
+    *out_span = az_span_append_uint8(*out_span, value_to_append);
 
     nn %= div;
     div /= 10;
   }
 
   uint8_t value_to_append = _az_decimal_to_ascii((uint8_t)nn);
-  return az_span_append_uint8(*out_span, value_to_append, out_span);
+  *out_span = az_span_append_uint8(*out_span, value_to_append);
+  return AZ_OK;
 }
 
 AZ_NODISCARD az_result
@@ -558,7 +582,8 @@ AZ_NODISCARD az_result az_span_append_i32toa(az_span destination, int32_t source
 
   if (source < 0)
   {
-    AZ_RETURN_IF_FAILED(az_span_append_uint8(*out_span, '-', out_span));
+    AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*out_span, 1);
+    *out_span = az_span_append_uint8(*out_span, '-');
     source = -source;
   }
 

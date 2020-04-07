@@ -88,7 +88,8 @@ void test_az_http_pipeline_policy_telemetry()
   memset(header_buf, 0, sizeof(header_buf));
 
   az_span url_span = AZ_SPAN_FROM_BUFFER(buf);
-  assert_return_code(az_span_append(url_span, AZ_SPAN_FROM_STR("url"), &url_span), AZ_OK);
+  url_span = az_span_append(url_span, AZ_SPAN_FROM_STR("url"));
+  assert_int_equal(az_span_capacity(url_span) + 3, 100);
   az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
   _az_http_request hrb;
 
@@ -120,7 +121,8 @@ void test_az_http_pipeline_policy_apiversion()
   memset(header_buf, 0, sizeof(header_buf));
 
   az_span url_span = AZ_SPAN_FROM_BUFFER(buf);
-  assert_return_code(az_span_append(url_span, AZ_SPAN_FROM_STR("url"), &url_span), AZ_OK);
+  url_span = az_span_append(url_span, AZ_SPAN_FROM_STR("url"));
+  assert_int_equal(az_span_capacity(url_span) + 3, 100);
   az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
   _az_http_request hrb;
 
@@ -159,7 +161,8 @@ void test_az_http_pipeline_policy_uniquerequestid()
   memset(header_buf, 0, sizeof(header_buf));
 
   az_span url_span = AZ_SPAN_FROM_BUFFER(buf);
-  assert_return_code(az_span_append(url_span, AZ_SPAN_FROM_STR("url"), &url_span), AZ_OK);
+  url_span = az_span_append(url_span, AZ_SPAN_FROM_STR("url"));
+  assert_int_equal(az_span_capacity(url_span) + 3, 100);
   az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
   _az_http_request hrb;
 
@@ -255,7 +258,8 @@ void test_az_http_pipeline_policy_credential()
   memset(header_buf, 0, sizeof(header_buf));
 
   az_span url_span = AZ_SPAN_FROM_BUFFER(buf);
-  assert_return_code(az_span_append(url_span, AZ_SPAN_FROM_STR("url"), &url_span), AZ_OK);
+  url_span = az_span_append(url_span, AZ_SPAN_FROM_STR("url"));
+  assert_int_equal(az_span_capacity(url_span) + 3, 100);
   az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
   _az_http_request hrb;
 
@@ -296,7 +300,8 @@ void test_az_http_pipeline_policy_retry()
   memset(header_buf, 0, sizeof(header_buf));
 
   az_span url_span = AZ_SPAN_FROM_BUFFER(buf);
-  assert_return_code(az_span_append(url_span, AZ_SPAN_FROM_STR("url"), &url_span), AZ_OK);
+  url_span = az_span_append(url_span, AZ_SPAN_FROM_STR("url"));
+  assert_int_equal(az_span_capacity(url_span) + 3, 100);
   az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
   _az_http_request hrb;
 
@@ -335,7 +340,8 @@ void test_az_http_pipeline_policy_retry_with_header()
   memset(header_buf, 0, sizeof(header_buf));
 
   az_span url_span = AZ_SPAN_FROM_BUFFER(buf);
-  assert_return_code(az_span_append(url_span, AZ_SPAN_FROM_STR("url"), &url_span), AZ_OK);
+  url_span = az_span_append(url_span, AZ_SPAN_FROM_STR("url"));
+  assert_int_equal(az_span_capacity(url_span) + 3, 100);
   az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
   _az_http_request hrb;
 
@@ -374,7 +380,8 @@ void test_az_http_pipeline_policy_retry_with_header_2()
   memset(header_buf, 0, sizeof(header_buf));
 
   az_span url_span = AZ_SPAN_FROM_BUFFER(buf);
-  assert_return_code(az_span_append(url_span, AZ_SPAN_FROM_STR("url"), &url_span), AZ_OK);
+  url_span = az_span_append(url_span, AZ_SPAN_FROM_STR("url"));
+  assert_int_equal(az_span_capacity(url_span) + 3, 100);
   az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
   _az_http_request hrb;
 

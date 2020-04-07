@@ -38,6 +38,9 @@ void test_az_span(void** state);
 void test_az_span_replace(void** state);
 void test_az_span_getters(void** state);
 
+void az_span_append_uint8_NULL_destination_fails(void** state);
+void az_span_append_uint8_overflow_fails(void** state);
+
 /* AZ_context tests */
 void test_az_context(void** state);
 

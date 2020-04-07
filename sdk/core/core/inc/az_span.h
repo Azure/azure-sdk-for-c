@@ -309,7 +309,8 @@ AZ_NODISCARD az_span az_span_token(az_span source, az_span delimiter, az_span* o
  * @param[in] destination The az_span where the byte should be appended to.
  * @param[in] byte The uint8 to append to the destination span
  * @return An #az_span that is a clone of the \p destination span with its length increased by 1.
- *         The method assumes that the \p destination has a large enough capacity to hold one more byte.
+ *         The method assumes that the \p destination has a large enough capacity to hold one more
+ * byte.
  */
 az_span az_span_append_uint8(az_span destination, uint8_t byte);
 
@@ -319,8 +320,9 @@ az_span az_span_append_uint8(az_span destination, uint8_t byte);
  *
  * @param[in] destination The az_span where the bytes should be appended to.
  * @param[in] source Refers to the bytes to be appended to the destination
- * @return An #az_span that is a clone of the \p destination span with its length increased by the \p source length.
- *         The method assumes that the \p destination has a large enough capacity to hold the \p source.
+ * @return An #az_span that is a clone of the \p destination span with its length increased by the
+ * \p source length. The method assumes that the \p destination has a large enough capacity to hold
+ * the \p source.
  */
 az_span az_span_append(az_span destination, az_span source);
 
@@ -427,8 +429,9 @@ AZ_INLINE void az_span_set(az_span destination, uint8_t fill)
  *
  * @param[in] destination The span whose bytes will be replaced by the source's bytes
  * @param[in] source The span containing the bytes to copy to the destination
- * @return An #az_span that is a clone of the \p destination span with its length updated to the \p source length.
- *         The method assumes that the \p destination has a large enough capacity to hold the \p source. 
+ * @return An #az_span that is a clone of the \p destination span with its length updated to the \p
+ * source length. The method assumes that the \p destination has a large enough capacity to hold the
+ * \p source.
  */
 az_span az_span_copy(az_span destination, az_span source);
 

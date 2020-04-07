@@ -50,28 +50,36 @@ AZ_NODISCARD az_result az_iot_hub_client_user_name_get(
   const az_span* const module_id = &(client->_internal.options.module_id);
   const az_span* const user_agent = &(client->_internal.options.user_agent);
 
-  AZ_RETURN_IF_FAILED(
-      az_span_copy(mqtt_user_name, client->_internal.iot_hub_hostname, &mqtt_user_name));
-  AZ_RETURN_IF_FAILED(
-      az_span_append_uint8(mqtt_user_name, hub_client_forward_slash, &mqtt_user_name));
-  AZ_RETURN_IF_FAILED(az_span_append(mqtt_user_name, client->_internal.device_id, &mqtt_user_name));
-  AZ_RETURN_IF_FAILED(
-      az_span_append_uint8(mqtt_user_name, hub_client_forward_slash, &mqtt_user_name));
+  int32_t required_length = az_span_length(client->_internal.iot_hub_hostname)
+      + az_span_length(client->_internal.device_id) + az_span_length(hub_client_api_version) + 2;
+  if (az_span_length(*module_id) > 0)
+  {
+    required_length += az_span_length(*module_id) + 1;
+  }
+  if (az_span_length(*user_agent) > 0)
+  {
+    required_length += az_span_length(*user_agent) + 1;
+  }
+
+  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(mqtt_user_name, required_length);
+
+  mqtt_user_name = az_span_copy(mqtt_user_name, client->_internal.iot_hub_hostname);
+  mqtt_user_name = az_span_append_uint8(mqtt_user_name, hub_client_forward_slash);
+  mqtt_user_name = az_span_append(mqtt_user_name, client->_internal.device_id);
+  mqtt_user_name = az_span_append_uint8(mqtt_user_name, hub_client_forward_slash);
 
   if (az_span_length(*module_id) > 0)
   {
-    AZ_RETURN_IF_FAILED(az_span_append(mqtt_user_name, *module_id, &mqtt_user_name));
-    AZ_RETURN_IF_FAILED(
-        az_span_append_uint8(mqtt_user_name, hub_client_forward_slash, &mqtt_user_name));
+    mqtt_user_name = az_span_append(mqtt_user_name, *module_id);
+    mqtt_user_name = az_span_append_uint8(mqtt_user_name, hub_client_forward_slash);
   }
 
-  AZ_RETURN_IF_FAILED(az_span_append(mqtt_user_name, hub_client_api_version, &mqtt_user_name));
+  mqtt_user_name = az_span_append(mqtt_user_name, hub_client_api_version);
 
   if (az_span_length(*user_agent) > 0)
   {
-    AZ_RETURN_IF_FAILED(
-        az_span_append_uint8(mqtt_user_name, hub_client_param_separator, &mqtt_user_name));
-    AZ_RETURN_IF_FAILED(az_span_append(mqtt_user_name, *user_agent, &mqtt_user_name));
+    mqtt_user_name = az_span_append_uint8(mqtt_user_name, hub_client_param_separator);
+    mqtt_user_name = az_span_append(mqtt_user_name, *user_agent);
   }
 
   *out_mqtt_user_name = mqtt_user_name;
@@ -90,13 +98,20 @@ AZ_NODISCARD az_result az_iot_hub_client_id_get(
 
   const az_span* const module_id = &(client->_internal.options.module_id);
 
-  AZ_RETURN_IF_FAILED(az_span_copy(mqtt_client_id, client->_internal.device_id, &mqtt_client_id));
+  int32_t required_length = az_span_length(client->_internal.device_id);
+  if (az_span_length(*module_id) > 0)
+  {
+    required_length += az_span_length(*module_id) + 1;
+  }
+
+  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(mqtt_client_id, required_length);
+
+  mqtt_client_id = az_span_copy(mqtt_client_id, client->_internal.device_id);
 
   if (az_span_length(*module_id) > 0)
   {
-    AZ_RETURN_IF_FAILED(
-        az_span_append_uint8(mqtt_client_id, hub_client_forward_slash, &mqtt_client_id));
-    AZ_RETURN_IF_FAILED(az_span_append(mqtt_client_id, *module_id, &mqtt_client_id));
+    mqtt_client_id = az_span_append_uint8(mqtt_client_id, hub_client_forward_slash);
+    mqtt_client_id = az_span_append(mqtt_client_id, *module_id);
   }
 
   *out_mqtt_client_id = mqtt_client_id;
@@ -127,14 +142,23 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_append(
 
   az_span prop_span = properties->_internal.properties;
 
-  if (az_span_length(prop_span) > 0)
+  int32_t required_length = az_span_length(name) + az_span_length(value) + 1;
+  int32_t prop_length = az_span_length(prop_span);
+  if (prop_length > 0)
   {
-    AZ_RETURN_IF_FAILED(az_span_append_uint8(prop_span, hub_client_param_separator, &prop_span));
+    required_length += prop_length + 1;
   }
 
-  AZ_RETURN_IF_FAILED(az_span_append(prop_span, name, &prop_span));
-  AZ_RETURN_IF_FAILED(az_span_append_uint8(prop_span, hub_client_param_equals, &prop_span));
-  AZ_RETURN_IF_FAILED(az_span_append(prop_span, value, &prop_span));
+  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(prop_span, required_length);
+
+  if (prop_length > 0)
+  {
+    prop_span = az_span_append_uint8(prop_span, hub_client_param_separator);
+  }
+
+  prop_span = az_span_append(prop_span, name);
+  prop_span = az_span_append_uint8(prop_span, hub_client_param_equals);
+  prop_span = az_span_append(prop_span, value);
 
   properties->_internal.properties = prop_span;
 

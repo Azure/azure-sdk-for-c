@@ -18,7 +18,7 @@ static const az_span pnp_model_id = AZ_SPAN_LITERAL_FROM_STR("digital-twin-model
 
 AZ_NODISCARD az_iot_pnp_client_options az_iot_pnp_client_options_default()
 {
-  az_iot_pnp_client_options options = (az_iot_pnp_client_options) {
+  az_iot_pnp_client_options options = (az_iot_pnp_client_options){
     .user_agent = AZ_SPAN_NULL,
     .content_encoding = AZ_SPAN_NULL,
     .content_type = AZ_SPAN_NULL,
@@ -62,13 +62,16 @@ AZ_NODISCARD az_result az_iot_pnp_client_get_user_name(
 
   AZ_RETURN_IF_FAILED(az_iot_hub_client_user_name_get(
       &client->_internal.iot_hub_client, mqtt_user_name, &mqtt_user_name));
-  AZ_RETURN_IF_FAILED(
-      az_span_append_uint8(mqtt_user_name, pnp_client_param_separator, &mqtt_user_name));
-  AZ_RETURN_IF_FAILED(az_span_append(mqtt_user_name, pnp_model_id, &mqtt_user_name));
-  AZ_RETURN_IF_FAILED(
-      az_span_append_uint8(mqtt_user_name, pnp_client_param_equals, &mqtt_user_name));
-  AZ_RETURN_IF_FAILED(
-      az_span_append(mqtt_user_name, client->_internal.root_interface_name, &mqtt_user_name));
+
+  int32_t required_length
+      = az_span_length(pnp_model_id) + az_span_length(client->_internal.root_interface_name) + 2;
+
+  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(mqtt_user_name, required_length);
+
+  mqtt_user_name = az_span_append_uint8(mqtt_user_name, pnp_client_param_separator);
+  mqtt_user_name = az_span_append(mqtt_user_name, pnp_model_id);
+  mqtt_user_name = az_span_append_uint8(mqtt_user_name, pnp_client_param_equals);
+  mqtt_user_name = az_span_append(mqtt_user_name, client->_internal.root_interface_name);
 
   *out_mqtt_user_name = mqtt_user_name;
 

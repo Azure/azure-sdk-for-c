@@ -74,6 +74,7 @@ AZ_NODISCARD az_keyvault_keys_client_options az_keyvault_keys_client_options_def
   return options;
 }
 
+// TODO: Rename the self parameter to client to be  consistent with other clients.
 AZ_NODISCARD az_result az_keyvault_keys_client_init(
     az_keyvault_keys_client* self,
     az_span uri,
@@ -142,7 +143,8 @@ AZ_NODISCARD az_result az_keyvault_keys_client_init(
   };
 
   // Copy url to client buffer so customer can re-use buffer on his/her side
-  AZ_RETURN_IF_FAILED(az_span_copy(self->_internal.uri, uri, &self->_internal.uri));
+  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(self->_internal.uri, az_span_length(uri));
+  self->_internal.uri = az_span_copy(self->_internal.uri, uri);
 
   AZ_RETURN_IF_FAILED(
       _az_credential_set_scopes(cred, AZ_SPAN_FROM_STR("https://vault.azure.net/.default")));
@@ -243,7 +245,8 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
   uint8_t url_buffer[AZ_HTTP_REQUEST_URL_BUF_SIZE];
   az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
   // copy url from client
-  AZ_RETURN_IF_FAILED(az_span_copy(request_url_span, client->_internal.uri, &request_url_span));
+  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(request_url_span, az_span_length(client->_internal.uri));
+  request_url_span = az_span_copy(request_url_span, client->_internal.uri);
 
   // Headers buffer
   uint8_t headers_buffer[_az_KEYVAULT_HTTP_REQUEST_HEADER_BUF_SIZE];
@@ -302,7 +305,8 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
   uint8_t url_buffer[AZ_HTTP_REQUEST_URL_BUF_SIZE];
   az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
   // copy url from client
-  AZ_RETURN_IF_FAILED(az_span_copy(request_url_span, client->_internal.uri, &request_url_span));
+  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(request_url_span, az_span_length(client->_internal.uri));
+  request_url_span = az_span_copy(request_url_span, client->_internal.uri);
 
   // create request
   _az_http_request hrb;
@@ -336,7 +340,9 @@ AZ_NODISCARD az_result az_keyvault_keys_key_delete(
   uint8_t url_buffer[AZ_HTTP_REQUEST_URL_BUF_SIZE];
   az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
   // copy url from client
-  AZ_RETURN_IF_FAILED(az_span_copy(request_url_span, client->_internal.uri, &request_url_span));
+  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(request_url_span, az_span_length(client->_internal.uri));
+  request_url_span = az_span_copy(request_url_span, client->_internal.uri);
+
   uint8_t headers_buffer[_az_KEYVAULT_HTTP_REQUEST_HEADER_BUF_SIZE];
   az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
 

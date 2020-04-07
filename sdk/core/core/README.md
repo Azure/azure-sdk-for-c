@@ -79,7 +79,7 @@ some_function(AZ_SPAN_FROM_STR("Hello"));  // cap = 5, len = 5
 As shown above, an `az_span` over a string does not include the 0-terminator. If you need to 0-terminate the string, you can call this function to append a 0 byte (if the string’s length is less than its capacity):
 
 ```C
-az_result az_span_append_uint8(az_span destination, uint8_t byte, az_span* out_span);
+az_span az_span_append_uint8(az_span destination, uint8_t byte);
 ```
 
 and then call this function to get the address of the 0-terminated string:

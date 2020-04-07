@@ -10,17 +10,38 @@
 #include <setjmp.h>
 #include <stdarg.h>
 
+#include <az_test_precondition.h>
 #include <cmocka.h>
 
 #include <_az_cfg.h>
 
-/* void az_span_append_uint8_NULL_out_span_fails()
+#ifndef NO_PRECONDITION_CHECKING
+
+enable_precondition_check_tests();
+
+void az_span_append_uint8_NULL_destination_fails(void** state)
 {
-  uint8_t raw_buffer[15];
+  (void)state;
+  az_span buffer = AZ_SPAN_NULL;
+
+  assert_precondition_checked(az_span_append_uint8(buffer, 'a'));
+}
+
+void az_span_append_uint8_overflow_fails(void** state)
+{
+  (void)state;
+  uint8_t raw_buffer[2];
   az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer);
 
-  assert_true(az_span_append_uint8(buffer, 'a', NULL) == AZ_ERROR_ARG);
-} */
+  buffer = az_span_append_uint8(buffer, 'a');
+  assert_int_equals(az_span_capacity(buffer), 1);
+  buffer = az_span_append_uint8(buffer, 'b');
+  assert_int_equals(az_span_capacity(buffer), 0);
+
+  assert_precondition_checked(az_span_append_uint8(buffer, 'c'));
+}
+
+#endif // NO_PRECONDITION_CHECKING
 
 static void az_single_char_ascii_lower_test()
 {
@@ -68,24 +89,18 @@ static void az_single_char_ascii_lower_test()
   }
 }
 
-static void az_span_append_uint8_overflow_fails()
-{
-  uint8_t raw_buffer[2];
-  az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer);
-
-  assert_true(az_succeeded(az_span_append_uint8(buffer, 'a', &buffer)));
-  assert_true(az_succeeded(az_span_append_uint8(buffer, 'b', &buffer)));
-  assert_true(az_failed(az_span_append_uint8(buffer, 'c', &buffer)));
-}
-
 static void az_span_append_uint8_succeeds()
 {
   uint8_t raw_buffer[15];
   az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer);
 
-  assert_true(az_succeeded(az_span_append_uint8(buffer, 'a', &buffer)));
-  assert_true(az_succeeded(az_span_append_uint8(buffer, 'b', &buffer)));
-  assert_true(az_succeeded(az_span_append_uint8(buffer, 'c', &buffer)));
+  buffer = az_span_append_uint8(buffer, 'a');
+  assert_int_equals(az_span_capacity(buffer), 14);
+  buffer = az_span_append_uint8(buffer, 'b');
+  assert_int_equals(az_span_capacity(buffer), 13);
+  buffer = az_span_append_uint8(buffer, 'c');
+  assert_int_equals(az_span_capacity(buffer), 12);
+
   assert_true(az_span_is_content_equal(buffer, AZ_SPAN_FROM_STR("abc")));
 }
 
@@ -310,9 +325,14 @@ static void az_span_token_success()
   assert_true(az_span_ptr(token) == az_span_ptr(span));
   assert_true(az_span_length(token) == 4);
   assert_true(az_span_capacity(token) == az_span_length(token));
-  assert_true(az_span_ptr(out_span) == (az_span_ptr(span) + az_span_length(token) + az_span_length(delim)));
-  assert_true(az_span_length(out_span) == (az_span_length(span) - az_span_length(token) - az_span_length(delim)));
-  assert_true(az_span_capacity(out_span) == (az_span_capacity(span) - az_span_capacity(token) - az_span_capacity(delim)));
+  assert_true(
+      az_span_ptr(out_span) == (az_span_ptr(span) + az_span_length(token) + az_span_length(delim)));
+  assert_true(
+      az_span_length(out_span)
+      == (az_span_length(span) - az_span_length(token) - az_span_length(delim)));
+  assert_true(
+      az_span_capacity(out_span)
+      == (az_span_capacity(span) - az_span_capacity(token) - az_span_capacity(delim)));
 
   // token: "defg" (span+10)
   span = out_span;
@@ -321,9 +341,14 @@ static void az_span_token_success()
   assert_true(az_span_ptr(token) == az_span_ptr(span));
   assert_true(az_span_length(token) == 4);
   assert_true(az_span_capacity(token) == az_span_length(token));
-  assert_true(az_span_ptr(out_span) == (az_span_ptr(span) + az_span_length(token) + az_span_length(delim)));
-  assert_true(az_span_length(out_span) == (az_span_length(span) - az_span_length(token) - az_span_length(delim)));
-  assert_true(az_span_capacity(out_span) == (az_span_capacity(span) - az_span_capacity(token) - az_span_capacity(delim)));
+  assert_true(
+      az_span_ptr(out_span) == (az_span_ptr(span) + az_span_length(token) + az_span_length(delim)));
+  assert_true(
+      az_span_length(out_span)
+      == (az_span_length(span) - az_span_length(token) - az_span_length(delim)));
+  assert_true(
+      az_span_capacity(out_span)
+      == (az_span_capacity(span) - az_span_capacity(token) - az_span_capacity(delim)));
 
   // token: "defg" (span+17)
   span = out_span;
@@ -338,7 +363,7 @@ static void az_span_token_success()
 
   // Out_span is empty.
   span = out_span;
-  
+
   token = az_span_token(span, delim, &out_span);
   assert_true(az_span_is_content_equal(token, AZ_SPAN_NULL));
 }
@@ -347,8 +372,6 @@ void test_az_span(void** state)
 {
   (void)state;
 
-  // az_span_append_uint8_NULL_out_span_fails();
-  az_span_append_uint8_overflow_fails();
   az_span_append_uint8_succeeds();
 
   az_span_append_i32toa_succeeds();

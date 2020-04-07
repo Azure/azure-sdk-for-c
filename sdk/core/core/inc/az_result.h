@@ -51,6 +51,15 @@ enum
     } \
   } while (0)
 
+#define AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(span, required_space) \
+  do \
+  { \
+    if ((az_span_capacity(span) - az_span_length(span)) < required_space) \
+    { \
+      return AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY; \
+    } \
+  } while (0)
+
 /**
  * The type represents error conditions.
  * Bits:

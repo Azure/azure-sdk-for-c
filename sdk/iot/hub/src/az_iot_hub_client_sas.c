@@ -31,24 +31,22 @@ az_result az_iot_sas_token_get_document(
   AZ_PRECONDITION_VALID_SPAN(document, 0, false);
   AZ_PRECONDITION_NOT_NULL(out_document);
 
-  az_result result;
+  az_span devices_string = AZ_SPAN_FROM_STR(SCOPE_DEVICES_STRING);
+  int32_t required_length = az_span_length(iothub_fqdn) + az_span_length(device_id)
+      + az_span_length(devices_string) + 1;
+
+  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(document, required_length);
 
   *out_document = document;
 
-  if (az_failed(result = az_span_append(*out_document, iothub_fqdn, out_document))
-      || az_failed(
-             result
-             = az_span_append(*out_document, AZ_SPAN_FROM_STR(SCOPE_DEVICES_STRING), out_document))
-      || az_failed(result = az_span_append(*out_document, device_id, out_document))
-      || az_failed(result = az_span_append_uint8(*out_document, LF, out_document))
-      || az_failed(result = az_span_append_i32toa(*out_document, expiry_time_secs, out_document)))
-  {
-    return result;
-  }
-  else
-  {
-    return AZ_OK;
-  }
+  *out_document = az_span_append(*out_document, iothub_fqdn);
+  *out_document = az_span_append(*out_document, devices_string);
+  *out_document = az_span_append(*out_document, device_id);
+  *out_document = az_span_append_uint8(*out_document, LF);
+
+  AZ_RETURN_IF_FAILED(az_span_append_i32toa(*out_document, expiry_time_secs, out_document));
+
+  return AZ_OK;
 }
 
 az_result az_iot_sas_token_generate(
@@ -60,8 +58,6 @@ az_result az_iot_sas_token_generate(
     az_span sas_token,
     az_span* out_sas_token)
 {
-  az_result result;
-
   AZ_PRECONDITION_VALID_SPAN(device_id, 1, false);
   AZ_PRECONDITION_VALID_SPAN(iothub_fqdn, 1, false);
   AZ_PRECONDITION_VALID_SPAN(signature, 1, false);
@@ -72,46 +68,49 @@ az_result az_iot_sas_token_generate(
   // Concatenates: "SharedAccessSignature sr=" scope "&sig=" sig  "&se=" expiration_time_secs
   //               plus, if key_name != NULL, "&skn=" key_name
 
+  az_span sr_string = AZ_SPAN_FROM_STR(SAS_TOKEN_SR);
+  az_span devices_string = AZ_SPAN_FROM_STR(SCOPE_DEVICES_STRING);
+  az_span sig_string = AZ_SPAN_FROM_STR(SAS_TOKEN_SIG);
+  az_span se_string = AZ_SPAN_FROM_STR(SAS_TOKEN_SE);
+  int32_t required_length = az_span_length(sr_string) + az_span_length(devices_string)
+      + az_span_length(sig_string) + az_span_length(se_string) + az_span_length(iothub_fqdn)
+      + az_span_length(device_id) + az_span_length(signature) + 5;
+
+  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(sas_token, required_length);
+
   *out_sas_token = sas_token;
 
   // SharedAccessSignature
-  if (az_failed(
-          result = az_span_append(*out_sas_token, AZ_SPAN_FROM_STR(SAS_TOKEN_SR), out_sas_token))
-      || az_failed(result = az_span_append_uint8(*out_sas_token, EQUAL_SIGN, out_sas_token))
-      || az_failed(result = az_span_append(*out_sas_token, iothub_fqdn, out_sas_token))
-      || az_failed(
-             result = az_span_append(
-                 *out_sas_token, AZ_SPAN_FROM_STR(SCOPE_DEVICES_STRING), out_sas_token))
-      || az_failed(result = az_span_append(*out_sas_token, device_id, out_sas_token)) ||
-      // Signature
-      az_failed(result = az_span_append_uint8(*out_sas_token, AMPERSAND, out_sas_token))
-      || az_failed(
-             result
-             = az_span_append(*out_sas_token, AZ_SPAN_FROM_STR(SAS_TOKEN_SIG), out_sas_token))
-      || az_failed(result = az_span_append_uint8(*out_sas_token, EQUAL_SIGN, out_sas_token))
-      || az_failed(result = az_span_append(*out_sas_token, signature, out_sas_token)) ||
-      // Expiration
-      az_failed(result = az_span_append_uint8(*out_sas_token, AMPERSAND, out_sas_token))
-      || az_failed(
-             result = az_span_append(*out_sas_token, AZ_SPAN_FROM_STR(SAS_TOKEN_SE), out_sas_token))
-      || az_failed(result = az_span_append_uint8(*out_sas_token, EQUAL_SIGN, out_sas_token))
-      || az_failed(result = az_span_append_i32toa(*out_sas_token, expiry_time_secs, out_sas_token)))
-  {
-    return result;
-  }
+  *out_sas_token = az_span_append(*out_sas_token, sr_string);
+  *out_sas_token = az_span_append_uint8(*out_sas_token, EQUAL_SIGN);
+  *out_sas_token = az_span_append(*out_sas_token, iothub_fqdn);
+  *out_sas_token = az_span_append(*out_sas_token, devices_string);
+  *out_sas_token = az_span_append(*out_sas_token, device_id);
+
+  // Signature
+  *out_sas_token = az_span_append_uint8(*out_sas_token, AMPERSAND);
+  *out_sas_token = az_span_append(*out_sas_token, sig_string);
+  *out_sas_token = az_span_append_uint8(*out_sas_token, EQUAL_SIGN);
+  *out_sas_token = az_span_append(*out_sas_token, signature);
+
+  // Expiration
+  *out_sas_token = az_span_append_uint8(*out_sas_token, AMPERSAND);
+  *out_sas_token = az_span_append(*out_sas_token, se_string);
+  *out_sas_token = az_span_append_uint8(*out_sas_token, EQUAL_SIGN);
+  AZ_RETURN_IF_FAILED(az_span_append_i32toa(*out_sas_token, expiry_time_secs, out_sas_token));
 
   if (az_span_ptr(key_name) != NULL && az_span_length(key_name) > 0)
   {
+    az_span skn_string = AZ_SPAN_FROM_STR(SAS_TOKEN_SKN);
+    required_length = az_span_length(skn_string) + az_span_length(key_name) + 2;
+
+    AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*out_sas_token, required_length);
+
     // Key Name
-    if (az_failed(result = az_span_append_uint8(*out_sas_token, AMPERSAND, out_sas_token))
-        || az_failed(
-               result
-               = az_span_append(*out_sas_token, AZ_SPAN_FROM_STR(SAS_TOKEN_SKN), out_sas_token))
-        || az_failed(result = az_span_append_uint8(*out_sas_token, EQUAL_SIGN, out_sas_token))
-        || az_failed(result = az_span_append(*out_sas_token, key_name, out_sas_token)))
-    {
-      return result;
-    }
+    *out_sas_token = az_span_append_uint8(*out_sas_token, AMPERSAND);
+    *out_sas_token = az_span_append(*out_sas_token, skn_string);
+    *out_sas_token = az_span_append_uint8(*out_sas_token, EQUAL_SIGN);
+    *out_sas_token = az_span_append(*out_sas_token, key_name);
   }
 
   return AZ_OK;
