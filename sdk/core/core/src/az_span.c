@@ -153,7 +153,7 @@ AZ_NODISCARD int32_t az_span_find(az_span source, az_span target)
   { 
     return 0;
   }
-  else if (source_length == 0) 
+  else if (source_length == 0 || source_length < target_length) 
   {
     return target_not_found;
   }
@@ -163,7 +163,7 @@ AZ_NODISCARD int32_t az_span_find(az_span source, az_span target)
     uint8_t* target_ptr = az_span_ptr(target);
 
     // This loop traverses `source` position by position (step 1.)
-    for (int32_t i = 0; i < source_length; i++)
+    for (int32_t i = 0; i < (source_length - target_length + 1); i++)
     {
       // This is the check done in step 1. above.
       if (source_ptr[i] == target_ptr[0])

@@ -105,7 +105,7 @@ AZ_NODISCARD int32_t az_iot_retry_calc_delay(
  * `out_remainder` is set to an empty #az_span.
  * @return The #az_span pointing to the token delimited by the beginning of `source` up to the first
  * occurrence of (but not including the) `delimiter`, or the end of `source` if `delimiter` is not
- * found. If `source` or `delimiter` is empty, AZ_SPAN_NULL is returned instead.
+ * found. If `source` is empty, AZ_SPAN_NULL is returned instead.
  */
 AZ_NODISCARD az_span az_span_token(az_span source, az_span delimiter, az_span* out_remainder);
 
