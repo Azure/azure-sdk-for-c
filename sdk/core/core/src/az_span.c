@@ -229,20 +229,14 @@ AZ_NODISCARD az_span az_span_token(az_span source, az_span delimiter, az_span* o
   }
 }
 
-AZ_NODISCARD az_result az_span_copy(az_span destination, az_span source, az_span* out_span)
+az_span az_span_copy(az_span destination, az_span source)
 {
-  AZ_PRECONDITION_NOT_NULL(out_span);
+  AZ_PRECONDITION(az_span_capacity(destination) >= az_span_length(source));
 
   int32_t src_len = az_span_length(source);
-  if (az_span_capacity(destination) < src_len)
-  {
-    return AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY;
-  }
-
   uint8_t* ptr = az_span_ptr(destination);
-  memmove((void*)ptr, (void const*)az_span_ptr(source), (size_t)src_len);
-  *out_span = az_span_init(ptr, src_len, az_span_capacity(destination));
-  return AZ_OK;
+  memmove((void*)ptr, (void const*)az_span_ptr(source), (size_t)az_span_length(source));
+  return az_span_init(ptr, src_len, az_span_capacity(destination));
 }
 
 AZ_NODISCARD AZ_INLINE bool should_encode(uint8_t c)
@@ -323,22 +317,19 @@ az_span_to_str(char* destination, int32_t destination_max_size, az_span source)
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_span_append(az_span destination, az_span source, az_span* out_span)
+az_span az_span_append(az_span destination, az_span source)
 {
-  AZ_PRECONDITION_NOT_NULL(out_span);
+  AZ_PRECONDITION(
+      (az_span_length(destination) + az_span_length(source)) <= az_span_capacity(destination));
 
   int32_t const dest_length = az_span_length(destination);
   int32_t const dest_capacity = az_span_capacity(destination);
   int32_t const src_length = az_span_length(source);
   int32_t const dest_length_after_appending = dest_length + src_length;
-  if (dest_length_after_appending > dest_capacity)
-  {
-    return AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY;
-  }
+
   uint8_t* ptr = az_span_ptr(destination);
   memmove((void*)(&ptr[dest_length]), (void const*)az_span_ptr(source), (size_t)src_length);
-  *out_span = az_span_init(ptr, dest_length_after_appending, dest_capacity);
-  return AZ_OK;
+  return az_span_init(ptr, dest_length_after_appending, dest_capacity);
 }
 
 /**
@@ -627,7 +618,7 @@ AZ_NODISCARD az_result _az_scan_until(az_span self, _az_predicate predicate, int
   return AZ_ERROR_ITEM_NOT_FOUND;
 }
 
-AZ_NODISCARD az_result az_span_append_uint8(az_span destination, uint8_t byte, az_span* out_span)
+az_span az_span_append_uint8(az_span destination, uint8_t byte)
 {
-  return az_span_append(destination, az_span_init(&byte, 1, 1), out_span);
+  return az_span_append(destination, az_span_init(&byte, 1, 1));
 }
