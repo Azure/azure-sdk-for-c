@@ -15,7 +15,7 @@ int main()
 {
   int result = 0;
   
-  // Placeholder for result += test_iot_common_();
+  result += test_az_iot_core();
   
   return result;
 }

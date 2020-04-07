@@ -12,6 +12,7 @@ include(AddTestCMocka)
 
 add_cmocka_test(${TARGET_NAME} SOURCES
                 main.c
+                test_az_iot_core.c
                 COMPILE_OPTIONS ${DEFAULT_C_COMPILE_FLAGS}
                 LINK_TARGETS
                     az_core

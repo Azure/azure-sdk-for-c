@@ -250,97 +250,110 @@ static void az_span_find_beginning_success()
 {
   az_span span = AZ_SPAN_FROM_STR("abcdefgabcdefg");
   az_span target = AZ_SPAN_FROM_STR("abc");
-  az_span instance;
 
-  assert_return_code(az_span_find(span, target, &instance), AZ_OK);
-  assert_true(az_span_length(target) == az_span_length(instance));
-  assert_true(az_span_ptr(span) == az_span_ptr(instance));
+  assert_int_equal(az_span_find(span, target), 0);
 }
 
 static void az_span_find_middle_success()
 {
   az_span span = AZ_SPAN_FROM_STR("abcdefgabcdefg");
   az_span target = AZ_SPAN_FROM_STR("gab");
-  az_span instance;
 
-  assert_return_code(az_span_find(span, target, &instance), AZ_OK);
-  assert_true(az_span_length(target) == az_span_length(instance));
-  assert_true((az_span_ptr(span) + 6) == az_span_ptr(instance));
+  assert_int_equal(az_span_find(span, target), 6);
 }
 
 static void az_span_find_end_success()
 {
   az_span span = AZ_SPAN_FROM_STR("abcdefgabcdefgh");
   az_span target = AZ_SPAN_FROM_STR("efgh");
-  az_span instance;
 
-  assert_return_code(az_span_find(span, target, &instance), AZ_OK);
-  assert_true(az_span_length(target) == az_span_length(instance));
-  assert_true((az_span_ptr(span) + 11) == az_span_ptr(instance));
+  assert_int_equal(az_span_find(span, target), 11);
+}
+
+static void az_span_find_source_target_identical_success()
+{
+  az_span span = AZ_SPAN_FROM_STR("abcdefgabcdefg");
+  az_span target = AZ_SPAN_FROM_STR("abcdefgabcdefg");
+
+  assert_int_equal(az_span_find(span, target), 0);
 }
 
 static void az_span_find_not_found_fail()
 {
   az_span span = AZ_SPAN_FROM_STR("abcdefgabcdefg");
   az_span target = AZ_SPAN_FROM_STR("abd");
-  az_span instance;
 
-  assert_true(az_span_find(span, target, &instance) == AZ_ERROR_ITEM_NOT_FOUND);
+  assert_int_equal(az_span_find(span, target), -1);
 }
 
-static void az_span_token_success()
+static void az_span_find_error_cases_fail()
 {
-  az_span span = AZ_SPAN_FROM_STR("abcdefgabcdefgabcdefg");
-  az_span delim = AZ_SPAN_FROM_STR("abc");
-  az_span token;
-  az_span out_span;
+  az_span span = AZ_SPAN_FROM_STR("abcdefgabcdefg");
+  az_span target = AZ_SPAN_FROM_STR("abd");
 
-  // token: ""
-  token = az_span_token(span, delim, &out_span);
-  assert_non_null(az_span_ptr(token));
-  assert_true(az_span_length(token) == 0);
-  assert_true(az_span_ptr(out_span) == (az_span_ptr(span) + az_span_length(delim)));
-  assert_true(az_span_length(out_span) == (az_span_length(span) - az_span_length(delim)));
-  assert_true(az_span_capacity(out_span) == (az_span_capacity(span) - az_span_capacity(delim)));
+  assert_int_equal(az_span_find(AZ_SPAN_NULL, AZ_SPAN_NULL), 0);
+  assert_int_equal(az_span_find(span, AZ_SPAN_NULL), 0);
+  assert_int_equal(az_span_find(AZ_SPAN_NULL, target), -1);
+}
 
-  // token: "defg" (span+3)
-  span = out_span;
+static void az_span_find_target_longer_than_source_fails()
+{
+  az_span span = AZ_SPAN_FROM_STR("aa");
+  az_span target = AZ_SPAN_FROM_STR("aaa");
 
-  token = az_span_token(span, delim, &out_span);
-  assert_true(az_span_ptr(token) == az_span_ptr(span));
-  assert_true(az_span_length(token) == 4);
-  assert_true(az_span_capacity(token) == az_span_length(token));
-  assert_true(az_span_ptr(out_span) == (az_span_ptr(span) + az_span_length(token) + az_span_length(delim)));
-  assert_true(az_span_length(out_span) == (az_span_length(span) - az_span_length(token) - az_span_length(delim)));
-  assert_true(az_span_capacity(out_span) == (az_span_capacity(span) - az_span_capacity(token) - az_span_capacity(delim)));
+  assert_int_equal(az_span_find(span, target), -1);
+}
 
-  // token: "defg" (span+10)
-  span = out_span;
+static void az_span_find_target_overlap_continuation_of_source_fails()
+{
+  az_span span = AZ_SPAN_FROM_STR("abcd");
+  az_span target = AZ_SPAN_FROM_STR("cde");
 
-  token = az_span_token(span, delim, &out_span);
-  assert_true(az_span_ptr(token) == az_span_ptr(span));
-  assert_true(az_span_length(token) == 4);
-  assert_true(az_span_capacity(token) == az_span_length(token));
-  assert_true(az_span_ptr(out_span) == (az_span_ptr(span) + az_span_length(token) + az_span_length(delim)));
-  assert_true(az_span_length(out_span) == (az_span_length(span) - az_span_length(token) - az_span_length(delim)));
-  assert_true(az_span_capacity(out_span) == (az_span_capacity(span) - az_span_capacity(token) - az_span_capacity(delim)));
+  assert_int_equal(az_span_find(span, target), -1);
+}
 
-  // token: "defg" (span+17)
-  span = out_span;
+static void az_span_find_target_more_chars_than_prefix_of_source_fails()
+{
+  az_span span = AZ_SPAN_FROM_STR("abcd");
+  az_span target = AZ_SPAN_FROM_STR("zab");
 
-  token = az_span_token(span, delim, &out_span);
-  assert_true(az_span_ptr(token) == az_span_ptr(span));
-  assert_true(az_span_length(token) == 4);
-  assert_true(az_span_capacity(token) == az_span_length(token));
-  assert_true(az_span_ptr(out_span) == NULL);
-  assert_true(az_span_length(out_span) == 0);
-  assert_true(az_span_capacity(out_span) == 0);
+  assert_int_equal(az_span_find(span, target), -1);
+}
 
-  // Out_span is empty.
-  span = out_span;
-  
-  token = az_span_token(span, delim, &out_span);
-  assert_true(az_span_is_content_equal(token, AZ_SPAN_NULL));
+static void az_span_find_overlapping_target_success()
+{
+  az_span span = AZ_SPAN_FROM_STR("abcdefghij");
+  az_span target = az_span_slice(span, 6, 9);
+
+  assert_int_equal(az_span_find(span, target), 6);
+}
+
+static void az_span_find_embedded_NULLs_success()
+{
+  az_span span = AZ_SPAN_FROM_STR("abcd\0\0fghij");
+  az_span target = AZ_SPAN_FROM_STR("\0\0");
+
+  assert_int_equal(az_span_find(span, target), 4);
+}
+
+static void az_span_find_capacity_checks_success()
+{
+  uint8_t* buffer = (uint8_t*)"aaaa";
+
+  assert_int_equal(az_span_find(az_span_init(buffer, 2, 4), az_span_init(buffer, 2, 3)), 0);
+  assert_int_equal(az_span_find(az_span_init(buffer, 2, 3), az_span_init(buffer, 2, 4)), 0);
+  assert_int_equal(az_span_find(az_span_init(buffer, 2, 3), az_span_init(buffer, 0, 2)), 0);
+  assert_int_equal(az_span_find(az_span_init(buffer, 0, 2), az_span_init(buffer, 0, 2)), 0);
+}
+
+static void az_span_find_overlapping_checks_success()
+{
+  az_span span = AZ_SPAN_FROM_STR("abcdefghij");
+  az_span source = az_span_slice(span, 1, 4);
+  az_span target = az_span_slice(span, 6, 9);
+  assert_int_equal(az_span_find(source, target), -1);
+  assert_int_equal(az_span_find(source, az_span_slice(span, 1, 5)), -1);
+  assert_int_equal(az_span_find(source, az_span_slice(span, 2, 4)), 1);
 }
 
 void test_az_span(void** state)
@@ -373,7 +386,14 @@ void test_az_span(void** state)
   az_span_find_beginning_success();
   az_span_find_middle_success();
   az_span_find_end_success();
+  az_span_find_source_target_identical_success();
   az_span_find_not_found_fail();
-
-  az_span_token_success();
+  az_span_find_error_cases_fail();
+  az_span_find_target_longer_than_source_fails();
+  az_span_find_target_overlap_continuation_of_source_fails();
+  az_span_find_target_more_chars_than_prefix_of_source_fails();
+  az_span_find_overlapping_target_success();
+  az_span_find_embedded_NULLs_success();
+  az_span_find_capacity_checks_success();
+  az_span_find_overlapping_checks_success();
 }
