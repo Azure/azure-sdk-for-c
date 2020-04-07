@@ -22,6 +22,27 @@
   assert_true(az_span_append_uint8(buffer, 'a', NULL) == AZ_ERROR_ARG);
 } */
 
+static void az_span_slice_tests()
+{
+  uint8_t raw_buffer[20];
+  az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer);
+  az_result res = az_span_append_uint8(buffer, 'a', &buffer);
+  res = az_span_append_uint8(buffer, 'b', &buffer);
+  res = az_span_append_uint8(buffer, 'c', &buffer);
+  res = az_span_append_uint8(buffer, 'd', &buffer);
+
+  assert_int_equal(az_span_length(buffer), 4);
+  assert_int_equal(az_span_capacity(buffer), 20);
+
+  az_span result = az_span_slice(buffer, 1, -1);
+  assert_int_equal(az_span_length(result), 3);
+  assert_int_equal(az_span_capacity(result), 19);
+
+  result = az_span_slice(buffer, 5, -1);
+  assert_int_equal(az_span_length(result), 0);
+  assert_int_equal(az_span_capacity(result), 15);
+}
+
 static void az_single_char_ascii_lower_test()
 {
   for (uint8_t i = 0; i <= SCHAR_MAX; ++i)
@@ -346,6 +367,8 @@ static void az_span_token_success()
 void test_az_span(void** state)
 {
   (void)state;
+
+  az_span_slice_tests();
 
   // az_span_append_uint8_NULL_out_span_fails();
   az_span_append_uint8_overflow_fails();
