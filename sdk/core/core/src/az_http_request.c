@@ -139,7 +139,7 @@ az_http_request_append_header(_az_http_request* p_request, az_span key, az_span 
 
   az_pair header_to_append = az_pair_init(key, value);
 
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*headers_ptr, sizeof header_to_append);
+  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*headers_ptr, (int32_t)sizeof header_to_append);
 
   *headers_ptr = az_span_append(
       *headers_ptr,
