@@ -36,12 +36,19 @@ static const char test_correct_client_id[] = "my_device";
 static const char test_correct_client_id_with_module_id[] = "my_device/my_module_id";
 
 // Properties
+#define TEST_KEY "key"
 #define TEST_KEY_ONE "key_one"
 #define TEST_KEY_TWO "key_two"
+#define TEST_KEY_THREE "key_three"
 #define TEST_VALUE_ONE "value_one"
 #define TEST_VALUE_TWO "value_two"
+#define TEST_VALUE_THREE "value_three"
 #define TEST_KEY_VALUE_ONE "key_one=value_one"
+#define TEST_KEY_VALUE_TWO "key_one=value_one&key_two=value_two"
+#define TEST_KEY_VALUE_SUBSTRING "key_one=value_one&key=value_two"
+#define TEST_KEY_VALUE_THREE "key_one=value_one&key_two=value_two&key_three=value_three"
 
+static const az_span test_key = AZ_SPAN_LITERAL_FROM_STR(TEST_KEY);
 static const az_span test_key_one = AZ_SPAN_LITERAL_FROM_STR(TEST_KEY_ONE);
 static const az_span test_key_two = AZ_SPAN_LITERAL_FROM_STR(TEST_KEY_TWO);
 static const az_span test_value_one = AZ_SPAN_LITERAL_FROM_STR(TEST_VALUE_ONE);
@@ -188,6 +195,35 @@ static void test_az_iot_hub_client_properties_append_NULL_value_span_fails(void*
   az_iot_hub_client_properties props;
 
   assert_precondition_checked(az_iot_hub_client_properties_append(&props, test_key_one, AZ_SPAN_NULL));
+}
+
+static void test_az_iot_hub_client_properties_find_NULL_props_fail(void** state)
+{
+  (void)state;
+
+  az_span out_value;
+
+  assert_precondition_checked(az_iot_hub_client_properties_find(NULL, test_key_one, &out_value));
+}
+
+static void test_az_iot_hub_client_properties_find_NULL_name_fail(void** state)
+{
+  (void)state;
+
+  az_iot_hub_client_properties props;
+
+  az_span out_value;
+
+  assert_precondition_checked(az_iot_hub_client_properties_find(&props, AZ_SPAN_NULL, &out_value));
+}
+
+static void test_az_iot_hub_client_properties_find_NULL_value_fail(void** state)
+{
+  (void)state;
+
+  az_iot_hub_client_properties props;
+
+  assert_precondition_checked(az_iot_hub_client_properties_find(&props, test_key_one, NULL));
 }
 
 #endif // NO_PRECONDITION_CHECKING
@@ -554,6 +590,96 @@ static void test_az_iot_hub_client_properties_append_twice_small_buffer_fail(voi
   assert_int_equal(az_span_capacity(props._internal.properties), sizeof(test_correct_two_key_value) - 2);
 }
 
+static void test_az_iot_hub_client_properties_find_succeed(void** state)
+{
+  (void)state;
+
+  az_span test_span = az_span_from_str(TEST_KEY_VALUE_ONE);
+  az_iot_hub_client_properties props;
+
+  assert_int_equal(az_iot_hub_client_properties_init(&props, test_span), AZ_OK);
+
+  az_span out_value;
+  assert_int_equal(az_iot_hub_client_properties_find(&props, test_key_one, &out_value), AZ_OK);
+  assert_memory_equal(
+      az_span_ptr(out_value), az_span_ptr(test_value_one), (size_t)az_span_length(test_value_one));
+}
+
+static void test_az_iot_hub_client_properties_find_middle_succeed(void** state)
+{
+  (void)state;
+
+  az_span test_span = az_span_from_str(TEST_KEY_VALUE_THREE);
+  az_iot_hub_client_properties props;
+
+  assert_int_equal(az_iot_hub_client_properties_init(&props, test_span), AZ_OK);
+
+  az_span out_value;
+  assert_int_equal(az_iot_hub_client_properties_find(&props, test_key_two, &out_value), AZ_OK);
+  assert_memory_equal(
+      az_span_ptr(out_value), az_span_ptr(test_value_two), (size_t)az_span_length(test_value_two));
+}
+
+static void test_az_iot_hub_client_properties_find_end_succeed(void** state)
+{
+  (void)state;
+
+  az_span test_span = az_span_from_str(TEST_KEY_VALUE_TWO);
+  az_iot_hub_client_properties props;
+
+  assert_int_equal(az_iot_hub_client_properties_init(&props, test_span), AZ_OK);
+
+  az_span out_value;
+  assert_int_equal(az_iot_hub_client_properties_find(&props, test_key_two, &out_value), AZ_OK);
+  assert_memory_equal(
+      az_span_ptr(out_value), az_span_ptr(test_value_two), (size_t)az_span_length(test_value_two));
+}
+
+static void test_az_iot_hub_client_properties_find_substring_succeed(void** state)
+{
+  (void)state;
+
+  az_span test_span = az_span_from_str(TEST_KEY_VALUE_SUBSTRING);
+  az_iot_hub_client_properties props;
+
+  assert_int_equal(az_iot_hub_client_properties_init(&props, test_span), AZ_OK);
+
+  az_span out_value;
+  assert_int_equal(az_iot_hub_client_properties_find(&props, test_key, &out_value), AZ_OK);
+  assert_memory_equal(
+      az_span_ptr(out_value), az_span_ptr(test_value_two), (size_t)az_span_length(test_value_two));
+}
+
+static void test_az_iot_hub_client_properties_find_fail(void** state)
+{
+  (void)state;
+
+  az_span test_span = az_span_from_str(TEST_KEY_VALUE_ONE);
+  az_iot_hub_client_properties props;
+
+  assert_int_equal(az_iot_hub_client_properties_init(&props, test_span), AZ_OK);
+
+  az_span out_value;
+  assert_int_equal(
+      az_iot_hub_client_properties_find(&props, AZ_SPAN_FROM_STR("key_foo"), &out_value),
+      AZ_ERROR_ITEM_NOT_FOUND);
+}
+
+static void test_az_iot_hub_client_properties_find_substring_fail(void** state)
+{
+  (void)state;
+
+  az_span test_span = az_span_from_str(TEST_KEY_VALUE_TWO);
+  az_iot_hub_client_properties props;
+
+  assert_int_equal(az_iot_hub_client_properties_init(&props, test_span), AZ_OK);
+
+  az_span out_value;
+  assert_int_equal(
+      az_iot_hub_client_properties_find(&props, AZ_SPAN_FROM_STR("key"), &out_value),
+      AZ_ERROR_ITEM_NOT_FOUND);
+}
+
 int test_iot_hub_client()
 {
 #ifndef NO_PRECONDITION_CHECKING
@@ -576,6 +702,9 @@ int test_iot_hub_client()
     cmocka_unit_test(test_az_iot_hub_client_properties_append_get_NULL_props_fails),
     cmocka_unit_test(test_az_iot_hub_client_properties_append_NULL_name_span_fails),
     cmocka_unit_test(test_az_iot_hub_client_properties_append_NULL_value_span_fails),
+    cmocka_unit_test(test_az_iot_hub_client_properties_find_NULL_props_fail),
+    cmocka_unit_test(test_az_iot_hub_client_properties_find_NULL_name_fail),
+    cmocka_unit_test(test_az_iot_hub_client_properties_find_NULL_value_fail),
 #endif // NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_az_iot_hub_client_get_default_options_succeed),
     cmocka_unit_test(test_az_iot_hub_client_init_succeed),
@@ -596,6 +725,12 @@ int test_iot_hub_client()
     cmocka_unit_test(test_az_iot_hub_client_properties_append_small_buffer_fail),
     cmocka_unit_test(test_az_iot_hub_client_properties_append_twice_succeed),
     cmocka_unit_test(test_az_iot_hub_client_properties_append_twice_small_buffer_fail),
+    cmocka_unit_test(test_az_iot_hub_client_properties_find_succeed),
+    cmocka_unit_test(test_az_iot_hub_client_properties_find_middle_succeed),
+    cmocka_unit_test(test_az_iot_hub_client_properties_find_end_succeed),
+    cmocka_unit_test(test_az_iot_hub_client_properties_find_substring_succeed),
+    cmocka_unit_test(test_az_iot_hub_client_properties_find_fail),
+    cmocka_unit_test(test_az_iot_hub_client_properties_find_substring_fail),
   };
   return cmocka_run_group_tests_name("az_iot_hub_client", tests, NULL, NULL);
 }
