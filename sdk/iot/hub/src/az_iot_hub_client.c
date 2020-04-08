@@ -154,42 +154,27 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_find(
 
   az_span remaining = properties->_internal.properties;
 
-  int32_t index = 0;
-  // Keep looking in case the passed name is a substring of a name in props
   while (az_span_length(remaining) != 0)
   {
-    index = az_span_find(remaining, name);
-    if (index != -1)
+    az_span delim_span = az_span_token(remaining, hub_client_param_equals_span, &remaining);
+    if (az_span_is_content_equal(delim_span, name))
+    {
+      *out_value = az_span_token(remaining, hub_client_param_separator_span, &remaining);
+      return AZ_OK;
+    }
+    else
     {
       az_span value;
-      az_span found_name;
-      remaining = az_span_slice(remaining, index, -1);
-      found_name = az_span_token(remaining, hub_client_param_equals_span, &value);
-
-      // If found_name is not equal to the input name, then name is substring of found_name
-      // Look again starting at the remainder
-      if (az_span_length(found_name) != az_span_length(name))
+      value = az_span_token(remaining, hub_client_param_separator_span, &remaining);
+      (void)value;
+      if (az_span_length(remaining) > 0)
       {
-        // We do not care about value here, only remaining
-        value = az_span_token(
-            az_span_slice(remaining, index, -1), hub_client_param_separator_span, &remaining);
         continue;
-      }
-
-      // If lengths do match, and value length is not zero we have found the property.
-      if (az_span_length(value) > 0)
-      {
-        *out_value = az_span_token(value, hub_client_param_separator_span, &value);
-        return AZ_OK;
       }
       else
       {
         break;
       }
-    }
-    else
-    {
-      break;
     }
   }
 

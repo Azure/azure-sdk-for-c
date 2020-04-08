@@ -696,6 +696,21 @@ static void test_az_iot_hub_client_properties_find_substring_fail(void** state)
       AZ_ERROR_ITEM_NOT_FOUND);
 }
 
+static void test_az_iot_hub_client_properties_find_substring_suffix_fail(void** state)
+{
+  (void)state;
+
+  az_span test_span = az_span_from_str(TEST_KEY_VALUE_TWO);
+  az_iot_hub_client_properties props;
+
+  assert_int_equal(az_iot_hub_client_properties_init(&props, test_span), AZ_OK);
+
+  az_span out_value;
+  assert_int_equal(
+      az_iot_hub_client_properties_find(&props, AZ_SPAN_FROM_STR("one"), &out_value),
+      AZ_ERROR_ITEM_NOT_FOUND);
+}
+
 static void test_az_iot_hub_client_properties_find_value_match_fail(void** state)
 {
   (void)state;
@@ -778,6 +793,7 @@ int test_iot_hub_client()
     cmocka_unit_test(test_az_iot_hub_client_properties_find_name_value_same_succeed),
     cmocka_unit_test(test_az_iot_hub_client_properties_find_fail),
     cmocka_unit_test(test_az_iot_hub_client_properties_find_substring_fail),
+    cmocka_unit_test(test_az_iot_hub_client_properties_find_substring_suffix_fail),
     cmocka_unit_test(test_az_iot_hub_client_properties_find_value_match_fail),
     cmocka_unit_test(test_az_iot_hub_client_properties_find_value_match_end_fail),
   };
