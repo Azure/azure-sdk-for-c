@@ -175,9 +175,17 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_find(
             az_span_slice(remaining, index, -1), hub_client_param_separator_span, &remaining);
         continue;
       }
-      // If lengths do match, we have found the property. Return value.
-      *out_value = az_span_token(value, hub_client_param_separator_span, &value);
-      return AZ_OK;
+
+      // If lengths do match, and value length is not zero we have found the property.
+      if (az_span_length(value) > 0)
+      {
+        *out_value = az_span_token(value, hub_client_param_separator_span, &value);
+        return AZ_OK;
+      }
+      else
+      {
+        break;
+      }
     }
     else
     {

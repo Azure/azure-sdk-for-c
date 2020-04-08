@@ -46,6 +46,7 @@ static const char test_correct_client_id_with_module_id[] = "my_device/my_module
 #define TEST_KEY_VALUE_ONE "key_one=value_one"
 #define TEST_KEY_VALUE_TWO "key_one=value_one&key_two=value_two"
 #define TEST_KEY_VALUE_SUBSTRING "key_one=value_one&key=value_two"
+#define TEST_KEY_VALUE_SAME "key_one=key&key=value_two"
 #define TEST_KEY_VALUE_THREE "key_one=value_one&key_two=value_two&key_three=value_three"
 
 static const az_span test_key = AZ_SPAN_LITERAL_FROM_STR(TEST_KEY);
@@ -650,6 +651,21 @@ static void test_az_iot_hub_client_properties_find_substring_succeed(void** stat
       az_span_ptr(out_value), az_span_ptr(test_value_two), (size_t)az_span_length(test_value_two));
 }
 
+static void test_az_iot_hub_client_properties_find_name_value_same_succeed(void** state)
+{
+  (void)state;
+
+  az_span test_span = az_span_from_str(TEST_KEY_VALUE_SAME);
+  az_iot_hub_client_properties props;
+
+  assert_int_equal(az_iot_hub_client_properties_init(&props, test_span), AZ_OK);
+
+  az_span out_value;
+  assert_int_equal(az_iot_hub_client_properties_find(&props, test_key, &out_value), AZ_OK);
+  assert_memory_equal(
+      az_span_ptr(out_value), az_span_ptr(test_value_two), (size_t)az_span_length(test_value_two));
+}
+
 static void test_az_iot_hub_client_properties_find_fail(void** state)
 {
   (void)state;
@@ -677,6 +693,36 @@ static void test_az_iot_hub_client_properties_find_substring_fail(void** state)
   az_span out_value;
   assert_int_equal(
       az_iot_hub_client_properties_find(&props, AZ_SPAN_FROM_STR("key"), &out_value),
+      AZ_ERROR_ITEM_NOT_FOUND);
+}
+
+static void test_az_iot_hub_client_properties_find_value_match_fail(void** state)
+{
+  (void)state;
+
+  az_span test_span = az_span_from_str(TEST_KEY_VALUE_THREE);
+  az_iot_hub_client_properties props;
+
+  assert_int_equal(az_iot_hub_client_properties_init(&props, test_span), AZ_OK);
+
+  az_span out_value;
+  assert_int_equal(
+      az_iot_hub_client_properties_find(&props, AZ_SPAN_FROM_STR("value_two"), &out_value),
+      AZ_ERROR_ITEM_NOT_FOUND);
+}
+
+static void test_az_iot_hub_client_properties_find_value_match_end_fail(void** state)
+{
+  (void)state;
+
+  az_span test_span = az_span_from_str(TEST_KEY_VALUE_THREE);
+  az_iot_hub_client_properties props;
+
+  assert_int_equal(az_iot_hub_client_properties_init(&props, test_span), AZ_OK);
+
+  az_span out_value;
+  assert_int_equal(
+      az_iot_hub_client_properties_find(&props, AZ_SPAN_FROM_STR("value_three"), &out_value),
       AZ_ERROR_ITEM_NOT_FOUND);
 }
 
@@ -729,8 +775,11 @@ int test_iot_hub_client()
     cmocka_unit_test(test_az_iot_hub_client_properties_find_middle_succeed),
     cmocka_unit_test(test_az_iot_hub_client_properties_find_end_succeed),
     cmocka_unit_test(test_az_iot_hub_client_properties_find_substring_succeed),
+    cmocka_unit_test(test_az_iot_hub_client_properties_find_name_value_same_succeed),
     cmocka_unit_test(test_az_iot_hub_client_properties_find_fail),
     cmocka_unit_test(test_az_iot_hub_client_properties_find_substring_fail),
+    cmocka_unit_test(test_az_iot_hub_client_properties_find_value_match_fail),
+    cmocka_unit_test(test_az_iot_hub_client_properties_find_value_match_end_fail),
   };
   return cmocka_run_group_tests_name("az_iot_hub_client", tests, NULL, NULL);
 }
