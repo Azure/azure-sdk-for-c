@@ -29,15 +29,20 @@
 
 // Device information
 #define REGISTRATION_ID_ENV "AZ_IOT_REGISTRATION_ID"
+
 // AZ_IOT_DEVICE_X509_CERT_PEM_FILE is the path to a PEM file containing the device certificate and
 // key as well as any intermediate certificates chaining to an uploaded group certificate.
-
 #define DEVICE_X509_CERT_PEM_FILE "AZ_IOT_DEVICE_X509_CERT_PEM_FILE"
+
+// AZ_IOT_DEVICE_X509_TRUST_PEM_FILE is the path to a PEM file containing the server trusted CA
+// This is usually not needed on Linux or Mac but needs to be set on Windows.
+#define DEVICE_X509_TRUST_PEM_FILE "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE"
 
 static char global_provisioning_endpoint[256] = { 0 };
 static char id_scope[16] = { 0 };
 static char registration_id[256] = { 0 };
 static char x509_cert_pem_file[256] = { 0 };
+static char x509_trust_pem_file[256] = { 0 };
 
 static az_iot_provisioning_client provisioning_client;
 static MQTTClient mqtt_client;
@@ -97,9 +102,13 @@ static az_result read_configuration_and_init_client()
       registration_id_span,
       &registration_id_span));
 
-  az_span temp = AZ_SPAN_LITERAL_FROM_BUFFER(x509_cert_pem_file);
+  az_span cert = AZ_SPAN_LITERAL_FROM_BUFFER(x509_cert_pem_file);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
-      "X509 Certificate PEM Store File", DEVICE_X509_CERT_PEM_FILE, NULL, false, temp, &temp));
+      "X509 Certificate PEM Store File", DEVICE_X509_CERT_PEM_FILE, NULL, false, cert, &cert));
+
+  az_span trusted = AZ_SPAN_LITERAL_FROM_BUFFER(x509_trust_pem_file);
+  AZ_RETURN_IF_FAILED(read_configuration_entry(
+      "X509 Trusted PEM Store File", DEVICE_X509_TRUST_PEM_FILE, "", false, trusted, &trusted));
 
   AZ_RETURN_IF_FAILED(az_iot_provisioning_client_init(
       &provisioning_client, endpoint_span, id_scope_span, registration_id_span, NULL));
@@ -165,6 +174,11 @@ static int connect()
   mqtt_connect_options.password = NULL; // Using X509 Client Certificate authentication.
 
   mqtt_ssl_options.keyStore = (char*)x509_cert_pem_file;
+  if (*x509_trust_pem_file != '\0')
+  {
+    mqtt_ssl_options.trustStore = (char*)x509_trust_pem_file;
+  }
+  
   mqtt_connect_options.ssl = &mqtt_ssl_options;
 
   if ((rc = MQTTClient_connect(mqtt_client, &mqtt_connect_options)) != MQTTCLIENT_SUCCESS)
