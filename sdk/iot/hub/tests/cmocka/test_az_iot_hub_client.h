@@ -6,3 +6,4 @@ int test_iot_sas_token();
 int test_iot_hub_telemetry();
 int test_iot_hub_client();
 int test_az_iot_hub_client_twin();
+int test_iot_hub_methods();

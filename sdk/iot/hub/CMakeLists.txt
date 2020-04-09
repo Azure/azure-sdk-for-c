@@ -18,6 +18,7 @@ add_library (
     src/az_iot_hub_client_telemetry.c
     src/az_iot_hub_client_c2d.c
     src/az_iot_hub_client_twin.c
+    src/az_iot_hub_client_methods.c
 )
 
 target_include_directories (${TARGET_NAME} PUBLIC inc)
