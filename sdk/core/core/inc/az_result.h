@@ -118,6 +118,9 @@ typedef enum
 
   AZ_ERROR_HTTP_RESPONSE_OVERFLOW = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 5),
   AZ_ERROR_HTTP_RESPONSE_COULDNT_RESOLVE_HOST = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 6),
+
+  //IoT error codes
+  AZ_ERROR_IOT_INVALID_FEATURE_TOPIC = _az_RESULT_MAKE_ERROR(_az_FACILITY_IOT, 1),
 } az_result;
 
 /// Checks wheteher the \a result provided indicates a failure.
