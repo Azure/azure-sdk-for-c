@@ -193,9 +193,15 @@ az_iot_hub_client_properties_next(az_iot_hub_client_properties* properties, az_p
 
   out->key = az_span_token(prop_span, hub_client_param_equals_span, &remainder);
   out->value = az_span_token(remainder, hub_client_param_separator_span, &remainder);
-  properties->_internal.current_property_index = az_span_length(remainder) == 0
-      ? (uint32_t)prop_length
-      : (uint32_t)(az_span_ptr(remainder) - az_span_ptr(properties->_internal.properties));
+  if (az_span_length(remainder) == 0)
+  {
+    properties->_internal.current_property_index = (uint32_t)prop_length;
+  }
+  else
+  {
+    properties->_internal.current_property_index
+        = (uint32_t)(az_span_ptr(remainder) - az_span_ptr(properties->_internal.properties));
+  }
 
   return AZ_OK;
 }
