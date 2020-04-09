@@ -72,10 +72,75 @@ static void az_span_token_success(void** state)
   assert_true(az_span_is_content_equal(token, AZ_SPAN_NULL));
 }
 
+static void test_az_iot_get_status(void** state)
+{
+  (void)state;
+
+  az_iot_status status;
+
+  assert_int_equal(az_iot_get_status(200, &status), AZ_OK);
+  assert_int_equal(AZ_IOT_STATUS_OK, status);
+
+  assert_int_equal(az_iot_get_status(202, &status), AZ_OK);
+  assert_int_equal(AZ_IOT_STATUS_ACCEPTED, status);
+
+  assert_int_equal(az_iot_get_status(204, &status), AZ_OK);
+  assert_int_equal(AZ_IOT_STATUS_NO_CONTENT, status);
+
+  assert_int_equal(az_iot_get_status(400, &status), AZ_OK);
+  assert_int_equal(AZ_IOT_STATUS_BAD_REQUEST, status);
+
+  assert_int_equal(az_iot_get_status(401, &status), AZ_OK);
+  assert_int_equal(AZ_IOT_STATUS_UNAUTHORIZED, status);
+
+  assert_int_equal(az_iot_get_status(403, &status), AZ_OK);
+  assert_int_equal(AZ_IOT_STATUS_FORBIDDEN, status);
+
+  assert_int_equal(az_iot_get_status(404, &status), AZ_OK);
+  assert_int_equal(AZ_IOT_STATUS_NOT_FOUND, status);
+
+  assert_int_equal(az_iot_get_status(405, &status), AZ_OK);
+  assert_int_equal(AZ_IOT_STATUS_NOT_ALLOWED, status);
+
+  assert_int_equal(az_iot_get_status(409, &status), AZ_OK);
+  assert_int_equal(AZ_IOT_STATUS_NOT_CONFLICT, status);
+
+  assert_int_equal(az_iot_get_status(412, &status), AZ_OK);
+  assert_int_equal(AZ_IOT_STATUS_PRECONDITION_FAILED, status);
+
+  assert_int_equal(az_iot_get_status(413, &status), AZ_OK);
+  assert_int_equal(AZ_IOT_STATUS_REQUEST_TOO_LARGE, status);
+
+  assert_int_equal(az_iot_get_status(415, &status), AZ_OK);
+  assert_int_equal(AZ_IOT_STATUS_UNSUPPORTED_TYPE, status);
+
+  assert_int_equal(az_iot_get_status(429, &status), AZ_OK);
+  assert_int_equal(AZ_IOT_STATUS_THROTTLED, status);
+
+  assert_int_equal(az_iot_get_status(499, &status), AZ_OK);
+  assert_int_equal(AZ_IOT_STATUS_CLIENT_CLOSED, status);
+
+  assert_int_equal(az_iot_get_status(500, &status), AZ_OK);
+  assert_int_equal(AZ_IOT_STATUS_SERVER_ERROR, status);
+
+  assert_int_equal(az_iot_get_status(502, &status), AZ_OK);
+  assert_int_equal(AZ_IOT_STATUS_BAD_GATEWAY, status);
+
+  assert_int_equal(az_iot_get_status(503, &status), AZ_OK);
+  assert_int_equal(AZ_IOT_STATUS_SERVICE_UNAVAILABLE, status);
+
+  assert_int_equal(az_iot_get_status(504, &status), AZ_OK);
+  assert_int_equal(AZ_IOT_STATUS_TIMEOUT, status);
+
+  assert_int_equal(az_iot_get_status(999, &status), AZ_ERROR_ITEM_NOT_FOUND);
+
+}
+
 int test_az_iot_core()
 {
   const struct CMUnitTest tests[] = {
-    cmocka_unit_test(az_span_token_success)
+    cmocka_unit_test(az_span_token_success),
+    cmocka_unit_test(test_az_iot_get_status),
   };
   return cmocka_run_group_tests_name("az_iot_core", tests, NULL, NULL);
 }

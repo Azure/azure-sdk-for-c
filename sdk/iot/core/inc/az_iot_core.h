@@ -59,6 +59,15 @@ typedef enum
 } az_iot_status;
 
 /**
+ * @brief Get the #az_iot_status from an int
+ * 
+ * @param[in] status_int  The int with the status number.
+ * @param[out]  status  The #az_iot_status* with the status enum.
+ */
+
+AZ_NODISCARD az_result az_iot_get_status(uint32_t status_int, az_iot_status* status);
+
+/**
  * @brief Checks if the status indicates a successful operation.
  *
  * @param[in] status The #az_iot_status to verify.
