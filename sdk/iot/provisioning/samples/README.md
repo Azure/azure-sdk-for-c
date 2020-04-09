@@ -37,7 +37,7 @@ When interacting with the Azure Device Provisioning Service using this C client 
 
 ## Next steps
 
-Start using the IoT Provisioning Client in your solutions. Our SDK details could be found at [SDK README][IOT_CLIENT_README].
+Start using the IoT Provisioning Client in your solutions. Our SDK details can be found at [SDK README][IOT_CLIENT_README].
 
 ### Additional Documentation
 
