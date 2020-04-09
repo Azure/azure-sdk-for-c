@@ -1,7 +1,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#ifdef _MSC_VER
+// warning C4201: nonstandard extension used: nameless struct/union
+#pragma warning(disable : 4201)
+#endif
 #include <paho-mqtt/MQTTClient.h>
+#ifdef _MSC_VER
+#pragma warning(default : 4201)
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,6 +17,10 @@
 #include <az_iot_provisioning_client.h>
 #include <az_result.h>
 #include <az_span.h>
+
+// TODO: #564 - Remove the use of the _az_cfh.h header in samples.
+//              Note: this is required to work-around MQTTClient.h as well as az_span init issues.
+#include <_az_cfg.h>
 
 // Service information
 #define GLOBAL_PROVISIONING_ENDPOINT_DEFAULT "ssl://global.azure-devices-provisioning.net:8883"
@@ -277,27 +289,27 @@ int main()
     return rc;
   }
 
-  if ((rc = connect()))
+  if ((rc = connect()) != 0)
   {
     return rc;
   }
 
   printf("Connected to %s.\n", global_provisioning_endpoint);
 
-  if ((rc = subscribe()))
+  if ((rc = subscribe()) != 0)
   {
     return rc;
   }
 
   printf("Subscribed.\n");
 
-  if ((rc = register_device()))
+  if ((rc = register_device()) != 0)
   {
     return rc;
   }
 
   printf("Started registration. [Press ENTER to abort]\n");
-  getchar();
+  (void)getchar();
 
   if ((rc = MQTTClient_disconnect(mqtt_client, 10000)) != MQTTCLIENT_SUCCESS)
   {

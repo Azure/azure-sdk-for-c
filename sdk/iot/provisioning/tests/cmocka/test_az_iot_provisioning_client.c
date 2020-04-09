@@ -150,6 +150,11 @@ static void test_az_iot_provisioning_client_get_operation_status_publish_topic_f
   assert_int_equal(0xCC, topic_buffer[az_span_length(topic)]);
 }
 
+#ifdef _MSC_VER
+// warning C4113: 'void (__cdecl *)()' differs in parameter lists from 'CMUnitTestFunction'
+#pragma warning(disable : 4113)
+#endif
+
 int test_az_iot_provisioning_client()
 {
   const struct CMUnitTest tests[] = {
