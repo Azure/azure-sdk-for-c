@@ -12,6 +12,8 @@
 
 #include <cmocka.h>
 
+#include <_az_cfg.h>
+
 static const az_span test_global_device_endpoint
     = AZ_SPAN_LITERAL_FROM_STR("global.azure-devices-provisioning.net");
 

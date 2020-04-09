@@ -77,8 +77,8 @@ AZ_NODISCARD az_result az_iot_provisioning_client_init(
  * @brief Gets the MQTT user name.
  *
  * @param[in] client The #az_iot_provisioning_client to use for this call.
- * @param[in] mqtt_user_name An empty #az_span with sufficient capacity to hold the MQTT username.
- * @param[out] out_mqtt_user_name The output #az_span containing the MQTT username.
+ * @param[in] mqtt_user_name An empty #az_span with sufficient capacity to hold the MQTT user name.
+ * @param[out] out_mqtt_user_name The output #az_span containing the MQTT user name.
  * @return #az_result
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_user_name_get(
@@ -247,7 +247,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_register_publish_topic_get(
  * @note The payload of the MQTT publish message should be empty.
  *
  * @param[in] client The #az_iot_provisioning_client to use for this call.
- * @param[in] register_response The received response.
+ * @param[in] register_response The received #az_iot_provisioning_client_register_response response.
  * @param[in] mqtt_topic An empty #az_span with sufficient capacity to hold the MQTT topic.
  * @param[out] out_mqtt_topic The output #az_span containing the MQTT topic.
  * @return #az_result

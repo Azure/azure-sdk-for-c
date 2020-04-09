@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <stdint.h>
-
 #include "az_iot_provisioning_client.h"
 #include <az_precondition_internal.h>
 #include <az_result.h>
@@ -42,14 +40,8 @@ AZ_NODISCARD az_result az_iot_provisioning_client_init(
   client->_internal.id_scope = id_scope;
   client->_internal.registration_id = registration_id;
 
-  if (options != NULL)
-  {
-    client->_internal.options.user_agent = options->user_agent;
-  }
-  else
-  {
-    client->_internal.options = az_iot_provisioning_client_options_default();
-  }
+  client->_internal.options
+      = options == NULL ? az_iot_provisioning_client_options_default() : *options;
 
   return AZ_OK;
 }
@@ -80,6 +72,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_user_name_get(
   }
 
   *out_mqtt_user_name = mqtt_user_name;
+
   return AZ_OK;
 }
 
@@ -97,6 +90,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_id_get(
       az_span_copy(mqtt_client_id, client->_internal.registration_id, &mqtt_client_id));
 
   *out_mqtt_client_id = mqtt_client_id;
+
   return AZ_OK;
 }
 
@@ -118,6 +112,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_register_subscribe_topic_filte
   AZ_RETURN_IF_FAILED(az_span_append_uint8(mqtt_topic_filter, '#', &mqtt_topic_filter));
 
   *out_mqtt_topic_filter = mqtt_topic_filter;
+
   return AZ_OK;
 }
 
@@ -138,7 +133,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_received_topic_payload_parse(
   return AZ_ERROR_NOT_IMPLEMENTED;
 }
 
-// $dps/registrations/PUT/iotdps-register/?$rid={%s}
+// $dps/registrations/PUT/iotdps-register/?$rid=%s
 AZ_NODISCARD az_result az_iot_provisioning_client_register_publish_topic_get(
     az_iot_provisioning_client const* client,
     az_span mqtt_topic,
@@ -155,10 +150,11 @@ AZ_NODISCARD az_result az_iot_provisioning_client_register_publish_topic_get(
   AZ_RETURN_IF_FAILED(az_span_append(mqtt_topic, str_put_iotdps_register, &mqtt_topic));
 
   *out_mqtt_topic = mqtt_topic;
+
   return AZ_OK;
 }
 
-// Topic: $dps/registrations/GET/iotdps-get-operationstatus/?$rid={%s}&operationId=%s
+// Topic: $dps/registrations/GET/iotdps-get-operationstatus/?$rid=%s&operationId=%s
 AZ_NODISCARD az_result az_iot_provisioning_client_get_operation_status_publish_topic_get(
     az_iot_provisioning_client const* client,
     az_iot_provisioning_client_register_response const* register_response,

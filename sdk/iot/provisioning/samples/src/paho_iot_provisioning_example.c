@@ -61,7 +61,7 @@ static az_result read_configuration_entry(
   return AZ_OK;
 }
 
-static az_result read_configuration()
+static az_result read_configuration_and_init_client()
 {
   az_span endpoint_span = AZ_SPAN_LITERAL_FROM_BUFFER(global_provisioning_endpoint);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
@@ -98,23 +98,31 @@ static az_result read_configuration()
 static int on_received(void* context, char* topicName, int topicLen, MQTTClient_message* message)
 {
   UNUSED(context);
-  UNUSED(topicLen);
 
   int i;
   char* payloadptr;
 
+  if (topicLen == 0)
+  {
+    // The length of the topic if there are one more NULL characters embedded in topicName,
+    // otherwise topicLen is 0.
+    topicLen = (int)strlen(topicName);
+  }
+
   printf("Message arrived\n");
-  printf("     topic: %s\n", topicName);
-  printf("   message: ");
+  printf("     topic (%d): %s\n", topicLen, topicName);
+  printf("   message (%d): ", message->payloadlen);
 
   payloadptr = message->payload;
   for (i = 0; i < message->payloadlen; i++)
   {
     putchar(*payloadptr++);
   }
+  
   putchar('\n');
   MQTTClient_freeMessage(&message);
   MQTTClient_free(topicName);
+
   return 1;
 }
 
@@ -227,7 +235,7 @@ int main()
 {
   int rc;
 
-  if ((rc = read_configuration()) != AZ_OK)
+  if ((rc = read_configuration_and_init_client()) != AZ_OK)
   {
     printf("Failed to read configuration from environment variables, return code %d\n", rc);
     return rc;
@@ -298,7 +306,7 @@ int main()
   }
 
   printf("Disconnected.\n");
-
   MQTTClient_destroy(&mqtt_client);
+
   return 0;
 }
