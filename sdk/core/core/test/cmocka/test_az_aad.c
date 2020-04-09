@@ -47,8 +47,10 @@ az_result __wrap_az_http_client_send_request(
 }
 
 #ifdef MOCK_ENABLED
-static void test_az_token_expired()
+static void test_az_token_expired(void** state)
 {
+  (void)state;
+
   _az_token token = { 0 };
   token._internal.expires_at_msec = 100;
 
@@ -62,8 +64,10 @@ static void test_az_token_expired()
   assert_true(_az_token_expired(&token));
 }
 
-static void test_az_aad_request_token()
+static void test_az_aad_request_token(void** state)
 {
+  (void)state;
+
   // Calling az_aad_request_token(_az_http_request* ref_request, _az_token* out_token);
   _az_token t = { 0 };
   _az_http_request r = { 0 };
@@ -86,8 +90,10 @@ static void test_az_aad_request_token()
 }
 #endif // MOCK_ENABLED
 
-static void test_az_aad_build_body()
+static void test_az_aad_build_body(void** state)
 {
+  (void)state;
+
   uint8_t buffer[500];
   az_span body = AZ_SPAN_FROM_BUFFER(buffer);
   assert_return_code(
@@ -100,23 +106,24 @@ static void test_az_aad_build_body()
       AZ_OK);
 }
 
-static void test_az_aad_build_url()
+static void test_az_aad_build_url(void** state)
 {
+  (void)state;
+
   uint8_t buffer[500];
   az_span url = AZ_SPAN_FROM_BUFFER(buffer);
   assert_return_code(_az_aad_build_url(url, AZ_SPAN_FROM_STR("tenant"), &url), AZ_OK);
 }
 
-void test_az_aad(void** state)
+int test_az_add()
 {
-  (void)state;
-
-/* Tests using wrap to mock. Only suported by gcc */
+  const struct CMUnitTest tests[] = {
 #ifdef MOCK_ENABLED
-  test_az_token_expired();
-  test_az_aad_request_token();
+    cmocka_unit_test(test_az_token_expired),
+    cmocka_unit_test(test_az_aad_request_token),
 #endif // MOCK_ENABLED
-
-  test_az_aad_build_body();
-  test_az_aad_build_url();
+    cmocka_unit_test(test_az_aad_build_body),
+    cmocka_unit_test(test_az_aad_build_url),
+  };
+  return cmocka_run_group_tests_name("az_core_aad", tests, NULL, NULL);
 }

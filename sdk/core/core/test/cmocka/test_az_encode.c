@@ -45,7 +45,7 @@ static uint8_t uri_decoded_buf[] = {
 
 static az_span uri_decoded = AZ_SPAN_LITERAL_FROM_INITIALIZED_BUFFER(uri_decoded_buf);
 
-void test_url_encode(void** state)
+static void test_url_encode(void** state)
 {
   (void)state;
   uint8_t buffer[1000];
@@ -62,4 +62,12 @@ void test_url_encode(void** state)
     TEST_EXPECT_SUCCESS(az_span_copy_url_encode(builder, uri_decoded, &builder));
     assert_true(az_span_is_content_equal(builder, uri_encoded));
   }
+}
+
+int test_az_encode()
+{
+  const struct CMUnitTest tests[] = {
+    cmocka_unit_test(test_url_encode),
+  };
+  return cmocka_run_group_tests_name("az_core_encode", tests, NULL, NULL);
 }
