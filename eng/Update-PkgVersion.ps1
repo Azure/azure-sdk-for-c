@@ -22,14 +22,11 @@ Use this to overide version incement logic and set a version specified by this p
 
 
 .EXAMPLE
-Updating package version for Azure.Core
-Update-PkgVersion.ps1 -ServiceDirectory core -PackageName Azure.Core
+Updating package version for azure-core
+Update-PkgVersion.ps1 -ServiceDirectory core -PackageName core
 
-Updating package version for Azure.Core with a specified verion
-Update-PkgVersion.ps1 -ServiceDirectory core -PackageName Azure.Core -NewVersionString 2.0.5
-
-Updating package version for Microsoft.Azure.CognitiveServices.AnomalyDetector
-Update-PkgVersion.ps1 -ServiceDirectory cognitiveservices -PackageName Microsoft.Azure.CognitiveServices.AnomalyDetector -PackageDirName AnomalyDetector
+Updating package version for azure-core with a specified verion
+Update-PkgVersion.ps1 -ServiceDirectory core -PackageName core -NewVersionString 2.0.5
 
 #>
 
@@ -47,10 +44,15 @@ Param (
 
 . ${PSScriptRoot}\common\scripts\SemVer.ps1
 
-# Updated Version in csproj and changelog using computed or set NewVersionString
+# Updated Version in version file and changelog using computed or set NewVersionString
 function Update-Version($Unreleased=$True, $ReplaceVersion=$False)
 {
     Write-Verbose "New Version: $SemVer"
+    if ($SemVer.HasValidPrereleaseLabel() -ne $true){
+        Write-Error "Invalid prerelease label"
+        exit 1
+    }
+
     Set-Content -Path $PackageVersionPath -Value $SemVer.ToString()
 
     # Increment Version in ChangeLog file
