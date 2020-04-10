@@ -69,7 +69,7 @@ typedef enum
  *  @retval #AZ_ERROR_ITEM_NOT_FOUND If the int is NOT an #az_iot_status enum
  */
 
-AZ_NODISCARD az_result az_iot_get_status(uint32_t status_int, az_iot_status* status);
+AZ_NODISCARD az_result az_iot_get_status_from_uint32(uint32_t status_int, az_iot_status* status);
 
 /**
  * @brief Checks if the status indicates a successful operation.
