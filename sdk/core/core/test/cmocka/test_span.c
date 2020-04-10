@@ -22,7 +22,7 @@
   assert_true(az_span_append_uint8(buffer, 'a', NULL) == AZ_ERROR_ARG);
 } */
 
-static void az_span_slice_tests()
+static void az_span_slice_test()
 {
   uint8_t raw_buffer[20];
   az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer);
