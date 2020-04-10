@@ -381,7 +381,7 @@ void test_az_span(void** state)
 {
   (void)state;
 
-  az_span_slice_tests();
+  az_span_slice_test();
 
   // az_span_append_uint8_NULL_out_span_fails();
   az_span_append_uint8_overflow_fails();
