@@ -157,10 +157,10 @@ AZ_NODISCARD int32_t az_span_find(az_span source, az_span target)
   const int32_t target_not_found = -1;
 
   if (target_length == 0)
-  { 
+  {
     return 0;
   }
-  else if (source_length < target_length) 
+  else if (source_length < target_length)
   {
     return target_not_found;
   }
@@ -178,28 +178,30 @@ AZ_NODISCARD int32_t az_span_find(az_span source, az_span target)
         // The condition in step 2. has been satisfied.
         int32_t j;
         // This is the loop defined in step 3.
-        // The loop must be broken if it reaches the ends of `target` (step 3.) OR `source` (step 5.).
+        // The loop must be broken if it reaches the ends of `target` (step 3.) OR `source`
+        // (step 5.).
         for (j = 1; j < target_length && (i + j) < source_length; j++)
         {
           // Condition defined in step 5.
           if (source_ptr[i + j] != target_ptr[j])
           {
-              break;
+            break;
           }
         }
-  
+
         if (j == target_length)
         {
-          // All bytes in `target` have been checked and matched the corresponding bytes in `source` (from the start point `i`),
-          // so this is indeed an instance of `target` in that position of `source` (step 4.).
+          // All bytes in `target` have been checked and matched the corresponding bytes in `source`
+          // (from the start point `i`), so this is indeed an instance of `target` in that position
+          // of `source` (step 4.).
 
           return i;
         }
       }
-    } 
+    }
   }
 
-  // If the function hasn't returned before, all positions 
+  // If the function hasn't returned before, all positions
   // of `source` have been evaluated but `target` could not be found.
   return target_not_found;
 }

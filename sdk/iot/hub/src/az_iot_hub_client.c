@@ -61,7 +61,7 @@ AZ_NODISCARD az_result az_iot_hub_client_user_name_get(
     required_length += az_span_length(*user_agent) + 1;
   }
 
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(mqtt_user_name, required_length);
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(mqtt_user_name, required_length);
 
   mqtt_user_name = az_span_copy(mqtt_user_name, client->_internal.iot_hub_hostname);
   mqtt_user_name = az_span_append_uint8(mqtt_user_name, hub_client_forward_slash);
@@ -77,7 +77,8 @@ AZ_NODISCARD az_result az_iot_hub_client_user_name_get(
 
   if (az_span_length(*user_agent) > 0)
   {
-    mqtt_user_name = az_span_append_uint8(mqtt_user_name, hub_client_param_separator_span);
+    mqtt_user_name
+        = az_span_append_uint8(mqtt_user_name, *az_span_ptr(hub_client_param_separator_span));
     mqtt_user_name = az_span_append(mqtt_user_name, *user_agent);
   }
 
@@ -152,11 +153,11 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_append(
 
   if (prop_length > 0)
   {
-    prop_span = az_span_append_uint8(prop_span, hub_client_param_separator_span);
+    prop_span = az_span_append_uint8(prop_span, *az_span_ptr(hub_client_param_separator_span));
   }
 
   prop_span = az_span_append(prop_span, name);
-  prop_span = az_span_append_uint8(prop_span, hub_client_param_equals_span);
+  prop_span = az_span_append_uint8(prop_span, *az_span_ptr(hub_client_param_equals_span));
   prop_span = az_span_append(prop_span, value);
 
   properties->_internal.properties = prop_span;

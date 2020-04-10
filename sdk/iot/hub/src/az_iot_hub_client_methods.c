@@ -26,10 +26,15 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_subscribe_topic_filter_get(
 
   UNUSED(client);
 
-  AZ_RETURN_IF_FAILED(az_span_copy(mqtt_topic_filter, methods_topic_prefix, &mqtt_topic_filter));
-  AZ_RETURN_IF_FAILED(
-      az_span_append(mqtt_topic_filter, methods_topic_filter_suffix, &mqtt_topic_filter));
-  AZ_RETURN_IF_FAILED(az_span_append_uint8(mqtt_topic_filter, '#', &mqtt_topic_filter));
+  int32_t required_length
+      = az_span_length(methods_topic_prefix) + az_span_length(methods_topic_filter_suffix) + 1;
+
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(mqtt_topic_filter, required_length);
+
+  // TODO: Merge these two calls into one since they are copying two strings literals.
+  mqtt_topic_filter = az_span_copy(mqtt_topic_filter, methods_topic_prefix);
+  mqtt_topic_filter = az_span_append(mqtt_topic_filter, methods_topic_filter_suffix);
+  mqtt_topic_filter = az_span_append_uint8(mqtt_topic_filter, '#');
 
   *out_mqtt_topic_filter = mqtt_topic_filter;
 
@@ -99,11 +104,22 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_response_publish_topic_get(
 
   UNUSED(client);
 
-  AZ_RETURN_IF_FAILED(az_span_copy(mqtt_topic, methods_topic_prefix, &mqtt_topic));
-  AZ_RETURN_IF_FAILED(az_span_append(mqtt_topic, methods_response_topic_result, &mqtt_topic));
+  int32_t required_length
+      = az_span_length(methods_topic_prefix) + az_span_length(methods_response_topic_result);
+
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(mqtt_topic, required_length);
+
+  mqtt_topic = az_span_copy(mqtt_topic, methods_topic_prefix);
+  mqtt_topic = az_span_append(mqtt_topic, methods_response_topic_result);
+
   AZ_RETURN_IF_FAILED(az_span_append_u32toa(mqtt_topic, (uint32_t)status, &mqtt_topic));
-  AZ_RETURN_IF_FAILED(az_span_append(mqtt_topic, methods_response_topic_properties, &mqtt_topic));
-  AZ_RETURN_IF_FAILED(az_span_append(mqtt_topic, request_id, &mqtt_topic));
+
+  required_length = az_span_length(methods_response_topic_properties) + az_span_length(request_id);
+
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(mqtt_topic, required_length);
+
+  mqtt_topic = az_span_append(mqtt_topic, methods_response_topic_properties);
+  mqtt_topic = az_span_append(mqtt_topic, request_id);
 
   *out_mqtt_topic = mqtt_topic;
 

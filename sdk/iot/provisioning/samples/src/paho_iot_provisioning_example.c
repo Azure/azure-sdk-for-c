@@ -61,13 +61,16 @@ static az_result read_configuration_entry(
   if (env != NULL)
   {
     printf("%s\n", hide_value ? "***" : env);
-    *out_value = az_span_init(az_span_ptr(buffer), 0, az_span_capacity(buffer));
-    AZ_RETURN_IF_FAILED(az_span_copy(*out_value, az_span_from_str(env), out_value));
+    az_span env_span = az_span_from_str(env);
+    AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(buffer, az_span_length(env_span));
+    *out_value = az_span_copy(buffer, env_span);
   }
   else if (default_value != NULL)
   {
     printf("%s\n", default_value);
-    AZ_RETURN_IF_FAILED(az_span_copy(*out_value, az_span_from_str(default_value), out_value));
+    az_span default_span = az_span_from_str(default_value);
+    AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(buffer, az_span_length(default_span));
+    *out_value = az_span_copy(buffer, default_span);
   }
   else
   {
