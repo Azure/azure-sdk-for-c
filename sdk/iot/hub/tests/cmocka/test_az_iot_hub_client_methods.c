@@ -4,6 +4,7 @@
 #include "test_az_iot_hub_client.h"
 #include <az_iot_hub_client.h>
 #include <az_span.h>
+#include <az_result.h>
 
 #include <az_precondition.h>
 #include <az_precondition_internal.h>
@@ -394,7 +395,7 @@ static void test_az_iot_hub_client_methods_received_topic_parse_c2d_topic_fail(v
 
   assert_true(
       az_iot_hub_client_methods_received_topic_parse(&client, received_topic, &out_request)
-      == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+      == AZ_ERROR_IOT_TOPIC_NO_MATCH);
 }
 
 static void test_az_iot_hub_client_methods_received_topic_parse_get_twin_topic_fail(void** state)
@@ -410,7 +411,7 @@ static void test_az_iot_hub_client_methods_received_topic_parse_get_twin_topic_f
 
   assert_true(
       az_iot_hub_client_methods_received_topic_parse(&client, received_topic, &out_request)
-      == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+      == AZ_ERROR_IOT_TOPIC_NO_MATCH);
 }
 
 static void test_az_iot_hub_client_methods_received_topic_parse_twin_patch_topic_fail(void** state)
@@ -426,7 +427,7 @@ static void test_az_iot_hub_client_methods_received_topic_parse_twin_patch_topic
 
   assert_true(
       az_iot_hub_client_methods_received_topic_parse(&client, received_topic, &out_request)
-      == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+      == AZ_ERROR_IOT_TOPIC_NO_MATCH);
 }
 
 static void test_az_iot_hub_client_methods_received_topic_parse_topic_filter_fail(void** state)
@@ -445,7 +446,7 @@ static void test_az_iot_hub_client_methods_received_topic_parse_topic_filter_fai
 
   assert_true(
       az_iot_hub_client_methods_received_topic_parse(&client, received_topic, &out_request)
-      == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+      == AZ_ERROR_IOT_TOPIC_NO_MATCH);
 }
 
 static void test_az_iot_hub_client_methods_received_topic_parse_response_topic_fail(void** state)
@@ -461,7 +462,7 @@ static void test_az_iot_hub_client_methods_received_topic_parse_response_topic_f
 
   assert_true(
       az_iot_hub_client_methods_received_topic_parse(&client, received_topic, &out_request)
-      == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+      == AZ_ERROR_IOT_TOPIC_NO_MATCH);
 }
 
 int test_iot_hub_methods()
