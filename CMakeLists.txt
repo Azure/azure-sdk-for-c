@@ -9,6 +9,7 @@ option(WARNINGS_AS_ERRORS "Treat compiler warnings as errors" ON)
 option(BUILD_CURL_TRANSPORT "Build internal http transport implementation with CURL for HTTP Pipeline" OFF)
 option(UNIT_TESTING "Build unit test projects" OFF)
 option(UNIT_TESTING_MOCK_ENABLED "wrap PAL functions with mock implementation for tests" OFF)
+option(BUILD_PAHO_TRANSPORT "Build IoT Samples with Paho MQTT support" OFF)
 
 #enable mock functions with link option -ld
 if(UNIT_TESTING_MOCK_ENABLED)
@@ -42,7 +43,7 @@ add_subdirectory(sdk/core/core)
 
 add_subdirectory(sdk/platform/http_client/nohttp)
 # Adding transport implementation for curl
-# Users can still build Core and SDK client without depending on a HTPP transport implementation
+# Users can still build Core and SDK client without depending on a HTTP transport implementation
 if(BUILD_CURL_TRANSPORT)
   add_subdirectory(sdk/platform/http_client/curl)
 endif()
@@ -64,6 +65,9 @@ if(NOT DEFINED ENV{AZ_SDK_C_NO_SAMPLES})
   add_subdirectory(sdk/samples/keyvault/keyvault)
   add_subdirectory(sdk/samples/keyvault/keyvault/samples)
   add_subdirectory(sdk/storage/blobs/samples)
+  if(BUILD_PAHO_TRANSPORT)
+    add_subdirectory(sdk/iot/provisioning/samples)
+  endif()
 endif()
 
 # default for Unit testing with cmocka is OFF, however, this will be ON on CI and tests must
