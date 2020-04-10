@@ -141,7 +141,7 @@ AZ_NODISCARD az_span az_span_from_str(char* str);
 #define AZ_SPAN_LITERAL_FROM_BUFFER(BYTE_BUFFER) \
   { \
     ._internal = { \
-      .ptr = BYTE_BUFFER, \
+      .ptr = (uint8_t*)BYTE_BUFFER, \
       .length = 0, \
       .capacity = (sizeof(BYTE_BUFFER) / sizeof(BYTE_BUFFER[0])), \
     }, \
@@ -272,33 +272,16 @@ AZ_NODISCARD az_result az_span_to_uint32(az_span span, uint32_t* out_number);
 /**
  * @brief az_span_find searches for `target` in `source`, returning an #az_span within `source` if
  * it finds it.
- *
+ * 
  * @param[in] source The #az_span with the content to be searched on.
  * @param[in] target The #az_span containing the token to be searched in `source`.
- * @param[out] out_span The #az_span pointing to the first occurrence of `target` in `source`, if it
- * is found.
- * @return An #az_result value indicating the result of the operation.
- *          #AZ_OK if `target` is found in `source`
- *          #AZ_ERROR_ITEM_NOT_FOUND if `target` is not found in `source`
- * is found within the span.
+ * @return The position of `target` in `source` if `source` contains `target`,
+ *         0 if `target` is empty (if its length is equal zero),
+ *         -1 if `source` is empty (if its length is equal zero) and `target` is non-empty,
+ *         -1 if `target` is not found in `source`.
  */
-AZ_NODISCARD az_result az_span_find(az_span source, az_span target, az_span* out_span);
+AZ_NODISCARD int32_t az_span_find(az_span source, az_span target);
 
-/**
- * @brief az_span_token is a string tokenizer for az_span.
- *
- * @param[in] source The #az_span with the content to be searched on. It must be a non-empty
- * #az_span.
- * @param[in] delimiter The #az_span containing the delimiter to "split" `source` into tokens.  It
- * must be a non-empty #az_span.
- * @param[out] out_remainder The #az_span pointing to the remaining bytes in `source`, starting
- * after the occurrence of `delimiter`. If the position after `delimiter` is the end of `source`,
- * `out_remainder` is set to a NULL/empty #az_span.
- * @return The #az_span pointing to the token delimited by the beginning of `source` up to the first
- * occurrence of (but not including the) `delimiter`, or the end of `source` if `delimiter` is not
- * found. If `source` or `delimiter` is empty, AZ_SPAN_NULL is returned instead.
- */
-AZ_NODISCARD az_span az_span_token(az_span source, az_span delimiter, az_span* out_remainder);
 
 /******************************  SPAN APPENDING */
 

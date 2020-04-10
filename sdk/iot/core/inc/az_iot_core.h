@@ -59,6 +59,19 @@ typedef enum
 } az_iot_status;
 
 /**
+ * @brief Get the #az_iot_status from an int.
+ *
+ * @param[in] status_int The int with the status number.
+ * @param[out] status The #az_iot_status* with the status enum.
+ * @return The #az_result with the result of the get operation.
+ *  @retval #AZ_OK If the int is an #az_iot_status enum. `status` will be set to the according
+ * enum.
+ *  @retval #AZ_ERROR_ITEM_NOT_FOUND If the int is NOT an #az_iot_status enum.
+ */
+
+AZ_NODISCARD az_result az_iot_get_status_from_uint32(uint32_t status_int, az_iot_status* status);
+
+/**
  * @brief Checks if the status indicates a successful operation.
  *
  * @param[in] status The #az_iot_status to verify.
@@ -92,6 +105,22 @@ AZ_NODISCARD int32_t az_iot_retry_calc_delay(
     int32_t retry_delay_msec,
     int32_t max_retry_delay_msec,
     int32_t random_msec);
+
+/**
+ * @brief az_span_token is a string tokenizer for az_span.
+ *
+ * @param[in] source The #az_span with the content to be searched on. It must be a non-empty
+ * #az_span.
+ * @param[in] delimiter The #az_span containing the delimiter to "split" `source` into tokens.  It
+ * must be a non-empty #az_span.
+ * @param[out] out_remainder The #az_span pointing to the remaining bytes in `source`, starting
+ * after the occurrence of `delimiter`. If the position after `delimiter` is the end of `source`,
+ * `out_remainder` is set to an empty #az_span.
+ * @return The #az_span pointing to the token delimited by the beginning of `source` up to the first
+ * occurrence of (but not including the) `delimiter`, or the end of `source` if `delimiter` is not
+ * found. If `source` is empty, AZ_SPAN_NULL is returned instead.
+ */
+AZ_NODISCARD az_span az_span_token(az_span source, az_span delimiter, az_span* out_remainder);
 
 #include <_az_cfg_suffix.h>
 

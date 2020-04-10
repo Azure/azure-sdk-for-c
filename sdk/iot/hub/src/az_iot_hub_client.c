@@ -11,10 +11,10 @@
 #include <_az_cfg.h>
 
 static const uint8_t hub_client_forward_slash = '/';
-static const uint8_t hub_client_param_separator = '&';
-static const uint8_t hub_client_param_equals = '=';
+static const az_span hub_client_param_separator_span = AZ_SPAN_LITERAL_FROM_STR("&");
+static const az_span hub_client_param_equals_span = AZ_SPAN_LITERAL_FROM_STR("=");
 
-static const az_span hub_client_api_version = AZ_SPAN_LITERAL_FROM_STR("?api-version=2018-06-30");
+static const az_span hub_service_api_version = AZ_SPAN_LITERAL_FROM_STR("/?api-version=2018-06-30");
 
 AZ_NODISCARD az_iot_hub_client_options az_iot_hub_client_options_default()
 {
@@ -55,22 +55,21 @@ AZ_NODISCARD az_result az_iot_hub_client_user_name_get(
   AZ_RETURN_IF_FAILED(
       az_span_append_uint8(mqtt_user_name, hub_client_forward_slash, &mqtt_user_name));
   AZ_RETURN_IF_FAILED(az_span_append(mqtt_user_name, client->_internal.device_id, &mqtt_user_name));
-  AZ_RETURN_IF_FAILED(
-      az_span_append_uint8(mqtt_user_name, hub_client_forward_slash, &mqtt_user_name));
 
   if (az_span_length(*module_id) > 0)
   {
-    AZ_RETURN_IF_FAILED(az_span_append(mqtt_user_name, *module_id, &mqtt_user_name));
     AZ_RETURN_IF_FAILED(
         az_span_append_uint8(mqtt_user_name, hub_client_forward_slash, &mqtt_user_name));
+    AZ_RETURN_IF_FAILED(az_span_append(mqtt_user_name, *module_id, &mqtt_user_name));
   }
 
-  AZ_RETURN_IF_FAILED(az_span_append(mqtt_user_name, hub_client_api_version, &mqtt_user_name));
+  AZ_RETURN_IF_FAILED(
+      az_span_append(mqtt_user_name, hub_service_api_version, &mqtt_user_name));
 
   if (az_span_length(*user_agent) > 0)
   {
-    AZ_RETURN_IF_FAILED(
-        az_span_append_uint8(mqtt_user_name, hub_client_param_separator, &mqtt_user_name));
+    AZ_RETURN_IF_FAILED(az_span_append_uint8(
+        mqtt_user_name, *az_span_ptr(hub_client_param_separator_span), &mqtt_user_name));
     AZ_RETURN_IF_FAILED(az_span_append(mqtt_user_name, *user_agent, &mqtt_user_name));
   }
 
@@ -111,7 +110,7 @@ az_iot_hub_client_properties_init(az_iot_hub_client_properties* properties, az_s
   AZ_PRECONDITION_VALID_SPAN(buffer, 0, false);
 
   properties->_internal.properties = buffer;
-  properties->_internal.current_property = az_span_ptr(buffer);
+  properties->_internal.current_property_index = 0;
 
   return AZ_OK;
 }
@@ -129,14 +128,79 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_append(
 
   if (az_span_length(prop_span) > 0)
   {
-    AZ_RETURN_IF_FAILED(az_span_append_uint8(prop_span, hub_client_param_separator, &prop_span));
+    AZ_RETURN_IF_FAILED(
+        az_span_append_uint8(prop_span, *az_span_ptr(hub_client_param_separator_span), &prop_span));
   }
 
   AZ_RETURN_IF_FAILED(az_span_append(prop_span, name, &prop_span));
-  AZ_RETURN_IF_FAILED(az_span_append_uint8(prop_span, hub_client_param_equals, &prop_span));
+  AZ_RETURN_IF_FAILED(
+      az_span_append_uint8(prop_span, *az_span_ptr(hub_client_param_equals_span), &prop_span));
   AZ_RETURN_IF_FAILED(az_span_append(prop_span, value, &prop_span));
 
   properties->_internal.properties = prop_span;
+
+  return AZ_OK;
+}
+
+AZ_NODISCARD az_result az_iot_hub_client_properties_find(
+    az_iot_hub_client_properties* properties,
+    az_span name,
+    az_span* out_value)
+{
+  AZ_PRECONDITION_NOT_NULL(properties);
+  AZ_PRECONDITION_VALID_SPAN(name, 1, false);
+  AZ_PRECONDITION_NOT_NULL(out_value);
+
+  az_span remaining = properties->_internal.properties;
+
+  while (az_span_length(remaining) != 0)
+  {
+    az_span delim_span = az_span_token(remaining, hub_client_param_equals_span, &remaining);
+    if (az_span_is_content_equal(delim_span, name))
+    {
+      *out_value = az_span_token(remaining, hub_client_param_separator_span, &remaining);
+      return AZ_OK;
+    }
+    else
+    {
+      az_span value;
+      value = az_span_token(remaining, hub_client_param_separator_span, &remaining);
+      (void)value;
+    }
+  }
+
+  return AZ_ERROR_ITEM_NOT_FOUND;
+}
+
+AZ_NODISCARD az_result
+az_iot_hub_client_properties_next(az_iot_hub_client_properties* properties, az_pair* out)
+{
+  AZ_PRECONDITION_NOT_NULL(properties);
+  AZ_PRECONDITION_NOT_NULL(out);
+
+  int32_t index = (int32_t)properties->_internal.current_property_index;
+  int32_t prop_length = az_span_length(properties->_internal.properties);
+
+  if (index == prop_length)
+  {
+    *out = AZ_PAIR_NULL;
+    return AZ_ERROR_EOF;
+  }
+
+  az_span remainder;
+  az_span prop_span = az_span_slice(properties->_internal.properties, index, prop_length);
+
+  out->key = az_span_token(prop_span, hub_client_param_equals_span, &remainder);
+  out->value = az_span_token(remainder, hub_client_param_separator_span, &remainder);
+  if (az_span_length(remainder) == 0)
+  {
+    properties->_internal.current_property_index = (uint32_t)prop_length;
+  }
+  else
+  {
+    properties->_internal.current_property_index
+        = (uint32_t)(az_span_ptr(remainder) - az_span_ptr(properties->_internal.properties));
+  }
 
   return AZ_OK;
 }
