@@ -43,19 +43,19 @@ AZ_INLINE az_result _az_http_policy_retry_append_http_retry_msg(
     az_span* ref_log_msg)
 {
   az_span retry_count_string = AZ_SPAN_FROM_STR("HTTP Retry attempt #");
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*ref_log_msg, az_span_length(retry_count_string));
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(*ref_log_msg, az_span_length(retry_count_string));
   *ref_log_msg = az_span_append(*ref_log_msg, retry_count_string);
 
   AZ_RETURN_IF_FAILED(az_span_append_i32toa(*ref_log_msg, (int32_t)attempt, ref_log_msg));
 
   az_span infix_string = AZ_SPAN_FROM_STR(" will be made in ");
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*ref_log_msg, az_span_length(infix_string));
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(*ref_log_msg, az_span_length(infix_string));
   *ref_log_msg = az_span_append(*ref_log_msg, infix_string);
 
   AZ_RETURN_IF_FAILED(az_span_append_i32toa(*ref_log_msg, delay_msec, ref_log_msg));
 
   az_span suffix_string = AZ_SPAN_FROM_STR("ms.");
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*ref_log_msg, az_span_length(suffix_string));
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(*ref_log_msg, az_span_length(suffix_string));
   *ref_log_msg = az_span_append(*ref_log_msg, suffix_string);
 
   return AZ_OK;

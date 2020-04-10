@@ -104,7 +104,7 @@ _az_span_append_header_to_buffer(az_span writable_buffer, az_pair header, az_spa
   int32_t required_length
       = az_span_length(header.key) + az_span_length(separator) + az_span_length(header.value) + 1;
 
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(writable_buffer, required_length);
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(writable_buffer, required_length);
 
   writable_buffer = az_span_append(writable_buffer, header.key);
   writable_buffer = az_span_append(writable_buffer, separator);
@@ -206,7 +206,7 @@ _az_http_client_curl_append_url(az_span writable_buffer, az_span url_from_reques
 {
   int32_t required_length = az_span_length(url_from_request) + 1;
 
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(writable_buffer, required_length);
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(writable_buffer, required_length);
 
   writable_buffer = az_span_append(writable_buffer, url_from_request);
   writable_buffer = az_span_append_uint8(writable_buffer, '0');
@@ -536,7 +536,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
   // make sure to set the end of the body response as the end of the complete response
   if (az_succeeded(result))
   {
-    AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(response->_internal.http_response, 1);
+    AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(response->_internal.http_response, 1);
 
     response->_internal.http_response
         = az_span_append_uint8(response->_internal.http_response, '0');

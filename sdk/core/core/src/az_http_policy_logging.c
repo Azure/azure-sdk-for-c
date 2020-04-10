@@ -71,7 +71,7 @@ static az_result _az_http_policy_logging_append_http_request_msg(
         = az_span_length(request->_internal.method) + az_span_length(request->_internal.url) + 1;
   }
 
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*ref_log_msg, required_length);
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(*ref_log_msg, required_length);
 
   *ref_log_msg = az_span_append(*ref_log_msg, http_request_string);
 
@@ -101,7 +101,7 @@ static az_result _az_http_policy_logging_append_http_request_msg(
       required_length += _az_LOG_LENGTHY_VALUE_MAX_LENGTH + az_span_length(colon_separator_string);
     }
 
-    AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*ref_log_msg, required_length);
+    AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(*ref_log_msg, required_length);
 
     *ref_log_msg = az_span_append(*ref_log_msg, new_line_tab_string);
 
@@ -124,25 +124,25 @@ static az_result _az_http_policy_logging_append_http_response_msg(
     az_span* ref_log_msg)
 {
   az_span http_response_string = AZ_SPAN_FROM_STR("HTTP Response (");
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*ref_log_msg, az_span_length(http_response_string));
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(*ref_log_msg, az_span_length(http_response_string));
   *ref_log_msg = az_span_append(*ref_log_msg, http_response_string);
 
   AZ_RETURN_IF_FAILED(az_span_append_i64toa(*ref_log_msg, duration_msec, ref_log_msg));
 
   az_span ms_string = AZ_SPAN_FROM_STR("ms)");
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*ref_log_msg, az_span_length(ms_string));
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(*ref_log_msg, az_span_length(ms_string));
   *ref_log_msg = az_span_append(*ref_log_msg, ms_string);
 
   if (ref_response == NULL || az_span_length(ref_response->_internal.http_response) == 0)
   {
     az_span is_empty_string = AZ_SPAN_FROM_STR(" is empty");
-    AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*ref_log_msg, az_span_length(is_empty_string));
+    AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(*ref_log_msg, az_span_length(is_empty_string));
     *ref_log_msg = az_span_append(*ref_log_msg, is_empty_string);
     return AZ_OK;
   }
 
   az_span colon_separator_string = AZ_SPAN_FROM_STR(" : ");
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*ref_log_msg, az_span_length(colon_separator_string));
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(*ref_log_msg, az_span_length(colon_separator_string));
   *ref_log_msg = az_span_append(*ref_log_msg, colon_separator_string);
 
   az_http_response_status_line status_line = { 0 };
@@ -150,7 +150,7 @@ static az_result _az_http_policy_logging_append_http_response_msg(
   AZ_RETURN_IF_FAILED(
       az_span_append_u64toa(*ref_log_msg, (uint64_t)status_line.status_code, ref_log_msg));
 
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*ref_log_msg, az_span_length(status_line.reason_phrase) + 1);
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(*ref_log_msg, az_span_length(status_line.reason_phrase) + 1);
   *ref_log_msg = az_span_append_uint8(*ref_log_msg, ' ');
   *ref_log_msg = az_span_append(*ref_log_msg, status_line.reason_phrase);
 
@@ -165,7 +165,7 @@ static az_result _az_http_policy_logging_append_http_response_msg(
       required_length += _az_LOG_LENGTHY_VALUE_MAX_LENGTH + az_span_length(colon_separator_string);
     }
 
-    AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*ref_log_msg, required_length);
+    AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(*ref_log_msg, required_length);
 
     *ref_log_msg = az_span_append(*ref_log_msg, new_line_tab_string);
     *ref_log_msg = az_span_append(*ref_log_msg, header.key);
@@ -181,7 +181,7 @@ static az_result _az_http_policy_logging_append_http_response_msg(
   az_span arrow_separator_string = AZ_SPAN_FROM_STR(" -> ");
   int32_t required_length
       = az_span_length(new_lines_string) + az_span_length(arrow_separator_string);
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*ref_log_msg, required_length);
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(*ref_log_msg, required_length);
 
   *ref_log_msg = az_span_append(*ref_log_msg, new_lines_string);
   *ref_log_msg = az_span_append(*ref_log_msg, arrow_separator_string);

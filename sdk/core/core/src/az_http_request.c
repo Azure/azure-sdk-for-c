@@ -96,7 +96,7 @@ az_http_request_set_query_parameter(_az_http_request* p_request, az_span name, a
 
   int32_t required_length = az_span_length(name) + az_span_length(name) + 2;
 
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(p_request->_internal.url, required_length);
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(p_request->_internal.url, required_length);
 
   // Append either '?' or '&'
   uint8_t separator;
@@ -139,7 +139,7 @@ az_http_request_append_header(_az_http_request* p_request, az_span key, az_span 
 
   az_pair header_to_append = az_pair_init(key, value);
 
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*headers_ptr, (int32_t)sizeof header_to_append);
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(*headers_ptr, (int32_t)sizeof header_to_append);
 
   *headers_ptr = az_span_append(
       *headers_ptr,

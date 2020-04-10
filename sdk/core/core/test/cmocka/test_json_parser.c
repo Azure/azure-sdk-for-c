@@ -376,21 +376,21 @@ az_result read_write_token(az_span* output, int32_t* o, az_json_parser* state, a
   {
     case AZ_JSON_TOKEN_NULL:
     {
-      AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*output, 4);
+      AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(*output, 4);
       *output = az_span_append(*output, AZ_SPAN_FROM_STR("null"));
       return AZ_OK;
     }
     case AZ_JSON_TOKEN_BOOLEAN:
     {
       int32_t required_length = token._internal.boolean ? 4 : 5;
-      AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*output, required_length);
+      AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(*output, required_length);
       *output = az_span_append(
           *output, token._internal.boolean ? AZ_SPAN_FROM_STR("true") : AZ_SPAN_FROM_STR("false"));
       return AZ_OK;
     }
     case AZ_JSON_TOKEN_NUMBER:
     {
-      AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*output, 1);
+      AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(*output, 1);
       *output = az_span_append_uint8(*output, '0');
       return AZ_OK;
     }
@@ -400,7 +400,7 @@ az_result read_write_token(az_span* output, int32_t* o, az_json_parser* state, a
     }
     case AZ_JSON_TOKEN_OBJECT_START:
     {
-      AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*output, 1);
+      AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(*output, 1);
       *output = az_span_append_uint8(*output, '{');
       bool need_comma = false;
       while (true)
@@ -414,7 +414,7 @@ az_result read_write_token(az_span* output, int32_t* o, az_json_parser* state, a
         AZ_RETURN_IF_FAILED(result);
         if (need_comma)
         {
-          AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*output, 1);
+          AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(*output, 1);
           *output = az_span_append_uint8(*output, ',');
         }
         else
@@ -422,17 +422,17 @@ az_result read_write_token(az_span* output, int32_t* o, az_json_parser* state, a
           need_comma = true;
         }
         AZ_RETURN_IF_FAILED(write_str(*output, member.name, output));
-        AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*output, 1);
+        AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(*output, 1);
         *output = az_span_append_uint8(*output, ':');
         AZ_RETURN_IF_FAILED(read_write_token(output, o, state, member.token));
       }
-      AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*output, 1);
+      AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(*output, 1);
       *output = az_span_append_uint8(*output, '}');
       return AZ_OK;
     }
     case AZ_JSON_TOKEN_ARRAY_START:
     {
-      AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*output, 1);
+      AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(*output, 1);
       *output = az_span_append_uint8(*output, '[');
       bool need_comma = false;
       while (true)
@@ -446,7 +446,7 @@ az_result read_write_token(az_span* output, int32_t* o, az_json_parser* state, a
         AZ_RETURN_IF_FAILED(result);
         if (need_comma)
         {
-          AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*output, 1);
+          AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(*output, 1);
           *output = az_span_append_uint8(*output, ',');
         }
         else
@@ -455,7 +455,7 @@ az_result read_write_token(az_span* output, int32_t* o, az_json_parser* state, a
         }
         AZ_RETURN_IF_FAILED(read_write_token(output, o, state, element));
       }
-      AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*output, 1);
+      AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(*output, 1);
       *output = az_span_append_uint8(*output, ']');
       return AZ_OK;
     }
@@ -468,7 +468,7 @@ az_result read_write_token(az_span* output, int32_t* o, az_json_parser* state, a
 az_result write_str(az_span span, az_span s, az_span* out)
 {
   *out = span;
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*out, az_span_length(s) + 2);
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(*out, az_span_length(s) + 2);
   *out = az_span_append_uint8(*out, '"');
   *out = az_span_append(*out, s);
   *out = az_span_append_uint8(*out, '"');

@@ -35,7 +35,7 @@ az_result az_iot_sas_token_get_document(
   int32_t required_length = az_span_length(iothub_fqdn) + az_span_length(device_id)
       + az_span_length(devices_string) + 1;
 
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(document, required_length);
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(document, required_length);
 
   *out_document = document;
 
@@ -76,7 +76,7 @@ az_result az_iot_sas_token_generate(
       + az_span_length(sig_string) + az_span_length(se_string) + az_span_length(iothub_fqdn)
       + az_span_length(device_id) + az_span_length(signature) + 5;
 
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(sas_token, required_length);
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(sas_token, required_length);
 
   *out_sas_token = sas_token;
 
@@ -104,7 +104,7 @@ az_result az_iot_sas_token_generate(
     az_span skn_string = AZ_SPAN_FROM_STR(SAS_TOKEN_SKN);
     required_length = az_span_length(skn_string) + az_span_length(key_name) + 2;
 
-    AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*out_sas_token, required_length);
+    AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(*out_sas_token, required_length);
 
     // Key Name
     *out_sas_token = az_span_append_uint8(*out_sas_token, AMPERSAND);

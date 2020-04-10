@@ -51,7 +51,7 @@ enum
     } \
   } while (0)
 
-#define AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(span, required_space) \
+#define AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(span, required_space) \
   do \
   { \
     if ((az_span_capacity(span) - az_span_length(span)) < required_space) \

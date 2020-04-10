@@ -120,7 +120,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
   };
 
   // Copy url to client buffer so customer can re-use buffer on his/her side
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(client->_internal.uri, az_span_length(uri));
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(client->_internal.uri, az_span_length(uri));
   client->_internal.uri = az_span_copy(client->_internal.uri, uri);
 
   AZ_RETURN_IF_FAILED(
@@ -153,7 +153,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
   uint8_t url_buffer[AZ_HTTP_REQUEST_URL_BUF_SIZE];
   az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
   // copy url from client
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(request_url_span, az_span_length(client->_internal.uri));
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(request_url_span, az_span_length(client->_internal.uri));
   request_url_span = az_span_copy(request_url_span, client->_internal.uri);
 
   uint8_t headers_buffer[_az_STORAGE_HTTP_REQUEST_HEADER_BUF_SIZE];

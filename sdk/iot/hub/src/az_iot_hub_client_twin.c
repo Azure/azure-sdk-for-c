@@ -33,7 +33,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_response_subscribe_topic_filter_ge
 
   int32_t required_length = az_span_length(az_iot_hub_twin_response_sub_topic) + 1;
 
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(mqtt_topic_filter, required_length);
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(mqtt_topic_filter, required_length);
 
   mqtt_topic_filter = az_span_copy(mqtt_topic_filter, az_iot_hub_twin_response_sub_topic);
   mqtt_topic_filter = az_span_append_uint8(mqtt_topic_filter, az_iot_hub_client_twin_hashtag);
@@ -54,7 +54,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_patch_subscribe_topic_filter_get(
 
   int32_t required_length = az_span_length(az_iot_hub_twin_patch_sub_topic);
 
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(mqtt_topic_filter, required_length);
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(mqtt_topic_filter, required_length);
 
   mqtt_topic_filter = az_span_copy(mqtt_topic_filter, az_iot_hub_twin_patch_sub_topic);
 
@@ -77,7 +77,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_get_publish_topic_get(
   int32_t required_length = az_span_length(az_iot_hub_twin_get_pub_topic)
       + az_span_length(az_iot_hub_client_twin_request_id_suffix) + az_span_length(request_id);
 
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(mqtt_topic, required_length);
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(mqtt_topic, required_length);
 
   mqtt_topic = az_span_copy(mqtt_topic, az_iot_hub_twin_get_pub_topic);
   mqtt_topic = az_span_append(mqtt_topic, az_iot_hub_client_twin_request_id_suffix);
@@ -102,7 +102,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_patch_publish_topic_get(
   int32_t required_length = az_span_length(az_iot_hub_twin_patch_pub_topic)
       + az_span_length(az_iot_hub_client_twin_request_id_suffix) + az_span_length(request_id);
 
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(mqtt_topic, required_length);
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(mqtt_topic, required_length);
 
   mqtt_topic = az_span_copy(mqtt_topic, az_iot_hub_twin_patch_pub_topic);
   mqtt_topic = az_span_append(mqtt_topic, az_iot_hub_client_twin_request_id_suffix);

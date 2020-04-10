@@ -50,13 +50,13 @@ _az_span_append_with_url_encode(az_span dst, az_span src, az_span* out)
 AZ_NODISCARD az_result _az_aad_build_url(az_span url, az_span tenant_id, az_span* out_url)
 {
   az_span root_url = AZ_SPAN_FROM_STR("https://login.microsoftonline.com/");
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(url, az_span_length(root_url));
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(url, az_span_length(root_url));
   *out_url = az_span_append(url, root_url);
 
   AZ_RETURN_IF_FAILED(_az_span_append_with_url_encode(*out_url, tenant_id, out_url));
 
   az_span oath_token = AZ_SPAN_FROM_STR("/oauth2/v2.0/token");
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*out_url, az_span_length(oath_token));
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(*out_url, az_span_length(oath_token));
   *out_url = az_span_append(*out_url, oath_token);
 
   return AZ_OK;
@@ -72,13 +72,13 @@ AZ_NODISCARD az_result _az_aad_build_body(
 {
   az_span grant_type_and_client_id_key
       = AZ_SPAN_FROM_STR("grant_type=client_credentials&client_id=");
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(body, az_span_length(grant_type_and_client_id_key));
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(body, az_span_length(grant_type_and_client_id_key));
   *out_body = az_span_append(body, grant_type_and_client_id_key);
 
   AZ_RETURN_IF_FAILED(_az_span_append_with_url_encode(*out_body, client_id, out_body));
 
   az_span scope_key = AZ_SPAN_FROM_STR("&scope=");
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*out_body, az_span_length(scope_key));
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(*out_body, az_span_length(scope_key));
   *out_body = az_span_append(*out_body, scope_key);
 
   AZ_RETURN_IF_FAILED(_az_span_append_with_url_encode(*out_body, scopes, out_body));
@@ -86,7 +86,7 @@ AZ_NODISCARD az_result _az_aad_build_body(
   if (az_span_length(client_secret) > 0)
   {
     az_span client_secret_key = AZ_SPAN_FROM_STR("&client_secret=");
-    AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*out_body, az_span_length(client_secret_key));
+    AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(*out_body, az_span_length(client_secret_key));
     *out_body = az_span_append(*out_body, client_secret_key);
 
     AZ_RETURN_IF_FAILED(_az_span_append_with_url_encode(*out_body, client_secret, out_body));
@@ -166,7 +166,7 @@ AZ_NODISCARD az_result _az_aad_request_token(_az_http_request* request, _az_toke
 
   az_span new_token_span = AZ_SPAN_FROM_BUFFER(new_token._internal.token);
   new_token_span = az_span_copy(new_token_span, AZ_SPAN_FROM_STR("Bearer "));
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(new_token_span, az_span_length(access_token));
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(new_token_span, az_span_length(access_token));
   new_token_span = az_span_append(new_token_span, access_token);
 
   new_token._internal.token_length = (int16_t)az_span_length(new_token_span);

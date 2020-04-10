@@ -143,7 +143,7 @@ AZ_NODISCARD az_result az_keyvault_keys_client_init(
   };
 
   // Copy url to client buffer so customer can re-use buffer on his/her side
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(self->_internal.uri, az_span_length(uri));
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(self->_internal.uri, az_span_length(uri));
   self->_internal.uri = az_span_copy(self->_internal.uri, uri);
 
   AZ_RETURN_IF_FAILED(
@@ -245,7 +245,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
   uint8_t url_buffer[AZ_HTTP_REQUEST_URL_BUF_SIZE];
   az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
   // copy url from client
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(request_url_span, az_span_length(client->_internal.uri));
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(request_url_span, az_span_length(client->_internal.uri));
   request_url_span = az_span_copy(request_url_span, client->_internal.uri);
 
   // Headers buffer
@@ -305,7 +305,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
   uint8_t url_buffer[AZ_HTTP_REQUEST_URL_BUF_SIZE];
   az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
   // copy url from client
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(request_url_span, az_span_length(client->_internal.uri));
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(request_url_span, az_span_length(client->_internal.uri));
   request_url_span = az_span_copy(request_url_span, client->_internal.uri);
 
   // create request
@@ -340,7 +340,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_delete(
   uint8_t url_buffer[AZ_HTTP_REQUEST_URL_BUF_SIZE];
   az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
   // copy url from client
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(request_url_span, az_span_length(client->_internal.uri));
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(request_url_span, az_span_length(client->_internal.uri));
   request_url_span = az_span_copy(request_url_span, client->_internal.uri);
 
   uint8_t headers_buffer[_az_KEYVAULT_HTTP_REQUEST_HEADER_BUF_SIZE];

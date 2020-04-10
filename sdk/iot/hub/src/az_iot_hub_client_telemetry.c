@@ -39,7 +39,7 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_publish_topic_get(
     required_length += az_span_length(properties->_internal.properties);
   }
 
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(mqtt_topic, required_length);
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(mqtt_topic, required_length);
 
   mqtt_topic = az_span_copy(mqtt_topic, telemetry_topic_prefix);
   mqtt_topic = az_span_append(mqtt_topic, client->_internal.device_id);

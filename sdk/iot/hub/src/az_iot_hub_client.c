@@ -61,7 +61,7 @@ AZ_NODISCARD az_result az_iot_hub_client_user_name_get(
     required_length += az_span_length(*user_agent) + 1;
   }
 
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(mqtt_user_name, required_length);
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(mqtt_user_name, required_length);
 
   mqtt_user_name = az_span_copy(mqtt_user_name, client->_internal.iot_hub_hostname);
   mqtt_user_name = az_span_append_uint8(mqtt_user_name, hub_client_forward_slash);
@@ -104,7 +104,7 @@ AZ_NODISCARD az_result az_iot_hub_client_id_get(
     required_length += az_span_length(*module_id) + 1;
   }
 
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(mqtt_client_id, required_length);
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(mqtt_client_id, required_length);
 
   mqtt_client_id = az_span_copy(mqtt_client_id, client->_internal.device_id);
 
@@ -149,7 +149,7 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_append(
     required_length += prop_length + 1;
   }
 
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(prop_span, required_length);
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(prop_span, required_length);
 
   if (prop_length > 0)
   {

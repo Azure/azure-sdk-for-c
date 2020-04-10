@@ -66,7 +66,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_get_user_name(
   int32_t required_length
       = az_span_length(pnp_model_id) + az_span_length(client->_internal.root_interface_name) + 2;
 
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(mqtt_user_name, required_length);
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(mqtt_user_name, required_length);
 
   mqtt_user_name = az_span_append_uint8(mqtt_user_name, pnp_client_param_separator);
   mqtt_user_name = az_span_append(mqtt_user_name, pnp_model_id);

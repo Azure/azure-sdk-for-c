@@ -42,7 +42,8 @@ AZ_NODISCARD az_span az_span_slice(az_span span, int32_t start_index, int32_t en
   int32_t const capacity = az_span_capacity(span);
 
   end_index = end_index == -1 ? capacity : end_index;
-  return az_span_init(az_span_ptr(span) + start_index, end_index - start_index, capacity - start_index);
+  return az_span_init(
+      az_span_ptr(span) + start_index, end_index - start_index, capacity - start_index);
 }
 
 AZ_NODISCARD AZ_INLINE uint8_t _az_tolower(uint8_t value)
@@ -131,19 +132,25 @@ AZ_NODISCARD az_result az_span_to_uint32(az_span span, uint32_t* out_number)
 
 AZ_NODISCARD az_result az_span_find(az_span source, az_span target, az_span* out_span)
 {
-/* This function implements the Naive string-search algorithm.
- * The rationale to use this algorithm instead of other potentialy more 
- * performing ones (Rabin-Karp, e.g.) is due to no additional space needed.
- * The logic:
- * 1. The function will look into each position of `source` if it contains the same value as the first position of `target`.
- * 2. If it does, it could be that the next bytes in `source` are a perfect match of the remaining bytes of `target`.
- * 3. Being so, it loops through the remaining bytes of `target` and see if they match exactly the next bytes of `source`.
- * 4. If the loop gets to the end (all bytes of `target` are evaluated), it means `target` indeed occurs in that position of `source`.
- * 5. If the loop gets interrupted before cruising through the entire `target`, the function must go back to step 1. from  the next position in `source`.
- *    The loop in 5. gets interrupted if
- *    - a byte in `target` is different than `source`, in the expected corresponding position;
- *    - the loop has reached the end of `source` (and there are still remaing bytes of `target` to be checked).
- */
+  /* This function implements the Naive string-search algorithm.
+   * The rationale to use this algorithm instead of other potentialy more
+   * performing ones (Rabin-Karp, e.g.) is due to no additional space needed.
+   * The logic:
+   * 1. The function will look into each position of `source` if it contains the same value as the
+   * first position of `target`.
+   * 2. If it does, it could be that the next bytes in `source` are a perfect match of the remaining
+   * bytes of `target`.
+   * 3. Being so, it loops through the remaining bytes of `target` and see if they match exactly the
+   * next bytes of `source`.
+   * 4. If the loop gets to the end (all bytes of `target` are evaluated), it means `target` indeed
+   * occurs in that position of `source`.
+   * 5. If the loop gets interrupted before cruising through the entire `target`, the function must
+   * go back to step 1. from  the next position in `source`.
+   *   The loop in 5. gets interrupted if
+   *     - a byte in `target` is different than `source`, in the expected corresponding position;
+   *     - the loop has reached the end of `source` (and there are still remaing bytes of `target`
+   *         to be checked).
+   */
   AZ_PRECONDITION_VALID_SPAN(source, 1, false);
   AZ_PRECONDITION_VALID_SPAN(target, 1, false);
   AZ_PRECONDITION_NOT_NULL(out_span);
@@ -168,15 +175,16 @@ AZ_NODISCARD az_result az_span_find(az_span source, az_span target, az_span* out
         // Condition defined in step 5.
         if (source_ptr[i + j] != target_ptr[j])
         {
-            break;
+          break;
         }
       }
- 
+
       if (j == target_length)
       {
-        // All bytes in `target` have been checked and matched the corresponding bytes in `source` (from the start point `i`),
-        // so this is indeed an instance of `target` in that position of `source` (step 4.).
-        // Here we create a span in `source` to map the occurrence of `target` in `source` (pardon the redundancy of words, done for explicit clarity).
+        // All bytes in `target` have been checked and matched the corresponding bytes in `source`
+        // (from the start point `i`), so this is indeed an instance of `target` in that position of
+        // `source` (step 4.). Here we create a span in `source` to map the occurrence of `target`
+        // in `source` (pardon the redundancy of words, done for explicit clarity).
         *out_span = az_span_init(source_ptr + i, target_length, target_length);
 
         return AZ_OK;
@@ -184,7 +192,7 @@ AZ_NODISCARD az_result az_span_find(az_span source, az_span target, az_span* out
     }
   }
 
-  // If the function hasn't returned before, all positions 
+  // If the function hasn't returned before, all positions
   // of `source` have been evaluated but `target` could not be found.
   return AZ_ERROR_ITEM_NOT_FOUND;
 }
@@ -211,21 +219,19 @@ AZ_NODISCARD az_span az_span_token(az_span source, az_span delimiter, az_span* o
       int32_t instance_length = az_span_length(instance);
 
       *out_remainder = az_span_init(
-        instance_ptr + instance_length, 
-        (int32_t)(source_length - instance_length - (instance_ptr - source_ptr)),
-        (int32_t)(source_capacity - instance_length - (instance_ptr - source_ptr)));
+          instance_ptr + instance_length,
+          (int32_t)(source_length - instance_length - (instance_ptr - source_ptr)),
+          (int32_t)(source_capacity - instance_length - (instance_ptr - source_ptr)));
 
       return az_span_init(
-        source_ptr, 
-        (int32_t)(instance_ptr - source_ptr), 
-        (int32_t)(instance_ptr - source_ptr));
+          source_ptr, (int32_t)(instance_ptr - source_ptr), (int32_t)(instance_ptr - source_ptr));
     }
     else
     {
       *out_remainder = AZ_SPAN_NULL;
 
       return az_span_init(source_ptr, source_length, source_capacity);
-    } 
+    }
   }
 }
 
@@ -235,7 +241,7 @@ az_span az_span_copy(az_span destination, az_span source)
 
   int32_t src_len = az_span_length(source);
   uint8_t* ptr = az_span_ptr(destination);
-  memmove((void*)ptr, (void const*)az_span_ptr(source), (size_t)az_span_length(source));
+  memmove((void*)ptr, (void const*)az_span_ptr(source), (size_t)src_len);
   return az_span_init(ptr, src_len, az_span_capacity(destination));
 }
 
@@ -407,7 +413,11 @@ AZ_NODISCARD az_result _az_span_replace(az_span* self, int32_t start, int32_t en
 AZ_NODISCARD az_result az_span_append_dtoa(az_span destination, double source, az_span* out_span)
 {
   AZ_PRECONDITION_NOT_NULL(out_span);
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(destination, 1);
+
+  // Verify to make sure that the destination has at least one byte up front (for either a digit or
+  // the sign), since that's is common across all branches.
+  // We verify that the destination is large enough for more digits later.
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(destination, 1);
 
   uint64_t const* const source_bin_rep_view = (uint64_t*)&source;
 
@@ -442,7 +452,7 @@ AZ_NODISCARD az_result az_span_append_dtoa(az_span destination, double source, a
         }
       }
 
-      AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*out_span, digit_count);
+      AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(*out_span, digit_count);
 
       do
       {
@@ -475,7 +485,7 @@ AZ_INLINE uint8_t _az_decimal_to_ascii(uint8_t d) { return (uint8_t)(('0' + d) &
 
 static AZ_NODISCARD az_result _az_span_builder_append_uint64(az_span* self, uint64_t n)
 {
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*self, 1);
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(*self, 1);
 
   if (n == 0)
   {
@@ -492,7 +502,7 @@ static AZ_NODISCARD az_result _az_span_builder_append_uint64(az_span* self, uint
     digit_count--;
   }
 
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*self, digit_count);
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(*self, digit_count);
 
   while (div > 1)
   {
@@ -521,7 +531,7 @@ AZ_NODISCARD az_result az_span_append_i64toa(az_span destination, int64_t source
 
   if (source < 0)
   {
-    AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(destination, 1);
+    AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(destination, 1);
     *out_span = az_span_append(destination, AZ_SPAN_FROM_STR("-"));
     return _az_span_builder_append_uint64(out_span, (uint64_t)-source);
   }
@@ -532,7 +542,7 @@ AZ_NODISCARD az_result az_span_append_i64toa(az_span destination, int64_t source
 static AZ_NODISCARD az_result
 _az_span_builder_append_u32toa(az_span self, uint32_t n, az_span* out_span)
 {
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(self, 1);
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(self, 1);
 
   if (n == 0)
   {
@@ -549,7 +559,7 @@ _az_span_builder_append_u32toa(az_span self, uint32_t n, az_span* out_span)
     digit_count--;
   }
 
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(self, digit_count);
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(self, digit_count);
 
   *out_span = self;
 
@@ -582,7 +592,7 @@ AZ_NODISCARD az_result az_span_append_i32toa(az_span destination, int32_t source
 
   if (source < 0)
   {
-    AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(*out_span, 1);
+    AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(*out_span, 1);
     *out_span = az_span_append_uint8(*out_span, '-');
     source = -source;
   }

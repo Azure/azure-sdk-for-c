@@ -26,7 +26,7 @@ AZ_NODISCARD az_result az_iot_hub_client_c2d_subscribe_topic_filter_get(
   int32_t required_length = az_span_length(c2d_topic_prefix)
       + az_span_length(client->_internal.device_id) + az_span_length(c2d_topic_suffix) + 1;
 
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(mqtt_topic_filter, required_length);
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(mqtt_topic_filter, required_length);
 
   mqtt_topic_filter = az_span_copy(mqtt_topic_filter, c2d_topic_prefix);
   mqtt_topic_filter = az_span_append(mqtt_topic_filter, client->_internal.device_id);

@@ -31,7 +31,7 @@ static az_result _az_add_telemetry_property(
     required_length++;
   }
 
-  AZ_RETURN_IF_SPAN_CAPACITY_TOO_SMALL(mqtt_topic, required_length);
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(mqtt_topic, required_length);
 
   if (add_separator)
   {
