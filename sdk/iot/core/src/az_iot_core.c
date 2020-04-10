@@ -10,7 +10,7 @@
 
 #include <_az_cfg.h>
 
-az_result az_iot_get_status(uint32_t status_int, az_iot_status* status)
+AZ_NODISCARD az_result az_iot_get_status(uint32_t status_int, az_iot_status* status)
 {
   switch(status_int)
   {
