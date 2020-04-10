@@ -12,7 +12,7 @@
 
 AZ_NODISCARD az_result az_iot_get_status(uint32_t status_int, az_iot_status* status)
 {
-  switch(status_int)
+  switch (status_int)
   {
     case AZ_IOT_STATUS_OK:
       *status = AZ_IOT_STATUS_OK;
@@ -90,7 +90,8 @@ AZ_NODISCARD az_span az_span_token(az_span source, az_span delimiter, az_span* o
 
     if (index != -1)
     {
-      *out_remainder = az_span_slice(source, index + az_span_length(delimiter), az_span_length(source));
+      *out_remainder
+          = az_span_slice(source, index + az_span_length(delimiter), az_span_length(source));
 
       return az_span_slice(source, 0, index);
     }
@@ -99,6 +100,6 @@ AZ_NODISCARD az_span az_span_token(az_span source, az_span delimiter, az_span* o
       *out_remainder = AZ_SPAN_NULL;
 
       return source;
-    } 
+    }
   }
 }
