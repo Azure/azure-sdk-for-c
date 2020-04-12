@@ -25,14 +25,21 @@ static az_result _az_add_telemetry_property(
     bool add_separator,
     az_span* out_mqtt_topic)
 {
+  int32_t required_length = az_span_length(property_name) + az_span_length(property_value) + 1;
   if (add_separator)
   {
-    AZ_RETURN_IF_FAILED(
-        az_span_append_uint8(mqtt_topic, pnp_telemetry_param_separator, &mqtt_topic));
+    required_length++;
   }
-  AZ_RETURN_IF_FAILED(az_span_append(mqtt_topic, property_name, &mqtt_topic));
-  AZ_RETURN_IF_FAILED(az_span_append_uint8(mqtt_topic, pnp_telemetry_param_equals, &mqtt_topic));
-  AZ_RETURN_IF_FAILED(az_span_append(mqtt_topic, property_value, &mqtt_topic));
+
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(mqtt_topic, required_length);
+
+  if (add_separator)
+  {
+    mqtt_topic = az_span_append_uint8(mqtt_topic, pnp_telemetry_param_separator);
+  }
+  mqtt_topic = az_span_append(mqtt_topic, property_name);
+  mqtt_topic = az_span_append_uint8(mqtt_topic, pnp_telemetry_param_equals);
+  mqtt_topic = az_span_append(mqtt_topic, property_value);
 
   *out_mqtt_topic = mqtt_topic;
 

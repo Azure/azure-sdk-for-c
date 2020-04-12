@@ -291,14 +291,11 @@ AZ_NODISCARD int32_t az_span_find(az_span source, az_span target);
  *
  * @param[in] destination The az_span where the byte should be appended to.
  * @param[in] byte The uint8 to append to the destination span
- * @param[out] out_span A pointer to an az_span that receives the span referring to the
- * destination span with its length increased by 1
- * @return An #az_result value indicating the result of the operation.
- *          #AZ_OK if successful
- *          #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the destination is not big enough to
- * contain the appended byte
+ * @return An #az_span that is a clone of the \p destination span with its length increased by 1.
+ *         The method assumes that the \p destination has a large enough capacity to hold one more
+ * byte.
  */
-AZ_NODISCARD az_result az_span_append_uint8(az_span destination, uint8_t byte, az_span* out_span);
+az_span az_span_append_uint8(az_span destination, uint8_t byte);
 
 /**
  * @brief az_span_append appends the bytes referred to by the source span into the
@@ -306,14 +303,11 @@ AZ_NODISCARD az_result az_span_append_uint8(az_span destination, uint8_t byte, a
  *
  * @param[in] destination The az_span where the bytes should be appended to.
  * @param[in] source Refers to the bytes to be appended to the destination
- * @param[out] out_span A pointer to an az_span that receives the span referring to the
- * destination span with its length updated.
- * @return An #az_result value indicating the result of the operation.
- *          #AZ_OK if successful
- *          #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the \p destination is not big enough to
- *  contain the appended bytes.
+ * @return An #az_span that is a clone of the \p destination span with its length increased by the
+ * \p source length. The method assumes that the \p destination has a large enough capacity to hold
+ * the \p source.
  */
-AZ_NODISCARD az_result az_span_append(az_span destination, az_span source, az_span* out_span);
+az_span az_span_append(az_span destination, az_span source);
 
 /**
  * @brief az_span_append_i32toa appends an int32 as digit characters to the destination
@@ -418,14 +412,11 @@ AZ_INLINE void az_span_set(az_span destination, uint8_t fill)
  *
  * @param[in] destination The span whose bytes will be replaced by the source's bytes
  * @param[in] source The span containing the bytes to copy to the destination
- * @param[out] out_span A pointer to an az_span that receives the span referring to the destination
- * span with its length updated
- * @return An #az_result value indicating the result of the operation.
- *          #AZ_OK if successful
- *          #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the \p destination is not big enough to hold the
- * source's length
+ * @return An #az_span that is a clone of the \p destination span with its length updated to the \p
+ * source length. The method assumes that the \p destination has a large enough capacity to hold the
+ * \p source.
  */
-AZ_NODISCARD az_result az_span_copy(az_span destination, az_span source, az_span* out_span);
+az_span az_span_copy(az_span destination, az_span source);
 
 /**
  * @brief az_span_copy_url_encode Copies a URL in the source span to the destination span by

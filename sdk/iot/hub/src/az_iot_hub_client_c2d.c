@@ -23,13 +23,15 @@ AZ_NODISCARD az_result az_iot_hub_client_c2d_subscribe_topic_filter_get(
   AZ_PRECONDITION_VALID_SPAN(mqtt_topic_filter, 0, false);
   AZ_PRECONDITION_NOT_NULL(out_mqtt_topic_filter);
 
-  AZ_RETURN_IF_FAILED(az_span_copy(mqtt_topic_filter, c2d_topic_prefix, &mqtt_topic_filter));
-  AZ_RETURN_IF_FAILED(
-      az_span_append(mqtt_topic_filter, client->_internal.device_id, &mqtt_topic_filter));
-  AZ_RETURN_IF_FAILED(
-      az_span_append(mqtt_topic_filter, c2d_topic_suffix, &mqtt_topic_filter));
-  AZ_RETURN_IF_FAILED(
-      az_span_append_uint8(mqtt_topic_filter, hash_tag, &mqtt_topic_filter));
+  int32_t required_length = az_span_length(c2d_topic_prefix)
+      + az_span_length(client->_internal.device_id) + az_span_length(c2d_topic_suffix) + 1;
+
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(mqtt_topic_filter, required_length);
+
+  mqtt_topic_filter = az_span_copy(mqtt_topic_filter, c2d_topic_prefix);
+  mqtt_topic_filter = az_span_append(mqtt_topic_filter, client->_internal.device_id);
+  mqtt_topic_filter = az_span_append(mqtt_topic_filter, c2d_topic_suffix);
+  mqtt_topic_filter = az_span_append_uint8(mqtt_topic_filter, hash_tag);
 
   *out_mqtt_topic_filter = mqtt_topic_filter;
 
