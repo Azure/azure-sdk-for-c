@@ -14,6 +14,9 @@
 
 #ifdef _MSC_VER
 
+// Disable warnings:
+// -----------------
+
 // warning C4061: enumerator 'AZ_OK' in switch of enum 'az_result' is not explicitly handled by a
 // case label
 #pragma warning(disable : 4061)
@@ -38,6 +41,12 @@
 // warning C6387: 'str' could be '0':  this does not adhere to the specification for the function
 // 'strlen' Using AZ_PRECONDITION_NOT_NULL
 #pragma warning(disable : 6387)
+
+// Treat warnings as errors:
+// -------------------------
+
+// warning C4710: '...': function not inlined
+#pragma warning(error : 4710)
 
 #endif // _MSC_VER
 
