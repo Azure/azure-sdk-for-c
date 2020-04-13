@@ -53,7 +53,8 @@ void test_http_request(void** state)
     memset(header_buf, 0, sizeof(header_buf));
 
     az_span url_span = AZ_SPAN_FROM_BUFFER(buf);
-    TEST_EXPECT_SUCCESS(az_span_append(url_span, hrb_url, &url_span));
+    url_span = az_span_append(url_span, hrb_url);
+    assert_int_equal(az_span_length(url_span), az_span_length(hrb_url));
     az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
     _az_http_request hrb;
 

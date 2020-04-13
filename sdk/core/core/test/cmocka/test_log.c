@@ -114,16 +114,16 @@ void test_az_log(void** state)
   uint8_t response_buf[1024] = { 0 };
   az_span response_builder = AZ_SPAN_FROM_BUFFER(response_buf);
 
-  TEST_EXPECT_SUCCESS(az_span_append(
-      response_builder,
-      AZ_SPAN_FROM_STR("HTTP/1.1 404 Not Found\r\n"
-                       "Header11: Value11\r\n"
-                       "Header22: NNNNOOOOPPPPQQQQRRRRSSSSTTTTUUUUVVVVWWWWXXXXYYYYZZZZ\r\n"
-                       "Header33:\r\n"
-                       "Header44: cba888888777777666666555555444444333333222222111111\r\n"
-                       "\r\n"
-                       "KKKKKJJJJJIIIIIHHHHHGGGGGFFFFFEEEEEDDDDDCCCCCBBBBBAAAAA"),
-      &response_builder));
+  az_span response_span
+      = AZ_SPAN_FROM_STR("HTTP/1.1 404 Not Found\r\n"
+                         "Header11: Value11\r\n"
+                         "Header22: NNNNOOOOPPPPQQQQRRRRSSSSTTTTUUUUVVVVWWWWXXXXYYYYZZZZ\r\n"
+                         "Header33:\r\n"
+                         "Header44: cba888888777777666666555555444444333333222222111111\r\n"
+                         "\r\n"
+                         "KKKKKJJJJJIIIIIHHHHHGGGGGFFFFFEEEEEDDDDDCCCCCBBBBBAAAAA");
+  response_builder = az_span_append(response_builder, response_span);
+  assert_int_equal(az_span_length(response_builder), az_span_length(response_span));
 
   az_http_response response = { 0 };
   TEST_EXPECT_SUCCESS(az_http_response_init(&response, response_builder));

@@ -46,7 +46,8 @@ AZ_NODISCARD az_result az_http_request_init(
                                 .query_start
                                 = url_with_query == AZ_ERROR_ITEM_NOT_FOUND ? 0 : query_start,
                                 .headers = headers_buffer,
-                                .max_headers = az_span_capacity(headers_buffer) / (int32_t)sizeof(az_pair),
+                                .max_headers
+                                = az_span_capacity(headers_buffer) / (int32_t)sizeof(az_pair),
                                 .retry_headers_start_byte_offset = 0,
                                 .body = body,
                             } };
@@ -93,26 +94,34 @@ az_http_request_set_query_parameter(_az_http_request* p_request, az_span name, a
   // name or value can't be empty
   AZ_PRECONDITION(az_span_length(name) > 0 && az_span_length(value) > 0);
 
+  int32_t required_length = az_span_length(name) + az_span_length(name) + 2;
+
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(p_request->_internal.url, required_length);
+
   // Append either '?' or '&'
-  AZ_RETURN_IF_FAILED(az_span_append(
-      p_request->_internal.url,
-      p_request->_internal.query_start == 0 ? AZ_SPAN_FROM_STR("?") : AZ_SPAN_FROM_STR("&"),
-      &p_request->_internal.url));
-  // update QPs starting position when it's 0
+  uint8_t separator;
   if (p_request->_internal.query_start == 0)
   {
-    p_request->_internal.query_start = az_span_length(p_request->_internal.url);
+    separator = '?';
+
+    // update QPs starting position when it's 0
+    p_request->_internal.query_start = az_span_length(p_request->_internal.url) + 1;
+  }
+  else
+  {
+    separator = '&';
   }
 
+  p_request->_internal.url = az_span_append_uint8(p_request->_internal.url, separator);
+
   // Append parameter name
-  AZ_RETURN_IF_FAILED(az_span_append(p_request->_internal.url, name, &p_request->_internal.url));
+  p_request->_internal.url = az_span_append(p_request->_internal.url, name);
 
   // Append equal sym
-  AZ_RETURN_IF_FAILED(
-      az_span_append(p_request->_internal.url, AZ_SPAN_FROM_STR("="), &p_request->_internal.url));
+  p_request->_internal.url = az_span_append_uint8(p_request->_internal.url, '=');
 
   // Parameter value
-  AZ_RETURN_IF_FAILED(az_span_append(p_request->_internal.url, value, &p_request->_internal.url));
+  p_request->_internal.url = az_span_append(p_request->_internal.url, value);
 
   return AZ_OK;
 }
@@ -129,10 +138,14 @@ az_http_request_append_header(_az_http_request* p_request, az_span key, az_span 
   az_span* headers_ptr = &p_request->_internal.headers;
 
   az_pair header_to_append = az_pair_init(key, value);
-  return az_span_append(
+
+  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(*headers_ptr, (int32_t)sizeof header_to_append);
+
+  *headers_ptr = az_span_append(
       *headers_ptr,
-      az_span_init((uint8_t*)&header_to_append, sizeof header_to_append, sizeof header_to_append),
-      headers_ptr);
+      az_span_init((uint8_t*)&header_to_append, sizeof header_to_append, sizeof header_to_append));
+
+  return AZ_OK;
 }
 
 AZ_NODISCARD az_result

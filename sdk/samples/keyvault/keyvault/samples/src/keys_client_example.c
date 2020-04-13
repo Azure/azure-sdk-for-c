@@ -123,14 +123,16 @@ int main()
   // version is still at http_response. Let's copy it to a new buffer
   uint8_t version_buf[40];
   az_span version_builder = AZ_SPAN_FROM_BUFFER(version_buf);
-  az_result const ap_res = az_span_append(version_builder, version, &version_builder);
-
-  if (az_failed(ap_res))
+  if ((az_span_capacity(version_builder) - az_span_length(version_builder))
+      < az_span_length(version))
   {
     printf("Failed to append key version");
   }
-
-  version = az_span_slice(version_builder, 0, az_span_length(version_builder));
+  else
+  {
+    version_builder = az_span_append(version_builder, version);
+    version = az_span_slice(version_builder, 0, az_span_length(version_builder));
+  }
 
   // Reuse response buffer for delete Key by creating a new span from response_buffer
   az_result const reset2_op = az_http_response_init(&http_response, response_span);
