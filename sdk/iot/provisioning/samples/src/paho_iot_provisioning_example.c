@@ -121,7 +121,7 @@ static az_result read_configuration_and_init_client()
 
 static int on_received(void* context, char* topicName, int topicLen, MQTTClient_message* message)
 {
-  UNUSED(context);
+  (void)context;
 
   int i;
   char* payloadptr;
