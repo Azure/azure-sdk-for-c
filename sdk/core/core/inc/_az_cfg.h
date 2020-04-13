@@ -91,8 +91,4 @@
 // Get the number of elements in an array
 #define _az_COUNTOF(array) (sizeof(array) / sizeof(array[0]))
 
-#ifndef UNUSED
-#define UNUSED(x) (void)(x)
-#endif
-
 #endif // _az_CFG_H
