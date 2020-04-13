@@ -41,9 +41,25 @@ AZ_NODISCARD az_span az_span_slice(az_span span, int32_t start_index, int32_t en
 
   int32_t const capacity = az_span_capacity(span);
 
-  end_index = end_index == -1 ? capacity : end_index;
-  return az_span_init(
-      az_span_ptr(span) + start_index, end_index - start_index, capacity - start_index);
+  int32_t new_length;
+
+  // If end_index == -1, slice to the end of the span's length.
+  if (end_index == -1)
+  {
+    new_length = az_span_length(span) - start_index;
+    // Slicing beyond the length is allowed as long as it is within its capacity.
+    // Make sure that length is clamped at the bottom by 0, so it doesn't become negative.
+    if (new_length < 0)
+    {
+      new_length = 0;
+    }
+  }
+  else
+  {
+    new_length = end_index - start_index;
+  }
+
+  return az_span_init(az_span_ptr(span) + start_index, new_length, capacity - start_index);
 }
 
 AZ_NODISCARD AZ_INLINE uint8_t _az_tolower(uint8_t value)

@@ -14,6 +14,27 @@
 
 #include <_az_cfg.h>
 
+static void az_span_slice_test()
+{
+  uint8_t raw_buffer[20];
+  az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer);
+  buffer = az_span_append_uint8(buffer, 'a');
+  buffer = az_span_append_uint8(buffer, 'b');
+  buffer = az_span_append_uint8(buffer, 'c');
+  buffer = az_span_append_uint8(buffer, 'd');
+
+  assert_int_equal(az_span_length(buffer), 4);
+  assert_int_equal(az_span_capacity(buffer), 20);
+
+  az_span result = az_span_slice(buffer, 1, -1);
+  assert_int_equal(az_span_length(result), 3);
+  assert_int_equal(az_span_capacity(result), 19);
+
+  result = az_span_slice(buffer, 5, -1);
+  assert_int_equal(az_span_length(result), 0);
+  assert_int_equal(az_span_capacity(result), 15);
+}
+
 static void az_single_char_ascii_lower_test()
 {
   for (uint8_t i = 0; i <= SCHAR_MAX; ++i)
@@ -345,6 +366,8 @@ static void az_span_find_overlapping_checks_success()
 void test_az_span(void** state)
 {
   (void)state;
+
+  az_span_slice_test();
 
   az_span_append_uint8_succeeds();
 
