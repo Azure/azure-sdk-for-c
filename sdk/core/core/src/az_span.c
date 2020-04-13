@@ -42,7 +42,7 @@ AZ_NODISCARD az_span az_span_slice(az_span span, int32_t start_index, int32_t en
   int32_t const capacity = az_span_capacity(span);
 
   int32_t new_length;
-  
+
   // If end_index == -1, slice to the end of the span's length.
   if (end_index == -1)
   {
