@@ -107,7 +107,7 @@ AZ_INLINE AZ_NODISCARD az_result _az_http_policy_retry_get_retry_after(
     {
       if (az_span_is_content_equal_ignoring_case(header.key, AZ_SPAN_FROM_STR("retry-after-ms"))
           || az_span_is_content_equal_ignoring_case(
-              header.key, AZ_SPAN_FROM_STR("x-ms-retry-after-ms")))
+                 header.key, AZ_SPAN_FROM_STR("x-ms-retry-after-ms")))
       {
         // The value is in milliseconds.
         int32_t const msec = _az_uint32_span_to_int32(header.value);
@@ -158,6 +158,8 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
   int32_t const retry_delay_msec = retry_options->retry_delay_msec;
   int32_t const max_retry_delay_msec = retry_options->max_retry_delay_msec;
   az_http_status_code const* const status_codes = retry_options->status_codes;
+
+  AZ_RETURN_IF_FAILED(_az_http_request_mark_retry_headers_start(p_request));
 
   az_context* const context = p_request->_internal.context;
 

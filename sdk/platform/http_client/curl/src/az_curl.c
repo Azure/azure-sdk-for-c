@@ -109,7 +109,7 @@ _az_span_append_header_to_buffer(az_span writable_buffer, az_pair header, az_spa
   writable_buffer = az_span_append(writable_buffer, header.key);
   writable_buffer = az_span_append(writable_buffer, separator);
   writable_buffer = az_span_append(writable_buffer, header.value);
-  writable_buffer = az_span_append_uint8(writable_buffer, '0');
+  writable_buffer = az_span_append_uint8(writable_buffer, 0);
 
   return AZ_OK;
 }
@@ -209,7 +209,7 @@ _az_http_client_curl_append_url(az_span writable_buffer, az_span url_from_reques
   AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(writable_buffer, required_length);
 
   writable_buffer = az_span_append(writable_buffer, url_from_request);
-  writable_buffer = az_span_append_uint8(writable_buffer, '0');
+  writable_buffer = az_span_append_uint8(writable_buffer, 0);
 
   return AZ_OK;
 }
@@ -538,8 +538,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
   {
     AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(response->_internal.http_response, 1);
 
-    response->_internal.http_response
-        = az_span_append_uint8(response->_internal.http_response, '0');
+    response->_internal.http_response = az_span_append_uint8(response->_internal.http_response, 0);
   }
   return result;
 }
