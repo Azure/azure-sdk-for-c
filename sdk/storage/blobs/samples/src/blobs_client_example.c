@@ -18,6 +18,15 @@
 #define URI_ENV "test_uri"
 
 int exit_code = 0;
+static az_span content_to_upload = AZ_SPAN_LITERAL_FROM_STR("Some test Content");
+
+/*
+* uncomment this to enable logging
+{
+  (void)classification;
+  printf("%.*s\n", az_span_length(message), az_span_ptr(message));
+}
+ */
 
 /**
  * @brief Returns blob content in buffer
@@ -52,7 +61,15 @@ az_storage_blobs_blob_download(az_storage_blobs_blob_client* client, az_http_res
       AZ_SPAN_NULL));
 
   // start pipeline
-  return az_http_pipeline_process(&client->_internal.pipeline, &hrb, response);
+  AZ_RETURN_IF_FAILED(az_http_pipeline_process(&client->_internal.pipeline, &hrb, response));
+
+  az_span body = { 0 };
+  AZ_RETURN_IF_FAILED(az_http_response_get_body(response, &body));
+
+  // do anything with the body, like print it out maybe
+  printf("%.*s\n", az_span_length(body), az_span_ptr(body));
+
+  return AZ_OK;
 }
 
 static AZ_NODISCARD az_result
@@ -86,6 +103,11 @@ az_storage_blobs_blob_delete(az_storage_blobs_blob_client* client, az_http_respo
 
 int main()
 {
+  /* Uncomment this to enable logging all http responses
+  az_log_classification const classifications[] = { AZ_LOG_HTTP_RESPONSE, AZ_LOG_END_OF_LIST };
+  az_log_set_classifications(classifications);
+  az_log_set_callback(test_log_func); */
+
   // Init client.
   //  Example expects the URI_ENV to be a URL w/ SAS token
   az_storage_blobs_blob_client client = { 0 };
@@ -101,7 +123,7 @@ int main()
   /******* Create a buffer for response (will be reused for all requests)   *****/
   uint8_t response_buffer[1024 * 4] = { 0 };
   az_http_response http_response = { 0 };
-  az_result const init_http_response_result
+  az_result init_http_response_result
       = az_http_response_init(&http_response, AZ_SPAN_FROM_BUFFER(response_buffer));
 
   if (az_failed(init_http_response_result))
@@ -109,12 +131,9 @@ int main()
     printf("Failed to init http response");
   }
 
+  printf("Uploading blob...\n");
   az_result const create_result = az_storage_blobs_blob_upload(
-      &client,
-      &az_context_app,
-      AZ_SPAN_FROM_STR("Some Test Content for the new blob"),
-      NULL,
-      &http_response);
+      &client, &az_context_app, content_to_upload, NULL, &http_response);
 
   // validate sample running with no_op http client
   if (create_result == AZ_ERROR_NOT_IMPLEMENTED)
@@ -130,6 +149,11 @@ int main()
     printf("Failed to create blob");
   }
 
+  // clear response to be reused
+  init_http_response_result
+      = az_http_response_init(&http_response, AZ_SPAN_FROM_BUFFER(response_buffer));
+
+  printf("Downloading blob and printing it below:\n\n");
   az_result const get_result = az_storage_blobs_blob_download(&client, &http_response);
 
   if (az_failed(get_result))
@@ -137,6 +161,11 @@ int main()
     printf("Failed to get blob");
   }
 
+  // clear response to be reused
+  init_http_response_result
+      = az_http_response_init(&http_response, AZ_SPAN_FROM_BUFFER(response_buffer));
+
+  printf("\nDeleting blob\n");
   az_result const delete_result = az_storage_blobs_blob_delete(&client, &http_response);
 
   if (az_failed(delete_result))
@@ -144,5 +173,6 @@ int main()
     printf("Failed to delete blob");
   }
 
+  printf("Sample finished\n");
   return exit_code;
 }
