@@ -348,14 +348,18 @@ static int32_t _az_http_client_curl_upload_read_callback(
   if (userdata_length < 1)
     return CURLE_OK; // Success, all bytes copied
 
+  // Calculate how many bytes can we copy from customer data (upload_content)
+  // Curl provides dst buffer with a max size of dest_buffer_size, if customer data size is less
+  // than the max, we can copy all customer data directly and have it uploaded at once.
+  // If not, we can only copy the max dst size from customer data and wait for another upload to
+  // copy a next chunk of data
   int32_t size_of_copy = (userdata_length < dst_buffer_size) ? userdata_length : dst_buffer_size;
 
   memcpy(dst, az_span_ptr(*upload_content), (size_t)size_of_copy);
 
-  // Update the userdata span
-  //  ptr will point to remaining data to be copied
-  //  length and capacity are set to the size of the remaining content
-  *upload_content = az_span_slice(*upload_content, dst_buffer_size, -1);
+  // Update the userdata span. If we already copied all content, slice will set upload_content with
+  // 0 length
+  *upload_content = az_span_slice(*upload_content, size_of_copy, -1);
 
   return size_of_copy;
 }
