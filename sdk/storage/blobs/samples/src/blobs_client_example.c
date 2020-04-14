@@ -123,7 +123,7 @@ int main()
   /******* Create a buffer for response (will be reused for all requests)   *****/
   uint8_t response_buffer[1024 * 4] = { 0 };
   az_http_response http_response = { 0 };
-  az_result init_http_response_result
+  az_result const init_http_response_result
       = az_http_response_init(&http_response, AZ_SPAN_FROM_BUFFER(response_buffer));
 
   if (az_failed(init_http_response_result))
@@ -149,10 +149,6 @@ int main()
     printf("Failed to create blob");
   }
 
-  // clear response to be reused
-  init_http_response_result
-      = az_http_response_init(&http_response, AZ_SPAN_FROM_BUFFER(response_buffer));
-
   printf("Downloading blob and printing it below:\n\n");
   az_result const get_result = az_storage_blobs_blob_download(&client, &http_response);
 
@@ -160,10 +156,6 @@ int main()
   {
     printf("Failed to get blob");
   }
-
-  // clear response to be reused
-  init_http_response_result
-      = az_http_response_init(&http_response, AZ_SPAN_FROM_BUFFER(response_buffer));
 
   printf("\nDeleting blob\n");
   az_result const delete_result = az_storage_blobs_blob_delete(&client, &http_response);
