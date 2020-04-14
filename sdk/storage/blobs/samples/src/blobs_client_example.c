@@ -22,6 +22,7 @@ static az_span content_to_upload = AZ_SPAN_LITERAL_FROM_STR("Some test Content")
 
 /*
 * uncomment this to enable logging
+static void test_log_func(az_log_classification classification, az_span message)
 {
   (void)classification;
   printf("%.*s\n", az_span_length(message), az_span_ptr(message));
