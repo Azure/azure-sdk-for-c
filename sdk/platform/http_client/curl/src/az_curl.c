@@ -357,7 +357,7 @@ static int32_t _az_http_client_curl_upload_read_callback(
 
   memcpy(dst, az_span_ptr(*upload_content), (size_t)size_of_copy);
 
-  // Update the userdata span. If we already copied all content, slice will let upload_content with
+  // Update the userdata span. If we already copied all content, slice will set upload_content with
   // 0 length
   *upload_content = az_span_slice(*upload_content, size_of_copy, -1);
 
