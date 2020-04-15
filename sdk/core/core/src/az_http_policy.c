@@ -105,7 +105,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_transport(
   (void)p_policies; // this is the last policy in the pipeline, we just void it
   (void)p_data;
 
-  // make sure the response is reset (in case it is a re-usable response)
+  // make sure the response is resetted
   _az_http_response_reset(p_response);
 
   return az_http_client_send_request(p_request, p_response);
