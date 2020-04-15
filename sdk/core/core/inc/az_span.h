@@ -199,31 +199,6 @@ AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1, az_span 
 AZ_NODISCARD az_result
 az_span_to_str(char* destination, int32_t destination_max_size, az_span source);
 
-/******************************  SPAN PARSING */
-
-/**
- * @brief az_span_to_uint64 parses an az_span containing ASCII digits into a uint64 number
- *
- * @param[in] span The az_span containing the ASCII digits to be parsed.
- * @param[in] out_number The pointer to the variable that is to receive the number
- * @return An #az_result value indicating the result of the operation.
- *          #AZ_OK if successful
- *          #AZ_ERROR_PARSER_UNEXPECTED_CHAR if a non-ASCII digit is found within the span.
- */
-
-AZ_NODISCARD az_result az_span_to_uint64(az_span span, uint64_t* out_number);
-
-/**
- * @brief az_span_to_uint32 parses an az_span containing ASCII digits into a uint32 number
- *
- * @param span The az_span containing the ASCII digits to be parsed.
- * @param out_number The pointer to the variable that is to receive the number
- * @return An #az_result value indicating the result of the operation.
- *          #AZ_OK if successful
- *          #AZ_ERROR_PARSER_UNEXPECTED_CHAR if a non-ASCII digit is found within the span.
- */
-AZ_NODISCARD az_result az_span_to_uint32(az_span span, uint32_t* out_number);
-
 /**
  * @brief az_span_find searches for `target` in `source`, returning an #az_span within `source` if
  * it finds it.
@@ -281,8 +256,44 @@ AZ_NODISCARD az_result
 az_span_copy_url_encode(az_span destination, az_span source, az_span* out_span);
 
 /**
- * @brief az_span_copy_i32toa copies an int32 as digit characters to the destination starting at its
- * 0-th index.
+ * @brief az_span_fill Fills all the bytes of the destination span with the specified value.
+ *
+ * @param[in] destination The span whose bytes will be set to \p value.
+ * @param[in] value The byte to be replicated within the destination span.
+ */
+AZ_INLINE void az_span_fill(az_span destination, uint8_t value)
+{
+  memset(az_span_ptr(destination), value, (size_t)az_span_size(destination));
+}
+
+/******************************  SPAN PARSING AND FORMATTING */
+
+/**
+ * @brief az_span_atou64 Parses an az_span containing ASCII digits into a uint64 number.
+ *
+ * @param[in] span The az_span containing the ASCII digits to be parsed.
+ * @param[in] out_number The pointer to the variable that is to receive the number
+ * @return An #az_result value indicating the result of the operation.
+ *          #AZ_OK if successful
+ *          #AZ_ERROR_PARSER_UNEXPECTED_CHAR if a non-ASCII digit is found within the span.
+ */
+
+AZ_NODISCARD az_result az_span_atou64(az_span span, uint64_t* out_number);
+
+/**
+ * @brief az_span_atou Parses an az_span containing ASCII digits into a uint32 number.
+ *
+ * @param span The az_span containing the ASCII digits to be parsed.
+ * @param out_number The pointer to the variable that is to receive the number
+ * @return An #az_result value indicating the result of the operation.
+ *          #AZ_OK if successful
+ *          #AZ_ERROR_PARSER_UNEXPECTED_CHAR if a non-ASCII digit is found within the span.
+ */
+AZ_NODISCARD az_result az_span_atou(az_span span, uint32_t* out_number);
+
+/**
+ * @brief az_span_itoa Converts an int32 into its digit characters and copies them to the
+ * destination span starting at its 0-th index.
  *
  * @param[in] destination The az_span where the bytes should be copied to.
  * @param[in] source The int32 whose number is copied to the destination span as ASCII digits.
@@ -293,11 +304,11 @@ az_span_copy_url_encode(az_span destination, az_span source, az_span* out_span);
  *          #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the \p destination is not big enough to contain
  * the copied bytes
  */
-AZ_NODISCARD az_result az_span_copy_i32toa(az_span destination, int32_t source, az_span* out_span);
+AZ_NODISCARD az_result az_span_itoa(az_span destination, int32_t source, az_span* out_span);
 
 /**
- * @brief az_span_copy_u32toa copies a uint32 as digit characters to the destination starting at its
- * 0-th index.
+ * @brief az_span_utoa Converts a uint32 into its digit characters and copies them to the
+ * destination span starting at its 0-th index.
  *
  * @param[in] destination The az_span where the bytes should be copied to.
  * @param[in] source The uint32 whose number is copied to the destination span as ASCII digits.
@@ -308,11 +319,11 @@ AZ_NODISCARD az_result az_span_copy_i32toa(az_span destination, int32_t source, 
  *          #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the destination is not big enough to contain the
  * copied bytes
  */
-AZ_NODISCARD az_result az_span_copy_u32toa(az_span destination, uint32_t source, az_span* out_span);
+AZ_NODISCARD az_result az_span_utoa(az_span destination, uint32_t source, az_span* out_span);
 
 /**
- * @brief az_span_copy_i64toa copies an int64 as digit characters to the destination starting at its
- * 0-th index.
+ * @brief az_span_i64toa Converts an int64 into its digit characters and copies them to the
+ * destination span starting at its 0-th index.
  *
  * @param[in] destination The az_span where the bytes should be copied to.
  * @param[in] source The int64 whose number is copied to the destination span as ASCII digits.
@@ -323,11 +334,11 @@ AZ_NODISCARD az_result az_span_copy_u32toa(az_span destination, uint32_t source,
  *          #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the destination is not big enough to contain the
  * copied bytes
  */
-AZ_NODISCARD az_result az_span_copy_i64toa(az_span destination, int64_t source, az_span* out_span);
+AZ_NODISCARD az_result az_span_i64toa(az_span destination, int64_t source, az_span* out_span);
 
 /**
- * @brief az_span_copy_u64toa copies a uint64 as digit characters to the destination starting at its
- * 0-th index.
+ * @brief az_span_u64toa Converts a uint64 into its digit characters and copies them to the
+ * destination span starting at its 0-th index.
  *
  * @param[in] destination The az_span where the bytes should be copied to.
  * @param[in] source The uint64 whose number is copied to the destination span as ASCII digits.
@@ -338,11 +349,11 @@ AZ_NODISCARD az_result az_span_copy_i64toa(az_span destination, int64_t source, 
  *          #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the destination is not big enough to contain the
  * copied bytes
  */
-AZ_NODISCARD az_result az_span_copy_u64toa(az_span destination, uint64_t source, az_span* out_span);
+AZ_NODISCARD az_result az_span_u64toa(az_span destination, uint64_t source, az_span* out_span);
 
 /**
- * @brief az_span_copy_dtoa copies a double as digit characters to the destination starting at its
- * 0-th index.
+ * @brief az_span_dtoa Converts a double into its digit characters and copies them to the
+ * destination span starting at its 0-th index.
  *
  * @param[in] destination The az_span where the bytes should be copied to.
  * @param[in] source The double whose number is copied to the destination span as ASCII digits.
@@ -353,18 +364,7 @@ AZ_NODISCARD az_result az_span_copy_u64toa(az_span destination, uint64_t source,
  *          #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the destination is not big enough to contain the
  * copied bytes
  */
-AZ_NODISCARD az_result az_span_copy_dtoa(az_span destination, double source, az_span* out_span);
-
-/**
- * @brief az_span_fill Fills all the bytes of the destination span with the specified value.
- *
- * @param[in] destination The span whose bytes will be set to \p value.
- * @param[in] value The byte to be replicated within the destination span.
- */
-AZ_INLINE void az_span_fill(az_span destination, uint8_t value)
-{
-  memset(az_span_ptr(destination), value, (size_t)az_span_size(destination));
-}
+AZ_NODISCARD az_result az_span_dtoa(az_span destination, double source, az_span* out_span);
 
 /******************************  SPAN PAIR  */
 

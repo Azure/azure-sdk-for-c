@@ -48,13 +48,13 @@ AZ_INLINE az_result _az_http_policy_retry_append_http_retry_msg(
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(*ref_log_msg, az_span_size(retry_count_string));
   az_span remainder = az_span_copy(*ref_log_msg, retry_count_string);
 
-  AZ_RETURN_IF_FAILED(az_span_copy_i32toa(remainder, (int32_t)attempt, &remainder));
+  AZ_RETURN_IF_FAILED(az_span_itoa(remainder, (int32_t)attempt, &remainder));
 
   az_span infix_string = AZ_SPAN_FROM_STR(" will be made in ");
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, az_span_size(infix_string));
   remainder = az_span_copy(remainder, infix_string);
 
-  AZ_RETURN_IF_FAILED(az_span_copy_i32toa(remainder, delay_msec, &remainder));
+  AZ_RETURN_IF_FAILED(az_span_itoa(remainder, delay_msec, &remainder));
 
   az_span suffix_string = AZ_SPAN_FROM_STR("ms.");
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, az_span_size(suffix_string));
@@ -78,7 +78,7 @@ AZ_INLINE void _az_http_policy_retry_log(int16_t attempt, int32_t delay_msec)
 AZ_INLINE AZ_NODISCARD int32_t _az_uint32_span_to_int32(az_span span)
 {
   uint32_t value = 0;
-  if (az_succeeded(az_span_to_uint32(span, &value)))
+  if (az_succeeded(az_span_atou(span, &value)))
   {
     return value < INT32_MAX ? (int32_t)value : INT32_MAX;
   }

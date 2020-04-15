@@ -183,7 +183,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
   az_span content_length_builder = AZ_SPAN_FROM_BUFFER(content_length);
   az_span remainder;
   AZ_RETURN_IF_FAILED(
-      az_span_copy_i64toa(content_length_builder, az_span_size(content), &remainder));
+      az_span_i64toa(content_length_builder, az_span_size(content), &remainder));
   content_length_builder
       = az_span_slice(content_length_builder, 0, _az_span_diff(remainder, content_length_builder));
 

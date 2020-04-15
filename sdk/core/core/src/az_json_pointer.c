@@ -173,7 +173,7 @@ AZ_NODISCARD static az_result az_json_parser_get_by_pointer_token(
     case AZ_JSON_TOKEN_ARRAY_START:
     {
       uint64_t i = 0;
-      AZ_RETURN_IF_FAILED(az_span_to_uint64(pointer_token, &i));
+      AZ_RETURN_IF_FAILED(az_span_atou64(pointer_token, &i));
       while (true)
       {
         AZ_RETURN_IF_FAILED(az_json_parser_parse_array_item(json_parser, inout_token));

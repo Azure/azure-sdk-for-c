@@ -45,7 +45,7 @@ az_result az_iot_sas_token_get_document(
   remainder = az_span_copy(remainder, device_id);
   remainder = az_span_copy_uint8(remainder, LF);
 
-  AZ_RETURN_IF_FAILED(az_span_copy_i32toa(remainder, expiry_time_secs, &remainder));
+  AZ_RETURN_IF_FAILED(az_span_itoa(remainder, expiry_time_secs, &remainder));
 
   *out_document = az_span_slice(document, 0, _az_span_diff(remainder, document));
 
@@ -100,7 +100,7 @@ az_result az_iot_sas_token_generate(
   remainder = az_span_copy_uint8(remainder, AMPERSAND);
   remainder = az_span_copy(remainder, se_string);
   remainder = az_span_copy_uint8(remainder, EQUAL_SIGN);
-  AZ_RETURN_IF_FAILED(az_span_copy_i32toa(remainder, expiry_time_secs, &remainder));
+  AZ_RETURN_IF_FAILED(az_span_itoa(remainder, expiry_time_secs, &remainder));
 
   if (az_span_ptr(key_name) != NULL && az_span_size(key_name) > 0)
   {

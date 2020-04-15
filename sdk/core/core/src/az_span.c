@@ -114,7 +114,7 @@ AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1, az_span 
   return true;
 }
 
-AZ_NODISCARD az_result az_span_to_uint64(az_span span, uint64_t* out_number)
+AZ_NODISCARD az_result az_span_atou64(az_span span, uint64_t* out_number)
 {
   AZ_PRECONDITION_VALID_SPAN(span, 1, false);
   AZ_PRECONDITION_NOT_NULL(out_number);
@@ -142,7 +142,7 @@ AZ_NODISCARD az_result az_span_to_uint64(az_span span, uint64_t* out_number)
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_span_to_uint32(az_span span, uint32_t* out_number)
+AZ_NODISCARD az_result az_span_atou(az_span span, uint32_t* out_number)
 {
   AZ_PRECONDITION_VALID_SPAN(span, 1, false);
   AZ_PRECONDITION_NOT_NULL(out_number);
@@ -426,7 +426,7 @@ _az_span_replace(az_span self, int32_t current_size, int32_t start, int32_t end,
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_span_copy_dtoa(az_span destination, double source, az_span* out_span)
+AZ_NODISCARD az_result az_span_dtoa(az_span destination, double source, az_span* out_span)
 {
   AZ_PRECONDITION_VALID_SPAN(destination, 0, false);
   AZ_PRECONDITION_NOT_NULL(out_span);
@@ -533,7 +533,7 @@ static AZ_NODISCARD az_result _az_span_builder_append_uint64(az_span* self, uint
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_span_copy_u64toa(az_span destination, uint64_t source, az_span* out_span)
+AZ_NODISCARD az_result az_span_u64toa(az_span destination, uint64_t source, az_span* out_span)
 {
   AZ_PRECONDITION_VALID_SPAN(destination, 0, false);
   AZ_PRECONDITION_NOT_NULL(out_span);
@@ -542,7 +542,7 @@ AZ_NODISCARD az_result az_span_copy_u64toa(az_span destination, uint64_t source,
   return _az_span_builder_append_uint64(out_span, source);
 }
 
-AZ_NODISCARD az_result az_span_copy_i64toa(az_span destination, int64_t source, az_span* out_span)
+AZ_NODISCARD az_result az_span_i64toa(az_span destination, int64_t source, az_span* out_span)
 {
   AZ_PRECONDITION_VALID_SPAN(destination, 0, false);
   AZ_PRECONDITION_NOT_NULL(out_span);
@@ -595,14 +595,14 @@ _az_span_builder_append_u32toa(az_span self, uint32_t n, az_span* out_span)
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_span_copy_u32toa(az_span destination, uint32_t source, az_span* out_span)
+AZ_NODISCARD az_result az_span_utoa(az_span destination, uint32_t source, az_span* out_span)
 {
   AZ_PRECONDITION_VALID_SPAN(destination, 0, false);
   AZ_PRECONDITION_NOT_NULL(out_span);
   return _az_span_builder_append_u32toa(destination, source, out_span);
 }
 
-AZ_NODISCARD az_result az_span_copy_i32toa(az_span destination, int32_t source, az_span* out_span)
+AZ_NODISCARD az_result az_span_itoa(az_span destination, int32_t source, az_span* out_span)
 {
   AZ_PRECONDITION_VALID_SPAN(destination, 0, false);
   AZ_PRECONDITION_NOT_NULL(out_span);

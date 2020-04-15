@@ -119,7 +119,7 @@ az_json_builder_append_token(az_json_builder* json_builder, az_json_token token)
     {
       json_builder->_internal.need_comma = true;
       az_span remainder;
-      AZ_RETURN_IF_FAILED(az_span_copy_dtoa(remaining_json, token._internal.number, &remainder));
+      AZ_RETURN_IF_FAILED(az_span_dtoa(remaining_json, token._internal.number, &remainder));
       json_builder->_internal.length += _az_span_diff(remainder, remaining_json);
       remaining_json = remainder;
       break;
