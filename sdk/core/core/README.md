@@ -35,32 +35,11 @@ Create an empty (or NULL) `az_span`:
 az_span span_null = AZ_SPAN_NULL; // size = 0
 ```
 
-Create an `az_span` literal from an uninitialized byte buffer:
-
-```C
-uint8_t buffer[1024];
-az_span span_over_buffer = AZ_SPAN_LITERAL_FROM_BUFFER(buffer); // size = 1024
-```
-
-Create an `az_span` literal from an initialized bytes buffer:
-
-```C
-uint8_t buffer[] = { 1, 2, 3, 4, 5 };
-az_span span_over_buffer = AZ_SPAN_LITERAL_FROM_INITIALIZED_BUFFER(buffer); // size = 5
-```
-
-Create an `az_span` expression from an uninitialized byte buffer:
+Create an `az_span` expression from a byte buffer:
 
 ```C
 uint8_t buffer[1024];
 some_function(AZ_SPAN_FROM_BUFFER(buffer));  // size = 1024
-```
-
-Create an `az_span` expression from an initialized bytes buffer:
-
-```C
-uint8_t buffer[] = { 1, 2, 3, 4, 5 };
-some_function(AZ_SPAN_FROM_INITIALIZED_BUFFER(buffer));  // size = 5
 ```
 
 Create an `az_span` literal from a string (the span does NOT include the 0-terminating byte):

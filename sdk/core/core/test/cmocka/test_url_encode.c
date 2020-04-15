@@ -43,8 +43,6 @@ static uint8_t uri_decoded_buf[] = {
   0xF0, 0xF1, 0xF2, 0xF3, 0xF4, 0xF5, 0xF6, 0xF7, 0xF8, 0xF9, 0xFA, 0xFB, 0xFC, 0xFD, 0xFE, 0xFF
 };
 
-static az_span uri_decoded = AZ_SPAN_LITERAL_FROM_INITIALIZED_BUFFER(uri_decoded_buf);
-
 void test_url_encode(void** state)
 {
   (void)state;
@@ -56,11 +54,12 @@ void test_url_encode(void** state)
     az_span remainder;
     TEST_EXPECT_SUCCESS(
         az_span_copy_url_encode(builder, AZ_SPAN_FROM_STR("https://vault.azure.net"), &remainder));
-    assert_true(
-        az_span_is_content_equal(az_span_slice(builder, 0, 29), AZ_SPAN_FROM_STR("https%3A%2F%2Fvault.azure.net")));
+    assert_true(az_span_is_content_equal(
+        az_span_slice(builder, 0, 29), AZ_SPAN_FROM_STR("https%3A%2F%2Fvault.azure.net")));
 
     builder = AZ_SPAN_FROM_BUFFER(buffer);
-    TEST_EXPECT_SUCCESS(az_span_copy_url_encode(builder, uri_decoded, &remainder));
+    TEST_EXPECT_SUCCESS(
+        az_span_copy_url_encode(builder, AZ_SPAN_FROM_BUFFER(uri_decoded_buf), &remainder));
     assert_true(az_span_is_content_equal(az_span_slice(builder, 0, 636), uri_encoded));
   }
 }

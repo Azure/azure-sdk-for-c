@@ -77,7 +77,7 @@ static AZ_NODISCARD az_result _az_json_builder_write_span(az_json_builder* self,
       };
 
       AZ_RETURN_IF_NOT_ENOUGH_SIZE(remaining_json, (int32_t)sizeof(array));
-      remaining_json = az_span_copy(remaining_json, AZ_SPAN_FROM_INITIALIZED_BUFFER(array));
+      remaining_json = az_span_copy(remaining_json, AZ_SPAN_FROM_BUFFER(array));
       self->_internal.length += (int32_t)sizeof(array);
       continue;
     }

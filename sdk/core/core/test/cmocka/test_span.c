@@ -33,7 +33,7 @@ static void az_single_char_ascii_lower_test()
   for (uint8_t i = 0; i <= SCHAR_MAX; ++i)
   {
     uint8_t buffer[1] = { i };
-    az_span span = AZ_SPAN_LITERAL_FROM_INITIALIZED_BUFFER(buffer);
+    az_span span = AZ_SPAN_FROM_BUFFER(buffer);
 
     // Comparison to itself should return true for all values in the range.
     assert_true(az_span_is_content_equal_ignoring_case(span, span));
@@ -42,14 +42,14 @@ static void az_single_char_ascii_lower_test()
     if (i >= 'A' && i <= 'Z')
     {
       uint8_t lower[1] = { (uint8_t)(i + 32) };
-      az_span lowerSpan = AZ_SPAN_LITERAL_FROM_INITIALIZED_BUFFER(lower);
+      az_span lowerSpan = AZ_SPAN_FROM_BUFFER(lower);
       assert_true(az_span_is_content_equal_ignoring_case(span, lowerSpan));
       assert_true(az_span_is_content_equal_ignoring_case(lowerSpan, span));
     }
     else if (i >= 'a' && i <= 'z')
     {
       uint8_t upper[1] = { (uint8_t)(i - 32) };
-      az_span upperSpan = AZ_SPAN_LITERAL_FROM_INITIALIZED_BUFFER(upper);
+      az_span upperSpan = AZ_SPAN_FROM_BUFFER(upper);
       assert_true(az_span_is_content_equal_ignoring_case(span, upperSpan));
       assert_true(az_span_is_content_equal_ignoring_case(upperSpan, span));
     }
@@ -59,7 +59,7 @@ static void az_single_char_ascii_lower_test()
       for (uint8_t j = 0; j <= SCHAR_MAX; ++j)
       {
         uint8_t other[1] = { j };
-        az_span otherSpan = AZ_SPAN_LITERAL_FROM_INITIALIZED_BUFFER(other);
+        az_span otherSpan = AZ_SPAN_FROM_BUFFER(other);
 
         if (i == j)
         {

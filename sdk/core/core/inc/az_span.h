@@ -55,21 +55,14 @@ AZ_NODISCARD AZ_INLINE int32_t az_span_size(az_span span) { return span._interna
 /********************************  CONSTRUCTORS */
 
 /**
- * @brief Creates an empty span literal
- * ptr is NULL
- * size is initialized to 0
+ * @brief The AZ_SPAN_NULL macro returns an empty az_span.
  *
  */
-#define AZ_SPAN_LITERAL_NULL \
+#define AZ_SPAN_NULL \
+  (az_span) \
   { \
     ._internal = {.ptr = NULL, .size = 0 } \
   }
-
-/**
- * @brief The AZ_SPAN_NULL macro returns an empty az_span \see AZ_SPAN_LITERAL_NULL.
- *
- */
-#define AZ_SPAN_NULL (az_span) AZ_SPAN_LITERAL_NULL
 
 // Returns the size (in bytes) of a literal string
 // Note: Concatenating "" to S produces a compiler error if S is not a literal string
@@ -99,6 +92,28 @@ AZ_NODISCARD AZ_INLINE int32_t az_span_size(az_span span) { return span._interna
  */
 #define AZ_SPAN_FROM_STR(STRING_LITERAL) (az_span) AZ_SPAN_LITERAL_FROM_STR(STRING_LITERAL)
 
+// Returns 1 if the address of the array is equal to the address of its 1st element
+// https://stackoverflow.com/questions/16794900/validate-an-argument-is-array-type-in-c-c-pre-processing-macro-on-compile-time
+#define _az_IS_ARRAY(array) ((sizeof(array[0]) == 1) && (((void*)&(array)) == ((void*)(&array[0]))))
+
+/**
+ * @brief AZ_SPAN_FROM_BUFFER returns an az_span expression over an uninitialized byte buffer. For
+ * example:
+ *
+ * uint8_t buffer[1024];
+ * some_function(AZ_SPAN_FROM_BUFFER(buffer));  // Size = 1024
+ *
+ * BYTE_BUFFER MUST be an array defined like 'uint8_t buffer[10]'; and not 'uint8_t* buffer'
+ */
+#define AZ_SPAN_FROM_BUFFER(BYTE_BUFFER) \
+  (az_span) \
+  { \
+    ._internal = { \
+      .ptr = (uint8_t*)BYTE_BUFFER, \
+      .size = (sizeof(BYTE_BUFFER) / _az_IS_ARRAY(BYTE_BUFFER)), \
+    }, \
+  }
+
 /**
  * @brief az_span_init returns a span over a byte buffer.
  *
@@ -116,69 +131,6 @@ AZ_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t size);
  * the \0 terminator.
  */
 AZ_NODISCARD az_span az_span_from_str(char* str);
-
-/**
- * @brief AZ_SPAN_LITERAL_FROM_BUFFER returns a literal az_span over a byte buffer.
- * The size of the resulting az_span is set to the count of items the buffer can store based on
- * the sizeof(BYTE_BUFFER). For example:
- *
- * uint8_t buffer[1024];
- * const az_span buf = AZ_SPAN_LITERAL_FROM_BUFFER(buffer);  // Size = 1024
- */
-#define AZ_SPAN_LITERAL_FROM_BUFFER(BYTE_BUFFER) \
-  { \
-    ._internal = { \
-      .ptr = (uint8_t*)BYTE_BUFFER, \
-      .size = (sizeof(BYTE_BUFFER) / sizeof(BYTE_BUFFER[0])), \
-    }, \
-  }
-
-// Returns 1 if the address of the array is equal to the address of its 1st element
-// https://stackoverflow.com/questions/16794900/validate-an-argument-is-array-type-in-c-c-pre-processing-macro-on-compile-time
-#define AZ_IS_ARRAY(array) ((sizeof(array[0]) == 1) && (((void*)&(array)) == ((void*)(&array[0]))))
-
-/**
- * @brief AZ_SPAN_FROM_BUFFER returns an az_span expression over an uninitialized byte buffer. For
- * example:
- *
- * uint8_t buffer[1024];
- * some_function(AZ_SPAN_FROM_BUFFER(buffer));  // Size = 1024
- *
- * BYTE_BUFFER MUST be an array defined like 'uint8_t buffer[10]'; and not 'uint8_t* buffer'
- */
-#define AZ_SPAN_FROM_BUFFER(BYTE_BUFFER) \
-  (az_span) \
-  { \
-    ._internal = { \
-      .ptr = (uint8_t*)BYTE_BUFFER, \
-      .size = (sizeof(BYTE_BUFFER) / AZ_IS_ARRAY(BYTE_BUFFER)), \
-    }, \
-  }
-
-/**
- * @brief AZ_SPAN_LITERAL_FROM_INITIALIZED_BUFFER returns a literal az_span over an initialized byte
- * buffer. For example:
- *
- * uint8_t buffer[] = { 1, 2, 3 };
- * const az_span buf = AZ_SPAN_LITERAL_FROM_INITIALIZED_BUFFER(buffer); // Size = 3
- */
-#define AZ_SPAN_LITERAL_FROM_INITIALIZED_BUFFER(BYTE_BUFFER) \
-  { \
-    ._internal = { \
-      .ptr = BYTE_BUFFER, \
-      .size = (sizeof(BYTE_BUFFER) / sizeof(BYTE_BUFFER[0])), \
-    }, \
-  }
-
-/**
- * @brief AZ_SPAN_FROM_INITIALIZED_BUFFER returns an az_span expression over an initialized byte
- * buffer. For example
- *
- * uint8_t buffer[] = { 1, 2, 3 };
- * const az_span buf = AZ_SPAN_LITERAL_FROM_INITIALIZED_BUFFER(buffer); // Size = 3
- */
-#define AZ_SPAN_FROM_INITIALIZED_BUFFER(BYTE_BUFFER) \
-  (az_span) AZ_SPAN_LITERAL_FROM_INITIALIZED_BUFFER(BYTE_BUFFER)
 
 /******************************  SPAN MANIPULATION */
 

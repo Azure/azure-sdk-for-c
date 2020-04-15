@@ -80,7 +80,7 @@ void test_json_builder(void** state)
 
     // this json { "span": "\" } would be scaped to { "span": "\\"" }
     uint8_t single_char[1] = { '\\' }; // char = '\'
-    az_span single_span = AZ_SPAN_FROM_INITIALIZED_BUFFER(single_char);
+    az_span single_span = AZ_SPAN_FROM_BUFFER(single_char);
 
     TEST_EXPECT_SUCCESS(az_json_builder_append_token(&builder, az_json_token_object_start()));
 
@@ -103,7 +103,7 @@ void test_json_builder(void** state)
 
     // this json { "span": "\" } would be written as { "span": \"" } with no extra scaping
     uint8_t single_char[1] = { 92 }; // char = '\'
-    az_span single_span = AZ_SPAN_FROM_INITIALIZED_BUFFER(single_char);
+    az_span single_span = AZ_SPAN_FROM_BUFFER(single_char);
 
     TEST_EXPECT_SUCCESS(az_json_builder_append_token(&builder, az_json_token_object_start()));
 

@@ -40,7 +40,7 @@ static void test_az_iot_provisioning_client_default_options_get_connect_info_suc
   assert_int_equal(AZ_OK, ret);
 
   uint8_t client_id_buffer[128];
-  az_span client_id = AZ_SPAN_LITERAL_FROM_BUFFER(client_id_buffer);
+  az_span client_id = AZ_SPAN_FROM_BUFFER(client_id_buffer);
   az_span_fill(client_id, 0xCC);
 
   ret = az_iot_provisioning_client_id_get(&client, client_id, &client_id);
@@ -50,7 +50,7 @@ static void test_az_iot_provisioning_client_default_options_get_connect_info_suc
   assert_int_equal(0xCC, client_id_buffer[az_span_size(client_id)]);
 
   uint8_t username_buffer[128];
-  az_span username = AZ_SPAN_LITERAL_FROM_BUFFER(username_buffer);
+  az_span username = AZ_SPAN_FROM_BUFFER(username_buffer);
   az_span_fill(username, 0xCC);
 
   az_span expected_username
@@ -75,7 +75,7 @@ static void test_az_iot_provisioning_client_custom_options_get_username_succeed(
   assert_int_equal(AZ_OK, ret);
 
   uint8_t username_buffer[128];
-  az_span username = AZ_SPAN_LITERAL_FROM_BUFFER(username_buffer);
+  az_span username = AZ_SPAN_FROM_BUFFER(username_buffer);
   az_span_fill(username, 0xCC);
 
   az_span expected_username = AZ_SPAN_LITERAL_FROM_STR(
@@ -93,7 +93,7 @@ static void test_az_iot_provisioning_client_get_subscribe_topic_filter_succeed()
 {
   az_iot_provisioning_client client;
   uint8_t topic_buffer[128];
-  az_span topic = AZ_SPAN_LITERAL_FROM_BUFFER(topic_buffer);
+  az_span topic = AZ_SPAN_FROM_BUFFER(topic_buffer);
   az_span_fill(topic, 0xCC);
 
   az_span expected_topic = AZ_SPAN_LITERAL_FROM_STR("$dps/registrations/res/#");
@@ -109,7 +109,7 @@ static void test_az_iot_provisioning_client_get_register_publish_topic_filter_su
 {
   az_iot_provisioning_client client;
   uint8_t topic_buffer[128];
-  az_span topic = AZ_SPAN_LITERAL_FROM_BUFFER(topic_buffer);
+  az_span topic = AZ_SPAN_FROM_BUFFER(topic_buffer);
   az_span_fill(topic, 0xCC);
 
   az_span expected_topic
@@ -125,7 +125,7 @@ static void test_az_iot_provisioning_client_get_operation_status_publish_topic_f
 {
   az_iot_provisioning_client client;
   uint8_t topic_buffer[128];
-  az_span topic = AZ_SPAN_LITERAL_FROM_BUFFER(topic_buffer);
+  az_span topic = AZ_SPAN_FROM_BUFFER(topic_buffer);
   az_span_fill(topic, 0xCC);
 
   az_span expected_topic
