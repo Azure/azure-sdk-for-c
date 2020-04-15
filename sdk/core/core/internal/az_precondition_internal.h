@@ -24,8 +24,9 @@
  *        unpredictable behavior.
  *
  *        Also, if you define the NO_PRECONDITION_CHECKING symbol when compiling the SDK
- *        code, all of the Azure SDK precondition checking will be excluding making the
- *        binary code smaller and faster. We recommend doing this before you ship your code.
+ *        code (or adding option -DBUILD_PRECONDITION=OFF with cmake), all of the Azure SDK
+ *        precondition checking will be excluding making the binary code smaller and faster. We
+ *        recommend doing this before you ship your code.
  */
 
 #ifndef _az_PRECONDITION_INTERNAL_H
@@ -59,7 +60,6 @@ az_precondition_failed_fn az_precondition_failed_get_callback();
 
 #define AZ_PRECONDITION_NOT_NULL(arg) AZ_PRECONDITION((arg != NULL))
 #define AZ_PRECONDITION_IS_NULL(arg) AZ_PRECONDITION((arg == NULL))
-
 
 AZ_NODISCARD AZ_INLINE bool az_span_is_valid(az_span span, int32_t min_length, bool null_is_valid)
 {

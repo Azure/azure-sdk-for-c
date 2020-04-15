@@ -10,6 +10,12 @@ option(BUILD_CURL_TRANSPORT "Build internal http transport implementation with C
 option(UNIT_TESTING "Build unit test projects" OFF)
 option(UNIT_TESTING_MOCK_ENABLED "wrap PAL functions with mock implementation for tests" OFF)
 option(BUILD_PAHO_TRANSPORT "Build IoT Samples with Paho MQTT support" OFF)
+option(BUILD_PRECONDITIONS "Build SDK with preconditions enabled" ON)
+
+#enable mock functions with link option -ld
+if (NOT BUILD_PRECONDITIONS)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DNO_PRECONDITION_CHECKING")
+endif()
 
 #enable mock functions with link option -ld
 if(UNIT_TESTING_MOCK_ENABLED)
