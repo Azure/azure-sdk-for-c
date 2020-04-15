@@ -62,7 +62,7 @@ AZ_NODISCARD az_span az_span_slice(az_span span, int32_t start_index, int32_t en
   //        0 <= start_index <= span.size
   //    Otherwise
   //        0 <= start_index <= end_index
-  AZ_PRECONDITION_INT32_RANGE(-1, end_index, az_span_size(span));
+  AZ_PRECONDITION_RANGE(-1, end_index, az_span_size(span));
 
   // Do not reorder the OR conditions, since we are relying on short-circuiting.
   AZ_PRECONDITION(

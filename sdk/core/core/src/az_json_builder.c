@@ -5,15 +5,9 @@
 #include "az_json_string_private.h"
 #include "az_span_private.h"
 #include <az_json.h>
+#include <az_span_internal.h>
 
 #include <_az_cfg.h>
-
-static AZ_NODISCARD int32_t _az_span_diff(az_span new_span, az_span old_span)
-{
-  int32_t answer = az_span_size(old_span) - az_span_size(new_span);
-  AZ_PRECONDITION(answer == (int32_t)(az_span_ptr(new_span) - az_span_ptr(old_span)));
-  return answer;
-}
 
 static AZ_NODISCARD az_span _get_remaining_span(az_json_builder* json_builder)
 {

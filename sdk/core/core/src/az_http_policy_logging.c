@@ -8,6 +8,7 @@
 #include <az_http_transport.h>
 #include <az_log_internal.h>
 #include <az_platform_internal.h>
+#include <az_span_internal.h>
 
 #include <_az_cfg.h>
 
@@ -49,13 +50,6 @@ static az_span _az_http_policy_logging_copy_lengthy_value(az_span ref_log_msg, a
   ref_log_msg = az_span_copy(ref_log_msg, az_span_slice(value, 0, first));
   ref_log_msg = az_span_copy(ref_log_msg, ellipsis);
   return az_span_copy(ref_log_msg, az_span_slice(value, value_size - last, value_size));
-}
-
-static AZ_NODISCARD int32_t _az_span_diff(az_span new_span, az_span old_span)
-{
-  int32_t answer = az_span_size(old_span) - az_span_size(new_span);
-  AZ_PRECONDITION(answer == (int32_t)(az_span_ptr(new_span) - az_span_ptr(old_span)));
-  return answer;
 }
 
 static az_result _az_http_policy_logging_append_http_request_msg(
@@ -197,7 +191,8 @@ static az_result _az_http_policy_logging_append_http_response_msg(
   az_span append_request = remainder;
   AZ_RETURN_IF_FAILED(_az_http_policy_logging_append_http_request_msg(request, &append_request));
 
-  *ref_log_msg = az_span_slice(*ref_log_msg, 0, _az_span_diff(remainder, *ref_log_msg) + az_span_size(append_request));
+  *ref_log_msg = az_span_slice(
+      *ref_log_msg, 0, _az_span_diff(remainder, *ref_log_msg) + az_span_size(append_request));
   return AZ_OK;
 }
 

@@ -28,11 +28,9 @@ static const az_span test_device_id = AZ_SPAN_LITERAL_FROM_STR(TEST_DEVICE_ID_ST
 static uint8_t g_expected_methods_subscribe_topic[] = "$iothub/methods/POST/#";
 
 #ifndef NO_PRECONDITION_CHECKING
+enable_precondition_check_tests();
 
-enable_precondition_check_tests()
-
-    static void test_az_iot_hub_client_methods_subscribe_topic_filter_get_NULL_client_fail(
-        void** state)
+static void test_az_iot_hub_client_methods_subscribe_topic_filter_get_NULL_client_fail(void** state)
 {
   (void)state;
 

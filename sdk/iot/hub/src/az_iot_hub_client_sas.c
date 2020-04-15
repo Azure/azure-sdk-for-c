@@ -5,6 +5,7 @@
 #include <az_precondition.h>
 #include <az_precondition_internal.h>
 #include <az_span.h>
+#include <az_span_internal.h>
 
 #include <stdint.h>
 
@@ -18,13 +19,6 @@
 #define SAS_TOKEN_SE "se"
 #define SAS_TOKEN_SIG "sig"
 #define SAS_TOKEN_SKN "skn"
-
-static AZ_NODISCARD int32_t _az_span_diff(az_span new_span, az_span old_span)
-{
-  int32_t answer = az_span_size(old_span) - az_span_size(new_span);
-  AZ_PRECONDITION(answer == (int32_t)(az_span_ptr(new_span) - az_span_ptr(old_span)));
-  return answer;
-}
 
 az_result az_iot_sas_token_get_document(
     az_span iothub_fqdn,

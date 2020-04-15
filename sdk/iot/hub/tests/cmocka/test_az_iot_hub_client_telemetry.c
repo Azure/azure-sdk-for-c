@@ -36,10 +36,9 @@ static const char g_test_correct_topic_with_options_module_id_with_props[]
     = "devices/my_device/modules/my_module_id/messages/events/key=value&key_two=value2";
 
 #ifndef NO_PRECONDITION_CHECKING
+enable_precondition_check_tests();
 
-enable_precondition_check_tests()
-
-    static void test_az_iot_hub_client_telemetry_publish_topic_get_NULL_client_fails(void** state)
+static void test_az_iot_hub_client_telemetry_publish_topic_get_NULL_client_fails(void** state)
 {
   (void)state;
 

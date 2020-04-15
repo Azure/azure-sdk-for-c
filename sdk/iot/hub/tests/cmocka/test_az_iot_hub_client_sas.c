@@ -27,12 +27,11 @@
 #define TEST_KEY_NAME "iothubowner"
 
 #ifndef NO_PRECONDITION_CHECKING
+enable_precondition_check_tests();
 
-enable_precondition_check_tests()
+// Tests
 
-    // Tests
-
-    static void az_iot_sas_token_get_document_NULL_document_fails(void** state)
+static void az_iot_sas_token_get_document_NULL_document_fails(void** state)
 {
   (void)state;
   az_span iothub_fqdn = AZ_SPAN_FROM_STR(TEST_FQDN);

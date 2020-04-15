@@ -8,6 +8,7 @@
 #include <az_json.h>
 #include <az_platform_internal.h>
 #include <az_precondition_internal.h>
+#include <az_span_internal.h>
 
 #include <stddef.h>
 
@@ -24,13 +25,6 @@ AZ_NODISCARD az_result _az_token_set(_az_token* self, _az_token const* new_token
   // TODO: thread sync
   *self = *new_token;
   return AZ_OK;
-}
-
-static AZ_NODISCARD int32_t _az_span_diff(az_span new_span, az_span old_span)
-{
-  int32_t answer = az_span_size(old_span) - az_span_size(new_span);
-  AZ_PRECONDITION(answer == (int32_t)(az_span_ptr(new_span) - az_span_ptr(old_span)));
-  return answer;
 }
 
 // https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow#request-an-access-token

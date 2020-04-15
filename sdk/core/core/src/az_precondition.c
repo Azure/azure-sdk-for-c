@@ -10,12 +10,11 @@
 
 static void az_precondition_failed_default()
 {
-  ///* By default, when a precondition fails the calling thread is suspended forever */
-  //while (true)
-  //{
-  //  az_platform_sleep_msec(INT32_MAX);
-  //}
-  *(char*)NULL = 0;
+  /* By default, when a precondition fails the calling thread is suspended forever */
+  while (true)
+  {
+    az_platform_sleep_msec(INT32_MAX);
+  }
 }
 
 az_precondition_failed_fn _az_precondition_failed_callback = az_precondition_failed_default;

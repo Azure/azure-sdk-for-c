@@ -45,10 +45,9 @@ static const char g_test_correct_pnp_topic_content_type_and_encoding[]
       "&%24.ct=" TEST_CONTENT_TYPE "&%24.ce=" TEST_CONTENT_ENCODING;
 
 #ifndef NO_PRECONDITION_CHECKING
+enable_precondition_check_tests();
 
-enable_precondition_check_tests()
-
-    static void test_az_iot_pnp_client_telemetry_get_publish_topic_NULL_client_fails(void** state)
+static void test_az_iot_pnp_client_telemetry_get_publish_topic_NULL_client_fails(void** state)
 {
   (void)state;
 

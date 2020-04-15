@@ -9,6 +9,7 @@
 #include <az_json.h>
 #include <az_precondition.h>
 #include <az_precondition_internal.h>
+#include <az_span_internal.h>
 #include <az_storage_blobs.h>
 
 #include <stddef.h>
@@ -129,13 +130,6 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
       _az_credential_set_scopes(cred, AZ_SPAN_FROM_STR("https://storage.azure.com/.default")));
 
   return AZ_OK;
-}
-
-static AZ_NODISCARD int32_t _az_span_diff(az_span new_span, az_span old_span)
-{
-  int32_t answer = az_span_size(old_span) - az_span_size(new_span);
-  AZ_PRECONDITION(answer == (int32_t)(az_span_ptr(new_span) - az_span_ptr(old_span)));
-  return answer;
 }
 
 AZ_NODISCARD az_result az_storage_blobs_blob_upload(

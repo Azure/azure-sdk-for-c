@@ -9,6 +9,7 @@
 #include <az_log_internal.h>
 #include <az_platform_internal.h>
 #include <az_retry_internal.h>
+#include <az_span_internal.h>
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -25,13 +26,6 @@ static az_http_status_code const _default_status_codes[] = {
   AZ_HTTP_STATUS_CODE_GATEWAY_TIMEOUT,
   AZ_HTTP_STATUS_CODE_NONE,
 };
-
-static AZ_NODISCARD int32_t _az_span_diff(az_span new_span, az_span old_span)
-{
-  int32_t answer = az_span_size(old_span) - az_span_size(new_span);
-  AZ_PRECONDITION(answer == (int32_t)(az_span_ptr(new_span) - az_span_ptr(old_span)));
-  return answer;
-}
 
 AZ_NODISCARD az_http_policy_retry_options _az_http_policy_retry_options_default()
 {

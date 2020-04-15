@@ -31,10 +31,10 @@ static const char test_correct_twin_patch_pub_topic[]
     = "$iothub/twin/PATCH/properties/reported/?$rid=id_one";
 
 #ifndef NO_PRECONDITION_CHECKING
-enable_precondition_check_tests()
+enable_precondition_check_tests();
 
-    static void test_az_iot_hub_client_twin_response_subscribe_topic_filter_get_null_client_fails(
-        void** state)
+static void test_az_iot_hub_client_twin_response_subscribe_topic_filter_get_null_client_fails(
+    void** state)
 {
   (void)state;
 

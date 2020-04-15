@@ -285,7 +285,7 @@ typedef struct
 
 /*
  * @brief az_json_parser_init initializes an az_json_parser to parse the JSON payload contained
- * within the passed in buffer. JSON buffer.
+ * within the passed in buffer.
  *
  * @param json_parser A pointer to an az_json_parser instance to initialize.
  * @param json_buffer A pointer to a buffer containing the JSON document to parse.

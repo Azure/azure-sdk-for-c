@@ -7,6 +7,7 @@
 #include <az_precondition_internal.h>
 #include <az_result.h>
 #include <az_span.h>
+#include <az_span_internal.h>
 
 #include <_az_cfg.h>
 
@@ -14,13 +15,6 @@ static const az_span methods_topic_prefix = AZ_SPAN_LITERAL_FROM_STR("$iothub/me
 static const az_span methods_topic_filter_suffix = AZ_SPAN_LITERAL_FROM_STR("POST/");
 static const az_span methods_response_topic_result = AZ_SPAN_LITERAL_FROM_STR("res/");
 static const az_span methods_response_topic_properties = AZ_SPAN_LITERAL_FROM_STR("/?$rid=");
-
-static AZ_NODISCARD int32_t _az_span_diff(az_span new_span, az_span old_span)
-{
-  int32_t answer = az_span_size(old_span) - az_span_size(new_span);
-  AZ_PRECONDITION(answer == (int32_t)(az_span_ptr(new_span) - az_span_ptr(old_span)));
-  return answer;
-}
 
 AZ_NODISCARD az_result az_iot_hub_client_methods_subscribe_topic_filter_get(
     az_iot_hub_client const* client,
