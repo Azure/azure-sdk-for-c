@@ -18,21 +18,14 @@ static void az_span_slice_test()
 {
   uint8_t raw_buffer[20];
   az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer);
-  buffer = az_span_append_uint8(buffer, 'a');
-  buffer = az_span_append_uint8(buffer, 'b');
-  buffer = az_span_append_uint8(buffer, 'c');
-  buffer = az_span_append_uint8(buffer, 'd');
 
-  assert_int_equal(az_span_length(buffer), 4);
-  assert_int_equal(az_span_capacity(buffer), 20);
+  assert_int_equal(az_span_size(buffer), 20);
 
   az_span result = az_span_slice(buffer, 1, -1);
-  assert_int_equal(az_span_length(result), 3);
-  assert_int_equal(az_span_capacity(result), 19);
+  assert_int_equal(az_span_size(result), 19);
 
   result = az_span_slice(buffer, 5, -1);
-  assert_int_equal(az_span_length(result), 0);
-  assert_int_equal(az_span_capacity(result), 15);
+  assert_int_equal(az_span_size(result), 15);
 }
 
 static void az_single_char_ascii_lower_test()
@@ -86,79 +79,77 @@ static void az_span_append_uint8_succeeds()
   uint8_t raw_buffer[15];
   az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer);
 
-  buffer = az_span_append_uint8(buffer, 'a');
-  assert_int_equal(az_span_length(buffer), 1);
-  buffer = az_span_append_uint8(buffer, 'b');
-  assert_int_equal(az_span_length(buffer), 2);
-  buffer = az_span_append_uint8(buffer, 'c');
-  assert_int_equal(az_span_length(buffer), 3);
+  buffer = az_span_copy_uint8(buffer, 'a');
+  assert_int_equal(az_span_size(buffer), 14);
+  buffer = az_span_copy_uint8(buffer, 'b');
+  assert_int_equal(az_span_size(buffer), 13);
+  buffer = az_span_copy_uint8(buffer, 'c');
+  assert_int_equal(az_span_size(buffer), 12);
 
-  assert_true(az_span_is_content_equal(buffer, AZ_SPAN_FROM_STR("abc")));
+  assert_true(az_span_is_content_equal(
+      az_span_slice(AZ_SPAN_FROM_BUFFER(raw_buffer), 0, 3), AZ_SPAN_FROM_STR("abc")));
 }
 
-static void az_span_append_i32toa_succeeds()
+static void az_span_copy_i32toa_succeeds()
 {
   int32_t v = 12345;
   uint8_t raw_buffer[15];
   az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer);
   az_span out_span;
 
-  assert_true(az_succeeded(az_span_append_i32toa(buffer, v, &out_span)));
-  assert_true(az_span_is_content_equal(out_span, AZ_SPAN_FROM_STR("12345")));
+  assert_true(az_succeeded(az_span_copy_i32toa(buffer, v, &out_span)));
+  assert_int_equal(az_span_size(out_span), 10);
+  assert_true(az_span_is_content_equal(
+      az_span_slice(AZ_SPAN_FROM_BUFFER(raw_buffer), 0, 5), AZ_SPAN_FROM_STR("12345")));
 }
 
-static void az_span_append_i32toa_negative_succeeds()
+static void az_span_copy_i32toa_negative_succeeds()
 {
   int32_t v = -12345;
   uint8_t raw_buffer[15];
   az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer);
   az_span out_span;
 
-  assert_true(az_succeeded(az_span_append_i32toa(buffer, v, &out_span)));
-  assert_true(az_span_is_content_equal(out_span, AZ_SPAN_FROM_STR("-12345")));
+  assert_true(az_succeeded(az_span_copy_i32toa(buffer, v, &out_span)));
+  assert_int_equal(az_span_size(out_span), 9);
+  assert_true(az_span_is_content_equal(
+      az_span_slice(AZ_SPAN_FROM_BUFFER(raw_buffer), 0, 6), AZ_SPAN_FROM_STR("-12345")));
 }
 
-static void az_span_append_i32toa_zero_succeeds()
+static void az_span_copy_i32toa_zero_succeeds()
 {
   int32_t v = 0;
   uint8_t raw_buffer[15];
   az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer);
   az_span out_span;
 
-  assert_true(az_succeeded(az_span_append_i32toa(buffer, v, &out_span)));
-  assert_true(az_span_is_content_equal(out_span, AZ_SPAN_FROM_STR("0")));
+  assert_true(az_succeeded(az_span_copy_i32toa(buffer, v, &out_span)));
+  assert_int_equal(az_span_size(out_span), 14);
+  assert_true(az_span_is_content_equal(
+      az_span_slice(AZ_SPAN_FROM_BUFFER(raw_buffer), 0, 1), AZ_SPAN_FROM_STR("0")));
 }
 
-static void az_span_append_i32toa_max_int_succeeds()
+static void az_span_copy_i32toa_max_int_succeeds()
 {
   int32_t v = 2147483647;
   uint8_t raw_buffer[15];
   az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer);
   az_span out_span;
 
-  assert_true(az_succeeded(az_span_append_i32toa(buffer, v, &out_span)));
-  assert_true(az_span_is_content_equal(out_span, AZ_SPAN_FROM_STR("2147483647")));
+  assert_true(az_succeeded(az_span_copy_i32toa(buffer, v, &out_span)));
+  assert_int_equal(az_span_size(out_span), 5);
+  assert_true(az_span_is_content_equal(
+      az_span_slice(AZ_SPAN_FROM_BUFFER(raw_buffer), 0, 10), AZ_SPAN_FROM_STR("2147483647")));
 }
 
-static void az_span_append_i32toa_NULL_span_fails()
-{
-  int32_t v = 2147483647;
-  uint8_t raw_buffer[15];
-  az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer);
-  az_span out_span;
-
-  assert_true(az_succeeded(az_span_append_i32toa(buffer, v, &out_span)));
-  assert_true(az_span_is_content_equal(out_span, AZ_SPAN_FROM_STR("2147483647")));
-}
-
-static void az_span_append_i32toa_overflow_fails()
+static void az_span_copy_i32toa_overflow_fails()
 {
   int32_t v = 2147483647;
   uint8_t raw_buffer[4];
   az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer);
   az_span out_span;
 
-  assert_true(az_span_append_i32toa(buffer, v, &out_span) == AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY);
+  assert_true(az_span_copy_i32toa(buffer, v, &out_span) == AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
 }
 
 static void az_span_append_u32toa_succeeds()
@@ -168,8 +159,10 @@ static void az_span_append_u32toa_succeeds()
   az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer);
   az_span out_span;
 
-  assert_true(az_succeeded(az_span_append_u32toa(buffer, v, &out_span)));
-  assert_true(az_span_is_content_equal(out_span, AZ_SPAN_FROM_STR("12345")));
+  assert_true(az_succeeded(az_span_copy_u32toa(buffer, v, &out_span)));
+  assert_int_equal(az_span_size(out_span), 10);
+  assert_true(az_span_is_content_equal(
+      az_span_slice(AZ_SPAN_FROM_BUFFER(raw_buffer), 0, 5), AZ_SPAN_FROM_STR("12345")));
 }
 
 static void az_span_append_u32toa_zero_succeeds()
@@ -179,8 +172,10 @@ static void az_span_append_u32toa_zero_succeeds()
   az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer);
   az_span out_span;
 
-  assert_true(az_succeeded(az_span_append_u32toa(buffer, v, &out_span)));
-  assert_true(az_span_is_content_equal(out_span, AZ_SPAN_FROM_STR("0")));
+  assert_true(az_succeeded(az_span_copy_u32toa(buffer, v, &out_span)));
+  assert_int_equal(az_span_size(out_span), 14);
+  assert_true(az_span_is_content_equal(
+      az_span_slice(AZ_SPAN_FROM_BUFFER(raw_buffer), 0, 1), AZ_SPAN_FROM_STR("0")));
 }
 
 static void az_span_append_u32toa_max_uint_succeeds()
@@ -190,19 +185,10 @@ static void az_span_append_u32toa_max_uint_succeeds()
   az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer);
   az_span out_span;
 
-  assert_true(az_succeeded(az_span_append_u32toa(buffer, v, &out_span)));
-  assert_true(az_span_is_content_equal(out_span, AZ_SPAN_FROM_STR("4294967295")));
-}
-
-static void az_span_append_u32toa_NULL_span_fails()
-{
-  uint32_t v = 2147483647;
-  uint8_t raw_buffer[15];
-  az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer);
-  az_span out_span;
-
-  assert_true(az_succeeded(az_span_append_u32toa(buffer, v, &out_span)));
-  assert_true(az_span_is_content_equal(out_span, AZ_SPAN_FROM_STR("2147483647")));
+  assert_true(az_succeeded(az_span_copy_u32toa(buffer, v, &out_span)));
+  assert_int_equal(az_span_size(out_span), 5);
+  assert_true(az_span_is_content_equal(
+      az_span_slice(AZ_SPAN_FROM_BUFFER(raw_buffer), 0, 10), AZ_SPAN_FROM_STR("4294967295")));
 }
 
 static void az_span_append_u32toa_overflow_fails()
@@ -212,7 +198,7 @@ static void az_span_append_u32toa_overflow_fails()
   az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer);
   az_span out_span;
 
-  assert_true(az_span_append_u32toa(buffer, v, &out_span) == AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY);
+  assert_true(az_span_copy_u32toa(buffer, v, &out_span) == AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
 }
 
 static void az_span_to_lower_test()
@@ -347,10 +333,15 @@ static void az_span_find_capacity_checks_success()
 {
   uint8_t* buffer = (uint8_t*)"aaaa";
 
-  assert_int_equal(az_span_find(az_span_init(buffer, 2, 4), az_span_init(buffer, 2, 3)), 0);
-  assert_int_equal(az_span_find(az_span_init(buffer, 2, 3), az_span_init(buffer, 2, 4)), 0);
-  assert_int_equal(az_span_find(az_span_init(buffer, 2, 3), az_span_init(buffer, 0, 2)), 0);
-  assert_int_equal(az_span_find(az_span_init(buffer, 0, 2), az_span_init(buffer, 0, 2)), 0);
+  assert_int_equal(az_span_find(az_span_init(buffer, 2), az_span_init(buffer, 2)), 0);
+  assert_int_equal(az_span_find(az_span_init(buffer, 2), az_span_init(buffer, 0)), 0);
+  assert_int_equal(az_span_find(az_span_init(buffer, 0), az_span_init(buffer, 0)), 0);
+
+  assert_int_equal(az_span_find(az_span_init(buffer, 2), az_span_init(buffer + 1, 2)), 0);
+  assert_int_equal(az_span_find(az_span_init(buffer + 1, 2), az_span_init(buffer, 2)), 0);
+  assert_int_equal(az_span_find(az_span_init(buffer + 1, 2), az_span_init(buffer + 1, 2)), 0);
+  assert_int_equal(az_span_find(az_span_init(buffer, 2), az_span_init(buffer + 2, 2)), 0);
+  assert_int_equal(az_span_find(az_span_init(buffer + 2, 2), az_span_init(buffer, 2)), 0);
 }
 
 static void az_span_find_overlapping_checks_success()
@@ -371,17 +362,15 @@ void test_az_span(void** state)
 
   az_span_append_uint8_succeeds();
 
-  az_span_append_i32toa_succeeds();
-  az_span_append_i32toa_negative_succeeds();
-  az_span_append_i32toa_max_int_succeeds();
-  az_span_append_i32toa_zero_succeeds();
-  az_span_append_i32toa_NULL_span_fails();
-  az_span_append_i32toa_overflow_fails();
+  az_span_copy_i32toa_succeeds();
+  az_span_copy_i32toa_negative_succeeds();
+  az_span_copy_i32toa_max_int_succeeds();
+  az_span_copy_i32toa_zero_succeeds();
+  az_span_copy_i32toa_overflow_fails();
 
   az_span_append_u32toa_succeeds();
   az_span_append_u32toa_zero_succeeds();
   az_span_append_u32toa_max_uint_succeeds();
-  az_span_append_u32toa_NULL_span_fails();
   az_span_append_u32toa_overflow_fails();
 
   az_single_char_ascii_lower_test();

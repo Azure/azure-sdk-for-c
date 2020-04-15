@@ -34,7 +34,7 @@ static AZ_NODISCARD az_result _az_span_malloc(int32_t size, az_span* out)
   {
     return AZ_ERROR_OUT_OF_MEMORY;
   }
-  *out = az_span_init(p, 0, size);
+  *out = az_span_init(p, size);
   return AZ_OK;
 }
 
@@ -102,14 +102,14 @@ static AZ_NODISCARD az_result
 _az_span_append_header_to_buffer(az_span writable_buffer, az_pair header, az_span separator)
 {
   int32_t required_length
-      = az_span_length(header.key) + az_span_length(separator) + az_span_length(header.value) + 1;
+      = az_span_size(header.key) + az_span_size(separator) + az_span_size(header.value) + 1;
 
-  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(writable_buffer, required_length);
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(writable_buffer, required_length);
 
-  writable_buffer = az_span_append(writable_buffer, header.key);
-  writable_buffer = az_span_append(writable_buffer, separator);
-  writable_buffer = az_span_append(writable_buffer, header.value);
-  writable_buffer = az_span_append_uint8(writable_buffer, '0');
+  writable_buffer = az_span_copy(writable_buffer, header.key);
+  writable_buffer = az_span_copy(writable_buffer, separator);
+  writable_buffer = az_span_copy(writable_buffer, header.value);
+  az_span_copy_uint8(writable_buffer, '0');
 
   return AZ_OK;
 }
@@ -149,8 +149,8 @@ static AZ_NODISCARD az_result _az_http_client_curl_add_header_to_curl_list(
   // allocate a buffer for header
   az_span writable_buffer;
   {
-    int32_t const buffer_size = az_span_length(header.key) + az_span_length(separator)
-        + az_span_length(header.value) + az_span_length(AZ_SPAN_FROM_STR("\0"));
+    int32_t const buffer_size = az_span_size(header.key) + az_span_size(separator)
+        + az_span_size(header.value) + az_span_size(AZ_SPAN_FROM_STR("\0"));
 
     AZ_RETURN_IF_FAILED(_az_span_malloc(buffer_size, &writable_buffer));
   }
@@ -204,12 +204,12 @@ _az_http_client_curl_build_headers(_az_http_request* p_request, struct curl_slis
 static AZ_NODISCARD az_result
 _az_http_client_curl_append_url(az_span writable_buffer, az_span url_from_request)
 {
-  int32_t required_length = az_span_length(url_from_request) + 1;
+  int32_t required_length = az_span_size(url_from_request) + 1;
 
-  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(writable_buffer, required_length);
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(writable_buffer, required_length);
 
-  writable_buffer = az_span_append(writable_buffer, url_from_request);
-  writable_buffer = az_span_append_uint8(writable_buffer, '0');
+  writable_buffer = az_span_copy(writable_buffer, url_from_request);
+  writable_buffer = az_span_copy_uint8(writable_buffer, '0');
 
   return AZ_OK;
 }
@@ -234,16 +234,14 @@ static size_t _az_http_client_curl_write_to_span(
   size_t const expected_size = size * nmemb;
   az_span* const user_buffer_builder = (az_span*)userp;
 
-  az_span const span_for_content
-      = az_span_init((uint8_t*)contents, (int32_t)expected_size, (int32_t)expected_size);
+  az_span const span_for_content = az_span_init((uint8_t*)contents, (int32_t)expected_size);
 
-  if ((az_span_capacity(*user_buffer_builder) - az_span_length(*user_buffer_builder))
-      < az_span_length(span_for_content))
+  if (az_span_size(*user_buffer_builder) < az_span_size(span_for_content))
   {
     return expected_size + 1;
   }
 
-  *user_buffer_builder = az_span_append(*user_buffer_builder, span_for_content);
+  az_span_copy(*user_buffer_builder, span_for_content);
 
   // This callback needs to return the response size or curl will consider it as it failed
   return expected_size;
@@ -291,7 +289,7 @@ _az_http_client_curl_send_post_request(CURL* p_curl, _az_http_request const* p_r
   // Method
   az_span body = { 0 };
   int32_t const required_length
-      = az_span_length(p_request->_internal.body) + az_span_length(AZ_SPAN_FROM_STR("\0"));
+      = az_span_size(p_request->_internal.body) + az_span_size(AZ_SPAN_FROM_STR("\0"));
 
   AZ_RETURN_IF_FAILED(_az_span_malloc(required_length, &body));
 
@@ -342,7 +340,7 @@ static int32_t _az_http_client_curl_upload_read_callback(
   if (dst_buffer_size < 1)
     return CURL_READFUNC_ABORT;
 
-  int32_t userdata_length = az_span_length(*upload_content);
+  int32_t userdata_length = az_span_size(*upload_content);
 
   // Return if nothing to copy
   if (userdata_length < 1)
@@ -382,7 +380,7 @@ _az_http_client_curl_send_upload_request(CURL* p_curl, _az_http_request const* p
 
   // Set the size of the upload
   AZ_RETURN_IF_CURL_FAILED(
-      curl_easy_setopt(p_curl, CURLOPT_INFILESIZE, (curl_off_t)az_span_length(body)));
+      curl_easy_setopt(p_curl, CURLOPT_INFILESIZE, (curl_off_t)az_span_size(body)));
 
   // Do the curl work
   // curl_easy_perform does not return until the CURLOPT_READFUNCTION callbacks complete.
@@ -436,14 +434,15 @@ _az_http_client_curl_setup_url(CURL* p_curl, _az_http_request const* p_request)
   az_span writable_buffer;
   {
     // Add 1 for 0-terminated str
-    int32_t const url_final_size = az_span_length(p_request->_internal.url) + 1;
+    int32_t const url_final_size = p_request->_internal.url_length + 1;
 
     // allocate buffer to add \0
     AZ_RETURN_IF_FAILED(_az_span_malloc(url_final_size, &writable_buffer));
   }
 
   // write url in buffer (will add \0 at the end)
-  az_result result = _az_http_client_curl_append_url(writable_buffer, p_request->_internal.url);
+  az_result result = _az_http_client_curl_append_url(
+      writable_buffer, az_span_slice(p_request->_internal.url, 0, p_request->_internal.url_length));
 
   if (az_succeeded(result))
   {
@@ -452,7 +451,7 @@ _az_http_client_curl_setup_url(CURL* p_curl, _az_http_request const* p_request)
   }
 
   // free used buffer before anything else
-  memset(az_span_ptr(writable_buffer), 0, (size_t)az_span_capacity(writable_buffer));
+  memset(az_span_ptr(writable_buffer), 0, (size_t)az_span_size(writable_buffer));
   _az_span_free(&writable_buffer);
 
   return result;
@@ -536,10 +535,9 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
   // make sure to set the end of the body response as the end of the complete response
   if (az_succeeded(result))
   {
-    AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(response->_internal.http_response, 1);
+    AZ_RETURN_IF_NOT_ENOUGH_SIZE(response->_internal.http_response, 1);
 
-    response->_internal.http_response
-        = az_span_append_uint8(response->_internal.http_response, '0');
+    az_span_copy_uint8(response->_internal.http_response, '0');
   }
   return result;
 }

@@ -27,37 +27,37 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_publish_topic_get(
 
   const az_span* const module_id = &(client->_internal.options.module_id);
 
-  int32_t required_length = az_span_length(telemetry_topic_prefix)
-      + az_span_length(client->_internal.device_id) + az_span_length(telemetry_topic_suffix);
-  int32_t module_id_length = az_span_length(*module_id);
+  int32_t required_length = az_span_size(telemetry_topic_prefix)
+      + az_span_size(client->_internal.device_id) + az_span_size(telemetry_topic_suffix);
+  int32_t module_id_length = az_span_size(*module_id);
   if (module_id_length > 0)
   {
-    required_length += az_span_length(telemetry_topic_modules_mid) + az_span_length(*module_id);
+    required_length += az_span_size(telemetry_topic_modules_mid) + az_span_size(*module_id);
   }
   if (properties != NULL)
   {
-    required_length += az_span_length(properties->_internal.properties);
+    required_length += az_span_size(properties->_internal.properties);
   }
 
-  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(mqtt_topic, required_length);
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_topic, required_length);
 
-  mqtt_topic = az_span_copy(mqtt_topic, telemetry_topic_prefix);
-  mqtt_topic = az_span_append(mqtt_topic, client->_internal.device_id);
+  az_span remainder = az_span_copy(mqtt_topic, telemetry_topic_prefix);
+  remainder = az_span_copy(remainder, client->_internal.device_id);
 
   if (module_id_length > 0)
   {
-    mqtt_topic = az_span_append(mqtt_topic, telemetry_topic_modules_mid);
-    mqtt_topic = az_span_append(mqtt_topic, *module_id);
+    remainder = az_span_copy(remainder, telemetry_topic_modules_mid);
+    remainder = az_span_copy(remainder, *module_id);
   }
 
-  mqtt_topic = az_span_append(mqtt_topic, telemetry_topic_suffix);
+  remainder = az_span_copy(remainder, telemetry_topic_suffix);
 
   if (properties != NULL)
   {
-    mqtt_topic = az_span_append(mqtt_topic, properties->_internal.properties);
+      az_span_copy(remainder, properties->_internal.properties);
   }
 
-  *out_mqtt_topic = mqtt_topic;
+  *out_mqtt_topic = az_span_slice(mqtt_topic, 0, required_length);
 
   return AZ_OK;
 }

@@ -105,7 +105,7 @@ int main()
     printf("Failed to reset http response (1)");
   }
 
-  az_span_set(http_response._internal.http_response, '.');
+  az_span_fill(http_response._internal.http_response, '.');
 
   /******************  GET KEY latest ver ******************************/
   az_result get_key_result = az_keyvault_keys_key_get(
@@ -123,15 +123,14 @@ int main()
   // version is still at http_response. Let's copy it to a new buffer
   uint8_t version_buf[40];
   az_span version_builder = AZ_SPAN_FROM_BUFFER(version_buf);
-  if ((az_span_capacity(version_builder) - az_span_length(version_builder))
-      < az_span_length(version))
+  if (az_span_size(version_builder) < az_span_size(version))
   {
     printf("Failed to append key version");
   }
   else
   {
-    version_builder = az_span_append(version_builder, version);
-    version = az_span_slice(version_builder, 0, az_span_length(version_builder));
+    az_span_copy(version_builder, version);
+    version = az_span_slice(version_builder, 0, az_span_size(version));
   }
 
   // Reuse response buffer for delete Key by creating a new span from response_buffer
@@ -141,7 +140,7 @@ int main()
     printf("Failed to reset http response (2)");
   }
 
-  az_span_set(response_span, '.');
+  az_span_fill(response_span, '.');
 
   /*********************  Create a new key version (use default options) *************/
   az_result const create_version_result = az_keyvault_keys_key_create(
@@ -168,7 +167,7 @@ int main()
     printf("Failed to reset http response (3)");
   }
 
-  az_span_set(response_span, '.');
+  az_span_fill(response_span, '.');
 
   /******************  GET KEY previous ver ******************************/
   az_result const get_key_prev_ver_result = az_keyvault_keys_key_get(
@@ -199,7 +198,7 @@ int main()
     printf("Failed to reset http response (4)");
   }
 
-  az_span_set(response_span, '.');
+  az_span_fill(response_span, '.');
 
   /******************  GET KEY (should return failed response ) ******************************/
   az_result get_key_again_result = az_keyvault_keys_key_get(
@@ -248,7 +247,7 @@ az_span get_key_version(az_http_response* response)
     return AZ_SPAN_NULL;
   }
   // calculate version
-  int32_t kid_length = az_span_length(k);
+  int32_t kid_length = az_span_size(k);
   az_span version = { 0 };
 
   for (int32_t index = kid_length; index > 0; --index)

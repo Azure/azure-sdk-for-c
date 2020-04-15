@@ -19,6 +19,13 @@
 #define SAS_TOKEN_SIG "sig"
 #define SAS_TOKEN_SKN "skn"
 
+static AZ_NODISCARD int32_t _az_span_diff(az_span new_span, az_span old_span)
+{
+  int32_t answer = az_span_size(old_span) - az_span_size(new_span);
+  AZ_PRECONDITION(answer == (int32_t)(az_span_ptr(new_span) - az_span_ptr(old_span)));
+  return answer;
+}
+
 az_result az_iot_sas_token_get_document(
     az_span iothub_fqdn,
     az_span device_id,
@@ -32,19 +39,21 @@ az_result az_iot_sas_token_get_document(
   AZ_PRECONDITION_NOT_NULL(out_document);
 
   az_span devices_string = AZ_SPAN_FROM_STR(SCOPE_DEVICES_STRING);
-  int32_t required_length = az_span_length(iothub_fqdn) + az_span_length(device_id)
-      + az_span_length(devices_string) + 1;
+  int32_t required_length
+      = az_span_size(iothub_fqdn) + az_span_size(device_id) + az_span_size(devices_string) + 1;
 
-  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(document, required_length);
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(document, required_length);
 
-  *out_document = document;
+  az_span remainder = document;
 
-  *out_document = az_span_append(*out_document, iothub_fqdn);
-  *out_document = az_span_append(*out_document, devices_string);
-  *out_document = az_span_append(*out_document, device_id);
-  *out_document = az_span_append_uint8(*out_document, LF);
+  remainder = az_span_copy(remainder, iothub_fqdn);
+  remainder = az_span_copy(remainder, devices_string);
+  remainder = az_span_copy(remainder, device_id);
+  remainder = az_span_copy_uint8(remainder, LF);
 
-  AZ_RETURN_IF_FAILED(az_span_append_i32toa(*out_document, expiry_time_secs, out_document));
+  AZ_RETURN_IF_FAILED(az_span_copy_i32toa(remainder, expiry_time_secs, &remainder));
+
+  *out_document = az_span_slice(document, 0, _az_span_diff(remainder, document));
 
   return AZ_OK;
 }
@@ -72,46 +81,48 @@ az_result az_iot_sas_token_generate(
   az_span devices_string = AZ_SPAN_FROM_STR(SCOPE_DEVICES_STRING);
   az_span sig_string = AZ_SPAN_FROM_STR(SAS_TOKEN_SIG);
   az_span se_string = AZ_SPAN_FROM_STR(SAS_TOKEN_SE);
-  int32_t required_length = az_span_length(sr_string) + az_span_length(devices_string)
-      + az_span_length(sig_string) + az_span_length(se_string) + az_span_length(iothub_fqdn)
-      + az_span_length(device_id) + az_span_length(signature) + 5;
+  int32_t required_length = az_span_size(sr_string) + az_span_size(devices_string)
+      + az_span_size(sig_string) + az_span_size(se_string) + az_span_size(iothub_fqdn)
+      + az_span_size(device_id) + az_span_size(signature) + 5;
 
-  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(sas_token, required_length);
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(sas_token, required_length);
 
-  *out_sas_token = sas_token;
+  az_span remainder = sas_token;
 
   // SharedAccessSignature
-  *out_sas_token = az_span_append(*out_sas_token, sr_string);
-  *out_sas_token = az_span_append_uint8(*out_sas_token, EQUAL_SIGN);
-  *out_sas_token = az_span_append(*out_sas_token, iothub_fqdn);
-  *out_sas_token = az_span_append(*out_sas_token, devices_string);
-  *out_sas_token = az_span_append(*out_sas_token, device_id);
+  remainder = az_span_copy(remainder, sr_string);
+  remainder = az_span_copy_uint8(remainder, EQUAL_SIGN);
+  remainder = az_span_copy(remainder, iothub_fqdn);
+  remainder = az_span_copy(remainder, devices_string);
+  remainder = az_span_copy(remainder, device_id);
 
   // Signature
-  *out_sas_token = az_span_append_uint8(*out_sas_token, AMPERSAND);
-  *out_sas_token = az_span_append(*out_sas_token, sig_string);
-  *out_sas_token = az_span_append_uint8(*out_sas_token, EQUAL_SIGN);
-  *out_sas_token = az_span_append(*out_sas_token, signature);
+  remainder = az_span_copy_uint8(remainder, AMPERSAND);
+  remainder = az_span_copy(remainder, sig_string);
+  remainder = az_span_copy_uint8(remainder, EQUAL_SIGN);
+  remainder = az_span_copy(remainder, signature);
 
   // Expiration
-  *out_sas_token = az_span_append_uint8(*out_sas_token, AMPERSAND);
-  *out_sas_token = az_span_append(*out_sas_token, se_string);
-  *out_sas_token = az_span_append_uint8(*out_sas_token, EQUAL_SIGN);
-  AZ_RETURN_IF_FAILED(az_span_append_i32toa(*out_sas_token, expiry_time_secs, out_sas_token));
+  remainder = az_span_copy_uint8(remainder, AMPERSAND);
+  remainder = az_span_copy(remainder, se_string);
+  remainder = az_span_copy_uint8(remainder, EQUAL_SIGN);
+  AZ_RETURN_IF_FAILED(az_span_copy_i32toa(remainder, expiry_time_secs, &remainder));
 
-  if (az_span_ptr(key_name) != NULL && az_span_length(key_name) > 0)
+  if (az_span_ptr(key_name) != NULL && az_span_size(key_name) > 0)
   {
     az_span skn_string = AZ_SPAN_FROM_STR(SAS_TOKEN_SKN);
-    required_length = az_span_length(skn_string) + az_span_length(key_name) + 2;
+    required_length = az_span_size(skn_string) + az_span_size(key_name) + 2;
 
-    AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(*out_sas_token, required_length);
+    AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, required_length);
 
     // Key Name
-    *out_sas_token = az_span_append_uint8(*out_sas_token, AMPERSAND);
-    *out_sas_token = az_span_append(*out_sas_token, skn_string);
-    *out_sas_token = az_span_append_uint8(*out_sas_token, EQUAL_SIGN);
-    *out_sas_token = az_span_append(*out_sas_token, key_name);
+    remainder = az_span_copy_uint8(remainder, AMPERSAND);
+    remainder = az_span_copy(remainder, skn_string);
+    remainder = az_span_copy_uint8(remainder, EQUAL_SIGN);
+    az_span_copy(remainder, key_name);
   }
+
+  *out_sas_token = az_span_slice(sas_token, 0, _az_span_diff(remainder, sas_token));
 
   return AZ_OK;
 }

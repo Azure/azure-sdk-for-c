@@ -50,7 +50,7 @@ void test_json_pointer(void** state)
         buffer[i] = (uint8_t)code_point;
         ++i;
       }
-      az_span const b = az_span_init(buffer, i, i);
+      az_span const b = az_span_init(buffer, i);
       assert_true(az_span_is_content_equal(b, AZ_SPAN_FROM_STR("abc")));
     }
     assert_true(_az_span_reader_read_json_pointer_token(&parser, &p) == AZ_ERROR_ITEM_NOT_FOUND);
@@ -78,7 +78,7 @@ void test_json_pointer(void** state)
         buffer[i] = (uint8_t)code_point;
         ++i;
       }
-      az_span const b = az_span_init(buffer, i, i);
+      az_span const b = az_span_init(buffer, i);
       assert_true(az_span_is_content_equal(b, AZ_SPAN_FROM_STR("abc")));
     }
     assert_true(_az_span_reader_read_json_pointer_token(&parser, &p) == AZ_OK);
@@ -110,7 +110,7 @@ void test_json_pointer(void** state)
         buffer[i] = (uint8_t)code_point;
         ++i;
       }
-      az_span const b = az_span_init(buffer, i, i);
+      az_span const b = az_span_init(buffer, i);
       assert_true(az_span_is_content_equal(b, AZ_SPAN_FROM_STR("ab/c")));
     }
     assert_true(_az_span_reader_read_json_pointer_token(&parser, &p) == AZ_OK);
@@ -133,7 +133,7 @@ void test_json_pointer(void** state)
         buffer[i] = (uint8_t)code_point;
         ++i;
       }
-      az_span const b = az_span_init(buffer, i, i);
+      az_span const b = az_span_init(buffer, i);
       assert_true(az_span_is_content_equal(b, AZ_SPAN_FROM_STR("dff~x")));
     }
     assert_true(_az_span_reader_read_json_pointer_token(&parser, &p) == AZ_ERROR_ITEM_NOT_FOUND);

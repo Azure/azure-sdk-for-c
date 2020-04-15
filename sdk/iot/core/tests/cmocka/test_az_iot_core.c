@@ -5,16 +5,16 @@
 #include <az_iot_core.h>
 #include <az_span.h>
 
-#include <az_precondition_internal.h>
 #include <az_precondition.h>
+#include <az_precondition_internal.h>
 
 #include <setjmp.h>
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdint.h>
 
-#include <cmocka.h>
 #include <az_test_precondition.h>
+#include <cmocka.h>
 
 static void az_span_token_success(void** state)
 {
@@ -27,47 +27,44 @@ static void az_span_token_success(void** state)
   // token: ""
   token = az_span_token(span, delim, &out_span);
   assert_non_null(az_span_ptr(token));
-  assert_true(az_span_length(token) == 0);
-  assert_true(az_span_ptr(out_span) == (az_span_ptr(span) + az_span_length(delim)));
-  assert_true(az_span_length(out_span) == (az_span_length(span) - az_span_length(delim)));
-  assert_true(az_span_capacity(out_span) == (az_span_capacity(span) - az_span_capacity(delim)));
+  assert_true(az_span_size(token) == 0);
+  assert_true(az_span_ptr(out_span) == (az_span_ptr(span) + az_span_size(delim)));
+  assert_true(az_span_size(out_span) == (az_span_size(span) - az_span_size(delim)));
 
   // token: "defg" (span+3)
   span = out_span;
 
   token = az_span_token(span, delim, &out_span);
   assert_true(az_span_ptr(token) == az_span_ptr(span));
-  assert_true(az_span_length(token) == 4);
-  assert_true(az_span_capacity(token) == az_span_capacity(span));
-  assert_true(az_span_ptr(out_span) == (az_span_ptr(span) + az_span_length(token) + az_span_length(delim)));
-  assert_true(az_span_length(out_span) == (az_span_length(span) - az_span_length(token) - az_span_length(delim)));
-  assert_true(az_span_capacity(out_span) == (az_span_capacity(span) - az_span_length(token) - az_span_length(delim)));
+  assert_int_equal(az_span_size(token), 4);
+  assert_true(
+      az_span_ptr(out_span) == (az_span_ptr(span) + az_span_size(token) + az_span_size(delim)));
+  assert_true(
+      az_span_size(out_span) == (az_span_size(span) - az_span_size(token) - az_span_size(delim)));
 
   // token: "defg" (span+10)
   span = out_span;
 
   token = az_span_token(span, delim, &out_span);
   assert_true(az_span_ptr(token) == az_span_ptr(span));
-  assert_true(az_span_length(token) == 4);
-  assert_true(az_span_capacity(token) == az_span_length(span));
-  assert_true(az_span_ptr(out_span) == (az_span_ptr(span) + az_span_length(token) + az_span_length(delim)));
-  assert_true(az_span_length(out_span) == (az_span_length(span) - az_span_length(token) - az_span_length(delim)));
-  assert_true(az_span_capacity(out_span) == (az_span_capacity(span) - az_span_length(token) - az_span_length(delim)));
+  assert_int_equal(az_span_size(token), 4);
+  assert_true(
+      az_span_ptr(out_span) == (az_span_ptr(span) + az_span_size(token) + az_span_size(delim)));
+  assert_true(
+      az_span_size(out_span) == (az_span_size(span) - az_span_size(token) - az_span_size(delim)));
 
   // token: "defg" (span+17)
   span = out_span;
 
   token = az_span_token(span, delim, &out_span);
   assert_true(az_span_ptr(token) == az_span_ptr(span));
-  assert_true(az_span_length(token) == 4);
-  assert_true(az_span_capacity(token) == az_span_length(span));
+  assert_int_equal(az_span_size(token), 4);
   assert_true(az_span_ptr(out_span) == NULL);
-  assert_true(az_span_length(out_span) == 0);
-  assert_true(az_span_capacity(out_span) == 0);
+  assert_true(az_span_size(out_span) == 0);
 
   // Out_span is empty.
   span = out_span;
-  
+
   token = az_span_token(span, delim, &out_span);
   assert_true(az_span_is_content_equal(token, AZ_SPAN_NULL));
 }
@@ -133,7 +130,6 @@ static void test_az_iot_get_status_from_uint32(void** state)
   assert_int_equal(AZ_IOT_STATUS_TIMEOUT, status);
 
   assert_int_equal(az_iot_get_status_from_uint32(999, &status), AZ_ERROR_ITEM_NOT_FOUND);
-
 }
 
 int test_az_iot_core()

@@ -31,14 +31,14 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_response_subscribe_topic_filter_ge
   AZ_PRECONDITION_VALID_SPAN(mqtt_topic_filter, 0, false);
   AZ_PRECONDITION_NOT_NULL(out_mqtt_topic_filter);
 
-  int32_t required_length = az_span_length(az_iot_hub_twin_response_sub_topic) + 1;
+  int32_t required_length = az_span_size(az_iot_hub_twin_response_sub_topic) + 1;
 
-  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(mqtt_topic_filter, required_length);
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_topic_filter, required_length);
 
-  mqtt_topic_filter = az_span_copy(mqtt_topic_filter, az_iot_hub_twin_response_sub_topic);
-  mqtt_topic_filter = az_span_append_uint8(mqtt_topic_filter, az_iot_hub_client_twin_hashtag);
+  az_span remainder = az_span_copy(mqtt_topic_filter, az_iot_hub_twin_response_sub_topic);
+  az_span_copy_uint8(remainder, az_iot_hub_client_twin_hashtag);
 
-  *out_mqtt_topic_filter = mqtt_topic_filter;
+  *out_mqtt_topic_filter = az_span_slice(mqtt_topic_filter, 0, required_length);
 
   return AZ_OK;
 }
@@ -52,13 +52,13 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_patch_subscribe_topic_filter_get(
   AZ_PRECONDITION_VALID_SPAN(mqtt_topic_filter, 0, false);
   AZ_PRECONDITION_NOT_NULL(out_mqtt_topic_filter);
 
-  int32_t required_length = az_span_length(az_iot_hub_twin_patch_sub_topic);
+  int32_t required_length = az_span_size(az_iot_hub_twin_patch_sub_topic);
 
-  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(mqtt_topic_filter, required_length);
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_topic_filter, required_length);
 
-  mqtt_topic_filter = az_span_copy(mqtt_topic_filter, az_iot_hub_twin_patch_sub_topic);
+  az_span_copy(mqtt_topic_filter, az_iot_hub_twin_patch_sub_topic);
 
-  *out_mqtt_topic_filter = mqtt_topic_filter;
+  *out_mqtt_topic_filter = az_span_slice(mqtt_topic_filter, 0, required_length);
 
   return AZ_OK;
 }
@@ -74,16 +74,16 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_get_publish_topic_get(
   AZ_PRECONDITION_VALID_SPAN(mqtt_topic, 0, false);
   AZ_PRECONDITION_NOT_NULL(out_mqtt_topic);
 
-  int32_t required_length = az_span_length(az_iot_hub_twin_get_pub_topic)
-      + az_span_length(az_iot_hub_client_twin_request_id_suffix) + az_span_length(request_id);
+  int32_t required_length = az_span_size(az_iot_hub_twin_get_pub_topic)
+      + az_span_size(az_iot_hub_client_twin_request_id_suffix) + az_span_size(request_id);
 
-  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(mqtt_topic, required_length);
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_topic, required_length);
 
-  mqtt_topic = az_span_copy(mqtt_topic, az_iot_hub_twin_get_pub_topic);
-  mqtt_topic = az_span_append(mqtt_topic, az_iot_hub_client_twin_request_id_suffix);
-  mqtt_topic = az_span_append(mqtt_topic, request_id);
+  az_span remainder = az_span_copy(mqtt_topic, az_iot_hub_twin_get_pub_topic);
+  remainder = az_span_copy(remainder, az_iot_hub_client_twin_request_id_suffix);
+  az_span_copy(remainder, request_id);
 
-  *out_mqtt_topic = mqtt_topic;
+  *out_mqtt_topic = az_span_slice(mqtt_topic, 0, required_length);
 
   return AZ_OK;
 }
@@ -99,16 +99,16 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_patch_publish_topic_get(
   AZ_PRECONDITION_VALID_SPAN(mqtt_topic, 0, false);
   AZ_PRECONDITION_NOT_NULL(out_mqtt_topic);
 
-  int32_t required_length = az_span_length(az_iot_hub_twin_patch_pub_topic)
-      + az_span_length(az_iot_hub_client_twin_request_id_suffix) + az_span_length(request_id);
+  int32_t required_length = az_span_size(az_iot_hub_twin_patch_pub_topic)
+      + az_span_size(az_iot_hub_client_twin_request_id_suffix) + az_span_size(request_id);
 
-  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(mqtt_topic, required_length);
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_topic, required_length);
 
-  mqtt_topic = az_span_copy(mqtt_topic, az_iot_hub_twin_patch_pub_topic);
-  mqtt_topic = az_span_append(mqtt_topic, az_iot_hub_client_twin_request_id_suffix);
-  mqtt_topic = az_span_append(mqtt_topic, request_id);
+  az_span remainder = az_span_copy(mqtt_topic, az_iot_hub_twin_patch_pub_topic);
+  remainder = az_span_copy(remainder, az_iot_hub_client_twin_request_id_suffix);
+  az_span_copy(remainder, request_id);
 
-  *out_mqtt_topic = mqtt_topic;
+  *out_mqtt_topic = az_span_slice(mqtt_topic, 0, required_length);
 
   return AZ_OK;
 }

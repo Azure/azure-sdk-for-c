@@ -25,23 +25,24 @@ static az_result _az_add_telemetry_property(
     bool add_separator,
     az_span* out_mqtt_topic)
 {
-  int32_t required_length = az_span_length(property_name) + az_span_length(property_value) + 1;
+  int32_t required_length = az_span_size(property_name) + az_span_size(property_value) + 1;
   if (add_separator)
   {
     required_length++;
   }
 
-  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(mqtt_topic, required_length);
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_topic, required_length);
 
+  az_span remainder = mqtt_topic;
   if (add_separator)
   {
-    mqtt_topic = az_span_append_uint8(mqtt_topic, pnp_telemetry_param_separator);
+    remainder = az_span_copy_uint8(remainder, pnp_telemetry_param_separator);
   }
-  mqtt_topic = az_span_append(mqtt_topic, property_name);
-  mqtt_topic = az_span_append_uint8(mqtt_topic, pnp_telemetry_param_equals);
-  mqtt_topic = az_span_append(mqtt_topic, property_value);
+  remainder = az_span_copy(remainder, property_name);
+  remainder = az_span_copy_uint8(remainder, pnp_telemetry_param_equals);
+  az_span_copy(remainder, property_value);
 
-  *out_mqtt_topic = mqtt_topic;
+  *out_mqtt_topic = az_span_slice(mqtt_topic, 0, required_length);
 
   return AZ_OK;
 }
@@ -59,33 +60,51 @@ AZ_NODISCARD az_result az_iot_pnp_client_telemetry_get_publish_topic(
   AZ_PRECONDITION_IS_NULL(reserved);
   AZ_PRECONDITION_NOT_NULL(out_mqtt_topic);
 
+  az_span written_span;
+  int32_t written = 0;
+
   AZ_RETURN_IF_FAILED(az_iot_hub_client_telemetry_publish_topic_get(
-      &client->_internal.iot_hub_client, NULL, mqtt_topic, &mqtt_topic));
+      &client->_internal.iot_hub_client,
+      NULL,
+      az_span_slice(mqtt_topic, written, -1),
+      &written_span));
+
+  written += az_span_size(written_span);
 
   AZ_RETURN_IF_FAILED(_az_add_telemetry_property(
-      mqtt_topic, pnp_telemetry_component_name_param, component_name, false, &mqtt_topic));
+      az_span_slice(mqtt_topic, written, -1),
+      pnp_telemetry_component_name_param,
+      component_name,
+      false,
+      &written_span));
+
+  written += az_span_size(written_span);
 
   if (az_span_ptr(client->_internal.options.content_type) != NULL)
   {
     AZ_RETURN_IF_FAILED(_az_add_telemetry_property(
-        mqtt_topic,
+        az_span_slice(mqtt_topic, written, -1),
         pnp_telemetry_content_type_param,
         client->_internal.options.content_type,
         true,
-        &mqtt_topic));
+        &written_span));
+
+    written += az_span_size(written_span);
   }
 
   if (az_span_ptr(client->_internal.options.content_encoding) != NULL)
   {
     AZ_RETURN_IF_FAILED(_az_add_telemetry_property(
-        mqtt_topic,
+        az_span_slice(mqtt_topic, written, -1),
         pnp_telemetry_content_encoding_param,
         client->_internal.options.content_encoding,
         true,
-        &mqtt_topic));
+        &written_span));
+
+    written += az_span_size(written_span);
   }
 
-  *out_mqtt_topic = mqtt_topic;
+  *out_mqtt_topic = az_span_slice(mqtt_topic, 0, written);
 
   return AZ_OK;
 }

@@ -67,11 +67,11 @@ void my_property_func()
 {
   //Allocate a span to put the properties
   uint8_t property_buffer[64];
-  az_span property_span = az_span_init(property_buffer, 0, sizeof(property_buffer));
+  az_span property_span = az_span_init(property_buffer, sizeof(property_buffer));
   
   //Initialize the property struct with the span
   az_iot_hub_client_properties props;
-  az_iot_hub_client_properties_init(&props, property_span);
+  az_iot_hub_client_properties_init(&props, property_span, 0);
   //Append properties
   az_iot_hub_client_properties_append(&props, AZ_SPAN_FROM_STR("key"), AZ_SPAN_FROM_STR("value"));
   //At this point, you are able to pass the `props` to other API's with property parameters.
@@ -87,7 +87,7 @@ void my_property_func()
 {
   //Initialize the property struct with the span
   az_iot_hub_client_properties props;
-  az_iot_hub_client_properties_init(&props, my_prop_span);
+  az_iot_hub_client_properties_init(&props, my_prop_span, az_span_size(my_prop_span));
   //At this point, you are able to pass the `props` to other API's with property parameters.
 }
 ```
@@ -112,7 +112,7 @@ void my_telemetry_func()
   //Optionally, the size can include space for a null terminator.
   //Here, the buffer is zero initialized to null terminate the topic.
   uint8_t telemetry_topic_buffer[64] = { 0 };
-  az_span topic_span = az_span_init(telemetry_topic_buffer, 0,
+  az_span topic_span = az_span_init(telemetry_topic_buffer,
                 sizeof(telemetry_topic_buffer) / sizeof(telemetry_topic_buffer[0]));
 
   //Get the NULL terminated topic and put in topic_span to send the telemetry

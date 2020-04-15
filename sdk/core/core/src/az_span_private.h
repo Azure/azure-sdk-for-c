@@ -14,17 +14,6 @@
 #include <_az_cfg_prefix.h>
 
 /**
- * @brief Use this only to create a span from uint8_t object.
- * The size of the returned span is always one.
- * Don't use this function for arrays. Use @var AZ_SPAN_FROM_ARRAY instead.
- * Don't us
- */
-AZ_NODISCARD AZ_INLINE az_span az_span_from_single_item(uint8_t* ptr)
-{
-  return az_span_init(ptr, 1, 1);
-}
-
-/**
  * @brief Replace all contents from a starting position to an end position with the content of a
  * provided span
  *
@@ -34,7 +23,7 @@ AZ_NODISCARD AZ_INLINE az_span az_span_from_single_item(uint8_t* ptr)
  * @param span content to use for replacement
  * @return AZ_NODISCARD az_span_replace
  */
-AZ_NODISCARD az_result _az_span_replace(az_span* self, int32_t start, int32_t end, az_span span);
+AZ_NODISCARD az_result _az_span_replace(az_span self, int32_t self_length, int32_t start, int32_t end, az_span span);
 
 typedef az_result (*_az_predicate)(az_span slice);
 

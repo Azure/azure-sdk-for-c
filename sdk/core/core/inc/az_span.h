@@ -27,16 +27,14 @@
 
 /**
  * az_span is a "view" over a byte buffer. It contains a pointer to the
- * start of the byte buffer, the buffer's capacity; and the length (number of
- * bytes) in use from the start of the buffer.
+ * start of the byte buffer and the buffer's available size.
  */
 typedef struct
 {
   struct
   {
     uint8_t* ptr;
-    int32_t length; ///< length must be >= 0
-    int32_t capacity; ///< capacity must be >= 0
+    int32_t size; ///< size must be >= 0
   } _internal;
 } az_span;
 
@@ -49,30 +47,22 @@ typedef struct
 AZ_NODISCARD AZ_INLINE uint8_t* az_span_ptr(az_span span) { return span._internal.ptr; }
 
 /**
- * @brief az_span_length Returns the number of bytes within the span.
+ * @brief az_span_size Returns the number of bytes within the span.
  *
  */
-AZ_NODISCARD AZ_INLINE int32_t az_span_length(az_span span) { return span._internal.length; }
-
-/**
- * @brief az_span_capacity Returns the maximum number of bytes.
- * Capacity will always be greater than or equal to length.
- *
- */
-AZ_NODISCARD AZ_INLINE int32_t az_span_capacity(az_span span) { return span._internal.capacity; }
+AZ_NODISCARD AZ_INLINE int32_t az_span_size(az_span span) { return span._internal.size; }
 
 /********************************  CONSTRUCTORS */
 
 /**
  * @brief Creates an empty span literal
  * ptr is NULL
- * length is initialized to 0
- * capacity is initialized to 0
+ * size is initialized to 0
  *
  */
 #define AZ_SPAN_LITERAL_NULL \
   { \
-    ._internal = {.ptr = NULL, .length = 0, .capacity = 0 } \
+    ._internal = {.ptr = NULL, .size = 0 } \
   }
 
 /**
@@ -88,8 +78,8 @@ AZ_NODISCARD AZ_INLINE int32_t az_span_capacity(az_span span) { return span._int
 
 /**
  * @brief The AZ_SPAN_LITERAL_FROM_STR macro returns a literal az_span over a literal string.
- * An empty ("") literal string results in a span with length/capacity set to 0.
- * The length and capacity of the span is equal to the length of the string.
+ * An empty ("") literal string results in a span with size set to 0.
+ * The size of the span is equal to the length of the string.
  * For example:
  *
  * `static const az_span hw = AZ_SPAN_LITERAL_FROM_STR("Hello world");`
@@ -98,8 +88,7 @@ AZ_NODISCARD AZ_INLINE int32_t az_span_capacity(az_span span) { return span._int
   { \
     ._internal = { \
       .ptr = (uint8_t*)STRING_LITERAL, \
-      .length = _az_STRING_LITERAL_LEN(STRING_LITERAL), \
-      .capacity = _az_STRING_LITERAL_LEN(STRING_LITERAL), \
+      .size = _az_STRING_LITERAL_LEN(STRING_LITERAL), \
     }, \
   }
 
@@ -114,61 +103,70 @@ AZ_NODISCARD AZ_INLINE int32_t az_span_capacity(az_span span) { return span._int
  * @brief az_span_init returns a span over a byte buffer.
  *
  * @param[in] ptr The memory address of the 1st byte in the byte buffer
- * @param[in] length The number of bytes initialized in the byte buffer
- * @param[in] capacity The number of total bytes in the byte buffer
+ * @param[in] size The number of total bytes in the byte buffer
  * @return az_span The "view" over the byte buffer.
  */
-AZ_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t length, int32_t capacity);
+AZ_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t size);
 
 /**
  * @brief az_span_from_str returns an az_span from a 0-terminated array of bytes (chars)
  *
  * @param[in] str The pointer to the 0-terminated array of bytes (chars)
- * @return az_span An az_span over the byte buffer; length & capacity are set to the string's
- * length not including the \0 terminator.
+ * @return az_span An az_span over the byte buffer; size is set to the string's length not including
+ * the \0 terminator.
  */
 AZ_NODISCARD az_span az_span_from_str(char* str);
 
 /**
  * @brief AZ_SPAN_LITERAL_FROM_BUFFER returns a literal az_span over a byte buffer.
- * The length of the resulting az_span is set to 0.
- * The capacity of the resulting az_span is set to the count of items the buffer can store based on
+ * The size of the resulting az_span is set to the count of items the buffer can store based on
  * the sizeof(BYTE_BUFFER). For example:
  *
  * uint8_t buffer[1024];
- * const az_span buf = AZ_SPAN_LITERAL_FROM_BUFFER(buffer);  // Len=0, Cap=1024
+ * const az_span buf = AZ_SPAN_LITERAL_FROM_BUFFER(buffer);  // Size = 1024
  */
 #define AZ_SPAN_LITERAL_FROM_BUFFER(BYTE_BUFFER) \
   { \
     ._internal = { \
       .ptr = (uint8_t*)BYTE_BUFFER, \
-      .length = 0, \
-      .capacity = (sizeof(BYTE_BUFFER) / sizeof(BYTE_BUFFER[0])), \
+      .size = (sizeof(BYTE_BUFFER) / sizeof(BYTE_BUFFER[0])), \
     }, \
   }
+
+// Returns 1 if the address of the array is equal to the address of its 1st element
+// https://stackoverflow.com/questions/16794900/validate-an-argument-is-array-type-in-c-c-pre-processing-macro-on-compile-time
+#define AZ_IS_ARRAY(array) ((sizeof(array[0]) == 1) && (((void*)&(array)) == ((void*)(&array[0]))))
 
 /**
  * @brief AZ_SPAN_FROM_BUFFER returns an az_span expression over an uninitialized byte buffer. For
  * example:
  *
  * uint8_t buffer[1024];
- * some_function(AZ_SPAN_FROM_BUFFER(buffer));  // Len=0, Cap=1024
+ * some_function(AZ_SPAN_FROM_BUFFER(buffer));  // Size = 1024
+ *
+ * BYTE_BUFFER MUST be an array defined like 'uint8_t buffer[10]'; and not 'uint8_t* buffer'
  */
-#define AZ_SPAN_FROM_BUFFER(BYTE_BUFFER) (az_span) AZ_SPAN_LITERAL_FROM_BUFFER(BYTE_BUFFER)
+#define AZ_SPAN_FROM_BUFFER(BYTE_BUFFER) \
+  (az_span) \
+  { \
+    ._internal = { \
+      .ptr = (uint8_t*)BYTE_BUFFER, \
+      .size = (sizeof(BYTE_BUFFER) / AZ_IS_ARRAY(BYTE_BUFFER)), \
+    }, \
+  }
 
 /**
  * @brief AZ_SPAN_LITERAL_FROM_INITIALIZED_BUFFER returns a literal az_span over an initialized byte
  * buffer. For example:
  *
  * uint8_t buffer[] = { 1, 2, 3 };
- * const az_span buf = AZ_SPAN_LITERAL_FROM_INITIALIZED_BUFFER(buffer); // Len=3, Cap=3
+ * const az_span buf = AZ_SPAN_LITERAL_FROM_INITIALIZED_BUFFER(buffer); // Size = 3
  */
 #define AZ_SPAN_LITERAL_FROM_INITIALIZED_BUFFER(BYTE_BUFFER) \
   { \
     ._internal = { \
       .ptr = BYTE_BUFFER, \
-      .length = (sizeof(BYTE_BUFFER) / sizeof(BYTE_BUFFER[0])), \
-      .capacity = (sizeof(BYTE_BUFFER) / sizeof(BYTE_BUFFER[0])), \
+      .size = (sizeof(BYTE_BUFFER) / sizeof(BYTE_BUFFER[0])), \
     }, \
   }
 
@@ -177,7 +175,7 @@ AZ_NODISCARD az_span az_span_from_str(char* str);
  * buffer. For example
  *
  * uint8_t buffer[] = { 1, 2, 3 };
- * const az_span buf = AZ_SPAN_LITERAL_FROM_INITIALIZED_BUFFER(buffer); // Len=3, Cap=3
+ * const az_span buf = AZ_SPAN_LITERAL_FROM_INITIALIZED_BUFFER(buffer); // Size = 3
  */
 #define AZ_SPAN_FROM_INITIALIZED_BUFFER(BYTE_BUFFER) \
   (az_span) AZ_SPAN_LITERAL_FROM_INITIALIZED_BUFFER(BYTE_BUFFER)
@@ -198,24 +196,24 @@ AZ_NODISCARD az_span az_span_from_str(char* str);
 AZ_NODISCARD az_span az_span_slice(az_span span, int32_t start_index, int32_t end_index);
 
 /**
- * @brief az_span_is_content_equal returns `true` if the lengths and bytes referred by \p span1 and
+ * @brief az_span_is_content_equal returns `true` if the sizes and bytes referred by \p span1 and
  * \p span2 are identical.
  *
- * @return Returns true if the lengths of both spans are identical and the bytes in both spans are
+ * @return Returns true if the sizes of both spans are identical and the bytes in both spans are
  * also identical.
  */
 AZ_NODISCARD AZ_INLINE bool az_span_is_content_equal(az_span span1, az_span span2)
 {
-  return az_span_length(span1) == az_span_length(span2)
-      && memcmp(az_span_ptr(span1), az_span_ptr(span2), (size_t)az_span_length(span1)) == 0;
+  return az_span_size(span1) == az_span_size(span2)
+      && memcmp(az_span_ptr(span1), az_span_ptr(span2), (size_t)az_span_size(span1)) == 0;
 }
 
 /**
- * @brief az_span_is_content_equal_ignoring_case returns `true` if the lengths and characters
+ * @brief az_span_is_content_equal_ignoring_case returns `true` if the sizes and characters
  * referred to by \p span1 and \p span2 are identical except for case. This function assumes the
  * bytes in both spans are ASCII characters.
  *
- * @return Returns true if the lengths of both spans are identical and the ASCII characters in both
+ * @return Returns true if the sizes of both spans are identical and the ASCII characters in both
  * spans are also identical except for case.
  */
 AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1, az_span span2);
@@ -226,18 +224,15 @@ AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1, az_span 
  *
  * The buffer referred to by destination must have a size that is at least 1 byte bigger
  * than the \p source az_span. The string \p destination is converted to a zero-terminated str.
- Content
- * is copied to \p source buffer and then \0 is added at the end. Then out_result will be created
- out
- * of buffer
+ * Content is copied to \p source buffer and then \0 is added at the end.
  *
  * @param[in] destination A pointer to a buffer where the string should be copied
  * @param[in] destination_max_size The maximum available space within the buffer referred to by
- destination.
+ * destination.
  * @param[in] source The az_span containing the not-0-terminated string
  * @return An #az_result value indicating the result of the operation.
  *          #AZ_OK If \p source span content is successfully copied to the destination.
- *          #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the \p destination buffer is too small to
+ *          #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the \p destination buffer is too small to
  copy the string and 0-terminate it
  */
 AZ_NODISCARD az_result
@@ -264,159 +259,49 @@ AZ_NODISCARD az_result az_span_to_uint64(az_span span, uint64_t* out_number);
  * @param out_number The pointer to the variable that is to receive the number
  * @return An #az_result value indicating the result of the operation.
  *          #AZ_OK if successful
- *          #AZ_ERROR_PARSER_UNEXPECTED_CHAR if a non-ASCII digit
- * is found within the span.
+ *          #AZ_ERROR_PARSER_UNEXPECTED_CHAR if a non-ASCII digit is found within the span.
  */
 AZ_NODISCARD az_result az_span_to_uint32(az_span span, uint32_t* out_number);
 
 /**
  * @brief az_span_find searches for `target` in `source`, returning an #az_span within `source` if
  * it finds it.
- * 
+ *
  * @param[in] source The #az_span with the content to be searched on.
  * @param[in] target The #az_span containing the token to be searched in `source`.
  * @return The position of `target` in `source` if `source` contains `target`,
- *         0 if `target` is empty (if its length is equal zero),
- *         -1 if `source` is empty (if its length is equal zero) and `target` is non-empty,
+ *         0 if `target` is empty (if its size is equal zero),
+ *         -1 if `source` is empty (if its size is equal zero) and `target` is non-empty,
  *         -1 if `target` is not found in `source`.
  */
 AZ_NODISCARD int32_t az_span_find(az_span source, az_span target);
 
-
-/******************************  SPAN APPENDING */
-
-/**
- * @brief az_span_append_uint8 appends the uint8 \p byte to the \p destination starting at the
- * destination span length.
- *
- * @param[in] destination The az_span where the byte should be appended to.
- * @param[in] byte The uint8 to append to the destination span
- * @return An #az_span that is a clone of the \p destination span with its length increased by 1.
- *         The method assumes that the \p destination has a large enough capacity to hold one more
- * byte.
- */
-az_span az_span_append_uint8(az_span destination, uint8_t byte);
-
-/**
- * @brief az_span_append appends the bytes referred to by the source span into the
- * destination span starting at the destination span length.
- *
- * @param[in] destination The az_span where the bytes should be appended to.
- * @param[in] source Refers to the bytes to be appended to the destination
- * @return An #az_span that is a clone of the \p destination span with its length increased by the
- * \p source length. The method assumes that the \p destination has a large enough capacity to hold
- * the \p source.
- */
-az_span az_span_append(az_span destination, az_span source);
-
-/**
- * @brief az_span_append_i32toa appends an int32 as digit characters to the destination
- * starting at the destination span length.
- *
- * @param[in] destination The az_span where the bytes should be appended to
- * @param[in] source The int32 whose number is appended to the destination span as ASCII
- * digits
- * @param[out] out_span A pointer to an az_span that receives the span referring to the
- * destination span with its length updated
- * @return An #az_result value indicating the result of the operation.
- *          #AZ_OK if successful
- *          #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the \p destination is not big enough to
- * contain the appended bytes
- */
-AZ_NODISCARD az_result
-az_span_append_i32toa(az_span destination, int32_t source, az_span* out_span);
-
-/**
- * @brief az_span_append_u32toa appends a uint32 as digit characters to the destination
- * starting at the destination span length.
- *
- * @param[in] destination The az_span where the bytes should be appended to
- * @param[in] source The uint32 whose number is appended to the destination span as ASCII
- * digits
- * @param[out] out_span A pointer to an az_span that receives the span referring to the
- * destination span with its length updated
- * @return An #az_result value indicating the result of the operation:
- *          #AZ_OK if successful
- *          #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the destination is not big enough to
- * contain the appended bytes
- */
-AZ_NODISCARD az_result
-az_span_append_u32toa(az_span destination, uint32_t source, az_span* out_span);
-
-/**
- * @brief az_span_append_i64toa appends an int64 as digit characters to the destination
- * starting at the destination span length.
- *
- * @param[in] destination The az_span where the bytes should be appended to
- * @param[in] source The int64 whose number is appended to the destination span as ASCII
- * digits
- * @param[out] out_span A pointer to an az_span that receives the span referring to the
- * destination span with its length updated
- * @return An #az_result value indicating the result of the operation:
- *          #AZ_OK if successful
- *          #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the destination is not big enough to
- * contain the appended bytes
- */
-AZ_NODISCARD az_result
-az_span_append_i64toa(az_span destination, int64_t source, az_span* out_span);
-
-/**
- * @brief az_span_append_u64toa appends a uint64 as digit characters to the destination
- * starting at the destination span length.
- *
- * @param[in] destination The az_span where the bytes should be appended to
- * @param[in] source The uint64 whose number is appended to the destination span as ASCII
- * digits
- * @param[out] out_span A pointer to an az_span that receives the span referring to the
- * destination span with its length updated
- * @return An #az_result value indicating the result of the operation:
- *          #AZ_OK if successful
- *          #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the destination is not big enough to
- * contain the appended bytes
- */
-AZ_NODISCARD az_result
-az_span_append_u64toa(az_span destination, uint64_t source, az_span* out_span);
-
-/**
- * @brief az_span_append_dtoa appends a double as digit characters to the destination
- * starting at the destination span length
- *
- * @param[in] destination The az_span where the bytes should be appended to
- * @param[in] source The double whose number is appended to the destination span as ASCII
- * digits
- * @param[out] out_span A pointer to an az_span that receives the span referring to the
- * destination span with its length updated
- * @return An #az_result value indicating the result of the operation:
- *          #AZ_OK if successful
- *          #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the destination is not big enough to
- * contain the appended bytes
- */
-AZ_NODISCARD az_result az_span_append_dtoa(az_span destination, double source, az_span* out_span);
-
 /******************************  SPAN COPYING */
 
 /**
- * @brief az_span_set sets all the bytes of the destination span (up to its capacity) to \p
- * fill.
+ * @brief az_span_copy copies the content of the source span to the destination span.
  *
- * @param[in] destination The span whose bytes will be set to \p fill
- * @param[in] fill The byte to be replicated within the destination span
- */
-AZ_INLINE void az_span_set(az_span destination, uint8_t fill)
-{
-  memset(az_span_ptr(destination), fill, (size_t)az_span_capacity(destination));
-}
-
-/**
- * @brief az_span_copy copies the content of the source span to the destination span
+ * @param[in] destination The span whose bytes will be replaced by the source's bytes.
+ * @param[in] source The span containing the bytes to copy to the destination.
+ * @return An #az_span that is a slice of the \p destination span (i.e. the remainder) after the
+ * source bytes has been copied.
  *
- * @param[in] destination The span whose bytes will be replaced by the source's bytes
- * @param[in] source The span containing the bytes to copy to the destination
- * @return An #az_span that is a clone of the \p destination span with its length updated to the \p
- * source length. The method assumes that the \p destination has a large enough capacity to hold the
- * \p source.
+ * @remarks The method assumes that the \p destination has a large enough size to hold the \p
+ * source.
+ * @remarks This method copies all of source to destination even if source and destination overlap.
  */
 az_span az_span_copy(az_span destination, az_span source);
+
+/**
+ * @brief az_span_copy_uint8 copies the uint8 \p byte to the \p destination at its 0-th index.
+ *
+ * @param[in] destination The az_span where the byte should be copied to.
+ * @param[in] byte The uint8 to copy into the destination span.
+ * @return An #az_span that is a slice of the \p destination span (i.e. the remainder) after the
+ * byte has been copied. The method assumes that the \p destination has a large enough size to
+ * hold one more byte.
+ */
+az_span az_span_copy_uint8(az_span destination, uint8_t byte);
 
 /**
  * @brief az_span_copy_url_encode Copies a URL in the source span to the destination span by
@@ -424,15 +309,101 @@ az_span az_span_copy(az_span destination, az_span source);
  *
  * @param[in] destination The span whose bytes will receive the url-encoded source
  * @param[in] source The span containing the non-url-encoded bytes
- * @param[out] out_span A pointer to an az_span that receives the span referring to the
- * destination span with its length updated
+ * @param[out] out_span A pointer to an az_span that receives the remainder of the destination span
+ * after the url-encoded source has been copied.
  * @return An #az_result value indicating the result of the operation.
  *          #AZ_OK if successful
- *          #AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY if the \p destination is not big enough to
- * hold the source's length
+ *          #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the \p destination is not big enough to contain
+ * the encoded bytes
  */
 AZ_NODISCARD az_result
 az_span_copy_url_encode(az_span destination, az_span source, az_span* out_span);
+
+/**
+ * @brief az_span_copy_i32toa copies an int32 as digit characters to the destination starting at its
+ * 0-th index.
+ *
+ * @param[in] destination The az_span where the bytes should be copied to.
+ * @param[in] source The int32 whose number is copied to the destination span as ASCII digits.
+ * @param[out] out_span A pointer to an az_span that receives the remainder of the destination span
+ * after the int32 has been copied.
+ * @return An #az_result value indicating the result of the operation.
+ *          #AZ_OK if successful
+ *          #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the \p destination is not big enough to contain
+ * the copied bytes
+ */
+AZ_NODISCARD az_result az_span_copy_i32toa(az_span destination, int32_t source, az_span* out_span);
+
+/**
+ * @brief az_span_copy_u32toa copies a uint32 as digit characters to the destination starting at its
+ * 0-th index.
+ *
+ * @param[in] destination The az_span where the bytes should be copied to.
+ * @param[in] source The uint32 whose number is copied to the destination span as ASCII digits.
+ * @param[out] out_span A pointer to an az_span that receives the remainder of the destination span
+ * after the uint32 has been copied.
+ * @return An #az_result value indicating the result of the operation:
+ *          #AZ_OK if successful
+ *          #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the destination is not big enough to contain the
+ * copied bytes
+ */
+AZ_NODISCARD az_result az_span_copy_u32toa(az_span destination, uint32_t source, az_span* out_span);
+
+/**
+ * @brief az_span_copy_i64toa copies an int64 as digit characters to the destination starting at its
+ * 0-th index.
+ *
+ * @param[in] destination The az_span where the bytes should be copied to.
+ * @param[in] source The int64 whose number is copied to the destination span as ASCII digits.
+ * @param[out] out_span A pointer to an az_span that receives the remainder of the destination span
+ * after the int64 has been copied.
+ * @return An #az_result value indicating the result of the operation:
+ *          #AZ_OK if successful
+ *          #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the destination is not big enough to contain the
+ * copied bytes
+ */
+AZ_NODISCARD az_result az_span_copy_i64toa(az_span destination, int64_t source, az_span* out_span);
+
+/**
+ * @brief az_span_copy_u64toa copies a uint64 as digit characters to the destination starting at its
+ * 0-th index.
+ *
+ * @param[in] destination The az_span where the bytes should be copied to.
+ * @param[in] source The uint64 whose number is copied to the destination span as ASCII digits.
+ * @param[out] out_span A pointer to an az_span that receives the remainder of the destination span
+ * after the uint64 has been copied.
+ * @return An #az_result value indicating the result of the operation:
+ *          #AZ_OK if successful
+ *          #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the destination is not big enough to contain the
+ * copied bytes
+ */
+AZ_NODISCARD az_result az_span_copy_u64toa(az_span destination, uint64_t source, az_span* out_span);
+
+/**
+ * @brief az_span_copy_dtoa copies a double as digit characters to the destination starting at its
+ * 0-th index.
+ *
+ * @param[in] destination The az_span where the bytes should be copied to.
+ * @param[in] source The double whose number is copied to the destination span as ASCII digits.
+ * @param[out] out_span A pointer to an az_span that receives the remainder of the destination span
+ * after the double has been copied.
+ * @return An #az_result value indicating the result of the operation:
+ *          #AZ_OK if successful
+ *          #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the destination is not big enough to contain the
+ * copied bytes
+ */
+AZ_NODISCARD az_result az_span_copy_dtoa(az_span destination, double source, az_span* out_span);
+
+/**
+ * @brief az_span_fill Fills all the bytes of the destination span with the specified value.
+ *
+ * @param[in] destination The span whose bytes will be set to \p value.
+ * @param[in] value The byte to be replicated within the destination span.
+ */
+AZ_INLINE void az_span_fill(az_span destination, uint8_t value)
+{
+  memset(az_span_ptr(destination), value, (size_t)az_span_size(destination));
+}
 
 /******************************  SPAN PAIR  */
 
@@ -448,7 +419,7 @@ typedef struct
 
 /**
  * @brief The AZ_PAIR_NULL macro returns an az_pair instance whose key and value fields are
- * initialized to AZ_SPAN_NULL
+ * initialized to AZ_SPAN_NULL.
  *
  */
 #define AZ_PAIR_NULL \
@@ -458,9 +429,9 @@ typedef struct
  * @brief az_pair_init returns an az_pair with its key and value fields initialized to the specified
  * key and value parameters.
  *
- * @param[in] key A span whose bytes represent the key
- * @param[in] value A span whose bytes represent the key's value
- * @return  An az_pair with the field initialized to the parameters' values
+ * @param[in] key A span whose bytes represent the key.
+ * @param[in] value A span whose bytes represent the key's value.
+ * @return  An az_pair with the field initialized to the parameters' values.
  */
 AZ_NODISCARD AZ_INLINE az_pair az_pair_init(az_span key, az_span value)
 {
@@ -471,10 +442,10 @@ AZ_NODISCARD AZ_INLINE az_pair az_pair_init(az_span key, az_span value)
  * @brief az_pair_from_str returns an az_pair with its key and value fields initialized to span's
  * over the specified key and value 0-terminated string parameters.
  *
- * @param[in] key A string representing the key
- * @param[in] value A string representing the key's value
- * @return  An az_pair with the field initialized to the az_span instances over the passed-in
- * strings
+ * @param[in] key A string representing the key.
+ * @param[in] value A string representing the key's value.
+ * @return  An az_pair with the fields initialized to the az_span instances over the passed-in
+ * strings.
  */
 AZ_NODISCARD AZ_INLINE az_pair az_pair_from_str(char* key, char* value)
 {

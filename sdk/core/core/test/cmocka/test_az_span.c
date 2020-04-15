@@ -20,7 +20,6 @@ void test_az_span_getters(void** state)
 
   uint8_t example[] = "example";
   az_span span = AZ_SPAN_FROM_INITIALIZED_BUFFER(example);
-  assert_int_equal(az_span_capacity(span), 8);
-  assert_int_equal(az_span_length(span), 8);
+  assert_int_equal(az_span_size(span), 8);
   assert_ptr_equal(az_span_ptr(span), &example);
 }
