@@ -144,7 +144,9 @@ static void test_az_iot_pnp_client_get_user_name_succeed(void** state)
 
   assert_int_equal(az_span_length(test_span), _az_COUNTOF(test_correct_pnp_user_name) - 1);
   assert_memory_equal(
-      test_correct_pnp_user_name, az_span_ptr(test_span), _az_COUNTOF(test_correct_pnp_user_name) - 1);
+      test_correct_pnp_user_name,
+      az_span_ptr(test_span),
+      _az_COUNTOF(test_correct_pnp_user_name) - 1);
 }
 
 static void test_az_iot_pnp_client_get_user_name_small_buffer_fail(void** state)
@@ -217,7 +219,7 @@ static void test_az_iot_pnp_client_get_user_name_user_options_small_buffer_fail(
 // merge if guidance is available.  Otherwise will open separate GitHub bug to not block merge
 // and record number here.
 
-int test_iot_pnp_client()
+int test_iot_pnp_client(char const* const test_set_name)
 {
 #ifndef NO_PRECONDITION_CHECKING
   setup_precondition_check_tests();
@@ -238,6 +240,5 @@ int test_iot_pnp_client()
     cmocka_unit_test(test_az_iot_pnp_client_get_user_name_user_options_succeed),
     cmocka_unit_test(test_az_iot_pnp_client_get_user_name_user_options_small_buffer_fail),
   };
-  return cmocka_run_group_tests_name("az_iot_pnp_client", tests, NULL, NULL);
+  return cmocka_run_group_tests_name(test_set_name, tests, NULL, NULL);
 }
-

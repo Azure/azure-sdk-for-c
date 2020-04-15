@@ -14,8 +14,8 @@
 int main()
 {
   int result = 0;
-  
-  result += test_az_iot_core();
-  
+
+  result += test_az_iot_core("az_iot_core");
+
   return result;
 }

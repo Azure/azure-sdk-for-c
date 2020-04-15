@@ -330,7 +330,7 @@ test_az_iot_hub_client_telemetry_publish_topic_get_with_options_module_id_with_p
       _az_COUNTOF(g_test_correct_topic_with_options_module_id_with_props) - 2);
 }
 
-int test_iot_hub_telemetry()
+int test_iot_hub_telemetry(char const* const test_set_name)
 {
 #ifndef NO_PRECONDITION_CHECKING
   setup_precondition_check_tests();
@@ -361,5 +361,5 @@ int test_iot_hub_telemetry()
         test_az_iot_hub_client_telemetry_publish_topic_get_with_options_module_id_with_props_small_buffer_fails),
   };
 
-  return cmocka_run_group_tests_name("az_iot_hub_client_telemetry", tests, NULL, NULL);
+  return cmocka_run_group_tests_name(test_set_name, tests, NULL, NULL);
 }

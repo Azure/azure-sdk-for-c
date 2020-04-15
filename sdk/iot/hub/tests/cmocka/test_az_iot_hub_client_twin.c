@@ -558,7 +558,7 @@ static void test_az_iot_hub_client_twin_patch_publish_topic_get_small_buffer_fai
       az_span_capacity(test_span), _az_COUNTOF(test_correct_twin_patch_pub_topic) - 2);
 }
 
-int test_az_iot_hub_client_twin()
+int test_az_iot_hub_client_twin(char const* const test_set_name)
 {
 #ifndef NO_PRECONDITION_CHECKING
   setup_precondition_check_tests();
@@ -600,5 +600,5 @@ int test_az_iot_hub_client_twin()
     cmocka_unit_test(test_az_iot_hub_client_twin_patch_publish_topic_get_small_buffer_fails),
   };
 
-  return cmocka_run_group_tests_name("az_iot_hub_client_twin", tests, NULL, NULL);
+  return cmocka_run_group_tests_name(test_set_name, tests, NULL, NULL);
 }

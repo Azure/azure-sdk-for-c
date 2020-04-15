@@ -12,17 +12,16 @@
 
 #include <cmocka.h>
 
-
 static void test_az_iot_provisioning_client_register_publish_topic_get_succeed(void** state)
 {
   (void)state;
 }
 
-int test_az_iot_provisioning_client_register()
+int test_az_iot_provisioning_client_register(char const* const test_set_name)
 {
   const struct CMUnitTest tests[] = {
-       cmocka_unit_test(test_az_iot_provisioning_client_register_publish_topic_get_succeed),
+    cmocka_unit_test(test_az_iot_provisioning_client_register_publish_topic_get_succeed),
   };
 
-  return cmocka_run_group_tests_name("az_iot_provisioning_client_register", tests, NULL, NULL);
+  return cmocka_run_group_tests_name(test_set_name, tests, NULL, NULL);
 }

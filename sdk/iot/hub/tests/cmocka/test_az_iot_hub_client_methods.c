@@ -3,8 +3,8 @@
 
 #include "test_az_iot_hub_client.h"
 #include <az_iot_hub_client.h>
-#include <az_span.h>
 #include <az_result.h>
+#include <az_span.h>
 
 #include <az_precondition.h>
 #include <az_precondition_internal.h>
@@ -465,7 +465,7 @@ static void test_az_iot_hub_client_methods_received_topic_parse_response_topic_f
       == AZ_ERROR_IOT_TOPIC_NO_MATCH);
 }
 
-int test_iot_hub_methods()
+int test_iot_hub_methods(char const* const test_set_name)
 {
 #ifndef NO_PRECONDITION_CHECKING
   setup_precondition_check_tests();
@@ -508,5 +508,5 @@ int test_iot_hub_methods()
     cmocka_unit_test(test_az_iot_hub_client_methods_received_topic_parse_response_topic_fail)
   };
 
-  return cmocka_run_group_tests_name("az_iot_hub_methods", tests, NULL, NULL);
+  return cmocka_run_group_tests_name(test_set_name, tests, NULL, NULL);
 }

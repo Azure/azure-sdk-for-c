@@ -1,4 +1,4 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-int test_az_iot_core();
+int test_az_iot_core(char const* const test_set_name);

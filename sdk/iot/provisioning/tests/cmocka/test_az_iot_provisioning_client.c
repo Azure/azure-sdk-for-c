@@ -155,7 +155,7 @@ static void test_az_iot_provisioning_client_get_operation_status_publish_topic_f
 #pragma warning(disable : 4113)
 #endif
 
-int test_az_iot_provisioning_client()
+int test_az_iot_provisioning_client(char const* const test_set_name)
 {
   const struct CMUnitTest tests[] = {
     cmocka_unit_test(test_az_iot_provisioning_client_options_default_succeed),
@@ -167,5 +167,5 @@ int test_az_iot_provisioning_client()
         test_az_iot_provisioning_client_get_operation_status_publish_topic_filter_succeed),
   };
 
-  return cmocka_run_group_tests_name("az_iot_provisioning_client", tests, NULL, NULL);
+  return cmocka_run_group_tests_name(test_set_name, tests, NULL, NULL);
 }

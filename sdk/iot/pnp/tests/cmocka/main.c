@@ -15,8 +15,8 @@ int main()
 {
   int result = 0;
 
-  result += test_iot_pnp_client();
-  result += test_iot_pnp_telemetry();
+  result += test_iot_pnp_client("az_iot_pnp_client");
+  result += test_iot_pnp_telemetry("az_iot_pnp_client_telemetry");
 
   return result;
 }

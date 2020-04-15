@@ -3,5 +3,5 @@
 
 // Placeholder for int test_iot_provisioning_(); declarations
 
-int test_az_iot_provisioning_client();
-int test_az_iot_provisioning_client_register();
+int test_az_iot_provisioning_client(char const* const test_set_name);
+int test_az_iot_provisioning_client_register(char const* const test_set_name);

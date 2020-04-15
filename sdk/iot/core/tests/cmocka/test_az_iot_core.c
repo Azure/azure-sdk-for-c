@@ -136,11 +136,11 @@ static void test_az_iot_get_status_from_uint32(void** state)
 
 }
 
-int test_az_iot_core()
+int test_az_iot_core(char const* const test_set_name)
 {
   const struct CMUnitTest tests[] = {
     cmocka_unit_test(az_span_token_success),
     cmocka_unit_test(test_az_iot_get_status_from_uint32),
   };
-  return cmocka_run_group_tests_name("az_iot_core", tests, NULL, NULL);
+  return cmocka_run_group_tests_name(test_set_name, tests, NULL, NULL);
 }

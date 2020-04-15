@@ -862,7 +862,7 @@ static void test_az_iot_hub_client_properties_next_empty_succeed(void** state)
   assert_int_equal(az_iot_hub_client_properties_next(&props, &pair_out), AZ_ERROR_EOF);
 }
 
-int test_iot_hub_client()
+int test_iot_hub_client(char const* const test_set_name)
 {
 #ifndef NO_PRECONDITION_CHECKING
   setup_precondition_check_tests();
@@ -923,5 +923,5 @@ int test_iot_hub_client()
     cmocka_unit_test(test_az_iot_hub_client_properties_next_twice_succeed),
     cmocka_unit_test(test_az_iot_hub_client_properties_next_empty_succeed),
   };
-  return cmocka_run_group_tests_name("az_iot_hub_client", tests, NULL, NULL);
+  return cmocka_run_group_tests_name(test_set_name, tests, NULL, NULL);
 }
