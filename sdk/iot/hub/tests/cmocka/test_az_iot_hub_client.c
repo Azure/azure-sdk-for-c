@@ -61,7 +61,7 @@ static const char test_correct_one_key_value[] = "key_one=value_one";
 static const char test_correct_two_key_value[] = "key_one=value_one&key_two=value_two";
 
 #ifndef NO_PRECONDITION_CHECKING
-enable_precondition_check_tests();
+enable_precondition_check_tests()
 
 static void test_az_iot_hub_client_init_NULL_client_fails(void** state)
 {

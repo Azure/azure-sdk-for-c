@@ -40,7 +40,7 @@ static const char test_correct_pnp_user_name_with_user_agent[]
       "&digital-twin-model-id=" TEST_ROOT_INTERFACE_NAME;
 
 #ifndef NO_PRECONDITION_CHECKING
-enable_precondition_check_tests();
+enable_precondition_check_tests()
 
 static void test_az_iot_pnp_client_init_NULL_client_fails(void** state)
 {

@@ -27,7 +27,7 @@
 #define TEST_KEY_NAME "iothubowner"
 
 #ifndef NO_PRECONDITION_CHECKING
-enable_precondition_check_tests();
+enable_precondition_check_tests()
 
 // Tests
 

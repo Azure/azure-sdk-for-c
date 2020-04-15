@@ -35,7 +35,7 @@ static const az_span test_URL_ENCODED_topic
                                "ghi=%2Fsome%2Fthing&jkl=%2Fsome%2Fthing%2F%3Fbla%3Dbla");
 
 #ifndef NO_PRECONDITION_CHECKING
-enable_precondition_check_tests();
+enable_precondition_check_tests()
 
 static void test_az_iot_hub_client_c2d_received_topic_parse_NULL_client_fail(void** state)
 {

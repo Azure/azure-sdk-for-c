@@ -95,13 +95,7 @@ void test_az_http_pipeline_policy_telemetry()
 
   assert_return_code(
       az_http_request_init(
-          &hrb,
-          &az_context_app,
-          az_http_method_get(),
-          url_span,
-          3,
-          header_span,
-          AZ_SPAN_NULL),
+          &hrb, &az_context_app, az_http_method_get(), url_span, 3, header_span, AZ_SPAN_NULL),
       AZ_OK);
 
   // Create policy options
@@ -134,13 +128,7 @@ void test_az_http_pipeline_policy_apiversion()
 
   assert_return_code(
       az_http_request_init(
-          &hrb,
-          &az_context_app,
-          az_http_method_get(),
-          url_span,
-          3,
-          header_span,
-          AZ_SPAN_NULL),
+          &hrb, &az_context_app, az_http_method_get(), url_span, 3, header_span, AZ_SPAN_NULL),
       AZ_OK);
 
   // Create policy options
@@ -180,13 +168,7 @@ void test_az_http_pipeline_policy_uniquerequestid()
 
   assert_return_code(
       az_http_request_init(
-          &hrb,
-          &az_context_app,
-          az_http_method_get(),
-          url_span,
-          3,
-          header_span,
-          AZ_SPAN_NULL),
+          &hrb, &az_context_app, az_http_method_get(), url_span, 3, header_span, AZ_SPAN_NULL),
       AZ_OK);
 
   _az_http_policy policies[1] = {            
@@ -283,12 +265,7 @@ void test_az_http_pipeline_policy_credential()
 
   assert_return_code(
       az_http_request_init(
-          &hrb,
-          &az_context_app,
-          az_http_method_get(),
-          az_span_slice(url_span, 0, 3),
-          header_span,
-          AZ_SPAN_NULL),
+          &hrb, &az_context_app, az_http_method_get(), url_span, 3, header_span, AZ_SPAN_NULL),
       AZ_OK);
 
   // Create a credential sample
@@ -330,12 +307,7 @@ void test_az_http_pipeline_policy_retry()
 
   assert_return_code(
       az_http_request_init(
-          &hrb,
-          &az_context_app,
-          az_http_method_get(),
-          az_span_slice(url_span, 0, 3),
-          header_span,
-          AZ_SPAN_NULL),
+          &hrb, &az_context_app, az_http_method_get(), url_span, 3, header_span, AZ_SPAN_NULL),
       AZ_OK);
 
   // Create policy options
@@ -375,12 +347,7 @@ void test_az_http_pipeline_policy_retry_with_header()
 
   assert_return_code(
       az_http_request_init(
-          &hrb,
-          &az_context_app,
-          az_http_method_get(),
-          az_span_slice(url_span, 0, 3),
-          header_span,
-          AZ_SPAN_NULL),
+          &hrb, &az_context_app, az_http_method_get(), url_span, 3, header_span, AZ_SPAN_NULL),
       AZ_OK);
 
   // Create policy options
@@ -420,12 +387,7 @@ void test_az_http_pipeline_policy_retry_with_header_2()
 
   assert_return_code(
       az_http_request_init(
-          &hrb,
-          &az_context_app,
-          az_http_method_get(),
-          az_span_slice(url_span, 0, 3),
-          header_span,
-          AZ_SPAN_NULL),
+          &hrb, &az_context_app, az_http_method_get(), url_span, 3, header_span, AZ_SPAN_NULL),
       AZ_OK);
 
   // Create policy options
