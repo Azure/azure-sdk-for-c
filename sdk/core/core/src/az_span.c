@@ -18,6 +18,9 @@ enum
   _az_ASCII_LOWER_DIF = 'a' - 'A',
 };
 
+#ifndef NO_PRECONDITION_CHECKING
+// Note: If you are modifying this method, make sure to modify the inline version in the az_span.h
+// file as well.
 AZ_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t size)
 {
   // If ptr is not null, then:
@@ -26,24 +29,16 @@ AZ_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t size)
   //   size == 0
   AZ_PRECONDITION((ptr != NULL && size >= 0) || (ptr + (uint32_t)size == 0));
 
-  // Make sure that the user can't create an invalid az_span with a negative size.
-  if (ptr == NULL || size < 0)
-  {
-    size = 0;
-  }
-
   return (az_span){ ._internal = { .ptr = ptr, .size = size, }, };
 }
-
-AZ_NODISCARD AZ_INLINE az_span _az_span_init_unchecked(uint8_t* ptr, int32_t size)
-{
-  return (az_span){ ._internal = { .ptr = ptr, .size = size, }, };
-}
+#endif // NO_PRECONDITION_CHECKING
 
 AZ_NODISCARD az_span az_span_from_str(char* str)
 {
   AZ_PRECONDITION_NOT_NULL(str);
 
+  // Avoid passing in null pointer to strlen to avoid memory access violation:
+  // https://stackoverflow.com/questions/5796103/strlen-not-checking-for-null
   if (str == NULL)
   {
     return AZ_SPAN_NULL;
@@ -53,7 +48,7 @@ AZ_NODISCARD az_span az_span_from_str(char* str)
 
   AZ_PRECONDITION(length >= 0);
 
-  return _az_span_init_unchecked((uint8_t*)str, length);
+  return az_span_init((uint8_t*)str, length);
 }
 
 AZ_NODISCARD az_span az_span_slice(az_span span, int32_t start_index, int32_t end_index)
@@ -74,22 +69,12 @@ AZ_NODISCARD az_span az_span_slice(az_span span, int32_t start_index, int32_t en
       (end_index == -1 && ((uint32_t)start_index <= (uint32_t)az_span_size(span)))
       || ((uint32_t)start_index <= (uint32_t)end_index));
 
-  int32_t const size = az_span_size(span);
-
-  // Slicing beyond the span's size is not allowed.
-  // Also make sure that start_index is not negative and it is not larger than end_index.
-  if (((uint32_t)(end_index + 1) > (uint32_t)(size + 1)) || ((uint32_t)start_index > (uint32_t)size)
-      || ((uint32_t)start_index > (uint32_t)end_index))
-  {
-    return span;
-  }
-
   int32_t new_size;
 
   // If end_index == -1, slice to the end of the span's size.
   if (end_index == -1)
   {
-    new_size = size - start_index;
+    new_size = az_span_size(span) - start_index;
   }
   else
   {
@@ -98,7 +83,7 @@ AZ_NODISCARD az_span az_span_slice(az_span span, int32_t start_index, int32_t en
 
   AZ_PRECONDITION(new_size >= 0);
 
-  return _az_span_init_unchecked(az_span_ptr(span) + start_index, new_size);
+  return az_span_init(az_span_ptr(span) + start_index, new_size);
 }
 
 AZ_NODISCARD AZ_INLINE uint8_t _az_tolower(uint8_t value)

@@ -28,6 +28,16 @@ static void az_span_slice_test()
   assert_int_equal(az_span_size(result), 15);
 }
 
+static void az_span_from_str_succeeds()
+{
+  char* str = "HelloWorld";
+  az_span buffer = az_span_from_str(str);
+
+  assert_int_equal(az_span_size(buffer), 10);
+  assert_true(az_span_ptr(buffer) != NULL);
+  assert_true((char*)az_span_ptr(buffer) == str);
+}
+
 static void az_single_char_ascii_lower_test()
 {
   for (uint8_t i = 0; i <= SCHAR_MAX; ++i)
@@ -359,6 +369,8 @@ void test_az_span(void** state)
   (void)state;
 
   az_span_slice_test();
+
+  az_span_from_str_succeeds();
 
   az_span_append_uint8_succeeds();
 
