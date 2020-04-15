@@ -111,7 +111,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_register_subscribe_topic_filte
     az_span mqtt_topic_filter,
     az_span* out_mqtt_topic_filter)
 {
-  UNUSED(client);
+  (void)client;
 
   AZ_PRECONDITION_NOT_NULL(client);
   AZ_PRECONDITION_VALID_SPAN(mqtt_topic_filter, 0, false);
@@ -141,10 +141,10 @@ AZ_NODISCARD az_result az_iot_provisioning_client_received_topic_payload_parse(
     az_span received_payload,
     az_iot_provisioning_client_register_response* out_response)
 {
-  UNUSED(client);
-  UNUSED(received_topic);
-  UNUSED(received_payload);
-  UNUSED(out_response);
+  (void)client;
+  (void)received_topic;
+  (void)received_payload;
+  (void)out_response;
 
   return AZ_ERROR_NOT_IMPLEMENTED;
 }
@@ -155,7 +155,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_register_publish_topic_get(
     az_span mqtt_topic,
     az_span* out_mqtt_topic)
 {
-  UNUSED(client);
+  (void)client;
 
   AZ_PRECONDITION_NOT_NULL(client);
   AZ_PRECONDITION_VALID_SPAN(mqtt_topic, 0, false);
@@ -182,7 +182,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_get_operation_status_publish_t
     az_span mqtt_topic,
     az_span* out_mqtt_topic)
 {
-  UNUSED(client);
+  (void)client;
 
   AZ_PRECONDITION_NOT_NULL(client);
   AZ_PRECONDITION_VALID_SPAN(mqtt_topic, 0, false);

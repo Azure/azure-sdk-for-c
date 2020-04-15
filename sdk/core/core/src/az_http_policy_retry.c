@@ -163,6 +163,8 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
   int32_t const max_retry_delay_msec = retry_options->max_retry_delay_msec;
   az_http_status_code const* const status_codes = retry_options->status_codes;
 
+  AZ_RETURN_IF_FAILED(_az_http_request_mark_retry_headers_start(p_request));
+
   az_context* const context = p_request->_internal.context;
 
   bool const should_log = az_log_should_write(AZ_LOG_HTTP_RETRY);

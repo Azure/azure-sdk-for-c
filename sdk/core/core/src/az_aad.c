@@ -84,7 +84,7 @@ AZ_NODISCARD az_result _az_aad_request_token(_az_http_request* request, _az_toke
   AZ_RETURN_IF_FAILED(az_http_request_append_header(
       request,
       AZ_SPAN_FROM_STR("Content-Type"),
-      AZ_SPAN_FROM_STR("application/x-www-url-form-urlencoded")));
+      AZ_SPAN_FROM_STR("application/x-www-form-urlencoded")));
 
   uint8_t response_buf[_az_AAD_RESPONSE_BUF_SIZE] = { 0 };
   az_http_response response = { 0 };
