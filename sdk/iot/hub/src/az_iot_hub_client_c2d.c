@@ -46,6 +46,7 @@ AZ_NODISCARD az_result az_iot_hub_client_c2d_received_topic_parse(
   AZ_PRECONDITION_NOT_NULL(client);
   AZ_PRECONDITION_VALID_SPAN(received_topic, 1, false);
   AZ_PRECONDITION_NOT_NULL(out_request);
+  (void)client;
 
   az_span token;
   token = az_span_token(received_topic, c2d_topic_suffix, &received_topic);
