@@ -18,16 +18,16 @@
 #define URI_ENV "test_uri"
 
 int exit_code = 0;
-static az_span content_to_upload = AZ_SPAN_LITERAL_FROM_STR("Some test Content");
+static az_span content_to_upload = AZ_SPAN_LITERAL_FROM_STR("Some test content");
 
+// Uncomment below code to enable logging (and the first lines of main function)
 /*
-* uncomment this to enable logging
 static void test_log_func(az_log_classification classification, az_span message)
 {
   (void)classification;
   printf("%.*s\n", az_span_length(message), az_span_ptr(message));
 }
- */
+*/
 
 /**
  * @brief Returns blob content in buffer
@@ -104,10 +104,12 @@ az_storage_blobs_blob_delete(az_storage_blobs_blob_client* client, az_http_respo
 
 int main()
 {
-  /* Uncomment this to enable logging all http responses
+  // Uncomment below code to enable logging
+  /*
   az_log_classification const classifications[] = { AZ_LOG_HTTP_RESPONSE, AZ_LOG_END_OF_LIST };
   az_log_set_classifications(classifications);
-  az_log_set_callback(test_log_func); */
+  az_log_set_callback(test_log_func);
+  */
 
   // Init client.
   //  Example expects the URI_ENV to be a URL w/ SAS token

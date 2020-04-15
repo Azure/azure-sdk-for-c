@@ -3,6 +3,7 @@
 
 #include <az_http.h>
 
+#include "az_http_private.h"
 #include "az_span_private.h"
 #include <az_precondition.h>
 #include <az_precondition_internal.h>
@@ -257,4 +258,16 @@ AZ_NODISCARD az_result az_http_response_get_body(az_http_response* response, az_
 
   response->_internal.parser.next_kind = _az_HTTP_RESPONSE_KIND_EOF;
   return AZ_OK;
+}
+
+void _az_http_response_reset(az_http_response* http_response)
+{
+  // never fails, discard the result
+  az_result result = az_http_response_init(
+      http_response,
+      az_span_init(
+          http_response->_internal.http_response._internal.ptr,
+          0,
+          az_span_capacity(http_response->_internal.http_response)));
+  (void)result;
 }
