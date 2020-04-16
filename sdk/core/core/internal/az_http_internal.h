@@ -244,7 +244,7 @@ AZ_NODISCARD az_result az_http_request_append_path(_az_http_request* p_request, 
  * @return
  *   - *`AZ_OK`* success.
  *   - *`AZ_ERROR_INSUFFICIENT_SPAN_SIZE`* the `URL` would grow past the `max_url_size`, should
- * the parameter gets set.
+ * the parameter get set.
  *   - *`AZ_ERROR_ARG`*
  *     - `p_request` is _NULL_.
  *     - `name` or `value` are invalid spans (see @ref az_span_is_valid).
