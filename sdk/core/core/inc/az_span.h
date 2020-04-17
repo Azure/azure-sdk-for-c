@@ -102,7 +102,13 @@ AZ_NODISCARD AZ_INLINE int32_t az_span_size(az_span span) { return span._interna
 #define AZ_SPAN_FROM_STR(STRING_LITERAL) (az_span) AZ_SPAN_LITERAL_FROM_STR(STRING_LITERAL)
 
 // Returns 1 if the address of the array is equal to the address of its 1st element.
-#define _az_IS_ARRAY(array) ((sizeof(array[0]) == 1) && (((void*)&(array)) == ((void*)(&array[0]))))
+// Returns 0 for anything that is not an array (for example any arbitrary pointer).
+#define _az_IS_ARRAY(array) (((void*)&(array)) == ((void*)(&array[0])))
+
+// Returns 1 if the element size of the array is 1 (which is only true for byte arrays such as
+// uint8_t[] and char[]).
+// Returns 0 for any other element size (for example int32_t[]).
+#define _az_IS_BYTE_ARRAY(array) ((sizeof(array[0]) == 1) && _az_IS_ARRAY(array))
 
 /**
  * @brief Returns an #az_span expression over an uninitialized byte buffer.
@@ -116,12 +122,13 @@ AZ_NODISCARD AZ_INLINE int32_t az_span_size(az_span span) { return span._interna
  * @remarks BYTE_BUFFER MUST be an array defined like `uint8_t buffer[10];` and not `uint8_t*
  * buffer`
  */
+// Force a division by 0 that gets detected by compilers for anything that isn't a byte array.
 #define AZ_SPAN_FROM_BUFFER(BYTE_BUFFER) \
   (az_span) \
   { \
     ._internal = { \
       .ptr = (uint8_t*)BYTE_BUFFER, \
-      .size = (sizeof(BYTE_BUFFER) / _az_IS_ARRAY(BYTE_BUFFER)), \
+      .size = (sizeof(BYTE_BUFFER) / (_az_IS_BYTE_ARRAY(BYTE_BUFFER) ? 1 : 0)), \
     }, \
   }
 

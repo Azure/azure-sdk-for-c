@@ -28,6 +28,44 @@ static void az_span_slice_to_end_test()
   assert_int_equal(az_span_size(result), 15);
 }
 
+static void az_span_test_macro_only_allows_byte_buffers()
+{
+  {
+    uint8_t uint8_buffer[2];
+    assert_int_equal(_az_IS_ARRAY(uint8_buffer), 1);
+    assert_int_equal(_az_IS_BYTE_ARRAY(uint8_buffer), 1);
+    az_span valid = AZ_SPAN_FROM_BUFFER(uint8_buffer);
+    assert_int_equal(az_span_size(valid), 2);
+  }
+
+  {
+    char char_buffer[2];
+    assert_int_equal(_az_IS_ARRAY(char_buffer), 1);
+    assert_int_equal(_az_IS_BYTE_ARRAY(char_buffer), 1);
+    az_span valid = AZ_SPAN_FROM_BUFFER(char_buffer);
+    assert_int_equal(az_span_size(valid), 2);
+  }
+
+  {
+    uint32_t uint32_buffer[2];
+    assert_int_equal(_az_IS_ARRAY(uint32_buffer), 1);
+    assert_int_equal(_az_IS_BYTE_ARRAY(uint32_buffer), 0);
+  }
+
+  {
+    uint8_t x = 1;
+    uint8_t* p1 = &x;
+    assert_int_equal(_az_IS_ARRAY(p1), 0);
+    assert_int_equal(_az_IS_BYTE_ARRAY(p1), 0);
+  }
+
+  {
+    char* p1 = "HELLO";
+    assert_int_equal(_az_IS_ARRAY(p1), 0);
+    assert_int_equal(_az_IS_BYTE_ARRAY(p1), 0);
+  }
+}
+
 static void az_span_from_str_succeeds()
 {
   char* str = "HelloWorld";
@@ -369,6 +407,8 @@ void test_az_span(void** state)
   (void)state;
 
   az_span_slice_to_end_test();
+
+  az_span_test_macro_only_allows_byte_buffers();
 
   az_span_from_str_succeeds();
 
