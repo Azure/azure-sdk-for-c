@@ -215,17 +215,14 @@ AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1, az_span 
  destination char buffer and appends the 0-terminating byte.
  *
  * The buffer referred to by \p destination must have a size that is at least 1 byte bigger
- * than the \p source #az_span. The \p destination string is zero-terminated.
+ * than the \p source #az_span for the \p destination string to be zero-terminated.
  * Content is copied from the \p source buffer and then \0 is added at the end.
  *
  * @param[in] destination A pointer to a buffer where the string should be copied into.
  * @param[in] destination_max_size The maximum available space within the buffer referred to by
  * \p destination.
- * @param[in] source The #az_span containing the not-0-terminated string.
- * @return An #az_result value indicating the result of the operation:
- *         - #AZ_OK if the \p source content is successfully copied to the \p destination
- *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the \p destination buffer is too small to copy the
- * string and 0-terminate it
+ * @param[in] source The #az_span containing the not-0-terminated string to copy into \p
+ destination.
  */
 void az_span_to_str(char* destination, int32_t destination_max_size, az_span source);
 
