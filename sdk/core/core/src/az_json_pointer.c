@@ -29,7 +29,7 @@ static AZ_NODISCARD az_result _az_span_reader_read_json_pointer_char(az_span* se
     case '~':
     {
       // move reader to next position
-      *self = az_span_slice(*self, 1, -1);
+      *self = az_span_slice_to_end(*self, 1);
       // check for EOF
       if (az_span_size(*self) == 0)
       {
@@ -38,7 +38,7 @@ static AZ_NODISCARD az_result _az_span_reader_read_json_pointer_char(az_span* se
       // get char
       uint8_t const e = az_span_ptr(*self)[0];
       // move to next position again
-      *self = az_span_slice(*self, 1, -1);
+      *self = az_span_slice_to_end(*self, 1);
       switch (e)
       {
         case '0':
@@ -60,7 +60,7 @@ static AZ_NODISCARD az_result _az_span_reader_read_json_pointer_char(az_span* se
     default:
     {
       // move reader to next position
-      *self = az_span_slice(*self, 1, -1);
+      *self = az_span_slice_to_end(*self, 1);
 
       *out = (uint8_t)result;
       return AZ_OK;
@@ -89,7 +89,7 @@ AZ_NODISCARD az_result _az_span_reader_read_json_pointer_token(az_span* self, az
     }
   }
   // move forward
-  *self = az_span_slice(*self, 1, -1);
+  *self = az_span_slice_to_end(*self, 1);
   if (az_span_size(*self) == 0)
   {
     *out = *self;

@@ -55,34 +55,18 @@ AZ_NODISCARD az_span az_span_slice(az_span span, int32_t start_index, int32_t en
   AZ_PRECONDITION_VALID_SPAN(span, 0, true);
 
   // The following set of preconditions validate that:
-  //    -1 <= end_index <= span.size
+  //    0 <= end_index <= span.size
   // And
-  //    If end_index == -1:
-  //        0 <= start_index <= span.size
-  //    Otherwise
-  //        0 <= start_index <= end_index
-  AZ_PRECONDITION_RANGE(-1, end_index, az_span_size(span));
+  //    0 <= start_index <= end_index
+  AZ_PRECONDITION_RANGE(0, end_index, az_span_size(span));
+  AZ_PRECONDITION((uint32_t)start_index <= (uint32_t)end_index);
 
-  // Do not reorder the OR conditions, since we are relying on short-circuiting.
-  AZ_PRECONDITION(
-      (end_index == -1 && ((uint32_t)start_index <= (uint32_t)az_span_size(span)))
-      || ((uint32_t)start_index <= (uint32_t)end_index));
+  return az_span_init(az_span_ptr(span) + start_index, end_index - start_index);
+}
 
-  int32_t new_size;
-
-  // If end_index == -1, slice to the end of the span's size.
-  if (end_index == -1)
-  {
-    new_size = az_span_size(span) - start_index;
-  }
-  else
-  {
-    new_size = end_index - start_index;
-  }
-
-  AZ_PRECONDITION(new_size >= 0);
-
-  return az_span_init(az_span_ptr(span) + start_index, new_size);
+AZ_NODISCARD az_span az_span_slice_to_end(az_span span, int32_t start_index)
+{
+  return az_span_slice(span, start_index, az_span_size(span));
 }
 
 AZ_NODISCARD AZ_INLINE uint8_t _az_tolower(uint8_t value)
@@ -267,7 +251,7 @@ az_span az_span_copy(az_span destination, az_span source)
   uint8_t* ptr = az_span_ptr(destination);
   memmove((void*)ptr, (void const*)az_span_ptr(source), (size_t)src_size);
 
-  return az_span_slice(destination, src_size, -1);
+  return az_span_slice_to_end(destination, src_size);
 }
 
 az_span az_span_copy_u8(az_span destination, uint8_t byte)
@@ -342,7 +326,7 @@ az_span_copy_url_encode(az_span destination, az_span source, az_span* out_span)
       s += 3;
     }
   }
-  *out_span = az_span_slice(destination, result_size, -1);
+  *out_span = az_span_slice_to_end(destination, result_size);
 
   return AZ_OK;
 }
@@ -420,7 +404,7 @@ _az_span_replace(az_span self, int32_t current_size, int32_t start, int32_t end,
   // insert at the end case (no need to make left or right shift)
   if (start == current_size)
   {
-    self = az_span_copy(az_span_slice(self, start, -1), span);
+    self = az_span_copy(az_span_slice_to_end(self, start), span);
     return AZ_OK;
   }
   // replace all content case (no need to make left or right shift, only copy)
@@ -432,14 +416,14 @@ _az_span_replace(az_span self, int32_t current_size, int32_t start, int32_t end,
   }
 
   // get the span needed to be moved before adding a new span
-  az_span dst = az_span_slice(self, start + span_size, -1);
+  az_span dst = az_span_slice_to_end(self, start + span_size);
   // get the span where to move content
   az_span src = az_span_slice(self, end, current_size);
   {
     // move content left or right so new span can be added
     az_span_copy(dst, src);
     // add the new span
-    az_span_copy(az_span_slice(self, start, -1), span);
+    az_span_copy(az_span_slice_to_end(self, start), span);
   }
 
   return AZ_OK;
@@ -658,7 +642,7 @@ AZ_NODISCARD az_result _az_is_expected_span(az_span* self, az_span expected)
     return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
   // move reader after the expected span (means it was parsed as expected)
-  *self = az_span_slice(*self, expected_size, -1);
+  *self = az_span_slice_to_end(*self, expected_size);
 
   return AZ_OK;
 }
@@ -669,7 +653,7 @@ AZ_NODISCARD az_result _az_scan_until(az_span self, _az_predicate predicate, int
 {
   for (int32_t index = 0; index < az_span_size(self); ++index)
   {
-    az_span s = az_span_slice(self, index, -1);
+    az_span s = az_span_slice_to_end(self, index);
     az_result predicate_result = predicate(s);
     switch (predicate_result)
     {

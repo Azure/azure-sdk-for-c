@@ -51,7 +51,7 @@ static AZ_NODISCARD az_result _az_get_digit(az_span* self, uint8_t* save_here)
   *save_here = (uint8_t)(c_ptr - '0');
 
   // move reader after the expected digit (means it was parsed as expected)
-  *self = az_span_slice(*self, 1, -1);
+  *self = az_span_slice_to_end(*self, 1);
 
   return AZ_OK;
 }
@@ -85,7 +85,7 @@ _az_get_http_status_line(az_span* self, az_http_response_status_line* out_status
     AZ_RETURN_IF_FAILED(az_span_atou64(az_span_init(az_span_ptr(*self), 3), &code));
     out_status_line->status_code = (az_http_status_code)code;
     // move reader
-    *self = az_span_slice(*self, 3, -1);
+    *self = az_span_slice_to_end(*self, 3);
   }
 
   // SP
@@ -100,7 +100,7 @@ _az_get_http_status_line(az_span* self, az_http_response_status_line* out_status
   // save reason-phrase in status line now that we got the offset. Remove 1 last chars(\r)
   out_status_line->reason_phrase = az_span_slice(*self, 0, offset - 1);
   // move position of reader after reason-phrase (parsed done)
-  *self = az_span_slice(*self, offset + 1, -1);
+  *self = az_span_slice_to_end(*self, offset + 1);
   // CR LF
   // AZ_RETURN_IF_FAILED(_az_is_expected_span(response, AZ_SPAN_FROM_STR("\r\n")));
 
@@ -175,12 +175,12 @@ az_http_response_get_next_header(az_http_response* response, az_pair* out_header
     // form a header name. Reader is currently at char ':'
     out_header->key = az_span_slice(*reader, 0, field_name_length);
     // update reader to next position after colon (add one)
-    *reader = az_span_slice(*reader, field_name_length + 1, -1);
+    *reader = az_span_slice_to_end(*reader, field_name_length + 1);
 
     // OWS
     int32_t ows_len = 0;
     AZ_RETURN_IF_FAILED(_az_scan_until(*reader, _az_slice_is_not_http_whitespace, &ows_len));
-    *reader = az_span_slice(*reader, ows_len, -1);
+    *reader = az_span_slice_to_end(*reader, ows_len);
   }
   // field-value    = *( field-content / obs-fold )
   // field-content  = field-vchar [ 1*( SP / HTAB ) field-vchar ]
@@ -214,7 +214,7 @@ az_http_response_get_next_header(az_http_response* response, az_pair* out_header
     }
     out_header->value = az_span_slice(*reader, 0, offset_value_end);
     // moving reader. It is currently after \r was found
-    *reader = az_span_slice(*reader, offset, -1);
+    *reader = az_span_slice_to_end(*reader, offset);
   }
 
   AZ_RETURN_IF_FAILED(_az_is_expected_span(reader, AZ_SPAN_FROM_STR("\n")));
@@ -253,7 +253,7 @@ AZ_NODISCARD az_result az_http_response_get_body(az_http_response* response, az_
   }
 
   // take all the remaining content from reader as body
-  *out_body = az_span_slice(response->_internal.parser.remaining, 0, -1);
+  *out_body = az_span_slice_to_end(response->_internal.parser.remaining, 0);
 
   response->_internal.parser.next_kind = _az_HTTP_RESPONSE_KIND_EOF;
   return AZ_OK;

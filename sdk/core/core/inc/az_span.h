@@ -168,6 +168,17 @@ AZ_NODISCARD az_span az_span_from_str(char* str);
 AZ_NODISCARD az_span az_span_slice(az_span span, int32_t start_index, int32_t end_index);
 
 /**
+ * @brief Returns a new #az_span which is a sub-span of the specified \p span.
+ *
+ * @param[in] span The original #az_span.
+ * @param[in] start_index An index into the original #az_span indicating where the returned #az_span
+ * will start.
+ * @return An #az_span into a portion (from \p start_index to the size) of the original
+ * #az_span.
+ */
+AZ_NODISCARD az_span az_span_slice_to_end(az_span span, int32_t start_index);
+
+/**
  * @brief Determines whether two spans are equal by comparing their bytes.
  *
  * @param[in] span1 The first #az_span to compare.

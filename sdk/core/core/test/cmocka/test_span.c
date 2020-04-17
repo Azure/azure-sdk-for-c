@@ -14,17 +14,17 @@
 
 #include <_az_cfg.h>
 
-static void az_span_slice_test()
+static void az_span_slice_to_end_test()
 {
   uint8_t raw_buffer[20];
   az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer);
 
   assert_int_equal(az_span_size(buffer), 20);
 
-  az_span result = az_span_slice(buffer, 1, -1);
+  az_span result = az_span_slice_to_end(buffer, 1);
   assert_int_equal(az_span_size(result), 19);
 
-  result = az_span_slice(buffer, 5, -1);
+  result = az_span_slice_to_end(buffer, 5);
   assert_int_equal(az_span_size(result), 15);
 }
 
@@ -368,7 +368,7 @@ void test_az_span(void** state)
 {
   (void)state;
 
-  az_span_slice_test();
+  az_span_slice_to_end_test();
 
   az_span_from_str_succeeds();
 

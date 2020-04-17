@@ -118,8 +118,10 @@ AZ_NODISCARD az_result az_iot_hub_client_id_get(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result
-az_iot_hub_client_properties_init(az_iot_hub_client_properties* properties, az_span buffer, int32_t written_length)
+AZ_NODISCARD az_result az_iot_hub_client_properties_init(
+    az_iot_hub_client_properties* properties,
+    az_span buffer,
+    int32_t written_length)
 {
   AZ_PRECONDITION_NOT_NULL(properties);
   AZ_PRECONDITION_VALID_SPAN(buffer, 0, false);
@@ -143,10 +145,10 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_append(
 
   int32_t prop_length = properties->_internal.properties_length;
 
-  az_span remainder = az_span_slice(properties->_internal.properties, prop_length, -1);
+  az_span remainder = az_span_slice_to_end(properties->_internal.properties, prop_length);
 
   int32_t required_length = az_span_size(name) + az_span_size(value) + 1;
-  
+
   if (prop_length > 0)
   {
     required_length += 1;

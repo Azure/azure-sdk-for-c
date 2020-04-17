@@ -72,12 +72,17 @@ AZ_NODISCARD az_result az_http_request_append_path(_az_http_request* p_request, 
    * a temp buffer to join "/" and path and then use replace. But that will cost us more stack
    * memory.
    */
-  AZ_RETURN_IF_FAILED(
-      _az_span_replace(p_request->_internal.url, p_request->_internal.url_length, query_start, query_start, AZ_SPAN_FROM_STR("/")));
+  AZ_RETURN_IF_FAILED(_az_span_replace(
+      p_request->_internal.url,
+      p_request->_internal.url_length,
+      query_start,
+      query_start,
+      AZ_SPAN_FROM_STR("/")));
   query_start += 1; // a size of "/"
   p_request->_internal.url_length++;
 
-  AZ_RETURN_IF_FAILED(_az_span_replace(p_request->_internal.url, p_request->_internal.url_length, query_start, query_start, path));
+  AZ_RETURN_IF_FAILED(_az_span_replace(
+      p_request->_internal.url, p_request->_internal.url_length, query_start, query_start, path));
   query_start += az_span_size(path);
   p_request->_internal.url_length += az_span_size(path);
 
@@ -103,7 +108,7 @@ az_http_request_set_query_parameter(_az_http_request* p_request, az_span name, a
   int32_t required_length = az_span_size(name) + az_span_size(value) + 2;
 
   az_span url_remainder
-      = az_span_slice(p_request->_internal.url, p_request->_internal.url_length, -1);
+      = az_span_slice_to_end(p_request->_internal.url, p_request->_internal.url_length);
 
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(url_remainder, required_length);
 
@@ -153,7 +158,7 @@ az_http_request_append_header(_az_http_request* p_request, az_span key, az_span 
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(headers, (int32_t)sizeof header_to_append);
 
   az_span_copy(
-      az_span_slice(headers, (int32_t)sizeof(az_pair) * p_request->_internal.headers_length, -1),
+      az_span_slice_to_end(headers, (int32_t)sizeof(az_pair) * p_request->_internal.headers_length),
       az_span_init((uint8_t*)&header_to_append, sizeof header_to_append));
 
   p_request->_internal.headers_length++;

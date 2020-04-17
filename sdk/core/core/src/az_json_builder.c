@@ -11,7 +11,7 @@
 
 static AZ_NODISCARD az_span _get_remaining_span(az_json_builder* json_builder)
 {
-  return az_span_slice(json_builder->_internal.json, json_builder->_internal.length, -1);
+  return az_span_slice_to_end(json_builder->_internal.json, json_builder->_internal.length);
 }
 
 AZ_NODISCARD static az_result az_json_builder_append_str(az_json_builder* self, az_span value)

@@ -66,7 +66,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_get_user_name(
       az_iot_hub_client_user_name_get(&client->_internal.iot_hub_client, remainder, &user_name));
 
   int32_t written = az_span_size(user_name);
-  remainder = az_span_slice(remainder, written, -1);
+  remainder = az_span_slice_to_end(remainder, written);
 
   int32_t required_length
       = az_span_size(pnp_model_id) + az_span_size(client->_internal.root_interface_name) + 2;

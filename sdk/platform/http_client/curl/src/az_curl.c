@@ -296,7 +296,8 @@ _az_http_client_curl_send_post_request(CURL* p_curl, _az_http_request const* p_r
   char* b = (char*)az_span_ptr(body);
   az_span_to_str(b, required_length, p_request->_internal.body);
 
-  az_result res_code = _az_http_client_curl_code_to_result(curl_easy_setopt(p_curl, CURLOPT_POSTFIELDS, b));
+  az_result res_code
+      = _az_http_client_curl_code_to_result(curl_easy_setopt(p_curl, CURLOPT_POSTFIELDS, b));
   if (az_succeeded(res_code))
   {
     res_code = _az_http_client_curl_code_to_result(curl_easy_perform(p_curl));
@@ -354,7 +355,7 @@ static int32_t _az_http_client_curl_upload_read_callback(
 
   // Update the userdata span. If we already copied all content, slice will set upload_content with
   // 0 length
-  *upload_content = az_span_slice(*upload_content, size_of_copy, -1);
+  *upload_content = az_span_slice_to_end(*upload_content, size_of_copy);
 
   return size_of_copy;
 }
