@@ -232,16 +232,20 @@ static size_t _az_http_client_curl_write_to_span(
     void* userp)
 {
   size_t const expected_size = size * nmemb;
-  az_span* const user_buffer_builder = (az_span*)userp;
+  az_http_response* response = (az_http_response*)userp;
+
+  az_span remaining
+      = az_span_slice_to_end(response->_internal.http_response, response->_internal.written);
 
   az_span const span_for_content = az_span_init((uint8_t*)contents, (int32_t)expected_size);
 
-  if (az_span_size(*user_buffer_builder) < az_span_size(span_for_content))
+  if (az_span_size(remaining) < (int32_t)expected_size)
   {
     return expected_size + 1;
   }
 
-  az_span_copy(*user_buffer_builder, span_for_content);
+  az_span_copy(remaining, span_for_content);
+  response->_internal.written += (int32_t)expected_size;
 
   // This callback needs to return the response size or curl will consider it as it failed
   return expected_size;
@@ -467,19 +471,19 @@ _az_http_client_curl_setup_url(CURL* p_curl, _az_http_request const* p_request)
  * @return az_result
  */
 static AZ_NODISCARD az_result
-_az_http_client_curl_setup_response_redirect(CURL* p_curl, az_span* response_builder)
+_az_http_client_curl_setup_response_redirect(CURL* p_curl, az_http_response* response)
 {
   AZ_PRECONDITION_NOT_NULL(p_curl);
 
   AZ_RETURN_IF_CURL_FAILED(
       curl_easy_setopt(p_curl, CURLOPT_HEADERFUNCTION, _az_http_client_curl_write_to_span));
 
-  AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl, CURLOPT_HEADERDATA, (void*)response_builder));
+  AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl, CURLOPT_HEADERDATA, (void*)response));
 
   AZ_RETURN_IF_CURL_FAILED(
       curl_easy_setopt(p_curl, CURLOPT_WRITEFUNCTION, _az_http_client_curl_write_to_span));
 
-  AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl, CURLOPT_WRITEDATA, (void*)response_builder));
+  AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl, CURLOPT_WRITEDATA, (void*)response));
 
   return AZ_OK;
 }
@@ -508,8 +512,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
 
   AZ_RETURN_IF_FAILED(_az_http_client_curl_setup_url(p_curl, p_request));
 
-  AZ_RETURN_IF_FAILED(
-      _az_http_client_curl_setup_response_redirect(p_curl, &response->_internal.http_response));
+  AZ_RETURN_IF_FAILED(_az_http_client_curl_setup_response_redirect(p_curl, &response));
 
   if (az_span_is_content_equal(p_request->_internal.method, az_http_method_get()))
   {
@@ -537,9 +540,13 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
   // make sure to set the end of the body response as the end of the complete response
   if (az_succeeded(result))
   {
-    AZ_RETURN_IF_NOT_ENOUGH_SIZE(response->_internal.http_response, 1);
+    az_span remaining
+        = az_span_slice_to_end(response->_internal.http_response, response->_internal.written);
 
-    az_span_copy_u8(response->_internal.http_response, 0);
+    AZ_RETURN_IF_NOT_ENOUGH_SIZE(remaining, 1);
+
+    az_span_copy_u8(remaining, 0);
+    response->_internal.written++;
   }
   return result;
 }
