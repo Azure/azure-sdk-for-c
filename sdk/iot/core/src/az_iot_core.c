@@ -80,7 +80,7 @@ AZ_NODISCARD az_span az_span_token(az_span source, az_span delimiter, az_span* o
   AZ_PRECONDITION_VALID_SPAN(delimiter, 1, false);
   AZ_PRECONDITION_NOT_NULL(out_remainder);
 
-  if (az_span_length(source) == 0)
+  if (az_span_size(source) == 0)
   {
     return AZ_SPAN_NULL;
   }
@@ -90,8 +90,7 @@ AZ_NODISCARD az_span az_span_token(az_span source, az_span delimiter, az_span* o
 
     if (index != -1)
     {
-      *out_remainder
-          = az_span_slice(source, index + az_span_length(delimiter), az_span_length(source));
+      *out_remainder = az_span_slice(source, index + az_span_size(delimiter), az_span_size(source));
 
       return az_span_slice(source, 0, index);
     }

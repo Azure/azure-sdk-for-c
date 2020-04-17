@@ -45,14 +45,14 @@ void test_az_http_pipeline_process()
   memset(header_buf, 0, sizeof(header_buf));
 
   az_span url_span = AZ_SPAN_FROM_BUFFER(buf);
-  url_span = az_span_append(url_span, AZ_SPAN_FROM_STR("url"));
-  assert_int_equal(az_span_length(url_span), 3);
+  az_span remainder = az_span_copy(url_span, AZ_SPAN_FROM_STR("url"));
+  assert_int_equal(az_span_size(remainder), 97);
   az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
   _az_http_request hrb;
 
   assert_return_code(
       az_http_request_init(
-          &hrb, &az_context_app, az_http_method_get(), url_span, header_span, AZ_SPAN_NULL),
+          &hrb, &az_context_app, az_http_method_get(), url_span, 3, header_span, AZ_SPAN_NULL),
       AZ_OK);
 
   _az_http_pipeline pipeline = (_az_http_pipeline){

@@ -4,7 +4,6 @@
 #ifndef _az_JSON_STRING_PRIVATE_H
 #define _az_JSON_STRING_PRIVATE_H
 
-#include "az_span_private.h"
 #include <az_json.h>
 #include <az_span.h>
 
