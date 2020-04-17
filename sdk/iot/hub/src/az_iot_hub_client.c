@@ -127,8 +127,8 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_init(
   AZ_PRECONDITION_VALID_SPAN(buffer, 0, false);
   AZ_PRECONDITION(written_length >= 0);
 
-  properties->_internal.properties = buffer;
-  properties->_internal.properties_length = written_length;
+  properties->_internal.properties_buffer = buffer;
+  properties->_internal.properties_written = written_length;
   properties->_internal.current_property_index = 0;
 
   return AZ_OK;
@@ -143,9 +143,9 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_append(
   AZ_PRECONDITION_VALID_SPAN(name, 1, false);
   AZ_PRECONDITION_VALID_SPAN(value, 1, false);
 
-  int32_t prop_length = properties->_internal.properties_length;
+  int32_t prop_length = properties->_internal.properties_written;
 
-  az_span remainder = az_span_slice_to_end(properties->_internal.properties, prop_length);
+  az_span remainder = az_span_slice_to_end(properties->_internal.properties_buffer, prop_length);
 
   int32_t required_length = az_span_size(name) + az_span_size(value) + 1;
 
@@ -165,7 +165,7 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_append(
   remainder = az_span_copy_u8(remainder, *az_span_ptr(hub_client_param_equals_span));
   az_span_copy(remainder, value);
 
-  properties->_internal.properties_length += required_length;
+  properties->_internal.properties_written += required_length;
 
   return AZ_OK;
 }
@@ -179,8 +179,8 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_find(
   AZ_PRECONDITION_VALID_SPAN(name, 1, false);
   AZ_PRECONDITION_NOT_NULL(out_value);
 
-  az_span remaining
-      = az_span_slice(properties->_internal.properties, 0, properties->_internal.properties_length);
+  az_span remaining = az_span_slice(
+      properties->_internal.properties_buffer, 0, properties->_internal.properties_written);
 
   while (az_span_size(remaining) != 0)
   {
@@ -208,7 +208,7 @@ az_iot_hub_client_properties_next(az_iot_hub_client_properties* properties, az_p
   AZ_PRECONDITION_NOT_NULL(out);
 
   int32_t index = (int32_t)properties->_internal.current_property_index;
-  int32_t prop_length = properties->_internal.properties_length;
+  int32_t prop_length = properties->_internal.properties_written;
 
   if (index == prop_length)
   {
@@ -217,7 +217,7 @@ az_iot_hub_client_properties_next(az_iot_hub_client_properties* properties, az_p
   }
 
   az_span remainder;
-  az_span prop_span = az_span_slice(properties->_internal.properties, index, prop_length);
+  az_span prop_span = az_span_slice(properties->_internal.properties_buffer, index, prop_length);
 
   out->key = az_span_token(prop_span, hub_client_param_equals_span, &remainder);
   out->value = az_span_token(remainder, hub_client_param_separator_span, &remainder);
@@ -228,7 +228,7 @@ az_iot_hub_client_properties_next(az_iot_hub_client_properties* properties, az_p
   else
   {
     properties->_internal.current_property_index
-        = (uint32_t)(az_span_ptr(remainder) - az_span_ptr(properties->_internal.properties));
+        = (uint32_t)(az_span_ptr(remainder) - az_span_ptr(properties->_internal.properties_buffer));
   }
 
   return AZ_OK;

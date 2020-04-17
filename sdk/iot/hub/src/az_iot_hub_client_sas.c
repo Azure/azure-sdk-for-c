@@ -61,15 +61,16 @@ az_result az_iot_sas_token_generate(
     az_span sas_token,
     az_span* out_sas_token)
 {
-  AZ_PRECONDITION_VALID_SPAN(device_id, 1, false);
   AZ_PRECONDITION_VALID_SPAN(iothub_fqdn, 1, false);
+  AZ_PRECONDITION_VALID_SPAN(device_id, 1, false);
   AZ_PRECONDITION_VALID_SPAN(signature, 1, false);
   AZ_PRECONDITION(expiry_time_secs > 0);
+  AZ_PRECONDITION_VALID_SPAN(sas_token, 0, false);
   AZ_PRECONDITION_VALID_SPAN(sas_token, 0, false);
   AZ_PRECONDITION_NOT_NULL(out_sas_token);
 
   // Concatenates: "SharedAccessSignature sr=" scope "&sig=" sig  "&se=" expiration_time_secs
-  //               plus, if key_name != NULL, "&skn=" key_name
+  //               plus, if key_name size > 0, "&skn=" key_name
 
   az_span sr_string = AZ_SPAN_FROM_STR(SAS_TOKEN_SR);
   az_span devices_string = AZ_SPAN_FROM_STR(SCOPE_DEVICES_STRING);
@@ -102,7 +103,7 @@ az_result az_iot_sas_token_generate(
   remainder = az_span_copy_u8(remainder, EQUAL_SIGN);
   AZ_RETURN_IF_FAILED(az_span_i32toa(remainder, expiry_time_secs, &remainder));
 
-  if (az_span_ptr(key_name) != NULL && az_span_size(key_name) > 0)
+  if (az_span_size(key_name) > 0)
   {
     az_span skn_string = AZ_SPAN_FROM_STR(SAS_TOKEN_SKN);
     required_length = az_span_size(skn_string) + az_span_size(key_name) + 2;
@@ -113,7 +114,7 @@ az_result az_iot_sas_token_generate(
     remainder = az_span_copy_u8(remainder, AMPERSAND);
     remainder = az_span_copy(remainder, skn_string);
     remainder = az_span_copy_u8(remainder, EQUAL_SIGN);
-    az_span_copy(remainder, key_name);
+    remainder = az_span_copy(remainder, key_name);
   }
 
   *out_sas_token = az_span_slice(sas_token, 0, _az_span_diff(remainder, sas_token));

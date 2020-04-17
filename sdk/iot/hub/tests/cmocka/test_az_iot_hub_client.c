@@ -522,7 +522,7 @@ static void test_az_iot_hub_client_properties_init_user_set_params_succeed(void*
       az_iot_hub_client_properties_init(&props, test_span, az_span_size(test_span)), AZ_OK);
 
   assert_memory_equal(
-      az_span_ptr(props._internal.properties),
+      az_span_ptr(props._internal.properties_buffer),
       test_correct_one_key_value,
       sizeof(test_correct_one_key_value) - 1);
 }
@@ -540,7 +540,7 @@ static void test_az_iot_hub_client_properties_append_succeed(void** state)
   assert_int_equal(
       az_iot_hub_client_properties_append(&props, test_key_one, test_value_one), AZ_OK);
   az_span_for_test_verify(
-      props._internal.properties,
+      az_span_slice(props._internal.properties_buffer, 0, props._internal.properties_written),
       test_correct_one_key_value,
       _az_COUNTOF(test_correct_one_key_value) - 1,
       az_span_init(test_span_buf, _az_COUNTOF(test_span_buf)),
@@ -560,7 +560,7 @@ static void test_az_iot_hub_client_properties_append_small_buffer_fail(void** st
       az_iot_hub_client_properties_append(&props, test_key_one, test_value_one),
       AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
   assert_int_equal(
-      az_span_size(props._internal.properties), sizeof(test_correct_one_key_value) - 2);
+      az_span_size(props._internal.properties_buffer), sizeof(test_correct_one_key_value) - 2);
 }
 
 static void test_az_iot_hub_client_properties_append_twice_succeed(void** state)
@@ -578,7 +578,7 @@ static void test_az_iot_hub_client_properties_append_twice_succeed(void** state)
   assert_int_equal(
       az_iot_hub_client_properties_append(&props, test_key_two, test_value_two), AZ_OK);
   az_span_for_test_verify(
-      props._internal.properties,
+      az_span_slice(props._internal.properties_buffer, 0, props._internal.properties_written),
       test_correct_two_key_value,
       _az_COUNTOF(test_correct_two_key_value) - 1,
       az_span_init(test_span_buf, _az_COUNTOF(test_span_buf)),
@@ -599,9 +599,9 @@ static void test_az_iot_hub_client_properties_append_twice_small_buffer_fail(voi
   assert_int_equal(
       az_iot_hub_client_properties_append(&props, test_key_two, test_value_two),
       AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
-  assert_int_equal(props._internal.properties_length, sizeof(test_correct_one_key_value) - 1);
+  assert_int_equal(props._internal.properties_written, sizeof(test_correct_one_key_value) - 1);
   assert_int_equal(
-      az_span_size(props._internal.properties), sizeof(test_correct_two_key_value) - 2);
+      az_span_size(props._internal.properties_buffer), sizeof(test_correct_two_key_value) - 2);
 }
 
 static void test_az_iot_hub_client_properties_find_succeed(void** state)

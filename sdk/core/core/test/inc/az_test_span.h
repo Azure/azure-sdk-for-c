@@ -10,12 +10,12 @@
 #ifndef _az_SPAN_TESTING_H
 #define _az_SPAN_TESTING_H
 
-#include <assert.h>
+// This header must be included prior to including cmocka.h.
 #include <setjmp.h>
-#include <stdarg.h>
-#include <stddef.h>
-#include <stdint.h>
+
+#include <assert.h>
 #include <cmocka.h>
+#include <stdint.h>
 
 #include <az_result.h>
 #include <az_span.h>
@@ -23,7 +23,6 @@
 #include <stdio.h>
 
 #include <_az_cfg_prefix.h>
-
 
 /**
  * @brief az_span_for_test_init returns a span over a byte buffer, directly invoking
@@ -46,26 +45,33 @@ AZ_NODISCARD AZ_INLINE az_span az_span_for_test_init(uint8_t* ptr, int32_t size)
  *
  * The function will assert on any unexpected results.
  *
- * @param[in] result_span Span that has the result of the test run.
+ * @param[in] result_span Span that has the result of the test run, which should be a slice of the
+ * original span.
  * @param[in] buffer_expected Buffer that contains expected results of the test and that result_span
  * will match on success.
- * @param[in] size_expected The expected size of result_span.
+ * @param[in] result_size_expected The expected size of result_span.
+ * @param[in] original_span The span around the entire input buffer which is use to verify only the
+ * resulting slice got updated, while the rest retain their original sentinel values.
+ * @param[in] original_size_expected The expected size of original span, which should remain
+ * unchanged.
  */
 AZ_INLINE void az_span_for_test_verify(
     az_span result_span,
     const void* const buffer_expected,
-    int32_t length_expected,
-    az_span original_buffer,
-    int32_t size_expected)
+    int32_t result_size_expected,
+    az_span original_span,
+    int32_t original_size_expected)
 {
-  assert_int_equal(az_span_size(original_buffer), size_expected);
-  assert_memory_equal(az_span_ptr(result_span), (size_t)buffer_expected, (size_t)length_expected);
+  assert_int_equal(az_span_size(result_span), result_size_expected);
+  assert_int_equal(az_span_size(original_span), original_size_expected);
   assert_memory_equal(
-      az_span_ptr(original_buffer), (size_t)buffer_expected, (size_t)length_expected);
+      az_span_ptr(result_span), (size_t)buffer_expected, (size_t)result_size_expected);
+  assert_memory_equal(
+      az_span_ptr(original_span), (size_t)buffer_expected, (size_t)result_size_expected);
 
-  for (int32_t i = length_expected; i < size_expected; i++)
+  for (int32_t i = result_size_expected; i < original_size_expected; i++)
   {
-    assert_true(*(uint8_t*)(az_span_ptr(original_buffer) + i) == 0xcc);
+    assert_true(*(uint8_t*)(az_span_ptr(original_span) + i) == 0xcc);
   }
 }
 

@@ -181,8 +181,8 @@ typedef struct az_iot_hub_client_properties
 {
   struct
   {
-    az_span properties;
-    int32_t properties_length;
+    az_span properties_buffer;
+    int32_t properties_written;
     uint32_t current_property_index;
   } _internal;
 } az_iot_hub_client_properties;

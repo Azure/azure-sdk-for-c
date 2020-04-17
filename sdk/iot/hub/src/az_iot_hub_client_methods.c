@@ -120,7 +120,7 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_response_publish_topic_get(
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, required_length);
 
   remainder = az_span_copy(remainder, methods_response_topic_properties);
-  az_span_copy(remainder, request_id);
+  remainder = az_span_copy(remainder, request_id);
 
   *out_mqtt_topic = az_span_slice(mqtt_topic, 0, _az_span_diff(remainder, mqtt_topic));
 
