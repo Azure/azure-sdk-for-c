@@ -512,7 +512,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
 
   AZ_RETURN_IF_FAILED(_az_http_client_curl_setup_url(p_curl, p_request));
 
-  AZ_RETURN_IF_FAILED(_az_http_client_curl_setup_response_redirect(p_curl, &response));
+  AZ_RETURN_IF_FAILED(_az_http_client_curl_setup_response_redirect(p_curl, response));
 
   if (az_span_is_content_equal(p_request->_internal.method, az_http_method_get()))
   {
