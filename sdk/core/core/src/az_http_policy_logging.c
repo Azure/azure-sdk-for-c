@@ -23,12 +23,14 @@ enum
 
 static az_span _az_http_policy_logging_copy_lengthy_value(az_span ref_log_msg, az_span value)
 {
-  // The caller should validate that ref_log_msg is large enough to contain the value az_span
-  // This means, ref_log_msg must have at least _az_LOG_LENGTHY_VALUE_MAX_LENGTH (i.e. 50) bytes
-  // available.
-  AZ_PRECONDITION(az_span_size(ref_log_msg) >= _az_LOG_LENGTHY_VALUE_MAX_LENGTH);
-
   int32_t value_size = az_span_size(value);
+
+  // The caller should validate that ref_log_msg is large enough to contain the value az_span
+  // This means, ref_log_msg must have available at least _az_LOG_LENGTHY_VALUE_MAX_LENGTH (i.e. 50)
+  // bytes or as much as the size of the value az_span, whichever is smaller.
+  AZ_PRECONDITION(
+      az_span_size(ref_log_msg) >= _az_LOG_LENGTHY_VALUE_MAX_LENGTH
+      || az_span_size(ref_log_msg) >= value_size);
 
   if (value_size <= _az_LOG_LENGTHY_VALUE_MAX_LENGTH)
   {
@@ -150,8 +152,7 @@ static az_result _az_http_policy_logging_append_http_response_msg(
 
   az_http_response_status_line status_line = { 0 };
   AZ_RETURN_IF_FAILED(az_http_response_get_status_line(ref_response, &status_line));
-  AZ_RETURN_IF_FAILED(
-      az_span_u64toa(remainder, (uint64_t)status_line.status_code, &remainder));
+  AZ_RETURN_IF_FAILED(az_span_u64toa(remainder, (uint64_t)status_line.status_code, &remainder));
 
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, az_span_size(status_line.reason_phrase) + 1);
   remainder = az_span_copy_u8(remainder, ' ');

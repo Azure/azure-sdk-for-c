@@ -463,11 +463,12 @@ _az_http_client_curl_setup_url(CURL* p_curl, _az_http_request const* p_request)
   return result;
 }
 
+// TODO: Fix up the documentation here.
 /**
  * @brief set url the response redirection to user buffer
  *
- * @param p_curl specif curl structure used to send http request
- * @param response_builder an http request builder holding all http request data
+ * @param p_curl specific curl structure used to send http request
+ * @param response an http response object which will hold all the HTTP response
  * @return az_result
  */
 static AZ_NODISCARD az_result
