@@ -10,8 +10,10 @@
 #ifndef _az_SPAN_TESTING_H
 #define _az_SPAN_TESTING_H
 
-// This header must be included prior to including cmocka.h.
+// These headers must be included prior to including cmocka.h.
 #include <setjmp.h>
+#include <stdarg.h>
+#include <stddef.h>
 
 #include <assert.h>
 #include <cmocka.h>
