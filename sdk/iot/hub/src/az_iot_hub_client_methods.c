@@ -35,7 +35,7 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_subscribe_topic_filter_get(
   // TODO: Merge these two calls into one since they are copying two strings literals.
   az_span remainder = az_span_copy(mqtt_topic_filter, methods_topic_prefix);
   remainder = az_span_copy(remainder, methods_topic_filter_suffix);
-  az_span_copy_uint8(remainder, '#');
+  az_span_copy_u8(remainder, '#');
 
   *out_mqtt_topic_filter = az_span_slice(mqtt_topic_filter, 0, required_length);
 
@@ -113,7 +113,7 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_response_publish_topic_get(
   az_span remainder = az_span_copy(mqtt_topic, methods_topic_prefix);
   remainder = az_span_copy(remainder, methods_response_topic_result);
 
-  AZ_RETURN_IF_FAILED(az_span_utoa(remainder, (uint32_t)status, &remainder));
+  AZ_RETURN_IF_FAILED(az_span_u32toa(remainder, (uint32_t)status, &remainder));
 
   required_length = az_span_size(methods_response_topic_properties) + az_span_size(request_id);
 

@@ -209,8 +209,7 @@ AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1, az_span 
  *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the \p destination buffer is too small to copy the
  * string and 0-terminate it
  */
-AZ_NODISCARD az_result
-az_span_to_str(char* destination, int32_t destination_max_size, az_span source);
+void az_span_to_str(char* destination, int32_t destination_max_size, az_span source);
 
 /**
  * @brief Searches for \p target in \p source, returning an #az_span within \p source if it finds
@@ -252,23 +251,7 @@ az_span az_span_copy(az_span destination, az_span source);
  * @remarks The method assumes that the \p destination has a large enough size to  hold one more
  * byte.
  */
-az_span az_span_copy_uint8(az_span destination, uint8_t byte);
-
-/**
- * @brief Copies a URL in the \p source #az_span to the \p destination #az_span by url-encoding the
- * \p source span characters.
- *
- * @param[in] destination The #az_span whose bytes will receive the url-encoded source.
- * @param[in] source The #az_span containing the non-url-encoded bytes.
- * @param[out] out_span A pointer to an #az_span that receives the remainder of the \p destination
- * #az_span after the url-encoded \p source has been copied.
- * @return An #az_result value indicating the result of the operation:
- *         - #AZ_OK if successful
- *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the \p destination is not big enough to contain
- * the encoded bytes
- */
-AZ_NODISCARD az_result
-az_span_copy_url_encode(az_span destination, az_span source, az_span* out_span);
+az_span az_span_copy_u8(az_span destination, uint8_t byte);
 
 /**
  * @brief Fills all the bytes of the \p destination #az_span with the specified value.
@@ -304,7 +287,7 @@ AZ_NODISCARD az_result az_span_atou64(az_span span, uint64_t* out_number);
  *         - #AZ_OK if successful
  *         - #AZ_ERROR_PARSER_UNEXPECTED_CHAR if a non-ASCII digit is found within the span.
  */
-AZ_NODISCARD az_result az_span_atou(az_span span, uint32_t* out_number);
+AZ_NODISCARD az_result az_span_atou32(az_span span, uint32_t* out_number);
 
 /**
  * @brief Converts an int32 into its digit characters and copies them to the \p destination #az_span
@@ -320,7 +303,7 @@ AZ_NODISCARD az_result az_span_atou(az_span span, uint32_t* out_number);
  *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the \p destination is not big enough to contain the
  * copied bytes
  */
-AZ_NODISCARD az_result az_span_itoa(az_span destination, int32_t source, az_span* out_span);
+AZ_NODISCARD az_result az_span_i32toa(az_span destination, int32_t source, az_span* out_span);
 
 /**
  * @brief Converts a uint32 into its digit characters and copies them to the \p destination #az_span
@@ -336,7 +319,7 @@ AZ_NODISCARD az_result az_span_itoa(az_span destination, int32_t source, az_span
  *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the \p destination is not big enough to contain the
  * copied bytes
  */
-AZ_NODISCARD az_result az_span_utoa(az_span destination, uint32_t source, az_span* out_span);
+AZ_NODISCARD az_result az_span_u32toa(az_span destination, uint32_t source, az_span* out_span);
 
 /**
  * @brief Converts an int64 into its digit characters and copies them to the \p destination #az_span

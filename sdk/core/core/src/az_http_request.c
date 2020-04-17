@@ -121,13 +121,13 @@ az_http_request_set_query_parameter(_az_http_request* p_request, az_span name, a
     separator = '&';
   }
 
-  url_remainder = az_span_copy_uint8(url_remainder, separator);
+  url_remainder = az_span_copy_u8(url_remainder, separator);
 
   // Append parameter name
   url_remainder = az_span_copy(url_remainder, name);
 
   // Append equal sym
-  url_remainder = az_span_copy_uint8(url_remainder, '=');
+  url_remainder = az_span_copy_u8(url_remainder, '=');
 
   // Parameter value
   url_remainder = az_span_copy(url_remainder, value);

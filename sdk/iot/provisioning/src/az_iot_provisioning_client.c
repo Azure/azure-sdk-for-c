@@ -75,7 +75,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_user_name_get(
 
   if (az_span_size(*user_agent) > 0)
   {
-    remainder = az_span_copy_uint8(remainder, '&');
+    remainder = az_span_copy_u8(remainder, '&');
     az_span_copy(remainder, *user_agent);
   }
 
@@ -125,7 +125,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_register_subscribe_topic_filte
   az_span remainder = az_span_copy(mqtt_topic_filter, str_dps);
   remainder = az_span_copy(remainder, str_registrations);
   remainder = az_span_copy(remainder, str_res);
-  az_span_copy_uint8(remainder, '#');
+  az_span_copy_u8(remainder, '#');
 
   *out_mqtt_topic_filter = az_span_slice(mqtt_topic_filter, 0, required_length);
 

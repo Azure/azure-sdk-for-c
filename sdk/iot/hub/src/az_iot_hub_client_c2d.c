@@ -31,7 +31,7 @@ AZ_NODISCARD az_result az_iot_hub_client_c2d_subscribe_topic_filter_get(
   az_span remainder = az_span_copy(mqtt_topic_filter, c2d_topic_prefix);
   remainder = az_span_copy(remainder, client->_internal.device_id);
   remainder = az_span_copy(remainder, c2d_topic_suffix);
-  az_span_copy_uint8(remainder, hash_tag);
+  az_span_copy_u8(remainder, hash_tag);
 
   *out_mqtt_topic_filter = az_span_slice(mqtt_topic_filter, 0, required_length);
 

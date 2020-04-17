@@ -43,9 +43,9 @@ az_result az_iot_sas_token_get_document(
   remainder = az_span_copy(remainder, iothub_fqdn);
   remainder = az_span_copy(remainder, devices_string);
   remainder = az_span_copy(remainder, device_id);
-  remainder = az_span_copy_uint8(remainder, LF);
+  remainder = az_span_copy_u8(remainder, LF);
 
-  AZ_RETURN_IF_FAILED(az_span_itoa(remainder, expiry_time_secs, &remainder));
+  AZ_RETURN_IF_FAILED(az_span_i32toa(remainder, expiry_time_secs, &remainder));
 
   *out_document = az_span_slice(document, 0, _az_span_diff(remainder, document));
 
@@ -85,22 +85,22 @@ az_result az_iot_sas_token_generate(
 
   // SharedAccessSignature
   remainder = az_span_copy(remainder, sr_string);
-  remainder = az_span_copy_uint8(remainder, EQUAL_SIGN);
+  remainder = az_span_copy_u8(remainder, EQUAL_SIGN);
   remainder = az_span_copy(remainder, iothub_fqdn);
   remainder = az_span_copy(remainder, devices_string);
   remainder = az_span_copy(remainder, device_id);
 
   // Signature
-  remainder = az_span_copy_uint8(remainder, AMPERSAND);
+  remainder = az_span_copy_u8(remainder, AMPERSAND);
   remainder = az_span_copy(remainder, sig_string);
-  remainder = az_span_copy_uint8(remainder, EQUAL_SIGN);
+  remainder = az_span_copy_u8(remainder, EQUAL_SIGN);
   remainder = az_span_copy(remainder, signature);
 
   // Expiration
-  remainder = az_span_copy_uint8(remainder, AMPERSAND);
+  remainder = az_span_copy_u8(remainder, AMPERSAND);
   remainder = az_span_copy(remainder, se_string);
-  remainder = az_span_copy_uint8(remainder, EQUAL_SIGN);
-  AZ_RETURN_IF_FAILED(az_span_itoa(remainder, expiry_time_secs, &remainder));
+  remainder = az_span_copy_u8(remainder, EQUAL_SIGN);
+  AZ_RETURN_IF_FAILED(az_span_i32toa(remainder, expiry_time_secs, &remainder));
 
   if (az_span_ptr(key_name) != NULL && az_span_size(key_name) > 0)
   {
@@ -110,9 +110,9 @@ az_result az_iot_sas_token_generate(
     AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, required_length);
 
     // Key Name
-    remainder = az_span_copy_uint8(remainder, AMPERSAND);
+    remainder = az_span_copy_u8(remainder, AMPERSAND);
     remainder = az_span_copy(remainder, skn_string);
-    remainder = az_span_copy_uint8(remainder, EQUAL_SIGN);
+    remainder = az_span_copy_u8(remainder, EQUAL_SIGN);
     az_span_copy(remainder, key_name);
   }
 

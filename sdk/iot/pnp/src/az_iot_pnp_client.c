@@ -73,9 +73,9 @@ AZ_NODISCARD az_result az_iot_pnp_client_get_user_name(
 
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, required_length);
 
-  remainder = az_span_copy_uint8(remainder, pnp_client_param_separator);
+  remainder = az_span_copy_u8(remainder, pnp_client_param_separator);
   remainder = az_span_copy(remainder, pnp_model_id);
-  remainder = az_span_copy_uint8(remainder, pnp_client_param_equals);
+  remainder = az_span_copy_u8(remainder, pnp_client_param_equals);
   az_span_copy(remainder, client->_internal.root_interface_name);
 
   *out_mqtt_user_name = az_span_slice(mqtt_user_name, 0, written + required_length);

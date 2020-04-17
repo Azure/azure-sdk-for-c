@@ -109,7 +109,7 @@ _az_span_append_header_to_buffer(az_span writable_buffer, az_pair header, az_spa
   writable_buffer = az_span_copy(writable_buffer, header.key);
   writable_buffer = az_span_copy(writable_buffer, separator);
   writable_buffer = az_span_copy(writable_buffer, header.value);
-  az_span_copy_uint8(writable_buffer, 0);
+  az_span_copy_u8(writable_buffer, 0);
 
   return AZ_OK;
 }
@@ -209,7 +209,7 @@ _az_http_client_curl_append_url(az_span writable_buffer, az_span url_from_reques
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(writable_buffer, required_length);
 
   writable_buffer = az_span_copy(writable_buffer, url_from_request);
-  az_span_copy_uint8(writable_buffer, 0);
+  az_span_copy_u8(writable_buffer, 0);
 
   return AZ_OK;
 }
@@ -294,15 +294,12 @@ _az_http_client_curl_send_post_request(CURL* p_curl, _az_http_request const* p_r
   AZ_RETURN_IF_FAILED(_az_span_malloc(required_length, &body));
 
   char* b = (char*)az_span_ptr(body);
-  az_result res_code = az_span_to_str(b, required_length, p_request->_internal.body);
+  az_span_to_str(b, required_length, p_request->_internal.body);
 
+  az_result res_code = _az_http_client_curl_code_to_result(curl_easy_setopt(p_curl, CURLOPT_POSTFIELDS, b));
   if (az_succeeded(res_code))
   {
-    res_code = _az_http_client_curl_code_to_result(curl_easy_setopt(p_curl, CURLOPT_POSTFIELDS, b));
-    if (az_succeeded(res_code))
-    {
-      res_code = _az_http_client_curl_code_to_result(curl_easy_perform(p_curl));
-    }
+    res_code = _az_http_client_curl_code_to_result(curl_easy_perform(p_curl));
   }
 
   _az_span_free(&body);
@@ -541,7 +538,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
   {
     AZ_RETURN_IF_NOT_ENOUGH_SIZE(response->_internal.http_response, 1);
 
-    az_span_copy_uint8(response->_internal.http_response, 0);
+    az_span_copy_u8(response->_internal.http_response, 0);
   }
   return result;
 }

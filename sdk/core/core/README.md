@@ -57,7 +57,7 @@ some_function(AZ_SPAN_FROM_STR("Hello"));  // size = 5
 As shown above, an `az_span` over a string does not include the 0-terminator. If you need to 0-terminate the string, you can call this function to append a 0 byte (if the span's size is large enough to hold the extra byte):
 
 ```C
-az_span az_span_copy_uint8(az_span destination, uint8_t byte);
+az_span az_span_copy_u8(az_span destination, uint8_t byte);
 ```
 
 and then call this function to get the address of the 0-terminated string:
@@ -69,7 +69,7 @@ char* str = (char*) az_span_ptr(span); // str points to a 0-terminated string
 Or, you can call this function to copy the string in the `az_span` to your own `char*` buffer; this function will 0-termiante the string in the `char*` buffer:
 
 ```C
-az_result az_span_to_str(char* destination, int32_t destination_max_size, az_span source);
+void az_span_to_str(char* destination, int32_t destination_max_size, az_span source);
 ```
 
 There are many functions to manipulate `az_span` instances. You can slice (subset an `az_span`), parse an `az_span` containing a string into an number, format a number as a string into an `az_span`, check if two `az_span` instances are equal or the contents of two `az_span` instances are equal, and more.

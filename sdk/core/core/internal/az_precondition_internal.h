@@ -82,9 +82,7 @@ AZ_NODISCARD AZ_INLINE bool az_span_is_valid(az_span span, int32_t min_size, boo
     result = ptr != NULL && span_size >= 0;
   }
 
-  result = result && min_size <= span_size;
-
-  return result;
+  return result && min_size <= span_size;
 }
 
 #define AZ_PRECONDITION_VALID_SPAN(span, min_size, null_is_valid) \

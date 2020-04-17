@@ -36,7 +36,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_response_subscribe_topic_filter_ge
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_topic_filter, required_length);
 
   az_span remainder = az_span_copy(mqtt_topic_filter, az_iot_hub_twin_response_sub_topic);
-  az_span_copy_uint8(remainder, az_iot_hub_client_twin_hashtag);
+  az_span_copy_u8(remainder, az_iot_hub_client_twin_hashtag);
 
   *out_mqtt_topic_filter = az_span_slice(mqtt_topic_filter, 0, required_length);
 

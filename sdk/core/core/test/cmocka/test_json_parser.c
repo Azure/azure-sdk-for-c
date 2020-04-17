@@ -404,7 +404,7 @@ az_result read_write_token(
     case AZ_JSON_TOKEN_NUMBER:
     {
       AZ_RETURN_IF_NOT_ENOUGH_SIZE(*output, 1);
-      *output = az_span_copy_uint8(*output, '0');
+      *output = az_span_copy_u8(*output, '0');
       *written += 1;
       return AZ_OK;
     }
@@ -415,7 +415,7 @@ az_result read_write_token(
     case AZ_JSON_TOKEN_OBJECT_START:
     {
       AZ_RETURN_IF_NOT_ENOUGH_SIZE(*output, 1);
-      *output = az_span_copy_uint8(*output, '{');
+      *output = az_span_copy_u8(*output, '{');
       *written += 1;
       bool need_comma = false;
       while (true)
@@ -430,7 +430,7 @@ az_result read_write_token(
         if (need_comma)
         {
           AZ_RETURN_IF_NOT_ENOUGH_SIZE(*output, 1);
-          *output = az_span_copy_uint8(*output, ',');
+          *output = az_span_copy_u8(*output, ',');
           *written += 1;
         }
         else
@@ -439,19 +439,19 @@ az_result read_write_token(
         }
         AZ_RETURN_IF_FAILED(write_str(*output, member.name, output, written));
         AZ_RETURN_IF_NOT_ENOUGH_SIZE(*output, 1);
-        *output = az_span_copy_uint8(*output, ':');
+        *output = az_span_copy_u8(*output, ':');
         *written += 1;
         AZ_RETURN_IF_FAILED(read_write_token(output, written, o, state, member.token));
       }
       AZ_RETURN_IF_NOT_ENOUGH_SIZE(*output, 1);
-      *output = az_span_copy_uint8(*output, '}');
+      *output = az_span_copy_u8(*output, '}');
       *written += 1;
       return AZ_OK;
     }
     case AZ_JSON_TOKEN_ARRAY_START:
     {
       AZ_RETURN_IF_NOT_ENOUGH_SIZE(*output, 1);
-      *output = az_span_copy_uint8(*output, '[');
+      *output = az_span_copy_u8(*output, '[');
       *written += 1;
       bool need_comma = false;
       while (true)
@@ -466,7 +466,7 @@ az_result read_write_token(
         if (need_comma)
         {
           AZ_RETURN_IF_NOT_ENOUGH_SIZE(*output, 1);
-          *output = az_span_copy_uint8(*output, ',');
+          *output = az_span_copy_u8(*output, ',');
           *written += 1;
         }
         else
@@ -476,7 +476,7 @@ az_result read_write_token(
         AZ_RETURN_IF_FAILED(read_write_token(output, written, o, state, element));
       }
       AZ_RETURN_IF_NOT_ENOUGH_SIZE(*output, 1);
-      *output = az_span_copy_uint8(*output, ']');
+      *output = az_span_copy_u8(*output, ']');
       *written += 1;
       return AZ_OK;
     }
@@ -492,9 +492,9 @@ az_result write_str(az_span span, az_span s, az_span* out, int32_t* written)
   int32_t required_length = az_span_size(s) + 2;
 
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(*out, required_length);
-  *out = az_span_copy_uint8(*out, '"');
+  *out = az_span_copy_u8(*out, '"');
   *out = az_span_copy(*out, s);
-  *out = az_span_copy_uint8(*out, '"');
+  *out = az_span_copy_u8(*out, '"');
 
   *written += required_length;
   return AZ_OK;

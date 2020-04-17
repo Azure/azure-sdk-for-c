@@ -81,7 +81,7 @@ static az_result _az_http_policy_logging_append_http_request_msg(
   }
 
   remainder = az_span_copy(remainder, request->_internal.method);
-  remainder = az_span_copy_uint8(remainder, ' ');
+  remainder = az_span_copy_u8(remainder, ' ');
   remainder = az_span_copy(
       remainder, az_span_slice(request->_internal.url, 0, request->_internal.url_length));
 
@@ -154,7 +154,7 @@ static az_result _az_http_policy_logging_append_http_response_msg(
       az_span_u64toa(remainder, (uint64_t)status_line.status_code, &remainder));
 
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, az_span_size(status_line.reason_phrase) + 1);
-  remainder = az_span_copy_uint8(remainder, ' ');
+  remainder = az_span_copy_u8(remainder, ' ');
   remainder = az_span_copy(remainder, status_line.reason_phrase);
 
   az_span new_line_tab_string = AZ_SPAN_FROM_STR("\n\t");

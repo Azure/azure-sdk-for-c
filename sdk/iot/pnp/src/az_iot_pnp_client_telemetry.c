@@ -36,10 +36,10 @@ static az_result _az_add_telemetry_property(
   az_span remainder = mqtt_topic;
   if (add_separator)
   {
-    remainder = az_span_copy_uint8(remainder, pnp_telemetry_param_separator);
+    remainder = az_span_copy_u8(remainder, pnp_telemetry_param_separator);
   }
   remainder = az_span_copy(remainder, property_name);
-  remainder = az_span_copy_uint8(remainder, pnp_telemetry_param_equals);
+  remainder = az_span_copy_u8(remainder, pnp_telemetry_param_equals);
   az_span_copy(remainder, property_value);
 
   *out_mqtt_topic = az_span_slice(mqtt_topic, 0, required_length);
