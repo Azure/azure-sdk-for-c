@@ -74,6 +74,7 @@ AZ_NODISCARD az_keyvault_keys_client_options az_keyvault_keys_client_options_def
   return options;
 }
 
+// TODO: Rename the self parameter to client to be  consistent with other clients.
 AZ_NODISCARD az_result az_keyvault_keys_client_init(
     az_keyvault_keys_client* self,
     az_span uri,
@@ -142,7 +143,10 @@ AZ_NODISCARD az_result az_keyvault_keys_client_init(
   };
 
   // Copy url to client buffer so customer can re-use buffer on his/her side
-  AZ_RETURN_IF_FAILED(az_span_copy(self->_internal.uri, uri, &self->_internal.uri));
+  int32_t uri_size = az_span_size(uri);
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(self->_internal.uri, uri_size);
+  az_span_copy(self->_internal.uri, uri);
+  self->_internal.uri = az_span_slice(self->_internal.uri, 0, uri_size);
 
   AZ_RETURN_IF_FAILED(
       _az_credential_set_scopes(cred, AZ_SPAN_FROM_STR("https://vault.azure.net/.default")));
@@ -225,7 +229,7 @@ AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
   }
 
   AZ_RETURN_IF_FAILED(az_json_builder_append_token(&builder, az_json_token_object_end()));
-  *http_body = builder._internal.json;
+  *http_body = az_json_builder_span_get(&builder);
 
   return AZ_OK;
 }
@@ -243,7 +247,9 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
   uint8_t url_buffer[AZ_HTTP_REQUEST_URL_BUF_SIZE];
   az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
   // copy url from client
-  AZ_RETURN_IF_FAILED(az_span_copy(request_url_span, client->_internal.uri, &request_url_span));
+  int32_t uri_size = az_span_size(client->_internal.uri);
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(request_url_span, uri_size);
+  az_span_copy(request_url_span, client->_internal.uri);
 
   // Headers buffer
   uint8_t headers_buffer[_az_KEYVAULT_HTTP_REQUEST_HEADER_BUF_SIZE];
@@ -259,7 +265,13 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
   // create request
   _az_http_request hrb;
   AZ_RETURN_IF_FAILED(az_http_request_init(
-      &hrb, context, az_http_method_post(), request_url_span, request_headers_span, created_body));
+      &hrb,
+      context,
+      az_http_method_post(),
+      request_url_span,
+      uri_size,
+      request_headers_span,
+      created_body));
 
   // add path to request
   AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, az_keyvault_client_constant_for_keys()));
@@ -302,12 +314,20 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
   uint8_t url_buffer[AZ_HTTP_REQUEST_URL_BUF_SIZE];
   az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
   // copy url from client
-  AZ_RETURN_IF_FAILED(az_span_copy(request_url_span, client->_internal.uri, &request_url_span));
+  int32_t uri_size = az_span_size(client->_internal.uri);
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(request_url_span, uri_size);
+  az_span_copy(request_url_span, client->_internal.uri);
 
   // create request
   _az_http_request hrb;
   AZ_RETURN_IF_FAILED(az_http_request_init(
-      &hrb, context, az_http_method_get(), request_url_span, request_headers_span, AZ_SPAN_NULL));
+      &hrb,
+      context,
+      az_http_method_get(),
+      request_url_span,
+      uri_size,
+      request_headers_span,
+      AZ_SPAN_NULL));
 
   // Add path to request
   AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, az_keyvault_client_constant_for_keys()));
@@ -316,7 +336,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
   AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, key_name));
 
   // Add key_version if requested
-  if (az_span_length(key_version) > 0)
+  if (az_span_size(key_version) > 0)
   {
     AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, key_version));
   }
@@ -336,7 +356,10 @@ AZ_NODISCARD az_result az_keyvault_keys_key_delete(
   uint8_t url_buffer[AZ_HTTP_REQUEST_URL_BUF_SIZE];
   az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
   // copy url from client
-  AZ_RETURN_IF_FAILED(az_span_copy(request_url_span, client->_internal.uri, &request_url_span));
+  int32_t uri_size = az_span_size(client->_internal.uri);
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(request_url_span, uri_size);
+  az_span_copy(request_url_span, client->_internal.uri);
+
   uint8_t headers_buffer[_az_KEYVAULT_HTTP_REQUEST_HEADER_BUF_SIZE];
   az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
 
@@ -348,6 +371,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_delete(
       context,
       az_http_method_delete(),
       request_url_span,
+      uri_size,
       request_headers_span,
       AZ_SPAN_NULL));
 

@@ -23,63 +23,41 @@ Many SDK functions return an `az_result` as defined in [inc/az_result.h](inc/az_
 An `az_span` is a small data structure (defined in our [az_span.h](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/core/core/inc/az_span.h) file) wrapping a byte buffer. Specifically, an `az_span` instance contains:
 
 - a byte pointer
-- an integer capacity
-- an integer length
+- an integer size
 
-Our SDK passes `az_span` instances to functions to ensure that a buffer’s address capacity, and length are always passed together; this reduces the chance of bugs. And, since we have the length and capacity, operations are fast; for example, we never need to call `strlen` to find the length of a string in order to append to it. Furthermore, when our SDK functions write or append to an `az_span`, our functions ensure that we never write beyond the capacity of the buffer; this prevents data corruption. And finally, when reading from an `az_span`, we never read past the `az_span`’s length ensuring that we don’t process uninitialized data.
+Our SDK passes `az_span` instances to functions to ensure that a buffer’s address and size are always passed together; this reduces the chance of bugs. And, since we have the size, operations are fast; for example, we never need to call `strlen` to find the length of a string in order to append to it. Furthermore, when our SDK functions write or copy to an `az_span`, our functions ensure that we never write beyond the size of the buffer; this prevents data corruption. And finally, when reading from an `az_span`, we never read past the `az_span`’s size ensuring that we don’t process uninitialized data.
 
 Since many of our SDK functions require `az_span` parameters, customers must know how to create `az_span` instances so that you can call functions in our SDK. Here are some examples.
 
 Create an empty (or NULL) `az_span`:
 
 ```C
-az_span span_null = AZ_SPAN_NULL; // cap = 0, len = 0
+az_span span_null = AZ_SPAN_NULL; // size = 0
 ```
 
-Create an `az_span` literal from an uninitialized byte buffer:
+Create an `az_span` expression from a byte buffer:
 
 ```C
 uint8_t buffer[1024];
-az_span span_over_buffer = AZ_SPAN_LITERAL_FROM_BUFFER(buffer); // cap = 1024, len = 0
-```
-
-Create an `az_span` literal from an initialized bytes buffer:
-
-```C
-uint8_t buffer[] = { 1, 2, 3, 4, 5 };
-az_span span_over_buffer = AZ_SPAN_LITERAL_FROM_INITIALIZED_BUFFER(buffer); // cap = 5, len = 5
-```
-
-Create an `az_span` expression from an uninitialized byte buffer:
-
-```C
-uint8_t buffer[1024];
-some_function(AZ_SPAN_FROM_BUFFER(buffer));  // cap = 1024, len = 0
-```
-
-Create an `az_span` expression from an initialized bytes buffer:
-
-```C
-uint8_t buffer[] = { 1, 2, 3, 4, 5 };
-some_function(AZ_SPAN_FROM_INITIALIZED_BUFFER(buffer));  // cap = 5, len = 5
+some_function(AZ_SPAN_FROM_BUFFER(buffer));  // size = 1024
 ```
 
 Create an `az_span` literal from a string (the span does NOT include the 0-terminating byte):
 
 ```C
-az_span span_over_str = AZ_SPAN_LITERAL_FROM_STR("Hello");  // cap = 5, len = 5
+az_span span_over_str = AZ_SPAN_LITERAL_FROM_STR("Hello");  // size = 5
 ```
 
 Create an `az_span` expression from a string (the span does NOT include the 0-terminating byte):
 
 ```C
-some_function(AZ_SPAN_FROM_STR("Hello"));  // cap = 5, len = 5
+some_function(AZ_SPAN_FROM_STR("Hello"));  // size = 5
 ```
 
-As shown above, an `az_span` over a string does not include the 0-terminator. If you need to 0-terminate the string, you can call this function to append a 0 byte (if the string’s length is less than its capacity):
+As shown above, an `az_span` over a string does not include the 0-terminator. If you need to 0-terminate the string, you can call this function to append a 0 byte (if the span's size is large enough to hold the extra byte):
 
 ```C
-az_result az_span_append_uint8(az_span destination, uint8_t byte, az_span* out_span);
+az_span az_span_copy_u8(az_span destination, uint8_t byte);
 ```
 
 and then call this function to get the address of the 0-terminated string:
@@ -91,10 +69,10 @@ char* str = (char*) az_span_ptr(span); // str points to a 0-terminated string
 Or, you can call this function to copy the string in the `az_span` to your own `char*` buffer; this function will 0-termiante the string in the `char*` buffer:
 
 ```C
-az_result az_span_to_str(char* destination, int32_t destination_max_size, az_span source);
+void az_span_to_str(char* destination, int32_t destination_max_size, az_span source);
 ```
 
-There are many functions to manipulate `az_span` instances. You can slice (subset an `az_span`), parse an `az_span` containing a string into an number, append a number as a string to the end of an `az_span`, check if two `az_span` instances are equal or the contents of two `az_span` instances are equal, and more.
+There are many functions to manipulate `az_span` instances. You can slice (subset an `az_span`), parse an `az_span` containing a string into an number, format a number as a string into an `az_span`, check if two `az_span` instances are equal or the contents of two `az_span` instances are equal, and more.
 
 ### Strings
 
@@ -129,7 +107,7 @@ Log classifications allow your application to select which specific log messages
    ```C
    void test_log_func(az_log_classification classification, az_span message)
    {
-      printf("%.*s\n", az_span_length(message), az_span_ptr(message));
+      printf("%.*s\n", az_span_size(message), az_span_ptr(message));
    }
 
    int main()
@@ -148,7 +126,7 @@ The public SDK functions validate the arguments passed to them to ensure that th
 
 To override the default behavior, implement a function matching the `az_precondition_failed_fn` function signature and then, in your application's initialization (before calling any Azure SDK function), call `az_precondition_failed_set_callback` passing it the address of your function. Now, when any Azure SDK function detects a precondition failure, it will invoke your callback instead. You might override the callback to attach a debugger or perhaps to reboot the device rather than allowing it to continue running with unpredictable behavior.
 
-Also, if you define the `NO_PRECONDITION_CHECKING` symbol when compiling the SDK code, all of the Azure SDK precondition checking will be excluded, making the binary code smaller and faster. We recommend doing this before you ship your code.
+Also, if you define the `NO_PRECONDITION_CHECKING` symbol when compiling the SDK code (or adding option -DBUILD_PRECONDITIONS=OFF with cmake), all of the Azure SDK precondition checking will be excluded, making the binary code smaller and faster. We recommend doing this before you ship your code.
 
 ### Canceling an Operation
 

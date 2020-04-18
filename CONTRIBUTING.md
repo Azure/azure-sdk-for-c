@@ -63,7 +63,7 @@ cd vcpkg
 # build vcpkg (remove .bat on Linux/Mac)
 .\bootstrap-vcpkg.bat
 # install dependencies (remove .exe in Linux/Mac) and update triplet
-vcpkg.exe install --triplet x64-windows-static curl[winssl] cmocka
+vcpkg.exe install --triplet x64-windows-static curl[winssl] cmocka paho-mqtt
 # Add this environment variables to link this VCPKG folder with cmake:
 # VCPKG_DEFAULT_TRIPLET=x64-windows-static
 # VCPKG_ROOT=PATH_TO_VCPKG (replace PATH_TO_VCPKG for where vcpkg is installed)
@@ -102,13 +102,11 @@ Follow next steps to install VCPKG and have it linked to cmake
 
 ```bash
 # Clone vcpgk:
-git clone https://github.com/Microsoft/vcpkg.git
-# (consider this path as PATH_TO_VCPKG)
+ # (consider this path as PATH_TO_VCPKG)
 cd vcpkg
 # build vcpkg
 ./bootstrap-vcpkg.sh
-
-./vcpkg install --triplet x64-linux curl cmocka
+./vcpkg install --triplet x64-linux curl cmocka paho-mqtt
 export VCPKG_DEFAULT_TRIPLET=x64-linux
 export VCPKG_ROOT=PATH_TO_VCPKG #replace PATH_TO_VCPKG for where vcpkg is installed
 ```
@@ -117,7 +115,7 @@ export VCPKG_ROOT=PATH_TO_VCPKG #replace PATH_TO_VCPKG for where vcpkg is instal
 
 Alternatively, for Ubuntu 18.04 you can use:
 
-`sudo apt install build-essential cmake libcmocka-dev libcmocka0 gcovr lcov doxygen curl libcurl4-openssl-dev libssl-dev`
+`sudo apt install build-essential cmake libcmocka-dev libcmocka0 gcovr lcov doxygen curl libcurl4-openssl-dev libssl-dev ca-certificates`
 
 #### Build
 
@@ -161,9 +159,7 @@ git clone https://github.com/Microsoft/vcpkg.git
 cd vcpkg
 # build vcpkg
 ./bootstrap-vcpkg.sh
-
-# Mac:
-./vcpkg install --triplet x64-osx curl cmocka
+./vcpkg install --triplet x64-osx curl cmocka paho-mqtt
 export VCPKG_DEFAULT_TRIPLET=x64-osx
 export VCPKG_ROOT=PATH_TO_VCPKG #replace PATH_TO_VCPKG for where vcpkg is installed
 ```

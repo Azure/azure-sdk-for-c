@@ -10,14 +10,16 @@
 #ifndef _az_IOT_PROVISIONING_CLIENT_H
 #define _az_IOT_PROVISIONING_CLIENT_H
 
+#include <az_iot_core.h>
 #include <az_result.h>
 #include <az_span.h>
-#include <az_iot_core.h>
 
 #include <stdbool.h>
 #include <stdint.h>
 
 #include <_az_cfg_prefix.h>
+
+#define AZ_IOT_PROVISIONING_SERVICE_VERSION "2019-03-31"
 
 /**
  * @brief Azure IoT Provisioning Client options.
@@ -51,7 +53,7 @@ typedef struct az_iot_provisioning_client
  *
  * @return #az_iot_provisioning_client_options.
  */
-az_iot_provisioning_client_options az_iot_provisioning_client_options_default();
+AZ_NODISCARD az_iot_provisioning_client_options az_iot_provisioning_client_options_default();
 
 /**
  * @brief Initializes an Azure IoT Provisioning Client.
@@ -69,14 +71,14 @@ AZ_NODISCARD az_result az_iot_provisioning_client_init(
     az_span global_device_endpoint,
     az_span id_scope,
     az_span registration_id,
-    az_iot_provisioning_client_options* options);
+    az_iot_provisioning_client_options const* options);
 
 /**
- * @brief Gets the MQTT client id.
+ * @brief Gets the MQTT user name.
  *
  * @param[in] client The #az_iot_provisioning_client to use for this call.
- * @param[in] mqtt_user_name An empty #az_span with sufficient capacity to hold the MQTT client id.
- * @param[out] out_mqtt_user_name The output #az_span containing the MQTT client id.
+ * @param[in] mqtt_user_name An empty #az_span with sufficient capacity to hold the MQTT user name.
+ * @param[out] out_mqtt_user_name The output #az_span containing the MQTT user name.
  * @return #az_result
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_user_name_get(
@@ -196,11 +198,9 @@ typedef struct az_iot_provisioning_client_registration_state
 typedef struct az_iot_provisioning_client_register_response
 {
   az_iot_status status; /**< The current request status.
-                                             * @note The response for the register operation is
-                                             * available through #registration_state only. */
-  az_span request_id; /**< Request ID for the register operation.
-                       * @note This must match all messages associated with the registration
-                       * operation. */
+                         * @note The response for the register operation is
+                         * available through #registration_state only. */
+  az_span operation_id; /**< Operation ID of the register operation. */
   az_span registration_state; /**< An #az_span containing the state of the register operation.
                                * @details This can be one of the following: 'unassigned',
                                * 'assigning', 'assigned', 'failed', 'disabled'. */
@@ -247,15 +247,14 @@ AZ_NODISCARD az_result az_iot_provisioning_client_register_publish_topic_get(
  * @note The payload of the MQTT publish message should be empty.
  *
  * @param[in] client The #az_iot_provisioning_client to use for this call.
- * @param[in] request_id The request id. Must match a received
- *                       #az_iot_provisioning_client_register_response request_id.
+ * @param[in] register_response The received #az_iot_provisioning_client_register_response response.
  * @param[in] mqtt_topic An empty #az_span with sufficient capacity to hold the MQTT topic.
  * @param[out] out_mqtt_topic The output #az_span containing the MQTT topic.
  * @return #az_result
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_get_operation_status_publish_topic_get(
     az_iot_provisioning_client const* client,
-    az_span request_id,
+    az_iot_provisioning_client_register_response const* register_response,
     az_span mqtt_topic,
     az_span* out_mqtt_topic);
 

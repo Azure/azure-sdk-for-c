@@ -338,3 +338,6 @@ build/
 
 # VS Code Files
 .vscode
+
+# Certificates
+*.pem
