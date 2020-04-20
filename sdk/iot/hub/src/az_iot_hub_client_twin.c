@@ -147,6 +147,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_received_topic_parse(
   AZ_PRECONDITION_NOT_NULL(client);
   AZ_PRECONDITION_VALID_SPAN(received_topic, 1, false);
   AZ_PRECONDITION_NOT_NULL(out_twin_response);
+  (void)client;
 
   az_result result;
 
