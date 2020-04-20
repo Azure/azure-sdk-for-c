@@ -34,7 +34,7 @@ AZ_NODISCARD az_result az_http_request_init(
   AZ_PRECONDITION_VALID_SPAN(headers_buffer, 0, false);
 
   int32_t query_start = 0;
-  az_result url_with_query = _az_scan_until(url, _az_is_question_mark, &query_start);
+  az_result url_with_query = _az_scan_until(url, url_length, _az_is_question_mark, &query_start);
 
   *p_request
       = (_az_http_request){ ._internal = {

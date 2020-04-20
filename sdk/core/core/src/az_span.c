@@ -649,9 +649,10 @@ AZ_NODISCARD az_result _az_is_expected_span(az_span* self, az_span expected)
 
 // PRIVATE. read until condition is true on character.
 // Then return number of positions read with output parameter
-AZ_NODISCARD az_result _az_scan_until(az_span self, _az_predicate predicate, int32_t* out_index)
+AZ_NODISCARD az_result
+_az_scan_until(az_span self, int32_t current_size, _az_predicate predicate, int32_t* out_index)
 {
-  for (int32_t index = 0; index < az_span_size(self); ++index)
+  for (int32_t index = 0; index < current_size; ++index)
   {
     az_span s = az_span_slice_to_end(self, index);
     az_result predicate_result = predicate(s);
