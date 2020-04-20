@@ -15,7 +15,7 @@
 
 #include <_az_cfg.h>
 
-#define URI_ENV "test_uri"
+#define URI_ENV "AZURE_KEYVAULT_URL"
 
 int exit_code = 0;
 

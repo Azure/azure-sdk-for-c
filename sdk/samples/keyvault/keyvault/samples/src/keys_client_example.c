@@ -13,10 +13,22 @@
 
 #include <_az_cfg.h>
 
-#define TENANT_ID_ENV "tenant_id"
-#define CLIENT_ID_ENV "client_id"
-#define CLIENT_SECRET_ENV "client_secret"
-#define URI_ENV "test_uri"
+#define TENANT_ID_ENV "AZURE_TENANT_ID"
+#define CLIENT_ID_ENV "AZURE_CLIENT_ID"
+#define CLIENT_SECRET_ENV "AZURE_CLIENT_SECRET"
+#define URI_ENV "AZURE_KEYVAULT_URL"
+
+#define TEST_FAIL_ON_ERROR(result, message) \
+  do \
+  { \
+    if (az_failed(result)) \
+    { \
+      printf("\n"); \
+      printf(message); \
+      printf("\n"); \
+      return 1; \
+    } \
+  } while (0)
 
 int exit_code = 0;
 
@@ -33,10 +45,7 @@ int main()
       az_span_from_str(getenv(CLIENT_ID_ENV)),
       az_span_from_str(getenv(CLIENT_SECRET_ENV)));
 
-  if (az_failed(creds_retcode))
-  {
-    printf("Failed to init credential");
-  }
+  TEST_FAIL_ON_ERROR(creds_retcode, "Failed to init credential");
 
   /************ Creates keyvault client    ****************/
   az_keyvault_keys_client client = { 0 };
@@ -47,10 +56,7 @@ int main()
   az_result const operation_result = az_keyvault_keys_client_init(
       &client, az_span_from_str(getenv(URI_ENV)), &credential, &options);
 
-  if (az_failed(operation_result))
-  {
-    printf("Failed to init keys client");
-  }
+  TEST_FAIL_ON_ERROR(operation_result, "Failed to init keys client");
 
   /******* Create a buffer for response (will be reused for all requests)   *****/
   uint8_t response_buffer[1024 * 4];
@@ -58,10 +64,7 @@ int main()
   az_http_response http_response = { 0 };
   az_result const init_http_response_result = az_http_response_init(&http_response, response_span);
 
-  if (az_failed(init_http_response_result))
-  {
-    printf("Failed to init http response");
-  }
+  TEST_FAIL_ON_ERROR(init_http_response_result, "Failed to init http response");
 
   /******************  CREATE KEY with options******************************/
   az_keyvault_create_key_options key_options = { 0 };
@@ -91,30 +94,21 @@ int main()
     return 0;
   }
 
-  if (az_failed(create_result))
-  {
-    printf("Failed to create key");
-  }
+  TEST_FAIL_ON_ERROR(create_result, "Failed to create key");
 
   printf("Key created result: \n%s", response_buffer);
 
   // Reuse response buffer for create Key by creating a new span from response_buffer
   az_result const reset1_op = az_http_response_init(&http_response, response_span);
-  if (az_failed(reset1_op))
-  {
-    printf("Failed to reset http response (1)");
-  }
+  TEST_FAIL_ON_ERROR(reset1_op, "Failed to reset http response");
 
-  az_span_fill(http_response._internal.http_response, '.');
+  az_span_fill(http_response._internal.http_response, 'h');
 
   /******************  GET KEY latest ver ******************************/
   az_result get_key_result = az_keyvault_keys_key_get(
       &client, &az_context_app, AZ_SPAN_FROM_STR("test-new-key"), AZ_SPAN_NULL, &http_response);
 
-  if (az_failed(get_key_result))
-  {
-    printf("Failed to get key");
-  }
+  TEST_FAIL_ON_ERROR(get_key_result, "Failed to get key");
 
   printf("\n\n*********************************\nGet Key result: \n%s", response_buffer);
 
@@ -135,10 +129,7 @@ int main()
 
   // Reuse response buffer for delete Key by creating a new span from response_buffer
   az_result const reset2_op = az_http_response_init(&http_response, response_span);
-  if (az_failed(reset2_op))
-  {
-    printf("Failed to reset http response (2)");
-  }
+  TEST_FAIL_ON_ERROR(reset2_op, "Failed to reset http response");
 
   az_span_fill(response_span, '.');
 
@@ -151,10 +142,7 @@ int main()
       NULL,
       &http_response);
 
-  if (az_failed(create_version_result))
-  {
-    printf("Failed to create key version");
-  }
+  TEST_FAIL_ON_ERROR(create_version_result, "Failed to create key version");
 
   printf(
       "\n\n*********************************\nKey new version created result: \n%s",
@@ -162,10 +150,7 @@ int main()
 
   // Reuse response buffer for delete Key by creating a new span from response_buffer
   az_result const reset3_op = az_http_response_init(&http_response, response_span);
-  if (az_failed(reset3_op))
-  {
-    printf("Failed to reset http response (3)");
-  }
+  TEST_FAIL_ON_ERROR(reset3_op, "Failed to reset http response");
 
   az_span_fill(response_span, '.');
 
@@ -173,10 +158,7 @@ int main()
   az_result const get_key_prev_ver_result = az_keyvault_keys_key_get(
       &client, &az_context_app, AZ_SPAN_FROM_STR("test-new-key"), version, &http_response);
 
-  if (az_failed(get_key_prev_ver_result))
-  {
-    printf("Failed to get previous version of the key");
-  }
+  TEST_FAIL_ON_ERROR(get_key_prev_ver_result, "Failed to get previous version of the key");
 
   printf("\n\n*********************************\nGet Key previous Ver: \n%s", response_buffer);
 
@@ -184,30 +166,20 @@ int main()
   az_result const delete_key_result = az_keyvault_keys_key_delete(
       &client, &az_context_app, AZ_SPAN_FROM_STR("test-new-key"), &http_response);
 
-  if (az_failed(delete_key_result))
-  {
-    printf("Failed to delete key");
-  }
+  TEST_FAIL_ON_ERROR(delete_key_result, "Failed to delete key");
 
   printf("\n\n*********************************\nDELETED Key: \n %s", response_buffer);
 
   // Reuse response buffer for create Key by creating a new span from response_buffer
   az_result const reset4_op = az_http_response_init(&http_response, response_span);
-  if (az_failed(reset4_op))
-  {
-    printf("Failed to reset http response (4)");
-  }
-
+  TEST_FAIL_ON_ERROR(reset4_op, "Failed to reset http response");
   az_span_fill(response_span, '.');
 
   /******************  GET KEY (should return failed response ) ******************************/
   az_result get_key_again_result = az_keyvault_keys_key_get(
       &client, &az_context_app, AZ_SPAN_FROM_STR("test-new-key"), AZ_SPAN_NULL, &http_response);
 
-  if (az_failed(get_key_again_result))
-  {
-    printf("Failed to get key (2)");
-  }
+  TEST_FAIL_ON_ERROR(get_key_again_result, "Failed to get key");
 
   printf(
       "\n\n*********************************\nGet Key again after DELETE result: \n%s\n",
