@@ -20,7 +20,7 @@ static const az_span az_iot_hub_twin_get_pub_topic = AZ_SPAN_LITERAL_FROM_STR("$
 static const az_span az_iot_hub_twin_patch_pub_topic
     = AZ_SPAN_LITERAL_FROM_STR("$iothub/twin/PATCH/properties/reported/");
 static const az_span az_iot_hub_twin_patch_sub_topic
-    = AZ_SPAN_LITERAL_FROM_STR("$iothub/twin/PATCH/properties/desired/");
+    = AZ_SPAN_LITERAL_FROM_STR("$iothub/twin/PATCH/properties/desired/#");
 
 AZ_NODISCARD az_result az_iot_hub_client_twin_response_subscribe_topic_filter_get(
     az_iot_hub_client const* client,
