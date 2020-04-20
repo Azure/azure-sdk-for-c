@@ -300,7 +300,7 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_publish_topic_get(
  * @note C2D MQTT Publish messages will have QoS At Least Once (1).
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
- * @param[in] mqtt_topic_filter A char buffer with sufficient capacity to hold the MQTT topic
+ * @param[out] mqtt_topic_filter A char buffer with sufficient capacity to hold the MQTT topic
  *                              filter.
  * @param[in] mqtt_topic_filter_size The size of the passed buffer. Must be greater than 0.
  * @param[out] out_mqtt_topic_filter_length The optional output length of the mqtt topic filter. Can
