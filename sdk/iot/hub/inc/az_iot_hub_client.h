@@ -300,15 +300,18 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_publish_topic_get(
  * @note C2D MQTT Publish messages will have QoS At Least Once (1).
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
- * @param[in] mqtt_topic_filter An empty #az_span with sufficient capacity to hold the MQTT topic
+ * @param[in] mqtt_topic_filter A char buffer with sufficient capacity to hold the MQTT topic
  *                              filter.
- * @param[out] out_mqtt_topic_filter The output #az_span containing the MQTT topic filter.
+ * @param[in] mqtt_topic_filter_size The size of the passed buffer. Must be greater than 0.
+ * @param[out] out_mqtt_topic_filter_length The optional output length of the mqtt topic filter. Can
+ * be `NULL`.
  * @return #az_result
  */
 AZ_NODISCARD az_result az_iot_hub_client_c2d_subscribe_topic_filter_get(
     az_iot_hub_client const* client,
-    az_span mqtt_topic_filter,
-    az_span* out_mqtt_topic_filter);
+    char* mqtt_topic_filter,
+    size_t mqtt_topic_filter_size,
+    size_t* out_mqtt_topic_filter_length);
 
 /**
  * @brief The Cloud To Device Request.
