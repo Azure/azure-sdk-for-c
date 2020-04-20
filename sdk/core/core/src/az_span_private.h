@@ -46,7 +46,8 @@ typedef az_result (*_az_predicate)(az_span slice);
 
 // PRIVATE. read until condition is true on character.
 // Then return number of positions read with output parameter
-AZ_NODISCARD az_result _az_scan_until(az_span self, _az_predicate predicate, int32_t* out_index);
+AZ_NODISCARD az_result
+_az_span_scan_until(az_span self, _az_predicate predicate, int32_t* out_index);
 
 AZ_NODISCARD az_result _az_is_expected_span(az_span* self, az_span expected);
 
