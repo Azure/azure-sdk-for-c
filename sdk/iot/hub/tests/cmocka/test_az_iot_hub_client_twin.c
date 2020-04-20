@@ -259,6 +259,45 @@ static void test_az_iot_hub_client_twin_patch_publish_topic_get_NULL_out_span_fa
       &client, test_device_request_id, test_span, NULL));
 }
 
+static void test_az_iot_hub_client_twin_received_topic_parse_NULL_client_fails(
+    void** state)
+{
+  (void)state;
+
+  az_iot_hub_client_twin_response response;
+
+  assert_precondition_checked(az_iot_hub_client_twin_received_topic_parse(
+      NULL, test_twin_received_topic_desired_success, &response));
+}
+
+static void test_az_iot_hub_client_twin_received_topic_parse_NULL_rec_topic_fails(
+    void** state)
+{
+  (void)state;
+
+  az_iot_hub_client client;
+  assert_int_equal(
+      az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL), AZ_OK);
+
+  az_iot_hub_client_twin_response response;
+
+  assert_precondition_checked(az_iot_hub_client_twin_received_topic_parse(
+      &client, AZ_SPAN_NULL, &response));
+}
+
+static void test_az_iot_hub_client_twin_received_topic_parse_NULL_response_fails(
+    void** state)
+{
+  (void)state;
+
+  az_iot_hub_client client;
+  assert_int_equal(
+      az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL), AZ_OK);;
+
+  assert_precondition_checked(az_iot_hub_client_twin_received_topic_parse(
+      &client, test_twin_received_topic_desired_success, NULL));
+}
+
 #endif // NO_PRECONDITION_CHECKING
 
 static void test_az_iot_hub_client_twin_response_subscribe_topic_filter_get_succeed(void** state)
@@ -676,6 +715,9 @@ int test_az_iot_hub_client_twin()
     cmocka_unit_test(test_az_iot_hub_client_twin_patch_publish_topic_get_invalid_request_id_fails),
     cmocka_unit_test(test_az_iot_hub_client_twin_patch_publish_topic_get_NULL_span_fails),
     cmocka_unit_test(test_az_iot_hub_client_twin_patch_publish_topic_get_NULL_out_span_fails),
+    cmocka_unit_test(test_az_iot_hub_client_twin_received_topic_parse_NULL_client_fails),
+    cmocka_unit_test(test_az_iot_hub_client_twin_received_topic_parse_NULL_rec_topic_fails),
+    cmocka_unit_test(test_az_iot_hub_client_twin_received_topic_parse_NULL_response_fails),
 #endif // NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_az_iot_hub_client_twin_response_subscribe_topic_filter_get_succeed),
     cmocka_unit_test(test_az_iot_hub_client_twin_response_subscribe_topic_filter_get_twice_succeed),
