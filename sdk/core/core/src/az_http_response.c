@@ -95,7 +95,7 @@ _az_get_http_status_line(az_span* self, az_http_response_status_line* out_status
   // HTAB = "\t"
   // VCHAR or obs-text is %x21-FF,
   int32_t offset = 0;
-  AZ_RETURN_IF_FAILED(_az_scan_until(*self, _az_is_new_line, &offset));
+  AZ_RETURN_IF_FAILED(_az_span_scan_until(*self, _az_is_new_line, &offset));
 
   // save reason-phrase in status line now that we got the offset. Remove 1 last chars(\r)
   out_status_line->reason_phrase = az_span_slice(*self, 0, offset - 1);
@@ -170,7 +170,7 @@ az_http_response_get_next_header(az_http_response* response, az_pair* out_header
     //         "_" / "`" / "|" / "~" / DIGIT / ALPHA;
     // any VCHAR,
     //    except delimiters
-    AZ_RETURN_IF_FAILED(_az_scan_until(*reader, _az_is_a_colon, &field_name_length));
+    AZ_RETURN_IF_FAILED(_az_span_scan_until(*reader, _az_is_a_colon, &field_name_length));
 
     // form a header name. Reader is currently at char ':'
     out_header->key = az_span_slice(*reader, 0, field_name_length);
@@ -179,7 +179,7 @@ az_http_response_get_next_header(az_http_response* response, az_pair* out_header
 
     // OWS
     int32_t ows_len = 0;
-    AZ_RETURN_IF_FAILED(_az_scan_until(*reader, _az_slice_is_not_http_whitespace, &ows_len));
+    AZ_RETURN_IF_FAILED(_az_span_scan_until(*reader, _az_slice_is_not_http_whitespace, &ows_len));
     *reader = az_span_slice_to_end(*reader, ows_len);
   }
   // field-value    = *( field-content / obs-fold )
