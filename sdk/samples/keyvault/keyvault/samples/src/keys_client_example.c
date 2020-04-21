@@ -116,15 +116,14 @@ int main()
   // version is still at http_response. Let's copy it to a new buffer
   uint8_t version_buf[40];
   az_span version_builder = AZ_SPAN_FROM_BUFFER(version_buf);
-  if ((az_span_capacity(version_builder) - az_span_length(version_builder))
-      < az_span_length(version))
+  if (az_span_size(version_builder) < az_span_size(version))
   {
     printf("Failed to append key version");
   }
   else
   {
-    version_builder = az_span_append(version_builder, version);
-    version = az_span_slice(version_builder, 0, az_span_length(version_builder));
+    az_span_copy(version_builder, version);
+    version = az_span_slice(version_builder, 0, az_span_size(version));
   }
 
   az_span_set(response_span, '.');
@@ -220,7 +219,7 @@ az_span get_key_version(az_http_response* response)
     return AZ_SPAN_NULL;
   }
   // calculate version
-  int32_t kid_length = az_span_length(k);
+  int32_t kid_length = az_span_size(k);
   az_span version = { 0 };
 
   for (int32_t index = kid_length; index > 0; --index)
@@ -228,7 +227,7 @@ az_span get_key_version(az_http_response* response)
 
     if (az_span_ptr(k)[index] == '/')
     {
-      version = az_span_slice(k, index + 1, -1);
+      version = az_span_slice_to_end(k, index + 1);
       break;
     }
   }

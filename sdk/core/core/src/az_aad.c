@@ -2,11 +2,15 @@
 // SPDX-License-Identifier: MIT
 
 #include "az_aad_private.h"
+#include "az_span_private.h"
+
 #include <az_config_internal.h>
 #include <az_http.h>
 #include <az_http_internal.h>
 #include <az_json.h>
 #include <az_platform_internal.h>
+#include <az_precondition_internal.h>
+#include <az_span_internal.h>
 
 #include <stddef.h>
 
@@ -25,39 +29,20 @@ AZ_NODISCARD az_result _az_token_set(_az_token* self, _az_token const* new_token
   return AZ_OK;
 }
 
-static AZ_NODISCARD az_result
-_az_span_append_with_url_encode(az_span dst, az_span src, az_span* out)
-{
-  int32_t dst_length = az_span_length(dst);
-  uint8_t* p_dst = az_span_ptr(dst);
-  int32_t remaining = az_span_capacity(dst) - dst_length;
-  // get remaining from dst
-  az_span span_from_current_length_to_capacity = az_span_init(p_dst + dst_length, 0, remaining);
-
-  // Copy src into remaining with encoded (copy handles overflow)
-  AZ_RETURN_IF_FAILED(az_span_copy_url_encode(
-      span_from_current_length_to_capacity, src, &span_from_current_length_to_capacity));
-  // return new span with updated length
-  *out = az_span_init(
-      az_span_ptr(dst),
-      dst_length + az_span_length(span_from_current_length_to_capacity),
-      az_span_capacity(dst));
-
-  return AZ_OK;
-}
-
 // https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow#request-an-access-token
 AZ_NODISCARD az_result _az_aad_build_url(az_span url, az_span tenant_id, az_span* out_url)
 {
   az_span root_url = AZ_SPAN_FROM_STR("https://login.microsoftonline.com/");
-  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(url, az_span_length(root_url));
-  *out_url = az_span_append(url, root_url);
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(url, az_span_size(root_url));
+  az_span remainder = az_span_copy(url, root_url);
 
-  AZ_RETURN_IF_FAILED(_az_span_append_with_url_encode(*out_url, tenant_id, out_url));
+  AZ_RETURN_IF_FAILED(az_span_copy_url_encode(remainder, tenant_id, &remainder));
 
   az_span oath_token = AZ_SPAN_FROM_STR("/oauth2/v2.0/token");
-  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(*out_url, az_span_length(oath_token));
-  *out_url = az_span_append(*out_url, oath_token);
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, az_span_size(oath_token));
+  remainder = az_span_copy(remainder, oath_token);
+
+  *out_url = az_span_slice(url, 0, _az_span_diff(remainder, url));
 
   return AZ_OK;
 }
@@ -72,26 +57,27 @@ AZ_NODISCARD az_result _az_aad_build_body(
 {
   az_span grant_type_and_client_id_key
       = AZ_SPAN_FROM_STR("grant_type=client_credentials&client_id=");
-  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(body, az_span_length(grant_type_and_client_id_key));
-  *out_body = az_span_append(body, grant_type_and_client_id_key);
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(body, az_span_size(grant_type_and_client_id_key));
+  az_span remainder = az_span_copy(body, grant_type_and_client_id_key);
 
-  AZ_RETURN_IF_FAILED(_az_span_append_with_url_encode(*out_body, client_id, out_body));
+  AZ_RETURN_IF_FAILED(az_span_copy_url_encode(remainder, client_id, &remainder));
 
   az_span scope_key = AZ_SPAN_FROM_STR("&scope=");
-  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(*out_body, az_span_length(scope_key));
-  *out_body = az_span_append(*out_body, scope_key);
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, az_span_size(scope_key));
+  remainder = az_span_copy(remainder, scope_key);
 
-  AZ_RETURN_IF_FAILED(_az_span_append_with_url_encode(*out_body, scopes, out_body));
+  AZ_RETURN_IF_FAILED(az_span_copy_url_encode(remainder, scopes, &remainder));
 
-  if (az_span_length(client_secret) > 0)
+  if (az_span_size(client_secret) > 0)
   {
     az_span client_secret_key = AZ_SPAN_FROM_STR("&client_secret=");
-    AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(*out_body, az_span_length(client_secret_key));
-    *out_body = az_span_append(*out_body, client_secret_key);
+    AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, az_span_size(client_secret_key));
+    remainder = az_span_copy(remainder, client_secret_key);
 
-    AZ_RETURN_IF_FAILED(_az_span_append_with_url_encode(*out_body, client_secret, out_body));
+    AZ_RETURN_IF_FAILED(az_span_copy_url_encode(remainder, client_secret, &remainder));
   }
 
+  *out_body = az_span_slice(body, 0, _az_span_diff(remainder, body));
   return AZ_OK;
 }
 
@@ -165,11 +151,11 @@ AZ_NODISCARD az_result _az_aad_request_token(_az_http_request* request, _az_toke
   };
 
   az_span new_token_span = AZ_SPAN_FROM_BUFFER(new_token._internal.token);
-  new_token_span = az_span_copy(new_token_span, AZ_SPAN_FROM_STR("Bearer "));
-  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(new_token_span, az_span_length(access_token));
-  new_token_span = az_span_append(new_token_span, access_token);
+  az_span remainder = az_span_copy(new_token_span, AZ_SPAN_FROM_STR("Bearer "));
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, az_span_size(access_token));
+  remainder = az_span_copy(remainder, access_token);
 
-  new_token._internal.token_length = (int16_t)az_span_length(new_token_span);
+  new_token._internal.token_length = (int16_t)_az_span_diff(remainder, new_token_span);
 
   AZ_RETURN_IF_FAILED(_az_token_set(out_token, &new_token));
 

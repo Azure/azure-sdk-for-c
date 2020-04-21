@@ -40,10 +40,9 @@ static const char test_correct_pnp_user_name_with_user_agent[]
       "&digital-twin-model-id=" TEST_ROOT_INTERFACE_NAME;
 
 #ifndef NO_PRECONDITION_CHECKING
-
 enable_precondition_check_tests()
 
-    static void test_az_iot_pnp_client_init_NULL_client_fails(void** state)
+static void test_az_iot_pnp_client_init_NULL_client_fails(void** state)
 {
   (void)state;
 
@@ -139,12 +138,14 @@ static void test_az_iot_pnp_client_get_user_name_succeed(void** state)
       AZ_OK);
 
   uint8_t test_span_buffer[_az_COUNTOF(test_correct_pnp_user_name) - 1];
-  az_span test_span = az_span_init(test_span_buffer, 0, _az_COUNTOF(test_span_buffer));
+  az_span test_span = az_span_init(test_span_buffer, _az_COUNTOF(test_span_buffer));
   assert_int_equal(az_iot_pnp_client_get_user_name(&client, test_span, &test_span), AZ_OK);
 
-  assert_int_equal(az_span_length(test_span), _az_COUNTOF(test_correct_pnp_user_name) - 1);
+  assert_int_equal(az_span_size(test_span), _az_COUNTOF(test_correct_pnp_user_name) - 1);
   assert_memory_equal(
-      test_correct_pnp_user_name, az_span_ptr(test_span), _az_COUNTOF(test_correct_pnp_user_name) - 1);
+      test_correct_pnp_user_name,
+      az_span_ptr(test_span),
+      _az_COUNTOF(test_correct_pnp_user_name) - 1);
 }
 
 static void test_az_iot_pnp_client_get_user_name_small_buffer_fail(void** state)
@@ -158,10 +159,10 @@ static void test_az_iot_pnp_client_get_user_name_small_buffer_fail(void** state)
       AZ_OK);
 
   uint8_t test_span_buffer[_az_COUNTOF(test_correct_pnp_user_name) - 2];
-  az_span test_span = az_span_init(test_span_buffer, 0, _az_COUNTOF(test_span_buffer));
+  az_span test_span = az_span_init(test_span_buffer, _az_COUNTOF(test_span_buffer));
   assert_int_equal(
       az_iot_pnp_client_get_user_name(&client, test_span, &test_span),
-      AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY);
+      AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
 }
 
 static void test_az_iot_pnp_client_get_user_name_user_options_succeed(void** state)
@@ -180,11 +181,11 @@ static void test_az_iot_pnp_client_get_user_name_user_options_succeed(void** sta
       AZ_OK);
 
   uint8_t test_span_buffer[_az_COUNTOF(test_correct_pnp_user_name_with_user_agent) - 1];
-  az_span test_span = az_span_init(test_span_buffer, 0, _az_COUNTOF(test_span_buffer));
+  az_span test_span = az_span_init(test_span_buffer, _az_COUNTOF(test_span_buffer));
   assert_int_equal(az_iot_pnp_client_get_user_name(&client, test_span, &test_span), AZ_OK);
 
   assert_int_equal(
-      az_span_length(test_span), _az_COUNTOF(test_correct_pnp_user_name_with_user_agent) - 1);
+      az_span_size(test_span), _az_COUNTOF(test_correct_pnp_user_name_with_user_agent) - 1);
   assert_memory_equal(
       test_correct_pnp_user_name_with_user_agent,
       az_span_ptr(test_span),
@@ -207,10 +208,10 @@ static void test_az_iot_pnp_client_get_user_name_user_options_small_buffer_fail(
       AZ_OK);
 
   uint8_t test_span_buffer[_az_COUNTOF(test_correct_pnp_user_name_with_user_agent) - 2];
-  az_span test_span = az_span_init(test_span_buffer, 0, _az_COUNTOF(test_span_buffer));
+  az_span test_span = az_span_init(test_span_buffer, _az_COUNTOF(test_span_buffer));
   assert_int_equal(
       az_iot_pnp_client_get_user_name(&client, test_span, &test_span),
-      AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY);
+      AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
 }
 
 // TODO: Add tests for inline functions (e.g. az_iot_pnp_client_get_id).  Will add them prior to
@@ -240,4 +241,3 @@ int test_iot_pnp_client()
   };
   return cmocka_run_group_tests_name("az_iot_pnp_client", tests, NULL, NULL);
 }
-

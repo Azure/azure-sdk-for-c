@@ -29,79 +29,6 @@ static void test_log_func(az_log_classification classification, az_span message)
 }
 */
 
-/**
- * @brief Returns blob content in buffer
- *
- * @param client Client
- * @param response Response
- * @return AZ_NODISCARD az_storage_blobs_blob_download
- */
-static AZ_NODISCARD az_result
-az_storage_blobs_blob_download(az_storage_blobs_blob_client* client, az_http_response* response)
-{
-
-  // Request buffer
-  // create request buffer TODO: define size for a getKey Request
-  uint8_t url_buffer[1024 * 4];
-  az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
-  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(request_url_span, az_span_length(client->_internal.uri));
-  request_url_span = az_span_append(request_url_span, client->_internal.uri);
-
-  uint8_t headers_buffer[4 * sizeof(az_pair)];
-  az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
-
-  // create request
-  // TODO: define max URL size
-  _az_http_request hrb;
-  AZ_RETURN_IF_FAILED(az_http_request_init(
-      &hrb,
-      &az_context_app,
-      az_http_method_get(),
-      request_url_span,
-      request_headers_span,
-      AZ_SPAN_NULL));
-
-  // start pipeline
-  AZ_RETURN_IF_FAILED(az_http_pipeline_process(&client->_internal.pipeline, &hrb, response));
-
-  az_span body = { 0 };
-  AZ_RETURN_IF_FAILED(az_http_response_get_body(response, &body));
-
-  // do anything with the body, like print it out maybe
-  printf("%.*s\n", az_span_length(body), az_span_ptr(body));
-
-  return AZ_OK;
-}
-
-static AZ_NODISCARD az_result
-az_storage_blobs_blob_delete(az_storage_blobs_blob_client* client, az_http_response* response)
-{
-
-  // Request buffer
-  // create request buffer TODO: define size for blob delete
-  uint8_t url_buffer[1024 * 4];
-  az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
-  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(request_url_span, az_span_length(client->_internal.uri));
-  request_url_span = az_span_append(request_url_span, client->_internal.uri);
-
-  uint8_t headers_buffer[4 * sizeof(az_pair)];
-  az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
-
-  // create request
-  // TODO: define max URL size
-  _az_http_request hrb;
-  AZ_RETURN_IF_FAILED(az_http_request_init(
-      &hrb,
-      &az_context_app,
-      az_http_method_delete(),
-      request_url_span,
-      request_headers_span,
-      AZ_SPAN_NULL));
-
-  // start pipeline
-  return az_http_pipeline_process(&client->_internal.pipeline, &hrb, response);
-}
-
 int main()
 {
   // Uncomment below code to enable logging
@@ -152,22 +79,5 @@ int main()
     printf("Failed to create blob");
   }
 
-  printf("Downloading blob and printing it below:\n\n");
-  az_result const get_result = az_storage_blobs_blob_download(&client, &http_response);
-
-  if (az_failed(get_result))
-  {
-    printf("Failed to get blob");
-  }
-
-  printf("\nDeleting blob\n");
-  az_result const delete_result = az_storage_blobs_blob_delete(&client, &http_response);
-
-  if (az_failed(delete_result))
-  {
-    printf("Failed to delete blob");
-  }
-
-  printf("Sample finished\n");
   return exit_code;
 }

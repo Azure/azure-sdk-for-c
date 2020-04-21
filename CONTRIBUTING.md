@@ -91,7 +91,7 @@ cmake --build .
 Open project folder with Visual Studio. If VCPKG has been previously installed and set up like mentioned [above](#VCPKG). Everything will be ready to build.
 Right after opening project, Visual Studio will read cmake files and generate cache files automatically.
 
-### Linux / Mac
+### Linux
 
 #### VCPKG
 
@@ -106,26 +106,63 @@ Follow next steps to install VCPKG and have it linked to cmake
 cd vcpkg
 # build vcpkg
 ./bootstrap-vcpkg.sh
-
-# Linux:
 ./vcpkg install --triplet x64-linux curl cmocka paho-mqtt
 export VCPKG_DEFAULT_TRIPLET=x64-linux
 export VCPKG_ROOT=PATH_TO_VCPKG #replace PATH_TO_VCPKG for where vcpkg is installed
-
-# Mac:
-./vcpkg install --triplet x64-osx curl cmocka paho-mqtt
-export VCPKG_DEFAULT_TRIPLET=x64-osx
-export VCPKG_ROOT=PATH_TO_VCPKG #replace PATH_TO_VCPKG for where vcpkg is installed
 ```
-
-> Note: On macOS, `.\bootstrap-vcpkg` may fail if your version of the C++ toolchain is not new enough to support vcpkg. To resolve
-this, vcpkg recommends installing `gcc@6` from Homebrew (`brew install gcc@6`), then re-run the bootstrapping script.
 
 #### Debian
 
 Alternatively, for Ubuntu 18.04 you can use:
 
 `sudo apt install build-essential cmake libcmocka-dev libcmocka0 gcovr lcov doxygen curl libcurl4-openssl-dev libssl-dev ca-certificates`
+
+#### Build
+
+```bash
+# cd to project folder
+cd azure_sdk_for_c
+# create a new folder to generate cmake files for building (i.e. build)
+mkdir build
+cd build
+# generate files
+# cmake will automatically detect what C compiler is used by system by default and will generate files for it
+cmake ..
+# compile files. Cmake would call compiler and linker to generate libs
+make
+```
+
+> Note: The steps above would compile and generate the default output for azure-sdk-for-c which includes static libraries only. See below section [Compiler Options](#compiler-options)
+
+### Mac
+
+#### VCPKG
+VCPKG can be used to download packages sources, headers and build libraries for whatever TRIPLET is set up (platform/architecture).
+VCPKG maintains any installed package inside its own folder, allowing to have multiple vcpkg folder with different dependencies installed on each. This is also great because you don't have to install dependencies globally on your system.
+
+First, ensure that you have the latest `gcc` installed:
+
+```
+brew update
+brew upgrade
+brew info gcc
+brew install gcc
+brew cleanup
+```
+
+Follow next steps to install VCPKG and have it linked to cmake
+
+```bash
+# Clone vcpgk:
+git clone https://github.com/Microsoft/vcpkg.git
+# (consider this path as PATH_TO_VCPKG)
+cd vcpkg
+# build vcpkg
+./bootstrap-vcpkg.sh
+./vcpkg install --triplet x64-osx curl cmocka paho-mqtt
+export VCPKG_DEFAULT_TRIPLET=x64-osx
+export VCPKG_ROOT=PATH_TO_VCPKG #replace PATH_TO_VCPKG for where vcpkg is installed
+```
 
 #### Build
 

@@ -51,12 +51,12 @@ enum
     } \
   } while (0)
 
-#define AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(span, required_space) \
+#define AZ_RETURN_IF_NOT_ENOUGH_SIZE(span, required_space) \
   do \
   { \
-    if ((az_span_capacity(span) - az_span_length(span)) < required_space) \
+    if (az_span_size(span) < required_space) \
     { \
-      return AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY; \
+      return AZ_ERROR_INSUFFICIENT_SPAN_SIZE; \
     } \
   } while (0)
 
@@ -85,9 +85,9 @@ typedef enum
       _az_FACILITY_CORE,
       1), ///< Input argument does not comply with the requested range of values.
 
-  AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY = _az_RESULT_MAKE_ERROR(
+  AZ_ERROR_INSUFFICIENT_SPAN_SIZE = _az_RESULT_MAKE_ERROR(
       _az_FACILITY_CORE,
-      2), ///< There is not enough capacity in the span provided.
+      2), ///< The size of the provided span is too small.
 
   AZ_ERROR_NOT_IMPLEMENTED
   = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 3), ///< Requested functionality is not implemented.
@@ -128,7 +128,7 @@ typedef enum
   AZ_ERROR_HTTP_RESPONSE_OVERFLOW = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 5),
   AZ_ERROR_HTTP_RESPONSE_COULDNT_RESOLVE_HOST = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 6),
 
-  //IoT error codes
+  // IoT error codes
   AZ_ERROR_IOT_TOPIC_NO_MATCH = _az_RESULT_MAKE_ERROR(_az_FACILITY_IOT, 1),
 } az_result;
 

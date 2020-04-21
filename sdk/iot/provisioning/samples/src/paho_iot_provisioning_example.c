@@ -62,15 +62,17 @@ static az_result read_configuration_entry(
   {
     printf("%s\n", hide_value ? "***" : env);
     az_span env_span = az_span_from_str(env);
-    AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(buffer, az_span_length(env_span));
-    *out_value = az_span_copy(buffer, env_span);
+    AZ_RETURN_IF_NOT_ENOUGH_SIZE(buffer, az_span_size(env_span));
+    az_span_copy(buffer, env_span);
+    *out_value = az_span_slice(buffer, 0, az_span_size(env_span));
   }
   else if (default_value != NULL)
   {
     printf("%s\n", default_value);
     az_span default_span = az_span_from_str(default_value);
-    AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(buffer, az_span_length(default_span));
-    *out_value = az_span_copy(buffer, default_span);
+    AZ_RETURN_IF_NOT_ENOUGH_SIZE(buffer, az_span_size(default_span));
+    az_span_copy(buffer, default_span);
+    *out_value = az_span_slice(buffer, 0, az_span_size(default_span));
   }
   else
   {
@@ -142,7 +144,7 @@ static int on_received(void* context, char* topicName, int topicLen, MQTTClient_
   {
     putchar(*payloadptr++);
   }
-  
+
   putchar('\n');
   MQTTClient_freeMessage(&message);
   MQTTClient_free(topicName);
@@ -167,7 +169,7 @@ static int connect()
     return rc;
   }
 
-  if ((rc = az_span_append_uint8(username_span, '\0', &username_span)) != AZ_OK)
+  if ((rc = az_span_copy_u8(username_span, '\0', &username_span)) != AZ_OK)
   {
     printf("Failed to get MQTT username, return code %d\n", rc);
     return rc;
@@ -181,7 +183,7 @@ static int connect()
   {
     mqtt_ssl_options.trustStore = (char*)x509_trust_pem_file;
   }
-  
+
   mqtt_connect_options.ssl = &mqtt_ssl_options;
 
   if ((rc = MQTTClient_connect(mqtt_client, &mqtt_connect_options)) != MQTTCLIENT_SUCCESS)
@@ -208,7 +210,7 @@ static int subscribe()
     return rc;
   }
 
-  if ((rc = az_span_append_uint8(topic_filter_span, '\0', &topic_filter_span)) != AZ_OK)
+  if ((rc = az_span_copy_u8(topic_filter_span, '\0', &topic_filter_span)) != AZ_OK)
   {
     printf("Failed to get MQTT SUB topic filter, return code %d\n", rc);
     return rc;
@@ -240,7 +242,7 @@ static int register_device()
     return rc;
   }
 
-  if ((rc = az_span_append_uint8(topic_span, '\0', &topic_span)) != AZ_OK)
+  if ((rc = az_span_copy_u8(topic_span, '\0', &topic_span)) != AZ_OK)
   {
     printf("Failed to get MQTT PUB register topic, return code %d\n", rc);
     return rc;
@@ -281,7 +283,7 @@ int main()
     return rc;
   }
 
-  if ((rc = az_span_append_uint8(client_id_span, '\0', &client_id_span)) != AZ_OK)
+  if ((rc = az_span_copy_u8(client_id_span, '\0', &client_id_span)) != AZ_OK)
   {
     printf("Failed to get MQTT username, return code %d\n", rc);
     return rc;

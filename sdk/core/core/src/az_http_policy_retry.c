@@ -9,6 +9,7 @@
 #include <az_log_internal.h>
 #include <az_platform_internal.h>
 #include <az_retry_internal.h>
+#include <az_span_internal.h>
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -37,26 +38,29 @@ AZ_NODISCARD az_http_policy_retry_options _az_http_policy_retry_options_default(
   };
 }
 
+// TODO: Add unit tests
 AZ_INLINE az_result _az_http_policy_retry_append_http_retry_msg(
     int16_t attempt,
     int32_t delay_msec,
     az_span* ref_log_msg)
 {
   az_span retry_count_string = AZ_SPAN_FROM_STR("HTTP Retry attempt #");
-  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(*ref_log_msg, az_span_length(retry_count_string));
-  *ref_log_msg = az_span_append(*ref_log_msg, retry_count_string);
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(*ref_log_msg, az_span_size(retry_count_string));
+  az_span remainder = az_span_copy(*ref_log_msg, retry_count_string);
 
-  AZ_RETURN_IF_FAILED(az_span_append_i32toa(*ref_log_msg, (int32_t)attempt, ref_log_msg));
+  AZ_RETURN_IF_FAILED(az_span_i32toa(remainder, (int32_t)attempt, &remainder));
 
   az_span infix_string = AZ_SPAN_FROM_STR(" will be made in ");
-  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(*ref_log_msg, az_span_length(infix_string));
-  *ref_log_msg = az_span_append(*ref_log_msg, infix_string);
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, az_span_size(infix_string));
+  remainder = az_span_copy(remainder, infix_string);
 
-  AZ_RETURN_IF_FAILED(az_span_append_i32toa(*ref_log_msg, delay_msec, ref_log_msg));
+  AZ_RETURN_IF_FAILED(az_span_i32toa(remainder, delay_msec, &remainder));
 
   az_span suffix_string = AZ_SPAN_FROM_STR("ms.");
-  AZ_RETURN_IF_NOT_ENOUGH_CAPACITY(*ref_log_msg, az_span_length(suffix_string));
-  *ref_log_msg = az_span_append(*ref_log_msg, suffix_string);
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, az_span_size(suffix_string));
+  remainder = az_span_copy(remainder, suffix_string);
+
+  *ref_log_msg = az_span_slice(*ref_log_msg, 0, _az_span_diff(remainder, *ref_log_msg));
 
   return AZ_OK;
 }
@@ -74,7 +78,7 @@ AZ_INLINE void _az_http_policy_retry_log(int16_t attempt, int32_t delay_msec)
 AZ_INLINE AZ_NODISCARD int32_t _az_uint32_span_to_int32(az_span span)
 {
   uint32_t value = 0;
-  if (az_succeeded(az_span_to_uint32(span, &value)))
+  if (az_succeeded(az_span_atou32(span, &value)))
   {
     return value < INT32_MAX ? (int32_t)value : INT32_MAX;
   }
