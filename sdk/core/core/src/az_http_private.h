@@ -38,6 +38,12 @@ AZ_NODISCARD AZ_INLINE az_result _az_http_request_remove_retry_headers(_az_http_
   return AZ_OK;
 }
 
+/**
+ * @brief sets buffer and parser to its initial state
+ *
+ */
+void _az_http_response_reset(az_http_response* http_response);
+
 #include <_az_cfg_suffix.h>
 
 #endif // _az_HTTP_PRIVATE_H
