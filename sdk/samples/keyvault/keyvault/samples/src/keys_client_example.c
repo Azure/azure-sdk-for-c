@@ -98,7 +98,7 @@ int main()
 
   printf("Key created result: \n%s", response_buffer);
 
-  az_span_set(http_response._internal.http_response, '.');
+  az_span_fill(http_response._internal.http_response, '.');
 
   /******************  GET KEY latest ver ******************************/
   az_result get_key_result = az_keyvault_keys_key_get(
@@ -126,7 +126,7 @@ int main()
     version = az_span_slice(version_builder, 0, az_span_size(version));
   }
 
-  az_span_set(response_span, '.');
+  az_span_fill(response_span, '.');
 
   /*********************  Create a new key version (use default options) *************/
   az_result const create_version_result = az_keyvault_keys_key_create(
@@ -146,7 +146,7 @@ int main()
       "\n\n*********************************\nKey new version created result: \n%s",
       response_buffer);
 
-  az_span_set(response_span, '.');
+  az_span_fill(response_span, '.');
 
   /******************  GET KEY previous ver ******************************/
   az_result const get_key_prev_ver_result = az_keyvault_keys_key_get(
@@ -170,7 +170,7 @@ int main()
 
   printf("\n\n*********************************\nDELETED Key: \n %s", response_buffer);
 
-  az_span_set(response_span, '.');
+  az_span_fill(response_span, '.');
 
   /******************  GET KEY (should return failed response ) ******************************/
   az_result get_key_again_result = az_keyvault_keys_key_get(

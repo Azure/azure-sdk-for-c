@@ -263,11 +263,8 @@ AZ_NODISCARD az_result az_http_response_get_body(az_http_response* response, az_
 void _az_http_response_reset(az_http_response* http_response)
 {
   // never fails, discard the result
-  az_result result = az_http_response_init(
-      http_response,
-      az_span_init(
-          http_response->_internal.http_response._internal.ptr,
-          0,
-          az_span_capacity(http_response->_internal.http_response)));
+  // init will set written to 0 and will use the same az_span. Internal parser's state is also
+  // reset
+  az_result result = az_http_response_init(http_response, http_response->_internal.http_response);
   (void)result;
 }
