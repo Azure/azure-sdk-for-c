@@ -402,6 +402,58 @@ static void az_span_find_overlapping_checks_success()
   assert_int_equal(az_span_find(source, az_span_slice(span, 2, 4)), 1);
 }
 
+static void az_span_i64toa_test()
+{
+  uint8_t buffer[100];
+  az_span b_span = AZ_SPAN_FROM_BUFFER(buffer);
+  az_span remainder;
+  int32_t size_before_write = az_span_size(b_span);
+  int64_t number = 123;
+  az_span number_str = AZ_SPAN_FROM_STR("123");
+
+  assert_return_code(az_span_i64toa(b_span, number, &remainder), AZ_OK);
+  assert_int_equal(size_before_write, az_span_size(b_span));
+  // remainder should be size minus number of digits (3)
+  assert_int_equal(az_span_size(remainder), size_before_write - 3);
+
+  // create az_span for written data
+  b_span = az_span_init(az_span_ptr(b_span), az_span_size(b_span) - az_span_size(remainder));
+
+  assert_true(az_span_is_content_equal(b_span, number_str));
+
+  // convert back
+  uint64_t reverse = 0;
+  assert_return_code(az_span_atou64(b_span, &reverse), AZ_OK);
+  assert_int_equal(reverse, number);
+}
+
+static void az_span_i64toa_negative_number_test()
+{
+  uint8_t buffer[100];
+  az_span b_span = AZ_SPAN_FROM_BUFFER(buffer);
+  az_span remainder;
+  int32_t size_before_write = az_span_size(b_span);
+  int64_t number = -123;
+  az_span number_str = AZ_SPAN_FROM_STR("-123");
+
+  assert_return_code(az_span_i64toa(b_span, number, &remainder), AZ_OK);
+  assert_int_equal(size_before_write, az_span_size(b_span));
+  // remainder should be size minus number of digits (4)
+  assert_int_equal(az_span_size(remainder), size_before_write - 4);
+
+  // create az_span for written data
+  b_span = az_span_init(az_span_ptr(b_span), az_span_size(b_span) - az_span_size(remainder));
+
+  assert_true(az_span_is_content_equal(b_span, number_str));
+
+  // convert back TODO: az_span_ato64 should support negative numbers since az_span_i64toa support
+  // it. https://github.com/Azure/azure-sdk-for-c/issues/598
+  /* uint64_t reverse = 0;
+  assert_return_code(az_span_atou64(b_span, &reverse), AZ_OK);
+  assert_int_equal(reverse, number);
+  */
+}
+
 void test_az_span(void** state)
 {
   (void)state;
@@ -444,4 +496,6 @@ void test_az_span(void** state)
   az_span_find_embedded_NULLs_success();
   az_span_find_capacity_checks_success();
   az_span_find_overlapping_checks_success();
+  az_span_i64toa_test();
+  az_span_i64toa_negative_number_test();
 }
