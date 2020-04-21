@@ -13,7 +13,7 @@ if(EXISTS ${AZ_SDK_VERSION_H_FILE})
     message(STATUS "Read version from ${AZ_SDK_VERSION_H_FILE}")
 
     #Find and read the AZ_SDK_VERSION_STRING define
-    string(REGEX MATCHALL "#define AZ_SDK_VERSION_STRING \"([0-9]+)\.([0-9]+)\.([0-9]+)(\-[^\"]+)?\"" VERSION_PARTS ${VERSION_H_CONTENT})
+    string(REGEX MATCHALL "#define AZ_SDK_VERSION_STRING \"([0-9]+)\.([0-9]+)\.([0-9]+)(\-[^\"\-]+)?\"" VERSION_PARTS ${VERSION_H_CONTENT})
     
     #Ensure we matched as expected.
     #   MAJOR.AZ_VERSION_MINOR.PATCH are required. 
