@@ -15,9 +15,21 @@
 #ifndef _az_VERSION_H
 #define _az_VERSION_H
 
-int az_core_version_get_major();
-int az_core_version_get_minor();
-int az_core_version_get_patch();
-const char* az_core_version_get_prerelease();
+// @brief AZ_SDK_VERSION_STRING Version string for telemetry
+#define AZ_SDK_VERSION_STRING "1.0.0-preview.1"
+
+// @brief AZ_SDK_VERSION_MAJOR Major portion of the Version
+#define AZ_SDK_VERSION_MAJOR 1
+
+// @brief AZ_SDK_VERSION_MINOR Minor portion of the Version
+#define AZ_SDK_VERSION_MINOR 0
+
+// @brief AZ_SDK_VERSION_PATCH Patch portion of the Version
+#define AZ_SDK_VERSION_PATCH 0
+
+// @brief AZ_SDK_VERSION_PRERELEASE Optional portion of the version
+//  SDK is in a prerelease state when prerelease is present
+//  See https://semver.org
+#define AZ_SDK_VERSION_PRERELEASE "preview.1"
 
 #endif //_az_VERSION_H
