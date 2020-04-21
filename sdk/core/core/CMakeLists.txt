@@ -14,6 +14,10 @@ if(EXISTS ${AZ_SDK_VERSION_H_FILE})
 
     #Find and read the AZ_SDK_VERSION_STRING define
     string(REGEX MATCHALL "#define AZ_SDK_VERSION_STRING \"([0-9]+)\.([0-9]+)\.([0.9]+)([^\"]*)\"" VERSION_PARTS ${VERSION_H_CONTENT})
+    
+    #Ensure we matched as expected.
+    #   MAJOR.AZ_VERSION_MINOR.PATCH are required. 
+    #   PRERELEASE is optional.
     if(NOT CMAKE_MATCH_1 AND NOT CMAKE_MATCH_2 AND NOT CMAKE_MATCH_3)
         message(FATAL_ERROR "Unexpected version format in ${AZ_SDK_VERSION_H_FILE}")
     endif()
@@ -21,6 +25,8 @@ if(EXISTS ${AZ_SDK_VERSION_H_FILE})
     set(AZ_SDK_VERSION_MINOR ${CMAKE_MATCH_2} )
     set(AZ_SDK_VERSION_PATCH ${CMAKE_MATCH_3} )
     if(CMAKE_MATCH_4)
+        #Trim off the "-" from the start of pre-release portion
+        # https://cmake.org/cmake/help/v3.10/command/string.html?highlight=substring#substring
         string(SUBSTRING ${CMAKE_MATCH_4} 1 -1 PRERELEASE_SUBSTRING )
         set(AZ_SDK_VERSION_PRERELEASE ${PRERELEASE_SUBSTRING})
     endif()
