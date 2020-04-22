@@ -25,7 +25,7 @@
 #define TEST_HUB_HOSTNAME_STR "myiothub.azure-devices.net"
 #define TEST_MODULE_ID "my_module_id"
 #define TEST_USER_AGENT "os=azrtos"
-#define PLATFORM_USER_AGENT = "DeviceClientType=c/" AZ_SDK_VERSION_STRING;
+#define PLATFORM_USER_AGENT "DeviceClientType=c/" AZ_SDK_VERSION_STRING;
 
 static const az_span test_device_id = AZ_SPAN_LITERAL_FROM_STR(TEST_DEVICE_ID_STR);
 static const az_span test_hub_hostname = AZ_SPAN_LITERAL_FROM_STR(TEST_HUB_HOSTNAME_STR);
