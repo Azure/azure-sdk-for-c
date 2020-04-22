@@ -109,7 +109,7 @@ static void test_json_builder(void** state)
     TEST_EXPECT_SUCCESS(az_json_builder_append_token(&builder, az_json_token_object_end()));
 
     assert_true(az_span_is_content_equal(
-        builder._internal.json,
+        az_json_builder_span_get(&builder),
         AZ_SPAN_FROM_STR( //
             "{"
             "\"name\":true,"
@@ -127,7 +127,7 @@ static void test_json_builder(void** state)
 
     // this json { "span": "\" } would be scaped to { "span": "\\"" }
     uint8_t single_char[1] = { '\\' }; // char = '\'
-    az_span single_span = AZ_SPAN_FROM_INITIALIZED_BUFFER(single_char);
+    az_span single_span = AZ_SPAN_FROM_BUFFER(single_char);
 
     TEST_EXPECT_SUCCESS(az_json_builder_append_token(&builder, az_json_token_object_start()));
 
@@ -140,7 +140,7 @@ static void test_json_builder(void** state)
                                         "\"span\":\"\\\\\""
                                         "}");
 
-    assert_true(az_span_is_content_equal(builder._internal.json, expected));
+    assert_true(az_span_is_content_equal(az_json_builder_span_get(&builder), expected));
   }
   {
     // json with AZ_JSON_TOKEN_STRING
@@ -150,7 +150,7 @@ static void test_json_builder(void** state)
 
     // this json { "span": "\" } would be written as { "span": \"" } with no extra scaping
     uint8_t single_char[1] = { 92 }; // char = '\'
-    az_span single_span = AZ_SPAN_FROM_INITIALIZED_BUFFER(single_char);
+    az_span single_span = AZ_SPAN_FROM_BUFFER(single_char);
 
     TEST_EXPECT_SUCCESS(az_json_builder_append_token(&builder, az_json_token_object_start()));
 
@@ -160,7 +160,7 @@ static void test_json_builder(void** state)
     TEST_EXPECT_SUCCESS(az_json_builder_append_token(&builder, az_json_token_object_end()));
 
     assert_true(az_span_is_content_equal(
-        builder._internal.json,
+        az_json_builder_span_get(&builder),
         AZ_SPAN_FROM_STR( //
             "{"
             "\"span\":\"\\\""
@@ -192,7 +192,7 @@ static void test_json_builder(void** state)
     TEST_EXPECT_SUCCESS(az_json_builder_append_token(&builder, az_json_token_object_end()));
 
     assert_true(az_span_is_content_equal(
-        builder._internal.json,
+        az_json_builder_span_get(&builder),
         AZ_SPAN_FROM_STR( //
             "{"
             "\"array\":[1,2,\"sd\":{},3]"
@@ -219,7 +219,7 @@ static void test_json_builder(void** state)
           az_json_builder_append_token(&nested_object_builder, az_json_token_object_end()));
 
       assert_true(az_span_is_content_equal(
-          nested_object_builder._internal.json,
+          az_json_builder_span_get(&nested_object_builder),
           AZ_SPAN_FROM_STR( //
               "{"
               "\"bar\":true"
@@ -237,14 +237,14 @@ static void test_json_builder(void** state)
       TEST_EXPECT_SUCCESS(az_json_builder_append_object(
           &builder, AZ_SPAN_FROM_STR("foo"), az_json_token_array_start()));
       TEST_EXPECT_SUCCESS(az_json_builder_append_array_item(
-          &builder, az_json_token_object(nested_object_builder._internal.json)));
+          &builder, az_json_token_object(az_json_builder_span_get(&nested_object_builder))));
       TEST_EXPECT_SUCCESS(az_json_builder_append_token(&builder, az_json_token_array_end()));
     }
 
     TEST_EXPECT_SUCCESS(az_json_builder_append_token(&builder, az_json_token_object_end()));
 
     assert_true(az_span_is_content_equal(
-        builder._internal.json,
+        az_json_builder_span_get(&builder),
         AZ_SPAN_FROM_STR( //
             "{"
             "\"foo\":["
@@ -275,7 +275,7 @@ static void test_json_builder(void** state)
           az_json_builder_append_token(&nested_object_builder, az_json_token_object_end()));
 
       assert_true(az_span_is_content_equal(
-          nested_object_builder._internal.json,
+          az_json_builder_span_get(&nested_object_builder),
           AZ_SPAN_FROM_STR( //
               "{"
               "\"bar\":true"
@@ -293,16 +293,16 @@ static void test_json_builder(void** state)
       TEST_EXPECT_SUCCESS(az_json_builder_append_object(
           &builder, AZ_SPAN_FROM_STR("foo"), az_json_token_array_start()));
       TEST_EXPECT_SUCCESS(az_json_builder_append_array_item(
-          &builder, az_json_token_object(nested_object_builder._internal.json)));
+          &builder, az_json_token_object(az_json_builder_span_get(&nested_object_builder))));
       TEST_EXPECT_SUCCESS(az_json_builder_append_array_item(
-          &builder, az_json_token_object(nested_object_builder._internal.json)));
+          &builder, az_json_token_object(az_json_builder_span_get(&nested_object_builder))));
       TEST_EXPECT_SUCCESS(az_json_builder_append_token(&builder, az_json_token_array_end()));
     }
 
     TEST_EXPECT_SUCCESS(az_json_builder_append_token(&builder, az_json_token_object_end()));
 
     assert_true(az_span_is_content_equal(
-        builder._internal.json,
+        az_json_builder_span_get(&builder),
         AZ_SPAN_FROM_STR( //
             "{"
             "\"foo\":["
@@ -414,8 +414,13 @@ static void test_json_get_by_pointer(void** state)
 
 /** Json parser **/
 az_result read_write(az_span input, az_span* output, int32_t* o);
-az_result read_write_token(az_span* output, int32_t* o, az_json_parser* state, az_json_token token);
-az_result write_str(az_span span, az_span s, az_span* out);
+az_result read_write_token(
+    az_span* output,
+    int32_t* written,
+    int32_t* o,
+    az_json_parser* state,
+    az_json_token token);
+az_result write_str(az_span span, az_span s, az_span* out, int32_t* written);
 
 static az_span const sample1 = AZ_SPAN_LITERAL_FROM_STR( //
     "{\n"
@@ -514,7 +519,7 @@ static void test_json_parser(void** state)
     assert_true(az_json_parser_parse_token(&json_state, &token) == AZ_OK);
     assert_true(token.kind == AZ_JSON_TOKEN_STRING);
     assert_true(az_span_ptr(token._internal.string) == (az_span_ptr(s) + 2));
-    assert_true(az_span_length(token._internal.string) == 8);
+    assert_true(az_span_size(token._internal.string) == 8);
     assert_true(az_json_parser_done(&json_state) == AZ_OK);
   }
   {
@@ -525,7 +530,7 @@ static void test_json_parser(void** state)
     assert_true(az_json_parser_parse_token(&json_state, &token) == AZ_OK);
     assert_true(token.kind == AZ_JSON_TOKEN_STRING);
     assert_true(az_span_ptr(token._internal.string) == az_span_ptr(s) + 1);
-    assert_true(az_span_length(token._internal.string) == 6);
+    assert_true(az_span_size(token._internal.string) == 6);
     assert_true(az_json_parser_done(&json_state) == AZ_OK);
   }
   {
@@ -681,10 +686,10 @@ static void test_json_parser(void** state)
     az_json_token_member token_member;
     assert_true(az_json_parser_parse_token_member(&json_state, &token_member) == AZ_OK);
     assert_true(az_span_ptr(token_member.name) == az_span_ptr(json) + 2);
-    assert_true(az_span_length(token_member.name) == 1);
+    assert_true(az_span_size(token_member.name) == 1);
     assert_true(token_member.token.kind == AZ_JSON_TOKEN_STRING);
     assert_true(az_span_ptr(token_member.token._internal.string) == az_span_ptr(json) + 6);
-    assert_true(az_span_length(token_member.token._internal.string) == 12);
+    assert_true(az_span_size(token_member.token._internal.string) == 12);
     assert_true(
         az_json_parser_parse_token_member(&json_state, &token_member) == AZ_ERROR_ITEM_NOT_FOUND);
     assert_true(az_json_parser_done(&json_state) == AZ_OK);
@@ -726,7 +731,6 @@ static void test_json_parser(void** state)
     }
     {
       int32_t o = 0;
-      output = AZ_SPAN_FROM_BUFFER(buffer);
       az_span const json = AZ_SPAN_FROM_STR(
           // 0           1           2           3           4           5 6 01234
           // 56789 01234 56678 01234 56789 01234 56789 01234 56789 01234 56789 012
@@ -735,7 +739,6 @@ static void test_json_parser(void** state)
           "   \"\\t\\n\": \"\\u0abc\"   "
           "}]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] ]]]]] "
           "]]]]] ]]]");
-      output._internal.length = 0;
       output = AZ_SPAN_FROM_BUFFER(buffer);
       az_result const result = read_write(json, &output, &o);
       assert_true(result == AZ_OK);
@@ -759,34 +762,47 @@ static void test_json_parser(void** state)
 }
 
 // Aux funtions
-az_result read_write(az_span input, az_span* output, int32_t* o)
-{
-  az_json_parser parser = { 0 };
-  TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, input));
-  az_json_token token;
-  AZ_RETURN_IF_FAILED(az_json_parser_parse_token(&parser, &token));
-  AZ_RETURN_IF_FAILED(read_write_token(output, o, &parser, token));
-  return az_json_parser_done(&parser);
-}
-
-az_result read_write_token(az_span* output, int32_t* o, az_json_parser* state, az_json_token token)
+az_result read_write_token(
+    az_span* output,
+    int32_t* written,
+    int32_t* o,
+    az_json_parser* state,
+    az_json_token token)
 {
   switch (token.kind)
   {
     case AZ_JSON_TOKEN_NULL:
-      return az_span_append(*output, AZ_SPAN_FROM_STR("null"), output);
+    {
+      AZ_RETURN_IF_NOT_ENOUGH_SIZE(*output, 4);
+      *output = az_span_copy(*output, AZ_SPAN_FROM_STR("null"));
+      *written += 4;
+      return AZ_OK;
+    }
     case AZ_JSON_TOKEN_BOOLEAN:
-      return az_span_append(
-          *output,
-          token._internal.boolean ? AZ_SPAN_FROM_STR("true") : AZ_SPAN_FROM_STR("false"),
-          output);
+    {
+      int32_t required_length = token._internal.boolean ? 4 : 5;
+      AZ_RETURN_IF_NOT_ENOUGH_SIZE(*output, required_length);
+      *output = az_span_copy(
+          *output, token._internal.boolean ? AZ_SPAN_FROM_STR("true") : AZ_SPAN_FROM_STR("false"));
+      *written += required_length;
+      return AZ_OK;
+    }
     case AZ_JSON_TOKEN_NUMBER:
-      return az_span_append(*output, AZ_SPAN_FROM_STR("0"), output);
+    {
+      AZ_RETURN_IF_NOT_ENOUGH_SIZE(*output, 1);
+      *output = az_span_copy_u8(*output, '0');
+      *written += 1;
+      return AZ_OK;
+    }
     case AZ_JSON_TOKEN_STRING:
-      return write_str(*output, token._internal.string, output);
+    {
+      return write_str(*output, token._internal.string, output, written);
+    }
     case AZ_JSON_TOKEN_OBJECT_START:
     {
-      AZ_RETURN_IF_FAILED(az_span_append(*output, AZ_SPAN_FROM_STR("{"), output));
+      AZ_RETURN_IF_NOT_ENOUGH_SIZE(*output, 1);
+      *output = az_span_copy_u8(*output, '{');
+      *written += 1;
       bool need_comma = false;
       while (true)
       {
@@ -799,21 +815,30 @@ az_result read_write_token(az_span* output, int32_t* o, az_json_parser* state, a
         AZ_RETURN_IF_FAILED(result);
         if (need_comma)
         {
-          AZ_RETURN_IF_FAILED(az_span_append(*output, AZ_SPAN_FROM_STR(","), output));
+          AZ_RETURN_IF_NOT_ENOUGH_SIZE(*output, 1);
+          *output = az_span_copy_u8(*output, ',');
+          *written += 1;
         }
         else
         {
           need_comma = true;
         }
-        AZ_RETURN_IF_FAILED(write_str(*output, member.name, output));
-        AZ_RETURN_IF_FAILED(az_span_append(*output, AZ_SPAN_FROM_STR(":"), output));
-        AZ_RETURN_IF_FAILED(read_write_token(output, o, state, member.token));
+        AZ_RETURN_IF_FAILED(write_str(*output, member.name, output, written));
+        AZ_RETURN_IF_NOT_ENOUGH_SIZE(*output, 1);
+        *output = az_span_copy_u8(*output, ':');
+        *written += 1;
+        AZ_RETURN_IF_FAILED(read_write_token(output, written, o, state, member.token));
       }
-      return az_span_append(*output, AZ_SPAN_FROM_STR("}"), output);
+      AZ_RETURN_IF_NOT_ENOUGH_SIZE(*output, 1);
+      *output = az_span_copy_u8(*output, '}');
+      *written += 1;
+      return AZ_OK;
     }
     case AZ_JSON_TOKEN_ARRAY_START:
     {
-      AZ_RETURN_IF_FAILED(az_span_append(*output, AZ_SPAN_FROM_STR("["), output));
+      AZ_RETURN_IF_NOT_ENOUGH_SIZE(*output, 1);
+      *output = az_span_copy_u8(*output, '[');
+      *written += 1;
       bool need_comma = false;
       while (true)
       {
@@ -826,15 +851,20 @@ az_result read_write_token(az_span* output, int32_t* o, az_json_parser* state, a
         AZ_RETURN_IF_FAILED(result);
         if (need_comma)
         {
-          AZ_RETURN_IF_FAILED(az_span_append(*output, AZ_SPAN_FROM_STR(","), output));
+          AZ_RETURN_IF_NOT_ENOUGH_SIZE(*output, 1);
+          *output = az_span_copy_u8(*output, ',');
+          *written += 1;
         }
         else
         {
           need_comma = true;
         }
-        AZ_RETURN_IF_FAILED(read_write_token(output, o, state, element));
+        AZ_RETURN_IF_FAILED(read_write_token(output, written, o, state, element));
       }
-      return az_span_append(*output, AZ_SPAN_FROM_STR("]"), output);
+      AZ_RETURN_IF_NOT_ENOUGH_SIZE(*output, 1);
+      *output = az_span_copy_u8(*output, ']');
+      *written += 1;
+      return AZ_OK;
     }
     default:
       break;
@@ -842,12 +872,30 @@ az_result read_write_token(az_span* output, int32_t* o, az_json_parser* state, a
   return AZ_ERROR_JSON_INVALID_STATE;
 }
 
-az_result write_str(az_span span, az_span s, az_span* out)
+az_result read_write(az_span input, az_span* output, int32_t* o)
+{
+  az_json_parser parser = { 0 };
+  TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, input));
+  az_json_token token;
+  AZ_RETURN_IF_FAILED(az_json_parser_parse_token(&parser, &token));
+  int32_t written = 0;
+  az_span output_copy = *output;
+  AZ_RETURN_IF_FAILED(read_write_token(&output_copy, &written, o, &parser, token));
+  *output = az_span_slice(*output, 0, written);
+  return az_json_parser_done(&parser);
+}
+
+az_result write_str(az_span span, az_span s, az_span* out, int32_t* written)
 {
   *out = span;
-  AZ_RETURN_IF_FAILED(az_span_append(*out, AZ_SPAN_FROM_STR("\""), out));
-  AZ_RETURN_IF_FAILED(az_span_append(*out, s, out));
-  AZ_RETURN_IF_FAILED(az_span_append(*out, AZ_SPAN_FROM_STR("\""), out));
+  int32_t required_length = az_span_size(s) + 2;
+
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(*out, required_length);
+  *out = az_span_copy_u8(*out, '"');
+  *out = az_span_copy(*out, s);
+  *out = az_span_copy_u8(*out, '"');
+
+  *written += required_length;
   return AZ_OK;
 }
 
@@ -889,7 +937,7 @@ static void test_json_pointer(void** state)
         buffer[i] = (uint8_t)code_point;
         ++i;
       }
-      az_span const b = az_span_init(buffer, i, i);
+      az_span const b = az_span_init(buffer, i);
       assert_true(az_span_is_content_equal(b, AZ_SPAN_FROM_STR("abc")));
     }
     assert_true(_az_span_reader_read_json_pointer_token(&parser, &p) == AZ_ERROR_ITEM_NOT_FOUND);
@@ -917,7 +965,7 @@ static void test_json_pointer(void** state)
         buffer[i] = (uint8_t)code_point;
         ++i;
       }
-      az_span const b = az_span_init(buffer, i, i);
+      az_span const b = az_span_init(buffer, i);
       assert_true(az_span_is_content_equal(b, AZ_SPAN_FROM_STR("abc")));
     }
     assert_true(_az_span_reader_read_json_pointer_token(&parser, &p) == AZ_OK);
@@ -949,7 +997,7 @@ static void test_json_pointer(void** state)
         buffer[i] = (uint8_t)code_point;
         ++i;
       }
-      az_span const b = az_span_init(buffer, i, i);
+      az_span const b = az_span_init(buffer, i);
       assert_true(az_span_is_content_equal(b, AZ_SPAN_FROM_STR("ab/c")));
     }
     assert_true(_az_span_reader_read_json_pointer_token(&parser, &p) == AZ_OK);
@@ -972,7 +1020,7 @@ static void test_json_pointer(void** state)
         buffer[i] = (uint8_t)code_point;
         ++i;
       }
-      az_span const b = az_span_init(buffer, i, i);
+      az_span const b = az_span_init(buffer, i);
       assert_true(az_span_is_content_equal(b, AZ_SPAN_FROM_STR("dff~x")));
     }
     assert_true(_az_span_reader_read_json_pointer_token(&parser, &p) == AZ_ERROR_ITEM_NOT_FOUND);

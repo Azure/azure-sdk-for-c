@@ -4,6 +4,13 @@
 #include "az_span_private.h"
 #include "az_test_definitions.h"
 
+#include <stdarg.h>
+#include <stddef.h>
+
+#include <limits.h>
+#include <setjmp.h>
+#include <stdint.h>
+
 #include <cmocka.h>
 
 #include <_az_cfg.h>
