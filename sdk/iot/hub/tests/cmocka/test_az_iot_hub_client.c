@@ -5,6 +5,7 @@
 #include <az_iot_hub_client.h>
 #include <az_span.h>
 #include <az_test_span.h>
+#include <az_version.h>
 
 #include <az_precondition.h>
 #include <az_precondition_internal.h>
@@ -29,7 +30,7 @@ static const az_span test_device_id = AZ_SPAN_LITERAL_FROM_STR(TEST_DEVICE_ID_ST
 static const az_span test_hub_hostname = AZ_SPAN_LITERAL_FROM_STR(TEST_HUB_HOSTNAME_STR);
 
 static const char test_correct_user_name[]
-    = "myiothub.azure-devices.net/my_device/?api-version=2018-06-30";
+    = "myiothub.azure-devices.net/my_device/?api-version=2018-06-30&DeviceClientType=c/" AZ_SDK_VERSION_STRING;
 static const char test_correct_user_name_with_module_id[]
     = "myiothub.azure-devices.net/my_device/my_module_id/?api-version=2018-06-30&os=azrtos";
 static const char test_correct_client_id[] = "my_device";
