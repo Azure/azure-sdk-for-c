@@ -20,7 +20,7 @@ static const az_span hub_service_api_version = AZ_SPAN_LITERAL_FROM_STR("/?api-v
 AZ_NODISCARD az_iot_hub_client_options az_iot_hub_client_options_default()
 {
   return (az_iot_hub_client_options){ .module_id = AZ_SPAN_NULL,
-                                      .user_agent = AZ_SPAN_LITERAL_FROM_STR("&DeviceClientType=c/" AZ_SDK_VERSION_STRING) };
+                                      .user_agent = AZ_SPAN_LITERAL_FROM_STR("DeviceClientType=c/" AZ_SDK_VERSION_STRING) };
 }
 
 AZ_NODISCARD az_result az_iot_hub_client_init(
