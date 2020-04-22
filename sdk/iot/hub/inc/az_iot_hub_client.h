@@ -301,13 +301,13 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_publish_topic_get(
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
  * @param[out] mqtt_topic_filter A char buffer with sufficient capacity to hold the MQTT topic
- *                              filter.
+ *                              filter. On success, will be `NULL` terminated.
  * @param[in] mqtt_topic_filter_size The size of the passed buffer. Must be greater than 0.
  * @param[out] out_mqtt_topic_filter_length The optional output length of the mqtt topic filter. Can
  * be `NULL`.
  * @return #az_result
  */
-AZ_NODISCARD az_result az_iot_hub_client_c2d_subscribe_topic_filter_get(
+AZ_NODISCARD az_result az_iot_hub_client_c2d_get_subscribe_topic_filter(
     az_iot_hub_client const* client,
     char* mqtt_topic_filter,
     size_t mqtt_topic_filter_size,

@@ -79,7 +79,7 @@ _Example:_
 
 ```C
 
-if(az_failed(az_iot_hub_client_c2d_subscribe_topic_filter_get(client, mqtt_topic_filter, &mqtt_topic_filter))
+if(az_failed(az_iot_hub_client_c2d_get_subscribe_topic_filter(client, mqtt_topic_filter, &mqtt_topic_filter))
 {
     // error.
 }

@@ -15,7 +15,7 @@ static const az_span c2d_topic_suffix = AZ_SPAN_LITERAL_FROM_STR("/messages/devi
 static const uint8_t null_terminator = '\0';
 static const uint8_t hash_tag = '#';
 
-AZ_NODISCARD az_result az_iot_hub_client_c2d_subscribe_topic_filter_get(
+AZ_NODISCARD az_result az_iot_hub_client_c2d_get_subscribe_topic_filter(
     az_iot_hub_client const* client,
     char* mqtt_topic_filter,
     size_t mqtt_topic_filter_size,
