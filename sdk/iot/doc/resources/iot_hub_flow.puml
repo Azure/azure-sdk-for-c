@@ -30,8 +30,8 @@ application_mqtt_connect --> az_iot_hub_client_telemetry_publish_topic_get : Tel
 az_iot_hub_client_telemetry_publish_topic_get --> application_mqtt_publish
 
 ' C2D
-application_mqtt_connect --> az_iot_hub_client_c2d_subscribe_topic_filter_get
-az_iot_hub_client_c2d_subscribe_topic_filter_get --> application_mqtt_subscribe
+application_mqtt_connect --> az_iot_hub_client_c2d_get_subscribe_topic_filter
+az_iot_hub_client_c2d_get_subscribe_topic_filter --> application_mqtt_subscribe
 
 ' Methods
 application_mqtt_connect --> az_iot_hub_client_methods_subscribe_topic_filter_get
