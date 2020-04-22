@@ -26,7 +26,7 @@ static const az_span test_device_request_id = AZ_SPAN_LITERAL_FROM_STR("id_one")
 static const char test_correct_twin_response_topic_filter[] = "$iothub/twin/res/#";
 static const char test_correct_twin_get_request_topic[] = "$iothub/twin/GET/?$rid=id_one";
 static const char test_correct_twin_path_subscribe_topic[]
-    = "$iothub/twin/PATCH/properties/desired/";
+    = "$iothub/twin/PATCH/properties/desired/#";
 static const char test_correct_twin_patch_pub_topic[]
     = "$iothub/twin/PATCH/properties/reported/?$rid=id_one";
 
