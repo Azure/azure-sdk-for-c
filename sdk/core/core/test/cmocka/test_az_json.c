@@ -25,12 +25,10 @@ static void test_json_token_null(void** state)
   assert_int_equal(token._internal.number, 0);
 
   assert_ptr_equal(az_span_ptr(token._internal.string), NULL);
-  assert_int_equal(az_span_capacity(token._internal.string), 0);
-  assert_int_equal(az_span_length(token._internal.string), 0);
+  assert_int_equal(az_span_size(token._internal.string), 0);
 
   assert_ptr_equal(az_span_ptr(token._internal.span), NULL);
-  assert_int_equal(az_span_capacity(token._internal.span), 0);
-  assert_int_equal(az_span_length(token._internal.span), 0);
+  assert_int_equal(az_span_size(token._internal.span), 0);
 }
 
 static void test_json_token_boolean(void** state)

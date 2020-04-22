@@ -88,11 +88,13 @@ static void test_az_log(void** state)
   //  uint8_t hrb_buf[4 * 1024] = { 0 };
   uint8_t headers[4 * 1024] = { 0 };
   _az_http_request hrb = { 0 };
+  az_span url = AZ_SPAN_FROM_STR("https://www.example.com");
   TEST_EXPECT_SUCCESS(az_http_request_init(
       &hrb,
       &az_context_app,
       az_http_method_get(),
-      AZ_SPAN_FROM_STR("https://www.example.com"),
+      url,
+      az_span_size(url),
       AZ_SPAN_FROM_BUFFER(headers),
       AZ_SPAN_FROM_STR("AAAAABBBBBCCCCCDDDDDEEEEEFFFFFGGGGGHHHHHIIIIIJJJJJKKKKK")));
 
@@ -114,16 +116,17 @@ static void test_az_log(void** state)
   uint8_t response_buf[1024] = { 0 };
   az_span response_builder = AZ_SPAN_FROM_BUFFER(response_buf);
 
-  TEST_EXPECT_SUCCESS(az_span_append(
-      response_builder,
-      AZ_SPAN_FROM_STR("HTTP/1.1 404 Not Found\r\n"
-                       "Header11: Value11\r\n"
-                       "Header22: NNNNOOOOPPPPQQQQRRRRSSSSTTTTUUUUVVVVWWWWXXXXYYYYZZZZ\r\n"
-                       "Header33:\r\n"
-                       "Header44: cba888888777777666666555555444444333333222222111111\r\n"
-                       "\r\n"
-                       "KKKKKJJJJJIIIIIHHHHHGGGGGFFFFFEEEEEDDDDDCCCCCBBBBBAAAAA"),
-      &response_builder));
+  az_span response_span
+      = AZ_SPAN_FROM_STR("HTTP/1.1 404 Not Found\r\n"
+                         "Header11: Value11\r\n"
+                         "Header22: NNNNOOOOPPPPQQQQRRRRSSSSTTTTUUUUVVVVWWWWXXXXYYYYZZZZ\r\n"
+                         "Header33:\r\n"
+                         "Header44: cba888888777777666666555555444444333333222222111111\r\n"
+                         "\r\n"
+                         "KKKKKJJJJJIIIIIHHHHHGGGGGFFFFFEEEEEDDDDDCCCCCBBBBBAAAAA");
+  az_span_copy(response_builder, response_span);
+  response_builder = az_span_slice(response_builder, 0, az_span_size(response_span));
+  assert_int_equal(az_span_size(response_builder), az_span_size(response_span));
 
   az_http_response response = { 0 };
   TEST_EXPECT_SUCCESS(az_http_response_init(&response, response_builder));

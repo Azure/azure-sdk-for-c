@@ -61,8 +61,10 @@ typedef struct
     az_context* context;
     az_http_method method;
     az_span url;
+    int32_t url_length;
     int32_t query_start;
     _az_http_request_headers headers; // Contains az_pairs
+    int32_t headers_length;
     int32_t max_headers;
     int32_t retry_headers_start_byte_offset;
     az_span body;

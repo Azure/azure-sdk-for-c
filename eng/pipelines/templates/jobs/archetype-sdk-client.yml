@@ -7,7 +7,14 @@ jobs:
 - job: Validate
   strategy:
     matrix:
-      # Build with no dependencies at all (No samples)
+      # Build with no dependencies at all (No samples) - PRECONDITIONS ON
+      # WARNINGS_AS_ERRORS          ON
+      # BUILD_CURL_TRANSPORT        OFF
+      # UNIT_TESTING                OFF
+      # UNIT_TESTING_MOCK_ENABLED   OFF
+      # BUILD_PAHO_TRANSPORT        OFF
+      # BUILD_PRECONDITIONS         ON
+      # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_NONE
       Linux_x64:
         vm.image: 'ubuntu-18.04'
         vcpkg.deps: ''
@@ -29,7 +36,14 @@ jobs:
        vcpkg.deps: ''
        VCPKG_DEFAULT_TRIPLET: 'x64-osx'
 
-      # Build with sample dependencies [curl for transport]
+      # Build with sample dependencies [curl for transport] - PRECONDITIONS ON
+      # WARNINGS_AS_ERRORS          ON
+      # BUILD_CURL_TRANSPORT        ON
+      # UNIT_TESTING                OFF
+      # UNIT_TESTING_MOCK_ENABLED   OFF
+      # BUILD_PAHO_TRANSPORT        OFF
+      # BUILD_PRECONDITIONS         ON
+      # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_POSIX / AZ_PLATFORM_IMPL_WIN32
       Linux_x64_with_samples:
         vm.image: 'ubuntu-18.04'
         vcpkg.deps: 'curl[ssl]'
@@ -55,7 +69,14 @@ jobs:
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
         build.args: ' -DBUILD_CURL_TRANSPORT=ON -DAZ_PLATFORM_IMPL=POSIX'
 
-      # Build with sample dependencies and unit testing [curl for transport and cmoka]
+      # Build with sample dependencies and unit testing [curl for transport and cmoka]  - PRECONDITIONS ON
+      # WARNINGS_AS_ERRORS          ON
+      # BUILD_CURL_TRANSPORT        ON
+      # UNIT_TESTING                ON
+      # UNIT_TESTING_MOCK_ENABLED   OFF
+      # BUILD_PAHO_TRANSPORT        OFF
+      # BUILD_PRECONDITIONS         ON
+      # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_POSIX / AZ_PLATFORM_IMPL_WIN32
       Linux_x64_with_samples_and_unit_test:
         vm.image: 'ubuntu-18.04'
         vcpkg.deps: 'curl[ssl] cmocka'
@@ -81,7 +102,14 @@ jobs:
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
         build.args: ' -DBUILD_CURL_TRANSPORT=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON'
 
-      # Build with unit testing only. No samples [cmoka]
+      # Build with unit testing only. No samples [cmoka] - PRECONDITIONS ON
+      # WARNINGS_AS_ERRORS          ON
+      # BUILD_CURL_TRANSPORT        OFF
+      # UNIT_TESTING                ON
+      # UNIT_TESTING_MOCK_ENABLED   ON
+      # BUILD_PAHO_TRANSPORT        OFF
+      # BUILD_PRECONDITIONS         ON
+      # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_NONE
       Linux_x64_with_unit_test:
         vm.image: 'ubuntu-18.04'
         vcpkg.deps: 'cmocka'
@@ -108,6 +136,39 @@ jobs:
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
         build.args: ' -DUNIT_TESTING=ON'
+
+      # Build with unit testing only. No samples [cmoka] - PRECONDITIONS OFF
+      # WARNINGS_AS_ERRORS          ON
+      # BUILD_CURL_TRANSPORT        OFF
+      # UNIT_TESTING                ON
+      # UNIT_TESTING_MOCK_ENABLED   OFF
+      # BUILD_PAHO_TRANSPORT        OFF
+      # BUILD_PRECONDITIONS         OFF
+      # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_NONE
+      Linux_x64_with_unit_test_no_preconditions:
+        vm.image: 'ubuntu-18.04'
+        vcpkg.deps: 'cmocka'
+        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
+        build.args: ' -DUNIT_TESTING=ON -DBUILD_PRECONDITIONS=OFF'
+      Win_x86_with_unit_test_no_preconditions:
+        vm.image: 'windows-2019'
+        vcpkg.deps: 'cmocka'
+        VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
+        CMAKE_GENERATOR: 'Visual Studio 16 2019'
+        CMAKE_GENERATOR_PLATFORM: Win32
+        build.args: ' -DUNIT_TESTING=ON -DBUILD_PRECONDITIONS=OFF'
+      Win_x64_with_unit_test_no_preconditions:
+        vm.image: 'windows-2019'
+        vcpkg.deps: 'cmocka'
+        VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
+        CMAKE_GENERATOR: 'Visual Studio 16 2019'
+        CMAKE_GENERATOR_PLATFORM: x64
+        build.args: ' -DUNIT_TESTING=ON -DBUILD_PRECONDITIONS=OFF'
+      MacOS_x64_with_unit_test_no_preconditions:
+        vm.image: 'macOS-10.15'
+        vcpkg.deps: 'cmocka'
+        VCPKG_DEFAULT_TRIPLET: 'x64-osx'
+        build.args: ' -DUNIT_TESTING=ON -DBUILD_PRECONDITIONS=OFF'
   pool:
     vmImage: $(vm.image)
   variables:

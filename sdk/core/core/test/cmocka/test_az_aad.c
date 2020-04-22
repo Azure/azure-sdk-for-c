@@ -80,6 +80,7 @@ static void test_az_aad_request_token(void** state)
           &az_context_app,
           az_http_method_get(),
           AZ_SPAN_FROM_STR("url"),
+          3,
           AZ_SPAN_FROM_BUFFER(headers),
           AZ_SPAN_FROM_BUFFER(body)),
       AZ_OK);

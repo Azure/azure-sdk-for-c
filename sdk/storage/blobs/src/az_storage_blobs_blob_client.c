@@ -9,6 +9,7 @@
 #include <az_json.h>
 #include <az_precondition.h>
 #include <az_precondition_internal.h>
+#include <az_span_internal.h>
 #include <az_storage_blobs.h>
 
 #include <stddef.h>
@@ -120,7 +121,10 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
   };
 
   // Copy url to client buffer so customer can re-use buffer on his/her side
-  AZ_RETURN_IF_FAILED(az_span_copy(client->_internal.uri, uri, &client->_internal.uri));
+  int32_t uri_size = az_span_size(uri);
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(client->_internal.uri, uri_size);
+  az_span_copy(client->_internal.uri, uri);
+  client->_internal.uri = az_span_slice(client->_internal.uri, 0, uri_size);
 
   AZ_RETURN_IF_FAILED(
       _az_credential_set_scopes(cred, AZ_SPAN_FROM_STR("https://storage.azure.com/.default")));
@@ -152,14 +156,23 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
   uint8_t url_buffer[AZ_HTTP_REQUEST_URL_BUF_SIZE];
   az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
   // copy url from client
-  AZ_RETURN_IF_FAILED(az_span_copy(request_url_span, client->_internal.uri, &request_url_span));
+  int32_t uri_size = az_span_size(client->_internal.uri);
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(request_url_span, uri_size);
+  az_span_copy(request_url_span, client->_internal.uri);
+
   uint8_t headers_buffer[_az_STORAGE_HTTP_REQUEST_HEADER_BUF_SIZE];
   az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
 
   // create request
   _az_http_request hrb;
   AZ_RETURN_IF_FAILED(az_http_request_init(
-      &hrb, context, az_http_method_put(), request_url_span, request_headers_span, content));
+      &hrb,
+      context,
+      az_http_method_put(),
+      request_url_span,
+      uri_size,
+      request_headers_span,
+      content));
 
   // add blob type to request
   AZ_RETURN_IF_FAILED(az_http_request_append_header(
@@ -168,8 +181,11 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
   //
   uint8_t content_length[_az_INT64_AS_STR_BUF_SIZE] = { 0 };
   az_span content_length_builder = AZ_SPAN_FROM_BUFFER(content_length);
-  AZ_RETURN_IF_FAILED(az_span_append_i64toa(
-      content_length_builder, az_span_length(content), &content_length_builder));
+  az_span remainder;
+  AZ_RETURN_IF_FAILED(
+      az_span_i64toa(content_length_builder, az_span_size(content), &remainder));
+  content_length_builder
+      = az_span_slice(content_length_builder, 0, _az_span_diff(remainder, content_length_builder));
 
   // add Content-Length to request
   AZ_RETURN_IF_FAILED(

@@ -190,6 +190,7 @@ typedef struct
   struct
   {
     az_span json;
+    int32_t length;
     bool need_comma;
   } _internal;
 } az_json_builder;
@@ -204,7 +205,8 @@ typedef struct
 AZ_NODISCARD AZ_INLINE az_result
 az_json_builder_init(az_json_builder* json_builder, az_span json_buffer)
 {
-  *json_builder = (az_json_builder){ ._internal = { .json = json_buffer, .need_comma = false } };
+  *json_builder
+      = (az_json_builder){ ._internal = { .json = json_buffer, .length = 0, .need_comma = false } };
   return AZ_OK;
 }
 
@@ -216,7 +218,7 @@ az_json_builder_init(az_json_builder* json_builder, az_span json_buffer)
  */
 AZ_NODISCARD AZ_INLINE az_span az_json_builder_span_get(az_json_builder const* json_builder)
 {
-  return json_builder->_internal.json;
+  return az_span_slice(json_builder->_internal.json, 0, json_builder->_internal.length);
 }
 
 /*
@@ -282,8 +284,8 @@ typedef struct
 } az_json_token_member;
 
 /*
- * @brief az_json_parser_init initializes an az_json_parser to parse the JSON payload contained within the passed in buffer.
- * JSON buffer.
+ * @brief az_json_parser_init initializes an az_json_parser to parse the JSON payload contained
+ * within the passed in buffer.
  *
  * @param json_parser A pointer to an az_json_parser instance to initialize.
  * @param json_buffer A pointer to a buffer containing the JSON document to parse.
