@@ -139,7 +139,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_patch_publish_topic_get(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_iot_hub_client_twin_received_topic_parse(
+AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
     az_iot_hub_client const* client,
     az_span received_topic,
     az_iot_hub_client_twin_response* out_twin_response)

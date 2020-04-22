@@ -471,7 +471,7 @@ typedef struct az_iot_hub_client_twin_response
  *                         #az_iot_hub_client_twin_response.
  * @return #az_result
  */
-AZ_NODISCARD az_result az_iot_hub_client_twin_received_topic_parse(
+AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
     az_iot_hub_client const* client,
     az_span received_topic,
     az_iot_hub_client_twin_response* out_twin_response);

@@ -63,8 +63,8 @@ state application_mqtt_receive <<APP>> {
 ' Callback delegating handler:
     [*] --> az_iot_hub_client_c2d_received_topic_parse : Received PUBLISH message
     az_iot_hub_client_c2d_received_topic_parse --> az_iot_hub_client_methods_received_topic_parse : not c2d related
-    az_iot_hub_client_methods_received_topic_parse --> az_iot_hub_client_twin_received_topic_parse : not methods related
-    az_iot_hub_client_twin_received_topic_parse --> [*] : not twin related
+    az_iot_hub_client_methods_received_topic_parse --> az_iot_hub_client_twin_parse_received_topic : not methods related
+    az_iot_hub_client_twin_parse_received_topic --> [*] : not twin related
 
 ' C2D
     az_iot_hub_client_c2d_received_topic_parse -> az_iot_hub_client_c2d_request : c2d call received
@@ -76,7 +76,7 @@ state application_mqtt_receive <<APP>> {
     application_method_handle -> az_iot_hub_client_methods_response_publish_topic_get
     
 ' Twin
-    az_iot_hub_client_twin_received_topic_parse -> az_iot_hub_client_twin_response : twin GET or PATCH received
+    az_iot_hub_client_twin_parse_received_topic -> az_iot_hub_client_twin_response : twin GET or PATCH received
 }
 
 ' IoT Hub client:
