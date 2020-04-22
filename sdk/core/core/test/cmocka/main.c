@@ -17,15 +17,17 @@ int main()
 {
   int result = 0;
 
-  result += test_az_json();
-  result += test_az_span();
+  // every test function returns the number of tests failed, 0 means success (there shouldn't be
+  // negative numbers
+  result += test_az_add();
   result += test_az_context();
   result += test_az_http();
+  result += test_az_json();
   result += test_az_logging();
-  result += test_az_encode();
   result += test_az_pipeline();
-  result += test_az_add();
   result += test_az_policy();
+  result += test_az_span();
+  result += test_az_url_encode();
 
   return result;
 }

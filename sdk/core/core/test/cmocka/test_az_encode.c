@@ -67,7 +67,7 @@ static void test_url_encode(void** state)
   }
 }
 
-int test_az_encode()
+int test_az_url_encode()
 {
   const struct CMUnitTest tests[] = {
     cmocka_unit_test(test_url_encode),

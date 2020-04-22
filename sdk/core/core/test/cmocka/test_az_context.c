@@ -45,7 +45,6 @@ int test_az_context()
 {
   const struct CMUnitTest tests[] = {
     cmocka_unit_test(az_context_test),
-
   };
   return cmocka_run_group_tests_name("az_core_context", tests, NULL, NULL);
 }
