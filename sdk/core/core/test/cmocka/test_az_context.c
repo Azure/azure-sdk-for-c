@@ -13,7 +13,7 @@
 
 #include <_az_cfg.h>
 
-void test_az_context(void** state)
+static void az_context_test(void** state)
 {
   (void)state;
 
@@ -39,4 +39,12 @@ void test_az_context(void** state)
   expiration = az_context_get_expiration(&ctx3); // Should be 0
 
   assert_true(expiration == 0);
+}
+
+int test_az_context()
+{
+  const struct CMUnitTest tests[] = {
+    cmocka_unit_test(az_context_test),
+  };
+  return cmocka_run_group_tests_name("az_core_context", tests, NULL, NULL);
 }
