@@ -16,12 +16,11 @@ static const az_span hub_client_param_separator_span = AZ_SPAN_LITERAL_FROM_STR(
 static const az_span hub_client_param_equals_span = AZ_SPAN_LITERAL_FROM_STR("=");
 
 static const az_span hub_service_api_version = AZ_SPAN_LITERAL_FROM_STR("/?api-version=2018-06-30");
-static const az_span hub_service_user_agent = AZ_SPAN_LITERAL_FROM_STR("&DeviceClientType=");
 
 AZ_NODISCARD az_iot_hub_client_options az_iot_hub_client_options_default()
 {
   return (az_iot_hub_client_options){ .module_id = AZ_SPAN_NULL,
-                                      .user_agent = AZ_SPAN_LITERAL_FROM_STR("c/" AZ_SDK_VERSION_STRING) };
+                                      .user_agent = AZ_SPAN_LITERAL_FROM_STR("&DeviceClientType=c/" AZ_SDK_VERSION_STRING) };
 }
 
 AZ_NODISCARD az_result az_iot_hub_client_init(
@@ -61,7 +60,7 @@ AZ_NODISCARD az_result az_iot_hub_client_user_name_get(
   }
   if (az_span_size(*user_agent) > 0)
   {
-    required_length += az_span_size(hub_service_user_agent) + az_span_size(*user_agent);
+    required_length += az_span_size(*user_agent) + az_span_size(hub_client_param_separator_span);
   }
 
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_user_name, required_length);
@@ -80,7 +79,7 @@ AZ_NODISCARD az_result az_iot_hub_client_user_name_get(
 
   if (az_span_size(*user_agent) > 0)
   {
-    remainder = az_span_copy(remainder, hub_service_user_agent);
+    remainder = az_span_copy_u8(remainder, *az_span_ptr(hub_client_param_separator_span));
     az_span_copy(remainder, *user_agent);
   }
 
