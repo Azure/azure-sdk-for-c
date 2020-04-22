@@ -25,13 +25,13 @@
 #define TEST_HUB_HOSTNAME_STR "myiothub.azure-devices.net"
 #define TEST_MODULE_ID "my_module_id"
 #define TEST_USER_AGENT "os=azrtos"
+#define PLATFORM_USER_AGENT = "DeviceClientType=c/" AZ_SDK_VERSION_STRING;
 
 static const az_span test_device_id = AZ_SPAN_LITERAL_FROM_STR(TEST_DEVICE_ID_STR);
 static const az_span test_hub_hostname = AZ_SPAN_LITERAL_FROM_STR(TEST_HUB_HOSTNAME_STR);
 
-static const char platform_user_agent[] = "DeviceClientType=c/" AZ_SDK_VERSION_STRING;
 static const char test_correct_user_name[]
-    = "myiothub.azure-devices.net/my_device/?api-version=2018-06-30&" platform_user_agent;
+    = "myiothub.azure-devices.net/my_device/?api-version=2018-06-30&" PLATFORM_USER_AGENT;
 static const char test_correct_user_name_with_module_id[]
     = "myiothub.azure-devices.net/my_device/my_module_id/?api-version=2018-06-30&os=azrtos";
 static const char test_correct_client_id[] = "my_device";
@@ -259,7 +259,7 @@ static void test_az_iot_hub_client_get_default_options_succeed(void** state)
 
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   assert_true(az_span_is_content_equal(options.module_id, AZ_SPAN_NULL));
-  assert_true(az_span_is_content_equal(options.user_agent, az_span_from_str(platform_user_agent)));
+  assert_true(az_span_is_content_equal(options.user_agent, az_span_from_str(PLATFORM_USER_AGENT)));
 }
 
 static void test_az_iot_hub_client_init_succeed(void** state)
