@@ -366,5 +366,5 @@ int test_iot_pnp_telemetry()
     cmocka_unit_test(
         test_az_iot_pnp_client_telemetry_publish_topic_get_content_type_and_encoding_with_small_buffer_fails),
   };
-  return cmocka_run_group_tests_name("az_iot_pnp_client", tests, NULL, NULL);
+  return cmocka_run_group_tests_name("az_iot_pnp_client_telemetry", tests, NULL, NULL);
 }

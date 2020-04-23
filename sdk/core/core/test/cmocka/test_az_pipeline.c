@@ -30,7 +30,7 @@ az_result test_policy_2(
 
 void test_az_http_pipeline_process();
 
-void test_az_pipeline(void** state)
+static void az_pipeline_test(void** state)
 {
   (void)state;
 
@@ -106,4 +106,12 @@ az_result test_policy_2(
   (void)p_request;
   (void)p_response;
   return AZ_OK;
+}
+
+int test_az_pipeline()
+{
+  const struct CMUnitTest tests[] = {
+    cmocka_unit_test(az_pipeline_test),
+  };
+  return cmocka_run_group_tests_name("az_core_pipeline", tests, NULL, NULL);
 }
