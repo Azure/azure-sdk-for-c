@@ -234,7 +234,7 @@ az_span az_span_copy(az_span destination, az_span source)
   // Implementations of memmove generally do the right thing when number of bytes to move is 0, even
   // if the ptr is null, but given the behavior is documented to be undefined, we disallow it as a
   // precondition.
-  AZ_PRECONDITION_VALID_SPAN(source, 0, false);
+  AZ_PRECONDITION_VALID_SPAN(source, 0, true);
 
   int32_t src_size = az_span_size(source);
 
