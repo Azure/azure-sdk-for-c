@@ -4,6 +4,13 @@
 #include "az_span_private.h"
 #include "az_test_definitions.h"
 
+#include <stdarg.h>
+#include <stddef.h>
+
+#include <limits.h>
+#include <setjmp.h>
+#include <stdint.h>
+
 #include <cmocka.h>
 
 #include <_az_cfg.h>
@@ -39,7 +46,7 @@ static uint8_t uri_decoded_buf[] = {
   0xF0, 0xF1, 0xF2, 0xF3, 0xF4, 0xF5, 0xF6, 0xF7, 0xF8, 0xF9, 0xFA, 0xFB, 0xFC, 0xFD, 0xFE, 0xFF
 };
 
-void test_url_encode(void** state)
+static void test_url_encode(void** state)
 {
   (void)state;
   uint8_t buffer[1000];
@@ -58,4 +65,12 @@ void test_url_encode(void** state)
         az_span_copy_url_encode(builder, AZ_SPAN_FROM_BUFFER(uri_decoded_buf), &remainder));
     assert_true(az_span_is_content_equal(az_span_slice(builder, 0, 636), uri_encoded));
   }
+}
+
+int test_az_url_encode()
+{
+  const struct CMUnitTest tests[] = {
+    cmocka_unit_test(test_url_encode),
+  };
+  return cmocka_run_group_tests_name("az_core_encode", tests, NULL, NULL);
 }

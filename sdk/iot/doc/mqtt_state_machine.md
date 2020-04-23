@@ -79,7 +79,7 @@ _Example:_
 
 ```C
 
-if(az_failed(az_iot_hub_client_c2d_subscribe_topic_filter_get(client, mqtt_topic_filter, &mqtt_topic_filter))
+if(az_failed(az_iot_hub_client_c2d_get_subscribe_topic_filter(client, mqtt_topic_filter, &mqtt_topic_filter))
 {
     // error.
 }
@@ -128,7 +128,7 @@ _Example:_
         //  method_request.name contains the method
         //  method_request.request_id contains the request ID that must be used to submit the response using az_iot_hub_client_methods_response_publish_topic_get()
     }
-    else if (az_succeeded(ret = az_iot_hub_client_twin_received_topic_parse(client, received_topic, &twin_response)))
+    else if (az_succeeded(ret = az_iot_hub_client_twin_parse_received_topic(client, received_topic, &twin_response)))
     {
         // This is a Twin operation.
         switch (twin_response.response_type)

@@ -19,24 +19,15 @@ endif()
 
 add_cmocka_test(${TARGET_NAME} SOURCES
                 main.c
-                test_az_json.c
-                test_json_value.c
-                test_json_string.c
-                test_json_pointer.c
-                test_json_parser.c
-                test_json_get_by_pointer.c
-                test_json_builder.c
-                test_az_span.c
-                test_span.c
-                test_span_replace.c
-                test_az_context.c
-                test_log.c
-                test_http_request.c
-                test_http_response_read_and_parse.c
-                test_az_pipeline.c
-                test_url_encode.c
                 test_az_aad.c
-                test_az_http_policy.c
+                test_az_context.c
+                test_az_encode.c
+                test_az_http.c
+                test_az_json.c
+                test_az_logging.c
+                test_az_pipeline.c
+                test_az_policy.c
+                test_az_span.c
                 COMPILE_OPTIONS ${DEFAULT_C_COMPILE_FLAGS}
                 LINK_OPTIONS ${WRAP_FUNCTIONS}
                 # grant access to Private functions to test az_json_private

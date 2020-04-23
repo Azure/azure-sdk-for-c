@@ -27,16 +27,24 @@
 AZ_NODISCARD AZ_INLINE az_result _az_http_request_mark_retry_headers_start(_az_http_request* p_hrb)
 {
   AZ_PRECONDITION_NOT_NULL(p_hrb);
-  p_hrb->_internal.retry_headers_start_byte_offset = p_hrb->_internal.headers_length * (int32_t)sizeof(az_pair);
+  p_hrb->_internal.retry_headers_start_byte_offset
+      = p_hrb->_internal.headers_length * (int32_t)sizeof(az_pair);
   return AZ_OK;
 }
 
 AZ_NODISCARD AZ_INLINE az_result _az_http_request_remove_retry_headers(_az_http_request* p_hrb)
 {
   AZ_PRECONDITION_NOT_NULL(p_hrb);
-  p_hrb->_internal.headers_length = p_hrb->_internal.retry_headers_start_byte_offset / (int32_t)sizeof(az_pair);
+  p_hrb->_internal.headers_length
+      = p_hrb->_internal.retry_headers_start_byte_offset / (int32_t)sizeof(az_pair);
   return AZ_OK;
 }
+
+/**
+ * @brief Sets buffer and parser to its initial state.
+ *
+ */
+void _az_http_response_reset(az_http_response* http_response);
 
 #include <_az_cfg_suffix.h>
 

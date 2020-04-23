@@ -81,7 +81,7 @@ static void _log_listener_NULL(az_log_classification classification, az_span mes
   }
 }
 
-void test_az_log(void** state)
+static void test_az_log(void** state)
 {
   (void)state;
   // Set up test values etc.
@@ -203,4 +203,12 @@ void test_az_log(void** state)
 
   az_log_set_classifications(NULL);
   az_log_set_callback(NULL);
+}
+
+int test_az_logging()
+{
+  const struct CMUnitTest tests[] = {
+    cmocka_unit_test(test_az_log),
+  };
+  return cmocka_run_group_tests_name("az_core_logging", tests, NULL, NULL);
 }

@@ -557,6 +557,9 @@ AZ_NODISCARD az_result az_span_i64toa(az_span destination, int64_t source, az_sp
     return _az_span_builder_append_uint64(out_span, (uint64_t)-source);
   }
 
+  // make out_span point to destination before trying to write on it (might be an empty az_span or
+  // pointing else where)
+  *out_span = destination;
   return _az_span_builder_append_uint64(out_span, (uint64_t)source);
 }
 
