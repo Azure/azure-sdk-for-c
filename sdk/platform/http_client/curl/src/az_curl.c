@@ -150,7 +150,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_add_header_to_curl_list(
   az_span writable_buffer;
   {
     int32_t const buffer_size = az_span_size(header.key) + az_span_size(separator)
-        + az_span_size(header.value) + az_span_size(AZ_SPAN_FROM_STR("\0"));
+        + az_span_size(header.value) + 1 /*one for 0 terminated*/;
 
     AZ_RETURN_IF_FAILED(_az_span_malloc(buffer_size, &writable_buffer));
   }
@@ -171,6 +171,32 @@ static AZ_NODISCARD az_result _az_http_client_curl_add_header_to_curl_list(
 }
 
 /**
+ * @brief Adds special header "Expect:" for libcurl to avoid sending only headers to server and wait
+ * for a 100 Continue response before sending a PUT method
+ * see:https://gms.tf/when-curl-sends-100-continue.html
+ *
+ * This function is meant to be called after all headers from original request was called. It will
+ * append another header and set headers for a p_curl session
+ *
+ * @param p_curl reference to an easy curl session
+ * @param p_list list of headers as curl list
+ *
+ * @return az_result
+ */
+static AZ_NODISCARD az_result
+_az_http_client_curl_add_expect_header(CURL* p_curl, struct curl_slist** p_list)
+{
+  AZ_PRECONDITION_NOT_NULL(p_curl);
+  AZ_PRECONDITION_NOT_NULL(p_list);
+
+  // Append header to current custom headers list
+  AZ_RETURN_IF_FAILED(_az_http_client_curl_slist_append(p_list, "Expect:"));
+  // Update the reference to curl custom list (in case it gets moved in memory due to appending)
+  AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl, CURLOPT_HTTPHEADER, *p_list));
+  return AZ_OK;
+}
+
+/**
  * @brief loop all the headers from a HTTP request and set each header into easy curl
  *
  * @param p_request an http builder request reference
@@ -187,7 +213,7 @@ _az_http_client_curl_build_headers(_az_http_request* p_request, struct curl_slis
   {
     AZ_RETURN_IF_FAILED(az_http_request_get_header(p_request, offset, &header));
     AZ_RETURN_IF_FAILED(
-        _az_http_client_curl_add_header_to_curl_list(header, p_headers, AZ_SPAN_FROM_STR(": ")));
+        _az_http_client_curl_add_header_to_curl_list(header, p_headers, AZ_SPAN_FROM_STR(":")));
   }
 
   return AZ_OK;
@@ -402,8 +428,10 @@ _az_http_client_curl_send_upload_request(CURL* p_curl, _az_http_request const* p
  * @param p_request an http request builder
  * @return az_result
  */
-static AZ_NODISCARD az_result
-_az_http_client_curl_setup_headers(CURL* p_curl, _az_http_request* p_request)
+static AZ_NODISCARD az_result _az_http_client_curl_setup_headers(
+    CURL* p_curl,
+    struct curl_slist** p_list,
+    _az_http_request* p_request)
 {
   AZ_PRECONDITION_NOT_NULL(p_curl);
   AZ_PRECONDITION_NOT_NULL(p_request);
@@ -414,12 +442,10 @@ _az_http_client_curl_setup_headers(CURL* p_curl, _az_http_request* p_request)
     return AZ_OK;
   }
 
-  // creates a slist for bulding curl headers
-  struct curl_slist* p_list = NULL;
   // build headers into a slist as curl is expecting
-  AZ_RETURN_IF_FAILED(_az_http_client_curl_build_headers(p_request, &p_list));
+  AZ_RETURN_IF_FAILED(_az_http_client_curl_build_headers(p_request, p_list));
   // set all headers from slist
-  AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl, CURLOPT_HTTPHEADER, p_list));
+  AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl, CURLOPT_HTTPHEADER, *p_list));
 
   return AZ_OK;
 }
@@ -509,7 +535,8 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
 
   az_result result = AZ_ERROR_ARG;
 
-  AZ_RETURN_IF_FAILED(_az_http_client_curl_setup_headers(p_curl, p_request));
+  struct curl_slist* p_list = NULL;
+  AZ_RETURN_IF_FAILED(_az_http_client_curl_setup_headers(p_curl, &p_list, p_request));
 
   AZ_RETURN_IF_FAILED(_az_http_client_curl_setup_url(p_curl, p_request));
 
@@ -519,18 +546,20 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
   {
     result = _az_http_client_curl_send_get_request(p_curl);
   }
-  else if (az_span_is_content_equal(p_request->_internal.method, az_http_method_post()))
-  {
-    result = _az_http_client_curl_send_post_request(p_curl, p_request);
-  }
   else if (az_span_is_content_equal(p_request->_internal.method, az_http_method_delete()))
   {
     result = _az_http_client_curl_send_delete_request(p_curl, p_request);
+  }
+  else if (az_span_is_content_equal(p_request->_internal.method, az_http_method_post()))
+  {
+    AZ_RETURN_IF_FAILED(_az_http_client_curl_add_expect_header(p_curl, &p_list));
+    result = _az_http_client_curl_send_post_request(p_curl, p_request);
   }
   else if (az_span_is_content_equal(p_request->_internal.method, az_http_method_put()))
   {
     // As of CURL 7.12.1 CURLOPT_PUT is deprecated.  PUT requests should be made using
     // CURLOPT_UPLOAD
+    AZ_RETURN_IF_FAILED(_az_http_client_curl_add_expect_header(p_curl, &p_list));
     result = _az_http_client_curl_send_upload_request(p_curl, p_request);
   }
   else
