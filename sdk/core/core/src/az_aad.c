@@ -47,10 +47,6 @@ AZ_NODISCARD AZ_INLINE bool _az_span_url_should_encode(uint8_t c)
 AZ_NODISCARD az_result
 _az_span_copy_url_encode(az_span destination, az_span source, az_span* out_span)
 {
-  AZ_PRECONDITION_NOT_NULL(out_span);
-  AZ_PRECONDITION_VALID_SPAN(destination, 0, true);
-  AZ_PRECONDITION_VALID_SPAN(source, 0, true);
-
   int32_t const input_size = az_span_size(source);
 
   int32_t result_size = 0;
