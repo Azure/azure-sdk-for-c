@@ -122,6 +122,15 @@ AZ_NODISCARD int32_t az_iot_retry_calc_delay(
  */
 AZ_NODISCARD az_span az_span_token(az_span source, az_span delimiter, az_span* out_remainder);
 
+/**
+ * @brief utoa_size gives the length, in bytes, of the string that would represent the given number.
+ *
+ * @param[in] number The number whose length, as a string, is to be evaluated.
+ * @return The length (not considering null terminator) of the string that would represent the given
+ * number.
+ */
+AZ_NODISCARD int32_t u32toa_size(uint32_t number);
+
 #include <_az_cfg_suffix.h>
 
 #endif //!_az_IOT_CORE_H

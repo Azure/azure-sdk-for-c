@@ -17,6 +17,7 @@ int main()
   
   result += test_az_iot_provisioning_client();
   result += test_az_iot_provisioning_client_register();
+  result += test_az_iot_provisioning_client_sas_token();
 
   return result;
 }

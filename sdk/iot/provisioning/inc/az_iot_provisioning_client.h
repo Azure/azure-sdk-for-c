@@ -116,14 +116,17 @@ AZ_NODISCARD az_result az_iot_provisioning_client_id_get(
  * @details The application must obtain a valid clear-text signature using
  *          this API, sign it using HMAC-SHA256 using the Shared Access Key as password then Base64
  *          encode the result.
- *
+ * 
+ * @note More information available at
+ * https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-devguide-security#security-tokens
+ * 
  * @param[in] client The #az_iot_provisioning_client to use for this call.
  * @param[in] token_expiration_epoch_time The time, in seconds, from 1/1/1970.
  * @param[in] signature An empty #az_span with sufficient capacity to hold the SAS signature.
  * @param[out] out_signature The output #az_span containing the SAS signature.
  * @return #az_result
  */
-AZ_NODISCARD az_result az_iot_provisioning_client_sas_signature_get(
+AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_signature(
     az_iot_provisioning_client const* client,
     uint32_t token_expiration_epoch_time,
     az_span signature,
@@ -138,19 +141,26 @@ AZ_NODISCARD az_result az_iot_provisioning_client_sas_signature_get(
  * @param[in] base64_hmac_sha256_signature The Base64 encoded value of the HMAC-SHA256(signature,
  *                                         SharedAccessKey). The signature is obtained by using
  *                                         #az_iot_hub_client_sas_signature_get.
+ * @param[in] token_expiration_epoch_time The time, in seconds, from 1/1/1970.
  * @param[in] key_name The Shared Access Key Name (Policy Name). This is optional. For security
  *                     reasons we recommend using one key per device instead of using a global
  *                     policy key.
- * @param[in] mqtt_password An empty #az_span with sufficient capacity to hold the MQTT password.
- * @param[out] out_mqtt_password The output #az_span containing the MQTT password.
+  * @param[out] mqtt_password A buffer with sufficient capacity to hold the MQTT password.
+ *                           If successful, contains a null-terminated string with the password
+ *                           that needs to be passed to the MQTT client.
+ * @param[in] mqtt_password_size The size, in bytes of \p mqtt_password.
+ * @param[out] out_mqtt_password_length __[nullable]__ Contains the string length, in bytes, of
+ *                                                     \p mqtt_password. Can be `NULL`.
  * @return #az_result.
  */
-AZ_NODISCARD az_result az_iot_hub_client_sas_password_get(
+AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_password(
     az_iot_provisioning_client const* client,
     az_span base64_hmac_sha256_signature,
+    uint32_t token_expiration_epoch_time,
     az_span key_name,
-    az_span mqtt_password,
-    az_span* out_mqtt_password);
+    char* mqtt_password,
+    size_t mqtt_password_size,
+    size_t* out_mqtt_password_length);
 
 /**
  *

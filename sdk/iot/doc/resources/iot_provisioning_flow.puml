@@ -19,10 +19,10 @@ state application_mqtt_connect <<APP>>
 az_iot_provisioning_client_id_get --> application_mqtt_connect
 
 ' Optional SAS token generation:
-az_iot_provisioning_client_id_get -> az_iot_provisioning_client_sas_signature_get : SAS auth
-az_iot_provisioning_client_sas_signature_get -> application_hmac256
-application_hmac256 -> az_iot_provisioning_client_sas_password_get
-az_iot_provisioning_client_sas_password_get --> application_mqtt_connect : password
+az_iot_provisioning_client_id_get -> az_iot_provisioning_client_sas_get_signature : SAS auth
+az_iot_provisioning_client_sas_get_signature -> application_hmac256
+application_hmac256 -> az_iot_provisioning_client_sas_get_password
+az_iot_provisioning_client_sas_get_password --> application_mqtt_connect : password
 state application_hmac256 <<APP>>
 
 ' Subscribe
@@ -55,7 +55,7 @@ az_iot_provisioning_client_init : - id_scope
 az_iot_provisioning_client_init : - registration_id
 
 ' SAS Tokens
-az_iot_provisioning_client_sas_signature_get : - token_expiration_unix_time
+az_iot_provisioning_client_sas_get_signature : - token_expiration_unix_time
 
 az_iot_provisioning_client_received_topic_payload_parse : - topic
 az_iot_provisioning_client_received_topic_payload_parse : - payload
@@ -72,7 +72,7 @@ az_iot_provisioning_client_register_response : ..- json_payload
 az_iot_provisioning_client_register_response : ..- error_code
 az_iot_provisioning_client_register_response : ..- error_message
 
-az_iot_provisioning_client_sas_password_get: - Base64(HMAC-SHA256(signature, SharedAccessKey))
+az_iot_provisioning_client_sas_get_password: - Base64(HMAC-SHA256(signature, SharedAccessKey))
 
 az_iot_provisioning_client_get_operation_status_publish_topic_get : - request_id
 

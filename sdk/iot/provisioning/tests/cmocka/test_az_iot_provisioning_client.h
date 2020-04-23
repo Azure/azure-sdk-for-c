@@ -5,3 +5,4 @@
 
 int test_az_iot_provisioning_client();
 int test_az_iot_provisioning_client_register();
+int test_az_iot_provisioning_client_sas_token();
