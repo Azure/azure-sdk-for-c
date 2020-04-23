@@ -174,6 +174,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_add_header_to_curl_list(
  * @brief Adds special header "Expect:" for libcurl to avoid sending only headers to server and wait
  * for a 100 Continue response before sending a PUT method
  *
+ * see: https://github.com/curl/curl/blob/master/docs/FAQ#L1033
  * libcurl makes all POST and PUT requests (except for POST requests with a
  * very tiny request body) use the "Expect: 100-continue" header. This header
  * allows the server to deny the operation early so that libcurl can bail out
