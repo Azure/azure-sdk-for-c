@@ -18,6 +18,7 @@ AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
     az_keyvault_create_key_options* options,
     az_span* http_body);
 
+void test_keyvault(void** state);
 void test_keyvault(void** state)
 {
   (void)state;
@@ -34,43 +35,39 @@ void test_keyvault(void** state)
               az_keyvault_web_key_type_rsa(), &options, &http_body)
           == AZ_OK);
 
-      assert_true(az_span_is_equal(http_body, expected));
+      assert_true(az_span_is_content_equal(http_body, expected));
     }
     {
-      az_keyvault_create_key_options options = { 0 };
-      options.enabled = az_optional_bool_create(true);
+      az_keyvault_create_key_options options = az_keyvault_create_key_options_default();
 
       uint8_t body_buffer[1024];
 
       az_span http_body = AZ_SPAN_FROM_BUFFER(body_buffer);
 
-      az_span const expected
-          = AZ_SPAN_FROM_STR("{\"kty\":\"RSA\",\"attributes\":{\"enabled\":true}}");
+      az_span const expected = AZ_SPAN_FROM_STR("{\"kty\":\"RSA\"}");
 
       assert_true(
           _az_keyvault_keys_key_create_build_json_body(
               az_keyvault_web_key_type_rsa(), &options, &http_body)
           == AZ_OK);
 
-      assert_true(az_span_is_equal(http_body, expected));
+      assert_true(az_span_is_content_equal(http_body, expected));
     }
     {
-      az_keyvault_create_key_options options = { 0 };
-      options.enabled = az_optional_bool_create(false);
+      az_keyvault_create_key_options options = az_keyvault_create_key_options_default();
 
       uint8_t body_buffer[1024];
 
       az_span http_body = AZ_SPAN_FROM_BUFFER(body_buffer);
 
-      az_span const expected
-          = AZ_SPAN_FROM_STR("{\"kty\":\"RSA\",\"attributes\":{\"enabled\":false}}");
+      az_span const expected = AZ_SPAN_FROM_STR("{\"kty\":\"RSA\"}");
 
       assert_true(
           _az_keyvault_keys_key_create_build_json_body(
               az_keyvault_web_key_type_rsa(), &options, &http_body)
           == AZ_OK);
 
-      assert_true(az_span_is_equal(http_body, expected));
+      assert_true(az_span_is_content_equal(http_body, expected));
     }
   }
 }

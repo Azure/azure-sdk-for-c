@@ -67,8 +67,6 @@ int main()
   az_keyvault_create_key_options key_options = { 0 };
 
   // override options values
-  key_options.enabled = az_optional_bool_create(false);
-  // buffer for operations
   key_options.operations = (az_span[]){ az_keyvault_key_operation_sign(), AZ_SPAN_NULL };
 
   // buffer for tags   ->  adding tags
@@ -100,14 +98,7 @@ int main()
 
   printf("Key created result: \n%s", response_buffer);
 
-  // Reuse response buffer for create Key by creating a new span from response_buffer
-  az_result const reset1_op = az_http_response_init(&http_response, response_span);
-  if (az_failed(reset1_op))
-  {
-    printf("Failed to reset http response (1)");
-  }
-
-  az_span_set(http_response._internal.http_response, '.');
+  az_span_fill(http_response._internal.http_response, '.');
 
   /******************  GET KEY latest ver ******************************/
   az_result get_key_result = az_keyvault_keys_key_get(
@@ -125,23 +116,17 @@ int main()
   // version is still at http_response. Let's copy it to a new buffer
   uint8_t version_buf[40];
   az_span version_builder = AZ_SPAN_FROM_BUFFER(version_buf);
-  az_result const ap_res = az_span_append(version_builder, version, &version_builder);
-
-  if (az_failed(ap_res))
+  if (az_span_size(version_builder) < az_span_size(version))
   {
     printf("Failed to append key version");
   }
-
-  version = az_span_slice(version_builder, 0, az_span_length(version_builder));
-
-  // Reuse response buffer for delete Key by creating a new span from response_buffer
-  az_result const reset2_op = az_http_response_init(&http_response, response_span);
-  if (az_failed(reset2_op))
+  else
   {
-    printf("Failed to reset http response (2)");
+    az_span_copy(version_builder, version);
+    version = az_span_slice(version_builder, 0, az_span_size(version));
   }
 
-  az_span_set(response_span, '.');
+  az_span_fill(response_span, '.');
 
   /*********************  Create a new key version (use default options) *************/
   az_result const create_version_result = az_keyvault_keys_key_create(
@@ -161,14 +146,7 @@ int main()
       "\n\n*********************************\nKey new version created result: \n%s",
       response_buffer);
 
-  // Reuse response buffer for delete Key by creating a new span from response_buffer
-  az_result const reset3_op = az_http_response_init(&http_response, response_span);
-  if (az_failed(reset3_op))
-  {
-    printf("Failed to reset http response (3)");
-  }
-
-  az_span_set(response_span, '.');
+  az_span_fill(response_span, '.');
 
   /******************  GET KEY previous ver ******************************/
   az_result const get_key_prev_ver_result = az_keyvault_keys_key_get(
@@ -192,14 +170,7 @@ int main()
 
   printf("\n\n*********************************\nDELETED Key: \n %s", response_buffer);
 
-  // Reuse response buffer for create Key by creating a new span from response_buffer
-  az_result const reset4_op = az_http_response_init(&http_response, response_span);
-  if (az_failed(reset4_op))
-  {
-    printf("Failed to reset http response (4)");
-  }
-
-  az_span_set(response_span, '.');
+  az_span_fill(response_span, '.');
 
   /******************  GET KEY (should return failed response ) ******************************/
   az_result get_key_again_result = az_keyvault_keys_key_get(
@@ -242,13 +213,13 @@ az_span get_key_version(az_http_response* response)
   }
 
   az_span k = { 0 };
-  r = az_json_token_get_string(value, &k);
+  r = az_json_token_get_string(&value, &k);
   if (az_failed(r))
   {
     return AZ_SPAN_NULL;
   }
   // calculate version
-  int32_t kid_length = az_span_length(k);
+  int32_t kid_length = az_span_size(k);
   az_span version = { 0 };
 
   for (int32_t index = kid_length; index > 0; --index)
@@ -256,7 +227,7 @@ az_span get_key_version(az_http_response* response)
 
     if (az_span_ptr(k)[index] == '/')
     {
-      version = az_span_slice(k, index + 1, -1);
+      version = az_span_slice_to_end(k, index + 1);
       break;
     }
   }

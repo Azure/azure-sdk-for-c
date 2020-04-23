@@ -34,7 +34,7 @@ static AZ_NODISCARD az_result _az_span_malloc(int32_t size, az_span* out)
   {
     return AZ_ERROR_OUT_OF_MEMORY;
   }
-  *out = az_span_init(p, 0, size);
+  *out = az_span_init(p, size);
   return AZ_OK;
 }
 
@@ -51,7 +51,7 @@ static void _az_span_free(az_span* p)
 /**
  * Converts CURLcode to az_result.
  */
-AZ_NODISCARD az_result _az_http_client_curl_code_to_result(CURLcode code)
+static AZ_NODISCARD az_result _az_http_client_curl_code_to_result(CURLcode code)
 {
   switch (code)
   {
@@ -101,10 +101,15 @@ AZ_NODISCARD AZ_INLINE az_result _az_http_client_curl_done(CURL** pp)
 static AZ_NODISCARD az_result
 _az_span_append_header_to_buffer(az_span writable_buffer, az_pair header, az_span separator)
 {
-  AZ_RETURN_IF_FAILED(az_span_append(writable_buffer, header.key, &writable_buffer));
-  AZ_RETURN_IF_FAILED(az_span_append(writable_buffer, separator, &writable_buffer));
-  AZ_RETURN_IF_FAILED(az_span_append(writable_buffer, header.value, &writable_buffer));
-  AZ_RETURN_IF_FAILED(az_span_append(writable_buffer, AZ_SPAN_FROM_STR("\0"), &writable_buffer));
+  int32_t required_length
+      = az_span_size(header.key) + az_span_size(separator) + az_span_size(header.value) + 1;
+
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(writable_buffer, required_length);
+
+  writable_buffer = az_span_copy(writable_buffer, header.key);
+  writable_buffer = az_span_copy(writable_buffer, separator);
+  writable_buffer = az_span_copy(writable_buffer, header.value);
+  az_span_copy_u8(writable_buffer, 0);
 
   return AZ_OK;
 }
@@ -144,8 +149,8 @@ static AZ_NODISCARD az_result _az_http_client_curl_add_header_to_curl_list(
   // allocate a buffer for header
   az_span writable_buffer;
   {
-    int32_t const buffer_size = az_span_length(header.key) + az_span_length(separator)
-        + az_span_length(header.value) + az_span_length(AZ_SPAN_FROM_STR("\0"));
+    int32_t const buffer_size = az_span_size(header.key) + az_span_size(separator)
+        + az_span_size(header.value) + az_span_size(AZ_SPAN_FROM_STR("\0"));
 
     AZ_RETURN_IF_FAILED(_az_span_malloc(buffer_size, &writable_buffer));
   }
@@ -199,9 +204,12 @@ _az_http_client_curl_build_headers(_az_http_request* p_request, struct curl_slis
 static AZ_NODISCARD az_result
 _az_http_client_curl_append_url(az_span writable_buffer, az_span url_from_request)
 {
+  int32_t required_length = az_span_size(url_from_request) + 1;
 
-  AZ_RETURN_IF_FAILED(az_span_append(writable_buffer, url_from_request, &writable_buffer));
-  AZ_RETURN_IF_FAILED(az_span_append(writable_buffer, AZ_SPAN_FROM_STR("\0"), &writable_buffer));
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(writable_buffer, required_length);
+
+  writable_buffer = az_span_copy(writable_buffer, url_from_request);
+  az_span_copy_u8(writable_buffer, 0);
 
   return AZ_OK;
 }
@@ -224,11 +232,20 @@ static size_t _az_http_client_curl_write_to_span(
     void* userp)
 {
   size_t const expected_size = size * nmemb;
-  az_span* const user_buffer_builder = (az_span*)userp;
+  az_http_response* response = (az_http_response*)userp;
 
-  az_span const span_for_content
-      = az_span_init((uint8_t*)contents, (int32_t)expected_size, (int32_t)expected_size);
-  AZ_RETURN_IF_FAILED(az_span_append(*user_buffer_builder, span_for_content, user_buffer_builder));
+  az_span remaining
+      = az_span_slice_to_end(response->_internal.http_response, response->_internal.written);
+
+  az_span const span_for_content = az_span_init((uint8_t*)contents, (int32_t)expected_size);
+
+  if (az_span_size(remaining) < (int32_t)expected_size)
+  {
+    return expected_size + 1;
+  }
+
+  az_span_copy(remaining, span_for_content);
+  response->_internal.written += (int32_t)expected_size;
 
   // This callback needs to return the response size or curl will consider it as it failed
   return expected_size;
@@ -276,20 +293,18 @@ _az_http_client_curl_send_post_request(CURL* p_curl, _az_http_request const* p_r
   // Method
   az_span body = { 0 };
   int32_t const required_length
-      = az_span_length(p_request->_internal.body) + az_span_length(AZ_SPAN_FROM_STR("\0"));
+      = az_span_size(p_request->_internal.body) + az_span_size(AZ_SPAN_FROM_STR("\0"));
 
   AZ_RETURN_IF_FAILED(_az_span_malloc(required_length, &body));
 
   char* b = (char*)az_span_ptr(body);
-  az_result res_code = az_span_to_str(b, required_length, p_request->_internal.body);
+  az_span_to_str(b, required_length, p_request->_internal.body);
 
+  az_result res_code
+      = _az_http_client_curl_code_to_result(curl_easy_setopt(p_curl, CURLOPT_POSTFIELDS, b));
   if (az_succeeded(res_code))
   {
-    res_code = _az_http_client_curl_code_to_result(curl_easy_setopt(p_curl, CURLOPT_POSTFIELDS, b));
-    if (az_succeeded(res_code))
-    {
-      res_code = _az_http_client_curl_code_to_result(curl_easy_perform(p_curl));
-    }
+    res_code = _az_http_client_curl_code_to_result(curl_easy_perform(p_curl));
   }
 
   _az_span_free(&body);
@@ -327,20 +342,24 @@ static int32_t _az_http_client_curl_upload_read_callback(
   if (dst_buffer_size < 1)
     return CURL_READFUNC_ABORT;
 
-  int32_t userdata_length = az_span_length(*upload_content);
+  int32_t userdata_length = az_span_size(*upload_content);
 
   // Return if nothing to copy
   if (userdata_length < 1)
     return CURLE_OK; // Success, all bytes copied
 
+  // Calculate how many bytes can we copy from customer data (upload_content)
+  // Curl provides dst buffer with a max size of dest_buffer_size, if customer data size is less
+  // than the max, we can copy all customer data directly and have it uploaded at once.
+  // If not, we can only copy the max dst size from customer data and wait for another upload to
+  // copy a next chunk of data
   int32_t size_of_copy = (userdata_length < dst_buffer_size) ? userdata_length : dst_buffer_size;
 
-  memcpy(dst, az_span_ptr(*upload_content), size_of_copy);
+  memcpy(dst, az_span_ptr(*upload_content), (size_t)size_of_copy);
 
-  // Update the userdata span
-  //  ptr will point to remaining data to be copied
-  //  length and capacity are set to the size of the remaining content
-  *upload_content = az_span_slice(*upload_content, dst_buffer_size, -1);
+  // Update the userdata span. If we already copied all content, slice will set upload_content with
+  // 0 length
+  *upload_content = az_span_slice_to_end(*upload_content, size_of_copy);
 
   return size_of_copy;
 }
@@ -367,7 +386,7 @@ _az_http_client_curl_send_upload_request(CURL* p_curl, _az_http_request const* p
 
   // Set the size of the upload
   AZ_RETURN_IF_CURL_FAILED(
-      curl_easy_setopt(p_curl, CURLOPT_INFILESIZE, (curl_off_t)az_span_length(body)));
+      curl_easy_setopt(p_curl, CURLOPT_INFILESIZE, (curl_off_t)az_span_size(body)));
 
   // Do the curl work
   // curl_easy_perform does not return until the CURLOPT_READFUNCTION callbacks complete.
@@ -421,14 +440,15 @@ _az_http_client_curl_setup_url(CURL* p_curl, _az_http_request const* p_request)
   az_span writable_buffer;
   {
     // Add 1 for 0-terminated str
-    int32_t const url_final_size = az_span_length(p_request->_internal.url) + 1;
+    int32_t const url_final_size = p_request->_internal.url_length + 1;
 
     // allocate buffer to add \0
     AZ_RETURN_IF_FAILED(_az_span_malloc(url_final_size, &writable_buffer));
   }
 
   // write url in buffer (will add \0 at the end)
-  az_result result = _az_http_client_curl_append_url(writable_buffer, p_request->_internal.url);
+  az_result result = _az_http_client_curl_append_url(
+      writable_buffer, az_span_slice(p_request->_internal.url, 0, p_request->_internal.url_length));
 
   if (az_succeeded(result))
   {
@@ -437,33 +457,34 @@ _az_http_client_curl_setup_url(CURL* p_curl, _az_http_request const* p_request)
   }
 
   // free used buffer before anything else
-  memset(az_span_ptr(writable_buffer), 0, az_span_capacity(writable_buffer));
+  memset(az_span_ptr(writable_buffer), 0, (size_t)az_span_size(writable_buffer));
   _az_span_free(&writable_buffer);
 
   return result;
 }
 
+// TODO: Fix up the documentation here.
 /**
  * @brief set url the response redirection to user buffer
  *
- * @param p_curl specif curl structure used to send http request
- * @param response_builder an http request builder holding all http request data
+ * @param p_curl specific curl structure used to send http request
+ * @param response an http response object which will hold all the HTTP response
  * @return az_result
  */
 static AZ_NODISCARD az_result
-_az_http_client_curl_setup_response_redirect(CURL* p_curl, az_span* response_builder)
+_az_http_client_curl_setup_response_redirect(CURL* p_curl, az_http_response* response)
 {
   AZ_PRECONDITION_NOT_NULL(p_curl);
 
   AZ_RETURN_IF_CURL_FAILED(
       curl_easy_setopt(p_curl, CURLOPT_HEADERFUNCTION, _az_http_client_curl_write_to_span));
 
-  AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl, CURLOPT_HEADERDATA, (void*)response_builder));
+  AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl, CURLOPT_HEADERDATA, (void*)response));
 
   AZ_RETURN_IF_CURL_FAILED(
       curl_easy_setopt(p_curl, CURLOPT_WRITEFUNCTION, _az_http_client_curl_write_to_span));
 
-  AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl, CURLOPT_WRITEDATA, (void*)response_builder));
+  AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl, CURLOPT_WRITEDATA, (void*)response));
 
   return AZ_OK;
 }
@@ -492,22 +513,21 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
 
   AZ_RETURN_IF_FAILED(_az_http_client_curl_setup_url(p_curl, p_request));
 
-  AZ_RETURN_IF_FAILED(
-      _az_http_client_curl_setup_response_redirect(p_curl, &response->_internal.http_response));
+  AZ_RETURN_IF_FAILED(_az_http_client_curl_setup_response_redirect(p_curl, response));
 
-  if (az_span_is_equal(p_request->_internal.method, az_http_method_get()))
+  if (az_span_is_content_equal(p_request->_internal.method, az_http_method_get()))
   {
     result = _az_http_client_curl_send_get_request(p_curl);
   }
-  else if (az_span_is_equal(p_request->_internal.method, az_http_method_post()))
+  else if (az_span_is_content_equal(p_request->_internal.method, az_http_method_post()))
   {
     result = _az_http_client_curl_send_post_request(p_curl, p_request);
   }
-  else if (az_span_is_equal(p_request->_internal.method, az_http_method_delete()))
+  else if (az_span_is_content_equal(p_request->_internal.method, az_http_method_delete()))
   {
     result = _az_http_client_curl_send_delete_request(p_curl, p_request);
   }
-  else if (az_span_is_equal(p_request->_internal.method, az_http_method_put()))
+  else if (az_span_is_content_equal(p_request->_internal.method, az_http_method_put()))
   {
     // As of CURL 7.12.1 CURLOPT_PUT is deprecated.  PUT requests should be made using
     // CURLOPT_UPLOAD
@@ -521,10 +541,13 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
   // make sure to set the end of the body response as the end of the complete response
   if (az_succeeded(result))
   {
-    AZ_RETURN_IF_FAILED(az_span_append(
-        response->_internal.http_response,
-        AZ_SPAN_FROM_STR("\0"),
-        &response->_internal.http_response));
+    az_span remaining
+        = az_span_slice_to_end(response->_internal.http_response, response->_internal.written);
+
+    AZ_RETURN_IF_NOT_ENOUGH_SIZE(remaining, 1);
+
+    az_span_copy_u8(remaining, 0);
+    response->_internal.written++;
   }
   return result;
 }

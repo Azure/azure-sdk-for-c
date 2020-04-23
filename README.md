@@ -2,240 +2,134 @@
 
 [![Build Status](https://dev.azure.com/azure-sdk/public/_apis/build/status/c/c%20-%20client%20-%20ci?branchName=master)](https://dev.azure.com/azure-sdk/public/_build/latest?definitionId=722&branchName=master)
 
-This repository contains official Embedded C libraries for Azure services.
+The Azure SDK for C is designed to allow small embedded (IoT) devices to communicate with Azure services. Since we expect our client library code to run on microcontrollers, which have very limited amounts of flash and RAM, and have slower CPUs, our C SDK does things very differently than the SDKs we offer for other languages.
 
-## Getting started
+With this in mind, there are many tenants or principles that we follow in order to properly address this target audience:
 
-To get started with a specific library, see the **README.md** file located in the library's project folder. You can find service libraries in the `/sdk` directory.
+- Customers of our SDK compile our source code along with their own.
 
-### Prerequisites
-- CMake version 3.10 is required to use these libraries.
-- C compiler. MSVC, gcc or clang are recommended.
-- cmocka. For building and running unit tests. By default building unit tests is disabled, so, unless you want to add unit test or run it, you don't need to install this. See below how vcpkg can be used to install dependencies
-- curl. Curl is used a http stack and it is required for building and running service samples (keyvault and storage). You don't need to install curl if not building samples.
+- We target the C99 programming language and test with gcc, clang, & MS Visual C compilers.
 
-### Development Environment
-Project contains files to work on Windows, Mac or Linux based OS.
+- We offer very few abstractions making our code easy to understand and debug.
 
-### VCPKG
-vcpkg is the easiest way to have dependencies installed. It downloads packages sources, headers and build libraries for whatever TRIPLET is set up (platform/arq).
-VCPKG maintains any installed package inside its own folder, allowing to have multiple vcpkg folder with different dependencies installed on each. This is also great because you don't have to install dependencies globally on your system.
+- Our SDK is non allocating. That is, customers must allocate our data structures where they desire (global memory, heap, stack, etc.) and then pass the address of the allocated structure into our functions to initialize them and in order to perform various operations.
 
-Follow next steps to install VCPKG and have it linked to cmake
-```bash
-# Clone vcpgk:
-git clone https://github.com/Microsoft/vcpkg.git
-# (consider this path as PATH_TO_VCPKG)
-cd vcpkg
-# build vcpkg (remove .bat on Linux/Mac)
-.\bootstrap-vcpkg.bat
-# install dependencies (remove .exe in Linux/Mac) and update triplet
-vcpkg.exe install --triplet x64-windows-static curl[winssl] cmocka
-# Add environment variables:
-# VCPKG_DEFAULT_TRIPLET=x64-windows-static
-# VCPKG_ROOT=[PATH_TO_VCPKG] (replace PATH_TO_VCPKG for where vcpkg is installed)
-```
+- Unlike our other language SDKs, many things (such as composing an HTTP pipeline of policies) are done in source code as opposed to runtime. This reduces code size, improves execution speed and locks-in behavior, reducing the chance of bugs at runtime.
 
-### Windows
-Follow next steps to build project from command prompt
-```bash
-# cd to project folder
-cd azure_sdk_for_c
-# create a new folder to generate cmake files for building (i.e. build)
-mkdir build
-cd build
-# generate files
-# cmake will automatically detect what C compiler is used by system by default and will generate files for it
-cmake ..
-# compile files. Cmake would call compiler and linker to generate libs
-cmake --build .
-```
+- We support microcontrollers with no operating system, microcontrollers with a real-time operating system (like [Azure RTOS](http://rtos.com)), Linux, and Windows. Customers can implement their own "platform layer" to use our SDK on devices we don’t support out-of-the-box. The platform layer requires minimal functionality such as a clock, a mutex, sleep, and an HTTP stack. We provide some platform layers, and more will be added over time.
 
-> Note: The steps above would compile and generate the default output for azure-sdk-for-c which includes static libraries only. See below section [Compiler Options](#compiler-options)
+## The GitHub Repository
 
+To get help with the SDK:
 
-#### Visual Studio 2019
-Open project folder with Visual Studio. If VCPKG has been previously installed and set up like mentioned [above](#VCPKG). Everything will be ready to build.
-Right after opening project, Visual Studio will read cmake files and generate cache files automatically.
+- File a [Github Issue](https://github.com/Azure/azure-sdk-for-c/issues/new/choose).
+- Ask new qustions or see others' questions on [Stack Overflow](https://stackoverflow.com/questions/tagged/azure+c) using the `azure` and `c` tags.
 
-### Linux / Mac
-VCPKG can also be used in Linux to avoid installing libraries globally. Follow instructions [here](#vcpkg) to use VCPKG in Linux.
+### Master Branch
 
-```bash
-# cd to project folder
-cd azure_sdk_for_c
-# create a new folder to generate cmake files for building (i.e. build)
-mkdir build
-cd build
-# generate files
-# cmake will automatically detect what C compiler is used by system by default and will generate files for it
-cmake ..
-# compile files. Cmake would call compiler and linker to generate libs
-make
-```
+The master branch has the most recent code with new features and bug fixes. It does **not** represent the latest General Availability (**GA**) release of the SDK.
 
-> Note: The steps above would compile and generate the default output for azure-sdk-for-c which includes static libraries only. See below section [Compiler Options](#compiler-options)
+### Release Branches and Release Tagging
 
+When we make an official release, we will create a unique git tag containing the name and version to mark the commit. We'll use this tag for servicing via hotfix branches as well as debugging the code for a particular preview or stable release version. A release tag looks like this:
 
-### Compiler Options
-By default, when building project with no options, next static libraries are generated
-- ``Libraries``:
-  - az_core
-  - az_iot
-  - az_keyvault
-  - az_storage_blobs
-- ``Platform Abstraction Layer``: Default empty implementation for platform functions like time and http stack. This default implementation is used to compile only but will return ERROR NOT IMPLEMENTED when running it.
-  - az_noplatform
-  - az_nohttp
-  - az_posix (on Lin/Mac)
-  - az_win32 (on Windows)
-- ``Samples``: By default, samples are built using the default PAL (see [running samples section](#running-samples)). This means that running samples would throw errors like:
-```bash
-./keys_client_example
-Running sample with no_op HTTP implementation.
-Recompile az_core with an HTTP client implementation like CURL to see sample sending network requests.
+   `<package-name>_<package-version>`
 
-i.e. cmake -DBUILD_CURL_TRANSPORT=ON ..
-```
-  - keys_client_example
-  - blobs_client_example
+ For more information, please see this [branching strategy](https://github.com/Azure/azure-sdk/blob/master/docs/policies/repobranching.md#release-tagging) document.
 
-When running cmake, next options can be used to change the output libraries/Pal/Samples:
-- `BUILD_CURL_TRANSPORT`: This option would build an HTTP transport library using CURL. It requires libcurl to be installed (vcpkg or globally). This option will make samples to be linked with this HTTP and be functional to send HTTP requests<br>
-use it as
-```bash
-cmake -DBUILD_CURL_TRANSPORT ..
-cmake --build .
-```
-- `UNIT_TESTING`: This option requires cmocka to be installed and it will generate unit tests for each project.<br>
-use it as
-```bash
-cmake -DUNIT_TESTING ..
-cmake --build .
-# ctest will call and run tests
-# -V runs tests in verbose mode to show more info about tests
-ctest -V
-```
+## Getting Started Using the SDK
 
-## Running Test and Samples
-### Unit test
-See [compiler options section](#compiler-options) to learn about how to build and run unit tests.
+1. Install the required prerequisites:
+   - [CMake](https://cmake.org/download/) version 3.10 or later
+   - C compiler: [MSVC](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2019), [gcc](https://gcc.gnu.org/) or [clang](https://clang.llvm.org/) are recommended
+   - [git](https://git-scm.com/downloads) to clone our Azure SDK repository with the desired tag
 
-### Running samples
-See [compiler options section](#compiler-options) to learn about how to build samples with HTTP implementation in order to be runnable.
+2. Clone our Azure SDK repository, optionally using the desired version tag.
 
-After building samples with HTTP stack, set next environment variables to set log in credentials. Samples will read this values from env an use it to log in to Azure Service like Storage or KeyVault. Learn about the supported authentication [client secret here](https://docs.microsoft.com/en-us/azure/active-directory/azuread-dev/v1-oauth2-on-behalf-of-flow#service-to-service-access-token-request).
-```bash
-# On linux, set env var like this. For Windows, do it from advanced settings/ env variables
+    ```bash
+    git clone https://github.com/Azure/azure-sdk-for-c
+    ```
 
-# replace question marks for your id
-export tenant_id=????????-????-????-????-????????????
-export client_id=????????-????-????-????-????????????
-export client_secret=????????????
-# set uri depending on Azure Service
-export test_uri=https://????.????.azure.net
-```
+    ```bash
+    git checkout <tag_name>
+    ```
 
+    For information about using a specific client library, see the README file located in the client library's folder which is a subdirectory under the [`/sdk`](sdk) folder.
 
+3. Ensure the SDK builds correctly.
 
-## Build Docs
-Running below command from root folder will create a new folder `docs` containing html file with documentation about CORE headers.
-> doxygen needs to be installed in the system
-```bash
-doxygen Doxyfile
-```
+   - Create an output directory for your build artifacts (in this example, we named it `build`, but you can pick any name).
 
-## Code Coverage Reports
-Code coverage reports can be generated after running unit tests for each project. Follow below instructions will generate code coverage reports.
-### Requirements
-- <b>gcc</b>. clang/MSVC not supported<br>
-- <b>Debug</b>. Build files for debug `cmake -DCMAKE_BUILD_TYPE=Debug ..`
-- <b>cmocka / Unit Test Enabled</b>. Build cmocka unit tests `cmake --DUNIT_TESTING=ON ..`
-- <b>environment variable</b>. `export AZ_SDK_CODE_COV=1`
+   ```bash
+   mkdir build
+   ```
 
-```bash
-# from source code root, create a new folder to build project:
-mkdir build
-cd build
+   - Navigate to that newly created directory.
 
-# set env variable to enable building code coverage
-export AZ_SDK_CODE_COV=1
-# generate cmake files with Debug and cmocka unit tests enabled 
-cmake -DUNIT_TESTING=ON -DCMAKE_BUILD_TYPE=Debug ..
-# build
-cmake --build .
+   ```bash
+   cd build
+   ```
 
-## There are 3 available reports to generate for each project:
-# 1. using lcov. Html files grouped by folders. Make sure lcov
-# is installed.
-make ${project_name}_cov //i.e. az_core_cov or az_iot_cov
+   - Run `cmake` pointing to the sources at the root of the repo to generate the builds files.
 
-# 2. using gcov. Html page with all results in one page. Make sure
-# gcov is installed.
-make ${project_name}_cov_html //i.e. az_core_cov_html or az_iot_cov_html
+    ```bash
+    cmake ..
+    ```
 
-# 3. using gcov. XML file with all results. Make sure
-# gcov is installed.
-make ${project_name}_cov_xml //i.e. az_core_cov_xml or az_iot_cov_xml
+   - Launch the underlying build system to compile the libraries.
 
-## Code Coverage is available for this projects:
-#  az_core
-#  az_iot
-#  az_keyvault
-#  az_storage_blobs
-```
+    ```bash
+    cmake --build .
+    ```
 
-## Need help?
-* File an issue via [Github Issues](https://github.com/Azure/azure-sdk-for-c/issues/new/choose).
-* Check [previous questions](https://stackoverflow.com/questions/tagged/azure+c) or ask new ones on StackOverflow using
-  the `azure` and `c` tags.
+   This results in building each library as a static library file, placed in the output directory you created (for example `build\sdk\core\core\Debug`). At a minimum, you must have an `Azure Core` library, a `Platform` library, and an `HTTP` library. Then, you can build any additional Azure service client library you intend to use from within your application (for example `build\sdk\storage\blobs\Debug`). To use our client libraries in your application, just `#include` our public header files and then link your application's object files with our libray files.
 
-## Navigating the repository
+4. Provide platform-specific implementations for functionality required by `Azure Core`. For more information, see the [Azure Core Porting Guide](sdk/core/core/README.md#Porting-the-Azure-SDK-to-Another-Platform).
 
-### Master branch
+## SDK Architecture
 
-The master branch has the most recent code with new features and bug fixes. It does **not** represent latest released **GA** SDK.
+At the heart of our SDK is, what we refer to as, [Azure Core](sdk/core/core). This code defines several data types and functions for use by the client libraries that build on top of us such as an `Azure Storage Blob` client library and `IoT` client libraries. Here are some of the features that customers use directly:
 
-### Release branches (Release tagging)
+- **Spans**: A span represents a byte buffer and is used for string manipulations, HTTP requests/responses, building/parsing JSON payloads. It allows us to return a substring within a larger string without any memory allocations. See the [Working With Spans](sdk/core/core/README.md#Working-With-Spans) section of the `Azure Core` README for more information.
 
-For each package we release there will be a unique git tag created that contains the name and the version of the package to mark the commit of the code that produced the package. This tag will be used for servicing via hotfix branches as well as debugging the code for a particular preview or stable release version.
-Format of the release tags are `<package-name>_<package-version>`. For more information please see [our branching strategy](https://github.com/Azure/azure-sdk/blob/master/docs/policies/repobranching.md#release-tagging).
+- **Logging**: As our SDK performs operations, it can send log messages to a customer-defined callback. Customers can enable this to assist with debugging and diagnosing issues when leveraging our SDK code. See the [Logging SDK Operations](sdk/core/core/README.md#Logging-SDK-Operations) section of the `Azure Core` README for more information.
+
+- **Contexts**: Contexts offer an I/O cancellation mechanism. Multiple contexts can be composed together in your application’s call tree. When a context is canceled, its children are also canceled. See the [Canceling an Operation](sdk/core/core/README.md#Canceling-an-Operation) section of the `Azure Core` README for more information.
+
+- **JSON**: Non-allocating JSON builder and JSON parsing data structures and operations.
+
+- **HTTP**: Non-allocating HTTP request and HTTP response data structures and operations.
+
+In addition to the above features, `Azure Core` provides features available to client libraries written to access other Azure services. Customers use these features indirectly by way of interacting with a client library. By providing these features in `Azure Core`, the client libraries built on top of us will share a common implementation and many features will behave identically across client libraries. For example, `Azure Core` offers a standard set of credential types and an HTTP pipeline with logging, retry, and telemetry policies.
 
 ## Contributing
-For details on contributing to this repository, see the [contributing guide](https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md).
 
-This project welcomes contributions and suggestions. Most contributions require you to agree to a Contributor License
-Agreement (CLA) declaring that you have the right to, and actually do, grant us the rights to use your contribution. For
-details, visit https://cla.microsoft.com.
+For details on contributing to this repository, see the [contributing guide](CONTRIBUTING.md).
 
-When you submit a pull request, a CLA-bot will automatically determine whether you need to provide a CLA and decorate
-the PR appropriately (e.g., label, comment). Simply follow the instructions provided by the bot. You will only need to
-do this once across all repositories using our CLA.
+This project welcomes contributions and suggestions. Most contributions require you to agree to a Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us the rights to use your contribution. For details, visit [https://cla.microsoft.com](https://cla.microsoft.com).
+
+When you submit a pull request, a CLA-bot will automatically determine whether you need to provide a CLA and decorate the PR appropriately (e.g., label, comment). Simply follow the instructions provided by the bot. You will only need to do this once across all repositories using our CLA.
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact
 [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
+### Additional Helpful Links for Contributors
 
-### Additional Helpful Links for Contributors  
-Many people all over the world have helped make this project better.  You'll want to check out:
+Many people all over the world have helped make this project better. You'll want to check out:
 
-* [What are some good first issues for new contributors to the repo?](https://github.com/azure/azure-sdk-for-c/issues?q=is%3Aopen+is%3Aissue+label%3A%22up+for+grabs%22)
-* [How to build and test your change](CONTRIBUTING.md#developer-guide)
-* [How you can make a change happen!](CONTRIBUTING.md#pull-requests)
-* Frequently Asked Questions (FAQ) and Conceptual Topics in the detailed [Azure SDK for C wiki][azure_sdk_for_c_wiki].
+- [What are some good first issues for new contributors to the repo?](https://github.com/azure/azure-sdk-for-c/issues?q=is%3Aopen+is%3Aissue+label%3A%22up+for+grabs%22)
+- [How to build and test your change](CONTRIBUTING.md#developer-guide)
+- [How you can make a change happen!](CONTRIBUTING.md#pull-requests)
 
 ### Community
 
-* Chat with other community members [![Join the chat at https://gitter.im/azure/azure-sdk-for-c](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/azure/azure-sdk-for-c?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+- Chat with other community members: [![Join the chat at https://gitter.im/azure/azure-sdk-for-c](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/azure/azure-sdk-for-c?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-### Reporting security issues and security bugs
+### Reporting Security Issues and Security Bugs
 
 Security issues and bugs should be reported privately, via email, to the Microsoft Security Response Center (MSRC) <secure@microsoft.com>. You should receive a response within 24 hours. If for some reason you do not, please follow up via email to ensure we received your original message. Further information, including the MSRC PGP key, can be found in the [Security TechCenter](https://www.microsoft.com/msrc/faqs-report-an-issue).
 
 ### License
 
 Azure SDK for C is licensed under the [MIT](LICENSE) license.
-
-<!-- LINKS -->
-[azure_sdk_for_c_wiki]: https://github.com/azure/azure-sdk-for-c/wiki

@@ -5,6 +5,11 @@
  * @file az_result.h
  *
  * @brief az_result and facilities definition
+ *
+ * NOTE: You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
+ * prefixed with an underscore ('_') directly in your application code. These symbols
+ * are part of Azure SDK's internal implementation; we do not document these symbols
+ * and they are subject to change in future versions of the SDK which would break your code.
  */
 
 #ifndef _az_RESULT_H
@@ -46,6 +51,15 @@ enum
     } \
   } while (0)
 
+#define AZ_RETURN_IF_NOT_ENOUGH_SIZE(span, required_space) \
+  do \
+  { \
+    if (az_span_size(span) < required_space) \
+    { \
+      return AZ_ERROR_INSUFFICIENT_SPAN_SIZE; \
+    } \
+  } while (0)
+
 /**
  * The type represents error conditions.
  * Bits:
@@ -71,9 +85,9 @@ typedef enum
       _az_FACILITY_CORE,
       1), ///< Input argument does not comply with the requested range of values.
 
-  AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY = _az_RESULT_MAKE_ERROR(
+  AZ_ERROR_INSUFFICIENT_SPAN_SIZE = _az_RESULT_MAKE_ERROR(
       _az_FACILITY_CORE,
-      2), ///< There is not enough capacity in the span provided.
+      2), ///< The size of the provided span is too small.
 
   AZ_ERROR_NOT_IMPLEMENTED
   = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 3), ///< Requested functionality is not implemented.
@@ -113,6 +127,9 @@ typedef enum
 
   AZ_ERROR_HTTP_RESPONSE_OVERFLOW = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 5),
   AZ_ERROR_HTTP_RESPONSE_COULDNT_RESOLVE_HOST = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 6),
+
+  // IoT error codes
+  AZ_ERROR_IOT_TOPIC_NO_MATCH = _az_RESULT_MAKE_ERROR(_az_FACILITY_IOT, 1),
 } az_result;
 
 /// Checks wheteher the \a result provided indicates a failure.

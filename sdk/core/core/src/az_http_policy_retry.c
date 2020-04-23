@@ -9,6 +9,7 @@
 #include <az_log_internal.h>
 #include <az_platform_internal.h>
 #include <az_retry_internal.h>
+#include <az_span_internal.h>
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -26,7 +27,7 @@ static az_http_status_code const _default_status_codes[] = {
   AZ_HTTP_STATUS_CODE_NONE,
 };
 
-AZ_NODISCARD az_http_policy_retry_options az_http_policy_retry_options_default()
+AZ_NODISCARD az_http_policy_retry_options _az_http_policy_retry_options_default()
 {
   return (az_http_policy_retry_options){
     .max_retries = 4,
@@ -37,21 +38,29 @@ AZ_NODISCARD az_http_policy_retry_options az_http_policy_retry_options_default()
   };
 }
 
+// TODO: Add unit tests
 AZ_INLINE az_result _az_http_policy_retry_append_http_retry_msg(
     int16_t attempt,
     int32_t delay_msec,
     az_span* ref_log_msg)
 {
-  AZ_RETURN_IF_FAILED(
-      az_span_append(*ref_log_msg, AZ_SPAN_FROM_STR("HTTP Retry attempt #"), ref_log_msg));
+  az_span retry_count_string = AZ_SPAN_FROM_STR("HTTP Retry attempt #");
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(*ref_log_msg, az_span_size(retry_count_string));
+  az_span remainder = az_span_copy(*ref_log_msg, retry_count_string);
 
-  AZ_RETURN_IF_FAILED(az_span_append_i32toa(*ref_log_msg, (int32_t)attempt, ref_log_msg));
+  AZ_RETURN_IF_FAILED(az_span_i32toa(remainder, (int32_t)attempt, &remainder));
 
-  AZ_RETURN_IF_FAILED(
-      az_span_append(*ref_log_msg, AZ_SPAN_FROM_STR(" will be made in "), ref_log_msg));
+  az_span infix_string = AZ_SPAN_FROM_STR(" will be made in ");
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, az_span_size(infix_string));
+  remainder = az_span_copy(remainder, infix_string);
 
-  AZ_RETURN_IF_FAILED(az_span_append_i32toa(*ref_log_msg, delay_msec, ref_log_msg));
-  AZ_RETURN_IF_FAILED(az_span_append(*ref_log_msg, AZ_SPAN_FROM_STR("ms."), ref_log_msg));
+  AZ_RETURN_IF_FAILED(az_span_i32toa(remainder, delay_msec, &remainder));
+
+  az_span suffix_string = AZ_SPAN_FROM_STR("ms.");
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, az_span_size(suffix_string));
+  remainder = az_span_copy(remainder, suffix_string);
+
+  *ref_log_msg = az_span_slice(*ref_log_msg, 0, _az_span_diff(remainder, *ref_log_msg));
 
   return AZ_OK;
 }
@@ -60,16 +69,18 @@ AZ_INLINE void _az_http_policy_retry_log(int16_t attempt, int32_t delay_msec)
 {
   uint8_t log_msg_buf[AZ_LOG_MSG_BUF_SIZE] = { 0 };
   az_span log_msg = AZ_SPAN_FROM_BUFFER(log_msg_buf);
+
   (void)_az_http_policy_retry_append_http_retry_msg(attempt, delay_msec, &log_msg);
+
   az_log_write(AZ_LOG_HTTP_RETRY, log_msg);
 }
 
 AZ_INLINE AZ_NODISCARD int32_t _az_uint32_span_to_int32(az_span span)
 {
   uint32_t value = 0;
-  if (az_succeeded(az_span_to_uint32(span, &value)))
+  if (az_succeeded(az_span_atou32(span, &value)))
   {
-    return value < INT32_MAX ? value : INT32_MAX;
+    return value < INT32_MAX ? (int32_t)value : INT32_MAX;
   }
 
   return -1;
@@ -139,30 +150,32 @@ AZ_INLINE AZ_NODISCARD az_result _az_http_policy_retry_get_retry_after(
 }
 
 AZ_NODISCARD az_result az_http_pipeline_policy_retry(
-    _az_http_policy* policies,
-    void* options,
-    _az_http_request* ref_request,
-    az_http_response* ref_response)
+    _az_http_policy* p_policies,
+    void* p_data,
+    _az_http_request* p_request,
+    az_http_response* p_response)
 {
   az_http_policy_retry_options const* const retry_options
-      = (az_http_policy_retry_options const*)options;
+      = (az_http_policy_retry_options const*)p_data;
 
   int16_t const max_retries = retry_options->max_retries;
   int32_t const retry_delay_msec = retry_options->retry_delay_msec;
   int32_t const max_retry_delay_msec = retry_options->max_retry_delay_msec;
   az_http_status_code const* const status_codes = retry_options->status_codes;
 
-  az_context* const context = ref_request->_internal.context;
+  AZ_RETURN_IF_FAILED(_az_http_request_mark_retry_headers_start(p_request));
+
+  az_context* const context = p_request->_internal.context;
 
   bool const should_log = az_log_should_write(AZ_LOG_HTTP_RETRY);
   az_result result = AZ_OK;
   int16_t attempt = 1;
   while (true)
   {
-    AZ_RETURN_IF_FAILED(az_http_response_init(ref_response, ref_response->_internal.http_response));
-    AZ_RETURN_IF_FAILED(_az_http_request_remove_retry_headers(ref_request));
+    AZ_RETURN_IF_FAILED(az_http_response_init(p_response, p_response->_internal.http_response));
+    AZ_RETURN_IF_FAILED(_az_http_request_remove_retry_headers(p_request));
 
-    result = az_http_pipeline_nextpolicy(policies, ref_request, ref_response);
+    result = az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
 
     // Even HTTP 429, or 502 are expected to be AZ_OK, so the failed result is not retriable.
     if (attempt > max_retries || az_failed(result))
@@ -172,7 +185,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
 
     int32_t retry_after_msec = -1;
     bool should_retry = false;
-    az_http_response response_copy = *ref_response;
+    az_http_response response_copy = *p_response;
     AZ_RETURN_IF_FAILED(_az_http_policy_retry_get_retry_after(
         &response_copy, status_codes, &should_retry, &retry_after_msec));
 

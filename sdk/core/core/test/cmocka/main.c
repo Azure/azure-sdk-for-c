@@ -1,24 +1,33 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
-#include "az_test_definitions.h"
+#include <stdlib.h>
 
 #include <setjmp.h>
 #include <stdarg.h>
+#include <stddef.h>
+#include <stdint.h>
 
 #include <cmocka.h>
 
-#include <az_json.h>
+#include "az_test_definitions.h"
 
 #include <_az_cfg.h>
 
-/**
- * How to add tests:
- * 1. Add tests definition to az_test_definitions.h. All tests must follow the signature `void
- * test_name(void** state)`.
- * 2. Add test_names to `CMUnitTest test[]` array at the end of `az_test_definitions.h`
- * 3. Add a .c file with tests' implementation.
- * 4. Uppdate CMakeLists.txt file to make tests include the created .c file
- * Run ctest
- *
- */
-int main(void) { return cmocka_run_group_tests_name("az_core", tests, NULL, NULL); }
+int main()
+{
+  int result = 0;
+
+  // every test function returns the number of tests failed, 0 means success (there shouldn't be
+  // negative numbers
+  result += test_az_add();
+  result += test_az_context();
+  result += test_az_http();
+  result += test_az_json();
+  result += test_az_logging();
+  result += test_az_pipeline();
+  result += test_az_policy();
+  result += test_az_span();
+  result += test_az_url_encode();
+
+  return result;
+}

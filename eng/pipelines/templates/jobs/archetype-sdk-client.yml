@@ -7,7 +7,14 @@ jobs:
 - job: Validate
   strategy:
     matrix:
-      # Build with no dependencies at all (No samples)
+      # Build with no dependencies at all (No samples) - PRECONDITIONS ON
+      # WARNINGS_AS_ERRORS          ON
+      # BUILD_CURL_TRANSPORT        OFF
+      # UNIT_TESTING                OFF
+      # UNIT_TESTING_MOCK_ENABLED   OFF
+      # BUILD_PAHO_TRANSPORT        OFF
+      # BUILD_PRECONDITIONS         ON
+      # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_NONE
       Linux_x64:
         vm.image: 'ubuntu-18.04'
         vcpkg.deps: ''
@@ -25,11 +32,18 @@ jobs:
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: x64
       MacOS_x64:
-       vm.image: 'macOS-10.14'
+       vm.image: 'macOS-10.15'
        vcpkg.deps: ''
        VCPKG_DEFAULT_TRIPLET: 'x64-osx'
 
-      # Build with sample dependencies [curl for transport]
+      # Build with sample dependencies [curl for transport] - PRECONDITIONS ON
+      # WARNINGS_AS_ERRORS          ON
+      # BUILD_CURL_TRANSPORT        ON
+      # UNIT_TESTING                OFF
+      # UNIT_TESTING_MOCK_ENABLED   OFF
+      # BUILD_PAHO_TRANSPORT        OFF
+      # BUILD_PRECONDITIONS         ON
+      # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_POSIX / AZ_PLATFORM_IMPL_WIN32
       Linux_x64_with_samples:
         vm.image: 'ubuntu-18.04'
         vcpkg.deps: 'curl[ssl]'
@@ -50,12 +64,19 @@ jobs:
         CMAKE_GENERATOR_PLATFORM: x64
         build.args: ' -DBUILD_CURL_TRANSPORT=ON -DAZ_PLATFORM_IMPL=WIN32'
       MacOS_x64_with_samples:
-       vm.image: 'macOS-10.14'
-       vcpkg.deps: 'curl[ssl]'
-       VCPKG_DEFAULT_TRIPLET: 'x64-osx'
-       build.args: ' -DBUILD_CURL_TRANSPORT=ON -DAZ_PLATFORM_IMPL=POSIX'
+        vm.image: 'macOS-10.15'
+        vcpkg.deps: 'curl[ssl]'
+        VCPKG_DEFAULT_TRIPLET: 'x64-osx'
+        build.args: ' -DBUILD_CURL_TRANSPORT=ON -DAZ_PLATFORM_IMPL=POSIX'
 
-      # Build with sample dependencies and unit testing [curl for transport and cmoka]
+      # Build with sample dependencies and unit testing [curl for transport and cmoka]  - PRECONDITIONS ON
+      # WARNINGS_AS_ERRORS          ON
+      # BUILD_CURL_TRANSPORT        ON
+      # UNIT_TESTING                ON
+      # UNIT_TESTING_MOCK_ENABLED   OFF
+      # BUILD_PAHO_TRANSPORT        OFF
+      # BUILD_PRECONDITIONS         ON
+      # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_POSIX / AZ_PLATFORM_IMPL_WIN32
       Linux_x64_with_samples_and_unit_test:
         vm.image: 'ubuntu-18.04'
         vcpkg.deps: 'curl[ssl] cmocka'
@@ -76,17 +97,25 @@ jobs:
         CMAKE_GENERATOR_PLATFORM: x64
         build.args: ' -DBUILD_CURL_TRANSPORT=ON -DAZ_PLATFORM_IMPL=WIN32 -DUNIT_TESTING=ON'
       MacOS_x64_with_samples_and_unit_test:
-       vm.image: 'macOS-10.14'
-       vcpkg.deps: 'curl[ssl] cmocka'
-       VCPKG_DEFAULT_TRIPLET: 'x64-osx'
-       build.args: ' -DBUILD_CURL_TRANSPORT=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON'
+        vm.image: 'macOS-10.15'
+        vcpkg.deps: 'curl[ssl] cmocka'
+        VCPKG_DEFAULT_TRIPLET: 'x64-osx'
+        build.args: ' -DBUILD_CURL_TRANSPORT=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON'
 
-      # Build with unit testing only. No samples [cmoka]
+      # Build with unit testing only. No samples [cmoka] - PRECONDITIONS ON
+      # WARNINGS_AS_ERRORS          ON
+      # BUILD_CURL_TRANSPORT        OFF
+      # UNIT_TESTING                ON
+      # UNIT_TESTING_MOCK_ENABLED   ON
+      # BUILD_PAHO_TRANSPORT        OFF
+      # BUILD_PRECONDITIONS         ON
+      # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_NONE
       Linux_x64_with_unit_test:
         vm.image: 'ubuntu-18.04'
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        build.args: ' -DUNIT_TESTING=ON -DCMAKE_BUILD_TYPE=Debug'
+        # This is the only platform where we run mocking functions and generate CodeCoverage
+        build.args: ' -DUNIT_TESTING=ON -DCMAKE_BUILD_TYPE=Debug -DUNIT_TESTING_MOCK_ENABLED=ON'
         AZ_SDK_CODE_COV: 1
       Win_x86_with_unit_test:
         vm.image: 'windows-2019'
@@ -103,10 +132,43 @@ jobs:
         CMAKE_GENERATOR_PLATFORM: x64
         build.args: ' -DUNIT_TESTING=ON'
       MacOS_x64_with_unit_test:
-       vm.image: 'macOS-10.14'
-       vcpkg.deps: 'cmocka'
-       VCPKG_DEFAULT_TRIPLET: 'x64-osx'
-       build.args: ' -DUNIT_TESTING=ON'
+        vm.image: 'macOS-10.15'
+        vcpkg.deps: 'cmocka'
+        VCPKG_DEFAULT_TRIPLET: 'x64-osx'
+        build.args: ' -DUNIT_TESTING=ON'
+
+      # Build with unit testing only. No samples [cmoka] - PRECONDITIONS OFF
+      # WARNINGS_AS_ERRORS          ON
+      # BUILD_CURL_TRANSPORT        OFF
+      # UNIT_TESTING                ON
+      # UNIT_TESTING_MOCK_ENABLED   OFF
+      # BUILD_PAHO_TRANSPORT        OFF
+      # BUILD_PRECONDITIONS         OFF
+      # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_NONE
+      Linux_x64_with_unit_test_no_preconditions:
+        vm.image: 'ubuntu-18.04'
+        vcpkg.deps: 'cmocka'
+        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
+        build.args: ' -DUNIT_TESTING=ON -DBUILD_PRECONDITIONS=OFF'
+      Win_x86_with_unit_test_no_preconditions:
+        vm.image: 'windows-2019'
+        vcpkg.deps: 'cmocka'
+        VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
+        CMAKE_GENERATOR: 'Visual Studio 16 2019'
+        CMAKE_GENERATOR_PLATFORM: Win32
+        build.args: ' -DUNIT_TESTING=ON -DBUILD_PRECONDITIONS=OFF'
+      Win_x64_with_unit_test_no_preconditions:
+        vm.image: 'windows-2019'
+        vcpkg.deps: 'cmocka'
+        VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
+        CMAKE_GENERATOR: 'Visual Studio 16 2019'
+        CMAKE_GENERATOR_PLATFORM: x64
+        build.args: ' -DUNIT_TESTING=ON -DBUILD_PRECONDITIONS=OFF'
+      MacOS_x64_with_unit_test_no_preconditions:
+        vm.image: 'macOS-10.15'
+        vcpkg.deps: 'cmocka'
+        VCPKG_DEFAULT_TRIPLET: 'x64-osx'
+        build.args: ' -DUNIT_TESTING=ON -DBUILD_PRECONDITIONS=OFF'
   pool:
     vmImage: $(vm.image)
   variables:
@@ -179,7 +241,7 @@ jobs:
       cmakeArgs: --build .
     displayName: cmake build
   - script: |
-      ctest -C Debug
+      ctest -V
     workingDirectory: build
     displayName: ctest
 
@@ -192,11 +254,10 @@ jobs:
       testRunTitle: 'C99 - $(Agent.JobName)'
     condition: contains(variables['vcpkg.deps'], 'cmocka')
 
-  - script: |
-      make az_core_cov_xml
-      make az_iot_cov_xml
-      make az_keyvault_cov_xml
-      make az_storage_blobs_cov_xml
+  # Make coverage targets (specified in coverage_targets.txt) and assemble
+  # coverage report
+  - bash: |
+      make `cat coverage_targets.txt`
       ../tools/reportgenerator "-reports:sdk/*/*/*cov_xml.xml" "-targetdir:." "-reporttypes:Cobertura"
     workingDirectory: build
     displayName: Generate Code Coverage Data
@@ -209,6 +270,25 @@ jobs:
     displayName: Publish Code Coverage to DevOps
     condition: eq(variables['AZ_SDK_CODE_COV'], 1)
 
+  - task: mspremier.BuildQualityChecks.QualityChecks-task.BuildQualityChecks@6
+    displayName: Check line coverage
+    inputs:
+      checkCoverage: true
+      coverageFailOption: fixed
+      coverageType: line
+      # 85% minimum line coverage
+      coverageThreshold: 85
+    condition: eq(variables['AZ_SDK_CODE_COV'], 1)
+
+  - task: mspremier.BuildQualityChecks.QualityChecks-task.BuildQualityChecks@6
+    displayName: Check branch coverage
+    inputs:
+      checkCoverage: true
+      coverageFailOption: fixed
+      coverageType: branch
+      # 60% minimum branch coverage
+      coverageThreshold: 60
+    condition: eq(variables['AZ_SDK_CODE_COV'], 1)
 
 # Disable build for c - client 
 - ${{ if ne(parameters.ServiceDirectory, 'not-specified' )}}:
@@ -250,9 +330,12 @@ jobs:
               path: $(Build.ArtifactStagingDirectory)/packages
 
       # Generate Documentation
-      - pwsh: >-
-          choco install doxygen.install
-        displayName: Install Doxygen
+      - pwsh: |
+          $setupFile="doxygen-1.8.15-setup.exe";
+          Invoke-WebRequest -MaximumRetryCount 10 -Uri "https://azuresdktooling.blob.core.windows.net/dependencies/doxygen-1.8.15-setup.exe" `
+          -OutFile $setupFile | Wait-Process; Start-Process -Filepath .\$setupFile -ArgumentList @("/VERYSILENT") -Wait
+        workingDirectory: $(Agent.TempDirectory)
+        displayName: Download and Install Doxygen
 
       - ${{ each artifact in parameters.Artifacts }}:
         - pwsh: Write-Host "##vso[task.setvariable variable=PackageVersion]$(Get-Content .\sdk\${{ parameters.ServiceDirectory }}\${{ artifact.Path }}\version.txt)"
