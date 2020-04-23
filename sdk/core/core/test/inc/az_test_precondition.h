@@ -4,6 +4,7 @@
 #ifndef _az_PRECONDITION_TESTING_H
 #define _az_PRECONDITION_TESTING_H
 
+#include <assert.h>
 #include <setjmp.h>
 #include <stdint.h>
 #include <cmocka.h>
@@ -37,9 +38,10 @@ static void az_precondition_test_failed_fn() \
   precondition_test_count = 0; \
   (void)setjmp(g_precond_test_jmp_buf); \
   if (precondition_test_count == 0) { \
-    fn; \
+    assert(fn); \
   } \
-  assert_int_equal(1, precondition_test_count);
+  assert_int_equal(1, precondition_test_count); \
+  
 
 
 #endif // _az_PRECONDITION_TESTING_H

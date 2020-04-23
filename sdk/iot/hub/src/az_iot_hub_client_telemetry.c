@@ -11,7 +11,6 @@
 
 #include <_az_cfg.h>
 
-static const uint8_t telemetry_prop_delim = '?';
 static const az_span telemetry_topic_prefix = AZ_SPAN_LITERAL_FROM_STR("devices/");
 static const az_span telemetry_topic_modules_mid = AZ_SPAN_LITERAL_FROM_STR("/modules/");
 static const az_span telemetry_topic_suffix = AZ_SPAN_LITERAL_FROM_STR("/messages/events/");
@@ -28,25 +27,37 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_publish_topic_get(
 
   const az_span* const module_id = &(client->_internal.options.module_id);
 
-  AZ_RETURN_IF_FAILED(az_span_append(mqtt_topic, telemetry_topic_prefix, out_mqtt_topic));
-  AZ_RETURN_IF_FAILED(az_span_append(*out_mqtt_topic, client->_internal.device_id, out_mqtt_topic));
-
-  if (az_span_length(*module_id) != 0)
+  int32_t required_length = az_span_size(telemetry_topic_prefix)
+      + az_span_size(client->_internal.device_id) + az_span_size(telemetry_topic_suffix);
+  int32_t module_id_length = az_span_size(*module_id);
+  if (module_id_length > 0)
   {
-    AZ_RETURN_IF_FAILED(
-        az_span_append(*out_mqtt_topic, telemetry_topic_modules_mid, out_mqtt_topic));
-    AZ_RETURN_IF_FAILED(az_span_append(*out_mqtt_topic, *module_id, out_mqtt_topic));
+    required_length += az_span_size(telemetry_topic_modules_mid) + module_id_length;
+  }
+  if (properties != NULL)
+  {
+    required_length += az_span_size(properties->_internal.properties_buffer);
   }
 
-  AZ_RETURN_IF_FAILED(az_span_append(*out_mqtt_topic, telemetry_topic_suffix, out_mqtt_topic));
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_topic, required_length);
+
+  az_span remainder = az_span_copy(mqtt_topic, telemetry_topic_prefix);
+  remainder = az_span_copy(remainder, client->_internal.device_id);
+
+  if (module_id_length > 0)
+  {
+    remainder = az_span_copy(remainder, telemetry_topic_modules_mid);
+    remainder = az_span_copy(remainder, *module_id);
+  }
+
+  remainder = az_span_copy(remainder, telemetry_topic_suffix);
 
   if (properties != NULL)
   {
-    AZ_RETURN_IF_FAILED(
-        az_span_append_uint8(*out_mqtt_topic, telemetry_prop_delim, out_mqtt_topic));
-    AZ_RETURN_IF_FAILED(
-        az_span_append(*out_mqtt_topic, properties->_internal.properties, out_mqtt_topic));
+    az_span_copy(remainder, properties->_internal.properties_buffer);
   }
+
+  *out_mqtt_topic = az_span_slice(mqtt_topic, 0, required_length);
 
   return AZ_OK;
 }

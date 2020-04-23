@@ -9,6 +9,13 @@ option(WARNINGS_AS_ERRORS "Treat compiler warnings as errors" ON)
 option(BUILD_CURL_TRANSPORT "Build internal http transport implementation with CURL for HTTP Pipeline" OFF)
 option(UNIT_TESTING "Build unit test projects" OFF)
 option(UNIT_TESTING_MOCK_ENABLED "wrap PAL functions with mock implementation for tests" OFF)
+option(BUILD_PAHO_TRANSPORT "Build IoT Samples with Paho MQTT support" OFF)
+option(BUILD_PRECONDITIONS "Build SDK with preconditions enabled" ON)
+
+#enable mock functions with link option -ld
+if (NOT BUILD_PRECONDITIONS)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DNO_PRECONDITION_CHECKING")
+endif()
 
 #enable mock functions with link option -ld
 if(UNIT_TESTING_MOCK_ENABLED)
@@ -32,11 +39,17 @@ enable_testing ()
 
 include(eng/cmake/global_compile_options.txt)
 
+# List of projects that generate coverage
+# This write empty makes sure that if file is already there, we replace it for an empty one
+# Then each project will APPEND to this file
+# At the end of cmake generate, this file will list the targets for code cov
+file(WRITE ${CMAKE_BINARY_DIR}/coverage_targets.txt "")
+
 add_subdirectory(sdk/core/core)
 
 add_subdirectory(sdk/platform/http_client/nohttp)
 # Adding transport implementation for curl
-# Users can still build Core and SDK client without depending on a HTPP transport implementation
+# Users can still build Core and SDK client without depending on a HTTP transport implementation
 if(BUILD_CURL_TRANSPORT)
   add_subdirectory(sdk/platform/http_client/curl)
 endif()
@@ -46,6 +59,7 @@ add_subdirectory(sdk/storage/blobs)
 add_subdirectory(sdk/iot/core)
 add_subdirectory(sdk/iot/hub)
 add_subdirectory(sdk/iot/provisioning)
+add_subdirectory(sdk/iot/pnp)
 
 # PAL
 add_subdirectory(sdk/platform/noplatform)
@@ -57,6 +71,9 @@ if(NOT DEFINED ENV{AZ_SDK_C_NO_SAMPLES})
   add_subdirectory(sdk/samples/keyvault/keyvault)
   add_subdirectory(sdk/samples/keyvault/keyvault/samples)
   add_subdirectory(sdk/storage/blobs/samples)
+  if(BUILD_PAHO_TRANSPORT)
+    add_subdirectory(sdk/iot/provisioning/samples)
+  endif()
 endif()
 
 # default for Unit testing with cmocka is OFF, however, this will be ON on CI and tests must
@@ -64,10 +81,13 @@ endif()
 if (UNIT_TESTING)
   add_subdirectory(sdk/core/core/test/cmocka)
   add_subdirectory(sdk/storage/blobs/test/cmocka)
+  add_subdirectory(sdk/iot/core/tests/cmocka)
   add_subdirectory(sdk/iot/hub/tests/cmocka)
   add_subdirectory(sdk/iot/provisioning/tests/cmocka)
+  add_subdirectory(sdk/iot/pnp/tests/cmocka)
 
   if(NOT DEFINED ENV{AZ_SDK_C_NO_SAMPLES})
     add_subdirectory(sdk/samples/keyvault/keyvault/test/cmocka)
   endif()
 endif()
+

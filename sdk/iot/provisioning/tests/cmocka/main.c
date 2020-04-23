@@ -15,7 +15,8 @@ int main()
 {
   int result = 0;
   
-  // Placeholder for result += test_iot_provisioning_();
+  result += test_az_iot_provisioning_client();
+  result += test_az_iot_provisioning_client_register();
 
   return result;
 }

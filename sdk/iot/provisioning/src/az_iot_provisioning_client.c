@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <stdint.h>
-
 #include "az_iot_provisioning_client.h"
 #include <az_precondition_internal.h>
 #include <az_result.h>
@@ -10,3 +8,200 @@
 
 #include <_az_cfg.h>
 
+static const az_span provisioning_service_api_version
+    = AZ_SPAN_LITERAL_FROM_STR("/api-version=" AZ_IOT_PROVISIONING_SERVICE_VERSION);
+
+static const az_span str_dps = AZ_SPAN_LITERAL_FROM_STR("$dps");
+static const az_span str_registrations = AZ_SPAN_LITERAL_FROM_STR("/registrations/");
+static const az_span str_put_iotdps_register
+    = AZ_SPAN_LITERAL_FROM_STR("PUT/iotdps-register/?$rid=1");
+static const az_span str_get_iotdps_get_operationstatus
+    = AZ_SPAN_LITERAL_FROM_STR("GET/iotdps-get-operationstatus/?$rid=1&operationId=");
+static const az_span str_res = AZ_SPAN_LITERAL_FROM_STR("res/");
+
+AZ_NODISCARD az_iot_provisioning_client_options az_iot_provisioning_client_options_default()
+{
+  return (az_iot_provisioning_client_options){ .user_agent = AZ_SPAN_NULL };
+}
+
+AZ_NODISCARD az_result az_iot_provisioning_client_init(
+    az_iot_provisioning_client* client,
+    az_span global_device_endpoint,
+    az_span id_scope,
+    az_span registration_id,
+    az_iot_provisioning_client_options const* options)
+{
+  AZ_PRECONDITION_NOT_NULL(client);
+  AZ_PRECONDITION_VALID_SPAN(global_device_endpoint, 1, false);
+  AZ_PRECONDITION_VALID_SPAN(id_scope, 1, false);
+  AZ_PRECONDITION_VALID_SPAN(registration_id, 1, false);
+
+  client->_internal.global_device_endpoint = global_device_endpoint;
+  client->_internal.id_scope = id_scope;
+  client->_internal.registration_id = registration_id;
+
+  client->_internal.options
+      = options == NULL ? az_iot_provisioning_client_options_default() : *options;
+
+  return AZ_OK;
+}
+
+// <id_scope>/registrations/<registration_id>/api-version=<service_version>
+AZ_NODISCARD az_result az_iot_provisioning_client_user_name_get(
+    az_iot_provisioning_client const* client,
+    az_span mqtt_user_name,
+    az_span* out_mqtt_user_name)
+{
+  AZ_PRECONDITION_NOT_NULL(client);
+  AZ_PRECONDITION_VALID_SPAN(mqtt_user_name, 0, false);
+  AZ_PRECONDITION_NOT_NULL(out_mqtt_user_name);
+
+  const az_span* const user_agent = &(client->_internal.options.user_agent);
+
+  int32_t required_length = az_span_size(client->_internal.id_scope)
+      + az_span_size(str_registrations) + az_span_size(client->_internal.registration_id)
+      + az_span_size(provisioning_service_api_version);
+  if (az_span_size(*user_agent) > 0)
+  {
+    required_length += az_span_size(*user_agent) + 1;
+  }
+
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_user_name, required_length);
+
+  az_span remainder = az_span_copy(mqtt_user_name, client->_internal.id_scope);
+  remainder = az_span_copy(remainder, str_registrations);
+  remainder = az_span_copy(remainder, client->_internal.registration_id);
+  remainder = az_span_copy(remainder, provisioning_service_api_version);
+
+  if (az_span_size(*user_agent) > 0)
+  {
+    remainder = az_span_copy_u8(remainder, '&');
+    az_span_copy(remainder, *user_agent);
+  }
+
+  *out_mqtt_user_name = az_span_slice(mqtt_user_name, 0, required_length);
+
+  return AZ_OK;
+}
+
+// <registration_id>
+AZ_NODISCARD az_result az_iot_provisioning_client_id_get(
+    az_iot_provisioning_client const* client,
+    az_span mqtt_client_id,
+    az_span* out_mqtt_client_id)
+{
+  AZ_PRECONDITION_NOT_NULL(client);
+  AZ_PRECONDITION_VALID_SPAN(mqtt_client_id, 0, false);
+  AZ_PRECONDITION_NOT_NULL(out_mqtt_client_id);
+
+  int required_length = az_span_size(client->_internal.registration_id);
+
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_client_id, required_length);
+
+  az_span_copy(mqtt_client_id, client->_internal.registration_id);
+
+  *out_mqtt_client_id = az_span_slice(mqtt_client_id, 0, required_length);
+
+  return AZ_OK;
+}
+
+// $dps/registrations/res/#
+AZ_NODISCARD az_result az_iot_provisioning_client_register_subscribe_topic_filter_get(
+    az_iot_provisioning_client const* client,
+    az_span mqtt_topic_filter,
+    az_span* out_mqtt_topic_filter)
+{
+  (void)client;
+
+  AZ_PRECONDITION_NOT_NULL(client);
+  AZ_PRECONDITION_VALID_SPAN(mqtt_topic_filter, 0, false);
+  AZ_PRECONDITION_NOT_NULL(out_mqtt_topic_filter);
+
+  int32_t required_length
+      = az_span_size(str_dps) + az_span_size(str_registrations) + az_span_size(str_res) + 1;
+
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_topic_filter, required_length);
+
+  az_span remainder = az_span_copy(mqtt_topic_filter, str_dps);
+  remainder = az_span_copy(remainder, str_registrations);
+  remainder = az_span_copy(remainder, str_res);
+  az_span_copy_u8(remainder, '#');
+
+  *out_mqtt_topic_filter = az_span_slice(mqtt_topic_filter, 0, required_length);
+
+  return AZ_OK;
+}
+
+// topic: $dps/registrations/res/202/?$rid=1&retry-after=3
+// payload:
+// {"operationId":"4.d0a671905ea5b2c8.42d78160-4c78-479e-8be7-61d5e55dac0d","status":"assigning"}
+AZ_NODISCARD az_result az_iot_provisioning_client_received_topic_payload_parse(
+    az_iot_provisioning_client const* client,
+    az_span received_topic,
+    az_span received_payload,
+    az_iot_provisioning_client_register_response* out_response)
+{
+  (void)client;
+  (void)received_topic;
+  (void)received_payload;
+  (void)out_response;
+
+  return AZ_ERROR_NOT_IMPLEMENTED;
+}
+
+// $dps/registrations/PUT/iotdps-register/?$rid=%s
+AZ_NODISCARD az_result az_iot_provisioning_client_register_publish_topic_get(
+    az_iot_provisioning_client const* client,
+    az_span mqtt_topic,
+    az_span* out_mqtt_topic)
+{
+  (void)client;
+
+  AZ_PRECONDITION_NOT_NULL(client);
+  AZ_PRECONDITION_VALID_SPAN(mqtt_topic, 0, false);
+  AZ_PRECONDITION_NOT_NULL(out_mqtt_topic);
+
+  int32_t required_length = az_span_size(str_dps) + az_span_size(str_registrations)
+      + az_span_size(str_put_iotdps_register);
+
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_topic, required_length);
+
+  az_span remainder = az_span_copy(mqtt_topic, str_dps);
+  remainder = az_span_copy(remainder, str_registrations);
+  az_span_copy(remainder, str_put_iotdps_register);
+
+  *out_mqtt_topic = az_span_slice(mqtt_topic, 0, required_length);
+
+  return AZ_OK;
+}
+
+// Topic: $dps/registrations/GET/iotdps-get-operationstatus/?$rid=%s&operationId=%s
+AZ_NODISCARD az_result az_iot_provisioning_client_get_operation_status_publish_topic_get(
+    az_iot_provisioning_client const* client,
+    az_iot_provisioning_client_register_response const* register_response,
+    az_span mqtt_topic,
+    az_span* out_mqtt_topic)
+{
+  (void)client;
+
+  AZ_PRECONDITION_NOT_NULL(client);
+  AZ_PRECONDITION_VALID_SPAN(mqtt_topic, 0, false);
+  AZ_PRECONDITION_NOT_NULL(out_mqtt_topic);
+  AZ_PRECONDITION_NOT_NULL(register_response);
+  AZ_PRECONDITION_VALID_SPAN(register_response->operation_id, 1, false);
+
+  int32_t required_length = az_span_size(str_dps) + az_span_size(str_registrations)
+      + az_span_size(str_get_iotdps_get_operationstatus)
+      + az_span_size(register_response->operation_id);
+
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_topic, required_length);
+
+  az_span remainder = az_span_copy(mqtt_topic, str_dps);
+  remainder = az_span_copy(remainder, str_registrations);
+  remainder = az_span_copy(remainder, str_get_iotdps_get_operationstatus);
+  az_span_copy(remainder, register_response->operation_id);
+
+  *out_mqtt_topic = az_span_slice(mqtt_topic, 0, required_length);
+
+  return AZ_OK;
+}
