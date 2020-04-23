@@ -76,12 +76,14 @@ static void test_http_request(void** state)
     TEST_EXPECT_SUCCESS(az_http_request_set_query_parameter(
         &hrb, hrb_param_api_version_name, hrb_param_api_version_token));
     assert_int_equal(hrb._internal.url_length, az_span_size(hrb_url2));
-    assert_true(az_span_is_content_equal(az_span_slice(hrb._internal.url, 0, hrb._internal.url_length), hrb_url2));
+    assert_true(az_span_is_content_equal(
+        az_span_slice(hrb._internal.url, 0, hrb._internal.url_length), hrb_url2));
 
     TEST_EXPECT_SUCCESS(az_http_request_set_query_parameter(
         &hrb, hrb_param_test_param_name, hrb_param_test_param_token));
     assert_int_equal(hrb._internal.url_length, az_span_size(hrb_url3));
-    assert_true(az_span_is_content_equal(az_span_slice(hrb._internal.url, 0, hrb._internal.url_length), hrb_url3));
+    assert_true(az_span_is_content_equal(
+        az_span_slice(hrb._internal.url, 0, hrb._internal.url_length), hrb_url3));
 
     TEST_EXPECT_SUCCESS(az_http_request_append_header(
         &hrb, hrb_header_content_type_name, hrb_header_content_type_token));
@@ -144,6 +146,31 @@ static void test_http_request(void** state)
         az_span_ptr(url),
         az_span_ptr(AZ_SPAN_FROM_STR("https://antk-keyvault.vault.azure.net/secrets/Password/"
                                      "path?api-version=7.0&test-param=token")));
+  }
+  {
+    uint8_t buf[100];
+    uint8_t header_buf[(2 * sizeof(az_pair))];
+    memset(buf, 0, sizeof(buf));
+    memset(header_buf, 0, sizeof(header_buf));
+
+    az_span url_span = AZ_SPAN_FROM_BUFFER(buf);
+    az_span remainder = az_span_copy(url_span, hrb_url);
+    assert_int_equal(az_span_size(remainder), 100 - az_span_size(hrb_url));
+    az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
+    _az_http_request hrb;
+
+    TEST_EXPECT_SUCCESS(az_http_request_init(
+        &hrb,
+        &az_context_app,
+        az_http_method_get(),
+        url_span,
+        az_span_size(hrb_url),
+        header_span,
+        AZ_SPAN_FROM_STR("body")));
+
+    // Empty header
+    assert_return_code(
+        az_http_request_append_header(&hrb, AZ_SPAN_FROM_STR("header"), AZ_SPAN_NULL), AZ_OK);
   }
 }
 
