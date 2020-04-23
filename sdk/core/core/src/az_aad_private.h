@@ -52,7 +52,7 @@ AZ_NODISCARD az_result _az_token_set(_az_token* self, _az_token const* new_token
  * the encoded bytes
  */
 AZ_NODISCARD az_result
-_az_span_copy_url_encode(az_span destination, az_span source, az_span* out_span);
+_az_url_encode(az_span destination, az_span source, az_span* out_span);
 
 #include <_az_cfg_suffix.h>
 

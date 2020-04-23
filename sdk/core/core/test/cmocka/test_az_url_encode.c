@@ -17,7 +17,7 @@
 
 #define TEST_EXPECT_SUCCESS(exp) assert_true(az_succeeded(exp))
 
-static az_span uri_encoded = AZ_SPAN_LITERAL_FROM_STR(
+static az_span url_encoded = AZ_SPAN_LITERAL_FROM_STR(
     "%00%01%02%03%04%05%06%07%08%09%0A%0B%0C%0D%0E%0F%10%11%12%13%14%15%16%17%18%19%1A%1B%1C%1D%1E%"
     "1F%20%21%22%23%24%25%26%27%28%29%2A%2B%2C-.%2F0123456789%3A%3B%3C%3D%3E%3F%"
     "40ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~%7F%80%81%82%"
@@ -27,7 +27,7 @@ static az_span uri_encoded = AZ_SPAN_LITERAL_FROM_STR(
     "E0%E1%E2%E3%E4%E5%E6%E7%E8%E9%EA%EB%EC%ED%EE%EF%F0%F1%F2%F3%F4%F5%F6%F7%F8%F9%FA%FB%FC%FD%FE%"
     "FF");
 
-static uint8_t uri_decoded_buf[] = {
+static uint8_t url_decoded_buf[] = {
   0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
   0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F,
   0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F,
@@ -56,13 +56,13 @@ static void test_url_encode(void** state)
 
     az_span remainder;
     TEST_EXPECT_SUCCESS(
-        _az_span_copy_url_encode(builder, AZ_SPAN_FROM_STR("https://vault.azure.net"), &remainder));
+        _az_url_encode(builder, AZ_SPAN_FROM_STR("https://vault.azure.net"), &remainder));
     assert_true(az_span_is_content_equal(
         az_span_slice(builder, 0, 29), AZ_SPAN_FROM_STR("https%3A%2F%2Fvault.azure.net")));
 
     builder = AZ_SPAN_FROM_BUFFER(buffer);
     TEST_EXPECT_SUCCESS(
-        _az_span_copy_url_encode(builder, AZ_SPAN_FROM_BUFFER(uri_decoded_buf), &remainder));
+        _az_url_encode(builder, AZ_SPAN_FROM_BUFFER(url_decoded_buf), &remainder));
     assert_true(az_span_is_content_equal(az_span_slice(builder, 0, 636), uri_encoded));
   }
 }
