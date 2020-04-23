@@ -57,8 +57,10 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_get_publish_topic(
 
   if (properties != NULL)
   {
-    az_span_copy(remainder, properties->_internal.properties_buffer);
+    remainder = az_span_copy(remainder, properties->_internal.properties_buffer);
   }
+
+  az_span_copy_u8(remainder, null_terminator);
 
   if(out_mqtt_topic_length)
   {
