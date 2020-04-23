@@ -38,6 +38,22 @@ AZ_NODISCARD bool _az_token_expired(_az_token const* token);
 
 AZ_NODISCARD az_result _az_token_set(_az_token* self, _az_token const* new_token);
 
+/**
+ * @brief Copies a URL in the \p source #az_span to the \p destination #az_span by url-encoding the
+ * \p source span characters.
+ *
+ * @param[in] destination The #az_span whose bytes will receive the url-encoded source.
+ * @param[in] source The #az_span containing the non-url-encoded bytes.
+ * @param[out] out_span A pointer to an #az_span that receives the remainder of the \p destination
+ * #az_span after the url-encoded \p source has been copied.
+ * @return An #az_result value indicating the result of the operation:
+ *         - #AZ_OK if successful
+ *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the \p destination is not big enough to contain
+ * the encoded bytes
+ */
+AZ_NODISCARD az_result
+_az_span_copy_url_encode(az_span destination, az_span source, az_span* out_span);
+
 #include <_az_cfg_suffix.h>
 
 #endif // _az_AAD_PRIVATE_H

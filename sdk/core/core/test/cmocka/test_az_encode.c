@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "az_span_private.h"
+#include "az_aad_private.h"
 #include "az_test_definitions.h"
 
 #include <stdarg.h>
@@ -56,13 +56,13 @@ static void test_url_encode(void** state)
 
     az_span remainder;
     TEST_EXPECT_SUCCESS(
-        az_span_copy_url_encode(builder, AZ_SPAN_FROM_STR("https://vault.azure.net"), &remainder));
+        _az_span_copy_url_encode(builder, AZ_SPAN_FROM_STR("https://vault.azure.net"), &remainder));
     assert_true(az_span_is_content_equal(
         az_span_slice(builder, 0, 29), AZ_SPAN_FROM_STR("https%3A%2F%2Fvault.azure.net")));
 
     builder = AZ_SPAN_FROM_BUFFER(buffer);
     TEST_EXPECT_SUCCESS(
-        az_span_copy_url_encode(builder, AZ_SPAN_FROM_BUFFER(uri_decoded_buf), &remainder));
+        _az_span_copy_url_encode(builder, AZ_SPAN_FROM_BUFFER(uri_decoded_buf), &remainder));
     assert_true(az_span_is_content_equal(az_span_slice(builder, 0, 636), uri_encoded));
   }
 }

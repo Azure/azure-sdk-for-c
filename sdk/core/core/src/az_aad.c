@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "az_aad_private.h"
+#include "az_hex_private.h"
 #include "az_span_private.h"
 
 #include <az_config_internal.h>
@@ -29,6 +30,66 @@ AZ_NODISCARD az_result _az_token_set(_az_token* self, _az_token const* new_token
   return AZ_OK;
 }
 
+AZ_NODISCARD AZ_INLINE bool _az_span_url_should_encode(uint8_t c)
+{
+  switch (c)
+  {
+    case '-':
+    case '_':
+    case '.':
+    case '~':
+      return false;
+    default:
+      return !(('0' <= c && c <= '9') || ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z'));
+  }
+}
+
+AZ_NODISCARD az_result
+_az_span_copy_url_encode(az_span destination, az_span source, az_span* out_span)
+{
+  AZ_PRECONDITION_NOT_NULL(out_span);
+  AZ_PRECONDITION_VALID_SPAN(destination, 0, true);
+  AZ_PRECONDITION_VALID_SPAN(source, 0, true);
+
+  int32_t const input_size = az_span_size(source);
+
+  int32_t result_size = 0;
+  for (int32_t i = 0; i < input_size; ++i)
+  {
+    result_size += _az_span_url_should_encode(az_span_ptr(source)[i]) ? 3 : 1;
+  }
+
+  if (az_span_size(destination) < result_size)
+  {
+    return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
+  }
+
+  uint8_t* p_s = az_span_ptr(source);
+  uint8_t* p_d = az_span_ptr(destination);
+  int32_t s = 0;
+  for (int32_t i = 0; i < input_size; ++i)
+  {
+    uint8_t c = p_s[i];
+    if (!_az_span_url_should_encode(c))
+    {
+      *p_d = c;
+      p_d += 1;
+      s += 1;
+    }
+    else
+    {
+      p_d[0] = '%';
+      p_d[1] = _az_number_to_upper_hex(c >> 4);
+      p_d[2] = _az_number_to_upper_hex(c & 0x0F);
+      p_d += 3;
+      s += 3;
+    }
+  }
+  *out_span = az_span_slice_to_end(destination, result_size);
+
+  return AZ_OK;
+}
+
 // https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow#request-an-access-token
 AZ_NODISCARD az_result _az_aad_build_url(az_span url, az_span tenant_id, az_span* out_url)
 {
@@ -36,7 +97,7 @@ AZ_NODISCARD az_result _az_aad_build_url(az_span url, az_span tenant_id, az_span
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(url, az_span_size(root_url));
   az_span remainder = az_span_copy(url, root_url);
 
-  AZ_RETURN_IF_FAILED(az_span_copy_url_encode(remainder, tenant_id, &remainder));
+  AZ_RETURN_IF_FAILED(_az_span_copy_url_encode(remainder, tenant_id, &remainder));
 
   az_span oath_token = AZ_SPAN_FROM_STR("/oauth2/v2.0/token");
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, az_span_size(oath_token));
@@ -60,13 +121,13 @@ AZ_NODISCARD az_result _az_aad_build_body(
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(body, az_span_size(grant_type_and_client_id_key));
   az_span remainder = az_span_copy(body, grant_type_and_client_id_key);
 
-  AZ_RETURN_IF_FAILED(az_span_copy_url_encode(remainder, client_id, &remainder));
+  AZ_RETURN_IF_FAILED(_az_span_copy_url_encode(remainder, client_id, &remainder));
 
   az_span scope_key = AZ_SPAN_FROM_STR("&scope=");
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, az_span_size(scope_key));
   remainder = az_span_copy(remainder, scope_key);
 
-  AZ_RETURN_IF_FAILED(az_span_copy_url_encode(remainder, scopes, &remainder));
+  AZ_RETURN_IF_FAILED(_az_span_copy_url_encode(remainder, scopes, &remainder));
 
   if (az_span_size(client_secret) > 0)
   {
@@ -74,7 +135,7 @@ AZ_NODISCARD az_result _az_aad_build_body(
     AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, az_span_size(client_secret_key));
     remainder = az_span_copy(remainder, client_secret_key);
 
-    AZ_RETURN_IF_FAILED(az_span_copy_url_encode(remainder, client_secret, &remainder));
+    AZ_RETURN_IF_FAILED(_az_span_copy_url_encode(remainder, client_secret, &remainder));
   }
 
   *out_body = az_span_slice(body, 0, _az_span_diff(remainder, body));
