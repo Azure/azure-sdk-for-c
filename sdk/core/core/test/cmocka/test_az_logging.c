@@ -81,18 +81,20 @@ static void _log_listener_NULL(az_log_classification classification, az_span mes
   }
 }
 
-void test_az_log(void** state)
+static void test_az_log(void** state)
 {
   (void)state;
   // Set up test values etc.
   //  uint8_t hrb_buf[4 * 1024] = { 0 };
   uint8_t headers[4 * 1024] = { 0 };
   _az_http_request hrb = { 0 };
+  az_span url = AZ_SPAN_FROM_STR("https://www.example.com");
   TEST_EXPECT_SUCCESS(az_http_request_init(
       &hrb,
       &az_context_app,
       az_http_method_get(),
-      AZ_SPAN_FROM_STR("https://www.example.com"),
+      url,
+      az_span_size(url),
       AZ_SPAN_FROM_BUFFER(headers),
       AZ_SPAN_FROM_STR("AAAAABBBBBCCCCCDDDDDEEEEEFFFFFGGGGGHHHHHIIIIIJJJJJKKKKK")));
 
@@ -122,8 +124,9 @@ void test_az_log(void** state)
                          "Header44: cba888888777777666666555555444444333333222222111111\r\n"
                          "\r\n"
                          "KKKKKJJJJJIIIIIHHHHHGGGGGFFFFFEEEEEDDDDDCCCCCBBBBBAAAAA");
-  response_builder = az_span_append(response_builder, response_span);
-  assert_int_equal(az_span_length(response_builder), az_span_length(response_span));
+  az_span_copy(response_builder, response_span);
+  response_builder = az_span_slice(response_builder, 0, az_span_size(response_span));
+  assert_int_equal(az_span_size(response_builder), az_span_size(response_span));
 
   az_http_response response = { 0 };
   TEST_EXPECT_SUCCESS(az_http_response_init(&response, response_builder));
@@ -200,4 +203,12 @@ void test_az_log(void** state)
 
   az_log_set_classifications(NULL);
   az_log_set_callback(NULL);
+}
+
+int test_az_logging()
+{
+  const struct CMUnitTest tests[] = {
+    cmocka_unit_test(test_az_log),
+  };
+  return cmocka_run_group_tests_name("az_core_logging", tests, NULL, NULL);
 }

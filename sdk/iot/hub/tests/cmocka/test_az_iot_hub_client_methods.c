@@ -3,8 +3,8 @@
 
 #include "test_az_iot_hub_client.h"
 #include <az_iot_hub_client.h>
-#include <az_span.h>
 #include <az_result.h>
+#include <az_span.h>
 
 #include <az_precondition.h>
 #include <az_precondition_internal.h>
@@ -28,17 +28,15 @@ static const az_span test_device_id = AZ_SPAN_LITERAL_FROM_STR(TEST_DEVICE_ID_ST
 static uint8_t g_expected_methods_subscribe_topic[] = "$iothub/methods/POST/#";
 
 #ifndef NO_PRECONDITION_CHECKING
-
 enable_precondition_check_tests()
 
-    static void test_az_iot_hub_client_methods_subscribe_topic_filter_get_NULL_client_fail(
-        void** state)
+static void test_az_iot_hub_client_methods_subscribe_topic_filter_get_NULL_client_fail(void** state)
 {
   (void)state;
 
   uint8_t mqtt_sub_topic_buf[TEST_SPAN_BUFFER_SIZE];
   az_span mqtt_sub_topic
-      = az_span_for_test_init(mqtt_sub_topic_buf, 0, _az_COUNTOF(mqtt_sub_topic_buf));
+      = az_span_for_test_init(mqtt_sub_topic_buf, _az_COUNTOF(mqtt_sub_topic_buf));
 
   assert_precondition_checked(
       az_iot_hub_client_methods_subscribe_topic_filter_get(NULL, mqtt_sub_topic, &mqtt_sub_topic));
@@ -51,7 +49,7 @@ static void test_az_iot_hub_client_methods_subscribe_topic_filter_get_NULL_out_t
 
   uint8_t mqtt_sub_topic_buf[TEST_SPAN_BUFFER_SIZE];
   az_span mqtt_sub_topic
-      = az_span_for_test_init(mqtt_sub_topic_buf, 0, _az_COUNTOF(mqtt_sub_topic_buf));
+      = az_span_for_test_init(mqtt_sub_topic_buf, _az_COUNTOF(mqtt_sub_topic_buf));
 
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
@@ -66,7 +64,7 @@ static void test_az_iot_hub_client_methods_subscribe_topic_filter_get_empty_topi
 
   uint8_t mqtt_sub_topic_buf[TEST_SPAN_BUFFER_SIZE];
   az_span mqtt_sub_topic
-      = az_span_for_test_init(mqtt_sub_topic_buf, 0, _az_COUNTOF(mqtt_sub_topic_buf));
+      = az_span_for_test_init(mqtt_sub_topic_buf, _az_COUNTOF(mqtt_sub_topic_buf));
 
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
@@ -81,7 +79,7 @@ static void test_az_iot_hub_client_methods_response_publish_topic_get_NULL_clien
 
   uint8_t mqtt_sub_topic_buf[TEST_SPAN_BUFFER_SIZE];
   az_span mqtt_sub_topic
-      = az_span_for_test_init(mqtt_sub_topic_buf, 0, _az_COUNTOF(mqtt_sub_topic_buf));
+      = az_span_for_test_init(mqtt_sub_topic_buf, _az_COUNTOF(mqtt_sub_topic_buf));
 
   az_span request_id = AZ_SPAN_LITERAL_FROM_STR("2");
   uint16_t status = 202;
@@ -97,7 +95,7 @@ static void test_az_iot_hub_client_methods_response_publish_topic_get_NULL_out_t
 
   uint8_t mqtt_sub_topic_buf[TEST_SPAN_BUFFER_SIZE];
   az_span mqtt_sub_topic
-      = az_span_for_test_init(mqtt_sub_topic_buf, 0, _az_COUNTOF(mqtt_sub_topic_buf));
+      = az_span_for_test_init(mqtt_sub_topic_buf, _az_COUNTOF(mqtt_sub_topic_buf));
 
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
@@ -116,7 +114,7 @@ static void test_az_iot_hub_client_methods_response_publish_topic_get_AZ_SPAN_NU
 
   uint8_t mqtt_sub_topic_buf[TEST_SPAN_BUFFER_SIZE];
   az_span mqtt_sub_topic
-      = az_span_for_test_init(mqtt_sub_topic_buf, 0, _az_COUNTOF(mqtt_sub_topic_buf));
+      = az_span_for_test_init(mqtt_sub_topic_buf, _az_COUNTOF(mqtt_sub_topic_buf));
 
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
@@ -135,7 +133,7 @@ static void test_az_iot_hub_client_methods_response_publish_topic_get_EMPTY_requ
 
   uint8_t mqtt_sub_topic_buf[TEST_SPAN_BUFFER_SIZE];
   az_span mqtt_sub_topic
-      = az_span_for_test_init(mqtt_sub_topic_buf, 0, _az_COUNTOF(mqtt_sub_topic_buf));
+      = az_span_for_test_init(mqtt_sub_topic_buf, _az_COUNTOF(mqtt_sub_topic_buf));
 
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
@@ -154,7 +152,7 @@ static void test_az_iot_hub_client_methods_response_publish_topic_get_AZ_SPAN_NU
 
   uint8_t mqtt_sub_topic_buf[TEST_SPAN_BUFFER_SIZE];
   az_span mqtt_sub_topic
-      = az_span_for_test_init(mqtt_sub_topic_buf, 0, _az_COUNTOF(mqtt_sub_topic_buf));
+      = az_span_for_test_init(mqtt_sub_topic_buf, _az_COUNTOF(mqtt_sub_topic_buf));
 
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
@@ -231,7 +229,7 @@ static void test_az_iot_hub_client_methods_subscribe_topic_filter_get_succeed(vo
 
   uint8_t mqtt_sub_topic_buf[TEST_SPAN_BUFFER_SIZE];
   az_span mqtt_sub_topic
-      = az_span_for_test_init(mqtt_sub_topic_buf, 0, _az_COUNTOF(mqtt_sub_topic_buf));
+      = az_span_for_test_init(mqtt_sub_topic_buf, _az_COUNTOF(mqtt_sub_topic_buf));
 
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
@@ -244,6 +242,7 @@ static void test_az_iot_hub_client_methods_subscribe_topic_filter_get_succeed(vo
       mqtt_sub_topic,
       g_expected_methods_subscribe_topic,
       _az_COUNTOF(g_expected_methods_subscribe_topic) - 1,
+      az_span_init(mqtt_sub_topic_buf, _az_COUNTOF(mqtt_sub_topic_buf)),
       TEST_SPAN_BUFFER_SIZE);
 }
 
@@ -254,14 +253,14 @@ static void test_az_iot_hub_client_methods_subscribe_topic_filter_get_INSUFFICIE
 
   uint8_t mqtt_sub_topic_buf[5];
   az_span mqtt_sub_topic
-      = az_span_for_test_init(mqtt_sub_topic_buf, 0, _az_COUNTOF(mqtt_sub_topic_buf));
+      = az_span_for_test_init(mqtt_sub_topic_buf, _az_COUNTOF(mqtt_sub_topic_buf));
 
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
 
   assert_true(
       az_iot_hub_client_methods_subscribe_topic_filter_get(&client, mqtt_sub_topic, &mqtt_sub_topic)
-      == AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY);
+      == AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
 }
 
 static void test_az_iot_hub_client_methods_response_publish_topic_get_succeed(void** state)
@@ -270,7 +269,7 @@ static void test_az_iot_hub_client_methods_response_publish_topic_get_succeed(vo
 
   uint8_t mqtt_sub_topic_buf[TEST_SPAN_BUFFER_SIZE];
   az_span mqtt_sub_topic
-      = az_span_for_test_init(mqtt_sub_topic_buf, 0, _az_COUNTOF(mqtt_sub_topic_buf));
+      = az_span_for_test_init(mqtt_sub_topic_buf, _az_COUNTOF(mqtt_sub_topic_buf));
 
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
@@ -285,7 +284,11 @@ static void test_az_iot_hub_client_methods_response_publish_topic_get_succeed(vo
       == AZ_OK);
 
   az_span_for_test_verify(
-      mqtt_sub_topic, expected_topic, _az_COUNTOF(expected_topic) - 1, TEST_SPAN_BUFFER_SIZE);
+      mqtt_sub_topic,
+      expected_topic,
+      _az_COUNTOF(expected_topic) - 1,
+      az_span_init(mqtt_sub_topic_buf, _az_COUNTOF(mqtt_sub_topic_buf)),
+      TEST_SPAN_BUFFER_SIZE);
 }
 
 static void
@@ -296,7 +299,7 @@ test_az_iot_hub_client_methods_response_publish_topic_get_INSUFFICIENT_BUFFER_fo
 
   uint8_t mqtt_sub_topic_buf[10];
   az_span mqtt_sub_topic
-      = az_span_for_test_init(mqtt_sub_topic_buf, 0, _az_COUNTOF(mqtt_sub_topic_buf));
+      = az_span_for_test_init(mqtt_sub_topic_buf, _az_COUNTOF(mqtt_sub_topic_buf));
 
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
@@ -307,7 +310,7 @@ test_az_iot_hub_client_methods_response_publish_topic_get_INSUFFICIENT_BUFFER_fo
   assert_true(
       az_iot_hub_client_methods_response_publish_topic_get(
           &client, request_id, status, mqtt_sub_topic, &mqtt_sub_topic)
-      == AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY);
+      == AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
 }
 
 static void
@@ -318,7 +321,7 @@ test_az_iot_hub_client_methods_response_publish_topic_get_INSUFFICIENT_BUFFER_fo
 
   uint8_t mqtt_sub_topic_buf[21]; // Enough for "$iothub/methods/res/2"
   az_span mqtt_sub_topic
-      = az_span_for_test_init(mqtt_sub_topic_buf, 0, _az_COUNTOF(mqtt_sub_topic_buf));
+      = az_span_for_test_init(mqtt_sub_topic_buf, _az_COUNTOF(mqtt_sub_topic_buf));
 
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
@@ -329,7 +332,7 @@ test_az_iot_hub_client_methods_response_publish_topic_get_INSUFFICIENT_BUFFER_fo
   assert_true(
       az_iot_hub_client_methods_response_publish_topic_get(
           &client, request_id, status, mqtt_sub_topic, &mqtt_sub_topic)
-      == AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY);
+      == AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
 }
 
 static void
@@ -340,7 +343,7 @@ test_az_iot_hub_client_methods_response_publish_topic_get_INSUFFICIENT_BUFFER_fo
 
   uint8_t mqtt_sub_topic_buf[24]; // Enough for "$iothub/methods/res/202/"
   az_span mqtt_sub_topic
-      = az_span_for_test_init(mqtt_sub_topic_buf, 0, _az_COUNTOF(mqtt_sub_topic_buf));
+      = az_span_for_test_init(mqtt_sub_topic_buf, _az_COUNTOF(mqtt_sub_topic_buf));
 
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
@@ -351,7 +354,7 @@ test_az_iot_hub_client_methods_response_publish_topic_get_INSUFFICIENT_BUFFER_fo
   assert_true(
       az_iot_hub_client_methods_response_publish_topic_get(
           &client, request_id, status, mqtt_sub_topic, &mqtt_sub_topic)
-      == AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY);
+      == AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
 }
 
 static void test_az_iot_hub_client_methods_received_topic_parse_succeed(void** state)
@@ -370,9 +373,9 @@ static void test_az_iot_hub_client_methods_received_topic_parse_succeed(void** s
   assert_true(
       az_iot_hub_client_methods_received_topic_parse(&client, received_topic, &out_request)
       == AZ_OK);
-  assert_int_equal(az_span_length(out_request.name), _az_COUNTOF(expected_name) - 1);
+  assert_int_equal(az_span_size(out_request.name), _az_COUNTOF(expected_name) - 1);
   assert_memory_equal(az_span_ptr(out_request.name), expected_name, _az_COUNTOF(expected_name) - 1);
-  assert_int_equal(az_span_length(out_request.request_id), _az_COUNTOF(expected_request_id) - 1);
+  assert_int_equal(az_span_size(out_request.request_id), _az_COUNTOF(expected_request_id) - 1);
   assert_memory_equal(
       az_span_ptr(out_request.request_id),
       expected_request_id,
@@ -438,9 +441,7 @@ static void test_az_iot_hub_client_methods_received_topic_parse_topic_filter_fai
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
 
   az_span received_topic = az_span_init(
-      g_expected_methods_subscribe_topic,
-      _az_COUNTOF(g_expected_methods_subscribe_topic),
-      _az_COUNTOF(g_expected_methods_subscribe_topic));
+      g_expected_methods_subscribe_topic, _az_COUNTOF(g_expected_methods_subscribe_topic));
 
   az_iot_hub_client_method_request out_request;
 

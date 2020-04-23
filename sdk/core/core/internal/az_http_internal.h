@@ -119,8 +119,7 @@ _az_http_policy_apiversion_options_default()
  */
 AZ_NODISCARD AZ_INLINE int32_t _az_http_request_headers_count(_az_http_request const* request)
 {
-  // Cast the unsigned sizeof result to ensure the divsion is signed/signed
-  return az_span_length(request->_internal.headers) / (int32_t)sizeof(az_pair);
+  return request->_internal.headers_length;
 }
 
 /**
@@ -207,7 +206,7 @@ az_http_client_send_request(_az_http_request* p_request, az_http_response* p_res
  *
  * @return
  *   - *`AZ_OK`* success.
- *   - *`AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY`* `buffer` does not have enough space to fit the
+ *   - *`AZ_ERROR_INSUFFICIENT_SPAN_SIZE`* `buffer` does not have enough space to fit the
  * `max_url_size`.
  *   - *`AZ_ERROR_ARG`*
  *     - `p_request` is _NULL_.
@@ -219,6 +218,7 @@ AZ_NODISCARD az_result az_http_request_init(
     az_context* context,
     az_http_method method,
     az_span url,
+    int32_t url_length,
     az_span headers_buffer,
     az_span body);
 
@@ -243,8 +243,8 @@ AZ_NODISCARD az_result az_http_request_append_path(_az_http_request* p_request, 
  *
  * @return
  *   - *`AZ_OK`* success.
- *   - *`AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY`* the `URL` would grow past the `max_url_size`, should
- * the parameter gets set.
+ *   - *`AZ_ERROR_INSUFFICIENT_SPAN_SIZE`* the `URL` would grow past the `max_url_size`, should
+ * the parameter get set.
  *   - *`AZ_ERROR_ARG`*
  *     - `p_request` is _NULL_.
  *     - `name` or `value` are invalid spans (see @ref az_span_is_valid).
@@ -263,7 +263,7 @@ az_http_request_set_query_parameter(_az_http_request* p_request, az_span name, a
  *
  * @return
  *   - *`AZ_OK`* success.
- *   - *`AZ_ERROR_INSUFFICIENT_SPAN_CAPACITY`* there isn't enough space in the `p_request->buffer`
+ *   - *`AZ_ERROR_INSUFFICIENT_SPAN_SIZE`* there isn't enough space in the `p_request->buffer`
  * to add a header.
  *   - *`AZ_ERROR_ARG`*
  *     - `p_request` is _NULL_.

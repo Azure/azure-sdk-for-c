@@ -142,6 +142,7 @@ typedef struct
   struct
   {
     az_span http_response;
+    int32_t written;
     struct
     {
       az_span remaining; // the remaining un-parsed portion of the original http_response.
@@ -164,6 +165,7 @@ AZ_NODISCARD AZ_INLINE az_result az_http_response_init(az_http_response* respons
   *response = (az_http_response){
     ._internal = {
       .http_response = buffer,
+      .written = 0,
       .parser = {
         .remaining = AZ_SPAN_NULL,
         .next_kind = _az_HTTP_RESPONSE_KIND_STATUS_LINE,
