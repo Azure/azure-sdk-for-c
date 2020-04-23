@@ -63,7 +63,7 @@ static void test_url_encode(void** state)
     builder = AZ_SPAN_FROM_BUFFER(buffer);
     TEST_EXPECT_SUCCESS(
         _az_url_encode(builder, AZ_SPAN_FROM_BUFFER(url_decoded_buf), &remainder));
-    assert_true(az_span_is_content_equal(az_span_slice(builder, 0, 636), uri_encoded));
+    assert_true(az_span_is_content_equal(az_span_slice(builder, 0, 636), url_encoded));
   }
 }
 
