@@ -16,6 +16,8 @@
 #include <az_test_precondition.h>
 #include <cmocka.h>
 
+#define TEST_SPAN_BUFFER_SIZE 128
+
 // PnP Client
 #define TEST_DEVICE_ID_STR "my_device"
 #define TEST_DEVICE_HOSTNAME_STR "myiothub.azure-devices.net"
@@ -137,15 +139,14 @@ static void test_az_iot_pnp_client_get_user_name_succeed(void** state)
           &client, test_device_hostname, test_device_id, test_root_interface_name, NULL),
       AZ_OK);
 
-  uint8_t test_span_buffer[_az_COUNTOF(test_correct_pnp_user_name) - 1];
-  az_span test_span = az_span_init(test_span_buffer, _az_COUNTOF(test_span_buffer));
-  assert_int_equal(az_iot_pnp_client_get_user_name(&client, test_span, &test_span), AZ_OK);
-
-  assert_int_equal(az_span_size(test_span), _az_COUNTOF(test_correct_pnp_user_name) - 1);
-  assert_memory_equal(
-      test_correct_pnp_user_name,
-      az_span_ptr(test_span),
-      _az_COUNTOF(test_correct_pnp_user_name) - 1);
+  char mqtt_topic_buf[TEST_SPAN_BUFFER_SIZE];
+  int32_t mqtt_topic_length;
+  assert_int_equal(
+      az_iot_pnp_client_get_user_name(
+          &client, mqtt_topic_buf, sizeof(mqtt_topic_buf), &mqtt_topic_length),
+      AZ_OK);
+  assert_string_equal(test_correct_pnp_user_name, mqtt_topic_buf);
+  assert_int_equal(sizeof(test_correct_pnp_user_name) - 1, mqtt_topic_length);
 }
 
 static void test_az_iot_pnp_client_get_user_name_small_buffer_fail(void** state)
@@ -158,10 +159,12 @@ static void test_az_iot_pnp_client_get_user_name_small_buffer_fail(void** state)
           &client, test_device_hostname, test_device_id, test_root_interface_name, NULL),
       AZ_OK);
 
-  uint8_t test_span_buffer[_az_COUNTOF(test_correct_pnp_user_name) - 2];
-  az_span test_span = az_span_init(test_span_buffer, _az_COUNTOF(test_span_buffer));
+  char mqtt_topic_buf[_az_COUNTOF(test_correct_pnp_user_name) - 2];
+  int32_t mqtt_topic_length;
+
   assert_int_equal(
-      az_iot_pnp_client_get_user_name(&client, test_span, &test_span),
+      az_iot_pnp_client_get_user_name(
+          &client, mqtt_topic_buf, sizeof(mqtt_topic_buf), &mqtt_topic_length),
       AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
 }
 
@@ -180,16 +183,14 @@ static void test_az_iot_pnp_client_get_user_name_user_options_succeed(void** sta
           &client, test_device_hostname, test_device_id, test_root_interface_name, &options),
       AZ_OK);
 
-  uint8_t test_span_buffer[_az_COUNTOF(test_correct_pnp_user_name_with_user_agent) - 1];
-  az_span test_span = az_span_init(test_span_buffer, _az_COUNTOF(test_span_buffer));
-  assert_int_equal(az_iot_pnp_client_get_user_name(&client, test_span, &test_span), AZ_OK);
-
+  char mqtt_topic_buf[TEST_SPAN_BUFFER_SIZE];
+  int32_t mqtt_topic_length;
   assert_int_equal(
-      az_span_size(test_span), _az_COUNTOF(test_correct_pnp_user_name_with_user_agent) - 1);
-  assert_memory_equal(
-      test_correct_pnp_user_name_with_user_agent,
-      az_span_ptr(test_span),
-      _az_COUNTOF(test_correct_pnp_user_name_with_user_agent) - 1);
+      az_iot_pnp_client_get_user_name(
+          &client, mqtt_topic_buf, sizeof(mqtt_topic_buf), &mqtt_topic_length),
+      AZ_OK);
+  assert_string_equal(test_correct_pnp_user_name_with_user_agent, mqtt_topic_buf);
+  assert_int_equal(sizeof(test_correct_pnp_user_name_with_user_agent) - 1, mqtt_topic_length);
 }
 
 static void test_az_iot_pnp_client_get_user_name_user_options_small_buffer_fail(void** state)
@@ -207,10 +208,11 @@ static void test_az_iot_pnp_client_get_user_name_user_options_small_buffer_fail(
           &client, test_device_hostname, test_device_id, test_root_interface_name, &options),
       AZ_OK);
 
-  uint8_t test_span_buffer[_az_COUNTOF(test_correct_pnp_user_name_with_user_agent) - 2];
-  az_span test_span = az_span_init(test_span_buffer, _az_COUNTOF(test_span_buffer));
+  char mqtt_topic_buf[_az_COUNTOF(test_correct_pnp_user_name_with_user_agent) - 2];
+  int32_t mqtt_topic_length;
   assert_int_equal(
-      az_iot_pnp_client_get_user_name(&client, test_span, &test_span),
+      az_iot_pnp_client_get_user_name(
+          &client, mqtt_topic_buf, sizeof(mqtt_topic_buf), &mqtt_topic_length),
       AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
 }
 

@@ -11,6 +11,7 @@
 
 #include <_az_cfg.h>
 
+static const uint8_t null_terminator = '\0';
 static const uint8_t hub_client_forward_slash = '/';
 static const az_span hub_client_param_separator_span = AZ_SPAN_LITERAL_FROM_STR("&");
 static const az_span hub_client_param_equals_span = AZ_SPAN_LITERAL_FROM_STR("=");
@@ -43,30 +44,35 @@ AZ_NODISCARD az_result az_iot_hub_client_init(
 
 AZ_NODISCARD az_result az_iot_hub_client_user_name_get(
     az_iot_hub_client const* client,
-    az_span mqtt_user_name,
-    az_span* out_mqtt_user_name)
+    char* mqtt_user_name,
+    int32_t mqtt_user_name_size,
+    int32_t* out_mqtt_user_name_length)
 {
   AZ_PRECONDITION_NOT_NULL(client);
-  AZ_PRECONDITION_VALID_SPAN(mqtt_user_name, 0, false);
-  AZ_PRECONDITION_NOT_NULL(out_mqtt_user_name);
+  AZ_PRECONDITION_NOT_NULL(mqtt_user_name);
+  AZ_PRECONDITION(mqtt_user_name_size > 0);
 
   const az_span* const module_id = &(client->_internal.options.module_id);
   const az_span* const user_agent = &(client->_internal.options.user_agent);
 
+  az_span mqtt_user_name_span = az_span_init((uint8_t*)mqtt_user_name, mqtt_user_name_size);
+
   int32_t required_length = az_span_size(client->_internal.iot_hub_hostname)
-      + az_span_size(client->_internal.device_id) + az_span_size(hub_service_api_version) + 1;
+      + az_span_size(client->_internal.device_id) + az_span_size(hub_service_api_version)
+      + (int32_t)sizeof(hub_client_forward_slash);
   if (az_span_size(*module_id) > 0)
   {
-    required_length += az_span_size(*module_id) + 1;
+    required_length += az_span_size(*module_id) + (int32_t)sizeof(hub_client_forward_slash);
   }
   if (az_span_size(*user_agent) > 0)
   {
     required_length += az_span_size(*user_agent) + az_span_size(hub_client_param_separator_span);
   }
 
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_user_name, required_length);
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(
+      mqtt_user_name_span, required_length + (int32_t)sizeof(null_terminator));
 
-  az_span remainder = az_span_copy(mqtt_user_name, client->_internal.iot_hub_hostname);
+  az_span remainder = az_span_copy(mqtt_user_name_span, client->_internal.iot_hub_hostname);
   remainder = az_span_copy_u8(remainder, hub_client_forward_slash);
   remainder = az_span_copy(remainder, client->_internal.device_id);
 
@@ -81,42 +87,55 @@ AZ_NODISCARD az_result az_iot_hub_client_user_name_get(
   if (az_span_size(*user_agent) > 0)
   {
     remainder = az_span_copy_u8(remainder, *az_span_ptr(hub_client_param_separator_span));
-    az_span_copy(remainder, *user_agent);
+    remainder = az_span_copy(remainder, *user_agent);
   }
 
-  *out_mqtt_user_name = az_span_slice(mqtt_user_name, 0, required_length);
+  az_span_copy_u8(remainder, '\0');
+
+  if (out_mqtt_user_name_length)
+  {
+    *out_mqtt_user_name_length = required_length;
+  }
 
   return AZ_OK;
 }
 
 AZ_NODISCARD az_result az_iot_hub_client_id_get(
     az_iot_hub_client const* client,
-    az_span mqtt_client_id,
-    az_span* out_mqtt_client_id)
+    char* mqtt_client_id,
+    int32_t mqtt_client_id_size,
+    int32_t* out_mqtt_client_id_length)
 {
   AZ_PRECONDITION_NOT_NULL(client);
-  AZ_PRECONDITION_VALID_SPAN(mqtt_client_id, 0, false);
-  AZ_PRECONDITION_NOT_NULL(out_mqtt_client_id);
+  AZ_PRECONDITION_NOT_NULL(mqtt_client_id);
+  AZ_PRECONDITION(mqtt_client_id_size > 0);
 
+  az_span mqtt_client_id_span = az_span_init((uint8_t*)mqtt_client_id, mqtt_client_id_size);
   const az_span* const module_id = &(client->_internal.options.module_id);
 
   int32_t required_length = az_span_size(client->_internal.device_id);
   if (az_span_size(*module_id) > 0)
   {
-    required_length += az_span_size(*module_id) + 1;
+    required_length += az_span_size(*module_id) + (int32_t)sizeof(hub_client_forward_slash);
   }
 
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_client_id, required_length);
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(
+      mqtt_client_id_span, required_length + (int32_t)sizeof(null_terminator));
 
-  az_span remainder = az_span_copy(mqtt_client_id, client->_internal.device_id);
+  az_span remainder = az_span_copy(mqtt_client_id_span, client->_internal.device_id);
 
   if (az_span_size(*module_id) > 0)
   {
     remainder = az_span_copy_u8(remainder, hub_client_forward_slash);
-    az_span_copy(remainder, *module_id);
+    remainder = az_span_copy(remainder, *module_id);
   }
 
-  *out_mqtt_client_id = az_span_slice(mqtt_client_id, 0, required_length);
+  az_span_copy_u8(remainder, null_terminator);
+
+  if (out_mqtt_client_id_length)
+  {
+    *out_mqtt_client_id_length = required_length;
+  }
 
   return AZ_OK;
 }

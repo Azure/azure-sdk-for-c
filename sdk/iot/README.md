@@ -94,7 +94,7 @@ void my_property_func()
 
 ### Telemetry
 
-Telemetry functionality can be achieved by sending a user payload to a specific topic. In order to get the appropriate topic to which to send, use the `az_iot_hub_client_telemetry_publish_topic_get()` API. An example use case is below.
+Telemetry functionality can be achieved by sending a user payload to a specific topic. In order to get the appropriate topic to which to send, use the `az_iot_hub_client_telemetry_get_publish_topic()` API. An example use case is below.
 
 ```C
 //FOR SIMPLICITY THIS DOES NOT HAVE ERROR CHECKING. IN PRODUCTION ENSURE PROPER ERROR CHECKING.
@@ -116,7 +116,7 @@ void my_telemetry_func()
                 sizeof(telemetry_topic_buffer) / sizeof(telemetry_topic_buffer[0]));
 
   //Get the NULL terminated topic and put in topic_span to send the telemetry
-  az_iot_hub_client_telemetry_publish_topic_get(&my_client, NULL, topic_span, &topic_span);
+  az_iot_hub_client_telemetry_get_publish_topic(&my_client, NULL, topic_span, &topic_span);
 }
 ```
 

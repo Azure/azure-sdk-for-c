@@ -11,6 +11,7 @@
 
 #include <_az_cfg.h>
 
+static const uint8_t null_terminator = '\0';
 static const uint8_t pnp_client_param_separator = '&';
 static const uint8_t pnp_client_param_equals = '=';
 
@@ -53,32 +54,39 @@ AZ_NODISCARD az_result az_iot_pnp_client_init(
 
 AZ_NODISCARD az_result az_iot_pnp_client_get_user_name(
     az_iot_pnp_client const* client,
-    az_span mqtt_user_name,
-    az_span* out_mqtt_user_name)
+    char* mqtt_user_name,
+    int32_t mqtt_user_name_size,
+    int32_t* out_mqtt_user_name_length)
 {
   AZ_PRECONDITION_NOT_NULL(client);
-  AZ_PRECONDITION_VALID_SPAN(mqtt_user_name, 0, false);
-  AZ_PRECONDITION_NOT_NULL(out_mqtt_user_name);
+  AZ_PRECONDITION_NOT_NULL(mqtt_user_name);
+  AZ_PRECONDITION(mqtt_user_name_size > 0);
 
-  az_span remainder = mqtt_user_name;
-  az_span user_name;
-  AZ_RETURN_IF_FAILED(
-      az_iot_hub_client_user_name_get(&client->_internal.iot_hub_client, remainder, &user_name));
+  int32_t written;
 
-  int32_t written = az_span_size(user_name);
-  remainder = az_span_slice_to_end(remainder, written);
+  // First get hub user name since it is unknown how long it will be
+  AZ_RETURN_IF_FAILED(az_iot_hub_client_user_name_get(
+      &client->_internal.iot_hub_client, mqtt_user_name, mqtt_user_name_size, &written));
 
-  int32_t required_length
-      = az_span_size(pnp_model_id) + az_span_size(client->_internal.root_interface_name) + 2;
+  az_span mqtt_user_name_span = az_span_init((uint8_t*)mqtt_user_name, mqtt_user_name_size);
 
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, required_length);
+  int32_t required_length = written + az_span_size(pnp_model_id)
+      + az_span_size(client->_internal.root_interface_name) + 2;
+
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_user_name_span, required_length);
+
+  az_span remainder = az_span_slice_to_end(mqtt_user_name_span, written);
 
   remainder = az_span_copy_u8(remainder, pnp_client_param_separator);
   remainder = az_span_copy(remainder, pnp_model_id);
   remainder = az_span_copy_u8(remainder, pnp_client_param_equals);
-  az_span_copy(remainder, client->_internal.root_interface_name);
+  remainder = az_span_copy(remainder, client->_internal.root_interface_name);
+  az_span_copy_u8(remainder, null_terminator);
 
-  *out_mqtt_user_name = az_span_slice(mqtt_user_name, 0, written + required_length);
+  if(out_mqtt_user_name_length)
+  {
+    *out_mqtt_user_name_length = required_length;
+  }
 
   return AZ_OK;
 }
