@@ -49,7 +49,7 @@ static uint8_t url_decoded_buf[] = {
 static void test_url_encode(void** state)
 {
   (void)state;
-  uint8_t buffer[1000];
+  uint8_t buf[1000];
 
   {
     az_span buffer = AZ_SPAN_FROM_BUFFER(buf);
