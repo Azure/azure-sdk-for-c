@@ -29,8 +29,6 @@
 #ifndef NO_PRECONDITION_CHECKING
 enable_precondition_check_tests()
 
-// Tests
-
 static void az_iot_sas_token_get_document_NULL_document_fails(void** state)
 {
   (void)state;
