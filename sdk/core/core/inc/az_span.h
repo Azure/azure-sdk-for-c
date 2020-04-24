@@ -252,6 +252,8 @@ AZ_NODISCARD int32_t az_span_find(az_span source, az_span target);
  * @remarks The method assumes that the \p destination has a large enough size to hold the \p
  * source.
  * @remarks This method copies all of \p source into the \p destination even if they overlap.
+ * @remarks If \p source is an empty #az_span or #AZ_SPAN_NULL, this function will just return
+ * \p destination.
  */
 az_span az_span_copy(az_span destination, az_span source);
 

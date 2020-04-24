@@ -148,9 +148,6 @@ az_http_request_append_header(_az_http_request* p_request, az_span key, az_span 
 {
   AZ_PRECONDITION_NOT_NULL(p_request);
   AZ_PRECONDITION_VALID_SPAN(key, 1, false);
-  AZ_PRECONDITION_VALID_SPAN(value, 0, true);
-
-  AZ_PRECONDITION(az_span_size(key) > 0 || az_span_size(value) > 0);
 
   az_span headers = p_request->_internal.headers;
 
@@ -182,6 +179,20 @@ az_http_request_get_header(_az_http_request const* request, int32_t index, az_pa
   return AZ_OK;
 }
 
+/**
+ * @brief Get parts of an HTTP request. NULL in accepted to ignore getting any parts, for example,
+ * call this function like below to get only the http method and ignore getting url and body
+ *   az_http_request_get_parts(request, &method, NULL, NULL)`
+ *
+ * This function is expected to be used by transport layer only.
+ *
+ * @param request HTTP request to get parts from.
+ * @param out_method Pointer to write HTTP method to. Use NULL to ignore getting this value.
+ * @param out_url Pointer to write URL to. Use NULL to ignore getting this value.
+ * @param out_body Pointer to write HTTP request body to. Use NULL to ignore getting this value.
+ *
+ * @retval AZ_OK Success.
+ */
 AZ_NODISCARD az_result az_http_request_get_parts(
     _az_http_request const* request,
     az_http_method* out_method,

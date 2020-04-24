@@ -231,14 +231,14 @@ AZ_NODISCARD int32_t az_span_find(az_span source, az_span target)
 
 az_span az_span_copy(az_span destination, az_span source)
 {
-  // Implementations of memmove generally do the right thing when number of bytes to move is 0, even
-  // if the ptr is null, but given the behavior is documented to be undefined, we disallow it as a
-  // precondition.
-  AZ_PRECONDITION_VALID_SPAN(source, 0, true);
-
   int32_t src_size = az_span_size(source);
 
   AZ_PRECONDITION_VALID_SPAN(destination, src_size, false);
+
+  if (src_size == 0 || az_span_ptr(source) == NULL)
+  {
+    return destination;
+  }
 
   // Even though the contract of this method is that the destination must be larger than source, cap
   // the data move if the source is too large, to avoid memory corruption.
