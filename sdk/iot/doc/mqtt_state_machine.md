@@ -56,19 +56,17 @@ If SAS tokens are used the following APIs provide a way to create as well as ref
 _Example:_
 
 ```C
-if(az_failed(az_iot_hub_client_sas_signature_get(client, unix_time + 3600, signature, &signature)));
+if(az_failed(az_iot_hub_client_sas_get_signature(client, unix_time + 3600, signature, &signature)));
 {
     // error.
 }
 
 // Base64Encode the HMAC256 of the az_span_ptr(signature) with the Shared Access Key.
 
-if(az_failed(az_iot_hub_client_sas_password_get(client, base64_hmac_sha256_signature, NULL, password, &password)))
+if(az_failed(az_iot_hub_client_sas_get_password(client, base64_hmac_sha256_signature, NULL, password, password_size, &password_length)))
 {
     // error.
 }
-
-// Use az_span_ptr(password) and az_span_len(password).
 ```
 
 ### Subscribe to topics
