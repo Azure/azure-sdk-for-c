@@ -35,9 +35,7 @@ static const az_span test_signature = AZ_SPAN_LITERAL_FROM_STR(TEST_SIG);
 #ifndef NO_PRECONDITION_CHECKING
 enable_precondition_check_tests()
 
-    // Tests
-
-    static void az_iot_hub_client_sas_get_signature_NULL_signature_fails(void** state)
+static void az_iot_hub_client_sas_get_signature_NULL_signature_fails(void** state)
 {
   (void)state;
   az_iot_hub_client client;
