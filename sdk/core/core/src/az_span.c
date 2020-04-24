@@ -10,6 +10,7 @@
 
 #include <ctype.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 #include <_az_cfg.h>
 
@@ -150,6 +151,30 @@ AZ_NODISCARD az_result az_span_atou32(az_span span, uint32_t* out_number)
   }
 
   *out_number = value;
+  return AZ_OK;
+}
+
+AZ_NODISCARD az_result az_span_atod(az_span span, az_span* conversion_buffer, double* out_number)
+{
+  AZ_PRECONDITION_VALID_SPAN(span, 1, false);
+  AZ_PRECONDITION_NOT_NULL(out_number);
+
+  if (conversion_buffer == NULL)
+  {
+    // This means there is already an invalid character after the last digit to convert
+    *out_number = atof((char*)az_span_ptr(span));
+    return AZ_OK;
+  }
+
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(
+      *conversion_buffer, az_span_size(span) + 1 /*plus 1 for the extra char to be added*/);
+
+  // Copy content to conversion buffer
+  az_span remainder = az_span_copy(*conversion_buffer, span);
+  remainder = az_span_copy_u8(remainder, '\0');
+
+  // call atof with copied content plus invalid character at the end
+  *out_number = atof((char*)az_span_ptr(*conversion_buffer));
   return AZ_OK;
 }
 

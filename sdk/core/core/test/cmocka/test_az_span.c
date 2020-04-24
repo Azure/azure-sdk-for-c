@@ -751,6 +751,73 @@ static void az_span_u32toa_overflow_fails(void** state)
   assert_true(az_span_u32toa(buffer, v, &out_span) == AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
 }
 
+static void az_span_atod_test(void** state)
+{
+  (void)state;
+  uint8_t buff[10];
+  az_span buff_span = AZ_SPAN_FROM_BUFFER(buff);
+  az_span remainder = { 0 };
+  remainder = az_span_copy_u8(buff_span, '-');
+  remainder = az_span_copy_u8(remainder, '1');
+  remainder = az_span_copy_u8(remainder, '2');
+  remainder = az_span_copy_u8(remainder, '2');
+  remainder = az_span_copy_u8(remainder, '2');
+  remainder = az_span_copy_u8(remainder, '.');
+  remainder = az_span_copy_u8(remainder, '5');
+  remainder = az_span_copy_u8(remainder, '6');
+  remainder = az_span_copy_u8(remainder, '8');
+  remainder = az_span_copy_u8(remainder, '1');
+  double number = -1222.5681;
+
+  uint8_t convertion_buff[11];
+  az_span conv_span = AZ_SPAN_FROM_BUFFER(convertion_buff);
+
+  double result = 0;
+  assert_return_code(az_span_atod(buff_span, &conv_span, &result), AZ_OK);
+
+  assert_true(number - result < 0.00001);
+}
+
+static void az_span_atod_test_possitive(void** state)
+{
+  (void)state;
+  uint8_t buff[10];
+  az_span buff_span = AZ_SPAN_FROM_BUFFER(buff);
+  az_span remainder = { 0 };
+  remainder = az_span_copy_u8(buff_span, '9');
+  remainder = az_span_copy_u8(remainder, '1');
+  remainder = az_span_copy_u8(remainder, '2');
+  remainder = az_span_copy_u8(remainder, '2');
+  remainder = az_span_copy_u8(remainder, '2');
+  remainder = az_span_copy_u8(remainder, '.');
+  remainder = az_span_copy_u8(remainder, '5');
+  remainder = az_span_copy_u8(remainder, '6');
+  remainder = az_span_copy_u8(remainder, '8');
+  remainder = az_span_copy_u8(remainder, '1');
+  double number = 91222.5681;
+
+  uint8_t convertion_buff[11];
+  az_span conv_span = AZ_SPAN_FROM_BUFFER(convertion_buff);
+
+  double result = 0;
+  assert_return_code(az_span_atod(buff_span, &conv_span, &result), AZ_OK);
+
+  assert_true(number - result < 0.00001);
+}
+
+static void az_span_atod_test_no_extra_buffer(void** state)
+{
+  (void)state;
+  // this will be zero terminated
+  az_span buff_span = AZ_SPAN_FROM_STR("-1222.568");
+  double number = -1222.568;
+
+  double result = 0;
+  assert_return_code(az_span_atod(buff_span, NULL, &result), AZ_OK);
+
+  assert_true(number - result < 0.00001);
+}
+
 int test_az_span()
 {
   const struct CMUnitTest tests[] = {
@@ -789,6 +856,9 @@ int test_az_span()
     cmocka_unit_test(az_span_u32toa_zero_succeeds),
     cmocka_unit_test(az_span_u32toa_max_uint_succeeds),
     cmocka_unit_test(az_span_u32toa_overflow_fails),
+    cmocka_unit_test(az_span_atod_test),
+    cmocka_unit_test(az_span_atod_test_no_extra_buffer),
+    cmocka_unit_test(az_span_atod_test_possitive),
   };
   return cmocka_run_group_tests_name("az_core_span", tests, NULL, NULL);
 }
