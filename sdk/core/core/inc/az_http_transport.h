@@ -96,7 +96,7 @@ az_http_request_get_header(_az_http_request const* request, int32_t index, az_pa
  * getting this value.
  * @param[out] out_url __[nullable]__ Pointer to write URL to. Use `NULL` to ignore getting this
  * value.
- * @param[out] out_bodyp __[nullable]__ Pointer to write HTTP request body to. Use `NULL` to ignore
+ * @param[out] out_body __[nullable]__ Pointer to write HTTP request body to. Use `NULL` to ignore
  * getting this value.
  *
  * @retval AZ_OK Success.
