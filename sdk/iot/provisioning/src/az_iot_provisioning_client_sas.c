@@ -14,6 +14,7 @@
 #define LF '\n'
 #define AMPERSAND '&'
 #define EQUAL_SIGN '='
+#define STRING_NULL_TERMINATOR '\0'
 #define SCOPE_REGISTRATIONS_STRING "%2fregistrations%2f"
 #define SAS_TOKEN_SR "SharedAccessSignature sr"
 #define SAS_TOKEN_SE "se"
@@ -42,15 +43,16 @@ AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_signature(
   // Where
   // resource-string: <scope-id>/registrations/<registration-id>
 
-  int32_t required_size = az_span_size(client->_internal.id_scope)
-      + az_span_size(client->_internal.registration_id) + az_span_size(resources_string)
-      + u32toa_size(token_expiration_epoch_time)
-      + 1; // 1 is for one line feed character.
+  int32_t required_size = 
+      az_span_size(client->_internal.id_scope)
+      + az_span_size(resources_string)
+      + az_span_size(client->_internal.registration_id)
+      + 1 // LF
+      + az_u32toa_size(token_expiration_epoch_time);
+
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(signature, required_size);
 
   az_span remainder = signature;
-
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, required_size);
-
   remainder = az_span_copy(remainder, client->_internal.id_scope);
   remainder = az_span_copy(remainder, resources_string);
   remainder = az_span_copy(remainder, client->_internal.registration_id);
@@ -85,52 +87,64 @@ AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_password(
   // Where:
   // resource-string: <scope-id>/registrations/<registration-id>
 
-  int32_t required_size = az_span_size(sr_string) + az_span_size(resources_string)
-      + az_span_size(sig_string) + az_span_size(se_string)
-      + az_span_size(client->_internal.id_scope) + az_span_size(client->_internal.registration_id)
+  int32_t required_size = 
+      az_span_size(sr_string) 
+      + 1 // EQUAL_SIGN
+      + az_span_size(client->_internal.id_scope) 
+      + az_span_size(resources_string)
+      + az_span_size(client->_internal.registration_id)
+      + 1 // AMPERSAND
+      + az_span_size(sig_string) 
+      + 1 // EQUAL_SIGN
       + az_span_size(base64_hmac_sha256_signature)
-      + u32toa_size(token_expiration_epoch_time) 
-      + 6; // Number of ampersands, equal signs and null terminator.
+      + 1 // AMPERSAND
+      + az_span_size(se_string)
+      + 1 // EQUAL_SIGN
+      + az_u32toa_size(token_expiration_epoch_time) 
+      + 1; // STRING_NULL_TERMINATOR
 
   if (az_span_size(key_name) > 0)
   {
-    required_size += az_span_size(skn_string) + az_span_size(key_name)
-        + 2; // 2 is for one ampersand and one equal sign.
+      required_size += 
+      1 // AMPERSAND
+      + az_span_size(skn_string) 
+      + 1 // EQUAL_SIGN
+      + az_span_size(key_name);
   }
 
-  az_span remainder = az_span_init((uint8_t*)mqtt_password, (int32_t)mqtt_password_size);
+  az_span mqtt_password_span = az_span_init((uint8_t*)mqtt_password, (int32_t)mqtt_password_size);
 
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, required_size);
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_password_span, required_size);
 
   // SharedAccessSignature, resource string
-  remainder = az_span_copy(remainder, sr_string);
-  remainder = az_span_copy_u8(remainder, EQUAL_SIGN);
-  remainder = az_span_copy(remainder, client->_internal.id_scope);
-  remainder = az_span_copy(remainder, resources_string);
-  remainder = az_span_copy(remainder, client->_internal.registration_id);
+  mqtt_password_span = az_span_copy(mqtt_password_span, sr_string);
+  mqtt_password_span = az_span_copy_u8(mqtt_password_span, EQUAL_SIGN);
+  mqtt_password_span = az_span_copy(mqtt_password_span, client->_internal.id_scope);
+  mqtt_password_span = az_span_copy(mqtt_password_span, resources_string);
+  mqtt_password_span = az_span_copy(mqtt_password_span, client->_internal.registration_id);
 
   // Signature
-  remainder = az_span_copy_u8(remainder, AMPERSAND);
-  remainder = az_span_copy(remainder, sig_string);
-  remainder = az_span_copy_u8(remainder, EQUAL_SIGN);
-  remainder = az_span_copy(remainder, base64_hmac_sha256_signature);
+  mqtt_password_span = az_span_copy_u8(mqtt_password_span, AMPERSAND);
+  mqtt_password_span = az_span_copy(mqtt_password_span, sig_string);
+  mqtt_password_span = az_span_copy_u8(mqtt_password_span, EQUAL_SIGN);
+  mqtt_password_span = az_span_copy(mqtt_password_span, base64_hmac_sha256_signature);
 
   // Expiration
-  remainder = az_span_copy_u8(remainder, AMPERSAND);
-  remainder = az_span_copy(remainder, se_string);
-  remainder = az_span_copy_u8(remainder, EQUAL_SIGN);
-  AZ_RETURN_IF_FAILED(az_span_u32toa(remainder, token_expiration_epoch_time, &remainder));
+  mqtt_password_span = az_span_copy_u8(mqtt_password_span, AMPERSAND);
+  mqtt_password_span = az_span_copy(mqtt_password_span, se_string);
+  mqtt_password_span = az_span_copy_u8(mqtt_password_span, EQUAL_SIGN);
+  AZ_RETURN_IF_FAILED(az_span_u32toa(mqtt_password_span, token_expiration_epoch_time, &mqtt_password_span));
 
   if (az_span_size(key_name) > 0)
   {
     // Key Name
-    remainder = az_span_copy_u8(remainder, AMPERSAND);
-    remainder = az_span_copy(remainder, skn_string);
-    remainder = az_span_copy_u8(remainder, EQUAL_SIGN);
-    remainder = az_span_copy(remainder, key_name);
+    mqtt_password_span = az_span_copy_u8(mqtt_password_span, AMPERSAND);
+    mqtt_password_span = az_span_copy(mqtt_password_span, skn_string);
+    mqtt_password_span = az_span_copy_u8(mqtt_password_span, EQUAL_SIGN);
+    mqtt_password_span = az_span_copy(mqtt_password_span, key_name);
   }
 
-  remainder = az_span_copy_u8(remainder, '\0');
+  mqtt_password_span = az_span_copy_u8(mqtt_password_span, STRING_NULL_TERMINATOR);
 
   if (out_mqtt_password_length != NULL)
   {
