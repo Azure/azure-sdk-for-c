@@ -80,10 +80,12 @@ AZ_NODISCARD az_result az_iot_pnp_client_init(
  * {iothubhostname}/{device_id}/?api-version=2018-06-30&{user_agent}&digital-twin-model-id={root_interface_name}
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
- * @param[out] mqtt_user_name A char buffer with sufficient capacity to hold the MQTT user name.
- * @param[in] mqtt_user_name_size The size of the passed buffer. Must be greater than 0.
- * @param[out] out_mqtt_user_name_length The optional output length of the mqtt user name. Can
- * be `NULL`.
+ * @param[out] mqtt_user_name A buffer with sufficient capacity to hold the MQTT user name.
+ *                            If successful, contains a null-terminated string with the user name
+ *                            that needs to be passed to the MQTT client.
+ * @param[in] mqtt_user_name_size The size, in bytes of \p mqtt_user_name.
+ * @param[out] out_mqtt_user_name_length __[nullable]__ Contains the string length, in bytes, of
+ *                                                      \p mqtt_user_name. Can be `NULL`.
  * @return #az_result
  */
 AZ_NODISCARD az_result az_iot_pnp_client_get_user_name(
@@ -99,10 +101,12 @@ AZ_NODISCARD az_result az_iot_pnp_client_get_user_name(
  * {device_id}
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
- * @param[out] mqtt_client_id A char buffer with sufficient capacity to hold the MQTT client id.
- * @param[in] mqtt_client_id_size The size of the passed buffer. Must be greater than 0.
- * @param[out] out_mqtt_client_id_length The optional output length of the mqtt client id. Can
- * be `NULL`.
+ * @param[out] mqtt_client_id A buffer with sufficient capacity to hold the MQTT client id.
+ *                            If successful, contains a null-terminated string with the client id
+ *                            that needs to be passed to the MQTT client.
+ * @param[in] mqtt_client_id_size The size, in bytes of \p mqtt_client_id.
+ * @param[out] out_mqtt_client_id_length __[nullable]__ Contains the string length, in bytes, of
+ *                                                      of \p mqtt_client_id. Can be `NULL`.
  * @return #az_result
  */
 AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_id(
@@ -205,12 +209,13 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_sas_password(
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in] component_name An #az_span specifying the component name to publish telemetry on.
- * @param[out] mqtt_topic A char buffer with sufficient capacity to hold the MQTT topic
- * filter. On success, will be `NULL` terminated.
- * @param[in] mqtt_topic_size The size of the passed buffer. Must be greater than 0.
+ * @param[out] mqtt_topic A buffer with sufficient capacity to hold the MQTT topic. If
+ *                        successful, contains a null-terminated string with the topic that
+ *                        needs to be passed to the MQTT client.
+ * @param[in] mqtt_topic_size The size, in bytes of \p mqtt_topic.
  * @param[in] reserved Reserved for future use.  Must be NULL.
- * @param[out] out_mqtt_topic_length The optional output length of the mqtt topic filter. Can
- * be `NULL`.
+ * @param[out] out_mqtt_topic_length __[nullable]__ Contains the string length, in bytes, of
+ *                                                  \p mqtt_topic. Can be `NULL`.
  * @return #az_result
  */
 AZ_NODISCARD az_result az_iot_pnp_client_telemetry_get_publish_topic(

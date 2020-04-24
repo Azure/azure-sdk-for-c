@@ -91,10 +91,12 @@ AZ_NODISCARD az_result az_iot_hub_client_init(
  * {iothubhostname}/{device_id}/{module_id}/?api-version=2018-06-30&{user_agent}
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
- * @param[out] mqtt_user_name A char buffer with sufficient capacity to hold the MQTT user name.
- * @param[in] mqtt_user_name_size The size of the passed buffer. Must be greater than 0.
- * @param[out] out_mqtt_user_name_length The optional output length of the mqtt user name. Can
- * be `NULL`.
+ * @param[out] mqtt_user_name A buffer with sufficient capacity to hold the MQTT user name.
+ *                            If successful, contains a null-terminated string with the user name
+ *                            that needs to be passed to the MQTT client.
+ * @param[in] mqtt_user_name_size The size, in bytes of \p mqtt_user_name.
+ * @param[out] out_mqtt_user_name_length __[nullable]__ Contains the string length, in bytes, of
+ *                                                      \p mqtt_user_name. Can be `NULL`.
  * @return #az_result.
  */
 AZ_NODISCARD az_result az_iot_hub_client_user_name_get(
@@ -111,10 +113,12 @@ AZ_NODISCARD az_result az_iot_hub_client_user_name_get(
  * [Format with module id] {device_id}/{module_id}
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
- * @param[out] mqtt_client_id A char buffer with sufficient capacity to hold the MQTT client id.
- * @param[in] mqtt_client_id_size The size of the passed buffer. Must be greater than 0.
- * @param[out] out_mqtt_client_id_length The optional output length of the mqtt client id. Can
- * be `NULL`.
+ * @param[out] mqtt_client_id A buffer with sufficient capacity to hold the MQTT client id.
+ *                            If successful, contains a null-terminated string with the client id
+ *                            that needs to be passed to the MQTT client.
+ * @param[in] mqtt_client_id_size The size, in bytes of \p mqtt_client_id.
+ * @param[out] out_mqtt_client_id_length __[nullable]__ Contains the string length, in bytes, of
+ *                                                      of \p mqtt_client_id. Can be `NULL`.
  * @return #az_result
  */
 AZ_NODISCARD az_result az_iot_hub_client_id_get(
@@ -300,11 +304,12 @@ az_iot_hub_client_properties_next(az_iot_hub_client_properties* properties, az_p
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
  * @param[in] properties An optional #az_iot_hub_client_properties object (can be NULL).
- * @param[out] mqtt_topic A char buffer with sufficient capacity to hold the MQTT topic
- * filter. On success, will be `NULL` terminated.
- * @param[in] mqtt_topic_size The size of the passed buffer. Must be greater than 0.
- * @param[out] out_mqtt_topic_length The optional output length of the mqtt topic filter. Can
- * be `NULL`.
+ * @param[out] mqtt_topic A buffer with sufficient capacity to hold the MQTT topic. If
+ *                        successful, contains a null-terminated string with the topic that
+ *                        needs to be passed to the MQTT client.
+ * @param[in] mqtt_topic_size The size, in bytes of \p mqtt_topic.
+ * @param[out] out_mqtt_topic_length __[nullable]__ Contains the string length, in bytes, of
+ *                                                  \p mqtt_topic. Can be `NULL`.
  * @return #az_result
  */
 AZ_NODISCARD az_result az_iot_hub_client_telemetry_get_publish_topic(
@@ -325,11 +330,12 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_get_publish_topic(
  * @note C2D MQTT Publish messages will have QoS At Least Once (1).
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
- * @param[out] mqtt_topic_filter A char buffer with sufficient capacity to hold the MQTT topic
- *                              filter. On success, will be `NULL` terminated.
- * @param[in] mqtt_topic_filter_size The size of the passed buffer. Must be greater than 0.
- * @param[out] out_mqtt_topic_filter_length The optional output length of the mqtt topic filter. Can
- * be `NULL`.
+ * @param[out] mqtt_topic_filter A buffer with sufficient capacity to hold the MQTT topic filter.
+ *                               If successful, contains a null-terminated string with the topic
+ *                               filter that needs to be passed to the MQTT client.
+ * @param[in] mqtt_topic_filter_size The size, in bytes of \p mqtt_topic_filter.
+ * @param[out] out_mqtt_topic_filter_length __[nullable]__ Contains the string length, in bytes, of
+ *                                                         \p mqtt_topic_filter. Can be `NULL`.
  * @return #az_result
  */
 AZ_NODISCARD az_result az_iot_hub_client_c2d_get_subscribe_topic_filter(
@@ -371,11 +377,12 @@ AZ_NODISCARD az_result az_iot_hub_client_c2d_parse_received_topic(
  * @brief Gets the MQTT topic filter to subscribe to method requests.
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
- * @param[out] mqtt_topic_filter A char buffer with sufficient capacity to hold the MQTT topic
- *                              filter. On success, will be `NULL` terminated.
- * @param[in] mqtt_topic_filter_size The size of the passed buffer. Must be greater than 0.
- * @param[out] out_mqtt_topic_filter_length The optional output length of the mqtt topic filter. Can
- * be `NULL`.
+ * @param[out] mqtt_topic_filter A buffer with sufficient capacity to hold the MQTT topic filter.
+ *                               If successful, contains a null-terminated string with the topic
+ *                               filter that needs to be passed to the MQTT client.
+ * @param[in] mqtt_topic_filter_size The size, in bytes of \p mqtt_topic_filter.
+ * @param[out] out_mqtt_topic_filter_length __[nullable]__ Contains the string length, in bytes, of
+ *                                                         \p mqtt_topic_filter. Can be `NULL`.
  * @return #az_result
  */
 AZ_NODISCARD az_result az_iot_hub_client_methods_get_subscribe_topic_filter(
@@ -416,11 +423,12 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_parse_received_topic(
  * @param[in] request_id The request id. Must match a received #az_iot_hub_client_method_request
  *                       request_id.
  * @param[in] status The status. Must be 200 for "OK", 404 for "error", or 504 for "timeout"
- * @param[out] mqtt_topic A char buffer with sufficient capacity to hold the MQTT topic
- *                              filter. On success, will be `NULL` terminated.
- * @param[in] mqtt_topic_size The size of the passed buffer. Must be greater than 0.
- * @param[out] out_mqtt_topic_length The optional output length of the mqtt topic filter. Can
- * be `NULL`.
+ * @param[out] mqtt_topic A buffer with sufficient capacity to hold the MQTT topic. If
+ *                        successful, contains a null-terminated string with the topic that
+ *                        needs to be passed to the MQTT client.
+ * @param[in] mqtt_topic_size The size, in bytes of \p mqtt_topic.
+ * @param[out] out_mqtt_topic_length __[nullable]__ Contains the string length, in bytes, of
+ *                                                  \p mqtt_topic. Can be `NULL`.
  * @return #az_result
  */
 AZ_NODISCARD az_result az_iot_hub_client_methods_get_response_publish_topic(
@@ -441,11 +449,12 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_get_response_publish_topic(
  * @brief Gets the MQTT topic filter to subscribe to twin operation responses.
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
- * @param[out] mqtt_topic_filter A char buffer with sufficient capacity to hold the MQTT topic
- *                              filter. On success, will be `NULL` terminated.
- * @param[in] mqtt_topic_filter_size The size of the passed buffer. Must be greater than 0.
- * @param[out] out_mqtt_topic_filter_length The optional output length of the mqtt topic filter. Can
- * be `NULL`.
+ * @param[out] mqtt_topic_filter A buffer with sufficient capacity to hold the MQTT topic filter.
+ *                               If successful, contains a null-terminated string with the topic
+ *                               filter that needs to be passed to the MQTT client.
+ * @param[in] mqtt_topic_filter_size The size, in bytes of \p mqtt_topic_filter.
+ * @param[out] out_mqtt_topic_filter_length __[nullable]__ Contains the string length, in bytes, of
+ *                                                         \p mqtt_topic_filter. Can be `NULL`.
  * @return #az_result
  */
 AZ_NODISCARD az_result az_iot_hub_client_twin_get_response_subscribe_topic_filter(
@@ -459,11 +468,12 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_get_response_subscribe_topic_filte
  * @note The payload will contain only changes made to the desired properties.
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
- * @param[out] mqtt_topic_filter A char buffer with sufficient capacity to hold the MQTT topic
- *                              filter. On success, will be `NULL` terminated.
- * @param[in] mqtt_topic_filter_size The size of the passed buffer. Must be greater than 0.
- * @param[out] out_mqtt_topic_filter_length The optional output length of the mqtt topic filter. Can
- * be `NULL`.
+ * @param[out] mqtt_topic_filter A buffer with sufficient capacity to hold the MQTT topic filter.
+ *                               If successful, contains a null-terminated string with the topic
+ *                               filter that needs to be passed to the MQTT client.
+ * @param[in] mqtt_topic_filter_size The size, in bytes of \p mqtt_topic_filter.
+ * @param[out] out_mqtt_topic_filter_length __[nullable]__ Contains the string length, in bytes, of
+ *                                                         \p mqtt_topic_filter. Can be `NULL`.
  * @return #az_result
  */
 AZ_NODISCARD az_result az_iot_hub_client_twin_get_patch_subscribe_topic_filter(
@@ -520,11 +530,12 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
  * @param[in] request_id The request id.
- * @param[out] mqtt_topic A char buffer with sufficient capacity to hold the MQTT topic
- *                              filter. On success, will be `NULL` terminated.
- * @param[in] mqtt_topic_size The size of the passed buffer. Must be greater than 0.
- * @param[out] out_mqtt_topic_length The optional output length of the mqtt topic filter. Can
- * be `NULL`.
+ * @param[out] mqtt_topic A buffer with sufficient capacity to hold the MQTT topic. If
+ *                        successful, contains a null-terminated string with the topic that
+ *                        needs to be passed to the MQTT client.
+ * @param[in] mqtt_topic_size The size, in bytes of \p mqtt_topic.
+ * @param[out] out_mqtt_topic_length __[nullable]__ Contains the string length, in bytes, of
+ *                                                  \p mqtt_topic. Can be `NULL`.
  * @return #az_result
  */
 AZ_NODISCARD az_result az_iot_hub_client_twin_get_get_publish_topic(
@@ -541,11 +552,12 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_get_get_publish_topic(
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
  * @param[in] request_id The request id.
- * @param[out] mqtt_topic A char buffer with sufficient capacity to hold the MQTT topic
- *                              filter. On success, will be `NULL` terminated.
- * @param[in] mqtt_topic_size The size of the passed buffer. Must be greater than 0.
- * @param[out] out_mqtt_topic_length The optional output length of the mqtt topic filter. Can
- * be `NULL`.
+ * @param[out] mqtt_topic A buffer with sufficient capacity to hold the MQTT topic. If
+ *                        successful, contains a null-terminated string with the topic that
+ *                        needs to be passed to the MQTT client.
+ * @param[in] mqtt_topic_size The size, in bytes of \p mqtt_topic.
+ * @param[out] out_mqtt_topic_length __[nullable]__ Contains the string length, in bytes, of
+ *                                                  \p mqtt_topic. Can be `NULL`.
  * @return #az_result
  */
 AZ_NODISCARD az_result az_iot_hub_client_twin_get_patch_publish_topic(
