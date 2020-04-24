@@ -43,13 +43,14 @@ AZ_NODISCARD az_result az_iot_hub_client_sas_get_signature(
   int32_t required_size = az_span_size(client->_internal.iot_hub_hostname)
       + az_span_size(devices_string)
       + az_span_size(client->_internal.device_id)
-      + (int32_t)sizeof(LF)
+      + 1 // LF
       + u32toa_size(token_expiration_epoch_time);
 
   if (az_span_size(client->_internal.options.module_id) > 0)
   {
-    required_size
-        += + az_span_size(modules_string) + az_span_size(client->_internal.options.module_id);
+    required_size += 
+        az_span_size(modules_string) 
+        + az_span_size(client->_internal.options.module_id);
   }
 
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(signature, required_size);
@@ -70,7 +71,7 @@ AZ_NODISCARD az_result az_iot_hub_client_sas_get_signature(
 
   AZ_RETURN_IF_FAILED(az_span_u32toa(remainder, token_expiration_epoch_time, &remainder));
 
-  *out_signature = az_span_slice(signature, 0, _az_span_diff(remainder, signature));
+  *out_signature = az_span_slice(signature, 0, required_size);
 
   return AZ_OK;
 }
@@ -96,19 +97,19 @@ AZ_NODISCARD az_result az_iot_hub_client_sas_get_password(
   // This does not account for the size of `token_expiration_epoch_time`, which will be handled by az_span_u32toa.
   int32_t required_size = 
       az_span_size(sr_string) 
-      + (int32_t)sizeof(EQUAL_SIGN)
+      + 1 // EQUAL_SIGN
       + az_span_size(client->_internal.iot_hub_hostname)
       + az_span_size(devices_string)
       + az_span_size(client->_internal.device_id)
-      + (int32_t)sizeof(AMPERSAND)
+      + 1 // AMPERSAND
       + az_span_size(sig_string) 
-      + (int32_t)sizeof(EQUAL_SIGN)
+      + 1 // EQUAL_SIGN
       + az_span_size(base64_hmac_sha256_signature)
-      + (int32_t)sizeof(AMPERSAND)
+      + 1 // AMPERSAND
       + az_span_size(se_string) 
-      + (int32_t)sizeof(EQUAL_SIGN)
+      + 1 // EQUAL_SIGN
       + u32toa_size(token_expiration_epoch_time)
-      + (int32_t)sizeof(STRING_NULL_TERMINATOR);
+      + 1; // STRING_NULL_TERMINATOR
 
   if (az_span_size(client->_internal.options.module_id) > 0)
   {
@@ -120,9 +121,9 @@ AZ_NODISCARD az_result az_iot_hub_client_sas_get_password(
   if (az_span_size(key_name) > 0)
   {
     required_size += 
-        + (int32_t)sizeof(AMPERSAND)
+        1 // AMPERSAND
         + az_span_size(skn_string) 
-        + (int32_t)sizeof(EQUAL_SIGN)
+        + 1 // EQUAL_SIGN
         + az_span_size(key_name);
   }
 
@@ -167,12 +168,13 @@ AZ_NODISCARD az_result az_iot_hub_client_sas_get_password(
     mqtt_password_span = az_span_copy(mqtt_password_span, key_name);
   }
 
+  mqtt_password_span = az_span_copy_u8(mqtt_password_span, STRING_NULL_TERMINATOR);
+
   if (out_mqtt_password_length != NULL)
   {
-    *out_mqtt_password_length = (mqtt_password_size - (size_t)az_span_size(mqtt_password_span));
+    *out_mqtt_password_length = ((size_t)required_size - 1);
   }
 
-  mqtt_password_span = az_span_copy_u8(mqtt_password_span, STRING_NULL_TERMINATOR);
 
   return AZ_OK;
 }

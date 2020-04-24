@@ -121,7 +121,7 @@ static void az_iot_hub_client_sas_get_signature_device_succeeds(void** state)
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
 
-  const char* expected_signature
+  const char expected_signature[]
       = TEST_DEVICE_HOSTNAME_STR "/devices/" TEST_DEVICE_ID_STR "\n" TEST_EXPIRATION_STR;
 
   uint8_t signature_buffer[TEST_SPAN_BUFFER_SIZE];
@@ -132,7 +132,7 @@ static void az_iot_hub_client_sas_get_signature_device_succeeds(void** state)
       &client, test_sas_expiry_time_secs, signature, &out_signature)));
 
   az_span_for_test_verify(
-      out_signature, expected_signature, (int32_t)strlen(expected_signature), signature, TEST_SPAN_BUFFER_SIZE);
+      out_signature, expected_signature, sizeof(expected_signature) - 1, signature, TEST_SPAN_BUFFER_SIZE);
 }
 
 static void az_iot_hub_client_sas_get_signature_module_succeeds(void** state)
