@@ -4,5 +4,5 @@
 // Placeholder for int test_iot_provisioning_(); declarations
 
 int test_az_iot_provisioning_client();
-int test_az_iot_provisioning_client_register();
 int test_az_iot_provisioning_client_sas_token();
+int test_az_iot_provisioning_client_parser();

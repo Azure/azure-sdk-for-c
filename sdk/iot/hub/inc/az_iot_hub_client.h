@@ -5,6 +5,8 @@
  * @file az_iot_hub_client.h
  *
  * @brief definition for the Azure IoT Hub client.
+ * @note The IoT Hub MQTT protocol is described at 
+ * https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-mqtt-support
  */
 
 #ifndef _az_IOT_HUB_CLIENT_H
@@ -129,6 +131,9 @@ AZ_NODISCARD az_result az_iot_hub_client_id_get(
  * @details The application must obtain a valid clear-text signature using this API, sign it using
  *          HMAC-SHA256 using the Shared Access Key as password then Base64 encode the result.
  *
+ * @note More information available at
+ * https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-devguide-security#security-tokens
+ * 
  * @param[in] client The #az_iot_hub_client to use for this call.
  * @param[in] token_expiration_epoch_time The time, in seconds, from 1/1/1970.
  * @param[in] signature An empty #az_span with sufficient capacity to hold the SAS signature.
