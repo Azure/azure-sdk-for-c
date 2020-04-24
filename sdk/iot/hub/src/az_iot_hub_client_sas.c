@@ -44,7 +44,7 @@ AZ_NODISCARD az_result az_iot_hub_client_sas_get_signature(
       + az_span_size(devices_string)
       + az_span_size(client->_internal.device_id)
       + 1 // LF
-      + u32toa_size(token_expiration_epoch_time);
+      + az_u32toa_size(token_expiration_epoch_time);
 
   if (az_span_size(client->_internal.options.module_id) > 0)
   {
@@ -108,7 +108,7 @@ AZ_NODISCARD az_result az_iot_hub_client_sas_get_password(
       + 1 // AMPERSAND
       + az_span_size(se_string) 
       + 1 // EQUAL_SIGN
-      + u32toa_size(token_expiration_epoch_time)
+      + az_u32toa_size(token_expiration_epoch_time)
       + 1; // STRING_NULL_TERMINATOR
 
   if (az_span_size(client->_internal.options.module_id) > 0)

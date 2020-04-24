@@ -129,7 +129,7 @@ AZ_NODISCARD az_span az_span_token(az_span source, az_span delimiter, az_span* o
  * @return The length (not considering null terminator) of the string that would represent the given
  * number.
  */
-AZ_NODISCARD int32_t u32toa_size(uint32_t number);
+AZ_NODISCARD int32_t az_u32toa_size(uint32_t number);
 
 #include <_az_cfg_suffix.h>
 
