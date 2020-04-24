@@ -805,6 +805,31 @@ static void az_span_atod_test_possitive(void** state)
   assert_true(number - result < 0.00001);
 }
 
+static void az_span_atod_test_not_enough_space(void** state)
+{
+  (void)state;
+  uint8_t buff[10];
+  az_span buff_span = AZ_SPAN_FROM_BUFFER(buff);
+  az_span remainder = { 0 };
+  remainder = az_span_copy_u8(buff_span, '9');
+  remainder = az_span_copy_u8(remainder, '1');
+  remainder = az_span_copy_u8(remainder, '2');
+  remainder = az_span_copy_u8(remainder, '2');
+  remainder = az_span_copy_u8(remainder, '2');
+  remainder = az_span_copy_u8(remainder, '.');
+  remainder = az_span_copy_u8(remainder, '5');
+  remainder = az_span_copy_u8(remainder, '6');
+  remainder = az_span_copy_u8(remainder, '8');
+  remainder = az_span_copy_u8(remainder, '1');
+
+  uint8_t convertion_buff[10];
+  az_span conv_span = AZ_SPAN_FROM_BUFFER(convertion_buff);
+
+  double result = 0;
+  az_result result_op = az_span_atod(buff_span, &conv_span, &result);
+  assert_true(result_op == AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+}
+
 static void az_span_atod_test_no_extra_buffer(void** state)
 {
   (void)state;
@@ -859,6 +884,7 @@ int test_az_span()
     cmocka_unit_test(az_span_atod_test),
     cmocka_unit_test(az_span_atod_test_no_extra_buffer),
     cmocka_unit_test(az_span_atod_test_possitive),
+    cmocka_unit_test(az_span_atod_test_not_enough_space),
   };
   return cmocka_run_group_tests_name("az_core_span", tests, NULL, NULL);
 }
