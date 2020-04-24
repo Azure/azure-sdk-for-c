@@ -13,6 +13,7 @@ include(AddTestCMocka)
 add_cmocka_test(${TARGET_NAME} SOURCES
                 main.c
                 test_az_iot_provisioning_client.c
+                test_az_iot_provisioning_client_sas.c
                 test_az_iot_provisioning_client_parser.c
                 COMPILE_OPTIONS ${DEFAULT_C_COMPILE_FLAGS}
                 LINK_TARGETS
