@@ -4,6 +4,8 @@
 #include "az_aad_private.h"
 #include "az_test_definitions.h"
 
+#include <az_span_internal.h>
+
 #include <stdarg.h>
 #include <stddef.h>
 
@@ -14,8 +16,6 @@
 #include <cmocka.h>
 
 #include <_az_cfg.h>
-
-#define TEST_EXPECT_SUCCESS(exp) assert_true(az_succeeded(exp))
 
 static az_span url_encoded = AZ_SPAN_LITERAL_FROM_STR(
     "%00%01%02%03%04%05%06%07%08%09%0A%0B%0C%0D%0E%0F%10%11%12%13%14%15%16%17%18%19%1A%1B%1C%1D%1E%"
@@ -49,19 +49,27 @@ static uint8_t url_decoded_buf[] = {
 static void test_url_encode(void** state)
 {
   (void)state;
-  uint8_t buf[1000];
+  uint8_t buf[256 * 3] = { 0 };
+  az_span buffer = AZ_SPAN_FROM_BUFFER(buf);
 
   {
-    az_span buffer = AZ_SPAN_FROM_BUFFER(buf);
-    TEST_EXPECT_SUCCESS(_az_url_encode(AZ_SPAN_FROM_STR("https://vault.azure.net"), &buffer));
+    az_span remainder = buffer;
+
     assert_true(
-        az_span_is_content_equal(buffer, AZ_SPAN_FROM_STR("https%3A%2F%2Fvault.azure.net")));
+        az_succeeded(_az_url_encode(AZ_SPAN_FROM_STR("https://vault.azure.net"), &remainder)));
+
+    assert_true(az_span_is_content_equal(
+        az_span_slice(_az_span_diff(remainder, buffer)),
+        AZ_SPAN_FROM_STR("https%3A%2F%2Fvault.azure.net")));
   }
 
   {
-    az_span buffer = AZ_SPAN_FROM_BUFFER(buf);
-    TEST_EXPECT_SUCCESS(_az_url_encode(AZ_SPAN_FROM_BUFFER(url_decoded_buf), &buffer));
-    assert_true(az_span_is_content_equal(buffer, url_encoded));
+    az_span remainder = buffer;
+
+    assert_true(az_succeeded(_az_url_encode(AZ_SPAN_FROM_BUFFER(url_decoded_buf), &buffer)));
+
+    assert_true(
+        az_span_is_content_equal(az_span_slice(_az_span_diff(remainder, buffer)), , url_encoded));
   }
 }
 
