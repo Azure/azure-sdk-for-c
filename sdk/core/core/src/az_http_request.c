@@ -199,3 +199,8 @@ AZ_NODISCARD az_result az_http_request_get_parts(
   }
   return AZ_OK;
 }
+
+AZ_NODISCARD int32_t _az_http_request_headers_count(_az_http_request const* request)
+{
+  return request->_internal.headers_length;
+}

@@ -96,6 +96,8 @@ az_http_request_get_header(_az_http_request const* request, int32_t index, az_pa
  * getting this value.
  * @param[out] out_url __[nullable]__ Pointer to write URL to. Use `NULL` to ignore getting this
  * value.
+ * @param[out] out_url_length __[nullable]__ Pointer to write URL length to. Use `NUL` to ignore
+ * getting this value.
  * @param[out] out_body __[nullable]__ Pointer to write HTTP request body to. Use `NULL` to ignore
  * getting this value.
  *
@@ -106,6 +108,19 @@ AZ_NODISCARD az_result az_http_request_get_parts(
     az_http_method* out_method,
     az_span* out_url,
     az_span* out_body);
+
+AZ_NODISCARD az_result az_http_response_write_span(az_http_response* response, az_span write);
+AZ_NODISCARD az_result az_http_response_write_u8(az_http_response* response, uint8_t byte);
+
+/**
+ * @brief Returns the count of headers on the request
+ *        Each header is an az_pair
+ *
+ */
+AZ_NODISCARD int32_t _az_http_request_headers_count(_az_http_request const* request);
+
+AZ_NODISCARD az_result
+az_http_client_send_request(_az_http_request* p_request, az_http_response* p_response);
 
 #include <_az_cfg_suffix.h>
 

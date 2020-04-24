@@ -268,3 +268,35 @@ void _az_http_response_reset(az_http_response* http_response)
   az_result result = az_http_response_init(http_response, http_response->_internal.http_response);
   (void)result;
 }
+
+static az_span _az_http_response_get_remaining(az_http_response const* response)
+{
+  return az_span_slice_to_end(response->_internal.http_response, response->_internal.written);
+}
+
+AZ_NODISCARD az_result az_http_response_write_span(az_http_response* response, az_span write)
+{
+  AZ_PRECONDITION_NOT_NULL(response);
+
+  az_span remaining = _az_http_response_get_remaining(response);
+  int32_t write_size = az_span_size(write);
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(remaining, write_size);
+
+  remaining = az_span_copy(remaining, write);
+  response->_internal.written += write_size;
+
+  return AZ_OK;
+}
+
+AZ_NODISCARD az_result az_http_response_write_u8(az_http_response* response, uint8_t byte)
+{
+  AZ_PRECONDITION_NOT_NULL(response);
+
+  az_span remaining = _az_http_response_get_remaining(response);
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(remaining, 1);
+
+  remaining = az_span_copy_u8(remaining, byte);
+  response->_internal.written += 1;
+
+  return AZ_OK;
+}
