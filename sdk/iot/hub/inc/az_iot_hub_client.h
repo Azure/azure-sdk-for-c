@@ -100,8 +100,8 @@ AZ_NODISCARD az_result az_iot_hub_client_init(
 AZ_NODISCARD az_result az_iot_hub_client_user_name_get(
     az_iot_hub_client const* client,
     char* mqtt_user_name,
-    int32_t mqtt_user_name_size,
-    int32_t* out_mqtt_user_name_length);
+    size_t mqtt_user_name_size,
+    size_t* out_mqtt_user_name_length);
 
 /**
  * @brief Gets the MQTT client id.
@@ -120,8 +120,8 @@ AZ_NODISCARD az_result az_iot_hub_client_user_name_get(
 AZ_NODISCARD az_result az_iot_hub_client_id_get(
     az_iot_hub_client const* client,
     char*  mqtt_client_id,
-    int32_t mqtt_client_id_size,
-    int32_t* out_mqtt_client_id_length);
+    size_t mqtt_client_id_size,
+    size_t* out_mqtt_client_id_length);
 
 /**
  *
@@ -311,8 +311,8 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_get_publish_topic(
     az_iot_hub_client const* client,
     az_iot_hub_client_properties const* properties,
     char* mqtt_topic,
-    int32_t mqtt_topic_size,
-    int32_t* out_mqtt_topic_length);
+    size_t mqtt_topic_size,
+    size_t* out_mqtt_topic_length);
 
 /**
  *
@@ -335,8 +335,8 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_get_publish_topic(
 AZ_NODISCARD az_result az_iot_hub_client_c2d_get_subscribe_topic_filter(
     az_iot_hub_client const* client,
     char* mqtt_topic_filter,
-    int32_t mqtt_topic_filter_size,
-    int32_t* out_mqtt_topic_filter_length);
+    size_t mqtt_topic_filter_size,
+    size_t* out_mqtt_topic_filter_length);
 
 /**
  * @brief The Cloud To Device Request.
@@ -381,8 +381,8 @@ AZ_NODISCARD az_result az_iot_hub_client_c2d_parse_received_topic(
 AZ_NODISCARD az_result az_iot_hub_client_methods_get_subscribe_topic_filter(
     az_iot_hub_client const* client,
     char* mqtt_topic_filter,
-    int32_t mqtt_topic_filter_size,
-    int32_t* out_mqtt_topic_filter_length);
+    size_t mqtt_topic_filter_size,
+    size_t* out_mqtt_topic_filter_length);
 
 /**
  * @brief A method request received from IoT Hub.
@@ -428,8 +428,8 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_get_response_publish_topic(
     az_span request_id,
     uint16_t status,
     char* mqtt_topic,
-    int32_t mqtt_topic_size,
-    int32_t* out_mqtt_topic_length);
+    size_t mqtt_topic_size,
+    size_t* out_mqtt_topic_length);
 
 /**
  *
@@ -451,8 +451,8 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_get_response_publish_topic(
 AZ_NODISCARD az_result az_iot_hub_client_twin_get_response_subscribe_topic_filter(
     az_iot_hub_client const* client,
     char* mqtt_topic_filter,
-    int32_t mqtt_topic_filter_size,
-    int32_t* out_mqtt_topic_filter_length);
+    size_t mqtt_topic_filter_size,
+    size_t* out_mqtt_topic_filter_length);
 
 /**
  * @brief Gets the MQTT topic filter to subscribe to twin desired property changes.
@@ -469,8 +469,8 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_get_response_subscribe_topic_filte
 AZ_NODISCARD az_result az_iot_hub_client_twin_get_patch_subscribe_topic_filter(
     az_iot_hub_client const* client,
     char* mqtt_topic_filter,
-    int32_t mqtt_topic_filter_size,
-    int32_t* out_mqtt_topic_filter_length);
+    size_t mqtt_topic_filter_size,
+    size_t* out_mqtt_topic_filter_length);
 
 /**
  * @brief Twin response type.
@@ -531,8 +531,8 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_get_get_publish_topic(
     az_iot_hub_client const* client,
     az_span request_id,
     char* mqtt_topic,
-    int32_t mqtt_topic_size,
-    int32_t* out_mqtt_topic_length);
+    size_t mqtt_topic_size,
+    size_t* out_mqtt_topic_length);
 
 /**
  * @brief Gets the MQTT topic that must be used to submit a Twin PATCH request.
@@ -552,8 +552,8 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_get_patch_publish_topic(
     az_iot_hub_client const* client,
     az_span request_id,
     char* mqtt_topic,
-    int32_t mqtt_topic_size,
-    int32_t* out_mqtt_topic_length);
+    size_t mqtt_topic_size,
+    size_t* out_mqtt_topic_length);
 
 #include <_az_cfg_suffix.h>
 

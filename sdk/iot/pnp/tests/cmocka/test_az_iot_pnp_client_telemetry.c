@@ -52,7 +52,7 @@ static void test_az_iot_pnp_client_telemetry_get_publish_topic_NULL_client_fails
   (void)state;
 
   char mqtt_topic_buf[TEST_SPAN_BUFFER_SIZE];
-  int32_t mqtt_topic_length;
+  size_t mqtt_topic_length;
 
   assert_precondition_checked(az_iot_pnp_client_telemetry_get_publish_topic(
       NULL, test_component_name, mqtt_topic_buf, sizeof(mqtt_topic_buf), NULL, &mqtt_topic_length));
@@ -69,7 +69,7 @@ static void test_az_iot_pnp_client_telemetry_get_publish_topic_NULL_mqtt_topic_f
       AZ_OK);
 
   char mqtt_topic_buf[TEST_SPAN_BUFFER_SIZE];
-  int32_t mqtt_topic_length;
+  size_t mqtt_topic_length;
 
   assert_precondition_checked(az_iot_pnp_client_telemetry_get_publish_topic(
       &client, test_component_name, NULL, sizeof(mqtt_topic_buf), NULL, &mqtt_topic_length));
@@ -87,7 +87,7 @@ static void test_az_iot_pnp_client_telemetry_get_publish_topic_NULL_out_mqtt_top
       AZ_OK);
 
   char mqtt_topic_buf[TEST_SPAN_BUFFER_SIZE];
-  int32_t mqtt_topic_length;
+  size_t mqtt_topic_length;
 
   assert_precondition_checked(az_iot_pnp_client_telemetry_get_publish_topic(
       &client, test_component_name, mqtt_topic_buf, 0, NULL, &mqtt_topic_length));
@@ -105,7 +105,7 @@ static void test_az_iot_pnp_client_telemetry_get_publish_topic_NULL_component_na
       AZ_OK);
 
   char mqtt_topic_buf[TEST_SPAN_BUFFER_SIZE];
-  int32_t mqtt_topic_length;
+  size_t mqtt_topic_length;
 
   assert_precondition_checked(az_iot_pnp_client_telemetry_get_publish_topic(
       &client, AZ_SPAN_NULL, mqtt_topic_buf, sizeof(mqtt_topic_buf), NULL, &mqtt_topic_length));
@@ -122,7 +122,7 @@ static void test_az_iot_pnp_client_telemetry_get_publish_topic_non_NULL_reserved
       AZ_OK);
 
   char mqtt_topic_buf[TEST_SPAN_BUFFER_SIZE];
-  int32_t mqtt_topic_length;
+  size_t mqtt_topic_length;
 
   assert_precondition_checked(az_iot_pnp_client_telemetry_get_publish_topic(
       &client, AZ_SPAN_NULL, mqtt_topic_buf, sizeof(mqtt_topic_buf), (void*)0x1, &mqtt_topic_length));
@@ -141,7 +141,7 @@ static void test_az_iot_pnp_client_telemetry_publish_topic_get_no_options_succee
       AZ_OK);
 
   char mqtt_topic_buf[TEST_SPAN_BUFFER_SIZE];
-  int32_t mqtt_topic_length;
+  size_t mqtt_topic_length;
 
   assert_int_equal(
       az_iot_pnp_client_telemetry_get_publish_topic(
@@ -166,7 +166,7 @@ static void test_az_iot_pnp_client_telemetry_publish_topic_get_content_type_succ
       AZ_OK);
 
   char mqtt_topic_buf[TEST_SPAN_BUFFER_SIZE];
-  int32_t mqtt_topic_length;
+  size_t mqtt_topic_length;
 
   assert_int_equal(
       az_iot_pnp_client_telemetry_get_publish_topic(
@@ -197,7 +197,7 @@ static void test_az_iot_pnp_client_telemetry_publish_topic_get_content_encoding_
       AZ_OK);
 
   char mqtt_topic_buf[TEST_SPAN_BUFFER_SIZE];
-  int32_t mqtt_topic_length;
+  size_t mqtt_topic_length;
 
   assert_int_equal(
       az_iot_pnp_client_telemetry_get_publish_topic(
@@ -229,7 +229,7 @@ static void test_az_iot_pnp_client_telemetry_publish_topic_get_content_type_and_
       AZ_OK);
 
   char mqtt_topic_buf[TEST_SPAN_BUFFER_SIZE];
-  int32_t mqtt_topic_length;
+  size_t mqtt_topic_length;
 
   assert_int_equal(
       az_iot_pnp_client_telemetry_get_publish_topic(
@@ -256,7 +256,7 @@ static void test_az_iot_pnp_client_telemetry_publish_topic_get_with_small_buffer
       AZ_OK);
 
   char mqtt_topic_buf[_az_COUNTOF(g_test_correct_pnp_topic_no_options) - 2];
-  int32_t mqtt_topic_length;
+  size_t mqtt_topic_length;
 
   assert_int_equal(
       az_iot_pnp_client_telemetry_get_publish_topic(
@@ -284,7 +284,7 @@ static void test_az_iot_pnp_client_telemetry_publish_topic_get_content_type_with
       AZ_OK);
 
   char mqtt_topic_buf[_az_COUNTOF(g_test_correct_pnp_topic_content_type) - 2];
-  int32_t mqtt_topic_length;
+  size_t mqtt_topic_length;
 
   assert_int_equal(
       az_iot_pnp_client_telemetry_get_publish_topic(
@@ -313,7 +313,7 @@ test_az_iot_pnp_client_telemetry_publish_topic_get_content_encoding_with_small_b
       AZ_OK);
 
   char mqtt_topic_buf[_az_COUNTOF(g_test_correct_pnp_topic_content_type) - 2];
-  int32_t mqtt_topic_length;
+  size_t mqtt_topic_length;
 
   assert_int_equal(
       az_iot_pnp_client_telemetry_get_publish_topic(
@@ -343,7 +343,7 @@ test_az_iot_pnp_client_telemetry_publish_topic_get_content_type_and_encoding_wit
       AZ_OK);
 
   char mqtt_topic_buf[_az_COUNTOF(g_test_correct_pnp_topic_content_type_and_encoding) - 2];
-  int32_t mqtt_topic_length;
+  size_t mqtt_topic_length;
 
   assert_int_equal(
       az_iot_pnp_client_telemetry_get_publish_topic(

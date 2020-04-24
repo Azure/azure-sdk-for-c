@@ -55,8 +55,8 @@ AZ_NODISCARD az_result az_iot_pnp_client_init(
 AZ_NODISCARD az_result az_iot_pnp_client_get_user_name(
     az_iot_pnp_client const* client,
     char* mqtt_user_name,
-    int32_t mqtt_user_name_size,
-    int32_t* out_mqtt_user_name_length)
+    size_t mqtt_user_name_size,
+    size_t* out_mqtt_user_name_length)
 {
   AZ_PRECONDITION_NOT_NULL(client);
   AZ_PRECONDITION_NOT_NULL(mqtt_user_name);
@@ -66,9 +66,10 @@ AZ_NODISCARD az_result az_iot_pnp_client_get_user_name(
 
   // First get hub user name since it is unknown how long it will be
   AZ_RETURN_IF_FAILED(az_iot_hub_client_user_name_get(
-      &client->_internal.iot_hub_client, mqtt_user_name, mqtt_user_name_size, &written));
+      &client->_internal.iot_hub_client, mqtt_user_name, mqtt_user_name_size, (size_t*)&written));
 
-  az_span mqtt_user_name_span = az_span_init((uint8_t*)mqtt_user_name, mqtt_user_name_size);
+  az_span mqtt_user_name_span
+      = az_span_init((uint8_t*)mqtt_user_name, (int32_t)mqtt_user_name_size);
 
   int32_t required_length = written + az_span_size(pnp_model_id)
       + az_span_size(client->_internal.root_interface_name) + 2;
@@ -85,7 +86,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_get_user_name(
 
   if(out_mqtt_user_name_length)
   {
-    *out_mqtt_user_name_length = required_length;
+    *out_mqtt_user_name_length = (size_t)required_length;
   }
 
   return AZ_OK;

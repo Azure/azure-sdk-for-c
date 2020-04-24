@@ -23,8 +23,8 @@ static const az_span methods_response_topic_properties = AZ_SPAN_LITERAL_FROM_ST
 AZ_NODISCARD az_result az_iot_hub_client_methods_get_subscribe_topic_filter(
     az_iot_hub_client const* client,
     char* mqtt_topic_filter,
-    int32_t mqtt_topic_filter_size,
-    int32_t* out_mqtt_topic_filter_length)
+    size_t mqtt_topic_filter_size,
+    size_t* out_mqtt_topic_filter_length)
 {
   AZ_PRECONDITION_NOT_NULL(client);
   AZ_PRECONDITION_NOT_NULL(mqtt_topic_filter);
@@ -33,7 +33,7 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_get_subscribe_topic_filter(
   (void)client;
 
   az_span mqtt_topic_filter_span
-      = az_span_init((uint8_t*)mqtt_topic_filter, mqtt_topic_filter_size);
+      = az_span_init((uint8_t*)mqtt_topic_filter, (int32_t)mqtt_topic_filter_size);
 
   int32_t required_length = az_span_size(methods_topic_prefix)
       + az_span_size(methods_topic_filter_suffix) + (int32_t)sizeof(hashtag);
@@ -49,7 +49,7 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_get_subscribe_topic_filter(
 
   if(out_mqtt_topic_filter_length)
   {
-    *out_mqtt_topic_filter_length = required_length;
+    *out_mqtt_topic_filter_length = (size_t)required_length;
   }
 
   return AZ_OK;
@@ -109,8 +109,8 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_get_response_publish_topic(
     az_span request_id,
     uint16_t status,
     char* mqtt_topic,
-    int32_t mqtt_topic_size,
-    int32_t* out_mqtt_topic_length)
+    size_t mqtt_topic_size,
+    size_t* out_mqtt_topic_length)
 {
   AZ_PRECONDITION_NOT_NULL(client);
   AZ_PRECONDITION_VALID_SPAN(request_id, 1, false);
@@ -120,7 +120,7 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_get_response_publish_topic(
 
   (void)client;
 
-  az_span mqtt_topic_span = az_span_init((uint8_t*)mqtt_topic, mqtt_topic_size);
+  az_span mqtt_topic_span = az_span_init((uint8_t*)mqtt_topic, (int32_t)mqtt_topic_size);
   int32_t required_length = az_span_size(methods_topic_prefix)
       + az_span_size(methods_response_topic_result) + STATUS_TO_STR_SIZE
       + az_span_size(methods_response_topic_properties) + az_span_size(request_id);
@@ -138,7 +138,7 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_get_response_publish_topic(
 
   if(out_mqtt_topic_length)
   {
-    *out_mqtt_topic_length = required_length;
+    *out_mqtt_topic_length = (size_t)required_length;
   }
 
   return AZ_OK;

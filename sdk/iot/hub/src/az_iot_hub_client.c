@@ -45,8 +45,8 @@ AZ_NODISCARD az_result az_iot_hub_client_init(
 AZ_NODISCARD az_result az_iot_hub_client_user_name_get(
     az_iot_hub_client const* client,
     char* mqtt_user_name,
-    int32_t mqtt_user_name_size,
-    int32_t* out_mqtt_user_name_length)
+    size_t mqtt_user_name_size,
+    size_t* out_mqtt_user_name_length)
 {
   AZ_PRECONDITION_NOT_NULL(client);
   AZ_PRECONDITION_NOT_NULL(mqtt_user_name);
@@ -55,7 +55,7 @@ AZ_NODISCARD az_result az_iot_hub_client_user_name_get(
   const az_span* const module_id = &(client->_internal.options.module_id);
   const az_span* const user_agent = &(client->_internal.options.user_agent);
 
-  az_span mqtt_user_name_span = az_span_init((uint8_t*)mqtt_user_name, mqtt_user_name_size);
+  az_span mqtt_user_name_span = az_span_init((uint8_t*)mqtt_user_name, (int32_t)mqtt_user_name_size);
 
   int32_t required_length = az_span_size(client->_internal.iot_hub_hostname)
       + az_span_size(client->_internal.device_id) + az_span_size(hub_service_api_version)
@@ -94,7 +94,7 @@ AZ_NODISCARD az_result az_iot_hub_client_user_name_get(
 
   if (out_mqtt_user_name_length)
   {
-    *out_mqtt_user_name_length = required_length;
+    *out_mqtt_user_name_length = (size_t)required_length;
   }
 
   return AZ_OK;
@@ -103,14 +103,14 @@ AZ_NODISCARD az_result az_iot_hub_client_user_name_get(
 AZ_NODISCARD az_result az_iot_hub_client_id_get(
     az_iot_hub_client const* client,
     char* mqtt_client_id,
-    int32_t mqtt_client_id_size,
-    int32_t* out_mqtt_client_id_length)
+    size_t mqtt_client_id_size,
+    size_t* out_mqtt_client_id_length)
 {
   AZ_PRECONDITION_NOT_NULL(client);
   AZ_PRECONDITION_NOT_NULL(mqtt_client_id);
   AZ_PRECONDITION(mqtt_client_id_size > 0);
 
-  az_span mqtt_client_id_span = az_span_init((uint8_t*)mqtt_client_id, mqtt_client_id_size);
+  az_span mqtt_client_id_span = az_span_init((uint8_t*)mqtt_client_id, (int32_t)mqtt_client_id_size);
   const az_span* const module_id = &(client->_internal.options.module_id);
 
   int32_t required_length = az_span_size(client->_internal.device_id);
@@ -134,7 +134,7 @@ AZ_NODISCARD az_result az_iot_hub_client_id_get(
 
   if (out_mqtt_client_id_length)
   {
-    *out_mqtt_client_id_length = required_length;
+    *out_mqtt_client_id_length = (size_t)required_length;
   }
 
   return AZ_OK;

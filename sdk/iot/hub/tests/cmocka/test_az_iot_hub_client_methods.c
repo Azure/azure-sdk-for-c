@@ -35,7 +35,7 @@ static void test_az_iot_hub_client_methods_get_subscribe_topic_filter_NULL_clien
   (void)state;
 
   char test_buf[TEST_SPAN_BUFFER_SIZE];
-  int32_t test_length;
+  size_t test_length;
 
   assert_precondition_checked(
       az_iot_hub_client_methods_get_subscribe_topic_filter(NULL, test_buf, sizeof(test_buf), &test_length));
@@ -47,7 +47,7 @@ static void test_az_iot_hub_client_methods_get_subscribe_topic_filter_NULL_out_t
   (void)state;
 
   char test_buf[TEST_SPAN_BUFFER_SIZE];
-  int32_t test_length;
+  size_t test_length;
 
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
@@ -61,7 +61,7 @@ static void test_az_iot_hub_client_methods_get_subscribe_topic_filter_empty_topi
   (void)state;
 
   char test_buf[TEST_SPAN_BUFFER_SIZE];
-  int32_t test_length;
+  size_t test_length;
 
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
@@ -75,7 +75,7 @@ static void test_az_iot_hub_client_methods_get_response_publish_topic_NULL_clien
   (void)state;
 
   char test_buf[TEST_SPAN_BUFFER_SIZE];
-  int32_t test_length;
+  size_t test_length;
 
   az_span request_id = AZ_SPAN_LITERAL_FROM_STR("2");
   uint16_t status = 200;
@@ -90,7 +90,7 @@ static void test_az_iot_hub_client_methods_get_response_publish_topic_NULL_out_t
   (void)state;
 
   char test_buf[TEST_SPAN_BUFFER_SIZE];
-  int32_t test_length;
+  size_t test_length;
 
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
@@ -108,7 +108,7 @@ static void test_az_iot_hub_client_methods_get_response_publish_topic_zero_size_
   (void)state;
 
   char test_buf[TEST_SPAN_BUFFER_SIZE];
-  int32_t test_length;
+  size_t test_length;
 
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
@@ -126,7 +126,7 @@ static void test_az_iot_hub_client_methods_get_response_publish_topic_EMPTY_requ
   (void)state;
 
   char test_buf[TEST_SPAN_BUFFER_SIZE];
-  int32_t test_length;
+  size_t test_length;
 
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
@@ -144,7 +144,7 @@ static void test_az_iot_hub_client_methods_get_response_publish_topic_AZ_SPAN_NU
   (void)state;
 
   char test_buf[TEST_SPAN_BUFFER_SIZE];
-  int32_t test_length;
+  size_t test_length;
 
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
@@ -220,7 +220,7 @@ static void test_az_iot_hub_client_methods_get_subscribe_topic_filter_succeed(vo
   (void)state;
 
   char test_buf[TEST_SPAN_BUFFER_SIZE];
-  int32_t test_length;
+  size_t test_length;
 
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
@@ -239,7 +239,7 @@ static void test_az_iot_hub_client_methods_get_subscribe_topic_filter_INSUFFICIE
   (void)state;
 
   char test_buf[5];
-  int32_t test_length;
+  size_t test_length;
 
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
@@ -255,7 +255,7 @@ static void test_az_iot_hub_client_methods_get_response_publish_topic_succeed(vo
   (void)state;
 
   char test_buf[TEST_SPAN_BUFFER_SIZE];
-  int32_t test_length;
+  size_t test_length;
 
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
@@ -280,7 +280,7 @@ test_az_iot_hub_client_methods_get_response_publish_topic_INSUFFICIENT_BUFFER_fo
   (void)state;
 
   char test_buf[10];
-  int32_t test_length;
+  size_t test_length;
 
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
@@ -301,7 +301,7 @@ test_az_iot_hub_client_methods_get_response_publish_topic_INSUFFICIENT_BUFFER_fo
   (void)state;
 
   char test_buf[21];  // Enough for "$iothub/methods/res/2"
-  int32_t test_length;
+  size_t test_length;
 
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
@@ -322,7 +322,7 @@ test_az_iot_hub_client_methods_get_response_publish_topic_INSUFFICIENT_BUFFER_fo
   (void)state;
 
   char test_buf[24]; // Enough for "$iothub/methods/res/200/"
-  int32_t test_length;
+  size_t test_length;
 
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);

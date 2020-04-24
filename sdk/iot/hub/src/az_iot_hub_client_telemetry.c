@@ -20,8 +20,8 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_get_publish_topic(
     az_iot_hub_client const* client,
     az_iot_hub_client_properties const* properties,
     char* mqtt_topic,
-    int32_t mqtt_topic_size,
-    int32_t* out_mqtt_topic_length)
+    size_t mqtt_topic_size,
+    size_t* out_mqtt_topic_length)
 {
   AZ_PRECONDITION_NOT_NULL(client);
   AZ_PRECONDITION_NOT_NULL(mqtt_topic);
@@ -29,7 +29,7 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_get_publish_topic(
 
   const az_span* const module_id = &(client->_internal.options.module_id);
 
-  az_span mqtt_topic_span = az_span_init((uint8_t*) mqtt_topic, mqtt_topic_size);
+  az_span mqtt_topic_span = az_span_init((uint8_t*) mqtt_topic, (int32_t)mqtt_topic_size);
   int32_t required_length = az_span_size(telemetry_topic_prefix)
       + az_span_size(client->_internal.device_id) + az_span_size(telemetry_topic_suffix);
   int32_t module_id_length = az_span_size(*module_id);
@@ -64,7 +64,7 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_get_publish_topic(
 
   if(out_mqtt_topic_length)
   {
-    *out_mqtt_topic_length = required_length;
+    *out_mqtt_topic_length = (size_t)required_length;
   }
 
   return AZ_OK;

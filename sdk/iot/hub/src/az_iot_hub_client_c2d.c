@@ -18,8 +18,8 @@ static const uint8_t hash_tag = '#';
 AZ_NODISCARD az_result az_iot_hub_client_c2d_get_subscribe_topic_filter(
     az_iot_hub_client const* client,
     char* mqtt_topic_filter,
-    int32_t mqtt_topic_filter_size,
-    int32_t* out_mqtt_topic_filter_length)
+    size_t mqtt_topic_filter_size,
+    size_t* out_mqtt_topic_filter_length)
 {
   AZ_PRECONDITION_NOT_NULL(client);
   AZ_PRECONDITION_NOT_NULL(mqtt_topic_filter);
@@ -42,7 +42,7 @@ AZ_NODISCARD az_result az_iot_hub_client_c2d_get_subscribe_topic_filter(
 
   if (out_mqtt_topic_filter_length)
   {
-    *out_mqtt_topic_filter_length = required_length;
+    *out_mqtt_topic_filter_length = (size_t)required_length;
   }
 
   return AZ_OK;

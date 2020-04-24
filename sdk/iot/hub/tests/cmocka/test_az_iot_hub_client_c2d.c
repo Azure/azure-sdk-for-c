@@ -134,7 +134,7 @@ static void test_az_iot_hub_client_c2d_get_subscribe_topic_filter_succeed(void**
   assert_true(
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, &options) == AZ_OK);
 
-  int32_t returned_size;
+  size_t returned_size;
   assert_true(
       az_iot_hub_client_c2d_get_subscribe_topic_filter(
           &client, mqtt_sub_topic_buf, sizeof(mqtt_sub_topic_buf), &returned_size)
@@ -154,7 +154,7 @@ static void test_az_iot_hub_client_c2d_get_subscribe_topic_filter_small_buffer_f
   assert_true(
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, &options) == AZ_OK);
 
-  int32_t returned_size;
+  size_t returned_size;
   assert_true(
       az_iot_hub_client_c2d_get_subscribe_topic_filter(
           &client, mqtt_sub_topic_buf, sizeof(mqtt_sub_topic_buf), &returned_size)

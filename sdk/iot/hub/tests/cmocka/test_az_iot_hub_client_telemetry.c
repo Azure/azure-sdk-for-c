@@ -43,7 +43,7 @@ static void test_az_iot_hub_client_telemetry_get_publish_topic_NULL_client_fails
   (void)state;
 
   char test_buf[TEST_SPAN_BUFFER_SIZE];
-  int32_t test_length;
+  size_t test_length;
 
   assert_precondition_checked(az_iot_hub_client_telemetry_get_publish_topic(
       NULL, NULL, test_buf, sizeof(test_buf), &test_length));
@@ -57,7 +57,7 @@ static void test_az_iot_hub_client_telemetry_get_publish_topic_NULL_mqtt_topic_f
   assert_int_equal(
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL), AZ_OK);
 
-  int32_t test_length;
+  size_t test_length;
 
   assert_precondition_checked(az_iot_hub_client_telemetry_get_publish_topic(
       &client, NULL, NULL, TEST_SPAN_BUFFER_SIZE, &test_length));
@@ -73,7 +73,7 @@ static void test_az_iot_hub_client_telemetry_get_publish_topic_NULL_out_mqtt_top
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL), AZ_OK);
 
   char test_buf[TEST_SPAN_BUFFER_SIZE];
-  int32_t test_length;
+  size_t test_length;
 
   assert_precondition_checked(az_iot_hub_client_telemetry_get_publish_topic(
       &client, NULL, test_buf, 0, &test_length));
@@ -91,7 +91,7 @@ static void test_az_iot_hub_client_telemetry_get_publish_topic_no_options_no_pro
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL), AZ_OK);
 
   char test_buf[TEST_SPAN_BUFFER_SIZE];
-  int32_t test_length;
+  size_t test_length;
 
   assert_true(
       az_iot_hub_client_telemetry_get_publish_topic(
@@ -114,7 +114,7 @@ static void test_az_iot_hub_client_telemetry_get_publish_topic_with_options_no_p
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, &options), AZ_OK);
 
   char test_buf[TEST_SPAN_BUFFER_SIZE];
-  int32_t test_length;
+  size_t test_length;
 
   assert_true(
       az_iot_hub_client_telemetry_get_publish_topic(
@@ -142,7 +142,7 @@ static void test_az_iot_hub_client_telemetry_get_publish_topic_with_options_with
       az_iot_hub_client_properties_init(&props, test_props, az_span_size(test_props)), AZ_OK);
 
   char test_buf[TEST_SPAN_BUFFER_SIZE];
-  int32_t test_length;
+  size_t test_length;
 
   assert_true(
       az_iot_hub_client_telemetry_get_publish_topic(
@@ -171,7 +171,7 @@ test_az_iot_hub_client_telemetry_get_publish_topic_with_options_with_props_small
       az_iot_hub_client_properties_init(&props, test_props, az_span_size(test_props)), AZ_OK);
 
   char test_buf[sizeof(g_test_correct_topic_with_options_with_props) - 2];
-  int32_t test_length;
+  size_t test_length;
 
   assert_true(
       az_iot_hub_client_telemetry_get_publish_topic(
@@ -193,7 +193,7 @@ static void test_az_iot_hub_client_telemetry_get_publish_topic_no_options_with_p
       az_iot_hub_client_properties_init(&props, test_props, az_span_size(test_props)), AZ_OK);
 
   char test_buf[TEST_SPAN_BUFFER_SIZE];
-  int32_t test_length;
+  size_t test_length;
 
   assert_true(
       az_iot_hub_client_telemetry_get_publish_topic(
@@ -219,7 +219,7 @@ test_az_iot_hub_client_telemetry_get_publish_topic_no_options_with_props_small_b
       az_iot_hub_client_properties_init(&props, test_props, az_span_size(test_props)), AZ_OK);
 
   char test_buf[sizeof(g_test_correct_topic_no_options_with_props) - 2];
-  int32_t test_length;
+  size_t test_length;
 
   assert_true(
       az_iot_hub_client_telemetry_get_publish_topic(
@@ -245,7 +245,7 @@ test_az_iot_hub_client_telemetry_get_publish_topic_with_options_module_id_with_p
       az_iot_hub_client_properties_init(&props, test_props, az_span_size(test_props)), AZ_OK);
 
   char test_buf[TEST_SPAN_BUFFER_SIZE];
-  int32_t test_length;
+  size_t test_length;
 
   assert_true(
       az_iot_hub_client_telemetry_get_publish_topic(
@@ -274,7 +274,7 @@ test_az_iot_hub_client_telemetry_get_publish_topic_with_options_module_id_with_p
       az_iot_hub_client_properties_init(&props, test_props, az_span_size(test_props)), AZ_OK);
 
   char test_buf[sizeof(g_test_correct_topic_with_options_module_id_with_props) - 2];
-  int32_t test_length;
+  size_t test_length;
 
   assert_true(
       az_iot_hub_client_telemetry_get_publish_topic(

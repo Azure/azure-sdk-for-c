@@ -140,7 +140,7 @@ static void test_az_iot_pnp_client_get_user_name_succeed(void** state)
       AZ_OK);
 
   char mqtt_topic_buf[TEST_SPAN_BUFFER_SIZE];
-  int32_t mqtt_topic_length;
+  size_t mqtt_topic_length;
   assert_int_equal(
       az_iot_pnp_client_get_user_name(
           &client, mqtt_topic_buf, sizeof(mqtt_topic_buf), &mqtt_topic_length),
@@ -160,7 +160,7 @@ static void test_az_iot_pnp_client_get_user_name_small_buffer_fail(void** state)
       AZ_OK);
 
   char mqtt_topic_buf[_az_COUNTOF(test_correct_pnp_user_name) - 2];
-  int32_t mqtt_topic_length;
+  size_t mqtt_topic_length;
 
   assert_int_equal(
       az_iot_pnp_client_get_user_name(
@@ -184,7 +184,7 @@ static void test_az_iot_pnp_client_get_user_name_user_options_succeed(void** sta
       AZ_OK);
 
   char mqtt_topic_buf[TEST_SPAN_BUFFER_SIZE];
-  int32_t mqtt_topic_length;
+  size_t mqtt_topic_length;
   assert_int_equal(
       az_iot_pnp_client_get_user_name(
           &client, mqtt_topic_buf, sizeof(mqtt_topic_buf), &mqtt_topic_length),
@@ -209,7 +209,7 @@ static void test_az_iot_pnp_client_get_user_name_user_options_small_buffer_fail(
       AZ_OK);
 
   char mqtt_topic_buf[_az_COUNTOF(test_correct_pnp_user_name_with_user_agent) - 2];
-  int32_t mqtt_topic_length;
+  size_t mqtt_topic_length;
   assert_int_equal(
       az_iot_pnp_client_get_user_name(
           &client, mqtt_topic_buf, sizeof(mqtt_topic_buf), &mqtt_topic_length),
