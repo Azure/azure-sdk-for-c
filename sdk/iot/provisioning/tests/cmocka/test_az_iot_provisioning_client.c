@@ -43,7 +43,7 @@ static void test_az_iot_provisioning_client_default_options_get_connect_info_suc
       NULL);
   assert_int_equal(AZ_OK, ret);
 
-  char client_id[strlen(TEST_REGISTRATION_ID) + 2];
+  char client_id[sizeof(TEST_REGISTRATION_ID) + 1];
   memset(client_id, 0xCC, sizeof(client_id));
   ret = az_iot_provisioning_client_get_client_id(&client, client_id, sizeof(client_id), NULL);
   assert_int_equal(AZ_OK, ret);
@@ -58,10 +58,10 @@ static void test_az_iot_provisioning_client_default_options_get_connect_info_suc
   assert_int_equal((uint8_t)0xCC, (uint8_t)client_id[strlen(client_id) + 1]);
   assert_int_equal(strlen(TEST_REGISTRATION_ID), client_id_len);
 
-  char* expected_username = TEST_ID_SCOPE "/registrations/" TEST_REGISTRATION_ID
+  char expected_username[] = TEST_ID_SCOPE "/registrations/" TEST_REGISTRATION_ID
                                           "/api-version=" AZ_IOT_PROVISIONING_SERVICE_VERSION;
 
-  char user_name[strlen(expected_username) + 2];
+  char user_name[sizeof(expected_username) + 1];
   memset(user_name, 0xCC, sizeof(user_name));
   ret = az_iot_provisioning_client_get_user_name(&client, user_name, sizeof(user_name), NULL);
   assert_int_equal(AZ_OK, ret);
@@ -91,11 +91,11 @@ static void test_az_iot_provisioning_client_custom_options_get_username_succeed(
       &options);
   assert_int_equal(AZ_OK, ret);
 
-  char* expected_username = TEST_ID_SCOPE
+  char expected_username[] = TEST_ID_SCOPE
       "/registrations/" TEST_REGISTRATION_ID
       "/api-version=" AZ_IOT_PROVISIONING_SERVICE_VERSION USER_AGENT_PREFIX TEST_USER_AGENT;
 
-  char user_name[strlen(expected_username) + 2];
+  char user_name[sizeof(expected_username) + 1];
   memset(user_name, 0xCC, sizeof(user_name));
   size_t user_name_len;
   ret = az_iot_provisioning_client_get_user_name(
@@ -120,7 +120,7 @@ static void test_az_iot_provisioning_client_get_connect_info_insufficient_space_
       &options);
   assert_int_equal(AZ_OK, ret);
 
-  char client_id[strlen(TEST_REGISTRATION_ID)]; // no space for '\0'
+  char client_id[sizeof(TEST_REGISTRATION_ID) - 1];
   memset(client_id, 0xCC, sizeof(client_id));
   size_t client_id_len = 0xBAADC0DE;
   ret = az_iot_provisioning_client_get_client_id(
@@ -133,11 +133,11 @@ static void test_az_iot_provisioning_client_get_connect_info_insufficient_space_
 
   assert_int_equal(0xBAADC0DE, client_id_len);
 
-  char* expected_username = TEST_ID_SCOPE
+  char expected_username[] = TEST_ID_SCOPE
       "/registrations/" TEST_REGISTRATION_ID
       "/api-version=" AZ_IOT_PROVISIONING_SERVICE_VERSION USER_AGENT_PREFIX TEST_USER_AGENT;
 
-  char user_name[strlen(expected_username)]; // no space for '\0'
+  char user_name[sizeof(expected_username) - 1];
   memset(user_name, 0xCC, sizeof(user_name));
   size_t user_name_len = 0xBAADC0DE;
   ret = az_iot_provisioning_client_get_user_name(
@@ -154,9 +154,9 @@ static void test_az_iot_provisioning_client_get_connect_info_insufficient_space_
 static void test_az_iot_provisioning_client_get_subscribe_topic_filter_succeed()
 {
   az_iot_provisioning_client client;
-  char* expected_topic = "$dps/registrations/res/#";
+  char expected_topic[] = "$dps/registrations/res/#";
 
-  char topic[strlen(expected_topic) + 2];
+  char topic[sizeof(expected_topic) + 1];
   memset(topic, 0xCC, sizeof(topic));
   az_result ret = az_iot_provisioning_client_register_get_subscribe_topic_filter(
       &client, topic, sizeof(topic), NULL);
@@ -177,9 +177,9 @@ static void test_az_iot_provisioning_client_get_subscribe_topic_filter_succeed()
 static void test_az_iot_provisioning_client_get_subscribe_topic_filter_insufficient_space_fails()
 {
   az_iot_provisioning_client client;
-  char* expected_topic = "$dps/registrations/res/#";
+  char expected_topic[] = "$dps/registrations/res/#";
 
-  char topic[strlen(expected_topic)]; // no space for '\0'
+  char topic[sizeof(expected_topic) - 1];
   memset(topic, 0xCC, sizeof(topic));
   size_t topic_len = 0xBAADC0DE;
   az_result ret = az_iot_provisioning_client_register_get_subscribe_topic_filter(
@@ -196,9 +196,9 @@ static void test_az_iot_provisioning_client_get_subscribe_topic_filter_insuffici
 static void test_az_iot_provisioning_client_get_register_publish_topic_succeed()
 {
   az_iot_provisioning_client client;
-  char* expected_topic = "$dps/registrations/PUT/iotdps-register/?$rid=1";
+  char expected_topic[] = "$dps/registrations/PUT/iotdps-register/?$rid=1";
 
-  char topic[strlen(expected_topic) + 2];
+  char topic[sizeof(expected_topic) + 1];
   memset(topic, 0xCC, sizeof(topic));
   az_result ret
       = az_iot_provisioning_client_register_get_publish_topic(&client, topic, sizeof(topic), NULL);
@@ -220,9 +220,9 @@ static void test_az_iot_provisioning_client_get_register_publish_topic_succeed()
 static void test_az_iot_provisioning_client_get_register_publish_topic_insufficient_space_fails()
 {
   az_iot_provisioning_client client;
-  char* expected_topic = "$dps/registrations/PUT/iotdps-register/?$rid=1";
+  char expected_topic[] = "$dps/registrations/PUT/iotdps-register/?$rid=1";
 
-  char topic[strlen(expected_topic)];
+  char topic[sizeof(expected_topic) - 1];
   memset(topic, 0xCC, sizeof(topic));
 
   size_t topic_len = 0xBAADC0DE;
@@ -242,10 +242,10 @@ static void test_az_iot_provisioning_client_get_operation_status_publish_topic_s
 {
   az_iot_provisioning_client client;
 
-  char* expected_topic
+  char expected_topic[]
       = "$dps/registrations/GET/iotdps-get-operationstatus/?$rid=1&operationId=" TEST_OPERATION_ID;
 
-  char topic[strlen(expected_topic) + 2];
+  char topic[sizeof(expected_topic) + 1];
   memset(topic, 0xCC, sizeof(topic));
   az_span operation_id = AZ_SPAN_LITERAL_FROM_STR(TEST_OPERATION_ID);
   az_iot_provisioning_client_register_response response = { 0 };
@@ -276,7 +276,7 @@ test_az_iot_provisioning_client_get_operation_status_publish_topic_insufficient_
   char* expected_topic
       = "$dps/registrations/GET/iotdps-get-operationstatus/?$rid=1&operationId=" TEST_OPERATION_ID;
 
-  char topic[strlen(expected_topic)]; // no space for '\0'
+  char topic[sizeof(expected_topic) - 1];
   memset(topic, 0xCC, sizeof(topic));
   az_span operation_id = AZ_SPAN_LITERAL_FROM_STR(TEST_OPERATION_ID);
   az_iot_provisioning_client_register_response response = { 0 };
