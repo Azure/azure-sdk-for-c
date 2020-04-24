@@ -16,7 +16,7 @@ int main()
   int result = 0;
   
   result += test_az_iot_provisioning_client();
-  result += test_az_iot_provisioning_client_register();
+  result += test_az_iot_provisioning_client_parser();
 
   return result;
 }
