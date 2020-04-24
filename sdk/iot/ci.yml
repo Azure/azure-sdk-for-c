@@ -23,15 +23,6 @@ stages:
     parameters:
       ServiceDirectory: iot
       Artifacts:
-        - Name: az_iot_core
-          Path: core
-          SafeName: az_iot_core
-        - Name: az_iot_hub
-          Path: hub
-          SafeName: az_iot_hub
-        - Name: az_iot_pnp
-          Path: pnp
-          SafeName: az_iot_pnp
-        - Name: az_iot_provisioning
-          Path: provisioning
-          SafeName: az_iot_provisioning
+        # Use the path "." to build artifacts from the service directory
+        - Name: az_iot
+          Path: .
