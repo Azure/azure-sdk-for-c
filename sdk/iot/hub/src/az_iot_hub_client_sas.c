@@ -14,6 +14,7 @@
 #define LF '\n'
 #define AMPERSAND '&'
 #define EQUAL_SIGN '='
+#define STRING_NULL_TERMINATOR '\0'
 #define SCOPE_DEVICES_STRING "/devices/"
 #define SCOPE_MODULES_STRING "/modules/"
 #define SAS_TOKEN_SR "SharedAccessSignature sr"
@@ -40,18 +41,20 @@ AZ_NODISCARD az_result az_iot_hub_client_sas_get_signature(
   AZ_PRECONDITION_NOT_NULL(out_signature);
 
   int32_t required_size = az_span_size(client->_internal.iot_hub_hostname)
-      + az_span_size(client->_internal.device_id) + az_span_size(devices_string)
-      + 1; // 1 is for one line feed character.
+      + az_span_size(devices_string)
+      + az_span_size(client->_internal.device_id)
+      + (int32_t)sizeof(LF)
+      + u32toa_size(token_expiration_epoch_time);
 
   if (az_span_size(client->_internal.options.module_id) > 0)
   {
     required_size
-        += az_span_size(client->_internal.options.module_id) + az_span_size(modules_string);
+        += + az_span_size(modules_string) + az_span_size(client->_internal.options.module_id);
   }
 
-  az_span remainder = signature;
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(signature, required_size);
 
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, required_size);
+  az_span remainder = signature;
 
   remainder = az_span_copy(remainder, client->_internal.iot_hub_hostname);
   remainder = az_span_copy(remainder, devices_string);
@@ -91,70 +94,85 @@ AZ_NODISCARD az_result az_iot_hub_client_sas_get_password(
   //               plus, if key_name size > 0, "&skn=" key_name
 
   // This does not account for the size of `token_expiration_epoch_time`, which will be handled by az_span_u32toa.
-  int32_t required_size = az_span_size(sr_string) + az_span_size(devices_string)
-      + az_span_size(sig_string) + az_span_size(se_string)
-      + az_span_size(client->_internal.iot_hub_hostname) + az_span_size(client->_internal.device_id)
-      + az_span_size(base64_hmac_sha256_signature) + 6; // Number of ampersands, equal signs and null terminator.
+  int32_t required_size = 
+      az_span_size(sr_string) 
+      + (int32_t)sizeof(EQUAL_SIGN)
+      + az_span_size(client->_internal.iot_hub_hostname)
+      + az_span_size(devices_string)
+      + az_span_size(client->_internal.device_id)
+      + (int32_t)sizeof(AMPERSAND)
+      + az_span_size(sig_string) 
+      + (int32_t)sizeof(EQUAL_SIGN)
+      + az_span_size(base64_hmac_sha256_signature)
+      + (int32_t)sizeof(AMPERSAND)
+      + az_span_size(se_string) 
+      + (int32_t)sizeof(EQUAL_SIGN)
+      + u32toa_size(token_expiration_epoch_time)
+      + (int32_t)sizeof(STRING_NULL_TERMINATOR);
 
   if (az_span_size(client->_internal.options.module_id) > 0)
   {
-    required_size
-        += az_span_size(client->_internal.options.module_id) + az_span_size(modules_string);
+    required_size +=
+        az_span_size(modules_string) 
+        + az_span_size(client->_internal.options.module_id);
   }
 
   if (az_span_size(key_name) > 0)
   {
-    required_size += az_span_size(skn_string) + az_span_size(key_name)
-        + 2; // 2 is for one ampersand and one equal sign.
+    required_size += 
+        + (int32_t)sizeof(AMPERSAND)
+        + az_span_size(skn_string) 
+        + (int32_t)sizeof(EQUAL_SIGN)
+        + az_span_size(key_name);
   }
 
-  az_span remainder = az_span_init((uint8_t*)mqtt_password, (int32_t)mqtt_password_size);
+  az_span mqtt_password_span = az_span_init((uint8_t*)mqtt_password, (int32_t)mqtt_password_size);
 
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, required_size);
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_password_span, required_size);
 
   // SharedAccessSignature
-  remainder = az_span_copy(remainder, sr_string);
-  remainder = az_span_copy_u8(remainder, EQUAL_SIGN);
-  remainder = az_span_copy(remainder, client->_internal.iot_hub_hostname);
+  mqtt_password_span = az_span_copy(mqtt_password_span, sr_string);
+  mqtt_password_span = az_span_copy_u8(mqtt_password_span, EQUAL_SIGN);
+  mqtt_password_span = az_span_copy(mqtt_password_span, client->_internal.iot_hub_hostname);
 
   // Device ID
-  remainder = az_span_copy(remainder, devices_string);
-  remainder = az_span_copy(remainder, client->_internal.device_id);
+  mqtt_password_span = az_span_copy(mqtt_password_span, devices_string);
+  mqtt_password_span = az_span_copy(mqtt_password_span, client->_internal.device_id);
 
   // Module ID
   if (az_span_size(client->_internal.options.module_id) > 0)
   {
-    remainder = az_span_copy(remainder, modules_string);
-    remainder = az_span_copy(remainder, client->_internal.options.module_id);
+    mqtt_password_span = az_span_copy(mqtt_password_span, modules_string);
+    mqtt_password_span = az_span_copy(mqtt_password_span, client->_internal.options.module_id);
   }
 
   // Signature
-  remainder = az_span_copy_u8(remainder, AMPERSAND);
-  remainder = az_span_copy(remainder, sig_string);
-  remainder = az_span_copy_u8(remainder, EQUAL_SIGN);
-  remainder = az_span_copy(remainder, base64_hmac_sha256_signature);
+  mqtt_password_span = az_span_copy_u8(mqtt_password_span, AMPERSAND);
+  mqtt_password_span = az_span_copy(mqtt_password_span, sig_string);
+  mqtt_password_span = az_span_copy_u8(mqtt_password_span, EQUAL_SIGN);
+  mqtt_password_span = az_span_copy(mqtt_password_span, base64_hmac_sha256_signature);
 
   // Expiration
-  remainder = az_span_copy_u8(remainder, AMPERSAND);
-  remainder = az_span_copy(remainder, se_string);
-  remainder = az_span_copy_u8(remainder, EQUAL_SIGN);
-  AZ_RETURN_IF_FAILED(az_span_u32toa(remainder, token_expiration_epoch_time, &remainder));
+  mqtt_password_span = az_span_copy_u8(mqtt_password_span, AMPERSAND);
+  mqtt_password_span = az_span_copy(mqtt_password_span, se_string);
+  mqtt_password_span = az_span_copy_u8(mqtt_password_span, EQUAL_SIGN);
+  AZ_RETURN_IF_FAILED(az_span_u32toa(mqtt_password_span, token_expiration_epoch_time, &mqtt_password_span));
 
   if (az_span_size(key_name) > 0)
   {
     // Key Name
-    remainder = az_span_copy_u8(remainder, AMPERSAND);
-    remainder = az_span_copy(remainder, skn_string);
-    remainder = az_span_copy_u8(remainder, EQUAL_SIGN);
-    remainder = az_span_copy(remainder, key_name);
+    mqtt_password_span = az_span_copy_u8(mqtt_password_span, AMPERSAND);
+    mqtt_password_span = az_span_copy(mqtt_password_span, skn_string);
+    mqtt_password_span = az_span_copy_u8(mqtt_password_span, EQUAL_SIGN);
+    mqtt_password_span = az_span_copy(mqtt_password_span, key_name);
   }
 
   if (out_mqtt_password_length != NULL)
   {
-    *out_mqtt_password_length = (mqtt_password_size - (size_t)az_span_size(remainder));
+    *out_mqtt_password_length = (mqtt_password_size - (size_t)az_span_size(mqtt_password_span));
   }
 
-  remainder = az_span_copy_u8(remainder, '\0');
+  mqtt_password_span = az_span_copy_u8(mqtt_password_span, STRING_NULL_TERMINATOR);
 
   return AZ_OK;
 }

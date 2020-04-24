@@ -132,11 +132,38 @@ static void test_az_iot_get_status_from_uint32(void** state)
   assert_int_equal(az_iot_get_status_from_uint32(999, &status), AZ_ERROR_ITEM_NOT_FOUND);
 }
 
+static void u32toa_size_success(void** state)
+{
+  (void)state;
+  assert_int_equal(u32toa_size(0), 1);
+  assert_int_equal(u32toa_size(9), 1);
+  assert_int_equal(u32toa_size(10), 2);
+  assert_int_equal(u32toa_size(99), 2);
+  assert_int_equal(u32toa_size(100), 3);
+  assert_int_equal(u32toa_size(199), 3);
+  assert_int_equal(u32toa_size(1000), 4);
+  assert_int_equal(u32toa_size(1999), 4);
+  assert_int_equal(u32toa_size(10000), 5);
+  assert_int_equal(u32toa_size(19999), 5);
+  assert_int_equal(u32toa_size(100000), 6);  
+  assert_int_equal(u32toa_size(199999), 6);
+  assert_int_equal(u32toa_size(1000000), 7);
+  assert_int_equal(u32toa_size(1999999), 7);
+  assert_int_equal(u32toa_size(10000000), 8);
+  assert_int_equal(u32toa_size(19999999), 8);
+  assert_int_equal(u32toa_size(100000000), 9);
+  assert_int_equal(u32toa_size(199999999), 9);
+  assert_int_equal(u32toa_size(1000000000), 10);
+  assert_int_equal(u32toa_size(4294967295), 10);
+}
+
+
 int test_az_iot_core()
 {
   const struct CMUnitTest tests[] = {
     cmocka_unit_test(az_span_token_success),
     cmocka_unit_test(test_az_iot_get_status_from_uint32),
+    cmocka_unit_test(u32toa_size_success)
   };
   return cmocka_run_group_tests_name("az_iot_core", tests, NULL, NULL);
 }
