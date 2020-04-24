@@ -52,7 +52,7 @@ static void test_url_encode(void** state)
   uint8_t buf[256 * 3] = { 0 };
   az_span buffer = AZ_SPAN_FROM_BUFFER(buf);
 
-  az_span result = { 0 }
+  az_span result = { 0 };
   {
     az_span remainder = buffer;
 
