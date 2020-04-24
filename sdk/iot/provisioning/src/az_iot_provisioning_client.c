@@ -17,13 +17,13 @@ static const az_span str_dps_registrations_res
     = AZ_SPAN_LITERAL_FROM_STR("$dps/registrations/res/");
 
 // /registrations/
-AZ_INLINE az_span get_str_registrations()
+AZ_INLINE az_span _az_iot_provisioning_get_str_registrations()
 {
   return az_span_slice(str_dps_registrations_res, 4, 19);
 }
 
 // $dps/registrations/
-AZ_INLINE az_span get_str_dps_registrations()
+AZ_INLINE az_span _az_iot_provisioning_get_str_dps_registrations()
 {
   return az_span_slice(str_dps_registrations_res, 0, 19);
 }
@@ -74,8 +74,8 @@ AZ_NODISCARD az_result az_iot_provisioning_client_get_user_name(
       = az_span_init((uint8_t*)mqtt_user_name, (int32_t)mqtt_user_name_size);
 
   const az_span* const user_agent = &(client->_internal.options.user_agent);
-  az_span str_registrations = get_str_registrations();
-      
+  az_span str_registrations = _az_iot_provisioning_get_str_registrations();
+
   int32_t required_size = 1 + az_span_size(client->_internal.id_scope)
       + az_span_size(str_registrations) + az_span_size(client->_internal.registration_id)
       + az_span_size(provisioning_service_api_version);
@@ -167,7 +167,6 @@ AZ_NODISCARD az_result az_iot_provisioning_client_register_get_subscribe_topic_f
   return AZ_OK;
 }
 
-
 // $dps/registrations/PUT/iotdps-register/?$rid=%s
 AZ_NODISCARD az_result az_iot_provisioning_client_register_get_publish_topic(
     az_iot_provisioning_client const* client,
@@ -182,7 +181,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_register_get_publish_topic(
   AZ_PRECONDITION(mqtt_topic_size > 0);
 
   az_span mqtt_topic_span = az_span_init((uint8_t*)mqtt_topic, (int32_t)mqtt_topic_size);
-  az_span str_dps_registrations = get_str_dps_registrations();
+  az_span str_dps_registrations = _az_iot_provisioning_get_str_dps_registrations();
 
   int32_t required_size
       = 1 + az_span_size(str_dps_registrations) + az_span_size(str_put_iotdps_register);
@@ -219,7 +218,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_query_status_get_publish_topic
   AZ_PRECONDITION_VALID_SPAN(register_response->operation_id, 1, false);
 
   az_span mqtt_topic_span = az_span_init((uint8_t*)mqtt_topic, (int32_t)mqtt_topic_size);
-  az_span str_dps_registrations = get_str_dps_registrations();
+  az_span str_dps_registrations = _az_iot_provisioning_get_str_dps_registrations();
 
   int32_t required_size = 1 + az_span_size(str_dps_registrations)
       + az_span_size(str_get_iotdps_get_operationstatus)
@@ -240,7 +239,8 @@ AZ_NODISCARD az_result az_iot_provisioning_client_query_status_get_publish_topic
   return AZ_OK;
 }
 
-AZ_INLINE az_iot_provisioning_client_registration_state registration_state_default()
+AZ_INLINE az_iot_provisioning_client_registration_state
+_az_iot_provisioning_registration_state_default()
 {
   return (az_iot_provisioning_client_registration_state){ .assigned_hub_hostname = AZ_SPAN_NULL,
                                                           .device_id = AZ_SPAN_NULL,
@@ -249,6 +249,11 @@ AZ_INLINE az_iot_provisioning_client_registration_state registration_state_defau
                                                           .error_message = AZ_SPAN_NULL,
                                                           .error_tracking_id = AZ_SPAN_NULL,
                                                           .error_timestamp = AZ_SPAN_NULL };
+}
+
+AZ_INLINE az_iot_status _az_iot_status_from_extended_status(uint32_t extended_status)
+{
+  return (az_iot_status)(extended_status / 1000);
 }
 
 /*
@@ -275,7 +280,7 @@ AZ_INLINE az_result az_iot_provisioning_client_parse_payload_error_code(
     AZ_RETURN_IF_FAILED(az_json_token_get_number(&tm->token, &value));
     // TODO: #612 - non-FPU based JSON parser should be used instead.
     out_state->extended_error_code = (uint32_t)value;
-    out_state->status = (uint32_t)value / 1000;
+    out_state->status = _az_iot_status_from_extended_status(out_state->extended_error_code);
 
     return AZ_OK;
   }
@@ -348,7 +353,7 @@ AZ_INLINE az_result az_iot_provisioning_client_parse_payload(
     return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
 
-  out_response->registration_information = registration_state_default();
+  out_response->registration_information = _az_iot_provisioning_registration_state_default();
 
   while (az_succeeded(az_json_parser_parse_token_member(&jp, &tm)))
   {
