@@ -44,6 +44,7 @@ AZ_NODISCARD AZ_INLINE bool _az_url_should_encode(uint8_t c)
   }
 }
 
+// Does not check ref_destination for NULL.
 AZ_NODISCARD az_result
 _az_url_encode(az_span source, az_span* ref_destination)
 {
