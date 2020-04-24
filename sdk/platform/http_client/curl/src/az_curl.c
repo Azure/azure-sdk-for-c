@@ -123,6 +123,8 @@ _az_http_client_curl_slist_append(struct curl_slist** self, char const* str)
   struct curl_slist* const p_list = curl_slist_append(*self, str);
   if (p_list == NULL)
   {
+    // free any previous allocates custom headers
+    curl_slist_free_all(*self);
     return AZ_ERROR_HTTP_PLATFORM;
   }
   *self = p_list;
@@ -579,6 +581,9 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
   {
     return AZ_ERROR_HTTP_INVALID_METHOD_VERB;
   }
+
+  // Clean custom headers previously appended
+  curl_slist_free_all(p_list);
 
   // make sure to set the end of the body response as the end of the complete response
   if (az_succeeded(result))
