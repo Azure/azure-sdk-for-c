@@ -50,20 +50,18 @@ static void test_url_encode(void** state)
 {
   (void)state;
   uint8_t buffer[1000];
+
   {
-    uint8_t buf[256 * 3];
-    az_span builder = AZ_SPAN_FROM_BUFFER(buf);
+    az_span buffer = AZ_SPAN_FROM_BUFFER(buf);
+    TEST_EXPECT_SUCCESS(_az_url_encode(AZ_SPAN_FROM_STR("https://vault.azure.net"), &buffer));
+    assert_true(
+        az_span_is_content_equal(buffer, AZ_SPAN_FROM_STR("https%3A%2F%2Fvault.azure.net")));
+  }
 
-    az_span remainder;
-    TEST_EXPECT_SUCCESS(
-        _az_url_encode(builder, AZ_SPAN_FROM_STR("https://vault.azure.net"), &remainder));
-    assert_true(az_span_is_content_equal(
-        az_span_slice(builder, 0, 29), AZ_SPAN_FROM_STR("https%3A%2F%2Fvault.azure.net")));
-
-    builder = AZ_SPAN_FROM_BUFFER(buffer);
-    TEST_EXPECT_SUCCESS(
-        _az_url_encode(builder, AZ_SPAN_FROM_BUFFER(url_decoded_buf), &remainder));
-    assert_true(az_span_is_content_equal(az_span_slice(builder, 0, 636), url_encoded));
+  {
+    az_span buffer = AZ_SPAN_FROM_BUFFER(buf);
+    TEST_EXPECT_SUCCESS(_az_url_encode(AZ_SPAN_FROM_BUFFER(url_decoded_buf), &buffer));
+    assert_true(az_span_is_content_equal(buffer, url_encoded));
   }
 }
 
