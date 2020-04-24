@@ -179,20 +179,6 @@ az_http_request_get_header(_az_http_request const* request, int32_t index, az_pa
   return AZ_OK;
 }
 
-/**
- * @brief Get parts of an HTTP request. NULL in accepted to ignore getting any parts, for example,
- * call this function like below to get only the http method and ignore getting url and body
- *   az_http_request_get_parts(request, &method, NULL, NULL)`
- *
- * This function is expected to be used by transport layer only.
- *
- * @param request HTTP request to get parts from.
- * @param out_method Pointer to write HTTP method to. Use NULL to ignore getting this value.
- * @param out_url Pointer to write URL to. Use NULL to ignore getting this value.
- * @param out_body Pointer to write HTTP request body to. Use NULL to ignore getting this value.
- *
- * @retval AZ_OK Success.
- */
 AZ_NODISCARD az_result az_http_request_get_parts(
     _az_http_request const* request,
     az_http_method* out_method,

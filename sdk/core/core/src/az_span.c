@@ -235,7 +235,7 @@ az_span az_span_copy(az_span destination, az_span source)
 
   AZ_PRECONDITION_VALID_SPAN(destination, src_size, false);
 
-  if (src_size == 0 || az_span_ptr(source) == NULL)
+  if (src_size == 0)
   {
     return destination;
   }
