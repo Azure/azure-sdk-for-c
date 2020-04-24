@@ -305,27 +305,27 @@ AZ_NODISCARD az_result az_span_atou64(az_span span, uint64_t* out_number);
 AZ_NODISCARD az_result az_span_atou32(az_span span, uint32_t* out_number);
 
 /**
- * @brief Parses an #az_span containing ASCII digits into positive or negative double number. This
+ * @brief Parses an #az_span containing ASCII digits into double number. This
  * function uses atof from standard library, so it will convert digits until the last valid
  * character is found.
  *
- * If there is not an invalid character before the end of \p content, function will use
- * \p conversion_buffer to copy \p span content and attach a \0 at the end to set
- * the end of the digits.
+ * @remarks If there is not a non-digit character before the end of \p span content, function will
+ * use \p copy_buffer to copy \p span content and attach a \0 at the end to set the end of the
+ * digits.
  *
- * Use NULL for \p conversion_buffer if \p span content has already an invalid character or \0
- * after the last digit to convert.
+ * @remarks Use `NULL` for \p copy_buffer if \p span content has already a non-digit character
+ * or \0 after the last digit to convert.
  *
  * @param[in] span The #az_span containing the ASCII digits to be parsed.
- * @param[in] conversion_buffer \p span content will be copied here and a \0 is appended at the end
+ * @param[in] copy_buffer \p span content will be copied here and a \0 is appended at the end
  * before converting. Use NULL if there is already a \0 after the last digit to convert.
  * @param[out] out_number The pointer to the variable that is to receive the number.
  * @return An #az_result value indicating the result of the operation:
  *         - #AZ_OK if successful
- *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if \p conversion_buffer has not enough size to copy \p
+ *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if \p copy_buffer has not enough size to copy \p
  * span content
  */
-AZ_NODISCARD az_result az_span_atod(az_span span, az_span* conversion_buffer, double* out_number);
+AZ_NODISCARD az_result az_span_atod(az_span span, az_span* copy_buffer, double* out_number);
 
 /**
  * @brief Converts an int32 into its digit characters and copies them to the \p destination #az_span

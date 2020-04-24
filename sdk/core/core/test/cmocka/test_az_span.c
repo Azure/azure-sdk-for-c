@@ -778,7 +778,7 @@ static void az_span_atod_test(void** state)
   assert_true(number - result < 0.00001);
 }
 
-static void az_span_atod_test_possitive(void** state)
+static void az_span_atod_test_positive(void** state)
 {
   (void)state;
   uint8_t buff[10];
@@ -883,7 +883,7 @@ int test_az_span()
     cmocka_unit_test(az_span_u32toa_overflow_fails),
     cmocka_unit_test(az_span_atod_test),
     cmocka_unit_test(az_span_atod_test_no_extra_buffer),
-    cmocka_unit_test(az_span_atod_test_possitive),
+    cmocka_unit_test(az_span_atod_test_positive),
     cmocka_unit_test(az_span_atod_test_not_enough_space),
   };
   return cmocka_run_group_tests_name("az_core_span", tests, NULL, NULL);
