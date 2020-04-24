@@ -19,10 +19,10 @@ az_iot_hub_client_id_get -> application_mqtt_connect: X509 Client Auth: password
 state application_mqtt_connect <<APP>>
 
 ' Optional SAS token generation:
-az_iot_hub_client_id_get -> az_iot_hub_client_sas_signature_get : SAS auth
-az_iot_hub_client_sas_signature_get -> application_hmac256
-application_hmac256 -> az_iot_hub_client_sas_password_get
-az_iot_hub_client_sas_password_get --> application_mqtt_connect : password is a SAS token
+az_iot_hub_client_id_get -> az_iot_hub_client_sas_get_signature : SAS auth
+az_iot_hub_client_sas_get_signature -> application_hmac256
+application_hmac256 -> az_iot_hub_client_sas_get_password
+az_iot_hub_client_sas_get_password --> application_mqtt_connect : password is a SAS token
 state application_hmac256 <<APP>>
 
 ' Telemetry
@@ -86,8 +86,8 @@ az_iot_hub_client_init : - device_id
 az_iot_hub_client_user_name_get : - iot_hub
 
 ' SAS Tokens
-az_iot_hub_client_sas_signature_get : - unix_time
-az_iot_hub_client_sas_password_get: - Base64(HMAC-SHA256(signature, SharedAccessKey))
+az_iot_hub_client_sas_get_signature : - unix_time
+az_iot_hub_client_sas_get_password: - Base64(HMAC-SHA256(signature, SharedAccessKey))
 
 az_iot_hub_client_telemetry_publish_topic_get : - az_iot_hub_client_properties
 

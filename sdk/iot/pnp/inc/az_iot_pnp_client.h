@@ -105,7 +105,8 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_id(
     az_span mqtt_client_id,
     az_span* out_mqtt_client_id)
 {
-  return az_iot_hub_client_id_get(&client->_internal.iot_hub_client, mqtt_client_id, out_mqtt_client_id);
+  return az_iot_hub_client_id_get(
+      &client->_internal.iot_hub_client, mqtt_client_id, out_mqtt_client_id);
 }
 
 /*
@@ -134,8 +135,8 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_sas_signature(
     az_span signature,
     az_span* out_signature)
 {
-  return az_iot_hub_client_sas_signature_get(&client->_internal.iot_hub_client, 
-      token_expiration_epoch_time, signature, out_signature);
+  return az_iot_hub_client_sas_get_signature(
+      &client->_internal.iot_hub_client, token_expiration_epoch_time, signature, out_signature);
 }
 
 /**
@@ -147,22 +148,35 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_sas_signature(
  * @param[in] base64_hmac_sha256_signature The Base64 encoded value of the HMAC-SHA256(signature,
  *                                         SharedAccessKey). The signature is obtained by using
  *                                         #az_iot_pnp_client_sas_signature_get.
+ * @param[in] token_expiration_epoch_time The time, in seconds, from 1/1/1970.
  * @param[in] key_name The Shared Access Key Name (Policy Name). This is optional. For security
  *                     reasons we recommend using one key per device instead of using a global
  *                     policy key.
- * @param[in] mqtt_password An empty #az_span with sufficient capacity to hold the MQTT password.
- * @param[out] out_mqtt_password The output #az_span containing the MQTT password.
+ * @param[out] mqtt_password A buffer with sufficient capacity to hold the MQTT password.
+ *                           If successful, contains a null-terminated string with the password
+ *                           that needs to be passed to the MQTT client.
+ * @param[in] mqtt_password_size The size, in bytes of \p mqtt_password.
+ * @param[out] out_mqtt_password_length __[nullable]__ Contains the string length, in bytes, of
+ *                                                     \p mqtt_password. Can be `NULL`.
  * @return #az_result
  */
 AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_sas_password(
     az_iot_pnp_client const* client,
     az_span base64_hmac_sha256_signature,
+    uint32_t token_expiration_epoch_time,
     az_span key_name,
-    az_span mqtt_password,
-    az_span* out_mqtt_password)
+    char* mqtt_password,
+    size_t mqtt_password_size,
+    size_t* out_mqtt_password_length)
 {
-  return az_iot_hub_client_sas_password_get(&client->_internal.iot_hub_client, 
-      base64_hmac_sha256_signature, key_name, mqtt_password, out_mqtt_password);
+  return az_iot_hub_client_sas_get_password(
+      &client->_internal.iot_hub_client,
+      base64_hmac_sha256_signature,
+      token_expiration_epoch_time,
+      key_name,
+      mqtt_password,
+      mqtt_password_size,
+      out_mqtt_password_length);
 }
 
 /*
