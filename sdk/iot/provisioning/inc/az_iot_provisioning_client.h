@@ -155,6 +155,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_signature(
  * @param[in] base64_hmac_sha256_signature The Base64 encoded value of the HMAC-SHA256(signature,
  *                                         SharedAccessKey). The signature is obtained by using
  *                                         #az_iot_hub_client_sas_signature_get.
+ * @param[in] token_expiration_epoch_time The time, in seconds, from 1/1/1970.
  * @param[in] key_name The Shared Access Key Name (Policy Name). This is optional. For security
  *                     reasons we recommend using one key per device instead of using a global
  *                     policy key.
@@ -169,6 +170,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_signature(
 AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_password(
     az_iot_provisioning_client const* client,
     az_span base64_hmac_sha256_signature,
+    uint32_t token_expiration_epoch_time,
     az_span key_name,
     char* mqtt_password,
     size_t mqtt_password_size,

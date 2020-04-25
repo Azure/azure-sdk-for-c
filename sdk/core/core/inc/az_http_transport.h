@@ -91,13 +91,11 @@ az_http_request_get_header(_az_http_request const* request, int32_t index, az_pa
  *
  * @remarks This function is expected to be used by transport layer only.
  *
- * @param request HTTP request to get parts from.
+ * @param[in] request HTTP request to get parts from.
  * @param[out] out_method __[nullable]__ Pointer to write HTTP method to. Use `NULL` to ignore
  * getting this value.
  * @param[out] out_url __[nullable]__ Pointer to write URL to. Use `NULL` to ignore getting this
  * value.
- * @param[out] out_url_length __[nullable]__ Pointer to write URL length to. Use `NUL` to ignore
- * getting this value.
  * @param[out] out_body __[nullable]__ Pointer to write HTTP request body to. Use `NULL` to ignore
  * getting this value.
  *
