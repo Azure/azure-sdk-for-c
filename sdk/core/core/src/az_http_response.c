@@ -269,6 +269,7 @@ void _az_http_response_reset(az_http_response* http_response)
   (void)result;
 }
 
+// internal function to get az_http_response remainder
 static az_span _az_http_response_get_remaining(az_http_response const* response)
 {
   return az_span_slice_to_end(response->_internal.http_response, response->_internal.written);

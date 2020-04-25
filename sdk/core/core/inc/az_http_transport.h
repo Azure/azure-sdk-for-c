@@ -89,7 +89,7 @@ az_http_request_get_header(_az_http_request const* request, int32_t index, az_pa
  * call this function like below to get only the http method and ignore getting url and body.
  *   `az_http_request_get_parts(request, &method, NULL, NULL)`
  *
- * This function is expected to be used by transport layer only.
+ * @remarks This function is expected to be used by transport layer only.
  *
  * @param request HTTP request to get parts from.
  * @param[out] out_method __[nullable]__ Pointer to write HTTP method to. Use `NULL` to ignore
@@ -101,7 +101,8 @@ az_http_request_get_header(_az_http_request const* request, int32_t index, az_pa
  * @param[out] out_body __[nullable]__ Pointer to write HTTP request body to. Use `NULL` to ignore
  * getting this value.
  *
- * @retval AZ_OK Success.
+ * @retval An #az_result value indicating the result of the operation:
+ *         - #AZ_OK if successful
  */
 AZ_NODISCARD az_result az_http_request_get_parts(
     _az_http_request const* request,
@@ -109,7 +110,38 @@ AZ_NODISCARD az_result az_http_request_get_parts(
     az_span* out_url,
     az_span* out_body);
 
+/**
+ * @brief This function is expected to be used by transport adapters like curl. Use it to write
+ * content from \p write to \p response.
+ *
+ * @remarks This is a convenient way of hiding the internal implementation of az_htt_response.
+ *
+ * @remarks Parameter \p write can be an empty span. If so, nothing will be written.
+ *
+ * @param[in] response Pointer to an az_http_response.
+ * @param[in] write This is an az_span with the content to be written into response.
+ * @return An #az_result value indicating the result of the operation:
+ *         - #AZ_OK if successful
+ *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the \p response is not big enough to contain the
+ * \p write content
+ */
 AZ_NODISCARD az_result az_http_response_write_span(az_http_response* response, az_span write);
+
+/**
+ * @brief This function is expected to be used by transport adapters like curl. Use it to write
+ * just one single byte to an az_http_response.
+ *
+ * @remarks This is a convenient way of hiding the internal implementation of az_htt_response.
+ *
+ * @remarks Parameter \p write can be an empty span. If so, nothing will be written.
+ *
+ * @param[in] response Pointer to an az_http_response.
+ * @param[in] byte This is a single byte to be written into response.
+ * @return An #az_result value indicating the result of the operation:
+ *         - #AZ_OK if successful.
+ *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the \p response is not big enough to contain one
+ * extra byte.
+ */
 AZ_NODISCARD az_result az_http_response_write_u8(az_http_response* response, uint8_t byte);
 
 /**
@@ -119,6 +151,13 @@ AZ_NODISCARD az_result az_http_response_write_u8(az_http_response* response, uin
  */
 AZ_NODISCARD int32_t _az_http_request_headers_count(_az_http_request const* request);
 
+/**
+ * @brief This is the general signature that any transport adapter like curl needs to implement.
+ *
+ * @param[in] p_request Points to an az_http_request
+ * @param[in] p_response Points to an az_http_response
+ * @return AZ_NODISCARD az_http_client_send_request
+ */
 AZ_NODISCARD az_result
 az_http_client_send_request(_az_http_request* p_request, az_http_response* p_response);
 
