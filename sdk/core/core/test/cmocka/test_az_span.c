@@ -751,6 +751,14 @@ static void az_span_u32toa_overflow_fails(void** state)
   assert_true(az_span_u32toa(buffer, v, &out_span) == AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
 }
 
+static void az_span_copy_empty(void** state)
+{
+  (void)state;
+  uint8_t buff[10];
+  az_span dst = AZ_SPAN_FROM_BUFFER(buff);
+  assert_true(az_span_is_content_equal(az_span_copy(dst, AZ_SPAN_NULL), dst));
+}
+
 int test_az_span()
 {
   const struct CMUnitTest tests[] = {
@@ -789,6 +797,7 @@ int test_az_span()
     cmocka_unit_test(az_span_u32toa_zero_succeeds),
     cmocka_unit_test(az_span_u32toa_max_uint_succeeds),
     cmocka_unit_test(az_span_u32toa_overflow_fails),
+    cmocka_unit_test(az_span_copy_empty),
   };
   return cmocka_run_group_tests_name("az_core_span", tests, NULL, NULL);
 }

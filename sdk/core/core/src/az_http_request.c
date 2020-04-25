@@ -148,9 +148,6 @@ az_http_request_append_header(_az_http_request* p_request, az_span key, az_span 
 {
   AZ_PRECONDITION_NOT_NULL(p_request);
   AZ_PRECONDITION_VALID_SPAN(key, 1, false);
-  AZ_PRECONDITION_VALID_SPAN(value, 1, false);
-
-  AZ_PRECONDITION(az_span_size(key) > 0 || az_span_size(value) > 0);
 
   az_span headers = p_request->_internal.headers;
 
@@ -188,8 +185,17 @@ AZ_NODISCARD az_result az_http_request_get_parts(
     az_span* out_url,
     az_span* out_body)
 {
-  *out_method = request->_internal.method;
-  *out_url = az_span_slice(request->_internal.url, 0, request->_internal.url_length);
-  *out_body = request->_internal.body;
+  if (out_method != NULL)
+  {
+    *out_method = request->_internal.method;
+  }
+  if (out_url != NULL)
+  {
+    *out_url = az_span_slice(request->_internal.url, 0, request->_internal.url_length);
+  }
+  if (out_body != NULL)
+  {
+    *out_body = request->_internal.body;
+  }
   return AZ_OK;
 }
