@@ -65,14 +65,14 @@ static void test_az_iot_provisioning_client_default_options_get_connect_info_suc
   memset(user_name, 0xCC, sizeof(user_name));
   ret = az_iot_provisioning_client_get_user_name(&client, user_name, sizeof(user_name), NULL);
   assert_int_equal(AZ_OK, ret);
-  assert_memory_equal(expected_username, user_name, strlen(user_name));
+  assert_string_equal(expected_username, user_name);
   assert_int_equal((uint8_t)0xCC, (uint8_t)user_name[strlen(user_name) + 1]);
 
   size_t user_name_len;
   ret = az_iot_provisioning_client_get_user_name(
       &client, user_name, sizeof(user_name), &user_name_len);
   assert_int_equal(AZ_OK, ret);
-  assert_memory_equal(expected_username, user_name, strlen(user_name));
+  assert_string_equal(expected_username, user_name);
   assert_int_equal((uint8_t)0xCC, (uint8_t)user_name[strlen(user_name) + 1]);
   assert_int_equal(strlen(expected_username), user_name_len);
 }
@@ -101,7 +101,7 @@ static void test_az_iot_provisioning_client_custom_options_get_username_succeed(
   ret = az_iot_provisioning_client_get_user_name(
       &client, user_name, sizeof(user_name), &user_name_len);
   assert_int_equal(AZ_OK, ret);
-  assert_memory_equal(expected_username, user_name, strlen(user_name));
+  assert_string_equal(expected_username, user_name);
   assert_int_equal((uint8_t)0xCC, (uint8_t)user_name[strlen(user_name) + 1]);
   assert_int_equal(strlen(expected_username), user_name_len);
 }
@@ -162,14 +162,14 @@ static void test_az_iot_provisioning_client_get_subscribe_topic_filter_succeed()
       &client, topic, sizeof(topic), NULL);
 
   assert_int_equal(AZ_OK, ret);
-  assert_memory_equal(expected_topic, topic, strlen(topic));
+  assert_string_equal(expected_topic, topic);
   assert_int_equal((uint8_t)0xCC, (uint8_t)topic[strlen(topic) + 1]);
 
   size_t topic_len;
   ret = az_iot_provisioning_client_register_get_subscribe_topic_filter(
       &client, topic, sizeof(topic), &topic_len);
   assert_int_equal(AZ_OK, ret);
-  assert_memory_equal(expected_topic, topic, strlen(topic));
+  assert_string_equal(expected_topic, topic);
   assert_int_equal((uint8_t)0xCC, (uint8_t)topic[strlen(topic) + 1]);
   assert_int_equal(strlen(expected_topic), topic_len);
 }
@@ -204,7 +204,7 @@ static void test_az_iot_provisioning_client_get_register_publish_topic_succeed()
       = az_iot_provisioning_client_register_get_publish_topic(&client, topic, sizeof(topic), NULL);
 
   assert_int_equal(AZ_OK, ret);
-  assert_memory_equal(expected_topic, topic, strlen(topic));
+  assert_string_equal(expected_topic, topic);
   assert_int_equal((uint8_t)0xCC, (uint8_t)topic[strlen(topic) + 1]);
 
   size_t topic_len;
@@ -212,7 +212,7 @@ static void test_az_iot_provisioning_client_get_register_publish_topic_succeed()
       &client, topic, sizeof(topic), &topic_len);
 
   assert_int_equal(AZ_OK, ret);
-  assert_memory_equal(expected_topic, topic, strlen(topic));
+  assert_string_equal(expected_topic, topic);
   assert_int_equal((uint8_t)0xCC, (uint8_t)topic[strlen(topic) + 1]);
   assert_int_equal(strlen(expected_topic), topic_len);
 }
@@ -255,7 +255,7 @@ static void test_az_iot_provisioning_client_get_operation_status_publish_topic_s
       &client, &response, topic, sizeof(topic), NULL);
 
   assert_int_equal(AZ_OK, ret);
-  assert_memory_equal(expected_topic, topic, strlen(topic));
+  assert_string_equal(expected_topic, topic);
   assert_int_equal((uint8_t)0xCC, (uint8_t)topic[strlen(topic) + 1]);
 
   size_t topic_len;
@@ -263,7 +263,7 @@ static void test_az_iot_provisioning_client_get_operation_status_publish_topic_s
       &client, &response, topic, sizeof(topic), &topic_len);
 
   assert_int_equal(AZ_OK, ret);
-  assert_memory_equal(expected_topic, topic, strlen(topic));
+  assert_string_equal(expected_topic, topic);
   assert_int_equal((uint8_t)0xCC, (uint8_t)topic[strlen(topic) + 1]);
   assert_int_equal(strlen(expected_topic), topic_len);
 }
