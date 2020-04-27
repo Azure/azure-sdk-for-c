@@ -39,7 +39,7 @@ AZ_NODISCARD az_result _az_aad_build_url(az_span url, az_span tenant_id, az_span
   {
     int32_t url_length = 0;
     AZ_RETURN_IF_FAILED(_az_url_encode(remainder, tenant_id, &url_length));
-    remainder = az_span_slice(remainder, 0, url_length);
+    remainder = az_span_slice_to_end(remainder, url_length);
   }
 
   az_span const oath_token = AZ_SPAN_FROM_STR("/oauth2/v2.0/token");
