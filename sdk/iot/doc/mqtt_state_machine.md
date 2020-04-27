@@ -132,7 +132,7 @@ _Example:_
         switch (twin_response.response_type)
         {
             case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_GET:
-                // This is a response to a az_iot_hub_client_twin_get_get_publish_topic.
+                // This is a response to a az_iot_hub_client_twin_document_get_publish_topic.
                 break;
             case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES:
                 // This is received as the Twin desired properties were changed using the service client.

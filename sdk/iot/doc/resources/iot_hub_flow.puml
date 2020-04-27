@@ -47,8 +47,8 @@ application_mqtt_connect --> az_iot_hub_client_twin_get_patch_subscribe_topic_fi
 az_iot_hub_client_twin_get_patch_subscribe_topic_filter --> application_mqtt_subscribe
 
 
-application_mqtt_subscribe --> az_iot_hub_client_twin_get_get_publish_topic
-az_iot_hub_client_twin_get_get_publish_topic --> application_mqtt_publish
+application_mqtt_subscribe --> az_iot_hub_client_twin_document_get_publish_topic
+az_iot_hub_client_twin_document_get_publish_topic --> application_mqtt_publish
 
 application_mqtt_subscribe --> az_iot_hub_client_twin_get_patch_publish_topic
 az_iot_hub_client_twin_get_patch_publish_topic --> application_mqtt_publish
@@ -101,7 +101,7 @@ az_iot_hub_client_methods_get_response_publish_topic: - status
 state az_iot_hub_client_c2d_request <<STRUCT>>
 az_iot_hub_client_c2d_request : - az_iot_hub_client_properties
 
-az_iot_hub_client_twin_get_get_publish_topic : - request_id
+az_iot_hub_client_twin_document_get_publish_topic : - request_id
 
 az_iot_hub_client_twin_get_patch_publish_topic : - request_id
 az_iot_hub_client_twin_get_patch_publish_topic : - if_match_version

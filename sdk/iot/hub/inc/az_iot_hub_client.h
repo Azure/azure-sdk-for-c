@@ -538,7 +538,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
  *                                                  \p mqtt_topic. Can be `NULL`.
  * @return #az_result
  */
-AZ_NODISCARD az_result az_iot_hub_client_twin_get_get_publish_topic(
+AZ_NODISCARD az_result az_iot_hub_client_twin_document_get_publish_topic(
     az_iot_hub_client const* client,
     az_span request_id,
     char* mqtt_topic,

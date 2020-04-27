@@ -91,7 +91,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_get_patch_subscribe_topic_filter(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_iot_hub_client_twin_get_get_publish_topic(
+AZ_NODISCARD az_result az_iot_hub_client_twin_document_get_publish_topic(
     az_iot_hub_client const* client,
     az_span request_id,
     char* mqtt_topic,
