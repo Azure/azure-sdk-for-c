@@ -16,9 +16,9 @@
  * @brief Copies character from the \p source #az_span to the \p destination #az_span by
  * URL-encoding the \p source span characters.
  *
- * @param[in] destination The #az_span whose bytes will receive the URL-encoded source.
+ * @param[in] destination The #az_span whose bytes will receive the URL-encoded \p source.
  * @param[in] source The #az_span containing the non-URL-encoded bytes.
- * @param[out] out_length A pointer to a #uint32_t that is going to be assigned the length
+ * @param[out] out_length A pointer to an int32_t that is going to be assigned the length
  * of URL-encoding the \p source.
  * @return An #az_result value indicating the result of the operation:
  *         - #AZ_OK if successful
