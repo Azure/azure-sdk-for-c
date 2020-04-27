@@ -216,7 +216,7 @@ static void test_az_iot_pnp_client_get_user_name_user_options_small_buffer_fail(
       AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
 }
 
-// TODO: Add tests for inline functions (e.g. az_iot_pnp_client_get_id).  Will add them prior to
+// TODO: Add tests for inline functions (e.g. az_iot_pnp_client_get_client_id).  Will add them prior to
 // merge if guidance is available.  Otherwise will open separate GitHub bug to not block merge
 // and record number here.
 

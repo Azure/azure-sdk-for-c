@@ -109,7 +109,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_get_user_name(
  *                                                      of \p mqtt_client_id. Can be `NULL`.
  * @return #az_result
  */
-AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_id(
+AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_client_id(
     az_iot_pnp_client const* client,
     char* mqtt_client_id,
     size_t mqtt_client_id_size,
@@ -290,7 +290,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_command_parse_received_topic(
  * @param[out] out_mqtt_topic The output #az_span containing the MQTT topic.
  * @return #az_result
  */
-AZ_NODISCARD az_result az_iot_pnp_client_command_get_response_publish_topic(
+AZ_NODISCARD az_result az_iot_pnp_client_command_response_get_publish_topic(
     az_iot_pnp_client const* client,
     az_span request_id,
     uint16_t status,
