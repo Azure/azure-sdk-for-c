@@ -51,9 +51,9 @@ static az_span _az_add_telemetry_property(
 AZ_NODISCARD az_result az_iot_pnp_client_telemetry_get_publish_topic(
     az_iot_pnp_client const* client,
     az_span component_name,
+    void* reserved,
     char* mqtt_topic,
     size_t mqtt_topic_size,
-    void* reserved,
     size_t* out_mqtt_topic_length)
 {
   AZ_PRECONDITION_NOT_NULL(client);
@@ -63,16 +63,21 @@ AZ_NODISCARD az_result az_iot_pnp_client_telemetry_get_publish_topic(
   AZ_PRECONDITION_IS_NULL(reserved);
   (void)reserved;
 
-  size_t written;
+  size_t hub_topic_written_length;
 
-  // First get hub topic since it is unknown how long it will be
+  // First get hub topic
   AZ_RETURN_IF_FAILED(az_iot_hub_client_telemetry_get_publish_topic(
-      &client->_internal.iot_hub_client, NULL, mqtt_topic, mqtt_topic_size, (size_t*)&written));
+      &client->_internal.iot_hub_client,
+      NULL,
+      mqtt_topic,
+      mqtt_topic_size,
+      (size_t*)&hub_topic_written_length));
 
   az_span mqtt_topic_span = az_span_init((uint8_t*)mqtt_topic, (int32_t)mqtt_topic_size);
 
   // Hub topic plus pnp values
-  int32_t required_length = (int32_t)written + az_span_size(pnp_telemetry_component_name_param)
+  int32_t required_length = (int32_t)hub_topic_written_length
+      + az_span_size(pnp_telemetry_component_name_param)
       + (int32_t)sizeof(pnp_telemetry_param_equals) + az_span_size(component_name);
 
   // Content type size if applicable
@@ -96,8 +101,9 @@ AZ_NODISCARD az_result az_iot_pnp_client_telemetry_get_publish_topic(
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_topic_span, required_length + (int32_t)sizeof(null_terminator));
 
   // Proceed with appending since there is enough size
-  az_span remaining
-      = az_span_init((uint8_t*)(mqtt_topic + written), (int32_t)(mqtt_topic_size - written));
+  az_span remaining = az_span_init(
+      (uint8_t*)(mqtt_topic + hub_topic_written_length),
+      (int32_t)(mqtt_topic_size - hub_topic_written_length));
 
   remaining = _az_add_telemetry_property(
       remaining, pnp_telemetry_component_name_param, component_name, false);

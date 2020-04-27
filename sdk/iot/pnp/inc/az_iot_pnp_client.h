@@ -209,11 +209,11 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_sas_password(
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in] component_name An #az_span specifying the component name to publish telemetry on.
+ * @param[in] reserved Reserved for future use.  Must be NULL.
  * @param[out] mqtt_topic A buffer with sufficient capacity to hold the MQTT topic. If
  *                        successful, contains a null-terminated string with the topic that
  *                        needs to be passed to the MQTT client.
  * @param[in] mqtt_topic_size The size, in bytes of \p mqtt_topic.
- * @param[in] reserved Reserved for future use.  Must be NULL.
  * @param[out] out_mqtt_topic_length __[nullable]__ Contains the string length, in bytes, of
  *                                                  \p mqtt_topic. Can be `NULL`.
  * @return #az_result
@@ -221,9 +221,9 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_sas_password(
 AZ_NODISCARD az_result az_iot_pnp_client_telemetry_get_publish_topic(
     az_iot_pnp_client const* client,
     az_span component_name,
+    void* reserved,
     char* mqtt_topic,
     size_t mqtt_topic_size,
-    void* reserved,
     size_t* out_mqtt_topic_length);
 
 /*
