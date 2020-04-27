@@ -237,16 +237,20 @@ AZ_NODISCARD az_result az_iot_pnp_client_telemetry_get_publish_topic(
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in] reserved Reserved for future use.  Must be NULL.
- * @param[in] mqtt_topic_filter An empty #az_span with sufficient capacity to hold the MQTT topic
- *                              filter.
- * @param[out] out_mqtt_topic_filter The output #az_span containing the MQTT topic filter.
+ * @param[out] mqtt_topic_filter A buffer with sufficient capacity to hold the MQTT topic filter.
+ *                               If successful, contains a null-terminated string with the topic
+ *                               filter that needs to be passed to the MQTT client.
+ * @param[in] mqtt_topic_filter_size The size, in bytes of \p mqtt_topic_filter.
+ * @param[out] out_mqtt_topic_filter_length __[nullable]__ Contains the string length, in bytes, of
+ *                                                         \p mqtt_topic_filter. Can be `NULL`.
  * @return #az_result
  */
 AZ_NODISCARD az_result az_iot_pnp_client_command_get_subscribe_topic_filter(
     az_iot_pnp_client const* client,
     void* reserved,
-    az_span mqtt_topic_filter,
-    az_span* out_mqtt_topic_filter);
+    char* mqtt_topic_filter,
+    size_t mqtt_topic_filter_size,
+    size_t* out_mqtt_topic_filter_length);
 
 /**
  * @brief A command request received from the PnP service.
