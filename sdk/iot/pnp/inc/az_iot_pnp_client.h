@@ -236,16 +236,16 @@ AZ_NODISCARD az_result az_iot_pnp_client_telemetry_get_publish_topic(
  * @brief Gets the MQTT topic filter to subscribe to PnP commands.
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
+ * @param[in] reserved Reserved for future use.  Must be NULL.
  * @param[in] mqtt_topic_filter An empty #az_span with sufficient capacity to hold the MQTT topic
  *                              filter.
- * @param[in] reserved Reserved for future use.  Must be NULL.
  * @param[out] out_mqtt_topic_filter The output #az_span containing the MQTT topic filter.
  * @return #az_result
  */
 AZ_NODISCARD az_result az_iot_pnp_client_command_get_subscribe_topic_filter(
     az_iot_pnp_client const* client,
-    az_span mqtt_topic_filter,
     void* reserved,
+    az_span mqtt_topic_filter,
     az_span* out_mqtt_topic_filter);
 
 /**
@@ -285,18 +285,23 @@ AZ_NODISCARD az_result az_iot_pnp_client_command_parse_received_topic(
  * @param[in] request_id The request id. Must match a received #az_iot_pnp_client_command_request
  *                       request_id.
  * @param[in] status The status. (E.g. 200 for success.)
- * @param[in] mqtt_topic An empty #az_span with sufficient capacity to hold the MQTT topic.
  * @param[in] reserved Reserved for future use.  Must be NULL.
- * @param[out] out_mqtt_topic The output #az_span containing the MQTT topic.
+ * @param[out] mqtt_topic A buffer with sufficient capacity to hold the MQTT topic. If
+ *                        successful, contains a null-terminated string with the topic that
+ *                        needs to be passed to the MQTT client.
+ * @param[in] mqtt_topic_size The size, in bytes of \p mqtt_topic.
+ * @param[out] out_mqtt_topic_length __[nullable]__ Contains the string length, in bytes, of
+ *                                                  \p mqtt_topic. Can be `NULL`.
  * @return #az_result
  */
 AZ_NODISCARD az_result az_iot_pnp_client_command_response_get_publish_topic(
     az_iot_pnp_client const* client,
     az_span request_id,
     uint16_t status,
-    az_span mqtt_topic,
     void* reserved,
-    az_span* out_mqtt_topic);
+    char* mqtt_topic,
+    size_t mqtt_topic_size,
+    size_t* out_mqtt_topic_length);
 
 #include <_az_cfg_suffix.h>
 
