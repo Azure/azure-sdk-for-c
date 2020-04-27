@@ -63,7 +63,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_telemetry_get_publish_topic(
   AZ_PRECONDITION_IS_NULL(reserved);
   (void)reserved;
 
-  size_t hub_topic_written_length;
+  size_t hub_topic_length;
 
   // First get hub topic
   AZ_RETURN_IF_FAILED(az_iot_hub_client_telemetry_get_publish_topic(
@@ -71,12 +71,12 @@ AZ_NODISCARD az_result az_iot_pnp_client_telemetry_get_publish_topic(
       NULL,
       mqtt_topic,
       mqtt_topic_size,
-      (size_t*)&hub_topic_written_length));
+      (size_t*)&hub_topic_length));
 
   az_span mqtt_topic_span = az_span_init((uint8_t*)mqtt_topic, (int32_t)mqtt_topic_size);
 
   // Hub topic plus pnp values
-  int32_t required_length = (int32_t)hub_topic_written_length
+  int32_t required_length = (int32_t)hub_topic_length
       + az_span_size(pnp_telemetry_component_name_param)
       + (int32_t)sizeof(pnp_telemetry_param_equals) + az_span_size(component_name);
 
@@ -102,8 +102,8 @@ AZ_NODISCARD az_result az_iot_pnp_client_telemetry_get_publish_topic(
 
   // Proceed with appending since there is enough size
   az_span remaining = az_span_init(
-      (uint8_t*)(mqtt_topic + hub_topic_written_length),
-      (int32_t)(mqtt_topic_size - hub_topic_written_length));
+      (uint8_t*)(mqtt_topic + hub_topic_length),
+      (int32_t)(mqtt_topic_size - hub_topic_length));
 
   remaining = _az_add_telemetry_property(
       remaining, pnp_telemetry_component_name_param, component_name, false);
