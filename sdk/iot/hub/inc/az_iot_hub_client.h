@@ -99,7 +99,7 @@ AZ_NODISCARD az_result az_iot_hub_client_init(
  *                                                      \p mqtt_user_name. Can be `NULL`.
  * @return #az_result.
  */
-AZ_NODISCARD az_result az_iot_hub_client_user_name_get(
+AZ_NODISCARD az_result az_iot_hub_client_get_user_name(
     az_iot_hub_client const* client,
     char* mqtt_user_name,
     size_t mqtt_user_name_size,
@@ -121,7 +121,7 @@ AZ_NODISCARD az_result az_iot_hub_client_user_name_get(
  *                                                      of \p mqtt_client_id. Can be `NULL`.
  * @return #az_result
  */
-AZ_NODISCARD az_result az_iot_hub_client_id_get(
+AZ_NODISCARD az_result az_iot_hub_client_get_client_id(
     az_iot_hub_client const* client,
     char*  mqtt_client_id,
     size_t mqtt_client_id_size,
@@ -431,7 +431,7 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_parse_received_topic(
  *                                                  \p mqtt_topic. Can be `NULL`.
  * @return #az_result
  */
-AZ_NODISCARD az_result az_iot_hub_client_methods_get_response_publish_topic(
+AZ_NODISCARD az_result az_iot_hub_client_methods_response_get_publish_topic(
     az_iot_hub_client const* client,
     az_span request_id,
     uint16_t status,
@@ -457,7 +457,7 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_get_response_publish_topic(
  *                                                         \p mqtt_topic_filter. Can be `NULL`.
  * @return #az_result
  */
-AZ_NODISCARD az_result az_iot_hub_client_twin_get_response_subscribe_topic_filter(
+AZ_NODISCARD az_result az_iot_hub_client_twin_response_get_subscribe_topic_filter(
     az_iot_hub_client const* client,
     char* mqtt_topic_filter,
     size_t mqtt_topic_filter_size,
@@ -476,7 +476,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_get_response_subscribe_topic_filte
  *                                                         \p mqtt_topic_filter. Can be `NULL`.
  * @return #az_result
  */
-AZ_NODISCARD az_result az_iot_hub_client_twin_get_patch_subscribe_topic_filter(
+AZ_NODISCARD az_result az_iot_hub_client_twin_patch_get_subscribe_topic_filter(
     az_iot_hub_client const* client,
     char* mqtt_topic_filter,
     size_t mqtt_topic_filter_size,
@@ -560,7 +560,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_document_get_publish_topic(
  *                                                  \p mqtt_topic. Can be `NULL`.
  * @return #az_result
  */
-AZ_NODISCARD az_result az_iot_hub_client_twin_get_patch_publish_topic(
+AZ_NODISCARD az_result az_iot_hub_client_twin_patch_get_publish_topic(
     az_iot_hub_client const* client,
     az_span request_id,
     char* mqtt_topic,

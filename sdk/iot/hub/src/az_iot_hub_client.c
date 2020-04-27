@@ -42,7 +42,7 @@ AZ_NODISCARD az_result az_iot_hub_client_init(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_iot_hub_client_user_name_get(
+AZ_NODISCARD az_result az_iot_hub_client_get_user_name(
     az_iot_hub_client const* client,
     char* mqtt_user_name,
     size_t mqtt_user_name_size,
@@ -100,7 +100,7 @@ AZ_NODISCARD az_result az_iot_hub_client_user_name_get(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_iot_hub_client_id_get(
+AZ_NODISCARD az_result az_iot_hub_client_get_client_id(
     az_iot_hub_client const* client,
     char* mqtt_client_id,
     size_t mqtt_client_id_size,

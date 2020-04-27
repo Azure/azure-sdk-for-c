@@ -65,7 +65,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_get_user_name(
   size_t hub_user_name_length;
 
   // First get hub user name
-  AZ_RETURN_IF_FAILED(az_iot_hub_client_user_name_get(
+  AZ_RETURN_IF_FAILED(az_iot_hub_client_get_user_name(
       &client->_internal.iot_hub_client,
       mqtt_user_name,
       mqtt_user_name_size,

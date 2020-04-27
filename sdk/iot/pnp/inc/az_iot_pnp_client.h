@@ -115,7 +115,7 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_id(
     size_t mqtt_client_id_size,
     size_t* out_mqtt_client_id_length)
 {
-  return az_iot_hub_client_id_get(
+  return az_iot_hub_client_get_client_id(
       &client->_internal.iot_hub_client,
       mqtt_client_id,
       mqtt_client_id_size,

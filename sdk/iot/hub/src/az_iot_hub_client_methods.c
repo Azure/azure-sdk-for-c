@@ -104,7 +104,7 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_parse_received_topic(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_iot_hub_client_methods_get_response_publish_topic(
+AZ_NODISCARD az_result az_iot_hub_client_methods_response_get_publish_topic(
     az_iot_hub_client const* client,
     az_span request_id,
     uint16_t status,

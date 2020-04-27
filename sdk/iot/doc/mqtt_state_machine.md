@@ -124,7 +124,7 @@ _Example:_
     {
         // This is a Method request:
         //  method_request.name contains the method
-        //  method_request.request_id contains the request ID that must be used to submit the response using az_iot_hub_client_methods_get_response_publish_topic()
+        //  method_request.request_id contains the request ID that must be used to submit the response using az_iot_hub_client_methods_response_get_publish_topic()
     }
     else if (az_succeeded(ret = az_iot_hub_client_twin_parse_received_topic(client, received_topic, &twin_response)))
     {
@@ -138,7 +138,7 @@ _Example:_
                 // This is received as the Twin desired properties were changed using the service client.
                 break;
             case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES:
-                // This is a response received after patching the reported properties using az_iot_hub_client_twin_get_patch_publish_topic().
+                // This is a response received after patching the reported properties using az_iot_hub_client_twin_patch_get_publish_topic().
                 break;
             default:
                 // error.
