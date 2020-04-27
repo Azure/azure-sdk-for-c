@@ -88,7 +88,7 @@ AZ_NODISCARD az_result _az_aad_build_body(
     remainder = az_span_slice_to_end(remainder, url_length);
   }
 
-  *out_body = az_span_slice(body, 0, url_length);
+  *out_body = az_span_slice(body, 0, _az_span_diff(remainder, body));
   return AZ_OK;
 }
 

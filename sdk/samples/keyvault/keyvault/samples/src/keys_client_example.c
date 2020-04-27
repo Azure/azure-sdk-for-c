@@ -4,6 +4,7 @@
 #include <az_context.h>
 #include <az_credentials.h>
 #include <az_http.h>
+#include <az_http_internal.h>
 #include <az_json.h>
 #include <az_keyvault.h>
 
@@ -17,13 +18,14 @@
 #define CLIENT_SECRET_ENV "client_secret"
 #define URI_ENV "test_uri"
 
+int exit_code = 0;
+
 az_span get_key_version(az_http_response* response);
 
 int main()
 {
   /************* create credentials as client_id type   ***********/
   az_credential_client_secret credential = { 0 };
-
   // init credential_credentials struc
   az_result const creds_retcode = az_credential_client_secret_init(
       &credential,
@@ -34,7 +36,6 @@ int main()
   if (az_failed(creds_retcode))
   {
     printf("Failed to init credential");
-    return 1;
   }
 
   /************ Creates keyvault client    ****************/
@@ -49,7 +50,6 @@ int main()
   if (az_failed(operation_result))
   {
     printf("Failed to init keys client");
-    return 2;
   }
 
   /******* Create a buffer for response (will be reused for all requests)   *****/
@@ -61,11 +61,10 @@ int main()
   if (az_failed(init_http_response_result))
   {
     printf("Failed to init http response");
-    return 3;
   }
 
   /******************  CREATE KEY with options******************************/
-  az_keyvault_create_key_options key_options = az_keyvault_create_key_options_default();
+  az_keyvault_create_key_options key_options = { 0 };
 
   // override options values
   key_options.operations = (az_span[]){ az_keyvault_key_operation_sign(), AZ_SPAN_NULL };
@@ -89,14 +88,12 @@ int main()
     printf("Running sample with no_op HTTP implementation.\nRecompile az_core with an HTTP client "
            "implementation like CURL to see sample sending network requests.\n\n"
            "i.e. cmake -DBUILD_CURL_TRANSPORT=ON ..\n\n");
-
-    return 4;
+    return 0;
   }
 
   if (az_failed(create_result))
   {
     printf("Failed to create key");
-    return 5;
   }
 
   printf("Key created result: \n%s", response_buffer);
@@ -110,7 +107,6 @@ int main()
   if (az_failed(get_key_result))
   {
     printf("Failed to get key");
-    return 6;
   }
 
   printf("\n\n*********************************\nGet Key result: \n%s", response_buffer);
@@ -123,7 +119,6 @@ int main()
   if (az_span_size(version_builder) < az_span_size(version))
   {
     printf("Failed to append key version");
-    return 7;
   }
   else
   {
@@ -145,7 +140,6 @@ int main()
   if (az_failed(create_version_result))
   {
     printf("Failed to create key version");
-    return 8;
   }
 
   printf(
@@ -161,7 +155,6 @@ int main()
   if (az_failed(get_key_prev_ver_result))
   {
     printf("Failed to get previous version of the key");
-    return 9;
   }
 
   printf("\n\n*********************************\nGet Key previous Ver: \n%s", response_buffer);
@@ -173,7 +166,6 @@ int main()
   if (az_failed(delete_key_result))
   {
     printf("Failed to delete key");
-    return 10;
   }
 
   printf("\n\n*********************************\nDELETED Key: \n %s", response_buffer);
@@ -187,14 +179,13 @@ int main()
   if (az_failed(get_key_again_result))
   {
     printf("Failed to get key (2)");
-    return 11;
   }
 
   printf(
       "\n\n*********************************\nGet Key again after DELETE result: \n%s\n",
       response_buffer);
 
-  return 0;
+  return exit_code;
 }
 
 az_span get_key_version(az_http_response* response)

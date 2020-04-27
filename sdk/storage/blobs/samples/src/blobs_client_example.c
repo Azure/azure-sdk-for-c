@@ -4,6 +4,7 @@
 #include <az_context.h>
 #include <az_credentials.h>
 #include <az_http.h>
+#include <az_http_internal.h>
 #include <az_http_transport.h>
 #include <az_json.h>
 #include <az_log.h>
@@ -16,6 +17,7 @@
 
 #define URI_ENV "test_uri"
 
+int exit_code = 0;
 static az_span content_to_upload = AZ_SPAN_LITERAL_FROM_STR("Some test content");
 
 // Uncomment below code to enable logging (and the first lines of main function)
@@ -46,7 +48,6 @@ int main()
   if (az_failed(operation_result))
   {
     printf("Failed to init blob client");
-    return 1;
   }
 
   /******* Create a buffer for response (will be reused for all requests)   *****/
@@ -58,7 +59,6 @@ int main()
   if (az_failed(init_http_response_result))
   {
     printf("Failed to init http response");
-    return 2;
   }
 
   printf("Uploading blob...\n");
@@ -71,15 +71,13 @@ int main()
     printf("Running sample with no_op HTTP implementation.\nRecompile az_core with an HTTP client "
            "implementation like CURL to see sample sending network requests.\n\n"
            "i.e. cmake -DBUILD_CURL_TRANSPORT=ON ..\n\n");
-
-    return 3;
+    return 0;
   }
 
   if (az_failed(create_result))
   {
     printf("Failed to create blob");
-    return 4;
   }
 
-  return 0;
+  return exit_code;
 }
