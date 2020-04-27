@@ -251,6 +251,7 @@ typedef struct az_iot_provisioning_client_register_response
  * @param[out] out_response If the message is register-operation related, this will contain the
  *                          #az_iot_provisioning_client_register_response.
  * @return #az_result
+ *         - #AZ_ERROR_IOT_TOPIC_NO_MATCH if the topic is not matching the expected format.
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_parse_received_topic_and_payload(
     az_iot_provisioning_client const* client,
