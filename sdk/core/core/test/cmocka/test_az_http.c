@@ -172,6 +172,36 @@ static void test_http_request(void** state)
     assert_return_code(
         az_http_request_append_header(&hrb, AZ_SPAN_FROM_STR("header"), AZ_SPAN_NULL), AZ_OK);
   }
+  {
+    uint8_t buf[100];
+    uint8_t header_buf[(2 * sizeof(az_pair))];
+    memset(buf, 0, sizeof(buf));
+    memset(header_buf, 0, sizeof(header_buf));
+
+    az_span url_span = AZ_SPAN_FROM_BUFFER(buf);
+    az_span remainder = az_span_copy(url_span, hrb_url);
+    assert_int_equal(az_span_size(remainder), 100 - az_span_size(hrb_url));
+    az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
+    _az_http_request hrb;
+
+    TEST_EXPECT_SUCCESS(az_http_request_init(
+        &hrb,
+        &az_context_app,
+        az_http_method_get(),
+        url_span,
+        az_span_size(hrb_url),
+        header_span,
+        AZ_SPAN_FROM_STR("body")));
+
+    // Remove empty spaces from the left of header name
+    assert_return_code(
+        az_http_request_append_header(&hrb, AZ_SPAN_FROM_STR(" \t\r\nheader"), AZ_SPAN_NULL),
+        AZ_OK);
+
+    az_pair header = { 0 };
+    assert_return_code(az_http_request_get_header(&hrb, 0, &header), AZ_OK);
+    assert_true(az_span_is_content_equal(header.key, AZ_SPAN_FROM_STR("header")));
+  }
 }
 
 #define EXAMPLE_BODY \
