@@ -102,7 +102,7 @@ AZ_NODISCARD az_result az_json_parser_init(az_json_parser* json_parser, az_span 
   return AZ_OK;
 }
 
-static az_result az_span_reader_skip_json_white_space(az_span* self)
+AZ_NODISCARD az_result az_span_reader_skip_json_white_space(az_span* self)
 {
   if (az_span_size(*self) == 0)
   {

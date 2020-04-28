@@ -35,6 +35,9 @@ _az_span_scan_until(az_span self, _az_predicate predicate, int32_t* out_index);
 
 AZ_NODISCARD az_result _az_is_expected_span(az_span* self, az_span expected);
 
+// Used internally by json parser and also by httpRequest
+AZ_NODISCARD az_result az_span_reader_skip_json_white_space(az_span* self);
+
 #include <_az_cfg_suffix.h>
 
 #endif // _az_SPAN_PRIVATE_H
