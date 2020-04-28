@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef _az_CREDENTIAL_INTERNAL_H
-#define _az_CREDENTIAL_INTERNAL_H
+#ifndef _az_CREDENTIALS_INTERNAL_H
+#define _az_CREDENTIALS_INTERNAL_H
 
 #include <az_credentials.h>
 #include <az_result.h>
@@ -22,4 +22,4 @@ _az_credential_set_scopes(_az_credential* credential, az_span scopes)
 
 #include <_az_cfg_suffix.h>
 
-#endif // _az_CREDENTIAL_INTERNAL_H
+#endif // _az_CREDENTIALS_INTERNAL_H
