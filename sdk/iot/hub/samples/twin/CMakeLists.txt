@@ -1,12 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # SPDX-License-Identifier: MIT
 
-if (BUILD_PAHO_TRANSPORT)
-
-cmake_minimum_required (VERSION 3.10)
-
-project (az_iot_hub_samples LANGUAGES C)
-
 set(CMAKE_C_STANDARD 99)
 
 find_package(eclipse-paho-mqtt-c CONFIG)
@@ -37,5 +31,3 @@ target_link_libraries(
   OpenSSL::SSL
   OpenSSL::Crypto
   )
-
-endif()
