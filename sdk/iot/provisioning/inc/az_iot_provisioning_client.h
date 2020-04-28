@@ -5,8 +5,13 @@
  * @file az_iot_provisioning_client.h
  *
  * @brief definition for the Azure Device Provisioning client.
- * @note The Device Provisioning MQTT protocol is described at
+ * @remark The Device Provisioning MQTT protocol is described at
  * https://docs.microsoft.com/en-us/azure/iot-dps/iot-dps-mqtt-support
+ *
+ * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
+ * prefixed with an underscore ('_') directly in your application code. These symbols
+ * are part of Azure SDK's internal implementation; we do not document these symbols
+ * and they are subject to change in future versions of the SDK which would break your code.
  */
 
 #ifndef _az_IOT_PROVISIONING_CLIENT_H
@@ -131,7 +136,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_get_client_id(
  *          this API, sign it using HMAC-SHA256 using the Shared Access Key as password then Base64
  *          encode the result.
  *
- * @note More information available at
+ * @remark More information available at
  * https://docs.microsoft.com/en-us/azure/iot-dps/concepts-symmetric-key-attestation#detailed-attestation-process
  *
  * @param[in] client The #az_iot_provisioning_client to use for this call.
@@ -148,7 +153,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_signature(
 
 /**
  * @brief Gets the MQTT password.
- * @note The MQTT password must be an empty string if X509 Client certificates are used. Use this
+ * @remark The MQTT password must be an empty string if X509 Client certificates are used. Use this
  *       API only when authenticating with SAS tokens.
  *
  * @param[in] client The #az_iot_provisioning_client to use for this call.
@@ -205,21 +210,21 @@ AZ_NODISCARD az_result az_iot_provisioning_client_register_get_subscribe_topic_f
 
 /**
  * @brief The registration operation state.
- * @note This is returned only when the operation completed.
+ * @remark This is returned only when the operation completed.
  *
  */
-typedef struct az_iot_provisioning_client_registration_state
+typedef struct az_iot_provisioning_client_registration_result
 {
-  az_span assigned_hub_hostname; /**< Assigned Azure IoT Hub hostname. @note This is only
+  az_span assigned_hub_hostname; /**< Assigned Azure IoT Hub hostname. @remark This is only
                                     available if error_code is success. */
   az_span device_id; /**< Assigned device ID. */
-  az_iot_status status; /**< The register operation status. */
+  az_iot_status error_code; /**< The error code. */
   uint32_t extended_error_code; /**< The extended, 6 digit error code. */
   az_span error_message; /**< Error description. */
   az_span error_tracking_id; /**< Submit this ID when asking for Azure IoT service-desk help. */
   az_span
       error_timestamp; /**< Submit this timestamp when asking for Azure IoT service-desk help. */
-} az_iot_provisioning_client_registration_state;
+} az_iot_provisioning_client_registration_result;
 
 /**
  * @brief Register or query operation response.
@@ -228,16 +233,19 @@ typedef struct az_iot_provisioning_client_registration_state
 typedef struct az_iot_provisioning_client_register_response
 {
   az_iot_status status; /**< The current request status.
-                         * @note The authoritative response for the device registration operation
+                         * @remark The authoritative response for the device registration operation
                          * (which may require several requests) is available only through
-                         * #registration_state.  */
+                         * #operation_status.  */
   az_span operation_id; /**< Operation ID of the register operation. */
-  az_span registration_state; /**< An #az_span containing the state of the register operation.
-                               * @details This can be one of the following: 'unassigned',
-                               * 'assigning', 'assigned', 'failed', 'disabled'. */
+  az_span operation_status; /**< An #az_span containing the status of the register operation.
+                             * @details This can be one of the following: `unassigned`,
+                             * `assigning`, `assigned`, `failed`, `disabled`.
+                             * #az_iot_provisioning_client_parse_operation_status can optionally
+                             * be used to convert this into
+                             * the #az_iot_provisioning_client_operation_status enum. */
   uint32_t retry_after_seconds; /**< Recommended timeout before sending the next MQTT publish. */
-  az_iot_provisioning_client_registration_state
-      registration_information; /**< If the operation is complete (success or error), the
+  az_iot_provisioning_client_registration_result
+      registration_result; /**< If the operation is complete (success or error), the
                                    registration state will contain the hub and device id in case of
                                    success. */
 } az_iot_provisioning_client_register_response;
@@ -260,9 +268,54 @@ AZ_NODISCARD az_result az_iot_provisioning_client_parse_received_topic_and_paylo
     az_iot_provisioning_client_register_response* out_response);
 
 /**
+ * @brief Azure IoT Provisioning Service operation status.
+ * 
+ */
+typedef enum
+{
+  // Device assignment in progress.
+  AZ_IOT_PROVISIONING_STATUS_UNASSIGNED,
+  AZ_IOT_PROVISIONING_STATUS_ASSIGNING,
+  
+  // Device assignment operation complete.
+  AZ_IOT_PROVISIONING_STATUS_ASSIGNED,
+  AZ_IOT_PROVISIONING_STATUS_FAILED,
+  AZ_IOT_PROVISIONING_STATUS_DISABLED,
+} az_iot_provisioning_client_operation_status;
+
+/**
+ * @brief Returns the #az_iot_provisioning_client_operation_status of a
+ * #az_iot_provisioning_client_register_response object.
+ *
+ * @param[in] response The #az_iot_provisioning_client_register_response obtained after a successful
+ *                     call to #az_iot_provisioning_client_parse_received_topic_and_payload.
+ * @param[out] out_operation_status The registration operation status.
+ * @return #az_result
+ *         - #AZ_ERROR_PARSER_UNEXPECTED_CHAR if the string contains an unexpected value.
+ *         @remark See #az_iot_provisioning_client_register_response for acceptable values.
+ */
+AZ_NODISCARD az_result az_iot_provisioning_client_parse_operation_status(
+    az_iot_provisioning_client_register_response* response,
+    az_iot_provisioning_client_operation_status* out_operation_status);
+
+/**
+ * @brief Checks if the status indicates that the service has an authoritative result of the
+ * register operation. The operation may have completed in either success or error.
+ *
+ * @param[in] operation_status The #az_iot_provisioning_client_operation_status obtained by calling
+ * #az_iot_provisioning_client_parse_operation_status.
+ * @return `true` if the operation completed. `false` otherwise.
+ */
+AZ_INLINE bool az_iot_provisioning_client_operation_complete(
+    az_iot_provisioning_client_operation_status operation_status)
+{
+  return (operation_status > AZ_IOT_PROVISIONING_STATUS_ASSIGNING);
+}
+
+/**
  * @brief Gets the MQTT topic that must be used to submit a Register request.
- * @note The payload of the MQTT publish message may contain a JSON document formatted according to
- * the [Provisioning Service's Device Registration document]
+ * @remark The payload of the MQTT publish message may contain a JSON document formatted according
+ * to the [Provisioning Service's Device Registration document]
  * (https://docs.microsoft.com/en-us/rest/api/iot-dps/runtimeregistration/registerdevice#deviceregistration)
  * specification.
  *
@@ -283,7 +336,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_register_get_publish_topic(
 
 /**
  * @brief Gets the MQTT topic that must be used to submit a Register Status request.
- * @note The payload of the MQTT publish message should be empty.
+ * @remark The payload of the MQTT publish message should be empty.
  *
  * @param[in] client The #az_iot_provisioning_client to use for this call.
  * @param[in] register_response The received #az_iot_provisioning_client_register_response response.

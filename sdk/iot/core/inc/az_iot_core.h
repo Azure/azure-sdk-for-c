@@ -21,12 +21,16 @@
 /**
  * @brief Azure IoT service MQTT connection properties.
  *
+ * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
+ * prefixed with an underscore ('_') directly in your application code. These symbols
+ * are part of Azure SDK's internal implementation; we do not document these symbols
+ * and they are subject to change in future versions of the SDK which would break your code.
  */
+
 enum
 {
-  AZ_CLIENT_DEFAULT_MQTT_CONNECT_PORT = 8883,
-  AZ_CLIENT_DEFAULT_MQTT_CONNECT_CLEAN_SESSION = 0x20,
-  AZ_CLIENT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS = 240
+  AZ_IOT_DEFAULT_MQTT_CONNECT_PORT = 8883,
+  AZ_IOT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS = 240
 };
 
 /**
@@ -59,34 +63,27 @@ typedef enum
 } az_iot_status;
 
 /**
- * @brief Get the #az_iot_status from an int.
- *
- * @param[in] status_int The int with the status number.
- * @param[out] status The #az_iot_status* with the status enum.
- * @return The #az_result with the result of the get operation.
- *  @retval #AZ_OK If the int is an #az_iot_status enum. `status` will be set to the according
- * enum.
- *  @retval #AZ_ERROR_ITEM_NOT_FOUND If the int is NOT an #az_iot_status enum.
- */
-
-AZ_NODISCARD az_result az_iot_get_status_from_uint32(uint32_t status_int, az_iot_status* status);
-
-/**
  * @brief Checks if the status indicates a successful operation.
  *
  * @param[in] status The #az_iot_status to verify.
- * @return True if the status indicates success. False otherwise.
+ * @return `true` if the status indicates success. `false` otherwise.
  */
-AZ_NODISCARD bool az_iot_is_success_status(az_iot_status status);
+AZ_INLINE bool az_iot_is_success_status(az_iot_status status)
+{
+  return status < AZ_IOT_STATUS_BAD_REQUEST;
+}
 
 /**
  * @brief Checks if the status indicates a retriable error occurred during the
  *        operation.
  *
  * @param[in] status The #az_iot_status to verify.
- * @return True if the operation should be retried. False otherwise.
+ * @return `true` if the operation should be retried. `false` otherwise.
  */
-AZ_NODISCARD bool az_iot_is_retriable_status(az_iot_status status);
+AZ_INLINE bool az_iot_is_retriable_status(az_iot_status status)
+{
+  return ((status == AZ_IOT_STATUS_THROTTLED) || (status == AZ_IOT_STATUS_SERVER_ERROR));
+}
 
 /**
  * @brief Calculates the recommended delay before retrying an operation that failed.
@@ -94,7 +91,7 @@ AZ_NODISCARD bool az_iot_is_retriable_status(az_iot_status status);
  * @param[in] operation_msec The time it took, in milliseconds, to perform the operation that
  *                           failed.
  * @param[in] attempt The number of failed retry attempts.
- * @param[in] retry_delay_msec The minimum time, in milliseconds, to wait before a retry.
+ * @param[in] min_retry_delay_msec The minimum time, in milliseconds, to wait before a retry.
  * @param[in] max_retry_delay_msec The maximum time, in milliseconds, to wait before a retry.
  * @param[in] random_msec A random value between 0 and the maximum allowed jitter, in milliseconds.
  * @return The recommended delay in milliseconds.
@@ -102,12 +99,12 @@ AZ_NODISCARD bool az_iot_is_retriable_status(az_iot_status status);
 AZ_NODISCARD int32_t az_iot_retry_calc_delay(
     int32_t operation_msec,
     int16_t attempt,
-    int32_t retry_delay_msec,
+    int32_t min_retry_delay_msec,
     int32_t max_retry_delay_msec,
     int32_t random_msec);
 
 /**
- * @brief az_span_token is a string tokenizer for az_span.
+ * @brief _az_span_token is a string tokenizer for az_span.
  *
  * @param[in] source The #az_span with the content to be searched on. It must be a non-empty
  * #az_span.
@@ -120,7 +117,7 @@ AZ_NODISCARD int32_t az_iot_retry_calc_delay(
  * occurrence of (but not including the) `delimiter`, or the end of `source` if `delimiter` is not
  * found. If `source` is empty, AZ_SPAN_NULL is returned instead.
  */
-AZ_NODISCARD az_span az_span_token(az_span source, az_span delimiter, az_span* out_remainder);
+AZ_NODISCARD az_span _az_span_token(az_span source, az_span delimiter, az_span* out_remainder);
 
 /**
  * @brief _az_iot_u32toa_size gives the length, in bytes, of the string that would represent the given number.
