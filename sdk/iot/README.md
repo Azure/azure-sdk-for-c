@@ -16,7 +16,7 @@ TBD
 
 To use IoT Hub connectivity, the first action by a developer should be to initialize the
 client with the `az_iot_hub_client_init()` API. Once that is initialized, you may use the
-`az_iot_hub_client_get_user_name()` and `az_iot_hub_client_client_id_get()` to get the
+`az_iot_hub_client_get_user_name()` and `az_iot_hub_client_get_client_id()` to get the
 user name and client id to establish a connection with IoT Hub.
 
 An example use case is below.
@@ -49,7 +49,7 @@ int main()
                 sizeof(my_mqtt_user_name), &my_mqtt_user_name_length);
 
   //Get the MQTT client id to connect
-  az_iot_hub_client_client_id_get(&my_client, my_mqtt_client_id, 
+  az_iot_hub_client_get_client_id(&my_client, my_mqtt_client_id, 
                 sizeof(my_mqtt_client_id), &my_mqtt_client_id_length);
 
   //At this point you are free to use my_mqtt_client_id and my_mqtt_user_name to connect using
