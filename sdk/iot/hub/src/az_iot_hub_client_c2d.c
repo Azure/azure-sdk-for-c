@@ -48,7 +48,7 @@ AZ_NODISCARD az_result az_iot_hub_client_c2d_get_subscribe_topic_filter(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_iot_hub_client_c2d_received_topic_parse(
+AZ_NODISCARD az_result az_iot_hub_client_c2d_parse_received_topic(
     az_iot_hub_client const* client,
     az_span received_topic,
     az_iot_hub_client_c2d_request* out_request)

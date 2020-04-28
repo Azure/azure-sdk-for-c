@@ -13,45 +13,45 @@ state color_coding {
 
 ' Init
 [*] --> az_iot_hub_client_init: START
-az_iot_hub_client_init -> az_iot_hub_client_user_name_get
-az_iot_hub_client_user_name_get -> az_iot_hub_client_id_get
-az_iot_hub_client_id_get -> application_mqtt_connect: X509 Client Auth: password is empty
+az_iot_hub_client_init -> az_iot_hub_client_get_user_name
+az_iot_hub_client_get_user_name -> az_iot_hub_client_get_client_id
+az_iot_hub_client_get_client_id -> application_mqtt_connect: X509 Client Auth: password is empty
 state application_mqtt_connect <<APP>>
 
 ' Optional SAS token generation:
-az_iot_hub_client_id_get -> az_iot_hub_client_sas_get_signature : SAS auth
+az_iot_hub_client_get_client_id -> az_iot_hub_client_sas_get_signature : SAS auth
 az_iot_hub_client_sas_get_signature -> application_hmac256
 application_hmac256 -> az_iot_hub_client_sas_get_password
 az_iot_hub_client_sas_get_password --> application_mqtt_connect : password is a SAS token
 state application_hmac256 <<APP>>
 
 ' Telemetry
-application_mqtt_connect --> az_iot_hub_client_telemetry_publish_topic_get : Telemetry can be used w/o subscribing to any topic.
-az_iot_hub_client_telemetry_publish_topic_get --> application_mqtt_publish
+application_mqtt_connect --> az_iot_hub_client_telemetry_get_publish_topic : Telemetry can be used w/o subscribing to any topic.
+az_iot_hub_client_telemetry_get_publish_topic --> application_mqtt_publish
 
 ' C2D
 application_mqtt_connect --> az_iot_hub_client_c2d_get_subscribe_topic_filter
 az_iot_hub_client_c2d_get_subscribe_topic_filter --> application_mqtt_subscribe
 
 ' Methods
-application_mqtt_connect --> az_iot_hub_client_methods_subscribe_topic_filter_get
-az_iot_hub_client_methods_subscribe_topic_filter_get --> application_mqtt_subscribe
+application_mqtt_connect --> az_iot_hub_client_methods_get_subscribe_topic_filter
+az_iot_hub_client_methods_get_subscribe_topic_filter --> application_mqtt_subscribe
 
-az_iot_hub_client_methods_response_publish_topic_get --> application_mqtt_publish
+az_iot_hub_client_methods_response_get_publish_topic --> application_mqtt_publish
 
 ' Twin
-application_mqtt_connect --> az_iot_hub_client_twin_response_subscribe_topic_filter_get
-az_iot_hub_client_twin_response_subscribe_topic_filter_get --> application_mqtt_subscribe
+application_mqtt_connect --> az_iot_hub_client_twin_response_get_subscribe_topic_filter
+az_iot_hub_client_twin_response_get_subscribe_topic_filter --> application_mqtt_subscribe
 
-application_mqtt_connect --> az_iot_hub_client_twin_patch_subscribe_topic_filter_get
-az_iot_hub_client_twin_patch_subscribe_topic_filter_get --> application_mqtt_subscribe
+application_mqtt_connect --> az_iot_hub_client_twin_patch_get_subscribe_topic_filter
+az_iot_hub_client_twin_patch_get_subscribe_topic_filter --> application_mqtt_subscribe
 
 
-application_mqtt_subscribe --> az_iot_hub_client_twin_get_publish_topic_get
-az_iot_hub_client_twin_get_publish_topic_get --> application_mqtt_publish
+application_mqtt_subscribe --> az_iot_hub_client_twin_document_get_publish_topic
+az_iot_hub_client_twin_document_get_publish_topic --> application_mqtt_publish
 
-application_mqtt_subscribe --> az_iot_hub_client_twin_patch_publish_topic_get
-az_iot_hub_client_twin_patch_publish_topic_get --> application_mqtt_publish
+application_mqtt_subscribe --> az_iot_hub_client_twin_patch_get_publish_topic
+az_iot_hub_client_twin_patch_get_publish_topic --> application_mqtt_publish
 
 ' Common subscribe
 state application_mqtt_subscribe <<APP>>
@@ -61,19 +61,19 @@ state application_mqtt_publish <<APP>>
 
 state application_mqtt_receive <<APP>> { 
 ' Callback delegating handler:
-    [*] --> az_iot_hub_client_c2d_received_topic_parse : Received PUBLISH message
-    az_iot_hub_client_c2d_received_topic_parse --> az_iot_hub_client_methods_received_topic_parse : not c2d related
-    az_iot_hub_client_methods_received_topic_parse --> az_iot_hub_client_twin_parse_received_topic : not methods related
+    [*] --> az_iot_hub_client_c2d_parse_received_topic : Received PUBLISH message
+    az_iot_hub_client_c2d_parse_received_topic --> az_iot_hub_client_methods_parse_received_topic : not c2d related
+    az_iot_hub_client_methods_parse_received_topic --> az_iot_hub_client_twin_parse_received_topic : not methods related
     az_iot_hub_client_twin_parse_received_topic --> [*] : not twin related
 
 ' C2D
-    az_iot_hub_client_c2d_received_topic_parse -> az_iot_hub_client_c2d_request : c2d call received
+    az_iot_hub_client_c2d_parse_received_topic -> az_iot_hub_client_c2d_request : c2d call received
     
 ' Methods:
-    az_iot_hub_client_methods_received_topic_parse -> az_iot_hub_client_method_request : method call received
+    az_iot_hub_client_methods_parse_received_topic -> az_iot_hub_client_method_request : method call received
     az_iot_hub_client_method_request -> application_method_handle
     state application_method_handle <<APP>>
-    application_method_handle -> az_iot_hub_client_methods_response_publish_topic_get
+    application_method_handle -> az_iot_hub_client_methods_response_get_publish_topic
     
 ' Twin
     az_iot_hub_client_twin_parse_received_topic -> az_iot_hub_client_twin_response : twin GET or PATCH received
@@ -83,28 +83,28 @@ state application_mqtt_receive <<APP>> {
 az_iot_hub_client_init : - iot_hub_hostname
 az_iot_hub_client_init : - device_id
 
-az_iot_hub_client_user_name_get : - iot_hub
+az_iot_hub_client_get_user_name : - iot_hub
 
 ' SAS Tokens
 az_iot_hub_client_sas_get_signature : - unix_time
 az_iot_hub_client_sas_get_password: - Base64(HMAC-SHA256(signature, SharedAccessKey))
 
-az_iot_hub_client_telemetry_publish_topic_get : - az_iot_hub_client_properties
+az_iot_hub_client_telemetry_get_publish_topic : - az_iot_hub_client_properties
 
 state az_iot_hub_client_method_request <<STRUCT>>
 az_iot_hub_client_method_request: - request_id
 az_iot_hub_client_method_request: - name
 
-az_iot_hub_client_methods_response_publish_topic_get: - request_id
-az_iot_hub_client_methods_response_publish_topic_get: - status
+az_iot_hub_client_methods_response_get_publish_topic: - request_id
+az_iot_hub_client_methods_response_get_publish_topic: - status
 
 state az_iot_hub_client_c2d_request <<STRUCT>>
 az_iot_hub_client_c2d_request : - az_iot_hub_client_properties
 
-az_iot_hub_client_twin_get_publish_topic_get : - request_id
+az_iot_hub_client_twin_document_get_publish_topic : - request_id
 
-az_iot_hub_client_twin_patch_publish_topic_get : - request_id
-az_iot_hub_client_twin_patch_publish_topic_get : - if_match_version
+az_iot_hub_client_twin_patch_get_publish_topic : - request_id
+az_iot_hub_client_twin_patch_get_publish_topic : - if_match_version
 
 state az_iot_hub_client_twin_response <<STRUCT>>
 az_iot_hub_client_twin_response : - response_type
