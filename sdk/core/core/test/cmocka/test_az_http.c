@@ -10,9 +10,13 @@
 #include <az_json.h>
 #include <az_span.h>
 
+#include <az_precondition.h>
+#include <az_precondition_internal.h>
+
 #include <setjmp.h>
 #include <stdarg.h>
 
+#include <az_test_precondition.h>
 #include <cmocka.h>
 
 #include <_az_cfg.h>
@@ -319,9 +323,50 @@ static void test_http_response(void** state)
   }
 }
 
+#ifndef NO_PRECONDITION_CHECKING
+enable_precondition_check_tests()
+
+static void test_http_request_removing_left_white_spaces(void** state)
+{
+  (void)state;
+
+  uint8_t buf[100];
+  uint8_t header_buf[(2 * sizeof(az_pair))];
+  memset(buf, 0, sizeof(buf));
+  memset(header_buf, 0, sizeof(header_buf));
+
+  az_span url_span = AZ_SPAN_FROM_BUFFER(buf);
+  az_span remainder = az_span_copy(url_span, hrb_url);
+  assert_int_equal(az_span_size(remainder), 100 - az_span_size(hrb_url));
+  az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
+  _az_http_request hrb;
+
+  TEST_EXPECT_SUCCESS(az_http_request_init(
+      &hrb,
+      &az_context_app,
+      az_http_method_get(),
+      url_span,
+      az_span_size(hrb_url),
+      header_span,
+      AZ_SPAN_FROM_STR("body")));
+
+  // Nothing but empty name - should hit precondion
+  assert_precondition_checked(
+      az_http_request_append_header(&hrb, AZ_SPAN_FROM_STR(" \t\r"), AZ_SPAN_NULL));
+}
+
+#endif // NO_PRECONDITION_CHECKING
+
 int test_az_http()
 {
+#ifndef NO_PRECONDITION_CHECKING
+  setup_precondition_check_tests();
+#endif // NO_PRECONDITION_CHECKING
+
   const struct CMUnitTest tests[] = {
+#ifndef NO_PRECONDITION_CHECKING
+    cmocka_unit_test(test_http_request_removing_left_white_spaces),
+#endif // NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_http_request),
     cmocka_unit_test(test_http_response),
   };
