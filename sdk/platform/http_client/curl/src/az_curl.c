@@ -223,7 +223,7 @@ _az_http_client_curl_build_headers(_az_http_request* p_request, struct curl_slis
   AZ_PRECONDITION_NOT_NULL(p_request);
 
   az_pair header;
-  for (int32_t offset = 0; offset < _az_http_request_headers_count(p_request); ++offset)
+  for (int32_t offset = 0; offset < az_http_request_headers_count(p_request); ++offset)
   {
     AZ_RETURN_IF_FAILED(az_http_request_get_header(p_request, offset, &header));
     AZ_RETURN_IF_FAILED(
@@ -449,7 +449,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_setup_headers(
   AZ_PRECONDITION_NOT_NULL(p_curl);
   AZ_PRECONDITION_NOT_NULL(p_request);
 
-  if (_az_http_request_headers_count(p_request) == 0)
+  if (az_http_request_headers_count(p_request) == 0)
   {
     // no headers, no need to set it up
     return AZ_OK;
@@ -477,6 +477,7 @@ _az_http_client_curl_setup_url(CURL* p_curl, _az_http_request const* p_request)
   AZ_PRECONDITION_NOT_NULL(p_request);
 
   az_span request_url = { 0 };
+  // get request_url. It will have the size of what is has written in it only
   AZ_RETURN_IF_FAILED(az_http_request_get_parts(p_request, NULL, &request_url, NULL));
   int32_t request_url_size = az_span_size(request_url);
 
@@ -490,8 +491,8 @@ _az_http_client_curl_setup_url(CURL* p_curl, _az_http_request const* p_request)
   }
 
   // write url in buffer (will add \0 at the end)
-  az_result result = _az_http_client_curl_append_url(
-      writable_buffer, az_span_slice(request_url, 0, request_url_size));
+  // request_url is already with the size of what it has written only
+  az_result result = _az_http_client_curl_append_url(writable_buffer, request_url);
 
   if (az_succeeded(result))
   {

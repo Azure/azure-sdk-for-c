@@ -170,7 +170,7 @@ az_http_request_get_header(_az_http_request const* request, int32_t index, az_pa
   AZ_PRECONDITION_NOT_NULL(request);
   AZ_PRECONDITION_NOT_NULL(out_header);
 
-  if (index >= _az_http_request_headers_count(request))
+  if (index >= az_http_request_headers_count(request))
   {
     return AZ_ERROR_ARG;
   }
@@ -200,7 +200,7 @@ AZ_NODISCARD az_result az_http_request_get_parts(
   return AZ_OK;
 }
 
-AZ_NODISCARD int32_t _az_http_request_headers_count(_az_http_request const* request)
+AZ_NODISCARD int32_t az_http_request_headers_count(_az_http_request const* request)
 {
   return request->_internal.headers_length;
 }

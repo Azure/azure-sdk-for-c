@@ -76,7 +76,7 @@ typedef struct
  *
  * @param request HTTP request to get HTTP header from.
  * @param index Index of the HTTP header to get.
- * @param out_header Pointer to write the result to.
+ * @param out_header Pointer to source the result to.
  *
  * @retval AZ_OK Success.
  * @retval AZ_ERROR_ARG \a index is out of range.
@@ -92,11 +92,11 @@ az_http_request_get_header(_az_http_request const* request, int32_t index, az_pa
  * @remarks This function is expected to be used by transport layer only.
  *
  * @param[in] request HTTP request to get parts from.
- * @param[out] out_method __[nullable]__ Pointer to write HTTP method to. Use `NULL` to ignore
+ * @param[out] out_method __[nullable]__ Pointer to source HTTP method to. Use `NULL` to ignore
  * getting this value.
- * @param[out] out_url __[nullable]__ Pointer to write URL to. Use `NULL` to ignore getting this
+ * @param[out] out_url __[nullable]__ Pointer to source URL to. Use `NULL` to ignore getting this
  * value.
- * @param[out] out_body __[nullable]__ Pointer to write HTTP request body to. Use `NULL` to ignore
+ * @param[out] out_body __[nullable]__ Pointer to source HTTP request body to. Use `NULL` to ignore
  * getting this value.
  *
  * @retval An #az_result value indicating the result of the operation:
@@ -109,29 +109,27 @@ AZ_NODISCARD az_result az_http_request_get_parts(
     az_span* out_body);
 
 /**
- * @brief This function is expected to be used by transport adapters like curl. Use it to write
- * content from \p write to \p response.
+ * @brief This function is expected to be used by transport adapters like curl. Use it to source
+ * content from \p source to \p response.
  *
- * @remarks This is a convenient way of hiding the internal implementation of az_htt_response.
- *
- * @remarks Parameter \p write can be an empty span. If so, nothing will be written.
+ * @remarks Parameter \p source can be an empty span. If so, nothing will be written.
  *
  * @param[in] response Pointer to an az_http_response.
- * @param[in] write This is an az_span with the content to be written into response.
+ * @param[in] source This is an az_span with the content to be written into response.
  * @return An #az_result value indicating the result of the operation:
  *         - #AZ_OK if successful
  *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the \p response is not big enough to contain the
- * \p write content
+ * \p source content
  */
-AZ_NODISCARD az_result az_http_response_write_span(az_http_response* response, az_span write);
+AZ_NODISCARD az_result az_http_response_write_span(az_http_response* response, az_span source);
 
 /**
- * @brief This function is expected to be used by transport adapters like curl. Use it to write
+ * @brief This function is expected to be used by transport adapters like curl. Use it to source
  * just one single byte to an az_http_response.
  *
  * @remarks This is a convenient way of hiding the internal implementation of az_htt_response.
  *
- * @remarks Parameter \p write can be an empty span. If so, nothing will be written.
+ * @remarks Parameter \p source can be an empty span. If so, nothing will be written.
  *
  * @param[in] response Pointer to an az_http_response.
  * @param[in] byte This is a single byte to be written into response.
@@ -143,17 +141,18 @@ AZ_NODISCARD az_result az_http_response_write_span(az_http_response* response, a
 AZ_NODISCARD az_result az_http_response_write_u8(az_http_response* response, uint8_t byte);
 
 /**
- * @brief Returns the count of headers on the request
- *        Each header is an az_pair
+ * @brief Returns the number of headers within the request
+ *        Each header is an #az_pair.
  *
  */
-AZ_NODISCARD int32_t _az_http_request_headers_count(_az_http_request const* request);
+AZ_NODISCARD int32_t az_http_request_headers_count(_az_http_request const* request);
 
 /**
- * @brief This is the general signature that any transport adapter like curl needs to implement.
+ * @brief Send and http request thru the wire and write the response into \p p_response.
  *
- * @param[in] p_request Points to an az_http_request
- * @param[in] p_response Points to an az_http_response
+ * @param[in] p_request Points to an az_http_request that contains the settings and data that is
+ * used to send the request thru the wire.
+ * @param[out] p_response Points to an az_http_response where the response from wire will be written
  * @return AZ_NODISCARD az_http_client_send_request
  */
 AZ_NODISCARD az_result
