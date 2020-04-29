@@ -75,8 +75,8 @@ static void test_az_iot_hub_client_telemetry_get_publish_topic_NULL_out_mqtt_top
   char test_buf[TEST_SPAN_BUFFER_SIZE];
   size_t test_length;
 
-  assert_precondition_checked(
-      az_iot_hub_client_telemetry_get_publish_topic(&client, NULL, test_buf, 0, &test_length));
+  assert_precondition_checked(az_iot_hub_client_telemetry_get_publish_topic(
+      &client, NULL, test_buf, 0, &test_length));
 }
 
 #endif // NO_PRECONDITION_CHECKING
