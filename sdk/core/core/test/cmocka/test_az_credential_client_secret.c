@@ -83,9 +83,13 @@ static void test_credential_client_secret(void** state)
   (void)ignore;
 }
 
+enum
+{
+  CLOCK_INCREMENT = 10000000000;
+}
+
 static az_result send_request(_az_http_request* request, az_http_response* response)
 {
-  int const clock_increment = 10000000000;
   static bool redo_auth = false;
 
   az_span const request_url
@@ -140,7 +144,7 @@ static az_result send_request(_az_http_request* request, az_http_response* respo
       if (!redo_auth)
       {
 #ifdef MOCK_ENABLED
-        will_return(__wrap_az_platform_clock_msec, clock_increment);
+        will_return(__wrap_az_platform_clock_msec, CLOCK_INCREMENT);
 #endif // MOCK_ENABLED
         response->_internal.http_response = AZ_SPAN_FROM_STR(
             "HTTP/1.1 200 OK\r\n\r\n{ 'access_token' : 'AccessToken', 'expires_in' : 3600 }");
@@ -148,7 +152,7 @@ static az_result send_request(_az_http_request* request, az_http_response* respo
       else
       {
 #ifdef MOCK_ENABLED
-        will_return(__wrap_az_platform_clock_msec, clock_increment * 3);
+        will_return(__wrap_az_platform_clock_msec, CLOCK_INCREMENT * 3);
 #endif // MOCK_ENABLED
         response->_internal.http_response = AZ_SPAN_FROM_STR(
             "HTTP/1.1 200 OK\r\n\r\n{ 'access_token' : 'NewAccessToken', 'expires_in' : 3600 }");
@@ -202,7 +206,7 @@ static az_result send_request(_az_http_request* request, az_http_response* respo
 
 #ifdef MOCK_ENABLED
       // Next time the function is invoked, the token is going to be considered expired.
-      will_return(__wrap_az_platform_clock_msec, clock_increment * 2);
+      will_return(__wrap_az_platform_clock_msec, CLOCK_INCREMENT * 2);
 #endif // MOCK_ENABLED
 
       redo_auth = true;
