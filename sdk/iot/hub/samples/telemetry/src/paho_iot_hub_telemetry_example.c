@@ -160,7 +160,7 @@ static int send_telemetry_messages()
   int rc;
   for (int i = 0; i < NUMBER_OF_MESSAGES; ++i)
   {
-    printf("Sending Message %i\r\n", i + 1);
+    printf("Sending Message %i\n", i + 1);
     if ((rc = MQTTClient_publish(
              mqtt_client,
              telemetry_topic,

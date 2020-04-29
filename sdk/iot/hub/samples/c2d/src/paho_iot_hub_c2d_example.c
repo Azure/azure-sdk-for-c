@@ -116,7 +116,7 @@ static int on_received(void* context, char* topicName, int topicLen, MQTTClient_
   if (az_iot_hub_client_c2d_parse_received_topic(&client, topic_span, &c2d_request) == AZ_OK)
   {
     printf("C2D Message arrived\n");
-    printf("Payload:\r\n%.*s\r\n", message->payloadlen, (char*)message->payload);
+    printf("Payload:\n%.*s\n", message->payloadlen, (char*)message->payload);
   }
 
   (void)result;
