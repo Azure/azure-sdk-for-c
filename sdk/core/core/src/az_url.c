@@ -43,25 +43,23 @@ AZ_NODISCARD az_result _az_url_encode(az_span destination, az_span source, int32
     return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
   }
 
-  uint8_t* p_s = az_span_ptr(source);
-  uint8_t* p_d = az_span_ptr(destination);
-  int32_t s = 0;
-  for (int32_t i = 0; i < input_size; ++i)
+  uint8_t* src_ptr = az_span_ptr(source);
+  uint8_t* dest_ptr = az_span_ptr(destination);
+
+  for (int32_t src_idx = 0; src_idx < input_size; ++src_idx)
   {
-    uint8_t c = p_s[i];
+    uint8_t c = src_ptr[i];
     if (!_az_url_should_encode(c))
     {
-      *p_d = c;
-      p_d += 1;
-      s += 1;
+      *dest_ptr = c;
+      dest_ptr += 1;
     }
     else
     {
-      p_d[0] = '%';
-      p_d[1] = _az_number_to_upper_hex(c >> 4);
-      p_d[2] = _az_number_to_upper_hex(c & 0x0F);
-      p_d += 3;
-      s += 3;
+      dest_ptr[0] = '%';
+      dest_ptr[1] = _az_number_to_upper_hex(c >> 4);
+      dest_ptr[2] = _az_number_to_upper_hex(c & 0x0F);
+      dest_ptr += 3;
     }
   }
 
