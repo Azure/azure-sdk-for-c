@@ -5,11 +5,14 @@
 // warning C4201: nonstandard extension used: nameless struct/union
 #pragma warning(disable : 4201)
 #endif
-#include <MQTTClient.h>
+#include <paho-mqtt/MQTTClient.h>
 #ifdef _MSC_VER
 #pragma warning(default : 4201)
 #endif
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #ifdef _WIN32
 // Required for Sleep(DWORD)
 #include <Windows.h>
@@ -17,10 +20,6 @@
 // Required for sleep(unsigned int)
 #include <unistd.h>
 #endif
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #include <az_iot_hub_client.h>
 #include <az_result.h>
@@ -48,8 +47,8 @@
 
 #define NUMBER_OF_MESSAGES 5
 
-static char x509_cert_pem_file[512] = { 0 };
-static char x509_trust_pem_file[256] = { 0 };
+static char x509_cert_pem_file[512];
+static char x509_trust_pem_file[256];
 char telemetry_topic[128];
 static const char* telemetry_message_payloads[NUMBER_OF_MESSAGES] = {
   "Message One", "Message Two", "Message Three", "Message Four", "Message Five",
@@ -120,16 +119,15 @@ static az_result read_configuration_and_init_client()
   return AZ_OK;
 }
 
-static int connect()
+static int connect_device()
 {
   int rc;
 
   MQTTClient_SSLOptions mqtt_ssl_options = MQTTClient_SSLOptions_initializer;
   MQTTClient_connectOptions mqtt_connect_options = MQTTClient_connectOptions_initializer;
 
-  char username[128] = { 0 };
-  size_t username_length;
-  if ((rc = az_iot_hub_client_get_user_name(&client, username, sizeof(username), &username_length))
+  char username[128];
+  if ((rc = az_iot_hub_client_get_user_name(&client, username, sizeof(username), NULL))
       != AZ_OK)
 
   {
@@ -138,7 +136,7 @@ static int connect()
   }
 
   mqtt_connect_options.username = username;
-  mqtt_connect_options.password = NULL;
+  mqtt_connect_options.password = NULL; // Using X509 Client Certificate authentication.
 
   mqtt_ssl_options.keyStore = (char*)x509_cert_pem_file;
   if (*x509_trust_pem_file != '\0')
@@ -173,7 +171,7 @@ static int send_telemetry_messages()
              NULL))
         != MQTTCLIENT_SUCCESS)
     {
-      printf("Failed to publish get_operation_status, return code %d\n", rc);
+      printf("Failed to publish telemetry topic, return code %d\n", rc);
       return rc;
     }
     sleep_seconds(1);
@@ -191,7 +189,7 @@ int main()
     return rc;
   }
 
-  char client_id[128] = { 0 };
+  char client_id[128];
   size_t client_id_length;
   if ((rc
        = az_iot_hub_client_get_client_id(&client, client_id, sizeof(client_id), &client_id_length))
@@ -208,7 +206,7 @@ int main()
     return rc;
   }
 
-  if ((rc = connect()) != 0)
+  if ((rc = connect_device()) != 0)
   {
     return rc;
   }

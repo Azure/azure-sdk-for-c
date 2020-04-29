@@ -5,7 +5,7 @@
 // warning C4201: nonstandard extension used: nameless struct/union
 #pragma warning(disable : 4201)
 #endif
-#include <MQTTClient.h>
+#include <paho-mqtt/MQTTClient.h>
 #ifdef _MSC_VER
 #pragma warning(default : 4201)
 #endif
@@ -39,11 +39,11 @@
 // This is usually not needed on Linux or Mac but needs to be set on Windows.
 #define DEVICE_X509_TRUST_PEM_FILE "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE"
 
-static char x509_cert_pem_file[512] = { 0 };
-static char x509_trust_pem_file[256] = { 0 };
-static char get_twin_topic[128] = { 0 };
+static char x509_cert_pem_file[512];
+static char x509_trust_pem_file[256];
+static char get_twin_topic[128];
 static az_span get_twin_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("get_twin");
-static char reported_property_topic[128] = { 0 };
+static char reported_property_topic[128];
 static az_span reported_property_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("reported_prop");
 static az_span reported_property_name = AZ_SPAN_LITERAL_FROM_STR("foo");
 static int32_t reported_property_value = 0;
@@ -163,14 +163,14 @@ static int on_received(void* context, char* topicName, int topicLen, MQTTClient_
   return 1;
 }
 
-static int connect()
+static int connect_device()
 {
   int rc;
 
   MQTTClient_SSLOptions mqtt_ssl_options = MQTTClient_SSLOptions_initializer;
   MQTTClient_connectOptions mqtt_connect_options = MQTTClient_connectOptions_initializer;
 
-  char username[128] = { 0 };
+  char username[128];
   size_t username_length;
   if ((rc = az_iot_hub_client_get_user_name(&client, username, sizeof(username), &username_length))
       != AZ_OK)
@@ -262,7 +262,7 @@ static int send_get_twin()
   if ((rc = MQTTClient_publish(mqtt_client, get_twin_topic, 0, NULL, 0, 0, NULL))
       != MQTTCLIENT_SUCCESS)
   {
-    printf("Failed to publish get_operation_status, return code %d\n", rc);
+    printf("Failed to publish twin document request, return code %d\n", rc);
     return rc;
   }
   return rc;
@@ -270,7 +270,6 @@ static int send_get_twin()
 
 static int build_reported_property(az_json_builder* json_builder)
 {
-  // "{\"foo\":1}";
   az_result result;
   result = az_json_builder_init(json_builder, AZ_SPAN_FROM_BUFFER(reported_property_payload));
   result = az_json_builder_append_token(json_builder, az_json_token_object_start());
@@ -339,7 +338,7 @@ int main()
     return rc;
   }
 
-  char client_id[128] = { 0 };
+  char client_id[128];
   if ((rc = az_iot_hub_client_get_client_id(&client, client_id, sizeof(client_id), NULL)) != AZ_OK)
   {
     printf("Failed to get MQTT clientId, return code %d\n", rc);
@@ -360,7 +359,7 @@ int main()
     return rc;
   }
 
-  if ((rc = connect()) != 0)
+  if ((rc = connect_device()) != 0)
   {
     return rc;
   }

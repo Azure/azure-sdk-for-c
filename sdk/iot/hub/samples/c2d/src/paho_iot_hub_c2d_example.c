@@ -5,7 +5,7 @@
 // warning C4201: nonstandard extension used: nameless struct/union
 #pragma warning(disable : 4201)
 #endif
-#include <MQTTClient.h>
+#include <paho-mqtt/MQTTClient.h>
 #ifdef _MSC_VER
 #pragma warning(default : 4201)
 #endif
@@ -38,8 +38,8 @@
 // This is usually not needed on Linux or Mac but needs to be set on Windows.
 #define DEVICE_X509_TRUST_PEM_FILE "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE"
 
-static char x509_cert_pem_file[512] = { 0 };
-static char x509_trust_pem_file[256] = { 0 };
+static char x509_cert_pem_file[512];
+static char x509_trust_pem_file[256];
 
 static az_iot_hub_client client;
 static MQTTClient mqtt_client;
@@ -128,14 +128,14 @@ static int on_received(void* context, char* topicName, int topicLen, MQTTClient_
   return 1;
 }
 
-static int connect()
+static int connect_device()
 {
   int rc;
 
   MQTTClient_SSLOptions mqtt_ssl_options = MQTTClient_SSLOptions_initializer;
   MQTTClient_connectOptions mqtt_connect_options = MQTTClient_connectOptions_initializer;
 
-  char username[128] = { 0 };
+  char username[128];
   size_t username_length;
   if ((rc = az_iot_hub_client_get_user_name(&client, username, sizeof(username), &username_length))
       != AZ_OK)
@@ -199,7 +199,7 @@ int main()
     return rc;
   }
 
-  char client_id[128] = { 0 };
+  char client_id[128];
   size_t client_id_length;
   if ((rc = az_iot_hub_client_get_client_id(&client, client_id, sizeof(client_id), &client_id_length)) != AZ_OK)
   {
@@ -221,7 +221,7 @@ int main()
     return rc;
   }
 
-  if ((rc = connect()) != 0)
+  if ((rc = connect_device()) != 0)
   {
     return rc;
   }
