@@ -59,6 +59,7 @@ static void test_credential_client_secret(void** state)
   uint8_t response_buf[500] = { 0 };
   ignore = az_http_response_init(&response, AZ_SPAN_FROM_BUFFER(response_buf));
 
+#ifdef MOCK_ENABLED
   ignore = az_http_pipeline_process(&pipeline, &request, &response);
   assert_true(az_span_is_content_equal(
       AZ_SPAN_FROM_STR("FirstResponse"), response._internal.http_response));
@@ -66,9 +67,12 @@ static void test_credential_client_secret(void** state)
   ignore = az_http_pipeline_process(&pipeline, &request, &response);
   assert_true(az_span_is_content_equal(
       AZ_SPAN_FROM_STR("SubsequentResponse"), response._internal.http_response));
+#endif // MOCK_ENABLED
 
   (void)ignore;
 }
+
+az_result send_request(_az_http_request* request, az_http_response* response);
 
 az_result send_request(_az_http_request* request, az_http_response* response)
 {
@@ -103,14 +107,15 @@ az_result send_request(_az_http_request* request, az_http_response* response)
     }
 
     static int auth_attempt = 0;
-#ifdef MOCK_ENABLED
-    will_return(__wrap_az_platform_clock_msec, 0);
     ++auth_attempt;
-#endif // MOCK_ENABLED
 
     // 3rd attempt should never happen because the token should not be expiring given that clock
     // returns 0.
     assert_in_range(auth_attempt, 1, 2);
+
+#ifdef MOCK_ENABLED
+    will_return(__wrap_az_platform_clock_msec, 0);
+#endif // MOCK_ENABLED
 
     if (auth_attempt == 1)
     {
@@ -141,9 +146,7 @@ az_result send_request(_az_http_request* request, az_http_response* response)
       }
     }
 
-#ifdef MOCK_ENABLED
     assert_true(has_auth_header);
-#endif // MOCK_ENABLED
 
     static bool first_attempt = true;
     if (first_attempt)
