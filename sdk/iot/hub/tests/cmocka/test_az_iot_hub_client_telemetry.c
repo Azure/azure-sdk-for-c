@@ -75,8 +75,8 @@ static void test_az_iot_hub_client_telemetry_get_publish_topic_NULL_out_mqtt_top
   char test_buf[TEST_SPAN_BUFFER_SIZE];
   size_t test_length;
 
-  assert_precondition_checked(az_iot_hub_client_telemetry_get_publish_topic(
-      &client, NULL, test_buf, 0, &test_length));
+  assert_precondition_checked(
+      az_iot_hub_client_telemetry_get_publish_topic(&client, NULL, test_buf, 0, &test_length));
 }
 
 #endif // NO_PRECONDITION_CHECKING
@@ -151,6 +151,43 @@ static void test_az_iot_hub_client_telemetry_get_publish_topic_with_options_with
 
   assert_string_equal(g_test_correct_topic_with_options_with_props, test_buf);
   assert_int_equal(sizeof(g_test_correct_topic_with_options_with_props) - 1, test_length);
+}
+
+static void test_az_iot_hub_client_telemetry_get_publish_topic_with_props_unfilled_succeed(
+    void** state)
+{
+  (void)state;
+
+  az_iot_hub_client client;
+  assert_int_equal(
+      az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL), AZ_OK);
+
+  //Create unfilled property span
+  az_iot_hub_client_properties props;
+  uint8_t test_prop_unfilled_buf[TEST_SPAN_BUFFER_SIZE];
+  memset(test_prop_unfilled_buf, 0xFF, sizeof(test_prop_unfilled_buf));
+  az_span test_prop_unfilled_span
+      = az_span_init(test_prop_unfilled_buf, sizeof(test_prop_unfilled_buf));
+  assert_int_equal(az_iot_hub_client_properties_init(&props, test_prop_unfilled_span, 0), AZ_OK);
+  assert_int_equal(
+      az_iot_hub_client_properties_append(
+          &props, AZ_SPAN_FROM_STR("key"), AZ_SPAN_FROM_STR("value")),
+      AZ_OK);
+  assert_int_equal(
+      az_iot_hub_client_properties_append(
+          &props, AZ_SPAN_FROM_STR("key_two"), AZ_SPAN_FROM_STR("value2")),
+      AZ_OK);
+
+  char test_buf[TEST_SPAN_BUFFER_SIZE];
+  size_t test_length;
+
+  assert_true(
+      az_iot_hub_client_telemetry_get_publish_topic(
+          &client, &props, test_buf, sizeof(test_buf), &test_length)
+      == AZ_OK);
+
+  assert_string_equal(g_test_correct_topic_no_options_with_props, test_buf);
+  assert_int_equal(sizeof(g_test_correct_topic_no_options_with_props) - 1, test_length);
 }
 
 static void
@@ -300,6 +337,8 @@ int test_iot_hub_telemetry()
         test_az_iot_hub_client_telemetry_get_publish_topic_with_options_no_props_succeed),
     cmocka_unit_test(
         test_az_iot_hub_client_telemetry_get_publish_topic_with_options_with_props_succeed),
+    cmocka_unit_test(
+        test_az_iot_hub_client_telemetry_get_publish_topic_with_props_unfilled_succeed),
     cmocka_unit_test(
         test_az_iot_hub_client_telemetry_get_publish_topic_with_options_with_props_small_buffer_fails),
     cmocka_unit_test(
