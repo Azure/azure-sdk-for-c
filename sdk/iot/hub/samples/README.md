@@ -27,9 +27,12 @@ Getting started explained in detail [here][SDK_README_GETTING_STARTED].
 
 ## Examples
 
-   Following section document various examples.
+The following section documents various examples. All of them use the [Eclipse Paho MQTT C client][Eclipse_Paho].
 
-1. [IoT Hub using Paho][samples_paho]: Register a device using the IoT Hub client and the [Eclipse Paho MQTT C client][Eclipse_Paho].
+1. [IoT Hub C2D][paho_c2d_sample]: Receive and view incoming C2D messages using the IoT Hub client.
+2. [IoT Hub Telemetry][paho_telemetry_sample]: Send 5 telemetry messages using the IoT Hub client.
+3. [IoT Hub Twin][paho_twin_sample]: Use twin features such as updating reported properties, 
+    receiving the twin document, and receiving desired properties using the IoT Hub client.
 
 ## Troubleshooting
 
@@ -52,7 +55,9 @@ This project welcomes contributions and suggestions. Find [more contributing][SD
 [SDK_README_CONTRIBUTING]:../../README.md#contributing
 [SDK_README_GETTING_STARTED]: ../../README.md#getting-started
 [SDK_README_KEY_CONCEPTS]: ../../README.md#key-concepts
-[samples_paho]: src/paho_iot_hub_example.c
+[paho_c2d_sample]: c2d/src/paho_iot_hub_c2d_example.c
+[paho_telemetry_sample]: telemetry/src/paho_iot_hub_telemetry_example.c
+[paho_twin_sample]: twin/src/paho_iot_hub_twin_example.c
 [iot_hub_mqtt]: https://docs.microsoft.com/en-us/azure/iot-dps/iot-dps-mqtt-support
 [error_codes]: ../../doc/mqtt_state_machine.md#IoT-Service-Errors
 [Eclipse_Paho]: https://www.eclipse.org/paho/clients/c/
