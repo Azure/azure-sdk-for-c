@@ -126,7 +126,7 @@ The public SDK functions validate the arguments passed to them to ensure that th
 
 To override the default behavior, implement a function matching the `az_precondition_failed_fn` function signature and then, in your application's initialization (before calling any Azure SDK function), call `az_precondition_failed_set_callback` passing it the address of your function. Now, when any Azure SDK function detects a precondition failure, it will invoke your callback instead. You might override the callback to attach a debugger or perhaps to reboot the device rather than allowing it to continue running with unpredictable behavior.
 
-Also, if you define the `NO_PRECONDITION_CHECKING` symbol when compiling the SDK code (or adding option -DBUILD_PRECONDITIONS=OFF with cmake), all of the Azure SDK precondition checking will be excluded, making the binary code smaller and faster. We recommend doing this before you ship your code.
+Also, if you define the `AZ_NO_PRECONDITION_CHECKING` symbol when compiling the SDK code (or adding option -DBUILD_PRECONDITIONS=OFF with cmake), all of the Azure SDK precondition checking will be excluded, making the binary code smaller and faster. We recommend doing this before you ship your code.
 
 ### Canceling an Operation
 

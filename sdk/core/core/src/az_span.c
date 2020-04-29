@@ -18,7 +18,7 @@ enum
   _az_ASCII_LOWER_DIF = 'a' - 'A',
 };
 
-#ifndef NO_PRECONDITION_CHECKING
+#ifndef AZ_NO_PRECONDITION_CHECKING
 // Note: If you are modifying this method, make sure to modify the inline version in the az_span.h
 // file as well.
 AZ_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t size)
@@ -31,7 +31,7 @@ AZ_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t size)
 
   return (az_span){ ._internal = { .ptr = ptr, .size = size, }, };
 }
-#endif // NO_PRECONDITION_CHECKING
+#endif // AZ_NO_PRECONDITION_CHECKING
 
 AZ_NODISCARD az_span az_span_from_str(char* str)
 {

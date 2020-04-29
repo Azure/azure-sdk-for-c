@@ -34,7 +34,7 @@ static const az_span test_URL_ENCODED_topic
                                "%24.to=%2Fdevices%2Fuseragent_c%2Fmessages%2FdeviceBound&abc=123&"
                                "ghi=%2Fsome%2Fthing&jkl=%2Fsome%2Fthing%2F%3Fbla%3Dbla");
 
-#ifndef NO_PRECONDITION_CHECKING
+#ifndef AZ_NO_PRECONDITION_CHECKING
 enable_precondition_check_tests()
 
 static void test_az_iot_hub_client_c2d_parse_received_topic_NULL_client_fail(void** state)
@@ -119,7 +119,7 @@ static void test_az_iot_hub_client_c2d_parse_received_topic_MALFORMED_fail(void*
       az_iot_hub_client_c2d_parse_received_topic(&client, received_topic, &out_request));
 }
 
-#endif // NO_PRECONDITION_CHECKING
+#endif // AZ_NO_PRECONDITION_CHECKING
 
 static void test_az_iot_hub_client_c2d_get_subscribe_topic_filter_succeed(void** state)
 {
@@ -229,19 +229,19 @@ static void test_az_iot_hub_client_c2d_parse_received_topic_URL_ENCODED_succeed(
 
 int test_iot_hub_c2d()
 {
-#ifndef NO_PRECONDITION_CHECKING
+#ifndef AZ_NO_PRECONDITION_CHECKING
   setup_precondition_check_tests();
-#endif // NO_PRECONDITION_CHECKING
+#endif // AZ_NO_PRECONDITION_CHECKING
 
   const struct CMUnitTest tests[] = {
-#ifndef NO_PRECONDITION_CHECKING
+#ifndef AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_az_iot_hub_client_c2d_parse_received_topic_NULL_client_fail),
     cmocka_unit_test(
         test_az_iot_hub_client_c2d_parse_received_topic_AZ_SPAN_NULL_received_topic_fail),
     cmocka_unit_test(test_az_iot_hub_client_c2d_parse_received_topic_NULL_out_request_fail),
     cmocka_unit_test(test_az_iot_hub_client_c2d_parse_received_topic_no_properties_fail),
     cmocka_unit_test(test_az_iot_hub_client_c2d_parse_received_topic_MALFORMED_fail),
-#endif // NO_PRECONDITION_CHECKING
+#endif // AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_az_iot_hub_client_c2d_get_subscribe_topic_filter_succeed),
     cmocka_unit_test(test_az_iot_hub_client_c2d_get_subscribe_topic_filter_small_buffer_fail),
     cmocka_unit_test(test_az_iot_hub_client_c2d_parse_received_topic_URL_DECODED_succeed),

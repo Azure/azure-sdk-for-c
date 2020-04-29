@@ -32,7 +32,7 @@ static const az_span test_module_id = AZ_SPAN_LITERAL_FROM_STR(TEST_MODULE_ID_ST
 static const uint32_t test_sas_expiry_time_secs = 1578941692;
 static const az_span test_signature = AZ_SPAN_LITERAL_FROM_STR(TEST_SIG);
 
-#ifndef NO_PRECONDITION_CHECKING
+#ifndef AZ_NO_PRECONDITION_CHECKING
 enable_precondition_check_tests()
 
 static void az_iot_hub_client_sas_get_signature_NULL_signature_fails(void** state)
@@ -113,7 +113,7 @@ static void az_iot_hub_client_sas_get_password_empty_password_buffer_span_fails(
       &client, test_signature, test_sas_expiry_time_secs, key_name, password, 0, &length));
 }
 
-#endif // NO_PRECONDITION_CHECKING
+#endif // AZ_NO_PRECONDITION_CHECKING
 
 static void az_iot_hub_client_sas_get_signature_device_succeeds(void** state)
 {
@@ -367,19 +367,19 @@ static void az_iot_hub_client_sas_get_signature_module_signature_overflow_fails(
 
 int test_iot_sas_token()
 {
-#ifndef NO_PRECONDITION_CHECKING
+#ifndef AZ_NO_PRECONDITION_CHECKING
   setup_precondition_check_tests();
-#endif // NO_PRECONDITION_CHECKING
+#endif // AZ_NO_PRECONDITION_CHECKING
 
   const struct CMUnitTest tests[] = {
-#ifndef NO_PRECONDITION_CHECKING
+#ifndef AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(az_iot_hub_client_sas_get_signature_NULL_signature_fails),
     cmocka_unit_test(az_iot_hub_client_sas_get_signature_NULL_signature_span_fails),
     cmocka_unit_test(az_iot_hub_client_sas_get_signature_NULL_client_fails),
     cmocka_unit_test(az_iot_hub_client_sas_get_password_EMPTY_signature_fails),
     cmocka_unit_test(az_iot_hub_client_sas_get_password_NULL_password_span_fails),
     cmocka_unit_test(az_iot_hub_client_sas_get_password_empty_password_buffer_span_fails),
-#endif // NO_PRECONDITION_CHECKING
+#endif // AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(az_iot_hub_client_sas_get_signature_device_succeeds),
     cmocka_unit_test(az_iot_hub_client_sas_get_password_device_no_out_length_succeeds),
     cmocka_unit_test(az_iot_hub_client_sas_get_signature_module_succeeds),

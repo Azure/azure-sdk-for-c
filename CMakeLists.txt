@@ -14,12 +14,12 @@ option(BUILD_PRECONDITIONS "Build SDK with preconditions enabled" ON)
 
 #enable mock functions with link option -ld
 if (NOT BUILD_PRECONDITIONS)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DNO_PRECONDITION_CHECKING")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DAZ_NO_PRECONDITION_CHECKING")
 endif()
 
 #enable mock functions with link option -ld
 if(UNIT_TESTING_MOCK_ENABLED)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DMOCK_ENABLED")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_az_MOCK_ENABLED")
 endif()
 
 if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)

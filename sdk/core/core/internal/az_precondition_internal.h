@@ -23,7 +23,7 @@
  *        perhaps to reboot the device rather than allowing it to continue running with
  *        unpredictable behavior.
  *
- *        Also, if you define the NO_PRECONDITION_CHECKING symbol when compiling the SDK
+ *        Also, if you define the AZ_NO_PRECONDITION_CHECKING symbol when compiling the SDK
  *        code (or adding option -DBUILD_PRECONDITIONS=OFF with cmake), all of the Azure SDK
  *        precondition checking will be excluding making the binary code smaller and faster. We
  *        recommend doing this before you ship your code.
@@ -43,7 +43,7 @@
 
 az_precondition_failed_fn az_precondition_failed_get_callback();
 
-#ifdef NO_PRECONDITION_CHECKING
+#ifdef AZ_NO_PRECONDITION_CHECKING
 #define AZ_PRECONDITION(condition)
 #else
 #define AZ_PRECONDITION(condition) \
@@ -54,7 +54,7 @@ az_precondition_failed_fn az_precondition_failed_get_callback();
       az_precondition_failed_get_callback()(); \
     } \
   } while (0)
-#endif
+#endif // AZ_NO_PRECONDITION_CHECKING
 
 #define AZ_PRECONDITION_RANGE(low, arg, max) AZ_PRECONDITION((low <= arg && arg <= max))
 
