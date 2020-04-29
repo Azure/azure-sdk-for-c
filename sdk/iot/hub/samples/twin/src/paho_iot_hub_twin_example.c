@@ -132,9 +132,6 @@ static int on_received(void* context, char* topicName, int topicLen, MQTTClient_
 {
   (void)context;
 
-  // int i;
-  // char* payloadptr;
-
   if (topicLen == 0)
   {
     // The length of the topic if there are one more NULL characters embedded in topicName,
