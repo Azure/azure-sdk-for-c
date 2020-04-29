@@ -76,7 +76,7 @@ typedef struct
  *
  * @param request HTTP request to get HTTP header from.
  * @param index Index of the HTTP header to get.
- * @param out_header Pointer to source the result to.
+ * @param out_header Pointer to write the result to.
  *
  * @retval AZ_OK Success.
  * @retval AZ_ERROR_ARG \a index is out of range.
@@ -85,31 +85,47 @@ AZ_NODISCARD az_result
 az_http_request_get_header(_az_http_request const* request, int32_t index, az_pair* out_header);
 
 /**
- * @brief Get parts of an HTTP request. `NULL` in accepted to ignore getting any parts, for example,
- * call this function like below to get only the http method and ignore getting url and body.
- *   `az_http_request_get_parts(request, &method, NULL, NULL)`
+ * @brief Get method of an HTTP request.
  *
  * @remarks This function is expected to be used by transport layer only.
  *
  * @param[in] request HTTP request to get parts from.
- * @param[out] out_method __[nullable]__ Pointer to source HTTP method to. Use `NULL` to ignore
- * getting this value.
- * @param[out] out_url __[nullable]__ Pointer to source URL to. Use `NULL` to ignore getting this
- * value.
- * @param[out] out_body __[nullable]__ Pointer to source HTTP request body to. Use `NULL` to ignore
- * getting this value.
+ * @param[out] out_method Pointer to write HTTP method to.
  *
  * @retval An #az_result value indicating the result of the operation:
  *         - #AZ_OK if successful
  */
-AZ_NODISCARD az_result az_http_request_get_parts(
-    _az_http_request const* request,
-    az_http_method* out_method,
-    az_span* out_url,
-    az_span* out_body);
+AZ_NODISCARD az_result
+az_http_request_get_method(_az_http_request const* request, az_http_method* out_method);
 
 /**
- * @brief This function is expected to be used by transport adapters like curl. Use it to source
+ * @brief Get url from an HTTP request.
+ *
+ * @remarks This function is expected to be used by transport layer only.
+ *
+ * @param[in] request HTTP request to get parts from.
+ * @param[out] out_url Pointer to write URL to.
+ *
+ * @retval An #az_result value indicating the result of the operation:
+ *         - #AZ_OK if successful
+ */
+AZ_NODISCARD az_result az_http_request_get_url(_az_http_request const* request, az_span* out_url);
+
+/**
+ * @brief Get body from an HTTP request.
+ *
+ * @remarks This function is expected to be used by transport layer only.
+ *
+ * @param[in] request HTTP request to get parts from.
+ * @param[out] out_body Pointer to write HTTP request body to.
+ *
+ * @retval An #az_result value indicating the result of the operation:
+ *         - #AZ_OK if successful
+ */
+AZ_NODISCARD az_result az_http_request_get_body(_az_http_request const* request, az_span* out_body);
+
+/**
+ * @brief This function is expected to be used by transport adapters like curl. Use it to write
  * content from \p source to \p response.
  *
  * @remarks Parameter \p source can be an empty span. If so, nothing will be written.
@@ -141,9 +157,11 @@ AZ_NODISCARD az_result az_http_response_write_span(az_http_response* response, a
 AZ_NODISCARD az_result az_http_response_write_u8(az_http_response* response, uint8_t byte);
 
 /**
- * @brief Returns the number of headers within the request
- *        Each header is an #az_pair.
+ * @brief Returns the number of headers within the request.
+ * Each header is an #az_pair.
  *
+ * @param[in] request Pointer to an az http request to be used by this function.
+ * @return Number of headers in the request.
  */
 AZ_NODISCARD int32_t az_http_request_headers_count(_az_http_request const* request);
 

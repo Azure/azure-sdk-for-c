@@ -329,7 +329,7 @@ _az_http_client_curl_send_post_request(CURL* p_curl, _az_http_request const* p_r
 
   // Method
   az_span request_body = { 0 };
-  AZ_RETURN_IF_FAILED(az_http_request_get_parts(p_request, NULL, NULL, &request_body));
+  AZ_RETURN_IF_FAILED(az_http_request_get_body(p_request, &request_body));
   az_span body = { 0 };
   int32_t const required_length = az_span_size(request_body) + az_span_size(AZ_SPAN_FROM_STR("\0"));
 
@@ -413,7 +413,7 @@ _az_http_client_curl_send_upload_request(CURL* p_curl, _az_http_request const* p
   AZ_PRECONDITION_NOT_NULL(p_request);
 
   az_span body = { 0 };
-  AZ_RETURN_IF_FAILED(az_http_request_get_parts(p_request, NULL, NULL, &body));
+  AZ_RETURN_IF_FAILED(az_http_request_get_body(p_request, &body));
 
   AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl, CURLOPT_UPLOAD, 1L));
   AZ_RETURN_IF_CURL_FAILED(
@@ -478,7 +478,7 @@ _az_http_client_curl_setup_url(CURL* p_curl, _az_http_request const* p_request)
 
   az_span request_url = { 0 };
   // get request_url. It will have the size of what is has written in it only
-  AZ_RETURN_IF_FAILED(az_http_request_get_parts(p_request, NULL, &request_url, NULL));
+  AZ_RETURN_IF_FAILED(az_http_request_get_url(p_request, &request_url));
   int32_t request_url_size = az_span_size(request_url);
 
   az_span writable_buffer;
@@ -561,7 +561,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
   AZ_RETURN_IF_FAILED(_az_http_client_curl_setup_response_redirect(p_curl, response));
 
   az_http_method method;
-  AZ_RETURN_IF_FAILED(az_http_request_get_parts(p_request, &method, NULL, NULL));
+  AZ_RETURN_IF_FAILED(az_http_request_get_method(p_request, &method));
 
   if (az_span_is_content_equal(method, az_http_method_get()))
   {
