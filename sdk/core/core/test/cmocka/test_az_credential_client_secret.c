@@ -223,7 +223,7 @@ az_result __wrap_az_http_client_send_request(_az_http_request* request, az_http_
 
 az_result __wrap_az_http_client_send_request(_az_http_request* request, az_http_response* response)
 {
-  send_request(request, response);
+  return send_request(request, response);
 }
 #endif // MOCK_ENABLED
 
