@@ -52,13 +52,14 @@ AZ_NODISCARD az_span az_span_from_str(char* str)
 
 AZ_NODISCARD az_span az_span_slice(az_span span, int32_t start_index, int32_t end_index)
 {
-  AZ_PRECONDITION_VALID_SPAN(span, 0);
+  int32_t const span_size = az_span_size(span);
+  AZ_PRECONDITION(span_size >= 0);
 
   // The following set of preconditions validate that:
   //    0 <= end_index <= span.size
   // And
   //    0 <= start_index <= end_index
-  AZ_PRECONDITION_RANGE(0, end_index, az_span_size(span));
+  AZ_PRECONDITION_RANGE(0, end_index, span_size);
   AZ_PRECONDITION((uint32_t)start_index <= (uint32_t)end_index);
 
   return az_span_init(az_span_ptr(span) + start_index, end_index - start_index);
