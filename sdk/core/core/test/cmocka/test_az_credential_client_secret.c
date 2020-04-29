@@ -88,7 +88,9 @@ enum
   CLOCK_INCREMENT = 100000000,
 };
 
-static az_result send_request(_az_http_request* request, az_http_response* response)
+az_result send_request(_az_http_request* request, az_http_response* response);
+
+az_result send_request(_az_http_request* request, az_http_response* response)
 {
   static bool redo_auth = false;
 
