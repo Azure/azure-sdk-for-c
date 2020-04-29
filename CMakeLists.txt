@@ -7,7 +7,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake-modules")
 
 option(WARNINGS_AS_ERRORS "Treat compiler warnings as errors" ON)
 option(BUILD_CURL_TRANSPORT "Build internal http transport implementation with CURL for HTTP Pipeline" OFF)
-option(UNIT_TESTING "Build unit test projects" ON)
+option(UNIT_TESTING "Build unit test projects" OFF)
 option(UNIT_TESTING_MOCK_ENABLED "wrap PAL functions with mock implementation for tests" OFF)
 option(BUILD_PAHO_TRANSPORT "Build IoT Samples with Paho MQTT support" OFF)
 option(BUILD_PRECONDITIONS "Build SDK with preconditions enabled" ON)
