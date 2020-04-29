@@ -290,7 +290,7 @@ jobs:
       coverageThreshold: 60
     condition: eq(variables['AZ_SDK_CODE_COV'], 1)
 
-# Disable build for c - client 
+# Disable build for c - client
 - ${{ if ne(parameters.ServiceDirectory, 'not-specified' )}}:
   - job: GenerateReleaseArtifacts
     pool:
@@ -324,10 +324,11 @@ jobs:
               }
             displayName: Copy CHANGELOG.md to package artifact
 
-          - task: PublishPipelineArtifact@1
-            inputs:
-              artifactName: packages
-              path: $(Build.ArtifactStagingDirectory)/packages
+      # This assumes that there are entries in parameters.Artifacts
+      - task: PublishPipelineArtifact@1
+        inputs:
+          artifactName: packages
+          path: $(Build.ArtifactStagingDirectory)/packages
 
       # Generate Documentation
       - pwsh: |

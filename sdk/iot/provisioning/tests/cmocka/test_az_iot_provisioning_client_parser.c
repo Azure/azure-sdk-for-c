@@ -31,7 +31,8 @@
 #define TEST_ERROR_TRACKING_ID "8ad0463c-6427-4479-9dfa-3e8bb7003e9b"
 #define TEST_ERROR_TIMESTAMP "2020-04-10T05:24:22.4718526Z"
 
-static void test_az_iot_provisioning_client_received_topic_payload_parse_assigning_state_succeed()
+static void
+test_az_iot_provisioning_client_parse_received_topic_and_payload_assigning_state_succeed()
 {
   az_iot_provisioning_client client;
   az_span received_topic = AZ_SPAN_FROM_STR("$dps/registrations/res/202/?$rid=1&retry-after=3");
@@ -56,7 +57,31 @@ static void test_az_iot_provisioning_client_received_topic_payload_parse_assigni
       strlen(TEST_STATUS_ASSIGNING));
 }
 
-static void test_az_iot_provisioning_client_received_topic_payload_parse_assigning2_state_succeed()
+static void
+test_az_iot_provisioning_client_parse_received_topic_and_payload_topic_not_matched_fails()
+{
+  az_iot_provisioning_client client;
+  az_span received_topic = AZ_SPAN_FROM_STR("$dps/registrations/unknown");
+  az_span received_payload = AZ_SPAN_FROM_STR("{\"operationId\":\"" TEST_OPERATION_ID
+                                              "\",\"status\":\"" TEST_STATUS_ASSIGNING "\"}");
+
+  az_iot_provisioning_client_register_response response = { .status = AZ_IOT_STATUS_FORBIDDEN,
+                                                            .retry_after_seconds = 0xBAADC0DE,
+                                                            .operation_id = AZ_SPAN_NULL,
+                                                            .registration_state = AZ_SPAN_NULL,
+                                                            .registration_information = { 0 } };
+
+  az_result ret = az_iot_provisioning_client_parse_received_topic_and_payload(
+      &client, received_topic, received_payload, &response);
+  assert_int_equal(AZ_ERROR_IOT_TOPIC_NO_MATCH, ret);
+
+  // From topic
+  assert_int_equal(AZ_IOT_STATUS_FORBIDDEN, response.status); // 202
+  assert_int_equal(0xBAADC0DE, response.retry_after_seconds);
+}
+
+static void
+test_az_iot_provisioning_client_parse_received_topic_and_payload_parse_assigning2_state_succeed()
 {
   az_iot_provisioning_client client;
   az_span received_topic = AZ_SPAN_FROM_STR("$dps/registrations/res/202/?retry-after=120&$rid=1");
@@ -83,7 +108,8 @@ static void test_az_iot_provisioning_client_received_topic_payload_parse_assigni
       strlen(TEST_STATUS_ASSIGNING));
 }
 
-static void test_az_iot_provisioning_client_received_topic_payload_parse_assigned_state_succeed()
+static void
+test_az_iot_provisioning_client_parse_received_topic_and_payload_assigned_state_succeed()
 {
   az_iot_provisioning_client client;
   az_span received_topic = AZ_SPAN_FROM_STR("$dps/registrations/res/200/?$rid=1");
@@ -130,13 +156,14 @@ static void test_az_iot_provisioning_client_received_topic_payload_parse_assigne
 }
 
 static void
-test_az_iot_provisioning_client_received_topic_payload_parse_invalid_certificate_error_succeed()
+test_az_iot_provisioning_client_parse_received_topic_and_payload_invalid_certificate_error_succeed()
 {
   az_iot_provisioning_client client;
   az_span received_topic = AZ_SPAN_FROM_STR("$dps/registrations/res/401/?$rid=1");
-  az_span received_payload = AZ_SPAN_FROM_STR(
-      "{\"errorCode\":401002,\"trackingId\":\"" TEST_ERROR_TRACKING_ID "\","
-      "\"message\":\"" TEST_ERROR_MESSAGE_INVALID_CERT "\",\"timestampUtc\":\"" TEST_ERROR_TIMESTAMP "\"}");
+  az_span received_payload
+      = AZ_SPAN_FROM_STR("{\"errorCode\":401002,\"trackingId\":\"" TEST_ERROR_TRACKING_ID "\","
+                         "\"message\":\"" TEST_ERROR_MESSAGE_INVALID_CERT
+                         "\",\"timestampUtc\":\"" TEST_ERROR_TIMESTAMP "\"}");
 
   az_iot_provisioning_client_register_response response;
   az_result ret = az_iot_provisioning_client_parse_received_topic_and_payload(
@@ -172,7 +199,7 @@ test_az_iot_provisioning_client_received_topic_payload_parse_invalid_certificate
       strlen(TEST_ERROR_TRACKING_ID));
 }
 
-static void test_az_iot_provisioning_client_received_topic_payload_parse_disabled_state_succeed()
+static void test_az_iot_provisioning_client_parse_received_topic_payload_disabled_state_succeed()
 {
   az_iot_provisioning_client client;
   az_span received_topic = AZ_SPAN_FROM_STR("$dps/registrations/res/200/?$rid=1");
@@ -197,7 +224,7 @@ static void test_az_iot_provisioning_client_received_topic_payload_parse_disable
 }
 
 static void
-test_az_iot_provisioning_client_received_topic_payload_parse_allocation_error_state_succeed()
+test_az_iot_provisioning_client_parse_received_topic_and_payload_allocation_error_state_succeed()
 {
   az_iot_provisioning_client client;
   az_span received_topic = AZ_SPAN_FROM_STR("$dps/registrations/res/200/?$rid=1");
@@ -245,6 +272,94 @@ test_az_iot_provisioning_client_received_topic_payload_parse_allocation_error_st
   assert_int_equal(0, az_span_size(response.registration_information.error_tracking_id));
 }
 
+static void
+test_az_iot_provisioning_client_received_topic_and_payload_parse_invalid_json_payload_fails()
+{
+  az_iot_provisioning_client client;
+  az_span received_topic = AZ_SPAN_FROM_STR("$dps/registrations/res/200/?$rid=1");
+  az_span received_payload = AZ_SPAN_FROM_STR("123");
+
+  az_iot_provisioning_client_register_response response;
+  az_result ret = az_iot_provisioning_client_parse_received_topic_and_payload(
+      &client, received_topic, received_payload, &response);
+  assert_int_equal(AZ_ERROR_PARSER_UNEXPECTED_CHAR, ret);
+}
+
+static void
+test_az_iot_provisioning_client_received_topic_and_payload_parse_operationid_not_found_fails()
+{
+  az_iot_provisioning_client client;
+  az_span received_topic = AZ_SPAN_FROM_STR("$dps/registrations/res/200/?$rid=1");
+  az_span received_payload
+      = AZ_SPAN_FROM_STR(/*\"operationId\":\"" TEST_OPERATION_ID*/
+                         "{\"status\":\"" TEST_STATUS_FAILED "\",\"registrationState\":{"
+                         "\"registrationId\":\"" TEST_REGISTRATION_ID "\","
+                         "\"createdDateTimeUtc\":\"2020-04-10T03:11:13.0276997Z\","
+                         "\"status\":\"" TEST_STATUS_FAILED "\","
+                         "\"errorCode\":400207,"
+                         "\"errorMessage\":\"" TEST_ERROR_MESSAGE_ALLOCATION "\","
+                         "\"lastUpdatedDateTimeUtc\":\"" TEST_ERROR_TIMESTAMP "\","
+                         "\"etag\":\"IjYxMDA4ZDQ2LTAwMDAtMDEwMC0wMDAwLTVlOGZlM2QxMDAwMCI=\"}}");
+
+  az_iot_provisioning_client_register_response response;
+  az_result ret = az_iot_provisioning_client_parse_received_topic_and_payload(
+      &client, received_topic, received_payload, &response);
+  assert_int_equal(AZ_ERROR_ITEM_NOT_FOUND, ret);
+}
+
+static void
+test_az_iot_provisioning_client_received_topic_and_payload_parse_registration_state_not_found_fails()
+{
+  az_iot_provisioning_client client;
+  az_span received_topic = AZ_SPAN_FROM_STR("$dps/registrations/res/200/?$rid=1");
+  az_span received_payload
+      = AZ_SPAN_FROM_STR("{\"operationId\":\"" TEST_OPERATION_ID
+                         /*"\",\"status\":\"" TEST_STATUS_FAILED */ "\",\"registrationState\":{"
+                         "\"registrationId\":\"" TEST_REGISTRATION_ID "\","
+                         "\"createdDateTimeUtc\":\"2020-04-10T03:11:13.0276997Z\","
+                         "\"status\":\"" TEST_STATUS_FAILED "\","
+                         "\"errorCode\":400207,"
+                         "\"errorMessage\":\"" TEST_ERROR_MESSAGE_ALLOCATION "\","
+                         "\"lastUpdatedDateTimeUtc\":\"" TEST_ERROR_TIMESTAMP "\","
+                         "\"etag\":\"IjYxMDA4ZDQ2LTAwMDAtMDEwMC0wMDAwLTVlOGZlM2QxMDAwMCI=\"}}");
+
+  az_iot_provisioning_client_register_response response;
+  az_result ret = az_iot_provisioning_client_parse_received_topic_and_payload(
+      &client, received_topic, received_payload, &response);
+  assert_int_equal(AZ_ERROR_ITEM_NOT_FOUND, ret);
+}
+
+static void
+test_az_iot_provisioning_client_received_topic_and_payload_parse_error_code_not_found_fails()
+{
+  az_iot_provisioning_client client;
+  az_span received_topic = AZ_SPAN_FROM_STR("$dps/registrations/res/200/?$rid=1");
+  az_span received_payload = AZ_SPAN_FROM_STR(
+      "{" /*\"errorCode\":401002,*/ "\"trackingId\":\"" TEST_ERROR_TRACKING_ID "\","
+      "\"message\":\"" TEST_ERROR_MESSAGE_INVALID_CERT "\",\"timestampUtc\":\"" TEST_ERROR_TIMESTAMP
+      "\"}");
+
+  az_iot_provisioning_client_register_response response;
+  az_result ret = az_iot_provisioning_client_parse_received_topic_and_payload(
+      &client, received_topic, received_payload, &response);
+  assert_int_equal(AZ_ERROR_ITEM_NOT_FOUND, ret);
+}
+
+static void
+test_az_iot_provisioning_client_received_topic_and_payload_parse_invalid_registration_state_fails()
+{
+  az_iot_provisioning_client client;
+  az_span received_topic = AZ_SPAN_FROM_STR("$dps/registrations/res/200/?$rid=1");
+  az_span received_payload
+      = AZ_SPAN_FROM_STR("{\"operationId\":\"" TEST_OPERATION_ID
+                         "\",\"status\":\"" TEST_STATUS_FAILED "\",\"registrationState\":123}");
+
+  az_iot_provisioning_client_register_response response;
+  az_result ret = az_iot_provisioning_client_parse_received_topic_and_payload(
+      &client, received_topic, received_payload, &response);
+  assert_int_equal(AZ_ERROR_PARSER_UNEXPECTED_CHAR, ret);
+}
+
 #ifdef _MSC_VER
 // warning C4113: 'void (__cdecl *)()' differs in parameter lists from 'CMUnitTestFunction'
 #pragma warning(disable : 4113)
@@ -254,17 +369,29 @@ int test_az_iot_provisioning_client_parser()
 {
   const struct CMUnitTest tests[] = {
     cmocka_unit_test(
-        test_az_iot_provisioning_client_received_topic_payload_parse_assigning_state_succeed),
+        test_az_iot_provisioning_client_parse_received_topic_and_payload_assigning_state_succeed),
     cmocka_unit_test(
-        test_az_iot_provisioning_client_received_topic_payload_parse_assigning2_state_succeed),
+        test_az_iot_provisioning_client_parse_received_topic_and_payload_topic_not_matched_fails),
     cmocka_unit_test(
-        test_az_iot_provisioning_client_received_topic_payload_parse_assigned_state_succeed),
+        test_az_iot_provisioning_client_parse_received_topic_and_payload_parse_assigning2_state_succeed),
     cmocka_unit_test(
-        test_az_iot_provisioning_client_received_topic_payload_parse_invalid_certificate_error_succeed),
+        test_az_iot_provisioning_client_parse_received_topic_and_payload_assigned_state_succeed),
     cmocka_unit_test(
-        test_az_iot_provisioning_client_received_topic_payload_parse_allocation_error_state_succeed),
+        test_az_iot_provisioning_client_parse_received_topic_and_payload_invalid_certificate_error_succeed),
     cmocka_unit_test(
-        test_az_iot_provisioning_client_received_topic_payload_parse_disabled_state_succeed),
+        test_az_iot_provisioning_client_parse_received_topic_payload_disabled_state_succeed),
+    cmocka_unit_test(
+        test_az_iot_provisioning_client_parse_received_topic_and_payload_allocation_error_state_succeed),
+    cmocka_unit_test(
+        test_az_iot_provisioning_client_received_topic_and_payload_parse_invalid_json_payload_fails),
+    cmocka_unit_test(
+        test_az_iot_provisioning_client_received_topic_and_payload_parse_operationid_not_found_fails),
+    cmocka_unit_test(
+        test_az_iot_provisioning_client_received_topic_and_payload_parse_registration_state_not_found_fails),
+    cmocka_unit_test(
+        test_az_iot_provisioning_client_received_topic_and_payload_parse_error_code_not_found_fails),
+    cmocka_unit_test(
+        test_az_iot_provisioning_client_received_topic_and_payload_parse_invalid_registration_state_fails),
   };
 
   return cmocka_run_group_tests_name("az_iot_provisioning_client_parser", tests, NULL, NULL);
