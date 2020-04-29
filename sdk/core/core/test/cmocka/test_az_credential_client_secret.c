@@ -66,22 +66,22 @@ static void test_credential_client_secret(void** state)
 
     ignore = az_http_pipeline_process(&pipeline, &request, &response);
     assert_true(az_span_is_content_equal(
-        AZ_SPAN_FROM_STR("FirstResponse"), response._internal.http_response));
+        AZ_SPAN_FROM_STR("HTTP/1.1 200 OK\r\n\r\Response1"), response._internal.http_response));
 
     ignore = az_http_pipeline_process(&pipeline, &request, &response);
     assert_true(az_span_is_content_equal(
-        AZ_SPAN_FROM_STR("SubsequentResponse"), response._internal.http_response));
+        AZ_SPAN_FROM_STR("HTTP/1.1 200 OK\r\n\r\Response2"), response._internal.http_response));
   }
   {
     will_return(__wrap_az_platform_clock_msec, 2 * 100000000);
 
     ignore = az_http_pipeline_process(&pipeline, &request, &response);
     assert_true(az_span_is_content_equal(
-        AZ_SPAN_FROM_STR("FirstResponse"), response._internal.http_response));
+        AZ_SPAN_FROM_STR("HTTP/1.1 200 OK\r\n\r\Response3"), response._internal.http_response));
 
     ignore = az_http_pipeline_process(&pipeline, &request, &response);
     assert_true(az_span_is_content_equal(
-        AZ_SPAN_FROM_STR("SubsequentResponse"), response._internal.http_response));
+        AZ_SPAN_FROM_STR("HTTP/1.1 200 OK\r\n\r\Response4"), response._internal.http_response));
   }
 #else
   (void)pipeline;
@@ -187,20 +187,26 @@ az_result send_request(_az_http_request* request, az_http_response* response)
 
     assert_true(has_auth_header);
 
-    static bool first_attempt = true;
-    if (redo_auth)
-    {
-      first_attempt = true;
-    }
+    static int attempt = 0;
+    ++attempt
 
-    if (first_attempt)
+    if (attempt == 1)
     {
-      response->_internal.http_response = AZ_SPAN_FROM_STR("FirstResponse");
+      response->_internal.http_response = AZ_SPAN_FROM_STR("HTTP/1.1 200 OK\r\n\r\Response1");
       first_attempt = false;
     }
-    else
+    else if (attempt == 2)
     {
-      response->_internal.http_response = AZ_SPAN_FROM_STR("SubsequentResponse");
+      response->_internal.http_response = AZ_SPAN_FROM_STR("HTTP/1.1 200 OK\r\n\r\Response2");
+      redo_auth = true;
+    }
+    if (attempt == 3 && redo_auth)
+    {
+      response->_internal.http_response = AZ_SPAN_FROM_STR("HTTP/1.1 200 OK\r\n\r\Response3");
+    }
+    else if (attempt == 4 && redo_auth)
+    {
+      response->_internal.http_response = AZ_SPAN_FROM_STR("HTTP/1.1 200 OK\r\n\r\Response4");
       redo_auth = true;
     }
   }

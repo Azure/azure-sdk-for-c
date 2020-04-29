@@ -30,7 +30,7 @@ AZ_NODISCARD az_result _az_url_encode(az_span destination, az_span source, int32
   AZ_PRECONDITION_VALID_SPAN(source, 0, true);
 
   int32_t const input_size = az_span_size(source);
-  AZ_PRECONDITION_VALID_SPAN(destination, input_size, true);
+  AZ_PRECONDITION_VALID_SPAN(destination, input_size, false);
 
   int32_t result_size = 0;
   for (int32_t i = 0; i < input_size; ++i)
