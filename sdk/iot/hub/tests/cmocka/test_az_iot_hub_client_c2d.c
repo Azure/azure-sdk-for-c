@@ -86,7 +86,7 @@ static void test_az_iot_hub_client_c2d_parse_received_topic_NULL_out_request_fai
       az_iot_hub_client_c2d_parse_received_topic(&client, received_topic, NULL));
 }
 
-// Note: c2d messages ALWAYS contain propeties (at least $.to).
+// Note: c2d messages ALWAYS contain properties (at least $.to).
 static void test_az_iot_hub_client_c2d_parse_received_topic_no_properties_fail(void** state)
 {
   (void)state;
