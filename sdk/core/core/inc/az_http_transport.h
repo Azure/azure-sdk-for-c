@@ -141,18 +141,18 @@ AZ_NODISCARD az_result az_http_response_write_span(az_http_response* response, a
 AZ_NODISCARD az_result az_http_response_write_u8(az_http_response* response, uint8_t byte);
 
 /**
- * @brief Returns the number of headers within the request
+ * @brief Returns the number of headers within the request.
  *        Each header is an #az_pair.
  *
  */
 AZ_NODISCARD int32_t az_http_request_headers_count(_az_http_request const* request);
 
 /**
- * @brief Send and http request thru the wire and write the response into \p p_response.
+ * @brief Send an HTTP request through the wire and write the response into \p p_response.
  *
  * @param[in] p_request Points to an az_http_request that contains the settings and data that is
- * used to send the request thru the wire.
- * @param[out] p_response Points to an az_http_response where the response from wire will be written
+ * used to send the request through the wire.
+ * @param[out] p_response Points to an az_http_response where the response from the wire will be written.
  * @return AZ_NODISCARD az_http_client_send_request
  */
 AZ_NODISCARD az_result
