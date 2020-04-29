@@ -41,7 +41,7 @@ static const char test_correct_twin_path_subscribe_topic[]
 static const char test_correct_twin_patch_pub_topic[]
     = "$iothub/twin/PATCH/properties/reported/?$rid=id_one";
 
-#ifndef NO_PRECONDITION_CHECKING
+#ifndef AZ_NO_PRECONDITION_CHECKING
 enable_precondition_check_tests()
 
     static void test_az_iot_hub_client_twin_response_get_subscribe_topic_filter_null_client_fails(
@@ -292,7 +292,7 @@ static void test_az_iot_hub_client_twin_parse_received_topic_NULL_response_fails
       &client, test_twin_received_topic_desired_success, NULL));
 }
 
-#endif // NO_PRECONDITION_CHECKING
+#endif // AZ_NO_PRECONDITION_CHECKING
 
 static void test_az_iot_hub_client_twin_response_get_subscribe_topic_filter_succeed(void** state)
 {
@@ -532,12 +532,12 @@ static void test_az_iot_hub_client_twin_parse_received_topic_not_found_prefix_fa
 
 int test_az_iot_hub_client_twin()
 {
-#ifndef NO_PRECONDITION_CHECKING
+#ifndef AZ_NO_PRECONDITION_CHECKING
   setup_precondition_check_tests();
-#endif // NO_PRECONDITION_CHECKING
+#endif // AZ_NO_PRECONDITION_CHECKING
 
   const struct CMUnitTest tests[] = {
-#ifndef NO_PRECONDITION_CHECKING
+#ifndef AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(
         test_az_iot_hub_client_twin_response_get_subscribe_topic_filter_null_client_fails),
     cmocka_unit_test(
@@ -560,7 +560,7 @@ int test_az_iot_hub_client_twin()
     cmocka_unit_test(test_az_iot_hub_client_twin_parse_received_topic_NULL_client_fails),
     cmocka_unit_test(test_az_iot_hub_client_twin_parse_received_topic_NULL_rec_topic_fails),
     cmocka_unit_test(test_az_iot_hub_client_twin_parse_received_topic_NULL_response_fails),
-#endif // NO_PRECONDITION_CHECKING
+#endif // AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_az_iot_hub_client_twin_response_get_subscribe_topic_filter_succeed),
     cmocka_unit_test(
         test_az_iot_hub_client_twin_response_get_subscribe_topic_filter_small_buffer_fails),

@@ -27,7 +27,7 @@ AZ_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t size)
   //   size >= 0
   // Otherwise, if ptr is null, then:
   //   size == 0
-  AZ_PRECONDITION((ptr != NULL && size >= 0) || (ptr + (uint32_t)size == 0));
+  _az_PRECONDITION((ptr != NULL && size >= 0) || (ptr + (uint32_t)size == 0));
 
   return (az_span){ ._internal = { .ptr = ptr, .size = size, }, };
 }
@@ -35,7 +35,7 @@ AZ_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t size)
 
 AZ_NODISCARD az_span az_span_from_str(char* str)
 {
-  AZ_PRECONDITION_NOT_NULL(str);
+  _az_PRECONDITION_NOT_NULL(str);
 
   // Avoid passing in null pointer to strlen to avoid memory access violation.
   if (str == NULL)
@@ -45,21 +45,21 @@ AZ_NODISCARD az_span az_span_from_str(char* str)
 
   int32_t const length = (int32_t)strlen(str);
 
-  AZ_PRECONDITION(length >= 0);
+  _az_PRECONDITION(length >= 0);
 
   return az_span_init((uint8_t*)str, length);
 }
 
 AZ_NODISCARD az_span az_span_slice(az_span span, int32_t start_index, int32_t end_index)
 {
-  AZ_PRECONDITION_VALID_SPAN(span, 0, true);
+  _az_PRECONDITION_VALID_SPAN(span, 0, true);
 
   // The following set of preconditions validate that:
   //    0 <= end_index <= span.size
   // And
   //    0 <= start_index <= end_index
-  AZ_PRECONDITION_RANGE(0, end_index, az_span_size(span));
-  AZ_PRECONDITION((uint32_t)start_index <= (uint32_t)end_index);
+  _az_PRECONDITION_RANGE(0, end_index, az_span_size(span));
+  _az_PRECONDITION((uint32_t)start_index <= (uint32_t)end_index);
 
   return az_span_init(az_span_ptr(span) + start_index, end_index - start_index);
 }
@@ -99,8 +99,8 @@ AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1, az_span 
 
 AZ_NODISCARD az_result az_span_atou64(az_span span, uint64_t* out_number)
 {
-  AZ_PRECONDITION_VALID_SPAN(span, 1, false);
-  AZ_PRECONDITION_NOT_NULL(out_number);
+  _az_PRECONDITION_VALID_SPAN(span, 1, false);
+  _az_PRECONDITION_NOT_NULL(out_number);
 
   int32_t self_size = az_span_size(span);
   uint64_t value = 0;
@@ -127,8 +127,8 @@ AZ_NODISCARD az_result az_span_atou64(az_span span, uint64_t* out_number)
 
 AZ_NODISCARD az_result az_span_atou32(az_span span, uint32_t* out_number)
 {
-  AZ_PRECONDITION_VALID_SPAN(span, 1, false);
-  AZ_PRECONDITION_NOT_NULL(out_number);
+  _az_PRECONDITION_VALID_SPAN(span, 1, false);
+  _az_PRECONDITION_NOT_NULL(out_number);
 
   int32_t self_size = az_span_size(span);
   uint32_t value = 0;
@@ -233,7 +233,7 @@ az_span az_span_copy(az_span destination, az_span source)
 {
   int32_t src_size = az_span_size(source);
 
-  AZ_PRECONDITION_VALID_SPAN(destination, src_size, false);
+  _az_PRECONDITION_VALID_SPAN(destination, src_size, false);
 
   if (src_size == 0)
   {
@@ -256,7 +256,7 @@ az_span az_span_copy(az_span destination, az_span source)
 
 az_span az_span_copy_u8(az_span destination, uint8_t byte)
 {
-  AZ_PRECONDITION_VALID_SPAN(destination, 1, false);
+  _az_PRECONDITION_VALID_SPAN(destination, 1, false);
 
   // Even though the contract of the method is that the destination must be at least 1 byte large,
   // no-op if it is empty to avoid memory corruption.
@@ -273,17 +273,17 @@ az_span az_span_copy_u8(az_span destination, uint8_t byte)
 
 void az_span_to_str(char* destination, int32_t destination_max_size, az_span source)
 {
-  AZ_PRECONDITION_NOT_NULL(destination);
-  AZ_PRECONDITION(destination_max_size > 0);
+  _az_PRECONDITION_NOT_NULL(destination);
+  _az_PRECONDITION(destination_max_size > 0);
 
   // Implementations of memmove generally do the right thing when number of bytes to move is 0, even
   // if the ptr is null, but given the behavior is documented to be undefined, we disallow it as a
   // precondition.
-  AZ_PRECONDITION_VALID_SPAN(source, 0, false);
+  _az_PRECONDITION_VALID_SPAN(source, 0, false);
 
   int32_t size_to_write = az_span_size(source);
 
-  AZ_PRECONDITION(size_to_write < destination_max_size);
+  _az_PRECONDITION(size_to_write < destination_max_size);
 
   // Even though the contract of this method is that the destination_max_size must be larger than
   // source to be able to copy all of the source to the char buffer including an extra null
@@ -302,7 +302,7 @@ void az_span_to_str(char* destination, int32_t destination_max_size, az_span sou
     }
   }
 
-  AZ_PRECONDITION(size_to_write >= 0);
+  _az_PRECONDITION(size_to_write >= 0);
 
   memmove((void*)destination, (void const*)az_span_ptr(source), (size_t)size_to_write);
   destination[size_to_write] = 0;
@@ -371,8 +371,8 @@ _az_span_replace(az_span self, int32_t current_size, int32_t start, int32_t end,
 
 AZ_NODISCARD az_result az_span_dtoa(az_span destination, double source, az_span* out_span)
 {
-  AZ_PRECONDITION_VALID_SPAN(destination, 0, false);
-  AZ_PRECONDITION_NOT_NULL(out_span);
+  _az_PRECONDITION_VALID_SPAN(destination, 0, false);
+  _az_PRECONDITION_NOT_NULL(out_span);
 
   // Verify to make sure that the destination has at least one byte up front (for either a digit or
   // the sign), since that's is common across all branches.
@@ -478,8 +478,8 @@ static AZ_NODISCARD az_result _az_span_builder_append_uint64(az_span* self, uint
 
 AZ_NODISCARD az_result az_span_u64toa(az_span destination, uint64_t source, az_span* out_span)
 {
-  AZ_PRECONDITION_VALID_SPAN(destination, 0, false);
-  AZ_PRECONDITION_NOT_NULL(out_span);
+  _az_PRECONDITION_VALID_SPAN(destination, 0, false);
+  _az_PRECONDITION_NOT_NULL(out_span);
   *out_span = destination;
 
   return _az_span_builder_append_uint64(out_span, source);
@@ -487,8 +487,8 @@ AZ_NODISCARD az_result az_span_u64toa(az_span destination, uint64_t source, az_s
 
 AZ_NODISCARD az_result az_span_i64toa(az_span destination, int64_t source, az_span* out_span)
 {
-  AZ_PRECONDITION_VALID_SPAN(destination, 0, false);
-  AZ_PRECONDITION_NOT_NULL(out_span);
+  _az_PRECONDITION_VALID_SPAN(destination, 0, false);
+  _az_PRECONDITION_NOT_NULL(out_span);
 
   if (source < 0)
   {
@@ -543,15 +543,15 @@ _az_span_builder_append_u32toa(az_span self, uint32_t n, az_span* out_span)
 
 AZ_NODISCARD az_result az_span_u32toa(az_span destination, uint32_t source, az_span* out_span)
 {
-  AZ_PRECONDITION_VALID_SPAN(destination, 0, false);
-  AZ_PRECONDITION_NOT_NULL(out_span);
+  _az_PRECONDITION_VALID_SPAN(destination, 0, false);
+  _az_PRECONDITION_NOT_NULL(out_span);
   return _az_span_builder_append_u32toa(destination, source, out_span);
 }
 
 AZ_NODISCARD az_result az_span_i32toa(az_span destination, int32_t source, az_span* out_span)
 {
-  AZ_PRECONDITION_VALID_SPAN(destination, 0, false);
-  AZ_PRECONDITION_NOT_NULL(out_span);
+  _az_PRECONDITION_VALID_SPAN(destination, 0, false);
+  _az_PRECONDITION_NOT_NULL(out_span);
 
   *out_span = destination;
 
