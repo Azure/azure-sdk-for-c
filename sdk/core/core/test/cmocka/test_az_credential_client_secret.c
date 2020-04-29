@@ -188,7 +188,7 @@ az_result send_request(_az_http_request* request, az_http_response* response)
     assert_true(has_auth_header);
 
     static int attempt = 0;
-    ++attempt
+    ++attempt;
 
     if (attempt == 1)
     {
