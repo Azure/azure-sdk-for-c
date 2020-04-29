@@ -39,7 +39,7 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_get_publish_topic(
   }
   if (properties != NULL)
   {
-    required_length += az_span_size(properties->_internal.properties_buffer);
+    required_length += properties->_internal.properties_written;
   }
 
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_topic_span, required_length + (int32_t)sizeof(null_terminator));
@@ -57,7 +57,10 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_get_publish_topic(
 
   if (properties != NULL)
   {
-    remainder = az_span_copy(remainder, properties->_internal.properties_buffer);
+    remainder = az_span_copy(
+        remainder,
+        az_span_slice(
+            properties->_internal.properties_buffer, 0, properties->_internal.properties_written));
   }
 
   az_span_copy_u8(remainder, null_terminator);
