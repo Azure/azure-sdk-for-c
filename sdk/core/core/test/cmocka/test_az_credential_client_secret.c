@@ -61,32 +61,34 @@ static void test_credential_client_secret(void** state)
   ignore = az_http_response_init(&response, AZ_SPAN_FROM_BUFFER(response_buf));
 
 #ifdef MOCK_ENABLED
-  ignore = az_http_pipeline_process(&pipeline, &request, &response);
-  assert_true(az_span_is_content_equal(
-      AZ_SPAN_FROM_STR("FirstResponse"), response._internal.http_response));
+  {
+    will_return(__wrap_az_platform_clock_msec, 1 * 100000000);
 
-  ignore = az_http_pipeline_process(&pipeline, &request, &response);
-  assert_true(az_span_is_content_equal(
-      AZ_SPAN_FROM_STR("SubsequentResponse"), response._internal.http_response));
+    ignore = az_http_pipeline_process(&pipeline, &request, &response);
+    assert_true(az_span_is_content_equal(
+        AZ_SPAN_FROM_STR("FirstResponse"), response._internal.http_response));
 
-  ignore = az_http_pipeline_process(&pipeline, &request, &response);
-  assert_true(az_span_is_content_equal(
-      AZ_SPAN_FROM_STR("FirstResponse"), response._internal.http_response));
+    ignore = az_http_pipeline_process(&pipeline, &request, &response);
+    assert_true(az_span_is_content_equal(
+        AZ_SPAN_FROM_STR("SubsequentResponse"), response._internal.http_response));
+  }
+  {
+    will_return(__wrap_az_platform_clock_msec, 2 * 100000000);
 
-  ignore = az_http_pipeline_process(&pipeline, &request, &response);
-  assert_true(az_span_is_content_equal(
-      AZ_SPAN_FROM_STR("SubsequentResponse"), response._internal.http_response));
+    ignore = az_http_pipeline_process(&pipeline, &request, &response);
+    assert_true(az_span_is_content_equal(
+        AZ_SPAN_FROM_STR("FirstResponse"), response._internal.http_response));
+
+    ignore = az_http_pipeline_process(&pipeline, &request, &response);
+    assert_true(az_span_is_content_equal(
+        AZ_SPAN_FROM_STR("SubsequentResponse"), response._internal.http_response));
+  }
 #else
   (void)pipeline;
 #endif // MOCK_ENABLED
 
   (void)ignore;
 }
-
-enum
-{
-  CLOCK_INCREMENT = 100000000,
-};
 
 az_result send_request(_az_http_request* request, az_http_response* response);
 
@@ -145,17 +147,11 @@ az_result send_request(_az_http_request* request, az_http_response* response)
     {
       if (!redo_auth)
       {
-#ifdef MOCK_ENABLED
-        will_return(__wrap_az_platform_clock_msec, CLOCK_INCREMENT);
-#endif // MOCK_ENABLED
         response->_internal.http_response = AZ_SPAN_FROM_STR(
             "HTTP/1.1 200 OK\r\n\r\n{ 'access_token' : 'AccessToken', 'expires_in' : 3600 }");
       }
       else
       {
-#ifdef MOCK_ENABLED
-        will_return(__wrap_az_platform_clock_msec, CLOCK_INCREMENT * 3);
-#endif // MOCK_ENABLED
         response->_internal.http_response = AZ_SPAN_FROM_STR(
             "HTTP/1.1 200 OK\r\n\r\n{ 'access_token' : 'NewAccessToken', 'expires_in' : 3600 }");
       }
@@ -205,12 +201,6 @@ az_result send_request(_az_http_request* request, az_http_response* response)
     else
     {
       response->_internal.http_response = AZ_SPAN_FROM_STR("SubsequentResponse");
-
-#ifdef MOCK_ENABLED
-      // Next time the function is invoked, the token is going to be considered expired.
-      will_return(__wrap_az_platform_clock_msec, CLOCK_INCREMENT * 2);
-#endif // MOCK_ENABLED
-
       redo_auth = true;
     }
   }
