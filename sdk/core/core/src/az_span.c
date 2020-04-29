@@ -618,3 +618,75 @@ _az_span_scan_until(az_span self, _az_predicate predicate, int32_t* out_index)
   }
   return AZ_ERROR_ITEM_NOT_FOUND;
 }
+
+AZ_NODISCARD az_span _az_span_trim_white_space(az_span source)
+{
+  // remove white spaces from left
+  az_span left_trim = _az_span_trim_white_space_from_start(source);
+  // calculate the offset after moving after white spaces
+  int32_t offset = az_span_size(source) - az_span_size(left_trim);
+  // remove from right
+  az_span right_trim = _az_span_trim_white_space_from_end(source);
+
+  if (offset == 0)
+  {
+    // nothing removed from left, return
+    return right_trim;
+  }
+
+  // slice right with the offset
+  return az_span_slice_to_end(right_trim, offset);
+}
+
+AZ_NODISCARD AZ_INLINE bool _az_is_white_space(uint8_t c)
+{
+  switch (c)
+  {
+    case ' ':
+    case '\t':
+    case '\n':
+    case '\r':
+      return true;
+  }
+  return false;
+}
+
+AZ_NODISCARD az_span _az_span_trim_white_space_from_start(az_span source)
+{
+  // set contract to support only az_span with length 1
+  AZ_PRECONDITION_VALID_SPAN(source, 1, false);
+
+  // loop from start to the first non white space
+  uint8_t* source_ptr = az_span_ptr(source);
+  for (int32_t index = 0; index < az_span_size(source); ++index)
+  {
+    if (!_az_is_white_space(source_ptr[index]))
+    {
+      return az_span_slice_to_end(source, index);
+    }
+  }
+  // reaching here means it was all white spaces
+  // Return az_span of size 0, using AZ_SPAN_NULL for now so we dont call slice
+  return AZ_SPAN_NULL;
+}
+
+AZ_NODISCARD az_span _az_span_trim_white_space_from_end(az_span source)
+{
+  // set contract to support only az_span with length 1
+  AZ_PRECONDITION_VALID_SPAN(source, 1, false);
+
+  // loop from end to the first non white space or 0
+  uint8_t* source_ptr = az_span_ptr(source);
+  int32_t source_size = az_span_size(source);
+  for (int32_t index = source_size - 1; index >= 0;)
+  {
+    --index;
+    if (!_az_is_white_space(source_ptr[index]))
+    {
+      return az_span_slice(source, 0, index); // slice from start to index
+    }
+  }
+  // reaching here means it was all white spaces
+  // Return az_span of size 0, using AZ_SPAN_NULL for now so we dont call slice
+  return AZ_SPAN_NULL;
+}

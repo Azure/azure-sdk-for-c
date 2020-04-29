@@ -38,6 +38,59 @@ AZ_NODISCARD az_result _az_is_expected_span(az_span* self, az_span expected);
 // Used internally by json parser and also by httpRequest
 AZ_NODISCARD az_result az_span_reader_skip_json_white_space(az_span* self);
 
+/**
+ * @brief Removes any white space from right and left of \p span. Function will create a new
+ * #az_span poiniting to the first non-white-space (` `, \\n, \\r, \\t) found in \p span and up to
+ * the last non-white-space char.
+ *
+ * @remarks If \p span is full of non-white-space characters, this function will retrun an az_span
+ * of size 0.
+ *
+ * Example:
+ *  az_span a = AZ_SPAN_FROM_STR("  text with   \\n spaces   ");
+ *  az_span b = _az_span_trim_white_space(a);
+ *  // assert( b ==  AZ_SPAN_FROM_STR("text with   \\n spaces"));
+ *
+ * @param[in] source #az_span pointing to a memory address that might contain white spaces.
+ * @return AZ_NODISCARD _az_span_trim_white_space.
+ */
+AZ_NODISCARD az_span _az_span_trim_white_space(az_span source);
+
+/**
+ * @brief Removes any white space from the left of \p span. Function will create a new
+ * #az_span poiniting to the first non-white-space (` `, \\n, \\r, \\t) found in \p span and up to
+ * the end of \p span
+ *
+ * @remarks If \p span is full of non-white-space characters, this function will retrun an az_span
+ * of size 0.
+ *
+ * Example:
+ *  az_span a = AZ_SPAN_FROM_STR("  text with   \\n spaces   ");
+ *  az_span b = _az_span_trim_white_space_from_start(a);
+ *  // assert( b ==  AZ_SPAN_FROM_STR("text with   \\n spaces   "));
+ *
+ * @param[in] source #az_span pointing to a memory address that might contain white spaces.
+ * @return AZ_NODISCARD _az_span_trim_white_space.
+ */
+AZ_NODISCARD az_span _az_span_trim_white_space_from_start(az_span source);
+
+/**
+ * @brief Removes any white space from the right of \p span. Function will create a new
+ * #az_span poiniting to the start of \p span and up to the last non-white-space char.
+ *
+ * @remarks If \p span is full of non-white-space characters, this function will retrun an az_span
+ * of size 0.
+ *
+ * Example:
+ *  az_span a = AZ_SPAN_FROM_STR("  text with   \\n spaces   ");
+ *  az_span b = _az_span_trim_white_space_from_end(a);
+ *  // assert( b ==  AZ_SPAN_FROM_STR("  text with   \\n spaces"));
+ *
+ * @param[in] source #az_span pointing to a memory address that might contain white spaces.
+ * @return AZ_NODISCARD _az_span_trim_white_space.
+ */
+AZ_NODISCARD az_span _az_span_trim_white_space_from_end(az_span source);
+
 #include <_az_cfg_suffix.h>
 
 #endif // _az_SPAN_PRIVATE_H
