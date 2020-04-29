@@ -29,9 +29,9 @@ AZ_NODISCARD az_result az_http_request_init(
     az_span body)
 {
   AZ_PRECONDITION_NOT_NULL(p_request);
-  AZ_PRECONDITION_VALID_SPAN(method, 1, false);
-  AZ_PRECONDITION_VALID_SPAN(url, 1, false);
-  AZ_PRECONDITION_VALID_SPAN(headers_buffer, 0, false);
+  AZ_PRECONDITION_VALID_SPAN(method, 1);
+  AZ_PRECONDITION_VALID_SPAN(url, 1);
+  AZ_PRECONDITION_VALID_SPAN(headers_buffer, 0);
 
   int32_t query_start = 0;
   az_result url_with_query = _az_span_scan_until(
@@ -100,8 +100,8 @@ AZ_NODISCARD az_result
 az_http_request_set_query_parameter(_az_http_request* p_request, az_span name, az_span value)
 {
   AZ_PRECONDITION_NOT_NULL(p_request);
-  AZ_PRECONDITION_VALID_SPAN(name, 1, false);
-  AZ_PRECONDITION_VALID_SPAN(value, 1, false);
+  AZ_PRECONDITION_VALID_SPAN(name, 1);
+  AZ_PRECONDITION_VALID_SPAN(value, 1);
 
   // name or value can't be empty
   AZ_PRECONDITION(az_span_size(name) > 0 && az_span_size(value) > 0);
@@ -147,7 +147,7 @@ AZ_NODISCARD az_result
 az_http_request_append_header(_az_http_request* p_request, az_span key, az_span value)
 {
   AZ_PRECONDITION_NOT_NULL(p_request);
-  AZ_PRECONDITION_VALID_SPAN(key, 1, false);
+  AZ_PRECONDITION_VALID_SPAN(key, 1);
 
   az_span headers = p_request->_internal.headers;
 

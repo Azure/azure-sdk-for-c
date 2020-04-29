@@ -41,9 +41,9 @@ AZ_NODISCARD az_result az_iot_provisioning_client_init(
     az_iot_provisioning_client_options const* options)
 {
   AZ_PRECONDITION_NOT_NULL(client);
-  AZ_PRECONDITION_VALID_SPAN(global_device_endpoint, 1, false);
-  AZ_PRECONDITION_VALID_SPAN(id_scope, 1, false);
-  AZ_PRECONDITION_VALID_SPAN(registration_id, 1, false);
+  AZ_PRECONDITION_VALID_SPAN(global_device_endpoint, 1);
+  AZ_PRECONDITION_VALID_SPAN(id_scope, 1);
+  AZ_PRECONDITION_VALID_SPAN(registration_id, 1);
 
   client->_internal.global_device_endpoint = global_device_endpoint;
   client->_internal.id_scope = id_scope;
@@ -218,7 +218,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_query_status_get_publish_topic
   AZ_PRECONDITION(mqtt_topic_size > 0);
 
   AZ_PRECONDITION_NOT_NULL(register_response);
-  AZ_PRECONDITION_VALID_SPAN(register_response->operation_id, 1, false);
+  AZ_PRECONDITION_VALID_SPAN(register_response->operation_id, 1);
 
   az_span mqtt_topic_span = az_span_init((uint8_t*)mqtt_topic, (int32_t)mqtt_topic_size);
   az_span str_dps_registrations = _az_iot_provisioning_get_str_dps_registrations();
@@ -450,8 +450,8 @@ AZ_NODISCARD az_result az_iot_provisioning_client_parse_received_topic_and_paylo
   (void)client;
 
   AZ_PRECONDITION_NOT_NULL(client);
-  AZ_PRECONDITION_VALID_SPAN(received_topic, 0, false);
-  AZ_PRECONDITION_VALID_SPAN(received_payload, 0, false);
+  AZ_PRECONDITION_VALID_SPAN(received_topic, 0);
+  AZ_PRECONDITION_VALID_SPAN(received_payload, 0);
   AZ_PRECONDITION_NOT_NULL(out_response);
 
   int32_t idx = az_span_find(received_topic, str_dps_registrations_res);

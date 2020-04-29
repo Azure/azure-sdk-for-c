@@ -77,7 +77,7 @@ AZ_NODISCARD az_result az_iot_get_status_from_uint32(uint32_t status_int, az_iot
 
 AZ_NODISCARD az_span az_span_token(az_span source, az_span delimiter, az_span* out_remainder)
 {
-  AZ_PRECONDITION_VALID_SPAN(delimiter, 1, false);
+  AZ_PRECONDITION_VALID_SPAN(delimiter, 1);
   AZ_PRECONDITION_NOT_NULL(out_remainder);
 
   if (az_span_size(source) == 0)

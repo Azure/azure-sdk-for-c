@@ -52,7 +52,7 @@ AZ_NODISCARD az_span az_span_from_str(char* str)
 
 AZ_NODISCARD az_span az_span_slice(az_span span, int32_t start_index, int32_t end_index)
 {
-  AZ_PRECONDITION_VALID_SPAN(span, 0, true);
+  AZ_PRECONDITION_VALID_SPAN(span, 0);
 
   // The following set of preconditions validate that:
   //    0 <= end_index <= span.size
@@ -99,7 +99,7 @@ AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1, az_span 
 
 AZ_NODISCARD az_result az_span_atou64(az_span span, uint64_t* out_number)
 {
-  AZ_PRECONDITION_VALID_SPAN(span, 1, false);
+  AZ_PRECONDITION_VALID_SPAN(span, 1);
   AZ_PRECONDITION_NOT_NULL(out_number);
 
   int32_t self_size = az_span_size(span);
@@ -127,7 +127,7 @@ AZ_NODISCARD az_result az_span_atou64(az_span span, uint64_t* out_number)
 
 AZ_NODISCARD az_result az_span_atou32(az_span span, uint32_t* out_number)
 {
-  AZ_PRECONDITION_VALID_SPAN(span, 1, false);
+  AZ_PRECONDITION_VALID_SPAN(span, 1);
   AZ_PRECONDITION_NOT_NULL(out_number);
 
   int32_t self_size = az_span_size(span);
@@ -231,9 +231,9 @@ AZ_NODISCARD int32_t az_span_find(az_span source, az_span target)
 
 az_span az_span_copy(az_span destination, az_span source)
 {
+  AZ_PRECONDITION_VALID_SPAN(source, 0);
   int32_t src_size = az_span_size(source);
-
-  AZ_PRECONDITION_VALID_SPAN(destination, src_size, false);
+  AZ_PRECONDITION_VALID_SPAN(destination, src_size);
 
   if (src_size == 0)
   {
@@ -256,7 +256,7 @@ az_span az_span_copy(az_span destination, az_span source)
 
 az_span az_span_copy_u8(az_span destination, uint8_t byte)
 {
-  AZ_PRECONDITION_VALID_SPAN(destination, 1, false);
+  AZ_PRECONDITION_VALID_SPAN(destination, 1);
 
   // Even though the contract of the method is that the destination must be at least 1 byte large,
   // no-op if it is empty to avoid memory corruption.
@@ -279,7 +279,7 @@ void az_span_to_str(char* destination, int32_t destination_max_size, az_span sou
   // Implementations of memmove generally do the right thing when number of bytes to move is 0, even
   // if the ptr is null, but given the behavior is documented to be undefined, we disallow it as a
   // precondition.
-  AZ_PRECONDITION_VALID_SPAN(source, 0, false);
+  AZ_PRECONDITION_VALID_SPAN(source, 0);
 
   int32_t size_to_write = az_span_size(source);
 
@@ -371,7 +371,7 @@ _az_span_replace(az_span self, int32_t current_size, int32_t start, int32_t end,
 
 AZ_NODISCARD az_result az_span_dtoa(az_span destination, double source, az_span* out_span)
 {
-  AZ_PRECONDITION_VALID_SPAN(destination, 0, false);
+  AZ_PRECONDITION_VALID_SPAN(destination, 0);
   AZ_PRECONDITION_NOT_NULL(out_span);
 
   // Verify to make sure that the destination has at least one byte up front (for either a digit or
@@ -478,7 +478,7 @@ static AZ_NODISCARD az_result _az_span_builder_append_uint64(az_span* self, uint
 
 AZ_NODISCARD az_result az_span_u64toa(az_span destination, uint64_t source, az_span* out_span)
 {
-  AZ_PRECONDITION_VALID_SPAN(destination, 0, false);
+  AZ_PRECONDITION_VALID_SPAN(destination, 0);
   AZ_PRECONDITION_NOT_NULL(out_span);
   *out_span = destination;
 
@@ -487,7 +487,7 @@ AZ_NODISCARD az_result az_span_u64toa(az_span destination, uint64_t source, az_s
 
 AZ_NODISCARD az_result az_span_i64toa(az_span destination, int64_t source, az_span* out_span)
 {
-  AZ_PRECONDITION_VALID_SPAN(destination, 0, false);
+  AZ_PRECONDITION_VALID_SPAN(destination, 0);
   AZ_PRECONDITION_NOT_NULL(out_span);
 
   if (source < 0)
@@ -543,14 +543,14 @@ _az_span_builder_append_u32toa(az_span self, uint32_t n, az_span* out_span)
 
 AZ_NODISCARD az_result az_span_u32toa(az_span destination, uint32_t source, az_span* out_span)
 {
-  AZ_PRECONDITION_VALID_SPAN(destination, 0, false);
+  AZ_PRECONDITION_VALID_SPAN(destination, 0);
   AZ_PRECONDITION_NOT_NULL(out_span);
   return _az_span_builder_append_u32toa(destination, source, out_span);
 }
 
 AZ_NODISCARD az_result az_span_i32toa(az_span destination, int32_t source, az_span* out_span)
 {
-  AZ_PRECONDITION_VALID_SPAN(destination, 0, false);
+  AZ_PRECONDITION_VALID_SPAN(destination, 0);
   AZ_PRECONDITION_NOT_NULL(out_span);
 
   *out_span = destination;

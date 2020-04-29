@@ -99,7 +99,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_document_get_publish_topic(
     size_t* out_mqtt_topic_length)
 {
   AZ_PRECONDITION_NOT_NULL(client);
-  AZ_PRECONDITION_VALID_SPAN(request_id, 1, false);
+  AZ_PRECONDITION_VALID_SPAN(request_id, 1);
   AZ_PRECONDITION_NOT_NULL(mqtt_topic);
   AZ_PRECONDITION(mqtt_topic_size > 0);
   (void)client;
@@ -137,7 +137,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_patch_get_publish_topic(
     size_t* out_mqtt_topic_length)
 {
   AZ_PRECONDITION_NOT_NULL(client);
-  AZ_PRECONDITION_VALID_SPAN(request_id, 1, false);
+  AZ_PRECONDITION_VALID_SPAN(request_id, 1);
   AZ_PRECONDITION_NOT_NULL(mqtt_topic);
   AZ_PRECONDITION(mqtt_topic_size > 0);
   (void)client;
@@ -173,7 +173,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
     az_iot_hub_client_twin_response* out_twin_response)
 {
   AZ_PRECONDITION_NOT_NULL(client);
-  AZ_PRECONDITION_VALID_SPAN(received_topic, 1, false);
+  AZ_PRECONDITION_VALID_SPAN(received_topic, 1);
   AZ_PRECONDITION_NOT_NULL(out_twin_response);
   (void)client;
 

@@ -57,7 +57,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_telemetry_get_publish_topic(
     size_t* out_mqtt_topic_length)
 {
   AZ_PRECONDITION_NOT_NULL(client);
-  AZ_PRECONDITION_VALID_SPAN(component_name, 1, false);
+  AZ_PRECONDITION_VALID_SPAN(component_name, 1);
   AZ_PRECONDITION_NOT_NULL(mqtt_topic);
   AZ_PRECONDITION(mqtt_topic_size > 0);
   AZ_PRECONDITION_IS_NULL(reserved);

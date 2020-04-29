@@ -36,9 +36,9 @@ AZ_NODISCARD az_result az_iot_pnp_client_init(
     az_iot_pnp_client_options const* options)
 {
   AZ_PRECONDITION_NOT_NULL(client);
-  AZ_PRECONDITION_VALID_SPAN(iot_hub_hostname, 1, false);
-  AZ_PRECONDITION_VALID_SPAN(device_id, 1, false);
-  AZ_PRECONDITION_VALID_SPAN(root_interface_name, 1, false);
+  AZ_PRECONDITION_VALID_SPAN(iot_hub_hostname, 1);
+  AZ_PRECONDITION_VALID_SPAN(device_id, 1);
+  AZ_PRECONDITION_VALID_SPAN(root_interface_name, 1);
 
   az_iot_hub_client_options hub_options = az_iot_hub_client_options_default();
   hub_options.user_agent = (options != NULL) ? options->user_agent : AZ_SPAN_NULL;

@@ -35,7 +35,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_signature(
 {
   AZ_PRECONDITION_NOT_NULL(client);
   AZ_PRECONDITION(token_expiration_epoch_time > 0);
-  AZ_PRECONDITION_VALID_SPAN(signature, 0, false);
+  AZ_PRECONDITION_VALID_SPAN(signature, 0);
   AZ_PRECONDITION_NOT_NULL(out_signature);
 
   // Produces the following signature:
@@ -75,7 +75,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_password(
     size_t* out_mqtt_password_length)
 {
   AZ_PRECONDITION_NOT_NULL(client);
-  AZ_PRECONDITION_VALID_SPAN(base64_hmac_sha256_signature, 1, false);
+  AZ_PRECONDITION_VALID_SPAN(base64_hmac_sha256_signature, 1);
   AZ_PRECONDITION(token_expiration_epoch_time > 0);
   AZ_PRECONDITION_NOT_NULL(mqtt_password);
   AZ_PRECONDITION(mqtt_password_size > 0);

@@ -61,33 +61,16 @@ az_precondition_failed_fn az_precondition_failed_get_callback();
 #define AZ_PRECONDITION_NOT_NULL(arg) AZ_PRECONDITION((arg != NULL))
 #define AZ_PRECONDITION_IS_NULL(arg) AZ_PRECONDITION((arg == NULL))
 
-AZ_NODISCARD AZ_INLINE bool az_span_is_valid(az_span span, int32_t min_size, bool null_is_valid)
+AZ_NODISCARD AZ_INLINE bool az_span_is_valid(az_span span, int32_t min_size)
 {
-  uint8_t* ptr = az_span_ptr(span);
+  uint8_t* const ptr = az_span_ptr(span);
   int32_t const span_size = az_span_size(span);
 
-  bool result = false;
-
-  /* Span is valid if:
-     The size is greater than or equal to a user defined minimum value AND one of the
-     following:
-        - If null_is_valid is true and the pointer in the span is null, the size must also be 0.
-        - In the case of the pointer not being NULL, the size is greater than or equal to zero.
-  */
-  if (null_is_valid)
-  {
-    result = ptr == NULL ? span_size == 0 : span_size >= 0;
-  }
-  else
-  {
-    result = ptr != NULL && span_size >= 0;
-  }
-
-  return result && min_size <= span_size;
+  return span_size >= 0 && (span_size == 0 || ptr != NULL) && span_size >= min_size;
 }
 
-#define AZ_PRECONDITION_VALID_SPAN(span, min_size, null_is_valid) \
-  AZ_PRECONDITION(az_span_is_valid(span, min_size, null_is_valid))
+#define AZ_PRECONDITION_VALID_SPAN(span, min_size) \
+  AZ_PRECONDITION(az_span_is_valid(span, min_size))
 
 #include <_az_cfg_suffix.h>
 
