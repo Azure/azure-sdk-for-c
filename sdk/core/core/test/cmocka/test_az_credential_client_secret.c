@@ -29,7 +29,8 @@ static void test_credential_client_secret(void** state)
       AZ_SPAN_FROM_STR("ClientID"),
       AZ_SPAN_FROM_STR("ClientSecret"))));
 
-  assert_true(az_succeeded(_az_credential_set_scopes((_az_credential*)&credential, AZ_SPAN_FROM_STR("Scopes"))));
+  assert_true(az_succeeded(
+      _az_credential_set_scopes((_az_credential*)&credential, AZ_SPAN_FROM_STR("Scopes"))));
 
   _az_http_pipeline pipeline = (_az_http_pipeline){
     ._internal = {
@@ -67,15 +68,26 @@ static void test_credential_client_secret(void** state)
   ignore = az_http_pipeline_process(&pipeline, &request, &response);
   assert_true(az_span_is_content_equal(
       AZ_SPAN_FROM_STR("SubsequentResponse"), response._internal.http_response));
+
+  ignore = az_http_pipeline_process(&pipeline, &request, &response);
+  assert_true(az_span_is_content_equal(
+      AZ_SPAN_FROM_STR("FirstResponse"), response._internal.http_response));
+
+  ignore = az_http_pipeline_process(&pipeline, &request, &response);
+  assert_true(az_span_is_content_equal(
+      AZ_SPAN_FROM_STR("SubsequentResponse"), response._internal.http_response));
+#else
+  (void)pipeline;
 #endif // MOCK_ENABLED
 
   (void)ignore;
 }
 
-az_result send_request(_az_http_request* request, az_http_response* response);
-
-az_result send_request(_az_http_request* request, az_http_response* response)
+static az_result send_request(_az_http_request* request, az_http_response* response)
 {
+  int const clock_increment = 10000000000;
+  static bool redo_auth = false;
+
   az_span const request_url
       = az_span_slice(request->_internal.url, 0, request->_internal.url_length);
 
@@ -107,15 +119,16 @@ az_result send_request(_az_http_request* request, az_http_response* response)
     }
 
     static int auth_attempt = 0;
+    if (redo_auth)
+    {
+      auth_attempt = 0;
+    }
+
     ++auth_attempt;
 
     // 3rd attempt should never happen because the token should not be expiring given that clock
     // returns 0.
     assert_in_range(auth_attempt, 1, 2);
-
-#ifdef MOCK_ENABLED
-    will_return(__wrap_az_platform_clock_msec, 0);
-#endif // MOCK_ENABLED
 
     if (auth_attempt == 1)
     {
@@ -124,8 +137,22 @@ az_result send_request(_az_http_request* request, az_http_response* response)
     }
     else
     {
-      response->_internal.http_response = AZ_SPAN_FROM_STR(
-          "HTTP/1.1 200 OK\r\n\r\n{ 'access_token' : 'AccessToken', 'expires_in' : 3600 }");
+      if (!redo_auth)
+      {
+#ifdef MOCK_ENABLED
+        will_return(__wrap_az_platform_clock_msec, clock_increment);
+#endif // MOCK_ENABLED
+        response->_internal.http_response = AZ_SPAN_FROM_STR(
+            "HTTP/1.1 200 OK\r\n\r\n{ 'access_token' : 'AccessToken', 'expires_in' : 3600 }");
+      }
+      else
+      {
+#ifdef MOCK_ENABLED
+        will_return(__wrap_az_platform_clock_msec, clock_increment * 3);
+#endif // MOCK_ENABLED
+        response->_internal.http_response = AZ_SPAN_FROM_STR(
+            "HTTP/1.1 200 OK\r\n\r\n{ 'access_token' : 'NewAccessToken', 'expires_in' : 3600 }");
+      }
     }
   }
   else // The actual HTTP request
@@ -141,7 +168,17 @@ az_result send_request(_az_http_request* request, az_http_response* response)
 
       if (az_span_is_content_equal(AZ_SPAN_FROM_STR("authorization"), header.key))
       {
-        assert_true(az_span_is_content_equal(AZ_SPAN_FROM_STR("Bearer AccessToken"), header.value));
+        if (!redo_auth)
+        {
+          assert_true(
+              az_span_is_content_equal(AZ_SPAN_FROM_STR("Bearer AccessToken"), header.value));
+        }
+        else
+        {
+          assert_true(
+              az_span_is_content_equal(AZ_SPAN_FROM_STR("Bearer NewAccessToken"), header.value));
+        }
+
         has_auth_header = true;
       }
     }
@@ -149,6 +186,11 @@ az_result send_request(_az_http_request* request, az_http_response* response)
     assert_true(has_auth_header);
 
     static bool first_attempt = true;
+    if (redo_auth)
+    {
+      first_attempt = true;
+    }
+
     if (first_attempt)
     {
       response->_internal.http_response = AZ_SPAN_FROM_STR("FirstResponse");
@@ -157,6 +199,13 @@ az_result send_request(_az_http_request* request, az_http_response* response)
     else
     {
       response->_internal.http_response = AZ_SPAN_FROM_STR("SubsequentResponse");
+
+#ifdef MOCK_ENABLED
+      // Next time the function is invoked, the token is going to be considered expired.
+      will_return(__wrap_az_platform_clock_msec, clock_increment * 2);
+#endif // MOCK_ENABLED
+
+      redo_auth = true;
     }
   }
 
@@ -164,6 +213,8 @@ az_result send_request(_az_http_request* request, az_http_response* response)
 }
 
 #ifdef MOCK_ENABLED
+az_result __wrap_az_http_client_send_request(_az_http_request* request, az_http_response* response);
+
 az_result __wrap_az_http_client_send_request(_az_http_request* request, az_http_response* response)
 {
   send_request(request, response);
