@@ -48,7 +48,7 @@ AZ_NODISCARD az_result _az_url_encode(az_span destination, az_span source, int32
 
   for (int32_t src_idx = 0; src_idx < input_size; ++src_idx)
   {
-    uint8_t c = src_ptr[i];
+    uint8_t c = src_ptr[src_idx];
     if (!_az_url_should_encode(c))
     {
       *dest_ptr = c;
