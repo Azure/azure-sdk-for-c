@@ -30,9 +30,9 @@
 #include <_az_cfg.h>
 
 // Service information
-#define HUB_URL "ssl://dawalton-hub.azure-devices.net:8883"
-#define HUB_FQDN "dawalton-hub.azure-devices.net"
-#define DEVICE_ID "paho_example"
+#define DEVICE_ID "<YOUR DEVICE ID HERE>"
+#define HUB_FQDN "<YOUR IOT HUB FQDN HERE>"
+#define HUB_URL "ssl://" HUB_FQDN ":8883"
 
 // Device information
 #define REGISTRATION_ID_ENV "AZ_IOT_REGISTRATION_ID"
