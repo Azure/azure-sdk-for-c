@@ -90,3 +90,4 @@ if (UNIT_TESTING)
     add_subdirectory(sdk/samples/keyvault/keyvault/test/cmocka)
   endif()
 endif()
+
