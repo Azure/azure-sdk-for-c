@@ -220,11 +220,14 @@ az_result send_request(_az_http_request* request, az_http_response* response)
 
 #ifdef MOCK_ENABLED
 az_result __wrap_az_http_client_send_request(_az_http_request* request, az_http_response* response);
+int64_t __wrap_az_platform_clock_msec();
 
 az_result __wrap_az_http_client_send_request(_az_http_request* request, az_http_response* response)
 {
   return send_request(request, response);
 }
+
+int64_t __wrap_az_platform_clock_msec() { return (int64_t)mock(); }
 #endif // MOCK_ENABLED
 
 int test_az_credential_client_secret()
