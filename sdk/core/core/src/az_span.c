@@ -280,11 +280,9 @@ void az_span_to_str(char* destination, int32_t destination_max_size, az_span sou
   // Implementations of memmove generally do the right thing when number of bytes to move is 0, even
   // if the ptr is null, but given the behavior is documented to be undefined, we disallow it as a
   // precondition.
-  uint32_t const source_span_size = az_span_size(source);
-  AZ_PRECONDITION(source_span_size >= 0);
-  AZ_PRECONDITION_NOT_NULL(az_span_ptr(source));
+  AZ_PRECONDITION_VALID_SPAN(source, 0);
 
-  int32_t size_to_write = source_span_size;
+  int32_t size_to_write = az_span_size(source);
 
   AZ_PRECONDITION(size_to_write < destination_max_size);
 
