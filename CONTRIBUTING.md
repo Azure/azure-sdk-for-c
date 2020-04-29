@@ -49,6 +49,12 @@ See how `vcpkg` can be used to install dependencies, [below](#VCPKG).
 
 Project contains files to work on Windows, Mac or Linux based OS.
 
+**Note** For any environment variables set to use with CMake, the environment variables must be set
+BEFORE the first cmake generation command (`cmake ..`). The environment variables will NOT be picked up
+if you have already generated the build files, set environment variables, and then regenerate. In that
+case, you must either delete the `CMakeCache.txt` file or delete the folder in which you are generating build
+files and start again.
+
 ### Windows
 
 vcpkg is the easiest way to have dependencies installed. It downloads packages sources, headers and build libraries for whatever TRIPLET is set up (platform/arq).
