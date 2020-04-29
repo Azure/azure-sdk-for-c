@@ -86,7 +86,7 @@ static void test_credential_client_secret(void** state)
 enum
 {
   CLOCK_INCREMENT = 100000000,
-}
+};
 
 static az_result send_request(_az_http_request* request, az_http_response* response)
 {
