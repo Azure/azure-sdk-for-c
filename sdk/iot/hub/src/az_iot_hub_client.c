@@ -146,7 +146,7 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_init(
     int32_t written_length)
 {
   _az_PRECONDITION_NOT_NULL(properties);
-  _az_PRECONDITION_VALID_SPAN(buffer, 0, false);
+  _az_PRECONDITION_VALID_SPAN(buffer, 0, true);
   _az_PRECONDITION(written_length >= 0);
 
   properties->_internal.properties_buffer = buffer;

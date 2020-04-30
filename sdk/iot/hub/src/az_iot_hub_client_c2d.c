@@ -60,9 +60,16 @@ AZ_NODISCARD az_result az_iot_hub_client_c2d_parse_received_topic(
 
   az_span token;
   token = az_span_token(received_topic, c2d_topic_suffix, &received_topic);
-  token = az_span_token(received_topic, c2d_topic_suffix, &received_topic);
-  AZ_RETURN_IF_FAILED(
-      az_iot_hub_client_properties_init(&out_request->properties, token, az_span_size(token)));
+  if (az_span_ptr(received_topic) != NULL)
+  {
+    token = az_span_token(received_topic, c2d_topic_suffix, &received_topic);
+    AZ_RETURN_IF_FAILED(
+        az_iot_hub_client_properties_init(&out_request->properties, token, az_span_size(token)));
+  }
+  else
+  {
+    return AZ_ERROR_IOT_TOPIC_NO_MATCH;
+  }
 
   return AZ_OK;
 }
