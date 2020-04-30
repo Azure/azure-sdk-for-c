@@ -178,7 +178,10 @@ az_http_response_get_next_header(az_http_response* response, az_pair* out_header
     // update reader to next position after colon (add one)
     *reader = az_span_slice_to_end(*reader, field_name_length + 1);
 
-    // OWS
+    // Remove white spaces from header name https://github.com/Azure/azure-sdk-for-c/issues/604
+    out_header->key = _az_span_trim_white_space(out_header->key);
+
+    // OWS -> remove the optional white spaces before header value
     int32_t ows_len = 0;
     AZ_RETURN_IF_FAILED(_az_span_scan_until(*reader, _az_slice_is_not_http_whitespace, &ows_len));
     *reader = az_span_slice_to_end(*reader, ows_len);
@@ -216,6 +219,9 @@ az_http_response_get_next_header(az_http_response* response, az_pair* out_header
     out_header->value = az_span_slice(*reader, 0, offset_value_end);
     // moving reader. It is currently after \r was found
     *reader = az_span_slice_to_end(*reader, offset);
+
+    // Remove white spaces from header name https://github.com/Azure/azure-sdk-for-c/issues/604
+    out_header->value = _az_span_trim_white_space_from_end(out_header->value);
   }
 
   AZ_RETURN_IF_FAILED(_az_is_expected_span(reader, AZ_SPAN_FROM_STR("\n")));
