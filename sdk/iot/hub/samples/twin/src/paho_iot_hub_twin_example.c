@@ -23,10 +23,11 @@
 //              Note: this is required to work-around MQTTClient.h as well as az_span init issues.
 #include <_az_cfg.h>
 
-// Service information
-#define DEVICE_ID "<YOUR DEVICE ID HERE>"
-#define HUB_FQDN "<YOUR IOT HUB FQDN HERE>"
-#define HUB_URL "ssl://" HUB_FQDN ":8883"
+// Device ID
+#define DEVICE_ID "AZ_IOT_DEVICE_ID"
+
+// IoT Hub FQDN
+#define IOT_HUB_FQDN "AZ_IOT_HUB_FQDN"
 
 // Device information
 #define REGISTRATION_ID_ENV "AZ_IOT_REGISTRATION_ID"
@@ -39,8 +40,15 @@
 // This is usually not needed on Linux or Mac but needs to be set on Windows.
 #define DEVICE_X509_TRUST_PEM_FILE "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE"
 
+static char device_id[64];
+static char iot_hub_fqdn[128];
 static char x509_cert_pem_file[512];
 static char x509_trust_pem_file[256];
+
+static char paho_endpoint[128];
+static az_span paho_prefix = AZ_SPAN_LITERAL_FROM_STR("ssl://");
+static az_span paho_suffix = AZ_SPAN_LITERAL_FROM_STR(":8883");
+
 static char get_twin_topic[128];
 static az_span get_twin_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("get_twin");
 static char reported_property_topic[128];
@@ -88,6 +96,22 @@ static az_result read_configuration_entry(
   return AZ_OK;
 }
 
+static az_result create_paho_endpoint(char* destination, int32_t size, az_span iot_hub)
+{
+  int32_t iot_hub_length = (int32_t)strlen(iot_hub_fqdn);
+  int32_t required_size = az_span_size(paho_prefix) + iot_hub_length + az_span_size(paho_suffix);
+  if (required_size > size)
+  {
+    return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
+  }
+  az_span destination_span = az_span_init((uint8_t*)destination, size);
+  az_span remainder = az_span_copy(destination_span, paho_prefix);
+  remainder = az_span_copy(remainder, az_span_slice(iot_hub, 0, iot_hub_length));
+  az_span_copy(remainder, paho_suffix);
+
+  return AZ_OK;
+}
+
 static az_result read_configuration_and_init_client()
 {
 
@@ -99,8 +123,22 @@ static az_result read_configuration_and_init_client()
   AZ_RETURN_IF_FAILED(read_configuration_entry(
       "X509 Trusted PEM Store File", DEVICE_X509_TRUST_PEM_FILE, "", false, trusted, &trusted));
 
+az_span device_id_span = AZ_SPAN_FROM_BUFFER(device_id);
+  AZ_RETURN_IF_FAILED(
+      read_configuration_entry("Device ID", DEVICE_ID, "", false, device_id_span, &trusted));
+
+  az_span iot_hub_fqdn_span = AZ_SPAN_FROM_BUFFER(iot_hub_fqdn);
+  AZ_RETURN_IF_FAILED(read_configuration_entry(
+      "IoT Hub FQDN", IOT_HUB_FQDN, "", false, iot_hub_fqdn_span, &trusted));
+
+  AZ_RETURN_IF_FAILED(
+      create_paho_endpoint(paho_endpoint, (int32_t)sizeof(paho_endpoint), iot_hub_fqdn_span));
+
   AZ_RETURN_IF_FAILED(az_iot_hub_client_init(
-      &client, AZ_SPAN_FROM_STR(HUB_FQDN), AZ_SPAN_FROM_STR(DEVICE_ID), NULL));
+      &client,
+      az_span_slice(iot_hub_fqdn_span, 0, (int32_t)strlen(iot_hub_fqdn)),
+      az_span_slice(device_id_span, 0, (int32_t)strlen(device_id)),
+      NULL));
 
   return AZ_OK;
 }
@@ -342,7 +380,8 @@ int main()
     return rc;
   }
 
-  if ((rc = MQTTClient_create(&mqtt_client, HUB_URL, client_id, MQTTCLIENT_PERSISTENCE_NONE, NULL))
+  if ((rc = MQTTClient_create(
+           &mqtt_client, paho_endpoint, client_id, MQTTCLIENT_PERSISTENCE_NONE, NULL))
       != MQTTCLIENT_SUCCESS)
   {
     printf("Failed to create MQTT client, return code %d\n", rc);

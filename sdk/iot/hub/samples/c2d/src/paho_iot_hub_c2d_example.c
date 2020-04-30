@@ -86,15 +86,15 @@ static az_result read_configuration_entry(
 
 static az_result create_paho_endpoint(char* destination, int32_t size, az_span iot_hub)
 {
-  int32_t required_size
-      = az_span_size(paho_prefix) + az_span_size(iot_hub) + az_span_size(paho_suffix);
+  int32_t iot_hub_length = (int32_t)strlen(iot_hub_fqdn);
+  int32_t required_size = az_span_size(paho_prefix) + iot_hub_length + az_span_size(paho_suffix);
   if (required_size > size)
   {
     return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
   }
   az_span destination_span = az_span_init((uint8_t*)destination, size);
   az_span remainder = az_span_copy(destination_span, paho_prefix);
-  remainder = az_span_copy(remainder, iot_hub);
+  remainder = az_span_copy(remainder, az_span_slice(iot_hub, 0, iot_hub_length));
   az_span_copy(remainder, paho_suffix);
 
   return AZ_OK;
@@ -113,16 +113,20 @@ static az_result read_configuration_and_init_client()
 
   az_span device_id_span = AZ_SPAN_FROM_BUFFER(device_id);
   AZ_RETURN_IF_FAILED(
-      read_configuration_entry("Device ID", DEVICE_ID, "", false, trusted, &trusted));
+      read_configuration_entry("Device ID", DEVICE_ID, "", false, device_id_span, &trusted));
 
-  az_span hub_fqdn_span = AZ_SPAN_FROM_BUFFER(iot_hub_fqdn);
+  az_span iot_hub_fqdn_span = AZ_SPAN_FROM_BUFFER(iot_hub_fqdn);
+  AZ_RETURN_IF_FAILED(read_configuration_entry(
+      "IoT Hub FQDN", IOT_HUB_FQDN, "", false, iot_hub_fqdn_span, &trusted));
+
   AZ_RETURN_IF_FAILED(
-      read_configuration_entry("IoT Hub FQDN", IOT_HUB_FQDN, "", false, trusted, &trusted));
+      create_paho_endpoint(paho_endpoint, (int32_t)sizeof(paho_endpoint), iot_hub_fqdn_span));
 
-  AZ_RETURN_IF_FAILED(
-      create_paho_endpoint(paho_endpoint, (int32_t)sizeof(paho_endpoint), hub_fqdn_span));
-
-  AZ_RETURN_IF_FAILED(az_iot_hub_client_init(&client, hub_fqdn_span, device_id_span, NULL));
+  AZ_RETURN_IF_FAILED(az_iot_hub_client_init(
+      &client,
+      az_span_slice(iot_hub_fqdn_span, 0, (int32_t)strlen(iot_hub_fqdn)),
+      az_span_slice(device_id_span, 0, (int32_t)strlen(device_id)),
+      NULL));
 
   return AZ_OK;
 }
