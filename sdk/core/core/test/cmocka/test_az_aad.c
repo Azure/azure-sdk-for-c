@@ -46,7 +46,7 @@ az_result __wrap_az_http_client_send_request(
   return AZ_OK;
 }
 
-#ifdef MOCK_ENABLED
+#ifdef _az_MOCK_ENABLED
 static void test_az_token_expired(void** state)
 {
   (void)state;
@@ -89,7 +89,7 @@ static void test_az_aad_request_token(void** state)
   assert_return_code(_az_aad_request_token(&r, &t), AZ_OK);
   assert_string_equal(t._internal.token, "Bearer fakeToken");
 }
-#endif // MOCK_ENABLED
+#endif // _az_MOCK_ENABLED
 
 static void test_az_aad_build_body(void** state)
 {
@@ -119,10 +119,10 @@ static void test_az_aad_build_url(void** state)
 int test_az_add()
 {
   const struct CMUnitTest tests[] = {
-#ifdef MOCK_ENABLED
+#ifdef _az_MOCK_ENABLED
     cmocka_unit_test(test_az_token_expired),
     cmocka_unit_test(test_az_aad_request_token),
-#endif // MOCK_ENABLED
+#endif // _az_MOCK_ENABLED
     cmocka_unit_test(test_az_aad_build_body),
     cmocka_unit_test(test_az_aad_build_url),
   };

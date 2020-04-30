@@ -11,8 +11,6 @@
 
 #include <_az_cfg.h>
 
-#define STATUS_TO_STR_SIZE 3
-
 static const uint8_t hashtag = '#';
 static const uint8_t null_terminator = '\0';
 static const az_span methods_topic_prefix = AZ_SPAN_LITERAL_FROM_STR("$iothub/methods/");
@@ -26,9 +24,9 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_get_subscribe_topic_filter(
     size_t mqtt_topic_filter_size,
     size_t* out_mqtt_topic_filter_length)
 {
-  AZ_PRECONDITION_NOT_NULL(client);
-  AZ_PRECONDITION_NOT_NULL(mqtt_topic_filter);
-  AZ_PRECONDITION(mqtt_topic_filter_size > 0);
+  _az_PRECONDITION_NOT_NULL(client);
+  _az_PRECONDITION_NOT_NULL(mqtt_topic_filter);
+  _az_PRECONDITION(mqtt_topic_filter_size > 0);
 
   (void)client;
 
@@ -60,9 +58,9 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_parse_received_topic(
     az_span received_topic,
     az_iot_hub_client_method_request* out_request)
 {
-  AZ_PRECONDITION_NOT_NULL(client);
-  AZ_PRECONDITION_VALID_SPAN(received_topic, 1, false);
-  AZ_PRECONDITION_NOT_NULL(out_request);
+  _az_PRECONDITION_NOT_NULL(client);
+  _az_PRECONDITION_VALID_SPAN(received_topic, 1, false);
+  _az_PRECONDITION_NOT_NULL(out_request);
 
   (void)client;
 
@@ -112,17 +110,16 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_response_get_publish_topic(
     size_t mqtt_topic_size,
     size_t* out_mqtt_topic_length)
 {
-  AZ_PRECONDITION_NOT_NULL(client);
-  AZ_PRECONDITION_VALID_SPAN(request_id, 1, false);
-  AZ_PRECONDITION(status == 200 || status == 404 || status == 504);
-  AZ_PRECONDITION_NOT_NULL(mqtt_topic);
-  AZ_PRECONDITION(mqtt_topic_size);
+  _az_PRECONDITION_NOT_NULL(client);
+  _az_PRECONDITION_VALID_SPAN(request_id, 1, false);
+  _az_PRECONDITION_NOT_NULL(mqtt_topic);
+  _az_PRECONDITION(mqtt_topic_size);
 
   (void)client;
 
   az_span mqtt_topic_span = az_span_init((uint8_t*)mqtt_topic, (int32_t)mqtt_topic_size);
   int32_t required_length = az_span_size(methods_topic_prefix)
-      + az_span_size(methods_response_topic_result) + STATUS_TO_STR_SIZE
+      + az_span_size(methods_response_topic_result) + _az_iot_u32toa_size(status)
       + az_span_size(methods_response_topic_properties) + az_span_size(request_id);
 
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_topic_span, required_length + (int32_t)sizeof(null_terminator));

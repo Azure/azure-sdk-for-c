@@ -35,11 +35,6 @@ static AZ_NODISCARD az_span _get_remaining_span(az_json_builder* json_builder)
 // TODO: Make this a precondition?
 static AZ_NODISCARD bool _az_is_appending_value_valid(az_json_builder* json_builder)
 {
-  az_json_token_kind kind = json_builder->_internal.token_kind;
-
-  if (_az_json_stack_peek(&json_builder->_internal.bit_stack))
-  {
-    // Cannot write a JSON value within an object without a property name first.
     // That includes writing the start of an object or array without a property name.
     if (kind != AZ_JSON_TOKEN_PROPERTY_NAME)
     {
@@ -484,7 +479,7 @@ AZ_NODISCARD az_result az_json_builder_append_number(az_json_builder* json_build
 AZ_NODISCARD az_result
 az_json_builder_append_int32_number(az_json_builder* json_builder, int32_t value)
 {
-  AZ_PRECONDITION_NOT_NULL(json_builder);
+  _az_PRECONDITION_NOT_NULL(json_builder);
 
   if (!_az_is_appending_value_valid(json_builder))
   {
@@ -521,7 +516,7 @@ az_json_builder_append_int32_number(az_json_builder* json_builder, int32_t value
 AZ_NODISCARD az_result
 az_json_builder_append_int64_number(az_json_builder* json_builder, int64_t value)
 {
-  AZ_PRECONDITION_NOT_NULL(json_builder);
+  _az_PRECONDITION_NOT_NULL(json_builder);
 
   if (!_az_is_appending_value_valid(json_builder))
   {

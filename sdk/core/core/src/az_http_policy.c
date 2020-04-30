@@ -10,7 +10,6 @@
 
 #include <_az_cfg.h>
 
-static const az_span AZ_MS_CLIENT_REQUESTID = AZ_SPAN_LITERAL_FROM_STR("x-ms-client-request-id");
 static const az_span AZ_HTTP_HEADER_USER_AGENT = AZ_SPAN_LITERAL_FROM_STR("User-Agent");
 
 AZ_NODISCARD az_result az_http_pipeline_policy_apiversion(
@@ -37,24 +36,6 @@ AZ_NODISCARD az_result az_http_pipeline_policy_apiversion(
     default:
       return AZ_ERROR_ARG;
   }
-
-  return az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
-}
-
-AZ_NODISCARD az_result az_http_pipeline_policy_uniquerequestid(
-    _az_http_policy* p_policies,
-    void* p_data,
-    _az_http_request* p_request,
-    az_http_response* p_response)
-{
-  (void)p_data;
-
-  // TODO - add a UUID create implementation
-  az_span const uniqueid = AZ_SPAN_LITERAL_FROM_STR("123e4567-e89b-12d3-a456-426655440000");
-
-  // Append the Unique GUID into the headers
-  //  x-ms-client-request-id
-  AZ_RETURN_IF_FAILED(az_http_request_append_header(p_request, AZ_MS_CLIENT_REQUESTID, uniqueid));
 
   return az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
 }

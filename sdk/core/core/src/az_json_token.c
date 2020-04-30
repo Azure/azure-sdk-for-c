@@ -8,7 +8,8 @@
 
 AZ_NODISCARD az_result az_json_token_get_boolean(az_json_token const* token, bool* out_value)
 {
-  AZ_PRECONDITION_NOT_NULL(out_value);
+
+  _az_PRECONDITION_NOT_NULL(out_value);
 
   if (token->kind != AZ_JSON_TOKEN_TRUE && token->kind != AZ_JSON_TOKEN_FALSE)
   {
@@ -22,7 +23,7 @@ AZ_NODISCARD az_result az_json_token_get_boolean(az_json_token const* token, boo
 AZ_NODISCARD az_result az_json_token_get_string(az_json_token const* token, az_span* out_value)
 {
 
-  AZ_PRECONDITION_NOT_NULL(out_value);
+  _az_PRECONDITION_NOT_NULL(out_value);
 
   if (token->kind != AZ_JSON_TOKEN_STRING)
   {
@@ -36,7 +37,7 @@ AZ_NODISCARD az_result az_json_token_get_string(az_json_token const* token, az_s
 AZ_NODISCARD az_result az_json_token_get_number(az_json_token const* token, double* out_value)
 {
 
-  AZ_PRECONDITION_NOT_NULL(out_value);
+  _az_PRECONDITION_NOT_NULL(out_value);
 
   if (token->kind != AZ_JSON_TOKEN_NUMBER)
   {

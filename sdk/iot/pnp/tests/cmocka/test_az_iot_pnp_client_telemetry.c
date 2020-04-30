@@ -44,7 +44,7 @@ static const char g_test_correct_pnp_topic_content_type_and_encoding[]
     = "devices/my_device/messages/events/%24.ifname=" TEST_COMPONENT_NAME
       "&%24.ct=" TEST_CONTENT_TYPE "&%24.ce=" TEST_CONTENT_ENCODING;
 
-#ifndef NO_PRECONDITION_CHECKING
+#ifndef AZ_NO_PRECONDITION_CHECKING
 enable_precondition_check_tests()
 
 static void test_az_iot_pnp_client_telemetry_get_publish_topic_NULL_client_fails(void** state)
@@ -128,7 +128,7 @@ static void test_az_iot_pnp_client_telemetry_get_publish_topic_non_NULL_reserved
       &client, AZ_SPAN_NULL, (void*)0x1, mqtt_topic_buf, sizeof(mqtt_topic_buf), &mqtt_topic_length));
 }
 
-#endif // NO_PRECONDITION_CHECKING
+#endif // AZ_NO_PRECONDITION_CHECKING
 
 static void test_az_iot_pnp_client_telemetry_publish_topic_get_no_options_succeed(void** state)
 {
@@ -358,18 +358,18 @@ test_az_iot_pnp_client_telemetry_publish_topic_get_content_type_and_encoding_wit
 
 int test_iot_pnp_telemetry()
 {
-#ifndef NO_PRECONDITION_CHECKING
+#ifndef AZ_NO_PRECONDITION_CHECKING
   setup_precondition_check_tests();
-#endif // NO_PRECONDITION_CHECKING
+#endif // AZ_NO_PRECONDITION_CHECKING
 
   const struct CMUnitTest tests[] = {
-#ifndef NO_PRECONDITION_CHECKING
+#ifndef AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_az_iot_pnp_client_telemetry_get_publish_topic_NULL_client_fails),
     cmocka_unit_test(test_az_iot_pnp_client_telemetry_get_publish_topic_NULL_mqtt_topic_fails),
     cmocka_unit_test(test_az_iot_pnp_client_telemetry_get_publish_topic_NULL_out_mqtt_topic_fails),
     cmocka_unit_test(test_az_iot_pnp_client_telemetry_get_publish_topic_NULL_component_name_fails),
     cmocka_unit_test(test_az_iot_pnp_client_telemetry_get_publish_topic_non_NULL_reserved_fails),
-#endif // NO_PRECONDITION_CHECKING
+#endif // AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_az_iot_pnp_client_telemetry_publish_topic_get_no_options_succeed),
     cmocka_unit_test(test_az_iot_pnp_client_telemetry_publish_topic_get_content_type_succeed),
     cmocka_unit_test(test_az_iot_pnp_client_telemetry_publish_topic_get_content_encoding_succeed),
