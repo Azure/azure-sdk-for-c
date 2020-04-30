@@ -16,7 +16,7 @@ static AZ_NODISCARD az_span _get_remaining_span(az_json_builder* json_builder)
 
 AZ_NODISCARD static az_result az_json_builder_append_str(az_json_builder* self, az_span value)
 {
-  AZ_PRECONDITION_NOT_NULL(self);
+  _az_PRECONDITION_NOT_NULL(self);
 
   az_span remaining_json = _get_remaining_span(self);
 
@@ -34,7 +34,7 @@ AZ_NODISCARD static az_result az_json_builder_append_str(az_json_builder* self, 
 
 static AZ_NODISCARD az_result _az_json_builder_write_span(az_json_builder* self, az_span value)
 {
-  AZ_PRECONDITION_NOT_NULL(self);
+  _az_PRECONDITION_NOT_NULL(self);
 
   az_span remaining_json = _get_remaining_span(self);
 
@@ -90,7 +90,7 @@ static AZ_NODISCARD az_result _az_json_builder_write_span(az_json_builder* self,
 AZ_NODISCARD az_result
 az_json_builder_append_token(az_json_builder* json_builder, az_json_token token)
 {
-  AZ_PRECONDITION_NOT_NULL(json_builder);
+  _az_PRECONDITION_NOT_NULL(json_builder);
   az_span remaining_json = _get_remaining_span(json_builder);
 
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(remaining_json, 1);
@@ -181,7 +181,7 @@ az_json_builder_append_token(az_json_builder* json_builder, az_json_token token)
 
 AZ_NODISCARD static az_result az_json_builder_write_comma(az_json_builder* self)
 {
-  AZ_PRECONDITION_NOT_NULL(self);
+  _az_PRECONDITION_NOT_NULL(self);
 
   if (self->_internal.need_comma)
   {
@@ -196,7 +196,7 @@ AZ_NODISCARD static az_result az_json_builder_write_comma(az_json_builder* self)
 AZ_NODISCARD az_result
 az_json_builder_append_object(az_json_builder* json_builder, az_span name, az_json_token token)
 {
-  AZ_PRECONDITION_NOT_NULL(json_builder);
+  _az_PRECONDITION_NOT_NULL(json_builder);
 
   AZ_RETURN_IF_FAILED(az_json_builder_write_comma(json_builder));
   AZ_RETURN_IF_FAILED(az_json_builder_append_str(json_builder, name));
@@ -213,7 +213,7 @@ az_json_builder_append_object(az_json_builder* json_builder, az_span name, az_js
 AZ_NODISCARD az_result
 az_json_builder_append_array_item(az_json_builder* json_builder, az_json_token token)
 {
-  AZ_PRECONDITION_NOT_NULL(json_builder);
+  _az_PRECONDITION_NOT_NULL(json_builder);
 
   AZ_RETURN_IF_FAILED(az_json_builder_write_comma(json_builder));
   AZ_RETURN_IF_FAILED(az_json_builder_append_token(json_builder, token));

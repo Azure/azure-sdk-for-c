@@ -35,11 +35,11 @@
 // specified
 #pragma warning(disable : 5045)
 
-// warning C6011: Dereferencing NULL pointer. Using AZ_PRECONDITION_NOT_NULL
+// warning C6011: Dereferencing NULL pointer. Using _az_PRECONDITION_NOT_NULL
 #pragma warning(disable : 6011)
 
 // warning C6387: 'str' could be '0':  this does not adhere to the specification for the function
-// 'strlen' Using AZ_PRECONDITION_NOT_NULL
+// 'strlen' Using _az_PRECONDITION_NOT_NULL
 #pragma warning(disable : 6387)
 
 // Treat warnings as errors:

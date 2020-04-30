@@ -377,8 +377,8 @@ AZ_NODISCARD static az_result az_json_parser_get_value_space(
 AZ_NODISCARD az_result
 az_json_parser_parse_token(az_json_parser* json_parser, az_json_token* out_token)
 {
-  AZ_PRECONDITION_NOT_NULL(json_parser);
-  AZ_PRECONDITION_NOT_NULL(out_token);
+  _az_PRECONDITION_NOT_NULL(json_parser);
+  _az_PRECONDITION_NOT_NULL(out_token);
 
   if (!az_json_parser_stack_is_empty(json_parser))
   {
@@ -473,8 +473,8 @@ AZ_NODISCARD az_result az_json_parser_parse_token_member(
     az_json_parser* json_parser,
     az_json_token_member* out_token_member)
 {
-  AZ_PRECONDITION_NOT_NULL(json_parser);
-  AZ_PRECONDITION_NOT_NULL(out_token_member);
+  _az_PRECONDITION_NOT_NULL(json_parser);
+  _az_PRECONDITION_NOT_NULL(out_token_member);
 
   az_span* p_reader = &json_parser->_internal.reader;
   AZ_RETURN_IF_FAILED(az_json_parser_check_item_begin(json_parser, AZ_JSON_STACK_OBJECT));
@@ -490,8 +490,8 @@ AZ_NODISCARD az_result az_json_parser_parse_token_member(
 AZ_NODISCARD az_result
 az_json_parser_parse_array_item(az_json_parser* json_parser, az_json_token* out_token)
 {
-  AZ_PRECONDITION_NOT_NULL(json_parser);
-  AZ_PRECONDITION_NOT_NULL(out_token);
+  _az_PRECONDITION_NOT_NULL(json_parser);
+  _az_PRECONDITION_NOT_NULL(out_token);
 
   AZ_RETURN_IF_FAILED(az_json_parser_check_item_begin(json_parser, AZ_JSON_STACK_ARRAY));
   AZ_RETURN_IF_FAILED(az_json_parser_get_value_space(json_parser, out_token));
@@ -500,7 +500,7 @@ az_json_parser_parse_array_item(az_json_parser* json_parser, az_json_token* out_
 
 AZ_NODISCARD az_result az_json_parser_done(az_json_parser* json_parser)
 {
-  AZ_PRECONDITION_NOT_NULL(json_parser);
+  _az_PRECONDITION_NOT_NULL(json_parser);
 
   if (az_span_size(json_parser->_internal.reader) > 0
       || !az_json_parser_stack_is_empty(json_parser))
@@ -513,7 +513,7 @@ AZ_NODISCARD az_result az_json_parser_done(az_json_parser* json_parser)
 AZ_NODISCARD az_result
 az_json_parser_skip_children(az_json_parser* json_parser, az_json_token token)
 {
-  AZ_PRECONDITION_NOT_NULL(json_parser);
+  _az_PRECONDITION_NOT_NULL(json_parser);
 
   switch (token.kind)
   {

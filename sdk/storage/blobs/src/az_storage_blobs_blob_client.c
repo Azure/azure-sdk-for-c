@@ -59,8 +59,8 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
     void* credential,
     az_storage_blobs_blob_client_options* options)
 {
-  AZ_PRECONDITION_NOT_NULL(client);
-  AZ_PRECONDITION_NOT_NULL(options);
+  _az_PRECONDITION_NOT_NULL(client);
+  _az_PRECONDITION_NOT_NULL(options);
 
   _az_credential* const cred = (_az_credential*)credential;
 

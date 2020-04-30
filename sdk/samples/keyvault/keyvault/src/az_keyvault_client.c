@@ -81,8 +81,8 @@ AZ_NODISCARD az_result az_keyvault_keys_client_init(
     void* credential,
     az_keyvault_keys_client_options* options)
 {
-  AZ_PRECONDITION_NOT_NULL(self);
-  AZ_PRECONDITION_NOT_NULL(options);
+  _az_PRECONDITION_NOT_NULL(self);
+  _az_PRECONDITION_NOT_NULL(options);
 
   _az_credential* const cred = (_az_credential*)credential;
 
