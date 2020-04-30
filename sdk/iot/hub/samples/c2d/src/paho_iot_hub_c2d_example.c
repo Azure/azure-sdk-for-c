@@ -27,9 +27,6 @@
 #define HUB_FQDN "<YOUR IOT HUB FQDN HERE>"
 #define HUB_URL "ssl://" HUB_FQDN ":8883"
 
-// Device information
-#define REGISTRATION_ID_ENV "AZ_IOT_REGISTRATION_ID"
-
 // AZ_IOT_DEVICE_X509_CERT_PEM_FILE is the path to a PEM file containing the device certificate and
 // key as well as any intermediate certificates chaining to an uploaded group certificate.
 #define DEVICE_X509_CERT_PEM_FILE "AZ_IOT_DEVICE_X509_CERT_PEM_FILE"
@@ -108,18 +105,18 @@ static int on_received(void* context, char* topicName, int topicLen, MQTTClient_
     topicLen = (int)strlen(topicName);
   }
 
-  az_result result;
-
-  az_span topic_span = az_span_init((uint8_t*)topicName, topicLen);
-
   az_iot_hub_client_c2d_request c2d_request;
-  if (az_iot_hub_client_c2d_parse_received_topic(&client, topic_span, &c2d_request) == AZ_OK)
+  if (az_iot_hub_client_c2d_parse_received_topic(
+          &client, az_span_init((uint8_t*)topicName, topicLen), &c2d_request)
+      == AZ_OK)
   {
+    char* payload = (char*)message->payload;
     printf("C2D Message arrived\n");
-    printf("Payload:\n%.*s\n", message->payloadlen, (char*)message->payload);
+    for (int32_t i = 0; i < message->payloadlen; i++)
+    {
+      putchar(*(payload + i));
+    }
   }
-
-  (void)result;
 
   putchar('\n');
   MQTTClient_freeMessage(&message);

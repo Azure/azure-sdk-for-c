@@ -30,8 +30,8 @@ Getting started explained in detail [here][SDK_README_GETTING_STARTED].
 The following section documents various examples. All of them use the [Eclipse Paho MQTT C client][Eclipse_Paho].
 
 1. [IoT Hub C2D][paho_c2d_sample]: Receive and view incoming C2D messages using the IoT Hub client.
-2. [IoT Hub Telemetry][paho_telemetry_sample]: Send 5 telemetry messages using the IoT Hub client.
-3. [IoT Hub Twin][paho_twin_sample]: Use twin features such as updating reported properties, 
+1. [IoT Hub Telemetry][paho_telemetry_sample]: Send 5 telemetry messages using the IoT Hub client.
+1. [IoT Hub Twin][paho_twin_sample]: Use twin features such as updating reported properties, 
     receiving the twin document, and receiving desired properties using the IoT Hub client.
 
 ## Troubleshooting
