@@ -118,7 +118,7 @@ static AZ_NODISCARD bool _az_is_appending_container_end_valid(az_json_builder* j
   return true;
 }
 
-AZ_NODISCARD int32_t
+static AZ_NODISCARD int32_t
 _az_json_builder_escaped_length(az_span value, int32_t* out_index_of_first_escaped_char)
 {
   _az_PRECONDITION_NOT_NULL(out_index_of_first_escaped_char);
@@ -190,7 +190,7 @@ _az_json_builder_escaped_length(az_span value, int32_t* out_index_of_first_escap
   return escaped_length;
 }
 
-AZ_NODISCARD az_span _az_json_builder_escape_and_copy(az_span destination, az_span source)
+static AZ_NODISCARD az_span _az_json_builder_escape_and_copy(az_span destination, az_span source)
 {
   _az_PRECONDITION_VALID_SPAN(source, 1, false);
 
@@ -393,7 +393,7 @@ az_json_builder_append_property_name(az_json_builder* json_builder, az_span name
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result _az_json_builder_append_literal(
+static AZ_NODISCARD az_result _az_json_builder_append_literal(
     az_json_builder* json_builder,
     az_span literal,
     az_json_token_kind literal_kind)
@@ -529,7 +529,7 @@ az_json_builder_append_int32_number(az_json_builder* json_builder, int32_t value
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result _az_json_builder_append_container_start(
+static AZ_NODISCARD az_result _az_json_builder_append_container_start(
     az_json_builder* json_builder,
     uint8_t byte,
     az_json_token_kind container_kind)
