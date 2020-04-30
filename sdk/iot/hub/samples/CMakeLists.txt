@@ -18,6 +18,7 @@ if(NOT OpenSSL_FOUND)
 endif()
 
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/c2d)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/methods)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/telemetry)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/twin)
 
