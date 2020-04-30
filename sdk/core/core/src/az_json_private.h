@@ -11,6 +11,7 @@
 
 enum
 {
+  // We are using a uint64_t to represent our nested state, so we can only go 64 levels deep.
   _az_MAX_JSON_STACK_SIZE = sizeof(uint64_t) * 8 // 64
 };
 

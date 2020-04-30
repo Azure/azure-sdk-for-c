@@ -24,7 +24,7 @@
 
 #include <_az_cfg_prefix.h>
 
-/*
+/**
  * @brief Defines symbols for the various kinds of JSON tokens that make up any JSON text.
  */
 typedef enum
@@ -42,16 +42,22 @@ typedef enum
   AZ_JSON_TOKEN_NULL, ///< The token kind is the JSON literal `null`.
 } az_json_token_kind;
 
+/**
+ * @brief A limited stack used by the #az_json_builder to track state information for validation.
+ */
 typedef struct
 {
   struct
   {
+    // This uint64_t container represents a tiny stack to track the state during nested transitions.
+    // The first bit represents the state of the current depth (1 == object, 0 == array).
+    // Each subsequent bit is the parent / containing type (object or array).
     uint64_t az_json_stack;
     int32_t current_depth;
   } _internal;
 } _az_json_bit_stack;
 
-/*
+/**
  * @brief An az_json_token instance represents a JSON token. The kind field indicates the kind of
  * token and based on the kind, you can access the corresponding field.
  */
@@ -209,7 +215,7 @@ typedef struct
  * @brief Gets the default json builder options which builds minimized JSON (with no extra white
  * space) according to the JSON RFC.
  * @details Call this to obtain an initialized #az_json_builder_options structure that can be
- * modified and passed to #az_json_builder_init.
+ * modified and passed to #az_json_builder_init().
  *
  * @return The default #az_json_builder_options.
  */
@@ -224,11 +230,13 @@ AZ_NODISCARD AZ_INLINE az_json_builder_options az_json_builder_options_default()
   return options;
 }
 
-/*
+/**
  * @brief Provides forward-only, non-cached building of UTF-8 encoded JSON text into the provided
  * buffer.
+ *
  * @remarks #az_json_builder builds the text sequentially with no caching and by default adheres to
  * the JSON RFC: https://tools.ietf.org/html/rfc8259.
+ *
  */
 typedef struct
 {
@@ -243,15 +251,15 @@ typedef struct
   } _internal;
 } az_json_builder;
 
-/*
+/**
  * @brief Initializes an #az_json_builder which writes JSON text into a buffer.
  *
  * @param[out] json_builder A pointer to an #az_json_builder instance to initialize.
  * @param[in] destination_buffer An #az_span over the byte buffer where the JSON text is to be
  * written.
  * @param[in] az_json_builder_options __[nullable]__ A reference to an #az_json_builder_options
- * structure which defines custom behavior of the #az_json_builder. If `NULL` is passed,
- * `az_json_builder_init()` will use the default options (i.e. #az_json_builder_options_default()).
+ * structure which defines custom behavior of the #az_json_builder. If `NULL` is passed, the builder
+ * will use the default options (i.e. #az_json_builder_options_default()).
  *
  * @return An #az_result value indicating the result of the operation:
  *         - #AZ_OK if the az_json_builder is initialized successfully
@@ -274,7 +282,7 @@ AZ_NODISCARD AZ_INLINE az_result az_json_builder_init(
   return AZ_OK;
 }
 
-/*
+/**
  * @brief Returns the #az_span containing the JSON text written to the underlying buffer so far.
  *
  * @param[in] json_builder A pointer to an #az_json_builder instance wrapping the destination
@@ -292,7 +300,7 @@ AZ_NODISCARD AZ_INLINE az_span az_json_builder_get_json(az_json_builder const* j
       json_builder->_internal.destination_buffer, 0, json_builder->_internal.bytes_written);
 }
 
-/*
+/**
  * @brief Appends the UTF-8 text value (as a JSON string) into the buffer.
  *
  * @param[in] json_builder A pointer to an #az_json_builder instance containing the buffer to append
@@ -310,7 +318,7 @@ AZ_NODISCARD AZ_INLINE az_span az_json_builder_get_json(az_json_builder const* j
 AZ_NODISCARD az_result az_json_builder_append_string(az_json_builder* json_builder, az_span value);
 
 // TODO: Consider adding char* overloads to make passing string literals as property names easier.
-/*
+/**
  * @brief Appends the UTF-8 property name (as a JSON string) which is the first part of a name/value
  * pair of a JSON object.
  *
@@ -326,7 +334,7 @@ AZ_NODISCARD az_result az_json_builder_append_string(az_json_builder* json_build
 AZ_NODISCARD az_result
 az_json_builder_append_property_name(az_json_builder* json_builder, az_span name);
 
-/*
+/**
  * @brief Appends a boolean value (as a JSON literal `true` or `false`).
  *
  * @param[in] json_builder A pointer to an #az_json_builder instance containing the buffer to append
@@ -340,7 +348,7 @@ az_json_builder_append_property_name(az_json_builder* json_builder, az_span name
 AZ_NODISCARD az_result az_json_builder_append_bool(az_json_builder* json_builder, bool value);
 
 // TODO: Consider removing for now until we have complete double formatting and parsing.
-/*
+/**
  * @brief Appends a double number value.
  *
  * @param[in] json_builder A pointer to an #az_json_builder instance containing the buffer to append
@@ -353,7 +361,7 @@ AZ_NODISCARD az_result az_json_builder_append_bool(az_json_builder* json_builder
  */
 AZ_NODISCARD az_result az_json_builder_append_number(az_json_builder* json_builder, double value);
 
-/*
+/**
  * @brief Appends an int32_t number value.
  *
  * @param[in] json_builder A pointer to an #az_json_builder instance containing the buffer to append
@@ -367,7 +375,7 @@ AZ_NODISCARD az_result az_json_builder_append_number(az_json_builder* json_build
 AZ_NODISCARD az_result
 az_json_builder_append_int32_number(az_json_builder* json_builder, int32_t value);
 
-/*
+/**
  * @brief Appends the JSON literal `null`.
  *
  * @param[in] json_builder A pointer to an #az_json_builder instance containing the buffer to append
@@ -379,7 +387,7 @@ az_json_builder_append_int32_number(az_json_builder* json_builder, int32_t value
  */
 AZ_NODISCARD az_result az_json_builder_append_null(az_json_builder* json_builder);
 
-/*
+/**
  * @brief Appends the beginning of a JSON object (i.e. `{`).
  *
  * @param[in] json_builder A pointer to an #az_json_builder instance containing the buffer to append
@@ -391,7 +399,7 @@ AZ_NODISCARD az_result az_json_builder_append_null(az_json_builder* json_builder
  */
 AZ_NODISCARD az_result az_json_builder_append_object_start(az_json_builder* json_builder);
 
-/*
+/**
  * @brief Appends the beginning of a JSON array (i.e. `[`).
  *
  * @param[in] json_builder A pointer to an #az_json_builder instance containing the buffer to append
@@ -403,7 +411,7 @@ AZ_NODISCARD az_result az_json_builder_append_object_start(az_json_builder* json
  */
 AZ_NODISCARD az_result az_json_builder_append_array_start(az_json_builder* json_builder);
 
-/*
+/**
  * @brief Appends the end of the current JSON object (i.e. `}`) or JSON array (i.e. `]`), depending
  * on which JSON container is currently open.
  *
