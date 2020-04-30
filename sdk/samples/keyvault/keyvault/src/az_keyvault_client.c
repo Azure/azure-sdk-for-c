@@ -102,12 +102,6 @@ AZ_NODISCARD az_result az_keyvault_keys_client_init(
             },
             {
               ._internal = {
-                .process = az_http_pipeline_policy_uniquerequestid,
-                .p_options = NULL,
-              },
-            },
-            {
-              ._internal = {
                 .process = az_http_pipeline_policy_telemetry,
                 .p_options = &self->_internal.options._internal._telemetry_options,
               },
