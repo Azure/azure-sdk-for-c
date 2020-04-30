@@ -19,11 +19,11 @@ AZ_NODISCARD int32_t az_iot_retry_calc_delay(
     int32_t max_retry_delay_msec,
     int32_t random_msec)
 {
-  AZ_PRECONDITION_RANGE(0, operation_msec, INT32_MAX - 1);
-  AZ_PRECONDITION_RANGE(0, attempt, INT16_MAX - 1);
-  AZ_PRECONDITION_RANGE(0, min_retry_delay_msec, INT32_MAX - 1);
-  AZ_PRECONDITION_RANGE(0, max_retry_delay_msec, INT32_MAX - 1);
-  AZ_PRECONDITION_RANGE(0, random_msec, INT32_MAX - 1);
+  _az_PRECONDITION_RANGE(0, operation_msec, INT32_MAX - 1);
+  _az_PRECONDITION_RANGE(0, attempt, INT16_MAX - 1);
+  _az_PRECONDITION_RANGE(0, min_retry_delay_msec, INT32_MAX - 1);
+  _az_PRECONDITION_RANGE(0, max_retry_delay_msec, INT32_MAX - 1);
+  _az_PRECONDITION_RANGE(0, random_msec, INT32_MAX - 1);
 
   int32_t delay = _az_retry_calc_delay(attempt, min_retry_delay_msec, max_retry_delay_msec);
   
