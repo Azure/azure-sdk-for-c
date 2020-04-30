@@ -275,7 +275,7 @@ static az_span _az_http_response_get_remaining(az_http_response const* response)
   return az_span_slice_to_end(response->_internal.http_response, response->_internal.written);
 }
 
-AZ_NODISCARD az_result az_http_response_write_span(az_http_response* response, az_span write)
+AZ_NODISCARD az_result az_http_response_write_span(az_http_response* response, az_span source)
 {
   AZ_PRECONDITION_NOT_NULL(response);
 

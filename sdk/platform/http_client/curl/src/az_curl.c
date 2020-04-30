@@ -477,7 +477,7 @@ _az_http_client_curl_setup_url(CURL* p_curl, _az_http_request const* p_request)
   AZ_PRECONDITION_NOT_NULL(p_request);
 
   az_span request_url = { 0 };
-  // get request_url. It will have the size of what is has written in it only
+  // get request_url. It will have the size of what it has written in it only
   AZ_RETURN_IF_FAILED(az_http_request_get_url(p_request, &request_url));
   int32_t request_url_size = az_span_size(request_url);
 

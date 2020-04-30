@@ -89,8 +89,8 @@ az_http_request_get_header(_az_http_request const* request, int32_t index, az_pa
  *
  * @remarks This function is expected to be used by transport layer only.
  *
- * @param[in] request HTTP request to get parts from.
- * @param[out] out_method Pointer to write HTTP method to.
+ * @param[in] request The HTTP request from which to get the method.
+ * @param[out] out_method Pointer to write the HTTP method to.
  *
  * @retval An #az_result value indicating the result of the operation:
  *         - #AZ_OK if successful
@@ -103,8 +103,8 @@ az_http_request_get_method(_az_http_request const* request, az_http_method* out_
  *
  * @remarks This function is expected to be used by transport layer only.
  *
- * @param[in] request HTTP request to get parts from.
- * @param[out] out_url Pointer to write URL to.
+ * @param[in] request The HTTP request from which to get the url.
+ * @param[out] out_url Pointer to write the HTTP URL to.
  *
  * @retval An #az_result value indicating the result of the operation:
  *         - #AZ_OK if successful
@@ -116,8 +116,8 @@ AZ_NODISCARD az_result az_http_request_get_url(_az_http_request const* request, 
  *
  * @remarks This function is expected to be used by transport layer only.
  *
- * @param[in] request HTTP request to get parts from.
- * @param[out] out_body Pointer to write HTTP request body to.
+ * @param[in] request The HTTP request  from which to get the body.
+ * @param[out] out_body Pointer to write the HTTP request body to.
  *
  * @retval An #az_result value indicating the result of the operation:
  *         - #AZ_OK if successful
@@ -128,22 +128,22 @@ AZ_NODISCARD az_result az_http_request_get_body(_az_http_request const* request,
  * @brief This function is expected to be used by transport adapters like curl. Use it to write
  * content from \p source to \p response.
  *
- * @remarks Parameter \p source can be an empty span. If so, nothing will be written.
+ * @remarks The \p source can be an empty #az_span. If so, nothing will be written.
  *
  * @param[in] response Pointer to an az_http_response.
  * @param[in] source This is an az_span with the content to be written into response.
  * @return An #az_result value indicating the result of the operation:
  *         - #AZ_OK if successful
- *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the \p response is not big enough to contain the
+ *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the \p response buffer is not big enough to contain the
  * \p source content
  */
 AZ_NODISCARD az_result az_http_response_write_span(az_http_response* response, az_span source);
 
 /**
- * @brief This function is expected to be used by transport adapters like curl. Use it to source
+ * @brief This function is expected to be used by transport adapters like curl. Use it to write
  * just one single byte to an az_http_response.
  *
- * @remarks This is a convenient way of hiding the internal implementation of az_htt_response.
+ * @remarks This is a convenient way of hiding the internal implementation of az_http_response.
  *
  * @remarks Parameter \p source can be an empty span. If so, nothing will be written.
  *
@@ -160,7 +160,7 @@ AZ_NODISCARD az_result az_http_response_write_u8(az_http_response* response, uin
  * @brief Returns the number of headers within the request.
  * Each header is an #az_pair.
  *
- * @param[in] request Pointer to an az http request to be used by this function.
+ * @param[in] request Pointer to an az_http_request to be used by this function.
  * @return Number of headers in the request.
  */
 AZ_NODISCARD int32_t az_http_request_headers_count(_az_http_request const* request);
