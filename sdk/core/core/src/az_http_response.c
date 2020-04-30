@@ -220,7 +220,7 @@ az_http_response_get_next_header(az_http_response* response, az_pair* out_header
     // moving reader. It is currently after \r was found
     *reader = az_span_slice_to_end(*reader, offset);
 
-    // Remove white spaces from header name https://github.com/Azure/azure-sdk-for-c/issues/604
+    // Remove white spaces from value https://github.com/Azure/azure-sdk-for-c/issues/604
     out_header->value = _az_span_trim_white_space_from_end(out_header->value);
   }
 
