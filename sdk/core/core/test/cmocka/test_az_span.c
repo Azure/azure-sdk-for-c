@@ -759,6 +759,48 @@ static void az_span_copy_empty(void** state)
   assert_true(az_span_is_content_equal(az_span_copy(dst, AZ_SPAN_NULL), dst));
 }
 
+static void az_span_trim(void** state)
+{
+  (void)state;
+  az_span source = _az_span_trim_white_space(AZ_SPAN_FROM_STR("   abc   "));
+  assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("abc")));
+}
+
+static void az_span_trim_left(void** state)
+{
+  (void)state;
+  az_span source = _az_span_trim_white_space_from_start(AZ_SPAN_FROM_STR("   abc   "));
+  assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("abc   ")));
+}
+
+static void az_span_trim_right(void** state)
+{
+  (void)state;
+  az_span source = _az_span_trim_white_space_from_end(AZ_SPAN_FROM_STR("   abc   "));
+  assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("   abc")));
+}
+
+static void az_span_trim_all_white(void** state)
+{
+  (void)state;
+  az_span source = _az_span_trim_white_space(AZ_SPAN_FROM_STR("       "));
+  assert_int_equal(az_span_size(source), 0);
+}
+
+static void az_span_trim_none(void** state)
+{
+  (void)state;
+  az_span source = _az_span_trim_white_space(AZ_SPAN_FROM_STR("abc"));
+  assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("abc")));
+}
+
+static void az_span_trim_spaced(void** state)
+{
+  (void)state;
+  az_span source = _az_span_trim_white_space(AZ_SPAN_FROM_STR(" a  b     c    "));
+  assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("a  b     c")));
+}
+
 int test_az_span()
 {
   const struct CMUnitTest tests[] = {
@@ -798,6 +840,12 @@ int test_az_span()
     cmocka_unit_test(az_span_u32toa_max_uint_succeeds),
     cmocka_unit_test(az_span_u32toa_overflow_fails),
     cmocka_unit_test(az_span_copy_empty),
+    cmocka_unit_test(az_span_trim),
+    cmocka_unit_test(az_span_trim_left),
+    cmocka_unit_test(az_span_trim_right),
+    cmocka_unit_test(az_span_trim_all_white),
+    cmocka_unit_test(az_span_trim_none),
+    cmocka_unit_test(az_span_trim_spaced),
   };
   return cmocka_run_group_tests_name("az_core_span", tests, NULL, NULL);
 }
