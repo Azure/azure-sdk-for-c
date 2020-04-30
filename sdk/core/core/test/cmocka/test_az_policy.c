@@ -16,7 +16,7 @@
 
 #include <_az_cfg.h>
 
-#ifdef MOCK_ENABLED
+#ifdef _az_MOCK_ENABLED
 az_result test_policy_transport_retry_response(
     _az_http_policy* p_policies,
     void* p_options,
@@ -38,7 +38,7 @@ void test_az_http_pipeline_policy_credential(void** state);
 void test_az_http_pipeline_policy_retry(void** state);
 void test_az_http_pipeline_policy_retry_with_header(void** state);
 void test_az_http_pipeline_policy_retry_with_header_2(void** state);
-#endif // MOCK_ENABLED
+#endif // _az_MOCK_ENABLED
 
 static az_result test_policy_transport(
     _az_http_policy* p_policies,
@@ -47,7 +47,6 @@ static az_result test_policy_transport(
     az_http_response* p_response);
 
 void test_az_http_pipeline_policy_apiversion(void** state);
-void test_az_http_pipeline_policy_uniquerequestid(void** state);
 void test_az_http_pipeline_policy_telemetry(void** state);
 
 az_result test_policy_transport(
@@ -140,40 +139,7 @@ void test_az_http_pipeline_policy_apiversion(void** state)
   assert_return_code(az_http_pipeline_policy_apiversion(policies, &api_version, &hrb, NULL), AZ_OK);
 }
 
-void test_az_http_pipeline_policy_uniquerequestid(void** state)
-{
-  (void)state;
-
-  uint8_t buf[100];
-  uint8_t header_buf[(2 * sizeof(az_pair))];
-  memset(buf, 0, sizeof(buf));
-  memset(header_buf, 0, sizeof(header_buf));
-
-  az_span url_span = AZ_SPAN_FROM_BUFFER(buf);
-  az_span remainder = az_span_copy(url_span, AZ_SPAN_FROM_STR("url"));
-  assert_int_equal(az_span_size(remainder), 97);
-  az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-  _az_http_request hrb;
-
-  assert_return_code(
-      az_http_request_init(
-          &hrb, &az_context_app, az_http_method_get(), url_span, 3, header_span, AZ_SPAN_NULL),
-      AZ_OK);
-
-  _az_http_policy policies[1] = {            
-            {
-              ._internal = {
-                .process = test_policy_transport,
-                .p_options = NULL,
-              },
-            },
-        };
-
-  // make sure token is not expired
-  assert_return_code(az_http_pipeline_policy_uniquerequestid(policies, NULL, &hrb, NULL), AZ_OK);
-}
-
-#ifdef MOCK_ENABLED
+#ifdef _az_MOCK_ENABLED
 
 const az_span retry_response = AZ_SPAN_LITERAL_FROM_STR("HTTP/1.1 408 Request Timeout\r\n"
                                                         "Content-Type: text/html; charset=UTF-8\r\n"
@@ -409,19 +375,18 @@ void test_az_http_pipeline_policy_retry_with_header_2(void** state)
       az_http_pipeline_policy_retry(policies, &retry_options, &hrb, &response), AZ_OK);
 }
 
-#endif // MOCK_ENABLED
+#endif // _az_MOCK_ENABLED
 
 int test_az_policy()
 {
   const struct CMUnitTest tests[] = {
-#ifdef MOCK_ENABLED
+#ifdef _az_MOCK_ENABLED
     cmocka_unit_test(test_az_http_pipeline_policy_credential),
     cmocka_unit_test(test_az_http_pipeline_policy_retry),
     cmocka_unit_test(test_az_http_pipeline_policy_retry_with_header),
     cmocka_unit_test(test_az_http_pipeline_policy_retry_with_header_2),
-#endif // MOCK_ENABLED
+#endif // _az_MOCK_ENABLED
     cmocka_unit_test(test_az_http_pipeline_policy_apiversion),
-    cmocka_unit_test(test_az_http_pipeline_policy_uniquerequestid),
     cmocka_unit_test(test_az_http_pipeline_policy_telemetry),
   };
   return cmocka_run_group_tests_name("az_core_policy", tests, NULL, NULL);

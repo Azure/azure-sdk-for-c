@@ -10,7 +10,7 @@
 
 static AZ_NODISCARD az_result _az_span_reader_read_json_pointer_char(az_span* self, uint32_t* out)
 {
-  AZ_PRECONDITION_NOT_NULL(self);
+  _az_PRECONDITION_NOT_NULL(self);
   int32_t reader_current_length = az_span_size(*self);
 
   // check for EOF
@@ -208,7 +208,7 @@ AZ_NODISCARD static az_result az_json_parser_get_by_pointer_token(
 AZ_NODISCARD az_result
 az_json_parse_by_pointer(az_span json_buffer, az_span json_pointer, az_json_token* out_token)
 {
-  AZ_PRECONDITION_NOT_NULL(out_token);
+  _az_PRECONDITION_NOT_NULL(out_token);
 
   az_json_parser json_parser = { 0 };
   AZ_RETURN_IF_FAILED(az_json_parser_init(&json_parser, json_buffer));

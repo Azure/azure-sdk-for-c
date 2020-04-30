@@ -63,7 +63,7 @@ static const az_span test_value_three = AZ_SPAN_LITERAL_FROM_STR(TEST_VALUE_THRE
 static const char test_correct_one_key_value[] = "key_one=value_one";
 static const char test_correct_two_key_value[] = "key_one=value_one&key_two=value_two";
 
-#ifndef NO_PRECONDITION_CHECKING
+#ifndef AZ_NO_PRECONDITION_CHECKING
 enable_precondition_check_tests()
 
 static void test_az_iot_hub_client_init_NULL_client_fails(void** state)
@@ -259,7 +259,7 @@ static void test_az_iot_hub_client_properties_next_NULL_out_fail(void** state)
   assert_precondition_checked(az_iot_hub_client_properties_next(&props, NULL));
 }
 
-#endif // NO_PRECONDITION_CHECKING
+#endif // AZ_NO_PRECONDITION_CHECKING
 
 static void test_az_iot_hub_client_get_default_options_succeed(void** state)
 {
@@ -834,12 +834,12 @@ static void test_az_iot_hub_client_properties_next_empty_succeed(void** state)
 
 int test_iot_hub_client()
 {
-#ifndef NO_PRECONDITION_CHECKING
+#ifndef AZ_NO_PRECONDITION_CHECKING
   setup_precondition_check_tests();
-#endif // NO_PRECONDITION_CHECKING
+#endif // AZ_NO_PRECONDITION_CHECKING
 
   const struct CMUnitTest tests[] = {
-#ifndef NO_PRECONDITION_CHECKING
+#ifndef AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_az_iot_hub_client_init_NULL_client_fails),
     cmocka_unit_test(test_az_iot_hub_client_init_NULL_device_id_fails),
     cmocka_unit_test(test_az_iot_hub_client_init_NULL_hub_hostname_id_fails),
@@ -859,7 +859,7 @@ int test_iot_hub_client()
     cmocka_unit_test(test_az_iot_hub_client_properties_find_NULL_value_fail),
     cmocka_unit_test(test_az_iot_hub_client_properties_next_NULL_props_fail),
     cmocka_unit_test(test_az_iot_hub_client_properties_next_NULL_out_fail),
-#endif // NO_PRECONDITION_CHECKING
+#endif // AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_az_iot_hub_client_get_default_options_succeed),
     cmocka_unit_test(test_az_iot_hub_client_init_succeed),
     cmocka_unit_test(test_az_iot_hub_client_init_custom_options_succeed),

@@ -35,10 +35,10 @@ AZ_NODISCARD az_result az_iot_pnp_client_init(
     az_span root_interface_name,
     az_iot_pnp_client_options const* options)
 {
-  AZ_PRECONDITION_NOT_NULL(client);
-  AZ_PRECONDITION_VALID_SPAN(iot_hub_hostname, 1, false);
-  AZ_PRECONDITION_VALID_SPAN(device_id, 1, false);
-  AZ_PRECONDITION_VALID_SPAN(root_interface_name, 1, false);
+  _az_PRECONDITION_NOT_NULL(client);
+  _az_PRECONDITION_VALID_SPAN(iot_hub_hostname, 1, false);
+  _az_PRECONDITION_VALID_SPAN(device_id, 1, false);
+  _az_PRECONDITION_VALID_SPAN(root_interface_name, 1, false);
 
   az_iot_hub_client_options hub_options = az_iot_hub_client_options_default();
   hub_options.user_agent = (options != NULL) ? options->user_agent : AZ_SPAN_NULL;
@@ -58,9 +58,9 @@ AZ_NODISCARD az_result az_iot_pnp_client_get_user_name(
     size_t mqtt_user_name_size,
     size_t* out_mqtt_user_name_length)
 {
-  AZ_PRECONDITION_NOT_NULL(client);
-  AZ_PRECONDITION_NOT_NULL(mqtt_user_name);
-  AZ_PRECONDITION(mqtt_user_name_size > 0);
+  _az_PRECONDITION_NOT_NULL(client);
+  _az_PRECONDITION_NOT_NULL(mqtt_user_name);
+  _az_PRECONDITION(mqtt_user_name_size > 0);
 
   size_t hub_user_name_length;
 

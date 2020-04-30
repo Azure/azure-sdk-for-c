@@ -28,7 +28,7 @@ static az_span _az_http_policy_logging_copy_lengthy_value(az_span ref_log_msg, a
   // The caller should validate that ref_log_msg is large enough to contain the value az_span
   // This means, ref_log_msg must have available at least _az_LOG_LENGTHY_VALUE_MAX_LENGTH (i.e. 50)
   // bytes or as much as the size of the value az_span, whichever is smaller.
-  AZ_PRECONDITION(
+  _az_PRECONDITION(
       az_span_size(ref_log_msg) >= _az_LOG_LENGTHY_VALUE_MAX_LENGTH
       || az_span_size(ref_log_msg) >= value_size);
 
@@ -47,7 +47,7 @@ static az_span _az_http_policy_logging_copy_lengthy_value(az_span ref_log_msg, a
       = ((_az_LOG_LENGTHY_VALUE_MAX_LENGTH / 2) + (_az_LOG_LENGTHY_VALUE_MAX_LENGTH % 2)) // 23
       - (ellipsis_len / 2);
 
-  AZ_PRECONDITION((first + last + ellipsis_len) == _az_LOG_LENGTHY_VALUE_MAX_LENGTH);
+  _az_PRECONDITION((first + last + ellipsis_len) == _az_LOG_LENGTHY_VALUE_MAX_LENGTH);
 
   ref_log_msg = az_span_copy(ref_log_msg, az_span_slice(value, 0, first));
   ref_log_msg = az_span_copy(ref_log_msg, ellipsis);

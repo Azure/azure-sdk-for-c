@@ -35,7 +35,7 @@ static const char g_test_correct_topic_no_options_with_props[]
 static const char g_test_correct_topic_with_options_module_id_with_props[]
     = "devices/my_device/modules/my_module_id/messages/events/key=value&key_two=value2";
 
-#ifndef NO_PRECONDITION_CHECKING
+#ifndef AZ_NO_PRECONDITION_CHECKING
 enable_precondition_check_tests()
 
 static void test_az_iot_hub_client_telemetry_get_publish_topic_NULL_client_fails(void** state)
@@ -79,7 +79,7 @@ static void test_az_iot_hub_client_telemetry_get_publish_topic_NULL_out_mqtt_top
       &client, NULL, test_buf, 0, &test_length));
 }
 
-#endif // NO_PRECONDITION_CHECKING
+#endif // AZ_NO_PRECONDITION_CHECKING
 
 static void test_az_iot_hub_client_telemetry_get_publish_topic_no_options_no_props_succeed(
     void** state)
@@ -321,16 +321,16 @@ test_az_iot_hub_client_telemetry_get_publish_topic_with_options_module_id_with_p
 
 int test_iot_hub_telemetry()
 {
-#ifndef NO_PRECONDITION_CHECKING
+#ifndef AZ_NO_PRECONDITION_CHECKING
   setup_precondition_check_tests();
-#endif // NO_PRECONDITION_CHECKING
+#endif // AZ_NO_PRECONDITION_CHECKING
 
   const struct CMUnitTest tests[] = {
-#ifndef NO_PRECONDITION_CHECKING
+#ifndef AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_az_iot_hub_client_telemetry_get_publish_topic_NULL_client_fails),
     cmocka_unit_test(test_az_iot_hub_client_telemetry_get_publish_topic_NULL_mqtt_topic_fails),
     cmocka_unit_test(test_az_iot_hub_client_telemetry_get_publish_topic_NULL_out_mqtt_topic_fails),
-#endif // NO_PRECONDITION_CHECKING
+#endif // AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(
         test_az_iot_hub_client_telemetry_get_publish_topic_no_options_no_props_succeed),
     cmocka_unit_test(

@@ -59,8 +59,8 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
     void* credential,
     az_storage_blobs_blob_client_options* options)
 {
-  AZ_PRECONDITION_NOT_NULL(client);
-  AZ_PRECONDITION_NOT_NULL(options);
+  _az_PRECONDITION_NOT_NULL(client);
+  _az_PRECONDITION_NOT_NULL(options);
 
   _az_credential* const cred = (_az_credential*)credential;
 
@@ -76,12 +76,6 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
               ._internal = {
                 .process = az_http_pipeline_policy_apiversion,
                 .p_options= &client->_internal.options._internal.api_version,
-              },
-            },
-            {
-              ._internal = {
-                .process = az_http_pipeline_policy_uniquerequestid,
-                .p_options = NULL,
               },
             },
             {

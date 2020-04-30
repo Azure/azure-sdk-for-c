@@ -31,9 +31,9 @@ AZ_NODISCARD az_result az_iot_hub_client_init(
     az_span device_id,
     az_iot_hub_client_options const* options)
 {
-  AZ_PRECONDITION_NOT_NULL(client);
-  AZ_PRECONDITION_VALID_SPAN(iot_hub_hostname, 1, false);
-  AZ_PRECONDITION_VALID_SPAN(device_id, 1, false);
+  _az_PRECONDITION_NOT_NULL(client);
+  _az_PRECONDITION_VALID_SPAN(iot_hub_hostname, 1, false);
+  _az_PRECONDITION_VALID_SPAN(device_id, 1, false);
 
   client->_internal.iot_hub_hostname = iot_hub_hostname;
   client->_internal.device_id = device_id;
@@ -48,9 +48,9 @@ AZ_NODISCARD az_result az_iot_hub_client_get_user_name(
     size_t mqtt_user_name_size,
     size_t* out_mqtt_user_name_length)
 {
-  AZ_PRECONDITION_NOT_NULL(client);
-  AZ_PRECONDITION_NOT_NULL(mqtt_user_name);
-  AZ_PRECONDITION(mqtt_user_name_size > 0);
+  _az_PRECONDITION_NOT_NULL(client);
+  _az_PRECONDITION_NOT_NULL(mqtt_user_name);
+  _az_PRECONDITION(mqtt_user_name_size > 0);
 
   const az_span* const module_id = &(client->_internal.options.module_id);
   const az_span* const user_agent = &(client->_internal.options.user_agent);
@@ -106,9 +106,9 @@ AZ_NODISCARD az_result az_iot_hub_client_get_client_id(
     size_t mqtt_client_id_size,
     size_t* out_mqtt_client_id_length)
 {
-  AZ_PRECONDITION_NOT_NULL(client);
-  AZ_PRECONDITION_NOT_NULL(mqtt_client_id);
-  AZ_PRECONDITION(mqtt_client_id_size > 0);
+  _az_PRECONDITION_NOT_NULL(client);
+  _az_PRECONDITION_NOT_NULL(mqtt_client_id);
+  _az_PRECONDITION(mqtt_client_id_size > 0);
 
   az_span mqtt_client_id_span = az_span_init((uint8_t*)mqtt_client_id, (int32_t)mqtt_client_id_size);
   const az_span* const module_id = &(client->_internal.options.module_id);
@@ -145,9 +145,9 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_init(
     az_span buffer,
     int32_t written_length)
 {
-  AZ_PRECONDITION_NOT_NULL(properties);
-  AZ_PRECONDITION_VALID_SPAN(buffer, 0, false);
-  AZ_PRECONDITION(written_length >= 0);
+  _az_PRECONDITION_NOT_NULL(properties);
+  _az_PRECONDITION_VALID_SPAN(buffer, 0, false);
+  _az_PRECONDITION(written_length >= 0);
 
   properties->_internal.properties_buffer = buffer;
   properties->_internal.properties_written = written_length;
@@ -161,9 +161,9 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_append(
     az_span name,
     az_span value)
 {
-  AZ_PRECONDITION_NOT_NULL(properties);
-  AZ_PRECONDITION_VALID_SPAN(name, 1, false);
-  AZ_PRECONDITION_VALID_SPAN(value, 1, false);
+  _az_PRECONDITION_NOT_NULL(properties);
+  _az_PRECONDITION_VALID_SPAN(name, 1, false);
+  _az_PRECONDITION_VALID_SPAN(value, 1, false);
 
   int32_t prop_length = properties->_internal.properties_written;
 
@@ -197,9 +197,9 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_find(
     az_span name,
     az_span* out_value)
 {
-  AZ_PRECONDITION_NOT_NULL(properties);
-  AZ_PRECONDITION_VALID_SPAN(name, 1, false);
-  AZ_PRECONDITION_NOT_NULL(out_value);
+  _az_PRECONDITION_NOT_NULL(properties);
+  _az_PRECONDITION_VALID_SPAN(name, 1, false);
+  _az_PRECONDITION_NOT_NULL(out_value);
 
   az_span remaining = az_span_slice(
       properties->_internal.properties_buffer, 0, properties->_internal.properties_written);
@@ -226,8 +226,8 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_find(
 AZ_NODISCARD az_result
 az_iot_hub_client_properties_next(az_iot_hub_client_properties* properties, az_pair* out)
 {
-  AZ_PRECONDITION_NOT_NULL(properties);
-  AZ_PRECONDITION_NOT_NULL(out);
+  _az_PRECONDITION_NOT_NULL(properties);
+  _az_PRECONDITION_NOT_NULL(out);
 
   int32_t index = (int32_t)properties->_internal.current_property_index;
   int32_t prop_length = properties->_internal.properties_written;

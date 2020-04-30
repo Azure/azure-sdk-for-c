@@ -13,7 +13,7 @@
 
 /*Copying AZ_CONTRACT on purpose from AZ_CORE because 3rd parties can define this and should not
  * depend on internal CORE headers */
-#define AZ_PRECONDITION(condition, error) \
+#define _az_PRECONDITION(condition, error) \
   do \
   { \
     if (!(condition)) \
@@ -22,11 +22,11 @@
     } \
   } while (0)
 
-#define AZ_PRECONDITION_NOT_NULL(arg) AZ_PRECONDITION((arg) != NULL, AZ_ERROR_ARG)
+#define _az_PRECONDITION_NOT_NULL(arg) _az_PRECONDITION((arg) != NULL, AZ_ERROR_ARG)
 
 static AZ_NODISCARD az_result _az_span_malloc(int32_t size, az_span* out)
 {
-  AZ_PRECONDITION_NOT_NULL(out);
+  _az_PRECONDITION_NOT_NULL(out);
 
   uint8_t* const p = (uint8_t*)malloc((size_t)size);
   if (p == NULL)
@@ -80,8 +80,8 @@ AZ_NODISCARD AZ_INLINE az_result _az_http_client_curl_init(CURL** out)
 
 AZ_NODISCARD AZ_INLINE az_result _az_http_client_curl_done(CURL** pp)
 {
-  AZ_PRECONDITION_NOT_NULL(pp);
-  AZ_PRECONDITION_NOT_NULL(*pp);
+  _az_PRECONDITION_NOT_NULL(pp);
+  _az_PRECONDITION_NOT_NULL(*pp);
 
   curl_easy_cleanup(*pp);
   *pp = NULL;
@@ -116,8 +116,8 @@ _az_span_append_header_to_buffer(az_span writable_buffer, az_pair header, az_spa
 static AZ_NODISCARD az_result
 _az_http_client_curl_slist_append(struct curl_slist** self, char const* str)
 {
-  AZ_PRECONDITION_NOT_NULL(self);
-  AZ_PRECONDITION_NOT_NULL(str);
+  _az_PRECONDITION_NOT_NULL(self);
+  _az_PRECONDITION_NOT_NULL(str);
 
   struct curl_slist* const p_list = curl_slist_append(*self, str);
   if (p_list == NULL)
@@ -145,7 +145,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_add_header_to_curl_list(
     struct curl_slist** p_list,
     az_span separator)
 {
-  AZ_PRECONDITION_NOT_NULL(p_list);
+  _az_PRECONDITION_NOT_NULL(p_list);
 
   // allocate a buffer for header
   az_span writable_buffer;
@@ -200,8 +200,8 @@ static AZ_NODISCARD az_result _az_http_client_curl_add_header_to_curl_list(
 static AZ_NODISCARD az_result
 _az_http_client_curl_add_expect_header(CURL* p_curl, struct curl_slist** p_list)
 {
-  AZ_PRECONDITION_NOT_NULL(p_curl);
-  AZ_PRECONDITION_NOT_NULL(p_list);
+  _az_PRECONDITION_NOT_NULL(p_curl);
+  _az_PRECONDITION_NOT_NULL(p_list);
 
   // Append header to current custom headers list
   AZ_RETURN_IF_FAILED(_az_http_client_curl_slist_append(p_list, "Expect:"));
@@ -220,7 +220,7 @@ _az_http_client_curl_add_expect_header(CURL* p_curl, struct curl_slist** p_list)
 static AZ_NODISCARD az_result
 _az_http_client_curl_build_headers(_az_http_request* p_request, struct curl_slist** p_headers)
 {
-  AZ_PRECONDITION_NOT_NULL(p_request);
+  _az_PRECONDITION_NOT_NULL(p_request);
 
   az_pair header;
   for (int32_t offset = 0; offset < az_http_request_headers_count(p_request); ++offset)
@@ -293,7 +293,7 @@ static size_t _az_http_client_curl_write_to_span(
  */
 static AZ_NODISCARD az_result _az_http_client_curl_send_get_request(CURL* p_curl)
 {
-  AZ_PRECONDITION_NOT_NULL(p_curl);
+  _az_PRECONDITION_NOT_NULL(p_curl);
 
   // send
   AZ_RETURN_IF_CURL_FAILED(curl_easy_perform(p_curl));
@@ -307,8 +307,8 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_get_request(CURL* p_curl
 static AZ_NODISCARD az_result
 _az_http_client_curl_send_delete_request(CURL* p_curl, _az_http_request const* p_request)
 {
-  AZ_PRECONDITION_NOT_NULL(p_curl);
-  AZ_PRECONDITION_NOT_NULL(p_request);
+  _az_PRECONDITION_NOT_NULL(p_curl);
+  _az_PRECONDITION_NOT_NULL(p_request);
 
   AZ_RETURN_IF_FAILED(_az_http_client_curl_code_to_result(
       curl_easy_setopt(p_curl, CURLOPT_CUSTOMREQUEST, "DELETE")));
@@ -324,8 +324,8 @@ _az_http_client_curl_send_delete_request(CURL* p_curl, _az_http_request const* p
 static AZ_NODISCARD az_result
 _az_http_client_curl_send_post_request(CURL* p_curl, _az_http_request const* p_request)
 {
-  AZ_PRECONDITION_NOT_NULL(p_curl);
-  AZ_PRECONDITION_NOT_NULL(p_request);
+  _az_PRECONDITION_NOT_NULL(p_curl);
+  _az_PRECONDITION_NOT_NULL(p_request);
 
   // Method
   az_span request_body = { 0 };
@@ -409,8 +409,8 @@ static int32_t _az_http_client_curl_upload_read_callback(
 static AZ_NODISCARD az_result
 _az_http_client_curl_send_upload_request(CURL* p_curl, _az_http_request const* p_request)
 {
-  AZ_PRECONDITION_NOT_NULL(p_curl);
-  AZ_PRECONDITION_NOT_NULL(p_request);
+  _az_PRECONDITION_NOT_NULL(p_curl);
+  _az_PRECONDITION_NOT_NULL(p_request);
 
   az_span body = { 0 };
   AZ_RETURN_IF_FAILED(az_http_request_get_body(p_request, &body));
@@ -446,8 +446,8 @@ static AZ_NODISCARD az_result _az_http_client_curl_setup_headers(
     struct curl_slist** p_list,
     _az_http_request* p_request)
 {
-  AZ_PRECONDITION_NOT_NULL(p_curl);
-  AZ_PRECONDITION_NOT_NULL(p_request);
+  _az_PRECONDITION_NOT_NULL(p_curl);
+  _az_PRECONDITION_NOT_NULL(p_request);
 
   if (az_http_request_headers_count(p_request) == 0)
   {
@@ -473,8 +473,8 @@ static AZ_NODISCARD az_result _az_http_client_curl_setup_headers(
 static AZ_NODISCARD az_result
 _az_http_client_curl_setup_url(CURL* p_curl, _az_http_request const* p_request)
 {
-  AZ_PRECONDITION_NOT_NULL(p_curl);
-  AZ_PRECONDITION_NOT_NULL(p_request);
+  _az_PRECONDITION_NOT_NULL(p_curl);
+  _az_PRECONDITION_NOT_NULL(p_request);
 
   az_span request_url = { 0 };
   // get request_url. It will have the size of what it has written in it only
@@ -518,7 +518,7 @@ _az_http_client_curl_setup_url(CURL* p_curl, _az_http_request const* p_request)
 static AZ_NODISCARD az_result
 _az_http_client_curl_setup_response_redirect(CURL* p_curl, az_http_response* response)
 {
-  AZ_PRECONDITION_NOT_NULL(p_curl);
+  _az_PRECONDITION_NOT_NULL(p_curl);
 
   AZ_RETURN_IF_CURL_FAILED(
       curl_easy_setopt(p_curl, CURLOPT_HEADERFUNCTION, _az_http_client_curl_write_to_span));
@@ -548,8 +548,8 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
     _az_http_request* p_request,
     az_http_response* response)
 {
-  AZ_PRECONDITION_NOT_NULL(p_curl);
-  AZ_PRECONDITION_NOT_NULL(p_request);
+  _az_PRECONDITION_NOT_NULL(p_curl);
+  _az_PRECONDITION_NOT_NULL(p_request);
 
   az_result result = AZ_ERROR_ARG;
 
@@ -604,8 +604,8 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
 AZ_NODISCARD az_result
 az_http_client_send_request(_az_http_request* p_request, az_http_response* p_response)
 {
-  AZ_PRECONDITION_NOT_NULL(p_request);
-  AZ_PRECONDITION_NOT_NULL(p_response);
+  _az_PRECONDITION_NOT_NULL(p_request);
+  _az_PRECONDITION_NOT_NULL(p_response);
 
   CURL* p_curl = NULL;
 
