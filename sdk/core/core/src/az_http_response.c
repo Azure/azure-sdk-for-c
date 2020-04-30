@@ -277,7 +277,7 @@ static az_span _az_http_response_get_remaining(az_http_response const* response)
 
 AZ_NODISCARD az_result az_http_response_write_span(az_http_response* response, az_span source)
 {
-  AZ_PRECONDITION_NOT_NULL(response);
+  _az_PRECONDITION_NOT_NULL(response);
 
   az_span remaining = _az_http_response_get_remaining(response);
   int32_t write_size = az_span_size(source);
