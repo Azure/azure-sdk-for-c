@@ -63,6 +63,11 @@ az_precondition_failed_fn az_precondition_failed_get_callback();
 
 AZ_NODISCARD AZ_INLINE bool az_span_is_valid(az_span span, int32_t min_size, bool null_is_valid)
 {
+  if (min_size < 0)
+  {
+    return false;
+  }
+
   uint8_t* ptr = az_span_ptr(span);
   int32_t const span_size = az_span_size(span);
 

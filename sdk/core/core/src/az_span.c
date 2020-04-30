@@ -231,14 +231,14 @@ AZ_NODISCARD int32_t az_span_find(az_span source, az_span target)
 
 az_span az_span_copy(az_span destination, az_span source)
 {
-  // Implementations of memmove generally do the right thing when number of bytes to move is 0, even
-  // if the ptr is null, but given the behavior is documented to be undefined, we disallow it as a
-  // precondition.
-  AZ_PRECONDITION_VALID_SPAN(source, 0, false);
-
   int32_t src_size = az_span_size(source);
 
   AZ_PRECONDITION_VALID_SPAN(destination, src_size, false);
+
+  if (src_size == 0)
+  {
+    return destination;
+  }
 
   // Even though the contract of this method is that the destination must be larger than source, cap
   // the data move if the source is too large, to avoid memory corruption.
@@ -269,66 +269,6 @@ az_span az_span_copy_u8(az_span destination, uint8_t byte)
   uint8_t* dst_ptr = az_span_ptr(destination);
   dst_ptr[0] = byte;
   return az_span_init(dst_ptr + 1, dest_size - 1);
-}
-
-AZ_NODISCARD AZ_INLINE bool should_encode(uint8_t c)
-{
-  switch (c)
-  {
-    case '-':
-    case '_':
-    case '.':
-    case '~':
-      return false;
-    default:
-      return !(('0' <= c && c <= '9') || ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z'));
-  }
-}
-
-AZ_NODISCARD az_result
-az_span_copy_url_encode(az_span destination, az_span source, az_span* out_span)
-{
-  AZ_PRECONDITION_NOT_NULL(out_span);
-  AZ_PRECONDITION_VALID_SPAN(destination, 0, true);
-  AZ_PRECONDITION_VALID_SPAN(source, 0, true);
-
-  int32_t const input_size = az_span_size(source);
-
-  int32_t result_size = 0;
-  for (int32_t i = 0; i < input_size; ++i)
-  {
-    result_size += should_encode(az_span_ptr(source)[i]) ? 3 : 1;
-  }
-
-  if (az_span_size(destination) < result_size)
-  {
-    return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
-  }
-
-  uint8_t* p_s = az_span_ptr(source);
-  uint8_t* p_d = az_span_ptr(destination);
-  int32_t s = 0;
-  for (int32_t i = 0; i < input_size; ++i)
-  {
-    uint8_t c = p_s[i];
-    if (!should_encode(c))
-    {
-      *p_d = c;
-      p_d += 1;
-      s += 1;
-    }
-    else
-    {
-      p_d[0] = '%';
-      p_d[1] = _az_number_to_upper_hex(c >> 4);
-      p_d[2] = _az_number_to_upper_hex(c & 0x0F);
-      p_d += 3;
-      s += 3;
-    }
-  }
-  *out_span = az_span_slice_to_end(destination, result_size);
-
-  return AZ_OK;
 }
 
 void az_span_to_str(char* destination, int32_t destination_max_size, az_span source)

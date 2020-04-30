@@ -1,0 +1,28 @@
+resources:
+  repositories:
+      # Update refs to get to newer versions of build tools. Make sure to update
+      # refs in all relevant files to apply the changes universally.
+    - repository: azure-sdk-tools
+      type: github
+      name: Azure/azure-sdk-tools
+      endpoint: azure
+    - repository: azure-sdk-build-tools
+      type: git
+      name: internal/azure-sdk-build-tools
+
+trigger:
+  branches:
+    include:
+      - master
+      - feature/*
+      - release/*
+      - hotfix/*
+
+stages:
+  - template: ../../eng/pipelines/templates/stages/archetype-sdk-client.yml
+    parameters:
+      ServiceDirectory: iot
+      Artifacts:
+        # Use the path "." to build artifacts from the service directory
+        - Name: az_iot
+          Path: .

@@ -41,66 +41,66 @@ jobs:
       # BUILD_CURL_TRANSPORT        ON
       # UNIT_TESTING                OFF
       # UNIT_TESTING_MOCK_ENABLED   OFF
-      # BUILD_PAHO_TRANSPORT        OFF
+      # BUILD_PAHO_TRANSPORT        ON
       # BUILD_PRECONDITIONS         ON
       # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_POSIX / AZ_PLATFORM_IMPL_WIN32
       Linux_x64_with_samples:
         vm.image: 'ubuntu-18.04'
-        vcpkg.deps: 'curl[ssl]'
+        vcpkg.deps: 'curl[ssl] paho-mqtt'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        build.args: ' -DBUILD_CURL_TRANSPORT=ON -DAZ_PLATFORM_IMPL=POSIX'
+        build.args: ' -DBUILD_CURL_TRANSPORT=ON -DBUILD_PAHO_TRANSPORT=ON -DAZ_PLATFORM_IMPL=POSIX'
       Win_x86_with_samples:
         vm.image: 'windows-2019'
-        vcpkg.deps: 'curl[winssl]'
+        vcpkg.deps: 'curl[winssl] paho-mqtt'
         VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: Win32
-        build.args: ' -DBUILD_CURL_TRANSPORT=ON -DAZ_PLATFORM_IMPL=WIN32'
+        build.args: ' -DBUILD_CURL_TRANSPORT=ON -DBUILD_PAHO_TRANSPORT=ON -DAZ_PLATFORM_IMPL=WIN32'
       Win_x64_with_samples:
         vm.image: 'windows-2019'
-        vcpkg.deps: 'curl[winssl]'
+        vcpkg.deps: 'curl[winssl] paho-mqtt'
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: x64
-        build.args: ' -DBUILD_CURL_TRANSPORT=ON -DAZ_PLATFORM_IMPL=WIN32'
+        build.args: ' -DBUILD_CURL_TRANSPORT=ON -DBUILD_PAHO_TRANSPORT=ON -DAZ_PLATFORM_IMPL=WIN32'
       MacOS_x64_with_samples:
         vm.image: 'macOS-10.15'
-        vcpkg.deps: 'curl[ssl]'
+        vcpkg.deps: 'curl[ssl] paho-mqtt'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
-        build.args: ' -DBUILD_CURL_TRANSPORT=ON -DAZ_PLATFORM_IMPL=POSIX'
+        build.args: ' -DBUILD_CURL_TRANSPORT=ON -DBUILD_PAHO_TRANSPORT=ON -DAZ_PLATFORM_IMPL=POSIX'
 
       # Build with sample dependencies and unit testing [curl for transport and cmoka]  - PRECONDITIONS ON
       # WARNINGS_AS_ERRORS          ON
       # BUILD_CURL_TRANSPORT        ON
       # UNIT_TESTING                ON
       # UNIT_TESTING_MOCK_ENABLED   OFF
-      # BUILD_PAHO_TRANSPORT        OFF
+      # BUILD_PAHO_TRANSPORT        ON
       # BUILD_PRECONDITIONS         ON
       # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_POSIX / AZ_PLATFORM_IMPL_WIN32
       Linux_x64_with_samples_and_unit_test:
         vm.image: 'ubuntu-18.04'
-        vcpkg.deps: 'curl[ssl] cmocka'
+        vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        build.args: ' -DBUILD_CURL_TRANSPORT=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON'
+        build.args: ' -DBUILD_CURL_TRANSPORT=ON -DBUILD_PAHO_TRANSPORT=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON'
       Win_x86_with_samples_and_unit_test:
         vm.image: 'windows-2019'
-        vcpkg.deps: 'curl[winssl] cmocka'
+        vcpkg.deps: 'curl[winssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: Win32
-        build.args: ' -DBUILD_CURL_TRANSPORT=ON -DAZ_PLATFORM_IMPL=WIN32 -DUNIT_TESTING=ON'
+        build.args: ' -DBUILD_CURL_TRANSPORT=ON -DBUILD_PAHO_TRANSPORT=ON -DAZ_PLATFORM_IMPL=WIN32 -DUNIT_TESTING=ON'
       Win_x64_with_samples_and_unit_test:
         vm.image: 'windows-2019'
-        vcpkg.deps: 'curl[winssl] cmocka'
+        vcpkg.deps: 'curl[winssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: x64
-        build.args: ' -DBUILD_CURL_TRANSPORT=ON -DAZ_PLATFORM_IMPL=WIN32 -DUNIT_TESTING=ON'
+        build.args: ' -DBUILD_CURL_TRANSPORT=ON -DBUILD_PAHO_TRANSPORT=ON -DAZ_PLATFORM_IMPL=WIN32 -DUNIT_TESTING=ON'
       MacOS_x64_with_samples_and_unit_test:
         vm.image: 'macOS-10.15'
-        vcpkg.deps: 'curl[ssl] cmocka'
+        vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
-        build.args: ' -DBUILD_CURL_TRANSPORT=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON'
+        build.args: ' -DBUILD_CURL_TRANSPORT=ON -DBUILD_PAHO_TRANSPORT=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON'
 
       # Build with unit testing only. No samples [cmoka] - PRECONDITIONS ON
       # WARNINGS_AS_ERRORS          ON
@@ -290,7 +290,7 @@ jobs:
       coverageThreshold: 60
     condition: eq(variables['AZ_SDK_CODE_COV'], 1)
 
-# Disable build for c - client 
+# Disable build for c - client
 - ${{ if ne(parameters.ServiceDirectory, 'not-specified' )}}:
   - job: GenerateReleaseArtifacts
     pool:
@@ -324,10 +324,11 @@ jobs:
               }
             displayName: Copy CHANGELOG.md to package artifact
 
-          - task: PublishPipelineArtifact@1
-            inputs:
-              artifactName: packages
-              path: $(Build.ArtifactStagingDirectory)/packages
+      # This assumes that there are entries in parameters.Artifacts
+      - task: PublishPipelineArtifact@1
+        inputs:
+          artifactName: packages
+          path: $(Build.ArtifactStagingDirectory)/packages
 
       # Generate Documentation
       - pwsh: |

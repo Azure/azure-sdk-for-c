@@ -41,12 +41,19 @@ Thank you for your interest in contributing to Azure SDK for C.
 - C compiler: [MSVC](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2019), [gcc](https://gcc.gnu.org/) or [clang](https://clang.llvm.org/) are recommended
 - [git](https://git-scm.com/downloads) to clone our Azure SDK repository with the desired tag
 - [cmocka](https://cmocka.org/) for building and running unit tests. By default, building unit tests is disabled, so, unless you want to add unit tests or run then, you don't need to install this. See how `vcpkg` can be used to install dependencies, [below](#VCPKG).
-- [curl](https://curl.haxx.se/download.html) which is used as an http stack, and is required for building and running service samples (keyvault and storage). You don't need to install curl if you are not building samples.
+- [libcurl](https://curl.haxx.se/download.html) which is used as an http stack, and is required for building and running service samples (keyvault and storage). You don't need to install libcurl if you are not building samples. The minimum required version of libcurl is 7.1.
+See how `vcpkg` can be used to install dependencies, [below](#VCPKG).
 - [doxygen](http://www.doxygen.nl/download.html) if you need to generate and view documentation.
 
 ### Development Environment
 
 Project contains files to work on Windows, Mac or Linux based OS.
+
+**Note** For any environment variables set to use with CMake, the environment variables must be set
+BEFORE the first cmake generation command (`cmake ..`). The environment variables will NOT be picked up
+if you have already generated the build files, set environment variables, and then regenerate. In that
+case, you must either delete the `CMakeCache.txt` file or delete the folder in which you are generating build
+files and start again.
 
 ### Windows
 
