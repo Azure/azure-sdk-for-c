@@ -424,7 +424,7 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_parse_received_topic(
  * @param[in] client The #az_iot_hub_client to use for this call.
  * @param[in] request_id The request id. Must match a received #az_iot_hub_client_method_request
  *                       request_id.
- * @param[in] status The status.
+ * @param[in] status A code that indicates the result of the method, as defined by the user.
  * @param[out] mqtt_topic A buffer with sufficient capacity to hold the MQTT topic. If
  *                        successful, contains a null-terminated string with the topic that
  *                        needs to be passed to the MQTT client.

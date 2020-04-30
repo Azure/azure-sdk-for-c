@@ -286,8 +286,8 @@ static void test_az_iot_hub_client_methods_response_get_publish_topic_user_statu
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
 
   az_span request_id = AZ_SPAN_LITERAL_FROM_STR("2");
-  uint16_t status = 12345;
-  const char expected_topic[] = "$iothub/methods/res/12345/?$rid=2";
+  uint16_t status = UINT16_MAX;
+  const char expected_topic[] = "$iothub/methods/res/65535/?$rid=2";
 
   assert_true(
       az_iot_hub_client_methods_response_get_publish_topic(
@@ -307,8 +307,8 @@ static void test_az_iot_hub_client_methods_response_get_publish_topic_user_statu
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
 
   az_span request_id = AZ_SPAN_LITERAL_FROM_STR("2");
-  uint16_t status = 12345;
-  const char expected_topic[] = "$iothub/methods/res/12345/?$rid=2";
+  uint16_t status = UINT16_MAX;
+  const char expected_topic[] = "$iothub/methods/res/65535/?$rid=2";
 
   char test_buf[sizeof(expected_topic) - 2];
   size_t test_length;
