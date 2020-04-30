@@ -10,7 +10,6 @@
 
 #include <_az_cfg.h>
 
-static const az_span AZ_MS_CLIENT_REQUESTID = AZ_SPAN_LITERAL_FROM_STR("x-ms-client-request-id");
 static const az_span AZ_HTTP_HEADER_USER_AGENT = AZ_SPAN_LITERAL_FROM_STR("User-Agent");
 
 AZ_NODISCARD az_result az_http_pipeline_policy_apiversion(
