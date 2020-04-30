@@ -44,9 +44,11 @@ AZ_NODISCARD az_result _az_is_expected_span(az_span* self, az_span expected);
  * of size 0.
  *
  * Example:
+ * \code{.c}
  *  az_span a = AZ_SPAN_FROM_STR("  text with   \\n spaces   ");
  *  az_span b = _az_span_trim_white_space(a);
  *  // assert( b ==  AZ_SPAN_FROM_STR("text with   \\n spaces"));
+ * \endcode
  *
  * @param[in] source #az_span pointing to a memory address that might contain white spaces.
  * @return AZ_NODISCARD _az_span_trim_white_space.
@@ -62,9 +64,11 @@ AZ_NODISCARD az_span _az_span_trim_white_space(az_span source);
  * of size 0.
  *
  * Example:
+ * \code{.c}
  *  az_span a = AZ_SPAN_FROM_STR("  text with   \\n spaces   ");
  *  az_span b = _az_span_trim_white_space_from_start(a);
  *  // assert( b ==  AZ_SPAN_FROM_STR("text with   \\n spaces   "));
+ * \endcode
  *
  * @param[in] source #az_span pointing to a memory address that might contain white spaces.
  * @return AZ_NODISCARD _az_span_trim_white_space.
@@ -79,9 +83,11 @@ AZ_NODISCARD az_span _az_span_trim_white_space_from_start(az_span source);
  * of size 0.
  *
  * Example:
+ * \code{.c}
  *  az_span a = AZ_SPAN_FROM_STR("  text with   \\n spaces   ");
  *  az_span b = _az_span_trim_white_space_from_end(a);
  *  // assert( b ==  AZ_SPAN_FROM_STR("  text with   \\n spaces"));
+ * \endcode
  *
  * @param[in] source #az_span pointing to a memory address that might contain white spaces.
  * @return AZ_NODISCARD _az_span_trim_white_space.
