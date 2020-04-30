@@ -14,7 +14,7 @@ option(BUILD_PRECONDITIONS "Build SDK with preconditions enabled" ON)
 
 #enable mock functions with link option -ld
 if (NOT BUILD_PRECONDITIONS)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DAZ_NO_PRECONDITION_CHECKING")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DAZ_NO_PRECONDITION_CHECKING") 
 endif()
 
 #enable mock functions with link option -ld
@@ -90,4 +90,3 @@ if (UNIT_TESTING)
     add_subdirectory(sdk/samples/keyvault/keyvault/test/cmocka)
   endif()
 endif()
-
