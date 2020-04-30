@@ -60,7 +60,7 @@ static void test_credential_client_secret(void** state)
   uint8_t response_buf[500] = { 0 };
   ignore = az_http_response_init(&response, AZ_SPAN_FROM_BUFFER(response_buf));
 
-#ifdef MOCK_ENABLED
+#ifdef _az_MOCK_ENABLED
   {
     will_return(__wrap_az_platform_clock_msec, 1 * 100000000);
 
@@ -85,7 +85,7 @@ static void test_credential_client_secret(void** state)
   }
 #else
   (void)pipeline;
-#endif // MOCK_ENABLED
+#endif // _az_MOCK_ENABLED
 
   (void)ignore;
 }
@@ -213,7 +213,7 @@ az_result send_request(_az_http_request* request, az_http_response* response)
   return AZ_OK;
 }
 
-#ifdef MOCK_ENABLED
+#ifdef _az_MOCK_ENABLED
 az_result __wrap_az_http_client_send_request(_az_http_request* request, az_http_response* response);
 int64_t __wrap_az_platform_clock_msec();
 
@@ -223,7 +223,7 @@ az_result __wrap_az_http_client_send_request(_az_http_request* request, az_http_
 }
 
 int64_t __wrap_az_platform_clock_msec() { return (int64_t)mock(); }
-#endif // MOCK_ENABLED
+#endif // _az_MOCK_ENABLED
 
 int test_az_credential_client_secret()
 {
