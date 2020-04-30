@@ -148,8 +148,9 @@ az_http_request_append_header(_az_http_request* p_request, az_span key, az_span 
 {
   AZ_PRECONDITION_NOT_NULL(p_request);
 
-  // update key to remove any empty spaces from the left. (i.e. "  header" -> "header")
-  AZ_RETURN_IF_FAILED(az_span_reader_skip_json_white_space(&key));
+  // remove white spaces from kay and value
+  key = _az_span_trim_white_space(key);
+  value = _az_span_trim_white_space(value);
 
   AZ_PRECONDITION_VALID_SPAN(key, 1, false);
 

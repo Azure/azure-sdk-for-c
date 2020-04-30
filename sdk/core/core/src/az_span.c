@@ -621,6 +621,12 @@ _az_span_scan_until(az_span self, _az_predicate predicate, int32_t* out_index)
 
 AZ_NODISCARD az_span _az_span_trim_white_space(az_span source)
 {
+  // az_span source with size 0 is allowed. For instance, a header value can be AZ_SPAN_NULL
+  if (az_span_size(source) == 0)
+  {
+    return source;
+  }
+
   // remove white spaces from left
   az_span left_trim = _az_span_trim_white_space_from_start(source);
   // calculate the offset after moving after white spaces
@@ -631,7 +637,7 @@ AZ_NODISCARD az_span _az_span_trim_white_space(az_span source)
   if (offset == 0)
   {
     // nothing removed from left, return
-    return right_trim;
+    return left_trim;
   }
 
   // slice right with the offset
@@ -653,8 +659,11 @@ AZ_NODISCARD AZ_INLINE bool _az_is_white_space(uint8_t c)
 
 AZ_NODISCARD az_span _az_span_trim_white_space_from_start(az_span source)
 {
-  // set contract to support only az_span with length 1
-  AZ_PRECONDITION_VALID_SPAN(source, 1, false);
+  // az_span source with size 0 is allowed. For instance, a header value can be AZ_SPAN_NULL
+  if (az_span_size(source) == 0)
+  {
+    return source;
+  }
 
   // loop from start to the first non white space
   uint8_t* source_ptr = az_span_ptr(source);
@@ -672,18 +681,22 @@ AZ_NODISCARD az_span _az_span_trim_white_space_from_start(az_span source)
 
 AZ_NODISCARD az_span _az_span_trim_white_space_from_end(az_span source)
 {
-  // set contract to support only az_span with length 1
-  AZ_PRECONDITION_VALID_SPAN(source, 1, false);
+  // az_span source with size 0 is allowed. For instance, a header value can be AZ_SPAN_NULL
+  if (az_span_size(source) == 0)
+  {
+    return source;
+  }
 
   // loop from end to the first non white space or 0
   uint8_t* source_ptr = az_span_ptr(source);
   int32_t source_size = az_span_size(source);
-  for (int32_t index = source_size - 1; index >= 0;)
+  for (int32_t index = source_size; index >= 0;)
   {
     --index;
     if (!_az_is_white_space(source_ptr[index]))
     {
-      return az_span_slice(source, 0, index); // slice from start to index
+      // slice from start to index plus 1 as slice end_index is inclusive
+      return az_span_slice(source, 0, index + 1);
     }
   }
   // reaching here means it was all white spaces
