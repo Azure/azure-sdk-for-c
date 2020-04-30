@@ -366,7 +366,7 @@ typedef struct az_iot_hub_client_c2d_request
  * @param[out] out_request If the message is a C2D request, this will contain the
  *                         #az_iot_hub_client_c2d_request
  * @return #az_result
- *         - #AZ_ERROR_IOT_TOPIC_NO_MATCH if the topic is not matching the expected format.
+ *         - `AZ_ERROR_IOT_TOPIC_NO_MATCH` if the topic is not matching the expected format.
  */
 AZ_NODISCARD az_result az_iot_hub_client_c2d_parse_received_topic(
     az_iot_hub_client const* client,
@@ -416,7 +416,7 @@ typedef struct az_iot_hub_client_method_request
  * @param[out] out_request If the message is a method request, this will contain the
  *                         #az_iot_hub_client_method_request.
  * @return #az_result
- *         - #AZ_ERROR_IOT_TOPIC_NO_MATCH if the topic is not matching the expected format.
+ *         - `AZ_ERROR_IOT_TOPIC_NO_MATCH` if the topic is not matching the expected format.
  */
 AZ_NODISCARD az_result az_iot_hub_client_methods_parse_received_topic(
     az_iot_hub_client const* client,
@@ -525,7 +525,7 @@ typedef struct az_iot_hub_client_twin_response
  * @param[out] out_twin_response If the message is twin-operation related, this will contain the
  *                         #az_iot_hub_client_twin_response.
  * @return #az_result
- *         - #AZ_ERROR_IOT_TOPIC_NO_MATCH if the topic is not matching the expected format.
+ *         - `AZ_ERROR_IOT_TOPIC_NO_MATCH` if the topic is not matching the expected format.
  */
 AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
     az_iot_hub_client const* client,

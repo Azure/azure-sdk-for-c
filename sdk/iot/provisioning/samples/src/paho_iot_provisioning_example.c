@@ -347,7 +347,7 @@ static int get_operation_status()
     MQTTClient_freeMessage(&message);
     MQTTClient_free(topic);
   }
-  
+
   return 0;
 }
 

@@ -159,7 +159,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_signature(
  * @param[in] client The #az_iot_provisioning_client to use for this call.
  * @param[in] base64_hmac_sha256_signature The Base64 encoded value of the HMAC-SHA256(signature,
  *                                         SharedAccessKey). The signature is obtained by using
- *                                         #az_iot_hub_client_sas_signature_get.
+ *                                         #az_iot_provisioning_client_sas_get_signature.
  * @param[in] token_expiration_epoch_time The time, in seconds, from 1/1/1970.
  * @param[in] key_name The Shared Access Key Name (Policy Name). This is optional. For security
  *                     reasons we recommend using one key per device instead of using a global
@@ -259,7 +259,7 @@ typedef struct az_iot_provisioning_client_register_response
  * @param[out] out_response If the message is register-operation related, this will contain the
  *                          #az_iot_provisioning_client_register_response.
  * @return #az_result
- *         - #AZ_ERROR_IOT_TOPIC_NO_MATCH if the topic is not matching the expected format.
+ *         - `AZ_ERROR_IOT_TOPIC_NO_MATCH` if the topic is not matching the expected format.
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_parse_received_topic_and_payload(
     az_iot_provisioning_client const* client,

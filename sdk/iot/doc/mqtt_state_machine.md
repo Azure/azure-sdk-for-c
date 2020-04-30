@@ -61,7 +61,7 @@ if(az_failed(az_iot_hub_client_sas_get_signature(client, unix_time + 3600, signa
     // error.
 }
 
-// Base64Encode the HMAC256 of the az_span_ptr(signature)/az_span_len(signature) with the Shared Access Key.
+// Application will Base64Encode the HMAC256 of the az_span_ptr(signature) containing az_span_size(signature) bytes with the Shared Access Key.
 
 if(az_failed(az_iot_hub_client_sas_get_password(client, base64_hmac_sha256_signature, NULL, password, password_size, &password_length)))
 {
@@ -92,7 +92,7 @@ if(az_failed(az_iot_hub_client_c2d_get_subscribe_topic_filter(client, topic, top
 }
 ```
 
-_Note:_ If the MQTT stack allows, it is recommended to subscribe prior to connecting.
+__Note:__ If the MQTT stack allows, it is recommended to subscribe prior to connecting.
 
 ### Sending APIs
 
