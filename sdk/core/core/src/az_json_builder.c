@@ -28,6 +28,8 @@ enum
 
 static AZ_NODISCARD az_span _get_remaining_span(az_json_builder* json_builder)
 {
+  _az_PRECONDITION_NOT_NULL(json_builder);
+
   return az_span_slice_to_end(
       json_builder->_internal.destination_buffer, json_builder->_internal.bytes_written);
 }
@@ -35,6 +37,8 @@ static AZ_NODISCARD az_span _get_remaining_span(az_json_builder* json_builder)
 // TODO: Make this a precondition?
 static AZ_NODISCARD bool _az_is_appending_value_valid(az_json_builder* json_builder)
 {
+  _az_PRECONDITION_NOT_NULL(json_builder);
+
   az_json_token_kind kind = json_builder->_internal.token_kind;
 
   if (_az_json_stack_peek(&json_builder->_internal.bit_stack))
@@ -77,6 +81,8 @@ static AZ_NODISCARD bool _az_is_appending_value_valid(az_json_builder* json_buil
 // TODO: Make this a precondition?
 static AZ_NODISCARD bool _az_is_appending_property_name_valid(az_json_builder* json_builder)
 {
+  _az_PRECONDITION_NOT_NULL(json_builder);
+
   az_json_token_kind kind = json_builder->_internal.token_kind;
 
   // Cannot write a JSON property within an array or as the first JSON token.
@@ -95,10 +101,13 @@ static AZ_NODISCARD bool _az_is_appending_property_name_valid(az_json_builder* j
 // TODO: Make this a precondition?
 static AZ_NODISCARD bool _az_is_appending_container_end_valid(az_json_builder* json_builder)
 {
+  _az_PRECONDITION_NOT_NULL(json_builder);
+
   az_json_token_kind kind = json_builder->_internal.token_kind;
 
   // Cannot write an end of a container without a matching start.
-  // This includes writing the end token as the first token in the JSON or right after a property name.
+  // This includes writing the end token as the first token in the JSON or right after a property
+  // name.
   if (json_builder->_internal.bit_stack._internal.current_depth <= 0
       || kind == AZ_JSON_TOKEN_PROPERTY_NAME)
   {
@@ -109,7 +118,7 @@ static AZ_NODISCARD bool _az_is_appending_container_end_valid(az_json_builder* j
   return true;
 }
 
-static AZ_NODISCARD int32_t
+AZ_NODISCARD int32_t
 _az_json_builder_escaped_length(az_span value, int32_t* out_index_of_first_escaped_char)
 {
   _az_PRECONDITION_NOT_NULL(out_index_of_first_escaped_char);
@@ -181,7 +190,7 @@ _az_json_builder_escaped_length(az_span value, int32_t* out_index_of_first_escap
   return escaped_length;
 }
 
-static AZ_NODISCARD az_span _az_json_builder_escape_and_copy(az_span destination, az_span source)
+AZ_NODISCARD az_span _az_json_builder_escape_and_copy(az_span destination, az_span source)
 {
   _az_PRECONDITION_VALID_SPAN(source, 1, false);
 
@@ -520,44 +529,7 @@ az_json_builder_append_int32_number(az_json_builder* json_builder, int32_t value
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result
-az_json_builder_append_int64_number(az_json_builder* json_builder, int64_t value)
-{
-  _az_PRECONDITION_NOT_NULL(json_builder);
-
-  if (!_az_is_appending_value_valid(json_builder))
-  {
-    return AZ_ERROR_JSON_INVALID_STATE;
-  }
-
-  az_span remaining_json = _get_remaining_span(json_builder);
-
-  int32_t required_size = 1; // Need space to write at least one digit.
-
-  if (json_builder->_internal.need_comma)
-  {
-    required_size++; // For the leading comma separator.
-  }
-
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(remaining_json, required_size);
-
-  if (json_builder->_internal.need_comma)
-  {
-    remaining_json = az_span_copy_u8(remaining_json, ',');
-  }
-
-  az_span leftover;
-  AZ_RETURN_IF_FAILED(az_span_i64toa(remaining_json, value, &leftover));
-
-  // We already accounted for the first digit above, so therefore subtract one.
-  json_builder->_internal.bytes_written
-      += required_size + _az_span_diff(leftover, remaining_json) - 1;
-  json_builder->_internal.need_comma = true;
-  json_builder->_internal.token_kind = AZ_JSON_TOKEN_NUMBER;
-  return AZ_OK;
-}
-
-static AZ_NODISCARD az_result _az_json_builder_append_container_start(
+AZ_NODISCARD az_result _az_json_builder_append_container_start(
     az_json_builder* json_builder,
     uint8_t byte,
     az_json_token_kind container_kind)

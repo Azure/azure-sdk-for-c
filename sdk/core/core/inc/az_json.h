@@ -287,7 +287,7 @@ AZ_NODISCARD AZ_INLINE az_result az_json_builder_init(
  */
 AZ_NODISCARD AZ_INLINE az_span az_json_builder_get_json(az_json_builder const* json_builder)
 {
-  // TODO: Consider precondition validation before returning.
+  // TODO: Consider precondition validation of the state before returning.
   return az_span_slice(
       json_builder->_internal.destination_buffer, 0, json_builder->_internal.bytes_written);
 }
@@ -366,21 +366,6 @@ AZ_NODISCARD az_result az_json_builder_append_number(az_json_builder* json_build
  */
 AZ_NODISCARD az_result
 az_json_builder_append_int32_number(az_json_builder* json_builder, int32_t value);
-
-// TODO: Remove
-/*
- * @brief Appends an int64_t number value.
- *
- * @param[in] json_builder A pointer to an #az_json_builder instance containing the buffer to append
- * the number to.
- * @param[in] value The value to be written as a JSON number.
- *
- * @return An #az_result value indicating the result of the operation:
- *         - #AZ_OK if the number was appended successfully
- *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the buffer is too small
- */
-AZ_NODISCARD az_result
-az_json_builder_append_int64_number(az_json_builder* json_builder, int64_t value);
 
 /*
  * @brief Appends the JSON literal `null`.
