@@ -112,8 +112,8 @@ AZ_NODISCARD az_result az_http_response_get_status_line(
     az_http_response* response,
     az_http_response_status_line* out_status_line)
 {
-  AZ_PRECONDITION_NOT_NULL(response);
-  AZ_PRECONDITION_NOT_NULL(out_status_line);
+  _az_PRECONDITION_NOT_NULL(response);
+  _az_PRECONDITION_NOT_NULL(out_status_line);
 
   // Restart parser to the beggining
   response->_internal.parser.remaining = response->_internal.http_response;
@@ -131,8 +131,8 @@ AZ_NODISCARD az_result az_http_response_get_status_line(
 AZ_NODISCARD az_result
 az_http_response_get_next_header(az_http_response* response, az_pair* out_header)
 {
-  AZ_PRECONDITION_NOT_NULL(response);
-  AZ_PRECONDITION_NOT_NULL(out_header);
+  _az_PRECONDITION_NOT_NULL(response);
+  _az_PRECONDITION_NOT_NULL(out_header);
   az_span* reader = &response->_internal.parser.remaining;
   {
     _az_http_response_kind const kind = response->_internal.parser.next_kind;
@@ -225,8 +225,8 @@ az_http_response_get_next_header(az_http_response* response, az_pair* out_header
 
 AZ_NODISCARD az_result az_http_response_get_body(az_http_response* response, az_span* out_body)
 {
-  AZ_PRECONDITION_NOT_NULL(response);
-  AZ_PRECONDITION_NOT_NULL(out_body);
+  _az_PRECONDITION_NOT_NULL(response);
+  _az_PRECONDITION_NOT_NULL(out_body);
 
   // Make sure get body works no matter where is the current parsing. Allow users to call get body
   // directly and ignore headers and status line

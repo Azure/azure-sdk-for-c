@@ -16,6 +16,8 @@
 #include <az_test_precondition.h>
 #include <cmocka.h>
 
+#define TEST_SPAN_BUFFER_SIZE 128
+
 // PnP Client
 #define TEST_DEVICE_ID_STR "my_device"
 #define TEST_DEVICE_HOSTNAME_STR "myiothub.azure-devices.net"
@@ -39,7 +41,7 @@ static const char test_correct_pnp_user_name_with_user_agent[]
     = "myiothub.azure-devices.net/my_device/?api-version=2018-06-30&" TEST_USER_AGENT
       "&digital-twin-model-id=" TEST_ROOT_INTERFACE_NAME;
 
-#ifndef NO_PRECONDITION_CHECKING
+#ifndef AZ_NO_PRECONDITION_CHECKING
 enable_precondition_check_tests()
 
 static void test_az_iot_pnp_client_init_NULL_client_fails(void** state)
@@ -77,7 +79,7 @@ static void test_az_iot_pnp_client_init_empty_root_interface_name_fails(void** s
       az_iot_pnp_client_init(&client, test_device_hostname, test_device_id, AZ_SPAN_NULL, NULL));
 }
 
-#endif // NO_PRECONDITION_CHECKING
+#endif // AZ_NO_PRECONDITION_CHECKING
 
 static void test_az_iot_pnp_client_get_default_options_succeed(void** state)
 {
@@ -137,15 +139,14 @@ static void test_az_iot_pnp_client_get_user_name_succeed(void** state)
           &client, test_device_hostname, test_device_id, test_root_interface_name, NULL),
       AZ_OK);
 
-  uint8_t test_span_buffer[_az_COUNTOF(test_correct_pnp_user_name) - 1];
-  az_span test_span = az_span_init(test_span_buffer, _az_COUNTOF(test_span_buffer));
-  assert_int_equal(az_iot_pnp_client_get_user_name(&client, test_span, &test_span), AZ_OK);
-
-  assert_int_equal(az_span_size(test_span), _az_COUNTOF(test_correct_pnp_user_name) - 1);
-  assert_memory_equal(
-      test_correct_pnp_user_name,
-      az_span_ptr(test_span),
-      _az_COUNTOF(test_correct_pnp_user_name) - 1);
+  char test_buf[TEST_SPAN_BUFFER_SIZE];
+  size_t test_length;
+  assert_int_equal(
+      az_iot_pnp_client_get_user_name(
+          &client, test_buf, sizeof(test_buf), &test_length),
+      AZ_OK);
+  assert_string_equal(test_correct_pnp_user_name, test_buf);
+  assert_int_equal(sizeof(test_correct_pnp_user_name) - 1, test_length);
 }
 
 static void test_az_iot_pnp_client_get_user_name_small_buffer_fail(void** state)
@@ -158,10 +159,12 @@ static void test_az_iot_pnp_client_get_user_name_small_buffer_fail(void** state)
           &client, test_device_hostname, test_device_id, test_root_interface_name, NULL),
       AZ_OK);
 
-  uint8_t test_span_buffer[_az_COUNTOF(test_correct_pnp_user_name) - 2];
-  az_span test_span = az_span_init(test_span_buffer, _az_COUNTOF(test_span_buffer));
+  char test_buf[_az_COUNTOF(test_correct_pnp_user_name) - 2];
+  size_t test_length;
+
   assert_int_equal(
-      az_iot_pnp_client_get_user_name(&client, test_span, &test_span),
+      az_iot_pnp_client_get_user_name(
+          &client, test_buf, sizeof(test_buf), &test_length),
       AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
 }
 
@@ -180,16 +183,14 @@ static void test_az_iot_pnp_client_get_user_name_user_options_succeed(void** sta
           &client, test_device_hostname, test_device_id, test_root_interface_name, &options),
       AZ_OK);
 
-  uint8_t test_span_buffer[_az_COUNTOF(test_correct_pnp_user_name_with_user_agent) - 1];
-  az_span test_span = az_span_init(test_span_buffer, _az_COUNTOF(test_span_buffer));
-  assert_int_equal(az_iot_pnp_client_get_user_name(&client, test_span, &test_span), AZ_OK);
-
+  char test_buf[TEST_SPAN_BUFFER_SIZE];
+  size_t test_length;
   assert_int_equal(
-      az_span_size(test_span), _az_COUNTOF(test_correct_pnp_user_name_with_user_agent) - 1);
-  assert_memory_equal(
-      test_correct_pnp_user_name_with_user_agent,
-      az_span_ptr(test_span),
-      _az_COUNTOF(test_correct_pnp_user_name_with_user_agent) - 1);
+      az_iot_pnp_client_get_user_name(
+          &client, test_buf, sizeof(test_buf), &test_length),
+      AZ_OK);
+  assert_string_equal(test_correct_pnp_user_name_with_user_agent, test_buf);
+  assert_int_equal(sizeof(test_correct_pnp_user_name_with_user_agent) - 1, test_length);
 }
 
 static void test_az_iot_pnp_client_get_user_name_user_options_small_buffer_fail(void** state)
@@ -207,30 +208,31 @@ static void test_az_iot_pnp_client_get_user_name_user_options_small_buffer_fail(
           &client, test_device_hostname, test_device_id, test_root_interface_name, &options),
       AZ_OK);
 
-  uint8_t test_span_buffer[_az_COUNTOF(test_correct_pnp_user_name_with_user_agent) - 2];
-  az_span test_span = az_span_init(test_span_buffer, _az_COUNTOF(test_span_buffer));
+  char test_buf[_az_COUNTOF(test_correct_pnp_user_name_with_user_agent) - 2];
+  size_t test_length;
   assert_int_equal(
-      az_iot_pnp_client_get_user_name(&client, test_span, &test_span),
+      az_iot_pnp_client_get_user_name(
+          &client, test_buf, sizeof(test_buf), &test_length),
       AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
 }
 
-// TODO: Add tests for inline functions (e.g. az_iot_pnp_client_get_id).  Will add them prior to
+// TODO: Add tests for inline functions (e.g. az_iot_pnp_client_get_client_id).  Will add them prior to
 // merge if guidance is available.  Otherwise will open separate GitHub bug to not block merge
 // and record number here.
 
 int test_iot_pnp_client()
 {
-#ifndef NO_PRECONDITION_CHECKING
+#ifndef AZ_NO_PRECONDITION_CHECKING
   setup_precondition_check_tests();
-#endif // NO_PRECONDITION_CHECKING
+#endif // AZ_NO_PRECONDITION_CHECKING
 
   const struct CMUnitTest tests[] = {
-#ifndef NO_PRECONDITION_CHECKING
+#ifndef AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_az_iot_pnp_client_init_NULL_client_fails),
     cmocka_unit_test(test_az_iot_pnp_client_init_empty_iot_hub_hostname_fails),
     cmocka_unit_test(test_az_iot_pnp_client_init_empty_device_id_fails),
     cmocka_unit_test(test_az_iot_pnp_client_init_empty_root_interface_name_fails),
-#endif // NO_PRECONDITION_CHECKING
+#endif // AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_az_iot_pnp_client_get_default_options_succeed),
     cmocka_unit_test(test_az_iot_pnp_client_init_succeed),
     cmocka_unit_test(test_az_iot_pnp_client_init_custom_options_succeed),

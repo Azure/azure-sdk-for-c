@@ -38,6 +38,9 @@ AZ_NODISCARD bool _az_token_expired(_az_token const* token);
 
 AZ_NODISCARD az_result _az_token_set(_az_token* self, _az_token const* new_token);
 
+// This function is only exposed so it can be tested.
+AZ_NODISCARD az_result _az_url_encode(az_span source, az_span* ref_destination);
+
 #include <_az_cfg_suffix.h>
 
 #endif // _az_AAD_PRIVATE_H

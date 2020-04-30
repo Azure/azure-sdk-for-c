@@ -8,9 +8,10 @@ cmake_minimum_required (VERSION 3.10)
 project (az_curl LANGUAGES C)
 
 set(CMAKE_C_STANDARD 99)
-find_package(CURL CONFIG)
+set(CURL_MIN_REQUIRED_VERSION 7.1) #Min curl version to support CURLOPT_HTTPHEADER option
+find_package(CURL ${CURL_MIN_REQUIRED_VERSION} CONFIG) 
 if(NOT CURL_FOUND)
-  find_package(CURL REQUIRED)
+  find_package(CURL ${CURL_MIN_REQUIRED_VERSION} REQUIRED)
 endif()
 
 add_library (

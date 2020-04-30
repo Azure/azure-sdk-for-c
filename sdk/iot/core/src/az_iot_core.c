@@ -77,8 +77,8 @@ AZ_NODISCARD az_result az_iot_get_status_from_uint32(uint32_t status_int, az_iot
 
 AZ_NODISCARD az_span az_span_token(az_span source, az_span delimiter, az_span* out_remainder)
 {
-  AZ_PRECONDITION_VALID_SPAN(delimiter, 1, false);
-  AZ_PRECONDITION_NOT_NULL(out_remainder);
+  _az_PRECONDITION_VALID_SPAN(delimiter, 1, false);
+  _az_PRECONDITION_NOT_NULL(out_remainder);
 
   if (az_span_size(source) == 0)
   {
@@ -100,5 +100,25 @@ AZ_NODISCARD az_span az_span_token(az_span source, az_span delimiter, az_span* o
 
       return source;
     }
+  }
+}
+
+AZ_NODISCARD int32_t _az_iot_u32toa_size(uint32_t number)
+{
+  if (number == 0)
+  {
+    return 1;
+  }
+  else
+  {
+    uint32_t div = 1000000000;
+    int32_t digit_count = 10;
+    while (number / div == 0)
+    {
+      div /= 10;
+      digit_count--;
+    }
+
+    return digit_count; 
   }
 }

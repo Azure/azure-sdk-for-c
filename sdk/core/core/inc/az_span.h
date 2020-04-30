@@ -139,7 +139,7 @@ AZ_NODISCARD AZ_INLINE int32_t az_span_size(az_span span) { return span._interna
  * @param[in] size The number of total bytes in the byte buffer.
  * @return The "view" over the byte buffer.
  */
-#ifdef NO_PRECONDITION_CHECKING
+#ifdef AZ_NO_PRECONDITION_CHECKING
 // Note: If you are modifying this method, make sure to modify the non-inline version in the
 // az_span.c file as well.
 AZ_NODISCARD AZ_INLINE az_span az_span_init(uint8_t* ptr, int32_t size)
@@ -148,7 +148,7 @@ AZ_NODISCARD AZ_INLINE az_span az_span_init(uint8_t* ptr, int32_t size)
 }
 #else
 AZ_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t size);
-#endif // NO_PRECONDITION_CHECKING
+#endif // AZ_NO_PRECONDITION_CHECKING
 
 /**
  * @brief Returns an #az_span from a 0-terminated array of bytes (chars).
@@ -252,6 +252,8 @@ AZ_NODISCARD int32_t az_span_find(az_span source, az_span target);
  * @remarks The method assumes that the \p destination has a large enough size to hold the \p
  * source.
  * @remarks This method copies all of \p source into the \p destination even if they overlap.
+ * @remarks If \p source is an empty #az_span or #AZ_SPAN_NULL, this function will just return
+ * \p destination.
  */
 az_span az_span_copy(az_span destination, az_span source);
 

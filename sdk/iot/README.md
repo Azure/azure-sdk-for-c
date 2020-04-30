@@ -16,7 +16,7 @@ TBD
 
 To use IoT Hub connectivity, the first action by a developer should be to initialize the
 client with the `az_iot_hub_client_init()` API. Once that is initialized, you may use the
-`az_iot_hub_client_user_name_get()` and `az_iot_hub_client_client_id_get()` to get the
+`az_iot_hub_client_get_user_name()` and `az_iot_hub_client_get_client_id()` to get the
 user name and client id to establish a connection with IoT Hub.
 
 An example use case is below.
@@ -29,12 +29,12 @@ static az_span my_iothub_hostname = AZ_SPAN_LITERAL_FROM_STR("constoso.azure-dev
 static az_span my_device_id = AZ_SPAN_LITERAL_FROM_STR("contoso_device");
 
 //Make sure to size the buffer to fit the user name (100 is an example)
-static uint8_t my_mqtt_user_name_buffer[100];
-static az_span my_mqtt_user_name = AZ_SPAN_LITERAL_FROM_BUFFER(my_mqtt_user_name_buffer);
+static char my_mqtt_user_name[100];
+static size_t my_mqtt_user_name_length;
 
 //Make sure to size the buffer to fit the client id (16 is an example)
-static uint8_t my_mqtt_client_id_buffer[16];
-static az_span my_mqtt_client_id = AZ_SPAN_LITERAL_FROM_BUFFER(my_mqtt_client_id_buffer);
+static char my_mqtt_client_id_buffer[16];
+static size_t my_mqtt_client_id_length;
 
 int main()
 {
@@ -45,10 +45,12 @@ int main()
   az_iot_hub_client_init(&my_client, my_iothub_hostname, my_device_id, &options);
 
   //Get the MQTT user name to connect
-  az_iot_hub_client_user_name_get(&my_client, my_mqtt_user_name, &my_mqtt_user_name)
+  az_iot_hub_client_get_user_name(&my_client, my_mqtt_user_name, 
+                sizeof(my_mqtt_user_name), &my_mqtt_user_name_length);
 
   //Get the MQTT client id to connect
-  az_iot_hub_client_client_id_get(&my_client, my_mqtt_client_id, &my_mqtt_client_id);
+  az_iot_hub_client_get_client_id(&my_client, my_mqtt_client_id, 
+                sizeof(my_mqtt_client_id), &my_mqtt_client_id_length);
 
   //At this point you are free to use my_mqtt_client_id and my_mqtt_user_name to connect using
   //your MQTT client.
@@ -94,7 +96,7 @@ void my_property_func()
 
 ### Telemetry
 
-Telemetry functionality can be achieved by sending a user payload to a specific topic. In order to get the appropriate topic to which to send, use the `az_iot_hub_client_telemetry_publish_topic_get()` API. An example use case is below.
+Telemetry functionality can be achieved by sending a user payload to a specific topic. In order to get the appropriate topic to which to send, use the `az_iot_hub_client_telemetry_get_publish_topic()` API. An example use case is below.
 
 ```C
 //FOR SIMPLICITY THIS DOES NOT HAVE ERROR CHECKING. IN PRODUCTION ENSURE PROPER ERROR CHECKING.
@@ -108,15 +110,13 @@ void my_telemetry_func()
   //Initialize the client to then pass to the telemetry API
   az_iot_hub_client_init(&my_client, my_iothub_hostname, my_device_id, NULL);
 
-  //Allocate a span with capacity large enough to put the telemetry topic.
-  //Optionally, the size can include space for a null terminator.
-  //Here, the buffer is zero initialized to null terminate the topic.
-  uint8_t telemetry_topic_buffer[64] = { 0 };
-  az_span topic_span = az_span_init(telemetry_topic_buffer,
-                sizeof(telemetry_topic_buffer) / sizeof(telemetry_topic_buffer[0]));
+  //Allocate a char buffer with capacity large enough to put the telemetry topic.
+  char telemetry_topic[64];
+  size_t telemetry_topic_length;
 
-  //Get the NULL terminated topic and put in topic_span to send the telemetry
-  az_iot_hub_client_telemetry_publish_topic_get(&my_client, NULL, topic_span, &topic_span);
+  //Get the NULL terminated topic and put in telemetry_topic to send the telemetry
+  az_iot_hub_client_telemetry_get_publish_topic(&my_client, NULL, telemetry_topic, 
+                                    sizeof(telemetry_topic), &telemetry_topic_length);
 }
 ```
 

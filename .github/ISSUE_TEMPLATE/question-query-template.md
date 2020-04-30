@@ -1,7 +1,7 @@
 ---
 name: Question/Query template
 about: Use this template to file a question/query for the SDK team
-title: "[QUERY]"
+title: ""
 labels: ''
 assignees: ''
 
