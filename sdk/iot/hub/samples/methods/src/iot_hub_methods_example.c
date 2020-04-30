@@ -15,18 +15,18 @@
 #include <string.h>
 
 #include <az_iot_hub_client.h>
+#include <az_json.h>
 #include <az_result.h>
 #include <az_span.h>
-#include <az_json.h>
 
 // TODO: #564 - Remove the use of the _az_cfh.h header in samples.
 //              Note: this is required to work-around MQTTClient.h as well as az_span init issues.
 #include <_az_cfg.h>
 
-//Device ID
+// Device ID
 #define DEVICE_ID "AZ_IOT_DEVICE_ID"
 
-//IoT Hub FQDN
+// IoT Hub FQDN
 #define IOT_HUB_FQDN "AZ_IOT_HUB_FQDN"
 
 // AZ_IOT_DEVICE_X509_CERT_PEM_FILE is the path to a PEM file containing the device certificate and
@@ -91,7 +91,8 @@ static az_result read_configuration_entry(
 static az_result create_mqtt_endpoint(char* destination, int32_t size, az_span iot_hub)
 {
   int32_t iot_hub_length = (int32_t)strlen(iot_hub_fqdn);
-  int32_t required_size = az_span_size(mqtt_url_prefix) + iot_hub_length + az_span_size(mqtt_url_suffix);
+  int32_t required_size
+      = az_span_size(mqtt_url_prefix) + iot_hub_length + az_span_size(mqtt_url_suffix);
   if (required_size > size)
   {
     return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
@@ -144,7 +145,7 @@ static az_result parse_value_to_double(az_span payload, int64_t* value)
   az_json_token json_token;
   az_json_token_member json_token_member;
   double double_value;
-  while (result != AZ_OK)
+  do
   {
     result = az_json_parser_parse_token(&json_parser, &json_token);
 
@@ -158,7 +159,7 @@ static az_result parse_value_to_double(az_span payload, int64_t* value)
         break;
       }
     }
-  }
+  } while (result != AZ_OK);
   return result;
 }
 
@@ -166,7 +167,7 @@ static const az_span double_method_span = AZ_SPAN_LITERAL_FROM_STR("double");
 static az_result double_method(int64_t in, int64_t* out)
 {
   printf("Invoking double method\n");
-  if((in > INT64_MAX / 2) || in < INT64_MIN / 2)
+  if ((in > INT64_MAX / 2) || in < INT64_MIN / 2)
   {
     return AZ_ERROR_ARG;
   }
@@ -174,11 +175,14 @@ static az_result double_method(int64_t in, int64_t* out)
   return AZ_OK;
 }
 
-static az_result send_method_response(az_iot_hub_client_method_request* request, uint16_t status, int64_t return_value)
+static az_result send_method_response(
+    az_iot_hub_client_method_request* request,
+    uint16_t status,
+    int64_t return_value)
 {
   az_result result;
 
-  //Get the response topic
+  // Get the response topic
   char methods_response_topic[128];
   if ((result = az_iot_hub_client_methods_response_get_publish_topic(
            &client,
@@ -220,7 +224,7 @@ static az_result send_method_response(az_iot_hub_client_method_request* request,
   }
   putchar('\n');
 
-  //Send the response
+  // Send the response
   if ((result = MQTTClient_publish(
            mqtt_client,
            methods_response_topic,
@@ -256,36 +260,42 @@ static int on_received(void* context, char* topicName, int topicLen, MQTTClient_
           &client, az_span_init((uint8_t*)topicName, topicLen), &method_request)
       == AZ_OK)
   {
+    az_result result;
+
     printf("Direct Method arrived\n");
-    if(az_span_is_content_equal(double_method_span, method_request.name))
+    if (az_span_is_content_equal(double_method_span, method_request.name))
     {
-      //Get payload value
+      // Get payload value
       az_span payload_span = az_span_init((uint8_t*)message->payload, message->payloadlen);
       int64_t value_to_double;
-      if(parse_value_to_double(payload_span, &value_to_double) != AZ_OK)
+      if ((result = parse_value_to_double(payload_span, &value_to_double)) != AZ_OK)
       {
-        //Error
+        printf("Unable to parse input value, status %d", result);
+        return result;
       }
 
-      //Invoke Method
+      // Invoke Method
       int64_t return_value;
-      if(double_method(value_to_double, &return_value) == AZ_ERROR_ARG)
+      if ((result = double_method(value_to_double, &return_value)) == AZ_ERROR_ARG)
       {
-        //Error
+        printf("Unable to invoke double_method, status %d", result);
+        return result;
       }
 
-      //Build a response
-      if(send_method_response(&method_request, 200, return_value) != AZ_OK)
+      // Build a response
+      if ((result = send_method_response(&method_request, 200, return_value)) != AZ_OK)
       {
-        //Error
+        printf("Unable to send %d response, status %d", 200, result);
+        return result;
       }
     }
     else
     {
       // Unsupported Method
-      if (send_method_response(&method_request, 404, 0xDEAD) != AZ_OK)
+      if ((result = send_method_response(&method_request, 404, 0xFFFF)) != AZ_OK)
       {
-        // Error
+        printf("Unable to send %d response, status %d", 404, result);
+        return result;
       }
     }
   }
@@ -339,8 +349,8 @@ static int subscribe()
 
   char c2d_topic[128];
   size_t c2d_topic_length;
-  if ((rc
-       = az_iot_hub_client_methods_get_subscribe_topic_filter(&client, c2d_topic, sizeof(c2d_topic), &c2d_topic_length))
+  if ((rc = az_iot_hub_client_methods_get_subscribe_topic_filter(
+           &client, c2d_topic, sizeof(c2d_topic), &c2d_topic_length))
       != AZ_OK)
 
   {
@@ -369,7 +379,9 @@ int main()
 
   char client_id[128];
   size_t client_id_length;
-  if ((rc = az_iot_hub_client_get_client_id(&client, client_id, sizeof(client_id), &client_id_length)) != AZ_OK)
+  if ((rc
+       = az_iot_hub_client_get_client_id(&client, client_id, sizeof(client_id), &client_id_length))
+      != AZ_OK)
   {
     printf("Failed to get MQTT clientId, return code %d\n", rc);
     return rc;
