@@ -212,7 +212,7 @@ static void test_az_iot_hub_client_c2d_parse_received_topic_no_props_succeed(voi
       AZ_OK);
 }
 
-static void test_az_iot_hub_client_c2d_parse_received_topic_fail(void** state)
+static void test_az_iot_hub_client_c2d_parse_received_topic_reject(void** state)
 {
   (void)state;
 
@@ -230,7 +230,7 @@ static void test_az_iot_hub_client_c2d_parse_received_topic_fail(void** state)
       AZ_ERROR_IOT_TOPIC_NO_MATCH);
 }
 
-static void test_az_iot_hub_client_c2d_parse_received_topic_malformed_fail(void** state)
+static void test_az_iot_hub_client_c2d_parse_received_topic_malformed_reject(void** state)
 {
   (void)state;
 
@@ -266,8 +266,8 @@ int test_iot_hub_c2d()
     cmocka_unit_test(test_az_iot_hub_client_c2d_parse_received_topic_url_decoded_succeed),
     cmocka_unit_test(test_az_iot_hub_client_c2d_parse_received_topic_url_encoded_succeed),
     cmocka_unit_test(test_az_iot_hub_client_c2d_parse_received_topic_no_props_succeed),
-    cmocka_unit_test(test_az_iot_hub_client_c2d_parse_received_topic_fail),
-    cmocka_unit_test(test_az_iot_hub_client_c2d_parse_received_topic_malformed_fail),
+    cmocka_unit_test(test_az_iot_hub_client_c2d_parse_received_topic_reject),
+    cmocka_unit_test(test_az_iot_hub_client_c2d_parse_received_topic_malformed_reject),
   };
   return cmocka_run_group_tests_name("az_iot_hub_c2d", tests, NULL, NULL);
 }
