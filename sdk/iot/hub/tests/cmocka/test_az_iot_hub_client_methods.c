@@ -27,7 +27,7 @@ static const az_span test_device_hostname = AZ_SPAN_LITERAL_FROM_STR(TEST_DEVICE
 static const az_span test_device_id = AZ_SPAN_LITERAL_FROM_STR(TEST_DEVICE_ID_STR);
 static uint8_t g_expected_methods_subscribe_topic[] = "$iothub/methods/POST/#";
 
-#ifndef NO_PRECONDITION_CHECKING
+#ifndef AZ_NO_PRECONDITION_CHECKING
 enable_precondition_check_tests()
 
 static void test_az_iot_hub_client_methods_get_subscribe_topic_filter_NULL_client_fail(void** state)
@@ -213,7 +213,7 @@ static void test_az_iot_hub_client_methods_parse_received_topic_NULL_out_request
       az_iot_hub_client_methods_parse_received_topic(&client, received_topic, NULL));
 }
 
-#endif // NO_PRECONDITION_CHECKING
+#endif // AZ_NO_PRECONDITION_CHECKING
 
 static void test_az_iot_hub_client_methods_get_subscribe_topic_filter_succeed(void** state)
 {
@@ -447,12 +447,12 @@ static void test_az_iot_hub_client_methods_parse_received_topic_response_topic_f
 
 int test_iot_hub_methods()
 {
-#ifndef NO_PRECONDITION_CHECKING
+#ifndef AZ_NO_PRECONDITION_CHECKING
   setup_precondition_check_tests();
-#endif // NO_PRECONDITION_CHECKING
+#endif // AZ_NO_PRECONDITION_CHECKING
 
   const struct CMUnitTest tests[] = {
-#ifndef NO_PRECONDITION_CHECKING
+#ifndef AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_az_iot_hub_client_methods_get_subscribe_topic_filter_NULL_client_fail),
     cmocka_unit_test(test_az_iot_hub_client_methods_get_subscribe_topic_filter_NULL_out_topic_fail),
     cmocka_unit_test(test_az_iot_hub_client_methods_get_subscribe_topic_filter_empty_topic_fail),
@@ -469,7 +469,7 @@ int test_iot_hub_methods()
     cmocka_unit_test(
         test_az_iot_hub_client_methods_parse_received_topic_AZ_SPAN_NULL_received_topic_fail),
     cmocka_unit_test(test_az_iot_hub_client_methods_parse_received_topic_NULL_out_request_fail),
-#endif // NO_PRECONDITION_CHECKING
+#endif // AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_az_iot_hub_client_methods_get_subscribe_topic_filter_succeed),
     cmocka_unit_test(
         test_az_iot_hub_client_methods_get_subscribe_topic_filter_INSUFFICIENT_BUFFER_fail),

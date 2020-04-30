@@ -12,9 +12,9 @@ AZ_NODISCARD az_result az_http_pipeline_process(
     _az_http_request* p_request,
     az_http_response* p_response)
 {
-  AZ_PRECONDITION_NOT_NULL(p_request);
-  AZ_PRECONDITION_NOT_NULL(p_response);
-  AZ_PRECONDITION_NOT_NULL(pipeline);
+  _az_PRECONDITION_NOT_NULL(p_request);
+  _az_PRECONDITION_NOT_NULL(p_response);
+  _az_PRECONDITION_NOT_NULL(pipeline);
 
   return pipeline->_internal.p_policies[0]._internal.process(
       &(pipeline->_internal.p_policies[1]),
