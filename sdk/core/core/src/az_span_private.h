@@ -36,12 +36,11 @@ _az_span_scan_until(az_span self, _az_predicate predicate, int32_t* out_index);
 AZ_NODISCARD az_result _az_is_expected_span(az_span* self, az_span expected);
 
 /**
- * @brief Removes any white space from right and left of \p span. Function will create a new
- * #az_span poiniting to the first non-white-space (` `, \\n, \\r, \\t) found in \p span and up to
- * the last non-white-space char.
+ * @brief Removes all leading and trailing white space characters from the \p span. Function will create a new
+ * #az_span pointing to the first non-white-space (` `, \\n, \\r, \\t) character found in \p span and up to
+ * the last non-white-space character.
  *
- * @remarks If \p span is full of non-white-space characters, this function will retrun an az_span
- * of size 0.
+ * @remarks If \p span is full of non-white-space characters, this function will return an empty #az_span slice.
  *
  * Example:
  * \code{.c}
@@ -51,7 +50,7 @@ AZ_NODISCARD az_result _az_is_expected_span(az_span* self, az_span expected);
  * \endcode
  *
  * @param[in] source #az_span pointing to a memory address that might contain white spaces.
- * @return AZ_NODISCARD _az_span_trim_white_space.
+ * @return The trimmed #az_span.
  */
 AZ_NODISCARD az_span _az_span_trim_white_space(az_span source);
 

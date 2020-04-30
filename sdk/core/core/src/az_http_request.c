@@ -148,7 +148,7 @@ az_http_request_append_header(_az_http_request* p_request, az_span key, az_span 
 {
   _az_PRECONDITION_NOT_NULL(p_request);
 
-  // remove white spaces from kay and value
+  // remove white spaces from key and value
   key = _az_span_trim_white_space(key);
   value = _az_span_trim_white_space(value);
 
