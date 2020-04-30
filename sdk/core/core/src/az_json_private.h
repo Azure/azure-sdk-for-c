@@ -22,7 +22,7 @@ typedef enum
 
 AZ_INLINE _az_json_stack_item _az_json_stack_pop(_az_json_bit_stack* json_stack)
 {
-  AZ_PRECONDITION(
+  _az_PRECONDITION(
       json_stack->_internal.current_depth > 0
       && json_stack->_internal.current_depth <= _az_MAX_JSON_STACK_SIZE);
 
@@ -42,7 +42,7 @@ AZ_INLINE _az_json_stack_item _az_json_stack_pop(_az_json_bit_stack* json_stack)
 
 AZ_INLINE void _az_json_stack_push(_az_json_bit_stack* json_stack, _az_json_stack_item item)
 {
-  AZ_PRECONDITION(
+  _az_PRECONDITION(
       json_stack->_internal.current_depth >= 0
       && json_stack->_internal.current_depth < _az_MAX_JSON_STACK_SIZE);
 
@@ -53,7 +53,7 @@ AZ_INLINE void _az_json_stack_push(_az_json_bit_stack* json_stack, _az_json_stac
 
 AZ_NODISCARD AZ_INLINE _az_json_stack_item _az_json_stack_peek(_az_json_bit_stack const* json_stack)
 {
-  AZ_PRECONDITION(
+  _az_PRECONDITION(
       json_stack->_internal.current_depth >= 0
       && json_stack->_internal.current_depth <= _az_MAX_JSON_STACK_SIZE);
 
