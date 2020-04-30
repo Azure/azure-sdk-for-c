@@ -193,7 +193,6 @@ az_result send_request(_az_http_request* request, az_http_response* response)
     if (attempt == 1)
     {
       response->_internal.http_response = AZ_SPAN_FROM_STR("HTTP/1.1 200 OK\r\n\r\nResponse1");
-      first_attempt = false;
     }
     else if (attempt == 2)
     {
