@@ -783,7 +783,7 @@ static void az_span_trim_right(void** state)
 static void az_span_trim_all_white(void** state)
 {
   (void)state;
-  az_span source = _az_span_trim_white_space(AZ_SPAN_FROM_STR("       "));
+  az_span source = _az_span_trim_white_space(AZ_SPAN_FROM_STR("\t\n\r       "));
   assert_int_equal(az_span_size(source), 0);
 }
 
@@ -797,8 +797,22 @@ static void az_span_trim_none(void** state)
 static void az_span_trim_spaced(void** state)
 {
   (void)state;
-  az_span source = _az_span_trim_white_space(AZ_SPAN_FROM_STR(" a  b     c    "));
-  assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("a  b     c")));
+  az_span source = _az_span_trim_white_space(AZ_SPAN_FROM_STR("\ta\n b     c    "));
+  assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("a\n b     c")));
+}
+
+static void az_span_trim_zero(void** state)
+{
+  (void)state;
+  az_span source = _az_span_trim_white_space(AZ_SPAN_FROM_STR(""));
+  assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("")));
+}
+
+static void az_span_trim_null(void** state)
+{
+  (void)state;
+  az_span source = _az_span_trim_white_space(AZ_SPAN_NULL);
+  assert_int_equal(az_span_size(source), 0);
 }
 
 int test_az_span()
@@ -846,6 +860,8 @@ int test_az_span()
     cmocka_unit_test(az_span_trim_all_white),
     cmocka_unit_test(az_span_trim_none),
     cmocka_unit_test(az_span_trim_spaced),
+    cmocka_unit_test(az_span_trim_zero),
+    cmocka_unit_test(az_span_trim_null),
   };
   return cmocka_run_group_tests_name("az_core_span", tests, NULL, NULL);
 }
