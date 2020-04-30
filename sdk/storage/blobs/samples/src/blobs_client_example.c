@@ -100,11 +100,27 @@ int main()
   TEST_FAIL_ON_ERROR(create_result, "Failed to create blob");
 
   // 4) get response and parse it
-  az_span body_payload = { 0 };
-  az_result get_body_op = az_http_response_get_body(&http_response, &body_payload);
-  TEST_FAIL_ON_ERROR(get_body_op, "Failed to get body payload");
+  az_http_response_status_line status_line = { 0 };
+  TEST_FAIL_ON_ERROR(
+      az_http_response_get_status_line(&http_response, &status_line), "Failed to get status code");
+  printf("Status Code: %d\n", status_line.status_code);
+  printf(
+      "Phrase: %.*s\n",
+      az_span_size(status_line.reason_phrase),
+      az_span_ptr(status_line.reason_phrase));
 
-  printf("%.*s\n", az_span_size(body_payload), az_span_ptr(body_payload));
+  printf("\nHeaders:\n");
+  // loop all headers from response
+  for (az_pair header;
+       az_http_response_get_next_header(&http_response, &header) != AZ_ERROR_ITEM_NOT_FOUND;)
+  {
+    printf(
+        "%.*s:%.*s\n",
+        az_span_size(header.key),
+        az_span_ptr(header.key),
+        az_span_size(header.value),
+        az_span_ptr(header.value));
+  }
 
   return exit_code;
 }
