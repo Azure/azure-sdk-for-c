@@ -29,10 +29,10 @@ Getting started explained in detail [here][SDK_README_GETTING_STARTED].
 
 The following section documents various examples. All of them use the [Eclipse Paho MQTT C client][Eclipse_Paho].
 
-### [IoT Hub C2D][paho_c2d_sample]
+### [IoT Hub C2D][c2d_sample]
 Receive and view incoming C2D messages using the IoT Hub client.
 
-### [IoT Hub Methods][paho_methods_sample]
+### [IoT Hub Methods][methods_sample]
 Invoke methods from the cloud. The sample supports a method named "double"
 which will return back to you the value sent as the payload. The payload must be of the form:
 ```json
@@ -41,9 +41,9 @@ which will return back to you the value sent as the payload. The payload must be
 }
 ```
 where 10 can be substituted for any number between `UINT64_T_MIN / 2` and `UINT64_T_MAX / 2`.
-### [IoT Hub Telemetry][paho_telemetry_sample]
+### [IoT Hub Telemetry][telemetry_sample]
 Send 5 telemetry messages using the IoT Hub client.
-### [IoT Hub Twin][paho_twin_sample]
+### [IoT Hub Twin][twin_sample]
 Use twin features such as updating reported properties, receiving the twin document, and receiving desired properties using the IoT Hub client.
 
 ## Troubleshooting
@@ -67,10 +67,10 @@ This project welcomes contributions and suggestions. Find [more contributing][SD
 [SDK_README_CONTRIBUTING]:../../README.md#contributing
 [SDK_README_GETTING_STARTED]: ../../README.md#getting-started
 [SDK_README_KEY_CONCEPTS]: ../../README.md#key-concepts
-[paho_c2d_sample]: c2d/src/paho_iot_hub_c2d_example.c
-[paho_methods_sample]: methods/src/paho_iot_methods_example.c
-[paho_telemetry_sample]: telemetry/src/paho_iot_hub_telemetry_example.c
-[paho_twin_sample]: twin/src/paho_iot_hub_twin_example.c
+[c2d_sample]: c2d/src/iot_hub_c2d_example.c
+[methods_sample]: methods/src/iot_methods_example.c
+[telemetry_sample]: telemetry/src/iot_hub_telemetry_example.c
+[twin_sample]: twin/src/iot_hub_twin_example.c
 [iot_hub_mqtt]: https://docs.microsoft.com/en-us/azure/iot-dps/iot-dps-mqtt-support
 [error_codes]: ../../doc/mqtt_state_machine.md#IoT-Service-Errors
 [Eclipse_Paho]: https://www.eclipse.org/paho/clients/c/

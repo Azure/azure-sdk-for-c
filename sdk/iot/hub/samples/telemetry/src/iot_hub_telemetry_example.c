@@ -54,9 +54,9 @@ static char x509_cert_pem_file[512];
 static char x509_trust_pem_file[256];
 char telemetry_topic[128];
 
-static char paho_endpoint[128];
-static az_span paho_prefix = AZ_SPAN_LITERAL_FROM_STR("ssl://");
-static az_span paho_suffix = AZ_SPAN_LITERAL_FROM_STR(":8883");
+static char mqtt_endpoint[128];
+static az_span mqtt_url_prefix = AZ_SPAN_LITERAL_FROM_STR("ssl://");
+static az_span mqtt_url_suffix = AZ_SPAN_LITERAL_FROM_STR(":8883");
 
 static const char* telemetry_message_payloads[NUMBER_OF_MESSAGES] = {
   "Message One", "Message Two", "Message Three", "Message Four", "Message Five",
@@ -110,18 +110,18 @@ static az_result read_configuration_entry(
   return AZ_OK;
 }
 
-static az_result create_paho_endpoint(char* destination, int32_t size, az_span iot_hub)
+static az_result create_mqtt_endpoint(char* destination, int32_t size, az_span iot_hub)
 {
   int32_t iot_hub_length = (int32_t)strlen(iot_hub_fqdn);
-  int32_t required_size = az_span_size(paho_prefix) + iot_hub_length + az_span_size(paho_suffix);
+  int32_t required_size = az_span_size(mqtt_url_prefix) + iot_hub_length + az_span_size(mqtt_url_suffix);
   if (required_size > size)
   {
     return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
   }
   az_span destination_span = az_span_init((uint8_t*)destination, size);
-  az_span remainder = az_span_copy(destination_span, paho_prefix);
+  az_span remainder = az_span_copy(destination_span, mqtt_url_prefix);
   remainder = az_span_copy(remainder, az_span_slice(iot_hub, 0, iot_hub_length));
-  az_span_copy(remainder, paho_suffix);
+  az_span_copy(remainder, mqtt_url_suffix);
 
   return AZ_OK;
 }
@@ -146,7 +146,7 @@ static az_result read_configuration_and_init_client()
       "IoT Hub FQDN", IOT_HUB_FQDN, "", false, iot_hub_fqdn_span, &trusted));
 
   AZ_RETURN_IF_FAILED(
-      create_paho_endpoint(paho_endpoint, (int32_t)sizeof(paho_endpoint), iot_hub_fqdn_span));
+      create_mqtt_endpoint(mqtt_endpoint, (int32_t)sizeof(mqtt_endpoint), iot_hub_fqdn_span));
 
   AZ_RETURN_IF_FAILED(az_iot_hub_client_init(
       &client,
@@ -237,7 +237,7 @@ int main()
   }
 
   if ((rc = MQTTClient_create(
-           &mqtt_client, paho_endpoint, client_id, MQTTCLIENT_PERSISTENCE_NONE, NULL))
+           &mqtt_client, mqtt_endpoint, client_id, MQTTCLIENT_PERSISTENCE_NONE, NULL))
       != MQTTCLIENT_SUCCESS)
   {
     printf("Failed to create MQTT client, return code %d\n", rc);

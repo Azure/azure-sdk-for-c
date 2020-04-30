@@ -2,19 +2,19 @@
 # SPDX-License-Identifier: MIT
 
 add_executable (
-  paho_iot_hub_twin_example 
-  src/paho_iot_hub_twin_example.c
+  iot_hub_twin_example 
+  src/iot_hub_twin_example.c
   )
 
 target_link_libraries(
-  paho_iot_hub_twin_example PRIVATE
+  iot_hub_twin_example PRIVATE
   az_iot_hub
   az_iot_core
   az_core
   )
 
 target_link_libraries(
-  paho_iot_hub_twin_example PRIVATE
+  iot_hub_twin_example PRIVATE
   eclipse-paho-mqtt-c::paho-mqtt3cs-static
   OpenSSL::SSL
   OpenSSL::Crypto
