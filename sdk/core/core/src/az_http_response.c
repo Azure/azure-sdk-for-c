@@ -280,24 +280,11 @@ AZ_NODISCARD az_result az_http_response_write_span(az_http_response* response, a
   AZ_PRECONDITION_NOT_NULL(response);
 
   az_span remaining = _az_http_response_get_remaining(response);
-  int32_t write_size = az_span_size(write);
+  int32_t write_size = az_span_size(source);
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(remaining, write_size);
 
-  remaining = az_span_copy(remaining, write);
+  remaining = az_span_copy(remaining, source);
   response->_internal.written += write_size;
-
-  return AZ_OK;
-}
-
-AZ_NODISCARD az_result az_http_response_write_u8(az_http_response* response, uint8_t byte)
-{
-  AZ_PRECONDITION_NOT_NULL(response);
-
-  az_span remaining = _az_http_response_get_remaining(response);
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(remaining, 1);
-
-  remaining = az_span_copy_u8(remaining, byte);
-  response->_internal.written += 1;
 
   return AZ_OK;
 }

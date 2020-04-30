@@ -134,27 +134,10 @@ AZ_NODISCARD az_result az_http_request_get_body(_az_http_request const* request,
  * @param[in] source This is an az_span with the content to be written into response.
  * @return An #az_result value indicating the result of the operation:
  *         - #AZ_OK if successful
- *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the \p response buffer is not big enough to contain the
- * \p source content
+ *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the \p response buffer is not big enough to contain
+ * the \p source content
  */
 AZ_NODISCARD az_result az_http_response_write_span(az_http_response* response, az_span source);
-
-/**
- * @brief This function is expected to be used by transport adapters like curl. Use it to write
- * just one single byte to an az_http_response.
- *
- * @remarks This is a convenient way of hiding the internal implementation of az_http_response.
- *
- * @remarks Parameter \p source can be an empty span. If so, nothing will be written.
- *
- * @param[in] response Pointer to an az_http_response.
- * @param[in] byte This is a single byte to be written into response.
- * @return An #az_result value indicating the result of the operation:
- *         - #AZ_OK if successful.
- *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the \p response is not big enough to contain one
- * extra byte.
- */
-AZ_NODISCARD az_result az_http_response_write_u8(az_http_response* response, uint8_t byte);
 
 /**
  * @brief Returns the number of headers within the request.
@@ -172,7 +155,15 @@ AZ_NODISCARD int32_t az_http_request_headers_count(_az_http_request const* reque
  * used to send the request through the wire.
  * @param[out] p_response Points to an az_http_response where the response from the wire will be
  * written.
- * @return AZ_NODISCARD az_http_client_send_request
+ * @return An #az_result value indicating the result of the operation:
+ *         - #AZ_OK if successful
+ *         - #CURLE_WRITE_ERROR if there was any issue while trying to write into \p response. It
+ * might means that there was not enough size on \p response to hold the entire response from
+ * network.
+ *         - #CURLE_COULDNT_RESOLVE_HOST if the url from \p p_request can't be resolved by http
+ * stack and request was not sent.
+ *         - #AZ_ERROR_HTTP_PLATFORM Any other issue from the transport layer.
+ *
  */
 AZ_NODISCARD az_result
 az_http_client_send_request(_az_http_request* p_request, az_http_response* p_response);

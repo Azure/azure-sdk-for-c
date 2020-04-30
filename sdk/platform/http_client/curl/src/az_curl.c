@@ -591,16 +591,6 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
   // Clean custom headers previously appended
   curl_slist_free_all(p_list);
 
-  // make sure to set the end of the body response as the end of the complete response
-  if (az_succeeded(result))
-  {
-    az_result append_zero_to_respose = az_http_response_write_u8(response, 0);
-    if (az_failed(append_zero_to_respose))
-    {
-      return append_zero_to_respose;
-    }
-  }
-
   return result;
 }
 
