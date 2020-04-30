@@ -12,12 +12,12 @@ option(UNIT_TESTING_MOCK_ENABLED "wrap PAL functions with mock implementation fo
 option(BUILD_PAHO_TRANSPORT "Build IoT Samples with Paho MQTT support" OFF)
 option(BUILD_PRECONDITIONS "Build SDK with preconditions enabled" ON)
 
-#enable mock functions with link option -ld
+# disable preconditions when it's set to OFF
 if (NOT BUILD_PRECONDITIONS)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DAZ_NO_PRECONDITION_CHECKING")
 endif()
 
-#enable mock functions with link option -ld
+# enable mock functions with link option -ld
 if(UNIT_TESTING_MOCK_ENABLED)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_az_MOCK_ENABLED")
 endif()
