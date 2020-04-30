@@ -257,7 +257,7 @@ typedef struct
  * @param[out] json_builder A pointer to an #az_json_builder instance to initialize.
  * @param[in] destination_buffer An #az_span over the byte buffer where the JSON text is to be
  * written.
- * @param[in] az_json_builder_options __[nullable]__ A reference to an #az_json_builder_options
+ * @param[in] options __[nullable]__ A reference to an #az_json_builder_options
  * structure which defines custom behavior of the #az_json_builder. If `NULL` is passed, the builder
  * will use the default options (i.e. #az_json_builder_options_default()).
  *
