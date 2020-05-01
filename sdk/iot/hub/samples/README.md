@@ -28,6 +28,14 @@ Getting started explained in detail [here][SDK_README_GETTING_STARTED].
 ## Samples
 
 The following section documents various samples. All of them use the [Eclipse Paho MQTT C client][Eclipse_Paho].
+For all of these samples, the following environment variables will need to be set:
+
+- `AZ_IOT_DEVICE_ID`: Your device id.
+- `AZ_IOT_HUB_HOSTNAME`: The hostname of your IoT Hub.
+- `AZ_IOT_DEVICE_X509_CERT_PEM_FILE`: The full path to your device cert (in `.pem` format) concatenated
+ with its private key.
+- `AZ_IOT_DEVICE_X509_TRUST_PEM_FILE`: The full path to the trusted server cert (in `.pem` format). This is usually
+not needed on Mac or Linux but might be needed for Windows.
 
 ### [IoT Hub Telemetry][telemetry_sample]
 Send 5 telemetry messages using the IoT Hub Client.

@@ -32,7 +32,7 @@
 // Device ID
 #define DEVICE_ID "AZ_IOT_DEVICE_ID"
 
-// IoT Hub FQDN
+// IoT Hub Hostname
 #define IOT_HUB_HOSTNAME "AZ_IOT_HUB_HOSTNAME"
 
 // AZ_IOT_DEVICE_X509_CERT_PEM_FILE is the path to a PEM file containing the device certificate and
@@ -149,7 +149,7 @@ static az_result read_configuration_and_init_client()
 
   az_span iot_hub_hostname_span = AZ_SPAN_FROM_BUFFER(iot_hub_hostname);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
-      "IoT Hub FQDN", IOT_HUB_HOSTNAME, "", false, iot_hub_hostname_span, &iot_hub_hostname_span));
+      "IoT Hub Hostname", IOT_HUB_HOSTNAME, "", false, iot_hub_hostname_span, &iot_hub_hostname_span));
 
   AZ_RETURN_IF_FAILED(
       create_mqtt_endpoint(mqtt_endpoint, (int32_t)sizeof(mqtt_endpoint), iot_hub_hostname_span));

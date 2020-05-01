@@ -26,7 +26,7 @@
 // Device ID
 #define DEVICE_ID "AZ_IOT_DEVICE_ID"
 
-// IoT Hub FQDN
+// IoT Hub Hostname
 #define IOT_HUB_HOSTNAME "AZ_IOT_HUB_HOSTNAME"
 
 // AZ_IOT_DEVICE_X509_CERT_PEM_FILE is the path to a PEM file containing the device certificate and
@@ -133,7 +133,7 @@ static az_result read_configuration_and_init_client()
 
   az_span iot_hub_hostname_span = AZ_SPAN_FROM_BUFFER(iot_hub_hostname);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
-      "IoT Hub FQDN", IOT_HUB_HOSTNAME, "", false, iot_hub_hostname_span, &iot_hub_hostname_span));
+      "IoT Hub Hostname", IOT_HUB_HOSTNAME, "", false, iot_hub_hostname_span, &iot_hub_hostname_span));
 
   AZ_RETURN_IF_FAILED(
       create_mqtt_endpoint(mqtt_endpoint, (int32_t)sizeof(mqtt_endpoint), iot_hub_hostname_span));
@@ -153,25 +153,23 @@ static az_span ping_method(void)
   return ping_method_success_response;
 }
 
-static az_result send_method_response(
+static int send_method_response(
     az_iot_hub_client_method_request* request,
     uint16_t status,
     az_span response)
 {
-  az_result result;
-
   // Get the response topic
-  if ((result = az_iot_hub_client_methods_response_get_publish_topic(
+  if (az_iot_hub_client_methods_response_get_publish_topic(
            &client,
            request->request_id,
            status,
            methods_response_topic,
            sizeof(methods_response_topic),
-           NULL))
+           NULL)
       != AZ_OK)
   {
-    printf("Unable to get twin document publish topic, return code %d\n", result);
-    return result;
+    printf("Unable to get twin document publish topic");
+    return -1;
   }
 
   printf("Status: %u\tPayload:", status);
@@ -183,7 +181,8 @@ static az_result send_method_response(
   putchar('\n');
 
   // Send the response
-  if ((result = MQTTClient_publish(
+  int rc;
+  if ((rc = MQTTClient_publish(
            mqtt_client,
            methods_response_topic,
            az_span_size(response),
@@ -193,13 +192,13 @@ static az_result send_method_response(
            NULL))
       != MQTTCLIENT_SUCCESS)
   {
-    printf("Failed to publish twin document request, return code %d\n", result);
-    return result;
+    printf("Failed to send method response, return code %d\n", rc);
+    return rc;
   }
 
   printf("Sent response\n");
 
-  return result;
+  return 0;
 }
 
 static int on_received(void* context, char* topicName, int topicLen, MQTTClient_message* message)
@@ -218,8 +217,6 @@ static int on_received(void* context, char* topicName, int topicLen, MQTTClient_
           &client, az_span_init((uint8_t*)topicName, topicLen), &method_request)
       == AZ_OK)
   {
-    az_result result;
-
     printf("Direct Method arrived\n");
     if (az_span_is_content_equal(ping_method_name_span, method_request.name))
     {
@@ -227,19 +224,19 @@ static int on_received(void* context, char* topicName, int topicLen, MQTTClient_
       az_span response = ping_method();
 
       // Send a response
-      if ((result = send_method_response(&method_request, 200, response)) != AZ_OK)
+      int rc;
+      if ((rc = send_method_response(&method_request, 200, response)) != 0)
       {
-        printf("Unable to send %d response, status %d\n", 200, result);
-        return result;
+        printf("Unable to send %d response, status %d\n", 200, rc);
       }
     }
     else
     {
       // Unsupported Method
-      if ((result = send_method_response(&method_request, 404, ping_method_fail_response)) != AZ_OK)
+      int rc;
+      if ((rc = send_method_response(&method_request, 404, ping_method_fail_response)) != 0)
       {
-        printf("Unable to send %d response, status %d\n", 404, result);
-        return result;
+        printf("Unable to send %d response, status %d\n", 404, rc);
       }
     }
   }
