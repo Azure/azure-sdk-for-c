@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 #include "az_aad_private.h"
-#include <az_url_internal.h>
 
 #include <az_config_internal.h>
 #include <az_http.h>
@@ -38,7 +37,7 @@ AZ_NODISCARD az_result _az_aad_build_url(az_span url, az_span tenant_id, az_span
 
   {
     int32_t url_length = 0;
-    AZ_RETURN_IF_FAILED(_az_url_encode(remainder, tenant_id, &url_length));
+    AZ_RETURN_IF_FAILED(_az_span_url_encode(remainder, tenant_id, &url_length));
     remainder = az_span_slice_to_end(remainder, url_length);
   }
 
@@ -66,7 +65,7 @@ AZ_NODISCARD az_result _az_aad_build_body(
   az_span remainder = az_span_copy(body, grant_type_and_client_id_key);
   int32_t url_length = 0;
 
-  AZ_RETURN_IF_FAILED(_az_url_encode(remainder, client_id, &url_length));
+  AZ_RETURN_IF_FAILED(_az_span_url_encode(remainder, client_id, &url_length));
   remainder = az_span_slice_to_end(remainder, url_length);
 
   az_span const scope_key = AZ_SPAN_FROM_STR("&scope=");
@@ -74,7 +73,7 @@ AZ_NODISCARD az_result _az_aad_build_body(
 
   remainder = az_span_copy(remainder, scope_key);
 
-  AZ_RETURN_IF_FAILED(_az_url_encode(remainder, scopes, &url_length));
+  AZ_RETURN_IF_FAILED(_az_span_url_encode(remainder, scopes, &url_length));
   remainder = az_span_slice_to_end(remainder, url_length);
 
   if (az_span_size(client_secret) > 0)
@@ -84,7 +83,7 @@ AZ_NODISCARD az_result _az_aad_build_body(
 
     remainder = az_span_copy(remainder, client_secret_key);
 
-    AZ_RETURN_IF_FAILED(_az_url_encode(remainder, client_secret, &url_length));
+    AZ_RETURN_IF_FAILED(_az_span_url_encode(remainder, client_secret, &url_length));
     remainder = az_span_slice_to_end(remainder, url_length);
   }
 
