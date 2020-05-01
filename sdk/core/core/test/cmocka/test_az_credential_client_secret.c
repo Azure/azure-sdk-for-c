@@ -49,7 +49,7 @@ static void test_credential_client_secret(void** state)
   };
 
   // Cmocka works in a way that you have to pre-load it with a value for every time it will be
-  // invoked (tt does not resure previously set value).
+  // invoked (it does not return previously set value).
   int const clock_nrequests[] = {
     2, // wait to retry, set token expiration
     1, // check if token has expired
