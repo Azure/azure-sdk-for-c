@@ -13,6 +13,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef _WIN32
+// Required for Sleep(DWORD)
+#include <Windows.h>
+#else
+// Required for sleep(unsigned int)
+#include <unistd.h>
+#endif
 
 #include <az_iot_hub_client.h>
 #include <az_result.h>
@@ -22,11 +29,11 @@
 //              Note: this is required to work-around MQTTClient.h as well as az_span init issues.
 #include <_az_cfg.h>
 
-//Device ID
+// Device ID
 #define DEVICE_ID "AZ_IOT_DEVICE_ID"
 
-//IoT Hub FQDN
-#define IOT_HUB_FQDN "AZ_IOT_HUB_FQDN"
+// IoT Hub FQDN
+#define IOT_HUB_HOSTNAME "AZ_IOT_HUB_HOSTNAME"
 
 // AZ_IOT_DEVICE_X509_CERT_PEM_FILE is the path to a PEM file containing the device certificate and
 // key as well as any intermediate certificates chaining to an uploaded group certificate.
@@ -36,18 +43,38 @@
 // This is usually not needed on Linux or Mac but needs to be set on Windows.
 #define DEVICE_X509_TRUST_PEM_FILE "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE"
 
+#define TIMEOUT_MQTT_DISCONNECT_MS 10 * 1000
+#define TELEMETRY_SEND_INTERVAL 1
+#define NUMBER_OF_MESSAGES 5
+
 static const uint8_t null_terminator = '\0';
 static char device_id[64];
-static char iot_hub_fqdn[128];
+static char iot_hub_hostname[128];
 static char x509_cert_pem_file[512];
 static char x509_trust_pem_file[256];
+char telemetry_topic[128];
 
+static char mqtt_client_id[128];
+static char mqtt_username[128];
 static char mqtt_endpoint[128];
 static az_span mqtt_url_prefix = AZ_SPAN_LITERAL_FROM_STR("ssl://");
 static az_span mqtt_url_suffix = AZ_SPAN_LITERAL_FROM_STR(":8883");
 
+static const char* telemetry_message_payloads[NUMBER_OF_MESSAGES] = {
+  "Message One", "Message Two", "Message Three", "Message Four", "Message Five",
+};
+
 static az_iot_hub_client client;
 static MQTTClient mqtt_client;
+
+static void sleep_seconds(uint32_t seconds)
+{
+#ifdef _WIN32
+  Sleep((DWORD)seconds * 1000);
+#else
+  sleep(seconds);
+#endif
+}
 
 static az_result read_configuration_entry(
     const char* name,
@@ -85,16 +112,18 @@ static az_result read_configuration_entry(
   return AZ_OK;
 }
 
-static az_result create_mqtt_endpoint(char* destination, int32_t size, az_span iot_hub)
+static az_result create_mqtt_endpoint(char* destination, int32_t destination_size, az_span iot_hub)
 {
-  int32_t iot_hub_length = (int32_t)strlen(iot_hub_fqdn);
+  int32_t iot_hub_length = (int32_t)strlen(iot_hub_hostname);
   int32_t required_size = az_span_size(mqtt_url_prefix) + iot_hub_length
       + az_span_size(mqtt_url_suffix) + (int32_t)sizeof(null_terminator);
-  if (required_size > size)
+
+  if (required_size > destination_size)
   {
     return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
   }
-  az_span destination_span = az_span_init((uint8_t*)destination, size);
+
+  az_span destination_span = az_span_init((uint8_t*)destination, destination_size);
   az_span remainder = az_span_copy(destination_span, mqtt_url_prefix);
   remainder = az_span_copy(remainder, az_span_slice(iot_hub, 0, iot_hub_length));
   remainder = az_span_copy(remainder, mqtt_url_suffix);
@@ -105,6 +134,7 @@ static az_result create_mqtt_endpoint(char* destination, int32_t size, az_span i
 
 static az_result read_configuration_and_init_client()
 {
+
   az_span cert = AZ_SPAN_FROM_BUFFER(x509_cert_pem_file);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
       "X509 Certificate PEM Store File", DEVICE_X509_CERT_PEM_FILE, NULL, false, cert, &cert));
@@ -117,51 +147,20 @@ static az_result read_configuration_and_init_client()
   AZ_RETURN_IF_FAILED(
       read_configuration_entry("Device ID", DEVICE_ID, "", false, device_id_span, &device_id_span));
 
-  az_span iot_hub_fqdn_span = AZ_SPAN_FROM_BUFFER(iot_hub_fqdn);
+  az_span iot_hub_hostname_span = AZ_SPAN_FROM_BUFFER(iot_hub_hostname);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
-      "IoT Hub FQDN", IOT_HUB_FQDN, "", false, iot_hub_fqdn_span, &iot_hub_fqdn_span));
+      "IoT Hub FQDN", IOT_HUB_HOSTNAME, "", false, iot_hub_hostname_span, &iot_hub_hostname_span));
 
   AZ_RETURN_IF_FAILED(
-      create_mqtt_endpoint(mqtt_endpoint, (int32_t)sizeof(mqtt_endpoint), iot_hub_fqdn_span));
+      create_mqtt_endpoint(mqtt_endpoint, (int32_t)sizeof(mqtt_endpoint), iot_hub_hostname_span));
 
   AZ_RETURN_IF_FAILED(az_iot_hub_client_init(
       &client,
-      az_span_slice(iot_hub_fqdn_span, 0, (int32_t)strlen(iot_hub_fqdn)),
+      az_span_slice(iot_hub_hostname_span, 0, (int32_t)strlen(iot_hub_hostname)),
       az_span_slice(device_id_span, 0, (int32_t)strlen(device_id)),
       NULL));
 
   return AZ_OK;
-}
-
-static int on_received(void* context, char* topicName, int topicLen, MQTTClient_message* message)
-{
-  (void)context;
-
-  if (topicLen == 0)
-  {
-    // The length of the topic if there are one or more NULL characters embedded in topicName,
-    // otherwise topicLen is 0.
-    topicLen = (int)strlen(topicName);
-  }
-
-  az_iot_hub_client_c2d_request c2d_request;
-  if (az_iot_hub_client_c2d_parse_received_topic(
-          &client, az_span_init((uint8_t*)topicName, topicLen), &c2d_request)
-      == AZ_OK)
-  {
-    char* payload = (char*)message->payload;
-    printf("C2D Message arrived\n");
-    for (int32_t i = 0; i < message->payloadlen; i++)
-    {
-      putchar(*(payload + i));
-    }
-  }
-
-  putchar('\n');
-  MQTTClient_freeMessage(&message);
-  MQTTClient_free(topicName);
-
-  return 1;
 }
 
 static int connect_device()
@@ -173,9 +172,7 @@ static int connect_device()
   mqtt_connect_options.cleansession = false;
   mqtt_connect_options.keepAliveInterval = AZ_IOT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS;
 
-  char username[128];
-  size_t username_length;
-  if ((rc = az_iot_hub_client_get_user_name(&client, username, sizeof(username), &username_length))
+  if ((rc = az_iot_hub_client_get_user_name(&client, mqtt_username, sizeof(mqtt_username), NULL))
       != AZ_OK)
 
   {
@@ -183,8 +180,8 @@ static int connect_device()
     return rc;
   }
 
-  mqtt_connect_options.username = username;
-  mqtt_connect_options.password = NULL;
+  mqtt_connect_options.username = mqtt_username;
+  mqtt_connect_options.password = NULL; // Using X509 Client Certificate authentication.
 
   mqtt_ssl_options.keyStore = (char*)x509_cert_pem_file;
   if (*x509_trust_pem_file != '\0')
@@ -203,28 +200,36 @@ static int connect_device()
   return 0;
 }
 
-static int subscribe()
+static int send_telemetry_messages()
 {
   int rc;
 
-  char c2d_topic[128];
-  size_t c2d_topic_length;
-  if ((rc
-       = az_iot_hub_client_c2d_get_subscribe_topic_filter(&client, c2d_topic, sizeof(c2d_topic), &c2d_topic_length))
+  if ((rc = az_iot_hub_client_telemetry_get_publish_topic(
+           &client, NULL, telemetry_topic, sizeof(telemetry_topic), NULL))
       != AZ_OK)
-
   {
-    printf("Failed to get C2D MQTT SUB topic filter, return code %d\n", rc);
     return rc;
   }
 
-  if ((rc = MQTTClient_subscribe(mqtt_client, c2d_topic, 1)) != MQTTCLIENT_SUCCESS)
+  for (int i = 0; i < NUMBER_OF_MESSAGES; ++i)
   {
-    printf("Failed to subscribe, return code %d\n", rc);
-    return rc;
+    printf("Sending Message %d\n", i + 1);
+    if ((rc = MQTTClient_publish(
+             mqtt_client,
+             telemetry_topic,
+             (int)strlen(telemetry_message_payloads[i]),
+             telemetry_message_payloads[i],
+             0,
+             0,
+             NULL))
+        != MQTTCLIENT_SUCCESS)
+    {
+      printf("Failed to publish telemetry message %d, return code %d\n", i + 1, rc);
+      return rc;
+    }
+    sleep_seconds(TELEMETRY_SEND_INTERVAL);
   }
-
-  return 0;
+  return rc;
 }
 
 int main()
@@ -237,26 +242,20 @@ int main()
     return rc;
   }
 
-  char client_id[128];
   size_t client_id_length;
-  if ((rc = az_iot_hub_client_get_client_id(&client, client_id, sizeof(client_id), &client_id_length)) != AZ_OK)
+  if ((rc = az_iot_hub_client_get_client_id(
+           &client, mqtt_client_id, sizeof(mqtt_client_id), &client_id_length))
+      != AZ_OK)
   {
     printf("Failed to get MQTT clientId, return code %d\n", rc);
     return rc;
   }
 
   if ((rc = MQTTClient_create(
-           &mqtt_client, mqtt_endpoint, client_id, MQTTCLIENT_PERSISTENCE_NONE, NULL))
+           &mqtt_client, mqtt_endpoint, mqtt_client_id, MQTTCLIENT_PERSISTENCE_NONE, NULL))
       != MQTTCLIENT_SUCCESS)
   {
     printf("Failed to create MQTT client, return code %d\n", rc);
-    return rc;
-  }
-
-  if ((rc = MQTTClient_setCallbacks(mqtt_client, NULL, NULL, on_received, NULL))
-      != MQTTCLIENT_SUCCESS)
-  {
-    printf("Failed to set MQTT callbacks, return code %d\n", rc);
     return rc;
   }
 
@@ -265,17 +264,16 @@ int main()
     return rc;
   }
 
-  if ((rc = subscribe()) != 0)
+  // Loop and send 5 messages
+  if ((rc = send_telemetry_messages()) != 0)
   {
     return rc;
   }
 
-  printf("Subscribed to topics.\n");
-
-  printf("Waiting for activity. [Press ENTER to abort]\n");
+  printf("Messages Sent [Press ENTER to shut down]\n");
   (void)getchar();
 
-  if ((rc = MQTTClient_disconnect(mqtt_client, 10000)) != MQTTCLIENT_SUCCESS)
+  if ((rc = MQTTClient_disconnect(mqtt_client, TIMEOUT_MQTT_DISCONNECT_MS)) != MQTTCLIENT_SUCCESS)
   {
     printf("Failed to disconnect MQTT client, return code %d\n", rc);
     return rc;

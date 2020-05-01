@@ -25,9 +25,9 @@ This document describes how to use samples and what is done in each sample.
 
 Getting started explained in detail [here][SDK_README_GETTING_STARTED].
 
-## Examples
+## Samples
 
-The following section documents various examples. All of them use the [Eclipse Paho MQTT C client][Eclipse_Paho].
+The following section documents various samples. All of them use the [Eclipse Paho MQTT C client][Eclipse_Paho].
 
 ### [IoT Hub Telemetry][telemetry_sample]
 Send 5 telemetry messages using the IoT Hub Client.
@@ -36,14 +36,14 @@ Send 5 telemetry messages using the IoT Hub Client.
 Use twin features such as updating reported properties, receiving the twin document, and receiving desired properties using the IoT Hub Client.
 
 ### [IoT Hub Methods][methods_sample]
-Invoke methods from the cloud. The sample supports a method named "double"
-which will return back to you the value sent as the payload. The payload must be of the form:
+Invoke methods from the cloud. The sample supports a method named "ping"
+which if successful will return back to you a json payload of the following:
+
 ```json
-{
-  "value": 10
-}
+{"response": "pong"}
 ```
-where 10 can be substituted for any number between `INT64_MIN / 2` and `INT64_MAX / 2`.
+
+On failure, a status of `404` will be returned with an empty JSON payload.
 
 ### [IoT Hub C2D][c2d_sample]
 Receive and view incoming C2D messages using the IoT Hub Client.
@@ -64,10 +64,10 @@ For extensive documentation on Azure IoT Hub, see the [API reference documentati
 [IOT_CLIENT_README]: ../../README.md
 [SDK_README_GETTING_STARTED]: ../../README.md#getting-started
 [SDK_README_KEY_CONCEPTS]: ../../README.md#key-concepts
-[c2d_sample]: c2d/src/iot_hub_c2d_example.c
-[methods_sample]: methods/src/iot_hub_methods_example.c
-[telemetry_sample]: telemetry/src/iot_hub_telemetry_example.c
-[twin_sample]: twin/src/iot_hub_twin_example.c
+[c2d_sample]: src/iot_hub_c2d_sample.c
+[methods_sample]: src/iot_hub_methods_sample.c
+[telemetry_sample]: src/iot_hub_telemetry_sample.c
+[twin_sample]: src/iot_hub_twin_sample.c
 [iot_hub_mqtt]: https://docs.microsoft.com/en-us/azure/iot-dps/iot-dps-mqtt-support
 [error_codes]: ../../doc/mqtt_state_machine.md#IoT-Service-Errors
 [Eclipse_Paho]: https://www.eclipse.org/paho/clients/c/
