@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "az_credentials.h"
 #include "az_test_definitions.h"
+#include <az_credentials.h>
 #include <az_credentials_internal.h>
 #include <az_http.h>
 #include <az_http_internal.h>
@@ -41,53 +41,44 @@ static void test_credential_client_secret(void** state)
     },
   };
 
-  az_result ignore = { 0 };
+  az_span const expected_responses[] = {
+    AZ_SPAN_FROM_STR("HTTP/1.1 200 OK\r\n\r\nResponse1"),
+    AZ_SPAN_FROM_STR("HTTP/1.1 200 OK\r\n\r\nResponse2"),
+    AZ_SPAN_FROM_STR("HTTP/1.1 200 OK\r\n\r\nResponse3"),
+    AZ_SPAN_FROM_STR("HTTP/1.1 200 OK\r\n\r\nResponse4"),
+  };
 
   az_span const request_url = AZ_SPAN_FROM_STR("https://www.microsoft.com/test/request");
-  uint8_t header_buf[500];
-  uint8_t body_buf[500];
-  _az_http_request request = { 0 };
-  ignore = az_http_request_init(
-      &request,
-      &az_context_app,
-      az_http_method_get(),
-      request_url,
-      0,
-      AZ_SPAN_FROM_BUFFER(header_buf),
-      AZ_SPAN_FROM_BUFFER(body_buf));
+  for (int i = 0; i < 4; ++i)
+  {
+    az_result ignore = { 0 };
 
-  az_http_response response = { 0 };
-  uint8_t response_buf[500] = { 0 };
-  ignore = az_http_response_init(&response, AZ_SPAN_FROM_BUFFER(response_buf));
+    uint8_t header_buf[500] = { 0 };
+    uint8_t body_buf[500] = { 0 };
+    _az_http_request request = { 0 };
+    ignore = az_http_request_init(
+        &request,
+        &az_context_app,
+        az_http_method_get(),
+        request_url,
+        az_span_size(request_url),
+        AZ_SPAN_FROM_BUFFER(header_buf),
+        AZ_SPAN_FROM_BUFFER(body_buf));
+
+    az_http_response response = { 0 };
+    uint8_t response_buf[500] = { 0 };
+    ignore = az_http_response_init(&response, AZ_SPAN_FROM_BUFFER(response_buf));
 
 #ifdef _az_MOCK_ENABLED
-  {
-    will_return(__wrap_az_platform_clock_msec, 1 * 100000000);
-
+    will_return(__wrap_az_platform_clock_msec, ((i / 2) + 1) * 100000000);
     ignore = az_http_pipeline_process(&pipeline, &request, &response);
-    assert_true(az_span_is_content_equal(
-        AZ_SPAN_FROM_STR("HTTP/1.1 200 OK\r\n\r\nResponse1"), response._internal.http_response));
-
-    ignore = az_http_pipeline_process(&pipeline, &request, &response);
-    assert_true(az_span_is_content_equal(
-        AZ_SPAN_FROM_STR("HTTP/1.1 200 OK\r\n\r\nResponse2"), response._internal.http_response));
-  }
-  {
-    will_return(__wrap_az_platform_clock_msec, 2 * 100000000);
-
-    ignore = az_http_pipeline_process(&pipeline, &request, &response);
-    assert_true(az_span_is_content_equal(
-        AZ_SPAN_FROM_STR("HTTP/1.1 200 OK\r\n\r\nResponse3"), response._internal.http_response));
-
-    ignore = az_http_pipeline_process(&pipeline, &request, &response);
-    assert_true(az_span_is_content_equal(
-        AZ_SPAN_FROM_STR("HTTP/1.1 200 OK\r\n\r\nResponse4"), response._internal.http_response));
-  }
-#else
-  (void)pipeline;
+    assert_true(az_span_is_content_equal(expected_responses[i], response._internal.http_response));
+#else // _az_MOCK_ENABLED
+    (void)ignore;
+    (void)pipeline;
+    (void)expected_responses;
 #endif // _az_MOCK_ENABLED
-
-  (void)ignore;
+  }
 }
 
 az_result send_request(_az_http_request* request, az_http_response* response);
@@ -127,7 +118,7 @@ az_result send_request(_az_http_request* request, az_http_response* response)
     }
 
     static int auth_attempt = 0;
-    if (redo_auth)
+    if (redo_auth && auth_attempt == 2)
     {
       auth_attempt = 0;
     }
@@ -147,13 +138,15 @@ az_result send_request(_az_http_request* request, az_http_response* response)
     {
       if (!redo_auth)
       {
-        response->_internal.http_response = AZ_SPAN_FROM_STR(
-            "HTTP/1.1 200 OK\r\n\r\n{ 'access_token' : 'AccessToken', 'expires_in' : 3600 }");
+        response->_internal.http_response
+            = AZ_SPAN_FROM_STR("HTTP/1.1 200 OK\r\n\r\n"
+                               "{ \"access_token\" : \"AccessToken\", \"expires_in\" : 3600 }");
       }
       else
       {
-        response->_internal.http_response = AZ_SPAN_FROM_STR(
-            "HTTP/1.1 200 OK\r\n\r\n{ 'access_token' : 'NewAccessToken', 'expires_in' : 3600 }");
+        response->_internal.http_response
+            = AZ_SPAN_FROM_STR("HTTP/1.1 200 OK\r\n\r\n"
+                               "{ \"access_token\" : \"NewAccessToken\", \"expires_in\" : 3600 }");
       }
     }
   }
@@ -201,12 +194,12 @@ az_result send_request(_az_http_request* request, az_http_response* response)
     }
     if (attempt == 3 && redo_auth)
     {
-      response->_internal.http_response = AZ_SPAN_FROM_STR("HTTP/1.1 200 OK\r\n\r\rResponse3");
+      response->_internal.http_response = AZ_SPAN_FROM_STR("HTTP/1.1 200 OK\r\n\r\nResponse3");
     }
     else if (attempt == 4 && redo_auth)
     {
-      response->_internal.http_response = AZ_SPAN_FROM_STR("HTTP/1.1 200 OK\r\n\r\rResponse4");
-      redo_auth = true;
+      response->_internal.http_response = AZ_SPAN_FROM_STR("HTTP/1.1 200 OK\r\n\r\nResponse4");
+      redo_auth = false;
     }
   }
 
