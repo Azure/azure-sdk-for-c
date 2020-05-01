@@ -52,13 +52,13 @@ static void test_url_encode(void** state)
   int32_t url_length = 0;
 
   assert_true(az_succeeded(
-      _az_url_encode(buffer, AZ_SPAN_FROM_STR("https://vault.azure.net"), &url_length)));
+      _az_span_url_encode(buffer, AZ_SPAN_FROM_STR("https://vault.azure.net"), &url_length)));
 
   assert_true(az_span_is_content_equal(
       az_span_slice(buffer, 0, url_length), AZ_SPAN_FROM_STR("https%3A%2F%2Fvault.azure.net")));
 
   assert_true(
-      az_succeeded(_az_url_encode(buffer, AZ_SPAN_FROM_BUFFER(url_decoded_buf), &url_length)));
+      az_succeeded(_az_span_url_encode(buffer, AZ_SPAN_FROM_BUFFER(url_decoded_buf), &url_length)));
 
   assert_true(az_span_is_content_equal(az_span_slice(buffer, 0, url_length), url_encoded));
 }
