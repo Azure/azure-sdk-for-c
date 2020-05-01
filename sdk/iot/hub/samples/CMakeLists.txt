@@ -17,8 +17,82 @@ if(NOT OpenSSL_FOUND)
   find_package(OpenSSL REQUIRED)
 endif()
 
-add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/c2d)
-add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/methods)
-add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/telemetry)
-add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/twin)
+# C2D Sample
+add_executable (
+  iot_hub_c2d_example 
+  ${CMAKE_CURRENT_LIST_DIR}/iot_hub_c2d_example.c
+  )
 
+target_link_libraries(
+  iot_hub_c2d_example PRIVATE
+  az_iot_hub
+  az_iot_core
+  az_core
+)
+
+target_link_libraries(
+  iot_hub_c2d_example PRIVATE
+  eclipse-paho-mqtt-c::paho-mqtt3cs-static
+  OpenSSL::SSL
+  OpenSSL::Crypto
+  )
+
+# Methods Sample
+add_executable (
+  iot_hub_methods_example 
+  ${CMAKE_CURRENT_LIST_DIR}/iot_hub_methods_example.c
+  )
+
+target_link_libraries(
+  iot_hub_methods_example PRIVATE
+  az_iot_hub
+  az_iot_core
+  az_core
+  )
+
+target_link_libraries(
+  iot_hub_methods_example PRIVATE
+  eclipse-paho-mqtt-c::paho-mqtt3cs-static
+  OpenSSL::SSL
+  OpenSSL::Crypto
+  )
+
+# Telemetry Sample
+add_executable (
+  iot_hub_telemetry_example 
+  ${CMAKE_CURRENT_LIST_DIR}/iot_hub_telemetry_example.c
+  )
+
+target_link_libraries(
+  iot_hub_telemetry_example PRIVATE
+  az_iot_hub
+  az_iot_core
+  az_core
+  )
+
+target_link_libraries(
+  iot_hub_telemetry_example PRIVATE
+  eclipse-paho-mqtt-c::paho-mqtt3cs-static
+  OpenSSL::SSL
+  OpenSSL::Crypto
+  )
+
+# Twin Sample
+add_executable (
+  iot_hub_twin_example 
+  ${CMAKE_CURRENT_LIST_DIR}/iot_hub_twin_example.c
+  )
+
+target_link_libraries(
+  iot_hub_twin_example PRIVATE
+  az_iot_hub
+  az_iot_core
+  az_core
+  )
+
+target_link_libraries(
+  iot_hub_twin_example PRIVATE
+  eclipse-paho-mqtt-c::paho-mqtt3cs-static
+  OpenSSL::SSL
+  OpenSSL::Crypto
+  )

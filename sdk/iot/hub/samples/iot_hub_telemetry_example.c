@@ -35,9 +35,6 @@
 // IoT Hub FQDN
 #define IOT_HUB_FQDN "AZ_IOT_HUB_FQDN"
 
-// Device information
-#define REGISTRATION_ID_ENV "AZ_IOT_REGISTRATION_ID"
-
 // AZ_IOT_DEVICE_X509_CERT_PEM_FILE is the path to a PEM file containing the device certificate and
 // key as well as any intermediate certificates chaining to an uploaded group certificate.
 #define DEVICE_X509_CERT_PEM_FILE "AZ_IOT_DEVICE_X509_CERT_PEM_FILE"
@@ -48,6 +45,7 @@
 
 #define NUMBER_OF_MESSAGES 5
 
+static const uint8_t null_terminator = '\0';
 static char device_id[64];
 static char iot_hub_fqdn[128];
 static char x509_cert_pem_file[512];
@@ -113,7 +111,8 @@ static az_result read_configuration_entry(
 static az_result create_mqtt_endpoint(char* destination, int32_t size, az_span iot_hub)
 {
   int32_t iot_hub_length = (int32_t)strlen(iot_hub_fqdn);
-  int32_t required_size = az_span_size(mqtt_url_prefix) + iot_hub_length + az_span_size(mqtt_url_suffix);
+  int32_t required_size = az_span_size(mqtt_url_prefix) + iot_hub_length
+      + az_span_size(mqtt_url_suffix) + (int32_t)sizeof(null_terminator);
   if (required_size > size)
   {
     return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
@@ -121,7 +120,8 @@ static az_result create_mqtt_endpoint(char* destination, int32_t size, az_span i
   az_span destination_span = az_span_init((uint8_t*)destination, size);
   az_span remainder = az_span_copy(destination_span, mqtt_url_prefix);
   remainder = az_span_copy(remainder, az_span_slice(iot_hub, 0, iot_hub_length));
-  az_span_copy(remainder, mqtt_url_suffix);
+  remainder = az_span_copy(remainder, mqtt_url_suffix);
+  az_span_copy_u8(remainder, null_terminator);
 
   return AZ_OK;
 }
@@ -139,11 +139,11 @@ static az_result read_configuration_and_init_client()
 
   az_span device_id_span = AZ_SPAN_FROM_BUFFER(device_id);
   AZ_RETURN_IF_FAILED(
-      read_configuration_entry("Device ID", DEVICE_ID, "", false, device_id_span, &trusted));
+      read_configuration_entry("Device ID", DEVICE_ID, "", false, device_id_span, &device_id_span));
 
   az_span iot_hub_fqdn_span = AZ_SPAN_FROM_BUFFER(iot_hub_fqdn);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
-      "IoT Hub FQDN", IOT_HUB_FQDN, "", false, iot_hub_fqdn_span, &trusted));
+      "IoT Hub FQDN", IOT_HUB_FQDN, "", false, iot_hub_fqdn_span, &iot_hub_fqdn_span));
 
   AZ_RETURN_IF_FAILED(
       create_mqtt_endpoint(mqtt_endpoint, (int32_t)sizeof(mqtt_endpoint), iot_hub_fqdn_span));
@@ -163,6 +163,8 @@ static int connect_device()
 
   MQTTClient_SSLOptions mqtt_ssl_options = MQTTClient_SSLOptions_initializer;
   MQTTClient_connectOptions mqtt_connect_options = MQTTClient_connectOptions_initializer;
+  mqtt_connect_options.cleansession = false;
+  mqtt_connect_options.keepAliveInterval = AZ_IOT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS;
 
   char username[128];
   if ((rc = az_iot_hub_client_get_user_name(&client, username, sizeof(username), NULL)) != AZ_OK)
@@ -195,6 +197,14 @@ static int connect_device()
 static int send_telemetry_messages()
 {
   int rc;
+
+  if ((rc = az_iot_hub_client_telemetry_get_publish_topic(
+           &client, NULL, telemetry_topic, sizeof(telemetry_topic), NULL))
+      != AZ_OK)
+  {
+    return rc;
+  }
+
   for (int i = 0; i < NUMBER_OF_MESSAGES; ++i)
   {
     printf("Sending Message %i\n", i + 1);
@@ -245,13 +255,6 @@ int main()
   }
 
   if ((rc = connect_device()) != 0)
-  {
-    return rc;
-  }
-
-  if ((rc = az_iot_hub_client_telemetry_get_publish_topic(
-           &client, NULL, telemetry_topic, sizeof(telemetry_topic), NULL))
-      != AZ_OK)
   {
     return rc;
   }
