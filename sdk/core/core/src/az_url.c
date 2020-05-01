@@ -40,6 +40,7 @@ AZ_NODISCARD az_result _az_url_encode(az_span destination, az_span source, int32
 
   if (az_span_size(destination) < result_size)
   {
+    *out_length = 0;
     return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
   }
 

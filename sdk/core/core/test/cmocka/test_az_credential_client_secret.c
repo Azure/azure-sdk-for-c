@@ -22,7 +22,7 @@ static void test_credential_client_secret(void** state)
   (void)state;
 
   az_credential_client_secret credential = { 0 };
-  // init credential_credentials struc
+
   assert_true(az_succeeded(az_credential_client_secret_init(
       &credential,
       AZ_SPAN_FROM_STR("TenantID"),
@@ -48,6 +48,24 @@ static void test_credential_client_secret(void** state)
     AZ_SPAN_FROM_STR("HTTP/1.1 200 OK\r\n\r\nResponse4"),
   };
 
+  // Cmocka works in a way that you have to pre-load it with a value for every time it will be
+  // invoked (tt does not resure previously set value).
+  int const clock_requests[]{
+    2, // wait to retry, set token expiration
+    1, // check if token has expired
+    3, // check if token has expired, wait to retry, settoken expiration
+    1, // check if token has expired
+  };
+
+  // Some value that is big enough so that when you add 3600000 milliseconds to it (1 hour),
+  // and while in debuger, the vallue you see is seen as "103600000", which is easy to debug.
+  int const clock_values[]{
+    100000000, // first - initial request. Token will be obtained
+    100000000, // the token is not expected to expire, cached value will be used.
+    200000000, // token should be considered expired, when clock is this, so it should refresh.
+    200000000, // use cached refreshed token.
+  };
+
   az_span const request_url = AZ_SPAN_FROM_STR("https://www.microsoft.com/test/request");
   for (int i = 0; i < 4; ++i)
   {
@@ -70,12 +88,18 @@ static void test_credential_client_secret(void** state)
     ignore = az_http_response_init(&response, AZ_SPAN_FROM_BUFFER(response_buf));
 
 #ifdef _az_MOCK_ENABLED
-    will_return(__wrap_az_platform_clock_msec, ((i / 2) + 1) * 100000000);
+    for (var j = 0; j < clock_requests[i]; ++j)
+    {
+      will_return(__wrap_az_platform_clock_msec, clock_values[j]);
+    }
+
     ignore = az_http_pipeline_process(&pipeline, &request, &response);
     assert_true(az_span_is_content_equal(expected_responses[i], response._internal.http_response));
 #else // _az_MOCK_ENABLED
     (void)pipeline;
     (void)expected_responses;
+    (void)clock_requests;
+    (void)clock_values;
 #endif // _az_MOCK_ENABLED
     (void)ignore;
   }
@@ -85,6 +109,11 @@ az_result send_request(_az_http_request* request, az_http_response* response);
 
 az_result send_request(_az_http_request* request, az_http_response* response)
 {
+  // This function handles requests to both auth service and to the supposed service itself.
+  // (we only can inject at compile time).
+
+  // This is used to indicate whether we should be returning and expecting the "AuthToken" or
+  // "NewAuthToken" (supposedly the one that you get requesting a token an hour later).
   static bool redo_auth = false;
 
   az_span const request_url
@@ -125,12 +154,14 @@ az_result send_request(_az_http_request* request, az_http_response* response)
 
     ++auth_attempt;
 
-    // 3rd attempt should never happen because the token should not be expiring given that clock
-    // returns 0.
+    // 3rd attempt to request a token should never happen because we expect the token to be cached.
+    // (Unless we are simulating an expired token, which is controlled by redo_auth static variable
+    // in this function).
     assert_in_range(auth_attempt, 1, 2);
 
     if (auth_attempt == 1)
     {
+      // Simulate a retriable HTTP error during a first attempt to get token.
       response->_internal.http_response
           = AZ_SPAN_FROM_STR("HTTP/1.1 500 Internal Server Error\r\n\r\n");
     }
@@ -138,12 +169,14 @@ az_result send_request(_az_http_request* request, az_http_response* response)
     {
       if (!redo_auth)
       {
+        // "Initial" token.
         response->_internal.http_response
             = AZ_SPAN_FROM_STR("HTTP/1.1 200 OK\r\n\r\n"
                                "{ \"access_token\" : \"AccessToken\", \"expires_in\" : 3600 }");
       }
       else
       {
+        // "New" token.
         response->_internal.http_response
             = AZ_SPAN_FROM_STR("HTTP/1.1 200 OK\r\n\r\n"
                                "{ \"access_token\" : \"NewAccessToken\", \"expires_in\" : 3600 }");
@@ -168,7 +201,7 @@ az_result send_request(_az_http_request* request, az_http_response* response)
           assert_true(
               az_span_is_content_equal(AZ_SPAN_FROM_STR("Bearer AccessToken"), header.value));
         }
-        else
+        else // Verify that we've got the refreshed token
         {
           assert_true(
               az_span_is_content_equal(AZ_SPAN_FROM_STR("Bearer NewAccessToken"), header.value));
@@ -183,6 +216,8 @@ az_result send_request(_az_http_request* request, az_http_response* response)
     static int attempt = 0;
     ++attempt;
 
+    // Return different values so that it is more likely that the test wenth through all
+    // verifications (both old and new token).
     if (attempt == 1)
     {
       response->_internal.http_response = AZ_SPAN_FROM_STR("HTTP/1.1 200 OK\r\n\r\nResponse1");
