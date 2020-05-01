@@ -50,7 +50,7 @@ static void test_credential_client_secret(void** state)
 
   // Cmocka works in a way that you have to pre-load it with a value for every time it will be
   // invoked (tt does not resure previously set value).
-  int const clock_requests[] = {
+  int const clock_nrequests[] = {
     2, // wait to retry, set token expiration
     1, // check if token has expired
     3, // check if token has expired, wait to retry, set token expiration
@@ -59,7 +59,7 @@ static void test_credential_client_secret(void** state)
 
   // Some value that is big enough so that when you add 3600000 milliseconds to it (1 hour),
   // and while in debuger, the vallue you see is seen as "103600000", which is easy to debug.
-  int const clock_values[] = {
+  int const clock_value[] = {
     100000000, // first - initial request. Token will be obtained
     100000000, // the token is not expected to expire, cached value will be used.
     200000000, // token should be considered expired, when clock is this, so it should refresh.
@@ -88,18 +88,14 @@ static void test_credential_client_secret(void** state)
     ignore = az_http_response_init(&response, AZ_SPAN_FROM_BUFFER(response_buf));
 
 #ifdef _az_MOCK_ENABLED
-    for (int j = 0; j < clock_requests[i]; ++j)
-    {
-      will_return(__wrap_az_platform_clock_msec, clock_values[j]);
-    }
-
+    will_return_count(__wrap_az_platform_clock_msec, clock_value[i], clock_nrequests[i]);
     ignore = az_http_pipeline_process(&pipeline, &request, &response);
     assert_true(az_span_is_content_equal(expected_responses[i], response._internal.http_response));
 #else // _az_MOCK_ENABLED
     (void)pipeline;
     (void)expected_responses;
-    (void)clock_requests;
-    (void)clock_values;
+    (void)clock_nrequests;
+    (void)clock_value;
 #endif // _az_MOCK_ENABLED
     (void)ignore;
   }
