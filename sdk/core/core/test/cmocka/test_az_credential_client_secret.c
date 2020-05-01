@@ -74,10 +74,10 @@ static void test_credential_client_secret(void** state)
     ignore = az_http_pipeline_process(&pipeline, &request, &response);
     assert_true(az_span_is_content_equal(expected_responses[i], response._internal.http_response));
 #else // _az_MOCK_ENABLED
-    (void)ignore;
     (void)pipeline;
     (void)expected_responses;
 #endif // _az_MOCK_ENABLED
+    (void)ignore;
   }
 }
 
