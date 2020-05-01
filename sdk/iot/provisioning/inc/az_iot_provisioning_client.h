@@ -292,7 +292,6 @@ typedef enum
  * @param[out] out_operation_status The registration operation status.
  * @return #az_result
  *         - #AZ_ERROR_PARSER_UNEXPECTED_CHAR if the string contains an unexpected value.
- *         @remark See #az_iot_provisioning_client_register_response for acceptable values.
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_parse_operation_status(
     az_iot_provisioning_client_register_response* response,

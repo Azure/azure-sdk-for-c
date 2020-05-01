@@ -5,6 +5,11 @@
  * @file az_iot_core.h
  *
  * @brief Azure IoT common definitions.
+ *
+ * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
+ * prefixed with an underscore ('_') directly in your application code. These symbols
+ * are part of Azure SDK's internal implementation; we do not document these symbols
+ * and they are subject to change in future versions of the SDK which would break your code.
  */
 
 #ifndef _az_IOT_CORE_H
@@ -17,15 +22,6 @@
 #include <stdint.h>
 
 #include <_az_cfg_prefix.h>
-
-/**
- * @brief Azure IoT service MQTT connection properties.
- *
- * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
- * prefixed with an underscore ('_') directly in your application code. These symbols
- * are part of Azure SDK's internal implementation; we do not document these symbols
- * and they are subject to change in future versions of the SDK which would break your code.
- */
 
 enum
 {
@@ -68,7 +64,7 @@ typedef enum
  * @param[in] status The #az_iot_status to verify.
  * @return `true` if the status indicates success. `false` otherwise.
  */
-AZ_INLINE bool az_iot_is_success_status(az_iot_status status)
+AZ_NODISCARD AZ_INLINE bool az_iot_is_success_status(az_iot_status status)
 {
   return status < AZ_IOT_STATUS_BAD_REQUEST;
 }
@@ -80,7 +76,7 @@ AZ_INLINE bool az_iot_is_success_status(az_iot_status status)
  * @param[in] status The #az_iot_status to verify.
  * @return `true` if the operation should be retried. `false` otherwise.
  */
-AZ_INLINE bool az_iot_is_retriable_status(az_iot_status status)
+AZ_NODISCARD AZ_INLINE bool az_iot_is_retriable_status(az_iot_status status)
 {
   return ((status == AZ_IOT_STATUS_THROTTLED) || (status == AZ_IOT_STATUS_SERVER_ERROR));
 }
@@ -104,7 +100,7 @@ AZ_NODISCARD int32_t az_iot_retry_calc_delay(
     int32_t random_msec);
 
 /**
- * @brief _az_span_token is a string tokenizer for az_span.
+ * @brief String tokenizer for #az_span.
  *
  * @param[in] source The #az_span with the content to be searched on. It must be a non-empty
  * #az_span.
@@ -120,7 +116,7 @@ AZ_NODISCARD int32_t az_iot_retry_calc_delay(
 AZ_NODISCARD az_span _az_span_token(az_span source, az_span delimiter, az_span* out_remainder);
 
 /**
- * @brief _az_iot_u32toa_size gives the length, in bytes, of the string that would represent the given number.
+ * @brief Gives the length, in bytes, of the string that would represent the given number.
  *
  * @param[in] number The number whose length, as a string, is to be evaluated.
  * @return The length (not considering null terminator) of the string that would represent the given

@@ -75,7 +75,7 @@ Recommended defaults:
 
 #### MQTT Clean Session
 
-We recommend to always use Clean Session false when connecting to IoT Hub.
+We recommend to always use [Clean Session](http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc398718030) false when connecting to IoT Hub.
 Connecting with Clean Session true will remove all enqueued C2D messages.
 
 ### Subscribe to topics
