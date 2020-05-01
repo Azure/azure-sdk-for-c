@@ -88,7 +88,7 @@ static void test_credential_client_secret(void** state)
     ignore = az_http_response_init(&response, AZ_SPAN_FROM_BUFFER(response_buf));
 
 #ifdef _az_MOCK_ENABLED
-    for (var j = 0; j < clock_requests[i]; ++j)
+    for (int j = 0; j < clock_requests[i]; ++j)
     {
       will_return(__wrap_az_platform_clock_msec, clock_values[j]);
     }
