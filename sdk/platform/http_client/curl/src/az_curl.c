@@ -491,7 +491,7 @@ _az_http_client_curl_setup_url(CURL* p_curl, _az_http_request const* p_request)
   }
 
   // write url in buffer (will add \0 at the end)
-  // request_url is already with the size of what it has written only
+  // request_url is already the right size containing only what has been written into it
   az_result result = _az_http_client_curl_append_url(writable_buffer, request_url);
 
   if (az_succeeded(result))
