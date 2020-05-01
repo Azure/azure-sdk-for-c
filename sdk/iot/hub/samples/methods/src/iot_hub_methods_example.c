@@ -216,7 +216,7 @@ static az_result send_method_response(
     response_span = AZ_SPAN_FROM_STR("{}");
   }
 
-  printf("Status: %d\tPayload:", status);
+  printf("Status: %u\tPayload:", status);
   char* payload_char = (char*)az_span_ptr(response_span);
   for (int32_t i = 0; i < az_span_size(response_span); i++)
   {
