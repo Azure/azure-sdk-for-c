@@ -62,6 +62,7 @@ add_library (
   src/az_log.c
   src/az_precondition.c
   src/az_span.c
+  src/az_url.c
   )
 
 target_include_directories (${TARGET_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc> $<INSTALL_INTERFACE:include/${TARGET_NAME}>)

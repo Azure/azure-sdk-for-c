@@ -19,8 +19,8 @@ endif()
 
 add_cmocka_test(${TARGET_NAME} SOURCES
                 main.c
-                test_az_aad.c
                 test_az_context.c
+                test_az_credential_client_secret.c
                 test_az_http.c
                 test_az_json.c
                 test_az_logging.c
