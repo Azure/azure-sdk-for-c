@@ -3,6 +3,7 @@
 
 #include "test_az_iot_provisioning_client.h"
 #include <az_iot_provisioning_client.h>
+#include <az_log.h>
 #include <az_span.h>
 #include <az_test_span.h>
 
@@ -355,7 +356,8 @@ test_az_iot_provisioning_client_received_topic_and_payload_parse_invalid_operati
   assert_int_equal(AZ_ERROR_PARSER_UNEXPECTED_CHAR, ret);
 }
 
-static void test_az_iot_provisioning_client_received_topic_and_payload_parse_invalid_result_json_fails()
+static void
+test_az_iot_provisioning_client_received_topic_and_payload_parse_invalid_result_json_fails()
 {
   az_iot_provisioning_client client;
   az_span received_topic = AZ_SPAN_FROM_STR("$dps/registrations/res/200/?$rid=1");
@@ -393,7 +395,8 @@ static void test_az_iot_provisioning_client_received_topic_and_payload_parse_hub
   assert_int_equal(AZ_ERROR_ITEM_NOT_FOUND, ret);
 }
 
-static void test_az_iot_provisioning_client_received_topic_and_payload_parse_device_not_found_fails()
+static void
+test_az_iot_provisioning_client_received_topic_and_payload_parse_device_not_found_fails()
 {
   az_iot_provisioning_client client;
   az_span received_topic = AZ_SPAN_FROM_STR("$dps/registrations/res/200/?$rid=1");
@@ -466,6 +469,55 @@ static void test_az_iot_provisioning_client_operation_complete_translate_succeed
   assert_true(az_iot_provisioning_client_operation_complete(AZ_IOT_PROVISIONING_STATUS_DISABLED));
 }
 
+static const az_span _log_received_topic = AZ_SPAN_LITERAL_FROM_STR("$dps/registrations/res/202");
+static const az_span _log_received_payload = AZ_SPAN_LITERAL_FROM_STR("LOG_PAYLOAD");
+
+static int _log_invoked_topic = 0;
+static int _log_invoked_payload = 0;
+static void _log_listener(az_log_classification classification, az_span message)
+{
+  switch (classification)
+  {
+    case AZ_LOG_MQTT_RECEIVED_TOPIC:
+      assert_memory_equal(
+          az_span_ptr(_log_received_topic), az_span_ptr(message), (size_t)az_span_size(message));
+      _log_invoked_topic++;
+      break;
+    case AZ_LOG_MQTT_RECEIVED_PAYLOAD:
+      assert_memory_equal(
+          az_span_ptr(_log_received_payload), az_span_ptr(message), (size_t)az_span_size(message));
+      _log_invoked_payload++;
+      break;
+    default:
+      assert_true(false);
+  }
+}
+
+static void test_az_iot_provisioning_client_logging_succeed()
+{
+  az_log_classification const classifications[]
+      = { AZ_LOG_MQTT_RECEIVED_TOPIC, AZ_LOG_MQTT_RECEIVED_PAYLOAD, AZ_LOG_END_OF_LIST };
+  az_log_set_callback(_log_listener);
+  az_log_set_classifications(classifications);
+
+  assert_int_equal(0, _log_invoked_topic);
+  assert_int_equal(0, _log_invoked_payload);
+
+  _log_invoked_topic = 0;
+  _log_invoked_payload = 0;
+
+  az_iot_provisioning_client client;
+  az_iot_provisioning_client_register_response response;
+  assert_true(az_failed(az_iot_provisioning_client_parse_received_topic_and_payload(
+      &client, _log_received_topic, _log_received_payload, &response)));
+
+  assert_int_equal(1, _log_invoked_topic);
+  assert_int_equal(1, _log_invoked_payload);
+
+  az_log_set_classifications(NULL);
+  az_log_set_callback(NULL);
+}
+
 #ifdef _MSC_VER
 // warning C4113: 'void (__cdecl *)()' differs in parameter lists from 'CMUnitTestFunction'
 #pragma warning(disable : 4113)
@@ -506,6 +558,7 @@ int test_az_iot_provisioning_client_parser()
         test_az_iot_provisioning_client_received_topic_and_payload_parse_device_not_found_fails),
     cmocka_unit_test(test_az_iot_provisioning_client_parse_operation_status_translate_succeed),
     cmocka_unit_test(test_az_iot_provisioning_client_operation_complete_translate_succeed),
+    cmocka_unit_test(test_az_iot_provisioning_client_logging_succeed),
   };
 
   return cmocka_run_group_tests_name("az_iot_provisioning_client_parser", tests, NULL, NULL);
