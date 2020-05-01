@@ -206,16 +206,16 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_find(
 
   while (az_span_size(remaining) != 0)
   {
-    az_span delim_span = az_span_token(remaining, hub_client_param_equals_span, &remaining);
+    az_span delim_span = _az_span_token(remaining, hub_client_param_equals_span, &remaining);
     if (az_span_is_content_equal(delim_span, name))
     {
-      *out_value = az_span_token(remaining, hub_client_param_separator_span, &remaining);
+      *out_value = _az_span_token(remaining, hub_client_param_separator_span, &remaining);
       return AZ_OK;
     }
     else
     {
       az_span value;
-      value = az_span_token(remaining, hub_client_param_separator_span, &remaining);
+      value = _az_span_token(remaining, hub_client_param_separator_span, &remaining);
       (void)value;
     }
   }
@@ -241,8 +241,8 @@ az_iot_hub_client_properties_next(az_iot_hub_client_properties* properties, az_p
   az_span remainder;
   az_span prop_span = az_span_slice(properties->_internal.properties_buffer, index, prop_length);
 
-  out->key = az_span_token(prop_span, hub_client_param_equals_span, &remainder);
-  out->value = az_span_token(remainder, hub_client_param_separator_span, &remainder);
+  out->key = _az_span_token(prop_span, hub_client_param_equals_span, &remainder);
+  out->value = _az_span_token(remainder, hub_client_param_separator_span, &remainder);
   if (az_span_size(remainder) == 0)
   {
     properties->_internal.current_property_index = (uint32_t)prop_length;

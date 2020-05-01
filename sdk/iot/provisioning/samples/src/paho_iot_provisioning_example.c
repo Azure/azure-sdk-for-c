@@ -145,6 +145,8 @@ static int connect_device()
 
   MQTTClient_SSLOptions mqtt_ssl_options = MQTTClient_SSLOptions_initializer;
   MQTTClient_connectOptions mqtt_connect_options = MQTTClient_connectOptions_initializer;
+  mqtt_connect_options.cleansession = false;
+  mqtt_connect_options.keepAliveInterval = AZ_IOT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS;
 
   char username[128];
   if ((rc = az_iot_provisioning_client_get_user_name(
@@ -280,7 +282,17 @@ static int get_operation_status()
       return rc;
     }
 
-    if (az_span_is_content_equal(response.registration_state, AZ_SPAN_FROM_STR("assigning")))
+    az_iot_provisioning_client_operation_status operation_status;
+    if (az_failed(
+            rc = az_iot_provisioning_client_parse_operation_status(&response, &operation_status)))
+    {
+      printf("Failed to parse operation_status, return code %d\n", rc);
+      return rc;
+    }
+
+    is_operation_complete = az_iot_provisioning_client_operation_complete(operation_status);
+
+    if (!is_operation_complete)
     {
       if (az_failed(
               rc = az_iot_provisioning_client_query_status_get_publish_topic(
@@ -300,36 +312,36 @@ static int get_operation_status()
         return rc;
       }
     }
-    else if (az_span_is_content_equal(response.registration_state, AZ_SPAN_FROM_STR("assigned")))
+    else
     {
-      printf("SUCCESS - Device provisioned:\n");
-      printf("\tHub Hostname: ");
-      print_az_span(response.registration_information.assigned_hub_hostname);
-      printf("\tDevice Id: ");
-      print_az_span(response.registration_information.device_id);
-      is_operation_complete = true;
-    }
-    else // unassigned, failed or disabled states
-    {
-      printf("ERROR - Device Provisioning failed:\n");
-      printf("\tRegistration state: ");
-      print_az_span(response.registration_state);
-      printf("\tLast operation status: %d\n", response.status);
-      printf("\tOperation ID: ");
-      print_az_span(response.operation_id);
-      printf("\tError code: %u\n", response.registration_information.extended_error_code);
-      printf("\tError message: ");
-      print_az_span(response.registration_information.error_message);
-      printf("\tError timestamp: ");
-      print_az_span(response.registration_information.error_timestamp);
-      printf("\tError tracking ID: ");
-      print_az_span(response.registration_information.error_tracking_id);
-      if (response.retry_after_seconds > 0)
+      if (operation_status == AZ_IOT_PROVISIONING_STATUS_ASSIGNED)
       {
-        printf("\tRetry-after: %u seconds.", response.retry_after_seconds);
+        printf("SUCCESS - Device provisioned:\n");
+        printf("\tHub Hostname: ");
+        print_az_span(response.registration_result.assigned_hub_hostname);
+        printf("\tDevice Id: ");
+        print_az_span(response.registration_result.device_id);
       }
-
-      is_operation_complete = true;
+      else // unassigned, failed or disabled states
+      {
+        printf("ERROR - Device Provisioning failed:\n");
+        printf("\tRegistration state: ");
+        print_az_span(response.operation_status);
+        printf("\tLast operation status: %d\n", response.status);
+        printf("\tOperation ID: ");
+        print_az_span(response.operation_id);
+        printf("\tError code: %u\n", response.registration_result.extended_error_code);
+        printf("\tError message: ");
+        print_az_span(response.registration_result.error_message);
+        printf("\tError timestamp: ");
+        print_az_span(response.registration_result.error_timestamp);
+        printf("\tError tracking ID: ");
+        print_az_span(response.registration_result.error_tracking_id);
+        if (response.retry_after_seconds > 0)
+        {
+          printf("\tRetry-after: %u seconds.", response.retry_after_seconds);
+        }
+      }
     }
 
     MQTTClient_freeMessage(&message);

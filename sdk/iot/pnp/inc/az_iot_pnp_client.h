@@ -154,8 +154,8 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_sas_signature(
 
 /**
  * @brief Gets the MQTT password.
- * @note The MQTT password must be an empty string if X509 Client certificates are used. Use this
- *       API only when authenticating with SAS tokens.
+ * @remark The MQTT password must be an empty string if X509 Client certificates are used. Use this
+ *         API only when authenticating with SAS tokens.
  *
  * @param[in] client The #az_iot_pnp_client to use for this call.
  * @param[in] base64_hmac_sha256_signature The Base64 encoded value of the HMAC-SHA256(signature,
@@ -200,8 +200,8 @@ AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_sas_password(
 
 /**
  * @brief Gets the MQTT topic that must be used for device to cloud telemetry messages.
- * @note Telemetry MQTT Publish messages must have QoS At Least Once (1).
- * @note This topic can also be used to set the MQTT Will message in the Connect message.
+ * @remark Telemetry MQTT Publish messages must have QoS At Least Once (1).
+ * @remark This topic can also be used to set the MQTT Will message in the Connect message.
  *
  * Should the user want a null terminated topic string, they may allocate a buffer large enough
  * to fit the topic plus a null terminator. They must set the last byte themselves or zero

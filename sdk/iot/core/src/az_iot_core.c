@@ -8,74 +8,41 @@
 #include <az_result.h>
 #include <az_span.h>
 
+#include <az_retry_internal.h>
+
 #include <_az_cfg.h>
 
-AZ_NODISCARD az_result az_iot_get_status_from_uint32(uint32_t status_int, az_iot_status* status)
+AZ_NODISCARD int32_t az_iot_retry_calc_delay(
+    int32_t operation_msec,
+    int16_t attempt,
+    int32_t min_retry_delay_msec,
+    int32_t max_retry_delay_msec,
+    int32_t random_msec)
 {
-  switch (status_int)
+  _az_PRECONDITION_RANGE(0, operation_msec, INT32_MAX - 1);
+  _az_PRECONDITION_RANGE(0, attempt, INT16_MAX - 1);
+  _az_PRECONDITION_RANGE(0, min_retry_delay_msec, INT32_MAX - 1);
+  _az_PRECONDITION_RANGE(0, max_retry_delay_msec, INT32_MAX - 1);
+  _az_PRECONDITION_RANGE(0, random_msec, INT32_MAX - 1);
+
+  int32_t delay = _az_retry_calc_delay(attempt, min_retry_delay_msec, max_retry_delay_msec);
+  
+  if (delay < 0) 
   {
-    case AZ_IOT_STATUS_OK:
-      *status = AZ_IOT_STATUS_OK;
-      break;
-    case AZ_IOT_STATUS_ACCEPTED:
-      *status = AZ_IOT_STATUS_ACCEPTED;
-      break;
-    case AZ_IOT_STATUS_NO_CONTENT:
-      *status = AZ_IOT_STATUS_NO_CONTENT;
-      break;
-    case AZ_IOT_STATUS_BAD_REQUEST:
-      *status = AZ_IOT_STATUS_BAD_REQUEST;
-      break;
-    case AZ_IOT_STATUS_UNAUTHORIZED:
-      *status = AZ_IOT_STATUS_UNAUTHORIZED;
-      break;
-    case AZ_IOT_STATUS_FORBIDDEN:
-      *status = AZ_IOT_STATUS_FORBIDDEN;
-      break;
-    case AZ_IOT_STATUS_NOT_FOUND:
-      *status = AZ_IOT_STATUS_NOT_FOUND;
-      break;
-    case AZ_IOT_STATUS_NOT_ALLOWED:
-      *status = AZ_IOT_STATUS_NOT_ALLOWED;
-      break;
-    case AZ_IOT_STATUS_NOT_CONFLICT:
-      *status = AZ_IOT_STATUS_NOT_CONFLICT;
-      break;
-    case AZ_IOT_STATUS_PRECONDITION_FAILED:
-      *status = AZ_IOT_STATUS_PRECONDITION_FAILED;
-      break;
-    case AZ_IOT_STATUS_REQUEST_TOO_LARGE:
-      *status = AZ_IOT_STATUS_REQUEST_TOO_LARGE;
-      break;
-    case AZ_IOT_STATUS_UNSUPPORTED_TYPE:
-      *status = AZ_IOT_STATUS_UNSUPPORTED_TYPE;
-      break;
-    case AZ_IOT_STATUS_THROTTLED:
-      *status = AZ_IOT_STATUS_THROTTLED;
-      break;
-    case AZ_IOT_STATUS_CLIENT_CLOSED:
-      *status = AZ_IOT_STATUS_CLIENT_CLOSED;
-      break;
-    case AZ_IOT_STATUS_SERVER_ERROR:
-      *status = AZ_IOT_STATUS_SERVER_ERROR;
-      break;
-    case AZ_IOT_STATUS_BAD_GATEWAY:
-      *status = AZ_IOT_STATUS_BAD_GATEWAY;
-      break;
-    case AZ_IOT_STATUS_SERVICE_UNAVAILABLE:
-      *status = AZ_IOT_STATUS_SERVICE_UNAVAILABLE;
-      break;
-    case AZ_IOT_STATUS_TIMEOUT:
-      *status = AZ_IOT_STATUS_TIMEOUT;
-      break;
-    default:
-      return AZ_ERROR_ITEM_NOT_FOUND;
+    delay = max_retry_delay_msec;
   }
 
-  return AZ_OK;
+  if (max_retry_delay_msec - delay > random_msec)
+  {
+    delay += random_msec;
+  }
+
+  delay -= operation_msec;
+
+  return delay > 0 ? delay : 0;
 }
 
-AZ_NODISCARD az_span az_span_token(az_span source, az_span delimiter, az_span* out_remainder)
+AZ_NODISCARD az_span _az_span_token(az_span source, az_span delimiter, az_span* out_remainder)
 {
   _az_PRECONDITION_VALID_SPAN(delimiter, 1, false);
   _az_PRECONDITION_NOT_NULL(out_remainder);
