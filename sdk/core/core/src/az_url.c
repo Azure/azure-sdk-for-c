@@ -29,11 +29,11 @@ AZ_NODISCARD az_result _az_url_encode(az_span destination, az_span source, int32
   _az_PRECONDITION_NOT_NULL(out_length);
   _az_PRECONDITION_VALID_SPAN(source, 0, true);
 
-  int32_t const input_size = az_span_size(source);
-  _az_PRECONDITION_VALID_SPAN(destination, input_size, false);
+  int32_t const source_size = az_span_size(source);
+  _az_PRECONDITION_VALID_SPAN(destination, source_size, false);
 
   int32_t result_size = 0;
-  for (int32_t i = 0; i < input_size; ++i)
+  for (int32_t i = 0; i < source_size; ++i)
   {
     result_size += _az_url_should_encode(az_span_ptr(source)[i]) ? 3 : 1;
   }
@@ -47,7 +47,7 @@ AZ_NODISCARD az_result _az_url_encode(az_span destination, az_span source, int32
   uint8_t* const src_ptr = az_span_ptr(source);
   uint8_t* dest_ptr = az_span_ptr(destination);
 
-  for (int32_t src_idx = 0; src_idx < input_size; ++src_idx)
+  for (int32_t src_idx = 0; src_idx < source_size; ++src_idx)
   {
     uint8_t c = src_ptr[src_idx];
     if (!_az_url_should_encode(c))
