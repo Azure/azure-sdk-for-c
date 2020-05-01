@@ -172,7 +172,7 @@ static int on_received(void* context, char* topicName, int topicLen, MQTTClient_
 
   if (topicLen == 0)
   {
-    // The length of the topic if there are one more NULL characters embedded in topicName,
+    // The length of the topic if there are one or more NULL characters embedded in topicName,
     // otherwise topicLen is 0.
     topicLen = (int)strlen(topicName);
   }

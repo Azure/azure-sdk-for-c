@@ -30,7 +30,7 @@ Getting started explained in detail [here][SDK_README_GETTING_STARTED].
 The following section documents various examples. All of them use the [Eclipse Paho MQTT C client][Eclipse_Paho].
 
 ### [IoT Hub C2D][c2d_sample]
-Receive and view incoming C2D messages using the IoT Hub client.
+Receive and view incoming C2D messages using the IoT Hub Client.
 
 ### [IoT Hub Methods][methods_sample]
 Invoke methods from the cloud. The sample supports a method named "double"
@@ -40,11 +40,11 @@ which will return back to you the value sent as the payload. The payload must be
   "value": 10
 }
 ```
-where 10 can be substituted for any number between `UINT64_T_MIN / 2` and `UINT64_T_MAX / 2`.
+where 10 can be substituted for any number between `INT64_MIN / 2` and `INT64_MAX / 2`.
 ### [IoT Hub Telemetry][telemetry_sample]
-Send 5 telemetry messages using the IoT Hub client.
+Send 5 telemetry messages using the IoT Hub Client.
 ### [IoT Hub Twin][twin_sample]
-Use twin features such as updating reported properties, receiving the twin document, and receiving desired properties using the IoT Hub client.
+Use twin features such as updating reported properties, receiving the twin document, and receiving desired properties using the IoT Hub Client.
 
 ## Troubleshooting
 
@@ -52,7 +52,7 @@ When interacting with the Azure IoT Hub using this C client library, errors are 
 
 ## Next steps
 
-Start using the IoT Hub Client in your solutions. Our SDK details can be found at [SDK README][IOT_CLIENT_README].
+Start using the IoT Hub Client in your solutions. More SDK details can be found in [SDK README][IOT_CLIENT_README].
 
 ### Additional Documentation
 
@@ -68,7 +68,7 @@ This project welcomes contributions and suggestions. Find [more contributing][SD
 [SDK_README_GETTING_STARTED]: ../../README.md#getting-started
 [SDK_README_KEY_CONCEPTS]: ../../README.md#key-concepts
 [c2d_sample]: c2d/src/iot_hub_c2d_example.c
-[methods_sample]: methods/src/iot_methods_example.c
+[methods_sample]: methods/src/iot_hub_methods_example.c
 [telemetry_sample]: telemetry/src/iot_hub_telemetry_example.c
 [twin_sample]: twin/src/iot_hub_twin_example.c
 [iot_hub_mqtt]: https://docs.microsoft.com/en-us/azure/iot-dps/iot-dps-mqtt-support
