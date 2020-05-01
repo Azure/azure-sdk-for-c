@@ -323,10 +323,10 @@ static void test_http_response(void** state)
   }
 }
 
-#ifndef NO_PRECONDITION_CHECKING
+#ifndef AZ_NO_PRECONDITION_CHECKING
 enable_precondition_check_tests()
 
-static void test_http_request_removing_left_white_spaces(void** state)
+    static void test_http_request_removing_left_white_spaces(void** state)
 {
   (void)state;
 
@@ -355,18 +355,18 @@ static void test_http_request_removing_left_white_spaces(void** state)
       az_http_request_append_header(&hrb, AZ_SPAN_FROM_STR(" \t\r"), AZ_SPAN_NULL));
 }
 
-#endif // NO_PRECONDITION_CHECKING
+#endif // AZ_NO_PRECONDITION_CHECKING
 
 int test_az_http()
 {
-#ifndef NO_PRECONDITION_CHECKING
+#ifndef AZ_NO_PRECONDITION_CHECKING
   setup_precondition_check_tests();
-#endif // NO_PRECONDITION_CHECKING
+#endif // AZ_NO_PRECONDITION_CHECKING
 
   const struct CMUnitTest tests[] = {
-#ifndef NO_PRECONDITION_CHECKING
+#ifndef AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_http_request_removing_left_white_spaces),
-#endif // NO_PRECONDITION_CHECKING
+#endif // AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_http_request),
     cmocka_unit_test(test_http_response),
   };
