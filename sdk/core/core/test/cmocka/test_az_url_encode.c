@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "az_test_definitions.h"
-#include <az_url_internal.h>
+#include <az_span_internal.h>
 
 #include <stdarg.h>
 #include <stddef.h>
