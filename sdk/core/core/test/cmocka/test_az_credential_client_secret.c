@@ -50,7 +50,7 @@ static void test_credential_client_secret(void** state)
 
   // Cmocka works in a way that you have to pre-load it with a value for every time it will be
   // invoked (tt does not resure previously set value).
-  int const clock_requests[]{
+  int const clock_requests[] = {
     2, // wait to retry, set token expiration
     1, // check if token has expired
     3, // check if token has expired, wait to retry, set token expiration
@@ -59,7 +59,7 @@ static void test_credential_client_secret(void** state)
 
   // Some value that is big enough so that when you add 3600000 milliseconds to it (1 hour),
   // and while in debuger, the vallue you see is seen as "103600000", which is easy to debug.
-  int const clock_values[]{
+  int const clock_values[] = {
     100000000, // first - initial request. Token will be obtained
     100000000, // the token is not expected to expire, cached value will be used.
     200000000, // token should be considered expired, when clock is this, so it should refresh.
