@@ -53,7 +53,7 @@ static void test_credential_client_secret(void** state)
   int const clock_requests[]{
     2, // wait to retry, set token expiration
     1, // check if token has expired
-    3, // check if token has expired, wait to retry, settoken expiration
+    3, // check if token has expired, wait to retry, set token expiration
     1, // check if token has expired
   };
 
