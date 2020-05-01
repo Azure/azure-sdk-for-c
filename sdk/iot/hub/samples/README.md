@@ -11,7 +11,7 @@ urlFragment: iot-hub-samples
 
 # Azure IoT Hub Sample
 
-This document explains samples for the Azure Embedded C SDK IoT Hub Client and how to use them.
+This document explains samples for the Azure SDK for Embedded C IoT Hub Client and how to use them.
 
 ## Key concepts
 
