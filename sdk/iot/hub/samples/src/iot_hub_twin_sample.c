@@ -122,7 +122,6 @@ static az_result create_mqtt_endpoint(char* destination, int32_t destination_siz
 
 static az_result read_configuration_and_init_client()
 {
-
   az_span cert = AZ_SPAN_FROM_BUFFER(x509_cert_pem_file);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
       "X509 Certificate PEM Store File", DEVICE_X509_CERT_PEM_FILE, NULL, false, cert, &cert));
