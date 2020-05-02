@@ -689,10 +689,10 @@ AZ_NODISCARD az_result _az_span_url_encode(az_span destination, az_span source, 
   _az_PRECONDITION_NOT_NULL(out_length);
   int32_t const result_size = _az_span_url_encode_get_size(destination, source);
 
-  if (result_size == -1)
+  if (result_size <= 0)
   {
     *out_length = 0;
-    return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
+    return result_size == 0 ? AZ_OK : AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
   }
 
   uint8_t* const src_ptr = az_span_ptr(source);
