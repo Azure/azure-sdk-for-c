@@ -646,10 +646,24 @@ AZ_NODISCARD az_result _az_span_url_encode(az_span destination, az_span source, 
   int32_t result_size = 0;
   for (int32_t i = 0; i < source_size; ++i)
   {
-    result_size += _az_span_url_should_encode(az_span_ptr(source)[i]) ? 3 : 1;
+    if (_az_span_url_should_encode(az_span_ptr(source)[i]))
+    {
+      if (result_size <= INT32_MAX - 3)
+      {
+        result_size += 3;
+        continue;
+      }
+    }
+    else if (result_size < INT32_MAX)
+    {
+      result_size += 1;
+      continue;
+    }
+    
+    result_size = -1;
   }
 
-  if (az_span_size(destination) < result_size)
+  if (result_size == -1 || az_span_size(destination) < result_size)
   {
     *out_length = 0;
     return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
