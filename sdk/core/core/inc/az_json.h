@@ -61,7 +61,7 @@ typedef struct
 /*
  * @brief az_json_token_null Returns the "null" JSON token.
  */
-AZ_NODISCARD AZ_INLINE az_json_token az_json_token_null()
+_az_NODISCARD _az_INLINE az_json_token az_json_token_null()
 {
   return (az_json_token){ .kind = AZ_JSON_TOKEN_NULL, ._internal = { 0 } };
 }
@@ -71,7 +71,7 @@ AZ_NODISCARD AZ_INLINE az_json_token az_json_token_null()
  *
  * @param value A boolean indicating how the az_json_token should be initialized.
  */
-AZ_NODISCARD AZ_INLINE az_json_token az_json_token_boolean(bool value)
+_az_NODISCARD _az_INLINE az_json_token az_json_token_boolean(bool value)
 {
   return (az_json_token){
     .kind = AZ_JSON_TOKEN_BOOLEAN,
@@ -84,7 +84,7 @@ AZ_NODISCARD AZ_INLINE az_json_token az_json_token_boolean(bool value)
  *
  * @param value A double indicating how the az_json_token should be initialized.
  */
-AZ_NODISCARD AZ_INLINE az_json_token az_json_token_number(double value)
+_az_NODISCARD _az_INLINE az_json_token az_json_token_number(double value)
 {
   return (az_json_token){
     .kind = AZ_JSON_TOKEN_NUMBER,
@@ -97,7 +97,7 @@ AZ_NODISCARD AZ_INLINE az_json_token az_json_token_number(double value)
  *
  * @param value A span over a string indicating how the az_json_token should be initialized.
  */
-AZ_NODISCARD AZ_INLINE az_json_token az_json_token_string(az_span value)
+_az_NODISCARD _az_INLINE az_json_token az_json_token_string(az_span value)
 {
   return (az_json_token){
     .kind = AZ_JSON_TOKEN_STRING,
@@ -110,7 +110,7 @@ AZ_NODISCARD AZ_INLINE az_json_token az_json_token_string(az_span value)
  *
  * @param value A span over an object indicating how the az_json_token should be initialized.
  */
-AZ_NODISCARD AZ_INLINE az_json_token az_json_token_object(az_span value)
+_az_NODISCARD _az_INLINE az_json_token az_json_token_object(az_span value)
 {
   return (az_json_token){
     .kind = AZ_JSON_TOKEN_OBJECT,
@@ -121,7 +121,7 @@ AZ_NODISCARD AZ_INLINE az_json_token az_json_token_object(az_span value)
 /*
  * @brief az_json_token_object_start returns a az_json_token representing the start of an object.
  */
-AZ_NODISCARD AZ_INLINE az_json_token az_json_token_object_start()
+_az_NODISCARD _az_INLINE az_json_token az_json_token_object_start()
 {
   return (az_json_token){ .kind = AZ_JSON_TOKEN_OBJECT_START, ._internal = { 0 } };
 }
@@ -129,7 +129,7 @@ AZ_NODISCARD AZ_INLINE az_json_token az_json_token_object_start()
 /*
  * @brief az_json_token_object_end returns a az_json_token representing the end of an object.
  */
-AZ_NODISCARD AZ_INLINE az_json_token az_json_token_object_end()
+_az_NODISCARD _az_INLINE az_json_token az_json_token_object_end()
 {
   return (az_json_token){ .kind = AZ_JSON_TOKEN_OBJECT_END, ._internal = { 0 } };
 }
@@ -137,7 +137,7 @@ AZ_NODISCARD AZ_INLINE az_json_token az_json_token_object_end()
 /*
  * @brief az_json_token_array_start returns a az_json_token representing the start of an array.
  */
-AZ_NODISCARD AZ_INLINE az_json_token az_json_token_array_start()
+_az_NODISCARD _az_INLINE az_json_token az_json_token_array_start()
 {
   return (az_json_token){ .kind = AZ_JSON_TOKEN_ARRAY_START, ._internal = { 0 } };
 }
@@ -145,7 +145,7 @@ AZ_NODISCARD AZ_INLINE az_json_token az_json_token_array_start()
 /*
  * @brief az_json_token_array_end returns a az_json_token representing the end of an array.
  */
-AZ_NODISCARD AZ_INLINE az_json_token az_json_token_array_end()
+_az_NODISCARD _az_INLINE az_json_token az_json_token_array_end()
 {
   return (az_json_token){ .kind = AZ_JSON_TOKEN_ARRAY_END, ._internal = { 0 } };
 }
@@ -158,7 +158,7 @@ AZ_NODISCARD AZ_INLINE az_json_token az_json_token_array_end()
  * @return AZ_OK if the boolean is returned.<br>
  * AZ_ERROR_ITEM_NOT_FOUND if the kind is not AZ_JSON_TOKEN_BOOLEAN.
  */
-AZ_NODISCARD az_result az_json_token_get_boolean(az_json_token const* token, bool* out_value);
+_az_NODISCARD az_result az_json_token_get_boolean(az_json_token const* token, bool* out_value);
 
 /*
  * @brief az_json_token_get_number returns the JSON token's number.
@@ -168,7 +168,7 @@ AZ_NODISCARD az_result az_json_token_get_boolean(az_json_token const* token, boo
  * @return AZ_OK if the number is returned.<br>
  * AZ_ERROR_ITEM_NOT_FOUND if the kind != AZ_JSON_TOKEN_NUMBER.
  */
-AZ_NODISCARD az_result az_json_token_get_number(az_json_token const* token, double* out_value);
+_az_NODISCARD az_result az_json_token_get_number(az_json_token const* token, double* out_value);
 
 /*
  * @brief az_json_token_get_string returns the JSON token's string via an az_span.
@@ -178,7 +178,7 @@ AZ_NODISCARD az_result az_json_token_get_number(az_json_token const* token, doub
  * @return AZ_OK if the string is returned.<br>
  * AZ_ERROR_ITEM_NOT_FOUND if the kind != AZ_JSON_TOKEN_STRING.
  */
-AZ_NODISCARD az_result az_json_token_get_string(az_json_token const* token, az_span* out_value);
+_az_NODISCARD az_result az_json_token_get_string(az_json_token const* token, az_span* out_value);
 
 /************************************ JSON BUILDER ******************/
 
@@ -202,7 +202,7 @@ typedef struct
  * @param json_buffer An az_span over the buffer where th JSON object is to be written.
  * @return AZ_OK if the az_json_builder is initialized correctly.
  */
-AZ_NODISCARD AZ_INLINE az_result
+_az_NODISCARD _az_INLINE az_result
 az_json_builder_init(az_json_builder* json_builder, az_span json_buffer)
 {
   *json_builder
@@ -216,7 +216,7 @@ az_json_builder_init(az_json_builder* json_builder, az_span json_buffer)
  * @param json_builder A pointer to an az_json_builder instance wrapping the JSON buffer.
  * @return an az_span containing the final JSON object.
  */
-AZ_NODISCARD AZ_INLINE az_span az_json_builder_span_get(az_json_builder const* json_builder)
+_az_NODISCARD _az_INLINE az_span az_json_builder_span_get(az_json_builder const* json_builder)
 {
   return az_span_slice(json_builder->_internal.json, 0, json_builder->_internal.length);
 }
@@ -230,7 +230,7 @@ AZ_NODISCARD AZ_INLINE az_span az_json_builder_span_get(az_json_builder const* j
  * @return AZ_OK if the token was appended successfully.<br>
  * AZ_ERROR_BUFFER_OVERFLOW if the buffer is too small.
  */
-AZ_NODISCARD az_result
+_az_NODISCARD az_result
 az_json_builder_append_token(az_json_builder* json_builder, az_json_token token);
 
 /*
@@ -243,7 +243,7 @@ az_json_builder_append_token(az_json_builder* json_builder, az_json_token token)
  * @return AZ_OK if the token was appended successfully.<br>
  * AZ_ERROR_BUFFER_OVERFLOW if the buffer is too small.
  */
-AZ_NODISCARD az_result
+_az_NODISCARD az_result
 az_json_builder_append_object(az_json_builder* json_builder, az_span name, az_json_token token);
 
 /*
@@ -255,7 +255,7 @@ az_json_builder_append_object(az_json_builder* json_builder, az_span name, az_js
  * @return AZ_OK if the token was appended successfully.<br>
  * AZ_ERROR_BUFFER_OVERFLOW if the buffer is too small.
  */
-AZ_NODISCARD az_result
+_az_NODISCARD az_result
 az_json_builder_append_array_item(az_json_builder* json_builder, az_json_token token);
 
 /************************************ JSON PARSER ******************/
@@ -291,7 +291,7 @@ typedef struct
  * @param json_buffer A pointer to a buffer containing the JSON document to parse.
  * @return AZ_OK if the token was appended successfully.<br>
  */
-AZ_NODISCARD az_result az_json_parser_init(az_json_parser* json_parser, az_span json_buffer);
+_az_NODISCARD az_result az_json_parser_init(az_json_parser* json_parser, az_span json_buffer);
 
 /*
  * @brief az_json_parser_parse_token returns the next token in the JSON document.
@@ -303,7 +303,7 @@ AZ_NODISCARD az_result az_json_parser_init(az_json_parser* json_parser, az_span 
  *         AZ_ERROR_PARSER_UNEXPECTED_CHAR when an invalid character is detected.<br>
  *         AZ_ERROR_ITEM_NOT_FOUND when no more items are found.
  */
-AZ_NODISCARD az_result
+_az_NODISCARD az_result
 az_json_parser_parse_token(az_json_parser* json_parser, az_json_token* out_token);
 
 /*
@@ -317,7 +317,7 @@ az_json_parser_parse_token(az_json_parser* json_parser, az_json_token* out_token
  *         AZ_ERROR_PARSER_UNEXPECTED_CHAR when an invalid character is detected.<br>
  *         AZ_ERROR_ITEM_NOT_FOUND when no more items are found.
  */
-AZ_NODISCARD az_result az_json_parser_parse_token_member(
+_az_NODISCARD az_result az_json_parser_parse_token_member(
     az_json_parser* json_parser,
     az_json_token_member* out_token_member);
 
@@ -331,7 +331,7 @@ AZ_NODISCARD az_result az_json_parser_parse_token_member(
  *         AZ_ERROR_PARSER_UNEXPECTED_CHAR when an invalid character is detected.<br>
  *         AZ_ERROR_ITEM_NOT_FOUND when no more items are found.
  */
-AZ_NODISCARD az_result
+_az_NODISCARD az_result
 az_json_parser_parse_array_item(az_json_parser* json_parser, az_json_token* out_token);
 
 /*
@@ -344,7 +344,7 @@ az_json_parser_parse_array_item(az_json_parser* json_parser, az_json_token* out_
  *         AZ_ERROR_PARSER_UNEXPECTED_CHAR when an invalid character is detected.<br>
  *         AZ_ERROR_ITEM_NOT_FOUND when no more items are found.
  */
-AZ_NODISCARD az_result
+_az_NODISCARD az_result
 az_json_parser_skip_children(az_json_parser* json_parser, az_json_token token);
 
 /*
@@ -354,7 +354,7 @@ az_json_parser_skip_children(az_json_parser* json_parser, az_json_token token);
  * @return AZ_OK if the token was parsed completely.<br>
  *         AZ_ERROR_JSON_INVALID_STATE if not all of the JSON document was parsed.
  */
-AZ_NODISCARD az_result az_json_parser_done(az_json_parser* json_parser);
+_az_NODISCARD az_result az_json_parser_done(az_json_parser* json_parser);
 
 /************************************ JSON POINTER ******************/
 
@@ -371,7 +371,7 @@ AZ_NODISCARD az_result az_json_parser_done(az_json_parser* json_parser);
  *         AZ_ERROR_PARSER_UNEXPECTED_CHAR when an invalid character is detected.<br>
  *         AZ_ERROR_ITEM_NOT_FOUND when no more items are found.
  */
-AZ_NODISCARD az_result
+_az_NODISCARD az_result
 az_json_parse_by_pointer(az_span json_buffer, az_span json_pointer, az_json_token* out_token);
 
 #include <_az_cfg_suffix.h>

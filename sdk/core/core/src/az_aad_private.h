@@ -23,20 +23,20 @@ enum
   _az_AAD_RESPONSE_BUF_SIZE = 3 * 1024,
 };
 
-AZ_NODISCARD az_result _az_aad_build_url(az_span url, az_span tenant_id, az_span* out_url);
+_az_NODISCARD az_result _az_aad_build_url(az_span url, az_span tenant_id, az_span* out_url);
 
-AZ_NODISCARD az_result _az_aad_build_body(
+_az_NODISCARD az_result _az_aad_build_body(
     az_span body,
     az_span client_id,
     az_span scopes,
     az_span client_secret,
     az_span* out_body);
 
-AZ_NODISCARD az_result _az_aad_request_token(_az_http_request* request, _az_token* out_token);
+_az_NODISCARD az_result _az_aad_request_token(_az_http_request* request, _az_token* out_token);
 
-AZ_NODISCARD bool _az_token_expired(_az_token const* token);
+_az_NODISCARD bool _az_token_expired(_az_token const* token);
 
-AZ_NODISCARD az_result _az_token_set(_az_token* self, _az_token const* new_token);
+_az_NODISCARD az_result _az_token_set(_az_token* self, _az_token const* new_token);
 
 #include <_az_cfg_suffix.h>
 

@@ -27,7 +27,7 @@ static az_http_status_code const _default_status_codes[] = {
   AZ_HTTP_STATUS_CODE_NONE,
 };
 
-AZ_NODISCARD az_http_policy_retry_options _az_http_policy_retry_options_default()
+_az_NODISCARD az_http_policy_retry_options _az_http_policy_retry_options_default()
 {
   return (az_http_policy_retry_options){
     .max_retries = 4,
@@ -39,7 +39,7 @@ AZ_NODISCARD az_http_policy_retry_options _az_http_policy_retry_options_default(
 }
 
 // TODO: Add unit tests
-AZ_INLINE az_result _az_http_policy_retry_append_http_retry_msg(
+_az_INLINE az_result _az_http_policy_retry_append_http_retry_msg(
     int16_t attempt,
     int32_t delay_msec,
     az_span* ref_log_msg)
@@ -65,7 +65,7 @@ AZ_INLINE az_result _az_http_policy_retry_append_http_retry_msg(
   return AZ_OK;
 }
 
-AZ_INLINE void _az_http_policy_retry_log(int16_t attempt, int32_t delay_msec)
+_az_INLINE void _az_http_policy_retry_log(int16_t attempt, int32_t delay_msec)
 {
   uint8_t log_msg_buf[AZ_LOG_MSG_BUF_SIZE] = { 0 };
   az_span log_msg = AZ_SPAN_FROM_BUFFER(log_msg_buf);
@@ -75,7 +75,7 @@ AZ_INLINE void _az_http_policy_retry_log(int16_t attempt, int32_t delay_msec)
   az_log_write(AZ_LOG_HTTP_RETRY, log_msg);
 }
 
-AZ_INLINE AZ_NODISCARD int32_t _az_uint32_span_to_int32(az_span span)
+_az_INLINE _az_NODISCARD int32_t _az_uint32_span_to_int32(az_span span)
 {
   uint32_t value = 0;
   if (az_succeeded(az_span_atou32(span, &value)))
@@ -86,7 +86,7 @@ AZ_INLINE AZ_NODISCARD int32_t _az_uint32_span_to_int32(az_span span)
   return -1;
 }
 
-AZ_INLINE AZ_NODISCARD az_result _az_http_policy_retry_get_retry_after(
+_az_INLINE _az_NODISCARD az_result _az_http_policy_retry_get_retry_after(
     az_http_response* ref_response,
     az_http_status_code const* status_codes,
     bool* should_retry,
@@ -149,7 +149,7 @@ AZ_INLINE AZ_NODISCARD az_result _az_http_policy_retry_get_retry_after(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_http_pipeline_policy_retry(
+_az_NODISCARD az_result az_http_pipeline_policy_retry(
     _az_http_policy* p_policies,
     void* p_data,
     _az_http_request* p_request,

@@ -42,7 +42,7 @@ typedef struct
   } _internal;
 } az_storage_blobs_blob_client;
 
-AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
+_az_NODISCARD az_result az_storage_blobs_blob_client_init(
     az_storage_blobs_blob_client* client,
     az_span uri,
     void* credential,
@@ -53,9 +53,9 @@ typedef struct
   az_span option;
 } az_storage_blobs_blob_upload_options;
 
-AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_options_default();
+_az_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_options_default();
 
-AZ_NODISCARD AZ_INLINE az_storage_blobs_blob_upload_options
+_az_NODISCARD _az_INLINE az_storage_blobs_blob_upload_options
 az_storage_blobs_blob_upload_options_default()
 {
   return (az_storage_blobs_blob_upload_options){ .option = AZ_SPAN_NULL };
@@ -74,9 +74,9 @@ typedef struct
  * @param options create options for blob. It can be NULL so nothing is added to http request
  * headers
  * @param response a pre allocated buffer where to write http response
- * @return AZ_NODISCARD az_storage_blobs_blob_create
+ * @return _az_NODISCARD az_storage_blobs_blob_create
  */
-AZ_NODISCARD az_result az_storage_blobs_blob_upload(
+_az_NODISCARD az_result az_storage_blobs_blob_upload(
     az_storage_blobs_blob_client* client,
     az_context* context,
     az_span content, /* Buffer of content*/

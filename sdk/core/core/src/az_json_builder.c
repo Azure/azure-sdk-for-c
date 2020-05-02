@@ -9,12 +9,12 @@
 
 #include <_az_cfg.h>
 
-static AZ_NODISCARD az_span _get_remaining_span(az_json_builder* json_builder)
+static _az_NODISCARD az_span _get_remaining_span(az_json_builder* json_builder)
 {
   return az_span_slice_to_end(json_builder->_internal.json, json_builder->_internal.length);
 }
 
-AZ_NODISCARD static az_result az_json_builder_append_str(az_json_builder* self, az_span value)
+_az_NODISCARD static az_result az_json_builder_append_str(az_json_builder* self, az_span value)
 {
   _az_PRECONDITION_NOT_NULL(self);
 
@@ -32,7 +32,7 @@ AZ_NODISCARD static az_result az_json_builder_append_str(az_json_builder* self, 
   return AZ_OK;
 }
 
-static AZ_NODISCARD az_result _az_json_builder_write_span(az_json_builder* self, az_span value)
+static _az_NODISCARD az_result _az_json_builder_write_span(az_json_builder* self, az_span value)
 {
   _az_PRECONDITION_NOT_NULL(self);
 
@@ -87,7 +87,7 @@ static AZ_NODISCARD az_result _az_json_builder_write_span(az_json_builder* self,
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result
+_az_NODISCARD az_result
 az_json_builder_append_token(az_json_builder* json_builder, az_json_token token)
 {
   _az_PRECONDITION_NOT_NULL(json_builder);
@@ -179,7 +179,7 @@ az_json_builder_append_token(az_json_builder* json_builder, az_json_token token)
   return AZ_OK;
 }
 
-AZ_NODISCARD static az_result az_json_builder_write_comma(az_json_builder* self)
+_az_NODISCARD static az_result az_json_builder_write_comma(az_json_builder* self)
 {
   _az_PRECONDITION_NOT_NULL(self);
 
@@ -193,7 +193,7 @@ AZ_NODISCARD static az_result az_json_builder_write_comma(az_json_builder* self)
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result
+_az_NODISCARD az_result
 az_json_builder_append_object(az_json_builder* json_builder, az_span name, az_json_token token)
 {
   _az_PRECONDITION_NOT_NULL(json_builder);
@@ -210,7 +210,7 @@ az_json_builder_append_object(az_json_builder* json_builder, az_span name, az_js
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result
+_az_NODISCARD az_result
 az_json_builder_append_array_item(az_json_builder* json_builder, az_json_token token)
 {
   _az_PRECONDITION_NOT_NULL(json_builder);

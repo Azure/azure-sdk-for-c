@@ -55,7 +55,7 @@ typedef struct
  * @brief function callback definition as a contract to be implemented for a credential
  *
  */
-typedef AZ_NODISCARD az_result (
+typedef _az_NODISCARD az_result (
     *_az_credential_apply_fn)(void* credential_options, _az_http_request* ref_request);
 
 /**
@@ -63,7 +63,7 @@ typedef AZ_NODISCARD az_result (
  * credential scopes when it supports it
  *
  */
-typedef AZ_NODISCARD az_result (*_az_credential_set_scopes_fn)(void* credential, az_span scopes);
+typedef _az_NODISCARD az_result (*_az_credential_set_scopes_fn)(void* credential, az_span scopes);
 
 /**
  * @brief Definition of an az_credential. Its is used internally to authenticate an SDK client with
@@ -107,7 +107,7 @@ typedef struct
  * @return AZ_OK = Successfull initialization <br>
  * Other value = Initialization failed
  */
-AZ_NODISCARD az_result az_credential_client_secret_init(
+_az_NODISCARD az_result az_credential_client_secret_init(
     az_credential_client_secret* self,
     az_span tenant_id,
     az_span client_id,

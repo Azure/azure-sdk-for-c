@@ -25,7 +25,7 @@ static const az_span az_iot_hub_twin_patch_pub_topic
 static const az_span az_iot_hub_twin_patch_sub_topic
     = AZ_SPAN_LITERAL_FROM_STR("PATCH/properties/desired/");
 
-AZ_NODISCARD az_result az_iot_hub_client_twin_response_get_subscribe_topic_filter(
+_az_NODISCARD az_result az_iot_hub_client_twin_response_get_subscribe_topic_filter(
     az_iot_hub_client const* client,
     char* mqtt_topic_filter,
     size_t mqtt_topic_filter_size,
@@ -58,7 +58,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_response_get_subscribe_topic_filte
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_iot_hub_client_twin_patch_get_subscribe_topic_filter(
+_az_NODISCARD az_result az_iot_hub_client_twin_patch_get_subscribe_topic_filter(
     az_iot_hub_client const* client,
     char* mqtt_topic_filter,
     size_t mqtt_topic_filter_size,
@@ -91,7 +91,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_patch_get_subscribe_topic_filter(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_iot_hub_client_twin_document_get_publish_topic(
+_az_NODISCARD az_result az_iot_hub_client_twin_document_get_publish_topic(
     az_iot_hub_client const* client,
     az_span request_id,
     char* mqtt_topic,
@@ -129,7 +129,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_document_get_publish_topic(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_iot_hub_client_twin_patch_get_publish_topic(
+_az_NODISCARD az_result az_iot_hub_client_twin_patch_get_publish_topic(
     az_iot_hub_client const* client,
     az_span request_id,
     char* mqtt_topic,
@@ -167,7 +167,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_patch_get_publish_topic(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
+_az_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
     az_iot_hub_client const* client,
     az_span received_topic,
     az_iot_hub_client_twin_response* out_twin_response)

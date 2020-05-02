@@ -34,25 +34,25 @@ enum
  */
 static az_span const AZ_HTTP_HEADER_API_VERSION = AZ_SPAN_LITERAL_FROM_STR("api-version");
 
-AZ_NODISCARD AZ_INLINE az_span az_keyvault_client_constant_for_keys()
+_az_NODISCARD _az_INLINE az_span az_keyvault_client_constant_for_keys()
 {
   return AZ_SPAN_FROM_STR("keys");
 }
-AZ_NODISCARD AZ_INLINE az_span az_keyvault_client_constant_for_create()
+_az_NODISCARD _az_INLINE az_span az_keyvault_client_constant_for_create()
 {
   return AZ_SPAN_FROM_STR("create");
 }
 
-AZ_NODISCARD AZ_INLINE az_span az_keyvault_client_constant_for_content_type()
+_az_NODISCARD _az_INLINE az_span az_keyvault_client_constant_for_content_type()
 {
   return AZ_SPAN_FROM_STR("Content-Type");
 }
-AZ_NODISCARD AZ_INLINE az_span az_keyvault_client_constant_for_application_json()
+_az_NODISCARD _az_INLINE az_span az_keyvault_client_constant_for_application_json()
 {
   return AZ_SPAN_FROM_STR("application/json");
 }
 
-AZ_NODISCARD az_keyvault_keys_client_options az_keyvault_keys_client_options_default()
+_az_NODISCARD az_keyvault_keys_client_options az_keyvault_keys_client_options_default()
 {
   az_keyvault_keys_client_options options = (az_keyvault_keys_client_options){
     ._internal = {
@@ -75,7 +75,7 @@ AZ_NODISCARD az_keyvault_keys_client_options az_keyvault_keys_client_options_def
 }
 
 // TODO: Rename the self parameter to client to be  consistent with other clients.
-AZ_NODISCARD az_result az_keyvault_keys_client_init(
+_az_NODISCARD az_result az_keyvault_keys_client_init(
     az_keyvault_keys_client* self,
     az_span uri,
     void* credential,
@@ -148,7 +148,7 @@ AZ_NODISCARD az_result az_keyvault_keys_client_init(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_keyvault_create_key_options az_keyvault_create_key_options_default()
+_az_NODISCARD az_keyvault_create_key_options az_keyvault_create_key_options_default()
 {
   return (az_keyvault_create_key_options){ .operations = NULL, .tags = NULL };
 }
@@ -159,14 +159,14 @@ AZ_NODISCARD az_keyvault_create_key_options az_keyvault_create_key_options_defau
  * @param json_web_key_type type of the key. It will be always added to json payload
  * @param options all optional settings that can be inside create key options
  * @param http_body action used by json builder to be called while building
- * @return AZ_NODISCARD _az_keyvault_keys_key_create_build_json_body
+ * @return _az_NODISCARD _az_keyvault_keys_key_create_build_json_body
  */
-AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
+_az_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
     az_span json_web_key_type,
     az_keyvault_create_key_options* options,
     az_span* http_body);
 
-AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
+_az_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
     az_json_web_key_type json_web_key_type,
     az_keyvault_create_key_options* options,
     az_span* http_body)
@@ -228,7 +228,7 @@ AZ_NODISCARD az_result _az_keyvault_keys_key_create_build_json_body(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_keyvault_keys_key_create(
+_az_NODISCARD az_result az_keyvault_keys_key_create(
     az_keyvault_keys_client* client,
     az_context* context,
     az_span key_name,
@@ -291,9 +291,9 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
  * @param key_name
  * @param key_type
  * @param response
- * @return AZ_NODISCARD az_keyvault_keys_key_get
+ * @return _az_NODISCARD az_keyvault_keys_key_get
  */
-AZ_NODISCARD az_result az_keyvault_keys_key_get(
+_az_NODISCARD az_result az_keyvault_keys_key_get(
     az_keyvault_keys_client* client,
     az_context* context,
     az_span key_name,
@@ -339,7 +339,7 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
   return az_http_pipeline_process(&client->_internal.pipeline, &hrb, response);
 }
 
-AZ_NODISCARD az_result az_keyvault_keys_key_delete(
+_az_NODISCARD az_result az_keyvault_keys_key_delete(
     az_keyvault_keys_client* client,
     az_context* context,
     az_span key_name,

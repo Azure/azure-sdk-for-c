@@ -67,28 +67,28 @@
 #define _az_CFG_H
 
 #ifdef _MSC_VER
-#define AZ_INLINE static __forceinline
+#define _az_INLINE static __forceinline
 #elif defined(__GNUC__) || defined(__clang__) // !_MSC_VER
-#define AZ_INLINE __attribute__((always_inline)) static inline
+#define _az_INLINE __attribute__((always_inline)) static inline
 #else // !_MSC_VER !__GNUC__ !__clang__
-#define AZ_INLINE static inline
+#define _az_INLINE static inline
 #endif // _MSC_VER
 
 #if defined(__GNUC__) && __GNUC__ >= 7
-#define AZ_FALLTHROUGH __attribute__((fallthrough))
+#define _az_FALLTHROUGH __attribute__((fallthrough))
 #else // !__GNUC__ >= 7
-#define AZ_FALLTHROUGH \
+#define _az_FALLTHROUGH \
   do \
   { \
   } while (0)
 #endif // __GNUC__ >= 7
 
 #ifdef _MSC_VER
-#define AZ_NODISCARD _Check_return_
+#define _az_NODISCARD _Check_return_
 #elif defined(__GNUC__) || defined(__clang__) // !_MSC_VER
-#define AZ_NODISCARD __attribute__((warn_unused_result))
+#define _az_NODISCARD __attribute__((warn_unused_result))
 #else // !_MSC_VER !__GNUC__ !__clang__
-#define AZ_NODISCARD
+#define _az_NODISCARD
 #endif // _MSC_VER
 
 // Get the number of elements in an array

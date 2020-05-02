@@ -59,7 +59,7 @@ extern az_context az_context_app;
  * @param[in] expiration The time when this new child node should be canceled
  * @return The new child az_context node
  */
-AZ_NODISCARD AZ_INLINE az_context
+_az_NODISCARD _az_INLINE az_context
 az_context_with_expiration(az_context const* parent, int64_t expiration)
 {
   return (az_context){ ._internal = { .parent = ((parent != NULL) ? parent : &az_context_app),
@@ -76,7 +76,7 @@ az_context_with_expiration(az_context const* parent, int64_t expiration)
  * @param[in] value A pointer to the value of this new az_context node
  * @return The new child az_context node
  */
-AZ_NODISCARD AZ_INLINE az_context
+_az_NODISCARD _az_INLINE az_context
 az_context_with_value(az_context const* parent, void* key, void* value)
 {
   return (az_context){ ._internal = { .parent = (parent != NULL) ? parent : &az_context_app,
@@ -92,7 +92,7 @@ az_context_with_value(az_context const* parent, void* key, void* value)
  * @param[in] context A pointer to the az_context node to be canceled; passing NULL cancels the root
  * az_context_app.
  */
-AZ_INLINE void az_context_cancel(az_context* context)
+_az_INLINE void az_context_cancel(az_context* context)
 {
   context = ((context != NULL) ? context : &az_context_app);
   context->_internal.expiration = 0; // The beginning of time
@@ -105,7 +105,7 @@ AZ_INLINE void az_context_cancel(az_context* context)
  * @param context A pointer to an az_context node
  * @return the soonest expiration time from this context and its parents
  */
-AZ_NODISCARD int64_t az_context_get_expiration(az_context const* context);
+_az_NODISCARD int64_t az_context_get_expiration(az_context const* context);
 
 /**
  * @brief az_context_has_expired returns true if this az_context node or any of its parent nodes'
@@ -115,7 +115,7 @@ AZ_NODISCARD int64_t az_context_get_expiration(az_context const* context);
  * az_context_app.
  * @param[in] current_time The current time.
  */
-AZ_NODISCARD AZ_INLINE bool az_context_has_expired(az_context const* context, int64_t current_time)
+_az_NODISCARD _az_INLINE bool az_context_has_expired(az_context const* context, int64_t current_time)
 {
   return az_context_get_expiration(context) < current_time;
 }
@@ -131,7 +131,7 @@ AZ_NODISCARD AZ_INLINE bool az_context_has_expired(az_context const* context, in
  * @return  #AZ_OK if the key is found
  *          #AZ_ERROR_ITEM_NOT_FOUND if no nodes are found with the specified key.
  */
-AZ_NODISCARD az_result az_context_get_value(az_context const* context, void* key, void** out_value);
+_az_NODISCARD az_result az_context_get_value(az_context const* context, void* key, void** out_value);
 
 #include <_az_cfg_suffix.h>
 

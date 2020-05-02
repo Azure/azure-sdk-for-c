@@ -138,7 +138,7 @@ typedef enum
 ///
 /// @retval true \a result indicates a failure.
 /// @retval false \a result is successful.
-AZ_NODISCARD AZ_INLINE bool az_failed(az_result result)
+_az_NODISCARD _az_INLINE bool az_failed(az_result result)
 {
   return ((int32_t)result & (int32_t)_az_ERROR_FLAG) != 0;
 }
@@ -149,7 +149,7 @@ AZ_NODISCARD AZ_INLINE bool az_failed(az_result result)
 ///
 /// @retval true \a result indicates success.
 /// @retval false \a result is a failure.
-AZ_NODISCARD AZ_INLINE bool az_succeeded(az_result result) { return !az_failed(result); }
+_az_NODISCARD _az_INLINE bool az_succeeded(az_result result) { return !az_failed(result); }
 
 #include <_az_cfg_suffix.h>
 

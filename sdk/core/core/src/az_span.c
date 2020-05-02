@@ -23,7 +23,7 @@ enum
 #ifndef AZ_NO_PRECONDITION_CHECKING
 // Note: If you are modifying this method, make sure to modify the inline version in the az_span.h
 // file as well.
-AZ_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t size)
+_az_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t size)
 {
   // If ptr is not null, then:
   //   size >= 0
@@ -35,7 +35,7 @@ AZ_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t size)
 }
 #endif // AZ_NO_PRECONDITION_CHECKING
 
-AZ_NODISCARD az_span az_span_from_str(char* str)
+_az_NODISCARD az_span az_span_from_str(char* str)
 {
   _az_PRECONDITION_NOT_NULL(str);
 
@@ -52,7 +52,7 @@ AZ_NODISCARD az_span az_span_from_str(char* str)
   return az_span_init((uint8_t*)str, length);
 }
 
-AZ_NODISCARD az_span az_span_slice(az_span span, int32_t start_index, int32_t end_index)
+_az_NODISCARD az_span az_span_slice(az_span span, int32_t start_index, int32_t end_index)
 {
   _az_PRECONDITION_VALID_SPAN(span, 0, true);
 
@@ -66,12 +66,12 @@ AZ_NODISCARD az_span az_span_slice(az_span span, int32_t start_index, int32_t en
   return az_span_init(az_span_ptr(span) + start_index, end_index - start_index);
 }
 
-AZ_NODISCARD az_span az_span_slice_to_end(az_span span, int32_t start_index)
+_az_NODISCARD az_span az_span_slice_to_end(az_span span, int32_t start_index)
 {
   return az_span_slice(span, start_index, az_span_size(span));
 }
 
-AZ_NODISCARD AZ_INLINE uint8_t _az_tolower(uint8_t value)
+_az_NODISCARD _az_INLINE uint8_t _az_tolower(uint8_t value)
 {
   // This is equivalent to the following but with fewer conditions.
   // return 'A' <= value && value <= 'Z' ? value + AZ_ASCII_LOWER_DIF : value;
@@ -82,7 +82,7 @@ AZ_NODISCARD AZ_INLINE uint8_t _az_tolower(uint8_t value)
   return value;
 }
 
-AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1, az_span span2)
+_az_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1, az_span span2)
 {
   int32_t const size = az_span_size(span1);
   if (size != az_span_size(span2))
@@ -99,7 +99,7 @@ AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1, az_span 
   return true;
 }
 
-AZ_NODISCARD az_result az_span_atou64(az_span span, uint64_t* out_number)
+_az_NODISCARD az_result az_span_atou64(az_span span, uint64_t* out_number)
 {
   _az_PRECONDITION_VALID_SPAN(span, 1, false);
   _az_PRECONDITION_NOT_NULL(out_number);
@@ -127,7 +127,7 @@ AZ_NODISCARD az_result az_span_atou64(az_span span, uint64_t* out_number)
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_span_atou32(az_span span, uint32_t* out_number)
+_az_NODISCARD az_result az_span_atou32(az_span span, uint32_t* out_number)
 {
   _az_PRECONDITION_VALID_SPAN(span, 1, false);
   _az_PRECONDITION_NOT_NULL(out_number);
@@ -155,7 +155,7 @@ AZ_NODISCARD az_result az_span_atou32(az_span span, uint32_t* out_number)
   return AZ_OK;
 }
 
-AZ_NODISCARD int32_t az_span_find(az_span source, az_span target)
+_az_NODISCARD int32_t az_span_find(az_span source, az_span target)
 {
   /* This function implements the Naive string-search algorithm.
    * The rationale to use this algorithm instead of other potentialy more
@@ -318,9 +318,9 @@ void az_span_to_str(char* destination, int32_t destination_max_size, az_span sou
  * @param start starting position where to replace
  * @param end end position where to replace
  * @param span content to use for replacement
- * @return AZ_NODISCARD az_span_replace
+ * @return _az_NODISCARD az_span_replace
  */
-AZ_NODISCARD az_result
+_az_NODISCARD az_result
 _az_span_replace(az_span self, int32_t current_size, int32_t start, int32_t end, az_span span)
 {
   int32_t const span_size = az_span_size(span);
@@ -371,7 +371,7 @@ _az_span_replace(az_span self, int32_t current_size, int32_t start, int32_t end,
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_span_dtoa(az_span destination, double source, az_span* out_span)
+_az_NODISCARD az_result az_span_dtoa(az_span destination, double source, az_span* out_span)
 {
   _az_PRECONDITION_VALID_SPAN(destination, 0, false);
   _az_PRECONDITION_NOT_NULL(out_span);
@@ -443,9 +443,9 @@ AZ_NODISCARD az_result az_span_dtoa(az_span destination, double source, az_span*
   }
 }
 
-AZ_INLINE uint8_t _az_decimal_to_ascii(uint8_t d) { return (uint8_t)(('0' + d) & 0xFF); }
+_az_INLINE uint8_t _az_decimal_to_ascii(uint8_t d) { return (uint8_t)(('0' + d) & 0xFF); }
 
-static AZ_NODISCARD az_result _az_span_builder_append_uint64(az_span* self, uint64_t n)
+static _az_NODISCARD az_result _az_span_builder_append_uint64(az_span* self, uint64_t n)
 {
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(*self, 1);
 
@@ -478,7 +478,7 @@ static AZ_NODISCARD az_result _az_span_builder_append_uint64(az_span* self, uint
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_span_u64toa(az_span destination, uint64_t source, az_span* out_span)
+_az_NODISCARD az_result az_span_u64toa(az_span destination, uint64_t source, az_span* out_span)
 {
   _az_PRECONDITION_VALID_SPAN(destination, 0, false);
   _az_PRECONDITION_NOT_NULL(out_span);
@@ -487,7 +487,7 @@ AZ_NODISCARD az_result az_span_u64toa(az_span destination, uint64_t source, az_s
   return _az_span_builder_append_uint64(out_span, source);
 }
 
-AZ_NODISCARD az_result az_span_i64toa(az_span destination, int64_t source, az_span* out_span)
+_az_NODISCARD az_result az_span_i64toa(az_span destination, int64_t source, az_span* out_span)
 {
   _az_PRECONDITION_VALID_SPAN(destination, 0, false);
   _az_PRECONDITION_NOT_NULL(out_span);
@@ -505,7 +505,7 @@ AZ_NODISCARD az_result az_span_i64toa(az_span destination, int64_t source, az_sp
   return _az_span_builder_append_uint64(out_span, (uint64_t)source);
 }
 
-static AZ_NODISCARD az_result
+static _az_NODISCARD az_result
 _az_span_builder_append_u32toa(az_span self, uint32_t n, az_span* out_span)
 {
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(self, 1);
@@ -543,14 +543,14 @@ _az_span_builder_append_u32toa(az_span self, uint32_t n, az_span* out_span)
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_span_u32toa(az_span destination, uint32_t source, az_span* out_span)
+_az_NODISCARD az_result az_span_u32toa(az_span destination, uint32_t source, az_span* out_span)
 {
   _az_PRECONDITION_VALID_SPAN(destination, 0, false);
   _az_PRECONDITION_NOT_NULL(out_span);
   return _az_span_builder_append_u32toa(destination, source, out_span);
 }
 
-AZ_NODISCARD az_result az_span_i32toa(az_span destination, int32_t source, az_span* out_span)
+_az_NODISCARD az_result az_span_i32toa(az_span destination, int32_t source, az_span* out_span)
 {
   _az_PRECONDITION_VALID_SPAN(destination, 0, false);
   _az_PRECONDITION_NOT_NULL(out_span);
@@ -568,7 +568,7 @@ AZ_NODISCARD az_result az_span_i32toa(az_span destination, int32_t source, az_sp
 }
 
 // TODO: pass az_span by value
-AZ_NODISCARD az_result _az_is_expected_span(az_span* self, az_span expected)
+_az_NODISCARD az_result _az_is_expected_span(az_span* self, az_span expected)
 {
   az_span actual_span = { 0 };
 
@@ -594,7 +594,7 @@ AZ_NODISCARD az_result _az_is_expected_span(az_span* self, az_span expected)
 
 // PRIVATE. read until condition is true on character.
 // Then return number of positions read with output parameter
-AZ_NODISCARD az_result
+_az_NODISCARD az_result
 _az_span_scan_until(az_span self, _az_predicate predicate, int32_t* out_index)
 {
   for (int32_t index = 0; index < az_span_size(self); ++index)
@@ -621,7 +621,7 @@ _az_span_scan_until(az_span self, _az_predicate predicate, int32_t* out_index)
   return AZ_ERROR_ITEM_NOT_FOUND;
 }
 
-AZ_NODISCARD AZ_INLINE bool _az_span_url_should_encode(uint8_t c)
+_az_NODISCARD _az_INLINE bool _az_span_url_should_encode(uint8_t c)
 {
   switch (c)
   {
@@ -635,7 +635,7 @@ AZ_NODISCARD AZ_INLINE bool _az_span_url_should_encode(uint8_t c)
   }
 }
 
-AZ_NODISCARD az_result _az_span_url_encode(az_span destination, az_span source, int32_t* out_length)
+_az_NODISCARD az_result _az_span_url_encode(az_span destination, az_span source, int32_t* out_length)
 {
   _az_PRECONDITION_NOT_NULL(out_length);
   _az_PRECONDITION_VALID_SPAN(source, 0, true);

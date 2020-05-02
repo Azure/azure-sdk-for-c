@@ -17,23 +17,23 @@ static const az_span str_dps_registrations_res
     = AZ_SPAN_LITERAL_FROM_STR("$dps/registrations/res/");
 
 // /registrations/
-AZ_INLINE az_span _az_iot_provisioning_get_str_registrations()
+_az_INLINE az_span _az_iot_provisioning_get_str_registrations()
 {
   return az_span_slice(str_dps_registrations_res, 4, 19);
 }
 
 // $dps/registrations/
-AZ_INLINE az_span _az_iot_provisioning_get_str_dps_registrations()
+_az_INLINE az_span _az_iot_provisioning_get_str_dps_registrations()
 {
   return az_span_slice(str_dps_registrations_res, 0, 19);
 }
 
-AZ_NODISCARD az_iot_provisioning_client_options az_iot_provisioning_client_options_default()
+_az_NODISCARD az_iot_provisioning_client_options az_iot_provisioning_client_options_default()
 {
   return (az_iot_provisioning_client_options){ .user_agent = AZ_SPAN_NULL };
 }
 
-AZ_NODISCARD az_result az_iot_provisioning_client_init(
+_az_NODISCARD az_result az_iot_provisioning_client_init(
     az_iot_provisioning_client* client,
     az_span global_device_endpoint,
     az_span id_scope,
@@ -56,7 +56,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_init(
 }
 
 // <id_scope>/registrations/<registration_id>/api-version=<service_version>
-AZ_NODISCARD az_result az_iot_provisioning_client_get_user_name(
+_az_NODISCARD az_result az_iot_provisioning_client_get_user_name(
     az_iot_provisioning_client const* client,
     char* mqtt_user_name,
     size_t mqtt_user_name_size,
@@ -109,7 +109,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_get_user_name(
 }
 
 // <registration_id>
-AZ_NODISCARD az_result az_iot_provisioning_client_get_client_id(
+_az_NODISCARD az_result az_iot_provisioning_client_get_client_id(
     az_iot_provisioning_client const* client,
     char* mqtt_client_id,
     size_t mqtt_client_id_size,
@@ -139,7 +139,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_get_client_id(
 }
 
 // $dps/registrations/res/#
-AZ_NODISCARD az_result az_iot_provisioning_client_register_get_subscribe_topic_filter(
+_az_NODISCARD az_result az_iot_provisioning_client_register_get_subscribe_topic_filter(
     az_iot_provisioning_client const* client,
     char* mqtt_topic_filter,
     size_t mqtt_topic_filter_size,
@@ -171,7 +171,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_register_get_subscribe_topic_f
 }
 
 // $dps/registrations/PUT/iotdps-register/?$rid=%s
-AZ_NODISCARD az_result az_iot_provisioning_client_register_get_publish_topic(
+_az_NODISCARD az_result az_iot_provisioning_client_register_get_publish_topic(
     az_iot_provisioning_client const* client,
     char* mqtt_topic,
     size_t mqtt_topic_size,
@@ -204,7 +204,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_register_get_publish_topic(
 }
 
 // Topic: $dps/registrations/GET/iotdps-get-operationstatus/?$rid=%s&operationId=%s
-AZ_NODISCARD az_result az_iot_provisioning_client_query_status_get_publish_topic(
+_az_NODISCARD az_result az_iot_provisioning_client_query_status_get_publish_topic(
     az_iot_provisioning_client const* client,
     az_iot_provisioning_client_register_response const* register_response,
     char* mqtt_topic,
@@ -242,7 +242,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_query_status_get_publish_topic
   return AZ_OK;
 }
 
-AZ_INLINE az_iot_provisioning_client_registration_result
+_az_INLINE az_iot_provisioning_client_registration_result
 _az_iot_provisioning_registration_result_default()
 {
   return (az_iot_provisioning_client_registration_result){ .assigned_hub_hostname = AZ_SPAN_NULL,
@@ -254,7 +254,7 @@ _az_iot_provisioning_registration_result_default()
                                                           .error_timestamp = AZ_SPAN_NULL };
 }
 
-AZ_INLINE az_iot_status _az_iot_status_from_extended_status(uint32_t extended_status)
+_az_INLINE az_iot_status _az_iot_status_from_extended_status(uint32_t extended_status)
 {
   return (az_iot_status)(extended_status / 1000);
 }
@@ -273,7 +273,7 @@ https://docs.microsoft.com/en-us/rest/api/iot-dps/runtimeregistration/registerde
     "lastUpdatedDateTimeUtc":"2020-04-10T03:11:13.2096201Z",
     "etag":"IjYxMDA4ZDQ2LTAwMDAtMDEwMC0wMDAwLTVlOGZlM2QxMDAwMCI="}}
 */
-AZ_INLINE az_result _az_iot_provisioning_client_parse_payload_error_code(
+_az_INLINE az_result _az_iot_provisioning_client_parse_payload_error_code(
     az_json_token_member* tm,
     az_iot_provisioning_client_registration_result* out_state)
 {
@@ -291,7 +291,7 @@ AZ_INLINE az_result _az_iot_provisioning_client_parse_payload_error_code(
   return AZ_ERROR_ITEM_NOT_FOUND;
 }
 
-AZ_INLINE az_result _az_iot_provisioning_client_payload_registration_result_parse(
+_az_INLINE az_result _az_iot_provisioning_client_payload_registration_result_parse(
     az_json_parser* jp,
     az_json_token_member* tm,
     az_iot_provisioning_client_registration_result* out_state)
@@ -343,7 +343,7 @@ AZ_INLINE az_result _az_iot_provisioning_client_payload_registration_result_pars
   return AZ_OK;
 }
 
-AZ_INLINE az_result az_iot_provisioning_client_parse_payload(
+_az_INLINE az_result az_iot_provisioning_client_parse_payload(
     az_span received_payload,
     az_iot_provisioning_client_register_response* out_response)
 {
@@ -446,7 +446,7 @@ Stage 3:
  {"errorCode":401002,"trackingId":"8ad0463c-6427-4479-9dfa-3e8bb7003e9b","message":"Invalid
   certificate.","timestampUtc":"2020-04-10T05:24:22.4718526Z"}
 */
-AZ_NODISCARD az_result az_iot_provisioning_client_parse_received_topic_and_payload(
+_az_NODISCARD az_result az_iot_provisioning_client_parse_received_topic_and_payload(
     az_iot_provisioning_client const* client,
     az_span received_topic,
     az_span received_payload,
@@ -491,7 +491,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_parse_received_topic_and_paylo
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_iot_provisioning_client_parse_operation_status(
+_az_NODISCARD az_result az_iot_provisioning_client_parse_operation_status(
     az_iot_provisioning_client_register_response* response,
     az_iot_provisioning_client_operation_status* out_operation_status)
 {

@@ -13,15 +13,15 @@
 
 // HTTP Response utility functions
 
-AZ_NODISCARD AZ_INLINE az_result _az_is_char(az_span slice, uint8_t c)
+_az_NODISCARD _az_INLINE az_result _az_is_char(az_span slice, uint8_t c)
 {
   return az_span_ptr(slice)[0] == c ? AZ_OK : AZ_CONTINUE;
 }
 
-static AZ_NODISCARD az_result _az_is_a_colon(az_span slice) { return _az_is_char(slice, ':'); }
-static AZ_NODISCARD az_result _az_is_new_line(az_span slice) { return _az_is_char(slice, '\n'); }
+static _az_NODISCARD az_result _az_is_a_colon(az_span slice) { return _az_is_char(slice, ':'); }
+static _az_NODISCARD az_result _az_is_new_line(az_span slice) { return _az_is_char(slice, '\n'); }
 
-static AZ_NODISCARD bool _az_is_http_whitespace(uint8_t c)
+static _az_NODISCARD bool _az_is_http_whitespace(uint8_t c)
 {
   switch (c)
   {
@@ -34,13 +34,13 @@ static AZ_NODISCARD bool _az_is_http_whitespace(uint8_t c)
   }
 }
 
-static AZ_NODISCARD az_result _az_slice_is_not_http_whitespace(az_span slice)
+static _az_NODISCARD az_result _az_slice_is_not_http_whitespace(az_span slice)
 {
   return _az_is_http_whitespace(az_span_ptr(slice)[0]) == true ? AZ_CONTINUE : AZ_OK;
 }
 
 /* PRIVATE Function. parse next  */
-static AZ_NODISCARD az_result _az_get_digit(az_span* self, uint8_t* save_here)
+static _az_NODISCARD az_result _az_get_digit(az_span* self, uint8_t* save_here)
 {
 
   uint8_t c_ptr = az_span_ptr(*self)[0];
@@ -61,7 +61,7 @@ static AZ_NODISCARD az_result _az_get_digit(az_span* self, uint8_t* save_here)
  * Status line https://tools.ietf.org/html/rfc7230#section-3.1.2
  * HTTP-version SP status-code SP reason-phrase CRLF
  */
-static AZ_NODISCARD az_result
+static _az_NODISCARD az_result
 _az_get_http_status_line(az_span* self, az_http_response_status_line* out_status_line)
 {
 
@@ -108,7 +108,7 @@ _az_get_http_status_line(az_span* self, az_http_response_status_line* out_status
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_http_response_get_status_line(
+_az_NODISCARD az_result az_http_response_get_status_line(
     az_http_response* response,
     az_http_response_status_line* out_status_line)
 {
@@ -128,7 +128,7 @@ AZ_NODISCARD az_result az_http_response_get_status_line(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result
+_az_NODISCARD az_result
 az_http_response_get_next_header(az_http_response* response, az_pair* out_header)
 {
   _az_PRECONDITION_NOT_NULL(response);
@@ -223,7 +223,7 @@ az_http_response_get_next_header(az_http_response* response, az_pair* out_header
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_http_response_get_body(az_http_response* response, az_span* out_body)
+_az_NODISCARD az_result az_http_response_get_body(az_http_response* response, az_span* out_body)
 {
   _az_PRECONDITION_NOT_NULL(response);
   _az_PRECONDITION_NOT_NULL(out_body);

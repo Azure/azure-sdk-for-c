@@ -29,7 +29,7 @@ static az_span const AZ_STORAGE_BLOBS_BLOB_TYPE_BLOCKBLOB = AZ_SPAN_LITERAL_FROM
 static az_span const AZ_HTTP_HEADER_CONTENT_LENGTH = AZ_SPAN_LITERAL_FROM_STR("Content-Length");
 static az_span const AZ_HTTP_HEADER_CONTENT_TYPE = AZ_SPAN_LITERAL_FROM_STR("Content-Type");
 
-AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_options_default()
+_az_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_options_default()
 {
 
   az_storage_blobs_blob_client_options options = (az_storage_blobs_blob_client_options) {
@@ -53,7 +53,7 @@ AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_o
   return options;
 }
 
-AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
+_az_NODISCARD az_result az_storage_blobs_blob_client_init(
     az_storage_blobs_blob_client* client,
     az_span uri,
     void* credential,
@@ -126,7 +126,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_storage_blobs_blob_upload(
+_az_NODISCARD az_result az_storage_blobs_blob_upload(
     az_storage_blobs_blob_client* client,
     az_context* context,
     az_span content, /* Buffer of content*/

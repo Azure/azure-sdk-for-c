@@ -17,7 +17,7 @@ static const uint8_t pnp_client_param_equals = '=';
 
 static const az_span pnp_model_id = AZ_SPAN_LITERAL_FROM_STR("digital-twin-model-id");
 
-AZ_NODISCARD az_iot_pnp_client_options az_iot_pnp_client_options_default()
+_az_NODISCARD az_iot_pnp_client_options az_iot_pnp_client_options_default()
 {
   az_iot_pnp_client_options options = (az_iot_pnp_client_options){
     .user_agent = AZ_SPAN_NULL,
@@ -28,7 +28,7 @@ AZ_NODISCARD az_iot_pnp_client_options az_iot_pnp_client_options_default()
   return options;
 }
 
-AZ_NODISCARD az_result az_iot_pnp_client_init(
+_az_NODISCARD az_result az_iot_pnp_client_init(
     az_iot_pnp_client* client,
     az_span iot_hub_hostname,
     az_span device_id,
@@ -52,7 +52,7 @@ AZ_NODISCARD az_result az_iot_pnp_client_init(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_iot_pnp_client_get_user_name(
+_az_NODISCARD az_result az_iot_pnp_client_get_user_name(
     az_iot_pnp_client const* client,
     char* mqtt_user_name,
     size_t mqtt_user_name_size,

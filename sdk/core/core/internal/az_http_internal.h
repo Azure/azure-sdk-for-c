@@ -25,7 +25,7 @@ typedef struct _az_http_policy _az_http_policy;
  * specif pointer type to cast options to.
  *
  */
-typedef AZ_NODISCARD az_result (*_az_http_policy_process_fn)(
+typedef _az_NODISCARD az_result (*_az_http_policy_process_fn)(
     _az_http_policy* p_policies,
     void* p_options,
     _az_http_request* p_request,
@@ -101,12 +101,12 @@ typedef struct
  * @brief Initialize _az_http_policy_telemetry_options with default values
  *
  */
-AZ_NODISCARD AZ_INLINE _az_http_policy_telemetry_options _az_http_policy_telemetry_options_default()
+_az_NODISCARD _az_INLINE _az_http_policy_telemetry_options _az_http_policy_telemetry_options_default()
 {
   return (_az_http_policy_telemetry_options){ .os = AZ_SPAN_FROM_STR("Unknown OS") };
 }
 
-AZ_NODISCARD AZ_INLINE _az_http_policy_apiversion_options
+_az_NODISCARD _az_INLINE _az_http_policy_apiversion_options
 _az_http_policy_apiversion_options_default()
 {
   return (_az_http_policy_apiversion_options){ 0 };
@@ -117,7 +117,7 @@ _az_http_policy_apiversion_options_default()
  *        Each header is an az_pair
  *
  */
-AZ_NODISCARD AZ_INLINE int32_t _az_http_request_headers_count(_az_http_request const* request)
+_az_NODISCARD _az_INLINE int32_t _az_http_request_headers_count(_az_http_request const* request)
 {
   return request->_internal.headers_length;
 }
@@ -126,7 +126,7 @@ AZ_NODISCARD AZ_INLINE int32_t _az_http_request_headers_count(_az_http_request c
  * @brief Initialize az_http_policy_retry_options with default values
  *
  */
-AZ_NODISCARD az_http_policy_retry_options _az_http_policy_retry_options_default();
+_az_NODISCARD az_http_policy_retry_options _az_http_policy_retry_options_default();
 
 // PipelinePolicies
 //   Policies are non-allocating caveat the TransportPolicy
@@ -145,48 +145,48 @@ AZ_NODISCARD az_http_policy_retry_options _az_http_policy_retry_options_default(
 //
 
 // Start the pipeline
-AZ_NODISCARD az_result az_http_pipeline_process(
+_az_NODISCARD az_result az_http_pipeline_process(
     _az_http_pipeline* pipeline,
     _az_http_request* p_request,
     az_http_response* p_response);
 
-AZ_NODISCARD az_result az_http_pipeline_policy_apiversion(
+_az_NODISCARD az_result az_http_pipeline_policy_apiversion(
     _az_http_policy* p_policies,
     void* p_data,
     _az_http_request* p_request,
     az_http_response* p_response);
 
-AZ_NODISCARD az_result az_http_pipeline_policy_telemetry(
+_az_NODISCARD az_result az_http_pipeline_policy_telemetry(
     _az_http_policy* p_policies,
     void* p_options,
     _az_http_request* p_request,
     az_http_response* p_response);
 
-AZ_NODISCARD az_result az_http_pipeline_policy_retry(
+_az_NODISCARD az_result az_http_pipeline_policy_retry(
     _az_http_policy* p_policies,
     void* p_data,
     _az_http_request* p_request,
     az_http_response* p_response);
 
-AZ_NODISCARD az_result az_http_pipeline_policy_credential(
+_az_NODISCARD az_result az_http_pipeline_policy_credential(
     _az_http_policy* p_policies,
     void* p_data,
     _az_http_request* p_request,
     az_http_response* p_response);
 
-AZ_NODISCARD az_result az_http_pipeline_policy_logging(
+_az_NODISCARD az_result az_http_pipeline_policy_logging(
     _az_http_policy* p_policies,
     void* p_data,
     _az_http_request* p_request,
     az_http_response* p_response);
 
-AZ_NODISCARD az_result az_http_pipeline_policy_transport(
+_az_NODISCARD az_result az_http_pipeline_policy_transport(
     _az_http_policy* p_policies,
     void* p_data,
     _az_http_request* p_request,
     az_http_response* p_response);
 
-AZ_NODISCARD az_result
+_az_NODISCARD az_result
 az_http_client_send_request(_az_http_request* p_request, az_http_response* p_response);
 
 /**
@@ -207,7 +207,7 @@ az_http_client_send_request(_az_http_request* p_request, az_http_response* p_res
  *     - `buffer`, `method_verb`, or `initial_url` are invalid spans (see @ref az_span_is_valid).
  *     - `max_url_size` is less than `initial_url.size`.
  */
-AZ_NODISCARD az_result az_http_request_init(
+_az_NODISCARD az_result az_http_request_init(
     _az_http_request* p_request,
     az_context* context,
     az_http_method method,
@@ -224,9 +224,9 @@ AZ_NODISCARD az_result az_http_request_init(
  *
  * @param p_request http request builder reference
  * @param path span to a path to be appended into url
- * @return AZ_NODISCARD az_http_request_builder_append_path
+ * @return _az_NODISCARD az_http_request_builder_append_path
  */
-AZ_NODISCARD az_result az_http_request_append_path(_az_http_request* p_request, az_span path);
+_az_NODISCARD az_result az_http_request_append_path(_az_http_request* p_request, az_span path);
 
 /**
  * @brief Set query parameter.
@@ -245,7 +245,7 @@ AZ_NODISCARD az_result az_http_request_append_path(_az_http_request* p_request, 
  *     - `name` or `value` are empty.
  *     - `name`'s or `value`'s buffer overlap resulting `url`'s buffer.
  */
-AZ_NODISCARD az_result
+_az_NODISCARD az_result
 az_http_request_set_query_parameter(_az_http_request* p_request, az_span name, az_span value);
 
 /**
@@ -265,7 +265,7 @@ az_http_request_set_query_parameter(_az_http_request* p_request, az_span name, a
  *     - `key` or `value` are empty.
  *     - `name`'s or `value`'s buffer overlap resulting `url`'s buffer.
  */
-AZ_NODISCARD az_result
+_az_NODISCARD az_result
 az_http_request_append_header(_az_http_request* p_request, az_span key, az_span value);
 
 #include <_az_cfg_suffix.h>

@@ -25,7 +25,7 @@
 
 #define _az_PRECONDITION_NOT_NULL(arg) _az_PRECONDITION((arg) != NULL, AZ_ERROR_ARG)
 
-static AZ_NODISCARD az_result _az_span_malloc(int32_t size, az_span* out)
+static _az_NODISCARD az_result _az_span_malloc(int32_t size, az_span* out)
 {
   _az_PRECONDITION_NOT_NULL(out);
 
@@ -51,7 +51,7 @@ static void _az_span_free(az_span* p)
 /**
  * Converts CURLcode to az_result.
  */
-static AZ_NODISCARD az_result _az_http_client_curl_code_to_result(CURLcode code)
+static _az_NODISCARD az_result _az_http_client_curl_code_to_result(CURLcode code)
 {
   switch (code)
   {
@@ -73,13 +73,13 @@ static AZ_NODISCARD az_result _az_http_client_curl_code_to_result(CURLcode code)
 // returning AZ error on CURL Error
 #define AZ_RETURN_IF_CURL_FAILED(exp) AZ_RETURN_IF_FAILED(_az_http_client_curl_code_to_result(exp))
 
-AZ_NODISCARD AZ_INLINE az_result _az_http_client_curl_init(CURL** out)
+_az_NODISCARD _az_INLINE az_result _az_http_client_curl_init(CURL** out)
 {
   *out = curl_easy_init();
   return AZ_OK;
 }
 
-AZ_NODISCARD AZ_INLINE az_result _az_http_client_curl_done(CURL** pp)
+_az_NODISCARD _az_INLINE az_result _az_http_client_curl_done(CURL** pp)
 {
   _az_PRECONDITION_NOT_NULL(pp);
   _az_PRECONDITION_NOT_NULL(*pp);
@@ -98,7 +98,7 @@ AZ_NODISCARD AZ_INLINE az_result _az_http_client_curl_done(CURL** pp)
  * @param separator symbol to be used between key and value
  * @return az_result
  */
-static AZ_NODISCARD az_result
+static _az_NODISCARD az_result
 _az_span_append_header_to_buffer(az_span writable_buffer, az_pair header, az_span separator)
 {
   int32_t required_length
@@ -114,7 +114,7 @@ _az_span_append_header_to_buffer(az_span writable_buffer, az_pair header, az_spa
   return AZ_OK;
 }
 
-static AZ_NODISCARD az_result
+static _az_NODISCARD az_result
 _az_http_client_curl_slist_append(struct curl_slist** self, char const* str)
 {
   _az_PRECONDITION_NOT_NULL(self);
@@ -141,7 +141,7 @@ _az_http_client_curl_slist_append(struct curl_slist** self, char const* str)
  * @param separator a symbol to be used between key and value for a header
  * @return az_result
  */
-static AZ_NODISCARD az_result _az_http_client_curl_add_header_to_curl_list(
+static _az_NODISCARD az_result _az_http_client_curl_add_header_to_curl_list(
     az_pair header,
     struct curl_slist** p_list,
     az_span separator)
@@ -198,7 +198,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_add_header_to_curl_list(
  *
  * @return az_result
  */
-static AZ_NODISCARD az_result
+static _az_NODISCARD az_result
 _az_http_client_curl_add_expect_header(CURL* p_curl, struct curl_slist** p_list)
 {
   _az_PRECONDITION_NOT_NULL(p_curl);
@@ -218,7 +218,7 @@ _az_http_client_curl_add_expect_header(CURL* p_curl, struct curl_slist** p_list)
  * @param p_headers list of headers in curl specific list
  * @return az_result
  */
-static AZ_NODISCARD az_result
+static _az_NODISCARD az_result
 _az_http_client_curl_build_headers(_az_http_request* p_request, struct curl_slist** p_headers)
 {
   _az_PRECONDITION_NOT_NULL(p_request);
@@ -242,7 +242,7 @@ _az_http_client_curl_build_headers(_az_http_request* p_request, struct curl_slis
  * @param url_from_request a url that is not zero terminated
  * @return az_result
  */
-static AZ_NODISCARD az_result
+static _az_NODISCARD az_result
 _az_http_client_curl_append_url(az_span writable_buffer, az_span url_from_request)
 {
   int32_t required_length = az_span_size(url_from_request) + 1;
@@ -295,7 +295,7 @@ static size_t _az_http_client_curl_write_to_span(
 /**
  * handles GET request
  */
-static AZ_NODISCARD az_result _az_http_client_curl_send_get_request(CURL* p_curl)
+static _az_NODISCARD az_result _az_http_client_curl_send_get_request(CURL* p_curl)
 {
   _az_PRECONDITION_NOT_NULL(p_curl);
 
@@ -308,7 +308,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_get_request(CURL* p_curl
 /**
  * handles DELETE request
  */
-static AZ_NODISCARD az_result
+static _az_NODISCARD az_result
 _az_http_client_curl_send_delete_request(CURL* p_curl, _az_http_request const* p_request)
 {
   _az_PRECONDITION_NOT_NULL(p_curl);
@@ -325,7 +325,7 @@ _az_http_client_curl_send_delete_request(CURL* p_curl, _az_http_request const* p
 /**
  * handles POST request. It handles seting up a body for request
  */
-static AZ_NODISCARD az_result
+static _az_NODISCARD az_result
 _az_http_client_curl_send_post_request(CURL* p_curl, _az_http_request const* p_request)
 {
   _az_PRECONDITION_NOT_NULL(p_curl);
@@ -409,7 +409,7 @@ static int32_t _az_http_client_curl_upload_read_callback(
  * Perform an UPLOAD or PUT request.
  * As of CURL 7.12.1 CURLOPT_PUT is deprecated.  PUT requests should be made using CURLOPT_UPLOAD
  */
-static AZ_NODISCARD az_result
+static _az_NODISCARD az_result
 _az_http_client_curl_send_upload_request(CURL* p_curl, _az_http_request const* p_request)
 {
   _az_PRECONDITION_NOT_NULL(p_curl);
@@ -443,7 +443,7 @@ _az_http_client_curl_send_upload_request(CURL* p_curl, _az_http_request const* p
  * @param p_request an http request builder
  * @return az_result
  */
-static AZ_NODISCARD az_result _az_http_client_curl_setup_headers(
+static _az_NODISCARD az_result _az_http_client_curl_setup_headers(
     CURL* p_curl,
     struct curl_slist** p_list,
     _az_http_request* p_request)
@@ -472,7 +472,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_setup_headers(
  * @param p_request an az http request builder holding all data to send request
  * @return az_result
  */
-static AZ_NODISCARD az_result
+static _az_NODISCARD az_result
 _az_http_client_curl_setup_url(CURL* p_curl, _az_http_request const* p_request)
 {
   _az_PRECONDITION_NOT_NULL(p_curl);
@@ -512,7 +512,7 @@ _az_http_client_curl_setup_url(CURL* p_curl, _az_http_request const* p_request)
  * @param response an http response object which will hold all the HTTP response
  * @return az_result
  */
-static AZ_NODISCARD az_result
+static _az_NODISCARD az_result
 _az_http_client_curl_setup_response_redirect(CURL* p_curl, az_http_response* response)
 {
   _az_PRECONDITION_NOT_NULL(p_curl);
@@ -540,7 +540,7 @@ _az_http_client_curl_setup_response_redirect(CURL* p_curl, az_http_response* res
 
  * @return AZ_OK if request was sent and a response was received
  */
-static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
+static _az_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
     CURL* p_curl,
     _az_http_request* p_request,
     az_http_response* response)
@@ -606,7 +606,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
  * @param p_response pre-allocated buffer where http response will be written
  * @return az_result
  */
-AZ_NODISCARD az_result
+_az_NODISCARD az_result
 az_http_client_send_request(_az_http_request* p_request, az_http_response* p_response)
 {
   _az_PRECONDITION_NOT_NULL(p_request);

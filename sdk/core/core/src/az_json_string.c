@@ -11,7 +11,7 @@
 
 #include <_az_cfg.h>
 
-AZ_NODISCARD AZ_INLINE az_result az_hex_to_digit(uint8_t c, uint8_t* out)
+_az_NODISCARD _az_INLINE az_result az_hex_to_digit(uint8_t c, uint8_t* out)
 {
   if (isdigit(c))
   {
@@ -32,7 +32,7 @@ AZ_NODISCARD AZ_INLINE az_result az_hex_to_digit(uint8_t c, uint8_t* out)
   return AZ_OK;
 }
 
-AZ_NODISCARD AZ_INLINE az_result az_json_esc_decode(uint8_t c, uint8_t* out)
+_az_NODISCARD _az_INLINE az_result az_json_esc_decode(uint8_t c, uint8_t* out)
 {
   switch (c)
   {
@@ -78,7 +78,7 @@ AZ_NODISCARD AZ_INLINE az_result az_json_esc_decode(uint8_t c, uint8_t* out)
  * Encodes the given character into a JSON escape sequence. The function returns an empty span if
  * the given character doesn't require to be escaped.
  */
-AZ_NODISCARD az_span _az_json_esc_encode(uint8_t c)
+_az_NODISCARD az_span _az_json_esc_encode(uint8_t c)
 {
   switch (c)
   {
@@ -121,7 +121,7 @@ AZ_NODISCARD az_span _az_json_esc_encode(uint8_t c)
  * TODO: this function and JSON pointer read functions should return proper UNICODE
  *       code-point to be compatible.
  */
-AZ_NODISCARD az_result _az_span_reader_read_json_string_char(az_span* json_string, uint32_t* out)
+_az_NODISCARD az_result _az_span_reader_read_json_string_char(az_span* json_string, uint32_t* out)
 {
   int32_t reader_length = az_span_size(*json_string);
   if (reader_length == 0)
