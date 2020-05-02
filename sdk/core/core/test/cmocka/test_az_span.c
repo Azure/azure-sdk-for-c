@@ -3,8 +3,8 @@
 
 #include "az_span_private.h"
 #include "az_test_definitions.h"
-#include <az_span.h>
 #include <az_precondition_internal.h>
+#include <az_span.h>
 
 #include <stdarg.h>
 #include <stddef.h>
@@ -763,6 +763,38 @@ static void az_span_copy_empty(void** state)
 static void test_az_span_is_valid(void** state)
 {
   (void)state;
+  assert_true(_az_span_is_valid({ 0 }, 0, true));
+  assert_false(_az_span_is_valid({ 0 }, 0, false));
+  assert_false(_az_span_is_valid({ 0 }, 1, true));
+  assert_false(_az_span_is_valid({ 0 }, 1, false));
+  assert_false(_az_span_is_valid({ 0 }, -1, true));
+  assert_false(_az_span_is_valid({ 0 }, -1, false));
+
+  assert_true(_az_span_is_valid(AZ_SPAN_FROM_STR(""), 0, true));
+  assert_true(_az_span_is_valid(AZ_SPAN_FROM_STR(""), 0, false));
+  assert_false(_az_span_is_valid(AZ_SPAN_FROM_STR(""), 1, true));
+  assert_false(_az_span_is_valid(AZ_SPAN_FROM_STR(""), 1, false));
+  assert_false(_az_span_is_valid(AZ_SPAN_FROM_STR(""), -1, true));
+  assert_false(_az_span_is_valid(AZ_SPAN_FROM_STR(""), -1, false));
+
+  assert_true(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), 0, true));
+  assert_true(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), 0, false));
+  assert_true(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), 1, true));
+  assert_true(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), 1, false));
+  assert_true(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), 5, true));
+  assert_true(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), 5, false));
+  assert_false(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), 6, true));
+  assert_false(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), 6, false));
+  assert_false(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), -1, true));
+  assert_false(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), -1, false));
+
+  assert_true(_az_span_is_valid(az_span_init((uint8_t*)~0, 0), 0, false));
+  assert_false(_az_span_is_valid(az_span_init((uint8_t*)~0 - 1, 1), 0, false));
+  assert_false(_az_span_is_valid(az_span_init((uint8_t*)~0 - 1, 2), 0, false));
+  assert_true(_az_span_is_valid(az_span_init((uint8_t*)((~0) / 2), ((~0) / 2) + 1), 0, false));
+  assert_false(_az_span_is_valid(az_span_init((uint8_t*)((~0) / 2), ((~0) / 2) + 2), 0, false));
+
+  assert_false(_az_span_is_valid(az_span_init((uint8_t*)((~0) / 2), -1, 0, true));
 }
 
 int test_az_span()
