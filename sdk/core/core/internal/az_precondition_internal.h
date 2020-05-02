@@ -68,8 +68,14 @@ AZ_NODISCARD AZ_INLINE bool az_span_is_valid(az_span span, int32_t min_size, boo
     return false;
   }
 
-  uint8_t* ptr = az_span_ptr(span);
+  uint8_t* const ptr = az_span_ptr(span);
   int32_t const span_size = az_span_size(span);
+
+  // Can't wrap over the end of the address space
+  if (ptr + span_size < ptr)
+  {
+    return false;
+  }
 
   bool result = false;
 
