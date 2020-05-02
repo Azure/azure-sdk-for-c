@@ -72,7 +72,7 @@ AZ_NODISCARD AZ_INLINE bool az_span_is_valid(az_span span, int32_t min_size, boo
   int32_t const span_size = az_span_size(span);
 
   // Can't wrap over the end of the address space
-  if (ptr + span_size < ptr)
+  if (span_size > (uint8_t*)~0 - ptr)
   {
     return false;
   }
