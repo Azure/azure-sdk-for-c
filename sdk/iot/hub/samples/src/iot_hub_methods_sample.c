@@ -132,7 +132,12 @@ static az_result read_configuration_and_init_client()
 
   az_span iot_hub_hostname_span = AZ_SPAN_FROM_BUFFER(iot_hub_hostname);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
-      "IoT Hub Hostname", IOT_HUB_HOSTNAME, "", false, iot_hub_hostname_span, &iot_hub_hostname_span));
+      "IoT Hub Hostname",
+      IOT_HUB_HOSTNAME,
+      "",
+      false,
+      iot_hub_hostname_span,
+      &iot_hub_hostname_span));
 
   AZ_RETURN_IF_FAILED(
       create_mqtt_endpoint(mqtt_endpoint, (int32_t)sizeof(mqtt_endpoint), iot_hub_hostname_span));
@@ -159,12 +164,12 @@ static int send_method_response(
 {
   // Get the response topic
   if (az_iot_hub_client_methods_response_get_publish_topic(
-           &client,
-           request->request_id,
-           status,
-           methods_response_topic,
-           sizeof(methods_response_topic),
-           NULL)
+          &client,
+          request->request_id,
+          status,
+          methods_response_topic,
+          sizeof(methods_response_topic),
+          NULL)
       != AZ_OK)
   {
     printf("Unable to get twin document publish topic");
@@ -322,8 +327,8 @@ int main()
   }
 
   size_t client_id_length;
-  if ((rc
-       = az_iot_hub_client_get_client_id(&client, mqtt_client_id, sizeof(mqtt_client_id), &client_id_length))
+  if ((rc = az_iot_hub_client_get_client_id(
+           &client, mqtt_client_id, sizeof(mqtt_client_id), &client_id_length))
       != AZ_OK)
   {
     printf("Failed to get MQTT clientId, return code %d\n", rc);

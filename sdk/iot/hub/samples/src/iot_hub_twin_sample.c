@@ -136,7 +136,12 @@ static az_result read_configuration_and_init_client()
 
   az_span iot_hub_hostname_span = AZ_SPAN_FROM_BUFFER(iot_hub_hostname);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
-      "IoT Hub Hostname", IOT_HUB_HOSTNAME, "", false, iot_hub_hostname_span, &iot_hub_hostname_span));
+      "IoT Hub Hostname",
+      IOT_HUB_HOSTNAME,
+      "",
+      false,
+      iot_hub_hostname_span,
+      &iot_hub_hostname_span));
 
   AZ_RETURN_IF_FAILED(
       create_mqtt_endpoint(mqtt_endpoint, (int32_t)sizeof(mqtt_endpoint), iot_hub_hostname_span));
