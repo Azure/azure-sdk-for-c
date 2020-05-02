@@ -642,8 +642,12 @@ AZ_INLINE int32_t _az_span_url_encode_get_size(az_span destination, az_span sour
   int32_t const source_size = az_span_size(source);
   _az_PRECONDITION_VALID_SPAN(destination, source_size, false);
 
-  int32_t const destination_size = az_span_size(destination);
+  if (source_size == 0)
+  {
+    return 0;
+  }
 
+  int32_t const destination_size = az_span_size(destination);
   if (destination_size < source_size)
   {
     return -1;
