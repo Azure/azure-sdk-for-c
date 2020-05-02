@@ -643,31 +643,23 @@ AZ_NODISCARD az_result _az_span_url_encode(az_span destination, az_span source, 
   int32_t const source_size = az_span_size(source);
   _az_PRECONDITION_VALID_SPAN(destination, source_size, false);
 
-  int32_t result_size = 0;
+  int32_t extra_size_needed = 0;
   for (int32_t i = 0; i < source_size; ++i)
   {
     if (_az_span_url_should_encode(az_span_ptr(source)[i]))
     {
-      if (result_size <= INT32_MAX - 3)
-      {
-        result_size += 3;
-        continue;
-      }
+      ++extra_size_needed;
     }
-    else if (result_size < INT32_MAX)
-    {
-      result_size += 1;
-      continue;
-    }
-    
-    result_size = -1;
   }
 
-  if (result_size == -1 || az_span_size(destination) < result_size)
+  int32_t const destination_size = az_span_size(destination);
+  if (destination_size < source_size || (destination_size - source_size) / 2 < extra_size_needed)
   {
     *out_length = 0;
     return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
   }
+
+  int32_t const result_size = source_size + extra_size_needed * 2;
 
   uint8_t* const src_ptr = az_span_ptr(source);
   uint8_t* dest_ptr = az_span_ptr(destination);
