@@ -258,7 +258,7 @@ static int get_operation_status()
 
     if (topic_len == 0)
     {
-      // The length of the topic if there are one more NULL characters embedded in topic,
+      // The length of the topic if there are one or more NULL characters embedded in topic,
       // otherwise topic_len is 0.
       topic_len = (int)strlen(topic);
     }
