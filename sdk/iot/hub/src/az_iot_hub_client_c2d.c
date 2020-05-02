@@ -60,9 +60,8 @@ AZ_NODISCARD az_result az_iot_hub_client_c2d_parse_received_topic(
   _az_PRECONDITION_NOT_NULL(out_request);
   (void)client;
 
-  az_span token;
   az_span reminder;
-  token = _az_span_token(received_topic, c2d_topic_suffix, &reminder);
+  az_span token = _az_span_token(received_topic, c2d_topic_suffix, &reminder);
   if (az_span_ptr(reminder) == NULL)
   {
     return AZ_ERROR_IOT_TOPIC_NO_MATCH;
