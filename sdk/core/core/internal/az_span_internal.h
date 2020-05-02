@@ -30,6 +30,8 @@ AZ_INLINE AZ_NODISCARD int32_t _az_span_diff(az_span sliced_span, az_span origin
  * URL-encoding the \p source span characters.
  *
  * @param[in] destination The #az_span whose bytes will receive the URL-encoded \p source.
+ * If \p destination can't fit the \p source, some data may still be written to it, but the \p
+ * out_length will be set to 0, and the function will return #AZ_ERROR_INSUFFICIENT_SPAN_SIZE.
  * @param[in] source The #az_span containing the non-URL-encoded bytes.
  * @param[out] out_length A pointer to an int32_t that is going to be assigned the length
  * of URL-encoding the \p source.
