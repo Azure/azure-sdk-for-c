@@ -3,6 +3,7 @@
 
 #include "az_test_definitions.h"
 #include <az_span_internal.h>
+#include <az_test_precondition.h>
 
 #include <stdarg.h>
 #include <stddef.h>
@@ -14,6 +15,8 @@
 #include <cmocka.h>
 
 #include <_az_cfg.h>
+
+enable_precondition_check_tests();
 
 static az_span url_encoded = AZ_SPAN_LITERAL_FROM_STR(
     "%00%01%02%03%04%05%06%07%08%09%0A%0B%0C%0D%0E%0F%10%11%12%13%14%15%16%17%18%19%1A%1B%1C%1D%1E%"
@@ -51,16 +54,112 @@ static void test_url_encode(void** state)
   az_span const buffer = AZ_SPAN_FROM_BUFFER(buf);
   int32_t url_length = 0;
 
-  assert_true(az_succeeded(
-      _az_span_url_encode(buffer, AZ_SPAN_FROM_STR("https://vault.azure.net"), &url_length)));
+  {
+    // Empty
+    uint8_t buf0[0] = {};
+    az_span const buffer0 = AZ_SPAN_FROM_BUFFER(buf0);
+    url_length = 0xFF;
+    assert_true(az_succeeded(_az_span_url_encode(buffer0, { 0 }, &url_length)));
+    assert_true(az_span_is_content_equal(az_span_slice(buffer0, 0, url_length), { 0 }));
+    assert_int_equal(url_length, 0);
+  }
+  {
+    // Just enough to do no encoding
+    uint8_t buf5[5] = { 0 };
+    az_span const buffer5 = AZ_SPAN_FROM_BUFFER(buf5);
 
-  assert_true(az_span_is_content_equal(
-      az_span_slice(buffer, 0, url_length), AZ_SPAN_FROM_STR("https%3A%2F%2Fvault.azure.net")));
+    url_length = 0xFF;
+    assert_true(az_succeeded(_az_span_url_encode(buffer5, AZ_SPAN_FROM_STR("hello"), &url_length)));
 
-  assert_true(
-      az_succeeded(_az_span_url_encode(buffer, AZ_SPAN_FROM_BUFFER(url_decoded_buf), &url_length)));
+    assert_true(
+        az_span_is_content_equal(az_span_slice(bufer5, 0, url_length), AZ_SPAN_FROM_STR("hello")));
 
-  assert_true(az_span_is_content_equal(az_span_slice(buffer, 0, url_length), url_encoded));
+    assert_int_equal(url_length, sizeof("hello"));
+
+    // Insufficient size
+    url_length = 0xFF;
+    assert_true(
+        _az_span_url_encode(az_span_slice(0, 2), AZ_SPAN_FROM_STR("/"), &url_length)
+        == AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+
+    assert_int_equal(url_length, 0);
+    assert_true(az_span_is_content_equal(
+        az_span_slice(buffer5, 0, sizeof(buf5)), AZ_SPAN_FROM_STR("%2Flo")));
+  }
+  {
+    // May be sufficient to perform encoding
+    uint8_t buf7[7] = { 0 };
+    az_span const buffer7 = AZ_SPAN_FROM_BUFFER(buf7);
+
+    url_length = 0xFF;
+    assert_true(az_succeeded(_az_span_url_encode(buffer7, AZ_SPAN_FROM_STR("he/lo"), &url_length)));
+
+    assert_true(az_span_is_content_equal(
+        az_span_slice(buffer7, 0, url_length), AZ_SPAN_FROM_STR("he%2Flo")));
+
+    assert_int_equal(url_length, sizeof("he%2Flo"));
+  }
+#ifdef AZ_NO_PRECONDITION_CHECKING
+  {
+    uint8_t buf5[5] = { '*', '*', '*', '*', '*' };
+    az_span const buffer5 = AZ_SPAN_FROM_BUFFER(buf5);
+
+    url_length = 0xFF;
+    assert_true(
+        _az_span_url_encode(buffer5, AZ_SPAN_FROM_STR("hello_world"), &url_length)
+        == AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+
+    assert_int_equal(url_length, 0);
+
+    url_length = 0xFF;
+    assert_true(az_span_is_content_equal(
+        az_span_slice(buffer5, 0, sizeof(buf5)), AZ_SPAN_FROM_STR("*****")));
+    assert_int_equal(url_length, 0);
+
+    url_length = 0xFF;
+    assert_precondition_checked(_az_span_url_encode({ 0 }, { 0 }, &url_length));
+    assert_int_equal(url_length, 0);
+  }
+#else
+  {
+    setup_precondition_check_tests();
+
+    uint8_t buf5[5] = { 0 };
+    az_span const buffer5 = AZ_SPAN_FROM_BUFFER(buf5);
+
+    url_length = 0xFF;
+    assert_precondition_checked(
+        _az_span_url_encode(buffer5, AZ_SPAN_FROM_STR("hello_world"), &url_length));
+    assert_int_equal(url_length, 0);
+
+    url_length = 0xFF;
+    assert_precondition_checked(_az_span_url_encode({ 0 }, { 0 }, &url_length));
+    assert_int_equal(url_length, 0);
+
+    uint8_t buf0[0] = { 0 };
+    az_span const buffer0 = AZ_SPAN_FROM_BUFFER(buf0);
+    assert_precondition_checked(_az_span_url_encode(buffer0, { 0 }, NULL));
+  }
+  {
+    url_length = 0xFF;
+    assert_true(az_succeeded(
+        _az_span_url_encode(buffer, AZ_SPAN_FROM_STR("https://vault.azure.net"), &url_length)));
+
+    assert_true(az_span_is_content_equal(
+        az_span_slice(buffer, 0, url_length), AZ_SPAN_FROM_STR("https%3A%2F%2Fvault.azure.net")));
+
+    assert_int_equal(url_length, sizeof("https%3A%2F%2Fvault.azure.net"));
+  }
+  {
+    url_length = 0xFF;
+    assert_true(az_succeeded(
+        _az_span_url_encode(buffer, AZ_SPAN_FROM_BUFFER(url_decoded_buf), &url_length)));
+
+    assert_true(az_span_is_content_equal(az_span_slice(buffer, 0, url_length), url_encoded));
+
+    assert_int_equal(url_length, 256 * 3);
+  }
+#endif // AZ_NO_PRECONDITION_CHECKING
 }
 
 int test_az_url_encode()

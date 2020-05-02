@@ -3,10 +3,11 @@
 
 #include "az_span_private.h"
 #include "az_test_definitions.h"
+#include <az_span.h>
+#include <az_precondition_internal.h>
+
 #include <stdarg.h>
 #include <stddef.h>
-
-#include <az_span.h>
 
 #include <limits.h>
 #include <setjmp.h>
@@ -759,6 +760,11 @@ static void az_span_copy_empty(void** state)
   assert_true(az_span_is_content_equal(az_span_copy(dst, AZ_SPAN_NULL), dst));
 }
 
+static void test_az_span_is_valid(void** state)
+{
+  (void)state;
+}
+
 int test_az_span()
 {
   const struct CMUnitTest tests[] = {
@@ -798,6 +804,7 @@ int test_az_span()
     cmocka_unit_test(az_span_u32toa_max_uint_succeeds),
     cmocka_unit_test(az_span_u32toa_overflow_fails),
     cmocka_unit_test(az_span_copy_empty),
+    cmocka_unit_test(test_az_span_is_valid),
   };
   return cmocka_run_group_tests_name("az_core_span", tests, NULL, NULL);
 }
