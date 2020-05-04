@@ -4,11 +4,12 @@ Official Embedded C clients for Azure IoT Hub and Device Provisioning Service.
 
 ## Getting started
 
-TBD
+The Azure IoT library is compiled following the same steps listed on the root [README](https://github.com/Azure/azure-sdk-for-c/blob/master/README.md) documentation, under ["Getting Started Using the SDK"](https://github.com/Azure/azure-sdk-for-c/blob/master/README.md#getting-started-using-the-sdk).
 
 ### Prerequisites
 
-TBD
+For compiling the Azure IoT Embedded SDK for the most common platforms, no further prerequisites are necessary.
+Please follow the instructions in the Getting Started section above.
 
 ## Examples
 
