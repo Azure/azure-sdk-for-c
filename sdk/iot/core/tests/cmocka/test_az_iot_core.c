@@ -16,58 +16,6 @@
 #include <az_test_precondition.h>
 #include <cmocka.h>
 
-static void test_az_span_token_success()
-{
-  az_span span = AZ_SPAN_FROM_STR("abcdefgabcdefgabcdefg");
-  az_span delim = AZ_SPAN_FROM_STR("abc");
-  az_span token;
-  az_span out_span;
-
-  // token: ""
-  token = _az_span_token(span, delim, &out_span);
-  assert_non_null(az_span_ptr(token));
-  assert_true(az_span_size(token) == 0);
-  assert_true(az_span_ptr(out_span) == (az_span_ptr(span) + az_span_size(delim)));
-  assert_true(az_span_size(out_span) == (az_span_size(span) - az_span_size(delim)));
-
-  // token: "defg" (span+3)
-  span = out_span;
-
-  token = _az_span_token(span, delim, &out_span);
-  assert_true(az_span_ptr(token) == az_span_ptr(span));
-  assert_int_equal(az_span_size(token), 4);
-  assert_true(
-      az_span_ptr(out_span) == (az_span_ptr(span) + az_span_size(token) + az_span_size(delim)));
-  assert_true(
-      az_span_size(out_span) == (az_span_size(span) - az_span_size(token) - az_span_size(delim)));
-
-  // token: "defg" (span+10)
-  span = out_span;
-
-  token = _az_span_token(span, delim, &out_span);
-  assert_true(az_span_ptr(token) == az_span_ptr(span));
-  assert_int_equal(az_span_size(token), 4);
-  assert_true(
-      az_span_ptr(out_span) == (az_span_ptr(span) + az_span_size(token) + az_span_size(delim)));
-  assert_true(
-      az_span_size(out_span) == (az_span_size(span) - az_span_size(token) - az_span_size(delim)));
-
-  // token: "defg" (span+17)
-  span = out_span;
-
-  token = _az_span_token(span, delim, &out_span);
-  assert_true(az_span_ptr(token) == az_span_ptr(span));
-  assert_int_equal(az_span_size(token), 4);
-  assert_true(az_span_ptr(out_span) == NULL);
-  assert_true(az_span_size(out_span) == 0);
-
-  // Out_span is empty.
-  span = out_span;
-
-  token = _az_span_token(span, delim, &out_span);
-  assert_true(az_span_is_content_equal(token, AZ_SPAN_NULL));
-}
-
 static void test_az_iot_u32toa_size_success()
 {
   assert_int_equal(_az_iot_u32toa_size(0), 1);
@@ -145,7 +93,6 @@ static void test_az_iot_retry_calc_delay_overflow_time_success()
 int test_az_iot_core()
 {
   const struct CMUnitTest tests[] = {
-    cmocka_unit_test(test_az_span_token_success),
     cmocka_unit_test(test_az_iot_u32toa_size_success),
     cmocka_unit_test(test_az_iot_is_success_status_translate_success),
     cmocka_unit_test(test_az_iot_is_retriable_status_translate_success),

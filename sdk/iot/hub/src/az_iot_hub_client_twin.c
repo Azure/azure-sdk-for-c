@@ -8,6 +8,7 @@
 #include <az_precondition_internal.h>
 #include <az_result.h>
 #include <az_span.h>
+#include <az_span_internal.h>
 
 #include <_az_cfg.h>
 
