@@ -17,7 +17,7 @@
 #ifndef _az_IOT_PROVISIONING_CLIENT_H
 #define _az_IOT_PROVISIONING_CLIENT_H
 
-#include <az_iot_core.h>
+#include <az_iot_common.h>
 #include <az_result.h>
 #include <az_span.h>
 

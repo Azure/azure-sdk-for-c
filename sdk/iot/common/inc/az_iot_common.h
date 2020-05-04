@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 /**
- * @file az_iot_core.h
+ * @file az_iot_common.h
  *
  * @brief Azure IoT common definitions.
  *
@@ -98,31 +98,6 @@ AZ_NODISCARD int32_t az_iot_retry_calc_delay(
     int32_t min_retry_delay_msec,
     int32_t max_retry_delay_msec,
     int32_t random_msec);
-
-/**
- * @brief String tokenizer for #az_span.
- *
- * @param[in] source The #az_span with the content to be searched on. It must be a non-empty
- * #az_span.
- * @param[in] delimiter The #az_span containing the delimiter to "split" `source` into tokens.  It
- * must be a non-empty #az_span.
- * @param[out] out_remainder The #az_span pointing to the remaining bytes in `source`, starting
- * after the occurrence of `delimiter`. If the position after `delimiter` is the end of `source`,
- * `out_remainder` is set to an empty #az_span.
- * @return The #az_span pointing to the token delimited by the beginning of `source` up to the first
- * occurrence of (but not including the) `delimiter`, or the end of `source` if `delimiter` is not
- * found. If `source` is empty, AZ_SPAN_NULL is returned instead.
- */
-AZ_NODISCARD az_span _az_span_token(az_span source, az_span delimiter, az_span* out_remainder);
-
-/**
- * @brief Gives the length, in bytes, of the string that would represent the given number.
- *
- * @param[in] number The number whose length, as a string, is to be evaluated.
- * @return The length (not considering null terminator) of the string that would represent the given
- * number.
- */
-AZ_NODISCARD int32_t _az_iot_u32toa_size(uint32_t number);
 
 #include <_az_cfg_suffix.h>
 

@@ -6,6 +6,7 @@
 #include "az_iot_hub_client.h"
 #include <az_result.h>
 #include <az_span.h>
+#include <az_span_internal.h>
 
 #include <az_log_internal.h>
 #include <az_precondition_internal.h>
