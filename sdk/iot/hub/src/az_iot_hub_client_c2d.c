@@ -4,9 +4,11 @@
 #include <stdint.h>
 
 #include "az_iot_hub_client.h"
-#include <az_precondition_internal.h>
 #include <az_result.h>
 #include <az_span.h>
+
+#include <az_log_internal.h>
+#include <az_precondition_internal.h>
 
 #include <_az_cfg.h>
 
@@ -58,18 +60,18 @@ AZ_NODISCARD az_result az_iot_hub_client_c2d_parse_received_topic(
   _az_PRECONDITION_NOT_NULL(out_request);
   (void)client;
 
-  az_span token;
-  token = _az_span_token(received_topic, c2d_topic_suffix, &received_topic);
-  if (az_span_ptr(received_topic) != NULL)
-  {
-    token = _az_span_token(received_topic, c2d_topic_suffix, &received_topic);
-    AZ_RETURN_IF_FAILED(
-        az_iot_hub_client_properties_init(&out_request->properties, token, az_span_size(token)));
-  }
-  else
+  az_span reminder;
+  az_span token = _az_span_token(received_topic, c2d_topic_suffix, &reminder);
+  if (az_span_ptr(reminder) == NULL)
   {
     return AZ_ERROR_IOT_TOPIC_NO_MATCH;
   }
+
+  az_log_write(AZ_LOG_MQTT_RECEIVED_TOPIC, received_topic);
+
+  token = _az_span_token(reminder, c2d_topic_suffix, &reminder);
+  AZ_RETURN_IF_FAILED(
+      az_iot_hub_client_properties_init(&out_request->properties, token, az_span_size(token)));
 
   return AZ_OK;
 }
