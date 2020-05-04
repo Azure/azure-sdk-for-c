@@ -157,11 +157,11 @@ AZ_NODISCARD int32_t az_http_request_headers_count(_az_http_request const* reque
  * written.
  * @return An #az_result value indicating the result of the operation:
  *         - #AZ_OK if successful
- *         - #AZ_ERROR_HTTP_RESPONSE_OVERFLOW if there was any issue while trying to write into \p p_response. It
- * might mean that there was not enough space in \p p_response to hold the entire response from
- * the network.
- *         - #AZ_ERROR_HTTP_RESPONSE_COULDNT_RESOLVE_HOST if the url from \p p_request can't be resolved by the http
- * stack and the request was not sent.
+ *         - #AZ_ERROR_HTTP_RESPONSE_OVERFLOW if there was any issue while trying to write into \p
+ * p_response. It might mean that there was not enough space in \p p_response to hold the entire
+ * response from the network.
+ *         - #AZ_ERROR_HTTP_RESPONSE_COULDNT_RESOLVE_HOST if the url from \p p_request can't be
+ * resolved by the http stack and the request was not sent.
  *         - #AZ_ERROR_HTTP_PLATFORM any other issue from the transport layer.
  *
  */
