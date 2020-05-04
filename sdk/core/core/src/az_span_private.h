@@ -56,7 +56,7 @@ AZ_NODISCARD az_result _az_is_expected_span(az_span* self, az_span expected);
 AZ_NODISCARD az_span _az_span_trim_white_space(az_span source);
 
 /**
- * @brief Removes all leading and trailing white space characters from the start of \p span.
+ * @brief Removes all leading white space characters from the start of \p span.
  * Function will create a new #az_span pointing to the first non-white-space (` `, \\n, \\r, \\t)
  * character found in \p span and up to the last character.
  *
@@ -76,7 +76,7 @@ AZ_NODISCARD az_span _az_span_trim_white_space(az_span source);
 AZ_NODISCARD az_span _az_span_trim_white_space_from_start(az_span source);
 
 /**
- * @brief Removes all leading and trailing white space characters from the end of \p span.
+ * @brief Removes all trailing white space characters from the end of \p span.
  * Function will create a new #az_span pointing to the first character in \p span and up to the last
  * non-white-space (` `, \\n, \\r, \\t) character.
  *
