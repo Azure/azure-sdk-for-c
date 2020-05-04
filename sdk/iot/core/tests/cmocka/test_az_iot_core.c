@@ -157,16 +157,16 @@ static void test_az_iot_provisioning_client_logging_succeed()
 {
   az_log_classification const classifications[]
       = { AZ_LOG_IOT_RETRY, AZ_LOG_END_OF_LIST };
-  az_log_set_callback(_log_listener);
   az_log_set_classifications(classifications);
+  az_log_set_callback(_log_listener);
 
   assert_int_equal(0, _log_retry);
   _log_retry = 0;
   assert_int_equal(2229, az_iot_retry_calc_delay(5, 1, 500, 100000, 1234));
   assert_int_equal(1, _log_retry);
 
-  az_log_set_classifications(NULL);
   az_log_set_callback(NULL);
+  az_log_set_classifications(NULL);
 }
 
 #ifdef _MSC_VER
