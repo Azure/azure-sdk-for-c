@@ -143,7 +143,9 @@ static void test_http_request(void** state)
     az_http_method method;
     az_span body;
     az_span url;
-    assert_return_code(az_http_request_get_parts(&hrb, &method, &url, &body), AZ_OK);
+    assert_return_code(az_http_request_get_method(&hrb, &method), AZ_OK);
+    assert_return_code(az_http_request_get_url(&hrb, &url), AZ_OK);
+    assert_return_code(az_http_request_get_body(&hrb, &body), AZ_OK);
     assert_string_equal(az_span_ptr(method), az_span_ptr(az_http_method_get()));
     assert_string_equal(az_span_ptr(body), az_span_ptr(AZ_SPAN_FROM_STR("body")));
     assert_string_equal(

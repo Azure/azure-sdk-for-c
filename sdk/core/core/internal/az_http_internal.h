@@ -113,16 +113,6 @@ _az_http_policy_apiversion_options_default()
 }
 
 /**
- * @brief Returns the count of headers on the request
- *        Each header is an az_pair
- *
- */
-AZ_NODISCARD AZ_INLINE int32_t _az_http_request_headers_count(_az_http_request const* request)
-{
-  return request->_internal.headers_length;
-}
-
-/**
  * @brief Initialize az_http_policy_retry_options with default values
  *
  */
@@ -185,9 +175,6 @@ AZ_NODISCARD az_result az_http_pipeline_policy_transport(
     void* p_data,
     _az_http_request* p_request,
     az_http_response* p_response);
-
-AZ_NODISCARD az_result
-az_http_client_send_request(_az_http_request* p_request, az_http_response* p_response);
 
 /**
  * @brief Format buffer as a http request containing URL and header spans.

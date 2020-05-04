@@ -25,11 +25,11 @@ For more information about Azure IoT services using MQTT see [this article](http
 
 ### IoT Hub
 
-![iot_hub_flow](https://www.plantuml.com/plantuml/png/0/dLTTRzis57tNhxXlJOTvAuAbG8qYgE84SzQayM8L650K12tTM4GaKYMff5wn_pvI7vRZYgBbF1W1UUwvXuVKvUK7fQdKPPu5WNfalA2Ivc36DCAF0CpV1OqVrrAKF9c9JCZtxyF5ulmSpE_DzIoChky-zSEMqVtdMMIGD_G9UO8o-C-ag8XZYo2nI1XVDrdgYUNbHn8khlT6BiCe97SNVrtD8kXuTq0xMiZixl8A6f4suokuvam7Ntxv2fF9ET1_2HEQfEMAn1b3hWapqrDOHk5z5FJFGczSgL0IJdCaQzI1PxwVWYMEs7gY2YgAZCLKCy59_arhunhd61l5_vozUGUp2WzXgTCf55IfPo4JO0emB_IciTl5iRN9c7HNs6cQmJ9SWXQFo66D76KLDHsM-DESeeeejkPKbx9U_hJYfKPcS0XyR-5fJkFJixT1pvXRGEk6m-9zI7qwN4wzD9TsBlLOt2hRSJV237FKSXCuC_GVJjq6ag9SPKobH8k2nOsdMrg8AOSLWZbp2Jp_Ba2LAnLBjh8Vc1P0-GQgmD-2SJbwJMbWTc6pqyknIufF4zBAmoRL0ykq-LhwTseue5_Y5cz5tg9EHQB62ithi75Y_K5UmMvIYQeGNE4H6nKzCpxwy9cOBkSe6muDzPjnXEI2wZWzGgylpYisS4yEwJNKF-zeC0RisVxZPDLs72pC0VUN497dWaDde-FIwZItXNLeMJqv9SR8dj3KpTk_emWojkgI9e4hRQEqg-OENClUzaS_mAwDPjdAD4QGc1gxDcXJZbFAampbjEfVt6s9hNeDPzAuQNepPUNVDyEm-7nnSxsSGuvAqJLMZ2EOXikU8paN6WmZICoC3uaZvo39OBLn9cqeFOdTB3QhjRjcixWjLNEHZRNFlMtVIbJsWhP6nUOCG4jGvUYkfEbHzhbtRITrFT2JtHkx_-tKi_MntMcwdPZjfr9bSw8yXyzrqxKELXVQw3FWlUQCSzNH-FCg0Y5X4KQpUUTV_PuG4SpB5TJXKzUZOGeJQCTJeRHz2WnX4tnYCPg-El0-9dQehI3RZ4Qs6LN1ORtu14hElXFDUXNjTyOMVq4LlltZP7uRpYRBUMZQsvCjwQ-mJAd498nZKuS-ukRrwo0OsyfEUZQcaA90gHcgRTNrdTsTvw4FQtCs_rhJ3u5NMtXKVtPWCX-5TQ4SS6Et-WnQyR9C-SmVrOhiBNLik-1roXlD7aXUJJ-XLARkkErw-UKF6hPV9Ap8PgVqfi038tpBUW5lDliGw7Qbho3i2YumRZhN1se-os3WPMioeJGCvFlPctT4orAPEv588VHmr9T6JXKMsxFoOB7ujVUTRYCUSGCdETtOf-epqwcfi-RTEb_UceBn0NbIvjd_ "iot_hub_flow")
+![iot_hub_flow](https://www.plantuml.com/plantuml/svg/0/dLTjRzis4FxENt7VbWnpLmHBWHf5KCK9vgp9uiOgCA0e15gwM4GaKYMff5wn_pvIBvRjY7fnFXY1U7VFmuV7uzr7fQdKUPeGefuOpwYaAPXl6k4d0VDtISEdjHGvZsOY4VB31s-nkBW0ytjxC_Fyc_k_sysM_iENcMyiR-apyWWb-Sz05853Qn648c9yNQ6K2ykhJu6tk3duSkNvNd1_-TVrp8ScxexH3fTWTdzr3HL9Y_WBt72coTTVly5aSW7qtu097SJvAWWJXbm7p2nFOUbx3pvfNuLMlpNg85Se0qvJ93thxX0rJaHwreiGMPQma6ecU91-rsPLS8wXuV_F-TltC2jimSjrF8MCAlKYP0HC0QQPtbJYks9iHJEItMTscIQmz9QWnHDoM2D7MNXD1p5zPQAeAimKMtEgSuamBS9JmvOCCJ_OVvpIyEpy7MdvrasW5eRqcvGfun9iNsFQYDMYTCriHsGV4qnHomrn8hHdhAuTIwxvAc4g3hJ8M6WuRSD2I3ci44mIHl3okm2LhrGesShUEYs0yWqKJc_8E8nMKIeJkx7PsTNOBOLdKNdQ5KKieO97bcXJESOwj5FSsbgITwXZ4QcnHDFIRHpPVgTUmkwW4bKckC8Z3if_ONnqyXcVVSp1CWnrxHVZ2CePrM5y1Dy-lrwonBtOnJSIOPxMfNNlMCbeZvv4E8vW8ymWTWxp_c8YqbHmQ0Hrl68Dvxh4Tcsh1LDYYEpPlaftdtqV4hPgG2FYWgsODdNTOLT7hzkdds3tHfDaPVecY4orNHjhKvXZogC4vRHeRznTYwr_fbSpzwYA76qVW8Vg0oo-NDxUBEUGeb9qZKN44P6w2w03d0iD9Y98J8mEaGEpCqXdpZb1gv0zmEue5jNANKQpTjjGrPCsLZxNiKdydgEoxOCLAZGv0BLhWT4yJjEZv7EVsWvq-Q45lTVtyEwKgsNQxlJaJfljLIdGd5QToUT-yse5YwTjT0xqFdX6kI8r_hpsGKXOUFvitkXNZXl2Xtc-Wj9zwfeffZ21-diib7PC4LlR29zPY7PEC1Ysq_Hjfwd8i4PxKZQc0Vx8MDd51vW9Kv0rQuKzR8HjX4kgyDqV9_CxRpPPpZtJpPvi8Nw3PKmbHbuOccBp2JUdfmEZFk6cdA38s4Ptqd9OcHGPIirGRIjnNpxlJ9HzjXQp-hTzO7jjxjfQVoOF1EiBOLN8EzJOhKYTKkoNhZxnn_Se1_iTsqSSkhlskt-TEtTyUFCjG2MrtcGuqAFZ15-RLwSrnFGPfJBts9O3hwcYmBXfIX-fkOQaOt0rI2XDXE37-TltWPQvCWzT88NGtLvVApg5MsWF-z7QuhVMCRowtt2IqesTH5-OZatnD6FfV7btIiX7v56U9ly3 "iot_hub_flow")
 
 ### Device Provisioning Service
 
-![iot_provisioning_flow](https://www.plantuml.com/plantuml/png/0/fLTXRzCy4FwUNt5yeaCK8VI2z5OmaNMJjXVshYn1GaB8SfDhQfROmNRA2kA_SqwJDkhI9ktsePFivvwxUto-SzuRoxKjijJpp9sGETSy0rgp2ByzeByp7jqbMXKo7gjKwRTl_Sdaz1Jez-FLs0-lRlvlXmNXxUTnICYFV84oHktz8HSbSUGGB5Ana4dbPRKHd7zW_kHgQ-NS3trsS_RVnJY43My3r8Y5ZM_EBw0Aqdby2bTIME_hisym79u2_yM4iYpNQY6CK98YO54gK5ec23U28FHlGwy3raLL6DHCyWnPWjRh2-mCC2vH8_Zo-kM_m0ixh_JaUPwAY5k2i-o7jIIjb1ZPjGxTfANh7JHEn9lSBVCK0Zy0g-vGGe8ITOaUzN6mDpN33JCYaTmM6giidQSooOFijlAOPpnwzVgDrxBM8wIS6_DJwRZh6BUnU-Mar6fio_dLmTL7Hze7nTH4MapHsqdPKJaQ4s4ibPgfgPXLkOZOJAHkkIEz7kRj6Q_nkmfr3TYKwcv8cmUD4Oe5agRNdy8GKZ65jK7inBkjOjzBt5Ezl9YcmiohvFkAzi2gNQiAjakfQdjJ5pjmjI1rd_uD94AfpUJp6LIxSTayU_J46by5d_DbgdXC_xN1qKDQc6cLmLHJVz0mY59LnA0qNCG9dfGkZtJL-uGqcbn9WuzsvhGPWLGMckQKQ4ggKs5rycy5r21r1rSOUFSEg0jGxwfEus2svj775DTom_rammq38QEqA4SjQgsqEMbCpeSSTNsL8JtOxJW7Acwcycegi5KmBRUc8zr-BFjlKJdv9ysZMv6FEaVx28QGf6hAKqRFbbm9sfWhOzsKxcLC0yz457ylyEfegrH5sR7St0lTX3NUWHDpk9hC3EzpKL4MKjmpAoXqxzZhiEAbzKSnL2lhldL8jJSUVGVPER-hyZdSJkEF0erxlXnZQ_MIyLavTWutRbH4ATOZEOISAPrrFzJQg5wy6Aux2PiNqrutOHTHZ0iHuH6AEkFlXbAfY-W8-xBtkMyEFDuwGsDuilygRJy5tN6SSODl_XbSNllZON3fq_DkiBwwpo6OSusn7qN4_W6N9oTx-NisnwqIfhRYRrebK4z3FUFaqTlpIgNBWtf1OjpJzmQpkY1bOgQLilkjlbQXbcOHQYjc3elVlBQHjNLTMfx23dE7InXaP43FjP_2peK4Bk4ok2QrtbEVfW_Olm00 "iot_provisioning_flow")
+![iot_provisioning_flow](https://www.plantuml.com/plantuml/svg/0/hLTHRziu37xNhz3RaiCo70xRW0L3CJSjq6xhDTTum81X41IBSOJOaYV9MRFX_lient6onedjP7q82fFyI7waAEgTTTouF4q8iGkfCcvuIl6R0_gJKFoxvD4YDZfNOgGJRTw-3SRZYmkAlnzlHq5uU_zllTeaVFWq2b7p8r-24c38_-YY08wy1ekqa2eklQm5awiFB1ZVFlbo5OG1kxzyVpqAwHPtHsad5ZQwlxgcPP3UupDwgwGZN_xwIWU32yf_CAaTounUIYkrmWXOb4XGZadK6z9963o4f46j2Ie6nt8BXYcU0cchs0Pr4uIWG_hvrTzlAC_TlAILPraY8-xGYgNV72fhfI1o5HsjiOj03g1vIkyp_vadT19CgDCBK3G61QRG7dRmSpHVossXRsMikCiDOCxUOP5o9xidwSnJ7ltpwZMf-TOof8nR-rqRGJhe7cKLKwimzwkv2MvJI2p199_QoCWfa8EG3Ura89RMOUyLN6tWcDEPZDXC9YWYvvdNPrpf7chRIg7AzzaHdLeV1YAGIzymT_-58Ktab5OMmjFtK4PFcf1R4f3bqqJQ-JfzSf9LVIQbof-4BCavH7-9i6ss0teRZZStma-Al1PqZpzTqb8gYZ7TOlhYnMDXWodADk9Ae62LQ2w6-z1qPdHAfmRdZw6zAD6veDhGQn53lt1xXhlMnJTWCwqi_167dgSXLThHNGXCEC4AODys-DWBgXtfEYidD_ELpYrfbyjJioPdM_r8fra2hf6pVOiTbYeXhOGzcqSHMEkxOCPbWgE_VwAFtMuNIF_gDuzI-GB5IBFTMKFsRJP7g8XXJzh0rxSSpAhajcR6DEHrtFhuh2dMfl5k1wv1XurxqP0EQ9peAKyOxdoPbYYOQ-kQzg3AM0fc8oIwbVAwtylooMAk-_qWz0k99HqtYy5waM7mcCaICbVoaJc9ePDpJlOQk-5UQ8LI_b-Dv2wZO6TpxcJd_PPpeRFTzd19SOxrgVuDE3m4VEO55d0l4YU1x7GPIlBa-46eGtdnOa1nlSDsmzhEyschGt48IC1IHd02fTuOZ5c_lKvo3O_El-K4EnEci4vnVFBu300iIhJmskTGuSytzbUQaIxBl6-CIsxXzSlUpLqm6ank0bpGUzL0UKudSsv01CM5z05M_NvN-0Mirkz7SlgOtpk4E2A3xTZ7YmnvcN6CaHnvcU000BD40X_nnOcivyYcO4PhTzpgInbaOHQ1SNBcTU4hgRjUVpkkjM-paXNQIz405_JlqitnAkQAtapk-eIymzxCq-GN "iot_provisioning_flow")
 
 ## Porting the IoT Clients
 
@@ -47,7 +47,7 @@ Optionally, the IoT services support MQTT tunneling over WebSocket Secure which 
 ### Connecting
 
 The application code is required to initialize the TLS and MQTT stacks.
-Two authentication schemes are currently supported: _X509 Client Certificate Authentication_ and _Shared Access Signature_ authentication. 
+Two authentication schemes are currently supported: _X509 Client Certificate Authentication_ and _Shared Access Signature_ authentication.
 
 When X509 client authentication is used, the MQTT password field should be an empty string.
 
@@ -61,13 +61,22 @@ if(az_failed(az_iot_hub_client_sas_get_signature(client, unix_time + 3600, signa
     // error.
 }
 
-// Base64Encode the HMAC256 of the az_span_ptr(signature) with the Shared Access Key.
+// Application will Base64Encode the HMAC256 of the az_span_ptr(signature) containing az_span_size(signature) bytes with the Shared Access Key.
 
 if(az_failed(az_iot_hub_client_sas_get_password(client, base64_hmac_sha256_signature, NULL, password, password_size, &password_length)))
 {
     // error.
 }
 ```
+
+Recommended defaults:
+    - MQTT Keep-Alive Interval:  `AZ_IOT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS`
+    - MQTT Clean Session: false.
+
+#### MQTT Clean Session
+
+We recommend to always use [Clean Session](http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc398718030) false when connecting to IoT Hub.
+Connecting with Clean Session true will remove all enqueued C2D messages.
 
 ### Subscribe to topics
 
@@ -77,13 +86,13 @@ _Example:_
 
 ```C
 
-if(az_failed(az_iot_hub_client_c2d_get_subscribe_topic_filter(client, mqtt_topic_filter, &mqtt_topic_filter))
+if(az_failed(az_iot_hub_client_c2d_get_subscribe_topic_filter(client, topic, topic_size, NULL))
 {
     // error.
 }
-
-// Use az_span_ptr(mqtt_topic_filter) and az_span_len(mqtt_topic_filter).
 ```
+
+__Note:__ If the MQTT stack allows, it is recommended to subscribe prior to connecting.
 
 ### Sending APIs
 
@@ -93,13 +102,13 @@ The application is responsible for filling in the MQTT payload with the format e
 _Example:_
 
 ```C
-if(az_failed(az_iot_hub_client_telemetry_get_publish_topic(client, NULL, mqtt_topic, &mqtt_topic)))
+if(az_failed(az_iot_hub_client_telemetry_get_publish_topic(client, NULL, topic, topic_size, NULL)))
 {
     // error.
 }
-
-// Use az_span_ptr(mqtt_topic) and az_span_len(mqtt_topic) to create an MQTT Publish message.
 ```
+
+__Note:__ To limit overheads, when publishing, it is recommended to serialize as many MQTT messages within the same TLS record. This feature may not be available on all MQTT/TLS/Sockets stacks.
 
 ### Receiving APIs
 
@@ -145,6 +154,8 @@ _Example:_
         }
     }
 ```
+
+__Important:__ C2D messages are not enqueued until the device establishes the first MQTT session (connects for the first time to IoT Hub). The C2D message queue is preserved (according to the per-message time-to-live) as long as the device connects with Clean Session `false`.
 
 ### Retrying Operations
 
@@ -229,7 +240,7 @@ else
 
 Combining the functions above we recommend the following flow:
 
-![iot_retry_flow](https://www.plantuml.com/plantuml/png/0/bLN1QiCm3BtxAtGR3F83PPHsWR50QKkQdSO8Rk9cfguTRAVGZVtxx2u9JQEaQmuvw3tvINeMdXbBjQqEWfWzboNLz00kP1by4t3VCytsXLQLp4Cbb7vwcg_Nqocu_o8AvqcqMkAqJHA_XObZBkYHoPnfdFOoZnQEjD9K5epy4FB--051C8L89UbQgoCtN4akYpHc1JVMdVDNtI0ETOc4FC0b0M9cDQTRmO1fhRGXmqVu0Zg8RdBJ7UMYqgokOfpKj4V6QNsvZ8gi4auWpPcW9p86zhDfMTPvI94js8m9HszuC5RG10AWNobNzjpgwOp_en6VTqu8wCvhNFktL39ePmVtk2VhKcuwY19n5r5gNpfMNYKDDSkPj9mAW-dsMO3QW_3ky6aWss_S1AG2PJ_TzB8M9ZTcxD7NQfkkIgQfTGntpARACcRChXAT3Y-MjfjniQmEm7Uqc-6LVMJ8K1HhFKJHziphlKDYBVTwopgnfgrE41yQ9ZAsGlMaa6t0vpHs-GVnpho6h_hm_PWuAuEoWGYPkJV0FJA_ "iot_retry_flow")
+![iot_retry_flow](https://www.plantuml.com/plantuml/svg/0/bPNDQkCm4CVlUegvBHIy3n1AQ3RBie7G13TxMefHd6agwaf6abEwfUzUsObSoHedsnnya7xpd-_enbYkRVDSCVCaPCqrVmPtP17U6BZV3ru-xRLgv6wkAgMlhsVhzNGAxhjSp6URnUgMnkus-P_vnf5BVa2vGqrZlsQBfODMciizidV6_bxTGvPDOQtLGHYXf91xTWmeF08Vo1lhX8z4ZdjXBEhY9nv4YHxgY6-nVOvM2xwj451hfKt7UES3dT15A59eBr8yS54r6dr2dS4mcc5QgNbdTXv9LKfUbKtbOYjsMF7NL6C0f0gyhWDR8iyU20jA4rJzO09j7fT3cq3cI5ChQV1xPvBn1tkQdKk6_5yXbEqgzjhT1pbH4t2hPDQN5_wlO_Ba8EqQKJKIZYRaCfw6aAlMKp7Nk4Df1Q_CcF-KXD7-4UoN6ZbYtoxK1AG2PHzHGzbVitTWB6f7Yo_KflZTR9t9NLEMQ0mxhRw_-DpwpvpTUR6gKNFhbA8C_Jf713lDGYj7_Wd4Ujx-NDV9-wZH9D5hKnjCdFSyjQ_HULY4w28jHzHImkcvpGegIImJNSTB6pJA9FKStvVZrEMOrNx0sfV5pz1menowsbek94Xy2KRK3T-DUxdSq_W1 "iot_retry_flow")
 
 When devices are using IoT Hub without Provisioning Service, we recommend attempting to rotate the IoT Credentials (SAS Token or X509 Certificate) on authentication issues.
 

@@ -174,7 +174,7 @@ az_http_request_get_header(_az_http_request const* request, int32_t index, az_pa
   _az_PRECONDITION_NOT_NULL(request);
   _az_PRECONDITION_NOT_NULL(out_header);
 
-  if (index >= _az_http_request_headers_count(request))
+  if (index >= az_http_request_headers_count(request))
   {
     return AZ_ERROR_ARG;
   }
@@ -183,23 +183,37 @@ az_http_request_get_header(_az_http_request const* request, int32_t index, az_pa
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_http_request_get_parts(
-    _az_http_request const* request,
-    az_http_method* out_method,
-    az_span* out_url,
-    az_span* out_body)
+AZ_NODISCARD az_result
+az_http_request_get_method(_az_http_request const* request, az_http_method* out_method)
 {
-  if (out_method != NULL)
-  {
-    *out_method = request->_internal.method;
-  }
-  if (out_url != NULL)
-  {
-    *out_url = az_span_slice(request->_internal.url, 0, request->_internal.url_length);
-  }
-  if (out_body != NULL)
-  {
-    *out_body = request->_internal.body;
-  }
+  _az_PRECONDITION_NOT_NULL(request);
+  _az_PRECONDITION_NOT_NULL(out_method);
+
+  *out_method = request->_internal.method;
+
   return AZ_OK;
+}
+
+AZ_NODISCARD az_result az_http_request_get_url(_az_http_request const* request, az_span* out_url)
+{
+  _az_PRECONDITION_NOT_NULL(request);
+  _az_PRECONDITION_NOT_NULL(out_url);
+
+  *out_url = az_span_slice(request->_internal.url, 0, request->_internal.url_length);
+
+  return AZ_OK;
+}
+
+AZ_NODISCARD az_result az_http_request_get_body(_az_http_request const* request, az_span* out_body)
+{
+  _az_PRECONDITION_NOT_NULL(request);
+  _az_PRECONDITION_NOT_NULL(out_body);
+
+  *out_body = request->_internal.body;
+  return AZ_OK;
+}
+
+AZ_NODISCARD int32_t az_http_request_headers_count(_az_http_request const* request)
+{
+  return request->_internal.headers_length;
 }

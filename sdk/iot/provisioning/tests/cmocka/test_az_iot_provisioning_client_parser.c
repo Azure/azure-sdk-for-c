@@ -3,6 +3,7 @@
 
 #include "test_az_iot_provisioning_client.h"
 #include <az_iot_provisioning_client.h>
+#include <az_log.h>
 #include <az_span.h>
 #include <az_test_span.h>
 
@@ -25,6 +26,7 @@
 #define TEST_STATUS_ASSIGNED "assigned"
 #define TEST_STATUS_FAILED "failed"
 #define TEST_STATUS_DISABLED "disabled"
+#define TEST_STATUS_UNASSIGNED "unassigned"
 
 #define TEST_ERROR_MESSAGE_INVALID_CERT "Invalid certificate."
 #define TEST_ERROR_MESSAGE_ALLOCATION "Custom allocation failed with status code: 400"
@@ -52,9 +54,7 @@ test_az_iot_provisioning_client_parse_received_topic_and_payload_assigning_state
   assert_memory_equal(
       az_span_ptr(response.operation_id), TEST_OPERATION_ID, strlen(TEST_OPERATION_ID));
   assert_memory_equal(
-      az_span_ptr(response.registration_state),
-      TEST_STATUS_ASSIGNING,
-      strlen(TEST_STATUS_ASSIGNING));
+      az_span_ptr(response.operation_status), TEST_STATUS_ASSIGNING, strlen(TEST_STATUS_ASSIGNING));
 }
 
 static void
@@ -68,8 +68,8 @@ test_az_iot_provisioning_client_parse_received_topic_and_payload_topic_not_match
   az_iot_provisioning_client_register_response response = { .status = AZ_IOT_STATUS_FORBIDDEN,
                                                             .retry_after_seconds = 0xBAADC0DE,
                                                             .operation_id = AZ_SPAN_NULL,
-                                                            .registration_state = AZ_SPAN_NULL,
-                                                            .registration_information = { 0 } };
+                                                            .operation_status = AZ_SPAN_NULL,
+                                                            .registration_result = { 0 } };
 
   az_result ret = az_iot_provisioning_client_parse_received_topic_and_payload(
       &client, received_topic, received_payload, &response);
@@ -103,9 +103,7 @@ test_az_iot_provisioning_client_parse_received_topic_and_payload_parse_assigning
   assert_memory_equal(
       az_span_ptr(response.operation_id), TEST_OPERATION_ID, strlen(TEST_OPERATION_ID));
   assert_memory_equal(
-      az_span_ptr(response.registration_state),
-      TEST_STATUS_ASSIGNING,
-      strlen(TEST_STATUS_ASSIGNING));
+      az_span_ptr(response.operation_status), TEST_STATUS_ASSIGNING, strlen(TEST_STATUS_ASSIGNING));
 }
 
 static void
@@ -140,19 +138,17 @@ test_az_iot_provisioning_client_parse_received_topic_and_payload_assigned_state_
   assert_memory_equal(
       az_span_ptr(response.operation_id), TEST_OPERATION_ID, strlen(TEST_OPERATION_ID));
   assert_memory_equal(
-      az_span_ptr(response.registration_state), TEST_STATUS_ASSIGNED, strlen(TEST_STATUS_ASSIGNED));
+      az_span_ptr(response.operation_status), TEST_STATUS_ASSIGNED, strlen(TEST_STATUS_ASSIGNED));
   assert_memory_equal(
-      az_span_ptr(response.registration_information.assigned_hub_hostname),
+      az_span_ptr(response.registration_result.assigned_hub_hostname),
       TEST_HUB_HOSTNAME,
       strlen(TEST_HUB_HOSTNAME));
   assert_memory_equal(
-      az_span_ptr(response.registration_information.device_id),
-      TEST_DEVICE_ID,
-      strlen(TEST_DEVICE_ID));
+      az_span_ptr(response.registration_result.device_id), TEST_DEVICE_ID, strlen(TEST_DEVICE_ID));
 
-  assert_int_equal(200, response.registration_information.status);
-  assert_int_equal(0, response.registration_information.extended_error_code);
-  assert_int_equal(0, az_span_size(response.registration_information.error_message));
+  assert_int_equal(0, response.registration_result.error_code);
+  assert_int_equal(0, response.registration_result.extended_error_code);
+  assert_int_equal(0, az_span_size(response.registration_result.error_message));
 }
 
 static void
@@ -177,24 +173,24 @@ test_az_iot_provisioning_client_parse_received_topic_and_payload_invalid_certifi
   // From payload
   assert_int_equal(0, az_span_size(response.operation_id));
   assert_memory_equal(
-      az_span_ptr(response.registration_state), TEST_STATUS_FAILED, strlen(TEST_STATUS_FAILED));
+      az_span_ptr(response.operation_status), TEST_STATUS_FAILED, strlen(TEST_STATUS_FAILED));
 
-  assert_int_equal(0, az_span_size(response.registration_information.assigned_hub_hostname));
-  assert_int_equal(0, az_span_size(response.registration_information.device_id));
+  assert_int_equal(0, az_span_size(response.registration_result.assigned_hub_hostname));
+  assert_int_equal(0, az_span_size(response.registration_result.device_id));
 
-  assert_int_equal(AZ_IOT_STATUS_UNAUTHORIZED, response.registration_information.status);
-  assert_int_equal(401002, response.registration_information.extended_error_code);
+  assert_int_equal(AZ_IOT_STATUS_UNAUTHORIZED, response.registration_result.error_code);
+  assert_int_equal(401002, response.registration_result.extended_error_code);
 
   assert_memory_equal(
-      az_span_ptr(response.registration_information.error_message),
+      az_span_ptr(response.registration_result.error_message),
       TEST_ERROR_MESSAGE_INVALID_CERT,
       strlen(TEST_ERROR_MESSAGE_INVALID_CERT));
   assert_memory_equal(
-      az_span_ptr(response.registration_information.error_timestamp),
+      az_span_ptr(response.registration_result.error_timestamp),
       TEST_ERROR_TIMESTAMP,
       strlen(TEST_ERROR_TIMESTAMP));
   assert_memory_equal(
-      az_span_ptr(response.registration_information.error_tracking_id),
+      az_span_ptr(response.registration_result.error_tracking_id),
       TEST_ERROR_TRACKING_ID,
       strlen(TEST_ERROR_TRACKING_ID));
 }
@@ -220,7 +216,7 @@ static void test_az_iot_provisioning_client_parse_received_topic_payload_disable
   // From payload
   assert_int_equal(0, az_span_size(response.operation_id));
   assert_memory_equal(
-      az_span_ptr(response.registration_state), TEST_STATUS_DISABLED, strlen(TEST_STATUS_DISABLED));
+      az_span_ptr(response.operation_status), TEST_STATUS_DISABLED, strlen(TEST_STATUS_DISABLED));
 }
 
 static void
@@ -252,24 +248,24 @@ test_az_iot_provisioning_client_parse_received_topic_and_payload_allocation_erro
   assert_memory_equal(
       az_span_ptr(response.operation_id), TEST_OPERATION_ID, strlen(TEST_OPERATION_ID));
   assert_memory_equal(
-      az_span_ptr(response.registration_state), TEST_STATUS_FAILED, strlen(TEST_STATUS_FAILED));
+      az_span_ptr(response.operation_status), TEST_STATUS_FAILED, strlen(TEST_STATUS_FAILED));
 
-  assert_int_equal(0, az_span_size(response.registration_information.assigned_hub_hostname));
-  assert_int_equal(0, az_span_size(response.registration_information.device_id));
+  assert_int_equal(0, az_span_size(response.registration_result.assigned_hub_hostname));
+  assert_int_equal(0, az_span_size(response.registration_result.device_id));
 
-  assert_int_equal(AZ_IOT_STATUS_BAD_REQUEST, response.registration_information.status);
-  assert_int_equal(400207, response.registration_information.extended_error_code);
+  assert_int_equal(AZ_IOT_STATUS_BAD_REQUEST, response.registration_result.error_code);
+  assert_int_equal(400207, response.registration_result.extended_error_code);
 
   assert_memory_equal(
-      az_span_ptr(response.registration_information.error_message),
+      az_span_ptr(response.registration_result.error_message),
       TEST_ERROR_MESSAGE_ALLOCATION,
       strlen(TEST_ERROR_MESSAGE_ALLOCATION));
   assert_memory_equal(
-      az_span_ptr(response.registration_information.error_timestamp),
+      az_span_ptr(response.registration_result.error_timestamp),
       TEST_ERROR_TIMESTAMP,
       strlen(TEST_ERROR_TIMESTAMP));
 
-  assert_int_equal(0, az_span_size(response.registration_information.error_tracking_id));
+  assert_int_equal(0, az_span_size(response.registration_result.error_tracking_id));
 }
 
 static void
@@ -308,7 +304,7 @@ test_az_iot_provisioning_client_received_topic_and_payload_parse_operationid_not
 }
 
 static void
-test_az_iot_provisioning_client_received_topic_and_payload_parse_registration_state_not_found_fails()
+test_az_iot_provisioning_client_received_topic_and_payload_parse_operation_status_not_found_fails()
 {
   az_iot_provisioning_client client;
   az_span received_topic = AZ_SPAN_FROM_STR("$dps/registrations/res/200/?$rid=1");
@@ -346,7 +342,7 @@ test_az_iot_provisioning_client_received_topic_and_payload_parse_error_code_not_
 }
 
 static void
-test_az_iot_provisioning_client_received_topic_and_payload_parse_invalid_registration_state_fails()
+test_az_iot_provisioning_client_received_topic_and_payload_parse_invalid_operation_status_fails()
 {
   az_iot_provisioning_client client;
   az_span received_topic = AZ_SPAN_FROM_STR("$dps/registrations/res/200/?$rid=1");
@@ -358,6 +354,168 @@ test_az_iot_provisioning_client_received_topic_and_payload_parse_invalid_registr
   az_result ret = az_iot_provisioning_client_parse_received_topic_and_payload(
       &client, received_topic, received_payload, &response);
   assert_int_equal(AZ_ERROR_PARSER_UNEXPECTED_CHAR, ret);
+}
+
+static void
+test_az_iot_provisioning_client_received_topic_and_payload_parse_invalid_result_json_fails()
+{
+  az_iot_provisioning_client client;
+  az_span received_topic = AZ_SPAN_FROM_STR("$dps/registrations/res/200/?$rid=1");
+  az_span received_payload
+      = AZ_SPAN_FROM_STR("{\"operationId\":\"" TEST_OPERATION_ID
+                         /*"\",\"status\":\"" TEST_STATUS_FAILED */ "\",\"registrationState\":{"
+                         "\"registrationId\":\"" TEST_REGISTRATION_ID "\",");
+
+  az_iot_provisioning_client_register_response response;
+  az_result ret = az_iot_provisioning_client_parse_received_topic_and_payload(
+      &client, received_topic, received_payload, &response);
+  assert_int_equal(AZ_ERROR_ITEM_NOT_FOUND, ret);
+}
+
+static void test_az_iot_provisioning_client_received_topic_and_payload_parse_hub_not_found_fails()
+{
+  az_iot_provisioning_client client;
+  az_span received_topic = AZ_SPAN_FROM_STR("$dps/registrations/res/200/?$rid=1");
+  az_span received_payload
+      = AZ_SPAN_FROM_STR("{\"operationId\":\"" TEST_OPERATION_ID
+                         "\",\"status\":\"" TEST_STATUS_ASSIGNED "\",\"registrationState\":{"
+                         "\"x509\":{},"
+                         "\"registrationId\":\"" TEST_REGISTRATION_ID "\","
+                         "\"createdDateTimeUtc\":\"2020-04-10T03:11:13.0276997Z\","
+                         "\"deviceId\":\"" TEST_DEVICE_ID "\","
+                         "\"status\":\"" TEST_STATUS_ASSIGNED "\","
+                         "\"substatus\":\"initialAssignment\","
+                         "\"lastUpdatedDateTimeUtc\":\"2020-04-10T03:11:13.2096201Z\","
+                         "\"etag\":\"IjYxMDA4ZDQ2LTAwMDAtMDEwMC0wMDAwLTVlOGZlM2QxMDAwMCI=\","
+                         "\"payload\":{\"hello\":\"world\",\"arr\":[1,2,3,4,5,6],\"num\":123}}}");
+
+  az_iot_provisioning_client_register_response response;
+  az_result ret = az_iot_provisioning_client_parse_received_topic_and_payload(
+      &client, received_topic, received_payload, &response);
+  assert_int_equal(AZ_ERROR_ITEM_NOT_FOUND, ret);
+}
+
+static void
+test_az_iot_provisioning_client_received_topic_and_payload_parse_device_not_found_fails()
+{
+  az_iot_provisioning_client client;
+  az_span received_topic = AZ_SPAN_FROM_STR("$dps/registrations/res/200/?$rid=1");
+  az_span received_payload
+      = AZ_SPAN_FROM_STR("{\"operationId\":\"" TEST_OPERATION_ID
+                         "\",\"status\":\"" TEST_STATUS_ASSIGNED "\",\"registrationState\":{"
+                         "\"x509\":{},"
+                         "\"registrationId\":\"" TEST_REGISTRATION_ID "\","
+                         "\"createdDateTimeUtc\":\"2020-04-10T03:11:13.0276997Z\","
+                         "\"assignedHub\":\"" TEST_HUB_HOSTNAME "\","
+                         "\"status\":\"" TEST_STATUS_ASSIGNED "\","
+                         "\"substatus\":\"initialAssignment\","
+                         "\"lastUpdatedDateTimeUtc\":\"2020-04-10T03:11:13.2096201Z\","
+                         "\"etag\":\"IjYxMDA4ZDQ2LTAwMDAtMDEwMC0wMDAwLTVlOGZlM2QxMDAwMCI=\","
+                         "\"payload\":{\"hello\":\"world\",\"arr\":[1,2,3,4,5,6],\"num\":123}}}");
+
+  az_iot_provisioning_client_register_response response;
+  az_result ret = az_iot_provisioning_client_parse_received_topic_and_payload(
+      &client, received_topic, received_payload, &response);
+  assert_int_equal(AZ_ERROR_ITEM_NOT_FOUND, ret);
+}
+
+static void test_az_iot_provisioning_client_parse_operation_status_translate_succeed()
+{
+  az_iot_provisioning_client_register_response response = { .status = AZ_IOT_STATUS_FORBIDDEN,
+                                                            .retry_after_seconds = 0xBAADC0DE,
+                                                            .operation_id = AZ_SPAN_NULL,
+                                                            .operation_status = AZ_SPAN_NULL,
+                                                            .registration_result = { 0 } };
+
+  az_iot_provisioning_client_operation_status operation_status = 0xBAADC0DE;
+
+  assert_true(
+      az_failed(az_iot_provisioning_client_parse_operation_status(&response, &operation_status)));
+  assert_int_equal((uint32_t)0xBAADC0DE, (uint32_t)operation_status);
+
+  response.operation_status = AZ_SPAN_FROM_STR(TEST_STATUS_UNASSIGNED);
+  assert_true(az_succeeded(
+      az_iot_provisioning_client_parse_operation_status(&response, &operation_status)));
+  assert_int_equal(AZ_IOT_PROVISIONING_STATUS_UNASSIGNED, operation_status);
+
+  response.operation_status = AZ_SPAN_FROM_STR(TEST_STATUS_ASSIGNING);
+  assert_true(az_succeeded(
+      az_iot_provisioning_client_parse_operation_status(&response, &operation_status)));
+  assert_int_equal(AZ_IOT_PROVISIONING_STATUS_ASSIGNING, operation_status);
+
+  response.operation_status = AZ_SPAN_FROM_STR(TEST_STATUS_ASSIGNED);
+  assert_true(az_succeeded(
+      az_iot_provisioning_client_parse_operation_status(&response, &operation_status)));
+  assert_int_equal(AZ_IOT_PROVISIONING_STATUS_ASSIGNED, operation_status);
+
+  response.operation_status = AZ_SPAN_FROM_STR(TEST_STATUS_FAILED);
+  assert_true(az_succeeded(
+      az_iot_provisioning_client_parse_operation_status(&response, &operation_status)));
+  assert_int_equal(AZ_IOT_PROVISIONING_STATUS_FAILED, operation_status);
+
+  response.operation_status = AZ_SPAN_FROM_STR(TEST_STATUS_DISABLED);
+  assert_true(az_succeeded(
+      az_iot_provisioning_client_parse_operation_status(&response, &operation_status)));
+  assert_int_equal(AZ_IOT_PROVISIONING_STATUS_DISABLED, operation_status);
+}
+
+static void test_az_iot_provisioning_client_operation_complete_translate_succeed()
+{
+  assert_false(
+      az_iot_provisioning_client_operation_complete(AZ_IOT_PROVISIONING_STATUS_UNASSIGNED));
+  assert_false(az_iot_provisioning_client_operation_complete(AZ_IOT_PROVISIONING_STATUS_ASSIGNING));
+  assert_true(az_iot_provisioning_client_operation_complete(AZ_IOT_PROVISIONING_STATUS_ASSIGNED));
+  assert_true(az_iot_provisioning_client_operation_complete(AZ_IOT_PROVISIONING_STATUS_FAILED));
+  assert_true(az_iot_provisioning_client_operation_complete(AZ_IOT_PROVISIONING_STATUS_DISABLED));
+}
+
+static const az_span _log_received_topic = AZ_SPAN_LITERAL_FROM_STR("$dps/registrations/res/202");
+static const az_span _log_received_payload = AZ_SPAN_LITERAL_FROM_STR("LOG_PAYLOAD");
+
+static int _log_invoked_topic = 0;
+static int _log_invoked_payload = 0;
+static void _log_listener(az_log_classification classification, az_span message)
+{
+  switch (classification)
+  {
+    case AZ_LOG_MQTT_RECEIVED_TOPIC:
+      assert_memory_equal(
+          az_span_ptr(_log_received_topic), az_span_ptr(message), (size_t)az_span_size(message));
+      _log_invoked_topic++;
+      break;
+    case AZ_LOG_MQTT_RECEIVED_PAYLOAD:
+      assert_memory_equal(
+          az_span_ptr(_log_received_payload), az_span_ptr(message), (size_t)az_span_size(message));
+      _log_invoked_payload++;
+      break;
+    default:
+      assert_true(false);
+  }
+}
+
+static void test_az_iot_provisioning_client_logging_succeed()
+{
+  az_log_classification const classifications[]
+      = { AZ_LOG_MQTT_RECEIVED_TOPIC, AZ_LOG_MQTT_RECEIVED_PAYLOAD, AZ_LOG_END_OF_LIST };
+  az_log_set_classifications(classifications);
+  az_log_set_callback(_log_listener);
+
+  assert_int_equal(0, _log_invoked_topic);
+  assert_int_equal(0, _log_invoked_payload);
+
+  _log_invoked_topic = 0;
+  _log_invoked_payload = 0;
+
+  az_iot_provisioning_client client;
+  az_iot_provisioning_client_register_response response;
+  assert_true(az_failed(az_iot_provisioning_client_parse_received_topic_and_payload(
+      &client, _log_received_topic, _log_received_payload, &response)));
+
+  assert_int_equal(1, _log_invoked_topic);
+  assert_int_equal(1, _log_invoked_payload);
+
+  az_log_set_callback(NULL);
+  az_log_set_classifications(NULL);
 }
 
 #ifdef _MSC_VER
@@ -387,11 +545,20 @@ int test_az_iot_provisioning_client_parser()
     cmocka_unit_test(
         test_az_iot_provisioning_client_received_topic_and_payload_parse_operationid_not_found_fails),
     cmocka_unit_test(
-        test_az_iot_provisioning_client_received_topic_and_payload_parse_registration_state_not_found_fails),
+        test_az_iot_provisioning_client_received_topic_and_payload_parse_operation_status_not_found_fails),
     cmocka_unit_test(
         test_az_iot_provisioning_client_received_topic_and_payload_parse_error_code_not_found_fails),
     cmocka_unit_test(
-        test_az_iot_provisioning_client_received_topic_and_payload_parse_invalid_registration_state_fails),
+        test_az_iot_provisioning_client_received_topic_and_payload_parse_invalid_operation_status_fails),
+    cmocka_unit_test(
+        test_az_iot_provisioning_client_received_topic_and_payload_parse_invalid_result_json_fails),
+    cmocka_unit_test(
+        test_az_iot_provisioning_client_received_topic_and_payload_parse_hub_not_found_fails),
+    cmocka_unit_test(
+        test_az_iot_provisioning_client_received_topic_and_payload_parse_device_not_found_fails),
+    cmocka_unit_test(test_az_iot_provisioning_client_parse_operation_status_translate_succeed),
+    cmocka_unit_test(test_az_iot_provisioning_client_operation_complete_translate_succeed),
+    cmocka_unit_test(test_az_iot_provisioning_client_logging_succeed),
   };
 
   return cmocka_run_group_tests_name("az_iot_provisioning_client_parser", tests, NULL, NULL);

@@ -205,50 +205,6 @@ az_result test_policy_transport_retry_response_with_header_2(
   return AZ_OK;
 }
 
-void test_az_http_pipeline_policy_credential(void** state)
-{
-  (void)state;
-
-  uint8_t buf[100];
-  uint8_t header_buf[(2 * sizeof(az_pair))];
-  memset(buf, 0, sizeof(buf));
-  memset(header_buf, 0, sizeof(header_buf));
-
-  az_span url_span = AZ_SPAN_FROM_BUFFER(buf);
-  az_span remainder = az_span_copy(url_span, AZ_SPAN_FROM_STR("url"));
-  assert_int_equal(az_span_size(remainder), 97);
-  az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-  _az_http_request hrb;
-
-  assert_return_code(
-      az_http_request_init(
-          &hrb, &az_context_app, az_http_method_get(), url_span, 3, header_span, AZ_SPAN_NULL),
-      AZ_OK);
-
-  // Create a credential sample
-  az_credential_client_secret credential = { 0 };
-  assert_return_code(
-      az_credential_client_secret_init(
-          &credential,
-          AZ_SPAN_FROM_STR("id"),
-          AZ_SPAN_FROM_STR("tenant"),
-          AZ_SPAN_FROM_STR("secret")),
-      AZ_OK);
-
-  _az_http_policy policies[1] = {            
-            {
-              ._internal = {
-                .process = test_policy_transport,
-                .p_options = NULL,
-              },
-            },
-        };
-
-  // make sure token is not expired
-  will_return(__wrap_az_platform_clock_msec, 0);
-  assert_return_code(az_http_pipeline_policy_credential(policies, &credential, &hrb, NULL), AZ_OK);
-}
-
 void test_az_http_pipeline_policy_retry(void** state)
 {
   (void)state;
@@ -282,10 +238,7 @@ void test_az_http_pipeline_policy_retry(void** state)
         };
 
   // set clock sec required when retrying (will retry 4 times)
-  will_return(__wrap_az_platform_clock_msec, 0);
-  will_return(__wrap_az_platform_clock_msec, 0);
-  will_return(__wrap_az_platform_clock_msec, 0);
-  will_return(__wrap_az_platform_clock_msec, 0);
+  will_return_count(__wrap_az_platform_clock_msec, 0, 4);
   az_http_response response;
   assert_return_code(
       az_http_pipeline_policy_retry(policies, &retry_options, &hrb, &response), AZ_OK);
@@ -325,7 +278,6 @@ void test_az_http_pipeline_policy_retry_with_header(void** state)
             },
         };
 
-  // set clock sec required when retrying (will retry 4 times)
   will_return(__wrap_az_platform_clock_msec, 0);
 
   az_http_response response;
@@ -367,7 +319,6 @@ void test_az_http_pipeline_policy_retry_with_header_2(void** state)
             },
         };
 
-  // set clock sec required when retrying (will retry 4 times)
   will_return(__wrap_az_platform_clock_msec, 0);
 
   az_http_response response;
@@ -381,7 +332,6 @@ int test_az_policy()
 {
   const struct CMUnitTest tests[] = {
 #ifdef _az_MOCK_ENABLED
-    cmocka_unit_test(test_az_http_pipeline_policy_credential),
     cmocka_unit_test(test_az_http_pipeline_policy_retry),
     cmocka_unit_test(test_az_http_pipeline_policy_retry_with_header),
     cmocka_unit_test(test_az_http_pipeline_policy_retry_with_header_2),

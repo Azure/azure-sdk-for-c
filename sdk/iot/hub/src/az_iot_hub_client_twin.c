@@ -5,9 +5,11 @@
 
 #include "az_iot_hub_client.h"
 #include <az_precondition.h>
-#include <az_precondition_internal.h>
 #include <az_result.h>
 #include <az_span.h>
+
+#include <az_log_internal.h>
+#include <az_precondition_internal.h>
 
 #include <_az_cfg.h>
 
@@ -183,6 +185,8 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
   // Check if is related to twin or not
   if ((twin_index = az_span_find(received_topic, az_iot_hub_twin_topic_prefix)) >= 0)
   {
+    az_log_write(AZ_LOG_MQTT_RECEIVED_TOPIC, received_topic);
+
     int32_t twin_feature_index;
     az_span twin_feature_span
         = az_span_slice(received_topic, twin_index, az_span_size(received_topic));
@@ -192,7 +196,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
     {
       // Is a res case
       az_span remainder;
-      az_span status_str = az_span_token(
+      az_span status_str = _az_span_token(
           az_span_slice(
               received_topic,
               twin_feature_index + az_span_size(az_iot_hub_twin_response_sub_topic),
@@ -203,7 +207,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
       // Get status and convert to enum
       uint32_t status_int;
       AZ_RETURN_IF_FAILED(az_span_atou32(status_str, &status_int));
-      AZ_RETURN_IF_FAILED(az_iot_get_status_from_uint32(status_int, &out_twin_response->status));
+      out_twin_response->status = (az_iot_status)status_int;
 
       // Get request id prop value
       az_iot_hub_client_properties props;
