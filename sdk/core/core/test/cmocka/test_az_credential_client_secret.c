@@ -132,7 +132,7 @@ az_result send_request(_az_http_request* request, az_http_response* response)
                          "&client_secret=ClientSecret"),
         body));
 
-    assert_int_equal(1, _az_http_request_headers_count(request));
+    assert_int_equal(1, az_http_request_headers_count(request));
     {
       az_pair header = { 0 };
 
@@ -184,7 +184,7 @@ az_result send_request(_az_http_request* request, az_http_response* response)
   else // The actual HTTP request
   {
     bool has_auth_header = false;
-    int32_t const header_count = _az_http_request_headers_count(request);
+    int32_t const header_count = az_http_request_headers_count(request);
     for (int32_t i = 0; i < header_count; ++i)
     {
       az_pair header = { 0 };

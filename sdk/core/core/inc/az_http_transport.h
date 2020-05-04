@@ -146,7 +146,7 @@ AZ_NODISCARD az_result az_http_response_write_span(az_http_response* response, a
  * @param[in] request Pointer to an az_http_request to be used by this function.
  * @return Number of headers in the request.
  */
-AZ_NODISCARD int32_t _az_http_request_headers_count(_az_http_request const* request);
+AZ_NODISCARD int32_t az_http_request_headers_count(_az_http_request const* request);
 
 /**
  * @brief Send an HTTP request through the wire and write the response into \p p_response.

@@ -223,7 +223,7 @@ _az_http_client_curl_build_headers(_az_http_request* p_request, struct curl_slis
   _az_PRECONDITION_NOT_NULL(p_request);
 
   az_pair header;
-  for (int32_t offset = 0; offset < _az_http_request_headers_count(p_request); ++offset)
+  for (int32_t offset = 0; offset < az_http_request_headers_count(p_request); ++offset)
   {
     AZ_RETURN_IF_FAILED(az_http_request_get_header(p_request, offset, &header));
     AZ_RETURN_IF_FAILED(
@@ -449,7 +449,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_setup_headers(
   _az_PRECONDITION_NOT_NULL(p_curl);
   _az_PRECONDITION_NOT_NULL(p_request);
 
-  if (_az_http_request_headers_count(p_request) == 0)
+  if (az_http_request_headers_count(p_request) == 0)
   {
     // no headers, no need to set it up
     return AZ_OK;
