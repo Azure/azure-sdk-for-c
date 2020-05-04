@@ -8,7 +8,7 @@
 #include <az_result.h>
 #include <az_span.h>
 #include <az_span_internal.h>
-#include <az_iot_core_internal.h>
+#include <az_iot_common_internal.h>
 
 #include <_az_cfg.h>
 

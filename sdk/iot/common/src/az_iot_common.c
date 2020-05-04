@@ -3,8 +3,8 @@
 
 #include <stdint.h>
 
-#include "az_iot_core.h"
-#include <az_iot_core_internal.h>
+#include "az_iot_common.h"
+#include <az_iot_common_internal.h>
 #include <az_precondition_internal.h>
 #include <az_result.h>
 #include <az_span.h>

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 /**
- * @file az_iot_core.h
+ * @file az_iot_common.h
  *
  * @brief Azure IoT common definitions.
  *

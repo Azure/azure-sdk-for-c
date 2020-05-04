@@ -26,7 +26,7 @@ add_executable (
 target_link_libraries(
   iot_hub_c2d_sample PRIVATE
   az_iot_hub
-  az_iot_core
+  az_iot_common
   az_core
 )
 
@@ -46,7 +46,7 @@ add_executable (
 target_link_libraries(
   iot_hub_methods_sample PRIVATE
   az_iot_hub
-  az_iot_core
+  az_iot_common
   az_core
   )
 
@@ -66,7 +66,7 @@ add_executable (
 target_link_libraries(
   iot_hub_telemetry_sample PRIVATE
   az_iot_hub
-  az_iot_core
+  az_iot_common
   az_core
   )
 
@@ -86,7 +86,7 @@ add_executable (
 target_link_libraries(
   iot_hub_twin_sample PRIVATE
   az_iot_hub
-  az_iot_core
+  az_iot_common
   az_core
   )
 

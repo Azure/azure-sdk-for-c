@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "test_az_iot_core.h"
-#include <az_iot_core.h>
-#include <az_iot_core_internal.h>
+#include "test_az_iot_common.h"
+#include <az_iot_common.h>
+#include <az_iot_common_internal.h>
 #include <az_span.h>
 
 #include <az_precondition.h>
@@ -91,7 +91,7 @@ static void test_az_iot_retry_calc_delay_overflow_time_success()
 #pragma warning(disable : 4113)
 #endif
 
-int test_az_iot_core()
+int test_az_iot_common()
 {
   const struct CMUnitTest tests[] = {
     cmocka_unit_test(test_az_iot_u32toa_size_success),
@@ -100,5 +100,5 @@ int test_az_iot_core()
     cmocka_unit_test(test_az_iot_retry_calc_delay_common_timings_success),
     cmocka_unit_test(test_az_iot_retry_calc_delay_overflow_time_success),
   };
-  return cmocka_run_group_tests_name("az_iot_core", tests, NULL, NULL);
+  return cmocka_run_group_tests_name("az_iot_common", tests, NULL, NULL);
 }
