@@ -112,8 +112,10 @@ az_result send_request(_az_http_request* request, az_http_response* response)
   // "NewAuthToken" (supposedly the one that you get requesting a token an hour later).
   static bool redo_auth = false;
 
-  az_span const request_url
-      = az_span_slice(request->_internal.url, 0, request->_internal.url_length);
+  az_span request_url = { 0 };
+  assert_true(az_http_request_get_url(request, &request_url));
+  az_span body = { 0 };
+  assert_true(az_http_request_get_body(request, &body));
 
   if (!az_span_is_content_equal(
           AZ_SPAN_FROM_STR("https://www.microsoft.com/test/request"),
@@ -128,9 +130,9 @@ az_result send_request(_az_http_request* request, az_http_response* response)
                          "&client_id=ClientID"
                          "&scope=Scopes"
                          "&client_secret=ClientSecret"),
-        request->_internal.body));
+        body));
 
-    assert_int_equal(1, _az_http_request_headers_count(request));
+    assert_int_equal(1, az_http_request_headers_count(request));
     {
       az_pair header = { 0 };
 
@@ -182,7 +184,7 @@ az_result send_request(_az_http_request* request, az_http_response* response)
   else // The actual HTTP request
   {
     bool has_auth_header = false;
-    int32_t const header_count = _az_http_request_headers_count(request);
+    int32_t const header_count = az_http_request_headers_count(request);
     for (int32_t i = 0; i < header_count; ++i)
     {
       az_pair header = { 0 };
