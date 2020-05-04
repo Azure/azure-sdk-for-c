@@ -100,6 +100,8 @@ At the heart of our SDK is, what we refer to as, [Azure Core](sdk/core/core). Th
 
 - **HTTP**: Non-allocating HTTP request and HTTP response data structures and operations.
 
+- **Argument Validation**: Our SDK function validate arguments you pass to it and invoke a callback when validation fails. By default, this callback suspends the calling thread _forever_. However, you can override this behavior and, in fact, you can disable all argument validation to get smaller and faster code. See the [SDK Function Argument Validation](https://github.com/Azure/azure-sdk-for-c/tree/ba67151753118b484347b16ccc18d1ba1d5342b9/sdk/core/core#sdk-function-argument-validation) section of the `Azure Core` README for more information.
+
 In addition to the above features, `Azure Core` provides features available to client libraries written to access other Azure services. Customers use these features indirectly by way of interacting with a client library. By providing these features in `Azure Core`, the client libraries built on top of us will share a common implementation and many features will behave identically across client libraries. For example, `Azure Core` offers a standard set of credential types and an HTTP pipeline with logging, retry, and telemetry policies.
 
 ## Contributing
