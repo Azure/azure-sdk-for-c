@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include <az_iot_hub_client.h>
+#include <az_iot_common_internal.h>
 #include <az_precondition.h>
 #include <az_span.h>
 

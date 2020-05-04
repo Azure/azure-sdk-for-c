@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include "az_span_internal.h"
 #include "az_span_private.h"
 #include "az_test_definitions.h"
 #include <stdarg.h>
@@ -815,6 +816,59 @@ static void az_span_trim_null(void** state)
   assert_int_equal(az_span_size(source), 0);
 }
 
+static void test_az_span_token_success(void** state)
+{
+  (void)state;
+  az_span span = AZ_SPAN_FROM_STR("abcdefgabcdefgabcdefg");
+  az_span delim = AZ_SPAN_FROM_STR("abc");
+  az_span token;
+  az_span out_span;
+
+  // token: ""
+  token = _az_span_token(span, delim, &out_span);
+  assert_non_null(az_span_ptr(token));
+  assert_true(az_span_size(token) == 0);
+  assert_true(az_span_ptr(out_span) == (az_span_ptr(span) + az_span_size(delim)));
+  assert_true(az_span_size(out_span) == (az_span_size(span) - az_span_size(delim)));
+
+  // token: "defg" (span+3)
+  span = out_span;
+
+  token = _az_span_token(span, delim, &out_span);
+  assert_true(az_span_ptr(token) == az_span_ptr(span));
+  assert_int_equal(az_span_size(token), 4);
+  assert_true(
+      az_span_ptr(out_span) == (az_span_ptr(span) + az_span_size(token) + az_span_size(delim)));
+  assert_true(
+      az_span_size(out_span) == (az_span_size(span) - az_span_size(token) - az_span_size(delim)));
+
+  // token: "defg" (span+10)
+  span = out_span;
+
+  token = _az_span_token(span, delim, &out_span);
+  assert_true(az_span_ptr(token) == az_span_ptr(span));
+  assert_int_equal(az_span_size(token), 4);
+  assert_true(
+      az_span_ptr(out_span) == (az_span_ptr(span) + az_span_size(token) + az_span_size(delim)));
+  assert_true(
+      az_span_size(out_span) == (az_span_size(span) - az_span_size(token) - az_span_size(delim)));
+
+  // token: "defg" (span+17)
+  span = out_span;
+
+  token = _az_span_token(span, delim, &out_span);
+  assert_true(az_span_ptr(token) == az_span_ptr(span));
+  assert_int_equal(az_span_size(token), 4);
+  assert_true(az_span_ptr(out_span) == NULL);
+  assert_true(az_span_size(out_span) == 0);
+
+  // Out_span is empty.
+  span = out_span;
+
+  token = _az_span_token(span, delim, &out_span);
+  assert_true(az_span_is_content_equal(token, AZ_SPAN_NULL));
+}
+
 int test_az_span()
 {
   const struct CMUnitTest tests[] = {
@@ -862,6 +916,7 @@ int test_az_span()
     cmocka_unit_test(az_span_trim_spaced),
     cmocka_unit_test(az_span_trim_zero),
     cmocka_unit_test(az_span_trim_null),
+    cmocka_unit_test(test_az_span_token_success),
   };
   return cmocka_run_group_tests_name("az_core_span", tests, NULL, NULL);
 }

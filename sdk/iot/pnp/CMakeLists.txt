@@ -20,7 +20,7 @@ add_library (
 target_include_directories (${TARGET_NAME} PUBLIC inc)
 target_include_directories (${TARGET_NAME} PRIVATE src)
 target_include_directories (${TARGET_NAME} PRIVATE 
-  ${az_SOURCE_DIR}/sdk/iot/core/inc
+  ${az_SOURCE_DIR}/sdk/iot/common/inc
   ${az_SOURCE_DIR}/sdk/iot/hub/inc
 )
 
@@ -34,5 +34,5 @@ set(COV_EXCLUDE
     ${az_SOURCE_DIR}/sdk/core/core/inc/*
     ${az_SOURCE_DIR}/sdk/core/core/internal/*
     ${az_SOURCE_DIR}/sdk/iot/hub/inc/*
-    ${az_SOURCE_DIR}/sdk/iot/core/inc/*)
+    ${az_SOURCE_DIR}/sdk/iot/common/inc/*)
 include(CreateCodeCoverageTargets)
