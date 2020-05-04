@@ -760,8 +760,9 @@ static void az_span_copy_empty(void** state)
   assert_true(az_span_is_content_equal(az_span_copy(dst, AZ_SPAN_NULL), dst));
 }
 
-static void test_az_span_token_success()
+static void test_az_span_token_success(void** state)
 {
+  (void)state;
   az_span span = AZ_SPAN_FROM_STR("abcdefgabcdefgabcdefg");
   az_span delim = AZ_SPAN_FROM_STR("abc");
   az_span token;
