@@ -6,6 +6,7 @@
 #include <az_precondition_internal.h>
 #include <az_span.h>
 #include <az_span_internal.h>
+#include <az_iot_core_internal.h>
 
 #include <stdint.h>
 

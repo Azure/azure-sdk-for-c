@@ -3,6 +3,7 @@
 
 #include "test_az_iot_core.h"
 #include <az_iot_core.h>
+#include <az_iot_core_internal.h>
 #include <az_span.h>
 
 #include <az_precondition.h>
