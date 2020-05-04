@@ -87,7 +87,7 @@ static az_result _az_http_policy_logging_append_http_request_msg(
   remainder = az_span_copy(
       remainder, az_span_slice(request->_internal.url, 0, request->_internal.url_length));
 
-  int32_t const headers_count = az_http_request_headers_count(request);
+  int32_t const headers_count = _az_http_request_headers_count(request);
 
   az_span new_line_tab_string = AZ_SPAN_FROM_STR("\n\t");
   az_span colon_separator_string = AZ_SPAN_FROM_STR(" : ");
