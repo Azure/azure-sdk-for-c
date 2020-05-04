@@ -816,6 +816,55 @@ static void az_span_trim_null(void** state)
   assert_int_equal(az_span_size(source), 0);
 }
 
+static void az_span_trim_start(void** state)
+{
+  (void)state;
+  az_span source = _az_span_trim_white_space_from_start(AZ_SPAN_NULL);
+  assert_int_equal(az_span_size(source), 0);
+}
+
+static void az_span_trim_end(void** state)
+{
+  (void)state;
+  az_span source = _az_span_trim_white_space_from_end(AZ_SPAN_FROM_STR("\ta\n b     c    "));
+  assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("\ta\n b     c")));
+}
+
+static void az_span_trim_unicode(void** state)
+{
+  (void)state;
+  az_span source
+      = _az_span_trim_white_space_from_end(AZ_SPAN_FROM_STR("  \\U+00A0a\n b     c\\U+2028    "));
+  assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("  \\U+00A0a\n b     c\\U+2028")));
+}
+
+static void az_span_trim_two_calls(void** state)
+{
+  (void)state;
+  az_span source = _az_span_trim_white_space_from_start(
+      _az_span_trim_white_space_from_end(AZ_SPAN_FROM_STR("  \\U+00A0a\n b     c\\U+2028    ")));
+  assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("\\U+00A0a\n b     c\\U+2028")));
+}
+
+static void az_span_trim_two_calls_inverse(void** state)
+{
+  (void)state;
+  az_span source = _az_span_trim_white_space_from_end(
+      _az_span_trim_white_space_from_start(AZ_SPAN_FROM_STR("  \\U+00A0a\n b     c\\U+2028    ")));
+  assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("\\U+00A0a\n b     c\\U+2028")));
+}
+
+static void az_span_trim_repeat_calls(void** state)
+{
+  (void)state;
+  az_span source = _az_span_trim_white_space_from_end(
+      _az_span_trim_white_space_from_start(AZ_SPAN_FROM_STR("  1234    ")));
+  source = _az_span_trim_white_space(source);
+  source = _az_span_trim_white_space(source);
+  source = _az_span_trim_white_space(source);
+  assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("1234")));
+}
+
 static void test_az_span_token_success(void** state)
 {
   (void)state;
@@ -917,6 +966,12 @@ int test_az_span()
     cmocka_unit_test(az_span_trim_zero),
     cmocka_unit_test(az_span_trim_null),
     cmocka_unit_test(test_az_span_token_success),
+    cmocka_unit_test(az_span_trim_start),
+    cmocka_unit_test(az_span_trim_end),
+    cmocka_unit_test(az_span_trim_unicode),
+    cmocka_unit_test(az_span_trim_two_calls),
+    cmocka_unit_test(az_span_trim_two_calls_inverse),
+    cmocka_unit_test(az_span_trim_repeat_calls),
   };
   return cmocka_run_group_tests_name("az_core_span", tests, NULL, NULL);
 }
