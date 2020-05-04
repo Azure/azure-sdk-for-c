@@ -3,10 +3,12 @@
 
 #include "az_iot_provisioning_client.h"
 #include <az_json.h>
-#include <az_precondition_internal.h>
 #include <az_result.h>
 #include <az_span.h>
 #include <az_span_internal.h>
+
+#include <az_log_internal.h>
+#include <az_precondition_internal.h>
 
 #include <_az_cfg.h>
 
@@ -247,12 +249,12 @@ AZ_INLINE az_iot_provisioning_client_registration_result
 _az_iot_provisioning_registration_result_default()
 {
   return (az_iot_provisioning_client_registration_result){ .assigned_hub_hostname = AZ_SPAN_NULL,
-                                                          .device_id = AZ_SPAN_NULL,
-                                                          .error_code = 0,
-                                                          .extended_error_code = 0,
-                                                          .error_message = AZ_SPAN_NULL,
-                                                          .error_tracking_id = AZ_SPAN_NULL,
-                                                          .error_timestamp = AZ_SPAN_NULL };
+                                                           .device_id = AZ_SPAN_NULL,
+                                                           .error_code = 0,
+                                                           .extended_error_code = 0,
+                                                           .error_message = AZ_SPAN_NULL,
+                                                           .error_tracking_id = AZ_SPAN_NULL,
+                                                           .error_timestamp = AZ_SPAN_NULL };
 }
 
 AZ_INLINE az_iot_status _az_iot_status_from_extended_status(uint32_t extended_status)
@@ -388,13 +390,13 @@ AZ_INLINE az_result az_iot_provisioning_client_parse_payload(
     }
     else if (az_span_is_content_equal(AZ_SPAN_FROM_STR("message"), tm.name))
     {
-      AZ_RETURN_IF_FAILED(az_json_token_get_string(
-          &tm.token, &out_response->registration_result.error_message));
+      AZ_RETURN_IF_FAILED(
+          az_json_token_get_string(&tm.token, &out_response->registration_result.error_message));
     }
     else if (az_span_is_content_equal(AZ_SPAN_FROM_STR("timestampUtc"), tm.name))
     {
-      AZ_RETURN_IF_FAILED(az_json_token_get_string(
-          &tm.token, &out_response->registration_result.error_timestamp));
+      AZ_RETURN_IF_FAILED(
+          az_json_token_get_string(&tm.token, &out_response->registration_result.error_timestamp));
     }
     else if (tm.token.kind == AZ_JSON_TOKEN_OBJECT_START)
     {
@@ -466,6 +468,9 @@ AZ_NODISCARD az_result az_iot_provisioning_client_parse_received_topic_and_paylo
     return AZ_ERROR_IOT_TOPIC_NO_MATCH;
   }
 
+  az_log_write(AZ_LOG_MQTT_RECEIVED_TOPIC, received_topic);
+  az_log_write(AZ_LOG_MQTT_RECEIVED_PAYLOAD, received_payload);
+
   // Parse the status.
   az_span remainder = az_span_slice_to_end(received_topic, az_span_size(str_dps_registrations_res));
 
@@ -503,7 +508,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_parse_operation_status(
   else if (az_span_is_content_equal(response->operation_status, AZ_SPAN_FROM_STR("assigned")))
   {
     *out_operation_status = AZ_IOT_PROVISIONING_STATUS_ASSIGNED;
-  } 
+  }
   else if (az_span_is_content_equal(response->operation_status, AZ_SPAN_FROM_STR("failed")))
   {
     *out_operation_status = AZ_IOT_PROVISIONING_STATUS_FAILED;

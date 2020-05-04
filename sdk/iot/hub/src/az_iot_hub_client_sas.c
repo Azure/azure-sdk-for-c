@@ -4,9 +4,11 @@
 #include <az_iot_hub_client.h>
 #include <az_iot_common_internal.h>
 #include <az_precondition.h>
-#include <az_precondition_internal.h>
 #include <az_span.h>
+
 #include <az_span_internal.h>
+#include <az_precondition_internal.h>
+#include <az_log_internal.h>
 
 #include <stdint.h>
 
@@ -73,6 +75,7 @@ AZ_NODISCARD az_result az_iot_hub_client_sas_get_signature(
   AZ_RETURN_IF_FAILED(az_span_u32toa(remainder, token_expiration_epoch_time, &remainder));
 
   *out_signature = az_span_slice(signature, 0, required_size);
+  az_log_write(AZ_LOG_IOT_SAS_TOKEN, *out_signature);
 
   return AZ_OK;
 }

@@ -4,11 +4,13 @@
 #include <stdint.h>
 
 #include "az_iot_hub_client.h"
-#include <az_precondition_internal.h>
 #include <az_result.h>
 #include <az_span.h>
 #include <az_span_internal.h>
 #include <az_iot_common_internal.h>
+
+#include <az_log_internal.h>
+#include <az_precondition_internal.h>
 
 #include <_az_cfg.h>
 
@@ -46,7 +48,7 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_get_subscribe_topic_filter(
   remainder = az_span_copy_u8(remainder, hashtag);
   az_span_copy_u8(remainder, null_terminator);
 
-  if(out_mqtt_topic_filter_length)
+  if (out_mqtt_topic_filter_length)
   {
     *out_mqtt_topic_filter_length = (size_t)required_length;
   }
@@ -71,6 +73,8 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_parse_received_topic(
   {
     return AZ_ERROR_IOT_TOPIC_NO_MATCH;
   }
+
+  az_log_write(AZ_LOG_MQTT_RECEIVED_TOPIC, received_topic);
 
   received_topic = az_span_slice(
       received_topic, index + az_span_size(methods_topic_prefix), az_span_size(received_topic));
@@ -134,7 +138,7 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_response_get_publish_topic(
   remainder = az_span_copy(remainder, request_id);
   az_span_copy_u8(remainder, null_terminator);
 
-  if(out_mqtt_topic_length)
+  if (out_mqtt_topic_length)
   {
     *out_mqtt_topic_length = (size_t)required_length;
   }
