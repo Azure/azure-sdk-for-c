@@ -11,7 +11,7 @@
 
 #include <_az_cfg.h>
 
-static _az_NODISCARD az_result _az_credential_client_secret_request_token(
+static AZ_NODISCARD az_result _az_credential_client_secret_request_token(
     az_credential_client_secret* credential,
     az_context* context)
 {
@@ -38,7 +38,7 @@ static _az_NODISCARD az_result _az_credential_client_secret_request_token(
 }
 
 // This gets called from the http credential policy
-static _az_NODISCARD az_result _az_credential_client_secret_apply(
+static AZ_NODISCARD az_result _az_credential_client_secret_apply(
     az_credential_client_secret* credential,
     _az_http_request* ref_request)
 {
@@ -59,14 +59,14 @@ static _az_NODISCARD az_result _az_credential_client_secret_apply(
   return AZ_OK;
 }
 
-static _az_NODISCARD az_result
+static AZ_NODISCARD az_result
 _az_credential_client_secret_set_scopes(az_credential_client_secret* self, az_span scopes)
 {
   self->_internal.scopes = scopes;
   return AZ_OK;
 }
 
-_az_NODISCARD az_result az_credential_client_secret_init(
+AZ_NODISCARD az_result az_credential_client_secret_init(
     az_credential_client_secret* self,
     az_span tenant_id,
     az_span client_id,

@@ -54,7 +54,7 @@ typedef struct az_iot_pnp_client
  *
  * @return #az_iot_pnp_client_options.
  */
-_az_NODISCARD az_iot_pnp_client_options az_iot_pnp_client_options_default();
+AZ_NODISCARD az_iot_pnp_client_options az_iot_pnp_client_options_default();
 
 /**
  * @brief Initializes an Azure IoT PnP Client.
@@ -66,7 +66,7 @@ _az_NODISCARD az_iot_pnp_client_options az_iot_pnp_client_options_default();
  * @param[in] options A reference to an #az_iot_pnp_client_options structure. Can be NULL.
  * @return #az_result
  */
-_az_NODISCARD az_result az_iot_pnp_client_init(
+AZ_NODISCARD az_result az_iot_pnp_client_init(
     az_iot_pnp_client* client,
     az_span iot_hub_hostname,
     az_span device_id,
@@ -88,7 +88,7 @@ _az_NODISCARD az_result az_iot_pnp_client_init(
  *                                                      \p mqtt_user_name. Can be `NULL`.
  * @return #az_result
  */
-_az_NODISCARD az_result az_iot_pnp_client_get_user_name(
+AZ_NODISCARD az_result az_iot_pnp_client_get_user_name(
     az_iot_pnp_client const* client,
     char* mqtt_user_name,
     size_t mqtt_user_name_size,
@@ -109,7 +109,7 @@ _az_NODISCARD az_result az_iot_pnp_client_get_user_name(
  *                                                      of \p mqtt_client_id. Can be `NULL`.
  * @return #az_result
  */
-_az_NODISCARD _az_INLINE az_result az_iot_pnp_client_get_client_id(
+AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_client_id(
     az_iot_pnp_client const* client,
     char* mqtt_client_id,
     size_t mqtt_client_id_size,
@@ -142,7 +142,7 @@ _az_NODISCARD _az_INLINE az_result az_iot_pnp_client_get_client_id(
  * @param[out] out_signature The output #az_span containing the SAS signature.
  * @return #az_result
  */
-_az_NODISCARD _az_INLINE az_result az_iot_pnp_client_get_sas_signature(
+AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_sas_signature(
     az_iot_pnp_client const* client,
     uint32_t token_expiration_epoch_time,
     az_span signature,
@@ -173,7 +173,7 @@ _az_NODISCARD _az_INLINE az_result az_iot_pnp_client_get_sas_signature(
  *                                                     \p mqtt_password. Can be `NULL`.
  * @return #az_result
  */
-_az_NODISCARD _az_INLINE az_result az_iot_pnp_client_get_sas_password(
+AZ_NODISCARD AZ_INLINE az_result az_iot_pnp_client_get_sas_password(
     az_iot_pnp_client const* client,
     az_span base64_hmac_sha256_signature,
     uint32_t token_expiration_epoch_time,
@@ -218,7 +218,7 @@ _az_NODISCARD _az_INLINE az_result az_iot_pnp_client_get_sas_password(
  *                                                  \p mqtt_topic. Can be `NULL`.
  * @return #az_result
  */
-_az_NODISCARD az_result az_iot_pnp_client_telemetry_get_publish_topic(
+AZ_NODISCARD az_result az_iot_pnp_client_telemetry_get_publish_topic(
     az_iot_pnp_client const* client,
     az_span component_name,
     void* reserved,
@@ -245,7 +245,7 @@ _az_NODISCARD az_result az_iot_pnp_client_telemetry_get_publish_topic(
  *                                                         \p mqtt_topic_filter. Can be `NULL`.
  * @return #az_result
  */
-_az_NODISCARD az_result az_iot_pnp_client_command_get_subscribe_topic_filter(
+AZ_NODISCARD az_result az_iot_pnp_client_command_get_subscribe_topic_filter(
     az_iot_pnp_client const* client,
     void* reserved,
     char* mqtt_topic_filter,
@@ -276,7 +276,7 @@ typedef struct az_iot_pnp_client_command_request
  *                                 #az_iot_pnp_client_command_request.
  * @return #az_result
  */
-_az_NODISCARD az_result az_iot_pnp_client_command_parse_received_topic(
+AZ_NODISCARD az_result az_iot_pnp_client_command_parse_received_topic(
     az_iot_pnp_client const* client,
     az_span received_topic,
     az_span received_payload,
@@ -298,7 +298,7 @@ _az_NODISCARD az_result az_iot_pnp_client_command_parse_received_topic(
  *                                                  \p mqtt_topic. Can be `NULL`.
  * @return #az_result
  */
-_az_NODISCARD az_result az_iot_pnp_client_command_response_get_publish_topic(
+AZ_NODISCARD az_result az_iot_pnp_client_command_response_get_publish_topic(
     az_iot_pnp_client const* client,
     az_span request_id,
     uint16_t status,

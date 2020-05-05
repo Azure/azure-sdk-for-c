@@ -160,7 +160,7 @@ typedef struct
  * @param buffer A span over the byte buffer that is to be filled with the HTTP response data. This
  * buffer must be large enough to hold the entire response.
  */
-_az_NODISCARD _az_INLINE az_result az_http_response_init(az_http_response* response, az_span buffer)
+AZ_NODISCARD AZ_INLINE az_result az_http_response_init(az_http_response* response, az_span buffer)
 {
   *response = (az_http_response){
     ._internal = {
@@ -200,7 +200,7 @@ typedef struct
  * @return AZ_OK = inline code is parsed and returned.<br>
  * Other value =  http response was not parsed
  */
-_az_NODISCARD az_result az_http_response_get_status_line(
+AZ_NODISCARD az_result az_http_response_get_status_line(
     az_http_response* response,
     az_http_response_status_line* out_status_line);
 
@@ -221,7 +221,7 @@ _az_NODISCARD az_result az_http_response_get_status_line(
  * AZ_ERROR_INVALID_STATE = The az_http_response instance is in an invalid state; consider calling
  * az_http_response_get_status_line to reset its state.
  */
-_az_NODISCARD az_result
+AZ_NODISCARD az_result
 az_http_response_get_next_header(az_http_response* response, az_pair* out_header);
 
 /**
@@ -232,7 +232,7 @@ az_http_response_get_next_header(az_http_response* response, az_pair* out_header
  * @return AZ_OK = An az_span over the reponse body was returned<br>
  * Other value = Error while trying to read and parse body
  */
-_az_NODISCARD az_result az_http_response_get_body(az_http_response* response, az_span* out_body);
+AZ_NODISCARD az_result az_http_response_get_body(az_http_response* response, az_span* out_body);
 
 #include <_az_cfg_suffix.h>
 

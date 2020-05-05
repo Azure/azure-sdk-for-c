@@ -26,22 +26,22 @@
 typedef az_span az_http_method;
 
 /// HTTP GET method name.
-_az_INLINE az_http_method az_http_method_get() { return AZ_SPAN_FROM_STR("GET"); }
+AZ_INLINE az_http_method az_http_method_get() { return AZ_SPAN_FROM_STR("GET"); }
 
 /// HTTP HEAD method name.
-_az_INLINE az_http_method az_http_method_head() { return AZ_SPAN_FROM_STR("HEAD"); }
+AZ_INLINE az_http_method az_http_method_head() { return AZ_SPAN_FROM_STR("HEAD"); }
 
 /// HTTP POST method name.
-_az_INLINE az_http_method az_http_method_post() { return AZ_SPAN_FROM_STR("POST"); }
+AZ_INLINE az_http_method az_http_method_post() { return AZ_SPAN_FROM_STR("POST"); }
 
 /// HTTP PUT method name.
-_az_INLINE az_http_method az_http_method_put() { return AZ_SPAN_FROM_STR("PUT"); }
+AZ_INLINE az_http_method az_http_method_put() { return AZ_SPAN_FROM_STR("PUT"); }
 
 /// HTTP DELETE method name.
-_az_INLINE az_http_method az_http_method_delete() { return AZ_SPAN_FROM_STR("DELETE"); }
+AZ_INLINE az_http_method az_http_method_delete() { return AZ_SPAN_FROM_STR("DELETE"); }
 
 /// HTTP PATCH method name.
-_az_INLINE az_http_method az_http_method_patch() { return AZ_SPAN_FROM_STR("PATCH"); }
+AZ_INLINE az_http_method az_http_method_patch() { return AZ_SPAN_FROM_STR("PATCH"); }
 
 /**
  * @brief _az_http_request_headers is a type representing a buffer of az_pair instances for HTTP
@@ -81,7 +81,7 @@ typedef struct
  * @retval AZ_OK Success.
  * @retval AZ_ERROR_ARG \a index is out of range.
  */
-_az_NODISCARD az_result
+AZ_NODISCARD az_result
 az_http_request_get_header(_az_http_request const* request, int32_t index, az_pair* out_header);
 
 /**
@@ -101,7 +101,7 @@ az_http_request_get_header(_az_http_request const* request, int32_t index, az_pa
  *
  * @retval AZ_OK Success.
  */
-_az_NODISCARD az_result az_http_request_get_parts(
+AZ_NODISCARD az_result az_http_request_get_parts(
     _az_http_request const* request,
     az_http_method* out_method,
     az_span* out_url,

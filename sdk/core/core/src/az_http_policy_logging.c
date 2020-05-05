@@ -223,7 +223,7 @@ void _az_http_policy_logging_log_http_response(
   az_log_write(AZ_LOG_HTTP_RESPONSE, log_msg);
 }
 
-_az_NODISCARD az_result az_http_pipeline_policy_logging(
+AZ_NODISCARD az_result az_http_pipeline_policy_logging(
     _az_http_policy* p_policies,
     void* p_data,
     _az_http_request* p_request,

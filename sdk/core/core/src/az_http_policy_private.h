@@ -8,7 +8,7 @@
 
 #include <_az_cfg_prefix.h>
 
-_az_NODISCARD _az_INLINE az_result az_http_pipeline_nextpolicy(
+AZ_NODISCARD AZ_INLINE az_result az_http_pipeline_nextpolicy(
     _az_http_policy* p_policies,
     _az_http_request* p_request,
     az_http_response* p_response)

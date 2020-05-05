@@ -15,13 +15,13 @@
 
 #include <_az_cfg.h>
 
-_az_NODISCARD bool _az_token_expired(_az_token const* token)
+AZ_NODISCARD bool _az_token_expired(_az_token const* token)
 {
   int64_t const expires_at_msec = token->_internal.expires_at_msec;
   return expires_at_msec <= 0 || az_platform_clock_msec() > expires_at_msec;
 }
 
-_az_NODISCARD az_result _az_token_set(_az_token* self, _az_token const* new_token)
+AZ_NODISCARD az_result _az_token_set(_az_token* self, _az_token const* new_token)
 {
   // TODO: thread sync
   *self = *new_token;
@@ -29,7 +29,7 @@ _az_NODISCARD az_result _az_token_set(_az_token* self, _az_token const* new_toke
 }
 
 // https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow#request-an-access-token
-_az_NODISCARD az_result _az_aad_build_url(az_span url, az_span tenant_id, az_span* out_url)
+AZ_NODISCARD az_result _az_aad_build_url(az_span url, az_span tenant_id, az_span* out_url)
 {
   az_span const root_url = AZ_SPAN_FROM_STR("https://login.microsoftonline.com/");
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(url, az_span_size(root_url));
@@ -51,7 +51,7 @@ _az_NODISCARD az_result _az_aad_build_url(az_span url, az_span tenant_id, az_spa
 }
 
 // https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow#request-an-access-token
-_az_NODISCARD az_result _az_aad_build_body(
+AZ_NODISCARD az_result _az_aad_build_body(
     az_span body,
     az_span client_id,
     az_span scopes,
@@ -91,7 +91,7 @@ _az_NODISCARD az_result _az_aad_build_body(
   return AZ_OK;
 }
 
-_az_NODISCARD az_result _az_aad_request_token(_az_http_request* request, _az_token* out_token)
+AZ_NODISCARD az_result _az_aad_request_token(_az_http_request* request, _az_token* out_token)
 {
   AZ_RETURN_IF_FAILED(az_http_request_append_header(
       request,

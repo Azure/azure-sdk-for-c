@@ -5,7 +5,7 @@
 
 #include <_az_cfg.h>
 
-_az_NODISCARD az_result
+AZ_NODISCARD az_result
 az_http_client_send_request(_az_http_request* p_request, az_http_response* p_response)
 {
   (void)p_request;

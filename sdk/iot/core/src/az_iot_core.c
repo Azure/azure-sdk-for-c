@@ -12,7 +12,7 @@
 
 #include <_az_cfg.h>
 
-_az_NODISCARD int32_t az_iot_retry_calc_delay(
+AZ_NODISCARD int32_t az_iot_retry_calc_delay(
     int32_t operation_msec,
     int16_t attempt,
     int32_t min_retry_delay_msec,
@@ -42,7 +42,7 @@ _az_NODISCARD int32_t az_iot_retry_calc_delay(
   return delay > 0 ? delay : 0;
 }
 
-_az_NODISCARD az_span _az_span_token(az_span source, az_span delimiter, az_span* out_remainder)
+AZ_NODISCARD az_span _az_span_token(az_span source, az_span delimiter, az_span* out_remainder)
 {
   _az_PRECONDITION_VALID_SPAN(delimiter, 1, false);
   _az_PRECONDITION_NOT_NULL(out_remainder);
@@ -70,7 +70,7 @@ _az_NODISCARD az_span _az_span_token(az_span source, az_span delimiter, az_span*
   }
 }
 
-_az_NODISCARD int32_t _az_iot_u32toa_size(uint32_t number)
+AZ_NODISCARD int32_t _az_iot_u32toa_size(uint32_t number)
 {
   if (number == 0)
   {

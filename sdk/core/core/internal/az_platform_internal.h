@@ -11,16 +11,16 @@
 
 #include <_az_cfg_prefix.h>
 
-_az_NODISCARD int64_t az_platform_clock_msec();
+AZ_NODISCARD int64_t az_platform_clock_msec();
 
 void az_platform_sleep_msec(int32_t milliseconds);
 
 typedef struct az_platform_mtx az_platform_mtx;
 
 void az_platform_mtx_destroy(az_platform_mtx* mtx);
-_az_NODISCARD az_result az_platform_mtx_init(az_platform_mtx* mtx);
-_az_NODISCARD az_result az_platform_mtx_lock(az_platform_mtx* mtx);
-_az_NODISCARD az_result az_platform_mtx_unlock(az_platform_mtx* mtx);
+AZ_NODISCARD az_result az_platform_mtx_init(az_platform_mtx* mtx);
+AZ_NODISCARD az_result az_platform_mtx_lock(az_platform_mtx* mtx);
+AZ_NODISCARD az_result az_platform_mtx_unlock(az_platform_mtx* mtx);
 
 #include <_az_cfg_suffix.h>
 

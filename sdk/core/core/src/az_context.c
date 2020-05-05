@@ -16,7 +16,7 @@ az_context az_context_app = {
 };
 
 // Returns the soonest expiration time of this az_context node or any of its parent nodes.
-_az_NODISCARD int64_t az_context_get_expiration(az_context const* context)
+AZ_NODISCARD int64_t az_context_get_expiration(az_context const* context)
 {
   int64_t expiration = _az_CONTEXT_MAX_EXPIRATION;
   for (; context != NULL; context = context->_internal.parent)
@@ -30,7 +30,7 @@ _az_NODISCARD int64_t az_context_get_expiration(az_context const* context)
 // Walks up this az_context node's parent until it find a node whose key matches the specified key
 // and return the corresponding value. Returns AZ_ERROR_ITEM_NOT_FOUND is there are no nodes
 // matching the specified key.
-_az_NODISCARD az_result az_context_get_value(az_context const* context, void* key, void** out_value)
+AZ_NODISCARD az_result az_context_get_value(az_context const* context, void* key, void** out_value)
 {
   for (; context != NULL; context = context->_internal.parent)
   {

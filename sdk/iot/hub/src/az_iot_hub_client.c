@@ -20,12 +20,12 @@ static const az_span hub_service_api_version = AZ_SPAN_LITERAL_FROM_STR("/?api-v
 static const az_span client_sdk_version
     = AZ_SPAN_LITERAL_FROM_STR("DeviceClientType=c%2F" AZ_SDK_VERSION_STRING);
 
-_az_NODISCARD az_iot_hub_client_options az_iot_hub_client_options_default()
+AZ_NODISCARD az_iot_hub_client_options az_iot_hub_client_options_default()
 {
   return (az_iot_hub_client_options){ .module_id = AZ_SPAN_NULL, .user_agent = client_sdk_version };
 }
 
-_az_NODISCARD az_result az_iot_hub_client_init(
+AZ_NODISCARD az_result az_iot_hub_client_init(
     az_iot_hub_client* client,
     az_span iot_hub_hostname,
     az_span device_id,
@@ -42,7 +42,7 @@ _az_NODISCARD az_result az_iot_hub_client_init(
   return AZ_OK;
 }
 
-_az_NODISCARD az_result az_iot_hub_client_get_user_name(
+AZ_NODISCARD az_result az_iot_hub_client_get_user_name(
     az_iot_hub_client const* client,
     char* mqtt_user_name,
     size_t mqtt_user_name_size,
@@ -100,7 +100,7 @@ _az_NODISCARD az_result az_iot_hub_client_get_user_name(
   return AZ_OK;
 }
 
-_az_NODISCARD az_result az_iot_hub_client_get_client_id(
+AZ_NODISCARD az_result az_iot_hub_client_get_client_id(
     az_iot_hub_client const* client,
     char* mqtt_client_id,
     size_t mqtt_client_id_size,
@@ -140,7 +140,7 @@ _az_NODISCARD az_result az_iot_hub_client_get_client_id(
   return AZ_OK;
 }
 
-_az_NODISCARD az_result az_iot_hub_client_properties_init(
+AZ_NODISCARD az_result az_iot_hub_client_properties_init(
     az_iot_hub_client_properties* properties,
     az_span buffer,
     int32_t written_length)
@@ -156,7 +156,7 @@ _az_NODISCARD az_result az_iot_hub_client_properties_init(
   return AZ_OK;
 }
 
-_az_NODISCARD az_result az_iot_hub_client_properties_append(
+AZ_NODISCARD az_result az_iot_hub_client_properties_append(
     az_iot_hub_client_properties* properties,
     az_span name,
     az_span value)
@@ -192,7 +192,7 @@ _az_NODISCARD az_result az_iot_hub_client_properties_append(
   return AZ_OK;
 }
 
-_az_NODISCARD az_result az_iot_hub_client_properties_find(
+AZ_NODISCARD az_result az_iot_hub_client_properties_find(
     az_iot_hub_client_properties* properties,
     az_span name,
     az_span* out_value)
@@ -223,7 +223,7 @@ _az_NODISCARD az_result az_iot_hub_client_properties_find(
   return AZ_ERROR_ITEM_NOT_FOUND;
 }
 
-_az_NODISCARD az_result
+AZ_NODISCARD az_result
 az_iot_hub_client_properties_next(az_iot_hub_client_properties* properties, az_pair* out)
 {
   _az_PRECONDITION_NOT_NULL(properties);

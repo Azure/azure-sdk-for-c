@@ -18,7 +18,7 @@ static const az_span methods_topic_filter_suffix = AZ_SPAN_LITERAL_FROM_STR("POS
 static const az_span methods_response_topic_result = AZ_SPAN_LITERAL_FROM_STR("res/");
 static const az_span methods_response_topic_properties = AZ_SPAN_LITERAL_FROM_STR("/?$rid=");
 
-_az_NODISCARD az_result az_iot_hub_client_methods_get_subscribe_topic_filter(
+AZ_NODISCARD az_result az_iot_hub_client_methods_get_subscribe_topic_filter(
     az_iot_hub_client const* client,
     char* mqtt_topic_filter,
     size_t mqtt_topic_filter_size,
@@ -53,7 +53,7 @@ _az_NODISCARD az_result az_iot_hub_client_methods_get_subscribe_topic_filter(
   return AZ_OK;
 }
 
-_az_NODISCARD az_result az_iot_hub_client_methods_parse_received_topic(
+AZ_NODISCARD az_result az_iot_hub_client_methods_parse_received_topic(
     az_iot_hub_client const* client,
     az_span received_topic,
     az_iot_hub_client_method_request* out_request)
@@ -102,7 +102,7 @@ _az_NODISCARD az_result az_iot_hub_client_methods_parse_received_topic(
   return AZ_OK;
 }
 
-_az_NODISCARD az_result az_iot_hub_client_methods_response_get_publish_topic(
+AZ_NODISCARD az_result az_iot_hub_client_methods_response_get_publish_topic(
     az_iot_hub_client const* client,
     az_span request_id,
     uint16_t status,

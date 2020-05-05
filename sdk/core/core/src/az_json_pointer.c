@@ -8,7 +8,7 @@
 
 #include <_az_cfg.h>
 
-static _az_NODISCARD az_result _az_span_reader_read_json_pointer_char(az_span* self, uint32_t* out)
+static AZ_NODISCARD az_result _az_span_reader_read_json_pointer_char(az_span* self, uint32_t* out)
 {
   _az_PRECONDITION_NOT_NULL(self);
   int32_t reader_current_length = az_span_size(*self);
@@ -73,7 +73,7 @@ static _az_NODISCARD az_result _az_span_reader_read_json_pointer_char(az_span* s
  *
  * See https://tools.ietf.org/html/rfc6901
  */
-_az_NODISCARD az_result _az_span_reader_read_json_pointer_token(az_span* self, az_span* out)
+AZ_NODISCARD az_result _az_span_reader_read_json_pointer_token(az_span* self, az_span* out)
 {
   // read `/` if any.
   {
@@ -126,7 +126,7 @@ _az_NODISCARD az_result _az_span_reader_read_json_pointer_token(az_span* self, a
 /**
  * Returns a next character in the given span reader of JSON pointer reference token.
  */
-_az_NODISCARD az_result _az_span_reader_read_json_pointer_token_char(az_span* self, uint32_t* out)
+AZ_NODISCARD az_result _az_span_reader_read_json_pointer_token_char(az_span* self, uint32_t* out)
 {
   uint32_t c;
   az_result const result = _az_span_reader_read_json_pointer_char(self, &c);
@@ -139,7 +139,7 @@ _az_NODISCARD az_result _az_span_reader_read_json_pointer_token_char(az_span* se
   return AZ_OK;
 }
 
-_az_NODISCARD static bool az_json_pointer_token_eq_json_string(
+AZ_NODISCARD static bool az_json_pointer_token_eq_json_string(
     az_span pointer_token,
     az_span json_string)
 {
@@ -164,7 +164,7 @@ _az_NODISCARD static bool az_json_pointer_token_eq_json_string(
   }
 }
 
-_az_NODISCARD static az_result az_json_parser_get_by_pointer_token(
+AZ_NODISCARD static az_result az_json_parser_get_by_pointer_token(
     az_json_parser* json_parser,
     az_span pointer_token,
     az_json_token* inout_token)
@@ -205,7 +205,7 @@ _az_NODISCARD static az_result az_json_parser_get_by_pointer_token(
   }
 }
 
-_az_NODISCARD az_result
+AZ_NODISCARD az_result
 az_json_parse_by_pointer(az_span json_buffer, az_span json_pointer, az_json_token* out_token)
 {
   _az_PRECONDITION_NOT_NULL(out_token);

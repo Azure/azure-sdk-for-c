@@ -48,7 +48,7 @@ static az_span _az_add_telemetry_property(
   return az_span_slice_to_end(mqtt_topic, required_length);
 }
 
-_az_NODISCARD az_result az_iot_pnp_client_telemetry_get_publish_topic(
+AZ_NODISCARD az_result az_iot_pnp_client_telemetry_get_publish_topic(
     az_iot_pnp_client const* client,
     az_span component_name,
     void* reserved,

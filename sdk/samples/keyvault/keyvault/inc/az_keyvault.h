@@ -37,7 +37,7 @@ typedef struct
  * Use this, for instance, when only caring about setting one option by calling this method and then
  * overriding that specific option
  */
-_az_NODISCARD az_keyvault_keys_client_options az_keyvault_keys_client_options_default();
+AZ_NODISCARD az_keyvault_keys_client_options az_keyvault_keys_client_options_default();
 
 typedef struct
 {
@@ -53,7 +53,7 @@ typedef struct
   } _internal;
 } az_keyvault_keys_client;
 
-_az_NODISCARD az_result az_keyvault_keys_client_init(
+AZ_NODISCARD az_result az_keyvault_keys_client_init(
     az_keyvault_keys_client* self,
     az_span uri,
     void* credential,
@@ -61,53 +61,53 @@ _az_NODISCARD az_result az_keyvault_keys_client_init(
 
 typedef az_span az_json_web_key_type;
 
-_az_NODISCARD _az_INLINE az_json_web_key_type az_keyvault_web_key_type_ec()
+AZ_NODISCARD AZ_INLINE az_json_web_key_type az_keyvault_web_key_type_ec()
 {
   return AZ_SPAN_FROM_STR("EC");
 }
-_az_NODISCARD _az_INLINE az_json_web_key_type az_keyvault_web_key_type_ec_hsm()
+AZ_NODISCARD AZ_INLINE az_json_web_key_type az_keyvault_web_key_type_ec_hsm()
 {
   return AZ_SPAN_FROM_STR("EC-HSM");
 }
-_az_NODISCARD _az_INLINE az_json_web_key_type az_keyvault_web_key_type_rsa()
+AZ_NODISCARD AZ_INLINE az_json_web_key_type az_keyvault_web_key_type_rsa()
 {
   return AZ_SPAN_FROM_STR("RSA");
 }
-_az_NODISCARD _az_INLINE az_json_web_key_type az_keyvault_web_key_type_rsa_hsm()
+AZ_NODISCARD AZ_INLINE az_json_web_key_type az_keyvault_web_key_type_rsa_hsm()
 {
   return AZ_SPAN_FROM_STR("RSA-HSM");
 }
-_az_NODISCARD _az_INLINE az_json_web_key_type az_keyvault_web_key_type_oct()
+AZ_NODISCARD AZ_INLINE az_json_web_key_type az_keyvault_web_key_type_oct()
 {
   return AZ_SPAN_FROM_STR("oct");
 }
 
 typedef az_span az_keyvault_key_operation;
-_az_NODISCARD _az_INLINE az_keyvault_key_operation az_keyvault_key_operation_decrypt()
+AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_decrypt()
 {
   return AZ_SPAN_FROM_STR("decrypt");
 }
-_az_NODISCARD _az_INLINE az_keyvault_key_operation az_keyvault_key_operation_encrypt()
+AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_encrypt()
 {
   return AZ_SPAN_FROM_STR("encrypt");
 }
-_az_NODISCARD _az_INLINE az_keyvault_key_operation az_keyvault_key_operation_sign()
+AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_sign()
 {
   return AZ_SPAN_FROM_STR("sign");
 }
-_az_NODISCARD _az_INLINE az_keyvault_key_operation az_keyvault_key_operation_unwrap_key()
+AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_unwrap_key()
 {
   return AZ_SPAN_FROM_STR("unwrapKey");
 }
-_az_NODISCARD _az_INLINE az_keyvault_key_operation az_keyvault_key_operation_verify()
+AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_verify()
 {
   return AZ_SPAN_FROM_STR("verify");
 }
-_az_NODISCARD _az_INLINE az_keyvault_key_operation az_keyvault_key_operation_wrap_key()
+AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_wrap_key()
 {
   return AZ_SPAN_FROM_STR("wrapKey");
 }
-_az_NODISCARD _az_INLINE az_keyvault_key_operation az_keyvault_key_operation_null()
+AZ_NODISCARD AZ_INLINE az_keyvault_key_operation az_keyvault_key_operation_null()
 {
   return AZ_SPAN_NULL;
 }
@@ -123,7 +123,7 @@ typedef struct
   */
 } az_keyvault_create_key_options;
 
-_az_NODISCARD az_keyvault_create_key_options az_keyvault_create_key_options_default();
+AZ_NODISCARD az_keyvault_create_key_options az_keyvault_create_key_options_default();
 
 /**
  * @brief Creates a new key, stores it, then returns key parameters and attributes to the client.
@@ -137,9 +137,9 @@ _az_NODISCARD az_keyvault_create_key_options az_keyvault_create_key_options_defa
  * @param options create options for key. It can be NULL so nothing is added to http request body
  * and server will use defaults to create key
  * @param response a pre allocated buffer where to write http response
- * @return _az_NODISCARD az_keyvault_keys_key_create
+ * @return AZ_NODISCARD az_keyvault_keys_key_create
  */
-_az_NODISCARD az_result az_keyvault_keys_key_create(
+AZ_NODISCARD az_result az_keyvault_keys_key_create(
     az_keyvault_keys_client* client,
     az_context* context,
     az_span key_name,
@@ -158,9 +158,9 @@ _az_NODISCARD az_result az_keyvault_keys_key_create(
  * @param key_name name of key to be retrieved
  * @param key_version specific key version to get. It can be null to get latest version
  * @param response a pre allocated buffer where to write http response
- * @return _az_NODISCARD az_keyvault_keys_key_get
+ * @return AZ_NODISCARD az_keyvault_keys_key_get
  */
-_az_NODISCARD az_result az_keyvault_keys_key_get(
+AZ_NODISCARD az_result az_keyvault_keys_key_get(
     az_keyvault_keys_client* client,
     az_context* context,
     az_span key_name,
@@ -177,9 +177,9 @@ _az_NODISCARD az_result az_keyvault_keys_key_get(
  * @param client a keyvault client structure
  * @param key_name name of the key to be deleted
  * @param response a pre allocated buffer where to write http response
- * @return _az_NODISCARD az_keyvault_keys_key_delete
+ * @return AZ_NODISCARD az_keyvault_keys_key_delete
  */
-_az_NODISCARD az_result az_keyvault_keys_key_delete(
+AZ_NODISCARD az_result az_keyvault_keys_key_delete(
     az_keyvault_keys_client* client,
     az_context* context,
     az_span key_name,

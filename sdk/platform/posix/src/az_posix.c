@@ -11,7 +11,7 @@
 
 #include <_az_cfg.h>
 
-_az_NODISCARD int64_t az_platform_clock_msec()
+AZ_NODISCARD int64_t az_platform_clock_msec()
 {
   return (int64_t)((clock() / CLOCKS_PER_SEC) * _az_TIME_MILLISECONDS_PER_SECOND);
 }
@@ -29,17 +29,17 @@ void az_platform_mtx_destroy(az_platform_mtx* mtx)
   }
 }
 
-_az_NODISCARD az_result az_platform_mtx_init(az_platform_mtx* mtx)
+AZ_NODISCARD az_result az_platform_mtx_init(az_platform_mtx* mtx)
 {
   return pthread_mutex_init(&mtx->_internal.mutex, NULL) == 0 ? AZ_OK : AZ_ERROR_MUTEX;
 }
 
-_az_NODISCARD az_result az_platform_mtx_lock(az_platform_mtx* mtx)
+AZ_NODISCARD az_result az_platform_mtx_lock(az_platform_mtx* mtx)
 {
   return pthread_mutex_lock(&mtx->_internal.mutex) == 0 ? AZ_OK : AZ_ERROR_MUTEX;
 }
 
-_az_NODISCARD az_result az_platform_mtx_unlock(az_platform_mtx* mtx)
+AZ_NODISCARD az_result az_platform_mtx_unlock(az_platform_mtx* mtx)
 {
   return pthread_mutex_unlock(&mtx->_internal.mutex) == 0 ? AZ_OK : AZ_ERROR_MUTEX;
 }

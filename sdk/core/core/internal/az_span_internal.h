@@ -15,7 +15,7 @@
 // Use this helper to figure out how much the sliced_span has moved in comparison to the
 // original_span while writing and slicing a copy of the original.
 // The \p sliced_span must be some slice of the \p original_span (and have the same backing memory).
-_az_INLINE _az_NODISCARD int32_t _az_span_diff(az_span sliced_span, az_span original_span)
+AZ_INLINE AZ_NODISCARD int32_t _az_span_diff(az_span sliced_span, az_span original_span)
 {
   int32_t answer = az_span_size(original_span) - az_span_size(sliced_span);
 
@@ -38,7 +38,7 @@ _az_INLINE _az_NODISCARD int32_t _az_span_diff(az_span sliced_span, az_span orig
  *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the \p destination is not big enough to contain
  * the encoded bytes
  */
-_az_NODISCARD az_result
+AZ_NODISCARD az_result
 _az_span_url_encode(az_span destination, az_span source, int32_t* out_length);
 
 #include <_az_cfg_suffix.h>

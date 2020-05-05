@@ -34,7 +34,7 @@
  * @param[in] size The number of total bytes in the byte buffer.
  * @return az_span The "view" over the byte buffer, with the buffer filled with 0xcc.
  */
-_az_NODISCARD _az_INLINE az_span az_span_for_test_init(uint8_t* ptr, int32_t size)
+AZ_NODISCARD AZ_INLINE az_span az_span_for_test_init(uint8_t* ptr, int32_t size)
 {
   az_span new_span = az_span_init(ptr, size);
   az_span_fill(new_span, 0xcc);
@@ -57,7 +57,7 @@ _az_NODISCARD _az_INLINE az_span az_span_for_test_init(uint8_t* ptr, int32_t siz
  * @param[in] original_size_expected The expected size of original span, which should remain
  * unchanged.
  */
-_az_INLINE void az_span_for_test_verify(
+AZ_INLINE void az_span_for_test_verify(
     az_span result_span,
     const void* const buffer_expected,
     int32_t result_size_expected,

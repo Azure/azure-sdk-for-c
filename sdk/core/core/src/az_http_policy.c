@@ -12,7 +12,7 @@
 
 static const az_span AZ_HTTP_HEADER_USER_AGENT = AZ_SPAN_LITERAL_FROM_STR("User-Agent");
 
-_az_NODISCARD az_result az_http_pipeline_policy_apiversion(
+AZ_NODISCARD az_result az_http_pipeline_policy_apiversion(
     _az_http_policy* p_policies,
     void* p_data,
     _az_http_request* p_request,
@@ -40,7 +40,7 @@ _az_NODISCARD az_result az_http_pipeline_policy_apiversion(
   return az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
 }
 
-_az_NODISCARD az_result az_http_pipeline_policy_telemetry(
+AZ_NODISCARD az_result az_http_pipeline_policy_telemetry(
     _az_http_policy* p_policies,
     void* p_options,
     _az_http_request* p_request,
@@ -55,7 +55,7 @@ _az_NODISCARD az_result az_http_pipeline_policy_telemetry(
   return az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
 }
 
-_az_INLINE _az_NODISCARD az_result
+AZ_INLINE AZ_NODISCARD az_result
 _az_apply_credential(_az_credential* credential, _az_http_request* ref_request)
 {
   // Only apply the credential if the apply_credential method exists
@@ -64,7 +64,7 @@ _az_apply_credential(_az_credential* credential, _az_http_request* ref_request)
       : (credential->_internal.apply_credential)(credential, ref_request);
 }
 
-_az_NODISCARD az_result az_http_pipeline_policy_credential(
+AZ_NODISCARD az_result az_http_pipeline_policy_credential(
     _az_http_policy* p_policies,
     void* p_data,
     _az_http_request* p_request,
@@ -77,7 +77,7 @@ _az_NODISCARD az_result az_http_pipeline_policy_credential(
   return az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
 }
 
-_az_NODISCARD az_result az_http_pipeline_policy_transport(
+AZ_NODISCARD az_result az_http_pipeline_policy_transport(
     _az_http_policy* p_policies,
     void* p_data,
     _az_http_request* p_request,

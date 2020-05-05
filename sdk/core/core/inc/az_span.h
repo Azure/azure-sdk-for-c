@@ -44,13 +44,13 @@ typedef struct
  * @brief Returns the #az_span byte buffer's starting memory address.
  *
  */
-_az_NODISCARD _az_INLINE uint8_t* az_span_ptr(az_span span) { return span._internal.ptr; }
+AZ_NODISCARD AZ_INLINE uint8_t* az_span_ptr(az_span span) { return span._internal.ptr; }
 
 /**
  * @brief Returns the number of bytes within the #az_span.
  *
  */
-_az_NODISCARD _az_INLINE int32_t az_span_size(az_span span) { return span._internal.size; }
+AZ_NODISCARD AZ_INLINE int32_t az_span_size(az_span span) { return span._internal.size; }
 
 /********************************  CONSTRUCTORS */
 
@@ -142,12 +142,12 @@ _az_NODISCARD _az_INLINE int32_t az_span_size(az_span span) { return span._inter
 #ifdef AZ_NO_PRECONDITION_CHECKING
 // Note: If you are modifying this method, make sure to modify the non-inline version in the
 // az_span.c file as well.
-_az_NODISCARD _az_INLINE az_span az_span_init(uint8_t* ptr, int32_t size)
+AZ_NODISCARD AZ_INLINE az_span az_span_init(uint8_t* ptr, int32_t size)
 {
   return (az_span){ ._internal = { .ptr = ptr, .size = size, }, };
 }
 #else
-_az_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t size);
+AZ_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t size);
 #endif // AZ_NO_PRECONDITION_CHECKING
 
 /**
@@ -157,7 +157,7 @@ _az_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t size);
  * @return An #az_span over the byte buffer where the size is set to the string's length not
  * including the \0 terminator.
  */
-_az_NODISCARD az_span az_span_from_str(char* str);
+AZ_NODISCARD az_span az_span_from_str(char* str);
 
 /******************************  SPAN MANIPULATION */
 
@@ -172,7 +172,7 @@ _az_NODISCARD az_span az_span_from_str(char* str);
  * @return An #az_span into a portion (from \p start_index to \p end_index - 1) of the original
  * #az_span.
  */
-_az_NODISCARD az_span az_span_slice(az_span span, int32_t start_index, int32_t end_index);
+AZ_NODISCARD az_span az_span_slice(az_span span, int32_t start_index, int32_t end_index);
 
 /**
  * @brief Returns a new #az_span which is a sub-span of the specified \p span.
@@ -183,7 +183,7 @@ _az_NODISCARD az_span az_span_slice(az_span span, int32_t start_index, int32_t e
  * @return An #az_span into a portion (from \p start_index to the size) of the original
  * #az_span.
  */
-_az_NODISCARD az_span az_span_slice_to_end(az_span span, int32_t start_index);
+AZ_NODISCARD az_span az_span_slice_to_end(az_span span, int32_t start_index);
 
 /**
  * @brief Determines whether two spans are equal by comparing their bytes.
@@ -193,7 +193,7 @@ _az_NODISCARD az_span az_span_slice_to_end(az_span span, int32_t start_index);
  * @return `true` if the sizes of both spans are identical and the bytes in both spans are
  * also identical. Otherwise, `false`.
  */
-_az_NODISCARD _az_INLINE bool az_span_is_content_equal(az_span span1, az_span span2)
+AZ_NODISCARD AZ_INLINE bool az_span_is_content_equal(az_span span1, az_span span2)
 {
   return az_span_size(span1) == az_span_size(span2)
       && memcmp(az_span_ptr(span1), az_span_ptr(span2), (size_t)az_span_size(span1)) == 0;
@@ -208,7 +208,7 @@ _az_NODISCARD _az_INLINE bool az_span_is_content_equal(az_span span1, az_span sp
  * spans are also identical, except for casing.
  * @remarks This function assumes the bytes in both spans are ASCII characters.
  */
-_az_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1, az_span span2);
+AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1, az_span span2);
 
 /**
  * @brief Copies a \p source #az_span containing a string (that is not 0-terminated) to a \p
@@ -237,7 +237,7 @@ void az_span_to_str(char* destination, int32_t destination_max_size, az_span sou
  *         - -1 if \p source is empty (if its size is equal zero) and \p target is non-empty
  *         - -1 if \p target is not found in `source`
  */
-_az_NODISCARD int32_t az_span_find(az_span source, az_span target);
+AZ_NODISCARD int32_t az_span_find(az_span source, az_span target);
 
 /******************************  SPAN COPYING */
 
@@ -276,7 +276,7 @@ az_span az_span_copy_u8(az_span destination, uint8_t byte);
  * @param[in] destination The #az_span whose bytes will be set to \p value.
  * @param[in] value The byte to be replicated within the destination #az_span.
  */
-_az_INLINE void az_span_fill(az_span destination, uint8_t value)
+AZ_INLINE void az_span_fill(az_span destination, uint8_t value)
 {
   memset(az_span_ptr(destination), value, (size_t)az_span_size(destination));
 }
@@ -293,7 +293,7 @@ _az_INLINE void az_span_fill(az_span destination, uint8_t value)
  *         - #AZ_ERROR_PARSER_UNEXPECTED_CHAR if a non-ASCII digit is found within the span
  */
 
-_az_NODISCARD az_result az_span_atou64(az_span span, uint64_t* out_number);
+AZ_NODISCARD az_result az_span_atou64(az_span span, uint64_t* out_number);
 
 /**
  * @brief Parses an #az_span containing ASCII digits into a uint32 number.
@@ -304,7 +304,7 @@ _az_NODISCARD az_result az_span_atou64(az_span span, uint64_t* out_number);
  *         - #AZ_OK if successful
  *         - #AZ_ERROR_PARSER_UNEXPECTED_CHAR if a non-ASCII digit is found within the span.
  */
-_az_NODISCARD az_result az_span_atou32(az_span span, uint32_t* out_number);
+AZ_NODISCARD az_result az_span_atou32(az_span span, uint32_t* out_number);
 
 /**
  * @brief Converts an int32 into its digit characters and copies them to the \p destination #az_span
@@ -320,7 +320,7 @@ _az_NODISCARD az_result az_span_atou32(az_span span, uint32_t* out_number);
  *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the \p destination is not big enough to contain the
  * copied bytes
  */
-_az_NODISCARD az_result az_span_i32toa(az_span destination, int32_t source, az_span* out_span);
+AZ_NODISCARD az_result az_span_i32toa(az_span destination, int32_t source, az_span* out_span);
 
 /**
  * @brief Converts a uint32 into its digit characters and copies them to the \p destination #az_span
@@ -336,7 +336,7 @@ _az_NODISCARD az_result az_span_i32toa(az_span destination, int32_t source, az_s
  *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the \p destination is not big enough to contain the
  * copied bytes
  */
-_az_NODISCARD az_result az_span_u32toa(az_span destination, uint32_t source, az_span* out_span);
+AZ_NODISCARD az_result az_span_u32toa(az_span destination, uint32_t source, az_span* out_span);
 
 /**
  * @brief Converts an int64 into its digit characters and copies them to the \p destination #az_span
@@ -352,7 +352,7 @@ _az_NODISCARD az_result az_span_u32toa(az_span destination, uint32_t source, az_
  *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the \p destination is not big enough to contain the
  * copied bytes
  */
-_az_NODISCARD az_result az_span_i64toa(az_span destination, int64_t source, az_span* out_span);
+AZ_NODISCARD az_result az_span_i64toa(az_span destination, int64_t source, az_span* out_span);
 
 /**
  * @brief Converts a uint64 into its digit characters and copies them to the \p destination #az_span
@@ -368,7 +368,7 @@ _az_NODISCARD az_result az_span_i64toa(az_span destination, int64_t source, az_s
  *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the \p destination is not big enough to contain the
  * copied bytes
  */
-_az_NODISCARD az_result az_span_u64toa(az_span destination, uint64_t source, az_span* out_span);
+AZ_NODISCARD az_result az_span_u64toa(az_span destination, uint64_t source, az_span* out_span);
 
 /**
  * @brief Converts a double into its digit characters and copies them to the \p destination #az_span
@@ -384,7 +384,7 @@ _az_NODISCARD az_result az_span_u64toa(az_span destination, uint64_t source, az_
  *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the \p destination is not big enough to contain the
  * copied bytes
  */
-_az_NODISCARD az_result az_span_dtoa(az_span destination, double source, az_span* out_span);
+AZ_NODISCARD az_result az_span_dtoa(az_span destination, double source, az_span* out_span);
 
 /******************************  SPAN PAIR  */
 
@@ -413,7 +413,7 @@ typedef struct
  * @param[in] value An #az_span whose bytes represent the key's value.
  * @return  An #az_pair with the field initialized to the parameters' values.
  */
-_az_NODISCARD _az_INLINE az_pair az_pair_init(az_span key, az_span value)
+AZ_NODISCARD AZ_INLINE az_pair az_pair_init(az_span key, az_span value)
 {
   return (az_pair){ .key = key, .value = value };
 }
@@ -427,7 +427,7 @@ _az_NODISCARD _az_INLINE az_pair az_pair_init(az_span key, az_span value)
  * @return  An #az_pair with the fields initialized to the #az_span instances over the passed-in
  * strings.
  */
-_az_NODISCARD _az_INLINE az_pair az_pair_from_str(char* key, char* value)
+AZ_NODISCARD AZ_INLINE az_pair az_pair_from_str(char* key, char* value)
 {
   return az_pair_init(az_span_from_str(key), az_span_from_str(value));
 }

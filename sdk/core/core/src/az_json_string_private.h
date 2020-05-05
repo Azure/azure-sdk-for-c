@@ -15,13 +15,13 @@
  * Encodes the given character into a JSON escape sequence. The function returns an empty span if
  * the given character doesn't require to be escaped.
  */
-_az_NODISCARD az_span _az_json_esc_encode(uint8_t c);
+AZ_NODISCARD az_span _az_json_esc_encode(uint8_t c);
 
 /**
  * TODO: this function and JSON pointer read functions should return proper UNICODE
  *       code-point to be compatible.
  */
-_az_NODISCARD az_result _az_span_reader_read_json_string_char(az_span* self, uint32_t* out);
+AZ_NODISCARD az_result _az_span_reader_read_json_string_char(az_span* self, uint32_t* out);
 
 /**
  * Returns a next reference token in the JSON pointer. The JSON pointer parser is @var
@@ -29,14 +29,14 @@ _az_NODISCARD az_result _az_span_reader_read_json_string_char(az_span* self, uin
  *
  * See https://tools.ietf.org/html/rfc6901
  */
-_az_NODISCARD az_result _az_span_reader_read_json_pointer_token(az_span* self, az_span* out);
+AZ_NODISCARD az_result _az_span_reader_read_json_pointer_token(az_span* self, az_span* out);
 
 /**
  * Returns a next character in the given span reader of JSON pointer reference token.
  */
-_az_NODISCARD az_result _az_span_reader_read_json_pointer_token_char(az_span* self, uint32_t* out);
+AZ_NODISCARD az_result _az_span_reader_read_json_pointer_token_char(az_span* self, uint32_t* out);
 
-_az_NODISCARD _az_INLINE az_json_token az_json_token_span(az_span span)
+AZ_NODISCARD AZ_INLINE az_json_token az_json_token_span(az_span span)
 {
   return (az_json_token){
     .kind = AZ_JSON_TOKEN_SPAN,

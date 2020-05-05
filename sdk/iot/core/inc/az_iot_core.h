@@ -64,7 +64,7 @@ typedef enum
  * @param[in] status The #az_iot_status to verify.
  * @return `true` if the status indicates success. `false` otherwise.
  */
-_az_NODISCARD _az_INLINE bool az_iot_is_success_status(az_iot_status status)
+AZ_NODISCARD AZ_INLINE bool az_iot_is_success_status(az_iot_status status)
 {
   return status < AZ_IOT_STATUS_BAD_REQUEST;
 }
@@ -76,7 +76,7 @@ _az_NODISCARD _az_INLINE bool az_iot_is_success_status(az_iot_status status)
  * @param[in] status The #az_iot_status to verify.
  * @return `true` if the operation should be retried. `false` otherwise.
  */
-_az_NODISCARD _az_INLINE bool az_iot_is_retriable_status(az_iot_status status)
+AZ_NODISCARD AZ_INLINE bool az_iot_is_retriable_status(az_iot_status status)
 {
   return ((status == AZ_IOT_STATUS_THROTTLED) || (status == AZ_IOT_STATUS_SERVER_ERROR));
 }
@@ -92,7 +92,7 @@ _az_NODISCARD _az_INLINE bool az_iot_is_retriable_status(az_iot_status status)
  * @param[in] random_msec A random value between 0 and the maximum allowed jitter, in milliseconds.
  * @return The recommended delay in milliseconds.
  */
-_az_NODISCARD int32_t az_iot_retry_calc_delay(
+AZ_NODISCARD int32_t az_iot_retry_calc_delay(
     int32_t operation_msec,
     int16_t attempt,
     int32_t min_retry_delay_msec,
@@ -113,7 +113,7 @@ _az_NODISCARD int32_t az_iot_retry_calc_delay(
  * occurrence of (but not including the) `delimiter`, or the end of `source` if `delimiter` is not
  * found. If `source` is empty, AZ_SPAN_NULL is returned instead.
  */
-_az_NODISCARD az_span _az_span_token(az_span source, az_span delimiter, az_span* out_remainder);
+AZ_NODISCARD az_span _az_span_token(az_span source, az_span delimiter, az_span* out_remainder);
 
 /**
  * @brief Gives the length, in bytes, of the string that would represent the given number.
@@ -122,7 +122,7 @@ _az_NODISCARD az_span _az_span_token(az_span source, az_span delimiter, az_span*
  * @return The length (not considering null terminator) of the string that would represent the given
  * number.
  */
-_az_NODISCARD int32_t _az_iot_u32toa_size(uint32_t number);
+AZ_NODISCARD int32_t _az_iot_u32toa_size(uint32_t number);
 
 #include <_az_cfg_suffix.h>
 
