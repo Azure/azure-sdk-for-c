@@ -763,6 +763,12 @@ static void az_span_copy_empty(void** state)
 static void test_az_span_is_valid(void** state)
 {
   (void)state;
+  {
+    az_span const span_zeroed = { 0 };
+    az_span const span_null = AZ_SPAN_NULL;
+    assert_true(memcmp(&span_zeroed, &span_null, sizeof(az_span)) == 0);
+  }
+
   assert_true(_az_span_is_valid({ 0 }, 0, true));
   assert_false(_az_span_is_valid({ 0 }, 0, false));
   assert_false(_az_span_is_valid({ 0 }, 1, true));
@@ -788,13 +794,18 @@ static void test_az_span_is_valid(void** state)
   assert_false(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), -1, true));
   assert_false(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), -1, false));
 
-  assert_true(_az_span_is_valid(az_span_init((uint8_t*)~0, 0), 0, false));
-  assert_false(_az_span_is_valid(az_span_init((uint8_t*)~0 - 1, 1), 0, false));
-  assert_false(_az_span_is_valid(az_span_init((uint8_t*)~0 - 1, 2), 0, false));
-  assert_true(_az_span_is_valid(az_span_init((uint8_t*)((~0) / 2), ((~0) / 2) + 1), 0, false));
-  assert_false(_az_span_is_valid(az_span_init((uint8_t*)((~0) / 2), ((~0) / 2) + 2), 0, false));
+  uint8_t* const max_ptr = (uint8_t*)~0;
+  assert_true(_az_span_is_valid(az_span_init(max_ptr, 0), 0, false));
+  assert_true(_az_span_is_valid(az_span_init(max_ptr, 0), 0, true));
 
-  assert_false(_az_span_is_valid(az_span_init((uint8_t*)((~0) / 2), -1, 0, true));
+  assert_false(_az_span_is_valid(az_span_init(max_ptr, 1), 0, false));
+  assert_false(_az_span_is_valid(az_span_init(max_ptr, 1), 0, true));
+
+  assert_true(_az_span_is_valid(az_span_init(max_ptr - 1 , 1), 0, false));
+  assert_true(_az_span_is_valid(az_span_init(max_ptr - 1, 1), 0, true));
+
+  assert_false(_az_span_is_valid(az_span_init(max_ptr - 1, 2), 0, false));
+  assert_false(_az_span_is_valid(az_span_init(max_ptr - 1, 2), 0, true));
 }
 
 int test_az_span()

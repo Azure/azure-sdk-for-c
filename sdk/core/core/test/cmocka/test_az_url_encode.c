@@ -47,7 +47,7 @@ static uint8_t url_decoded_buf[] = {
   0xF0, 0xF1, 0xF2, 0xF3, 0xF4, 0xF5, 0xF6, 0xF7, 0xF8, 0xF9, 0xFA, 0xFB, 0xFC, 0xFD, 0xFE, 0xFF
 };
 
-static void test_url_encode(void** state)
+static void test_url_encode_basic(void** state)
 {
   (void)state;
   uint8_t buf[256 * 3] = { 0 };
@@ -71,75 +71,111 @@ static void test_url_encode(void** state)
     url_length = 0xFF;
     assert_true(az_succeeded(_az_span_url_encode(buffer5, AZ_SPAN_FROM_STR("hello"), &url_length)));
 
-    assert_true(
-        az_span_is_content_equal(az_span_slice(bufer5, 0, url_length), AZ_SPAN_FROM_STR("hello")));
-
     assert_int_equal(url_length, sizeof("hello"));
+    assert_true(az_span_is_content_equal(buffer5, AZ_SPAN_FROM_STR("hello")));
 
     // Insufficient size
+    buf5 = { '*', '*', '*', '*', '*' };
+    az_span const buffer2 = az_span_slice(buffer5, 0, 2);
     url_length = 0xFF;
+
     assert_true(
-        _az_span_url_encode(az_span_slice(0, 2), AZ_SPAN_FROM_STR("/"), &url_length)
+        _az_span_url_encode(buffer2, AZ_SPAN_FROM_STR("/"), &url_length)
         == AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
 
     assert_int_equal(url_length, 0);
-    assert_true(az_span_is_content_equal(
-        az_span_slice(buffer5, 0, sizeof(buf5)), AZ_SPAN_FROM_STR("%2Flo")));
+    assert_true(az_span_is_content_equal(buffer5, AZ_SPAN_FROM_STR("*****")));
+
+    // Sufficient size
+    az_span const buffer3 = az_span_slice(buffer5, 0, 3);
+    url_length = 0xFF;
+
+    assert_true(az_succeeded(_az_span_url_encode(buffer3, AZ_SPAN_FROM_STR("/"), &url_length)));
+    assert_int_equal(url_length, 3);
+    assert_true(az_span_is_content_equal(buffer5, AZ_SPAN_FROM_STR("%2F**")));
   }
   {
     // May be sufficient to perform encoding
-    uint8_t buf7[7] = { 0 };
+    uint8_t buf7[7] = { '*', '*', '*', '*', '*', '*', '*' };
     az_span const buffer7 = AZ_SPAN_FROM_BUFFER(buf7);
-
-    url_length = 0xFF;
-    assert_true(az_succeeded(_az_span_url_encode(buffer7, AZ_SPAN_FROM_STR("he/lo"), &url_length)));
-
-    assert_true(az_span_is_content_equal(
-        az_span_slice(buffer7, 0, url_length), AZ_SPAN_FROM_STR("he%2Flo")));
-
-    assert_int_equal(url_length, sizeof("he%2Flo"));
+    az_span const buffer5 = az_span_slice(buffer7, 0, 5);
+    az_span const buffer6 = az_span_slice(buffer7, 0, 6);
+    {
+      url_length = 0xFF;
+      assert_true(
+          _az_span_url_encode(buffer5, AZ_SPAN_FROM_STR("he/lo"), &url_length)
+          == AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+      assert_int_equal(url_length, 0);
+      assert_true(az_span_is_content_equal(buffer5, AZ_SPAN_FROM_STR("*****")));
+    }
+    {
+      url_length = 0xFF;
+      assert_true(
+          _az_span_url_encode(buffer6, AZ_SPAN_FROM_STR("he/lo"), &url_length)
+          == AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+      assert_int_equal(url_length, 0);
+      assert_true(az_span_is_content_equal(buffer6, AZ_SPAN_FROM_STR("******")));
+    }
+    {
+      url_length = 0xFF;
+      assert_true(
+          az_succeeded(_az_span_url_encode(buffer7, AZ_SPAN_FROM_STR("he/lo"), &url_length)));
+      assert_int_equal(url_length, sizeof("he%2Flo"));
+      assert_true(az_span_is_content_equal(buffer7, AZ_SPAN_FROM_STR("he%2Flo")));
+    }
   }
+}
+
+static void test_url_encode_preconditions(void** state)
+{
+  (void)state;
 #ifdef AZ_NO_PRECONDITION_CHECKING
   {
-    uint8_t buf5[5] = { '*', '*', '*', '*', '*' };
-    az_span const buffer5 = AZ_SPAN_FROM_BUFFER(buf5);
+    {
+      uint8_t buf5[5] = { '*', '*', '*', '*', '*' };
+      az_span const buffer5 = AZ_SPAN_FROM_BUFFER(buf5);
 
-    url_length = 0xFF;
-    assert_true(
-        _az_span_url_encode(buffer5, AZ_SPAN_FROM_STR("hello_world"), &url_length)
-        == AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+      url_length = 0xFF;
+      assert_true(
+          _az_span_url_encode(buffer5, AZ_SPAN_FROM_STR("hello_world"), &url_length)
+          == AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
 
-    assert_int_equal(url_length, 0);
-
-    url_length = 0xFF;
-    assert_true(az_span_is_content_equal(
-        buffer5, AZ_SPAN_FROM_STR("*****")));
-    assert_int_equal(url_length, 0);
-
-    url_length = 0xFF;
-    assert_precondition_checked(_az_span_url_encode({ 0 }, { 0 }, &url_length));
-    assert_int_equal(url_length, 0);
+      assert_int_equal(url_length, 0);
+      assert_true(az_span_is_content_equal(buffer5, AZ_SPAN_FROM_STR("*****")));
+    }
+    {
+      url_length = 0xFF;
+      assert_true(az_succeeded(_az_span_url_encode({ 0 }, { 0 }, &url_length)));
+      assert_int_equal(url_length, 0);
+    }
   }
 #else
   {
     setup_precondition_check_tests();
 
-    uint8_t buf5[5] = { 0 };
+    uint8_t buf5[5] = { '*', '*', '*', '*', '*' };
     az_span const buffer5 = AZ_SPAN_FROM_BUFFER(buf5);
 
     url_length = 0xFF;
     assert_precondition_checked(
         _az_span_url_encode(buffer5, AZ_SPAN_FROM_STR("hello_world"), &url_length));
-    assert_int_equal(url_length, 0);
+    assert_int_equal(url_length, 0xFF);
+    assert_true(az_span_is_content_equal(buffer5, AZ_SPAN_FROM_STR("*****")));
 
     url_length = 0xFF;
     assert_precondition_checked(_az_span_url_encode({ 0 }, { 0 }, &url_length));
-    assert_int_equal(url_length, 0);
+    assert_int_equal(url_length, 0xFF);
 
     uint8_t buf0[0] = { 0 };
     az_span const buffer0 = AZ_SPAN_FROM_BUFFER(buf0);
-    assert_precondition_checked(_az_span_url_encode(buffer0, { 0 }, NULL));
+    assert_precondition_checked(_az_span_url_encode(buffer0, AZ_SPAN_FROM_STR("hello"), NULL));
   }
+#endif // AZ_NO_PRECONDITION_CHECKING
+}
+
+static void test_url_encode_usage(void** state)
+{
+  (void)state;
   {
     url_length = 0xFF;
     assert_true(az_succeeded(
@@ -150,6 +186,11 @@ static void test_url_encode(void** state)
 
     assert_int_equal(url_length, sizeof("https%3A%2F%2Fvault.azure.net"));
   }
+}
+
+static void test_url_encode_full(void** state)
+{
+  (void)state;
   {
     url_length = 0xFF;
     assert_true(az_succeeded(
@@ -159,13 +200,15 @@ static void test_url_encode(void** state)
 
     assert_int_equal(url_length, 256 * 3);
   }
-#endif // AZ_NO_PRECONDITION_CHECKING
 }
 
 int test_az_url_encode()
 {
   const struct CMUnitTest tests[] = {
-    cmocka_unit_test(test_url_encode),
+    cmocka_unit_test(test_url_encode_basic),
+    cmocka_unit_test(test_url_encode_preconditions),
+    cmocka_unit_test(test_url_encode_usage),
+    cmocka_unit_test(test_url_encode_full),
   };
   return cmocka_run_group_tests_name("az_core_encode", tests, NULL, NULL);
 }
