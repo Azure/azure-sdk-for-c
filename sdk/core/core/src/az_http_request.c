@@ -147,8 +147,12 @@ AZ_NODISCARD az_result
 az_http_request_append_header(_az_http_request* p_request, az_span key, az_span value)
 {
   _az_PRECONDITION_NOT_NULL(p_request);
-  _az_PRECONDITION_VALID_SPAN(key, 1, false);
 
+  // remove white spaces from key and value
+  key = _az_span_trim_white_space(key);
+  value = _az_span_trim_white_space(value);
+
+  _az_PRECONDITION_VALID_SPAN(key, 1, false);
   az_span headers = p_request->_internal.headers;
 
   az_pair header_to_append = az_pair_init(key, value);

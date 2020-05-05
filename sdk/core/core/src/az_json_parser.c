@@ -26,24 +26,6 @@ typedef enum
 } az_json_stack_item;
 
 /**
- * @brief check if input @p c is a white space. Utility function that help discarding empty spaces
- * from tokens
- *
- */
-AZ_NODISCARD AZ_INLINE bool az_json_is_white_space(uint8_t c)
-{
-  switch (c)
-  {
-    case ' ':
-    case '\t':
-    case '\n':
-    case '\r':
-      return true;
-  }
-  return false;
-}
-
-/**
  * @brief check if @p c is either an 'e' or an 'E'. This is a helper function to handle exponential
  * numbers like 10e10
  *
@@ -99,23 +81,6 @@ AZ_NODISCARD AZ_INLINE az_result az_json_parser_pop_stack(az_json_parser* json_p
 AZ_NODISCARD az_result az_json_parser_init(az_json_parser* json_parser, az_span json_buffer)
 {
   *json_parser = (az_json_parser){ ._internal = { .reader = json_buffer, .stack = 1 } };
-  return AZ_OK;
-}
-
-static az_result az_span_reader_skip_json_white_space(az_span* self)
-{
-  if (az_span_size(*self) == 0)
-  {
-    return AZ_OK;
-  }
-  while (az_json_is_white_space(az_span_ptr(*self)[0]))
-  {
-    *self = az_span_slice_to_end(*self, 1);
-    if (az_span_size(*self) == 0)
-    {
-      return AZ_OK;
-    }
-  }
   return AZ_OK;
 }
 
@@ -404,7 +369,7 @@ AZ_NODISCARD static az_result az_json_parser_get_value_space(
   AZ_RETURN_IF_FAILED(az_json_parser_get_value(p_state, out_token));
   if (az_span_size(p_state->_internal.reader) > 0)
   {
-    AZ_RETURN_IF_FAILED(az_span_reader_skip_json_white_space(&p_state->_internal.reader));
+    p_state->_internal.reader = _az_span_trim_white_space_from_start(p_state->_internal.reader);
   }
   return AZ_OK;
 }
@@ -420,7 +385,7 @@ az_json_parser_parse_token(az_json_parser* json_parser, az_json_token* out_token
     return AZ_ERROR_JSON_INVALID_STATE;
   }
   az_span* p_reader = &json_parser->_internal.reader;
-  AZ_RETURN_IF_FAILED(az_span_reader_skip_json_white_space(p_reader));
+  *p_reader = _az_span_trim_white_space_from_start(*p_reader);
   AZ_RETURN_IF_FAILED(az_json_parser_get_value_space(json_parser, out_token));
   bool const is_empty = az_span_size(*p_reader) == 0; // everything was read
   switch (out_token->kind)
@@ -447,7 +412,7 @@ AZ_NODISCARD static az_result az_json_parser_read_comma_or_close(az_json_parser*
   {
     // skip ',' and read all whitespaces.
     *p_reader = az_span_slice_to_end(*p_reader, 1);
-    AZ_RETURN_IF_FAILED(az_span_reader_skip_json_white_space(p_reader));
+    *p_reader = _az_span_trim_white_space_from_start(*p_reader);
     return AZ_OK;
   }
   uint8_t const close = az_json_stack_item_to_close(az_json_parser_stack_last(json_parser));
@@ -480,7 +445,8 @@ AZ_NODISCARD static az_result az_json_parser_check_item_begin(
   // c == close
   AZ_RETURN_IF_FAILED(az_json_parser_pop_stack(json_parser));
   *p_reader = az_span_slice_to_end(*p_reader, 1);
-  AZ_RETURN_IF_FAILED(az_span_reader_skip_json_white_space(p_reader));
+  *p_reader = _az_span_trim_white_space_from_start(*p_reader);
+
   if (!az_json_parser_stack_is_empty(json_parser))
   {
     AZ_RETURN_IF_FAILED(az_json_parser_read_comma_or_close(json_parser));
@@ -514,9 +480,9 @@ AZ_NODISCARD az_result az_json_parser_parse_token_member(
   AZ_RETURN_IF_FAILED(az_json_parser_check_item_begin(json_parser, AZ_JSON_STACK_OBJECT));
   AZ_RETURN_IF_FAILED(_az_is_expected_span(p_reader, AZ_SPAN_FROM_STR("\"")));
   AZ_RETURN_IF_FAILED(az_span_reader_get_json_string_rest(p_reader, &out_token_member->name));
-  AZ_RETURN_IF_FAILED(az_span_reader_skip_json_white_space(p_reader));
+  *p_reader = _az_span_trim_white_space(*p_reader);
   AZ_RETURN_IF_FAILED(_az_is_expected_span(p_reader, AZ_SPAN_FROM_STR(":")));
-  AZ_RETURN_IF_FAILED(az_span_reader_skip_json_white_space(p_reader));
+  *p_reader = _az_span_trim_white_space(*p_reader);
   AZ_RETURN_IF_FAILED(az_json_parser_get_value_space(json_parser, &out_token_member->token));
   return az_json_parser_check_item_end(json_parser, out_token_member->token);
 }

@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "az_span_private.h"
 #include "az_span_internal.h"
+#include "az_span_private.h"
 #include "az_test_definitions.h"
 #include <stdarg.h>
 #include <stddef.h>
@@ -760,6 +760,111 @@ static void az_span_copy_empty(void** state)
   assert_true(az_span_is_content_equal(az_span_copy(dst, AZ_SPAN_NULL), dst));
 }
 
+static void az_span_trim(void** state)
+{
+  (void)state;
+  az_span source = _az_span_trim_white_space(AZ_SPAN_FROM_STR("   abc   "));
+  assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("abc")));
+}
+
+static void az_span_trim_left(void** state)
+{
+  (void)state;
+  az_span source = _az_span_trim_white_space_from_start(AZ_SPAN_FROM_STR("   abc   "));
+  assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("abc   ")));
+}
+
+static void az_span_trim_right(void** state)
+{
+  (void)state;
+  az_span source = _az_span_trim_white_space_from_end(AZ_SPAN_FROM_STR("   abc   "));
+  assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("   abc")));
+}
+
+static void az_span_trim_all_white(void** state)
+{
+  (void)state;
+  az_span source = _az_span_trim_white_space(AZ_SPAN_FROM_STR("\t\n\r       "));
+  assert_int_equal(az_span_size(source), 0);
+}
+
+static void az_span_trim_none(void** state)
+{
+  (void)state;
+  az_span source = _az_span_trim_white_space(AZ_SPAN_FROM_STR("abc"));
+  assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("abc")));
+}
+
+static void az_span_trim_spaced(void** state)
+{
+  (void)state;
+  az_span source = _az_span_trim_white_space(AZ_SPAN_FROM_STR("\ta\n b     c    "));
+  assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("a\n b     c")));
+}
+
+static void az_span_trim_zero(void** state)
+{
+  (void)state;
+  az_span source = _az_span_trim_white_space(AZ_SPAN_FROM_STR(""));
+  assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("")));
+}
+
+static void az_span_trim_null(void** state)
+{
+  (void)state;
+  az_span source = _az_span_trim_white_space(AZ_SPAN_NULL);
+  assert_int_equal(az_span_size(source), 0);
+}
+
+static void az_span_trim_start(void** state)
+{
+  (void)state;
+  az_span source = _az_span_trim_white_space_from_start(AZ_SPAN_NULL);
+  assert_int_equal(az_span_size(source), 0);
+}
+
+static void az_span_trim_end(void** state)
+{
+  (void)state;
+  az_span source = _az_span_trim_white_space_from_end(AZ_SPAN_FROM_STR("\ta\n b     c    "));
+  assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("\ta\n b     c")));
+}
+
+static void az_span_trim_unicode(void** state)
+{
+  (void)state;
+  az_span source
+      = _az_span_trim_white_space_from_end(AZ_SPAN_FROM_STR("  \\U+00A0a\n b     c\\U+2028    "));
+  assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("  \\U+00A0a\n b     c\\U+2028")));
+}
+
+static void az_span_trim_two_calls(void** state)
+{
+  (void)state;
+  az_span source = _az_span_trim_white_space_from_start(
+      _az_span_trim_white_space_from_end(AZ_SPAN_FROM_STR("  \\U+00A0a\n b     c\\U+2028    ")));
+  assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("\\U+00A0a\n b     c\\U+2028")));
+}
+
+static void az_span_trim_two_calls_inverse(void** state)
+{
+  (void)state;
+  az_span source = _az_span_trim_white_space_from_end(
+      _az_span_trim_white_space_from_start(AZ_SPAN_FROM_STR("  \\U+00A0a\n b     c\\U+2028    ")));
+  assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("\\U+00A0a\n b     c\\U+2028")));
+}
+
+static void az_span_trim_repeat_calls(void** state)
+{
+  (void)state;
+  az_span source = _az_span_trim_white_space_from_end(
+      _az_span_trim_white_space_from_start(AZ_SPAN_FROM_STR("  1234    ")));
+  source = _az_span_trim_white_space(source);
+  source = _az_span_trim_white_space(source);
+  source = _az_span_trim_white_space(source);
+  assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("1234")));
+}
+
 static void test_az_span_token_success(void** state)
 {
   (void)state;
@@ -852,7 +957,21 @@ int test_az_span()
     cmocka_unit_test(az_span_u32toa_max_uint_succeeds),
     cmocka_unit_test(az_span_u32toa_overflow_fails),
     cmocka_unit_test(az_span_copy_empty),
+    cmocka_unit_test(az_span_trim),
+    cmocka_unit_test(az_span_trim_left),
+    cmocka_unit_test(az_span_trim_right),
+    cmocka_unit_test(az_span_trim_all_white),
+    cmocka_unit_test(az_span_trim_none),
+    cmocka_unit_test(az_span_trim_spaced),
+    cmocka_unit_test(az_span_trim_zero),
+    cmocka_unit_test(az_span_trim_null),
     cmocka_unit_test(test_az_span_token_success),
+    cmocka_unit_test(az_span_trim_start),
+    cmocka_unit_test(az_span_trim_end),
+    cmocka_unit_test(az_span_trim_unicode),
+    cmocka_unit_test(az_span_trim_two_calls),
+    cmocka_unit_test(az_span_trim_two_calls_inverse),
+    cmocka_unit_test(az_span_trim_repeat_calls),
   };
   return cmocka_run_group_tests_name("az_core_span", tests, NULL, NULL);
 }

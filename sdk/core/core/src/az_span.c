@@ -621,6 +621,77 @@ _az_span_scan_until(az_span self, _az_predicate predicate, int32_t* out_index)
   return AZ_ERROR_ITEM_NOT_FOUND;
 }
 
+AZ_NODISCARD az_span _az_span_trim_white_space(az_span source)
+{
+  // Trim from end after trim from start
+  return _az_span_trim_white_space_from_end(_az_span_trim_white_space_from_start(source));
+}
+
+AZ_NODISCARD AZ_INLINE bool _az_is_white_space(uint8_t c)
+{
+  switch (c)
+  {
+    case ' ':
+    case '\t':
+    case '\n':
+    case '\r':
+      return true;
+  }
+  return false;
+}
+
+typedef enum
+{
+  LEFT = 0,
+  RIGHT = 1,
+} az_span_trim_side;
+
+// Return a trim az_span. Depending on arg side, function will trim left of right
+AZ_NODISCARD static az_span _az_span_trim_side(az_span source, az_span_trim_side side)
+{
+  int32_t increment = 1;
+  uint8_t* source_ptr = az_span_ptr(source);
+  int32_t source_size = az_span_size(source);
+
+  if (side == RIGHT)
+  {
+    increment = -1; // Set increment to be decremental for moving ptr
+    source_ptr += (source_size - 1); // Set initial position to the end
+  }
+
+  // loop source, just to make sure staying within the size range
+  int32_t index = 0;
+  for (; index < source_size; index++)
+  {
+    if (!_az_is_white_space(*source_ptr))
+    {
+      break;
+    }
+    // update ptr to next position
+    source_ptr += increment;
+  }
+
+  // return the slice depending on side
+  if (side == RIGHT)
+  {
+    // calculate index from right.
+    index = source_size - index;
+    return az_span_slice(source, 0, index);
+  }
+
+  return az_span_slice_to_end(source, index); // worst case index would be source_size
+}
+
+AZ_NODISCARD az_span _az_span_trim_white_space_from_start(az_span source)
+{
+  return _az_span_trim_side(source, LEFT);
+}
+
+AZ_NODISCARD az_span _az_span_trim_white_space_from_end(az_span source)
+{
+  return _az_span_trim_side(source, RIGHT);
+}
+
 AZ_NODISCARD AZ_INLINE bool _az_span_url_should_encode(uint8_t c)
 {
   switch (c)
