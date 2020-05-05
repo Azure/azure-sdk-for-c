@@ -23,7 +23,7 @@ This document describes how to use samples and what is done in each sample.
 
 ## Getting started
 
-These samples use X509 authentication to connect to IoT Hub. To easily run these samples, we have provided
+These samples use X509 authentication to connect to Azure IoT Hub. To easily run these samples, we have provided
 a script to generate a self-signed device certificate used for device authentication. You can run it using the following
 steps.
 
