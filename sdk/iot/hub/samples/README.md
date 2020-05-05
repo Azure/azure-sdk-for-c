@@ -48,6 +48,8 @@ Hub portal, you can use this script with the following form:
 where you substitute the validation key in for `<VALIDATION_KEY>`. The validation cert will be output with the
 name `validation_ec_cert.pem` and you can upload that for the validation step.
 
+For more details on validating hub certs, refer to [this online documentation](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-x509ca-overview#how-to-register-the-x509-ca-certificate-to-iot-hub)
+
 ***NOTE: THESE ARE TO BE USED FOR SAMPLE USE ONLY. DO NOT USE THEM IN PRODUCTION***
 
 ## Samples
