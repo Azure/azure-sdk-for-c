@@ -257,7 +257,7 @@ static void test_http_request_header_validation_above_127(void** state)
         header_span,
         AZ_SPAN_FROM_STR("body")));
 
-    uint8_t c[1] = { 200 };
+    uint8_t c[1] = { 255 };
     az_span header_name = AZ_SPAN_FROM_BUFFER(c);
     az_result r = az_http_request_append_header(&hrb, header_name, hrb_header_content_type_token);
 

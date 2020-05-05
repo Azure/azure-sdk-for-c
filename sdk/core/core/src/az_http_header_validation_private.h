@@ -145,6 +145,7 @@ static const uint8_t az_http_valid_token[256] = {
   0, // 125 ->  }
   '~', // 126 ->  ~
   0 // 127 ->  DEL
+  // ...128-255 is all zeros (not valid) characters
 };
 
 // Loop all characters from name and validate each.
@@ -154,7 +155,7 @@ AZ_NODISCARD AZ_INLINE bool az_http_is_valid_header_name(az_span name)
   for (int32_t i = 0; i < az_span_size(name); i++)
   {
     uint8_t c = name_ptr[i];
-    if (c > 127 || az_http_valid_token[c] == 0)
+    if (az_http_valid_token[c] == 0)
     {
       return false;
     }
