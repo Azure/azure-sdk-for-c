@@ -817,7 +817,6 @@ INPUT                  = ./sdk/core/core/inc \
                          ./sdk/iot/core/inc \
                          ./sdk/iot/hub/inc \
                          ./sdk/iot/provisioning/inc \
-                         ./sdk/iot/pnp/inc \
                          ./README.md
 
 # This tag can be used to specify the character encoding of the source files
