@@ -153,7 +153,8 @@ AZ_NODISCARD AZ_INLINE bool az_http_is_valid_header_name(az_span name)
   uint8_t* name_ptr = az_span_ptr(name);
   for (int32_t i = 0; i < az_span_size(name); i++)
   {
-    if (az_http_valid_token[name_ptr[i]] == 0)
+    uint8_t c = name_ptr[i];
+    if (c > 127 || az_http_valid_token[c] == 0)
     {
       return false;
     }
