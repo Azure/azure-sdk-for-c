@@ -22,6 +22,7 @@ echo "If required (for example on Windows), download the Baltimore PEM CA from h
 echo    export AZ_IOT_DEVICE_X509_TRUST_PEM_FILE=$(pwd)/BaltimoreCyberTrustRoot.crt.pem
 
 echo "Sample certificate generated:"
-echo "Upload device_ec_cert.pem to Device Provisioning Service."
 echo "Use the device_cert_store.pem file within the sample:"
 echo    export AZ_IOT_DEVICE_X509_CERT_PEM_FILE=$(pwd)/device_cert_store.pem
+
+echo "Upload the user_root_cert.pem to IoT Hub"
