@@ -4,12 +4,32 @@ Official Embedded C clients for Azure IoT Hub and Device Provisioning Service.
 
 ## Getting started
 
-The Azure IoT library is compiled following the same steps listed on the root [README](https://github.com/Azure/azure-sdk-for-c/blob/master/README.md) documentation, under ["Getting Started Using the SDK"](https://github.com/Azure/azure-sdk-for-c/blob/master/README.md#getting-started-using-the-sdk).
+- The Azure IoT library is compiled following the same steps listed on the root [README](https://github.com/Azure/azure-sdk-for-c/blob/master/README.md) documentation, under ["Getting Started Using the SDK"](https://github.com/Azure/azure-sdk-for-c/blob/master/README.md#getting-started-using-the-sdk).
+
+- **Docs**: If you're new to the Embedded C SDK take a look at the [Machine State diagram](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/iot/doc/mqtt_state_machine.md#device-provisioning-service) that explains the high-level architecture, SDK components, and a clear view of SDK x Application responsibilities. 
+- **Samples**: [This page](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/iot/samples) explains samples for the Azure Embedded C SDK IoT Provisioning Client and how to use them.
 
 ### Prerequisites
 
 For compiling the Azure IoT Embedded SDK for the most common platforms, no further prerequisites are necessary.
 Please follow the instructions in the Getting Started section above.
+
+## Key Features
+
+
+Feature | Embedded C SDK | Description
+---------|----------|---------------------
+ [Send device-to-cloud message](https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-messages-d2c) | [Suported] | Send device-to-cloud messages (max 256KB) to IoT Hub with the option to add custom properties. 
+ [Receive cloud-to-device messages](https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-messages-c2d) | [Supported] | Receive cloud-to-device messages and read associated custom and system properties from IoT Hub.   
+ [Device Twins](https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-device-twins) | [Supported] | IoT Hub persists a device twin for each device that you connect to IoT Hub.  The device can perform operations like get twin tags, subscribe to desired properties.
+ [Direct Methods](https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-direct-methods) | [Supported] | IoT Hub gives you the ability to invoke direct methods on devices from the cloud.  The SDK supports handler for method specific and generic operation. 
+ [DPS - Device Provisioning Service](https://docs.microsoft.com/azure/iot-dps/) | [Supported] | This SDK supports connecting your device to the Device Provisioning Service via [individual enrollment](https://docs.microsoft.com/azure/iot-dps/concepts-service#enrollment) using [X.509 leaf certificate](https://docs.microsoft.com/azure/iot-dps/concepts-security#leaf-certificate).  This [quickstart](https://docs.microsoft.com/azure/iot-dps/quick-create-simulated-device-x509) reviews how to create a simulated device for individual enrollment with X.509. 
+ Protocol | MQTT | The Embedded C SDK suports only MQTT.  
+ Retry Policies | [Partially supported] | The embedded C SDK provides guidelines for retries, but actual retries should be handled by the application
+ [Plug and Play](https://docs.microsoft.com/en-us/azure/iot-pnp/overview-iot-plug-and-play) | [not supported yet] | IoT Plug and Play Preview enables solution developers to integrate devices with their solutions without writing any embedded code. 
+
+
+
 
 ## Examples
 

@@ -7,7 +7,8 @@ The use of any of the Azure IoT Common library functions and/or definitions outs
 
 ## Getting started
 
-TBD
+- **Docs**: If you're new to the Embedded C SDK take a look at the [Machine State diagram](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/iot/doc/mqtt_state_machine.md#device-provisioning-service) that explains the high-level architecture, SDK components, and a clear view of SDK x Application responsibilities. 
+- **Samples**: [This page](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/iot/samples) explains samples for the Azure Embedded C SDK IoT Provisioning Client and how to use them.
 
 ### Prerequisites
 

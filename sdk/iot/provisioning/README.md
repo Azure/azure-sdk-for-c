@@ -1,18 +1,14 @@
 # Azure IoT Clients for Embedded C: Azure IoT Device Provisioning Client
 
-Official Embedded C client for Azure IoT Device Provisioning.
+Official Embedded C client for Azure IoT DPS - Device Provisioning Services.
+
+For more details about DPS check [Azure documentation](https://docs.microsoft.com/azure/iot-dps/)
 
 ## Getting started
 
-TBD
+- Pelase refer to the state machine diagram which describes the Embedded C SDK flow for DPS [here](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/iot/doc/mqtt_state_machine.md#device-provisioning-service). 
 
-### Prerequisites
-
-TBD
-
-## Examples
-
-TBD
+- **Samples**: [This page](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/iot/samples) explains samples for the Azure Embedded C SDK IoT Provisioning Client and how to use them.
 
 ## Need help?
 
