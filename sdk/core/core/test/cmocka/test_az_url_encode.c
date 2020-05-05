@@ -113,7 +113,7 @@ static void test_url_encode(void** state)
 
     url_length = 0xFF;
     assert_true(az_span_is_content_equal(
-        az_span_slice(buffer5, 0, sizeof(buf5)), AZ_SPAN_FROM_STR("*****")));
+        buffer5, AZ_SPAN_FROM_STR("*****")));
     assert_int_equal(url_length, 0);
 
     url_length = 0xFF;
