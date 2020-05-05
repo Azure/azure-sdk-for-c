@@ -155,11 +155,8 @@ az_http_request_append_header(_az_http_request* p_request, az_span key, az_span 
 
   _az_PRECONDITION_VALID_SPAN(key, 1, false);
 
-  // validate header name contains only valid chars
-  if (!az_http_is_valid_header_name(key))
-  {
-    return AZ_ERROR_ARG;
-  }
+  // Make this function to only work with valid input for header name
+  _az_PRECONDITION(az_http_is_valid_header_name(key));
 
   az_span headers = p_request->_internal.headers;
   az_pair header_to_append = az_pair_init(key, value);
