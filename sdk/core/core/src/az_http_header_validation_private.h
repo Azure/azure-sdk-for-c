@@ -9,10 +9,15 @@
  *
  */
 
+#ifndef _az_HTTP_HEADER_VALIDATION_PRIVATE_H
+#define _az_HTTP_HEADER_VALIDATION_PRIVATE_H
+
 #include <az_span.h>
 
 #include <stdbool.h>
 #include <stdint.h>
+
+#include <_az_cfg_prefix.h>
 
 // Bit array from ASCII to valid. Every zero in array means invalid character, while non-zeros
 // return the valid character.
@@ -162,3 +167,7 @@ AZ_NODISCARD AZ_INLINE bool az_http_is_valid_header_name(az_span name)
   }
   return true;
 }
+
+#include <_az_cfg_suffix.h>
+
+#endif // _az_HTTP_HEADER_VALIDATION_PRIVATE_H
