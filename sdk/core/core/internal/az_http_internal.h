@@ -60,7 +60,7 @@ typedef struct
 {
   struct
   {
-    _az_http_policy p_policies[10];
+    _az_http_policy p_policies[11];
   } _internal;
 } _az_http_pipeline;
 

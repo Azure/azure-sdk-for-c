@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 #include <az_config_internal.h>
-#include <az_credentials_internal.h>
 #include <az_credentials.h>
+#include <az_credentials_internal.h>
 #include <az_http.h>
 #include <az_http_internal.h>
 #include <az_http_transport.h>
@@ -121,6 +121,12 @@ AZ_NODISCARD az_result az_keyvault_keys_client_init(
             {
               ._internal = {
                 .process = az_http_pipeline_policy_logging,
+                .p_options = NULL,
+              },
+            },
+            {
+              ._internal = {
+                .process = az_http_pipeline_policy_header_validation,
                 .p_options = NULL,
               },
             },
