@@ -50,8 +50,6 @@ static char mqtt_endpoint[128];
 static az_span mqtt_url_prefix = AZ_SPAN_LITERAL_FROM_STR("ssl://");
 static az_span mqtt_url_suffix = AZ_SPAN_LITERAL_FROM_STR(":8883");
 
-static char c2d_topic[128];
-
 static az_iot_hub_client client;
 static MQTTClient mqtt_client;
 
@@ -218,17 +216,8 @@ static int subscribe()
 {
   int rc;
 
-  size_t c2d_topic_length;
-  if ((rc = az_iot_hub_client_c2d_get_subscribe_topic_filter(
-           &client, c2d_topic, sizeof(c2d_topic), &c2d_topic_length))
-      != AZ_OK)
-
-  {
-    printf("Failed to get C2D MQTT SUB topic filter, return code %d\n", rc);
-    return rc;
-  }
-
-  if ((rc = MQTTClient_subscribe(mqtt_client, c2d_topic, 1)) != MQTTCLIENT_SUCCESS)
+  if ((rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_HUB_CLIENT_C2D_SUBSCRIBE_TOPIC, 1))
+      != MQTTCLIENT_SUCCESS)
   {
     printf("Failed to subscribe, return code %d\n", rc);
     return rc;

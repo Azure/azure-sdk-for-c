@@ -141,38 +141,6 @@ AZ_NODISCARD az_result az_iot_provisioning_client_get_client_id(
   return AZ_OK;
 }
 
-// $dps/registrations/res/#
-AZ_NODISCARD az_result az_iot_provisioning_client_register_get_subscribe_topic_filter(
-    az_iot_provisioning_client const* client,
-    char* mqtt_topic_filter,
-    size_t mqtt_topic_filter_size,
-    size_t* out_mqtt_topic_filter_length)
-{
-  (void)client;
-
-  _az_PRECONDITION_NOT_NULL(client);
-  _az_PRECONDITION_NOT_NULL(mqtt_topic_filter);
-  _az_PRECONDITION(mqtt_topic_filter_size > 0);
-
-  az_span mqtt_topic_filter_span
-      = az_span_init((uint8_t*)mqtt_topic_filter, (int32_t)mqtt_topic_filter_size);
-  int32_t required_length = az_span_size(str_dps_registrations_res) + (int32_t)sizeof((uint8_t)'#');
-
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(
-      mqtt_topic_filter_span, required_length + (int32_t)sizeof((uint8_t)'\0'));
-
-  az_span remainder = az_span_copy(mqtt_topic_filter_span, str_dps_registrations_res);
-  remainder = az_span_copy_u8(remainder, '#');
-  remainder = az_span_copy_u8(remainder, '\0');
-
-  if (out_mqtt_topic_filter_length)
-  {
-    *out_mqtt_topic_filter_length = (size_t)required_length;
-  }
-
-  return AZ_OK;
-}
-
 // $dps/registrations/PUT/iotdps-register/?$rid=%s
 AZ_NODISCARD az_result az_iot_provisioning_client_register_get_publish_topic(
     az_iot_provisioning_client const* client,

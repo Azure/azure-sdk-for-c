@@ -51,7 +51,6 @@ static char mqtt_endpoint[128];
 static az_span mqtt_url_prefix = AZ_SPAN_LITERAL_FROM_STR("ssl://");
 static az_span mqtt_url_suffix = AZ_SPAN_LITERAL_FROM_STR(":8883");
 
-static char methods_subscribe_topic[128];
 static char methods_response_topic[128];
 static const az_span ping_method_name_span = AZ_SPAN_LITERAL_FROM_STR("ping");
 static az_span ping_method_success_response = AZ_SPAN_LITERAL_FROM_STR("{\"response\": \"pong\"}");
@@ -216,6 +215,8 @@ static int on_received(void* context, char* topicName, int topicLen, MQTTClient_
     topicLen = (int)strlen(topicName);
   }
 
+  printf("Topic: %s\n", topicName);
+
   az_iot_hub_client_method_request method_request;
   if (az_iot_hub_client_methods_parse_received_topic(
           &client, az_span_init((uint8_t*)topicName, topicLen), &method_request)
@@ -294,20 +295,8 @@ static int subscribe()
 {
   int rc;
 
-  size_t methods_subscribe_topic_length;
-  if ((rc = az_iot_hub_client_methods_get_subscribe_topic_filter(
-           &client,
-           methods_subscribe_topic,
-           sizeof(methods_subscribe_topic),
-           &methods_subscribe_topic_length))
-      != AZ_OK)
-
-  {
-    printf("Failed to get method topic filter, return code %d\n", rc);
-    return rc;
-  }
-
-  if ((rc = MQTTClient_subscribe(mqtt_client, methods_subscribe_topic, 1)) != MQTTCLIENT_SUCCESS)
+  if ((rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_HUB_CLIENT_METHODS_SUBSCRIBE_TOPIC, 1))
+      != MQTTCLIENT_SUCCESS)
   {
     printf("Failed to subscribe to method topic filter, return code %d\n", rc);
     return rc;

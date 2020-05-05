@@ -51,8 +51,6 @@ static char mqtt_endpoint[128];
 static az_span mqtt_url_prefix = AZ_SPAN_LITERAL_FROM_STR("ssl://");
 static az_span mqtt_url_suffix = AZ_SPAN_LITERAL_FROM_STR(":8883");
 
-static char twin_response_topic[128];
-static char twin_desired_topic[128];
 static char get_twin_topic[128];
 static az_span get_twin_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("get_twin");
 static char reported_property_topic[128];
@@ -189,6 +187,8 @@ static int on_received(void* context, char* topicName, int topicLen, MQTTClient_
     topicLen = (int)strlen(topicName);
   }
 
+  printf("Topic: %s\n", topicName);
+
   az_span topic_span = az_span_init((uint8_t*)topicName, topicLen);
 
   az_iot_hub_client_twin_response twin_response;
@@ -249,29 +249,15 @@ static int subscribe()
 {
   int rc;
 
-  if ((rc = az_iot_hub_client_twin_patch_get_subscribe_topic_filter(
-           &client, twin_desired_topic, sizeof(twin_desired_topic), NULL))
-      != AZ_OK)
-  {
-    printf("Failed to get twin patch topic filter, return code %d\n", rc);
-    return rc;
-  }
-
-  if ((rc = az_iot_hub_client_twin_response_get_subscribe_topic_filter(
-           &client, twin_response_topic, sizeof(twin_response_topic), NULL))
-      != AZ_OK)
-  {
-    printf("Failed to get twin response topic filter, return code %d\n", rc);
-    return rc;
-  }
-
-  if ((rc = MQTTClient_subscribe(mqtt_client, twin_desired_topic, 1)) != MQTTCLIENT_SUCCESS)
+  if ((rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_HUB_CLIENT_TWIN_PATCH_SUBSCRIBE_TOPIC, 1))
+      != MQTTCLIENT_SUCCESS)
   {
     printf("Failed to subscribe to twin patch topic filter, return code %d\n", rc);
     return rc;
   }
 
-  if ((rc = MQTTClient_subscribe(mqtt_client, twin_response_topic, 1)) != MQTTCLIENT_SUCCESS)
+  if ((rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_SUBSCRIBE_TOPIC, 1))
+      != MQTTCLIENT_SUCCESS)
   {
     printf("Failed to subscribe to twin response topic filter, return code %d\n", rc);
     return rc;
