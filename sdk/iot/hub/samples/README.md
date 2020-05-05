@@ -24,31 +24,23 @@ This document describes how to use samples and what is done in each sample.
 ## Getting started
 
 These samples use X509 authentication to connect to IoT Hub. To easily run these samples, we have provided
-two scripts: one to generate the root cert and device cert used to connect, and the other to generate the
-validation cert which IoT Hub uses to certify you are the owner of the root cert. The following details how
-to use these scripts.
+a script to generate a self-signed device certificate used for device authentication. You can run it using the following
+steps.
 
-### `generate_certificate.sh`
-1. Create a device in IoT Hub with `X.509 CA Signed` authentication.
 1. Run the script using the following form:
-```bash
-./generate_certificate <device_id>
-```
-where you substitute you own device_id for `<device_id>`.
+    ```bash
+    ./generate_certificate.sh
+    ```
+1. Take note of the certificate fingerprint printed at the end of the output.
+1. Create a device in IoT Hub with `X.509 Self-Signed` authentication.
+1. Paste in the certificate fingerprint printed previously. You MUST remove the colons from the fingerprint hash
+before pasting into IoT Hub.
+
 
 After this is generated, the environment variable `AZ_IOT_DEVICE_X509_CERT_PEM_FILE` will be set for you
 and is ready to use in the samples.
 
-### `generate_validation.sh`
-IoT Hub has a validation step to ensure you own the CA cert. Once you acquire the validation code in the IoT
-Hub portal, you can use this script with the following form:
-```bash
-./generate_validation.sh <VALIDATION_KEY>
-```
-where you substitute the validation key in for `<VALIDATION_KEY>`. The validation cert will be output with the
-name `validation_ec_cert.pem` and you can upload that for the validation step.
-
-For more details on validating hub certs, refer to [this online documentation](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-x509ca-overview#how-to-register-the-x509-ca-certificate-to-iot-hub)
+For more details on X509 authentication, refer to [this online documentation](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-x509ca-overview#how-to-register-the-x509-ca-certificate-to-iot-hub)
 
 ***NOTE: THESE ARE TO BE USED FOR SAMPLE USE ONLY. DO NOT USE THEM IN PRODUCTION***
 
