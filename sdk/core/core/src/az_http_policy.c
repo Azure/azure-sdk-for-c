@@ -1,7 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include "az_http_header_validation_private.h"
 #include "az_http_policy_private.h"
+
 #include "az_http_private.h"
 #include <az_credentials.h>
 #include <az_http.h>
@@ -75,6 +77,34 @@ AZ_NODISCARD az_result az_http_pipeline_policy_credential(
     AZ_RETURN_IF_FAILED(_az_apply_credential((_az_credential*)p_data, p_request));
   }
   return az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
+}
+
+AZ_NODISCARD az_result az_http_pipeline_policy_header_validation(
+    _az_http_policy* p_policies,
+    void* p_data,
+    _az_http_request* p_request,
+    az_http_response* p_response)
+{
+  (void)p_data;
+  az_result call_next_policy_result
+      = az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
+
+  // Validate headers on response
+  // 1. parse status line to have access to headers
+  az_http_response_status_line status = { 0 };
+  AZ_RETURN_IF_FAILED(az_http_response_get_status_line(p_response, &status));
+
+  // loop headers and validate
+  for (az_pair header;
+       az_http_response_get_next_header(p_response, &header) != AZ_ERROR_ITEM_NOT_FOUND;)
+  {
+    if (!az_http_is_valid_header_name(header.key))
+    {
+      return AZ_ERROR_HTTP_RESPONSE_CONTAINS_INVALID_HEADERS;
+    }
+  }
+
+  return call_next_policy_result;
 }
 
 AZ_NODISCARD az_result az_http_pipeline_policy_transport(

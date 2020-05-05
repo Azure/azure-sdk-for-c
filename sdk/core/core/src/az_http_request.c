@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include "az_http_header_validation_private.h"
 #include "az_http_private.h"
 #include "az_span_private.h"
 
@@ -153,8 +154,14 @@ az_http_request_append_header(_az_http_request* p_request, az_span key, az_span 
   value = _az_span_trim_white_space(value);
 
   _az_PRECONDITION_VALID_SPAN(key, 1, false);
-  az_span headers = p_request->_internal.headers;
 
+  // validate header name contains only valid chars
+  if (!az_http_is_valid_header_name(key))
+  {
+    return AZ_ERROR_ARG;
+  }
+
+  az_span headers = p_request->_internal.headers;
   az_pair header_to_append = az_pair_init(key, value);
 
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(headers, (int32_t)sizeof header_to_append);
