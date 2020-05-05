@@ -190,19 +190,62 @@ make
 
 ### Compiler Options
 
-By default, when building project with no options, next static libraries are generated
+By default, when building project with no options, next static libraries are generated:
 
 - ``Libraries``:
   - az_core
+    - az_span, az_http, az_json, etc.
   - az_iot
-  - az_keyvault
+    -  iot_provisioning, iot_hub, etc.
   - az_storage_blobs
-- ``Platform Abstraction Layer``: Default empty implementation for platform functions like time and http stack. This default implementation is used to compile only but will return ERROR NOT IMPLEMENTED when running it.
+    -  Storage SDK blobs client.
   - az_noplatform
+    - Library that provides a basic returning error for platform abstraction as AZ_NOT_IMPLEMENTED. This ensures project can be compiled without the need to provide any specific platform implementation. This is useful if you want to use az_core without platform specific functions likes Mutex or Time. 
   - az_nohttp
-  - az_posix (on Lin/Mac)
-  - az_win32 (on Windows)
-- ``Samples``: By default, samples are built using the default PAL (see [running samples section](#running-samples)). This means that running samples would throw errors like:
+    -  Library that provides a basic returning error when calling HTTP stack. Similar to az_noplatform, this library ensures project can be compiled without requiring any HTTP stack implementation. This us useful if you want to use az_core without az_http functionality.
+
+The next compiler options are available for adding/removing project features.
+
+<table>
+<tr>
+<td>Option</td>
+<td>Description</td>
+<td>Default Value</td>
+</tr>
+<tr>
+<td>UNIT_TESTING</td>
+<td>Generates Unit Test for compilation. When turning this option ON, cmocka is a required dependency for compilation.<br>After Compiling, use `ctest` to run Unit Test.</td>
+<td>OFF</td>
+</tr>
+<tr>
+<td>UNIT_TESTING_MOCK_ENABLED</td>
+<td>This option works only with GCC. It uses -ld option from linker to mock functions during unit test. This is used to test platform or HTTP functions by mocking the return values.</td>
+<td>OFF</td>
+</tr>
+<tr>
+<td>BUILD_PRECONDITIONS</td>
+<td>Turning this option ON would remove all method contracts. This us typically for shipping libraries for production to make it as much optimized as possible.</td>
+<td>ON</td>
+</tr>
+<tr>
+<td>BUILD_CURL_TRANSPORT</td>
+<td>This option requires Libcurl dependency to be available. It generates an HTTP stack with libcurl for az_http to be able to send requests thru the wire. This library would replace the no_http.</td>
+<td>OFF</td>
+</tr>
+<tr>
+<td>BUILD_PAHO_TRANSPORT</td>
+<td>This option requires paho-mqtt dependency to be available. Provides Paho MQTT support for iot.</td>
+<td>OFF</td>
+</tr>
+<tr>
+<td>AZ_PLATFORM_IMPL</td>
+<td>This option can be set to any of the next values:<br>- No_value: default value is used and no_platform library is used.<br>- "POSIX": Provides implementation for Linux and Mac systems.<br>- "WIN32": Provides platform implementation for Windows based system<br>- "USER": Tells cmake to use an specific implementation provided by user. When setting this option, user must provide an implementation library and set option `AZ_USER_PLATFORM_IMPL_NAME` with the name of the library (i.e. <code>-DAZ_PLATFORM_IMPL=USER -DAZ_USER_PLATFORM_IMPL_NAME=user_platform_lib</code>). cmake will look for this library to link az_core</td>
+<td>No_value</td>
+</tr>
+</table>
+
+
+- ``Samples``: Whenever UNIT_TESTING is ON, samples are built using the default PAL (see [running samples section](#running-samples)). This means that running samples would throw errors like:
 
 ```bash
 ./keys_client_example
@@ -212,17 +255,13 @@ Recompile az_core with an HTTP client implementation like CURL to see sample sen
 i.e. cmake -DBUILD_CURL_TRANSPORT=ON ..
 ```
 
-When running cmake, next options can be used to change the output libraries/Pal/Samples:
+## Running Tests and Samples
 
-- `BUILD_CURL_TRANSPORT`: This option would build an HTTP transport library using CURL. It requires libcurl to be installed (vcpkg or globally). This option will make samples to be linked with this HTTP and be functional to send HTTP requests.
+### Unit tests
 
-```bash
-cmake -DBUILD_CURL_TRANSPORT=ON ..
-cmake --build .
-```
+See [compiler options section](#compiler-options) to learn about how to build and run unit tests.
 
-- `UNIT_TESTING`: This option requires cmocka to be installed and it will generate unit tests for each project.
-
+After compiling project with unit test enabled, run tests with:
 ```bash
 cmake -DUNIT_TESTING=ON ..
 cmake --build .
@@ -231,11 +270,6 @@ cmake --build .
 ctest -V
 ```
 
-## Running Tests and Samples
-
-### Unit tests
-
-See [compiler options section](#compiler-options) to learn about how to build and run unit tests.
 
 ### Test with mocked functions
 
@@ -253,17 +287,20 @@ cmake -DUNIT_TESTING=ON -DUNIT_TESTING_MOCK_ENABLED=ON ..
 
 See [compiler options section](#compiler-options) to learn about how to build samples with HTTP implementation in order to be runnable.
 
-After building samples with HTTP stack, set next environment variables to set log in credentials. Samples will read these values from env and use it to log in to Azure Service like Storage or KeyVault. Learn about the supported authentication [client secret here](https://docs.microsoft.com/en-us/azure/active-directory/azuread-dev/v1-oauth2-on-behalf-of-flow#service-to-service-access-token-request).
+After building samples with HTTP stack, set next environment variables for enabling credentials. Samples will read these values from env and use it to log in to Azure Service like Storage or KeyVault. Learn about the supported authentication [client secret here](https://docs.microsoft.com/en-us/azure/active-directory/azuread-dev/v1-oauth2-on-behalf-of-flow#service-to-service-access-token-request).
 
 ```bash
 # On linux, set env var like this. For Windows, do it from advanced settings/ env variables
 
-# replace question marks for your id
-export tenant_id=????????-????-????-????-????????????
-export client_id=????????-????-????-????-????????????
-export client_secret=????????????
-# set uri depending on Azure Service
-export test_uri=https://????.????.azure.net
+# KEY-VAULT Sample
+export AZURE_TENANT_ID="????????-????-????-????-????????????"
+export AZURE_CLIENT_ID="????????-????-????-????-????????????"
+export AZURE_CLIENT_SECRET="????????????"
+export AZURE_KEYVAULT_URL="https://????.????.azure.net"
+
+# STORAGE Sample (only 1 env var required)
+# URL must contain a valid container, blob and SaS token
+export AZURE_STORAGE_URL="https://storageAccount.blob.core.windows.net/container/blob?sv=xxx&ss=xx&srt=xx&sp=xx&se=xx&st=xxx&spr=https,http&sig=xxx"
 ```
 
 ## Build Docs
