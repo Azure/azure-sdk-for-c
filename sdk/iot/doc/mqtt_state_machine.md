@@ -85,7 +85,8 @@ Each service requiring a subscription implements a function similar to the follo
 _Example:_
 
 ```C
-)
+// AZ_IOT_HUB_CLIENT_METHODS_SUBSCRIBE_TOPIC contains the methods topic filter.
+MQTTClient_subscribe(mqtt_client, AZ_IOT_HUB_CLIENT_METHODS_SUBSCRIBE_TOPIC, 1);
 ```
 
 __Note:__ If the MQTT stack allows, it is recommended to subscribe prior to connecting.
@@ -98,8 +99,10 @@ The application is responsible for filling in the MQTT payload with the format e
 _Example:_
 
 ```C
-// AZ_IOT_HUB_CLIENT_METHODS_SUBSCRIBE_TOPIC contains the methods topic filter.
-MQTTClient_subscribe(mqtt_client, AZ_IOT_HUB_CLIENT_METHODS_SUBSCRIBE_TOPIC, 1);
+if(az_failed(az_iot_hub_client_telemetry_get_publish_topic(client, NULL, topic, topic_size, NULL)))
+{
+    // error.
+}
 ```
 
 __Note:__ To limit overheads, when publishing, it is recommended to serialize as many MQTT messages within the same TLS record. This feature may not be available on all MQTT/TLS/Sockets stacks.
