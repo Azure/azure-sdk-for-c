@@ -210,34 +210,6 @@ static void test_http_request(void** state)
   }
 }
 
-static void test_http_request_header_validation_above_127(void** state)
-{
-  (void)state;
-  {
-    uint8_t header_buf[(2 * sizeof(az_pair))];
-    memset(header_buf, 0, sizeof(header_buf));
-
-    az_span url_span = AZ_SPAN_FROM_STR("some.url.com");
-    az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-    _az_http_request hrb;
-
-    TEST_EXPECT_SUCCESS(az_http_request_init(
-        &hrb,
-        &az_context_app,
-        az_http_method_get(),
-        url_span,
-        az_span_size(url_span),
-        header_span,
-        AZ_SPAN_FROM_STR("body")));
-
-    uint8_t c[1] = { 255 };
-    az_span header_name = AZ_SPAN_FROM_BUFFER(c);
-    az_result r = az_http_request_append_header(&hrb, header_name, hrb_header_content_type_token);
-
-    assert_true(r = AZ_ERROR_ARG);
-  }
-}
-
 #define EXAMPLE_BODY \
   "{\r\n" \
   "  \"somejson\":45\r" \
@@ -405,10 +377,35 @@ static void test_http_request_header_validation(void** state)
         header_span,
         AZ_SPAN_FROM_STR("body")));
 
-    az_result r = az_http_request_append_header(
-        &hrb, AZ_SPAN_FROM_STR("(headerName)"), hrb_header_content_type_token);
+    assert_precondition_checked(az_http_request_append_header(
+        &hrb, AZ_SPAN_FROM_STR("(headerName)"), hrb_header_content_type_token));
+  }
+}
 
-    assert_true(r = AZ_ERROR_ARG);
+static void test_http_request_header_validation_above_127(void** state)
+{
+  (void)state;
+  {
+    uint8_t header_buf[(2 * sizeof(az_pair))];
+    memset(header_buf, 0, sizeof(header_buf));
+
+    az_span url_span = AZ_SPAN_FROM_STR("some.url.com");
+    az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
+    _az_http_request hrb;
+
+    TEST_EXPECT_SUCCESS(az_http_request_init(
+        &hrb,
+        &az_context_app,
+        az_http_method_get(),
+        url_span,
+        az_span_size(url_span),
+        header_span,
+        AZ_SPAN_FROM_STR("body")));
+
+    uint8_t c[1] = { 255 };
+    az_span header_name = AZ_SPAN_FROM_BUFFER(c);
+    assert_precondition_checked(
+        az_http_request_append_header(&hrb, header_name, hrb_header_content_type_token));
   }
 }
 
@@ -424,10 +421,10 @@ int test_az_http()
 #ifndef AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_http_request_removing_left_white_spaces),
     cmocka_unit_test(test_http_request_header_validation),
+    cmocka_unit_test(test_http_request_header_validation_above_127),
 #endif // AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_http_request),
     cmocka_unit_test(test_http_response),
-    cmocka_unit_test(test_http_request_header_validation_above_127),
   };
   return cmocka_run_group_tests_name("az_core_http", tests, NULL, NULL);
 }
