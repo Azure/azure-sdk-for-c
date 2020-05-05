@@ -2,8 +2,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # SPDX-License-Identifier: MIT
 
-echo "Generating DEMO User Device Cert"
-echo "DO NOT USE THIS IN PRODUCTION"
 openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
 openssl req -new -days 365 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=paho-sample-device1"
 openssl x509 -noout -text -in device_ec_cert.pem
