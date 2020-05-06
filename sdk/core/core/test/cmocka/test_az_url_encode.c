@@ -365,9 +365,9 @@ static void test_url_encode_full(void** state)
   (void)state;
 
   uint8_t values256[256] = { 0 };
-  for (int i = 0; i < _az_COUNTOF(buf); ++i)
+  for (int i = 0; i < _az_COUNTOF(values256); ++i)
   {
-    buf[i] = (uint8_t)i;
+    values256[i] = (uint8_t)i;
   }
 
   uint8_t buf[256 * 3] = { 0 };
