@@ -121,7 +121,11 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_document_get_publish_topic(
   remainder = az_span_copy_u8(remainder, az_iot_hub_client_twin_question);
   remainder = az_span_copy(remainder, az_iot_hub_client_request_id_span);
   remainder = az_span_copy_u8(remainder, az_iot_hub_client_twin_equals);
-  AZ_RETURN_IF_FAILED(az_span_u32toa(remainder, request_id, &remainder));
+
+  // Ignore the result value since we have checked that there is enough space
+  az_result unused = az_span_u32toa(remainder, request_id, &remainder);
+  (void)unused;
+
   az_span_copy_u8(remainder, null_terminator);
 
   if (out_mqtt_topic_length)
@@ -158,7 +162,11 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_patch_get_publish_topic(
   remainder = az_span_copy_u8(remainder, az_iot_hub_client_twin_question);
   remainder = az_span_copy(remainder, az_iot_hub_client_request_id_span);
   remainder = az_span_copy_u8(remainder, az_iot_hub_client_twin_equals);
-  AZ_RETURN_IF_FAILED(az_span_u32toa(remainder, request_id, &remainder));
+
+  // Ignore the result value since we have checked that there is enough space
+  az_result unused = az_span_u32toa(remainder, request_id, &remainder);
+  (void)unused;
+
   az_span_copy_u8(remainder, null_terminator);
 
   if (out_mqtt_topic_length)

@@ -128,14 +128,17 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_response_get_publish_topic(
 
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_topic_span, required_length + (int32_t)sizeof(null_terminator));
 
+  // Ignore the result value since we have checked that there is enough space
+  az_result unused;
+
   az_span remainder = az_span_copy(mqtt_topic_span, methods_topic_prefix);
   remainder = az_span_copy(remainder, methods_response_topic_result);
-
-  AZ_RETURN_IF_FAILED(az_span_u32toa(remainder, (uint32_t)status, &remainder));
-
+  unused = az_span_u32toa(remainder, (uint32_t)status, &remainder);
   remainder = az_span_copy(remainder, methods_response_topic_properties);
-  AZ_RETURN_IF_FAILED(az_span_u32toa(remainder, request_id, &remainder));
+  unused = az_span_u32toa(remainder, request_id, &remainder);
   az_span_copy_u8(remainder, null_terminator);
+
+  (void)unused;
 
   if (out_mqtt_topic_length)
   {
