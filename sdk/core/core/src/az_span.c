@@ -714,6 +714,8 @@ AZ_NODISCARD az_result _az_span_url_encode(az_span destination, az_span source, 
   int32_t const source_size = az_span_size(source);
   _az_PRECONDITION_VALID_SPAN(destination, source_size, false);
 
+  _az_PRECONDITION_NO_OVERLAP_SPANS(destination, source);
+
   if (source_size == 0)
   {
     *out_length = 0;
@@ -739,7 +741,8 @@ AZ_NODISCARD az_result _az_span_url_encode(az_span destination, az_span source, 
   if (extra_space_have >= source_size)
   {
     // We know that there's enough space even if every character gets encoded.
-    for (int32_t src_idx = 0; src_idx < source_size; ++src_idx)
+    int32_t src_idx = 0;
+    do
     {
       uint8_t c = src_ptr[src_idx];
       if (!_az_span_url_should_encode(c))
@@ -754,13 +757,16 @@ AZ_NODISCARD az_result _az_span_url_encode(az_span destination, az_span source, 
         dest_ptr[2] = _az_number_to_upper_hex(c & 0x0F);
         dest_ptr += 3;
       }
-    }
+
+      ++src_idx;
+    } while (src_idx < source_size);
   }
   else
   {
     // We may or may not have enough space, given whether the input needs much encoding or not.
     int32_t extra_space_used = 0;
-    for (int32_t src_idx = 0; src_idx < source_size; ++src_idx)
+    int32_t src_idx = 0;
+    do
     {
       uint8_t c = src_ptr[src_idx];
       if (!_az_span_url_should_encode(c))
@@ -782,7 +788,9 @@ AZ_NODISCARD az_result _az_span_url_encode(az_span destination, az_span source, 
         dest_ptr[2] = _az_number_to_upper_hex(c & 0x0F);
         dest_ptr += 3;
       }
-    }
+
+      ++src_idx;
+    } while (src_idx < source_size);
   }
 
   *out_length = (int32_t)(dest_ptr - dest_begin);

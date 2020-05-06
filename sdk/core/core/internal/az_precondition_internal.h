@@ -106,6 +106,16 @@ AZ_NODISCARD AZ_INLINE bool _az_span_is_valid(az_span span, int32_t min_size, bo
 #define _az_PRECONDITION_VALID_SPAN(span, min_size, null_is_valid) \
   _az_PRECONDITION(_az_span_is_valid(span, min_size, null_is_valid))
 
+AZ_NODISCARD AZ_INLINE bool _az_span_overlap(az_span a, az_span b)
+{
+  uint8_t* const a_ptr = az_span_ptr(a);
+  uint8_t* const b_ptr = az_span_ptr(b);
+
+  return a_ptr <= b_ptr ? (a_ptr + az_span_size(a) > b_ptr) : (b_ptr + az_span_size(b) > a_ptr);
+}
+
+#define _az_PRECONDITION_NO_OVERLAP_SPANS(a, b) _az_PRECONDITION(!_az_span_overlap(a, b))
+
 #include <_az_cfg_suffix.h>
 
 #endif // _az_PRECONDITION_INTERNAL_H
