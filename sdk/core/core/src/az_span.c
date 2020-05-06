@@ -729,7 +729,7 @@ AZ_NODISCARD az_result _az_span_url_encode(az_span destination, az_span source, 
     return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
   }
 
-  // "Extra space" is measured in units of 2 additional chracters
+  // "Extra space" is measured in units of 2 additional characters
   // per single source character ('/' => "%2F").
   int32_t const extra_space_have = (destination_size - source_size) / 2;
 

@@ -229,7 +229,7 @@ static void test_url_encode_preconditions(void** state)
       assert_true(az_span_is_content_equal(buffer5, AZ_SPAN_FROM_STR("*****")));
     }
     {
-      // Inut is empty, so the output is also empty BUT the output span is null.
+      // Ipnut is empty, so the output is also empty BUT the output span is null.
       int32_t url_length = 0xFF;
       assert_true(az_succeeded(_az_span_url_encode(AZ_SPAN_NULL, AZ_SPAN_NULL, &url_length)));
       assert_int_equal(url_length, 0);
@@ -289,7 +289,7 @@ static void test_url_encode_preconditions(void** state)
     }
 
     {
-      // Inut is empty, so the output is also empty BUT the output span is null.
+      // Input is empty, so the output is also empty BUT the output span is null.
       int32_t url_length = 0xFF;
       ASSERT_PRECONDITION_CHECKED(_az_span_url_encode(AZ_SPAN_NULL, AZ_SPAN_NULL, &url_length));
       assert_int_equal(url_length, 0xFF);
@@ -382,13 +382,13 @@ static void test_url_encode_full(void** state)
   assert_true(
       az_succeeded(_az_span_url_encode(buffer, AZ_SPAN_FROM_BUFFER(values256), &url_length)));
 
-  int const nunreserved = sizeof("-_.~"
-                                 "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                 "abcdefghijklmnopqrstuvwxyz"
-                                 "0123456789")
+  int const unreserved = sizeof("-_.~"
+                                "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                "abcdefghijklmnopqrstuvwxyz"
+                                "0123456789")
       - 1;
 
-  assert_int_equal(url_length, nunreserved + (256 - nunreserved) * 3);
+  assert_int_equal(url_length, unreserved + (256 - unreserved) * 3);
 
   assert_true(az_span_is_content_equal(
       buffer,

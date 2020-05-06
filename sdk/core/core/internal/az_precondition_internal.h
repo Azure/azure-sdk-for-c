@@ -80,6 +80,10 @@ AZ_NODISCARD AZ_INLINE bool _az_span_is_valid(az_span span, int32_t min_size, bo
         - In the case of the pointer not being NULL, the size is greater than or equal to zero.
   */
 
+  // On some platforms, in some cpmpilation configurations (Debug), NULL is not 0x0...0. But if you
+  // initialize a span with { 0 } (or if that span is a part of a structure that is initialized with
+  // { 0 }) the ptr is not going to be equal to NULL, however the intent of the precondition is to
+  // disallow default-initialized and null ptrs, so we should treat them the same.
   uint8_t* const default_init_ptr = az_span_ptr((az_span){ 0 });
   if (null_is_valid)
   {
@@ -90,11 +94,6 @@ AZ_NODISCARD AZ_INLINE bool _az_span_is_valid(az_span span, int32_t min_size, bo
     result = (ptr != NULL && ptr != default_init_ptr) && span_size >= 0;
   }
 
-  if (!result)
-  {
-    return false;
-  }
-
   // Can't wrap over the end of the address space.
   // The biggest theoretical pointer value is "(void*)~0" (0xFFFF...), which is the end of address
   // space. We don't attempt to read/write beyond the end of the address space - it is unlikely a
@@ -103,12 +102,9 @@ AZ_NODISCARD AZ_INLINE bool _az_span_is_valid(az_span span, int32_t min_size, bo
   // Example: (az_span) { .ptr = (uint8_t*)(~0 - 5), .size = 10 } is not a valid span, because most
   // likely you end up pointing to 0x0000 at .ptr[6], &.ptr[7] is 0x...0001, etc.
   uint8_t* const max_ptr = (uint8_t*)~0;
-  if ((size_t)span_size > (size_t)(max_ptr - ptr))
-  {
-    return false;
-  }
+  result &= ((size_t)span_size > (size_t)(max_ptr - ptr));
 
-  return min_size <= span_size;
+  return result && min_size <= span_size;
 }
 
 #define _az_PRECONDITION_VALID_SPAN(span, min_size, null_is_valid) \
