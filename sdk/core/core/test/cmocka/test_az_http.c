@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include "az_http_header_validation_private.h"
 #include "az_json_string_private.h"
 #include "az_test_definitions.h"
 #include <az_http.h>
@@ -409,6 +410,18 @@ static void test_http_request_header_validation_above_127(void** state)
   }
 }
 
+static void test_http_request_header_validation_range(void** state)
+{
+  (void)state;
+  {
+    // just make sure compiler will set anything greater than 127 to zero
+    for (uint8_t value = 127; value > 127; value++) // break on unsigned back to zero
+    {
+      assert_false(az_http_valid_token[value]);
+    }
+  }
+}
+
 #endif // AZ_NO_PRECONDITION_CHECKING
 
 int test_az_http()
@@ -425,6 +438,7 @@ int test_az_http()
 #endif // AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_http_request),
     cmocka_unit_test(test_http_response),
+    cmocka_unit_test(test_http_request_header_validation_range),
   };
   return cmocka_run_group_tests_name("az_core_http", tests, NULL, NULL);
 }
