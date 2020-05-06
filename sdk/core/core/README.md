@@ -153,8 +153,18 @@ Note however that cancellation is performed as a best effort; it is not guarante
    az_context_cancel(&az_context_app);
    // All children are now in the canceled state & the threads will start unwinding
    ```
+
+## Contributing
+
+If you'd like to contribute to this library, please read the [contributing guide][azure_sdk_for_c_contributing] to learn more about how to build and test the code.
+
+### License
+
+Azure SDK for Embedded C is licensed under the [MIT][azure_sdk_for_c_license] license.
+
 <!-- LINKS -->
 [azure_sdk_for_c_contributing]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md
+[azure_sdk_for_c_license]: https://github.com/Azure/azure-sdk-for-c/blob/master/LICENSE
 [azure_sdk_for_c_contributing_developer_guide]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md#developer-guide
 [azure_sdk_for_c_contributing_pull_requests]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md#pull-requests
 [azure_cli]: https://docs.microsoft.com/cli/azure
