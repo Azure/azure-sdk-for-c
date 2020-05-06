@@ -34,10 +34,10 @@
 
 #include <az_precondition.h>
 
+#include <az_span.h>
+
 #include <stdbool.h>
 #include <stddef.h>
-
-#include <az_span.h>
 
 #include <_az_cfg_prefix.h>
 
@@ -91,13 +91,16 @@ AZ_NODISCARD AZ_INLINE bool _az_span_is_valid(az_span span, int32_t min_size, bo
         - If null_is_valid is true and the pointer in the span is null, the size must also be 0.
         - In the case of the pointer not being NULL, the size is greater than or equal to zero.
   */
+
+  uint8_t* const default_init_ptr = az_span_ptr((az_span){ 0 });
+
   if (null_is_valid)
   {
-    result = ptr == NULL ? span_size == 0 : span_size >= 0;
+    result = (ptr == NULL || ptr == default_init_ptr) ? span_size == 0 : span_size >= 0;
   }
   else
   {
-    result = ptr != NULL && span_size >= 0;
+    result = (ptr != NULL || ptr == default_init_ptr) && span_size >= 0;
   }
 
   return result && min_size <= span_size;
