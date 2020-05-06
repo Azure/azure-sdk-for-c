@@ -74,7 +74,7 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_parse_received_topic(
     return AZ_ERROR_IOT_TOPIC_NO_MATCH;
   }
 
-  az_log_write(AZ_LOG_MQTT_RECEIVED_TOPIC, received_topic);
+  _az_log_write(AZ_LOG_MQTT_RECEIVED_TOPIC, received_topic);
 
   received_topic = az_span_slice(
       received_topic, index + az_span_size(methods_topic_prefix), az_span_size(received_topic));
