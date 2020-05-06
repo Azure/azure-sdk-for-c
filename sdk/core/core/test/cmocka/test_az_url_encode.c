@@ -21,7 +21,11 @@ static void test_url_encode_basic(void** state)
   (void)state;
   {
     // Empty (null) input span, empty non-null output span.
-    uint8_t buf20[20] = "********************";
+    uint8_t buf20[20] = {
+      '*', '*', '*', '*', '*', '*', '*', '*', '*', '*',
+      '*', '*', '*', '*', '*', '*', '*', '*', '*', '*',
+    };
+
     az_span const buffer0 = az_span_slice(AZ_SPAN_FROM_BUFFER(buf20), 0, 0);
 
     int32_t url_length = 0xFF;
@@ -32,10 +36,14 @@ static void test_url_encode_basic(void** state)
   }
   {
     // Empty (non-null) input span, empty non-null output span.
-    uint8_t buf20[20] = "********************";
+    uint8_t buf20[20] = {
+      '*', '*', '*', '*', '*', '*', '*', '*', '*', '*',
+      '*', '*', '*', '*', '*', '*', '*', '*', '*', '*',
+    };
+
     az_span const buffer0 = az_span_slice(AZ_SPAN_FROM_BUFFER(buf20), 0, 0);
 
-    uint8_t buf1[1] = { "A" };
+    uint8_t buf1[1] = { 'A' };
     az_span const buffer0input = az_span_slice(AZ_SPAN_FROM_BUFFER(buf1), 0, 0);
 
     int32_t url_length = 0xFF;
@@ -46,7 +54,11 @@ static void test_url_encode_basic(void** state)
   }
   {
     // Just enough to succeed, but not percent-encode.
-    uint8_t buf20[20] = "********************";
+    uint8_t buf20[20] = {
+      '*', '*', '*', '*', '*', '*', '*', '*', '*', '*',
+      '*', '*', '*', '*', '*', '*', '*', '*', '*', '*',
+    };
+
     az_span const buffer5 = az_span_slice(AZ_SPAN_FROM_BUFFER(buf20), 0, 5);
 
     int32_t url_length = 0xFF;
@@ -58,7 +70,11 @@ static void test_url_encode_basic(void** state)
   }
   {
     // Percent-encode single character.
-    uint8_t buf20[20] = "********************";
+    uint8_t buf20[20] = {
+      '*', '*', '*', '*', '*', '*', '*', '*', '*', '*',
+      '*', '*', '*', '*', '*', '*', '*', '*', '*', '*',
+    };
+
     az_span const buffer7 = az_span_slice(AZ_SPAN_FROM_BUFFER(buf20), 0, 7);
 
     int32_t url_length = 0xFF;
@@ -70,7 +86,11 @@ static void test_url_encode_basic(void** state)
   }
   {
     // Could've been enough space to encode, but the character needs percent-encoding.
-    uint8_t buf20[20] = "********************";
+    uint8_t buf20[20] = {
+      '*', '*', '*', '*', '*', '*', '*', '*', '*', '*',
+      '*', '*', '*', '*', '*', '*', '*', '*', '*', '*',
+    };
+
     az_span const buffer2 = az_span_slice(AZ_SPAN_FROM_BUFFER(buf20), 0, 9);
 
     int32_t url_length = 0xFF;
@@ -84,7 +104,11 @@ static void test_url_encode_basic(void** state)
   }
   {
     // Single character needs encoding, and there's enough space.
-    uint8_t buf20[20] = "********************";
+    uint8_t buf20[20] = {
+      '*', '*', '*', '*', '*', '*', '*', '*', '*', '*',
+      '*', '*', '*', '*', '*', '*', '*', '*', '*', '*',
+    };
+
     az_span const buffer3 = az_span_slice(AZ_SPAN_FROM_BUFFER(buf20), 0, 3);
 
     int32_t url_length = 0xFF;
@@ -96,7 +120,11 @@ static void test_url_encode_basic(void** state)
   }
   {
     // Enough space to encode 3 characters, regardless of input.
-    uint8_t buf20[20] = "********************";
+    uint8_t buf20[20] = {
+      '*', '*', '*', '*', '*', '*', '*', '*', '*', '*',
+      '*', '*', '*', '*', '*', '*', '*', '*', '*', '*',
+    };
+
     az_span const buffer9 = az_span_slice(AZ_SPAN_FROM_BUFFER(buf20), 0, 9);
 
     int32_t url_length = 0xFF;
@@ -108,7 +136,11 @@ static void test_url_encode_basic(void** state)
   }
   {
     // More than enough space to encode 3 characters, regardless of input.
-    uint8_t buf20[20] = "********************";
+    uint8_t buf20[20] = {
+      '*', '*', '*', '*', '*', '*', '*', '*', '*', '*',
+      '*', '*', '*', '*', '*', '*', '*', '*', '*', '*',
+    };
+
     az_span const buffer11 = az_span_slice(AZ_SPAN_FROM_BUFFER(buf20), 0, 11);
 
     int32_t url_length = 0xFF;
@@ -120,7 +152,11 @@ static void test_url_encode_basic(void** state)
   }
   {
     // Could've been enough space to encode 3 characters, but there's only space for two.
-    uint8_t buf20[20] = "********************";
+    uint8_t buf20[20] = {
+      '*', '*', '*', '*', '*', '*', '*', '*', '*', '*',
+      '*', '*', '*', '*', '*', '*', '*', '*', '*', '*',
+    };
+
     az_span const buffer10 = az_span_slice(AZ_SPAN_FROM_BUFFER(buf20), 0, 11);
 
     int32_t url_length = 0xFF;
@@ -135,7 +171,11 @@ static void test_url_encode_basic(void** state)
   {
     // Could've been enough space to encode 3 characters, but there's only space for two
     // Slightly bigger buffer, still not big enough.
-    uint8_t buf20[20] = "********************";
+    uint8_t buf20[20] = {
+      '*', '*', '*', '*', '*', '*', '*', '*', '*', '*',
+      '*', '*', '*', '*', '*', '*', '*', '*', '*', '*',
+    };
+
     az_span const buffer11 = az_span_slice(AZ_SPAN_FROM_BUFFER(buf20), 0, 11);
 
     int32_t url_length = 0xFF;
@@ -149,7 +189,11 @@ static void test_url_encode_basic(void** state)
   }
   {
     // Could've been enough space to encode 3 characters, and there's just enough space.
-    uint8_t buf20[20] = "********************";
+    uint8_t buf20[20] = {
+      '*', '*', '*', '*', '*', '*', '*', '*', '*', '*',
+      '*', '*', '*', '*', '*', '*', '*', '*', '*', '*',
+    };
+
     az_span const buffer12 = az_span_slice(AZ_SPAN_FROM_BUFFER(buf20), 0, 11);
 
     int32_t url_length = 0xFF;
@@ -173,7 +217,7 @@ static void test_url_encode_preconditions(void** state)
   {
     {
       // URL encode could never succeed.
-      uint8_t buf5[5] = "*****";
+      uint8_t buf5[5] = = { '*', '*', '*', '*', '*' };
       az_span const buffer5 = AZ_SPAN_FROM_BUFFER(buf5);
 
       int32_t url_length = 0xFF;
@@ -190,9 +234,8 @@ static void test_url_encode_preconditions(void** state)
       assert_true(az_succeeded(_az_span_url_encode(AZ_SPAN_NULL, AZ_SPAN_NULL, &url_length)));
       assert_int_equal(url_length, 0);
     }
-    {
-      // Overlapping buffers, same pointer.
-      uint8_t buf[13] = "aBc**********";
+    { // Overlapping buffers, same pointer.
+      uint8_t buf[13] = { 'a', 'B', 'c', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*' };
       az_span const in_buffer = az_span_slice(AZ_SPAN_FROM_BUFFER(buf), 0, 3);
       az_span const out_buffer = az_span_slice(AZ_SPAN_FROM_BUFFER(buf), 0, 3);
 
@@ -204,7 +247,8 @@ static void test_url_encode_preconditions(void** state)
     }
     {
       // Overlapping buffers, different pointers.
-      uint8_t buf[13] = "aBc///*******";
+      uint8_t buf[13] = { 'a', 'B', 'c', '/', '/', '/', '*', '*', '*', '*', '*', '*', '*' };
+
       az_span const in_buffer = az_span_slice(AZ_SPAN_FROM_BUFFER(buf), 0, 6);
       az_span const out_buffer = az_span_slice(AZ_SPAN_FROM_BUFFER(buf), 1, 13);
 
@@ -216,7 +260,7 @@ static void test_url_encode_preconditions(void** state)
     }
     {
       // Overlapping buffers, writing before reading.
-      uint8_t buf[12] = "////********";
+      uint8_t buf[12] = { '/', '/', '/', '/', '*', '*', '*', '*', '*', '*', '*', '*' };
       az_span const in_buffer = az_span_slice(AZ_SPAN_FROM_BUFFER(buf), 0, 4);
       az_span const out_buffer = az_span_slice(AZ_SPAN_FROM_BUFFER(buf), 0, 12);
 
@@ -233,7 +277,7 @@ static void test_url_encode_preconditions(void** state)
 
     {
       // URL encode could never succeed.
-      uint8_t buf5[5] = "*****";
+      uint8_t buf5[5] = { '*', '*', '*', '*', '*' };
       az_span const buffer5 = AZ_SPAN_FROM_BUFFER(buf5);
 
       int32_t url_length = 0xFF;
@@ -252,7 +296,7 @@ static void test_url_encode_preconditions(void** state)
     }
     {
       // Overlapping buffers, same pointer.
-      uint8_t buf[13] = "aBc**********";
+      uint8_t buf[13] = { 'a', 'B', 'c', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*' };
       az_span const in_buffer = az_span_slice(AZ_SPAN_FROM_BUFFER(buf), 0, 3);
       az_span const out_buffer = az_span_slice(AZ_SPAN_FROM_BUFFER(buf), 0, 3);
 
@@ -264,7 +308,7 @@ static void test_url_encode_preconditions(void** state)
     }
     {
       // Overlapping buffers, different pointers.
-      uint8_t buf[13] = "aBc///*******";
+      uint8_t buf[13] = { 'a', 'B', 'c', '/', '/', '/', '*', '*', '*', '*', '*', '*', '*' };
       az_span const in_buffer = az_span_slice(AZ_SPAN_FROM_BUFFER(buf), 0, 6);
       az_span const out_buffer = az_span_slice(AZ_SPAN_FROM_BUFFER(buf), 1, 13);
 
@@ -276,7 +320,7 @@ static void test_url_encode_preconditions(void** state)
     }
     {
       // Overlapping buffers, writing before reading.
-      uint8_t buf[14] = "////**********";
+      uint8_t buf[14] = { '/', '/', '/', '/', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*' };
       az_span const in_buffer = az_span_slice(AZ_SPAN_FROM_BUFFER(buf), 0, 4);
       az_span const out_buffer = az_span_slice(AZ_SPAN_FROM_BUFFER(buf), 1, 14);
 
