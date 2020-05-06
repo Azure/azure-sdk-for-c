@@ -29,7 +29,7 @@ static AZ_NODISCARD az_result _az_valid_header_name_to_colon(az_span slice)
 
   if (!az_http_valid_token[az_span_ptr(slice)[0]])
   {
-    return AZ_ERROR_HTTP_RESPONSE_CONTAINS_INVALID_HEADERS;
+    return AZ_ERROR_HTTP_CORRUPT_RESPONSE_HEADER;
   }
 
   return is_colon_result;

@@ -484,7 +484,7 @@ static void test_http_response_header_validation_fail(void** state)
     assert_return_code(az_http_response_get_status_line(&response, &status_line), AZ_OK);
     az_pair header = { 0 };
     az_result fail_header_result = az_http_response_get_next_header(&response, &header);
-    assert_true(AZ_ERROR_HTTP_RESPONSE_CONTAINS_INVALID_HEADERS == fail_header_result);
+    assert_true(AZ_ERROR_HTTP_CORRUPT_RESPONSE_HEADER == fail_header_result);
   }
 }
 
