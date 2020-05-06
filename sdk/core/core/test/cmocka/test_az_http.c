@@ -422,6 +422,8 @@ static void test_http_request_header_validation_above_127(void** state)
   }
 }
 
+#endif // AZ_NO_PRECONDITION_CHECKING
+
 static void test_http_request_header_validation_range(void** state)
 {
   (void)state;
@@ -433,8 +435,6 @@ static void test_http_request_header_validation_range(void** state)
     }
   }
 }
-
-#endif // AZ_NO_PRECONDITION_CHECKING
 
 static void test_http_response_header_validation(void** state)
 {
