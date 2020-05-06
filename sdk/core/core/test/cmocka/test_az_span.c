@@ -770,12 +770,12 @@ static void test_az_span_is_valid(void** state)
     assert_true(memcmp(&span_zeroed, &span_null, sizeof(az_span)) == 0);
   }
 
-  assert_true(_az_span_is_valid({ 0 }, 0, true));
-  assert_false(_az_span_is_valid({ 0 }, 0, false));
-  assert_false(_az_span_is_valid({ 0 }, 1, true));
-  assert_false(_az_span_is_valid({ 0 }, 1, false));
-  assert_false(_az_span_is_valid({ 0 }, -1, true));
-  assert_false(_az_span_is_valid({ 0 }, -1, false));
+  assert_true(_az_span_is_valid(AZ_SPAN_NULL, 0, true));
+  assert_false(_az_span_is_valid(AZ_SPAN_NULL, 0, false));
+  assert_false(_az_span_is_valid(AZ_SPAN_NULL, 1, true));
+  assert_false(_az_span_is_valid(AZ_SPAN_NULL, 1, false));
+  assert_false(_az_span_is_valid(AZ_SPAN_NULL, -1, true));
+  assert_false(_az_span_is_valid(AZ_SPAN_NULL, -1, false));
 
   assert_true(_az_span_is_valid(AZ_SPAN_FROM_STR(""), 0, true));
   assert_true(_az_span_is_valid(AZ_SPAN_FROM_STR(""), 0, false));
