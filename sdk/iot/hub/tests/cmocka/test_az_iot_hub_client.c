@@ -64,13 +64,13 @@ static const char test_correct_one_key_value[] = "key_one=value_one";
 static const char test_correct_two_key_value[] = "key_one=value_one&key_two=value_two";
 
 #ifndef AZ_NO_PRECONDITION_CHECKING
-enable_precondition_check_tests()
+ENABLE_PRECONDITION_CHECK_TESTS()
 
 static void test_az_iot_hub_client_init_NULL_client_fails(void** state)
 {
   (void)state;
 
-  assert_precondition_checked(
+  ASSERT_PRECONDITION_CHECKED(
       az_iot_hub_client_init(NULL, test_device_id, test_hub_hostname, NULL));
 }
 
@@ -80,7 +80,7 @@ static void test_az_iot_hub_client_init_NULL_device_id_fails(void** state)
 
   az_iot_hub_client client;
 
-  assert_precondition_checked(
+  ASSERT_PRECONDITION_CHECKED(
       az_iot_hub_client_init(&client, AZ_SPAN_NULL, test_hub_hostname, NULL));
 }
 
@@ -90,7 +90,7 @@ static void test_az_iot_hub_client_init_NULL_hub_hostname_id_fails(void** state)
 
   az_iot_hub_client client;
 
-  assert_precondition_checked(az_iot_hub_client_init(&client, test_device_id, AZ_SPAN_NULL, NULL));
+  ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_init(&client, test_device_id, AZ_SPAN_NULL, NULL));
 }
 
 static void test_az_iot_hub_client_get_user_name_NULL_client_fails(void** state)
@@ -100,7 +100,7 @@ static void test_az_iot_hub_client_get_user_name_NULL_client_fails(void** state)
   char test_buf[TEST_SPAN_BUFFER_SIZE];
   size_t test_length;
 
-  assert_precondition_checked(az_iot_hub_client_get_user_name(
+  ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_get_user_name(
       NULL, test_buf, sizeof(test_buf), &test_length));
 }
 
@@ -113,7 +113,7 @@ static void test_az_iot_hub_client_get_user_name_NULL_input_span_fails(void** st
   char test_buf[TEST_SPAN_BUFFER_SIZE];
   size_t test_length;
 
-  assert_precondition_checked(
+  ASSERT_PRECONDITION_CHECKED(
       az_iot_hub_client_get_user_name(&client, NULL, sizeof(test_buf), &test_length));
 }
 
@@ -126,7 +126,7 @@ static void test_az_iot_hub_client_get_user_name_NULL_output_span_fails(void** s
   char test_buf[TEST_SPAN_BUFFER_SIZE];
   size_t test_length;
 
-  assert_precondition_checked(
+  ASSERT_PRECONDITION_CHECKED(
       az_iot_hub_client_get_user_name(&client, test_buf, 0, &test_length));
 }
 
@@ -137,7 +137,7 @@ static void test_az_iot_hub_client_get_client_id_NULL_client_fails(void** state)
   char test_buf[TEST_SPAN_BUFFER_SIZE];
   size_t test_length;
 
-  assert_precondition_checked(
+  ASSERT_PRECONDITION_CHECKED(
       az_iot_hub_client_get_client_id(NULL, test_buf, sizeof(test_buf), &test_length));
 }
 
@@ -149,7 +149,7 @@ static void test_az_iot_hub_client_get_client_id_NULL_input_span_fails(void** st
   char test_buf[TEST_SPAN_BUFFER_SIZE];
   size_t test_length;
 
-  assert_precondition_checked(
+  ASSERT_PRECONDITION_CHECKED(
       az_iot_hub_client_get_client_id(&client, NULL, sizeof(test_buf), &test_length));
 }
 
@@ -161,7 +161,7 @@ static void test_az_iot_hub_client_get_client_id_NULL_output_span_fails(void** s
   char test_buf[TEST_SPAN_BUFFER_SIZE];
   size_t test_length;
 
-  assert_precondition_checked(
+  ASSERT_PRECONDITION_CHECKED(
       az_iot_hub_client_get_client_id(&client, test_buf, 0, &test_length));
 }
 
@@ -172,14 +172,14 @@ static void test_az_iot_hub_client_properties_init_NULL_props_fails(void** state
   uint8_t test_span_buf[TEST_SPAN_BUFFER_SIZE];
   az_span test_span = az_span_for_test_init(test_span_buf, _az_COUNTOF(test_span_buf));
 
-  assert_precondition_checked(az_iot_hub_client_properties_init(NULL, test_span, 0));
+  ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_properties_init(NULL, test_span, 0));
 }
 
 static void test_az_iot_hub_client_properties_append_get_NULL_props_fails(void** state)
 {
   (void)state;
 
-  assert_precondition_checked(
+  ASSERT_PRECONDITION_CHECKED(
       az_iot_hub_client_properties_append(NULL, test_key_one, test_value_one));
 }
 
@@ -189,7 +189,7 @@ static void test_az_iot_hub_client_properties_append_NULL_name_span_fails(void**
 
   az_iot_hub_client_properties props;
 
-  assert_precondition_checked(
+  ASSERT_PRECONDITION_CHECKED(
       az_iot_hub_client_properties_append(&props, AZ_SPAN_NULL, test_value_one));
 }
 
@@ -199,7 +199,7 @@ static void test_az_iot_hub_client_properties_append_NULL_value_span_fails(void*
 
   az_iot_hub_client_properties props;
 
-  assert_precondition_checked(
+  ASSERT_PRECONDITION_CHECKED(
       az_iot_hub_client_properties_append(&props, test_key_one, AZ_SPAN_NULL));
 }
 
@@ -209,7 +209,7 @@ static void test_az_iot_hub_client_properties_find_NULL_props_fail(void** state)
 
   az_span out_value;
 
-  assert_precondition_checked(az_iot_hub_client_properties_find(NULL, test_key_one, &out_value));
+  ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_properties_find(NULL, test_key_one, &out_value));
 }
 
 static void test_az_iot_hub_client_properties_find_NULL_name_fail(void** state)
@@ -220,7 +220,7 @@ static void test_az_iot_hub_client_properties_find_NULL_name_fail(void** state)
 
   az_span out_value;
 
-  assert_precondition_checked(az_iot_hub_client_properties_find(&props, AZ_SPAN_NULL, &out_value));
+  ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_properties_find(&props, AZ_SPAN_NULL, &out_value));
 }
 
 static void test_az_iot_hub_client_properties_find_NULL_value_fail(void** state)
@@ -229,7 +229,7 @@ static void test_az_iot_hub_client_properties_find_NULL_value_fail(void** state)
 
   az_iot_hub_client_properties props;
 
-  assert_precondition_checked(az_iot_hub_client_properties_find(&props, test_key_one, NULL));
+  ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_properties_find(&props, test_key_one, NULL));
 }
 
 static void test_az_iot_hub_client_properties_next_NULL_props_fail(void** state)
@@ -238,7 +238,7 @@ static void test_az_iot_hub_client_properties_next_NULL_props_fail(void** state)
 
   az_pair pair_out;
 
-  assert_precondition_checked(az_iot_hub_client_properties_next(NULL, &pair_out));
+  ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_properties_next(NULL, &pair_out));
 }
 
 static void test_az_iot_hub_client_properties_next_NULL_out_fail(void** state)
@@ -247,7 +247,7 @@ static void test_az_iot_hub_client_properties_next_NULL_out_fail(void** state)
 
   az_iot_hub_client_properties props;
 
-  assert_precondition_checked(az_iot_hub_client_properties_next(&props, NULL));
+  ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_properties_next(&props, NULL));
 }
 
 #endif // AZ_NO_PRECONDITION_CHECKING
@@ -849,7 +849,7 @@ static void test_az_iot_hub_client_properties_next_empty_succeed(void** state)
 int test_iot_hub_client()
 {
 #ifndef AZ_NO_PRECONDITION_CHECKING
-  setup_precondition_check_tests();
+  SETUP_PRECONDITION_CHECK_TESTS();
 #endif // AZ_NO_PRECONDITION_CHECKING
 
   const struct CMUnitTest tests[] = {

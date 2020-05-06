@@ -16,9 +16,7 @@
 
 #include <_az_cfg.h>
 
-enable_precondition_check_tests()
-
-    static void test_url_encode_basic(void** state)
+static void test_url_encode_basic(void** state)
 {
   (void)state;
   {
@@ -164,6 +162,10 @@ enable_precondition_check_tests()
   }
 }
 
+#ifndef AZ_NO_PRECONDITION_CHECKING
+ENABLE_PRECONDITION_CHECK_TESTS()
+#endif
+
 static void test_url_encode_preconditions(void** state)
 {
   (void)state;
@@ -190,7 +192,7 @@ static void test_url_encode_preconditions(void** state)
     }
     {
       // Overlapping buffers, same pointer.
-      uint8_t buf[1] = "aBc**********";
+      uint8_t buf[13] = "aBc**********";
       az_span const in_buffer = az_span_slice(AZ_SPAN_FROM_BUFFER(buf), 0, 3);
       az_span const out_buffer = az_span_slice(AZ_SPAN_FROM_BUFFER(buf), 0, 3);
 
@@ -202,7 +204,7 @@ static void test_url_encode_preconditions(void** state)
     }
     {
       // Overlapping buffers, different pointers.
-      uint8_t buf[1] = "aBc///*******";
+      uint8_t buf[13] = "aBc///*******";
       az_span const in_buffer = az_span_slice(AZ_SPAN_FROM_BUFFER(buf), 0, 6);
       az_span const out_buffer = az_span_slice(AZ_SPAN_FROM_BUFFER(buf), 1, 13);
 
@@ -214,7 +216,7 @@ static void test_url_encode_preconditions(void** state)
     }
     {
       // Overlapping buffers, writing before reading.
-      uint8_t buf[1] = "////********";
+      uint8_t buf[12] = "////********";
       az_span const in_buffer = az_span_slice(AZ_SPAN_FROM_BUFFER(buf), 0, 4);
       az_span const out_buffer = az_span_slice(AZ_SPAN_FROM_BUFFER(buf), 0, 12);
 
@@ -227,7 +229,7 @@ static void test_url_encode_preconditions(void** state)
   }
 #else
   {
-    setup_precondition_check_tests();
+    SETUP_PRECONDITION_CHECK_TESTS();
 
     {
       // URL encode could never succeed.
@@ -235,7 +237,7 @@ static void test_url_encode_preconditions(void** state)
       az_span const buffer5 = AZ_SPAN_FROM_BUFFER(buf5);
 
       int32_t url_length = 0xFF;
-      assert_precondition_checked(
+      ASSERT_PRECONDITION_CHECKED(
           _az_span_url_encode(buffer5, AZ_SPAN_FROM_STR("1234567890"), &url_length));
 
       assert_int_equal(url_length, 0xFF);
@@ -245,7 +247,7 @@ static void test_url_encode_preconditions(void** state)
     {
       // Inut is empty, so the output is also empty BUT the output span is null.
       int32_t url_length = 0xFF;
-      assert_precondition_checked(_az_span_url_encode(AZ_SPAN_NULL, AZ_SPAN_NULL, &url_length));
+      ASSERT_PRECONDITION_CHECKED(_az_span_url_encode(AZ_SPAN_NULL, AZ_SPAN_NULL, &url_length));
       assert_int_equal(url_length, 0xFF);
     }
     {
@@ -255,7 +257,7 @@ static void test_url_encode_preconditions(void** state)
       az_span const out_buffer = az_span_slice(AZ_SPAN_FROM_BUFFER(buf), 0, 3);
 
       int32_t url_length = 0xFF;
-      assert_precondition_checked(_az_span_url_encode(in_buffer, out_buffer, &url_length));
+      ASSERT_PRECONDITION_CHECKED(_az_span_url_encode(in_buffer, out_buffer, &url_length));
       assert_int_equal(url_length, 0xFF);
       assert_true(
           az_span_is_content_equal(AZ_SPAN_FROM_BUFFER(buf), AZ_SPAN_FROM_STR("aBc**********")));
@@ -267,7 +269,7 @@ static void test_url_encode_preconditions(void** state)
       az_span const out_buffer = az_span_slice(AZ_SPAN_FROM_BUFFER(buf), 1, 13);
 
       int32_t url_length = 0xFF;
-      assert_precondition_checked(_az_span_url_encode(in_buffer, out_buffer, &url_length));
+      ASSERT_PRECONDITION_CHECKED(_az_span_url_encode(in_buffer, out_buffer, &url_length));
       assert_int_equal(url_length, 0xFF);
       assert_true(
           az_span_is_content_equal(AZ_SPAN_FROM_BUFFER(buf), AZ_SPAN_FROM_STR("aBc///*******")));
@@ -279,7 +281,7 @@ static void test_url_encode_preconditions(void** state)
       az_span const out_buffer = az_span_slice(AZ_SPAN_FROM_BUFFER(buf), 1, 14);
 
       int32_t url_length = 0xFF;
-      assert_precondition_checked(_az_span_url_encode(in_buffer, out_buffer, &url_length));
+      ASSERT_PRECONDITION_CHECKED(_az_span_url_encode(in_buffer, out_buffer, &url_length));
       assert_int_equal(url_length, 0xFF);
       assert_true(
           az_span_is_content_equal(AZ_SPAN_FROM_BUFFER(buf), AZ_SPAN_FROM_STR("////**********")));
@@ -288,7 +290,7 @@ static void test_url_encode_preconditions(void** state)
       // NULL out_size parameter.
       uint8_t buf1[1] = { '*' };
       az_span const buffer0 = az_span_slice(AZ_SPAN_FROM_BUFFER(buf1), 0, 0);
-      assert_precondition_checked(_az_span_url_encode(buffer0, AZ_SPAN_NULL, NULL));
+      ASSERT_PRECONDITION_CHECKED(_az_span_url_encode(buffer0, AZ_SPAN_NULL, NULL));
       assert_true(az_span_is_content_equal(AZ_SPAN_FROM_BUFFER(buf1), AZ_SPAN_FROM_STR("*")));
     }
   }
@@ -352,24 +354,23 @@ static void test_url_encode_full(void** state)
   assert_int_equal(url_length, nunreserved + (256 - nunreserved) * 3);
 
   assert_true(az_span_is_content_equal(
-        buffer,
-        AZ_SPAN_FROM_STR(
-          "%00%01%02%03%04%05%06%07%08%09%0A%0B%0C%0D%0E%0F"
-          "%10%11%12%13%14%15%16%17%18%19%1A%1B%1C%1D%1E%1F"
-          "%20%21%22%23%24%25%26%27%28%29%2A%2B%2C-.%2F"
-          "0123456789%3A%3B%3C%3D%3E%3F"
-          "%40ABCDEFGHIJKLMNO"
-          "PQRSTUVWXYZ%5B%5C%5D%5E_"
-          "%60abcdefghijklmno"
-          "pqrstuvwxyz%7B%7C%7D~%7F"
-          "%80%81%82%83%84%85%86%87%88%89%8A%8B%8C%8D%8E%8F"
-          "%90%91%92%93%94%95%96%97%98%99%9A%9B%9C%9D%9E%9F"
-          "%A0%A1%A2%A3%A4%A5%A6%A7%A8%A9%AA%AB%AC%AD%AE%AF"
-          "%B0%B1%B2%B3%B4%B5%B6%B7%B8%B9%BA%BB%BC%BD%BE%BF"
-          "%C0%C1%C2%C3%C4%C5%C6%C7%C8%C9%CA%CB%CC%CD%CE%CF"
-          "%D0%D1%D2%D3%D4%D5%D6%D7%D8%D9%DA%DB%DC%DD%DE%DF"
-          "%E0%E1%E2%E3%E4%E5%E6%E7%E8%E9%EA%EB%EC%ED%EE%EF"
-          "%F0%F1%F2%F3%F4%F5%F6%F7%F8%F9%FA%FB%FC%FD%FE%FF")));
+      buffer,
+      AZ_SPAN_FROM_STR("%00%01%02%03%04%05%06%07%08%09%0A%0B%0C%0D%0E%0F"
+                       "%10%11%12%13%14%15%16%17%18%19%1A%1B%1C%1D%1E%1F"
+                       "%20%21%22%23%24%25%26%27%28%29%2A%2B%2C-.%2F"
+                       "0123456789%3A%3B%3C%3D%3E%3F"
+                       "%40ABCDEFGHIJKLMNO"
+                       "PQRSTUVWXYZ%5B%5C%5D%5E_"
+                       "%60abcdefghijklmno"
+                       "pqrstuvwxyz%7B%7C%7D~%7F"
+                       "%80%81%82%83%84%85%86%87%88%89%8A%8B%8C%8D%8E%8F"
+                       "%90%91%92%93%94%95%96%97%98%99%9A%9B%9C%9D%9E%9F"
+                       "%A0%A1%A2%A3%A4%A5%A6%A7%A8%A9%AA%AB%AC%AD%AE%AF"
+                       "%B0%B1%B2%B3%B4%B5%B6%B7%B8%B9%BA%BB%BC%BD%BE%BF"
+                       "%C0%C1%C2%C3%C4%C5%C6%C7%C8%C9%CA%CB%CC%CD%CE%CF"
+                       "%D0%D1%D2%D3%D4%D5%D6%D7%D8%D9%DA%DB%DC%DD%DE%DF"
+                       "%E0%E1%E2%E3%E4%E5%E6%E7%E8%E9%EA%EB%EC%ED%EE%EF"
+                       "%F0%F1%F2%F3%F4%F5%F6%F7%F8%F9%FA%FB%FC%FD%FE%FF")));
 }
 
 int test_az_url_encode()

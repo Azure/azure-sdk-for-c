@@ -326,7 +326,7 @@ static void test_http_response(void** state)
 }
 
 #ifndef AZ_NO_PRECONDITION_CHECKING
-enable_precondition_check_tests()
+ENABLE_PRECONDITION_CHECK_TESTS()
 
     static void test_http_request_removing_left_white_spaces(void** state)
 {
@@ -353,7 +353,7 @@ enable_precondition_check_tests()
       AZ_SPAN_FROM_STR("body")));
 
   // Nothing but empty name - should hit precondion
-  assert_precondition_checked(
+  ASSERT_PRECONDITION_CHECKED(
       az_http_request_append_header(&hrb, AZ_SPAN_FROM_STR(" \t\r"), AZ_SPAN_NULL));
 }
 
@@ -362,7 +362,7 @@ enable_precondition_check_tests()
 int test_az_http()
 {
 #ifndef AZ_NO_PRECONDITION_CHECKING
-  setup_precondition_check_tests();
+  SETUP_PRECONDITION_CHECK_TESTS();
 #endif // AZ_NO_PRECONDITION_CHECKING
 
   const struct CMUnitTest tests[] = {

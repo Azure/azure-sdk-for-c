@@ -43,14 +43,14 @@ static const char test_correct_twin_patch_pub_topic[]
     = "$iothub/twin/PATCH/properties/reported/?$rid=id_one";
 
 #ifndef AZ_NO_PRECONDITION_CHECKING
-enable_precondition_check_tests()
+ENABLE_PRECONDITION_CHECK_TESTS()
 
 static void test_az_iot_hub_client_twin_response_get_subscribe_topic_filter_null_client_fails()
 {
   char test_buf[TEST_SPAN_BUFFER_SIZE];
   size_t test_length;
 
-  assert_precondition_checked(az_iot_hub_client_twin_response_get_subscribe_topic_filter(
+  ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_twin_response_get_subscribe_topic_filter(
       NULL, test_buf, sizeof(test_buf), &test_length));
 }
 
@@ -63,7 +63,7 @@ static void test_az_iot_hub_client_twin_response_get_subscribe_topic_filter_NULL
   char test_buf[TEST_SPAN_BUFFER_SIZE];
   size_t test_length;
 
-  assert_precondition_checked(az_iot_hub_client_twin_response_get_subscribe_topic_filter(
+  ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_twin_response_get_subscribe_topic_filter(
       &client, NULL, sizeof(test_buf), &test_length));
 }
 
@@ -76,7 +76,7 @@ static void test_az_iot_hub_client_twin_response_get_subscribe_topic_filter_NULL
   char test_buf[TEST_SPAN_BUFFER_SIZE];
   size_t test_length;
 
-  assert_precondition_checked(az_iot_hub_client_twin_response_get_subscribe_topic_filter(
+  ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_twin_response_get_subscribe_topic_filter(
       &client, test_buf, 0, &test_length));
 }
 
@@ -85,7 +85,7 @@ static void test_az_iot_hub_client_twin_patch_get_subscribe_topic_filter_NULL_cl
   char test_buf[TEST_SPAN_BUFFER_SIZE];
   size_t test_length;
 
-  assert_precondition_checked(az_iot_hub_client_twin_patch_get_subscribe_topic_filter(
+  ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_twin_patch_get_subscribe_topic_filter(
       NULL, test_buf, sizeof(test_buf), &test_length));
 }
 
@@ -98,7 +98,7 @@ static void test_az_iot_hub_client_twin_patch_get_subscribe_topic_filter_NULL_sp
   char test_buf[TEST_SPAN_BUFFER_SIZE];
   size_t test_length;
 
-  assert_precondition_checked(az_iot_hub_client_twin_patch_get_subscribe_topic_filter(
+  ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_twin_patch_get_subscribe_topic_filter(
       &client, NULL, sizeof(test_buf), &test_length));
 }
 
@@ -111,7 +111,7 @@ static void test_az_iot_hub_client_twin_patch_get_subscribe_topic_filter_NULL_ou
   char test_buf[TEST_SPAN_BUFFER_SIZE];
   size_t test_length;
 
-  assert_precondition_checked(
+  ASSERT_PRECONDITION_CHECKED(
       az_iot_hub_client_twin_patch_get_subscribe_topic_filter(&client, test_buf, 0, &test_length));
 }
 
@@ -120,7 +120,7 @@ static void test_az_iot_hub_client_twin_document_get_publish_topic_NULL_client_f
   char test_buf[TEST_SPAN_BUFFER_SIZE];
   size_t test_length;
 
-  assert_precondition_checked(az_iot_hub_client_twin_document_get_publish_topic(
+  ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_twin_document_get_publish_topic(
       NULL, test_device_request_id, test_buf, sizeof(test_buf), &test_length));
 }
 
@@ -138,7 +138,7 @@ static void test_az_iot_hub_client_twin_document_get_publish_topic_NULL_request_
       = az_span_init(test_bad_request_id_buf, _az_COUNTOF(test_bad_request_id_buf));
   test_bad_request_id._internal.ptr = NULL;
 
-  assert_precondition_checked(az_iot_hub_client_twin_document_get_publish_topic(
+  ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_twin_document_get_publish_topic(
       &client, test_bad_request_id, test_buf, sizeof(test_buf), &test_length));
 }
 
@@ -151,7 +151,7 @@ static void test_az_iot_hub_client_twin_document_get_publish_topic_NULL_span_fai
   char test_buf[TEST_SPAN_BUFFER_SIZE];
   size_t test_length;
 
-  assert_precondition_checked(az_iot_hub_client_twin_document_get_publish_topic(
+  ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_twin_document_get_publish_topic(
       &client, test_device_request_id, NULL, sizeof(test_buf), &test_length));
 }
 
@@ -164,7 +164,7 @@ static void test_az_iot_hub_client_twin_document_get_publish_topic_NULL_out_span
   char test_buf[TEST_SPAN_BUFFER_SIZE];
   size_t test_length;
 
-  assert_precondition_checked(az_iot_hub_client_twin_document_get_publish_topic(
+  ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_twin_document_get_publish_topic(
       &client, test_device_request_id, test_buf, 0, &test_length));
 }
 
@@ -173,7 +173,7 @@ static void test_az_iot_hub_client_twin_patch_get_publish_topic_NULL_client_fail
   char test_buf[TEST_SPAN_BUFFER_SIZE];
   size_t test_length;
 
-  assert_precondition_checked(az_iot_hub_client_twin_patch_get_publish_topic(
+  ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_twin_patch_get_publish_topic(
       NULL, test_device_request_id, test_buf, sizeof(test_buf), &test_length));
 }
 
@@ -191,7 +191,7 @@ static void test_az_iot_hub_client_twin_patch_get_publish_topic_invalid_request_
       = az_span_init(test_bad_request_id_buf, _az_COUNTOF(test_bad_request_id_buf));
   test_bad_request_id._internal.ptr = NULL;
 
-  assert_precondition_checked(az_iot_hub_client_twin_patch_get_publish_topic(
+  ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_twin_patch_get_publish_topic(
       &client, test_bad_request_id, test_buf, sizeof(test_buf), &test_length));
 }
 
@@ -204,7 +204,7 @@ static void test_az_iot_hub_client_twin_patch_get_publish_topic_NULL_char_buf_fa
   char test_buf[TEST_SPAN_BUFFER_SIZE];
   size_t test_length;
 
-  assert_precondition_checked(az_iot_hub_client_twin_patch_get_publish_topic(
+  ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_twin_patch_get_publish_topic(
       &client, test_device_request_id, NULL, sizeof(test_buf), &test_length));
 }
 
@@ -217,7 +217,7 @@ static void test_az_iot_hub_client_twin_patch_get_publish_topic_NULL_out_span_fa
   char test_buf[TEST_SPAN_BUFFER_SIZE];
   size_t test_length;
 
-  assert_precondition_checked(az_iot_hub_client_twin_patch_get_publish_topic(
+  ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_twin_patch_get_publish_topic(
       &client, test_device_request_id, test_buf, 0, &test_length));
 }
 
@@ -225,7 +225,7 @@ static void test_az_iot_hub_client_twin_parse_received_topic_NULL_client_fails()
 {
   az_iot_hub_client_twin_response response;
 
-  assert_precondition_checked(az_iot_hub_client_twin_parse_received_topic(
+  ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_twin_parse_received_topic(
       NULL, test_twin_received_topic_desired_success, &response));
 }
 
@@ -237,7 +237,7 @@ static void test_az_iot_hub_client_twin_parse_received_topic_NULL_rec_topic_fail
 
   az_iot_hub_client_twin_response response;
 
-  assert_precondition_checked(
+  ASSERT_PRECONDITION_CHECKED(
       az_iot_hub_client_twin_parse_received_topic(&client, AZ_SPAN_NULL, &response));
 }
 
@@ -248,7 +248,7 @@ static void test_az_iot_hub_client_twin_parse_received_topic_NULL_response_fails
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL), AZ_OK);
   ;
 
-  assert_precondition_checked(az_iot_hub_client_twin_parse_received_topic(
+  ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_twin_parse_received_topic(
       &client, test_twin_received_topic_desired_success, NULL));
 }
 
@@ -511,7 +511,7 @@ static void test_az_iot_hub_client_twin_logging_succeed()
 int test_az_iot_hub_client_twin()
 {
 #ifndef AZ_NO_PRECONDITION_CHECKING
-  setup_precondition_check_tests();
+  SETUP_PRECONDITION_CHECK_TESTS();
 #endif // AZ_NO_PRECONDITION_CHECKING
 
   const struct CMUnitTest tests[] = {
