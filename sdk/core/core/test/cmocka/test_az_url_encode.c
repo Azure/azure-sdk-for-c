@@ -91,7 +91,7 @@ static void test_url_encode_basic(void** state)
       '*', '*', '*', '*', '*', '*', '*', '*', '*', '*',
     };
 
-    az_span const buffer2 = az_span_slice(AZ_SPAN_FROM_BUFFER(buf20), 0, 9);
+    az_span const buffer2 = az_span_slice(AZ_SPAN_FROM_BUFFER(buf20), 0, 2);
 
     int32_t url_length = 0xFF;
     assert_true(
@@ -240,7 +240,7 @@ static void test_url_encode_preconditions(void** state)
       az_span const out_buffer = az_span_slice(AZ_SPAN_FROM_BUFFER(buf), 0, 3);
 
       int32_t url_length = 0xFF;
-      assert_true(az_succeeded(_az_span_url_encode(in_buffer, out_buffer, &url_length)));
+      assert_true(az_succeeded(_az_span_url_encode(out_buffer, in_buffer, &url_length)));
       assert_int_equal(url_length, sizeof("aBc") - 1);
       assert_true(
           az_span_is_content_equal(AZ_SPAN_FROM_BUFFER(buf), AZ_SPAN_FROM_STR("aBc**********")));
@@ -253,7 +253,7 @@ static void test_url_encode_preconditions(void** state)
       az_span const out_buffer = az_span_slice(AZ_SPAN_FROM_BUFFER(buf), 1, 13);
 
       int32_t url_length = 0xFF;
-      assert_true(az_succeeded(_az_span_url_encode(in_buffer, out_buffer, &url_length)));
+      assert_true(az_succeeded(_az_span_url_encode(out_buffer, in_buffer, &url_length)));
       assert_int_equal(url_length, sizeof("aaaaaa") - 1);
       assert_true(
           az_span_is_content_equal(AZ_SPAN_FROM_BUFFER(buf), AZ_SPAN_FROM_STR("aaaaaaa******")));
@@ -265,7 +265,7 @@ static void test_url_encode_preconditions(void** state)
       az_span const out_buffer = az_span_slice(AZ_SPAN_FROM_BUFFER(buf), 0, 12);
 
       int32_t url_length = 0xFF;
-      assert_true(az_succeeded(_az_span_url_encode(in_buffer, out_buffer, &url_length)));
+      assert_true(az_succeeded(_az_span_url_encode(out_buffer, in_buffer, &url_length)));
       assert_int_equal(url_length, sizeof("%2F2F") - 1);
       assert_true(
           az_span_is_content_equal(AZ_SPAN_FROM_BUFFER(buf), AZ_SPAN_FROM_STR("%2F2F*******")));
@@ -301,7 +301,7 @@ static void test_url_encode_preconditions(void** state)
       az_span const out_buffer = az_span_slice(AZ_SPAN_FROM_BUFFER(buf), 0, 3);
 
       int32_t url_length = 0xFF;
-      ASSERT_PRECONDITION_CHECKED(_az_span_url_encode(in_buffer, out_buffer, &url_length));
+      ASSERT_PRECONDITION_CHECKED(_az_span_url_encode(out_buffer, in_buffer, &url_length));
       assert_int_equal(url_length, 0xFF);
       assert_true(
           az_span_is_content_equal(AZ_SPAN_FROM_BUFFER(buf), AZ_SPAN_FROM_STR("aBc**********")));
@@ -325,7 +325,7 @@ static void test_url_encode_preconditions(void** state)
       az_span const out_buffer = az_span_slice(AZ_SPAN_FROM_BUFFER(buf), 1, 14);
 
       int32_t url_length = 0xFF;
-      ASSERT_PRECONDITION_CHECKED(_az_span_url_encode(in_buffer, out_buffer, &url_length));
+      ASSERT_PRECONDITION_CHECKED(_az_span_url_encode(out_buffer, in_buffer, &url_length));
       assert_int_equal(url_length, 0xFF);
       assert_true(
           az_span_is_content_equal(AZ_SPAN_FROM_BUFFER(buf), AZ_SPAN_FROM_STR("////**********")));
@@ -393,7 +393,7 @@ static void test_url_encode_full(void** state)
   int const nunreserved = sizeof("-_.~"
                                  "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                  "abcdefghijklmnopqrstuvwxyz"
-                                 "0123456789" - 1);
+                                 "0123456789") - 1;
 
   assert_int_equal(url_length, nunreserved + (256 - nunreserved) * 3);
 
