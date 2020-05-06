@@ -429,7 +429,7 @@ static void test_http_request_header_validation_range(void** state)
   (void)state;
   {
     // just make sure compiler will set anything greater than 127 to zero
-    for (uint8_t value = 127; value > 127; value++) // break on unsigned back to zero
+    for (uint8_t value = 127; value >= 127; value++) // break on unsigned back to zero
     {
       assert_false(az_http_valid_token[value]);
     }
@@ -488,6 +488,28 @@ static void test_http_response_header_validation_fail(void** state)
   }
 }
 
+static void test_http_response_header_validation_space(void** state)
+{
+  (void)state;
+  {
+    az_http_response response = { 0 };
+    assert_return_code(
+        az_http_response_init(
+            &response,
+            AZ_SPAN_FROM_STR("HTTP/1.1 404 Not Found\r\n"
+                             "Header11 :Value11\r\n"
+                             "\r\n"
+                             "KKKKKJJJJJIIIIIHHHHHGGGGGFFFFFEEEEEDDDDDCCCCCBBBBBAAAAA")),
+        AZ_OK);
+
+    az_http_response_status_line status_line = { 0 };
+    assert_return_code(az_http_response_get_status_line(&response, &status_line), AZ_OK);
+    az_pair header = { 0 };
+    az_result fail_header_result = az_http_response_get_next_header(&response, &header);
+    assert_true(AZ_ERROR_HTTP_RESPONSE_CONTAINS_INVALID_HEADERS == fail_header_result);
+  }
+}
+
 int test_az_http()
 {
 #ifndef AZ_NO_PRECONDITION_CHECKING
@@ -505,6 +527,7 @@ int test_az_http()
     cmocka_unit_test(test_http_request_header_validation_range),
     cmocka_unit_test(test_http_response_header_validation),
     cmocka_unit_test(test_http_response_header_validation_fail),
+    cmocka_unit_test(test_http_response_header_validation_space),
   };
   return cmocka_run_group_tests_name("az_core_http", tests, NULL, NULL);
 }
