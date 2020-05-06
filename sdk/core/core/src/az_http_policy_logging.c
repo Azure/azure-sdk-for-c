@@ -58,6 +58,8 @@ static az_result _az_http_policy_logging_append_http_request_msg(
     _az_http_request const* request,
     az_span* ref_log_msg)
 {
+  extern az_span const _az_auth_header_name;
+
   az_span http_request_string = AZ_SPAN_FROM_STR("HTTP Request : ");
   az_span null_string = AZ_SPAN_FROM_STR("NULL");
 
@@ -104,12 +106,11 @@ static az_result _az_http_policy_logging_append_http_request_msg(
     }
 
     AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, required_length);
-
     remainder = az_span_copy(remainder, new_line_tab_string);
-
     remainder = az_span_copy(remainder, header.key);
 
-    if (az_span_size(header.value) > 0)
+    if (az_span_size(header.value) > 0
+        && !az_span_is_content_equal(header.key, _az_auth_header_name))
     {
       remainder = az_span_copy(remainder, colon_separator_string);
       remainder = _az_http_policy_logging_copy_lengthy_value(remainder, header.value);

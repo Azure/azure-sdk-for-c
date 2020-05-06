@@ -40,7 +40,8 @@ static void _log_listener(az_log_classification classification, az_span message)
           AZ_SPAN_FROM_STR("HTTP Request : GET https://www.example.com\n"
                            "\tHeader1 : Value1\n"
                            "\tHeader2 : ZZZZYYYYXXXXWWWWVVVVUU ... SSSRRRRQQQQPPPPOOOONNNN\n"
-                           "\tHeader3 : 1111112222223333334444 ... 55666666777777888888abc")));
+                           "\tHeader3 : 1111112222223333334444 ... 55666666777777888888abc\n"
+                           "\tauthorization")));
       break;
     case AZ_LOG_HTTP_RESPONSE:
       _log_invoked_for_http_response = true;
@@ -55,7 +56,8 @@ static void _log_listener(az_log_classification classification, az_span message)
                            " -> HTTP Request : GET https://www.example.com\n"
                            "\tHeader1 : Value1\n"
                            "\tHeader2 : ZZZZYYYYXXXXWWWWVVVVUU ... SSSRRRRQQQQPPPPOOOONNNN\n"
-                           "\tHeader3 : 1111112222223333334444 ... 55666666777777888888abc")));
+                           "\tHeader3 : 1111112222223333334444 ... 55666666777777888888abc\n"
+                           "\tauthorization")));
       break;
     default:
       assert_true(false);
@@ -112,6 +114,11 @@ static void test_az_log(void** state)
       &hrb,
       AZ_SPAN_FROM_STR("Header3"),
       AZ_SPAN_FROM_STR("111111222222333333444444555555666666777777888888abc")));
+
+  TEST_EXPECT_SUCCESS(az_http_request_append_header(
+      &hrb,
+      AZ_SPAN_FROM_STR("authorization"),
+      AZ_SPAN_FROM_STR("BigSecret!")));
 
   uint8_t response_buf[1024] = { 0 };
   az_span response_builder = AZ_SPAN_FROM_BUFFER(response_buf);
