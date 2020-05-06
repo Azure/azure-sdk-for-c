@@ -56,12 +56,13 @@ static void test_url_encode_basic(void** state)
 
   {
     // Empty
-    uint8_t buf0[0] = {};
-    az_span const buffer0 = AZ_SPAN_FROM_BUFFER(buf0);
+    uint8_t buf1[1] = { '*' };
+    az_span const buffer0 = az_span_slice(AZ_SPAN_FROM_BUFFER(buf1), 0, 0);
     url_length = 0xFF;
     assert_true(az_succeeded(_az_span_url_encode(buffer0, AZ_SPAN_NULL, &url_length)));
-    assert_true(az_span_is_content_equal(az_span_slice(buffer0, 0, url_length), AZ_SPAN_NULL));
     assert_int_equal(url_length, 0);
+    assert_true(az_span_is_content_equal(az_span_slice(buffer0, 0, url_length), AZ_SPAN_NULL));
+    assert_true(az_span_is_content_equal(AZ_SPAN_FROM_BUFFER(buf1), AZ_SPAN_FROM_STR("*")));
   }
   {
     // Just enough to do no encoding
@@ -166,9 +167,10 @@ static void test_url_encode_preconditions(void** state)
     assert_precondition_checked(_az_span_url_encode(AZ_SPAN_NULL, AZ_SPAN_NULL, &url_length));
     assert_int_equal(url_length, 0xFF);
 
-    uint8_t buf0[0] = { 0 };
-    az_span const buffer0 = AZ_SPAN_FROM_BUFFER(buf0);
+    uint8_t buf1[1] = { '*' };
+    az_span const buffer0 = az_span_slice(AZ_SPAN_FROM_BUFFER(buf1), 0, 0);
     assert_precondition_checked(_az_span_url_encode(buffer0, AZ_SPAN_FROM_STR("hello"), NULL));
+    assert_true(az_span_is_content_equal(AZ_SPAN_FROM_BUFFER(buf1), AZ_SPAN_FROM_STR("*")));
   }
 #endif // AZ_NO_PRECONDITION_CHECKING
 }
