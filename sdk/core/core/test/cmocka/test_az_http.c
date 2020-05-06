@@ -380,6 +380,12 @@ static void test_http_request_header_validation(void** state)
 
     assert_precondition_checked(az_http_request_append_header(
         &hrb, AZ_SPAN_FROM_STR("(headerName)"), hrb_header_content_type_token));
+
+    // make sure about header was not added
+    assert_int_equal(az_http_request_headers_count(&hrb), 0);
+    _az_http_request_headers headers = hrb._internal.headers;
+    size_t size = (size_t)az_span_size(headers);
+    assert_memory_equal(header_buf, headers._internal.ptr, size);
   }
 }
 
@@ -407,6 +413,12 @@ static void test_http_request_header_validation_above_127(void** state)
     az_span header_name = AZ_SPAN_FROM_BUFFER(c);
     assert_precondition_checked(
         az_http_request_append_header(&hrb, header_name, hrb_header_content_type_token));
+
+    // make sure about header was not added
+    assert_int_equal(az_http_request_headers_count(&hrb), 0);
+    _az_http_request_headers headers = hrb._internal.headers;
+    size_t size = (size_t)az_span_size(headers);
+    assert_memory_equal(header_buf, headers._internal.ptr, size);
   }
 }
 
