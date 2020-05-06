@@ -1,8 +1,8 @@
-# Azure SDK Storage Blobs Library for C
+# Azure SDK Storage Blobs Library for Embedded C
 
 Azure Storage Blobs library (`az_storage_blobs`) provides abstractions, and helpers for communicating with Azure Storage Blobs in the C programming language. This library follows the Azure SDK Design Guidelines for Embedded C.
 
-Use the Azure SDK Storage Blobs library for C to work with Azure Storage Blobs.
+Use the Azure SDK Storage Blobs Library for Embedded C to work with Azure Storage Blobs.
 
 * Upload blobs
 * Create and modify blob metadata
@@ -74,7 +74,7 @@ Many people all over the world have helped make this project better.  You'll wan
 * [What are some good first issues for new contributors to the repo?](https://github.com/azure/azure-sdk-for-c/issues?q=is%3Aopen+is%3Aissue+label%3A%22up+for+grabs%22)
 * [How to build and test your change][azure_sdk_for_c_contributing_developer_guide]
 * [How you can make a change happen!][azure_sdk_for_c_contributing_pull_requests]
-* Frequently Asked Questions (FAQ) and Conceptual Topics in the detailed [Azure SDK for C wiki](https://github.com/azure/azure-sdk-for-c/wiki).
+* Frequently Asked Questions (FAQ) and Conceptual Topics in the detailed [Azure SDK for Embedded C wiki](https://github.com/azure/azure-sdk-for-c/wiki).
 
 ### Community
 
@@ -86,7 +86,7 @@ Security issues and bugs should be reported privately, via email, to the Microso
 
 ### License
 
-Azure SDK for C is licensed under the [MIT](LICENSE) license.
+Azure SDK for Embedded C is licensed under the [MIT](LICENSE) license.
 
 <!-- LINKS -->
 [azure_sdk_for_c_contributing]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md

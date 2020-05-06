@@ -5,11 +5,11 @@ languages:
 products:
   - azure
   - azure-storage
-  - azure-blob-storage
+  - azure-storage-blobs
 urlFragment: storage-blob-samples
 ---
 
-# Azure Storage Blob Samples client library for C
+# Azure Storage Blob Samples client Library for Embedded C
 This document explains samples and how to use them.
 
 ## Key concepts

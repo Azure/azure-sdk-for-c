@@ -7,7 +7,7 @@ products:
 urlFragment: core-samples
 ---
 
-# Azure Core Samples client library for C
+# Azure Core Samples client Library for Embedded C
 This document explains samples and how to use them.
 
 ## Key concepts

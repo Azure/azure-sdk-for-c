@@ -32,10 +32,18 @@ static AZ_NODISCARD az_result _az_credential_client_secret_request_token(
   uint8_t header_buf[_az_AAD_REQUEST_HEADER_BUF_SIZE];
   _az_http_request request = { 0 };
   AZ_RETURN_IF_FAILED(az_http_request_init(
-      &request, context, az_http_method_post(), url_span, az_span_size(url), AZ_SPAN_FROM_BUFFER(header_buf), body));
+      &request,
+      context,
+      az_http_method_post(),
+      url_span,
+      az_span_size(url),
+      AZ_SPAN_FROM_BUFFER(header_buf),
+      body));
 
   return _az_aad_request_token(&request, &credential->_internal.token);
 }
+
+az_span const _az_auth_header_name = AZ_SPAN_LITERAL_FROM_STR("authorization");
 
 // This gets called from the http credential policy
 static AZ_NODISCARD az_result _az_credential_client_secret_apply(
@@ -53,7 +61,7 @@ static AZ_NODISCARD az_result _az_credential_client_secret_apply(
 
   AZ_RETURN_IF_FAILED(az_http_request_append_header(
       ref_request,
-      AZ_SPAN_FROM_STR("authorization"),
+      _az_auth_header_name,
       az_span_init(credential->_internal.token._internal.token, token_length)));
 
   return AZ_OK;

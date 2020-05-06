@@ -248,7 +248,7 @@ AZ_NODISCARD static az_result az_span_reader_get_json_number_digit_rest(
     {
       case '-':
         e_sign = -1;
-        AZ_FALLTHROUGH;
+        _az_FALLTHROUGH;
       case '+':
         *self = az_span_slice_to_end(*self, 1);
         if (az_span_size(*self) == 0)

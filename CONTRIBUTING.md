@@ -1,6 +1,6 @@
-# Azure SDK for C Contributing Guide
+# Azure SDK for Embedded C Contributing Guide
 
-Thank you for your interest in contributing to Azure SDK for C.
+Thank you for your interest in contributing to Azure SDK for Embedded C.
 
 - For reporting bugs, requesting features, or asking for support, please file an issue in the [issues](https://github.com/Azure/azure-sdk-for-c/issues) section of the project.
 
@@ -8,7 +8,7 @@ Thank you for your interest in contributing to Azure SDK for C.
 
 - To make code changes, or contribute something new, please follow the [GitHub Forks / Pull requests model](https://help.github.com/articles/fork-a-repo/): Fork the repo, make the change and propose it back by submitting a pull request.
 
-- Refer to the [wiki](https://github.com/Azure/azure-sdk-for-c/wiki) to learn about how Azure SDK for C generates lint checker, doxygen, and code coverage reports.
+- Refer to the [wiki](https://github.com/Azure/azure-sdk-for-c/wiki) to learn about how Azure SDK for Embedded C generates lint checker, doxygen, and code coverage reports.
 
 ## Pull Requests
 

@@ -8,13 +8,13 @@ resources:
       type: git
       name: internal/azure-sdk-build-tools
 
-trigger:
-  branches:
-    include:
-      - master
-      - feature/*
-      - release/*
-      - hotfix/*
+# This pipeline does not need to run on merge. It is primarily used for building
+# release assets.
+trigger: none
+
+# This pipeline does not need to run on PR. The c - client - ci pipeline handles
+# validating
+pr: none
 
 stages:
   - template: ../../eng/pipelines/templates/stages/archetype-sdk-client.yml
