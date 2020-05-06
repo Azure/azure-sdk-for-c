@@ -54,9 +54,8 @@ static az_span mqtt_url_suffix = AZ_SPAN_LITERAL_FROM_STR(":8883");
 static char twin_response_topic[128];
 static char twin_desired_topic[128];
 static char get_twin_topic[128];
-static az_span get_twin_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("get_twin");
+static uint32_t twin_request_id = 1;
 static char reported_property_topic[128];
-static az_span reported_property_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("reported_prop");
 static az_span reported_property_name = AZ_SPAN_LITERAL_FROM_STR("foo");
 static int32_t reported_property_value = 0;
 static char reported_property_payload[64];
@@ -286,7 +285,7 @@ static int send_get_twin()
   printf("Requesting twin document\n");
 
   if ((rc = az_iot_hub_client_twin_document_get_publish_topic(
-           &client, get_twin_topic_request_id, get_twin_topic, sizeof(get_twin_topic), NULL))
+           &client, twin_request_id++, get_twin_topic, sizeof(get_twin_topic), NULL))
       != AZ_OK)
   {
     printf("Unable to get twin document publish topic, return code %d\n", rc);
@@ -323,7 +322,7 @@ static int send_reported_property()
 
   if ((rc = az_iot_hub_client_twin_patch_get_publish_topic(
            &client,
-           reported_property_topic_request_id,
+           twin_request_id++,
            reported_property_topic,
            sizeof(reported_property_topic),
            NULL))

@@ -8,6 +8,7 @@
 #include <az_result.h>
 #include <az_span.h>
 #include <az_span_internal.h>
+#include <az_iot_common_internal.h>
 
 #include <az_log_internal.h>
 #include <az_precondition_internal.h>
@@ -96,13 +97,12 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_patch_get_subscribe_topic_filter(
 
 AZ_NODISCARD az_result az_iot_hub_client_twin_document_get_publish_topic(
     az_iot_hub_client const* client,
-    az_span request_id,
+    uint32_t request_id,
     char* mqtt_topic,
     size_t mqtt_topic_size,
     size_t* out_mqtt_topic_length)
 {
   _az_PRECONDITION_NOT_NULL(client);
-  _az_PRECONDITION_VALID_SPAN(request_id, 1, false);
   _az_PRECONDITION_NOT_NULL(mqtt_topic);
   _az_PRECONDITION(mqtt_topic_size > 0);
   (void)client;
@@ -112,7 +112,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_document_get_publish_topic(
       + az_span_size(az_iot_hub_twin_get_pub_topic)
       + (int32_t)sizeof(az_iot_hub_client_twin_question)
       + az_span_size(az_iot_hub_client_request_id_span)
-      + (int32_t)sizeof(az_iot_hub_client_twin_equals) + az_span_size(request_id);
+      + (int32_t)sizeof(az_iot_hub_client_twin_equals) + _az_iot_u32toa_size(request_id);
 
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_topic_span, required_length + (int32_t)sizeof(null_terminator));
 
@@ -121,7 +121,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_document_get_publish_topic(
   remainder = az_span_copy_u8(remainder, az_iot_hub_client_twin_question);
   remainder = az_span_copy(remainder, az_iot_hub_client_request_id_span);
   remainder = az_span_copy_u8(remainder, az_iot_hub_client_twin_equals);
-  remainder = az_span_copy(remainder, request_id);
+  AZ_RETURN_IF_FAILED(az_span_u32toa(remainder, request_id, &remainder));
   az_span_copy_u8(remainder, null_terminator);
 
   if (out_mqtt_topic_length)
@@ -134,13 +134,12 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_document_get_publish_topic(
 
 AZ_NODISCARD az_result az_iot_hub_client_twin_patch_get_publish_topic(
     az_iot_hub_client const* client,
-    az_span request_id,
+    uint32_t request_id,
     char* mqtt_topic,
     size_t mqtt_topic_size,
     size_t* out_mqtt_topic_length)
 {
   _az_PRECONDITION_NOT_NULL(client);
-  _az_PRECONDITION_VALID_SPAN(request_id, 1, false);
   _az_PRECONDITION_NOT_NULL(mqtt_topic);
   _az_PRECONDITION(mqtt_topic_size > 0);
   (void)client;
@@ -150,7 +149,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_patch_get_publish_topic(
       + az_span_size(az_iot_hub_twin_patch_pub_topic)
       + (int32_t)sizeof(az_iot_hub_client_twin_question)
       + az_span_size(az_iot_hub_client_request_id_span)
-      + (int32_t)sizeof(az_iot_hub_client_twin_equals) + az_span_size(request_id);
+      + (int32_t)sizeof(az_iot_hub_client_twin_equals) + _az_iot_u32toa_size(request_id);
 
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_topic_span, required_length + (int32_t)sizeof(null_terminator));
 
@@ -159,7 +158,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_patch_get_publish_topic(
   remainder = az_span_copy_u8(remainder, az_iot_hub_client_twin_question);
   remainder = az_span_copy(remainder, az_iot_hub_client_request_id_span);
   remainder = az_span_copy_u8(remainder, az_iot_hub_client_twin_equals);
-  remainder = az_span_copy(remainder, request_id);
+  AZ_RETURN_IF_FAILED(az_span_u32toa(remainder, request_id, &remainder));
   az_span_copy_u8(remainder, null_terminator);
 
   if (out_mqtt_topic_length)
@@ -215,8 +214,10 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
       az_span prop_span = az_span_slice(remainder, 1, az_span_size(remainder));
       AZ_RETURN_IF_FAILED(
           az_iot_hub_client_properties_init(&props, prop_span, az_span_size(prop_span)));
+      az_span request_id;
       AZ_RETURN_IF_FAILED(az_iot_hub_client_properties_find(
-          &props, az_iot_hub_client_request_id_span, &out_twin_response->request_id));
+          &props, az_iot_hub_client_request_id_span, &request_id));
+      AZ_RETURN_IF_FAILED(az_span_atou32(request_id, &out_twin_response->request_id));
 
       if (out_twin_response->status == AZ_IOT_STATUS_NO_CONTENT)
       {
@@ -251,7 +252,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
           &props, az_iot_hub_twin_version_prop, &out_twin_response->version));
 
       out_twin_response->response_type = AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES;
-      out_twin_response->request_id = AZ_SPAN_NULL;
+      out_twin_response->request_id = 0;
       out_twin_response->status = AZ_IOT_STATUS_OK;
 
       result = AZ_OK;

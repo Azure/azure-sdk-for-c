@@ -403,7 +403,7 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_get_subscribe_topic_filter(
  */
 typedef struct az_iot_hub_client_method_request
 {
-  az_span request_id; /**< The request id.
+  uint32_t request_id; /**< The request id.
                        * @note The application must match the method request and method response. */
   az_span name; /**< The method name. */
 } az_iot_hub_client_method_request;
@@ -440,7 +440,7 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_parse_received_topic(
  */
 AZ_NODISCARD az_result az_iot_hub_client_methods_response_get_publish_topic(
     az_iot_hub_client const* client,
-    az_span request_id,
+    uint32_t request_id,
     uint16_t status,
     char* mqtt_topic,
     size_t mqtt_topic_size,
@@ -508,7 +508,7 @@ typedef struct az_iot_hub_client_twin_response
 {
   az_iot_hub_client_twin_response_type response_type; /**< Twin response type. */
   az_iot_status status; /**< The operation status. */
-  az_span
+  uint32_t
       request_id; /**< Request ID matches the ID specified when issuing a Get or Patch command. */
   az_span version; /**< The Twin object version.
                     * @remark This is only returned when
@@ -548,7 +548,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
  */
 AZ_NODISCARD az_result az_iot_hub_client_twin_document_get_publish_topic(
     az_iot_hub_client const* client,
-    az_span request_id,
+    uint32_t request_id,
     char* mqtt_topic,
     size_t mqtt_topic_size,
     size_t* out_mqtt_topic_length);
@@ -570,7 +570,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_document_get_publish_topic(
  */
 AZ_NODISCARD az_result az_iot_hub_client_twin_patch_get_publish_topic(
     az_iot_hub_client const* client,
-    az_span request_id,
+    uint32_t request_id,
     char* mqtt_topic,
     size_t mqtt_topic_size,
     size_t* out_mqtt_topic_length);
