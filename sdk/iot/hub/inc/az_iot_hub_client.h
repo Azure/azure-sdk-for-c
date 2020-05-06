@@ -361,7 +361,7 @@ AZ_NODISCARD az_result az_iot_hub_client_c2d_parse_received_topic(
 
 /**
  * @brief The MQTT topic filter to subscribe to method requests.
- * @remark Methods MQTT Publish messages will have QoS At Most Once (0).
+ * @remark Methods MQTT Publish messages will have QoS At most once (0).
  */
 #define AZ_IOT_HUB_CLIENT_METHODS_SUBSCRIBE_TOPIC "$iothub/methods/POST/#"
 
@@ -422,13 +422,13 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_response_get_publish_topic(
 
 /**
  * @brief The MQTT topic filter to subscribe to twin operation responses.
- * @remark Twin MQTT Publish messages will have QoS At Most Once (0).
+ * @remark Twin MQTT Publish messages will have QoS At most once (0).
  */
 #define AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_SUBSCRIBE_TOPIC "$iothub/twin/res/#"
 
 /**
  * @brief Gets the MQTT topic filter to subscribe to twin desired property changes.
- * @remark Twin MQTT Publish messages will have QoS At Most Once (0).
+ * @remark Twin MQTT Publish messages will have QoS At most once (0).
  */
 #define AZ_IOT_HUB_CLIENT_TWIN_PATCH_SUBSCRIBE_TOPIC "$iothub/twin/PATCH/properties/desired/#"
 
