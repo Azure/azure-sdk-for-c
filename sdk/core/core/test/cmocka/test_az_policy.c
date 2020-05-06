@@ -97,96 +97,6 @@ void test_az_http_pipeline_policy_telemetry(void** state)
   assert_return_code(az_http_pipeline_policy_telemetry(policies, &telemetry, &hrb, NULL), AZ_OK);
 }
 
-static void test_az_http_pipeline_policy_header_validation(void** state)
-{
-  (void)state;
-
-  uint8_t buf[100];
-  uint8_t header_buf[(2 * sizeof(az_pair))];
-  memset(buf, 0, sizeof(buf));
-  memset(header_buf, 0, sizeof(header_buf));
-
-  az_span url_span = AZ_SPAN_FROM_BUFFER(buf);
-  az_span remainder = az_span_copy(url_span, AZ_SPAN_FROM_STR("url"));
-  assert_int_equal(az_span_size(remainder), 97);
-  az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-  _az_http_request hrb;
-
-  assert_return_code(
-      az_http_request_init(
-          &hrb, &az_context_app, az_http_method_get(), url_span, 3, header_span, AZ_SPAN_NULL),
-      AZ_OK);
-
-  _az_http_policy policies[1] = {            
-            {
-              ._internal = {
-                .process = test_policy_transport,
-                .p_options = NULL,
-              },
-            },
-        };
-  az_http_response response = { 0 };
-  assert_return_code(
-      az_http_response_init(
-          &response,
-          AZ_SPAN_FROM_STR("HTTP/1.1 404 Not Found\r\n"
-                           "Header11: Value11\r\n"
-                           "Header22: NNNNOOOOPPPPQQQQRRRRSSSSTTTTUUUUVVVVWWWWXXXXYYYYZZZZ\r\n"
-                           "Header33:\r\n"
-                           "Header44: cba888888777777666666555555444444333333222222111111\r\n"
-                           "\r\n"
-                           "KKKKKJJJJJIIIIIHHHHHGGGGGFFFFFEEEEEDDDDDCCCCCBBBBBAAAAA")),
-      AZ_OK);
-
-  assert_return_code(
-      az_http_pipeline_policy_header_validation(policies, NULL, &hrb, &response), AZ_OK);
-}
-
-static void test_az_http_pipeline_policy_header_validation_invalid(void** state)
-{
-  (void)state;
-
-  uint8_t buf[100];
-  uint8_t header_buf[(2 * sizeof(az_pair))];
-  memset(buf, 0, sizeof(buf));
-  memset(header_buf, 0, sizeof(header_buf));
-
-  az_span url_span = AZ_SPAN_FROM_BUFFER(buf);
-  az_span remainder = az_span_copy(url_span, AZ_SPAN_FROM_STR("url"));
-  assert_int_equal(az_span_size(remainder), 97);
-  az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-  _az_http_request hrb;
-
-  assert_return_code(
-      az_http_request_init(
-          &hrb, &az_context_app, az_http_method_get(), url_span, 3, header_span, AZ_SPAN_NULL),
-      AZ_OK);
-
-  _az_http_policy policies[1] = {            
-            {
-              ._internal = {
-                .process = test_policy_transport,
-                .p_options = NULL,
-              },
-            },
-        };
-  az_http_response response = { 0 };
-  assert_return_code(
-      az_http_response_init(
-          &response,
-          AZ_SPAN_FROM_STR("HTTP/1.1 404 Not Found\r\n"
-                           "Header11: Value11\r\n"
-                           "Header22: NNNNOOOOPPPPQQQQRRRRSSSSTTTTUUUUVVVVWWWWXXXXYYYYZZZZ\r\n"
-                           "Header33:\r\n"
-                           "He@ader44: cba888888777777666666555555444444333333222222111111\r\n"
-                           "\r\n"
-                           "KKKKKJJJJJIIIIIHHHHHGGGGGFFFFFEEEEEDDDDDCCCCCBBBBBAAAAA")),
-      AZ_OK);
-
-  az_result r = az_http_pipeline_policy_header_validation(policies, NULL, &hrb, &response);
-  assert_true(r == AZ_ERROR_HTTP_RESPONSE_CONTAINS_INVALID_HEADERS);
-}
-
 void test_az_http_pipeline_policy_apiversion(void** state)
 {
   (void)state;
@@ -428,8 +338,6 @@ int test_az_policy()
 #endif // _az_MOCK_ENABLED
     cmocka_unit_test(test_az_http_pipeline_policy_apiversion),
     cmocka_unit_test(test_az_http_pipeline_policy_telemetry),
-    cmocka_unit_test(test_az_http_pipeline_policy_header_validation),
-    cmocka_unit_test(test_az_http_pipeline_policy_header_validation_invalid),
   };
   return cmocka_run_group_tests_name("az_core_policy", tests, NULL, NULL);
 }

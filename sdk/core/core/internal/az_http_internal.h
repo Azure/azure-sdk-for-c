@@ -60,7 +60,7 @@ typedef struct
 {
   struct
   {
-    _az_http_policy p_policies[11];
+    _az_http_policy p_policies[10];
   } _internal;
 } _az_http_pipeline;
 
@@ -165,12 +165,6 @@ AZ_NODISCARD az_result az_http_pipeline_policy_credential(
     az_http_response* p_response);
 
 AZ_NODISCARD az_result az_http_pipeline_policy_logging(
-    _az_http_policy* p_policies,
-    void* p_data,
-    _az_http_request* p_request,
-    az_http_response* p_response);
-
-AZ_NODISCARD az_result az_http_pipeline_policy_header_validation(
     _az_http_policy* p_policies,
     void* p_data,
     _az_http_request* p_request,

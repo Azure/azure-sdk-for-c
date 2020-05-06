@@ -126,12 +126,6 @@ AZ_NODISCARD az_result az_keyvault_keys_client_init(
             },
             {
               ._internal = {
-                .process = az_http_pipeline_policy_header_validation,
-                .p_options = NULL,
-              },
-            },
-            {
-              ._internal = {
                 .process = az_http_pipeline_policy_transport,
                 .p_options= NULL,
               },

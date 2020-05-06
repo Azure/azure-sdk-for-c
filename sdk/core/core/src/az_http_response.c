@@ -3,6 +3,7 @@
 
 #include <az_http.h>
 
+#include "az_http_header_validation_private.h"
 #include "az_http_private.h"
 #include "az_span_private.h"
 #include <az_precondition.h>
@@ -18,7 +19,21 @@ AZ_NODISCARD AZ_INLINE az_result _az_is_char(az_span slice, uint8_t c)
   return az_span_ptr(slice)[0] == c ? AZ_OK : AZ_CONTINUE;
 }
 
-static AZ_NODISCARD az_result _az_is_a_colon(az_span slice) { return _az_is_char(slice, ':'); }
+static AZ_NODISCARD az_result _az_valid_header_name_to_colon(az_span slice)
+{
+  az_result is_colon_result = _az_is_char(slice, ':');
+  if (is_colon_result == AZ_OK)
+  {
+    return is_colon_result;
+  }
+
+  if (!az_http_valid_token[az_span_ptr(slice)[0]])
+  {
+    return AZ_ERROR_HTTP_RESPONSE_CONTAINS_INVALID_HEADERS;
+  }
+
+  return is_colon_result;
+}
 static AZ_NODISCARD az_result _az_is_new_line(az_span slice) { return _az_is_char(slice, '\n'); }
 
 static AZ_NODISCARD bool _az_is_http_whitespace(uint8_t c)
@@ -171,7 +186,8 @@ az_http_response_get_next_header(az_http_response* response, az_pair* out_header
     //         "_" / "`" / "|" / "~" / DIGIT / ALPHA;
     // any VCHAR,
     //    except delimiters
-    AZ_RETURN_IF_FAILED(_az_span_scan_until(*reader, _az_is_a_colon, &field_name_length));
+    AZ_RETURN_IF_FAILED(
+        _az_span_scan_until(*reader, _az_valid_header_name_to_colon, &field_name_length));
 
     // form a header name. Reader is currently at char ':'
     out_header->key = az_span_slice(*reader, 0, field_name_length);
