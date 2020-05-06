@@ -291,4 +291,4 @@ Security issues and bugs should be reported privately, via email, to the Microso
 
 ### License
 
-Azure IoT SDK for Embedded C is licensed under the [MIT](LICENSE) license.
+Azure IoT Embedded C SDK is licensed under the [MIT](LICENSE) license.

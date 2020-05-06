@@ -6,9 +6,9 @@ For more details about DPS check [Azure documentation](https://docs.microsoft.co
 
 ## Getting started
 
-- Pelase refer to the state machine diagram which describes the Embedded C SDK flow for DPS [here](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/iot/doc/mqtt_state_machine.md#device-provisioning-service). 
+- Pelase refer to the state machine diagram which describes the Azure IoT Embedded C SDK flow for DPS [here](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/iot/doc/mqtt_state_machine.md#device-provisioning-service). 
 
-- **Samples**: [This page](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/iot/samples) explains samples for the Azure Embedded C SDK IoT Provisioning Client and how to use them.
+- **Samples**: [This page](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/iot/provisioning/samples) explains samples for the Azure IoT Embedded C SDK IoT Provisioning Client and how to use them.
 
 ## Need help?
 
@@ -51,4 +51,4 @@ Security issues and bugs should be reported privately, via email, to the Microso
 
 ### License
 
-Azure IoT SDK for Embedded C is licensed under the [MIT](LICENSE) license.
+Azure IoT Embedded C SDK is licensed under the [MIT](LICENSE) license.
