@@ -1,9 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "az_http_header_validation_private.h"
 #include "az_http_policy_private.h"
-
 #include "az_http_private.h"
 #include <az_credentials.h>
 #include <az_http.h>
