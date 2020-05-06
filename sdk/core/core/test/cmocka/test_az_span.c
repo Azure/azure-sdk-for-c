@@ -808,11 +808,11 @@ static void test_az_span_is_valid(void** state)
   assert_false(_az_span_is_valid(az_span_init(max_ptr - 1, 2), 0, false));
   assert_false(_az_span_is_valid(az_span_init(max_ptr - 1, 2), 0, true));
 
-  assert_false(_az_span_is_valid(az_span_init(max_ptr - 1, UINT32_MAX), 0, false));
-  assert_false(_az_span_is_valid(az_span_init(max_ptr - 1, UINT32_MAX), 0, true));
+  assert_false(_az_span_is_valid(az_span_init(max_ptr - 1, INT32_MAX), 0, false));
+  assert_false(_az_span_is_valid(az_span_init(max_ptr - 1, INT32_MAX), 0, true));
 
-  assert_true(_az_span_is_valid(az_span_init(max_ptr - UINT32_MAX, UINT32_MAX), 0, false));
-  assert_true(_az_span_is_valid(az_span_init(max_ptr - UINT32_MAX, UINT32_MAX), 0, true));
+  assert_true(_az_span_is_valid(az_span_init(max_ptr - INT32_MAX, INT32_MAX), 0, false));
+  assert_true(_az_span_is_valid(az_span_init(max_ptr - INT32_MAX, INT32_MAX), 0, true));
 }
 
 static void test_az_span_overlap(void** state)
