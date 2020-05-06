@@ -14,8 +14,8 @@
 
 #include <_az_cfg.h>
 
-static az_log_classification const* _az_log_classifications = NULL;
-static az_log_message_fn _az_log_message_callback = NULL;
+static az_log_classification const* volatile _az_log_classifications = NULL;
+static az_log_message_fn volatile _az_log_message_callback = NULL;
 
 void az_log_set_classifications(az_log_classification const classifications[])
 {
@@ -27,15 +27,15 @@ void az_log_set_callback(az_log_message_fn az_log_message_callback)
   _az_log_message_callback = az_log_message_callback;
 }
 
-void az_log_write(az_log_classification classification, az_span message)
+void _az_log_write(az_log_classification classification, az_span message)
 {
-  if (_az_log_message_callback != NULL && az_log_should_write(classification))
+  if (_az_log_message_callback != NULL && _az_log_should_write(classification))
   {
     _az_log_message_callback(classification, message);
   }
 }
 
-bool az_log_should_write(az_log_classification classification)
+bool _az_log_should_write(az_log_classification classification)
 {
   if (_az_log_message_callback == NULL)
   {
