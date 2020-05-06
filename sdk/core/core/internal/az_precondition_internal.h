@@ -71,18 +71,6 @@ AZ_NODISCARD AZ_INLINE bool _az_span_is_valid(az_span span, int32_t min_size, bo
   uint8_t* const ptr = az_span_ptr(span);
   int32_t const span_size = az_span_size(span);
 
-  // Can't wrap over the end of the address space.
-  // The biggest theoretical pointer value is "(void*)~0" (0xFFFF...), which is the end of address
-  // space. We don't attempt to read/write beyond the end of the address space - it is unlikely a
-  // desired behavior, and it is not defined. So, if the span size is greater than the addresses
-  // left until the theoretical end of the address space, it is not a valid span.
-  // Example: (az_span) { .ptr = (uint8_t*)(~0 - 5), .size = 10 } is not a valid span, because most
-  // likely you end up pointing to 0x0000 at .ptr[6], &.ptr[7] is 0x...0001, etc.
-  if (span_size > (uint8_t*)~0 - ptr)
-  {
-    return false;
-  }
-
   bool result = false;
 
   /* Span is valid if:
@@ -93,7 +81,6 @@ AZ_NODISCARD AZ_INLINE bool _az_span_is_valid(az_span span, int32_t min_size, bo
   */
 
   uint8_t* const default_init_ptr = az_span_ptr((az_span){ 0 });
-
   if (null_is_valid)
   {
     result = (ptr == NULL || ptr == default_init_ptr) ? span_size == 0 : span_size >= 0;
@@ -103,7 +90,25 @@ AZ_NODISCARD AZ_INLINE bool _az_span_is_valid(az_span span, int32_t min_size, bo
     result = (ptr != NULL && ptr != default_init_ptr) && span_size >= 0;
   }
 
-  return result && min_size <= span_size;
+  if (!result)
+  {
+    return false;
+  }
+
+  // Can't wrap over the end of the address space.
+  // The biggest theoretical pointer value is "(void*)~0" (0xFFFF...), which is the end of address
+  // space. We don't attempt to read/write beyond the end of the address space - it is unlikely a
+  // desired behavior, and it is not defined. So, if the span size is greater than the addresses
+  // left until the theoretical end of the address space, it is not a valid span.
+  // Example: (az_span) { .ptr = (uint8_t*)(~0 - 5), .size = 10 } is not a valid span, because most
+  // likely you end up pointing to 0x0000 at .ptr[6], &.ptr[7] is 0x...0001, etc.
+  uint8_t* const max_ptr = (uint8_t*)~0;
+  if ((size_t)span_size > (size_t)(max_ptr - ptr))
+  {
+    return false;
+  }
+
+  return min_size <= span_size;
 }
 
 #define _az_PRECONDITION_VALID_SPAN(span, min_size, null_is_valid) \
