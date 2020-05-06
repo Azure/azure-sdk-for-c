@@ -5,10 +5,11 @@
 #define _az_PRECONDITION_TESTING_H
 
 #include <assert.h>
-#include <cmocka.h>
 #include <setjmp.h>
 #include <stdarg.h>
 #include <stdint.h>
+
+#include <cmocka.h>
 
 // This block defines the resources needed to verify precondition checking.
 // Macro enable_precondition_check_tests() (no semi-colon at end) shall be invoked in the unit test
