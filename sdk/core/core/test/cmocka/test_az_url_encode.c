@@ -217,7 +217,7 @@ static void test_url_encode_preconditions(void** state)
   {
     {
       // URL encode could never succeed.
-      uint8_t buf5[5] = = { '*', '*', '*', '*', '*' };
+      uint8_t buf5[5] = { '*', '*', '*', '*', '*' };
       az_span const buffer5 = AZ_SPAN_FROM_BUFFER(buf5);
 
       int32_t url_length = 0xFF;
