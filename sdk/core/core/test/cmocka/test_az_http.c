@@ -497,7 +497,7 @@ static void test_http_response_header_validation_space(void** state)
         az_http_response_init(
             &response,
             AZ_SPAN_FROM_STR("HTTP/1.1 404 Not Found\r\n"
-                             "Header11 :Value11\r\n"
+                             "   Header11     :         Value11\r\n"
                              "\r\n"
                              "KKKKKJJJJJIIIIIHHHHHGGGGGFFFFFEEEEEDDDDDCCCCCBBBBBAAAAA")),
         AZ_OK);
@@ -505,8 +505,10 @@ static void test_http_response_header_validation_space(void** state)
     az_http_response_status_line status_line = { 0 };
     assert_return_code(az_http_response_get_status_line(&response, &status_line), AZ_OK);
     az_pair header = { 0 };
-    az_result fail_header_result = az_http_response_get_next_header(&response, &header);
-    assert_true(AZ_ERROR_HTTP_RESPONSE_CONTAINS_INVALID_HEADERS == fail_header_result);
+    // Spaces in headers are Fine, we trim them
+    assert_return_code(az_http_response_get_next_header(&response, &header), AZ_OK);
+    assert_true(az_span_is_content_equal(header.key, AZ_SPAN_FROM_STR("Header11")));
+    assert_true(az_span_is_content_equal(header.value, AZ_SPAN_FROM_STR("Value11")));
   }
 }
 
