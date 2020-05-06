@@ -764,11 +764,12 @@ static void az_span_copy_empty(void** state)
 static void test_az_span_is_valid(void** state)
 {
   (void)state;
-  {
-    az_span const span_zeroed = { 0 };
-    az_span const span_null = AZ_SPAN_NULL;
-    assert_true(memcmp(&span_zeroed, &span_null, sizeof(az_span)) == 0);
-  }
+  assert_true(_az_span_is_valid((az_span){ 0 }, 0, true));
+  assert_false(_az_span_is_valid((az_span){ 0 }, 0, false));
+  assert_false(_az_span_is_valid((az_span){ 0 }, 1, true));
+  assert_false(_az_span_is_valid((az_span){ 0 }, 1, false));
+  assert_false(_az_span_is_valid((az_span){ 0 }, -1, true));
+  assert_false(_az_span_is_valid((az_span){ 0 }, -1, false));
 
   assert_true(_az_span_is_valid(AZ_SPAN_NULL, 0, true));
   assert_false(_az_span_is_valid(AZ_SPAN_NULL, 0, false));

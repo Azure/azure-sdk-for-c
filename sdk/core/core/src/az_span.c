@@ -748,7 +748,7 @@ AZ_NODISCARD az_result _az_span_url_encode(az_span destination, az_span source, 
       if (!_az_span_url_should_encode(c))
       {
         *dest_ptr = c;
-        dest_ptr += 1;
+        ++dest_ptr;
       }
       else
       {
@@ -772,7 +772,7 @@ AZ_NODISCARD az_result _az_span_url_encode(az_span destination, az_span source, 
       if (!_az_span_url_should_encode(c))
       {
         *dest_ptr = c;
-        dest_ptr += 1;
+        ++dest_ptr;
       }
       else
       {

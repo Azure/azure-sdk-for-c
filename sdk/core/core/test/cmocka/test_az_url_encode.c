@@ -64,7 +64,7 @@ static void test_url_encode_basic(void** state)
     int32_t url_length = 0xFF;
     assert_true(az_succeeded(_az_span_url_encode(buffer5, AZ_SPAN_FROM_STR("AbCdE"), &url_length)));
 
-    assert_int_equal(url_length, sizeof("AbCdE"));
+    assert_int_equal(url_length, sizeof("AbCdE") - 1);
     assert_true(az_span_is_content_equal(
         AZ_SPAN_FROM_BUFFER(buf20), AZ_SPAN_FROM_STR("AbCdE***************")));
   }
@@ -80,7 +80,7 @@ static void test_url_encode_basic(void** state)
     int32_t url_length = 0xFF;
     assert_true(az_succeeded(_az_span_url_encode(buffer7, AZ_SPAN_FROM_STR("aBc/g"), &url_length)));
 
-    assert_int_equal(url_length, sizeof("aBc%2Fg"));
+    assert_int_equal(url_length, sizeof("aBc%2Fg") - 1);
     assert_true(az_span_is_content_equal(
         AZ_SPAN_FROM_BUFFER(buf20), AZ_SPAN_FROM_STR("aBc%2Fg*************")));
   }
@@ -114,7 +114,7 @@ static void test_url_encode_basic(void** state)
     int32_t url_length = 0xFF;
     assert_true(az_succeeded(_az_span_url_encode(buffer3, AZ_SPAN_FROM_STR("/"), &url_length)));
 
-    assert_int_equal(url_length, sizeof("%2F"));
+    assert_int_equal(url_length, sizeof("%2F") - 1);
     assert_true(az_span_is_content_equal(
         AZ_SPAN_FROM_BUFFER(buf20), AZ_SPAN_FROM_STR("%2F*****************")));
   }
@@ -130,7 +130,7 @@ static void test_url_encode_basic(void** state)
     int32_t url_length = 0xFF;
     assert_true(az_succeeded(_az_span_url_encode(buffer9, AZ_SPAN_FROM_STR("///"), &url_length)));
 
-    assert_int_equal(url_length, sizeof("%2F%2F%2F"));
+    assert_int_equal(url_length, sizeof("%2F%2F%2F") - 1);
     assert_true(az_span_is_content_equal(
         AZ_SPAN_FROM_BUFFER(buf20), AZ_SPAN_FROM_STR("%2F%2F%2F***********")));
   }
@@ -146,7 +146,7 @@ static void test_url_encode_basic(void** state)
     int32_t url_length = 0xFF;
     assert_true(az_succeeded(_az_span_url_encode(buffer11, AZ_SPAN_FROM_STR("///"), &url_length)));
 
-    assert_int_equal(url_length, sizeof("%2F%2F%2F"));
+    assert_int_equal(url_length, sizeof("%2F%2F%2F") - 1);
     assert_true(az_span_is_content_equal(
         AZ_SPAN_FROM_BUFFER(buf20), AZ_SPAN_FROM_STR("%2F%2F%2F***********")));
   }
@@ -200,7 +200,7 @@ static void test_url_encode_basic(void** state)
     assert_true(
         az_succeeded(_az_span_url_encode(buffer12, AZ_SPAN_FROM_STR("AbC///"), &url_length)));
 
-    assert_int_equal(url_length, sizeof("AbC%2F%2F%2F"));
+    assert_int_equal(url_length, sizeof("AbC%2F%2F%2F") - 1);
     assert_true(az_span_is_content_equal(
         AZ_SPAN_FROM_BUFFER(buf20), AZ_SPAN_FROM_STR("AbC%2F%2F%2F***********")));
   }
@@ -241,7 +241,7 @@ static void test_url_encode_preconditions(void** state)
 
       int32_t url_length = 0xFF;
       assert_true(az_succeeded(_az_span_url_encode(in_buffer, out_buffer, &url_length)));
-      assert_int_equal(url_length, sizeof("aBc"));
+      assert_int_equal(url_length, sizeof("aBc") - 1);
       assert_true(
           az_span_is_content_equal(AZ_SPAN_FROM_BUFFER(buf), AZ_SPAN_FROM_STR("aBc**********")));
     }
@@ -254,7 +254,7 @@ static void test_url_encode_preconditions(void** state)
 
       int32_t url_length = 0xFF;
       assert_true(az_succeeded(_az_span_url_encode(in_buffer, out_buffer, &url_length)));
-      assert_int_equal(url_length, sizeof("aaaaaa"));
+      assert_int_equal(url_length, sizeof("aaaaaa") - 1);
       assert_true(
           az_span_is_content_equal(AZ_SPAN_FROM_BUFFER(buf), AZ_SPAN_FROM_STR("aaaaaaa******")));
     }
@@ -266,7 +266,7 @@ static void test_url_encode_preconditions(void** state)
 
       int32_t url_length = 0xFF;
       assert_true(az_succeeded(_az_span_url_encode(in_buffer, out_buffer, &url_length)));
-      assert_int_equal(url_length, sizeof("%2F2F"));
+      assert_int_equal(url_length, sizeof("%2F2F") - 1);
       assert_true(
           az_span_is_content_equal(AZ_SPAN_FROM_BUFFER(buf), AZ_SPAN_FROM_STR("%2F2F*******")));
     }
@@ -356,7 +356,7 @@ static void test_url_encode_usage(void** state)
   assert_true(az_span_is_content_equal(
       az_span_slice(buffer, 0, url_length), AZ_SPAN_FROM_STR("https%3A%2F%2Fvault.azure.net")));
 
-  assert_int_equal(url_length, sizeof("https%3A%2F%2Fvault.azure.net"));
+  assert_int_equal(url_length, sizeof("https%3A%2F%2Fvault.azure.net") - 1);
 }
 
 static void test_url_encode_full(void** state)
@@ -393,7 +393,7 @@ static void test_url_encode_full(void** state)
   int const nunreserved = sizeof("-_.~"
                                  "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                  "abcdefghijklmnopqrstuvwxyz"
-                                 "0123456789");
+                                 "0123456789" - 1);
 
   assert_int_equal(url_length, nunreserved + (256 - nunreserved) * 3);
 
