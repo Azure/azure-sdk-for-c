@@ -192,7 +192,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_password(
 
 /**
  * @brief The MQTT topic filter to subscribe to register responses.
- * @remark Register MQTT Publish messages will have QoS At Most Once (0).
+ * @remark Register MQTT Publish messages will have QoS At most once (0).
  */
 #define AZ_IOT_PROVISIONING_CLIENT_REGISTER_SUBSCRIBE_TOPIC "$dps/registrations/res/#"
 

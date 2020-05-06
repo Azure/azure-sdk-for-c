@@ -16,19 +16,24 @@ static const az_span str_put_iotdps_register
     = AZ_SPAN_LITERAL_FROM_STR("PUT/iotdps-register/?$rid=1");
 static const az_span str_get_iotdps_get_operationstatus
     = AZ_SPAN_LITERAL_FROM_STR("GET/iotdps-get-operationstatus/?$rid=1&operationId=");
-static const az_span str_dps_registrations_res
-    = AZ_SPAN_LITERAL_FROM_STR("$dps/registrations/res/");
+
+// $dps/registrations/res/
+AZ_INLINE az_span _az_iot_provisioning_get_dps_registrations_res()
+{
+  az_span sub_topic = AZ_SPAN_LITERAL_FROM_STR(AZ_IOT_PROVISIONING_CLIENT_REGISTER_SUBSCRIBE_TOPIC);
+  return az_span_slice(sub_topic, 0, 23);
+}
 
 // /registrations/
 AZ_INLINE az_span _az_iot_provisioning_get_str_registrations()
 {
-  return az_span_slice(str_dps_registrations_res, 4, 19);
+  return az_span_slice(_az_iot_provisioning_get_dps_registrations_res(), 4, 19);
 }
 
 // $dps/registrations/
 AZ_INLINE az_span _az_iot_provisioning_get_str_dps_registrations()
 {
-  return az_span_slice(str_dps_registrations_res, 0, 19);
+  return az_span_slice(_az_iot_provisioning_get_dps_registrations_res(), 0, 19);
 }
 
 AZ_NODISCARD az_iot_provisioning_client_options az_iot_provisioning_client_options_default()
@@ -430,6 +435,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_parse_received_topic_and_paylo
   _az_PRECONDITION_VALID_SPAN(received_payload, 0, false);
   _az_PRECONDITION_NOT_NULL(out_response);
 
+  az_span str_dps_registrations_res = _az_iot_provisioning_get_dps_registrations_res();
   int32_t idx = az_span_find(received_topic, str_dps_registrations_res);
   if (idx != 0)
   {

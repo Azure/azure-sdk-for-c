@@ -198,7 +198,7 @@ AZ_NODISCARD az_result az_iot_hub_client_sas_get_password(
  *
  * Properties APIs
  *
- *   IoT Hub message properties are used for Device to Cloud (D2C) as well as Cloud to Device (C2D).
+ *   IoT Hub message properties are used for Device-to-Cloud (D2C) as well as Cloud-to-Device (C2D).
  *   Properties are always appended to the MQTT topic of the published or received message and
  *   must contain Uri-encoded keys and values.
  */
@@ -297,7 +297,7 @@ az_iot_hub_client_properties_next(az_iot_hub_client_properties* properties, az_p
 
 /**
  * @brief Gets the MQTT topic that must be used for device to cloud telemetry messages.
- * @remark Telemetry MQTT Publish messages must have QoS At Least Once (1).
+ * @remark Telemetry MQTT Publish messages must have QoS At least once (1).
  * @remark This topic can also be used to set the MQTT Will message in the Connect message.
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
@@ -319,18 +319,18 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_get_publish_topic(
 
 /**
  *
- * Cloud to device (C2D) APIs
+ * Cloud-to-device (C2D) APIs
  *
  */
 
 /**
- * @brief The MQTT topic filter to subscribe to cloud to device requests.
- * @remark C2D MQTT Publish messages will have QoS At Least Once (1).
+ * @brief The MQTT topic filter to subscribe to Cloud-to-Device requests.
+ * @remark C2D MQTT Publish messages will have QoS At least once (1).
  */
 #define AZ_IOT_HUB_CLIENT_C2D_SUBSCRIBE_TOPIC "devices/+/messages/devicebound/#"
 
 /**
- * @brief The Cloud To Device Request.
+ * @brief The Cloud-To-Device Request.
  *
  */
 typedef struct az_iot_hub_client_c2d_request
