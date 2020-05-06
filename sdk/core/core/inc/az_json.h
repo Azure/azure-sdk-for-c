@@ -24,7 +24,7 @@
 
 #include <_az_cfg_prefix.h>
 
-/*
+/**
  * @brief az_json_token_kind is an enum defining symbols for the various kinds of JSON tokens.
  */
 typedef enum
@@ -43,7 +43,7 @@ typedef enum
   AZ_JSON_TOKEN_SPAN,
 } az_json_token_kind;
 
-/*
+/**
  * @brief An az_json_token instance represents a JSON token. The kind field indicates the kind of
  * token and based on the kind, you access the corresponding field.
  */
@@ -58,7 +58,7 @@ typedef struct
   } _internal;
 } az_json_token;
 
-/*
+/**
  * @brief az_json_token_null Returns the "null" JSON token.
  */
 AZ_NODISCARD AZ_INLINE az_json_token az_json_token_null()
@@ -66,7 +66,7 @@ AZ_NODISCARD AZ_INLINE az_json_token az_json_token_null()
   return (az_json_token){ .kind = AZ_JSON_TOKEN_NULL, ._internal = { 0 } };
 }
 
-/*
+/**
  * @brief az_json_token_boolean Returns a boolean JSON token representing either "true" or "false".
  *
  * @param value A boolean indicating how the az_json_token should be initialized.
@@ -79,7 +79,7 @@ AZ_NODISCARD AZ_INLINE az_json_token az_json_token_boolean(bool value)
   };
 }
 
-/*
+/**
  * @brief az_json_token_number returns a az_json_token containing a number.
  *
  * @param value A double indicating how the az_json_token should be initialized.
@@ -92,7 +92,7 @@ AZ_NODISCARD AZ_INLINE az_json_token az_json_token_number(double value)
   };
 }
 
-/*
+/**
  * @brief az_json_token_string returns a az_json_token containing a string.
  *
  * @param value A span over a string indicating how the az_json_token should be initialized.
@@ -105,7 +105,7 @@ AZ_NODISCARD AZ_INLINE az_json_token az_json_token_string(az_span value)
   };
 }
 
-/*
+/**
  * @brief az_json_token_string returns a az_json_token containing an object.
  *
  * @param value A span over an object indicating how the az_json_token should be initialized.
@@ -118,7 +118,7 @@ AZ_NODISCARD AZ_INLINE az_json_token az_json_token_object(az_span value)
   };
 }
 
-/*
+/**
  * @brief az_json_token_object_start returns a az_json_token representing the start of an object.
  */
 AZ_NODISCARD AZ_INLINE az_json_token az_json_token_object_start()
@@ -126,7 +126,7 @@ AZ_NODISCARD AZ_INLINE az_json_token az_json_token_object_start()
   return (az_json_token){ .kind = AZ_JSON_TOKEN_OBJECT_START, ._internal = { 0 } };
 }
 
-/*
+/**
  * @brief az_json_token_object_end returns a az_json_token representing the end of an object.
  */
 AZ_NODISCARD AZ_INLINE az_json_token az_json_token_object_end()
@@ -134,7 +134,7 @@ AZ_NODISCARD AZ_INLINE az_json_token az_json_token_object_end()
   return (az_json_token){ .kind = AZ_JSON_TOKEN_OBJECT_END, ._internal = { 0 } };
 }
 
-/*
+/**
  * @brief az_json_token_array_start returns a az_json_token representing the start of an array.
  */
 AZ_NODISCARD AZ_INLINE az_json_token az_json_token_array_start()
@@ -142,7 +142,7 @@ AZ_NODISCARD AZ_INLINE az_json_token az_json_token_array_start()
   return (az_json_token){ .kind = AZ_JSON_TOKEN_ARRAY_START, ._internal = { 0 } };
 }
 
-/*
+/**
  * @brief az_json_token_array_end returns a az_json_token representing the end of an array.
  */
 AZ_NODISCARD AZ_INLINE az_json_token az_json_token_array_end()
@@ -150,7 +150,7 @@ AZ_NODISCARD AZ_INLINE az_json_token az_json_token_array_end()
   return (az_json_token){ .kind = AZ_JSON_TOKEN_ARRAY_END, ._internal = { 0 } };
 }
 
-/*
+/**
  * @brief az_json_token_get_boolean returns the JSON token's boolean.
  *
  * @param token A pointer to an az_json_token instance.
@@ -160,7 +160,7 @@ AZ_NODISCARD AZ_INLINE az_json_token az_json_token_array_end()
  */
 AZ_NODISCARD az_result az_json_token_get_boolean(az_json_token const* token, bool* out_value);
 
-/*
+/**
  * @brief az_json_token_get_number returns the JSON token's number.
  *
  * @param token A pointer to an az_json_token instance.
@@ -170,7 +170,7 @@ AZ_NODISCARD az_result az_json_token_get_boolean(az_json_token const* token, boo
  */
 AZ_NODISCARD az_result az_json_token_get_number(az_json_token const* token, double* out_value);
 
-/*
+/**
  * @brief az_json_token_get_string returns the JSON token's string via an az_span.
  *
  * @param token A pointer to an az_json_token instance.
@@ -182,7 +182,7 @@ AZ_NODISCARD az_result az_json_token_get_string(az_json_token const* token, az_s
 
 /************************************ JSON BUILDER ******************/
 
-/*
+/**
  * @brief An az_json_builder allows you to build a JSON object into a buffer.
  */
 typedef struct
@@ -195,7 +195,7 @@ typedef struct
   } _internal;
 } az_json_builder;
 
-/*
+/**
  * @brief az_json_builder_init initializes an az_json_builder which writes JSON into a buffer.
  *
  * @param json_builder A pointer to an az_json_builder instance to initialize.
@@ -210,7 +210,7 @@ az_json_builder_init(az_json_builder* json_builder, az_span json_buffer)
   return AZ_OK;
 }
 
-/*
+/**
  * @brief az_json_builder_span_get returns the az_span containing the final JSON object.
  *
  * @param json_builder A pointer to an az_json_builder instance wrapping the JSON buffer.
@@ -221,7 +221,7 @@ AZ_NODISCARD AZ_INLINE az_span az_json_builder_span_get(az_json_builder const* j
   return az_span_slice(json_builder->_internal.json, 0, json_builder->_internal.length);
 }
 
-/*
+/**
  * @brief az_json_builder_append_token appends an az_json_token to the JSON buffer.
  *
  * @param json_builder A pointer to an az_json_builder instance containing the buffer to append the
@@ -233,7 +233,7 @@ AZ_NODISCARD AZ_INLINE az_span az_json_builder_span_get(az_json_builder const* j
 AZ_NODISCARD az_result
 az_json_builder_append_token(az_json_builder* json_builder, az_json_token token);
 
-/*
+/**
  * @brief az_json_builder_append_object appends a JSON to the JSON buffer.
  *
  * @param json_builder A pointer to an az_json_builder instance containing the buffer to append the
@@ -246,7 +246,7 @@ az_json_builder_append_token(az_json_builder* json_builder, az_json_token token)
 AZ_NODISCARD az_result
 az_json_builder_append_object(az_json_builder* json_builder, az_span name, az_json_token token);
 
-/*
+/**
  * @brief az_json_builder_append_array_item appends an array item to the JSON buffer.
  *
  * @param json_builder A pointer to an az_json_builder instance containing the buffer to append the
@@ -262,7 +262,7 @@ az_json_builder_append_array_item(az_json_builder* json_builder, az_json_token t
 
 typedef uint64_t _az_json_stack;
 
-/*
+/**
  * @brief An az_json_parser returns the JSON tokens contained within a JSON buffer.
  */
 typedef struct
@@ -274,7 +274,7 @@ typedef struct
   } _internal;
 } az_json_parser;
 
-/*
+/**
  * @brief An az_json_token_member represents a JSON element's name and value.
  */
 typedef struct
@@ -283,7 +283,7 @@ typedef struct
   az_json_token token;
 } az_json_token_member;
 
-/*
+/**
  * @brief az_json_parser_init initializes an az_json_parser to parse the JSON payload contained
  * within the passed in buffer.
  *
@@ -293,7 +293,7 @@ typedef struct
  */
 AZ_NODISCARD az_result az_json_parser_init(az_json_parser* json_parser, az_span json_buffer);
 
-/*
+/**
  * @brief az_json_parser_parse_token returns the next token in the JSON document.
  *
  * @param json_parser A pointer to an az_json_parser instance containing the JSON to parse.
@@ -306,7 +306,7 @@ AZ_NODISCARD az_result az_json_parser_init(az_json_parser* json_parser, az_span 
 AZ_NODISCARD az_result
 az_json_parser_parse_token(az_json_parser* json_parser, az_json_token* out_token);
 
-/*
+/**
  * @brief az_json_parser_parse_token_member returns the next token member in the JSON document.
  *
  * @param json_parser A pointer to an az_json_parser instance containing the JSON to parse.
@@ -321,7 +321,7 @@ AZ_NODISCARD az_result az_json_parser_parse_token_member(
     az_json_parser* json_parser,
     az_json_token_member* out_token_member);
 
-/*
+/**
  * @brief az_json_parser_parse_array_item returns the next array item in the JSON document.
  *
  * @param json_parser A pointer to an az_json_parser instance containing the JSON to parse.
@@ -334,7 +334,7 @@ AZ_NODISCARD az_result az_json_parser_parse_token_member(
 AZ_NODISCARD az_result
 az_json_parser_parse_array_item(az_json_parser* json_parser, az_json_token* out_token);
 
-/*
+/**
  * @brief az_json_parser_skip_children parses and skips over any nested JSON elements.
  *
  * @param json_parser A pointer to an az_json_parser instance containing the JSON to parse.
@@ -347,7 +347,7 @@ az_json_parser_parse_array_item(az_json_parser* json_parser, az_json_token* out_
 AZ_NODISCARD az_result
 az_json_parser_skip_children(az_json_parser* json_parser, az_json_token token);
 
-/*
+/**
  * @brief  az_json_parser_done validates that there is nothing else to parse in the JSON document.
  *
  * @param json_parser A pointer to an az_json_parser instance containing the JSON that was parsed.
@@ -358,7 +358,7 @@ AZ_NODISCARD az_result az_json_parser_done(az_json_parser* json_parser);
 
 /************************************ JSON POINTER ******************/
 
-/*
+/**
  * @brief az_json_parse_by_pointer parses a JSON document and returns the az_json_token identified
  * by a JSON pointer.
  *
