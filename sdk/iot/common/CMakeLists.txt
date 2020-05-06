@@ -3,7 +3,7 @@
 
 cmake_minimum_required (VERSION 3.10)
 
-set(TARGET_NAME "az_iot_core")
+set(TARGET_NAME "az_iot_common")
 
 project (${TARGET_NAME} LANGUAGES C)
 
@@ -13,7 +13,7 @@ include(CheckAndIncludeCodeCov)
 
 add_library (
     ${TARGET_NAME}
-    src/az_iot_core.c
+    src/az_iot_common.c
 )
 
 target_include_directories (${TARGET_NAME} PUBLIC inc)

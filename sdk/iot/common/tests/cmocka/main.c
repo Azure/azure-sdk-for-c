@@ -9,13 +9,13 @@
 
 #include <cmocka.h>
 
-#include "test_az_iot_core.h"
+#include "test_az_iot_common.h"
 
 int main()
 {
   int result = 0;
   
-  result += test_az_iot_core();
+  result += test_az_iot_common();
   
   return result;
 }
