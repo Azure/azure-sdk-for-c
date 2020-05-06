@@ -91,10 +91,10 @@ For extensive documentation on Azure IoT Hub, see the [API reference documentati
 [IOT_CLIENT_README]: ../../README.md
 [SDK_README_GETTING_STARTED]: ../../README.md#getting-started
 [SDK_README_KEY_CONCEPTS]: ../../README.md#key-concepts
-[c2d_sample]: src/iot_hub_c2d_sample.c
-[methods_sample]: src/iot_hub_methods_sample.c
-[telemetry_sample]: src/iot_hub_telemetry_sample.c
-[twin_sample]: src/iot_hub_twin_sample.c
+[c2d_sample]: src/paho_iot_hub_c2d_example.c
+[methods_sample]: src/paho_iot_hub_methods_example.c
+[telemetry_sample]: src/paho_iot_hub_telemetry_example.c
+[twin_sample]: src/paho_iot_hub_twin_example.c
 [iot_hub_mqtt]: https://docs.microsoft.com/en-us/azure/iot-dps/iot-dps-mqtt-support
 [error_codes]: ../../doc/mqtt_state_machine.md#IoT-Service-Errors
 [Eclipse_Paho]: https://www.eclipse.org/paho/clients/c/

@@ -26,26 +26,12 @@ az_iot_hub_client_sas_get_password --> application_mqtt_connect : password is a 
 state application_hmac256 <<APP>>
 
 ' Telemetry
-application_mqtt_connect --> az_iot_hub_client_telemetry_get_publish_topic : Telemetry can be used w/o subscribing to any topic.
+application_mqtt_connect -l-> az_iot_hub_client_telemetry_get_publish_topic : Telemetry can be used w/o subscribing to any topic.
 az_iot_hub_client_telemetry_get_publish_topic --> application_mqtt_publish
 
-' C2D
-application_mqtt_connect --> az_iot_hub_client_c2d_get_subscribe_topic_filter
-az_iot_hub_client_c2d_get_subscribe_topic_filter --> application_mqtt_subscribe
-
-' Methods
-application_mqtt_connect --> az_iot_hub_client_methods_get_subscribe_topic_filter
-az_iot_hub_client_methods_get_subscribe_topic_filter --> application_mqtt_subscribe
+application_mqtt_connect --> application_mqtt_subscribe
 
 az_iot_hub_client_methods_response_get_publish_topic --> application_mqtt_publish
-
-' Twin
-application_mqtt_connect --> az_iot_hub_client_twin_response_get_subscribe_topic_filter
-az_iot_hub_client_twin_response_get_subscribe_topic_filter --> application_mqtt_subscribe
-
-application_mqtt_connect --> az_iot_hub_client_twin_patch_get_subscribe_topic_filter
-az_iot_hub_client_twin_patch_get_subscribe_topic_filter --> application_mqtt_subscribe
-
 
 application_mqtt_subscribe --> az_iot_hub_client_twin_document_get_publish_topic
 az_iot_hub_client_twin_document_get_publish_topic --> application_mqtt_publish
@@ -113,6 +99,12 @@ az_iot_hub_client_twin_response : - version
 ' Application interfaces
 application_mqtt_connect : - server_x509_trusted_root
 application_mqtt_connect : - [client_x509_certificate]
+
+application_mqtt_subscribe: - (optional) AZ_IOT_HUB_CLIENT_C2D_SUBSCRIBE_TOPIC
+application_mqtt_subscribe: - (optional) AZ_IOT_HUB_CLIENT_METHODS_SUBSCRIBE_TOPIC
+application_mqtt_subscribe: - (optional) AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_SUBSCRIBE_TOPIC
+application_mqtt_subscribe: - (optional) AZ_IOT_HUB_CLIENT_TWIN_PATCH_SUBSCRIBE_TOPIC
+
 application_hmac256 : - key (may be within an HSM)
 
 @enduml
