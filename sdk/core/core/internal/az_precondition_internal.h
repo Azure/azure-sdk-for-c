@@ -100,7 +100,7 @@ AZ_NODISCARD AZ_INLINE bool _az_span_is_valid(az_span span, int32_t min_size, bo
   }
   else
   {
-    result = (ptr != NULL || ptr == default_init_ptr) && span_size >= 0;
+    result = (ptr != NULL && ptr != default_init_ptr) && span_size >= 0;
   }
 
   return result && min_size <= span_size;
