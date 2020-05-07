@@ -22,5 +22,8 @@ echo -e "\nSample certificate generated"
 echo "Use the device_cert_store.pem file within the sample:"
 echo    export AZ_IOT_DEVICE_X509_CERT_PEM_FILE=$(pwd)/device_cert_store.pem
 
-echo -e "\nUse the following fingerprint when creating your device in IoT Hub (must remove colons):"
-openssl x509 -noout -fingerprint -in device_ec_cert.pem
+echo -e "\nUse the following fingerprint when creating your device in IoT Hub:"
+FINGERPRINT=`openssl x509 -noout -fingerprint -in device_ec_cert.pem`
+echo "${FINGERPRINT//:}"
+echo "${FINGERPRINT//:}" > fingerprint.txt
+echo -e "\nThe fingerprint has also been placed in fingerprint.txt for future reference"
