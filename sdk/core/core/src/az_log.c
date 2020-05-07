@@ -47,11 +47,12 @@ static bool _az_log_write_engine(bool log_it, az_log_classification classificati
     return false;
   }
 
-  az_log_classification current_classification[2] = { classification, AZ_LOG_END_OF_LIST };
   if (classifications == NULL)
   {
     // If the user hasn't registered any classifications, then we log everything.
-    classifications = current_classification;
+    classifications
+        = &classification; // We don't need AZ_LOG_END_OF_LIST to be there, as very first comparison
+                           // is going to succeed and return from the function.
   }
 
   for (az_log_classification const* cls = classifications; *cls != AZ_LOG_END_OF_LIST; ++cls)
@@ -63,6 +64,7 @@ static bool _az_log_write_engine(bool log_it, az_log_classification classificati
       {
         callback(classification, message);
       }
+
       return true;
     }
   }
