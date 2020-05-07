@@ -429,9 +429,9 @@ static void test_http_request_header_validation_range(void** state)
   (void)state;
   {
     // just make sure compiler will set anything greater than 127 to zero
-    for (uint8_t value = 127; value >= 127; value++) // break on unsigned back to zero
+    for (int32_t value = 127; value < 256; value++)
     {
-      assert_false(az_http_valid_token[value]);
+      assert_false(az_http_valid_token[(uint8_t)value]);
     }
   }
 }
