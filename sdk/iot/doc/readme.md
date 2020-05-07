@@ -71,7 +71,7 @@ if(az_failed(az_iot_hub_client_sas_get_password(client, base64_hmac_sha256_signa
 
 Recommended defaults:
     - MQTT Keep-Alive Interval:  `AZ_IOT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS`
-    - MQTT Clean Session: false.
+    - MQTT Clean Session: `false`.
 
 #### MQTT Clean Session
 
