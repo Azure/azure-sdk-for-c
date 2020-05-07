@@ -154,9 +154,8 @@ static int on_received(void* context, char* topicName, int topicLen, MQTTClient_
   }
 
   az_iot_hub_client_c2d_request c2d_request;
-  if (az_iot_hub_client_c2d_parse_received_topic(
-          &client, az_span_init((uint8_t*)topicName, topicLen), &c2d_request)
-      == AZ_OK)
+  if (az_succeeded(az_iot_hub_client_c2d_parse_received_topic(
+          &client, az_span_init((uint8_t*)topicName, topicLen), &c2d_request)))
   {
     char* payload = (char*)message->payload;
     printf("C2D Message arrived\n");
@@ -183,10 +182,9 @@ static int connect_device()
   mqtt_connect_options.keepAliveInterval = AZ_IOT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS;
 
   size_t username_length;
-  if ((rc = az_iot_hub_client_get_user_name(
-           &client, mqtt_username, sizeof(mqtt_username), &username_length))
-      != AZ_OK)
-
+  if (az_failed(
+          rc = az_iot_hub_client_get_user_name(
+              &client, mqtt_username, sizeof(mqtt_username), &username_length)))
   {
     printf("Failed to get MQTT clientId, return code %d\n", rc);
     return rc;
@@ -230,16 +228,16 @@ int main()
 {
   int rc;
 
-  if ((rc = read_configuration_and_init_client()) != AZ_OK)
+  if (az_failed(rc = read_configuration_and_init_client()))
   {
     printf("Failed to read configuration from environment variables, return code %d\n", rc);
     return rc;
   }
 
   size_t client_id_length;
-  if ((rc = az_iot_hub_client_get_client_id(
-           &client, mqtt_client_id, sizeof(mqtt_client_id), &client_id_length))
-      != AZ_OK)
+  if (az_failed(
+          rc = az_iot_hub_client_get_client_id(
+              &client, mqtt_client_id, sizeof(mqtt_client_id), &client_id_length)))
   {
     printf("Failed to get MQTT clientId, return code %d\n", rc);
     return rc;
