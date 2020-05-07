@@ -1,6 +1,36 @@
-# Azure SDK for C Contributing Guide
+# Contributing
 
-Thank you for your interest in contributing to Azure SDK for C.
+This project welcomes contributions and suggestions.  Most contributions require you to agree to a
+Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
+the rights to use your contribution. For details, visit https://cla.microsoft.com.
+
+When you submit a pull request, a CLA-bot will automatically determine whether you need to provide
+a CLA and decorate the PR appropriately (e.g., label, comment). Simply follow the instructions
+provided by the bot. You will only need to do this once across all repos using our CLA.
+
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
+For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
+contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+
+### Additional Helpful Links for Contributors  
+Many people all over the world have helped make this project better.  You'll want to check out:
+
+* [What are some good first issues for new contributors to the repo?](https://github.com/azure/azure-sdk-for-c/issues?q=is%3Aopen+is%3Aissue+label%3A%22up+for+grabs%22)
+* [How to build and test your change][azure_sdk_for_c_contributing_developer_guide]
+* [How you can make a change happen!][azure_sdk_for_c_contributing_pull_requests]
+* Frequently Asked Questions (FAQ) and Conceptual Topics in the detailed [Azure SDK for Embedded C wiki](https://github.com/azure/azure-sdk-for-c/wiki).
+
+### Community
+
+* Chat with other community members [![Join the chat at https://gitter.im/azure/azure-sdk-for-c](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/azure/azure-sdk-for-c?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+### Reporting security issues and security bugs
+
+Security issues and bugs should be reported privately, via email, to the Microsoft Security Response Center (MSRC) <secure@microsoft.com>. You should receive a response within 24 hours. If for some reason you do not, please follow up via email to ensure we received your original message. Further information, including the MSRC PGP key, can be found in the [Security TechCenter](https://www.microsoft.com/msrc/faqs-report-an-issue).
+
+# How to contribute to the Azure SDK for Embedded C
+
+There are manay ways that you can contribute to the Azure SDK for Embedded C project.
 
 - For reporting bugs, requesting features, or asking for support, please file an issue in the [issues](https://github.com/Azure/azure-sdk-for-c/issues) section of the project.
 
@@ -8,7 +38,7 @@ Thank you for your interest in contributing to Azure SDK for C.
 
 - To make code changes, or contribute something new, please follow the [GitHub Forks / Pull requests model](https://help.github.com/articles/fork-a-repo/): Fork the repo, make the change and propose it back by submitting a pull request.
 
-- Refer to the [wiki](https://github.com/Azure/azure-sdk-for-c/wiki) to learn about how Azure SDK for C generates lint checker, doxygen, and code coverage reports.
+- Refer to the [wiki](https://github.com/Azure/azure-sdk-for-c/wiki) to learn about how Azure SDK for Embedded C generates lint checker, doxygen, and code coverage reports.
 
 ## Pull Requests
 

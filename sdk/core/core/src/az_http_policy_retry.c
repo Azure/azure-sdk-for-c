@@ -72,7 +72,7 @@ AZ_INLINE void _az_http_policy_retry_log(int16_t attempt, int32_t delay_msec)
 
   (void)_az_http_policy_retry_append_http_retry_msg(attempt, delay_msec, &log_msg);
 
-  az_log_write(AZ_LOG_HTTP_RETRY, log_msg);
+  _az_log_write(AZ_LOG_HTTP_RETRY, log_msg);
 }
 
 AZ_INLINE AZ_NODISCARD int32_t _az_uint32_span_to_int32(az_span span)
@@ -167,7 +167,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
 
   az_context* const context = p_request->_internal.context;
 
-  bool const should_log = az_log_should_write(AZ_LOG_HTTP_RETRY);
+  bool const should_log = _az_log_should_write(AZ_LOG_HTTP_RETRY);
   az_result result = AZ_OK;
   int16_t attempt = 1;
   while (true)
