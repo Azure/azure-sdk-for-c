@@ -80,7 +80,7 @@ AZ_NODISCARD AZ_INLINE bool _az_span_is_valid(az_span span, int32_t min_size, bo
         - In the case of the pointer not being NULL, the size is greater than or equal to zero.
   */
 
-  // On some platforms, in some cpmpilation configurations (Debug), NULL is not 0x0...0. But if you
+  // On some platforms, in some compilation configurations (Debug), NULL is not 0x0...0. But if you
   // initialize a span with { 0 } (or if that span is a part of a structure that is initialized with
   // { 0 }) the ptr is not going to be equal to NULL, however the intent of the precondition is to
   // disallow default-initialized and null ptrs, so we should treat them the same.
