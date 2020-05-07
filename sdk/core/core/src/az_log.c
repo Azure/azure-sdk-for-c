@@ -40,7 +40,7 @@ static bool _az_log_write_engine(bool log_it, az_log_classification classificati
 {
   // Copy the volatile fields to local variables so that they don't change within this function
   az_log_message_fn const callback = _az_log_message_callback;
-  az_log_classification const* const classifications = _az_log_classifications;
+  az_log_classification const* classifications = _az_log_classifications;
 
   if (callback == NULL)
   {
@@ -48,27 +48,25 @@ static bool _az_log_write_engine(bool log_it, az_log_classification classificati
     return false;
   }
 
-  // If the user hasn't registered any classifications, then we log everything.
-  bool const log_everything = (classifications == NULL);
-  switch (log_everything)
+  az_log_classification current_classification[2] = { classification, AZ_LOG_END_OF_LIST };
+  if (classifications == NULL)
   {
-    case false:
-      for (az_log_classification const* cls = classifications; *cls != AZ_LOG_END_OF_LIST; ++cls)
-      {
-        // If this message's classification is in the customer-provided list, we should log it.
-        if (*cls == classification)
-        {
-          _az_FALLTHROUGH;
-          case true:
-            if (log_it)
-            {
-              callback(classification, message);
-            }
+    // If the user hasn't registered any classifications, then we log everything.
+    classifications = current_classification;
+  }
 
-            return true;
-        }
+  for (az_log_classification const* cls = classifications; *cls != AZ_LOG_END_OF_LIST; ++cls)
+  {
+    // If this message's classification is in the customer-provided list, we should log it.
+    if (*cls == classification)
+    {
+      if (log_it)
+      {
+        callback(classification, message);
       }
-  };
+      return true;
+    }
+  }
 
   // This message's classification is not in the customer-provided list; we should not log it.
   return false;

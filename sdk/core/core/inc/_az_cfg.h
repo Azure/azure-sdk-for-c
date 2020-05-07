@@ -60,7 +60,6 @@
 
 #pragma clang diagnostic ignored "-Wmissing-field-initializers"
 #pragma clang diagnostic ignored "-Wmissing-braces"
-#pragma clang diagnostic ignored "-Wswitch-bool"
 
 #endif // __clang__
 
