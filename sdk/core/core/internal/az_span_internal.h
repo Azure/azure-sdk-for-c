@@ -37,9 +37,29 @@ AZ_INLINE AZ_NODISCARD int32_t _az_span_diff(az_span sliced_span, az_span origin
  *         - #AZ_OK if successful
  *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the \p destination is not big enough to contain
  * the encoded bytes
+ *
+ * @remark If \p destination can't fit the \p source, some data may still be written to it, but the
+ * \p out_length will be set to 0, and the function will return #AZ_ERROR_INSUFFICIENT_SPAN_SIZE.
+ * @remark The \p destination and \p source must not overlap.
  */
 AZ_NODISCARD az_result
 _az_span_url_encode(az_span destination, az_span source, int32_t* out_length);
+
+/**
+ * @brief String tokenizer for #az_span.
+ *
+ * @param[in] source The #az_span with the content to be searched on. It must be a non-empty
+ * #az_span.
+ * @param[in] delimiter The #az_span containing the delimiter to "split" `source` into tokens.  It
+ * must be a non-empty #az_span.
+ * @param[out] out_remainder The #az_span pointing to the remaining bytes in `source`, starting
+ * after the occurrence of `delimiter`. If the position after `delimiter` is the end of `source`,
+ * `out_remainder` is set to an empty #az_span.
+ * @return The #az_span pointing to the token delimited by the beginning of `source` up to the first
+ * occurrence of (but not including the) `delimiter`, or the end of `source` if `delimiter` is not
+ * found. If `source` is empty, AZ_SPAN_NULL is returned instead.
+ */
+AZ_NODISCARD az_span _az_span_token(az_span source, az_span delimiter, az_span* out_remainder);
 
 #include <_az_cfg_suffix.h>
 

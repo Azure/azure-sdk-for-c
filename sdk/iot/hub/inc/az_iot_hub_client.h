@@ -17,7 +17,7 @@
 #ifndef _az_IOT_HUB_CLIENT_H
 #define _az_IOT_HUB_CLIENT_H
 
-#include <az_iot_core.h>
+#include <az_iot_common.h>
 #include <az_result.h>
 #include <az_span.h>
 
@@ -198,7 +198,7 @@ AZ_NODISCARD az_result az_iot_hub_client_sas_get_password(
  *
  * Properties APIs
  *
- *   IoT Hub message properties are used for Device to Cloud (D2C) as well as Cloud to Device (C2D).
+ *   IoT Hub message properties are used for Device-to-Cloud (D2C) as well as Cloud-to-Device (C2D).
  *   Properties are always appended to the MQTT topic of the published or received message and
  *   must contain Uri-encoded keys and values.
  */
@@ -297,15 +297,8 @@ az_iot_hub_client_properties_next(az_iot_hub_client_properties* properties, az_p
 
 /**
  * @brief Gets the MQTT topic that must be used for device to cloud telemetry messages.
- * @remark Telemetry MQTT Publish messages must have QoS At Least Once (1).
+ * @remark Telemetry MQTT Publish messages must have QoS At least once (1).
  * @remark This topic can also be used to set the MQTT Will message in the Connect message.
- *
- * Should the user want a null terminated topic string, they may allocate a buffer large enough
- * to fit the topic plus a null terminator. They must set the last byte themselves or zero
- * initialize the buffer.
- *
- * The telemetry topic will be of the following format:
- * `devices/{device_id}/messages/events/{property_bag}`
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
  * @param[in] properties An optional #az_iot_hub_client_properties object (can be NULL).
@@ -326,31 +319,18 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_get_publish_topic(
 
 /**
  *
- * Cloud to device (C2D) APIs
+ * Cloud-to-device (C2D) APIs
  *
  */
 
 /**
- * @brief Gets the MQTT topic filter to subscribe to cloud to device requests.
- * @remark C2D MQTT Publish messages will have QoS At Least Once (1).
- *
- * @param[in] client The #az_iot_hub_client to use for this call.
- * @param[out] mqtt_topic_filter A buffer with sufficient capacity to hold the MQTT topic filter.
- *                               If successful, contains a null-terminated string with the topic
- *                               filter that needs to be passed to the MQTT client.
- * @param[in] mqtt_topic_filter_size The size, in bytes of \p mqtt_topic_filter.
- * @param[out] out_mqtt_topic_filter_length __[nullable]__ Contains the string length, in bytes, of
- *                                                         \p mqtt_topic_filter. Can be `NULL`.
- * @return #az_result
+ * @brief The MQTT topic filter to subscribe to Cloud-to-Device requests.
+ * @remark C2D MQTT Publish messages will have QoS At least once (1).
  */
-AZ_NODISCARD az_result az_iot_hub_client_c2d_get_subscribe_topic_filter(
-    az_iot_hub_client const* client,
-    char* mqtt_topic_filter,
-    size_t mqtt_topic_filter_size,
-    size_t* out_mqtt_topic_filter_length);
+#define AZ_IOT_HUB_CLIENT_C2D_SUBSCRIBE_TOPIC "devices/+/messages/devicebound/#"
 
 /**
- * @brief The Cloud To Device Request.
+ * @brief The Cloud-To-Device Request.
  *
  */
 typedef struct az_iot_hub_client_c2d_request
@@ -380,22 +360,10 @@ AZ_NODISCARD az_result az_iot_hub_client_c2d_parse_received_topic(
  */
 
 /**
- * @brief Gets the MQTT topic filter to subscribe to method requests.
- *
- * @param[in] client The #az_iot_hub_client to use for this call.
- * @param[out] mqtt_topic_filter A buffer with sufficient capacity to hold the MQTT topic filter.
- *                               If successful, contains a null-terminated string with the topic
- *                               filter that needs to be passed to the MQTT client.
- * @param[in] mqtt_topic_filter_size The size, in bytes of \p mqtt_topic_filter.
- * @param[out] out_mqtt_topic_filter_length __[nullable]__ Contains the string length, in bytes, of
- *                                                         \p mqtt_topic_filter. Can be `NULL`.
- * @return #az_result
+ * @brief The MQTT topic filter to subscribe to method requests.
+ * @remark Methods MQTT Publish messages will have QoS At most once (0).
  */
-AZ_NODISCARD az_result az_iot_hub_client_methods_get_subscribe_topic_filter(
-    az_iot_hub_client const* client,
-    char* mqtt_topic_filter,
-    size_t mqtt_topic_filter_size,
-    size_t* out_mqtt_topic_filter_length);
+#define AZ_IOT_HUB_CLIENT_METHODS_SUBSCRIBE_TOPIC "$iothub/methods/POST/#"
 
 /**
  * @brief A method request received from IoT Hub.
@@ -453,41 +421,16 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_response_get_publish_topic(
  */
 
 /**
- * @brief Gets the MQTT topic filter to subscribe to twin operation responses.
- *
- * @param[in] client The #az_iot_hub_client to use for this call.
- * @param[out] mqtt_topic_filter A buffer with sufficient capacity to hold the MQTT topic filter.
- *                               If successful, contains a null-terminated string with the topic
- *                               filter that needs to be passed to the MQTT client.
- * @param[in] mqtt_topic_filter_size The size, in bytes of \p mqtt_topic_filter.
- * @param[out] out_mqtt_topic_filter_length __[nullable]__ Contains the string length, in bytes, of
- *                                                         \p mqtt_topic_filter. Can be `NULL`.
- * @return #az_result
+ * @brief The MQTT topic filter to subscribe to twin operation responses.
+ * @remark Twin MQTT Publish messages will have QoS At most once (0).
  */
-AZ_NODISCARD az_result az_iot_hub_client_twin_response_get_subscribe_topic_filter(
-    az_iot_hub_client const* client,
-    char* mqtt_topic_filter,
-    size_t mqtt_topic_filter_size,
-    size_t* out_mqtt_topic_filter_length);
+#define AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_SUBSCRIBE_TOPIC "$iothub/twin/res/#"
 
 /**
  * @brief Gets the MQTT topic filter to subscribe to twin desired property changes.
- * @remark The payload will contain only changes made to the desired properties.
- *
- * @param[in] client The #az_iot_hub_client to use for this call.
- * @param[out] mqtt_topic_filter A buffer with sufficient capacity to hold the MQTT topic filter.
- *                               If successful, contains a null-terminated string with the topic
- *                               filter that needs to be passed to the MQTT client.
- * @param[in] mqtt_topic_filter_size The size, in bytes of \p mqtt_topic_filter.
- * @param[out] out_mqtt_topic_filter_length __[nullable]__ Contains the string length, in bytes, of
- *                                                         \p mqtt_topic_filter. Can be `NULL`.
- * @return #az_result
+ * @remark Twin MQTT Publish messages will have QoS At most once (0).
  */
-AZ_NODISCARD az_result az_iot_hub_client_twin_patch_get_subscribe_topic_filter(
-    az_iot_hub_client const* client,
-    char* mqtt_topic_filter,
-    size_t mqtt_topic_filter_size,
-    size_t* out_mqtt_topic_filter_length);
+#define AZ_IOT_HUB_CLIENT_TWIN_PATCH_SUBSCRIBE_TOPIC "$iothub/twin/PATCH/properties/desired/#"
 
 /**
  * @brief Twin response type.

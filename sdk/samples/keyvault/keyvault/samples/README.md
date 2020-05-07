@@ -9,7 +9,7 @@ products:
 urlFragment: keyvault-keys-samples
 ---
 
-# Azure KeyVault Keys Samples client library for C
+# Azure KeyVault Keys Samples client Library for Embedded C
 This document explains samples and how to use them.
 
 ## Key concepts

@@ -23,7 +23,26 @@ This document describes how to use samples and what is done in each sample.
 
 ## Getting started
 
-Getting started explained in detail [here][SDK_README_GETTING_STARTED].
+These samples use X509 authentication to connect to Azure IoT Hub. To easily run these samples, we have provided
+a script to generate a self-signed device certificate used for device authentication. You can run it using the following
+steps.
+
+1. Run the script using the following form:
+    ```bash
+    ./generate_certificate.sh
+    ```
+1. Take note of the certificate fingerprint printed at the end of the output.
+1. Create a device in IoT Hub with `X.509 Self-Signed` authentication.
+1. Paste in the certificate fingerprint printed previously. You MUST remove the colons from the fingerprint hash
+before pasting into IoT Hub.
+
+
+After this is generated, the environment variable `AZ_IOT_DEVICE_X509_CERT_PEM_FILE` will be set for you
+and is ready to use in the samples.
+
+For more details on X509 authentication, refer to [this online documentation](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-x509ca-overview#how-to-register-the-x509-ca-certificate-to-iot-hub)
+
+***NOTE: THESE ARE TO BE USED FOR SAMPLE USE ONLY. DO NOT USE THEM IN PRODUCTION***
 
 ## Samples
 
@@ -72,10 +91,10 @@ For extensive documentation on Azure IoT Hub, see the [API reference documentati
 [IOT_CLIENT_README]: ../../README.md
 [SDK_README_GETTING_STARTED]: ../../README.md#getting-started
 [SDK_README_KEY_CONCEPTS]: ../../README.md#key-concepts
-[c2d_sample]: src/iot_hub_c2d_sample.c
-[methods_sample]: src/iot_hub_methods_sample.c
-[telemetry_sample]: src/iot_hub_telemetry_sample.c
-[twin_sample]: src/iot_hub_twin_sample.c
+[c2d_sample]: src/paho_iot_hub_c2d_example.c
+[methods_sample]: src/paho_iot_hub_methods_example.c
+[telemetry_sample]: src/paho_iot_hub_telemetry_example.c
+[twin_sample]: src/paho_iot_hub_twin_example.c
 [iot_hub_mqtt]: https://docs.microsoft.com/en-us/azure/iot-dps/iot-dps-mqtt-support
 [error_codes]: ../../doc/mqtt_state_machine.md#IoT-Service-Errors
 [Eclipse_Paho]: https://www.eclipse.org/paho/clients/c/

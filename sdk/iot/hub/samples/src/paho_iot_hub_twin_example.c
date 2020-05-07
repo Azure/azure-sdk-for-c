@@ -15,6 +15,7 @@
 #include <string.h>
 
 #include <az_iot_hub_client.h>
+#include <az_json.h>
 #include <az_result.h>
 #include <az_span.h>
 
@@ -50,7 +51,13 @@ static char mqtt_endpoint[128];
 static az_span mqtt_url_prefix = AZ_SPAN_LITERAL_FROM_STR("ssl://");
 static az_span mqtt_url_suffix = AZ_SPAN_LITERAL_FROM_STR(":8883");
 
-static char c2d_topic[128];
+static char get_twin_topic[128];
+static az_span get_twin_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("get_twin");
+static char reported_property_topic[128];
+static az_span reported_property_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("reported_prop");
+static az_span reported_property_name = AZ_SPAN_LITERAL_FROM_STR("foo");
+static int32_t reported_property_value = 0;
+static char reported_property_payload[64];
 
 static az_iot_hub_client client;
 static MQTTClient mqtt_client;
@@ -96,10 +103,12 @@ static az_result create_mqtt_endpoint(char* destination, int32_t destination_siz
   int32_t iot_hub_length = (int32_t)strlen(iot_hub_hostname);
   int32_t required_size = az_span_size(mqtt_url_prefix) + iot_hub_length
       + az_span_size(mqtt_url_suffix) + (int32_t)sizeof(null_terminator);
+
   if (required_size > destination_size)
   {
     return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
   }
+
   az_span destination_span = az_span_init((uint8_t*)destination, destination_size);
   az_span remainder = az_span_copy(destination_span, mqtt_url_prefix);
   remainder = az_span_copy(remainder, az_span_slice(iot_hub, 0, iot_hub_length));
@@ -144,6 +153,29 @@ static az_result read_configuration_and_init_client()
   return AZ_OK;
 }
 
+static void print_twin_response_type(
+    az_iot_hub_client_twin_response_type type,
+    MQTTClient_message* message)
+{
+  switch (type)
+  {
+    case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_GET:
+      printf("A twin GET response was received\n");
+      if (message->payloadlen)
+      {
+        printf("Payload:\n%.*s\n", message->payloadlen, (char*)message->payload);
+      }
+      break;
+    case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES:
+      printf("A twin desired properties message was received\n");
+      printf("Payload:\n%.*s\n", message->payloadlen, (char*)message->payload);
+      break;
+    case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES:
+      printf("A twin reported properties message was received\n");
+      break;
+  }
+}
+
 static int on_received(void* context, char* topicName, int topicLen, MQTTClient_message* message)
 {
   (void)context;
@@ -155,17 +187,16 @@ static int on_received(void* context, char* topicName, int topicLen, MQTTClient_
     topicLen = (int)strlen(topicName);
   }
 
-  az_iot_hub_client_c2d_request c2d_request;
-  if (az_iot_hub_client_c2d_parse_received_topic(
-          &client, az_span_init((uint8_t*)topicName, topicLen), &c2d_request)
-      == AZ_OK)
+  printf("Topic: %s\n", topicName);
+
+  az_span topic_span = az_span_init((uint8_t*)topicName, topicLen);
+
+  az_iot_hub_client_twin_response twin_response;
+  if (az_iot_hub_client_twin_parse_received_topic(&client, topic_span, &twin_response) == AZ_OK)
   {
-    char* payload = (char*)message->payload;
-    printf("C2D Message arrived\n");
-    for (int32_t i = 0; i < message->payloadlen; i++)
-    {
-      putchar(*(payload + i));
-    }
+    printf("Twin Message Arrived\n");
+    print_twin_response_type(twin_response.response_type, message);
+    printf("Response status was %d\n", twin_response.status);
   }
 
   putchar('\n');
@@ -218,23 +249,99 @@ static int subscribe()
 {
   int rc;
 
-  size_t c2d_topic_length;
-  if ((rc = az_iot_hub_client_c2d_get_subscribe_topic_filter(
-           &client, c2d_topic, sizeof(c2d_topic), &c2d_topic_length))
-      != AZ_OK)
-
+  if ((rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_HUB_CLIENT_TWIN_PATCH_SUBSCRIBE_TOPIC, 1))
+      != MQTTCLIENT_SUCCESS)
   {
-    printf("Failed to get C2D MQTT SUB topic filter, return code %d\n", rc);
+    printf("Failed to subscribe to twin patch topic filter, return code %d\n", rc);
     return rc;
   }
 
-  if ((rc = MQTTClient_subscribe(mqtt_client, c2d_topic, 1)) != MQTTCLIENT_SUCCESS)
+  if ((rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_SUBSCRIBE_TOPIC, 1))
+      != MQTTCLIENT_SUCCESS)
   {
-    printf("Failed to subscribe, return code %d\n", rc);
+    printf("Failed to subscribe to twin response topic filter, return code %d\n", rc);
     return rc;
   }
 
   return 0;
+}
+
+static int send_get_twin()
+{
+  int rc;
+  printf("Requesting twin document\n");
+
+  if ((rc = az_iot_hub_client_twin_document_get_publish_topic(
+           &client, get_twin_topic_request_id, get_twin_topic, sizeof(get_twin_topic), NULL))
+      != AZ_OK)
+  {
+    printf("Unable to get twin document publish topic, return code %d\n", rc);
+    return rc;
+  }
+
+  if ((rc = MQTTClient_publish(mqtt_client, get_twin_topic, 0, NULL, 0, 0, NULL))
+      != MQTTCLIENT_SUCCESS)
+  {
+    printf("Failed to publish twin document request, return code %d\n", rc);
+    return rc;
+  }
+  return rc;
+}
+
+static int build_reported_property(az_json_builder* json_builder)
+{
+  az_result result;
+  result = az_json_builder_init(json_builder, AZ_SPAN_FROM_BUFFER(reported_property_payload));
+  result = az_json_builder_append_token(json_builder, az_json_token_object_start());
+  az_json_token reported_property_value_token
+      = az_json_token_number((double)reported_property_value++);
+  result = az_json_builder_append_object(
+      json_builder, reported_property_name, reported_property_value_token);
+  result = az_json_builder_append_token(json_builder, az_json_token_object_end());
+
+  return result;
+}
+
+static int send_reported_property()
+{
+  int rc;
+  printf("Sending reported property\n");
+
+  if ((rc = az_iot_hub_client_twin_patch_get_publish_topic(
+           &client,
+           reported_property_topic_request_id,
+           reported_property_topic,
+           sizeof(reported_property_topic),
+           NULL))
+      != AZ_OK)
+  {
+    printf("Unable to get twin document publish topic, return code %d\n", rc);
+    return rc;
+  }
+
+  az_json_builder json_builder;
+  if ((rc = build_reported_property(&json_builder)) != AZ_OK)
+  {
+    return rc;
+  }
+  az_span json_payload = az_json_builder_span_get(&json_builder);
+
+  printf("Payload: %.*s\n", az_span_size(json_payload), (char*)az_span_ptr(json_payload));
+
+  if ((rc = MQTTClient_publish(
+           mqtt_client,
+           reported_property_topic,
+           az_span_size(json_payload),
+           az_span_ptr(json_payload),
+           0,
+           0,
+           NULL))
+      != MQTTCLIENT_SUCCESS)
+  {
+    printf("Failed to publish reported property, return code %d\n", rc);
+    return rc;
+  }
+  return rc;
 }
 
 int main()
@@ -247,9 +354,7 @@ int main()
     return rc;
   }
 
-  size_t client_id_length;
-  if ((rc = az_iot_hub_client_get_client_id(
-           &client, mqtt_client_id, sizeof(mqtt_client_id), &client_id_length))
+  if ((rc = az_iot_hub_client_get_client_id(&client, mqtt_client_id, sizeof(mqtt_client_id), NULL))
       != AZ_OK)
   {
     printf("Failed to get MQTT clientId, return code %d\n", rc);
@@ -283,8 +388,33 @@ int main()
 
   printf("Subscribed to topics.\n");
 
-  printf("Waiting for activity. [Press ENTER to abort]\n");
-  (void)getchar();
+  printf(
+      "\nWaiting for activity:\nPress 'g' to get the twin document\nPress 'r' to send a reported "
+      "property\n[Press 'q' to quit]\n");
+
+  int input;
+  while (1)
+  {
+    input = getchar();
+    if (input != '\n')
+    {
+      switch (input)
+      {
+        case 'g':
+          send_get_twin();
+          break;
+        case 'r':
+          send_reported_property();
+          break;
+        default:
+          break;
+      }
+      if (input == 'q')
+      {
+        break;
+      }
+    }
+  }
 
   if ((rc = MQTTClient_disconnect(mqtt_client, TIMEOUT_MQTT_DISCONNECT_MS)) != MQTTCLIENT_SUCCESS)
   {

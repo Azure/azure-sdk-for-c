@@ -17,7 +17,7 @@
 #ifndef _az_IOT_PROVISIONING_CLIENT_H
 #define _az_IOT_PROVISIONING_CLIENT_H
 
-#include <az_iot_core.h>
+#include <az_iot_common.h>
 #include <az_result.h>
 #include <az_span.h>
 
@@ -191,22 +191,10 @@ AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_password(
  */
 
 /**
- * @brief Gets the MQTT topic filter to subscribe to register responses.
- *
- * @param[in] client The #az_iot_provisioning_client to use for this call.
- * @param[out] mqtt_topic_filter A buffer with sufficient capacity to hold the MQTT topic filter.
- *                               If successful, contains a null-terminated string with the topic
- *                               filter that needs to be passed to the MQTT client.
- * @param[in] mqtt_topic_filter_size The size, in bytes of \p mqtt_topic_filter.
- * @param[out] out_mqtt_topic_filter_length __[nullable]__ Contains the string length, in bytes, of
- *                                                         \p mqtt_topic_filter. Can be `NULL`.
- * @return #az_result
+ * @brief The MQTT topic filter to subscribe to register responses.
+ * @remark Register MQTT Publish messages will have QoS At most once (0).
  */
-AZ_NODISCARD az_result az_iot_provisioning_client_register_get_subscribe_topic_filter(
-    az_iot_provisioning_client const* client,
-    char* mqtt_topic_filter,
-    size_t mqtt_topic_filter_size,
-    size_t* out_mqtt_topic_filter_length);
+#define AZ_IOT_PROVISIONING_CLIENT_REGISTER_SUBSCRIBE_TOPIC "$dps/registrations/res/#"
 
 /**
  * @brief The registration operation state.

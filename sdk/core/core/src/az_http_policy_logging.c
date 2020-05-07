@@ -58,6 +58,8 @@ static az_result _az_http_policy_logging_append_http_request_msg(
     _az_http_request const* request,
     az_span* ref_log_msg)
 {
+  extern az_span const _az_auth_header_name;
+
   az_span http_request_string = AZ_SPAN_FROM_STR("HTTP Request : ");
   az_span null_string = AZ_SPAN_FROM_STR("NULL");
 
@@ -87,7 +89,7 @@ static az_result _az_http_policy_logging_append_http_request_msg(
   remainder = az_span_copy(
       remainder, az_span_slice(request->_internal.url, 0, request->_internal.url_length));
 
-  int32_t const headers_count = _az_http_request_headers_count(request);
+  int32_t const headers_count = az_http_request_headers_count(request);
 
   az_span new_line_tab_string = AZ_SPAN_FROM_STR("\n\t");
   az_span colon_separator_string = AZ_SPAN_FROM_STR(" : ");
@@ -104,12 +106,11 @@ static az_result _az_http_policy_logging_append_http_request_msg(
     }
 
     AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, required_length);
-
     remainder = az_span_copy(remainder, new_line_tab_string);
-
     remainder = az_span_copy(remainder, header.key);
 
-    if (az_span_size(header.value) > 0)
+    if (az_span_size(header.value) > 0
+        && !az_span_is_content_equal(header.key, _az_auth_header_name))
     {
       remainder = az_span_copy(remainder, colon_separator_string);
       remainder = _az_http_policy_logging_copy_lengthy_value(remainder, header.value);
@@ -204,7 +205,7 @@ void _az_http_policy_logging_log_http_request(_az_http_request const* request)
 
   (void)_az_http_policy_logging_append_http_request_msg(request, &log_msg);
 
-  az_log_write(AZ_LOG_HTTP_REQUEST, log_msg);
+  _az_log_write(AZ_LOG_HTTP_REQUEST, log_msg);
 }
 
 void _az_http_policy_logging_log_http_response(
@@ -220,7 +221,7 @@ void _az_http_policy_logging_log_http_response(
   (void)_az_http_policy_logging_append_http_response_msg(
       &response_copy, duration_msec, request, &log_msg);
 
-  az_log_write(AZ_LOG_HTTP_RESPONSE, log_msg);
+  _az_log_write(AZ_LOG_HTTP_RESPONSE, log_msg);
 }
 
 AZ_NODISCARD az_result az_http_pipeline_policy_logging(
@@ -231,12 +232,12 @@ AZ_NODISCARD az_result az_http_pipeline_policy_logging(
 {
   (void)p_data;
 
-  if (az_log_should_write(AZ_LOG_HTTP_REQUEST))
+  if (_az_log_should_write(AZ_LOG_HTTP_REQUEST))
   {
     _az_http_policy_logging_log_http_request(p_request);
   }
 
-  if (!az_log_should_write(AZ_LOG_HTTP_RESPONSE))
+  if (!_az_log_should_write(AZ_LOG_HTTP_RESPONSE))
   {
     // If no logging is needed, do not even measure the response time.
     return az_http_pipeline_nextpolicy(p_policies, p_request, p_response);

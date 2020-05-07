@@ -75,9 +75,9 @@
 #endif // _MSC_VER
 
 #if defined(__GNUC__) && __GNUC__ >= 7
-#define AZ_FALLTHROUGH __attribute__((fallthrough))
+#define _az_FALLTHROUGH __attribute__((fallthrough))
 #else // !__GNUC__ >= 7
-#define AZ_FALLTHROUGH \
+#define _az_FALLTHROUGH \
   do \
   { \
   } while (0)

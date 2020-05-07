@@ -5,11 +5,11 @@ languages:
 products:
   - azure
   - azure-storage
-  - azure-blob-storage
+  - azure-storage-blobs
 urlFragment: storage-blob-samples
 ---
 
-# Azure Storage Blob Samples client library for C
+# Azure Storage Blob Samples client Library for Embedded C
 This document explains samples and how to use them.
 
 ## Key concepts
@@ -38,9 +38,16 @@ Start using Storage blob C SDK in your solutions. Our SDK details could be found
 For more extensive documentation on Azure Storage blob, see the [API reference documentation][storageblob_rest].
 
 ## Contributing
-This project welcomes contributions and suggestions. Find [more contributing][SDK_README_CONTRIBUTING] details here.
+
+If you'd like to contribute to this library, please read the [contributing guide][azure_sdk_for_c_contributing] to learn more about how to build and test the code.
+
+### License
+
+Azure SDK for Embedded C is licensed under the [MIT][azure_sdk_for_c_license] license.
 
 <!-- LINKS -->
+[azure_sdk_for_c_contributing]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md
+[azure_sdk_for_c_license]: https://github.com/Azure/azure-sdk-for-c/blob/master/LICENSE
 [BLOB_SDK_README]: ../README.md
 [SDK_README_CONTRIBUTING]:../README.md#contributing
 [SDK_README_GETTING_STARTED]: ../README.md#getting-started

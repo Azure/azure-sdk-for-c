@@ -3,11 +3,13 @@
 
 #include <stdint.h>
 
-#include "az_iot_core.h"
+#include "az_iot_common.h"
+#include <az_iot_common_internal.h>
 #include <az_precondition_internal.h>
 #include <az_result.h>
 #include <az_span.h>
 
+#include <az_log_internal.h>
 #include <az_retry_internal.h>
 
 #include <_az_cfg.h>
@@ -25,9 +27,11 @@ AZ_NODISCARD int32_t az_iot_retry_calc_delay(
   _az_PRECONDITION_RANGE(0, max_retry_delay_msec, INT32_MAX - 1);
   _az_PRECONDITION_RANGE(0, random_msec, INT32_MAX - 1);
 
+  _az_log_write(AZ_LOG_IOT_RETRY, AZ_SPAN_NULL);
+
   int32_t delay = _az_retry_calc_delay(attempt, min_retry_delay_msec, max_retry_delay_msec);
-  
-  if (delay < 0) 
+
+  if (delay < 0)
   {
     delay = max_retry_delay_msec;
   }
@@ -40,34 +44,6 @@ AZ_NODISCARD int32_t az_iot_retry_calc_delay(
   delay -= operation_msec;
 
   return delay > 0 ? delay : 0;
-}
-
-AZ_NODISCARD az_span _az_span_token(az_span source, az_span delimiter, az_span* out_remainder)
-{
-  _az_PRECONDITION_VALID_SPAN(delimiter, 1, false);
-  _az_PRECONDITION_NOT_NULL(out_remainder);
-
-  if (az_span_size(source) == 0)
-  {
-    return AZ_SPAN_NULL;
-  }
-  else
-  {
-    int32_t index = az_span_find(source, delimiter);
-
-    if (index != -1)
-    {
-      *out_remainder = az_span_slice(source, index + az_span_size(delimiter), az_span_size(source));
-
-      return az_span_slice(source, 0, index);
-    }
-    else
-    {
-      *out_remainder = AZ_SPAN_NULL;
-
-      return source;
-    }
-  }
 }
 
 AZ_NODISCARD int32_t _az_iot_u32toa_size(uint32_t number)
@@ -86,6 +62,6 @@ AZ_NODISCARD int32_t _az_iot_u32toa_size(uint32_t number)
       digit_count--;
     }
 
-    return digit_count; 
+    return digit_count;
   }
 }

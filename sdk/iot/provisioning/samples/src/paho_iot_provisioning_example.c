@@ -181,16 +181,9 @@ static int subscribe()
 {
   int rc;
 
-  char topic_filter[128];
-  if ((rc = az_iot_provisioning_client_register_get_subscribe_topic_filter(
-           &provisioning_client, topic_filter, sizeof(topic_filter), NULL))
-      != AZ_OK)
-  {
-    printf("Failed to get MQTT SUB topic filter, return code %d\n", rc);
-    return rc;
-  }
-
-  if ((rc = MQTTClient_subscribe(mqtt_client, topic_filter, 1)) != MQTTCLIENT_SUCCESS)
+  if ((rc
+       = MQTTClient_subscribe(mqtt_client, AZ_IOT_PROVISIONING_CLIENT_REGISTER_SUBSCRIBE_TOPIC, 1))
+      != MQTTCLIENT_SUCCESS)
   {
     printf("Failed to subscribe, return code %d\n", rc);
     return rc;
