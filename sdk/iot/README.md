@@ -1,14 +1,38 @@
-# Azure IoT Clients for Embedded C
+# Embedded C for Azure IoT Clients
 
-Official Embedded C clients for Azure IoT Hub and Device Provisioning Service.
+Azure SDK for Embedded C official IoT Hub client library.
 
 ## Getting started
 
-TBD
+- **Docs**: If you're new to the Azure SDK for Embedded C take a look at the [State Machine diagram](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/iot/doc/mqtt_state_machine.md) that explains the high-level architecture, SDK components, and a clear view of SDK x Application responsibilities. 
+
+- **Build**: The Azure IoT library is compiled following the same steps listed on the root [README](https://github.com/Azure/azure-sdk-for-c/blob/master/README.md) documentation, under ["Getting Started Using the SDK"](https://github.com/Azure/azure-sdk-for-c/blob/master/README.md#getting-started-using-the-sdk). 
+
+- **Samples**: [This page](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/iot/hub/samples) explains samples for the Azure Embedded C SDK IoT Hub Client and [this page](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/iot/provisioning/samples) shows the Provisioning Clients and how to use them.
 
 ### Prerequisites
 
-TBD
+For compiling the Azure SDK for Embedded C for the most common platforms (Windows and Linux), no further prerequisites are necessary.
+Please follow the instructions in the [Getting Started](#Getting-Started) section above.
+For compiling for specific target devices, please refer to their specific toolchain documentation. 
+
+## Key Features
+
+:heavy_check_mark: feature available  :heavy_check_mark:* feature partially available (see Description for details)  :heavy_multiplication_x: feature planned but not supported
+
+Feature | Azure SDK for Embedded C | Description
+---------|----------|---------------------
+ [Send device-to-cloud message](https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-messages-d2c) | :heavy_check_mark: | Send device-to-cloud messages to IoT Hub with the option to add custom message properties. 
+ [Receive cloud-to-device messages](https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-messages-c2d) | :heavy_check_mark: | Receive cloud-to-device messages and associated properties from IoT Hub.   
+ [Device Twins](https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-device-twins) | :heavy_check_mark: | IoT Hub persists a device twin for each device that you connect to IoT Hub.  The device can perform operations like get twin document, subscribe to desired property updates.
+ [Direct Methods](https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-direct-methods) | :heavy_check_mark: | IoT Hub gives you the ability to invoke direct methods on devices from the cloud.  
+ [DPS - Device Provisioning Service](https://docs.microsoft.com/azure/iot-dps/) | [Supported] | This SDK supports connecting your device to the Device Provisioning Service via, for example, [individual enrollment](https://docs.microsoft.com/azure/iot-dps/concepts-service#enrollment) using an [X.509 leaf certificate](https://docs.microsoft.com/azure/iot-dps/concepts-security#leaf-certificate).  
+ Protocol | MQTT | The Azure SDK for Embedded C supports only MQTT.  
+ Retry Policies | :heavy_check_mark:* | The Azure SDK for Embedded C provides guidelines for retries, but actual retries should be handled by the application.
+ [Plug and Play](https://docs.microsoft.com/en-us/azure/iot-pnp/overview-iot-plug-and-play) | :heavy_multiplication_x: | IoT Plug and Play Preview enables solution developers to integrate devices with their solutions without writing any embedded code. 
+
+
+
 
 ## Examples
 
@@ -59,7 +83,7 @@ int main()
 
 ### Properties
 
-Included in the IoT SDK are helper functions to form and manage properties for IoT Hub services. Implementation starts by using the `az_iot_hub_client_properties_init()` API. The user is free to intitialize using an empty, but appropriately sized, span to later append properties or an already populated span containing a properly formated property buffer. "Properly formatted" properties follow the form `{key}={value}&{key}={value}`.
+Included in the Azure SDK for Embedded C are helper functions to form and manage properties for IoT Hub services. Implementation starts by using the `az_iot_hub_client_properties_init()` API. The user is free to intitialize using an empty, but appropriately sized, span to later append properties or an already populated span containing a properly formated property buffer. "Properly formatted" properties follow the form `{key}={value}&{key}={value}`.
 
 Below is an example use case of appending properties.
 
@@ -128,12 +152,37 @@ void my_telemetry_func()
 
 ## Contributing
 
-If you'd like to contribute to this library, please read the [contributing guide][azure_sdk_for_c_contributing] to learn more about how to build and test the code.
+For details on contributing to this repository, see the [contributing guide](https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md).
+
+This project welcomes contributions and suggestions. Most contributions require you to agree to a Contributor License
+Agreement (CLA) declaring that you have the right to, and actually do, grant us the rights to use your contribution. For
+details, visit https://cla.microsoft.com.
+
+When you submit a pull request, a CLA-bot will automatically determine whether you need to provide a CLA and decorate
+the PR appropriately (e.g., label, comment). Simply follow the instructions provided by the bot. You will only need to
+do this once across all repositories using our CLA.
+
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
+For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact
+[opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+
+### Additional Helpful Links for Contributors
+
+Many people all over the world have helped make this project better.  You'll want to check out:
+
+* [What are some good first issues for new contributors to the repo?](https://github.com/azure/azure-sdk-for-c/issues?q=is%3Aopen+is%3Aissue+label%3A%22up+for+grabs%22)
+* [How to build and test your change](CONTRIBUTING.md#developer-guide)
+* [How you can make a change happen!](CONTRIBUTING.md#pull-requests)
+* Frequently Asked Questions (FAQ) and Conceptual Topics in the detailed [Azure SDK for C wiki][azure_sdk_for_c_wiki].
+
+### Community
+
+* Chat with other community members [![Join the chat at https://gitter.im/azure/azure-sdk-for-c](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/azure/azure-sdk-for-c?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+### Reporting security issues and security bugs
+
+Security issues and bugs should be reported privately, via email, to the Microsoft Security Response Center (MSRC) <secure@microsoft.com>. You should receive a response within 24 hours. If for some reason you do not, please follow up via email to ensure we received your original message. Further information, including the MSRC PGP key, can be found in the [Security TechCenter](https://www.microsoft.com/msrc/faqs-report-an-issue).
 
 ### License
 
-Azure SDK for Embedded C is licensed under the [MIT][azure_sdk_for_c_license] license.
-
-<!-- LINKS -->
-[azure_sdk_for_c_contributing]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md
-[azure_sdk_for_c_license]: https://github.com/Azure/azure-sdk-for-c/blob/master/LICENSE
+Azure SDK for Embedded C is licensed under the [MIT](LICENSE) license.
