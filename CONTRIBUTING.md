@@ -190,7 +190,7 @@ make
 
 ### Compiler Options
 
-By default, when building project with no options, next static libraries are generated:
+By default, when building the project with no options, the following static libraries are generated:
 
 - ``Libraries``:
   - az_core
@@ -200,11 +200,11 @@ By default, when building project with no options, next static libraries are gen
   - az_storage_blobs
     -  Storage SDK blobs client.
   - az_noplatform
-    - Library that provides a basic returning error for platform abstraction as AZ_NOT_IMPLEMENTED. This ensures project can be compiled without the need to provide any specific platform implementation. This is useful if you want to use az_core without platform specific functions likes Mutex or Time. 
+    - Library that provides a basic returning error for platform abstraction as AZ_NOT_IMPLEMENTED. This ensures the project can be compiled without the need to provide any specific platform implementation. This is useful if you want to use az_core without platform specific functions like `mutex` or `time`. 
   - az_nohttp
-    -  Library that provides a basic returning error when calling HTTP stack. Similar to az_noplatform, this library ensures project can be compiled without requiring any HTTP stack implementation. This us useful if you want to use az_core without az_http functionality.
+    -  Library that provides a basic returning error when calling HTTP stack. Similar to az_noplatform, this library ensures the project can be compiled without requiring any HTTP stack implementation. This is useful if you want to use `az_core` without `az_http` functionality.
 
-The next compiler options are available for adding/removing project features.
+The following compiler options are available for adding/removing project features.
 
 <table>
 <tr>
@@ -287,7 +287,7 @@ cmake -DUNIT_TESTING=ON -DUNIT_TESTING_MOCK_ENABLED=ON ..
 
 See [compiler options section](#compiler-options) to learn about how to build samples with HTTP implementation in order to be runnable.
 
-After building samples with HTTP stack, set next environment variables for enabling credentials. Samples will read these values from env and use it to log in to Azure Service like Storage or KeyVault. Learn about the supported authentication [client secret here](https://docs.microsoft.com/en-us/azure/active-directory/azuread-dev/v1-oauth2-on-behalf-of-flow#service-to-service-access-token-request).
+After building samples with HTTP stack, set the environment variables for credentials. The samples read these environment values to authenticate to Azure services. See [client secret here](https://docs.microsoft.com/en-us/azure/active-directory/azuread-dev/v1-oauth2-on-behalf-of-flow#service-to-service-access-token-request) for additional details on Azure authentication.
 
 ```bash
 # On linux, set env var like this. For Windows, do it from advanced settings/ env variables
@@ -296,11 +296,12 @@ After building samples with HTTP stack, set next environment variables for enabl
 export AZURE_TENANT_ID="????????-????-????-????-????????????"
 export AZURE_CLIENT_ID="????????-????-????-????-????????????"
 export AZURE_CLIENT_SECRET="????????????"
-export AZURE_KEYVAULT_URL="https://????.????.azure.net"
+export AZURE_KEYVAULT_URL="https://???????????.??"
 
 # STORAGE Sample (only 1 env var required)
 # URL must contain a valid container, blob and SaS token
-export AZURE_STORAGE_URL="https://storageAccount.blob.core.windows.net/container/blob?sv=xxx&ss=xx&srt=xx&sp=xx&se=xx&st=xxx&spr=https,http&sig=xxx"
+# e.g "https://storageAccount.blob.core.windows.net/container/blob?sv=xxx&ss=xx&srt=xx&sp=xx&se=xx&st=xxx&spr=https,http&sig=xxx"
+export AZURE_STORAGE_URL="https://??????????????"
 ```
 
 ## Build Docs
