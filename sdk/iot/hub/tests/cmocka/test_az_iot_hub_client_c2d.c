@@ -26,7 +26,6 @@
 
 static const az_span test_device_hostname = AZ_SPAN_LITERAL_FROM_STR(TEST_DEVICE_HOSTNAME_STR);
 static const az_span test_device_id = AZ_SPAN_LITERAL_FROM_STR(TEST_DEVICE_ID_STR);
-static char g_test_correct_subscribe_topic[] = "devices/my_device/messages/devicebound/#";
 static const az_span test_url_no_props
     = AZ_SPAN_LITERAL_FROM_STR("devices/useragent_c/messages/devicebound/");
 static const az_span test_url_decoded_topic = AZ_SPAN_LITERAL_FROM_STR(
@@ -40,7 +39,7 @@ static const az_span test_parse_method_topic_fail
     = AZ_SPAN_LITERAL_FROM_STR("$iothub/methods/POST/foo/?$rid=one");
 
 #ifndef AZ_NO_PRECONDITION_CHECKING
-enable_precondition_check_tests()
+ENABLE_PRECONDITION_CHECK_TESTS()
 
 static void test_az_iot_hub_client_c2d_parse_received_topic_NULL_client_fail()
 {
@@ -50,7 +49,7 @@ static void test_az_iot_hub_client_c2d_parse_received_topic_NULL_client_fail()
 
   az_iot_hub_client_c2d_request out_request;
 
-  assert_precondition_checked(
+  ASSERT_PRECONDITION_CHECKED(
       az_iot_hub_client_c2d_parse_received_topic(NULL, received_topic, &out_request));
 }
 
@@ -68,7 +67,7 @@ static void test_az_iot_hub_client_c2d_parse_received_topic_AZ_SPAN_NULL_receive
 
   az_iot_hub_client_c2d_request out_request;
 
-  assert_precondition_checked(
+  ASSERT_PRECONDITION_CHECKED(
       az_iot_hub_client_c2d_parse_received_topic(&client, received_topic, &out_request));
 }
 
@@ -81,45 +80,11 @@ static void test_az_iot_hub_client_c2d_parse_received_topic_NULL_out_request_fai
 
   az_span received_topic = test_url_decoded_topic;
 
-  assert_precondition_checked(
+  ASSERT_PRECONDITION_CHECKED(
       az_iot_hub_client_c2d_parse_received_topic(&client, received_topic, NULL));
 }
 
 #endif // NO_PRECONDITION_CHECKING
-
-static void test_az_iot_hub_client_c2d_get_subscribe_topic_filter_succeed()
-{
-  char mqtt_sub_topic_buf[TEST_SPAN_BUFFER_SIZE];
-
-  az_iot_hub_client client;
-  az_iot_hub_client_options options = az_iot_hub_client_options_default();
-  assert_true(
-      az_iot_hub_client_init(&client, test_device_hostname, test_device_id, &options) == AZ_OK);
-
-  size_t returned_size;
-  assert_true(
-      az_iot_hub_client_c2d_get_subscribe_topic_filter(
-          &client, mqtt_sub_topic_buf, sizeof(mqtt_sub_topic_buf), &returned_size)
-      == AZ_OK);
-  assert_string_equal(mqtt_sub_topic_buf, g_test_correct_subscribe_topic);
-  assert_int_equal(returned_size, sizeof(g_test_correct_subscribe_topic) - 1);
-}
-
-static void test_az_iot_hub_client_c2d_get_subscribe_topic_filter_small_buffer_fail()
-{
-  char mqtt_sub_topic_buf[_az_COUNTOF(g_test_correct_subscribe_topic) - 2];
-
-  az_iot_hub_client client;
-  az_iot_hub_client_options options = az_iot_hub_client_options_default();
-  assert_true(
-      az_iot_hub_client_init(&client, test_device_hostname, test_device_id, &options) == AZ_OK);
-
-  size_t returned_size;
-  assert_true(
-      az_iot_hub_client_c2d_get_subscribe_topic_filter(
-          &client, mqtt_sub_topic_buf, sizeof(mqtt_sub_topic_buf), &returned_size)
-      == AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
-}
 
 static void test_az_iot_hub_client_c2d_parse_received_topic_url_decoded_succeed()
 {
@@ -277,7 +242,7 @@ static void test_az_iot_hub_client_c2d_logging_succeed()
 int test_iot_hub_c2d()
 {
 #ifndef AZ_NO_PRECONDITION_CHECKING
-  setup_precondition_check_tests();
+  SETUP_PRECONDITION_CHECK_TESTS();
 #endif // AZ_NO_PRECONDITION_CHECKING
 
   const struct CMUnitTest tests[] = {
@@ -287,8 +252,6 @@ int test_iot_hub_c2d()
         test_az_iot_hub_client_c2d_parse_received_topic_AZ_SPAN_NULL_received_topic_fail),
     cmocka_unit_test(test_az_iot_hub_client_c2d_parse_received_topic_NULL_out_request_fail),
 #endif // NO_PRECONDITION_CHECKING
-    cmocka_unit_test(test_az_iot_hub_client_c2d_get_subscribe_topic_filter_succeed),
-    cmocka_unit_test(test_az_iot_hub_client_c2d_get_subscribe_topic_filter_small_buffer_fail),
     cmocka_unit_test(test_az_iot_hub_client_c2d_parse_received_topic_url_decoded_succeed),
     cmocka_unit_test(test_az_iot_hub_client_c2d_parse_received_topic_url_encoded_succeed),
     cmocka_unit_test(test_az_iot_hub_client_c2d_parse_received_topic_no_props_succeed),

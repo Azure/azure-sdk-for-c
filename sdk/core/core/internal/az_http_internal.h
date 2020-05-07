@@ -191,7 +191,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_transport(
  * `max_url_size`.
  *   - *`AZ_ERROR_ARG`*
  *     - `p_request` is _NULL_.
- *     - `buffer`, `method_verb`, or `initial_url` are invalid spans (see @ref az_span_is_valid).
+ *     - `buffer`, `method_verb`, or `initial_url` are invalid spans (see @ref _az_span_is_valid).
  *     - `max_url_size` is less than `initial_url.size`.
  */
 AZ_NODISCARD az_result az_http_request_init(
@@ -228,7 +228,7 @@ AZ_NODISCARD az_result az_http_request_append_path(_az_http_request* p_request, 
  * the parameter get set.
  *   - *`AZ_ERROR_ARG`*
  *     - `p_request` is _NULL_.
- *     - `name` or `value` are invalid spans (see @ref az_span_is_valid).
+ *     - `name` or `value` are invalid spans (see @ref _az_span_is_valid).
  *     - `name` or `value` are empty.
  *     - `name`'s or `value`'s buffer overlap resulting `url`'s buffer.
  */
@@ -248,7 +248,7 @@ az_http_request_set_query_parameter(_az_http_request* p_request, az_span name, a
  * to add a header.
  *   - *`AZ_ERROR_ARG`*
  *     - `p_request` is _NULL_.
- *     - `key` or `value` are invalid spans (see @ref az_span_is_valid).
+ *     - `key` or `value` are invalid spans (see @ref _az_span_is_valid).
  *     - `key` or `value` are empty.
  *     - `name`'s or `value`'s buffer overlap resulting `url`'s buffer.
  */

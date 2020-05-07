@@ -151,48 +151,6 @@ static void test_az_iot_provisioning_client_get_connect_info_insufficient_space_
   assert_int_equal(0xBAADC0DE, user_name_len);
 }
 
-static void test_az_iot_provisioning_client_get_subscribe_topic_filter_succeed()
-{
-  az_iot_provisioning_client client;
-  char expected_topic[] = "$dps/registrations/res/#";
-
-  char topic[sizeof(expected_topic) + 1];
-  memset(topic, 0xCC, sizeof(topic));
-  az_result ret = az_iot_provisioning_client_register_get_subscribe_topic_filter(
-      &client, topic, sizeof(topic), NULL);
-
-  assert_int_equal(AZ_OK, ret);
-  assert_string_equal(expected_topic, topic);
-  assert_int_equal((uint8_t)0xCC, (uint8_t)topic[strlen(topic) + 1]);
-
-  size_t topic_len;
-  ret = az_iot_provisioning_client_register_get_subscribe_topic_filter(
-      &client, topic, sizeof(topic), &topic_len);
-  assert_int_equal(AZ_OK, ret);
-  assert_string_equal(expected_topic, topic);
-  assert_int_equal((uint8_t)0xCC, (uint8_t)topic[strlen(topic) + 1]);
-  assert_int_equal(strlen(expected_topic), topic_len);
-}
-
-static void test_az_iot_provisioning_client_get_subscribe_topic_filter_insufficient_space_fails()
-{
-  az_iot_provisioning_client client;
-  char expected_topic[] = "$dps/registrations/res/#";
-
-  char topic[sizeof(expected_topic) - 1];
-  memset(topic, 0xCC, sizeof(topic));
-  size_t topic_len = 0xBAADC0DE;
-  az_result ret = az_iot_provisioning_client_register_get_subscribe_topic_filter(
-      &client, topic, sizeof(topic), &topic_len);
-  assert_int_equal(AZ_ERROR_INSUFFICIENT_SPAN_SIZE, ret);
-  for (size_t i = 0; i < sizeof(topic); i++)
-  {
-    assert_int_equal((uint8_t)0xCC, (uint8_t)topic[i]);
-  }
-
-  assert_int_equal(0xBAADC0DE, topic_len);
-}
-
 static void test_az_iot_provisioning_client_get_register_publish_topic_succeed()
 {
   az_iot_provisioning_client client;
@@ -307,9 +265,6 @@ int test_az_iot_provisioning_client()
     cmocka_unit_test(test_az_iot_provisioning_client_default_options_get_connect_info_succeed),
     cmocka_unit_test(test_az_iot_provisioning_client_custom_options_get_username_succeed),
     cmocka_unit_test(test_az_iot_provisioning_client_get_connect_info_insufficient_space_fails),
-    cmocka_unit_test(test_az_iot_provisioning_client_get_subscribe_topic_filter_succeed),
-    cmocka_unit_test(
-        test_az_iot_provisioning_client_get_subscribe_topic_filter_insufficient_space_fails),
     cmocka_unit_test(test_az_iot_provisioning_client_get_register_publish_topic_succeed),
     cmocka_unit_test(
         test_az_iot_provisioning_client_get_register_publish_topic_insufficient_space_fails),

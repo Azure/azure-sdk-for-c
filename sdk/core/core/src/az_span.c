@@ -714,40 +714,86 @@ AZ_NODISCARD az_result _az_span_url_encode(az_span destination, az_span source, 
   int32_t const source_size = az_span_size(source);
   _az_PRECONDITION_VALID_SPAN(destination, source_size, false);
 
-  int32_t result_size = 0;
-  for (int32_t i = 0; i < source_size; ++i)
+  _az_PRECONDITION_NO_OVERLAP_SPANS(destination, source);
+
+  if (source_size == 0)
   {
-    result_size += _az_span_url_should_encode(az_span_ptr(source)[i]) ? 3 : 1;
+    *out_length = 0;
+    return AZ_OK;
   }
 
-  if (az_span_size(destination) < result_size)
+  int32_t const destination_size = az_span_size(destination);
+  if (destination_size < source_size)
   {
     *out_length = 0;
     return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
   }
 
-  uint8_t* const src_ptr = az_span_ptr(source);
-  uint8_t* dest_ptr = az_span_ptr(destination);
+  // "Extra space" is measured in units of 2 additional characters
+  // per single source character ('/' => "%2F").
+  int32_t const extra_space_have = (destination_size - source_size) / 2;
 
-  for (int32_t src_idx = 0; src_idx < source_size; ++src_idx)
+  uint8_t* const dest_begin = az_span_ptr(destination);
+
+  uint8_t* const src_ptr = az_span_ptr(source);
+  uint8_t* dest_ptr = dest_begin;
+
+  if (extra_space_have >= source_size)
   {
-    uint8_t c = src_ptr[src_idx];
-    if (!_az_span_url_should_encode(c))
+    // We know that there's enough space even if every character gets encoded.
+    int32_t src_idx = 0;
+    do
     {
-      *dest_ptr = c;
-      dest_ptr += 1;
-    }
-    else
+      uint8_t c = src_ptr[src_idx];
+      if (!_az_span_url_should_encode(c))
+      {
+        *dest_ptr = c;
+        ++dest_ptr;
+      }
+      else
+      {
+        dest_ptr[0] = '%';
+        dest_ptr[1] = _az_number_to_upper_hex(c >> 4);
+        dest_ptr[2] = _az_number_to_upper_hex(c & 0x0F);
+        dest_ptr += 3;
+      }
+
+      ++src_idx;
+    } while (src_idx < source_size);
+  }
+  else
+  {
+    // We may or may not have enough space, given whether the input needs much encoding or not.
+    int32_t extra_space_used = 0;
+    int32_t src_idx = 0;
+    do
     {
-      dest_ptr[0] = '%';
-      dest_ptr[1] = _az_number_to_upper_hex(c >> 4);
-      dest_ptr[2] = _az_number_to_upper_hex(c & 0x0F);
-      dest_ptr += 3;
-    }
+      uint8_t c = src_ptr[src_idx];
+      if (!_az_span_url_should_encode(c))
+      {
+        *dest_ptr = c;
+        ++dest_ptr;
+      }
+      else
+      {
+        ++extra_space_used;
+        if (extra_space_used > extra_space_have)
+        {
+          *out_length = 0;
+          return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
+        }
+
+        dest_ptr[0] = '%';
+        dest_ptr[1] = _az_number_to_upper_hex(c >> 4);
+        dest_ptr[2] = _az_number_to_upper_hex(c & 0x0F);
+        dest_ptr += 3;
+      }
+
+      ++src_idx;
+    } while (src_idx < source_size);
   }
 
-  *out_length = result_size;
-
+  *out_length = (int32_t)(dest_ptr - dest_begin);
   return AZ_OK;
 }
 

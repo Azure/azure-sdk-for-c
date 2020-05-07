@@ -26,8 +26,7 @@ az_iot_provisioning_client_sas_get_password --> application_mqtt_connect : passw
 state application_hmac256 <<APP>>
 
 ' Subscribe
-application_mqtt_connect --> az_iot_provisioning_client_register_get_subscribe_topic_filter
-az_iot_provisioning_client_register_get_subscribe_topic_filter --> application_mqtt_subscribe
+application_mqtt_connect --> application_mqtt_subscribe
 state application_mqtt_subscribe <<APP>>
 'application_mqtt_subscribe --> application_mqtt_receive : MQTT lib subscribed
 
@@ -86,6 +85,7 @@ az_iot_provisioning_client_query_status_get_publish_topic : - operation_id
 ' Application interfaces
 application_mqtt_connect : - server_x509_trusted_root
 application_mqtt_connect : - [client_x509_certificate]
+application_mqtt_subscribe: - AZ_IOT_PROVISIONING_CLIENT_REGISTER_SUBSCRIBE_TOPIC
 application_delay : - retry_after
 application_hmac256 : - key (may be within an HSM)
 
