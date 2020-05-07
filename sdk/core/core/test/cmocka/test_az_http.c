@@ -329,7 +329,7 @@ static void test_http_response(void** state)
 #ifndef AZ_NO_PRECONDITION_CHECKING
 ENABLE_PRECONDITION_CHECK_TESTS()
 
-    static void test_http_request_removing_left_white_spaces(void** state)
+static void test_http_request_removing_left_white_spaces(void** state)
 {
   (void)state;
 
@@ -378,7 +378,7 @@ static void test_http_request_header_validation(void** state)
         header_span,
         AZ_SPAN_FROM_STR("body")));
 
-    assert_precondition_checked(az_http_request_append_header(
+    ASSERT_PRECONDITION_CHECKED(az_http_request_append_header(
         &hrb, AZ_SPAN_FROM_STR("(headerName)"), hrb_header_content_type_token));
 
     // make sure about header was not added
@@ -411,7 +411,7 @@ static void test_http_request_header_validation_above_127(void** state)
 
     uint8_t c[1] = { 255 };
     az_span header_name = AZ_SPAN_FROM_BUFFER(c);
-    assert_precondition_checked(
+    ASSERT_PRECONDITION_CHECKED(
         az_http_request_append_header(&hrb, header_name, hrb_header_content_type_token));
 
     // make sure about header was not added
