@@ -403,7 +403,7 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_get_subscribe_topic_filter(
  */
 typedef struct az_iot_hub_client_method_request
 {
-  uint32_t request_id; /**< The request id.
+  az_span request_id; /**< The request id.
                        * @note The application must match the method request and method response. */
   az_span name; /**< The method name. */
 } az_iot_hub_client_method_request;
@@ -440,7 +440,7 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_parse_received_topic(
  */
 AZ_NODISCARD az_result az_iot_hub_client_methods_response_get_publish_topic(
     az_iot_hub_client const* client,
-    uint32_t request_id,
+    az_span request_id,
     uint16_t status,
     char* mqtt_topic,
     size_t mqtt_topic_size,
