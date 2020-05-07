@@ -39,7 +39,7 @@ AZ_INLINE AZ_NODISCARD int32_t _az_span_diff(az_span sliced_span, az_span origin
  * the encoded bytes
  *
  * @remark If \p destination can't fit the \p source, some data may still be written to it, but the
- * \p out_length will be set to 0, and the function will return #AZ_ERROR_INSUFFICIENT_SPAN_SIZE. \p
+ * \p out_length will be set to 0, and the function will return #AZ_ERROR_INSUFFICIENT_SPAN_SIZE. The \p
  * destination and \p source must not overlap.
  */
 AZ_NODISCARD az_result
