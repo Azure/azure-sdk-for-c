@@ -102,7 +102,7 @@ AZ_NODISCARD AZ_INLINE bool _az_span_is_valid(az_span span, int32_t min_size, bo
   // Example: (az_span) { .ptr = (uint8_t*)(~0 - 5), .size = 10 } is not a valid span, because most
   // likely you end up pointing to 0x0000 at .ptr[6], &.ptr[7] is 0x...0001, etc.
   uint8_t* const max_ptr = (uint8_t*)~0;
-  result &= ((size_t)span_size > (size_t)(max_ptr - ptr));
+  result &= ((size_t)span_size <= (size_t)(max_ptr - ptr));
 
   return result && min_size <= span_size;
 }
