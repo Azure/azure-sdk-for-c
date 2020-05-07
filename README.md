@@ -88,7 +88,7 @@ When we make an official release, we will create a unique git tag containing the
 
 ## SDK Architecture
 
-At the heart of our SDK is, what we refer to as, [Azure Core](sdk/core/core). This code defines several data types and functions for use by the client libraries that build on top of us such as an `Azure Storage Blob` client library and `IoT` [client libraries](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/iot). Here are some of the features that customers use directly:
+At the heart of our SDK is, what we refer to as, [Azure Core](sdk/core/core). This code defines several data types and functions for use by the client libraries that build on top of us such as an [Azure Storage Blob](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/storage) client library and [IoT client libraries](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/iot). Here are some of the features that customers use directly:
 
 - **Spans**: A span represents a byte buffer and is used for string manipulations, HTTP requests/responses, building/parsing JSON payloads. It allows us to return a substring within a larger string without any memory allocations. See the [Working With Spans](sdk/core/core/README.md#Working-With-Spans) section of the `Azure Core` README for more information.
 
