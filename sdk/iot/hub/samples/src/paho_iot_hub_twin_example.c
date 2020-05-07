@@ -192,7 +192,7 @@ static int on_received(void* context, char* topicName, int topicLen, MQTTClient_
   az_span topic_span = az_span_init((uint8_t*)topicName, topicLen);
 
   az_iot_hub_client_twin_response twin_response;
-  if (az_iot_hub_client_twin_parse_received_topic(&client, topic_span, &twin_response) == AZ_OK)
+  if (az_succeeded(az_iot_hub_client_twin_parse_received_topic(&client, topic_span, &twin_response)))
   {
     printf("Twin Message Arrived\n");
     print_twin_response_type(twin_response.response_type, message);
@@ -216,9 +216,8 @@ static int connect_device()
   mqtt_connect_options.keepAliveInterval = AZ_IOT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS;
 
   size_t username_length;
-  if ((rc = az_iot_hub_client_get_user_name(
-           &client, mqtt_username, sizeof(mqtt_username), &username_length))
-      != AZ_OK)
+  if (az_failed(rc = az_iot_hub_client_get_user_name(
+           &client, mqtt_username, sizeof(mqtt_username), &username_length)))
 
   {
     printf("Failed to get MQTT clientId, return code %d\n", rc);
@@ -271,9 +270,8 @@ static int send_get_twin()
   int rc;
   printf("Requesting twin document\n");
 
-  if ((rc = az_iot_hub_client_twin_document_get_publish_topic(
-           &client, get_twin_topic_request_id, get_twin_topic, sizeof(get_twin_topic), NULL))
-      != AZ_OK)
+  if (az_failed(rc = az_iot_hub_client_twin_document_get_publish_topic(
+           &client, get_twin_topic_request_id, get_twin_topic, sizeof(get_twin_topic), NULL)))
   {
     printf("Unable to get twin document publish topic, return code %d\n", rc);
     return rc;
@@ -307,20 +305,20 @@ static int send_reported_property()
   int rc;
   printf("Sending reported property\n");
 
-  if ((rc = az_iot_hub_client_twin_patch_get_publish_topic(
-           &client,
-           reported_property_topic_request_id,
-           reported_property_topic,
-           sizeof(reported_property_topic),
-           NULL))
-      != AZ_OK)
+  if (az_failed(
+          rc = az_iot_hub_client_twin_patch_get_publish_topic(
+              &client,
+              reported_property_topic_request_id,
+              reported_property_topic,
+              sizeof(reported_property_topic),
+              NULL)))
   {
     printf("Unable to get twin document publish topic, return code %d\n", rc);
     return rc;
   }
 
   az_json_builder json_builder;
-  if ((rc = build_reported_property(&json_builder)) != AZ_OK)
+  if (az_failed(rc = build_reported_property(&json_builder)))
   {
     return rc;
   }
@@ -348,14 +346,13 @@ int main()
 {
   int rc;
 
-  if ((rc = read_configuration_and_init_client()) != AZ_OK)
+  if (az_failed(rc = read_configuration_and_init_client()))
   {
     printf("Failed to read configuration from environment variables, return code %d\n", rc);
     return rc;
   }
 
-  if ((rc = az_iot_hub_client_get_client_id(&client, mqtt_client_id, sizeof(mqtt_client_id), NULL))
-      != AZ_OK)
+  if (az_failed(rc = az_iot_hub_client_get_client_id(&client, mqtt_client_id, sizeof(mqtt_client_id), NULL)))
   {
     printf("Failed to get MQTT clientId, return code %d\n", rc);
     return rc;

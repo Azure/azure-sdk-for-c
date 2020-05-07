@@ -176,8 +176,9 @@ static int connect_device()
   mqtt_connect_options.cleansession = false;
   mqtt_connect_options.keepAliveInterval = AZ_IOT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS;
 
-  if ((rc = az_iot_hub_client_get_user_name(&client, mqtt_username, sizeof(mqtt_username), NULL))
-      != AZ_OK)
+  if (az_failed(
+          rc
+          = az_iot_hub_client_get_user_name(&client, mqtt_username, sizeof(mqtt_username), NULL)))
 
   {
     printf("Failed to get MQTT clientId, return code %d\n", rc);
@@ -208,9 +209,8 @@ static int send_telemetry_messages()
 {
   int rc;
 
-  if ((rc = az_iot_hub_client_telemetry_get_publish_topic(
-           &client, NULL, telemetry_topic, sizeof(telemetry_topic), NULL))
-      != AZ_OK)
+  if (az_failed(rc = az_iot_hub_client_telemetry_get_publish_topic(
+           &client, NULL, telemetry_topic, sizeof(telemetry_topic), NULL)))
   {
     return rc;
   }
@@ -240,16 +240,15 @@ int main()
 {
   int rc;
 
-  if ((rc = read_configuration_and_init_client()) != AZ_OK)
+  if (az_failed(rc = read_configuration_and_init_client()))
   {
     printf("Failed to read configuration from environment variables, return code %d\n", rc);
     return rc;
   }
 
   size_t client_id_length;
-  if ((rc = az_iot_hub_client_get_client_id(
-           &client, mqtt_client_id, sizeof(mqtt_client_id), &client_id_length))
-      != AZ_OK)
+  if (az_failed(rc = az_iot_hub_client_get_client_id(
+           &client, mqtt_client_id, sizeof(mqtt_client_id), &client_id_length)))
   {
     printf("Failed to get MQTT clientId, return code %d\n", rc);
     return rc;

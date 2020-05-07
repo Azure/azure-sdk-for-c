@@ -162,14 +162,13 @@ static int send_method_response(
     az_span response)
 {
   // Get the response topic
-  if (az_iot_hub_client_methods_response_get_publish_topic(
+  if (az_failed(az_iot_hub_client_methods_response_get_publish_topic(
           &client,
           request->request_id,
           status,
           methods_response_topic,
           sizeof(methods_response_topic),
-          NULL)
-      != AZ_OK)
+          NULL)))
   {
     printf("Unable to get twin document publish topic");
     return -1;
@@ -218,9 +217,8 @@ static int on_received(void* context, char* topicName, int topicLen, MQTTClient_
   printf("Topic: %s\n", topicName);
 
   az_iot_hub_client_method_request method_request;
-  if (az_iot_hub_client_methods_parse_received_topic(
-          &client, az_span_init((uint8_t*)topicName, topicLen), &method_request)
-      == AZ_OK)
+  if (az_succeeded(az_iot_hub_client_methods_parse_received_topic(
+          &client, az_span_init((uint8_t*)topicName, topicLen), &method_request)))
   {
     printf("Direct Method arrived\n");
     if (az_span_is_content_equal(ping_method_name_span, method_request.name))
@@ -262,10 +260,9 @@ static int connect_device()
   mqtt_connect_options.keepAliveInterval = AZ_IOT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS;
 
   size_t username_length;
-  if ((rc = az_iot_hub_client_get_user_name(
-           &client, mqtt_username, sizeof(mqtt_username), &username_length))
-      != AZ_OK)
-
+  if (az_failed(
+          rc = az_iot_hub_client_get_user_name(
+              &client, mqtt_username, sizeof(mqtt_username), &username_length)))
   {
     printf("Failed to get MQTT clientId, return code %d\n", rc);
     return rc;
@@ -309,16 +306,16 @@ int main()
 {
   int rc;
 
-  if ((rc = read_configuration_and_init_client()) != AZ_OK)
+  if (az_failed(rc = read_configuration_and_init_client()))
   {
     printf("Failed to read configuration from environment variables, return code %d\n", rc);
     return rc;
   }
 
   size_t client_id_length;
-  if ((rc = az_iot_hub_client_get_client_id(
-           &client, mqtt_client_id, sizeof(mqtt_client_id), &client_id_length))
-      != AZ_OK)
+  if (az_failed(
+          rc = az_iot_hub_client_get_client_id(
+              &client, mqtt_client_id, sizeof(mqtt_client_id), &client_id_length)))
   {
     printf("Failed to get MQTT clientId, return code %d\n", rc);
     return rc;
