@@ -49,7 +49,7 @@ Optionally, the IoT services support MQTT tunneling over WebSocket Secure which 
 The application code is required to initialize the TLS and MQTT stacks.
 Two authentication schemes are currently supported: _X509 Client Certificate Authentication_ and _Shared Access Signature_ authentication.
 
-When X509 client authentication is used, the MQTT password field should be an empty string.
+When X509 client authentication is used, the MQTT password field should be empty.
 
 If SAS tokens are used the following APIs provide a way to create as well as refresh the lifetime of the used token upon reconnect.
 
