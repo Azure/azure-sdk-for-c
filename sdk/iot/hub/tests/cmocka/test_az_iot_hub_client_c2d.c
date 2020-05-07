@@ -39,7 +39,7 @@ static const az_span test_parse_method_topic_fail
     = AZ_SPAN_LITERAL_FROM_STR("$iothub/methods/POST/foo/?$rid=one");
 
 #ifndef AZ_NO_PRECONDITION_CHECKING
-enable_precondition_check_tests()
+ENABLE_PRECONDITION_CHECK_TESTS()
 
 static void test_az_iot_hub_client_c2d_parse_received_topic_NULL_client_fail()
 {
@@ -49,7 +49,7 @@ static void test_az_iot_hub_client_c2d_parse_received_topic_NULL_client_fail()
 
   az_iot_hub_client_c2d_request out_request;
 
-  assert_precondition_checked(
+  ASSERT_PRECONDITION_CHECKED(
       az_iot_hub_client_c2d_parse_received_topic(NULL, received_topic, &out_request));
 }
 
@@ -67,7 +67,7 @@ static void test_az_iot_hub_client_c2d_parse_received_topic_AZ_SPAN_NULL_receive
 
   az_iot_hub_client_c2d_request out_request;
 
-  assert_precondition_checked(
+  ASSERT_PRECONDITION_CHECKED(
       az_iot_hub_client_c2d_parse_received_topic(&client, received_topic, &out_request));
 }
 
@@ -80,7 +80,7 @@ static void test_az_iot_hub_client_c2d_parse_received_topic_NULL_out_request_fai
 
   az_span received_topic = test_url_decoded_topic;
 
-  assert_precondition_checked(
+  ASSERT_PRECONDITION_CHECKED(
       az_iot_hub_client_c2d_parse_received_topic(&client, received_topic, NULL));
 }
 
@@ -242,7 +242,7 @@ static void test_az_iot_hub_client_c2d_logging_succeed()
 int test_iot_hub_c2d()
 {
 #ifndef AZ_NO_PRECONDITION_CHECKING
-  setup_precondition_check_tests();
+  SETUP_PRECONDITION_CHECK_TESTS();
 #endif // AZ_NO_PRECONDITION_CHECKING
 
   const struct CMUnitTest tests[] = {

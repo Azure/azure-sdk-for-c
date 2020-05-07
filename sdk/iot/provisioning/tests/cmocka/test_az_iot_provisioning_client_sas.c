@@ -36,7 +36,7 @@ static const uint32_t test_sas_expiry_time_secs = 1578941692;
 static const az_span test_signature = AZ_SPAN_LITERAL_FROM_STR(TEST_SIG);
 
 #ifndef AZ_NO_PRECONDITION_CHECKING
-enable_precondition_check_tests()
+ENABLE_PRECONDITION_CHECK_TESTS()
 
 static void az_iot_provisioning_client_sas_get_signature_NULL_signature_fails()
 {
@@ -48,7 +48,7 @@ static void az_iot_provisioning_client_sas_get_signature_NULL_signature_fails()
 
   az_span signature = AZ_SPAN_NULL;
 
-  assert_precondition_checked(az_iot_provisioning_client_sas_get_signature(
+  ASSERT_PRECONDITION_CHECKED(az_iot_provisioning_client_sas_get_signature(
       &client, test_sas_expiry_time_secs, signature, NULL));
 }
 
@@ -62,7 +62,7 @@ static void az_iot_provisioning_client_sas_get_signature_NULL_signature_span_fai
 
   az_span signature = AZ_SPAN_NULL;
 
-  assert_precondition_checked(az_iot_provisioning_client_sas_get_signature(
+  ASSERT_PRECONDITION_CHECKED(az_iot_provisioning_client_sas_get_signature(
       &client, test_sas_expiry_time_secs, signature, &signature));
 }
 
@@ -71,7 +71,7 @@ static void az_iot_provisioning_client_sas_get_signature_NULL_client_fails()
   uint8_t signature_buffer[TEST_SPAN_BUFFER_SIZE];
   az_span signature = az_span_init(signature_buffer, _az_COUNTOF(signature_buffer));
 
-  assert_precondition_checked(az_iot_provisioning_client_sas_get_signature(
+  ASSERT_PRECONDITION_CHECKED(az_iot_provisioning_client_sas_get_signature(
       NULL, test_sas_expiry_time_secs, signature, &signature));
 }
 
@@ -89,7 +89,7 @@ static void az_iot_provisioning_client_sas_get_password_EMPTY_signature_fails()
   char password[TEST_SPAN_BUFFER_SIZE];
   size_t length = 0;
 
-  assert_precondition_checked(az_iot_provisioning_client_sas_get_password(
+  ASSERT_PRECONDITION_CHECKED(az_iot_provisioning_client_sas_get_password(
       &client,
       signature,
       test_sas_expiry_time_secs,
@@ -111,7 +111,7 @@ static void az_iot_provisioning_client_sas_get_password_NULL_password_span_fails
   size_t length = 0;
   char password[TEST_SPAN_BUFFER_SIZE];
 
-  assert_precondition_checked(az_iot_provisioning_client_sas_get_password(
+  ASSERT_PRECONDITION_CHECKED(az_iot_provisioning_client_sas_get_password(
       &client,
       test_signature,
       test_sas_expiry_time_secs,
@@ -134,7 +134,7 @@ static void az_iot_provisioning_client_sas_get_password_empty_password_buffer_fa
   char password[TEST_SPAN_BUFFER_SIZE];
   size_t length = 0;
 
-  assert_precondition_checked(az_iot_provisioning_client_sas_get_password(
+  ASSERT_PRECONDITION_CHECKED(az_iot_provisioning_client_sas_get_password(
       &client, test_signature, test_sas_expiry_time_secs, key_name, password, 0, &length));
 }
 
@@ -318,7 +318,7 @@ static void test_az_iot_provisioning_client_sas_logging_succeed()
 int test_az_iot_provisioning_client_sas_token()
 {
 #ifndef AZ_NO_PRECONDITION_CHECKING
-  setup_precondition_check_tests();
+  SETUP_PRECONDITION_CHECK_TESTS();
 #endif // AZ_NO_PRECONDITION_CHECKING
 
   const struct CMUnitTest tests[] = {

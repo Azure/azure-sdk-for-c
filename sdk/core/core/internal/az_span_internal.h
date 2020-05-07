@@ -37,6 +37,10 @@ AZ_INLINE AZ_NODISCARD int32_t _az_span_diff(az_span sliced_span, az_span origin
  *         - #AZ_OK if successful
  *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the \p destination is not big enough to contain
  * the encoded bytes
+ *
+ * @remark If \p destination can't fit the \p source, some data may still be written to it, but the
+ * \p out_length will be set to 0, and the function will return #AZ_ERROR_INSUFFICIENT_SPAN_SIZE.
+ * @remark The \p destination and \p source must not overlap.
  */
 AZ_NODISCARD az_result
 _az_span_url_encode(az_span destination, az_span source, int32_t* out_length);
