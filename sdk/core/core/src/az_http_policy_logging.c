@@ -12,8 +12,6 @@
 
 #include <_az_cfg.h>
 
-#ifndef AZ_NO_LOGGING
-
 enum
 {
   _az_LOG_LENGTHY_VALUE_MAX_LENGTH
@@ -225,6 +223,8 @@ void _az_http_policy_logging_log_http_response(
 
   _az_log_write(AZ_LOG_HTTP_RESPONSE, log_msg);
 }
+
+#ifndef AZ_NO_LOGGING
 
 AZ_NODISCARD az_result az_http_pipeline_policy_logging(
     _az_http_policy* p_policies,
