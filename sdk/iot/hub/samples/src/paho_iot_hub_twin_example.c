@@ -179,7 +179,7 @@ static int on_received(void* context, char* topicName, int topicLen, MQTTClient_
     printf("Twin Message Arrived\n");
 
     // Determine what type of incoming twin message this is. Print relevant data for the message.
-    switch (type)
+    switch (twin_response.response_type)
     {
       // A response from a twin GET publish message with the twin document as a payload.
       case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_GET:
