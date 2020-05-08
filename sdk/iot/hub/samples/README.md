@@ -36,9 +36,7 @@ steps.
 1. Paste in the certificate fingerprint printed previously. You MUST remove the colons from the fingerprint hash
 before pasting into IoT Hub.
 
-
-After this is generated, the environment variable `AZ_IOT_DEVICE_X509_CERT_PEM_FILE` will be set for you
-and is ready to use in the samples.
+After this is generated, make sure to set `AZ_IOT_DEVICE_X509_CERT_PEM_FILE` as an environment variable.
 
 For more details on X509 authentication, refer to [this online documentation](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-x509ca-overview#how-to-register-the-x509-ca-certificate-to-iot-hub)
 
