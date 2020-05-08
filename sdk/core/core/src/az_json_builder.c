@@ -34,6 +34,7 @@ static AZ_NODISCARD az_span _get_remaining_span(az_json_builder* json_builder)
       json_builder->_internal.destination_buffer, json_builder->_internal.bytes_written);
 }
 
+#ifndef AZ_NO_PRECONDITION_CHECKING
 static AZ_NODISCARD bool _az_is_appending_value_valid(az_json_builder* json_builder)
 {
   _az_PRECONDITION_NOT_NULL(json_builder);
@@ -138,6 +139,7 @@ static AZ_NODISCARD bool _az_is_appending_container_end_valid(
   // JSON builder state is valid and an end of a container can be appended.
   return true;
 }
+#endif // AZ_NO_PRECONDITION_CHECKING
 
 // Returns the length of the JSON string within the az_span after it has been escaped.
 // The out parameter contains the index where the first character to escape is found.
