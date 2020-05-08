@@ -160,7 +160,7 @@ static az_result read_configuration_and_init_client()
   AZ_RETURN_IF_FAILED(
       create_mqtt_endpoint(mqtt_endpoint, (int32_t)sizeof(mqtt_endpoint), iot_hub_hostname_span));
 
-  // Initialize the az_iot_hub_client
+  // Initialize the hub client with the hub host endpoint and the default connection options
   AZ_RETURN_IF_FAILED(az_iot_hub_client_init(
       &client,
       az_span_slice(iot_hub_hostname_span, 0, (int32_t)strlen(iot_hub_hostname)),
@@ -195,7 +195,7 @@ static int connect_device()
   mqtt_connect_options.username = mqtt_username;
   mqtt_connect_options.password = NULL;
 
-  // Set the device cert for authentication
+  // Set the device cert for tls mutual authentication
   mqtt_ssl_options.keyStore = (char*)x509_cert_pem_file;
   if (*x509_trust_pem_file != '\0')
   {
