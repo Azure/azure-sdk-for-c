@@ -294,7 +294,7 @@ static int send_get_twin()
     return rc;
   }
 
-  // Publish the message. This will trigger the service to send back the twin document.
+  // Publish the get twin message. This will trigger the service to send back the twin document for this device.
   // The response is handled in the on_received function.
   if ((rc = MQTTClient_publish(mqtt_client, get_twin_topic, 0, NULL, 0, 0, NULL))
       != MQTTCLIENT_SUCCESS)
