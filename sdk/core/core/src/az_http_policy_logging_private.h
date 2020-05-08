@@ -18,6 +18,23 @@ void _az_http_policy_logging_log_http_response(
     int64_t duration_msec,
     _az_http_request const* request);
 
+#ifdef AZ_NO_LOGGING
+AZ_INLINE void _az_http_policy_logging_log_http_request(_az_http_request const* request)
+{
+  (void)request;
+}
+
+void _az_http_policy_logging_log_http_response(
+    az_http_response const* response,
+    int64_t duration_msec,
+    _az_http_request const* request)
+{
+  (void)response;
+  (void)duration_msec;
+  (void)request;
+}
+#endif // AZ_NO_LOGGING
+
 #include <_az_cfg_suffix.h>
 
 #endif // _az_HTTP_POLICY_LOGGING_PRIVATE_H

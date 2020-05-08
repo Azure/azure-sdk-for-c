@@ -83,6 +83,12 @@ static void _log_listener_NULL(az_log_classification classification, az_span mes
   }
 }
 
+#ifndef AZ_NO_LOGGING
+#define TRUE_ONLY_WHEN_LOGGING_IS_ON true
+#else
+#define TRUE_ONLY_WHEN_LOGGING_IS_ON false
+#endif AZ_NO_LOGGING
+
 static void test_az_log(void** state)
 {
   (void)state;
@@ -116,9 +122,7 @@ static void test_az_log(void** state)
       AZ_SPAN_FROM_STR("111111222222333333444444555555666666777777888888abc")));
 
   TEST_EXPECT_SUCCESS(az_http_request_append_header(
-      &hrb,
-      AZ_SPAN_FROM_STR("authorization"),
-      AZ_SPAN_FROM_STR("BigSecret!")));
+      &hrb, AZ_SPAN_FROM_STR("authorization"), AZ_SPAN_FROM_STR("BigSecret!")));
 
   uint8_t response_buf[1024] = { 0 };
   az_span response_builder = AZ_SPAN_FROM_BUFFER(response_buf);
@@ -144,7 +148,7 @@ static void test_az_log(void** state)
     _reset_log_invocation_status();
     az_log_set_callback(_log_listener_NULL);
     _az_http_policy_logging_log_http_request(NULL);
-    assert_true(_log_invoked_for_http_request == true);
+    assert_true(_log_invoked_for_http_request == TRUE_ONLY_WHEN_LOGGING_IS_ON);
     assert_true(_log_invoked_for_http_response == false);
   }
   // Actual test below
@@ -157,12 +161,12 @@ static void test_az_log(void** state)
     assert_true(_log_invoked_for_http_response == false);
 
     _az_http_policy_logging_log_http_request(&hrb);
-    assert_true(_log_invoked_for_http_request == true);
+    assert_true(_log_invoked_for_http_request == TRUE_ONLY_WHEN_LOGGING_IS_ON);
     assert_true(_log_invoked_for_http_response == false);
 
     _az_http_policy_logging_log_http_response(&response, 3456, &hrb);
-    assert_true(_log_invoked_for_http_request == true);
-    assert_true(_log_invoked_for_http_response == true);
+    assert_true(_log_invoked_for_http_request == TRUE_ONLY_WHEN_LOGGING_IS_ON);
+    assert_true(_log_invoked_for_http_response == TRUE_ONLY_WHEN_LOGGING_IS_ON);
   }
   {
     _reset_log_invocation_status();
@@ -187,8 +191,8 @@ static void test_az_log(void** state)
       // (and customer is going to get all of them).
       az_log_set_callback(_log_listener);
 
-      assert_true(_az_log_should_write(AZ_LOG_HTTP_REQUEST) == true);
-      assert_true(_az_log_should_write(AZ_LOG_HTTP_RESPONSE) == true);
+      assert_true(_az_log_should_write(AZ_LOG_HTTP_REQUEST) == TRUE_ONLY_WHEN_LOGGING_IS_ON);
+      assert_true(_az_log_should_write(AZ_LOG_HTTP_RESPONSE) == TRUE_ONLY_WHEN_LOGGING_IS_ON);
     }
 
     // Verify that if customer specifies the classifications, we'll only invoking the logging
@@ -198,13 +202,13 @@ static void test_az_log(void** state)
     az_log_classification const classifications[] = { AZ_LOG_HTTP_REQUEST, AZ_LOG_END_OF_LIST };
     az_log_set_classifications(classifications);
 
-    assert_true(_az_log_should_write(AZ_LOG_HTTP_REQUEST) == true);
+    assert_true(_az_log_should_write(AZ_LOG_HTTP_REQUEST) == TRUE_ONLY_WHEN_LOGGING_IS_ON);
     assert_true(_az_log_should_write(AZ_LOG_HTTP_RESPONSE) == false);
 
     _az_http_policy_logging_log_http_request(&hrb);
     _az_http_policy_logging_log_http_response(&response, 3456, &hrb);
 
-    assert_true(_log_invoked_for_http_request == true);
+    assert_true(_log_invoked_for_http_request == TRUE_ONLY_WHEN_LOGGING_IS_ON);
     assert_true(_log_invoked_for_http_response == false);
   }
 
