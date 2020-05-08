@@ -87,7 +87,7 @@ static void _log_listener_NULL(az_log_classification classification, az_span mes
 #define TRUE_ONLY_WHEN_LOGGING_IS_ON true
 #else
 #define TRUE_ONLY_WHEN_LOGGING_IS_ON false
-#endif AZ_NO_LOGGING
+#endif // AZ_NO_LOGGING
 
 static void test_az_log(void** state)
 {
