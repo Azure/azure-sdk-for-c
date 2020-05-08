@@ -27,7 +27,6 @@ Feature | Azure SDK for Embedded C | Description
  [Device Twins](https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-device-twins) | :heavy_check_mark: | IoT Hub persists a device twin for each device that you connect to IoT Hub.  The device can perform operations like get twin document, subscribe to desired property updates.
  [Direct Methods](https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-direct-methods) | :heavy_check_mark: | IoT Hub gives you the ability to invoke direct methods on devices from the cloud.  
  [DPS - Device Provisioning Service](https://docs.microsoft.com/azure/iot-dps/) | :heavy_check_mark: | This SDK supports connecting your device to the Device Provisioning Service via, for example, [individual enrollment](https://docs.microsoft.com/azure/iot-dps/concepts-service#enrollment) using an [X.509 leaf certificate](https://docs.microsoft.com/azure/iot-dps/concepts-security#leaf-certificate).  
-
  Protocol | MQTT | The Azure SDK for Embedded C supports only MQTT.  
  Retry Policies | :heavy_check_mark:* | The Azure SDK for Embedded C provides guidelines for retries, but actual retries should be handled by the application.
  [Plug and Play](https://docs.microsoft.com/en-us/azure/iot-pnp/overview-iot-plug-and-play) | :heavy_multiplication_x: | IoT Plug and Play Preview enables solution developers to integrate devices with their solutions without writing any embedded code. 
@@ -172,9 +171,8 @@ For more information see the [Code of Conduct FAQ](https://opensource.microsoft.
 Many people all over the world have helped make this project better.  You'll want to check out:
 
 * [What are some good first issues for new contributors to the repo?](https://github.com/azure/azure-sdk-for-c/issues?q=is%3Aopen+is%3Aissue+label%3A%22up+for+grabs%22)
-* [How to build and test your change](CONTRIBUTING.md#developer-guide)
-* [How you can make a change happen!](CONTRIBUTING.md#pull-requests)
-* Frequently Asked Questions (FAQ) and Conceptual Topics in the detailed [Azure SDK for C wiki][azure_sdk_for_c_wiki].
+* [How to build and test your change](https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md#developer-guide)
+* [How you can make a change happen!](https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md#pull-requests)
 
 ### Community
 
@@ -186,4 +184,4 @@ Security issues and bugs should be reported privately, via email, to the Microso
 
 ### License
 
-Azure SDK for Embedded C is licensed under the [MIT](LICENSE) license.
+Azure SDK for Embedded C is licensed under the [MIT](https://github.com/Azure/azure-sdk-for-c/blob/master/LICENSE) license.
