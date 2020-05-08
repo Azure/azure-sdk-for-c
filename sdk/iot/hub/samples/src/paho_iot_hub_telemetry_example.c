@@ -43,7 +43,7 @@
 // This is usually not needed on Linux or Mac but needs to be set on Windows.
 #define ENV_DEVICE_X509_TRUST_PEM_FILE "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE"
 
-#define TIMEOUT_MQTT_DISCONNECT_MS 10 * 1000
+#define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
 #define TELEMETRY_SEND_INTERVAL 1
 #define NUMBER_OF_MESSAGES 5
 
@@ -76,6 +76,7 @@ static void sleep_seconds(uint32_t seconds)
 #endif
 }
 
+// Read OS environment variables using stdlib function
 static az_result read_configuration_entry(
     const char* name,
     const char* env_name,
@@ -112,6 +113,7 @@ static az_result read_configuration_entry(
   return AZ_OK;
 }
 
+// Create mqtt endpoint e.g: ssl//contoso.azure-devices.net:8883
 static az_result create_mqtt_endpoint(char* destination, int32_t destination_size, az_span iot_hub)
 {
   int32_t iot_hub_length = (int32_t)strlen(iot_hub_hostname);
@@ -132,9 +134,9 @@ static az_result create_mqtt_endpoint(char* destination, int32_t destination_siz
   return AZ_OK;
 }
 
+// Read the user environment variables used to connect to IoT Hub
 static az_result read_configuration_and_init_client()
 {
-  // Read the user environment variables used to connect to IoT Hub
   az_span cert = AZ_SPAN_FROM_BUFFER(x509_cert_pem_file);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
       "X509 Certificate PEM Store File", ENV_DEVICE_X509_CERT_PEM_FILE, NULL, false, cert, &cert));
