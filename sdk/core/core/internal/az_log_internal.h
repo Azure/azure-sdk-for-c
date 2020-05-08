@@ -16,6 +16,20 @@ bool _az_log_should_write(az_log_classification classification);
 
 void _az_log_write(az_log_classification classification, az_span message);
 
+#ifdef AZ_NO_LOGGING
+AZ_INLINE bool _az_log_should_write(az_log_classification classification)
+{
+  (void)classification;
+  return false;
+}
+
+AZ_INLINE void _az_log_write(az_log_classification classification, az_span message)
+{
+  (void)classification;
+  (void)message;
+}
+#endif // AZ_NO_LOGGING
+
 #include <_az_cfg_suffix.h>
 
 #endif // _az_LOG_INTERNAL_H

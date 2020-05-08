@@ -87,6 +87,18 @@ void az_log_set_classifications(az_log_classification const classifications[]);
  */
 void az_log_set_callback(az_log_message_fn az_log_message_callback);
 
+#ifdef AZ_NO_LOGGING
+AZ_INLINE void az_log_set_classifications(az_log_classification const classifications[])
+{
+  (void)classifications;
+}
+
+AZ_INLINE void az_log_set_callback(az_log_message_fn az_log_message_callback)
+{
+  (void)az_log_message_callback;
+}
+#endif // AZ_NO_LOGGING
+
 #include <_az_cfg_suffix.h>
 
 #endif // _az_LOG_H
