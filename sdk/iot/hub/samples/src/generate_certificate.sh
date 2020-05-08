@@ -2,6 +2,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # SPDX-License-Identifier: MIT
 
+set -o errexit # Exit if command failed.
 set -o nounset # Exit if variable not set.
 set -o pipefail # Exit if pipe failed.
 
@@ -9,7 +10,7 @@ openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey
 openssl req -new -days 365 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=paho-sample-device1"
 openssl x509 -noout -text -in device_ec_cert.pem
 
-rm device_cert_store.pem
+rm -f device_cert_store.pem
 cat device_ec_cert.pem device_ec_key.pem > device_cert_store.pem
 
 echo -e "\nIt is NOT recommended to use OpenSSL on Windows or OSX. Recommended TLS stacks are:"
@@ -26,6 +27,5 @@ echo "Use the following command to set the environment variable for the samples:
 echo    export AZ_IOT_DEVICE_X509_CERT_PEM_FILE=$(pwd)/device_cert_store.pem
 
 echo -e "\nUse the following fingerprint when creating your device in IoT Hub:"
-echo `openssl x509 -noout -fingerprint -in device_ec_cert.pem | tee | sed 's/://g'`
-openssl x509 -noout -fingerprint -in device_ec_cert.pem | tee | sed 's/://g' > fingerprint.txt
+openssl x509 -noout -fingerprint -in device_ec_cert.pem |  sed 's/://g'| tee  fingerprint.txt
 echo -e "\nThe fingerprint has also been placed in fingerprint.txt for future reference"
