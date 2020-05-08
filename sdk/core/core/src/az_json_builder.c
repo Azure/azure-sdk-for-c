@@ -319,6 +319,7 @@ AZ_INLINE void _az_update_json_builder_state(
 AZ_NODISCARD az_result az_json_builder_append_string(az_json_builder* json_builder, az_span value)
 {
   _az_PRECONDITION_NOT_NULL(json_builder);
+  // A null span is allowed, and we write an empty JSON string for it.
   _az_PRECONDITION_VALID_SPAN(value, 0, true);
   _az_PRECONDITION(az_span_size(value) <= _az_MAX_UNESCAPED_STRING_SIZE);
   _az_PRECONDITION(_az_is_appending_value_valid(json_builder));
