@@ -296,8 +296,8 @@ static int send_get_twin()
     return rc;
   }
 
-  // Publish the get twin message. This will trigger the service to send back the twin document for this device.
-  // The response is handled in the on_received function.
+  // Publish the get twin message. This will trigger the service to send back the twin document for
+  // this device. The response is handled in the on_received function.
   if ((rc = MQTTClient_publish(mqtt_client, get_twin_topic, 0, NULL, 0, 0, NULL))
       != MQTTCLIENT_SUCCESS)
   {
@@ -310,13 +310,11 @@ static int send_get_twin()
 static int build_reported_property(az_json_builder* json_builder)
 {
   az_result result;
-  result = az_json_builder_init(json_builder, AZ_SPAN_FROM_BUFFER(reported_property_payload));
-  result = az_json_builder_append_token(json_builder, az_json_token_object_start());
-  az_json_token reported_property_value_token
-      = az_json_token_number((double)reported_property_value++);
-  result = az_json_builder_append_object(
-      json_builder, reported_property_name, reported_property_value_token);
-  result = az_json_builder_append_token(json_builder, az_json_token_object_end());
+  result = az_json_builder_init(json_builder, AZ_SPAN_FROM_BUFFER(reported_property_payload), NULL);
+  result = az_json_builder_append_begin_object(json_builder);
+  result = az_json_builder_append_property_name(json_builder, reported_property_name);
+  result = az_json_builder_append_int32_number(json_builder, reported_property_value++);
+  result = az_json_builder_append_end_object(json_builder);
 
   return result;
 }
@@ -345,7 +343,7 @@ static int send_reported_property()
   {
     return rc;
   }
-  az_span json_payload = az_json_builder_span_get(&json_builder);
+  az_span json_payload = az_json_builder_get_json(&json_builder);
 
   printf("Payload: %.*s\n", az_span_size(json_payload), (char*)az_span_ptr(json_payload));
 
