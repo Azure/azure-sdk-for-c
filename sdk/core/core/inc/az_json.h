@@ -30,10 +30,10 @@
 typedef enum
 {
   AZ_JSON_TOKEN_NONE, ///< There is no value (as distinct from #AZ_JSON_TOKEN_NULL).
-  AZ_JSON_TOKEN_OBJECT_START, ///< The token kind is the start of a JSON object.
-  AZ_JSON_TOKEN_OBJECT_END, ///< The token kind is the end of a JSON object.
-  AZ_JSON_TOKEN_ARRAY_START, ///< The token kind is the start of a JSON array.
-  AZ_JSON_TOKEN_ARRAY_END, ///< The token kind is the end of a JSON array.
+  AZ_JSON_TOKEN_BEGIN_OBJECT, ///< The token kind is the start of a JSON object.
+  AZ_JSON_TOKEN_END_OBJECT, ///< The token kind is the end of a JSON object.
+  AZ_JSON_TOKEN_BEGIN_ARRAY, ///< The token kind is the start of a JSON array.
+  AZ_JSON_TOKEN_END_ARRAY, ///< The token kind is the end of a JSON array.
   AZ_JSON_TOKEN_PROPERTY_NAME, ///< The token kind is a JSON property name.
   AZ_JSON_TOKEN_STRING, ///< The token kind is a JSON string.
   AZ_JSON_TOKEN_NUMBER, ///< The token kind is a JSON number.
@@ -127,41 +127,41 @@ AZ_NODISCARD AZ_INLINE az_json_token az_json_token_string(az_span value)
 AZ_NODISCARD AZ_INLINE az_json_token az_json_token_object(az_span value)
 {
   return (az_json_token){
-    .kind = AZ_JSON_TOKEN_OBJECT_START,
+    .kind = AZ_JSON_TOKEN_BEGIN_OBJECT,
     ._internal.span = value,
   };
 }
 
 /*
- * @brief az_json_token_object_start returns an az_json_token representing the start of an object.
+ * @brief returns an az_json_token representing the start of an object.
  */
-AZ_NODISCARD AZ_INLINE az_json_token az_json_token_object_start()
+AZ_NODISCARD AZ_INLINE az_json_token az_json_token_begin_object()
 {
-  return (az_json_token){ .kind = AZ_JSON_TOKEN_OBJECT_START, ._internal = { 0 } };
+  return (az_json_token){ .kind = AZ_JSON_TOKEN_BEGIN_OBJECT, ._internal = { 0 } };
 }
 
 /*
- * @brief az_json_token_object_end returns an az_json_token representing the end of an object.
+ * @brief returns an az_json_token representing the end of an object.
  */
-AZ_NODISCARD AZ_INLINE az_json_token az_json_token_object_end()
+AZ_NODISCARD AZ_INLINE az_json_token az_json_token_end_object()
 {
-  return (az_json_token){ .kind = AZ_JSON_TOKEN_OBJECT_END, ._internal = { 0 } };
+  return (az_json_token){ .kind = AZ_JSON_TOKEN_END_OBJECT, ._internal = { 0 } };
 }
 
 /*
- * @brief az_json_token_array_start returns an az_json_token representing the start of an array.
+ * @brief returns an az_json_token representing the start of an array.
  */
-AZ_NODISCARD AZ_INLINE az_json_token az_json_token_array_start()
+AZ_NODISCARD AZ_INLINE az_json_token az_json_token_begin_array()
 {
-  return (az_json_token){ .kind = AZ_JSON_TOKEN_ARRAY_START, ._internal = { 0 } };
+  return (az_json_token){ .kind = AZ_JSON_TOKEN_BEGIN_ARRAY, ._internal = { 0 } };
 }
 
 /*
- * @brief az_json_token_array_end returns an az_json_token representing the end of an array.
+ * @brief returns an az_json_token representing the end of an array.
  */
-AZ_NODISCARD AZ_INLINE az_json_token az_json_token_array_end()
+AZ_NODISCARD AZ_INLINE az_json_token az_json_token_end_array()
 {
-  return (az_json_token){ .kind = AZ_JSON_TOKEN_ARRAY_END, ._internal = { 0 } };
+  return (az_json_token){ .kind = AZ_JSON_TOKEN_END_ARRAY, ._internal = { 0 } };
 }
 
 /*
@@ -205,9 +205,7 @@ typedef struct
   struct
   {
     // Currently, this is unused, but needed as a placeholder since we can't have an empty struct.
-    bool write_formatted; // Indicates whether the #az_json_builder should format the JSON output,
-                          // which includes indenting nested JSON tokens, adding new lines, and
-                          // adding white space between property names and values.
+    bool unused;
   } _internal;
 } az_json_builder_options;
 
@@ -223,7 +221,7 @@ AZ_NODISCARD AZ_INLINE az_json_builder_options az_json_builder_options_default()
 {
   az_json_builder_options options = (az_json_builder_options) {
     ._internal = {
-      .write_formatted = false,
+      .unused = false,
     },
   };
 
@@ -295,7 +293,6 @@ AZ_NODISCARD AZ_INLINE az_result az_json_builder_init(
  */
 AZ_NODISCARD AZ_INLINE az_span az_json_builder_get_json(az_json_builder const* json_builder)
 {
-  // TODO: Consider precondition validation of the state before returning.
   return az_span_slice(
       json_builder->_internal.destination_buffer, 0, json_builder->_internal.bytes_written);
 }
@@ -308,8 +305,7 @@ AZ_NODISCARD AZ_INLINE az_span az_json_builder_get_json(az_json_builder const* j
  * @param[in] value The UTF-8 encoded value to be written as a JSON string. The value is escaped
  * before writing.
  *
- * @remarks If \p value is #AZ_SPAN_NULL, the JSON `null` value is written, as if the
- * #az_json_builder_append_null() method was called.
+ * @remarks If \p value is #AZ_SPAN_NULL, the empty JSON string value is written (i.e. "").
  *
  * @return An #az_result value indicating the result of the operation:
  *         - #AZ_OK if the string value was appended successfully
@@ -317,7 +313,6 @@ AZ_NODISCARD AZ_INLINE az_span az_json_builder_get_json(az_json_builder const* j
  */
 AZ_NODISCARD az_result az_json_builder_append_string(az_json_builder* json_builder, az_span value);
 
-// TODO: Consider adding char* overloads to make passing string literals as property names easier.
 /**
  * @brief Appends the UTF-8 property name (as a JSON string) which is the first part of a name/value
  * pair of a JSON object.
@@ -397,7 +392,7 @@ AZ_NODISCARD az_result az_json_builder_append_null(az_json_builder* json_builder
  *         - #AZ_OK if object start was appended successfully
  *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the buffer is too small
  */
-AZ_NODISCARD az_result az_json_builder_append_object_start(az_json_builder* json_builder);
+AZ_NODISCARD az_result az_json_builder_append_begin_object(az_json_builder* json_builder);
 
 /**
  * @brief Appends the beginning of a JSON array (i.e. `[`).
@@ -409,20 +404,31 @@ AZ_NODISCARD az_result az_json_builder_append_object_start(az_json_builder* json
  *         - #AZ_OK if array start was appended successfully
  *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the buffer is too small
  */
-AZ_NODISCARD az_result az_json_builder_append_array_start(az_json_builder* json_builder);
+AZ_NODISCARD az_result az_json_builder_append_begin_array(az_json_builder* json_builder);
 
 /**
- * @brief Appends the end of the current JSON object (i.e. `}`) or JSON array (i.e. `]`), depending
- * on which JSON container is currently open.
+ * @brief Appends the end of the current JSON object (i.e. `}`).
  *
  * @param[in] json_builder A pointer to an #az_json_builder instance containing the buffer to append
  * the closing character to.
  *
  * @return An #az_result value indicating the result of the operation:
- *         - #AZ_OK if container end was appended successfully
+ *         - #AZ_OK if object end was appended successfully
  *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the buffer is too small
  */
-AZ_NODISCARD az_result az_json_builder_append_container_end(az_json_builder* json_builder);
+AZ_NODISCARD az_result az_json_builder_append_end_object(az_json_builder* json_builder);
+
+/**
+ * @brief Appends the end of the current JSON array (i.e. `]`).
+ *
+ * @param[in] json_builder A pointer to an #az_json_builder instance containing the buffer to append
+ * the closing character to.
+ *
+ * @return An #az_result value indicating the result of the operation:
+ *         - #AZ_OK if array end was appended successfully
+ *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the buffer is too small
+ */
+AZ_NODISCARD az_result az_json_builder_append_end_array(az_json_builder* json_builder);
 
 /************************************ JSON PARSER ******************/
 

@@ -48,7 +48,7 @@ static AZ_NODISCARD bool _az_is_appending_value_valid(az_json_builder* json_buil
     if (kind != AZ_JSON_TOKEN_PROPERTY_NAME)
     {
       // Given we are within a JSON object, kind cannot be start of an array or none.
-      _az_PRECONDITION(kind != AZ_JSON_TOKEN_NONE && kind != AZ_JSON_TOKEN_ARRAY_START);
+      _az_PRECONDITION(kind != AZ_JSON_TOKEN_NONE && kind != AZ_JSON_TOKEN_BEGIN_ARRAY);
 
       return false;
     }
@@ -63,7 +63,7 @@ static AZ_NODISCARD bool _az_is_appending_value_valid(az_json_builder* json_buil
     // an existing closed object/array.
 
     // Given we are not within a JSON object, kind cannot be property name.
-    _az_PRECONDITION(kind != AZ_JSON_TOKEN_PROPERTY_NAME && kind != AZ_JSON_TOKEN_OBJECT_START);
+    _az_PRECONDITION(kind != AZ_JSON_TOKEN_PROPERTY_NAME && kind != AZ_JSON_TOKEN_BEGIN_OBJECT);
 
     // It is more likely for current_depth to not equal 0 when writing valid JSON, so check that
     // first to rely on short-circuiting and return quickly.
@@ -90,7 +90,7 @@ static AZ_NODISCARD bool _az_is_appending_property_name_valid(az_json_builder* j
   if (!_az_json_stack_peek(&json_builder->_internal.bit_stack)
       || kind == AZ_JSON_TOKEN_PROPERTY_NAME)
   {
-    _az_PRECONDITION(kind != AZ_JSON_TOKEN_OBJECT_START);
+    _az_PRECONDITION(kind != AZ_JSON_TOKEN_BEGIN_OBJECT);
     return false;
   }
 
@@ -99,7 +99,9 @@ static AZ_NODISCARD bool _az_is_appending_property_name_valid(az_json_builder* j
 }
 
 // TODO: Make this a precondition?
-static AZ_NODISCARD bool _az_is_appending_container_end_valid(az_json_builder* json_builder)
+static AZ_NODISCARD bool _az_is_appending_container_end_valid(
+    az_json_builder* json_builder,
+    uint8_t byte)
 {
   _az_PRECONDITION_NOT_NULL(json_builder);
 
@@ -114,15 +116,40 @@ static AZ_NODISCARD bool _az_is_appending_container_end_valid(az_json_builder* j
     return false;
   }
 
+  _az_json_stack_item stack_item = _az_json_stack_peek(&json_builder->_internal.bit_stack);
+
+  if (byte == ']')
+  {
+    // If inside a JSON object, then appending an end bracket is invalid:
+    if (stack_item)
+    {
+      _az_PRECONDITION(kind != AZ_JSON_TOKEN_NONE);
+      return false;
+    }
+  }
+  else
+  {
+    _az_PRECONDITION(byte == '}');
+
+    // If not inside a JSON object, then appending an end brace is invalid:
+    if (!stack_item)
+    {
+      return false;
+    }
+  }
+
   // JSON builder state is valid and an end of a container can be appended.
   return true;
 }
 
+// Returns the length of the JSON string within the az_span after it has been escaped.
+// The out parameter contains the index where the first character to escape is found.
+// If no chars need to be escaped then return the size of value with the out parameter set to -1.
 static AZ_NODISCARD int32_t
 _az_json_builder_escaped_length(az_span value, int32_t* out_index_of_first_escaped_char)
 {
   _az_PRECONDITION_NOT_NULL(out_index_of_first_escaped_char);
-  _az_PRECONDITION_VALID_SPAN(value, 0, false);
+  _az_PRECONDITION_VALID_SPAN(value, 0, true);
 
   int32_t value_size = az_span_size(value);
   _az_PRECONDITION(value_size <= _az_MAX_UNESCAPED_STRING_SIZE);
@@ -207,43 +234,39 @@ static AZ_NODISCARD az_span _az_json_builder_escape_and_copy(az_span destination
   {
     uint8_t const ch = value_ptr[i];
 
+    uint8_t escaped = 0;
+
     switch (ch)
     {
       case '\\':
       case '"':
       {
-        remaining_destination = az_span_copy_u8(remaining_destination, '\\');
-        remaining_destination = az_span_copy_u8(remaining_destination, ch);
+        escaped = ch;
         break;
       }
       case '\b':
       {
-        remaining_destination = az_span_copy_u8(remaining_destination, '\\');
-        remaining_destination = az_span_copy_u8(remaining_destination, 'b');
+        escaped = 'b';
         break;
       }
       case '\f':
       {
-        remaining_destination = az_span_copy_u8(remaining_destination, '\\');
-        remaining_destination = az_span_copy_u8(remaining_destination, 'f');
+        escaped = 'f';
         break;
       }
       case '\n':
       {
-        remaining_destination = az_span_copy_u8(remaining_destination, '\\');
-        remaining_destination = az_span_copy_u8(remaining_destination, 'n');
+        escaped = 'n';
         break;
       }
       case '\r':
       {
-        remaining_destination = az_span_copy_u8(remaining_destination, '\\');
-        remaining_destination = az_span_copy_u8(remaining_destination, 'r');
+        escaped = 'r';
         break;
       }
       case '\t':
       {
-        remaining_destination = az_span_copy_u8(remaining_destination, '\\');
-        remaining_destination = az_span_copy_u8(remaining_destination, 't');
+        escaped = 't';
         break;
       }
       default:
@@ -270,10 +293,30 @@ static AZ_NODISCARD az_span _az_json_builder_escape_and_copy(az_span destination
       }
     }
 
+    // If escaped is non-zero, then we found one of the characters that needs to be escaped.
+    // Otherwise, we hit the default case in the switch above, in which case, we already wrote
+    // the character.
+    if (escaped)
+    {
+      remaining_destination = az_span_copy_u8(remaining_destination, '\\');
+      remaining_destination = az_span_copy_u8(remaining_destination, escaped);
+    }
+
     i++;
   }
 
   return remaining_destination;
+}
+
+AZ_INLINE void _az_update_json_builder_state(
+    az_json_builder* json_builder,
+    int32_t required_size,
+    bool need_comma,
+    az_json_token_kind token_kind)
+{
+  json_builder->_internal.bytes_written += required_size;
+  json_builder->_internal.need_comma = need_comma;
+  json_builder->_internal.token_kind = token_kind;
 }
 
 AZ_NODISCARD az_result az_json_builder_append_string(az_json_builder* json_builder, az_span value)
@@ -285,11 +328,6 @@ AZ_NODISCARD az_result az_json_builder_append_string(az_json_builder* json_build
   if (!_az_is_appending_value_valid(json_builder))
   {
     return AZ_ERROR_JSON_INVALID_STATE;
-  }
-
-  if (az_span_ptr(value) == NULL)
-  {
-    return az_json_builder_append_null(json_builder);
   }
 
   az_span remaining_json = _get_remaining_span(json_builder);
@@ -330,15 +368,14 @@ AZ_NODISCARD az_result az_json_builder_append_string(az_json_builder* json_build
 
   az_span_copy_u8(remaining_json, '"');
 
-  json_builder->_internal.bytes_written += required_size;
-  json_builder->_internal.need_comma = true;
-  json_builder->_internal.token_kind = AZ_JSON_TOKEN_STRING;
+  _az_update_json_builder_state(json_builder, required_size, true, AZ_JSON_TOKEN_STRING);
   return AZ_OK;
 }
 
 AZ_NODISCARD az_result
 az_json_builder_append_property_name(az_json_builder* json_builder, az_span name)
 {
+  // TODO: Consider refactoring to reduce duplication between writing property name and string.
   _az_PRECONDITION_NOT_NULL(json_builder);
   _az_PRECONDITION_VALID_SPAN(name, 0, false);
   _az_PRECONDITION(az_span_size(name) <= _az_MAX_UNESCAPED_STRING_SIZE);
@@ -387,9 +424,7 @@ az_json_builder_append_property_name(az_json_builder* json_builder, az_span name
   remaining_json = az_span_copy_u8(remaining_json, '"');
   remaining_json = az_span_copy_u8(remaining_json, ':');
 
-  json_builder->_internal.bytes_written += required_size;
-  json_builder->_internal.need_comma = false;
-  json_builder->_internal.token_kind = AZ_JSON_TOKEN_PROPERTY_NAME;
+  _az_update_json_builder_state(json_builder, required_size, false, AZ_JSON_TOKEN_PROPERTY_NAME);
   return AZ_OK;
 }
 
@@ -428,9 +463,7 @@ static AZ_NODISCARD az_result _az_json_builder_append_literal(
 
   remaining_json = az_span_copy(remaining_json, literal);
 
-  json_builder->_internal.bytes_written += required_size;
-  json_builder->_internal.need_comma = true;
-  json_builder->_internal.token_kind = literal_kind;
+  _az_update_json_builder_state(json_builder, required_size, true, literal_kind);
   return AZ_OK;
 }
 
@@ -485,10 +518,11 @@ AZ_NODISCARD az_result az_json_builder_append_number(az_json_builder* json_build
   AZ_RETURN_IF_FAILED(az_span_dtoa(remaining_json, value, &leftover));
 
   // We already accounted for the first digit above, so therefore subtract one.
-  json_builder->_internal.bytes_written
-      += required_size + _az_span_diff(leftover, remaining_json) - 1;
-  json_builder->_internal.need_comma = true;
-  json_builder->_internal.token_kind = AZ_JSON_TOKEN_NUMBER;
+  _az_update_json_builder_state(
+      json_builder,
+      required_size + _az_span_diff(leftover, remaining_json) - 1,
+      true,
+      AZ_JSON_TOKEN_NUMBER);
   return AZ_OK;
 }
 
@@ -522,10 +556,11 @@ az_json_builder_append_int32_number(az_json_builder* json_builder, int32_t value
   AZ_RETURN_IF_FAILED(az_span_i32toa(remaining_json, value, &leftover));
 
   // We already accounted for the first digit above, so therefore subtract one.
-  json_builder->_internal.bytes_written
-      += required_size + _az_span_diff(leftover, remaining_json) - 1;
-  json_builder->_internal.need_comma = true;
-  json_builder->_internal.token_kind = AZ_JSON_TOKEN_NUMBER;
+  _az_update_json_builder_state(
+      json_builder,
+      required_size + _az_span_diff(leftover, remaining_json) - 1,
+      true,
+      AZ_JSON_TOKEN_NUMBER);
   return AZ_OK;
 }
 
@@ -536,7 +571,7 @@ static AZ_NODISCARD az_result _az_json_builder_append_container_start(
 {
   _az_PRECONDITION_NOT_NULL(json_builder);
   _az_PRECONDITION(
-      container_kind == AZ_JSON_TOKEN_OBJECT_START || container_kind == AZ_JSON_TOKEN_ARRAY_START);
+      container_kind == AZ_JSON_TOKEN_BEGIN_OBJECT || container_kind == AZ_JSON_TOKEN_BEGIN_ARRAY);
 
   if (!_az_is_appending_value_valid(json_builder))
   {
@@ -569,10 +604,8 @@ static AZ_NODISCARD az_result _az_json_builder_append_container_start(
 
   remaining_json = az_span_copy_u8(remaining_json, byte);
 
-  json_builder->_internal.bytes_written += required_size;
-  json_builder->_internal.need_comma = false;
-  json_builder->_internal.token_kind = container_kind;
-  if (container_kind == AZ_JSON_TOKEN_OBJECT_START)
+  _az_update_json_builder_state(json_builder, required_size, false, container_kind);
+  if (container_kind == AZ_JSON_TOKEN_BEGIN_OBJECT)
   {
     _az_json_stack_push(&json_builder->_internal.bit_stack, _az_JSON_STACK_OBJECT);
   }
@@ -584,21 +617,26 @@ static AZ_NODISCARD az_result _az_json_builder_append_container_start(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_json_builder_append_object_start(az_json_builder* json_builder)
+AZ_NODISCARD az_result az_json_builder_append_begin_object(az_json_builder* json_builder)
 {
-  return _az_json_builder_append_container_start(json_builder, '{', AZ_JSON_TOKEN_OBJECT_START);
+  return _az_json_builder_append_container_start(json_builder, '{', AZ_JSON_TOKEN_BEGIN_OBJECT);
 }
 
-AZ_NODISCARD az_result az_json_builder_append_array_start(az_json_builder* json_builder)
+AZ_NODISCARD az_result az_json_builder_append_begin_array(az_json_builder* json_builder)
 {
-  return _az_json_builder_append_container_start(json_builder, '[', AZ_JSON_TOKEN_ARRAY_START);
+  return _az_json_builder_append_container_start(json_builder, '[', AZ_JSON_TOKEN_BEGIN_ARRAY);
 }
 
-AZ_NODISCARD az_result az_json_builder_append_container_end(az_json_builder* json_builder)
+static AZ_NODISCARD az_result az_json_builder_append_container_end(
+    az_json_builder* json_builder,
+    uint8_t byte,
+    az_json_token_kind container_kind)
 {
   _az_PRECONDITION_NOT_NULL(json_builder);
+  _az_PRECONDITION(
+      container_kind == AZ_JSON_TOKEN_END_OBJECT || container_kind == AZ_JSON_TOKEN_END_ARRAY);
 
-  if (!_az_is_appending_container_end_valid(json_builder))
+  if (!_az_is_appending_container_end_valid(json_builder, byte))
   {
     return AZ_ERROR_JSON_INVALID_STATE;
   }
@@ -609,20 +647,20 @@ AZ_NODISCARD az_result az_json_builder_append_container_end(az_json_builder* jso
 
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(remaining_json, required_size);
 
-  if (_az_json_stack_peek(&json_builder->_internal.bit_stack))
-  {
-    remaining_json = az_span_copy_u8(remaining_json, '}');
-    json_builder->_internal.token_kind = AZ_JSON_TOKEN_OBJECT_END;
-  }
-  else
-  {
-    remaining_json = az_span_copy_u8(remaining_json, ']');
-    json_builder->_internal.token_kind = AZ_JSON_TOKEN_ARRAY_END;
-  }
+  remaining_json = az_span_copy_u8(remaining_json, byte);
 
-  json_builder->_internal.bytes_written += required_size;
-  json_builder->_internal.need_comma = true;
+  _az_update_json_builder_state(json_builder, required_size, true, container_kind);
   _az_json_stack_pop(&json_builder->_internal.bit_stack);
 
   return AZ_OK;
+}
+
+AZ_NODISCARD az_result az_json_builder_append_end_object(az_json_builder* json_builder)
+{
+  return az_json_builder_append_container_end(json_builder, '}', AZ_JSON_TOKEN_END_OBJECT);
+}
+
+AZ_NODISCARD az_result az_json_builder_append_end_array(az_json_builder* json_builder)
+{
+  return az_json_builder_append_container_end(json_builder, ']', AZ_JSON_TOKEN_END_ARRAY);
 }

@@ -12,7 +12,9 @@
 enum
 {
   // We are using a uint64_t to represent our nested state, so we can only go 64 levels deep.
-  _az_MAX_JSON_STACK_SIZE = sizeof(uint64_t) * 8 // 64
+  // This is safe to do because sizeof will not dereference the pointer and is used to find the size
+  // of the field used as the stack.
+  _az_MAX_JSON_STACK_SIZE = sizeof(((_az_json_bit_stack*)0)->_internal.az_json_stack) * 8 // 64
 };
 
 typedef enum

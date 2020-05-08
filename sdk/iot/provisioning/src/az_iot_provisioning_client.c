@@ -272,7 +272,7 @@ AZ_INLINE az_result _az_iot_provisioning_client_payload_registration_result_pars
     az_json_token_member* tm,
     az_iot_provisioning_client_registration_result* out_state)
 {
-  if (tm->token.kind != AZ_JSON_TOKEN_OBJECT_START)
+  if (tm->token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
   {
     return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
@@ -301,7 +301,7 @@ AZ_INLINE az_result _az_iot_provisioning_client_payload_registration_result_pars
     {
       AZ_RETURN_IF_FAILED(az_json_token_get_string(&tm->token, &out_state->error_timestamp));
     }
-    else if (tm->token.kind == AZ_JSON_TOKEN_OBJECT_START)
+    else if (tm->token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT)
     {
       AZ_RETURN_IF_FAILED(az_json_parser_skip_children(jp, tm->token));
     }
@@ -332,7 +332,7 @@ AZ_INLINE az_result az_iot_provisioning_client_parse_payload(
 
   AZ_RETURN_IF_FAILED(az_json_parser_init(&jp, received_payload));
   AZ_RETURN_IF_FAILED(az_json_parser_parse_token(&jp, &tm.token));
-  if (tm.token.kind != AZ_JSON_TOKEN_OBJECT_START)
+  if (tm.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
   {
     return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
@@ -371,7 +371,7 @@ AZ_INLINE az_result az_iot_provisioning_client_parse_payload(
       AZ_RETURN_IF_FAILED(
           az_json_token_get_string(&tm.token, &out_response->registration_result.error_timestamp));
     }
-    else if (tm.token.kind == AZ_JSON_TOKEN_OBJECT_START)
+    else if (tm.token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT)
     {
       AZ_RETURN_IF_FAILED(az_json_parser_skip_children(&jp, tm.token));
     }

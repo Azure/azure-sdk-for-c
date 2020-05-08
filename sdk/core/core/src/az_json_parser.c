@@ -341,11 +341,11 @@ AZ_NODISCARD static az_result az_json_parser_get_value(
       out_token->kind = AZ_JSON_TOKEN_NUMBER;
       return az_span_reader_get_json_number_digit_rest(p_reader, &out_token->_internal.number);
     case '{':
-      out_token->kind = AZ_JSON_TOKEN_OBJECT_START;
+      out_token->kind = AZ_JSON_TOKEN_BEGIN_OBJECT;
       *p_reader = az_span_slice_to_end(*p_reader, 1);
       return az_json_parser_push_stack(json_parser, _az_JSON_STACK_OBJECT);
     case '[':
-      out_token->kind = AZ_JSON_TOKEN_ARRAY_START;
+      out_token->kind = AZ_JSON_TOKEN_BEGIN_ARRAY;
       *p_reader = az_span_slice_to_end(*p_reader, 1);
       return az_json_parser_push_stack(json_parser, _az_JSON_STACK_ARRAY);
   }
@@ -380,8 +380,8 @@ az_json_parser_parse_token(az_json_parser* json_parser, az_json_token* out_token
   bool const is_empty = az_span_size(*p_reader) == 0; // everything was read
   switch (out_token->kind)
   {
-    case AZ_JSON_TOKEN_ARRAY_START:
-    case AZ_JSON_TOKEN_OBJECT_START:
+    case AZ_JSON_TOKEN_BEGIN_ARRAY:
+    case AZ_JSON_TOKEN_BEGIN_OBJECT:
       return is_empty ? AZ_ERROR_EOF : AZ_OK;
     default:
       break;
@@ -450,8 +450,8 @@ AZ_NODISCARD static az_result az_json_parser_check_item_end(
 {
   switch (value.kind)
   {
-    case AZ_JSON_TOKEN_OBJECT_START:
-    case AZ_JSON_TOKEN_ARRAY_START:
+    case AZ_JSON_TOKEN_BEGIN_OBJECT:
+    case AZ_JSON_TOKEN_BEGIN_ARRAY:
       return AZ_OK;
     default:
       break;
@@ -507,8 +507,8 @@ az_json_parser_skip_children(az_json_parser* json_parser, az_json_token token)
 
   switch (token.kind)
   {
-    case AZ_JSON_TOKEN_OBJECT_START:
-    case AZ_JSON_TOKEN_ARRAY_START:
+    case AZ_JSON_TOKEN_BEGIN_OBJECT:
+    case AZ_JSON_TOKEN_BEGIN_ARRAY:
     {
       break;
     }

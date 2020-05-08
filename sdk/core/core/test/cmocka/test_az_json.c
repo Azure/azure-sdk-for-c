@@ -75,20 +75,20 @@ static void test_json_builder(void** state)
     // 0_________1_________2_________3_________4_________5_________6_________7_________8_________9_________0
     // 01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456
     // {"name":true,"foo":["bar",null,0,-12],"int-max":9007199254740991,"esc":"_\"_\\_\b\f\n\r\t_","u":"a\u001Fb"}
-    TEST_EXPECT_SUCCESS(az_json_builder_append_object_start(&builder));
+    TEST_EXPECT_SUCCESS(az_json_builder_append_begin_object(&builder));
 
     TEST_EXPECT_SUCCESS(az_json_builder_append_property_name(&builder, AZ_SPAN_FROM_STR("name")));
     TEST_EXPECT_SUCCESS(az_json_builder_append_bool(&builder, true));
 
     {
       TEST_EXPECT_SUCCESS(az_json_builder_append_property_name(&builder, AZ_SPAN_FROM_STR("foo")));
-      TEST_EXPECT_SUCCESS(az_json_builder_append_array_start(&builder));
+      TEST_EXPECT_SUCCESS(az_json_builder_append_begin_array(&builder));
       az_result e = az_json_builder_append_string(&builder, AZ_SPAN_FROM_STR("bar"));
       TEST_EXPECT_SUCCESS(e);
       TEST_EXPECT_SUCCESS(az_json_builder_append_null(&builder));
       TEST_EXPECT_SUCCESS(az_json_builder_append_int32_number(&builder, 0));
       TEST_EXPECT_SUCCESS(az_json_builder_append_int32_number(&builder, -12));
-      TEST_EXPECT_SUCCESS(az_json_builder_append_container_end(&builder));
+      TEST_EXPECT_SUCCESS(az_json_builder_append_end_array(&builder));
     }
 
     TEST_EXPECT_SUCCESS(
@@ -107,7 +107,7 @@ static void test_json_builder(void** state)
             "\x1f"
             "b")));
 
-    TEST_EXPECT_SUCCESS(az_json_builder_append_container_end(&builder));
+    TEST_EXPECT_SUCCESS(az_json_builder_append_end_object(&builder));
 
     az_span_to_str((char*)array, 200, az_json_builder_get_json(&builder));
 
@@ -131,12 +131,12 @@ static void test_json_builder(void** state)
     uint8_t single_char[1] = { '\\' }; // char = '\'
     az_span single_span = AZ_SPAN_FROM_BUFFER(single_char);
 
-    TEST_EXPECT_SUCCESS(az_json_builder_append_object_start(&builder));
+    TEST_EXPECT_SUCCESS(az_json_builder_append_begin_object(&builder));
 
     TEST_EXPECT_SUCCESS(az_json_builder_append_property_name(&builder, AZ_SPAN_FROM_STR("span")));
     TEST_EXPECT_SUCCESS(az_json_builder_append_string(&builder, single_span));
 
-    TEST_EXPECT_SUCCESS(az_json_builder_append_container_end(&builder));
+    TEST_EXPECT_SUCCESS(az_json_builder_append_end_object(&builder));
 
     az_span expected = AZ_SPAN_FROM_STR("{"
                                         "\"span\":\"\\\\\""
@@ -151,21 +151,21 @@ static void test_json_builder(void** state)
     TEST_EXPECT_SUCCESS(az_json_builder_init(&builder, AZ_SPAN_FROM_BUFFER(array), NULL));
 
     // this json { "array": [1, 2, {}, 3 ] }
-    TEST_EXPECT_SUCCESS(az_json_builder_append_object_start(&builder));
+    TEST_EXPECT_SUCCESS(az_json_builder_append_begin_object(&builder));
 
     TEST_EXPECT_SUCCESS(az_json_builder_append_property_name(&builder, AZ_SPAN_FROM_STR("array")));
-    TEST_EXPECT_SUCCESS(az_json_builder_append_array_start(&builder));
+    TEST_EXPECT_SUCCESS(az_json_builder_append_begin_array(&builder));
 
     TEST_EXPECT_SUCCESS(az_json_builder_append_int32_number(&builder, 1));
     TEST_EXPECT_SUCCESS(az_json_builder_append_int32_number(&builder, 2));
 
-    TEST_EXPECT_SUCCESS(az_json_builder_append_object_start(&builder));
-    TEST_EXPECT_SUCCESS(az_json_builder_append_container_end(&builder));
+    TEST_EXPECT_SUCCESS(az_json_builder_append_begin_object(&builder));
+    TEST_EXPECT_SUCCESS(az_json_builder_append_end_object(&builder));
 
     TEST_EXPECT_SUCCESS(az_json_builder_append_int32_number(&builder, 3));
 
-    TEST_EXPECT_SUCCESS(az_json_builder_append_container_end(&builder));
-    TEST_EXPECT_SUCCESS(az_json_builder_append_container_end(&builder));
+    TEST_EXPECT_SUCCESS(az_json_builder_append_end_array(&builder));
+    TEST_EXPECT_SUCCESS(az_json_builder_append_end_object(&builder));
 
     assert_true(az_span_is_content_equal(
         az_json_builder_get_json(&builder),
@@ -184,11 +184,11 @@ static void test_json_builder(void** state)
       // {"bar":true}
       TEST_EXPECT_SUCCESS(az_json_builder_init(
           &nested_object_builder, AZ_SPAN_FROM_BUFFER(nested_object_array), NULL));
-      TEST_EXPECT_SUCCESS(az_json_builder_append_object_start(&nested_object_builder));
+      TEST_EXPECT_SUCCESS(az_json_builder_append_begin_object(&nested_object_builder));
       TEST_EXPECT_SUCCESS(
           az_json_builder_append_property_name(&nested_object_builder, AZ_SPAN_FROM_STR("bar")));
       TEST_EXPECT_SUCCESS(az_json_builder_append_bool(&nested_object_builder, true));
-      TEST_EXPECT_SUCCESS(az_json_builder_append_container_end(&nested_object_builder));
+      TEST_EXPECT_SUCCESS(az_json_builder_append_end_object(&nested_object_builder));
 
       assert_true(az_span_is_content_equal(
           az_json_builder_get_json(&nested_object_builder),
@@ -546,7 +546,7 @@ static void test_json_parser(void** state)
     TEST_EXPECT_SUCCESS(az_json_parser_init(&json_state, AZ_SPAN_FROM_STR(" [ true, 0.25 ]")));
     az_json_token token = { 0 };
     assert_true(az_json_parser_parse_token(&json_state, &token) == AZ_OK);
-    assert_true(token.kind == AZ_JSON_TOKEN_ARRAY_START);
+    assert_true(token.kind == AZ_JSON_TOKEN_BEGIN_ARRAY);
     assert_true(az_json_parser_parse_array_item(&json_state, &token) == AZ_OK);
     assert_true(token.kind == AZ_JSON_TOKEN_TRUE);
     assert_true(token._internal.boolean == true);
@@ -567,7 +567,7 @@ static void test_json_parser(void** state)
     TEST_EXPECT_SUCCESS(az_json_parser_init(&json_state, json));
     az_json_token token;
     assert_true(az_json_parser_parse_token(&json_state, &token) == AZ_OK);
-    assert_true(token.kind == AZ_JSON_TOKEN_OBJECT_START);
+    assert_true(token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT);
     az_json_token_member token_member;
     assert_true(az_json_parser_parse_token_member(&json_state, &token_member) == AZ_OK);
     assert_true(az_span_ptr(token_member.name) == az_span_ptr(json) + 2);
@@ -690,7 +690,7 @@ az_result read_write_token(
     {
       return write_str(*output, token._internal.string, output, written);
     }
-    case AZ_JSON_TOKEN_OBJECT_START:
+    case AZ_JSON_TOKEN_BEGIN_OBJECT:
     {
       AZ_RETURN_IF_NOT_ENOUGH_SIZE(*output, 1);
       *output = az_span_copy_u8(*output, '{');
@@ -726,7 +726,7 @@ az_result read_write_token(
       *written += 1;
       return AZ_OK;
     }
-    case AZ_JSON_TOKEN_ARRAY_START:
+    case AZ_JSON_TOKEN_BEGIN_ARRAY:
     {
       AZ_RETURN_IF_NOT_ENOUGH_SIZE(*output, 1);
       *output = az_span_copy_u8(*output, '[');
