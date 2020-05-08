@@ -6,7 +6,7 @@
  *
  * @brief az_result and facilities definition
  *
- * NOTE: You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
+ * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
  * prefixed with an underscore ('_') directly in your application code. These symbols
  * are part of Azure SDK's internal implementation; we do not document these symbols
  * and they are subject to change in future versions of the SDK which would break your code.
@@ -127,6 +127,8 @@ typedef enum
 
   AZ_ERROR_HTTP_RESPONSE_OVERFLOW = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 5),
   AZ_ERROR_HTTP_RESPONSE_COULDNT_RESOLVE_HOST = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 6),
+
+  AZ_ERROR_HTTP_CORRUPT_RESPONSE_HEADER = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 7),
 
   // IoT error codes
   AZ_ERROR_IOT_TOPIC_NO_MATCH = _az_RESULT_MAKE_ERROR(_az_FACILITY_IOT, 1),

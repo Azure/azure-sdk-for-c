@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include "az_http_header_validation_private.h"
 #include "az_http_private.h"
 #include "az_span_private.h"
 
@@ -147,10 +148,17 @@ AZ_NODISCARD az_result
 az_http_request_append_header(_az_http_request* p_request, az_span key, az_span value)
 {
   _az_PRECONDITION_NOT_NULL(p_request);
+
+  // remove white spaces from key and value
+  key = _az_span_trim_white_space(key);
+  value = _az_span_trim_white_space(value);
+
   _az_PRECONDITION_VALID_SPAN(key, 1, false);
 
-  az_span headers = p_request->_internal.headers;
+  // Make this function to only work with valid input for header name
+  _az_PRECONDITION(az_http_is_valid_header_name(key));
 
+  az_span headers = p_request->_internal.headers;
   az_pair header_to_append = az_pair_init(key, value);
 
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(headers, (int32_t)sizeof header_to_append);
@@ -170,7 +178,7 @@ az_http_request_get_header(_az_http_request const* request, int32_t index, az_pa
   _az_PRECONDITION_NOT_NULL(request);
   _az_PRECONDITION_NOT_NULL(out_header);
 
-  if (index >= _az_http_request_headers_count(request))
+  if (index >= az_http_request_headers_count(request))
   {
     return AZ_ERROR_ARG;
   }
@@ -179,23 +187,37 @@ az_http_request_get_header(_az_http_request const* request, int32_t index, az_pa
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_http_request_get_parts(
-    _az_http_request const* request,
-    az_http_method* out_method,
-    az_span* out_url,
-    az_span* out_body)
+AZ_NODISCARD az_result
+az_http_request_get_method(_az_http_request const* request, az_http_method* out_method)
 {
-  if (out_method != NULL)
-  {
-    *out_method = request->_internal.method;
-  }
-  if (out_url != NULL)
-  {
-    *out_url = az_span_slice(request->_internal.url, 0, request->_internal.url_length);
-  }
-  if (out_body != NULL)
-  {
-    *out_body = request->_internal.body;
-  }
+  _az_PRECONDITION_NOT_NULL(request);
+  _az_PRECONDITION_NOT_NULL(out_method);
+
+  *out_method = request->_internal.method;
+
   return AZ_OK;
+}
+
+AZ_NODISCARD az_result az_http_request_get_url(_az_http_request const* request, az_span* out_url)
+{
+  _az_PRECONDITION_NOT_NULL(request);
+  _az_PRECONDITION_NOT_NULL(out_url);
+
+  *out_url = az_span_slice(request->_internal.url, 0, request->_internal.url_length);
+
+  return AZ_OK;
+}
+
+AZ_NODISCARD az_result az_http_request_get_body(_az_http_request const* request, az_span* out_body)
+{
+  _az_PRECONDITION_NOT_NULL(request);
+  _az_PRECONDITION_NOT_NULL(out_body);
+
+  *out_body = request->_internal.body;
+  return AZ_OK;
+}
+
+AZ_NODISCARD int32_t az_http_request_headers_count(_az_http_request const* request)
+{
+  return request->_internal.headers_length;
 }

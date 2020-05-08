@@ -1,5 +1,6 @@
 import argparse
 import os
+import platform
 import shutil
 from subprocess import check_call
 
@@ -9,7 +10,10 @@ parser.add_argument('--PackagePath', default='')
 parser.add_argument('--PackageName', default='')
 parser.add_argument('--PackageVersion', default='')
 parser.add_argument('--AssetsPath', default='')
-parser.add_argument('--DoxygenPath', default='c:\\program files\\doxygen\\bin\\doxygen.exe')
+if platform.system() == "Linux":
+  parser.add_argument('--DoxygenPath', default='/usr/bin/doxygen')
+else:
+  parser.add_argument('--DoxygenPath', default='c:\\program files\\doxygen\\bin\\doxygen.exe')
 
 args = parser.parse_args()
 

@@ -3,6 +3,7 @@
 
 #include <az_http.h>
 
+#include "az_http_header_validation_private.h"
 #include "az_http_private.h"
 #include "az_span_private.h"
 #include <az_precondition.h>
@@ -18,7 +19,21 @@ AZ_NODISCARD AZ_INLINE az_result _az_is_char(az_span slice, uint8_t c)
   return az_span_ptr(slice)[0] == c ? AZ_OK : AZ_CONTINUE;
 }
 
-static AZ_NODISCARD az_result _az_is_a_colon(az_span slice) { return _az_is_char(slice, ':'); }
+static AZ_NODISCARD az_result _az_valid_header_name_to_colon(az_span slice)
+{
+  az_result is_colon_result = _az_is_char(slice, ':');
+  if (is_colon_result == AZ_OK)
+  {
+    return is_colon_result;
+  }
+
+  if (!az_http_valid_token[az_span_ptr(slice)[0]])
+  {
+    return AZ_ERROR_HTTP_CORRUPT_RESPONSE_HEADER;
+  }
+
+  return is_colon_result;
+}
 static AZ_NODISCARD az_result _az_is_new_line(az_span slice) { return _az_is_char(slice, '\n'); }
 
 static AZ_NODISCARD bool _az_is_http_whitespace(uint8_t c)
@@ -171,14 +186,18 @@ az_http_response_get_next_header(az_http_response* response, az_pair* out_header
     //         "_" / "`" / "|" / "~" / DIGIT / ALPHA;
     // any VCHAR,
     //    except delimiters
-    AZ_RETURN_IF_FAILED(_az_span_scan_until(*reader, _az_is_a_colon, &field_name_length));
+    AZ_RETURN_IF_FAILED(
+        _az_span_scan_until(*reader, _az_valid_header_name_to_colon, &field_name_length));
 
     // form a header name. Reader is currently at char ':'
     out_header->key = az_span_slice(*reader, 0, field_name_length);
     // update reader to next position after colon (add one)
     *reader = az_span_slice_to_end(*reader, field_name_length + 1);
 
-    // OWS
+    // Remove white spaces from header name https://github.com/Azure/azure-sdk-for-c/issues/604
+    out_header->key = _az_span_trim_white_space(out_header->key);
+
+    // OWS -> remove the optional white spaces before header value
     int32_t ows_len = 0;
     AZ_RETURN_IF_FAILED(_az_span_scan_until(*reader, _az_slice_is_not_http_whitespace, &ows_len));
     *reader = az_span_slice_to_end(*reader, ows_len);
@@ -216,6 +235,9 @@ az_http_response_get_next_header(az_http_response* response, az_pair* out_header
     out_header->value = az_span_slice(*reader, 0, offset_value_end);
     // moving reader. It is currently after \r was found
     *reader = az_span_slice_to_end(*reader, offset);
+
+    // Remove white spaces from value https://github.com/Azure/azure-sdk-for-c/issues/604
+    out_header->value = _az_span_trim_white_space_from_end(out_header->value);
   }
 
   AZ_RETURN_IF_FAILED(_az_is_expected_span(reader, AZ_SPAN_FROM_STR("\n")));
@@ -267,4 +289,24 @@ void _az_http_response_reset(az_http_response* http_response)
   // reset
   az_result result = az_http_response_init(http_response, http_response->_internal.http_response);
   (void)result;
+}
+
+// internal function to get az_http_response remainder
+static az_span _az_http_response_get_remaining(az_http_response const* response)
+{
+  return az_span_slice_to_end(response->_internal.http_response, response->_internal.written);
+}
+
+AZ_NODISCARD az_result az_http_response_write_span(az_http_response* response, az_span source)
+{
+  _az_PRECONDITION_NOT_NULL(response);
+
+  az_span remaining = _az_http_response_get_remaining(response);
+  int32_t write_size = az_span_size(source);
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(remaining, write_size);
+
+  remaining = az_span_copy(remaining, source);
+  response->_internal.written += write_size;
+
+  return AZ_OK;
 }

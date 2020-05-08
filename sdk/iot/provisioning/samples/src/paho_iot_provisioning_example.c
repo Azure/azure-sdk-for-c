@@ -45,7 +45,7 @@
 #define DEVICE_X509_TRUST_PEM_FILE "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE"
 
 #define TIMEOUT_MQTT_RECEIVE_MS 60 * 1000
-#define TIMEOUT_MQTT_DISCONNECT_MS 10 * 1000
+#define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
 
 static char global_provisioning_endpoint[256] = { 0 };
 static char id_scope[16] = { 0 };
@@ -145,11 +145,12 @@ static int connect_device()
 
   MQTTClient_SSLOptions mqtt_ssl_options = MQTTClient_SSLOptions_initializer;
   MQTTClient_connectOptions mqtt_connect_options = MQTTClient_connectOptions_initializer;
+  mqtt_connect_options.cleansession = false;
+  mqtt_connect_options.keepAliveInterval = AZ_IOT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS;
 
   char username[128];
-  if ((rc = az_iot_provisioning_client_get_user_name(
-           &provisioning_client, username, sizeof(username), NULL))
-      != AZ_OK)
+  if (az_failed(rc = az_iot_provisioning_client_get_user_name(
+           &provisioning_client, username, sizeof(username), NULL)))
   {
     printf("Failed to get MQTT username, return code %d\n", rc);
     return rc;
@@ -179,16 +180,9 @@ static int subscribe()
 {
   int rc;
 
-  char topic_filter[128];
-  if ((rc = az_iot_provisioning_client_register_get_subscribe_topic_filter(
-           &provisioning_client, topic_filter, sizeof(topic_filter), NULL))
-      != AZ_OK)
-  {
-    printf("Failed to get MQTT SUB topic filter, return code %d\n", rc);
-    return rc;
-  }
-
-  if ((rc = MQTTClient_subscribe(mqtt_client, topic_filter, 1)) != MQTTCLIENT_SUCCESS)
+  if ((rc
+       = MQTTClient_subscribe(mqtt_client, AZ_IOT_PROVISIONING_CLIENT_REGISTER_SUBSCRIBE_TOPIC, 1))
+      != MQTTCLIENT_SUCCESS)
   {
     printf("Failed to subscribe, return code %d\n", rc);
     return rc;
@@ -203,9 +197,8 @@ static int register_device()
   MQTTClient_message pubmsg = MQTTClient_message_initializer;
 
   char topic[128];
-  if ((rc = az_iot_provisioning_client_register_get_publish_topic(
-           &provisioning_client, topic, sizeof(topic), NULL))
-      != AZ_OK)
+  if (az_failed(rc = az_iot_provisioning_client_register_get_publish_topic(
+           &provisioning_client, topic, sizeof(topic), NULL)))
   {
     printf("Failed to get MQTT PUB register topic, return code %d\n", rc);
     return rc;
@@ -256,7 +249,7 @@ static int get_operation_status()
 
     if (topic_len == 0)
     {
-      // The length of the topic if there are one more NULL characters embedded in topic,
+      // The length of the topic if there are one or more NULL characters embedded in topic,
       // otherwise topic_len is 0.
       topic_len = (int)strlen(topic);
     }
@@ -280,7 +273,17 @@ static int get_operation_status()
       return rc;
     }
 
-    if (az_span_is_content_equal(response.registration_state, AZ_SPAN_FROM_STR("assigning")))
+    az_iot_provisioning_client_operation_status operation_status;
+    if (az_failed(
+            rc = az_iot_provisioning_client_parse_operation_status(&response, &operation_status)))
+    {
+      printf("Failed to parse operation_status, return code %d\n", rc);
+      return rc;
+    }
+
+    is_operation_complete = az_iot_provisioning_client_operation_complete(operation_status);
+
+    if (!is_operation_complete)
     {
       if (az_failed(
               rc = az_iot_provisioning_client_query_status_get_publish_topic(
@@ -300,36 +303,36 @@ static int get_operation_status()
         return rc;
       }
     }
-    else if (az_span_is_content_equal(response.registration_state, AZ_SPAN_FROM_STR("assigned")))
+    else
     {
-      printf("SUCCESS - Device provisioned:\n");
-      printf("\tHub Hostname: ");
-      print_az_span(response.registration_information.assigned_hub_hostname);
-      printf("\tDevice Id: ");
-      print_az_span(response.registration_information.device_id);
-      is_operation_complete = true;
-    }
-    else // unassigned, failed or disabled states
-    {
-      printf("ERROR - Device Provisioning failed:\n");
-      printf("\tRegistration state: ");
-      print_az_span(response.registration_state);
-      printf("\tLast operation status: %d\n", response.status);
-      printf("\tOperation ID: ");
-      print_az_span(response.operation_id);
-      printf("\tError code: %u\n", response.registration_information.extended_error_code);
-      printf("\tError message: ");
-      print_az_span(response.registration_information.error_message);
-      printf("\tError timestamp: ");
-      print_az_span(response.registration_information.error_timestamp);
-      printf("\tError tracking ID: ");
-      print_az_span(response.registration_information.error_tracking_id);
-      if (response.retry_after_seconds > 0)
+      if (operation_status == AZ_IOT_PROVISIONING_STATUS_ASSIGNED)
       {
-        printf("\tRetry-after: %u seconds.", response.retry_after_seconds);
+        printf("SUCCESS - Device provisioned:\n");
+        printf("\tHub Hostname: ");
+        print_az_span(response.registration_result.assigned_hub_hostname);
+        printf("\tDevice Id: ");
+        print_az_span(response.registration_result.device_id);
       }
-
-      is_operation_complete = true;
+      else // unassigned, failed or disabled states
+      {
+        printf("ERROR - Device Provisioning failed:\n");
+        printf("\tRegistration state: ");
+        print_az_span(response.operation_status);
+        printf("\tLast operation status: %d\n", response.status);
+        printf("\tOperation ID: ");
+        print_az_span(response.operation_id);
+        printf("\tError code: %u\n", response.registration_result.extended_error_code);
+        printf("\tError message: ");
+        print_az_span(response.registration_result.error_message);
+        printf("\tError timestamp: ");
+        print_az_span(response.registration_result.error_timestamp);
+        printf("\tError tracking ID: ");
+        print_az_span(response.registration_result.error_tracking_id);
+        if (response.retry_after_seconds > 0)
+        {
+          printf("\tRetry-after: %u seconds.", response.retry_after_seconds);
+        }
+      }
     }
 
     MQTTClient_freeMessage(&message);
@@ -343,16 +346,15 @@ int main()
 {
   int rc;
 
-  if ((rc = read_configuration_and_init_client()) != AZ_OK)
+  if (az_failed(rc = read_configuration_and_init_client()))
   {
     printf("Failed to read configuration from environment variables, return code %d\n", rc);
     return rc;
   }
 
   char client_id[128];
-  if ((rc = az_iot_provisioning_client_get_client_id(
-           &provisioning_client, client_id, sizeof(client_id), NULL))
-      != AZ_OK)
+  if (az_failed(rc = az_iot_provisioning_client_get_client_id(
+           &provisioning_client, client_id, sizeof(client_id), NULL)))
   {
     printf("Failed to get MQTT clientId, return code %d\n", rc);
     return rc;

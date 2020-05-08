@@ -6,7 +6,7 @@
  *
  * @brief Disable warnings.
  *
- * NOTE: You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
+ * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
  * prefixed with an underscore ('_') directly in your application code. These symbols
  * are part of Azure SDK's internal implementation; we do not document these symbols
  * and they are subject to change in future versions of the SDK which would break your code.
@@ -75,9 +75,9 @@
 #endif // _MSC_VER
 
 #if defined(__GNUC__) && __GNUC__ >= 7
-#define AZ_FALLTHROUGH __attribute__((fallthrough))
+#define _az_FALLTHROUGH __attribute__((fallthrough))
 #else // !__GNUC__ >= 7
-#define AZ_FALLTHROUGH \
+#define _az_FALLTHROUGH \
   do \
   { \
   } while (0)

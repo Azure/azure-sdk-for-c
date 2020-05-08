@@ -27,7 +27,7 @@ add_executable (
 target_link_libraries(
   paho_iot_provisioning_example PRIVATE
   az_iot_provisioning
-  az_iot_core
+  az_iot_common
   az_core
   )
 

@@ -7,7 +7,7 @@
  * @brief This header defines the types and functions your application uses
  *        to be notified of Azure SDK client library log messages.
  *
- * NOTE: You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
+ * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
  * prefixed with an underscore ('_') directly in your application code. These symbols
  * are part of Azure SDK's internal implementation; we do not document these symbols
  * and they are subject to change in future versions of the SDK which would break your code.
@@ -44,6 +44,17 @@ typedef enum
   AZ_LOG_HTTP_RETRY = _az_LOG_MAKE_CLASSIFICATION(
       _az_FACILITY_HTTP,
       3), ///< First HTTP request did not succeed and will be retried.
+
+  AZ_LOG_MQTT_RECEIVED_TOPIC
+  = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_MQTT, 1), ///< Accepted MQTT topic received.
+
+  AZ_LOG_MQTT_RECEIVED_PAYLOAD
+  = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_MQTT, 2), ///< Accepted MQTT payload received.
+
+  AZ_LOG_IOT_RETRY = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_IOT, 1), ///< IoT Client retry.
+
+  AZ_LOG_IOT_SAS_TOKEN
+  = _az_LOG_MAKE_CLASSIFICATION(_az_FACILITY_IOT, 2), ///< IoT Client generated new SAS token.
 } az_log_classification;
 
 /**

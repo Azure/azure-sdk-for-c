@@ -1,6 +1,36 @@
-# Azure SDK for C Contributing Guide
+# Contributing
 
-Thank you for your interest in contributing to Azure SDK for C.
+This project welcomes contributions and suggestions.  Most contributions require you to agree to a
+Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
+the rights to use your contribution. For details, visit https://cla.microsoft.com.
+
+When you submit a pull request, a CLA-bot will automatically determine whether you need to provide
+a CLA and decorate the PR appropriately (e.g., label, comment). Simply follow the instructions
+provided by the bot. You will only need to do this once across all repos using our CLA.
+
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
+For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
+contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+
+### Additional Helpful Links for Contributors  
+Many people all over the world have helped make this project better.  You'll want to check out:
+
+* [What are some good first issues for new contributors to the repo?](https://github.com/azure/azure-sdk-for-c/issues?q=is%3Aopen+is%3Aissue+label%3A%22up+for+grabs%22)
+* [How to build and test your change][azure_sdk_for_c_contributing_developer_guide]
+* [How you can make a change happen!][azure_sdk_for_c_contributing_pull_requests]
+* Frequently Asked Questions (FAQ) and Conceptual Topics in the detailed [Azure SDK for Embedded C wiki](https://github.com/azure/azure-sdk-for-c/wiki).
+
+### Community
+
+* Chat with other community members [![Join the chat at https://gitter.im/azure/azure-sdk-for-c](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/azure/azure-sdk-for-c?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+### Reporting security issues and security bugs
+
+Security issues and bugs should be reported privately, via email, to the Microsoft Security Response Center (MSRC) <secure@microsoft.com>. You should receive a response within 24 hours. If for some reason you do not, please follow up via email to ensure we received your original message. Further information, including the MSRC PGP key, can be found in the [Security TechCenter](https://www.microsoft.com/msrc/faqs-report-an-issue).
+
+# How to contribute to the Azure SDK for Embedded C
+
+There are manay ways that you can contribute to the Azure SDK for Embedded C project.
 
 - For reporting bugs, requesting features, or asking for support, please file an issue in the [issues](https://github.com/Azure/azure-sdk-for-c/issues) section of the project.
 
@@ -8,7 +38,7 @@ Thank you for your interest in contributing to Azure SDK for C.
 
 - To make code changes, or contribute something new, please follow the [GitHub Forks / Pull requests model](https://help.github.com/articles/fork-a-repo/): Fork the repo, make the change and propose it back by submitting a pull request.
 
-- Refer to the [wiki](https://github.com/Azure/azure-sdk-for-c/wiki) to learn about how Azure SDK for C generates lint checker, doxygen, and code coverage reports.
+- Refer to the [wiki](https://github.com/Azure/azure-sdk-for-c/wiki) to learn about how Azure SDK for Embedded C generates lint checker, doxygen, and code coverage reports.
 
 ## Pull Requests
 
@@ -190,19 +220,62 @@ make
 
 ### Compiler Options
 
-By default, when building project with no options, next static libraries are generated
+By default, when building the project with no options, the following static libraries are generated:
 
 - ``Libraries``:
   - az_core
+    - az_span, az_http, az_json, etc.
   - az_iot
-  - az_keyvault
+    -  iot_provisioning, iot_hub, etc.
   - az_storage_blobs
-- ``Platform Abstraction Layer``: Default empty implementation for platform functions like time and http stack. This default implementation is used to compile only but will return ERROR NOT IMPLEMENTED when running it.
+    -  Storage SDK blobs client.
   - az_noplatform
+    - Library that provides a basic returning error for platform abstraction as AZ_NOT_IMPLEMENTED. This ensures the project can be compiled without the need to provide any specific platform implementation. This is useful if you want to use az_core without platform specific functions like `mutex` or `time`. 
   - az_nohttp
-  - az_posix (on Lin/Mac)
-  - az_win32 (on Windows)
-- ``Samples``: By default, samples are built using the default PAL (see [running samples section](#running-samples)). This means that running samples would throw errors like:
+    -  Library that provides a basic returning error when calling HTTP stack. Similar to az_noplatform, this library ensures the project can be compiled without requiring any HTTP stack implementation. This is useful if you want to use `az_core` without `az_http` functionality.
+
+The following compiler options are available for adding/removing project features.
+
+<table>
+<tr>
+<td>Option</td>
+<td>Description</td>
+<td>Default Value</td>
+</tr>
+<tr>
+<td>UNIT_TESTING</td>
+<td>Generates Unit Test for compilation. When turning this option ON, cmocka is a required dependency for compilation.<br>After Compiling, use `ctest` to run Unit Test.</td>
+<td>OFF</td>
+</tr>
+<tr>
+<td>UNIT_TESTING_MOCK_ENABLED</td>
+<td>This option works only with GCC. It uses -ld option from linker to mock functions during unit test. This is used to test platform or HTTP functions by mocking the return values.</td>
+<td>OFF</td>
+</tr>
+<tr>
+<td>BUILD_PRECONDITIONS</td>
+<td>Turning this option ON would remove all method contracts. This us typically for shipping libraries for production to make it as much optimized as possible.</td>
+<td>ON</td>
+</tr>
+<tr>
+<td>BUILD_CURL_TRANSPORT</td>
+<td>This option requires Libcurl dependency to be available. It generates an HTTP stack with libcurl for az_http to be able to send requests thru the wire. This library would replace the no_http.</td>
+<td>OFF</td>
+</tr>
+<tr>
+<td>BUILD_PAHO_TRANSPORT</td>
+<td>This option requires paho-mqtt dependency to be available. Provides Paho MQTT support for iot.</td>
+<td>OFF</td>
+</tr>
+<tr>
+<td>AZ_PLATFORM_IMPL</td>
+<td>This option can be set to any of the next values:<br>- No_value: default value is used and no_platform library is used.<br>- "POSIX": Provides implementation for Linux and Mac systems.<br>- "WIN32": Provides platform implementation for Windows based system<br>- "USER": Tells cmake to use an specific implementation provided by user. When setting this option, user must provide an implementation library and set option `AZ_USER_PLATFORM_IMPL_NAME` with the name of the library (i.e. <code>-DAZ_PLATFORM_IMPL=USER -DAZ_USER_PLATFORM_IMPL_NAME=user_platform_lib</code>). cmake will look for this library to link az_core</td>
+<td>No_value</td>
+</tr>
+</table>
+
+
+- ``Samples``: Whenever UNIT_TESTING is ON, samples are built using the default PAL (see [running samples section](#running-samples)). This means that running samples would throw errors like:
 
 ```bash
 ./keys_client_example
@@ -212,17 +285,13 @@ Recompile az_core with an HTTP client implementation like CURL to see sample sen
 i.e. cmake -DBUILD_CURL_TRANSPORT=ON ..
 ```
 
-When running cmake, next options can be used to change the output libraries/Pal/Samples:
+## Running Tests and Samples
 
-- `BUILD_CURL_TRANSPORT`: This option would build an HTTP transport library using CURL. It requires libcurl to be installed (vcpkg or globally). This option will make samples to be linked with this HTTP and be functional to send HTTP requests.
+### Unit tests
 
-```bash
-cmake -DBUILD_CURL_TRANSPORT=ON ..
-cmake --build .
-```
+See [compiler options section](#compiler-options) to learn about how to build and run unit tests.
 
-- `UNIT_TESTING`: This option requires cmocka to be installed and it will generate unit tests for each project.
-
+After compiling project with unit test enabled, run tests with:
 ```bash
 cmake -DUNIT_TESTING=ON ..
 cmake --build .
@@ -231,11 +300,6 @@ cmake --build .
 ctest -V
 ```
 
-## Running Tests and Samples
-
-### Unit tests
-
-See [compiler options section](#compiler-options) to learn about how to build and run unit tests.
 
 ### Test with mocked functions
 
@@ -253,17 +317,21 @@ cmake -DUNIT_TESTING=ON -DUNIT_TESTING_MOCK_ENABLED=ON ..
 
 See [compiler options section](#compiler-options) to learn about how to build samples with HTTP implementation in order to be runnable.
 
-After building samples with HTTP stack, set next environment variables to set log in credentials. Samples will read these values from env and use it to log in to Azure Service like Storage or KeyVault. Learn about the supported authentication [client secret here](https://docs.microsoft.com/en-us/azure/active-directory/azuread-dev/v1-oauth2-on-behalf-of-flow#service-to-service-access-token-request).
+After building samples with HTTP stack, set the environment variables for credentials. The samples read these environment values to authenticate to Azure services. See [client secret here](https://docs.microsoft.com/en-us/azure/active-directory/azuread-dev/v1-oauth2-on-behalf-of-flow#service-to-service-access-token-request) for additional details on Azure authentication.
 
 ```bash
 # On linux, set env var like this. For Windows, do it from advanced settings/ env variables
 
-# replace question marks for your id
-export tenant_id=????????-????-????-????-????????????
-export client_id=????????-????-????-????-????????????
-export client_secret=????????????
-# set uri depending on Azure Service
-export test_uri=https://????.????.azure.net
+# KEY-VAULT Sample
+export AZURE_TENANT_ID="????????-????-????-????-????????????"
+export AZURE_CLIENT_ID="????????-????-????-????-????????????"
+export AZURE_CLIENT_SECRET="????????????"
+export AZURE_KEYVAULT_URL="https://???????????.??"
+
+# STORAGE Sample (only 1 env var required)
+# URL must contain a valid container, blob and SaS token
+# e.g "https://storageAccount.blob.core.windows.net/container/blob?sv=xxx&ss=xx&srt=xx&sp=xx&se=xx&st=xxx&spr=https,http&sig=xxx"
+export AZURE_STORAGE_URL="https://??????????????"
 ```
 
 ## Build Docs

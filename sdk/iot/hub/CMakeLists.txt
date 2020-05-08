@@ -25,7 +25,7 @@ target_include_directories (${TARGET_NAME} PUBLIC inc)
 target_include_directories (${TARGET_NAME} PRIVATE src)
 
 target_link_libraries(${TARGET_NAME} PRIVATE az_core)
-target_link_libraries(${TARGET_NAME} PRIVATE az_iot_core)
+target_link_libraries(${TARGET_NAME} PRIVATE az_iot_common)
 
 add_library (az::iot::hub ALIAS ${TARGET_NAME})
 

@@ -1,12 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include "az_span_internal.h"
 #include "az_span_private.h"
 #include "az_test_definitions.h"
+#include <az_precondition_internal.h>
+#include <az_span.h>
+
 #include <stdarg.h>
 #include <stddef.h>
-
-#include <az_span.h>
 
 #include <limits.h>
 #include <setjmp.h>
@@ -759,6 +761,252 @@ static void az_span_copy_empty(void** state)
   assert_true(az_span_is_content_equal(az_span_copy(dst, AZ_SPAN_NULL), dst));
 }
 
+static void test_az_span_is_valid(void** state)
+{
+  (void)state;
+  assert_true(_az_span_is_valid((az_span){ 0 }, 0, true));
+  assert_false(_az_span_is_valid((az_span){ 0 }, 0, false));
+  assert_false(_az_span_is_valid((az_span){ 0 }, 1, true));
+  assert_false(_az_span_is_valid((az_span){ 0 }, 1, false));
+  assert_false(_az_span_is_valid((az_span){ 0 }, -1, true));
+  assert_false(_az_span_is_valid((az_span){ 0 }, -1, false));
+
+  assert_true(_az_span_is_valid(AZ_SPAN_NULL, 0, true));
+  assert_false(_az_span_is_valid(AZ_SPAN_NULL, 0, false));
+  assert_false(_az_span_is_valid(AZ_SPAN_NULL, 1, true));
+  assert_false(_az_span_is_valid(AZ_SPAN_NULL, 1, false));
+  assert_false(_az_span_is_valid(AZ_SPAN_NULL, -1, true));
+  assert_false(_az_span_is_valid(AZ_SPAN_NULL, -1, false));
+
+  assert_true(_az_span_is_valid(AZ_SPAN_FROM_STR(""), 0, true));
+  assert_true(_az_span_is_valid(AZ_SPAN_FROM_STR(""), 0, false));
+  assert_false(_az_span_is_valid(AZ_SPAN_FROM_STR(""), 1, true));
+  assert_false(_az_span_is_valid(AZ_SPAN_FROM_STR(""), 1, false));
+  assert_false(_az_span_is_valid(AZ_SPAN_FROM_STR(""), -1, true));
+  assert_false(_az_span_is_valid(AZ_SPAN_FROM_STR(""), -1, false));
+
+  assert_true(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), 0, true));
+  assert_true(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), 0, false));
+  assert_true(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), 1, true));
+  assert_true(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), 1, false));
+  assert_true(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), 5, true));
+  assert_true(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), 5, false));
+  assert_false(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), 6, true));
+  assert_false(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), 6, false));
+  assert_false(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), -1, true));
+  assert_false(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), -1, false));
+
+  uint8_t* const max_ptr = (uint8_t*)~0;
+  assert_true(_az_span_is_valid(az_span_init(max_ptr, 0), 0, false));
+  assert_true(_az_span_is_valid(az_span_init(max_ptr, 0), 0, true));
+
+  assert_false(_az_span_is_valid(az_span_init(max_ptr, 1), 0, false));
+  assert_false(_az_span_is_valid(az_span_init(max_ptr, 1), 0, true));
+
+  assert_true(_az_span_is_valid(az_span_init(max_ptr - 1, 1), 0, false));
+  assert_true(_az_span_is_valid(az_span_init(max_ptr - 1, 1), 0, true));
+
+  assert_false(_az_span_is_valid(az_span_init(max_ptr - 1, 2), 0, false));
+  assert_false(_az_span_is_valid(az_span_init(max_ptr - 1, 2), 0, true));
+
+  assert_false(_az_span_is_valid(az_span_init(max_ptr - 1, INT32_MAX), 0, false));
+  assert_false(_az_span_is_valid(az_span_init(max_ptr - 1, INT32_MAX), 0, true));
+
+  assert_true(_az_span_is_valid(az_span_init(max_ptr - INT32_MAX, INT32_MAX), 0, false));
+  assert_true(_az_span_is_valid(az_span_init(max_ptr - INT32_MAX, INT32_MAX), 0, true));
+}
+
+static void test_az_span_overlap(void** state)
+{
+  (void)state;
+
+  assert_false(_az_span_overlap(az_span_init((uint8_t*)10, 10), az_span_init((uint8_t*)30, 10)));
+  assert_false(_az_span_overlap(az_span_init((uint8_t*)30, 10), az_span_init((uint8_t*)10, 10)));
+
+  assert_false(_az_span_overlap(az_span_init((uint8_t*)10, 10), az_span_init((uint8_t*)20, 10)));
+  assert_false(_az_span_overlap(az_span_init((uint8_t*)20, 10), az_span_init((uint8_t*)10, 10)));
+
+  assert_false(_az_span_overlap(az_span_init((uint8_t*)10, 0), az_span_init((uint8_t*)10, 0)));
+
+  assert_true(_az_span_overlap(az_span_init((uint8_t*)10, 10), az_span_init((uint8_t*)15, 0)));
+  assert_true(_az_span_overlap(az_span_init((uint8_t*)15, 0), az_span_init((uint8_t*)10, 10)));
+
+  assert_true(_az_span_overlap(az_span_init((uint8_t*)10, 10), az_span_init((uint8_t*)10, 15)));
+  assert_true(_az_span_overlap(az_span_init((uint8_t*)10, 15), az_span_init((uint8_t*)10, 10)));
+
+  assert_true(_az_span_overlap(az_span_init((uint8_t*)15, 10), az_span_init((uint8_t*)10, 15)));
+  assert_true(_az_span_overlap(az_span_init((uint8_t*)10, 15), az_span_init((uint8_t*)15, 10)));
+
+  assert_true(_az_span_overlap(az_span_init((uint8_t*)10, 10), az_span_init((uint8_t*)5, 10)));
+  assert_true(_az_span_overlap(az_span_init((uint8_t*)5, 10), az_span_init((uint8_t*)10, 10)));
+
+  assert_true(_az_span_overlap(az_span_init((uint8_t*)10, 10), az_span_init((uint8_t*)10, 10)));
+
+  assert_true(_az_span_overlap(az_span_init((uint8_t*)10, 10), az_span_init((uint8_t*)15, 10)));
+  assert_true(_az_span_overlap(az_span_init((uint8_t*)15, 10), az_span_init((uint8_t*)10, 10)));
+
+  assert_true(_az_span_overlap(az_span_init((uint8_t*)10, 10), az_span_init((uint8_t*)12, 5)));
+  assert_true(_az_span_overlap(az_span_init((uint8_t*)12, 5), az_span_init((uint8_t*)10, 10)));
+}
+
+static void az_span_trim(void** state)
+{
+  (void)state;
+  az_span source = _az_span_trim_white_space(AZ_SPAN_FROM_STR("   abc   "));
+  assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("abc")));
+}
+
+static void az_span_trim_left(void** state)
+{
+  (void)state;
+  az_span source = _az_span_trim_white_space_from_start(AZ_SPAN_FROM_STR("   abc   "));
+  assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("abc   ")));
+}
+
+static void az_span_trim_right(void** state)
+{
+  (void)state;
+  az_span source = _az_span_trim_white_space_from_end(AZ_SPAN_FROM_STR("   abc   "));
+  assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("   abc")));
+}
+
+static void az_span_trim_all_white(void** state)
+{
+  (void)state;
+  az_span source = _az_span_trim_white_space(AZ_SPAN_FROM_STR("\t\n\r       "));
+  assert_int_equal(az_span_size(source), 0);
+}
+
+static void az_span_trim_none(void** state)
+{
+  (void)state;
+  az_span source = _az_span_trim_white_space(AZ_SPAN_FROM_STR("abc"));
+  assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("abc")));
+}
+
+static void az_span_trim_spaced(void** state)
+{
+  (void)state;
+  az_span source = _az_span_trim_white_space(AZ_SPAN_FROM_STR("\ta\n b     c    "));
+  assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("a\n b     c")));
+}
+
+static void az_span_trim_zero(void** state)
+{
+  (void)state;
+  az_span source = _az_span_trim_white_space(AZ_SPAN_FROM_STR(""));
+  assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("")));
+}
+
+static void az_span_trim_null(void** state)
+{
+  (void)state;
+  az_span source = _az_span_trim_white_space(AZ_SPAN_NULL);
+  assert_int_equal(az_span_size(source), 0);
+}
+
+static void az_span_trim_start(void** state)
+{
+  (void)state;
+  az_span source = _az_span_trim_white_space_from_start(AZ_SPAN_NULL);
+  assert_int_equal(az_span_size(source), 0);
+}
+
+static void az_span_trim_end(void** state)
+{
+  (void)state;
+  az_span source = _az_span_trim_white_space_from_end(AZ_SPAN_FROM_STR("\ta\n b     c    "));
+  assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("\ta\n b     c")));
+}
+
+static void az_span_trim_unicode(void** state)
+{
+  (void)state;
+  az_span source
+      = _az_span_trim_white_space_from_end(AZ_SPAN_FROM_STR("  \\U+00A0a\n b     c\\U+2028    "));
+  assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("  \\U+00A0a\n b     c\\U+2028")));
+}
+
+static void az_span_trim_two_calls(void** state)
+{
+  (void)state;
+  az_span source = _az_span_trim_white_space_from_start(
+      _az_span_trim_white_space_from_end(AZ_SPAN_FROM_STR("  \\U+00A0a\n b     c\\U+2028    ")));
+  assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("\\U+00A0a\n b     c\\U+2028")));
+}
+
+static void az_span_trim_two_calls_inverse(void** state)
+{
+  (void)state;
+  az_span source = _az_span_trim_white_space_from_end(
+      _az_span_trim_white_space_from_start(AZ_SPAN_FROM_STR("  \\U+00A0a\n b     c\\U+2028    ")));
+  assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("\\U+00A0a\n b     c\\U+2028")));
+}
+
+static void az_span_trim_repeat_calls(void** state)
+{
+  (void)state;
+  az_span source = _az_span_trim_white_space_from_end(
+      _az_span_trim_white_space_from_start(AZ_SPAN_FROM_STR("  1234    ")));
+  source = _az_span_trim_white_space(source);
+  source = _az_span_trim_white_space(source);
+  source = _az_span_trim_white_space(source);
+  assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("1234")));
+}
+
+static void test_az_span_token_success(void** state)
+{
+  (void)state;
+  az_span span = AZ_SPAN_FROM_STR("abcdefgabcdefgabcdefg");
+  az_span delim = AZ_SPAN_FROM_STR("abc");
+  az_span token;
+  az_span out_span;
+
+  // token: ""
+  token = _az_span_token(span, delim, &out_span);
+  assert_non_null(az_span_ptr(token));
+  assert_true(az_span_size(token) == 0);
+  assert_true(az_span_ptr(out_span) == (az_span_ptr(span) + az_span_size(delim)));
+  assert_true(az_span_size(out_span) == (az_span_size(span) - az_span_size(delim)));
+
+  // token: "defg" (span+3)
+  span = out_span;
+
+  token = _az_span_token(span, delim, &out_span);
+  assert_true(az_span_ptr(token) == az_span_ptr(span));
+  assert_int_equal(az_span_size(token), 4);
+  assert_true(
+      az_span_ptr(out_span) == (az_span_ptr(span) + az_span_size(token) + az_span_size(delim)));
+  assert_true(
+      az_span_size(out_span) == (az_span_size(span) - az_span_size(token) - az_span_size(delim)));
+
+  // token: "defg" (span+10)
+  span = out_span;
+
+  token = _az_span_token(span, delim, &out_span);
+  assert_true(az_span_ptr(token) == az_span_ptr(span));
+  assert_int_equal(az_span_size(token), 4);
+  assert_true(
+      az_span_ptr(out_span) == (az_span_ptr(span) + az_span_size(token) + az_span_size(delim)));
+  assert_true(
+      az_span_size(out_span) == (az_span_size(span) - az_span_size(token) - az_span_size(delim)));
+
+  // token: "defg" (span+17)
+  span = out_span;
+
+  token = _az_span_token(span, delim, &out_span);
+  assert_true(az_span_ptr(token) == az_span_ptr(span));
+  assert_int_equal(az_span_size(token), 4);
+  assert_true(az_span_ptr(out_span) == NULL);
+  assert_true(az_span_size(out_span) == 0);
+
+  // Out_span is empty.
+  span = out_span;
+
+  token = _az_span_token(span, delim, &out_span);
+  assert_true(az_span_is_content_equal(token, AZ_SPAN_NULL));
+}
+
 int test_az_span()
 {
   const struct CMUnitTest tests[] = {
@@ -798,6 +1046,23 @@ int test_az_span()
     cmocka_unit_test(az_span_u32toa_max_uint_succeeds),
     cmocka_unit_test(az_span_u32toa_overflow_fails),
     cmocka_unit_test(az_span_copy_empty),
+    cmocka_unit_test(test_az_span_is_valid),
+    cmocka_unit_test(test_az_span_overlap),
+    cmocka_unit_test(az_span_trim),
+    cmocka_unit_test(az_span_trim_left),
+    cmocka_unit_test(az_span_trim_right),
+    cmocka_unit_test(az_span_trim_all_white),
+    cmocka_unit_test(az_span_trim_none),
+    cmocka_unit_test(az_span_trim_spaced),
+    cmocka_unit_test(az_span_trim_zero),
+    cmocka_unit_test(az_span_trim_null),
+    cmocka_unit_test(test_az_span_token_success),
+    cmocka_unit_test(az_span_trim_start),
+    cmocka_unit_test(az_span_trim_end),
+    cmocka_unit_test(az_span_trim_unicode),
+    cmocka_unit_test(az_span_trim_two_calls),
+    cmocka_unit_test(az_span_trim_two_calls_inverse),
+    cmocka_unit_test(az_span_trim_repeat_calls),
   };
   return cmocka_run_group_tests_name("az_core_span", tests, NULL, NULL);
 }

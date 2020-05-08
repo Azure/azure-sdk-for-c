@@ -3,9 +3,12 @@
 
 #include "az_iot_provisioning_client.h"
 #include <az_json.h>
-#include <az_precondition_internal.h>
 #include <az_result.h>
 #include <az_span.h>
+#include <az_span_internal.h>
+
+#include <az_log_internal.h>
+#include <az_precondition_internal.h>
 
 #include <_az_cfg.h>
 
@@ -13,19 +16,24 @@ static const az_span str_put_iotdps_register
     = AZ_SPAN_LITERAL_FROM_STR("PUT/iotdps-register/?$rid=1");
 static const az_span str_get_iotdps_get_operationstatus
     = AZ_SPAN_LITERAL_FROM_STR("GET/iotdps-get-operationstatus/?$rid=1&operationId=");
-static const az_span str_dps_registrations_res
-    = AZ_SPAN_LITERAL_FROM_STR("$dps/registrations/res/");
+
+// $dps/registrations/res/
+AZ_INLINE az_span _az_iot_provisioning_get_dps_registrations_res()
+{
+  az_span sub_topic = AZ_SPAN_LITERAL_FROM_STR(AZ_IOT_PROVISIONING_CLIENT_REGISTER_SUBSCRIBE_TOPIC);
+  return az_span_slice(sub_topic, 0, 23);
+}
 
 // /registrations/
 AZ_INLINE az_span _az_iot_provisioning_get_str_registrations()
 {
-  return az_span_slice(str_dps_registrations_res, 4, 19);
+  return az_span_slice(_az_iot_provisioning_get_dps_registrations_res(), 4, 19);
 }
 
 // $dps/registrations/
 AZ_INLINE az_span _az_iot_provisioning_get_str_dps_registrations()
 {
-  return az_span_slice(str_dps_registrations_res, 0, 19);
+  return az_span_slice(_az_iot_provisioning_get_dps_registrations_res(), 0, 19);
 }
 
 AZ_NODISCARD az_iot_provisioning_client_options az_iot_provisioning_client_options_default()
@@ -138,38 +146,6 @@ AZ_NODISCARD az_result az_iot_provisioning_client_get_client_id(
   return AZ_OK;
 }
 
-// $dps/registrations/res/#
-AZ_NODISCARD az_result az_iot_provisioning_client_register_get_subscribe_topic_filter(
-    az_iot_provisioning_client const* client,
-    char* mqtt_topic_filter,
-    size_t mqtt_topic_filter_size,
-    size_t* out_mqtt_topic_filter_length)
-{
-  (void)client;
-
-  _az_PRECONDITION_NOT_NULL(client);
-  _az_PRECONDITION_NOT_NULL(mqtt_topic_filter);
-  _az_PRECONDITION(mqtt_topic_filter_size > 0);
-
-  az_span mqtt_topic_filter_span
-      = az_span_init((uint8_t*)mqtt_topic_filter, (int32_t)mqtt_topic_filter_size);
-  int32_t required_length = az_span_size(str_dps_registrations_res) + (int32_t)sizeof((uint8_t)'#');
-
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(
-      mqtt_topic_filter_span, required_length + (int32_t)sizeof((uint8_t)'\0'));
-
-  az_span remainder = az_span_copy(mqtt_topic_filter_span, str_dps_registrations_res);
-  remainder = az_span_copy_u8(remainder, '#');
-  remainder = az_span_copy_u8(remainder, '\0');
-
-  if (out_mqtt_topic_filter_length)
-  {
-    *out_mqtt_topic_filter_length = (size_t)required_length;
-  }
-
-  return AZ_OK;
-}
-
 // $dps/registrations/PUT/iotdps-register/?$rid=%s
 AZ_NODISCARD az_result az_iot_provisioning_client_register_get_publish_topic(
     az_iot_provisioning_client const* client,
@@ -242,16 +218,16 @@ AZ_NODISCARD az_result az_iot_provisioning_client_query_status_get_publish_topic
   return AZ_OK;
 }
 
-AZ_INLINE az_iot_provisioning_client_registration_state
-_az_iot_provisioning_registration_state_default()
+AZ_INLINE az_iot_provisioning_client_registration_result
+_az_iot_provisioning_registration_result_default()
 {
-  return (az_iot_provisioning_client_registration_state){ .assigned_hub_hostname = AZ_SPAN_NULL,
-                                                          .device_id = AZ_SPAN_NULL,
-                                                          .status = AZ_IOT_STATUS_OK,
-                                                          .extended_error_code = 0,
-                                                          .error_message = AZ_SPAN_NULL,
-                                                          .error_tracking_id = AZ_SPAN_NULL,
-                                                          .error_timestamp = AZ_SPAN_NULL };
+  return (az_iot_provisioning_client_registration_result){ .assigned_hub_hostname = AZ_SPAN_NULL,
+                                                           .device_id = AZ_SPAN_NULL,
+                                                           .error_code = 0,
+                                                           .extended_error_code = 0,
+                                                           .error_message = AZ_SPAN_NULL,
+                                                           .error_tracking_id = AZ_SPAN_NULL,
+                                                           .error_timestamp = AZ_SPAN_NULL };
 }
 
 AZ_INLINE az_iot_status _az_iot_status_from_extended_status(uint32_t extended_status)
@@ -275,7 +251,7 @@ https://docs.microsoft.com/en-us/rest/api/iot-dps/runtimeregistration/registerde
 */
 AZ_INLINE az_result _az_iot_provisioning_client_parse_payload_error_code(
     az_json_token_member* tm,
-    az_iot_provisioning_client_registration_state* out_state)
+    az_iot_provisioning_client_registration_result* out_state)
 {
   if (az_span_is_content_equal(AZ_SPAN_FROM_STR("errorCode"), tm->name))
   {
@@ -283,7 +259,7 @@ AZ_INLINE az_result _az_iot_provisioning_client_parse_payload_error_code(
     AZ_RETURN_IF_FAILED(az_json_token_get_number(&tm->token, &value));
     // TODO: #612 - non-FPU based JSON parser should be used instead.
     out_state->extended_error_code = (uint32_t)value;
-    out_state->status = _az_iot_status_from_extended_status(out_state->extended_error_code);
+    out_state->error_code = _az_iot_status_from_extended_status(out_state->extended_error_code);
 
     return AZ_OK;
   }
@@ -291,10 +267,10 @@ AZ_INLINE az_result _az_iot_provisioning_client_parse_payload_error_code(
   return AZ_ERROR_ITEM_NOT_FOUND;
 }
 
-AZ_INLINE az_result _az_iot_provisioning_client_payload_registration_state_parse(
+AZ_INLINE az_result _az_iot_provisioning_client_payload_registration_result_parse(
     az_json_parser* jp,
     az_json_token_member* tm,
-    az_iot_provisioning_client_registration_state* out_state)
+    az_iot_provisioning_client_registration_result* out_state)
 {
   if (tm->token.kind != AZ_JSON_TOKEN_OBJECT_START)
   {
@@ -335,6 +311,11 @@ AZ_INLINE az_result _az_iot_provisioning_client_payload_registration_state_parse
     }
   }
 
+  if (found_assigned_hub != found_device_id)
+  {
+    return AZ_ERROR_ITEM_NOT_FOUND;
+  }
+
   return AZ_OK;
 }
 
@@ -346,7 +327,7 @@ AZ_INLINE az_result az_iot_provisioning_client_parse_payload(
   az_json_parser jp;
   az_json_token_member tm;
   bool found_operation_id = false;
-  bool found_registration_state = false;
+  bool found_operation_status = false;
   bool found_error = false;
 
   AZ_RETURN_IF_FAILED(az_json_parser_init(&jp, received_payload));
@@ -356,7 +337,7 @@ AZ_INLINE az_result az_iot_provisioning_client_parse_payload(
     return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
 
-  out_response->registration_information = _az_iot_provisioning_registration_state_default();
+  out_response->registration_result = _az_iot_provisioning_registration_result_default();
 
   while (az_succeeded(az_json_parser_parse_token_member(&jp, &tm)))
   {
@@ -367,35 +348,35 @@ AZ_INLINE az_result az_iot_provisioning_client_parse_payload(
     }
     else if (az_span_is_content_equal(AZ_SPAN_FROM_STR("status"), tm.name))
     {
-      found_registration_state = true;
-      AZ_RETURN_IF_FAILED(az_json_token_get_string(&tm.token, &out_response->registration_state));
+      found_operation_status = true;
+      AZ_RETURN_IF_FAILED(az_json_token_get_string(&tm.token, &out_response->operation_status));
     }
     else if (az_span_is_content_equal(AZ_SPAN_FROM_STR("registrationState"), tm.name))
     {
-      AZ_RETURN_IF_FAILED(_az_iot_provisioning_client_payload_registration_state_parse(
-          &jp, &tm, &out_response->registration_information));
+      AZ_RETURN_IF_FAILED(_az_iot_provisioning_client_payload_registration_result_parse(
+          &jp, &tm, &out_response->registration_result));
     }
     else if (az_span_is_content_equal(AZ_SPAN_FROM_STR("trackingId"), tm.name))
     {
       AZ_RETURN_IF_FAILED(az_json_token_get_string(
-          &tm.token, &out_response->registration_information.error_tracking_id));
+          &tm.token, &out_response->registration_result.error_tracking_id));
     }
     else if (az_span_is_content_equal(AZ_SPAN_FROM_STR("message"), tm.name))
     {
-      AZ_RETURN_IF_FAILED(az_json_token_get_string(
-          &tm.token, &out_response->registration_information.error_message));
+      AZ_RETURN_IF_FAILED(
+          az_json_token_get_string(&tm.token, &out_response->registration_result.error_message));
     }
     else if (az_span_is_content_equal(AZ_SPAN_FROM_STR("timestampUtc"), tm.name))
     {
-      AZ_RETURN_IF_FAILED(az_json_token_get_string(
-          &tm.token, &out_response->registration_information.error_timestamp));
+      AZ_RETURN_IF_FAILED(
+          az_json_token_get_string(&tm.token, &out_response->registration_result.error_timestamp));
     }
     else if (tm.token.kind == AZ_JSON_TOKEN_OBJECT_START)
     {
       AZ_RETURN_IF_FAILED(az_json_parser_skip_children(&jp, tm.token));
     }
     else if (az_succeeded(_az_iot_provisioning_client_parse_payload_error_code(
-                 &tm, &out_response->registration_information)))
+                 &tm, &out_response->registration_result)))
     {
       found_error = true;
     }
@@ -403,10 +384,10 @@ AZ_INLINE az_result az_iot_provisioning_client_parse_payload(
     // else ignore token.
   }
 
-  if (!(found_registration_state && found_operation_id))
+  if (!(found_operation_status && found_operation_id))
   {
     out_response->operation_id = AZ_SPAN_NULL;
-    out_response->registration_state = AZ_SPAN_FROM_STR("failed");
+    out_response->operation_status = AZ_SPAN_FROM_STR("failed");
 
     if (!found_error)
     {
@@ -454,16 +435,20 @@ AZ_NODISCARD az_result az_iot_provisioning_client_parse_received_topic_and_paylo
   _az_PRECONDITION_VALID_SPAN(received_payload, 0, false);
   _az_PRECONDITION_NOT_NULL(out_response);
 
+  az_span str_dps_registrations_res = _az_iot_provisioning_get_dps_registrations_res();
   int32_t idx = az_span_find(received_topic, str_dps_registrations_res);
   if (idx != 0)
   {
     return AZ_ERROR_IOT_TOPIC_NO_MATCH;
   }
 
+  _az_log_write(AZ_LOG_MQTT_RECEIVED_TOPIC, received_topic);
+  _az_log_write(AZ_LOG_MQTT_RECEIVED_PAYLOAD, received_payload);
+
   // Parse the status.
   az_span remainder = az_span_slice_to_end(received_topic, az_span_size(str_dps_registrations_res));
 
-  az_span int_slice = az_span_token(remainder, AZ_SPAN_FROM_STR("/"), &remainder);
+  az_span int_slice = _az_span_token(remainder, AZ_SPAN_FROM_STR("/"), &remainder);
   AZ_RETURN_IF_FAILED(az_span_atou32(int_slice, (uint32_t*)(&out_response->status)));
 
   // Parse the optional retry-after= field.
@@ -472,7 +457,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_parse_received_topic_and_paylo
   if (idx != -1)
   {
     remainder = az_span_slice_to_end(remainder, idx + az_span_size(retry_after));
-    int_slice = az_span_token(remainder, AZ_SPAN_FROM_STR("&"), &remainder);
+    int_slice = _az_span_token(remainder, AZ_SPAN_FROM_STR("&"), &remainder);
 
     AZ_RETURN_IF_FAILED(az_span_atou32(int_slice, &out_response->retry_after_seconds));
   }
@@ -482,6 +467,38 @@ AZ_NODISCARD az_result az_iot_provisioning_client_parse_received_topic_and_paylo
   }
 
   AZ_RETURN_IF_FAILED(az_iot_provisioning_client_parse_payload(received_payload, out_response));
+
+  return AZ_OK;
+}
+
+AZ_NODISCARD az_result az_iot_provisioning_client_parse_operation_status(
+    az_iot_provisioning_client_register_response* response,
+    az_iot_provisioning_client_operation_status* out_operation_status)
+{
+  if (az_span_is_content_equal(response->operation_status, AZ_SPAN_FROM_STR("assigning")))
+  {
+    *out_operation_status = AZ_IOT_PROVISIONING_STATUS_ASSIGNING;
+  }
+  else if (az_span_is_content_equal(response->operation_status, AZ_SPAN_FROM_STR("assigned")))
+  {
+    *out_operation_status = AZ_IOT_PROVISIONING_STATUS_ASSIGNED;
+  }
+  else if (az_span_is_content_equal(response->operation_status, AZ_SPAN_FROM_STR("failed")))
+  {
+    *out_operation_status = AZ_IOT_PROVISIONING_STATUS_FAILED;
+  }
+  else if (az_span_is_content_equal(response->operation_status, AZ_SPAN_FROM_STR("unassigned")))
+  {
+    *out_operation_status = AZ_IOT_PROVISIONING_STATUS_UNASSIGNED;
+  }
+  else if (az_span_is_content_equal(response->operation_status, AZ_SPAN_FROM_STR("disabled")))
+  {
+    *out_operation_status = AZ_IOT_PROVISIONING_STATUS_DISABLED;
+  }
+  else
+  {
+    return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
+  }
 
   return AZ_OK;
 }

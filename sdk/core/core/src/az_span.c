@@ -7,8 +7,10 @@
 #include <az_precondition.h>
 #include <az_precondition_internal.h>
 #include <az_span.h>
+#include <az_span_internal.h>
 
 #include <ctype.h>
+#include <stdbool.h>
 #include <stdint.h>
 
 #include <_az_cfg.h>
@@ -617,4 +619,206 @@ _az_span_scan_until(az_span self, _az_predicate predicate, int32_t* out_index)
     }
   }
   return AZ_ERROR_ITEM_NOT_FOUND;
+}
+
+AZ_NODISCARD az_span _az_span_trim_white_space(az_span source)
+{
+  // Trim from end after trim from start
+  return _az_span_trim_white_space_from_end(_az_span_trim_white_space_from_start(source));
+}
+
+AZ_NODISCARD AZ_INLINE bool _az_is_white_space(uint8_t c)
+{
+  switch (c)
+  {
+    case ' ':
+    case '\t':
+    case '\n':
+    case '\r':
+      return true;
+  }
+  return false;
+}
+
+typedef enum
+{
+  LEFT = 0,
+  RIGHT = 1,
+} az_span_trim_side;
+
+// Return a trim az_span. Depending on arg side, function will trim left of right
+AZ_NODISCARD static az_span _az_span_trim_side(az_span source, az_span_trim_side side)
+{
+  int32_t increment = 1;
+  uint8_t* source_ptr = az_span_ptr(source);
+  int32_t source_size = az_span_size(source);
+
+  if (side == RIGHT)
+  {
+    increment = -1; // Set increment to be decremental for moving ptr
+    source_ptr += (source_size - 1); // Set initial position to the end
+  }
+
+  // loop source, just to make sure staying within the size range
+  int32_t index = 0;
+  for (; index < source_size; index++)
+  {
+    if (!_az_is_white_space(*source_ptr))
+    {
+      break;
+    }
+    // update ptr to next position
+    source_ptr += increment;
+  }
+
+  // return the slice depending on side
+  if (side == RIGHT)
+  {
+    // calculate index from right.
+    index = source_size - index;
+    return az_span_slice(source, 0, index);
+  }
+
+  return az_span_slice_to_end(source, index); // worst case index would be source_size
+}
+
+AZ_NODISCARD az_span _az_span_trim_white_space_from_start(az_span source)
+{
+  return _az_span_trim_side(source, LEFT);
+}
+
+AZ_NODISCARD az_span _az_span_trim_white_space_from_end(az_span source)
+{
+  return _az_span_trim_side(source, RIGHT);
+}
+
+AZ_NODISCARD AZ_INLINE bool _az_span_url_should_encode(uint8_t c)
+{
+  switch (c)
+  {
+    case '-':
+    case '_':
+    case '.':
+    case '~':
+      return false;
+    default:
+      return !(('0' <= c && c <= '9') || ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z'));
+  }
+}
+
+AZ_NODISCARD az_result _az_span_url_encode(az_span destination, az_span source, int32_t* out_length)
+{
+  _az_PRECONDITION_NOT_NULL(out_length);
+  _az_PRECONDITION_VALID_SPAN(source, 0, true);
+
+  int32_t const source_size = az_span_size(source);
+  _az_PRECONDITION_VALID_SPAN(destination, source_size, false);
+
+  _az_PRECONDITION_NO_OVERLAP_SPANS(destination, source);
+
+  if (source_size == 0)
+  {
+    *out_length = 0;
+    return AZ_OK;
+  }
+
+  int32_t const destination_size = az_span_size(destination);
+  if (destination_size < source_size)
+  {
+    *out_length = 0;
+    return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
+  }
+
+  // "Extra space" is measured in units of 2 additional characters
+  // per single source character ('/' => "%2F").
+  int32_t const extra_space_have = (destination_size - source_size) / 2;
+
+  uint8_t* const dest_begin = az_span_ptr(destination);
+
+  uint8_t* const src_ptr = az_span_ptr(source);
+  uint8_t* dest_ptr = dest_begin;
+
+  if (extra_space_have >= source_size)
+  {
+    // We know that there's enough space even if every character gets encoded.
+    int32_t src_idx = 0;
+    do
+    {
+      uint8_t c = src_ptr[src_idx];
+      if (!_az_span_url_should_encode(c))
+      {
+        *dest_ptr = c;
+        ++dest_ptr;
+      }
+      else
+      {
+        dest_ptr[0] = '%';
+        dest_ptr[1] = _az_number_to_upper_hex(c >> 4);
+        dest_ptr[2] = _az_number_to_upper_hex(c & 0x0F);
+        dest_ptr += 3;
+      }
+
+      ++src_idx;
+    } while (src_idx < source_size);
+  }
+  else
+  {
+    // We may or may not have enough space, given whether the input needs much encoding or not.
+    int32_t extra_space_used = 0;
+    int32_t src_idx = 0;
+    do
+    {
+      uint8_t c = src_ptr[src_idx];
+      if (!_az_span_url_should_encode(c))
+      {
+        *dest_ptr = c;
+        ++dest_ptr;
+      }
+      else
+      {
+        ++extra_space_used;
+        if (extra_space_used > extra_space_have)
+        {
+          *out_length = 0;
+          return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
+        }
+
+        dest_ptr[0] = '%';
+        dest_ptr[1] = _az_number_to_upper_hex(c >> 4);
+        dest_ptr[2] = _az_number_to_upper_hex(c & 0x0F);
+        dest_ptr += 3;
+      }
+
+      ++src_idx;
+    } while (src_idx < source_size);
+  }
+
+  *out_length = (int32_t)(dest_ptr - dest_begin);
+  return AZ_OK;
+}
+
+AZ_NODISCARD az_span _az_span_token(az_span source, az_span delimiter, az_span* out_remainder)
+{
+  _az_PRECONDITION_VALID_SPAN(delimiter, 1, false);
+  _az_PRECONDITION_NOT_NULL(out_remainder);
+
+  if (az_span_size(source) == 0)
+  {
+    return AZ_SPAN_NULL;
+  }
+
+  int32_t index = az_span_find(source, delimiter);
+
+  if (index != -1)
+  {
+    *out_remainder = az_span_slice(source, index + az_span_size(delimiter), az_span_size(source));
+
+    return az_span_slice(source, 0, index);
+  }
+  else
+  {
+    *out_remainder = AZ_SPAN_NULL;
+
+    return source;
+  }
 }

@@ -6,7 +6,7 @@
  *
  * @brief Utilities to be used by HTTP transport policy implementations.
  *
- * NOTE: You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
+ * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
  * prefixed with an underscore ('_') directly in your application code. These symbols
  * are part of Azure SDK's internal implementation; we do not document these symbols
  * and they are subject to change in future versions of the SDK which would break your code.
@@ -85,27 +85,88 @@ AZ_NODISCARD az_result
 az_http_request_get_header(_az_http_request const* request, int32_t index, az_pair* out_header);
 
 /**
- * @brief Get parts of an HTTP request. `NULL` in accepted to ignore getting any parts, for example,
- * call this function like below to get only the http method and ignore getting url and body.
- *   `az_http_request_get_parts(request, &method, NULL, NULL)`
+ * @brief Get method of an HTTP request.
  *
- * This function is expected to be used by transport layer only.
+ * @remarks This function is expected to be used by transport layer only.
  *
- * @param request HTTP request to get parts from.
- * @param[out] out_method __[nullable]__ Pointer to write HTTP method to. Use `NULL` to ignore
- * getting this value.
- * @param[out] out_url __[nullable]__ Pointer to write URL to. Use `NULL` to ignore getting this
- * value.
- * @param[out] out_body __[nullable]__ Pointer to write HTTP request body to. Use `NULL` to ignore
- * getting this value.
+ * @param[in] request The HTTP request from which to get the method.
+ * @param[out] out_method Pointer to write the HTTP method to.
  *
- * @retval AZ_OK Success.
+ * @retval An #az_result value indicating the result of the operation:
+ *         - #AZ_OK if successful
  */
-AZ_NODISCARD az_result az_http_request_get_parts(
-    _az_http_request const* request,
-    az_http_method* out_method,
-    az_span* out_url,
-    az_span* out_body);
+AZ_NODISCARD az_result
+az_http_request_get_method(_az_http_request const* request, az_http_method* out_method);
+
+/**
+ * @brief Get url from an HTTP request.
+ *
+ * @remarks This function is expected to be used by transport layer only.
+ *
+ * @param[in] request The HTTP request from which to get the url.
+ * @param[out] out_url Pointer to write the HTTP URL to.
+ *
+ * @retval An #az_result value indicating the result of the operation:
+ *         - #AZ_OK if successful
+ */
+AZ_NODISCARD az_result az_http_request_get_url(_az_http_request const* request, az_span* out_url);
+
+/**
+ * @brief Get body from an HTTP request.
+ *
+ * @remarks This function is expected to be used by transport layer only.
+ *
+ * @param[in] request The HTTP request  from which to get the body.
+ * @param[out] out_body Pointer to write the HTTP request body to.
+ *
+ * @retval An #az_result value indicating the result of the operation:
+ *         - #AZ_OK if successful
+ */
+AZ_NODISCARD az_result az_http_request_get_body(_az_http_request const* request, az_span* out_body);
+
+/**
+ * @brief This function is expected to be used by transport adapters like curl. Use it to write
+ * content from \p source to \p response.
+ *
+ * @remarks The \p source can be an empty #az_span. If so, nothing will be written.
+ *
+ * @param[in] response Pointer to an az_http_response.
+ * @param[in] source This is an az_span with the content to be written into response.
+ * @return An #az_result value indicating the result of the operation:
+ *         - #AZ_OK if successful
+ *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the \p response buffer is not big enough to contain
+ * the \p source content
+ */
+AZ_NODISCARD az_result az_http_response_write_span(az_http_response* response, az_span source);
+
+/**
+ * @brief Returns the number of headers within the request.
+ * Each header is an #az_pair.
+ *
+ * @param[in] request Pointer to an az_http_request to be used by this function.
+ * @return Number of headers in the request.
+ */
+AZ_NODISCARD int32_t az_http_request_headers_count(_az_http_request const* request);
+
+/**
+ * @brief Send an HTTP request through the wire and write the response into \p p_response.
+ *
+ * @param[in] p_request Points to an az_http_request that contains the settings and data that is
+ * used to send the request through the wire.
+ * @param[out] p_response Points to an az_http_response where the response from the wire will be
+ * written.
+ * @return An #az_result value indicating the result of the operation:
+ *         - #AZ_OK if successful
+ *         - #AZ_ERROR_HTTP_RESPONSE_OVERFLOW if there was any issue while trying to write into \p
+ * p_response. It might mean that there was not enough space in \p p_response to hold the entire
+ * response from the network.
+ *         - #AZ_ERROR_HTTP_RESPONSE_COULDNT_RESOLVE_HOST if the url from \p p_request can't be
+ * resolved by the http stack and the request was not sent.
+ *         - #AZ_ERROR_HTTP_PLATFORM any other issue from the transport layer.
+ *
+ */
+AZ_NODISCARD az_result
+az_http_client_send_request(_az_http_request* p_request, az_http_response* p_response);
 
 #include <_az_cfg_suffix.h>
 

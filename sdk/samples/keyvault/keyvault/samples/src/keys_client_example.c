@@ -26,7 +26,8 @@ int main()
 {
   /************* create credentials as client_id type   ***********/
   az_credential_client_secret credential = { 0 };
-  // init credential_credentials struc
+
+  // init the credential struct
   az_result const creds_retcode = az_credential_client_secret_init(
       &credential,
       az_span_from_str(getenv(TENANT_ID_ENV)),
