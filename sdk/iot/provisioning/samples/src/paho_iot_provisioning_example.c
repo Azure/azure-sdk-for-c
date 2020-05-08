@@ -45,7 +45,7 @@
 #define DEVICE_X509_TRUST_PEM_FILE "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE"
 
 #define TIMEOUT_MQTT_RECEIVE_MS 60 * 1000
-#define TIMEOUT_MQTT_DISCONNECT_MS 10 * 1000
+#define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
 
 static char global_provisioning_endpoint[256] = { 0 };
 static char id_scope[16] = { 0 };
