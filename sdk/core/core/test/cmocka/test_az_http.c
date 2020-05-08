@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include "az_http_header_validation_private.h"
 #include "az_json_string_private.h"
 #include "az_test_definitions.h"
 #include <az_http.h>
@@ -328,7 +329,7 @@ static void test_http_response(void** state)
 #ifndef AZ_NO_PRECONDITION_CHECKING
 ENABLE_PRECONDITION_CHECK_TESTS()
 
-    static void test_http_request_removing_left_white_spaces(void** state)
+static void test_http_request_removing_left_white_spaces(void** state)
 {
   (void)state;
 
@@ -357,7 +358,159 @@ ENABLE_PRECONDITION_CHECK_TESTS()
       az_http_request_append_header(&hrb, AZ_SPAN_FROM_STR(" \t\r"), AZ_SPAN_NULL));
 }
 
+static void test_http_request_header_validation(void** state)
+{
+  (void)state;
+  {
+    uint8_t header_buf[(2 * sizeof(az_pair))];
+    memset(header_buf, 0, sizeof(header_buf));
+
+    az_span url_span = AZ_SPAN_FROM_STR("some.url.com");
+    az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
+    _az_http_request hrb;
+
+    TEST_EXPECT_SUCCESS(az_http_request_init(
+        &hrb,
+        &az_context_app,
+        az_http_method_get(),
+        url_span,
+        az_span_size(url_span),
+        header_span,
+        AZ_SPAN_FROM_STR("body")));
+
+    ASSERT_PRECONDITION_CHECKED(az_http_request_append_header(
+        &hrb, AZ_SPAN_FROM_STR("(headerName)"), hrb_header_content_type_token));
+
+    // make sure about header was not added
+    assert_int_equal(az_http_request_headers_count(&hrb), 0);
+    _az_http_request_headers headers = hrb._internal.headers;
+    size_t size = (size_t)az_span_size(headers);
+    assert_memory_equal(header_buf, headers._internal.ptr, size);
+  }
+}
+
+static void test_http_request_header_validation_above_127(void** state)
+{
+  (void)state;
+  {
+    uint8_t header_buf[(2 * sizeof(az_pair))];
+    memset(header_buf, 0, sizeof(header_buf));
+
+    az_span url_span = AZ_SPAN_FROM_STR("some.url.com");
+    az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
+    _az_http_request hrb;
+
+    TEST_EXPECT_SUCCESS(az_http_request_init(
+        &hrb,
+        &az_context_app,
+        az_http_method_get(),
+        url_span,
+        az_span_size(url_span),
+        header_span,
+        AZ_SPAN_FROM_STR("body")));
+
+    uint8_t c[1] = { 255 };
+    az_span header_name = AZ_SPAN_FROM_BUFFER(c);
+    ASSERT_PRECONDITION_CHECKED(
+        az_http_request_append_header(&hrb, header_name, hrb_header_content_type_token));
+
+    // make sure about header was not added
+    assert_int_equal(az_http_request_headers_count(&hrb), 0);
+    _az_http_request_headers headers = hrb._internal.headers;
+    size_t size = (size_t)az_span_size(headers);
+    assert_memory_equal(header_buf, headers._internal.ptr, size);
+  }
+}
+
 #endif // AZ_NO_PRECONDITION_CHECKING
+
+static void test_http_request_header_validation_range(void** state)
+{
+  (void)state;
+  {
+    // just make sure compiler will set anything greater than 127 to zero
+    for (int32_t value = 127; value < 256; value++)
+    {
+      assert_false(az_http_valid_token[(uint8_t)value]);
+    }
+  }
+}
+
+static void test_http_response_header_validation(void** state)
+{
+  (void)state;
+  {
+    az_http_response response = { 0 };
+    assert_return_code(
+        az_http_response_init(
+            &response,
+            AZ_SPAN_FROM_STR("HTTP/1.1 404 Not Found\r\n"
+                             "Header11: Value11\r\n"
+                             "Header22: NNNNOOOOPPPPQQQQRRRRSSSSTTTTUUUUVVVVWWWWXXXXYYYYZZZZ\r\n"
+                             "Header33:\r\n"
+                             "Header44: cba888888777777666666555555444444333333222222111111\r\n"
+                             "\r\n"
+                             "KKKKKJJJJJIIIIIHHHHHGGGGGFFFFFEEEEEDDDDDCCCCCBBBBBAAAAA")),
+        AZ_OK);
+
+    az_http_response_status_line status_line = { 0 };
+    assert_return_code(az_http_response_get_status_line(&response, &status_line), AZ_OK);
+    for (az_pair header;
+         az_http_response_get_next_header(&response, &header) != AZ_ERROR_ITEM_NOT_FOUND;)
+    {
+      // all valid headers
+      assert_true(az_span_ptr(header.key) != NULL);
+      assert_true(az_span_size(header.key) > 0);
+      assert_true(az_span_ptr(header.value) != NULL);
+    }
+  }
+}
+
+static void test_http_response_header_validation_fail(void** state)
+{
+  (void)state;
+  {
+    az_http_response response = { 0 };
+    assert_return_code(
+        az_http_response_init(
+            &response,
+            AZ_SPAN_FROM_STR("HTTP/1.1 404 Not Found\r\n"
+                             "(Header11): Value11\r\n"
+                             "\r\n"
+                             "KKKKKJJJJJIIIIIHHHHHGGGGGFFFFFEEEEEDDDDDCCCCCBBBBBAAAAA")),
+        AZ_OK);
+
+    az_http_response_status_line status_line = { 0 };
+    assert_return_code(az_http_response_get_status_line(&response, &status_line), AZ_OK);
+    az_pair header = { 0 };
+    az_result fail_header_result = az_http_response_get_next_header(&response, &header);
+    assert_true(AZ_ERROR_HTTP_CORRUPT_RESPONSE_HEADER == fail_header_result);
+  }
+}
+
+static void test_http_response_header_validation_space(void** state)
+{
+  (void)state;
+  {
+    az_http_response response = { 0 };
+    assert_return_code(
+        az_http_response_init(
+            &response,
+            AZ_SPAN_FROM_STR("HTTP/1.1 404 Not Found\r\n"
+                             "   Header11     :         Value11\r\n"
+                             "\r\n"
+                             "KKKKKJJJJJIIIIIHHHHHGGGGGFFFFFEEEEEDDDDDCCCCCBBBBBAAAAA")),
+        AZ_OK);
+
+    az_http_response_status_line status_line = { 0 };
+    assert_return_code(az_http_response_get_status_line(&response, &status_line), AZ_OK);
+    az_pair header = { 0 };
+    // Spaces in headers are Fine, we trim them
+    assert_return_code(az_http_response_get_next_header(&response, &header), AZ_OK);
+    assert_true(az_span_is_content_equal(header.key, AZ_SPAN_FROM_STR("Header11")));
+    assert_true(az_span_is_content_equal(header.value, AZ_SPAN_FROM_STR("Value11")));
+  }
+}
 
 int test_az_http()
 {
@@ -368,9 +521,15 @@ int test_az_http()
   const struct CMUnitTest tests[] = {
 #ifndef AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_http_request_removing_left_white_spaces),
+    cmocka_unit_test(test_http_request_header_validation),
+    cmocka_unit_test(test_http_request_header_validation_above_127),
 #endif // AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_http_request),
     cmocka_unit_test(test_http_response),
+    cmocka_unit_test(test_http_request_header_validation_range),
+    cmocka_unit_test(test_http_response_header_validation),
+    cmocka_unit_test(test_http_response_header_validation_fail),
+    cmocka_unit_test(test_http_response_header_validation_space),
   };
   return cmocka_run_group_tests_name("az_core_http", tests, NULL, NULL);
 }
