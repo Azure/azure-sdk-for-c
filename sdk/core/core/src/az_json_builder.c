@@ -34,7 +34,6 @@ static AZ_NODISCARD az_span _get_remaining_span(az_json_builder* json_builder)
       json_builder->_internal.destination_buffer, json_builder->_internal.bytes_written);
 }
 
-// TODO: Make this a precondition?
 static AZ_NODISCARD bool _az_is_appending_value_valid(az_json_builder* json_builder)
 {
   _az_PRECONDITION_NOT_NULL(json_builder);
@@ -78,7 +77,6 @@ static AZ_NODISCARD bool _az_is_appending_value_valid(az_json_builder* json_buil
   return true;
 }
 
-// TODO: Make this a precondition?
 static AZ_NODISCARD bool _az_is_appending_property_name_valid(az_json_builder* json_builder)
 {
   _az_PRECONDITION_NOT_NULL(json_builder);
@@ -98,7 +96,6 @@ static AZ_NODISCARD bool _az_is_appending_property_name_valid(az_json_builder* j
   return true;
 }
 
-// TODO: Make this a precondition?
 static AZ_NODISCARD bool _az_is_appending_container_end_valid(
     az_json_builder* json_builder,
     uint8_t byte)
@@ -324,11 +321,7 @@ AZ_NODISCARD az_result az_json_builder_append_string(az_json_builder* json_build
   _az_PRECONDITION_NOT_NULL(json_builder);
   _az_PRECONDITION_VALID_SPAN(value, 0, true);
   _az_PRECONDITION(az_span_size(value) <= _az_MAX_UNESCAPED_STRING_SIZE);
-
-  if (!_az_is_appending_value_valid(json_builder))
-  {
-    return AZ_ERROR_JSON_INVALID_STATE;
-  }
+  _az_PRECONDITION(_az_is_appending_value_valid(json_builder));
 
   az_span remaining_json = _get_remaining_span(json_builder);
 
@@ -379,11 +372,7 @@ az_json_builder_append_property_name(az_json_builder* json_builder, az_span name
   _az_PRECONDITION_NOT_NULL(json_builder);
   _az_PRECONDITION_VALID_SPAN(name, 0, false);
   _az_PRECONDITION(az_span_size(name) <= _az_MAX_UNESCAPED_STRING_SIZE);
-
-  if (!_az_is_appending_property_name_valid(json_builder))
-  {
-    return AZ_ERROR_JSON_INVALID_STATE;
-  }
+  _az_PRECONDITION(_az_is_appending_property_name_valid(json_builder));
 
   az_span remaining_json = _get_remaining_span(json_builder);
 
@@ -439,11 +428,7 @@ static AZ_NODISCARD az_result _az_json_builder_append_literal(
       || literal_kind == AZ_JSON_TOKEN_FALSE);
   _az_PRECONDITION_VALID_SPAN(literal, 4, false);
   _az_PRECONDITION(az_span_size(literal) <= 5); // null, true, or false
-
-  if (!_az_is_appending_value_valid(json_builder))
-  {
-    return AZ_ERROR_JSON_INVALID_STATE;
-  }
+  _az_PRECONDITION(_az_is_appending_value_valid(json_builder));
 
   az_span remaining_json = _get_remaining_span(json_builder);
 
@@ -492,11 +477,7 @@ AZ_NODISCARD az_result az_json_builder_append_null(az_json_builder* json_builder
 AZ_NODISCARD az_result az_json_builder_append_number(az_json_builder* json_builder, double value)
 {
   _az_PRECONDITION_NOT_NULL(json_builder);
-
-  if (!_az_is_appending_value_valid(json_builder))
-  {
-    return AZ_ERROR_JSON_INVALID_STATE;
-  }
+  _az_PRECONDITION(_az_is_appending_value_valid(json_builder));
 
   az_span remaining_json = _get_remaining_span(json_builder);
 
@@ -530,11 +511,7 @@ AZ_NODISCARD az_result
 az_json_builder_append_int32_number(az_json_builder* json_builder, int32_t value)
 {
   _az_PRECONDITION_NOT_NULL(json_builder);
-
-  if (!_az_is_appending_value_valid(json_builder))
-  {
-    return AZ_ERROR_JSON_INVALID_STATE;
-  }
+  _az_PRECONDITION(_az_is_appending_value_valid(json_builder));
 
   az_span remaining_json = _get_remaining_span(json_builder);
 
@@ -572,15 +549,10 @@ static AZ_NODISCARD az_result _az_json_builder_append_container_start(
   _az_PRECONDITION_NOT_NULL(json_builder);
   _az_PRECONDITION(
       container_kind == AZ_JSON_TOKEN_BEGIN_OBJECT || container_kind == AZ_JSON_TOKEN_BEGIN_ARRAY);
-
-  if (!_az_is_appending_value_valid(json_builder))
-  {
-    return AZ_ERROR_JSON_INVALID_STATE;
-  }
+  _az_PRECONDITION(_az_is_appending_value_valid(json_builder));
 
   // The current depth is equal to or larger than the maximum allowed depth of 64. Cannot write the
   // next JSON object or array.
-  // TODO: Make this a precondition?
   if (json_builder->_internal.bit_stack._internal.current_depth >= _az_MAX_JSON_STACK_SIZE)
   {
     return AZ_ERROR_JSON_NESTING_OVERFLOW;
@@ -635,11 +607,7 @@ static AZ_NODISCARD az_result az_json_builder_append_container_end(
   _az_PRECONDITION_NOT_NULL(json_builder);
   _az_PRECONDITION(
       container_kind == AZ_JSON_TOKEN_END_OBJECT || container_kind == AZ_JSON_TOKEN_END_ARRAY);
-
-  if (!_az_is_appending_container_end_valid(json_builder, byte))
-  {
-    return AZ_ERROR_JSON_INVALID_STATE;
-  }
+  _az_PRECONDITION(_az_is_appending_container_end_valid(json_builder, byte));
 
   az_span remaining_json = _get_remaining_span(json_builder);
 

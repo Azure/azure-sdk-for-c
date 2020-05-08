@@ -391,6 +391,8 @@ AZ_NODISCARD az_result az_json_builder_append_null(az_json_builder* json_builder
  * @return An #az_result value indicating the result of the operation:
  *         - #AZ_OK if object start was appended successfully
  *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the buffer is too small
+ *         - #AZ_ERROR_JSON_NESTING_OVERFLOW if the depth of the JSON exceeds the maximum allowed
+ *           depth of 64
  */
 AZ_NODISCARD az_result az_json_builder_append_begin_object(az_json_builder* json_builder);
 
@@ -403,6 +405,8 @@ AZ_NODISCARD az_result az_json_builder_append_begin_object(az_json_builder* json
  * @return An #az_result value indicating the result of the operation:
  *         - #AZ_OK if array start was appended successfully
  *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the buffer is too small
+ *         - #AZ_ERROR_JSON_NESTING_OVERFLOW if the depth of the JSON exceeds the maximum allowed
+ *           depth of 64
  */
 AZ_NODISCARD az_result az_json_builder_append_begin_array(az_json_builder* json_builder);
 
