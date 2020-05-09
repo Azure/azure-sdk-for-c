@@ -70,9 +70,9 @@ There are manay ways that you can contribute to the Azure SDK for Embedded C pro
 - [CMake](https://cmake.org/download/) version 3.10 or later
 - C compiler: [MSVC](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2019), [gcc](https://gcc.gnu.org/) or [clang](https://clang.llvm.org/) are recommended
 - [git](https://git-scm.com/downloads) to clone our Azure SDK repository with the desired tag
-- [cmocka](https://cmocka.org/) for building and running unit tests. By default, building unit tests is disabled, so, unless you want to add unit tests or run then, you don't need to install this. See how `vcpkg` can be used to install dependencies, [below](#VCPKG).
+- [cmocka](https://cmocka.org/) for building and running unit tests. By default, building unit tests is disabled, so, unless you want to add unit tests or run then, you don't need to install this. See how `vcpkg` can be used to install dependencies [here][vcpkg].
 - [libcurl](https://curl.haxx.se/download.html) which is used as an http stack, and is required for building and running service samples (keyvault and storage). You don't need to install libcurl if you are not building samples. The minimum required version of libcurl is 7.1.
-See how `vcpkg` can be used to install dependencies, [below](#VCPKG).
+See how `vcpkg` can be used to install dependencies [here][vcpkg].
 - [doxygen](http://www.doxygen.nl/download.html) if you need to generate and view documentation.
 
 ## Running Tests
@@ -155,3 +155,7 @@ make ${project_name}_cov_xml //i.e. az_core_cov_xml or az_iot_cov_xml
 
 > Note: If `make` fails with "project not found" it's likely you are not using `gcc`. Use `sudo update-alternatives --config c+++` and `sudo update-alternatives --config cc` to switch to gcc.
 ```
+
+<!-- LINKS -->
+[vcpkg]: ./README.md#development-environment
+[azure_sdk_for_c_license]: https://github.com/Azure/azure-sdk-for-c/blob/master/LICENSE
