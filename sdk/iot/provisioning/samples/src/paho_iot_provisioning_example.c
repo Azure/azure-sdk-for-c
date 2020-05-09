@@ -45,7 +45,7 @@
 #define DEVICE_X509_TRUST_PEM_FILE "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE"
 
 #define TIMEOUT_MQTT_RECEIVE_MS 60 * 1000
-#define TIMEOUT_MQTT_DISCONNECT_MS 10 * 1000
+#define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
 
 static char global_provisioning_endpoint[256] = { 0 };
 static char id_scope[16] = { 0 };
@@ -149,9 +149,8 @@ static int connect_device()
   mqtt_connect_options.keepAliveInterval = AZ_IOT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS;
 
   char username[128];
-  if ((rc = az_iot_provisioning_client_get_user_name(
-           &provisioning_client, username, sizeof(username), NULL))
-      != AZ_OK)
+  if (az_failed(rc = az_iot_provisioning_client_get_user_name(
+           &provisioning_client, username, sizeof(username), NULL)))
   {
     printf("Failed to get MQTT username, return code %d\n", rc);
     return rc;
@@ -181,16 +180,9 @@ static int subscribe()
 {
   int rc;
 
-  char topic_filter[128];
-  if ((rc = az_iot_provisioning_client_register_get_subscribe_topic_filter(
-           &provisioning_client, topic_filter, sizeof(topic_filter), NULL))
-      != AZ_OK)
-  {
-    printf("Failed to get MQTT SUB topic filter, return code %d\n", rc);
-    return rc;
-  }
-
-  if ((rc = MQTTClient_subscribe(mqtt_client, topic_filter, 1)) != MQTTCLIENT_SUCCESS)
+  if ((rc
+       = MQTTClient_subscribe(mqtt_client, AZ_IOT_PROVISIONING_CLIENT_REGISTER_SUBSCRIBE_TOPIC, 1))
+      != MQTTCLIENT_SUCCESS)
   {
     printf("Failed to subscribe, return code %d\n", rc);
     return rc;
@@ -205,9 +197,8 @@ static int register_device()
   MQTTClient_message pubmsg = MQTTClient_message_initializer;
 
   char topic[128];
-  if ((rc = az_iot_provisioning_client_register_get_publish_topic(
-           &provisioning_client, topic, sizeof(topic), NULL))
-      != AZ_OK)
+  if (az_failed(rc = az_iot_provisioning_client_register_get_publish_topic(
+           &provisioning_client, topic, sizeof(topic), NULL)))
   {
     printf("Failed to get MQTT PUB register topic, return code %d\n", rc);
     return rc;
@@ -355,16 +346,15 @@ int main()
 {
   int rc;
 
-  if ((rc = read_configuration_and_init_client()) != AZ_OK)
+  if (az_failed(rc = read_configuration_and_init_client()))
   {
     printf("Failed to read configuration from environment variables, return code %d\n", rc);
     return rc;
   }
 
   char client_id[128];
-  if ((rc = az_iot_provisioning_client_get_client_id(
-           &provisioning_client, client_id, sizeof(client_id), NULL))
-      != AZ_OK)
+  if (az_failed(rc = az_iot_provisioning_client_get_client_id(
+           &provisioning_client, client_id, sizeof(client_id), NULL)))
   {
     printf("Failed to get MQTT clientId, return code %d\n", rc);
     return rc;

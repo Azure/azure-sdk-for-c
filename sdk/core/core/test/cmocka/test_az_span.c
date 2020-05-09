@@ -4,10 +4,11 @@
 #include "az_span_internal.h"
 #include "az_span_private.h"
 #include "az_test_definitions.h"
+#include <az_precondition_internal.h>
+#include <az_span.h>
+
 #include <stdarg.h>
 #include <stddef.h>
-
-#include <az_span.h>
 
 #include <limits.h>
 #include <setjmp.h>
@@ -760,6 +761,94 @@ static void az_span_copy_empty(void** state)
   assert_true(az_span_is_content_equal(az_span_copy(dst, AZ_SPAN_NULL), dst));
 }
 
+static void test_az_span_is_valid(void** state)
+{
+  (void)state;
+  assert_true(_az_span_is_valid((az_span){ 0 }, 0, true));
+  assert_false(_az_span_is_valid((az_span){ 0 }, 0, false));
+  assert_false(_az_span_is_valid((az_span){ 0 }, 1, true));
+  assert_false(_az_span_is_valid((az_span){ 0 }, 1, false));
+  assert_false(_az_span_is_valid((az_span){ 0 }, -1, true));
+  assert_false(_az_span_is_valid((az_span){ 0 }, -1, false));
+
+  assert_true(_az_span_is_valid(AZ_SPAN_NULL, 0, true));
+  assert_false(_az_span_is_valid(AZ_SPAN_NULL, 0, false));
+  assert_false(_az_span_is_valid(AZ_SPAN_NULL, 1, true));
+  assert_false(_az_span_is_valid(AZ_SPAN_NULL, 1, false));
+  assert_false(_az_span_is_valid(AZ_SPAN_NULL, -1, true));
+  assert_false(_az_span_is_valid(AZ_SPAN_NULL, -1, false));
+
+  assert_true(_az_span_is_valid(AZ_SPAN_FROM_STR(""), 0, true));
+  assert_true(_az_span_is_valid(AZ_SPAN_FROM_STR(""), 0, false));
+  assert_false(_az_span_is_valid(AZ_SPAN_FROM_STR(""), 1, true));
+  assert_false(_az_span_is_valid(AZ_SPAN_FROM_STR(""), 1, false));
+  assert_false(_az_span_is_valid(AZ_SPAN_FROM_STR(""), -1, true));
+  assert_false(_az_span_is_valid(AZ_SPAN_FROM_STR(""), -1, false));
+
+  assert_true(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), 0, true));
+  assert_true(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), 0, false));
+  assert_true(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), 1, true));
+  assert_true(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), 1, false));
+  assert_true(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), 5, true));
+  assert_true(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), 5, false));
+  assert_false(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), 6, true));
+  assert_false(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), 6, false));
+  assert_false(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), -1, true));
+  assert_false(_az_span_is_valid(AZ_SPAN_FROM_STR("Hello"), -1, false));
+
+  uint8_t* const max_ptr = (uint8_t*)~0;
+  assert_true(_az_span_is_valid(az_span_init(max_ptr, 0), 0, false));
+  assert_true(_az_span_is_valid(az_span_init(max_ptr, 0), 0, true));
+
+  assert_false(_az_span_is_valid(az_span_init(max_ptr, 1), 0, false));
+  assert_false(_az_span_is_valid(az_span_init(max_ptr, 1), 0, true));
+
+  assert_true(_az_span_is_valid(az_span_init(max_ptr - 1, 1), 0, false));
+  assert_true(_az_span_is_valid(az_span_init(max_ptr - 1, 1), 0, true));
+
+  assert_false(_az_span_is_valid(az_span_init(max_ptr - 1, 2), 0, false));
+  assert_false(_az_span_is_valid(az_span_init(max_ptr - 1, 2), 0, true));
+
+  assert_false(_az_span_is_valid(az_span_init(max_ptr - 1, INT32_MAX), 0, false));
+  assert_false(_az_span_is_valid(az_span_init(max_ptr - 1, INT32_MAX), 0, true));
+
+  assert_true(_az_span_is_valid(az_span_init(max_ptr - INT32_MAX, INT32_MAX), 0, false));
+  assert_true(_az_span_is_valid(az_span_init(max_ptr - INT32_MAX, INT32_MAX), 0, true));
+}
+
+static void test_az_span_overlap(void** state)
+{
+  (void)state;
+
+  assert_false(_az_span_overlap(az_span_init((uint8_t*)10, 10), az_span_init((uint8_t*)30, 10)));
+  assert_false(_az_span_overlap(az_span_init((uint8_t*)30, 10), az_span_init((uint8_t*)10, 10)));
+
+  assert_false(_az_span_overlap(az_span_init((uint8_t*)10, 10), az_span_init((uint8_t*)20, 10)));
+  assert_false(_az_span_overlap(az_span_init((uint8_t*)20, 10), az_span_init((uint8_t*)10, 10)));
+
+  assert_false(_az_span_overlap(az_span_init((uint8_t*)10, 0), az_span_init((uint8_t*)10, 0)));
+
+  assert_true(_az_span_overlap(az_span_init((uint8_t*)10, 10), az_span_init((uint8_t*)15, 0)));
+  assert_true(_az_span_overlap(az_span_init((uint8_t*)15, 0), az_span_init((uint8_t*)10, 10)));
+
+  assert_true(_az_span_overlap(az_span_init((uint8_t*)10, 10), az_span_init((uint8_t*)10, 15)));
+  assert_true(_az_span_overlap(az_span_init((uint8_t*)10, 15), az_span_init((uint8_t*)10, 10)));
+
+  assert_true(_az_span_overlap(az_span_init((uint8_t*)15, 10), az_span_init((uint8_t*)10, 15)));
+  assert_true(_az_span_overlap(az_span_init((uint8_t*)10, 15), az_span_init((uint8_t*)15, 10)));
+
+  assert_true(_az_span_overlap(az_span_init((uint8_t*)10, 10), az_span_init((uint8_t*)5, 10)));
+  assert_true(_az_span_overlap(az_span_init((uint8_t*)5, 10), az_span_init((uint8_t*)10, 10)));
+
+  assert_true(_az_span_overlap(az_span_init((uint8_t*)10, 10), az_span_init((uint8_t*)10, 10)));
+
+  assert_true(_az_span_overlap(az_span_init((uint8_t*)10, 10), az_span_init((uint8_t*)15, 10)));
+  assert_true(_az_span_overlap(az_span_init((uint8_t*)15, 10), az_span_init((uint8_t*)10, 10)));
+
+  assert_true(_az_span_overlap(az_span_init((uint8_t*)10, 10), az_span_init((uint8_t*)12, 5)));
+  assert_true(_az_span_overlap(az_span_init((uint8_t*)12, 5), az_span_init((uint8_t*)10, 10)));
+}
+
 static void az_span_trim(void** state)
 {
   (void)state;
@@ -957,6 +1046,8 @@ int test_az_span()
     cmocka_unit_test(az_span_u32toa_max_uint_succeeds),
     cmocka_unit_test(az_span_u32toa_overflow_fails),
     cmocka_unit_test(az_span_copy_empty),
+    cmocka_unit_test(test_az_span_is_valid),
+    cmocka_unit_test(test_az_span_overlap),
     cmocka_unit_test(az_span_trim),
     cmocka_unit_test(az_span_trim_left),
     cmocka_unit_test(az_span_trim_right),

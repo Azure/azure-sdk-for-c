@@ -171,7 +171,7 @@ AZ_NODISCARD static az_result az_json_parser_get_by_pointer_token(
 {
   switch (inout_token->kind)
   {
-    case AZ_JSON_TOKEN_ARRAY_START:
+    case AZ_JSON_TOKEN_BEGIN_ARRAY:
     {
       uint64_t i = 0;
       AZ_RETURN_IF_FAILED(az_span_atou64(pointer_token, &i));
@@ -186,7 +186,7 @@ AZ_NODISCARD static az_result az_json_parser_get_by_pointer_token(
         AZ_RETURN_IF_FAILED(az_json_parser_skip_children(json_parser, *inout_token));
       }
     }
-    case AZ_JSON_TOKEN_OBJECT_START:
+    case AZ_JSON_TOKEN_BEGIN_OBJECT:
     {
       while (true)
       {

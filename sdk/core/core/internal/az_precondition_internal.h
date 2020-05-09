@@ -34,10 +34,10 @@
 
 #include <az_precondition.h>
 
+#include <az_span.h>
+
 #include <stdbool.h>
 #include <stddef.h>
-
-#include <az_span.h>
 
 #include <_az_cfg_prefix.h>
 
@@ -61,14 +61,14 @@ az_precondition_failed_fn az_precondition_failed_get_callback();
 #define _az_PRECONDITION_NOT_NULL(arg) _az_PRECONDITION((arg != NULL))
 #define _az_PRECONDITION_IS_NULL(arg) _az_PRECONDITION((arg == NULL))
 
-AZ_NODISCARD AZ_INLINE bool az_span_is_valid(az_span span, int32_t min_size, bool null_is_valid)
+AZ_NODISCARD AZ_INLINE bool _az_span_is_valid(az_span span, int32_t min_size, bool null_is_valid)
 {
   if (min_size < 0)
   {
     return false;
   }
 
-  uint8_t* ptr = az_span_ptr(span);
+  uint8_t* const ptr = az_span_ptr(span);
   int32_t const span_size = az_span_size(span);
 
   bool result = false;
@@ -79,20 +79,46 @@ AZ_NODISCARD AZ_INLINE bool az_span_is_valid(az_span span, int32_t min_size, boo
         - If null_is_valid is true and the pointer in the span is null, the size must also be 0.
         - In the case of the pointer not being NULL, the size is greater than or equal to zero.
   */
+
+  // On some platforms, in some compilation configurations (Debug), NULL is not 0x0...0. But if you
+  // initialize a span with { 0 } (or if that span is a part of a structure that is initialized with
+  // { 0 }) the ptr is not going to be equal to NULL, however the intent of the precondition is to
+  // disallow default-initialized and null ptrs, so we should treat them the same.
+  uint8_t* const default_init_ptr = az_span_ptr((az_span){ 0 });
   if (null_is_valid)
   {
-    result = ptr == NULL ? span_size == 0 : span_size >= 0;
+    result = (ptr == NULL || ptr == default_init_ptr) ? span_size == 0 : span_size >= 0;
   }
   else
   {
-    result = ptr != NULL && span_size >= 0;
+    result = (ptr != NULL && ptr != default_init_ptr) && span_size >= 0;
   }
+
+  // Can't wrap over the end of the address space.
+  // The biggest theoretical pointer value is "(void*)~0" (0xFFFF...), which is the end of address
+  // space. We don't attempt to read/write beyond the end of the address space - it is unlikely a
+  // desired behavior, and it is not defined. So, if the span size is greater than the addresses
+  // left until the theoretical end of the address space, it is not a valid span.
+  // Example: (az_span) { .ptr = (uint8_t*)(~0 - 5), .size = 10 } is not a valid span, because most
+  // likely you end up pointing to 0x0000 at .ptr[6], &.ptr[7] is 0x...0001, etc.
+  uint8_t* const max_ptr = (uint8_t*)~0;
+  result &= ((size_t)span_size <= (size_t)(max_ptr - ptr));
 
   return result && min_size <= span_size;
 }
 
 #define _az_PRECONDITION_VALID_SPAN(span, min_size, null_is_valid) \
-  _az_PRECONDITION(az_span_is_valid(span, min_size, null_is_valid))
+  _az_PRECONDITION(_az_span_is_valid(span, min_size, null_is_valid))
+
+AZ_NODISCARD AZ_INLINE bool _az_span_overlap(az_span a, az_span b)
+{
+  uint8_t* const a_ptr = az_span_ptr(a);
+  uint8_t* const b_ptr = az_span_ptr(b);
+
+  return a_ptr <= b_ptr ? (a_ptr + az_span_size(a) > b_ptr) : (b_ptr + az_span_size(b) > a_ptr);
+}
+
+#define _az_PRECONDITION_NO_OVERLAP_SPANS(a, b) _az_PRECONDITION(!_az_span_overlap(a, b))
 
 #include <_az_cfg_suffix.h>
 

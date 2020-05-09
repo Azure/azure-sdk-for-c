@@ -36,7 +36,7 @@ static const char g_test_correct_topic_with_options_module_id_with_props[]
     = "devices/my_device/modules/my_module_id/messages/events/key=value&key_two=value2";
 
 #ifndef AZ_NO_PRECONDITION_CHECKING
-enable_precondition_check_tests()
+ENABLE_PRECONDITION_CHECK_TESTS()
 
 static void test_az_iot_hub_client_telemetry_get_publish_topic_NULL_client_fails(void** state)
 {
@@ -45,7 +45,7 @@ static void test_az_iot_hub_client_telemetry_get_publish_topic_NULL_client_fails
   char test_buf[TEST_SPAN_BUFFER_SIZE];
   size_t test_length;
 
-  assert_precondition_checked(az_iot_hub_client_telemetry_get_publish_topic(
+  ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_telemetry_get_publish_topic(
       NULL, NULL, test_buf, sizeof(test_buf), &test_length));
 }
 
@@ -59,7 +59,7 @@ static void test_az_iot_hub_client_telemetry_get_publish_topic_NULL_mqtt_topic_f
 
   size_t test_length;
 
-  assert_precondition_checked(az_iot_hub_client_telemetry_get_publish_topic(
+  ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_telemetry_get_publish_topic(
       &client, NULL, NULL, TEST_SPAN_BUFFER_SIZE, &test_length));
 }
 
@@ -75,7 +75,7 @@ static void test_az_iot_hub_client_telemetry_get_publish_topic_NULL_out_mqtt_top
   char test_buf[TEST_SPAN_BUFFER_SIZE];
   size_t test_length;
 
-  assert_precondition_checked(az_iot_hub_client_telemetry_get_publish_topic(
+  ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_telemetry_get_publish_topic(
       &client, NULL, test_buf, 0, &test_length));
 }
 
@@ -322,7 +322,7 @@ test_az_iot_hub_client_telemetry_get_publish_topic_with_options_module_id_with_p
 int test_iot_hub_telemetry()
 {
 #ifndef AZ_NO_PRECONDITION_CHECKING
-  setup_precondition_check_tests();
+  SETUP_PRECONDITION_CHECK_TESTS();
 #endif // AZ_NO_PRECONDITION_CHECKING
 
   const struct CMUnitTest tests[] = {
