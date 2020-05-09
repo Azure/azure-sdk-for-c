@@ -225,7 +225,6 @@ void _az_http_policy_logging_log_http_response(
 }
 
 #ifndef _az_NO_LOGGING
-
 AZ_NODISCARD az_result az_http_pipeline_policy_logging(
     _az_http_policy* p_policies,
     void* p_data,
@@ -253,5 +252,4 @@ AZ_NODISCARD az_result az_http_pipeline_policy_logging(
 
   return result;
 }
-
 #endif // _az_NO_LOGGING
