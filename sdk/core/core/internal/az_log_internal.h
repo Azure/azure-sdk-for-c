@@ -13,7 +13,7 @@
 
 // If the user hasn't registered any classifications, then we log everything.
 
-#ifndef AZ_NO_LOGGING
+#ifndef _az_NO_LOGGING
 bool _az_log_should_write(az_log_classification classification);
 void _az_log_write(az_log_classification classification, az_span message);
 #else
@@ -28,7 +28,7 @@ AZ_INLINE void _az_log_write(az_log_classification classification, az_span messa
   (void)classification;
   (void)message;
 }
-#endif // AZ_NO_LOGGING
+#endif // _az_NO_LOGGING
 
 #include <_az_cfg_suffix.h>
 

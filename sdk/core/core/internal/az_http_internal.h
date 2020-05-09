@@ -164,13 +164,13 @@ AZ_NODISCARD az_result az_http_pipeline_policy_credential(
     _az_http_request* p_request,
     az_http_response* p_response);
 
-#ifndef AZ_NO_LOGGING
+#ifndef _az_NO_LOGGING
 AZ_NODISCARD az_result az_http_pipeline_policy_logging(
     _az_http_policy* p_policies,
     void* p_data,
     _az_http_request* p_request,
     az_http_response* p_response);
-#endif // AZ_NO_LOGGING
+#endif // _az_NO_LOGGING
 
 AZ_NODISCARD az_result az_http_pipeline_policy_transport(
     _az_http_policy* p_policies,

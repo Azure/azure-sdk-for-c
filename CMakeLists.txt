@@ -20,7 +20,7 @@ endif()
 
 # disable preconditions when it's set to OFF
 if (NOT BUILD_LOGGING)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DAZ_NO_LOGGING")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_az_NO_LOGGING")
 endif()
 
 

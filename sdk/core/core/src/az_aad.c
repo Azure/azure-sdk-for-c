@@ -113,9 +113,9 @@ AZ_NODISCARD az_result _az_aad_request_token(_az_http_request* request, _az_toke
     ._internal = {
       .p_policies = {
         {._internal = { .process = az_http_pipeline_policy_retry, .p_options = &retry_options, }, },
-#ifndef AZ_NO_LOGGING
+#ifndef _az_NO_LOGGING
         {._internal = { .process = az_http_pipeline_policy_logging, .p_options = NULL, }, },
-#endif // AZ_NO_LOGGING
+#endif // _az_NO_LOGGING
         {._internal = { .process = az_http_pipeline_policy_transport, .p_options = NULL, }, },
       },
     },

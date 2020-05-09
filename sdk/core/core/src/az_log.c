@@ -14,7 +14,7 @@
 
 #include <_az_cfg.h>
 
-#ifndef AZ_NO_LOGGING
+#ifndef _az_NO_LOGGING
 
 static az_log_classification const* volatile _az_log_classifications = NULL;
 static az_log_message_fn volatile _az_log_message_callback = NULL;
@@ -87,4 +87,4 @@ void _az_log_write(az_log_classification classification, az_span message)
   (void)_az_log_write_engine(true, classification, message);
 }
 
-#endif // AZ_NO_LOGGING
+#endif // _az_NO_LOGGING
