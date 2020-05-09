@@ -86,6 +86,73 @@ When we make an official release, we will create a unique git tag containing the
 
 4. Provide platform-specific implementations for functionality required by `Azure Core`. For more information, see the [Azure Core Porting Guide](sdk/core/core/README.md#Porting-the-Azure-SDK-to-Another-Platform).
 
+### Compiler Options
+
+By default, when building the project with no options, the following static libraries are generated:
+
+- ``Libraries``:
+  - az_core
+    - az_span, az_http, az_json, etc.
+  - az_iot
+    -  iot_provisioning, iot_hub, etc.
+  - az_storage_blobs
+    -  Storage SDK blobs client.
+  - az_noplatform
+    - Library that provides a basic returning error for platform abstraction as AZ_NOT_IMPLEMENTED. This ensures the project can be compiled without the need to provide any specific platform implementation. This is useful if you want to use az_core without platform specific functions like `mutex` or `time`. 
+  - az_nohttp
+    -  Library that provides a basic returning error when calling HTTP stack. Similar to az_noplatform, this library ensures the project can be compiled without requiring any HTTP stack implementation. This is useful if you want to use `az_core` without `az_http` functionality.
+
+The following compiler options are available for adding/removing project features.
+
+<table>
+<tr>
+<td>Option</td>
+<td>Description</td>
+<td>Default Value</td>
+</tr>
+<tr>
+<td>UNIT_TESTING</td>
+<td>Generates Unit Test for compilation. When turning this option ON, cmocka is a required dependency for compilation.<br>After Compiling, use `ctest` to run Unit Test.</td>
+<td>OFF</td>
+</tr>
+<tr>
+<td>UNIT_TESTING_MOCK_ENABLED</td>
+<td>This option works only with GCC. It uses -ld option from linker to mock functions during unit test. This is used to test platform or HTTP functions by mocking the return values.</td>
+<td>OFF</td>
+</tr>
+<tr>
+<td>BUILD_PRECONDITIONS</td>
+<td>Turning this option ON would remove all method contracts. This us typically for shipping libraries for production to make it as much optimized as possible.</td>
+<td>ON</td>
+</tr>
+<tr>
+<td>BUILD_CURL_TRANSPORT</td>
+<td>This option requires Libcurl dependency to be available. It generates an HTTP stack with libcurl for az_http to be able to send requests thru the wire. This library would replace the no_http.</td>
+<td>OFF</td>
+</tr>
+<tr>
+<td>BUILD_PAHO_TRANSPORT</td>
+<td>This option requires paho-mqtt dependency to be available. Provides Paho MQTT support for iot.</td>
+<td>OFF</td>
+</tr>
+<tr>
+<td>AZ_PLATFORM_IMPL</td>
+<td>This option can be set to any of the next values:<br>- No_value: default value is used and no_platform library is used.<br>- "POSIX": Provides implementation for Linux and Mac systems.<br>- "WIN32": Provides platform implementation for Windows based system<br>- "USER": Tells cmake to use an specific implementation provided by user. When setting this option, user must provide an implementation library and set option `AZ_USER_PLATFORM_IMPL_NAME` with the name of the library (i.e. <code>-DAZ_PLATFORM_IMPL=USER -DAZ_USER_PLATFORM_IMPL_NAME=user_platform_lib</code>). cmake will look for this library to link az_core</td>
+<td>No_value</td>
+</tr>
+</table>
+
+
+- ``Samples``: Whenever UNIT_TESTING is ON, samples are built using the default PAL (see [running samples section](#running-samples)). This means that running samples would throw errors like:
+
+```bash
+./keys_client_example
+Running sample with no_op HTTP implementation.
+Recompile az_core with an HTTP client implementation like CURL to see sample sending network requests.
+
+i.e. cmake -DBUILD_CURL_TRANSPORT=ON ..
+```
+
 ### Development Environment
 
 Project contains files to work on Windows, Mac or Linux based OS.
@@ -229,72 +296,6 @@ make
 
 > Note: The steps above would compile and generate the default output for azure-sdk-for-c which includes static libraries only. See below section [Compiler Options](#compiler-options)
 
-### Compiler Options
-
-By default, when building the project with no options, the following static libraries are generated:
-
-- ``Libraries``:
-  - az_core
-    - az_span, az_http, az_json, etc.
-  - az_iot
-    -  iot_provisioning, iot_hub, etc.
-  - az_storage_blobs
-    -  Storage SDK blobs client.
-  - az_noplatform
-    - Library that provides a basic returning error for platform abstraction as AZ_NOT_IMPLEMENTED. This ensures the project can be compiled without the need to provide any specific platform implementation. This is useful if you want to use az_core without platform specific functions like `mutex` or `time`. 
-  - az_nohttp
-    -  Library that provides a basic returning error when calling HTTP stack. Similar to az_noplatform, this library ensures the project can be compiled without requiring any HTTP stack implementation. This is useful if you want to use `az_core` without `az_http` functionality.
-
-The following compiler options are available for adding/removing project features.
-
-<table>
-<tr>
-<td>Option</td>
-<td>Description</td>
-<td>Default Value</td>
-</tr>
-<tr>
-<td>UNIT_TESTING</td>
-<td>Generates Unit Test for compilation. When turning this option ON, cmocka is a required dependency for compilation.<br>After Compiling, use `ctest` to run Unit Test.</td>
-<td>OFF</td>
-</tr>
-<tr>
-<td>UNIT_TESTING_MOCK_ENABLED</td>
-<td>This option works only with GCC. It uses -ld option from linker to mock functions during unit test. This is used to test platform or HTTP functions by mocking the return values.</td>
-<td>OFF</td>
-</tr>
-<tr>
-<td>BUILD_PRECONDITIONS</td>
-<td>Turning this option ON would remove all method contracts. This us typically for shipping libraries for production to make it as much optimized as possible.</td>
-<td>ON</td>
-</tr>
-<tr>
-<td>BUILD_CURL_TRANSPORT</td>
-<td>This option requires Libcurl dependency to be available. It generates an HTTP stack with libcurl for az_http to be able to send requests thru the wire. This library would replace the no_http.</td>
-<td>OFF</td>
-</tr>
-<tr>
-<td>BUILD_PAHO_TRANSPORT</td>
-<td>This option requires paho-mqtt dependency to be available. Provides Paho MQTT support for iot.</td>
-<td>OFF</td>
-</tr>
-<tr>
-<td>AZ_PLATFORM_IMPL</td>
-<td>This option can be set to any of the next values:<br>- No_value: default value is used and no_platform library is used.<br>- "POSIX": Provides implementation for Linux and Mac systems.<br>- "WIN32": Provides platform implementation for Windows based system<br>- "USER": Tells cmake to use an specific implementation provided by user. When setting this option, user must provide an implementation library and set option `AZ_USER_PLATFORM_IMPL_NAME` with the name of the library (i.e. <code>-DAZ_PLATFORM_IMPL=USER -DAZ_USER_PLATFORM_IMPL_NAME=user_platform_lib</code>). cmake will look for this library to link az_core</td>
-<td>No_value</td>
-</tr>
-</table>
-
-
-- ``Samples``: Whenever UNIT_TESTING is ON, samples are built using the default PAL (see [running samples section](#running-samples)). This means that running samples would throw errors like:
-
-```bash
-./keys_client_example
-Running sample with no_op HTTP implementation.
-Recompile az_core with an HTTP client implementation like CURL to see sample sending network requests.
-
-i.e. cmake -DBUILD_CURL_TRANSPORT=ON ..
-```
 
 ## SDK Architecture
 
