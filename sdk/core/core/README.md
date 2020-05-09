@@ -16,7 +16,7 @@ The `Azure Core` library requires you to implement a few functions to provide pl
 
 ### Function Results
 
-Many SDK functions return an `az_result` as defined in [inc/az_result.h](inc/az_result.h) header file. An `az_result` is a 32-bit enum value. If a function fails to execute as intended, the `az_result` symbol returned will be prefixed with `AZ_ERROR_`. Most functions return `AZ_OK` to indicate success. However, some functions return a reason for success; these symbols with be prefixed with `AZ_` but will **not** contain `ERROR` in the symbol. Some functions return an `az_result` and some other value; the other value is returned via an output parameter.
+Many SDK functions return an `az_result` as defined in [inc/az_result.h](inc/az_result.h) header file. An `az_result` is a 32-bit enum value. When a function succeeds, it typically returns AZ_OK. When a function fails, it returns an `az_result` symbol prefixed with `AZ_ERROR_`. A few functions return a reason for success; these symbols will be prefixed with `AZ_` but will **not** contain `ERROR` in the symbol. For functions that need to return an `az_result` and some other value; the other value is returned via an output parameter. If you simply want to know if an `az_result` value indicates generic success or failure, call either the `az_succeeded` or `az_failed` function, respectively. Both of these functions take an `az_result` value and return `true` or `false`.
 
 ### Working with Spans
 
