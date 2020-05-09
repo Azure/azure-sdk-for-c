@@ -96,7 +96,6 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
                 .p_options = cred,
               },
             },
-#ifndef _az_NO_LOGGING
 
             {
               ._internal = {
@@ -104,7 +103,6 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
                 .p_options = NULL,
               },
             },
-#endif // _az_NO_LOGGING
             {
               ._internal = {
                 .process = az_http_pipeline_policy_transport,
