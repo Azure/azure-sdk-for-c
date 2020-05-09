@@ -121,8 +121,7 @@ Log classifications allow your application to select which specific log messages
    ```
 
 If the SDK is built with `AZ_NO_LOGGING` macro defined (or adding option -DBUILD_LOGGING=OFF with cmake), it should reduce the binary size and slightly improve performance.
-The logging should have negligible performance impact if no listener is registered, or if classifications include only the small portion of messages, but when the SDK is built with `AZ_NO_LOGGING`, the parts of logging messages text won't be included in the output binary, and it should not be possible to make logging function even in smallest capacity - recompilation without `AZ_NO_LOGGING` would be required.
-When the code is built with `AZ_NO_LOGGING`, all the logging-related code could still be present and get compiled, but it is expected to get completely removed during compilation.
+Logging has a negligible performance impact if no listener is registered or if you specify few classifications. However, if you'd like to exclude all of the logging code to make your final executable smaller, define the AZ_NO_LOGGING symbol when building the SDK.
 
 ### SDK Function Argument Validation
 
