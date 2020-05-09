@@ -93,7 +93,7 @@ AZ_NODISCARD AZ_INLINE az_json_token az_json_token_boolean(bool value)
   };
 }
 
-/*
+/**
  * @brief az_json_token_number returns an az_json_token containing a number.
  *
  * @param value A double indicating how the az_json_token should be initialized.
@@ -106,7 +106,7 @@ AZ_NODISCARD AZ_INLINE az_json_token az_json_token_number(double value)
   };
 }
 
-/*
+/**
  * @brief az_json_token_string returns an az_json_token containing a string.
  *
  * @param value A span over a string indicating how the az_json_token should be initialized.
@@ -119,7 +119,7 @@ AZ_NODISCARD AZ_INLINE az_json_token az_json_token_string(az_span value)
   };
 }
 
-/*
+/**
  * @brief az_json_token_string returns an az_json_token containing an object.
  *
  * @param value A span over an object indicating how the az_json_token should be initialized.
@@ -132,7 +132,7 @@ AZ_NODISCARD AZ_INLINE az_json_token az_json_token_object(az_span value)
   };
 }
 
-/*
+/**
  * @brief returns an az_json_token representing the start of an object.
  */
 AZ_NODISCARD AZ_INLINE az_json_token az_json_token_begin_object()
@@ -140,7 +140,7 @@ AZ_NODISCARD AZ_INLINE az_json_token az_json_token_begin_object()
   return (az_json_token){ .kind = AZ_JSON_TOKEN_BEGIN_OBJECT, ._internal = { 0 } };
 }
 
-/*
+/**
  * @brief returns an az_json_token representing the end of an object.
  */
 AZ_NODISCARD AZ_INLINE az_json_token az_json_token_end_object()
@@ -148,7 +148,7 @@ AZ_NODISCARD AZ_INLINE az_json_token az_json_token_end_object()
   return (az_json_token){ .kind = AZ_JSON_TOKEN_END_OBJECT, ._internal = { 0 } };
 }
 
-/*
+/**
  * @brief returns an az_json_token representing the start of an array.
  */
 AZ_NODISCARD AZ_INLINE az_json_token az_json_token_begin_array()
@@ -156,7 +156,7 @@ AZ_NODISCARD AZ_INLINE az_json_token az_json_token_begin_array()
   return (az_json_token){ .kind = AZ_JSON_TOKEN_BEGIN_ARRAY, ._internal = { 0 } };
 }
 
-/*
+/**
  * @brief returns an az_json_token representing the end of an array.
  */
 AZ_NODISCARD AZ_INLINE az_json_token az_json_token_end_array()
