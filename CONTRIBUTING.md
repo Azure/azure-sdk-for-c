@@ -75,7 +75,7 @@ There are manay ways that you can contribute to the Azure SDK for Embedded C pro
 See how `vcpkg` can be used to install dependencies, [below](#VCPKG).
 - [doxygen](http://www.doxygen.nl/download.html) if you need to generate and view documentation.
 
-## Running Tests and Samples
+## Running Tests
 
 ### Unit tests
 
@@ -101,27 +101,6 @@ To enable building project and linking with this option, as well as adding tests
 
 ```cmake
 cmake -DUNIT_TESTING=ON -DUNIT_TESTING_MOCK_ENABLED=ON ..
-```
-
-### Running samples
-
-See [compiler options section](#compiler-options) to learn about how to build samples with HTTP implementation in order to be runnable.
-
-After building samples with HTTP stack, set the environment variables for credentials. The samples read these environment values to authenticate to Azure services. See [client secret here](https://docs.microsoft.com/en-us/azure/active-directory/azuread-dev/v1-oauth2-on-behalf-of-flow#service-to-service-access-token-request) for additional details on Azure authentication.
-
-```bash
-# On linux, set env var like this. For Windows, do it from advanced settings/ env variables
-
-# KEY-VAULT Sample
-export AZURE_TENANT_ID="????????-????-????-????-????????????"
-export AZURE_CLIENT_ID="????????-????-????-????-????????????"
-export AZURE_CLIENT_SECRET="????????????"
-export AZURE_KEYVAULT_URL="https://???????????.??"
-
-# STORAGE Sample (only 1 env var required)
-# URL must contain a valid container, blob and SaS token
-# e.g "https://storageAccount.blob.core.windows.net/container/blob?sv=xxx&ss=xx&srt=xx&sp=xx&se=xx&st=xxx&spr=https,http&sig=xxx"
-export AZURE_STORAGE_URL="https://??????????????"
 ```
 
 ## Build Docs
