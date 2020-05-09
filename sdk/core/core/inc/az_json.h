@@ -511,10 +511,10 @@ AZ_NODISCARD az_result
 az_json_parser_parse_array_item(az_json_parser* json_parser, az_json_token* out_token);
 
 /**
- * @brief az_json_parser_skip_children parses and skips over any nested JSON elements.
+ * @brief Parses and skips over any nested JSON elements.
  *
  * @param json_parser A pointer to an az_json_parser instance containing the JSON to parse.
- * @param out_token A pointer to an az_json_token containing the next parsed JSON token.
+ * @param token An #az_json_token containing the next parsed JSON token.
  * @return AZ_OK if the token was parsed successfully.<br>
  *         AZ_ERROR_EOF when the end of the JSON document is reached.<br>
  *         AZ_ERROR_PARSER_UNEXPECTED_CHAR when an invalid character is detected.<br>
