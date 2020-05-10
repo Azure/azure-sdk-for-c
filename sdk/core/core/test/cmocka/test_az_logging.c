@@ -179,17 +179,17 @@ static void test_az_log(void** state)
 
     {
       // Verify that our internal should_write() function would return false if none is listening.
-      assert_true(_az_log_should_write(AZ_LOG_HTTP_REQUEST) == false);
-      assert_true(_az_log_should_write(AZ_LOG_HTTP_RESPONSE) == false);
+      assert_true(_az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_REQUEST) == false);
+      assert_true(_az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_RESPONSE) == false);
 
       // If a callback is set, and no classifications are specified, we are going to log all of them
       // (and customer is going to get all of them).
       az_log_set_callback(_log_listener);
 
-      assert_true(_az_log_should_write(AZ_LOG_HTTP_REQUEST) == _az_BUILT_WITH_LOGGING(true, false));
+      assert_true(_az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_REQUEST) == _az_BUILT_WITH_LOGGING(true, false));
 
       assert_true(
-          _az_log_should_write(AZ_LOG_HTTP_RESPONSE) == _az_BUILT_WITH_LOGGING(true, false));
+          _az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_RESPONSE) == _az_BUILT_WITH_LOGGING(true, false));
     }
 
     // Verify that if customer specifies the classifications, we'll only invoking the logging
@@ -199,8 +199,8 @@ static void test_az_log(void** state)
     az_log_classification const classifications[] = { AZ_LOG_HTTP_REQUEST, AZ_LOG_END_OF_LIST };
     az_log_set_classifications(classifications);
 
-    assert_true(_az_log_should_write(AZ_LOG_HTTP_REQUEST) == _az_BUILT_WITH_LOGGING(true, false));
-    assert_true(_az_log_should_write(AZ_LOG_HTTP_RESPONSE) == false);
+    assert_true(_az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_REQUEST) == _az_BUILT_WITH_LOGGING(true, false));
+    assert_true(_az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_RESPONSE) == false);
 
     _az_http_policy_logging_log_http_request(&hrb);
     _az_http_policy_logging_log_http_response(&response, 3456, &hrb);

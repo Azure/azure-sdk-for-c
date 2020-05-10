@@ -119,7 +119,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
   // Check if is related to twin or not
   if ((twin_index = az_span_find(received_topic, az_iot_hub_twin_topic_prefix)) >= 0)
   {
-    _az_log_write(AZ_LOG_MQTT_RECEIVED_TOPIC, received_topic);
+    _az_LOG_WRITE(AZ_LOG_MQTT_RECEIVED_TOPIC, received_topic);
 
     int32_t twin_feature_index;
     az_span twin_feature_span

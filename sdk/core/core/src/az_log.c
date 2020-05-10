@@ -29,8 +29,8 @@ void az_log_set_callback(az_log_message_fn az_log_message_callback)
   _az_log_message_callback = az_log_message_callback;
 }
 
-// _az_log_write_engine is a function private to this .c file; it contains the code to handle
-// _az_log_should_write & _az_log_write.
+// _az_LOG_WRITE_engine is a function private to this .c file; it contains the code to handle
+// _az_LOG_SHOULD_WRITE & _az_LOG_WRITE.
 //
 // If log_it is false, then the function returns true or false indicating whether the message
 // should be logged (without actually logging it).
