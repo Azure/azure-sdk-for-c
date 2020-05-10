@@ -39,7 +39,8 @@ named `fingerprint.txt` for your convenience).
 1. Create a device in IoT Hub with `X.509 Self-Signed` authentication.
 1. Paste in the certificate fingerprint printed previously.
 
-After this is generated, make sure to set `AZ_IOT_DEVICE_X509_CERT_PEM_FILE` as an environment variable.
+After this is generated, make sure to set `AZ_IOT_DEVICE_X509_CERT_PEM_FILE` as an environment variable. It should be the
+full path to the generated `device_cert_store.pem` file.
 
 For more details on X509 authentication, refer to [this online documentation](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-x509ca-overview#how-to-register-the-x509-ca-certificate-to-iot-hub)
 
