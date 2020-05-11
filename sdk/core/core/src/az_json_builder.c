@@ -34,7 +34,28 @@ static AZ_NODISCARD az_span _get_remaining_span(az_json_builder* json_builder)
       json_builder->_internal.destination_buffer, json_builder->_internal.bytes_written);
 }
 
-#ifndef AZ_NO_PRECONDITION_CHECKING
+#ifdef AZ_NO_PRECONDITION_CHECKING
+AZ_INLINE AZ_NODISCARD bool _az_is_appending_value_valid(az_json_builder* json_builder)
+{
+  (void)json_builder;
+  return true;
+}
+
+AZ_INLINE AZ_NODISCARD bool _az_is_appending_property_name_valid(az_json_builder* json_builder)
+{
+  (void)json_builder;
+  return true;
+}
+
+AZ_INLINE AZ_NODISCARD bool _az_is_appending_container_end_valid(
+    az_json_builder* json_builder,
+    uint8_t byte)
+{
+  (void)json_builder;
+  (void)byte;
+  return true;
+}
+#else
 static AZ_NODISCARD bool _az_is_appending_value_valid(az_json_builder* json_builder)
 {
   _az_precondition_not_null(json_builder);
