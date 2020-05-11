@@ -28,7 +28,7 @@ enum
 
 static AZ_NODISCARD az_span _get_remaining_span(az_json_builder* json_builder)
 {
-  _az_PRECONDITION_NOT_NULL(json_builder);
+  _az_precondition_not_null(json_builder);
 
   return az_span_slice_to_end(
       json_builder->_internal.destination_buffer, json_builder->_internal.bytes_written);
@@ -37,7 +37,7 @@ static AZ_NODISCARD az_span _get_remaining_span(az_json_builder* json_builder)
 #ifndef AZ_NO_PRECONDITION_CHECKING
 static AZ_NODISCARD bool _az_is_appending_value_valid(az_json_builder* json_builder)
 {
-  _az_PRECONDITION_NOT_NULL(json_builder);
+  _az_precondition_not_null(json_builder);
 
   az_json_token_kind kind = json_builder->_internal.token_kind;
 
@@ -48,7 +48,7 @@ static AZ_NODISCARD bool _az_is_appending_value_valid(az_json_builder* json_buil
     if (kind != AZ_JSON_TOKEN_PROPERTY_NAME)
     {
       // Given we are within a JSON object, kind cannot be start of an array or none.
-      _az_PRECONDITION(kind != AZ_JSON_TOKEN_NONE && kind != AZ_JSON_TOKEN_BEGIN_ARRAY);
+      _az_precondition(kind != AZ_JSON_TOKEN_NONE && kind != AZ_JSON_TOKEN_BEGIN_ARRAY);
 
       return false;
     }
@@ -63,7 +63,7 @@ static AZ_NODISCARD bool _az_is_appending_value_valid(az_json_builder* json_buil
     // an existing closed object/array.
 
     // Given we are not within a JSON object, kind cannot be property name.
-    _az_PRECONDITION(kind != AZ_JSON_TOKEN_PROPERTY_NAME && kind != AZ_JSON_TOKEN_BEGIN_OBJECT);
+    _az_precondition(kind != AZ_JSON_TOKEN_PROPERTY_NAME && kind != AZ_JSON_TOKEN_BEGIN_OBJECT);
 
     // It is more likely for current_depth to not equal 0 when writing valid JSON, so check that
     // first to rely on short-circuiting and return quickly.
@@ -80,7 +80,7 @@ static AZ_NODISCARD bool _az_is_appending_value_valid(az_json_builder* json_buil
 
 static AZ_NODISCARD bool _az_is_appending_property_name_valid(az_json_builder* json_builder)
 {
-  _az_PRECONDITION_NOT_NULL(json_builder);
+  _az_precondition_not_null(json_builder);
 
   az_json_token_kind kind = json_builder->_internal.token_kind;
 
@@ -89,7 +89,7 @@ static AZ_NODISCARD bool _az_is_appending_property_name_valid(az_json_builder* j
   if (!_az_json_stack_peek(&json_builder->_internal.bit_stack)
       || kind == AZ_JSON_TOKEN_PROPERTY_NAME)
   {
-    _az_PRECONDITION(kind != AZ_JSON_TOKEN_BEGIN_OBJECT);
+    _az_precondition(kind != AZ_JSON_TOKEN_BEGIN_OBJECT);
     return false;
   }
 
@@ -101,7 +101,7 @@ static AZ_NODISCARD bool _az_is_appending_container_end_valid(
     az_json_builder* json_builder,
     uint8_t byte)
 {
-  _az_PRECONDITION_NOT_NULL(json_builder);
+  _az_precondition_not_null(json_builder);
 
   az_json_token_kind kind = json_builder->_internal.token_kind;
 
@@ -121,13 +121,13 @@ static AZ_NODISCARD bool _az_is_appending_container_end_valid(
     // If inside a JSON object, then appending an end bracket is invalid:
     if (stack_item)
     {
-      _az_PRECONDITION(kind != AZ_JSON_TOKEN_NONE);
+      _az_precondition(kind != AZ_JSON_TOKEN_NONE);
       return false;
     }
   }
   else
   {
-    _az_PRECONDITION(byte == '}');
+    _az_precondition(byte == '}');
 
     // If not inside a JSON object, then appending an end brace is invalid:
     if (!stack_item)
@@ -147,11 +147,11 @@ static AZ_NODISCARD bool _az_is_appending_container_end_valid(
 static AZ_NODISCARD int32_t
 _az_json_builder_escaped_length(az_span value, int32_t* out_index_of_first_escaped_char)
 {
-  _az_PRECONDITION_NOT_NULL(out_index_of_first_escaped_char);
-  _az_PRECONDITION_VALID_SPAN(value, 0, true);
+  _az_precondition_not_null(out_index_of_first_escaped_char);
+  _az_precondition_valid_span(value, 0, true);
 
   int32_t value_size = az_span_size(value);
-  _az_PRECONDITION(value_size <= _az_MAX_UNESCAPED_STRING_SIZE);
+  _az_precondition(value_size <= _az_MAX_UNESCAPED_STRING_SIZE);
 
   int32_t escaped_length = 0;
   *out_index_of_first_escaped_char = -1;
@@ -218,11 +218,11 @@ _az_json_builder_escaped_length(az_span value, int32_t* out_index_of_first_escap
 
 static AZ_NODISCARD az_span _az_json_builder_escape_and_copy(az_span destination, az_span source)
 {
-  _az_PRECONDITION_VALID_SPAN(source, 1, false);
+  _az_precondition_valid_span(source, 1, false);
 
   int32_t src_size = az_span_size(source);
-  _az_PRECONDITION(src_size <= _az_MAX_UNESCAPED_STRING_SIZE);
-  _az_PRECONDITION_VALID_SPAN(destination, src_size + 1, false);
+  _az_precondition(src_size <= _az_MAX_UNESCAPED_STRING_SIZE);
+  _az_precondition_valid_span(destination, src_size + 1, false);
 
   int32_t i = 0;
   uint8_t* value_ptr = az_span_ptr(source);
@@ -320,11 +320,11 @@ AZ_INLINE void _az_update_json_builder_state(
 
 AZ_NODISCARD az_result az_json_builder_append_string(az_json_builder* json_builder, az_span value)
 {
-  _az_PRECONDITION_NOT_NULL(json_builder);
+  _az_precondition_not_null(json_builder);
   // A null span is allowed, and we write an empty JSON string for it.
-  _az_PRECONDITION_VALID_SPAN(value, 0, true);
-  _az_PRECONDITION(az_span_size(value) <= _az_MAX_UNESCAPED_STRING_SIZE);
-  _az_PRECONDITION(_az_is_appending_value_valid(json_builder));
+  _az_precondition_valid_span(value, 0, true);
+  _az_precondition(az_span_size(value) <= _az_MAX_UNESCAPED_STRING_SIZE);
+  _az_precondition(_az_is_appending_value_valid(json_builder));
 
   az_span remaining_json = _get_remaining_span(json_builder);
 
@@ -372,10 +372,10 @@ AZ_NODISCARD az_result
 az_json_builder_append_property_name(az_json_builder* json_builder, az_span name)
 {
   // TODO: Consider refactoring to reduce duplication between writing property name and string.
-  _az_PRECONDITION_NOT_NULL(json_builder);
-  _az_PRECONDITION_VALID_SPAN(name, 0, false);
-  _az_PRECONDITION(az_span_size(name) <= _az_MAX_UNESCAPED_STRING_SIZE);
-  _az_PRECONDITION(_az_is_appending_property_name_valid(json_builder));
+  _az_precondition_not_null(json_builder);
+  _az_precondition_valid_span(name, 0, false);
+  _az_precondition(az_span_size(name) <= _az_MAX_UNESCAPED_STRING_SIZE);
+  _az_precondition(_az_is_appending_property_name_valid(json_builder));
 
   az_span remaining_json = _get_remaining_span(json_builder);
 
@@ -425,13 +425,13 @@ static AZ_NODISCARD az_result _az_json_builder_append_literal(
     az_span literal,
     az_json_token_kind literal_kind)
 {
-  _az_PRECONDITION_NOT_NULL(json_builder);
-  _az_PRECONDITION(
+  _az_precondition_not_null(json_builder);
+  _az_precondition(
       literal_kind == AZ_JSON_TOKEN_NULL || literal_kind == AZ_JSON_TOKEN_TRUE
       || literal_kind == AZ_JSON_TOKEN_FALSE);
-  _az_PRECONDITION_VALID_SPAN(literal, 4, false);
-  _az_PRECONDITION(az_span_size(literal) <= 5); // null, true, or false
-  _az_PRECONDITION(_az_is_appending_value_valid(json_builder));
+  _az_precondition_valid_span(literal, 4, false);
+  _az_precondition(az_span_size(literal) <= 5); // null, true, or false
+  _az_precondition(_az_is_appending_value_valid(json_builder));
 
   az_span remaining_json = _get_remaining_span(json_builder);
 
@@ -479,8 +479,8 @@ AZ_NODISCARD az_result az_json_builder_append_null(az_json_builder* json_builder
 
 AZ_NODISCARD az_result az_json_builder_append_number(az_json_builder* json_builder, double value)
 {
-  _az_PRECONDITION_NOT_NULL(json_builder);
-  _az_PRECONDITION(_az_is_appending_value_valid(json_builder));
+  _az_precondition_not_null(json_builder);
+  _az_precondition(_az_is_appending_value_valid(json_builder));
 
   az_span remaining_json = _get_remaining_span(json_builder);
 
@@ -513,8 +513,8 @@ AZ_NODISCARD az_result az_json_builder_append_number(az_json_builder* json_build
 AZ_NODISCARD az_result
 az_json_builder_append_int32_number(az_json_builder* json_builder, int32_t value)
 {
-  _az_PRECONDITION_NOT_NULL(json_builder);
-  _az_PRECONDITION(_az_is_appending_value_valid(json_builder));
+  _az_precondition_not_null(json_builder);
+  _az_precondition(_az_is_appending_value_valid(json_builder));
 
   az_span remaining_json = _get_remaining_span(json_builder);
 
@@ -549,10 +549,10 @@ static AZ_NODISCARD az_result _az_json_builder_append_container_start(
     uint8_t byte,
     az_json_token_kind container_kind)
 {
-  _az_PRECONDITION_NOT_NULL(json_builder);
-  _az_PRECONDITION(
+  _az_precondition_not_null(json_builder);
+  _az_precondition(
       container_kind == AZ_JSON_TOKEN_BEGIN_OBJECT || container_kind == AZ_JSON_TOKEN_BEGIN_ARRAY);
-  _az_PRECONDITION(_az_is_appending_value_valid(json_builder));
+  _az_precondition(_az_is_appending_value_valid(json_builder));
 
   // The current depth is equal to or larger than the maximum allowed depth of 64. Cannot write the
   // next JSON object or array.
@@ -607,10 +607,10 @@ static AZ_NODISCARD az_result az_json_builder_append_container_end(
     uint8_t byte,
     az_json_token_kind container_kind)
 {
-  _az_PRECONDITION_NOT_NULL(json_builder);
-  _az_PRECONDITION(
+  _az_precondition_not_null(json_builder);
+  _az_precondition(
       container_kind == AZ_JSON_TOKEN_END_OBJECT || container_kind == AZ_JSON_TOKEN_END_ARRAY);
-  _az_PRECONDITION(_az_is_appending_container_end_valid(json_builder, byte));
+  _az_precondition(_az_is_appending_container_end_valid(json_builder, byte));
 
   az_span remaining_json = _get_remaining_span(json_builder);
 

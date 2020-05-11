@@ -43,23 +43,22 @@
 
 az_precondition_failed_fn az_precondition_failed_get_callback();
 
+AZ_INLINE void _az_precondition(bool condition)
+{
 #ifdef AZ_NO_PRECONDITION_CHECKING
-#define _az_PRECONDITION(condition)
+  (void)condition;
 #else
-#define _az_PRECONDITION(condition) \
-  do \
-  { \
-    if (!(condition)) \
-    { \
-      az_precondition_failed_get_callback()(); \
-    } \
-  } while (0)
+  if (!condition)
+  {
+    az_precondition_failed_get_callback()();
+  }
 #endif // AZ_NO_PRECONDITION_CHECKING
+}
 
-#define _az_PRECONDITION_RANGE(low, arg, max) _az_PRECONDITION((low <= arg && arg <= max))
+#define _az_PRECONDITION_RANGE(low, arg, max) _az_precondition((low <= arg && arg <= max))
 
-#define _az_PRECONDITION_NOT_NULL(arg) _az_PRECONDITION((arg != NULL))
-#define _az_PRECONDITION_IS_NULL(arg) _az_PRECONDITION((arg == NULL))
+AZ_INLINE void _az_precondition_not_null(void const* arg) { _az_precondition(arg != NULL); }
+AZ_INLINE void _az_precondition_null(void const* arg) { _az_precondition(arg == NULL); }
 
 AZ_NODISCARD AZ_INLINE bool _az_span_is_valid(az_span span, int32_t min_size, bool null_is_valid)
 {
@@ -107,8 +106,10 @@ AZ_NODISCARD AZ_INLINE bool _az_span_is_valid(az_span span, int32_t min_size, bo
   return result && min_size <= span_size;
 }
 
-#define _az_PRECONDITION_VALID_SPAN(span, min_size, null_is_valid) \
-  _az_PRECONDITION(_az_span_is_valid(span, min_size, null_is_valid))
+AZ_INLINE void _az_precondition_valid_span(az_span span, int32_t min_size, bool null_is_valid)
+{
+  _az_precondition(_az_span_is_valid(span, min_size, null_is_valid));
+}
 
 AZ_NODISCARD AZ_INLINE bool _az_span_overlap(az_span a, az_span b)
 {
@@ -118,7 +119,10 @@ AZ_NODISCARD AZ_INLINE bool _az_span_overlap(az_span a, az_span b)
   return a_ptr <= b_ptr ? (a_ptr + az_span_size(a) > b_ptr) : (b_ptr + az_span_size(b) > a_ptr);
 }
 
-#define _az_PRECONDITION_NO_OVERLAP_SPANS(a, b) _az_PRECONDITION(!_az_span_overlap(a, b))
+AZ_INLINE void _az_precondition_no_overlap_spans(az_span a, az_span b)
+{
+  _az_precondition(!_az_span_overlap(a, b));
+}
 
 #include <_az_cfg_suffix.h>
 

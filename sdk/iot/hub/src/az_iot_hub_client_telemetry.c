@@ -23,9 +23,9 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_get_publish_topic(
     size_t mqtt_topic_size,
     size_t* out_mqtt_topic_length)
 {
-  _az_PRECONDITION_NOT_NULL(client);
-  _az_PRECONDITION_NOT_NULL(mqtt_topic);
-  _az_PRECONDITION(mqtt_topic_size > 0);
+  _az_precondition_not_null(client);
+  _az_precondition_not_null(mqtt_topic);
+  _az_precondition(mqtt_topic_size > 0);
 
   const az_span* const module_id = &(client->_internal.options.module_id);
 

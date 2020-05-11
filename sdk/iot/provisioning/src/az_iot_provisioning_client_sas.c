@@ -36,10 +36,10 @@ AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_signature(
     az_span signature,
     az_span* out_signature)
 {
-  _az_PRECONDITION_NOT_NULL(client);
-  _az_PRECONDITION(token_expiration_epoch_time > 0);
-  _az_PRECONDITION_VALID_SPAN(signature, 0, false);
-  _az_PRECONDITION_NOT_NULL(out_signature);
+  _az_precondition_not_null(client);
+  _az_precondition(token_expiration_epoch_time > 0);
+  _az_precondition_valid_span(signature, 0, false);
+  _az_precondition_not_null(out_signature);
 
   // Produces the following signature:
   // url-encoded(<resource-string>)\n<expiration-time>
@@ -78,11 +78,11 @@ AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_password(
     size_t mqtt_password_size,
     size_t* out_mqtt_password_length)
 {
-  _az_PRECONDITION_NOT_NULL(client);
-  _az_PRECONDITION_VALID_SPAN(base64_hmac_sha256_signature, 1, false);
-  _az_PRECONDITION(token_expiration_epoch_time > 0);
-  _az_PRECONDITION_NOT_NULL(mqtt_password);
-  _az_PRECONDITION(mqtt_password_size > 0);
+  _az_precondition_not_null(client);
+  _az_precondition_valid_span(base64_hmac_sha256_signature, 1, false);
+  _az_precondition(token_expiration_epoch_time > 0);
+  _az_precondition_not_null(mqtt_password);
+  _az_precondition(mqtt_password_size > 0);
 
   // Concatenates:
   // "SharedAccessSignature sr=<url-encoded(resource-string)>&sig=<signature>&se=<expiration-time>"

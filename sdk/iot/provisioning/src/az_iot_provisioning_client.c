@@ -48,10 +48,10 @@ AZ_NODISCARD az_result az_iot_provisioning_client_init(
     az_span registration_id,
     az_iot_provisioning_client_options const* options)
 {
-  _az_PRECONDITION_NOT_NULL(client);
-  _az_PRECONDITION_VALID_SPAN(global_device_endpoint, 1, false);
-  _az_PRECONDITION_VALID_SPAN(id_scope, 1, false);
-  _az_PRECONDITION_VALID_SPAN(registration_id, 1, false);
+  _az_precondition_not_null(client);
+  _az_precondition_valid_span(global_device_endpoint, 1, false);
+  _az_precondition_valid_span(id_scope, 1, false);
+  _az_precondition_valid_span(registration_id, 1, false);
 
   client->_internal.global_device_endpoint = global_device_endpoint;
   client->_internal.id_scope = id_scope;
@@ -70,9 +70,9 @@ AZ_NODISCARD az_result az_iot_provisioning_client_get_user_name(
     size_t mqtt_user_name_size,
     size_t* out_mqtt_user_name_length)
 {
-  _az_PRECONDITION_NOT_NULL(client);
-  _az_PRECONDITION_NOT_NULL(mqtt_user_name);
-  _az_PRECONDITION(mqtt_user_name_size > 0);
+  _az_precondition_not_null(client);
+  _az_precondition_not_null(mqtt_user_name);
+  _az_precondition(mqtt_user_name_size > 0);
 
   az_span provisioning_service_api_version
       = AZ_SPAN_LITERAL_FROM_STR("/api-version=" AZ_IOT_PROVISIONING_SERVICE_VERSION);
@@ -123,9 +123,9 @@ AZ_NODISCARD az_result az_iot_provisioning_client_get_client_id(
     size_t mqtt_client_id_size,
     size_t* out_mqtt_client_id_length)
 {
-  _az_PRECONDITION_NOT_NULL(client);
-  _az_PRECONDITION_NOT_NULL(mqtt_client_id);
-  _az_PRECONDITION(mqtt_client_id_size > 0);
+  _az_precondition_not_null(client);
+  _az_precondition_not_null(mqtt_client_id);
+  _az_precondition(mqtt_client_id_size > 0);
 
   az_span mqtt_client_id_span
       = az_span_init((uint8_t*)mqtt_client_id, (int32_t)mqtt_client_id_size);
@@ -155,9 +155,9 @@ AZ_NODISCARD az_result az_iot_provisioning_client_register_get_publish_topic(
 {
   (void)client;
 
-  _az_PRECONDITION_NOT_NULL(client);
-  _az_PRECONDITION_NOT_NULL(mqtt_topic);
-  _az_PRECONDITION(mqtt_topic_size > 0);
+  _az_precondition_not_null(client);
+  _az_precondition_not_null(mqtt_topic);
+  _az_precondition(mqtt_topic_size > 0);
 
   az_span mqtt_topic_span = az_span_init((uint8_t*)mqtt_topic, (int32_t)mqtt_topic_size);
   az_span str_dps_registrations = _az_iot_provisioning_get_str_dps_registrations();
@@ -189,12 +189,12 @@ AZ_NODISCARD az_result az_iot_provisioning_client_query_status_get_publish_topic
 {
   (void)client;
 
-  _az_PRECONDITION_NOT_NULL(client);
-  _az_PRECONDITION_NOT_NULL(mqtt_topic);
-  _az_PRECONDITION(mqtt_topic_size > 0);
+  _az_precondition_not_null(client);
+  _az_precondition_not_null(mqtt_topic);
+  _az_precondition(mqtt_topic_size > 0);
 
-  _az_PRECONDITION_NOT_NULL(register_response);
-  _az_PRECONDITION_VALID_SPAN(register_response->operation_id, 1, false);
+  _az_precondition_not_null(register_response);
+  _az_precondition_valid_span(register_response->operation_id, 1, false);
 
   az_span mqtt_topic_span = az_span_init((uint8_t*)mqtt_topic, (int32_t)mqtt_topic_size);
   az_span str_dps_registrations = _az_iot_provisioning_get_str_dps_registrations();
@@ -430,10 +430,10 @@ AZ_NODISCARD az_result az_iot_provisioning_client_parse_received_topic_and_paylo
 {
   (void)client;
 
-  _az_PRECONDITION_NOT_NULL(client);
-  _az_PRECONDITION_VALID_SPAN(received_topic, 0, false);
-  _az_PRECONDITION_VALID_SPAN(received_payload, 0, false);
-  _az_PRECONDITION_NOT_NULL(out_response);
+  _az_precondition_not_null(client);
+  _az_precondition_valid_span(received_topic, 0, false);
+  _az_precondition_valid_span(received_payload, 0, false);
+  _az_precondition_not_null(out_response);
 
   az_span str_dps_registrations_res = _az_iot_provisioning_get_dps_registrations_res();
   int32_t idx = az_span_find(received_topic, str_dps_registrations_res);

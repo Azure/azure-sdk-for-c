@@ -26,7 +26,7 @@
  */
 AZ_NODISCARD AZ_INLINE az_result _az_http_request_mark_retry_headers_start(_az_http_request* p_hrb)
 {
-  _az_PRECONDITION_NOT_NULL(p_hrb);
+  _az_precondition_not_null(p_hrb);
   p_hrb->_internal.retry_headers_start_byte_offset
       = p_hrb->_internal.headers_length * (int32_t)sizeof(az_pair);
   return AZ_OK;
@@ -34,7 +34,7 @@ AZ_NODISCARD AZ_INLINE az_result _az_http_request_mark_retry_headers_start(_az_h
 
 AZ_NODISCARD AZ_INLINE az_result _az_http_request_remove_retry_headers(_az_http_request* p_hrb)
 {
-  _az_PRECONDITION_NOT_NULL(p_hrb);
+  _az_precondition_not_null(p_hrb);
   p_hrb->_internal.headers_length
       = p_hrb->_internal.retry_headers_start_byte_offset / (int32_t)sizeof(az_pair);
   return AZ_OK;

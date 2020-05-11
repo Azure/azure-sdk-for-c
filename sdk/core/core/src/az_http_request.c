@@ -29,10 +29,10 @@ AZ_NODISCARD az_result az_http_request_init(
     az_span headers_buffer,
     az_span body)
 {
-  _az_PRECONDITION_NOT_NULL(p_request);
-  _az_PRECONDITION_VALID_SPAN(method, 1, false);
-  _az_PRECONDITION_VALID_SPAN(url, 1, false);
-  _az_PRECONDITION_VALID_SPAN(headers_buffer, 0, false);
+  _az_precondition_not_null(p_request);
+  _az_precondition_valid_span(method, 1, false);
+  _az_precondition_valid_span(url, 1, false);
+  _az_precondition_valid_span(headers_buffer, 0, false);
 
   int32_t query_start = 0;
   az_result url_with_query = _az_span_scan_until(
@@ -62,7 +62,7 @@ AZ_NODISCARD az_result az_http_request_init(
 
 AZ_NODISCARD az_result az_http_request_append_path(_az_http_request* p_request, az_span path)
 {
-  _az_PRECONDITION_NOT_NULL(p_request);
+  _az_precondition_not_null(p_request);
 
   // get the query starting point.
   bool url_with_question_mark = p_request->_internal.query_start > 0;
@@ -100,12 +100,12 @@ AZ_NODISCARD az_result az_http_request_append_path(_az_http_request* p_request, 
 AZ_NODISCARD az_result
 az_http_request_set_query_parameter(_az_http_request* p_request, az_span name, az_span value)
 {
-  _az_PRECONDITION_NOT_NULL(p_request);
-  _az_PRECONDITION_VALID_SPAN(name, 1, false);
-  _az_PRECONDITION_VALID_SPAN(value, 1, false);
+  _az_precondition_not_null(p_request);
+  _az_precondition_valid_span(name, 1, false);
+  _az_precondition_valid_span(value, 1, false);
 
   // name or value can't be empty
-  _az_PRECONDITION(az_span_size(name) > 0 && az_span_size(value) > 0);
+  _az_precondition(az_span_size(name) > 0 && az_span_size(value) > 0);
 
   int32_t required_length = az_span_size(name) + az_span_size(value) + 2;
 
@@ -147,16 +147,16 @@ az_http_request_set_query_parameter(_az_http_request* p_request, az_span name, a
 AZ_NODISCARD az_result
 az_http_request_append_header(_az_http_request* p_request, az_span key, az_span value)
 {
-  _az_PRECONDITION_NOT_NULL(p_request);
+  _az_precondition_not_null(p_request);
 
   // remove white spaces from key and value
   key = _az_span_trim_white_space(key);
   value = _az_span_trim_white_space(value);
 
-  _az_PRECONDITION_VALID_SPAN(key, 1, false);
+  _az_precondition_valid_span(key, 1, false);
 
   // Make this function to only work with valid input for header name
-  _az_PRECONDITION(az_http_is_valid_header_name(key));
+  _az_precondition(az_http_is_valid_header_name(key));
 
   az_span headers = p_request->_internal.headers;
   az_pair header_to_append = az_pair_init(key, value);
@@ -175,8 +175,8 @@ az_http_request_append_header(_az_http_request* p_request, az_span key, az_span 
 AZ_NODISCARD az_result
 az_http_request_get_header(_az_http_request const* request, int32_t index, az_pair* out_header)
 {
-  _az_PRECONDITION_NOT_NULL(request);
-  _az_PRECONDITION_NOT_NULL(out_header);
+  _az_precondition_not_null(request);
+  _az_precondition_not_null(out_header);
 
   if (index >= az_http_request_headers_count(request))
   {
@@ -190,8 +190,8 @@ az_http_request_get_header(_az_http_request const* request, int32_t index, az_pa
 AZ_NODISCARD az_result
 az_http_request_get_method(_az_http_request const* request, az_http_method* out_method)
 {
-  _az_PRECONDITION_NOT_NULL(request);
-  _az_PRECONDITION_NOT_NULL(out_method);
+  _az_precondition_not_null(request);
+  _az_precondition_not_null(out_method);
 
   *out_method = request->_internal.method;
 
@@ -200,8 +200,8 @@ az_http_request_get_method(_az_http_request const* request, az_http_method* out_
 
 AZ_NODISCARD az_result az_http_request_get_url(_az_http_request const* request, az_span* out_url)
 {
-  _az_PRECONDITION_NOT_NULL(request);
-  _az_PRECONDITION_NOT_NULL(out_url);
+  _az_precondition_not_null(request);
+  _az_precondition_not_null(out_url);
 
   *out_url = az_span_slice(request->_internal.url, 0, request->_internal.url_length);
 
@@ -210,8 +210,8 @@ AZ_NODISCARD az_result az_http_request_get_url(_az_http_request const* request, 
 
 AZ_NODISCARD az_result az_http_request_get_body(_az_http_request const* request, az_span* out_body)
 {
-  _az_PRECONDITION_NOT_NULL(request);
-  _az_PRECONDITION_NOT_NULL(out_body);
+  _az_precondition_not_null(request);
+  _az_precondition_not_null(out_body);
 
   *out_body = request->_internal.body;
   return AZ_OK;

@@ -34,10 +34,10 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_document_get_publish_topic(
     size_t mqtt_topic_size,
     size_t* out_mqtt_topic_length)
 {
-  _az_PRECONDITION_NOT_NULL(client);
-  _az_PRECONDITION_VALID_SPAN(request_id, 1, false);
-  _az_PRECONDITION_NOT_NULL(mqtt_topic);
-  _az_PRECONDITION(mqtt_topic_size > 0);
+  _az_precondition_not_null(client);
+  _az_precondition_valid_span(request_id, 1, false);
+  _az_precondition_not_null(mqtt_topic);
+  _az_precondition(mqtt_topic_size > 0);
   (void)client;
 
   az_span mqtt_topic_span = az_span_init((uint8_t*)mqtt_topic, (int32_t)mqtt_topic_size);
@@ -72,10 +72,10 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_patch_get_publish_topic(
     size_t mqtt_topic_size,
     size_t* out_mqtt_topic_length)
 {
-  _az_PRECONDITION_NOT_NULL(client);
-  _az_PRECONDITION_VALID_SPAN(request_id, 1, false);
-  _az_PRECONDITION_NOT_NULL(mqtt_topic);
-  _az_PRECONDITION(mqtt_topic_size > 0);
+  _az_precondition_not_null(client);
+  _az_precondition_valid_span(request_id, 1, false);
+  _az_precondition_not_null(mqtt_topic);
+  _az_precondition(mqtt_topic_size > 0);
   (void)client;
 
   az_span mqtt_topic_span = az_span_init((uint8_t*)mqtt_topic, (int32_t)mqtt_topic_size);
@@ -108,9 +108,9 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
     az_span received_topic,
     az_iot_hub_client_twin_response* out_twin_response)
 {
-  _az_PRECONDITION_NOT_NULL(client);
-  _az_PRECONDITION_VALID_SPAN(received_topic, 1, false);
-  _az_PRECONDITION_NOT_NULL(out_twin_response);
+  _az_precondition_not_null(client);
+  _az_precondition_valid_span(received_topic, 1, false);
+  _az_precondition_not_null(out_twin_response);
   (void)client;
 
   az_result result;
