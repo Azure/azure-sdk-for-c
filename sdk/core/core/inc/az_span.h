@@ -26,7 +26,7 @@
 #include <_az_cfg_prefix.h>
 
 /**
- * A span is a "view" over a byte buffer that represents a contiguous region of memory. It contains
+ * @brief A span is a "view" over a byte buffer that represents a contiguous region of memory. It contains
  * a pointer to the start of the byte buffer and the buffer's size.
  */
 typedef struct
@@ -389,7 +389,7 @@ AZ_NODISCARD az_result az_span_dtoa(az_span destination, double source, az_span*
 /******************************  SPAN PAIR  */
 
 /**
- * An #az_pair represents a key/value pair of #az_span instances.
+ * @brief Represents a key/value pair of #az_span instances.
  * This is typically used for HTTP query parameters and headers.
  */
 typedef struct
