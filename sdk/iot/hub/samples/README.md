@@ -104,7 +104,7 @@ For extensive documentation on Azure IoT Hub, see the [API reference documentati
 [IOT_CLIENT_README]: ../../README.md
 [SDK_README_GETTING_STARTED]: ../../README.md#getting-started
 [SDK_README_KEY_CONCEPTS]: ../../README.md#key-concepts
-[VCPKG_DIRECTIONS]:../../../../CONTRIBUTING.md#development-environment
+[VCPKG_DIRECTIONS]:../../../../README.md#development-environment
 [c2d_sample]: src/paho_iot_hub_c2d_example.c
 [methods_sample]: src/paho_iot_hub_methods_example.c
 [telemetry_sample]: src/paho_iot_hub_telemetry_example.c
