@@ -23,14 +23,9 @@ void _az_log_write(az_log_classification classification, az_span message);
 
 #else
 
-#define _az_LOG_SHOULD_WRITE(classification) ((void)classification, false)
+#define _az_LOG_SHOULD_WRITE(classification) false
 
-#define _az_LOG_WRITE(classification, message) \
-  do \
-  { \
-    (void)classification; \
-    (void)message; \
-  } while (0)
+#define _az_LOG_WRITE(classification, message)
 
 #endif // AZ_NO_LOGGING
 
