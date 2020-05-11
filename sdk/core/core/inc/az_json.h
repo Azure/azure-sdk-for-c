@@ -342,20 +342,6 @@ az_json_builder_append_property_name(az_json_builder* json_builder, az_span name
  */
 AZ_NODISCARD az_result az_json_builder_append_bool(az_json_builder* json_builder, bool value);
 
-// TODO: Consider removing for now until we have complete double formatting and parsing.
-/**
- * @brief Appends a double number value.
- *
- * @param[in] json_builder A pointer to an #az_json_builder instance containing the buffer to append
- * the number to.
- * @param[in] value The value to be written as a JSON number.
- *
- * @return An #az_result value indicating the result of the operation:
- *         - #AZ_OK if the number was appended successfully
- *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the buffer is too small
- */
-AZ_NODISCARD az_result az_json_builder_append_number(az_json_builder* json_builder, double value);
-
 /**
  * @brief Appends an int32_t number value.
  *
