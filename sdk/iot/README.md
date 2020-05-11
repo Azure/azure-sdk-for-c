@@ -2,7 +2,7 @@
 
 Azure SDK for Embedded C official IoT Hub client library.
 
-## Getting started
+## Getting Started
 
 - **Docs**: If you're new to the Azure SDK for Embedded C take a look at the [State Machine diagram](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/iot/doc/mqtt_state_machine.md) that explains the high-level architecture, SDK components, and a clear view of SDK x Application responsibilities. 
 
@@ -144,7 +144,7 @@ void my_telemetry_func()
 }
 ```
 
-## Need help?
+## Need Help?
 
 * File an issue via [Github Issues](https://github.com/Azure/azure-sdk-for-c/issues/new/choose).
 * Check [previous questions](https://stackoverflow.com/questions/tagged/azure+c) or ask new ones on StackOverflow using

@@ -13,7 +13,7 @@ urlFragment: iot-hub-samples
 
 This document explains samples for the Azure SDK for Embedded C IoT Hub Client and how to use them.
 
-## Key concepts
+## Key Concepts
 
 Key concepts are explained in detail [here][SDK_README_KEY_CONCEPTS].
 
@@ -24,7 +24,7 @@ install OpenSSL prior to using the script.
 - To use the samples, we use [Eclipse Paho MQTT C client][Eclipse_Paho]. You can use the directions
 [here][VCPKG_DIRECTIONS] to set up VCPKG to download and manage linking the dependency.
 
-## Getting started
+## Getting Started
 
 These samples use X509 authentication to connect to Azure IoT Hub. To easily run these samples, we have provided
 a script to generate a self-signed device certificate used for device authentication. You can run it using the following
@@ -92,7 +92,7 @@ Receive and view incoming C2D messages using the IoT Hub Client.
 
 When interacting with the Azure IoT Hub using this C client library, errors are documented within the [MQTT State Machine][error_codes] requests.
 
-## Next steps
+## Next Steps
 
 Start using the IoT Hub Client in your solutions. More SDK details can be found in [SDK README][IOT_CLIENT_README].
 

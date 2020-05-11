@@ -12,13 +12,13 @@ urlFragment: keyvault-keys-samples
 # Azure KeyVault Keys Samples client Library for Embedded C
 This document explains samples and how to use them.
 
-## Key concepts
+## Key Concepts
 Key concepts are explained in detail [here][SDK_README_KEY_CONCEPTS].
 
 # Samples Azure KeyVault Keys APIs
 This document describes how to use samples and what is done in each sample.
 
-## Getting started
+## Getting Started
 Getting started explained in detail [here][SDK_README_GETTING_STARTED].
 
 ## Examples
@@ -29,7 +29,7 @@ Getting started explained in detail [here][SDK_README_GETTING_STARTED].
 ## Troubleshooting
 
 
-## Next steps
+## Next Steps
 
 
 ###  Additional Documentation

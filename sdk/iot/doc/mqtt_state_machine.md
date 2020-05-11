@@ -1,6 +1,6 @@
 # Azure IoT Client MQTT State Machine
 
-## High-level architecture
+## High-level Architecture
 
 Device Provisioning and IoT Hub service protocols require additional state management on top of the MQTT protocol. The Azure IoT Hub and Provisioning clients for C provide a common programming model. The clients must be layered on top of an MQTT client selected by the application developer.
 
@@ -78,7 +78,7 @@ Recommended defaults:
 We recommend to always use [Clean Session](http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc398718030) false when connecting to IoT Hub.
 Connecting with Clean Session true will remove all enqueued C2D messages.
 
-### Subscribe to topics
+### Subscribe to Topics
 
 Each service requiring a subscription implements a function similar to the following:
 
@@ -158,7 +158,7 @@ __Important:__ C2D messages are not enqueued until the device establishes the fi
 
 Retrying operations requires understanding two aspects: error evaluation (did the operation fail, should the operation be retried) and retry timing (how long to delay before retrying the operation). The IoT client library is supplying optional APIs for error classification and retry timing.
 
-#### Error policy
+#### Error Policy
 
 The SDK will not handle protocol-level (WebSocket, MQTT, TLS or TCP) errors. The application-developer is expected to classify and handle errors the following way:
 
@@ -192,7 +192,7 @@ else
 }
 ```
 
-#### Retry timing
+#### Retry Timing
 
 Network timeouts and the MQTT keep-alive interval should be configured considering tradeoffs between how fast network issues are detected vs traffic overheads. [This document](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-mqtt-support#default-keep-alive-timeout) describes the recommended keep-alive timeouts as well as the minimum idle timeout supported by Azure IoT services.
 

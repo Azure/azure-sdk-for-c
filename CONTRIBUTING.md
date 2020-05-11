@@ -24,11 +24,11 @@ Many people all over the world have helped make this project better.  You'll wan
 
 * Chat with other community members [![Join the chat at https://gitter.im/azure/azure-sdk-for-c](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/azure/azure-sdk-for-c?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-### Reporting security issues and security bugs
+### Reporting Security Issues and Security Bugs
 
 Security issues and bugs should be reported privately, via email, to the Microsoft Security Response Center (MSRC) <secure@microsoft.com>. You should receive a response within 24 hours. If for some reason you do not, please follow up via email to ensure we received your original message. Further information, including the MSRC PGP key, can be found in the [Security TechCenter](https://www.microsoft.com/msrc/faqs-report-an-issue).
 
-# How to contribute to the Azure SDK for Embedded C
+# How to Contribute to the Azure SDK for Embedded C
 
 There are manay ways that you can contribute to the Azure SDK for Embedded C project.
 
@@ -77,7 +77,7 @@ See how `vcpkg` can be used to install dependencies [here][vcpkg].
 
 ## Running Tests
 
-### Unit tests
+### Unit Tests
 
 See [compiler options section](#compiler-options) to learn about how to build and run unit tests.
 
@@ -91,7 +91,7 @@ ctest -V
 ```
 
 
-### Test with mocked functions
+### Test with Mocked Functions
 
 Some test uses linker option ld to wrap functions and mock the implementation for it to do unit testing. Specially for PAL-related functions, mocking functions becomes a convenient way to break dependency between functions.
 
