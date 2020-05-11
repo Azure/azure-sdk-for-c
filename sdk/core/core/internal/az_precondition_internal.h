@@ -55,7 +55,10 @@ AZ_INLINE void _az_precondition(bool condition)
 #endif // AZ_NO_PRECONDITION_CHECKING
 }
 
-#define _az_PRECONDITION_RANGE(low, arg, max) _az_precondition((low <= arg && arg <= max))
+AZ_INLINE void _az_precondition_range(int32_t low, int32_t arg, int32_t max)
+{
+  _az_precondition((low <= arg && arg <= max));
+}
 
 AZ_INLINE void _az_precondition_not_null(void const* arg) { _az_precondition(arg != NULL); }
 AZ_INLINE void _az_precondition_null(void const* arg) { _az_precondition(arg == NULL); }
