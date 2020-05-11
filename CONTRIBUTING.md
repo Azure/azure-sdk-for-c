@@ -91,7 +91,7 @@ ctest -V
 ```
 
 
-### Test With Mocked Functions
+### Test with Mocked Functions
 
 Some test uses linker option ld to wrap functions and mock the implementation for it to do unit testing. Specially for PAL-related functions, mocking functions becomes a convenient way to break dependency between functions.
 

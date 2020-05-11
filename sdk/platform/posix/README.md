@@ -1,4 +1,4 @@
-# Azure Platform Abstraction Layer Implemented With POSIX APIs
+# Azure Platform Abstraction Layer Implemented with POSIX APIs
 
 Azure POSIX Platform abstraction layer (`az_posix`) provides platform-specific implementation for the small set of features that Azure SDK needs, yet they are not available as a part of the C99 standard library. This library follows the Azure SDK Design Guidelines for Embedded C.
 
