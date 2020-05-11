@@ -60,7 +60,7 @@ AZ_NODISCARD az_span az_span_slice(az_span span, int32_t start_index, int32_t en
   //    0 <= end_index <= span.size
   // And
   //    0 <= start_index <= end_index
-  _az_PRECONDITION_RANGE(0, end_index, az_span_size(span));
+  _az_precondition_range(0, end_index, az_span_size(span));
   _az_precondition((uint32_t)start_index <= (uint32_t)end_index);
 
   return az_span_init(az_span_ptr(span) + start_index, end_index - start_index);
