@@ -153,13 +153,14 @@ static const uint8_t az_http_valid_token[256] = {
   // ...128-255 is all zeros (not valid) characters
 };
 
-#ifndef AZ_NO_PRECONDITION_CHECKING
-
 /* This function is for httpRequest only to check header names are valid.
  * Validation is a Precondition so this code would compile away if preconditions are OFF
  */
 AZ_NODISCARD AZ_INLINE bool az_http_is_valid_header_name(az_span name)
 {
+#ifdef AZ_NO_PRECONDITION_CHECKING
+  (void)name;
+#else
   uint8_t* name_ptr = az_span_ptr(name);
   for (int32_t i = 0; i < az_span_size(name); i++)
   {
@@ -170,9 +171,8 @@ AZ_NODISCARD AZ_INLINE bool az_http_is_valid_header_name(az_span name)
     }
   }
   return true;
-}
-
 #endif // AZ_NO_PRECONDITION_CHECKING
+}
 
 #include <_az_cfg_suffix.h>
 
