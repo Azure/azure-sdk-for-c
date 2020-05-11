@@ -98,20 +98,29 @@ static void test_az_span_is_content_equal(void** state)
   az_span a = AZ_SPAN_FROM_STR("one");
   az_span b = AZ_SPAN_FROM_STR("One");
   az_span c = AZ_SPAN_FROM_STR("one1");
+  az_span d = AZ_SPAN_FROM_STR("done"); // d contains a
 
   assert_false(az_span_is_content_equal(a, b));
   assert_false(az_span_is_content_equal(b, a));
   assert_false(az_span_is_content_equal(a, c));
   assert_false(az_span_is_content_equal(c, a));
+  assert_false(az_span_is_content_equal(a, d));
+  assert_false(az_span_is_content_equal(d, a));
 
   assert_true(az_span_is_content_equal(a, AZ_SPAN_FROM_STR("one")));
-
-  assert_false(az_span_is_content_equal(a, AZ_SPAN_NULL));
-  assert_false(az_span_is_content_equal(AZ_SPAN_NULL, a));
-  assert_true(az_span_is_content_equal(AZ_SPAN_NULL, AZ_SPAN_NULL));
   assert_true(az_span_is_content_equal(a, a));
 
+  // Comparing subsets
+  assert_true(az_span_is_content_equal(a, az_span_slice_to_end(d, 1)));
+  assert_true(az_span_is_content_equal(az_span_slice_to_end(d, 1), a));
+
+  // Comparing empty to non-empty
+  assert_false(az_span_is_content_equal(a, AZ_SPAN_NULL));
+  assert_false(az_span_is_content_equal(AZ_SPAN_NULL, a));
+
   // Empty spans are equal
+  assert_true(az_span_is_content_equal(AZ_SPAN_NULL, AZ_SPAN_NULL));
+
   assert_true(az_span_is_content_equal(az_span_slice_to_end(a, 3), AZ_SPAN_NULL));
   assert_true(az_span_is_content_equal(az_span_slice_to_end(a, 3), az_span_slice_to_end(b, 3)));
 
