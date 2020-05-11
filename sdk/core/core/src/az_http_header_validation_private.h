@@ -160,6 +160,7 @@ AZ_NODISCARD AZ_INLINE bool az_http_is_valid_header_name(az_span name)
 {
 #ifdef AZ_NO_PRECONDITION_CHECKING
   (void)name;
+  return true;
 #else
   uint8_t* name_ptr = az_span_ptr(name);
   for (int32_t i = 0; i < az_span_size(name); i++)
