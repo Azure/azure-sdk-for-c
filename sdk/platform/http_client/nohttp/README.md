@@ -4,25 +4,25 @@ Azure Empty Transport Policy (`az_nohttp`) provides an empty stub for the HTTP t
 
 The library allows clients to communicate with Azure.
 
-## Getting started
+## Getting Started
 
-### Install the package
-
-TODO
-
-### Authenticate the client
+### Install the Package
 
 TODO
 
-### Get credentials
+### Authenticate the Client
 
 TODO
 
-### Create client
+### Get Credentials
 
 TODO
 
-## Key concepts
+### Create Client
+
+TODO
+
+## Key Concepts
 
 TODO
 
@@ -36,17 +36,17 @@ TODO
 
 TODO
 
-### Retry policy
+### Retry Policy
 
 TODO
 
-## Next steps
+## Next Steps
 
-### More sample code
+### More Sample Code
 
 TODO
 
-### Additional documentation
+### Additional Documentation
 
 TODO
 

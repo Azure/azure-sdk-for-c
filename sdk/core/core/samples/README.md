@@ -10,13 +10,13 @@ urlFragment: core-samples
 # Azure Core Samples client Library for Embedded C
 This document explains samples and how to use them.
 
-## Key concepts
+## Key Concepts
 
 
 # Samples Azure Core
 
 
-## Getting started
+## Getting Sarted
 
 
 ## Examples
@@ -25,7 +25,7 @@ This document explains samples and how to use them.
 ## Troubleshooting
 
 
-## Next steps
+## Next Steps
 
 
 ###  Additional Documentation

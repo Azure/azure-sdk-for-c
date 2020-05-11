@@ -1,26 +1,26 @@
-# Azure Platform abstraction layer implemented with Win32 library
+# Azure Platform Abstraction Layer Implemented With Win32 Library
 
 Azure Win32 Platform abstraction layer (`az_win32`) provides platform-specific implementation for the small set of features that Azure SDK needs, yet they are not available as a part of the C99 standard library. This library follows the Azure SDK Design Guidelines for Embedded C.
 
-## Getting started
+## Getting Started
 
-### Install the package
-
-TODO
-
-### Authenticate the client
+### Install the Package
 
 TODO
 
-### Get credentials
+### Authenticate the Client
 
 TODO
 
-### Create client
+### Get Credentials
 
 TODO
 
-## Key concepts
+### Create Client
+
+TODO
+
+## Key Concepts
 
 TODO
 
@@ -34,17 +34,17 @@ TODO
 
 TODO
 
-### Retry policy
+### Retry Policy
 
 TODO
 
-## Next steps
+## Next Steps
 
-### More sample code
+### More Sample Code
 
 TODO
 
-### Additional documentation
+### Additional Documentation
 
 TODO
 

@@ -4,7 +4,7 @@ Azure Core Library for Embedded C (`az_core`) provides shared primitives, abstra
 
 The library allows client libraries to expose common functionality in a consistent fashion.  Once you learn how to use these APIs in one client library, you will know how to use them in other client libraries.
 
-## Getting started
+## Getting Started
 
 TODO
 
@@ -12,13 +12,13 @@ TODO
 
 The `Azure Core` library requires you to implement a few functions to provide platform-specific features such as a clock, a thread sleep, a mutual-exclusive thread synchronization lock, and an HTTP stack. By default, `Azure Core` ships with no-op versions of these functions, all of which return `AZ_RESULT_NOT_IMPLEMENTED`. The no-op versions allow the Azure SDK to compile successfully so you can verify that your build tool chain is working properly; however, failures occur if you execute the code.
 
-## Key concepts
+## Key Concepts
 
 ### Function Results
 
 Many SDK functions return an `az_result` as defined in [inc/az_result.h](inc/az_result.h) header file. An `az_result` is a 32-bit enum value. When a function succeeds, it typically returns AZ_OK. When a function fails, it returns an `az_result` symbol prefixed with `AZ_ERROR_`. A few functions return a reason for success; these symbols will be prefixed with `AZ_` but will **not** contain `ERROR` in the symbol. For functions that need to return an `az_result` and some other value; the other value is returned via an output parameter. If you simply want to know if an `az_result` value indicates generic success or failure, call either the `az_succeeded` or `az_failed` function, respectively. Both of these functions take an `az_result` value and return `true` or `false`.
 
-### Working with Spans
+### Working With Spans
 
 An `az_span` is a small data structure (defined in our [az_span.h](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/core/core/inc/az_span.h) file) wrapping a byte buffer. Specifically, an `az_span` instance contains:
 

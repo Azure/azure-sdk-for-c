@@ -4,13 +4,13 @@ Official Embedded C client for Azure IoT Provisioning Service.
 
 For more details about Provisioning Service check [Azure documentation](https://docs.microsoft.com/azure/iot-dps/)
 
-## Getting started
+## Getting Started
 
 - Pelase refer to the state machine diagram which describes the Azure SDK for Embedded C flow for Provisioning Service [here](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/iot/doc/mqtt_state_machine.md#device-provisioning-service). 
 
 - **Samples**: [This page](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/iot/provisioning/samples) explains samples for the Azure SDK for Embedded C IoT Provisioning Client and how to use them.
 
-## Need help?
+## Need Help?
 
 * File an issue via [Github Issues](https://github.com/Azure/azure-sdk-for-c/issues/new/choose).
 * Check [previous questions](https://stackoverflow.com/questions/tagged/azure+c) or ask new ones on StackOverflow using

@@ -7,25 +7,25 @@ Use the Azure SDK Storage Blobs Library for Embedded C to work with Azure Storag
 * Upload blobs
 * Create and modify blob metadata
 
-## Getting started
+## Getting Started
 
-### Install the package
+### Install the Package
 
 TODO link to the vcpkg
 
-### Authenticate the client
+### Authenticate the Client
 
 TODO
 
-### Get credentials
+### Get Credentials
 
 TODO
 
-### Create client
+### Create Client
 
 TODO
 
-## Key concepts
+## Key Concepts
 
 TODO
 
@@ -39,17 +39,17 @@ TODO
 
 TODO
 
-### Retry policy
+### Retry Policy
 
 While working with Storage, you might encounter transient failures caused by [rate limits][storage_rate_limits] enforced by the service, or other transient problems like network outages. For information about handling these types of failures, see [Retry pattern][azure_pattern_retry] in the Cloud Design Patterns guide, and the related [Circuit Breaker pattern][azure_pattern_circuit_breaker].
 
-## Next steps
+## Next Steps
 
-### More sample code
+### More Sample Code
 
 TODO
 
-### Additional documentation
+### Additional Documentation
 
 For more extensive documentation on Azure Storage service, see the [Azure Storage documentation][storage_docs] on docs.microsoft.com.
 
