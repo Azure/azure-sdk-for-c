@@ -106,11 +106,10 @@ typedef enum
 } az_http_status_code;
 
 /**
- * @brief An az_http_policy_retry_options instance allows you to customize the retry policy
- * used by an XxxClient type whenever it performs an I/O operation. Applications should
- * acquire an initialized instance of this struct by calling az_http_policy_retry_options_default
- * first and then modify any fields you desire before passing a pointer to this struct
- * when initializing the XxxClient.
+ * @brief Allows you to customize the retry policy used by SDK clients whenever they performs an I/O
+ * operation.
+ * @details Applications should acquire an initialized instance of this struct and then modify any
+ * fields you desire before passing a pointer to this struct when initializing the specific client.
  */
 typedef struct
 {
@@ -129,12 +128,12 @@ typedef enum
 } _az_http_response_kind;
 
 /**
- * @brief az_http_response represents an HTTP response.
+ * @brief Represents an HTTP response.
  *
- * Users create an instance of this and pass it in to an Azure service client's operation function.
- * The function initializes the az_http_response and application code can query the response after
- * the operation completes by calling the az_http_response_get_status_line,
- * az_http_response_get_next_header and az_http_response_get_body functions.
+ * @details Users create an instance of this and pass it in to an Azure service client's operation
+ * function. The function initializes the az_http_response and application code can query the
+ * response after the operation completes by calling the #az_http_response_get_status_line,
+ * #az_http_response_get_next_header and #az_http_response_get_body functions.
  *
  */
 typedef struct
@@ -177,8 +176,8 @@ AZ_NODISCARD AZ_INLINE az_result az_http_response_init(az_http_response* respons
 }
 
 /**
- * @brief az_http_response_status_line represents the result of making an HTTP request.
- * An application obtains this initialed structured by calling az_http_response_get_status_line.
+ * @brief Represents the result of making an HTTP request.
+ * An application obtains this initialized structure by calling #az_http_response_get_status_line.
  *
  * @see https://tools.ietf.org/html/rfc7230#section-3.1.2
  */

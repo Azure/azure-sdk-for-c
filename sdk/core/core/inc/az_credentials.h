@@ -80,7 +80,7 @@ typedef struct
 } _az_credential;
 
 /**
- * @brief az_credential_client_secret is used by an Azure SDK client to authenticate with its
+ * @brief This structure is used by Azure SDK clients to authenticate with the
  * Azure service using a tenant ID, client ID and client secret.
  */
 typedef struct
