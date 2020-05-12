@@ -1,4 +1,4 @@
-# Embedded C for Azure IoT Clients
+# Azure IoT Clients
 
 Azure SDK for Embedded C official IoT Hub client library.
 
