@@ -116,17 +116,17 @@ The following compiler options are available for adding/removing project feature
 <td>OFF</td>
 </tr>
 <tr>
-<td>UNIT_TESTING_MOCK_ENABLED</td>
+<td>UNIT_TESTING_MOCKS</td>
 <td>This option works only with GCC. It uses -ld option from linker to mock functions during unit test. This is used to test platform or HTTP functions by mocking the return values.</td>
 <td>OFF</td>
 </tr>
 <tr>
-<td>BUILD_PRECONDITIONS</td>
+<td>PRECONDITIONS</td>
 <td>Turning this option ON would remove all method contracts. This us typically for shipping libraries for production to make it as much optimized as possible.</td>
 <td>ON</td>
 </tr>
 <tr>
-<td>BUILD_CURL_TRANSPORT</td>
+<td>TRANSPORT_CURL</td>
 <td>This option requires Libcurl dependency to be available. It generates an HTTP stack with libcurl for az_http to be able to send requests thru the wire. This library would replace the no_http.</td>
 <td>OFF</td>
 </tr>
@@ -150,7 +150,7 @@ The following compiler options are available for adding/removing project feature
 Running sample with no_op HTTP implementation.
 Recompile az_core with an HTTP client implementation like CURL to see sample sending network requests.
 
-i.e. cmake -DBUILD_CURL_TRANSPORT=ON ..
+i.e. cmake -DTRANSPORT_CURL=ON ..
 ```
 
 ## Running Samples
