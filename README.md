@@ -46,13 +46,9 @@ When we make an official release, we will create a unique git tag containing the
 
 2. Clone our Azure SDK repository, optionally using the desired version tag.
 
-    ```bash
-    git clone https://github.com/Azure/azure-sdk-for-c
-    ```
+        git clone https://github.com/Azure/azure-sdk-for-c
 
-    ```bash
-    git checkout <tag_name>
-    ```
+        git checkout <tag_name>
 
     For information about using a specific client library, see the README file located in the client library's folder which is a subdirectory under the [`/sdk`](sdk) folder.
 
@@ -60,27 +56,19 @@ When we make an official release, we will create a unique git tag containing the
 
    - Create an output directory for your build artifacts (in this example, we named it `build`, but you can pick any name).
 
-   ```bash
-   mkdir build
-   ```
+          mkdir build
 
    - Navigate to that newly created directory.
 
-   ```bash
-   cd build
-   ```
+          cd build
 
    - Run `cmake` pointing to the sources at the root of the repo to generate the builds files.
 
-    ```bash
-    cmake ..
-    ```
+          cmake ..
 
    - Launch the underlying build system to compile the libraries.
 
-    ```bash
-    cmake --build .
-    ```
+          cmake --build .
 
    This results in building each library as a static library file, placed in the output directory you created (for example `build\sdk\core\core\Debug`). At a minimum, you must have an `Azure Core` library, a `Platform` library, and an `HTTP` library. Then, you can build any additional Azure service client library you intend to use from within your application (for example `build\sdk\storage\blobs\Debug`). To use our client libraries in your application, just `#include` our public header files and then link your application's object files with our library files.
 
@@ -142,16 +130,13 @@ The following compiler options are available for adding/removing project feature
 </tr>
 </table>
 
-
 - ``Samples``: Whenever UNIT_TESTING is ON, samples are built using the default PAL (see [running samples section](#running-samples)). This means that running samples would throw errors like:
 
-```bash
-./keys_client_example
-Running sample with no_op HTTP implementation.
-Recompile az_core with an HTTP client implementation like CURL to see sample sending network requests.
+      ./keys_client_example
+      Running sample with no_op HTTP implementation.
+      Recompile az_core with an HTTP client implementation like CURL to see sample sending network requests.
 
-i.e. cmake -DTRANSPORT_CURL=ON ..
-```
+      i.e. cmake -DBUILD_CURL_TRANSPORT=ON ..
 
 ## Running Samples
 
@@ -358,7 +343,7 @@ Many people all over the world have helped make this project better.  You'll wan
 
 ### Community
 
-* Chat with other community members [![Join the chat at https://gitter.im/azure/azure-sdk-for-c](https://badges.gitter.im/Join%20Chat.png)](https://gitter.im/azure/azure-sdk-for-c?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+* Chat with other community members [![Join the chat at https://gitter.im/azure/azure-sdk-for-c](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/azure/azure-sdk-for-c?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ### Reporting Security Issues and Security Bugs
 
