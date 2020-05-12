@@ -132,7 +132,7 @@ int main()
   {
     printf("Running sample with no_op HTTP implementation.\nRecompile az_core with an HTTP client "
            "implementation like CURL to see sample sending network requests.\n\n"
-           "i.e. cmake -DBUILD_CURL_TRANSPORT=ON ..\n\n");
+           "i.e. cmake -DTRANSPORT_CURL=ON ..\n\n");
     return 0;
   }
 
