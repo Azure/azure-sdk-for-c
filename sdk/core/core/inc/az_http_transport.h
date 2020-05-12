@@ -137,7 +137,7 @@ AZ_NODISCARD az_result az_http_request_get_body(_az_http_request const* request,
  *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the \p response buffer is not big enough to contain
  * the \p source content
  */
-AZ_NODISCARD az_result az_http_response_write_span(az_http_response* response, az_span source);
+AZ_NODISCARD az_result az_http_response_append(az_http_response* response, az_span source);
 
 /**
  * @brief Returns the number of headers within the request.

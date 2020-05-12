@@ -276,7 +276,7 @@ static size_t _az_http_client_curl_write_to_span(
 
   az_span const span_for_content = az_span_init((uint8_t*)contents, (int32_t)expected_size);
 
-  az_result write_response_result = az_http_response_write_span(response, span_for_content);
+  az_result write_response_result = az_http_response_append(response, span_for_content);
 
   if (az_failed(write_response_result))
   {
