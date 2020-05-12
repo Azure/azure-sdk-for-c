@@ -26,8 +26,8 @@
 #include <_az_cfg_prefix.h>
 
 /**
- * @brief A span is a "view" over a byte buffer that represents a contiguous region of memory. It contains
- * a pointer to the start of the byte buffer and the buffer's size.
+ * @brief Represents a "view" over a byte buffer that represents a contiguous region of memory. It
+ * contains a pointer to the start of the byte buffer and the buffer's size.
  */
 typedef struct
 {

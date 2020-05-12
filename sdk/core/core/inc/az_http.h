@@ -128,7 +128,7 @@ typedef enum
 } _az_http_response_kind;
 
 /**
- * @brief Represents an HTTP response.
+ * @brief Allows you to parse an HTTP response's status line, headers, and body.
  *
  * @details Users create an instance of this and pass it in to an Azure service client's operation
  * function. The function initializes the az_http_response and application code can query the
