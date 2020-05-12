@@ -57,7 +57,7 @@ typedef struct
 } az_storage_blobs_blob_client;
 
 /**
- * @brief Init a client with default options
+ * @brief Initialize a client with default options.
  *
  * @param client blob_client to initialize
  * @param url a url to a blob storage account
