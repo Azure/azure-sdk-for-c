@@ -59,18 +59,15 @@ typedef struct
 
 /**
  * @brief Init a client with default options
- * This is convenient method to create a client with basic settings
- * Specific options can be modified after initializing the options
  *
- * @remark Use this, for instance, when only caring about setting one option by calling this method and then
- * overriding that specific option
+ * @param client blob_client to initialize
+ * @param url a url to a blob storage account
+ * @param credential credential object for authentication
+ *         #AZ_CREDENTIAL_ANONYMOUS should be used for SAS
+ * @param options client options
  *
- * @param client HTTP request to get HTTP header from.
- * @param index Index of the HTTP header to get.
- * @param out_header Pointer to write the result to.
- *
- * @retval AZ_OK Success.
- * @retval AZ_ERROR_ARG \a index is out of range.
+ * @return An #az_result value indicating the result of the operation:
+ *         - #AZ_OK if successful
  */
 AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
     az_storage_blobs_blob_client* client,
