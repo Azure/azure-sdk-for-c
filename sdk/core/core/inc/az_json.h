@@ -58,7 +58,7 @@ typedef struct
 } _az_json_bit_stack;
 
 /**
- * @brief An az_json_token instance represents a JSON token. The kind field indicates the kind of
+ * @brief Represents a JSON token. The kind field indicates the kind of
  * token and based on the kind, you can access the corresponding field.
  */
 typedef struct
@@ -425,7 +425,7 @@ AZ_NODISCARD az_result az_json_builder_append_end_array(az_json_builder* json_bu
 typedef uint64_t _az_json_stack;
 
 /**
- * @brief An az_json_parser returns the JSON tokens contained within a JSON buffer.
+ * @brief Returns the JSON tokens contained within a JSON buffer.
  */
 typedef struct
 {
@@ -437,7 +437,7 @@ typedef struct
 } az_json_parser;
 
 /**
- * @brief An az_json_token_member represents a JSON element's name and value.
+ * @brief Represents a JSON element's name and value.
  */
 typedef struct
 {
