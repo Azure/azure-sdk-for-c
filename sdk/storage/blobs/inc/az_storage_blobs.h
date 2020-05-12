@@ -1,6 +1,17 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+/**
+ * @file az_storage_blobs.h
+ *
+ * @brief Definition for the Azure Storage Blob client.
+ *
+ * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
+ * prefixed with an underscore ('_') directly in your application code. These symbols
+ * are part of Azure SDK's internal implementation; we do not document these symbols
+ * and they are subject to change in future versions of the SDK which would break your code.
+ */
+
 #ifndef _az_STORAGE_BLOBS_H
 #define _az_STORAGE_BLOBS_H
 
@@ -16,6 +27,9 @@
 
 #include <_az_cfg_prefix.h>
 
+/**
+ * @brief Client is fixed to a specific version of the Azure Blob Storage service
+ */
 static az_span const AZ_STORAGE_API_VERSION = AZ_SPAN_LITERAL_FROM_STR("2019-02-02");
 
 typedef struct
@@ -42,6 +56,22 @@ typedef struct
   } _internal;
 } az_storage_blobs_blob_client;
 
+
+/**
+ * @brief Init a client with default options
+ * This is convenient method to create a client with basic settings
+ * Specific options can be modified after initializing the options
+ *
+ * @remark Use this, for instance, when only caring about setting one option by calling this method and then
+ * overriding that specific option
+ *
+ * @param client HTTP request to get HTTP header from.
+ * @param index Index of the HTTP header to get.
+ * @param out_header Pointer to write the result to.
+ *
+ * @retval AZ_OK Success.
+ * @retval AZ_ERROR_ARG \a index is out of range.
+ */
 AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
     az_storage_blobs_blob_client* client,
     az_span uri,
@@ -53,28 +83,39 @@ typedef struct
   az_span option;
 } az_storage_blobs_blob_upload_options;
 
+/**
+ * @brief Init a client with default options
+ * This is convenient method to create a client with basic settings
+ * Specific options can be modified after initializing the options
+ *
+ * @remark Use this, for instance, when only caring about setting one option by calling this method
+ * and then overriding that specific option
+ */
 AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_options_default();
 
+/**
+ * @brief Init a blob upload with default options
+ * This is convenient method to create a blob upload options with basic settings
+ * Specific options can be modified after initializing the options
+ *
+ */
 AZ_NODISCARD AZ_INLINE az_storage_blobs_blob_upload_options
 az_storage_blobs_blob_upload_options_default()
 {
   return (az_storage_blobs_blob_upload_options){ .option = AZ_SPAN_NULL };
 }
 
-typedef struct
-{
-  az_span option;
-} az_storage_blobs_blob_download_options;
-
 /**
- * @brief Creates a new blob
+ * @brief Uploads to a blob
  *
  * @param client a storage blobs client structure
+ * @param context supports cancelling long running operations
  * @param content blob content
- * @param options create options for blob. It can be NULL so nothing is added to http request
- * headers
+ * @param options upload options for blob. 
  * @param response a pre allocated buffer where to write http response
- * @return AZ_NODISCARD az_storage_blobs_blob_create
+ *
+ * @return An #az_result value indicating the result of the operation:
+ *         - #AZ_OK if successful
  */
 AZ_NODISCARD az_result az_storage_blobs_blob_upload(
     az_storage_blobs_blob_client* client,
