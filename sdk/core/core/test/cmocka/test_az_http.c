@@ -538,13 +538,40 @@ static void test_http_response_append_overflow(void** state)
 {
   (void)state;
   {
-    uint8_t buffer[10];
+    uint8_t buffer[10] = "..........";
     az_http_response response = { 0 };
     az_span append_this = AZ_SPAN_FROM_STR("0123456789123456");
 
     assert_return_code(az_http_response_init(&response, AZ_SPAN_FROM_BUFFER(buffer)), AZ_OK);
-    az_result overflow = az_http_response_append(&response, append_this);
-    assert_true(overflow == AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+
+    int32_t response_written_state = response._internal.written;
+
+    az_result result = az_http_response_append(&response, append_this);
+    assert_true(result == AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+
+    // make sure buffer content didn't change
+    assert_memory_equal(buffer, "..........", 10);
+
+    // make sure response state didn't change
+    assert_int_equal(response_written_state, response._internal.written);
+  }
+}
+
+static void test_http_response_append_overflow_on_second_call(void** state)
+{
+  (void)state;
+  {
+    uint8_t buffer[10] = "..........";
+    az_http_response response = { 0 };
+    az_span this_will_fit_once = AZ_SPAN_FROM_STR("0123456");
+    assert_return_code(az_http_response_init(&response, AZ_SPAN_FROM_BUFFER(buffer)), AZ_OK);
+
+    assert_return_code(az_http_response_append(&response, this_will_fit_once), AZ_OK);
+
+    az_result result = az_http_response_append(&response, this_will_fit_once);
+    assert_true(result == AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+    assert_memory_equal(buffer, az_span_ptr(this_will_fit_once), 7);
+    assert_memory_equal(buffer + 7, "...", 3);
   }
 }
 
@@ -569,6 +596,7 @@ int test_az_http()
     cmocka_unit_test(test_http_response_header_validation_space),
     cmocka_unit_test(test_http_response_append_overflow),
     cmocka_unit_test(test_http_response_append),
+    cmocka_unit_test(test_http_response_append_overflow_on_second_call),
   };
   return cmocka_run_group_tests_name("az_core_http", tests, NULL, NULL);
 }
