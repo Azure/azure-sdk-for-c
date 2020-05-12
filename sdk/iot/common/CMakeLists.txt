@@ -25,6 +25,6 @@ add_library (az::iot::core ALIAS ${TARGET_NAME})
 
 # set coverage excluding for az_core. Don't show coverage outside iot
 set(COV_EXCLUDE
-    ${az_SOURCE_DIR}/sdk/core/core/inc/*
-    ${az_SOURCE_DIR}/sdk/core/core/internal/*)
+    ${az_SOURCE_DIR}/sdk/core/az_core/inc/*
+    ${az_SOURCE_DIR}/sdk/core/az_core/internal/*)
 include(CreateCodeCoverageTargets)

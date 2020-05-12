@@ -30,7 +30,7 @@ Sometimes we want to illustrate how several APIs or even packages work together 
 This section lists how-to guides for the most commonly used APIs and most common scenarios, i.e. this section does not attempt to be a complete directory of guides contained in this repository. 
 
 #### General How-To Guides
-- [How to create **KeyVault Http Client**](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/core/core#examples)
+- [How to create **KeyVault Http Client**](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/core/az_core#examples)
 - How to configure, access, and analyze **logging** information (TODO)
 
 #### Azure.Storage.Blobs

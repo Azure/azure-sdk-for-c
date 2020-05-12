@@ -45,7 +45,7 @@ include(eng/cmake/global_compile_options.txt)
 # At the end of cmake generate, this file will list the targets for code cov
 file(WRITE ${CMAKE_BINARY_DIR}/coverage_targets.txt "")
 
-add_subdirectory(sdk/core/core)
+add_subdirectory(sdk/core/az_core)
 
 add_subdirectory(sdk/platform/http_client/nohttp)
 # Adding transport implementation for curl
@@ -79,7 +79,7 @@ endif()
 # default for Unit testing with cmocka is OFF, however, this will be ON on CI and tests must
 # pass before commiting changes
 if (UNIT_TESTING)
-  add_subdirectory(sdk/core/core/test/cmocka)
+  add_subdirectory(sdk/core/az_core/test/cmocka)
   add_subdirectory(sdk/storage/blobs/test/cmocka)
   add_subdirectory(sdk/iot/common/tests/cmocka)
   add_subdirectory(sdk/iot/hub/tests/cmocka)
