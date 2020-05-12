@@ -131,7 +131,7 @@ The following compiler options are available for adding/removing project feature
 <td>OFF</td>
 </tr>
 <tr>
-<td>BUILD_PAHO_TRANSPORT</td>
+<td>TRANSPORT_PAHO</td>
 <td>This option requires paho-mqtt dependency to be available. Provides Paho MQTT support for iot.</td>
 <td>OFF</td>
 </tr>
