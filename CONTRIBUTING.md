@@ -97,10 +97,10 @@ Some test uses linker option ld to wrap functions and mock the implementation fo
 
 In order to run this tests, GCC is required (or any compiler that supports -ld linker flag).
 
-To enable building project and linking with this option, as well as adding tests using mocked functions, add option `-DUNIT_TESTING_MOCK_ENABLED=ON` next to `-DUNIT_TESTING=ON` to cmake cache generation (see below example)
+To enable building project and linking with this option, as well as adding tests using mocked functions, add option `-DUNIT_TESTING_MOCKS=ON` next to `-DUNIT_TESTING=ON` to cmake cache generation (see below example)
 
 ```cmake
-cmake -DUNIT_TESTING=ON -DUNIT_TESTING_MOCK_ENABLED=ON ..
+cmake -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON ..
 ```
 
 ## Build Docs

@@ -23,7 +23,7 @@ With this in mind, there are many tenants or principles that we follow in order 
 To get help with the SDK:
 
 - File a [Github Issue](https://github.com/Azure/azure-sdk-for-c/issues/new/choose).
-- Ask new qustions or see others' questions on [Stack Overflow](https://stackoverflow.com/questions/tagged/azure+c) using the `azure` and `c` tags.
+- Ask new questions or see others' questions on [Stack Overflow](https://stackoverflow.com/questions/tagged/azure+c) using the `azure` and `c` tags.
 
 ### Master Branch
 
@@ -82,7 +82,7 @@ When we make an official release, we will create a unique git tag containing the
     cmake --build .
     ```
 
-   This results in building each library as a static library file, placed in the output directory you created (for example `build\sdk\core\core\Debug`). At a minimum, you must have an `Azure Core` library, a `Platform` library, and an `HTTP` library. Then, you can build any additional Azure service client library you intend to use from within your application (for example `build\sdk\storage\blobs\Debug`). To use our client libraries in your application, just `#include` our public header files and then link your application's object files with our libray files.
+   This results in building each library as a static library file, placed in the output directory you created (for example `build\sdk\core\core\Debug`). At a minimum, you must have an `Azure Core` library, a `Platform` library, and an `HTTP` library. Then, you can build any additional Azure service client library you intend to use from within your application (for example `build\sdk\storage\blobs\Debug`). To use our client libraries in your application, just `#include` our public header files and then link your application's object files with our library files.
 
 4. Provide platform-specific implementations for functionality required by `Azure Core`. For more information, see the [Azure Core Porting Guide](sdk/core/core/README.md#Porting-the-Azure-SDK-to-Another-Platform).
 
@@ -116,17 +116,17 @@ The following compiler options are available for adding/removing project feature
 <td>OFF</td>
 </tr>
 <tr>
-<td>UNIT_TESTING_MOCK_ENABLED</td>
+<td>UNIT_TESTING_MOCKS</td>
 <td>This option works only with GCC. It uses -ld option from linker to mock functions during unit test. This is used to test platform or HTTP functions by mocking the return values.</td>
 <td>OFF</td>
 </tr>
 <tr>
-<td>BUILD_PRECONDITIONS</td>
+<td>PRECONDITIONS</td>
 <td>Turning this option ON would remove all method contracts. This us typically for shipping libraries for production to make it as much optimized as possible.</td>
 <td>ON</td>
 </tr>
 <tr>
-<td>BUILD_CURL_TRANSPORT</td>
+<td>TRANSPORT_CURL</td>
 <td>This option requires Libcurl dependency to be available. It generates an HTTP stack with libcurl for az_http to be able to send requests thru the wire. This library would replace the no_http.</td>
 <td>OFF</td>
 </tr>
@@ -150,7 +150,7 @@ The following compiler options are available for adding/removing project feature
 Running sample with no_op HTTP implementation.
 Recompile az_core with an HTTP client implementation like CURL to see sample sending network requests.
 
-i.e. cmake -DBUILD_CURL_TRANSPORT=ON ..
+i.e. cmake -DTRANSPORT_CURL=ON ..
 ```
 
 ## Running Samples
@@ -192,7 +192,7 @@ VCPKG maintains any installed package inside its own folder, allowing to have mu
 Follow next steps to install VCPKG and have it linked to cmake
 
 ```bash
-# Clone vcpgk:
+# Clone vcpkg:
 git clone https://github.com/Microsoft/vcpkg.git
 # (consider this path as PATH_TO_VCPKG)
 cd vcpkg
@@ -237,7 +237,7 @@ VCPKG maintains any installed package inside its own folder, allowing to have mu
 Follow next steps to install VCPKG and have it linked to cmake
 
 ```bash
-# Clone vcpgk:
+# Clone vcpkg:
  # (consider this path as PATH_TO_VCPKG)
 cd vcpkg
 # build vcpkg
@@ -289,7 +289,7 @@ brew cleanup
 Follow next steps to install VCPKG and have it linked to cmake
 
 ```bash
-# Clone vcpgk:
+# Clone vcpkg:
 git clone https://github.com/Microsoft/vcpkg.git
 # (consider this path as PATH_TO_VCPKG)
 cd vcpkg
