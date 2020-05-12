@@ -32,5 +32,5 @@ add_library (az::storage::blobs ALIAS ${TARGET_NAME})
 # set coverage excluding for az_core. Don't show coverage outside storage blobs
 set(COV_EXCLUDE
     ${az_SOURCE_DIR}/sdk/core/az_core/inc/*
-    ${az_SOURCE_DIR}/sdk/core/az-core/internal/*)
+    ${az_SOURCE_DIR}/sdk/core/az_core/internal/*)
 include(CreateCodeCoverageTargets)
