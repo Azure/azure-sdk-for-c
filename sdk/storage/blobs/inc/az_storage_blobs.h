@@ -59,7 +59,7 @@ typedef struct
 /**
  * @brief Initialize a client with default options.
  *
- * @param client blob_client to initialize
+ * @param client The blob client instance to initialize.
  * @param url a url to a blob storage account
  * @param credential credential object for authentication
  *         #AZ_CREDENTIAL_ANONYMOUS should be used for SAS
