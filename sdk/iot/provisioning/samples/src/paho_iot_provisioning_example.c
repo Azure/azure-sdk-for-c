@@ -49,6 +49,7 @@
 
 static char mqtt_client_id[128];
 static char mqtt_username[128];
+static char register_publish_topic[128];
 static char global_provisioning_endpoint[256] = { 0 };
 static char id_scope[16] = { 0 };
 static char registration_id[256] = { 0 };
@@ -208,10 +209,9 @@ static int register_device()
   int rc;
   MQTTClient_message pubmsg = MQTTClient_message_initializer;
 
-  char topic[128];
   if (az_failed(
           rc = az_iot_provisioning_client_register_get_publish_topic(
-              &provisioning_client, topic, sizeof(topic), NULL)))
+              &provisioning_client, register_publish_topic, sizeof(register_publish_topic), NULL)))
   {
     printf("Failed to get MQTT PUB register topic, return code %d\n", rc);
     return rc;
@@ -222,7 +222,8 @@ static int register_device()
   pubmsg.qos = 1;
   pubmsg.retained = 0;
 
-  if ((rc = MQTTClient_publishMessage(mqtt_client, topic, &pubmsg, NULL)) != MQTTCLIENT_SUCCESS)
+  if ((rc = MQTTClient_publishMessage(mqtt_client, register_publish_topic, &pubmsg, NULL))
+      != MQTTCLIENT_SUCCESS)
   {
     printf("Failed to publish register request, return code %d\n", rc);
     return rc;
@@ -366,7 +367,7 @@ int main()
     return rc;
   }
 
-    // Get the MQTT client id used for the MQTT connection
+  // Get the MQTT client id used for the MQTT connection
   if (az_failed(
           rc = az_iot_provisioning_client_get_client_id(
               &provisioning_client, mqtt_client_id, sizeof(mqtt_client_id), NULL)))
