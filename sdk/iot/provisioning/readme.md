@@ -6,7 +6,7 @@ For more details about Provisioning Service check [Azure documentation](https://
 
 ## Getting Started
 
-- Pelase refer to the state machine diagram which describes the Azure SDK for Embedded C flow for Provisioning Service [here](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/iot/doc/mqtt_state_machine.md#device-provisioning-service). 
+- Please refer to the state machine diagram which describes the Azure SDK for Embedded C flow for Provisioning Service [here](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/iot/doc/mqtt_state_machine.md#device-provisioning-service). 
 
 - **Samples**: [This page](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/iot/provisioning/samples) explains samples for the Azure SDK for Embedded C IoT Provisioning Client and how to use them.
 
