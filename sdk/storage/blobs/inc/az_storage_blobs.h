@@ -28,7 +28,7 @@
 #include <_az_cfg_prefix.h>
 
 /**
- * @brief Client is fixed to a specific version of the Azure Blob Storage service
+ * @brief Client is fixed to a specific version of the Azure Storage Blobs service
  */
 static az_span const AZ_STORAGE_API_VERSION = AZ_SPAN_LITERAL_FROM_STR("2019-02-02");
 
@@ -47,9 +47,9 @@ typedef struct
   struct
   {
     // buffer to copy customer url. Then it stays immutable
-    uint8_t url_buffer[AZ_HTTP_REQUEST_URL_BUF_SIZE];
-    // this url will point to url_buffer
-    az_span uri;
+    uint8_t endpoint_buffer[AZ_HTTP_REQUEST_URL_BUF_SIZE];
+    // this url will point to endpoint_buffer
+    az_span endpoint;
     _az_http_pipeline pipeline;
     az_storage_blobs_blob_client_options options;
     _az_credential* credential;
@@ -60,7 +60,7 @@ typedef struct
  * @brief Initialize a client with default options.
  *
  * @param client The blob client instance to initialize.
- * @param url A url to a blob storage account.
+ * @param endpoint A url to a blob storage account.
  * @param credential credential object for authentication
  *         #AZ_CREDENTIAL_ANONYMOUS should be used for SAS
  * @param options client options
@@ -70,13 +70,16 @@ typedef struct
  */
 AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
     az_storage_blobs_blob_client* client,
-    az_span uri,
+    az_span endpoint,
     void* credential,
     az_storage_blobs_blob_client_options* options);
 
 typedef struct
 {
-  az_span option;
+  struct
+  {
+    az_span option;
+  } _internal;
 } az_storage_blobs_blob_upload_options;
 
 /**
@@ -98,7 +101,7 @@ AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_o
 AZ_NODISCARD AZ_INLINE az_storage_blobs_blob_upload_options
 az_storage_blobs_blob_upload_options_default()
 {
-  return (az_storage_blobs_blob_upload_options){ .option = AZ_SPAN_NULL };
+  return (az_storage_blobs_blob_upload_options){ ._internal = { .option = AZ_SPAN_NULL } };
 }
 
 /**
