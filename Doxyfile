@@ -814,7 +814,7 @@ WARN_LOGFILE           =
 # Note: If this tag is empty the current directory is searched.
 
 INPUT                  = ./sdk/core/core/inc \
-                         ./sdk/iot/core/inc \
+                         ./sdk/iot/common/inc \
                          ./sdk/iot/hub/inc \
                          ./sdk/iot/provisioning/inc \
                          ./README.md
