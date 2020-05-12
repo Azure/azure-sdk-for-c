@@ -108,8 +108,9 @@ typedef enum
 /**
  * @brief Allows you to customize the retry policy used by SDK clients whenever they performs an I/O
  * operation.
- * @details Applications should acquire an initialized instance of this struct and then modify any
- * fields you desire before passing a pointer to this struct when initializing the specific client.
+ * @details Client libraries should acquire an initialized instance of this struct and then modify
+ * any fields necessary before passing a pointer to this struct when initializing the specific
+ * client.
  */
 typedef struct
 {
