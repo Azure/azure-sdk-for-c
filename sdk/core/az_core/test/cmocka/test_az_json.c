@@ -93,7 +93,7 @@ static void test_json_builder(void** state)
 
     TEST_EXPECT_SUCCESS(
         az_json_builder_append_property_name(&builder, AZ_SPAN_FROM_STR("int-max")));
-    TEST_EXPECT_SUCCESS(az_json_builder_append_number(&builder, 9007199254740991ull));
+    TEST_EXPECT_SUCCESS(az_json_builder_append_int32_number(&builder, 2147483647));
 
     TEST_EXPECT_SUCCESS(az_json_builder_append_property_name(&builder, AZ_SPAN_FROM_STR("esc")));
     TEST_EXPECT_SUCCESS(
@@ -116,7 +116,7 @@ static void test_json_builder(void** state)
         "{"
         "\"name\":true,"
         "\"foo\":[\"bar\",null,0,-12],"
-        "\"int-max\":9007199254740991,"
+        "\"int-max\":2147483647,"
         "\"esc\":\"_\\\"_\\\\_\\b\\f\\n\\r\\t_\","
         "\"u\":\"a\\u001Fb\""
         "}");

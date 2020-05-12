@@ -477,39 +477,6 @@ AZ_NODISCARD az_result az_json_builder_append_null(az_json_builder* json_builder
       json_builder, AZ_SPAN_FROM_STR("null"), AZ_JSON_TOKEN_NULL);
 }
 
-AZ_NODISCARD az_result az_json_builder_append_number(az_json_builder* json_builder, double value)
-{
-  _az_PRECONDITION_NOT_NULL(json_builder);
-  _az_PRECONDITION(_az_is_appending_value_valid(json_builder));
-
-  az_span remaining_json = _get_remaining_span(json_builder);
-
-  int32_t required_size = 1; // Need space to write at least one digit.
-
-  if (json_builder->_internal.need_comma)
-  {
-    required_size++; // For the leading comma separator.
-  }
-
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(remaining_json, required_size);
-
-  if (json_builder->_internal.need_comma)
-  {
-    remaining_json = az_span_copy_u8(remaining_json, ',');
-  }
-
-  az_span leftover;
-  AZ_RETURN_IF_FAILED(az_span_dtoa(remaining_json, value, &leftover));
-
-  // We already accounted for the first digit above, so therefore subtract one.
-  _az_update_json_builder_state(
-      json_builder,
-      required_size + _az_span_diff(leftover, remaining_json) - 1,
-      true,
-      AZ_JSON_TOKEN_NUMBER);
-  return AZ_OK;
-}
-
 AZ_NODISCARD az_result
 az_json_builder_append_int32_number(az_json_builder* json_builder, int32_t value)
 {
