@@ -1,4 +1,4 @@
-# Azure IoT Clients for Embedded C: Azure IoT Hub Client
+# Azure IoT Hub Client
 
 Official Embedded C client for Azure IoT Hub.
 
