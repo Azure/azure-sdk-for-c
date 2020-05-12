@@ -24,7 +24,7 @@
  *        unpredictable behavior.
  *
  *        Also, if you define the AZ_NO_PRECONDITION_CHECKING symbol when compiling the SDK
- *        code (or adding option -DBUILD_PRECONDITIONS=OFF with cmake), all of the Azure SDK
+ *        code (or adding option -DBUILD_WITH_PRECONDITIONS=OFF with cmake), all of the Azure SDK
  *        precondition checking will be excluding making the binary code smaller and faster. We
  *        recommend doing this before you ship your code.
  *
