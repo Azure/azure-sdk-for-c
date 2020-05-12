@@ -4,7 +4,7 @@
 /**
  * @file az_storage_blobs.h
  *
- * @brief Definition for the Azure Storage Blob client.
+ * @brief Definition for the Azure Storage Blobs client.
  *
  * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
  * prefixed with an underscore ('_') directly in your application code. These symbols
