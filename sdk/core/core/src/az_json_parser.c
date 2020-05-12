@@ -85,7 +85,7 @@ typedef struct
   uint64_t value;
   bool remainder;
   int16_t exp;
-} az_dec_number;
+} _az_dec_number;
 
 /* Calculate 10 ^ exp with O(log exp) by doing incremental multiplication
  If result goes beyone double limits (Overflow), infinite is returned based on standard IEEE_754
@@ -113,7 +113,7 @@ AZ_NODISCARD static double _ten_to_exp(int16_t exp)
 }
 
 // double result follows IEEE_754 https://en.wikipedia.org/wiki/IEEE_754
-static AZ_NODISCARD az_result _az_json_number_to_double(az_dec_number const* p, double* out)
+static AZ_NODISCARD az_result _az_json_number_to_double(_az_dec_number const* p, double* out)
 {
   *out = (double)p->value * _ten_to_exp(p->exp) * (double)p->sign;
   return AZ_OK;
@@ -121,7 +121,7 @@ static AZ_NODISCARD az_result _az_json_number_to_double(az_dec_number const* p, 
 
 AZ_NODISCARD static az_result az_span_reader_get_json_number_int(
     az_span* self,
-    az_dec_number* p_n,
+    _az_dec_number* p_n,
     int16_t e_offset,
     uint8_t first)
 {
@@ -160,7 +160,7 @@ AZ_NODISCARD static az_result az_span_reader_get_json_number_digit_rest(
     az_span* self,
     double* out_value)
 {
-  az_dec_number i = {
+  _az_dec_number i = {
     .sign = 1,
     .value = 0,
     .remainder = false,
