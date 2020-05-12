@@ -422,6 +422,15 @@ static void test_http_request_header_validation_above_127(void** state)
   }
 }
 
+static void test_http_response_append_null_response(void** state)
+{
+  (void)state;
+  {
+    az_http_response* ptr = NULL;
+    ASSERT_PRECONDITION_CHECKED(az_http_response_append(ptr, AZ_SPAN_FROM_STR("test")));
+  }
+}
+
 #endif // AZ_NO_PRECONDITION_CHECKING
 
 static void test_http_request_header_validation_range(void** state)
@@ -512,6 +521,33 @@ static void test_http_response_header_validation_space(void** state)
   }
 }
 
+static void test_http_response_append(void** state)
+{
+  (void)state;
+  {
+    uint8_t buffer[10];
+    az_http_response response = { 0 };
+    az_span append_this = AZ_SPAN_FROM_STR("0123456789");
+    assert_return_code(az_http_response_init(&response, AZ_SPAN_FROM_BUFFER(buffer)), AZ_OK);
+    assert_return_code(az_http_response_append(&response, append_this), AZ_OK);
+    assert_memory_equal(buffer, az_span_ptr(append_this), 10);
+  }
+}
+
+static void test_http_response_append_overflow(void** state)
+{
+  (void)state;
+  {
+    uint8_t buffer[10];
+    az_http_response response = { 0 };
+    az_span append_this = AZ_SPAN_FROM_STR("0123456789123456");
+
+    assert_return_code(az_http_response_init(&response, AZ_SPAN_FROM_BUFFER(buffer)), AZ_OK);
+    az_result overflow = az_http_response_append(&response, append_this);
+    assert_true(overflow == AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+  }
+}
+
 int test_az_http()
 {
 #ifndef AZ_NO_PRECONDITION_CHECKING
@@ -523,6 +559,7 @@ int test_az_http()
     cmocka_unit_test(test_http_request_removing_left_white_spaces),
     cmocka_unit_test(test_http_request_header_validation),
     cmocka_unit_test(test_http_request_header_validation_above_127),
+    cmocka_unit_test(test_http_response_append_null_response),
 #endif // AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_http_request),
     cmocka_unit_test(test_http_response),
@@ -530,6 +567,8 @@ int test_az_http()
     cmocka_unit_test(test_http_response_header_validation),
     cmocka_unit_test(test_http_response_header_validation_fail),
     cmocka_unit_test(test_http_response_header_validation_space),
+    cmocka_unit_test(test_http_response_append_overflow),
+    cmocka_unit_test(test_http_response_append),
   };
   return cmocka_run_group_tests_name("az_core_http", tests, NULL, NULL);
 }
