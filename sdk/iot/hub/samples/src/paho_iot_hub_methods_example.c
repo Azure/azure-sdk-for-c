@@ -342,40 +342,53 @@ int main()
     printf("Failed to create MQTT client, return code %d\n", rc);
     return rc;
   }
-
-  // Set the callback for incoming MQTT messages
-  if ((rc = MQTTClient_setCallbacks(mqtt_client, NULL, NULL, on_received, NULL))
-      != MQTTCLIENT_SUCCESS)
+  else
   {
-    printf("Failed to set MQTT callbacks, return code %d\n", rc);
-    return rc;
+    // Set the callback for incoming MQTT messages
+    if ((rc = MQTTClient_setCallbacks(mqtt_client, NULL, NULL, on_received, NULL))
+        != MQTTCLIENT_SUCCESS)
+    {
+      //Failed to set the callback - move to destroy mqtt client and return
+      printf("Failed to set MQTT callbacks, return code %d\n", rc);
+    }
+    else
+    {
+      // Connect to IoT Hub
+      if ((rc = connect_device()) != 0)
+      {
+        // Connect failed - move to clean up resources
+      }
+      else
+      {
+        // Subscribe to the methods topic to receive method invocations
+        if ((rc = subscribe()) != 0)
+        {
+          // Failed to subscribe - move to disconnect and clean up resources
+        }
+        else
+        {
+          printf("Subscribed to topics.\n");
+
+          // Connected and subscribed: Wait for any incoming method invocations
+          printf("Waiting for activity. [Press ENTER to abort]\n");
+          (void)getchar();
+        }
+
+        // In success case or on error subscribing, gracefully disconnect from service
+        if ((rc = MQTTClient_disconnect(mqtt_client, TIMEOUT_MQTT_DISCONNECT_MS))
+            != MQTTCLIENT_SUCCESS)
+        {
+          printf("Failed to disconnect MQTT client, return code %d\n", rc);
+        }
+        else
+        {
+          printf("Disconnected.\n");
+        }
+      }
+    }
   }
 
-  // Connect to IoT Hub
-  if ((rc = connect_device()) != 0)
-  {
-    return rc;
-  }
-
-  // Subscribe to the methods topic to receive method invocations
-  if ((rc = subscribe()) != 0)
-  {
-    return rc;
-  }
-
-  printf("Subscribed to topics.\n");
-
-  // Wait for any incoming method invocations
-  printf("Waiting for activity. [Press ENTER to abort]\n");
-  (void)getchar();
-
-  if ((rc = MQTTClient_disconnect(mqtt_client, TIMEOUT_MQTT_DISCONNECT_MS)) != MQTTCLIENT_SUCCESS)
-  {
-    printf("Failed to disconnect MQTT client, return code %d\n", rc);
-    return rc;
-  }
-
-  printf("Disconnected.\n");
+  // Clean up resources - destroy the initialized mqtt client
   MQTTClient_destroy(&mqtt_client);
 
   return 0;

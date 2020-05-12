@@ -277,29 +277,41 @@ int main()
     printf("Failed to create MQTT client, return code %d\n", rc);
     return rc;
   }
-
-  // Connect to IoT Hub
-  if ((rc = connect_device()) != 0)
+  else
   {
-    return rc;
+    // Connect to IoT Hub
+    if ((rc = connect_device()) != 0)
+    {
+      // Connect failed - move to clean up resources
+    }
+    else
+    {
+      // Loop and send 5 messages
+      if ((rc = send_telemetry_messages()) != 0)
+      {
+        printf("Failed to send telemetry messages, return code %d\n", rc);
+      }
+      else
+      {
+        // Successfully sent messages - wait for user to shut down
+        printf("Messages Sent [Press ENTER to shut down]\n");
+        (void)getchar();
+      }
+
+      // In success case or on error sending telemetry, gracefully disconnect from service
+      if ((rc = MQTTClient_disconnect(mqtt_client, TIMEOUT_MQTT_DISCONNECT_MS))
+          != MQTTCLIENT_SUCCESS)
+      {
+        printf("Failed to disconnect MQTT client, return code %d\n", rc);
+      }
+      else
+      {
+        printf("Disconnected.\n");
+      }
+    }
   }
 
-  // Loop and send 5 messages
-  if ((rc = send_telemetry_messages()) != 0)
-  {
-    return rc;
-  }
-
-  printf("Messages Sent [Press ENTER to shut down]\n");
-  (void)getchar();
-
-  if ((rc = MQTTClient_disconnect(mqtt_client, TIMEOUT_MQTT_DISCONNECT_MS)) != MQTTCLIENT_SUCCESS)
-  {
-    printf("Failed to disconnect MQTT client, return code %d\n", rc);
-    return rc;
-  }
-
-  printf("Disconnected.\n");
+  // Clean up resources - destroy the initialized mqtt client
   MQTTClient_destroy(&mqtt_client);
 
   return 0;

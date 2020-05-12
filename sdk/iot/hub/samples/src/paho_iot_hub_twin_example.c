@@ -392,65 +392,76 @@ int main()
     printf("Failed to create MQTT client, return code %d\n", rc);
     return rc;
   }
-
-  // Set the callback for incoming MQTT messages
-  if ((rc = MQTTClient_setCallbacks(mqtt_client, NULL, NULL, on_received, NULL))
-      != MQTTCLIENT_SUCCESS)
+  else
   {
-    printf("Failed to set MQTT callbacks, return code %d\n", rc);
-    return rc;
-  }
-
-  // Connect to IoT Hub
-  if ((rc = connect_device()) != 0)
-  {
-    return rc;
-  }
-
-  // Subscribe to the necessary twin topics to receive twin updates and responses
-  if ((rc = subscribe()) != 0)
-  {
-    return rc;
-  }
-
-  printf("Subscribed to topics.\n");
-
-  printf(
-      "\nWaiting for activity:\nPress 'g' to get the twin document\nPress 'r' to send a reported "
-      "property\n[Press 'q' to quit]\n");
-
-  int input;
-  while (1)
-  {
-    input = getchar();
-    if (input != '\n')
+    // Set the callback for incoming MQTT messages
+    if ((rc = MQTTClient_setCallbacks(mqtt_client, NULL, NULL, on_received, NULL))
+        != MQTTCLIENT_SUCCESS)
     {
-      switch (input)
+      //Failed to set the callback - move to destroy mqtt client and return
+      printf("Failed to set MQTT callbacks, return code %d\n", rc);
+    }
+    else
+    {
+      // Connect to IoT Hub
+      if ((rc = connect_device()) != 0)
       {
-        case 'g':
-          send_get_twin();
-          break;
-        case 'r':
-          send_reported_property();
-          break;
-        default:
-          break;
+        // Connect failed - move to clean up resources
       }
-      if (input == 'q')
+      else
       {
-        break;
+        // Subscribe to the necessary twin topics to receive twin updates and responses
+        if ((rc = subscribe()) != 0)
+        {
+          // Failed to subscribe - move to disconnect and clean up resources
+        }
+        else
+        {
+          printf("Subscribed to topics.\n");
+          printf("\nWaiting for activity:\nPress 'g' to get the twin document\nPress 'r' to send a "
+                 "reported "
+                 "property\n[Press 'q' to quit]\n");
+          int input;
+          while (1)
+          {
+            input = getchar();
+            if (input != '\n')
+            {
+              switch (input)
+              {
+                case 'g':
+                  send_get_twin();
+                  break;
+                case 'r':
+                  send_reported_property();
+                  break;
+                default:
+                  break;
+              }
+              if (input == 'q')
+              {
+                break;
+              }
+            }
+          }
+        }
+
+        // In success case or on error subscribing, gracefully disconnect from service
+        if ((rc = MQTTClient_disconnect(mqtt_client, TIMEOUT_MQTT_DISCONNECT_MS))
+            != MQTTCLIENT_SUCCESS)
+        {
+          printf("Failed to disconnect MQTT client, return code %d\n", rc);
+        }
+        else
+        {
+          printf("Disconnected.\n");
+        }
       }
     }
-  }
 
-  if ((rc = MQTTClient_disconnect(mqtt_client, TIMEOUT_MQTT_DISCONNECT_MS)) != MQTTCLIENT_SUCCESS)
-  {
-    printf("Failed to disconnect MQTT client, return code %d\n", rc);
-    return rc;
+    // Clean up resources - destroy the initialized mqtt client
+    MQTTClient_destroy(&mqtt_client);
   }
-
-  printf("Disconnected.\n");
-  MQTTClient_destroy(&mqtt_client);
 
   return 0;
 }
