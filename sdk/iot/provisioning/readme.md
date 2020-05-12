@@ -1,4 +1,4 @@
-# Azure IoT Clients for Embedded C: Azure IoT Device Provisioning Client
+# Azure IoT Device Provisioning Client
 
 Official Embedded C client for Azure IoT Provisioning Service.
 
