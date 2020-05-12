@@ -56,7 +56,6 @@ typedef struct
   } _internal;
 } az_storage_blobs_blob_client;
 
-
 /**
  * @brief Init a client with default options
  *
