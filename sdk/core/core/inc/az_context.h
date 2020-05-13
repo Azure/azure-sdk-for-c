@@ -25,8 +25,9 @@
 typedef struct az_context az_context;
 
 /**
- * @brief An az_context value is a node in a tree that represents expiration times and key/value
- * pairs. The root node in the tree (ultimate parent) is az_context_app which is a context for the
+ * @brief A context is a node within a tree that represents expiration times and key/value
+ * pairs.
+ * @details The root node in the tree (ultimate parent) is #az_context_app which is a context for the
  * entire application. Each new node is a child of some parent.
  */
 struct az_context

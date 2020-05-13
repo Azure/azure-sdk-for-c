@@ -13,15 +13,18 @@ urlFragment: iot-hub-samples
 
 This document explains samples for the Azure SDK for Embedded C IoT Hub Client and how to use them.
 
-## Key concepts
+## Key Concepts
 
 Key concepts are explained in detail [here][SDK_README_KEY_CONCEPTS].
 
-## Samples for Azure IoT Hub Client APIs
+## Prerequisites
 
-This document describes how to use samples and what is done in each sample.
+- To generate the device certificate, the provided script uses [OpenSSL](https://www.openssl.org/). Please
+install OpenSSL prior to using the script.
+- To use the samples, we use [Eclipse Paho MQTT C client][Eclipse_Paho]. You can use the directions
+[here][VCPKG_DIRECTIONS] to set up VCPKG to download and manage linking the dependency.
 
-## Getting started
+## Getting Started
 
 These samples use X509 authentication to connect to Azure IoT Hub. To easily run these samples, we have provided
 a script to generate a self-signed device certificate used for device authentication. You can run it using the following
@@ -31,12 +34,13 @@ steps.
     ```bash
     ./generate_certificate.sh
     ```
-1. Take note of the certificate fingerprint printed at the end of the output.
+1. Take note of the certificate fingerprint printed at the end of the output. (It is also placed in a file
+named `fingerprint.txt` for your convenience).
 1. Create a device in IoT Hub with `X.509 Self-Signed` authentication.
-1. Paste in the certificate fingerprint printed previously. You MUST remove the colons from the fingerprint hash
-before pasting into IoT Hub.
+1. Paste in the certificate fingerprint printed previously.
 
-After this is generated, make sure to set `AZ_IOT_DEVICE_X509_CERT_PEM_FILE` as an environment variable.
+After this is generated, make sure to set `AZ_IOT_DEVICE_X509_CERT_PEM_FILE` as an environment variable. It should be the
+full path to the generated `device_cert_store.pem` file.
 
 For more details on X509 authentication, refer to [this online documentation](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-x509ca-overview#how-to-register-the-x509-ca-certificate-to-iot-hub)
 
@@ -44,15 +48,26 @@ For more details on X509 authentication, refer to [this online documentation](ht
 
 ## Samples
 
-The following section documents various samples. All of them use the [Eclipse Paho MQTT C client][Eclipse_Paho].
-For all of these samples, the following environment variables will need to be set:
+For all of these samples, the following environment variables will need to be set.
 
+**NOTE**: These need to be set before running the cmake commands.
+
+- `VCPKG_DEFAULT_TRIPLET`: The triplet created using the instructions [here][VCPKG_DIRECTIONS].
+- `VCPKG_ROOT`: The full path to the VCPKG directory used to generate the triplet.
 - `AZ_IOT_DEVICE_ID`: Your device id.
 - `AZ_IOT_HUB_HOSTNAME`: The hostname of your IoT Hub.
 - `AZ_IOT_DEVICE_X509_CERT_PEM_FILE`: The full path to your device cert (in `.pem` format) concatenated
  with its private key.
 - `AZ_IOT_DEVICE_X509_TRUST_PEM_FILE`: The full path to the trusted server cert (in `.pem` format). This is usually
 not needed on Mac or Linux but might be needed for Windows.
+
+Once these are set, you MUST compile the SDK with the `TRANSPORT_PAHO` option turned on. For example, on the command
+line, it might look like the following:
+```bash
+cmake -DTRANSPORT_PAHO=ON ..
+```
+
+After the SDK is built, you are free to run any of the following samples.
 
 ### [IoT Hub Telemetry][telemetry_sample]
 Send 5 telemetry messages using the IoT Hub Client.
@@ -77,7 +92,7 @@ Receive and view incoming C2D messages using the IoT Hub Client.
 
 When interacting with the Azure IoT Hub using this C client library, errors are documented within the [MQTT State Machine][error_codes] requests.
 
-## Next steps
+## Next Steps
 
 Start using the IoT Hub Client in your solutions. More SDK details can be found in [SDK README][IOT_CLIENT_README].
 
@@ -89,6 +104,7 @@ For extensive documentation on Azure IoT Hub, see the [API reference documentati
 [IOT_CLIENT_README]: ../../README.md
 [SDK_README_GETTING_STARTED]: ../../README.md#getting-started
 [SDK_README_KEY_CONCEPTS]: ../../README.md#key-concepts
+[VCPKG_DIRECTIONS]:../../../../README.md#development-environment
 [c2d_sample]: src/paho_iot_hub_c2d_example.c
 [methods_sample]: src/paho_iot_hub_methods_example.c
 [telemetry_sample]: src/paho_iot_hub_telemetry_example.c

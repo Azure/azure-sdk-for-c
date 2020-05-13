@@ -8,9 +8,9 @@ Use the Azure KeyVault Keys library to work with Azure KeyVault Keys.
 * Get Key
 * Delete Key
 
-## Getting started
+## Getting Started
 
-### Download the sample
+### Download the Sample
 
 **Prerequisites**: You must have an [Azure subscription][azure_sub], [Azure KeyVault account][keyvault_account] (KeyVault), and [C compiler][c_compiler] to use this package.
 
@@ -20,19 +20,19 @@ If you need a KeyVault vault, you can use the Azure [Cloud Shell][cloud_shell_ba
 az keyvault create --resource-group <resource-group-name> --name <keyvault-account-name>  --location <azure-region>
 ```
 
-### Authenticate the client
+### Authenticate the Client
 
 TODO
 
-### Get credentials
+### Get Credentials
 
 TODO
 
-### Create client
+### Create Client
 
 TODO
 
-## Key concepts
+## Key Concepts
 
 TODO
 
@@ -46,17 +46,17 @@ TODO
 
 TODO
 
-### Retry policy
+### Retry Policy
 
 While working with KeyVault, you might encounter transient failures caused by [rate limits][keyvault_rate_limits] enforced by the service, or other transient problems like network outages. For information about handling these types of failures, see [Retry pattern][azure_pattern_retry] in the Cloud Design Patterns guide, and the related [Circuit Breaker pattern][azure_pattern_circuit_breaker].
 
-## Next steps
+## Next Steps
 
-### More sample code
+### More Sample Code
 
 TODO
 
-### Additional documentation
+### Additional Documentation
 
 For more extensive documentation on Azure Storage service, see the [Azure KeyVault documentation][keyvault_docs] on docs.microsoft.com.
 
@@ -87,7 +87,7 @@ Many people all over the world have helped make this project better.  You'll wan
 
 * Chat with other community members [![Join the chat at https://gitter.im/azure/azure-sdk-for-c](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/azure/azure-sdk-for-c?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-### Reporting security issues and security bugs
+### Reporting Security Issues and Security Bugs
 
 Security issues and bugs should be reported privately, via email, to the Microsoft Security Response Center (MSRC) <secure@microsoft.com>. You should receive a response within 24 hours. If for some reason you do not, please follow up via email to ensure we received your original message. Further information, including the MSRC PGP key, can be found in the [Security TechCenter](https://www.microsoft.com/msrc/faqs-report-an-issue).
 

@@ -4,19 +4,15 @@ Azure Core Library for Embedded C (`az_core`) provides shared primitives, abstra
 
 The library allows client libraries to expose common functionality in a consistent fashion.  Once you learn how to use these APIs in one client library, you will know how to use them in other client libraries.
 
-## Getting started
-
-TODO
-
 ## Porting the Azure SDK to Another Platform
 
 The `Azure Core` library requires you to implement a few functions to provide platform-specific features such as a clock, a thread sleep, a mutual-exclusive thread synchronization lock, and an HTTP stack. By default, `Azure Core` ships with no-op versions of these functions, all of which return `AZ_RESULT_NOT_IMPLEMENTED`. The no-op versions allow the Azure SDK to compile successfully so you can verify that your build tool chain is working properly; however, failures occur if you execute the code.
 
-## Key concepts
+## Key Concepts
 
 ### Function Results
 
-Many SDK functions return an `az_result` as defined in [inc/az_result.h](inc/az_result.h) header file. An `az_result` is a 32-bit enum value. If a function fails to execute as intended, the `az_result` symbol returned will be prefixed with `AZ_ERROR_`. Most functions return `AZ_OK` to indicate success. However, some functions return a reason for success; these symbols with be prefixed with `AZ_` but will **not** contain `ERROR` in the symbol. Some functions return an `az_result` and some other value; the other value is returned via an output parameter.
+Many SDK functions return an `az_result` as defined in [inc/az_result.h](inc/az_result.h) header file. An `az_result` is a 32-bit enum value. When a function succeeds, it typically returns AZ_OK. When a function fails, it returns an `az_result` symbol prefixed with `AZ_ERROR_`. A few functions return a reason for success; these symbols will be prefixed with `AZ_` but will **not** contain `ERROR` in the symbol. For functions that need to return an `az_result` and some other value; the other value is returned via an output parameter. If you simply want to know if an `az_result` value indicates generic success or failure, call either the `az_succeeded` or `az_failed` function, respectively. Both of these functions take an `az_result` value and return `true` or `false`.
 
 ### Working with Spans
 
@@ -129,7 +125,7 @@ The public SDK functions validate the arguments passed to them to ensure that th
 
 To override the default behavior, implement a function matching the `az_precondition_failed_fn` function signature and then, in your application's initialization (before calling any Azure SDK function), call `az_precondition_failed_set_callback` passing it the address of your function. Now, when any Azure SDK function detects a precondition failure, it will invoke your callback instead. You might override the callback to attach a debugger or perhaps to reboot the device rather than allowing it to continue running with unpredictable behavior.
 
-Also, if you define the `AZ_NO_PRECONDITION_CHECKING` symbol when compiling the SDK code (or adding option -DBUILD_PRECONDITIONS=OFF with cmake), all of the Azure SDK precondition checking will be excluded, making the binary code smaller and faster. We recommend doing this before you ship your code.
+Also, if you define the `AZ_NO_PRECONDITION_CHECKING` symbol when compiling the SDK code (or adding option -DPRECONDITIONS=OFF with cmake), all of the Azure SDK precondition checking will be excluded, making the binary code smaller and faster. We recommend doing this before you ship your code.
 
 ### Canceling an Operation
 

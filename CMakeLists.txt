@@ -6,26 +6,25 @@ cmake_minimum_required (VERSION 3.10)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake-modules")
 
 option(WARNINGS_AS_ERRORS "Treat compiler warnings as errors" ON)
-option(BUILD_CURL_TRANSPORT "Build internal http transport implementation with CURL for HTTP Pipeline" OFF)
+option(TRANSPORT_CURL "Build internal http transport implementation with CURL for HTTP Pipeline" OFF)
 option(UNIT_TESTING "Build unit test projects" OFF)
-option(UNIT_TESTING_MOCK_ENABLED "wrap PAL functions with mock implementation for tests" OFF)
-option(BUILD_PAHO_TRANSPORT "Build IoT Samples with Paho MQTT support" OFF)
-option(BUILD_PRECONDITIONS "Build SDK with preconditions enabled" ON)
-option(BUILD_LOGGING "Build SDK with logging support" ON)
+option(UNIT_TESTING_MOCKS "wrap PAL functions with mock implementation for tests" OFF)
+option(TRANSPORT_PAHO "Build IoT Samples with Paho MQTT support" OFF)
+option(PRECONDITIONS "Build SDK with preconditions enabled" ON)
+option(NO_LOGGING "Build SDK without logging support" OFF)
 
 # disable preconditions when it's set to OFF
-if (NOT BUILD_PRECONDITIONS)
+if (NOT PRECONDITIONS)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DAZ_NO_PRECONDITION_CHECKING")
 endif()
 
-# disable preconditions when it's set to OFF
-if (NOT BUILD_LOGGING)
+if (NO_LOGGING)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DAZ_NO_LOGGING")
 endif()
 
 
 # enable mock functions with link option -ld
-if(UNIT_TESTING_MOCK_ENABLED)
+if(UNIT_TESTING_MOCKS)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_az_MOCK_ENABLED")
 endif()
 
@@ -57,7 +56,7 @@ add_subdirectory(sdk/core/core)
 add_subdirectory(sdk/platform/http_client/nohttp)
 # Adding transport implementation for curl
 # Users can still build Core and SDK client without depending on a HTTP transport implementation
-if(BUILD_CURL_TRANSPORT)
+if(TRANSPORT_CURL)
   add_subdirectory(sdk/platform/http_client/curl)
 endif()
 
@@ -77,7 +76,7 @@ if(NOT DEFINED ENV{AZ_SDK_C_NO_SAMPLES})
   add_subdirectory(sdk/samples/keyvault/keyvault)
   add_subdirectory(sdk/samples/keyvault/keyvault/samples)
   add_subdirectory(sdk/storage/blobs/samples)
-  if(BUILD_PAHO_TRANSPORT)
+  if(TRANSPORT_PAHO)
     add_subdirectory(sdk/iot/provisioning/samples)
     add_subdirectory(sdk/iot/hub/samples)
   endif()

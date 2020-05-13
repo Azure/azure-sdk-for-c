@@ -51,10 +51,10 @@ enum
     } \
   } while (0)
 
-#define AZ_RETURN_IF_NOT_ENOUGH_SIZE(span, required_space) \
+#define AZ_RETURN_IF_NOT_ENOUGH_SIZE(span, required_size) \
   do \
   { \
-    if (az_span_size(span) < required_space) \
+    if (az_span_size(span) < required_size || required_size < 0) \
     { \
       return AZ_ERROR_INSUFFICIENT_SPAN_SIZE; \
     } \
@@ -113,7 +113,7 @@ typedef enum
 
   // JSON error codes
   AZ_ERROR_JSON_INVALID_STATE = _az_RESULT_MAKE_ERROR(_az_FACILITY_JSON, 1),
-  AZ_ERROR_JSON_NESTING_OVERFLOW = _az_RESULT_MAKE_ERROR(_az_FACILITY_JSON, 2),
+  AZ_ERROR_JSON_NESTING_OVERFLOW = _az_RESULT_MAKE_ERROR(_az_FACILITY_JSON, 2), ///< The JSON depth is too large.
   AZ_ERROR_JSON_STRING_END = _az_RESULT_MAKE_ERROR(_az_FACILITY_JSON, 3),
   AZ_ERROR_JSON_POINTER_TOKEN_END = _az_RESULT_MAKE_ERROR(_az_FACILITY_JSON, 4),
 

@@ -66,7 +66,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
 
   *client = (az_storage_blobs_blob_client) {
     ._internal = {
-      .uri = AZ_SPAN_FROM_BUFFER(client->_internal.url_buffer),
+      .endpoint = AZ_SPAN_FROM_BUFFER(client->_internal.endpoint_buffer),
       .options = *options,
       .credential = cred,
       .pipeline = (_az_http_pipeline){
@@ -118,9 +118,9 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
 
   // Copy url to client buffer so customer can re-use buffer on his/her side
   int32_t uri_size = az_span_size(uri);
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(client->_internal.uri, uri_size);
-  az_span_copy(client->_internal.uri, uri);
-  client->_internal.uri = az_span_slice(client->_internal.uri, 0, uri_size);
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(client->_internal.endpoint, uri_size);
+  az_span_copy(client->_internal.endpoint, uri);
+  client->_internal.endpoint = az_span_slice(client->_internal.endpoint, 0, uri_size);
 
   AZ_RETURN_IF_FAILED(
       _az_credential_set_scopes(cred, AZ_SPAN_FROM_STR("https://storage.azure.com/.default")));
@@ -152,9 +152,9 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
   uint8_t url_buffer[AZ_HTTP_REQUEST_URL_BUF_SIZE];
   az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
   // copy url from client
-  int32_t uri_size = az_span_size(client->_internal.uri);
+  int32_t uri_size = az_span_size(client->_internal.endpoint);
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(request_url_span, uri_size);
-  az_span_copy(request_url_span, client->_internal.uri);
+  az_span_copy(request_url_span, client->_internal.endpoint);
 
   uint8_t headers_buffer[_az_STORAGE_HTTP_REQUEST_HEADER_BUF_SIZE];
   az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);

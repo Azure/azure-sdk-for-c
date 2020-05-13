@@ -36,14 +36,6 @@ AZ_NODISCARD az_result _az_span_reader_read_json_pointer_token(az_span* self, az
  */
 AZ_NODISCARD az_result _az_span_reader_read_json_pointer_token_char(az_span* self, uint32_t* out);
 
-AZ_NODISCARD AZ_INLINE az_json_token az_json_token_span(az_span span)
-{
-  return (az_json_token){
-    .kind = AZ_JSON_TOKEN_SPAN,
-    ._internal.span = span,
-  };
-}
-
 #include <_az_cfg_suffix.h>
 
 #endif // _az_JSON_STRING_PRIVATE_H

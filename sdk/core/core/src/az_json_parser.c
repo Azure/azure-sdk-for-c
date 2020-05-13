@@ -3,6 +3,7 @@
 
 #include <az_json.h>
 
+#include "az_json_private.h"
 #include "az_json_string_private.h"
 #include "az_span_private.h"
 #include <az_span.h>
@@ -13,17 +14,6 @@
 #include <math.h>
 
 #include <_az_cfg.h>
-
-enum
-{
-  AZ_JSON_STACK_SIZE = 63
-};
-
-typedef enum
-{
-  AZ_JSON_STACK_OBJECT = 0,
-  AZ_JSON_STACK_ARRAY = 1,
-} az_json_stack_item;
 
 /**
  * @brief check if @p c is either an 'e' or an 'E'. This is a helper function to handle exponential
@@ -46,7 +36,7 @@ AZ_NODISCARD AZ_INLINE bool az_json_parser_stack_is_empty(az_json_parser const* 
   return json_parser->_internal.stack == 1;
 }
 
-AZ_NODISCARD AZ_INLINE az_json_stack_item
+AZ_NODISCARD AZ_INLINE _az_json_stack_item
 az_json_parser_stack_last(az_json_parser const* json_parser)
 {
   return json_parser->_internal.stack & 1;
@@ -55,7 +45,7 @@ az_json_parser_stack_last(az_json_parser const* json_parser)
 AZ_NODISCARD AZ_INLINE az_result
 az_json_parser_push_stack(az_json_parser* json_parser, _az_json_stack json_stack)
 {
-  if (json_parser->_internal.stack >> AZ_JSON_STACK_SIZE != 0)
+  if (json_parser->_internal.stack >> (_az_MAX_JSON_STACK_SIZE - 1) != 0)
   {
     return AZ_ERROR_JSON_NESTING_OVERFLOW;
   }
@@ -95,7 +85,7 @@ typedef struct
   uint64_t value;
   bool remainder;
   int16_t exp;
-} az_dec_number;
+} _az_dec_number;
 
 /* Calculate 10 ^ exp with O(log exp) by doing incremental multiplication
  If result goes beyone double limits (Overflow), infinite is returned based on standard IEEE_754
@@ -123,7 +113,7 @@ AZ_NODISCARD static double _ten_to_exp(int16_t exp)
 }
 
 // double result follows IEEE_754 https://en.wikipedia.org/wiki/IEEE_754
-static AZ_NODISCARD az_result _az_json_number_to_double(az_dec_number const* p, double* out)
+static AZ_NODISCARD az_result _az_json_number_to_double(_az_dec_number const* p, double* out)
 {
   *out = (double)p->value * _ten_to_exp(p->exp) * (double)p->sign;
   return AZ_OK;
@@ -131,7 +121,7 @@ static AZ_NODISCARD az_result _az_json_number_to_double(az_dec_number const* p, 
 
 AZ_NODISCARD static az_result az_span_reader_get_json_number_int(
     az_span* self,
-    az_dec_number* p_n,
+    _az_dec_number* p_n,
     int16_t e_offset,
     uint8_t first)
 {
@@ -170,7 +160,7 @@ AZ_NODISCARD static az_result az_span_reader_get_json_number_digit_rest(
     az_span* self,
     double* out_value)
 {
-  az_dec_number i = {
+  _az_dec_number i = {
     .sign = 1,
     .value = 0,
     .remainder = false,
@@ -333,11 +323,11 @@ AZ_NODISCARD static az_result az_json_parser_get_value(
   switch (c)
   {
     case 't':
-      out_token->kind = AZ_JSON_TOKEN_BOOLEAN;
+      out_token->kind = AZ_JSON_TOKEN_TRUE;
       out_token->_internal.boolean = true;
       return _az_is_expected_span(p_reader, AZ_SPAN_FROM_STR("true"));
     case 'f':
-      out_token->kind = AZ_JSON_TOKEN_BOOLEAN;
+      out_token->kind = AZ_JSON_TOKEN_FALSE;
       out_token->_internal.boolean = false;
       return _az_is_expected_span(p_reader, AZ_SPAN_FROM_STR("false"));
     case 'n':
@@ -351,13 +341,13 @@ AZ_NODISCARD static az_result az_json_parser_get_value(
       out_token->kind = AZ_JSON_TOKEN_NUMBER;
       return az_span_reader_get_json_number_digit_rest(p_reader, &out_token->_internal.number);
     case '{':
-      out_token->kind = AZ_JSON_TOKEN_OBJECT_START;
+      out_token->kind = AZ_JSON_TOKEN_BEGIN_OBJECT;
       *p_reader = az_span_slice_to_end(*p_reader, 1);
-      return az_json_parser_push_stack(json_parser, AZ_JSON_STACK_OBJECT);
+      return az_json_parser_push_stack(json_parser, _az_JSON_STACK_OBJECT);
     case '[':
-      out_token->kind = AZ_JSON_TOKEN_ARRAY_START;
+      out_token->kind = AZ_JSON_TOKEN_BEGIN_ARRAY;
       *p_reader = az_span_slice_to_end(*p_reader, 1);
-      return az_json_parser_push_stack(json_parser, AZ_JSON_STACK_ARRAY);
+      return az_json_parser_push_stack(json_parser, _az_JSON_STACK_ARRAY);
   }
   return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
 }
@@ -390,8 +380,8 @@ az_json_parser_parse_token(az_json_parser* json_parser, az_json_token* out_token
   bool const is_empty = az_span_size(*p_reader) == 0; // everything was read
   switch (out_token->kind)
   {
-    case AZ_JSON_TOKEN_ARRAY_START:
-    case AZ_JSON_TOKEN_OBJECT_START:
+    case AZ_JSON_TOKEN_BEGIN_ARRAY:
+    case AZ_JSON_TOKEN_BEGIN_OBJECT:
       return is_empty ? AZ_ERROR_EOF : AZ_OK;
     default:
       break;
@@ -399,9 +389,9 @@ az_json_parser_parse_token(az_json_parser* json_parser, az_json_token* out_token
   return is_empty ? AZ_OK : AZ_ERROR_PARSER_UNEXPECTED_CHAR;
 }
 
-AZ_NODISCARD AZ_INLINE uint8_t az_json_stack_item_to_close(az_json_stack_item item)
+AZ_NODISCARD AZ_INLINE uint8_t az_json_stack_item_to_close(_az_json_stack_item item)
 {
-  return item == AZ_JSON_STACK_OBJECT ? '}' : ']';
+  return item == _az_JSON_STACK_OBJECT ? '}' : ']';
 }
 
 AZ_NODISCARD static az_result az_json_parser_read_comma_or_close(az_json_parser* json_parser)
@@ -425,7 +415,7 @@ AZ_NODISCARD static az_result az_json_parser_read_comma_or_close(az_json_parser*
 
 AZ_NODISCARD static az_result az_json_parser_check_item_begin(
     az_json_parser* json_parser,
-    az_json_stack_item stack_item)
+    _az_json_stack_item stack_item)
 {
   if (az_json_parser_stack_is_empty(json_parser)
       || az_json_parser_stack_last(json_parser) != stack_item)
@@ -460,8 +450,8 @@ AZ_NODISCARD static az_result az_json_parser_check_item_end(
 {
   switch (value.kind)
   {
-    case AZ_JSON_TOKEN_OBJECT_START:
-    case AZ_JSON_TOKEN_ARRAY_START:
+    case AZ_JSON_TOKEN_BEGIN_OBJECT:
+    case AZ_JSON_TOKEN_BEGIN_ARRAY:
       return AZ_OK;
     default:
       break;
@@ -477,7 +467,7 @@ AZ_NODISCARD az_result az_json_parser_parse_token_member(
   _az_PRECONDITION_NOT_NULL(out_token_member);
 
   az_span* p_reader = &json_parser->_internal.reader;
-  AZ_RETURN_IF_FAILED(az_json_parser_check_item_begin(json_parser, AZ_JSON_STACK_OBJECT));
+  AZ_RETURN_IF_FAILED(az_json_parser_check_item_begin(json_parser, _az_JSON_STACK_OBJECT));
   AZ_RETURN_IF_FAILED(_az_is_expected_span(p_reader, AZ_SPAN_FROM_STR("\"")));
   AZ_RETURN_IF_FAILED(az_span_reader_get_json_string_rest(p_reader, &out_token_member->name));
   *p_reader = _az_span_trim_white_space(*p_reader);
@@ -493,7 +483,7 @@ az_json_parser_parse_array_item(az_json_parser* json_parser, az_json_token* out_
   _az_PRECONDITION_NOT_NULL(json_parser);
   _az_PRECONDITION_NOT_NULL(out_token);
 
-  AZ_RETURN_IF_FAILED(az_json_parser_check_item_begin(json_parser, AZ_JSON_STACK_ARRAY));
+  AZ_RETURN_IF_FAILED(az_json_parser_check_item_begin(json_parser, _az_JSON_STACK_ARRAY));
   AZ_RETURN_IF_FAILED(az_json_parser_get_value_space(json_parser, out_token));
   return az_json_parser_check_item_end(json_parser, *out_token);
 }
@@ -517,8 +507,8 @@ az_json_parser_skip_children(az_json_parser* json_parser, az_json_token token)
 
   switch (token.kind)
   {
-    case AZ_JSON_TOKEN_OBJECT_START:
-    case AZ_JSON_TOKEN_ARRAY_START:
+    case AZ_JSON_TOKEN_BEGIN_OBJECT:
+    case AZ_JSON_TOKEN_BEGIN_ARRAY:
     {
       break;
     }
@@ -536,7 +526,7 @@ az_json_parser_skip_children(az_json_parser* json_parser, az_json_token token)
     // az_json_parser_get_stack
     switch (az_json_parser_stack_last(json_parser))
     {
-      case AZ_JSON_STACK_OBJECT:
+      case _az_JSON_STACK_OBJECT:
       {
         az_json_token_member member = { 0 };
         az_result const result = az_json_parser_parse_token_member(json_parser, &member);

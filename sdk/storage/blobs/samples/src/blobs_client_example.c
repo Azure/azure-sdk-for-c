@@ -1,6 +1,22 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+/**
+ * @file blobs_client_example.c
+ * @brief
+ * Notes:
+ *   This sample requires an Storage account and shared access signature enabled for it.
+ *
+ * What this sample does:
+ * 1) Creates blob client using the url and shared access signature on it to set up client
+ *
+ * 2) Creates an HTTP Response. It will be used to hold service response
+ *
+ * 3) Upload blob
+ *
+ * 4) Get payload from response and parse it
+ */
+
 #include <az_context.h>
 #include <az_credentials.h>
 #include <az_http.h>
@@ -15,7 +31,19 @@
 
 #include <_az_cfg.h>
 
-#define URI_ENV "test_uri"
+#define URI_ENV "AZURE_STORAGE_URL"
+
+#define TEST_FAIL_ON_ERROR(result, message) \
+  do \
+  { \
+    if (az_failed(result)) \
+    { \
+      printf("\n"); \
+      printf(message); \
+      printf("\n"); \
+      return 1; \
+    } \
+  } while (0)
 
 int exit_code = 0;
 static az_span content_to_upload = AZ_SPAN_LITERAL_FROM_STR("Some test content");
@@ -38,29 +66,24 @@ int main()
   az_log_set_callback(test_log_func);
   */
 
-  // Init client.
-  //  Example expects the URI_ENV to be a URL w/ SAS token
+  // 1) Init client.
+  // Example expects AZURE_STORAGE_URL in env to be a URL w/ SAS token
   az_storage_blobs_blob_client client = { 0 };
   az_storage_blobs_blob_client_options options = az_storage_blobs_blob_client_options_default();
   az_result const operation_result = az_storage_blobs_blob_client_init(
       &client, az_span_from_str(getenv(URI_ENV)), AZ_CREDENTIAL_ANONYMOUS, &options);
 
-  if (az_failed(operation_result))
-  {
-    printf("Failed to init blob client");
-  }
+  TEST_FAIL_ON_ERROR(operation_result, "Failed to init blob client");
 
-  /******* Create a buffer for response (will be reused for all requests)   *****/
+  /******* 2) Create a buffer for response (will be reused for all requests)   *****/
   uint8_t response_buffer[1024 * 4] = { 0 };
   az_http_response http_response = { 0 };
   az_result const init_http_response_result
       = az_http_response_init(&http_response, AZ_SPAN_FROM_BUFFER(response_buffer));
 
-  if (az_failed(init_http_response_result))
-  {
-    printf("Failed to init http response");
-  }
+  TEST_FAIL_ON_ERROR(init_http_response_result, "Failed to init http response");
 
+  // 3) upload content
   printf("Uploading blob...\n");
   az_result const create_result = az_storage_blobs_blob_upload(
       &client, &az_context_app, content_to_upload, NULL, &http_response);
@@ -70,13 +93,33 @@ int main()
   {
     printf("Running sample with no_op HTTP implementation.\nRecompile az_core with an HTTP client "
            "implementation like CURL to see sample sending network requests.\n\n"
-           "i.e. cmake -DBUILD_CURL_TRANSPORT=ON ..\n\n");
+           "i.e. cmake -DTRANSPORT_CURL=ON ..\n\n");
     return 0;
   }
 
-  if (az_failed(create_result))
+  TEST_FAIL_ON_ERROR(create_result, "Failed to create blob");
+
+  // 4) get response and parse it
+  az_http_response_status_line status_line = { 0 };
+  TEST_FAIL_ON_ERROR(
+      az_http_response_get_status_line(&http_response, &status_line), "Failed to get status code");
+  printf("Status Code: %d\n", status_line.status_code);
+  printf(
+      "Phrase: %.*s\n",
+      az_span_size(status_line.reason_phrase),
+      az_span_ptr(status_line.reason_phrase));
+
+  printf("\nHeaders:\n");
+  // loop all headers from response
+  for (az_pair header;
+       az_http_response_get_next_header(&http_response, &header) != AZ_ERROR_ITEM_NOT_FOUND;)
   {
-    printf("Failed to create blob");
+    printf(
+        "%.*s:%.*s\n",
+        az_span_size(header.key),
+        az_span_ptr(header.key),
+        az_span_size(header.value),
+        az_span_ptr(header.value));
   }
 
   return exit_code;

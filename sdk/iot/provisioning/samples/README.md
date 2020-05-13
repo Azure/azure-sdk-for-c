@@ -13,7 +13,7 @@ urlFragment: iot-provisioning-samples
 
 This document explains samples for the Azure Embedded C SDK IoT Provisioning Client and how to use them.
 
-## Key concepts
+## Key Concepts
 
 Key concepts are explained in detail [here][SDK_README_KEY_CONCEPTS].
 
@@ -21,7 +21,7 @@ Key concepts are explained in detail [here][SDK_README_KEY_CONCEPTS].
 
 This document describes how to use samples and what is done in each sample.
 
-## Getting started
+## Getting Started
 
 Getting started explained in detail [here][SDK_README_GETTING_STARTED].
 
@@ -35,7 +35,7 @@ Getting started explained in detail [here][SDK_README_GETTING_STARTED].
 
 When interacting with the Azure Device Provisioning Service using this C client library, errors are documented within the [MQTT State Machine][error_codes] requests.
 
-## Next steps
+## Next Steps
 
 Start using the IoT Provisioning Client in your solutions. Our SDK details can be found at [SDK README][IOT_CLIENT_README].
 

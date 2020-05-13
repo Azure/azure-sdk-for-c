@@ -18,7 +18,7 @@
 typedef struct _az_http_policy _az_http_policy;
 
 /**
- * @brief Defines the callback signature of a policy process witch should receive an
+ * @brief Defines the callback signature of a policy process which should receive an
  * _az_http_policy, options reference (as void *), an _az_http_request and az_http_response.
  *
  * void * is used as polymorphic solution for any policy. Each policy implementation would know the
