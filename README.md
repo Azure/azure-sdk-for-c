@@ -125,7 +125,7 @@ The following compiler options are available for adding/removing project feature
 </tr>
 <tr>
 <td>PLATFORM</td>
-<td>This option can be set to any of the next values:<br>- No_value: default value is used and no_platform library is used.<br>- "POSIX": Provides implementation for Linux and Mac systems.<br>- "WIN32": Provides platform implementation for Windows based system<br>- "CUSTOM": Tells cmake to use a specific implementation provided by user. When setting this option, user must provide an implementation library and set option `CUSTOM_PLATFORM_NAME` with the name of the library (i.e. <code>-DPLATFORM=CUSTOM -DCUSTOM_PLATFORM_NAME=user_platform_lib</code>). cmake will look for this library to link az_core</td>
+<td>This option can be set to any of the next values:<br>- No_value: "AUTO"<br>- "NONE": no_platform library is used.<br>- "POSIX": Provides implementation for Linux and Mac systems.<br>- "WIN32": Provides platform implementation for Windows based system<br>- "AUTO": use "WIN32" or "POSIX" if possible, otherwise "NONE"<br>- Custom_name: Tells cmake to use a specific implementation provided by user. When setting this option, user must provide an implementation library and set option `PLATFORM` with the name of the library (i.e. <code>-DPLATFORM=user_platform_lib</code>). cmake will look for this library to link az_core</td>
 
 <td>No_value</td>
 </tr>
