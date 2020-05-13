@@ -6,7 +6,7 @@
 #include <_az_cfg.h>
 
 /**
- * @brief Provides no http support.
+ * @brief Provides no HTTP support.
  *
  * @param p_request an internal http builder with data to build and send http request
  * @param p_response pre-allocated buffer where http response will be written
