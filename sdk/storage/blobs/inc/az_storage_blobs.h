@@ -61,7 +61,7 @@ typedef struct
  *
  * @param client The blob client instance to initialize.
  * @param endpoint A url to a blob storage account.
- * @param credential credential object for authentication
+ * @param credential The object used for authentication.
  *         #AZ_CREDENTIAL_ANONYMOUS should be used for SAS
  * @param options  A reference to an #az_storage_blobs_blob_client_options structure which defines custom behavior of the client.
  *
