@@ -106,7 +106,7 @@ typedef struct
  * @param client_secret an Azure client secret
  * @retval An #az_result value indicating the result of the operation:
  *         - #AZ_OK if successful
- *         - Other value = Initialization failed
+ *         - Other error code if initialization failed
  */
 AZ_NODISCARD az_result az_credential_client_secret_init(
     az_credential_client_secret* self,
