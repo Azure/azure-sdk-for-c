@@ -20,9 +20,6 @@
 #include <az_context.h>
 #include <az_credentials.h>
 #include <az_http.h>
-#include <az_http_internal.h>
-#include <az_http_transport.h>
-#include <az_json.h>
 #include <az_log.h>
 #include <az_storage_blobs.h>
 
@@ -45,7 +42,6 @@
     } \
   } while (0)
 
-int exit_code = 0;
 static az_span content_to_upload = AZ_SPAN_LITERAL_FROM_STR("Some test content");
 
 // Uncomment below code to enable logging (and the first lines of main function)
@@ -122,5 +118,5 @@ int main()
         az_span_ptr(header.value));
   }
 
-  return exit_code;
+  return 0;
 }

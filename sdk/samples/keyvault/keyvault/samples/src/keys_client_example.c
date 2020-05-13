@@ -43,7 +43,6 @@
 #include <az_context.h>
 #include <az_credentials.h>
 #include <az_http.h>
-#include <az_http_internal.h>
 #include <az_json.h>
 #include <az_keyvault.h>
 
@@ -68,8 +67,6 @@
       return 1; \
     } \
   } while (0)
-
-int exit_code = 0;
 
 az_span get_key_version(az_http_response* response);
 az_span const key_name_for_test = AZ_SPAN_LITERAL_FROM_STR("test-new-key");
@@ -166,7 +163,7 @@ int main()
           "buffer",
           version_len,
           version_buffer_len);
-      return exit_code + 1; // Error, terminate proccess with non 0 as error.
+      return 1; // Error, terminate proccess with non 0 as error.
     }
     else
     {
@@ -222,7 +219,7 @@ int main()
       "\n\n*********************************\nGet Key again after DELETE result: \n%s\n",
       response_buffer);
 
-  return exit_code;
+  return 0;
 }
 
 az_span get_key_version(az_http_response* response)
