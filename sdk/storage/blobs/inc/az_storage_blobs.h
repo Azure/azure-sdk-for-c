@@ -84,8 +84,7 @@ typedef struct
 
 /**
  * @brief Init a client with default options
- * This is convenient method to create a client with basic settings
- * Specific options can be modified after initializing the options
+* @details Call this to obtain an initialized #az_storage_blobs_blob_client_options structure that can be modified and passed to #az_storage_blobs_blob_client_init().
  *
  * @remark Use this, for instance, when only caring about setting one option by calling this method
  * and then overriding that specific option
