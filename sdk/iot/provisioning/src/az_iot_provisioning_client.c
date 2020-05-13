@@ -442,8 +442,8 @@ AZ_NODISCARD az_result az_iot_provisioning_client_parse_received_topic_and_paylo
     return AZ_ERROR_IOT_TOPIC_NO_MATCH;
   }
 
-  _az_log_write(AZ_LOG_MQTT_RECEIVED_TOPIC, received_topic);
-  _az_log_write(AZ_LOG_MQTT_RECEIVED_PAYLOAD, received_payload);
+  _az_LOG_WRITE(AZ_LOG_MQTT_RECEIVED_TOPIC, received_topic);
+  _az_LOG_WRITE(AZ_LOG_MQTT_RECEIVED_PAYLOAD, received_payload);
 
   // Parse the status.
   az_span remainder = az_span_slice_to_end(received_topic, az_span_size(str_dps_registrations_res));
