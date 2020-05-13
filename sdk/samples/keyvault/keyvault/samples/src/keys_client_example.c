@@ -155,7 +155,8 @@ int main()
 
   /****************** 7) get key version from response ****/
   // version is still at http_response. Let's copy it to a new buffer
-  az_span copy_version_buffer = AZ_SPAN_FROM_BUFFER((uint8_t[40]){ 0 });
+  uint8_t copy_version_buf[40] = { 0 };
+  az_span copy_version_buffer = AZ_SPAN_FROM_BUFFER(copy_version_buf);
   // version span will be pointing to http_response, so it will change as soon as http response is
   // reused. We just need to get it and then copy it to copy_version_builder to keep it
   az_span version = get_key_version(&http_response);
