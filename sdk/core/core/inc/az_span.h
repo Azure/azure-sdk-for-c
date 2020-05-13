@@ -195,8 +195,22 @@ AZ_NODISCARD az_span az_span_slice_to_end(az_span span, int32_t start_index);
  */
 AZ_NODISCARD AZ_INLINE bool az_span_is_content_equal(az_span span1, az_span span2)
 {
-  return az_span_size(span1) == az_span_size(span2)
-      && memcmp(az_span_ptr(span1), az_span_ptr(span2), (size_t)az_span_size(span1)) == 0;
+  int32_t span1_size = az_span_size(span1);
+  int32_t span2_size = az_span_size(span2);
+
+  // Make sure to avoid passing a null pointer to memcmp, which is considered undefined.
+  // We assume that if the size is non-zero, then the pointer can't be null.
+  if (span1_size == 0)
+  {
+    // Two empty spans are considered equal, even if their pointers are different.
+    return span2_size == 0;
+  }
+
+  // If span2_size == 0, then the first condition which compares sizes will be false, since we
+  // checked the size of span1 above. And due to short-circuiting we won't be calling memcmp anyway.
+  // Therefore, we don't need to check for that explicitly.
+  return span1_size == span2_size
+      && memcmp(az_span_ptr(span1), az_span_ptr(span2), (size_t)span1_size) == 0;
 }
 
 /**

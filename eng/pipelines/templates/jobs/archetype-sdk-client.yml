@@ -9,11 +9,11 @@ jobs:
     matrix:
       # Build with no dependencies at all (No samples) - PRECONDITIONS ON
       # WARNINGS_AS_ERRORS          ON
-      # BUILD_CURL_TRANSPORT        OFF
+      # TRANSPORT_CURL              OFF
       # UNIT_TESTING                OFF
-      # UNIT_TESTING_MOCK_ENABLED   OFF
-      # BUILD_PAHO_TRANSPORT        OFF
-      # BUILD_PRECONDITIONS         ON
+      # UNIT_TESTING_MOCKS          OFF
+      # TRANSPORT_PAHO              OFF
+      # PRECONDITIONS               ON
       # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_NONE
       Linux_x64:
         vm.image: 'ubuntu-18.04'
@@ -38,84 +38,84 @@ jobs:
 
       # Build with sample dependencies [curl for transport] - PRECONDITIONS ON
       # WARNINGS_AS_ERRORS          ON
-      # BUILD_CURL_TRANSPORT        ON
+      # TRANSPORT_CURL              ON
       # UNIT_TESTING                OFF
-      # UNIT_TESTING_MOCK_ENABLED   OFF
-      # BUILD_PAHO_TRANSPORT        ON
-      # BUILD_PRECONDITIONS         ON
+      # UNIT_TESTING_MOCKS          OFF
+      # TRANSPORT_PAHO              ON
+      # PRECONDITIONS               ON
       # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_POSIX / AZ_PLATFORM_IMPL_WIN32
       Linux_x64_with_samples:
         vm.image: 'ubuntu-18.04'
         vcpkg.deps: 'curl[ssl] paho-mqtt'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        build.args: ' -DBUILD_CURL_TRANSPORT=ON -DBUILD_PAHO_TRANSPORT=ON -DAZ_PLATFORM_IMPL=POSIX'
+        build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX'
       Win_x86_with_samples:
         vm.image: 'windows-2019'
         vcpkg.deps: 'curl[winssl] paho-mqtt'
         VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: Win32
-        build.args: ' -DBUILD_CURL_TRANSPORT=ON -DBUILD_PAHO_TRANSPORT=ON -DAZ_PLATFORM_IMPL=WIN32'
+        build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=WIN32'
       Win_x64_with_samples:
         vm.image: 'windows-2019'
         vcpkg.deps: 'curl[winssl] paho-mqtt'
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: x64
-        build.args: ' -DBUILD_CURL_TRANSPORT=ON -DBUILD_PAHO_TRANSPORT=ON -DAZ_PLATFORM_IMPL=WIN32'
+        build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=WIN32'
       MacOS_x64_with_samples:
         vm.image: 'macOS-10.15'
         vcpkg.deps: 'curl[ssl] paho-mqtt'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
-        build.args: ' -DBUILD_CURL_TRANSPORT=ON -DBUILD_PAHO_TRANSPORT=ON -DAZ_PLATFORM_IMPL=POSIX'
+        build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX'
 
-      # Build with sample dependencies and unit testing [curl for transport and cmoka]  - PRECONDITIONS ON
+      # Build with sample dependencies and unit testing [curl for transport and cmocka]  - PRECONDITIONS ON
       # WARNINGS_AS_ERRORS          ON
-      # BUILD_CURL_TRANSPORT        ON
+      # TRANSPORT_CURL              ON
       # UNIT_TESTING                ON
-      # UNIT_TESTING_MOCK_ENABLED   OFF
-      # BUILD_PAHO_TRANSPORT        ON
-      # BUILD_PRECONDITIONS         ON
+      # UNIT_TESTING_MOCKS          OFF
+      # TRANSPORT_PAHO              ON
+      # PRECONDITIONS               ON
       # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_POSIX / AZ_PLATFORM_IMPL_WIN32
       Linux_x64_with_samples_and_unit_test:
         vm.image: 'ubuntu-18.04'
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        build.args: ' -DBUILD_CURL_TRANSPORT=ON -DBUILD_PAHO_TRANSPORT=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON'
+        build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON'
       Win_x86_with_samples_and_unit_test:
         vm.image: 'windows-2019'
         vcpkg.deps: 'curl[winssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: Win32
-        build.args: ' -DBUILD_CURL_TRANSPORT=ON -DBUILD_PAHO_TRANSPORT=ON -DAZ_PLATFORM_IMPL=WIN32 -DUNIT_TESTING=ON'
+        build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=WIN32 -DUNIT_TESTING=ON'
       Win_x64_with_samples_and_unit_test:
         vm.image: 'windows-2019'
         vcpkg.deps: 'curl[winssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: x64
-        build.args: ' -DBUILD_CURL_TRANSPORT=ON -DBUILD_PAHO_TRANSPORT=ON -DAZ_PLATFORM_IMPL=WIN32 -DUNIT_TESTING=ON'
+        build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=WIN32 -DUNIT_TESTING=ON'
       MacOS_x64_with_samples_and_unit_test:
         vm.image: 'macOS-10.15'
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
-        build.args: ' -DBUILD_CURL_TRANSPORT=ON -DBUILD_PAHO_TRANSPORT=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON'
+        build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON'
 
-      # Build with unit testing only. No samples [cmoka] - PRECONDITIONS ON
+      # Build with unit testing only. No samples [cmocka] - PRECONDITIONS ON
       # WARNINGS_AS_ERRORS          ON
-      # BUILD_CURL_TRANSPORT        OFF
+      # TRANSPORT_CURL              OFF
       # UNIT_TESTING                ON
-      # UNIT_TESTING_MOCK_ENABLED   ON
-      # BUILD_PAHO_TRANSPORT        OFF
-      # BUILD_PRECONDITIONS         ON
+      # UNIT_TESTING_MOCKS          ON
+      # TRANSPORT_PAHO              OFF
+      # PRECONDITIONS               ON
       # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_NONE
       Linux_x64_with_unit_test:
         vm.image: 'ubuntu-18.04'
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         # This is the only platform where we run mocking functions and generate CodeCoverage
-        build.args: ' -DUNIT_TESTING=ON -DCMAKE_BUILD_TYPE=Debug -DUNIT_TESTING_MOCK_ENABLED=ON'
+        build.args: ' -DUNIT_TESTING=ON -DCMAKE_BUILD_TYPE=Debug -DUNIT_TESTING_MOCKS=ON'
         AZ_SDK_CODE_COV: 1
       Win_x86_with_unit_test:
         vm.image: 'windows-2019'
@@ -137,38 +137,38 @@ jobs:
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
         build.args: ' -DUNIT_TESTING=ON'
 
-      # Build with unit testing only. No samples [cmoka] - PRECONDITIONS OFF
+      # Build with unit testing only. No samples [cmocka] - PRECONDITIONS OFF
       # WARNINGS_AS_ERRORS          ON
-      # BUILD_CURL_TRANSPORT        OFF
+      # TRANSPORT_CURL              OFF
       # UNIT_TESTING                ON
-      # UNIT_TESTING_MOCK_ENABLED   OFF
-      # BUILD_PAHO_TRANSPORT        OFF
-      # BUILD_PRECONDITIONS         OFF
+      # UNIT_TESTING_MOCKS          OFF
+      # TRANSPORT_PAHO              OFF
+      # PRECONDITIONS               OFF
       # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_NONE
       Linux_x64_with_unit_test_no_preconditions:
         vm.image: 'ubuntu-18.04'
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        build.args: ' -DUNIT_TESTING=ON -DBUILD_PRECONDITIONS=OFF'
+        build.args: ' -DUNIT_TESTING=ON -DPRECONDITIONS=OFF'
       Win_x86_with_unit_test_no_preconditions:
         vm.image: 'windows-2019'
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: Win32
-        build.args: ' -DUNIT_TESTING=ON -DBUILD_PRECONDITIONS=OFF'
+        build.args: ' -DUNIT_TESTING=ON -DPRECONDITIONS=OFF'
       Win_x64_with_unit_test_no_preconditions:
         vm.image: 'windows-2019'
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: x64
-        build.args: ' -DUNIT_TESTING=ON -DBUILD_PRECONDITIONS=OFF'
+        build.args: ' -DUNIT_TESTING=ON -DPRECONDITIONS=OFF'
       MacOS_x64_with_unit_test_no_preconditions:
         vm.image: 'macOS-10.15'
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
-        build.args: ' -DUNIT_TESTING=ON -DBUILD_PRECONDITIONS=OFF'
+        build.args: ' -DUNIT_TESTING=ON -DPRECONDITIONS=OFF'
   pool:
     vmImage: $(vm.image)
   variables:

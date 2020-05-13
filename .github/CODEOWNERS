@@ -21,7 +21,7 @@
 /sdk/platform/http_client/  @vhvb1989
 /sdk/platform/win32/        @antkmsft @jeffreyrichter
 /sdk/storage/               @gilbertw
-/sdk/iot/                   @CIPop @danewalton @ericwol-msft @ewertons @hihigupt @jspaith
+/sdk/iot/                   @CIPop @danewalton @ericwol-msft @ewertons @hihigupt @jspaith @momuno
 
 ###########
 # Eng Sys

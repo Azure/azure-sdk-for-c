@@ -302,7 +302,7 @@ build/
 /cmake-build-debug
 
 #Doxygen
-[Dd]ocs/
+/[Dd]ocs/
 
 # VS Code Files
 .vscode
