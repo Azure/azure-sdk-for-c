@@ -9,7 +9,7 @@
  * @brief Provides no HTTP support.
  *
  * @param p_request an internal http builder with data to build and send http request
- * @param p_response pre-allocated buffer where http response will be written
+ * @param p_response A pre-allocated buffer where the HTTP response will be written.
  * @retval An #az_result value indicating the result of the operation:
  *         - #AZ_OK if successful
  */
