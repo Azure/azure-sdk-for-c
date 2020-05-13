@@ -56,7 +56,7 @@
 #define CLIENT_SECRET_ENV "AZURE_CLIENT_SECRET"
 #define URI_ENV "AZURE_KEYVAULT_URL"
 
-#define TEST_FAIL_ON_ERROR(result, message) \
+#define RETURN_IF_FAILED(result, message) \
   do \
   { \
     if (az_failed(result)) \
@@ -83,7 +83,7 @@ int main()
       az_span_from_str(getenv(CLIENT_ID_ENV)),
       az_span_from_str(getenv(CLIENT_SECRET_ENV)));
 
-  TEST_FAIL_ON_ERROR(creds_retcode, "Failed to init credential");
+  RETURN_IF_FAILED(creds_retcode, "Failed to init credential");
 
   /************ 2) Creates keyvault client    ****************/
   az_keyvault_keys_client client = { 0 };
@@ -94,7 +94,7 @@ int main()
   az_result const operation_result = az_keyvault_keys_client_init(
       &client, az_span_from_str(getenv(URI_ENV)), &credential, &options);
 
-  TEST_FAIL_ON_ERROR(operation_result, "Failed to init keys client");
+  RETURN_IF_FAILED(operation_result, "Failed to init keys client");
 
   /******* 3) Create a buffer for response (will be reused for all requests)   *****/
   uint8_t response_buffer[1024 * 4];
@@ -102,7 +102,7 @@ int main()
   az_http_response http_response = { 0 };
   az_result const init_http_response_result = az_http_response_init(&http_response, response_span);
 
-  TEST_FAIL_ON_ERROR(init_http_response_result, "Failed to init http response");
+  RETURN_IF_FAILED(init_http_response_result, "Failed to init http response");
 
   /****************** 4) CREATE KEY with options******************************/
   az_keyvault_create_key_options key_options = az_keyvault_create_key_options_default();
@@ -133,7 +133,7 @@ int main()
     return 0;
   }
 
-  TEST_FAIL_ON_ERROR(create_result, "Failed to create key");
+  RETURN_IF_FAILED(create_result, "Failed to create key");
 
   printf("Key created result: \n%s", response_buffer);
 
@@ -141,7 +141,7 @@ int main()
   az_result get_key_result = az_keyvault_keys_key_get(
       &client, &az_context_app, key_name_for_test, AZ_SPAN_NULL, &http_response);
 
-  TEST_FAIL_ON_ERROR(get_key_result, "Failed to get key");
+  RETURN_IF_FAILED(get_key_result, "Failed to get key");
 
   printf("\n\n*********************************\nGet Key result: \n%s", response_buffer);
 
@@ -185,7 +185,7 @@ int main()
       NULL,
       &http_response);
 
-  TEST_FAIL_ON_ERROR(create_version_result, "Failed to create key version");
+  RETURN_IF_FAILED(create_version_result, "Failed to create key version");
 
   printf(
       "\n\n*********************************\nKey new version created result: \n%s",
@@ -197,7 +197,7 @@ int main()
   az_result const get_key_prev_ver_result = az_keyvault_keys_key_get(
       &client, &az_context_app, key_name_for_test, version, &http_response);
 
-  TEST_FAIL_ON_ERROR(get_key_prev_ver_result, "Failed to get previous version of the key");
+  RETURN_IF_FAILED(get_key_prev_ver_result, "Failed to get previous version of the key");
 
   printf("\n\n*********************************\nGet Key previous Ver: \n%s", response_buffer);
 
@@ -205,7 +205,7 @@ int main()
   az_result const delete_key_result
       = az_keyvault_keys_key_delete(&client, &az_context_app, key_name_for_test, &http_response);
 
-  TEST_FAIL_ON_ERROR(delete_key_result, "Failed to delete key");
+  RETURN_IF_FAILED(delete_key_result, "Failed to delete key");
 
   printf("\n\n*********************************\nDELETED Key: \n %s", response_buffer);
 
@@ -213,7 +213,7 @@ int main()
   az_result get_key_again_result = az_keyvault_keys_key_get(
       &client, &az_context_app, key_name_for_test, AZ_SPAN_NULL, &http_response);
 
-  TEST_FAIL_ON_ERROR(get_key_again_result, "Failed to get key");
+  RETURN_IF_FAILED(get_key_again_result, "Failed to get key");
 
   printf(
       "\n\n*********************************\nGet Key again after DELETE result: \n%s\n",

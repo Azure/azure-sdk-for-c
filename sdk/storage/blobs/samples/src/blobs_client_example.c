@@ -30,7 +30,7 @@
 
 #define URI_ENV "AZURE_STORAGE_URL"
 
-#define TEST_FAIL_ON_ERROR(result, message) \
+#define RETURN_IF_FAILED(result, message) \
   do \
   { \
     if (az_failed(result)) \
@@ -69,7 +69,7 @@ int main()
   az_result const operation_result = az_storage_blobs_blob_client_init(
       &client, az_span_from_str(getenv(URI_ENV)), AZ_CREDENTIAL_ANONYMOUS, &options);
 
-  TEST_FAIL_ON_ERROR(operation_result, "Failed to init blob client");
+  RETURN_IF_FAILED(operation_result, "Failed to init blob client");
 
   /******* 2) Create a buffer for response (will be reused for all requests)   *****/
   uint8_t response_buffer[1024 * 4] = { 0 };
@@ -77,7 +77,7 @@ int main()
   az_result const init_http_response_result
       = az_http_response_init(&http_response, AZ_SPAN_FROM_BUFFER(response_buffer));
 
-  TEST_FAIL_ON_ERROR(init_http_response_result, "Failed to init http response");
+  RETURN_IF_FAILED(init_http_response_result, "Failed to init http response");
 
   // 3) upload content
   printf("Uploading blob...\n");
@@ -93,11 +93,11 @@ int main()
     return 0;
   }
 
-  TEST_FAIL_ON_ERROR(create_result, "Failed to create blob");
+  RETURN_IF_FAILED(create_result, "Failed to create blob");
 
   // 4) get response and parse it
   az_http_response_status_line status_line = { 0 };
-  TEST_FAIL_ON_ERROR(
+  RETURN_IF_FAILED(
       az_http_response_get_status_line(&http_response, &status_line), "Failed to get status code");
   printf("Status Code: %d\n", status_line.status_code);
   printf(
