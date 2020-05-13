@@ -136,7 +136,7 @@ The following compiler options are available for adding/removing project feature
       Running sample with no_op HTTP implementation.
       Recompile az_core with an HTTP client implementation like CURL to see sample sending network requests.
 
-      i.e. cmake -DBUILD_CURL_TRANSPORT=ON ..
+      i.e. cmake -DTRANSPORT_CURL=ON ..
 
 ## Running Samples
 
