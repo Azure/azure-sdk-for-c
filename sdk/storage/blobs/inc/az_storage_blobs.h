@@ -110,7 +110,7 @@ az_storage_blobs_blob_upload_options_default()
 }
 
 /**
- * @brief Uploads to a blob
+ * @brief Uploads the contents to blob storage.
  *
  * @param client A storage blobs client structure.
  * @param context Supports cancelling long running operations.
