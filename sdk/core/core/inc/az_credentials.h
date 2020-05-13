@@ -104,8 +104,9 @@ typedef struct
  * @param tenant_id an Azure tenant ID
  * @param client_id an Azure client ID
  * @param client_secret an Azure client secret
- * @return AZ_OK = Successfull initialization <br>
- * Other value = Initialization failed
+ * @retval An #az_result value indicating the result of the operation:
+ *         - #AZ_OK if successful
+ *         - Other value = Initialization failed
  */
 AZ_NODISCARD az_result az_credential_client_secret_init(
     az_credential_client_secret* self,
