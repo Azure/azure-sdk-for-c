@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # SPDX-License-Identifier: MIT
 
-if (BUILD_CURL_TRANSPORT)
+if (TRANSPORT_CURL)
 
 cmake_minimum_required (VERSION 3.10)
 
