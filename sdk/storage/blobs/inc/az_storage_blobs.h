@@ -87,7 +87,7 @@ typedef struct
 * @details Call this to obtain an initialized #az_storage_blobs_blob_client_options structure that can be modified and passed to #az_storage_blobs_blob_client_init().
  *
  * @remark Use this, for instance, when only caring about setting one option by calling this method
- * and then overriding that specific option
+ * and then overriding that specific option.
  */
 AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_options_default();
 
