@@ -83,7 +83,7 @@ typedef struct
 } az_storage_blobs_blob_upload_options;
 
 /**
- * @brief Init a client with default options
+ * @brief Gets the default blob storage options.
 * @details Call this to obtain an initialized #az_storage_blobs_blob_client_options structure that can be modified and passed to #az_storage_blobs_blob_client_init().
  *
  * @remark Use this, for instance, when only caring about setting one option by calling this method
