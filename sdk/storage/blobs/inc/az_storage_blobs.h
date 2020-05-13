@@ -63,7 +63,7 @@ typedef struct
  * @param endpoint A url to a blob storage account.
  * @param credential credential object for authentication
  *         #AZ_CREDENTIAL_ANONYMOUS should be used for SAS
- * @param options client options
+ * @param options  A reference to an #az_storage_blobs_blob_client_options structure which defines custom behavior of the client.
  *
  * @return An #az_result value indicating the result of the operation:
  *         - #AZ_OK if successful
