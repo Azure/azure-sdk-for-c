@@ -124,8 +124,8 @@ The following compiler options are available for adding/removing project feature
 <td>OFF</td>
 </tr>
 <tr>
-<td>AZ_PLATFORM_IMPL</td>
-<td>This option can be set to any of the next values:<br>- No_value: default value is used and no_platform library is used.<br>- "POSIX": Provides implementation for Linux and Mac systems.<br>- "WIN32": Provides platform implementation for Windows based system<br>- "USER": Tells cmake to use an specific implementation provided by user. When setting this option, user must provide an implementation library and set option `AZ_USER_PLATFORM_IMPL_NAME` with the name of the library (i.e. <code>-DAZ_PLATFORM_IMPL=USER -DAZ_USER_PLATFORM_IMPL_NAME=user_platform_lib</code>). cmake will look for this library to link az_core</td>
+<td>PLATFORM</td>
+<td>This option can be set to any of the next values:<br>- No_value: default value is used and no_platform library is used.<br>- "POSIX": Provides implementation for Linux and Mac systems.<br>- "WIN32": Provides platform implementation for Windows based system<br>- "CUSTOM": Tells cmake to use an specific implementation provided by user. When setting this option, user must provide an implementation library and set option `CUSTOM_PLATFORM_NAME` with the name of the library (i.e. <code>-DPLATFORM=CUSTOM -DCUSTOM_PLATFORM_NAME=user_platform_lib</code>). cmake will look for this library to link az_core</td>
 <td>No_value</td>
 </tr>
 </table>
