@@ -63,7 +63,8 @@ typedef struct
  * @param endpoint A url to a blob storage account.
  * @param credential The object used for authentication.
  *         #AZ_CREDENTIAL_ANONYMOUS should be used for SAS.
- * @param options  A reference to an #az_storage_blobs_blob_client_options structure which defines custom behavior of the client.
+ * @param options  A reference to an #az_storage_blobs_blob_client_options structure which defines
+ * custom behavior of the client.
  *
  * @return An #az_result value indicating the result of the operation:
  *         - #AZ_OK if successful
@@ -84,7 +85,9 @@ typedef struct
 
 /**
  * @brief Gets the default blob storage options.
-* @details Call this to obtain an initialized #az_storage_blobs_blob_client_options structure that can be modified and passed to #az_storage_blobs_blob_client_init().
+ *
+ * @details Call this to obtain an initialized #az_storage_blobs_blob_client_options structure that
+ * can be modified and passed to #az_storage_blobs_blob_client_init().
  *
  * @remark Use this, for instance, when only caring about setting one option by calling this method
  * and then overriding that specific option.
@@ -92,9 +95,12 @@ typedef struct
 AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_options_default();
 
 /**
- * @brief Init a blob upload with default options
- * This is convenient method to create a blob upload options with basic settings
- * Specific options can be modified after initializing the options
+ * @brief Gets the default blob upload options
+ *
+ * @details Call this to obtain an initialized #az_storage_blobs_blob_upload_options structure
+ *
+ * @remark Use this, for instance, when only caring about setting one option by calling this method
+ * and then overriding that specific option.
  *
  */
 AZ_NODISCARD AZ_INLINE az_storage_blobs_blob_upload_options
