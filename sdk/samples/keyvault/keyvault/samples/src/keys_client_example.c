@@ -57,6 +57,17 @@
 #define CLIENT_SECRET_ENV "AZURE_CLIENT_SECRET"
 #define URI_ENV "AZURE_KEYVAULT_URL"
 
+#ifdef BUILD_CURL_TRANSPORT
+#define EXIT(code) \
+  do \
+  { \
+    curl_global_cleanup(); \
+    return code; \
+  } while (0)
+#else
+#define EXIT(code) return code;
+#endif
+
 #define TEST_FAIL_ON_ERROR(result, message) \
   do \
   { \
@@ -65,17 +76,22 @@
       printf("\n"); \
       printf(message); \
       printf("\n"); \
-      return 1; \
+      EXIT(1) \
     } \
   } while (0)
-
-int exit_code = 0;
 
 az_span get_key_version(az_http_response* response);
 az_span const key_name_for_test = AZ_SPAN_LITERAL_FROM_STR("test-new-key");
 
 int main()
 {
+
+// If running with libcurl, call global init. See project Readme for more info
+#ifdef BUILD_CURL_TRANSPORT
+  printf("Wololo\n\n\n\n");
+  curl_global_init(CURL_GLOBAL_ALL);
+#endif
+
   /************* 1) create secret id credentials for request   ***********/
   az_credential_client_secret credential = { 0 };
 
@@ -133,7 +149,7 @@ int main()
     printf("Running sample with no_op HTTP implementation.\nRecompile az_core with an HTTP client "
            "implementation like CURL to see sample sending network requests.\n\n"
            "i.e. cmake -DBUILD_CURL_TRANSPORT=ON ..\n\n");
-    return 0;
+    EXIT(1);
   }
 
   TEST_FAIL_ON_ERROR(create_result, "Failed to create key");
@@ -166,7 +182,7 @@ int main()
           "buffer",
           version_len,
           version_buffer_len);
-      return exit_code + 1; // Error, terminate proccess with non 0 as error.
+      EXIT(1); // Error, terminate proccess with non 0 as error.
     }
     else
     {
@@ -222,7 +238,7 @@ int main()
       "\n\n*********************************\nGet Key again after DELETE result: \n%s\n",
       response_buffer);
 
-  return exit_code;
+  EXIT(0); // terminate OK
 }
 
 az_span get_key_version(az_http_response* response)
