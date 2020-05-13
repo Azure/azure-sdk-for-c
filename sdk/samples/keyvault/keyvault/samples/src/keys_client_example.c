@@ -105,7 +105,7 @@ int main()
   TEST_FAIL_ON_ERROR(init_http_response_result, "Failed to init http response");
 
   /****************** 4) CREATE KEY with options******************************/
-  az_keyvault_create_key_options key_options = { 0 };
+  az_keyvault_create_key_options key_options = az_keyvault_create_key_options_default();
 
   // override options values
   key_options.operations = (az_span[]){ az_keyvault_key_operation_sign(), AZ_SPAN_NULL };
