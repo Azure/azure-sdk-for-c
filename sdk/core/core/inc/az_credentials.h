@@ -104,7 +104,7 @@ typedef struct
  * @param tenant_id an Azure tenant ID
  * @param client_id an Azure client ID
  * @param client_secret an Azure client secret
- * @retval An #az_result value indicating the result of the operation:
+ * @return An #az_result value indicating the result of the operation:
  *         - #AZ_OK if successful
  *         - Other error code if initialization failed
  */
