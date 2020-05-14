@@ -66,26 +66,27 @@ int main()
   // Example expects AZURE_STORAGE_URL in env to be a URL w/ SAS token
   az_storage_blobs_blob_client client = { 0 };
   az_storage_blobs_blob_client_options options = az_storage_blobs_blob_client_options_default();
-  az_result const operation_result = az_storage_blobs_blob_client_init(
+
+  az_result const client_init_result = az_storage_blobs_blob_client_init(
       &client, az_span_from_str(getenv(URI_ENV)), AZ_CREDENTIAL_ANONYMOUS, &options);
 
-  RETURN_IF_FAILED(operation_result, "Failed to init blob client");
+  RETURN_IF_FAILED(client_init_result, "Failed to init blob client");
 
   /******* 2) Create a buffer for response (will be reused for all requests)   *****/
   uint8_t response_buffer[1024 * 4] = { 0 };
   az_http_response http_response = { 0 };
-  az_result const init_http_response_result
+  az_result const http_response_init_result
       = az_http_response_init(&http_response, AZ_SPAN_FROM_BUFFER(response_buffer));
 
-  RETURN_IF_FAILED(init_http_response_result, "Failed to init http response");
+  RETURN_IF_FAILED(http_response_init_result, "Failed to init http response");
 
   // 3) upload content
   printf("Uploading blob...\n");
-  az_result const create_result = az_storage_blobs_blob_upload(
+  az_result const blob_upload_result = az_storage_blobs_blob_upload(
       &client, &az_context_app, content_to_upload, NULL, &http_response);
 
   // validate sample running with no_op http client
-  if (create_result == AZ_ERROR_NOT_IMPLEMENTED)
+  if (blob_upload_result == AZ_ERROR_NOT_IMPLEMENTED)
   {
     printf("Running sample with no_op HTTP implementation.\nRecompile az_core with an HTTP client "
            "implementation like CURL to see sample sending network requests.\n\n"
@@ -93,12 +94,16 @@ int main()
     return 1;
   }
 
-  RETURN_IF_FAILED(create_result, "Failed to create blob");
+  RETURN_IF_FAILED(blob_upload_result, "Failed to upload blob");
 
   // 4) get response and parse it
   az_http_response_status_line status_line = { 0 };
-  RETURN_IF_FAILED(
-      az_http_response_get_status_line(&http_response, &status_line), "Failed to get status code");
+
+  az_result const status_line_get_result
+      = az_http_response_get_status_line(&http_response, &status_line);
+
+  RETURN_IF_FAILED(status_line_get_result, "Failed to get status line");
+
   printf("Status Code: %d\n", status_line.status_code);
   printf(
       "Phrase: %.*s\n",
@@ -107,11 +112,19 @@ int main()
 
   printf("\nHeaders:\n");
   // loop all headers from response
-  for (az_pair header;
-       az_http_response_get_next_header(&http_response, &header) != AZ_ERROR_ITEM_NOT_FOUND;)
+  while (true)
   {
+    az_pair header = { 0 };
+    az_result const header_get_result = az_http_response_get_next_header(&http_response, &header);
+    if (header_get_result == AZ_ERROR_ITEM_NOT_FOUND)
+    {
+      break;
+    }
+
+    RETURN_IF_FAILED(header_get_result, "Failed to get header");
+
     printf(
-        "%.*s:%.*s\n",
+        "\t%.*s : %.*s\n",
         az_span_size(header.key),
         az_span_ptr(header.key),
         az_span_size(header.value),
