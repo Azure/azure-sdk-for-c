@@ -49,8 +49,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <_az_cfg.h>
-
 #define TENANT_ID_ENV "AZURE_TENANT_ID"
 #define CLIENT_ID_ENV "AZURE_CLIENT_ID"
 #define CLIENT_SECRET_ENV "AZURE_CLIENT_SECRET"
@@ -70,6 +68,13 @@
 
 az_span get_key_version(az_http_response* response);
 az_span const key_name_for_test = AZ_SPAN_LITERAL_FROM_STR("test-new-key");
+
+#ifdef _MSC_VER
+// "'getenv': This function or variable may be unsafe. Consider using _dupenv_s instead."
+#pragma warning(disable : 4996)
+// "Compiler will insert Spectre mitigation for memory load if /Qspectre switch specified"
+#pragma warning(disable : 5045)
+#endif
 
 int main()
 {
@@ -108,12 +113,17 @@ int main()
   az_keyvault_create_key_options key_options = az_keyvault_create_key_options_default();
 
   // override options values
-  key_options.operations = (az_span[]){ az_keyvault_key_operation_sign(), AZ_SPAN_NULL };
+  az_span operations[2] = { 0 };
+  operations[0] = az_keyvault_key_operation_sign();
+  operations[1] = AZ_SPAN_NULL;
+  key_options.operations = operations;
 
   // buffer for tags   ->  adding tags
-  key_options.tags = (az_pair[]){ az_pair_from_str("aKey", "aValue"),
-                                  az_pair_from_str("bKey", "bValue"),
-                                  AZ_PAIR_NULL };
+  az_pair tags[3] = { 0 };
+  tags[0] = az_pair_from_str("aKey", "aValue");
+  tags[1] = az_pair_from_str("bKey", "bValue");
+  tags[2] = AZ_PAIR_NULL;
+  key_options.tags = tags;
 
   // 5) This is the actual call to keyvault service
   az_result const key_create_result = az_keyvault_keys_key_create(
@@ -189,9 +199,7 @@ int main()
 
   RETURN_IF_FAILED(version_create_result, "Failed to create key version");
 
-  printf(
-      "\n\n*********************************\nKey new version created: \n%s",
-      response_buffer);
+  printf("\n\n*********************************\nKey new version created: \n%s", response_buffer);
 
   /****************** 9) GET KEY previous ver ******************************/
   // Here we use the version we recorded previously as parameter
@@ -218,8 +226,7 @@ int main()
   RETURN_IF_FAILED(key_get_again_result, "Failed to get key");
 
   printf(
-      "\n\n*********************************\nGet Key again after DELETE: \n%s\n",
-      response_buffer);
+      "\n\n*********************************\nGet Key again after DELETE: \n%s\n", response_buffer);
 
   return 0;
 }

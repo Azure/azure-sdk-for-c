@@ -26,8 +26,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <_az_cfg.h>
-
 #define URI_ENV "AZURE_STORAGE_URL"
 
 #define RETURN_IF_FAILED(result, message) \
@@ -43,6 +41,11 @@
   } while (0)
 
 static az_span content_to_upload = AZ_SPAN_LITERAL_FROM_STR("Some test content");
+
+#ifdef _MSC_VER
+// "'getenv': This function or variable may be unsafe. Consider using _dupenv_s instead."
+#pragma warning(disable : 4996)
+#endif
 
 // Uncomment below code to enable logging (and the first lines of main function)
 /*
