@@ -136,7 +136,7 @@ int main()
 
   RETURN_IF_FAILED(key_create_result, "Failed to create key");
 
-  printf("Key created result: \n%s", response_buffer);
+  printf("Key created: \n%s", response_buffer);
 
   /****************** 6) GET KEY latest ver ******************************/
   az_result const key_get_result = az_keyvault_keys_key_get(
@@ -144,7 +144,7 @@ int main()
 
   RETURN_IF_FAILED(key_get_result, "Failed to get key");
 
-  printf("\n\n*********************************\nGet Key result: \n%s", response_buffer);
+  printf("\n\n*********************************\nGet key: \n%s", response_buffer);
 
   /****************** 7) get key version from response ****/
   // version is still at http_response. Let's copy it to a new buffer
@@ -164,6 +164,7 @@ int main()
           "Use larger buffer.",
           version_len,
           version_buffer_len);
+
       return 1; // Error, terminate proccess with non 0 as error.
     }
     else
@@ -189,7 +190,7 @@ int main()
   RETURN_IF_FAILED(version_create_result, "Failed to create key version");
 
   printf(
-      "\n\n*********************************\nKey new version created result: \n%s",
+      "\n\n*********************************\nKey new version created: \n%s",
       response_buffer);
 
   /****************** 9) GET KEY previous ver ******************************/
@@ -217,7 +218,7 @@ int main()
   RETURN_IF_FAILED(key_get_again_result, "Failed to get key");
 
   printf(
-      "\n\n*********************************\nGet Key again after DELETE result: \n%s\n",
+      "\n\n*********************************\nGet Key again after DELETE: \n%s\n",
       response_buffer);
 
   return 0;
