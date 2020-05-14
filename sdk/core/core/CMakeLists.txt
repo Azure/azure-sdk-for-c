@@ -76,32 +76,6 @@ set_property(CACHE AZ_PLATFORM_IMPL PROPERTY STRINGS NONE WIN32 POSIX USER)
 
 set(AZ_USER_PLATFORM_IMPL_NAME "" CACHE STRING "Name of the implementation target")
 
-if(AZ_PLATFORM_IMPL STREQUAL "USER")
-  set(AZ_PLATFORM_IMPL_USER ON)
-elseif(AZ_PLATFORM_IMPL STREQUAL "POSIX")
-  set(AZ_PLATFORM_IMPL_POSIX ON)
-elseif(AZ_PLATFORM_IMPL STREQUAL "WIN32")
-  set(AZ_PLATFORM_IMPL_WIN32 ON)
-else()
-  set(AZ_PLATFORM_IMPL_NONE ON)
-endif()
-
-if(AZ_PLATFORM_IMPL_USER)
-  target_link_libraries(${TARGET_NAME} PRIVATE ${AZ_USER_PLATFORM_IMPL_NAME})
-elseif(AZ_PLATFORM_IMPL_POSIX)
-  target_link_libraries(${TARGET_NAME} PRIVATE az_posix)
-elseif(AZ_PLATFORM_IMPL_WIN32)
-  target_link_libraries(${TARGET_NAME} PRIVATE az_win32)
-elseif(AZ_PLATFORM_IMPL_NONE)
-  target_link_libraries(${TARGET_NAME} PRIVATE az_noplatform)
-endif()
-
-if (TRANSPORT_CURL)
-  target_link_libraries(${TARGET_NAME} PRIVATE az_curl)
-else()
-  target_link_libraries(${TARGET_NAME} PRIVATE az_nohttp)
-endif()
-
 # make sure that users can consume the project as a library.
 add_library (az::core ALIAS ${TARGET_NAME})
 

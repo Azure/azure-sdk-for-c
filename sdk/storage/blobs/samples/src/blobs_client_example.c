@@ -18,13 +18,9 @@
  */
 
 #include <az_context.h>
-#include <az_credentials.h>
-#include <az_http.h>
-#include <az_http_internal.h>
-#include <az_http_transport.h>
-#include <az_json.h>
-#include <az_log.h>
 #include <az_storage_blobs.h>
+
+#include <curl/curl.h>
 
 #include <stdio.h>
 #include <stdlib.h>

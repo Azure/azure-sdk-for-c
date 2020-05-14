@@ -43,9 +43,10 @@
 #include <az_context.h>
 #include <az_credentials.h>
 #include <az_http.h>
-#include <az_http_internal.h>
 #include <az_json.h>
 #include <az_keyvault.h>
+
+#include <curl/curl.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -57,7 +58,7 @@
 #define CLIENT_SECRET_ENV "AZURE_CLIENT_SECRET"
 #define URI_ENV "AZURE_KEYVAULT_URL"
 
-#ifdef BUILD_CURL_TRANSPORT
+#ifdef TRANSPORT_CURL
 #define EXIT(code) \
   do \
   { \
@@ -76,7 +77,7 @@
       printf("\n"); \
       printf(message); \
       printf("\n"); \
-      EXIT(1) \
+      EXIT(1); \
     } \
   } while (0)
 
@@ -87,10 +88,10 @@ int main()
 {
 
 // If running with libcurl, call global init. See project Readme for more info
-#ifdef BUILD_CURL_TRANSPORT
-  printf("Wololo\n\n\n\n");
-  curl_global_init(CURL_GLOBAL_ALL);
+#ifdef TRANSPORT_CURL
+  TEST_FAIL_ON_ERROR(curl_global_init(CURL_GLOBAL_ALL), "Fail to init libcurl");
 #endif
+  curl_global_init(CURL_GLOBAL_ALL);
 
   /************* 1) create secret id credentials for request   ***********/
   az_credential_client_secret credential = { 0 };

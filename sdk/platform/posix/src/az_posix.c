@@ -20,26 +20,3 @@ void az_platform_sleep_msec(int32_t milliseconds)
 {
   (void)usleep((useconds_t)milliseconds * _az_TIME_MICROSECONDS_PER_MILLISECOND);
 }
-
-void az_platform_mtx_destroy(az_platform_mtx* mtx)
-{
-  if (pthread_mutex_destroy(&mtx->_internal.mutex) == 0)
-  {
-    *mtx = (az_platform_mtx){ 0 };
-  }
-}
-
-AZ_NODISCARD az_result az_platform_mtx_init(az_platform_mtx* mtx)
-{
-  return pthread_mutex_init(&mtx->_internal.mutex, NULL) == 0 ? AZ_OK : AZ_ERROR_MUTEX;
-}
-
-AZ_NODISCARD az_result az_platform_mtx_lock(az_platform_mtx* mtx)
-{
-  return pthread_mutex_lock(&mtx->_internal.mutex) == 0 ? AZ_OK : AZ_ERROR_MUTEX;
-}
-
-AZ_NODISCARD az_result az_platform_mtx_unlock(az_platform_mtx* mtx)
-{
-  return pthread_mutex_unlock(&mtx->_internal.mutex) == 0 ? AZ_OK : AZ_ERROR_MUTEX;
-}

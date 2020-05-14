@@ -9,7 +9,6 @@
 #include <cmocka.h>
 
 #include <az_storage_blobs.h>
-#include <az_credentials.h>
 
 #include <_az_cfg.h>
 
@@ -21,6 +20,7 @@ void test_storage_blobs_init(void** state)
   az_storage_blobs_blob_client_options opts = az_storage_blobs_blob_client_options_default();
 
   assert_true(
-      az_storage_blobs_blob_client_init(&client, AZ_SPAN_FROM_STR("url"), AZ_CREDENTIAL_ANONYMOUS, &opts)
+      az_storage_blobs_blob_client_init(
+          &client, AZ_SPAN_FROM_STR("url"), AZ_CREDENTIAL_ANONYMOUS, &opts)
       == AZ_OK);
 }
