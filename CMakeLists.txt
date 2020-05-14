@@ -72,7 +72,7 @@ add_subdirectory(sdk/platform/win32)
 
 add_subdirectory(sdk/platform/http_client/nohttp)
 # Adding transport implementation for curl
-# Users can still build Core and SDK client without depending on a HTTP transport implementation
+# Users can still build Core and SDK client without depending on an HTTP transport implementation
 if(TRANSPORT_CURL)
   add_subdirectory(sdk/platform/http_client/curl)
 endif()
@@ -101,4 +101,3 @@ if (UNIT_TESTING)
     add_subdirectory(sdk/samples/keyvault/keyvault/test/cmocka)
   endif()
 endif()
-

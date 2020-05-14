@@ -72,7 +72,7 @@ There are manay ways that you can contribute to the Azure SDK for Embedded C pro
 - [git](https://git-scm.com/downloads) to clone our Azure SDK repository with the desired tag
 - [cmocka](https://cmocka.org/) for building and running unit tests. By default, building unit tests is disabled, so, unless you want to add unit tests or run then, you don't need to install this. See how `vcpkg` can be used to install dependencies [here][vcpkg].
 - [libcurl](https://curl.haxx.se/download.html) which is used as an http stack, and is required for building and running service samples (keyvault and storage). You don't need to install libcurl if you are not building samples, or if you will provide another HTTP stack implementation. The minimum required version of libcurl is 7.1.
-> Note: Using libcurl requires a global init and clean up that needs to happen on customer code. Take a look into Azure SDK Storage and Keyvault samples for how global init is done before sending http requests to Azure. See more info in Running Samples section.
+> Note: Using libcurl requires a global init and clean up that needs to happen in application code. Take a look into Azure SDK Storage and Keyvault samples for how global init is done before sending http requests to Azure. See more info in Running Samples section.
 
 See how `vcpkg` can be used to install dependencies [here][vcpkg].
 - [doxygen](http://www.doxygen.nl/download.html) if you need to generate and view documentation.
