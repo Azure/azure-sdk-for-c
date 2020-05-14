@@ -75,7 +75,14 @@ typedef void (*az_log_message_fn)(az_log_classification classification, az_span 
  * @param classifications An array of az_log_classification values.
  *                        The last element of the array must be AZ_LOG_END_OF_LIST.
  */
+#ifndef AZ_NO_LOGGING
 void az_log_set_classifications(az_log_classification const classifications[]);
+#else
+AZ_INLINE void az_log_set_classifications(az_log_classification const classifications[])
+{
+  (void)classifications;
+}
+#endif // AZ_NO_LOGGING
 
 /**
  * @brief az_log_set_callback sets the function that will be invoked to report an Azure SDK
@@ -85,7 +92,14 @@ void az_log_set_classifications(az_log_classification const classifications[]);
  * SDK client library report a log message matching one of the az_log_classifications passed to
  * az_log_set_classifications.
  */
+#ifndef AZ_NO_LOGGING
 void az_log_set_callback(az_log_message_fn az_log_message_callback);
+#else
+AZ_INLINE void az_log_set_callback(az_log_message_fn az_log_message_callback)
+{
+  (void)az_log_message_callback;
+}
+#endif // AZ_NO_LOGGING
 
 #include <_az_cfg_suffix.h>
 

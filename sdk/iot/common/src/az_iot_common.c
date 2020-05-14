@@ -27,7 +27,7 @@ AZ_NODISCARD int32_t az_iot_retry_calc_delay(
   _az_PRECONDITION_RANGE(0, max_retry_delay_msec, INT32_MAX - 1);
   _az_PRECONDITION_RANGE(0, random_msec, INT32_MAX - 1);
 
-  _az_log_write(AZ_LOG_IOT_RETRY, AZ_SPAN_NULL);
+  _az_LOG_WRITE(AZ_LOG_IOT_RETRY, AZ_SPAN_NULL);
 
   int32_t delay = _az_retry_calc_delay(attempt, min_retry_delay_msec, max_retry_delay_msec);
 

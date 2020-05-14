@@ -11,11 +11,17 @@ option(UNIT_TESTING "Build unit test projects" OFF)
 option(UNIT_TESTING_MOCKS "wrap PAL functions with mock implementation for tests" OFF)
 option(TRANSPORT_PAHO "Build IoT Samples with Paho MQTT support" OFF)
 option(PRECONDITIONS "Build SDK with preconditions enabled" ON)
+option(LOGGING "Build SDK with logging support" ON)
 
 # disable preconditions when it's set to OFF
 if (NOT PRECONDITIONS)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DAZ_NO_PRECONDITION_CHECKING")
 endif()
+
+if (NOT LOGGING)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DAZ_NO_LOGGING")
+endif()
+
 
 # enable mock functions with link option -ld
 if(UNIT_TESTING_MOCKS)
