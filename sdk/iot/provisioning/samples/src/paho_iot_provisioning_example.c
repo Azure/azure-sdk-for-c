@@ -50,6 +50,7 @@
 static char mqtt_client_id[128];
 static char mqtt_username[128];
 static char register_publish_topic[128];
+static char query_topic[256];
 static char global_provisioning_endpoint[256] = { 0 };
 static char id_scope[16] = { 0 };
 static char registration_id[256] = { 0 };
@@ -105,7 +106,7 @@ static az_result read_configuration_entry(
   return AZ_OK;
 }
 
-// Read the user environment variables used to connect to IoT Hub
+// Read the user environment variables used to connect to the Provisioning Service
 static az_result read_configuration_and_init_client()
 {
   az_span endpoint_span = AZ_SPAN_FROM_BUFFER(global_provisioning_endpoint);
@@ -157,7 +158,7 @@ static int connect_device()
   mqtt_connect_options.cleansession = false;
   mqtt_connect_options.keepAliveInterval = AZ_IOT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS;
 
-  // Get the MQTT user name used to connect to IoT Hub
+  // Get the MQTT user name used to connect to the Provisioning Service
   if (az_failed(
           rc = az_iot_provisioning_client_get_user_name(
               &provisioning_client, mqtt_username, sizeof(mqtt_username), NULL)))
@@ -179,7 +180,7 @@ static int connect_device()
 
   mqtt_connect_options.ssl = &mqtt_ssl_options;
 
-  // Connect to IoT Hub
+  // Connect to the Provisioning Service
   if ((rc = MQTTClient_connect(mqtt_client, &mqtt_connect_options)) != MQTTCLIENT_SUCCESS)
   {
     printf("Failed to connect, return code %d\n", rc);
@@ -189,6 +190,7 @@ static int connect_device()
   return 0;
 }
 
+// Subscribe to the necessary topic to receive responses from the Provisioning Service
 static int subscribe()
 {
   int rc;
@@ -204,11 +206,13 @@ static int subscribe()
   return 0;
 }
 
+// Send the register pub message to the Provisioning Service
 static int register_device()
 {
   int rc;
   MQTTClient_message pubmsg = MQTTClient_message_initializer;
 
+  // Get the topic to send the provisioning request
   if (az_failed(
           rc = az_iot_provisioning_client_register_get_publish_topic(
               &provisioning_client, register_publish_topic, sizeof(register_publish_topic), NULL)))
@@ -222,6 +226,7 @@ static int register_device()
   pubmsg.qos = 1;
   pubmsg.retained = 0;
 
+  // Send the registration request message
   if ((rc = MQTTClient_publishMessage(mqtt_client, register_publish_topic, &pubmsg, NULL))
       != MQTTCLIENT_SUCCESS)
   {
@@ -232,6 +237,7 @@ static int register_device()
   return 0;
 }
 
+// Print an az_span to the console
 static void print_az_span(az_span span)
 {
   char* buffer = (char*)az_span_ptr(span);
@@ -251,6 +257,8 @@ static int get_operation_status()
   int topic_len;
   MQTTClient_message* message;
 
+  // Continue to parse incoming responses from the Provisioning Service until
+  // the device has been successfully provisioned or an error occurs
   while (!is_operation_complete)
   {
     if ((rc
@@ -274,8 +282,8 @@ static int get_operation_status()
     print_az_span(az_span_init(message->payload, message->payloadlen));
 
     az_iot_provisioning_client_register_response response;
-    char query_topic[256];
 
+    // Parse the incoming message and payload
     if (az_failed(
             rc = az_iot_provisioning_client_parse_received_topic_and_payload(
                 &provisioning_client,
@@ -287,6 +295,7 @@ static int get_operation_status()
       return rc;
     }
 
+    // Parse the operation status from a string to an enum
     az_iot_provisioning_client_operation_status operation_status;
     if (az_failed(
             rc = az_iot_provisioning_client_parse_operation_status(&response, &operation_status)))
@@ -295,10 +304,13 @@ static int get_operation_status()
       return rc;
     }
 
+    // Check whether or not the operation is complete
     is_operation_complete = az_iot_provisioning_client_operation_complete(operation_status);
 
     if (!is_operation_complete)
     {
+      // In case the operation is not complete, issue a new query to the service
+      // Get the topic to send the query message
       if (az_failed(
               rc = az_iot_provisioning_client_query_status_get_publish_topic(
                   &provisioning_client, &response, query_topic, sizeof(query_topic), NULL)))
@@ -307,18 +319,23 @@ static int get_operation_status()
         return rc;
       }
 
+      // IMPORTANT: Wait the recommended retry-after number of seconds before query
       printf("Querying after %u seconds...\n", response.retry_after_seconds);
       sleep_seconds(response.retry_after_seconds);
 
+      // Publish the query message
       if ((rc = MQTTClient_publish(mqtt_client, query_topic, 0, NULL, 0, 0, NULL))
           != MQTTCLIENT_SUCCESS)
       {
         printf("Failed to publish get_operation_status, return code %d\n", rc);
         return rc;
       }
+
+      // Loop back up to receive the result of the query
     }
     else
     {
+      // Successful assignment - print out the assigned hostname and device id
       if (operation_status == AZ_IOT_PROVISIONING_STATUS_ASSIGNED)
       {
         printf("SUCCESS - Device provisioned:\n");
@@ -389,6 +406,7 @@ int main()
     return rc;
   }
 
+  // Connect to the Provisioning Service
   if ((rc = connect_device()) != 0)
   {
     return rc;
@@ -396,6 +414,7 @@ int main()
 
   printf("Connected to %s.\n", global_provisioning_endpoint);
 
+  // Subscribe to the necessary provisioning topic to receive provisioning responses
   if ((rc = subscribe()) != 0)
   {
     return rc;
@@ -403,23 +422,27 @@ int main()
 
   printf("Subscribed.\n");
 
+  // Begin the registration process by sending a registration request message
   if ((rc = register_device()) != 0)
   {
     return rc;
   }
 
+  // Receive the status of the registration request
   if ((rc = get_operation_status()) != 0)
   {
     return rc;
   }
 
+  // Gracefully disconnect: send the disconnect packet and close the socket
   if ((rc = MQTTClient_disconnect(mqtt_client, TIMEOUT_MQTT_DISCONNECT_MS)) != MQTTCLIENT_SUCCESS)
   {
     printf("Failed to disconnect MQTT client, return code %d\n", rc);
     return rc;
   }
-
   printf("Disconnected.\n");
+
+  // Clean up and release resources allocated by the mqtt client
   MQTTClient_destroy(&mqtt_client);
 
   return 0;
