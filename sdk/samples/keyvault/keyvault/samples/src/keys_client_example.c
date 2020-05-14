@@ -74,12 +74,12 @@ az_span const key_name_for_test = AZ_SPAN_LITERAL_FROM_STR("test-new-key");
 #pragma warning(disable : 4996)
 // "Compiler will insert Spectre mitigation for memory load if /Qspectre switch specified"
 #pragma warning(disable : 5045)
-#endif
+#endif // _MSC_VER
 
 int main()
 {
   /************* 1) create secret id credentials for request   ***********/
-  az_credential_client_secret credential = { { 0 } };
+  az_credential_client_secret credential;
 
   // init the credential struct
   az_result const credential_init_result = az_credential_client_secret_init(
@@ -91,7 +91,7 @@ int main()
   RETURN_IF_FAILED(credential_init_result, "Failed to init credential");
 
   /************ 2) Creates keyvault client    ****************/
-  az_keyvault_keys_client client = { { 0 } };
+  az_keyvault_keys_client client;
   az_keyvault_keys_client_options options = az_keyvault_keys_client_options_default();
 
   // URL will be copied to client's internal buffer. So we don't need to keep the content of URL
@@ -104,7 +104,7 @@ int main()
   /******* 3) Create a buffer for response (will be reused for all requests)   *****/
   uint8_t response_buffer[1024 * 4];
   az_span response_span = AZ_SPAN_FROM_BUFFER(response_buffer);
-  az_http_response http_response = { { 0 } };
+  az_http_response http_response;
   az_result const http_response_init_result = az_http_response_init(&http_response, response_span);
 
   RETURN_IF_FAILED(http_response_init_result, "Failed to init http response");
@@ -113,13 +113,13 @@ int main()
   az_keyvault_create_key_options key_options = az_keyvault_create_key_options_default();
 
   // override options values
-  az_span operations[2] = { { 0 } };
+  az_span operations[2];
   operations[0] = az_keyvault_key_operation_sign();
   operations[1] = AZ_SPAN_NULL;
   key_options.operations = operations;
 
   // buffer for tags   ->  adding tags
-  az_pair tags[3] = { { 0 } };
+  az_pair tags[3];
   tags[0] = az_pair_from_str("aKey", "aValue");
   tags[1] = az_pair_from_str("bKey", "bValue");
   tags[2] = AZ_PAIR_NULL;
@@ -233,9 +233,9 @@ int main()
 
 az_span get_key_version(az_http_response* response)
 {
-  az_span body = { 0 };
+  az_span body;
 
-  az_http_response_status_line status_line = { 0 };
+  az_http_response_status_line status_line ;
   az_result r = az_http_response_get_status_line(response, &status_line);
   if (az_failed(r))
   {
@@ -255,7 +255,7 @@ az_span get_key_version(az_http_response* response)
     return AZ_SPAN_NULL;
   }
 
-  az_span k = { 0 };
+  az_span k;
   r = az_json_token_get_string(&value, &k);
   if (az_failed(r))
   {
@@ -263,7 +263,7 @@ az_span get_key_version(az_http_response* response)
   }
   // calculate version
   int32_t const kid_length = az_span_size(k);
-  az_span version = { 0 };
+  az_span version = AZ_SPAN_NULL;
 
   for (int32_t index = kid_length; index > 0; --index)
   {

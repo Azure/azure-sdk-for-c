@@ -67,7 +67,7 @@ int main()
 
   // 1) Init client.
   // Example expects AZURE_STORAGE_URL in env to be a URL w/ SAS token
-  az_storage_blobs_blob_client client = { { 0 } };
+  az_storage_blobs_blob_client client;
   az_storage_blobs_blob_client_options options = az_storage_blobs_blob_client_options_default();
 
   az_result const client_init_result = az_storage_blobs_blob_client_init(
@@ -77,7 +77,7 @@ int main()
 
   /******* 2) Create a buffer for response (will be reused for all requests)   *****/
   uint8_t response_buffer[1024 * 4] = { 0 };
-  az_http_response http_response = { 0 };
+  az_http_response http_response;
   az_result const http_response_init_result
       = az_http_response_init(&http_response, AZ_SPAN_FROM_BUFFER(response_buffer));
 
@@ -101,7 +101,7 @@ int main()
   RETURN_IF_FAILED(blob_upload_result, "Failed to upload blob");
 
   // 4) get response and parse it
-  az_http_response_status_line status_line = { 0 };
+  az_http_response_status_line status_line;
 
   az_result const status_line_get_result
       = az_http_response_get_status_line(&http_response, &status_line);
@@ -118,7 +118,7 @@ int main()
   // loop all headers from response
   while (true)
   {
-    az_pair header = { 0 };
+    az_pair header;
     az_result const header_get_result = az_http_response_get_next_header(&http_response, &header);
     if (header_get_result == AZ_ERROR_ITEM_NOT_FOUND)
     {
