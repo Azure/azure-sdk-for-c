@@ -159,7 +159,8 @@ export AZURE_KEYVAULT_URL="https://???????????.??"
 export AZURE_STORAGE_URL="https://??????????????"
 ```
 
-### Libcurl global init and global clean up
+### Libcurl Global Init and Global Clean Up
+
 When you select to build the libcurl http stack implementation, you have to make sure to call `curl_global_init` before using SDK client like Storage or Keyvault to send HTTP request to Azure.
 
 You need to also call `curl_global_cleanup` once you no longer need to perform SDk client API calls.
