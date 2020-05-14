@@ -67,7 +67,7 @@ int main()
 
   // 1) Init client.
   // Example expects AZURE_STORAGE_URL in env to be a URL w/ SAS token
-  az_storage_blobs_blob_client client = { 0 };
+  az_storage_blobs_blob_client client = { { 0 } };
   az_storage_blobs_blob_client_options options = az_storage_blobs_blob_client_options_default();
 
   az_result const client_init_result = az_storage_blobs_blob_client_init(
