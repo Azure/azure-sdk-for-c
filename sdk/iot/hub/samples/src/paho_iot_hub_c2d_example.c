@@ -291,13 +291,15 @@ int main()
   printf("Waiting for activity. [Press ENTER to abort]\n");
   (void)getchar();
 
+  // Gracefully disconnect: send the disconnect packet and close the socket
   if ((rc = MQTTClient_disconnect(mqtt_client, TIMEOUT_MQTT_DISCONNECT_MS)) != MQTTCLIENT_SUCCESS)
   {
     printf("Failed to disconnect MQTT client, return code %d\n", rc);
     return rc;
   }
-
   printf("Disconnected.\n");
+
+  // Clean up and release resources allocated by the mqtt client
   MQTTClient_destroy(&mqtt_client);
 
   return 0;
