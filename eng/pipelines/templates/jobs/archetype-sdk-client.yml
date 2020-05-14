@@ -14,6 +14,7 @@ jobs:
       # UNIT_TESTING_MOCKS          OFF
       # TRANSPORT_PAHO              OFF
       # PRECONDITIONS               ON
+      # LOGGING                     ON
       # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_NONE
       Linux_x64:
         vm.image: 'ubuntu-18.04'
@@ -43,6 +44,7 @@ jobs:
       # UNIT_TESTING_MOCKS          OFF
       # TRANSPORT_PAHO              ON
       # PRECONDITIONS               ON
+      # LOGGING                     ON
       # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_POSIX / AZ_PLATFORM_IMPL_WIN32
       Linux_x64_with_samples:
         vm.image: 'ubuntu-18.04'
@@ -76,6 +78,7 @@ jobs:
       # UNIT_TESTING_MOCKS          OFF
       # TRANSPORT_PAHO              ON
       # PRECONDITIONS               ON
+      # LOGGING                     ON
       # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_POSIX / AZ_PLATFORM_IMPL_WIN32
       Linux_x64_with_samples_and_unit_test:
         vm.image: 'ubuntu-18.04'
@@ -109,6 +112,7 @@ jobs:
       # UNIT_TESTING_MOCKS          ON
       # TRANSPORT_PAHO              OFF
       # PRECONDITIONS               ON
+      # LOGGING                     ON
       # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_NONE
       Linux_x64_with_unit_test:
         vm.image: 'ubuntu-18.04'
@@ -144,6 +148,7 @@ jobs:
       # UNIT_TESTING_MOCKS          OFF
       # TRANSPORT_PAHO              OFF
       # PRECONDITIONS               OFF
+      # LOGGING                     ON
       # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_NONE
       Linux_x64_with_unit_test_no_preconditions:
         vm.image: 'ubuntu-18.04'
@@ -169,6 +174,21 @@ jobs:
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
         build.args: ' -DUNIT_TESTING=ON -DPRECONDITIONS=OFF'
+
+      # Build with no logging
+      # WARNINGS_AS_ERRORS          ON
+      # TRANSPORT_CURL              ON
+      # UNIT_TESTING                ON
+      # UNIT_TESTING_MOCK_ENABLED   OFF
+      # TRANSPORT_PAHO              ON
+      # PRECONDITIONS               OFF
+      # LOGGING                     OFF
+      # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_POSIX
+      Linux_x64_with_unit_tests_and_samples_no_logging_no_preconditions:
+        vm.image: 'ubuntu-18.04'
+        vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
+        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
+        build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON -DPRECONDITIONS=OFF -DLOGGING=OFF'
   pool:
     vmImage: $(vm.image)
   variables:

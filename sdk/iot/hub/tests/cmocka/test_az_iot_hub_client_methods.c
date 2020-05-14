@@ -5,18 +5,18 @@
 #include <az_iot_hub_client.h>
 #include <az_log.h>
 #include <az_precondition.h>
+#include <az_precondition_internal.h>
 #include <az_result.h>
 #include <az_span.h>
-
-#include <az_precondition_internal.h>
+#include <az_test_log.h>
+#include <az_test_precondition.h>
+#include <az_test_span.h>
 
 #include <setjmp.h>
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdint.h>
 
-#include <az_test_precondition.h>
-#include <az_test_span.h>
 #include <cmocka.h>
 
 #define TEST_SPAN_BUFFER_SIZE 128
@@ -399,7 +399,7 @@ static void test_az_iot_hub_client_methods_logging_succeed()
       az_iot_hub_client_methods_parse_received_topic(&client, _log_expected_topic, &out_request)
       == AZ_OK);
 
-  assert_int_equal(1, _log_invoked_topic);
+  assert_int_equal(_az_BUILT_WITH_LOGGING(1, 0), _log_invoked_topic);
 
   az_log_set_callback(NULL);
   az_log_set_classifications(NULL);
