@@ -32,12 +32,7 @@ AZ_NODISCARD az_result _az_aad_build_body(
     az_span client_secret,
     az_span* out_body);
 
-AZ_NODISCARD az_result _az_aad_request_token(_az_http_request* request, _az_token* out_token);
-
-AZ_NODISCARD bool _az_token_expired(_az_token const* token);
-
-AZ_NODISCARD az_result _az_token_set(_az_token_credential* self, _az_token const* new_token);
-AZ_NODISCARD az_result _az_token_get(_az_token_credential* self, _az_token* out_token);
+AZ_NODISCARD az_result _az_aad_request_token(_az_http_request* request, _az_credential_token* out_token_credential);
 
 #include <_az_cfg_suffix.h>
 

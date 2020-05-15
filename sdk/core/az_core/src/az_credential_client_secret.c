@@ -41,7 +41,7 @@ static AZ_NODISCARD az_result _az_credential_client_secret_request_token(
       AZ_SPAN_FROM_BUFFER(header_buf),
       body));
 
-  return _az_aad_request_token(&request, &credential->_internal.token);
+  return _az_aad_request_token(&request, &credential->_internal.token_credential);
 }
 
 az_span const _az_auth_header_name = AZ_SPAN_LITERAL_FROM_STR("authorization");
@@ -51,19 +51,21 @@ static AZ_NODISCARD az_result _az_credential_client_secret_apply(
     az_credential_client_secret* credential,
     _az_http_request* ref_request)
 {
+  _az_token token = { 0 };
+  AZ_RETURN_IF_FAILED(_az_credential_token_get_token(&credential->_internal.token_credential, &token));
 
-  if (_az_token_expired(&(credential->_internal.token)))
+  if (_az_token_expired(&token))
   {
     AZ_RETURN_IF_FAILED(
         _az_credential_client_secret_request_token(credential, ref_request->_internal.context));
   }
 
-  int16_t const token_length = credential->_internal.token._internal.token_length;
+  int16_t const token_length = token._internal.token_length;
 
   AZ_RETURN_IF_FAILED(az_http_request_append_header(
       ref_request,
       _az_auth_header_name,
-      az_span_init(credential->_internal.token._internal.token, token_length)));
+      az_span_init(token._internal.token, token_length)));
 
   return AZ_OK;
 }
@@ -97,7 +99,7 @@ AZ_NODISCARD az_result az_credential_client_secret_init(
       },
     };
 
-  AZ_RETURN_IF_FAILED(az_credential_token_init(&self->_internal.token_credential));
+  AZ_RETURN_IF_FAILED(_az_credential_token_init(&self->_internal.token_credential));
 
   return AZ_OK;
 }

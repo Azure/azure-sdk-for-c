@@ -21,7 +21,8 @@ AZ_NODISCARD az_result _az_credential_token_init(_az_credential_token* out_crede
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result _az_token_set(_az_credential_token* self, _az_token const* new_token)
+AZ_NODISCARD az_result
+_az_credential_token_set_token(_az_credential_token* self, _az_token const* new_token)
 {
   while (!az_platform_atomic_compare_exchange(
       &self->_internal.lock, &_az_token_credential_unlocked, &_az_token_credential_locked))
@@ -35,7 +36,8 @@ AZ_NODISCARD az_result _az_token_set(_az_credential_token* self, _az_token const
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result _az_token_get(_az_credential_token* self, _az_token* out_token)
+AZ_NODISCARD az_result
+_az_credential_token_get_token(_az_credential_token* self, _az_token* out_token)
 {
   while (!az_platform_atomic_compare_exchange(
       &self->_internal.lock, &_az_token_credential_unlocked, &_az_token_credential_locked))

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "az_aad_private.h"
-
+#include "az_credential_token_private.h"
 #include <az_http.h>
 #include <az_http_internal.h>
 #include <az_json.h>
@@ -77,7 +77,7 @@ AZ_NODISCARD az_result _az_aad_build_body(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result _az_aad_request_token(_az_http_request* request, _az_token* out_token)
+AZ_NODISCARD az_result _az_aad_request_token(_az_http_request* request, _az_credential_token* out_token_credential)
 {
   AZ_RETURN_IF_FAILED(az_http_request_append_header(
       request,
@@ -155,7 +155,7 @@ AZ_NODISCARD az_result _az_aad_request_token(_az_http_request* request, _az_toke
 
   new_token._internal.token_length = (int16_t)_az_span_diff(remainder, new_token_span);
 
-  AZ_RETURN_IF_FAILED(_az_token_set(out_token, &new_token));
+  AZ_RETURN_IF_FAILED(_az_credential_token_set_token(out_token_credential, &new_token));
 
   return AZ_OK;
 }
