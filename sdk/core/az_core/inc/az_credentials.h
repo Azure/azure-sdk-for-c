@@ -20,6 +20,7 @@
 #include <az_result.h>
 #include <az_span.h>
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -45,11 +46,20 @@ typedef struct
 {
   struct
   {
-    uint8_t token[_az_TOKEN_BUF_SIZE]; /*!< Base64-encoded token */
     int16_t token_length;
     int64_t expires_at_msec;
+    uint8_t token[_az_TOKEN_BUF_SIZE]; /*!< Base64-encoded token */
   } _internal;
 } _az_token;
+
+typedef struct
+{
+  struct
+  {
+    bool* volatile lock;
+    _az_token volatile token;
+  } _internal;
+} _az_credential_token;
 
 /**
  * @brief function callback definition as a contract to be implemented for a credential
@@ -88,11 +98,11 @@ typedef struct
   struct
   {
     _az_credential credential; /// must be the first field in every credential structure
+    _az_credential_token token_credential;
     az_span tenant_id;
     az_span client_id;
     az_span client_secret;
     az_span scopes;
-    _az_token token;
   } _internal;
 } az_credential_client_secret;
 

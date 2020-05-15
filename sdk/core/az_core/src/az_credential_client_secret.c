@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "az_aad_private.h"
+#include "az_credential_token_private.h"
 #include <az_credentials.h>
 #include <az_http.h>
 #include <az_http_internal.h>
@@ -88,13 +89,15 @@ AZ_NODISCARD az_result az_credential_client_secret_init(
           .set_scopes = (_az_credential_set_scopes_fn)_az_credential_client_secret_set_scopes,
           },
         },
+        .token_credential = { 0 },
         .tenant_id = tenant_id,
         .client_id = client_id,
         .client_secret = client_secret,
         .scopes = { 0 },
-        .token = { 0 }
       },
     };
+
+  AZ_RETURN_IF_FAILED(az_credential_token_init(&self->_internal.token_credential));
 
   return AZ_OK;
 }

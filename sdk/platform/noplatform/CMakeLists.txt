@@ -11,5 +11,3 @@ add_library(az_noplatform STATIC)
 target_link_libraries(az_noplatform PRIVATE az_core)
 
 target_sources(az_noplatform PRIVATE src/az_noplatform.c)
-
-target_include_directories(az_noplatform PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc>)

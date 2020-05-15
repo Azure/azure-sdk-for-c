@@ -47,6 +47,7 @@ add_library (
   ${TARGET_NAME}
   src/az_aad.c
   src/az_credential_client_secret.c
+  src/az_credential_token.c
   src/az_context.c
   src/az_http_pipeline.c
   src/az_http_policy.c

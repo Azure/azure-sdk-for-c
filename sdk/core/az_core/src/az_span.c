@@ -3,7 +3,7 @@
 
 #include "az_hex_private.h"
 #include "az_span_private.h"
-#include <az_platform_internal.h>
+#include <az_platform.h>
 #include <az_precondition.h>
 #include <az_precondition_internal.h>
 #include <az_span.h>

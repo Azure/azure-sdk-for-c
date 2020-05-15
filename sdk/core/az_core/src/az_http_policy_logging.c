@@ -7,7 +7,7 @@
 #include <az_http_internal.h>
 #include <az_http_transport.h>
 #include <az_log_internal.h>
-#include <az_platform_internal.h>
+#include <az_platform.h>
 #include <az_span_internal.h>
 
 #include <_az_cfg.h>

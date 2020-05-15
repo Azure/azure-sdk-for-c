@@ -3,30 +3,16 @@
 
 #include "az_aad_private.h"
 
-#include <az_config_internal.h>
 #include <az_http.h>
 #include <az_http_internal.h>
 #include <az_json.h>
-#include <az_platform_internal.h>
+#include <az_platform.h>
 #include <az_precondition_internal.h>
 #include <az_span_internal.h>
 
 #include <stddef.h>
 
 #include <_az_cfg.h>
-
-AZ_NODISCARD bool _az_token_expired(_az_token const* token)
-{
-  int64_t const expires_at_msec = token->_internal.expires_at_msec;
-  return expires_at_msec <= 0 || az_platform_clock_msec() > expires_at_msec;
-}
-
-AZ_NODISCARD az_result _az_token_set(_az_token* self, _az_token const* new_token)
-{
-  // TODO: thread sync
-  *self = *new_token;
-  return AZ_OK;
-}
 
 // https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow#request-an-access-token
 AZ_NODISCARD az_result _az_aad_build_url(az_span url, az_span tenant_id, az_span* out_url)
