@@ -59,6 +59,27 @@ static void test_log_func(az_log_classification classification, az_span message)
 
 int main()
 {
+#ifdef TRANSPORT_CURL
+  // If running with libcurl, call global init. See project Readme for more info
+  CURLcode lib_curl_init = curl_global_init(CURL_GLOBAL_ALL);
+  if (lib_curl_init != CURLE_OK)
+  {
+    RETURN_IF_FAILED(AZ_ERROR_HTTP_PLATFORM, "Couldn't init libcurl");
+  }
+  // Set up libcurl cleaning callback as to be called before ending program
+  atexit(curl_global_cleanup);
+#endif
+#ifdef AZ_NO_HTTP
+  // validate sample running with no_op http client
+  {
+    printf("Running sample with no_op HTTP implementation.\nRecompile az_core with an HTTP client "
+           "implementation like CURL to see sample sending network requests.\n\n"
+           "i.e. cmake -DTRANSPORT_CURL=ON ..\n\n");
+
+    return 255;
+  }
+#endif
+
   // Uncomment below code to enable logging
   /*
   az_log_classification const classifications[] = { AZ_LOG_HTTP_RESPONSE, AZ_LOG_END_OF_LIST };

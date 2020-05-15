@@ -58,17 +58,6 @@
 #define CLIENT_SECRET_ENV "AZURE_CLIENT_SECRET"
 #define URI_ENV "AZURE_KEYVAULT_URL"
 
-#ifdef TRANSPORT_CURL
-#define EXIT(code) \
-  do \
-  { \
-    curl_global_cleanup(); \
-    return code; \
-  } while (0)
-#else
-#define EXIT(code) return code;
-#endif
-
 #define RETURN_IF_FAILED(result, message) \
   do \
   { \
@@ -77,7 +66,7 @@
       printf("\n"); \
       printf(message); \
       printf("\n"); \
-      EXIT(1); \
+      return 1; \
     } \
   } while (0)
 
@@ -93,10 +82,25 @@ az_span const key_name_for_test = AZ_SPAN_LITERAL_FROM_STR("test-new-key");
 
 int main()
 {
-
-// If running with libcurl, call global init. See project Readme for more info
 #ifdef TRANSPORT_CURL
-  RETURN_IF_FAILED(curl_global_init(CURL_GLOBAL_ALL), "Fail to init libcurl");
+  // If running with libcurl, call global init. See project Readme for more info
+  CURLcode lib_curl_init = curl_global_init(CURL_GLOBAL_ALL);
+  if (lib_curl_init != CURLE_OK)
+  {
+    RETURN_IF_FAILED(AZ_ERROR_HTTP_PLATFORM, "Couldn't init libcurl");
+  }
+  // Set up libcurl cleaning callback as to be called before ending program
+  atexit(curl_global_cleanup);
+#endif
+#ifdef AZ_NO_HTTP
+  // validate sample running with no_op http client
+  {
+    printf("Running sample with no_op HTTP implementation.\nRecompile az_core with an HTTP client "
+           "implementation like CURL to see sample sending network requests.\n\n"
+           "i.e. cmake -DTRANSPORT_CURL=ON ..\n\n");
+
+    return 255;
+  }
 #endif
 
   /************* 1) create secret id credentials for request   ***********/
@@ -154,16 +158,6 @@ int main()
       az_keyvault_web_key_type_rsa(),
       &key_options,
       &http_response);
-
-  // validate sample running with no_op http client
-  if (key_create_result == AZ_ERROR_NOT_IMPLEMENTED)
-  {
-    printf("Running sample with no_op HTTP implementation.\nRecompile az_core with an HTTP client "
-           "implementation like CURL to see sample sending network requests.\n\n"
-           "i.e. cmake -DTRANSPORT_CURL=ON ..\n\n");
-
-    return 255;
-  }
 
   RETURN_IF_FAILED(key_create_result, "Failed to create key");
 
