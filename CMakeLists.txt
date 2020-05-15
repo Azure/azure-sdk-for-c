@@ -67,9 +67,13 @@ add_subdirectory(sdk/iot/hub)
 add_subdirectory(sdk/iot/provisioning)
 
 # PAL
-add_subdirectory(sdk/platform/noplatform)
-add_subdirectory(sdk/platform/posix)
-add_subdirectory(sdk/platform/win32)
+if(AZ_PLATFORM_IMPL STREQUAL "POSIX")
+  add_subdirectory(sdk/platform/posix)
+elseif(AZ_PLATFORM_IMPL STREQUAL "WIN32")
+  add_subdirectory(sdk/platform/win32)
+else()
+  add_subdirectory(sdk/platform/noplatform)
+endif()
 
 # User can disable samples generation by setting env variable AZ_SDK_C_NO_SAMPLES
 if(NOT DEFINED ENV{AZ_SDK_C_NO_SAMPLES})
