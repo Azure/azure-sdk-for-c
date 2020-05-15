@@ -46,9 +46,8 @@
 #include <az_json.h>
 #include <az_keyvault.h>
 
-#ifdef TRANSPORT_CURL
-#include <curl/curl.h>
-#endif
+// Uncomment below lines when working with libcurl
+// #include <curl/curl.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -61,8 +60,6 @@
 az_span get_key_version(az_http_response* response);
 az_span const key_name_for_test = AZ_SPAN_LITERAL_FROM_STR("test-new-key");
 
-static void formatMessage(char const* const message) { printf("\n%s\n", message); }
-
 #ifdef _MSC_VER
 // "'getenv': This function or variable may be unsafe. Consider using _dupenv_s instead."
 #pragma warning(disable : 4996)
@@ -72,16 +69,17 @@ static void formatMessage(char const* const message) { printf("\n%s\n", message)
 
 int main()
 {
-#ifdef TRANSPORT_CURL
+// Uncomment below lines when working with libcurl
+/*
   // If running with libcurl, call global init. See project Readme for more info
   if (curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK)
   {
-    formatMessage("Couldn't init libcurl");
+    printf("\nCouldn't init libcurl\n");
     return 1;
   }
   // Set up libcurl cleaning callback as to be called before ending program
   atexit(curl_global_cleanup);
-#endif
+*/
 #ifdef AZ_NO_HTTP
   // validate sample running with no_op http client
   printf("Running sample with no_op HTTP implementation.\nRecompile az_core with an HTTP client "
@@ -102,7 +100,7 @@ int main()
           az_span_from_str(getenv(CLIENT_SECRET_ENV)))
       != AZ_OK)
   {
-    formatMessage("Failed to init credential");
+    printf("\nFailed to init credential\n");
     return 1;
   }
 
@@ -112,11 +110,10 @@ int main()
 
   // URL will be copied to client's internal buffer. So we don't need to keep the content of URL
   // buffer immutable  on client's side
-  if (az_keyvault_keys_client_init(
-          &client, az_span_from_str(getenv(URI_ENV)), &credential, &options)
-      != AZ_OK)
+  if (az_failed(az_keyvault_keys_client_init(
+          &client, az_span_from_str(getenv(URI_ENV)), &credential, &options)))
   {
-    formatMessage("Failed to init keys client");
+    printf("\nFailed to init keys client\n");
     return 1;
   }
 
@@ -126,7 +123,7 @@ int main()
   az_http_response http_response;
   if (az_http_response_init(&http_response, response_span) != AZ_OK)
   {
-    formatMessage("Failed to init http response");
+    printf("\nFailed to init http response\n");
     return 1;
   }
 
@@ -156,7 +153,7 @@ int main()
           &http_response)
       != AZ_OK)
   {
-    formatMessage("Failed to create key");
+    printf("\nFailed to create key\n");
     return 1;
   }
 
@@ -167,7 +164,7 @@ int main()
           &client, &az_context_app, key_name_for_test, AZ_SPAN_NULL, &http_response)
       != AZ_OK)
   {
-    formatMessage("Failed to get key");
+    printf("\nFailed to get key\n");
     return 1;
   }
 
@@ -214,7 +211,7 @@ int main()
           &http_response)
       != AZ_OK)
   {
-    formatMessage("Failed to create key version");
+    printf("\nFailed to create key version\n");
     return 1;
   }
 
@@ -226,7 +223,7 @@ int main()
   if (az_keyvault_keys_key_get(&client, &az_context_app, key_name_for_test, version, &http_response)
       != AZ_OK)
   {
-    formatMessage("Failed to get previous version of the key");
+    printf("\nFailed to get previous version of the key\n");
     return 1;
   }
 
@@ -236,7 +233,7 @@ int main()
   if (az_keyvault_keys_key_delete(&client, &az_context_app, key_name_for_test, &http_response)
       != AZ_OK)
   {
-    formatMessage("Failed to delete key");
+    printf("\nFailed to delete key\n");
     return 1;
   }
 
@@ -247,7 +244,7 @@ int main()
           &client, &az_context_app, key_name_for_test, AZ_SPAN_NULL, &http_response)
       != AZ_OK)
   {
-    formatMessage("Failed to get key");
+    printf("\nFailed to get key\n");
     return 1;
   }
 
