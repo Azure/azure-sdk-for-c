@@ -31,6 +31,6 @@
 
 // @brief Optional pre-release identifier.
 //  SDK is in a prerelease state when present.
-#define AZ_SDK_VERSION_PRERELEASE "preview.1"
+#define AZ_SDK_VERSION_PRERELEASE "preview.2"
 
 #endif //_az_VERSION_H
