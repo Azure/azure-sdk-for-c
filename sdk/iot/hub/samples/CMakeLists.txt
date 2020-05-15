@@ -30,6 +30,15 @@ target_link_libraries(
   az_core
 )
 
+# detect what platform impl to link automatically
+if (WIN32)
+  target_link_libraries(paho_iot_hub_c2d_example PRIVATE az_win32)
+elseif(UNIX)
+  target_link_libraries(paho_iot_hub_c2d_example PRIVATE az_posix)
+else()
+  target_link_libraries(paho_iot_hub_c2d_example PRIVATE az_noplatform)
+endif()
+
 target_link_libraries(
   paho_iot_hub_c2d_example PRIVATE
   eclipse-paho-mqtt-c::paho-mqtt3cs-static
@@ -49,6 +58,15 @@ target_link_libraries(
   az_iot_common
   az_core
   )
+
+# detect what platform impl to link automatically
+if (WIN32)
+  target_link_libraries(paho_iot_hub_methods_example PRIVATE az_win32)
+elseif(UNIX)
+  target_link_libraries(paho_iot_hub_methods_example PRIVATE az_posix)
+else()
+  target_link_libraries(paho_iot_hub_methods_example PRIVATE az_noplatform)
+endif()
 
 target_link_libraries(
   paho_iot_hub_methods_example PRIVATE
@@ -70,6 +88,15 @@ target_link_libraries(
   az_core
   )
 
+# detect what platform impl to link automatically
+if (WIN32)
+  target_link_libraries(paho_iot_hub_telemetry_example PRIVATE az_win32)
+elseif(UNIX)
+  target_link_libraries(paho_iot_hub_telemetry_example PRIVATE az_posix)
+else()
+  target_link_libraries(paho_iot_hub_telemetry_example PRIVATE az_noplatform)
+endif()
+
 target_link_libraries(
   paho_iot_hub_telemetry_example PRIVATE
   eclipse-paho-mqtt-c::paho-mqtt3cs-static
@@ -89,6 +116,15 @@ target_link_libraries(
   az_iot_common
   az_core
   )
+
+# detect what platform impl to link automatically
+if (WIN32)
+  target_link_libraries(paho_iot_hub_twin_example PRIVATE az_win32)
+elseif(UNIX)
+  target_link_libraries(paho_iot_hub_twin_example PRIVATE az_posix)
+else()
+  target_link_libraries(paho_iot_hub_twin_example PRIVATE az_noplatform)
+endif()
 
 target_link_libraries(
   paho_iot_hub_twin_example PRIVATE

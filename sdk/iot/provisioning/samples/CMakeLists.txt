@@ -31,6 +31,15 @@ target_link_libraries(
   az_core
   )
 
+# detect what platform impl to link automatically
+if (WIN32)
+  target_link_libraries(paho_iot_provisioning_example PRIVATE az_win32)
+elseif(UNIX)
+  target_link_libraries(paho_iot_provisioning_example PRIVATE az_posix)
+else()
+  target_link_libraries(paho_iot_provisioning_example PRIVATE az_noplatform)
+endif()
+
 target_link_libraries(
   paho_iot_provisioning_example PRIVATE
   eclipse-paho-mqtt-c::paho-mqtt3cs-static
