@@ -165,9 +165,12 @@ When you select to build the libcurl http stack implementation, you have to make
 
 You need to also call `curl_global_cleanup` once you no longer need to perform SDk client API calls.
 
-The reason for this is the fact of this functions are not thread-safe, and a customer can use libcurl not only for Azure SDK library but for some other purpose. That makes customer responsibility to init and clean up libcurl before and after usage.
+Take a look to [Storare Blob SDK client sample](sdk/storage/blobs/samples/src/blobs_client_example.c). Note how you can use function `atexit()` to set libcurl global clean up.
 
-This is libcurl specific only.
+The reason for this is the fact of this functions are not thread-safe, and a customer can use libcurl not only for Azure SDK library but for some other purpose. More info [here](https://curl.haxx.se/libcurl/c/curl_global_init.html).
+
+
+**This is libcurl specific only.**
 
 ### Development Environment
 
@@ -311,6 +314,31 @@ make
 ```
 
 > Note: The steps above would compile and generate the default output for azure-sdk-for-c which includes static libraries only. See section [Compiler Options](#compiler-options)
+
+### Using your own HTTP stack implementation
+You can create and use your own HTTP stack and adapter. This is to avoid the libcurl implementation from Azure SDK.
+
+The first step is to understand the two components that are required. The first one is an **HTTP stack implementation** that is capable of sending bits through the wire. Some examples of these are libcurl, win32, etc.
+
+The second component is an **HTTP transport adapter**. This is the implementation code which takes an http request from Azure SDK Core and uses it to send it using the specific HTTP stack implementation. Azure SDK Core provides the next contract that this component needs to implement:
+
+```c
+AZ_NODISCARD az_result
+az_http_client_send_request(_az_http_request* p_request, az_http_response* p_response);
+```
+
+For example, Azure SDK provides a cmake target `az_curl` (find it [here](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/platform/http_client/curl/src/az_curl.c)) with the implementation code for the contract function mentioned before. It uses an `_az_http_request` reference to create an specific `libcurl` request and send it though the wire. Then it uses `libcurl` response to fill the `az_http_response` reference structure.
+
+### Link your application with your own HTTP stack
+Create your own http adapter for an Http stack and then use the following cmake command to have it linked to your application
+```cmake
+target_link_libraries(your_application_target PRIVATE lib_adapter http_stack_lib)
+
+# For instance, this is how we link libcurl and its adapter
+target_link_libraries(blobs_client_example PRIVATE az_curl CURL::libcurl)
+```
+
+See the complete cmake file and how to link your own library [here](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/storage/blobs/samples/CMakeLists.txt#L23)
 
 
 ## SDK Architecture

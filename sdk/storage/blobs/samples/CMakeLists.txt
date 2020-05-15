@@ -24,9 +24,6 @@ target_link_libraries(blobs_client_example PRIVATE az_storage_blobs az_core)
 # When using a different HTTP transport adapter implementation, link it here instead of az_curl and libcurl
 if(TRANSPORT_CURL)
   target_link_libraries(blobs_client_example PRIVATE az_curl CURL::libcurl)
-# Uncomment below 2 lines to link a custom http implementation
-# elseif(USER_TRANSPORT_IMPLEMENTATION)
-  # target_link_libraries(keys_client_example PRIVATE customer_implementation_lib_name)
 else()
   # linking default no http implementation to be able to compile and link sample.
   target_link_libraries(blobs_client_example PRIVATE az_nohttp)
