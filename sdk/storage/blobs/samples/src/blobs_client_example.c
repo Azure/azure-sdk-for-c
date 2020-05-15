@@ -20,7 +20,9 @@
 #include <az_context.h>
 #include <az_storage_blobs.h>
 
+#ifdef TRANSPORT_CURL
 #include <curl/curl.h>
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>

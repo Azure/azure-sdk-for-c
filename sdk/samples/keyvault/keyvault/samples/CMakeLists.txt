@@ -24,6 +24,8 @@ target_link_libraries(keys_client_example PRIVATE az_keyvault az_core)
 # When using a different HTTP transport adapter implementation, link it here instead of az_curl and libcurl
 if(TRANSPORT_CURL)
   target_link_libraries(keys_client_example PRIVATE az_curl CURL::libcurl)
+else()
+  target_link_libraries(keys_client_example PRIVATE az_nohttp)
 endif()
 
 # using no_platform for now. TODO: show how to auto link

@@ -46,7 +46,9 @@
 #include <az_json.h>
 #include <az_keyvault.h>
 
+#ifdef TRANSPORT_CURL
 #include <curl/curl.h>
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -94,9 +96,8 @@ int main()
 
 // If running with libcurl, call global init. See project Readme for more info
 #ifdef TRANSPORT_CURL
-  TEST_FAIL_ON_ERROR(curl_global_init(CURL_GLOBAL_ALL), "Fail to init libcurl");
+  RETURN_IF_FAILED(curl_global_init(CURL_GLOBAL_ALL), "Fail to init libcurl");
 #endif
-  curl_global_init(CURL_GLOBAL_ALL);
 
   /************* 1) create secret id credentials for request   ***********/
   az_credential_client_secret credential;

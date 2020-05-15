@@ -15,22 +15,21 @@ option(LOGGING "Build SDK with logging support" ON)
 
 # disable preconditions when it's set to OFF
 if (NOT PRECONDITIONS)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DAZ_NO_PRECONDITION_CHECKING")
+  add_compile_definitions(AZ_NO_PRECONDITION_CHECKING)
 endif()
 
 if (NOT LOGGING)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DAZ_NO_LOGGING")
+  add_compile_definitions(AZ_NO_LOGGING)
 endif()
-
 
 # enable mock functions with link option -ld
 if(UNIT_TESTING_MOCKS)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_az_MOCK_ENABLED")
+  add_compile_definitions(_az_MOCK_ENABLED)
 endif()
 
 # make libcurl option enabled to be visible to code
 if(TRANSPORT_CURL)
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DTRANSPORT_CURL")
+  add_compile_definitions(TRANSPORT_CURL)
 endif()
 
 if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
