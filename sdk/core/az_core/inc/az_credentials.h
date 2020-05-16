@@ -46,8 +46,8 @@ typedef struct
 {
   struct
   {
-    int16_t token_length;
     int64_t expires_at_msec;
+    int16_t token_length;
     uint8_t token[_az_TOKEN_BUF_SIZE]; /*!< Base64-encoded token */
   } _internal;
 } _az_token;

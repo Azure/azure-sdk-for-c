@@ -3,6 +3,7 @@
 
 #include <az_platform.h>
 
+// Two macros below are not used in the code below, it is windows.h that consumes them.
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <windows.h>
