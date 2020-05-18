@@ -57,7 +57,10 @@
 #define CLIENT_SECRET_ENV "AZURE_CLIENT_SECRET"
 #define URI_ENV "AZURE_KEYVAULT_URL"
 
+// Fuction implementation after main method.
+// This function takes the key version from an http keyvault response payload.
 az_span get_key_version(az_http_response* response);
+// Name for the Key to be used in this sample
 az_span const key_name_for_test = AZ_SPAN_LITERAL_FROM_STR("test-new-key");
 
 #ifdef _MSC_VER
@@ -69,25 +72,17 @@ az_span const key_name_for_test = AZ_SPAN_LITERAL_FROM_STR("test-new-key");
 
 int main()
 {
-// Uncomment below lines when working with libcurl
-/*
-  // If running with libcurl, call global init. See project Readme for more info
-  if (curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK)
-  {
-    printf("\nCouldn't init libcurl\n");
-    return 1;
-  }
-  // Set up libcurl cleaning callback as to be called before ending program
-  atexit(curl_global_cleanup);
-*/
-#ifdef AZ_NO_HTTP
-  // validate sample running with no_op http client
-  printf("Running sample with no_op HTTP implementation.\nRecompile az_core with an HTTP client "
-         "implementation like CURL to see sample sending network requests.\n\n"
-         "i.e. cmake -DTRANSPORT_CURL=ON ..\n\n");
-
-  return 255;
-#endif
+  // Uncomment below lines when working with libcurl
+  /*
+    // If running with libcurl, call global init. See project Readme for more info
+    if (curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK)
+    {
+      printf("\nCouldn't init libcurl\n");
+      return 1;
+    }
+    // Set up libcurl cleaning callback as to be called before ending program
+    atexit(curl_global_cleanup);
+  */
 
   /************* 1) create secret id credentials for request   ***********/
   az_credential_client_secret credential;
@@ -127,7 +122,7 @@ int main()
     return 1;
   }
 
-  /****************** 4) CREATE KEY with options******************************/
+  /****************** 4) CREATE KEY options for request ******************************/
   az_keyvault_create_key_options key_options = az_keyvault_create_key_options_default();
 
   // override options values
@@ -144,14 +139,25 @@ int main()
   key_options.tags = tags;
 
   // 5) This is the actual call to keyvault service
-  if (az_keyvault_keys_key_create(
-          &client,
-          &az_context_app,
-          key_name_for_test,
-          az_keyvault_web_key_type_rsa(),
-          &key_options,
-          &http_response)
-      != AZ_OK)
+  az_result send_request_result = az_keyvault_keys_key_create(
+      &client,
+      &az_context_app,
+      key_name_for_test,
+      az_keyvault_web_key_type_rsa(),
+      &key_options,
+      &http_response);
+
+  // This validation is only for the first time SDK client is used. API will return not implemented
+  // if samples were built with no_http lib.
+  if (send_request_result == AZ_ERROR_NOT_IMPLEMENTED)
+  {
+    printf("Running sample with no_op HTTP implementation.\nRecompile az_core with an HTTP client "
+           "implementation like CURL to see sample sending network requests.\n\n"
+           "i.e. cmake -DTRANSPORT_CURL=ON ..\n\n");
+
+    return 1;
+  }
+  else if (send_request_result != AZ_OK) // Any other error would terminate sample
   {
     printf("\nFailed to create key\n");
     return 1;
