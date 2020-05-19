@@ -235,7 +235,7 @@ static void az_iot_provisioning_client_sas_get_password_device_overflow_fails()
 
   az_span key_name = AZ_SPAN_NULL;
 
-  char password[132];
+  char password[131];
   size_t length = 0;
 
   assert_int_equal(
@@ -258,7 +258,7 @@ static void az_iot_provisioning_client_sas_get_signature_device_signature_overfl
           &client, test_global_device_endpoint, test_id_scope, test_registration_id, NULL),
       AZ_OK);
 
-  uint8_t signature_buffer[54];
+  uint8_t signature_buffer[52];
   az_span signature = az_span_init(signature_buffer, _az_COUNTOF(signature_buffer));
 
   assert_int_equal(
