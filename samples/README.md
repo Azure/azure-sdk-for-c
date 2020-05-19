@@ -26,8 +26,8 @@ Each package folder contains a subfolder called `/samples` with code samples. Th
 This section lists how-to guides for the most commonly used APIs and most common scenarios, i.e. this section does not attempt to be a complete directory of guides contained in this repository. 
 
 #### General How-To Guides
-- [How to port the Azure SDK to another platform](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/core/core#porting-the-azure-sdk-to-another-platform)
-- [How to configure, access, and analyze logging information](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/core/core#logging-sdk-operations)
+- [How to port the Azure SDK to another platform](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/core/az_core#porting-the-azure-sdk-to-another-platform)
+- [How to configure, access, and analyze logging information](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/core/az_core#logging-sdk-operations)
 
 #### Azure.IoT
 - [IoT Hub samples](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/iot/hub/samples#getting-started)

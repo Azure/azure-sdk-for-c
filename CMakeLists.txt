@@ -56,7 +56,7 @@ include(eng/cmake/global_compile_options.txt)
 file(WRITE ${CMAKE_BINARY_DIR}/coverage_targets.txt "")
 
 
-add_subdirectory(sdk/core/core)
+add_subdirectory(sdk/core/az_core)
 
 # SDK Clients and tests
 add_subdirectory(sdk/storage/blobs)
@@ -97,7 +97,7 @@ endif()
 # default for Unit testing with cmocka is OFF, however, this will be ON on CI and tests must
 # pass before commiting changes
 if (UNIT_TESTING)
-  add_subdirectory(sdk/core/core/test)
+  add_subdirectory(sdk/core/az_core/test)
   add_subdirectory(sdk/storage/blobs/test)
   add_subdirectory(sdk/iot/common/tests)
   add_subdirectory(sdk/iot/hub/tests)

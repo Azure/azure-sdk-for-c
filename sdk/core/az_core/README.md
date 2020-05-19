@@ -16,7 +16,7 @@ Many SDK functions return an `az_result` as defined in [inc/az_result.h](inc/az_
 
 ### Working with Spans
 
-An `az_span` is a small data structure (defined in our [az_span.h](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/core/core/inc/az_span.h) file) wrapping a byte buffer. Specifically, an `az_span` instance contains:
+An `az_span` is a small data structure (defined in our [az_span.h](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/core/az_core/inc/az_span.h) file) wrapping a byte buffer. Specifically, an `az_span` instance contains:
 
 - a byte pointer
 - an integer size
@@ -82,7 +82,7 @@ az_span hello_world = AZ_SPAN_FROM_STR("Hello world!");
 
 As our SDK performs operations, it can send log messages to a customer-defined callback. Customers can enable this to assist with debugging and diagnosing issues when leveraging our SDK code.
 
-To enable logging, you must first write a callback function that our logging mechanism will invoke periodically with messages. The function signature must match this type definition (defined in the [az_log.h](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/core/core/inc/az_log.h) file):
+To enable logging, you must first write a callback function that our logging mechanism will invoke periodically with messages. The function signature must match this type definition (defined in the [az_log.h](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/core/az_core/inc/az_log.h) file):
 
    ```C
    typedef void (*az_log_fn)(az_log_classification classification, az_span message);
@@ -129,7 +129,7 @@ Also, if you define the `AZ_NO_PRECONDITION_CHECKING` symbol when compiling the 
 
 ### Canceling an Operation
 
-`Azure Core` provides a rich cancellation mechanism by way of its `az_context` type (defined in the [az_context.h](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/core/core/inc/az_context.h) file). As your code executes and functions call other functions, a pointer to an `az_context` is passed as an argument through the functions. At any point, a function can create a new `az_context` specifying a parent `az_context` and a timeout period and then, this new `az_context` is passed down to more functions. When a parent `az_context` instance expires or is canceled, all of its children are canceled as well.
+`Azure Core` provides a rich cancellation mechanism by way of its `az_context` type (defined in the [az_context.h](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/core/az_core/inc/az_context.h) file). As your code executes and functions call other functions, a pointer to an `az_context` is passed as an argument through the functions. At any point, a function can create a new `az_context` specifying a parent `az_context` and a timeout period and then, this new `az_context` is passed down to more functions. When a parent `az_context` instance expires or is canceled, all of its children are canceled as well.
 
 There is a special singleton instance of the `az_context` type called `az_context_app`. This instance represents your entire application and this `az_context` instance never expires. It is common to use this instance as the ultimate root of all `az_context` instances. So then, as functions call other functions, these functions can create child `az_context` instances and pass the child down through the call tree. Imagine you have the following `az_context` tree:
 
