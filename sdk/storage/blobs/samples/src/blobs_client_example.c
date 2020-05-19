@@ -18,27 +18,15 @@
  */
 
 #include <az_context.h>
-#include <az_credentials.h>
-#include <az_http.h>
-#include <az_log.h>
 #include <az_storage_blobs.h>
+
+// Uncomment below lines when working with libcurl
+// #include <curl/curl.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 
 #define URI_ENV "AZURE_STORAGE_URL"
-
-#define RETURN_IF_FAILED(result, message) \
-  do \
-  { \
-    if (az_failed(result)) \
-    { \
-      printf("\n"); \
-      printf(message); \
-      printf("\n"); \
-      return 1; \
-    } \
-  } while (0)
 
 static az_span content_to_upload = AZ_SPAN_LITERAL_FROM_STR("Some test content");
 
@@ -58,6 +46,18 @@ static void test_log_func(az_log_classification classification, az_span message)
 
 int main()
 {
+  // Uncomment below lines when working with libcurl
+  /*
+    // If running with libcurl, call global init. See project Readme for more info
+    if (curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK)
+    {
+      printf("\nCouldn't init libcurl\n");
+      return 1;
+    }
+    // Set up libcurl cleaning callback as to be called before ending program
+    atexit(curl_global_cleanup);
+  */
+
   // Uncomment below code to enable logging
   /*
   az_log_classification const classifications[] = { AZ_LOG_HTTP_RESPONSE, AZ_LOG_END_OF_LIST };
@@ -70,43 +70,52 @@ int main()
   az_storage_blobs_blob_client client;
   az_storage_blobs_blob_client_options options = az_storage_blobs_blob_client_options_default();
 
-  az_result const client_init_result = az_storage_blobs_blob_client_init(
-      &client, az_span_from_str(getenv(URI_ENV)), AZ_CREDENTIAL_ANONYMOUS, &options);
-
-  RETURN_IF_FAILED(client_init_result, "Failed to init blob client");
+  if (az_storage_blobs_blob_client_init(
+          &client, az_span_from_str(getenv(URI_ENV)), AZ_CREDENTIAL_ANONYMOUS, &options)
+      != AZ_OK)
+  {
+    printf("\nFailed to init blob client\n");
+    return 1;
+  }
 
   /******* 2) Create a buffer for response (will be reused for all requests)   *****/
   uint8_t response_buffer[1024 * 4] = { 0 };
   az_http_response http_response;
-  az_result const http_response_init_result
-      = az_http_response_init(&http_response, AZ_SPAN_FROM_BUFFER(response_buffer));
-
-  RETURN_IF_FAILED(http_response_init_result, "Failed to init http response");
+  if (az_http_response_init(&http_response, AZ_SPAN_FROM_BUFFER(response_buffer)) != AZ_OK)
+  {
+    printf("\nFailed to init http response\n");
+    return 1;
+  }
 
   // 3) upload content
   printf("Uploading blob...\n");
   az_result const blob_upload_result = az_storage_blobs_blob_upload(
       &client, &az_context_app, content_to_upload, NULL, &http_response);
 
-  // validate sample running with no_op http client
+  // This validation is only for the first time SDK client is used. API will return not implemented
+  // if samples were built with no_http lib.
   if (blob_upload_result == AZ_ERROR_NOT_IMPLEMENTED)
   {
     printf("Running sample with no_op HTTP implementation.\nRecompile az_core with an HTTP client "
            "implementation like CURL to see sample sending network requests.\n\n"
            "i.e. cmake -DTRANSPORT_CURL=ON ..\n\n");
 
-    return 255;
+    return 1;
   }
-
-  RETURN_IF_FAILED(blob_upload_result, "Failed to upload blob");
+  else if (blob_upload_result != AZ_OK) // Any other error would terminate sample
+  {
+    printf("\nFailed to upload blob\n");
+    return 1;
+  }
 
   // 4) get response and parse it
   az_http_response_status_line status_line;
 
-  az_result const status_line_get_result
-      = az_http_response_get_status_line(&http_response, &status_line);
-
-  RETURN_IF_FAILED(status_line_get_result, "Failed to get status line");
+  if (az_http_response_get_status_line(&http_response, &status_line) != AZ_OK)
+  {
+    printf("\nFailed to get status line\n");
+    return 1;
+  }
 
   printf("Status Code: %d\n", status_line.status_code);
   printf(
@@ -124,8 +133,11 @@ int main()
     {
       break;
     }
-
-    RETURN_IF_FAILED(header_get_result, "Failed to get header");
+    else if (header_get_result != AZ_OK)
+    {
+      printf("\nFailed to get header\n");
+      return 1;
+    }
 
     printf(
         "\t%.*s : %.*s\n",

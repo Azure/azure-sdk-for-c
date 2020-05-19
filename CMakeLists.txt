@@ -15,17 +15,21 @@ option(LOGGING "Build SDK with logging support" ON)
 
 # disable preconditions when it's set to OFF
 if (NOT PRECONDITIONS)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DAZ_NO_PRECONDITION_CHECKING")
+  add_compile_definitions(AZ_NO_PRECONDITION_CHECKING)
 endif()
 
 if (NOT LOGGING)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DAZ_NO_LOGGING")
+  add_compile_definitions(AZ_NO_LOGGING)
 endif()
-
 
 # enable mock functions with link option -ld
 if(UNIT_TESTING_MOCKS)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_az_MOCK_ENABLED")
+  add_compile_definitions(_az_MOCK_ENABLED)
+endif()
+
+# make libcurl option enabled to be visible to code
+if(TRANSPORT_CURL)
+  add_compile_definitions(TRANSPORT_CURL)
 endif()
 
 if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
@@ -51,14 +55,8 @@ include(eng/cmake/global_compile_options.txt)
 # At the end of cmake generate, this file will list the targets for code cov
 file(WRITE ${CMAKE_BINARY_DIR}/coverage_targets.txt "")
 
-add_subdirectory(sdk/core/core)
 
-add_subdirectory(sdk/platform/http_client/nohttp)
-# Adding transport implementation for curl
-# Users can still build Core and SDK client without depending on a HTTP transport implementation
-if(TRANSPORT_CURL)
-  add_subdirectory(sdk/platform/http_client/curl)
-endif()
+add_subdirectory(sdk/core/core)
 
 # SDK Clients and tests
 add_subdirectory(sdk/storage/blobs)
@@ -66,13 +64,23 @@ add_subdirectory(sdk/iot/common)
 add_subdirectory(sdk/iot/hub)
 add_subdirectory(sdk/iot/provisioning)
 
-# PAL
+#PAL
 if(AZ_PLATFORM_IMPL STREQUAL "POSIX")
   add_subdirectory(sdk/platform/posix)
+  set(PAL az_posix)
 elseif(AZ_PLATFORM_IMPL STREQUAL "WIN32")
   add_subdirectory(sdk/platform/win32)
+  set(PAL az_win32)
 else()
   add_subdirectory(sdk/platform/noplatform)
+  set(PAL az_noplatform)
+endif()
+
+add_subdirectory(sdk/platform/http_client/nohttp)
+# Adding transport implementation for curl
+# Users can still build Core and SDK client without depending on an HTTP transport implementation
+if(TRANSPORT_CURL)
+  add_subdirectory(sdk/platform/http_client/curl)
 endif()
 
 # User can disable samples generation by setting env variable AZ_SDK_C_NO_SAMPLES

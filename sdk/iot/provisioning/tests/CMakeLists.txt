@@ -17,7 +17,8 @@ add_cmocka_test(${TARGET_NAME} SOURCES
                 test_az_iot_provisioning_client_parser.c
                 COMPILE_OPTIONS ${DEFAULT_C_COMPILE_FLAGS}
                 LINK_TARGETS
-                    az_core
                     az_iot_common
                     az_iot_provisioning
+                    az_core
+                    ${PAL}
                 )

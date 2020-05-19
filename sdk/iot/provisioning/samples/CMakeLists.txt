@@ -31,6 +31,9 @@ target_link_libraries(
   az_core
   )
 
+# PAL
+target_link_libraries(paho_iot_provisioning_example PRIVATE ${PAL})
+
 target_link_libraries(
   paho_iot_provisioning_example PRIVATE
   eclipse-paho-mqtt-c::paho-mqtt3cs-static
