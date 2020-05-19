@@ -57,7 +57,7 @@ typedef struct
 {
   struct
   {
-    uint8_t padding[4]; // will be removed, it is here to help debugging Linux x64
+    uint8_t padding[5]; // will be removed, it is here to help debugging Linux x64
     _az_spinlock lock;
     _az_token volatile token;
   } _internal;
