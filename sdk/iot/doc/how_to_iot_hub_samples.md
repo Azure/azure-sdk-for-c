@@ -2,7 +2,7 @@
 
 **Warning: this documentation is for educational purposes only. Any costs, conditions and agreements associated with the information below are to be evaluated and approved according to the discretion of the reader.**
 
-_Last edited on May 17th, 2020._
+_Last edited on May 19th, 2020._
 
 This is a step-by-step guide of how to start from scratch and get the Azure SDK for Embedded C IoT Hub Samples running. 
 
@@ -200,7 +200,7 @@ export AZ_IOT_HUB_HOSTNAME=<FQDN obtained on step 7>
 
 `AZ_IOT_DEVICE_X509_TRUST_PEM_FILE` is not required for all platforms (like Linux).
 
-`AZ_IOT_DEVICE_X509_CERT_PEM_FILE` has already been set on step 7.
+`AZ_IOT_DEVICE_X509_CERT_PEM_FILE` has already been set on step 5.
 
 Using the values from the example above, the export command would look like this (don't run these command lines, you should use your own device ID and hostname)
 
