@@ -63,7 +63,7 @@ add_library (
   src/az_log.c
   src/az_precondition.c
   src/az_span.c
-   "internal/az_spinlock_internal.h" "src/az_spinlock.c" "inc/_az_spinlock.h")
+  src/az_spinlock.c)
 
 target_include_directories (${TARGET_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc> $<INSTALL_INTERFACE:include/${TARGET_NAME}>)
 # include internal headers
