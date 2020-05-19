@@ -70,9 +70,9 @@ When we make an official release, we will create a unique git tag containing the
 
           cmake --build .
 
-   This results in building each library as a static library file, placed in the output directory you created (for example `build\sdk\core\core\Debug`). At a minimum, you must have an `Azure Core` library, a `Platform` library, and an `HTTP` library. Then, you can build any additional Azure service client library you intend to use from within your application (for example `build\sdk\storage\blobs\Debug`). To use our client libraries in your application, just `#include` our public header files and then link your application's object files with our library files.
+   This results in building each library as a static library file, placed in the output directory you created (for example `build\sdk\core\az_core\Debug`). At a minimum, you must have an `Azure Core` library, a `Platform` library, and an `HTTP` library. Then, you can build any additional Azure service client library you intend to use from within your application (for example `build\sdk\storage\blobs\Debug`). To use our client libraries in your application, just `#include` our public header files and then link your application's object files with our library files.
 
-4. Provide platform-specific implementations for functionality required by `Azure Core`. For more information, see the [Azure Core Porting Guide](sdk/core/core/README.md#Porting-the-Azure-SDK-to-Another-Platform).
+4. Provide platform-specific implementations for functionality required by `Azure Core`. For more information, see the [Azure Core Porting Guide](sdk/core/az_core/README.md#Porting-the-Azure-SDK-to-Another-Platform).
 
 ### Compiler Options
 
@@ -343,19 +343,19 @@ See the complete cmake file and how to link your own library [here](https://gith
 
 ## SDK Architecture
 
-At the heart of our SDK is, what we refer to as, [Azure Core](sdk/core/core). This code defines several data types and functions for use by the client libraries that build on top of us such as an [Azure Storage Blob](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/storage) client library and [Azure IoT client libraries](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/iot). Here are some of the features that customers use directly:
+At the heart of our SDK is, what we refer to as, [Azure Core](sdk/core/az_core). This code defines several data types and functions for use by the client libraries that build on top of us such as an [Azure Storage Blob](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/storage) client library and [Azure IoT client libraries](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/iot). Here are some of the features that customers use directly:
 
-- **Spans**: A span represents a byte buffer and is used for string manipulations, HTTP requests/responses, building/parsing JSON payloads. It allows us to return a substring within a larger string without any memory allocations. See the [Working With Spans](sdk/core/core/README.md#Working-With-Spans) section of the `Azure Core` README for more information.
+- **Spans**: A span represents a byte buffer and is used for string manipulations, HTTP requests/responses, building/parsing JSON payloads. It allows us to return a substring within a larger string without any memory allocations. See the [Working With Spans](sdk/core/az_core/README.md#Working-With-Spans) section of the `Azure Core` README for more information.
 
-- **Logging**: As our SDK performs operations, it can send log messages to a customer-defined callback. Customers can enable this to assist with debugging and diagnosing issues when leveraging our SDK code. See the [Logging SDK Operations](sdk/core/core/README.md#Logging-SDK-Operations) section of the `Azure Core` README for more information.
+- **Logging**: As our SDK performs operations, it can send log messages to a customer-defined callback. Customers can enable this to assist with debugging and diagnosing issues when leveraging our SDK code. See the [Logging SDK Operations](sdk/core/az_core/README.md#Logging-SDK-Operations) section of the `Azure Core` README for more information.
 
-- **Contexts**: Contexts offer an I/O cancellation mechanism. Multiple contexts can be composed together in your application’s call tree. When a context is canceled, its children are also canceled. See the [Canceling an Operation](sdk/core/core/README.md#Canceling-an-Operation) section of the `Azure Core` README for more information.
+- **Contexts**: Contexts offer an I/O cancellation mechanism. Multiple contexts can be composed together in your application’s call tree. When a context is canceled, its children are also canceled. See the [Canceling an Operation](sdk/core/az_core/README.md#Canceling-an-Operation) section of the `Azure Core` README for more information.
 
 - **JSON**: Non-allocating JSON builder and JSON parsing data structures and operations.
 
 - **HTTP**: Non-allocating HTTP request and HTTP response data structures and operations.
 
-- **Argument Validation**: The SDK validates function arguments and invokes a callback when validation fails. By default, this callback suspends the calling thread _forever_. However, you can override this behavior and, in fact, you can disable all argument validation to get smaller and faster code. See the [SDK Function Argument Validation](sdk/core/core/README.md#sdk-function-argument-validation) section of the `Azure Core` README for more information.
+- **Argument Validation**: The SDK validates function arguments and invokes a callback when validation fails. By default, this callback suspends the calling thread _forever_. However, you can override this behavior and, in fact, you can disable all argument validation to get smaller and faster code. See the [SDK Function Argument Validation](sdk/core/az_core/README.md#sdk-function-argument-validation) section of the `Azure Core` README for more information.
 
 In addition to the above features, `Azure Core` provides features available to client libraries written to access other Azure services. Customers use these features indirectly by way of interacting with a client library. By providing these features in `Azure Core`, the client libraries built on top of us will share a common implementation and many features will behave identically across client libraries. For example, `Azure Core` offers a standard set of credential types and an HTTP pipeline with logging, retry, and telemetry policies.
 
