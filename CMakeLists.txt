@@ -65,9 +65,13 @@ add_subdirectory(sdk/iot/hub)
 add_subdirectory(sdk/iot/provisioning)
 
 # PAL
-add_subdirectory(sdk/platform/noplatform)
-add_subdirectory(sdk/platform/posix)
-add_subdirectory(sdk/platform/win32)
+if(AZ_PLATFORM_IMPL STREQUAL "POSIX")
+  add_subdirectory(sdk/platform/posix)
+elseif(AZ_PLATFORM_IMPL STREQUAL "WIN32")
+  add_subdirectory(sdk/platform/win32)
+else()
+  add_subdirectory(sdk/platform/noplatform)
+endif()
 
 add_subdirectory(sdk/platform/http_client/nohttp)
 # Adding transport implementation for curl

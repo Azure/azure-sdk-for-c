@@ -62,7 +62,7 @@ add_library (
   src/az_log.c
   src/az_precondition.c
   src/az_span.c
-   "test/inc/az_test_log.h")
+  )
 
 target_include_directories (${TARGET_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc> $<INSTALL_INTERFACE:include/${TARGET_NAME}>)
 # include internal headers
