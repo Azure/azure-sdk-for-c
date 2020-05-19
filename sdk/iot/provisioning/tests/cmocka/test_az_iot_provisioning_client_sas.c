@@ -22,7 +22,7 @@
 
 #define TEST_REGISTRATION_ID_STR "myRegistrationId"
 #define TEST_ID_SCOPE "0neFEEDC0DE"
-#define TEST_URL_ENCODED_RESOURCE_URI "0neFEEDC0DE%2fregistrations%2fmyRegistrationId"
+#define TEST_URL_ENCODED_RESOURCE_URI "0neFEEDC0DE/registrations/myRegistrationId"
 
 #define TEST_SIG "cS1eHM%2FlDjsRsrZV9508wOFrgmZk4g8FNg8NwHVSiSQ"
 #define TEST_EXPIRATION_STR "1578941692"
@@ -174,7 +174,7 @@ static void az_iot_provisioning_client_sas_get_password_device_succeeds()
       AZ_OK);
 
   const char expected_password[]
-      = "SharedAccessSignature sr=" TEST_ID_SCOPE "%2fregistrations%2f" TEST_REGISTRATION_ID_STR
+      = "SharedAccessSignature sr=" TEST_ID_SCOPE "/registrations/" TEST_REGISTRATION_ID_STR
         "&sig=" TEST_SIG "&se=" TEST_EXPIRATION_STR;
 
   az_span key_name = AZ_SPAN_NULL;
@@ -204,7 +204,7 @@ static void az_iot_provisioning_client_sas_get_password_device_with_keyname_succ
       AZ_OK);
 
   const char expected_password[]
-      = "SharedAccessSignature sr=" TEST_ID_SCOPE "%2fregistrations%2f" TEST_REGISTRATION_ID_STR
+      = "SharedAccessSignature sr=" TEST_ID_SCOPE "/registrations/" TEST_REGISTRATION_ID_STR
         "&sig=" TEST_SIG "&se=" TEST_EXPIRATION_STR "&skn=" TEST_KEY_NAME;
 
   az_span key_name = AZ_SPAN_FROM_STR(TEST_KEY_NAME);
