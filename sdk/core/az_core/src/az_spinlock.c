@@ -12,7 +12,7 @@
 // The top 2 bits are reserved for writers; the bottom 30 bits are for readers
 enum
 {
-  _az_MASK_WRITER_BIT = 0x80000000,
+  _az_MASK_WRITER_BIT = (int)0x80000000,
   _az_MASK_WRITER_WAITING_BIT = 0x40000000,
   _az_MASK_WRITER_BITS = _az_MASK_WRITER_BIT | _az_MASK_WRITER_WAITING_BIT,
   _az_MASK_READER_BITS = ~_az_MASK_WRITER_BITS,
