@@ -5,17 +5,17 @@
 #include <az_iot_hub_client.h>
 #include <az_log.h>
 #include <az_precondition.h>
-#include <az_span.h>
-
 #include <az_precondition_internal.h>
+#include <az_span.h>
+#include <az_test_log.h>
+#include <az_test_precondition.h>
+#include <az_test_span.h>
 
 #include <setjmp.h>
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdint.h>
 
-#include <az_test_precondition.h>
-#include <az_test_span.h>
 #include <cmocka.h>
 
 #define TEST_SPAN_BUFFER_SIZE 128
@@ -359,7 +359,7 @@ static void test_az_iot_hub_client_twin_logging_succeed()
           &client, test_twin_received_topic_desired_success, &response),
       AZ_OK);
 
-  assert_int_equal(1, _log_invoked_topic);
+  assert_int_equal(_az_BUILT_WITH_LOGGING(1, 0), _log_invoked_topic);
 
   az_log_set_callback(NULL);
   az_log_set_classifications(NULL);

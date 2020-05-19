@@ -1,4 +1,4 @@
-# Embedded C for Azure IoT Clients
+# Azure IoT Clients
 
 Azure SDK for Embedded C official IoT Hub client library.
 
@@ -9,6 +9,8 @@ Azure SDK for Embedded C official IoT Hub client library.
 - **Build**: The Azure IoT library is compiled following the same steps listed on the root [README](https://github.com/Azure/azure-sdk-for-c/blob/master/README.md) documentation, under ["Getting Started Using the SDK"](https://github.com/Azure/azure-sdk-for-c/blob/master/README.md#getting-started-using-the-sdk). 
 
 - **Samples**: [This page](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/iot/hub/samples) explains samples for the Azure Embedded C SDK IoT Hub Client and [this page](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/iot/provisioning/samples) shows the Provisioning Clients and how to use them.
+
+  For a step-by-step guide starting from scratch, you may refer to [this documentation](./doc/how_to_iot_hub_samples.md).
 
 ### Prerequisites
 

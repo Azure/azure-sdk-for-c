@@ -6,16 +6,16 @@
 #include <az_iot_common_internal.h>
 #include <az_log.h>
 #include <az_precondition.h>
-#include <az_span.h>
-
 #include <az_precondition_internal.h>
+#include <az_span.h>
+#include <az_test_log.h>
+#include <az_test_precondition.h>
 
 #include <setjmp.h>
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdint.h>
 
-#include <az_test_precondition.h>
 #include <cmocka.h>
 
 static void test_az_iot_u32toa_size_success()
@@ -94,7 +94,7 @@ static void _log_listener(az_log_classification classification, az_span message)
   {
     case AZ_LOG_IOT_RETRY:
       _log_retry++;
-      assert_ptr_equal(az_span_ptr(message), (void *)0);
+      assert_ptr_equal(az_span_ptr(message), (void*)0);
       assert_int_equal(az_span_size(message), 0);
       break;
     default:
@@ -104,15 +104,14 @@ static void _log_listener(az_log_classification classification, az_span message)
 
 static void test_az_iot_provisioning_client_logging_succeed()
 {
-  az_log_classification const classifications[]
-      = { AZ_LOG_IOT_RETRY, AZ_LOG_END_OF_LIST };
+  az_log_classification const classifications[] = { AZ_LOG_IOT_RETRY, AZ_LOG_END_OF_LIST };
   az_log_set_classifications(classifications);
   az_log_set_callback(_log_listener);
 
   assert_int_equal(0, _log_retry);
   _log_retry = 0;
   assert_int_equal(2229, az_iot_retry_calc_delay(5, 1, 500, 100000, 1234));
-  assert_int_equal(1, _log_retry);
+  assert_int_equal(_az_BUILT_WITH_LOGGING(1, 0), _log_retry);
 
   az_log_set_callback(NULL);
   az_log_set_classifications(NULL);

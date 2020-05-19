@@ -31,7 +31,7 @@ AZ_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t size)
   //   size == 0
   _az_PRECONDITION((ptr != NULL && size >= 0) || (ptr + (uint32_t)size == 0));
 
-  return (az_span){ ._internal = { .ptr = ptr, .size = size, }, };
+  return (az_span){ ._internal = { .ptr = ptr, .size = size } };
 }
 #endif // AZ_NO_PRECONDITION_CHECKING
 
@@ -584,7 +584,7 @@ AZ_NODISCARD static az_span _az_span_trim_side(az_span source, az_span_trim_side
   if (side == RIGHT)
   {
     increment = -1; // Set increment to be decremental for moving ptr
-    source_ptr += (source_size - 1); // Set initial position to the end
+    source_ptr += ((size_t)source_size - 1); // Set initial position to the end
   }
 
   // loop source, just to make sure staying within the size range
