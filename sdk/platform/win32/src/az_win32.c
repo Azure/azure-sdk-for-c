@@ -20,5 +20,5 @@ AZ_NODISCARD bool az_platform_atomic_compare_exchange(
     uintptr_t desired)
 {
   return InterlockedCompareExchangePointer((void* volatile*)obj, (void*)desired, (void*)expected)
-      == expected;
+      == (void*)expected;
 }
