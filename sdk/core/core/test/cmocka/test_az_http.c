@@ -561,7 +561,7 @@ static void test_http_response_append_overflow_on_second_call(void** state)
 {
   (void)state;
   {
-    uint8_t buffer[10] = "..........";
+    uint8_t buffer[10] = ".........";
     az_http_response response = { 0 };
     az_span this_will_fit_once = AZ_SPAN_FROM_STR("0123456");
     assert_return_code(az_http_response_init(&response, AZ_SPAN_FROM_BUFFER(buffer)), AZ_OK);
@@ -571,7 +571,7 @@ static void test_http_response_append_overflow_on_second_call(void** state)
     az_result result = az_http_response_append(&response, this_will_fit_once);
     assert_true(result == AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
     assert_memory_equal(buffer, az_span_ptr(this_will_fit_once), 7);
-    assert_memory_equal(buffer + 7, "...", 3);
+    assert_memory_equal(buffer + 7, "..", 2);
   }
 }
 
