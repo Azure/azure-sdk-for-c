@@ -31,5 +31,5 @@ else()
   target_compile_definitions(keys_client_example PRIVATE AZ_NO_HTTP)
 endif()
 
-# using no_platform for now. TODO: show how to auto link
-target_link_libraries(keys_client_example PRIVATE az_noplatform)
+# PAL
+target_link_libraries(keys_client_example PRIVATE ${PAL})

@@ -64,13 +64,16 @@ add_subdirectory(sdk/iot/common)
 add_subdirectory(sdk/iot/hub)
 add_subdirectory(sdk/iot/provisioning)
 
-# PAL
+#PAL
 if(AZ_PLATFORM_IMPL STREQUAL "POSIX")
   add_subdirectory(sdk/platform/posix)
+  set(PAL az_posix)
 elseif(AZ_PLATFORM_IMPL STREQUAL "WIN32")
   add_subdirectory(sdk/platform/win32)
+  set(PAL az_win32)
 else()
   add_subdirectory(sdk/platform/noplatform)
+  set(PAL az_noplatform)
 endif()
 
 add_subdirectory(sdk/platform/http_client/nohttp)

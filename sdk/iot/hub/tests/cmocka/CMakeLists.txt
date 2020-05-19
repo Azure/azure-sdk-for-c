@@ -23,5 +23,5 @@ add_cmocka_test(${TARGET_NAME} SOURCES
                     az_iot_common
                     az_iot_hub
                     az_core
-                    az_noplatform
+                    ${PAL}
                 )

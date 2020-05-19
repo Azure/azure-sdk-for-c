@@ -30,14 +30,8 @@ target_link_libraries(
   az_core
 )
 
-# detect what platform impl to link automatically
-if (WIN32)
-  target_link_libraries(paho_iot_hub_c2d_example PRIVATE az_win32)
-elseif(UNIX)
-  target_link_libraries(paho_iot_hub_c2d_example PRIVATE az_posix)
-else()
-  target_link_libraries(paho_iot_hub_c2d_example PRIVATE az_noplatform)
-endif()
+# PAL
+target_link_libraries(paho_iot_hub_c2d_example PRIVATE ${PAL})
 
 target_link_libraries(
   paho_iot_hub_c2d_example PRIVATE
@@ -59,14 +53,8 @@ target_link_libraries(
   az_core
   )
 
-# detect what platform impl to link automatically
-if (WIN32)
-  target_link_libraries(paho_iot_hub_methods_example PRIVATE az_win32)
-elseif(UNIX)
-  target_link_libraries(paho_iot_hub_methods_example PRIVATE az_posix)
-else()
-  target_link_libraries(paho_iot_hub_methods_example PRIVATE az_noplatform)
-endif()
+# PAL
+target_link_libraries(paho_iot_hub_methods_example PRIVATE ${PAL})
 
 target_link_libraries(
   paho_iot_hub_methods_example PRIVATE
@@ -88,14 +76,8 @@ target_link_libraries(
   az_core
   )
 
-# detect what platform impl to link automatically
-if (WIN32)
-  target_link_libraries(paho_iot_hub_telemetry_example PRIVATE az_win32)
-elseif(UNIX)
-  target_link_libraries(paho_iot_hub_telemetry_example PRIVATE az_posix)
-else()
-  target_link_libraries(paho_iot_hub_telemetry_example PRIVATE az_noplatform)
-endif()
+# PAL
+target_link_libraries(paho_iot_hub_telemetry_example PRIVATE ${PAL})
 
 target_link_libraries(
   paho_iot_hub_telemetry_example PRIVATE
@@ -117,14 +99,8 @@ target_link_libraries(
   az_core
   )
 
-# detect what platform impl to link automatically
-if (WIN32)
-  target_link_libraries(paho_iot_hub_twin_example PRIVATE az_win32)
-elseif(UNIX)
-  target_link_libraries(paho_iot_hub_twin_example PRIVATE az_posix)
-else()
-  target_link_libraries(paho_iot_hub_twin_example PRIVATE az_noplatform)
-endif()
+# PAL
+target_link_libraries(paho_iot_hub_twin_example PRIVATE ${PAL})
 
 target_link_libraries(
   paho_iot_hub_twin_example PRIVATE

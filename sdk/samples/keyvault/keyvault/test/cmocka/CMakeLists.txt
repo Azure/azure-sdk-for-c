@@ -18,5 +18,5 @@ add_cmocka_test(${TARGET_NAME} SOURCES
                     az_keyvault
                     az_core
                     az_nohttp
-                    az_noplatform
+                    ${PAL}
                 )

@@ -31,6 +31,5 @@ else()
   target_compile_definitions(blobs_client_example PRIVATE AZ_NO_HTTP)
 endif()
 
-# using no_platform for now. TODO: show how to auto link
-target_link_libraries(blobs_client_example PRIVATE az_noplatform)
-
+# get the appropiate PAL lib to link
+target_link_libraries(blobs_client_example PRIVATE ${PAL})
