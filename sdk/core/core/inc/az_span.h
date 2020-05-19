@@ -72,15 +72,6 @@ AZ_NODISCARD AZ_INLINE az_span az_span_init(uint8_t* ptr, int32_t size)
 AZ_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t size);
 #endif // AZ_NO_PRECONDITION_CHECKING
 
-// Same function as above, only for use in AZ_SPAN_FROM_BUFFER macro.
-// So that the users don't get warnings in their code when they use the macro:
-// C4221: nonstandard extension: 'ptr': cannot be initialized using address of automatic variable
-// C4204: nonstandard extension: non-constant aggregate initializer
-AZ_NODISCARD AZ_INLINE az_span _az_span_init(uint8_t* ptr, int32_t size)
-{
-  return (az_span){ ._internal = { .ptr = ptr, .size = size } };
-}
-
 /**
  * @brief Returns an empty #az_span.
  *
@@ -153,7 +144,7 @@ AZ_NODISCARD AZ_INLINE az_span _az_span_init(uint8_t* ptr, int32_t size)
  */
 // Force a division by 0 that gets detected by compilers for anything that isn't a byte array.
 #define AZ_SPAN_FROM_BUFFER(BYTE_BUFFER) \
-  _az_span_init( \
+  az_span_init( \
       (uint8_t*)BYTE_BUFFER, (sizeof(BYTE_BUFFER) / (_az_IS_BYTE_ARRAY(BYTE_BUFFER) ? 1 : 0)))
 
 /**
