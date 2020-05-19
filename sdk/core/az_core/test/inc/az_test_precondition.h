@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef _az_PRECONDITION_TESTING_H
-#define _az_PRECONDITION_TESTING_H
+#ifndef _az_TEST_PRECONDITION_H
+#define _az_TEST_PRECONDITION_H
 
 #include <assert.h>
 #include <setjmp.h>
@@ -49,4 +49,4 @@
   } \
   assert_int_equal(1, precondition_test_count);
 
-#endif // _az_PRECONDITION_TESTING_H
+#endif // _az_TEST_PRECONDITION_H

@@ -55,9 +55,38 @@ AZ_NODISCARD AZ_INLINE int32_t az_span_size(az_span span) { return span._interna
 /********************************  CONSTRUCTORS */
 
 /**
+ * @brief Returns an #az_span over a byte buffer.
+ *
+ * @param[in] ptr The memory address of the 1st byte in the byte buffer.
+ * @param[in] size The number of total bytes in the byte buffer.
+ * @return The "view" over the byte buffer.
+ */
+// Note: If you are modifying this method, make sure to modify the non-inline version in the
+// az_span.c file as well, and the _az_ version right below.
+#ifdef AZ_NO_PRECONDITION_CHECKING
+AZ_NODISCARD AZ_INLINE az_span az_span_init(uint8_t* ptr, int32_t size)
+{
+  return (az_span){ ._internal = { .ptr = ptr, .size = size } };
+}
+#else
+AZ_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t size);
+#endif // AZ_NO_PRECONDITION_CHECKING
+
+// Same function as above, only for use in AZ_SPAN_FROM_BUFFER macro.
+// So that the users don't get warnings in their code when they use the macro:
+// C4221: nonstandard extension: 'ptr': cannot be initialized using address of automatic variable
+// C4204: nonstandard extension: non-constant aggregate initializer
+AZ_NODISCARD AZ_INLINE az_span _az_span_init(uint8_t* ptr, int32_t size)
+{
+  return (az_span){ ._internal = { .ptr = ptr, .size = size } };
+}
+
+/**
  * @brief Returns an empty #az_span.
  *
  */
+// When updating this macro, also update AZ_PAIR_NULL, which should be using this macro, but can't
+// due to warnings, and so it is using an expansion of this macro instead.
 #define AZ_SPAN_NULL \
   (az_span) \
   { \
@@ -124,31 +153,8 @@ AZ_NODISCARD AZ_INLINE int32_t az_span_size(az_span span) { return span._interna
  */
 // Force a division by 0 that gets detected by compilers for anything that isn't a byte array.
 #define AZ_SPAN_FROM_BUFFER(BYTE_BUFFER) \
-  (az_span) \
-  { \
-    ._internal = { \
-      .ptr = (uint8_t*)BYTE_BUFFER, \
-      .size = (sizeof(BYTE_BUFFER) / (_az_IS_BYTE_ARRAY(BYTE_BUFFER) ? 1 : 0)), \
-    }, \
-  }
-
-/**
- * @brief Returns an #az_span over a byte buffer.
- *
- * @param[in] ptr The memory address of the 1st byte in the byte buffer.
- * @param[in] size The number of total bytes in the byte buffer.
- * @return The "view" over the byte buffer.
- */
-#ifdef AZ_NO_PRECONDITION_CHECKING
-// Note: If you are modifying this method, make sure to modify the non-inline version in the
-// az_span.c file as well.
-AZ_NODISCARD AZ_INLINE az_span az_span_init(uint8_t* ptr, int32_t size)
-{
-  return (az_span){ ._internal = { .ptr = ptr, .size = size, }, };
-}
-#else
-AZ_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t size);
-#endif // AZ_NO_PRECONDITION_CHECKING
+  _az_span_init( \
+      (uint8_t*)BYTE_BUFFER, (sizeof(BYTE_BUFFER) / (_az_IS_BYTE_ARRAY(BYTE_BUFFER) ? 1 : 0)))
 
 /**
  * @brief Returns an #az_span from a 0-terminated array of bytes (chars).
@@ -195,8 +201,22 @@ AZ_NODISCARD az_span az_span_slice_to_end(az_span span, int32_t start_index);
  */
 AZ_NODISCARD AZ_INLINE bool az_span_is_content_equal(az_span span1, az_span span2)
 {
-  return az_span_size(span1) == az_span_size(span2)
-      && memcmp(az_span_ptr(span1), az_span_ptr(span2), (size_t)az_span_size(span1)) == 0;
+  int32_t span1_size = az_span_size(span1);
+  int32_t span2_size = az_span_size(span2);
+
+  // Make sure to avoid passing a null pointer to memcmp, which is considered undefined.
+  // We assume that if the size is non-zero, then the pointer can't be null.
+  if (span1_size == 0)
+  {
+    // Two empty spans are considered equal, even if their pointers are different.
+    return span2_size == 0;
+  }
+
+  // If span2_size == 0, then the first condition which compares sizes will be false, since we
+  // checked the size of span1 above. And due to short-circuiting we won't be calling memcmp anyway.
+  // Therefore, we don't need to check for that explicitly.
+  return span1_size == span2_size
+      && memcmp(az_span_ptr(span1), az_span_ptr(span2), (size_t)span1_size) == 0;
 }
 
 /**
@@ -387,7 +407,12 @@ typedef struct
  *
  */
 #define AZ_PAIR_NULL \
-  (az_pair) { .key = AZ_SPAN_NULL, .value = AZ_SPAN_NULL }
+  (az_pair) \
+  { \
+    .key = { ._internal = { .ptr = NULL, .size = 0 } }, \
+    .value \
+        = {._internal = { .ptr = NULL, .size = 0 } } \
+  }
 
 /**
  * @brief Returns an #az_pair with its key and value fields initialized to the specified key and

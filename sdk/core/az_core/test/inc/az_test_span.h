@@ -7,8 +7,8 @@
  * @brief Test only utilities for helping validate spans.
  */
 
-#ifndef _az_SPAN_TESTING_H
-#define _az_SPAN_TESTING_H
+#ifndef _az_TEST_SPAN_H
+#define _az_TEST_SPAN_H
 
 // These headers must be included prior to including cmocka.h.
 #include <setjmp.h>
@@ -79,4 +79,4 @@ AZ_INLINE void az_span_for_test_verify(
 
 #include <_az_cfg_suffix.h>
 
-#endif // _az_SPAN_TESTING_H
+#endif // _az_TEST_SPAN_H

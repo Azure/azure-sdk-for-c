@@ -96,7 +96,7 @@ elseif(AZ_PLATFORM_IMPL_NONE)
   target_link_libraries(${TARGET_NAME} PRIVATE az_noplatform)
 endif()
 
-if (BUILD_CURL_TRANSPORT)
+if (TRANSPORT_CURL)
   target_link_libraries(${TARGET_NAME} PRIVATE az_curl)
 else()
   target_link_libraries(${TARGET_NAME} PRIVATE az_nohttp)

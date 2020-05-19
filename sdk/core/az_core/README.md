@@ -116,13 +116,16 @@ Log classifications allow your application to select which specific log messages
    }
    ```
 
+If the SDK is built with `AZ_NO_LOGGING` macro defined (or adding option -DLOGGING=OFF with cmake), it should reduce the binary size and slightly improve performance.
+Logging has a negligible performance impact if no listener is registered or if you specify few classifications. However, if you'd like to exclude all of the logging code to make your final executable smaller, define the `AZ_NO_LOGGING` symbol when building the SDK.
+
 ### SDK Function Argument Validation
 
 The public SDK functions validate the arguments passed to them to ensure that the calling code is passing valid values. The valid value is called a contract precondition. If an SDK function detects a precondition failure (invalid argument value), then by default, it calls a function that places the calling thread into an infinite sleep state; other threads continue to run.
 
 To override the default behavior, implement a function matching the `az_precondition_failed_fn` function signature and then, in your application's initialization (before calling any Azure SDK function), call `az_precondition_failed_set_callback` passing it the address of your function. Now, when any Azure SDK function detects a precondition failure, it will invoke your callback instead. You might override the callback to attach a debugger or perhaps to reboot the device rather than allowing it to continue running with unpredictable behavior.
 
-Also, if you define the `AZ_NO_PRECONDITION_CHECKING` symbol when compiling the SDK code (or adding option -DBUILD_PRECONDITIONS=OFF with cmake), all of the Azure SDK precondition checking will be excluded, making the binary code smaller and faster. We recommend doing this before you ship your code.
+Also, if you define the `AZ_NO_PRECONDITION_CHECKING` symbol when compiling the SDK code (or adding option -DPRECONDITIONS=OFF with cmake), all of the Azure SDK precondition checking will be excluded, making the binary code smaller and faster. We recommend doing this before you ship your code.
 
 ### Canceling an Operation
 
