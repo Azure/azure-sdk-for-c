@@ -205,7 +205,7 @@ void _az_http_policy_logging_log_http_request(_az_http_request const* request)
 
   (void)_az_http_policy_logging_append_http_request_msg(request, &log_msg);
 
-  _az_log_write(AZ_LOG_HTTP_REQUEST, log_msg);
+  _az_LOG_WRITE(AZ_LOG_HTTP_REQUEST, log_msg);
 }
 
 void _az_http_policy_logging_log_http_response(
@@ -221,9 +221,10 @@ void _az_http_policy_logging_log_http_response(
   (void)_az_http_policy_logging_append_http_response_msg(
       &response_copy, duration_msec, request, &log_msg);
 
-  _az_log_write(AZ_LOG_HTTP_RESPONSE, log_msg);
+  _az_LOG_WRITE(AZ_LOG_HTTP_RESPONSE, log_msg);
 }
 
+#ifndef AZ_NO_LOGGING
 AZ_NODISCARD az_result az_http_pipeline_policy_logging(
     _az_http_policy* p_policies,
     void* p_data,
@@ -232,12 +233,12 @@ AZ_NODISCARD az_result az_http_pipeline_policy_logging(
 {
   (void)p_data;
 
-  if (_az_log_should_write(AZ_LOG_HTTP_REQUEST))
+  if (_az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_REQUEST))
   {
     _az_http_policy_logging_log_http_request(p_request);
   }
 
-  if (!_az_log_should_write(AZ_LOG_HTTP_RESPONSE))
+  if (!_az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_RESPONSE))
   {
     // If no logging is needed, do not even measure the response time.
     return az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
@@ -251,3 +252,4 @@ AZ_NODISCARD az_result az_http_pipeline_policy_logging(
 
   return result;
 }
+#endif // AZ_NO_LOGGING

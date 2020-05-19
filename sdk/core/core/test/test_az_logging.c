@@ -10,6 +10,7 @@
 #include <az_http_transport.h>
 #include <az_log.h>
 #include <az_log_internal.h>
+#include <az_test_log.h>
 
 #include <setjmp.h>
 #include <stdarg.h>
@@ -116,9 +117,7 @@ static void test_az_log(void** state)
       AZ_SPAN_FROM_STR("111111222222333333444444555555666666777777888888abc")));
 
   TEST_EXPECT_SUCCESS(az_http_request_append_header(
-      &hrb,
-      AZ_SPAN_FROM_STR("authorization"),
-      AZ_SPAN_FROM_STR("BigSecret!")));
+      &hrb, AZ_SPAN_FROM_STR("authorization"), AZ_SPAN_FROM_STR("BigSecret!")));
 
   uint8_t response_buf[1024] = { 0 };
   az_span response_builder = AZ_SPAN_FROM_BUFFER(response_buf);
@@ -144,7 +143,7 @@ static void test_az_log(void** state)
     _reset_log_invocation_status();
     az_log_set_callback(_log_listener_NULL);
     _az_http_policy_logging_log_http_request(NULL);
-    assert_true(_log_invoked_for_http_request == true);
+    assert_true(_log_invoked_for_http_request == _az_BUILT_WITH_LOGGING(true, false));
     assert_true(_log_invoked_for_http_response == false);
   }
   // Actual test below
@@ -157,12 +156,12 @@ static void test_az_log(void** state)
     assert_true(_log_invoked_for_http_response == false);
 
     _az_http_policy_logging_log_http_request(&hrb);
-    assert_true(_log_invoked_for_http_request == true);
+    assert_true(_log_invoked_for_http_request == _az_BUILT_WITH_LOGGING(true, false));
     assert_true(_log_invoked_for_http_response == false);
 
     _az_http_policy_logging_log_http_response(&response, 3456, &hrb);
-    assert_true(_log_invoked_for_http_request == true);
-    assert_true(_log_invoked_for_http_response == true);
+    assert_true(_log_invoked_for_http_request == _az_BUILT_WITH_LOGGING(true, false));
+    assert_true(_log_invoked_for_http_response == _az_BUILT_WITH_LOGGING(true, false));
   }
   {
     _reset_log_invocation_status();
@@ -180,15 +179,17 @@ static void test_az_log(void** state)
 
     {
       // Verify that our internal should_write() function would return false if none is listening.
-      assert_true(_az_log_should_write(AZ_LOG_HTTP_REQUEST) == false);
-      assert_true(_az_log_should_write(AZ_LOG_HTTP_RESPONSE) == false);
+      assert_true(_az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_REQUEST) == false);
+      assert_true(_az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_RESPONSE) == false);
 
       // If a callback is set, and no classifications are specified, we are going to log all of them
       // (and customer is going to get all of them).
       az_log_set_callback(_log_listener);
 
-      assert_true(_az_log_should_write(AZ_LOG_HTTP_REQUEST) == true);
-      assert_true(_az_log_should_write(AZ_LOG_HTTP_RESPONSE) == true);
+      assert_true(_az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_REQUEST) == _az_BUILT_WITH_LOGGING(true, false));
+
+      assert_true(
+          _az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_RESPONSE) == _az_BUILT_WITH_LOGGING(true, false));
     }
 
     // Verify that if customer specifies the classifications, we'll only invoking the logging
@@ -198,13 +199,13 @@ static void test_az_log(void** state)
     az_log_classification const classifications[] = { AZ_LOG_HTTP_REQUEST, AZ_LOG_END_OF_LIST };
     az_log_set_classifications(classifications);
 
-    assert_true(_az_log_should_write(AZ_LOG_HTTP_REQUEST) == true);
-    assert_true(_az_log_should_write(AZ_LOG_HTTP_RESPONSE) == false);
+    assert_true(_az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_REQUEST) == _az_BUILT_WITH_LOGGING(true, false));
+    assert_true(_az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_RESPONSE) == false);
 
     _az_http_policy_logging_log_http_request(&hrb);
     _az_http_policy_logging_log_http_response(&response, 3456, &hrb);
 
-    assert_true(_log_invoked_for_http_request == true);
+    assert_true(_log_invoked_for_http_request == _az_BUILT_WITH_LOGGING(true, false));
     assert_true(_log_invoked_for_http_response == false);
   }
 

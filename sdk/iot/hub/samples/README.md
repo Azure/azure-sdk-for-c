@@ -61,10 +61,10 @@ For all of these samples, the following environment variables will need to be se
 - `AZ_IOT_DEVICE_X509_TRUST_PEM_FILE`: The full path to the trusted server cert (in `.pem` format). This is usually
 not needed on Mac or Linux but might be needed for Windows.
 
-Once these are set, you MUST compile the SDK with the `BUILD_PAHO_TRANSPORT` option turned on. For example, on the command
+Once these are set, you MUST compile the SDK with the `TRANSPORT_PAHO` option turned on. For example, on the command
 line, it might look like the following:
 ```bash
-cmake -DBUILD_PAHO_TRANSPORT=ON ..
+cmake -DTRANSPORT_PAHO=ON ..
 ```
 
 After the SDK is built, you are free to run any of the following samples.

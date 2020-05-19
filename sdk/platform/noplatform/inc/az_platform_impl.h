@@ -6,6 +6,10 @@
 
 #include <_az_cfg_prefix.h>
 
+/**
+ * @brief A platform specific abstraction for a mutex.
+ *
+ */
 struct az_platform_mtx
 {
   struct
