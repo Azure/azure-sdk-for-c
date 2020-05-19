@@ -18,7 +18,7 @@
 #define AMPERSAND '&'
 #define EQUAL_SIGN '='
 #define STRING_NULL_TERMINATOR '\0'
-#define SCOPE_REGISTRATIONS_STRING "%2fregistrations%2f"
+#define SCOPE_REGISTRATIONS_STRING "/registrations/"
 #define SAS_TOKEN_SR "SharedAccessSignature sr"
 #define SAS_TOKEN_SE "se"
 #define SAS_TOKEN_SIG "sig"
