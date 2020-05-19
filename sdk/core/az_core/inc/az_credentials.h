@@ -15,6 +15,7 @@
 #ifndef _az_CREDENTIALS_H
 #define _az_CREDENTIALS_H
 
+#include <_az_spinlock.h>
 #include <az_http.h>
 #include <az_http_transport.h>
 #include <az_result.h>
@@ -56,7 +57,7 @@ typedef struct
 {
   struct
   {
-    bool* volatile lock;
+    _az_spinlock lock;
     _az_token volatile token;
   } _internal;
 } _az_credential_token;
