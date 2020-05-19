@@ -15,9 +15,10 @@ AZ_NODISCARD int64_t az_platform_clock_msec() { return GetTickCount64(); }
 void az_platform_sleep_msec(int32_t milliseconds) { Sleep(milliseconds); }
 
 AZ_NODISCARD bool az_platform_atomic_compare_exchange(
-    void* volatile* obj,
-    void* expected,
-    void* desired)
+    uintptr_t volatile* obj,
+    uintptr_t expected,
+    uintptr_t desired)
 {
-  return InterlockedCompareExchangePointer(obj, expected, desired) == expected;
+  return InterlockedCompareExchangePointer((void* volatile*)obj, (void*)desired, (void*)expected)
+      == expected;
 }
