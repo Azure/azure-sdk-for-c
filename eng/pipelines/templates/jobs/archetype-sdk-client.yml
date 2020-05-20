@@ -345,7 +345,7 @@ jobs:
         $VersionStringRegEx = '#define AZ_SDK_VERSION_STRING "(([0-9]+)\.([0-9]+)\.([0-9]+)(\-[^\"\-]+)?)"';
         $match = (Get-Content -Path sdk/core/az_core/inc/az_version.h -Raw) -match $VersionStringRegEx
         $version = $Matches[1]
-        $outputObject = @{ version = $version.ToString(); name = 'Azure SDK for Embedde' } | ConvertTo-Json
+        $outputObject = @{ version = $version.ToString(); name = 'Azure SDK for Embedded C' } | ConvertTo-Json
 
         Set-Content -Path $outputPath -Value $outputObject
       displayName: Create package info JSON file
@@ -381,7 +381,7 @@ jobs:
         targetFolder: $(Build.ArtifactStagingDirectory)/docs
       displayName: Copy documentation
 
-  - task: PublishPipelineArtifact@1
-    inputs:
-      artifactName: docs
-      path: $(Build.ArtifactStagingDirectory)/docs
+    - task: PublishPipelineArtifact@1
+      inputs:
+        artifactName: docs
+        path: $(Build.ArtifactStagingDirectory)/docs
