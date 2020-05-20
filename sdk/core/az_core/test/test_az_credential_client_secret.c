@@ -196,13 +196,6 @@ az_result send_request(_az_http_request* request, az_http_response* response)
       {
         if (!redo_auth)
         {
-          // vvvvvvv temp
-          char x[1024] = { 0 };
-          az_span_to_str(x, 1024, header.value);
-          assert_int_equal(sizeof("Bearer AccessToken") - 1, az_span_size(header.value));
-          assert_string_equal("Bearer AccessToken", x);
-          // ^^^^^^^ temp
-
           assert_true(
               az_span_is_content_equal(AZ_SPAN_FROM_STR("Bearer AccessToken"), header.value));
         }
