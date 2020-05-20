@@ -18,10 +18,13 @@ add_library (
 )
 
 target_include_directories (${TARGET_NAME} PUBLIC inc)
-target_include_directories (${TARGET_NAME} PRIVATE src)
 
-target_link_libraries(${TARGET_NAME} PRIVATE az_core)
-target_link_libraries(${TARGET_NAME} PRIVATE az_iot_common)
+target_link_libraries(${TARGET_NAME} PUBLIC
+  az_core
+  az_iot_common
+)
+
+install_target_dep_sources(${TARGET_NAME})
 
 add_library (az::iot::provisioning ALIAS ${TARGET_NAME})
 

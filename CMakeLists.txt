@@ -4,6 +4,8 @@
 cmake_minimum_required (VERSION 3.10)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake-modules")
+include(InstallFileToDirectory)
+
 
 option(WARNINGS_AS_ERRORS "Treat compiler warnings as errors" ON)
 option(TRANSPORT_CURL "Build internal http transport implementation with CURL for HTTP Pipeline" OFF)

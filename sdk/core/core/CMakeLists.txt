@@ -64,12 +64,22 @@ add_library (
   src/az_span.c
   )
 
-target_include_directories (${TARGET_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc> $<INSTALL_INTERFACE:include/${TARGET_NAME}>)
+target_include_directories (${TARGET_NAME} PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc>
+  $<INSTALL_INTERFACE:include/${TARGET_NAME}>
+  )
 # include internal headers
-target_include_directories(${TARGET_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/internal> $<INSTALL_INTERFACE:include/az_core_internal>)
+target_include_directories(${TARGET_NAME} PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/internal>
+  $<INSTALL_INTERFACE:include/az_core_internal>
+  )
 
 # include test internal headers
-target_include_directories(${TARGET_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/test/inc>)
+target_include_directories(${TARGET_NAME} PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/test/inc>
+)
+
+install_target_dep_sources(${TARGET_NAME})
 
 set(AZ_PLATFORM_IMPL "NONE" CACHE STRING "Platform implementation to use")
 set_property(CACHE AZ_PLATFORM_IMPL PROPERTY STRINGS NONE WIN32 POSIX USER)
@@ -87,19 +97,19 @@ else()
 endif()
 
 if(AZ_PLATFORM_IMPL_USER)
-  target_link_libraries(${TARGET_NAME} PRIVATE ${AZ_USER_PLATFORM_IMPL_NAME})
+  target_link_libraries(${TARGET_NAME} PUBLIC ${AZ_USER_PLATFORM_IMPL_NAME})
 elseif(AZ_PLATFORM_IMPL_POSIX)
-  target_link_libraries(${TARGET_NAME} PRIVATE az_posix)
+  target_link_libraries(${TARGET_NAME} PUBLIC az_posix)
 elseif(AZ_PLATFORM_IMPL_WIN32)
-  target_link_libraries(${TARGET_NAME} PRIVATE az_win32)
+  target_link_libraries(${TARGET_NAME} PUBLIC az_win32)
 elseif(AZ_PLATFORM_IMPL_NONE)
-  target_link_libraries(${TARGET_NAME} PRIVATE az_noplatform)
+  target_link_libraries(${TARGET_NAME} PUBLIC az_noplatform)
 endif()
 
 if (TRANSPORT_CURL)
-  target_link_libraries(${TARGET_NAME} PRIVATE az_curl)
+  target_link_libraries(${TARGET_NAME} PUBLIC az_curl)
 else()
-  target_link_libraries(${TARGET_NAME} PRIVATE az_nohttp)
+  target_link_libraries(${TARGET_NAME} PUBLIC az_nohttp)
 endif()
 
 # make sure that users can consume the project as a library.
