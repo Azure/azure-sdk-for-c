@@ -8,7 +8,6 @@ stages:
       - stage: Release_${{artifact.safeName}}
         displayName: 'Release ${{artifact.name}}'
         dependsOn: Build
-        condition:  and(succeeded(), ne(variables['Build.Repository.Name'], 'Azure/azure-sdk-for-c-pr'))
 
         jobs:
           - deployment: TagRepository
@@ -24,14 +23,13 @@ stages:
                 deploy:
                   steps:
                     - checkout: none
-                    - template: ../../tools/clone-buildtools/clone-buildtools.yml
                     - pwsh: Get-ChildItem -Recurse $(Pipeline.Workspace)/packages/${{artifact.Name}}
                       displayName: Output Visible Artifacts
                     - pwsh: >-
-                        Get-Content $(Pipeline.Workspace)/azure-sdk-build-tools/scripts/create-tags-and-git-release.ps1 | Write-Host
+                        Get-Content $(Build.SourcesDirectory)/eng/common/create-tags-and-git-release.ps1 | Write-Host
                       displayName: create-tags-and-git-release.ps1 contents
                     - pwsh: >-
-                          $(Pipeline.Workspace)/azure-sdk-build-tools/scripts/create-tags-and-git-release.ps1
+                          $(Build.SourcesDirectory)/eng/common/create-tags-and-git-release.ps1
                           -artifactLocation "$(Pipeline.Workspace)/packages/${{artifact.Name}}"
                           -packageRepository C
                           -releaseSha $(Build.SourceVersion)
@@ -56,18 +54,17 @@ stages:
                     steps:
                       - checkout: none
                       - pwsh: Write-Host 'publish docs'
-                      - template: ../../tools/clone-buildtools/clone-buildtools.yml
                       - pwsh: |
                           Get-ChildItem -Recurse $(Pipeline.Workspace)/docs/${{ artifact.Name }}
                         displayName: Output Visible Artifacts
-                      - template: ../../tools/generic-blob-upload/publish-blobs.yml
+                      - template: $(Build.SourcesDirectory)/eng/common/pipelines/templates/steps/publish-blobs.yml
                         parameters:
                           FolderForUpload: '$(Pipeline.Workspace)/docs/${{ artifact.Name }}'
                           BlobSASKey: '$(azure-sdk-docs-prod-sas)'
                           BlobName: '$(azure-sdk-docs-prod-blob-name)'
                           TargetLanguage: 'c'
                           # we override the regular script path because we have cloned the build tools repo as a separate artifact.
-                          ScriptPath: '$(Pipeline.Workspace)/azure-sdk-build-tools/scripts/copy-docs-to-blobstorage.ps1'
+                          ScriptPath: '$(Build.SourcesDirectory)/eng/common/scripts/copy-docs-to-blobstorage.ps1'
 
 
           - ${{if ne(artifact.options.skipUpdateSdkVersion, 'true')}}:
@@ -87,7 +84,7 @@ stages:
                       - pwsh: |
                           eng/Update-SdkVersion.ps1
                         displayName: Increment SDK version
-                      - template: ../steps/create-pull-request.yml
+                      - template:$(Build.SourcesDirectory)/eng/common/pipelines/templates/steps/create-pull-request.yml
                         parameters:
                           RepoName: azure-sdk-for-c
                           PRBranchName: increment-sdk-version-${{ parameters.ServiceDirectory }}-$(Build.BuildId)

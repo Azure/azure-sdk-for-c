@@ -13,7 +13,7 @@ stages:
 
   - ${{if and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['System.TeamProject'], 'internal'))}}:
 
-    - template: pipelines/stages/archetype-c-release.yml@azure-sdk-build-tools
+    - template: archetype-c-release.yml
       parameters:
         ServiceDirectory: ${{parameters.ServiceDirectory}}
         DependsOn:
