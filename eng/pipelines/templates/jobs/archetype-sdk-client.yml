@@ -1,6 +1,4 @@
 parameters:
-  Artifacts: []
-  ServiceDirectory: not-specified
   BuildReleaseArtifacts: true
 
 jobs:
@@ -321,89 +319,69 @@ jobs:
       # 60% minimum branch coverage
       coverageThreshold: 60
     condition: eq(variables['AZ_SDK_CODE_COV'], 1)
+ 
 
-# Disable build for c - client
-- ${{ if ne(parameters.ServiceDirectory, 'not-specified' )}}:
-  - job: GenerateReleaseArtifacts
-    pool:
-      vmImage: windows-2019
-    steps:
-      # Generate package spec JSON files for tagging the repo
-      - ${{ each artifact in parameters.Artifacts }}:
-          - pwsh: >-
-              New-Item
-              -ItemType directory
-              -Path $(Build.ArtifactStagingDirectory)
-              -Name packages/${{ artifact.Name }}
-            displayName: Create package info artifact location
 
-          - pwsh: |
-              $outputPath = Join-Path -Path $(Build.ArtifactStagingDirectory) packages/${{ artifact.Name }}/package-info.json
-              $version = Get-Content -Path sdk/${{ parameters.ServiceDirectory }}/${{ artifact.Path }}/version.txt
-              $outputObject = @{ version = $version.ToString(); name = '${{ artifact.Name }}' } | ConvertTo-Json
+- job: GenerateReleaseArtifacts
+  pool:
+    vmImage: windows-2019
+  steps:
+    # Generate release-info
+    - pwsh: >-
+        Copy-Item
+        sdk/core/az_core/CHANGELOG.md
+        $(Build.ArtifactStagingDirectory)/release-info/CHANGELOG.md
+      displayName: Copy CHANGELOG.md to package artifact output
 
-              Set-Content -Path $outputPath -Value $outputObject
-            displayName: Create package info JSON file
+    - pwsh: >-
+        New-Item
+        -ItemType directory
+        -Path $(Build.ArtifactStagingDirectory)
+        -Name release-info
+      displayName: Create package info artifact location
 
-          - pwsh: |
-              $outputPath = Join-Path -Path $(Build.ArtifactStagingDirectory) packages/${{ artifact.Name }}
-              $changelogPath = "sdk/${{ parameters.ServiceDirectory }}/${{ artifact.Path }}/CHANGELOG.md"
+    - pwsh: |
+        $outputPath = Join-Path -Path $(Build.ArtifactStagingDirectory) release-info/package-info.json
+        $VersionStringRegEx = '#define AZ_SDK_VERSION_STRING "(([0-9]+)\.([0-9]+)\.([0-9]+)(\-[^\"\-]+)?)"';
+        $match = (Get-Content -Path sdk/core/az_core/inc/az_version.h -Raw) -match $VersionStringRegEx
+        $version = $Matches[1]
+        $outputObject = @{ version = $version.ToString(); name = 'Azure SDK for Embedde' } | ConvertTo-Json
 
-              if (Test-Path $changeLogPath) {
-                Copy-Item sdk/${{ parameters.ServiceDirectory }}/${{ artifact.Path }}/CHANGELOG.md $outputPath
-              } else {
-                Write-Warning "$changeLogPath does not exist"
-              }
-            displayName: Copy CHANGELOG.md to package artifact
+        Set-Content -Path $outputPath -Value $outputObject
+      displayName: Create package info JSON file
 
-      # This assumes that there are entries in parameters.Artifacts
-      - task: PublishPipelineArtifact@1
-        inputs:
-          artifactName: packages
-          path: $(Build.ArtifactStagingDirectory)/packages
+    - task: PublishPipelineArtifact@1
+      inputs:
+        artifactName: release-info
+        path: $(Build.ArtifactStagingDirectory)/release-info
 
-      # Generate Documentation
-      - pwsh: |
-          $setupFile="doxygen-1.8.18-setup.exe";
+    # Generate Documentation
+    - pwsh: |
+        $setupFile="doxygen-1.8.18-setup.exe";
 
-          Invoke-WebRequest `
-            -MaximumRetryCount 10 `
-            -Uri "https://azuresdktooling.blob.core.windows.net/dependencies/$setupFile" `
-            -OutFile $setupFile `
-          | Wait-Process;
+        Invoke-WebRequest `
+          -MaximumRetryCount 10 `
+          -Uri "https://azuresdktooling.blob.core.windows.net/dependencies/$setupFile" `
+          -OutFile $setupFile `
+        | Wait-Process;
 
-          Start-Process -Filepath .\$setupFile -ArgumentList @("/VERYSILENT") -Wait
-        workingDirectory: $(Agent.TempDirectory)
-        displayName: Download and Install Doxygen
+        Start-Process -Filepath .\$setupFile -ArgumentList @("/VERYSILENT") -Wait
+      workingDirectory: $(Agent.TempDirectory)
+      displayName: Download and Install Doxygen
 
-      - ${{ each artifact in parameters.Artifacts }}:
-        - pwsh: Write-Host "##vso[task.setvariable variable=PackageVersion]$(Get-Content .\sdk\${{ parameters.ServiceDirectory }}\${{ artifact.Path }}\version.txt)"
-          displayName: Set $(PackageVersion) from version.txt file - ${{ artifact.Name }}
-        - pwsh: >-
-            python eng/docs/api/generate_docs.py
-            --TemplateFile="eng/docs/api/Doxyfile.template"
-            --PackagePath="sdk/${{ parameters.ServiceDirectory }}/${{ artifact.Path }}"
-            --PackageName="${{ artifact.Name }}"
-            --PackageVersion="$(PackageVersion)"
-            --AssetsPath="eng/docs/api/assets"
-            --DoxygenPath="c:\\program files\\doxygen\\bin\\doxygen.exe"
-          displayName: Generate docs - ${{ artifact.Name }}
+    - script: doxygen Doxyfile
+      displayName: Generate docs
 
-        - pwsh: New-Item -ItemType directory -Path $(Build.ArtifactStagingDirectory) -Name docs/${{ artifact.Name }}
-          displayName: Create doc artifact location - ${{ artifact.Name }}
+    - pwsh: New-Item -ItemType directory -Path $(Build.ArtifactStagingDirectory) -Name docs
+      displayName: Create doc artifact location
 
-        - task: CopyFiles@2
-          inputs:
-            sourceFolder: sdk/${{ parameters.ServiceDirectory }}/${{ artifact.Path }}/html
-            targetFolder: $(Build.ArtifactStagingDirectory)/docs/${{ artifact.Name }}
-          displayName: Copy documentation - ${{ artifact.Name }}
+    - task: CopyFiles@2
+      inputs:
+        sourceFolder: sdk/docs/html
+        targetFolder: $(Build.ArtifactStagingDirectory)/docs
+      displayName: Copy documentation
 
-        - pwsh: |
-            $packageInfoPath = Join-Path -Path $(Build.ArtifactStagingDirectory) packages/${{ artifact.Name }}/package-info.json
-            Copy-Item -Path $packageInfoPath -Destination $(Build.ArtifactStagingDirectory)/docs/${{ artifact.Name }}/package-info.json
-          displayName: Copy package-info.json to documentation path
-
-      - task: PublishPipelineArtifact@1
-        inputs:
-          artifactName: docs
-          path: $(Build.ArtifactStagingDirectory)/docs
+  - task: PublishPipelineArtifact@1
+    inputs:
+      artifactName: docs
+      path: $(Build.ArtifactStagingDirectory)/docs

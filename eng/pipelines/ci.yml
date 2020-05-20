@@ -19,5 +19,3 @@ pr:
 
 jobs:
   - template: ./templates/jobs/archetype-sdk-client.yml
-    parameters:
-      BuildReleaseArtifacts: false

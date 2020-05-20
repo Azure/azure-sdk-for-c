@@ -1,92 +1,80 @@
-parameters:
-  Artifacts: []
-  ArtifactName: 'not-specified'
-
 stages:
-  - ${{if and(eq(variables['Build.Reason'], 'Manual'), eq(variables['System.TeamProject'], 'internal'))}}:
-    - ${{ each artifact in parameters.Artifacts }}:
-      - stage: Release_${{artifact.safeName}}
-        displayName: 'Release ${{artifact.name}}'
-        dependsOn: Build
+- ${{if and(eq(variables['Build.Reason'], 'Manual'), eq(variables['System.TeamProject'], 'internal'))}}:
+  - stage: Release_C_SDK
+    displayName: 'Release C SDK'
+    dependsOn: Build
 
-        jobs:
-          - deployment: TagRepository
-            displayName: "Create release tag"
-            condition: ne(variables['Skip.TagRepository'], 'true')
-            environment: github
+    jobs:
+      - deployment: TagRepository
+        displayName: "Create release tag"
+        condition: ne(variables['Skip.TagRepository'], 'true')
+        environment: github
 
-            pool:
-              vmImage: windows-2019
+        pool:
+          vmImage: windows-2019
 
-            strategy:
-              runOnce:
-                deploy:
-                  steps:
-                    - checkout: none
-                    - pwsh: Get-ChildItem -Recurse $(Pipeline.Workspace)/packages/${{artifact.Name}}
-                      displayName: Output Visible Artifacts
-                    - pwsh: >-
-                        Get-Content $(Build.SourcesDirectory)/eng/common/create-tags-and-git-release.ps1 | Write-Host
-                      displayName: create-tags-and-git-release.ps1 contents
-                    - pwsh: >-
-                          $(Build.SourcesDirectory)/eng/common/create-tags-and-git-release.ps1
-                          -artifactLocation "$(Pipeline.Workspace)/packages/${{artifact.Name}}"
-                          -packageRepository C
-                          -releaseSha $(Build.SourceVersion)
-                          -repoId $(Build.Repository.Name)
-                      displayName: 'Verify Package Tags and Create Git Releases'
-                      timeoutInMinutes: 5
-                      env:
-                        GH_TOKEN: $(azuresdk-github-pat)
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: none
+                - pwsh: Get-ChildItem -Recurse $(Pipeline.Workspace)/release-info
+                  displayName: Output Visible Artifacts
+                - pwsh: >-
+                      $(Build.SourcesDirectory)/eng/scripts/create-tags-and-git-release.ps1
+                      -artifactLocation "$(Pipeline.Workspace)/release-info"
+                      -releaseSha $(Build.SourceVersion)
+                      -repoId $(Build.Repository.Name)
+                  displayName: 'Verify Package Tags and Create Git Releases'
+                  timeoutInMinutes: 5
+                  env:
+                    GH_TOKEN: $(azuresdk-github-pat)
 
-          - ${{if ne(artifact.options.skipPublishDocs, 'true')}}:
-            - deployment: PublishDocs
-              displayName: Publish Docs to GitHub pages
-              condition: ne(variables['Skip.PublishDocs'], 'true')
-              environment: githubio
+      - deployment: PublishDocs
+        displayName: Publish Docs to GitHub pages
+        condition: ne(variables['Skip.PublishDocs'], 'true')
+        environment: githubio
 
-              pool:
-                vmImage: windows-2019
+        pool:
+          vmImage: windows-2019
 
-              strategy:
-                runOnce:
-                  deploy:
-                    steps:
-                      - checkout: none
-                      - pwsh: Write-Host 'publish docs'
-                      - pwsh: |
-                          Get-ChildItem -Recurse $(Pipeline.Workspace)/docs/${{ artifact.Name }}
-                        displayName: Output Visible Artifacts
-                      - template: $(Build.SourcesDirectory)/eng/common/pipelines/templates/steps/publish-blobs.yml
-                        parameters:
-                          FolderForUpload: '$(Pipeline.Workspace)/docs/${{ artifact.Name }}'
-                          BlobSASKey: '$(azure-sdk-docs-prod-sas)'
-                          BlobName: '$(azure-sdk-docs-prod-blob-name)'
-                          TargetLanguage: 'c'
-                          # we override the regular script path because we have cloned the build tools repo as a separate artifact.
-                          ScriptPath: '$(Build.SourcesDirectory)/eng/common/scripts/copy-docs-to-blobstorage.ps1'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: none
+                - pwsh: Write-Host 'publish docs'
+                - pwsh: |
+                    Get-ChildItem -Recurse $(Pipeline.Workspace)/docs
+                  displayName: Output Visible Artifacts
+                - template: $(Build.SourcesDirectory)/eng/common/pipelines/templates/steps/publish-blobs.yml
+                  parameters:
+                    FolderForUpload: '$(Pipeline.Workspace)/docs'
+                    BlobSASKey: '$(azure-sdk-docs-prod-sas)'
+                    BlobName: '$(azure-sdk-docs-prod-blob-name)'
+                    TargetLanguage: 'c'
+                    # we override the regular script path because we have cloned the build tools repo as a separate artifact.
+                    ScriptPath: '$(Build.SourcesDirectory)/eng/common/scripts/copy-docs-to-blobstorage.ps1'
 
+      - deployment: UpdateSdkVersion
+        displayName: "Update SDK Version"
+        condition: and(succeeded(), ne(variables['Skip.UpdateSdkVersion'], 'true'))
+        environment: github
 
-          - ${{if ne(artifact.options.skipUpdateSdkVersion, 'true')}}:
-            - deployment: UpdateSdkVersion
-              displayName: "Update SDK Version"
-              condition: and(succeeded(), ne(variables['Skip.UpdateSdkVersion'], 'true'))
-              environment: github
+        pool:
+          vmImage: windows-2019
 
-              pool:
-                vmImage: windows-2019
-
-              strategy:
-                runOnce:
-                  deploy:
-                    steps:
-                      - checkout: self
-                      - pwsh: |
-                          eng/Update-SdkVersion.ps1
-                        displayName: Increment SDK version
-                      - template:$(Build.SourcesDirectory)/eng/common/pipelines/templates/steps/create-pull-request.yml
-                        parameters:
-                          RepoName: azure-sdk-for-c
-                          PRBranchName: increment-sdk-version-${{ parameters.ServiceDirectory }}-$(Build.BuildId)
-                          CommitMsg: "Increment sdk version after release of ${{ artifact.name }}"
-                          PRTitle: "Increment version for ${{ parameters.ServiceDirectory }} releases"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                - pwsh: |
+                    eng/scripts/Update-SdkVersion.ps1
+                  displayName: Increment SDK version
+                - template: $(Build.SourcesDirectory)/eng/common/pipelines/templates/steps/create-pull-request.yml
+                  parameters:
+                    RepoName: azure-sdk-for-c
+                    PRBranchName: increment-sdk-version-$(Build.BuildId)
+                    CommitMsg: "Increment sdk version after release of C SDK"
+                    PRTitle: "Increment version for C SDK releases"
