@@ -18,18 +18,14 @@ stages:
             deploy:
               steps:
                 - checkout: self
-                - pwsh: Get-ChildItem -Recurse $(Pipeline.Workspace)/release-info
-                  displayName: Output Visible Artifacts
-                - pwsh: >-
-                      $(Build.SourcesDirectory)/eng/common/scripts/create-tags-and-git-release.ps1
-                      -artifactLocation "$(Pipeline.Workspace)/release-info"
-                      -packageRepository C
-                      -releaseSha $(Build.SourceVersion)
-                      -repoId $(Build.Repository.Name)
-                  displayName: 'Verify Package Tags and Create Git Releases'
-                  timeoutInMinutes: 5
-                  env:
-                    GH_TOKEN: $(azuresdk-github-pat)
+                - template: /eng/common/pipelines/templates/steps/create-tags-and-git-release.yml
+                  parameters:
+                    ArtifactLocation: $(Pipeline.Workspace)/release-info
+                    PackageRepository: C
+                    ReleaseSha: $(Build.SourceVersion)
+                    RepoId: $(Build.Repository.Name)
+                    WorkingDirectory: $(Build.SourcesDirectory)
+                    ScriptDirectory: $(Build.SourcesDirectory)/eng/common/scripts/
 
       - deployment: PublishDocs
         displayName: Publish Docs to GitHub pages
@@ -44,7 +40,6 @@ stages:
             deploy:
               steps:
                 - checkout: self
-                - pwsh: Write-Host 'publish docs'
                 - pwsh: |
                     Get-ChildItem -Recurse $(Pipeline.Workspace)/docs
                   displayName: Output Visible Artifacts

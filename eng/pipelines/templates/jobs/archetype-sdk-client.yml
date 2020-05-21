@@ -320,78 +320,75 @@ jobs:
       # 60% minimum branch coverage
       coverageThreshold: 60
     condition: eq(variables['AZ_SDK_CODE_COV'], 1)
- 
 
+- ${{if and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['System.TeamProject'], 'internal'))}}:
+  - job: GenerateReleaseArtifacts
+    pool:
+      vmImage: windows-2019
+    steps:
+      # Generate release-info
+      - pwsh: >-
+          New-Item
+          -ItemType directory
+          -Path $(Build.ArtifactStagingDirectory)
+          -Name release-info
+        displayName: Create package info artifact location
 
-- job: GenerateReleaseArtifacts
-  pool:
-    vmImage: windows-2019
-  steps:
-    # Generate release-info
-    - pwsh: >-
-        New-Item
-        -ItemType directory
-        -Path $(Build.ArtifactStagingDirectory)
-        -Name release-info
-      displayName: Create package info artifact location
+      - pwsh: |
+          $outputPath = Join-Path -Path $(Build.ArtifactStagingDirectory) release-info/package-info.json
+          $version = eng/scripts/Get-SdkVersion.ps1
+          $outputObject = @{ version = $version.ToString(); name = 'Azure SDK for Embedded C' } | ConvertTo-Json
 
-    - pwsh: |
-        $outputPath = Join-Path -Path $(Build.ArtifactStagingDirectory) release-info/package-info.json
-        $VersionStringRegEx = '#define AZ_SDK_VERSION_STRING "(([0-9]+)\.([0-9]+)\.([0-9]+)(\-[^\"\-]+)?)"';
-        $match = (Get-Content -Path sdk/core/az_core/inc/az_version.h -Raw) -match $VersionStringRegEx
-        $version = $Matches[1]
-        $outputObject = @{ version = $version.ToString(); name = 'Azure SDK for Embedded C' } | ConvertTo-Json
+          Set-Content -Path $outputPath -Value $outputObject
 
-        Set-Content -Path $outputPath -Value $outputObject
+          # Set AZURE_SDK_VERSION for use in Doxygen generation
+          Write-Host "##vso[task.setvariable variable=AZURE_SDK_VERSION]$version"
+        displayName: Create package info JSON file
 
-        # Set AZURE_SDK_VERSION for use in Doxygen generation
-        Write-Host "##vso[task.setvariable variable=AZURE_SDK_VERSION]$version"
-      displayName: Create package info JSON file
+      - pwsh: >-
+          Copy-Item
+          sdk/core/az_core/CHANGELOG.md
+          (Join-Path $(Build.ArtifactStagingDirectory) release-info/CHANGELOG.md)
+        displayName: Copy CHANGELOG.md to package artifact output
 
-    - pwsh: >-
-        Copy-Item
-        sdk/core/az_core/CHANGELOG.md
-        (Join-Path $(Build.ArtifactStagingDirectory) release-info/CHANGELOG.md)
-      displayName: Copy CHANGELOG.md to package artifact output
+      - task: PublishPipelineArtifact@1
+        inputs:
+          artifactName: release-info
+          path: $(Build.ArtifactStagingDirectory)/release-info
 
-    - task: PublishPipelineArtifact@1
-      inputs:
-        artifactName: release-info
-        path: $(Build.ArtifactStagingDirectory)/release-info
+      # Generate Documentation
+      - pwsh: |
+          $setupFile="doxygen-1.8.18-setup.exe";
 
-    # Generate Documentation
-    - pwsh: |
-        $setupFile="doxygen-1.8.18-setup.exe";
+          Invoke-WebRequest `
+            -MaximumRetryCount 10 `
+            -Uri "https://azuresdktooling.blob.core.windows.net/dependencies/$setupFile" `
+            -OutFile $setupFile `
+          | Wait-Process;
 
-        Invoke-WebRequest `
-          -MaximumRetryCount 10 `
-          -Uri "https://azuresdktooling.blob.core.windows.net/dependencies/$setupFile" `
-          -OutFile $setupFile `
-        | Wait-Process;
+          Start-Process -Filepath .\$setupFile -ArgumentList @("/VERYSILENT") -Wait
+        workingDirectory: $(Agent.TempDirectory)
+        displayName: Download and Install Doxygen
 
-        Start-Process -Filepath .\$setupFile -ArgumentList @("/VERYSILENT") -Wait
-      workingDirectory: $(Agent.TempDirectory)
-      displayName: Download and Install Doxygen
+        # Assumes AZURE_SDK_VERSION is set in the environment
+      - script: '"C:/Program Files/doxygen/bin/doxygen.exe" Doxyfile'
+        displayName: Generate docs
 
-      # Assumes AZURE_SDK_VERSION is set in the environment
-    - script: '"C:/Program Files/doxygen/bin/doxygen.exe" Doxyfile'
-      displayName: Generate docs
+      - pwsh: New-Item -ItemType directory -Path $(Build.ArtifactStagingDirectory) -Name docs
+        displayName: Create doc artifact location
 
-    - pwsh: New-Item -ItemType directory -Path $(Build.ArtifactStagingDirectory) -Name docs
-      displayName: Create doc artifact location
+      - task: CopyFiles@2
+        inputs:
+          sourceFolder: docs/html
+          targetFolder: $(Build.ArtifactStagingDirectory)/docs
+        displayName: Copy documentation
 
-    - task: CopyFiles@2
-      inputs:
-        sourceFolder: docs/html
-        targetFolder: $(Build.ArtifactStagingDirectory)/docs
-      displayName: Copy documentation
+      - pwsh: |
+          $packageInfoPath = Join-Path -Path $(Build.ArtifactStagingDirectory) release-info/package-info.json
+          Copy-Item -Path $packageInfoPath -Destination $(Join-Path -Path $(Build.ArtifactStagingDirectory) /docs/package-info.json)
+        displayName: Copy package-info.json to documentation path
 
-    - pwsh: |
-        $packageInfoPath = Join-Path -Path $(Build.ArtifactStagingDirectory) release-info/package-info.json
-        Copy-Item -Path $packageInfoPath -Destination $(Join-Path -Path $(Build.ArtifactStagingDirectory) /docs/package-info.json)
-      displayName: Copy package-info.json to documentation path
-
-    - task: PublishPipelineArtifact@1
-      inputs:
-        artifactName: docs
-        path: $(Build.ArtifactStagingDirectory)/docs
+      - task: PublishPipelineArtifact@1
+        inputs:
+          artifactName: docs
+          path: $(Build.ArtifactStagingDirectory)/docs
