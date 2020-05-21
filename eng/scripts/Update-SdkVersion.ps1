@@ -56,7 +56,7 @@ function Update-Version([AzureEngSemanticVersion]$SemVer, $Unreleased=$True, $Re
      Set-Content -Path $PackageVersionPath -NoNewline
 
     # Increment Version in ChangeLog file
-    & "${PSScriptRoot}/common/Update-Change-Log.ps1" -Version $SemVer.ToString() -ChangeLogPath $ChangelogPath -Unreleased $Unreleased -ReplaceVersion $ReplaceVersion
+    & "${PSScriptRoot}/../common/Update-Change-Log.ps1" -Version $SemVer.ToString() -ChangeLogPath $ChangelogPath -Unreleased $Unreleased -ReplaceVersion $ReplaceVersion
 }
 
 # Obtain Current Package Version
