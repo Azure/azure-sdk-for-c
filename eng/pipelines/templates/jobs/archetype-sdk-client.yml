@@ -342,6 +342,9 @@ jobs:
         $outputObject = @{ version = $version.ToString(); name = 'Azure SDK for Embedded C' } | ConvertTo-Json
 
         Set-Content -Path $outputPath -Value $outputObject
+
+        # Set AZURE_SDK_VERSION for use in Doxygen generation
+        Write-Host "##vso[task.setvariable variable=AZURE_SDK_VERSION]$version"
       displayName: Create package info JSON file
 
     - pwsh: >-
@@ -369,6 +372,7 @@ jobs:
       workingDirectory: $(Agent.TempDirectory)
       displayName: Download and Install Doxygen
 
+      # Assumes AZURE_SDK_VERSION is set in the environment
     - script: '"C:/Program Files/doxygen/bin/doxygen.exe" Doxyfile'
       displayName: Generate docs
 
