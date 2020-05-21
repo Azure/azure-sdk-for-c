@@ -386,6 +386,11 @@ jobs:
         targetFolder: $(Build.ArtifactStagingDirectory)/docs
       displayName: Copy documentation
 
+    - pwsh: |
+        $packageInfoPath = Join-Path -Path $(Build.ArtifactStagingDirectory) release-info/package-info.json
+        Copy-Item -Path $packageInfoPath -Destination $(Join-Path -Path $(Build.ArtifactStagingDirectory) /docs/package-info.json)
+      displayName: Copy package-info.json to documentation path
+
     - task: PublishPipelineArtifact@1
       inputs:
         artifactName: docs

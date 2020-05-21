@@ -23,6 +23,7 @@ stages:
                 - pwsh: >-
                       $(Build.SourcesDirectory)/eng/common/scripts/create-tags-and-git-release.ps1
                       -artifactLocation "$(Pipeline.Workspace)/release-info"
+                      -packageRepository C
                       -releaseSha $(Build.SourceVersion)
                       -repoId $(Build.Repository.Name)
                   displayName: 'Verify Package Tags and Create Git Releases'
