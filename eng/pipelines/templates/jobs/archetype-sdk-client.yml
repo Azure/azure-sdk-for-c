@@ -369,7 +369,7 @@ jobs:
       workingDirectory: $(Agent.TempDirectory)
       displayName: Download and Install Doxygen
 
-    - script: "C:/Program Files/doxygen/bin/doxygen.exe" Doxyfile
+    - script: '"C:/Program Files/doxygen/bin/doxygen.exe" Doxyfile'
       displayName: Generate docs
 
     - pwsh: New-Item -ItemType directory -Path $(Build.ArtifactStagingDirectory) -Name docs
