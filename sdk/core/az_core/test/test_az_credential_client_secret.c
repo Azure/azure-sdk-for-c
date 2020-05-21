@@ -4,8 +4,8 @@
 #include "az_test_definitions.h"
 #include <az_credentials.h>
 #include <az_credentials_internal.h>
-#include <az_http.h>
 #include <az_http_internal.h>
+#include <az_http_transport.h>
 #include <az_span.h>
 
 #include <stddef.h>
@@ -113,9 +113,9 @@ az_result send_request(_az_http_request* request, az_http_response* response)
   static bool redo_auth = false;
 
   az_span request_url = { 0 };
-  assert_true(az_http_request_get_url(request, &request_url));
+  assert_true(az_succeeded(az_http_request_get_url(request, &request_url)));
   az_span body = { 0 };
-  assert_true(az_http_request_get_body(request, &body));
+  assert_true(az_succeeded(az_http_request_get_body(request, &body)));
 
   if (!az_span_is_content_equal(
           AZ_SPAN_FROM_STR("https://www.microsoft.com/test/request"),

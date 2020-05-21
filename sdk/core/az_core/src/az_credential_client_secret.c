@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "az_aad_private.h"
+#include "az_credential_token_private.h"
 #include <az_credentials.h>
 #include <az_http.h>
 #include <az_http_internal.h>
@@ -12,8 +13,9 @@
 #include <_az_cfg.h>
 
 static AZ_NODISCARD az_result _az_credential_client_secret_request_token(
-    az_credential_client_secret* credential,
-    az_context* context)
+    az_credential_client_secret const* credential,
+    az_context* context,
+    _az_token* out_token)
 {
   uint8_t url_buf[_az_AAD_REQUEST_URL_BUF_SIZE] = { 0 };
   az_span url_span = AZ_SPAN_FROM_BUFFER(url_buf);
@@ -40,7 +42,7 @@ static AZ_NODISCARD az_result _az_credential_client_secret_request_token(
       AZ_SPAN_FROM_BUFFER(header_buf),
       body));
 
-  return _az_aad_request_token(&request, &credential->_internal.token);
+  return _az_aad_request_token(&request, out_token);
 }
 
 az_span const _az_auth_header_name = AZ_SPAN_LITERAL_FROM_STR("authorization");
@@ -50,19 +52,23 @@ static AZ_NODISCARD az_result _az_credential_client_secret_apply(
     az_credential_client_secret* credential,
     _az_http_request* ref_request)
 {
+  _az_token token = { 0 };
+  AZ_RETURN_IF_FAILED(
+      _az_credential_token_get_token(&credential->_internal.token_credential, &token));
 
-  if (_az_token_expired(&(credential->_internal.token)))
+  if (_az_token_expired(&token))
   {
+    AZ_RETURN_IF_FAILED(_az_credential_client_secret_request_token(
+        credential, ref_request->_internal.context, &token));
+
     AZ_RETURN_IF_FAILED(
-        _az_credential_client_secret_request_token(credential, ref_request->_internal.context));
+        _az_credential_token_set_token(&credential->_internal.token_credential, &token));
   }
 
-  int16_t const token_length = credential->_internal.token._internal.token_length;
+  int16_t const token_length = token._internal.token_length;
 
   AZ_RETURN_IF_FAILED(az_http_request_append_header(
-      ref_request,
-      _az_auth_header_name,
-      az_span_init(credential->_internal.token._internal.token, token_length)));
+      ref_request, _az_auth_header_name, az_span_init(token._internal.token, token_length)));
 
   return AZ_OK;
 }
@@ -88,11 +94,11 @@ AZ_NODISCARD az_result az_credential_client_secret_init(
           .set_scopes = (_az_credential_set_scopes_fn)_az_credential_client_secret_set_scopes,
           },
         },
+        .token_credential = { 0 },
         .tenant_id = tenant_id,
         .client_id = client_id,
         .client_secret = client_secret,
         .scopes = { 0 },
-        .token = { 0 }
       },
     };
 

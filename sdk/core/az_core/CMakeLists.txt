@@ -47,6 +47,7 @@ add_library (
   ${TARGET_NAME}
   src/az_aad.c
   src/az_credential_client_secret.c
+  src/az_credential_token.c
   src/az_context.c
   src/az_http_pipeline.c
   src/az_http_policy.c
@@ -62,7 +63,7 @@ add_library (
   src/az_log.c
   src/az_precondition.c
   src/az_span.c
-  )
+  src/az_spinlock.c)
 
 target_include_directories (${TARGET_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc> $<INSTALL_INTERFACE:include/${TARGET_NAME}>)
 # include internal headers

@@ -34,10 +34,6 @@ AZ_NODISCARD az_result _az_aad_build_body(
 
 AZ_NODISCARD az_result _az_aad_request_token(_az_http_request* request, _az_token* out_token);
 
-AZ_NODISCARD bool _az_token_expired(_az_token const* token);
-
-AZ_NODISCARD az_result _az_token_set(_az_token* self, _az_token const* new_token);
-
 #include <_az_cfg_suffix.h>
 
 #endif // _az_AAD_PRIVATE_H

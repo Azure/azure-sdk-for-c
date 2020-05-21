@@ -15,11 +15,13 @@
 #ifndef _az_CREDENTIALS_H
 #define _az_CREDENTIALS_H
 
+#include <_az_spinlock.h>
 #include <az_http.h>
 #include <az_http_transport.h>
 #include <az_result.h>
 #include <az_span.h>
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -45,11 +47,27 @@ typedef struct
 {
   struct
   {
-    uint8_t token[_az_TOKEN_BUF_SIZE]; /*!< Base64-encoded token */
-    int16_t token_length;
     int64_t expires_at_msec;
+    int16_t token_length;
+    uint8_t token[_az_TOKEN_BUF_SIZE]; /*!< Base64-encoded token */
   } _internal;
 } _az_token;
+
+/**
+ * @brief Definition of token credential. Token credential pairs token with the thread-safety lock.
+ * Users should not access the token directly, without first using the corresponding thread-safe get
+ * and set functions which update or get the copy of a token. User should not access _internal
+ * field.
+ *
+ */
+typedef struct
+{
+  struct
+  {
+    _az_spinlock lock;
+    _az_token volatile token;
+  } _internal;
+} _az_credential_token;
 
 /**
  * @brief function callback definition as a contract to be implemented for a credential
@@ -88,11 +106,11 @@ typedef struct
   struct
   {
     _az_credential credential; /// must be the first field in every credential structure
+    _az_credential_token token_credential;
     az_span tenant_id;
     az_span client_id;
     az_span client_secret;
     az_span scopes;
-    _az_token token;
   } _internal;
 } az_credential_client_secret;
 
