@@ -32,7 +32,7 @@ AZ_NODISCARD az_result _az_aad_build_body(
     az_span client_secret,
     az_span* out_body);
 
-AZ_NODISCARD az_result _az_aad_request_token(_az_http_request* request, _az_credential_token* out_token_credential);
+AZ_NODISCARD az_result _az_aad_request_token(_az_http_request* request, _az_token* out_token);
 
 #include <_az_cfg_suffix.h>
 
