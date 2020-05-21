@@ -29,7 +29,7 @@ Param (
     [string] $NewVersionString
 )
 
-. ${PSScriptRoot}\common\scripts\SemVer.ps1
+. ${PSScriptRoot}\..\common\scripts\SemVer.ps1
 
 # Updated Version in version file and changelog using computed or set NewVersionString
 function Update-Version([AzureEngSemanticVersion]$SemVer, $Unreleased=$True, $ReplaceVersion=$False)

@@ -53,8 +53,7 @@ stages:
                     BlobSASKey: '$(azure-sdk-docs-prod-sas)'
                     BlobName: '$(azure-sdk-docs-prod-blob-name)'
                     TargetLanguage: 'c'
-                    # we override the regular script path because we have cloned the build tools repo as a separate artifact.
-                    ScriptPath: '$(Build.SourcesDirectory)/eng/common/scripts/copy-docs-to-blobstorage.ps1'
+                    ScriptPath: 'eng/common/scripts/copy-docs-to-blobstorage.ps1'
 
       - deployment: UpdateSdkVersion
         displayName: "Update SDK Version"
