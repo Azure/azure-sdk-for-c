@@ -53,6 +53,13 @@ typedef struct
   } _internal;
 } _az_token;
 
+/**
+ * @brief Definition of token credential. Token credential pairs token with the thread-safety lock.
+ * Users should not access the token directly, without first using the corresponding thread-safe get
+ * and set functions which update or get the copy of a token. User should not access _internal
+ * field.
+ *
+ */
 typedef struct
 {
   struct
