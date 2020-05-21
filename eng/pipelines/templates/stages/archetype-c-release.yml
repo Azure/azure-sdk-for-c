@@ -1,0 +1,75 @@
+stages:
+- ${{if and(eq(variables['Build.Reason'], 'Manual'), eq(variables['System.TeamProject'], 'internal'))}}:
+  - stage: Release_C_SDK
+    displayName: 'Release C SDK'
+    dependsOn: Build
+
+    jobs:
+      - deployment: TagRepository
+        displayName: "Create release tag"
+        condition: ne(variables['Skip.TagRepository'], 'true')
+        environment: github
+
+        pool:
+          vmImage: windows-2019
+
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                - template: /eng/common/pipelines/templates/steps/create-tags-and-git-release.yml
+                  parameters:
+                    ArtifactLocation: $(Pipeline.Workspace)/release-info
+                    PackageRepository: C
+                    ReleaseSha: $(Build.SourceVersion)
+                    RepoId: $(Build.Repository.Name)
+                    WorkingDirectory: $(Build.SourcesDirectory)
+                    ScriptDirectory: $(Build.SourcesDirectory)/eng/common/scripts/
+
+      - deployment: PublishDocs
+        displayName: Publish Docs to GitHub pages
+        condition: ne(variables['Skip.PublishDocs'], 'true')
+        environment: githubio
+
+        pool:
+          vmImage: windows-2019
+
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                - pwsh: |
+                    Get-ChildItem -Recurse $(Pipeline.Workspace)/docs
+                  displayName: Output Visible Artifacts
+                - template: /eng/common/pipelines/templates/steps/publish-blobs.yml
+                  parameters:
+                    FolderForUpload: '$(Pipeline.Workspace)/docs'
+                    BlobSASKey: '$(azure-sdk-docs-prod-sas)'
+                    BlobName: '$(azure-sdk-docs-prod-blob-name)'
+                    TargetLanguage: 'c'
+                    ScriptPath: 'eng/common/scripts/copy-docs-to-blobstorage.ps1'
+
+      - deployment: UpdateSdkVersion
+        displayName: "Update SDK Version"
+        condition: and(succeeded(), ne(variables['Skip.UpdateSdkVersion'], 'true'))
+        environment: github
+
+        pool:
+          vmImage: windows-2019
+
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                - pwsh: |
+                    eng/scripts/Update-SdkVersion.ps1
+                  displayName: Increment SDK version
+                - template: /eng/common/pipelines/templates/steps/create-pull-request.yml
+                  parameters:
+                    RepoName: azure-sdk-for-c
+                    PRBranchName: increment-sdk-version-$(Build.BuildId)
+                    CommitMsg: "Increment sdk version after release of C SDK"
+                    PRTitle: "Increment version for C SDK releases"
