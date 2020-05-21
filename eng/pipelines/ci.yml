@@ -18,4 +18,4 @@ pr:
       - hotfix/*
 
 jobs:
-  - template: ./templates/jobs/archetype-sdk-client.yml
+  - template: ./templates/stages/archetype-sdk-client.yml

@@ -377,7 +377,7 @@ jobs:
 
     - task: CopyFiles@2
       inputs:
-        sourceFolder: sdk/docs/html
+        sourceFolder: docs/html
         targetFolder: $(Build.ArtifactStagingDirectory)/docs
       displayName: Copy documentation
 
