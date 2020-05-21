@@ -21,7 +21,7 @@ stages:
                 - pwsh: Get-ChildItem -Recurse $(Pipeline.Workspace)/release-info
                   displayName: Output Visible Artifacts
                 - pwsh: >-
-                      $(Build.SourcesDirectory)/eng/scripts/create-tags-and-git-release.ps1
+                      $(Build.SourcesDirectory)/eng/common/scripts/create-tags-and-git-release.ps1
                       -artifactLocation "$(Pipeline.Workspace)/release-info"
                       -releaseSha $(Build.SourceVersion)
                       -repoId $(Build.Repository.Name)
