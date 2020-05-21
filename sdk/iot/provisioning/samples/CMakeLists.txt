@@ -32,7 +32,7 @@ target_link_libraries(
   )
 
 # PAL
-target_link_libraries(paho_iot_provisioning_example PRIVATE ${PAL})
+target_link_libraries(paho_iot_provisioning_example PRIVATE ${PLATFORM_LIB})
 
 target_link_libraries(
   paho_iot_provisioning_example PRIVATE

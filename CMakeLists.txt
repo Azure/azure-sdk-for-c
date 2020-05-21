@@ -6,12 +6,14 @@ cmake_minimum_required (VERSION 3.10)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake-modules")
 
 option(WARNINGS_AS_ERRORS "Treat compiler warnings as errors" ON)
-option(TRANSPORT_CURL "Build internal http transport implementation with CURL for HTTP Pipeline" OFF)
 option(UNIT_TESTING "Build unit test projects" OFF)
 option(UNIT_TESTING_MOCKS "wrap PAL functions with mock implementation for tests" OFF)
 option(TRANSPORT_PAHO "Build IoT Samples with Paho MQTT support" OFF)
 option(PRECONDITIONS "Build SDK with preconditions enabled" ON)
 option(LOGGING "Build SDK with logging support" ON)
+set(PLATFORM "AUTO" CACHE STRING "Build SDK with the specific platform layer implementation")
+set(HTTP_TRANSPORT "NONE" CACHE STRING "Build with HTTP transport implementation")
+
 
 # disable preconditions when it's set to OFF
 if (NOT PRECONDITIONS)
@@ -25,11 +27,6 @@ endif()
 # enable mock functions with link option -ld
 if(UNIT_TESTING_MOCKS)
   add_compile_definitions(_az_MOCK_ENABLED)
-endif()
-
-# make libcurl option enabled to be visible to code
-if(TRANSPORT_CURL)
-  add_compile_definitions(TRANSPORT_CURL)
 endif()
 
 if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
@@ -65,22 +62,46 @@ add_subdirectory(sdk/iot/hub)
 add_subdirectory(sdk/iot/provisioning)
 
 #PAL
-if(AZ_PLATFORM_IMPL STREQUAL "POSIX")
-  add_subdirectory(sdk/platform/posix)
-  set(PAL az_posix)
-elseif(AZ_PLATFORM_IMPL STREQUAL "WIN32")
-  add_subdirectory(sdk/platform/win32)
-  set(PAL az_win32)
-else()
-  add_subdirectory(sdk/platform/noplatform)
-  set(PAL az_noplatform)
+if(PLATFORM STREQUAL "AUTO")
+  if (WIN32)
+    set(PLATFORM "WIN32")
+  elseif(UNIX)
+    set(PLATFORM "POSIX")
+  else()
+    set(PLATFORM "NONE")
+  endif()
 endif()
 
-add_subdirectory(sdk/platform/http_client/nohttp)
-# Adding transport implementation for curl
-# Users can still build Core and SDK client without depending on an HTTP transport implementation
-if(TRANSPORT_CURL)
+if(PLATFORM STREQUAL "WIN32")
+  add_subdirectory(sdk/platform/win32)
+  set(PLATFORM_LIB az_win32)
+elseif(PLATFORM STREQUAL "POSIX")
+  add_subdirectory(sdk/platform/posix)
+  set(PLATFORM_LIB az_posix)
+elseif(PLATFORM STREQUAL "NONE")
+  add_subdirectory(sdk/platform/noplatform)
+  set(PLATFORM_LIB az_noplatform)
+else()
+  set(PLATFORM_LIB ${PLATFORM})
+endif()
+
+#HTTP Transport
+if(HTTP_TRANSPORT STREQUAL "AUTO")
+  if (WIN32 OR UNIX)
+    set(HTTP_TRANSPORT "CURL")
+  else()
+    set(HTTP_TRANSPORT "NONE")
+  endif()
+endif()
+
+if(HTTP_TRANSPORT STREQUAL "CURL")
   add_subdirectory(sdk/platform/http_client/curl)
+  set(HTTP_TRANSPORT_LIB az_curl)
+elseif(HTTP_TRANSPORT STREQUAL "NONE")
+  add_subdirectory(sdk/platform/http_client/nohttp)
+  set(HTTP_TRANSPORT_LIB az_nohttp)
+else()
+  set(HTTP_TRANSPORT_LIB ${HTTP_TRANSPORT})
 endif()
 
 # User can disable samples generation by setting env variable AZ_SDK_C_NO_SAMPLES

@@ -27,9 +27,7 @@ if(TRANSPORT_CURL)
 else()
   # linking default no http implementation to be able to compile and link sample.
   target_link_libraries(blobs_client_example PRIVATE az_nohttp)
-  # push compiler symbol so we can find out in Code about no http
-  target_compile_definitions(blobs_client_example PRIVATE AZ_NO_HTTP)
 endif()
 
 # get the appropiate PAL lib to link
-target_link_libraries(blobs_client_example PRIVATE ${PAL})
+target_link_libraries(blobs_client_example PRIVATE ${PLATFORM_LIB})

@@ -114,9 +114,9 @@ The following compiler options are available for adding/removing project feature
 <td>ON</td>
 </tr>
 <tr>
-<td>TRANSPORT_CURL</td>
-<td>This option requires Libcurl dependency to be available. It generates an HTTP stack with libcurl for az_http to be able to send requests thru the wire. This library would replace the no_http.</td>
-<td>OFF</td>
+<td>HTTP_TRANSPORT</td>
+<td>This option generates a HTTP stack for az_http to be able to send requests thru the wire. Possible values:<br>- No_value: "NONE"<br>-NONE: an empty HTTP stack implementation.<br>- CURL: Uses libcurl implementation. Requires Libcurl dependency to be available.<br>- custom_http_lib: Use a customer-provided implementation.</td>
+<td>NONE</td>
 </tr>
 <tr>
 <td>TRANSPORT_PAHO</td>
@@ -124,8 +124,8 @@ The following compiler options are available for adding/removing project feature
 <td>OFF</td>
 </tr>
 <tr>
-<td>AZ_PLATFORM_IMPL</td>
-<td>This option can be set to any of the next values:<br>- No_value: default value is used and no_platform library is used.<br>- "POSIX": Provides implementation for Linux and Mac systems.<br>- "WIN32": Provides platform implementation for Windows based system<br>- "USER": Tells cmake to use an specific implementation provided by user. When setting this option, user must provide an implementation library and set option `AZ_USER_PLATFORM_IMPL_NAME` with the name of the library (i.e. <code>-DAZ_PLATFORM_IMPL=USER -DAZ_USER_PLATFORM_IMPL_NAME=user_platform_lib</code>). cmake will look for this library to link az_core</td>
+<td>PLATFORM</td>
+<td>This option can be set to any of the next values:<br>- No_value: "AUTO". <br>- "AUTO": Use "WIN32" when the CMake target build platform supports Win32 API, "POSIX" if POSIX is supported, "NONE" if neither of the two. <br>- "NONE": default no_platform library is used.<br>- "POSIX": Provides implementation for Linux and Mac systems.<br>- "WIN32": Provides platform implementation for Windows based system<br>- custom_platform_lib: Tells cmake to use an specific implementation provided by user. When setting this option, user must provide an implementation library and set this with the name of the library (i.e. <code>-DPLATFORM=custom_platform_lib</code>). cmake will look for this library to link az_core</td>
 <td>No_value</td>
 </tr>
 </table>
@@ -136,7 +136,7 @@ The following compiler options are available for adding/removing project feature
       Running sample with no_op HTTP implementation.
       Recompile az_core with an HTTP client implementation like CURL to see sample sending network requests.
 
-      i.e. cmake -DTRANSPORT_CURL=ON ..
+      i.e. cmake -DHTTP_TRANSPORT=CURL ..
 
 ## Running Samples
 

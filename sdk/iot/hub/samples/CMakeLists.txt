@@ -31,7 +31,7 @@ target_link_libraries(
 )
 
 # PAL
-target_link_libraries(paho_iot_hub_c2d_example PRIVATE ${PAL})
+target_link_libraries(paho_iot_hub_c2d_example PRIVATE ${PLATFORM_LIB})
 
 target_link_libraries(
   paho_iot_hub_c2d_example PRIVATE
@@ -54,7 +54,7 @@ target_link_libraries(
   )
 
 # PAL
-target_link_libraries(paho_iot_hub_methods_example PRIVATE ${PAL})
+target_link_libraries(paho_iot_hub_methods_example PRIVATE ${PLATFORM_LIB})
 
 target_link_libraries(
   paho_iot_hub_methods_example PRIVATE
@@ -77,7 +77,7 @@ target_link_libraries(
   )
 
 # PAL
-target_link_libraries(paho_iot_hub_telemetry_example PRIVATE ${PAL})
+target_link_libraries(paho_iot_hub_telemetry_example PRIVATE ${PLATFORM_LIB})
 
 target_link_libraries(
   paho_iot_hub_telemetry_example PRIVATE
@@ -100,7 +100,7 @@ target_link_libraries(
   )
 
 # PAL
-target_link_libraries(paho_iot_hub_twin_example PRIVATE ${PAL})
+target_link_libraries(paho_iot_hub_twin_example PRIVATE ${PLATFORM_LIB})
 
 target_link_libraries(
   paho_iot_hub_twin_example PRIVATE

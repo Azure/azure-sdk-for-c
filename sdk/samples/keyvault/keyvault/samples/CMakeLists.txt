@@ -8,7 +8,7 @@ project (az_keyvault_keys_samples LANGUAGES C)
 set(CMAKE_C_STANDARD 99)
 
 # make sure libcurl is available for sample if compile option for libcurl is on
-if(TRANSPORT_CURL)
+if(HTTP_TRANSPORT STREQUAL "CURL")
   find_package(CURL ${CURL_MIN_REQUIRED_VERSION} CONFIG) 
   if(NOT CURL_FOUND)
     find_package(CURL ${CURL_MIN_REQUIRED_VERSION} REQUIRED)
@@ -27,9 +27,7 @@ if(TRANSPORT_CURL)
 else()
   # linking default no http implementation to be able to compile and link sample.
   target_link_libraries(keys_client_example PRIVATE az_nohttp)
-  # push compiler symbol so we can find out in Code about no http
-  target_compile_definitions(keys_client_example PRIVATE AZ_NO_HTTP)
 endif()
 
 # PAL
-target_link_libraries(keys_client_example PRIVATE ${PAL})
+target_link_libraries(keys_client_example PRIVATE ${PLATFORM_LIB})
