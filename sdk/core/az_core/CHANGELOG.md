@@ -1,5 +1,8 @@
 # Release History
 
+## 1.0.0-dev.4 (2020-05-21)
+- Testing release automation
+
 ## 1.0.0-preview.2 (Unreleased)
 - Update top-level CMakeLists.txt to only add subdirectory for specified platform.
 - Add compilation option to remove all logging from SDK code.
