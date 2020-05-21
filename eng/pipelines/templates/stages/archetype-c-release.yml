@@ -47,7 +47,7 @@ stages:
                 - pwsh: |
                     Get-ChildItem -Recurse $(Pipeline.Workspace)/docs
                   displayName: Output Visible Artifacts
-                - template: $(Build.SourcesDirectory)/eng/common/pipelines/templates/steps/publish-blobs.yml
+                - template: /eng/common/pipelines/templates/steps/publish-blobs.yml
                   parameters:
                     FolderForUpload: '$(Pipeline.Workspace)/docs'
                     BlobSASKey: '$(azure-sdk-docs-prod-sas)'
@@ -72,7 +72,7 @@ stages:
                 - pwsh: |
                     eng/scripts/Update-SdkVersion.ps1
                   displayName: Increment SDK version
-                - template: $(Build.SourcesDirectory)/eng/common/pipelines/templates/steps/create-pull-request.yml
+                - template: /eng/common/pipelines/templates/steps/create-pull-request.yml
                   parameters:
                     RepoName: azure-sdk-for-c
                     PRBranchName: increment-sdk-version-$(Build.BuildId)
