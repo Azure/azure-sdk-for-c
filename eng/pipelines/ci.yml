@@ -17,5 +17,5 @@ pr:
       - release/*
       - hotfix/*
 
-jobs:
+stages:
   - template: ./templates/stages/archetype-sdk-client.yml
