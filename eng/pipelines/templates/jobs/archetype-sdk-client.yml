@@ -328,12 +328,6 @@ jobs:
   steps:
     # Generate release-info
     - pwsh: >-
-        Copy-Item
-        sdk/core/az_core/CHANGELOG.md
-        (Join-Path $(Build.ArtifactStagingDirectory) release-info/CHANGELOG.md)
-      displayName: Copy CHANGELOG.md to package artifact output
-
-    - pwsh: >-
         New-Item
         -ItemType directory
         -Path $(Build.ArtifactStagingDirectory)
@@ -349,6 +343,12 @@ jobs:
 
         Set-Content -Path $outputPath -Value $outputObject
       displayName: Create package info JSON file
+
+    - pwsh: >-
+        Copy-Item
+        sdk/core/az_core/CHANGELOG.md
+        (Join-Path $(Build.ArtifactStagingDirectory) release-info/CHANGELOG.md)
+      displayName: Copy CHANGELOG.md to package artifact output
 
     - task: PublishPipelineArtifact@1
       inputs:
