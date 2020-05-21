@@ -25,7 +25,7 @@ Update-SdkVersion.ps1 -NewVersionString 2.0.5
 [CmdletBinding()]
 Param (
     [ValidateNotNullOrEmpty()]
-    [string] $RepoRoot = "${PSScriptRoot}/..",
+    [string] $RepoRoot = "${PSScriptRoot}/../..",
     [string] $NewVersionString
 )
 
