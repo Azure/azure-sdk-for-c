@@ -14,8 +14,11 @@ AZ_NODISCARD bool az_platform_atomic_compare_exchange(
     uintptr_t expected,
     uintptr_t desired)
 {
-  (void)obj;
-  (void)expected;
-  (void)desired;
-  return true;
+  if (*obj == expected)
+  {
+    *obj = desired;
+    return true;
+  }
+
+  return false;
 }
