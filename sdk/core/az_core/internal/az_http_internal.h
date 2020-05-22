@@ -109,7 +109,11 @@ AZ_NODISCARD AZ_INLINE _az_http_policy_telemetry_options _az_http_policy_telemet
 AZ_NODISCARD AZ_INLINE _az_http_policy_apiversion_options
 _az_http_policy_apiversion_options_default()
 {
-  return (_az_http_policy_apiversion_options){ 0 };
+  return (_az_http_policy_apiversion_options){
+    ._internal = { .option_location = _az_http_policy_apiversion_option_location_header,
+                   .name = AZ_SPAN_NULL,
+                   .version = AZ_SPAN_NULL }
+  };
 }
 
 /**

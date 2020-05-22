@@ -9,6 +9,11 @@
 
 #include <_az_cfg_prefix.h>
 
+#define _az_JSON_TOKEN_DEFAULT (az_json_token){ \
+  .kind = AZ_JSON_TOKEN_NONE, \
+  ._internal = { 0 } \
+}
+
 enum
 {
   // We are using a uint64_t to represent our nested state, so we can only go 64 levels deep.
@@ -40,7 +45,7 @@ AZ_INLINE _az_json_stack_item _az_json_stack_pop(_az_json_bit_stack* json_stack)
   }
 
   // true (i.e. 1) means _az_JSON_STACK_OBJECT, while false (i.e. 0) means _az_JSON_STACK_ARRAY
-  return (json_stack->_internal.az_json_stack & 1) != 0;
+  return (json_stack->_internal.az_json_stack & 1) != 0 ? _az_JSON_STACK_OBJECT : _az_JSON_STACK_ARRAY;
 }
 
 AZ_INLINE void _az_json_stack_push(_az_json_bit_stack* json_stack, _az_json_stack_item item)
@@ -61,7 +66,7 @@ AZ_NODISCARD AZ_INLINE _az_json_stack_item _az_json_stack_peek(_az_json_bit_stac
       && json_stack->_internal.current_depth <= _az_MAX_JSON_STACK_SIZE);
 
   // true (i.e. 1) means _az_JSON_STACK_OBJECT, while false (i.e. 0) means _az_JSON_STACK_ARRAY
-  return (json_stack->_internal.az_json_stack & 1) != 0;
+  return (json_stack->_internal.az_json_stack & 1) != 0 ? _az_JSON_STACK_OBJECT : _az_JSON_STACK_ARRAY;
 }
 
 #include <_az_cfg_suffix.h>
