@@ -224,7 +224,7 @@ _az_iot_provisioning_registration_result_default()
 {
   return (az_iot_provisioning_client_registration_result){ .assigned_hub_hostname = AZ_SPAN_NULL,
                                                            .device_id = AZ_SPAN_NULL,
-                                                           .error_code = AZ_IOT_STATUS_UNSET,
+                                                           .error_code = AZ_IOT_STATUS_UNKNOWN,
                                                            .extended_error_code = 0,
                                                            .error_message = AZ_SPAN_NULL,
                                                            .error_tracking_id = AZ_SPAN_NULL,
