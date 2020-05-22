@@ -39,7 +39,7 @@ AZ_NODISCARD AZ_INLINE bool az_json_parser_stack_is_empty(az_json_parser const* 
 AZ_NODISCARD AZ_INLINE _az_json_stack_item
 az_json_parser_stack_last(az_json_parser const* json_parser)
 {
-  return json_parser->_internal.stack & 1;
+  return json_parser->_internal.stack & 1 ? _az_JSON_STACK_OBJECT : _az_JSON_STACK_ARRAY;
 }
 
 AZ_NODISCARD AZ_INLINE az_result
@@ -538,7 +538,7 @@ az_json_parser_skip_children(az_json_parser* json_parser, az_json_token token)
       }
       default:
       {
-        az_json_token element = { 0 };
+        az_json_token element = _az_JSON_TOKEN_DEFAULT;
         az_result result = az_json_parser_parse_array_item(json_parser, &element);
         if (result != AZ_ERROR_ITEM_NOT_FOUND)
         {

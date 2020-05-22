@@ -35,6 +35,9 @@ enum
  */
 typedef enum
 {
+  // Default, unset value
+  AZ_IOT_STATUS_UNSET = 0,
+
   // Service success codes
   AZ_IOT_STATUS_OK = 200,
   AZ_IOT_STATUS_ACCEPTED = 202,
