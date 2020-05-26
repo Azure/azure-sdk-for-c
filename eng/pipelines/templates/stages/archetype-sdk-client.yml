@@ -3,6 +3,16 @@ stages:
     jobs:
       - template: ../jobs/archetype-sdk-client.yml
 
+  # TODO: Check queue time variables
+  - ${{ if eq(variables['System.TeamProject'], 'internal') }}:
+    - stage: Live Test
+      jobs:
+        - template: /eng/pipelines/templates/jobs/archetype-sdk-tests.yml
+          parameters:
+            SampleExecutablePaths:
+              - /sdk/samples/keyvault/keyvault/samples/keys_client_example
+              - /sdk/storage/blobs/samples/blobs_client_example
+
   - ${{if and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['System.TeamProject'], 'internal'))}}:
 
     - template: archetype-c-release.yml
