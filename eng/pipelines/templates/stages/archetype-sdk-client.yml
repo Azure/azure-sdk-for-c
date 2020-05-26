@@ -5,7 +5,7 @@ stages:
 
   # TODO: Check queue time variables
   - ${{ if eq(variables['System.TeamProject'], 'internal') }}:
-    - stage: Live Test
+    - stage: LiveTest
       jobs:
         - template: /eng/pipelines/templates/jobs/archetype-sdk-tests.yml
           parameters:
