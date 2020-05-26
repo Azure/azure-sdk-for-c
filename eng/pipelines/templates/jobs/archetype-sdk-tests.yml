@@ -2,7 +2,7 @@ parameters:
   SampleExecutablePaths: []
 
 jobs:
-  - LiveTest:
+  - job: LiveTest
     strategy:
       matrix:
         # Linux_x64_with_samples:
