@@ -90,7 +90,7 @@ jobs:
 
       - template: /eng/common/TestResources/deploy-test-resources.yml
         parameters:
-          ServiceDirectory: ''
+          ServiceDirectory: '.'
 
       # Run live tests (TODO: USE TEMPLATE)
       - script: ./sdk/samples/keyvault/keyvault/samples/keys_client_example
@@ -99,4 +99,4 @@ jobs:
 
       - template: /eng/common/TestResources/remove-test-resources.yml
         parameters:
-          ServiceDirectory: ''
+          ServiceDirectory: '.'
