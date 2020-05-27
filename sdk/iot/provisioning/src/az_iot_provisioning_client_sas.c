@@ -1,14 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include <az_iot_common_internal.h>
 #include <az_iot_provisioning_client.h>
 #include <az_precondition.h>
 #include <az_span.h>
 #include <az_span_internal.h>
-#include <az_iot_common_internal.h>
 
-#include <az_precondition_internal.h>
 #include <az_log_internal.h>
+#include <az_precondition_internal.h>
 
 #include <stdint.h>
 
@@ -46,24 +46,23 @@ AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_signature(
   // Where
   // resource-string: <scope-id>/registrations/<registration-id>
 
-  int32_t required_size = 
-      az_span_size(client->_internal.id_scope)
-      + az_span_size(resources_string)
-      + az_span_size(client->_internal.registration_id)
-      + 1 // LF
-      + _az_iot_u32toa_size(token_expiration_epoch_time);
-
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(signature, required_size);
-
   az_span remainder = signature;
-  remainder = az_span_copy(remainder, client->_internal.id_scope);
+  int32_t signature_size = az_span_size(signature);
+
+  AZ_RETURN_IF_FAILED(_az_span_copy_url_encode(remainder, client->_internal.id_scope, &remainder));
+
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, az_span_size(resources_string));
   remainder = az_span_copy(remainder, resources_string);
-  remainder = az_span_copy(remainder, client->_internal.registration_id);
+
+  AZ_RETURN_IF_FAILED(
+      _az_span_copy_url_encode(remainder, client->_internal.registration_id, &remainder));
+
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, 1 /* LF */);
   remainder = az_span_copy_u8(remainder, LF);
-  
+
   AZ_RETURN_IF_FAILED(az_span_u32toa(remainder, token_expiration_epoch_time, &remainder));
 
-  *out_signature = az_span_slice(signature, 0, required_size);
+  *out_signature = az_span_slice(signature, 0, signature_size - az_span_size(remainder));
   _az_LOG_WRITE(AZ_LOG_IOT_SAS_TOKEN, *out_signature);
 
   return AZ_OK;
@@ -91,68 +90,68 @@ AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_password(
   // Where:
   // resource-string: <scope-id>/registrations/<registration-id>
 
-  int32_t required_size = 
-      az_span_size(sr_string) 
-      + 1 // EQUAL_SIGN
-      + az_span_size(client->_internal.id_scope) 
-      + az_span_size(resources_string)
-      + az_span_size(client->_internal.registration_id)
-      + 1 // AMPERSAND
-      + az_span_size(sig_string) 
-      + 1 // EQUAL_SIGN
-      + az_span_size(base64_hmac_sha256_signature)
-      + 1 // AMPERSAND
-      + az_span_size(se_string)
-      + 1 // EQUAL_SIGN
-      + _az_iot_u32toa_size(token_expiration_epoch_time) 
-      + 1; // STRING_NULL_TERMINATOR
-
-  if (az_span_size(key_name) > 0)
-  {
-      required_size += 
-      1 // AMPERSAND
-      + az_span_size(skn_string) 
-      + 1 // EQUAL_SIGN
-      + az_span_size(key_name);
-  }
-
   az_span mqtt_password_span = az_span_init((uint8_t*)mqtt_password, (int32_t)mqtt_password_size);
 
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_password_span, required_size);
-
-  // SharedAccessSignature, resource string
+  // SharedAccessSignature
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_password_span, az_span_size(sr_string) + 1 /* EQUAL SIGN */);
   mqtt_password_span = az_span_copy(mqtt_password_span, sr_string);
   mqtt_password_span = az_span_copy_u8(mqtt_password_span, EQUAL_SIGN);
-  mqtt_password_span = az_span_copy(mqtt_password_span, client->_internal.id_scope);
+
+  // Resource string
+  AZ_RETURN_IF_FAILED(_az_span_copy_url_encode(
+      mqtt_password_span, client->_internal.id_scope, &mqtt_password_span));
+
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_password_span, az_span_size(resources_string));
   mqtt_password_span = az_span_copy(mqtt_password_span, resources_string);
-  mqtt_password_span = az_span_copy(mqtt_password_span, client->_internal.registration_id);
+
+  AZ_RETURN_IF_FAILED(_az_span_copy_url_encode(
+      mqtt_password_span, client->_internal.registration_id, &mqtt_password_span));
 
   // Signature
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(
+      mqtt_password_span, 1 /* AMPERSAND */ + az_span_size(sig_string) + 1 /* EQUAL_SIGN */);
   mqtt_password_span = az_span_copy_u8(mqtt_password_span, AMPERSAND);
   mqtt_password_span = az_span_copy(mqtt_password_span, sig_string);
   mqtt_password_span = az_span_copy_u8(mqtt_password_span, EQUAL_SIGN);
-  mqtt_password_span = az_span_copy(mqtt_password_span, base64_hmac_sha256_signature);
+
+  AZ_RETURN_IF_FAILED(_az_span_copy_url_encode(
+      mqtt_password_span, base64_hmac_sha256_signature, &mqtt_password_span));
 
   // Expiration
+
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(
+      mqtt_password_span,
+      1 /* AMPERSAND */ + az_span_size(se_string)
+          + 1 /* EQUAL_SIGN */ + _az_iot_u32toa_size(token_expiration_epoch_time));
   mqtt_password_span = az_span_copy_u8(mqtt_password_span, AMPERSAND);
   mqtt_password_span = az_span_copy(mqtt_password_span, se_string);
   mqtt_password_span = az_span_copy_u8(mqtt_password_span, EQUAL_SIGN);
-  AZ_RETURN_IF_FAILED(az_span_u32toa(mqtt_password_span, token_expiration_epoch_time, &mqtt_password_span));
+  AZ_RETURN_IF_FAILED(
+      az_span_u32toa(mqtt_password_span, token_expiration_epoch_time, &mqtt_password_span));
 
   if (az_span_size(key_name) > 0)
   {
     // Key Name
+    AZ_RETURN_IF_NOT_ENOUGH_SIZE(
+        mqtt_password_span,
+        1 // AMPERSAND
+            + az_span_size(skn_string) + 1 // EQUAL_SIGN
+            + az_span_size(key_name));
+
     mqtt_password_span = az_span_copy_u8(mqtt_password_span, AMPERSAND);
     mqtt_password_span = az_span_copy(mqtt_password_span, skn_string);
     mqtt_password_span = az_span_copy_u8(mqtt_password_span, EQUAL_SIGN);
     mqtt_password_span = az_span_copy(mqtt_password_span, key_name);
   }
 
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_password_span, 1 /* NULL TERMINATOR */);
   mqtt_password_span = az_span_copy_u8(mqtt_password_span, STRING_NULL_TERMINATOR);
 
   if (out_mqtt_password_length != NULL)
   {
-    *out_mqtt_password_length = ((size_t)required_size - 1);
+    *out_mqtt_password_length
+        = ((size_t)mqtt_password_size - (size_t)az_span_size(mqtt_password_span)
+           - 1 /* NULL TERMINATOR */);
   }
 
   return AZ_OK;

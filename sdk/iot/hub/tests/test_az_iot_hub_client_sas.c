@@ -23,7 +23,8 @@
 #define TEST_DEVICE_ID_STR "my_device"
 #define TEST_MODULE_ID_STR "my_module"
 #define TEST_DEVICE_HOSTNAME_STR "myiothub.azure-devices.net"
-#define TEST_SIG "cS1eHM%2FlDjsRsrZV9508wOFrgmZk4g8FNg8NwHVSiSQ"
+#define TEST_SIG "cS1eHM/lDjsRsrZV9508wOFrgmZk4g8FNg8NwHVSiSQ"
+#define TEST_URL_ENC_SIG "cS1eHM%2FlDjsRsrZV9508wOFrgmZk4g8FNg8NwHVSiSQ"
 #define TEST_EXPIRATION_STR "1578941692"
 #define TEST_KEY_NAME "iothubowner"
 
@@ -128,7 +129,7 @@ static void az_iot_hub_client_sas_get_signature_device_succeeds()
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
 
   const char expected_signature[]
-      = TEST_DEVICE_HOSTNAME_STR "/devices/" TEST_DEVICE_ID_STR "\n" TEST_EXPIRATION_STR;
+      = TEST_DEVICE_HOSTNAME_STR "%2Fdevices%2F" TEST_DEVICE_ID_STR "\n" TEST_EXPIRATION_STR;
 
   uint8_t signature_buffer[TEST_SPAN_BUFFER_SIZE];
   az_span signature = az_span_for_test_init(signature_buffer, _az_COUNTOF(signature_buffer));
@@ -154,7 +155,7 @@ static void az_iot_hub_client_sas_get_signature_module_succeeds()
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, &options) == AZ_OK);
 
   const char* expected_signature = TEST_DEVICE_HOSTNAME_STR
-      "/devices/" TEST_DEVICE_ID_STR "/modules/" TEST_MODULE_ID_STR "\n" TEST_EXPIRATION_STR;
+      "%2Fdevices%2F" TEST_DEVICE_ID_STR "%2Fmodules%2F" TEST_MODULE_ID_STR "\n" TEST_EXPIRATION_STR;
 
   uint8_t signature_buffer[TEST_SPAN_BUFFER_SIZE];
   az_span signature = az_span_for_test_init(signature_buffer, _az_COUNTOF(signature_buffer));
@@ -177,8 +178,8 @@ static void az_iot_hub_client_sas_get_password_device_succeeds()
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
 
   const char expected_password[]
-      = "SharedAccessSignature sr=" TEST_DEVICE_HOSTNAME_STR "/devices/" TEST_DEVICE_ID_STR
-        "&sig=" TEST_SIG "&se=" TEST_EXPIRATION_STR;
+      = "SharedAccessSignature sr=" TEST_DEVICE_HOSTNAME_STR "%2Fdevices%2F" TEST_DEVICE_ID_STR
+        "&sig=" TEST_URL_ENC_SIG "&se=" TEST_EXPIRATION_STR;
 
   az_span key_name = AZ_SPAN_NULL;
 
@@ -204,8 +205,8 @@ static void az_iot_hub_client_sas_get_password_device_no_out_length_succeeds()
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
 
   const char expected_password[]
-      = "SharedAccessSignature sr=" TEST_DEVICE_HOSTNAME_STR "/devices/" TEST_DEVICE_ID_STR
-        "&sig=" TEST_SIG "&se=" TEST_EXPIRATION_STR;
+      = "SharedAccessSignature sr=" TEST_DEVICE_HOSTNAME_STR "%2Fdevices%2F" TEST_DEVICE_ID_STR
+        "&sig=" TEST_URL_ENC_SIG "&se=" TEST_EXPIRATION_STR;
 
   az_span key_name = AZ_SPAN_NULL;
 
@@ -233,8 +234,8 @@ static void az_iot_hub_client_sas_get_password_module_succeeds()
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, &options) == AZ_OK);
 
   const char expected_password[]
-      = "SharedAccessSignature sr=" TEST_DEVICE_HOSTNAME_STR "/devices/" TEST_DEVICE_ID_STR
-        "/modules/" TEST_MODULE_ID_STR "&sig=" TEST_SIG "&se=" TEST_EXPIRATION_STR;
+      = "SharedAccessSignature sr=" TEST_DEVICE_HOSTNAME_STR "%2Fdevices%2F" TEST_DEVICE_ID_STR
+        "%2Fmodules%2F" TEST_MODULE_ID_STR "&sig=" TEST_URL_ENC_SIG "&se=" TEST_EXPIRATION_STR;
 
   az_span key_name = AZ_SPAN_NULL;
 
@@ -263,8 +264,8 @@ static void az_iot_hub_client_sas_get_password_module_no_length_succeeds()
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, &options) == AZ_OK);
 
   const char expected_password[]
-      = "SharedAccessSignature sr=" TEST_DEVICE_HOSTNAME_STR "/devices/" TEST_DEVICE_ID_STR
-        "/modules/" TEST_MODULE_ID_STR "&sig=" TEST_SIG "&se=" TEST_EXPIRATION_STR;
+      = "SharedAccessSignature sr=" TEST_DEVICE_HOSTNAME_STR "%2Fdevices%2F" TEST_DEVICE_ID_STR
+        "%2Fmodules%2F" TEST_MODULE_ID_STR "&sig=" TEST_URL_ENC_SIG "&se=" TEST_EXPIRATION_STR;
 
   az_span key_name = AZ_SPAN_NULL;
 
@@ -289,8 +290,8 @@ static void az_iot_hub_client_sas_get_password_device_with_keyname_succeeds()
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
 
   const char expected_password[]
-      = "SharedAccessSignature sr=" TEST_DEVICE_HOSTNAME_STR "/devices/" TEST_DEVICE_ID_STR
-        "&sig=" TEST_SIG "&se=" TEST_EXPIRATION_STR "&skn=" TEST_KEY_NAME;
+      = "SharedAccessSignature sr=" TEST_DEVICE_HOSTNAME_STR "%2Fdevices%2F" TEST_DEVICE_ID_STR
+        "&sig=" TEST_URL_ENC_SIG "&se=" TEST_EXPIRATION_STR "&skn=" TEST_KEY_NAME;
 
   az_span key_name = AZ_SPAN_FROM_STR(TEST_KEY_NAME);
 
@@ -319,8 +320,8 @@ static void az_iot_hub_client_sas_get_password_module_with_keyname_succeeds()
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, &options) == AZ_OK);
 
   const char expected_password[]
-      = "SharedAccessSignature sr=" TEST_DEVICE_HOSTNAME_STR "/devices/" TEST_DEVICE_ID_STR
-        "/modules/" TEST_MODULE_ID_STR "&sig=" TEST_SIG "&se=" TEST_EXPIRATION_STR
+      = "SharedAccessSignature sr=" TEST_DEVICE_HOSTNAME_STR "%2Fdevices%2F" TEST_DEVICE_ID_STR
+        "%2Fmodules%2F" TEST_MODULE_ID_STR "&sig=" TEST_URL_ENC_SIG "&se=" TEST_EXPIRATION_STR
         "&skn=" TEST_KEY_NAME;
 
   az_span key_name = AZ_SPAN_FROM_STR(TEST_KEY_NAME);
@@ -423,7 +424,7 @@ static int _log_invoked_sas = 0;
 static void _log_listener(az_log_classification classification, az_span message)
 {
   const char expected[]
-      = TEST_DEVICE_HOSTNAME_STR "/devices/" TEST_DEVICE_ID_STR "\n" TEST_EXPIRATION_STR;
+      = TEST_DEVICE_HOSTNAME_STR "%2Fdevices%2F" TEST_DEVICE_ID_STR "\n" TEST_EXPIRATION_STR;
 
   switch (classification)
   {

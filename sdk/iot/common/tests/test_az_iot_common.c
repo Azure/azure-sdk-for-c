@@ -117,6 +117,34 @@ static void test_az_iot_provisioning_client_logging_succeed()
   az_log_set_classifications(NULL);
 }
 
+static void test_az_span_copy_url_encode_succeed()
+{
+  az_span url_decoded_span = AZ_SPAN_FROM_STR("abc/=%012");
+
+  uint8_t url_encoded[15];
+  az_span url_encoded_span = AZ_SPAN_FROM_BUFFER(url_encoded);
+
+  az_span remaining;
+
+  uint8_t expected_result[] = "abc%2F%3D%25012";
+
+  assert_int_equal(_az_span_copy_url_encode(url_encoded_span, url_decoded_span, &remaining), AZ_OK);
+  assert_int_equal(az_span_size(remaining), 0);
+  assert_int_equal(az_span_size(url_encoded_span) - az_span_size(remaining), _az_COUNTOF(expected_result) - 1);
+}
+
+static void test_az_span_copy_url_encode_insufficient_size_fail()
+{
+  az_span url_decoded_span = AZ_SPAN_FROM_STR("abc/=%012");
+
+  uint8_t url_encoded[14]; // Needs 15 bytes, this will cause a failure (as expected by this test).
+  az_span url_encoded_span = AZ_SPAN_FROM_BUFFER(url_encoded);
+
+  az_span remaining;
+
+  assert_int_equal(_az_span_copy_url_encode(url_encoded_span, url_decoded_span, &remaining), AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+}
+
 #ifdef _MSC_VER
 // warning C4113: 'void (__cdecl *)()' differs in parameter lists from 'CMUnitTestFunction'
 #pragma warning(disable : 4113)
@@ -131,6 +159,8 @@ int test_az_iot_common()
     cmocka_unit_test(test_az_iot_retry_calc_delay_common_timings_success),
     cmocka_unit_test(test_az_iot_retry_calc_delay_overflow_time_success),
     cmocka_unit_test(test_az_iot_provisioning_client_logging_succeed),
+    cmocka_unit_test(test_az_span_copy_url_encode_succeed),
+    cmocka_unit_test(test_az_span_copy_url_encode_insufficient_size_fail),
   };
   return cmocka_run_group_tests_name("az_iot_common", tests, NULL, NULL);
 }
