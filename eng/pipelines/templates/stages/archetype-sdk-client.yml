@@ -13,7 +13,7 @@ stages:
               - /sdk/samples/keyvault/keyvault/samples/keys_client_example
               - /sdk/storage/blobs/samples/blobs_client_example
 
-  - ${{if and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['System.TeamProject'], 'internal'))}}:
+  - ${{ if and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['System.TeamProject'], 'internal'), ne(variables['Skip.Release'], 'true')) }}:
 
     - template: archetype-c-release.yml
       parameters:
