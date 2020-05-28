@@ -93,13 +93,13 @@ jobs:
           ServiceDirectory: '.'
 
       # Run live tests (TODO: USE TEMPLATE)
-      - ${{ each path in SampleExecutablePaths }}:
-        - script: ${{ path.value.LinuxMacPath }}
-          displayName: ${{ path.key }}
+      - ${{ each sample in LiveTestSamples }}:
+        - script: ${{ sample.value.LinuxMacPath }}
+          displayName: ${{ sample.key }}
           condition: not(contains(variables['vm.image'], 'windows'))
 
-        - script: ${{ path.value.WindowsPath }}
-          displayName: ${{ path.key }}
+        - script: ${{ sample.value.WindowsPath }}
+          displayName: ${{ sample.key }}
           condition: contains(variables['vm.image'], 'windows')
 
 
