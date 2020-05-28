@@ -9,9 +9,10 @@ stages:
       jobs:
         - template: /eng/pipelines/templates/jobs/archetype-sdk-tests.yml
           parameters:
-            SampleExecutablePaths:
-              - /sdk/samples/keyvault/keyvault/samples/keys_client_example
-              - /sdk/storage/blobs/samples/blobs_client_example
+            LiveTests:
+              Storage Blobs:
+                LinuxMacPath: ./build/sdk/storage/blobs/samples/blobs_client_example
+                WindowsPath: ./build/sdk/storage/blobs/samples/debug/blobs_client_example.exe
 
   - ${{ if and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['System.TeamProject'], 'internal'), ne(variables['Skip.Release'], 'true')) }}:
 
