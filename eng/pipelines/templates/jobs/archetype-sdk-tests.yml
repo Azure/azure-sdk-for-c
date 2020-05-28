@@ -93,8 +93,6 @@ jobs:
           ServiceDirectory: '.'
 
       # Run live tests (TODO: USE TEMPLATE)
-      - script: ./sdk/samples/keyvault/keyvault/samples/keys_client_example
-
       - script: ./sdk/storage/blobs/samples/blobs_client_example
 
       - template: /eng/common/TestResources/remove-test-resources.yml

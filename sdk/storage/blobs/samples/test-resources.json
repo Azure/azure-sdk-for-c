@@ -5,9 +5,9 @@
         "baseName": {
             "type": "string"
         },
-        "storageEndpointSuffix": {
+        "blobStorageEndpointSuffix": {
             "type": "string",
-            "defaultValue": "core.windows.net"
+            "defaultValue": "blob.core.windows.net"
         }
     },
     "variables": {
@@ -89,7 +89,7 @@
     "outputs": {
         "AZURE_STORAGE_URL": {
             "type": "string",
-            "value": "[format('https://{0}.{1}/{2}/TestBlob?{3}', parameters('baseName'), parameters('storageEndpointSuffix'), variables('blobContainerName'), listAccountSas(parameters('baseName'), variables('storageApiVersion'), variables('accountSasProperties')).accountSasToken)]"
+            "value": "[format('https://{0}.{1}/{2}/TestBlob?{3}', parameters('baseName'), parameters('blobStorageEndpointSuffix'), variables('blobContainerName'), listAccountSas(parameters('baseName'), variables('storageApiVersion'), variables('accountSasProperties')).accountSasToken)]"
         },
         "ACCOUNT_NAME": {
             "type": "string",
