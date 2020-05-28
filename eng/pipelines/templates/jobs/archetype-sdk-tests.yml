@@ -93,7 +93,7 @@ jobs:
           ServiceDirectory: '.'
 
       # Run live tests (TODO: USE TEMPLATE)
-      - script: ./sdk/storage/blobs/samples/blobs_client_example
+      - script: ./build/sdk/storage/blobs/samples/blobs_client_example
 
       - template: /eng/common/TestResources/remove-test-resources.yml
         parameters:
