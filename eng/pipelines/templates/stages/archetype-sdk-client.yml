@@ -1,10 +1,10 @@
 stages:
-  - stage: Build
-    dependsOn: []
-    # Purpose must be set at the level of the pipeline to enable this scenario
-    condition: eq(variables['PipelineType'], 'unified')
-    jobs:
-      - template: ../jobs/archetype-sdk-client.yml
+  - ${{ if not(endsWith(variables['Build.DefinitionName'], ' - tests')) }}:
+    - stage: Build
+      dependsOn: []
+      condition:
+      jobs:
+        - template: ../jobs/archetype-sdk-client.yml
 
   - ${{ if eq(variables['System.TeamProject'], 'internal') }}:
     - stage: LiveTest
@@ -19,7 +19,7 @@ stages:
                 LinuxMacPath: ./build/sdk/storage/blobs/samples/blobs_client_example
                 WindowsPath: ./build/sdk/storage/blobs/samples/debug/blobs_client_example.exe
 
-  - ${{ if and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['System.TeamProject'], 'internal')) }}:
+  - ${{ if and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['System.TeamProject'], 'internal'), not(endsWith(variables['Build.DefinitionName'], ' - tests'))) }}:
     - template: archetype-c-release.yml
       parameters:
         DependsOn:
