@@ -3,7 +3,7 @@
 parameters:
 - name: IsReleaseCandidate
   displayName: Is Release Candidate?
-  type: bool
+  type: boolean
   default: true
 
 
