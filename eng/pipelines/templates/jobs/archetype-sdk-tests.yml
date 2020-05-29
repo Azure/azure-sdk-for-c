@@ -49,7 +49,7 @@ jobs:
 
       # Run live tests
       - ${{ each sample in parameters.LiveTestSamples }}:
-        - script: ${{ sample.LinuxMacPath }}
+        - script: ${{ sample.NonWindowsPath }}
           displayName: Live Test ${{ sample.Name }} (Non-Windows)
           condition: not(contains(variables['OSVmImage'], 'windows'))
 

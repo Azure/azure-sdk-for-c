@@ -16,7 +16,7 @@ stages:
           parameters:
             LiveTestSamples:
               - Name: Storage Blobs
-                LinuxMacPath: ./build/sdk/storage/blobs/samples/blobs_client_example
+                NonWindowsPath: ./build/sdk/storage/blobs/samples/blobs_client_example
                 WindowsPath: ./build/sdk/storage/blobs/samples/debug/blobs_client_example.exe
 
   - ${{ if and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['System.TeamProject'], 'internal'), not(endsWith(variables['Build.DefinitionName'], ' - tests'))) }}:
