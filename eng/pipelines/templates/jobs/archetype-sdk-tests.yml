@@ -95,11 +95,11 @@ jobs:
       # Run live tests
       - ${{ each sample in parameters.LiveTestSamples }}:
         - script: ${{ sample.LinuxMacPath }}
-          displayName: Live Test ${{ sample.Name }}
+          displayName: Live Test ${{ sample.Name }} (Non-Windows)
           condition: not(contains(variables['vm.image'], 'windows'))
 
         - script: ${{ sample.WindowsPath }}
-          displayName: Live Test ${{ sample.Name }}
+          displayName: Live Test ${{ sample.Name }} (Windows)
           condition: contains(variables['vm.image'], 'windows')
 
 
