@@ -5,8 +5,7 @@
 # sample assumes that the blob is in place before execution.
 
 param (
-  [hashtable] $DeploymentOutputs,
-  [string] $ResourceGroupName
+  [hashtable] $DeploymentOutputs
 )
 
 $storageAccountName = $DeploymentOutputs['ACCOUNT_NAME']
