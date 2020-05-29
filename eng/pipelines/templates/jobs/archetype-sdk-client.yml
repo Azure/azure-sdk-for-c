@@ -3,7 +3,7 @@ parameters:
 
 jobs:
 - job: Validate
-  condition: and(succeededOrFailed(), ne(variables['Skip.Test'], 'true'))
+  condition: ne(variables['Skip.Test'], 'true')
   strategy:
     matrix:
       # Build with no dependencies at all (No samples) - PRECONDITIONS ON
