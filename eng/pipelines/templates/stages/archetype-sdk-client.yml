@@ -14,7 +14,7 @@ stages:
                 LinuxMacPath: ./build/sdk/storage/blobs/samples/blobs_client_example
                 WindowsPath: ./build/sdk/storage/blobs/samples/debug/blobs_client_example.exe
 
-  - ${{ if and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['System.TeamProject'], 'internal')) }}:
+  - ${{ if and(eq('${{ parameters.IsReleaseCandidate }}', 'true'), ne(variables['Build.Reason'], 'PullRequest'), eq(variables['System.TeamProject'], 'internal')) }}:
 
     - template: archetype-c-release.yml
       parameters:
