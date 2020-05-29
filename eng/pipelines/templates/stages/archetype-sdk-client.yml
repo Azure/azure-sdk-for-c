@@ -1,5 +1,7 @@
 stages:
   - stage: Build
+    # Purpose must be set at the level of the pipeline to enable this scenario
+    condition: eq(variables['PipelineType'], 'unified')
     jobs:
       - template: ../jobs/archetype-sdk-client.yml
 
@@ -16,7 +18,6 @@ stages:
                 WindowsPath: ./build/sdk/storage/blobs/samples/debug/blobs_client_example.exe
 
   - ${{ if and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['System.TeamProject'], 'internal')) }}:
-
     - template: archetype-c-release.yml
       parameters:
         DependsOn:

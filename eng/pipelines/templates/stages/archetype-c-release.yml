@@ -1,8 +1,6 @@
 stages:
 - ${{if and(eq(variables['Build.Reason'], 'Manual'), eq(variables['System.TeamProject'], 'internal'))}}:
   - stage: Release_C_SDK
-    # Purpose must be set at the level of the pipeline
-    condition: eq(variables['PipelineType'], 'unified')
     displayName: 'Release C SDK'
     dependsOn: Build
 
