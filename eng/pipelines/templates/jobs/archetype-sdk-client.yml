@@ -210,48 +210,11 @@ jobs:
   - checkout: self
     submodules: recursive
 
-  # Mac OS specific requirements
-  - task: Bash@3
-    inputs:
-      targetType: inline
-      script: |
-        sudo xcode-select --switch /Applications/Xcode_11.3.1.app
-        echo "xcode path:"
-        sudo xcode-select --print-path
+  - template: /eng/pipelines/templates/steps/vcpkg.yml
+    VmImageVariableName: vm.image
+    DependenciesVariableName: vcpkg.deps
 
-        # Install gcc 9
-        brew install gcc@9
-        gcc --version
-
-        git clone https://github.com/Microsoft/vcpkg.git
-        cd vcpkg
-        git rev-parse --verify HEAD
-        git status
-
-        ./bootstrap-vcpkg.sh
-
-        # Validate that vcpkg bootstrap succeeded
-        ./vcpkg version
-        if [ $? -ne 0 ]
-        then
-          echo "./bootstrap-vcpkg.sh FAILED"
-          exit 1
-        fi
-
-        echo "##vso[task.prependpath]$(pwd)"
-        echo "##vso[task.setvariable variable=VCPKG_INSTALLATION_ROOT;]$(pwd)"
-
-    # Execute only for Mac and if there is at least one dependency to be installed
-    condition: and(succeeded(), contains(variables['vm.image'], 'macOS'), not(eq(variables['vcpkg.deps'], '')))
-    displayName: vcpkg bootstrap
-
-
-  - script: |
-      vcpkg install $(vcpkg.deps)
-    displayName: vcpkg install dependencies
-    # Execute only if there is at least one dependency to be installed
-    condition: and(succeeded(), not(eq(variables['vcpkg.deps'], '')))
-
+  # Install gcovr and lcov for coverage information where appropriate
   - script: |
       sudo apt install -y gcovr lcov
       dotnet tool install -g dotnet-reportgenerator-globaltool
@@ -259,18 +222,10 @@ jobs:
     displayName: Install coverage tools
     condition: eq(variables['AZ_SDK_CODE_COV'], 1)
 
-  - task: CMake@1
-    inputs:
-      cmakeArgs: --version
-    displayName: cmake version
-  - task: CMake@1
-    inputs:
-      cmakeArgs: $(build.args) ..
-    displayName: cmake generate
-  - task: CMake@1
-    inputs:
-      cmakeArgs: --build .
-    displayName: cmake build
+  - template: /eng/pipelines/templates/steps/cmake-build.yml
+    BuildArgs: $(build.args)
+
+  # Run unit tests
   - script: |
       ctest -V
     workingDirectory: build
