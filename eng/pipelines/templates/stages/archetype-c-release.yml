@@ -1,7 +1,6 @@
 stages:
 - ${{if and(eq(variables['Build.Reason'], 'Manual'), eq(variables['System.TeamProject'], 'internal'))}}:
   - stage: Release_C_SDK
-    condition: succeeded()
     displayName: 'Release C SDK'
     dependsOn: Build
 
