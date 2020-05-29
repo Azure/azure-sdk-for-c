@@ -3,6 +3,7 @@ parameters:
 
 jobs:
   - job: LiveTest
+    condition: and(succeededOrFailed(), ne(variables['Skip.Test'], 'true'))
     strategy:
       matrix:
         Linux_x64_with_samples:

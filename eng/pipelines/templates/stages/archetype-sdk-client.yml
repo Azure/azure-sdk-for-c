@@ -8,8 +8,6 @@ stages:
 
   - ${{ if eq(variables['System.TeamProject'], 'internal') }}:
     - stage: LiveTest
-      # Purpose must be set at the level of the pipeline to enable this scenario
-      condition: eq(variables['PipelineType'], 'tests')
       dependsOn: []
       jobs:
         - template: /eng/pipelines/templates/jobs/archetype-sdk-tests.yml
