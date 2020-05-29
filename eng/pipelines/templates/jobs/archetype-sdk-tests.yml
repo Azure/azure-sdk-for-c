@@ -1,5 +1,5 @@
 parameters:
-  LiveTestSamples: {}
+  LiveTestSamples: []
 
 jobs:
   - job: LiveTest
@@ -92,14 +92,14 @@ jobs:
         parameters:
           ServiceDirectory: '.'
 
-      # Run live tests (TODO: USE TEMPLATE)
-      ${{ each sample in parameters.LiveTestSamples }}:
-        - script: ${{ sample.value.LinuxMacPath }}
-          displayName: ${{ sample.key }}
+      # Run live tests
+      - ${{ each sample in parameters.LiveTestSamples }}:
+        - script: ${{ sample.LinuxMacPath }}
+          displayName: Live Test ${{ sample.Name }}
           condition: not(contains(variables['vm.image'], 'windows'))
 
-        - script: ${{ sample.value.WindowsPath }}
-          displayName: ${{ sample.key }}
+        - script: ${{ sample.WindowsPath }}
+          displayName: Live Test ${{ sample.Name }}
           condition: contains(variables['vm.image'], 'windows')
 
 

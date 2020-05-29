@@ -9,8 +9,8 @@ stages:
       jobs:
         - template: /eng/pipelines/templates/jobs/archetype-sdk-tests.yml
           parameters:
-            LiveTests:
-              Storage Blobs:
+            LiveTestSamples:
+              - Name: Storage Blobs
                 LinuxMacPath: ./build/sdk/storage/blobs/samples/blobs_client_example
                 WindowsPath: ./build/sdk/storage/blobs/samples/debug/blobs_client_example.exe
 
