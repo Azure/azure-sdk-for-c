@@ -8,6 +8,10 @@
         "blobStorageEndpointSuffix": {
             "type": "string",
             "defaultValue": "blob.core.windows.net"
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]"
         }
     },
     "variables": {
@@ -27,7 +31,7 @@
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "[variables('storageApiVersion')]",
             "name": "[parameters('baseName')]",
-            "location": "westus",
+            "location": "[parameters('location')]",
             "sku": {
                 "name": "Standard_RAGRS",
                 "tier": "Standard"
