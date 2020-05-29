@@ -3,6 +3,7 @@ parameters:
 
 jobs:
   - job: LiveTest
+    condition: succeededOrFailed()
     strategy:
       matrix:
         Linux_x64_with_samples:
