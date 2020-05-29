@@ -3,9 +3,10 @@ stages:
     jobs:
       - template: ../jobs/archetype-sdk-client.yml
 
-  # TODO: Check queue time variables
   - ${{ if eq(variables['System.TeamProject'], 'internal') }}:
     - stage: LiveTest
+      # Purpose must be set at the level of the pipeline to enable this scenario
+      condition: eq(variables['PipelineType'], 'tests')
       jobs:
         - template: /eng/pipelines/templates/jobs/archetype-sdk-tests.yml
           parameters:
@@ -14,7 +15,7 @@ stages:
                 LinuxMacPath: ./build/sdk/storage/blobs/samples/blobs_client_example
                 WindowsPath: ./build/sdk/storage/blobs/samples/debug/blobs_client_example.exe
 
-  - ${{ if and(eq(parameters.IsReleaseCandidate, true), ne(variables['Build.Reason'], 'PullRequest'), eq(variables['System.TeamProject'], 'internal')) }}:
+  - ${{ if and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['System.TeamProject'], 'internal')) }}:
 
     - template: archetype-c-release.yml
       parameters:
