@@ -54,7 +54,7 @@ jobs:
           displayName: Live Test ${{ sample.Name }} (Non-Windows)
           condition: not(contains(variables['OSVmImage'], 'windows'))
 
-        - pwsh: ${{ sample.WindowsPath }}
+        - script: ${{ sample.WindowsPath }}
           displayName: Live Test ${{ sample.Name }} (Windows)
           condition: contains(variables['OSVmImage'], 'windows')
 
