@@ -2,14 +2,14 @@ stages:
   - stage: Build
     dependsOn: []
     # Purpose must be set at the level of the pipeline to enable this scenario
-    condition: and(succeeded(), eq(variables['PipelineType'], 'unified'))
+    condition: and(eq(variables['PipelineType'], 'unified'))
     jobs:
       - template: ../jobs/archetype-sdk-client.yml
 
   - ${{ if eq(variables['System.TeamProject'], 'internal') }}:
     - stage: LiveTest
       # Purpose must be set at the level of the pipeline to enable this scenario
-      condition: and(succeeded(), eq(variables['PipelineType'], 'tests'))
+      condition: and(eq(variables['PipelineType'], 'tests'))
       dependsOn: []
       jobs:
         - template: /eng/pipelines/templates/jobs/archetype-sdk-tests.yml
