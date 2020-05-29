@@ -211,8 +211,9 @@ jobs:
     submodules: recursive
 
   - template: /eng/pipelines/templates/steps/vcpkg.yml
-    VmImageVariableName: vm.image
-    DependenciesVariableName: vcpkg.deps
+    parameters:
+      VmImageVariableName: vm.image
+      DependenciesVariableName: vcpkg.deps
 
   # Install gcovr and lcov for coverage information where appropriate
   - script: |
@@ -223,7 +224,8 @@ jobs:
     condition: eq(variables['AZ_SDK_CODE_COV'], 1)
 
   - template: /eng/pipelines/templates/steps/cmake-build.yml
-    BuildArgs: $(build.args)
+    parameters:
+      BuildArgs: $(build.args)
 
   # Run unit tests
   - script: |
