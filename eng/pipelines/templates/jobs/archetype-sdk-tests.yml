@@ -1,0 +1,64 @@
+parameters:
+  LiveTestSamples: []
+
+jobs:
+  - job: LiveTest
+    condition: and(succeededOrFailed(), ne(variables['Skip.Test'], 'true'))
+    strategy:
+      matrix:
+        Linux_x64_with_samples:
+          OSVmImage: 'ubuntu-18.04'
+          vcpkg.deps: 'curl[ssl]'
+          VCPKG_DEFAULT_TRIPLET: 'x64-linux'
+          build.args: ' -DTRANSPORT_CURL=ON'
+        Win_x86_with_samples:
+          OSVmImage: 'windows-2019'
+          vcpkg.deps: 'curl[winssl]'
+          VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
+          CMAKE_GENERATOR: 'Visual Studio 16 2019'
+          CMAKE_GENERATOR_PLATFORM: Win32
+          build.args: ' -DTRANSPORT_CURL=ON'
+        Win_x64_with_samples:
+          OSVmImage: 'windows-2019'
+          vcpkg.deps: 'curl[winssl]'
+          VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
+          CMAKE_GENERATOR: 'Visual Studio 16 2019'
+          CMAKE_GENERATOR_PLATFORM: x64
+          build.args: ' -DTRANSPORT_CURL=ON'
+        MacOS_x64_with_samples:
+          OSVmImage: 'macOS-10.15'
+          vcpkg.deps: 'curl[ssl]'
+          VCPKG_DEFAULT_TRIPLET: 'x64-osx'
+          build.args: ' -DTRANSPORT_CURL=ON'
+
+    pool:
+      vmImage: $(OSVmImage)
+
+    steps:
+      - template: /eng/pipelines/templates/steps/vcpkg.yml
+        parameters:
+          VmImageVariableName: OSVmImage
+          DependenciesVariableName: vcpkg.deps
+
+      - template: /eng/pipelines/templates/steps/cmake-build.yml
+        parameters:
+          BuildArgs: $(build.args)
+
+      - template: /eng/common/TestResources/deploy-test-resources.yml
+        parameters:
+          ServiceDirectory: '.'
+
+      # Run live tests
+      - ${{ each sample in parameters.LiveTestSamples }}:
+        - script: ${{ sample.NonWindowsPath }}
+          displayName: Live Test ${{ sample.Name }} (Non-Windows)
+          condition: not(contains(variables['OSVmImage'], 'windows'))
+
+        - script: ${{ sample.WindowsPath }}
+          displayName: Live Test ${{ sample.Name }} (Windows)
+          condition: contains(variables['OSVmImage'], 'windows')
+
+
+      - template: /eng/common/TestResources/remove-test-resources.yml
+        parameters:
+          ServiceDirectory: '.'

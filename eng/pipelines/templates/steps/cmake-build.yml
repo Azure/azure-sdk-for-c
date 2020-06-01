@@ -1,0 +1,16 @@
+parameters:
+  BuildArgs: ''
+
+steps:
+  - task: CMake@1
+    inputs:
+      cmakeArgs: --version
+    displayName: cmake version
+  - task: CMake@1
+    inputs:
+      cmakeArgs: ${{ parameters.BuildArgs }} ..
+    displayName: cmake generate
+  - task: CMake@1
+    inputs:
+      cmakeArgs: --build .
+    displayName: cmake build

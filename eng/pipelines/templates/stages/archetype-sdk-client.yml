@@ -1,10 +1,23 @@
 stages:
-  - stage: Build
-    jobs:
-      - template: ../jobs/archetype-sdk-client.yml
+  - ${{ if not(endsWith(variables['Build.DefinitionName'], ' - tests')) }}:
+    - stage: Build
+      dependsOn: []
+      condition:
+      jobs:
+        - template: ../jobs/archetype-sdk-client.yml
 
-  - ${{if and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['System.TeamProject'], 'internal'))}}:
+  - ${{ if eq(variables['System.TeamProject'], 'internal') }}:
+    - stage: LiveTest
+      dependsOn: []
+      jobs:
+        - template: /eng/pipelines/templates/jobs/archetype-sdk-tests.yml
+          parameters:
+            LiveTestSamples:
+              - Name: Storage Blobs
+                NonWindowsPath: ./build/sdk/storage/blobs/samples/blobs_client_example
+                WindowsPath: build\sdk\storage\blobs\samples\debug\blobs_client_example.exe
 
+  - ${{ if and(eq(variables['Build.Reason'], 'Manual'), eq(variables['System.TeamProject'], 'internal'), not(endsWith(variables['Build.DefinitionName'], ' - tests'))) }}:
     - template: archetype-c-release.yml
       parameters:
         DependsOn:

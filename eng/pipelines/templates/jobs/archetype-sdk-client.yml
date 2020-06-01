@@ -16,26 +16,26 @@ jobs:
       # LOGGING                     ON
       # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_NONE
       Linux_x64:
-        vm.image: 'ubuntu-18.04'
+        OSVmImage: 'ubuntu-18.04'
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AZ_SDK_C_NO_SAMPLES: 'true'
       Win_x86:
-        vm.image: 'windows-2019'
+        OSVmImage: 'windows-2019'
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: Win32
         AZ_SDK_C_NO_SAMPLES: 'true'
       Win_x64:
-        vm.image: 'windows-2019'
+        OSVmImage: 'windows-2019'
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: x64
         AZ_SDK_C_NO_SAMPLES: 'true'
       MacOS_x64:
-       vm.image: 'macOS-10.15'
+       OSVmImage: 'macOS-10.15'
        vcpkg.deps: ''
        VCPKG_DEFAULT_TRIPLET: 'x64-osx'
        AZ_SDK_C_NO_SAMPLES: 'true'
@@ -50,26 +50,26 @@ jobs:
       # LOGGING                     ON
       # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_POSIX / AZ_PLATFORM_IMPL_WIN32
       Linux_x64_with_samples:
-        vm.image: 'ubuntu-18.04'
+        OSVmImage: 'ubuntu-18.04'
         vcpkg.deps: 'curl[ssl] paho-mqtt'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX'
       Win_x86_with_samples:
-        vm.image: 'windows-2019'
+        OSVmImage: 'windows-2019'
         vcpkg.deps: 'curl[winssl] paho-mqtt'
         VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: Win32
         build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=WIN32'
       Win_x64_with_samples:
-        vm.image: 'windows-2019'
+        OSVmImage: 'windows-2019'
         vcpkg.deps: 'curl[winssl] paho-mqtt'
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: x64
         build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=WIN32'
       MacOS_x64_with_samples:
-        vm.image: 'macOS-10.15'
+        OSVmImage: 'macOS-10.15'
         vcpkg.deps: 'curl[ssl] paho-mqtt'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
         build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX'
@@ -84,26 +84,26 @@ jobs:
       # LOGGING                     ON
       # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_POSIX / AZ_PLATFORM_IMPL_WIN32
       Linux_x64_with_samples_and_unit_test:
-        vm.image: 'ubuntu-18.04'
+        OSVmImage: 'ubuntu-18.04'
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON'
       Win_x86_with_samples_and_unit_test:
-        vm.image: 'windows-2019'
+        OSVmImage: 'windows-2019'
         vcpkg.deps: 'curl[winssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: Win32
         build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=WIN32 -DUNIT_TESTING=ON'
       Win_x64_with_samples_and_unit_test:
-        vm.image: 'windows-2019'
+        OSVmImage: 'windows-2019'
         vcpkg.deps: 'curl[winssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: x64
         build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=WIN32 -DUNIT_TESTING=ON'
       MacOS_x64_with_samples_and_unit_test:
-        vm.image: 'macOS-10.15'
+        OSVmImage: 'macOS-10.15'
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
         build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON'
@@ -118,7 +118,7 @@ jobs:
       # LOGGING                     ON
       # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_NONE
       Linux_x64_with_unit_test:
-        vm.image: 'ubuntu-18.04'
+        OSVmImage: 'ubuntu-18.04'
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         # This is the only platform where we run mocking functions and generate CodeCoverage
@@ -126,7 +126,7 @@ jobs:
         AZ_SDK_CODE_COV: 1
         AZ_SDK_C_NO_SAMPLES: 'true'
       Win_x86_with_unit_test:
-        vm.image: 'windows-2019'
+        OSVmImage: 'windows-2019'
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
@@ -134,7 +134,7 @@ jobs:
         build.args: ' -DUNIT_TESTING=ON'
         AZ_SDK_C_NO_SAMPLES: 'true'
       Win_x64_with_unit_test:
-        vm.image: 'windows-2019'
+        OSVmImage: 'windows-2019'
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
@@ -142,7 +142,7 @@ jobs:
         build.args: ' -DUNIT_TESTING=ON'
         AZ_SDK_C_NO_SAMPLES: 'true'
       MacOS_x64_with_unit_test:
-        vm.image: 'macOS-10.15'
+        OSVmImage: 'macOS-10.15'
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
         build.args: ' -DUNIT_TESTING=ON'
@@ -158,13 +158,13 @@ jobs:
       # LOGGING                     ON
       # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_NONE
       Linux_x64_with_unit_test_no_preconditions:
-        vm.image: 'ubuntu-18.04'
+        OSVmImage: 'ubuntu-18.04'
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: ' -DUNIT_TESTING=ON -DPRECONDITIONS=OFF'
         AZ_SDK_C_NO_SAMPLES: 'true'
       Win_x86_with_unit_test_no_preconditions:
-        vm.image: 'windows-2019'
+        OSVmImage: 'windows-2019'
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
@@ -172,7 +172,7 @@ jobs:
         build.args: ' -DUNIT_TESTING=ON -DPRECONDITIONS=OFF'
         AZ_SDK_C_NO_SAMPLES: 'true'
       Win_x64_with_unit_test_no_preconditions:
-        vm.image: 'windows-2019'
+        OSVmImage: 'windows-2019'
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
@@ -180,7 +180,7 @@ jobs:
         build.args: ' -DUNIT_TESTING=ON -DPRECONDITIONS=OFF'
         AZ_SDK_C_NO_SAMPLES: 'true'
       MacOS_x64_with_unit_test_no_preconditions:
-        vm.image: 'macOS-10.15'
+        OSVmImage: 'macOS-10.15'
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
         build.args: ' -DUNIT_TESTING=ON -DPRECONDITIONS=OFF'
@@ -196,12 +196,12 @@ jobs:
       # LOGGING                     OFF
       # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_POSIX
       Linux_x64_with_unit_tests_and_samples_no_logging_no_preconditions:
-        vm.image: 'ubuntu-18.04'
+        OSVmImage: 'ubuntu-18.04'
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON -DPRECONDITIONS=OFF -DLOGGING=OFF'
   pool:
-    vmImage: $(vm.image)
+    vmImage: $(OSVmImage)
   variables:
     CMOCKA_XML_FILE: "%g-test-results.xml"
     CMOCKA_MESSAGE_OUTPUT: "xml"
@@ -210,48 +210,11 @@ jobs:
   - checkout: self
     submodules: recursive
 
-  # Mac OS specific requirements
-  - task: Bash@3
-    inputs:
-      targetType: inline
-      script: |
-        sudo xcode-select --switch /Applications/Xcode_11.3.1.app
-        echo "xcode path:"
-        sudo xcode-select --print-path
+  - template: /eng/pipelines/templates/steps/vcpkg.yml
+    parameters:
+      DependenciesVariableName: vcpkg.deps
 
-        # Install gcc 9
-        brew install gcc@9
-        gcc --version
-
-        git clone https://github.com/Microsoft/vcpkg.git
-        cd vcpkg
-        git rev-parse --verify HEAD
-        git status
-
-        ./bootstrap-vcpkg.sh
-
-        # Validate that vcpkg bootstrap succeeded
-        ./vcpkg version
-        if [ $? -ne 0 ]
-        then
-          echo "./bootstrap-vcpkg.sh FAILED"
-          exit 1
-        fi
-
-        echo "##vso[task.prependpath]$(pwd)"
-        echo "##vso[task.setvariable variable=VCPKG_INSTALLATION_ROOT;]$(pwd)"
-
-    # Execute only for Mac and if there is at least one dependency to be installed
-    condition: and(succeeded(), contains(variables['vm.image'], 'macOS'), not(eq(variables['vcpkg.deps'], '')))
-    displayName: vcpkg bootstrap
-
-
-  - script: |
-      vcpkg install $(vcpkg.deps)
-    displayName: vcpkg install dependencies
-    # Execute only if there is at least one dependency to be installed
-    condition: and(succeeded(), not(eq(variables['vcpkg.deps'], '')))
-
+  # Install gcovr and lcov for coverage information where appropriate
   - script: |
       sudo apt install -y gcovr lcov
       dotnet tool install -g dotnet-reportgenerator-globaltool
@@ -259,18 +222,11 @@ jobs:
     displayName: Install coverage tools
     condition: eq(variables['AZ_SDK_CODE_COV'], 1)
 
-  - task: CMake@1
-    inputs:
-      cmakeArgs: --version
-    displayName: cmake version
-  - task: CMake@1
-    inputs:
-      cmakeArgs: $(build.args) ..
-    displayName: cmake generate
-  - task: CMake@1
-    inputs:
-      cmakeArgs: --build .
-    displayName: cmake build
+  - template: /eng/pipelines/templates/steps/cmake-build.yml
+    parameters:
+      BuildArgs: $(build.args)
+
+  # Run unit tests
   - script: |
       ctest -V
     workingDirectory: build
@@ -321,7 +277,7 @@ jobs:
       coverageThreshold: 60
     condition: eq(variables['AZ_SDK_CODE_COV'], 1)
 
-- ${{if and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['System.TeamProject'], 'internal'))}}:
+- ${{ if and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['System.TeamProject'], 'internal')) }}:
   - job: GenerateReleaseArtifacts
     pool:
       vmImage: windows-2019
