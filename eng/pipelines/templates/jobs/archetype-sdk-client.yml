@@ -212,7 +212,6 @@ jobs:
 
   - template: /eng/pipelines/templates/steps/vcpkg.yml
     parameters:
-      VmImageVariableName: OSVmImage
       DependenciesVariableName: vcpkg.deps
 
   # Install gcovr and lcov for coverage information where appropriate
