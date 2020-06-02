@@ -67,7 +67,7 @@ static AZ_NODISCARD az_result _az_credential_client_secret_apply(
 
   int16_t const token_length = token._internal.token_length;
 
-  // Still bad in terms of cuncurrency, but at least the pointer is not pointing to an unknown
+  // Still bad in terms of concurrency, but at least the pointer is not pointing to an unknown
   // memory. Temporary measure to improve https://github.com/Azure/azure-sdk-for-c/issues/799 a bit.
   uint8_t* const token_buf_ptr
       = (uint8_t*)(uintptr_t)credential->_internal.token_credential._internal.token._internal.token;
