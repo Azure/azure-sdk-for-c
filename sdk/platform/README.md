@@ -29,4 +29,13 @@ See [compiler options](https://github.com/Azure/azure-sdk-for-c#compiler-options
 
 
 
+## Contributing
+
+If you'd like to contribute to this library, please read the [contributing guide][azure_sdk_for_c_contributing] to learn more about how to build and test the code.
+
+### License
+
 Azure SDK for Embedded C is licensed under the [MIT][azure_sdk_for_c_license] license.
+
+<!-- LINKS -->
+[azure_sdk_for_c_contributing]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md
