@@ -16,6 +16,9 @@ steps:
   #     cmakeArgs: --build .
   #   displayName: cmake build
 
+  - script: mkdir build
+    displayName: create working directory
+
   - script: cmake --version
     workingDirectory: build
     displayName: cmake --version
