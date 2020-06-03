@@ -236,7 +236,8 @@ Follow next steps to install VCPKG and have it linked to cmake
 
 ```bash
 # Clone vcpkg:
- # (consider this path as PATH_TO_VCPKG)
+git clone https://github.com/Microsoft/vcpkg.git
+# (consider this path as PATH_TO_VCPKG)
 cd vcpkg
 # build vcpkg
 ./bootstrap-vcpkg.sh
