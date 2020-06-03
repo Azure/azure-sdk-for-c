@@ -46,6 +46,9 @@
 #include <az_json.h>
 #include <az_keyvault.h>
 
+// Uncomment below code to enable logging (and the first lines of main function)
+#include <az_log.h>
+
 // Uncomment below lines when working with libcurl
 // #include <curl/curl.h>
 
@@ -70,8 +73,18 @@ az_span const key_name_for_test = AZ_SPAN_LITERAL_FROM_STR("test-new-key");
 #pragma warning(disable : 5045)
 #endif // _MSC_VER
 
+static void test_log_func(az_log_classification classification, az_span message)
+{
+  (void)classification;
+  printf("%.*s\n", az_span_size(message), az_span_ptr(message));
+}
+
 int main()
 {
+
+  az_log_classification const classifications[] = { AZ_LOG_HTTP_RESPONSE, AZ_LOG_END_OF_LIST };
+  az_log_set_classifications(classifications);
+  az_log_set_callback(test_log_func);
   // Uncomment below lines when working with libcurl
   /*
     // If running with libcurl, call global init. See project Readme for more info

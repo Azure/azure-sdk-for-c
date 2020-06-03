@@ -25,6 +25,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+// Uncomment below code to enable logging (and the first lines of main function)
+// #include <az_log.h>
 
 #define URI_ENV "AZURE_STORAGE_URL"
 
