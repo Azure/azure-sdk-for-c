@@ -15,5 +15,5 @@ else()
     set(WARNINGS_AS_ERRORS_FLAG "-Werror")
   endif()
 
-  add_compile_options(-Wall -Wextra -pedantic  ${WARNINGS_AS_ERRORS_FLAG} -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal)
+  add_compile_options(-Wall -Wextra -pedantic  ${WARNINGS_AS_ERRORS_FLAG} -Wcast-qual -Wunused -Wuninitialized -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Wfloat-equal -Wno-clobbered)
 endif()
