@@ -65,11 +65,11 @@ char telemetry_topic[128];
 static char mqtt_client_id[128];
 static char mqtt_username[128];
 static char mqtt_endpoint[128];
-static char sas_b64_decoded_key[64];
+static char mqtt_password[256];
+static char sas_b64_decoded_key[32];
 static char sas_signature_buf[128];
 static char sas_signature_hmac_encoded_buf[128];
 static char sas_signature_encoded_buf_b64[128];
-static char sas_key_password[256];
 static az_span mqtt_url_prefix = AZ_SPAN_LITERAL_FROM_STR("ssl://");
 static az_span mqtt_url_suffix = AZ_SPAN_LITERAL_FROM_STR(":8883");
 
@@ -239,36 +239,42 @@ static int get_sas_key()
     return res;
   }
 
-  // HMAC the signature with the decoded key
-  az_span encoded_span = AZ_SPAN_FROM_BUFFER(sas_signature_hmac_encoded_buf);
+  // HMAC256 encrypt the signature with the decoded key
+  az_span hmac256_encrypted_span = AZ_SPAN_FROM_BUFFER(sas_signature_hmac_encoded_buf);
   if (az_failed(
-          res
-          = sample_hmac_encrypt(decoded_key_span, sas_signature_span, encoded_span, &encoded_span)))
+          res = sample_hmac_sha256_encrypt(
+              decoded_key_span,
+              sas_signature_span,
+              hmac256_encrypted_span,
+              &hmac256_encrypted_span)))
   {
     printf("Could not encrypt the signature: return code %d\n", res);
     return res;
   }
 
-  // base64 encode the result of the HMAC
-  az_span encoded_span_b64;
-  if(az_failed(res = sample_base64_encode(
-      encoded_span, AZ_SPAN_FROM_BUFFER(sas_signature_encoded_buf_b64), &encoded_span_b64)))
+  // base64 encode the result of the HMAC encryption
+  az_span b64_encoded_hmac256_encrypted_signature;
+  if (az_failed(
+          res = sample_base64_encode(
+              hmac256_encrypted_span,
+              AZ_SPAN_FROM_BUFFER(sas_signature_encoded_buf_b64),
+              &b64_encoded_hmac256_encrypted_signature)))
   {
     printf("Could not base64 encode the password: return code %d\n", res);
     return res;
   }
 
-  // Get the resulting password, passing the base64 encoded, HMAC signed bytes
-  size_t sas_key_length;
+  // Get the resulting password, passing the base64 encoded, HMAC encrypted bytes
+  size_t mqtt_password_length;
   if (az_failed(
           res = az_iot_hub_client_sas_get_password(
               &client,
-              encoded_span_b64,
+              b64_encoded_hmac256_encrypted_signature,
               sas_expiration,
               AZ_SPAN_NULL,
-              sas_key_password,
-              sizeof(sas_key_password),
-              &sas_key_length)))
+              mqtt_password,
+              sizeof(mqtt_password),
+              &mqtt_password_length)))
   {
     printf("Could not get the password: return code %d\n", res);
     return res;
@@ -300,7 +306,7 @@ static int connect_device()
 
   // This sample uses SAS authentication so the password field is set to the generated password
   mqtt_connect_options.username = mqtt_username;
-  mqtt_connect_options.password = sas_key_password;
+  mqtt_connect_options.password = mqtt_password;
   printf("SAS Key: %s\n", mqtt_connect_options.password);
 
   if (*x509_trust_pem_file != '\0')
