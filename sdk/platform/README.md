@@ -1,6 +1,6 @@
 # Azure SDK Platform
 
-The Azure SDK platform provides two abstractions with some built-in implementations that the caller can use or override with their own behavior. The first one is a transport adapter with helpers to allow clients to communicate with Azure. The second one is operating system specific implementations for the small set of features  that the Azure SDK needs that are not available as part of the C99 standard library (such as thread sleep).
+The Azure SDK platform provides two abstractions with some built-in implementations that the caller can use or override with their own behavior. The first one is a transport adapter with helpers to allow clients to communicate with Azure. The second one is operating system specific implementations for the small set of features that the Azure SDK needs that are not available as part of the C99 standard library (such as thread sleep).
 
 ## HTTP Transport Adapter
 
@@ -10,7 +10,7 @@ Azure SDK provides one implementation for libcurl (`az_curl`). To consume this i
 
 >Note: See [Compiler Options](https://github.com/Azure/azure-sdk-for-c#compiler-options). You have to turn on building curl transport in order to have this adapter available.
 
-The Azure SDK will also build and provide empty HTTP adapter stubs called `az_nohttp`. This target allows you to build `az_core` without any specific HTTP adapter. Use this option when you won't use any HTTP specific APIs from the Azure SDK.
+The Azure SDK also provides empty HTTP adapter stubs called `az_nohttp`. This target allows you to build `az_core` without any specific HTTP adapter. Use this option when you won't use any HTTP specific APIs from the Azure SDK.
 
 >Note: An `AZ_ERROR_NOT_IMPLEMENTED` will be returned from all HTTP APIs from the Azure SDK when building with `az_nohttp`.
 
