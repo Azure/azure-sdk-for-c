@@ -36,3 +36,4 @@ Azure SDK for Embedded C is licensed under the [MIT][azure_sdk_for_c_license] li
 
 <!-- LINKS -->
 [azure_sdk_for_c_contributing]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md
+[azure_sdk_for_c_license]: https://github.com/Azure/azure-sdk-for-c/blob/master/LICENSE
