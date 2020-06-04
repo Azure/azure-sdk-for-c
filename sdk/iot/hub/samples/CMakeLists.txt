@@ -65,7 +65,7 @@ target_link_libraries(
 
 # Telemetry Sample
 add_executable (
-  paho_iot_hub_telemetry_example 
+  paho_iot_hub_telemetry_example
   ${CMAKE_CURRENT_LIST_DIR}/src/paho_iot_hub_telemetry_example.c
   )
 
@@ -81,6 +81,30 @@ target_link_libraries(paho_iot_hub_telemetry_example PRIVATE ${PAL})
 
 target_link_libraries(
   paho_iot_hub_telemetry_example PRIVATE
+  eclipse-paho-mqtt-c::paho-mqtt3cs-static
+  OpenSSL::SSL
+  OpenSSL::Crypto
+  )
+
+# Telemetry Sample
+add_executable (
+  paho_iot_hub_sas_telemetry_example
+  ${CMAKE_CURRENT_LIST_DIR}/src/paho_iot_hub_sas_telemetry_example.c
+  ${CMAKE_CURRENT_LIST_DIR}/src/sample_base64.c
+  )
+
+target_link_libraries(
+  paho_iot_hub_sas_telemetry_example PRIVATE
+  az_iot_hub
+  az_iot_common
+  az_core
+  )
+
+# PAL
+target_link_libraries(paho_iot_hub_sas_telemetry_example PRIVATE ${PAL})
+
+target_link_libraries(
+  paho_iot_hub_sas_telemetry_example PRIVATE
   eclipse-paho-mqtt-c::paho-mqtt3cs-static
   OpenSSL::SSL
   OpenSSL::Crypto
