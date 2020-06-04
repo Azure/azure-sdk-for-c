@@ -23,7 +23,7 @@ az_result sample_base64_decode(az_span base64_encoded, az_span in_span, az_span*
   b64_decoder = BIO_new(BIO_f_base64());
 
   // Get the source BIO to push through the filter
-  source_mem_bio = BIO_new_mem_buf(az_span_ptr(base64_encoded), (size_t)az_span_size(base64_encoded));
+  source_mem_bio = BIO_new_mem_buf(az_span_ptr(base64_encoded), (int)az_span_size(base64_encoded));
 
   // Push the memory throught the filter
   source_mem_bio = BIO_push(b64_decoder, source_mem_bio);
