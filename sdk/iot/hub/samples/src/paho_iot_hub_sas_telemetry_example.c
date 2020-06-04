@@ -41,8 +41,8 @@
 // DO NOT MODIFY: IoT Hub SAS Key Environment Variable Name
 #define ENV_IOT_HUB_SAS_KEY "AZ_IOT_HUB_DEVICE_SAS_KEY"
 
-// DO NOT MODIFY: IoT Hub SAS Key Expiration Environment Variable Name (defaults to 2 hours)
-#define ENV_IOT_HUB_SAS_KEY_EXPIRATION "AZ_IOT_HUB_DEVICE_SAS_KEY_EXPIRATION"
+// DO NOT MODIFY: IoT Hub SAS Key Duration Environment Variable Name (defaults to 2 hours)
+#define ENV_IOT_HUB_SAS_KEY_DURATION "AZ_IOT_HUB_DEVICE_SAS_KEY_DURATION"
 
 // DO NOT MODIFY: the path to a PEM file containing the server trusted CA
 // This is usually not needed on Linux or Mac but needs to be set on Windows.
@@ -80,7 +80,7 @@ static const char* telemetry_message_payloads[NUMBER_OF_MESSAGES] = {
 static az_iot_hub_client client;
 static MQTTClient mqtt_client;
 
-static uint32_t get_expiration_time(uint32_t hours)
+static uint32_t get_epoch_expiration_time(uint32_t hours)
 {
   return (uint32_t)(time(NULL) + hours * 60 * 60);
 }
@@ -163,7 +163,7 @@ static az_result read_configuration_and_init_client()
   az_span iot_hub_sas_expiration = AZ_SPAN_FROM_BUFFER(iot_hub_sas_key_expiration_char);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
       "IoT Hub Device SAS Key Expiration (Hours)",
-      ENV_IOT_HUB_SAS_KEY_EXPIRATION,
+      ENV_IOT_HUB_SAS_KEY_DURATION,
       "2",
       false,
       iot_hub_sas_expiration,
@@ -209,12 +209,12 @@ static az_result read_configuration_and_init_client()
   return AZ_OK;
 }
 
-static int get_sas_key()
+static int generate_sas_key()
 {
   az_result res;
 
   // Create the POSIX expiration time from input hours
-  uint32_t sas_expiration = get_expiration_time(iot_hub_sas_key_expiration);
+  uint32_t sas_expiration = get_epoch_expiration_time(iot_hub_sas_key_expiration);
 
   // Decode the base64 encoded SAS key to use for HMAC signing
   az_span decoded_key_span;
@@ -239,7 +239,7 @@ static int get_sas_key()
     return res;
   }
 
-  // HMAC256 encrypt the signature with the decoded key
+  // HMAC-SHA256 encrypt the signature with the decoded key
   az_span hmac256_encrypted_span = AZ_SPAN_FROM_BUFFER(sas_signature_hmac_encoded_buf);
   if (az_failed(
           res = sample_hmac_sha256_encrypt(
@@ -379,7 +379,7 @@ int main()
     return rc;
   }
 
-  if (az_failed(rc = get_sas_key()))
+  if (az_failed(rc = generate_sas_key()))
   {
     printf("Failed to get SAS key, return code %d\n", rc);
     return rc;

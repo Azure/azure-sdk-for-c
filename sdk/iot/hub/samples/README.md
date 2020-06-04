@@ -67,7 +67,7 @@ For samples using certificate authentication, the following environment variable
 For samples using SAS Key authentication, the following environment variables need to be set.
 
 - `AZ_IOT_HUB_DEVICE_SAS_KEY`: The SAS key for your device (called "Primary Key" on the Azure Portal for your device).
-- `AZ_IOT_HUB_DEVICE_SAS_KEY_EXPIRATION`: Expiration (in hours) of the SAS key. If not set, this value will default to **2 hours.**
+- `AZ_IOT_HUB_DEVICE_SAS_KEY_DURATION`: Expiration (in hours) of the SAS key. If not set, this value will default to **2 hours.**
 
 Once these are set, you MUST compile the SDK with the `TRANSPORT_PAHO` option turned on. For example, on the command
 line, it might look like the following:
