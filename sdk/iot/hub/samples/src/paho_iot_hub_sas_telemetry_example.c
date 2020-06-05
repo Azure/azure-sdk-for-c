@@ -22,7 +22,7 @@
 #include <unistd.h>
 #endif
 
-#include "sample_base64.h"
+#include "sample_sas_utility.h"
 
 #include <az_iot_hub_client.h>
 #include <az_result.h>
@@ -239,37 +239,37 @@ static int generate_sas_key()
     return res;
   }
 
-  // HMAC-SHA256 encrypt the signature with the decoded key
-  az_span hmac256_encrypted_span = AZ_SPAN_FROM_BUFFER(sas_signature_hmac_encoded_buf);
+  // HMAC-SHA256 sign the signature with the decoded key
+  az_span hmac256_signed_span = AZ_SPAN_FROM_BUFFER(sas_signature_hmac_encoded_buf);
   if (az_failed(
-          res = sample_hmac_sha256_encrypt(
+          res = sample_hmac_sha256_sign(
               decoded_key_span,
               sas_signature_span,
-              hmac256_encrypted_span,
-              &hmac256_encrypted_span)))
+              hmac256_signed_span,
+              &hmac256_signed_span)))
   {
-    printf("Could not encrypt the signature: return code %d\n", res);
+    printf("Could not sign the signature: return code %d\n", res);
     return res;
   }
 
-  // base64 encode the result of the HMAC encryption
-  az_span b64_encoded_hmac256_encrypted_signature;
+  // base64 encode the result of the HMAC signing
+  az_span b64_encoded_hmac256_signed_signature;
   if (az_failed(
           res = sample_base64_encode(
-              hmac256_encrypted_span,
+              hmac256_signed_span,
               AZ_SPAN_FROM_BUFFER(sas_signature_encoded_buf_b64),
-              &b64_encoded_hmac256_encrypted_signature)))
+              &b64_encoded_hmac256_signed_signature)))
   {
     printf("Could not base64 encode the password: return code %d\n", res);
     return res;
   }
 
-  // Get the resulting password, passing the base64 encoded, HMAC encrypted bytes
+  // Get the resulting password, passing the base64 encoded, HMAC signed bytes
   size_t mqtt_password_length;
   if (az_failed(
           res = az_iot_hub_client_sas_get_password(
               &client,
-              b64_encoded_hmac256_encrypted_signature,
+              b64_encoded_hmac256_signed_signature,
               sas_expiration,
               AZ_SPAN_NULL,
               mqtt_password,
@@ -307,7 +307,6 @@ static int connect_device()
   // This sample uses SAS authentication so the password field is set to the generated password
   mqtt_connect_options.username = mqtt_username;
   mqtt_connect_options.password = mqtt_password;
-  printf("SAS Key: %s\n", mqtt_connect_options.password);
 
   if (*x509_trust_pem_file != '\0')
   {

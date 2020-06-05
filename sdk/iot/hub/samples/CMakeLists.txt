@@ -90,7 +90,7 @@ target_link_libraries(
 add_executable (
   paho_iot_hub_sas_telemetry_example
   ${CMAKE_CURRENT_LIST_DIR}/src/paho_iot_hub_sas_telemetry_example.c
-  ${CMAKE_CURRENT_LIST_DIR}/src/sample_base64.c
+  ${CMAKE_CURRENT_LIST_DIR}/src/sample_sas_utility.c
   )
 
 target_link_libraries(

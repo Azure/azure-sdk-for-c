@@ -7,7 +7,7 @@
 #include <openssl/hmac.h>
 
 #include "az_span.h"
-#include "sample_base64.h"
+#include "sample_sas_utility.h"
 
 // Decode an input span from base64 to bytes
 az_result sample_base64_decode(az_span base64_encoded, az_span in_span, az_span* out_span)
@@ -101,7 +101,7 @@ az_result sample_base64_encode(az_span bytes, az_span in_span, az_span* out_span
 }
 
 // HMAC256 an input span with an input key
-az_result sample_hmac_sha256_encrypt(az_span key, az_span bytes, az_span in_span, az_span* out_span)
+az_result sample_hmac_sha256_sign(az_span key, az_span bytes, az_span in_span, az_span* out_span)
 {
   az_result result;
 
