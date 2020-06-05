@@ -4,11 +4,6 @@
 #include "az_result.h"
 #include "az_span.h"
 
-/*
- * This serves as an example for fundamental functionality needed to use SAS key authentication.
- * This implementation uses OpenSSL.
- */
-
 // Decode an input span from base64 to raw bytes
 az_result sample_base64_decode(az_span base64_encoded, az_span in_span, az_span* out_span);
 

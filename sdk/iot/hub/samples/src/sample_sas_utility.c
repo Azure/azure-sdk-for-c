@@ -9,6 +9,11 @@
 #include "az_span.h"
 #include "sample_sas_utility.h"
 
+/*
+ * This serves as an example for fundamental functionality needed to use SAS key authentication.
+ * This implementation uses OpenSSL.
+ */
+
 // Decode an input span from base64 to bytes
 az_result sample_base64_decode(az_span base64_encoded, az_span in_span, az_span* out_span)
 {
@@ -30,13 +35,16 @@ az_result sample_base64_decode(az_span base64_encoded, az_span in_span, az_span*
   source_mem_bio = BIO_new_mem_buf(az_span_ptr(base64_encoded), (int)az_span_size(base64_encoded));
   if(source_mem_bio == NULL)
   {
+    BIO_free(b64_decoder);
     return AZ_ERROR_OUT_OF_MEMORY;
   }
 
-  // Push the memory throught the filter
+  // Push the memory through the filter
   source_mem_bio = BIO_push(b64_decoder, source_mem_bio);
   if(source_mem_bio == NULL)
   {
+    BIO_free(b64_decoder);
+    BIO_free(source_mem_bio);
     return AZ_ERROR_OUT_OF_MEMORY;
   }
 
@@ -84,6 +92,7 @@ az_result sample_base64_encode(az_span bytes, az_span in_span, az_span* out_span
   sink_mem_bio = BIO_new(BIO_s_mem());
   if(sink_mem_bio == NULL)
   {
+    BIO_free(b64_encoder);
     return AZ_ERROR_OUT_OF_MEMORY;
   }
 
@@ -91,6 +100,8 @@ az_result sample_base64_encode(az_span bytes, az_span in_span, az_span* out_span
   b64_encoder = BIO_push(b64_encoder, sink_mem_bio);
   if(b64_encoder == NULL)
   {
+    BIO_free(sink_mem_bio);
+    BIO_free(b64_encoder);
     return AZ_ERROR_OUT_OF_MEMORY;
   }
 
@@ -101,6 +112,8 @@ az_result sample_base64_encode(az_span bytes, az_span in_span, az_span* out_span
   int bytes_written = BIO_write(b64_encoder, az_span_ptr(bytes), (int)az_span_size(bytes));
   if(bytes_written < 1)
   {
+    BIO_free(sink_mem_bio);
+    BIO_free(b64_encoder);
     return AZ_ERROR_OUT_OF_MEMORY;
   }
 
@@ -123,6 +136,7 @@ az_result sample_base64_encode(az_span bytes, az_span in_span, az_span* out_span
     result = AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
   }
 
+  // Free the BIO chain
   BIO_free_all(b64_encoder);
 
   return result;
