@@ -116,7 +116,7 @@ AZ_NODISCARD az_result az_iot_hub_client_get_user_name(
  * @warning THIS FUNCTION IS TEMPORARY. IT IS SUBJECT TO CHANGE OR BE REMOVED IN THE FUTURE.
  * 
  * The user name will be of the following format:
- * {iothubhostname}/{device_id}/?api-version=2018-06-30&{user_agent}&digital-twin-model-id={model_id}
+ * {iothubhostname}/{device_id}/?api-version=2020-05-31-preview&{user_agent}&digital-twin-model-id={model_id}
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
  * @param[in] model_id A span with the model id of the device.
