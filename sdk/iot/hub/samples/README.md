@@ -56,10 +56,18 @@ For all of these samples, the following environment variables will need to be se
 - `VCPKG_ROOT`: The full path to the VCPKG directory used to generate the triplet.
 - `AZ_IOT_DEVICE_ID`: Your device id.
 - `AZ_IOT_HUB_HOSTNAME`: The hostname of your IoT Hub.
-- `AZ_IOT_DEVICE_X509_CERT_PEM_FILE`: The full path to your device cert (in `.pem` format) concatenated
- with its private key.
 - `AZ_IOT_DEVICE_X509_TRUST_PEM_FILE`: The full path to the trusted server cert (in `.pem` format). This is usually
 not needed on Mac or Linux but might be needed for Windows.
+
+For samples using certificate authentication, the following environment variable needs to be set.
+
+- `AZ_IOT_DEVICE_X509_CERT_PEM_FILE`: The full path to your device cert (in `.pem` format) concatenated
+ with its private key.
+
+For samples using SAS Key authentication, the following environment variables need to be set.
+
+- `AZ_IOT_HUB_DEVICE_SAS_KEY`: The SAS key for your device (called "Primary Key" on the Azure Portal for your device).
+- `AZ_IOT_HUB_DEVICE_SAS_KEY_DURATION`: Expiration (in hours) of the SAS key. If not set, this value will default to **2 hours.**
 
 Once these are set, you MUST compile the SDK with the `TRANSPORT_PAHO` option turned on. For example, on the command
 line, it might look like the following:
@@ -69,13 +77,16 @@ cmake -DTRANSPORT_PAHO=ON ..
 
 After the SDK is built, you are free to run any of the following samples.
 
-### [IoT Hub Telemetry][telemetry_sample]
-Send 5 telemetry messages using the IoT Hub Client.
+### [IoT Hub Telemetry (SAS Key)][telemetry_sample_sas]
+Send 5 telemetry messages using the IoT Hub Client with SAS key authentication.
 
-### [IoT Hub Twin][twin_sample]
+### [IoT Hub Telemetry (Certificates)][telemetry_sample_cert]
+Send 5 telemetry messages using the IoT Hub Client with certificate authentication.
+
+### [IoT Hub Twin (Certificates)][twin_sample]
 Use twin features such as updating reported properties, receiving the twin document, and receiving desired properties using the IoT Hub Client.
 
-### [IoT Hub Methods][methods_sample]
+### [IoT Hub Methods (Certificates)][methods_sample]
 Invoke methods from the cloud. The sample supports a method named "ping"
 which if successful will return back to you a json payload of the following:
 
@@ -85,7 +96,7 @@ which if successful will return back to you a json payload of the following:
 
 On failure, a status of `404` will be returned with an empty JSON payload.
 
-### [IoT Hub C2D][c2d_sample]
+### [IoT Hub C2D (Certificates)][c2d_sample]
 Receive and view incoming C2D messages using the IoT Hub Client.
 
 ## Troubleshooting
@@ -107,7 +118,8 @@ For extensive documentation on Azure IoT Hub, see the [API reference documentati
 [VCPKG_DIRECTIONS]:../../../../README.md#development-environment
 [c2d_sample]: src/paho_iot_hub_c2d_example.c
 [methods_sample]: src/paho_iot_hub_methods_example.c
-[telemetry_sample]: src/paho_iot_hub_telemetry_example.c
+[telemetry_sample_sas]: src/paho_iot_hub_sas_telemetry_example.c
+[telemetry_sample_cert]: src/paho_iot_hub_telemetry_example.c
 [twin_sample]: src/paho_iot_hub_twin_example.c
 [iot_hub_mqtt]: https://docs.microsoft.com/en-us/azure/iot-dps/iot-dps-mqtt-support
 [error_codes]: ../../doc/mqtt_state_machine.md#IoT-Service-Errors
