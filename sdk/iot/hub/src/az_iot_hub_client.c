@@ -4,8 +4,8 @@
 #include <stdint.h>
 
 #include "az_iot_hub_client.h"
-#include <az_precondition_internal.h>
 #include <az_iot_common_internal.h>
+#include <az_precondition_internal.h>
 #include <az_result.h>
 #include <az_span.h>
 #include <az_span_internal.h>
@@ -20,7 +20,8 @@ static const az_span hub_client_param_equals_span = AZ_SPAN_LITERAL_FROM_STR("="
 
 static const az_span hub_digital_twin_model_id = AZ_SPAN_LITERAL_FROM_STR("digital-twin-model-id");
 static const az_span hub_service_api_version = AZ_SPAN_LITERAL_FROM_STR("/?api-version=2018-06-30");
-static const az_span hub_service_preview_api_version = AZ_SPAN_LITERAL_FROM_STR("/?api-version=2020-05-31-preview");
+static const az_span hub_service_preview_api_version
+    = AZ_SPAN_LITERAL_FROM_STR("/?api-version=2020-05-31-preview");
 static const az_span client_sdk_version
     = AZ_SPAN_LITERAL_FROM_STR("DeviceClientType=c%2F" AZ_SDK_VERSION_STRING);
 
@@ -59,7 +60,8 @@ AZ_NODISCARD az_result az_iot_hub_client_get_user_name(
   const az_span* const module_id = &(client->_internal.options.module_id);
   const az_span* const user_agent = &(client->_internal.options.user_agent);
 
-  az_span mqtt_user_name_span = az_span_init((uint8_t*)mqtt_user_name, (int32_t)mqtt_user_name_size);
+  az_span mqtt_user_name_span
+      = az_span_init((uint8_t*)mqtt_user_name, (int32_t)mqtt_user_name_size);
 
   int32_t required_length = az_span_size(client->_internal.iot_hub_hostname)
       + az_span_size(client->_internal.device_id) + az_span_size(hub_service_api_version)
@@ -112,6 +114,7 @@ AZ_NODISCARD az_result az_iot_hub_client_get_user_name_with_model_id(
     size_t mqtt_user_name_size,
     size_t* out_mqtt_user_name_length)
 {
+  _az_PRECONDITION_VALID_SPAN(model_id, 1, false);
   _az_PRECONDITION_NOT_NULL(client);
   _az_PRECONDITION_NOT_NULL(mqtt_user_name);
   _az_PRECONDITION(mqtt_user_name_size > 0);
@@ -161,7 +164,7 @@ AZ_NODISCARD az_result az_iot_hub_client_get_user_name_with_model_id(
   remainder = az_span_copy_u8(remainder, *az_span_ptr(hub_client_param_equals_span));
 
   AZ_RETURN_IF_FAILED(_az_span_copy_url_encode(remainder, model_id, &remainder));
-  if(az_span_size(remainder) > 0)
+  if (az_span_size(remainder) > 0)
   {
     remainder = az_span_copy_u8(remainder, null_terminator);
   }
@@ -189,7 +192,8 @@ AZ_NODISCARD az_result az_iot_hub_client_get_client_id(
   _az_PRECONDITION_NOT_NULL(mqtt_client_id);
   _az_PRECONDITION(mqtt_client_id_size > 0);
 
-  az_span mqtt_client_id_span = az_span_init((uint8_t*)mqtt_client_id, (int32_t)mqtt_client_id_size);
+  az_span mqtt_client_id_span
+      = az_span_init((uint8_t*)mqtt_client_id, (int32_t)mqtt_client_id_size);
   const az_span* const module_id = &(client->_internal.options.module_id);
 
   int32_t required_length = az_span_size(client->_internal.device_id);
