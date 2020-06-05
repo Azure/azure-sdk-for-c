@@ -104,6 +104,7 @@ AZ_NODISCARD az_result az_iot_hub_client_get_user_name(
   return AZ_OK;
 }
 
+// TODO: GH #812 (Revisit this temporary function for PnP GA)
 AZ_NODISCARD az_result az_iot_hub_client_get_user_name_with_model_id(
     az_iot_hub_client const* client,
     az_span model_id,
@@ -169,8 +170,11 @@ AZ_NODISCARD az_result az_iot_hub_client_get_user_name_with_model_id(
     return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
   }
 
-  *out_mqtt_user_name_length
-      = mqtt_user_name_size - (size_t)az_span_size(remainder) - sizeof(null_terminator);
+  if (out_mqtt_user_name_length)
+  {
+    *out_mqtt_user_name_length
+        = mqtt_user_name_size - (size_t)az_span_size(remainder) - sizeof(null_terminator);
+  }
 
   return AZ_OK;
 }
