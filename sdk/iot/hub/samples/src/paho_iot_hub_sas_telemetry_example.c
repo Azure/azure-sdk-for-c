@@ -169,9 +169,7 @@ static az_result read_configuration_and_init_client()
       iot_hub_sas_expiration,
       &iot_hub_sas_expiration));
 
-  az_span iot_hub_sas_key_expiration_span
-      = az_span_init(az_span_ptr(iot_hub_sas_expiration), az_span_size(iot_hub_sas_expiration));
-  AZ_RETURN_IF_FAILED(az_span_atou32(iot_hub_sas_key_expiration_span, &iot_hub_sas_key_expiration));
+  AZ_RETURN_IF_FAILED(az_span_atou32(iot_hub_sas_expiration, &iot_hub_sas_key_expiration));
 
   iot_hub_sas_key_span = AZ_SPAN_FROM_BUFFER(iot_hub_sas_key);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
