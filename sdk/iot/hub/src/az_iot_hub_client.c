@@ -5,6 +5,7 @@
 
 #include "az_iot_hub_client.h"
 #include <az_precondition_internal.h>
+#include <az_iot_common_internal.h>
 #include <az_result.h>
 #include <az_span.h>
 #include <az_span_internal.h>
@@ -17,6 +18,7 @@ static const uint8_t hub_client_forward_slash = '/';
 static const az_span hub_client_param_separator_span = AZ_SPAN_LITERAL_FROM_STR("&");
 static const az_span hub_client_param_equals_span = AZ_SPAN_LITERAL_FROM_STR("=");
 
+static const az_span hub_digital_twin_model_id = AZ_SPAN_LITERAL_FROM_STR("digital-twin-model-id");
 static const az_span hub_service_api_version = AZ_SPAN_LITERAL_FROM_STR("/?api-version=2018-06-30");
 static const az_span client_sdk_version
     = AZ_SPAN_LITERAL_FROM_STR("DeviceClientType=c%2F" AZ_SDK_VERSION_STRING);
@@ -97,6 +99,52 @@ AZ_NODISCARD az_result az_iot_hub_client_get_user_name(
   {
     *out_mqtt_user_name_length = (size_t)required_length;
   }
+
+  return AZ_OK;
+}
+
+AZ_NODISCARD az_result az_iot_hub_client_get_user_name_with_model_id(
+    az_iot_hub_client const* client,
+    az_span model_id,
+    char* mqtt_user_name,
+    size_t mqtt_user_name_size,
+    size_t* out_mqtt_user_name_length)
+{
+  _az_PRECONDITION_NOT_NULL(client);
+  _az_PRECONDITION_NOT_NULL(mqtt_user_name);
+  _az_PRECONDITION(mqtt_user_name_size > 0);
+
+  size_t user_name_length;
+
+  AZ_RETURN_IF_FAILED(az_iot_hub_client_get_user_name(
+      client, mqtt_user_name, mqtt_user_name_size, &user_name_length));
+
+  size_t remaining_bytes = mqtt_user_name_size - user_name_length;
+  az_span remainder
+      = az_span_init((uint8_t*)(mqtt_user_name + user_name_length), (int32_t)remaining_bytes);
+
+  if ((az_span_size(hub_client_param_separator_span) + az_span_size(hub_digital_twin_model_id)
+       + az_span_size(hub_client_param_equals_span))
+      > az_span_size(remainder))
+  {
+    return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
+  }
+  remainder = az_span_copy_u8(remainder, *az_span_ptr(hub_client_param_separator_span));
+  remainder = az_span_copy(remainder, hub_digital_twin_model_id);
+  remainder = az_span_copy_u8(remainder, *az_span_ptr(hub_client_param_equals_span));
+
+  AZ_RETURN_IF_FAILED(_az_span_copy_url_encode(remainder, model_id, &remainder));
+  if(az_span_size(remainder) > 0)
+  {
+    remainder = az_span_copy_u8(remainder, null_terminator);
+  }
+  else
+  {
+    return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
+  }
+
+  *out_mqtt_user_name_length
+      = mqtt_user_name_size - (size_t)az_span_size(remainder) - sizeof(null_terminator);
 
   return AZ_OK;
 }
