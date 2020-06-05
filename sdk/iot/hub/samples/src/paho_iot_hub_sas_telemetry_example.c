@@ -160,16 +160,16 @@ static az_result read_configuration_and_init_client()
       "X509 Trusted PEM Store File", ENV_DEVICE_X509_TRUST_PEM_FILE, "", false, trusted, &trusted));
 
   char iot_hub_sas_key_expiration_char[SAS_TOKEN_EXPIRATION_TIME_DIGITS];
-  az_span iot_hub_sas_expiration = AZ_SPAN_FROM_BUFFER(iot_hub_sas_key_expiration_char);
+  az_span iot_hub_sas_expiration_span = AZ_SPAN_FROM_BUFFER(iot_hub_sas_key_expiration_char);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
       "IoT Hub Device SAS Key Expiration (Hours)",
       ENV_IOT_HUB_SAS_KEY_DURATION,
       "2",
       false,
-      iot_hub_sas_expiration,
-      &iot_hub_sas_expiration));
+      iot_hub_sas_expiration_span,
+      &iot_hub_sas_expiration_span));
 
-  AZ_RETURN_IF_FAILED(az_span_atou32(iot_hub_sas_expiration, &iot_hub_sas_key_expiration));
+  AZ_RETURN_IF_FAILED(az_span_atou32(iot_hub_sas_expiration_span, &iot_hub_sas_key_expiration));
 
   iot_hub_sas_key_span = AZ_SPAN_FROM_BUFFER(iot_hub_sas_key);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
