@@ -21,12 +21,24 @@ az_result sample_base64_decode(az_span base64_encoded, az_span in_span, az_span*
 
   // Create a BIO filter to process the bytes
   b64_decoder = BIO_new(BIO_f_base64());
+  if (b64_decoder == NULL)
+  {
+    return AZ_ERROR_OUT_OF_MEMORY;
+  }
 
   // Get the source BIO to push through the filter
   source_mem_bio = BIO_new_mem_buf(az_span_ptr(base64_encoded), (int)az_span_size(base64_encoded));
+  if(source_mem_bio == NULL)
+  {
+    return AZ_ERROR_OUT_OF_MEMORY;
+  }
 
   // Push the memory throught the filter
   source_mem_bio = BIO_push(b64_decoder, source_mem_bio);
+  if(source_mem_bio == NULL)
+  {
+    return AZ_ERROR_OUT_OF_MEMORY;
+  }
 
   // Set flags to not have a newline and close the BIO
   BIO_set_flags(source_mem_bio, BIO_FLAGS_BASE64_NO_NL);
@@ -63,18 +75,34 @@ az_result sample_base64_encode(az_span bytes, az_span in_span, az_span* out_span
 
   // Create a BIO filter to process the bytes
   b64_encoder = BIO_new(BIO_f_base64());
+  if(b64_encoder == NULL)
+  {
+    return AZ_ERROR_OUT_OF_MEMORY;
+  }
 
   // Create a memory sink BIO to process bytes to
   sink_mem_bio = BIO_new(BIO_s_mem());
+  if(sink_mem_bio == NULL)
+  {
+    return AZ_ERROR_OUT_OF_MEMORY;
+  }
 
   // Push the sink to the encoder
   b64_encoder = BIO_push(b64_encoder, sink_mem_bio);
+  if(b64_encoder == NULL)
+  {
+    return AZ_ERROR_OUT_OF_MEMORY;
+  }
 
-  //Set no newline flag for the encoder
+  // Set no newline flag for the encoder
   BIO_set_flags(b64_encoder, BIO_FLAGS_BASE64_NO_NL);
 
   // Write the bytes to be encoded
-  BIO_write(b64_encoder, az_span_ptr(bytes), (int)az_span_size(bytes));
+  int bytes_written = BIO_write(b64_encoder, az_span_ptr(bytes), (int)az_span_size(bytes));
+  if(bytes_written < 1)
+  {
+    return AZ_ERROR_OUT_OF_MEMORY;
+  }
 
   // Flush the BIO
   BIO_flush(b64_encoder);
