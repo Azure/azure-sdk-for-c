@@ -9,6 +9,10 @@
 #include "az_span.h"
 #include "sample_sas_utility.h"
 
+#ifdef _MSC_VER
+// "Compiler will insert Spectre mitigation for memory load if /Qspectre switch specified"
+#pragma warning(disable : 5045)
+#endif // _MSC_VER
 /*
  * This serves as an example for fundamental functionality needed to use SAS key authentication.
  * This implementation uses OpenSSL.
