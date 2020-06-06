@@ -34,8 +34,10 @@ function currentVersion() {
 }
 
 function currentPackage() {
-  // Filled in by Doxygen template
-  return "$projectname";
+  // C docs are generated as a monolith, the correct path is:
+  // https://azuresdkdocs.blob.core.windows.net/$web/c/docs/{version}/index.html
+  // This sets the "docs" piece of the URL path
+  return "docs";
 }
 
 function httpGetAsync(targetUrl, callback) {
