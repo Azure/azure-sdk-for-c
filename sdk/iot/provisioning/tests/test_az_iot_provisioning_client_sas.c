@@ -18,6 +18,8 @@
 
 #include <cmocka.h>
 
+#include <_az_cfg.h>
+
 #define TEST_SPAN_BUFFER_SIZE 256
 
 #define TEST_REGISTRATION_ID_STR "myRegistrationId"
