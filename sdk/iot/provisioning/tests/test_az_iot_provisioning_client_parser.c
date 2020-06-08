@@ -15,7 +15,6 @@
 
 #include <cmocka.h>
 
-// TODO: #564 - Remove the use of the _az_cfh.h header in samples.
 #include <_az_cfg.h>
 
 #define TEST_REGISTRATION_ID "myRegistrationId"

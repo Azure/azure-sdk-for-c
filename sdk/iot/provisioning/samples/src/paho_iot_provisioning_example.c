@@ -25,9 +25,6 @@
 #include <az_result.h>
 #include <az_span.h>
 
-// TODO: #564 - Remove the use of the _az_cfh.h header in samples.
-#include <_az_cfg.h>
-
 // DO NOT MODIFY: Service information
 #define ENV_GLOBAL_PROVISIONING_ENDPOINT_DEFAULT "ssl://global.azure-devices-provisioning.net:8883"
 #define ENV_GLOBAL_PROVISIONING_ENDPOINT "AZ_IOT_GLOBAL_PROVISIONING_ENDPOINT"
