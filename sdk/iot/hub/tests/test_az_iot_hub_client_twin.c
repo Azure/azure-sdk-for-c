@@ -18,6 +18,8 @@
 
 #include <cmocka.h>
 
+#include <_az_cfg.h>
+
 #define TEST_SPAN_BUFFER_SIZE 128
 
 static const az_span test_device_id = AZ_SPAN_LITERAL_FROM_STR("my_device");

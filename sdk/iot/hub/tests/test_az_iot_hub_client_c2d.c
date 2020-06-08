@@ -18,6 +18,8 @@
 
 #include <cmocka.h>
 
+#include <_az_cfg.h>
+
 #define TEST_SPAN_BUFFER_SIZE 128
 
 #define TEST_DEVICE_ID_STR "my_device"
