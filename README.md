@@ -18,6 +18,10 @@ With this in mind, there are many tenants or principles that we follow in order 
 
 - We support microcontrollers with no operating system, microcontrollers with a real-time operating system (like [Azure RTOS](http://rtos.com)), Linux, and Windows. Customers can implement their own "platform layer" to use our SDK on devices we don’t support out-of-the-box. The platform layer requires minimal functionality such as a clock, a mutex, sleep, and an HTTP stack. We provide some platform layers, and more will be added over time.
 
+## Documentation
+
+We use [doxygen](https://www.doxygen.nl) to generate documentation for source code. You can find the generated, versioned documentation [here](https://azure.github.io/azure-sdk-for-c).
+
 ## The GitHub Repository
 
 To get help with the SDK:
