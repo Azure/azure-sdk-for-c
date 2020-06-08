@@ -2,15 +2,17 @@ parameters:
   BuildArgs: ''
 
 steps:
-  - task: CMake@1
-    inputs:
-      cmakeArgs: --version
-    displayName: cmake version
-  - task: CMake@1
-    inputs:
-      cmakeArgs: ${{ parameters.BuildArgs }} ..
+  - script: mkdir build
+    displayName: create working directory
+
+  - script: cmake --version
+    workingDirectory: build
+    displayName: cmake --version
+
+  - script: cmake ${{ parameters.BuildArgs }} ..
+    workingDirectory: build
     displayName: cmake generate
-  - task: CMake@1
-    inputs:
-      cmakeArgs: --build .
+
+  - script: cmake --build .
+    workingDirectory: build
     displayName: cmake build
