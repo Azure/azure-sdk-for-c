@@ -55,7 +55,7 @@ Installing new libraries will make them instantly available.
 CMake projects should use: "-DCMAKE_TOOLCHAIN_FILE=c:/vcpkg/scripts/buildsystems/vcpkg.cmake"
 ```
 
-Save the CMAKE_TOOLCHAIN_FILE argument above, it will be used in a later step.
+Save the `CMAKE_TOOLCHAIN_FILE` argument above, it will be used in a later step.
 
 04. Add openssl to the PATH enviroment variable
 
