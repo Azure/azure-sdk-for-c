@@ -114,7 +114,7 @@ static az_result read_configuration_and_init_client()
 {
   az_span endpoint_span = AZ_SPAN_FROM_BUFFER(global_provisioning_endpoint);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
-      "Global Device Endpoint",
+      ENV_GLOBAL_PROVISIONING_ENDPOINT,
       ENV_GLOBAL_PROVISIONING_ENDPOINT,
       ENV_GLOBAL_PROVISIONING_ENDPOINT_DEFAULT,
       false,
@@ -123,11 +123,11 @@ static az_result read_configuration_and_init_client()
 
   az_span id_scope_span = AZ_SPAN_FROM_BUFFER(id_scope);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
-      "ID_Scope", ENV_ID_SCOPE_ENV, NULL, false, id_scope_span, &id_scope_span));
+      ENV_ID_SCOPE_ENV, ENV_ID_SCOPE_ENV, NULL, false, id_scope_span, &id_scope_span));
 
   az_span registration_id_span = AZ_SPAN_FROM_BUFFER(registration_id);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
-      "Registration ID",
+      ENV_REGISTRATION_ID_ENV,
       ENV_REGISTRATION_ID_ENV,
       NULL,
       false,
