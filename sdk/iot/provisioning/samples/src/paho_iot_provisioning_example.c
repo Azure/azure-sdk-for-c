@@ -136,11 +136,11 @@ static az_result read_configuration_and_init_client()
 
   az_span cert = AZ_SPAN_FROM_BUFFER(x509_cert_pem_file);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
-      "X509 Certificate PEM Store File", ENV_DEVICE_X509_CERT_PEM_FILE, NULL, false, cert, &cert));
+      ENV_DEVICE_X509_CERT_PEM_FILE, ENV_DEVICE_X509_CERT_PEM_FILE, NULL, false, cert, &cert));
 
   az_span trusted = AZ_SPAN_FROM_BUFFER(x509_trust_pem_file);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
-      "X509 Trusted PEM Store File", ENV_DEVICE_X509_TRUST_PEM_FILE, "", false, trusted, &trusted));
+      ENV_DEVICE_X509_TRUST_PEM_FILE, ENV_DEVICE_X509_TRUST_PEM_FILE, "", false, trusted, &trusted));
 
   // Initialize the provisioning client with the provisioning endpoint and the default connection
   // options
