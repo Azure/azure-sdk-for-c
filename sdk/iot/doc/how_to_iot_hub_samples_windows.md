@@ -15,9 +15,8 @@ What is covered:
 
 _Run on Microsoft Windows 10.0.18363.836._
 
-01. Install git
-
-  Get the installer from the official git [page](https://git-scm.com/download/win)
+01. Install git  
+Get the installer from the official git [page](https://git-scm.com/download/win)
 
 02. Install the latest cmake
 
