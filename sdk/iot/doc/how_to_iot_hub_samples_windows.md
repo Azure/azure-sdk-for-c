@@ -315,7 +315,7 @@ On the Azure Portal,
 - From the list of devices, click on your device (created on step Z).
 - Click on "Direct Method".
 - On "Method Name", type `ping` (the sample expects the name `ping`).
-- On "Payload", type '{ "somevalue": 1234 }' (the payload MUST be a valid Json).
+- On "Payload", type `{ "somevalue": 1234 }` (the payload MUST be a valid Json).
 - Click on "Invoke Method".
 - See the reply from the sample on "Result" (bottom of the page).
 
