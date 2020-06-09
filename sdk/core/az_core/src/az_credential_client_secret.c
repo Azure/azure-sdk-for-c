@@ -48,9 +48,11 @@ static AZ_NODISCARD az_result _az_credential_client_secret_request_token(
 az_span const _az_auth_header_name = AZ_SPAN_LITERAL_FROM_STR("authorization");
 
 // This gets called from the http credential policy
-static AZ_NODISCARD az_result _az_credential_client_secret_apply(
+static AZ_NODISCARD az_result _az_credential_client_secret_apply_policy(
+    _az_http_policy* policies,
     az_credential_client_secret* credential,
-    _az_http_request* ref_request)
+    _az_http_request* ref_request,
+    az_http_response* response)
 {
   _az_token token = { 0 };
   AZ_RETURN_IF_FAILED(
@@ -67,15 +69,10 @@ static AZ_NODISCARD az_result _az_credential_client_secret_apply(
 
   int16_t const token_length = token._internal.token_length;
 
-  // Still bad in terms of concurrency, but at least the pointer is not pointing to an unknown
-  // memory. Temporary measure to improve https://github.com/Azure/azure-sdk-for-c/issues/799 a bit.
-  uint8_t* const token_buf_ptr
-      = (uint8_t*)(uintptr_t)credential->_internal.token_credential._internal.token._internal.token;
-
   AZ_RETURN_IF_FAILED(az_http_request_append_header(
-      ref_request, _az_auth_header_name, az_span_init(token_buf_ptr, token_length)));
+      ref_request, _az_auth_header_name, az_span_init(token._internal.token, token_length)));
 
-  return AZ_OK;
+  return _az_http_pipeline_nextpolicy(policies, ref_request, response);
 }
 
 static AZ_NODISCARD az_result
@@ -95,7 +92,7 @@ AZ_NODISCARD az_result az_credential_client_secret_init(
     ._internal = {
       .credential = {
         ._internal = {
-          .apply_credential = (_az_credential_apply_fn)_az_credential_client_secret_apply,
+          .apply_credential_policy = (_az_credential_apply_policy_fn)_az_credential_client_secret_apply_policy,
           .set_scopes = (_az_credential_set_scopes_fn)_az_credential_client_secret_set_scopes,
           },
         },

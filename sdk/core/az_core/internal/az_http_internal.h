@@ -11,44 +11,6 @@
 #include <_az_cfg_prefix.h>
 
 /**
- * @brief Declaring az_http_policy for using it to create policy process callback
- * _az_http_policy_process_fn definition. Definition is added below after it.
- *
- */
-typedef struct _az_http_policy _az_http_policy;
-
-/**
- * @brief Defines the callback signature of a policy process which should receive an
- * _az_http_policy, options reference (as void *), an _az_http_request and az_http_response.
- *
- * void * is used as polymorphic solution for any policy. Each policy implementation would know the
- * specif pointer type to cast options to.
- *
- */
-typedef AZ_NODISCARD az_result (*_az_http_policy_process_fn)(
-    _az_http_policy* p_policies,
-    void* p_options,
-    _az_http_request* p_request,
-    az_http_response* p_response);
-
-/**
- * @brief Definition for an HTTP policy.
- *
- * An HTTP pipeline inside SDK clients is made of an array of this http policies.
- *
- * Users @b should @b not access _internal field where process callback and options are defined.
- *
- */
-struct _az_http_policy
-{
-  struct
-  {
-    _az_http_policy_process_fn process;
-    void* p_options;
-  } _internal;
-};
-
-/**
  * @brief Internal definition of an HTTP pipeline.
  *
  * Defines the number of policies inside a pipeline.
@@ -181,6 +143,22 @@ AZ_NODISCARD az_result az_http_pipeline_policy_transport(
     void* p_data,
     _az_http_request* p_request,
     az_http_response* p_response);
+
+AZ_NODISCARD AZ_INLINE az_result _az_http_pipeline_nextpolicy(
+    _az_http_policy* p_policies,
+    _az_http_request* p_request,
+    az_http_response* p_response)
+{
+  // Transport Policy is the last policy in the pipeline
+  //  it returns without calling nextpolicy
+  if (p_policies[0]._internal.process == NULL)
+  {
+    return AZ_ERROR_HTTP_PIPELINE_INVALID_POLICY;
+  }
+
+  return p_policies[0]._internal.process(
+      &(p_policies[1]), p_policies[0]._internal.p_options, p_request, p_response);
+}
 
 /**
  * @brief Format buffer as a http request containing URL and header spans.

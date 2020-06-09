@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "az_http_policy_private.h"
 #include "az_http_private.h"
 #include <az_credentials.h>
 #include <az_http.h>
@@ -37,7 +36,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_apiversion(
       return AZ_ERROR_ARG;
   }
 
-  return az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
+  return _az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
 }
 
 AZ_NODISCARD az_result az_http_pipeline_policy_telemetry(
@@ -52,16 +51,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_telemetry(
   AZ_RETURN_IF_FAILED(
       az_http_request_append_header(p_request, AZ_HTTP_HEADER_USER_AGENT, options->os));
 
-  return az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
-}
-
-AZ_INLINE AZ_NODISCARD az_result
-_az_apply_credential(_az_credential* credential, _az_http_request* ref_request)
-{
-  // Only apply the credential if the apply_credential method exists
-  return (credential->_internal.apply_credential == NULL)
-      ? AZ_OK
-      : (credential->_internal.apply_credential)(credential, ref_request);
+  return _az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
 }
 
 AZ_NODISCARD az_result az_http_pipeline_policy_credential(
@@ -70,11 +60,16 @@ AZ_NODISCARD az_result az_http_pipeline_policy_credential(
     _az_http_request* p_request,
     az_http_response* p_response)
 {
-  if (p_data != AZ_CREDENTIAL_ANONYMOUS)
+  _az_credential* const credential = (_az_credential*)p_data;
+  _az_credential_apply_policy_fn const policy_credential_apply
+      = credential == NULL ? NULL : credential->_internal.apply_credential_policy;
+
+  if (credential == AZ_CREDENTIAL_ANONYMOUS || policy_credential_apply == NULL)
   {
-    AZ_RETURN_IF_FAILED(_az_apply_credential((_az_credential*)p_data, p_request));
+    return _az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
   }
-  return az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
+
+  return policy_credential_apply(p_policies, credential, p_request, p_response);
 }
 
 AZ_NODISCARD az_result az_http_pipeline_policy_transport(

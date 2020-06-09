@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 #include "az_http_policy_logging_private.h"
-#include "az_http_policy_private.h"
 #include "az_span_private.h"
 #include <az_http_internal.h>
 #include <az_http_transport.h>
@@ -241,11 +240,11 @@ AZ_NODISCARD az_result az_http_pipeline_policy_logging(
   if (!_az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_RESPONSE))
   {
     // If no logging is needed, do not even measure the response time.
-    return az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
+    return _az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
   }
 
   int64_t const start = az_platform_clock_msec();
-  az_result const result = az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
+  az_result const result = _az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
   int64_t const end = az_platform_clock_msec();
 
   _az_http_policy_logging_log_http_response(p_response, end - start, p_request);

@@ -92,7 +92,7 @@ az_result test_policy_1(
   (void)p_options;
   (void)p_request;
   (void)p_response;
-  return az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
+  return _az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
 }
 
 az_result test_policy_2(

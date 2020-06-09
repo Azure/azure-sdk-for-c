@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "az_http_policy_private.h"
 #include "az_http_private.h"
 #include <az_config.h>
 #include <az_config_internal.h>
@@ -175,7 +174,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
     AZ_RETURN_IF_FAILED(az_http_response_init(p_response, p_response->_internal.http_response));
     AZ_RETURN_IF_FAILED(_az_http_request_remove_retry_headers(p_request));
 
-    result = az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
+    result = _az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
 
     // Even HTTP 429, or 502 are expected to be AZ_OK, so the failed result is not retriable.
     if (attempt > max_retries || az_failed(result))

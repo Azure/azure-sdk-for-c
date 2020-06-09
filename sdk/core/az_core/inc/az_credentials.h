@@ -73,8 +73,11 @@ typedef struct
  * @brief function callback definition as a contract to be implemented for a credential
  *
  */
-typedef AZ_NODISCARD az_result (
-    *_az_credential_apply_fn)(void* credential_options, _az_http_request* ref_request);
+typedef AZ_NODISCARD az_result (*_az_credential_apply_policy_fn)(
+    _az_http_policy* policies,
+    void* credential,
+    _az_http_request* ref_request,
+    az_http_response* response);
 
 /**
  * @brief function callback definition as a contract to be implemented for a credential to set
@@ -92,7 +95,7 @@ typedef struct
 {
   struct
   {
-    _az_credential_apply_fn apply_credential;
+    _az_credential_apply_policy_fn apply_credential_policy;
     _az_credential_set_scopes_fn set_scopes; // NULL if this credential doesn't support scopes.
   } _internal;
 } _az_credential;

@@ -168,6 +168,44 @@ AZ_NODISCARD int32_t az_http_request_headers_count(_az_http_request const* reque
 AZ_NODISCARD az_result
 az_http_client_send_request(_az_http_request* p_request, az_http_response* p_response);
 
+/**
+ * @brief Declaring az_http_policy for using it to create policy process callback
+ * _az_http_policy_process_fn definition. Definition is added below after it.
+ *
+ */
+typedef struct _az_http_policy _az_http_policy;
+
+/**
+ * @brief Defines the callback signature of a policy process which should receive an
+ * _az_http_policy, options reference (as void *), an _az_http_request and az_http_response.
+ *
+ * void * is used as polymorphic solution for any policy. Each policy implementation would know the
+ * specif pointer type to cast options to.
+ *
+ */
+typedef AZ_NODISCARD az_result (*_az_http_policy_process_fn)(
+    _az_http_policy* p_policies,
+    void* p_options,
+    _az_http_request* p_request,
+    az_http_response* p_response);
+
+/**
+ * @brief Definition for an HTTP policy.
+ *
+ * An HTTP pipeline inside SDK clients is made of an array of this http policies.
+ *
+ * Users @b should @b not access _internal field where process callback and options are defined.
+ *
+ */
+struct _az_http_policy
+{
+  struct
+  {
+    _az_http_policy_process_fn process;
+    void* p_options;
+  } _internal;
+};
+
 #include <_az_cfg_suffix.h>
 
 #endif // _az_HTTP_TRANSPORT_H
