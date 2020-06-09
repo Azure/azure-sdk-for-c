@@ -17,10 +17,6 @@
 // Disable warnings:
 // -----------------
 
-// warning C4061: enumerator 'AZ_OK' in switch of enum 'az_result' is not explicitly handled by a
-// case label
-#pragma warning(disable : 4061)
-
 // warning C4204: nonstandard extension used: non-constant aggregate initializer
 #pragma warning(disable : 4204)
 
@@ -28,19 +24,8 @@
 // automatic variable '...'
 #pragma warning(disable : 4221)
 
-// warning C4996: This function or variable may be unsafe. Consider using ..._s instead.
-#pragma warning(disable : 4996)
-
-// warning C5045: Compiler will insert Spectre mitigation for memory load if /Qspectre switch
-// specified
-#pragma warning(disable : 5045)
-
 // warning C6011: Dereferencing NULL pointer. Using _az_PRECONDITION_NOT_NULL
 #pragma warning(disable : 6011)
-
-// warning C6387: 'str' could be '0':  this does not adhere to the specification for the function
-// 'strlen' Using _az_PRECONDITION_NOT_NULL
-#pragma warning(disable : 6387)
 
 // Treat warnings as errors:
 // -------------------------

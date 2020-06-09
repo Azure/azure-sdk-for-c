@@ -3,11 +3,12 @@
 
 #ifdef _MSC_VER
 // warning C4201: nonstandard extension used: nameless struct/union
+#pragma warning(push)
 #pragma warning(disable : 4201)
 #endif
 #include <paho-mqtt/MQTTClient.h>
 #ifdef _MSC_VER
-#pragma warning(default : 4201)
+#pragma warning(pop)
 #endif
 
 #include <stdio.h>
@@ -25,9 +26,10 @@
 #include <az_result.h>
 #include <az_span.h>
 
-// TODO: #564 - Remove the use of the _az_cfh.h header in samples.
-//              Note: this is required to work-around MQTTClient.h as well as az_span init issues.
-#include <_az_cfg.h>
+#ifdef _MSC_VER
+// "'getenv': This function or variable may be unsafe. Consider using _dupenv_s instead."
+#pragma warning(disable : 4996)
+#endif
 
 // DO NOT MODIFY: Device ID Environment Variable Name
 #define ENV_DEVICE_ID "AZ_IOT_DEVICE_ID"

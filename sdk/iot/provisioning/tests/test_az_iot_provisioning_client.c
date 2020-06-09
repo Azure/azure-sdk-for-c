@@ -13,7 +13,6 @@
 
 #include <cmocka.h>
 
-// TODO: #564 - Remove the use of the _az_cfh.h header in samples.
 #include <_az_cfg.h>
 
 static const az_span test_global_device_endpoint

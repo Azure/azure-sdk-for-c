@@ -69,8 +69,6 @@ az_span const key_name_for_test = AZ_SPAN_LITERAL_FROM_STR("test-new-key");
 #ifdef _MSC_VER
 // "'getenv': This function or variable may be unsafe. Consider using _dupenv_s instead."
 #pragma warning(disable : 4996)
-// "Compiler will insert Spectre mitigation for memory load if /Qspectre switch specified"
-#pragma warning(disable : 5045)
 #endif // _MSC_VER
 
 static void test_log_func(az_log_classification classification, az_span message)
