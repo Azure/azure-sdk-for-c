@@ -19,7 +19,7 @@ Key concepts are explained in detail [here][SDK_README_KEY_CONCEPTS].
 
 ## Prerequisites
 
-- To generate the device certificate, the provided script uses [OpenSSL 1.1.1 LTS](https://www.openssl.org/). Please
+- To generate the device certificate, the provided script uses [OpenSSL 1.1.1 LTS](https://www.openssl.org/source/). Please
 install the OpenSSL command line utility prior to using the script.
 - To use the samples, we use [Eclipse Paho MQTT C client][Eclipse_Paho]. You can use the directions
 [here][VCPKG_DIRECTIONS] to set up VCPKG to download and manage linking the dependency.
