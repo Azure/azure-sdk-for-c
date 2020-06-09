@@ -36,7 +36,7 @@ C:\>
 
 03. Install Paho using vcpkg
  
-The Azure IoT SDK for C uses Eclipse Paho for C installed via vcpkg (for the cmake integration).
+The Azure IoT SDK for C uses Eclipse Paho for C installed via [vcpkg](https://github.com/Microsoft/vcpkg) (for the cmake integration).
 
 ```shell
 C:\> cd
