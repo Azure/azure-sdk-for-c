@@ -130,7 +130,7 @@ static int generateSasToken(char* sas_token, size_t size)
   }
 
   // Base64-decode device key
-  char base64_decoded_device_key[256];
+  char base64_decoded_device_key[32];
   int base64_decoded_device_key_length = base64_decode_chars(device_key, strlen(device_key), base64_decoded_device_key);
 
   if (base64_decoded_device_key_length == 0)
