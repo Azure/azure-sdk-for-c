@@ -197,7 +197,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, with Arduino IDE 
 
     <details>
     <summary>See the expected output.</summary>
-    ```
+    ```bash
     Starting event monitor, filtering on device: mydeviceid, use ctrl-c to stop...
     {
         "event": {
