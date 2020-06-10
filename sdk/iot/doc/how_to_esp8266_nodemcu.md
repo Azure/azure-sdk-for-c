@@ -24,7 +24,7 @@ What is covered:
 _The following was run on an Ubuntu Desktop 18.04 environment, with Arduino IDE 1.8.12._
 
 
-01. Create a Arduino library for Azure Embedded SDK for C 
+01. Create an Arduino library for Azure Embedded SDK for C 
 
     ```
     $ wget https://raw.githubusercontent.com/azure/azure-sdk-for-c/master/sdk/iot/hub/samples/esp8266nodemcu/generate_arduino_zip_library.sh
@@ -32,7 +32,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, with Arduino IDE 
     $ ./generate_arduino_zip_library.sh
     ```
 
-    This will create a local file named `azure-sdk-for-c.zip` containing the the whole [Azure SDK for C](https://github.com/Azure/azure-sdk-for-c) as an Arduino library.
+    This will create a local file named `azure-sdk-for-c.zip` containing the whole [Azure SDK for C](https://github.com/Azure/azure-sdk-for-c) as an Arduino library.
 
 
 02. Run the Arduino IDE
@@ -91,7 +91,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, with Arduino IDE 
 
     Copy the code from [here](https://github.com/azure/azure-sdk-for-c/blob/master/sdk/iot/hub/samples/esp8266nodemcu) into your sketch.
     
-    Edit the following parameters into `iot_configs.h` filling in your own information:
+    Edit the following parameters in `iot_configs.h`, filling in your own information:
 
     ```c
     // Wifi
@@ -196,7 +196,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, with Arduino IDE 
 
     <details>
     <summary>See the expected output.</summary>
-    ```
+    ```bash
     Starting event monitor, filtering on device: mydeviceid, use ctrl-c to stop...
     {
         "event": {
