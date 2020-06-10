@@ -25,7 +25,7 @@ What is covered:
 _The following was run on an Ubuntu Desktop 18.04 environment, with Arduino IDE 1.8.12._
 
 
-01. Create a Arduino library for Azure Embedded SDK for C 
+01. Create an Arduino library for Azure Embedded SDK for C 
 
     ```
     $ wget https://raw.githubusercontent.com/azure/azure-sdk-for-c/master/sdk/iot/hub/samples/esp8266nodemcu/generate_arduino_zip_library.sh
