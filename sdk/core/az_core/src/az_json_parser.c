@@ -68,12 +68,6 @@ AZ_NODISCARD AZ_INLINE az_result az_json_parser_pop_stack(az_json_parser* json_p
   return az_json_stack_pop(&json_parser->_internal.stack);
 }
 
-AZ_NODISCARD az_result az_json_parser_init(az_json_parser* json_parser, az_span json_buffer)
-{
-  *json_parser = (az_json_parser){ ._internal = { .reader = json_buffer, .stack = 1 } };
-  return AZ_OK;
-}
-
 // 18 decimal digits. 10^18 - 1.
 //                        0         1
 //                        012345678901234567
