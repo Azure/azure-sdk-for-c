@@ -100,6 +100,10 @@ void receivedCallback(char* topic, byte* payload, unsigned int length)
 
 static void initializeClients()
 {
+  // This disables the client verification of server-side certificate during TLS
+  // negotiation. It is not recommended to be a production-level practice for
+  // connecting with Azure IoT servers. 
+  // It has been disabled for simplifying the sample.
   wifi_client.setInsecure();
 
   if (az_failed(az_iot_hub_client_init(
@@ -186,7 +190,7 @@ static int connectToAzureIoTHub()
   size_t client_id_length;
   char mqtt_client_id[128];
   if (az_failed(az_iot_hub_client_get_client_id(
-          &client, mqtt_client_id, sizeof(mqtt_client_id), &client_id_length)))
+          &client, mqtt_client_id, sizeof(mqtt_client_id) - 1, &client_id_length)))
   {
     Serial.println("Failed getting client id");
     return 1;
