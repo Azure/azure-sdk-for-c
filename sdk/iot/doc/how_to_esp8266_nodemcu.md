@@ -1,4 +1,4 @@
-# How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Esp8266 NodeMCU
+# How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Espressif ESP8266 NodeMCU
 
 _Last edited on June 10th, 2020._
 
@@ -9,13 +9,12 @@ Pre-requisites:
 - [Having created an Azure IoT Hub](https://github.com/ewertons/azure-sdk-for-c/wiki/How-to-create-an-Azure-IoT-Hub)
 - Create a logical device using Authentication Type "Symmetric Key"
 - Latest [Arduino IDE](https://www.arduino.cc/en/Main/Software) installed
-- [Azure Command Line Interface utility](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-apt?view=azure-cli-latest#install-with-one-command)
-- Azure Command Line Interface utility and IoT extension
+- [Azure Command Line Interface utility](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-apt?view=azure-cli-latest#install-with-one-command) and the IoT extension
   ```shell
   $ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
   $ az extension add --name azure-iot
   ```
-  For more information please visit the [official documentation of Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-apt?view=azure-cli-latest#install-with-one-command).
+  Alternatively, you can use [azure-iot-explorer](https://github.com/Azure/azure-iot-explorer).
 
 What is covered:
 - Configuring Arduino IDE to compile a sample using Azure Embedded SDK for C
@@ -68,7 +67,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, with Arduino IDE 
 
     Finally, the Arduino IDE does not take compiler flags.
 
-    So the PubSubClient library code must be changed to make `MQTT_MAX_PACKET_SIZE` higher (e.g, 1024).
+    So the PubSubClient library code must be changed to make `MQTT_MAX_PACKET_SIZE` larger (e.g, 1024).
 
     To make the change, search for the file in your system
 

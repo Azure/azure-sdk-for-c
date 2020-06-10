@@ -12,7 +12,7 @@ Azure SDK for Embedded C official IoT Hub client library.
 
   For a step-by-step guide starting from scratch, you may refer to [this documentation](./doc/how_to_iot_hub_samples.md).
 
-  For step-by-step guides starting from scratch, you may refer to this documentation:
+  For step-by-step guides starting from scratch, you may refer to these documents:
   - [How to setup and run Azure SDK for Embedded C IoT Hub Samples on Linux](./doc/how_to_iot_hub_samples_linux.md)
   - [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Esp8266 NodeMCU](./doc/how_to_esp8266_nodemcu.md)
 

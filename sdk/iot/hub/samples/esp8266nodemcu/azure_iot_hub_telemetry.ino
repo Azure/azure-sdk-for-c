@@ -1,65 +1,72 @@
-#include <ESP8266WiFi.h>
-#include <WiFiClientSecure.h>
-#include <time.h>
-#include <stdbool.h>
-#include <PubSubClient.h>
-#include <bearssl/bearssl.h>
-#include <bearssl/bearssl_hmac.h>
-#include <base64.h>
-#include <libb64/cdecode.h>
-
 #include <stdlib.h>
 #include <string.h>
-#include <az_iot_hub_client.h>
+#include <stdbool.h>
+#include <time.h>
+
+#include <ESP8266WiFi.h>
+#include <PubSubClient.h>
+#include <WiFiClientSecure.h>
+#include <base64.h>
+#include <bearssl/bearssl.h>
+#include <bearssl/bearssl_hmac.h>
+#include <libb64/cdecode.h>
+
 #include <az_result.h>
 #include <az_span.h>
+#include <az_iot_hub_client.h>
 
 #include "iot_configs.h"
 
-const char* ssid = IOT_CONFIG_WIFI_SSID;
-const char* password = IOT_CONFIG_WIFI_PASSWORD;
-const char* host = IOT_CONFIG_IOTHUB_FQDN;
-const char* device_id = IOT_CONFIG_DEVICE_ID;
-const char* device_key = IOT_CONFIG_DEVICE_KEY;
-const int port = 8883;
+#define sizeofarray(a) (sizeof(a) / sizeof(a[0]))
+#define ONE_HOUR_IN_SECS 3600
+#define NTP_SERVERS "pool.ntp.org", "time.nist.gov"
 
-WiFiClientSecure wifi_client;
-PubSubClient mqtt_client(wifi_client);
-az_iot_hub_client client;
-bool is_ready_to_send = false;
-char sas_token[200];
+static const char* ssid = IOT_CONFIG_WIFI_SSID;
+static const char* password = IOT_CONFIG_WIFI_PASSWORD;
+static const char* host = IOT_CONFIG_IOTHUB_FQDN;
+static const char* device_id = IOT_CONFIG_DEVICE_ID;
+static const char* device_key = IOT_CONFIG_DEVICE_KEY;
+static const int port = 8883;
 
-unsigned long next_telemetry_send_time_ms = 0;
-  
-#define ONE_HOUR 3600
-#define sizeofarray(a) (sizeof(a)/sizeof(a[0]))
+static WiFiClientSecure wifi_client;
+static PubSubClient mqtt_client(wifi_client);
+static az_iot_hub_client client;
+static bool is_ready_to_send = false;
+static char sas_token[200];
+static uint8_t signature[512];
+static unsigned char encrypted_signature[32];
+static char base64_decoded_device_key[32];
+static unsigned long next_telemetry_send_time_ms = 0;
+static char telemetry_topic[128];
 
-static void connectToWiFi() 
+static void connectToWiFi()
 {
   Serial.begin(115200);
   Serial.println();
   Serial.print("Connecting to WIFI SSID ");
   Serial.println(ssid);
-  
+
   WiFi.mode(WIFI_STA);
   WiFi.hostname(host);
   WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) 
+  while (WiFi.status() != WL_CONNECTED)
   {
     delay(500);
     Serial.print(".");
   }
-  
-  Serial.println("WiFi connected, IP address: ");
+
+  Serial.print("WiFi connected, IP address: ");
   Serial.println(WiFi.localIP());
 }
 
 static void initializeTime()
 {
   Serial.print("Setting time using SNTP");
-  configTime(-5 * 3600, 0, "pool.ntp.org", "time.nist.gov");
+
+  configTime(-5 * 3600, 0, NTP_SERVERS);
   time_t now = time(NULL);
-  while (now < 1510592825) {
+  while (now < 1510592825)
+  {
     delay(500);
     Serial.print(".");
     now = time(nullptr);
@@ -79,11 +86,13 @@ static void printCurrentTime()
   Serial.print(getCurrentLocalTimeString());
 }
 
-void receivedCallback(char* topic, byte* payload, unsigned int length) {
+void receivedCallback(char* topic, byte* payload, unsigned int length)
+{
   Serial.print("Received [");
   Serial.print(topic);
   Serial.print("]: ");
-  for (int i = 0; i < length; i++) {
+  for (int i = 0; i < length; i++)
+  {
     Serial.print((char)payload[i]);
   }
 }
@@ -93,10 +102,10 @@ static void initializeClients()
   wifi_client.setInsecure();
 
   if (az_failed(az_iot_hub_client_init(
-      &client,
-      az_span_init((uint8_t*)host, strlen(host)),
-      az_span_init((uint8_t*)device_id, strlen(device_id)),
-      NULL)))
+          &client,
+          az_span_init((uint8_t*)host, strlen(host)),
+          az_span_init((uint8_t*)device_id, strlen(device_id)),
+          NULL)))
   {
     Serial.println("Failed initializing Azure IoT Hub client");
     return;
@@ -113,25 +122,24 @@ static uint32_t getSecondsSinceEpoch()
 
 static int generateSasToken(char* sas_token, size_t size)
 {
-  uint8_t signature[512];
-  unsigned char encrypted_signature[32];
-    
   az_span signature_span = az_span_init((uint8_t*)signature, sizeofarray(signature));
   az_span out_signature_span;
-  az_span encrypted_signature_span = az_span_init((uint8_t*)encrypted_signature, sizeofarray(encrypted_signature));
+  az_span encrypted_signature_span
+      = az_span_init((uint8_t*)encrypted_signature, sizeofarray(encrypted_signature));
 
-  uint32_t expiration = getSecondsSinceEpoch() + ONE_HOUR;
+  uint32_t expiration = getSecondsSinceEpoch() + ONE_HOUR_IN_SECS;
 
   // Get signature
-  if (az_failed(az_iot_hub_client_sas_get_signature(&client, expiration, signature_span, &out_signature_span)))
+  if (az_failed(az_iot_hub_client_sas_get_signature(
+          &client, expiration, signature_span, &out_signature_span)))
   {
     Serial.println("Failed getting SAS signature");
     return 1;
   }
 
   // Base64-decode device key
-  char base64_decoded_device_key[32];
-  int base64_decoded_device_key_length = base64_decode_chars(device_key, strlen(device_key), base64_decoded_device_key);
+  int base64_decoded_device_key_length
+      = base64_decode_chars(device_key, strlen(device_key), base64_decoded_device_key);
 
   if (base64_decoded_device_key_length == 0)
   {
@@ -141,41 +149,43 @@ static int generateSasToken(char* sas_token, size_t size)
 
   // SHA-256 encrypt
   br_hmac_key_context kc;
-  br_hmac_key_init(&kc, &br_sha256_vtable, base64_decoded_device_key, base64_decoded_device_key_length);
-  
+  br_hmac_key_init(
+      &kc, &br_sha256_vtable, base64_decoded_device_key, base64_decoded_device_key_length);
+
   br_hmac_context hmac_ctx;
   br_hmac_init(&hmac_ctx, &kc, 32);
   br_hmac_update(&hmac_ctx, az_span_ptr(out_signature_span), az_span_size(out_signature_span));
   br_hmac_out(&hmac_ctx, encrypted_signature);
 
-  // Base64 encode encrypted signature  
+  // Base64 encode encrypted signature
   String b64enc_hmacsha256_signature = base64::encode(encrypted_signature, br_hmac_size(&hmac_ctx));
 
-  az_span b64enc_hmacsha256_signature_span = az_span_init((uint8_t*)b64enc_hmacsha256_signature.c_str(), b64enc_hmacsha256_signature.length());
+  az_span b64enc_hmacsha256_signature_span = az_span_init(
+      (uint8_t*)b64enc_hmacsha256_signature.c_str(), b64enc_hmacsha256_signature.length());
 
   // URl-encode base64 encoded encrypted signature
-  size_t sas_token_length = 0;
-  if (az_failed(az_iot_hub_client_sas_get_password(&client, b64enc_hmacsha256_signature_span, expiration, AZ_SPAN_NULL, sas_token, size, &sas_token_length)))
+  if (az_failed(az_iot_hub_client_sas_get_password(
+          &client,
+          b64enc_hmacsha256_signature_span,
+          expiration,
+          AZ_SPAN_NULL,
+          sas_token,
+          size,
+          NULL)))
   {
     Serial.println("Failed getting SAS token");
     return 1;
   }
-  else if (sas_token_length == size)
-  {
-    Serial.println("Failed adding null terminator to sas token. Not enough space.");
-    return 1;
-  }
-
-  sas_token[sas_token_length] = '\0';
 
   return 0;
 }
 
 static int connectToAzureIoTHub()
-{ 
+{
   size_t client_id_length;
   char mqtt_client_id[128];
-  if (az_failed(az_iot_hub_client_get_client_id(&client, mqtt_client_id, sizeof(mqtt_client_id), &client_id_length)))
+  if (az_failed(az_iot_hub_client_get_client_id(
+          &client, mqtt_client_id, sizeof(mqtt_client_id), &client_id_length)))
   {
     Serial.println("Failed getting client id");
     return 1;
@@ -185,7 +195,8 @@ static int connectToAzureIoTHub()
 
   char mqtt_username[128];
   // Get the MQTT user name used to connect to IoT Hub
-  if (az_failed(az_iot_hub_client_get_user_name(&client, mqtt_username, sizeofarray(mqtt_username), NULL)))
+  if (az_failed(az_iot_hub_client_get_user_name(
+          &client, mqtt_username, sizeofarray(mqtt_username), NULL)))
   {
     printf("Failed to get MQTT clientId, return code\n");
     return 1;
@@ -193,24 +204,21 @@ static int connectToAzureIoTHub()
 
   Serial.print("Client ID: ");
   Serial.println(mqtt_client_id);
- 
+
   Serial.print("Username: ");
   Serial.println(mqtt_username);
-
-  Serial.print("Password: ");
-  Serial.println(sas_token);
 
   while (!mqtt_client.connected())
   {
     time_t now = time(NULL);
-    
+
     Serial.print("MQTT connecting ... ");
-    
+
     if (mqtt_client.connect(mqtt_client_id, mqtt_username, sas_token))
     {
       Serial.println("connected.");
     }
-    else 
+    else
     {
       Serial.print("failed, status code =");
       Serial.print(mqtt_client.state());
@@ -225,12 +233,16 @@ static int connectToAzureIoTHub()
   return 0;
 }
 
-void setup() {
+void setup()
+{
   connectToWiFi();
   initializeTime();
   printCurrentTime();
   initializeClients();
 
+  // The SAS token is valid for 1 hour by default in this sample.
+  // After one hour the sample must be restarted, or the client won't be able
+  // to connect/stay connected to the Azure IoT Hub.
   if (generateSasToken(sas_token, sizeofarray(sas_token)) != 0)
   {
     Serial.println("Failed generating MQTT password");
@@ -243,10 +255,8 @@ void setup() {
 
 static void sendTelemetry()
 {
-  char telemetry_topic[128];
-  if (az_failed(
-          az_iot_hub_client_telemetry_get_publish_topic(
-              &client, NULL, telemetry_topic, sizeof(telemetry_topic), NULL)))
+  if (az_failed(az_iot_hub_client_telemetry_get_publish_topic(
+          &client, NULL, telemetry_topic, sizeof(telemetry_topic), NULL)))
   {
     Serial.println("Failed az_iot_hub_client_telemetry_get_publish_topic");
     return;
@@ -255,12 +265,13 @@ static void sendTelemetry()
   mqtt_client.publish(telemetry_topic, getCurrentLocalTimeString(), false);
 }
 
-void loop() {
-  if(millis() > next_telemetry_send_time_ms)
-  { 
+void loop()
+{
+  if (millis() > next_telemetry_send_time_ms)
+  {
     if (is_ready_to_send)
     {
-      sendTelemetry(); 
+      sendTelemetry();
     }
 
     next_telemetry_send_time_ms = millis() + TELEMETRY_FREQUENCY_MILLISECS;
