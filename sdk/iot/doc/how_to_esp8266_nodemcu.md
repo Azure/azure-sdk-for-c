@@ -92,7 +92,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, with Arduino IDE 
 
     Copy the code from [here](https://github.com/azure/azure-sdk-for-c/blob/master/sdk/iot/hub/samples/esp8266nodemcu) into your sketch.
     
-    Edit the following parameters into `iot_configs.h` filling in your own information:
+    Edit the following parameters in `iot_configs.h`, filling in your own information:
 
     ```c
     // Wifi
