@@ -1,7 +1,8 @@
-#include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
 #include <time.h>
+
+#include <cstdlib>
 
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
