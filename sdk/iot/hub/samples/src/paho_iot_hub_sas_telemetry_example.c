@@ -159,7 +159,7 @@ static az_result read_configuration_and_init_client()
 {
   az_span trusted = AZ_SPAN_FROM_BUFFER(x509_trust_pem_file);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
-      "X509 Trusted PEM Store File", ENV_DEVICE_X509_TRUST_PEM_FILE, "", false, trusted, &trusted));
+      ENV_DEVICE_X509_TRUST_PEM_FILE, ENV_DEVICE_X509_TRUST_PEM_FILE, "", false, trusted, &trusted));
 
   char iot_hub_sas_key_expiration_char[SAS_TOKEN_EXPIRATION_TIME_DIGITS];
   az_span iot_hub_sas_expiration_span = AZ_SPAN_FROM_BUFFER(iot_hub_sas_key_expiration_char);
@@ -184,11 +184,11 @@ static az_result read_configuration_and_init_client()
 
   az_span device_id_span = AZ_SPAN_FROM_BUFFER(device_id);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
-      "Device ID", ENV_DEVICE_ID, "", false, device_id_span, &device_id_span));
+      ENV_DEVICE_ID, ENV_DEVICE_ID, "", false, device_id_span, &device_id_span));
 
   az_span iot_hub_hostname_span = AZ_SPAN_FROM_BUFFER(iot_hub_hostname);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
-      "IoT Hub Hostname",
+      ENV_IOT_HUB_HOSTNAME,
       ENV_IOT_HUB_HOSTNAME,
       "",
       false,
