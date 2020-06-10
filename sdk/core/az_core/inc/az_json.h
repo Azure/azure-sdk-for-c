@@ -63,15 +63,57 @@ typedef struct
 } _az_json_bit_stack;
 
 /**
- * @brief Represents a JSON token. The kind field indicates the type of
- * the JSON token and the token_slice represents the portion of the JSON payload that points to the
- * token value.
+ * @brief Represents a JSON token. The kind field indicates the type of the JSON token and the slice
+ * represents the portion of the JSON payload that represents to the token value.
  */
 typedef struct
 {
   az_json_token_kind kind;
-  az_span token_slice;
+  az_span slice;
 } az_json_token;
+
+/**
+ * @brief Returns the JSON token's boolean.
+ *
+ * @param token A pointer to an az_json_token instance.
+ * @param out_value A pointer to a variable to receive the value.
+ * @return AZ_OK if the boolean is returned.<br>
+ * AZ_ERROR_ITEM_NOT_FOUND if the kind is not AZ_JSON_TOKEN_BOOLEAN.
+ */
+AZ_NODISCARD az_result az_json_token_get_boolean(az_json_token const* json_token, bool* out_value);
+
+/**
+ * @brief Returns the JSON token's number as a 64-bit unsigned integer.
+ *
+ * @param token A pointer to an az_json_token instance.
+ * @param out_value A pointer to a variable to receive the value.
+ * @return AZ_OK if the number is returned.<br>
+ * AZ_ERROR_ITEM_NOT_FOUND if the kind != AZ_JSON_TOKEN_NUMBER.
+ */
+AZ_NODISCARD az_result
+az_json_token_get_uint64(az_json_token const* json_token, uint64_t* out_value);
+
+/**
+ * @brief Returns the JSON token's number as a 32-bit unsigned integer.
+ *
+ * @param token A pointer to an az_json_token instance.
+ * @param out_value A pointer to a variable to receive the value.
+ * @return AZ_OK if the number is returned.<br>
+ * AZ_ERROR_ITEM_NOT_FOUND if the kind != AZ_JSON_TOKEN_NUMBER.
+ */
+AZ_NODISCARD az_result
+az_json_token_get_uint32(az_json_token const* json_token, uint32_t* out_value);
+
+/**
+ * @brief Returns the JSON token's string after unescaping it, if required.
+ *
+ * @param token A pointer to an az_json_token instance.
+ * @param out_value A pointer to a variable to receive the value.
+ * @return AZ_OK if the string is returned.<br>
+ * AZ_ERROR_ITEM_NOT_FOUND if the kind != AZ_JSON_TOKEN_STRING.
+ */
+AZ_NODISCARD az_result
+az_json_token_get_string(az_json_token const* json_token, az_span* out_value);
 
 /************************************ JSON BUILDER ******************/
 
@@ -146,16 +188,16 @@ AZ_NODISCARD AZ_INLINE az_result az_json_builder_init(
     az_span destination_buffer,
     az_json_builder_options const* options)
 {
-  *json_builder
-      = (az_json_builder){ ._internal = {
-                               .destination_buffer = destination_buffer,
-                               .bytes_written = 0,
-                               .need_comma = false,
-                               .token_kind = AZ_JSON_TOKEN_NONE,
-                               .bit_stack = { 0 },
-                               .options
-                               = options == NULL ? az_json_builder_options_default() : *options,
-                           } };
+  *json_builder = (az_json_builder){
+    ._internal = {
+      .destination_buffer = destination_buffer,
+      .bytes_written = 0,
+      .need_comma = false,
+      .token_kind = AZ_JSON_TOKEN_NONE,
+      .bit_stack = { 0 },
+      .options = options == NULL ? az_json_builder_options_default() : *options,
+    },
+  };
   return AZ_OK;
 }
 
@@ -340,8 +382,7 @@ typedef uint64_t _az_json_stack;
  */
 typedef struct
 {
-  az_json_token_kind token_kind;
-  az_span token_span;
+  az_json_token token;
 
   struct
   {
@@ -369,14 +410,17 @@ AZ_NODISCARD AZ_INLINE az_result az_json_parser_init(
     az_span json_buffer,
     az_json_parser_options const* options)
 {
-  *json_parser = (az_json_parser){ .token_kind = AZ_JSON_TOKEN_NONE,
-                                   .token_span = AZ_SPAN_NULL,
-                                   ._internal = {
-                                       .json_buffer = json_buffer,
-                                       .stack = 1,
-                                       .options = options == NULL ? az_json_parser_options_default()
-                                                                  : *options,
-                                   } };
+  *json_parser = (az_json_parser){
+    .token = (az_json_token){
+      .kind = AZ_JSON_TOKEN_NONE,
+      .slice = AZ_SPAN_NULL,
+    },
+    ._internal = {
+      .json_buffer = json_buffer,
+      .stack = 1,
+      .options = options == NULL ? az_json_parser_options_default() : *options,
+    },
+  };
   return AZ_OK;
 }
 
@@ -405,60 +449,19 @@ AZ_NODISCARD az_result az_json_parser_move_to_next_token(az_json_parser* json_pa
 AZ_NODISCARD az_result az_json_parser_skip_children(az_json_parser* json_parser);
 
 /**
- * @brief Determines whether the unescaped JSON token value that the #az_json_parser points to is equal to the expected text within the provided byte span.
+ * @brief Determines whether the unescaped JSON token value that the #az_json_parser points to is
+ * equal to the expected text within the provided byte span.
  *
- * @param[in] json_parser A pointer to an #az_json_parser instance containing the JSON payload being parsed.
+ * @param[in] json_parser A pointer to an #az_json_parser instance containing the JSON payload being
+ * parsed.
  * @param[in] expected_text The lookup text to compare the token against.
  *
- * @return `true` if the current JSON token value in the JSON source semantically matches the expected lookup text; otherwise, false.
+ * @return `true` if the current JSON token value in the JSON source semantically matches the
+ * expected lookup text; otherwise, false.
  */
 AZ_NODISCARD bool az_json_parser_is_token_text_equal(
     az_json_parser const* json_parser,
     az_span expected_text);
-
-/**
- * @brief Returns the JSON token's boolean.
- *
- * @param token A pointer to an az_json_token instance.
- * @param out_value A pointer to a variable to receive the value.
- * @return AZ_OK if the boolean is returned.<br>
- * AZ_ERROR_ITEM_NOT_FOUND if the kind is not AZ_JSON_TOKEN_BOOLEAN.
- */
-AZ_NODISCARD az_result
-az_json_parser_get_boolean(az_json_parser const* json_parser, bool* out_value);
-
-/**
- * @brief Returns the JSON token's number as a 64-bit unsigned integer.
- *
- * @param token A pointer to an az_json_token instance.
- * @param out_value A pointer to a variable to receive the value.
- * @return AZ_OK if the number is returned.<br>
- * AZ_ERROR_ITEM_NOT_FOUND if the kind != AZ_JSON_TOKEN_NUMBER.
- */
-AZ_NODISCARD az_result
-az_json_parser_get_uint64(az_json_parser const* json_parser, uint64_t* out_value);
-
-/**
- * @brief Returns the JSON token's number as a 32-bit unsigned integer.
- *
- * @param token A pointer to an az_json_token instance.
- * @param out_value A pointer to a variable to receive the value.
- * @return AZ_OK if the number is returned.<br>
- * AZ_ERROR_ITEM_NOT_FOUND if the kind != AZ_JSON_TOKEN_NUMBER.
- */
-AZ_NODISCARD az_result
-az_json_parser_get_uint32(az_json_parser const* json_parser, uint32_t* out_value);
-
-/**
- * @brief Returns the JSON token's string after unescaping it, if required.
- *
- * @param token A pointer to an az_json_token instance.
- * @param out_value A pointer to a variable to receive the value.
- * @return AZ_OK if the string is returned.<br>
- * AZ_ERROR_ITEM_NOT_FOUND if the kind != AZ_JSON_TOKEN_STRING.
- */
-AZ_NODISCARD az_result
-az_json_parser_get_string(az_json_parser const* json_parser, az_span* out_value);
 
 /************************************ JSON POINTER ******************/
 

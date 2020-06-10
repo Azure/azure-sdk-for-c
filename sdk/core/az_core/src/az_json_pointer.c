@@ -177,27 +177,28 @@ AZ_NODISCARD static az_result az_json_parser_get_by_pointer_token(
       AZ_RETURN_IF_FAILED(az_span_atou64(pointer_token, &i));
       while (true)
       {
-        AZ_RETURN_IF_FAILED(az_json_parser_parse_array_item(json_parser, inout_token));
+        AZ_RETURN_IF_FAILED(az_json_parser_move_to_next_token(json_parser));
         if (i == 0)
         {
+          *inout_token = json_parser->token;
           return AZ_OK;
         }
         --i;
-        AZ_RETURN_IF_FAILED(az_json_parser_skip_children(json_parser, *inout_token));
+        AZ_RETURN_IF_FAILED(az_json_parser_skip_children(json_parser));
       }
     }
     case AZ_JSON_TOKEN_BEGIN_OBJECT:
     {
       while (true)
       {
-        az_json_token_member token_member = { 0 };
-        AZ_RETURN_IF_FAILED(az_json_parser_parse_token_member(json_parser, &token_member));
-        if (az_json_pointer_token_eq_json_string(pointer_token, token_member.name))
+        AZ_RETURN_IF_FAILED(az_json_parser_move_to_next_token(json_parser));
+        if (az_json_pointer_token_eq_json_string(pointer_token, json_parser->token.slice))
         {
-          *inout_token = token_member.token;
+          AZ_RETURN_IF_FAILED(az_json_parser_move_to_next_token(json_parser));
+          *inout_token = json_parser->token;
           return AZ_OK;
         }
-        AZ_RETURN_IF_FAILED(az_json_parser_skip_children(json_parser, token_member.token));
+        AZ_RETURN_IF_FAILED(az_json_parser_skip_children(json_parser));
       }
     }
     default:
@@ -211,9 +212,10 @@ az_json_parse_by_pointer(az_span json_buffer, az_span json_pointer, az_json_toke
   _az_PRECONDITION_NOT_NULL(out_token);
 
   az_json_parser json_parser = { 0 };
-  AZ_RETURN_IF_FAILED(az_json_parser_init(&json_parser, json_buffer));
+  AZ_RETURN_IF_FAILED(az_json_parser_init(&json_parser, json_buffer, NULL));
 
-  AZ_RETURN_IF_FAILED(az_json_parser_parse_token(&json_parser, out_token));
+  AZ_RETURN_IF_FAILED(az_json_parser_move_to_next_token(&json_parser));
+  *out_token = json_parser.token;
   while (true)
   {
     az_span pointer_token = AZ_SPAN_NULL;

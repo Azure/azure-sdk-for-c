@@ -75,49 +75,6 @@ AZ_NODISCARD AZ_INLINE az_result az_json_esc_decode(uint8_t c, uint8_t* out)
 }
 
 /**
- * Encodes the given character into a JSON escape sequence. The function returns an empty span if
- * the given character doesn't require to be escaped.
- */
-AZ_NODISCARD az_span _az_json_esc_encode(uint8_t c)
-{
-  switch (c)
-  {
-    case '\\':
-    {
-      return AZ_SPAN_FROM_STR("\\\\");
-    }
-    case '"':
-    {
-      return AZ_SPAN_FROM_STR("\\\"");
-    }
-    case '\b':
-    {
-      return AZ_SPAN_FROM_STR("\\b");
-    }
-    case '\f':
-    {
-      return AZ_SPAN_FROM_STR("\\f");
-    }
-    case '\n':
-    {
-      return AZ_SPAN_FROM_STR("\\n");
-    }
-    case '\r':
-    {
-      return AZ_SPAN_FROM_STR("\\r");
-    }
-    case '\t':
-    {
-      return AZ_SPAN_FROM_STR("\\t");
-    }
-    default:
-    {
-      return AZ_SPAN_NULL;
-    }
-  }
-}
-
-/**
  * TODO: this function and JSON pointer read functions should return proper UNICODE
  *       code-point to be compatible.
  */

@@ -12,12 +12,6 @@
 #include <_az_cfg_prefix.h>
 
 /**
- * Encodes the given character into a JSON escape sequence. The function returns an empty span if
- * the given character doesn't require to be escaped.
- */
-AZ_NODISCARD az_span _az_json_esc_encode(uint8_t c);
-
-/**
  * TODO: this function and JSON pointer read functions should return proper UNICODE
  *       code-point to be compatible.
  */
