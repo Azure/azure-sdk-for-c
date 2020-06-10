@@ -33,7 +33,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, with Arduino IDE 
     $ ./generate_arduino_zip_library.sh
     ```
 
-    This will create a local file named `azure-sdk-for-c.zip` containing the the whole [Azure SDK for C](https://github.com/Azure/azure-sdk-for-c) as an Arduino library.
+    This will create a local file named `azure-sdk-for-c.zip` containing the whole [Azure SDK for C](https://github.com/Azure/azure-sdk-for-c) as an Arduino library.
 
 
 02. Run the Arduino IDE
