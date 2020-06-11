@@ -17,22 +17,22 @@
 
 #ifdef _az_MOCK_ENABLED
 az_result test_policy_transport_retry_response(
-    _az_http_policy* p_policies,
-    void* p_options,
-    _az_http_request* p_request,
-    az_http_response* p_response);
+    _az_http_policy* ref_policies,
+    void* ref_options,
+    _az_http_request* ref_request,
+    az_http_response* ref_response);
 
 az_result test_policy_transport_retry_response_with_header(
-    _az_http_policy* p_policies,
-    void* p_options,
-    _az_http_request* p_request,
-    az_http_response* p_response);
+    _az_http_policy* ref_policies,
+    void* ref_options,
+    _az_http_request* ref_request,
+    az_http_response* ref_response);
 
 az_result test_policy_transport_retry_response_with_header_2(
-    _az_http_policy* p_policies,
-    void* p_options,
-    _az_http_request* p_request,
-    az_http_response* p_response);
+    _az_http_policy* ref_policies,
+    void* ref_options,
+    _az_http_request* ref_request,
+    az_http_response* ref_response);
 void test_az_http_pipeline_policy_credential(void** state);
 void test_az_http_pipeline_policy_retry(void** state);
 void test_az_http_pipeline_policy_retry_with_header(void** state);
@@ -40,24 +40,24 @@ void test_az_http_pipeline_policy_retry_with_header_2(void** state);
 #endif // _az_MOCK_ENABLED
 
 static az_result test_policy_transport(
-    _az_http_policy* p_policies,
-    void* p_options,
-    _az_http_request* p_request,
-    az_http_response* p_response);
+    _az_http_policy* ref_policies,
+    void* ref_options,
+    _az_http_request* ref_request,
+    az_http_response* ref_response);
 
 void test_az_http_pipeline_policy_apiversion(void** state);
 void test_az_http_pipeline_policy_telemetry(void** state);
 
 az_result test_policy_transport(
-    _az_http_policy* p_policies,
-    void* p_options,
-    _az_http_request* p_request,
-    az_http_response* p_response)
+    _az_http_policy* ref_policies,
+    void* ref_options,
+    _az_http_request* ref_request,
+    az_http_response* ref_response)
 {
-  (void)p_policies;
-  (void)p_options;
-  (void)p_request;
-  (void)p_response;
+  (void)ref_policies;
+  (void)ref_options;
+  (void)ref_request;
+  (void)ref_response;
   return AZ_OK;
 }
 
@@ -74,11 +74,11 @@ void test_az_http_pipeline_policy_telemetry(void** state)
   az_span remainder = az_span_copy(url_span, AZ_SPAN_FROM_STR("url"));
   assert_int_equal(az_span_size(remainder), 97);
   az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-  _az_http_request hrb;
+  _az_http_request request;
 
   assert_return_code(
       az_http_request_init(
-          &hrb, &az_context_app, az_http_method_get(), url_span, 3, header_span, AZ_SPAN_NULL),
+          &request, &az_context_app, az_http_method_get(), url_span, 3, header_span, AZ_SPAN_NULL),
       AZ_OK);
 
   // Create policy options
@@ -88,12 +88,13 @@ void test_az_http_pipeline_policy_telemetry(void** state)
             {
               ._internal = {
                 .process = test_policy_transport,
-                .p_options = NULL,
+                .options = NULL,
               },
             },
         };
 
-  assert_return_code(az_http_pipeline_policy_telemetry(policies, &telemetry, &hrb, NULL), AZ_OK);
+  assert_return_code(
+      az_http_pipeline_policy_telemetry(policies, &telemetry, &request, NULL), AZ_OK);
 }
 
 void test_az_http_pipeline_policy_apiversion(void** state)
@@ -109,11 +110,11 @@ void test_az_http_pipeline_policy_apiversion(void** state)
   az_span remainder = az_span_copy(url_span, AZ_SPAN_FROM_STR("url"));
   assert_int_equal(az_span_size(remainder), 97);
   az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-  _az_http_request hrb;
+  _az_http_request request;
 
   assert_return_code(
       az_http_request_init(
-          &hrb, &az_context_app, az_http_method_get(), url_span, 3, header_span, AZ_SPAN_NULL),
+          &request, &az_context_app, az_http_method_get(), url_span, 3, header_span, AZ_SPAN_NULL),
       AZ_OK);
 
   // Create policy options
@@ -126,16 +127,18 @@ void test_az_http_pipeline_policy_apiversion(void** state)
             {
               ._internal = {
                 .process = test_policy_transport,
-                .p_options = NULL,
+                .options = NULL,
               },
             },
         };
 
   // make sure token is not expired
-  assert_return_code(az_http_pipeline_policy_apiversion(policies, &api_version, &hrb, NULL), AZ_OK);
+  assert_return_code(
+      az_http_pipeline_policy_apiversion(policies, &api_version, &request, NULL), AZ_OK);
 
   api_version._internal.option_location = _az_http_policy_apiversion_option_location_header;
-  assert_return_code(az_http_pipeline_policy_apiversion(policies, &api_version, &hrb, NULL), AZ_OK);
+  assert_return_code(
+      az_http_pipeline_policy_apiversion(policies, &api_version, &request, NULL), AZ_OK);
 }
 
 #ifdef _az_MOCK_ENABLED
@@ -166,41 +169,41 @@ const az_span retry_response_with_header_2
                                "}\n");
 
 az_result test_policy_transport_retry_response(
-    _az_http_policy* p_policies,
-    void* p_options,
-    _az_http_request* p_request,
-    az_http_response* p_response)
+    _az_http_policy* ref_policies,
+    void* ref_options,
+    _az_http_request* ref_request,
+    az_http_response* ref_response)
 {
-  (void)p_policies;
-  (void)p_options;
-  (void)p_request;
-  assert_return_code(az_http_response_init(p_response, retry_response), AZ_OK);
+  (void)ref_policies;
+  (void)ref_options;
+  (void)ref_request;
+  assert_return_code(az_http_response_init(ref_response, retry_response), AZ_OK);
   return AZ_OK;
 }
 
 az_result test_policy_transport_retry_response_with_header(
-    _az_http_policy* p_policies,
-    void* p_options,
-    _az_http_request* p_request,
-    az_http_response* p_response)
+    _az_http_policy* ref_policies,
+    void* ref_options,
+    _az_http_request* ref_request,
+    az_http_response* ref_response)
 {
-  (void)p_policies;
-  (void)p_options;
-  (void)p_request;
-  assert_return_code(az_http_response_init(p_response, retry_response_with_header), AZ_OK);
+  (void)ref_policies;
+  (void)ref_options;
+  (void)ref_request;
+  assert_return_code(az_http_response_init(ref_response, retry_response_with_header), AZ_OK);
   return AZ_OK;
 }
 
 az_result test_policy_transport_retry_response_with_header_2(
-    _az_http_policy* p_policies,
-    void* p_options,
-    _az_http_request* p_request,
-    az_http_response* p_response)
+    _az_http_policy* ref_policies,
+    void* ref_options,
+    _az_http_request* ref_request,
+    az_http_response* ref_response)
 {
-  (void)p_policies;
-  (void)p_options;
-  (void)p_request;
-  assert_return_code(az_http_response_init(p_response, retry_response_with_header_2), AZ_OK);
+  (void)ref_policies;
+  (void)ref_options;
+  (void)ref_request;
+  assert_return_code(az_http_response_init(ref_response, retry_response_with_header_2), AZ_OK);
   return AZ_OK;
 }
 
@@ -217,11 +220,11 @@ void test_az_http_pipeline_policy_retry(void** state)
   az_span remainder = az_span_copy(url_span, AZ_SPAN_FROM_STR("url"));
   assert_int_equal(az_span_size(remainder), 97);
   az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-  _az_http_request hrb;
+  _az_http_request request;
 
   assert_return_code(
       az_http_request_init(
-          &hrb, &az_context_app, az_http_method_get(), url_span, 3, header_span, AZ_SPAN_NULL),
+          &request, &az_context_app, az_http_method_get(), url_span, 3, header_span, AZ_SPAN_NULL),
       AZ_OK);
 
   // Create policy options
@@ -231,7 +234,7 @@ void test_az_http_pipeline_policy_retry(void** state)
             {
               ._internal = {
                 .process = test_policy_transport_retry_response,
-                .p_options = NULL,
+                .options = NULL,
               },
             },
         };
@@ -240,7 +243,7 @@ void test_az_http_pipeline_policy_retry(void** state)
   will_return_count(__wrap_az_platform_clock_msec, 0, 4);
   az_http_response response;
   assert_return_code(
-      az_http_pipeline_policy_retry(policies, &retry_options, &hrb, &response), AZ_OK);
+      az_http_pipeline_policy_retry(policies, &retry_options, &request, &response), AZ_OK);
 }
 
 void test_az_http_pipeline_policy_retry_with_header(void** state)
@@ -256,11 +259,11 @@ void test_az_http_pipeline_policy_retry_with_header(void** state)
   az_span remainder = az_span_copy(url_span, AZ_SPAN_FROM_STR("url"));
   assert_int_equal(az_span_size(remainder), 97);
   az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-  _az_http_request hrb;
+  _az_http_request request;
 
   assert_return_code(
       az_http_request_init(
-          &hrb, &az_context_app, az_http_method_get(), url_span, 3, header_span, AZ_SPAN_NULL),
+          &request, &az_context_app, az_http_method_get(), url_span, 3, header_span, AZ_SPAN_NULL),
       AZ_OK);
 
   // Create policy options
@@ -272,7 +275,7 @@ void test_az_http_pipeline_policy_retry_with_header(void** state)
             {
               ._internal = {
                 .process = test_policy_transport_retry_response_with_header,
-                .p_options = NULL,
+                .options = NULL,
               },
             },
         };
@@ -281,7 +284,7 @@ void test_az_http_pipeline_policy_retry_with_header(void** state)
 
   az_http_response response;
   assert_return_code(
-      az_http_pipeline_policy_retry(policies, &retry_options, &hrb, &response), AZ_OK);
+      az_http_pipeline_policy_retry(policies, &retry_options, &request, &response), AZ_OK);
 }
 
 void test_az_http_pipeline_policy_retry_with_header_2(void** state)
@@ -297,11 +300,11 @@ void test_az_http_pipeline_policy_retry_with_header_2(void** state)
   az_span remainder = az_span_copy(url_span, AZ_SPAN_FROM_STR("url"));
   assert_int_equal(az_span_size(remainder), 97);
   az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-  _az_http_request hrb;
+  _az_http_request request;
 
   assert_return_code(
       az_http_request_init(
-          &hrb, &az_context_app, az_http_method_get(), url_span, 3, header_span, AZ_SPAN_NULL),
+          &request, &az_context_app, az_http_method_get(), url_span, 3, header_span, AZ_SPAN_NULL),
       AZ_OK);
 
   // Create policy options
@@ -313,7 +316,7 @@ void test_az_http_pipeline_policy_retry_with_header_2(void** state)
             {
               ._internal = {
                 .process = test_policy_transport_retry_response_with_header_2,
-                .p_options = NULL,
+                .options = NULL,
               },
             },
         };
@@ -322,7 +325,7 @@ void test_az_http_pipeline_policy_retry_with_header_2(void** state)
 
   az_http_response response;
   assert_return_code(
-      az_http_pipeline_policy_retry(policies, &retry_options, &hrb, &response), AZ_OK);
+      az_http_pipeline_policy_retry(policies, &retry_options, &request, &response), AZ_OK);
 }
 
 #endif // _az_MOCK_ENABLED

@@ -4,6 +4,7 @@
 #ifndef _az_HTTP_INTERNAL_H
 #define _az_HTTP_INTERNAL_H
 
+#include <az_context.h>
 #include <az_http.h>
 #include <az_http_transport.h>
 #include <az_result.h>
@@ -22,7 +23,7 @@ typedef struct
 {
   struct
   {
-    _az_http_policy p_policies[10];
+    _az_http_policy policies[10];
   } _internal;
 } _az_http_pipeline;
 
@@ -86,7 +87,7 @@ AZ_NODISCARD az_http_policy_retry_options _az_http_policy_retry_options_default(
 
 // PipelinePolicies
 //   Policies are non-allocating caveat the TransportPolicy
-//   Transport p_policies can only allocate if the transport layer they call allocates
+//   Transport policies can only allocate if the transport layer they call allocates
 // Client ->
 //  ===HttpPipelinePolicies===
 //    UniqueRequestID
@@ -102,70 +103,70 @@ AZ_NODISCARD az_http_policy_retry_options _az_http_policy_retry_options_default(
 
 // Start the pipeline
 AZ_NODISCARD az_result az_http_pipeline_process(
-    _az_http_pipeline* pipeline,
-    _az_http_request* p_request,
-    az_http_response* p_response);
+    _az_http_pipeline* ref_pipeline,
+    _az_http_request* ref_request,
+    az_http_response* ref_response);
 
 AZ_NODISCARD az_result az_http_pipeline_policy_apiversion(
-    _az_http_policy* p_policies,
-    void* p_data,
-    _az_http_request* p_request,
-    az_http_response* p_response);
+    _az_http_policy* ref_policies,
+    void* ref_options,
+    _az_http_request* ref_request,
+    az_http_response* ref_response);
 
 AZ_NODISCARD az_result az_http_pipeline_policy_telemetry(
-    _az_http_policy* p_policies,
-    void* p_options,
-    _az_http_request* p_request,
-    az_http_response* p_response);
+    _az_http_policy* ref_policies,
+    void* ref_options,
+    _az_http_request* ref_request,
+    az_http_response* ref_response);
 
 AZ_NODISCARD az_result az_http_pipeline_policy_retry(
-    _az_http_policy* p_policies,
-    void* p_data,
-    _az_http_request* p_request,
-    az_http_response* p_response);
+    _az_http_policy* ref_policies,
+    void* ref_options,
+    _az_http_request* ref_request,
+    az_http_response* ref_response);
 
 AZ_NODISCARD az_result az_http_pipeline_policy_credential(
-    _az_http_policy* p_policies,
-    void* p_data,
-    _az_http_request* p_request,
-    az_http_response* p_response);
+    _az_http_policy* ref_policies,
+    void* ref_options,
+    _az_http_request* ref_request,
+    az_http_response* ref_response);
 
 #ifndef AZ_NO_LOGGING
 AZ_NODISCARD az_result az_http_pipeline_policy_logging(
-    _az_http_policy* p_policies,
-    void* p_data,
-    _az_http_request* p_request,
-    az_http_response* p_response);
+    _az_http_policy* ref_policies,
+    void* ref_options,
+    _az_http_request* ref_request,
+    az_http_response* ref_response);
 #endif // AZ_NO_LOGGING
 
 AZ_NODISCARD az_result az_http_pipeline_policy_transport(
-    _az_http_policy* p_policies,
-    void* p_data,
-    _az_http_request* p_request,
-    az_http_response* p_response);
+    _az_http_policy* ref_policies,
+    void* ref_options,
+    _az_http_request* ref_request,
+    az_http_response* ref_response);
 
 AZ_NODISCARD AZ_INLINE az_result _az_http_pipeline_nextpolicy(
-    _az_http_policy* p_policies,
-    _az_http_request* p_request,
-    az_http_response* p_response)
+    _az_http_policy* ref_policies,
+    _az_http_request* ref_request,
+    az_http_response* ref_response)
 {
   // Transport Policy is the last policy in the pipeline
   //  it returns without calling nextpolicy
-  if (p_policies[0]._internal.process == NULL)
+  if (ref_policies[0]._internal.process == NULL)
   {
     return AZ_ERROR_HTTP_PIPELINE_INVALID_POLICY;
   }
 
-  return p_policies[0]._internal.process(
-      &(p_policies[1]), p_policies[0]._internal.p_options, p_request, p_response);
+  return ref_policies[0]._internal.process(
+      &(ref_policies[1]), ref_policies[0]._internal.options, ref_request, ref_response);
 }
 
 /**
  * @brief Format buffer as a http request containing URL and header spans.
  *
- * @param p_request HTTP request builder to initialize.
+ * @param ref_request HTTP request builder to initialize.
  * @param method HTTP verb: `"GET"`, `"POST"`, etc.
- * @param url Maximum URL length (see @ref az_http_request_builder_set_query_parameter).
+ * @param url Maximum URL length (see @ref az_http_request_set_query_parameter).
  * @param headers_buffer HTTP verb: `"GET"`, `"POST"`, etc.
  * @param body URL.
  *
@@ -174,12 +175,12 @@ AZ_NODISCARD AZ_INLINE az_result _az_http_pipeline_nextpolicy(
  *   - *`AZ_ERROR_INSUFFICIENT_SPAN_SIZE`* `buffer` does not have enough space to fit the
  * `max_url_size`.
  *   - *`AZ_ERROR_ARG`*
- *     - `p_request` is _NULL_.
+ *     - `ref_request` is _NULL_.
  *     - `buffer`, `method_verb`, or `initial_url` are invalid spans (see @ref _az_span_is_valid).
  *     - `max_url_size` is less than `initial_url.size`.
  */
 AZ_NODISCARD az_result az_http_request_init(
-    _az_http_request* p_request,
+    _az_http_request* out_request,
     az_context* context,
     az_http_method method,
     az_span url,
@@ -193,16 +194,16 @@ AZ_NODISCARD az_result az_http_request_init(
  * path equals to `test`, then request url will be updated to `http://example.net/test?qp=1`.
  *
  *
- * @param p_request http request builder reference
+ * @param ref_request http request builder reference
  * @param path span to a path to be appended into url
- * @return AZ_NODISCARD az_http_request_builder_append_path
+ * @return AZ_NODISCARD az_http_request_append_path
  */
-AZ_NODISCARD az_result az_http_request_append_path(_az_http_request* p_request, az_span path);
+AZ_NODISCARD az_result az_http_request_append_path(_az_http_request* ref_request, az_span path);
 
 /**
  * @brief Set query parameter.
  *
- * @param p_request HTTP request builder that holds the URL to set the query parameter to.
+ * @param ref_request HTTP request builder that holds the URL to set the query parameter to.
  * @param name URL parameter name.
  * @param value URL parameter value.
  *
@@ -217,12 +218,12 @@ AZ_NODISCARD az_result az_http_request_append_path(_az_http_request* p_request, 
  *     - `name`'s or `value`'s buffer overlap resulting `url`'s buffer.
  */
 AZ_NODISCARD az_result
-az_http_request_set_query_parameter(_az_http_request* p_request, az_span name, az_span value);
+az_http_request_set_query_parameter(_az_http_request* ref_request, az_span name, az_span value);
 
 /**
  * @brief Add a new HTTP header for the request.
  *
- * @param p_request HTTP request builder that holds the URL to set the query parameter to.
+ * @param ref_request HTTP request builder that holds the URL to set the query parameter to.
  * @param key Header name (e.g. `"Content-Type"`).
  * @param value Header value (e.g. `"application/x-www-form-urlencoded"`).
  *
@@ -237,7 +238,7 @@ az_http_request_set_query_parameter(_az_http_request* p_request, az_span name, a
  *     - `name`'s or `value`'s buffer overlap resulting `url`'s buffer.
  */
 AZ_NODISCARD az_result
-az_http_request_append_header(_az_http_request* p_request, az_span key, az_span value);
+az_http_request_append_header(_az_http_request* ref_request, az_span key, az_span value);
 
 #include <_az_cfg_suffix.h>
 

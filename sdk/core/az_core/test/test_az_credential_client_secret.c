@@ -34,9 +34,9 @@ static void test_credential_client_secret(void** state)
 
   _az_http_pipeline pipeline = (_az_http_pipeline){
     ._internal = {
-      .p_policies = {
-        {._internal = { .process = az_http_pipeline_policy_credential, .p_options = &credential, }, },
-        {._internal = { .process = az_http_pipeline_policy_transport, .p_options = NULL, }, },
+      .policies = {
+        {._internal = { .process = az_http_pipeline_policy_credential, .options = &credential, }, },
+        {._internal = { .process = az_http_pipeline_policy_transport, .options = NULL, }, },
       },
     },
   };
@@ -240,10 +240,10 @@ az_result send_request(_az_http_request* request, az_http_response* response)
 }
 
 #ifdef _az_MOCK_ENABLED
-az_result __wrap_az_http_client_send_request(_az_http_request* request, az_http_response* response);
+az_result __wrap_az_http_client_send_request(_az_http_request const* request, az_http_response* ref_response);
 int64_t __wrap_az_platform_clock_msec();
 
-az_result __wrap_az_http_client_send_request(_az_http_request* request, az_http_response* response)
+az_result __wrap_az_http_client_send_request(_az_http_request const* request, az_http_response* ref_response)
 {
   return send_request(request, response);
 }

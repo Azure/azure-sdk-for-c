@@ -225,29 +225,29 @@ void _az_http_policy_logging_log_http_response(
 
 #ifndef AZ_NO_LOGGING
 AZ_NODISCARD az_result az_http_pipeline_policy_logging(
-    _az_http_policy* p_policies,
-    void* p_data,
-    _az_http_request* p_request,
-    az_http_response* p_response)
+    _az_http_policy* ref_policies,
+    void* ref_options,
+    _az_http_request* ref_request,
+    az_http_response* ref_response)
 {
-  (void)p_data;
+  (void)ref_options;
 
   if (_az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_REQUEST))
   {
-    _az_http_policy_logging_log_http_request(p_request);
+    _az_http_policy_logging_log_http_request(ref_request);
   }
 
   if (!_az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_RESPONSE))
   {
     // If no logging is needed, do not even measure the response time.
-    return _az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
+    return _az_http_pipeline_nextpolicy(ref_policies, ref_request, ref_response);
   }
 
   int64_t const start = az_platform_clock_msec();
-  az_result const result = _az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
+  az_result const result = _az_http_pipeline_nextpolicy(ref_policies, ref_request, ref_response);
   int64_t const end = az_platform_clock_msec();
 
-  _az_http_policy_logging_log_http_response(p_response, end - start, p_request);
+  _az_http_policy_logging_log_http_response(ref_response, end - start, ref_request);
 
   return result;
 }

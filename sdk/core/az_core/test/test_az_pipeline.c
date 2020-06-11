@@ -16,16 +16,16 @@
 
 // define 2 test policies
 az_result test_policy_1(
-    _az_http_policy* p_policies,
-    void* p_options,
-    _az_http_request* p_request,
-    az_http_response* p_response);
+    _az_http_policy* ref_policies,
+    void* ref_options,
+    _az_http_request* ref_request,
+    az_http_response* ref_response);
 
 az_result test_policy_2(
-    _az_http_policy* p_policies,
-    void* p_options,
-    _az_http_request* p_request,
-    az_http_response* p_response);
+    _az_http_policy* ref_policies,
+    void* ref_options,
+    _az_http_request* ref_request,
+    az_http_response* ref_response);
 
 void test_az_http_pipeline_process();
 
@@ -47,26 +47,26 @@ void test_az_http_pipeline_process()
   az_span remainder = az_span_copy(url_span, AZ_SPAN_FROM_STR("url"));
   assert_int_equal(az_span_size(remainder), 97);
   az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-  _az_http_request hrb;
+  _az_http_request request;
 
   assert_return_code(
       az_http_request_init(
-          &hrb, &az_context_app, az_http_method_get(), url_span, 3, header_span, AZ_SPAN_NULL),
+          &request, &az_context_app, az_http_method_get(), url_span, 3, header_span, AZ_SPAN_NULL),
       AZ_OK);
 
   _az_http_pipeline pipeline = (_az_http_pipeline){
         ._internal = {
-          .p_policies = {
+          .policies = {
             {
               ._internal = {
                 .process = test_policy_1,
-                .p_options= NULL,
+                .options= NULL,
               },
             },
             {
               ._internal = {
                 .process = test_policy_2,
-                .p_options = NULL,
+                .options = NULL,
               },
             },
         },
@@ -78,32 +78,32 @@ void test_az_http_pipeline_process()
   az_http_response response;
   assert_return_code(az_http_response_init(&response, response_buffer), AZ_OK);
 
-  assert_return_code(az_http_pipeline_process(&pipeline, &hrb, &response), AZ_OK);
+  assert_return_code(az_http_pipeline_process(&pipeline, &request, &response), AZ_OK);
 }
 
 az_result test_policy_1(
-    _az_http_policy* p_policies,
-    void* p_options,
-    _az_http_request* p_request,
-    az_http_response* p_response)
+    _az_http_policy* ref_policies,
+    void* ref_options,
+    _az_http_request* ref_request,
+    az_http_response* ref_response)
 {
-  (void)p_policies;
-  (void)p_options;
-  (void)p_request;
-  (void)p_response;
-  return _az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
+  (void)ref_policies;
+  (void)ref_options;
+  (void)ref_request;
+  (void)ref_response;
+  return _az_http_pipeline_nextpolicy(ref_policies, ref_request, ref_response);
 }
 
 az_result test_policy_2(
-    _az_http_policy* p_policies,
-    void* p_options,
-    _az_http_request* p_request,
-    az_http_response* p_response)
+    _az_http_policy* ref_policies,
+    void* ref_options,
+    _az_http_request* ref_request,
+    az_http_response* ref_response)
 {
-  (void)p_policies;
-  (void)p_options;
-  (void)p_request;
-  (void)p_response;
+  (void)ref_policies;
+  (void)ref_options;
+  (void)ref_request;
+  (void)ref_response;
   return AZ_OK;
 }
 

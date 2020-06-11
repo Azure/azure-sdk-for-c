@@ -114,19 +114,20 @@ _az_span_append_header_to_buffer(az_span writable_buffer, az_pair header, az_spa
 }
 
 static AZ_NODISCARD az_result
-_az_http_client_curl_slist_append(struct curl_slist** self, char const* str)
+_az_http_client_curl_slist_append(struct curl_slist** ref_list, char const* str)
 {
-  _az_PRECONDITION_NOT_NULL(self);
+  _az_PRECONDITION_NOT_NULL(ref_list);
   _az_PRECONDITION_NOT_NULL(str);
 
-  struct curl_slist* const p_list = curl_slist_append(*self, str);
-  if (p_list == NULL)
+  struct curl_slist* const new_list = curl_slist_append(*ref_list, str);
+  if (new_list == NULL)
   {
     // free any previous allocates custom headers
-    curl_slist_free_all(*self);
+    curl_slist_free_all(*ref_list);
     return AZ_ERROR_HTTP_PLATFORM;
   }
-  *self = p_list;
+
+  *ref_list = new_list;
   return AZ_OK;
 }
 
@@ -136,16 +137,16 @@ _az_http_client_curl_slist_append(struct curl_slist** self, char const* str)
  * free after setting curl header.
  *
  * @param header a key and value representing an http header
- * @param p_list list of headers as curl list
+ * @param ref_list list of headers as curl list
  * @param separator a symbol to be used between key and value for a header
  * @return az_result
  */
 static AZ_NODISCARD az_result _az_http_client_curl_add_header_to_curl_list(
     az_pair header,
-    struct curl_slist** p_list,
+    struct curl_slist** ref_list,
     az_span separator)
 {
-  _az_PRECONDITION_NOT_NULL(p_list);
+  _az_PRECONDITION_NOT_NULL(ref_list);
 
   // allocate a buffer for header
   az_span writable_buffer;
@@ -163,7 +164,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_add_header_to_curl_list(
   if (az_succeeded(result))
   {
     char const* const buffer = (char const*)az_span_ptr(writable_buffer);
-    result = _az_http_client_curl_slist_append(p_list, buffer);
+    result = _az_http_client_curl_slist_append(ref_list, buffer);
   }
 
   // at any case, error or OK, free the allocated memory
@@ -190,44 +191,44 @@ static AZ_NODISCARD az_result _az_http_client_curl_add_header_to_curl_list(
  * any header, using -H / CURLOPT_HTTPHEADER, or by forcing it to use HTTP 1.0.
  *
  * This function is meant to be called after all headers from original request was called. It will
- * append another header and set headers for a p_curl session
+ * append another header and set headers for a ref_curl session
  *
- * @param p_curl reference to an easy curl session
- * @param p_list list of headers as curl list
+ * @param ref_curl reference to an easy curl session
+ * @param ref_list list of headers as curl list
  *
  * @return az_result
  */
 static AZ_NODISCARD az_result
-_az_http_client_curl_add_expect_header(CURL* p_curl, struct curl_slist** p_list)
+_az_http_client_curl_add_expect_header(CURL* ref_curl, struct curl_slist** ref_list)
 {
-  _az_PRECONDITION_NOT_NULL(p_curl);
-  _az_PRECONDITION_NOT_NULL(p_list);
+  _az_PRECONDITION_NOT_NULL(ref_curl);
+  _az_PRECONDITION_NOT_NULL(ref_list);
 
   // Append header to current custom headers list
-  AZ_RETURN_IF_FAILED(_az_http_client_curl_slist_append(p_list, "Expect:"));
+  AZ_RETURN_IF_FAILED(_az_http_client_curl_slist_append(ref_list, "Expect:"));
   // Update the reference to curl custom list (in case it gets moved in memory due to appending)
-  AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl, CURLOPT_HTTPHEADER, *p_list));
+  AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(ref_curl, CURLOPT_HTTPHEADER, *ref_list));
   return AZ_OK;
 }
 
 /**
  * @brief loop all the headers from a HTTP request and set each header into easy curl
  *
- * @param p_request an http builder request reference
- * @param p_headers list of headers in curl specific list
+ * @param ref_request an http builder request reference
+ * @param ref_headers list of headers in curl specific list
  * @return az_result
  */
 static AZ_NODISCARD az_result
-_az_http_client_curl_build_headers(_az_http_request* p_request, struct curl_slist** p_headers)
+_az_http_client_curl_build_headers(_az_http_request const* request, struct curl_slist** ref_headers)
 {
-  _az_PRECONDITION_NOT_NULL(p_request);
+  _az_PRECONDITION_NOT_NULL(request);
 
   az_pair header;
-  for (int32_t offset = 0; offset < az_http_request_headers_count(p_request); ++offset)
+  for (int32_t offset = 0; offset < az_http_request_headers_count(request); ++offset)
   {
-    AZ_RETURN_IF_FAILED(az_http_request_get_header(p_request, offset, &header));
+    AZ_RETURN_IF_FAILED(az_http_request_get_header(request, offset, &header));
     AZ_RETURN_IF_FAILED(
-        _az_http_client_curl_add_header_to_curl_list(header, p_headers, AZ_SPAN_FROM_STR(":")));
+        _az_http_client_curl_add_header_to_curl_list(header, ref_headers, AZ_SPAN_FROM_STR(":")));
   }
 
   return AZ_OK;
@@ -291,12 +292,12 @@ static size_t _az_http_client_curl_write_to_span(
 /**
  * handles GET request
  */
-static AZ_NODISCARD az_result _az_http_client_curl_send_get_request(CURL* p_curl)
+static AZ_NODISCARD az_result _az_http_client_curl_send_get_request(CURL* ref_curl)
 {
-  _az_PRECONDITION_NOT_NULL(p_curl);
+  _az_PRECONDITION_NOT_NULL(ref_curl);
 
   // send
-  AZ_RETURN_IF_CURL_FAILED(curl_easy_perform(p_curl));
+  AZ_RETURN_IF_CURL_FAILED(curl_easy_perform(ref_curl));
 
   return AZ_OK;
 }
@@ -305,15 +306,14 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_get_request(CURL* p_curl
  * handles DELETE request
  */
 static AZ_NODISCARD az_result
-_az_http_client_curl_send_delete_request(CURL* p_curl, _az_http_request const* p_request)
+_az_http_client_curl_send_delete_request(CURL* ref_curl)
 {
-  _az_PRECONDITION_NOT_NULL(p_curl);
-  _az_PRECONDITION_NOT_NULL(p_request);
+  _az_PRECONDITION_NOT_NULL(ref_curl)
 
   AZ_RETURN_IF_FAILED(_az_http_client_curl_code_to_result(
-      curl_easy_setopt(p_curl, CURLOPT_CUSTOMREQUEST, "DELETE")));
+      curl_easy_setopt(ref_curl, CURLOPT_CUSTOMREQUEST, "DELETE")));
 
-  AZ_RETURN_IF_FAILED(_az_http_client_curl_code_to_result(curl_easy_perform(p_curl)));
+  AZ_RETURN_IF_FAILED(_az_http_client_curl_code_to_result(curl_easy_perform(ref_curl)));
 
   return AZ_OK;
 }
@@ -322,14 +322,14 @@ _az_http_client_curl_send_delete_request(CURL* p_curl, _az_http_request const* p
  * handles POST request. It handles seting up a body for request
  */
 static AZ_NODISCARD az_result
-_az_http_client_curl_send_post_request(CURL* p_curl, _az_http_request const* p_request)
+_az_http_client_curl_send_post_request(CURL* ref_curl, _az_http_request const* request)
 {
-  _az_PRECONDITION_NOT_NULL(p_curl);
-  _az_PRECONDITION_NOT_NULL(p_request);
+  _az_PRECONDITION_NOT_NULL(ref_curl);
+  _az_PRECONDITION_NOT_NULL(request);
 
   // Method
   az_span request_body = { 0 };
-  AZ_RETURN_IF_FAILED(az_http_request_get_body(p_request, &request_body));
+  AZ_RETURN_IF_FAILED(az_http_request_get_body(request, &request_body));
   az_span body = { 0 };
   int32_t const required_length = az_span_size(request_body) + az_span_size(AZ_SPAN_FROM_STR("\0"));
 
@@ -339,10 +339,10 @@ _az_http_client_curl_send_post_request(CURL* p_curl, _az_http_request const* p_r
   az_span_to_str(b, required_length, request_body);
 
   az_result res_code
-      = _az_http_client_curl_code_to_result(curl_easy_setopt(p_curl, CURLOPT_POSTFIELDS, b));
+      = _az_http_client_curl_code_to_result(curl_easy_setopt(ref_curl, CURLOPT_POSTFIELDS, b));
   if (az_succeeded(res_code))
   {
-    res_code = _az_http_client_curl_code_to_result(curl_easy_perform(p_curl));
+    res_code = _az_http_client_curl_code_to_result(curl_easy_perform(ref_curl));
   }
 
   _az_span_free(&body);
@@ -407,29 +407,29 @@ static int32_t _az_http_client_curl_upload_read_callback(
  * As of CURL 7.12.1 CURLOPT_PUT is deprecated.  PUT requests should be made using CURLOPT_UPLOAD
  */
 static AZ_NODISCARD az_result
-_az_http_client_curl_send_upload_request(CURL* p_curl, _az_http_request const* p_request)
+_az_http_client_curl_send_upload_request(CURL* ref_curl, _az_http_request const* request)
 {
-  _az_PRECONDITION_NOT_NULL(p_curl);
-  _az_PRECONDITION_NOT_NULL(p_request);
+  _az_PRECONDITION_NOT_NULL(ref_curl);
+  _az_PRECONDITION_NOT_NULL(request);
 
   az_span body = { 0 };
-  AZ_RETURN_IF_FAILED(az_http_request_get_body(p_request, &body));
+  AZ_RETURN_IF_FAILED(az_http_request_get_body(request, &body));
 
-  AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl, CURLOPT_UPLOAD, 1L));
+  AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(ref_curl, CURLOPT_UPLOAD, 1L));
   AZ_RETURN_IF_CURL_FAILED(
-      curl_easy_setopt(p_curl, CURLOPT_READFUNCTION, _az_http_client_curl_upload_read_callback));
+      curl_easy_setopt(ref_curl, CURLOPT_READFUNCTION, _az_http_client_curl_upload_read_callback));
 
   // Setup the request to pass body into the read callback
   // The read callback receives the address of body
-  AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl, CURLOPT_READDATA, &body));
+  AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(ref_curl, CURLOPT_READDATA, &body));
 
   // Set the size of the upload
   AZ_RETURN_IF_CURL_FAILED(
-      curl_easy_setopt(p_curl, CURLOPT_INFILESIZE, (curl_off_t)az_span_size(body)));
+      curl_easy_setopt(ref_curl, CURLOPT_INFILESIZE, (curl_off_t)az_span_size(body)));
 
   // Do the curl work
   // curl_easy_perform does not return until the CURLOPT_READFUNCTION callbacks complete.
-  AZ_RETURN_IF_CURL_FAILED(curl_easy_perform(p_curl));
+  AZ_RETURN_IF_CURL_FAILED(curl_easy_perform(ref_curl));
 
   return AZ_OK;
 }
@@ -437,28 +437,29 @@ _az_http_client_curl_send_upload_request(CURL* p_curl, _az_http_request const* p
 /**
  * @brief finds out if there are headers in the request and add them to curl header list
  *
- * @param p_curl curl specific structure to send a request
- * @param p_request an http request builder
+ * @param ref_curl curl specific structure to send a request
+ * @param ref_list curl headers list
+ * @param request an http request
  * @return az_result
  */
 static AZ_NODISCARD az_result _az_http_client_curl_setup_headers(
-    CURL* p_curl,
-    struct curl_slist** p_list,
-    _az_http_request* p_request)
+    CURL* ref_curl,
+    struct curl_slist** ref_list,
+    _az_http_request const* request)
 {
-  _az_PRECONDITION_NOT_NULL(p_curl);
-  _az_PRECONDITION_NOT_NULL(p_request);
+  _az_PRECONDITION_NOT_NULL(ref_curl);
+  _az_PRECONDITION_NOT_NULL(request);
 
-  if (az_http_request_headers_count(p_request) == 0)
+  if (az_http_request_headers_count(request) == 0)
   {
     // no headers, no need to set it up
     return AZ_OK;
   }
 
   // build headers into a slist as curl is expecting
-  AZ_RETURN_IF_FAILED(_az_http_client_curl_build_headers(p_request, p_list));
+  AZ_RETURN_IF_FAILED(_az_http_client_curl_build_headers(request, ref_list));
   // set all headers from slist
-  AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl, CURLOPT_HTTPHEADER, *p_list));
+  AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(ref_curl, CURLOPT_HTTPHEADER, *ref_list));
 
   return AZ_OK;
 }
@@ -466,19 +467,19 @@ static AZ_NODISCARD az_result _az_http_client_curl_setup_headers(
 /**
  * @brief set url for the request
  *
- * @param p_curl specific curl struct to send a request
- * @param p_request an az http request builder holding all data to send request
+ * @param ref_curl specific curl struct to send a request
+ * @param ref_request an az http request builder holding all data to send request
  * @return az_result
  */
 static AZ_NODISCARD az_result
-_az_http_client_curl_setup_url(CURL* p_curl, _az_http_request const* p_request)
+_az_http_client_curl_setup_url(CURL* ref_curl, _az_http_request const* request)
 {
-  _az_PRECONDITION_NOT_NULL(p_curl);
-  _az_PRECONDITION_NOT_NULL(p_request);
+  _az_PRECONDITION_NOT_NULL(ref_curl);
+  _az_PRECONDITION_NOT_NULL(request);
 
   az_span request_url = { 0 };
   // get request_url. It will have the size of what it has written in it only
-  AZ_RETURN_IF_FAILED(az_http_request_get_url(p_request, &request_url));
+  AZ_RETURN_IF_FAILED(az_http_request_get_url(request, &request_url));
   int32_t request_url_size = az_span_size(request_url);
 
   az_span writable_buffer;
@@ -497,7 +498,7 @@ _az_http_client_curl_setup_url(CURL* p_curl, _az_http_request const* p_request)
   if (az_succeeded(result))
   {
     char* buffer = (char*)az_span_ptr(writable_buffer);
-    result = _az_http_client_curl_code_to_result(curl_easy_setopt(p_curl, CURLOPT_URL, buffer));
+    result = _az_http_client_curl_code_to_result(curl_easy_setopt(ref_curl, CURLOPT_URL, buffer));
   }
 
   // free used buffer before anything else
@@ -511,24 +512,24 @@ _az_http_client_curl_setup_url(CURL* p_curl, _az_http_request const* p_request)
 /**
  * @brief set url the response redirection to user buffer
  *
- * @param p_curl specific curl structure used to send http request
+ * @param ref_curl specific curl structure used to send http request
  * @param response an http response object which will hold all the HTTP response
  * @return az_result
  */
 static AZ_NODISCARD az_result
-_az_http_client_curl_setup_response_redirect(CURL* p_curl, az_http_response* response)
+_az_http_client_curl_setup_response_redirect(CURL* ref_curl, az_http_response* response)
 {
-  _az_PRECONDITION_NOT_NULL(p_curl);
+  _az_PRECONDITION_NOT_NULL(ref_curl);
 
   AZ_RETURN_IF_CURL_FAILED(
-      curl_easy_setopt(p_curl, CURLOPT_HEADERFUNCTION, _az_http_client_curl_write_to_span));
+      curl_easy_setopt(ref_curl, CURLOPT_HEADERFUNCTION, _az_http_client_curl_write_to_span));
 
-  AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl, CURLOPT_HEADERDATA, (void*)response));
+  AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(ref_curl, CURLOPT_HEADERDATA, (void*)response));
 
   AZ_RETURN_IF_CURL_FAILED(
-      curl_easy_setopt(p_curl, CURLOPT_WRITEFUNCTION, _az_http_client_curl_write_to_span));
+      curl_easy_setopt(ref_curl, CURLOPT_WRITEFUNCTION, _az_http_client_curl_write_to_span));
 
-  AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(p_curl, CURLOPT_WRITEDATA, (void*)response));
+  AZ_RETURN_IF_CURL_FAILED(curl_easy_setopt(ref_curl, CURLOPT_WRITEDATA, (void*)response));
 
   return AZ_OK;
 }
@@ -537,51 +538,51 @@ _az_http_client_curl_setup_response_redirect(CURL* p_curl, az_http_response* res
  * @brief use this method to group all the actions that we do with CURL so we can clean it after it
  * no matter is there is an error at any step.
  *
- * @param p_curl curl specific structure used to send an http request
- * @param p_request http builder with specific data to build an http request
+ * @param ref_curl curl specific structure used to send an http request
+ * @param ref_request http builder with specific data to build an http request
  * @param response pre-allocated buffer where to write http response
 
  * @return AZ_OK if request was sent and a response was received
  */
 static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
-    CURL* p_curl,
-    _az_http_request* p_request,
-    az_http_response* response)
+    CURL* ref_curl,
+    _az_http_request const* request,
+    az_http_response* ref_response)
 {
-  _az_PRECONDITION_NOT_NULL(p_curl);
-  _az_PRECONDITION_NOT_NULL(p_request);
+  _az_PRECONDITION_NOT_NULL(ref_curl);
+  _az_PRECONDITION_NOT_NULL(request);
 
   az_result result = AZ_ERROR_ARG;
 
-  struct curl_slist* p_list = NULL;
-  AZ_RETURN_IF_FAILED(_az_http_client_curl_setup_headers(p_curl, &p_list, p_request));
+  struct curl_slist* list = NULL;
+  AZ_RETURN_IF_FAILED(_az_http_client_curl_setup_headers(ref_curl, &list, request));
 
-  AZ_RETURN_IF_FAILED(_az_http_client_curl_setup_url(p_curl, p_request));
+  AZ_RETURN_IF_FAILED(_az_http_client_curl_setup_url(ref_curl, request));
 
-  AZ_RETURN_IF_FAILED(_az_http_client_curl_setup_response_redirect(p_curl, response));
+  AZ_RETURN_IF_FAILED(_az_http_client_curl_setup_response_redirect(ref_curl, ref_response));
 
   az_http_method method;
-  AZ_RETURN_IF_FAILED(az_http_request_get_method(p_request, &method));
+  AZ_RETURN_IF_FAILED(az_http_request_get_method(request, &method));
 
   if (az_span_is_content_equal(method, az_http_method_get()))
   {
-    result = _az_http_client_curl_send_get_request(p_curl);
+    result = _az_http_client_curl_send_get_request(ref_curl);
   }
   else if (az_span_is_content_equal(method, az_http_method_delete()))
   {
-    result = _az_http_client_curl_send_delete_request(p_curl, p_request);
+    result = _az_http_client_curl_send_delete_request(ref_curl, request);
   }
   else if (az_span_is_content_equal(method, az_http_method_post()))
   {
-    AZ_RETURN_IF_FAILED(_az_http_client_curl_add_expect_header(p_curl, &p_list));
-    result = _az_http_client_curl_send_post_request(p_curl, p_request);
+    AZ_RETURN_IF_FAILED(_az_http_client_curl_add_expect_header(ref_curl, &list));
+    result = _az_http_client_curl_send_post_request(ref_curl, request);
   }
   else if (az_span_is_content_equal(method, az_http_method_put()))
   {
     // As of CURL 7.12.1 CURLOPT_PUT is deprecated.  PUT requests should be made using
     // CURLOPT_UPLOAD
-    AZ_RETURN_IF_FAILED(_az_http_client_curl_add_expect_header(p_curl, &p_list));
-    result = _az_http_client_curl_send_upload_request(p_curl, p_request);
+    AZ_RETURN_IF_FAILED(_az_http_client_curl_add_expect_header(ref_curl, &list));
+    result = _az_http_client_curl_send_upload_request(ref_curl, request);
   }
   else
   {
@@ -589,7 +590,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
   }
 
   // Clean custom headers previously appended
-  curl_slist_free_all(p_list);
+  curl_slist_free_all(list);
 
   return result;
 }
@@ -597,27 +598,27 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
 /**
  * @brief uses AZ_HTTP_BUILDER to set up CURL request and perform it.
  *
- * @param p_request an internal http builder with data to build and send http request
- * @param p_response pre-allocated buffer where http response will be written
+ * @param request an internal http builder with data to build and send http request
+ * @param ref_response pre-allocated buffer where http response will be written
  * @return az_result
  */
 AZ_NODISCARD az_result
-az_http_client_send_request(_az_http_request* p_request, az_http_response* p_response)
+az_http_client_send_request(_az_http_request const* request, az_http_response* ref_response)
 {
-  _az_PRECONDITION_NOT_NULL(p_request);
-  _az_PRECONDITION_NOT_NULL(p_response);
+  _az_PRECONDITION_NOT_NULL(request);
+  _az_PRECONDITION_NOT_NULL(ref_response);
 
-  CURL* p_curl = NULL;
+  CURL* curl = NULL;
 
   // init curl
-  AZ_RETURN_IF_FAILED(_az_http_client_curl_init(&p_curl));
+  AZ_RETURN_IF_FAILED(_az_http_client_curl_init(&curl));
 
   // process request
   az_result process_result
-      = _az_http_client_curl_send_request_impl_process(p_curl, p_request, p_response);
+      = _az_http_client_curl_send_request_impl_process(curl, request, ref_response);
 
   // no matter if error or not, call curl done before returning to let curl clean everything
-  AZ_RETURN_IF_FAILED(_az_http_client_curl_done(&p_curl));
+  AZ_RETURN_IF_FAILED(_az_http_client_curl_done(&curl));
 
   return process_result;
 }

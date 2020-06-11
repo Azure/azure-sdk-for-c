@@ -71,43 +71,43 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
       .credential = cred,
       .pipeline = (_az_http_pipeline){
         ._internal = {
-          .p_policies = {
+          .policies = {
             {
               ._internal = {
                 .process = az_http_pipeline_policy_apiversion,
-                .p_options= &client->_internal.options._internal.api_version,
+                .options= &client->_internal.options._internal.api_version,
               },
             },
             {
               ._internal = {
                 .process = az_http_pipeline_policy_telemetry,
-                .p_options = &client->_internal.options._internal._telemetry_options,
+                .options = &client->_internal.options._internal._telemetry_options,
               },
             },
             {
               ._internal = {
                 .process = az_http_pipeline_policy_retry,
-                .p_options = &client->_internal.options.retry,
+                .options = &client->_internal.options.retry,
               },
             },
             {
               ._internal = {
                 .process = az_http_pipeline_policy_credential,
-                .p_options = cred,
+                .options = cred,
               },
             },
 #ifndef AZ_NO_LOGGING
             {
               ._internal = {
                 .process = az_http_pipeline_policy_logging,
-                .p_options = NULL,
+                .options = NULL,
               },
             },
 #endif // AZ_NO_LOGGING
             {
               ._internal = {
                 .process = az_http_pipeline_policy_transport,
-                .p_options = NULL,
+                .options = NULL,
               },
             },
           },
@@ -160,9 +160,9 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
   az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
 
   // create request
-  _az_http_request hrb;
+  _az_http_request request;
   AZ_RETURN_IF_FAILED(az_http_request_init(
-      &hrb,
+      &request,
       context,
       az_http_method_put(),
       request_url_span,
@@ -172,24 +172,24 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
 
   // add blob type to request
   AZ_RETURN_IF_FAILED(az_http_request_append_header(
-      &hrb, AZ_STORAGE_BLOBS_BLOB_HEADER_X_MS_BLOB_TYPE, AZ_STORAGE_BLOBS_BLOB_TYPE_BLOCKBLOB));
+      &request, AZ_STORAGE_BLOBS_BLOB_HEADER_X_MS_BLOB_TYPE, AZ_STORAGE_BLOBS_BLOB_TYPE_BLOCKBLOB));
 
   //
   uint8_t content_length[_az_INT64_AS_STR_BUF_SIZE] = { 0 };
-  az_span content_length_builder = AZ_SPAN_FROM_BUFFER(content_length);
+  az_span content_length_span = AZ_SPAN_FROM_BUFFER(content_length);
   az_span remainder;
-  AZ_RETURN_IF_FAILED(az_span_i64toa(content_length_builder, az_span_size(content), &remainder));
-  content_length_builder
-      = az_span_slice(content_length_builder, 0, _az_span_diff(remainder, content_length_builder));
+  AZ_RETURN_IF_FAILED(az_span_i64toa(content_length_span, az_span_size(content), &remainder));
+  content_length_span
+      = az_span_slice(content_length_span, 0, _az_span_diff(remainder, content_length_span));
 
   // add Content-Length to request
   AZ_RETURN_IF_FAILED(
-      az_http_request_append_header(&hrb, AZ_HTTP_HEADER_CONTENT_LENGTH, content_length_builder));
+      az_http_request_append_header(&request, AZ_HTTP_HEADER_CONTENT_LENGTH, content_length_span));
 
   // add blob type to request
   AZ_RETURN_IF_FAILED(az_http_request_append_header(
-      &hrb, AZ_HTTP_HEADER_CONTENT_TYPE, AZ_SPAN_FROM_STR("text/plain")));
+      &request, AZ_HTTP_HEADER_CONTENT_TYPE, AZ_SPAN_FROM_STR("text/plain")));
 
   // start pipeline
-  return az_http_pipeline_process(&client->_internal.pipeline, &hrb, response);
+  return az_http_pipeline_process(&client->_internal.pipeline, &request, response);
 }

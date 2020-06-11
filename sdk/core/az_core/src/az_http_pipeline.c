@@ -8,17 +8,17 @@
 #include <_az_cfg.h>
 
 AZ_NODISCARD az_result az_http_pipeline_process(
-    _az_http_pipeline* pipeline,
-    _az_http_request* p_request,
-    az_http_response* p_response)
+    _az_http_pipeline* ref_pipeline,
+    _az_http_request* ref_request,
+    az_http_response* ref_response)
 {
-  _az_PRECONDITION_NOT_NULL(p_request);
-  _az_PRECONDITION_NOT_NULL(p_response);
-  _az_PRECONDITION_NOT_NULL(pipeline);
+  _az_PRECONDITION_NOT_NULL(ref_request);
+  _az_PRECONDITION_NOT_NULL(ref_response);
+  _az_PRECONDITION_NOT_NULL(ref_pipeline);
 
-  return pipeline->_internal.p_policies[0]._internal.process(
-      &(pipeline->_internal.p_policies[1]),
-      pipeline->_internal.p_policies[0]._internal.p_options,
-      p_request,
-      p_response);
+  return ref_pipeline->_internal.policies[0]._internal.process(
+      &(ref_pipeline->_internal.policies[1]),
+      ref_pipeline->_internal.policies[0]._internal.options,
+      ref_request,
+      ref_response);
 }

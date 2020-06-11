@@ -12,10 +12,10 @@
 #include <_az_cfg_prefix.h>
 
 AZ_NODISCARD az_result
-_az_credential_token_set_token(_az_credential_token* self, _az_token const* new_token);
+_az_credential_token_set_token(_az_credential_token* ref_credential, _az_token const* new_token);
 
 AZ_NODISCARD az_result
-_az_credential_token_get_token(_az_credential_token* self, _az_token* out_token);
+_az_credential_token_get_token(_az_credential_token* ref_credential, _az_token* out_token);
 
 
 // Do not invoke on the _az_credential_token directly, i.e. _az_token_expired(&token_credential->_internal.token).

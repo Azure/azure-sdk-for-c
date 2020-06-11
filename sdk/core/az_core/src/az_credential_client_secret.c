@@ -76,23 +76,23 @@ static AZ_NODISCARD az_result _az_credential_client_secret_apply_policy(
 }
 
 static AZ_NODISCARD az_result
-_az_credential_client_secret_set_scopes(az_credential_client_secret* self, az_span scopes)
+_az_credential_client_secret_set_scopes(az_credential_client_secret* ref_credential, az_span scopes)
 {
-  self->_internal.scopes = scopes;
+  ref_credential->_internal.scopes = scopes;
   return AZ_OK;
 }
 
 AZ_NODISCARD az_result az_credential_client_secret_init(
-    az_credential_client_secret* self,
+    az_credential_client_secret* out_credential,
     az_span tenant_id,
     az_span client_id,
     az_span client_secret)
 {
-  *self = (az_credential_client_secret){
+  *out_credential = (az_credential_client_secret){
     ._internal = {
       .credential = {
         ._internal = {
-          .apply_credential_policy = (_az_credential_apply_policy_fn)_az_credential_client_secret_apply_policy,
+          .apply_credential_policy = (_az_http_policy_process_fn)_az_credential_client_secret_apply_policy,
           .set_scopes = (_az_credential_set_scopes_fn)_az_credential_client_secret_set_scopes,
           },
         },
