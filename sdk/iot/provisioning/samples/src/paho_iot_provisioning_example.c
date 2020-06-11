@@ -3,11 +3,12 @@
 
 #ifdef _MSC_VER
 // warning C4201: nonstandard extension used: nameless struct/union
+#pragma warning(push)
 #pragma warning(disable : 4201)
 #endif
 #include <paho-mqtt/MQTTClient.h>
 #ifdef _MSC_VER
-#pragma warning(default : 4201)
+#pragma warning(pop)
 #endif
 
 #include <stdio.h>
@@ -25,8 +26,10 @@
 #include <az_result.h>
 #include <az_span.h>
 
-// TODO: #564 - Remove the use of the _az_cfh.h header in samples.
-#include <_az_cfg.h>
+#ifdef _MSC_VER
+// "'getenv': This function or variable may be unsafe. Consider using _dupenv_s instead."
+#pragma warning(disable : 4996)
+#endif
 
 // DO NOT MODIFY: Service information
 #define ENV_GLOBAL_PROVISIONING_ENDPOINT_DEFAULT "ssl://global.azure-devices-provisioning.net:8883"
@@ -111,7 +114,7 @@ static az_result read_configuration_and_init_client()
 {
   az_span endpoint_span = AZ_SPAN_FROM_BUFFER(global_provisioning_endpoint);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
-      "Global Device Endpoint",
+      ENV_GLOBAL_PROVISIONING_ENDPOINT,
       ENV_GLOBAL_PROVISIONING_ENDPOINT,
       ENV_GLOBAL_PROVISIONING_ENDPOINT_DEFAULT,
       false,
@@ -120,11 +123,11 @@ static az_result read_configuration_and_init_client()
 
   az_span id_scope_span = AZ_SPAN_FROM_BUFFER(id_scope);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
-      "ID_Scope", ENV_ID_SCOPE_ENV, NULL, false, id_scope_span, &id_scope_span));
+      ENV_ID_SCOPE_ENV, ENV_ID_SCOPE_ENV, NULL, false, id_scope_span, &id_scope_span));
 
   az_span registration_id_span = AZ_SPAN_FROM_BUFFER(registration_id);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
-      "Registration ID",
+      ENV_REGISTRATION_ID_ENV,
       ENV_REGISTRATION_ID_ENV,
       NULL,
       false,
@@ -133,11 +136,11 @@ static az_result read_configuration_and_init_client()
 
   az_span cert = AZ_SPAN_FROM_BUFFER(x509_cert_pem_file);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
-      "X509 Certificate PEM Store File", ENV_DEVICE_X509_CERT_PEM_FILE, NULL, false, cert, &cert));
+      ENV_DEVICE_X509_CERT_PEM_FILE, ENV_DEVICE_X509_CERT_PEM_FILE, NULL, false, cert, &cert));
 
   az_span trusted = AZ_SPAN_FROM_BUFFER(x509_trust_pem_file);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
-      "X509 Trusted PEM Store File", ENV_DEVICE_X509_TRUST_PEM_FILE, "", false, trusted, &trusted));
+      ENV_DEVICE_X509_TRUST_PEM_FILE, ENV_DEVICE_X509_TRUST_PEM_FILE, "", false, trusted, &trusted));
 
   // Initialize the provisioning client with the provisioning endpoint and the default connection
   // options

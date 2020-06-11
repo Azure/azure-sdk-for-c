@@ -3,11 +3,12 @@
 
 #ifdef _MSC_VER
 // warning C4201: nonstandard extension used: nameless struct/union
+#pragma warning(push)
 #pragma warning(disable : 4201)
 #endif
 #include <paho-mqtt/MQTTClient.h>
 #ifdef _MSC_VER
-#pragma warning(default : 4201)
+#pragma warning(pop)
 #endif
 
 #include <stdio.h>
@@ -18,9 +19,10 @@
 #include <az_result.h>
 #include <az_span.h>
 
-// TODO: #564 - Remove the use of the _az_cfh.h header in samples.
-//              Note: this is required to work-around MQTTClient.h as well as az_span init issues.
-#include <_az_cfg.h>
+#ifdef _MSC_VER
+// "'getenv': This function or variable may be unsafe. Consider using _dupenv_s instead."
+#pragma warning(disable : 4996)
+#endif
 
 // DO NOT MODIFY: Device ID Environment Variable Name
 #define ENV_DEVICE_ID "AZ_IOT_DEVICE_ID"
@@ -114,19 +116,19 @@ static az_result read_configuration_and_init_client()
 {
   az_span cert = AZ_SPAN_FROM_BUFFER(x509_cert_pem_file);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
-      "X509 Certificate PEM Store File", ENV_DEVICE_X509_CERT_PEM_FILE, NULL, false, cert, &cert));
+      ENV_DEVICE_X509_CERT_PEM_FILE, ENV_DEVICE_X509_CERT_PEM_FILE, NULL, false, cert, &cert));
 
   az_span trusted = AZ_SPAN_FROM_BUFFER(x509_trust_pem_file);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
-      "X509 Trusted PEM Store File", ENV_DEVICE_X509_TRUST_PEM_FILE, "", false, trusted, &trusted));
+      ENV_DEVICE_X509_TRUST_PEM_FILE, ENV_DEVICE_X509_TRUST_PEM_FILE, "", false, trusted, &trusted));
 
   az_span device_id_span = AZ_SPAN_FROM_BUFFER(device_id);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
-      "Device ID", ENV_DEVICE_ID, "", false, device_id_span, &device_id_span));
+      ENV_DEVICE_ID, ENV_DEVICE_ID, "", false, device_id_span, &device_id_span));
 
   az_span iot_hub_hostname_span = AZ_SPAN_FROM_BUFFER(iot_hub_hostname);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
-      "IoT Hub Hostname",
+      ENV_IOT_HUB_HOSTNAME,
       ENV_IOT_HUB_HOSTNAME,
       "",
       false,

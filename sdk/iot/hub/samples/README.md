@@ -19,10 +19,15 @@ Key concepts are explained in detail [here][SDK_README_KEY_CONCEPTS].
 
 ## Prerequisites
 
-- To generate the device certificate, the provided script uses [OpenSSL](https://www.openssl.org/). Please
-install OpenSSL prior to using the script.
+- To generate the device certificate, the provided script uses [OpenSSL 1.1.1 LTS](https://www.openssl.org/source/). Please
+install the OpenSSL command line utility prior to using the script.
+  - Note: for Linux based systems, manual installation from source can be risky ([details here](https://github.com/openssl/openssl/issues/11227#issuecomment-616445289)). We recommend installing for Linux via apt:  
+  ```bash
+  sudo apt-get install libssl-dev
+  ```
 - To use the samples, we use [Eclipse Paho MQTT C client][Eclipse_Paho]. You can use the directions
 [here][VCPKG_DIRECTIONS] to set up VCPKG to download and manage linking the dependency.
+- If you are having trouble with any of the prerequisites, please see our `how_to_iot_hub_samples_<platform>.md` documents [here](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/iot/doc) for more help.
 
 ## Getting Started
 
