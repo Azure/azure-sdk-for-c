@@ -101,9 +101,9 @@ static void test_credential_client_secret(void** state)
   }
 }
 
-az_result send_request(_az_http_request* request, az_http_response* response);
+az_result send_request(_az_http_request const* request, az_http_response* response);
 
-az_result send_request(_az_http_request* request, az_http_response* response)
+az_result send_request(_az_http_request const* request, az_http_response* response)
 {
   // This function handles requests to both auth service and to the supposed service itself.
   // (we only can inject at compile time).
