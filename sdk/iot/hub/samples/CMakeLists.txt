@@ -17,6 +17,16 @@ if(NOT OpenSSL_FOUND)
   find_package(OpenSSL REQUIRED)
 endif()
 
+set (sample_link_libraries 
+  az_iot_hub
+  az_iot_common
+  az_core
+  ${PAL}
+  eclipse-paho-mqtt-c::paho-mqtt3cs-static
+  OpenSSL::SSL
+  OpenSSL::Crypto
+)
+
 # C2D Sample
 add_executable (
   paho_iot_hub_c2d_example 
@@ -25,20 +35,8 @@ add_executable (
 
 target_link_libraries(
   paho_iot_hub_c2d_example PRIVATE
-  az_iot_hub
-  az_iot_common
-  az_core
+  ${sample_link_libraries}
 )
-
-# PAL
-target_link_libraries(paho_iot_hub_c2d_example PRIVATE ${PAL})
-
-target_link_libraries(
-  paho_iot_hub_c2d_example PRIVATE
-  eclipse-paho-mqtt-c::paho-mqtt3cs-static
-  OpenSSL::SSL
-  OpenSSL::Crypto
-  )
 
 # Methods Sample
 add_executable (
@@ -48,20 +46,8 @@ add_executable (
 
 target_link_libraries(
   paho_iot_hub_methods_example PRIVATE
-  az_iot_hub
-  az_iot_common
-  az_core
-  )
-
-# PAL
-target_link_libraries(paho_iot_hub_methods_example PRIVATE ${PAL})
-
-target_link_libraries(
-  paho_iot_hub_methods_example PRIVATE
-  eclipse-paho-mqtt-c::paho-mqtt3cs-static
-  OpenSSL::SSL
-  OpenSSL::Crypto
-  )
+  ${sample_link_libraries}
+)
 
 # Telemetry Sample
 add_executable (
@@ -71,20 +57,8 @@ add_executable (
 
 target_link_libraries(
   paho_iot_hub_telemetry_example PRIVATE
-  az_iot_hub
-  az_iot_common
-  az_core
-  )
-
-# PAL
-target_link_libraries(paho_iot_hub_telemetry_example PRIVATE ${PAL})
-
-target_link_libraries(
-  paho_iot_hub_telemetry_example PRIVATE
-  eclipse-paho-mqtt-c::paho-mqtt3cs-static
-  OpenSSL::SSL
-  OpenSSL::Crypto
-  )
+  ${sample_link_libraries}
+)
 
 # Telemetry Sample
 add_executable (
@@ -95,9 +69,7 @@ add_executable (
 
 target_link_libraries(
   paho_iot_hub_sas_telemetry_example PRIVATE
-  az_iot_hub
-  az_iot_common
-  az_core
+  ${sample_link_libraries}
   )
 
 # PAL
@@ -118,17 +90,5 @@ add_executable (
 
 target_link_libraries(
   paho_iot_hub_twin_example PRIVATE
-  az_iot_hub
-  az_iot_common
-  az_core
-  )
-
-# PAL
-target_link_libraries(paho_iot_hub_twin_example PRIVATE ${PAL})
-
-target_link_libraries(
-  paho_iot_hub_twin_example PRIVATE
-  eclipse-paho-mqtt-c::paho-mqtt3cs-static
-  OpenSSL::SSL
-  OpenSSL::Crypto
-  )
+  ${sample_link_libraries}
+)
