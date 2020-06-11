@@ -164,7 +164,7 @@ AZ_NODISCARD AZ_INLINE az_result _az_http_pipeline_nextpolicy(
 /**
  * @brief Format buffer as a http request containing URL and header spans.
  *
- * @param ref_request HTTP request builder to initialize.
+ * @param out_request HTTP request builder to initialize.
  * @param method HTTP verb: `"GET"`, `"POST"`, etc.
  * @param url Maximum URL length (see @ref az_http_request_set_query_parameter).
  * @param headers_buffer HTTP verb: `"GET"`, `"POST"`, etc.

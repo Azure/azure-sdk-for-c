@@ -189,7 +189,7 @@ AZ_NODISCARD int32_t az_http_request_headers_count(_az_http_request const* reque
 /**
  * @brief Send an HTTP request through the wire and write the response into \p ref_response.
  *
- * @param[in] ref_request Points to an az_http_request that contains the settings and data that is
+ * @param[in] request Points to an az_http_request that contains the settings and data that is
  * used to send the request through the wire.
  * @param[out] ref_response Points to an az_http_response where the response from the wire will be
  * written.

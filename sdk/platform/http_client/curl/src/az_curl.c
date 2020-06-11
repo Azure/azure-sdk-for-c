@@ -308,7 +308,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_get_request(CURL* ref_cu
 static AZ_NODISCARD az_result
 _az_http_client_curl_send_delete_request(CURL* ref_curl)
 {
-  _az_PRECONDITION_NOT_NULL(ref_curl)
+  _az_PRECONDITION_NOT_NULL(ref_curl);
 
   AZ_RETURN_IF_FAILED(_az_http_client_curl_code_to_result(
       curl_easy_setopt(ref_curl, CURLOPT_CUSTOMREQUEST, "DELETE")));
@@ -570,7 +570,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
   }
   else if (az_span_is_content_equal(method, az_http_method_delete()))
   {
-    result = _az_http_client_curl_send_delete_request(ref_curl, request);
+    result = _az_http_client_curl_send_delete_request(ref_curl);
   }
   else if (az_span_is_content_equal(method, az_http_method_post()))
   {
