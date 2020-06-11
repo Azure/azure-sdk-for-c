@@ -25,37 +25,32 @@ _The following was run on Microsoft Windows 10.0.18363.836._
 
     After installing, check if cmake works correctly: 
 
-        ```shell
-        C:\>cmake --version
-        cmake version 3.15.19101501-MSVC_2
+    ```shell
+    C:\>cmake --version
+    cmake version 3.15.19101501-MSVC_2
 
-        CMake suite maintained and supported by Kitware (kitware.com/cmake).
+    CMake suite maintained and supported by Kitware (kitware.com/cmake).
 
-        C:\> 
-        ```
+    C:\> 
+    ```
 
 03. Install Paho using vcpkg
 
     The Azure IoT SDK for C uses Eclipse Paho installed via [vcpkg](https://github.com/Microsoft/vcpkg) (for the cmake integration).
 
-        ```shell
-        C:\> cd
-        C:\> git clone https://github.com/Microsoft/vcpkg
-        C:\> cd vcpkg/
-        C:\vcpkg> bootstrap-vcpkg.bat 
-        C:\vcpkg> vcpkg install paho-mqtt
-        ...
-        C:\vcpkg> vcpkg integrate install
-        Applied user-wide integration for this vcpkg root.
+    ```shell
+    C:\> cd
+    C:\> git clone https://github.com/Microsoft/vcpkg
+    C:\> cd vcpkg/
+    C:\vcpkg> bootstrap-vcpkg.bat 
+    C:\vcpkg> vcpkg install --triplet x64-windows-static curl[winssl] cmocka paho-mqtt
+    C:\vcpkg> vcpkg integrate install
+    ...
+    C:\vcpkg> set VCPKG_DEFAULT_TRIPLET=x64-windows-static
+    C:\vcpkg> set "VCPKG_ROOT=C:\vcpkg"
+    ```
 
-        All MSBuild C++ projects can now #include any installed libraries.
-        Linking will be handled automatically.
-        Installing new libraries will make them instantly available.
-
-        CMake projects should use: "-DCMAKE_TOOLCHAIN_FILE=c:/vcpkg/scripts/buildsystems/vcpkg.cmake"
-        ```
-
-    Save the `CMAKE_TOOLCHAIN_FILE` argument above, it will be used in a later step.
+    > Make sure `VCPKG_ROOT` has the path where vcpkg was cloned.
 
 04. Add openssl to the PATH enviroment variable
 
@@ -64,21 +59,21 @@ _The following was run on Microsoft Windows 10.0.18363.836._
 
     Use the commands below to find the path to the openssl.exe tool, then set it in the PATH variable.
 
-        ```shell
-        C:\vcpkg>where /r . openssl.exe
-        ...
-        C:\vcpkg\installed\x86-windows\tools\openssl\openssl.exe
-        ...
-        C:\vcpkg>set "PATH=%PATH%;C:\vcpkg\installed\x86-windows\tools\openssl"
-        ```
+    ```shell
+    C:\vcpkg>where /r . openssl.exe
+    ...
+    C:\vcpkg\installed\x86-windows\tools\openssl\openssl.exe
+    ...
+    C:\vcpkg>set "PATH=%PATH%;C:\vcpkg\installed\x86-windows\tools\openssl"
+    ```
 
     > Note: This applies only the current command window being used. If you open a new one, this step must be done again.
 
 05. Clone the Azure Embedded SDK for C
 
-        ```shell
-        C:\>git clone https://github.com/azure/azure-sdk-for-c
-        ```
+    ```shell
+    C:\>git clone https://github.com/azure/azure-sdk-for-c
+    ```
 
 05. Generate a self-signed certificate
 
@@ -219,17 +214,15 @@ _The following was run on Microsoft Windows 10.0.18363.836._
 
 09. Create and open the solution for the Azure Embedded SDK for C
 
-Back into the folder where the Azure SDK for C was cloned...
+    Back into the folder where the Azure SDK for C was cloned...
 
-```shell
-C:\azure-sdk-for-c>mkdir cmake
-C:\azure-sdk-for-c>cd cmake
-C:\azure-sdk-for-c\cmake>cmake -DTRANSPORT_PAHO=ON -DCMAKE_TOOLCHAIN_FILE=c:/vcpkg/scripts/buildsystems/vcpkg.cmake -A Win32 ..
-...
-C:\azure-sdk-for-c\cmake>az.sln
-```
-
-> Note: make sure the path set above for `CMAKE_TOOLCHAIN_FILE` matches the output of step 03 on your system.
+    ```shell
+    C:\azure-sdk-for-c>mkdir cmake
+    C:\azure-sdk-for-c>cd cmake
+    C:\azure-sdk-for-c\cmake>cmake -DTRANSPORT_PAHO=ON ..
+    ...
+    C:\azure-sdk-for-c\cmake>az.sln
+    ```
 
 10. Build and run the samples.
 
