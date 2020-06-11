@@ -55,15 +55,6 @@ include(eng/cmake/global_compile_options.txt)
 # At the end of cmake generate, this file will list the targets for code cov
 file(WRITE ${CMAKE_BINARY_DIR}/coverage_targets.txt "")
 
-
-add_subdirectory(sdk/core/az_core)
-
-# SDK Clients and tests
-add_subdirectory(sdk/storage/blobs)
-add_subdirectory(sdk/iot/common)
-add_subdirectory(sdk/iot/hub)
-add_subdirectory(sdk/iot/provisioning)
-
 #PAL
 if(AZ_PLATFORM_IMPL STREQUAL "POSIX")
   add_subdirectory(sdk/platform/posix)
@@ -75,6 +66,14 @@ else()
   add_subdirectory(sdk/platform/noplatform)
   set(PAL az_noplatform)
 endif()
+
+add_subdirectory(sdk/core/az_core)
+
+# SDK Clients and tests
+add_subdirectory(sdk/storage/blobs)
+add_subdirectory(sdk/iot/common)
+add_subdirectory(sdk/iot/hub)
+add_subdirectory(sdk/iot/provisioning)
 
 add_subdirectory(sdk/platform/http_client/nohttp)
 # Adding transport implementation for curl
