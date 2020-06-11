@@ -214,7 +214,7 @@ _az_http_client_curl_add_expect_header(CURL* ref_curl, struct curl_slist** ref_l
 /**
  * @brief loop all the headers from a HTTP request and set each header into easy curl
  *
- * @param ref_request an http builder request reference
+ * @param request an http builder request reference
  * @param ref_headers list of headers in curl specific list
  * @return az_result
  */
@@ -468,7 +468,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_setup_headers(
  * @brief set url for the request
  *
  * @param ref_curl specific curl struct to send a request
- * @param ref_request an az http request builder holding all data to send request
+ * @param request an az http request builder holding all data to send request
  * @return az_result
  */
 static AZ_NODISCARD az_result
@@ -539,8 +539,8 @@ _az_http_client_curl_setup_response_redirect(CURL* ref_curl, az_http_response* r
  * no matter is there is an error at any step.
  *
  * @param ref_curl curl specific structure used to send an http request
- * @param ref_request http builder with specific data to build an http request
- * @param response pre-allocated buffer where to write http response
+ * @param request http builder with specific data to build an http request
+ * @param ref_response pre-allocated buffer where to write http response
 
  * @return AZ_OK if request was sent and a response was received
  */

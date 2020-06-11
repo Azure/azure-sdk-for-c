@@ -245,7 +245,7 @@ int64_t __wrap_az_platform_clock_msec();
 
 az_result __wrap_az_http_client_send_request(_az_http_request const* request, az_http_response* ref_response)
 {
-  return send_request(request, response);
+  return send_request(request, ref_response);
 }
 
 int64_t __wrap_az_platform_clock_msec() { return (int64_t)mock(); }
