@@ -195,7 +195,8 @@ static az_result update_reported_property(az_span desired_payload)
       reported_payload = az_json_builder_get_json(&jb);
 
       printf("Updating device_count reported property to service.\n");
-      printf("Payload: %.*s\n", az_span_size(reported_payload), (char*)az_span_ptr(reported_payload));
+      printf(
+          "Payload: %.*s\n", az_span_size(reported_payload), (char*)az_span_ptr(reported_payload));
 
       // Publish the reported property payload to IoT Hub
       int rc;
@@ -508,7 +509,8 @@ int main()
   printf("\nSubscribed to topics.\n");
   printf("\nWaiting for activity:\n"
          "Press 'g' for device to request twin document from service.\n"
-         "Press 'r' for device to send device_count reported property to service. device_count will then locally increment.\n"
+         "Press 'r' for device to send device_count reported property to service. device_count "
+         "will then locally increment.\n"
          "[Press 'q' to quit]\n\n");
 
   int input;

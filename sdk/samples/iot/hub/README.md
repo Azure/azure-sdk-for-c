@@ -144,7 +144,7 @@ To send a desired property to the device, open the device twin document in your 
       "device_count": 42,
 ```
 
-Select Save to send the message. The device will respond:
+Select Save to send the message. The device will store value locally and report the property to the service.
 
 ```shell
 Received a message from service.
