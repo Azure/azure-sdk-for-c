@@ -57,9 +57,10 @@ static char get_twin_topic[128];
 static az_span get_twin_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("get_twin");
 static char reported_property_topic[128];
 static az_span reported_property_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("reported_prop");
-static az_span reported_property_name = AZ_SPAN_LITERAL_FROM_STR("foo");
+static az_span reported_property_name = AZ_SPAN_LITERAL_FROM_STR("device_count");
 static int32_t reported_property_value = 0;
-static char reported_property_payload[64];
+static char reported_property_buffer[64];
+static az_span version_name = AZ_SPAN_LITERAL_FROM_STR("$version");
 
 static az_iot_hub_client client;
 static MQTTClient mqtt_client;
@@ -131,7 +132,12 @@ static az_result read_configuration_and_init_client()
 
   az_span trusted = AZ_SPAN_FROM_BUFFER(x509_trust_pem_file);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_DEVICE_X509_TRUST_PEM_FILE, ENV_DEVICE_X509_TRUST_PEM_FILE, "", false, trusted, &trusted));
+      ENV_DEVICE_X509_TRUST_PEM_FILE,
+      ENV_DEVICE_X509_TRUST_PEM_FILE,
+      "",
+      false,
+      trusted,
+      &trusted));
 
   az_span device_id_span = AZ_SPAN_FROM_BUFFER(device_id);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
@@ -160,9 +166,66 @@ static az_result read_configuration_and_init_client()
   return AZ_OK;
 }
 
+static az_result update_reported_property(az_span desired_payload)
+{
+  az_json_parser jp;
+  az_json_token token;
+  az_json_token_member token_member;
+  az_json_builder jb;
+  az_span reported_payload;
+
+  // Parse desired property payload and construct reported property payload
+  AZ_RETURN_IF_FAILED(az_json_parser_init(&jp, desired_payload));
+  AZ_RETURN_IF_FAILED(az_json_parser_parse_token(&jp, &token));
+  AZ_RETURN_IF_FAILED(
+      az_json_builder_init(&jb, AZ_SPAN_FROM_BUFFER(reported_property_buffer), NULL));
+  AZ_RETURN_IF_FAILED(az_json_builder_append_begin_object(&jb));
+
+  AZ_RETURN_IF_FAILED(az_json_parser_parse_token_member(&jp, &token_member));
+  while (!az_span_is_content_equal(token_member.name, version_name))
+  {
+    if (az_span_is_content_equal(token_member.name, reported_property_name))
+    {
+      reported_property_value = (int32_t)token_member.token._internal.number;
+      AZ_RETURN_IF_FAILED(az_json_builder_append_property_name(&jb, reported_property_name));
+      AZ_RETURN_IF_FAILED(az_json_builder_append_int32_number(&jb, reported_property_value));
+      break;
+    }
+    AZ_RETURN_IF_FAILED(az_json_parser_parse_token_member(&jp, &token_member));
+  }
+  AZ_RETURN_IF_FAILED(az_json_builder_append_end_object(&jb));
+
+  reported_payload = az_json_builder_get_json(&jb);
+
+  printf("Updating device_count reported property to service.\n");
+  printf("Payload: %.*s\n", az_span_size(reported_payload), (char*)az_span_ptr(reported_payload));
+
+  // Publish the reported property payload to IoT Hub
+  int rc;
+  if ((rc = MQTTClient_publish(
+           mqtt_client,
+           reported_property_topic,
+           az_span_size(reported_payload),
+           az_span_ptr(reported_payload),
+           0,
+           0,
+           NULL))
+      != MQTTCLIENT_SUCCESS)
+  {
+    printf("Failed to publish reported property JSON. Return code %d.\n", rc);
+    // Need an MQTT facility error, not sure what to create for error name.
+    // return
+  }
+
+  return AZ_OK;
+}
+
 static int on_received(void* context, char* topicName, int topicLen, MQTTClient_message* message)
 {
   (void)context;
+
+  printf("Received a message from service.\n");
+  printf("Topic: %s\n", topicName);
 
   if (topicLen == 0)
   {
@@ -170,41 +233,66 @@ static int on_received(void* context, char* topicName, int topicLen, MQTTClient_
     // otherwise topicLen is 0.
     topicLen = (int)strlen(topicName);
   }
-
-  printf("Topic: %s\n", topicName);
-
   az_span topic_span = az_span_init((uint8_t*)topicName, topicLen);
 
   // Parse the incoming message topic and check to make sure it is a twin message
   az_iot_hub_client_twin_response twin_response;
-  if (az_succeeded(
-          az_iot_hub_client_twin_parse_received_topic(&client, topic_span, &twin_response)))
+  if (az_failed(az_iot_hub_client_twin_parse_received_topic(&client, topic_span, &twin_response)))
   {
-    printf("Twin Message Arrived\n");
+    printf("Topic is not a twin message.\n");
+  }
+  else
+  {
+    printf("Topic is a twin message.\n");
 
-    // Determine what type of incoming twin message this is. Print relevant data for the message.
+    // Determine type of incoming twin message. Print relevant data for the message.
     switch (twin_response.response_type)
     {
-      // A response from a twin GET publish message with the twin document as a payload.
+      // Type: A service response to a twin GET publish message.
+      // Payload: The JSON twin document.
       case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_GET:
-        printf("A twin GET response was received\n");
+        printf("A twin GET response was received.\n");
         if (message->payloadlen)
         {
           printf("Payload:\n%.*s\n", message->payloadlen, (char*)message->payload);
         }
+        printf("Response status was %d.\n", twin_response.status);
         break;
-      // An update to the desired properties with the properties as a JSON payload.
+
+      // Type: A service update to twin desired properties.
+      // Payload: The desired properties JSON.
       case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES:
-        printf("A twin desired properties message was received\n");
-        printf("Payload:\n%.*s\n", message->payloadlen, (char*)message->payload);
+        printf("A twin desired properties message was received.\n");
+        if (message->payloadlen)
+        {
+          printf("Payload:\n%.*s\n", message->payloadlen, (char*)message->payload);
+        }
+        printf("Response status was %d.\n", twin_response.status);
+
+        // Device will "update" device_count and send that reported property to service.
+        az_span payload_span = az_span_init((uint8_t*)message->payload, message->payloadlen);
+        if (az_failed(update_reported_property(payload_span)))
+        {
+          printf("Failed to update reported property JSON to IoT Hub.\n");
+        }
         break;
-      // A response from a twin reported properties publish message. With a successfull update of
-      // the reported properties, the payload will be empty and the status will be 204.
+
+      // Type: A service response to a twin reported properties publish message.
+      // Payload: Empty if reported properties were updated successfully on service.
       case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES:
-        printf("A twin reported properties message was received\n");
+        printf("A twin reported properties service response was received.\n");
+        if (message->payloadlen)
+        {
+          printf("Payload:\n%.*s\n", message->payloadlen, (char*)message->payload);
+        }
+        else
+        {
+          // Status will be 204 upon success.
+          printf("No Payload upon success.\n");
+        }
+        printf("Response status was %d.\n", twin_response.status);
         break;
     }
-    printf("Response status was %d\n", twin_response.status);
   }
 
   putchar('\n');
@@ -287,23 +375,23 @@ static int subscribe()
 static int send_get_twin()
 {
   int rc;
-  printf("Requesting twin document\n");
+  printf("Device requesting twin document from service.\n");
 
-  // Get the topic to send a twin GET publish message.
+  // Get the topic to send a twin GET publish message to service.
   if (az_failed(
           rc = az_iot_hub_client_twin_document_get_publish_topic(
               &client, get_twin_topic_request_id, get_twin_topic, sizeof(get_twin_topic), NULL)))
   {
-    printf("Unable to get twin document publish topic, return code %d\n", rc);
+    printf("Unable to get twin document publish topic, return code %d.\n", rc);
     return rc;
   }
 
-  // Publish the get twin message. This will trigger the service to send back the twin document for
-  // this device. The response is handled in the on_received function.
+  // Publish the twin document request. This will trigger the service to send back the twin document
+  // for this device. The response is handled in the on_received function.
   if ((rc = MQTTClient_publish(mqtt_client, get_twin_topic, 0, NULL, 0, 0, NULL))
       != MQTTCLIENT_SUCCESS)
   {
-    printf("Failed to publish twin document request, return code %d\n", rc);
+    printf("Failed to publish twin document request, return code %d.\n", rc);
     return rc;
   }
   return rc;
@@ -312,7 +400,7 @@ static int send_get_twin()
 static int build_reported_property(az_json_builder* json_builder)
 {
   az_result result;
-  result = az_json_builder_init(json_builder, AZ_SPAN_FROM_BUFFER(reported_property_payload), NULL);
+  result = az_json_builder_init(json_builder, AZ_SPAN_FROM_BUFFER(reported_property_buffer), NULL);
   result = az_json_builder_append_begin_object(json_builder);
   result = az_json_builder_append_property_name(json_builder, reported_property_name);
   result = az_json_builder_append_int32_number(json_builder, reported_property_value++);
@@ -324,7 +412,7 @@ static int build_reported_property(az_json_builder* json_builder)
 static int send_reported_property()
 {
   int rc;
-  printf("Sending reported property\n");
+  printf("Device sending reported properties to service.\n");
 
   // Get the topic used to send a reported property update
   if (az_failed(
@@ -335,7 +423,7 @@ static int send_reported_property()
               sizeof(reported_property_topic),
               NULL)))
   {
-    printf("Unable to get twin document publish topic, return code %d\n", rc);
+    printf("Unable to get twin document publish topic, return code %d.\n", rc);
     return rc;
   }
 
@@ -415,11 +503,11 @@ int main()
     return rc;
   }
 
-  printf("Subscribed to topics.\n");
-
-  printf(
-      "\nWaiting for activity:\nPress 'g' to get the twin document\nPress 'r' to send a reported "
-      "property\n[Press 'q' to quit]\n");
+  printf("\nSubscribed to topics.\n");
+  printf("\nWaiting for activity:\n"
+         "Press 'g' for device to request twin document from service.\n"
+         "Press 'r' for device to send reported properties to service.\n"
+         "[Press 'q' to quit]\n\n");
 
   int input;
   while (1)
