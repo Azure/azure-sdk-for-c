@@ -189,34 +189,36 @@ static az_result update_reported_property(az_span desired_payload)
       reported_property_value = (int32_t)token_member.token._internal.number;
       AZ_RETURN_IF_FAILED(az_json_builder_append_property_name(&jb, reported_property_name));
       AZ_RETURN_IF_FAILED(az_json_builder_append_int32_number(&jb, reported_property_value));
-      break;
+
+      AZ_RETURN_IF_FAILED(az_json_builder_append_end_object(&jb));
+
+      reported_payload = az_json_builder_get_json(&jb);
+
+      printf("Updating device_count reported property to service.\n");
+      printf("Payload: %.*s\n", az_span_size(reported_payload), (char*)az_span_ptr(reported_payload));
+
+      // Publish the reported property payload to IoT Hub
+      int rc;
+      if ((rc = MQTTClient_publish(
+               mqtt_client,
+               reported_property_topic,
+               az_span_size(reported_payload),
+               az_span_ptr(reported_payload),
+               0,
+               0,
+               NULL))
+          != MQTTCLIENT_SUCCESS)
+      {
+        printf("Failed to publish reported property JSON. Return code %d.\n", rc);
+        // Need an MQTT facility error, not sure what to create for error name.
+        // return
+      }
+      return AZ_OK;
     }
     AZ_RETURN_IF_FAILED(az_json_parser_parse_token_member(&jp, &token_member));
   }
-  AZ_RETURN_IF_FAILED(az_json_builder_append_end_object(&jb));
 
-  reported_payload = az_json_builder_get_json(&jb);
-
-  printf("Updating device_count reported property to service.\n");
-  printf("Payload: %.*s\n", az_span_size(reported_payload), (char*)az_span_ptr(reported_payload));
-
-  // Publish the reported property payload to IoT Hub
-  int rc;
-  if ((rc = MQTTClient_publish(
-           mqtt_client,
-           reported_property_topic,
-           az_span_size(reported_payload),
-           az_span_ptr(reported_payload),
-           0,
-           0,
-           NULL))
-      != MQTTCLIENT_SUCCESS)
-  {
-    printf("Failed to publish reported property JSON. Return code %d.\n", rc);
-    // Need an MQTT facility error, not sure what to create for error name.
-    // return
-  }
-
+  printf("Did not find \"device_count\" in desired property payload.\n");
   return AZ_OK;
 }
 
@@ -412,7 +414,7 @@ static int build_reported_property(az_json_builder* json_builder)
 static int send_reported_property()
 {
   int rc;
-  printf("Device sending reported properties to service.\n");
+  printf("Device sending device_count reported property to service.\n");
 
   // Get the topic used to send a reported property update
   if (az_failed(
@@ -506,7 +508,7 @@ int main()
   printf("\nSubscribed to topics.\n");
   printf("\nWaiting for activity:\n"
          "Press 'g' for device to request twin document from service.\n"
-         "Press 'r' for device to send reported properties to service.\n"
+         "Press 'r' for device to send device_count reported property to service. device_count will then locally increment.\n"
          "[Press 'q' to quit]\n\n");
 
   int input;
