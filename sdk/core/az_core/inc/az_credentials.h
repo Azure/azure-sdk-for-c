@@ -70,13 +70,6 @@ typedef struct
 } _az_credential_token;
 
 /**
- * @brief function callback definition as a contract to be implemented for a credential
- *
- */
-typedef AZ_NODISCARD az_result (
-    *_az_credential_apply_fn)(void* credential_options, _az_http_request* ref_request);
-
-/**
  * @brief function callback definition as a contract to be implemented for a credential to set
  * credential scopes when it supports it
  *
@@ -92,7 +85,7 @@ typedef struct
 {
   struct
   {
-    _az_credential_apply_fn apply_credential;
+    _az_http_policy_process_fn apply_credential_policy;
     _az_credential_set_scopes_fn set_scopes; // NULL if this credential doesn't support scopes.
   } _internal;
 } _az_credential;
@@ -118,7 +111,7 @@ typedef struct
  * @brief az_credential_client_secret_init initializes an az_credential_client_secret instance
  * with the specified tenant ID, client ID and client secret.
  *
- * @param self reference to a az_credential_client_secret instance to initialize
+ * @param out_credential reference to a az_credential_client_secret instance to initialize
  * @param tenant_id an Azure tenant ID
  * @param client_id an Azure client ID
  * @param client_secret an Azure client secret
@@ -127,7 +120,7 @@ typedef struct
  *         - Other error code if initialization failed
  */
 AZ_NODISCARD az_result az_credential_client_secret_init(
-    az_credential_client_secret* self,
+    az_credential_client_secret* out_credential,
     az_span tenant_id,
     az_span client_id,
     az_span client_secret);

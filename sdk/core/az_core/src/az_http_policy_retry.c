@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "az_http_policy_private.h"
 #include "az_http_private.h"
 #include <az_config.h>
 #include <az_config_internal.h>
@@ -150,32 +149,32 @@ AZ_INLINE AZ_NODISCARD az_result _az_http_policy_retry_get_retry_after(
 }
 
 AZ_NODISCARD az_result az_http_pipeline_policy_retry(
-    _az_http_policy* p_policies,
-    void* p_data,
-    _az_http_request* p_request,
-    az_http_response* p_response)
+    _az_http_policy* ref_policies,
+    void* ref_options,
+    _az_http_request* ref_request,
+    az_http_response* ref_response)
 {
   az_http_policy_retry_options const* const retry_options
-      = (az_http_policy_retry_options const*)p_data;
+      = (az_http_policy_retry_options const*)ref_options;
 
   int16_t const max_retries = retry_options->max_retries;
   int32_t const retry_delay_msec = retry_options->retry_delay_msec;
   int32_t const max_retry_delay_msec = retry_options->max_retry_delay_msec;
   az_http_status_code const* const status_codes = retry_options->status_codes;
 
-  AZ_RETURN_IF_FAILED(_az_http_request_mark_retry_headers_start(p_request));
+  AZ_RETURN_IF_FAILED(_az_http_request_mark_retry_headers_start(ref_request));
 
-  az_context* const context = p_request->_internal.context;
+  az_context* const context = ref_request->_internal.context;
 
   bool const should_log = _az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_RETRY);
   az_result result = AZ_OK;
   int16_t attempt = 1;
   while (true)
   {
-    AZ_RETURN_IF_FAILED(az_http_response_init(p_response, p_response->_internal.http_response));
-    AZ_RETURN_IF_FAILED(_az_http_request_remove_retry_headers(p_request));
+    AZ_RETURN_IF_FAILED(az_http_response_init(ref_response, ref_response->_internal.http_response));
+    AZ_RETURN_IF_FAILED(_az_http_request_remove_retry_headers(ref_request));
 
-    result = az_http_pipeline_nextpolicy(p_policies, p_request, p_response);
+    result = _az_http_pipeline_nextpolicy(ref_policies, ref_request, ref_response);
 
     // Even HTTP 429, or 502 are expected to be AZ_OK, so the failed result is not retriable.
     if (attempt > max_retries || az_failed(result))
@@ -185,7 +184,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
 
     int32_t retry_after_msec = -1;
     bool should_retry = false;
-    az_http_response response_copy = *p_response;
+    az_http_response response_copy = *ref_response;
     AZ_RETURN_IF_FAILED(_az_http_policy_retry_get_retry_after(
         &response_copy, status_codes, &should_retry, &retry_after_msec));
 

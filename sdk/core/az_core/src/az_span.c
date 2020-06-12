@@ -104,10 +104,10 @@ AZ_NODISCARD az_result az_span_atou64(az_span span, uint64_t* out_number)
   _az_PRECONDITION_VALID_SPAN(span, 1, false);
   _az_PRECONDITION_NOT_NULL(out_number);
 
-  int32_t self_size = az_span_size(span);
+  int32_t const span_size = az_span_size(span);
   uint64_t value = 0;
 
-  for (int32_t i = 0; i < self_size; ++i)
+  for (int32_t i = 0; i < span_size; ++i)
   {
     uint8_t result = az_span_ptr(span)[i];
     if (!isdigit(result))
@@ -132,10 +132,10 @@ AZ_NODISCARD az_result az_span_atou32(az_span span, uint32_t* out_number)
   _az_PRECONDITION_VALID_SPAN(span, 1, false);
   _az_PRECONDITION_NOT_NULL(out_number);
 
-  int32_t self_size = az_span_size(span);
+  int32_t const span_size = az_span_size(span);
   uint32_t value = 0;
 
-  for (int32_t i = 0; i < self_size; ++i)
+  for (int32_t i = 0; i < span_size; ++i)
   {
     uint8_t result = az_span_ptr(span)[i];
     if (!isdigit(result))
@@ -314,20 +314,24 @@ void az_span_to_str(char* destination, int32_t destination_max_size, az_span sou
  * @brief Replace all contents from a starting position to an end position with the content of a
  * provided span
  *
- * @param self src span where to replace content
+ * @param destination src span where to replace content
  * @param start starting position where to replace
  * @param end end position where to replace
- * @param span content to use for replacement
+ * @param replacement content to use for replacement
  * @return AZ_NODISCARD az_span_replace
  */
-AZ_NODISCARD az_result
-_az_span_replace(az_span self, int32_t current_size, int32_t start, int32_t end, az_span span)
+AZ_NODISCARD az_result _az_span_replace(
+    az_span destination,
+    int32_t current_size,
+    int32_t start,
+    int32_t end,
+    az_span replacement)
 {
-  int32_t const span_size = az_span_size(span);
+  int32_t const replacement_size = az_span_size(replacement);
   int32_t const replaced_size = end - start;
-  int32_t const size_after_replace = current_size - replaced_size + span_size;
+  int32_t const size_after_replace = current_size - replaced_size + replacement_size;
 
-  // Start and end position must be within the self span and be positive.
+  // Start and end position must be within the destination span and be positive.
   // Start position must be less or equal than end position.
   if ((uint32_t)start > (uint32_t)current_size || (uint32_t)end > (uint32_t)current_size
       || start > end)
@@ -336,9 +340,9 @@ _az_span_replace(az_span self, int32_t current_size, int32_t start, int32_t end,
   };
 
   // The replaced size must be less or equal to current span size. Can't replace more than what
-  // current is available. The size after replacing must be less than or equal to the size of self
-  // span.
-  if (replaced_size > current_size || size_after_replace > az_span_size(self))
+  // current is available. The size after replacing must be less than or equal to the size of
+  // destination span.
+  if (replaced_size > current_size || size_after_replace > az_span_size(destination))
   {
     return AZ_ERROR_ARG;
   };
@@ -346,26 +350,26 @@ _az_span_replace(az_span self, int32_t current_size, int32_t start, int32_t end,
   // insert at the end case (no need to make left or right shift)
   if (start == current_size)
   {
-    self = az_span_copy(az_span_slice_to_end(self, start), span);
+    destination = az_span_copy(az_span_slice_to_end(destination, start), replacement);
     return AZ_OK;
   }
   // replace all content case (no need to make left or right shift, only copy)
   // TODO: Verify and fix this check, if needed.
   if (current_size == replaced_size)
   {
-    self = az_span_copy(self, span);
+    destination = az_span_copy(destination, replacement);
     return AZ_OK;
   }
 
   // get the span needed to be moved before adding a new span
-  az_span dst = az_span_slice_to_end(self, start + span_size);
+  az_span dst = az_span_slice_to_end(destination, start + replacement_size);
   // get the span where to move content
-  az_span src = az_span_slice(self, end, current_size);
+  az_span src = az_span_slice(destination, end, current_size);
   {
     // move content left or right so new span can be added
     az_span_copy(dst, src);
     // add the new span
-    az_span_copy(az_span_slice_to_end(self, start), span);
+    az_span_copy(az_span_slice_to_end(destination, start), replacement);
   }
 
   return AZ_OK;
@@ -373,13 +377,13 @@ _az_span_replace(az_span self, int32_t current_size, int32_t start, int32_t end,
 
 AZ_INLINE uint8_t _az_decimal_to_ascii(uint8_t d) { return (uint8_t)(('0' + d) & 0xFF); }
 
-static AZ_NODISCARD az_result _az_span_builder_append_uint64(az_span* self, uint64_t n)
+static AZ_NODISCARD az_result _az_span_builder_append_uint64(az_span* ref_span, uint64_t n)
 {
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(*self, 1);
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(*ref_span, 1);
 
   if (n == 0)
   {
-    *self = az_span_copy_u8(*self, '0');
+    *ref_span = az_span_copy_u8(*ref_span, '0');
     return AZ_OK;
   }
 
@@ -392,17 +396,17 @@ static AZ_NODISCARD az_result _az_span_builder_append_uint64(az_span* self, uint
     digit_count--;
   }
 
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(*self, digit_count);
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(*ref_span, digit_count);
 
   while (div > 1)
   {
     uint8_t value_to_append = _az_decimal_to_ascii((uint8_t)(nn / div));
-    *self = az_span_copy_u8(*self, value_to_append);
+    *ref_span = az_span_copy_u8(*ref_span, value_to_append);
     nn %= div;
     div /= 10;
   }
   uint8_t value_to_append = _az_decimal_to_ascii((uint8_t)nn);
-  *self = az_span_copy_u8(*self, value_to_append);
+  *ref_span = az_span_copy_u8(*ref_span, value_to_append);
   return AZ_OK;
 }
 
@@ -434,13 +438,13 @@ AZ_NODISCARD az_result az_span_i64toa(az_span destination, int64_t source, az_sp
 }
 
 static AZ_NODISCARD az_result
-_az_span_builder_append_u32toa(az_span self, uint32_t n, az_span* out_span)
+_az_span_builder_append_u32toa(az_span destination, uint32_t n, az_span* out_span)
 {
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(self, 1);
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(destination, 1);
 
   if (n == 0)
   {
-    *out_span = az_span_copy_u8(self, '0');
+    *out_span = az_span_copy_u8(destination, '0');
     return AZ_OK;
   }
 
@@ -453,9 +457,9 @@ _az_span_builder_append_u32toa(az_span self, uint32_t n, az_span* out_span)
     digit_count--;
   }
 
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(self, digit_count);
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(destination, digit_count);
 
-  *out_span = self;
+  *out_span = destination;
 
   while (div > 1)
   {
@@ -496,26 +500,26 @@ AZ_NODISCARD az_result az_span_i32toa(az_span destination, int32_t source, az_sp
 }
 
 // TODO: pass az_span by value
-AZ_NODISCARD az_result _az_is_expected_span(az_span* self, az_span expected)
+AZ_NODISCARD az_result _az_is_expected_span(az_span* ref_span, az_span expected)
 {
   az_span actual_span = { 0 };
 
   int32_t expected_size = az_span_size(expected);
 
-  // EOF because self is smaller than the expected span
-  if (expected_size > az_span_size(*self))
+  // EOF because ref_span is smaller than the expected span
+  if (expected_size > az_span_size(*ref_span))
   {
     return AZ_ERROR_EOF;
   }
 
-  actual_span = az_span_slice(*self, 0, expected_size);
+  actual_span = az_span_slice(*ref_span, 0, expected_size);
 
   if (!az_span_is_content_equal(actual_span, expected))
   {
     return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
   // move reader after the expected span (means it was parsed as expected)
-  *self = az_span_slice_to_end(*self, expected_size);
+  *ref_span = az_span_slice_to_end(*ref_span, expected_size);
 
   return AZ_OK;
 }
@@ -523,11 +527,11 @@ AZ_NODISCARD az_result _az_is_expected_span(az_span* self, az_span expected)
 // PRIVATE. read until condition is true on character.
 // Then return number of positions read with output parameter
 AZ_NODISCARD az_result
-_az_span_scan_until(az_span self, _az_predicate predicate, int32_t* out_index)
+_az_span_scan_until(az_span span, _az_predicate predicate, int32_t* out_index)
 {
-  for (int32_t index = 0; index < az_span_size(self); ++index)
+  for (int32_t index = 0; index < az_span_size(span); ++index)
   {
-    az_span s = az_span_slice_to_end(self, index);
+    az_span s = az_span_slice_to_end(span, index);
     az_result predicate_result = predicate(s);
     switch (predicate_result)
     {

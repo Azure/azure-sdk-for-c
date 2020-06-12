@@ -8,10 +8,11 @@
 
 #include <_az_cfg.h>
 
-static AZ_NODISCARD az_result _az_span_reader_read_json_pointer_char(az_span* self, uint32_t* out)
+static AZ_NODISCARD az_result
+_az_span_reader_read_json_pointer_char(az_span* ref_span, uint32_t* out)
 {
-  _az_PRECONDITION_NOT_NULL(self);
-  int32_t reader_current_length = az_span_size(*self);
+  _az_PRECONDITION_NOT_NULL(ref_span);
+  int32_t reader_current_length = az_span_size(*ref_span);
 
   // check for EOF
   if (reader_current_length == 0)
@@ -19,7 +20,7 @@ static AZ_NODISCARD az_result _az_span_reader_read_json_pointer_char(az_span* se
     return AZ_ERROR_ITEM_NOT_FOUND;
   }
 
-  uint8_t const result = az_span_ptr(*self)[0];
+  uint8_t const result = az_span_ptr(*ref_span)[0];
   switch (result)
   {
     case '/':
@@ -29,16 +30,16 @@ static AZ_NODISCARD az_result _az_span_reader_read_json_pointer_char(az_span* se
     case '~':
     {
       // move reader to next position
-      *self = az_span_slice_to_end(*self, 1);
+      *ref_span = az_span_slice_to_end(*ref_span, 1);
       // check for EOF
-      if (az_span_size(*self) == 0)
+      if (az_span_size(*ref_span) == 0)
       {
         return AZ_ERROR_EOF;
       }
       // get char
-      uint8_t const e = az_span_ptr(*self)[0];
+      uint8_t const e = az_span_ptr(*ref_span)[0];
       // move to next position again
-      *self = az_span_slice_to_end(*self, 1);
+      *ref_span = az_span_slice_to_end(*ref_span, 1);
       switch (e)
       {
         case '0':
@@ -60,7 +61,7 @@ static AZ_NODISCARD az_result _az_span_reader_read_json_pointer_char(az_span* se
     default:
     {
       // move reader to next position
-      *self = az_span_slice_to_end(*self, 1);
+      *ref_span = az_span_slice_to_end(*ref_span, 1);
 
       *out = (uint8_t)result;
       return AZ_OK;
@@ -73,26 +74,26 @@ static AZ_NODISCARD az_result _az_span_reader_read_json_pointer_char(az_span* se
  *
  * See https://tools.ietf.org/html/rfc6901
  */
-AZ_NODISCARD az_result _az_span_reader_read_json_pointer_token(az_span* self, az_span* out)
+AZ_NODISCARD az_result _az_span_reader_read_json_pointer_token(az_span* ref_span, az_span* out)
 {
   // read `/` if any.
   {
     // check there is something still to read
-    if (az_span_size(*self) == 0)
+    if (az_span_size(*ref_span) == 0)
     {
       return AZ_ERROR_ITEM_NOT_FOUND;
     }
     // ensure first char of pointer is `/`
-    if (az_span_ptr(*self)[0] != '/')
+    if (az_span_ptr(*ref_span)[0] != '/')
     {
       return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
     }
   }
   // move forward
-  *self = az_span_slice_to_end(*self, 1);
-  if (az_span_size(*self) == 0)
+  *ref_span = az_span_slice_to_end(*ref_span, 1);
+  if (az_span_size(*ref_span) == 0)
   {
-    *out = *self;
+    *out = *ref_span;
     return AZ_OK;
   }
 
@@ -100,19 +101,19 @@ AZ_NODISCARD az_result _az_span_reader_read_json_pointer_token(az_span* self, az
   // end of a Json token. var begin will record the number of bytes read until token_end or
   // pointer_end. TODO: We might be able to implement _az_span_scan_until() here, since we ignore
   // the out of _az_span_reader_read_json_pointer_char()
-  int32_t initial_capacity = az_span_size(*self);
-  uint8_t* p_reader = az_span_ptr(*self);
+  int32_t initial_capacity = az_span_size(*ref_span);
+  uint8_t* reader = az_span_ptr(*ref_span);
   while (true)
   {
     uint32_t ignore = { 0 };
-    az_result const result = _az_span_reader_read_json_pointer_char(self, &ignore);
+    az_result const result = _az_span_reader_read_json_pointer_char(ref_span, &ignore);
     switch (result)
     {
       case AZ_ERROR_ITEM_NOT_FOUND:
       case AZ_ERROR_JSON_POINTER_TOKEN_END:
       {
-        int32_t current_capacity = initial_capacity - az_span_size(*self);
-        *out = az_span_init(p_reader, current_capacity);
+        int32_t current_capacity = initial_capacity - az_span_size(*ref_span);
+        *out = az_span_init(reader, current_capacity);
         return AZ_OK;
       }
       default:
@@ -126,10 +127,10 @@ AZ_NODISCARD az_result _az_span_reader_read_json_pointer_token(az_span* self, az
 /**
  * Returns a next character in the given span reader of JSON pointer reference token.
  */
-AZ_NODISCARD az_result _az_span_reader_read_json_pointer_token_char(az_span* self, uint32_t* out)
+AZ_NODISCARD az_result _az_span_reader_read_json_pointer_token_char(az_span* ref_span, uint32_t* out)
 {
   uint32_t c;
-  az_result const result = _az_span_reader_read_json_pointer_char(self, &c);
+  az_result const result = _az_span_reader_read_json_pointer_char(ref_span, &c);
   if (result == AZ_ERROR_JSON_POINTER_TOKEN_END)
   {
     return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
@@ -165,11 +166,11 @@ AZ_NODISCARD static bool az_json_pointer_token_eq_json_string(
 }
 
 AZ_NODISCARD static az_result az_json_parser_get_by_pointer_token(
-    az_json_parser* json_parser,
+    az_json_parser* ref_json_parser,
     az_span pointer_token,
-    az_json_token* inout_token)
+    az_json_token* ref_token)
 {
-  switch (inout_token->kind)
+  switch (ref_token->kind)
   {
     case AZ_JSON_TOKEN_BEGIN_ARRAY:
     {
@@ -177,13 +178,13 @@ AZ_NODISCARD static az_result az_json_parser_get_by_pointer_token(
       AZ_RETURN_IF_FAILED(az_span_atou64(pointer_token, &i));
       while (true)
       {
-        AZ_RETURN_IF_FAILED(az_json_parser_parse_array_item(json_parser, inout_token));
+        AZ_RETURN_IF_FAILED(az_json_parser_parse_array_item(ref_json_parser, ref_token));
         if (i == 0)
         {
           return AZ_OK;
         }
         --i;
-        AZ_RETURN_IF_FAILED(az_json_parser_skip_children(json_parser, *inout_token));
+        AZ_RETURN_IF_FAILED(az_json_parser_skip_children(ref_json_parser, *ref_token));
       }
     }
     case AZ_JSON_TOKEN_BEGIN_OBJECT:
@@ -191,13 +192,13 @@ AZ_NODISCARD static az_result az_json_parser_get_by_pointer_token(
       while (true)
       {
         az_json_token_member token_member = { 0 };
-        AZ_RETURN_IF_FAILED(az_json_parser_parse_token_member(json_parser, &token_member));
+        AZ_RETURN_IF_FAILED(az_json_parser_parse_token_member(ref_json_parser, &token_member));
         if (az_json_pointer_token_eq_json_string(pointer_token, token_member.name))
         {
-          *inout_token = token_member.token;
+          *ref_token = token_member.token;
           return AZ_OK;
         }
-        AZ_RETURN_IF_FAILED(az_json_parser_skip_children(json_parser, token_member.token));
+        AZ_RETURN_IF_FAILED(az_json_parser_skip_children(ref_json_parser, token_member.token));
       }
     }
     default:

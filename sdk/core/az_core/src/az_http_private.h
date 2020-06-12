@@ -18,25 +18,27 @@
  * @brief Mark that the HTTP headers that are gong to be added via
  * `az_http_request_append_header` are going to be considered as retry headers.
  *
- * @param p_hrb HTTP request builder.
+ * @param ref_request HTTP request.
  *
  * @return
  *   - *`AZ_OK`* success.
- *   - *`AZ_ERROR_ARG`* `p_hrb` is _NULL_.
+ *   - *`AZ_ERROR_ARG`* `ref_request` is _NULL_.
  */
-AZ_NODISCARD AZ_INLINE az_result _az_http_request_mark_retry_headers_start(_az_http_request* p_hrb)
+AZ_NODISCARD AZ_INLINE az_result
+_az_http_request_mark_retry_headers_start(_az_http_request* ref_request)
 {
-  _az_PRECONDITION_NOT_NULL(p_hrb);
-  p_hrb->_internal.retry_headers_start_byte_offset
-      = p_hrb->_internal.headers_length * (int32_t)sizeof(az_pair);
+  _az_PRECONDITION_NOT_NULL(ref_request);
+  ref_request->_internal.retry_headers_start_byte_offset
+      = ref_request->_internal.headers_length * (int32_t)sizeof(az_pair);
   return AZ_OK;
 }
 
-AZ_NODISCARD AZ_INLINE az_result _az_http_request_remove_retry_headers(_az_http_request* p_hrb)
+AZ_NODISCARD AZ_INLINE az_result
+_az_http_request_remove_retry_headers(_az_http_request* ref_request)
 {
-  _az_PRECONDITION_NOT_NULL(p_hrb);
-  p_hrb->_internal.headers_length
-      = p_hrb->_internal.retry_headers_start_byte_offset / (int32_t)sizeof(az_pair);
+  _az_PRECONDITION_NOT_NULL(ref_request);
+  ref_request->_internal.headers_length
+      = ref_request->_internal.retry_headers_start_byte_offset / (int32_t)sizeof(az_pair);
   return AZ_OK;
 }
 
@@ -44,7 +46,7 @@ AZ_NODISCARD AZ_INLINE az_result _az_http_request_remove_retry_headers(_az_http_
  * @brief Sets buffer and parser to its initial state.
  *
  */
-void _az_http_response_reset(az_http_response* http_response);
+void _az_http_response_reset(az_http_response* ref_response);
 
 #include <_az_cfg_suffix.h>
 

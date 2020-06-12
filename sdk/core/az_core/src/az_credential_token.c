@@ -8,20 +8,20 @@
 #include <_az_cfg.h>
 
 AZ_NODISCARD az_result
-_az_credential_token_set_token(_az_credential_token* self, _az_token const* new_token)
+_az_credential_token_set_token(_az_credential_token* ref_credential, _az_token const* new_token)
 {
-  _az_spinlock_enter_writer(&self->_internal.lock);
-  self->_internal.token = *new_token;
-  _az_spinlock_exit_writer(&self->_internal.lock);
+  _az_spinlock_enter_writer(&ref_credential->_internal.lock);
+  ref_credential->_internal.token = *new_token;
+  _az_spinlock_exit_writer(&ref_credential->_internal.lock);
   return AZ_OK;
 }
 
 AZ_NODISCARD az_result
-_az_credential_token_get_token(_az_credential_token* self, _az_token* out_token)
+_az_credential_token_get_token(_az_credential_token* ref_credential, _az_token* out_token)
 {
-  _az_spinlock_enter_reader(&self->_internal.lock);
-  *out_token = self->_internal.token;
-  _az_spinlock_exit_reader(&self->_internal.lock);
+  _az_spinlock_enter_reader(&ref_credential->_internal.lock);
+  *out_token = ref_credential->_internal.token;
+  _az_spinlock_exit_reader(&ref_credential->_internal.lock);
   return AZ_OK;
 }
 

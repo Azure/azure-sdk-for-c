@@ -54,10 +54,10 @@ typedef struct
 } az_keyvault_keys_client;
 
 AZ_NODISCARD az_result az_keyvault_keys_client_init(
-    az_keyvault_keys_client* self,
+    az_keyvault_keys_client* out_keys_client,
     az_span uri,
-    void* credential,
-    az_keyvault_keys_client_options* options);
+    void* ref_credential,
+    az_keyvault_keys_client_options* ref_options);
 
 typedef az_span az_json_web_key_type;
 
