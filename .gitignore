@@ -309,3 +309,6 @@ build/
 
 # Certificates
 *.pem
+
+# Cert fingerprint output
+fingerprint.txt
