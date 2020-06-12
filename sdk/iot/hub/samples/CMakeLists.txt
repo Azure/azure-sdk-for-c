@@ -22,31 +22,32 @@ add_executable (paho_iot_hub_c2d_example
   ${CMAKE_CURRENT_LIST_DIR}/src/paho_iot_hub_c2d_example.c
 )
 
+# SDK deps
 target_link_libraries(paho_iot_hub_c2d_example
   PRIVATE
-    az::core
     az::iot::hub
 )
 
-
-target_link_libraries(
-  paho_iot_hub_c2d_example PRIVATE
-  eclipse-paho-mqtt-c::paho-mqtt3cs-static
-  OpenSSL::SSL
-  OpenSSL::Crypto
-  )
+# External deps
+target_link_libraries(paho_iot_hub_c2d_example
+  PRIVATE
+    eclipse-paho-mqtt-c::paho-mqtt3cs-static
+    OpenSSL::SSL
+    OpenSSL::Crypto
+)
 
 # Methods Sample
 add_executable (paho_iot_hub_methods_example
   ${CMAKE_CURRENT_LIST_DIR}/src/paho_iot_hub_methods_example.c
 )
 
+# SDK deps
 target_link_libraries(paho_iot_hub_methods_example
   PRIVATE
-    az::core
     az::iot::hub
 )
 
+# External deps
 target_link_libraries(paho_iot_hub_methods_example
   PRIVATE
     eclipse-paho-mqtt-c::paho-mqtt3cs-static
@@ -59,12 +60,13 @@ add_executable (paho_iot_hub_telemetry_example
   ${CMAKE_CURRENT_LIST_DIR}/src/paho_iot_hub_telemetry_example.c
 )
 
+# SDK deps
 target_link_libraries(paho_iot_hub_telemetry_example
   PRIVATE
-    az::core
     az::iot::hub
 )
 
+# External deps
 target_link_libraries(paho_iot_hub_telemetry_example
   PRIVATE
     eclipse-paho-mqtt-c::paho-mqtt3cs-static
@@ -78,12 +80,13 @@ add_executable (paho_iot_hub_sas_telemetry_example
   ${CMAKE_CURRENT_LIST_DIR}/src/sample_sas_utility.c
 )
 
+# SDK deps
 target_link_libraries(paho_iot_hub_sas_telemetry_example
   PRIVATE
-    az::core
     az::iot::hub
 )
 
+# External deps
 target_link_libraries(paho_iot_hub_sas_telemetry_example
   PRIVATE
     eclipse-paho-mqtt-c::paho-mqtt3cs-static
@@ -96,13 +99,13 @@ add_executable (paho_iot_hub_twin_example
   ${CMAKE_CURRENT_LIST_DIR}/src/paho_iot_hub_twin_example.c
 )
 
+# SDK deps
 target_link_libraries(paho_iot_hub_twin_example
   PRIVATE
-    az::core
     az::iot::hub
 )
 
-
+# External deps
 target_link_libraries(paho_iot_hub_twin_example
   PRIVATE
     eclipse-paho-mqtt-c::paho-mqtt3cs-static

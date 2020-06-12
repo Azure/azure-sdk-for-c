@@ -23,13 +23,13 @@ add_executable (paho_iot_provisioning_example
   src/paho_iot_provisioning_example.c
 )
 
+# SDK deps
 target_link_libraries(paho_iot_provisioning_example
     PRIVATE
-      az::core
       az::iot::provisioning
 )
 
-
+# External deps
 target_link_libraries(paho_iot_provisioning_example
   PRIVATE
     eclipse-paho-mqtt-c::paho-mqtt3cs-static
