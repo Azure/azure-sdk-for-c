@@ -1,21 +1,21 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_config_internal.h>
-#include <az_credentials.h>
-#include <az_credentials_internal.h>
-#include <az_http.h>
-#include <az_http_internal.h>
-#include <az_http_transport.h>
-#include <az_json.h>
+#include <azure/core/internal/az_config_internal.h>
+#include <azure/core/az_credentials.h>
+#include <azure/core/internal/az_credentials_internal.h>
+#include <azure/core/az_http.h>
+#include <azure/core/internal/az_http_internal.h>
+#include <azure/core/az_http_transport.h>
+#include <azure/core/az_json.h>
 #include <az_keyvault.h>
-#include <az_precondition.h>
-#include <az_precondition_internal.h>
-#include <az_span.h>
+#include <azure/core/az_precondition.h>
+#include <azure/core/internal/az_precondition_internal.h>
+#include <azure/core/az_span.h>
 
 #include <stddef.h>
 
-#include <_az_cfg.h>
+#include <azure/core/_az_cfg.h>
 
 enum
 {

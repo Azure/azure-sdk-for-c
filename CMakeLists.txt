@@ -55,54 +55,48 @@ include(eng/cmake/global_compile_options.txt)
 # At the end of cmake generate, this file will list the targets for code cov
 file(WRITE ${CMAKE_BINARY_DIR}/coverage_targets.txt "")
 
-#PAL
-if(AZ_PLATFORM_IMPL STREQUAL "POSIX")
-  add_subdirectory(sdk/platform/posix)
-  set(PAL az_posix)
-elseif(AZ_PLATFORM_IMPL STREQUAL "WIN32")
-  add_subdirectory(sdk/platform/win32)
+# Determine platform to build
+if(AZ_PLATFORM_IMPL STREQUAL "WIN32")
+  # build windows platform
   set(PAL az_win32)
+elseif(AZ_PLATFORM_IMPL STREQUAL "POSIX")
+  # build linux platform
+  set(PAL az_posix)
 else()
-  add_subdirectory(sdk/platform/noplatform)
+  #noplatform
   set(PAL az_noplatform)
 endif()
 
-add_subdirectory(sdk/core/az_core)
+add_subdirectory(sdk/src/azure/core)
 
-# SDK Clients and tests
-add_subdirectory(sdk/storage/blobs)
-add_subdirectory(sdk/iot/common)
-add_subdirectory(sdk/iot/hub)
-add_subdirectory(sdk/iot/provisioning)
+# SDK Clients
+add_subdirectory(sdk/src/azure/iot)
+add_subdirectory(sdk/src/azure/storage)
 
-add_subdirectory(sdk/platform/http_client/nohttp)
-# Adding transport implementation for curl
-# Users can still build Core and SDK client without depending on an HTTP transport implementation
-if(TRANSPORT_CURL)
-  add_subdirectory(sdk/platform/http_client/curl)
-endif()
+#PAL (Hardware + HTTP)
+add_subdirectory(sdk/src/azure/platform)
 
 # User can disable samples generation by setting env variable AZ_SDK_C_NO_SAMPLES
 if(NOT DEFINED ENV{AZ_SDK_C_NO_SAMPLES})
   add_subdirectory(sdk/samples/keyvault/keyvault)
-  add_subdirectory(sdk/samples/keyvault/keyvault/samples)
-  add_subdirectory(sdk/storage/blobs/samples)
+  add_subdirectory(sdk/samples/storage)
   if(TRANSPORT_PAHO)
-    add_subdirectory(sdk/iot/provisioning/samples)
-    add_subdirectory(sdk/iot/hub/samples)
+    add_subdirectory(sdk/samples/iot/provisioning)
+    add_subdirectory(sdk/samples/iot/hub)
   endif()
 endif()
 
 # default for Unit testing with cmocka is OFF, however, this will be ON on CI and tests must
 # pass before commiting changes
 if (UNIT_TESTING)
-  add_subdirectory(sdk/core/az_core/test)
-  add_subdirectory(sdk/storage/blobs/test)
-  add_subdirectory(sdk/iot/common/tests)
-  add_subdirectory(sdk/iot/hub/tests)
-  add_subdirectory(sdk/iot/provisioning/tests)
+  # Core
+  add_subdirectory(sdk/tests/core)
 
-  if(NOT DEFINED ENV{AZ_SDK_C_NO_SAMPLES})
-    add_subdirectory(sdk/samples/keyvault/keyvault/test)
-  endif()
+  # IoT
+  add_subdirectory(sdk/tests/iot/common)
+  add_subdirectory(sdk/tests/iot/hub)
+  add_subdirectory(sdk/tests/iot/provisioning)
+
+  # Storage
+  add_subdirectory(sdk/tests/storage)
 endif()

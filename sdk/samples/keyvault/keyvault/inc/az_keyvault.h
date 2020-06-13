@@ -4,15 +4,15 @@
 #ifndef _az_KEYVAULT_H
 #define _az_KEYVAULT_H
 
-#include <az_credentials.h>
-#include <az_http.h>
-#include <az_http_internal.h>
-#include <az_result.h>
-#include <az_span.h>
+#include <azure/core/az_credentials.h>
+#include <azure/core/az_http.h>
+#include <azure/core/internal/az_http_internal.h>
+#include <azure/core/az_result.h>
+#include <azure/core/az_span.h>
 
 #include <stdint.h>
 
-#include <_az_cfg_prefix.h>
+#include <azure/core/_az_cfg_prefix.h>
 
 /**
  * @brief SDKs are specific to a fixed version of the KeyVault service
@@ -185,6 +185,6 @@ AZ_NODISCARD az_result az_keyvault_keys_key_delete(
     az_span key_name,
     az_http_response* response);
 
-#include <_az_cfg_suffix.h>
+#include <azure/core/_az_cfg_suffix.h>
 
 #endif // _az_KEYVAULT_H

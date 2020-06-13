@@ -99,7 +99,7 @@ function(ADD_CMOCKA_TEST _TARGET_NAME)
     target_include_directories(${_TARGET_NAME} PRIVATE ${CMOCKA_INCLUDE_DIR})
     
     if (DEFINED _add_cmocka_test_PRIVATE_ACCESS)
-        target_include_directories(${_TARGET_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/sdk/core/az_core/src)
+        target_include_directories(${_TARGET_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/sdk/src/azure/core/)
     endif()
 
     add_test(${_TARGET_NAME}
