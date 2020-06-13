@@ -19,24 +19,22 @@ if(NOT OpenSSL_FOUND)
   find_package(OpenSSL REQUIRED)
 endif()
 
-set (sample_link_libraries 
-  az_iot_provisioning
-  az_iot_common
-  az_core
-  ${PAL}
-  eclipse-paho-mqtt-c::paho-mqtt3cs-static
-  OpenSSL::SSL
-  OpenSSL::Crypto
+add_executable (paho_iot_provisioning_example 
+  src/paho_iot_provisioning_example.c
 )
 
-add_executable (
-  paho_iot_provisioning_example 
-  src/paho_iot_provisioning_example.c
-  )
+# SDK deps
+target_link_libraries(paho_iot_provisioning_example
+    PRIVATE
+      az::iot::provisioning
+)
 
-target_link_libraries(
-  paho_iot_provisioning_example PRIVATE
-  ${sample_link_libraries}
-  )
+# External deps
+target_link_libraries(paho_iot_provisioning_example
+  PRIVATE
+    eclipse-paho-mqtt-c::paho-mqtt3cs-static
+    OpenSSL::SSL
+    OpenSSL::Crypto
+)
 
 endif()

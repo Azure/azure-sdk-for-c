@@ -65,12 +65,28 @@ add_library (
   src/az_span.c
   src/az_spinlock.c)
 
-target_include_directories (${TARGET_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc> $<INSTALL_INTERFACE:include/${TARGET_NAME}>)
+target_include_directories (${TARGET_NAME}
+  PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc>
+    $<INSTALL_INTERFACE:include/${TARGET_NAME}>
+)
 # include internal headers
-target_include_directories(${TARGET_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/internal> $<INSTALL_INTERFACE:include/az_core_internal>)
+target_include_directories(${TARGET_NAME}
+  PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/internal>
+    $<INSTALL_INTERFACE:include/az_core_internal>
+)
 
 # include test internal headers
-target_include_directories(${TARGET_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/test/inc>)
+target_include_directories(${TARGET_NAME}
+  PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/test/inc>
+)
+
+target_link_libraries(${TARGET_NAME}
+  PUBLIC
+    ${PAL}
+)
 
 # make sure that users can consume the project as a library.
 add_library (az::core ALIAS ${TARGET_NAME})

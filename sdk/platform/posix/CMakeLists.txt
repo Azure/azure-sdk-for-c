@@ -11,4 +11,3 @@ add_library(az_posix STATIC)
 target_link_libraries(az_posix PRIVATE az_core)
 
 target_sources(az_posix PRIVATE src/az_posix.c)
-

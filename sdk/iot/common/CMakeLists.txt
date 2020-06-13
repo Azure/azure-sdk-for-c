@@ -11,20 +11,22 @@ set(CMAKE_C_STANDARD 99)
 
 include(CheckAndIncludeCodeCov)
 
-add_library (
-    ${TARGET_NAME}
-    src/az_iot_common.c
+add_library (${TARGET_NAME}
+  src/az_iot_common.c
 )
 
 target_include_directories (${TARGET_NAME} PUBLIC inc)
 target_include_directories (${TARGET_NAME} PRIVATE src)
 
-target_link_libraries(${TARGET_NAME} PRIVATE az_core)
+target_link_libraries(${TARGET_NAME}
+  PUBLIC
+    az::core
+)
 
 add_library (az::iot::common ALIAS ${TARGET_NAME})
 
 # set coverage excluding for az_core. Don't show coverage outside iot
 set(COV_EXCLUDE
-    ${az_SOURCE_DIR}/sdk/core/az_core/inc/*
-    ${az_SOURCE_DIR}/sdk/core/az_core/internal/*)
+  ${az_SOURCE_DIR}/sdk/core/az_core/inc/*
+  ${az_SOURCE_DIR}/sdk/core/az_core/internal/*)
 include(CreateCodeCoverageTargets)

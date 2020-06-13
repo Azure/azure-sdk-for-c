@@ -11,4 +11,3 @@ add_library(az_win32 STATIC)
 target_link_libraries(az_win32 PRIVATE az_core)
 
 target_sources(az_win32 PRIVATE src/az_win32.c)
-
