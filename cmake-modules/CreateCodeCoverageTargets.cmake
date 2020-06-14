@@ -1,5 +1,5 @@
 # codeCoverage
-function(create_code_coverage_targets code_cov_target)
+macro(create_code_coverage_targets code_cov_target)
     if(DEFINED ENV{AZ_SDK_CODE_COV} AND CMAKE_C_COMPILER_ID MATCHES "GNU")
         if(CMAKE_BUILD_TYPE STREQUAL "Debug")
             APPEND_COVERAGE_COMPILER_FLAGS()
@@ -17,4 +17,4 @@ function(create_code_coverage_targets code_cov_target)
             file(APPEND ${CMAKE_BINARY_DIR}/coverage_targets.txt " ${code_cov_target}_cov_xml")
         endif() 
     endif()
-endfunction()
+endmacro()
