@@ -14,8 +14,8 @@ stages:
           parameters:
             LiveTestSamples:
               - Name: Storage Blobs
-                NonWindowsPath: ./build/sdk/storage/blobs/samples/blobs_client_example
-                WindowsPath: build\sdk\storage\blobs\samples\debug\blobs_client_example.exe
+                NonWindowsPath: ./build/sdk/samples/storage/blobs/blobs_client_example
+                WindowsPath: build\sdk\samples\storage\blobs\debug\blobs_client_example.exe
               - Name: Keyvault Keys
                 NonWindowsPath: ./build/sdk/samples/keyvault/keyvault/samples/keys_client_example
                 WindowsPath: build\sdk\samples\keyvault\keyvault\samples\debug\keys_client_example.exe

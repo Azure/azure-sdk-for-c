@@ -303,7 +303,7 @@ jobs:
 
       - pwsh: >-
           Copy-Item
-          sdk/core/az_core/CHANGELOG.md
+          sdk/docs/core/CHANGELOG.md
           (Join-Path $(Build.ArtifactStagingDirectory) release-info/CHANGELOG.md)
         displayName: Copy CHANGELOG.md to package artifact output
 
