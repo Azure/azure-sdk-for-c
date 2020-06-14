@@ -169,7 +169,7 @@ When you select to build the libcurl http stack implementation, you have to make
 
 You need to also call `curl_global_cleanup` once you no longer need to perform SDk client API calls.
 
-Take a look to [Storare Blob SDK client sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/storage/blobs/samples/src/blobs_client_example.c). Note how you can use function `atexit()` to set libcurl global clean up.
+Take a look to [Storage Blob SDK client sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/storage/blobs/src/blobs_client_example.c). Note how you can use function `atexit()` to set libcurl global clean up.
 
 The reason for this is the fact of this functions are not thread-safe, and a customer can use libcurl not only for Azure SDK library but for some other purpose. More info [here](https://curl.haxx.se/libcurl/c/curl_global_init.html).
 
@@ -332,7 +332,7 @@ AZ_NODISCARD az_result
 az_http_client_send_request(_az_http_request const* request, az_http_response* ref_response);
 ```
 
-For example, Azure SDK provides a cmake target `az_curl` (find it [here](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/platform/http_client/curl/src/az_curl.c)) with the implementation code for the contract function mentioned before. It uses an `_az_http_request` reference to create an specific `libcurl` request and send it though the wire. Then it uses `libcurl` response to fill the `az_http_response` reference structure.
+For example, Azure SDK provides a cmake target `az_curl` (find it [here](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/src/azure/platform/az_curl.c)) with the implementation code for the contract function mentioned before. It uses an `_az_http_request` reference to create an specific `libcurl` request and send it though the wire. Then it uses `libcurl` response to fill the `az_http_response` reference structure.
 
 ### Link your application with your own HTTP stack
 Create your own http adapter for an Http stack and then use the following cmake command to have it linked to your application
