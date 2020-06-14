@@ -49,6 +49,9 @@ enable_testing ()
 
 include(eng/cmake/global_compile_options.txt)
 
+# Include function for creating code coverage targets
+include(CreateCodeCoverageTargets)
+
 # List of projects that generate coverage
 # This write empty makes sure that if file is already there, we replace it for an empty one
 # Then each project will APPEND to this file

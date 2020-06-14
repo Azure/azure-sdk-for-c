@@ -86,4 +86,4 @@ target_link_libraries(${TARGET_NAME}
 # make sure that users can consume the project as a library.
 add_library (az::core ALIAS ${TARGET_NAME})
 
-include(CreateCodeCoverageTargets)
+create_code_coverage_targets(${TARGET_NAME})
