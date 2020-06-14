@@ -77,7 +77,6 @@ target_include_directories(${TARGET_NAME}
     $<BUILD_INTERFACE:${az_SOURCE_DIR}/sdk/tests/core/inc>
 )
 
-message("PAL " ${PAL})
 target_link_libraries(${TARGET_NAME}
   PUBLIC
     ${PAL}

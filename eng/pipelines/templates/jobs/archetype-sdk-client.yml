@@ -245,7 +245,7 @@ jobs:
   # coverage report
   - bash: |
       make `cat coverage_targets.txt`
-      ../tools/reportgenerator "-reports:sdk/*/*/*cov_xml.xml" "-targetdir:." "-reporttypes:Cobertura"
+      ../tools/reportgenerator "-reports:sdk/*/*/*/*cov_xml.xml" "-targetdir:." "-reporttypes:Cobertura"
     workingDirectory: build
     displayName: Generate Code Coverage Data
     condition: eq(variables['AZ_SDK_CODE_COV'], 1)
