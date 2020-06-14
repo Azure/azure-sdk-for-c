@@ -117,15 +117,15 @@ Start using the IoT Hub Client in your solutions. More SDK details can be found 
 For extensive documentation on Azure IoT Hub, see the [API reference documentation][iot_hub_mqtt].
 
 <!-- LINKS -->
-[IOT_CLIENT_README]: ../../README.md
-[SDK_README_GETTING_STARTED]: ../../README.md#getting-started
-[SDK_README_KEY_CONCEPTS]: ../../README.md#key-concepts
-[VCPKG_DIRECTIONS]:../../../../README.md#development-environment
+[IOT_CLIENT_README]: https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot#azure-iot-clients
+[SDK_README_GETTING_STARTED]: https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot#getting-started
+[SDK_README_KEY_CONCEPTS]: https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot#azure-iot-clients
+[VCPKG_DIRECTIONS]:https://github.com/Azure/azure-sdk-for-c#development-environment
 [c2d_sample]: src/paho_iot_hub_c2d_example.c
 [methods_sample]: src/paho_iot_hub_methods_example.c
 [telemetry_sample_sas]: src/paho_iot_hub_sas_telemetry_example.c
 [telemetry_sample_cert]: src/paho_iot_hub_telemetry_example.c
 [twin_sample]: src/paho_iot_hub_twin_example.c
 [iot_hub_mqtt]: https://docs.microsoft.com/en-us/azure/iot-dps/iot-dps-mqtt-support
-[error_codes]: ../../doc/mqtt_state_machine.md#IoT-Service-Errors
+[error_codes]: https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/mqtt_state_machine.md#iot-service-errors
 [Eclipse_Paho]: https://www.eclipse.org/paho/clients/c/

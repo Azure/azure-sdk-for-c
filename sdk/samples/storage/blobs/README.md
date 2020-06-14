@@ -48,10 +48,10 @@ Azure SDK for Embedded C is licensed under the [MIT][azure_sdk_for_c_license] li
 <!-- LINKS -->
 [azure_sdk_for_c_contributing]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md
 [azure_sdk_for_c_license]: https://github.com/Azure/azure-sdk-for-c/blob/master/LICENSE
-[BLOB_SDK_README]: ../README.md
-[SDK_README_CONTRIBUTING]:../README.md#contributing
-[SDK_README_GETTING_STARTED]: ../README.md#getting-started
-[SDK_README_KEY_CONCEPTS]: ../README.md#key-concepts
+[BLOB_SDK_README]: https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/storage
+[SDK_README_CONTRIBUTING]:https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/storage#contributing
+[SDK_README_GETTING_STARTED]: https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/storage#getting-started
+[SDK_README_KEY_CONCEPTS]: https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/storage#key-concepts
 [samples_basic]: src/blobs_client_example.c
 [storageblob_rest]: https://docs.microsoft.com/en-us/rest/api/storageservices/blob-service-rest-api
 [error_codes]: https://docs.microsoft.com/rest/api/storageservices/blob-service-error-codes

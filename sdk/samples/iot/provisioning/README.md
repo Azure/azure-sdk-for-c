@@ -48,13 +48,13 @@ For extensive documentation on Azure Device Provisioning Service, see the [API r
 This project welcomes contributions and suggestions. Find [more contributing][SDK_README_CONTRIBUTING] details here.
 
 <!-- LINKS -->
-[IOT_CLIENT_README]: ../../README.md
-[SDK_README_CONTRIBUTING]:../../README.md#contributing
-[SDK_README_GETTING_STARTED]: ../../README.md#getting-started
-[SDK_README_KEY_CONCEPTS]: ../../README.md#key-concepts
+[IOT_CLIENT_README]: https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot#azure-iot-clients
+[SDK_README_CONTRIBUTING]:https://github.com/Azure/azure-sdk-for-c/tree/master#contributing
+[SDK_README_GETTING_STARTED]: https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot#getting-started
+[SDK_README_KEY_CONCEPTS]: https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot#azure-iot-clients
 [samples_paho]: src/paho_iot_provisioning_example.c
 [iot_provisioning_mqtt]: https://docs.microsoft.com/en-us/azure/iot-dps/iot-dps-mqtt-support
-[error_codes]: ../../doc/mqtt_state_machine.md#IoT-Service-Errors
+[error_codes]: https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/mqtt_state_machine.md#iot-service-errors
 [Eclipse_Paho]: https://www.eclipse.org/paho/clients/c/
 
 ![Impressions](https://azure-sdk-impressions.azurewebsites.net/api/impressions/azure-sdk-for-c%2Fsdk%2Fiot%2Fprovisioning%2Fsamples%2FREADME.png)
