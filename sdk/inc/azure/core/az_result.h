@@ -64,9 +64,8 @@ enum
  * The type represents success and error conditions.
  * Bits:
  * - 31 Severity (0 - success, 1 - failure).
- * - then
- *   - 16..30 Facility.
- *   - 0..15 Code.
+ * - 16..30 Facility.
+ * - 0..15 Code.
  */
 typedef enum
 {
