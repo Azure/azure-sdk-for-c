@@ -16,14 +16,14 @@
 
 # Service teams
 # Core
-sdk/doc/core/                 @ahsonkhan @antkmsft @gilbertw @jeffreyrichter @vhvb1989
+sdk/docs/core/                 @ahsonkhan @antkmsft @gilbertw @jeffreyrichter @vhvb1989
 sdk/inc/azure/core/           @ahsonkhan @antkmsft @gilbertw @jeffreyrichter @vhvb1989
 sdk/samples/core/             @ahsonkhan @antkmsft @gilbertw @jeffreyrichter @vhvb1989
 sdk/src/azure/core/           @ahsonkhan @antkmsft @gilbertw @jeffreyrichter @vhvb1989
 sdk/tests/core/               @ahsonkhan @antkmsft @gilbertw @jeffreyrichter @vhvb1989
 
 # IoT
-sdk/doc/iot/                  @CIPop @danewalton @ericwol-msft @ewertons @hihigupt @jspaith @momuno
+sdk/docs/iot/                  @CIPop @danewalton @ericwol-msft @ewertons @hihigupt @jspaith @momuno
 sdk/inc/azure/iot/            @CIPop @danewalton @ericwol-msft @ewertons @hihigupt @jspaith @momuno
 sdk/samples/iot/              @CIPop @danewalton @ericwol-msft @ewertons @hihigupt @jspaith @momuno
 sdk/src/azure/iot/            @CIPop @danewalton @ericwol-msft @ewertons @hihigupt @jspaith @momuno
@@ -36,7 +36,7 @@ sdk/samples/keyvault/         @vhvb1989
 sdk/src/azure/platform/       @antkmsft @jeffreyrichter @vhvb1989
 
 # Storage
-sdk/doc/storage/              @gilbertw
+sdk/docs/storage/              @gilbertw
 sdk/inc/azure/storage/        @gilbertw
 sdk/samples/storage/          @gilbertw
 sdk/src/azure/storage/        @gilbertw
