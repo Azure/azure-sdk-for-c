@@ -16,7 +16,7 @@ Many SDK functions return an `az_result` as defined in [inc/az_result.h](inc/az_
 
 ### Working with Spans
 
-An `az_span` is a small data structure (defined in our [az_span.h](hhttps://github.com/Azure/azure-sdk-for-c/blob/master/sdk/inc/azure/core/az_span.h) file) wrapping a byte buffer. Specifically, an `az_span` instance contains:
+An `az_span` is a small data structure (defined in our [az_span.h](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/inc/azure/core/az_span.h) file) wrapping a byte buffer. Specifically, an `az_span` instance contains:
 
 - a byte pointer
 - an integer size
