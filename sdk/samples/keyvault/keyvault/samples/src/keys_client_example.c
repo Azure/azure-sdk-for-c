@@ -40,14 +40,14 @@
  *
  */
 
-#include <az_context.h>
-#include <az_credentials.h>
-#include <az_http.h>
-#include <az_json.h>
+#include <azure/core/az_context.h>
+#include <azure/core/az_credentials.h>
+#include <azure/core/az_http.h>
+#include <azure/core/az_json.h>
 #include <az_keyvault.h>
 
 // Uncomment below code to enable logging (and the first lines of main function)
-#include <az_log.h>
+#include <azure/core/az_log.h>
 
 // Uncomment below lines when working with libcurl
 // #include <curl/curl.h>

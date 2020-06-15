@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_json.h>
+#include <azure/core/az_json.h>
 #include <az_keyvault.h>
-#include <az_span.h>
+#include <azure/core/az_span.h>
 
 #include <setjmp.h>
 #include <stdarg.h>
@@ -11,7 +11,7 @@
 
 #include <cmocka.h>
 
-#include <_az_cfg.h>
+#include <azure/core/_az_cfg.h>
 
 void test_keyvault(void** state);
 
