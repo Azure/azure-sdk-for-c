@@ -1,7 +1,7 @@
 # NOTE: Update-SdkVersion relies on these variables
 $RepoRoot = "${PSScriptRoot}/../.."
-$SdkVersionPath = Join-Path $RepoRoot "sdk\core\az_core\inc\az_version.h"
-$ChangelogPath = Join-Path $RepoRoot "sdk\core\az_core\CHANGELOG.md"
+$SdkVersionPath = Join-Path $RepoRoot "sdk\inc\azure\core\az_version.h"
+$ChangelogPath = Join-Path $RepoRoot "sdk\docs\core\CHANGELOG.md"
 $SdkVersionFile = Get-Content -Path $SdkVersionPath -Raw
 $VersionStringRegEx = '(#define AZ_SDK_VERSION_STRING )"(([0-9]+)\.([0-9]+)\.([0-9]+)(\-[^\"\-]+)?)"';
 $VersionMajorRegEx = '(#define AZ_SDK_VERSION_MAJOR )([0-9]+)';
