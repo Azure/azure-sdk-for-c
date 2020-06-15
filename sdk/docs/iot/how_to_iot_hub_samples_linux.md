@@ -1,6 +1,6 @@
 # How to Setup and Run Azure SDK for Embedded C IoT Hub Samples on Linux
 
-_Last edited on May 19th, 2020._
+_Last edited on June 15th, 2020._
 
 This is a step-by-step guide of how to start from scratch and get the Azure SDK for Embedded C IoT Hub Samples running. 
 
