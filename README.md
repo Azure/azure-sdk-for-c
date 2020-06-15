@@ -343,7 +343,7 @@ target_link_libraries(your_application_target PRIVATE lib_adapter http_stack_lib
 target_link_libraries(blobs_client_example PRIVATE az_curl CURL::libcurl)
 ```
 
-See the complete cmake file and how to link your own library [here](https://github.com/Azure/azure-sdk-for-c/blob/c3d88a660dc86cc2a57b225bfad205401de64379/sdk/src/azure/storage/CMakeLists.txt#L26)
+See the complete cmake file and how to link your own library [here](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/src/azure/storage/CMakeLists.txt#L26)
 
 
 ## SDK Architecture
