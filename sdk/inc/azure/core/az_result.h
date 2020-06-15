@@ -61,14 +61,11 @@ enum
   } while (0)
 
 /**
- * The type represents error conditions.
+ * The type represents success and error conditions.
  * Bits:
  * - 31 Severity (0 - success, 1 - failure).
- * - if failure then
- *   - 16..30 Facility.
- *   -  0..15 Code.
- * - otherwise
- *   -  0..30 Value
+ * - 16..30 Facility.
+ * - 0..15 Code.
  */
 typedef enum
 {
