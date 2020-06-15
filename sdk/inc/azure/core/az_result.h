@@ -61,7 +61,7 @@ enum
   } while (0)
 
 /**
- * The type represents error conditions.
+ * The type represents success and error conditions.
  * Bits:
  * - 31 Severity (0 - success, 1 - failure).
  * - then
