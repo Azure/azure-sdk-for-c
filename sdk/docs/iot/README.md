@@ -13,7 +13,7 @@ From a functional perspective, this means that the user's application code (not 
 
 A full list of features can be found in the doxygen docs listed below in [Docs](#docs).
 
-**Note**: this therefore requires a different programming model as compared to the earlier version of the SDK ([found here](https://github.com/Azure/azure-iot-sdk-c)). To better understand the responsibilities of the user application code and the SDK, please take a look at the [State Machine diagram](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/iot/doc/mqtt_state_machine.md) that explains the high-level architecture, SDK components, and a clear view of SDK x Application responsibilities.
+**Note**: this therefore requires a different programming model as compared to the earlier version of the SDK ([found here](https://github.com/Azure/azure-iot-sdk-c)). To better understand the responsibilities of the user application code and the SDK, please take a look at the [State Machine diagram](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/mqtt_state_machine.md) that explains the high-level architecture, SDK components, and a clear view of SDK x Application responsibilities.
 
 ### Docs
 For API documentation, please see the doxygen generated docs [here][azure_sdk_for_c_doxygen_docs]. You can find the IoT specific docs by navigating to the **Files -> File List** section near the top and choosing any of the header files prefixed with `az_iot_`.
@@ -26,7 +26,7 @@ The library targets made available via CMake are the following:
 - `az::iot::provisioning`: For Azure IoT Provisioning features ([API documentation here][azure_sdk_for_c_doxygen_provisioning_docs])
 
 ### Samples
-[This page](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/iot/hub/samples) explains samples for the Azure Embedded C SDK IoT Hub Client and [this page](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/iot/provisioning/samples) shows the Provisioning Clients and how to use them.
+[This page](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/samples/iot/hub#getting-started) explains samples for the Azure Embedded C SDK IoT Hub Client and [this page](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/samples/iot/provisioning#getting-started) shows the Provisioning Clients and how to use them.
 
   For step-by-step guides starting from scratch, you may refer to these documents:
   - [How to setup and run Azure SDK for Embedded C IoT Hub Samples on Linux](how_to_iot_hub_samples_linux.md)
