@@ -89,91 +89,22 @@ Send 5 telemetry messages using the IoT Hub Client with SAS key authentication.
 Send 5 telemetry messages using the IoT Hub Client with certificate authentication.
 
 ### [IoT Hub Twin (Certificates)][twin_sample]
-Use twin features such as receiving the twin document, updating reported properties, and receiving desired properties using the IoT Hub Client.
+Use device twin features such as receiving the twin document, updating reported properties, and sending desired properties using the Azure IoT Hub Client.
+This sample uses a property named `device_count`, which records the number of times the device sends a reported property message to the service.
 
-```shell
-/azure-sdk-for-c/cmake/sdk/iot/hub/samples$ ./paho_iot_hub_twin_example 
-AZ_IOT_DEVICE_X509_CERT_PEM_FILE = /mnt/c/Repos/azure-sdk-for-c/sdk/iot/hub/samples/src/device_cert_store.pem
-AZ_IOT_DEVICE_X509_TRUST_PEM_FILE =
-AZ_IOT_DEVICE_ID = testdevice-x509
-AZ_IOT_HUB_HOSTNAME = myiothub.azure-devices.net
-Posting connect semaphore for client TDS2 rc 0
-Subscribed to topics.
+* To initiate a GET response request from the device, you will use the command `g`. 
 
-Waiting for activity:
-Press 'g' for device to request twin document from service.
-Press 'r' for device to send device_count reported property to service. device_count will then locally increment.
-[Press 'q' to quit]
+* To initiate a reported property message from the device, you will use the command `r`.
 
-g
-Device requesting twin document from service.
-Received a message from service.
-Topic: $iothub/twin/res/200/?$rid=get_twin
-Topic is a twin message.
-A twin GET response was received.
-Payload:
-{"desired":{"$version":1},"reported":{"$version":1}}
-Response status was 200.
+* To send a device twin desired property message from the service to the device, open the device twin document in your Azure IoT Hub.  Add the property `device_count` along with a corresponding value to the `desired` section of the JSON.
 
-r
-Device sending device_count reported property to service.
-Payload: {"device_count":0}
-Received a message from service.
-Topic: $iothub/twin/res/204/?$rid=reported_prop&$version=2
-Topic is a twin message.
-A twin reported properties service response was received.
-No Payload upon success.
-Response status was 204.
+  ```json
+  "properties": {
+      "desired": {
+        "device_count": 42, //add this line
+  ```
 
-g
-Device requesting twin document from service.
-Received a message from service.
-Topic: $iothub/twin/res/200/?$rid=get_twin
-Topic is a twin message.
-A twin GET response was received.
-Payload:
-{"desired":{"$version":1},"reported":{"device_count":0,"$version":2}}
-Response status was 200.
-```
-
-To send a desired property to the device, open the device twin document in your IoT Hub and add `device_count` to the `desired` section of the JSON.
-
-```json
-"properties": {
-    "desired": {
-      "device_count": 42,
-```
-
-Select Save to send the message. The device will store value locally and report the property to the service.
-
-```shell
-Received a message from service.
-Topic: $iothub/twin/PATCH/properties/desired/?$version=2
-Topic is a twin message.
-A twin desired properties message was received.
-Payload:
-{"device_count":42,"$version":2}
-Response status was 200.
-Updating device_count reported property to service.
-Payload: {"device_count":42}
-
-Received a message from service.
-Topic: $iothub/twin/res/204/?$rid=reported_prop&$version=3
-Topic is a twin message.
-A twin reported properties service response was received.
-No Payload upon success.
-Response status was 204.
-
-g
-Device requesting twin document from service.
-Received a message from service.
-Topic: $iothub/twin/res/200/?$rid=get_twin
-Topic is a twin message.
-A twin GET response was received.
-Payload:
-{"desired":{"device_count":42,"$version":2},"reported":{"device_count":42,"$version":3}}
-Response status was 200.
-```
+  Select Save to send the message. The device will store the value locally and report the updated property to the service.
 
 
 
