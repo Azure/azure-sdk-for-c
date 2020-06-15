@@ -17,7 +17,7 @@ The Azure SDK repository is organized in the following folder structure, with th
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`/test`<br>
 
 ##  Getting Started Samples
-Each package folder contains a package-specific `README.md` file. Most of these `README` files contain `Hello World` code samples illustrating basic usage of the the APIs contained in the package. For example, you can find `Hello World` samples for the `azure-storage-blobs` package [here](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/storage/blobs/README.md#examples).
+Each package folder contains a package-specific `README.md` file. Most of these `README` files contain `Hello World` code samples illustrating basic usage of the the APIs contained in the package. For example, you can find `Hello World` samples for the `azure-storage-blobs` package [here](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/storage#examples).
 
 ## Package Samples and How-To Guides
 Each package folder contains a subfolder called `/samples` with code samples. These samples can either be short programs contained in `*.c` files, or more complete how-to guides (code samples and some commentary) contained in `*.md` files. You can find shortcuts to the main how-to guides in the [How-To Guides List](#how-to-guide-list) section below.
@@ -26,13 +26,13 @@ Each package folder contains a subfolder called `/samples` with code samples. Th
 This section lists how-to guides for the most commonly used APIs and most common scenarios, i.e. this section does not attempt to be a complete directory of guides contained in this repository. 
 
 #### General How-To Guides
-- [How to port the Azure SDK to another platform](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/core/az_core#porting-the-azure-sdk-to-another-platform)
-- [How to configure, access, and analyze logging information](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/core/az_core#logging-sdk-operations)
+- [How to port the Azure SDK to another platform](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core#porting-the-azure-sdk-to-another-platform)
+- [How to configure, access, and analyze logging information](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core#logging-sdk-operations)
 
 #### Azure.IoT
-- [IoT Hub samples](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/iot/hub/samples#getting-started)
-- [IoT Provisioning samples](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/iot/provisioning/samples#examples)
+- [IoT Hub samples](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/samples/iot/hub#getting-started)
+- [IoT Provisioning samples](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/samples/iot/provisioning#getting-started)
 
 
 #### Azure.Storage.Blobs
-- [How to Upload a blob](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/storage/blobs/samples/)
+- [How to Upload a blob](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/samples/storage/blobs)
