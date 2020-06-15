@@ -16,9 +16,6 @@ stages:
               - Name: Storage Blobs
                 NonWindowsPath: ./build/sdk/samples/storage/blobs/blobs_client_example
                 WindowsPath: build\sdk\samples\storage\blobs\debug\blobs_client_example.exe
-              - Name: Keyvault Keys
-                NonWindowsPath: ./build/sdk/samples/keyvault/keyvault/samples/keys_client_example
-                WindowsPath: build\sdk\samples\keyvault\keyvault\samples\debug\keys_client_example.exe
 
   - ${{ if and(eq(variables['Build.Reason'], 'Manual'), eq(variables['System.TeamProject'], 'internal'), not(endsWith(variables['Build.DefinitionName'], ' - tests'))) }}:
     - template: archetype-c-release.yml
