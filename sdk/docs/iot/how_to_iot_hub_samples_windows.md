@@ -1,6 +1,6 @@
 # How to Setup and Run Azure SDK for Embedded C IoT Hub Samples on Microsoft Windows
 
-_Last edited on June 3rd, 2020._
+_Last edited on June 15th, 2020._
 
 This is a step-by-step documentation of how to start from scratch and get the Azure SDK for Embedded C IoT Hub Samples running on Microsoft Windows. 
 
