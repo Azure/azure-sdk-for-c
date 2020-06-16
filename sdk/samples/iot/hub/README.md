@@ -89,7 +89,24 @@ Send 5 telemetry messages using the IoT Hub Client with SAS key authentication.
 Send 5 telemetry messages using the IoT Hub Client with certificate authentication.
 
 ### [IoT Hub Twin (Certificates)][twin_sample]
-Use twin features such as updating reported properties, receiving the twin document, and receiving desired properties using the IoT Hub Client.
+Use device twin features such as receiving the twin document, updating reported properties, and sending desired properties using the Azure IoT Hub Client.
+This sample uses a property named `device_count`, which records the number of times the device sends a reported property message to the service.
+
+* To initiate a GET response request from the device, you will use the command `g`. 
+
+* To initiate a reported property message from the device, you will use the command `r`.
+
+* To send a device twin desired property message from the service to the device, open the device twin document in your Azure IoT Hub.  Add the property `device_count` along with a corresponding value to the `desired` section of the JSON.
+
+  ```json
+  "properties": {
+      "desired": {
+        "device_count": 42, //add this line
+  ```
+
+  Select Save to send the message. The device will store the value locally and report the updated property to the service.
+
+
 
 ### [IoT Hub Methods (Certificates)][methods_sample]
 Invoke methods from the cloud. The sample supports a method named "ping"
