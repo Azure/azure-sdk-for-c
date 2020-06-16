@@ -6,7 +6,7 @@ The library allows client libraries to expose common functionality in a consiste
 
 ## Porting the Azure SDK to Another Platform
 
-The `Azure Core` library requires you to implement a few functions to provide platform-specific features such as a clock, a thread sleep, a mutual-exclusive thread synchronization lock, and an HTTP stack. By default, `Azure Core` ships with no-op versions of these functions, all of which return `AZ_RESULT_NOT_IMPLEMENTED`. The no-op versions allow the Azure SDK to compile successfully so you can verify that your build tool chain is working properly; however, failures occur if you execute the code.
+The `Azure Core` library requires you to implement a few functions to provide platform-specific features such as a clock, a thread sleep, and a mutual-exclusive thread synchronization lock. By default, `Azure Core` ships with no-op versions of these functions, all of which return `AZ_RESULT_NOT_IMPLEMENTED`. The no-op versions allow the Azure SDK to compile successfully so you can verify that your build tool chain is working properly; however, failures occur if you execute the code.
 
 ## Key Concepts
 
