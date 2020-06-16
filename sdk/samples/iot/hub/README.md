@@ -101,7 +101,7 @@ This sample uses a property named `device_count`, which records the number of ti
   ```json
   "properties": {
       "desired": {
-        "device_count": 42, //add this line
+        "device_count": 42,
   ```
 
   Select Save to send the message. The device will store the value locally and report the updated property to the service.
