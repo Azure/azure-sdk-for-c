@@ -18,6 +18,30 @@ With this in mind, there are many tenants or principles that we follow in order 
 
 - We support microcontrollers with no operating system, microcontrollers with a real-time operating system (like [Azure RTOS](https://azure.microsoft.com/en-us/services/rtos/)), Linux, and Windows. Customers can implement their own "platform layer" to use our SDK on devices we don’t support out-of-the-box. The platform layer requires minimal functionality such as a clock, a mutex, sleep, and an HTTP stack. We provide some platform layers, and more will be added over time.
 
+## Table of Contents
+- [Azure SDK for Embedded C](#azure-sdk-for-embedded-c)
+  - [Table of Contents](#table-of-contents)
+  - [Documentation](#documentation)
+  - [The GitHub Repository](#the-github-repository)
+    - [Master Branch](#master-branch)
+    - [Release Branches and Release Tagging](#release-branches-and-release-tagging)
+  - [Getting Started Using the SDK](#getting-started-using-the-sdk)
+    - [Compiler Options](#compiler-options)
+  - [Running Samples](#running-samples)
+    - [Libcurl Global Init and Global Clean Up](#libcurl-global-init-and-global-clean-up)
+    - [Development Environment](#development-environment)
+    - [Windows](#windows)
+    - [Linux](#linux)
+    - [Mac](#mac)
+    - [Using your own HTTP stack implementation](#using-your-own-http-stack-implementation)
+    - [Link your application with your own HTTP stack](#link-your-application-with-your-own-http-stack)
+  - [SDK Architecture](#sdk-architecture)
+  - [Contributing](#contributing)
+    - [Additional Helpful Links for Contributors](#additional-helpful-links-for-contributors)
+    - [Community](#community)
+    - [Reporting Security Issues and Security Bugs](#reporting-security-issues-and-security-bugs)
+    - [License](#license)
+
 ## Documentation
 
 We use [doxygen](https://www.doxygen.nl) to generate documentation for source code. You can find the generated, versioned documentation [here](https://azure.github.io/azure-sdk-for-c).
