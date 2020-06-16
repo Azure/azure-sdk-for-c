@@ -26,7 +26,9 @@ With this in mind, there are many tenants or principles that we follow in order 
     - [Master Branch](#master-branch)
     - [Release Branches and Release Tagging](#release-branches-and-release-tagging)
   - [Getting Started Using the SDK](#getting-started-using-the-sdk)
-    - [Compiler Options](#compiler-options)
+    - [CMake](#cmake)
+    - [CMake Options](#cmake-options)
+    - [Source Files (IDE, command line, etc)](#source-files-ide-command-line-etc)
   - [Running Samples](#running-samples)
     - [Libcurl Global Init and Global Clean Up](#libcurl-global-init-and-global-clean-up)
     - [Development Environment](#development-environment)
@@ -67,6 +69,9 @@ When we make an official release, we will create a unique git tag containing the
 
 ## Getting Started Using the SDK
 
+The SDK can be conveniently consumed either via CMake or other non-CMake methods (IDE workspaces, command line, and others).
+
+### CMake
 1. Install the required prerequisites:
    - [CMake](https://cmake.org/download/) version 3.10 or later
    - C compiler: [MSVC](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2019), [gcc](https://gcc.gnu.org/) or [clang](https://clang.llvm.org/) are recommended
@@ -102,7 +107,7 @@ When we make an official release, we will create a unique git tag containing the
 
 4. Provide platform-specific implementations for functionality required by `Azure Core`. For more information, see the [Azure Core Porting Guide](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core#porting-the-azure-sdk-to-another-platform).
 
-### Compiler Options
+### CMake Options
 
 By default, when building the project with no options, the following static libraries are generated:
 
@@ -118,7 +123,7 @@ By default, when building the project with no options, the following static libr
   - az_nohttp
     -  Library that provides a basic returning error when calling HTTP stack. Similar to az_noplatform, this library ensures the project can be compiled without requiring any HTTP stack implementation. This is useful if you want to use `az_core` without `az_http` functionality.
 
-The following compiler options are available for adding/removing project features.
+The following CMake options are available for adding/removing project features.
 
 <table>
 <tr>
@@ -138,7 +143,7 @@ The following compiler options are available for adding/removing project feature
 </tr>
 <tr>
 <td>PRECONDITIONS</td>
-<td>Turning this option ON would remove all method contracts. This us typically for shipping libraries for production to make it as much optimized as possible.</td>
+<td>Turning this option OFF would remove all method contracts. This is typically for shipping libraries for production to make it as optimized as possible.</td>
 <td>ON</td>
 </tr>
 <tr>
@@ -148,7 +153,7 @@ The following compiler options are available for adding/removing project feature
 </tr>
 <tr>
 <td>TRANSPORT_PAHO</td>
-<td>This option requires paho-mqtt dependency to be available. Provides Paho MQTT support for iot.</td>
+<td>This option requires paho-mqtt dependency to be available. Provides Paho MQTT support for IoT.</td>
 <td>OFF</td>
 </tr>
 <tr>
@@ -165,6 +170,29 @@ The following compiler options are available for adding/removing project feature
       Recompile az_core with an HTTP client implementation like CURL to see sample sending network requests.
 
       i.e. cmake -DTRANSPORT_CURL=ON ..
+
+### Source Files (IDE, command line, etc)
+
+We have set up the repo for easy integration into other projects which don't use CMake. Two main features make this possible:
+- To resolve all header file relative paths, you only need to include `sdk/inc` in your project. All header files are included in the sdk with relative paths to clearly demarcate the services they belong to. A couple examples being:  
+```c
+#include <azure/core/az_span.h>
+#include <azure/iot/az_iot_hub_client.h>
+```
+- All source files are placed in a directory structure similar to the headers: `sdk/src`. Each service has its own subdirectory to separate files which you may be singularly interested in.
+
+To use a specific service/feature, you may include the header file with the function declaration and compile the according `.c` containing the function implementation with your project.
+
+The specific dependencies of each service may vary, but a couple rules of thumb should resolve the most typical of issues.
+1. All services depend on `core` ([source files here](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/src/azure/core)). You may compile these files with your project to resolve core dependencies.
+2. Most services will require a platform file to be compiled with your project ([see here for porting instructions](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core#porting-the-azure-sdk-to-another-platform)). We have provided several implementations already [here](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/src/azure/platform) for [`windows`](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/src/azure/platform/az_win32.c), [`posix`](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/src/azure/platform/az_posix.c), and a [`no_platform`](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/src/azure/platform/az_noplatform.c) for no-op stubs. Please compile one of these, for your respective platform, with your project.
+
+The following compilation, preprocessor options will add or remove functionality in the SDK.
+
+| Option | Description |
+| ------ | ----------- |
+| `AZ_NO_PRECONDITION_CHECKING` | Turns off precondition checks to maximize performance with removal of function precondition checking. |
+| `AZ_NO_LOGGING` | Removes all logging code and artifacts from the SDK (helps reduce code size). |
 
 ## Running Samples
 
