@@ -295,7 +295,7 @@ function ParseCArtifact($pkg, $workingDirectory) {
   $releaseNotes = &"${PSScriptRoot}/../Extract-ReleaseNotes.ps1" -ChangeLogLocation @(Get-ChildItem -Path $packageArtifactLocation -Recurse -Include "CHANGELOG.md")[0]
 
   return New-Object PSObject -Property @{
-    PackageId      = ''
+    PackageId      = 'azure-sdk-for-c'
     PackageVersion = $packageInfo.version
     # Artifact info is always considered deployable for C becasue it is not
     # deployed anywhere. Dealing with duplicate tags happens downstream in
