@@ -57,7 +57,6 @@ static char get_twin_topic[128];
 static az_span get_twin_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("get_twin");
 static char reported_property_topic[128];
 static az_span reported_property_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("reported_prop");
-
 static az_span reported_property_name = AZ_SPAN_LITERAL_FROM_STR("device_count");
 static int32_t reported_property_value = 0;
 static char reported_property_buffer[64];
@@ -65,7 +64,6 @@ static az_span version_name = AZ_SPAN_LITERAL_FROM_STR("$version");
 
 static az_iot_hub_client client;
 static MQTTClient mqtt_client;
-
 
 //
 // Configuration and connection functions - uses MQTT API
@@ -86,14 +84,12 @@ static int subscribe();
 // Messaging and property functions
 //
 static int on_received(void* context, char* topicName, int topicLen, MQTTClient_message* message);
-
 static int send_get_twin();
 static int report_property();
 static az_result build_reported_property(az_span* reported_property_payload);
 static int send_reported_property(az_span reported_property_payload);
 static az_result update_property(az_span desired_payload);
 static void increment_property_count();
-
 
 int main()
 {
@@ -360,7 +356,6 @@ static int subscribe()
   return rc;
 }
 
-
 static int on_received(void* context, char* topicName, int topicLen, MQTTClient_message* message)
 {
   (void)context;
@@ -411,7 +406,7 @@ static int on_received(void* context, char* topicName, int topicLen, MQTTClient_
         else
         {
           // Status will be 204 upon success.
-          printf("Success. No Payload.\n");
+          printf("Success. No payload.\n");
         }
         printf("Response status was %d.\n", twin_response.status);
         break;
@@ -480,16 +475,15 @@ static int report_property()
   az_span reported_property_payload;
   printf("Device building reported property payload and sending to service.\n");
 
-  if (az_failed(
-          rc = build_reported_property(&reported_property_payload)))
+  if (az_failed(rc = build_reported_property(&reported_property_payload)))
   {
     printf("Unable to build reported property payload to send, return code %d.\n", rc);
     return rc;
   }
-  if (az_failed(
-          rc = send_reported_property(reported_property_payload)))
+  if (az_failed(rc = send_reported_property(reported_property_payload)))
   {
-    printf("Faied to send reported property payload to service. return code %d.\n", rc);
+    printf("Failed to send reported property payload to service. return code %d.\n", rc);
+    return rc;
   }
 
   return rc;
@@ -515,7 +509,10 @@ static int send_reported_property(az_span reported_property_payload)
 {
   int rc;
   printf("Device sending reported property to service.\n");
-  printf("Sending payload:\n%.*s\n", az_span_size(reported_property_payload), az_span_ptr(reported_property_payload));
+  printf(
+      "Sending payload:\n%.*s\n",
+      az_span_size(reported_property_payload),
+      az_span_ptr(reported_property_payload));
 
   // Get the topic used to send a reported property update
   if (az_failed(
@@ -530,8 +527,8 @@ static int send_reported_property(az_span reported_property_payload)
     return rc;
   }
 
-  // Publish the reported property payload to IoT Hub. This will trigger the service to send back a response
-  // to this device. The response is handled in the on_received function.
+  // Publish the reported property payload to IoT Hub. This will trigger the service to send back a
+  // response to this device. The response is handled in the on_received function.
   if ((rc = MQTTClient_publish(
            mqtt_client,
            reported_property_topic,
@@ -568,28 +565,29 @@ static az_result update_property(az_span desired_payload)
       double temp_property_value = 0.0;
       AZ_RETURN_IF_FAILED(az_json_token_get_number(&token_member.token, &temp_property_value));
 
-      printf("Updating \"%.*s\" locally.\n", az_span_size(reported_property_name), az_span_ptr(reported_property_name));
+      printf(
+          "Updating \"%.*s\" locally.\n",
+          az_span_size(reported_property_name),
+          az_span_ptr(reported_property_name));
       reported_property_value = (int32_t)temp_property_value;
       return AZ_OK;
     }
     AZ_RETURN_IF_FAILED(az_json_parser_parse_token_member(&json_parser, &token_member));
   }
 
-  printf("Did not find \"%.*s\" in desired property payload.\n", az_span_size(reported_property_name), az_span_ptr(reported_property_name));
+  printf(
+      "Did not find \"%.*s\" in desired property payload.\n",
+      az_span_size(reported_property_name),
+      az_span_ptr(reported_property_name));
   return AZ_ERROR_ITEM_NOT_FOUND;
 }
 
 static void increment_property_count()
-{ 
-  printf("Incrementing \"%.*s\" locally.\n", az_span_size(reported_property_name), az_span_ptr(reported_property_name));
-  reported_property_value++; 
-  return; 
+{
+  printf(
+      "Incrementing \"%.*s\" locally.\n",
+      az_span_size(reported_property_name),
+      az_span_ptr(reported_property_name));
+  reported_property_value++;
+  return;
 }
-
-
-
-
-
-
-
-
