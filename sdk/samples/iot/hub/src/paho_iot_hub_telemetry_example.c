@@ -22,9 +22,9 @@
 #include <unistd.h>
 #endif
 
-#include <azure/iot/az_iot_hub_client.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
+#include <azure/iot/az_iot_hub_client.h>
 
 #ifdef _MSC_VER
 // "'getenv': This function or variable may be unsafe. Consider using _dupenv_s instead."
@@ -69,13 +69,126 @@ static const char* telemetry_message_payloads[NUMBER_OF_MESSAGES] = {
 static az_iot_hub_client client;
 static MQTTClient mqtt_client;
 
-static void sleep_seconds(uint32_t seconds)
+//
+// Configuration and connection functions - uses MQTT API
+//
+static az_result read_configuration_and_init_client();
+static az_result read_configuration_entry(
+    const char* name,
+    const char* env_name,
+    char* default_value,
+    bool hide_value,
+    az_span buffer,
+    az_span* out_value);
+static az_result create_mqtt_endpoint(char* destination, int32_t destination_size, az_span iot_hub);
+static int connect_device();
+
+//
+// Messaging functions
+//
+static int send_telemetry_messages();
+static void sleep_seconds(uint32_t seconds);
+
+int main()
 {
-#ifdef _WIN32
-  Sleep((DWORD)seconds * 1000);
-#else
-  sleep(seconds);
-#endif
+  int rc;
+
+  // Read in the necessary environment variables and initialize the az_iot_hub_client
+  if (az_failed(rc = read_configuration_and_init_client()))
+  {
+    printf("Failed to read configuration from environment variables, return code %d\n", rc);
+    return rc;
+  }
+
+  // Get the MQTT client id used for the MQTT connection
+  size_t client_id_length;
+  if (az_failed(
+          rc = az_iot_hub_client_get_client_id(
+              &client, mqtt_client_id, sizeof(mqtt_client_id), &client_id_length)))
+  {
+    printf("Failed to get MQTT clientId, return code %d\n", rc);
+    return rc;
+  }
+
+  // Create the Paho MQTT client
+  if ((rc = MQTTClient_create(
+           &mqtt_client, mqtt_endpoint, mqtt_client_id, MQTTCLIENT_PERSISTENCE_NONE, NULL))
+      != MQTTCLIENT_SUCCESS)
+  {
+    printf("Failed to create MQTT client, return code %d\n", rc);
+    return rc;
+  }
+
+  // Connect to IoT Hub
+  if ((rc = connect_device()) != 0)
+  {
+    return rc;
+  }
+
+  // Loop and send 5 messages
+  if ((rc = send_telemetry_messages()) != 0)
+  {
+    return rc;
+  }
+
+  printf("Messages Sent [Press ENTER to shut down]\n");
+  (void)getchar();
+
+  // Gracefully disconnect: send the disconnect packet and close the socket
+  if ((rc = MQTTClient_disconnect(mqtt_client, TIMEOUT_MQTT_DISCONNECT_MS)) != MQTTCLIENT_SUCCESS)
+  {
+    printf("Failed to disconnect MQTT client, return code %d\n", rc);
+    return rc;
+  }
+  printf("Disconnected.\n");
+
+  // Clean up and release resources allocated by the mqtt client
+  MQTTClient_destroy(&mqtt_client);
+
+  return 0;
+}
+
+// Read the user environment variables used to connect to IoT Hub
+static az_result read_configuration_and_init_client()
+{
+  az_span cert = AZ_SPAN_FROM_BUFFER(x509_cert_pem_file);
+  AZ_RETURN_IF_FAILED(read_configuration_entry(
+      ENV_DEVICE_X509_CERT_PEM_FILE, ENV_DEVICE_X509_CERT_PEM_FILE, NULL, false, cert, &cert));
+
+  az_span trusted = AZ_SPAN_FROM_BUFFER(x509_trust_pem_file);
+  AZ_RETURN_IF_FAILED(read_configuration_entry(
+      ENV_DEVICE_X509_TRUST_PEM_FILE,
+      ENV_DEVICE_X509_TRUST_PEM_FILE,
+      "",
+      false,
+      trusted,
+      &trusted));
+
+  az_span device_id_span = AZ_SPAN_FROM_BUFFER(device_id);
+  AZ_RETURN_IF_FAILED(read_configuration_entry(
+      ENV_DEVICE_ID, ENV_DEVICE_ID, "", false, device_id_span, &device_id_span));
+
+  az_span iot_hub_hostname_span = AZ_SPAN_FROM_BUFFER(iot_hub_hostname);
+  AZ_RETURN_IF_FAILED(read_configuration_entry(
+      ENV_IOT_HUB_HOSTNAME,
+      ENV_IOT_HUB_HOSTNAME,
+      "",
+      false,
+      iot_hub_hostname_span,
+      &iot_hub_hostname_span));
+
+  // Paho requires that the MQTT endpoint be of the form ssl://<HUB ENDPOINT>:8883
+  AZ_RETURN_IF_FAILED(
+      create_mqtt_endpoint(mqtt_endpoint, (int32_t)sizeof(mqtt_endpoint), iot_hub_hostname_span));
+
+  // Initialize the hub client with the hub host endpoint and the default connection options
+  AZ_RETURN_IF_FAILED(az_iot_hub_client_init(
+      &client,
+      az_span_slice(iot_hub_hostname_span, 0, (int32_t)strlen(iot_hub_hostname)),
+      az_span_slice(device_id_span, 0, (int32_t)strlen(device_id)),
+      NULL));
+
+  return AZ_OK;
 }
 
 // Read OS environment variables using stdlib function
@@ -136,44 +249,6 @@ static az_result create_mqtt_endpoint(char* destination, int32_t destination_siz
   return AZ_OK;
 }
 
-// Read the user environment variables used to connect to IoT Hub
-static az_result read_configuration_and_init_client()
-{
-  az_span cert = AZ_SPAN_FROM_BUFFER(x509_cert_pem_file);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_DEVICE_X509_CERT_PEM_FILE, ENV_DEVICE_X509_CERT_PEM_FILE, NULL, false, cert, &cert));
-
-  az_span trusted = AZ_SPAN_FROM_BUFFER(x509_trust_pem_file);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_DEVICE_X509_TRUST_PEM_FILE, ENV_DEVICE_X509_TRUST_PEM_FILE, "", false, trusted, &trusted));
-
-  az_span device_id_span = AZ_SPAN_FROM_BUFFER(device_id);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_DEVICE_ID, ENV_DEVICE_ID, "", false, device_id_span, &device_id_span));
-
-  az_span iot_hub_hostname_span = AZ_SPAN_FROM_BUFFER(iot_hub_hostname);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_IOT_HUB_HOSTNAME,
-      ENV_IOT_HUB_HOSTNAME,
-      "",
-      false,
-      iot_hub_hostname_span,
-      &iot_hub_hostname_span));
-
-  // Paho requires that the MQTT endpoint be of the form ssl://<HUB ENDPOINT>:8883
-  AZ_RETURN_IF_FAILED(
-      create_mqtt_endpoint(mqtt_endpoint, (int32_t)sizeof(mqtt_endpoint), iot_hub_hostname_span));
-
-  // Initialize the hub client with the hub host endpoint and the default connection options
-  AZ_RETURN_IF_FAILED(az_iot_hub_client_init(
-      &client,
-      az_span_slice(iot_hub_hostname_span, 0, (int32_t)strlen(iot_hub_hostname)),
-      az_span_slice(device_id_span, 0, (int32_t)strlen(device_id)),
-      NULL));
-
-  return AZ_OK;
-}
-
 static int connect_device()
 {
   int rc;
@@ -189,7 +264,6 @@ static int connect_device()
   if (az_failed(
           rc
           = az_iot_hub_client_get_user_name(&client, mqtt_username, sizeof(mqtt_username), NULL)))
-
   {
     printf("Failed to get MQTT clientId, return code %d\n", rc);
     return rc;
@@ -215,7 +289,7 @@ static int connect_device()
     return rc;
   }
 
-  return 0;
+  return rc;
 }
 
 static int send_telemetry_messages()
@@ -250,61 +324,11 @@ static int send_telemetry_messages()
   return rc;
 }
 
-int main()
+static void sleep_seconds(uint32_t seconds)
 {
-  int rc;
-
-  // Read in the necessary environment variables and initialize the az_iot_hub_client
-  if (az_failed(rc = read_configuration_and_init_client()))
-  {
-    printf("Failed to read configuration from environment variables, return code %d\n", rc);
-    return rc;
-  }
-
-  // Get the MQTT client id used for the MQTT connection
-  size_t client_id_length;
-  if (az_failed(
-          rc = az_iot_hub_client_get_client_id(
-              &client, mqtt_client_id, sizeof(mqtt_client_id), &client_id_length)))
-  {
-    printf("Failed to get MQTT clientId, return code %d\n", rc);
-    return rc;
-  }
-
-  // Create the Paho MQTT client
-  if ((rc = MQTTClient_create(
-           &mqtt_client, mqtt_endpoint, mqtt_client_id, MQTTCLIENT_PERSISTENCE_NONE, NULL))
-      != MQTTCLIENT_SUCCESS)
-  {
-    printf("Failed to create MQTT client, return code %d\n", rc);
-    return rc;
-  }
-
-  // Connect to IoT Hub
-  if ((rc = connect_device()) != 0)
-  {
-    return rc;
-  }
-
-  // Loop and send 5 messages
-  if ((rc = send_telemetry_messages()) != 0)
-  {
-    return rc;
-  }
-
-  printf("Messages Sent [Press ENTER to shut down]\n");
-  (void)getchar();
-
-  // Gracefully disconnect: send the disconnect packet and close the socket
-  if ((rc = MQTTClient_disconnect(mqtt_client, TIMEOUT_MQTT_DISCONNECT_MS)) != MQTTCLIENT_SUCCESS)
-  {
-    printf("Failed to disconnect MQTT client, return code %d\n", rc);
-    return rc;
-  }
-  printf("Disconnected.\n");
-
-  // Clean up and release resources allocated by the mqtt client
-  MQTTClient_destroy(&mqtt_client);
-
-  return 0;
+#ifdef _WIN32
+  Sleep((DWORD)seconds * 1000);
+#else
+  sleep(seconds);
+#endif
 }

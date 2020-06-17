@@ -15,10 +15,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <azure/iot/az_iot_hub_client.h>
 #include <azure/core/az_json.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
+#include <azure/iot/az_iot_hub_client.h>
 
 #ifdef _MSC_VER
 // "'getenv': This function or variable may be unsafe. Consider using _dupenv_s instead."
@@ -81,7 +81,7 @@ static int connect_device();
 static int subscribe();
 
 //
-// Messaging and property functions
+// Messaging functions
 //
 static int on_received(void* context, char* topicName, int topicLen, MQTTClient_message* message);
 static int send_get_twin();
@@ -186,6 +186,50 @@ int main()
   return 0;
 }
 
+// Read the user environment variables used to connect to IoT Hub and initialize the IoT Hub client
+static az_result read_configuration_and_init_client()
+{
+  az_span cert = AZ_SPAN_FROM_BUFFER(x509_cert_pem_file);
+  AZ_RETURN_IF_FAILED(read_configuration_entry(
+      ENV_DEVICE_X509_CERT_PEM_FILE, ENV_DEVICE_X509_CERT_PEM_FILE, NULL, false, cert, &cert));
+
+  az_span trusted = AZ_SPAN_FROM_BUFFER(x509_trust_pem_file);
+  AZ_RETURN_IF_FAILED(read_configuration_entry(
+      ENV_DEVICE_X509_TRUST_PEM_FILE,
+      ENV_DEVICE_X509_TRUST_PEM_FILE,
+      "",
+      false,
+      trusted,
+      &trusted));
+
+  az_span device_id_span = AZ_SPAN_FROM_BUFFER(device_id);
+  AZ_RETURN_IF_FAILED(read_configuration_entry(
+      ENV_DEVICE_ID, ENV_DEVICE_ID, "", false, device_id_span, &device_id_span));
+
+  az_span iot_hub_hostname_span = AZ_SPAN_FROM_BUFFER(iot_hub_hostname);
+  AZ_RETURN_IF_FAILED(read_configuration_entry(
+      ENV_IOT_HUB_HOSTNAME,
+      ENV_IOT_HUB_HOSTNAME,
+      "",
+      false,
+      iot_hub_hostname_span,
+      &iot_hub_hostname_span));
+
+  // Paho requires that the MQTT endpoint be of the form ssl://<HUB ENDPOINT>:8883
+  AZ_RETURN_IF_FAILED(
+      create_mqtt_endpoint(mqtt_endpoint, (int32_t)sizeof(mqtt_endpoint), iot_hub_hostname_span));
+
+  // Initialize the hub client with the hub host endpoint and the default connection options
+  AZ_RETURN_IF_FAILED(az_iot_hub_client_init(
+      &client,
+      az_span_slice(iot_hub_hostname_span, 0, (int32_t)strlen(iot_hub_hostname)),
+      az_span_slice(device_id_span, 0, (int32_t)strlen(device_id)),
+      NULL));
+
+  return AZ_OK;
+}
+
+// Read OS environment variables using stdlib function
 static az_result read_configuration_entry(
     const char* name,
     const char* env_name,
@@ -243,49 +287,6 @@ static az_result create_mqtt_endpoint(char* destination, int32_t destination_siz
   return AZ_OK;
 }
 
-// Read the user environment variables used to connect to IoT Hub and initialize the IoT Hub client
-static az_result read_configuration_and_init_client()
-{
-  az_span cert = AZ_SPAN_FROM_BUFFER(x509_cert_pem_file);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_DEVICE_X509_CERT_PEM_FILE, ENV_DEVICE_X509_CERT_PEM_FILE, NULL, false, cert, &cert));
-
-  az_span trusted = AZ_SPAN_FROM_BUFFER(x509_trust_pem_file);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_DEVICE_X509_TRUST_PEM_FILE,
-      ENV_DEVICE_X509_TRUST_PEM_FILE,
-      "",
-      false,
-      trusted,
-      &trusted));
-
-  az_span device_id_span = AZ_SPAN_FROM_BUFFER(device_id);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_DEVICE_ID, ENV_DEVICE_ID, "", false, device_id_span, &device_id_span));
-
-  az_span iot_hub_hostname_span = AZ_SPAN_FROM_BUFFER(iot_hub_hostname);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_IOT_HUB_HOSTNAME,
-      ENV_IOT_HUB_HOSTNAME,
-      "",
-      false,
-      iot_hub_hostname_span,
-      &iot_hub_hostname_span));
-
-  // Paho requires that the MQTT endpoint be of the form ssl://<HUB ENDPOINT>:8883
-  AZ_RETURN_IF_FAILED(
-      create_mqtt_endpoint(mqtt_endpoint, (int32_t)sizeof(mqtt_endpoint), iot_hub_hostname_span));
-
-  // Initialize the hub client with the hub host endpoint and the default connection options
-  AZ_RETURN_IF_FAILED(az_iot_hub_client_init(
-      &client,
-      az_span_slice(iot_hub_hostname_span, 0, (int32_t)strlen(iot_hub_hostname)),
-      az_span_slice(device_id_span, 0, (int32_t)strlen(device_id)),
-      NULL));
-
-  return AZ_OK;
-}
-
 static int connect_device()
 {
   int rc;
@@ -301,7 +302,6 @@ static int connect_device()
   if (az_failed(
           rc
           = az_iot_hub_client_get_user_name(&client, mqtt_username, sizeof(mqtt_username), NULL)))
-
   {
     printf("Failed to get MQTT clientId, return code %d\n", rc);
     return rc;
