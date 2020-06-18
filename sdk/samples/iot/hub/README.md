@@ -27,7 +27,7 @@ install the OpenSSL command line utility prior to using the script.
   ```
 - To use the samples, we use [Eclipse Paho MQTT C client][Eclipse_Paho]. You can use the directions
 [here][VCPKG_DIRECTIONS] to set up VCPKG to download and manage linking the dependency.
-- If you are having trouble with any of the prerequisites, please see our `how_to_iot_hub_samples_<platform>.md` documents [here](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot/) for more help.
+- If you are having trouble with any of the prerequisites, please see our `how_to_iot_hub_samples_<platform>.md` documents in this directory.
 
 ## Getting Started
 
