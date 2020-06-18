@@ -58,7 +58,7 @@ To get help with the SDK:
 
 ### Structure
 
-The repo is structred with two priorities:
+The repo is structured with two priorities:
 1. Separation of services/features to make it easier to find relevant information and resources.
 2. Simplified source file structuring to easily integrate features into a user's project.
 
