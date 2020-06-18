@@ -66,8 +66,8 @@ function(ADD_CMOCKA_TEST _TARGET_NAME)
     add_executable(${_TARGET_NAME} ${_add_cmocka_test_SOURCES})
 
     # Suppress clobber warning for longjmp
-    if(CMAKE_C_COMPILER_ID MATHES "GNU")
-      target_compile_options(${_TARGET_NAME} -Wno-clobbered)
+    if(CMAKE_C_COMPILER_ID MATCHES "GNU")
+      target_compile_options(${_TARGET_NAME} PRIVATE -Wno-clobbered)
     endif()
 
     if (DEFINED _add_cmocka_test_COMPILE_OPTIONS)
