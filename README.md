@@ -23,6 +23,7 @@ With this in mind, there are many tenants or principles that we follow in order 
   - [Table of Contents](#table-of-contents)
   - [Documentation](#documentation)
   - [The GitHub Repository](#the-github-repository)
+    - [Structure](#structure)
     - [Master Branch](#master-branch)
     - [Release Branches and Release Tagging](#release-branches-and-release-tagging)
   - [Getting Started Using the SDK](#getting-started-using-the-sdk)
@@ -54,6 +55,21 @@ To get help with the SDK:
 
 - File a [Github Issue](https://github.com/Azure/azure-sdk-for-c/issues/new/choose).
 - Ask new questions or see others' questions on [Stack Overflow](https://stackoverflow.com/questions/tagged/azure+c) using the `azure` and `c` tags.
+
+### Structure
+
+The repo is structred with two priorities:
+1. Separation of services/features to make it easier to find relevant information and resources.
+2. Simplified source file structuring to easily integrate features into a user's project.
+
+`/sdk` (folder containing docs, sources, samples, tests for all SDK packages)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;`/docs` (documentation for each service (iot, storage, etc))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;`/inc` (include directory - can be singularly included in your project to resolve all headers)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;`/samples` (samples for each service)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;`/src` (source files for each service)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;`/tests` (tests for each service)<br>
+
+For instructions on how to consume the libraries via CMake, please see [here](#cmake). For instructions on how consume the source code in an IDE, command line, or other build systems, please see [here](#source-files-ide-command-line-etc).
 
 ### Master Branch
 
