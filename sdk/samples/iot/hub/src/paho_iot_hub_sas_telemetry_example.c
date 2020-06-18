@@ -83,26 +83,25 @@ static az_iot_hub_client client;
 static MQTTClient mqtt_client;
 
 //
-// Configuration and connection functions - uses MQTT API
+// Configuration and connection functions
 //
 static az_result read_configuration_and_init_client();
 static az_result read_configuration_entry(
-    const char* name,
     const char* env_name,
     char* default_value,
     bool hide_value,
     az_span buffer,
     az_span* out_value);
 static az_result create_mqtt_endpoint(char* destination, int32_t destination_size, az_span iot_hub);
-static int generate_sas_key();
-static uint32_t get_epoch_expiration_time(uint32_t hours);
+static az_result generate_sas_key();
+static uint32_t get_epoch_expiration_time_from_hours(uint32_t hours);
 static int connect_device();
 
 //
 // Messaging functions
 //
 static int send_telemetry_messages();
-static void sleep_seconds(uint32_t seconds);
+static void sleep_for_seconds(uint32_t seconds);
 
 int main()
 {
@@ -111,7 +110,8 @@ int main()
   // Read in the necessary environment variables and initialize the az_iot_hub_client
   if (az_failed(rc = read_configuration_and_init_client()))
   {
-    printf("Failed to read configuration from environment variables, return code %d\n", rc);
+    printf(
+        "Failed to read configuration from environment variables, az_result return code %04x\n", rc);
     return rc;
   }
 
@@ -121,13 +121,12 @@ int main()
           rc = az_iot_hub_client_get_client_id(
               &client, mqtt_client_id, sizeof(mqtt_client_id), &client_id_length)))
   {
-    printf("Failed to get MQTT clientId, return code %d\n", rc);
+    printf("Failed to get MQTT client id, az_result return code %04x\n", rc);
     return rc;
   }
 
   if (az_failed(rc = generate_sas_key()))
   {
-    printf("Failed to get SAS key, return code %d\n", rc);
     return rc;
   }
 
@@ -136,32 +135,32 @@ int main()
            &mqtt_client, mqtt_endpoint, mqtt_client_id, MQTTCLIENT_PERSISTENCE_NONE, NULL))
       != MQTTCLIENT_SUCCESS)
   {
-    printf("Failed to create MQTT client, return code %d\n", rc);
+    printf("Failed to create MQTT client, MQTTClient return code %d\n", rc);
     return rc;
   }
 
   // Connect to IoT Hub
-  if ((rc = connect_device()) != 0)
+  if ((rc = connect_device()) != MQTTCLIENT_SUCCESS)
   {
     return rc;
   }
 
   // Loop and send 5 messages
-  if ((rc = send_telemetry_messages()) != 0)
+  if ((rc = send_telemetry_messages()) != MQTTCLIENT_SUCCESS)
   {
     return rc;
   }
 
-  printf("Messages Sent [Press ENTER to shut down]\n");
+  printf("Messages Sent [Press any key to shut down]\n");
   (void)getchar();
 
   // Gracefully disconnect: send the disconnect packet and close the socket
   if ((rc = MQTTClient_disconnect(mqtt_client, TIMEOUT_MQTT_DISCONNECT_MS)) != MQTTCLIENT_SUCCESS)
   {
-    printf("Failed to disconnect MQTT client, return code %d\n", rc);
+    printf("Failed to disconnect MQTT client, MQTTClient return code %d\n", rc);
     return rc;
   }
-  printf("Disconnected.\n");
+  printf("Disconnected\n");
 
   // Clean up and release resources allocated by the mqtt client
   MQTTClient_destroy(&mqtt_client);
@@ -169,22 +168,16 @@ int main()
   return 0;
 }
 
-// Read the user environment variables used to connect to IoT Hub
+// Read the user environment variables used to connect to IoT Hub and initialize the IoT Hub client
 static az_result read_configuration_and_init_client()
 {
   az_span trusted = AZ_SPAN_FROM_BUFFER(x509_trust_pem_file);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_DEVICE_X509_TRUST_PEM_FILE,
-      ENV_DEVICE_X509_TRUST_PEM_FILE,
-      "",
-      false,
-      trusted,
-      &trusted));
+  AZ_RETURN_IF_FAILED(
+      read_configuration_entry(ENV_DEVICE_X509_TRUST_PEM_FILE, "", false, trusted, &trusted));
 
   char iot_hub_sas_key_expiration_char[SAS_TOKEN_EXPIRATION_TIME_DIGITS];
   az_span iot_hub_sas_expiration_span = AZ_SPAN_FROM_BUFFER(iot_hub_sas_key_expiration_char);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_IOT_HUB_SAS_KEY_DURATION,
       ENV_IOT_HUB_SAS_KEY_DURATION,
       "2",
       false,
@@ -195,25 +188,15 @@ static az_result read_configuration_and_init_client()
 
   iot_hub_sas_key_span = AZ_SPAN_FROM_BUFFER(iot_hub_sas_key);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_IOT_HUB_SAS_KEY,
-      ENV_IOT_HUB_SAS_KEY,
-      NULL,
-      true,
-      iot_hub_sas_key_span,
-      &iot_hub_sas_key_span));
+      ENV_IOT_HUB_SAS_KEY, NULL, true, iot_hub_sas_key_span, &iot_hub_sas_key_span));
 
   az_span device_id_span = AZ_SPAN_FROM_BUFFER(device_id);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_DEVICE_ID, ENV_DEVICE_ID, "", false, device_id_span, &device_id_span));
+  AZ_RETURN_IF_FAILED(
+      read_configuration_entry(ENV_DEVICE_ID, NULL, false, device_id_span, &device_id_span));
 
   az_span iot_hub_hostname_span = AZ_SPAN_FROM_BUFFER(iot_hub_hostname);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_IOT_HUB_HOSTNAME,
-      ENV_IOT_HUB_HOSTNAME,
-      "",
-      false,
-      iot_hub_hostname_span,
-      &iot_hub_hostname_span));
+      ENV_IOT_HUB_HOSTNAME, NULL, false, iot_hub_hostname_span, &iot_hub_hostname_span));
 
   // Paho requires that the MQTT endpoint be of the form ssl://<HUB ENDPOINT>:8883
   AZ_RETURN_IF_FAILED(
@@ -231,31 +214,27 @@ static az_result read_configuration_and_init_client()
 
 // Read OS environment variables using stdlib function
 static az_result read_configuration_entry(
-    const char* name,
     const char* env_name,
     char* default_value,
     bool hide_value,
     az_span buffer,
     az_span* out_value)
 {
-  printf("%s = ", name);
-  char* env = getenv(env_name);
+  printf("%s = ", env_name);
+  char* env_value = getenv(env_name);
 
-  if (env != NULL)
+  if (env_value == NULL && default_value != NULL)
   {
-    printf("%s\n", hide_value ? "***" : env);
-    az_span env_span = az_span_from_str(env);
+    env_value = default_value;
+  }
+
+  if (env_value != NULL)
+  {
+    printf("%s\n", hide_value ? "***" : env_value);
+    az_span env_span = az_span_from_str(env_value);
     AZ_RETURN_IF_NOT_ENOUGH_SIZE(buffer, az_span_size(env_span));
     az_span_copy(buffer, env_span);
     *out_value = az_span_slice(buffer, 0, az_span_size(env_span));
-  }
-  else if (default_value != NULL)
-  {
-    printf("%s\n", default_value);
-    az_span default_span = az_span_from_str(default_value);
-    AZ_RETURN_IF_NOT_ENOUGH_SIZE(buffer, az_span_size(default_span));
-    az_span_copy(buffer, default_span);
-    *out_value = az_span_slice(buffer, 0, az_span_size(default_span));
   }
   else
   {
@@ -287,62 +266,62 @@ static az_result create_mqtt_endpoint(char* destination, int32_t destination_siz
   return AZ_OK;
 }
 
-static int generate_sas_key()
+static az_result generate_sas_key()
 {
-  az_result res;
+  az_result rc;
 
   // Create the POSIX expiration time from input hours
-  uint32_t sas_expiration = get_epoch_expiration_time(iot_hub_sas_key_expiration);
+  uint32_t sas_expiration = get_epoch_expiration_time_from_hours(iot_hub_sas_key_expiration);
 
   // Decode the base64 encoded SAS key to use for HMAC signing
   az_span decoded_key_span;
   if (az_failed(
-          res = sample_base64_decode(
+          rc = sample_base64_decode(
               iot_hub_sas_key_span, AZ_SPAN_FROM_BUFFER(sas_b64_decoded_key), &decoded_key_span)))
   {
-    printf("Could not decode the SAS key: return code %d\n", res);
-    return res;
+    printf("Could not decode the SAS key, az_result return code %04x\n", rc);
+    return rc;
   }
 
   // Get the signature which will be signed with the decoded key
   az_span sas_signature_span;
   if (az_failed(
-          res = az_iot_hub_client_sas_get_signature(
+          rc = az_iot_hub_client_sas_get_signature(
               &client,
               sas_expiration,
               AZ_SPAN_FROM_BUFFER(sas_signature_buf),
               &sas_signature_span)))
   {
-    printf("Could not get the signature for SAS key: return code %d\n", res);
-    return res;
+    printf("Could not get the signature for SAS key, az_result return code %04x\n", rc);
+    return rc;
   }
 
   // HMAC-SHA256 sign the signature with the decoded key
   az_span hmac256_signed_span = AZ_SPAN_FROM_BUFFER(sas_signature_hmac_encoded_buf);
   if (az_failed(
-          res = sample_hmac_sha256_sign(
+          rc = sample_hmac_sha256_sign(
               decoded_key_span, sas_signature_span, hmac256_signed_span, &hmac256_signed_span)))
   {
-    printf("Could not sign the signature: return code %d\n", res);
-    return res;
+    printf("Could not sign the signature, az_result return code %04x\n", rc);
+    return rc;
   }
 
   // base64 encode the result of the HMAC signing
   az_span b64_encoded_hmac256_signed_signature;
   if (az_failed(
-          res = sample_base64_encode(
+          rc = sample_base64_encode(
               hmac256_signed_span,
               AZ_SPAN_FROM_BUFFER(sas_signature_encoded_buf_b64),
               &b64_encoded_hmac256_signed_signature)))
   {
-    printf("Could not base64 encode the password: return code %d\n", res);
-    return res;
+    printf("Could not base64 encode the password, az_result return code %04x\n", rc);
+    return rc;
   }
 
   // Get the resulting password, passing the base64 encoded, HMAC signed bytes
   size_t mqtt_password_length;
   if (az_failed(
-          res = az_iot_hub_client_sas_get_password(
+          rc = az_iot_hub_client_sas_get_password(
               &client,
               b64_encoded_hmac256_signed_signature,
               sas_expiration,
@@ -351,14 +330,14 @@ static int generate_sas_key()
               sizeof(mqtt_password),
               &mqtt_password_length)))
   {
-    printf("Could not get the password: return code %d\n", res);
-    return res;
+    printf("Could not get the password, az_result return code %04x\n", rc);
+    return rc;
   }
 
   return AZ_OK;
 }
 
-static uint32_t get_epoch_expiration_time(uint32_t hours)
+static uint32_t get_epoch_expiration_time_from_hours(uint32_t hours)
 {
   return (uint32_t)(time(NULL) + hours * 60 * 60);
 }
@@ -379,7 +358,7 @@ static int connect_device()
           rc
           = az_iot_hub_client_get_user_name(&client, mqtt_username, sizeof(mqtt_username), NULL)))
   {
-    printf("Failed to get MQTT clientId, return code %d\n", rc);
+    printf("Failed to get MQTT client id, az_result return code %04x\n", rc);
     return rc;
   }
 
@@ -397,11 +376,11 @@ static int connect_device()
   // Connect to IoT Hub
   if ((rc = MQTTClient_connect(mqtt_client, &mqtt_connect_options)) != MQTTCLIENT_SUCCESS)
   {
-    printf("Failed to connect, return code %d\n", rc);
+    printf("Failed to connect, MQTTClient return code %d\n", rc);
     return rc;
   }
 
-  return rc;
+  return MQTTCLIENT_SUCCESS;
 }
 
 static int send_telemetry_messages()
@@ -412,6 +391,7 @@ static int send_telemetry_messages()
           rc = az_iot_hub_client_telemetry_get_publish_topic(
               &client, NULL, telemetry_topic, sizeof(telemetry_topic), NULL)))
   {
+    printf("Unable to get telemetry publish topic, az_result return code %04x\n", rc);
     return rc;
   }
 
@@ -428,19 +408,21 @@ static int send_telemetry_messages()
              NULL))
         != MQTTCLIENT_SUCCESS)
     {
-      printf("Failed to publish telemetry message %d, return code %d\n", i + 1, rc);
+      printf("Failed to publish telemetry message %d, MQTTClient return code %d\n", i + 1, rc);
       return rc;
     }
-    sleep_seconds(TELEMETRY_SEND_INTERVAL);
+    sleep_for_seconds(TELEMETRY_SEND_INTERVAL);
   }
-  return rc;
+
+  return MQTTCLIENT_SUCCESS;
 }
 
-static void sleep_seconds(uint32_t seconds)
+static void sleep_for_seconds(uint32_t seconds)
 {
 #ifdef _WIN32
   Sleep((DWORD)seconds * 1000);
 #else
   sleep(seconds);
 #endif
+  return;
 }
