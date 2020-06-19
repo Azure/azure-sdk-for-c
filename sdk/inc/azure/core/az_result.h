@@ -131,7 +131,7 @@ typedef enum
   AZ_ERROR_IOT_TOPIC_NO_MATCH = _az_RESULT_MAKE_ERROR(_az_FACILITY_IOT, 1),
 } az_result;
 
-/// Checks wheteher the \a result provided indicates a failure.
+/// Checks whether the \a result provided indicates a failure.
 ///
 /// @param result Result value to check for failure.
 ///
@@ -142,7 +142,7 @@ AZ_NODISCARD AZ_INLINE bool az_failed(az_result result)
   return ((int32_t)result & (int32_t)_az_ERROR_FLAG) != 0;
 }
 
-/// Checks wheteher the \a result provided indicates a success.
+/// Checks whether the \a result provided indicates a success.
 ///
 /// @param result Result value to check for success.
 ///
