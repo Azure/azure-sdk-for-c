@@ -1,7 +1,5 @@
 # How to Setup and Run Azure SDK for Embedded C IoT Hub Samples on Linux
 
-_Last edited on June 15th, 2020._
-
 This is a step-by-step guide of how to start from scratch and get the Azure SDK for Embedded C IoT Hub Samples running. 
 
 Pre-requisites:
@@ -12,7 +10,7 @@ What is covered:
 - Downloading and building the Azure SDK for Embedded C suite
 - Configuring and running the IoT Hub client samples.  
 
-_The following was run on an Ubuntu Desktop 18.04 environment._
+_The following was run on an Ubuntu Desktop 18.04 environment, but it also works on WSL 1 and 2 (Windows Subsystem for Linux)_
 
 01. Install library dependencies
 
@@ -273,12 +271,12 @@ _The following was run on an Ubuntu Desktop 18.04 environment._
     - Go to your Azure IoT hub page.
     - Click on "IoT devices" under "Explorers".
     - From the list of devices, click on your device (created on step 8).
-      ![Device page](./resources/embc_samples_01_device.png)
+      ![Device page](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot/resources/embc_samples_01_device.png)
     - Click on "Message to Device".
     - On "Message Body", type "Hello world!" (too cheesy? how about "Lorem Ipsum"?)
-      ![Send message](./resources/embc_samples_02_c2d.png)
+      ![Send message](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot/resources/embc_samples_02_c2d.png)
     - Click on "Send Message".
-      ![Success](./resources/embc_samples_03_c2d_success.png)
+      ![Success](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot/resources/embc_samples_03_c2d_success.png)
 
     Back to the shell, verify that the message has been received by the sample:
 
@@ -322,12 +320,12 @@ _The following was run on an Ubuntu Desktop 18.04 environment._
     - Click on "IoT devices" under "Explorers".
     - From the list of devices, click on your device (created on step Z).
     - Click on "Direct Method".
-      ![Methods](./resources/embc_samples_04_methods.png)
+      ![Methods](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot/resources/embc_samples_04_methods.png)
     - On "Method Name", type "ping" (the sample expects the name "ping").
     - On "Payload", type '{ "somevalue": 1234 }' (the payload can be empty, but MUST be a valid Json).
     - Click on "Invoke Method".
     - See the reply from the sample on "Result" (bottom of the page).
-      ![Response](./resources/embc_samples_05_methods_response.png)
+      ![Response](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot/resources/embc_samples_05_methods_response.png)
 
 
     Back to the shell, verify that the message has been received by the sample:
@@ -397,7 +395,17 @@ _The following was run on an Ubuntu Desktop 18.04 environment._
     /azure-sdk-for-c/cmake/sdk/samples/iot/hub/$
     ```
 
-# License
+## Need Help?
+
+* File an issue via [Github Issues](https://github.com/Azure/azure-sdk-for-c/issues/new/choose).
+* Check [previous questions](https://stackoverflow.com/questions/tagged/azure+c) or ask new ones on StackOverflow using
+  the `azure` and `c` tags.
+
+## Contributing
+
+If you'd like to contribute to this library, please read the [contributing guide][azure_sdk_for_c_contributing] to learn more about how to build and test the code.
+
+### License
 
 Azure SDK for Embedded C is licensed under the [MIT][azure_sdk_for_c_license] license.
 

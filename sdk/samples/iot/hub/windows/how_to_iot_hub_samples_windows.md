@@ -1,7 +1,5 @@
 # How to Setup and Run Azure SDK for Embedded C IoT Hub Samples on Microsoft Windows
 
-_Last edited on June 15th, 2020._
-
 This is a step-by-step documentation of how to start from scratch and get the Azure SDK for Embedded C IoT Hub Samples running on Microsoft Windows. 
 
 Pre-requisites:
@@ -39,7 +37,6 @@ _The following was run on Microsoft Windows 10.0.18363.836._
     The Azure IoT SDK for C uses Eclipse Paho installed via [vcpkg](https://github.com/Microsoft/vcpkg) (for the cmake integration).
 
     ```shell
-    C:\> cd
     C:\> git clone https://github.com/Microsoft/vcpkg
     C:\> cd vcpkg/
     C:\vcpkg> bootstrap-vcpkg.bat 
@@ -72,6 +69,7 @@ _The following was run on Microsoft Windows 10.0.18363.836._
 05. Clone the Azure Embedded SDK for C
 
     ```shell
+    C:\>cd..
     C:\>git clone https://github.com/azure/azure-sdk-for-c
     ```
 
@@ -79,17 +77,13 @@ _The following was run on Microsoft Windows 10.0.18363.836._
 
     The Azure Embedded SDK for C IoT Client samples use a self-signed certificate.
 
-    A script is provided [here](https://github.com/ewertons/azure-sdk-for-c/blob/master/sdk/iot/hub/samples/src/generate_certificate.cmd) for creating that certificate on Windows. 
-
-    Copy the script to your Azure IoT Hub Client samples folder, then run:
-
     ```shell
     C:\azure-sdk-for-c\sdk\samples\iot\hub\src>generate_certificate.cmd
     ```
 
     <details>
     <summary>
-    Complete output of the `generate_certificate.cmd` script.
+    Expand to see the complete output of the `generate_certificate.cmd` script.
     </summary>
 
     ```shell
@@ -145,7 +139,9 @@ _The following was run on Microsoft Windows 10.0.18363.836._
     </details>
 
 
-    Do not forget to set the environment variables shown in the output above (make sure it maps to your local path as shown).
+    **Important**: Set the environment variables, as per the output shown above (make sure it maps to your local path as shown).
+
+    The example below shows what you should execute (but don't use these examples, use the ones you got on your output)
 
     ```shell
     C:\azure-sdk-for-c\sdk\samples\iot\hub\src>set "AZ_IOT_DEVICE_X509_CERT_PEM_FILE=C:\azure-sdk-for-c\sdk\samples\iot\hub\src\device_cert_store.pem"
@@ -155,7 +151,7 @@ _The following was run on Microsoft Windows 10.0.18363.836._
     Save the certificate Fingerprint above (in this example, "53748606517027078B5FE00E7A0D2A31F9AF4C31").
     It will be used to create the logical device on your Azure IoT Hub.
 
-    > For Windows, follow the instruction in the output of the script and download the Baltimore PEM CA from https://www.digicert.com/digicert-root-certificates.htm into the same place mentioned by the script output.
+    > Follow the instruction in the output of the script and download the Baltimore PEM CA from https://www.digicert.com/digicert-root-certificates.htm into the same place mentioned by the script output.
 
     You should have it saved as shown bellow:
 
@@ -178,7 +174,7 @@ _The following was run on Microsoft Windows 10.0.18363.836._
     - Click on "New".
     - Type an unique ID for your device.
     - Select "X.509 Self-Signed" for "Authentication type". 
-    - Type the fingerprint obtained in the previous step (the same can be used for primary and secondary Thumbprints; no colons!).
+    - Type the fingerprint obtained in the previous step (in this case, the same should be used for primary and secondary Thumbprints).
     - Click on "Save".
 
 07. Collect information about Azure IoT Hub and device
@@ -380,13 +376,23 @@ _The following was run on Microsoft Windows 10.0.18363.836._
 
     ```
 
-# License
+## Need Help?
+
+* File an issue via [Github Issues](https://github.com/Azure/azure-sdk-for-c/issues/new/choose).
+* Check [previous questions](https://stackoverflow.com/questions/tagged/azure+c) or ask new ones on StackOverflow using
+  the `azure` and `c` tags.
+
+## Contributing
+
+If you'd like to contribute to this library, please read the [contributing guide][azure_sdk_for_c_contributing] to learn more about how to build and test the code.
+
+### License
 
 Azure SDK for Embedded C is licensed under the [MIT][azure_sdk_for_c_license] license.
 
 <!-- LINKS -->
 [azure_sdk_for_c_contributing]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md
-[azure_sdk_for_c_license]: https://github.com/Azure/azure-sdk-for-c/blob/master/LICENSE
+[azure_sdk_for_c_license]: https://github.com/Azure/azure-sdk-for-c/blob/master/LICENSEcense.
 [azure_sdk_for_c_contributing_developer_guide]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md#developer-guide
 [azure_sdk_for_c_contributing_pull_requests]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md#pull-requests
 [azure_cli]: https://docs.microsoft.com/cli/azure

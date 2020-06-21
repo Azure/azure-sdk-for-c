@@ -1,7 +1,5 @@
 # How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Espressif ESP8266 NodeMCU
 
-_Last edited on June 10th, 2020._
-
 This is a to-the-point documentation of how to run an Azure SDK for Embedded C IoT Hub Telemetry Samples on an Esp8266 NodeMCU microcontroller. 
 
 Pre-requisites:
@@ -237,3 +235,23 @@ _The following was run on an Ubuntu Desktop 18.04 environment, with Arduino IDE 
     ^CStopping event monitor...
     ```
     </details>
+
+
+
+## Need Help?
+
+* File an issue via [Github Issues](https://github.com/Azure/azure-sdk-for-c/issues/new/choose).
+* Check [previous questions](https://stackoverflow.com/questions/tagged/azure+c) or ask new ones on StackOverflow using
+  the `azure` and `c` tags.
+
+## Contributing
+
+If you'd like to contribute to this library, please read the [contributing guide][azure_sdk_for_c_contributing] to learn more about how to build and test the code.
+
+### License
+
+Azure SDK for Embedded C is licensed under the [MIT][azure_sdk_for_c_license] license.
+
+<!-- LINKS -->
+[azure_sdk_for_c_contributing]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md
+[azure_sdk_for_c_license]: https://github.com/Azure/azure-sdk-for-c/blob/master/LICENSE
