@@ -33,7 +33,8 @@ The library targets made available via CMake are the following:
  For step-by-step guides starting from scratch, you may refer to these documents:
   - Linux: [How to Setup and Run Azure SDK for Embedded C IoT Hub Samples on Linux](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/samples/iot/hub/linux/how_to_iot_hub_samples_linux.md)
 
-  - Windows: [How to setup and run Azure SDK for Embedded C IoT Hub Samples on Microsoft Windows](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/samples/iot/hub/windows/how_to_iot_hub_samples_windows.md).
+  - Windows: [How to Setup and Run Azure SDK for Embedded C IoT Hub Samples on Microsoft Windows](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/samples/iot/hub/windows/how_to_iot_hub_samples_windows.md).
+
   - ESP8266: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Esp8266 NodeMCU](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/samples/iot/hub/esp8266nodemcu/how_to_esp8266_nodemcu.md)
 
   **Note**: While Windows and Linux devices are not likely to be considered as contrained ones, these samples were created to make it simpler to test the Azure SDK for Embedded C libraries, even without a real device. 
