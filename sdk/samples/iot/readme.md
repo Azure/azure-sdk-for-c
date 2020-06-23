@@ -2,7 +2,7 @@
 
 Samples for the Embedded C client for Azure IoT are divided into:
 
-- [IoT Hub Samples](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/samples/iot/hub/readme.md): Device samples for the common IoT Hub operations like D2C, C2D, Direct Methods, Device Twin and more.
+- [IoT Hub Samples](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/samples/iot/hub/readme.md): Device samples for the common IoT Hub operations like D2C, C2D, Direct Methods, and Device Twin.
 - [Provisioning Samples](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/samples/iot/hub/provisioning/readme.md): Device samples for the Device Provisioning service. 
 
 ## Getting Started
