@@ -91,7 +91,8 @@ When we make an official release, we will create a unique git tag containing the
 
    `<package-name>_<package-version>`
 
- The latest release can be foun in the [release section](https://github.com/Azure/azure-sdk-for-c/releases) of this repo. 
+ The latest release can be found in the [release section](https://github.com/Azure/azure-sdk-for-c/releases) of this repo. 
+
  
  For more information, please see this [branching strategy](https://github.com/Azure/azure-sdk/blob/master/docs/policies/repobranching.md#release-tagging) document.
 
