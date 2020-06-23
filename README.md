@@ -4,7 +4,7 @@
 
 The Azure SDK for Embedded C is designed to allow small embedded (IoT) devices to communicate with Azure services. Since we expect our client library code to run on microcontrollers, which have very limited amounts of flash and RAM, and have slower CPUs, our C SDK does things very differently than the SDKs we offer for other languages.
 
-With this in mind, there are many tenants or principles that we follow in order to properly address this target audience:
+With this in mind, there are many tenets or principles that we follow in order to properly address this target audience:
 
 - Customers of our SDK compile our source code along with their own.
 
@@ -23,6 +23,7 @@ With this in mind, there are many tenants or principles that we follow in order 
   - [Table of Contents](#table-of-contents)
   - [Documentation](#documentation)
   - [The GitHub Repository](#the-github-repository)
+    - [Services](#service)
     - [Structure](#structure)
     - [Master Branch](#master-branch)
     - [Release Branches and Release Tagging](#release-branches-and-release-tagging)
@@ -56,18 +57,27 @@ To get help with the SDK:
 - File a [Github Issue](https://github.com/Azure/azure-sdk-for-c/issues/new/choose).
 - Ask new questions or see others' questions on [Stack Overflow](https://stackoverflow.com/questions/tagged/azure+c) using the `azure` and `c` tags.
 
+### Services
+
+The Azure SDK for Embedded C repo has been structured around the service libraries it provides:
+
+
+1. [IoT](sdk/docs/iot) - Library to connect Embedded Devices to Azure IoT services
+2. [Storage](sdk/docs/storage) - Library to send blob files to Azure IoT services
+
+
 ### Structure
 
-The repo is structured with two priorities:
+This repo is structured with two priorities:
 1. Separation of services/features to make it easier to find relevant information and resources.
 2. Simplified source file structuring to easily integrate features into a user's project.
 
-`/sdk` (folder containing docs, sources, samples, tests for all SDK packages)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;`/docs` (documentation for each service (iot, storage, etc))<br>
-&nbsp;&nbsp;&nbsp;&nbsp;`/inc` (include directory - can be singularly included in your project to resolve all headers)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;`/samples` (samples for each service)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;`/src` (source files for each service)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;`/tests` (tests for each service)<br>
+`/sdk` - folder containing docs, sources, samples, tests for all SDK packages<br>
+&nbsp;&nbsp;&nbsp;&nbsp;`/docs` - documentation for each service (iot, storage, etc)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;`/inc` - include directory - can be singularly included in your project to resolve all headers<br>
+&nbsp;&nbsp;&nbsp;&nbsp;`/samples` - samples for each service<br>
+&nbsp;&nbsp;&nbsp;&nbsp;`/src` - source files for each service<br>
+&nbsp;&nbsp;&nbsp;&nbsp;`/tests` - tests for each service<br>
 
 For instructions on how to consume the libraries via CMake, please see [here](#cmake). For instructions on how consume the source code in an IDE, command line, or other build systems, please see [here](#source-files-ide-command-line-etc).
 
@@ -81,6 +91,9 @@ When we make an official release, we will create a unique git tag containing the
 
    `<package-name>_<package-version>`
 
+ The latest release can be found in the [release section](https://github.com/Azure/azure-sdk-for-c/releases) of this repo. 
+
+ 
  For more information, please see this [branching strategy](https://github.com/Azure/azure-sdk/blob/master/docs/policies/repobranching.md#release-tagging) document.
 
 ## Getting Started Using the SDK
@@ -99,7 +112,7 @@ The SDK can be conveniently consumed either via CMake or other non-CMake methods
 
         git checkout <tag_name>
 
-    For information about using a specific client library, see the README file located in the client library's folder which is a subdirectory under the [`/sdk`](sdk) folder.
+    For information about using a specific client library, see the README file located in the client library's folder which is a subdirectory under the [`/sdk/docs`](sdk/docs) folder.
 
 3. Ensure the SDK builds correctly.
 

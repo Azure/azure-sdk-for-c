@@ -6,6 +6,8 @@ Azure SDK for Embedded C official IoT client libraries.
 
 The Azure IoT Client library is created to facilitate connectivity to Azure IoT services alongside an MQTT and TLS stack of the user's choice. This means that this SDK is **NOT** a platform but instead is a true SDK library.
 
+![Methods](./resources/embc_high_level_arch.png)
+
 From a functional perspective, this means that the user's application code (not the SDK) calls directly to the MQTT stack of their choice. The SDK provides utilities (in the form of functions, default values, etc) which help make the connection and feature set easier. Some examples of those utilities include:
 - Publish topics to which messages can be sent and subscription topics to which users can subscribe for incoming messages.
 - Functions to parse incoming message topics which populate structs with crucial message information.
@@ -13,7 +15,7 @@ From a functional perspective, this means that the user's application code (not 
 
 A full list of features can be found in the doxygen docs listed below in [Docs](#docs).
 
-**Note**: this therefore requires a different programming model as compared to the earlier version of the SDK ([found here](https://github.com/Azure/azure-iot-sdk-c)). To better understand the responsibilities of the user application code and the SDK, please take a look at the [State Machine diagram](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/mqtt_state_machine.md) that explains the high-level architecture, SDK components, and a clear view of SDK x Application responsibilities.
+**Note**: this therefore requires a different programming model as compared to the earlier version of the C SDK ([found here](https://github.com/Azure/azure-iot-sdk-c)). To better understand the responsibilities of the user application code and the SDK, please take a look at the [State Machine diagram](mqtt_state_machine.md) that explains the high-level architecture, SDK components, and a clear view of SDK x Application responsibilities.
 
 ### Docs
 For API documentation, please see the doxygen generated docs [here][azure_sdk_for_c_doxygen_docs]. You can find the IoT specific docs by navigating to the **Files -> File List** section near the top and choosing any of the header files prefixed with `az_iot_`.
@@ -26,12 +28,16 @@ The library targets made available via CMake are the following:
 - `az::iot::provisioning`: For Azure IoT Provisioning features ([API documentation here][azure_sdk_for_c_doxygen_provisioning_docs])
 
 ### Samples
-[This page](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/samples/iot/hub#getting-started) explains samples for the Azure Embedded C SDK IoT Hub Client and [this page](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/samples/iot/provisioning#getting-started) shows the Provisioning Clients and how to use them.
+[This page](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/samples/iot/readme.md) explains samples for the Azure Embedded C SDK IoT Hub Client and the Provisioning Clients and how to use them.
 
-  For step-by-step guides starting from scratch, you may refer to these documents:
-  - [How to setup and run Azure SDK for Embedded C IoT Hub Samples on Linux](how_to_iot_hub_samples_linux.md)
-  - [How to setup and run Azure SDK for Embedded C IoT Hub Samples on Microsoft Windows](how_to_iot_hub_samples_windows.md).
-  - [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Esp8266 NodeMCU](how_to_esp8266_nodemcu.md)
+ For step-by-step guides starting from scratch, you may refer to these documents:
+  - Linux: [How to Setup and Run Azure SDK for Embedded C IoT Hub Samples on Linux](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/samples/iot/hub/linux/how_to_iot_hub_samples_linux.md)
+
+  - Windows: [How to Setup and Run Azure SDK for Embedded C IoT Hub Samples on Microsoft Windows](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/samples/iot/hub/windows/how_to_iot_hub_samples_windows.md).
+
+  - ESP8266: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Esp8266 NodeMCU](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/samples/iot/hub/esp8266nodemcu/how_to_esp8266_nodemcu.md)
+
+  **Note**: While Windows and Linux devices are not likely to be considered as contrained ones, these samples were created to make it simpler to test the Azure SDK for Embedded C libraries, even without a real device. 
 
 ### Prerequisites
 
@@ -184,4 +190,3 @@ Azure SDK for Embedded C is licensed under the [MIT][azure_sdk_for_c_license] li
 [azure_sdk_for_c_doxygen_hub_docs]: https://azuresdkdocs.blob.core.windows.net/$web/c/docs/1.0.0-preview.2/az__iot__hub__client_8h.html
 [azure_sdk_for_c_doxygen_provisioning_docs]: https://azuresdkdocs.blob.core.windows.net/$web/c/docs/1.0.0-preview.2/az__iot__provisioning__client_8h.html
 [azure_sdk_for_c_license]: https://github.com/Azure/azure-sdk-for-c/blob/master/LICENSE
-
