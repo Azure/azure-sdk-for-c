@@ -15,10 +15,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <azure/iot/az_iot_hub_client.h>
 #include <azure/core/az_json.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
+#include <azure/iot/az_iot_hub_client.h>
 
 #ifdef _MSC_VER
 // "'getenv': This function or variable may be unsafe. Consider using _dupenv_s instead."
@@ -66,11 +66,10 @@ static az_iot_hub_client client;
 static MQTTClient mqtt_client;
 
 //
-// Configuration and connection functions - uses MQTT API
+// Configuration and connection functions
 //
 static az_result read_configuration_and_init_client();
 static az_result read_configuration_entry(
-    const char* name,
     const char* env_name,
     char* default_value,
     bool hide_value,
@@ -81,7 +80,7 @@ static int connect_device();
 static int subscribe();
 
 //
-// Messaging and property functions
+// Messaging functions
 //
 static int on_received(void* context, char* topicName, int topicLen, MQTTClient_message* message);
 static int send_get_twin();
@@ -98,7 +97,9 @@ int main()
   // Read in the necessary environment variables and initialize the az_iot_hub_client
   if (az_failed(rc = read_configuration_and_init_client()))
   {
-    printf("Failed to read configuration from environment variables, return code %d\n", rc);
+    printf(
+        "Failed to read configuration from environment variables, az_result return code %04x\n",
+        rc);
     return rc;
   }
 
@@ -107,7 +108,7 @@ int main()
           rc
           = az_iot_hub_client_get_client_id(&client, mqtt_client_id, sizeof(mqtt_client_id), NULL)))
   {
-    printf("Failed to get MQTT clientId, return code %d\n", rc);
+    printf("Failed to get MQTT clientId, az_result return code %04x\n", rc);
     return rc;
   }
 
@@ -116,7 +117,7 @@ int main()
            &mqtt_client, mqtt_endpoint, mqtt_client_id, MQTTCLIENT_PERSISTENCE_NONE, NULL))
       != MQTTCLIENT_SUCCESS)
   {
-    printf("Failed to create MQTT client, return code %d\n", rc);
+    printf("Failed to create MQTT client, MQTTClient return code %d\n", rc);
     return rc;
   }
 
@@ -124,18 +125,18 @@ int main()
   if ((rc = MQTTClient_setCallbacks(mqtt_client, NULL, NULL, on_received, NULL))
       != MQTTCLIENT_SUCCESS)
   {
-    printf("Failed to set MQTT callbacks, return code %d\n", rc);
+    printf("Failed to set MQTT callbacks, MQTTClient return code %d\n", rc);
     return rc;
   }
 
   // Connect to IoT Hub
-  if ((rc = connect_device()) != 0)
+  if ((rc = connect_device()) != MQTTCLIENT_SUCCESS)
   {
     return rc;
   }
 
   // Subscribe to the necessary twin topics to receive twin updates and responses
-  if ((rc = subscribe()) != 0)
+  if ((rc = subscribe()) != MQTTCLIENT_SUCCESS)
   {
     return rc;
   }
@@ -175,10 +176,10 @@ int main()
   // Gracefully disconnect: send the disconnect packet and close the socket
   if ((rc = MQTTClient_disconnect(mqtt_client, TIMEOUT_MQTT_DISCONNECT_MS)) != MQTTCLIENT_SUCCESS)
   {
-    printf("Failed to disconnect MQTT client, return code %d\n", rc);
+    printf("Failed to disconnect MQTT client, MQTTClient return code %d\n", rc);
     return rc;
   }
-  printf("Disconnected.\n");
+  printf("Disconnected\n");
 
   // Clean up and release resources allocated by the mqtt client
   MQTTClient_destroy(&mqtt_client);
@@ -186,32 +187,62 @@ int main()
   return 0;
 }
 
+// Read the user environment variables used to connect to IoT Hub and initialize the IoT Hub client
+static az_result read_configuration_and_init_client()
+{
+  az_span cert = AZ_SPAN_FROM_BUFFER(x509_cert_pem_file);
+  AZ_RETURN_IF_FAILED(
+      read_configuration_entry(ENV_DEVICE_X509_CERT_PEM_FILE, NULL, false, cert, &cert));
+
+  az_span trusted = AZ_SPAN_FROM_BUFFER(x509_trust_pem_file);
+  AZ_RETURN_IF_FAILED(
+      read_configuration_entry(ENV_DEVICE_X509_TRUST_PEM_FILE, "", false, trusted, &trusted));
+
+  az_span device_id_span = AZ_SPAN_FROM_BUFFER(device_id);
+  AZ_RETURN_IF_FAILED(
+      read_configuration_entry(ENV_DEVICE_ID, NULL, false, device_id_span, &device_id_span));
+
+  az_span iot_hub_hostname_span = AZ_SPAN_FROM_BUFFER(iot_hub_hostname);
+  AZ_RETURN_IF_FAILED(read_configuration_entry(
+      ENV_IOT_HUB_HOSTNAME, NULL, false, iot_hub_hostname_span, &iot_hub_hostname_span));
+
+  // Paho requires that the MQTT endpoint be of the form ssl://<HUB ENDPOINT>:8883
+  AZ_RETURN_IF_FAILED(
+      create_mqtt_endpoint(mqtt_endpoint, (int32_t)sizeof(mqtt_endpoint), iot_hub_hostname_span));
+
+  // Initialize the hub client with the hub host endpoint and the default connection options
+  AZ_RETURN_IF_FAILED(az_iot_hub_client_init(
+      &client,
+      az_span_slice(iot_hub_hostname_span, 0, (int32_t)strlen(iot_hub_hostname)),
+      az_span_slice(device_id_span, 0, (int32_t)strlen(device_id)),
+      NULL));
+
+  return AZ_OK;
+}
+
+// Read OS environment variables using stdlib function
 static az_result read_configuration_entry(
-    const char* name,
     const char* env_name,
     char* default_value,
     bool hide_value,
     az_span buffer,
     az_span* out_value)
 {
-  printf("%s = ", name);
-  char* env = getenv(env_name);
+  printf("%s = ", env_name);
+  char* env_value = getenv(env_name);
 
-  if (env != NULL)
+  if (env_value == NULL && default_value != NULL)
   {
-    printf("%s\n", hide_value ? "***" : env);
-    az_span env_span = az_span_from_str(env);
+    env_value = default_value;
+  }
+
+  if (env_value != NULL)
+  {
+    printf("%s\n", hide_value ? "***" : env_value);
+    az_span env_span = az_span_from_str(env_value);
     AZ_RETURN_IF_NOT_ENOUGH_SIZE(buffer, az_span_size(env_span));
     az_span_copy(buffer, env_span);
     *out_value = az_span_slice(buffer, 0, az_span_size(env_span));
-  }
-  else if (default_value != NULL)
-  {
-    printf("%s\n", default_value);
-    az_span default_span = az_span_from_str(default_value);
-    AZ_RETURN_IF_NOT_ENOUGH_SIZE(buffer, az_span_size(default_span));
-    az_span_copy(buffer, default_span);
-    *out_value = az_span_slice(buffer, 0, az_span_size(default_span));
   }
   else
   {
@@ -243,49 +274,6 @@ static az_result create_mqtt_endpoint(char* destination, int32_t destination_siz
   return AZ_OK;
 }
 
-// Read the user environment variables used to connect to IoT Hub and initialize the IoT Hub client
-static az_result read_configuration_and_init_client()
-{
-  az_span cert = AZ_SPAN_FROM_BUFFER(x509_cert_pem_file);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_DEVICE_X509_CERT_PEM_FILE, ENV_DEVICE_X509_CERT_PEM_FILE, NULL, false, cert, &cert));
-
-  az_span trusted = AZ_SPAN_FROM_BUFFER(x509_trust_pem_file);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_DEVICE_X509_TRUST_PEM_FILE,
-      ENV_DEVICE_X509_TRUST_PEM_FILE,
-      "",
-      false,
-      trusted,
-      &trusted));
-
-  az_span device_id_span = AZ_SPAN_FROM_BUFFER(device_id);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_DEVICE_ID, ENV_DEVICE_ID, "", false, device_id_span, &device_id_span));
-
-  az_span iot_hub_hostname_span = AZ_SPAN_FROM_BUFFER(iot_hub_hostname);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_IOT_HUB_HOSTNAME,
-      ENV_IOT_HUB_HOSTNAME,
-      "",
-      false,
-      iot_hub_hostname_span,
-      &iot_hub_hostname_span));
-
-  // Paho requires that the MQTT endpoint be of the form ssl://<HUB ENDPOINT>:8883
-  AZ_RETURN_IF_FAILED(
-      create_mqtt_endpoint(mqtt_endpoint, (int32_t)sizeof(mqtt_endpoint), iot_hub_hostname_span));
-
-  // Initialize the hub client with the hub host endpoint and the default connection options
-  AZ_RETURN_IF_FAILED(az_iot_hub_client_init(
-      &client,
-      az_span_slice(iot_hub_hostname_span, 0, (int32_t)strlen(iot_hub_hostname)),
-      az_span_slice(device_id_span, 0, (int32_t)strlen(device_id)),
-      NULL));
-
-  return AZ_OK;
-}
-
 static int connect_device()
 {
   int rc;
@@ -301,9 +289,8 @@ static int connect_device()
   if (az_failed(
           rc
           = az_iot_hub_client_get_user_name(&client, mqtt_username, sizeof(mqtt_username), NULL)))
-
   {
-    printf("Failed to get MQTT clientId, return code %d\n", rc);
+    printf("Failed to get MQTT client id, az_result return code %04x\n", rc);
     return rc;
   }
 
@@ -323,11 +310,11 @@ static int connect_device()
   // Connect to IoT Hub
   if ((rc = MQTTClient_connect(mqtt_client, &mqtt_connect_options)) != MQTTCLIENT_SUCCESS)
   {
-    printf("Failed to connect, return code %d\n", rc);
+    printf("Failed to connect, MQTTClient return code %d\n", rc);
     return rc;
   }
 
-  return rc;
+  return MQTTCLIENT_SUCCESS;
 }
 
 static int subscribe()
@@ -339,7 +326,7 @@ static int subscribe()
   if ((rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_HUB_CLIENT_TWIN_PATCH_SUBSCRIBE_TOPIC, 1))
       != MQTTCLIENT_SUCCESS)
   {
-    printf("Failed to subscribe to twin patch topic filter, return code %d\n", rc);
+    printf("Failed to subscribe to the twin patch topic filter, MQTTClient return code %d\n", rc);
     return rc;
   }
 
@@ -349,16 +336,18 @@ static int subscribe()
   if ((rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_SUBSCRIBE_TOPIC, 1))
       != MQTTCLIENT_SUCCESS)
   {
-    printf("Failed to subscribe to twin response topic filter, return code %d\n", rc);
+    printf(
+        "Failed to subscribe to the twin response topic filter, MQTTClient return code %d\n", rc);
     return rc;
   }
 
-  return rc;
+  return MQTTCLIENT_SUCCESS;
 }
 
 static int on_received(void* context, char* topicName, int topicLen, MQTTClient_message* message)
 {
   (void)context;
+  int rc;
 
   printf("Received a message from service.\n");
   printf("Topic: %s\n", topicName);
@@ -373,14 +362,13 @@ static int on_received(void* context, char* topicName, int topicLen, MQTTClient_
 
   // Parse the incoming message topic and check to make sure it is a twin message
   az_iot_hub_client_twin_response twin_response;
-  if (az_failed(az_iot_hub_client_twin_parse_received_topic(&client, topic_span, &twin_response)))
+  if (az_failed(
+          rc = az_iot_hub_client_twin_parse_received_topic(&client, topic_span, &twin_response)))
   {
-    printf("Topic is not a twin message.\n");
+    printf("Topic is not a twin message, az_result return code %04x\n", rc);
   }
   else
   {
-    printf("Topic is a twin message.\n");
-
     // Determine type of incoming twin message. Print relevant data for the message.
     switch (twin_response.response_type)
     {
@@ -423,14 +411,13 @@ static int on_received(void* context, char* topicName, int topicLen, MQTTClient_
 
         // Device will update property locally and report that property to service.
         az_span payload_span = az_span_init((uint8_t*)message->payload, message->payloadlen);
-        if (az_failed(update_property(payload_span)))
+        if (az_failed(rc = update_property(payload_span)))
         {
-          printf("Failed to update property locally.\n");
+          printf("Failed to update property locally, az_result return code %04x\n", rc);
           break;
         }
-        if (az_failed(report_property()))
+        if ((rc = report_property()) != MQTTCLIENT_SUCCESS)
         {
-          printf("Failed to report property to IoT Hub.\n");
           break;
         }
         increment_property_count();
@@ -454,7 +441,7 @@ static int send_get_twin()
           rc = az_iot_hub_client_twin_document_get_publish_topic(
               &client, get_twin_topic_request_id, get_twin_topic, sizeof(get_twin_topic), NULL)))
   {
-    printf("Unable to get twin document publish topic, return code %d.\n", rc);
+    printf("Unable to get twin document publish topic, az_result return code %04x\n", rc);
     return rc;
   }
 
@@ -463,10 +450,10 @@ static int send_get_twin()
   if ((rc = MQTTClient_publish(mqtt_client, get_twin_topic, 0, NULL, 0, 0, NULL))
       != MQTTCLIENT_SUCCESS)
   {
-    printf("Failed to publish twin document request, return code %d.\n", rc);
+    printf("Failed to publish twin document request, MQTTClient return code %d\n", rc);
     return rc;
   }
-  return rc;
+  return MQTTCLIENT_SUCCESS;
 }
 
 static int report_property()
@@ -477,16 +464,15 @@ static int report_property()
 
   if (az_failed(rc = build_reported_property(&reported_property_payload)))
   {
-    printf("Unable to build reported property payload to send, return code %d.\n", rc);
+    printf("Unable to build reported property payload to send, az_result return code %04x\n", rc);
     return rc;
   }
-  if (az_failed(rc = send_reported_property(reported_property_payload)))
+  if ((rc = send_reported_property(reported_property_payload)) != MQTTCLIENT_SUCCESS)
   {
-    printf("Failed to send reported property payload to service. return code %d.\n", rc);
     return rc;
   }
 
-  return rc;
+  return MQTTCLIENT_SUCCESS;
 }
 
 static az_result build_reported_property(az_span* reported_property_payload)
@@ -523,7 +509,7 @@ static int send_reported_property(az_span reported_property_payload)
               sizeof(reported_property_topic),
               NULL)))
   {
-    printf("Unable to get reported property publish topic, return code %d.\n", rc);
+    printf("Unable to get reported property publish topic, az_result return code %04x\n", rc);
     return rc;
   }
 
@@ -539,27 +525,27 @@ static int send_reported_property(az_span reported_property_payload)
            NULL))
       != MQTTCLIENT_SUCCESS)
   {
-    printf("Failed to publish reported property, return code %d\n", rc);
+    printf("Failed to publish reported property, MQTTClient return code %d\n", rc);
     return rc;
   }
 
-  return rc;
+  return MQTTCLIENT_SUCCESS;
 }
 
 static az_result update_property(az_span desired_payload)
 {
+  // Parse desired property payload
   az_json_parser json_parser;
   az_json_token token;
   az_json_token_member token_member;
 
-  // Parse desired property payload
   AZ_RETURN_IF_FAILED(az_json_parser_init(&json_parser, desired_payload));
   AZ_RETURN_IF_FAILED(az_json_parser_parse_token(&json_parser, &token));
-
   AZ_RETURN_IF_FAILED(az_json_parser_parse_token_member(&json_parser, &token_member));
+
+  // Update property locally if found
   while (!az_span_is_content_equal(token_member.name, version_name))
   {
-    // Update property locally if found
     if (az_span_is_content_equal(token_member.name, reported_property_name))
     {
       double temp_property_value = 0.0;
