@@ -98,7 +98,8 @@ int main()
   if (az_failed(rc = read_configuration_and_init_client()))
   {
     printf(
-        "Failed to read configuration from environment variables, az_result return code %04x\n", rc);
+        "Failed to read configuration from environment variables, az_result return code %04x\n",
+        rc);
     return rc;
   }
 
@@ -335,7 +336,8 @@ static int subscribe()
   if ((rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_SUBSCRIBE_TOPIC, 1))
       != MQTTCLIENT_SUCCESS)
   {
-    printf("Failed to subscribe to the twin response topic filter, MQTTClient return code %d\n", rc);
+    printf(
+        "Failed to subscribe to the twin response topic filter, MQTTClient return code %d\n", rc);
     return rc;
   }
 

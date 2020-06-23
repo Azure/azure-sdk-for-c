@@ -111,7 +111,8 @@ int main()
   if (az_failed(rc = read_configuration_and_init_client()))
   {
     printf(
-        "Failed to read configuration from environment variables, az_result return code %04x\n", rc);
+        "Failed to read configuration from environment variables, az_result return code %04x\n",
+        rc);
     return rc;
   }
 

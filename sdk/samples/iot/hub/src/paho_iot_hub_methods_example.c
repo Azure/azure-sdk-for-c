@@ -93,7 +93,8 @@ int main()
   if (az_failed(rc = read_configuration_and_init_client()))
   {
     printf(
-        "Failed to read configuration from environment variables, az_result return code %04x\n", rc);
+        "Failed to read configuration from environment variables, az_result return code %04x\n",
+        rc);
     return rc;
   }
 
@@ -345,7 +346,7 @@ static int on_received(void* context, char* topicName, int topicLen, MQTTClient_
           az_span_size(method_request.name),
           az_span_ptr(method_request.name));
       if ((send_method_response(
-               &method_request, AZ_IOT_STATUS_NOT_FOUND, ping_method_fail_response))
+              &method_request, AZ_IOT_STATUS_NOT_FOUND, ping_method_fail_response))
           != MQTTCLIENT_SUCCESS)
       {
         printf("Unable to send %d response.\n", AZ_IOT_STATUS_NOT_FOUND);
