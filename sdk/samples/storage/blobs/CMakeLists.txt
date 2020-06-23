@@ -21,12 +21,12 @@ add_executable (blobs_client_example src/blobs_client_example.c)
 target_link_libraries(blobs_client_example PRIVATE az_storage_blobs az_core)
 
 # link libcurl impl when option is on
-# When using a different HTTP transport adapter implementation, link it here instead of az_curl and libcurl
+# When using a different HTTP transport adapter implementation, link it here instead of az_http_curl and libcurl
 if(TRANSPORT_CURL)
-  target_link_libraries(blobs_client_example PRIVATE az_curl CURL::libcurl)
+  target_link_libraries(blobs_client_example PRIVATE az_http_curl CURL::libcurl)
 else()
   # linking default no http implementation to be able to compile and link sample.
-  target_link_libraries(blobs_client_example PRIVATE az_nohttp)
+  target_link_libraries(blobs_client_example PRIVATE az_http_stub)
   # push compiler symbol so we can find out in Code about no http
   target_compile_definitions(blobs_client_example PRIVATE AZ_NO_HTTP)
 endif()

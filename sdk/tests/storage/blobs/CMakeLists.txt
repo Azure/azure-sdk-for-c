@@ -17,6 +17,6 @@ add_cmocka_test(${TARGET_NAME} SOURCES
                 LINK_TARGETS                    
                     az_storage_blobs
                     az_core
-                    az_nohttp
+                    az_http_stub
                     ${PAL}
                 )

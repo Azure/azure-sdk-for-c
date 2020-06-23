@@ -134,10 +134,10 @@ By default, when building the project with no options, the following static libr
     -  iot_provisioning, iot_hub, etc.
   - az_storage_blobs
     -  Storage SDK blobs client.
-  - az_noplatform
+  - az_platform_stub
     - Library that provides a basic returning error for platform abstraction as AZ_NOT_IMPLEMENTED. This ensures the project can be compiled without the need to provide any specific platform implementation. This is useful if you want to use az_core without platform specific functions like `mutex` or `time`. 
-  - az_nohttp
-    -  Library that provides a basic returning error when calling HTTP stack. Similar to az_noplatform, this library ensures the project can be compiled without requiring any HTTP stack implementation. This is useful if you want to use `az_core` without `az_http` functionality.
+  - az_http_stub
+    -  Library that provides a basic returning error when calling HTTP stack. Similar to az_platform_stub, this library ensures the project can be compiled without requiring any HTTP stack implementation. This is useful if you want to use `az_core` without `az_http` functionality.
 
 The following CMake options are available for adding/removing project features.
 
@@ -201,7 +201,7 @@ To use a specific service/feature, you may include the header file with the func
 
 The specific dependencies of each service may vary, but a couple rules of thumb should resolve the most typical of issues.
 1. All services depend on `core` ([source files here](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/src/azure/core)). You may compile these files with your project to resolve core dependencies.
-2. Most services will require a platform file to be compiled with your project ([see here for porting instructions](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core#porting-the-azure-sdk-to-another-platform)). We have provided several implementations already [here](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/src/azure/platform) for [`windows`](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/src/azure/platform/az_win32.c), [`posix`](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/src/azure/platform/az_posix.c), and a [`no_platform`](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/src/azure/platform/az_noplatform.c) for no-op stubs. Please compile one of these, for your respective platform, with your project.
+2. Most services will require a platform file to be compiled with your project ([see here for porting instructions](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core#porting-the-azure-sdk-to-another-platform)). We have provided several implementations already [here](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/src/azure/platform) for [`windows`](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/src/azure/platform/az_platform_win32.c), [`posix`](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/src/azure/platform/az_platform_posix.c), and a [`no_platform`](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/src/azure/platform/az_platform_stub.c) for no-op stubs. Please compile one of these, for your respective platform, with your project.
 
 The following compilation, preprocessor options will add or remove functionality in the SDK.
 
@@ -400,7 +400,7 @@ AZ_NODISCARD az_result
 az_http_client_send_request(_az_http_request const* request, az_http_response* ref_response);
 ```
 
-For example, Azure SDK provides a cmake target `az_curl` (find it [here](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/src/azure/platform/az_curl.c)) with the implementation code for the contract function mentioned before. It uses an `_az_http_request` reference to create an specific `libcurl` request and send it though the wire. Then it uses `libcurl` response to fill the `az_http_response` reference structure.
+For example, Azure SDK provides a cmake target `az_http_curl` (find it [here](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/src/azure/platform/az_http_curl.c)) with the implementation code for the contract function mentioned before. It uses an `_az_http_request` reference to create an specific `libcurl` request and send it though the wire. Then it uses `libcurl` response to fill the `az_http_response` reference structure.
 
 ### Link your application with your own HTTP stack
 Create your own http adapter for an Http stack and then use the following cmake command to have it linked to your application
@@ -408,7 +408,7 @@ Create your own http adapter for an Http stack and then use the following cmake 
 target_link_libraries(your_application_target PRIVATE lib_adapter http_stack_lib)
 
 # For instance, this is how we link libcurl and its adapter
-target_link_libraries(blobs_client_example PRIVATE az_curl CURL::libcurl)
+target_link_libraries(blobs_client_example PRIVATE az_http_curl CURL::libcurl)
 ```
 
 See the complete cmake file and how to link your own library [here](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/src/azure/storage/CMakeLists.txt#L26)

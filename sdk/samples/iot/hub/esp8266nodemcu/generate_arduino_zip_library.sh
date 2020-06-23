@@ -10,7 +10,7 @@ cp -r sdkrepo/sdk/inc/azure/iot/* azure-sdk-for-c/azure/iot
 
 cp -r sdkrepo/sdk/src/azure/core/* azure-sdk-for-c/
 cp -r sdkrepo/sdk/src/azure/iot/* azure-sdk-for-c/
-cp sdkrepo/sdk/src/azure/platform/az_noplatform.c azure-sdk-for-c/
+cp sdkrepo/sdk/src/azure/platform/az_platform_stub.c azure-sdk-for-c/
 
 zip -r9 azure-sdk-for-c azure-sdk-for-c/
 

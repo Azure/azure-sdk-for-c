@@ -8,31 +8,31 @@ set(CMAKE_C_STANDARD 99)
 
 if(AZ_PLATFORM_IMPL STREQUAL "WIN32")
   # build windows platform
-  add_library(az_win32 STATIC
-    ${CMAKE_CURRENT_LIST_DIR}/az_win32.c
+  add_library(az_platform_win32 STATIC
+    ${CMAKE_CURRENT_LIST_DIR}/az_platform_win32.c
   )
 
-  target_link_libraries(az_win32
+  target_link_libraries(az_platform_win32
     PRIVATE
       az_core
   )
 elseif(AZ_PLATFORM_IMPL STREQUAL "POSIX")
   # build linux platform
-  add_library(az_posix STATIC
-      ${CMAKE_CURRENT_LIST_DIR}/az_posix.c
+  add_library(az_platform_posix STATIC
+      ${CMAKE_CURRENT_LIST_DIR}/az_platform_posix.c
   )
 
-  target_link_libraries(az_posix
+  target_link_libraries(az_platform_posix
     PRIVATE
       az_core
   )
 else()
   #noplatform
-  add_library(az_noplatform STATIC
-    ${CMAKE_CURRENT_LIST_DIR}/az_noplatform.c
+  add_library(az_platform_stub STATIC
+    ${CMAKE_CURRENT_LIST_DIR}/az_platform_stub.c
   )
 
-  target_link_libraries(az_noplatform
+  target_link_libraries(az_platform_stub
     PRIVATE
       az_core
   )
@@ -40,15 +40,15 @@ endif()
 
 # HTTP Client
 add_library (
-  az_nohttp
+  az_http_stub
     STATIC
-      ${CMAKE_CURRENT_LIST_DIR}/az_nohttp.c
+      ${CMAKE_CURRENT_LIST_DIR}/az_http_stub.c
 )
 
-target_link_libraries(az_nohttp PRIVATE az_core)
+target_link_libraries(az_http_stub PRIVATE az_core)
 
 # make sure that users can consume the project as a library.
-add_library (az::nohttp ALIAS az_nohttp)
+add_library (az::nohttp ALIAS az_http_stub)
 
 # Curl Platform
 if (TRANSPORT_CURL)
@@ -59,16 +59,16 @@ if (TRANSPORT_CURL)
   endif()
 
   add_library (
-    az_curl
+    az_http_curl
       STATIC
-      ${CMAKE_CURRENT_LIST_DIR}/az_curl.c
+      ${CMAKE_CURRENT_LIST_DIR}/az_http_curl.c
   )
 
-  target_link_libraries(az_curl PRIVATE az_core)
+  target_link_libraries(az_http_curl PRIVATE az_core)
 
   # make sure that users can consume the project as a library.
-  add_library (az::curl ALIAS az_curl)
+  add_library (az::curl ALIAS az_http_curl)
 
-  target_link_libraries(az_curl PRIVATE CURL::libcurl)
+  target_link_libraries(az_http_curl PRIVATE CURL::libcurl)
 
 endif()

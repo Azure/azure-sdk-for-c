@@ -61,13 +61,13 @@ file(WRITE ${CMAKE_BINARY_DIR}/coverage_targets.txt "")
 # Determine platform to build
 if(AZ_PLATFORM_IMPL STREQUAL "WIN32")
   # build windows platform
-  set(PAL az_win32)
+  set(PAL az_platform_win32)
 elseif(AZ_PLATFORM_IMPL STREQUAL "POSIX")
   # build linux platform
-  set(PAL az_posix)
+  set(PAL az_platform_posix)
 else()
   #noplatform
-  set(PAL az_noplatform)
+  set(PAL az_platform_stub)
 endif()
 
 add_subdirectory(sdk/src/azure/core)
