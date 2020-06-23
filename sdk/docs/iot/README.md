@@ -31,7 +31,8 @@ The library targets made available via CMake are the following:
 [This page](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/samples/iot/readme.md) explains samples for the Azure Embedded C SDK IoT Hub Client and the Provisioning Clients and how to use them.
 
  For step-by-step guides starting from scratch, you may refer to these documents:
-  - Linux: [How to setup and run Azure SDK for Embedded C IoT Hub Samples on Linux](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/samples/iot/hub/linux/how_to_iot_hub_samples_linux.md)
+  - Linux: [How to Setup and Run Azure SDK for Embedded C IoT Hub Samples on Linux](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/samples/iot/hub/linux/how_to_iot_hub_samples_linux.md)
+
   - Windows: [How to setup and run Azure SDK for Embedded C IoT Hub Samples on Microsoft Windows](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/samples/iot/hub/windows/how_to_iot_hub_samples_windows.md).
   - ESP8266: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Esp8266 NodeMCU](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/samples/iot/hub/esp8266nodemcu/how_to_esp8266_nodemcu.md)
 
@@ -188,4 +189,3 @@ Azure SDK for Embedded C is licensed under the [MIT][azure_sdk_for_c_license] li
 [azure_sdk_for_c_doxygen_hub_docs]: https://azuresdkdocs.blob.core.windows.net/$web/c/docs/1.0.0-preview.2/az__iot__hub__client_8h.html
 [azure_sdk_for_c_doxygen_provisioning_docs]: https://azuresdkdocs.blob.core.windows.net/$web/c/docs/1.0.0-preview.2/az__iot__provisioning__client_8h.html
 [azure_sdk_for_c_license]: https://github.com/Azure/azure-sdk-for-c/blob/master/LICENSE
-
