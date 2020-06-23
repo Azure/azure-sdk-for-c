@@ -325,7 +325,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     - On "Payload", type '{ "somevalue": 1234 }' (the payload can be empty, but MUST be a valid Json).
     - Click on "Invoke Method".
     - See the reply from the sample on "Result" (bottom of the page).
-      ![Response](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot/resources/embc_samples_05_methods_response.png)
+      ![Response](../../../../docs/iot/resources/embc_samples_05_methods_response.png)
 
 
     Back to the shell, verify that the message has been received by the sample:
