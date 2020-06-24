@@ -104,17 +104,13 @@ This sample uses a property named `device_count`, which records the number of ti
 
 * To initiate a reported property message from the device, you will use the command `r`.
 
-* To send a device twin desired property message from the service to the device, open the device twin document in your Azure IoT Hub.  Add the property `device_count` along with a corresponding value to the `desired` section of the JSON.
-
-  ```json
-  "properties": {
-      "desired": {
-        "device_count": 42,
-  ```
-
-  Select Save to send the message. The device will store the value locally and report the updated property to the service.
-
-
+* To send a device twin desired property message from the service to the device, open the device twin document in your Azure IoT Hub.  Add the property `device_count` along with a corresponding value to the `desired` section of the JSON.  
+```json
+"properties": {
+    "desired": {
+      "device_count": 42,
+```
+* Select Save to send the message. The device will store the value locally and report the updated property to the service.
 
 ### [IoT Hub Methods (Certificates)][methods_sample]
 Invoke methods from the cloud. The sample supports a method named "ping"
