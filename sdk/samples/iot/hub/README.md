@@ -14,9 +14,9 @@ urlFragment: iot-hub-samples
 This document explains samples for the Azure SDK for Embedded C IoT Hub Client and how to use them. 
 
 For step-by-step guides starting from scratch, you may refer to these documents:
-  - Linux: [How to setup and run Azure SDK for Embedded C IoT Hub Samples on Linux](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/samples/iot/hub/linux/how_to_iot_hub_samples_linux.md)
-  - Windows: [How to setup and run Azure SDK for Embedded C IoT Hub Samples on Microsoft Windows](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/samples/iot/hub/windows/how_to_iot_hub_samples_windows.md).
-  - ESP8266: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Esp8266 NodeMCU](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/samples/iot/hub/esp8266nodemcu/how_to_esp8266_nodemcu.md)
+  - Linux: [How to setup and run Azure SDK for Embedded C IoT Hub Samples on Linux](./linux/how_to_iot_hub_samples_linux.md)
+  - Windows: [How to setup and run Azure SDK for Embedded C IoT Hub Samples on Microsoft Windows](./windows/how_to_iot_hub_samples_windows.md).
+  - ESP8266: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Esp8266 NodeMCU](./esp8266nodemcu/how_to_esp8266_nodemcu.md)
 
   **Note**: While Windows and Linux devices are not likely to be considered as contrained ones, these samples were created to make it simpler to test the Azure SDK for Embedded C libraries, even without a real device. 
 
@@ -104,17 +104,13 @@ This sample uses a property named `device_count`, which records the number of ti
 
 * To initiate a reported property message from the device, you will use the command `r`.
 
-* To send a device twin desired property message from the service to the device, open the device twin document in your Azure IoT Hub.  Add the property `device_count` along with a corresponding value to the `desired` section of the JSON.
-
-  ```json
-  "properties": {
-      "desired": {
-        "device_count": 42,
-  ```
-
-  Select Save to send the message. The device will store the value locally and report the updated property to the service.
-
-
+* To send a device twin desired property message from the service to the device, open the device twin document in your Azure IoT Hub.  Add the property `device_count` along with a corresponding value to the `desired` section of the JSON.  
+```json
+"properties": {
+    "desired": {
+      "device_count": 42,
+```
+* Select Save to send the message. The device will store the value locally and report the updated property to the service.
 
 ### [IoT Hub Methods (Certificates)][methods_sample]
 Invoke methods from the cloud. The sample supports a method named "ping"
@@ -152,5 +148,5 @@ For extensive documentation on Azure IoT Hub, see the [API reference documentati
 [telemetry_sample_cert]: src/paho_iot_hub_telemetry_example.c
 [twin_sample]: src/paho_iot_hub_twin_example.c
 [iot_hub_mqtt]: https://docs.microsoft.com/en-us/azure/iot-dps/iot-dps-mqtt-support
-[error_codes]: https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/mqtt_state_machine.md#iot-service-errors
+[error_codes]: ../../../../sdk/docs/iot/mqtt_state_machine.md#iot-service-errors
 [Eclipse_Paho]: https://www.eclipse.org/paho/clients/c/

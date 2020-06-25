@@ -54,7 +54,7 @@ This project welcomes contributions and suggestions. Find [more contributing][SD
 [SDK_README_KEY_CONCEPTS]: https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot#azure-iot-clients
 [samples_paho]: src/paho_iot_provisioning_example.c
 [iot_provisioning_mqtt]: https://docs.microsoft.com/en-us/azure/iot-dps/iot-dps-mqtt-support
-[error_codes]: https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/mqtt_state_machine.md#iot-service-errors
+[error_codes]: ../../../../sdk/docs/iot/mqtt_state_machine.md#iot-service-errors
 [Eclipse_Paho]: https://www.eclipse.org/paho/clients/c/
 
 ![Impressions](https://azure-sdk-impressions.azurewebsites.net/api/impressions/azure-sdk-for-c%2Fsdk%2Fiot%2Fprovisioning%2Fsamples%2FREADME.png)

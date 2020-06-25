@@ -16,8 +16,8 @@ contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additio
 Many people all over the world have helped make this project better.  You'll want to check out:
 
 * [What are some good first issues for new contributors to the repo?](https://github.com/azure/azure-sdk-for-c/issues?q=is%3Aopen+is%3Aissue+label%3Aup-for-grabs)
-* [How to build and test your change](https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md#developer-guide)
-* [How you can make a change happen!](https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md#pull-requests)
+* [How to build and test your change](#developer-guide)
+* [How you can make a change happen!](#pull-requests)
 * Conceptual Topics in the detailed [Azure SDK for Embedded C docs](https://azure.github.io/azure-sdk-for-c).
 
 ### Community

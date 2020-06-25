@@ -4,7 +4,7 @@ Official Embedded C client for Azure IoT Hub.
 
 ## Getting Started
 
-- **Docs**: If you're new to the Azure SDK for Embedded C take a look at the [State Machine diagram](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/mqtt_state_machine.md#device-provisioning-service) that explains the high-level architecture, SDK components, and a clear view of SDK x Application responsibilities. 
+- **Docs**: If you're new to the Azure SDK for Embedded C take a look at the [State Machine diagram](./mqtt_state_machine.md#iot-hub) that explains the high-level architecture, SDK components, and a clear view of SDK x Application responsibilities. 
 - **Samples**: [This page](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/samples/iot/hub/) explains samples for the Azure SDK for Embedded C and how to use them.
 
 ## Need Help?
@@ -22,5 +22,5 @@ If you'd like to contribute to this library, please read the [contributing guide
 Azure SDK for Embedded C is licensed under the [MIT][azure_sdk_for_c_license] license.
 
 <!-- LINKS -->
-[azure_sdk_for_c_contributing]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md
+[azure_sdk_for_c_contributing]: ../../../CONTRIBUTING.md
 [azure_sdk_for_c_license]: https://github.com/Azure/azure-sdk-for-c/blob/master/LICENSE
