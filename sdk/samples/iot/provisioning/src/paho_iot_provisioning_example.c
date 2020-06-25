@@ -472,4 +472,3 @@ static void print_az_span(az_span span)
   putchar('\n');
   return;
 }
-
