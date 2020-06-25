@@ -25,7 +25,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, with Arduino IDE 
 01. Create an Arduino library for Azure Embedded SDK for C 
 
     ```
-    $ wget https://raw.githubusercontent.com/azure/azure-sdk-for-c/master/sdk/iot/hub/samples/esp8266nodemcu/generate_arduino_zip_library.sh
+    $ wget https://raw.githubusercontent.com/Azure/azure-sdk-for-c/master/sdk/samples/iot/hub/esp8266nodemcu/generate_arduino_zip_library.sh
     $ chmod 777 generate_arduino_zip_library.sh
     $ ./generate_arduino_zip_library.sh
     ```
@@ -87,7 +87,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, with Arduino IDE 
 
 06. Create a sketch on Arduino IDE for the IoT Hub client telemetry sample
 
-    Copy the code from [here](https://github.com/azure/azure-sdk-for-c/blob/master/sdk/iot/hub/samples/esp8266nodemcu) into your sketch.
+    Copy the code from the [ESP8266 Node MCU sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/hub/esp8266nodemcu) into your sketch.
     
     Edit the following parameters in `iot_configs.h`, filling in your own information:
 
