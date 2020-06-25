@@ -124,12 +124,14 @@ int main()
   {
     return rc;
   }
+  printf("Connected to %s\n", global_provisioning_endpoint);
 
   // Subscribe to the necessary provisioning topic to receive provisioning responses
   if ((rc = subscribe()) != MQTTCLIENT_SUCCESS)
   {
     return rc;
   }
+  printf("Subscribed\n");
 
   // Begin the registration process by sending a registration request message
   if ((rc = register_device()) != MQTTCLIENT_SUCCESS)
@@ -470,3 +472,4 @@ static void print_az_span(az_span span)
   putchar('\n');
   return;
 }
+
