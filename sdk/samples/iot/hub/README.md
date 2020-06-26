@@ -106,9 +106,13 @@ This sample uses a property named `device_count`, which records the number of ti
 
 * To send a device twin desired property message from the service to the device, open the device twin document in your Azure IoT Hub.  Add the property `device_count` along with a corresponding value to the `desired` section of the JSON.  
 ```json
-"properties": {
+{
+  "properties": {
     "desired": {
       "device_count": 42,
+    }
+  }
+}
 ```
 * Select Save to send the message. The device will store the value locally and report the updated property to the service.
 
