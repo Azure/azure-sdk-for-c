@@ -18,7 +18,7 @@ For step-by-step guides starting from scratch, you may refer to these documents:
   - Windows: [How to setup and run Azure SDK for Embedded C IoT Hub Samples on Microsoft Windows](./windows/how_to_iot_hub_samples_windows.md).
   - ESP8266: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Esp8266 NodeMCU](./esp8266nodemcu/how_to_esp8266_nodemcu.md)
 
-  **Note**: While Windows and Linux devices are not likely to be considered as contrained ones, these samples were created to make it simpler to test the Azure SDK for Embedded C libraries, even without a real device. 
+  **Note**: While Windows and Linux devices are not likely to be considered as constrained ones, these samples were created to make it simpler to test the Azure SDK for Embedded C libraries, even without a real device. 
 
 
 ## Key Concepts
