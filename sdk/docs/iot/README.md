@@ -24,8 +24,8 @@ For API documentation, please see the doxygen generated docs [here][azure_sdk_fo
 The Azure IoT library is compiled following the same steps listed on the root [README](../../../README.md) documentation, under ["Getting Started Using the SDK"](../../../README.md#getting-started-using-the-sdk).
 
 The library targets made available via CMake are the following:
-- `az::iot::hub`: For Azure IoT Hub features ([API documentation here][azure_sdk_for_c_doxygen_hub_docs])
-- `az::iot::provisioning`: For Azure IoT Provisioning features ([API documentation here][azure_sdk_for_c_doxygen_provisioning_docs])
+- `az::iot::hub` - For Azure IoT Hub features ([API documentation here][azure_sdk_for_c_doxygen_hub_docs])
+- `az::iot::provisioning` - For Azure IoT Provisioning features ([API documentation here][azure_sdk_for_c_doxygen_provisioning_docs])
 
 ### Samples
 [This page](../../../sdk/samples/iot/readme.md) explains samples for the Azure Embedded C SDK IoT Hub Client and the Provisioning Clients and how to use them.
@@ -37,7 +37,11 @@ The library targets made available via CMake are the following:
 
   - ESP8266: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Esp8266 NodeMCU](../../../sdk/samples/iot/hub/esp8266nodemcu/how_to_esp8266_nodemcu.md)
 
-  **Note**: While Windows and Linux devices are not likely to be considered as contrained ones, these samples were created to make it simpler to test the Azure SDK for Embedded C libraries, even without a real device. 
+  **Note**: While Windows and Linux devices are not likely to be considered as constrained ones, these samples were created to make it simpler to test the Azure SDK for Embedded C libraries, even without a real device. 
+
+For extra guidance, please feel free to watch our Deep Dive Video below which goes over building the SDK, running the samples, and the architecture of the samples.
+
+[![Watch the video](./resources/deep_dive_screenshot.png)](https://youtu.be/qdb3QIq8msg)
 
 ### Prerequisites
 
