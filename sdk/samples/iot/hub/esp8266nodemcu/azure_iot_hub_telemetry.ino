@@ -12,9 +12,9 @@
 #include <bearssl/bearssl_hmac.h>
 #include <libb64/cdecode.h>
 
-#include <azure/core/az_result.h>
-#include <azure/core/az_span.h>
-#include <azure/iot/az_iot_hub_client.h>
+#include <az_result.h>
+#include <az_span.h>
+#include <az_iot_hub_client.h>
 
 #include "iot_configs.h"
 
