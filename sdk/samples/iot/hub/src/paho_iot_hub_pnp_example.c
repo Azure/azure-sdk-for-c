@@ -483,8 +483,6 @@ static int send_reported_temperature_property(double desired_temp)
 
 static az_result parse_desired_temperature_property(az_span twin_span, double* parsed_value)
 {
-  az_result result;
-
   az_json_parser jp;
   az_json_token_member tm;
   AZ_RETURN_IF_FAILED(az_json_parser_init(&jp, twin_span));
