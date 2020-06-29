@@ -394,7 +394,7 @@ static int send_method_response(
 
   printf("Status: %u\tPayload:", status);
   char* payload_char = (char*)az_span_ptr(response);
-  if (payload_char == NULL)
+  if (payload_char != NULL)
   {
     for (int32_t i = 0; i < az_span_size(response); i++)
     {
