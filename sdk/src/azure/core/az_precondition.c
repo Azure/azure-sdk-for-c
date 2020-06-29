@@ -9,11 +9,7 @@
 static void az_precondition_failed_default()
 {
   /* By default, when a precondition fails the calling thread spins forever */
-  static uint16_t value = 0;
-  while (value >= 0)
-  {
-    value++;
-  }
+  while (1) {}
 }
 
 az_precondition_failed_fn _az_precondition_failed_callback = az_precondition_failed_default;
