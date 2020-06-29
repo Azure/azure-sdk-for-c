@@ -78,7 +78,7 @@ static char telemetry_payload[32];
 
 // IoT Hub Direct Methods Values
 static char methods_response_topic[128];
-static const az_span method_payload_value = AZ_SPAN_LITERAL_FROM_STR("since");
+static const az_span report_method_payload_value_span = AZ_SPAN_LITERAL_FROM_STR("since");
 static const az_span report_method_name_span = AZ_SPAN_LITERAL_FROM_STR("getMaxMinReport");
 static const az_span report_max_temp_name_span = AZ_SPAN_LITERAL_FROM_STR("maxTemp");
 static const az_span report_min_temp_name_span = AZ_SPAN_LITERAL_FROM_STR("minTemp");
@@ -313,8 +313,6 @@ static az_result read_configuration_and_init_client()
 
 static az_result report_method(az_span payload, az_span response, az_span* out_response)
 {
-  az_result result;
-
   // Parse the "since" field in the payload
   az_json_parser jp;
   az_json_token_member tm;
@@ -328,9 +326,10 @@ static az_result report_method(az_span payload, az_span response, az_span* out_r
   az_span start_time_span = AZ_SPAN_NULL;
   while (az_succeeded(az_json_parser_parse_token_member(&jp, &tm)))
   {
-    if (az_span_is_content_equal(method_payload_value, tm.name))
+    if (az_span_is_content_equal(report_method_payload_value_span, tm.name))
     {
       AZ_RETURN_IF_FAILED(az_json_token_get_string(&tm.token, &start_time_span));
+      break;
     }
 
     // else ignore token.
@@ -346,33 +345,33 @@ static az_result report_method(az_span payload, az_span response, az_span* out_r
 
   // Build the method response payload
   az_json_builder json_builder;
-  result = az_json_builder_init(&json_builder, response, NULL);
-  result = az_json_builder_append_begin_object(&json_builder);
-  result = az_json_builder_append_property_name(&json_builder, report_max_temp_name_span);
-  result = az_json_builder_append_int32_number(&json_builder, (int32_t)device_max_temp);
-  result = az_json_builder_append_property_name(&json_builder, report_min_temp_name_span);
-  result = az_json_builder_append_int32_number(&json_builder, (int32_t)device_min_temp);
-  result = az_json_builder_append_property_name(&json_builder, report_avg_temp_name_span);
-  result = az_json_builder_append_int32_number(&json_builder, (int32_t)device_avg_temp);
-  result = az_json_builder_append_property_name(&json_builder, report_start_time_name_span);
+  AZ_RETURN_IF_FAILED(az_json_builder_init(&json_builder, response, NULL));
+  AZ_RETURN_IF_FAILED(az_json_builder_append_begin_object(&json_builder));
+  AZ_RETURN_IF_FAILED(az_json_builder_append_property_name(&json_builder, report_max_temp_name_span));
+  AZ_RETURN_IF_FAILED(az_json_builder_append_int32_number(&json_builder, (int32_t)device_max_temp));
+  AZ_RETURN_IF_FAILED(az_json_builder_append_property_name(&json_builder, report_min_temp_name_span));
+  AZ_RETURN_IF_FAILED(az_json_builder_append_int32_number(&json_builder, (int32_t)device_min_temp));
+  AZ_RETURN_IF_FAILED(az_json_builder_append_property_name(&json_builder, report_avg_temp_name_span));
+  AZ_RETURN_IF_FAILED(az_json_builder_append_int32_number(&json_builder, (int32_t)device_avg_temp));
+  AZ_RETURN_IF_FAILED(az_json_builder_append_property_name(&json_builder, report_start_time_name_span));
 
   // If the user specified a time, use that as the start | Otherwise use boot time
   if (az_span_size(start_time_span) > 0)
   {
-    result = az_json_builder_append_string(&json_builder, start_time_span);
+    AZ_RETURN_IF_FAILED(az_json_builder_append_string(&json_builder, start_time_span));
   }
   else
   {
-    result = az_json_builder_append_string(&json_builder, boot_time_span);
+    AZ_RETURN_IF_FAILED(az_json_builder_append_string(&json_builder, boot_time_span));
   }
 
-  result = az_json_builder_append_property_name(&json_builder, report_end_time_name_span);
-  result = az_json_builder_append_string(&json_builder, time_span);
-  result = az_json_builder_append_end_object(&json_builder);
+  AZ_RETURN_IF_FAILED(az_json_builder_append_property_name(&json_builder, report_end_time_name_span));
+  AZ_RETURN_IF_FAILED(az_json_builder_append_string(&json_builder, time_span));
+  AZ_RETURN_IF_FAILED(az_json_builder_append_end_object(&json_builder));
 
   *out_response = az_json_builder_get_json(&json_builder);
 
-  return result;
+  return AZ_OK;
 }
 
 static int send_method_response(
