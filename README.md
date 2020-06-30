@@ -232,12 +232,6 @@ After building samples with HTTP stack, set the environment variables for creden
 ```bash
 # On linux, set env var like this. For Windows, do it from advanced settings/ env variables
 
-# KEY-VAULT Sample
-export AZURE_TENANT_ID="????????-????-????-????-????????????"
-export AZURE_CLIENT_ID="????????-????-????-????-????????????"
-export AZURE_CLIENT_SECRET="????????????"
-export AZURE_KEYVAULT_URL="https://???????????.??"
-
 # STORAGE Sample (only 1 env var required)
 # URL must contain a valid container, blob and SaS token
 # e.g "https://storageAccount.blob.core.windows.net/container/blob?sv=xxx&ss=xx&srt=xx&sp=xx&se=xx&st=xxx&spr=https,http&sig=xxx"
@@ -246,7 +240,7 @@ export AZURE_STORAGE_URL="https://??????????????"
 
 ### Libcurl Global Init and Global Clean Up
 
-When you select to build the libcurl http stack implementation, you have to make sure to call `curl_global_init` before using SDK client like Storage or Keyvault to send HTTP request to Azure.
+When you select to build the libcurl http stack implementation, you have to make sure to call `curl_global_init` before using SDK client like Storage to send HTTP request to Azure.
 
 You need to also call `curl_global_cleanup` once you no longer need to perform SDk client API calls.
 
