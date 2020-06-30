@@ -36,11 +36,7 @@ typedef enum
   AZ_JSON_TOKEN_END_ARRAY, ///< The token kind is the end of a JSON array.
   AZ_JSON_TOKEN_PROPERTY_NAME, ///< The token kind is a JSON property name, which contains no
                                ///< escaped characters.
-  AZ_JSON_TOKEN_ESCAPED_PROPERTY_NAME, ///< The token kind is a JSON property name, which contains
-                                       ///< ecaped characters.
   AZ_JSON_TOKEN_STRING, ///< The token kind is a JSON string, which contains no escaped characters.
-  AZ_JSON_TOKEN_ESCAPED_STRING, ///< The token kind is a JSON string, which contains ecaped
-                                ///< characters.
   AZ_JSON_TOKEN_NUMBER, ///< The token kind is a JSON number.
   AZ_JSON_TOKEN_TRUE, ///< The token kind is the JSON literal `true`.
   AZ_JSON_TOKEN_FALSE, ///< The token kind is the JSON literal `false`.
@@ -64,7 +60,7 @@ typedef struct
 
 /**
  * @brief Represents a JSON token. The kind field indicates the type of the JSON token and the slice
- * represents the portion of the JSON payload that represents to the token value.
+ * represents the portion of the JSON payload that points to the token value.
  */
 typedef struct
 {
@@ -78,7 +74,7 @@ typedef struct
  * @param token A pointer to an az_json_token instance.
  * @param out_value A pointer to a variable to receive the value.
  * @return AZ_OK if the boolean is returned.<br>
- * AZ_ERROR_ITEM_NOT_FOUND if the kind is not AZ_JSON_TOKEN_BOOLEAN.
+ * AZ_ERROR_JSON_INVALID_STATE if the kind is not AZ_JSON_TOKEN_BOOLEAN.
  */
 AZ_NODISCARD az_result az_json_token_get_boolean(az_json_token const* json_token, bool* out_value);
 
@@ -88,7 +84,7 @@ AZ_NODISCARD az_result az_json_token_get_boolean(az_json_token const* json_token
  * @param token A pointer to an az_json_token instance.
  * @param out_value A pointer to a variable to receive the value.
  * @return AZ_OK if the number is returned.<br>
- * AZ_ERROR_ITEM_NOT_FOUND if the kind != AZ_JSON_TOKEN_NUMBER.
+ * AZ_ERROR_JSON_INVALID_STATE if the kind != AZ_JSON_TOKEN_NUMBER.
  */
 AZ_NODISCARD az_result
 az_json_token_get_uint64(az_json_token const* json_token, uint64_t* out_value);
@@ -99,7 +95,7 @@ az_json_token_get_uint64(az_json_token const* json_token, uint64_t* out_value);
  * @param token A pointer to an az_json_token instance.
  * @param out_value A pointer to a variable to receive the value.
  * @return AZ_OK if the number is returned.<br>
- * AZ_ERROR_ITEM_NOT_FOUND if the kind != AZ_JSON_TOKEN_NUMBER.
+ * AZ_ERROR_JSON_INVALID_STATE if the kind != AZ_JSON_TOKEN_NUMBER.
  */
 AZ_NODISCARD az_result
 az_json_token_get_uint32(az_json_token const* json_token, uint32_t* out_value);
@@ -110,7 +106,7 @@ az_json_token_get_uint32(az_json_token const* json_token, uint32_t* out_value);
  * @param token A pointer to an az_json_token instance.
  * @param out_value A pointer to a variable to receive the value.
  * @return AZ_OK if the string is returned.<br>
- * AZ_ERROR_ITEM_NOT_FOUND if the kind != AZ_JSON_TOKEN_STRING.
+ * AZ_ERROR_JSON_INVALID_STATE if the kind != AZ_JSON_TOKEN_STRING.
  */
 AZ_NODISCARD az_result
 az_json_token_get_string(az_json_token const* json_token, az_span* out_value);
@@ -362,7 +358,7 @@ typedef struct
  * @details Call this to obtain an initialized #az_json_parser_options structure that can be
  * modified and passed to #az_json_parser_init().
  *
- * @return The default #az_json_builder_options.
+ * @return The default #az_json_parser_options.
  */
 AZ_NODISCARD AZ_INLINE az_json_parser_options az_json_parser_options_default()
 {
@@ -375,10 +371,8 @@ AZ_NODISCARD AZ_INLINE az_json_parser_options az_json_parser_options_default()
   return options;
 }
 
-typedef uint64_t _az_json_stack;
-
 /**
- * @brief Returns the JSON tokens contained within a JSON buffer.
+ * @brief Returns the JSON tokens contained within a JSON buffer, one at a time.
  */
 typedef struct
 {
@@ -387,7 +381,9 @@ typedef struct
   struct
   {
     az_span json_buffer;
-    _az_json_stack stack;
+    int32_t bytes_consumed;
+    bool is_complex_json;
+    _az_json_bit_stack bit_stack;
     az_json_parser_options options;
   } _internal;
 } az_json_parser;
@@ -396,7 +392,7 @@ typedef struct
  * @brief Initializes an #az_json_parser to parse the JSON payload contained within the provided
  * buffer.
  *
- * @param[out] json_parser A pointer to an az_json_parser instance to initialize.
+ * @param[out] json_parser A pointer to an #az_json_parser instance to initialize.
  * @param[in] json_buffer An #az_span over the byte buffer containing the JSON text to parse.
  * @param[in] options __[nullable]__ A reference to an #az_json_parser_options
  * structure which defines custom behavior of the #az_json_parser. If `NULL` is passed, the parser
@@ -404,12 +400,20 @@ typedef struct
  *
  * @return An #az_result value indicating the result of the operation:
  *         - #AZ_OK if the az_json_parser is initialized successfully
+ *         - #AZ_ERROR_EOF if the provided json buffer is empty
  */
 AZ_NODISCARD AZ_INLINE az_result az_json_parser_init(
     az_json_parser* json_parser,
     az_span json_buffer,
     az_json_parser_options const* options)
 {
+  // TODO: Should this be a precondition? If so, there is an inlining issue here.
+  // An empty JSON payload is invalid.
+  if (az_span_size(json_buffer) < 1)
+  {
+    return AZ_ERROR_EOF;
+  }
+
   *json_parser = (az_json_parser){
     .token = (az_json_token){
       .kind = AZ_JSON_TOKEN_NONE,
@@ -417,7 +421,9 @@ AZ_NODISCARD AZ_INLINE az_result az_json_parser_init(
     },
     ._internal = {
       .json_buffer = json_buffer,
-      .stack = 1,
+      .bytes_consumed = 0,
+      .is_complex_json = false,
+      .bit_stack = { 0 },
       .options = options == NULL ? az_json_parser_options_default() : *options,
     },
   };
@@ -439,7 +445,7 @@ AZ_NODISCARD az_result az_json_parser_move_to_next_token(az_json_parser* json_pa
 /**
  * @brief Parses and skips over any nested JSON elements.
  *
- * @param json_parser A pointer to an az_json_parser instance containing the JSON to parse.
+ * @param json_parser A pointer to an #az_json_parser instance containing the JSON to parse.
  *
  * @return AZ_OK if the token was parsed successfully.<br>
  *         AZ_ERROR_EOF when the end of the JSON document is reached.<br>
@@ -452,8 +458,7 @@ AZ_NODISCARD az_result az_json_parser_skip_children(az_json_parser* json_parser)
  * @brief Determines whether the unescaped JSON token value that the #az_json_parser points to is
  * equal to the expected text within the provided byte span.
  *
- * @param[in] json_parser A pointer to an #az_json_parser instance containing the JSON payload being
- * parsed.
+ * @param[in] json_parser A pointer to an #az_json_parser instance containing the JSON string token.
  * @param[in] expected_text The lookup text to compare the token against.
  *
  * @return `true` if the current JSON token value in the JSON source semantically matches the
