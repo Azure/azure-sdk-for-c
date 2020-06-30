@@ -16,7 +16,7 @@
 #include <time.h>
 #ifdef _WIN32
 // Required for Sleep(DWORD)
-#include <Windows.h>
+#include <windows.h>
 #else
 // Required for sleep(unsigned int)
 #include <unistd.h>
@@ -54,6 +54,7 @@
 static const uint8_t null_terminator = '\0';
 static char boot_time_str[32];
 static az_span boot_time_span;
+static const char iso_spec_time_format[] = "%Y-%m-%dT%H:%M:%S%z";
 
 // IoT Hub Connection Values
 static az_iot_hub_client client;
@@ -128,7 +129,7 @@ static int send_method_response(
     az_span response);
 static int send_reported_temperature_property(double desired_temp);
 static az_result parse_desired_temperature_property(az_span twin_span, double* parsed_value);
-static az_result report_method(az_span payload, az_span response, az_span* out_response);
+static az_result invoke_getMaxMinReport(az_span payload, az_span response, az_span* out_response);
 
 int main()
 {
@@ -139,7 +140,7 @@ int main()
   struct tm* timeinfo;
   time(&rawtime);
   timeinfo = localtime(&rawtime);
-  size_t len = strftime(boot_time_str, sizeof(boot_time_str), "%Y-%m-%dT%H:%M:%S%z", timeinfo);
+  size_t len = strftime(boot_time_str, sizeof(boot_time_str), iso_spec_time_format, timeinfo);
   boot_time_span = az_span_init((uint8_t*)boot_time_str, (int32_t)len);
 
   // Read in the necessary environment variables and initialize the az_iot_hub_client
@@ -311,7 +312,8 @@ static az_result read_configuration_and_init_client()
   return AZ_OK;
 }
 
-static az_result report_method(az_span payload, az_span response, az_span* out_response)
+// Invoke the method requested from the service. Here, it generates a report for max, min, and avg temperatures.
+static az_result invoke_getMaxMinReport(az_span payload, az_span response, az_span* out_response)
 {
   // Parse the "since" field in the payload
   az_json_parser jp;
@@ -340,7 +342,7 @@ static az_result report_method(az_span payload, az_span response, az_span* out_r
   struct tm* timeinfo;
   time(&rawtime);
   timeinfo = localtime(&rawtime);
-  size_t len = strftime(end_time_buffer, sizeof(end_time_buffer), "%Y-%m-%dT%H:%M:%S%z", timeinfo);
+  size_t len = strftime(end_time_buffer, sizeof(end_time_buffer), iso_spec_time_format, timeinfo);
   az_span time_span = az_span_init((uint8_t*)end_time_buffer, (int32_t)len);
 
   // Build the method response payload
@@ -374,6 +376,7 @@ static az_result report_method(az_span payload, az_span response, az_span* out_r
   return AZ_OK;
 }
 
+// Send the response of the method invocation
 static int send_method_response(
     az_iot_hub_client_method_request* request,
     uint16_t status,
@@ -424,6 +427,7 @@ static int send_method_response(
   return 0;
 }
 
+// Build the JSON payload for the reported property
 static az_result build_reported_property(az_json_builder* json_builder, double property_val)
 {
   az_result result;
@@ -436,6 +440,7 @@ static az_result build_reported_property(az_json_builder* json_builder, double p
   return result;
 }
 
+// Send the twin reported property to the service
 static int send_reported_temperature_property(double desired_temp)
 {
   int rc;
@@ -481,6 +486,7 @@ static int send_reported_temperature_property(double desired_temp)
   return rc;
 }
 
+// Parse the desired temperature property from the incoming JSON
 static az_result parse_desired_temperature_property(az_span twin_span, double* parsed_value)
 {
   az_json_parser jp;
@@ -505,6 +511,7 @@ static az_result parse_desired_temperature_property(az_span twin_span, double* p
   return AZ_OK;
 }
 
+// Callback for incoming MQTT messages
 static int on_received(void* context, char* topicName, int topicLen, MQTTClient_message* message)
 {
   (void)context;
@@ -590,7 +597,7 @@ static int on_received(void* context, char* topicName, int topicLen, MQTTClient_
 
       // Invoke Method
       az_result response
-          = report_method(method_payload_span, method_response_span, &method_response_span);
+          = invoke_getMaxMinReport(method_payload_span, method_response_span, &method_response_span);
       (void)response;
 
       // Send method response with report as JSON payload
@@ -699,6 +706,7 @@ static int subscribe()
   return 0;
 }
 
+// Send JSON formatted telemetry messages
 static int send_telemetry_messages()
 {
   int rc;
