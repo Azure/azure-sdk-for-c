@@ -1,0 +1,30 @@
+{
+  "cmake.configureEnvironment": {
+    "VCPKG_ROOT": "",
+    "VCPKG_DEFAULT_TRIPLET": ""
+  },
+  "cmake.configureSettings": {
+    "WARNINGS_AS_ERRORS" : "ON",
+    "TRANSPORT_CURL" : "OFF",
+    "UNIT_TESTING" : "OFF",
+    "UNIT_TESTING_MOCKS" : "OFF",
+    "TRANSPORT_PAHO" : "OFF",
+    "PRECONDITIONS" : "ON",
+    "LOGGING" : "ON"
+  },
+  "cmake.debugConfig": {
+    "env": {
+      "AZ_IOT_DEVICE_ID": "",
+      "AZ_IOT_HUB_HOSTNAME": "",
+
+      "AZ_IOT_ID_SCOPE": "",
+      "AZ_IOT_REGISTRATION_ID": "",
+
+      "AZ_IOT_DEVICE_X509_CERT_PEM_FILE": "",
+      "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE": "",
+
+      "AZ_IOT_HUB_DEVICE_SAS_KEY": "",
+      "AZ_IOT_HUB_DEVICE_SAS_KEY_DURATION": ""
+    }
+  }
+}
