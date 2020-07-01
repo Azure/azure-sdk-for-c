@@ -333,7 +333,7 @@ AZ_INLINE az_result _az_iot_provisioning_client_payload_registration_result_pars
     AZ_RETURN_IF_FAILED(az_json_parser_move_to_next_token(jp));
   }
 
-  if (!found_assigned_hub || !found_device_id)
+  if (found_assigned_hub != found_device_id)
   {
     return AZ_ERROR_ITEM_NOT_FOUND;
   }

@@ -154,7 +154,7 @@ AZ_NODISCARD static az_result _az_json_parser_process_string(az_json_parser* jso
       {
         string_length++;
         // Expecting 4 hex digits to follow the escaped 'u'
-        if (string_length >= remaining_size - 4)
+        if (string_length > remaining_size - 4)
         {
           return AZ_ERROR_EOF;
         }
@@ -281,6 +281,21 @@ AZ_NODISCARD static int32_t _az_json_parser_consume_digits(az_span token)
   return counter;
 }
 
+AZ_NODISCARD static az_result _az_json_parser_update_number_state_if_single_value(
+    az_json_parser* json_parser,
+    az_span token_slice,
+    int32_t consumed_count)
+{
+  if (json_parser->_internal.is_complex_json)
+  {
+    return AZ_ERROR_EOF;
+  }
+
+  _az_json_parser_update_state(json_parser, AZ_JSON_TOKEN_NUMBER, token_slice, consumed_count);
+
+  return AZ_OK;
+}
+
 AZ_NODISCARD static az_result _az_json_parser_process_number(az_json_parser* json_parser)
 {
   az_span token = _get_remaining_json(json_parser);
@@ -317,7 +332,8 @@ AZ_NODISCARD static az_result _az_json_parser_process_number(az_json_parser* jso
       // If there is no more JSON, this is a valid end state only when the JSON payload contains a
       // single value: "[-]0"
       // Otherwise, the payload is incomplete and ending too early.
-      return json_parser->_internal.is_complex_json ? AZ_ERROR_EOF : AZ_OK;
+      return _az_json_parser_update_number_state_if_single_value(
+          json_parser, az_span_slice(token, 0, consumed_count), consumed_count);
     }
 
     next_byte = next_byte_ptr[consumed_count];
@@ -345,7 +361,8 @@ AZ_NODISCARD static az_result _az_json_parser_process_number(az_json_parser* jso
       // If there is no more JSON, this is a valid end state only when the JSON payload contains a
       // single value: "[-][digits]"
       // Otherwise, the payload is incomplete and ending too early.
-      return json_parser->_internal.is_complex_json ? AZ_ERROR_EOF : AZ_OK;
+      return _az_json_parser_update_number_state_if_single_value(
+          json_parser, az_span_slice(token, 0, consumed_count), consumed_count);
     }
 
     next_byte = next_byte_ptr[consumed_count];
@@ -375,7 +392,8 @@ AZ_NODISCARD static az_result _az_json_parser_process_number(az_json_parser* jso
       // If there is no more JSON, this is a valid end state only when the JSON payload contains a
       // single value: "[-][digits].[digits]"
       // Otherwise, the payload is incomplete and ending too early.
-      return json_parser->_internal.is_complex_json ? AZ_ERROR_EOF : AZ_OK;
+      return _az_json_parser_update_number_state_if_single_value(
+          json_parser, az_span_slice(token, 0, consumed_count), consumed_count);
     }
 
     next_byte = next_byte_ptr[consumed_count];
@@ -404,7 +422,7 @@ AZ_NODISCARD static az_result _az_json_parser_process_number(az_json_parser* jso
   }
 
   next_byte = next_byte_ptr[consumed_count];
-  if (next_byte != '-' && next_byte != '+')
+  if (next_byte == '-' || next_byte == '+')
   {
     consumed_count++;
 
@@ -423,7 +441,8 @@ AZ_NODISCARD static az_result _az_json_parser_process_number(az_json_parser* jso
     // If there is no more JSON, this is a valid end state only when the JSON payload contains a
     // single value: "[-][digits].[digits]e[+|-][digits]"
     // Otherwise, the payload is incomplete and ending too early.
-    return json_parser->_internal.is_complex_json ? AZ_ERROR_EOF : AZ_OK;
+    return _az_json_parser_update_number_state_if_single_value(
+        json_parser, az_span_slice(token, 0, consumed_count), consumed_count);
   }
 
   // Checking if we are done processing a JSON number
@@ -451,7 +470,7 @@ AZ_NODISCARD static az_result _az_json_parser_process_literal(
   int32_t expected_literal_size = az_span_size(literal);
 
   // Return EOF because the token is smaller than the expected literal.
-  if (token_size <= expected_literal_size)
+  if (token_size < expected_literal_size)
   {
     return AZ_ERROR_EOF;
   }
@@ -494,11 +513,10 @@ AZ_NODISCARD static az_result _az_json_parser_process_value(
 
 AZ_NODISCARD static az_result _az_json_parser_read_first_token(
     az_json_parser* json_parser,
-    az_span json)
+    az_span json,
+    uint8_t first_byte)
 {
-  uint8_t first = az_span_ptr(json)[0];
-
-  if (first == '{')
+  if (first_byte == '{')
   {
     _az_json_stack_push(&json_parser->_internal.bit_stack, _az_JSON_STACK_OBJECT);
     _az_json_parser_update_state(
@@ -506,7 +524,7 @@ AZ_NODISCARD static az_result _az_json_parser_read_first_token(
     json_parser->_internal.is_complex_json = true;
     return AZ_OK;
   }
-  else if (first == '[')
+  else if (first_byte == '[')
   {
     _az_json_stack_push(&json_parser->_internal.bit_stack, _az_JSON_STACK_ARRAY);
     _az_json_parser_update_state(
@@ -516,7 +534,7 @@ AZ_NODISCARD static az_result _az_json_parser_read_first_token(
   }
   else
   {
-    return _az_json_parser_process_value(json_parser, first);
+    return _az_json_parser_process_value(json_parser, first_byte);
   }
 }
 
@@ -595,7 +613,7 @@ AZ_NODISCARD az_result az_json_parser_move_to_next_token(az_json_parser* json_pa
   switch (json_parser->token.kind)
   {
     case AZ_JSON_TOKEN_NONE:
-      return _az_json_parser_read_first_token(json_parser, json);
+      return _az_json_parser_read_first_token(json_parser, json, first_byte);
     case AZ_JSON_TOKEN_BEGIN_OBJECT:
     {
       if (first_byte == '}')
