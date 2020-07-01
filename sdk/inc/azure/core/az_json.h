@@ -491,24 +491,6 @@ AZ_NODISCARD az_result az_json_parser_move_to_next_token(az_json_parser* json_pa
  */
 AZ_NODISCARD az_result az_json_parser_skip_children(az_json_parser* json_parser);
 
-/************************************ JSON POINTER ******************/
-
-/**
- * @brief az_json_parse_by_pointer parses a JSON document and returns the az_json_token identified
- * by a JSON pointer.
- *
- * @param json_buffer An az_span over a buffer containing the JSON document to parse.
- * @param json_pointer An az_span over a string containing JSON-pointer syntax (see
- * https://tools.ietf.org/html/rfc6901).
- * @param out_token A pointer to an az_json_token that receives the JSON token.
- * @return AZ_OK if the desired token was found in the JSON document.
- *         AZ_ERROR_EOF when the end of the JSON document is reached.<br>
- *         AZ_ERROR_PARSER_UNEXPECTED_CHAR when an invalid character is detected.<br>
- *         AZ_ERROR_ITEM_NOT_FOUND when no more items are found.
- */
-AZ_NODISCARD az_result
-az_json_parse_by_pointer(az_span json_buffer, az_span json_pointer, az_json_token* out_token);
-
 #include <azure/core/_az_cfg_suffix.h>
 
 #endif // _az_JSON_H

@@ -3,7 +3,6 @@
 
 #include "az_hex_private.h"
 #include "az_json_private.h"
-#include "az_json_string_private.h"
 #include "az_span_private.h"
 #include <azure/core/az_json.h>
 #include <azure/core/internal/az_span_internal.h>

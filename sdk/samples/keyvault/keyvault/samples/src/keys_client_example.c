@@ -40,11 +40,11 @@
  *
  */
 
+#include <az_keyvault.h>
 #include <azure/core/az_context.h>
 #include <azure/core/az_credentials.h>
 #include <azure/core/az_http.h>
 #include <azure/core/az_json.h>
-#include <az_keyvault.h>
 
 // Uncomment below code to enable logging (and the first lines of main function)
 #include <azure/core/az_log.h>
@@ -272,6 +272,61 @@ int main()
   return 0;
 }
 
+AZ_NODISCARD static az_result _az_parse_json_find_kid_property(
+    az_json_parser* jp,
+    az_span property_name,
+    int32_t recursive_depth,
+    az_json_token* json_kid)
+{
+
+  AZ_RETURN_IF_FAILED(az_json_parser_move_to_next_token(&jp));
+  if (jp.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
+  {
+    return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
+  }
+
+  bool found_property = false;
+  do
+  {
+    AZ_RETURN_IF_FAILED(az_json_parser_move_to_next_token(&jp));
+
+    if (az_json_token_is_text_equal(&jp.token, property_name)
+    {
+      recursive_depth++;
+      if (recursive_depth <= 2)
+      {
+        AZ_RETURN_IF_FAILED(_az_parse_json_find_kid_property(
+            jp, AZ_SPAN_FROM_STR("kid"), recursive_depth, json_kid));
+      }
+      else
+      {
+        *json_kid = jp.token;
+      }
+      found_property = true;
+    }
+    else
+    {
+      // ignore other tokens
+      AZ_RETURN_IF_FAILED(az_json_parser_skip_children(&jp));
+    }
+
+  } while (jp.token.kind != AZ_JSON_TOKEN_END_OBJECT);
+
+  if (!found_property)
+  {
+    return AZ_ERROR_ITEM_NOT_FOUND;
+  }
+
+  return AZ_OK;
+}
+
+AZ_NODISCARD static az_result _az_parse_json_payload(az_span body, az_json_token* json_kid)
+{
+  az_json_parser jp;
+  AZ_RETURN_IF_FAILED(az_json_parser_init(&jp, body, NULL));
+  return _az_parse_json_find_kid_property(jp, AZ_SPAN_FROM_STR("key"), 0, json_kid);
+}
+
 az_span get_key_version(az_http_response* response)
 {
   az_span body;
@@ -289,17 +344,14 @@ az_span get_key_version(az_http_response* response)
     return AZ_SPAN_NULL;
   }
   // get key from body
-  az_json_token value;
-  r = az_json_parse_by_pointer(body, AZ_SPAN_FROM_STR("/key/kid"), &value);
-  if (az_failed(r))
+
+  az_json_token value = { 0 };
+  r = _az_parse_json_payload(body, &value);
+  if (az_failed(r) || value.kind != AZ_JSON_TOKEN_STRING)
   {
     return AZ_SPAN_NULL;
   }
 
-  if (value.kind != AZ_JSON_TOKEN_STRING)
-  {
-    return AZ_SPAN_NULL;
-  }
   az_span k = value.slice;
   // calculate version
   int32_t const kid_length = az_span_size(k);
