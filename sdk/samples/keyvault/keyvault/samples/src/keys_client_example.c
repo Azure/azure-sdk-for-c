@@ -82,7 +82,7 @@ int main()
 
   az_log_classification const classifications[] = { AZ_LOG_HTTP_RESPONSE, AZ_LOG_END_OF_LIST };
   az_log_set_classifications(classifications);
-  az_log_set_callback(test_log_func);
+  az_log_set_callback(test_log_func)
   // Uncomment below lines when working with libcurl
   /*
     // If running with libcurl, call global init. See project Readme for more info
