@@ -687,7 +687,7 @@ AZ_NODISCARD az_result az_json_parser_skip_children(az_json_parser* json_parser)
     do
     {
       AZ_RETURN_IF_FAILED(az_json_parser_move_to_next_token(json_parser));
-    } while (depth < json_parser->_internal.bit_stack._internal.current_depth);
+    } while (depth <= json_parser->_internal.bit_stack._internal.current_depth);
   }
   return AZ_OK;
 }

@@ -759,6 +759,44 @@ static void test_json_parser_invalid(void** state)
       AZ_SPAN_FROM_STR("{\r\n\"isActive\":false \"\r\n}"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
 }
 
+static void test_json_skip_children(void** state)
+{
+  (void)state;
+
+  az_json_parser parser = { 0 };
+
+  TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR("{\"foo\":1}"), NULL));
+  TEST_EXPECT_SUCCESS(az_json_parser_move_to_next_token(&parser));
+  assert_int_equal(parser.token.kind, AZ_JSON_TOKEN_BEGIN_OBJECT);
+  TEST_EXPECT_SUCCESS(az_json_parser_skip_children(&parser));
+  assert_int_equal(parser.token.kind, AZ_JSON_TOKEN_END_OBJECT);
+  assert_int_equal(parser._internal.bit_stack._internal.current_depth, 0);
+
+  TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR("{\"foo\":{}}"), NULL));
+  TEST_EXPECT_SUCCESS(az_json_parser_move_to_next_token(&parser));
+  assert_int_equal(parser.token.kind, AZ_JSON_TOKEN_BEGIN_OBJECT);
+  TEST_EXPECT_SUCCESS(az_json_parser_skip_children(&parser));
+  assert_int_equal(parser.token.kind, AZ_JSON_TOKEN_END_OBJECT);
+  assert_int_equal(parser._internal.bit_stack._internal.current_depth, 0);
+
+  TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR("{\"foo\":{}}"), NULL));
+  TEST_EXPECT_SUCCESS(az_json_parser_move_to_next_token(&parser));
+  TEST_EXPECT_SUCCESS(az_json_parser_move_to_next_token(&parser));
+  assert_int_equal(parser.token.kind, AZ_JSON_TOKEN_PROPERTY_NAME);
+  TEST_EXPECT_SUCCESS(az_json_parser_skip_children(&parser));
+  assert_int_equal(parser.token.kind, AZ_JSON_TOKEN_END_OBJECT);
+  assert_int_equal(parser._internal.bit_stack._internal.current_depth, 1);
+
+  TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR("{\"foo\":{}}"), NULL));
+  TEST_EXPECT_SUCCESS(az_json_parser_move_to_next_token(&parser));
+  TEST_EXPECT_SUCCESS(az_json_parser_move_to_next_token(&parser));
+  TEST_EXPECT_SUCCESS(az_json_parser_move_to_next_token(&parser));
+  assert_int_equal(parser.token.kind, AZ_JSON_TOKEN_BEGIN_OBJECT);
+  TEST_EXPECT_SUCCESS(az_json_parser_skip_children(&parser));
+  assert_int_equal(parser.token.kind, AZ_JSON_TOKEN_END_OBJECT);
+  assert_int_equal(parser._internal.bit_stack._internal.current_depth, 1);
+}
+
 /** Json Value **/
 static void test_json_value(void** state)
 {
@@ -822,10 +860,9 @@ static void test_json_value(void** state)
 
 int test_az_json()
 {
-  const struct CMUnitTest tests[] = {
-    cmocka_unit_test(test_json_parser_init), cmocka_unit_test(test_json_builder),
-    cmocka_unit_test(test_json_parser),      cmocka_unit_test(test_json_parser_invalid),
-    cmocka_unit_test(test_json_value),
-  };
+  const struct CMUnitTest tests[]
+      = { cmocka_unit_test(test_json_parser_init),   cmocka_unit_test(test_json_builder),
+          cmocka_unit_test(test_json_parser),        cmocka_unit_test(test_json_parser_invalid),
+          cmocka_unit_test(test_json_skip_children), cmocka_unit_test(test_json_value) };
   return cmocka_run_group_tests_name("az_core_json", tests, NULL, NULL);
 }
