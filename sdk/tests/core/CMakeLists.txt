@@ -32,4 +32,4 @@ add_cmocka_test(${TARGET_NAME} SOURCES
                 LINK_OPTIONS ${WRAP_FUNCTIONS}
                 # grant access to Private functions to test az_json_private
                 PRIVATE_ACCESS ON
-                LINK_TARGETS az_core ${PAL} az_nohttp)
+                LINK_TARGETS az_core)
