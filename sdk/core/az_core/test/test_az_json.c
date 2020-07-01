@@ -729,6 +729,147 @@ az_result write_str(az_span span, az_span s, az_span* out, int32_t* written)
   return AZ_OK;
 }
 
+// Using a macro instead of a helper method to retain line number
+// in call stack to help debug which line/test case failed.
+#define test_json_parser_invalid_helper(json, expected_result) \
+  do \
+  { \
+    az_json_parser parser = { 0 }; \
+    TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, json, NULL)); \
+    az_result result = AZ_OK; \
+    while (result == AZ_OK) \
+    { \
+      result = az_json_parser_move_to_next_token(&parser); \
+    } \
+    assert_int_equal(result, expected_result); \
+  } while (0)
+
+static void test_json_parser_invalid(void** state)
+{
+  (void)state;
+
+  // Invalid nesting
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("{]"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("[}"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("{[]}"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("{[,]}"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("[[{,}]]"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("{{}}"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("[[{{}}]]"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(
+      AZ_SPAN_FROM_STR("{\"age\":30,\"ints\":[1, 2, 3}}"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(
+      AZ_SPAN_FROM_STR("[[[[{\r\n\"a\":[[[[{\"b\":[}]]]]}]]]]"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(
+      AZ_SPAN_FROM_STR("[[[[{\r\n\"a\":[[[[{\"b\":[]},[}]]]]}]]]]"),
+      AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+
+  // Invalid trailing commas
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR(","), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("   ,   "), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("{},"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("[],"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("1,"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("true,"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("false,"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("null,"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("{,}"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(
+      AZ_SPAN_FROM_STR("{\"a\": 1,,}"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(
+      AZ_SPAN_FROM_STR("{\"a\": 1,,\"b\":2,}"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("[,]"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("[1,2,]"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("[1,,]"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("[1,,2,]"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(
+      AZ_SPAN_FROM_STR("{\"a\":1,\"b\":[],}"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+
+  // Invalid literals and single tokens
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("nulz"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("truz"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("falsz"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("nul "), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("tru "), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("fals "), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("NULL"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("trUe"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("False"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("age"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("\""), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("\"age\":"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+
+  // Invalid numbers
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("12345.1."), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("-f"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("1.f"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("0.1f"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("0.1e1f"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("123f"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("0-"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("1-"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("1.1-"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("123,"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("+0"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("+1"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("01"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("-01"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("0.e"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("-0.e"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("0.1e+,"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("-0.1e- "), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("0.1e+}"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("-0.1e-]"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("1, 2"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("1, \"age\":"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("001"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("00h"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("[01"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("10.5e-f"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("10.5e-0.2"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(
+      AZ_SPAN_FROM_STR("{\"age\":30, \"ints\":[1, 2, 3, 4, 5.1e7.3]}"),
+      AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+
+  // Invalid strings
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("\"hel\rlo\""), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("\"hel\nlo\""), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("\"\\uABCX\""), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("\"\\uXABC\""), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(
+      AZ_SPAN_FROM_STR("\"hel\\uABCXlo\""), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(AZ_SPAN_FROM_STR("\"hel\\lo\""), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(
+      AZ_SPAN_FROM_STR("\"hel\\\\\\lo\""), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(
+      AZ_SPAN_FROM_STR("\"hel\\\tlo\""), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(
+      AZ_SPAN_FROM_STR("\"hello\\\\\"\""), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+
+  //  Invalid property names
+  test_json_parser_invalid_helper(
+      AZ_SPAN_FROM_STR("{\"hel\rlo\":1}"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(
+      AZ_SPAN_FROM_STR("{\"hel\nlo\":1}"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(
+      AZ_SPAN_FROM_STR("{\"\\uABCX\":1}"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(
+      AZ_SPAN_FROM_STR("{\"\\uXABC\":1}"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(
+      AZ_SPAN_FROM_STR("{\"hel\\uABCXlo\":1}"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(
+      AZ_SPAN_FROM_STR("\"hel\\lo\":1}"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(
+      AZ_SPAN_FROM_STR("{\"hel\\\\\\lo\":1}"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(
+      AZ_SPAN_FROM_STR("{\"hel\\\tlo\":1}"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  test_json_parser_invalid_helper(
+      AZ_SPAN_FROM_STR("{\"hello\\\\\"\":1}"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+
+  test_json_parser_invalid_helper(
+      AZ_SPAN_FROM_STR("{\r\n\"isActive\":false \"\r\n}"), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+}
+
 /** Json pointer **/
 static void test_json_pointer(void** state)
 {
@@ -1005,8 +1146,8 @@ int test_az_json()
   const struct CMUnitTest tests[] = {
     cmocka_unit_test(test_json_parser_init),    cmocka_unit_test(test_json_builder),
     cmocka_unit_test(test_json_get_by_pointer), cmocka_unit_test(test_json_parser),
-    cmocka_unit_test(test_json_pointer),        cmocka_unit_test(test_json_string),
-    cmocka_unit_test(test_json_value),
+    cmocka_unit_test(test_json_parser_invalid), cmocka_unit_test(test_json_pointer),
+    cmocka_unit_test(test_json_string),         cmocka_unit_test(test_json_value),
   };
   return cmocka_run_group_tests_name("az_core_json", tests, NULL, NULL);
 }

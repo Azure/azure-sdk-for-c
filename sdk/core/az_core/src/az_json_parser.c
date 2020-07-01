@@ -296,6 +296,21 @@ AZ_NODISCARD static az_result _az_json_parser_update_number_state_if_single_valu
   return AZ_OK;
 }
 
+AZ_NODISCARD static az_result _az_validate_next_byte_is_digit(az_span remaining_number)
+{
+  if (az_span_size(remaining_number) < 1)
+  {
+    return AZ_ERROR_EOF;
+  }
+
+  if (!isdigit(az_span_ptr(remaining_number)[0]))
+  {
+    return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
+  }
+
+  return AZ_OK;
+}
+
 AZ_NODISCARD static az_result _az_json_parser_process_number(az_json_parser* json_parser)
 {
   az_span token = _get_remaining_json(json_parser);
@@ -311,16 +326,10 @@ AZ_NODISCARD static az_result _az_json_parser_process_number(az_json_parser* jso
     consumed_count++;
 
     // A negative sign must be followed by at least one digit.
-    if (consumed_count >= token_size)
-    {
-      return AZ_ERROR_EOF;
-    }
+    AZ_RETURN_IF_FAILED(
+        _az_validate_next_byte_is_digit(az_span_slice_to_end(token, consumed_count)));
 
     next_byte = next_byte_ptr[consumed_count];
-    if (!isdigit(next_byte))
-    {
-      return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
-    }
   }
 
   if (next_byte == '0')
@@ -353,6 +362,7 @@ AZ_NODISCARD static az_result _az_json_parser_process_number(az_json_parser* jso
   }
   else
   {
+    _az_PRECONDITION(isdigit(next_byte));
     // Integer part before decimal
     consumed_count += _az_json_parser_consume_digits(az_span_slice_to_end(token, consumed_count));
 
@@ -384,6 +394,11 @@ AZ_NODISCARD static az_result _az_json_parser_process_number(az_json_parser* jso
   if (next_byte == '.')
   {
     consumed_count++;
+
+    // A decimal point must be followed by at least one digit.
+    AZ_RETURN_IF_FAILED(
+        _az_validate_next_byte_is_digit(az_span_slice_to_end(token, consumed_count)));
+
     // Integer part after decimal
     consumed_count += _az_json_parser_consume_digits(az_span_slice_to_end(token, consumed_count));
 
@@ -427,10 +442,8 @@ AZ_NODISCARD static az_result _az_json_parser_process_number(az_json_parser* jso
     consumed_count++;
 
     // A sign must be followed by at least one digit.
-    if (consumed_count >= token_size)
-    {
-      return AZ_ERROR_EOF;
-    }
+    AZ_RETURN_IF_FAILED(
+        _az_validate_next_byte_is_digit(az_span_slice_to_end(token, consumed_count)));
   }
 
   // Integer part after the 'e'/'E'
