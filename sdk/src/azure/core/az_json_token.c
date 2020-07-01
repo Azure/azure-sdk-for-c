@@ -5,7 +5,8 @@
 #include <azure/core/internal/az_precondition_internal.h>
 
 #include "az_json_private.h"
-#include <_az_cfg.h>
+
+#include <azure/core/_az_cfg.h>
 
 AZ_NODISCARD static uint8_t _az_json_unescape_single_byte(uint8_t ch)
 {

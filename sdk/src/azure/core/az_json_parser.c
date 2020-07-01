@@ -10,12 +10,12 @@
 
 #include <azure/core/_az_cfg.h>
 
-AZ_NODISCARD static az_span _get_remaining_json(az_json_parser* json_builder)
+AZ_NODISCARD static az_span _get_remaining_json(az_json_parser* json_parser)
 {
-  _az_PRECONDITION_NOT_NULL(json_builder);
+  _az_PRECONDITION_NOT_NULL(json_parser);
 
   return az_span_slice_to_end(
-      json_builder->_internal.json_buffer, json_builder->_internal.bytes_consumed);
+      json_parser->_internal.json_buffer, json_parser->_internal.bytes_consumed);
 }
 
 static void _az_json_parser_update_state(
@@ -125,8 +125,8 @@ AZ_NODISCARD static az_result _az_json_parser_process_string(az_json_parser* jso
   json_parser->_internal.bytes_consumed++;
 
   az_span token = _get_remaining_json(json_parser);
-  uint8_t* token_ptr = az_span_ptr(token);
-  int32_t remaining_size = az_span_size(token);
+  uint8_t* const token_ptr = az_span_ptr(token);
+  int32_t const remaining_size = az_span_size(token);
 
   int32_t string_length = 0;
   uint8_t next_byte = token_ptr[0];
@@ -261,7 +261,7 @@ AZ_NODISCARD static bool _az_finished_consuming_json_number(
 
 AZ_NODISCARD static int32_t _az_json_parser_consume_digits(az_span token)
 {
-  int32_t token_size = az_span_size(token);
+  int32_t const token_size = az_span_size(token);
   uint8_t* next_byte_ptr = az_span_ptr(token);
 
   int32_t counter = 0;
@@ -315,8 +315,8 @@ AZ_NODISCARD static az_result _az_json_parser_process_number(az_json_parser* jso
 {
   az_span token = _get_remaining_json(json_parser);
 
-  int32_t token_size = az_span_size(token);
-  uint8_t* next_byte_ptr = az_span_ptr(token);
+  int32_t const token_size = az_span_size(token);
+  uint8_t* const next_byte_ptr = az_span_ptr(token);
 
   int32_t consumed_count = 0;
 
@@ -479,8 +479,8 @@ AZ_NODISCARD static az_result _az_json_parser_process_literal(
 {
   az_span token = _get_remaining_json(json_parser);
 
-  int32_t token_size = az_span_size(token);
-  int32_t expected_literal_size = az_span_size(literal);
+  int32_t const token_size = az_span_size(token);
+  int32_t const expected_literal_size = az_span_size(literal);
 
   // Return EOF because the token is smaller than the expected literal.
   if (token_size < expected_literal_size)
@@ -499,7 +499,7 @@ AZ_NODISCARD static az_result _az_json_parser_process_literal(
 
 AZ_NODISCARD static az_result _az_json_parser_process_value(
     az_json_parser* json_parser,
-    uint8_t next_byte)
+    uint8_t const next_byte)
 {
   if (next_byte == '"')
     return _az_json_parser_process_string(json_parser);
@@ -527,7 +527,7 @@ AZ_NODISCARD static az_result _az_json_parser_process_value(
 AZ_NODISCARD static az_result _az_json_parser_read_first_token(
     az_json_parser* json_parser,
     az_span json,
-    uint8_t first_byte)
+    uint8_t const first_byte)
 {
   if (first_byte == '{')
   {
@@ -621,7 +621,7 @@ AZ_NODISCARD az_result az_json_parser_move_to_next_token(az_json_parser* json_pa
     return AZ_ERROR_EOF;
   }
 
-  uint8_t first_byte = az_span_ptr(json)[0];
+  uint8_t const first_byte = az_span_ptr(json)[0];
 
   switch (json_parser->token.kind)
   {

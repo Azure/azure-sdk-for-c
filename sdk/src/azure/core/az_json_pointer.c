@@ -178,28 +178,28 @@ AZ_NODISCARD static az_result az_json_parser_get_by_pointer_token(
       AZ_RETURN_IF_FAILED(az_span_atou64(pointer_token, &i));
       while (true)
       {
-        AZ_RETURN_IF_FAILED(az_json_parser_move_to_next_token(json_parser));
+        AZ_RETURN_IF_FAILED(az_json_parser_move_to_next_token(ref_json_parser));
         if (i == 0)
         {
-          *inout_token = json_parser->token;
+          *ref_token = ref_json_parser->token;
           return AZ_OK;
         }
         --i;
-        AZ_RETURN_IF_FAILED(az_json_parser_skip_children(json_parser));
+        AZ_RETURN_IF_FAILED(az_json_parser_skip_children(ref_json_parser));
       }
     }
     case AZ_JSON_TOKEN_BEGIN_OBJECT:
     {
       while (true)
       {
-        AZ_RETURN_IF_FAILED(az_json_parser_move_to_next_token(json_parser));
-        if (az_json_pointer_token_eq_json_string(pointer_token, json_parser->token.slice))
+        AZ_RETURN_IF_FAILED(az_json_parser_move_to_next_token(ref_json_parser));
+        if (az_json_pointer_token_eq_json_string(pointer_token, ref_json_parser->token.slice))
         {
-          AZ_RETURN_IF_FAILED(az_json_parser_move_to_next_token(json_parser));
-          *inout_token = json_parser->token;
+          AZ_RETURN_IF_FAILED(az_json_parser_move_to_next_token(ref_json_parser));
+          *ref_token = ref_json_parser->token;
           return AZ_OK;
         }
-        AZ_RETURN_IF_FAILED(az_json_parser_skip_children(json_parser));
+        AZ_RETURN_IF_FAILED(az_json_parser_skip_children(ref_json_parser));
       }
     }
     default:
