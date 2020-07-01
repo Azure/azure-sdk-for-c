@@ -137,9 +137,6 @@ AZ_NODISCARD az_result _az_aad_request_token(_az_http_request* request, _az_toke
   AZ_RETURN_IF_FAILED(
       az_json_parse_by_pointer(body, AZ_SPAN_FROM_STR("/access_token"), &json_token));
 
-  az_span access_token = { 0 };
-  AZ_RETURN_IF_FAILED(az_json_token_get_string(&json_token, &access_token));
-
   _az_token new_token = {
     ._internal = {
       .token = { 0 },
@@ -150,10 +147,13 @@ AZ_NODISCARD az_result _az_aad_request_token(_az_http_request* request, _az_toke
 
   az_span new_token_span = AZ_SPAN_FROM_BUFFER(new_token._internal.token);
   az_span remainder = az_span_copy(new_token_span, AZ_SPAN_FROM_STR("Bearer "));
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, az_span_size(access_token));
-  remainder = az_span_copy(remainder, access_token);
 
-  new_token._internal.token_length = (int16_t)_az_span_diff(remainder, new_token_span);
+  int32_t bytes_written = 0;
+  AZ_RETURN_IF_FAILED(az_json_token_get_string(
+      &json_token, (char*)az_span_ptr(remainder), az_span_size(remainder), &bytes_written));
+
+  new_token._internal.token_length
+      = (int16_t)(_az_span_diff(remainder, new_token_span) + bytes_written);
   *out_token = new_token;
 
   return AZ_OK;

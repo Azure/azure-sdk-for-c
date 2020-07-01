@@ -66,6 +66,11 @@ typedef struct
 {
   az_json_token_kind kind;
   az_span slice;
+
+  struct
+  {
+    bool string_has_escaped_chars;
+  } _internal;
 } az_json_token;
 
 /**
@@ -104,12 +109,38 @@ az_json_token_get_uint32(az_json_token const* json_token, uint32_t* out_value);
  * @brief Returns the JSON token's string after unescaping it, if required.
  *
  * @param token A pointer to an az_json_token instance.
- * @param out_value A pointer to a variable to receive the value.
+ * @param destination A pointer to a buffer where the string should be copied into.
+ * @param destination_max_size The maximum available space within the buffer referred to by
+ * \p destination.
+ * @param[out] out_string_length __[nullable]__ Contains the number of bytes written to the \p
+ * destination which denote the length of the unescaped string. If `NULL` is passed, the parameter
+ * is ignored.
  * @return AZ_OK if the string is returned.<br>
- * AZ_ERROR_JSON_INVALID_STATE if the kind != AZ_JSON_TOKEN_STRING.
+ * AZ_ERROR_JSON_INVALID_STATE if the kind != AZ_JSON_TOKEN_STRING.<br>
+ * AZ_ERROR_INSUFFICIENT_SPAN_SIZE if \p destination does not have enough size.
  */
-AZ_NODISCARD az_result
-az_json_token_get_string(az_json_token const* json_token, az_span* out_value);
+AZ_NODISCARD az_result az_json_token_get_string(
+    az_json_token const* json_token,
+    char* destination,
+    int32_t destination_max_size,
+    int32_t* out_string_length);
+
+/**
+ * @brief Determines whether the unescaped JSON token value that the #az_json_token points to is
+ * equal to the expected text within the provided byte span.
+ *
+ * @param[in] json_token A pointer to an #az_json_token instance containing the JSON string token.
+ * @param[in] expected_text The lookup text to compare the token against.
+ *
+ * @return `true` if the current JSON token value in the JSON source semantically matches the
+ * expected lookup text; otherwise, false.
+ *
+ * @remarks This operation is only valid for the string and property name token kinds. For all other
+ * token kinds, it returns false.
+ */
+AZ_NODISCARD bool az_json_token_is_text_equal(
+    az_json_token const* json_token,
+    az_span expected_text);
 
 /************************************ JSON BUILDER ******************/
 
@@ -418,6 +449,9 @@ AZ_NODISCARD AZ_INLINE az_result az_json_parser_init(
     .token = (az_json_token){
       .kind = AZ_JSON_TOKEN_NONE,
       .slice = AZ_SPAN_NULL,
+      ._internal = {
+        .string_has_escaped_chars = false,
+      },
     },
     ._internal = {
       .json_buffer = json_buffer,
@@ -447,26 +481,16 @@ AZ_NODISCARD az_result az_json_parser_move_to_next_token(az_json_parser* json_pa
  *
  * @param json_parser A pointer to an #az_json_parser instance containing the JSON to parse.
  *
- * @return AZ_OK if the token was parsed successfully.<br>
+ * @return AZ_OK if the children of the current JSON token are skipped successfully.<br>
  *         AZ_ERROR_EOF when the end of the JSON document is reached.<br>
  *         AZ_ERROR_PARSER_UNEXPECTED_CHAR when an invalid character is detected.<br>
  *         AZ_ERROR_ITEM_NOT_FOUND when no more items are found.
+ *
+ * @remarks If the current token kind is a property name, the parser first moves to the property
+ * value. Then, if the token kind is start of an object or array, the parser moves to the matching
+ * end object or array. For all other token kinds, the parser doesn't move and returns #AZ_OK.
  */
 AZ_NODISCARD az_result az_json_parser_skip_children(az_json_parser* json_parser);
-
-/**
- * @brief Determines whether the unescaped JSON token value that the #az_json_parser points to is
- * equal to the expected text within the provided byte span.
- *
- * @param[in] json_parser A pointer to an #az_json_parser instance containing the JSON string token.
- * @param[in] expected_text The lookup text to compare the token against.
- *
- * @return `true` if the current JSON token value in the JSON source semantically matches the
- * expected lookup text; otherwise, false.
- */
-AZ_NODISCARD bool az_json_parser_is_token_text_equal(
-    az_json_parser const* json_parser,
-    az_span expected_text);
 
 /************************************ JSON POINTER ******************/
 

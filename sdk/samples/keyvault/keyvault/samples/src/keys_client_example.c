@@ -296,12 +296,11 @@ az_span get_key_version(az_http_response* response)
     return AZ_SPAN_NULL;
   }
 
-  az_span k;
-  r = az_json_token_get_string(&value, &k);
-  if (az_failed(r))
+  if (value.kind != AZ_JSON_TOKEN_STRING)
   {
     return AZ_SPAN_NULL;
   }
+  az_span k = value.slice;
   // calculate version
   int32_t const kid_length = az_span_size(k);
   az_span version = AZ_SPAN_NULL;

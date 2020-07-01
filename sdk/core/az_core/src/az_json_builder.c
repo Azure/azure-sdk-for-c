@@ -10,22 +10,6 @@
 
 #include <_az_cfg.h>
 
-enum
-{
-  // Max size for an already escaped string value (~ half of INT_MAX)
-  _az_MAX_ESCAPED_STRING_SIZE = 1000000000,
-
-  // In the worst case, an ASCII character represented as a single UTF-8 byte could expand 6x when
-  // escaped.
-  // For example: '+' becomes '\u0043'
-  // Escaping surrogate pairs (represented by 3 or 4 UTF-8 bytes) would expand to 12 bytes (which is
-  // still <= 6x).
-  _az_MAX_EXPANSION_FACTOR_WHILE_ESCAPING = 6,
-
-  _az_MAX_UNESCAPED_STRING_SIZE
-  = _az_MAX_ESCAPED_STRING_SIZE / _az_MAX_EXPANSION_FACTOR_WHILE_ESCAPING, // 166_666_666 bytes
-};
-
 static AZ_NODISCARD az_span _get_remaining_span(az_json_builder* json_builder)
 {
   _az_PRECONDITION_NOT_NULL(json_builder);
