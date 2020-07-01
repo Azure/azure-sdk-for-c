@@ -93,7 +93,7 @@ function(ADD_CMOCKA_TEST _TARGET_NAME)
         set(CMOCKA_PREFIX "${VCPKG_PATH}installed/${VCPKG_TARGET_TRIPLET}")
         set(CMOCKA_LIB "debug;${CMOCKA_PREXIF}/debug${CMOCKA_STATIC_LIB};optimized;${CMOCKA_PREXIF}${CMOCKA_STATIC_LIB}")
     else()
-    set(CMOCKA_LIB cmocka)
+        set(CMOCKA_LIB cmocka)
     endif()
 
     if (DEFINED _add_cmocka_test_LINK_TARGETS)
