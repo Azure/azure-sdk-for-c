@@ -81,7 +81,7 @@ function(ADD_CMOCKA_TEST _TARGET_NAME)
             set(VCPKG_PATH $ENV{VCPKG_ROOT})
         endif()
         if(DEFINED ENV{VCPKG_INSTALLATION_ROOT})
-            set(VCPKG_PATH $ENV{VCPKG_INSTALLATION_ROOT})
+            set(VCPKG_PATH "$ENV{VCPKG_INSTALLATION_ROOT}/")
         endif()
         message(${VCPKG_PATH})
         # Temp fix for new VCPKG Cmoka returning relative path
