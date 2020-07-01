@@ -6,7 +6,7 @@ The Azure SDK for Embedded C is designed to allow small embedded (IoT) devices t
 
 With this in mind, there are many tenets or principles that we follow in order to properly address this target audience:
 
-- Customers of our SDK compile our source code along with their own.
+- Customers of our SDK compile the source code along with their own.
 
 - We target the C99 programming language and test with gcc, clang, & MS Visual C compilers.
 
