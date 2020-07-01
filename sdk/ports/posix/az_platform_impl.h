@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 #include <azure/core/internal/az_config_internal.h>
-#include <azure/core/az_platform.h>
 
 #include <time.h>
 
@@ -10,17 +9,17 @@
 
 #include <azure/core/_az_cfg.h>
 
-AZ_NODISCARD int64_t az_platform_clock_msec()
+inline AZ_NODISCARD int64_t az_platform_clock_msec()
 {
   return (int64_t)((clock() / CLOCKS_PER_SEC) * _az_TIME_MILLISECONDS_PER_SECOND);
 }
 
-void az_platform_sleep_msec(int32_t milliseconds)
+inline void az_platform_sleep_msec(int32_t milliseconds)
 {
   (void)usleep((useconds_t)milliseconds * _az_TIME_MICROSECONDS_PER_MILLISECOND);
 }
 
-AZ_NODISCARD bool az_platform_atomic_compare_exchange(
+inline AZ_NODISCARD bool az_platform_atomic_compare_exchange(
     uintptr_t volatile* obj,
     uintptr_t expected,
     uintptr_t desired)
