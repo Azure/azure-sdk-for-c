@@ -2,8 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "az_json_string_private.h"
-#include <azure/core/az_json.h>
-#include <azure/core/az_precondition.h>
+
 #include <azure/core/internal/az_precondition_internal.h>
 
 #include <azure/core/_az_cfg.h>
