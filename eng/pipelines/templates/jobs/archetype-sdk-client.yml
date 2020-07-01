@@ -245,7 +245,7 @@ jobs:
   # coverage report
   - bash: |
       make `cat coverage_targets.txt`
-      ../tools/reportgenerator "-reports:sdk/*/*/*cov_xml.xml" "-targetdir:." "-reporttypes:Cobertura"
+      ../tools/reportgenerator "-reports:sdk/*/*/*/*cov_xml.xml" "-targetdir:." "-reporttypes:Cobertura"
     workingDirectory: build
     displayName: Generate Code Coverage Data
     condition: eq(variables['AZ_SDK_CODE_COV'], 1)
@@ -303,7 +303,7 @@ jobs:
 
       - pwsh: >-
           Copy-Item
-          sdk/core/az_core/CHANGELOG.md
+          sdk/docs/core/CHANGELOG.md
           (Join-Path $(Build.ArtifactStagingDirectory) release-info/CHANGELOG.md)
         displayName: Copy CHANGELOG.md to package artifact output
 

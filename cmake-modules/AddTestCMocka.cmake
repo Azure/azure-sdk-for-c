@@ -65,6 +65,11 @@ function(ADD_CMOCKA_TEST _TARGET_NAME)
 
     add_executable(${_TARGET_NAME} ${_add_cmocka_test_SOURCES})
 
+    # Suppress clobber warning for longjmp
+    if(CMAKE_C_COMPILER_ID MATCHES "GNU")
+      target_compile_options(${_TARGET_NAME} PRIVATE -Wno-clobbered)
+    endif()
+
     if (DEFINED _add_cmocka_test_COMPILE_OPTIONS)
         target_compile_options(${_TARGET_NAME}
             PRIVATE ${_add_cmocka_test_COMPILE_OPTIONS}
@@ -99,7 +104,7 @@ function(ADD_CMOCKA_TEST _TARGET_NAME)
     target_include_directories(${_TARGET_NAME} PRIVATE ${CMOCKA_INCLUDE_DIR})
     
     if (DEFINED _add_cmocka_test_PRIVATE_ACCESS)
-        target_include_directories(${_TARGET_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/sdk/core/az_core/src)
+        target_include_directories(${_TARGET_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/sdk/src/azure/core/)
     endif()
 
     add_test(${_TARGET_NAME}

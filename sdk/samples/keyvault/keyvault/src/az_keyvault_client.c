@@ -1,21 +1,21 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <az_config_internal.h>
-#include <az_credentials.h>
-#include <az_credentials_internal.h>
-#include <az_http.h>
-#include <az_http_internal.h>
-#include <az_http_transport.h>
-#include <az_json.h>
+#include <azure/core/internal/az_config_internal.h>
+#include <azure/core/az_credentials.h>
+#include <azure/core/internal/az_credentials_internal.h>
+#include <azure/core/az_http.h>
+#include <azure/core/internal/az_http_internal.h>
+#include <azure/core/az_http_transport.h>
+#include <azure/core/az_json.h>
 #include <az_keyvault.h>
-#include <az_precondition.h>
-#include <az_precondition_internal.h>
-#include <az_span.h>
+#include <azure/core/az_precondition.h>
+#include <azure/core/internal/az_precondition_internal.h>
+#include <azure/core/az_span.h>
 
 #include <stddef.h>
 
-#include <_az_cfg.h>
+#include <azure/core/_az_cfg.h>
 
 enum
 {
@@ -74,62 +74,61 @@ AZ_NODISCARD az_keyvault_keys_client_options az_keyvault_keys_client_options_def
   return options;
 }
 
-// TODO: Rename the self parameter to client to be  consistent with other clients.
 AZ_NODISCARD az_result az_keyvault_keys_client_init(
-    az_keyvault_keys_client* self,
+    az_keyvault_keys_client* out_keys_client,
     az_span uri,
-    void* credential,
-    az_keyvault_keys_client_options* options)
+    void* ref_credential,
+    az_keyvault_keys_client_options* ref_options)
 {
-  _az_PRECONDITION_NOT_NULL(self);
-  _az_PRECONDITION_NOT_NULL(options);
+  _az_PRECONDITION_NOT_NULL(out_keys_client);
+  _az_PRECONDITION_NOT_NULL(ref_options);
 
-  _az_credential* const cred = (_az_credential*)credential;
+  _az_credential* const cred = (_az_credential*)ref_credential;
 
-  *self = (az_keyvault_keys_client) {
+  *out_keys_client = (az_keyvault_keys_client) {
     ._internal = {
-      .uri = AZ_SPAN_FROM_BUFFER(self->_internal.url_buffer),
-      .options = *options,
+      .uri = AZ_SPAN_FROM_BUFFER(out_keys_client->_internal.url_buffer),
+      .options = *ref_options,
       .credential = cred,
       .pipeline = (_az_http_pipeline){
         ._internal = {
-          .p_policies = {
+          .policies = {
             {
               ._internal = {
                 .process = az_http_pipeline_policy_apiversion,
-                .p_options= &self->_internal.options._internal.api_version,
+                .options= &out_keys_client->_internal.options._internal.api_version,
               },
             },
             {
               ._internal = {
                 .process = az_http_pipeline_policy_telemetry,
-                .p_options = &self->_internal.options._internal._telemetry_options,
+                .options = &out_keys_client->_internal.options._internal._telemetry_options,
               },
             },
             {
               ._internal = {
                 .process = az_http_pipeline_policy_retry,
-                .p_options = &self->_internal.options.retry,
+                .options = &out_keys_client->_internal.options.retry,
               },
             },
             {
               ._internal = {
                 .process = az_http_pipeline_policy_credential,
-                .p_options = cred,
+                .options = cred,
               },
             },
 #ifndef AZ_NO_LOGGING
             {
               ._internal = {
                 .process = az_http_pipeline_policy_logging,
-                .p_options = NULL,
+                .options = NULL,
               },
             },
 #endif // AZ_NO_LOGGING
             {
               ._internal = {
                 .process = az_http_pipeline_policy_transport,
-                .p_options= NULL,
+                .options= NULL,
               },
             },
           },
@@ -140,9 +139,9 @@ AZ_NODISCARD az_result az_keyvault_keys_client_init(
 
   // Copy url to client buffer so customer can re-use buffer on his/her side
   int32_t uri_size = az_span_size(uri);
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(self->_internal.uri, uri_size);
-  az_span_copy(self->_internal.uri, uri);
-  self->_internal.uri = az_span_slice(self->_internal.uri, 0, uri_size);
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(out_keys_client->_internal.uri, uri_size);
+  az_span_copy(out_keys_client->_internal.uri, uri);
+  out_keys_client->_internal.uri = az_span_slice(out_keys_client->_internal.uri, 0, uri_size);
 
   AZ_RETURN_IF_FAILED(
       _az_credential_set_scopes(cred, AZ_SPAN_FROM_STR("https://vault.azure.net/.default")));
@@ -262,9 +261,9 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
   az_span const created_body = json_builder;
 
   // create request
-  _az_http_request hrb;
+  _az_http_request request;
   AZ_RETURN_IF_FAILED(az_http_request_init(
-      &hrb,
+      &request,
       context,
       az_http_method_post(),
       request_url_span,
@@ -273,20 +272,22 @@ AZ_NODISCARD az_result az_keyvault_keys_key_create(
       created_body));
 
   // add path to request
-  AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, az_keyvault_client_constant_for_keys()));
+  AZ_RETURN_IF_FAILED(
+      az_http_request_append_path(&request, az_keyvault_client_constant_for_keys()));
 
-  AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, key_name));
+  AZ_RETURN_IF_FAILED(az_http_request_append_path(&request, key_name));
 
-  AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, az_keyvault_client_constant_for_create()));
+  AZ_RETURN_IF_FAILED(
+      az_http_request_append_path(&request, az_keyvault_client_constant_for_create()));
 
   // Adding header content-type json
   AZ_RETURN_IF_FAILED(az_http_request_append_header(
-      &hrb,
+      &request,
       az_keyvault_client_constant_for_content_type(),
       az_keyvault_client_constant_for_application_json()));
 
   // start pipeline
-  return az_http_pipeline_process(&client->_internal.pipeline, &hrb, response);
+  return az_http_pipeline_process(&client->_internal.pipeline, &request, response);
 }
 
 /**
@@ -318,9 +319,9 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
   az_span_copy(request_url_span, client->_internal.uri);
 
   // create request
-  _az_http_request hrb;
+  _az_http_request request;
   AZ_RETURN_IF_FAILED(az_http_request_init(
-      &hrb,
+      &request,
       context,
       az_http_method_get(),
       request_url_span,
@@ -329,19 +330,20 @@ AZ_NODISCARD az_result az_keyvault_keys_key_get(
       AZ_SPAN_NULL));
 
   // Add path to request
-  AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, az_keyvault_client_constant_for_keys()));
+  AZ_RETURN_IF_FAILED(
+      az_http_request_append_path(&request, az_keyvault_client_constant_for_keys()));
 
   // Add path to request after adding query parameter
-  AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, key_name));
+  AZ_RETURN_IF_FAILED(az_http_request_append_path(&request, key_name));
 
   // Add key_version if requested
   if (az_span_size(key_version) > 0)
   {
-    AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, key_version));
+    AZ_RETURN_IF_FAILED(az_http_request_append_path(&request, key_version));
   }
 
   // start pipeline
-  return az_http_pipeline_process(&client->_internal.pipeline, &hrb, response);
+  return az_http_pipeline_process(&client->_internal.pipeline, &request, response);
 }
 
 AZ_NODISCARD az_result az_keyvault_keys_key_delete(
@@ -364,9 +366,9 @@ AZ_NODISCARD az_result az_keyvault_keys_key_delete(
 
   // create request
   // TODO: define max URL size
-  _az_http_request hrb;
+  _az_http_request request;
   AZ_RETURN_IF_FAILED(az_http_request_init(
-      &hrb,
+      &request,
       context,
       az_http_method_delete(),
       request_url_span,
@@ -375,9 +377,10 @@ AZ_NODISCARD az_result az_keyvault_keys_key_delete(
       AZ_SPAN_NULL));
 
   // Add path to request
-  AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, az_keyvault_client_constant_for_keys()));
-  AZ_RETURN_IF_FAILED(az_http_request_append_path(&hrb, key_name));
+  AZ_RETURN_IF_FAILED(
+      az_http_request_append_path(&request, az_keyvault_client_constant_for_keys()));
+  AZ_RETURN_IF_FAILED(az_http_request_append_path(&request, key_name));
 
   // start pipeline
-  return az_http_pipeline_process(&client->_internal.pipeline, &hrb, response);
+  return az_http_pipeline_process(&client->_internal.pipeline, &request, response);
 }

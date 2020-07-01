@@ -4,7 +4,7 @@
 
 The Azure SDK for Embedded C is designed to allow small embedded (IoT) devices to communicate with Azure services. Since we expect our client library code to run on microcontrollers, which have very limited amounts of flash and RAM, and have slower CPUs, our C SDK does things very differently than the SDKs we offer for other languages.
 
-With this in mind, there are many tenants or principles that we follow in order to properly address this target audience:
+With this in mind, there are many tenets or principles that we follow in order to properly address this target audience:
 
 - Customers of our SDK compile our source code along with their own.
 
@@ -16,7 +16,39 @@ With this in mind, there are many tenants or principles that we follow in order 
 
 - Unlike our other language SDKs, many things (such as composing an HTTP pipeline of policies) are done in source code as opposed to runtime. This reduces code size, improves execution speed and locks-in behavior, reducing the chance of bugs at runtime.
 
-- We support microcontrollers with no operating system, microcontrollers with a real-time operating system (like [Azure RTOS](http://rtos.com)), Linux, and Windows. Customers can implement their own "platform layer" to use our SDK on devices we don’t support out-of-the-box. The platform layer requires minimal functionality such as a clock, a mutex, sleep, and an HTTP stack. We provide some platform layers, and more will be added over time.
+- We support microcontrollers with no operating system, microcontrollers with a real-time operating system (like [Azure RTOS](https://azure.microsoft.com/en-us/services/rtos/)), Linux, and Windows. Customers can implement their own "platform layer" to use our SDK on devices we don’t support out-of-the-box. The platform layer requires minimal functionality such as a clock, a mutex, and thread sleep. We provide some platform layers, and more will be added over time.
+
+## Table of Contents
+- [Azure SDK for Embedded C](#azure-sdk-for-embedded-c)
+  - [Table of Contents](#table-of-contents)
+  - [Documentation](#documentation)
+  - [The GitHub Repository](#the-github-repository)
+    - [Services](#services)
+    - [Structure](#structure)
+    - [Master Branch](#master-branch)
+    - [Release Branches and Release Tagging](#release-branches-and-release-tagging)
+  - [Getting Started Using the SDK](#getting-started-using-the-sdk)
+    - [CMake](#cmake)
+    - [CMake Options](#cmake-options)
+    - [Source Files (IDE, command line, etc)](#source-files-ide-command-line-etc)
+  - [Running Samples](#running-samples)
+    - [Libcurl Global Init and Global Clean Up](#libcurl-global-init-and-global-clean-up)
+    - [Development Environment](#development-environment)
+    - [Windows](#windows)
+    - [Linux](#linux)
+    - [Mac](#mac)
+    - [Using your own HTTP stack implementation](#using-your-own-http-stack-implementation)
+    - [Link your application with your own HTTP stack](#link-your-application-with-your-own-http-stack)
+  - [SDK Architecture](#sdk-architecture)
+  - [Contributing](#contributing)
+    - [Additional Helpful Links for Contributors](#additional-helpful-links-for-contributors)
+    - [Community](#community)
+    - [Reporting Security Issues and Security Bugs](#reporting-security-issues-and-security-bugs)
+    - [License](#license)
+
+## Documentation
+
+We use [doxygen](https://www.doxygen.nl) to generate documentation for source code. You can find the generated, versioned documentation [here](https://azure.github.io/azure-sdk-for-c).
 
 ## The GitHub Repository
 
@@ -24,6 +56,30 @@ To get help with the SDK:
 
 - File a [Github Issue](https://github.com/Azure/azure-sdk-for-c/issues/new/choose).
 - Ask new questions or see others' questions on [Stack Overflow](https://stackoverflow.com/questions/tagged/azure+c) using the `azure` and `c` tags.
+
+### Services
+
+The Azure SDK for Embedded C repo has been structured around the service libraries it provides:
+
+
+1. [IoT](sdk/docs/iot) - Library to connect Embedded Devices to Azure IoT services
+2. [Storage](sdk/docs/storage) - Library to send blob files to Azure IoT services
+
+
+### Structure
+
+This repo is structured with two priorities:
+1. Separation of services/features to make it easier to find relevant information and resources.
+2. Simplified source file structuring to easily integrate features into a user's project.
+
+`/sdk` - folder containing docs, sources, samples, tests for all SDK packages<br>
+&nbsp;&nbsp;&nbsp;&nbsp;`/docs` - documentation for each service (iot, storage, etc)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;`/inc` - include directory - can be singularly included in your project to resolve all headers<br>
+&nbsp;&nbsp;&nbsp;&nbsp;`/samples` - samples for each service<br>
+&nbsp;&nbsp;&nbsp;&nbsp;`/src` - source files for each service<br>
+&nbsp;&nbsp;&nbsp;&nbsp;`/tests` - tests for each service<br>
+
+For instructions on how to consume the libraries via CMake, please see [here](#cmake). For instructions on how consume the source code in an IDE, command line, or other build systems, please see [here](#source-files-ide-command-line-etc).
 
 ### Master Branch
 
@@ -35,10 +91,16 @@ When we make an official release, we will create a unique git tag containing the
 
    `<package-name>_<package-version>`
 
+ The latest release can be found in the [release section](https://github.com/Azure/azure-sdk-for-c/releases) of this repo. 
+
+ 
  For more information, please see this [branching strategy](https://github.com/Azure/azure-sdk/blob/master/docs/policies/repobranching.md#release-tagging) document.
 
 ## Getting Started Using the SDK
 
+The SDK can be conveniently consumed either via CMake or other non-CMake methods (IDE workspaces, command line, and others).
+
+### CMake
 1. Install the required prerequisites:
    - [CMake](https://cmake.org/download/) version 3.10 or later
    - C compiler: [MSVC](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2019), [gcc](https://gcc.gnu.org/) or [clang](https://clang.llvm.org/) are recommended
@@ -50,7 +112,7 @@ When we make an official release, we will create a unique git tag containing the
 
         git checkout <tag_name>
 
-    For information about using a specific client library, see the README file located in the client library's folder which is a subdirectory under the [`/sdk`](sdk) folder.
+    For information about using a specific client library, see the README file located in the client library's folder which is a subdirectory under the [`/sdk/docs`](sdk/docs) folder.
 
 3. Ensure the SDK builds correctly.
 
@@ -72,9 +134,9 @@ When we make an official release, we will create a unique git tag containing the
 
    This results in building each library as a static library file, placed in the output directory you created (for example `build\sdk\core\az_core\Debug`). At a minimum, you must have an `Azure Core` library, a `Platform` library, and an `HTTP` library. Then, you can build any additional Azure service client library you intend to use from within your application (for example `build\sdk\storage\blobs\Debug`). To use our client libraries in your application, just `#include` our public header files and then link your application's object files with our library files.
 
-4. Provide platform-specific implementations for functionality required by `Azure Core`. For more information, see the [Azure Core Porting Guide](sdk/core/az_core/README.md#Porting-the-Azure-SDK-to-Another-Platform).
+4. Provide platform-specific implementations for functionality required by `Azure Core`. For more information, see the [Azure Core Porting Guide](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core#porting-the-azure-sdk-to-another-platform).
 
-### Compiler Options
+### CMake Options
 
 By default, when building the project with no options, the following static libraries are generated:
 
@@ -90,7 +152,7 @@ By default, when building the project with no options, the following static libr
   - az_nohttp
     -  Library that provides a basic returning error when calling HTTP stack. Similar to az_noplatform, this library ensures the project can be compiled without requiring any HTTP stack implementation. This is useful if you want to use `az_core` without `az_http` functionality.
 
-The following compiler options are available for adding/removing project features.
+The following CMake options are available for adding/removing project features.
 
 <table>
 <tr>
@@ -110,7 +172,7 @@ The following compiler options are available for adding/removing project feature
 </tr>
 <tr>
 <td>PRECONDITIONS</td>
-<td>Turning this option ON would remove all method contracts. This us typically for shipping libraries for production to make it as much optimized as possible.</td>
+<td>Turning this option OFF would remove all method contracts. This is typically for shipping libraries for production to make it as optimized as possible.</td>
 <td>ON</td>
 </tr>
 <tr>
@@ -120,7 +182,7 @@ The following compiler options are available for adding/removing project feature
 </tr>
 <tr>
 <td>TRANSPORT_PAHO</td>
-<td>This option requires paho-mqtt dependency to be available. Provides Paho MQTT support for iot.</td>
+<td>This option requires paho-mqtt dependency to be available. Provides Paho MQTT support for IoT.</td>
 <td>OFF</td>
 </tr>
 <tr>
@@ -137,6 +199,29 @@ The following compiler options are available for adding/removing project feature
       Recompile az_core with an HTTP client implementation like CURL to see sample sending network requests.
 
       i.e. cmake -DTRANSPORT_CURL=ON ..
+
+### Source Files (IDE, command line, etc)
+
+We have set up the repo for easy integration into other projects which don't use CMake. Two main features make this possible:
+- To resolve all header file relative paths, you only need to include `sdk/inc` in your project. All header files are included in the sdk with relative paths to clearly demarcate the services they belong to. A couple examples being:  
+```c
+#include <azure/core/az_span.h>
+#include <azure/iot/az_iot_hub_client.h>
+```
+- All source files are placed in a directory structure similar to the headers: `sdk/src`. Each service has its own subdirectory to separate files which you may be singularly interested in.
+
+To use a specific service/feature, you may include the header file with the function declaration and compile the according `.c` containing the function implementation with your project.
+
+The specific dependencies of each service may vary, but a couple rules of thumb should resolve the most typical of issues.
+1. All services depend on `core` ([source files here](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/src/azure/core)). You may compile these files with your project to resolve core dependencies.
+2. Most services will require a platform file to be compiled with your project ([see here for porting instructions](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core#porting-the-azure-sdk-to-another-platform)). We have provided several implementations already [here](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/src/azure/platform) for [`windows`](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/src/azure/platform/az_win32.c), [`posix`](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/src/azure/platform/az_posix.c), and a [`no_platform`](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/src/azure/platform/az_noplatform.c) for no-op stubs. Please compile one of these, for your respective platform, with your project.
+
+The following compilation, preprocessor options will add or remove functionality in the SDK.
+
+| Option | Description |
+| ------ | ----------- |
+| `AZ_NO_PRECONDITION_CHECKING` | Turns off precondition checks to maximize performance with removal of function precondition checking. |
+| `AZ_NO_LOGGING` | Removes all logging code and artifacts from the SDK (helps reduce code size). |
 
 ## Running Samples
 
@@ -165,7 +250,7 @@ When you select to build the libcurl http stack implementation, you have to make
 
 You need to also call `curl_global_cleanup` once you no longer need to perform SDk client API calls.
 
-Take a look to [Storare Blob SDK client sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/storage/blobs/samples/src/blobs_client_example.c). Note how you can use function `atexit()` to set libcurl global clean up.
+Take a look to [Storage Blob SDK client sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/storage/blobs/src/blobs_client_example.c). Note how you can use function `atexit()` to set libcurl global clean up.
 
 The reason for this is the fact of this functions are not thread-safe, and a customer can use libcurl not only for Azure SDK library but for some other purpose. More info [here](https://curl.haxx.se/libcurl/c/curl_global_init.html).
 
@@ -325,10 +410,10 @@ The second component is an **HTTP transport adapter**. This is the implementatio
 
 ```c
 AZ_NODISCARD az_result
-az_http_client_send_request(_az_http_request* p_request, az_http_response* p_response);
+az_http_client_send_request(_az_http_request const* request, az_http_response* ref_response);
 ```
 
-For example, Azure SDK provides a cmake target `az_curl` (find it [here](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/platform/http_client/curl/src/az_curl.c)) with the implementation code for the contract function mentioned before. It uses an `_az_http_request` reference to create an specific `libcurl` request and send it though the wire. Then it uses `libcurl` response to fill the `az_http_response` reference structure.
+For example, Azure SDK provides a cmake target `az_curl` (find it [here](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/src/azure/platform/az_curl.c)) with the implementation code for the contract function mentioned before. It uses an `_az_http_request` reference to create an specific `libcurl` request and send it though the wire. Then it uses `libcurl` response to fill the `az_http_response` reference structure.
 
 ### Link your application with your own HTTP stack
 Create your own http adapter for an Http stack and then use the following cmake command to have it linked to your application
@@ -339,24 +424,24 @@ target_link_libraries(your_application_target PRIVATE lib_adapter http_stack_lib
 target_link_libraries(blobs_client_example PRIVATE az_curl CURL::libcurl)
 ```
 
-See the complete cmake file and how to link your own library [here](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/storage/blobs/samples/CMakeLists.txt#L23)
+See the complete cmake file and how to link your own library [here](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/src/azure/storage/CMakeLists.txt#L26)
 
 
 ## SDK Architecture
 
-At the heart of our SDK is, what we refer to as, [Azure Core](sdk/core/az_core). This code defines several data types and functions for use by the client libraries that build on top of us such as an [Azure Storage Blob](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/storage) client library and [Azure IoT client libraries](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/iot). Here are some of the features that customers use directly:
+At the heart of our SDK is, what we refer to as, [Azure Core](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core). This code defines several data types and functions for use by the client libraries that build on top of us such as an [Azure Storage Blob](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/storage) client library and [Azure IoT client libraries](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot). Here are some of the features that customers use directly:
 
-- **Spans**: A span represents a byte buffer and is used for string manipulations, HTTP requests/responses, building/parsing JSON payloads. It allows us to return a substring within a larger string without any memory allocations. See the [Working With Spans](sdk/core/az_core/README.md#Working-With-Spans) section of the `Azure Core` README for more information.
+- **Spans**: A span represents a byte buffer and is used for string manipulations, HTTP requests/responses, building/parsing JSON payloads. It allows us to return a substring within a larger string without any memory allocations. See the [Working With Spans](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core#working-with-spans) section of the `Azure Core` README for more information.
 
-- **Logging**: As our SDK performs operations, it can send log messages to a customer-defined callback. Customers can enable this to assist with debugging and diagnosing issues when leveraging our SDK code. See the [Logging SDK Operations](sdk/core/az_core/README.md#Logging-SDK-Operations) section of the `Azure Core` README for more information.
+- **Logging**: As our SDK performs operations, it can send log messages to a customer-defined callback. Customers can enable this to assist with debugging and diagnosing issues when leveraging our SDK code. See the [Logging SDK Operations](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core#logging-sdk-operations) section of the `Azure Core` README for more information.
 
-- **Contexts**: Contexts offer an I/O cancellation mechanism. Multiple contexts can be composed together in your application’s call tree. When a context is canceled, its children are also canceled. See the [Canceling an Operation](sdk/core/az_core/README.md#Canceling-an-Operation) section of the `Azure Core` README for more information.
+- **Contexts**: Contexts offer an I/O cancellation mechanism. Multiple contexts can be composed together in your application’s call tree. When a context is canceled, its children are also canceled. See the [Canceling an Operation](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core#canceling-an-operation) section of the `Azure Core` README for more information.
 
 - **JSON**: Non-allocating JSON builder and JSON parsing data structures and operations.
 
 - **HTTP**: Non-allocating HTTP request and HTTP response data structures and operations.
 
-- **Argument Validation**: The SDK validates function arguments and invokes a callback when validation fails. By default, this callback suspends the calling thread _forever_. However, you can override this behavior and, in fact, you can disable all argument validation to get smaller and faster code. See the [SDK Function Argument Validation](sdk/core/az_core/README.md#sdk-function-argument-validation) section of the `Azure Core` README for more information.
+- **Argument Validation**: The SDK validates function arguments and invokes a callback when validation fails. By default, this callback suspends the calling thread _forever_. However, you can override this behavior and, in fact, you can disable all argument validation to get smaller and faster code. See the [SDK Function Argument Validation](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core#sdk-function-argument-validation) section of the `Azure Core` README for more information.
 
 In addition to the above features, `Azure Core` provides features available to client libraries written to access other Azure services. Customers use these features indirectly by way of interacting with a client library. By providing these features in `Azure Core`, the client libraries built on top of us will share a common implementation and many features will behave identically across client libraries. For example, `Azure Core` offers a standard set of credential types and an HTTP pipeline with logging, retry, and telemetry policies.
 
@@ -377,8 +462,8 @@ For more information see the [Code of Conduct FAQ](https://opensource.microsoft.
 Many people all over the world have helped make this project better.  You'll want to check out:
 
 * [What are some good first issues for new contributors to the repo?](https://github.com/azure/azure-sdk-for-c/issues?q=is%3Aopen+is%3Aissue+label%3A%22up+for+grabs%22)
-* [How to build and test your change](https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md#developer-guide)
-* [How you can make a change happen!](https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md#pull-requests)
+* [How to build and test your change](./CONTRIBUTING.md#developer-guide)
+* [How you can make a change happen!](./CONTRIBUTING.md#pull-requests)
 
 ### Community
 
