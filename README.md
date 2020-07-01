@@ -30,6 +30,7 @@ With this in mind, there are many tenets or principles that we follow in order t
   - [Getting Started Using the SDK](#getting-started-using-the-sdk)
     - [CMake](#cmake)
     - [CMake Options](#cmake-options)
+    - [VSCode](#vscode)
     - [Source Files (IDE, command line, etc)](#source-files-ide-command-line-etc)
   - [Running Samples](#running-samples)
     - [Libcurl Global Init and Global Clean Up](#libcurl-global-init-and-global-clean-up)
@@ -199,6 +200,14 @@ The following CMake options are available for adding/removing project features.
       Recompile az_core with an HTTP client implementation like CURL to see sample sending network requests.
 
       i.e. cmake -DTRANSPORT_CURL=ON ..
+
+### VSCode
+
+For convenience, you can quickly get started using [VSCode](https://code.visualstudio.com/) and the [CMake Extension by Microsoft](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools&ssr=false#overview). Included in the repo is a `settings.json` file [here](https://github.com/Azure/azure-sdk-for-c/blob/master/.vscode/settings.json) which the extension will use to configure a CMake project. With this, you can run and debug samples and tests. Modify the variables in the file to your liking or as instructed by sample documentation and then select the following button in the extension:
+
+![VSCode CMake Config](./sdk/docs/resources/vscode_cmake_config.png)
+
+From there you can select targets to build and debug.
 
 ### Source Files (IDE, command line, etc)
 
