@@ -802,14 +802,34 @@ static void test_json_value(void** state)
 {
   (void)state;
 
-  az_json_token const json_boolean
-      = (az_json_token){ .kind = AZ_JSON_TOKEN_TRUE, .slice = AZ_SPAN_FROM_STR("true") };
-  az_json_token const json_number
-      = (az_json_token){ .kind = AZ_JSON_TOKEN_NUMBER, .slice = AZ_SPAN_FROM_STR("42") };
-  az_json_token const json_string
-      = (az_json_token){ .kind = AZ_JSON_TOKEN_STRING, .slice = AZ_SPAN_FROM_STR("Hello") };
-  az_json_token const json_property_name
-      = (az_json_token){ .kind = AZ_JSON_TOKEN_PROPERTY_NAME, .slice = AZ_SPAN_FROM_STR("Name") };
+  az_json_token const json_boolean = (az_json_token){
+      .kind = AZ_JSON_TOKEN_TRUE,
+      .slice = AZ_SPAN_FROM_STR("true"),
+      ._internal = {
+        .string_has_escaped_chars = false,
+      },
+    };
+  az_json_token const json_number = (az_json_token){
+      .kind = AZ_JSON_TOKEN_NUMBER,
+      .slice = AZ_SPAN_FROM_STR("42"),
+      ._internal = {
+        .string_has_escaped_chars = false,
+      },
+    };
+  az_json_token const json_string = (az_json_token){
+      .kind = AZ_JSON_TOKEN_STRING,
+      .slice = AZ_SPAN_FROM_STR("Hello"),
+      ._internal = {
+        .string_has_escaped_chars = false,
+      },
+    };
+  az_json_token const json_property_name = (az_json_token){
+      .kind = AZ_JSON_TOKEN_PROPERTY_NAME,
+      .slice = AZ_SPAN_FROM_STR("Name"),
+      ._internal = {
+        .string_has_escaped_chars = false,
+      },
+    };
 
   // boolean from boolean
   {
