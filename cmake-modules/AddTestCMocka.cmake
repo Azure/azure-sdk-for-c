@@ -78,8 +78,10 @@ function(ADD_CMOCKA_TEST _TARGET_NAME)
 
     if(DEFINED ENV{VCPKG_ROOT} OR DEFINED ENV{VCPKG_INSTALLATION_ROOT})
         set(CMOCKA_LIB ${CMOCKA_LIBRARIES})
+        message("This is the cmocka libs ----  ${CMOCKA_LIBRARIES}")
     else()
         set(CMOCKA_LIB cmocka)
+        message("This is the cmocka libs 22 ----  ${cmocka}")
     endif()
 
     if (DEFINED _add_cmocka_test_LINK_TARGETS)
