@@ -535,30 +535,43 @@ static int send_reported_property(az_span reported_property_payload)
 static az_result update_property(az_span desired_payload)
 {
   // Parse desired property payload
-  az_json_parser json_parser;
-  az_json_token token;
-  az_json_token_member token_member;
+  az_json_parser json_parser = { 0 };
 
-  AZ_RETURN_IF_FAILED(az_json_parser_init(&json_parser, desired_payload));
-  AZ_RETURN_IF_FAILED(az_json_parser_parse_token(&json_parser, &token));
-  AZ_RETURN_IF_FAILED(az_json_parser_parse_token_member(&json_parser, &token_member));
+  AZ_RETURN_IF_FAILED(az_json_parser_init(&json_parser, desired_payload, NULL));
+
+  AZ_RETURN_IF_FAILED(az_json_parser_move_to_next_token(&jp));
+  if (jp.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
+  {
+    return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
+  }
+
+  AZ_RETURN_IF_FAILED(az_json_parser_move_to_next_token(&jp));
 
   // Update property locally if found
-  while (!az_span_is_content_equal(token_member.name, version_name))
+  while (jp.token.kind != AZ_JSON_TOKEN_END_OBJECT)
   {
-    if (az_span_is_content_equal(token_member.name, reported_property_name))
+    if (az_json_token_is_text_equal(&jp.token, version_name))
     {
-      double temp_property_value = 0.0;
-      AZ_RETURN_IF_FAILED(az_json_token_get_number(&token_member.token, &temp_property_value));
+      break;
+    }
+    else if (az_json_token_is_text_equal(&jp.token, reported_property_name))
+    {
+      // TODO: Change back to int32_t once that is supported.
+      AZ_RETURN_IF_FAILED(az_json_token_get_uint32(&jp.token, &reported_property_value));
 
       printf(
           "Updating \"%.*s\" locally.\n",
           az_span_size(reported_property_name),
           az_span_ptr(reported_property_name));
-      reported_property_value = (int32_t)temp_property_value;
       return AZ_OK;
     }
-    AZ_RETURN_IF_FAILED(az_json_parser_parse_token_member(&json_parser, &token_member));
+    else
+    {
+      // ignore other tokens
+      AZ_RETURN_IF_FAILED(az_json_parser_skip_children(&jp));
+    }
+
+    AZ_RETURN_IF_FAILED(az_json_parser_move_to_next_token(&jp));
   }
 
   printf(

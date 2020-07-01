@@ -191,7 +191,7 @@ AZ_NODISCARD az_result az_json_token_get_string(
       }
     }
 
-    destination[dest_idx] = token_byte;
+    destination[dest_idx] = (char)token_byte;
     dest_idx++;
   }
 
