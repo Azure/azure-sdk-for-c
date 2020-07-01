@@ -154,7 +154,7 @@ AZ_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t size);
  * @return An #az_span over the byte buffer where the size is set to the string's length not
  * including the \0 terminator.
  */
-AZ_NODISCARD az_span az_span_from_str(char* str);
+AZ_NODISCARD az_span az_span_from_str(char const* str);
 
 /******************************  SPAN MANIPULATION */
 
@@ -427,7 +427,7 @@ AZ_NODISCARD AZ_INLINE az_pair az_pair_init(az_span key, az_span value)
  * @return  An #az_pair with the fields initialized to the #az_span instances over the passed-in
  * strings.
  */
-AZ_NODISCARD AZ_INLINE az_pair az_pair_from_str(char* key, char* value)
+AZ_NODISCARD AZ_INLINE az_pair az_pair_from_str(char const* key, char const* value)
 {
   return az_pair_init(az_span_from_str(key), az_span_from_str(value));
 }

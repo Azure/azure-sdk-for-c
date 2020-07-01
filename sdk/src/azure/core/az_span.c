@@ -5,8 +5,8 @@
 #include "az_span_private.h"
 #include <azure/core/az_platform.h>
 #include <azure/core/az_precondition.h>
-#include <azure/core/internal/az_precondition_internal.h>
 #include <azure/core/az_span.h>
+#include <azure/core/internal/az_precondition_internal.h>
 #include <azure/core/internal/az_span_internal.h>
 
 #include <ctype.h>
@@ -35,7 +35,7 @@ AZ_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t size)
 }
 #endif // AZ_NO_PRECONDITION_CHECKING
 
-AZ_NODISCARD az_span az_span_from_str(char* str)
+AZ_NODISCARD az_span az_span_from_str(char const* str)
 {
   _az_PRECONDITION_NOT_NULL(str);
 
