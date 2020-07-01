@@ -84,13 +84,13 @@ function(ADD_CMOCKA_TEST _TARGET_NAME)
             set(VCPKG_PATH "$ENV{VCPKG_INSTALLATION_ROOT}/")
         endif()
 
-        # Patch for new VCPKG Cmoka returning relative path
+        # Patch for new VCPKG cmocka returning relative path
         if(MSVC)
             set(CMOCKA_STATIC_LIB "/lib/cmocka-static.lib")
         else()
             set(CMOCKA_STATIC_LIB "/lib/libcmocka-static.a")
         endif()
-        set(CMOCKA_PREXIF "${VCPKG_PATH}installed/${VCPKG_TARGET_TRIPLET}")
+        set(CMOCKA_PREFIX "${VCPKG_PATH}installed/${VCPKG_TARGET_TRIPLET}")
         set(CMOCKA_LIB "debug;${CMOCKA_PREXIF}/debug${CMOCKA_STATIC_LIB};optimized;${CMOCKA_PREXIF}${CMOCKA_STATIC_LIB}")
     else()
     set(CMOCKA_LIB cmocka)
