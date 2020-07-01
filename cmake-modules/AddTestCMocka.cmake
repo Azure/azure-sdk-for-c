@@ -81,10 +81,12 @@ function(ADD_CMOCKA_TEST _TARGET_NAME)
             set(VCPKG_PATH $ENV{VCPKG_ROOT})
         endif()
         if(DEFINED ENV{VCPKG_INSTALLATION_ROOT})
-            set(VCPKG_PATH ENV{VCPKG_INSTALLATION_ROOT})
+            set(VCPKG_PATH $ENV{VCPKG_INSTALLATION_ROOT})
         endif()
         # Temp fix for new VCPKG Cmoka returning relative path
         set(CMOCKA_LIB "debug;${VCPKG_PATH}installed/${VCPKG_TARGET_TRIPLET}/debug/lib/libcmocka-static.a;optimized;${VCPKG_PATH}installed/${VCPKG_TARGET_TRIPLET}/debug/lib/libcmocka-static.a")
+
+        #set(CMOCKA_LIB ${CMOCKA_LIBRARIES})
     else()
         set(CMOCKA_LIB cmocka)
     endif()
