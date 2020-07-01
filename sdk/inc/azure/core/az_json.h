@@ -75,7 +75,7 @@ typedef struct
 /**
  * @brief Returns the JSON token's boolean.
  *
- * @param token A pointer to an az_json_token instance.
+ * @param json_token A pointer to an #az_json_token instance.
  * @param out_value A pointer to a variable to receive the value.
  * @return AZ_OK if the boolean is returned.<br>
  * AZ_ERROR_JSON_INVALID_STATE if the kind is not AZ_JSON_TOKEN_BOOLEAN.
@@ -85,7 +85,7 @@ AZ_NODISCARD az_result az_json_token_get_boolean(az_json_token const* json_token
 /**
  * @brief Returns the JSON token's number as a 64-bit unsigned integer.
  *
- * @param token A pointer to an az_json_token instance.
+ * @param json_token A pointer to an #az_json_token instance.
  * @param out_value A pointer to a variable to receive the value.
  * @return AZ_OK if the number is returned.<br>
  * AZ_ERROR_JSON_INVALID_STATE if the kind != AZ_JSON_TOKEN_NUMBER.
@@ -96,7 +96,7 @@ az_json_token_get_uint64(az_json_token const* json_token, uint64_t* out_value);
 /**
  * @brief Returns the JSON token's number as a 32-bit unsigned integer.
  *
- * @param token A pointer to an az_json_token instance.
+ * @param json_token A pointer to an #az_json_token instance.
  * @param out_value A pointer to a variable to receive the value.
  * @return AZ_OK if the number is returned.<br>
  * AZ_ERROR_JSON_INVALID_STATE if the kind != AZ_JSON_TOKEN_NUMBER.
@@ -107,7 +107,7 @@ az_json_token_get_uint32(az_json_token const* json_token, uint32_t* out_value);
 /**
  * @brief Returns the JSON token's string after unescaping it, if required.
  *
- * @param token A pointer to an az_json_token instance.
+ * @param json_token A pointer to an #az_json_token instance.
  * @param destination A pointer to a buffer where the string should be copied into.
  * @param destination_max_size The maximum available space within the buffer referred to by
  * \p destination.

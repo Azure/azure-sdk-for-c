@@ -536,28 +536,27 @@ static az_result update_property(az_span desired_payload)
 {
   // Parse desired property payload
   az_json_parser json_parser = { 0 };
-
   AZ_RETURN_IF_FAILED(az_json_parser_init(&json_parser, desired_payload, NULL));
 
-  AZ_RETURN_IF_FAILED(az_json_parser_move_to_next_token(&jp));
-  if (jp.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
+  AZ_RETURN_IF_FAILED(az_json_parser_move_to_next_token(&json_parser));
+  if (json_parser.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
   {
     return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
 
-  AZ_RETURN_IF_FAILED(az_json_parser_move_to_next_token(&jp));
+  AZ_RETURN_IF_FAILED(az_json_parser_move_to_next_token(&json_parser));
 
   // Update property locally if found
-  while (jp.token.kind != AZ_JSON_TOKEN_END_OBJECT)
+  while (json_parser.token.kind != AZ_JSON_TOKEN_END_OBJECT)
   {
-    if (az_json_token_is_text_equal(&jp.token, version_name))
+    if (az_json_token_is_text_equal(&json_parser.token, version_name))
     {
       break;
     }
-    else if (az_json_token_is_text_equal(&jp.token, reported_property_name))
+    else if (az_json_token_is_text_equal(&json_parser.token, reported_property_name))
     {
       // TODO: Change back to int32_t once that is supported.
-      AZ_RETURN_IF_FAILED(az_json_token_get_uint32(&jp.token, &reported_property_value));
+      AZ_RETURN_IF_FAILED(az_json_token_get_uint32(&json_parser.token, &reported_property_value));
 
       printf(
           "Updating \"%.*s\" locally.\n",
@@ -568,10 +567,10 @@ static az_result update_property(az_span desired_payload)
     else
     {
       // ignore other tokens
-      AZ_RETURN_IF_FAILED(az_json_parser_skip_children(&jp));
+      AZ_RETURN_IF_FAILED(az_json_parser_skip_children(&json_parser));
     }
 
-    AZ_RETURN_IF_FAILED(az_json_parser_move_to_next_token(&jp));
+    AZ_RETURN_IF_FAILED(az_json_parser_move_to_next_token(&json_parser));
   }
 
   printf(
