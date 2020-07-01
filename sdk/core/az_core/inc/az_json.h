@@ -34,9 +34,8 @@ typedef enum
   AZ_JSON_TOKEN_END_OBJECT, ///< The token kind is the end of a JSON object.
   AZ_JSON_TOKEN_BEGIN_ARRAY, ///< The token kind is the start of a JSON array.
   AZ_JSON_TOKEN_END_ARRAY, ///< The token kind is the end of a JSON array.
-  AZ_JSON_TOKEN_PROPERTY_NAME, ///< The token kind is a JSON property name, which contains no
-                               ///< escaped characters.
-  AZ_JSON_TOKEN_STRING, ///< The token kind is a JSON string, which contains no escaped characters.
+  AZ_JSON_TOKEN_PROPERTY_NAME, ///< The token kind is a JSON property name.
+  AZ_JSON_TOKEN_STRING, ///< The token kind is a JSON string.
   AZ_JSON_TOKEN_NUMBER, ///< The token kind is a JSON number.
   AZ_JSON_TOKEN_TRUE, ///< The token kind is the JSON literal `true`.
   AZ_JSON_TOKEN_FALSE, ///< The token kind is the JSON literal `false`.

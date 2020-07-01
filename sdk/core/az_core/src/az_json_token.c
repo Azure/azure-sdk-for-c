@@ -147,6 +147,7 @@ AZ_NODISCARD az_result az_json_token_get_string(
       return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
     }
 
+    // This will add a null terminator.
     az_span_to_str(destination, destination_max_size, token_slice);
 
     if (out_string_length != NULL)
