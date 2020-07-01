@@ -535,7 +535,7 @@ static int send_reported_property(az_span reported_property_payload)
 static az_result update_property(az_span desired_payload)
 {
   // Parse desired property payload
-  az_json_parser json_parser = { 0 };
+  az_json_parser json_parser;
   AZ_RETURN_IF_FAILED(az_json_parser_init(&json_parser, desired_payload, NULL));
 
   AZ_RETURN_IF_FAILED(az_json_parser_move_to_next_token(&json_parser));
@@ -556,12 +556,14 @@ static az_result update_property(az_span desired_payload)
     else if (az_json_token_is_text_equal(&json_parser.token, reported_property_name))
     {
       // TODO: Change back to int32_t once that is supported.
-      AZ_RETURN_IF_FAILED(az_json_token_get_uint32(&json_parser.token, &reported_property_value));
+      uint32_t temp_property_value = 0;
+      AZ_RETURN_IF_FAILED(az_json_token_get_uint32(&json_parser.token, &temp_property_value));
 
       printf(
           "Updating \"%.*s\" locally.\n",
           az_span_size(reported_property_name),
           az_span_ptr(reported_property_name));
+      reported_property_value = (int32_t)temp_property_value;
       return AZ_OK;
     }
     else
