@@ -20,8 +20,8 @@ Param (
     [string] $Filter = '*.md'
 )
 
-# Fetch a list of available emojis from the GitHub API
-$availableEmojis = ((Invoke-WebRequest 'https://api.github.com/emojis' ).Content | ConvertFrom-Json -AsHashtable)
+# Emoji list comes from GitHub (https://api.github.com/emojis)
+$availableEmojis = (Get-Content $PSScriptRoot/emojis.json | ConvertFrom-Json -AsHashtable)
 
 $files = Get-ChildItem -Path $Path -Filter $Filter -Recurse
 
