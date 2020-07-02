@@ -314,8 +314,8 @@ jobs:
     # Update links
     - template: /eng/common/pipelines/templates/steps/replace-relative-links.yml
       parameters:
-        TargetFolder: $(Build.SourcesDirectory)
-        RootFolder: $(Build.SourcesDirectory)
+        TargetFolder: .
+        RootFolder: .
         BuildSHA: $(Build.SourceVersion)
         RepoId: 'Azure/azure-sdk-for-c'
 
