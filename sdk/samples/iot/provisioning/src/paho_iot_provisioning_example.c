@@ -333,16 +333,17 @@ static int register_device()
 static int get_operation_status()
 {
   int rc;
+
   bool is_operation_complete = false;
-  char* topic;
-  int topic_len;
-  MQTTClient_message* message;
+  char* topic = NULL;
+  int topic_len = 0;
+  MQTTClient_message* message = NULL;
   az_iot_provisioning_client_register_response response;
   az_iot_provisioning_client_operation_status operation_status;
 
   // Continue to parse incoming responses from the Provisioning Service until
   // the device has been successfully provisioned or an error occurs
-  while (!is_operation_complete)
+  do
   {
     // Receive message.
     // If MQTTClient_receive is successful, topic and message memory must later be freed
@@ -375,7 +376,7 @@ static int get_operation_status()
         return rc;
       }
     }
-  }
+  } while (!is_operation_complete);
 
   // Operation is complete
   // Successful assignment - print out the assigned hostname and device id
@@ -487,8 +488,10 @@ static int send_operation_query_message(az_iot_provisioning_client_register_resp
 
 static int get_operation_status_free(int rc, char* topic, MQTTClient_message* message)
 {
-  MQTTClient_freeMessage(&message);
-  MQTTClient_free(topic);
+  if (message)
+    MQTTClient_freeMessage(&message);
+  if (topic)
+    MQTTClient_free(topic);
   return rc;
 }
 
