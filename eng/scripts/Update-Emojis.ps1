@@ -20,10 +20,30 @@ Param (
     [string] $Filter = '*.md'
 )
 
+# TODO: Fetch available emojis from GitHub's API (https://api.github.com/emojis)
+$availableEmojis = @{ heavy_check_mark = $true; heavy_multiplication_x = $true }
+
 $files = Get-ChildItem -Path $Path -Filter $Filter -Recurse
 
 foreach($file in $files) {
     Write-Verbose "Replacing content in $file"
     $fileContent = Get-Content $file
-    $fileContent -replace '(^|[^:])(:[a-zA-Z0-9_-]+?:)($|[^:])', '$1\emoji $2$3' | Set-Content -Path $file
+
+    $emojiCandidates = [regex]::Matches($fileContent, ':([a-zA-Z0-9_-]+?):') | ForEach-Object { $_.Groups[1].Value }
+
+    $matchSet = @{ }
+
+    foreach($match in $emojiCandidates) {
+        if (-not $matchSet.ContainsKey($match) -and $availableEmojis.ContainsKey($match)) {
+            $matchSet[$match] = $true
+        }
+    }
+
+    foreach($key in $matchSet.Keys) {
+        $fileContent = $fileContent.Replace(":$($key):", "\emoji :$($key):")
+    }
+
+    if ($matchSet.Keys.Count -gt 0) {
+        Set-Content $file -Value $fileContent
+    }
 }
