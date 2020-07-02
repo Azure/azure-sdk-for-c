@@ -311,14 +311,6 @@ jobs:
         artifactName: release-info
         path: $(Build.ArtifactStagingDirectory)/release-info
 
-    # Update links
-    - template: /eng/common/pipelines/templates/steps/replace-relative-links.yml
-      parameters:
-        TargetFolder: $(Build.SourcesDirectory)
-        RootFolder: $(Build.SourcesDirectory)
-        BuildSHA: $(Build.SourceVersion)
-        RepoId: 'Azure/azure-sdk-for-c'
-
     # Generate Documentation
     - pwsh: |
         $setupFile="doxygen-1.8.18-setup.exe";
