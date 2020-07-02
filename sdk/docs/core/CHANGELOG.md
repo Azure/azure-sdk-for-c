@@ -1,9 +1,6 @@
 # Release History
 
 
-## 1.0.0-dev.3 (2020-06-29)
-- Dev release only; validate shipping.
-
 ## 1.0.0-preview.3 (Unreleased)
 
 
