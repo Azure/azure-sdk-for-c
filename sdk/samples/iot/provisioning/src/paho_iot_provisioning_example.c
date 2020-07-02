@@ -77,10 +77,22 @@ static int connect_device();
 static int subscribe();
 
 //
-// Messaging functions
+// Device registration functions
 //
 static int register_device();
 static int get_operation_status();
+static az_result parse_operation_message(
+    char* topic,
+    int topic_len,
+    MQTTClient_message* message,
+    az_iot_provisioning_client_register_response* response,
+    az_iot_provisioning_client_operation_status* operation_status);
+static int send_operation_query_message();
+
+//
+// Helper functions
+//
+static int get_operation_status_free(int rc, char* topic, MQTTClient_message* message);
 static void sleep_for_seconds(uint32_t seconds);
 static void print_az_span(az_span span);
 
@@ -325,11 +337,15 @@ static int get_operation_status()
   char* topic;
   int topic_len;
   MQTTClient_message* message;
+  az_iot_provisioning_client_register_response response;
+  az_iot_provisioning_client_operation_status operation_status;
 
   // Continue to parse incoming responses from the Provisioning Service until
   // the device has been successfully provisioned or an error occurs
   while (!is_operation_complete)
   {
+    // Receive message.
+    // If MQTTClient_receive is successful, topic and message memory must later be freed
     if ((rc
          = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, TIMEOUT_MQTT_RECEIVE_MS))
         != MQTTCLIENT_SUCCESS)
@@ -337,117 +353,145 @@ static int get_operation_status()
       printf("Failed to receive message, MQTTClient return code %d\n", rc);
       return rc;
     }
-
     printf("Received a message from service.\n");
-    printf("Topic: %s\n", topic);
 
-    if (topic_len == 0)
-    {
-      // The length of the topic if there are one or more NULL characters embedded in topic,
-      // otherwise topic_len is 0.
-      topic_len = (int)strlen(topic);
-    }
-
-    az_span topic_span = az_span_init((uint8_t*)topic, topic_len);
-    az_span message_span = az_span_init((uint8_t*)message->payload, message->payloadlen);
-
-    // Parse the incoming message and payload
-    az_iot_provisioning_client_register_response response;
+    // Parse operation message
     if (az_failed(
-            rc = az_iot_provisioning_client_parse_received_topic_and_payload(
-                &provisioning_client, topic_span, message_span, &response)))
+            rc = parse_operation_message(topic, topic_len, message, &response, &operation_status)))
     {
-      printf("Message from unknown topic, az_result return code %0x4\n", rc);
-      MQTTClient_freeMessage(&message);
-      MQTTClient_free(topic);
-      return rc;
+      printf("Failed to parse operation message, az_result return code %04x\n", rc);
+      return get_operation_status_free(rc, topic, message);
     }
+    printf("Parsed operation message.\n");
 
-    printf("Received payload:\n");
-    print_az_span(message_span);
-    printf("Response status is %d.\n", response.status);
-
-    // Parse the operation status from a string to an enum
-    az_iot_provisioning_client_operation_status operation_status;
-    if (az_failed(
-            rc = az_iot_provisioning_client_parse_operation_status(&response, &operation_status)))
-    {
-      printf("Failed to parse operation_status, az_result return code %0x4\n", rc);
-      MQTTClient_freeMessage(&message);
-      MQTTClient_free(topic);
-      return rc;
-    }
-
-    // Check whether or not the operation is complete
+    // If operation is not complete, send query and loop to receive operation message
     is_operation_complete = az_iot_provisioning_client_operation_complete(operation_status);
     if (!is_operation_complete)
     {
-      // In case the operation is not complete, issue a new query to the service
-      // Get the topic to send the query message
-      if (az_failed(
-              rc = az_iot_provisioning_client_query_status_get_publish_topic(
-                  &provisioning_client, &response, query_topic, sizeof(query_topic), NULL)))
+      get_operation_status_free(0, topic, message);
+
+      if ((rc = send_operation_query_message()) != MQTTCLIENT_SUCCESS)
       {
-        printf("Unable to get query status publish topic, az_result return code %04x\n", rc);
-        MQTTClient_freeMessage(&message);
-        MQTTClient_free(topic);
         return rc;
       }
-
-      // IMPORTANT: Wait the recommended retry-after number of seconds before query
-      printf("Querying after %u seconds...\n", response.retry_after_seconds);
-      sleep_for_seconds(response.retry_after_seconds);
-
-      // Publish the query message
-      if ((rc = MQTTClient_publish(mqtt_client, query_topic, 0, NULL, 0, 0, NULL))
-          != MQTTCLIENT_SUCCESS)
-      {
-        printf("Failed to publish query status request, MQTTClient return code %d\n", rc);
-        MQTTClient_freeMessage(&message);
-        MQTTClient_free(topic);
-        return rc;
-      }
-
-      // Loop back up to receive the result of the query
     }
-    else
+  }
+
+  // Operation is complete
+  // Successful assignment - print out the assigned hostname and device id
+  if (operation_status == AZ_IOT_PROVISIONING_STATUS_ASSIGNED)
+  {
+    printf("SUCCESS - Device provisioned:\n");
+    printf("\tHub Hostname: ");
+    print_az_span(response.registration_result.assigned_hub_hostname);
+    printf("\tDevice Id: ");
+    print_az_span(response.registration_result.device_id);
+  }
+  else // Unsuccesful assignment (unassigned, failed or disabled states)
+  {
+    printf("ERROR - Device Provisioning failed:\n");
+    printf("\tRegistration state: ");
+    print_az_span(response.operation_status);
+    printf("\tLast operation status: %d\n", response.status);
+    printf("\tOperation ID: ");
+    print_az_span(response.operation_id);
+    printf("\tError code: %u\n", response.registration_result.extended_error_code);
+    printf("\tError message: ");
+    print_az_span(response.registration_result.error_message);
+    printf("\tError timestamp: ");
+    print_az_span(response.registration_result.error_timestamp);
+    printf("\tError tracking ID: ");
+    print_az_span(response.registration_result.error_tracking_id);
+
+    if (response.retry_after_seconds > 0)
     {
-      // Successful assignment - print out the assigned hostname and device id
-      if (operation_status == AZ_IOT_PROVISIONING_STATUS_ASSIGNED)
-      {
-        printf("SUCCESS - Device provisioned:\n");
-        printf("\tHub Hostname: ");
-        print_az_span(response.registration_result.assigned_hub_hostname);
-        printf("\tDevice Id: ");
-        print_az_span(response.registration_result.device_id);
-      }
-      else // unassigned, failed or disabled states
-      {
-        printf("ERROR - Device Provisioning failed:\n");
-        printf("\tRegistration state: ");
-        print_az_span(response.operation_status);
-        printf("\tLast operation status: %d\n", response.status);
-        printf("\tOperation ID: ");
-        print_az_span(response.operation_id);
-        printf("\tError code: %u\n", response.registration_result.extended_error_code);
-        printf("\tError message: ");
-        print_az_span(response.registration_result.error_message);
-        printf("\tError timestamp: ");
-        print_az_span(response.registration_result.error_timestamp);
-        printf("\tError tracking ID: ");
-        print_az_span(response.registration_result.error_tracking_id);
-        if (response.retry_after_seconds > 0)
-        {
-          printf("\tRetry-after: %u seconds.", response.retry_after_seconds);
-        }
-      }
+      printf("\tRetry-after: %u seconds.", response.retry_after_seconds);
     }
+  }
 
-    MQTTClient_freeMessage(&message);
-    MQTTClient_free(topic);
+  return get_operation_status_free(MQTTCLIENT_SUCCESS, topic, message);
+}
+
+static az_result parse_operation_message(
+    char* topic,
+    int topic_len,
+    MQTTClient_message* message,
+    az_iot_provisioning_client_register_response* response,
+    az_iot_provisioning_client_operation_status* operation_status)
+{
+  int rc;
+
+  printf("Topic: %s\n", topic);
+
+  if (topic_len == 0)
+  {
+    // The length of the topic if there are one or more NULL characters embedded in topic,
+    // otherwise topic_len is 0.
+    topic_len = (int)strlen(topic);
+  }
+
+  az_span topic_span = az_span_init((uint8_t*)topic, topic_len);
+  az_span message_span = az_span_init((uint8_t*)message->payload, message->payloadlen);
+
+  // Parse the incoming message and payload
+  if (az_failed(
+          rc = az_iot_provisioning_client_parse_received_topic_and_payload(
+              &provisioning_client, topic_span, message_span, response)))
+  {
+    printf("Message from unknown topic, az_result return code %0x4\n", rc);
+    return rc;
+  }
+  printf("Received payload:\n");
+  print_az_span(message_span);
+  printf("Response status is %d.\n", response->status);
+
+  // Parse the operation status from a string to an enum
+  if (az_failed(rc = az_iot_provisioning_client_parse_operation_status(response, operation_status)))
+  {
+    printf("Failed to parse operation_status, az_result return code %0x4\n", rc);
+    return rc;
+  }
+
+  return AZ_OK;
+}
+
+static int send_operation_query_message()
+{
+  int rc;
+
+  printf("sending operation query message\n");
+
+  // Get the topic to send the query message
+  az_iot_provisioning_client_register_response response;
+  if (az_failed(
+          rc = az_iot_provisioning_client_query_status_get_publish_topic(
+              &provisioning_client, &response, query_topic, sizeof(query_topic), NULL)))
+  {
+    printf("Unable to get query status publish topic, az_result return code %04x\n", rc);
+    return rc;
+  }
+
+  // IMPORTANT: Wait the recommended retry-after number of seconds before query
+  printf("Querying after %u seconds...\n", response.retry_after_seconds);
+  sleep_for_seconds(response.retry_after_seconds);
+
+  // Publish the query message
+  if ((rc = MQTTClient_publish(mqtt_client, query_topic, 0, NULL, 0, 0, NULL))
+      != MQTTCLIENT_SUCCESS)
+  {
+    printf("Failed to publish query status request, MQTTClient return code %d\n", rc);
+    return rc;
   }
 
   return MQTTCLIENT_SUCCESS;
+}
+
+static int get_operation_status_free(int rc, char* topic, MQTTClient_message* message)
+{
+  printf("freeing memory\n");
+  MQTTClient_freeMessage(&message);
+  MQTTClient_free(topic);
+  return rc;
 }
 
 static void sleep_for_seconds(uint32_t seconds)

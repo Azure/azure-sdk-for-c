@@ -1,6 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
-
+#include <stdio.h>
 #include <azure/iot/az_iot_provisioning_client.h>
 #include <azure/iot/az_iot_common.h>
 #include <azure/core/az_json.h>
@@ -189,17 +189,21 @@ AZ_NODISCARD az_result az_iot_provisioning_client_query_status_get_publish_topic
     size_t* out_mqtt_topic_length)
 {
   (void)client;
-
+printf("hello1\n");
   _az_PRECONDITION_NOT_NULL(client);
+  printf("hello2\n");
   _az_PRECONDITION_NOT_NULL(mqtt_topic);
+  printf("hello3\n");
   _az_PRECONDITION(mqtt_topic_size > 0);
-
+printf("hello4\n");
   _az_PRECONDITION_NOT_NULL(register_response);
+  printf("hello5\n");
   _az_PRECONDITION_VALID_SPAN(register_response->operation_id, 1, false);
+  printf("hello6\n");
 
   az_span mqtt_topic_span = az_span_init((uint8_t*)mqtt_topic, (int32_t)mqtt_topic_size);
   az_span str_dps_registrations = _az_iot_provisioning_get_str_dps_registrations();
-
+printf("hello7\n");
   int32_t required_length = az_span_size(str_dps_registrations)
       + az_span_size(str_get_iotdps_get_operationstatus)
       + az_span_size(register_response->operation_id);
