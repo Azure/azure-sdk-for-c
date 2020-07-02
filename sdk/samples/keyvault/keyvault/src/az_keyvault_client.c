@@ -151,7 +151,7 @@ AZ_NODISCARD az_result az_keyvault_keys_client_init(
 
 AZ_NODISCARD az_keyvault_create_key_options az_keyvault_create_key_options_default()
 {
-  return (az_keyvault_create_key_options){ .operations = NULL, .tags = NULL };
+  return (az_keyvault_create_key_options){ .operations = NULL, .tags = NULL }
 }
 
 /**
