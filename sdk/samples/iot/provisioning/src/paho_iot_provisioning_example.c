@@ -89,9 +89,6 @@ static az_result parse_operation_message(
     az_iot_provisioning_client_operation_status* operation_status);
 static int send_operation_query_message(az_iot_provisioning_client_register_response response);
 
-//
-// Helper functions
-//
 static int get_operation_status_free(int rc, char* topic, MQTTClient_message* message);
 static void sleep_for_seconds(uint32_t seconds);
 static void print_az_span(az_span span);
