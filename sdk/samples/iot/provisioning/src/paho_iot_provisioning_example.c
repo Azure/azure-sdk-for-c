@@ -487,7 +487,6 @@ static int send_operation_query_message(az_iot_provisioning_client_register_resp
 
 static int get_operation_status_free(int rc, char* topic, MQTTClient_message* message)
 {
-  printf("freeing memory\n");
   MQTTClient_freeMessage(&message);
   MQTTClient_free(topic);
   return rc;
