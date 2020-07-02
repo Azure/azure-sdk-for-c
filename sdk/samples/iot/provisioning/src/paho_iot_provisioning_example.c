@@ -87,7 +87,7 @@ static az_result parse_operation_message(
     MQTTClient_message* message,
     az_iot_provisioning_client_register_response* response,
     az_iot_provisioning_client_operation_status* operation_status);
-static int send_operation_query_message();
+static int send_operation_query_message(az_iot_provisioning_client_register_response response);
 
 //
 // Helper functions
@@ -370,7 +370,7 @@ static int get_operation_status()
     {
       get_operation_status_free(0, topic, message);
 
-      if ((rc = send_operation_query_message()) != MQTTCLIENT_SUCCESS)
+      if ((rc = send_operation_query_message(response)) != MQTTCLIENT_SUCCESS)
       {
         return rc;
       }
@@ -455,14 +455,13 @@ static az_result parse_operation_message(
   return AZ_OK;
 }
 
-static int send_operation_query_message()
+static int send_operation_query_message(az_iot_provisioning_client_register_response response)
 {
   int rc;
 
   printf("sending operation query message\n");
 
   // Get the topic to send the query message
-  az_iot_provisioning_client_register_response response;
   if (az_failed(
           rc = az_iot_provisioning_client_query_status_get_publish_topic(
               &provisioning_client, &response, query_topic, sizeof(query_topic), NULL)))
