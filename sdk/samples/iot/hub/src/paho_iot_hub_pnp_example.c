@@ -77,17 +77,17 @@ char telemetry_topic[128];
 static const az_span telemetry_name = AZ_SPAN_LITERAL_FROM_STR("temperature");
 static char telemetry_payload[32];
 
-// IoT Hub Direct Methods Values
-static char methods_response_topic[128];
-static const az_span report_method_payload_value_span = AZ_SPAN_LITERAL_FROM_STR("since");
-static const az_span report_method_name_span = AZ_SPAN_LITERAL_FROM_STR("getMaxMinReport");
+// IoT Hub Commands Values
+static char commands_response_topic[128];
+static const az_span report_command_payload_value_span = AZ_SPAN_LITERAL_FROM_STR("since");
+static const az_span report_command_name_span = AZ_SPAN_LITERAL_FROM_STR("getMaxMinReport");
 static const az_span report_max_temp_name_span = AZ_SPAN_LITERAL_FROM_STR("maxTemp");
 static const az_span report_min_temp_name_span = AZ_SPAN_LITERAL_FROM_STR("minTemp");
 static const az_span report_avg_temp_name_span = AZ_SPAN_LITERAL_FROM_STR("avgTemp");
 static const az_span report_start_time_name_span = AZ_SPAN_LITERAL_FROM_STR("startTime");
 static const az_span report_end_time_name_span = AZ_SPAN_LITERAL_FROM_STR("endTime");
 static char end_time_buffer[32];
-static char methods_response_payload[256];
+static char commands_response_payload[256];
 
 // IoT Hub Twin Values
 static char reported_property_topic[128];
@@ -123,7 +123,7 @@ static int subscribe();
 //
 static int on_received(void* context, char* topicName, int topicLen, MQTTClient_message* message);
 static int send_telemetry_messages();
-static int send_method_response(
+static int send_command_response(
     az_iot_hub_client_method_request* request,
     uint16_t status,
     az_span response);
@@ -135,7 +135,7 @@ int main()
 {
   int rc;
 
-  // Get the boot time for methods response
+  // Get the boot time for command response
   time_t rawtime;
   struct tm* timeinfo;
   time(&rawtime);
@@ -156,7 +156,7 @@ int main()
           rc = az_iot_hub_client_get_client_id(
               &client, mqtt_client_id, sizeof(mqtt_client_id), &client_id_length)))
   {
-    printf("Failed to get MQTT clientId, return code %d\n", rc);
+    printf("Failed to get MQTT client id, return code %d\n", rc);
     return rc;
   }
 
@@ -183,7 +183,7 @@ int main()
     return rc;
   }
 
-  // Subscribe to the necessary twin and methods topics to receive twin updates and responses
+  // Subscribe to the necessary twin and commands topics to receive twin updates and responses
   if ((rc = subscribe()) != 0)
   {
     return rc;
@@ -213,7 +213,7 @@ int main()
   return 0;
 }
 
-static void sleep_seconds(uint32_t seconds)
+static void sleep_for_seconds(uint32_t seconds)
 {
 #ifdef _WIN32
   Sleep((DWORD)seconds * 1000);
@@ -231,23 +231,20 @@ static az_result read_configuration_entry(
     az_span* out_value)
 {
   printf("%s = ", env_name);
-  char* env = getenv(env_name);
+  char* env_value = getenv(env_name);
 
-  if (env != NULL)
+  if (env_value != NULL && default_value != NULL)
   {
-    printf("%s\n", hide_value ? "***" : env);
-    az_span env_span = az_span_from_str(env);
+    env_value = default_value;
+  }
+
+  if (env_value != NULL)
+  {
+    printf("%s", hide_value ? "***" : env_value);
+    az_span env_span = az_span_from_str(env_value);
     AZ_RETURN_IF_NOT_ENOUGH_SIZE(buffer, az_span_size(env_span));
     az_span_copy(buffer, env_span);
     *out_value = az_span_slice(buffer, 0, az_span_size(env_span));
-  }
-  else if (default_value != NULL)
-  {
-    printf("%s\n", default_value);
-    az_span default_span = az_span_from_str(default_value);
-    AZ_RETURN_IF_NOT_ENOUGH_SIZE(buffer, az_span_size(default_span));
-    az_span_copy(buffer, default_span);
-    *out_value = az_span_slice(buffer, 0, az_span_size(default_span));
   }
   else
   {
@@ -292,11 +289,11 @@ static az_result read_configuration_and_init_client()
 
   az_span device_id_span = AZ_SPAN_FROM_BUFFER(device_id);
   AZ_RETURN_IF_FAILED(
-      read_configuration_entry(ENV_DEVICE_ID, "", false, device_id_span, &device_id_span));
+      read_configuration_entry(ENV_DEVICE_ID, NULL, false, device_id_span, &device_id_span));
 
   az_span iot_hub_hostname_span = AZ_SPAN_FROM_BUFFER(iot_hub_hostname);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_IOT_HUB_HOSTNAME, "", false, iot_hub_hostname_span, &iot_hub_hostname_span));
+      ENV_IOT_HUB_HOSTNAME, NULL, false, iot_hub_hostname_span, &iot_hub_hostname_span));
 
   // Paho requires that the MQTT endpoint be of the form ssl://<HUB ENDPOINT>:8883
   AZ_RETURN_IF_FAILED(
@@ -312,7 +309,8 @@ static az_result read_configuration_and_init_client()
   return AZ_OK;
 }
 
-// Invoke the method requested from the service. Here, it generates a report for max, min, and avg temperatures.
+// Invoke the command requested from the service. Here, it generates a report for max, min, and avg
+// temperatures.
 static az_result invoke_getMaxMinReport(az_span payload, az_span response, az_span* out_response)
 {
   // Parse the "since" field in the payload
@@ -328,7 +326,7 @@ static az_result invoke_getMaxMinReport(az_span payload, az_span response, az_sp
   az_span start_time_span = AZ_SPAN_NULL;
   while (az_succeeded(az_json_parser_parse_token_member(&jp, &tm)))
   {
-    if (az_span_is_content_equal(report_method_payload_value_span, tm.name))
+    if (az_span_is_content_equal(report_command_payload_value_span, tm.name))
     {
       AZ_RETURN_IF_FAILED(az_json_token_get_string(&tm.token, &start_time_span));
       break;
@@ -345,17 +343,21 @@ static az_result invoke_getMaxMinReport(az_span payload, az_span response, az_sp
   size_t len = strftime(end_time_buffer, sizeof(end_time_buffer), iso_spec_time_format, timeinfo);
   az_span time_span = az_span_init((uint8_t*)end_time_buffer, (int32_t)len);
 
-  // Build the method response payload
+  // Build the command response payload
   az_json_builder json_builder;
   AZ_RETURN_IF_FAILED(az_json_builder_init(&json_builder, response, NULL));
   AZ_RETURN_IF_FAILED(az_json_builder_append_begin_object(&json_builder));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_property_name(&json_builder, report_max_temp_name_span));
+  AZ_RETURN_IF_FAILED(
+      az_json_builder_append_property_name(&json_builder, report_max_temp_name_span));
   AZ_RETURN_IF_FAILED(az_json_builder_append_int32_number(&json_builder, (int32_t)device_max_temp));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_property_name(&json_builder, report_min_temp_name_span));
+  AZ_RETURN_IF_FAILED(
+      az_json_builder_append_property_name(&json_builder, report_min_temp_name_span));
   AZ_RETURN_IF_FAILED(az_json_builder_append_int32_number(&json_builder, (int32_t)device_min_temp));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_property_name(&json_builder, report_avg_temp_name_span));
+  AZ_RETURN_IF_FAILED(
+      az_json_builder_append_property_name(&json_builder, report_avg_temp_name_span));
   AZ_RETURN_IF_FAILED(az_json_builder_append_int32_number(&json_builder, (int32_t)device_avg_temp));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_property_name(&json_builder, report_start_time_name_span));
+  AZ_RETURN_IF_FAILED(
+      az_json_builder_append_property_name(&json_builder, report_start_time_name_span));
 
   // If the user specified a time, use that as the start | Otherwise use boot time
   if (az_span_size(start_time_span) > 0)
@@ -367,7 +369,8 @@ static az_result invoke_getMaxMinReport(az_span payload, az_span response, az_sp
     AZ_RETURN_IF_FAILED(az_json_builder_append_string(&json_builder, boot_time_span));
   }
 
-  AZ_RETURN_IF_FAILED(az_json_builder_append_property_name(&json_builder, report_end_time_name_span));
+  AZ_RETURN_IF_FAILED(
+      az_json_builder_append_property_name(&json_builder, report_end_time_name_span));
   AZ_RETURN_IF_FAILED(az_json_builder_append_string(&json_builder, time_span));
   AZ_RETURN_IF_FAILED(az_json_builder_append_end_object(&json_builder));
 
@@ -376,19 +379,19 @@ static az_result invoke_getMaxMinReport(az_span payload, az_span response, az_sp
   return AZ_OK;
 }
 
-// Send the response of the method invocation
-static int send_method_response(
+// Send the response of the command invocation
+static int send_command_response(
     az_iot_hub_client_method_request* request,
     uint16_t status,
     az_span response)
 {
-  // Get the response topic to publish the method response
+  // Get the response topic to publish the command response
   if (az_failed(az_iot_hub_client_methods_response_get_publish_topic(
           &client,
           request->request_id,
           status,
-          methods_response_topic,
-          sizeof(methods_response_topic),
+          commands_response_topic,
+          sizeof(commands_response_topic),
           NULL)))
   {
     printf("Unable to get twin document publish topic");
@@ -406,11 +409,11 @@ static int send_method_response(
     putchar('\n');
   }
 
-  // Send the methods response
+  // Send the commands response
   int rc;
   if ((rc = MQTTClient_publish(
            mqtt_client,
-           methods_response_topic,
+           commands_response_topic,
            az_span_size(response),
            az_span_ptr(response),
            0,
@@ -418,7 +421,7 @@ static int send_method_response(
            NULL))
       != MQTTCLIENT_SUCCESS)
   {
-    printf("Failed to send method response, return code %d\n", rc);
+    printf("Failed to send command response, return code %d\n", rc);
     return rc;
   }
 
@@ -529,7 +532,7 @@ static int on_received(void* context, char* topicName, int topicLen, MQTTClient_
 
   // Parse the incoming message topic and check which feature it is for
   az_iot_hub_client_twin_response twin_response;
-  az_iot_hub_client_method_request method_request;
+  az_iot_hub_client_method_request command_request;
 
   if (az_succeeded(
           az_iot_hub_client_twin_parse_received_topic(&client, topic_span, &twin_response)))
@@ -555,7 +558,11 @@ static int on_received(void* context, char* topicName, int topicLen, MQTTClient_
 
         // Get the new temperature
         double desired_temp;
-        parse_desired_temperature_property(twin_span, &desired_temp);
+        if (az_failed(parse_desired_temperature_property(twin_span, &desired_temp)))
+        {
+          printf("Could not parse desired temperature property\n");
+          break;
+        }
         current_device_temp = (int32_t)desired_temp;
 
         // Set the max/min temps if apply
@@ -586,32 +593,37 @@ static int on_received(void* context, char* topicName, int topicLen, MQTTClient_
     printf("Response status was %d\n", twin_response.status);
   }
   if (az_succeeded(az_iot_hub_client_methods_parse_received_topic(
-          &client, az_span_init((uint8_t*)topicName, topicLen), &method_request)))
+          &client, az_span_init((uint8_t*)topicName, topicLen), &command_request)))
   {
-    printf("Direct Method arrived\n");
-    if (az_span_is_content_equal(report_method_name_span, method_request.name))
+    printf("command arrived\n");
+    if (az_span_is_content_equal(report_command_name_span, command_request.name))
     {
-      az_span method_response_span = AZ_SPAN_FROM_BUFFER(methods_response_payload);
-      az_span method_payload_span
+      az_span command_response_span = AZ_SPAN_FROM_BUFFER(commands_response_payload);
+      az_span command_payload_span
           = az_span_init((uint8_t*)message->payload, (int32_t)message->payloadlen);
 
-      // Invoke Method
-      az_result response
-          = invoke_getMaxMinReport(method_payload_span, method_response_span, &method_response_span);
+      // Invoke command
+      az_result response = invoke_getMaxMinReport(
+          command_payload_span, command_response_span, &command_response_span);
       (void)response;
 
-      // Send method response with report as JSON payload
+      // Send command response with report as JSON payload
       int rc;
-      if ((rc = send_method_response(&method_request, 200, method_response_span)) != 0)
+      if ((rc = send_command_response(&command_request, 200, command_response_span)) != 0)
       {
         printf("Unable to send %d response, status %d\n", 200, rc);
       }
     }
     else
     {
-      // Unsupported Method
+      // Unsupported command
+      printf(
+          "Unsupported command received: %.*s.\n",
+          az_span_size(command_request.name),
+          az_span_ptr(command_request.name));
+
       int rc;
-      if ((rc = send_method_response(&method_request, 404, AZ_SPAN_NULL)) != 0)
+      if ((rc = send_command_response(&command_request, 404, AZ_SPAN_NULL)) != 0)
       {
         printf("Unable to send %d response, status %d\n", 404, rc);
       }
@@ -636,13 +648,13 @@ static int connect_device()
   mqtt_connect_options.cleansession = false;
   mqtt_connect_options.keepAliveInterval = AZ_IOT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS;
 
-  // Get the MQTT user name used to connect to IoT Hub
+  // Get the MQTT username used to connect to IoT Hub
   if (az_failed(
           rc = az_iot_hub_client_get_user_name_with_model_id(
               &client, model_id, mqtt_username, sizeof(mqtt_username), NULL)))
 
   {
-    printf("Failed to get MQTT clientId, return code %d\n", rc);
+    printf("Failed to get MQTT username, return code %d\n", rc);
     return rc;
   }
 
@@ -675,12 +687,12 @@ static int subscribe()
 {
   int rc;
 
-  // Subscribe to the methods topic. Messages received on this topic are methods to be invoked
+  // Subscribe to the commands topic. Messages received on this topic are commands to be invoked
   // on the device.
   if ((rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_HUB_CLIENT_METHODS_SUBSCRIBE_TOPIC, 1))
       != MQTTCLIENT_SUCCESS)
   {
-    printf("Failed to subscribe to twin patch topic filter, return code %d\n", rc);
+    printf("Failed to subscribe to the commands subscribe topic filter, return code %d\n", rc);
     return rc;
   }
 
@@ -689,7 +701,7 @@ static int subscribe()
   if ((rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_HUB_CLIENT_TWIN_PATCH_SUBSCRIBE_TOPIC, 1))
       != MQTTCLIENT_SUCCESS)
   {
-    printf("Failed to subscribe to twin patch topic filter, return code %d\n", rc);
+    printf("Failed to subscribe to the twin patch topic filter, return code %d\n", rc);
     return rc;
   }
 
@@ -729,7 +741,7 @@ static int send_telemetry_messages()
   (void)result;
 
   // New line to separate messages on the console
-  printf("\n");
+  putchar('\n');
   for (int i = 0; i < NUMBER_OF_MESSAGES; ++i)
   {
     printf("Sending Message %d\n", i + 1);
@@ -746,7 +758,8 @@ static int send_telemetry_messages()
       printf("Failed to publish telemetry message %d, return code %d\n", i + 1, rc);
       return rc;
     }
-    sleep_seconds(TELEMETRY_SEND_INTERVAL);
+    sleep_for_seconds(TELEMETRY_SEND_INTERVAL);
   }
   return rc;
 }
+

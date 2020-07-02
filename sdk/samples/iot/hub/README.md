@@ -129,7 +129,9 @@ On failure, a status of `404` will be returned with an empty JSON payload.
 Receive and view incoming C2D messages using the IoT Hub Client.
 
 ### [IoT Hub PnP (Certificates)][pnp_sample]
-Connect a PnP enabled device with the Digital Twin Model ID (DTMI) detailed [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/Thermostat.json). In short, the capabilities are listed here:
+Connect a PnP enabled device with the Digital Twin Model ID (DTMI) detailed [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/Thermostat.json).
+Note that due to limitations in the JSON builder, the values which are listed as doubles in the DTMI
+are instead `int32_t` here. This shortcoming is being tracked [here](https://github.com/Azure/azure-sdk-for-c/issues/881). In short, the capabilities are listed here:
 - **Methods**: Invoke a method called `getMaxMinReport` with JSON payload value `"since"` with an [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) value for start time for the report. The method sends a response containing the following JSON payload:  
 ```json
 {
