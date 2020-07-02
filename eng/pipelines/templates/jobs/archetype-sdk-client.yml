@@ -319,6 +319,13 @@ jobs:
         BuildSHA: $(Build.SourceVersion)
         RepoId: 'Azure/azure-sdk-for-c'
 
+    # Update emojis
+    - pwsh: ./eng/scripts/Update-Emojis.ps1 -Verbose
+      displayName: Replace emoji references in markdown files
+
+    - script: git diff
+      displayName: Show updated files
+
     # Generate Documentation
     - pwsh: |
         $setupFile="doxygen-1.8.18-setup.exe";
