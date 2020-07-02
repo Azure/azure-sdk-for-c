@@ -35,17 +35,10 @@ static const char test_correct_user_name[]
     = "myiothub.azure-devices.net/my_device/?api-version=2018-06-30&" PLATFORM_USER_AGENT;
 static const char test_correct_user_name_with_model_id[]
     = "myiothub.azure-devices.net/my_device/?api-version=2020-05-31-preview&" PLATFORM_USER_AGENT
-<<<<<<< Updated upstream
-      "&modelId=dtmi%3AYOUR_COMPANY_NAME_HERE%3Asample_device%3B1";
-static const char test_correct_user_name_with_model_id_with_module_id[]
-    = "myiothub.azure-devices.net/my_device/my_module_id/"
-      "?api-version=2020-05-31-preview&os=azrtos&modelId=dtmi%3AYOUR_COMPANY_NAME_HERE%"
-=======
       "&model-id=dtmi%3AYOUR_COMPANY_NAME_HERE%3Asample_device%3B1";
 static const char test_correct_user_name_with_model_id_with_module_id[]
     = "myiothub.azure-devices.net/my_device/my_module_id/"
       "?api-version=2020-05-31-preview&os=azrtos&model-id=dtmi%3AYOUR_COMPANY_NAME_HERE%"
->>>>>>> Stashed changes
       "3Asample_device%3B1";
 static const char test_correct_user_name_with_module_id[]
     = "myiothub.azure-devices.net/my_device/my_module_id/?api-version=2018-06-30&os=azrtos";
