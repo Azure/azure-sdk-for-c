@@ -20,8 +20,8 @@ Param (
     [string] $Filter = '*.md'
 )
 
-# TODO: Fetch available emojis from GitHub's API (https://api.github.com/emojis)
-$availableEmojis = @{ heavy_check_mark = $true; heavy_multiplication_x = $true }
+# Fetch a list of available emojis from the GitHub API
+$availableEmojis = ((Invoke-WebRequest 'https://api.github.com/emojis' ).Content | ConvertFrom-Json -AsHashtable)
 
 $files = Get-ChildItem -Path $Path -Filter $Filter -Recurse
 
@@ -40,6 +40,7 @@ foreach($file in $files) {
     }
 
     foreach($key in $matchSet.Keys) {
+        Write-Verbose "Replacing $key"
         $fileContent = $fileContent.Replace(":$($key):", "\emoji :$($key):")
     }
 
