@@ -97,6 +97,8 @@ typedef enum
 
   AZ_ERROR_EOF = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 6), ///< Unexpected end of the input data.
 
+  AZ_ERROR_NOT_SUPPORTED = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 7),
+
   // Platform
   AZ_ERROR_MUTEX = _az_RESULT_MAKE_ERROR(_az_FACILITY_PLATFORM, 1), ///< Mutex operation error.
 
@@ -110,7 +112,8 @@ typedef enum
 
   // JSON error codes
   AZ_ERROR_JSON_INVALID_STATE = _az_RESULT_MAKE_ERROR(_az_FACILITY_JSON, 1),
-  AZ_ERROR_JSON_NESTING_OVERFLOW = _az_RESULT_MAKE_ERROR(_az_FACILITY_JSON, 2), ///< The JSON depth is too large.
+  AZ_ERROR_JSON_NESTING_OVERFLOW
+  = _az_RESULT_MAKE_ERROR(_az_FACILITY_JSON, 2), ///< The JSON depth is too large.
   AZ_ERROR_JSON_STRING_END = _az_RESULT_MAKE_ERROR(_az_FACILITY_JSON, 3),
   AZ_ERROR_JSON_POINTER_TOKEN_END = _az_RESULT_MAKE_ERROR(_az_FACILITY_JSON, 4),
 

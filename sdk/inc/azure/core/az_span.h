@@ -297,25 +297,58 @@ AZ_INLINE void az_span_fill(az_span destination, uint8_t value)
 /**
  * @brief Parses an #az_span containing ASCII digits into a uint64 number.
  *
- * @param[in] span The #az_span containing the ASCII digits to be parsed.
+ * @param[in] source The #az_span containing the ASCII digits to be parsed.
  * @param[in] out_number The pointer to the variable that is to receive the number.
  * @return An #az_result value indicating the result of the operation:
  *         - #AZ_OK if successful
  *         - #AZ_ERROR_PARSER_UNEXPECTED_CHAR if a non-ASCII digit is found within the span
  */
+AZ_NODISCARD az_result az_span_atou64(az_span source, uint64_t* out_number);
 
-AZ_NODISCARD az_result az_span_atou64(az_span span, uint64_t* out_number);
+/**
+ * @brief Parses an #az_span containing ASCII digits into an int64 number.
+ *
+ * @param[in] source The #az_span containing the ASCII digits to be parsed.
+ * @param[in] out_number The pointer to the variable that is to receive the number.
+ * @return An #az_result value indicating the result of the operation:
+ *         - #AZ_OK if successful
+ *         - #AZ_ERROR_PARSER_UNEXPECTED_CHAR if a non-ASCII digit is found within the span
+ */
+AZ_NODISCARD az_result az_span_atoi64(az_span source, int64_t* out_number);
 
 /**
  * @brief Parses an #az_span containing ASCII digits into a uint32 number.
  *
- * @param span The #az_span containing the ASCII digits to be parsed.
+ * @param source The #az_span containing the ASCII digits to be parsed.
  * @param out_number The pointer to the variable that is to receive the number.
  * @return An #az_result value indicating the result of the operation:
  *         - #AZ_OK if successful
  *         - #AZ_ERROR_PARSER_UNEXPECTED_CHAR if a non-ASCII digit is found within the span.
  */
-AZ_NODISCARD az_result az_span_atou32(az_span span, uint32_t* out_number);
+AZ_NODISCARD az_result az_span_atou32(az_span source, uint32_t* out_number);
+
+/**
+ * @brief Parses an #az_span containing ASCII digits into an int32 number.
+ *
+ * @param[in] source The #az_span containing the ASCII digits to be parsed.
+ * @param[in] out_number The pointer to the variable that is to receive the number.
+ * @return An #az_result value indicating the result of the operation:
+ *         - #AZ_OK if successful
+ *         - #AZ_ERROR_PARSER_UNEXPECTED_CHAR if a non-ASCII digit is found within the span
+ */
+AZ_NODISCARD az_result az_span_atoi32(az_span source, int32_t* out_number);
+
+/**
+ * @brief Parses an #az_span containing ASCII digits into a double number.
+ *
+ * @param[in] source The #az_span containing the ASCII digits to be parsed.
+ * @param[in] out_number The pointer to the variable that is to receive the number.
+ * @return An #az_result value indicating the result of the operation:
+ *         - #AZ_OK if successful
+ *         - #AZ_ERROR_PARSER_UNEXPECTED_CHAR if a non-ASCII digit or an invalid character is found
+ * within the span
+ */
+AZ_NODISCARD az_result az_span_atod(az_span source, double* out_number);
 
 /**
  * @brief Converts an int32 into its digit characters and copies them to the \p destination #az_span
@@ -380,6 +413,33 @@ AZ_NODISCARD az_result az_span_i64toa(az_span destination, int64_t source, az_sp
  * copied bytes
  */
 AZ_NODISCARD az_result az_span_u64toa(az_span destination, uint64_t source, az_span* out_span);
+
+/**
+ * @brief Converts a double into its digit characters and copies them to the \p destination #az_span
+ * starting at its 0-th index.
+ *
+ * @param[in] destination The #az_span where the bytes should be copied to.
+ * @param[in] source The double whose number is copied to the \p destination #az_span as ASCII
+ * digits and characters.
+ * @param[in] fractional_digits The number of digits to write into the \p destination #az_span after
+ * the decimal point and truncate the rest.
+ * @param[out] out_span A pointer to an #az_span that receives the remainder of the \p destination
+ * #az_span after the double has been copied.
+ * @return An #az_result value indicating the result of the operation:
+ *         - #AZ_OK if successful
+ *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the \p destination is not big enough to contain the
+ * copied bytes
+ *         - #AZ_ERROR_NOT_SUPPORTED if the \p source contains an integer component that is too
+ * large and would overflow beyond 2^53 - 1.
+ *
+ * @remark Non-significant trailing zeros (after the decimal point) are not written, even if \p
+ * fractional_digits is large enough to allow the zero padding.
+ *
+ * @remark The \p fractional_digits must be between 0 and 15 (inclusive). Any value passed in that
+ * is larger will be clamped down to 15.
+ */
+AZ_NODISCARD az_result
+az_span_dtoa(az_span destination, double source, int32_t fractional_digits, az_span* out_span);
 
 /******************************  SPAN PAIR  */
 
