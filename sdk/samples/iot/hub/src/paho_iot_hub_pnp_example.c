@@ -529,7 +529,7 @@ static az_result parse_desired_temperature_property(az_span twin_span, double* p
     if (az_span_is_content_equal(desired_temp_property_name, tm.name))
     {
       AZ_RETURN_IF_FAILED(az_json_token_get_number(&tm.token, parsed_value));
-      return AZ_O;
+      return AZ_OK;
     }
 
     // else ignore token.
