@@ -114,8 +114,10 @@ AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1, az_span 
 
 // Disable the following warning just for this particular use case.
 // C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead.
+#ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4996)
+#endif
 
 // TODO: Fix whitespace scanning issue.
 void _az_span_ato_number_helper(az_span source, char* format, void* result, bool* success)
@@ -162,7 +164,9 @@ void _az_span_ato_number_helper(az_span source, char* format, void* result, bool
   errno = previous_err_no;
 }
 
+#ifdef _MSC_VER
 #pragma warning(pop)
+#endif
 
 AZ_NODISCARD az_result az_span_atou64(az_span source, uint64_t* out_number)
 {
@@ -589,7 +593,9 @@ az_span_dtoa(az_span destination, double source, int32_t fractional_digits, az_s
   {
     AZ_RETURN_IF_NOT_ENOUGH_SIZE(*out_span, 3);
 
-    if (source == -INFINITY)
+    // Check if source == -INFINITY, which is the only non-finite value that is less than 0, without
+    // using exact equality. Workaround for -Wfloat-equal.
+    if (source < 0)
     {
       AZ_RETURN_IF_NOT_ENOUGH_SIZE(*out_span, 4);
       *out_span = az_span_copy(*out_span, AZ_SPAN_FROM_STR("-inf"));
@@ -629,7 +635,7 @@ az_span_dtoa(az_span destination, double source, int32_t fractional_digits, az_s
 
   // Only print decimal digits if the user asked for at least one to be printed.
   // Or if the decimal part is non-zero.
-  if (fractional_digits <= 0 || after_decimal_part == 0)
+  if (fractional_digits <= 0 || after_decimal_part == 0.0)
   {
     return AZ_OK;
   }
