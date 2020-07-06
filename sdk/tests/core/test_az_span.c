@@ -403,9 +403,11 @@ static void az_span_atod_test(void** state)
   assert_true(value == 0.0001);
   assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("0.00102"), &value), AZ_OK);
   assert_true(value == 0.00102);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR(".34567"), &value), AZ_OK);
+  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("0.34567"), &value), AZ_OK);
   assert_true(value == .34567);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("-.34567"), &value), AZ_OK);
+  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("+0.34567"), &value), AZ_OK);
+  assert_true(value == .34567);
+  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("-0.34567"), &value), AZ_OK);
   assert_true(value == -.34567);
   assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("9876.54321"), &value), AZ_OK);
   assert_true(value == 9876.54321);
@@ -501,6 +503,143 @@ static void az_span_atod_test(void** state)
   assert_true(value == 1.7e308);
   assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("1.8e309"), &value), AZ_OK);
   assert_true(value == INFINITY);
+}
+
+static void az_span_ato_number_whitespace_or_invalid_not_allowed(void** state)
+{
+  (void)state;
+  int32_t value_i32 = 0;
+  uint32_t value_u32 = 0;
+  int64_t value_i64 = 0;
+  uint64_t value_u64 = 0;
+  double value_d = 0;
+
+  assert_int_equal(
+      az_span_atoi32(AZ_SPAN_FROM_STR("   123"), &value_i32), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atou32(AZ_SPAN_FROM_STR("   123"), &value_u32), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atoi64(AZ_SPAN_FROM_STR("   123"), &value_i64), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atou64(AZ_SPAN_FROM_STR("   123"), &value_u64), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atod(AZ_SPAN_FROM_STR("   123"), &value_d), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+
+  assert_int_equal(
+      az_span_atoi32(AZ_SPAN_FROM_STR("\n123"), &value_i32), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atou32(AZ_SPAN_FROM_STR("\n123"), &value_u32), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atoi64(AZ_SPAN_FROM_STR("\n123"), &value_i64), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atou64(AZ_SPAN_FROM_STR("\n123"), &value_u64), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atod(AZ_SPAN_FROM_STR("\n123"), &value_d), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+
+  assert_int_equal(
+      az_span_atoi32(AZ_SPAN_FROM_STR("a123"), &value_i32), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atou32(AZ_SPAN_FROM_STR("a123"), &value_u32), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atoi64(AZ_SPAN_FROM_STR("a123"), &value_i64), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atou64(AZ_SPAN_FROM_STR("a123"), &value_u64), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atod(AZ_SPAN_FROM_STR("a123"), &value_d), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+
+  assert_int_equal(
+      az_span_atoi32(AZ_SPAN_FROM_STR("- 123"), &value_i32), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atou32(AZ_SPAN_FROM_STR("- 123"), &value_u32), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atoi64(AZ_SPAN_FROM_STR("- 123"), &value_i64), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atou64(AZ_SPAN_FROM_STR("- 123"), &value_u64), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atod(AZ_SPAN_FROM_STR("- 123"), &value_d), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+
+  assert_int_equal(
+      az_span_atoi32(AZ_SPAN_FROM_STR("-\n123"), &value_i32), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atou32(AZ_SPAN_FROM_STR("-\n123"), &value_u32), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atoi64(AZ_SPAN_FROM_STR("-\n123"), &value_i64), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atou64(AZ_SPAN_FROM_STR("-\n123"), &value_u64), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atod(AZ_SPAN_FROM_STR("-\n123"), &value_d), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+}
+
+static void az_span_ato_number_no_out_of_bounds_reads(void** state)
+{
+  (void)state;
+  int32_t value_i32 = 0;
+  double value_d = 0;
+
+  az_span source = AZ_SPAN_FROM_STR("   123456");
+  // Makes sure we only read and parse up to the character '3', since that is the last character
+  // within the span slice
+  assert_int_equal(
+      az_span_atoi32(az_span_slice(source, 0, 6), &value_i32), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atod(az_span_slice(source, 0, 6), &value_d), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+
+  assert_int_equal(az_span_atoi32(az_span_slice(source, 3, 6), &value_i32), AZ_OK);
+  assert_int_equal(value_i32, 123);
+  assert_int_equal(az_span_atod(az_span_slice(source, 3, 6), &value_d), AZ_OK);
+  assert_int_equal(value_d, 123);
+
+  source = AZ_SPAN_FROM_STR("   123A");
+  // Makes sure we only read and parse up to the character '3', since that is the last character
+  // within the span slice
+  assert_int_equal(
+      az_span_atoi32(az_span_slice(source, 0, 6), &value_i32), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atod(az_span_slice(source, 0, 6), &value_d), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+
+  assert_int_equal(az_span_atoi32(az_span_slice(source, 3, 6), &value_i32), AZ_OK);
+  assert_int_equal(value_i32, 123);
+  assert_int_equal(az_span_atod(az_span_slice(source, 3, 6), &value_d), AZ_OK);
+  assert_int_equal(value_d, 123);
+
+  source = AZ_SPAN_FROM_STR("   123.");
+  // Makes sure we only read and parse up to the character '3', since that is the last character
+  // within the span slice
+  assert_int_equal(
+      az_span_atoi32(az_span_slice(source, 0, 6), &value_i32), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atod(az_span_slice(source, 0, 6), &value_d), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+
+  assert_int_equal(az_span_atoi32(az_span_slice(source, 3, 6), &value_i32), AZ_OK);
+  assert_int_equal(value_i32, 123);
+  assert_int_equal(az_span_atod(az_span_slice(source, 3, 6), &value_d), AZ_OK);
+  assert_int_equal(value_d, 123);
+
+  source = AZ_SPAN_FROM_STR("   123-");
+  assert_int_equal(
+      az_span_atoi32(az_span_slice(source, 0, 6), &value_i32), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atod(az_span_slice(source, 0, 6), &value_d), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+
+  assert_int_equal(az_span_atoi32(az_span_slice(source, 3, 6), &value_i32), AZ_OK);
+  assert_int_equal(value_i32, 123);
+  assert_int_equal(az_span_atod(az_span_slice(source, 3, 6), &value_d), AZ_OK);
+  assert_int_equal(value_d, 123);
+
+  source = AZ_SPAN_FROM_STR("   12-4");
+  assert_int_equal(
+      az_span_atoi32(az_span_slice(source, 0, 6), &value_i32), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atod(az_span_slice(source, 0, 6), &value_d), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+
+  assert_int_equal(
+      az_span_atoi32(az_span_slice(source, 3, 6), &value_i32), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atod(az_span_slice(source, 3, 6), &value_d), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+
+  source = AZ_SPAN_FROM_STR("n1");
+  assert_int_equal(az_span_atoi32(source, &value_i32), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(az_span_atod(source, &value_d), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
 }
 
 static void az_span_to_str_test(void** state)
@@ -1205,6 +1344,7 @@ static void az_span_dtoa_succeeds(void** state)
   az_span_dtoa_succeeds_helper(0.0001, 15, AZ_SPAN_FROM_STR("0.0001"));
   az_span_dtoa_succeeds_helper(0.00102, 15, AZ_SPAN_FROM_STR("0.00102"));
   az_span_dtoa_succeeds_helper(.34567, 15, AZ_SPAN_FROM_STR("0.34567"));
+  az_span_dtoa_succeeds_helper(+.34567, 15, AZ_SPAN_FROM_STR("0.34567"));
   az_span_dtoa_succeeds_helper(-.34567, 15, AZ_SPAN_FROM_STR("-0.34567"));
   az_span_dtoa_succeeds_helper(9876.54321, 15, AZ_SPAN_FROM_STR("9876.543209999999817"));
   az_span_dtoa_succeeds_helper(-9876.54321, 15, AZ_SPAN_FROM_STR("-9876.543209999999817"));
@@ -1274,6 +1414,7 @@ static void az_span_dtoa_succeeds(void** state)
   az_span_dtoa_succeeds_helper(0.0001, 2, AZ_SPAN_FROM_STR("0"));
   az_span_dtoa_succeeds_helper(0.00102, 2, AZ_SPAN_FROM_STR("0"));
   az_span_dtoa_succeeds_helper(.34567, 2, AZ_SPAN_FROM_STR("0.34"));
+  az_span_dtoa_succeeds_helper(+.34567, 2, AZ_SPAN_FROM_STR("0.34"));
   az_span_dtoa_succeeds_helper(-.34567, 2, AZ_SPAN_FROM_STR("-0.34"));
   az_span_dtoa_succeeds_helper(9876.54321, 2, AZ_SPAN_FROM_STR("9876.54"));
   az_span_dtoa_succeeds_helper(-9876.54321, 2, AZ_SPAN_FROM_STR("-9876.54"));
@@ -1759,6 +1900,8 @@ int test_az_span()
     cmocka_unit_test(az_span_atou64_test),
     cmocka_unit_test(az_span_atoi64_test),
     cmocka_unit_test(az_span_atod_test),
+    cmocka_unit_test(az_span_ato_number_whitespace_or_invalid_not_allowed),
+    cmocka_unit_test(az_span_ato_number_no_out_of_bounds_reads),
     cmocka_unit_test(az_span_i64toa_negative_number_test),
     cmocka_unit_test(az_span_i64toa_test),
     cmocka_unit_test(az_span_test_macro_only_allows_byte_buffers),

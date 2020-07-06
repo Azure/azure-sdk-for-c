@@ -119,12 +119,28 @@ AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1, az_span 
 #pragma warning(disable : 4996)
 #endif
 
-// TODO: Fix whitespace scanning issue.
-void _az_span_ato_number_helper(az_span source, char* format, void* result, bool* success)
+static bool _is_valid_start_of_number(uint8_t first_byte)
+{
+  // ".123" or "  123" are considered invalid
+  // 'n'/'N' is for "nan" and 'i'/'I' is for "inf"
+  return isdigit(first_byte) || first_byte == '-' || first_byte == '+' || first_byte == 'n'
+      || first_byte == 'N' || first_byte == 'i' || first_byte == 'I';
+}
+
+static void _az_span_ato_number_helper(az_span source, char* format, void* result, bool* success)
 {
   int32_t size = az_span_size(source);
 
   _az_PRECONDITION_RANGE(1, size, 99);
+
+  // This check is necessary to prevent sscanf from reading bytes past the end of the span, when the
+  // span might contain whitespace or other invalid bytes at the start.
+  uint8_t* source_ptr = az_span_ptr(source);
+  if (size < 1 || !_is_valid_start_of_number(source_ptr[0]))
+  {
+    *success = false;
+    return;
+  }
 
   // Starting at 1 to skip the '%' character
   format[1] = (char)((size / 10) + '0');
@@ -135,7 +151,7 @@ void _az_span_ato_number_helper(az_span source, char* format, void* result, bool
   // sscanf might set errno, so save it to restore later.
   int32_t previous_err_no = errno;
 
-  int32_t n = sscanf((char*)az_span_ptr(source), format, result, &chars_consumed);
+  int32_t n = sscanf((char*)source_ptr, format, result, &chars_consumed);
 
   if (success != NULL)
   {
@@ -618,7 +634,7 @@ az_span_dtoa(az_span destination, double source, int32_t fractional_digits, az_s
 
   // Only print decimal digits if the user asked for at least one to be printed.
   // Or if the decimal part is non-zero.
-  if (fractional_digits <= 0 || after_decimal_part == 0.0)
+  if (fractional_digits <= 0)
   {
     return AZ_OK;
   }
