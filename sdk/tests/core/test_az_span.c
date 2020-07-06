@@ -534,8 +534,16 @@ static void az_span_atod_test(void** state)
   assert_true(value == -1e300);
   assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("1.7e308"), &value), AZ_OK);
   assert_true(value == 1.7e308);
+
+  // https://github.com/Azure/azure-sdk-for-c/issues/893
+  // The result of this depends on the compiler.
+#ifdef _MSC_VER
   assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("1.8e309"), &value), AZ_OK);
   assert_true(value == INFINITY);
+#else
+  assert_int_equal(
+      az_span_atod(AZ_SPAN_FROM_STR("1.8e309"), &value), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+#endif // _MSC_VER
 }
 
 #ifdef __GNUC__
