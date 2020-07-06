@@ -484,25 +484,13 @@ static int send_command_response(
     }
   }
   putchar('\n');
-
+  
   // Send the commands response
-  if ((rc = MQTTClient_publish(
-           mqtt_client,
-           commands_response_topic,
-           az_span_size(response),
-           az_span_ptr(response),
-           0,
-           0,
-           NULL))
-      != MQTTCLIENT_SUCCESS)
-  {
-    printf("Failed to send command response, return code %d\n", rc);
-    return rc;
-  }
+  rc = mqtt_publish_message(commands_response_topic, response, 0);
 
   printf("Sent response\n");
 
-  return 0;
+  return rc;
 }
 
 // Build the JSON payload for the reported property
@@ -548,19 +536,8 @@ static int send_reported_temperature_property(double desired_temp)
   printf("Payload: %.*s\n", az_span_size(json_payload), (char*)az_span_ptr(json_payload));
 
   // Publish the reported property payload to IoT Hub
-  if ((rc = MQTTClient_publish(
-           mqtt_client,
-           reported_property_topic,
-           az_span_size(json_payload),
-           az_span_ptr(json_payload),
-           0,
-           0,
-           NULL))
-      != MQTTCLIENT_SUCCESS)
-  {
-    printf("Failed to publish reported property, return code %d\n", rc);
-    return rc;
-  }
+  rc = mqtt_publish_message(reported_property_topic, json_payload, 0);
+
   return rc;
 }
 
@@ -843,27 +820,10 @@ static int send_telemetry_message()
   (void)result;
 
   printf("Sending Telemetry Message\n");
-  mqtt_publish_message(telemetry_topic, json_payload, 1);
+  rc = mqtt_publish_message(telemetry_topic, json_payload, 0);
 
-  // if ((rc = MQTTClient_publish(
-  //          mqtt_client,
-  //          telemetry_topic,
-  //          (int)az_span_size(json_payload),
-  //          az_span_ptr(json_payload),
-  //          0,
-  //          0,
-  //          NULL))
-  //     != MQTTCLIENT_SUCCESS)
-  // {
-  //   printf("Failed to publish telemetry message %d, return code %d\n", i + 1, rc);
-  //   return rc;
-  // }
   // New line to separate messages on the console
   putchar('\n');
-  //  for (int i = 0; i < NUMBER_OF_MESSAGES; ++i)
-  // {
-  //   sleep_for_seconds(TELEMETRY_SEND_INTERVAL);
-  // }
   return rc;
 }
 
