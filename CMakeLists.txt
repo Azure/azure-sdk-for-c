@@ -81,7 +81,6 @@ add_subdirectory(sdk/src/azure/platform)
 
 # User can disable samples generation by setting env variable AZ_SDK_C_NO_SAMPLES
 if(NOT DEFINED ENV{AZ_SDK_C_NO_SAMPLES})
-  add_subdirectory(sdk/samples/keyvault/keyvault)
   add_subdirectory(sdk/samples/storage/blobs)
   if(TRANSPORT_PAHO)
     add_subdirectory(sdk/samples/iot/provisioning)
