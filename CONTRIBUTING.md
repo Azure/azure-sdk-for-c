@@ -71,8 +71,8 @@ There are manay ways that you can contribute to the Azure SDK for Embedded C pro
 - C compiler: [MSVC](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2019), [gcc](https://gcc.gnu.org/) or [clang](https://clang.llvm.org/) are recommended
 - [git](https://git-scm.com/downloads) to clone our Azure SDK repository with the desired tag
 - [cmocka](https://cmocka.org/) for building and running unit tests. By default, building unit tests is disabled, so, unless you want to add unit tests or run then, you don't need to install this. See how `vcpkg` can be used to install dependencies [here][vcpkg].
-- [libcurl](https://curl.haxx.se/download.html) which is used as an http stack, and is required for building and running service samples (keyvault and storage). You don't need to install libcurl if you are not building samples, or if you will provide another HTTP stack implementation. The minimum required version of libcurl is 7.1.
-> Note: Using libcurl requires a global init and clean up that needs to happen in application code. Take a look into Azure SDK Storage and Keyvault samples for how global init is done before sending http requests to Azure. See more info in Running Samples section.
+- [libcurl](https://curl.haxx.se/download.html) which is used as an http stack, and is required for building and running service samples (storage). You don't need to install libcurl if you are not building samples, or if you will provide another HTTP stack implementation. The minimum required version of libcurl is 7.1.
+> Note: Using libcurl requires a global init and clean up that needs to happen in application code. Take a look into Azure SDK Storage samples for how global init is done before sending http requests to Azure. See more info in Running Samples section.
 
 See how `vcpkg` can be used to install dependencies [here][vcpkg].
 - [doxygen](http://www.doxygen.nl/download.html) if you need to generate and view documentation.
@@ -152,7 +152,6 @@ make ${project_name}_cov_xml //i.e. az_core_cov_xml or az_iot_cov_xml
 ## Code Coverage is available for these projects:
 #  az_core
 #  az_iot
-#  az_keyvault
 #  az_storage_blobs
 
 > Note: If `make` fails with "project not found" it's likely you are not using `gcc`. Use `sudo update-alternatives --config c+++` and `sudo update-alternatives --config cc` to switch to gcc.

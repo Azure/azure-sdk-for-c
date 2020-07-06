@@ -285,12 +285,12 @@ static int connect_device()
   mqtt_connect_options.cleansession = false;
   mqtt_connect_options.keepAliveInterval = AZ_IOT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS;
 
-  // Get the MQTT user name used to connect to IoT Hub
+  // Get the MQTT username used to connect to IoT Hub
   if (az_failed(
           rc
           = az_iot_hub_client_get_user_name(&client, mqtt_username, sizeof(mqtt_username), NULL)))
   {
-    printf("Failed to get MQTT client id, az_result return code %04x\n", rc);
+    printf("Failed to get MQTT username, az_result return code %04x\n", rc);
     return rc;
   }
 
@@ -380,7 +380,7 @@ static int on_received(void* context, char* topicName, int topicLen, MQTTClient_
         {
           printf("Received payload:\n%.*s\n", message->payloadlen, (char*)message->payload);
         }
-        printf("Response status was %d.\n", twin_response.status);
+        printf("Response status is %d.\n", twin_response.status);
         break;
 
       // Type: A service response to a twin reported properties publish message.
@@ -396,7 +396,7 @@ static int on_received(void* context, char* topicName, int topicLen, MQTTClient_
           // Status will be 204 upon success.
           printf("Success. No payload.\n");
         }
-        printf("Response status was %d.\n", twin_response.status);
+        printf("Response status is %d.\n", twin_response.status);
         break;
 
       // Type: A service update to twin desired properties.
@@ -407,7 +407,7 @@ static int on_received(void* context, char* topicName, int topicLen, MQTTClient_
         {
           printf("Received payload:\n%.*s\n", message->payloadlen, (char*)message->payload);
         }
-        printf("Response status was %d.\n", twin_response.status);
+        printf("Response status is %d.\n", twin_response.status);
 
         // Device will update property locally and report that property to service.
         az_span payload_span = az_span_init((uint8_t*)message->payload, message->payloadlen);

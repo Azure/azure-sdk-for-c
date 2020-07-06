@@ -244,12 +244,12 @@ static int connect_device()
   mqtt_connect_options.cleansession = false;
   mqtt_connect_options.keepAliveInterval = AZ_IOT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS;
 
-  // Get the MQTT user name used to connect to IoT Hub
+  // Get the MQTT username used to connect to IoT Hub
   if (az_failed(
           rc
           = az_iot_hub_client_get_user_name(&client, mqtt_username, sizeof(mqtt_username), NULL)))
   {
-    printf("Failed to get MQTT clientId, az_result return code %04x\n", rc);
+    printf("Failed to get MQTT username, az_result return code %04x\n", rc);
     return rc;
   }
 

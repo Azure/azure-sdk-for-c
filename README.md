@@ -30,6 +30,7 @@ With this in mind, there are many tenets or principles that we follow in order t
   - [Getting Started Using the SDK](#getting-started-using-the-sdk)
     - [CMake](#cmake)
     - [CMake Options](#cmake-options)
+    - [VSCode](#vscode)
     - [Source Files (IDE, command line, etc)](#source-files-ide-command-line-etc)
   - [Running Samples](#running-samples)
     - [Libcurl Global Init and Global Clean Up](#libcurl-global-init-and-global-clean-up)
@@ -200,6 +201,14 @@ The following CMake options are available for adding/removing project features.
 
       i.e. cmake -DTRANSPORT_CURL=ON ..
 
+### VSCode
+
+For convenience, you can quickly get started using [VSCode](https://code.visualstudio.com/) and the [CMake Extension by Microsoft](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools&ssr=false#overview). Included in the repo is a `settings.json` file [here](https://github.com/Azure/azure-sdk-for-c/blob/master/.vscode/settings.json) which the extension will use to configure a CMake project. With this, you can run and debug samples and tests. Modify the variables in the file to your liking or as instructed by sample documentation and then select the following button in the extension:
+
+![VSCode CMake Config](./sdk/docs/resources/vscode_cmake_config.png)
+
+From there you can select targets to build and debug.
+
 ### Source Files (IDE, command line, etc)
 
 We have set up the repo for easy integration into other projects which don't use CMake. Two main features make this possible:
@@ -232,12 +241,6 @@ After building samples with HTTP stack, set the environment variables for creden
 ```bash
 # On linux, set env var like this. For Windows, do it from advanced settings/ env variables
 
-# KEY-VAULT Sample
-export AZURE_TENANT_ID="????????-????-????-????-????????????"
-export AZURE_CLIENT_ID="????????-????-????-????-????????????"
-export AZURE_CLIENT_SECRET="????????????"
-export AZURE_KEYVAULT_URL="https://???????????.??"
-
 # STORAGE Sample (only 1 env var required)
 # URL must contain a valid container, blob and SaS token
 # e.g "https://storageAccount.blob.core.windows.net/container/blob?sv=xxx&ss=xx&srt=xx&sp=xx&se=xx&st=xxx&spr=https,http&sig=xxx"
@@ -246,7 +249,7 @@ export AZURE_STORAGE_URL="https://??????????????"
 
 ### Libcurl Global Init and Global Clean Up
 
-When you select to build the libcurl http stack implementation, you have to make sure to call `curl_global_init` before using SDK client like Storage or Keyvault to send HTTP request to Azure.
+When you select to build the libcurl http stack implementation, you have to make sure to call `curl_global_init` before using SDK client like Storage to send HTTP request to Azure.
 
 You need to also call `curl_global_cleanup` once you no longer need to perform SDk client API calls.
 
