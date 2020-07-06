@@ -655,7 +655,7 @@ static void handle_command_message(
     int rc;
     if ((rc = send_command_response(command_request, return_code, command_response_span)) != 0)
     {
-      printf("Unable to send %d response, status %d\n", return_code, rc);
+      printf("Unable to send %u response, status %d\n", return_code, rc);
     }
   }
   else
