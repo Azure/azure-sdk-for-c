@@ -311,6 +311,18 @@ static void az_span_atoi64_test(void** state)
       AZ_ERROR_PARSER_UNEXPECTED_CHAR);
 }
 
+// Disable warning for float comparisons, for this particular test
+// error : comparing floating point with == or != is unsafe[-Werror = float - equal]
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal"
+#endif // __GNUC__
+
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wfloat-equal"
+#endif // __clang__
+
 static void az_span_atod_test(void** state)
 {
   (void)state;
@@ -525,6 +537,14 @@ static void az_span_atod_test(void** state)
   assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("1.8e309"), &value), AZ_OK);
   assert_true(value == INFINITY);
 }
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif // __GNUC__
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif // __clang__
 
 static void az_span_ato_number_whitespace_or_invalid_not_allowed(void** state)
 {
@@ -1317,7 +1337,7 @@ static void az_span_u32toa_overflow_fails(void** state)
     assert_true(az_succeeded(az_span_dtoa(buffer, v, fractional_digits, &out_span))); \
     double round_trip = 0; \
     assert_true(az_succeeded(az_span_atod(output, &round_trip))); \
-    if (isfinite(v)) \
+    if (isfinite((double)v)) \
     { \
       assert_true(fabs(v - round_trip) < 0.01); \
     } \

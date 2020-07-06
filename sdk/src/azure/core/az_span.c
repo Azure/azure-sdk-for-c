@@ -160,8 +160,7 @@ static void _az_span_ato_number_helper(az_span source, char* format, void* resul
     *success = size == chars_consumed && n == 1 && errno == 0;
   }
 
-  // Restore errno back to its original value before the call to sscanf changed potentially changed
-  // it.
+  // Restore errno back to its original value before the call to sscanf potentially changed it.
   errno = previous_err_no;
 }
 
