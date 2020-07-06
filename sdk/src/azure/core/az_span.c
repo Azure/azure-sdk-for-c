@@ -118,8 +118,11 @@ AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1, az_span 
 #pragma warning(disable : 4996)
 
 // TODO: Fix whitespace scanning issue.
-void _az_span_atonumber_helper(az_span source, char* format, void* result, bool* success)
+void _az_span_ato_number_helper(az_span source, char* format, void* result, bool* success)
 {
+  char temp_output[100] = { 0 };
+  az_span_to_str(temp_output, 100, source);
+  printf("_az_span_ato_number_helper: %s\n", temp_output);
   int32_t size = az_span_size(source);
 
   _az_PRECONDITION_RANGE(1, size, 99);
@@ -135,11 +138,23 @@ void _az_span_atonumber_helper(az_span source, char* format, void* result, bool*
 
   int32_t n = sscanf((char*)az_span_ptr(source), format, result, &chars_consumed);
 
+  int32_t current_err_no = errno;
+
+  if (current_err_no != 0)
+  {
+    printf(
+        "prev_err=%d, curr_err=%d, n=%d, cons=%d\n",
+        previous_err_no,
+        current_err_no,
+        n,
+        chars_consumed);
+  }
+
   if (success != NULL)
   {
     // True if the entire source was consumed by sscanf, it set the result argument, and it didn't
     // set errno to some non-zero value.
-    *success = size == chars_consumed && n == 1 && errno == 0;
+    *success = (size == chars_consumed && n == 1 && current_err_no == 0);
   }
 
   // Restore errno back to its original value before the call to sscanf changed potentially changed
@@ -154,10 +169,10 @@ AZ_NODISCARD az_result az_span_atou64(az_span source, uint64_t* out_number)
   _az_PRECONDITION_VALID_SPAN(source, 1, false);
   _az_PRECONDITION_NOT_NULL(out_number);
 
-  // Stack based string to allow thread-safe mutation by _az_span_atox
+  // Stack based string to allow thread-safe mutation by _az_span_ato_number_helper
   char format_template[8] = "%00lu%n";
   bool success = false;
-  _az_span_atonumber_helper(source, format_template, out_number, &success);
+  _az_span_ato_number_helper(source, format_template, out_number, &success);
 
   return success ? AZ_OK : AZ_ERROR_PARSER_UNEXPECTED_CHAR;
 }
@@ -167,10 +182,10 @@ AZ_NODISCARD az_result az_span_atou32(az_span source, uint32_t* out_number)
   _az_PRECONDITION_VALID_SPAN(source, 1, false);
   _az_PRECONDITION_NOT_NULL(out_number);
 
-  // Stack based string to allow thread-safe mutation by _az_span_atox
+  // Stack based string to allow thread-safe mutation by _az_span_ato_number_helper
   char format_template[7] = "%00u%n";
   bool success = false;
-  _az_span_atonumber_helper(source, format_template, out_number, &success);
+  _az_span_ato_number_helper(source, format_template, out_number, &success);
 
   return success ? AZ_OK : AZ_ERROR_PARSER_UNEXPECTED_CHAR;
 }
@@ -180,24 +195,26 @@ AZ_NODISCARD az_result az_span_atoi64(az_span source, int64_t* out_number)
   _az_PRECONDITION_VALID_SPAN(source, 1, false);
   _az_PRECONDITION_NOT_NULL(out_number);
 
-  // Stack based string to allow thread-safe mutation by _az_span_atox
+  // Stack based string to allow thread-safe mutation by _az_span_ato_number_helper
   char format_template[8] = "%00ld%n";
   bool success = false;
-  _az_span_atonumber_helper(source, format_template, out_number, &success);
+  _az_span_ato_number_helper(source, format_template, out_number, &success);
 
   return success ? AZ_OK : AZ_ERROR_PARSER_UNEXPECTED_CHAR;
 }
 
 AZ_NODISCARD az_result az_span_atoi32(az_span source, int32_t* out_number)
 {
+  printf("az_span_atoi32\n");
   _az_PRECONDITION_VALID_SPAN(source, 1, false);
   _az_PRECONDITION_NOT_NULL(out_number);
 
-  // Stack based string to allow thread-safe mutation by _az_span_atox
+  // Stack based string to allow thread-safe mutation by _az_span_ato_number_helper
   char format_template[7] = "%00d%n";
   bool success = false;
-  _az_span_atonumber_helper(source, format_template, out_number, &success);
+  _az_span_ato_number_helper(source, format_template, out_number, &success);
 
+  printf("Success: %d,  number: %d\n", success, *out_number);
   return success ? AZ_OK : AZ_ERROR_PARSER_UNEXPECTED_CHAR;
 }
 
@@ -206,10 +223,10 @@ AZ_NODISCARD az_result az_span_atod(az_span source, double* out_number)
   _az_PRECONDITION_VALID_SPAN(source, 1, false);
   _az_PRECONDITION_NOT_NULL(out_number);
 
-  // Stack based string to allow thread-safe mutation by _az_span_atox
+  // Stack based string to allow thread-safe mutation by _az_span_ato_number_helper
   char format_template[8] = "%00lf%n";
   bool success = false;
-  _az_span_atonumber_helper(source, format_template, out_number, &success);
+  _az_span_ato_number_helper(source, format_template, out_number, &success);
 
   return success ? AZ_OK : AZ_ERROR_PARSER_UNEXPECTED_CHAR;
 }

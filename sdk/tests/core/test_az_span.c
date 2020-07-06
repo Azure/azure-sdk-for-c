@@ -14,6 +14,7 @@
 #include <math.h>
 #include <setjmp.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #include <cmocka.h>
 
@@ -222,6 +223,10 @@ static void az_span_atoi32_test(void** state)
 {
   (void)state;
   int32_t value = 0;
+
+  printf("az_span_atoi32_test: %d\n", value);
+
+  printf("RESULT for \"0\": %d\n", az_span_atoi32(AZ_SPAN_FROM_STR("0"), &value));
 
   assert_return_code(az_span_atoi32(AZ_SPAN_FROM_STR("0"), &value), AZ_OK);
   assert_int_equal(value, 0);
