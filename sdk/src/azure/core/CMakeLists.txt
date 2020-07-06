@@ -61,7 +61,8 @@ add_library (
   ${CMAKE_CURRENT_LIST_DIR}/az_log.c
   ${CMAKE_CURRENT_LIST_DIR}/az_precondition.c
   ${CMAKE_CURRENT_LIST_DIR}/az_span.c
-  ${CMAKE_CURRENT_LIST_DIR}/az_spinlock.c)
+  ${CMAKE_CURRENT_LIST_DIR}/az_spinlock.c
+  ${az_SOURCE_DIR}/sdk/http_adapters/_template/az_http_adapter.c)
 
 target_include_directories (${TARGET_NAME}
   PUBLIC
@@ -69,15 +70,14 @@ target_include_directories (${TARGET_NAME}
   $<INSTALL_INTERFACE:include/${TARGET_NAME}>
 )
 
-# include test internal headers
+target_include_directories (${TARGET_NAME}
+  PUBLIC
+  $<BUILD_INTERFACE:${az_SOURCE_DIR}/sdk/ports/${PORTS_INCLUDE_DIR}>
+)
+
 target_include_directories(${TARGET_NAME}
   PUBLIC
     $<BUILD_INTERFACE:${az_SOURCE_DIR}/sdk/tests/core/inc>
-)
-
-target_link_libraries(${TARGET_NAME}
-  PUBLIC
-    ${PAL}
 )
 
 # make sure that users can consume the project as a library.
