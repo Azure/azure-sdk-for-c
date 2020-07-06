@@ -94,6 +94,8 @@ AZ_NODISCARD static az_result _az_parse_json_payload(
   bool found_expires_in = false;
   bool found_access_token = false;
 
+  AZ_RETURN_IF_FAILED(az_json_parser_move_to_next_token(&jp));
+
   while (jp.token.kind != AZ_JSON_TOKEN_END_OBJECT)
   {
     if (az_json_token_is_text_equal(&jp.token, AZ_SPAN_FROM_STR("expires_in")))
