@@ -243,8 +243,7 @@ static void az_span_atoi32_test(void** state)
   assert_return_code(az_span_atoi32(AZ_SPAN_FROM_STR("-4294967296"), &value), AZ_OK);
   assert_int_equal(value, 4294967295 - 4294967296 + 1);
   assert_return_code(az_span_atoi32(AZ_SPAN_FROM_STR("9223372036854775807"), &value), AZ_OK);
-  assert_int_equal(value, 18446744073709551615);
-  // Compier warning
+  // assert_int_equal(value, 18446744073709551615);// Compier warning
 }
 
 static void az_span_atou64_test(void** state)
