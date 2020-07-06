@@ -74,10 +74,9 @@ target_include_directories (${TARGET_NAME}
 
 target_include_directories (${TARGET_NAME}
   PUBLIC
-  $<BUILD_INTERFACE:${az_SOURCE_DIR}/sdk/ports/${PORTS_INCUDE_DIR}>
+  $<BUILD_INTERFACE:${az_SOURCE_DIR}/sdk/ports/${PORTS_INCLUDE_DIR}>
 )
 
-# include test internal headers
 target_include_directories(${TARGET_NAME}
   PUBLIC
     $<BUILD_INTERFACE:${az_SOURCE_DIR}/sdk/tests/core/inc>

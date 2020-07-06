@@ -9,28 +9,32 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include <azure/core/_az_cfg_prefix.h>
+#include <azure/core/_az_cfg.h>
 
 /**
  * @brief Gets the platform clock in milliseconds.
- * @remark The moment of time where clock starts is undefined, but if this function is getting
- * called twice with one second interval, the difference between the values returned should be equal
- * to 1000.
  * @return Platform clock in milliseconds.
  */
 inline AZ_NODISCARD int64_t az_platform_clock_msec() { 
-    #error "go see the docs"
+    // The method must be implemented
+    // The Azure SDK for Embedded C provides default implementations for Win32, Linux and Mac.
+    //  https://github.com/Azure/azure-sdk-for-c#cmake-options
+    #error "No method implementation provided, see documentation for additional details.  https://github.com/Azure/azure-sdk-for-c#cmake-options"
     return 0; 
 }
 
 /**
  * @brief Tells the platform to sleep for a given number of milliseconds.
  * @param milliseconds Number of milliseconds to sleep.
- * @remarks The behavior is undefined when \p milliseconds is a non-positive value (0 or less than
- * 0).
+ *        0 - Yield remainder of time slice and resume immediately
+ *       -1 - Sleep should not time out.
+ * @remarks Negative values (excluding -1) have undefined behavior
  */
 inline void az_platform_sleep_msec(int32_t milliseconds) { 
-    #error "go see the docs"
+    // The method must be implemented
+    // The Azure SDK for Embedded C provides default implementations for Win32, Linux and Mac.
+    //  https://github.com/Azure/azure-sdk-for-c#cmake-options
+    #error "No method implementation provided, see documentation for additional details.  https://github.com/Azure/azure-sdk-for-c#cmake-options"
     return;  
 }
 
@@ -40,7 +44,7 @@ inline void az_platform_sleep_msec(int32_t milliseconds) {
  *
  * @param obj A pointer to a pointer that needs to be changed.
  * @param expected An expected value of a value that \p obj is pointing to, prior to exchange.
- * @param desired A value to assign to the value that is pointed by \p obj, if its value equals to
+ * @param desired A value to assign to the value that is pointed by \p obj, if its value is equal to
  * \p expected.
  *
  * @return `true` if previous value of \p obj matches the \p expected.
@@ -53,10 +57,11 @@ inline AZ_NODISCARD bool az_platform_atomic_compare_exchange(
     uintptr_t expected,
     uintptr_t desired)
 {
-    #error "go see the docs"
+    // The method must be implemented
+    // The Azure SDK for Embedded C provides default implementations for Win32, Linux and Mac.
+    //  https://github.com/Azure/azure-sdk-for-c#cmake-options
+    #error "No method implementation provided, see documentation for additional details.  https://github.com/Azure/azure-sdk-for-c#cmake-options"
   return false;
 }
 
-#include <azure/core/_az_cfg_suffix.h>
-
-#endif
+#endif //__az_PLATFORM_IMPL_H
