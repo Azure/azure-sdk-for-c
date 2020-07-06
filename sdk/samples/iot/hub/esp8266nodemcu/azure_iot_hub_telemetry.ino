@@ -92,7 +92,7 @@ void receivedCallback(char* topic, byte* payload, unsigned int length)
   Serial.print("Received [");
   Serial.print(topic);
   Serial.print("]: ");
-  for (int i = 0; i < length; i++)
+  for (int i = 0; i <= length; i++)
   {
     Serial.print((char)payload[i]);
   }
@@ -281,4 +281,6 @@ void loop()
 
     next_telemetry_send_time_ms = millis() + TELEMETRY_FREQUENCY_MILLISECS;
   }
+  
+  mqtt_client.loop();
 }
