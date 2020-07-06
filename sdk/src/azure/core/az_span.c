@@ -635,7 +635,7 @@ az_span_dtoa(az_span destination, double source, int32_t fractional_digits, az_s
 
   // Only print decimal digits if the user asked for at least one to be printed.
   // Or if the decimal part is non-zero.
-  if (fractional_digits <= 0 || after_decimal_part == 0.0)
+  if (fractional_digits <= 0)
   {
     return AZ_OK;
   }
