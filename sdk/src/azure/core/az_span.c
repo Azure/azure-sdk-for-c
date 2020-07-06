@@ -112,13 +112,6 @@ AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1, az_span 
   return true;
 }
 
-// Disable the following warning just for this particular use case.
-// C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead.
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4996)
-#endif
-
 static bool _is_valid_start_of_number(uint8_t first_byte)
 {
   // ".123" or "  123" are considered invalid
@@ -126,6 +119,13 @@ static bool _is_valid_start_of_number(uint8_t first_byte)
   return isdigit(first_byte) || first_byte == '-' || first_byte == '+' || first_byte == 'n'
       || first_byte == 'N' || first_byte == 'i' || first_byte == 'I';
 }
+
+// Disable the following warning just for this particular use case.
+// C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead.
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4996)
+#endif
 
 static void _az_span_ato_number_helper(az_span source, char* format, void* result, bool* success)
 {
@@ -146,11 +146,11 @@ static void _az_span_ato_number_helper(az_span source, char* format, void* resul
   format[1] = (char)((size / 10) + '0');
   format[2] = (char)((size % 10) + '0');
 
-  int32_t chars_consumed = 0;
-
   // sscanf might set errno, so save it to restore later.
   int32_t previous_err_no = errno;
+  errno = 0;
 
+  int32_t chars_consumed = 0;
   int32_t n = sscanf((char*)source_ptr, format, result, &chars_consumed);
 
   if (success != NULL)
@@ -175,7 +175,7 @@ AZ_NODISCARD az_result az_span_atou64(az_span source, uint64_t* out_number)
   _az_PRECONDITION_NOT_NULL(out_number);
 
   // Stack based string to allow thread-safe mutation by _az_span_ato_number_helper
-  char format_template[8] = "%00lu%n";
+  char format_template[9] = "%00llu%n";
   bool success = false;
   _az_span_ato_number_helper(source, format_template, out_number, &success);
 
@@ -187,12 +187,22 @@ AZ_NODISCARD az_result az_span_atou32(az_span source, uint32_t* out_number)
   _az_PRECONDITION_VALID_SPAN(source, 1, false);
   _az_PRECONDITION_NOT_NULL(out_number);
 
-  // Stack based string to allow thread-safe mutation by _az_span_ato_number_helper
-  char format_template[7] = "%00u%n";
-  bool success = false;
-  _az_span_ato_number_helper(source, format_template, out_number, &success);
+  uint64_t placeholder = 0;
 
-  return success ? AZ_OK : AZ_ERROR_PARSER_UNEXPECTED_CHAR;
+  // Stack based string to allow thread-safe mutation by _az_span_ato_number_helper
+  // Using a format string for uint64_t to properly validate values that are out-of-range for
+  // uint32_t.
+  char format_template[9] = "%00llu%n";
+  bool success = false;
+  _az_span_ato_number_helper(source, format_template, &placeholder, &success);
+
+  if (placeholder > UINT32_MAX || !success)
+  {
+    return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
+  }
+
+  *out_number = (uint32_t)placeholder;
+  return AZ_OK;
 }
 
 AZ_NODISCARD az_result az_span_atoi64(az_span source, int64_t* out_number)
@@ -201,7 +211,7 @@ AZ_NODISCARD az_result az_span_atoi64(az_span source, int64_t* out_number)
   _az_PRECONDITION_NOT_NULL(out_number);
 
   // Stack based string to allow thread-safe mutation by _az_span_ato_number_helper
-  char format_template[8] = "%00ld%n";
+  char format_template[9] = "%00lld%n";
   bool success = false;
   _az_span_ato_number_helper(source, format_template, out_number, &success);
 
@@ -213,12 +223,22 @@ AZ_NODISCARD az_result az_span_atoi32(az_span source, int32_t* out_number)
   _az_PRECONDITION_VALID_SPAN(source, 1, false);
   _az_PRECONDITION_NOT_NULL(out_number);
 
-  // Stack based string to allow thread-safe mutation by _az_span_ato_number_helper
-  char format_template[7] = "%00d%n";
-  bool success = false;
-  _az_span_ato_number_helper(source, format_template, out_number, &success);
+  int64_t placeholder = 0;
 
-  return success ? AZ_OK : AZ_ERROR_PARSER_UNEXPECTED_CHAR;
+  // Stack based string to allow thread-safe mutation by _az_span_ato_number_helper
+  // Using a format string for int64_t to properly validate values that are out-of-range for
+  // int32_t.
+  char format_template[9] = "%00lld%n";
+  bool success = false;
+  _az_span_ato_number_helper(source, format_template, &placeholder, &success);
+
+  if (placeholder > INT32_MAX || placeholder < INT32_MIN || !success)
+  {
+    return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
+  }
+
+  *out_number = (int32_t)placeholder;
+  return AZ_OK;
 }
 
 AZ_NODISCARD az_result az_span_atod(az_span source, double* out_number)

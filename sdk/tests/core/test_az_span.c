@@ -189,33 +189,36 @@ static void az_span_atou32_test(void** state)
   (void)state;
   uint32_t value = 0;
 
-  assert_return_code(az_span_atou32(AZ_SPAN_FROM_STR("0"), &value), AZ_OK);
+  assert_int_equal(az_span_atou32(AZ_SPAN_FROM_STR("0"), &value), AZ_OK);
   assert_int_equal(value, 0);
-  assert_return_code(az_span_atou32(AZ_SPAN_FROM_STR("1024"), &value), AZ_OK);
+  assert_int_equal(az_span_atou32(AZ_SPAN_FROM_STR("1024"), &value), AZ_OK);
   assert_int_equal(value, 1024);
-  assert_return_code(az_span_atou32(AZ_SPAN_FROM_STR("2147483647"), &value), AZ_OK);
+  assert_int_equal(az_span_atou32(AZ_SPAN_FROM_STR("2147483647"), &value), AZ_OK);
   assert_int_equal(value, 2147483647);
-  assert_return_code(az_span_atou32(AZ_SPAN_FROM_STR("4294967295"), &value), AZ_OK);
+  assert_int_equal(az_span_atou32(AZ_SPAN_FROM_STR("4294967295"), &value), AZ_OK);
   assert_int_equal(value, 4294967295);
 
-  assert_return_code(az_span_atou32(AZ_SPAN_FROM_STR("-123"), &value), AZ_OK);
-  assert_int_equal(value, 4294967295 - 123 + 1);
-  assert_return_code(az_span_atou32(AZ_SPAN_FROM_STR("-2147483648"), &value), AZ_OK);
-  assert_int_equal(value, 4294967295 - 2147483648 + 1);
-  assert_return_code(az_span_atou32(AZ_SPAN_FROM_STR("-4294967295"), &value), AZ_OK);
-  assert_int_equal(value, 4294967295 - 4294967295 + 1);
-  assert_return_code(az_span_atou32(AZ_SPAN_FROM_STR("-4294967296"), &value), AZ_OK);
-  assert_int_equal(value, 4294967295 - 4294967296 + 1);
-  assert_return_code(az_span_atou32(AZ_SPAN_FROM_STR("4294967296"), &value), AZ_OK);
-  assert_int_equal(value, 4294967295 - 4294967296 + 1);
-  assert_return_code(az_span_atou32(AZ_SPAN_FROM_STR("42949672950"), &value), AZ_OK);
-  assert_int_equal(value, 4294967295 - 10 + 1);
-  assert_return_code(az_span_atou32(AZ_SPAN_FROM_STR("9223372036854775807"), &value), AZ_OK);
-  assert_int_equal(value, 4294967295);
-  assert_return_code(az_span_atou32(AZ_SPAN_FROM_STR("9223372036854775808"), &value), AZ_OK);
-  assert_int_equal(value, 0);
-  assert_return_code(az_span_atou32(AZ_SPAN_FROM_STR("18446744073709551615"), &value), AZ_OK);
-  assert_int_equal(value, 4294967295);
+  assert_int_equal(
+      az_span_atou32(AZ_SPAN_FROM_STR("-123"), &value), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atou32(AZ_SPAN_FROM_STR("-2147483648"), &value), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atou32(AZ_SPAN_FROM_STR("-4294967295"), &value), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atou32(AZ_SPAN_FROM_STR("-4294967296"), &value), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atou32(AZ_SPAN_FROM_STR("4294967296"), &value), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atou32(AZ_SPAN_FROM_STR("42949672950"), &value), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atou32(AZ_SPAN_FROM_STR("9223372036854775807"), &value),
+      AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atou32(AZ_SPAN_FROM_STR("9223372036854775808"), &value),
+      AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atou32(AZ_SPAN_FROM_STR("18446744073709551615"), &value),
+      AZ_ERROR_PARSER_UNEXPECTED_CHAR);
 }
 
 static void az_span_atoi32_test(void** state)
@@ -223,27 +226,28 @@ static void az_span_atoi32_test(void** state)
   (void)state;
   int32_t value = 0;
 
-  assert_return_code(az_span_atoi32(AZ_SPAN_FROM_STR("0"), &value), AZ_OK);
+  assert_int_equal(az_span_atoi32(AZ_SPAN_FROM_STR("0"), &value), AZ_OK);
   assert_int_equal(value, 0);
-  assert_return_code(az_span_atoi32(AZ_SPAN_FROM_STR("1024"), &value), AZ_OK);
+  assert_int_equal(az_span_atoi32(AZ_SPAN_FROM_STR("1024"), &value), AZ_OK);
   assert_int_equal(value, 1024);
-  assert_return_code(az_span_atoi32(AZ_SPAN_FROM_STR("-1024"), &value), AZ_OK);
+  assert_int_equal(az_span_atoi32(AZ_SPAN_FROM_STR("-1024"), &value), AZ_OK);
   assert_int_equal(value, -1024);
-  assert_return_code(az_span_atoi32(AZ_SPAN_FROM_STR("2147483647"), &value), AZ_OK);
+  assert_int_equal(az_span_atoi32(AZ_SPAN_FROM_STR("2147483647"), &value), AZ_OK);
   assert_int_equal(value, 2147483647);
-  assert_return_code(az_span_atoi32(AZ_SPAN_FROM_STR("-2147483648"), &value), AZ_OK);
+  assert_int_equal(az_span_atoi32(AZ_SPAN_FROM_STR("-2147483648"), &value), AZ_OK);
   assert_int_equal(value, -2147483647 - 1);
 
-  assert_return_code(az_span_atoi32(AZ_SPAN_FROM_STR("2147483648"), &value), AZ_OK);
-  assert_int_equal(value, -2147483647 - 1);
-  assert_return_code(az_span_atoi32(AZ_SPAN_FROM_STR("-2147483649"), &value), AZ_OK);
-  assert_int_equal(value, 2147483647);
-  assert_return_code(az_span_atoi32(AZ_SPAN_FROM_STR("-4294967295"), &value), AZ_OK);
-  assert_int_equal(value, 4294967295 - 4294967295 + 1);
-  assert_return_code(az_span_atoi32(AZ_SPAN_FROM_STR("-4294967296"), &value), AZ_OK);
-  assert_int_equal(value, 4294967295 - 4294967296 + 1);
-  assert_return_code(az_span_atoi32(AZ_SPAN_FROM_STR("9223372036854775807"), &value), AZ_OK);
-  assert_int_equal(value, 18446744073709551615);
+  assert_int_equal(
+      az_span_atoi32(AZ_SPAN_FROM_STR("2147483648"), &value), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atoi32(AZ_SPAN_FROM_STR("-2147483649"), &value), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atoi32(AZ_SPAN_FROM_STR("-4294967295"), &value), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atoi32(AZ_SPAN_FROM_STR("-4294967296"), &value), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atoi32(AZ_SPAN_FROM_STR("9223372036854775807"), &value),
+      AZ_ERROR_PARSER_UNEXPECTED_CHAR);
 }
 
 static void az_span_atou64_test(void** state)
@@ -251,18 +255,22 @@ static void az_span_atou64_test(void** state)
   (void)state;
   uint64_t value = 0;
 
-  assert_return_code(az_span_atou64(AZ_SPAN_FROM_STR("0"), &value), AZ_OK);
+  assert_int_equal(az_span_atou64(AZ_SPAN_FROM_STR("0"), &value), AZ_OK);
   assert_int_equal(value, 0);
-  assert_return_code(az_span_atou64(AZ_SPAN_FROM_STR("1024"), &value), AZ_OK);
+  assert_int_equal(az_span_atou64(AZ_SPAN_FROM_STR("1024"), &value), AZ_OK);
   assert_int_equal(value, 1024);
-  assert_return_code(az_span_atou64(AZ_SPAN_FROM_STR("2147483647"), &value), AZ_OK);
+  assert_int_equal(az_span_atou64(AZ_SPAN_FROM_STR("2147483647"), &value), AZ_OK);
   assert_int_equal(value, 2147483647);
-  assert_return_code(az_span_atou64(AZ_SPAN_FROM_STR("4294967295"), &value), AZ_OK);
+  assert_int_equal(az_span_atou64(AZ_SPAN_FROM_STR("4294967295"), &value), AZ_OK);
   assert_int_equal(value, 4294967295);
-  assert_return_code(az_span_atou64(AZ_SPAN_FROM_STR("9223372036854775807"), &value), AZ_OK);
-  assert_int_equal(value, 4294967295);
-  assert_return_code(az_span_atou64(AZ_SPAN_FROM_STR("18446744073709551615"), &value), AZ_OK);
-  assert_int_equal(value, 4294967295);
+  assert_int_equal(az_span_atou64(AZ_SPAN_FROM_STR("9223372036854775807"), &value), AZ_OK);
+  assert_int_equal(value, 9223372036854775807UL);
+  assert_int_equal(az_span_atou64(AZ_SPAN_FROM_STR("18446744073709551615"), &value), AZ_OK);
+  assert_int_equal(value, 18446744073709551615UL);
+
+  assert_int_equal(
+      az_span_atou64(AZ_SPAN_FROM_STR("18446744073709551616"), &value),
+      AZ_ERROR_PARSER_UNEXPECTED_CHAR);
 }
 
 static void az_span_atoi64_test(void** state)
@@ -270,24 +278,37 @@ static void az_span_atoi64_test(void** state)
   (void)state;
   int64_t value = 0;
 
-  assert_return_code(az_span_atoi64(AZ_SPAN_FROM_STR("0"), &value), AZ_OK);
+  assert_int_equal(az_span_atoi64(AZ_SPAN_FROM_STR("0"), &value), AZ_OK);
   assert_int_equal(value, 0);
-  assert_return_code(az_span_atoi64(AZ_SPAN_FROM_STR("1024"), &value), AZ_OK);
+  assert_int_equal(az_span_atoi64(AZ_SPAN_FROM_STR("1024"), &value), AZ_OK);
   assert_int_equal(value, 1024);
-  assert_return_code(az_span_atoi64(AZ_SPAN_FROM_STR("-1024"), &value), AZ_OK);
-  assert_int_equal(value, 4294967295 - 1024 + 1);
-  assert_return_code(az_span_atoi64(AZ_SPAN_FROM_STR("2147483647"), &value), AZ_OK);
+  assert_int_equal(az_span_atoi64(AZ_SPAN_FROM_STR("-1024"), &value), AZ_OK);
+  assert_int_equal(value, -1024);
+  assert_int_equal(az_span_atoi64(AZ_SPAN_FROM_STR("2147483647"), &value), AZ_OK);
   assert_int_equal(value, 2147483647);
-  assert_return_code(az_span_atoi64(AZ_SPAN_FROM_STR("-2147483648"), &value), AZ_OK);
-  assert_int_equal(value, 4294967295 - 2147483648 + 1);
-  assert_return_code(az_span_atoi64(AZ_SPAN_FROM_STR("4294967295"), &value), AZ_OK);
+  assert_int_equal(az_span_atoi64(AZ_SPAN_FROM_STR("-2147483648"), &value), AZ_OK);
+  assert_int_equal(value, -2147483647 - 1);
+  assert_int_equal(az_span_atoi64(AZ_SPAN_FROM_STR("4294967295"), &value), AZ_OK);
   assert_int_equal(value, 4294967295);
-  assert_return_code(az_span_atoi64(AZ_SPAN_FROM_STR("-4294967296"), &value), AZ_OK);
-  assert_int_equal(value, 4294967295 - 4294967296 + 1);
-  assert_return_code(az_span_atoi64(AZ_SPAN_FROM_STR("9223372036854775807"), &value), AZ_OK);
-  assert_int_equal(value, 4294967295);
-  assert_return_code(az_span_atoi64(AZ_SPAN_FROM_STR("-9223372036854775808"), &value), AZ_OK);
-  assert_int_equal(value, 0);
+  assert_int_equal(az_span_atoi64(AZ_SPAN_FROM_STR("-4294967296"), &value), AZ_OK);
+  assert_int_equal(value, -4294967296);
+  assert_int_equal(az_span_atoi64(AZ_SPAN_FROM_STR("9223372036854775807"), &value), AZ_OK);
+  assert_int_equal(value, 9223372036854775807L);
+  assert_int_equal(az_span_atoi64(AZ_SPAN_FROM_STR("-9223372036854775808"), &value), AZ_OK);
+  assert_int_equal(value, -9223372036854775807L - 1);
+
+  assert_int_equal(
+      az_span_atoi64(AZ_SPAN_FROM_STR("9223372036854775808"), &value),
+      AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atoi64(AZ_SPAN_FROM_STR("18446744073709551615"), &value),
+      AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atoi64(AZ_SPAN_FROM_STR("18446744073709551616"), &value),
+      AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atoi64(AZ_SPAN_FROM_STR("-9223372036854775809"), &value),
+      AZ_ERROR_PARSER_UNEXPECTED_CHAR);
 }
 
 static void az_span_atod_test(void** state)
@@ -295,213 +316,213 @@ static void az_span_atod_test(void** state)
   (void)state;
   double value = 0;
 
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("0"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("0"), &value), AZ_OK);
   assert_true(value == 0);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("1024"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("1024"), &value), AZ_OK);
   assert_true(value == 1024);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("-1024"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-1024"), &value), AZ_OK);
   assert_true(value == -1024);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("2147483647"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("2147483647"), &value), AZ_OK);
   assert_true(value == 2147483647);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("-2147483648"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-2147483648"), &value), AZ_OK);
   assert_true(value == -2147483647 - 1);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("4294967295"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("4294967295"), &value), AZ_OK);
   assert_true(value == 4294967295);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("-4294967296"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-4294967296"), &value), AZ_OK);
   assert_true(value == -4294967296);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("9223372036854775807"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("9223372036854775807"), &value), AZ_OK);
   assert_true(value == 9223372036854775807);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("-9223372036854775808"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-9223372036854775808"), &value), AZ_OK);
   assert_true(value == -2147483647 * (double)4294967298);
 
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("1.23e3"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("1.23e3"), &value), AZ_OK);
   assert_true(value == 1.23e3);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("1.23"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("1.23"), &value), AZ_OK);
   assert_true(value == 1.23);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("-123.456e-78"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-123.456e-78"), &value), AZ_OK);
   assert_true(value == -123.456e-78);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("123.456e+78"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("123.456e+78"), &value), AZ_OK);
   assert_true(value == 123.456e+78);
 
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("nan"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("nan"), &value), AZ_OK);
   assert_true(isnan(value));
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("inf"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("inf"), &value), AZ_OK);
   assert_true(value == INFINITY);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("-inf"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-inf"), &value), AZ_OK);
   assert_true(value == -INFINITY);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("NAN"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("NAN"), &value), AZ_OK);
   assert_true(isnan(value));
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("INF"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("INF"), &value), AZ_OK);
   assert_true(value == INFINITY);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("-INF"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-INF"), &value), AZ_OK);
   assert_true(value == -INFINITY);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("INFINITY"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("INFINITY"), &value), AZ_OK);
   assert_true(value == INFINITY);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("-INFINITY"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-INFINITY"), &value), AZ_OK);
   assert_true(value == -INFINITY);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("0"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("0"), &value), AZ_OK);
   assert_true(value == 0);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("-0"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-0"), &value), AZ_OK);
   assert_true(value == 0);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("0.0"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("0.0"), &value), AZ_OK);
   assert_true(value == 0);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("1"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("1"), &value), AZ_OK);
   assert_true(value == 1);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("1."), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("1."), &value), AZ_OK);
   assert_true(value == 1);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("1.e3"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("1.e3"), &value), AZ_OK);
   assert_true(value == 1000);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("-1"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-1"), &value), AZ_OK);
   assert_true(value == -1);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("1.0"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("1.0"), &value), AZ_OK);
   assert_true(value == 1);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("-1.0"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-1.0"), &value), AZ_OK);
   assert_true(value == -1);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("12345"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("12345"), &value), AZ_OK);
   assert_true(value == 12345);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("-12345"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-12345"), &value), AZ_OK);
   assert_true(value == -12345);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("123.123"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("123.123"), &value), AZ_OK);
   assert_true(value == 123.123);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("123.1230"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("123.1230"), &value), AZ_OK);
   assert_true(value == 123.1230);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("123.0100"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("123.0100"), &value), AZ_OK);
   assert_true(value == 123.0100);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("123.01"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("123.01"), &value), AZ_OK);
   assert_true(value == 123.01);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("123.001"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("123.001"), &value), AZ_OK);
   assert_true(value == 123.001);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("0.000000000000001"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("0.000000000000001"), &value), AZ_OK);
   assert_true(value == 0.000000000000001);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("1.0000000001"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("1.0000000001"), &value), AZ_OK);
   assert_true(value == 1.0000000001);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("-1.0000000001"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-1.0000000001"), &value), AZ_OK);
   assert_true(value == -1.0000000001);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("100.001"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("100.001"), &value), AZ_OK);
   assert_true(value == 100.001);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("100.00100"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("100.00100"), &value), AZ_OK);
   assert_true(value == 100.00100);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("00100.001"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("00100.001"), &value), AZ_OK);
   assert_true(value == 00100.001);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("00100.00100"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("00100.00100"), &value), AZ_OK);
   assert_true(value == 00100.00100);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("0.001"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("0.001"), &value), AZ_OK);
   assert_true(value == 0.001);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("0.0012"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("0.0012"), &value), AZ_OK);
   assert_true(value == 0.0012);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("1.2e4"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("1.2e4"), &value), AZ_OK);
   assert_true(value == 1.2e4);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("1.2e-4"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("1.2e-4"), &value), AZ_OK);
   assert_true(value == 1.2e-4);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("1.2e+4"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("1.2e+4"), &value), AZ_OK);
   assert_true(value == 1.2e+4);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("-1.2e4"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-1.2e4"), &value), AZ_OK);
   assert_true(value == -1.2e4);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("-1.2e-4"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-1.2e-4"), &value), AZ_OK);
   assert_true(value == -1.2e-4);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("0.0001"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("0.0001"), &value), AZ_OK);
   assert_true(value == 0.0001);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("0.00102"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("0.00102"), &value), AZ_OK);
   assert_true(value == 0.00102);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("0.34567"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("0.34567"), &value), AZ_OK);
   assert_true(value == .34567);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("+0.34567"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("+0.34567"), &value), AZ_OK);
   assert_true(value == .34567);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("-0.34567"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-0.34567"), &value), AZ_OK);
   assert_true(value == -.34567);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("9876.54321"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("9876.54321"), &value), AZ_OK);
   assert_true(value == 9876.54321);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("-9876.54321"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-9876.54321"), &value), AZ_OK);
   assert_true(value == -9876.54321);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("987654.321"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("987654.321"), &value), AZ_OK);
   assert_true(value == 987654.321);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("-987654.321"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-987654.321"), &value), AZ_OK);
   assert_true(value == -987654.321);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("987654.0000321"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("987654.0000321"), &value), AZ_OK);
   assert_true(value == 987654.0000321);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("2147483647"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("2147483647"), &value), AZ_OK);
   assert_true(value == 2147483647);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("2147483648"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("2147483648"), &value), AZ_OK);
   assert_true(value == 2147483648);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("-2147483648"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-2147483648"), &value), AZ_OK);
   assert_true(value == -2147483647 - 1);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("4503599627370496"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("4503599627370496"), &value), AZ_OK);
   assert_true(value == 4503599627370496);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("9007199254740991"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("9007199254740991"), &value), AZ_OK);
   assert_true(value == 9007199254740991);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("4503599627370496.2"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("4503599627370496.2"), &value), AZ_OK);
   assert_true(value == 4503599627370496.2);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("1e15"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("1e15"), &value), AZ_OK);
   assert_true(value == 1e15);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("-1e15"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-1e15"), &value), AZ_OK);
   assert_true(value == -1e15);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("1.8e10"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("1.8e10"), &value), AZ_OK);
   assert_true(value == 1.8e10);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("-1.8e10"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-1.8e10"), &value), AZ_OK);
   assert_true(value == -1.8e10);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("1e-15"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("1e-15"), &value), AZ_OK);
   assert_true(value == 1e-15);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("1e-10"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("1e-10"), &value), AZ_OK);
   assert_true(value == 1e-10);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("1e-5"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("1e-5"), &value), AZ_OK);
   assert_true(value == 1e-5);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("0.1234567890123456"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("0.1234567890123456"), &value), AZ_OK);
   assert_true(value == 0.1234567890123456);
-  assert_return_code(
+  assert_int_equal(
       az_span_atod(AZ_SPAN_FROM_STR("123456789012345.123456789012340000"), &value), AZ_OK);
   assert_true(value == 123456789012345.123456789012340000);
-  assert_return_code(
+  assert_int_equal(
       az_span_atod(AZ_SPAN_FROM_STR("1000000000000.123456789012340000"), &value), AZ_OK);
   assert_true(value == 1000000000000.123456789012340000);
-  assert_return_code(
+  assert_int_equal(
       az_span_atod(AZ_SPAN_FROM_STR("123456789012345.1234567890123400001"), &value), AZ_OK);
   assert_true(value == 123456789012345.1234567890123400001);
-  assert_return_code(
+  assert_int_equal(
       az_span_atod(AZ_SPAN_FROM_STR("1000000000000.1234567890123400001"), &value), AZ_OK);
   assert_true(value == 1000000000000.1234567890123400001);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("12345.123e-15"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("12345.123e-15"), &value), AZ_OK);
   assert_true(value == 12345.123e-15);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("12345.12300000010e5"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("12345.12300000010e5"), &value), AZ_OK);
   assert_true(value == 12345.12300000010e5);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("1e-300"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("1e-300"), &value), AZ_OK);
   assert_true(value == 1e-300);
 
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("9007199254740992"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("9007199254740992"), &value), AZ_OK);
   assert_true(value == 9007199254740992);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("9007199254740993"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("9007199254740993"), &value), AZ_OK);
   assert_true(value == 9007199254740993);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("45035996273704961"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("45035996273704961"), &value), AZ_OK);
   assert_true(value == 45035996273704961);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("9223372036854775806"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("9223372036854775806"), &value), AZ_OK);
   assert_true(value == 9223372036854775806);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("-9223372036854775806"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-9223372036854775806"), &value), AZ_OK);
   assert_true(value == -9223372036854775806);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("1844674407370955100"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("1844674407370955100"), &value), AZ_OK);
   assert_true(value == 1844674407370955100);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("1.844674407370955e+19"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("1.844674407370955e+19"), &value), AZ_OK);
   assert_true(value == 1.844674407370955e+19);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("1.8446744073709551e+19"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("1.8446744073709551e+19"), &value), AZ_OK);
   assert_true(value == 1.8446744073709551e+19);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("1.8446744073709552e+19"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("1.8446744073709552e+19"), &value), AZ_OK);
   assert_true(value == 1.8446744073709552e+19);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("18446744073709551615"), &value), AZ_OK);
-  assert_true(value == 18446744073709551615);
-  assert_return_code(
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("18446744073709551615"), &value), AZ_OK);
+  assert_true(value == 18446744073709551615UL);
+  assert_int_equal(
       az_span_atod(AZ_SPAN_FROM_STR("18446744073709551615.18446744073709551615"), &value), AZ_OK);
   assert_true(value == 18446744073709551615.18446744073709551615);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("1e16"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("1e16"), &value), AZ_OK);
   assert_true(value == 1e16);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("12345.123e15"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("12345.123e15"), &value), AZ_OK);
   assert_true(value == 12345.123e15);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("-12345.123e15"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-12345.123e15"), &value), AZ_OK);
   assert_true(value == -12345.123e15);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("1e300"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("1e300"), &value), AZ_OK);
   assert_true(value == 1e300);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("-1e300"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-1e300"), &value), AZ_OK);
   assert_true(value == -1e300);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("1.7e308"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("1.7e308"), &value), AZ_OK);
   assert_true(value == 1.7e308);
-  assert_return_code(az_span_atod(AZ_SPAN_FROM_STR("1.8e309"), &value), AZ_OK);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("1.8e309"), &value), AZ_OK);
   assert_true(value == INFINITY);
 }
 
@@ -1038,7 +1059,7 @@ static void az_span_i64toa_test(void** state)
   int64_t number = 123;
   az_span number_str = AZ_SPAN_FROM_STR("123");
 
-  assert_return_code(az_span_i64toa(b_span, number, &remainder), AZ_OK);
+  assert_int_equal(az_span_i64toa(b_span, number, &remainder), AZ_OK);
   assert_int_equal(size_before_write, az_span_size(b_span));
   // remainder should be size minus number of digits (3)
   assert_int_equal(az_span_size(remainder), size_before_write - 3);
@@ -1050,7 +1071,7 @@ static void az_span_i64toa_test(void** state)
 
   // convert back
   uint64_t reverse = 0;
-  assert_return_code(az_span_atou64(b_span, &reverse), AZ_OK);
+  assert_int_equal(az_span_atou64(b_span, &reverse), AZ_OK);
   assert_int_equal(reverse, number);
 }
 
@@ -1064,7 +1085,7 @@ static void az_span_i64toa_negative_number_test(void** state)
   int64_t number = -123;
   az_span number_str = AZ_SPAN_FROM_STR("-123");
 
-  assert_return_code(az_span_i64toa(b_span, number, &remainder), AZ_OK);
+  assert_int_equal(az_span_i64toa(b_span, number, &remainder), AZ_OK);
   assert_int_equal(size_before_write, az_span_size(b_span));
   // remainder should be size minus number of digits (4)
   assert_int_equal(az_span_size(remainder), size_before_write - 4);
@@ -1077,7 +1098,7 @@ static void az_span_i64toa_negative_number_test(void** state)
   // convert back TODO: az_span_ato64 should support negative numbers since az_span_i64toa support
   // it. https://github.com/Azure/azure-sdk-for-c/issues/598
   /* uint64_t reverse = 0;
-  assert_return_code(az_span_atou64(b_span, &reverse), AZ_OK);
+  assert_int_equal(az_span_atou64(b_span, &reverse), AZ_OK);
   assert_int_equal(reverse, number);
   */
 }
@@ -1291,13 +1312,14 @@ static void az_span_u32toa_overflow_fails(void** state)
     az_span out_span = AZ_SPAN_NULL; \
     assert_true(az_succeeded(az_span_dtoa(buffer, v, fractional_digits, &out_span))); \
     az_span output = az_span_slice(buffer, 0, _az_span_diff(out_span, buffer)); \
-    assert_memory_equal(az_span_ptr(output), az_span_ptr(expected), az_span_size(expected)); \
+    assert_memory_equal( \
+        az_span_ptr(output), az_span_ptr(expected), (size_t)az_span_size(expected)); \
     assert_true(az_succeeded(az_span_dtoa(buffer, v, fractional_digits, &out_span))); \
     double round_trip = 0; \
     assert_true(az_succeeded(az_span_atod(output, &round_trip))); \
-    if (!isnan(v)) \
+    if (isfinite(v)) \
     { \
-      assert_true(v == round_trip || fabs(v - round_trip) < 0.01); \
+      assert_true(fabs(v - round_trip) < 0.01); \
     } \
   } while (0)
 
@@ -1605,7 +1627,7 @@ static void az_span_dtoa_too_large(void** state)
   assert_int_equal(
       az_span_dtoa(buff, (double)1.8446744073709552e+19, 15, &o), AZ_ERROR_NOT_SUPPORTED);
   assert_int_equal(
-      az_span_dtoa(buff, (double)18446744073709551615, 15, &o), AZ_ERROR_NOT_SUPPORTED);
+      az_span_dtoa(buff, (double)18446744073709551615UL, 15, &o), AZ_ERROR_NOT_SUPPORTED);
   assert_int_equal(
       az_span_dtoa(buff, 18446744073709551615.18446744073709551615, 15, &o),
       AZ_ERROR_NOT_SUPPORTED);
