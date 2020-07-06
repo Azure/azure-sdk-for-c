@@ -61,13 +61,13 @@ file(WRITE ${CMAKE_BINARY_DIR}/coverage_targets.txt "")
 # Determine platform to build
 if(AZ_PLATFORM_IMPL STREQUAL "WIN32")
   # build windows platform
-  set(PAL az_win32)
+  set(PORTS_INCLUDE_DIR win32)
 elseif(AZ_PLATFORM_IMPL STREQUAL "POSIX")
   # build linux platform
-  set(PAL az_posix)
+  set(PORTS_INCLUDE_DIR posix)
 else()
   #noplatform
-  set(PAL az_noplatform)
+  set(PORTS_INCLUDE_DIR _template)
 endif()
 
 add_subdirectory(sdk/src/azure/core)
@@ -75,9 +75,6 @@ add_subdirectory(sdk/src/azure/core)
 # SDK Clients
 add_subdirectory(sdk/src/azure/iot)
 add_subdirectory(sdk/src/azure/storage)
-
-#PAL (Hardware + HTTP)
-add_subdirectory(sdk/src/azure/platform)
 
 # User can disable samples generation by setting env variable AZ_SDK_C_NO_SAMPLES
 if(NOT DEFINED ENV{AZ_SDK_C_NO_SAMPLES})
