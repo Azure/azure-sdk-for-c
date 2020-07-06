@@ -46,11 +46,14 @@
 // This is usually not needed on Linux or Mac but needs to be set on Windows.
 #define ENV_DEVICE_X509_TRUST_PEM_FILE "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE"
 
+#define TIMEOUT_WAIT_FOR_RECEIVE_MESSAGE_MS 1000
+#define TIMEOUT_WAIT_FOR_COMPLETION_MS 1000
 #define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
 #define TELEMETRY_SEND_INTERVAL 1
 #define NUMBER_OF_MESSAGES 5
 #define DEAFULT_START_TEMP_CELSIUS 22
 
+bool device_operational = true;
 static const uint8_t null_terminator = '\0';
 static char boot_time_str[32];
 static az_span boot_time_span;
@@ -94,6 +97,7 @@ static const az_span report_min_temp_name_span = AZ_SPAN_LITERAL_FROM_STR("minTe
 static const az_span report_avg_temp_name_span = AZ_SPAN_LITERAL_FROM_STR("avgTemp");
 static const az_span report_start_time_name_span = AZ_SPAN_LITERAL_FROM_STR("startTime");
 static const az_span report_end_time_name_span = AZ_SPAN_LITERAL_FROM_STR("endTime");
+static const az_span report_error_payload = AZ_SPAN_LITERAL_FROM_STR("{}");
 static char end_time_buffer[32];
 static char commands_response_payload[256];
 
@@ -125,12 +129,14 @@ static az_result read_configuration_entry(
 static az_result create_mqtt_endpoint(char* destination, int32_t destination_size, az_span iot_hub);
 static int connect_device();
 static int subscribe();
+static void sleep_for_seconds(uint32_t seconds);
 
 //
 // Messaging functions
 //
-static int on_received(void* context, char* topicName, int topicLen, MQTTClient_message* message);
-static int send_telemetry_messages();
+static int mqtt_publish_message();
+static int on_received(char* topicName, int topicLen, MQTTClient_message* message);
+static int send_telemetry_message();
 static int send_command_response(
     az_iot_hub_client_method_request* request,
     uint16_t status,
@@ -155,7 +161,7 @@ int main()
   time(&rawtime);
   timeinfo = localtime(&rawtime);
   size_t len = strftime(boot_time_str, sizeof(boot_time_str), iso_spec_time_format, timeinfo);
-  if(len == 0)
+  if (len == 0)
   {
     printf("Insufficient buffer size for program start time.\n");
     return -1;
@@ -188,14 +194,6 @@ int main()
     return rc;
   }
 
-  // Set the callback for incoming MQTT messages
-  if ((rc = MQTTClient_setCallbacks(mqtt_client, NULL, NULL, on_received, NULL))
-      != MQTTCLIENT_SUCCESS)
-  {
-    printf("Failed to set MQTT callbacks, return code %d\n", rc);
-    return rc;
-  }
-
   // Connect to IoT Hub
   if ((rc = connect_device()) != 0)
   {
@@ -208,11 +206,37 @@ int main()
     return rc;
   }
 
-  // Loop and send 5 messages
-  if ((rc = send_telemetry_messages()) != 0)
+  char* incoming_message_topic;
+  int incoming_message_topic_len;
+  MQTTClient_message* message;
+  while (device_operational)
   {
-    return rc;
+    // Receive any incoming messages
+    if (MQTTClient_receive(
+            mqtt_client,
+            &incoming_message_topic,
+            &incoming_message_topic_len,
+            &message,
+            TIMEOUT_WAIT_FOR_RECEIVE_MESSAGE_MS)
+            == MQTTCLIENT_SUCCESS
+        && incoming_message_topic != NULL)
+    {
+      on_received(incoming_message_topic, incoming_message_topic_len, message);
+
+      MQTTClient_freeMessage(&message);
+      MQTTClient_free(incoming_message_topic);
+    }
+
+    send_telemetry_message();
+
+    sleep_for_seconds(1);
   }
+
+  // Loop and send 5 messages
+  //  if ((rc = send_telemetry_messages()) != 0)
+  //  {
+  //    return rc;
+  //  }
 
   printf("Telemetry Sent | Waiting for messages from the Azure IoT Hub\n[Press ENTER to shut "
          "down]\n\n");
@@ -272,6 +296,28 @@ static az_result read_configuration_entry(
   }
 
   return AZ_OK;
+}
+
+static int mqtt_publish_message(char* topic, az_span payload, int qos)
+{
+  int rc;
+  MQTTClient_deliveryToken token;
+  if ((rc = MQTTClient_publish(
+                mqtt_client, topic, az_span_size(payload), az_span_ptr(payload), qos, 0, &token)
+           != MQTTCLIENT_SUCCESS))
+  {
+    printf("Unable to publish message\n");
+    return rc;
+  }
+
+  if ((rc = MQTTClient_waitForCompletion(mqtt_client, token, TIMEOUT_WAIT_FOR_COMPLETION_MS))
+      != MQTTCLIENT_SUCCESS)
+  {
+    printf("Wait for message completion timed out\n");
+    return rc;
+  }
+
+  return 0;
 }
 
 // Create mqtt endpoint e.g: ssl//contoso.azure-devices.net:8883
@@ -354,7 +400,7 @@ static az_result build_command_response_payload(
   AZ_RETURN_IF_FAILED(az_json_builder_append_end_object(json_builder));
 
   *response_payload = az_json_builder_get_json(json_builder);
-  
+
   return AZ_OK;
 }
 
@@ -373,7 +419,7 @@ static az_result invoke_getMaxMinReport(az_span payload, az_span response, az_sp
   }
 
   // Use the boot time span unless the user specifies one
-  az_span start_time_span = boot_time_span;
+  az_span start_time_span = AZ_SPAN_NULL;
   while (az_succeeded(az_json_parser_parse_token_member(&jp, &tm)))
   {
     if (az_span_is_content_equal(report_command_payload_value_span, tm.name))
@@ -384,7 +430,12 @@ static az_result invoke_getMaxMinReport(az_span payload, az_span response, az_sp
 
     // else ignore token.
   }
-  //TODO: Send a 404 if the start time was not sent
+
+  if (az_span_ptr(start_time_span) == NULL)
+  {
+    response = report_error_payload;
+    return AZ_ERROR_ITEM_NOT_FOUND;
+  }
 
   // Get the current time as a string
   time_t rawtime;
@@ -408,17 +459,19 @@ static int send_command_response(
     uint16_t status,
     az_span response)
 {
+  int rc;
   // Get the response topic to publish the command response
-  if (az_failed(az_iot_hub_client_methods_response_get_publish_topic(
-          &client,
-          request->request_id,
-          status,
-          commands_response_topic,
-          sizeof(commands_response_topic),
-          NULL)))
+  if (az_failed(
+          rc = az_iot_hub_client_methods_response_get_publish_topic(
+              &client,
+              request->request_id,
+              status,
+              commands_response_topic,
+              sizeof(commands_response_topic),
+              NULL)))
   {
     printf("Unable to get twin document publish topic\n");
-    return -1;
+    return rc;
   }
 
   printf("Status: %u\tPayload:", status);
@@ -433,7 +486,6 @@ static int send_command_response(
   putchar('\n');
 
   // Send the commands response
-  int rc;
   if ((rc = MQTTClient_publish(
            mqtt_client,
            commands_response_topic,
@@ -587,8 +639,8 @@ static void handle_twin_message(
 
       // Send back the max temp and print error if failed
       send_reported_temperature_property(device_max_temp);
-
       break;
+
     // A response from a twin reported properties publish message. With a successfull update of
     // the reported properties, the payload will be empty and the status will be 204.
     case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES:
@@ -610,15 +662,23 @@ static void handle_command_message(
         = az_span_init((uint8_t*)message->payload, (int32_t)message->payloadlen);
 
     // Invoke command
+    uint16_t return_code;
     az_result response = invoke_getMaxMinReport(
         command_payload_span, command_response_span, &command_response_span);
-    (void)response;
+    if (response == AZ_ERROR_ITEM_NOT_FOUND)
+    {
+      return_code = 404;
+    }
+    else
+    {
+      return_code = 200;
+    }
 
     // Send command response with report as JSON payload
     int rc;
-    if ((rc = send_command_response(command_request, 200, command_response_span)) != 0)
+    if ((rc = send_command_response(command_request, return_code, command_response_span)) != 0)
     {
-      printf("Unable to send %d response, status %d\n", 200, rc);
+      printf("Unable to send %d response, status %d\n", return_code, rc);
     }
   }
   else
@@ -630,7 +690,7 @@ static void handle_command_message(
         az_span_ptr(command_request->name));
 
     int rc;
-    if ((rc = send_command_response(command_request, 404, AZ_SPAN_NULL)) != 0)
+    if ((rc = send_command_response(command_request, 404, report_error_payload)) != 0)
     {
       printf("Unable to send %d response, status %d\n", 404, rc);
     }
@@ -638,10 +698,8 @@ static void handle_command_message(
 }
 
 // Callback for incoming MQTT messages
-static int on_received(void* context, char* topicName, int topicLen, MQTTClient_message* message)
+static int on_received(char* topicName, int topicLen, MQTTClient_message* message)
 {
-  (void)context;
-
   if (topicLen == 0)
   {
     // The length of the topic if there are one or more NULL characters embedded in topicName,
@@ -662,13 +720,13 @@ static int on_received(void* context, char* topicName, int topicLen, MQTTClient_
   {
     printf("Twin Message Arrived\n");
 
-    // Determine what kind of twin message it is and take appropriate actions 
+    // Determine what kind of twin message it is and take appropriate actions
     handle_twin_message(message, &twin_response);
 
     printf("Response status was %d\n", twin_response.status);
   }
   else if (az_succeeded(az_iot_hub_client_methods_parse_received_topic(
-          &client, az_span_init((uint8_t*)topicName, topicLen), &command_request)))
+               &client, az_span_init((uint8_t*)topicName, topicLen), &command_request)))
   {
     printf("Command arrived\n");
 
@@ -677,8 +735,6 @@ static int on_received(void* context, char* topicName, int topicLen, MQTTClient_
   }
 
   putchar('\n');
-  MQTTClient_freeMessage(&message);
-  MQTTClient_free(topicName);
 
   return 1;
 }
@@ -765,7 +821,7 @@ static int subscribe()
 }
 
 // Send JSON formatted telemetry messages
-static int send_telemetry_messages()
+static int send_telemetry_message()
 {
   int rc;
 
@@ -786,26 +842,28 @@ static int send_telemetry_messages()
   az_span json_payload = az_json_builder_get_json(&json_builder);
   (void)result;
 
+  printf("Sending Telemetry Message\n");
+  mqtt_publish_message(telemetry_topic, json_payload, 1);
+
+  // if ((rc = MQTTClient_publish(
+  //          mqtt_client,
+  //          telemetry_topic,
+  //          (int)az_span_size(json_payload),
+  //          az_span_ptr(json_payload),
+  //          0,
+  //          0,
+  //          NULL))
+  //     != MQTTCLIENT_SUCCESS)
+  // {
+  //   printf("Failed to publish telemetry message %d, return code %d\n", i + 1, rc);
+  //   return rc;
+  // }
   // New line to separate messages on the console
   putchar('\n');
-  for (int i = 0; i < NUMBER_OF_MESSAGES; ++i)
-  {
-    printf("Sending Message %d\n", i + 1);
-    if ((rc = MQTTClient_publish(
-             mqtt_client,
-             telemetry_topic,
-             (int)az_span_size(json_payload),
-             az_span_ptr(json_payload),
-             0,
-             0,
-             NULL))
-        != MQTTCLIENT_SUCCESS)
-    {
-      printf("Failed to publish telemetry message %d, return code %d\n", i + 1, rc);
-      return rc;
-    }
-    sleep_for_seconds(TELEMETRY_SEND_INTERVAL);
-  }
+  //  for (int i = 0; i < NUMBER_OF_MESSAGES; ++i)
+  // {
+  //   sleep_for_seconds(TELEMETRY_SEND_INTERVAL);
+  // }
   return rc;
 }
 
