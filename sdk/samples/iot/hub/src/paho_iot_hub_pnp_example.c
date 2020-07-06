@@ -211,7 +211,7 @@ int main()
   MQTTClient_message* message;
   while (device_operational)
   {
-    // Receive any incoming messages
+    // Receive any incoming messages from twin or commands
     if (MQTTClient_receive(
             mqtt_client,
             &incoming_message_topic,
@@ -226,20 +226,13 @@ int main()
       MQTTClient_freeMessage(&message);
       MQTTClient_free(incoming_message_topic);
     }
-
+ 
+    // Send a telemetry message
     send_telemetry_message();
 
     sleep_for_seconds(1);
   }
 
-  // Loop and send 5 messages
-  //  if ((rc = send_telemetry_messages()) != 0)
-  //  {
-  //    return rc;
-  //  }
-
-  printf("Telemetry Sent | Waiting for messages from the Azure IoT Hub\n[Press ENTER to shut "
-         "down]\n\n");
   (void)getchar();
 
   // Gracefully disconnect: send the disconnect packet and close the socket
@@ -303,17 +296,17 @@ static int mqtt_publish_message(char* topic, az_span payload, int qos)
   int rc;
   MQTTClient_deliveryToken token;
   if ((rc = MQTTClient_publish(
-                mqtt_client, topic, az_span_size(payload), az_span_ptr(payload), qos, 0, &token)
-           != MQTTCLIENT_SUCCESS))
+                mqtt_client, topic, az_span_size(payload), az_span_ptr(payload), qos, 0, &token))
+           != MQTTCLIENT_SUCCESS)
   {
-    printf("Unable to publish message\n");
+    printf("Unable to publish message, return code %d\n", rc);
     return rc;
   }
 
   if ((rc = MQTTClient_waitForCompletion(mqtt_client, token, TIMEOUT_WAIT_FOR_COMPLETION_MS))
       != MQTTCLIENT_SUCCESS)
   {
-    printf("Wait for message completion timed out\n");
+    printf("Wait for message completion timed out, return code %d\n", rc);
     return rc;
   }
 
@@ -484,7 +477,7 @@ static int send_command_response(
     }
   }
   putchar('\n');
-  
+
   // Send the commands response
   rc = mqtt_publish_message(commands_response_topic, response, 0);
 
@@ -797,6 +790,21 @@ static int subscribe()
   return 0;
 }
 
+static az_result build_telemetry_message(az_span* out_payload)
+{
+  az_json_builder json_builder;
+  AZ_RETURN_IF_FAILED(
+      az_json_builder_init(&json_builder, AZ_SPAN_FROM_BUFFER(telemetry_payload), NULL));
+  AZ_RETURN_IF_FAILED(az_json_builder_append_begin_object(&json_builder));
+  AZ_RETURN_IF_FAILED(az_json_builder_append_property_name(&json_builder, telemetry_name));
+  AZ_RETURN_IF_FAILED(
+      az_json_builder_append_int32_number(&json_builder, (int32_t)current_device_temp));
+  AZ_RETURN_IF_FAILED(az_json_builder_append_end_object(&json_builder));
+  *out_payload = az_json_builder_get_json(&json_builder);
+
+  return AZ_OK;
+}
+
 // Send JSON formatted telemetry messages
 static int send_telemetry_message()
 {
@@ -809,18 +817,15 @@ static int send_telemetry_message()
     return rc;
   }
 
-  az_json_builder json_builder;
-  az_result result;
-  result = az_json_builder_init(&json_builder, AZ_SPAN_FROM_BUFFER(telemetry_payload), NULL);
-  result = az_json_builder_append_begin_object(&json_builder);
-  result = az_json_builder_append_property_name(&json_builder, telemetry_name);
-  result = az_json_builder_append_int32_number(&json_builder, (int32_t)current_device_temp);
-  result = az_json_builder_append_end_object(&json_builder);
-  az_span json_payload = az_json_builder_get_json(&json_builder);
-  (void)result;
+  az_span telemetry_payload_span;
+  if (az_failed(rc = build_telemetry_message(&telemetry_payload_span)))
+  {
+    printf("Could not build telemetry payload, az_result %d\n", rc);
+    return rc;
+  }
 
   printf("Sending Telemetry Message\n");
-  rc = mqtt_publish_message(telemetry_topic, json_payload, 0);
+  rc = mqtt_publish_message(telemetry_topic, telemetry_payload_span, 0);
 
   // New line to separate messages on the console
   putchar('\n');
