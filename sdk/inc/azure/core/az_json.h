@@ -175,6 +175,8 @@ AZ_NODISCARD AZ_INLINE az_json_builder_options az_json_builder_options_default()
   return options;
 }
 
+// TODO: Should total_bytes_written be made public or should az_json_builder_get_json take a
+// destination buffer?
 /**
  * @brief Provides forward-only, non-cached building of UTF-8 encoded JSON text into the provided
  * buffer.
@@ -187,8 +189,13 @@ typedef struct
 {
   struct
   {
+    az_span first_destination_buffer; // This field is readonly. Do NOT modify.
     az_span destination_buffer;
     int32_t bytes_written;
+    int32_t
+        total_bytes_written; // For single contiguous buffer, bytes_written == total_bytes_written
+    az_span_allocator_fn allocator_callback;
+    az_allocator_context* context;
     bool need_comma;
     az_json_token_kind token_kind; // needed for validation, potentially #if/def with preconditions.
     _az_json_bit_stack bit_stack; // needed for validation, potentially #if/def with preconditions.
@@ -216,8 +223,12 @@ AZ_NODISCARD AZ_INLINE az_result az_json_builder_init(
 {
   *json_builder = (az_json_builder){
     ._internal = {
-      .destination_buffer = destination_buffer,
+      .first_destination_buffer = destination_buffer,
+      .destination_buffer = AZ_SPAN_NULL,
+      .allocator_callback = NULL,
+      .context = NULL,
       .bytes_written = 0,
+      .total_bytes_written = 0,
       .need_comma = false,
       .token_kind = AZ_JSON_TOKEN_NONE,
       .bit_stack = { 0 },
@@ -227,8 +238,37 @@ AZ_NODISCARD AZ_INLINE az_result az_json_builder_init(
   return AZ_OK;
 }
 
+// TODO: Should this accept void* user_context instead of az_allocator_context* and create the
+// allocator context internally?
 /**
- * @brief Returns the #az_span containing the JSON text written to the underlying buffer so far.
+ * @brief Initializes an #az_json_builder which writes JSON text into a destination that be
+ * non-contiguous buffers.
+ *
+ * @param[out] json_builder A pointer to an #az_json_builder instance to initialize.
+ * @param[in] first_destination_buffer An #az_span over the byte buffer where the JSON text is to be
+ * written at the start.
+ * @param[in] allocator_callback An #az_span_allocator_fn callback function that provides the
+ * destination span to write the JSON text to once the previous buffer is full or too small to
+ * contain the next token.
+ * @param[in] context An #az_allocator_context containing user-defined and other fields that are
+ * passed through to the #az_span_allocator_fn.
+ * @param[in] options __[nullable]__ A reference to an #az_json_builder_options
+ * structure which defines custom behavior of the #az_json_builder. If `NULL` is passed, the builder
+ * will use the default options (i.e. #az_json_builder_options_default()).
+ *
+ * @return An #az_result value indicating the result of the operation:
+ *         - #AZ_OK if the az_json_builder is initialized successfully
+ */
+AZ_NODISCARD az_result az_json_builder_init_chunked(
+    az_json_builder* json_builder,
+    az_span first_destination_buffer,
+    az_span_allocator_fn allocator_callback,
+    az_allocator_context* context,
+    az_json_builder_options const* options);
+
+/**
+ * @brief Returns the #az_span containing the JSON text written to the underlying buffer so far, or
+ * #AZ_SPAN_NULL if the text can't fit within the provided destination buffer.
  *
  * @param[in] json_builder A pointer to an #az_json_builder instance wrapping the destination
  * buffer.
@@ -237,11 +277,24 @@ AZ_NODISCARD AZ_INLINE az_result az_json_builder_init(
  * building JSON text into it.
  *
  * @return An #az_span containing the JSON text built so far.
+ *
+ * @remarks This method is useful when the destination is a single, contiguous buffer or the JSON
+ * text fits in the first buffer. When the destination can be a set of non-contiguous buffers, and
+ * the JSON is larger than the first provided destination span, this method return #AZ_SPAN_NULL.
  */
 AZ_NODISCARD AZ_INLINE az_span az_json_builder_get_json(az_json_builder const* json_builder)
 {
+  // In the case of discontiguous buffers, where the callback provided a destination buffer beyond
+  // the first one, the JSON won't fit within a single provided span.
+  if (json_builder->_internal.total_bytes_written
+      > az_span_size(json_builder->_internal.first_destination_buffer))
+  {
+    return AZ_SPAN_NULL;
+  }
   return az_span_slice(
-      json_builder->_internal.destination_buffer, 0, json_builder->_internal.bytes_written);
+      json_builder->_internal.first_destination_buffer,
+      0,
+      json_builder->_internal.total_bytes_written);
 }
 
 /**
