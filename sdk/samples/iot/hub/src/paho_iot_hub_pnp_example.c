@@ -417,10 +417,9 @@ static az_result invoke_getMaxMinReport(az_span payload, az_span response, az_sp
 {
   // Parse the "since" field in the payload.
   az_json_parser jp;
-  az_json_token tm;
   AZ_RETURN_IF_FAILED(az_json_parser_init(&jp, payload, NULL));
   AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
-  if (tm.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
+  if (jp.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
   {
     return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
@@ -428,18 +427,20 @@ static az_result invoke_getMaxMinReport(az_span payload, az_span response, az_sp
   // Get the user specified "since". Note that we don't honor this option to simplify the sample. It
   // is merely passed on to the method call and return payload.
   az_span start_time_span = AZ_SPAN_NULL;
-  while (az_succeeded(az_json_parser_next_token(&jp)))
+  while (jp.token.kind != AZ_JSON_TOKEN_END_OBJECT)
   {
-    if (az_json_token_is_text_equal(&tm, report_command_payload_value_span))
+    if (az_json_token_is_text_equal(&jp.token, report_command_payload_value_span))
     {
+      AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
       int32_t incoming_since_value_len;
       AZ_RETURN_IF_FAILED(az_json_token_get_string(
-          &tm, incoming_since_value, sizeof(incoming_since_value), &incoming_since_value_len));
+          &jp.token, incoming_since_value, sizeof(incoming_since_value), &incoming_since_value_len));
       start_time_span = az_span_init((uint8_t*)incoming_since_value, incoming_since_value_len);
       break;
     }
 
     // else ignore token.
+    AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
   }
 
   // Set the response payload to error if the "since" field was not sent
@@ -558,39 +559,56 @@ static int send_reported_temperature_property(double desired_temp)
 static az_result parse_twin_desired_temperature_property(az_span twin_payload_span, bool is_twin_get, uint32_t* parsed_value)
 {
   az_json_parser jp;
-  az_json_token tm;
+  bool desired_found = false;
   AZ_RETURN_IF_FAILED(az_json_parser_init(&jp, twin_payload_span, NULL));
   AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
-  if (tm.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
+  if (jp.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
   {
     return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
   // If is twin get payload, we have to parse one level deeper for "desired" wrapper
+  AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
   if (is_twin_get)
   {
-    while(az_succeeded(az_json_parser_next_token(&jp)))
+    while(jp.token.kind != AZ_JSON_TOKEN_END_OBJECT)
     {
-      if (az_json_token_is_text_equal(&tm, desired_property_name))
+      if (az_json_token_is_text_equal(&jp.token, desired_property_name))
       {
+        desired_found = true;
         break;
+      }
+      else
+      {
+        // else ignore token.
       }
     }
   }
 
-  if (tm.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
+  if (!desired_found)
+  {
+    printf("Desired property object not found in twin");
+    return AZ_ERROR_ITEM_NOT_FOUND;
+  }
+
+  AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
+  if (jp.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
   {
     return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
-
-  while (az_succeeded(az_json_parser_next_token(&jp)))
+  while (jp.token.kind != AZ_JSON_TOKEN_END_OBJECT)
   {
-    if (az_json_token_is_text_equal(&tm, desired_temp_property_name))
+    if (az_json_token_is_text_equal(&jp.token, desired_temp_property_name))
     {
-      AZ_RETURN_IF_FAILED(az_json_token_get_uint32(&tm, parsed_value));
+      AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
+      AZ_RETURN_IF_FAILED(az_json_token_get_uint32(&jp.token, parsed_value));
       return AZ_OK;
     }
+    else
+    {
+      // else ignore token.
+    }
 
-    // else ignore token.
+    AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
   }
 
   return AZ_ERROR_ITEM_NOT_FOUND;
@@ -602,6 +620,7 @@ static void handle_twin_message(
     MQTTClient_message* message,
     az_iot_hub_client_twin_response* twin_response)
 {
+  az_result result;
   uint32_t desired_temp;
   az_span twin_payload_span
       = az_span_init((uint8_t*)message->payload, (int32_t)message->payloadlen);
@@ -632,9 +651,9 @@ static void handle_twin_message(
       printf("Payload:\n%.*s\n", message->payloadlen, (char*)message->payload);
 
       // Get the new temperature
-      if (az_failed(parse_twin_desired_temperature_property(twin_payload_span, false, &desired_temp)))
+      if (az_failed(result = parse_twin_desired_temperature_property(twin_payload_span, false, &desired_temp)))
       {
-        printf("Could not parse desired temperature property\n");
+        printf("Could not parse desired temperature property, az_result %d\n", result);
         break;
       }
       current_device_temp = (int32_t)desired_temp;
@@ -855,7 +874,7 @@ static int send_twin_get_message(void)
     return rc;
   }
   
-  printf("Sending twin get request");
+  printf("Sending twin get request\n");
   rc = mqtt_publish_message(twin_get_topic, AZ_SPAN_NULL, 0);
 
   return rc;
