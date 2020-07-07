@@ -41,6 +41,11 @@ steps:
     condition: and(succeeded(), contains(variables['OSVmImage'], 'macOS'), not(eq(variables['${{ parameters.DependenciesVariableName }}'], '')))
     displayName: vcpkg bootstrap
 
+  #Show vcpkg version
+  - script: |
+      vcpkg version
+    displayName: vcpkg version
+
   - script: |
       vcpkg install $(${{ parameters.DependenciesVariableName }})
     displayName: vcpkg install dependencies
