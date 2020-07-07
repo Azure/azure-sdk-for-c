@@ -57,8 +57,6 @@ add_library (
   ${CMAKE_CURRENT_LIST_DIR}/az_http_response.c
   ${CMAKE_CURRENT_LIST_DIR}/az_json_builder.c
   ${CMAKE_CURRENT_LIST_DIR}/az_json_parser.c
-  ${CMAKE_CURRENT_LIST_DIR}/az_json_pointer.c
-  ${CMAKE_CURRENT_LIST_DIR}/az_json_string.c
   ${CMAKE_CURRENT_LIST_DIR}/az_json_token.c
   ${CMAKE_CURRENT_LIST_DIR}/az_log.c
   ${CMAKE_CURRENT_LIST_DIR}/az_precondition.c
