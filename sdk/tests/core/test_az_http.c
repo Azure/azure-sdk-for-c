@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 #include "az_http_header_validation_private.h"
-#include "az_json_string_private.h"
 #include "az_test_definitions.h"
 #include <azure/core/az_http.h>
 #include <azure/core/internal/az_http_internal.h>
