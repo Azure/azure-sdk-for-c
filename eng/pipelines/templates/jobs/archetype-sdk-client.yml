@@ -42,7 +42,7 @@ jobs:
        vcpkg.deps: ''
        VCPKG_DEFAULT_TRIPLET: 'x64-osx'
        AZ_SDK_C_NO_SAMPLES: 'true'
-       build.args: ' -DAZ_PLATFORM_IMPL=WIN32'
+       build.args: ' -DAZ_PLATFORM_IMPL=POSIX'
 
       # Build with sample dependencies [curl for transport] - PRECONDITIONS ON
       # WARNINGS_AS_ERRORS          ON
@@ -187,7 +187,7 @@ jobs:
         OSVmImage: 'macOS-10.15'
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
-        build.args: ' -DUNIT_TESTING=ON -DPRECONDITIONS=OFF -DAZ_PLATFORM_IMPL=WIN32'
+        build.args: ' -DUNIT_TESTING=ON -DPRECONDITIONS=OFF -DAZ_PLATFORM_IMPL=POSIX'
         AZ_SDK_C_NO_SAMPLES: 'true'
 
       # Build with no logging - samples - libcurl - paho - NoPreconditions
