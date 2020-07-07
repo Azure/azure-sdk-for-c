@@ -1123,12 +1123,9 @@ static void az_span_i64toa_negative_number_test(void** state)
 
   assert_true(az_span_is_content_equal(b_span, number_str));
 
-  // convert back TODO: az_span_ato64 should support negative numbers since az_span_i64toa support
-  // it. https://github.com/Azure/azure-sdk-for-c/issues/598
-  /* uint64_t reverse = 0;
-  assert_int_equal(az_span_atou64(b_span, &reverse), AZ_OK);
+  int64_t reverse = 0;
+  assert_int_equal(az_span_atoi64(b_span, &reverse), AZ_OK);
   assert_int_equal(reverse, number);
-  */
 }
 
 static void az_span_slice_to_end_test(void** state)

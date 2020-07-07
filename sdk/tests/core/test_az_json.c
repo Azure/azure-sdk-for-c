@@ -5,6 +5,7 @@
 #include <azure/core/az_json.h>
 #include <azure/core/az_span.h>
 
+#include <math.h>
 #include <setjmp.h>
 #include <stdarg.h>
 
@@ -58,7 +59,7 @@ static void test_json_builder(void** state)
     // 0___________________________________________________________________________________________________1
     // 0_________1_________2_________3_________4_________5_________6_________7_________8_________9_________0
     // 01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456
-    // {"name":true,"foo":["bar",null,0,-12],"int-max":9007199254740991,"esc":"_\"_\\_\b\f\n\r\t_","u":"a\u001Fb"}
+    // {"name":true,"foo":["bar",null,0,-12,12,9007199254740991],"int-max":2147483647,"esc":"_\"_\\_\b\f\n\r\t_","u":"a\u001Fb"}
     TEST_EXPECT_SUCCESS(az_json_builder_append_begin_object(&builder));
 
     TEST_EXPECT_SUCCESS(az_json_builder_append_property_name(&builder, AZ_SPAN_FROM_STR("name")));
@@ -72,6 +73,8 @@ static void test_json_builder(void** state)
       TEST_EXPECT_SUCCESS(az_json_builder_append_null(&builder));
       TEST_EXPECT_SUCCESS(az_json_builder_append_int32_number(&builder, 0));
       TEST_EXPECT_SUCCESS(az_json_builder_append_int32_number(&builder, -12));
+      TEST_EXPECT_SUCCESS(az_json_builder_append_double_number(&builder, 12.1, 0));
+      TEST_EXPECT_SUCCESS(az_json_builder_append_double_number(&builder, 9007199254740991ull, 0));
       TEST_EXPECT_SUCCESS(az_json_builder_append_end_array(&builder));
     }
 
@@ -99,11 +102,31 @@ static void test_json_builder(void** state)
         array,
         "{"
         "\"name\":true,"
-        "\"foo\":[\"bar\",null,0,-12],"
+        "\"foo\":[\"bar\",null,0,-12,12,9007199254740991],"
         "\"int-max\":2147483647,"
         "\"esc\":\"_\\\"_\\\\_\\b\\f\\n\\r\\t_\","
         "\"u\":\"a\\u001Fb\""
         "}");
+  }
+  {
+    uint8_t array[33] = { 0 };
+    az_json_builder builder = { 0 };
+    {
+      TEST_EXPECT_SUCCESS(az_json_builder_init(&builder, AZ_SPAN_FROM_BUFFER(array), NULL));
+
+      TEST_EXPECT_SUCCESS(az_json_builder_append_double_number(&builder, 0.000000000000001, 15));
+
+      az_span_to_str((char*)array, 33, az_json_builder_get_json(&builder));
+      assert_string_equal(array, "0.000000000000001");
+    }
+    {
+      TEST_EXPECT_SUCCESS(az_json_builder_init(&builder, AZ_SPAN_FROM_BUFFER(array), NULL));
+
+      TEST_EXPECT_SUCCESS(az_json_builder_append_double_number(&builder, 1e-300, 15));
+
+      az_span_to_str((char*)array, 33, az_json_builder_get_json(&builder));
+      assert_string_equal(array, "0");
+    }
   }
   {
     // json with AZ_JSON_TOKEN_STRING
@@ -134,7 +157,7 @@ static void test_json_builder(void** state)
     az_json_builder builder = { 0 };
     TEST_EXPECT_SUCCESS(az_json_builder_init(&builder, AZ_SPAN_FROM_BUFFER(array), NULL));
 
-    // this json { "array": [1, 2, {}, 3 ] }
+    // this json { "array": [1, 2, {}, 3, -12.3 ] }
     TEST_EXPECT_SUCCESS(az_json_builder_append_begin_object(&builder));
 
     TEST_EXPECT_SUCCESS(az_json_builder_append_property_name(&builder, AZ_SPAN_FROM_STR("array")));
@@ -148,6 +171,8 @@ static void test_json_builder(void** state)
 
     TEST_EXPECT_SUCCESS(az_json_builder_append_int32_number(&builder, 3));
 
+    TEST_EXPECT_SUCCESS(az_json_builder_append_double_number(&builder, -1.234e1, 1));
+
     TEST_EXPECT_SUCCESS(az_json_builder_append_end_array(&builder));
     TEST_EXPECT_SUCCESS(az_json_builder_append_end_object(&builder));
 
@@ -155,7 +180,7 @@ static void test_json_builder(void** state)
         az_json_builder_get_json(&builder),
         AZ_SPAN_FROM_STR( //
             "{"
-            "\"array\":[1,2,{},3]"
+            "\"array\":[1,2,{},3,-12.3]"
             "}")));
   }
   {
@@ -220,6 +245,11 @@ static az_span const sample1 = AZ_SPAN_LITERAL_FROM_STR( //
     "    }\n"
     "  }\n"
     "}\n");
+
+static bool _is_double_equal(double actual, double expected, double error)
+{
+  return fabs(actual - expected) < error;
+}
 
 static void test_json_parser(void** state)
 {
@@ -302,15 +332,25 @@ static void test_json_parser(void** state)
     TEST_EXPECT_SUCCESS(az_json_parser_next_token(&parser));
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_NUMBER, AZ_SPAN_FROM_STR("23"));
 
-    uint64_t const expected_64 = 23;
-    uint64_t token_value_number_bin_rep_view = 0;
-    TEST_EXPECT_SUCCESS(az_json_token_get_uint64(&parser.token, &token_value_number_bin_rep_view));
-    assert_true(token_value_number_bin_rep_view == expected_64);
+    uint64_t actual_u64 = 0;
+    TEST_EXPECT_SUCCESS(az_json_token_get_uint64(&parser.token, &actual_u64));
+    assert_int_equal(actual_u64, 23);
 
-    uint32_t const expected_32 = (uint32_t)expected_64;
-    uint32_t actual_number = 0;
-    TEST_EXPECT_SUCCESS(az_json_token_get_uint32(&parser.token, &actual_number));
-    assert_true(actual_number == expected_32);
+    uint32_t actual_u32 = 0;
+    TEST_EXPECT_SUCCESS(az_json_token_get_uint32(&parser.token, &actual_u32));
+    assert_int_equal(actual_u32, 23);
+
+    int64_t actual_i64 = 0;
+    TEST_EXPECT_SUCCESS(az_json_token_get_int64(&parser.token, &actual_i64));
+    assert_int_equal(actual_i64, 23);
+
+    int32_t actual_i32 = 0;
+    TEST_EXPECT_SUCCESS(az_json_token_get_int32(&parser.token, &actual_i32));
+    assert_int_equal(actual_i32, 23);
+
+    double actual_d = 0;
+    TEST_EXPECT_SUCCESS(az_json_token_get_double(&parser.token, &actual_d));
+    assert_int_equal(actual_d, 23);
   }
   {
     // no exp number, no decimal, negative integer only
@@ -318,6 +358,18 @@ static void test_json_parser(void** state)
     TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR(" -23 "), NULL));
     TEST_EXPECT_SUCCESS(az_json_parser_next_token(&parser));
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_NUMBER, AZ_SPAN_FROM_STR("-23"));
+
+    int64_t actual_i64 = 0;
+    TEST_EXPECT_SUCCESS(az_json_token_get_int64(&parser.token, &actual_i64));
+    assert_int_equal(actual_i64, -23);
+
+    int32_t actual_i32 = 0;
+    TEST_EXPECT_SUCCESS(az_json_token_get_int32(&parser.token, &actual_i32));
+    assert_int_equal(actual_i32, -23);
+
+    double actual_d = 0;
+    TEST_EXPECT_SUCCESS(az_json_token_get_double(&parser.token, &actual_d));
+    assert_int_equal(actual_d, -23);
   }
   {
     // negative number with decimals
@@ -326,8 +378,9 @@ static void test_json_parser(void** state)
     TEST_EXPECT_SUCCESS(az_json_parser_next_token(&parser));
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_NUMBER, AZ_SPAN_FROM_STR("-23.56"));
 
-    // TODO: Add back tests that validate az_json_token_get_double result when double support is
-    // enabled.
+    double actual_d = 0;
+    TEST_EXPECT_SUCCESS(az_json_token_get_double(&parser.token, &actual_d));
+    assert_true(_is_double_equal(actual_d, -23.56, 1e-2));
   }
   {
     // negative + decimals + exp
@@ -335,6 +388,10 @@ static void test_json_parser(void** state)
     TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR(" -23.56e-3"), NULL));
     TEST_EXPECT_SUCCESS(az_json_parser_next_token(&parser));
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_NUMBER, AZ_SPAN_FROM_STR("-23.56e-3"));
+
+    double actual_d = 0;
+    TEST_EXPECT_SUCCESS(az_json_token_get_double(&parser.token, &actual_d));
+    assert_true(_is_double_equal(actual_d, -0.02356, 1e-5));
   }
   {
     // exp
@@ -342,6 +399,10 @@ static void test_json_parser(void** state)
     TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR("1e50"), NULL));
     TEST_EXPECT_SUCCESS(az_json_parser_next_token(&parser));
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_NUMBER, AZ_SPAN_FROM_STR("1e50"));
+
+    double actual_d = 0;
+    TEST_EXPECT_SUCCESS(az_json_token_get_double(&parser.token, &actual_d));
+    assert_true(_is_double_equal(actual_d, 1e50, 1e-2));
   }
   {
     // big decimal + exp
@@ -351,6 +412,10 @@ static void test_json_parser(void** state)
     TEST_EXPECT_SUCCESS(az_json_parser_next_token(&parser));
     test_json_token_helper(
         parser.token, AZ_JSON_TOKEN_NUMBER, AZ_SPAN_FROM_STR("10000000000000000000000e17"));
+
+    double actual_d = 0;
+    TEST_EXPECT_SUCCESS(az_json_token_get_double(&parser.token, &actual_d));
+    assert_true(_is_double_equal(actual_d, 10000000000000000000000e17, 1e-2));
   }
   {
     // exp inf -> Any value above double MAX range would be translated to positive inf
@@ -358,6 +423,20 @@ static void test_json_parser(void** state)
     TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR("1e309"), NULL));
     TEST_EXPECT_SUCCESS(az_json_parser_next_token(&parser));
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_NUMBER, AZ_SPAN_FROM_STR("1e309"));
+
+    double actual_d = 0;
+    TEST_EXPECT_SUCCESS(az_json_token_get_double(&parser.token, &actual_d));
+    assert_true(!isfinite(actual_d));
+
+    // Create inf number with  IEEE 754 standard
+    // floating point number containing all zeroes in the mantissa (first twenty-three bits), and
+    // all ones in the exponent (next eight bits)
+    unsigned int p = 0x7F800000; // 0xFF << 23
+    float positiveInfinity = *(float*)&p;
+    double const expected = positiveInfinity;
+    uint64_t const* const expected_bin_rep_view = (uint64_t const*)&expected;
+    uint64_t const* const token_value_number_bin_rep_view = (uint64_t*)&actual_d;
+    assert_true(*token_value_number_bin_rep_view == *expected_bin_rep_view);
   }
   {
     // exp inf -> Any value below double MIN range would be translated 0
@@ -365,6 +444,10 @@ static void test_json_parser(void** state)
     TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR("1e-400"), NULL));
     TEST_EXPECT_SUCCESS(az_json_parser_next_token(&parser));
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_NUMBER, AZ_SPAN_FROM_STR("1e-400"));
+
+    double actual_d = 0;
+    TEST_EXPECT_SUCCESS(az_json_token_get_double(&parser.token, &actual_d));
+    assert_true(_is_double_equal(actual_d, 0.0, 1e-2));
   }
   {
     // negative exp
@@ -372,6 +455,10 @@ static void test_json_parser(void** state)
     TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR("1e-18"), NULL));
     TEST_EXPECT_SUCCESS(az_json_parser_next_token(&parser));
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_NUMBER, AZ_SPAN_FROM_STR("1e-18"));
+
+    double actual_d = 0;
+    TEST_EXPECT_SUCCESS(az_json_token_get_double(&parser.token, &actual_d));
+    assert_true(_is_double_equal(actual_d, 0.000000000000000001, 1e-17));
   }
   /* end of Testing parsing number and converting to double */
   {

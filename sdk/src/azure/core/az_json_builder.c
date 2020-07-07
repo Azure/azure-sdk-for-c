@@ -6,6 +6,7 @@
 #include "az_span_private.h"
 #include <azure/core/az_json.h>
 #include <azure/core/internal/az_span_internal.h>
+#include <math.h>
 
 #include <azure/core/_az_cfg.h>
 
@@ -519,6 +520,9 @@ AZ_NODISCARD az_result az_json_builder_append_double_number(
 {
   _az_PRECONDITION_NOT_NULL(json_builder);
   _az_PRECONDITION(_az_is_appending_value_valid(json_builder));
+  // Non-finite numbers are not supported because they lead to invalid JSON.
+  // Unquoted strings such as nan and -inf are invalid as JSON numbers.
+  _az_PRECONDITION(isfinite(value));
   _az_PRECONDITION_RANGE(0, fractional_digits, _az_MAX_SUPPORTED_FRACTIONAL_DIGITS);
 
   az_span remaining_json = _get_remaining_span(json_builder);

@@ -105,6 +105,36 @@ AZ_NODISCARD az_result
 az_json_token_get_uint32(az_json_token const* json_token, uint32_t* out_value);
 
 /**
+ * @brief Returns the JSON token's number as a 64-bit signed integer.
+ *
+ * @param json_token A pointer to an #az_json_token instance.
+ * @param out_value A pointer to a variable to receive the value.
+ * @return AZ_OK if the number is returned.<br>
+ * AZ_ERROR_JSON_INVALID_STATE if the kind != AZ_JSON_TOKEN_NUMBER.
+ */
+AZ_NODISCARD az_result az_json_token_get_int64(az_json_token const* json_token, int64_t* out_value);
+
+/**
+ * @brief Returns the JSON token's number as a 32-bit signed integer.
+ *
+ * @param json_token A pointer to an #az_json_token instance.
+ * @param out_value A pointer to a variable to receive the value.
+ * @return AZ_OK if the number is returned.<br>
+ * AZ_ERROR_JSON_INVALID_STATE if the kind != AZ_JSON_TOKEN_NUMBER.
+ */
+AZ_NODISCARD az_result az_json_token_get_int32(az_json_token const* json_token, int32_t* out_value);
+
+/**
+ * @brief Returns the JSON token's number as a double.
+ *
+ * @param json_token A pointer to an #az_json_token instance.
+ * @param out_value A pointer to a variable to receive the value.
+ * @return AZ_OK if the number is returned.<br>
+ * AZ_ERROR_JSON_INVALID_STATE if the kind != AZ_JSON_TOKEN_NUMBER.
+ */
+AZ_NODISCARD az_result az_json_token_get_double(az_json_token const* json_token, double* out_value);
+
+/**
  * @brief Returns the JSON token's string after unescaping it, if required.
  *
  * @param json_token A pointer to an #az_json_token instance.
@@ -302,7 +332,10 @@ az_json_builder_append_int32_number(az_json_builder* json_builder, int32_t value
  *         - #AZ_OK if the number was appended successfully
  *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the buffer is too small
  *         - #AZ_ERROR_NOT_SUPPORTED if the \p value contains an integer component that is too
- * large and would overflow beyond 2^53 - 1.
+ * large and would overflow beyond 2^53 - 1
+ *
+ * @remark Only finite double values are supported. Values such as NAN and INFINITY are not allowed
+ * and would lead to invalid JSON being written.
  *
  * @remark Non-significant trailing zeros (after the decimal point) are not written, even if \p
  * fractional_digits is large enough to allow the zero padding.

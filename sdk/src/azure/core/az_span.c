@@ -22,17 +22,6 @@
 // An IEEE 64-bit double has 52 bits of mantissa
 #define _az_MAX_SAFE_INTEGER 9007199254740991
 
-enum
-{
-  _az_ASCII_LOWER_DIF = 'a' - 'A',
-
-  // One less than the number of digits in _az_MAX_SAFE_INTEGER
-  // This many digits can roundtrip between double and uint64_t without loss of precision
-  // or causing integer overflow. We can't choose 16, because 9999999999999999 is larger than
-  // _az_MAX_SAFE_INTEGER.
-  _az_MAX_SUPPORTED_FRACTIONAL_DIGITS = 15,
-};
-
 #ifndef AZ_NO_PRECONDITION_CHECKING
 // Note: If you are modifying this method, make sure to modify the inline version in the az_span.h
 // file as well.
