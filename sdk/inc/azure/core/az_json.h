@@ -88,7 +88,9 @@ AZ_NODISCARD az_result az_json_token_get_boolean(az_json_token const* json_token
  * @param json_token A pointer to an #az_json_token instance.
  * @param out_value A pointer to a variable to receive the value.
  * @return AZ_OK if the number is returned.<br>
- * AZ_ERROR_JSON_INVALID_STATE if the kind != AZ_JSON_TOKEN_NUMBER.
+ * AZ_ERROR_JSON_INVALID_STATE if the kind != AZ_JSON_TOKEN_NUMBER.<br>
+ * AZ_ERROR_PARSER_UNEXPECTED_CHAR if a non-ASCII digit is found within the token or if it contains
+ * a number that would overflow or underflow uint64
  */
 AZ_NODISCARD az_result
 az_json_token_get_uint64(az_json_token const* json_token, uint64_t* out_value);
@@ -99,7 +101,9 @@ az_json_token_get_uint64(az_json_token const* json_token, uint64_t* out_value);
  * @param json_token A pointer to an #az_json_token instance.
  * @param out_value A pointer to a variable to receive the value.
  * @return AZ_OK if the number is returned.<br>
- * AZ_ERROR_JSON_INVALID_STATE if the kind != AZ_JSON_TOKEN_NUMBER.
+ * AZ_ERROR_JSON_INVALID_STATE if the kind != AZ_JSON_TOKEN_NUMBER.<br>
+ * AZ_ERROR_PARSER_UNEXPECTED_CHAR if a non-ASCII digit is found within the token or if it contains
+ * a number that would overflow or underflow uint32
  */
 AZ_NODISCARD az_result
 az_json_token_get_uint32(az_json_token const* json_token, uint32_t* out_value);
@@ -110,7 +114,9 @@ az_json_token_get_uint32(az_json_token const* json_token, uint32_t* out_value);
  * @param json_token A pointer to an #az_json_token instance.
  * @param out_value A pointer to a variable to receive the value.
  * @return AZ_OK if the number is returned.<br>
- * AZ_ERROR_JSON_INVALID_STATE if the kind != AZ_JSON_TOKEN_NUMBER.
+ * AZ_ERROR_JSON_INVALID_STATE if the kind != AZ_JSON_TOKEN_NUMBER.<br>
+ * AZ_ERROR_PARSER_UNEXPECTED_CHAR if a non-ASCII digit is found within the token or if it contains
+ * a number that would overflow or underflow int64
  */
 AZ_NODISCARD az_result az_json_token_get_int64(az_json_token const* json_token, int64_t* out_value);
 
@@ -120,7 +126,9 @@ AZ_NODISCARD az_result az_json_token_get_int64(az_json_token const* json_token, 
  * @param json_token A pointer to an #az_json_token instance.
  * @param out_value A pointer to a variable to receive the value.
  * @return AZ_OK if the number is returned.<br>
- * AZ_ERROR_JSON_INVALID_STATE if the kind != AZ_JSON_TOKEN_NUMBER.
+ * AZ_ERROR_JSON_INVALID_STATE if the kind != AZ_JSON_TOKEN_NUMBER.<br>
+ * AZ_ERROR_PARSER_UNEXPECTED_CHAR if a non-ASCII digit is found within the token or if it contains
+ * a number that would overflow or underflow int32
  */
 AZ_NODISCARD az_result az_json_token_get_int32(az_json_token const* json_token, int32_t* out_value);
 
