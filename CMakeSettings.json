@@ -1,40 +1,45 @@
 ﻿{
-  "configurations": [
-    {
-      "name": "x64-Debug",
-      "generator": "Ninja",
-      "configurationType": "Debug",
-      "inheritEnvironments": [ "msvc_x64_x64" ],
-      "buildRoot": "${projectDir}\\out\\build\\${name}",
-      "installRoot": "${projectDir}\\out\\install\\${name}",
-      "cmakeCommandArgs": "",
-      "buildCommandArgs": "-v",
-      "ctestCommandArgs": "",
-      "variables": [
+    "configurations": [
         {
-          "name": "UNIT_TESTING",
-          "value": "False",
-          "type": "BOOL"
-        }
-      ]
-    },
-    {
-      "name": "x64-Debug-withTests",
-      "generator": "Ninja",
-      "configurationType": "Debug",
-      "inheritEnvironments": [ "msvc_x64_x64" ],
-      "buildRoot": "${projectDir}\\out\\build\\${name}",
-      "installRoot": "${projectDir}\\out\\install\\${name}",
-      "cmakeCommandArgs": "",
-      "buildCommandArgs": "-v",
-      "ctestCommandArgs": "",
-      "variables": [
+            "name": "x64-Debug",
+            "generator": "Ninja",
+            "configurationType": "Debug",
+            "inheritEnvironments": [ "msvc_x64_x64" ],
+            "buildRoot": "${projectDir}\\out\\build\\${name}",
+            "installRoot": "${projectDir}\\out\\install\\${name}",
+            "cmakeCommandArgs": "",
+            "buildCommandArgs": "-v",
+            "ctestCommandArgs": "",
+            "variables": [
+                {
+                    "name": "AZ_PLATFORM_IMPL",
+                    "value": "WIN32",
+                    "type": "STRING"
+                }
+            ]
+        },
         {
-          "name": "UNIT_TESTING",
-          "value": "True",
-          "type": "BOOL"
+            "name": "x64-Debug-withTests",
+            "generator": "Ninja",
+            "configurationType": "Debug",
+            "inheritEnvironments": [ "msvc_x64_x64" ],
+            "buildRoot": "${projectDir}\\out\\build\\${name}",
+            "installRoot": "${projectDir}\\out\\install\\${name}",
+            "cmakeCommandArgs": "",
+            "buildCommandArgs": "-v",
+            "ctestCommandArgs": "",
+            "variables": [
+                {
+                    "name": "UNIT_TESTING",
+                    "value": "True",
+                    "type": "BOOL"
+                },
+                {
+                    "name": "AZ_PLATFORM_IMPL",
+                    "value": "WIN32",
+                    "type": "STRING"
+                }
+            ]
         }
-      ]
-    }
-  ]
+    ]
 }
