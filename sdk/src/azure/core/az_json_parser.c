@@ -55,7 +55,7 @@ static void _az_json_parser_update_state(
   json_parser->_internal.bytes_consumed += consumed;
 }
 
-AZ_NODISCARD static az_span _az_json_parser_skip_white_space(az_json_parser* json_parser)
+AZ_NODISCARD static az_span _az_json_parser_skip_whitespace(az_json_parser* json_parser)
 {
   az_span remaining = _get_remaining_json(json_parser);
   az_span json = _az_span_trim_white_space_from_start(remaining);
@@ -122,14 +122,6 @@ AZ_NODISCARD static bool _az_is_valid_escaped_character(uint8_t byte)
   }
 }
 
-// A hex digit is valid if it is in the range: [0..9] | [A..F] | [a..f]
-// Otherwise, return false.
-AZ_NODISCARD static bool _az_is_hex_digit(uint8_t byte)
-{
-  return (byte >= '0' && byte <= '9') || (byte >= 'a' && byte <= 'f')
-      || (byte >= 'A' && byte <= 'F');
-}
-
 AZ_NODISCARD static bool _az_validate_hex_digits(uint8_t* token_ptr, int32_t index)
 {
   // The caller already guaranteed that we have at least 4 bytes in the buffer.
@@ -137,7 +129,7 @@ AZ_NODISCARD static bool _az_validate_hex_digits(uint8_t* token_ptr, int32_t ind
   {
     uint8_t next_byte = token_ptr[index + i];
 
-    if (!_az_is_hex_digit(next_byte))
+    if (!isxdigit(next_byte))
     {
       return false;
     }
@@ -229,7 +221,7 @@ AZ_NODISCARD static az_result _az_json_parser_process_property_name(az_json_pars
 {
   AZ_RETURN_IF_FAILED(_az_json_parser_process_string(json_parser));
 
-  az_span json = _az_json_parser_skip_white_space(json_parser);
+  az_span json = _az_json_parser_skip_whitespace(json_parser);
 
   // Expected a colon to indicate that a value will follow after the property name, but instead
   // either reached end of data or some other character, which is invalid.
@@ -595,7 +587,7 @@ AZ_NODISCARD static az_result _az_json_parser_process_next_byte(
   {
     json_parser->_internal.bytes_consumed++;
 
-    az_span json = _az_json_parser_skip_white_space(json_parser);
+    az_span json = _az_json_parser_skip_whitespace(json_parser);
 
     // Expected start of a property name or value, but instead reached end of data.
     if (az_span_size(json) < 1)
@@ -638,7 +630,7 @@ AZ_NODISCARD az_result az_json_parser_next_token(az_json_parser* json_parser)
 {
   _az_PRECONDITION_NOT_NULL(json_parser);
 
-  az_span json = _az_json_parser_skip_white_space(json_parser);
+  az_span json = _az_json_parser_skip_whitespace(json_parser);
 
   if (az_span_size(json) < 1 && json_parser->token.kind != AZ_JSON_TOKEN_NONE)
   {
