@@ -49,7 +49,10 @@ steps:
       targetType: inline
       script: |
         cd $VCPKG_INSTALLATION_ROOT
-        git status
+
+        # Sometimes the image has changes in the git tree. Reset to HEAD and
+        # then pull
+        git reset --hard HEAD
         git pull origin master
 
         ./bootstrap-vcpkg.sh
