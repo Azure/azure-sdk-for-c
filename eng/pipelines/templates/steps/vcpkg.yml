@@ -49,7 +49,7 @@ steps:
       targetType: inline
       script: |
         cd $VCPKG_INSTALLATION_ROOT
-        git pull
+        git pull origin master
 
         ./bootstrap-vcpkg.sh
 
