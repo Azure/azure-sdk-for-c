@@ -432,36 +432,10 @@ typedef struct
  *         - #AZ_OK if the az_json_parser is initialized successfully
  *         - #AZ_ERROR_EOF if the provided json buffer is empty
  */
-AZ_NODISCARD AZ_INLINE az_result az_json_parser_init(
+AZ_NODISCARD az_result az_json_parser_init(
     az_json_parser* json_parser,
     az_span json_buffer,
-    az_json_parser_options const* options)
-{
-  // TODO: Should this be a precondition? If so, there is an inlining issue here.
-  // An empty JSON payload is invalid.
-  if (az_span_size(json_buffer) < 1)
-  {
-    return AZ_ERROR_EOF;
-  }
-
-  *json_parser = (az_json_parser){
-    .token = (az_json_token){
-      .kind = AZ_JSON_TOKEN_NONE,
-      .slice = AZ_SPAN_NULL,
-      ._internal = {
-        .string_has_escaped_chars = false,
-      },
-    },
-    ._internal = {
-      .json_buffer = json_buffer,
-      .bytes_consumed = 0,
-      .is_complex_json = false,
-      .bit_stack = { 0 },
-      .options = options == NULL ? az_json_parser_options_default() : *options,
-    },
-  };
-  return AZ_OK;
-}
+    az_json_parser_options const* options);
 
 /**
  * @brief Reads the next token in the JSON text and updates the parser state.
@@ -470,8 +444,7 @@ AZ_NODISCARD AZ_INLINE az_result az_json_parser_init(
  *
  * @return AZ_OK if the token was parsed successfully.<br>
  *         AZ_ERROR_EOF when the end of the JSON document is reached.<br>
- *         AZ_ERROR_PARSER_UNEXPECTED_CHAR when an invalid character is detected.<br>
- *         AZ_ERROR_ITEM_NOT_FOUND when no more items are found.
+ *         AZ_ERROR_PARSER_UNEXPECTED_CHAR when an invalid character is detected.
  */
 AZ_NODISCARD az_result az_json_parser_move_to_next_token(az_json_parser* json_parser);
 
@@ -482,8 +455,7 @@ AZ_NODISCARD az_result az_json_parser_move_to_next_token(az_json_parser* json_pa
  *
  * @return AZ_OK if the children of the current JSON token are skipped successfully.<br>
  *         AZ_ERROR_EOF when the end of the JSON document is reached.<br>
- *         AZ_ERROR_PARSER_UNEXPECTED_CHAR when an invalid character is detected.<br>
- *         AZ_ERROR_ITEM_NOT_FOUND when no more items are found.
+ *         AZ_ERROR_PARSER_UNEXPECTED_CHAR when an invalid character is detected.
  *
  * @remarks If the current token kind is a property name, the parser first moves to the property
  * value. Then, if the token kind is start of an object or array, the parser moves to the matching

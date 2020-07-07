@@ -10,6 +10,32 @@
 
 #include <azure/core/_az_cfg.h>
 
+AZ_NODISCARD az_result az_json_parser_init(
+    az_json_parser* json_parser,
+    az_span json_buffer,
+    az_json_parser_options const* options)
+{
+  _az_PRECONDITION(az_span_size(json_buffer) >= 1);
+
+  *json_parser = (az_json_parser){
+    .token = (az_json_token){
+      .kind = AZ_JSON_TOKEN_NONE,
+      .slice = AZ_SPAN_NULL,
+      ._internal = {
+        .string_has_escaped_chars = false,
+      },
+    },
+    ._internal = {
+      .json_buffer = json_buffer,
+      .bytes_consumed = 0,
+      .is_complex_json = false,
+      .bit_stack = { 0 },
+      .options = options == NULL ? az_json_parser_options_default() : *options,
+    },
+  };
+  return AZ_OK;
+}
+
 AZ_NODISCARD static az_span _get_remaining_json(az_json_parser* json_parser)
 {
   _az_PRECONDITION_NOT_NULL(json_parser);
@@ -614,11 +640,9 @@ AZ_NODISCARD az_result az_json_parser_move_to_next_token(az_json_parser* json_pa
 
   az_span json = _az_json_parser_skip_white_space(json_parser);
 
-  // An empty JSON payload is invalid.
-  // TODO: Should this return invalid state instead?
-  if (az_span_size(json) < 1)
+  if (az_span_size(json) < 1 && json_parser->token.kind != AZ_JSON_TOKEN_NONE)
   {
-    return AZ_ERROR_EOF;
+    return AZ_ERROR_JSON_PARSING_DONE;
   }
 
   uint8_t const first_byte = az_span_ptr(json)[0];
@@ -626,7 +650,14 @@ AZ_NODISCARD az_result az_json_parser_move_to_next_token(az_json_parser* json_pa
   switch (json_parser->token.kind)
   {
     case AZ_JSON_TOKEN_NONE:
+    {
+      // An empty JSON payload is invalid.
+      if (az_span_size(json) < 1)
+      {
+        return AZ_ERROR_EOF;
+      }
       return _az_json_parser_read_first_token(json_parser, json, first_byte);
+    }
     case AZ_JSON_TOKEN_BEGIN_OBJECT:
     {
       if (first_byte == '}')

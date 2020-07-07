@@ -31,10 +31,6 @@ static void test_json_parser_init(void** state)
 
   az_json_parser parser = { 0 };
 
-  // Empty JSON is invalid
-  assert_int_equal(az_json_parser_init(&parser, AZ_SPAN_FROM_STR(""), NULL), AZ_ERROR_EOF);
-  assert_int_equal(az_json_parser_init(&parser, AZ_SPAN_FROM_STR(""), &options), AZ_ERROR_EOF);
-
   assert_int_equal(az_json_parser_init(&parser, AZ_SPAN_FROM_STR("{}"), NULL), AZ_OK);
   assert_int_equal(az_json_parser_init(&parser, AZ_SPAN_FROM_STR("{}"), &options), AZ_OK);
 
@@ -389,7 +385,7 @@ static void test_json_parser(void** state)
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_NUMBER, AZ_SPAN_FROM_STR("0.25"));
     TEST_EXPECT_SUCCESS(az_json_parser_move_to_next_token(&parser));
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_END_ARRAY, AZ_SPAN_FROM_STR("]"));
-    assert_true(az_json_parser_move_to_next_token(&parser) == AZ_ERROR_EOF);
+    assert_true(az_json_parser_move_to_next_token(&parser) == AZ_ERROR_JSON_PARSING_DONE);
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_END_ARRAY, AZ_SPAN_FROM_STR("]"));
   }
   {
@@ -404,7 +400,7 @@ static void test_json_parser(void** state)
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_STRING, AZ_SPAN_FROM_STR("Hello world!"));
     TEST_EXPECT_SUCCESS(az_json_parser_move_to_next_token(&parser));
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_END_OBJECT, AZ_SPAN_FROM_STR("}"));
-    assert_true(az_json_parser_move_to_next_token(&parser) == AZ_ERROR_EOF);
+    assert_true(az_json_parser_move_to_next_token(&parser) == AZ_ERROR_JSON_PARSING_DONE);
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_END_OBJECT, AZ_SPAN_FROM_STR("}"));
   }
   {
@@ -440,7 +436,7 @@ static void test_json_parser(void** state)
           "[[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ "
           "[[[[[ [[[[");
       az_result const result = read_write(json, &output, &o);
-      assert_true(result == AZ_ERROR_EOF);
+      assert_int_equal(result, AZ_ERROR_JSON_PARSING_DONE);
     }
     {
       int32_t o = 0;
