@@ -416,8 +416,6 @@ static az_result parse_operation_message(
 {
   int rc;
 
-  printf("Topic: %s\n", topic);
-
   if (topic_len == 0)
   {
     // The length of the topic if there are one or more NULL characters embedded in topic,
@@ -427,6 +425,8 @@ static az_result parse_operation_message(
 
   az_span topic_span = az_span_init((uint8_t*)topic, topic_len);
   az_span message_span = az_span_init((uint8_t*)message->payload, message->payloadlen);
+  
+  print_az_span("Topic:\n", topic_span);
 
   // Parse the incoming message and payload
   if (az_failed(
