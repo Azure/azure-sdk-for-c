@@ -350,7 +350,7 @@ static void test_json_parser(void** state)
 
     double actual_d = 0;
     TEST_EXPECT_SUCCESS(az_json_token_get_double(&parser.token, &actual_d));
-    assert_int_equal(actual_d, 23);
+    assert_true(_is_double_equal(actual_d, 23, 1e-2));
   }
   {
     // no exp number, no decimal, negative integer only
@@ -369,7 +369,7 @@ static void test_json_parser(void** state)
 
     double actual_d = 0;
     TEST_EXPECT_SUCCESS(az_json_token_get_double(&parser.token, &actual_d));
-    assert_int_equal(actual_d, -23);
+    assert_true(_is_double_equal(actual_d, -23, 1e-2));
   }
   {
     // negative number with decimals
@@ -425,6 +425,10 @@ static void test_json_parser(void** state)
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_NUMBER, AZ_SPAN_FROM_STR("1e309"));
 
     double actual_d = 0;
+
+    // https://github.com/Azure/azure-sdk-for-c/issues/893
+    // The result of this depends on the compiler.
+#ifdef _MSC_VER
     TEST_EXPECT_SUCCESS(az_json_token_get_double(&parser.token, &actual_d));
     assert_true(!isfinite(actual_d));
 
@@ -437,6 +441,10 @@ static void test_json_parser(void** state)
     uint64_t const* const expected_bin_rep_view = (uint64_t const*)&expected;
     uint64_t const* const token_value_number_bin_rep_view = (uint64_t*)&actual_d;
     assert_true(*token_value_number_bin_rep_view == *expected_bin_rep_view);
+#else
+    assert_int_equal(
+        az_json_token_get_double(&parser.token, &actual_d), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+#endif // _MSC_VER
   }
   {
     // exp inf -> Any value below double MIN range would be translated 0
