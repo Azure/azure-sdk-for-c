@@ -566,22 +566,31 @@ static az_result parse_twin_desired_temperature_property(az_span twin_payload_sp
   {
     return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
-  // If is twin get payload, we have to parse one level deeper for "desired" wrapper
-  AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
+
   if (is_twin_get)
   {
-    while(jp.token.kind != AZ_JSON_TOKEN_END_OBJECT)
+    // If is twin get payload, we have to parse one level deeper for "desired" wrapper
+    AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
+    while (jp.token.kind != AZ_JSON_TOKEN_END_OBJECT)
     {
       if (az_json_token_is_text_equal(&jp.token, desired_property_name))
       {
         desired_found = true;
+        AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
         break;
       }
       else
       {
         // else ignore token.
+        AZ_RETURN_IF_FAILED(az_json_parser_skip_children(&jp));
       }
+ 
+      AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
     }
+  }
+  else
+  {
+    desired_found = true;
   }
 
   if (!desired_found)
@@ -590,11 +599,11 @@ static az_result parse_twin_desired_temperature_property(az_span twin_payload_sp
     return AZ_ERROR_ITEM_NOT_FOUND;
   }
 
-  AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
   if (jp.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
   {
     return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
+  AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
   while (jp.token.kind != AZ_JSON_TOKEN_END_OBJECT)
   {
     if (az_json_token_is_text_equal(&jp.token, desired_temp_property_name))
@@ -606,6 +615,7 @@ static az_result parse_twin_desired_temperature_property(az_span twin_payload_sp
     else
     {
       // else ignore token.
+      AZ_RETURN_IF_FAILED(az_json_parser_skip_children(&jp));
     }
 
     AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
