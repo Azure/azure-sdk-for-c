@@ -82,15 +82,16 @@ static int subscribe();
 static int register_device();
 static int get_operation_status();
 static az_result parse_operation_message(
-    char * topic,
+    char* topic,
     int topic_len,
-    MQTTClient_message const * message,
+    MQTTClient_message const* message,
     az_iot_provisioning_client_register_response* response,
     az_iot_provisioning_client_operation_status* operation_status);
-static int send_operation_query_message(az_iot_provisioning_client_register_response const * response);
+static int send_operation_query_message(
+    az_iot_provisioning_client_register_response const* response);
 
 static void sleep_for_seconds(uint32_t seconds);
-static void print_az_span(const char * str, az_span span);
+static void print_az_span(const char* str, az_span span);
 
 int main()
 {
@@ -355,7 +356,7 @@ static int get_operation_status()
     if (az_failed(
             rc = parse_operation_message(topic, topic_len, message, &response, &operation_status)))
     {
-      printf("Failed to parse operation message, az_result return code %04x\n", rc); 
+      printf("Failed to parse operation message, az_result return code %04x\n", rc);
       MQTTClient_freeMessage(&message);
       MQTTClient_free(topic);
       return rc;
@@ -407,9 +408,9 @@ static int get_operation_status()
 }
 
 static az_result parse_operation_message(
-    char * topic,
+    char* topic,
     int topic_len,
-    MQTTClient_message const * message,
+    MQTTClient_message const* message,
     az_iot_provisioning_client_register_response* response,
     az_iot_provisioning_client_operation_status* operation_status)
 {
@@ -448,7 +449,8 @@ static az_result parse_operation_message(
   return AZ_OK;
 }
 
-static int send_operation_query_message(az_iot_provisioning_client_register_response const * response)
+static int send_operation_query_message(
+    az_iot_provisioning_client_register_response const* response)
 {
   int rc;
 
@@ -489,7 +491,7 @@ static void sleep_for_seconds(uint32_t seconds)
 }
 
 // Print an az_span to the console
-static void print_az_span(const char * str, az_span span)
+static void print_az_span(const char* str, az_span span)
 {
   printf("%s", str);
 
