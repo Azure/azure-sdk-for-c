@@ -56,9 +56,6 @@ steps:
         git pull origin master
 
         ./bootstrap-vcpkg.sh
-
-        echo "##vso[task.prependpath]$(pwd)"
-        echo "##vso[task.setvariable variable=VCPKG_INSTALLATION_ROOT;]$(pwd)"
     condition: and(succeeded(), not(contains(variables['OSVmImage'], 'macOS')), not(eq(variables['${{ parameters.DependenciesVariableName }}'], '')))
     displayName: Upgrade vcpkg
 
