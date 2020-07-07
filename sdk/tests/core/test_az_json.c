@@ -454,8 +454,16 @@ static void test_json_parser(void** state)
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_NUMBER, AZ_SPAN_FROM_STR("1e-400"));
 
     double actual_d = 0;
+
+    // https://github.com/Azure/azure-sdk-for-c/issues/893
+    // The result of this depends on the compiler.
+#ifdef _MSC_VER
     TEST_EXPECT_SUCCESS(az_json_token_get_double(&parser.token, &actual_d));
     assert_true(_is_double_equal(actual_d, 0.0, 1e-2));
+#else
+    assert_int_equal(
+        az_json_token_get_double(&parser.token, &actual_d), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+#endif // _MSC_VER
   }
   {
     // negative exp
