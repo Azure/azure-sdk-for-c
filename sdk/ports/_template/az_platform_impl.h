@@ -19,7 +19,7 @@ inline AZ_NODISCARD int64_t az_platform_clock_msec() {
     // The method must be implemented
     // The Azure SDK for Embedded C provides default implementations for Win32, Linux and Mac.
     //  https://github.com/Azure/azure-sdk-for-c#cmake-options
-    #error "No method implementation provided, see documentation for additional details.  https://github.com/Azure/azure-sdk-for-c#cmake-options"
+    #error "No method implementation provided, see documentation for additional details.  https://github.com/Azure/azure-sdk-for-c"
     return 0; 
 }
 
@@ -34,7 +34,7 @@ inline void az_platform_sleep_msec(int32_t milliseconds) {
     // The method must be implemented
     // The Azure SDK for Embedded C provides default implementations for Win32, Linux and Mac.
     //  https://github.com/Azure/azure-sdk-for-c#cmake-options
-    #error "No method implementation provided, see documentation for additional details.  https://github.com/Azure/azure-sdk-for-c#cmake-options"
+    #error "No method implementation provided, see documentation for additional details.  https://github.com/Azure/azure-sdk-for-c"
     return;  
 }
 
@@ -60,7 +60,7 @@ inline AZ_NODISCARD bool az_platform_atomic_compare_exchange(
     // The method must be implemented
     // The Azure SDK for Embedded C provides default implementations for Win32, Linux and Mac.
     //  https://github.com/Azure/azure-sdk-for-c#cmake-options
-    #error "No method implementation provided, see documentation for additional details.  https://github.com/Azure/azure-sdk-for-c#cmake-options"
+    #error "No method implementation provided, see documentation for additional details.  https://github.com/Azure/azure-sdk-for-c"
   return false;
 }
 
