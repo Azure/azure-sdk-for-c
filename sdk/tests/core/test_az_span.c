@@ -271,6 +271,15 @@ static void az_span_atou64_test(void** state)
   assert_int_equal(
       az_span_atou64(AZ_SPAN_FROM_STR("18446744073709551616"), &value),
       AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atou64(AZ_SPAN_FROM_STR("-9223372036854775809"), &value),
+      AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atou64(AZ_SPAN_FROM_STR("-42"), &value), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atou64(AZ_SPAN_FROM_STR("1.2"), &value), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atou64(AZ_SPAN_FROM_STR("-1.2"), &value), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
 }
 
 static void az_span_atoi64_test(void** state)
@@ -309,6 +318,10 @@ static void az_span_atoi64_test(void** state)
   assert_int_equal(
       az_span_atoi64(AZ_SPAN_FROM_STR("-9223372036854775809"), &value),
       AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atoi64(AZ_SPAN_FROM_STR("1.2"), &value), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  assert_int_equal(
+      az_span_atoi64(AZ_SPAN_FROM_STR("-1.2"), &value), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
 }
 
 // Disable warning for float comparisons, for this particular test

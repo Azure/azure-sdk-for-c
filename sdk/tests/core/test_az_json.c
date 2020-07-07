@@ -899,6 +899,20 @@ static void test_json_value(void** state)
         .string_has_escaped_chars = false,
       },
     };
+  az_json_token const json_negative_number = (az_json_token){
+      .kind = AZ_JSON_TOKEN_NUMBER,
+      .slice = AZ_SPAN_FROM_STR("-42"),
+      ._internal = {
+        .string_has_escaped_chars = false,
+      },
+    };
+  az_json_token const json_decimal_number = (az_json_token){
+      .kind = AZ_JSON_TOKEN_NUMBER,
+      .slice = AZ_SPAN_FROM_STR("123.456"),
+      ._internal = {
+        .string_has_escaped_chars = false,
+      },
+    };
   az_json_token const json_string = (az_json_token){
       .kind = AZ_JSON_TOKEN_STRING,
       .slice = AZ_SPAN_FROM_STR("Hello"),
@@ -926,7 +940,36 @@ static void test_json_value(void** state)
     assert_true(
         az_json_token_get_boolean(&json_number, &boolean_value) == AZ_ERROR_JSON_INVALID_STATE);
   }
-
+  // unsigned number from negative number
+  {
+    uint32_t number_value_u32 = 0;
+    assert_int_equal(
+        az_json_token_get_uint32(&json_negative_number, &number_value_u32),
+        AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+    uint64_t number_value_u64 = 0;
+    assert_int_equal(
+        az_json_token_get_uint64(&json_negative_number, &number_value_u64),
+        AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  }
+  // integer number from double number
+  {
+    uint32_t number_value_u32 = 0;
+    assert_int_equal(
+        az_json_token_get_uint32(&json_decimal_number, &number_value_u32),
+        AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+    uint64_t number_value_u64 = 0;
+    assert_int_equal(
+        az_json_token_get_uint64(&json_decimal_number, &number_value_u64),
+        AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+    int32_t number_value_i32 = 0;
+    assert_int_equal(
+        az_json_token_get_int32(&json_decimal_number, &number_value_i32),
+        AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+    int64_t number_value_i64 = 0;
+    assert_int_equal(
+        az_json_token_get_int64(&json_decimal_number, &number_value_i64),
+        AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+  }
   // string from string
   {
     char string_value[10] = { 0 };
@@ -944,7 +987,6 @@ static void test_json_value(void** state)
         az_json_token_get_string(&json_boolean, string_value, 10, NULL)
         == AZ_ERROR_JSON_INVALID_STATE);
   }
-
   // number from number
   {
     uint64_t number_value = 1;
@@ -952,6 +994,20 @@ static void test_json_value(void** state)
 
     uint64_t const expected_value_bin_rep_view = 42;
     assert_true(number_value == expected_value_bin_rep_view);
+  }
+  // double number from decimal and negative number
+  {
+    double number_value = 1;
+    TEST_EXPECT_SUCCESS(az_json_token_get_double(&json_number, &number_value));
+    assert_true(_is_double_equal(number_value, 42, 1e-2));
+    TEST_EXPECT_SUCCESS(az_json_token_get_double(&json_negative_number, &number_value));
+    assert_true(_is_double_equal(number_value, -42, 1e-2));
+    TEST_EXPECT_SUCCESS(az_json_token_get_double(&json_decimal_number, &number_value));
+    assert_true(_is_double_equal(number_value, 123.456, 1e-2));
+
+    int int32_number = -1;
+    TEST_EXPECT_SUCCESS(az_json_token_get_int32(&json_negative_number, &int32_number));
+    assert_int_equal(int32_number, -42);
   }
   // number from string
   {
