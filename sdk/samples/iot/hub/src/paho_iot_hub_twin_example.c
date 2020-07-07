@@ -538,13 +538,13 @@ static az_result update_property(az_span desired_payload)
   az_json_parser json_parser;
   AZ_RETURN_IF_FAILED(az_json_parser_init(&json_parser, desired_payload, NULL));
 
-  AZ_RETURN_IF_FAILED(az_json_parser_move_to_next_token(&json_parser));
+  AZ_RETURN_IF_FAILED(az_json_parser_next_token(&json_parser));
   if (json_parser.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
   {
     return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
 
-  AZ_RETURN_IF_FAILED(az_json_parser_move_to_next_token(&json_parser));
+  AZ_RETURN_IF_FAILED(az_json_parser_next_token(&json_parser));
 
   // Update property locally if found
   while (json_parser.token.kind != AZ_JSON_TOKEN_END_OBJECT)
@@ -572,7 +572,7 @@ static az_result update_property(az_span desired_payload)
       AZ_RETURN_IF_FAILED(az_json_parser_skip_children(&json_parser));
     }
 
-    AZ_RETURN_IF_FAILED(az_json_parser_move_to_next_token(&json_parser));
+    AZ_RETURN_IF_FAILED(az_json_parser_next_token(&json_parser));
   }
 
   printf(

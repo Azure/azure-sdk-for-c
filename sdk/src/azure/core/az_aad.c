@@ -85,7 +85,7 @@ AZ_NODISCARD static az_result _az_parse_json_payload(
   az_json_parser jp;
   AZ_RETURN_IF_FAILED(az_json_parser_init(&jp, body, NULL));
 
-  AZ_RETURN_IF_FAILED(az_json_parser_move_to_next_token(&jp));
+  AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
   if (jp.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
   {
     return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
@@ -94,19 +94,19 @@ AZ_NODISCARD static az_result _az_parse_json_payload(
   bool found_expires_in = false;
   bool found_access_token = false;
 
-  AZ_RETURN_IF_FAILED(az_json_parser_move_to_next_token(&jp));
+  AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
 
   while (jp.token.kind != AZ_JSON_TOKEN_END_OBJECT)
   {
     if (az_json_token_is_text_equal(&jp.token, AZ_SPAN_FROM_STR("expires_in")))
     {
-      AZ_RETURN_IF_FAILED(az_json_parser_move_to_next_token(&jp));
+      AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
       AZ_RETURN_IF_FAILED(az_json_token_get_uint64(&jp.token, expires_in_seconds));
       found_expires_in = true;
     }
     else if (az_json_token_is_text_equal(&jp.token, AZ_SPAN_FROM_STR("access_token")))
     {
-      AZ_RETURN_IF_FAILED(az_json_parser_move_to_next_token(&jp));
+      AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
       *json_access_token = jp.token;
       found_access_token = true;
     }
@@ -115,7 +115,7 @@ AZ_NODISCARD static az_result _az_parse_json_payload(
       // ignore other tokens
       AZ_RETURN_IF_FAILED(az_json_parser_skip_children(&jp));
     }
-    AZ_RETURN_IF_FAILED(az_json_parser_move_to_next_token(&jp));
+    AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
   }
 
   if (!found_expires_in || !found_access_token)

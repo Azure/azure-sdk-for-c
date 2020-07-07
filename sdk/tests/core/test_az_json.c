@@ -227,56 +227,56 @@ static void test_json_parser(void** state)
   {
     az_json_parser parser = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR("    "), NULL));
-    assert_true(az_json_parser_move_to_next_token(&parser) == AZ_ERROR_EOF);
+    assert_true(az_json_parser_next_token(&parser) == AZ_ERROR_EOF);
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_NONE, AZ_SPAN_NULL);
   }
   {
     az_json_parser parser = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR("  null  "), NULL));
-    TEST_EXPECT_SUCCESS(az_json_parser_move_to_next_token(&parser));
+    TEST_EXPECT_SUCCESS(az_json_parser_next_token(&parser));
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_NULL, AZ_SPAN_FROM_STR("null"));
   }
   {
     az_json_parser parser = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR("  nul"), NULL));
-    assert_true(az_json_parser_move_to_next_token(&parser) == AZ_ERROR_EOF);
+    assert_true(az_json_parser_next_token(&parser) == AZ_ERROR_EOF);
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_NONE, AZ_SPAN_NULL);
   }
   {
     az_json_parser parser = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR("  false"), NULL));
-    TEST_EXPECT_SUCCESS(az_json_parser_move_to_next_token(&parser));
+    TEST_EXPECT_SUCCESS(az_json_parser_next_token(&parser));
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_FALSE, AZ_SPAN_FROM_STR("false"));
   }
   {
     az_json_parser parser = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR("  falsx  "), NULL));
-    assert_true(az_json_parser_move_to_next_token(&parser) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+    assert_true(az_json_parser_next_token(&parser) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_NONE, AZ_SPAN_NULL);
   }
   {
     az_json_parser parser = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR("true "), NULL));
-    TEST_EXPECT_SUCCESS(az_json_parser_move_to_next_token(&parser));
+    TEST_EXPECT_SUCCESS(az_json_parser_next_token(&parser));
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_TRUE, AZ_SPAN_FROM_STR("true"));
   }
   {
     az_json_parser parser = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR("  truem"), NULL));
-    TEST_EXPECT_SUCCESS(az_json_parser_move_to_next_token(&parser));
+    TEST_EXPECT_SUCCESS(az_json_parser_next_token(&parser));
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_TRUE, AZ_SPAN_FROM_STR("true"));
   }
   {
     az_json_parser parser = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR("  123a"), NULL));
-    assert_true(az_json_parser_move_to_next_token(&parser) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+    assert_true(az_json_parser_next_token(&parser) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_NONE, AZ_SPAN_NULL);
   }
   {
     az_span const s = AZ_SPAN_FROM_STR(" \"tr\\\"ue\\t\" ");
     az_json_parser parser = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, s, NULL));
-    TEST_EXPECT_SUCCESS(az_json_parser_move_to_next_token(&parser));
+    TEST_EXPECT_SUCCESS(az_json_parser_next_token(&parser));
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_STRING, AZ_SPAN_FROM_STR("tr\\\"ue\\t"));
     assert_true(az_span_ptr(parser.token.slice) == (az_span_ptr(s) + 2));
   }
@@ -284,7 +284,7 @@ static void test_json_parser(void** state)
     az_span const s = AZ_SPAN_FROM_STR("\"\\uFf0F\"");
     az_json_parser parser = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, s, NULL));
-    TEST_EXPECT_SUCCESS(az_json_parser_move_to_next_token(&parser));
+    TEST_EXPECT_SUCCESS(az_json_parser_next_token(&parser));
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_STRING, AZ_SPAN_FROM_STR("\\uFf0F"));
     assert_true(az_span_ptr(parser.token.slice) == az_span_ptr(s) + 1);
   }
@@ -292,14 +292,14 @@ static void test_json_parser(void** state)
     az_span const s = AZ_SPAN_FROM_STR("\"\\uFf0\"");
     az_json_parser parser = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, s, NULL));
-    assert_true(az_json_parser_move_to_next_token(&parser) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
+    assert_true(az_json_parser_next_token(&parser) == AZ_ERROR_PARSER_UNEXPECTED_CHAR);
   }
   /* Testing parsing number and converting to double (_az_json_number_to_double) */
   {
     // no exp number, no decimal, integer only
     az_json_parser parser = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR(" 23 "), NULL));
-    TEST_EXPECT_SUCCESS(az_json_parser_move_to_next_token(&parser));
+    TEST_EXPECT_SUCCESS(az_json_parser_next_token(&parser));
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_NUMBER, AZ_SPAN_FROM_STR("23"));
 
     uint64_t const expected_64 = 23;
@@ -316,14 +316,14 @@ static void test_json_parser(void** state)
     // no exp number, no decimal, negative integer only
     az_json_parser parser = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR(" -23 "), NULL));
-    TEST_EXPECT_SUCCESS(az_json_parser_move_to_next_token(&parser));
+    TEST_EXPECT_SUCCESS(az_json_parser_next_token(&parser));
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_NUMBER, AZ_SPAN_FROM_STR("-23"));
   }
   {
     // negative number with decimals
     az_json_parser parser = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR(" -23.56"), NULL));
-    TEST_EXPECT_SUCCESS(az_json_parser_move_to_next_token(&parser));
+    TEST_EXPECT_SUCCESS(az_json_parser_next_token(&parser));
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_NUMBER, AZ_SPAN_FROM_STR("-23.56"));
 
     // TODO: Add back tests that validate az_json_token_get_double result when double support is
@@ -333,14 +333,14 @@ static void test_json_parser(void** state)
     // negative + decimals + exp
     az_json_parser parser = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR(" -23.56e-3"), NULL));
-    TEST_EXPECT_SUCCESS(az_json_parser_move_to_next_token(&parser));
+    TEST_EXPECT_SUCCESS(az_json_parser_next_token(&parser));
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_NUMBER, AZ_SPAN_FROM_STR("-23.56e-3"));
   }
   {
     // exp
     az_json_parser parser = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR("1e50"), NULL));
-    TEST_EXPECT_SUCCESS(az_json_parser_move_to_next_token(&parser));
+    TEST_EXPECT_SUCCESS(az_json_parser_next_token(&parser));
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_NUMBER, AZ_SPAN_FROM_STR("1e50"));
   }
   {
@@ -348,7 +348,7 @@ static void test_json_parser(void** state)
     az_json_parser parser = { 0 };
     TEST_EXPECT_SUCCESS(
         az_json_parser_init(&parser, AZ_SPAN_FROM_STR("10000000000000000000000e17"), NULL));
-    TEST_EXPECT_SUCCESS(az_json_parser_move_to_next_token(&parser));
+    TEST_EXPECT_SUCCESS(az_json_parser_next_token(&parser));
     test_json_token_helper(
         parser.token, AZ_JSON_TOKEN_NUMBER, AZ_SPAN_FROM_STR("10000000000000000000000e17"));
   }
@@ -356,51 +356,51 @@ static void test_json_parser(void** state)
     // exp inf -> Any value above double MAX range would be translated to positive inf
     az_json_parser parser = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR("1e309"), NULL));
-    TEST_EXPECT_SUCCESS(az_json_parser_move_to_next_token(&parser));
+    TEST_EXPECT_SUCCESS(az_json_parser_next_token(&parser));
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_NUMBER, AZ_SPAN_FROM_STR("1e309"));
   }
   {
     // exp inf -> Any value below double MIN range would be translated 0
     az_json_parser parser = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR("1e-400"), NULL));
-    TEST_EXPECT_SUCCESS(az_json_parser_move_to_next_token(&parser));
+    TEST_EXPECT_SUCCESS(az_json_parser_next_token(&parser));
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_NUMBER, AZ_SPAN_FROM_STR("1e-400"));
   }
   {
     // negative exp
     az_json_parser parser = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR("1e-18"), NULL));
-    TEST_EXPECT_SUCCESS(az_json_parser_move_to_next_token(&parser));
+    TEST_EXPECT_SUCCESS(az_json_parser_next_token(&parser));
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_NUMBER, AZ_SPAN_FROM_STR("1e-18"));
   }
   /* end of Testing parsing number and converting to double */
   {
     az_json_parser parser = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR(" [ true, 0.25 ]"), NULL));
-    TEST_EXPECT_SUCCESS(az_json_parser_move_to_next_token(&parser));
+    TEST_EXPECT_SUCCESS(az_json_parser_next_token(&parser));
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_BEGIN_ARRAY, AZ_SPAN_FROM_STR("["));
-    TEST_EXPECT_SUCCESS(az_json_parser_move_to_next_token(&parser));
+    TEST_EXPECT_SUCCESS(az_json_parser_next_token(&parser));
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_TRUE, AZ_SPAN_FROM_STR("true"));
-    TEST_EXPECT_SUCCESS(az_json_parser_move_to_next_token(&parser));
+    TEST_EXPECT_SUCCESS(az_json_parser_next_token(&parser));
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_NUMBER, AZ_SPAN_FROM_STR("0.25"));
-    TEST_EXPECT_SUCCESS(az_json_parser_move_to_next_token(&parser));
+    TEST_EXPECT_SUCCESS(az_json_parser_next_token(&parser));
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_END_ARRAY, AZ_SPAN_FROM_STR("]"));
-    assert_true(az_json_parser_move_to_next_token(&parser) == AZ_ERROR_JSON_PARSING_DONE);
+    assert_true(az_json_parser_next_token(&parser) == AZ_ERROR_JSON_PARSING_DONE);
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_END_ARRAY, AZ_SPAN_FROM_STR("]"));
   }
   {
     az_span const json = AZ_SPAN_FROM_STR("{\"a\":\"Hello world!\"}");
     az_json_parser parser = { 0 };
     TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, json, NULL));
-    TEST_EXPECT_SUCCESS(az_json_parser_move_to_next_token(&parser));
+    TEST_EXPECT_SUCCESS(az_json_parser_next_token(&parser));
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_BEGIN_OBJECT, AZ_SPAN_FROM_STR("{"));
-    TEST_EXPECT_SUCCESS(az_json_parser_move_to_next_token(&parser));
+    TEST_EXPECT_SUCCESS(az_json_parser_next_token(&parser));
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_PROPERTY_NAME, AZ_SPAN_FROM_STR("a"));
-    TEST_EXPECT_SUCCESS(az_json_parser_move_to_next_token(&parser));
+    TEST_EXPECT_SUCCESS(az_json_parser_next_token(&parser));
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_STRING, AZ_SPAN_FROM_STR("Hello world!"));
-    TEST_EXPECT_SUCCESS(az_json_parser_move_to_next_token(&parser));
+    TEST_EXPECT_SUCCESS(az_json_parser_next_token(&parser));
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_END_OBJECT, AZ_SPAN_FROM_STR("}"));
-    assert_true(az_json_parser_move_to_next_token(&parser) == AZ_ERROR_JSON_PARSING_DONE);
+    assert_true(az_json_parser_next_token(&parser) == AZ_ERROR_JSON_PARSING_DONE);
     test_json_token_helper(parser.token, AZ_JSON_TOKEN_END_OBJECT, AZ_SPAN_FROM_STR("}"));
   }
   {
@@ -522,7 +522,7 @@ az_result read_write_token(
       bool need_comma = false;
       while (true)
       {
-        az_result const result = az_json_parser_move_to_next_token(state);
+        az_result const result = az_json_parser_next_token(state);
         AZ_RETURN_IF_FAILED(result);
         if (state->token.kind != AZ_JSON_TOKEN_PROPERTY_NAME)
         {
@@ -543,7 +543,7 @@ az_result read_write_token(
         *output = az_span_copy_u8(*output, ':');
         *written += 1;
 
-        AZ_RETURN_IF_FAILED(az_json_parser_move_to_next_token(state));
+        AZ_RETURN_IF_FAILED(az_json_parser_next_token(state));
         AZ_RETURN_IF_FAILED(read_write_token(output, written, o, state, state->token));
       }
       AZ_RETURN_IF_NOT_ENOUGH_SIZE(*output, 1);
@@ -559,7 +559,7 @@ az_result read_write_token(
       bool need_comma = false;
       while (true)
       {
-        az_result const result = az_json_parser_move_to_next_token(state);
+        az_result const result = az_json_parser_next_token(state);
         AZ_RETURN_IF_FAILED(result);
         if (state->token.kind == AZ_JSON_TOKEN_END_ARRAY)
         {
@@ -592,7 +592,7 @@ az_result read_write(az_span input, az_span* output, int32_t* o)
 {
   az_json_parser parser = { 0 };
   TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, input, NULL));
-  AZ_RETURN_IF_FAILED(az_json_parser_move_to_next_token(&parser));
+  AZ_RETURN_IF_FAILED(az_json_parser_next_token(&parser));
   int32_t written = 0;
   az_span output_copy = *output;
   AZ_RETURN_IF_FAILED(read_write_token(&output_copy, &written, o, &parser, parser.token));
@@ -624,7 +624,7 @@ az_result write_str(az_span span, az_span s, az_span* out, int32_t* written)
     az_result result = AZ_OK; \
     while (result == AZ_OK) \
     { \
-      result = az_json_parser_move_to_next_token(&parser); \
+      result = az_json_parser_next_token(&parser); \
     } \
     assert_int_equal(result, expected_result); \
   } while (0)
@@ -762,31 +762,31 @@ static void test_json_skip_children(void** state)
   az_json_parser parser = { 0 };
 
   TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR("{\"foo\":1}"), NULL));
-  TEST_EXPECT_SUCCESS(az_json_parser_move_to_next_token(&parser));
+  TEST_EXPECT_SUCCESS(az_json_parser_next_token(&parser));
   assert_int_equal(parser.token.kind, AZ_JSON_TOKEN_BEGIN_OBJECT);
   TEST_EXPECT_SUCCESS(az_json_parser_skip_children(&parser));
   assert_int_equal(parser.token.kind, AZ_JSON_TOKEN_END_OBJECT);
   assert_int_equal(parser._internal.bit_stack._internal.current_depth, 0);
 
   TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR("{\"foo\":{}}"), NULL));
-  TEST_EXPECT_SUCCESS(az_json_parser_move_to_next_token(&parser));
+  TEST_EXPECT_SUCCESS(az_json_parser_next_token(&parser));
   assert_int_equal(parser.token.kind, AZ_JSON_TOKEN_BEGIN_OBJECT);
   TEST_EXPECT_SUCCESS(az_json_parser_skip_children(&parser));
   assert_int_equal(parser.token.kind, AZ_JSON_TOKEN_END_OBJECT);
   assert_int_equal(parser._internal.bit_stack._internal.current_depth, 0);
 
   TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR("{\"foo\":{}}"), NULL));
-  TEST_EXPECT_SUCCESS(az_json_parser_move_to_next_token(&parser));
-  TEST_EXPECT_SUCCESS(az_json_parser_move_to_next_token(&parser));
+  TEST_EXPECT_SUCCESS(az_json_parser_next_token(&parser));
+  TEST_EXPECT_SUCCESS(az_json_parser_next_token(&parser));
   assert_int_equal(parser.token.kind, AZ_JSON_TOKEN_PROPERTY_NAME);
   TEST_EXPECT_SUCCESS(az_json_parser_skip_children(&parser));
   assert_int_equal(parser.token.kind, AZ_JSON_TOKEN_END_OBJECT);
   assert_int_equal(parser._internal.bit_stack._internal.current_depth, 1);
 
   TEST_EXPECT_SUCCESS(az_json_parser_init(&parser, AZ_SPAN_FROM_STR("{\"foo\":{}}"), NULL));
-  TEST_EXPECT_SUCCESS(az_json_parser_move_to_next_token(&parser));
-  TEST_EXPECT_SUCCESS(az_json_parser_move_to_next_token(&parser));
-  TEST_EXPECT_SUCCESS(az_json_parser_move_to_next_token(&parser));
+  TEST_EXPECT_SUCCESS(az_json_parser_next_token(&parser));
+  TEST_EXPECT_SUCCESS(az_json_parser_next_token(&parser));
+  TEST_EXPECT_SUCCESS(az_json_parser_next_token(&parser));
   assert_int_equal(parser.token.kind, AZ_JSON_TOKEN_BEGIN_OBJECT);
   TEST_EXPECT_SUCCESS(az_json_parser_skip_children(&parser));
   assert_int_equal(parser.token.kind, AZ_JSON_TOKEN_END_OBJECT);

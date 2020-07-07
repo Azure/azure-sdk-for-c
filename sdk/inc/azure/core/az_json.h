@@ -446,7 +446,7 @@ AZ_NODISCARD az_result az_json_parser_init(
  *         AZ_ERROR_EOF when the end of the JSON document is reached.<br>
  *         AZ_ERROR_PARSER_UNEXPECTED_CHAR when an invalid character is detected.
  */
-AZ_NODISCARD az_result az_json_parser_move_to_next_token(az_json_parser* json_parser);
+AZ_NODISCARD az_result az_json_parser_next_token(az_json_parser* json_parser);
 
 /**
  * @brief Parses and skips over any nested JSON elements.

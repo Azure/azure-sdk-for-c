@@ -634,7 +634,7 @@ AZ_NODISCARD static az_result _az_json_parser_process_next_byte(
   }
 }
 
-AZ_NODISCARD az_result az_json_parser_move_to_next_token(az_json_parser* json_parser)
+AZ_NODISCARD az_result az_json_parser_next_token(az_json_parser* json_parser)
 {
   _az_PRECONDITION_NOT_NULL(json_parser);
 
@@ -707,7 +707,7 @@ AZ_NODISCARD az_result az_json_parser_skip_children(az_json_parser* json_parser)
 
   if (json_parser->token.kind == AZ_JSON_TOKEN_PROPERTY_NAME)
   {
-    AZ_RETURN_IF_FAILED(az_json_parser_move_to_next_token(json_parser));
+    AZ_RETURN_IF_FAILED(az_json_parser_next_token(json_parser));
   }
 
   az_json_token_kind token_kind = json_parser->token.kind;
@@ -717,7 +717,7 @@ AZ_NODISCARD az_result az_json_parser_skip_children(az_json_parser* json_parser)
     int32_t depth = json_parser->_internal.bit_stack._internal.current_depth;
     do
     {
-      AZ_RETURN_IF_FAILED(az_json_parser_move_to_next_token(json_parser));
+      AZ_RETURN_IF_FAILED(az_json_parser_next_token(json_parser));
     } while (depth <= json_parser->_internal.bit_stack._internal.current_depth);
   }
   return AZ_OK;
