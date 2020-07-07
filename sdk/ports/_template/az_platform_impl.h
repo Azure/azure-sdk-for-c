@@ -15,27 +15,29 @@
  * @brief Gets the platform clock in milliseconds.
  * @return Platform clock in milliseconds.
  */
-inline AZ_NODISCARD int64_t az_platform_clock_msec() { 
-    // The method must be implemented
-    // The Azure SDK for Embedded C provides default implementations for Win32, Linux and Mac.
-    //  https://github.com/Azure/azure-sdk-for-c#cmake-options
-    #error "No method implementation provided, see documentation for additional details.  https://github.com/Azure/azure-sdk-for-c"
-    return 0; 
+AZ_NODISCARD AZ_INLINE int64_t az_platform_clock_msec()
+{
+// The method must be implemented
+// The Azure SDK for Embedded C provides default implementations for Win32, Linux and Mac.
+//  https://github.com/Azure/azure-sdk-for-c#cmake-options
+#error \
+    "No method implementation provided, see documentation for additional details.  https://github.com/Azure/azure-sdk-for-c"
+  return 0;
 }
 
 /**
  * @brief Tells the platform to sleep for a given number of milliseconds.
  * @param milliseconds Number of milliseconds to sleep.
- *        0 - Yield remainder of time slice and resume immediately
- *       -1 - Sleep should not time out.
- * @remarks Negative values (excluding -1) have undefined behavior
+ * @remarks Non-positive values (milliseconds <= 0) have undefined behavior
  */
-inline void az_platform_sleep_msec(int32_t milliseconds) { 
-    // The method must be implemented
-    // The Azure SDK for Embedded C provides default implementations for Win32, Linux and Mac.
-    //  https://github.com/Azure/azure-sdk-for-c#cmake-options
-    #error "No method implementation provided, see documentation for additional details.  https://github.com/Azure/azure-sdk-for-c"
-    return;  
+AZ_INLINE void az_platform_sleep_msec(int32_t milliseconds)
+{
+// The method must be implemented
+// The Azure SDK for Embedded C provides default implementations for Win32, Linux and Mac.
+//  https://github.com/Azure/azure-sdk-for-c#cmake-options
+#error \
+    "No method implementation provided, see documentation for additional details.  https://github.com/Azure/azure-sdk-for-c"
+  return;
 }
 
 /**
@@ -52,15 +54,16 @@ inline void az_platform_sleep_msec(int32_t milliseconds) {
  * @remarks If `*obj` equals to \p expected, its value is being overwritten with \p desired, and no
  * operation otherwise. Returns `true` if the value was overwritten, `false` otherwise.
  */
-inline AZ_NODISCARD bool az_platform_atomic_compare_exchange(
+AZ_NODISCARD AZ_INLINE bool az_platform_atomic_compare_exchange(
     uintptr_t volatile* obj,
     uintptr_t expected,
     uintptr_t desired)
 {
-    // The method must be implemented
-    // The Azure SDK for Embedded C provides default implementations for Win32, Linux and Mac.
-    //  https://github.com/Azure/azure-sdk-for-c#cmake-options
-    #error "No method implementation provided, see documentation for additional details.  https://github.com/Azure/azure-sdk-for-c"
+// The method must be implemented
+// The Azure SDK for Embedded C provides default implementations for Win32, Linux and Mac.
+//  https://github.com/Azure/azure-sdk-for-c#cmake-options
+#error \
+    "No method implementation provided, see documentation for additional details.  https://github.com/Azure/azure-sdk-for-c"
   return false;
 }
 
