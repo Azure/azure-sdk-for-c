@@ -126,13 +126,13 @@ AZ_NODISCARD az_result az_json_token_get_string(
 
 /**
  * @brief Determines whether the unescaped JSON token value that the #az_json_token points to is
- * equal to the expected text within the provided byte span.
+ * equal to the expected text within the provided byte span by doing a case-sensitive comparison.
  *
  * @param[in] json_token A pointer to an #az_json_token instance containing the JSON string token.
  * @param[in] expected_text The lookup text to compare the token against.
  *
  * @return `true` if the current JSON token value in the JSON source semantically matches the
- * expected lookup text; otherwise, false.
+ * expected lookup text, with the exact casing; otherwise, false.
  *
  * @remarks This operation is only valid for the string and property name token kinds. For all other
  * token kinds, it returns false.
@@ -403,10 +403,15 @@ AZ_NODISCARD AZ_INLINE az_json_parser_options az_json_parser_options_default()
 
 /**
  * @brief Returns the JSON tokens contained within a JSON buffer, one at a time.
+ *
+ * @remarks The token field is meant to be used as read-only to return the #az_json_token while
+ * parsing the JSON. Do NOT modify it.
  */
 typedef struct
 {
-  az_json_token token;
+  az_json_token
+      token; ///< This read-only field gives access to the current token that the #az_json_parser
+             ///< has processed, and it shouldn't be modified by the caller.
 
   struct
   {
