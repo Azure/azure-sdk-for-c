@@ -50,8 +50,7 @@
 #define TIMEOUT_WAIT_FOR_COMPLETION_MS 1000
 #define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
 #define TELEMETRY_SEND_INTERVAL 1
-#define NUMBER_OF_MESSAGES 5
-#define DEAFULT_START_TEMP_CELSIUS 22
+#define DEFAULT_START_TEMP_CELSIUS 22
 
 bool device_operational = true;
 static const uint8_t null_terminator = '\0';
@@ -109,12 +108,12 @@ static az_span reported_property_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("re
 static char reported_property_payload[32];
 
 // PnP Device Values
-static int32_t current_device_temp = DEAFULT_START_TEMP_CELSIUS;
-static int32_t device_temperature_avg_total = DEAFULT_START_TEMP_CELSIUS;
+static int32_t current_device_temp = DEFAULT_START_TEMP_CELSIUS;
+static int32_t device_temperature_avg_total = DEFAULT_START_TEMP_CELSIUS;
 static uint32_t device_temperature_avg_count = 1;
-static int32_t device_max_temp = DEAFULT_START_TEMP_CELSIUS;
-static int32_t device_min_temp = DEAFULT_START_TEMP_CELSIUS;
-static int32_t device_avg_temp = DEAFULT_START_TEMP_CELSIUS;
+static int32_t device_max_temp = DEFAULT_START_TEMP_CELSIUS;
+static int32_t device_min_temp = DEFAULT_START_TEMP_CELSIUS;
+static int32_t device_avg_temp = DEFAULT_START_TEMP_CELSIUS;
 
 //
 // Configuration and connection functions
@@ -137,6 +136,7 @@ static void sleep_for_seconds(uint32_t seconds);
 static int mqtt_publish_message();
 static int on_received(char* topicName, int topicLen, MQTTClient_message* message);
 static int send_telemetry_message();
+static int send_twin_get_message();
 static int send_command_response(
     az_iot_hub_client_method_request* request,
     uint16_t status,
@@ -209,8 +209,14 @@ int main()
   char* incoming_message_topic;
   int incoming_message_topic_len;
   MQTTClient_message* message;
+
+  // First get the twin document to check for updated desired properties
+  send_twin_get_message();
+   
   while (device_operational)
   {
+
+
     // Receive any incoming messages from twin or commands
     if (MQTTClient_receive(
             mqtt_client,
@@ -411,7 +417,7 @@ static az_result invoke_getMaxMinReport(az_span payload, az_span response, az_sp
     return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
 
-  // Use the boot time span unless the user specifies one
+  // Get the user specified "since"
   az_span start_time_span = AZ_SPAN_NULL;
   while (az_succeeded(az_json_parser_parse_token_member(&jp, &tm)))
   {
@@ -424,6 +430,7 @@ static az_result invoke_getMaxMinReport(az_span payload, az_span response, az_sp
     // else ignore token.
   }
 
+  // Set the response payload to error if the "since" field was not sent
   if (az_span_ptr(start_time_span) == NULL)
   {
     response = report_error_payload;
@@ -779,7 +786,7 @@ static int subscribe()
 
   // Subscribe to the twin response topic. Messages received on this topic will be response statuses
   // from published reported properties or the requested twin document from twin GET publish
-  // messages
+  // messages.
   if ((rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_SUBSCRIBE_TOPIC, 1))
       != MQTTCLIENT_SUCCESS)
   {
@@ -788,6 +795,11 @@ static int subscribe()
   }
 
   return 0;
+}
+
+static int send_twin_get_message()
+{
+  
 }
 
 static az_result build_telemetry_message(az_span* out_payload)
