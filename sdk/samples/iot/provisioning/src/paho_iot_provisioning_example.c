@@ -82,16 +82,15 @@ static int subscribe();
 static int register_device();
 static int get_operation_status();
 static az_result parse_operation_message(
-    char* topic,
+    char * topic,
     int topic_len,
-    MQTTClient_message* message,
+    MQTTClient_message const * message,
     az_iot_provisioning_client_register_response* response,
     az_iot_provisioning_client_operation_status* operation_status);
-static int send_operation_query_message(az_iot_provisioning_client_register_response response);
+static int send_operation_query_message(az_iot_provisioning_client_register_response const * response);
 
-static int get_operation_status_free(int rc, char* topic, MQTTClient_message* message);
 static void sleep_for_seconds(uint32_t seconds);
-static void print_az_span(az_span span);
+static void print_az_span(const char * str, az_span span);
 
 int main()
 {
@@ -330,7 +329,6 @@ static int register_device()
 static int get_operation_status()
 {
   int rc;
-
   bool is_operation_complete = false;
   char* topic = NULL;
   int topic_len = 0;
@@ -357,8 +355,10 @@ static int get_operation_status()
     if (az_failed(
             rc = parse_operation_message(topic, topic_len, message, &response, &operation_status)))
     {
-      printf("Failed to parse operation message, az_result return code %04x\n", rc);
-      return get_operation_status_free(rc, topic, message);
+      printf("Failed to parse operation message, az_result return code %04x\n", rc); 
+      MQTTClient_freeMessage(&message);
+      MQTTClient_free(topic);
+      return rc;
     }
     printf("Parsed operation message.\n");
 
@@ -366,9 +366,10 @@ static int get_operation_status()
     is_operation_complete = az_iot_provisioning_client_operation_complete(operation_status);
     if (!is_operation_complete)
     {
-      get_operation_status_free(0, topic, message);
+      MQTTClient_freeMessage(&message);
+      MQTTClient_free(topic);
 
-      if ((rc = send_operation_query_message(response)) != MQTTCLIENT_SUCCESS)
+      if ((rc = send_operation_query_message(&response)) != MQTTCLIENT_SUCCESS)
       {
         return rc;
       }
@@ -380,26 +381,19 @@ static int get_operation_status()
   if (operation_status == AZ_IOT_PROVISIONING_STATUS_ASSIGNED)
   {
     printf("SUCCESS - Device provisioned:\n");
-    printf("\tHub Hostname: ");
-    print_az_span(response.registration_result.assigned_hub_hostname);
-    printf("\tDevice Id: ");
-    print_az_span(response.registration_result.device_id);
+    print_az_span("\tHub Hostname: ", response.registration_result.assigned_hub_hostname);
+    print_az_span("\tDevice Id: ", response.registration_result.device_id);
   }
   else // Unsuccesful assignment (unassigned, failed or disabled states)
   {
     printf("ERROR - Device Provisioning failed:\n");
-    printf("\tRegistration state: ");
-    print_az_span(response.operation_status);
+    print_az_span("\tRegistration state: ", response.operation_status);
     printf("\tLast operation status: %d\n", response.status);
-    printf("\tOperation ID: ");
-    print_az_span(response.operation_id);
+    print_az_span("\tOperation ID: ", response.operation_id);
     printf("\tError code: %u\n", response.registration_result.extended_error_code);
-    printf("\tError message: ");
-    print_az_span(response.registration_result.error_message);
-    printf("\tError timestamp: ");
-    print_az_span(response.registration_result.error_timestamp);
-    printf("\tError tracking ID: ");
-    print_az_span(response.registration_result.error_tracking_id);
+    print_az_span("\tError message: ", response.registration_result.error_message);
+    print_az_span("\tError timestamp: ", response.registration_result.error_timestamp);
+    print_az_span("\tError tracking ID: ", response.registration_result.error_tracking_id);
 
     if (response.retry_after_seconds > 0)
     {
@@ -407,13 +401,15 @@ static int get_operation_status()
     }
   }
 
-  return get_operation_status_free(MQTTCLIENT_SUCCESS, topic, message);
+  MQTTClient_freeMessage(&message);
+  MQTTClient_free(topic);
+  return rc;
 }
 
 static az_result parse_operation_message(
-    char* topic,
+    char * topic,
     int topic_len,
-    MQTTClient_message* message,
+    MQTTClient_message const * message,
     az_iot_provisioning_client_register_response* response,
     az_iot_provisioning_client_operation_status* operation_status)
 {
@@ -439,8 +435,7 @@ static az_result parse_operation_message(
     printf("Message from unknown topic, az_result return code %0x4\n", rc);
     return rc;
   }
-  printf("Received payload:\n");
-  print_az_span(message_span);
+  print_az_span("Received payload:\n", message_span);
   printf("Response status is %d.\n", response->status);
 
   // Parse the operation status from a string to an enum
@@ -453,7 +448,7 @@ static az_result parse_operation_message(
   return AZ_OK;
 }
 
-static int send_operation_query_message(az_iot_provisioning_client_register_response response)
+static int send_operation_query_message(az_iot_provisioning_client_register_response const * response)
 {
   int rc;
 
@@ -462,15 +457,15 @@ static int send_operation_query_message(az_iot_provisioning_client_register_resp
   // Get the topic to send the query message
   if (az_failed(
           rc = az_iot_provisioning_client_query_status_get_publish_topic(
-              &provisioning_client, &response, query_topic, sizeof(query_topic), NULL)))
+              &provisioning_client, response, query_topic, sizeof(query_topic), NULL)))
   {
     printf("Unable to get query status publish topic, az_result return code %04x\n", rc);
     return rc;
   }
 
   // IMPORTANT: Wait the recommended retry-after number of seconds before query
-  printf("Querying after %u seconds...\n", response.retry_after_seconds);
-  sleep_for_seconds(response.retry_after_seconds);
+  printf("Querying after %u seconds...\n", response->retry_after_seconds);
+  sleep_for_seconds(response->retry_after_seconds);
 
   // Publish the query message
   if ((rc = MQTTClient_publish(mqtt_client, query_topic, 0, NULL, 0, 0, NULL))
@@ -481,15 +476,6 @@ static int send_operation_query_message(az_iot_provisioning_client_register_resp
   }
 
   return MQTTCLIENT_SUCCESS;
-}
-
-static int get_operation_status_free(int rc, char* topic, MQTTClient_message* message)
-{
-  if (message)
-    MQTTClient_freeMessage(&message);
-  if (topic)
-    MQTTClient_free(topic);
-  return rc;
 }
 
 static void sleep_for_seconds(uint32_t seconds)
@@ -503,8 +489,10 @@ static void sleep_for_seconds(uint32_t seconds)
 }
 
 // Print an az_span to the console
-static void print_az_span(az_span span)
+static void print_az_span(const char * str, az_span span)
 {
+  printf("%s", str);
+
   char* buffer = (char*)az_span_ptr(span);
   for (int32_t i = 0; i < az_span_size(span); i++)
   {
