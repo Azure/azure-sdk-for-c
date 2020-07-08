@@ -624,6 +624,29 @@ static az_result parse_twin_desired_temperature_property(az_span twin_payload_sp
   return AZ_ERROR_ITEM_NOT_FOUND;
 }
 
+static bool update_device_temp(int32_t temp)
+{
+  current_device_temp = temp;
+
+  bool ret = false;
+  if (current_device_temp > device_max_temp)
+  {
+    device_max_temp = current_device_temp;
+    ret = true;
+  }
+  if (current_device_temp < device_min_temp)
+  {
+    device_min_temp = current_device_temp;
+  }
+
+  // Increment the avg count, add the new temp to the total, and calculate the new avg
+  device_temperature_avg_count++;
+  device_temperature_avg_total += current_device_temp;
+  device_avg_temp = device_temperature_avg_total / (int32_t)device_temperature_avg_count;
+
+  return ret;
+}
+
 // Switch on the type of twin message and handle accordingly | On desired prop, respond with max
 // temp reported prop.
 static void handle_twin_message(
@@ -648,7 +671,10 @@ static void handle_twin_message(
       }
       else
       {
-        current_device_temp = (int32_t)desired_temp;
+        if (update_device_temp((int32_t)desired_temp))
+        {
+          send_reported_temperature_property(device_max_temp);
+        }
       }
       if (message->payloadlen)
       {
@@ -666,27 +692,8 @@ static void handle_twin_message(
         printf("Could not parse desired temperature property, az_result %d\n", result);
         break;
       }
-      current_device_temp = (int32_t)desired_temp;
 
-      // Set the max/min temps if apply
-      bool max_temp_changed = false;
-      if (current_device_temp > device_max_temp)
-      {
-        device_max_temp = current_device_temp;
-        max_temp_changed = true;
-      }
-      if (current_device_temp < device_min_temp)
-      {
-        device_min_temp = current_device_temp;
-      }
-
-      // Increment the avg count, add the new temp to the total, and calculate the new avg
-      device_temperature_avg_count++;
-      device_temperature_avg_total += current_device_temp;
-      device_avg_temp = device_temperature_avg_total / (int32_t)device_temperature_avg_count;
-
-      // Send back the max temp if it changed and print error if failed
-      if (max_temp_changed)
+      if (update_device_temp((int32_t)desired_temp))
       {
         send_reported_temperature_property(device_max_temp);
       }

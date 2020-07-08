@@ -144,7 +144,7 @@ are instead `int32_t` here. This shortcoming is being tracked [here](https://git
 ```
 with correct values substituted for each field.
 - **Telemetry**: Device sends a JSON message with the field name `temperature` and the `double` value of the temperature.
-- **Twin**: Desired property with the field name `targetTemperature` and the `double` value for the desired temperature. Reported property with the field name `maxTempSinceLastReboot` and the `double` value for the highest temperature.
+- **Twin**: Desired property with the field name `targetTemperature` and the `double` value for the desired temperature. Reported property with the field name `maxTempSinceLastReboot` and the `double` value for the highest temperature.Note that part of the PnP spec is a response to a desired property update from the service. The device will send back a reported property with a similarly named property and a set of "ack" values: `ac` for the HTTP-like ack code, `av` for ack version of the property, and an optional `ad` for an ack description.
 
 ## Troubleshooting
 
