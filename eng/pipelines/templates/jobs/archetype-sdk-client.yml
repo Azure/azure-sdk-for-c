@@ -14,7 +14,7 @@ jobs:
       # TRANSPORT_PAHO              OFF
       # PRECONDITIONS               ON
       # LOGGING                     ON
-      # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_POSIX / AZ_PLATFORM_IMPL_WIN32
+      # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_POSIX | AZ_PLATFORM_IMPL_WIN32
       Linux_x64:
         OSVmImage: 'ubuntu-18.04'
         vcpkg.deps: ''
@@ -52,7 +52,7 @@ jobs:
       # TRANSPORT_PAHO              ON
       # PRECONDITIONS               ON
       # LOGGING                     ON
-      # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_POSIX / AZ_PLATFORM_IMPL_WIN32
+      # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_POSIX | AZ_PLATFORM_IMPL_WIN32
       Linux_x64_with_samples:
         OSVmImage: 'ubuntu-18.04'
         vcpkg.deps: 'curl[ssl] paho-mqtt'
@@ -86,7 +86,7 @@ jobs:
       # TRANSPORT_PAHO              ON
       # PRECONDITIONS               ON
       # LOGGING                     ON
-      # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_POSIX / AZ_PLATFORM_IMPL_WIN32
+      # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_POSIX | AZ_PLATFORM_IMPL_WIN32
       Linux_x64_with_samples_and_unit_test:
         OSVmImage: 'ubuntu-18.04'
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
@@ -120,7 +120,7 @@ jobs:
       # TRANSPORT_PAHO              OFF
       # PRECONDITIONS               ON
       # LOGGING                     ON
-      # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_POSIX / AZ_PLATFORM_IMPL_WIN32
+      # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_POSIX | AZ_PLATFORM_IMPL_WIN32
       Linux_x64_with_unit_test:
         OSVmImage: 'ubuntu-18.04'
         vcpkg.deps: 'cmocka'
@@ -160,7 +160,7 @@ jobs:
       # TRANSPORT_PAHO              OFF
       # PRECONDITIONS               OFF
       # LOGGING                     ON
-      # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_POSIX / AZ_PLATFORM_IMPL_WIN32
+      # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_POSIX | AZ_PLATFORM_IMPL_WIN32
       Linux_x64_with_unit_test_no_preconditions:
         OSVmImage: 'ubuntu-18.04'
         vcpkg.deps: 'cmocka'
