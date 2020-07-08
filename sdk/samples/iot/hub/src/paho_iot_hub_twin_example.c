@@ -558,14 +558,13 @@ static az_result update_property(az_span desired_payload)
       // Move to the value token
       AZ_RETURN_IF_FAILED(az_json_parser_next_token(&json_parser));
 
-      int32_t temp_property_value = 0;
-      AZ_RETURN_IF_FAILED(az_json_token_get_int32(&json_parser.token, &temp_property_value));
+      AZ_RETURN_IF_FAILED(az_json_token_get_int32(&json_parser.token, &reported_property_value));
 
       printf(
           "Updating \"%.*s\" locally.\n",
           az_span_size(reported_property_name),
           az_span_ptr(reported_property_name));
-      reported_property_value = temp_property_value;
+
       return AZ_OK;
     }
     else
