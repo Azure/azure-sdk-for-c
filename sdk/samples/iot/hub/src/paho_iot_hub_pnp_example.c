@@ -816,9 +816,9 @@ static void handle_command_message(
         az_span_ptr(command_request->name));
 
     int rc;
-    if ((rc = send_command_response(command_request, 404, report_error_payload)) != 0)
+    if ((rc = send_command_response(command_request, 501, report_error_payload)) != 0)
     {
-      printf("Unable to send %d response, status %d\n", 404, rc);
+      printf("Unable to send %d response, status %d\n", 501, rc);
     }
   }
 }
