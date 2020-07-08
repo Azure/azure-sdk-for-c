@@ -555,6 +555,9 @@ static az_result update_property(az_span desired_payload)
     }
     else if (az_json_token_is_text_equal(&json_parser.token, reported_property_name))
     {
+      // Move to the value token
+      AZ_RETURN_IF_FAILED(az_json_parser_next_token(&json_parser));
+
       // TODO: Change back to int32_t once that is supported.
       uint32_t temp_property_value = 0;
       AZ_RETURN_IF_FAILED(az_json_token_get_uint32(&json_parser.token, &temp_property_value));
