@@ -391,13 +391,13 @@ static az_result build_command_response_payload(
   AZ_RETURN_IF_FAILED(az_json_builder_append_begin_object(json_builder));
   AZ_RETURN_IF_FAILED(
       az_json_builder_append_property_name(json_builder, report_max_temp_name_span));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_int32_number(json_builder, (int32_t)device_max_temp));
+  AZ_RETURN_IF_FAILED(az_json_builder_append_int32(json_builder, (int32_t)device_max_temp));
   AZ_RETURN_IF_FAILED(
       az_json_builder_append_property_name(json_builder, report_min_temp_name_span));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_int32_number(json_builder, (int32_t)device_min_temp));
+  AZ_RETURN_IF_FAILED(az_json_builder_append_int32(json_builder, (int32_t)device_min_temp));
   AZ_RETURN_IF_FAILED(
       az_json_builder_append_property_name(json_builder, report_avg_temp_name_span));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_int32_number(json_builder, (int32_t)device_avg_temp));
+  AZ_RETURN_IF_FAILED(az_json_builder_append_int32(json_builder, (int32_t)device_avg_temp));
   AZ_RETURN_IF_FAILED(
       az_json_builder_append_property_name(json_builder, report_start_time_name_span));
   AZ_RETURN_IF_FAILED(az_json_builder_append_string(json_builder, start_time_span));
@@ -523,11 +523,11 @@ static az_result build_confirmed_reported_property(
   AZ_RETURN_IF_FAILED(az_json_builder_append_property_name(json_builder, property_name));
   AZ_RETURN_IF_FAILED(az_json_builder_append_begin_object(json_builder));
   AZ_RETURN_IF_FAILED(az_json_builder_append_property_name(json_builder, AZ_SPAN_FROM_STR("value")));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_int32_number(json_builder, (int32_t)property_val));
+  AZ_RETURN_IF_FAILED(az_json_builder_append_int32(json_builder, (int32_t)property_val));
   AZ_RETURN_IF_FAILED(az_json_builder_append_property_name(json_builder, AZ_SPAN_FROM_STR("ac")));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_int32_number(json_builder, ac));
+  AZ_RETURN_IF_FAILED(az_json_builder_append_int32(json_builder, ac));
   AZ_RETURN_IF_FAILED(az_json_builder_append_property_name(json_builder, AZ_SPAN_FROM_STR("av")));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_int32_number(json_builder, av));
+  AZ_RETURN_IF_FAILED(az_json_builder_append_int32(json_builder, av));
   AZ_RETURN_IF_FAILED(az_json_builder_append_property_name(json_builder, AZ_SPAN_FROM_STR("ad")));
   AZ_RETURN_IF_FAILED(az_json_builder_append_string(json_builder, ad));
   AZ_RETURN_IF_FAILED(az_json_builder_append_end_object(json_builder));
@@ -544,7 +544,7 @@ static az_result build_reported_property(
   AZ_RETURN_IF_FAILED(az_json_builder_init(json_builder, AZ_SPAN_FROM_BUFFER(reported_property_payload), NULL));
   AZ_RETURN_IF_FAILED(az_json_builder_append_begin_object(json_builder));
   AZ_RETURN_IF_FAILED(az_json_builder_append_property_name(json_builder, property_name));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_int32_number(json_builder, (int32_t)property_val));
+  AZ_RETURN_IF_FAILED(az_json_builder_append_int32(json_builder, (int32_t)property_val));
   AZ_RETURN_IF_FAILED(az_json_builder_append_end_object(json_builder));
 
   return AZ_OK;
@@ -973,7 +973,7 @@ static az_result build_telemetry_message(az_span* out_payload)
   AZ_RETURN_IF_FAILED(az_json_builder_append_begin_object(&json_builder));
   AZ_RETURN_IF_FAILED(az_json_builder_append_property_name(&json_builder, telemetry_name));
   AZ_RETURN_IF_FAILED(
-      az_json_builder_append_int32_number(&json_builder, (int32_t)current_device_temp));
+      az_json_builder_append_int32(&json_builder, (int32_t)current_device_temp));
   AZ_RETURN_IF_FAILED(az_json_builder_append_end_object(&json_builder));
   *out_payload = az_json_builder_get_json(&json_builder);
 
