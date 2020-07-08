@@ -434,13 +434,13 @@ See the complete cmake file and how to link your own library [here](https://gith
 
 At the heart of our SDK is, what we refer to as, [Azure Core](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core). This code defines several data types and functions for use by the client libraries that build on top of us such as an [Azure Storage Blob](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/storage) client library and [Azure IoT client libraries](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot). Here are some of the features that customers use directly:
 
-- **Spans**: A span represents a byte buffer and is used for string manipulations, HTTP requests/responses, building/parsing JSON payloads. It allows us to return a substring within a larger string without any memory allocations. See the [Working With Spans](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core#working-with-spans) section of the `Azure Core` README for more information.
+- **Spans**: A span represents a byte buffer and is used for string manipulations, HTTP requests/responses, reading/writing JSON payloads. It allows us to return a substring within a larger string without any memory allocations. See the [Working With Spans](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core#working-with-spans) section of the `Azure Core` README for more information.
 
 - **Logging**: As our SDK performs operations, it can send log messages to a customer-defined callback. Customers can enable this to assist with debugging and diagnosing issues when leveraging our SDK code. See the [Logging SDK Operations](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core#logging-sdk-operations) section of the `Azure Core` README for more information.
 
 - **Contexts**: Contexts offer an I/O cancellation mechanism. Multiple contexts can be composed together in your application’s call tree. When a context is canceled, its children are also canceled. See the [Canceling an Operation](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core#canceling-an-operation) section of the `Azure Core` README for more information.
 
-- **JSON**: Non-allocating JSON builder and JSON parsing data structures and operations.
+- **JSON**: Non-allocating JSON reading and JSON writing data structures and operations.
 
 - **HTTP**: Non-allocating HTTP request and HTTP response data structures and operations.
 
