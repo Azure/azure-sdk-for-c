@@ -1,12 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <azure/iot/az_iot_provisioning_client.h>
-#include <azure/iot/az_iot_common.h>
 #include <azure/core/az_json.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
 #include <azure/core/internal/az_span_internal.h>
+#include <azure/iot/az_iot_common.h>
+#include <azure/iot/az_iot_provisioning_client.h>
 
 #include <azure/core/internal/az_log_internal.h>
 #include <azure/core/internal/az_precondition_internal.h>
@@ -278,9 +278,8 @@ AZ_INLINE az_result _az_iot_provisioning_client_payload_registration_result_pars
   bool found_assigned_hub = false;
   bool found_device_id = false;
 
-  AZ_RETURN_IF_FAILED(az_json_parser_next_token(jp));
-
-  while (jp->token.kind != AZ_JSON_TOKEN_END_OBJECT)
+  while ((!(found_device_id && found_assigned_hub)) && az_succeeded(az_json_parser_next_token(jp))
+         && jp->token.kind != AZ_JSON_TOKEN_END_OBJECT)
   {
     if (az_json_token_is_text_equal(&jp->token, AZ_SPAN_FROM_STR("assignedHub")))
     {
@@ -329,8 +328,6 @@ AZ_INLINE az_result _az_iot_provisioning_client_payload_registration_result_pars
       // ignore other tokens
       AZ_RETURN_IF_FAILED(az_json_parser_skip_children(jp));
     }
-
-    AZ_RETURN_IF_FAILED(az_json_parser_next_token(jp));
   }
 
   if (found_assigned_hub != found_device_id)
@@ -361,9 +358,7 @@ AZ_INLINE az_result az_iot_provisioning_client_parse_payload(
   bool found_operation_status = false;
   bool found_error = false;
 
-  AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
-
-  while (jp.token.kind != AZ_JSON_TOKEN_END_OBJECT)
+  while (az_succeeded(az_json_parser_next_token(&jp)) && jp.token.kind != AZ_JSON_TOKEN_END_OBJECT)
   {
     if (az_json_token_is_text_equal(&jp.token, AZ_SPAN_FROM_STR("operationId")))
     {
@@ -428,8 +423,6 @@ AZ_INLINE az_result az_iot_provisioning_client_parse_payload(
       // ignore other tokens
       AZ_RETURN_IF_FAILED(az_json_parser_skip_children(&jp));
     }
-
-    AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
   }
 
   if (!(found_operation_status && found_operation_id))
