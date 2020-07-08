@@ -14,12 +14,13 @@ jobs:
       # TRANSPORT_PAHO              OFF
       # PRECONDITIONS               ON
       # LOGGING                     ON
-      # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_NONE
+      # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_POSIX | AZ_PLATFORM_IMPL_WIN32
       Linux_x64:
         OSVmImage: 'ubuntu-18.04'
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AZ_SDK_C_NO_SAMPLES: 'true'
+        build.args: ' -DAZ_PLATFORM_IMPL=POSIX'
       Win_x86:
         OSVmImage: 'windows-2019'
         vcpkg.deps: ''
@@ -27,6 +28,7 @@ jobs:
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: Win32
         AZ_SDK_C_NO_SAMPLES: 'true'
+        build.args: ' -DAZ_PLATFORM_IMPL=WIN32'
       Win_x64:
         OSVmImage: 'windows-2019'
         vcpkg.deps: ''
@@ -34,11 +36,13 @@ jobs:
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: x64
         AZ_SDK_C_NO_SAMPLES: 'true'
+        build.args: ' -DAZ_PLATFORM_IMPL=WIN32'
       MacOS_x64:
        OSVmImage: 'macOS-10.15'
        vcpkg.deps: ''
        VCPKG_DEFAULT_TRIPLET: 'x64-osx'
        AZ_SDK_C_NO_SAMPLES: 'true'
+       build.args: ' -DAZ_PLATFORM_IMPL=POSIX'
 
       # Build with sample dependencies [curl for transport] - PRECONDITIONS ON
       # WARNINGS_AS_ERRORS          ON
@@ -48,7 +52,7 @@ jobs:
       # TRANSPORT_PAHO              ON
       # PRECONDITIONS               ON
       # LOGGING                     ON
-      # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_POSIX / AZ_PLATFORM_IMPL_WIN32
+      # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_POSIX | AZ_PLATFORM_IMPL_WIN32
       Linux_x64_with_samples:
         OSVmImage: 'ubuntu-18.04'
         vcpkg.deps: 'curl[ssl] paho-mqtt'
@@ -82,7 +86,7 @@ jobs:
       # TRANSPORT_PAHO              ON
       # PRECONDITIONS               ON
       # LOGGING                     ON
-      # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_POSIX / AZ_PLATFORM_IMPL_WIN32
+      # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_POSIX | AZ_PLATFORM_IMPL_WIN32
       Linux_x64_with_samples_and_unit_test:
         OSVmImage: 'ubuntu-18.04'
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
@@ -116,13 +120,13 @@ jobs:
       # TRANSPORT_PAHO              OFF
       # PRECONDITIONS               ON
       # LOGGING                     ON
-      # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_NONE
+      # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_POSIX | AZ_PLATFORM_IMPL_WIN32
       Linux_x64_with_unit_test:
         OSVmImage: 'ubuntu-18.04'
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         # This is the only platform where we run mocking functions and generate CodeCoverage
-        build.args: ' -DUNIT_TESTING=ON -DCMAKE_BUILD_TYPE=Debug -DUNIT_TESTING_MOCKS=ON'
+        build.args: ' -DUNIT_TESTING=ON -DCMAKE_BUILD_TYPE=Debug -DUNIT_TESTING_MOCKS=ON -DAZ_PLATFORM_IMPL=POSIX'
         AZ_SDK_CODE_COV: 1
         AZ_SDK_C_NO_SAMPLES: 'true'
       Win_x86_with_unit_test:
@@ -131,7 +135,7 @@ jobs:
         VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: Win32
-        build.args: ' -DUNIT_TESTING=ON'
+        build.args: ' -DUNIT_TESTING=ON -DAZ_PLATFORM_IMPL=WIN32'
         AZ_SDK_C_NO_SAMPLES: 'true'
       Win_x64_with_unit_test:
         OSVmImage: 'windows-2019'
@@ -139,13 +143,13 @@ jobs:
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: x64
-        build.args: ' -DUNIT_TESTING=ON'
+        build.args: ' -DUNIT_TESTING=ON -DAZ_PLATFORM_IMPL=WIN32'
         AZ_SDK_C_NO_SAMPLES: 'true'
       MacOS_x64_with_unit_test:
         OSVmImage: 'macOS-10.15'
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
-        build.args: ' -DUNIT_TESTING=ON'
+        build.args: ' -DUNIT_TESTING=ON -DAZ_PLATFORM_IMPL=POSIX'
         AZ_SDK_C_NO_SAMPLES: 'true'
 
       # Build with unit testing only. No samples [cmocka] - PRECONDITIONS OFF
@@ -156,12 +160,12 @@ jobs:
       # TRANSPORT_PAHO              OFF
       # PRECONDITIONS               OFF
       # LOGGING                     ON
-      # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_NONE
+      # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_POSIX | AZ_PLATFORM_IMPL_WIN32
       Linux_x64_with_unit_test_no_preconditions:
         OSVmImage: 'ubuntu-18.04'
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        build.args: ' -DUNIT_TESTING=ON -DPRECONDITIONS=OFF'
+        build.args: ' -DUNIT_TESTING=ON -DPRECONDITIONS=OFF -DAZ_PLATFORM_IMPL=POSIX'
         AZ_SDK_C_NO_SAMPLES: 'true'
       Win_x86_with_unit_test_no_preconditions:
         OSVmImage: 'windows-2019'
@@ -169,7 +173,7 @@ jobs:
         VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: Win32
-        build.args: ' -DUNIT_TESTING=ON -DPRECONDITIONS=OFF'
+        build.args: ' -DUNIT_TESTING=ON -DPRECONDITIONS=OFF -DAZ_PLATFORM_IMPL=WIN32'
         AZ_SDK_C_NO_SAMPLES: 'true'
       Win_x64_with_unit_test_no_preconditions:
         OSVmImage: 'windows-2019'
@@ -177,13 +181,13 @@ jobs:
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: x64
-        build.args: ' -DUNIT_TESTING=ON -DPRECONDITIONS=OFF'
+        build.args: ' -DUNIT_TESTING=ON -DPRECONDITIONS=OFF -DAZ_PLATFORM_IMPL=WIN32'
         AZ_SDK_C_NO_SAMPLES: 'true'
       MacOS_x64_with_unit_test_no_preconditions:
         OSVmImage: 'macOS-10.15'
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
-        build.args: ' -DUNIT_TESTING=ON -DPRECONDITIONS=OFF'
+        build.args: ' -DUNIT_TESTING=ON -DPRECONDITIONS=OFF -DAZ_PLATFORM_IMPL=POSIX'
         AZ_SDK_C_NO_SAMPLES: 'true'
 
       # Build with no logging - samples - libcurl - paho - NoPreconditions
