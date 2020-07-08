@@ -79,7 +79,7 @@ AZ_NODISCARD az_result _az_aad_build_body(
 
 AZ_NODISCARD static az_result _az_parse_json_payload(
     az_span body,
-    uint64_t* expires_in_seconds,
+    int64_t* expires_in_seconds,
     az_json_token* json_access_token)
 {
   az_json_parser jp;
@@ -101,7 +101,7 @@ AZ_NODISCARD static az_result _az_parse_json_payload(
     if (az_json_token_is_text_equal(&jp.token, AZ_SPAN_FROM_STR("expires_in")))
     {
       AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
-      AZ_RETURN_IF_FAILED(az_json_token_get_uint64(&jp.token, expires_in_seconds));
+      AZ_RETURN_IF_FAILED(az_json_token_get_int64(&jp.token, expires_in_seconds));
       found_expires_in = true;
     }
     else if (az_json_token_is_text_equal(&jp.token, AZ_SPAN_FROM_STR("access_token")))
@@ -170,13 +170,12 @@ AZ_NODISCARD az_result _az_aad_request_token(_az_http_request* request, _az_toke
   az_span body = { 0 };
   AZ_RETURN_IF_FAILED(az_http_response_get_body(&response, &body));
 
-  uint64_t expires_in_seconds = 0;
+  int64_t expires_in_seconds = 0;
   az_json_token json_access_token = { 0 };
   AZ_RETURN_IF_FAILED(_az_parse_json_payload(body, &expires_in_seconds, &json_access_token));
 
   // We'll assume the token expires 3 minutes prior to its actual expiration.
-  int64_t const expires_in_msec
-      = (((int64_t)expires_in_seconds) - (3 * _az_TIME_SECONDS_PER_MINUTE))
+  int64_t const expires_in_msec = ((expires_in_seconds) - (3 * _az_TIME_SECONDS_PER_MINUTE))
       * _az_TIME_MILLISECONDS_PER_SECOND;
 
   _az_token new_token = {

@@ -22,17 +22,6 @@
 // An IEEE 64-bit double has 52 bits of mantissa
 #define _az_MAX_SAFE_INTEGER 9007199254740991
 
-enum
-{
-  _az_ASCII_LOWER_DIF = 'a' - 'A',
-
-  // One less than the number of digits in _az_MAX_SAFE_INTEGER
-  // This many digits can roundtrip between double and uint64_t without loss of precision
-  // or causing integer overflow. We can't choose 16, because 9999999999999999 is larger than
-  // _az_MAX_SAFE_INTEGER.
-  _az_MAX_SUPPORTED_FRACTIONAL_DIGITS = 15,
-};
-
 #ifndef AZ_NO_PRECONDITION_CHECKING
 // Note: If you are modifying this method, make sure to modify the inline version in the az_span.h
 // file as well.
@@ -112,12 +101,20 @@ AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1, az_span 
   return true;
 }
 
-static bool _is_valid_start_of_number(uint8_t first_byte)
+static bool _is_valid_start_of_number(uint8_t first_byte, bool is_negative_allowed)
 {
   // ".123" or "  123" are considered invalid
   // 'n'/'N' is for "nan" and 'i'/'I' is for "inf"
-  return isdigit(first_byte) || first_byte == '-' || first_byte == '+' || first_byte == 'n'
-      || first_byte == 'N' || first_byte == 'i' || first_byte == 'I';
+  bool result = isdigit(first_byte) || first_byte == '+' || first_byte == 'n' || first_byte == 'N'
+      || first_byte == 'i' || first_byte == 'I';
+
+  // The first character can only be negative for int32, int64, and double.
+  if (is_negative_allowed)
+  {
+    result = result || first_byte == '-';
+  }
+
+  return result;
 }
 
 // Disable the following warning just for this particular use case.
@@ -127,7 +124,12 @@ static bool _is_valid_start_of_number(uint8_t first_byte)
 #pragma warning(disable : 4996)
 #endif
 
-static void _az_span_ato_number_helper(az_span source, char* format, void* result, bool* success)
+static void _az_span_ato_number_helper(
+    az_span source,
+    bool is_negative_allowed,
+    char* format,
+    void* result,
+    bool* success)
 {
   int32_t size = az_span_size(source);
 
@@ -136,7 +138,7 @@ static void _az_span_ato_number_helper(az_span source, char* format, void* resul
   // This check is necessary to prevent sscanf from reading bytes past the end of the span, when the
   // span might contain whitespace or other invalid bytes at the start.
   uint8_t* source_ptr = az_span_ptr(source);
-  if (size < 1 || !_is_valid_start_of_number(source_ptr[0]))
+  if (size < 1 || !_is_valid_start_of_number(source_ptr[0], is_negative_allowed))
   {
     *success = false;
     return;
@@ -176,7 +178,7 @@ AZ_NODISCARD az_result az_span_atou64(az_span source, uint64_t* out_number)
   // Stack based string to allow thread-safe mutation by _az_span_ato_number_helper
   char format_template[9] = "%00llu%n";
   bool success = false;
-  _az_span_ato_number_helper(source, format_template, out_number, &success);
+  _az_span_ato_number_helper(source, false, format_template, out_number, &success);
 
   return success ? AZ_OK : AZ_ERROR_PARSER_UNEXPECTED_CHAR;
 }
@@ -193,7 +195,7 @@ AZ_NODISCARD az_result az_span_atou32(az_span source, uint32_t* out_number)
   // uint32_t.
   char format_template[9] = "%00llu%n";
   bool success = false;
-  _az_span_ato_number_helper(source, format_template, &placeholder, &success);
+  _az_span_ato_number_helper(source, false, format_template, &placeholder, &success);
 
   if (placeholder > UINT32_MAX || !success)
   {
@@ -212,7 +214,7 @@ AZ_NODISCARD az_result az_span_atoi64(az_span source, int64_t* out_number)
   // Stack based string to allow thread-safe mutation by _az_span_ato_number_helper
   char format_template[9] = "%00lld%n";
   bool success = false;
-  _az_span_ato_number_helper(source, format_template, out_number, &success);
+  _az_span_ato_number_helper(source, true, format_template, out_number, &success);
 
   return success ? AZ_OK : AZ_ERROR_PARSER_UNEXPECTED_CHAR;
 }
@@ -229,7 +231,7 @@ AZ_NODISCARD az_result az_span_atoi32(az_span source, int32_t* out_number)
   // int32_t.
   char format_template[9] = "%00lld%n";
   bool success = false;
-  _az_span_ato_number_helper(source, format_template, &placeholder, &success);
+  _az_span_ato_number_helper(source, true, format_template, &placeholder, &success);
 
   if (placeholder > INT32_MAX || placeholder < INT32_MIN || !success)
   {
@@ -248,7 +250,7 @@ AZ_NODISCARD az_result az_span_atod(az_span source, double* out_number)
   // Stack based string to allow thread-safe mutation by _az_span_ato_number_helper
   char format_template[8] = "%00lf%n";
   bool success = false;
-  _az_span_ato_number_helper(source, format_template, out_number, &success);
+  _az_span_ato_number_helper(source, true, format_template, out_number, &success);
 
   return success ? AZ_OK : AZ_ERROR_PARSER_UNEXPECTED_CHAR;
 }
