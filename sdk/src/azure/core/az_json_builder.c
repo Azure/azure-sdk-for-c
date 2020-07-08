@@ -15,6 +15,8 @@ AZ_NODISCARD az_result az_json_builder_init(
     az_span destination_buffer,
     az_json_builder_options const* options)
 {
+  _az_PRECONDITION_NOT_NULL(json_builder);
+
   *json_builder
       = (az_json_builder){ ._internal = {
                                .destination_buffer = destination_buffer,
@@ -479,8 +481,7 @@ AZ_NODISCARD az_result az_json_builder_append_null(az_json_builder* json_builder
       json_builder, AZ_SPAN_FROM_STR("null"), AZ_JSON_TOKEN_NULL);
 }
 
-AZ_NODISCARD az_result
-az_json_builder_append_int32_number(az_json_builder* json_builder, int32_t value)
+AZ_NODISCARD az_result az_json_builder_append_int32(az_json_builder* json_builder, int32_t value)
 {
   _az_PRECONDITION_NOT_NULL(json_builder);
   _az_PRECONDITION(_az_is_appending_value_valid(json_builder));
@@ -513,7 +514,7 @@ az_json_builder_append_int32_number(az_json_builder* json_builder, int32_t value
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_json_builder_append_double_number(
+AZ_NODISCARD az_result az_json_builder_append_double(
     az_json_builder* json_builder,
     double value,
     int32_t fractional_digits)

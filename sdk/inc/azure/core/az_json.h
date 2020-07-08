@@ -325,8 +325,7 @@ AZ_NODISCARD az_result az_json_builder_append_bool(az_json_builder* json_builder
  *         - #AZ_OK if the number was appended successfully
  *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the buffer is too small
  */
-AZ_NODISCARD az_result
-az_json_builder_append_int32_number(az_json_builder* json_builder, int32_t value);
+AZ_NODISCARD az_result az_json_builder_append_int32(az_json_builder* json_builder, int32_t value);
 
 /**
  * @brief Appends a double number value.
@@ -351,7 +350,7 @@ az_json_builder_append_int32_number(az_json_builder* json_builder, int32_t value
  * @remark The \p fractional_digits must be between 0 and 15 (inclusive). Any value passed in that
  * is larger will be clamped down to 15.
  */
-AZ_NODISCARD az_result az_json_builder_append_double_number(
+AZ_NODISCARD az_result az_json_builder_append_double(
     az_json_builder* json_builder,
     double value,
     int32_t fractional_digits);

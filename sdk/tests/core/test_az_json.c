@@ -71,16 +71,16 @@ static void test_json_builder(void** state)
       az_result e = az_json_builder_append_string(&builder, AZ_SPAN_FROM_STR("bar"));
       TEST_EXPECT_SUCCESS(e);
       TEST_EXPECT_SUCCESS(az_json_builder_append_null(&builder));
-      TEST_EXPECT_SUCCESS(az_json_builder_append_int32_number(&builder, 0));
-      TEST_EXPECT_SUCCESS(az_json_builder_append_int32_number(&builder, -12));
-      TEST_EXPECT_SUCCESS(az_json_builder_append_double_number(&builder, 12.1, 0));
-      TEST_EXPECT_SUCCESS(az_json_builder_append_double_number(&builder, 9007199254740991ull, 0));
+      TEST_EXPECT_SUCCESS(az_json_builder_append_int32(&builder, 0));
+      TEST_EXPECT_SUCCESS(az_json_builder_append_int32(&builder, -12));
+      TEST_EXPECT_SUCCESS(az_json_builder_append_double(&builder, 12.1, 0));
+      TEST_EXPECT_SUCCESS(az_json_builder_append_double(&builder, 9007199254740991ull, 0));
       TEST_EXPECT_SUCCESS(az_json_builder_append_end_array(&builder));
     }
 
     TEST_EXPECT_SUCCESS(
         az_json_builder_append_property_name(&builder, AZ_SPAN_FROM_STR("int-max")));
-    TEST_EXPECT_SUCCESS(az_json_builder_append_int32_number(&builder, 2147483647));
+    TEST_EXPECT_SUCCESS(az_json_builder_append_int32(&builder, 2147483647));
 
     TEST_EXPECT_SUCCESS(az_json_builder_append_property_name(&builder, AZ_SPAN_FROM_STR("esc")));
     TEST_EXPECT_SUCCESS(
@@ -114,7 +114,7 @@ static void test_json_builder(void** state)
     {
       TEST_EXPECT_SUCCESS(az_json_builder_init(&builder, AZ_SPAN_FROM_BUFFER(array), NULL));
 
-      TEST_EXPECT_SUCCESS(az_json_builder_append_double_number(&builder, 0.000000000000001, 15));
+      TEST_EXPECT_SUCCESS(az_json_builder_append_double(&builder, 0.000000000000001, 15));
 
       az_span_to_str((char*)array, 33, az_json_builder_get_json(&builder));
       assert_string_equal(array, "0.000000000000001");
@@ -122,7 +122,7 @@ static void test_json_builder(void** state)
     {
       TEST_EXPECT_SUCCESS(az_json_builder_init(&builder, AZ_SPAN_FROM_BUFFER(array), NULL));
 
-      TEST_EXPECT_SUCCESS(az_json_builder_append_double_number(&builder, 1e-300, 15));
+      TEST_EXPECT_SUCCESS(az_json_builder_append_double(&builder, 1e-300, 15));
 
       az_span_to_str((char*)array, 33, az_json_builder_get_json(&builder));
       assert_string_equal(array, "0");
@@ -163,15 +163,15 @@ static void test_json_builder(void** state)
     TEST_EXPECT_SUCCESS(az_json_builder_append_property_name(&builder, AZ_SPAN_FROM_STR("array")));
     TEST_EXPECT_SUCCESS(az_json_builder_append_begin_array(&builder));
 
-    TEST_EXPECT_SUCCESS(az_json_builder_append_int32_number(&builder, 1));
-    TEST_EXPECT_SUCCESS(az_json_builder_append_int32_number(&builder, 2));
+    TEST_EXPECT_SUCCESS(az_json_builder_append_int32(&builder, 1));
+    TEST_EXPECT_SUCCESS(az_json_builder_append_int32(&builder, 2));
 
     TEST_EXPECT_SUCCESS(az_json_builder_append_begin_object(&builder));
     TEST_EXPECT_SUCCESS(az_json_builder_append_end_object(&builder));
 
-    TEST_EXPECT_SUCCESS(az_json_builder_append_int32_number(&builder, 3));
+    TEST_EXPECT_SUCCESS(az_json_builder_append_int32(&builder, 3));
 
-    TEST_EXPECT_SUCCESS(az_json_builder_append_double_number(&builder, -1.234e1, 1));
+    TEST_EXPECT_SUCCESS(az_json_builder_append_double(&builder, -1.234e1, 1));
 
     TEST_EXPECT_SUCCESS(az_json_builder_append_end_array(&builder));
     TEST_EXPECT_SUCCESS(az_json_builder_append_end_object(&builder));
