@@ -46,9 +46,10 @@
 // This is usually not needed on Linux or Mac but needs to be set on Windows.
 #define ENV_DEVICE_X509_TRUST_PEM_FILE "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE"
 
-#define TIMEOUT_WAIT_FOR_RECEIVE_MESSAGE_MS 1000
+#define TIMEOUT_WAIT_FOR_RECEIVE_MESSAGE_MS (8 * 1000)
 #define TIMEOUT_WAIT_FOR_COMPLETION_MS 1000
 #define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
+#define DEVICE_DO_WORK_SLEEP_MS 2
 #define TELEMETRY_SEND_INTERVAL 1
 #define DEFAULT_START_TEMP_CELSIUS 22
 
@@ -107,7 +108,13 @@ static char incoming_since_value[32];
 static char twin_get_topic[128];
 static char reported_property_topic[128];
 static const az_span desired_property_name = AZ_SPAN_LITERAL_FROM_STR("desired");
+static const az_span desired_property_version_name = AZ_SPAN_LITERAL_FROM_STR("$version");
 static const az_span desired_temp_property_name = AZ_SPAN_LITERAL_FROM_STR("targetTemperature");
+static const az_span desired_temp_response_value_name = AZ_SPAN_LITERAL_FROM_STR("value");
+static const az_span desired_temp_ack_code_name = AZ_SPAN_LITERAL_FROM_STR("ac");
+static const az_span desired_temp_ack_version_name = AZ_SPAN_LITERAL_FROM_STR("av");
+static const az_span desired_temp_ack_description_name = AZ_SPAN_LITERAL_FROM_STR("ad");
+static const az_span max_temp_reported_property_name = AZ_SPAN_LITERAL_FROM_STR("maxTempSinceLastReboot");
 static char reported_property_payload[128];
 
 // PnP Device Values
@@ -243,7 +250,7 @@ int main(void)
     // Send a telemetry message
     send_telemetry_message();
 
-    sleep_for_seconds(1);
+    sleep_for_seconds(DEVICE_DO_WORK_SLEEP_MS);
   }
 
   (void)getchar();
@@ -254,7 +261,10 @@ int main(void)
     printf("Failed to disconnect MQTT client, return code %d\n", rc);
     return rc;
   }
-  printf("Disconnected.\n");
+  else
+  {
+    printf("Disconnected.\n");
+  }
 
   // Clean up and release resources allocated by the mqtt client
   MQTTClient_destroy(&mqtt_client);
@@ -502,9 +512,10 @@ static int send_command_response(
   putchar('\n');
 
   // Send the commands response
-  rc = mqtt_publish_message(commands_response_topic, response, 0);
-
-  printf("Sent response\n");
+  if(rc = mqtt_publish_message(commands_response_topic, response, 0) == 0)
+  {
+    printf("Sent response\n");
+  }
 
   return rc;
 }
@@ -514,22 +525,22 @@ static az_result build_confirmed_reported_property(
     az_json_builder* json_builder,
     az_span property_name,
     double property_val,
-    int32_t ac,
-    int32_t av,
-    az_span ad)
+    int32_t ack_code_value,
+    int32_t ack_version_value,
+    az_span ack_description_value)
 {
   AZ_RETURN_IF_FAILED(az_json_builder_init(json_builder, AZ_SPAN_FROM_BUFFER(reported_property_payload), NULL));
   AZ_RETURN_IF_FAILED(az_json_builder_append_begin_object(json_builder));
   AZ_RETURN_IF_FAILED(az_json_builder_append_property_name(json_builder, property_name));
   AZ_RETURN_IF_FAILED(az_json_builder_append_begin_object(json_builder));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_property_name(json_builder, AZ_SPAN_FROM_STR("value")));
+  AZ_RETURN_IF_FAILED(az_json_builder_append_property_name(json_builder, desired_temp_response_value_name));
   AZ_RETURN_IF_FAILED(az_json_builder_append_int32(json_builder, (int32_t)property_val));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_property_name(json_builder, AZ_SPAN_FROM_STR("ac")));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_int32(json_builder, ac));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_property_name(json_builder, AZ_SPAN_FROM_STR("av")));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_int32(json_builder, av));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_property_name(json_builder, AZ_SPAN_FROM_STR("ad")));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_string(json_builder, ad));
+  AZ_RETURN_IF_FAILED(az_json_builder_append_property_name(json_builder, desired_temp_ack_code_name));
+  AZ_RETURN_IF_FAILED(az_json_builder_append_int32(json_builder, ack_code_value));
+  AZ_RETURN_IF_FAILED(az_json_builder_append_property_name(json_builder, desired_temp_ack_version_name));
+  AZ_RETURN_IF_FAILED(az_json_builder_append_int32(json_builder, ack_version_value));
+  AZ_RETURN_IF_FAILED(az_json_builder_append_property_name(json_builder, desired_temp_ack_description_name));
+  AZ_RETURN_IF_FAILED(az_json_builder_append_string(json_builder, ack_description_value));
   AZ_RETURN_IF_FAILED(az_json_builder_append_end_object(json_builder));
   AZ_RETURN_IF_FAILED(az_json_builder_append_end_object(json_builder));
 
@@ -575,7 +586,7 @@ static int send_reported_temperature_property(double temp_value, int32_t version
   {
     if (az_failed(
             rc = build_reported_property(
-                &json_builder, AZ_SPAN_FROM_STR("maxTempSinceLastReboot"), temp_value)))
+                &json_builder, max_temp_reported_property_name, temp_value)))
     {
       return rc;
     }
@@ -663,10 +674,9 @@ static az_result parse_twin_desired_temperature_property(
       AZ_RETURN_IF_FAILED(az_json_token_get_uint32(&jp.token, parsed_value));
       temp_found = true;
     }
-    else if (az_json_token_is_text_equal(&jp.token, AZ_SPAN_FROM_STR("$version")))
+    else if (az_json_token_is_text_equal(&jp.token, desired_property_version_name))
     {
       AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
-
       AZ_RETURN_IF_FAILED(az_json_token_get_uint32(&jp.token, (uint32_t*)version_number));
       version_found = true;
     }
@@ -680,13 +690,14 @@ static az_result parse_twin_desired_temperature_property(
   
   if(temp_found && version_found)
   {
+    printf("Desired temperature: %d\tVersion number: %d\n", *parsed_value, *version_number);
     return AZ_OK;
   }
 
   return AZ_ERROR_ITEM_NOT_FOUND;
 }
 
-static bool update_device_temp(int32_t temp)
+static void update_device_temp(int32_t temp, bool* max_temp_changed)
 {
   current_device_temp = temp;
 
@@ -706,7 +717,7 @@ static bool update_device_temp(int32_t temp)
   device_temperature_avg_total += current_device_temp;
   device_avg_temp = device_temperature_avg_total / (int32_t)device_temperature_avg_count;
 
-  return ret;
+  *max_temp_changed = ret;
 }
 
 // Switch on the type of twin message and handle accordingly | On desired prop, respond with max
@@ -716,6 +727,13 @@ static void handle_twin_message(
     az_iot_hub_client_twin_response* twin_response)
 {
   az_result result;
+
+  if (message->payloadlen)
+  {
+    printf("Payload:\n%.*s\n", message->payloadlen, (char*)message->payload);
+  }
+
+  bool max_temp_changed;
   uint32_t desired_temp;
   int32_t  version_num;
   az_span twin_payload_span
@@ -735,21 +753,17 @@ static void handle_twin_message(
       else
       {
         send_reported_temperature_property(desired_temp, version_num);
+        update_device_temp((int32_t)desired_temp, &max_temp_changed);
 
-        if (update_device_temp((int32_t)desired_temp))
+        if (max_temp_changed)
         {
-          send_reported_temperature_property(device_max_temp, version_num);
+          send_reported_temperature_property(device_max_temp, -1);
         }
-      }
-      if (message->payloadlen)
-      {
-        printf("Payload:\n%.*s\n", message->payloadlen, (char*)message->payload);
       }
       break;
     // An update to the desired properties with the properties as a JSON payload.
     case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES:
       printf("A twin desired properties message was received\n");
-      printf("Payload:\n%.*s\n", message->payloadlen, (char*)message->payload);
 
       // Get the new temperature
       if (az_failed(
@@ -760,8 +774,9 @@ static void handle_twin_message(
         break;
       }
       send_reported_temperature_property(desired_temp, version_num);
+      update_device_temp((int32_t)desired_temp, &max_temp_changed);
 
-      if (update_device_temp((int32_t)desired_temp))
+      if (max_temp_changed)
       {
         send_reported_temperature_property(device_max_temp, -1);
       }
@@ -816,9 +831,9 @@ static void handle_command_message(
         az_span_ptr(command_request->name));
 
     int rc;
-    if ((rc = send_command_response(command_request, 501, report_error_payload)) != 0)
+    if ((rc = send_command_response(command_request, 404, report_error_payload)) != 0)
     {
-      printf("Unable to send %d response, status %d\n", 501, rc);
+      printf("Unable to send %d response, status %d\n", 404, rc);
     }
   }
 }
@@ -886,7 +901,7 @@ static int connect_device(void)
     return rc;
   }
 
-  printf("%s\r\n", mqtt_username);
+  printf("MQTT username: %s\r\n", mqtt_username);
 
   // This sample uses X509 authentication so the password field is set to NULL
   mqtt_connect_options.username = mqtt_username;
