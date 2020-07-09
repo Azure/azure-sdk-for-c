@@ -91,7 +91,7 @@ static int send_operation_query_message(
     az_iot_provisioning_client_register_response const* response);
 
 static void sleep_for_seconds(uint32_t seconds);
-static void print_az_span(const char* str, az_span span);
+static void print_az_span(char const* span_description, az_span span);
 
 int main()
 {
@@ -100,8 +100,8 @@ int main()
   // Read in the necessary environment variables and initialize the az_iot_provisioning_client
   if (az_failed(rc = read_configuration_and_init_client()))
   {
-    printf(
-        "Failed to read configuration from environment variables, az_result return code %04x\n",
+    (void)printf(
+        "Failed to read configuration from environment variables: az_result return code 0x%04x .\n",
         rc);
     return rc;
   }
@@ -111,7 +111,7 @@ int main()
           rc = az_iot_provisioning_client_get_client_id(
               &provisioning_client, mqtt_client_id, sizeof(mqtt_client_id), NULL)))
   {
-    printf("Failed to get MQTT clientId, az_result return code %04x\n", rc);
+    (void)printf("Failed to get MQTT client id: az_result return code 0x%04x .\n", rc);
     return rc;
   }
 
@@ -124,7 +124,7 @@ int main()
            NULL))
       != MQTTCLIENT_SUCCESS)
   {
-    printf("Failed to create MQTT client, MQTTClient return code %d\n", rc);
+    (void)printf("Failed to create MQTT client: MQTTClient return code %d .\n", rc);
     return rc;
   }
 
@@ -133,14 +133,14 @@ int main()
   {
     return rc;
   }
-  printf("Connected to %s\n", global_provisioning_endpoint);
+  (void)printf("Connected to \"%s\".\n", global_provisioning_endpoint);
 
   // Subscribe to the necessary provisioning topic to receive provisioning responses
   if ((rc = subscribe()) != MQTTCLIENT_SUCCESS)
   {
     return rc;
   }
-  printf("Subscribed\n");
+  (void)printf("Subscribed.\n");
 
   // Begin the registration process by sending a registration request message
   if ((rc = register_device()) != MQTTCLIENT_SUCCESS)
@@ -157,10 +157,10 @@ int main()
   // Gracefully disconnect: send the disconnect packet and close the socket
   if ((rc = MQTTClient_disconnect(mqtt_client, TIMEOUT_MQTT_DISCONNECT_MS)) != MQTTCLIENT_SUCCESS)
   {
-    printf("Failed to disconnect MQTT client, MQTTClient return code %d\n", rc);
+    (void)printf("Failed to disconnect MQTT client: MQTTClient return code %d .\n", rc);
     return rc;
   }
-  printf("Disconnected\n");
+  (void)printf("Disconnected.\n");
 
   // Clean up and release resources allocated by the mqtt client
   MQTTClient_destroy(&mqtt_client);
@@ -212,7 +212,7 @@ static az_result read_configuration_entry(
     az_span buffer,
     az_span* out_value)
 {
-  printf("%s = ", env_name);
+  (void)printf("%s = ", env_name);
   char* env_value = getenv(env_name);
 
   if (env_value == NULL && default_value != NULL)
@@ -222,7 +222,7 @@ static az_result read_configuration_entry(
 
   if (env_value != NULL)
   {
-    printf("%s\n", hide_value ? "***" : env_value);
+    (void)printf("%s\n", hide_value ? "***" : env_value);
     az_span env_span = az_span_from_str(env_value);
     AZ_RETURN_IF_NOT_ENOUGH_SIZE(buffer, az_span_size(env_span));
     az_span_copy(buffer, env_span);
@@ -230,7 +230,7 @@ static az_result read_configuration_entry(
   }
   else
   {
-    printf("(missing) Please set the %s environment variable.\n", env_name);
+    (void)printf("(missing) Please set the %s environment variable.\n", env_name);
     return AZ_ERROR_ARG;
   }
 
@@ -253,7 +253,7 @@ static int connect_device()
           rc = az_iot_provisioning_client_get_user_name(
               &provisioning_client, mqtt_username, sizeof(mqtt_username), NULL)))
   {
-    printf("Failed to get MQTT username, az_result return code %0x4\n", rc);
+    (void)printf("Failed to get MQTT username: az_result return code 0x%04x .\n", rc);
     return rc;
   }
 
@@ -273,7 +273,7 @@ static int connect_device()
   // Connect to the Provisioning Service
   if ((rc = MQTTClient_connect(mqtt_client, &mqtt_connect_options)) != MQTTCLIENT_SUCCESS)
   {
-    printf("Failed to connect, MQTTClient return code %d\n", rc);
+    (void)printf("Failed to connect: MQTTClient return code %d .\n", rc);
     return rc;
   }
 
@@ -289,7 +289,7 @@ static int subscribe()
        = MQTTClient_subscribe(mqtt_client, AZ_IOT_PROVISIONING_CLIENT_REGISTER_SUBSCRIBE_TOPIC, 1))
       != MQTTCLIENT_SUCCESS)
   {
-    printf("Failed to subscribe to the register topic filter, MQTTClient return code %d\n", rc);
+    (void)printf("Failed to subscribe to the register topic filter: MQTTClient return code %d .\n", rc);
     return rc;
   }
 
@@ -306,7 +306,7 @@ static int register_device()
           rc = az_iot_provisioning_client_register_get_publish_topic(
               &provisioning_client, register_publish_topic, sizeof(register_publish_topic), NULL)))
   {
-    printf("Failed to get MQTT register publish topic, az_result return code %04x\n", rc);
+    (void)printf("Failed to get MQTT register publish topic: az_result return code 0x%04x .\n", rc);
     return rc;
   }
 
@@ -320,7 +320,7 @@ static int register_device()
   if ((rc = MQTTClient_publishMessage(mqtt_client, register_publish_topic, &pubmsg, NULL))
       != MQTTCLIENT_SUCCESS)
   {
-    printf("Failed to publish register request, MQTTClient return code %d\n", rc);
+    (void)printf("Failed to publish register request: MQTTClient return code %d .\n", rc);
     return rc;
   }
 
@@ -347,21 +347,21 @@ static int get_operation_status()
          = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, TIMEOUT_MQTT_RECEIVE_MS))
         != MQTTCLIENT_SUCCESS)
     {
-      printf("Failed to receive message, MQTTClient return code %d\n", rc);
+      (void)printf("Failed to receive message: MQTTClient return code %d .\n", rc);
       return rc;
     }
-    printf("Received a message from service.\n");
+    (void)printf("Received a message from service.\n");
 
     // Parse operation message
     if (az_failed(
             rc = parse_operation_message(topic, topic_len, message, &response, &operation_status)))
     {
-      printf("Failed to parse operation message, az_result return code %04x\n", rc);
+      (void)printf("Failed to parse operation message: az_result return code 0x%04x .\n", rc);
       MQTTClient_freeMessage(&message);
       MQTTClient_free(topic);
       return rc;
     }
-    printf("Parsed operation message.\n");
+    (void)printf("Parsed operation message.\n");
 
     // If operation is not complete, send query and loop to receive operation message
     is_operation_complete = az_iot_provisioning_client_operation_complete(operation_status);
@@ -381,24 +381,24 @@ static int get_operation_status()
   // Successful assignment - print out the assigned hostname and device id
   if (operation_status == AZ_IOT_PROVISIONING_STATUS_ASSIGNED)
   {
-    printf("SUCCESS - Device provisioned:\n");
+    (void)printf("SUCCESS - Device provisioned:\n");
     print_az_span("\tHub Hostname: ", response.registration_result.assigned_hub_hostname);
     print_az_span("\tDevice Id: ", response.registration_result.device_id);
   }
   else // Unsuccesful assignment (unassigned, failed or disabled states)
   {
-    printf("ERROR - Device Provisioning failed:\n");
+    (void)printf("ERROR - Device Provisioning failed:\n");
     print_az_span("\tRegistration state: ", response.operation_status);
-    printf("\tLast operation status: %d\n", response.status);
+    (void)printf("\tLast operation status: %d\n", response.status);
     print_az_span("\tOperation ID: ", response.operation_id);
-    printf("\tError code: %u\n", response.registration_result.extended_error_code);
+    (void)printf("\tError code: %u\n", response.registration_result.extended_error_code);
     print_az_span("\tError message: ", response.registration_result.error_message);
     print_az_span("\tError timestamp: ", response.registration_result.error_timestamp);
     print_az_span("\tError tracking ID: ", response.registration_result.error_tracking_id);
 
     if (response.retry_after_seconds > 0)
     {
-      printf("\tRetry-after: %u seconds.", response.retry_after_seconds);
+      (void)printf("\tRetry-after: %u seconds\n", response.retry_after_seconds);
     }
   }
 
@@ -426,23 +426,23 @@ static az_result parse_operation_message(
   az_span topic_span = az_span_init((uint8_t*)topic, topic_len);
   az_span message_span = az_span_init((uint8_t*)message->payload, message->payloadlen);
   
-  print_az_span("Topic:\n", topic_span);
+  print_az_span("Topic: ", topic_span);
 
   // Parse the incoming message and payload
   if (az_failed(
           rc = az_iot_provisioning_client_parse_received_topic_and_payload(
               &provisioning_client, topic_span, message_span, response)))
   {
-    printf("Message from unknown topic, az_result return code %0x4\n", rc);
+    (void)printf("Message from unknown topic: az_result return code 0x%04x .\n", rc);
     return rc;
   }
   print_az_span("Received payload:\n", message_span);
-  printf("Response status is %d.\n", response->status);
+  (void)printf("Response status: %d\n", response->status);
 
   // Parse the operation status from a string to an enum
   if (az_failed(rc = az_iot_provisioning_client_parse_operation_status(response, operation_status)))
   {
-    printf("Failed to parse operation_status, az_result return code %0x4\n", rc);
+    (void)printf("Failed to parse operation_status: az_result return code 0x%04x .\n", rc);
     return rc;
   }
 
@@ -454,26 +454,26 @@ static int send_operation_query_message(
 {
   int rc;
 
-  printf("sending operation query message\n");
+  (void)printf("Sending operation query message.\n");
 
   // Get the topic to send the query message
   if (az_failed(
           rc = az_iot_provisioning_client_query_status_get_publish_topic(
               &provisioning_client, response, query_topic, sizeof(query_topic), NULL)))
   {
-    printf("Unable to get query status publish topic, az_result return code %04x\n", rc);
+    (void)printf("Unable to get query status publish topic: az_result return code 0x%04x .\n", rc);
     return rc;
   }
 
   // IMPORTANT: Wait the recommended retry-after number of seconds before query
-  printf("Querying after %u seconds...\n", response->retry_after_seconds);
+  (void)printf("Querying after %u seconds...\n", response->retry_after_seconds);
   sleep_for_seconds(response->retry_after_seconds);
 
   // Publish the query message
   if ((rc = MQTTClient_publish(mqtt_client, query_topic, 0, NULL, 0, 0, NULL))
       != MQTTCLIENT_SUCCESS)
   {
-    printf("Failed to publish query status request, MQTTClient return code %d\n", rc);
+    (void)printf("Failed to publish query status request: MQTTClient return code %d .\n", rc);
     return rc;
   }
 
@@ -491,16 +491,16 @@ static void sleep_for_seconds(uint32_t seconds)
 }
 
 // Print an az_span to the console
-static void print_az_span(const char* str, az_span span)
+static void print_az_span(char const* span_description, az_span span)
 {
-  printf("%s", str);
+  (void)printf("%s", span_description);
 
   char* buffer = (char*)az_span_ptr(span);
   for (int32_t i = 0; i < az_span_size(span); i++)
   {
     putchar(*buffer++);
   }
-
   putchar('\n');
+
   return;
 }
