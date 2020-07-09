@@ -392,31 +392,31 @@ static az_result read_configuration_and_init_client(void)
 }
 
 static az_result build_command_response_payload(
-    az_json_builder* json_builder,
+    az_json_writer* json_builder,
     az_span start_time_span,
     az_span end_time_span,
     az_span* response_payload)
 {
   // Build the command response payload
-  AZ_RETURN_IF_FAILED(az_json_builder_append_begin_object(json_builder));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(json_builder));
   AZ_RETURN_IF_FAILED(
-      az_json_builder_append_property_name(json_builder, report_max_temp_name_span));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_int32(json_builder, (int32_t)device_max_temp));
+      az_json_writer_append_property_name(json_builder, report_max_temp_name_span));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_int32(json_builder, (int32_t)device_max_temp));
   AZ_RETURN_IF_FAILED(
-      az_json_builder_append_property_name(json_builder, report_min_temp_name_span));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_int32(json_builder, (int32_t)device_min_temp));
+      az_json_writer_append_property_name(json_builder, report_min_temp_name_span));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_int32(json_builder, (int32_t)device_min_temp));
   AZ_RETURN_IF_FAILED(
-      az_json_builder_append_property_name(json_builder, report_avg_temp_name_span));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_int32(json_builder, (int32_t)device_avg_temp));
+      az_json_writer_append_property_name(json_builder, report_avg_temp_name_span));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_int32(json_builder, (int32_t)device_avg_temp));
   AZ_RETURN_IF_FAILED(
-      az_json_builder_append_property_name(json_builder, report_start_time_name_span));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_string(json_builder, start_time_span));
+      az_json_writer_append_property_name(json_builder, report_start_time_name_span));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_string(json_builder, start_time_span));
   AZ_RETURN_IF_FAILED(
-      az_json_builder_append_property_name(json_builder, report_end_time_name_span));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_string(json_builder, end_time_span));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_end_object(json_builder));
+      az_json_writer_append_property_name(json_builder, report_end_time_name_span));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_string(json_builder, end_time_span));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(json_builder));
 
-  *response_payload = az_json_builder_get_json(json_builder);
+  *response_payload = az_json_writer_get_json(json_builder);
 
   return AZ_OK;
 }
@@ -426,9 +426,9 @@ static az_result build_command_response_payload(
 static az_result invoke_getMaxMinReport(az_span payload, az_span response, az_span* out_response)
 {
   // Parse the "since" field in the payload.
-  az_json_parser jp;
-  AZ_RETURN_IF_FAILED(az_json_parser_init(&jp, payload, NULL));
-  AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
+  az_json_reader jp;
+  AZ_RETURN_IF_FAILED(az_json_reader_init(&jp, payload, NULL));
+  AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jp));
   if (jp.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
   {
     return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
@@ -441,7 +441,7 @@ static az_result invoke_getMaxMinReport(az_span payload, az_span response, az_sp
   {
     if (az_json_token_is_text_equal(&jp.token, report_command_payload_value_span))
     {
-      AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
+      AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jp));
       int32_t incoming_since_value_len;
       AZ_RETURN_IF_FAILED(az_json_token_get_string(
           &jp.token,
@@ -453,7 +453,7 @@ static az_result invoke_getMaxMinReport(az_span payload, az_span response, az_sp
     }
 
     // else ignore token.
-    AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
+    AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jp));
   }
 
   // Set the response payload to error if the "since" field was not sent
@@ -471,8 +471,8 @@ static az_result invoke_getMaxMinReport(az_span payload, az_span response, az_sp
   size_t len = strftime(end_time_buffer, sizeof(end_time_buffer), iso_spec_time_format, timeinfo);
   az_span end_time_span = az_span_init((uint8_t*)end_time_buffer, (int32_t)len);
 
-  az_json_builder json_builder;
-  AZ_RETURN_IF_FAILED(az_json_builder_init(&json_builder, response, NULL));
+  az_json_writer json_builder;
+  AZ_RETURN_IF_FAILED(az_json_writer_init(&json_builder, response, NULL));
   AZ_RETURN_IF_FAILED(
       build_command_response_payload(&json_builder, start_time_span, end_time_span, out_response));
 
@@ -512,7 +512,7 @@ static int send_command_response(
   putchar('\n');
 
   // Send the commands response
-  if(rc = mqtt_publish_message(commands_response_topic, response, 0) == 0)
+  if((rc = mqtt_publish_message(commands_response_topic, response, 0)) == 0)
   {
     printf("Sent response\n");
   }
@@ -522,41 +522,41 @@ static int send_command_response(
 
 // Build the JSON payload for the reported property
 static az_result build_confirmed_reported_property(
-    az_json_builder* json_builder,
+    az_json_writer* json_builder,
     az_span property_name,
     double property_val,
     int32_t ack_code_value,
     int32_t ack_version_value,
     az_span ack_description_value)
 {
-  AZ_RETURN_IF_FAILED(az_json_builder_init(json_builder, AZ_SPAN_FROM_BUFFER(reported_property_payload), NULL));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_begin_object(json_builder));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_property_name(json_builder, property_name));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_begin_object(json_builder));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_property_name(json_builder, desired_temp_response_value_name));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_int32(json_builder, (int32_t)property_val));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_property_name(json_builder, desired_temp_ack_code_name));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_int32(json_builder, ack_code_value));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_property_name(json_builder, desired_temp_ack_version_name));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_int32(json_builder, ack_version_value));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_property_name(json_builder, desired_temp_ack_description_name));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_string(json_builder, ack_description_value));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_end_object(json_builder));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_end_object(json_builder));
+  AZ_RETURN_IF_FAILED(az_json_writer_init(json_builder, AZ_SPAN_FROM_BUFFER(reported_property_payload), NULL));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(json_builder));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(json_builder, property_name));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(json_builder));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(json_builder, desired_temp_response_value_name));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_int32(json_builder, (int32_t)property_val));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(json_builder, desired_temp_ack_code_name));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_int32(json_builder, ack_code_value));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(json_builder, desired_temp_ack_version_name));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_int32(json_builder, ack_version_value));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(json_builder, desired_temp_ack_description_name));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_string(json_builder, ack_description_value));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(json_builder));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(json_builder));
 
   return AZ_OK;
 }
 
 static az_result build_reported_property(
-    az_json_builder* json_builder,
+    az_json_writer* json_builder,
     az_span property_name,
     double property_val)
 {
-  AZ_RETURN_IF_FAILED(az_json_builder_init(json_builder, AZ_SPAN_FROM_BUFFER(reported_property_payload), NULL));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_begin_object(json_builder));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_property_name(json_builder, property_name));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_int32(json_builder, (int32_t)property_val));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_end_object(json_builder));
+  AZ_RETURN_IF_FAILED(az_json_writer_init(json_builder, AZ_SPAN_FROM_BUFFER(reported_property_payload), NULL));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(json_builder));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(json_builder, property_name));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_int32(json_builder, (int32_t)property_val));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(json_builder));
 
   return AZ_OK;
 }
@@ -581,7 +581,7 @@ static int send_reported_temperature_property(double temp_value, int32_t version
   }
 
   // Twin reported properties must be in JSON format. The payload is constructed here.
-  az_json_builder json_builder;
+  az_json_writer json_builder;
   if (version < 0)
   {
     if (az_failed(
@@ -600,7 +600,7 @@ static int send_reported_temperature_property(double temp_value, int32_t version
       return rc;
     }
   }
-  az_span json_payload = az_json_builder_get_json(&json_builder);
+  az_span json_payload = az_json_writer_get_json(&json_builder);
 
   printf("Payload: %.*s\n", az_span_size(json_payload), (char*)az_span_ptr(json_payload));
 
@@ -617,10 +617,10 @@ static az_result parse_twin_desired_temperature_property(
     uint32_t* parsed_value,
     int32_t* version_number)
 {
-  az_json_parser jp;
+  az_json_reader jp;
   bool desired_found = false;
-  AZ_RETURN_IF_FAILED(az_json_parser_init(&jp, twin_payload_span, NULL));
-  AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
+  AZ_RETURN_IF_FAILED(az_json_reader_init(&jp, twin_payload_span, NULL));
+  AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jp));
   if (jp.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
   {
     return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
@@ -629,22 +629,22 @@ static az_result parse_twin_desired_temperature_property(
   if (is_twin_get)
   {
     // If is twin get payload, we have to parse one level deeper for "desired" wrapper
-    AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
+    AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jp));
     while (jp.token.kind != AZ_JSON_TOKEN_END_OBJECT)
     {
       if (az_json_token_is_text_equal(&jp.token, desired_property_name))
       {
         desired_found = true;
-        AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
+        AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jp));
         break;
       }
       else
       {
         // else ignore token.
-        AZ_RETURN_IF_FAILED(az_json_parser_skip_children(&jp));
+        AZ_RETURN_IF_FAILED(az_json_reader_skip_children(&jp));
       }
 
-      AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
+      AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jp));
     }
   }
   else
@@ -662,7 +662,7 @@ static az_result parse_twin_desired_temperature_property(
   {
     return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
-  AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
+  AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jp));
 
   bool temp_found = false;
   bool version_found = false;
@@ -670,22 +670,22 @@ static az_result parse_twin_desired_temperature_property(
   {
     if (az_json_token_is_text_equal(&jp.token, desired_temp_property_name))
     {
-      AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
+      AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jp));
       AZ_RETURN_IF_FAILED(az_json_token_get_uint32(&jp.token, parsed_value));
       temp_found = true;
     }
     else if (az_json_token_is_text_equal(&jp.token, desired_property_version_name))
     {
-      AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
+      AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jp));
       AZ_RETURN_IF_FAILED(az_json_token_get_uint32(&jp.token, (uint32_t*)version_number));
       version_found = true;
     }
     else
     {
       // else ignore token.
-      AZ_RETURN_IF_FAILED(az_json_parser_skip_children(&jp));
+      AZ_RETURN_IF_FAILED(az_json_reader_skip_children(&jp));
     }
-    AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
+    AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jp));
   }
   
   if(temp_found && version_found)
@@ -982,15 +982,15 @@ static int send_twin_get_message(void)
 
 static az_result build_telemetry_message(az_span* out_payload)
 {
-  az_json_builder json_builder;
+  az_json_writer json_builder;
   AZ_RETURN_IF_FAILED(
-      az_json_builder_init(&json_builder, AZ_SPAN_FROM_BUFFER(telemetry_payload), NULL));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_begin_object(&json_builder));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_property_name(&json_builder, telemetry_name));
+      az_json_writer_init(&json_builder, AZ_SPAN_FROM_BUFFER(telemetry_payload), NULL));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&json_builder));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&json_builder, telemetry_name));
   AZ_RETURN_IF_FAILED(
-      az_json_builder_append_int32(&json_builder, (int32_t)current_device_temp));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_end_object(&json_builder));
-  *out_payload = az_json_builder_get_json(&json_builder);
+      az_json_writer_append_int32(&json_builder, (int32_t)current_device_temp));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&json_builder));
+  *out_payload = az_json_writer_get_json(&json_builder);
 
   return AZ_OK;
 }
