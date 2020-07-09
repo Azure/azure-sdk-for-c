@@ -461,7 +461,7 @@ static int send_operation_query_message(
               &provisioning_client, response, query_topic, sizeof(query_topic), NULL)))
   {
     printf("Unable to get query status publish topic, az_result return code %04x\n", rc);
-    return rc;
+    on_error(rc);
   }
 
   // IMPORTANT: Wait the recommended retry-after number of seconds before query
@@ -473,7 +473,6 @@ static int send_operation_query_message(
       != MQTTCLIENT_SUCCESS)
   {
     printf("Failed to publish query status request, MQTTClient return code %d\n", rc);
-    return rc;
   }
 
   return MQTTCLIENT_SUCCESS;
@@ -502,4 +501,11 @@ static void print_az_span(const char* str, az_span span)
 
   putchar('\n');
   return;
+}
+
+static void on_error(int rc)
+{
+  fflush(stdout);
+  fflush(stderr);
+  exit(rc);
 }
