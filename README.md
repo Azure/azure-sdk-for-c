@@ -291,6 +291,8 @@ vcpkg.exe install --triplet x64-windows-static curl[winssl] cmocka paho-mqtt
 # VCPKG_ROOT=PATH_TO_VCPKG (replace PATH_TO_VCPKG for where vcpkg is installed)
 ```
 
+If you previously installed VCPKG and dependencies, you may need to run `.\vcpkg.exe upgrade --no-dry-run` to upgrade to the latest packages.
+
 Follow next steps to build project from command prompt:
 
 ```bash
@@ -333,6 +335,8 @@ cd vcpkg
 export VCPKG_DEFAULT_TRIPLET=x64-linux
 export VCPKG_ROOT=PATH_TO_VCPKG #replace PATH_TO_VCPKG for where vcpkg is installed
 ```
+
+If you previously installed VCPKG and dependencies, you may need to run `./vcpkg upgrade --no-dry-run` to upgrade to the latest packages.
 
 #### Debian
 
@@ -386,6 +390,8 @@ cd vcpkg
 export VCPKG_DEFAULT_TRIPLET=x64-osx
 export VCPKG_ROOT=PATH_TO_VCPKG #replace PATH_TO_VCPKG for where vcpkg is installed
 ```
+
+If you previously installed VCPKG and dependencies, you may need to run `./vcpkg upgrade --no-dry-run` to upgrade to the latest packages.
 
 #### Build
 
