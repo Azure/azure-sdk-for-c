@@ -382,19 +382,19 @@ static int get_operation_status()
   if (operation_status == AZ_IOT_PROVISIONING_STATUS_ASSIGNED)
   {
     (void)printf("SUCCESS - Device provisioned:\n");
-    (void)print_az_span("\tHub Hostname: ", response.registration_result.assigned_hub_hostname);
-    (void)print_az_span("\tDevice Id: ", response.registration_result.device_id);
+    print_az_span("\tHub Hostname: ", response.registration_result.assigned_hub_hostname);
+    print_az_span("\tDevice Id: ", response.registration_result.device_id);
   }
   else // Unsuccesful assignment (unassigned, failed or disabled states)
   {
     (void)printf("ERROR - Device Provisioning failed:\n");
-    (void)print_az_span("\tRegistration state: ", response.operation_status);
+    print_az_span("\tRegistration state: ", response.operation_status);
     (void)printf("\tLast operation status: %d\n", response.status);
-    (void)print_az_span("\tOperation ID: ", response.operation_id);
+    print_az_span("\tOperation ID: ", response.operation_id);
     (void)printf("\tError code: %u\n", response.registration_result.extended_error_code);
-    (void)print_az_span("\tError message: ", response.registration_result.error_message);
-    (void)print_az_span("\tError timestamp: ", response.registration_result.error_timestamp);
-    (void)print_az_span("\tError tracking ID: ", response.registration_result.error_tracking_id);
+    print_az_span("\tError message: ", response.registration_result.error_message);
+    print_az_span("\tError timestamp: ", response.registration_result.error_timestamp);
+    print_az_span("\tError tracking ID: ", response.registration_result.error_tracking_id);
 
     if (response.retry_after_seconds > 0)
     {
@@ -426,7 +426,7 @@ static az_result parse_operation_message(
   az_span topic_span = az_span_init((uint8_t*)topic, topic_len);
   az_span message_span = az_span_init((uint8_t*)message->payload, message->payloadlen);
   
-  (void)print_az_span("Topic: ", topic_span);
+  print_az_span("Topic: ", topic_span);
 
   // Parse the incoming message and payload
   if (az_failed(
@@ -436,7 +436,7 @@ static az_result parse_operation_message(
     (void)printf("Message from unknown topic; az_result return code %0x4 .\n", rc);
     return rc;
   }
-  (void)print_az_span("Received payload:\n", message_span);
+  print_az_span("Received payload:\n", message_span);
   (void)printf("Response status: %d\n", response->status);
 
   // Parse the operation status from a string to an enum
@@ -493,7 +493,7 @@ static void sleep_for_seconds(uint32_t seconds)
 // Print an az_span to the console
 static void print_az_span(char const* span_description, az_span span)
 {
-  printf("%s", span_description);
+  (void)printf("%s", span_description);
 
   char* buffer = (char*)az_span_ptr(span);
   for (int32_t i = 0; i < az_span_size(span); i++)
