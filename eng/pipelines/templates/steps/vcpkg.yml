@@ -114,6 +114,11 @@ steps:
 
   - script: vcpkg version
     displayName: vcpkg version
+    condition: >-
+      and(
+        succeeded(),
+        not(eq(variables['${{ parameters.DependenciesVariableName }}'], ''))
+      )
 
   - script: |
       vcpkg install $(${{ parameters.DependenciesVariableName }})
