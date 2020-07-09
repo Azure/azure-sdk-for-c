@@ -92,7 +92,7 @@ static char telemetry_payload[32];
 
 // IoT Hub Commands Values
 static char commands_response_topic[128];
-static const az_span report_command_payload_value_span = AZ_SPAN_LITERAL_FROM_STR("since");
+//static const az_span report_command_payload_value_span = AZ_SPAN_LITERAL_FROM_STR("since");
 static const az_span report_command_name_span = AZ_SPAN_LITERAL_FROM_STR("getMaxMinReport");
 static const az_span report_max_temp_name_span = AZ_SPAN_LITERAL_FROM_STR("maxTemp");
 static const az_span report_min_temp_name_span = AZ_SPAN_LITERAL_FROM_STR("minTemp");
@@ -426,35 +426,14 @@ static az_result build_command_response_payload(
 static az_result invoke_getMaxMinReport(az_span payload, az_span response, az_span* out_response)
 {
   // Parse the "since" field in the payload.
+  az_span start_time_span = AZ_SPAN_NULL;
   az_json_reader jp;
   AZ_RETURN_IF_FAILED(az_json_reader_init(&jp, payload, NULL));
   AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jp));
-  if (jp.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
-  {
-    return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
-  }
-
-  // Get the user specified "since". Note that we don't honor this option to simplify the sample. It
-  // is merely passed on to the method call and return payload.
-  az_span start_time_span = AZ_SPAN_NULL;
-  while (jp.token.kind != AZ_JSON_TOKEN_END_OBJECT)
-  {
-    if (az_json_token_is_text_equal(&jp.token, report_command_payload_value_span))
-    {
-      AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jp));
-      int32_t incoming_since_value_len;
-      AZ_RETURN_IF_FAILED(az_json_token_get_string(
-          &jp.token,
-          incoming_since_value,
-          sizeof(incoming_since_value),
-          &incoming_since_value_len));
-      start_time_span = az_span_init((uint8_t*)incoming_since_value, incoming_since_value_len);
-      break;
-    }
-
-    // else ignore token.
-    AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jp));
-  }
+  int32_t incoming_since_value_len;
+  AZ_RETURN_IF_FAILED(az_json_token_get_string(
+      &jp.token, incoming_since_value, sizeof(incoming_since_value), &incoming_since_value_len));
+  start_time_span = az_span_init((uint8_t*)incoming_since_value, incoming_since_value_len);
 
   // Set the response payload to error if the "since" field was not sent
   if (az_span_ptr(start_time_span) == NULL)
