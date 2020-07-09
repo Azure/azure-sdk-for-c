@@ -254,7 +254,6 @@ int main(void)
     sleep_for_seconds(DEVICE_DO_WORK_SLEEP_MS);
   }
 
-  (void)getchar();
 
   // Gracefully disconnect: send the disconnect packet and close the socket
   if ((rc = MQTTClient_disconnect(mqtt_client, TIMEOUT_MQTT_DISCONNECT_MS)) != MQTTCLIENT_SUCCESS)
@@ -778,13 +777,13 @@ static void handle_command_message(
   if (az_span_is_content_equal(report_command_name_span, command_request->name))
   {
     az_span command_response_span = AZ_SPAN_FROM_BUFFER(commands_response_payload);
-    az_span command_payload_span
+    az_span command_response_payload_span
         = az_span_init((uint8_t*)message->payload, (int32_t)message->payloadlen);
 
     // Invoke command
     uint16_t return_code;
     az_result response = invoke_getMaxMinReport(
-        command_payload_span, command_response_span, &command_response_span);
+        command_response_payload_span, command_response_span, &command_response_span);
     if (response != AZ_OK)
     {
       return_code = 400;
@@ -838,12 +837,10 @@ static int on_received(char* topicName, int topicLen, MQTTClient_message* messag
   if (az_succeeded(
           az_iot_hub_client_twin_parse_received_topic(&client, topic_span, &twin_response)))
   {
-    printf("Twin Message Arrived\n");
+    printf("Twin Message Arrived: status %d\n", twin_response.status);
 
     // Determine what kind of twin message it is and take appropriate actions
     handle_twin_message(message, &twin_response);
-
-    printf("Response status was %d\n", twin_response.status);
   }
   else if (az_succeeded(az_iot_hub_client_methods_parse_received_topic(
                &client, az_span_init((uint8_t*)topicName, topicLen), &command_request)))
