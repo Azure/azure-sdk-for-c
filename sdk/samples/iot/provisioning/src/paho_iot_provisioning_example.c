@@ -101,7 +101,7 @@ int main()
   if (az_failed(rc = read_configuration_and_init_client()))
   {
     (void)printf(
-        "Failed to read configuration from environment variables: az_result return code %04x .\n",
+        "Failed to read configuration from environment variables: az_result return code 0x%04x .\n",
         rc);
     return rc;
   }
@@ -111,7 +111,7 @@ int main()
           rc = az_iot_provisioning_client_get_client_id(
               &provisioning_client, mqtt_client_id, sizeof(mqtt_client_id), NULL)))
   {
-    (void)printf("Failed to get MQTT client id: az_result return code %04x .\n", rc);
+    (void)printf("Failed to get MQTT client id: az_result return code 0x%04x .\n", rc);
     return rc;
   }
 
@@ -253,7 +253,7 @@ static int connect_device()
           rc = az_iot_provisioning_client_get_user_name(
               &provisioning_client, mqtt_username, sizeof(mqtt_username), NULL)))
   {
-    (void)printf("Failed to get MQTT username: az_result return code %04x .\n", rc);
+    (void)printf("Failed to get MQTT username: az_result return code 0x%04x .\n", rc);
     return rc;
   }
 
@@ -306,7 +306,7 @@ static int register_device()
           rc = az_iot_provisioning_client_register_get_publish_topic(
               &provisioning_client, register_publish_topic, sizeof(register_publish_topic), NULL)))
   {
-    (void)printf("Failed to get MQTT register publish topic: az_result return code %04x .\n", rc);
+    (void)printf("Failed to get MQTT register publish topic: az_result return code 0x%04x .\n", rc);
     return rc;
   }
 
@@ -356,7 +356,7 @@ static int get_operation_status()
     if (az_failed(
             rc = parse_operation_message(topic, topic_len, message, &response, &operation_status)))
     {
-      (void)printf("Failed to parse operation message: az_result return code %04x .\n", rc);
+      (void)printf("Failed to parse operation message: az_result return code 0x%04x .\n", rc);
       MQTTClient_freeMessage(&message);
       MQTTClient_free(topic);
       return rc;
@@ -433,7 +433,7 @@ static az_result parse_operation_message(
           rc = az_iot_provisioning_client_parse_received_topic_and_payload(
               &provisioning_client, topic_span, message_span, response)))
   {
-    (void)printf("Message from unknown topic: az_result return code %04x .\n", rc);
+    (void)printf("Message from unknown topic: az_result return code 0x%04x .\n", rc);
     return rc;
   }
   print_az_span("Received payload:\n", message_span);
@@ -442,7 +442,7 @@ static az_result parse_operation_message(
   // Parse the operation status from a string to an enum
   if (az_failed(rc = az_iot_provisioning_client_parse_operation_status(response, operation_status)))
   {
-    (void)printf("Failed to parse operation_status: az_result return code %04x .\n", rc);
+    (void)printf("Failed to parse operation_status: az_result return code 0x%04x .\n", rc);
     return rc;
   }
 
@@ -461,7 +461,7 @@ static int send_operation_query_message(
           rc = az_iot_provisioning_client_query_status_get_publish_topic(
               &provisioning_client, response, query_topic, sizeof(query_topic), NULL)))
   {
-    (void)printf("Unable to get query status publish topic: az_result return code %04x .\n", rc);
+    (void)printf("Unable to get query status publish topic: az_result return code 0x%04x .\n", rc);
     return rc;
   }
 
