@@ -477,16 +477,16 @@ static int report_property()
 
 static az_result build_reported_property(az_span* reported_property_payload)
 {
-  az_json_builder json_builder;
+  az_json_writer json_writer;
 
   AZ_RETURN_IF_FAILED(
-      az_json_builder_init(&json_builder, AZ_SPAN_FROM_BUFFER(reported_property_buffer), NULL));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_begin_object(&json_builder));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_property_name(&json_builder, reported_property_name));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_int32(&json_builder, reported_property_value));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_end_object(&json_builder));
+      az_json_writer_init(&json_writer, AZ_SPAN_FROM_BUFFER(reported_property_buffer), NULL));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&json_writer));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&json_writer, reported_property_name));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_int32(&json_writer, reported_property_value));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&json_writer));
 
-  *reported_property_payload = az_json_builder_get_json(&json_builder);
+  *reported_property_payload = az_json_writer_get_json(&json_writer);
 
   return AZ_OK;
 }
@@ -535,30 +535,30 @@ static int send_reported_property(az_span reported_property_payload)
 static az_result update_property(az_span desired_payload)
 {
   // Parse desired property payload
-  az_json_parser json_parser;
-  AZ_RETURN_IF_FAILED(az_json_parser_init(&json_parser, desired_payload, NULL));
+  az_json_reader json_reader;
+  AZ_RETURN_IF_FAILED(az_json_reader_init(&json_reader, desired_payload, NULL));
 
-  AZ_RETURN_IF_FAILED(az_json_parser_next_token(&json_parser));
-  if (json_parser.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
+  AZ_RETURN_IF_FAILED(az_json_reader_next_token(&json_reader));
+  if (json_reader.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
   {
     return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
 
-  AZ_RETURN_IF_FAILED(az_json_parser_next_token(&json_parser));
+  AZ_RETURN_IF_FAILED(az_json_reader_next_token(&json_reader));
 
   // Update property locally if found
-  while (json_parser.token.kind != AZ_JSON_TOKEN_END_OBJECT)
+  while (json_reader.token.kind != AZ_JSON_TOKEN_END_OBJECT)
   {
-    if (az_json_token_is_text_equal(&json_parser.token, version_name))
+    if (az_json_token_is_text_equal(&json_reader.token, version_name))
     {
       break;
     }
-    else if (az_json_token_is_text_equal(&json_parser.token, reported_property_name))
+    else if (az_json_token_is_text_equal(&json_reader.token, reported_property_name))
     {
       // Move to the value token
-      AZ_RETURN_IF_FAILED(az_json_parser_next_token(&json_parser));
+      AZ_RETURN_IF_FAILED(az_json_reader_next_token(&json_reader));
 
-      AZ_RETURN_IF_FAILED(az_json_token_get_int32(&json_parser.token, &reported_property_value));
+      AZ_RETURN_IF_FAILED(az_json_token_get_int32(&json_reader.token, &reported_property_value));
 
       printf(
           "Updating \"%.*s\" locally.\n",
@@ -570,10 +570,10 @@ static az_result update_property(az_span desired_payload)
     else
     {
       // ignore other tokens
-      AZ_RETURN_IF_FAILED(az_json_parser_skip_children(&json_parser));
+      AZ_RETURN_IF_FAILED(az_json_reader_skip_children(&json_reader));
     }
 
-    AZ_RETURN_IF_FAILED(az_json_parser_next_token(&json_parser));
+    AZ_RETURN_IF_FAILED(az_json_reader_next_token(&json_reader));
   }
 
   printf(
