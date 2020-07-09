@@ -558,15 +558,13 @@ static az_result update_property(az_span desired_payload)
       // Move to the value token
       AZ_RETURN_IF_FAILED(az_json_reader_next_token(&json_reader));
 
-      // TODO: Change back to int32_t once that is supported.
-      uint32_t temp_property_value = 0;
-      AZ_RETURN_IF_FAILED(az_json_token_get_uint32(&json_reader.token, &temp_property_value));
+      AZ_RETURN_IF_FAILED(az_json_token_get_int32(&json_reader.token, &reported_property_value));
 
       printf(
           "Updating \"%.*s\" locally.\n",
           az_span_size(reported_property_name),
           az_span_ptr(reported_property_name));
-      reported_property_value = (int32_t)temp_property_value;
+
       return AZ_OK;
     }
     else
