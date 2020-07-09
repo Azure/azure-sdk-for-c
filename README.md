@@ -285,7 +285,7 @@ cd vcpkg
 # build vcpkg (remove .bat on Linux/Mac)
 .\bootstrap-vcpkg.bat
 # install dependencies (remove .exe in Linux/Mac) and update triplet
-vcpkg.exe install --triplet x64-windows-static curl[winssl] cmocka paho-mqtt
+.\vcpkg.exe install --triplet x64-windows-static curl[winssl] cmocka paho-mqtt
 # Add this environment variables to link this VCPKG folder with cmake:
 # VCPKG_DEFAULT_TRIPLET=x64-windows-static
 # VCPKG_ROOT=PATH_TO_VCPKG (replace PATH_TO_VCPKG for where vcpkg is installed)
