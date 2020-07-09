@@ -982,7 +982,8 @@ static az_result build_telemetry_message(az_span* out_payload)
       az_json_writer_init(&json_builder, AZ_SPAN_FROM_BUFFER(telemetry_payload), NULL));
   AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&json_builder));
   AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&json_builder, telemetry_name));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_int32(&json_builder, (int32_t)current_device_temp));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_double(
+      &json_builder, current_device_temp, DOUBLE_DECIMAL_PLACE_DIGITS));
   AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&json_builder));
   *out_payload = az_json_writer_get_json(&json_builder);
 
