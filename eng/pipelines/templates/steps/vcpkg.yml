@@ -51,7 +51,7 @@ steps:
     condition: >-
       and(
         succeeded(),
-        not(eq(variables['${{ parameters.DependenciesVariableName }}'], '')
+        not(eq(variables['${{ parameters.DependenciesVariableName }}'], ''))
       )
 
   # Install vcpkg on MacOS
