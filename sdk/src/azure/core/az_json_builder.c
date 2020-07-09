@@ -13,18 +13,17 @@ AZ_NODISCARD az_result az_json_builder_chunked_init(
     az_json_builder* json_builder,
     az_span first_destination_buffer,
     az_span_allocator_fn allocator_callback,
-    az_allocator_context* context,
+    void* user_context,
     az_json_builder_options const* options)
 {
   _az_PRECONDITION_NOT_NULL(allocator_callback);
-  _az_PRECONDITION_NOT_NULL(context);
 
   *json_builder = (az_json_builder){
     ._internal = {
       .first_destination_buffer = first_destination_buffer,
       .destination_buffer = AZ_SPAN_NULL,
       .allocator_callback = allocator_callback,
-      .context = context,
+      .user_context = user_context,
       .bytes_written = 0,
       .total_bytes_written = 0,
       .need_comma = false,
@@ -53,14 +52,13 @@ _get_remaining_span(az_json_builder* json_builder, int32_t required_size)
   int32_t remaining_size = az_span_size(remaining);
   if (remaining_size < required_size && json_builder->_internal.allocator_callback != NULL)
   {
-    // If the callback is not null, the context is guaranteed to not be null as well.
-    json_builder->_internal.context->remaining_size = remaining_size;
-    json_builder->_internal.context->required_size = required_size;
+    az_allocator_context context = { .remaining_size = remaining_size,
+                                     .required_size = required_size,
+                                     .user_context = json_builder->_internal.user_context };
 
     // No more space left in the destination, let the caller fail with
     // AZ_ERROR_INSUFFICIENT_SPAN_SIZE
-    if (!az_succeeded(json_builder->_internal.allocator_callback(
-            json_builder->_internal.context, &remaining)))
+    if (!az_succeeded(json_builder->_internal.allocator_callback(&context, &remaining)))
     {
       return AZ_SPAN_NULL;
     }
