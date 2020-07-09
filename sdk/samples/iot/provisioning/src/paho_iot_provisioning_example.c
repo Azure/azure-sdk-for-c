@@ -349,10 +349,14 @@ static int get_operation_status()
     {
       printf("Failed to receive message, MQTTClient return code %d\n", rc);
       return rc;
+    } 
+    else if (MQTTCLIENT_TOPICNAME_TRUNCATED == rc) 
+    {
+      topic_len = (int)strlen(topic);
     }
     printf("Received a message from service.\n");
 
-    // Parse operation message
+    // Parse operation message; extract the response and operation status
     if (az_failed(
             rc = parse_operation_message(topic, topic_len, message, &response, &operation_status)))
     {
@@ -416,12 +420,7 @@ static az_result parse_operation_message(
 {
   int rc;
 
-  if (topic_len == 0)
-  {
-    // The length of the topic if there are one or more NULL characters embedded in topic,
-    // otherwise topic_len is 0.
-    topic_len = (int)strlen(topic);
-  }
+  
 
   az_span topic_span = az_span_init((uint8_t*)topic, topic_len);
   az_span message_span = az_span_init((uint8_t*)message->payload, message->payloadlen);
