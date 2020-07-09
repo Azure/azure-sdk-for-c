@@ -9,7 +9,7 @@
 
 #include <azure/core/_az_cfg.h>
 
-AZ_NODISCARD az_result az_json_builder_init_chunked(
+AZ_NODISCARD az_result az_json_builder_chunked_init(
     az_json_builder* json_builder,
     az_span first_destination_buffer,
     az_span_allocator_fn allocator_callback,

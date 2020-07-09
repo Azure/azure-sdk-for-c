@@ -259,7 +259,7 @@ AZ_NODISCARD AZ_INLINE az_result az_json_builder_init(
  * @return An #az_result value indicating the result of the operation:
  *         - #AZ_OK if the az_json_builder is initialized successfully
  */
-AZ_NODISCARD az_result az_json_builder_init_chunked(
+AZ_NODISCARD az_result az_json_builder_chunked_init(
     az_json_builder* json_builder,
     az_span first_destination_buffer,
     az_span_allocator_fn allocator_callback,
