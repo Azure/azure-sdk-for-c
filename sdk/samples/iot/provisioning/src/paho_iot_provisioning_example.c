@@ -456,12 +456,10 @@ static az_result parse_operation_message(
   return AZ_OK;
 }
 
-static int send_operation_query_message(
+static void send_operation_query_message(
     az_iot_provisioning_client_register_response const* response)
 {
   int rc;
-
-  printf("sending operation query message\n");
 
   // Get the topic to send the query message
   if (az_failed(
@@ -484,7 +482,7 @@ static int send_operation_query_message(
     exit(rc);
   }
 
-  return MQTTCLIENT_SUCCESS;
+  return;
 }
 
 static void sleep_for_seconds(uint32_t seconds)
