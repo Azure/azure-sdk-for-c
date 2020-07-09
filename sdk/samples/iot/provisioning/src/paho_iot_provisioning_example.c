@@ -50,6 +50,13 @@
 #define TIMEOUT_MQTT_RECEIVE_MS (60 * 1000)
 #define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
 
+#define LOG_ERROR(ErrorMsg, ...) {\
+  (void)printf("%s:%s:%d: ", __FILE__, __func__, __LINE__); \
+  (void)printf(ErrorMsg, __VA_ARGS__); \
+  fflush(stdout);\
+  fflush(stderr);\
+}
+
 static char mqtt_client_id[128];
 static char mqtt_username[128];
 static char register_publish_topic[128];
@@ -92,6 +99,7 @@ static int send_operation_query_message(
 
 static void sleep_for_seconds(uint32_t seconds);
 static void print_az_span(const char* str, az_span span);
+static void on_error(int rc);
 
 int main()
 {
@@ -441,7 +449,7 @@ static az_result parse_operation_message(
   // Parse the operation status from a string to an enum
   if (az_failed(rc = az_iot_provisioning_client_parse_operation_status(response, operation_status)))
   {
-    printf("Failed to parse operation_status, az_result return code %0x4\n", rc);
+    printf("Failed to parse operation_status, az_result return code %04x\n", rc);
     return rc;
   }
 
@@ -460,8 +468,8 @@ static int send_operation_query_message(
           rc = az_iot_provisioning_client_query_status_get_publish_topic(
               &provisioning_client, response, query_topic, sizeof(query_topic), NULL)))
   {
-    printf("Unable to get query status publish topic, az_result return code %04x\n", rc);
-    on_error(rc);
+    LOG_ERROR("Unable to get query status publish topic: az_result return code %04x\n", rc);
+    exit(rc);
   }
 
   // IMPORTANT: Wait the recommended retry-after number of seconds before query
@@ -472,7 +480,8 @@ static int send_operation_query_message(
   if ((rc = MQTTClient_publish(mqtt_client, query_topic, 0, NULL, 0, 0, NULL))
       != MQTTCLIENT_SUCCESS)
   {
-    printf("Failed to publish query status request, MQTTClient return code %d\n", rc);
+    LOG_ERROR("Failed to publish query status request: MQTTClient return code %d .\n", rc);
+    exit(rc);
   }
 
   return MQTTCLIENT_SUCCESS;
@@ -501,11 +510,4 @@ static void print_az_span(const char* str, az_span span)
 
   putchar('\n');
   return;
-}
-
-static void on_error(int rc)
-{
-  fflush(stdout);
-  fflush(stderr);
-  exit(rc);
 }
