@@ -107,6 +107,7 @@ steps:
     condition: >-
       and(
         succeeded(),
+        ne(variables['VcpkgRestoredFromCache'], 'true'),
         not(contains(variables['OSVmImage'], 'macOS')),
         not(eq(variables['${{ parameters.DependenciesVariableName }}'], ''))
       )
