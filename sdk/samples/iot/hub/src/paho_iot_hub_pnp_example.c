@@ -785,9 +785,9 @@ static void handle_command_message(
     uint16_t return_code;
     az_result response = invoke_getMaxMinReport(
         command_payload_span, command_response_span, &command_response_span);
-    if (response == AZ_ERROR_ITEM_NOT_FOUND)
+    if (response != AZ_OK)
     {
-      return_code = 404;
+      return_code = 400;
     }
     else
     {
