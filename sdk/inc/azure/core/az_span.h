@@ -5,7 +5,7 @@
  * @file az_span.h
  *
  * @brief An #az_span represents a contiguous byte buffer and is used for string manipulations,
- * HTTP requests/responses, building/parsing JSON payloads, and more.
+ * HTTP requests/responses, reading/writing JSON payloads, and more.
  *
  * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
  * prefixed with an underscore ('_') directly in your application code. These symbols

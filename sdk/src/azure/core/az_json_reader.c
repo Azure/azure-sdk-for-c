@@ -10,15 +10,15 @@
 
 #include <azure/core/_az_cfg.h>
 
-AZ_NODISCARD az_result az_json_parser_init(
-    az_json_parser* json_parser,
+AZ_NODISCARD az_result az_json_reader_init(
+    az_json_reader* json_reader,
     az_span json_buffer,
-    az_json_parser_options const* options)
+    az_json_reader_options const* options)
 {
-  _az_PRECONDITION_NOT_NULL(json_parser);
+  _az_PRECONDITION_NOT_NULL(json_reader);
   _az_PRECONDITION(az_span_size(json_buffer) >= 1);
 
-  *json_parser = (az_json_parser){
+  *json_reader = (az_json_reader){
     .token = (az_json_token){
       .kind = AZ_JSON_TOKEN_NONE,
       .slice = AZ_SPAN_NULL,
@@ -31,77 +31,77 @@ AZ_NODISCARD az_result az_json_parser_init(
       .bytes_consumed = 0,
       .is_complex_json = false,
       .bit_stack = { 0 },
-      .options = options == NULL ? az_json_parser_options_default() : *options,
+      .options = options == NULL ? az_json_reader_options_default() : *options,
     },
   };
   return AZ_OK;
 }
 
-AZ_NODISCARD static az_span _get_remaining_json(az_json_parser* json_parser)
+AZ_NODISCARD static az_span _get_remaining_json(az_json_reader* json_reader)
 {
-  _az_PRECONDITION_NOT_NULL(json_parser);
+  _az_PRECONDITION_NOT_NULL(json_reader);
 
   return az_span_slice_to_end(
-      json_parser->_internal.json_buffer, json_parser->_internal.bytes_consumed);
+      json_reader->_internal.json_buffer, json_reader->_internal.bytes_consumed);
 }
 
-static void _az_json_parser_update_state(
-    az_json_parser* json_parser,
+static void _az_json_reader_update_state(
+    az_json_reader* json_reader,
     az_json_token_kind token_kind,
     az_span token_slice,
     int32_t consumed)
 {
-  json_parser->token.kind = token_kind;
-  json_parser->token.slice = token_slice;
-  json_parser->_internal.bytes_consumed += consumed;
+  json_reader->token.kind = token_kind;
+  json_reader->token.slice = token_slice;
+  json_reader->_internal.bytes_consumed += consumed;
 }
 
-AZ_NODISCARD static az_span _az_json_parser_skip_whitespace(az_json_parser* json_parser)
+AZ_NODISCARD static az_span _az_json_reader_skip_whitespace(az_json_reader* json_reader)
 {
-  az_span remaining = _get_remaining_json(json_parser);
+  az_span remaining = _get_remaining_json(json_reader);
   az_span json = _az_span_trim_white_space_from_start(remaining);
 
   // Find out how many whitespace characters were trimmed.
-  json_parser->_internal.bytes_consumed += az_span_size(remaining) - az_span_size(json);
+  json_reader->_internal.bytes_consumed += az_span_size(remaining) - az_span_size(json);
 
   return json;
 }
 
-AZ_NODISCARD static az_result _az_json_parser_process_container_end(
-    az_json_parser* json_parser,
+AZ_NODISCARD static az_result _az_json_reader_process_container_end(
+    az_json_reader* json_reader,
     az_json_token_kind token_kind)
 {
   // The JSON payload is invalid if it has a mismatched container end without a matching open.
   if ((token_kind == AZ_JSON_TOKEN_END_OBJECT
-       && _az_json_stack_peek(&json_parser->_internal.bit_stack) != _az_JSON_STACK_OBJECT)
+       && _az_json_stack_peek(&json_reader->_internal.bit_stack) != _az_JSON_STACK_OBJECT)
       || (token_kind == AZ_JSON_TOKEN_END_ARRAY
-          && _az_json_stack_peek(&json_parser->_internal.bit_stack) != _az_JSON_STACK_ARRAY))
+          && _az_json_stack_peek(&json_reader->_internal.bit_stack) != _az_JSON_STACK_ARRAY))
   {
     return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
 
-  az_span token = _get_remaining_json(json_parser);
-  _az_json_stack_pop(&json_parser->_internal.bit_stack);
-  _az_json_parser_update_state(json_parser, token_kind, az_span_slice(token, 0, 1), 1);
+  az_span token = _get_remaining_json(json_reader);
+  _az_json_stack_pop(&json_reader->_internal.bit_stack);
+  _az_json_reader_update_state(json_reader, token_kind, az_span_slice(token, 0, 1), 1);
   return AZ_OK;
 }
 
-AZ_NODISCARD static az_result _az_json_parser_process_container_start(
-    az_json_parser* json_parser,
+AZ_NODISCARD static az_result _az_json_reader_process_container_start(
+    az_json_reader* json_reader,
     az_json_token_kind token_kind,
     _az_json_stack_item container_kind)
 {
   // The current depth is equal to or larger than the maximum allowed depth of 64. Cannot read the
   // next JSON object or array.
-  if (json_parser->_internal.bit_stack._internal.current_depth >= _az_MAX_JSON_STACK_SIZE)
+  if (json_reader->_internal.bit_stack._internal.current_depth >= _az_MAX_JSON_STACK_SIZE)
   {
     return AZ_ERROR_JSON_NESTING_OVERFLOW;
   }
 
-  az_span token = _get_remaining_json(json_parser);
+  az_span token = _get_remaining_json(json_reader);
 
-  _az_json_stack_push(&json_parser->_internal.bit_stack, container_kind);
-  _az_json_parser_update_state(json_parser, token_kind, az_span_slice(token, 0, 1), 1);
+  _az_json_stack_push(&json_reader->_internal.bit_stack, container_kind);
+  _az_json_reader_update_state(json_reader, token_kind, az_span_slice(token, 0, 1), 1);
   return AZ_OK;
 }
 
@@ -138,12 +138,12 @@ AZ_NODISCARD static bool _az_validate_hex_digits(uint8_t* token_ptr, int32_t ind
   return true;
 }
 
-AZ_NODISCARD static az_result _az_json_parser_process_string(az_json_parser* json_parser)
+AZ_NODISCARD static az_result _az_json_reader_process_string(az_json_reader* json_reader)
 {
   // Move past the first '"' character
-  json_parser->_internal.bytes_consumed++;
+  json_reader->_internal.bytes_consumed++;
 
-  az_span token = _get_remaining_json(json_parser);
+  az_span token = _get_remaining_json(json_reader);
   uint8_t* const token_ptr = az_span_ptr(token);
   int32_t const remaining_size = az_span_size(token);
 
@@ -151,7 +151,7 @@ AZ_NODISCARD static az_result _az_json_parser_process_string(az_json_parser* jso
   uint8_t next_byte = token_ptr[0];
 
   // Clear the state of any previous string token.
-  json_parser->token._internal.string_has_escaped_chars = false;
+  json_reader->token._internal.string_has_escaped_chars = false;
 
   while (true)
   {
@@ -161,7 +161,7 @@ AZ_NODISCARD static az_result _az_json_parser_process_string(az_json_parser* jso
     }
     else if (next_byte == '\\')
     {
-      json_parser->token._internal.string_has_escaped_chars = true;
+      json_reader->token._internal.string_has_escaped_chars = true;
       string_length++;
       if (string_length >= remaining_size)
       {
@@ -212,17 +212,17 @@ AZ_NODISCARD static az_result _az_json_parser_process_string(az_json_parser* jso
   }
 
   // Add 1 to number of bytes consumed to account for the last '"' character.
-  _az_json_parser_update_state(
-      json_parser, AZ_JSON_TOKEN_STRING, az_span_slice(token, 0, string_length), string_length + 1);
+  _az_json_reader_update_state(
+      json_reader, AZ_JSON_TOKEN_STRING, az_span_slice(token, 0, string_length), string_length + 1);
 
   return AZ_OK;
 }
 
-AZ_NODISCARD static az_result _az_json_parser_process_property_name(az_json_parser* json_parser)
+AZ_NODISCARD static az_result _az_json_reader_process_property_name(az_json_reader* json_reader)
 {
-  AZ_RETURN_IF_FAILED(_az_json_parser_process_string(json_parser));
+  AZ_RETURN_IF_FAILED(_az_json_reader_process_string(json_reader));
 
-  az_span json = _az_json_parser_skip_whitespace(json_parser);
+  az_span json = _az_json_reader_skip_whitespace(json_reader);
 
   // Expected a colon to indicate that a value will follow after the property name, but instead
   // either reached end of data or some other character, which is invalid.
@@ -235,11 +235,11 @@ AZ_NODISCARD static az_result _az_json_parser_process_property_name(az_json_pars
     return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
 
-  // We don't need to set the json_parser->token.slice since that was already done
-  // in _az_json_parser_process_string when processing the string portion of the property name.
-  // Therefore, we don't call _az_json_parser_update_state here.
-  json_parser->token.kind = AZ_JSON_TOKEN_PROPERTY_NAME;
-  json_parser->_internal.bytes_consumed += 1; // For the name / value separator
+  // We don't need to set the json_reader->token.slice since that was already done
+  // in _az_json_reader_process_string when processing the string portion of the property name.
+  // Therefore, we don't call _az_json_reader_update_state here.
+  json_reader->token.kind = AZ_JSON_TOKEN_PROPERTY_NAME;
+  json_reader->_internal.bytes_consumed += 1; // For the name / value separator
 
   return AZ_OK;
 }
@@ -278,7 +278,7 @@ AZ_NODISCARD static bool _az_finished_consuming_json_number(
   return false;
 }
 
-AZ_NODISCARD static int32_t _az_json_parser_consume_digits(az_span token)
+AZ_NODISCARD static int32_t _az_json_reader_consume_digits(az_span token)
 {
   int32_t const token_size = az_span_size(token);
   uint8_t* next_byte_ptr = az_span_ptr(token);
@@ -300,17 +300,17 @@ AZ_NODISCARD static int32_t _az_json_parser_consume_digits(az_span token)
   return counter;
 }
 
-AZ_NODISCARD static az_result _az_json_parser_update_number_state_if_single_value(
-    az_json_parser* json_parser,
+AZ_NODISCARD static az_result _az_json_reader_update_number_state_if_single_value(
+    az_json_reader* json_reader,
     az_span token_slice,
     int32_t consumed_count)
 {
-  if (json_parser->_internal.is_complex_json)
+  if (json_reader->_internal.is_complex_json)
   {
     return AZ_ERROR_EOF;
   }
 
-  _az_json_parser_update_state(json_parser, AZ_JSON_TOKEN_NUMBER, token_slice, consumed_count);
+  _az_json_reader_update_state(json_reader, AZ_JSON_TOKEN_NUMBER, token_slice, consumed_count);
 
   return AZ_OK;
 }
@@ -330,9 +330,9 @@ AZ_NODISCARD static az_result _az_validate_next_byte_is_digit(az_span remaining_
   return AZ_OK;
 }
 
-AZ_NODISCARD static az_result _az_json_parser_process_number(az_json_parser* json_parser)
+AZ_NODISCARD static az_result _az_json_reader_process_number(az_json_reader* json_reader)
 {
-  az_span token = _get_remaining_json(json_parser);
+  az_span token = _get_remaining_json(json_reader);
 
   int32_t const token_size = az_span_size(token);
   uint8_t* const next_byte_ptr = az_span_ptr(token);
@@ -360,8 +360,8 @@ AZ_NODISCARD static az_result _az_json_parser_process_number(az_json_parser* jso
       // If there is no more JSON, this is a valid end state only when the JSON payload contains a
       // single value: "[-]0"
       // Otherwise, the payload is incomplete and ending too early.
-      return _az_json_parser_update_number_state_if_single_value(
-          json_parser, az_span_slice(token, 0, consumed_count), consumed_count);
+      return _az_json_reader_update_number_state_if_single_value(
+          json_reader, az_span_slice(token, 0, consumed_count), consumed_count);
     }
 
     next_byte = next_byte_ptr[consumed_count];
@@ -370,8 +370,8 @@ AZ_NODISCARD static az_result _az_json_parser_process_number(az_json_parser* jso
     {
       if (result == AZ_OK)
       {
-        _az_json_parser_update_state(
-            json_parser,
+        _az_json_reader_update_state(
+            json_reader,
             AZ_JSON_TOKEN_NUMBER,
             az_span_slice(token, 0, consumed_count),
             consumed_count);
@@ -383,15 +383,15 @@ AZ_NODISCARD static az_result _az_json_parser_process_number(az_json_parser* jso
   {
     _az_PRECONDITION(isdigit(next_byte));
     // Integer part before decimal
-    consumed_count += _az_json_parser_consume_digits(az_span_slice_to_end(token, consumed_count));
+    consumed_count += _az_json_reader_consume_digits(az_span_slice_to_end(token, consumed_count));
 
     if (consumed_count >= token_size)
     {
       // If there is no more JSON, this is a valid end state only when the JSON payload contains a
       // single value: "[-][digits]"
       // Otherwise, the payload is incomplete and ending too early.
-      return _az_json_parser_update_number_state_if_single_value(
-          json_parser, az_span_slice(token, 0, consumed_count), consumed_count);
+      return _az_json_reader_update_number_state_if_single_value(
+          json_reader, az_span_slice(token, 0, consumed_count), consumed_count);
     }
 
     next_byte = next_byte_ptr[consumed_count];
@@ -400,8 +400,8 @@ AZ_NODISCARD static az_result _az_json_parser_process_number(az_json_parser* jso
     {
       if (result == AZ_OK)
       {
-        _az_json_parser_update_state(
-            json_parser,
+        _az_json_reader_update_state(
+            json_reader,
             AZ_JSON_TOKEN_NUMBER,
             az_span_slice(token, 0, consumed_count),
             consumed_count);
@@ -419,15 +419,15 @@ AZ_NODISCARD static az_result _az_json_parser_process_number(az_json_parser* jso
         _az_validate_next_byte_is_digit(az_span_slice_to_end(token, consumed_count)));
 
     // Integer part after decimal
-    consumed_count += _az_json_parser_consume_digits(az_span_slice_to_end(token, consumed_count));
+    consumed_count += _az_json_reader_consume_digits(az_span_slice_to_end(token, consumed_count));
 
     if (consumed_count >= token_size)
     {
       // If there is no more JSON, this is a valid end state only when the JSON payload contains a
       // single value: "[-][digits].[digits]"
       // Otherwise, the payload is incomplete and ending too early.
-      return _az_json_parser_update_number_state_if_single_value(
-          json_parser, az_span_slice(token, 0, consumed_count), consumed_count);
+      return _az_json_reader_update_number_state_if_single_value(
+          json_reader, az_span_slice(token, 0, consumed_count), consumed_count);
     }
 
     next_byte = next_byte_ptr[consumed_count];
@@ -436,8 +436,8 @@ AZ_NODISCARD static az_result _az_json_parser_process_number(az_json_parser* jso
     {
       if (result == AZ_OK)
       {
-        _az_json_parser_update_state(
-            json_parser,
+        _az_json_reader_update_state(
+            json_reader,
             AZ_JSON_TOKEN_NUMBER,
             az_span_slice(token, 0, consumed_count),
             consumed_count);
@@ -466,15 +466,15 @@ AZ_NODISCARD static az_result _az_json_parser_process_number(az_json_parser* jso
   }
 
   // Integer part after the 'e'/'E'
-  consumed_count += _az_json_parser_consume_digits(az_span_slice_to_end(token, consumed_count));
+  consumed_count += _az_json_reader_consume_digits(az_span_slice_to_end(token, consumed_count));
 
   if (consumed_count >= token_size)
   {
     // If there is no more JSON, this is a valid end state only when the JSON payload contains a
     // single value: "[-][digits].[digits]e[+|-][digits]"
     // Otherwise, the payload is incomplete and ending too early.
-    return _az_json_parser_update_number_state_if_single_value(
-        json_parser, az_span_slice(token, 0, consumed_count), consumed_count);
+    return _az_json_reader_update_number_state_if_single_value(
+        json_reader, az_span_slice(token, 0, consumed_count), consumed_count);
   }
 
   // Checking if we are done processing a JSON number
@@ -485,18 +485,18 @@ AZ_NODISCARD static az_result _az_json_parser_process_number(az_json_parser* jso
     return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
 
-  _az_json_parser_update_state(
-      json_parser, AZ_JSON_TOKEN_NUMBER, az_span_slice(token, 0, consumed_count), consumed_count);
+  _az_json_reader_update_state(
+      json_reader, AZ_JSON_TOKEN_NUMBER, az_span_slice(token, 0, consumed_count), consumed_count);
 
   return AZ_OK;
 }
 
-AZ_NODISCARD static az_result _az_json_parser_process_literal(
-    az_json_parser* json_parser,
+AZ_NODISCARD static az_result _az_json_reader_process_literal(
+    az_json_reader* json_reader,
     az_span literal,
     az_json_token_kind kind)
 {
-  az_span token = _get_remaining_json(json_parser);
+  az_span token = _get_remaining_json(json_reader);
 
   int32_t const token_size = az_span_size(token);
   int32_t const expected_literal_size = az_span_size(literal);
@@ -510,85 +510,85 @@ AZ_NODISCARD static az_result _az_json_parser_process_literal(
   token = az_span_slice(token, 0, expected_literal_size);
   if (az_span_is_content_equal(token, literal))
   {
-    _az_json_parser_update_state(json_parser, kind, token, expected_literal_size);
+    _az_json_reader_update_state(json_reader, kind, token, expected_literal_size);
     return AZ_OK;
   }
   return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
 }
 
-AZ_NODISCARD static az_result _az_json_parser_process_value(
-    az_json_parser* json_parser,
+AZ_NODISCARD static az_result _az_json_reader_process_value(
+    az_json_reader* json_reader,
     uint8_t const next_byte)
 {
   if (next_byte == '"')
-    return _az_json_parser_process_string(json_parser);
+    return _az_json_reader_process_string(json_reader);
   else if (next_byte == '{')
-    return _az_json_parser_process_container_start(
-        json_parser, AZ_JSON_TOKEN_BEGIN_OBJECT, _az_JSON_STACK_OBJECT);
+    return _az_json_reader_process_container_start(
+        json_reader, AZ_JSON_TOKEN_BEGIN_OBJECT, _az_JSON_STACK_OBJECT);
   else if (next_byte == '[')
-    return _az_json_parser_process_container_start(
-        json_parser, AZ_JSON_TOKEN_BEGIN_ARRAY, _az_JSON_STACK_ARRAY);
+    return _az_json_reader_process_container_start(
+        json_reader, AZ_JSON_TOKEN_BEGIN_ARRAY, _az_JSON_STACK_ARRAY);
   else if (isdigit(next_byte) || next_byte == '-')
-    return _az_json_parser_process_number(json_parser);
+    return _az_json_reader_process_number(json_reader);
   else if (next_byte == 'f')
-    return _az_json_parser_process_literal(
-        json_parser, AZ_SPAN_FROM_STR("false"), AZ_JSON_TOKEN_FALSE);
+    return _az_json_reader_process_literal(
+        json_reader, AZ_SPAN_FROM_STR("false"), AZ_JSON_TOKEN_FALSE);
   else if (next_byte == 't')
-    return _az_json_parser_process_literal(
-        json_parser, AZ_SPAN_FROM_STR("true"), AZ_JSON_TOKEN_TRUE);
+    return _az_json_reader_process_literal(
+        json_reader, AZ_SPAN_FROM_STR("true"), AZ_JSON_TOKEN_TRUE);
   else if (next_byte == 'n')
-    return _az_json_parser_process_literal(
-        json_parser, AZ_SPAN_FROM_STR("null"), AZ_JSON_TOKEN_NULL);
+    return _az_json_reader_process_literal(
+        json_reader, AZ_SPAN_FROM_STR("null"), AZ_JSON_TOKEN_NULL);
   else
     return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
 }
 
-AZ_NODISCARD static az_result _az_json_parser_read_first_token(
-    az_json_parser* json_parser,
+AZ_NODISCARD static az_result _az_json_reader_read_first_token(
+    az_json_reader* json_reader,
     az_span json,
     uint8_t const first_byte)
 {
   if (first_byte == '{')
   {
-    _az_json_stack_push(&json_parser->_internal.bit_stack, _az_JSON_STACK_OBJECT);
-    _az_json_parser_update_state(
-        json_parser, AZ_JSON_TOKEN_BEGIN_OBJECT, az_span_slice(json, 0, 1), 1);
-    json_parser->_internal.is_complex_json = true;
+    _az_json_stack_push(&json_reader->_internal.bit_stack, _az_JSON_STACK_OBJECT);
+    _az_json_reader_update_state(
+        json_reader, AZ_JSON_TOKEN_BEGIN_OBJECT, az_span_slice(json, 0, 1), 1);
+    json_reader->_internal.is_complex_json = true;
     return AZ_OK;
   }
   else if (first_byte == '[')
   {
-    _az_json_stack_push(&json_parser->_internal.bit_stack, _az_JSON_STACK_ARRAY);
-    _az_json_parser_update_state(
-        json_parser, AZ_JSON_TOKEN_BEGIN_ARRAY, az_span_slice(json, 0, 1), 1);
-    json_parser->_internal.is_complex_json = true;
+    _az_json_stack_push(&json_reader->_internal.bit_stack, _az_JSON_STACK_ARRAY);
+    _az_json_reader_update_state(
+        json_reader, AZ_JSON_TOKEN_BEGIN_ARRAY, az_span_slice(json, 0, 1), 1);
+    json_reader->_internal.is_complex_json = true;
     return AZ_OK;
   }
   else
   {
-    return _az_json_parser_process_value(json_parser, first_byte);
+    return _az_json_reader_process_value(json_reader, first_byte);
   }
 }
 
-AZ_NODISCARD static az_result _az_json_parser_process_next_byte(
-    az_json_parser* json_parser,
+AZ_NODISCARD static az_result _az_json_reader_process_next_byte(
+    az_json_reader* json_reader,
     uint8_t next_byte)
 {
   // Extra data after a single JSON value (complete object or array or one primitive value) is
   // invalid. Expected end of data.
-  if (json_parser->_internal.bit_stack._internal.current_depth == 0)
+  if (json_reader->_internal.bit_stack._internal.current_depth == 0)
   {
     return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
 
   bool within_object
-      = _az_json_stack_peek(&json_parser->_internal.bit_stack) == _az_JSON_STACK_OBJECT;
+      = _az_json_stack_peek(&json_reader->_internal.bit_stack) == _az_JSON_STACK_OBJECT;
 
   if (next_byte == ',')
   {
-    json_parser->_internal.bytes_consumed++;
+    json_reader->_internal.bytes_consumed++;
 
-    az_span json = _az_json_parser_skip_whitespace(json_parser);
+    az_span json = _az_json_reader_skip_whitespace(json_reader);
 
     // Expected start of a property name or value, but instead reached end of data.
     if (az_span_size(json) < 1)
@@ -605,20 +605,20 @@ AZ_NODISCARD static az_result _az_json_parser_process_next_byte(
       {
         return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
       }
-      return _az_json_parser_process_property_name(json_parser);
+      return _az_json_reader_process_property_name(json_reader);
     }
     else
     {
-      return _az_json_parser_process_value(json_parser, next_byte);
+      return _az_json_reader_process_value(json_reader, next_byte);
     }
   }
   else if (next_byte == '}')
   {
-    return _az_json_parser_process_container_end(json_parser, AZ_JSON_TOKEN_END_OBJECT);
+    return _az_json_reader_process_container_end(json_reader, AZ_JSON_TOKEN_END_OBJECT);
   }
   else if (next_byte == ']')
   {
-    return _az_json_parser_process_container_end(json_parser, AZ_JSON_TOKEN_END_ARRAY);
+    return _az_json_reader_process_container_end(json_reader, AZ_JSON_TOKEN_END_ARRAY);
   }
   else
   {
@@ -627,20 +627,20 @@ AZ_NODISCARD static az_result _az_json_parser_process_next_byte(
   }
 }
 
-AZ_NODISCARD az_result az_json_parser_next_token(az_json_parser* json_parser)
+AZ_NODISCARD az_result az_json_reader_next_token(az_json_reader* json_reader)
 {
-  _az_PRECONDITION_NOT_NULL(json_parser);
+  _az_PRECONDITION_NOT_NULL(json_reader);
 
-  az_span json = _az_json_parser_skip_whitespace(json_parser);
+  az_span json = _az_json_reader_skip_whitespace(json_reader);
 
-  if (az_span_size(json) < 1 && json_parser->token.kind != AZ_JSON_TOKEN_NONE)
+  if (az_span_size(json) < 1 && json_reader->token.kind != AZ_JSON_TOKEN_NONE)
   {
-    return AZ_ERROR_JSON_PARSING_DONE;
+    return AZ_ERROR_JSON_READER_DONE;
   }
 
   uint8_t const first_byte = az_span_ptr(json)[0];
 
-  switch (json_parser->token.kind)
+  switch (json_reader->token.kind)
   {
     case AZ_JSON_TOKEN_NONE:
     {
@@ -649,13 +649,13 @@ AZ_NODISCARD az_result az_json_parser_next_token(az_json_parser* json_parser)
       {
         return AZ_ERROR_EOF;
       }
-      return _az_json_parser_read_first_token(json_parser, json, first_byte);
+      return _az_json_reader_read_first_token(json_reader, json, first_byte);
     }
     case AZ_JSON_TOKEN_BEGIN_OBJECT:
     {
       if (first_byte == '}')
       {
-        return _az_json_parser_process_container_end(json_parser, AZ_JSON_TOKEN_END_OBJECT);
+        return _az_json_reader_process_container_end(json_reader, AZ_JSON_TOKEN_END_OBJECT);
       }
       else
       {
@@ -665,22 +665,22 @@ AZ_NODISCARD az_result az_json_parser_next_token(az_json_parser* json_parser)
         {
           return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
         }
-        return _az_json_parser_process_property_name(json_parser);
+        return _az_json_reader_process_property_name(json_reader);
       }
     }
     case AZ_JSON_TOKEN_BEGIN_ARRAY:
     {
       if (first_byte == ']')
       {
-        return _az_json_parser_process_container_end(json_parser, AZ_JSON_TOKEN_END_ARRAY);
+        return _az_json_reader_process_container_end(json_reader, AZ_JSON_TOKEN_END_ARRAY);
       }
       else
       {
-        return _az_json_parser_process_value(json_parser, first_byte);
+        return _az_json_reader_process_value(json_reader, first_byte);
       }
     }
     case AZ_JSON_TOKEN_PROPERTY_NAME:
-      return _az_json_parser_process_value(json_parser, first_byte);
+      return _az_json_reader_process_value(json_reader, first_byte);
     case AZ_JSON_TOKEN_END_OBJECT:
     case AZ_JSON_TOKEN_END_ARRAY:
     case AZ_JSON_TOKEN_STRING:
@@ -688,30 +688,30 @@ AZ_NODISCARD az_result az_json_parser_next_token(az_json_parser* json_parser)
     case AZ_JSON_TOKEN_TRUE:
     case AZ_JSON_TOKEN_FALSE:
     case AZ_JSON_TOKEN_NULL:
-      return _az_json_parser_process_next_byte(json_parser, first_byte);
+      return _az_json_reader_process_next_byte(json_reader, first_byte);
     default:
       return AZ_ERROR_JSON_INVALID_STATE;
   }
 }
 
-AZ_NODISCARD az_result az_json_parser_skip_children(az_json_parser* json_parser)
+AZ_NODISCARD az_result az_json_reader_skip_children(az_json_reader* json_reader)
 {
-  _az_PRECONDITION_NOT_NULL(json_parser);
+  _az_PRECONDITION_NOT_NULL(json_reader);
 
-  if (json_parser->token.kind == AZ_JSON_TOKEN_PROPERTY_NAME)
+  if (json_reader->token.kind == AZ_JSON_TOKEN_PROPERTY_NAME)
   {
-    AZ_RETURN_IF_FAILED(az_json_parser_next_token(json_parser));
+    AZ_RETURN_IF_FAILED(az_json_reader_next_token(json_reader));
   }
 
-  az_json_token_kind token_kind = json_parser->token.kind;
+  az_json_token_kind token_kind = json_reader->token.kind;
   if (token_kind == AZ_JSON_TOKEN_BEGIN_OBJECT || token_kind == AZ_JSON_TOKEN_BEGIN_ARRAY)
   {
-    // Keep moving the parser until we come back to the same depth.
-    int32_t depth = json_parser->_internal.bit_stack._internal.current_depth;
+    // Keep moving the reader until we come back to the same depth.
+    int32_t depth = json_reader->_internal.bit_stack._internal.current_depth;
     do
     {
-      AZ_RETURN_IF_FAILED(az_json_parser_next_token(json_parser));
-    } while (depth <= json_parser->_internal.bit_stack._internal.current_depth);
+      AZ_RETURN_IF_FAILED(az_json_reader_next_token(json_reader));
+    } while (depth <= json_reader->_internal.bit_stack._internal.current_depth);
   }
   return AZ_OK;
 }
