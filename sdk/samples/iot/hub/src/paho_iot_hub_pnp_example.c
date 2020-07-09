@@ -51,7 +51,8 @@
 #define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
 #define DEVICE_DO_WORK_SLEEP_MS 2
 #define TELEMETRY_SEND_INTERVAL 1
-#define DEFAULT_START_TEMP_CELSIUS 22
+#define DEFAULT_START_TEMP_CELSIUS 22.0
+#define DOUBLE_DECIMAL_PLACE_DIGITS 2
 
 bool device_operational = true;
 static const uint8_t null_terminator = '\0';
@@ -118,12 +119,12 @@ static const az_span max_temp_reported_property_name = AZ_SPAN_LITERAL_FROM_STR(
 static char reported_property_payload[128];
 
 // PnP Device Values
-static int32_t current_device_temp = DEFAULT_START_TEMP_CELSIUS;
-static int32_t device_temperature_avg_total = DEFAULT_START_TEMP_CELSIUS;
+static double current_device_temp = DEFAULT_START_TEMP_CELSIUS;
+static double device_temperature_avg_total = DEFAULT_START_TEMP_CELSIUS;
 static uint32_t device_temperature_avg_count = 1;
-static int32_t device_max_temp = DEFAULT_START_TEMP_CELSIUS;
-static int32_t device_min_temp = DEFAULT_START_TEMP_CELSIUS;
-static int32_t device_avg_temp = DEFAULT_START_TEMP_CELSIUS;
+static double device_max_temp = DEFAULT_START_TEMP_CELSIUS;
+static double device_min_temp = DEFAULT_START_TEMP_CELSIUS;
+static double device_avg_temp = DEFAULT_START_TEMP_CELSIUS;
 
 //
 // Configuration and connection functions
@@ -161,7 +162,7 @@ static void handle_command_message(
 static az_result parse_twin_desired_temperature_property(
     az_span twin_payload_span,
     bool is_twin_get,
-    uint32_t* parsed_value,
+    double* parsed_value,
     int32_t* version_number);
 static az_result invoke_getMaxMinReport(az_span payload, az_span response, az_span* out_response);
 static az_span get_request_id(void);
@@ -399,20 +400,19 @@ static az_result build_command_response_payload(
 {
   // Build the command response payload
   AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(json_builder));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(json_builder, report_max_temp_name_span));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_double(
+      json_builder, device_max_temp, DOUBLE_DECIMAL_PLACE_DIGITS));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(json_builder, report_min_temp_name_span));
   AZ_RETURN_IF_FAILED(
-      az_json_writer_append_property_name(json_builder, report_max_temp_name_span));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_int32(json_builder, (int32_t)device_max_temp));
+      az_json_writer_append_double(json_builder, device_min_temp, DOUBLE_DECIMAL_PLACE_DIGITS));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(json_builder, report_avg_temp_name_span));
   AZ_RETURN_IF_FAILED(
-      az_json_writer_append_property_name(json_builder, report_min_temp_name_span));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_int32(json_builder, (int32_t)device_min_temp));
-  AZ_RETURN_IF_FAILED(
-      az_json_writer_append_property_name(json_builder, report_avg_temp_name_span));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_int32(json_builder, (int32_t)device_avg_temp));
+      az_json_writer_append_double(json_builder, device_avg_temp, DOUBLE_DECIMAL_PLACE_DIGITS));
   AZ_RETURN_IF_FAILED(
       az_json_writer_append_property_name(json_builder, report_start_time_name_span));
   AZ_RETURN_IF_FAILED(az_json_writer_append_string(json_builder, start_time_span));
-  AZ_RETURN_IF_FAILED(
-      az_json_writer_append_property_name(json_builder, report_end_time_name_span));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(json_builder, report_end_time_name_span));
   AZ_RETURN_IF_FAILED(az_json_writer_append_string(json_builder, end_time_span));
   AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(json_builder));
 
@@ -513,7 +513,7 @@ static az_result build_confirmed_reported_property(
   AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(json_builder, property_name));
   AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(json_builder));
   AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(json_builder, desired_temp_response_value_name));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_int32(json_builder, (int32_t)property_val));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_double(json_builder, property_val, DOUBLE_DECIMAL_PLACE_DIGITS));
   AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(json_builder, desired_temp_ack_code_name));
   AZ_RETURN_IF_FAILED(az_json_writer_append_int32(json_builder, ack_code_value));
   AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(json_builder, desired_temp_ack_version_name));
@@ -534,7 +534,7 @@ static az_result build_reported_property(
   AZ_RETURN_IF_FAILED(az_json_writer_init(json_builder, AZ_SPAN_FROM_BUFFER(reported_property_payload), NULL));
   AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(json_builder));
   AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(json_builder, property_name));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_int32(json_builder, (int32_t)property_val));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_double(json_builder, property_val, DOUBLE_DECIMAL_PLACE_DIGITS));
   AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(json_builder));
 
   return AZ_OK;
@@ -593,7 +593,7 @@ static int send_reported_temperature_property(double temp_value, int32_t version
 static az_result parse_twin_desired_temperature_property(
     az_span twin_payload_span,
     bool is_twin_get,
-    uint32_t* parsed_value,
+    double* parsed_value,
     int32_t* version_number)
 {
   az_json_reader jp;
@@ -650,7 +650,7 @@ static az_result parse_twin_desired_temperature_property(
     if (az_json_token_is_text_equal(&jp.token, desired_temp_property_name))
     {
       AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jp));
-      AZ_RETURN_IF_FAILED(az_json_token_get_uint32(&jp.token, parsed_value));
+      AZ_RETURN_IF_FAILED(az_json_token_get_double(&jp.token, parsed_value));
       temp_found = true;
     }
     else if (az_json_token_is_text_equal(&jp.token, desired_property_version_name))
@@ -669,14 +669,14 @@ static az_result parse_twin_desired_temperature_property(
   
   if(temp_found && version_found)
   {
-    printf("Desired temperature: %d\tVersion number: %d\n", *parsed_value, *version_number);
+    printf("Desired temperature: %2f\tVersion number: %d\n", *parsed_value, *version_number);
     return AZ_OK;
   }
 
   return AZ_ERROR_ITEM_NOT_FOUND;
 }
 
-static void update_device_temp(int32_t temp, bool* max_temp_changed)
+static void update_device_temp(double temp, bool* max_temp_changed)
 {
   current_device_temp = temp;
 
@@ -694,7 +694,7 @@ static void update_device_temp(int32_t temp, bool* max_temp_changed)
   // Increment the avg count, add the new temp to the total, and calculate the new avg
   device_temperature_avg_count++;
   device_temperature_avg_total += current_device_temp;
-  device_avg_temp = device_temperature_avg_total / (int32_t)device_temperature_avg_count;
+  device_avg_temp = device_temperature_avg_total / device_temperature_avg_count;
 
   *max_temp_changed = ret;
 }
@@ -713,7 +713,7 @@ static void handle_twin_message(
   }
 
   bool max_temp_changed;
-  uint32_t desired_temp;
+  double desired_temp;
   int32_t  version_num;
   az_span twin_payload_span
       = az_span_init((uint8_t*)message->payload, (int32_t)message->payloadlen);
@@ -732,7 +732,7 @@ static void handle_twin_message(
       else
       {
         send_reported_temperature_property(desired_temp, version_num);
-        update_device_temp((int32_t)desired_temp, &max_temp_changed);
+        update_device_temp(desired_temp, &max_temp_changed);
 
         if (max_temp_changed)
         {
@@ -753,7 +753,7 @@ static void handle_twin_message(
         break;
       }
       send_reported_temperature_property(desired_temp, version_num);
-      update_device_temp((int32_t)desired_temp, &max_temp_changed);
+      update_device_temp(desired_temp, &max_temp_changed);
 
       if (max_temp_changed)
       {
