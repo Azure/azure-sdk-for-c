@@ -19,7 +19,7 @@ steps:
     condition: >-
       and(
         succeeded(),
-        not(eq(variables['${{ parameters.DependenciesVariableName }}'], ''),
+        not(eq(variables['${{ parameters.DependenciesVariableName }}'], '')),
         contains(variables['OSVmImage'], 'macOS')
       )
 
