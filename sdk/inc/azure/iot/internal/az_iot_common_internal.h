@@ -33,6 +33,15 @@
 AZ_NODISCARD int32_t _az_iot_u32toa_size(uint32_t number);
 
 /**
+ * @brief Gives the length, in bytes, of the string that would represent the given number.
+ *
+ * @param[in] number The number whose length, as a string, is to be evaluated.
+ * @return The length (not considering null terminator) of the string that would represent the given
+ * number.
+ */
+AZ_NODISCARD int32_t _az_iot_u64toa_size(uint64_t number);
+
+/**
  * @brief Copies the url-encoded content of `source` span into `destination`, returning the free remaining of `destination`.
  *
  * @param[in] destination The span where the `source` is url-encoded to.

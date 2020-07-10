@@ -67,6 +67,26 @@ AZ_NODISCARD int32_t _az_iot_u32toa_size(uint32_t number)
   }
 }
 
+AZ_NODISCARD int32_t _az_iot_u64toa_size(uint64_t number)
+{
+  if (number == 0)
+  {
+    return 1;
+  }
+  else
+  {
+    uint64_t div = 10000000000000000000ul;
+    int32_t digit_count = 20;
+    while (number / div == 0)
+    {
+      div /= 10;
+      digit_count--;
+    }
+
+    return digit_count;
+  }
+}
+
 AZ_NODISCARD az_result _az_span_copy_url_encode(az_span destination, az_span source, az_span* out_remainder)
 {
   int32_t length;

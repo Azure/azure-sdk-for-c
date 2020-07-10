@@ -5,9 +5,9 @@
  * @file az_iot_hub_client.h
  *
  * @brief definition for the Azure IoT Hub client.
- * @remark The IoT Hub MQTT protocol is described at 
+ * @remark The IoT Hub MQTT protocol is described at
  * https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-mqtt-support
- * 
+ *
  * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
  * prefixed with an underscore ('_') directly in your application code. These symbols
  * are part of Azure SDK's internal implementation; we do not document these symbols
@@ -17,9 +17,9 @@
 #ifndef _az_IOT_HUB_CLIENT_H
 #define _az_IOT_HUB_CLIENT_H
 
-#include <azure/iot/az_iot_common.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
+#include <azure/iot/az_iot_common.h>
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -90,6 +90,20 @@ AZ_NODISCARD az_result az_iot_hub_client_init(
     az_iot_hub_client_options const* options);
 
 /**
+ * @brief The HTTP URI Path necessary when connecting to IoT Hub using WebSockets.
+ */
+#define AZ_IOT_HUB_CLIENT_WEB_SOCKET_PATH "/$iothub/websocket"
+
+/**
+ * @brief The HTTP URI Path necessary when connecting to IoT Hub using WebSockets without an X509
+ * client certificate.
+ * @remark Most devices should use #AZ_IOT_HUB_CLIENT_WEB_SOCKET_PATH. This option is available for
+ * devices not using X509 client certificates that fail to connect to IoT Hub.
+ */
+#define AZ_IOT_HUB_CLIENT_WEB_SOCKET_PATH_NO_X509_CLIENT_CERT \
+  AZ_IOT_HUB_CLIENT_WEB_SOCKET_PATH "?iothub-no-client-cert=true"
+
+/**
  * @brief Gets the MQTT user name.
  *
  * The user name will be of the following format:
@@ -130,7 +144,7 @@ AZ_NODISCARD az_result az_iot_hub_client_get_user_name(
  */
 AZ_NODISCARD az_result az_iot_hub_client_get_client_id(
     az_iot_hub_client const* client,
-    char*  mqtt_client_id,
+    char* mqtt_client_id,
     size_t mqtt_client_id_size,
     size_t* out_mqtt_client_id_length);
 
@@ -150,7 +164,7 @@ AZ_NODISCARD az_result az_iot_hub_client_get_client_id(
  *
  * @remark More information available at
  * https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-devguide-security#security-tokens
- * 
+ *
  * @param[in] client The #az_iot_hub_client to use for this call.
  * @param[in] token_expiration_epoch_time The time, in seconds, from 1/1/1970.
  * @param[in] signature An empty #az_span with sufficient capacity to hold the SAS signature.
@@ -159,7 +173,7 @@ AZ_NODISCARD az_result az_iot_hub_client_get_client_id(
  */
 AZ_NODISCARD az_result az_iot_hub_client_sas_get_signature(
     az_iot_hub_client const* client,
-    uint32_t token_expiration_epoch_time,
+    uint64_t token_expiration_epoch_time,
     az_span signature,
     az_span* out_signature);
 
@@ -190,7 +204,7 @@ AZ_NODISCARD az_result az_iot_hub_client_sas_get_signature(
 AZ_NODISCARD az_result az_iot_hub_client_sas_get_password(
     az_iot_hub_client const* client,
     az_span base64_hmac_sha256_signature,
-    uint32_t token_expiration_epoch_time,
+    uint64_t token_expiration_epoch_time,
     az_span key_name,
     char* mqtt_password,
     size_t mqtt_password_size,
@@ -268,8 +282,8 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_append(
 
 /**
  * @brief Finds the value of a property.
- * @remark This will return the first value of the property with the given name if multiple properties
- *       with the same key exist.
+ * @remark This will return the first value of the property with the given name if multiple
+ * properties with the same key exist.
  *
  * @param[in] properties The #az_iot_hub_client_properties to use for this call
  * @param[in] name The name of the property.
