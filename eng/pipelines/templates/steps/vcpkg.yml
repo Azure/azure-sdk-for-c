@@ -47,7 +47,6 @@ steps:
 
   # Clear the vcpkg folder so the cache can successfully deploy to that location
   - bash: |
-      id
       sudo rm -rf $(VCPKG_INSTALLATION_ROOT)
       sudo mkdir -p $(VCPKG_INSTALLATION_ROOT)
       sudo chown `id --name -u`.`id --name -g` $(VCPKG_INSTALLATION_ROOT)
@@ -67,7 +66,7 @@ steps:
         | ${{ parameters.VcpkgVersion }}
         | $(Agent.Os)
         | $(${{ parameters.DependenciesVariableName }})
-        | engsys-0001
+        | engsys-0002
       path: $(VCPKG_INSTALLATION_ROOT)
       cacheHitVar: VcpkgRestoredFromCache
     displayName: Vcpkg Cache
