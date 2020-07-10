@@ -17,6 +17,7 @@ steps:
       targetType: inline
       workingDirectory: $(Agent.TempDirectory)
       script: echo "##vso[task.setvariable variable=VCPKG_INSTALLATION_ROOT;]$(Agent.TempDirectory)/vcpkg"
+    displayName: MacOS - Set VCPKG_INSTALLATION_ROOT
     condition: >-
       and(
         succeeded(),
@@ -36,11 +37,24 @@ steps:
         # Install gcc 9
         brew install gcc@9
         gcc --version
+    displayName: MacOS - Set tools versions
     condition: >-
       and(
         succeeded(),
         not(eq(variables['${{ parameters.DependenciesVariableName }}'], '')),
         contains(variables['OSVmImage'], 'macOS')
+      )
+
+  # Clear the vcpkg folder so the cache can successfully deploy to that location
+  - bash: |
+      rm -rf $(VCPKG_INSTALLATION_ROOT)
+      mkdir -p $(VCPKG_INSTALLATION_ROOT)
+    displayName: Linux - Clear vcpkg folder
+    condition: >-
+      and(
+        succeeded(),
+        not(eq(variables['${{ parameters.DependenciesVariableName }}'], '')),
+        contains(variables['OSVmImage'], 'ubuntu')
       )
 
   # Attempt to restore vcpkg from the cache
@@ -54,6 +68,7 @@ steps:
         | engsys-0001
       path: $(VCPKG_INSTALLATION_ROOT)
       cacheHitVar: VcpkgRestoredFromCache
+    displayName: Vcpkg Cache
     condition: >-
       and(
         succeeded(),
@@ -89,10 +104,10 @@ steps:
       and(
         succeeded(),
         ne(variables['VcpkgRestoredFromCache'], 'true'),
-        contains(variables['OSVmImage'], 'macOS'),
+        not(contains(variables['OSVmImage'], 'windows'))
         not(eq(variables['${{ parameters.DependenciesVariableName }}'], ''))
       )
-    displayName: vcpkg bootstrap (MacOS)
+    displayName: MacOS & Linux - vcpkg bootstrap
 
   # Update vcpkg and re-bootstrap on non-Mac OS'. Vcpkg is installed on the
   # image at a given time stamp and not moved forward until some update
@@ -117,7 +132,7 @@ steps:
         not(contains(variables['OSVmImage'], 'macOS')),
         not(eq(variables['${{ parameters.DependenciesVariableName }}'], ''))
       )
-    displayName: Set vcpkg version
+    displayName: Non-Mac - Set vcpkg version and bootstrap
 
   - script: vcpkg version
     displayName: vcpkg version
@@ -129,7 +144,7 @@ steps:
 
   - script: |
       vcpkg install $(${{ parameters.DependenciesVariableName }})
-    displayName: vcpkg install dependencies
+    displayName: Install Dependencies (vcpkg)
     # Execute only if there is at least one dependency to be installed
     condition: >-
       and(
