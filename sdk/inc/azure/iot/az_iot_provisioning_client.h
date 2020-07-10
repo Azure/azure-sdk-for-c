@@ -279,7 +279,7 @@ typedef enum
  *                     call to #az_iot_provisioning_client_parse_received_topic_and_payload.
  * @param[out] out_operation_status The registration operation status.
  * @return #az_result
- *         - #AZ_ERROR_PARSER_UNEXPECTED_CHAR if the string contains an unexpected value.
+ *         - #AZ_ERROR_UNEXPECTED_CHAR if the string contains an unexpected value.
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_parse_operation_status(
     az_iot_provisioning_client_register_response* response,

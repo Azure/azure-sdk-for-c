@@ -301,7 +301,7 @@ AZ_INLINE void az_span_fill(az_span destination, uint8_t value)
  * @param[in] out_number The pointer to the variable that is to receive the number.
  * @return An #az_result value indicating the result of the operation:
  *         - #AZ_OK if successful
- *         - #AZ_ERROR_PARSER_UNEXPECTED_CHAR if a non-ASCII digit is found within the span or if
+ *         - #AZ_ERROR_UNEXPECTED_CHAR if a non-ASCII digit is found within the span or if
  * the source contains a number that would overflow or underflow uint64.
  */
 AZ_NODISCARD az_result az_span_atou64(az_span source, uint64_t* out_number);
@@ -313,7 +313,7 @@ AZ_NODISCARD az_result az_span_atou64(az_span source, uint64_t* out_number);
  * @param[in] out_number The pointer to the variable that is to receive the number.
  * @return An #az_result value indicating the result of the operation:
  *         - #AZ_OK if successful
- *         - #AZ_ERROR_PARSER_UNEXPECTED_CHAR if a non-ASCII digit is found within the span or if
+ *         - #AZ_ERROR_UNEXPECTED_CHAR if a non-ASCII digit is found within the span or if
  * the source contains a number that would overflow or underflow int64
  */
 AZ_NODISCARD az_result az_span_atoi64(az_span source, int64_t* out_number);
@@ -325,7 +325,7 @@ AZ_NODISCARD az_result az_span_atoi64(az_span source, int64_t* out_number);
  * @param out_number The pointer to the variable that is to receive the number.
  * @return An #az_result value indicating the result of the operation:
  *         - #AZ_OK if successful
- *         - #AZ_ERROR_PARSER_UNEXPECTED_CHAR if a non-ASCII digit is found within the span or if
+ *         - #AZ_ERROR_UNEXPECTED_CHAR if a non-ASCII digit is found within the span or if
  * the source contains a number that would overflow or underflow uint32
  */
 AZ_NODISCARD az_result az_span_atou32(az_span source, uint32_t* out_number);
@@ -337,7 +337,7 @@ AZ_NODISCARD az_result az_span_atou32(az_span source, uint32_t* out_number);
  * @param[in] out_number The pointer to the variable that is to receive the number.
  * @return An #az_result value indicating the result of the operation:
  *         - #AZ_OK if successful
- *         - #AZ_ERROR_PARSER_UNEXPECTED_CHAR if a non-ASCII digit is found within the span or if
+ *         - #AZ_ERROR_UNEXPECTED_CHAR if a non-ASCII digit is found within the span or if
  * the source contains a number that would overflow or underflow int32
  */
 AZ_NODISCARD az_result az_span_atoi32(az_span source, int32_t* out_number);
@@ -349,7 +349,7 @@ AZ_NODISCARD az_result az_span_atoi32(az_span source, int32_t* out_number);
  * @param[in] out_number The pointer to the variable that is to receive the number.
  * @return An #az_result value indicating the result of the operation:
  *         - #AZ_OK if successful
- *         - #AZ_ERROR_PARSER_UNEXPECTED_CHAR if a non-ASCII digit or an invalid character is found
+ *         - #AZ_ERROR_UNEXPECTED_CHAR if a non-ASCII digit or an invalid character is found
  * within the span
  */
 AZ_NODISCARD az_result az_span_atod(az_span source, double* out_number);

@@ -61,7 +61,7 @@ static AZ_NODISCARD az_result _az_get_digit(az_span* ref_span, uint8_t* save_her
   uint8_t c_ptr = az_span_ptr(*ref_span)[0];
   if (!isdigit(c_ptr))
   {
-    return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
+    return AZ_ERROR_UNEXPECTED_CHAR;
   }
   //
   *save_here = (uint8_t)(c_ptr - '0');
@@ -228,7 +228,7 @@ az_http_response_get_next_header(az_http_response* ref_response, az_pair* out_he
       }
       if (c <= ' ')
       {
-        return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
+        return AZ_ERROR_UNEXPECTED_CHAR;
       }
       offset_value_end = offset; // increasing index only for valid chars,
     }
