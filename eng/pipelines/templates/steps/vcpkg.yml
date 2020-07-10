@@ -47,7 +47,7 @@ steps:
 
   # Clear the vcpkg folder so the cache can successfully deploy to that location
   - bash: |
-      rm -rf $(VCPKG_INSTALLATION_ROOT)
+      sudo rm -rf $(VCPKG_INSTALLATION_ROOT)
       mkdir -p $(VCPKG_INSTALLATION_ROOT)
     displayName: Linux - Clear vcpkg folder
     condition: >-
