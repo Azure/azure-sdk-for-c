@@ -16,7 +16,9 @@ steps:
     inputs:
       targetType: inline
       workingDirectory: $(Agent.TempDirectory)
-      script: echo "##vso[task.setvariable variable=VCPKG_INSTALLATION_ROOT;]$(Agent.TempDirectory)/vcpkg"
+      script: |
+        echo "##vso[task.prependpath]$(Agent.TempDirectory)/vcpkg"
+        echo "##vso[task.setvariable variable=VCPKG_INSTALLATION_ROOT;]$(Agent.TempDirectory)/vcpkg"
     displayName: MacOS - Set VCPKG_INSTALLATION_ROOT
     condition: >-
       and(
