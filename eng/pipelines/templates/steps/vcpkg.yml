@@ -76,7 +76,8 @@ steps:
     condition: >-
       and(
         succeeded(),
-        not(eq(variables['${{ parameters.DependenciesVariableName }}'], ''))
+        not(eq(variables['${{ parameters.DependenciesVariableName }}'], '')),
+        not(eq(variables['Skip.VcpkgCache'], 'true'))
       )
 
   # Install vcpkg on MacOS
