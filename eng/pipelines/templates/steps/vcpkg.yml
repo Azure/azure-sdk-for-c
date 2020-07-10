@@ -46,7 +46,12 @@ steps:
   # Attempt to restore vcpkg from the cache
   - task: Cache@2
     inputs:
-      key: $(Agent.JobName) | ${{ parameters.VcpkgVersion }} | $(Agent.Os) | $(${{ parameters.DependenciesVariableName }}) | engsys-0001
+      key: >-
+        $(Agent.JobName)
+        | ${{ parameters.VcpkgVersion }}
+        | $(Agent.Os)
+        | $(${{ parameters.DependenciesVariableName }})
+        | engsys-0001
       path: $(VCPKG_INSTALLATION_ROOT)
       cacheHitVar: VcpkgRestoredFromCache
     condition: >-
