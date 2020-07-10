@@ -69,7 +69,6 @@ steps:
         | ${{ parameters.VcpkgVersion }}
         | $(Agent.Os)
         | $(${{ parameters.DependenciesVariableName }})
-        | engsys-0001
       path: $(VCPKG_INSTALLATION_ROOT)
       cacheHitVar: VcpkgRestoredFromCache
     displayName: Vcpkg Cache
