@@ -73,7 +73,7 @@
   }
 #define LOG_AZ_SPAN(span_description, span) \
   { \
-    (void)printf("\t\t%s", span_description); \
+    (void)printf("\t\t%s ", span_description); \
     char* buffer = (char*)az_span_ptr(span); \
     for (int32_t i = 0; i < az_span_size(span); i++) \
     { \
@@ -239,7 +239,7 @@ static az_result read_configuration_entry(
 
   if (env_value != NULL)
   {
-    printf("%s = %s\n", env_name, hide_value ? "***" : env_value);
+    (void)printf("%s = %s\n", env_name, hide_value ? "***" : env_value);
     az_span env_span = az_span_from_str(env_value);
     AZ_RETURN_IF_NOT_ENOUGH_SIZE(buffer, az_span_size(env_span));
     az_span_copy(buffer, env_span);
@@ -357,7 +357,7 @@ static void receive_registration_status()
       LOG_ERROR("Failed to receive message: MQTTClient return code %d.", rc);
       exit(rc);
     }
-    else if (message == NULL)
+    else if (NULL == message)
     {
       LOG_ERROR("Timeout expired: MQTTClient return code %d.", rc);
       exit(rc);
@@ -385,22 +385,22 @@ static void receive_registration_status()
   } while (!is_operation_complete);
 
   // Operation is complete: Successful assignment
-  if (operation_status == AZ_IOT_PROVISIONING_STATUS_ASSIGNED)
+  if (AZ_IOT_PROVISIONING_STATUS_ASSIGNED == operation_status)
   {
     LOG_SUCCESS("Client provisioned:");
-    LOG_AZ_SPAN("Hub Hostname: ", response.registration_result.assigned_hub_hostname);
-    LOG_AZ_SPAN("Device Id: ", response.registration_result.device_id);
+    LOG_AZ_SPAN("Hub Hostname:", response.registration_result.assigned_hub_hostname);
+    LOG_AZ_SPAN("Device Id:", response.registration_result.device_id);
   }
   else // Unsuccesful assignment (unassigned, failed or disabled states)
   {
     LOG_ERROR("Client provisioning failed:");
-    LOG_AZ_SPAN("Registration state: ", response.operation_status);
+    LOG_AZ_SPAN("Registration state:", response.operation_status);
     LOG("Last operation status: %d", response.status);
-    LOG_AZ_SPAN("Operation ID: ", response.operation_id);
+    LOG_AZ_SPAN("Operation ID:", response.operation_id);
     LOG("Error code: %u", response.registration_result.extended_error_code);
-    LOG_AZ_SPAN("Error message: ", response.registration_result.error_message);
-    LOG_AZ_SPAN("Error timestamp: ", response.registration_result.error_timestamp);
-    LOG_AZ_SPAN("Error tracking ID: ", response.registration_result.error_tracking_id);
+    LOG_AZ_SPAN("Error message:", response.registration_result.error_message);
+    LOG_AZ_SPAN("Error timestamp:", response.registration_result.error_timestamp);
+    LOG_AZ_SPAN("Error tracking ID:", response.registration_result.error_tracking_id);
     exit((int)response.registration_result.extended_error_code);
   }
 
@@ -428,8 +428,8 @@ static void parse_operation_message(
     exit(rc);
   }
   LOG_SUCCESS("Client received a valid topic response:");
-  LOG_AZ_SPAN("Topic: ", topic_span);
-  LOG_AZ_SPAN("Payload: ", message_span);
+  LOG_AZ_SPAN("Topic:", topic_span);
+  LOG_AZ_SPAN("Payload:", message_span);
   LOG("Response status: %d", response->status);
 
   if (az_failed(rc = az_iot_provisioning_client_parse_operation_status(response, operation_status)))
