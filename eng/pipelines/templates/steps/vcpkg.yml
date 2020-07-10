@@ -49,6 +49,7 @@ steps:
   - bash: |
       sudo rm -rf $(VCPKG_INSTALLATION_ROOT)
       sudo mkdir -p $(VCPKG_INSTALLATION_ROOT)
+      sudo chmod 777 $(VCPKG_INSTALLATION_ROOT)
     displayName: Linux - Clear vcpkg folder
     condition: >-
       and(
