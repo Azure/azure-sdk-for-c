@@ -104,7 +104,7 @@ steps:
       and(
         succeeded(),
         ne(variables['VcpkgRestoredFromCache'], 'true'),
-        not(contains(variables['OSVmImage'], 'windows'))
+        not(contains(variables['OSVmImage'], 'windows')),
         not(eq(variables['${{ parameters.DependenciesVariableName }}'], ''))
       )
     displayName: MacOS & Linux - vcpkg bootstrap
