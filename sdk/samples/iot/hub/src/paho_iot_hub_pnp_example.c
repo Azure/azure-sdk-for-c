@@ -384,11 +384,13 @@ static az_result read_configuration_and_init_client(void)
       create_mqtt_endpoint(mqtt_endpoint, (int32_t)sizeof(mqtt_endpoint), iot_hub_hostname_span));
 
   // Initialize the hub client with the hub host endpoint and the default connection options
+  az_iot_hub_client_options options = az_iot_hub_client_options_default();
+  options.model_id = model_id;
   AZ_RETURN_IF_FAILED(az_iot_hub_client_init(
       &client,
       az_span_slice(iot_hub_hostname_span, 0, (int32_t)strlen(iot_hub_hostname)),
       az_span_slice(device_id_span, 0, (int32_t)strlen(device_id)),
-      NULL));
+      &options));
 
   return AZ_OK;
 }
@@ -888,8 +890,8 @@ static int connect_device(void)
 
   // Get the MQTT username used to connect to IoT Hub
   if (az_failed(
-          rc = az_iot_hub_client_get_user_name_with_model_id(
-              &client, model_id, mqtt_username, sizeof(mqtt_username), NULL)))
+          rc = az_iot_hub_client_get_user_name(
+              &client, mqtt_username, sizeof(mqtt_username), NULL)))
 
   {
     printf("Failed to get MQTT username, return code %d\n", rc);
