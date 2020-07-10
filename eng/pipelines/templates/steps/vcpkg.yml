@@ -6,7 +6,8 @@ parameters:
   # invocations
   DependenciesVariableName: vcpkg.deps
 
-  # Ref at which to check out (can be commit SHA or tag in the form of `tags/<tag>`)
+  # Ref at which to check out (can be commit SHA or tag in the form of
+  # `tags/<tag>`)
   VcpkgVersion: c6d69984edceacbe880fad20ddc8305a7ec6fb8c
 
 steps:
@@ -45,7 +46,7 @@ steps:
   # Attempt to restore vcpkg from the cache
   - task: Cache@2
     inputs:
-      key: $(Agent.JobName) | ${{ parameters.VcpkgVersion }} | $(Agent.Os) | $(${{ parameters.DependenciesVariableName }}) | 1.0.0-beta.1
+      key: $(Agent.JobName) | ${{ parameters.VcpkgVersion }} | $(Agent.Os) | $(${{ parameters.DependenciesVariableName }}) | engsys-0001
       path: $(VCPKG_INSTALLATION_ROOT)
       cacheHitVar: VcpkgRestoredFromCache
     condition: >-
