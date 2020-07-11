@@ -157,6 +157,10 @@ Start using the IoT Hub Client in your solutions. More SDK details can be found 
 
 For extensive documentation on Azure IoT Hub, see the [API reference documentation][iot_hub_mqtt].
 
+## Contributing
+
+This project welcomes contributions and suggestions. Find [more contributing][SDK_README_CONTRIBUTING] details here.
+
 <!-- LINKS -->
 [IOT_CLIENT_README]: https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot#azure-iot-clients
 [SDK_README_GETTING_STARTED]: https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot#getting-started
