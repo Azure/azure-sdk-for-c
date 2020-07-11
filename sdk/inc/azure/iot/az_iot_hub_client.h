@@ -46,6 +46,8 @@ typedef struct az_iot_hub_client_options
   az_span module_id; /**< The module name (if a module identity is used). */
   az_span user_agent; /**< The user-agent is a formatted string that will be used for Azure IoT
                          usage statistics. */
+  az_span model_id; /**< The model id used to identify the capabilities of a device based on the
+                       Digital Twin document */
 } az_iot_hub_client_options;
 
 /**
@@ -106,31 +108,6 @@ AZ_NODISCARD az_result az_iot_hub_client_init(
  */
 AZ_NODISCARD az_result az_iot_hub_client_get_user_name(
     az_iot_hub_client const* client,
-    char* mqtt_user_name,
-    size_t mqtt_user_name_size,
-    size_t* out_mqtt_user_name_length);
-
-/**
- * @brief Gets the MQTT user name with Digital Twin model id.
- *
- * @warning THIS FUNCTION IS TEMPORARY. IT IS SUBJECT TO CHANGE OR BE REMOVED IN THE FUTURE.
- * 
- * The user name will be of the following format:
- * {iothubhostname}/{device_id}/?api-version=2020-05-31-preview&{user_agent}&digital-twin-model-id={model_id}
- *
- * @param[in] client The #az_iot_hub_client to use for this call.
- * @param[in] model_id A span with the model id of the device.
- * @param[out] mqtt_user_name A buffer with sufficient capacity to hold the MQTT user name.
- *                            If successful, contains a null-terminated string with the user name
- *                            that needs to be passed to the MQTT client.
- * @param[in] mqtt_user_name_size The size, in bytes of \p mqtt_user_name.
- * @param[out] out_mqtt_user_name_length __[nullable]__ Contains the string length, in bytes, of
- *                                                      \p mqtt_user_name. Can be `NULL`.
- * @return #az_result.
- */
-AZ_NODISCARD az_result az_iot_hub_client_get_user_name_with_model_id(
-    az_iot_hub_client const* client,
-    az_span model_id,
     char* mqtt_user_name,
     size_t mqtt_user_name_size,
     size_t* out_mqtt_user_name_length);
