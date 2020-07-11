@@ -209,6 +209,8 @@ For convenience, you can quickly get started using [VSCode](https://code.visuals
 
 From there you can select targets to build and debug.
 
+**NOTE**: Especially on Windows, make sure you select a compiler platform version that matches the dependencies installed via VCPKG (i.e. `x64` or `x86`). Additionally, the triplet to use should be specified in the `VCPKG_DEFAULT_TRIPLET` field in `settings.json`.
+
 ### Source Files (IDE, command line, etc)
 
 We have set up the repo for easy integration into other projects which don't use CMake. Two main features make this possible:
