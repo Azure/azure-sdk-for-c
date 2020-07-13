@@ -36,7 +36,7 @@
 #endif
 
 // DO NOT MODIFY: Device ID Environment Variable Name
-#define ENV_DEVICE_ID "AZ_IOT_DEVICE_ID_SAS"
+#define ENV_DEVICE_ID "AZ_IOT_DEVICE_ID"
 
 // DO NOT MODIFY: IoT Hub Hostname Environment Variable Name
 #define ENV_IOT_HUB_HOSTNAME "AZ_IOT_HUB_HOSTNAME"
