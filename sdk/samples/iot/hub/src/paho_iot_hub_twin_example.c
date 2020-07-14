@@ -541,7 +541,7 @@ static az_result update_property(az_span desired_payload)
   AZ_RETURN_IF_FAILED(az_json_reader_next_token(&json_reader));
   if (json_reader.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
   {
-    return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
+    return AZ_ERROR_UNEXPECTED_CHAR;
   }
 
   AZ_RETURN_IF_FAILED(az_json_reader_next_token(&json_reader));
