@@ -42,6 +42,20 @@ static void test_az_iot_u32toa_size_success()
   assert_int_equal(_az_iot_u32toa_size(4294967295), 10);
 }
 
+static void test_az_iot_u64toa_size_success()
+{
+  assert_int_equal(_az_iot_u64toa_size(0), 1);
+  assert_int_equal(_az_iot_u64toa_size(9), 1);
+  assert_int_equal(_az_iot_u64toa_size(10), 2);
+  assert_int_equal(_az_iot_u64toa_size(99), 2);
+  assert_int_equal(_az_iot_u64toa_size(10000000000ul), 11);
+  assert_int_equal(_az_iot_u64toa_size(19999999999ul), 11);
+  assert_int_equal(_az_iot_u64toa_size(1000000000000000000ul), 19);
+  assert_int_equal(_az_iot_u64toa_size(1999999999999999999ul), 19);
+  assert_int_equal(_az_iot_u64toa_size(10000000000000000000ul), 20);
+  assert_int_equal(_az_iot_u64toa_size(18446744073709551615ul), 20);
+}
+
 static void test_az_iot_is_success_status_translate_success()
 {
   assert_true(az_iot_is_success_status(AZ_IOT_STATUS_OK));
@@ -154,6 +168,7 @@ int test_az_iot_common()
 {
   const struct CMUnitTest tests[] = {
     cmocka_unit_test(test_az_iot_u32toa_size_success),
+    cmocka_unit_test(test_az_iot_u64toa_size_success),
     cmocka_unit_test(test_az_iot_is_success_status_translate_success),
     cmocka_unit_test(test_az_iot_is_retriable_status_translate_success),
     cmocka_unit_test(test_az_iot_retry_calc_delay_common_timings_success),

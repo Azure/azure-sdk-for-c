@@ -27,6 +27,14 @@
 #include <azure/core/az_span.h>
 #include <azure/iot/az_iot_hub_client.h>
 
+#define TIMEOUT_WAIT_FOR_RECEIVE_MESSAGE_MS (8 * 1000)
+#define TIMEOUT_WAIT_FOR_COMPLETION_MS 1000
+#define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
+#define DEVICE_DO_WORK_SLEEP_MS 2
+#define TELEMETRY_SEND_INTERVAL 1
+#define DEFAULT_START_TEMP_CELSIUS 22.0
+#define DOUBLE_DECIMAL_PLACE_DIGITS 2
+
 #ifdef _MSC_VER
 // "'getenv': This function or variable may be unsafe. Consider using _dupenv_s instead."
 #pragma warning(disable : 4996)
@@ -45,14 +53,6 @@
 // DO NOT MODIFY: the path to a PEM file containing the server trusted CA
 // This is usually not needed on Linux or Mac but needs to be set on Windows.
 #define ENV_DEVICE_X509_TRUST_PEM_FILE "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE"
-
-#define TIMEOUT_WAIT_FOR_RECEIVE_MESSAGE_MS (8 * 1000)
-#define TIMEOUT_WAIT_FOR_COMPLETION_MS 1000
-#define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
-#define DEVICE_DO_WORK_SLEEP_MS 2
-#define TELEMETRY_SEND_INTERVAL 1
-#define DEFAULT_START_TEMP_CELSIUS 22.0
-#define DOUBLE_DECIMAL_PLACE_DIGITS 2
 
 bool device_operational = true;
 static const uint8_t null_terminator = '\0';
