@@ -44,11 +44,11 @@
 
 // DO NOT MODIFY: the path to a PEM file containing the device certificate and
 // key as well as any intermediate certificates chaining to an uploaded group certificate.
-#define ENV_DEVICE_X509_CERT_PEM_FILE_PATH "AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH"
+#define ENV_DEVICE_X509_CERT_PEM_FILE_PATH "AZ_IOT_DEVICE_X509_CERT_PEM_FILE"
 
 // DO NOT MODIFY: the path to a PEM file containing the server trusted CA
 // This is usually not needed on Linux or Mac but needs to be set on Windows.
-#define ENV_DEVICE_X509_TRUST_PEM_FILE_PATH "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH"
+#define ENV_DEVICE_X509_TRUST_PEM_FILE_PATH "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE"
 
 // Logging with formatting
 #define LOG_ERROR(...) \
@@ -376,10 +376,11 @@ static void receive_registration_status()
     if (!is_operation_complete)
     {
       LOG("Operation is still pending.");
-      MQTTClient_freeMessage(&message);
-      MQTTClient_free(topic);
 
       send_operation_query_message(&response);
+
+      MQTTClient_freeMessage(&message);
+      MQTTClient_free(topic);
       LOG_SUCCESS("Client sent operation query message.");
     }
   } while (!is_operation_complete);
