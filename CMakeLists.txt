@@ -103,15 +103,15 @@ if (UNIT_TESTING)
   add_subdirectory(sdk/tests/storage/blobs)
 endif()
 
-# Fail geneation when setting MOCKS ON without GCC
+# Fail generation when setting MOCKS ON without GCC
 if(UNIT_TESTING_MOCKS)
   if(UNIT_TESTING)
     if(NOT CMAKE_C_COMPILER_ID MATCHES "GNU")
-      # Fail generation when asking for MOCK withoyt GCC
-      message(FATAL_ERROR "Unsupported Compiler Option.\nOption `UNIT_TESTING_MOCK` is not supported on ${CMAKE_C_COMPILER_ID}. It is only supported by GNU gcc.\nRemove option `UNIT_TESTING_MOCK` to build tests without using MOCK")
+      # Fail generation when asking for MOCK without GCC
+      message(FATAL_ERROR "Unsupported Compiler Option.\nOption `UNIT_TESTING_MOCKS` is not supported on ${CMAKE_C_COMPILER_ID}. It is only supported by GNU gcc.\nRemove option `UNIT_TESTING_MOCKS` to build tests without using MOCK.")
     endif()
   else()
     # Mention MOCK is ignored
-    message(WARNING "UNIT_TESTING_MOCK will be ignored because UNIT_TESTING is not enabled.")
+    message(WARNING "UNIT_TESTING_MOCKS will be ignored because UNIT_TESTING is not enabled.")
   endif()
 endif()
