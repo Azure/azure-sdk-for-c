@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #ifdef _WIN32
 // Required for Sleep(DWORD)
 #include <Windows.h>
@@ -21,6 +22,8 @@
 // Required for sleep(unsigned int)
 #include <unistd.h>
 #endif
+
+#include "sample_sas_utility.h"
 
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
@@ -31,21 +34,23 @@
 #pragma warning(disable : 4996)
 #endif
 
-// DO NOT MODIFY: Service information
-#define ENV_GLOBAL_PROVISIONING_ENDPOINT_DEFAULT "ssl://global.azure-devices-provisioning.net:8883"
-#define ENV_GLOBAL_PROVISIONING_ENDPOINT "AZ_IOT_GLOBAL_PROVISIONING_ENDPOINT"
-#define ENV_ID_SCOPE_ENV "AZ_IOT_ID_SCOPE"
-
-// DO NOT MODIFY: Device information
-#define ENV_REGISTRATION_ID_ENV "AZ_IOT_REGISTRATION_ID"
-
-// DO NOT MODIFY: the path to a PEM file containing the device certificate and
-// key as well as any intermediate certificates chaining to an uploaded group certificate.
-#define ENV_DEVICE_X509_CERT_PEM_FILE_PATH "AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH"
+// DO NOT MODIFY: IoT Provisioning SAS Key
+#define ENV_IOT_PROVISIONING_SAS_KEY "AZ_IOT_PROVISIONING_SAS_KEY"
+#define ENV_IOT_PROVISIONING_SAS_KEY_DURATION \
+  "AZ_IOT_PROVISIONING_SAS_KEY_DURATION" // default is 2 hrs.
+#define SAS_KEY_DURATION_TIME_DIGITS 4
 
 // DO NOT MODIFY: the path to a PEM file containing the server trusted CA
 // This is usually not needed on Linux or Mac but needs to be set on Windows.
-#define ENV_DEVICE_X509_TRUST_PEM_FILE_PATH "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH"
+#define ENV_DEVICE_X509_TRUST_PEM_FILE_PATH "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE"
+
+// DO NOT MODIFY: Service information
+#define ENV_GLOBAL_PROVISIONING_ENDPOINT_DEFAULT "ssl://global.azure-devices-provisioning.net:8883"
+#define ENV_GLOBAL_PROVISIONING_ENDPOINT "AZ_IOT_GLOBAL_PROVISIONING_ENDPOINT"
+#define ENV_ID_SCOPE "AZ_IOT_ID_SCOPE"
+
+// DO NOT MODIFY: Device information
+#define ENV_REGISTRATION_ID_SAS "AZ_IOT_REGISTRATION_ID_SAS"
 
 #define TIMEOUT_MQTT_RECEIVE_MS (60 * 1000)
 #define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
@@ -82,20 +87,29 @@
     (void)printf("\n"); \
   }
 
-// Buffers
-static char x509_cert_pem_file_path_buffer[256];
+// Environment variables
+static char iot_provisioning_sas_key_buffer[128];
+static uint32_t iot_provisioning_sas_key_duration;
 static char x509_trust_pem_file_path_buffer[256];
 static char global_provisioning_endpoint_buffer[256];
 static char id_scope_buffer[16];
 static char registration_id_buffer[256];
-static char mqtt_client_id_buffer[128];
-static char mqtt_username_buffer[128];
-static char register_publish_topic_buffer[128];
-static char query_topic_buffer[256];
+
+// Generate SAS key variables
+static char sas_signature_buffer[128];
+static char sas_b64_decoded_key_buffer[32];
+static char sas_encoded_hmac256_signed_signature_buffer[128];
+static char sas_b64_encoded_hmac256_signed_signature_buffer[128];
+static char mqtt_password_buffer[256];
 
 // Clients
 static az_iot_provisioning_client provisioning_client;
 static MQTTClient mqtt_client;
+static char mqtt_client_id_buffer[128];
+static char mqtt_client_username_buffer[128];
+
+static char register_publish_topic_buffer[128];
+static char query_topic_buffer[256];
 
 // Functions
 static void create_and_configure_client();
@@ -109,6 +123,8 @@ static az_result read_configuration_entry(
     bool hide_value,
     az_span buffer,
     az_span* out_value);
+static void generate_sas_key();
+static uint32_t get_epoch_expiration_time_from_hours(uint32_t hours);
 static void connect_client_to_provisioning_service();
 static void subscribe_client_to_provisioning_service_topics();
 static void register_client_with_provisioning_service();
@@ -150,19 +166,23 @@ int main()
 static void create_and_configure_client()
 {
   int rc;
-  az_span endpoint;
+  az_span global_provisioning_endpoint;
   az_span id_scope;
   az_span registration_id;
 
-  if (az_failed(rc = read_environment_variables(&endpoint, &id_scope, &registration_id)))
+  if (az_failed(
+          rc
+          = read_environment_variables(&global_provisioning_endpoint, &id_scope, &registration_id)))
   {
-    LOG_ERROR("Failed to read evironment variables: az_result return code 0x%04x.", rc);
+    LOG_ERROR(
+        "Failed to read configuration from environment variables: az_result return code 0x%04x.",
+        rc);
     exit(rc);
   }
 
   if (az_failed(
           rc = az_iot_provisioning_client_init(
-              &provisioning_client, endpoint, id_scope, registration_id, NULL)))
+              &provisioning_client, global_provisioning_endpoint, id_scope, registration_id, NULL)))
   {
     LOG_ERROR("Failed to initialize provisioning client: az_result return code 0x%04x.", rc);
     exit(rc);
@@ -178,7 +198,7 @@ static void create_and_configure_client()
 
   if ((rc = MQTTClient_create(
            &mqtt_client,
-           (char*)az_span_ptr(endpoint),
+           (char*)az_span_ptr(global_provisioning_endpoint),
            mqtt_client_id_buffer,
            MQTTCLIENT_PERSISTENCE_NONE,
            NULL))
@@ -187,39 +207,55 @@ static void create_and_configure_client()
     LOG_ERROR("Failed to create MQTT client: MQTTClient return code %d.", rc);
     exit(rc);
   }
+
+  generate_sas_key();
 }
 
 static az_result read_environment_variables(
-    az_span* endpoint,
+    az_span* global_provisioning_endpoint,
     az_span* id_scope,
     az_span* registration_id)
 {
-  // Certification variables
-  az_span device_cert = AZ_SPAN_FROM_BUFFER(x509_cert_pem_file_path_buffer);
-  AZ_RETURN_IF_FAILED(
-      read_configuration_entry(ENV_DEVICE_X509_CERT_PEM_FILE_PATH, NULL, false, device_cert, &device_cert));
+  // Certification and SAS variables
+  az_span iot_provisioning_sas_key = AZ_SPAN_FROM_BUFFER(iot_provisioning_sas_key_buffer);
+  AZ_RETURN_IF_FAILED(read_configuration_entry(
+      ENV_IOT_PROVISIONING_SAS_KEY,
+      NULL,
+      true,
+      iot_provisioning_sas_key,
+      &iot_provisioning_sas_key));
 
-  az_span trusted_cert = AZ_SPAN_FROM_BUFFER(x509_trust_pem_file_path_buffer);
-  AZ_RETURN_IF_FAILED(
-      read_configuration_entry(ENV_DEVICE_X509_TRUST_PEM_FILE_PATH, "", false, trusted_cert, &trusted_cert));
+  char duration_buffer[SAS_KEY_DURATION_TIME_DIGITS];
+  az_span duration = AZ_SPAN_FROM_BUFFER(duration_buffer);
+  AZ_RETURN_IF_FAILED(read_configuration_entry(
+      ENV_IOT_PROVISIONING_SAS_KEY_DURATION, "2", false, duration, &duration));
+  AZ_RETURN_IF_FAILED(az_span_atou32(duration, &iot_provisioning_sas_key_duration));
+
+  az_span x509_trust_pem_file_path = AZ_SPAN_FROM_BUFFER(x509_trust_pem_file_path_buffer);
+  AZ_RETURN_IF_FAILED(read_configuration_entry(
+      ENV_DEVICE_X509_TRUST_PEM_FILE_PATH,
+      "",
+      false,
+      x509_trust_pem_file_path,
+      &x509_trust_pem_file_path));
 
   // Connection variables
-  *endpoint = AZ_SPAN_FROM_BUFFER(global_provisioning_endpoint_buffer);
+  *global_provisioning_endpoint = AZ_SPAN_FROM_BUFFER(global_provisioning_endpoint_buffer);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
       ENV_GLOBAL_PROVISIONING_ENDPOINT,
       ENV_GLOBAL_PROVISIONING_ENDPOINT_DEFAULT,
       false,
-      *endpoint,
-      endpoint));
+      *global_provisioning_endpoint,
+      global_provisioning_endpoint));
 
   *id_scope = AZ_SPAN_FROM_BUFFER(id_scope_buffer);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(ENV_ID_SCOPE_ENV, NULL, false, *id_scope, id_scope));
+  AZ_RETURN_IF_FAILED(read_configuration_entry(ENV_ID_SCOPE, NULL, false, *id_scope, id_scope));
 
   *registration_id = AZ_SPAN_FROM_BUFFER(registration_id_buffer);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_REGISTRATION_ID_ENV, NULL, false, *registration_id, registration_id));
+      ENV_REGISTRATION_ID_SAS, NULL, false, *registration_id, registration_id));
 
-  LOG(" "); //Log formatting
+  LOG(" "); // Log formatting
   return AZ_OK;
 }
 
@@ -247,11 +283,91 @@ static az_result read_configuration_entry(
   }
   else
   {
-    LOG_ERROR("(missing) Please set the %s environment variable.", env_name);
+    printf("(missing) Please set the %s environment variable.\n", env_name);
     return AZ_ERROR_ARG;
   }
 
   return AZ_OK;
+}
+
+static void generate_sas_key()
+{
+  int rc;
+
+  // Create the POSIX expiration time from input hours
+  uint32_t sas_duration = get_epoch_expiration_time_from_hours(iot_provisioning_sas_key_duration);
+
+  // Get the signature which will be signed with the decoded key
+  az_span sas_signature = AZ_SPAN_FROM_BUFFER(sas_signature_buffer);
+  if (az_failed(
+          rc = az_iot_provisioning_client_sas_get_signature(
+              &provisioning_client, sas_duration, sas_signature, &sas_signature)))
+  {
+    printf("Could not get the signature for SAS key: az_result return code %04x\n", rc);
+    exit(rc);
+  }
+
+  // Decode the base64 encoded SAS key to use for HMAC signing
+  az_span sas_b64_decoded_key = AZ_SPAN_FROM_BUFFER(sas_b64_decoded_key_buffer);
+  if (az_failed(
+          rc = sample_base64_decode(
+              AZ_SPAN_FROM_BUFFER(iot_provisioning_sas_key_buffer),
+              sas_b64_decoded_key,
+              &sas_b64_decoded_key)))
+  {
+    printf("Could not decode the SAS key: az_result return code %04x\n", rc);
+    exit(rc);
+  }
+
+  // HMAC-SHA256 sign the signature with the decoded key
+  az_span sas_encoded_hmac256_signed_signature
+      = AZ_SPAN_FROM_BUFFER(sas_encoded_hmac256_signed_signature_buffer);
+  if (az_failed(
+          rc = sample_hmac_sha256_sign(
+              sas_b64_decoded_key,
+              sas_signature,
+              sas_encoded_hmac256_signed_signature,
+              &sas_encoded_hmac256_signed_signature)))
+  {
+    printf("Could not sign the signature: az_result return code %04x\n", rc);
+    exit(rc);
+  }
+
+  // base64 encode the result of the HMAC signing
+  az_span sas_b64_encoded_hmac256_signed_signature
+      = AZ_SPAN_FROM_BUFFER(sas_b64_encoded_hmac256_signed_signature_buffer);
+  if (az_failed(
+          rc = sample_base64_encode(
+              sas_encoded_hmac256_signed_signature,
+              sas_b64_encoded_hmac256_signed_signature,
+              &sas_b64_encoded_hmac256_signed_signature)))
+  {
+    printf("Could not base64 encode the password: az_result return code %04x\n", rc);
+    exit(rc);
+  }
+
+  // Get the resulting password, passing the base64 encoded, HMAC signed bytes
+  size_t mqtt_password_length;
+  if (az_failed(
+          rc = az_iot_provisioning_client_sas_get_password(
+              &provisioning_client,
+              sas_b64_encoded_hmac256_signed_signature,
+              sas_duration,
+              AZ_SPAN_NULL,
+              mqtt_password_buffer,
+              sizeof(mqtt_password_buffer),
+              &mqtt_password_length)))
+  {
+    printf("Could not get the password: az_result return code %04x\n", rc);
+    exit(rc);
+  }
+
+  return;
+}
+
+static uint32_t get_epoch_expiration_time_from_hours(uint32_t hours)
+{
+  return (uint32_t)(time(NULL) + hours * 60 * 60);
 }
 
 static void connect_client_to_provisioning_service()
@@ -260,20 +376,22 @@ static void connect_client_to_provisioning_service()
 
   if (az_failed(
           rc = az_iot_provisioning_client_get_user_name(
-              &provisioning_client, mqtt_username_buffer, sizeof(mqtt_username_buffer), NULL)))
+              &provisioning_client,
+              mqtt_client_username_buffer,
+              sizeof(mqtt_client_username_buffer),
+              NULL)))
   {
     LOG_ERROR("Failed to get MQTT username: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
   MQTTClient_connectOptions mqtt_connect_options = MQTTClient_connectOptions_initializer;
-  mqtt_connect_options.username = mqtt_username_buffer;
-  mqtt_connect_options.password = NULL; // This sample uses x509 authentication.
+  mqtt_connect_options.username = mqtt_client_username_buffer;
+  mqtt_connect_options.password = mqtt_password_buffer;
   mqtt_connect_options.cleansession = false; // Set to false so can receive any pending messages.
   mqtt_connect_options.keepAliveInterval = AZ_IOT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS;
 
   MQTTClient_SSLOptions mqtt_ssl_options = MQTTClient_SSLOptions_initializer;
-  mqtt_ssl_options.keyStore = (char*)x509_cert_pem_file_path_buffer;
   if (*x509_trust_pem_file_path_buffer != '\0')
   {
     mqtt_ssl_options.trustStore = (char*)x509_trust_pem_file_path_buffer;
@@ -448,7 +566,11 @@ static void send_operation_query_message(
 
   if (az_failed(
           rc = az_iot_provisioning_client_query_status_get_publish_topic(
-              &provisioning_client, response, query_topic_buffer, sizeof(query_topic_buffer), NULL)))
+              &provisioning_client,
+              response,
+              query_topic_buffer,
+              sizeof(query_topic_buffer),
+              NULL)))
   {
     LOG_ERROR("Unable to get query status publish topic: az_result return code 0x%04x.", rc);
     exit(rc);

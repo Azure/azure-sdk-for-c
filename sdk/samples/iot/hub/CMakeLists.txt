@@ -96,13 +96,14 @@ target_link_libraries(paho_iot_hub_telemetry_example
 # Telemetry (SAS) Sample
 add_executable (paho_iot_hub_sas_telemetry_example
   ${CMAKE_CURRENT_LIST_DIR}/src/paho_iot_hub_sas_telemetry_example.c
-  ${CMAKE_CURRENT_LIST_DIR}/src/sample_sas_utility.c
+  ${az_iot_samples_SOURCE_DIR}/src/sample_sas_utility.c
 )
 
 # SDK deps
 target_link_libraries(paho_iot_hub_sas_telemetry_example
   PRIVATE
     az::iot::hub
+    az::iot::samples
 )
 
 # External deps
