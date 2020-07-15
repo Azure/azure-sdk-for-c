@@ -42,6 +42,9 @@ project (${TARGET_NAME} LANGUAGES C VERSION ${AZ_SDK_VERSION_MAJOR}.${AZ_SDK_VER
 set(CMAKE_C_STANDARD 99)
 
 include(CheckAndIncludeCodeCov)
+if(UNIT_TESTING_MOCKS)
+    include(AddTestCMocka)
+endif()
 
 add_library (
   ${TARGET_NAME}
@@ -62,7 +65,7 @@ add_library (
   ${CMAKE_CURRENT_LIST_DIR}/az_precondition.c
   ${CMAKE_CURRENT_LIST_DIR}/az_span.c
   ${CMAKE_CURRENT_LIST_DIR}/az_spinlock.c
-  ${az_SOURCE_DIR}/sdk/http_adapters/_template/az_http_adapter.c)
+  ${az_SOURCE_DIR}/sdk/http_adapters/${AZ_HTTP_ADAPTER_DIR}/az_http_adapter.c)
 
 target_include_directories (${TARGET_NAME}
   PUBLIC

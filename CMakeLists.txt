@@ -6,9 +6,9 @@ cmake_minimum_required (VERSION 3.10)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake-modules")
 
 option(WARNINGS_AS_ERRORS "Treat compiler warnings as errors" ON)
-option(TRANSPORT_CURL "Build internal http transport implementation with CURL for HTTP Pipeline" OFF)
 option(UNIT_TESTING "Build unit test projects" OFF)
-option(UNIT_TESTING_MOCKS "wrap PAL functions with mock implementation for tests" OFF)
+option(UNIT_TESTING_MOCKS "PAL and http functions with mock testing implementations" ON)
+option(TRANSPORT_CURL "Build internal http transport implementation with CURL for HTTP Pipeline" OFF)
 option(TRANSPORT_PAHO "Build IoT Samples with Paho MQTT support" OFF)
 option(PRECONDITIONS "Build SDK with preconditions enabled" ON)
 option(LOGGING "Build SDK with logging support" ON)
@@ -25,6 +25,13 @@ endif()
 # enable mock functions with link option -ld
 if(UNIT_TESTING_MOCKS)
   add_compile_definitions(_az_MOCK_ENABLED)
+  if(TRANSPORT_CURL OR TRANSPORT_PAHO)
+    message(FATAL_ERROR "UNIT_TESTING_MOCKS only compatible with TRANSPORT_MOCKS and AZ_PLATFORM_IMPL set to MOCKS")
+  endif()
+  set(AZ_PLATFORM_IMPL "MOCKS")
+  set(AZ_HTTP_ADAPTER_IMPL "MOCKS")
+  set(AZ_HTTP_ADAPTER_DIR mocks)
+  add_compile_definitions(TRANSPORT_MOCKS)
 endif()
 
 # make libcurl option enabled to be visible to code
@@ -65,6 +72,9 @@ if(AZ_PLATFORM_IMPL STREQUAL "WIN32")
 elseif(AZ_PLATFORM_IMPL STREQUAL "POSIX")
   # build linux platform
   set(PORTS_INCLUDE_DIR posix)
+elseif(AZ_PLATFORM_IMPL STREQUAL "MOCKS")
+  # build mock platform
+  set(PORTS_INCLUDE_DIR mocks)
 else()
   #noplatform
   set(PORTS_INCLUDE_DIR _template)

@@ -17,6 +17,9 @@
 
 #include <azure/core/_az_cfg.h>
 
+// Forwarding function for the pipeline to callback on
+az_result send_request(_az_http_request const* request, az_http_response* response);
+
 static void test_credential_client_secret(void** state)
 {
   (void)state;
@@ -88,7 +91,8 @@ static void test_credential_client_secret(void** state)
     ignore = az_http_response_init(&response, AZ_SPAN_FROM_BUFFER(response_buf));
 
 #ifdef _az_MOCK_ENABLED
-    will_return_count(__wrap_az_platform_clock_msec, clock_value[i], clock_nrequests[i]);
+    will_return_count(az_platform_clock_msec, clock_value[i], clock_nrequests[i]);
+    will_return(az_http_client_send_request, send_request);
     ignore = az_http_pipeline_process(&pipeline, &request, &response);
     assert_true(az_span_is_content_equal(expected_responses[i], response._internal.http_response));
 #else // _az_MOCK_ENABLED
@@ -100,8 +104,6 @@ static void test_credential_client_secret(void** state)
     (void)ignore;
   }
 }
-
-az_result send_request(_az_http_request const* request, az_http_response* response);
 
 az_result send_request(_az_http_request const* request, az_http_response* response)
 {
@@ -238,18 +240,6 @@ az_result send_request(_az_http_request const* request, az_http_response* respon
 
   return AZ_OK;
 }
-
-#ifdef _az_MOCK_ENABLED
-az_result __wrap_az_http_client_send_request(_az_http_request const* request, az_http_response* ref_response);
-int64_t __wrap_az_platform_clock_msec();
-
-az_result __wrap_az_http_client_send_request(_az_http_request const* request, az_http_response* ref_response)
-{
-  return send_request(request, ref_response);
-}
-
-int64_t __wrap_az_platform_clock_msec() { return (int64_t)mock(); }
-#endif // _az_MOCK_ENABLED
 
 int test_az_credential_client_secret()
 {
