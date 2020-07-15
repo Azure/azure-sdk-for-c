@@ -27,5 +27,5 @@ echo "Use the following command to set the environment variable for the samples:
 echo    export AZ_IOT_DEVICE_X509_CERT_PEM_FILE=$(pwd)/device_cert_store.pem
 
 echo -e "\nUse the following fingerprint when creating your device in IoT Hub:"
-openssl x509 -noout -fingerprint -in device_ec_cert.pem |  sed 's/://g'| tee  fingerprint.txt
+openssl x509 -noout -fingerprint -in device_ec_cert.pem | sed 's/://g'| tee fingerprint.txt
 echo -e "\nThe fingerprint has also been placed in fingerprint.txt for future reference"
