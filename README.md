@@ -277,13 +277,16 @@ files and start again.
 vcpkg is the easiest way to have dependencies installed. It downloads packages sources, headers and build libraries for whatever TRIPLET is set up (platform/arq).
 VCPKG maintains any installed package inside its own folder, allowing to have multiple vcpkg folder with different dependencies installed on each. This is also great because you don't have to install dependencies globally on your system.
 
-Follow next steps to install VCPKG and have it linked to cmake
+Follow next steps to install VCPKG and have it linked to cmake. The vcpkg repository is checked out at the ref in [vcpkg.yml](eng/pipelines/templates/steps/vcpkg.yml#L11). Azure SDK code in this version is known to work at that vcpkg ref.
 
 ```bash
 # Clone vcpkg:
 git clone https://github.com/Microsoft/vcpkg.git
 # (consider this path as PATH_TO_VCPKG)
 cd vcpkg
+# Checkout the vcpkg ref from the vcpkg.yml file (link above)
+# git checkout <vcpkg ref>
+
 # build vcpkg (remove .bat on Linux/Mac)
 .\bootstrap-vcpkg.bat
 # install dependencies (remove .exe in Linux/Mac) and update triplet
@@ -324,13 +327,16 @@ Right after opening project, Visual Studio will read cmake files and generate ca
 VCPKG can be used to download packages sources, headers and build libraries for whatever TRIPLET is set up (platform/architecture).
 VCPKG maintains any installed package inside its own folder, allowing to have multiple vcpkg folder with different dependencies installed on each. This is also great because you don't have to install dependencies globally on your system.
 
-Follow next steps to install VCPKG and have it linked to cmake
+Follow next steps to install VCPKG and have it linked to cmake.  The vcpkg repository is checked out at the ref in [vcpkg.yml](eng/pipelines/templates/steps/vcpkg.yml#L11). Azure SDK code in this version is known to work at that vcpkg ref.
 
 ```bash
 # Clone vcpkg:
 git clone https://github.com/Microsoft/vcpkg.git
 # (consider this path as PATH_TO_VCPKG)
 cd vcpkg
+# Checkout the vcpkg ref from the vcpkg.yml file (link above)
+# git checkout <vcpkg ref>
+
 # build vcpkg
 ./bootstrap-vcpkg.sh
 ./vcpkg install --triplet x64-linux curl cmocka paho-mqtt
@@ -379,13 +385,16 @@ brew install gcc
 brew cleanup
 ```
 
-Follow next steps to install VCPKG and have it linked to cmake
+Follow next steps to install VCPKG and have it linked to cmake. The vcpkg repository is checked out at the ref in [vcpkg.yml](eng/pipelines/templates/steps/vcpkg.yml#L11). Azure SDK code in this version is known to work at that vcpkg ref.
 
 ```bash
 # Clone vcpkg:
 git clone https://github.com/Microsoft/vcpkg.git
 # (consider this path as PATH_TO_VCPKG)
 cd vcpkg
+# Checkout the vcpkg ref from the vcpkg.yml file (link above)
+# git checkout <vcpkg ref>
+
 # build vcpkg
 ./bootstrap-vcpkg.sh
 ./vcpkg install --triplet x64-osx curl cmocka paho-mqtt
