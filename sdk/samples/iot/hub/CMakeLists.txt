@@ -69,4 +69,4 @@ target_link_libraries(paho_iot_hub_twin_example
     az::iot::samples::common
 )
 
-endif() # TRASPORT_PAHO
+endif() # TRANSPORT_PAHO

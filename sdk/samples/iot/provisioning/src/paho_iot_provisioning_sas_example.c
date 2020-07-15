@@ -510,7 +510,7 @@ static void receive_registration_status()
     LOG_AZ_SPAN("Hub Hostname:", response.registration_result.assigned_hub_hostname);
     LOG_AZ_SPAN("Device Id:", response.registration_result.device_id);
   }
-  else // Unsuccesful assignment (unassigned, failed or disabled states)
+  else // Unsuccessful assignment (unassigned, failed or disabled states)
   {
     LOG_ERROR("Client provisioning failed:");
     LOG_AZ_SPAN("Registration state:", response.operation_status);
