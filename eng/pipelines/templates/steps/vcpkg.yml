@@ -8,7 +8,7 @@ parameters:
 
   # Ref at which to check out (can be commit SHA or tag in the form of
   # `tags/<tag>`)
-  VcpkgVersion: c6d69984edceacbe880fad20ddc8305a7ec6fb8c
+  VcpkgVersion: tags/2020.06
 
 steps:
   # Set VCPKG_INSTALLATION_ROOT location for cache on Mac OS hosts
@@ -103,7 +103,6 @@ steps:
 
         echo "##vso[task.prependpath]$(pwd)"
         echo "##vso[task.setvariable variable=VCPKG_INSTALLATION_ROOT;]$(pwd)"
-    # Execute only for Mac and if there is at least one dependency to be installed
     condition: >-
       and(
         succeeded(),
