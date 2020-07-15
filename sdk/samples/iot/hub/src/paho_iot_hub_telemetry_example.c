@@ -26,6 +26,10 @@
 #include <azure/core/az_span.h>
 #include <azure/iot/az_iot_hub_client.h>
 
+#define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
+#define TELEMETRY_SEND_INTERVAL 1
+#define NUMBER_OF_MESSAGES 5
+
 #ifdef _MSC_VER
 // "'getenv': This function or variable may be unsafe. Consider using _dupenv_s instead."
 #pragma warning(disable : 4996)
@@ -44,10 +48,6 @@
 // DO NOT MODIFY: the path to a PEM file containing the server trusted CA
 // This is usually not needed on Linux or Mac but needs to be set on Windows.
 #define ENV_DEVICE_X509_TRUST_PEM_FILE "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE"
-
-#define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
-#define TELEMETRY_SEND_INTERVAL 1
-#define NUMBER_OF_MESSAGES 5
 
 static const uint8_t null_terminator = '\0';
 static char device_id[64];
@@ -131,9 +131,6 @@ int main()
   {
     return rc;
   }
-
-  printf("Messages Sent [Press any key to shut down]\n");
-  (void)getchar();
 
   // Gracefully disconnect: send the disconnect packet and close the socket
   if ((rc = MQTTClient_disconnect(mqtt_client, TIMEOUT_MQTT_DISCONNECT_MS)) != MQTTCLIENT_SUCCESS)
@@ -247,12 +244,12 @@ static int connect_device()
   mqtt_connect_options.cleansession = false;
   mqtt_connect_options.keepAliveInterval = AZ_IOT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS;
 
-  // Get the MQTT user name used to connect to IoT Hub
+  // Get the MQTT username used to connect to IoT Hub
   if (az_failed(
           rc
           = az_iot_hub_client_get_user_name(&client, mqtt_username, sizeof(mqtt_username), NULL)))
   {
-    printf("Failed to get MQTT client id, az_result return code %04x\n", rc);
+    printf("Failed to get MQTT username, az_result return code %04x\n", rc);
     return rc;
   }
 

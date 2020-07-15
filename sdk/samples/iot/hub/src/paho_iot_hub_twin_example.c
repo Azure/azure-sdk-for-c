@@ -20,6 +20,8 @@
 #include <azure/core/az_span.h>
 #include <azure/iot/az_iot_hub_client.h>
 
+#define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
+
 #ifdef _MSC_VER
 // "'getenv': This function or variable may be unsafe. Consider using _dupenv_s instead."
 #pragma warning(disable : 4996)
@@ -38,8 +40,6 @@
 // DO NOT MODIFY: the path to a PEM file containing the server trusted CA
 // This is usually not needed on Linux or Mac but needs to be set on Windows.
 #define ENV_DEVICE_X509_TRUST_PEM_FILE "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE"
-
-#define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
 
 static const uint8_t null_terminator = '\0';
 static char device_id[64];
@@ -285,12 +285,12 @@ static int connect_device()
   mqtt_connect_options.cleansession = false;
   mqtt_connect_options.keepAliveInterval = AZ_IOT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS;
 
-  // Get the MQTT user name used to connect to IoT Hub
+  // Get the MQTT username used to connect to IoT Hub
   if (az_failed(
           rc
           = az_iot_hub_client_get_user_name(&client, mqtt_username, sizeof(mqtt_username), NULL)))
   {
-    printf("Failed to get MQTT client id, az_result return code %04x\n", rc);
+    printf("Failed to get MQTT username, az_result return code %04x\n", rc);
     return rc;
   }
 
@@ -380,7 +380,7 @@ static int on_received(void* context, char* topicName, int topicLen, MQTTClient_
         {
           printf("Received payload:\n%.*s\n", message->payloadlen, (char*)message->payload);
         }
-        printf("Response status was %d.\n", twin_response.status);
+        printf("Response status is %d.\n", twin_response.status);
         break;
 
       // Type: A service response to a twin reported properties publish message.
@@ -396,7 +396,7 @@ static int on_received(void* context, char* topicName, int topicLen, MQTTClient_
           // Status will be 204 upon success.
           printf("Success. No payload.\n");
         }
-        printf("Response status was %d.\n", twin_response.status);
+        printf("Response status is %d.\n", twin_response.status);
         break;
 
       // Type: A service update to twin desired properties.
@@ -407,7 +407,7 @@ static int on_received(void* context, char* topicName, int topicLen, MQTTClient_
         {
           printf("Received payload:\n%.*s\n", message->payloadlen, (char*)message->payload);
         }
-        printf("Response status was %d.\n", twin_response.status);
+        printf("Response status is %d.\n", twin_response.status);
 
         // Device will update property locally and report that property to service.
         az_span payload_span = az_span_init((uint8_t*)message->payload, message->payloadlen);
@@ -477,16 +477,16 @@ static int report_property()
 
 static az_result build_reported_property(az_span* reported_property_payload)
 {
-  az_json_builder json_builder;
+  az_json_writer json_writer;
 
   AZ_RETURN_IF_FAILED(
-      az_json_builder_init(&json_builder, AZ_SPAN_FROM_BUFFER(reported_property_buffer), NULL));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_begin_object(&json_builder));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_property_name(&json_builder, reported_property_name));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_int32_number(&json_builder, reported_property_value));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_end_object(&json_builder));
+      az_json_writer_init(&json_writer, AZ_SPAN_FROM_BUFFER(reported_property_buffer), NULL));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&json_writer));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&json_writer, reported_property_name));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_int32(&json_writer, reported_property_value));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&json_writer));
 
-  *reported_property_payload = az_json_builder_get_json(&json_builder);
+  *reported_property_payload = az_json_writer_get_json(&json_writer);
 
   return AZ_OK;
 }
@@ -535,30 +535,45 @@ static int send_reported_property(az_span reported_property_payload)
 static az_result update_property(az_span desired_payload)
 {
   // Parse desired property payload
-  az_json_parser json_parser;
-  az_json_token token;
-  az_json_token_member token_member;
+  az_json_reader json_reader;
+  AZ_RETURN_IF_FAILED(az_json_reader_init(&json_reader, desired_payload, NULL));
 
-  AZ_RETURN_IF_FAILED(az_json_parser_init(&json_parser, desired_payload));
-  AZ_RETURN_IF_FAILED(az_json_parser_parse_token(&json_parser, &token));
-  AZ_RETURN_IF_FAILED(az_json_parser_parse_token_member(&json_parser, &token_member));
+  AZ_RETURN_IF_FAILED(az_json_reader_next_token(&json_reader));
+  if (json_reader.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
+  {
+    return AZ_ERROR_UNEXPECTED_CHAR;
+  }
+
+  AZ_RETURN_IF_FAILED(az_json_reader_next_token(&json_reader));
 
   // Update property locally if found
-  while (!az_span_is_content_equal(token_member.name, version_name))
+  while (json_reader.token.kind != AZ_JSON_TOKEN_END_OBJECT)
   {
-    if (az_span_is_content_equal(token_member.name, reported_property_name))
+    if (az_json_token_is_text_equal(&json_reader.token, version_name))
     {
-      double temp_property_value = 0.0;
-      AZ_RETURN_IF_FAILED(az_json_token_get_number(&token_member.token, &temp_property_value));
+      break;
+    }
+    else if (az_json_token_is_text_equal(&json_reader.token, reported_property_name))
+    {
+      // Move to the value token
+      AZ_RETURN_IF_FAILED(az_json_reader_next_token(&json_reader));
+
+      AZ_RETURN_IF_FAILED(az_json_token_get_int32(&json_reader.token, &reported_property_value));
 
       printf(
           "Updating \"%.*s\" locally.\n",
           az_span_size(reported_property_name),
           az_span_ptr(reported_property_name));
-      reported_property_value = (int32_t)temp_property_value;
+
       return AZ_OK;
     }
-    AZ_RETURN_IF_FAILED(az_json_parser_parse_token_member(&json_parser, &token_member));
+    else
+    {
+      // ignore other tokens
+      AZ_RETURN_IF_FAILED(az_json_reader_skip_children(&json_reader));
+    }
+
+    AZ_RETURN_IF_FAILED(az_json_reader_next_token(&json_reader));
   }
 
   printf(

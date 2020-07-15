@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// SPDX-License-Identifier: MIT
+
 #include <string.h>
 #include <stdbool.h>
 #include <time.h>
@@ -12,15 +15,16 @@
 #include <bearssl/bearssl_hmac.h>
 #include <libb64/cdecode.h>
 
-#include <azure/core/az_result.h>
-#include <azure/core/az_span.h>
-#include <azure/iot/az_iot_hub_client.h>
+#include <az_result.h>
+#include <az_span.h>
+#include <az_iot_hub_client.h>
 
 #include "iot_configs.h"
 
 #define sizeofarray(a) (sizeof(a) / sizeof(a[0]))
 #define ONE_HOUR_IN_SECS 3600
 #define NTP_SERVERS "pool.ntp.org", "time.nist.gov"
+#define MQTT_PACKET_SIZE 1024
 
 static const char* ssid = IOT_CONFIG_WIFI_SSID;
 static const char* password = IOT_CONFIG_WIFI_PASSWORD;
@@ -213,6 +217,8 @@ static int connectToAzureIoTHub()
   Serial.print("Username: ");
   Serial.println(mqtt_username);
 
+  mqtt_client.setBufferSize(MQTT_PACKET_SIZE);
+
   while (!mqtt_client.connected())
   {
     time_t now = time(NULL);
@@ -278,6 +284,8 @@ void loop()
     {
       sendTelemetry();
     }
+
+    mqtt_client.loop();
 
     next_telemetry_send_time_ms = millis() + TELEMETRY_FREQUENCY_MILLISECS;
   }

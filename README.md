@@ -30,6 +30,7 @@ With this in mind, there are many tenets or principles that we follow in order t
   - [Getting Started Using the SDK](#getting-started-using-the-sdk)
     - [CMake](#cmake)
     - [CMake Options](#cmake-options)
+    - [VSCode](#vscode)
     - [Source Files (IDE, command line, etc)](#source-files-ide-command-line-etc)
   - [Running Samples](#running-samples)
     - [Libcurl Global Init and Global Clean Up](#libcurl-global-init-and-global-clean-up)
@@ -200,6 +201,16 @@ The following CMake options are available for adding/removing project features.
 
       i.e. cmake -DTRANSPORT_CURL=ON ..
 
+### VSCode
+
+For convenience, you can quickly get started using [VSCode](https://code.visualstudio.com/) and the [CMake Extension by Microsoft](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools&ssr=false#overview). Included in the repo is a `settings.json` file [here](https://github.com/Azure/azure-sdk-for-c/blob/master/.vscode/settings.json) which the extension will use to configure a CMake project. With this, you can run and debug samples and tests. Modify the variables in the file to your liking or as instructed by sample documentation and then select the following button in the extension:
+
+![VSCode CMake Config](./sdk/docs/resources/vscode_cmake_config.png)
+
+From there you can select targets to build and debug.
+
+**NOTE**: Especially on Windows, make sure you select a compiler platform version that matches the dependencies installed via VCPKG (i.e. `x64` or `x86`). Additionally, the triplet to use should be specified in the `VCPKG_DEFAULT_TRIPLET` field in `settings.json`.
+
 ### Source Files (IDE, command line, etc)
 
 We have set up the repo for easy integration into other projects which don't use CMake. Two main features make this possible:
@@ -232,12 +243,6 @@ After building samples with HTTP stack, set the environment variables for creden
 ```bash
 # On linux, set env var like this. For Windows, do it from advanced settings/ env variables
 
-# KEY-VAULT Sample
-export AZURE_TENANT_ID="????????-????-????-????-????????????"
-export AZURE_CLIENT_ID="????????-????-????-????-????????????"
-export AZURE_CLIENT_SECRET="????????????"
-export AZURE_KEYVAULT_URL="https://???????????.??"
-
 # STORAGE Sample (only 1 env var required)
 # URL must contain a valid container, blob and SaS token
 # e.g "https://storageAccount.blob.core.windows.net/container/blob?sv=xxx&ss=xx&srt=xx&sp=xx&se=xx&st=xxx&spr=https,http&sig=xxx"
@@ -246,7 +251,7 @@ export AZURE_STORAGE_URL="https://??????????????"
 
 ### Libcurl Global Init and Global Clean Up
 
-When you select to build the libcurl http stack implementation, you have to make sure to call `curl_global_init` before using SDK client like Storage or Keyvault to send HTTP request to Azure.
+When you select to build the libcurl http stack implementation, you have to make sure to call `curl_global_init` before using SDK client like Storage to send HTTP request to Azure.
 
 You need to also call `curl_global_cleanup` once you no longer need to perform SDk client API calls.
 
@@ -282,11 +287,13 @@ cd vcpkg
 # build vcpkg (remove .bat on Linux/Mac)
 .\bootstrap-vcpkg.bat
 # install dependencies (remove .exe in Linux/Mac) and update triplet
-vcpkg.exe install --triplet x64-windows-static curl[winssl] cmocka paho-mqtt
+.\vcpkg.exe install --triplet x64-windows-static curl[winssl] cmocka paho-mqtt
 # Add this environment variables to link this VCPKG folder with cmake:
 # VCPKG_DEFAULT_TRIPLET=x64-windows-static
 # VCPKG_ROOT=PATH_TO_VCPKG (replace PATH_TO_VCPKG for where vcpkg is installed)
 ```
+
+If you previously installed VCPKG and dependencies, you may need to run `.\vcpkg.exe upgrade --no-dry-run` to upgrade to the latest packages.
 
 Follow next steps to build project from command prompt:
 
@@ -330,6 +337,8 @@ cd vcpkg
 export VCPKG_DEFAULT_TRIPLET=x64-linux
 export VCPKG_ROOT=PATH_TO_VCPKG #replace PATH_TO_VCPKG for where vcpkg is installed
 ```
+
+If you previously installed VCPKG and dependencies, you may need to run `./vcpkg upgrade --no-dry-run` to upgrade to the latest packages.
 
 #### Debian
 
@@ -384,6 +393,8 @@ export VCPKG_DEFAULT_TRIPLET=x64-osx
 export VCPKG_ROOT=PATH_TO_VCPKG #replace PATH_TO_VCPKG for where vcpkg is installed
 ```
 
+If you previously installed VCPKG and dependencies, you may need to run `./vcpkg upgrade --no-dry-run` to upgrade to the latest packages.
+
 #### Build
 
 ```bash
@@ -431,13 +442,13 @@ See the complete cmake file and how to link your own library [here](https://gith
 
 At the heart of our SDK is, what we refer to as, [Azure Core](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core). This code defines several data types and functions for use by the client libraries that build on top of us such as an [Azure Storage Blob](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/storage) client library and [Azure IoT client libraries](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot). Here are some of the features that customers use directly:
 
-- **Spans**: A span represents a byte buffer and is used for string manipulations, HTTP requests/responses, building/parsing JSON payloads. It allows us to return a substring within a larger string without any memory allocations. See the [Working With Spans](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core#working-with-spans) section of the `Azure Core` README for more information.
+- **Spans**: A span represents a byte buffer and is used for string manipulations, HTTP requests/responses, reading/writing JSON payloads. It allows us to return a substring within a larger string without any memory allocations. See the [Working With Spans](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core#working-with-spans) section of the `Azure Core` README for more information.
 
 - **Logging**: As our SDK performs operations, it can send log messages to a customer-defined callback. Customers can enable this to assist with debugging and diagnosing issues when leveraging our SDK code. See the [Logging SDK Operations](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core#logging-sdk-operations) section of the `Azure Core` README for more information.
 
 - **Contexts**: Contexts offer an I/O cancellation mechanism. Multiple contexts can be composed together in your application’s call tree. When a context is canceled, its children are also canceled. See the [Canceling an Operation](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core#canceling-an-operation) section of the `Azure Core` README for more information.
 
-- **JSON**: Non-allocating JSON builder and JSON parsing data structures and operations.
+- **JSON**: Non-allocating JSON reading and JSON writing data structures and operations.
 
 - **HTTP**: Non-allocating HTTP request and HTTP response data structures and operations.
 

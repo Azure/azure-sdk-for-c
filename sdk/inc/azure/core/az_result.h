@@ -92,14 +92,14 @@ typedef enum
   AZ_ERROR_ITEM_NOT_FOUND
   = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 4), ///< Requested item was not found.
 
-  AZ_ERROR_PARSER_UNEXPECTED_CHAR
+  AZ_ERROR_UNEXPECTED_CHAR
   = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 5), ///< Input can't be successfully parsed.
 
   AZ_ERROR_EOF = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 6), ///< Unexpected end of the input data.
 
-  // Platform
-  AZ_ERROR_MUTEX = _az_RESULT_MAKE_ERROR(_az_FACILITY_PLATFORM, 1), ///< Mutex operation error.
+  AZ_ERROR_NOT_SUPPORTED = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 7),
 
+  // Platform
   AZ_ERROR_OUT_OF_MEMORY = _az_RESULT_MAKE_ERROR(
       _az_FACILITY_PLATFORM,
       2), ///< Dynamic memory allocation request was not successful.
@@ -110,9 +110,9 @@ typedef enum
 
   // JSON error codes
   AZ_ERROR_JSON_INVALID_STATE = _az_RESULT_MAKE_ERROR(_az_FACILITY_JSON, 1),
-  AZ_ERROR_JSON_NESTING_OVERFLOW = _az_RESULT_MAKE_ERROR(_az_FACILITY_JSON, 2), ///< The JSON depth is too large.
-  AZ_ERROR_JSON_STRING_END = _az_RESULT_MAKE_ERROR(_az_FACILITY_JSON, 3),
-  AZ_ERROR_JSON_POINTER_TOKEN_END = _az_RESULT_MAKE_ERROR(_az_FACILITY_JSON, 4),
+  AZ_ERROR_JSON_NESTING_OVERFLOW
+  = _az_RESULT_MAKE_ERROR(_az_FACILITY_JSON, 2), ///< The JSON depth is too large.
+  AZ_ERROR_JSON_READER_DONE = _az_RESULT_MAKE_ERROR(_az_FACILITY_JSON, 3),
 
   // HTTP error codes
   AZ_ERROR_HTTP_INVALID_STATE = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 1),

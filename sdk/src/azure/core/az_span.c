@@ -5,20 +5,22 @@
 #include "az_span_private.h"
 #include <azure/core/az_platform.h>
 #include <azure/core/az_precondition.h>
-#include <azure/core/internal/az_precondition_internal.h>
 #include <azure/core/az_span.h>
+#include <azure/core/internal/az_precondition_internal.h>
 #include <azure/core/internal/az_span_internal.h>
 
 #include <ctype.h>
+#include <errno.h>
+#include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #include <azure/core/_az_cfg.h>
 
-enum
-{
-  _az_ASCII_LOWER_DIF = 'a' - 'A',
-};
+// The maximum integer value that can be stored in a double without losing precision (2^53 - 1)
+// An IEEE 64-bit double has 52 bits of mantissa
+#define _az_MAX_SAFE_INTEGER 9007199254740991
 
 #ifndef AZ_NO_PRECONDITION_CHECKING
 // Note: If you are modifying this method, make sure to modify the inline version in the az_span.h
@@ -99,60 +101,158 @@ AZ_NODISCARD bool az_span_is_content_equal_ignoring_case(az_span span1, az_span 
   return true;
 }
 
-AZ_NODISCARD az_result az_span_atou64(az_span span, uint64_t* out_number)
+static bool _is_valid_start_of_number(uint8_t first_byte, bool is_negative_allowed)
 {
-  _az_PRECONDITION_VALID_SPAN(span, 1, false);
-  _az_PRECONDITION_NOT_NULL(out_number);
+  // ".123" or "  123" are considered invalid
+  // 'n'/'N' is for "nan" and 'i'/'I' is for "inf"
+  bool result = isdigit(first_byte) || first_byte == '+' || first_byte == 'n' || first_byte == 'N'
+      || first_byte == 'i' || first_byte == 'I';
 
-  int32_t const span_size = az_span_size(span);
-  uint64_t value = 0;
-
-  for (int32_t i = 0; i < span_size; ++i)
+  // The first character can only be negative for int32, int64, and double.
+  if (is_negative_allowed)
   {
-    uint8_t result = az_span_ptr(span)[i];
-    if (!isdigit(result))
-    {
-      return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
-    }
-    uint64_t const d = (uint64_t)result - '0';
-    if ((UINT64_MAX - d) / 10 < value)
-    {
-      return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
-    }
-
-    value = value * 10 + d;
+    result = result || first_byte == '-';
   }
 
-  *out_number = value;
+  return result;
+}
+
+// Disable the following warning just for this particular use case.
+// C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead.
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4996)
+#endif
+
+static void _az_span_ato_number_helper(
+    az_span source,
+    bool is_negative_allowed,
+    char* format,
+    void* result,
+    bool* success)
+{
+  int32_t size = az_span_size(source);
+
+  _az_PRECONDITION_RANGE(1, size, 99);
+
+  // This check is necessary to prevent sscanf from reading bytes past the end of the span, when the
+  // span might contain whitespace or other invalid bytes at the start.
+  uint8_t* source_ptr = az_span_ptr(source);
+  if (size < 1 || !_is_valid_start_of_number(source_ptr[0], is_negative_allowed))
+  {
+    *success = false;
+    return;
+  }
+
+  // Starting at 1 to skip the '%' character
+  format[1] = (char)((size / 10) + '0');
+  format[2] = (char)((size % 10) + '0');
+
+  // sscanf might set errno, so save it to restore later.
+  int32_t previous_err_no = errno;
+  errno = 0;
+
+  int32_t chars_consumed = 0;
+  int32_t n = sscanf((char*)source_ptr, format, result, &chars_consumed);
+
+  if (success != NULL)
+  {
+    // True if the entire source was consumed by sscanf, it set the result argument, and it didn't
+    // set errno to some non-zero value.
+    *success = size == chars_consumed && n == 1 && errno == 0;
+  }
+
+  // Restore errno back to its original value before the call to sscanf potentially changed it.
+  errno = previous_err_no;
+}
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
+AZ_NODISCARD az_result az_span_atou64(az_span source, uint64_t* out_number)
+{
+  _az_PRECONDITION_VALID_SPAN(source, 1, false);
+  _az_PRECONDITION_NOT_NULL(out_number);
+
+  // Stack based string to allow thread-safe mutation by _az_span_ato_number_helper
+  char format_template[9] = "%00llu%n";
+  bool success = false;
+  _az_span_ato_number_helper(source, false, format_template, out_number, &success);
+
+  return success ? AZ_OK : AZ_ERROR_UNEXPECTED_CHAR;
+}
+
+AZ_NODISCARD az_result az_span_atou32(az_span source, uint32_t* out_number)
+{
+  _az_PRECONDITION_VALID_SPAN(source, 1, false);
+  _az_PRECONDITION_NOT_NULL(out_number);
+
+  uint64_t placeholder = 0;
+
+  // Stack based string to allow thread-safe mutation by _az_span_ato_number_helper
+  // Using a format string for uint64_t to properly validate values that are out-of-range for
+  // uint32_t.
+  char format_template[9] = "%00llu%n";
+  bool success = false;
+  _az_span_ato_number_helper(source, false, format_template, &placeholder, &success);
+
+  if (placeholder > UINT32_MAX || !success)
+  {
+    return AZ_ERROR_UNEXPECTED_CHAR;
+  }
+
+  *out_number = (uint32_t)placeholder;
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_span_atou32(az_span span, uint32_t* out_number)
+AZ_NODISCARD az_result az_span_atoi64(az_span source, int64_t* out_number)
 {
-  _az_PRECONDITION_VALID_SPAN(span, 1, false);
+  _az_PRECONDITION_VALID_SPAN(source, 1, false);
   _az_PRECONDITION_NOT_NULL(out_number);
 
-  int32_t const span_size = az_span_size(span);
-  uint32_t value = 0;
+  // Stack based string to allow thread-safe mutation by _az_span_ato_number_helper
+  char format_template[9] = "%00lld%n";
+  bool success = false;
+  _az_span_ato_number_helper(source, true, format_template, out_number, &success);
 
-  for (int32_t i = 0; i < span_size; ++i)
+  return success ? AZ_OK : AZ_ERROR_UNEXPECTED_CHAR;
+}
+
+AZ_NODISCARD az_result az_span_atoi32(az_span source, int32_t* out_number)
+{
+  _az_PRECONDITION_VALID_SPAN(source, 1, false);
+  _az_PRECONDITION_NOT_NULL(out_number);
+
+  int64_t placeholder = 0;
+
+  // Stack based string to allow thread-safe mutation by _az_span_ato_number_helper
+  // Using a format string for int64_t to properly validate values that are out-of-range for
+  // int32_t.
+  char format_template[9] = "%00lld%n";
+  bool success = false;
+  _az_span_ato_number_helper(source, true, format_template, &placeholder, &success);
+
+  if (placeholder > INT32_MAX || placeholder < INT32_MIN || !success)
   {
-    uint8_t result = az_span_ptr(span)[i];
-    if (!isdigit(result))
-    {
-      return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
-    }
-    uint32_t const d = (uint32_t)result - '0';
-    if ((UINT32_MAX - d) / 10 < value)
-    {
-      return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
-    }
-
-    value = value * 10 + d;
+    return AZ_ERROR_UNEXPECTED_CHAR;
   }
 
-  *out_number = value;
+  *out_number = (int32_t)placeholder;
   return AZ_OK;
+}
+
+AZ_NODISCARD az_result az_span_atod(az_span source, double* out_number)
+{
+  _az_PRECONDITION_VALID_SPAN(source, 1, false);
+  _az_PRECONDITION_NOT_NULL(out_number);
+
+  // Stack based string to allow thread-safe mutation by _az_span_ato_number_helper
+  char format_template[8] = "%00lf%n";
+  bool success = false;
+  _az_span_ato_number_helper(source, true, format_template, out_number, &success);
+
+  return success ? AZ_OK : AZ_ERROR_UNEXPECTED_CHAR;
 }
 
 AZ_NODISCARD int32_t az_span_find(az_span source, az_span target)
@@ -499,6 +599,126 @@ AZ_NODISCARD az_result az_span_i32toa(az_span destination, int32_t source, az_sp
   return _az_span_builder_append_u32toa(*out_span, (uint32_t)source, out_span);
 }
 
+AZ_NODISCARD az_result
+az_span_dtoa(az_span destination, double source, int32_t fractional_digits, az_span* out_span)
+{
+  _az_PRECONDITION_VALID_SPAN(destination, 0, false);
+  _az_PRECONDITION_RANGE(0, fractional_digits, _az_MAX_SUPPORTED_FRACTIONAL_DIGITS);
+  _az_PRECONDITION_NOT_NULL(out_span);
+
+  *out_span = destination;
+
+  // The input is either positive or negative infinity, or not a number.
+  if (!isfinite(source))
+  {
+    AZ_RETURN_IF_NOT_ENOUGH_SIZE(*out_span, 3);
+
+    // Check if source == -INFINITY, which is the only non-finite value that is less than 0, without
+    // using exact equality. Workaround for -Wfloat-equal.
+    if (source < 0)
+    {
+      AZ_RETURN_IF_NOT_ENOUGH_SIZE(*out_span, 4);
+      *out_span = az_span_copy(*out_span, AZ_SPAN_FROM_STR("-inf"));
+    }
+    else
+    {
+      if (isnan(source))
+      {
+        *out_span = az_span_copy(*out_span, AZ_SPAN_FROM_STR("nan"));
+      }
+      else
+      {
+        *out_span = az_span_copy(*out_span, AZ_SPAN_FROM_STR("inf"));
+      }
+    }
+    return AZ_OK;
+  }
+
+  if (source < 0)
+  {
+    AZ_RETURN_IF_NOT_ENOUGH_SIZE(*out_span, 1);
+    *out_span = az_span_copy_u8(*out_span, '-');
+    source = -source;
+  }
+
+  double integer_part = 0;
+  double after_decimal_part = modf(source, &integer_part);
+
+  if (integer_part > _az_MAX_SAFE_INTEGER)
+  {
+    return AZ_ERROR_NOT_SUPPORTED;
+  }
+
+  // The double to uint64_t cast should be safe without loss of precision.
+  // Append the integer part.
+  AZ_RETURN_IF_FAILED(_az_span_builder_append_uint64(out_span, (uint64_t)integer_part));
+
+  // Only print decimal digits if the user asked for at least one to be printed.
+  // Or if the decimal part is non-zero.
+  if (fractional_digits <= 0)
+  {
+    return AZ_OK;
+  }
+
+  // Clamp the fractional digits to the supported maximum value of 15.
+  if (fractional_digits > _az_MAX_SUPPORTED_FRACTIONAL_DIGITS)
+  {
+    fractional_digits = _az_MAX_SUPPORTED_FRACTIONAL_DIGITS;
+  }
+
+  int32_t leading_zeros = 0;
+  double shifted_fractional = after_decimal_part;
+  for (int32_t d = 0; d < fractional_digits; d++)
+  {
+    shifted_fractional *= 10;
+
+    // Any decimal component that is less than 0.1, when multiplied by 10, will be less than 1,
+    // which indicate a leading zero is present after the decimal point. For example, the decimal
+    // part could be 0.00, 0.09, 0.00010, etc.
+    if (shifted_fractional < 1)
+    {
+      leading_zeros++;
+      continue;
+    }
+  }
+
+  double shifted_fractional_integer_part = 0;
+  double unused = modf(shifted_fractional, &shifted_fractional_integer_part);
+  (void)unused;
+
+  // Since the maximum allowed fractional_digits is 15, this is guaranteed to be true.
+  _az_PRECONDITION(shifted_fractional_integer_part <= _az_MAX_SAFE_INTEGER);
+
+  // The double to uint64_t cast should be safe without loss of precision.
+  uint64_t fractional_part = (uint64_t)shifted_fractional_integer_part;
+
+  // If there is no fractional part (at least within the number of fractional digits the user
+  // specified), or if they were all non-significant zeros, don't print the decimal point or any
+  // trailing zeros.
+  if (fractional_part == 0)
+  {
+    return AZ_OK;
+  }
+
+  // Remove trailing zeros of the fraction part that don't need to be printed since they aren't
+  // significant.
+  while (fractional_part % 10 == 0)
+  {
+    fractional_part /= 10;
+  }
+
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(*out_span, 1 + leading_zeros);
+  *out_span = az_span_copy_u8(*out_span, '.');
+
+  for (int32_t z = 0; z < leading_zeros; z++)
+  {
+    *out_span = az_span_copy_u8(*out_span, '0');
+  }
+
+  // Append the fractional part.
+  return _az_span_builder_append_uint64(out_span, fractional_part);
+}
+
 // TODO: pass az_span by value
 AZ_NODISCARD az_result _az_is_expected_span(az_span* ref_span, az_span expected)
 {
@@ -516,7 +736,7 @@ AZ_NODISCARD az_result _az_is_expected_span(az_span* ref_span, az_span expected)
 
   if (!az_span_is_content_equal(actual_span, expected))
   {
-    return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
+    return AZ_ERROR_UNEXPECTED_CHAR;
   }
   // move reader after the expected span (means it was parsed as expected)
   *ref_span = az_span_slice_to_end(*ref_span, expected_size);

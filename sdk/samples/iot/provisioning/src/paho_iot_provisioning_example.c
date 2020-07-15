@@ -22,9 +22,12 @@
 #include <unistd.h>
 #endif
 
-#include <azure/iot/az_iot_provisioning_client.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
+#include <azure/iot/az_iot_provisioning_client.h>
+
+#define TIMEOUT_MQTT_RECEIVE_MS (60 * 1000)
+#define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
 
 #ifdef _MSC_VER
 // "'getenv': This function or variable may be unsafe. Consider using _dupenv_s instead."
@@ -41,160 +44,252 @@
 
 // DO NOT MODIFY: the path to a PEM file containing the device certificate and
 // key as well as any intermediate certificates chaining to an uploaded group certificate.
-#define ENV_DEVICE_X509_CERT_PEM_FILE "AZ_IOT_DEVICE_X509_CERT_PEM_FILE"
+#define ENV_DEVICE_X509_CERT_PEM_FILE_PATH "AZ_IOT_DEVICE_X509_CERT_PEM_FILE"
 
 // DO NOT MODIFY: the path to a PEM file containing the server trusted CA
 // This is usually not needed on Linux or Mac but needs to be set on Windows.
-#define ENV_DEVICE_X509_TRUST_PEM_FILE "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE"
+#define ENV_DEVICE_X509_TRUST_PEM_FILE_PATH "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE"
 
-#define TIMEOUT_MQTT_RECEIVE_MS (60 * 1000)
-#define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
+// Logging with formatting
+#define LOG_ERROR(...) \
+  { \
+    (void)fprintf(stderr, "ERROR:\t\t%s:%s():%d: ", __FILE__, __func__, __LINE__); \
+    (void)fprintf(stderr, __VA_ARGS__); \
+    (void)fprintf(stderr, "\n"); \
+    fflush(stdout); \
+    fflush(stderr); \
+  }
+#define LOG_SUCCESS(...) \
+  { \
+    (void)printf("SUCCESS:\t"); \
+    (void)printf(__VA_ARGS__); \
+    (void)printf("\n"); \
+  }
+#define LOG(...) \
+  { \
+    (void)printf("\t\t"); \
+    (void)printf(__VA_ARGS__); \
+    (void)printf("\n"); \
+  }
+#define LOG_AZ_SPAN(span_description, span) \
+  { \
+    (void)printf("\t\t%s ", span_description); \
+    char* buffer = (char*)az_span_ptr(span); \
+    for (int32_t i = 0; i < az_span_size(span); i++) \
+    { \
+      putchar(*buffer++); \
+    } \
+    (void)printf("\n"); \
+  }
 
-static char mqtt_client_id[128];
-static char mqtt_username[128];
-static char register_publish_topic[128];
-static char query_topic[256];
-static char global_provisioning_endpoint[256] = { 0 };
-static char id_scope[16] = { 0 };
-static char registration_id[256] = { 0 };
-static char x509_cert_pem_file[256] = { 0 };
-static char x509_trust_pem_file[256] = { 0 };
+// Buffers
+static char x509_cert_pem_file_path_buffer[256];
+static char x509_trust_pem_file_path_buffer[256];
+static char global_provisioning_endpoint_buffer[256];
+static char id_scope_buffer[16];
+static char registration_id_buffer[256];
+static char mqtt_client_id_buffer[128];
+static char mqtt_username_buffer[128];
+static char register_publish_topic_buffer[128];
+static char query_topic_buffer[256];
 
+// Clients
 static az_iot_provisioning_client provisioning_client;
 static MQTTClient mqtt_client;
 
-static void sleep_seconds(uint32_t seconds)
+// Functions
+static void create_and_configure_client();
+static az_result read_environment_variables(
+    az_span* endpoint,
+    az_span* id_scope,
+    az_span* registration_id);
+static az_result read_configuration_entry(
+    const char* env_name,
+    char* default_value,
+    bool hide_value,
+    az_span buffer,
+    az_span* out_value);
+static void connect_client_to_provisioning_service();
+static void subscribe_client_to_provisioning_service_topics();
+static void register_client_with_provisioning_service();
+static void receive_registration_status();
+static void parse_operation_message(
+    char* topic,
+    int topic_len,
+    const MQTTClient_message* message,
+    az_iot_provisioning_client_register_response* response,
+    az_iot_provisioning_client_operation_status* operation_status);
+static void send_operation_query_message(
+    const az_iot_provisioning_client_register_response* response);
+static void disconnect_client_from_provisioning_service();
+static void sleep_for_seconds(uint32_t seconds);
+
+int main()
 {
-#ifdef _WIN32
-  Sleep((DWORD)seconds * 1000);
-#else
-  sleep(seconds);
-#endif
+  create_and_configure_client();
+  LOG_SUCCESS("Client created and configured.");
+
+  connect_client_to_provisioning_service();
+  LOG_SUCCESS("Client connected to \"%s\".", global_provisioning_endpoint_buffer);
+
+  subscribe_client_to_provisioning_service_topics();
+  LOG_SUCCESS("Client subscribed to provisioning service topics.");
+
+  register_client_with_provisioning_service();
+  LOG_SUCCESS("Client registering with provisioning service.");
+
+  receive_registration_status();
+  LOG_SUCCESS("Client received registration status.")
+
+  disconnect_client_from_provisioning_service();
+  LOG_SUCCESS("Client disconnected from provisioning service.");
+
+  return 0;
 }
 
-// Read OS environment variables using stdlib function
+static void create_and_configure_client()
+{
+  int rc;
+  az_span endpoint;
+  az_span id_scope;
+  az_span registration_id;
+
+  if (az_failed(rc = read_environment_variables(&endpoint, &id_scope, &registration_id)))
+  {
+    LOG_ERROR("Failed to read evironment variables: az_result return code 0x%04x.", rc);
+    exit(rc);
+  }
+
+  if (az_failed(
+          rc = az_iot_provisioning_client_init(
+              &provisioning_client, endpoint, id_scope, registration_id, NULL)))
+  {
+    LOG_ERROR("Failed to initialize provisioning client: az_result return code 0x%04x.", rc);
+    exit(rc);
+  }
+
+  if (az_failed(
+          rc = az_iot_provisioning_client_get_client_id(
+              &provisioning_client, mqtt_client_id_buffer, sizeof(mqtt_client_id_buffer), NULL)))
+  {
+    LOG_ERROR("Failed to get MQTT client id: az_result return code 0x%04x.", rc);
+    exit(rc);
+  }
+
+  if ((rc = MQTTClient_create(
+           &mqtt_client,
+           (char*)az_span_ptr(endpoint),
+           mqtt_client_id_buffer,
+           MQTTCLIENT_PERSISTENCE_NONE,
+           NULL))
+      != MQTTCLIENT_SUCCESS)
+  {
+    LOG_ERROR("Failed to create MQTT client: MQTTClient return code %d.", rc);
+    exit(rc);
+  }
+}
+
+static az_result read_environment_variables(
+    az_span* endpoint,
+    az_span* id_scope,
+    az_span* registration_id)
+{
+  // Certification variables
+  az_span device_cert = AZ_SPAN_FROM_BUFFER(x509_cert_pem_file_path_buffer);
+  AZ_RETURN_IF_FAILED(read_configuration_entry(
+      ENV_DEVICE_X509_CERT_PEM_FILE_PATH, NULL, false, device_cert, &device_cert));
+
+  az_span trusted_cert = AZ_SPAN_FROM_BUFFER(x509_trust_pem_file_path_buffer);
+  AZ_RETURN_IF_FAILED(read_configuration_entry(
+      ENV_DEVICE_X509_TRUST_PEM_FILE_PATH, "", false, trusted_cert, &trusted_cert));
+
+  // Connection variables
+  *endpoint = AZ_SPAN_FROM_BUFFER(global_provisioning_endpoint_buffer);
+  AZ_RETURN_IF_FAILED(read_configuration_entry(
+      ENV_GLOBAL_PROVISIONING_ENDPOINT,
+      ENV_GLOBAL_PROVISIONING_ENDPOINT_DEFAULT,
+      false,
+      *endpoint,
+      endpoint));
+
+  *id_scope = AZ_SPAN_FROM_BUFFER(id_scope_buffer);
+  AZ_RETURN_IF_FAILED(read_configuration_entry(ENV_ID_SCOPE_ENV, NULL, false, *id_scope, id_scope));
+
+  *registration_id = AZ_SPAN_FROM_BUFFER(registration_id_buffer);
+  AZ_RETURN_IF_FAILED(read_configuration_entry(
+      ENV_REGISTRATION_ID_ENV, NULL, false, *registration_id, registration_id));
+
+  LOG(" "); // Log formatting
+  return AZ_OK;
+}
+
 static az_result read_configuration_entry(
-    const char* name,
     const char* env_name,
     char* default_value,
     bool hide_value,
     az_span buffer,
     az_span* out_value)
 {
-  printf("%s = ", name);
-  char* env = getenv(env_name);
+  char* env_value = getenv(env_name);
 
-  if (env != NULL)
+  if (env_value == NULL && default_value != NULL)
   {
-    printf("%s\n", hide_value ? "***" : env);
-    az_span env_span = az_span_from_str(env);
+    env_value = default_value;
+  }
+
+  if (env_value != NULL)
+  {
+    (void)printf("%s = %s\n", env_name, hide_value ? "***" : env_value);
+    az_span env_span = az_span_from_str(env_value);
     AZ_RETURN_IF_NOT_ENOUGH_SIZE(buffer, az_span_size(env_span));
     az_span_copy(buffer, env_span);
     *out_value = az_span_slice(buffer, 0, az_span_size(env_span));
   }
-  else if (default_value != NULL)
-  {
-    printf("%s\n", default_value);
-    az_span default_span = az_span_from_str(default_value);
-    AZ_RETURN_IF_NOT_ENOUGH_SIZE(buffer, az_span_size(default_span));
-    az_span_copy(buffer, default_span);
-    *out_value = az_span_slice(buffer, 0, az_span_size(default_span));
-  }
   else
   {
-    printf("(missing) Please set the %s environment variable.\n", env_name);
+    LOG_ERROR("(missing) Please set the %s environment variable.", env_name);
     return AZ_ERROR_ARG;
   }
 
   return AZ_OK;
 }
 
-// Read the user environment variables used to connect to the Provisioning Service
-static az_result read_configuration_and_init_client()
-{
-  az_span endpoint_span = AZ_SPAN_FROM_BUFFER(global_provisioning_endpoint);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_GLOBAL_PROVISIONING_ENDPOINT,
-      ENV_GLOBAL_PROVISIONING_ENDPOINT,
-      ENV_GLOBAL_PROVISIONING_ENDPOINT_DEFAULT,
-      false,
-      endpoint_span,
-      &endpoint_span));
-
-  az_span id_scope_span = AZ_SPAN_FROM_BUFFER(id_scope);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_ID_SCOPE_ENV, ENV_ID_SCOPE_ENV, NULL, false, id_scope_span, &id_scope_span));
-
-  az_span registration_id_span = AZ_SPAN_FROM_BUFFER(registration_id);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_REGISTRATION_ID_ENV,
-      ENV_REGISTRATION_ID_ENV,
-      NULL,
-      false,
-      registration_id_span,
-      &registration_id_span));
-
-  az_span cert = AZ_SPAN_FROM_BUFFER(x509_cert_pem_file);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_DEVICE_X509_CERT_PEM_FILE, ENV_DEVICE_X509_CERT_PEM_FILE, NULL, false, cert, &cert));
-
-  az_span trusted = AZ_SPAN_FROM_BUFFER(x509_trust_pem_file);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_DEVICE_X509_TRUST_PEM_FILE, ENV_DEVICE_X509_TRUST_PEM_FILE, "", false, trusted, &trusted));
-
-  // Initialize the provisioning client with the provisioning endpoint and the default connection
-  // options
-  AZ_RETURN_IF_FAILED(az_iot_provisioning_client_init(
-      &provisioning_client, endpoint_span, id_scope_span, registration_id_span, NULL));
-
-  return AZ_OK;
-}
-
-static int connect_device()
+static void connect_client_to_provisioning_service()
 {
   int rc;
 
-  MQTTClient_SSLOptions mqtt_ssl_options = MQTTClient_SSLOptions_initializer;
-  MQTTClient_connectOptions mqtt_connect_options = MQTTClient_connectOptions_initializer;
-
-  // NOTE: We recommend setting clean session to false in order to receive any pending messages
-  mqtt_connect_options.cleansession = false;
-  mqtt_connect_options.keepAliveInterval = AZ_IOT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS;
-
-  // Get the MQTT user name used to connect to the Provisioning Service
   if (az_failed(
           rc = az_iot_provisioning_client_get_user_name(
-              &provisioning_client, mqtt_username, sizeof(mqtt_username), NULL)))
+              &provisioning_client, mqtt_username_buffer, sizeof(mqtt_username_buffer), NULL)))
   {
-    printf("Failed to get MQTT username, return code %d\n", rc);
-    return rc;
+    LOG_ERROR("Failed to get MQTT username: az_result return code 0x%04x.", rc);
+    exit(rc);
   }
 
-  // This sample uses X509 authentication so the password field is set to NULL
-  mqtt_connect_options.username = mqtt_username;
-  mqtt_connect_options.password = NULL;
+  MQTTClient_connectOptions mqtt_connect_options = MQTTClient_connectOptions_initializer;
+  mqtt_connect_options.username = mqtt_username_buffer;
+  mqtt_connect_options.password = NULL; // This sample uses x509 authentication.
+  mqtt_connect_options.cleansession = false; // Set to false so can receive any pending messages.
+  mqtt_connect_options.keepAliveInterval = AZ_IOT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS;
 
-  // Set the device cert for tls mutual authentication
-  mqtt_ssl_options.keyStore = (char*)x509_cert_pem_file;
-  if (*x509_trust_pem_file != '\0')
+  MQTTClient_SSLOptions mqtt_ssl_options = MQTTClient_SSLOptions_initializer;
+  mqtt_ssl_options.keyStore = (char*)x509_cert_pem_file_path_buffer;
+  if (*x509_trust_pem_file_path_buffer != '\0')
   {
-    mqtt_ssl_options.trustStore = (char*)x509_trust_pem_file;
+    mqtt_ssl_options.trustStore = (char*)x509_trust_pem_file_path_buffer;
   }
-
   mqtt_connect_options.ssl = &mqtt_ssl_options;
 
-  // Connect to the Provisioning Service
   if ((rc = MQTTClient_connect(mqtt_client, &mqtt_connect_options)) != MQTTCLIENT_SUCCESS)
   {
-    printf("Failed to connect, return code %d\n", rc);
-    return rc;
+    LOG_ERROR("Failed to connect: MQTTClient return code %d.", rc);
+    exit(rc);
   }
 
-  return 0;
+  return;
 }
 
-// Subscribe to the necessary topic to receive responses from the Provisioning Service
-static int subscribe()
+static void subscribe_client_to_provisioning_service_topics()
 {
   int rc;
 
@@ -202,251 +297,203 @@ static int subscribe()
        = MQTTClient_subscribe(mqtt_client, AZ_IOT_PROVISIONING_CLIENT_REGISTER_SUBSCRIBE_TOPIC, 1))
       != MQTTCLIENT_SUCCESS)
   {
-    printf("Failed to subscribe, return code %d\n", rc);
-    return rc;
+    LOG_ERROR("Failed to subscribe to the register topic: MQTTClient return code %d.", rc);
+    exit(rc);
   }
 
-  return 0;
+  return;
 }
 
-// Send the register pub message to the Provisioning Service
-static int register_device()
+static void register_client_with_provisioning_service()
 {
   int rc;
-  MQTTClient_message pubmsg = MQTTClient_message_initializer;
 
-  // Get the topic to send the provisioning request
   if (az_failed(
           rc = az_iot_provisioning_client_register_get_publish_topic(
-              &provisioning_client, register_publish_topic, sizeof(register_publish_topic), NULL)))
+              &provisioning_client,
+              register_publish_topic_buffer,
+              sizeof(register_publish_topic_buffer),
+              NULL)))
   {
-    printf("Failed to get MQTT PUB register topic, return code %d\n", rc);
-    return rc;
+    LOG_ERROR("Failed to get MQTT register publish topic: az_result return code 0x%04x.", rc);
+    exit(rc);
   }
 
-  pubmsg.payload = NULL; // empty payload.
+  MQTTClient_message pubmsg = MQTTClient_message_initializer;
+  pubmsg.payload = NULL; // Empty payload
   pubmsg.payloadlen = 0;
   pubmsg.qos = 1;
   pubmsg.retained = 0;
 
-  // Send the registration request message
-  if ((rc = MQTTClient_publishMessage(mqtt_client, register_publish_topic, &pubmsg, NULL))
+  if ((rc = MQTTClient_publishMessage(mqtt_client, register_publish_topic_buffer, &pubmsg, NULL))
       != MQTTCLIENT_SUCCESS)
   {
-    printf("Failed to publish register request, return code %d\n", rc);
-    return rc;
+    LOG_ERROR("Failed to publish register request: MQTTClient return code %d.", rc);
+    exit(rc);
   }
 
-  return 0;
+  return;
 }
 
-// Print an az_span to the console
-static void print_az_span(az_span span)
-{
-  char* buffer = (char*)az_span_ptr(span);
-  for (int32_t i = 0; i < az_span_size(span); i++)
-  {
-    putchar(*buffer++);
-  }
-
-  putchar('\n');
-}
-
-static int get_operation_status()
+static void receive_registration_status()
 {
   int rc;
+  char* topic = NULL;
+  int topic_len = 0;
+  MQTTClient_message* message = NULL;
+  az_iot_provisioning_client_register_response response;
+  az_iot_provisioning_client_operation_status operation_status;
   bool is_operation_complete = false;
-  char* topic;
-  int topic_len;
-  MQTTClient_message* message;
 
-  // Continue to parse incoming responses from the Provisioning Service until
-  // the device has been successfully provisioned or an error occurs
-  while (!is_operation_complete)
+  // Continue to parse incoming responses from the Device Provisioning Service until
+  // the device has been successfully provisioned or an error occurs.
+  do
   {
-    if ((rc
-         = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, TIMEOUT_MQTT_RECEIVE_MS))
-        != MQTTCLIENT_SUCCESS)
+    if (((rc
+          = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, TIMEOUT_MQTT_RECEIVE_MS))
+         != MQTTCLIENT_SUCCESS)
+        && (MQTTCLIENT_TOPICNAME_TRUNCATED != rc))
     {
-      printf("Failed to receive message, return code %d\n", rc);
-      return rc;
+      LOG_ERROR("Failed to receive message: MQTTClient return code %d.", rc);
+      exit(rc);
     }
-
-    if (topic_len == 0)
+    else if (NULL == message)
     {
-      // The length of the topic if there are one or more NULL characters embedded in topic,
-      // otherwise topic_len is 0.
+      LOG_ERROR("Timeout expired: MQTTClient return code %d.", rc);
+      exit(rc);
+    }
+    else if (MQTTCLIENT_TOPICNAME_TRUNCATED == rc)
+    {
       topic_len = (int)strlen(topic);
     }
+    LOG_SUCCESS("Client received a message from provisioning service.");
 
-    printf("Message arrived\n");
-    printf("     topic (%d): %s\n", topic_len, topic);
-    printf("   message (%d): ", message->payloadlen);
-    print_az_span(az_span_init(message->payload, message->payloadlen));
+    parse_operation_message(topic, topic_len, message, &response, &operation_status);
+    LOG_SUCCESS("Client parsed operation message.");
 
-    az_iot_provisioning_client_register_response response;
-
-    // Parse the incoming message and payload
-    if (az_failed(
-            rc = az_iot_provisioning_client_parse_received_topic_and_payload(
-                &provisioning_client,
-                az_span_init((uint8_t*)topic, topic_len),
-                az_span_init((uint8_t*)message->payload, message->payloadlen),
-                &response)))
-    {
-      printf("Message from unknown topic, return code %d\n", rc);
-      return rc;
-    }
-
-    // Parse the operation status from a string to an enum
-    az_iot_provisioning_client_operation_status operation_status;
-    if (az_failed(
-            rc = az_iot_provisioning_client_parse_operation_status(&response, &operation_status)))
-    {
-      printf("Failed to parse operation_status, return code %d\n", rc);
-      return rc;
-    }
-
-    // Check whether or not the operation is complete
+    // If operation is not complete, send query and loop to receive operation message
     is_operation_complete = az_iot_provisioning_client_operation_complete(operation_status);
-
     if (!is_operation_complete)
     {
-      // In case the operation is not complete, issue a new query to the service
-      // Get the topic to send the query message
-      if (az_failed(
-              rc = az_iot_provisioning_client_query_status_get_publish_topic(
-                  &provisioning_client, &response, query_topic, sizeof(query_topic), NULL)))
-      {
-        printf("Failed to get operation status topic, return code %d\n", rc);
-        return rc;
-      }
+      LOG("Operation is still pending.");
 
-      // IMPORTANT: Wait the recommended retry-after number of seconds before query
-      printf("Querying after %u seconds...\n", response.retry_after_seconds);
-      sleep_seconds(response.retry_after_seconds);
+      send_operation_query_message(&response);
 
-      // Publish the query message
-      if ((rc = MQTTClient_publish(mqtt_client, query_topic, 0, NULL, 0, 0, NULL))
-          != MQTTCLIENT_SUCCESS)
-      {
-        printf("Failed to publish get_operation_status, return code %d\n", rc);
-        return rc;
-      }
-
-      // Loop back up to receive the result of the query
+      MQTTClient_freeMessage(&message);
+      MQTTClient_free(topic);
+      LOG_SUCCESS("Client sent operation query message.");
     }
-    else
-    {
-      // Successful assignment - print out the assigned hostname and device id
-      if (operation_status == AZ_IOT_PROVISIONING_STATUS_ASSIGNED)
-      {
-        printf("SUCCESS - Device provisioned:\n");
-        printf("\tHub Hostname: ");
-        print_az_span(response.registration_result.assigned_hub_hostname);
-        printf("\tDevice Id: ");
-        print_az_span(response.registration_result.device_id);
-      }
-      else // unassigned, failed or disabled states
-      {
-        printf("ERROR - Device Provisioning failed:\n");
-        printf("\tRegistration state: ");
-        print_az_span(response.operation_status);
-        printf("\tLast operation status: %d\n", response.status);
-        printf("\tOperation ID: ");
-        print_az_span(response.operation_id);
-        printf("\tError code: %u\n", response.registration_result.extended_error_code);
-        printf("\tError message: ");
-        print_az_span(response.registration_result.error_message);
-        printf("\tError timestamp: ");
-        print_az_span(response.registration_result.error_timestamp);
-        printf("\tError tracking ID: ");
-        print_az_span(response.registration_result.error_tracking_id);
-        if (response.retry_after_seconds > 0)
-        {
-          printf("\tRetry-after: %u seconds.", response.retry_after_seconds);
-        }
-      }
-    }
+  } while (!is_operation_complete);
 
-    MQTTClient_freeMessage(&message);
-    MQTTClient_free(topic);
+  // Operation is complete: Successful assignment
+  if (AZ_IOT_PROVISIONING_STATUS_ASSIGNED == operation_status)
+  {
+    LOG_SUCCESS("Client provisioned:");
+    LOG_AZ_SPAN("Hub Hostname:", response.registration_result.assigned_hub_hostname);
+    LOG_AZ_SPAN("Device Id:", response.registration_result.device_id);
+  }
+  else // Unsuccesful assignment (unassigned, failed or disabled states)
+  {
+    LOG_ERROR("Client provisioning failed:");
+    LOG_AZ_SPAN("Registration state:", response.operation_status);
+    LOG("Last operation status: %d", response.status);
+    LOG_AZ_SPAN("Operation ID:", response.operation_id);
+    LOG("Error code: %u", response.registration_result.extended_error_code);
+    LOG_AZ_SPAN("Error message:", response.registration_result.error_message);
+    LOG_AZ_SPAN("Error timestamp:", response.registration_result.error_timestamp);
+    LOG_AZ_SPAN("Error tracking ID:", response.registration_result.error_tracking_id);
+    exit((int)response.registration_result.extended_error_code);
   }
 
-  return 0;
+  MQTTClient_freeMessage(&message);
+  MQTTClient_free(topic);
+  return;
 }
 
-int main()
+static void parse_operation_message(
+    char* topic,
+    int topic_len,
+    MQTTClient_message const* message,
+    az_iot_provisioning_client_register_response* response,
+    az_iot_provisioning_client_operation_status* operation_status)
+{
+  int rc;
+  az_span topic_span = az_span_init((uint8_t*)topic, topic_len);
+  az_span message_span = az_span_init((uint8_t*)message->payload, message->payloadlen);
+
+  if (az_failed(
+          rc = az_iot_provisioning_client_parse_received_topic_and_payload(
+              &provisioning_client, topic_span, message_span, response)))
+  {
+    LOG_ERROR("Message from unknown topic: az_result return code 0x%04x.", rc);
+    exit(rc);
+  }
+  LOG_SUCCESS("Client received a valid topic response:");
+  LOG_AZ_SPAN("Topic:", topic_span);
+  LOG_AZ_SPAN("Payload:", message_span);
+  LOG("Response status: %d", response->status);
+
+  if (az_failed(rc = az_iot_provisioning_client_parse_operation_status(response, operation_status)))
+  {
+    LOG_ERROR("Failed to parse operation_status: az_result return code 0x%04x.", rc);
+    exit(rc);
+  }
+
+  return;
+}
+
+static void send_operation_query_message(
+    az_iot_provisioning_client_register_response const* response)
 {
   int rc;
 
-  // Read in the necessary environment variables and initialize the az_iot_provisioning_client
-  if (az_failed(rc = read_configuration_and_init_client()))
-  {
-    printf("Failed to read configuration from environment variables, return code %d\n", rc);
-    return rc;
-  }
-
-  // Get the MQTT client id used for the MQTT connection
   if (az_failed(
-          rc = az_iot_provisioning_client_get_client_id(
-              &provisioning_client, mqtt_client_id, sizeof(mqtt_client_id), NULL)))
+          rc = az_iot_provisioning_client_query_status_get_publish_topic(
+              &provisioning_client,
+              response,
+              query_topic_buffer,
+              sizeof(query_topic_buffer),
+              NULL)))
   {
-    printf("Failed to get MQTT clientId, return code %d\n", rc);
-    return rc;
+    LOG_ERROR("Unable to get query status publish topic: az_result return code 0x%04x.", rc);
+    exit(rc);
   }
 
-  // Create the Paho MQTT client
-  if ((rc = MQTTClient_create(
-           &mqtt_client,
-           global_provisioning_endpoint,
-           mqtt_client_id,
-           MQTTCLIENT_PERSISTENCE_NONE,
-           NULL))
+  // IMPORTANT: Wait the recommended retry-after number of seconds before query
+  LOG("Querying after %u seconds...", response->retry_after_seconds);
+  sleep_for_seconds(response->retry_after_seconds);
+
+  if ((rc = MQTTClient_publish(mqtt_client, query_topic_buffer, 0, NULL, 0, 0, NULL))
       != MQTTCLIENT_SUCCESS)
   {
-    printf("Failed to create MQTT client, return code %d\n", rc);
-    return rc;
+    LOG_ERROR("Failed to publish query status request: MQTTClient return code %d.", rc);
+    exit(rc);
   }
 
-  // Connect to the Provisioning Service
-  if ((rc = connect_device()) != 0)
-  {
-    return rc;
-  }
+  return;
+}
 
-  printf("Connected to %s.\n", global_provisioning_endpoint);
+static void disconnect_client_from_provisioning_service()
+{
+  int rc;
 
-  // Subscribe to the necessary provisioning topic to receive provisioning responses
-  if ((rc = subscribe()) != 0)
-  {
-    return rc;
-  }
-
-  printf("Subscribed.\n");
-
-  // Begin the registration process by sending a registration request message
-  if ((rc = register_device()) != 0)
-  {
-    return rc;
-  }
-
-  // Receive the status of the registration request
-  if ((rc = get_operation_status()) != 0)
-  {
-    return rc;
-  }
-
-  // Gracefully disconnect: send the disconnect packet and close the socket
   if ((rc = MQTTClient_disconnect(mqtt_client, TIMEOUT_MQTT_DISCONNECT_MS)) != MQTTCLIENT_SUCCESS)
   {
-    printf("Failed to disconnect MQTT client, return code %d\n", rc);
-    return rc;
+    LOG_ERROR("Failed to disconnect MQTT client: MQTTClient return code %d.", rc);
+    exit(rc);
   }
-  printf("Disconnected.\n");
 
-  // Clean up and release resources allocated by the mqtt client
   MQTTClient_destroy(&mqtt_client);
 
-  return 0;
+  return;
+}
+
+static void sleep_for_seconds(uint32_t seconds)
+{
+#ifdef _WIN32
+  Sleep((DWORD)seconds * 1000);
+#else
+  sleep(seconds);
+#endif
+  return;
 }
