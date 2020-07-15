@@ -84,8 +84,6 @@ if(NOT DEFINED ENV{AZ_SDK_C_NO_SAMPLES})
   add_subdirectory(sdk/samples/storage/blobs)
   if(TRANSPORT_PAHO)
     add_subdirectory(sdk/samples/iot)
-    add_subdirectory(sdk/samples/iot/provisioning)
-    add_subdirectory(sdk/samples/iot/hub)
   endif()
 endif()
 
