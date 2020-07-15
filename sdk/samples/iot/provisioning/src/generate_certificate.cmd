@@ -32,12 +32,13 @@ echo Once it is downloaded, run the following command to set the environment var
 echo.
 echo    set "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE=%CD%\BaltimoreCyberTrustRoot.crt.pem"
 echo.
-echo Sample certificate generated
+echo Sample certificate generated:
+echo Upload device_ec_cert.pem to Device Provisioning Service.
 echo Use the following command to set the environment variable for the samples:
 echo.
 echo    set "AZ_IOT_DEVICE_X509_CERT_PEM_FILE=%CD%\device_cert_store.pem"
 echo.
-echo Use the following fingerprint when creating your device in IoT Hub:
+echo Use the following fingerprint when enrolling your device in Device Provisioning Service:
 
 FOR /F "tokens=*" %%a in ('openssl x509 -noout -fingerprint -in device_ec_cert.pem') do SET output=%%a
 set fingerprint=%output::=%
