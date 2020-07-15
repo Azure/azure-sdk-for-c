@@ -87,8 +87,9 @@
     (void)printf("\n"); \
   }
 
-// Environment variables
+// Store environment variables
 static char iot_provisioning_sas_key_buffer[128];
+static az_span iot_provisioning_sas_key;
 static uint32_t iot_provisioning_sas_key_duration;
 static char x509_trust_pem_file_path_buffer[256];
 static char global_provisioning_endpoint_buffer[256];
@@ -209,6 +210,7 @@ static void create_and_configure_client()
   }
 
   generate_sas_key();
+  LOG_SUCCESS("Client generated SAS Key.");
 }
 
 static az_result read_environment_variables(
@@ -217,7 +219,7 @@ static az_result read_environment_variables(
     az_span* registration_id)
 {
   // Certification and SAS variables
-  az_span iot_provisioning_sas_key = AZ_SPAN_FROM_BUFFER(iot_provisioning_sas_key_buffer);
+  iot_provisioning_sas_key = AZ_SPAN_FROM_BUFFER(iot_provisioning_sas_key_buffer);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
       ENV_IOT_PROVISIONING_SAS_KEY,
       NULL,
@@ -283,7 +285,7 @@ static az_result read_configuration_entry(
   }
   else
   {
-    printf("(missing) Please set the %s environment variable.\n", env_name);
+    LOG_ERROR("(missing) Please set the %s environment variable", env_name);
     return AZ_ERROR_ARG;
   }
 
@@ -303,7 +305,7 @@ static void generate_sas_key()
           rc = az_iot_provisioning_client_sas_get_signature(
               &provisioning_client, sas_duration, sas_signature, &sas_signature)))
   {
-    printf("Could not get the signature for SAS key: az_result return code %04x\n", rc);
+    LOG_ERROR("Could not get the signature for SAS key: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
@@ -311,11 +313,9 @@ static void generate_sas_key()
   az_span sas_b64_decoded_key = AZ_SPAN_FROM_BUFFER(sas_b64_decoded_key_buffer);
   if (az_failed(
           rc = sample_base64_decode(
-              AZ_SPAN_FROM_BUFFER(iot_provisioning_sas_key_buffer),
-              sas_b64_decoded_key,
-              &sas_b64_decoded_key)))
+              iot_provisioning_sas_key, sas_b64_decoded_key, &sas_b64_decoded_key)))
   {
-    printf("Could not decode the SAS key: az_result return code %04x\n", rc);
+    LOG_ERROR("Could not decode the SAS key: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
@@ -329,7 +329,7 @@ static void generate_sas_key()
               sas_encoded_hmac256_signed_signature,
               &sas_encoded_hmac256_signed_signature)))
   {
-    printf("Could not sign the signature: az_result return code %04x\n", rc);
+    LOG_ERROR("Could not sign the signature: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
@@ -342,7 +342,7 @@ static void generate_sas_key()
               sas_b64_encoded_hmac256_signed_signature,
               &sas_b64_encoded_hmac256_signed_signature)))
   {
-    printf("Could not base64 encode the password: az_result return code %04x\n", rc);
+    LOG_ERROR("Could not base64 encode the password: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
@@ -358,7 +358,7 @@ static void generate_sas_key()
               sizeof(mqtt_password_buffer),
               &mqtt_password_length)))
   {
-    printf("Could not get the password: az_result return code %04x\n", rc);
+    LOG_ERROR("Could not get the password: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
@@ -494,11 +494,12 @@ static void receive_registration_status()
     if (!is_operation_complete)
     {
       LOG("Operation is still pending.");
-      MQTTClient_freeMessage(&message);
-      MQTTClient_free(topic);
 
       send_operation_query_message(&response);
       LOG_SUCCESS("Client sent operation query message.");
+
+      MQTTClient_freeMessage(&message);
+      MQTTClient_free(topic);
     }
   } while (!is_operation_complete);
 
