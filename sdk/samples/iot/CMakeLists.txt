@@ -19,9 +19,6 @@ if(NOT OpenSSL_FOUND)
   find_package(OpenSSL REQUIRED)
 endif()
 
-add_subdirectory(hub)
-add_subdirectory(provisioning)
-
 # Azure IoT Samples Library
 add_library (az_iot_samples_common
   ${CMAKE_CURRENT_LIST_DIR}/src/sample_sas_utility.c
@@ -29,7 +26,7 @@ add_library (az_iot_samples_common
 
 target_include_directories (az_iot_samples_common
   PUBLIC
-    ${az_iot_samples_common_SOURCE_DIR}/inc
+  ${CMAKE_CURRENT_LIST_DIR}/inc
 )
 
 # Internal deps
@@ -49,5 +46,8 @@ target_link_libraries(az_iot_samples_common
 
 add_library (az::iot::samples::common ALIAS az_iot_samples_common)
 
-endif()
+add_subdirectory(hub)
+add_subdirectory(provisioning)
+
+endif() # TRANSPORT_PAHO
 

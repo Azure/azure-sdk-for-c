@@ -20,13 +20,13 @@ target_link_libraries(paho_iot_provisioning_example
 )
 
 # Provisioning (SAS) Sample
-add_executable (paho_iot_sas_provisioning_example
-  ${CMAKE_CURRENT_LIST_DIR}/src/paho_iot_sas_provisioning_example.c
+add_executable (paho_iot_provisioning_sas_example
+  ${CMAKE_CURRENT_LIST_DIR}/src/paho_iot_provisioning_sas_example.c
 )
 
-target_link_libraries(paho_iot_sas_provisioning_example
+target_link_libraries(paho_iot_provisioning_sas_example
   PRIVATE
     az::iot::samples::common
 )
 
-endif()
+endif() # TRANSPORT_PAHO

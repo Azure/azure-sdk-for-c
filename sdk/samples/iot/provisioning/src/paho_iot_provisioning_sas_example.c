@@ -36,8 +36,8 @@
 
 // DO NOT MODIFY: IoT Provisioning SAS Key
 #define ENV_IOT_PROVISIONING_SAS_KEY "AZ_IOT_PROVISIONING_SAS_KEY"
-#define ENV_IOT_PROVISIONING_SAS_KEY_DURATION \
-  "AZ_IOT_PROVISIONING_SAS_KEY_DURATION" // default is 2 hrs.
+#define ENV_IOT_PROVISIONING_SAS_KEY_DURATION_MINUTES \
+  "AZ_IOT_PROVISIONING_SAS_KEY_DURATION_MINUTES" // default is 2 hrs.
 #define SAS_KEY_DURATION_TIME_DIGITS 4
 
 // DO NOT MODIFY: the path to a PEM file containing the server trusted CA
@@ -230,7 +230,7 @@ static az_result read_environment_variables(
   char duration_buffer[SAS_KEY_DURATION_TIME_DIGITS];
   az_span duration = AZ_SPAN_FROM_BUFFER(duration_buffer);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_IOT_PROVISIONING_SAS_KEY_DURATION, "2", false, duration, &duration));
+      ENV_IOT_PROVISIONING_SAS_KEY_DURATION_MINUTES, "120", false, duration, &duration));
   AZ_RETURN_IF_FAILED(az_span_atou32(duration, &iot_provisioning_sas_key_duration));
 
   az_span x509_trust_pem_file_path = AZ_SPAN_FROM_BUFFER(x509_trust_pem_file_path_buffer);
