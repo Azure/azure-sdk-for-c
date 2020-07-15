@@ -135,7 +135,7 @@ steps:
         not(contains(variables['OSVmImage'], 'macOS')),
         not(eq(variables['${{ parameters.DependenciesVariableName }}'], ''))
       )
-    displayName: Non-Mac - Set vcpkg version and bootstrap
+    displayName: Non-MacOS - vcpkg bootstrap
 
   - script: vcpkg version
     displayName: vcpkg version
