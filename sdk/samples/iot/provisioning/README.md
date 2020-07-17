@@ -24,7 +24,7 @@ Further background on the Azure IoT Client library and key concepts are explaine
 
 ## Prerequisites
 
-* Have an [Azure acount](https://azure.microsoft.com/en-us/) created.
+* Have an [Azure account](https://azure.microsoft.com/en-us/) created.
 * Have an [Azure IoT Hub](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal) created.
 * Have an [Azure IoT Hub Device Provisioning Service (DPS)](https://docs.microsoft.com/en-us/azure/iot-dps/quick-setup-auto-provision) created.
 * For Windows systems, have [Microsoft Visual Studio](https://visualstudio.microsoft.com/downloads/) installed.
@@ -42,7 +42,7 @@ Further background on the Azure IoT Client library and key concepts are explaine
 ## Getting Started
 
 ### Paho IoT Provisioning (Certificates)
-This sample uses x509 authentication to connect to Azure IoT Hub Device Provisioning Service (DPS).  To easily run this sample, we have provided a script to generate a self-signed device certification used for device authentication. This script is intended **for sample use only** and not to be used in production code.
+This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/provisioning/src/paho_iot_provisioning_example.c) uses x509 authentication to connect to Azure IoT Hub Device Provisioning Service (DPS).  To easily run this sample, we have provided a script to generate a self-signed device certification used for device authentication. This script is intended **for sample use only and not to be used in production code**.
 
 1. Enter the directory `/azure-sdk-for-c/sdk/samples/iot/provisioning/src/` and run the script using the following form:
 
@@ -58,7 +58,7 @@ This sample uses x509 authentication to connect to Azure IoT Hub Device Provisio
 3. In your Azure DPS, add a new individual device enrollment using the recently generated `device_ec_cert.pem` file.  See [here](https://docs.microsoft.com/en-us/azure/iot-dps/quick-create-simulated-device-x509#create-a-device-enrollment-entry-in-the-portal) for further instruction.  After creation, the Registration ID of your device should appear as `paho-sample-device1` in the Individual Enrollments tab.
 
 ### Paho IoT Provisioning (SAS)
-This sample uses SAS symmetric key authentication to connect to Azure IoT Hub Device Provisioning Service (DPS). When enrolling a device with the DPS, an option to auto-generate the key will be provided.  
+This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/provisioning/src/paho_iot_provisioning_sas_example.c) uses SAS symmetric key authentication to connect to Azure IoT Hub Device Provisioning Service (DPS). When enrolling a device with the DPS, an option to auto-generate the key will be provided.  
 
 * In your Azure DPS, add a new individual device enrollment using SAS. See [here](https://docs.microsoft.com/en-us/azure/iot-dps/quick-create-simulated-device-symm-key#create-a-device-enrollment-entry-in-the-portal) for further instruction. After creation, the Registration ID of your device will appear in the Individual Enrollments tab.
 
@@ -89,7 +89,7 @@ This sample uses SAS symmetric key authentication to connect to Azure IoT Hub De
 
 
 2. Compile the code:
-  * Enter the directory `/azure-sdk-for-c/cmake`.  If it does not exit, please create it.
+  * Enter the directory `/azure-sdk-for-c/cmake`.  If it does not exist, please create it.
   * Build the directory structure:
 
     ```bash
@@ -117,7 +117,7 @@ This sample uses SAS symmetric key authentication to connect to Azure IoT Hub De
     ```
 	Once the Windows solution opens in Visual Studio:
     * Navigate on the Solution Explorer panel to the sample solution you would like to run.
-    * Make it the default startup project (right-click on paho_iot_hub_c2d_example project, then click on Set as StartUp Project).
+    * Make it the default startup project (right-click on sample project, then click on Set as StartUp Project).
     * Build and run the project (F5 on most installations).
 
 ## Troubleshooting
