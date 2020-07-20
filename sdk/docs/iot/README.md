@@ -66,7 +66,7 @@ Feature | Azure SDK for Embedded C | Description
 
 ## Examples
 
-### IoT Hub Client
+### IoT Hub Client Initialization
 
 To use IoT Hub connectivity, the first action by a developer should be to initialize the
 client with the `az_iot_hub_client_init()` API. Once that is initialized, you may use the
@@ -174,7 +174,7 @@ void my_telemetry_func()
 }
 ```
 
-### IoT Hub Client 
+### IoT Hub Client with MQTT Stack
 
 Below is an implementation for using the IoT Hub Client SDK. This is meant to guide users in incorporating their MQTT stack with the IoT Hub Client SDK. Note for simplicity reasons, this code will not compile. Ideally, guiding principles can be inferred from reading through this snippet to create an IoT solution.
 
@@ -189,7 +189,6 @@ static az_span my_device_id = AZ_SPAN_LITERAL_FROM_STR("<your device id here>");
 
 //Make sure the buffer is large enough to fit the user name (100 is an example)
 static char my_mqtt_user_name[100];
-static size_t my_mqtt_user_name_length;
 
 //Make sure the buffer is large enough to fit the client id (16 is an example)
 static char my_mqtt_client_id[16];
