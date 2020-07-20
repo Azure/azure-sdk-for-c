@@ -11,14 +11,14 @@ urlFragment: iot-hub-samples
 
 # Azure IoT Hub Samples
 
-This document explains samples for the Azure SDK for Embedded C IoT Hub Client and how to use them. 
+This document explains samples for the Azure SDK for Embedded C IoT Hub Client and how to use them.
 
 For step-by-step guides starting from scratch, you may refer to these documents:
   - Linux: [How to setup and run Azure SDK for Embedded C IoT Hub Samples on Linux](./linux/how_to_iot_hub_samples_linux.md)
   - Windows: [How to setup and run Azure SDK for Embedded C IoT Hub Samples on Microsoft Windows](./windows/how_to_iot_hub_samples_windows.md).
   - ESP8266: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Esp8266 NodeMCU](./aziot_esp8266/how_to_esp8266_nodemcu.md)
 
-  **Note**: While Windows and Linux devices are not likely to be considered as constrained ones, these samples were created to make it simpler to test the Azure SDK for Embedded C libraries, even without a real device. 
+  **Note**: While Windows and Linux devices are not likely to be considered as constrained ones, these samples were created to make it simpler to test the Azure SDK for Embedded C libraries, even without a real device.
 
 
 ## Key Concepts
@@ -29,7 +29,7 @@ Key concepts are explained in detail [here][sdk_readme_key_concepts].
 
 - To generate the device certificate, the provided script uses [OpenSSL 1.1.1 LTS](https://www.openssl.org/source/). Please
 install the OpenSSL command line utility prior to using the script.
-  - Note: for Linux based systems, manual installation from source can be risky ([details here](https://github.com/openssl/openssl/issues/11227#issuecomment-616445289)). We recommend installing for Linux via apt:  
+  - Note: for Linux based systems, manual installation from source can be risky ([details here](https://github.com/openssl/openssl/issues/11227#issuecomment-616445289)). We recommend installing for Linux via apt:
   ```bash
   sudo apt-get install libssl-dev
   ```
@@ -99,11 +99,11 @@ Send 5 telemetry messages using the IoT Hub Client with certificate authenticati
 Use device twin features such as receiving the twin document, updating reported properties, and sending desired properties using the Azure IoT Hub Client.
 This sample uses a property named `device_count`, which records the number of times the device sends a reported property message to the service.
 
-* To initiate a GET response request from the device, you will use the command `g`. 
+* To initiate a GET response request from the device, you will use the command `g`.
 
 * To initiate a reported property message from the device, you will use the command `r`.
 
-* To send a device twin desired property message from the service to the device, open the device twin document in your Azure IoT Hub.  Add the property `device_count` along with a corresponding value to the `desired` section of the JSON.  
+* To send a device twin desired property message from the service to the device, open the device twin document in your Azure IoT Hub.  Add the property `device_count` along with a corresponding value to the `desired` section of the JSON.
 ```json
 {
   "properties": {
@@ -131,7 +131,7 @@ Receive and view incoming C2D messages using the IoT Hub Client.
 ### [IoT Hub PnP (Certificates)][pnp_sample]
 Connect a PnP enabled device with the Digital Twin Model ID (DTMI) detailed [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/Thermostat.json).
 In short, the capabilities are listed here:
-- **Methods**: Invoke a method called `getMaxMinReport` with JSON payload value `"since"` with an [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) value for start time for the report. The method sends a response containing the following JSON payload:  
+- **Methods**: Invoke a method called `getMaxMinReport` with JSON payload value `"since"` with an [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) value for start time for the report. The method sends a response containing the following JSON payload:
 ```json
 {
   "maxTemp": 20,
@@ -171,7 +171,7 @@ This project welcomes contributions and suggestions. Find [more contributing][sd
 [telemetry_sample_cert]: src/paho_iot_hub_telemetry_example.c
 [twin_sample]: src/paho_iot_hub_twin_example.c
 [pnp_sample]: src/paho_iot_hub_pnp_example.c
-[iot_hub_mqtt]: https://docs.microsoft.com/en-us/azure/iot-dps/iot-dps-mqtt-support
+[iot_hub_mqtt]: https://docs.microsoft.com/en-us/azure/iot-hub/about-iot-hub
 [error_codes]: ../../../../sdk/docs/iot/mqtt_state_machine.md#iot-service-errors
 [Eclipse_Paho]: https://www.eclipse.org/paho/clients/c/
 [sdk_readme_contributing]: https://github.com/Azure/azure-sdk-for-c/tree/master#contributing
