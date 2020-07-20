@@ -3,7 +3,6 @@
 
 #include "az_hex_private.h"
 #include "az_span_private.h"
-#include <azure/core/az_platform.h>
 #include <azure/core/az_precondition.h>
 #include <azure/core/az_span.h>
 #include <azure/core/internal/az_precondition_internal.h>
