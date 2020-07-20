@@ -56,16 +56,17 @@ All samples require either x509 certification or SAS symmetric key authenticatio
     ```cmd
     generate_certificate.cmd
     ```
-   The output will be used in the next steps.
+
+2. For Windows (or if required on your OS), set the environment variable `AZ_IOT_DEVICE_X509_TRUST_PEM_FILE` to the path of the BaltimoreCyberTrustRoot.crt.pem file noted near the bottom of the output. You must [download this pem file](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem) and store it in the location specified by that filepath.
+
+3. The remaining output will be used in the next steps.
 ### #Paho IoT Provisioning (Certificates)
 **Executable:** paho_iot_provisioning_sample
 
 This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/provisioning/src/paho_iot_provisioning_example.c) uses x509 authentication to connect to Azure IoT Hub Device Provisioning Service (DPS).
-1. Set the environment variable `AZ_IOT_DEVICE_X509_CERT_PEM_FILE` to the path of the generate .pem file noted at the bottom of the output.
+1. Set the environment variable `AZ_IOT_DEVICE_X509_CERT_PEM_FILE` to the path of the generated .pem file noted at the bottom of the output.
 
-2. For Windows (or if required on your OS), set the environment variable `AZ_IOT_DEVICE_X509_TRUST_PEM_FILE` to the path of the BaltimoreCyberTrustRoot.crt.pem file also noted near the bottom of the output.  You must [download this pem file](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem) and store it in the location specified by that filepath.
-
-3. In your Azure DPS, add a new individual device enrollment using the recently generated `device_ec_cert.pem` file.  See [here](https://docs.microsoft.com/en-us/azure/iot-dps/quick-create-simulated-device-x509#create-a-device-enrollment-entry-in-the-portal) for further instruction.  After creation, the Registration ID of your device should appear as `paho-sample-device1` in the Individual Enrollments tab.
+2. In your Azure DPS, add a new individual device enrollment using the recently generated `device_ec_cert.pem` file.  See [here](https://docs.microsoft.com/en-us/azure/iot-dps/quick-create-simulated-device-x509#create-a-device-enrollment-entry-in-the-portal) for further instruction.  After creation, the Registration ID of your device should appear as `paho-sample-device1` in the Individual Enrollments tab.
 
 ### Paho IoT Provisioning (SAS)
 **Executable:** paho_iot_provisioning_sas_sample
@@ -100,7 +101,7 @@ This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/i
 2. Compile the code:
   * Enter the directory `/azure-sdk-for-c/cmake`.  If it does not exist, please create it.
   * Build the directory structure and the samples:
-  
+
     ```bash
     cmake -DTRANSPORT_PAHO=ON ..
     cmake --build .
@@ -116,8 +117,8 @@ This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/i
     az.sln
     ```
 	Once the Windows solution opens in Visual Studio:
-    * Navigate on the Solution Explorer panel to the sample solution you would like to run.
-    * Make it the default startup project (right-click on the sample solution, then click on Set as Startup Project).
+    * Navigate on the Solution Explorer panel to the sample project you would like to run.
+    * Make it the default startup project (right-click on the sample project, then click on Set as Startup Project).
     * Build and run the project (F5 on most installations).
 
 ## Troubleshooting
