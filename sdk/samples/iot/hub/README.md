@@ -23,7 +23,7 @@ For step-by-step guides starting from scratch, you may refer to these documents:
 
 ## Key Concepts
 
-Key concepts are explained in detail [here][SDK_README_KEY_CONCEPTS].
+Key concepts are explained in detail [here][sdk_readme_key_concepts].
 
 ## Prerequisites
 
@@ -34,7 +34,7 @@ install the OpenSSL command line utility prior to using the script.
   sudo apt-get install libssl-dev
   ```
 - To use the samples, we use [Eclipse Paho MQTT C client][Eclipse_Paho]. You can use the directions
-[here][VCPKG_DIRECTIONS] to set up VCPKG to download and manage linking the dependency.
+[here][vcpkg_directions] to set up VCPKG to download and manage linking the dependency.
 
 ## Getting Started
 
@@ -64,7 +64,7 @@ For all of these samples, the following environment variables will need to be se
 
 **NOTE**: These need to be set before running the cmake commands.
 
-- `VCPKG_DEFAULT_TRIPLET`: The triplet created using the instructions [here][VCPKG_DIRECTIONS].
+- `VCPKG_DEFAULT_TRIPLET`: The triplet created using the instructions [here][vcpkg_directions].
 - `VCPKG_ROOT`: The full path to the VCPKG directory used to generate the triplet.
 - `AZ_IOT_DEVICE_ID`: Your device id.
 - `AZ_IOT_HUB_HOSTNAME`: The hostname of your IoT Hub.
@@ -151,7 +151,7 @@ When interacting with the Azure IoT Hub using this C client library, errors are 
 
 ## Next Steps
 
-Start using the IoT Hub Client in your solutions. More SDK details can be found in [SDK README][IOT_CLIENT_README].
+Start using the IoT Hub Client in your solutions. More SDK details can be found in [SDK README][iot_client_readme].
 
 ### Additional Documentation
 
@@ -159,13 +159,12 @@ For extensive documentation on Azure IoT Hub, see the [API reference documentati
 
 ## Contributing
 
-This project welcomes contributions and suggestions. Find [more contributing][SDK_README_CONTRIBUTING] details here.
+This project welcomes contributions and suggestions. Find [more contributing][sdk_readme_contributing] details here.
 
 <!-- LINKS -->
-[IOT_CLIENT_README]: https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot#azure-iot-clients
-[SDK_README_GETTING_STARTED]: https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot#getting-started
-[SDK_README_KEY_CONCEPTS]: https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot#azure-iot-clients
-[VCPKG_DIRECTIONS]:https://github.com/Azure/azure-sdk-for-c#development-environment
+[iot_client_readme]: https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot#azure-iot-clients
+[sdk_readme_key_concepts]: https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot#azure-iot-clients
+[vcpkg_directions]:https://github.com/Azure/azure-sdk-for-c#development-environment
 [c2d_sample]: src/paho_iot_hub_c2d_example.c
 [methods_sample]: src/paho_iot_hub_methods_example.c
 [telemetry_sample_sas]: src/paho_iot_hub_sas_telemetry_example.c
@@ -175,4 +174,4 @@ This project welcomes contributions and suggestions. Find [more contributing][SD
 [iot_hub_mqtt]: https://docs.microsoft.com/en-us/azure/iot-dps/iot-dps-mqtt-support
 [error_codes]: ../../../../sdk/docs/iot/mqtt_state_machine.md#iot-service-errors
 [Eclipse_Paho]: https://www.eclipse.org/paho/clients/c/
-[SDK_README_CONTRIBUTING]: https://github.com/Azure/azure-sdk-for-c/tree/master#contributing
+[sdk_readme_contributing]: https://github.com/Azure/azure-sdk-for-c/tree/master#contributing
