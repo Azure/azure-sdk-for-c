@@ -60,17 +60,17 @@ All samples require either x509 certification or SAS symmetric key authenticatio
 ### #Paho IoT Provisioning (Certificates)
 **Executable:** paho_iot_provisioning_sample
 
-This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/provisioning/src/paho_iot_provisioning_example.c) uses x509 authentication to connect to Azure IoT Hub Device Provisioning Service (DPS).  
-1. Set the environment variable `AZ_IOT_DEVICE_X509_CERT_PEM_FILE` noted at the bottom of the output.
+This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/provisioning/src/paho_iot_provisioning_example.c) uses x509 authentication to connect to Azure IoT Hub Device Provisioning Service (DPS).
+1. Set the environment variable `AZ_IOT_DEVICE_X509_CERT_PEM_FILE` to the path of the generate .pem file noted at the bottom of the output.
 
-2. For Windows (or if required on your OS), set the environment variable `AZ_IOT_DEVICE_X509_TRUST_PEM_FILE` also noted near the bottom of the output.  This variable denotes the filepath to BaltimoreCyberTrustRoot.crt.pem.  You must [download this file](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem) and store it in the location specified by that filepath. 
+2. For Windows (or if required on your OS), set the environment variable `AZ_IOT_DEVICE_X509_TRUST_PEM_FILE` to the path of the BaltimoreCyberTrustRoot.crt.pem file also noted near the bottom of the output.  You must [download this pem file](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem) and store it in the location specified by that filepath.
 
 3. In your Azure DPS, add a new individual device enrollment using the recently generated `device_ec_cert.pem` file.  See [here](https://docs.microsoft.com/en-us/azure/iot-dps/quick-create-simulated-device-x509#create-a-device-enrollment-entry-in-the-portal) for further instruction.  After creation, the Registration ID of your device should appear as `paho-sample-device1` in the Individual Enrollments tab.
 
 ### Paho IoT Provisioning (SAS)
 **Executable:** paho_iot_provisioning_sas_sample
 
-This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/provisioning/src/paho_iot_provisioning_sas_example.c) uses SAS symmetric key authentication to connect to Azure IoT Hub Device Provisioning Service (DPS).  
+This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/provisioning/src/paho_iot_provisioning_sas_example.c) uses SAS symmetric key authentication to connect to Azure IoT Hub Device Provisioning Service (DPS).
 
 * In your Azure DPS, add a new individual device enrollment using SAS. See [here](https://docs.microsoft.com/en-us/azure/iot-dps/quick-create-simulated-device-symm-key#create-a-device-enrollment-entry-in-the-portal) for further instruction, with one exception--for the Primary Key, **you must use** the fingerprint noted in the output.  **Do NOT use** the *Auto-generate keys* option. After creation, the Registration ID of your device will appear in the Individual Enrollments tab.
 
@@ -96,7 +96,6 @@ This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/i
   * `AZ_IOT_PROVISIONING_SAS_KEY`: Select your enrolled device from the Individual Enrollments tab and copy its Primary Key.
   * `AZ_IOT_ID_SCOPE`: Copy this value from the Overview tab in your Azure DPS.
   * `AZ_IOT_REGISTRATION_ID_SAS`: Copy the Registration Id of your SAS device from the Individual Enrollments tab.
-
 
 2. Compile the code:
   * Enter the directory `/azure-sdk-for-c/cmake`.  If it does not exist, please create it.
@@ -127,11 +126,11 @@ The error policy in using the Embedded C SDK client library is documented [here]
 
 ## Next Steps and Additional Documentation
 
-Start using the IoT Provisioning Client in your solutions! 
+Start using the IoT Provisioning Client in your solutions!
 
-* A general overivew of the Embedded C SDK and additional background on runing samples can be found in the [Azure SDK for Embedded C README](https://github.com/Azure/azure-sdk-for-c#azure-sdk-for-embedded-c).
-* More SDK details pertaining to IoT Client can be found in the [Azure IoT Client README](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot#azure-iot-clients). 
-* The [Azure IoT Client MQTT State Machine](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/mqtt_state_machine.md) provides a high-level architecture and API information. 
+* A general overivew of the Embedded C SDK and additional background on running samples can be found in the [Azure SDK for Embedded C README](https://github.com/Azure/azure-sdk-for-c#azure-sdk-for-embedded-c).
+* More SDK details pertaining to IoT Client can be found in the [Azure IoT Client README](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot#azure-iot-clients).
+* The [Azure IoT Client MQTT State Machine](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/mqtt_state_machine.md) provides a high-level architecture and API information.
 * For extensive documentation on the Azure IoT Hub Device Provisioning Service, see the [Microsoft reference documentation](https://docs.microsoft.com/en-us/azure/iot-dps/).
 
 

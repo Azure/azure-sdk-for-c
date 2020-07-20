@@ -26,7 +26,6 @@ echo "Use the following fingerprint when enrolling your device in Device Provisi
 echo -e "The fingerprint has also been placed in fingerprint.txt for future reference.\n"
 openssl x509 -noout -fingerprint -in device_ec_cert.pem | sed 's/://g'| tee fingerprint.txt
 
-
 echo -e "\n\nCERTIFICATE SAMPLES:"
 
 echo "If required (for example on Windows), download the Baltimore PEM CA from https://www.digicert.com/digicert-root-certificates.htm to the current folder."

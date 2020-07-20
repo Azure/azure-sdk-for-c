@@ -175,3 +175,4 @@ This project welcomes contributions and suggestions. Find [more contributing][SD
 [iot_hub_mqtt]: https://docs.microsoft.com/en-us/azure/iot-dps/iot-dps-mqtt-support
 [error_codes]: ../../../../sdk/docs/iot/mqtt_state_machine.md#iot-service-errors
 [Eclipse_Paho]: https://www.eclipse.org/paho/clients/c/
+[SDK_README_CONTRIBUTING]: https://github.com/Azure/azure-sdk-for-c/tree/master#contributing
