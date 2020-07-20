@@ -174,9 +174,9 @@ void my_telemetry_func()
 }
 ```
 
-### IoT Hub Pseudocode Implementation 
+### IoT Hub Client 
 
-Below is a pseudocode implementation for using the IoT Hub Client SDK. This is meant to guide users in incorporating their MQTT stack with the IoT Hub Client SDK. Note for simplicity reasons, this code will not compile. Ideally, guiding principles can be inferred from reading through this snippet to create an IoT solution.
+Below is an implementation for using the IoT Hub Client SDK. This is meant to guide users in incorporating their MQTT stack with the IoT Hub Client SDK. Note for simplicity reasons, this code will not compile. Ideally, guiding principles can be inferred from reading through this snippet to create an IoT solution.
 
 ```C
 #include <az/core/az_result.h>
@@ -187,11 +187,11 @@ az_iot_hub_client my_client;
 static az_span my_iothub_hostname = AZ_SPAN_LITERAL_FROM_STR("<your hub fqdn here>");
 static az_span my_device_id = AZ_SPAN_LITERAL_FROM_STR("<your device id here>");
 
-//Make sure to size the buffer to fit the user name (100 is an example)
+//Make sure the buffer is large enough to fit the user name (100 is an example)
 static char my_mqtt_user_name[100];
 static size_t my_mqtt_user_name_length;
 
-//Make sure to size the buffer to fit the client id (16 is an example)
+//Make sure the buffer is large enough to fit the client id (16 is an example)
 static char my_mqtt_client_id[16];
 
 //This assumes an X509 Cert. SAS keys may also be used.
@@ -216,10 +216,9 @@ int main()
 
   //Get the MQTT client id to connect
   az_iot_hub_client_get_client_id(&my_client, my_mqtt_client_id, 
-                sizeof(my_mqtt_client_id), &my_mqtt_client_id_length);
+                sizeof(my_mqtt_client_id), NULL);
 
-
-  //Initialize chosen MQTT client with necessary parameters (example params shown)
+  //Initialize MQTT client with necessary parameters (example params shown)
   mqtt_client my_mqtt_client;
   mqtt_client_init(&my_mqtt_client, my_iothub_hostname, my_mqtt_client_id);
 
@@ -241,7 +240,7 @@ int main()
   //This example would run to receive any incoming message and send a telemetry message five times
   int iterations = 0;
   mqtt_client_message msg;
-  while(iterations < 5)
+  while(iterations++ < 5)
   {
     if(mqtt_client_receive(&msg))
     {
@@ -249,8 +248,6 @@ int main()
     }
 
     send_telemetry_message();
-
-    iterations++;
   }
 
   //Disconnect from the IoT Hub
@@ -278,15 +275,15 @@ void handle_iot_message(mqtt_client_message* msg)
   az_iot_hub_client_method_request method_request;
   az_iot_hub_client_c2d_request c2d_request;
   az_iot_hub_client_twin_response twin_response;
-  if(az_iot_hub_client_methods_parse_received_topic(&client, incoming_topic, &method_request) == AZ_OK)
+  if (az_iot_hub_client_methods_parse_received_topic(&client, incoming_topic, &method_request) == AZ_OK)
   {
     //Handle the method request
   }
-  else if(az_iot_hub_client_c2d_parse_received_topic(&client, incoming_topic, &c2d_request) == AZ_OK)
+  else if (az_iot_hub_client_c2d_parse_received_topic(&client, incoming_topic, &c2d_request) == AZ_OK)
   {
-    //Handle the c2d request
+    //Handle the c2d message 
   }
-  else if(az_iot_hub_client_twin_parse_received_topic(&client, incoming_topic, &twin_response) == AZ_OK)
+  else if (az_iot_hub_client_twin_parse_received_topic(&client, incoming_topic, &twin_response) == AZ_OK)
   {
     //Handle the twin message
   }
