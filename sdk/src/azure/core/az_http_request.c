@@ -180,7 +180,7 @@ az_http_request_set_query_parameter(_az_http_request* ref_request, az_span name,
   az_span url_remainder
       = az_span_slice_to_end(ref_request->_internal.url, ref_request->_internal.url_length);
 
-  if (az_span_ptr(pre_existing_query_parameter_value) != NULL)
+  if (pre_existing_query_parameter_start_index > 0)
   { // a negative difference means shifting left and no required length.
     // a positive difference means new value will require shifting right.
     int32_t pre_existing_query_parameter_value_size
