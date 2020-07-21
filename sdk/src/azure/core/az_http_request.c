@@ -204,7 +204,7 @@ az_http_request_set_query_parameter(_az_http_request* ref_request, az_span name,
         value_index,
         value_index + prexisting_query_parameter_value_size,
         value));
-    ref_request->_internal.url_length += required_length;
+    ref_request->_internal.url_length += difference;
     return AZ_OK;
   }
 
