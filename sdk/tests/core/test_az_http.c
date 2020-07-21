@@ -208,6 +208,14 @@ static void test_http_request(void** state)
             &request, AZ_SPAN_FROM_STR("q1"), AZ_SPAN_FROM_STR("v1")),
         AZ_OK);
 
+    {
+      az_span expected_url = AZ_SPAN_FROM_STR("http://example.com?q1=v1");
+      uint8_t result[100];
+      az_span url_result = AZ_SPAN_FROM_BUFFER(result);
+      assert_return_code(az_http_request_get_url(&request, &url_result), AZ_OK);
+      assert_true(az_span_is_content_equal(url_result, expected_url));
+    }
+
     // set same qp new value
     assert_return_code(
         az_http_request_set_query_parameter(

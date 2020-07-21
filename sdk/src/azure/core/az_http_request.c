@@ -103,8 +103,10 @@ AZ_NODISCARD az_result az_http_request_append_path(_az_http_request* ref_request
 
 // returns the query parameter value from a query parameter name.
 // Or returns AZ_SPAN_NULL if query parameter name is not found
-static AZ_NODISCARD az_span
-_az_http_request_find_query_parameter(_az_http_request* ref_request, az_span query_parameter_name)
+static AZ_NODISCARD az_span _az_http_request_find_query_parameter(
+    _az_http_request* ref_request,
+    az_span query_parameter_name,
+    int32_t* out_query_parameter_index)
 {
   if (ref_request->_internal.query_start == 0)
   {
@@ -117,7 +119,7 @@ _az_http_request_find_query_parameter(_az_http_request* ref_request, az_span que
   int32_t new_qp_name_size = az_span_size(query_parameter_name);
 
   // will be set to the start of the value of a qp equal to the new qp
-  int32_t value_index_start = -1;
+  *out_query_parameter_index = -1;
 
   for (int32_t is_query_start = 1, index = ref_request->_internal.query_start; // +1 to jump `?`
        index < ref_request->_internal.url_length - new_qp_name_size;
@@ -126,9 +128,9 @@ _az_http_request_find_query_parameter(_az_http_request* ref_request, az_span que
     if (query_params_ptr[index] == '&')
     {
       is_query_start = 1; // set next index to be queryStart
-      if (value_index_start > 0)
+      if (*out_query_parameter_index > 0)
       { // if this was set before, it means we found the end of the value we want to return
-        return az_span_slice(url, value_index_start, index);
+        return az_span_slice(url, *out_query_parameter_index, index);
       }
       continue;
     }
@@ -144,17 +146,17 @@ _az_http_request_find_query_parameter(_az_http_request* ref_request, az_span que
           // advance index to value start
           index = index + new_qp_name_size + 1; // +1 to jump '='
           // set qp value start
-          value_index_start = index;
+          *out_query_parameter_index = index;
         }
       }
     }
     is_query_start = 0;
   }
 
-  if (value_index_start > 0)
+  if (*out_query_parameter_index > 0)
   { // getting here means we found the qp at the last position of url, so the value goes to the end
     // of url
-    return az_span_slice(url, value_index_start, ref_request->_internal.url_length);
+    return az_span_slice(url, *out_query_parameter_index, ref_request->_internal.url_length);
   }
 
   // didn't find the query parameter, return null
@@ -172,8 +174,9 @@ az_http_request_set_query_parameter(_az_http_request* ref_request, az_span name,
   _az_PRECONDITION(az_span_size(name) > 0 && az_span_size(value) > 0);
 
   // check if query parameter is already in url
-  az_span pre_existing_query_parameter_value
-      = _az_http_request_find_query_parameter(ref_request, name);
+  int32_t pre_existing_query_parameter_start_index = 0;
+  az_span pre_existing_query_parameter_value = _az_http_request_find_query_parameter(
+      ref_request, name, &pre_existing_query_parameter_start_index);
   az_span url_remainder
       = az_span_slice_to_end(ref_request->_internal.url, ref_request->_internal.url_length);
 
@@ -193,19 +196,13 @@ az_http_request_set_query_parameter(_az_http_request* ref_request, az_span name,
       return AZ_OK;
     }
 
-    // ptr difference should work because value is always inside url, same memory
-    uint8_t* url_prt_start = az_span_ptr(ref_request->_internal.url);
-    // ptr difference should work because value is always inside url, same memory
-    int32_t value_index
-        = (int32_t)(az_span_ptr(pre_existing_query_parameter_value) - url_prt_start);
-
     // Replace the value content. This might shift right or left the url contents.
     // No need to check
     AZ_RETURN_IF_FAILED(_az_span_replace(
         ref_request->_internal.url,
         ref_request->_internal.url_length,
-        value_index,
-        value_index + pre_existing_query_parameter_value_size,
+        pre_existing_query_parameter_start_index,
+        pre_existing_query_parameter_start_index + pre_existing_query_parameter_value_size,
         value));
     ref_request->_internal.url_length += difference;
     return AZ_OK;
