@@ -205,6 +205,17 @@ az_http_request_set_query_parameter(_az_http_request* ref_request, az_span name,
         pre_existing_query_parameter_start_index + pre_existing_query_parameter_value_size,
         value));
     ref_request->_internal.url_length += difference;
+    if (difference < 0)
+    {
+      // clear anything after a left shift
+      difference *= -1;
+      az_span_fill(
+          az_span_slice(
+              az_span_slice_to_end(ref_request->_internal.url, ref_request->_internal.url_length),
+              0,
+              difference),
+          0);
+    }
     return AZ_OK;
   }
 

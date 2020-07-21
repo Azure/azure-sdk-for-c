@@ -368,6 +368,46 @@ static void test_http_request(void** state)
     assert_return_code(az_http_request_get_url(&request, &url_result), AZ_OK);
     assert_true(az_span_is_content_equal(url_result, expected_url));
   }
+  { // Test adding duplicated clearing shift left
+    uint8_t buf[100];
+    uint8_t header_buf[(2 * sizeof(az_pair))];
+    memset(buf, 0, sizeof(buf));
+    memset(header_buf, 0, sizeof(header_buf));
+
+    az_span url_span = AZ_SPAN_FROM_BUFFER(buf);
+    az_span initial_url = AZ_SPAN_FROM_STR("http://example.com?q1=123456");
+    az_span remainder = az_span_copy(url_span, initial_url);
+    assert_int_equal(az_span_size(remainder), 100 - az_span_size(initial_url));
+    az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
+    _az_http_request request;
+
+    TEST_EXPECT_SUCCESS(az_http_request_init(
+        &request,
+        &az_context_app,
+        az_http_method_get(),
+        url_span,
+        az_span_size(initial_url),
+        header_span,
+        AZ_SPAN_FROM_STR("body")));
+
+    // set same qp new value
+    assert_return_code(
+        az_http_request_set_query_parameter(
+            &request, AZ_SPAN_FROM_STR("q1"), AZ_SPAN_FROM_STR("1")),
+        AZ_OK);
+
+    az_span expected_url = AZ_SPAN_FROM_STR("http://example.com?q1=1");
+    uint8_t result[100];
+    az_span url_result = AZ_SPAN_FROM_BUFFER(result);
+    assert_return_code(az_http_request_get_url(&request, &url_result), AZ_OK);
+    assert_true(az_span_is_content_equal(url_result, expected_url));
+
+    for (int32_t i = az_span_size(expected_url); i < az_span_size(initial_url); i++)
+    {
+      // make sure the left shift set right content to 0
+      assert_int_equal(buf[i], 0);
+    }
+  }
   { // Same size
     uint8_t buf[32];
     az_span url_span = AZ_SPAN_FROM_BUFFER(buf);
