@@ -19,6 +19,7 @@
 #include <azure/core/az_span.h>
 #include <azure/iot/az_iot_hub_client.h>
 
+#define TIMEOUT_MQTT_RECEIVE_MS (60 * 1000)
 #define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
 
 #ifdef _MSC_VER
@@ -39,6 +40,38 @@
 // DO NOT MODIFY: the path to a PEM file containing the server trusted CA
 // This is usually not needed on Linux or Mac but needs to be set on Windows.
 #define ENV_DEVICE_X509_TRUST_PEM_FILE "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE"
+
+// Logging with formatting
+#define LOG_ERROR(...) \
+  { \
+    (void)fprintf(stderr, "ERROR:\t\t%s:%s():%d: ", __FILE__, __func__, __LINE__); \
+    (void)fprintf(stderr, __VA_ARGS__); \
+    (void)fprintf(stderr, "\n"); \
+    fflush(stdout); \
+    fflush(stderr); \
+  }
+#define LOG_SUCCESS(...) \
+  { \
+    (void)printf("SUCCESS:\t"); \
+    (void)printf(__VA_ARGS__); \
+    (void)printf("\n"); \
+  }
+#define LOG(...) \
+  { \
+    (void)printf("\t\t"); \
+    (void)printf(__VA_ARGS__); \
+    (void)printf("\n"); \
+  }
+#define LOG_AZ_SPAN(span_description, span) \
+  { \
+    (void)printf("\t\t%s ", span_description); \
+    char* buffer = (char*)az_span_ptr(span); \
+    for (int32_t i = 0; i < az_span_size(span); i++) \
+    { \
+      putchar(*buffer++); \
+    } \
+    (void)printf("\n"); \
+  }
 
 static const uint8_t null_terminator = '\0';
 static char device_id[64];
@@ -72,7 +105,12 @@ static int subscribe();
 //
 // Messaging functions
 //
-static int on_received(void* context, char* topicName, int topicLen, MQTTClient_message* message);
+static void receive_message();
+static void parse_message(
+    char* topic,
+    int topic_len,
+    MQTTClient_message const* message,
+    az_iot_hub_client_c2d_request* c2d_request);
 
 int main()
 {
@@ -106,14 +144,6 @@ int main()
     return rc;
   }
 
-  // Set the callback for incoming MQTT messages
-  if ((rc = MQTTClient_setCallbacks(mqtt_client, NULL, NULL, on_received, NULL))
-      != MQTTCLIENT_SUCCESS)
-  {
-    printf("Failed to set MQTT callbacks, MQTTClient return code %d\n", rc);
-    return rc;
-  }
-
   // Connect to IoT Hub
   if ((rc = connect_device()) != MQTTCLIENT_SUCCESS)
   {
@@ -128,9 +158,9 @@ int main()
 
   printf("Subscribed to topics.\n");
 
-  // Wait for any incoming C2D messages
-  printf("Waiting for activity. [Press any key to abort]\n\n");
-  (void)getchar();
+  // Wait for any incoming C2D message
+  printf("Waiting for activity.\n\n");
+  receive_message();
 
   // Gracefully disconnect: send the disconnect packet and close the socket
   if ((rc = MQTTClient_disconnect(mqtt_client, TIMEOUT_MQTT_DISCONNECT_MS)) != MQTTCLIENT_SUCCESS)
@@ -290,39 +320,63 @@ static int subscribe()
   return MQTTCLIENT_SUCCESS;
 }
 
-static int on_received(void* context, char* topicName, int topicLen, MQTTClient_message* message)
+static void receive_message()
+//(void* context, char* topicName, int topicLen, MQTTClient_message* message)
 {
-  (void)context;
   int rc;
-
-  printf("Received a message from service.\n");
-  printf("Topic: %s\n", topicName);
-
-  if (topicLen == 0)
-  {
-    // The length of the topic if there are one or more NULL characters embedded in topicName,
-    // otherwise topicLen is 0.
-    topicLen = (int)strlen(topicName);
-  }
-  az_span topic_span = az_span_init((uint8_t*)topicName, topicLen);
-
-  // Parse the incoming message topic and check to make sure it is a C2D message
+  char* topic = NULL;
+  int topic_len = 0;
+  MQTTClient_message* message = NULL;
   az_iot_hub_client_c2d_request c2d_request;
-  if (az_failed(rc = az_iot_hub_client_c2d_parse_received_topic(&client, topic_span, &c2d_request)))
-  {
-    printf("Topic is not a C2D message, az_result return code %04x\n", rc);
-  }
-  else
-  {
-    if (message->payloadlen)
-    {
-      printf("Received payload:\n%.*s\n", message->payloadlen, (char*)message->payload);
-    }
-  }
 
-  putchar('\n');
+  // Wait until receive a message from service or timeout expires.
+  if (((rc
+          = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, TIMEOUT_MQTT_RECEIVE_MS))
+         != MQTTCLIENT_SUCCESS)
+        && (MQTTCLIENT_TOPICNAME_TRUNCATED != rc))
+  {
+    LOG_ERROR("Failed to receive message: MQTTClient return code %d.", rc);
+    exit(rc);
+  }
+  else if (NULL == message)
+  {
+    LOG_ERROR("Timeout expired: MQTTClient return code %d.", rc);
+    exit(rc);
+  }
+  else if (MQTTCLIENT_TOPICNAME_TRUNCATED == rc)
+  {
+    topic_len = (int)strlen(topic);
+  }
+  LOG_SUCCESS("Client received a message from the service.\n");
+
+  parse_message(topic, topic_len, message, &c2d_request);
+  LOG_SUCCESS("Client parsed message.");
+
   MQTTClient_freeMessage(&message);
-  MQTTClient_free(topicName);
+  MQTTClient_free(topic);
+  return;
+}
 
-  return 1;
+static void parse_message(
+    char* topic,
+    int topic_len,
+    MQTTClient_message const* message,
+    az_iot_hub_client_c2d_request* c2d_request)
+{
+  int rc;
+  az_span topic_span = az_span_init((uint8_t*)topic, topic_len);
+  az_span message_span = az_span_init((uint8_t*)message->payload, message->payloadlen);
+
+  if (az_failed(rc = az_iot_hub_client_c2d_parse_received_topic(&client, topic_span, c2d_request)))
+  {
+    LOG_ERROR("Message from unknown topic: az_result return code 0x%04x.", rc);
+    exit(rc);
+  }
+
+  LOG_SUCCESS("Client received a valid topic response:");
+  LOG_AZ_SPAN("Topic:", topic_span);
+  LOG_AZ_SPAN("Payload:", message_span);
+  //LOG("Response status: %d", response->status);
+
+  return;
 }
