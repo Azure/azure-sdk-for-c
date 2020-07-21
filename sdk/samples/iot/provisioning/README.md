@@ -59,7 +59,7 @@ set ENV_VARIABLE_NAME=VALUE
 
 Set the following environment variables:
   * `VCPKG_DEFAULT_TRIPLET` and `VCPKG_ROOT`: Refer to these [directions](https://github.com/Azure/azure-sdk-for-c#development-environment).
-  * `AZ_IOT_DEVICE_X509_TRUST_PEM_FILE`: **Only for Windows or if required by OS.** Download [BaltimoreCyberTrustRoot.crt.pem](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem) to `/azure-sdk-for-c/sdk/samples/iot/`. Copy the entire filepath to this downloaded .pem file, e.g. `C:/azure-sdk-for-c/sdk/samples/iot/BaltimoreCyberTrustRoot.crt.pem`.
+  * `AZ_IOT_DEVICE_X509_TRUST_PEM_FILE`: **Only for Windows or if required by OS.** Download [BaltimoreCyberTrustRoot.crt.pem](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem) to `/azure-sdk-for-c/sdk/samples/iot/`. Copy the full filepath to this downloaded .pem file, e.g. `C:/azure-sdk-for-c/sdk/samples/iot/BaltimoreCyberTrustRoot.crt.pem`.
 
 
 ### Paho IoT Provisioning (Certificates)
