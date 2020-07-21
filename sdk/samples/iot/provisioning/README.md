@@ -76,7 +76,7 @@ This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/i
     ```cmd
     generate_certificate.cmd
     ```
-2. In your Azure DPS, add a new individual device enrollment using the recently generated `device_ec_cert.pem` file.  See [here](https://docs.microsoft.com/en-us/azure/iot-dps/quick-create-simulated-device-x509#create-a-device-enrollment-entry-in-the-portal) for further instruction.  After creation, the Registration ID of your device should appear as `paho-sample-device1` in the Individual Enrollments tab.
+2. In your Azure DPS, add a new individual device enrollment using the recently generated `device_ec_cert.pem` file. See [here](https://docs.microsoft.com/en-us/azure/iot-dps/quick-create-simulated-device-x509#create-a-device-enrollment-entry-in-the-portal) for further instruction. After creation, the Registration ID of your device should appear as `paho-sample-device1` in the Individual Enrollments tab.
 3. Set the following environment variables:
 *  `AZ_IOT_DEVICE_X509_CERT_PEM_FILE`: Copy the path of the generated .pem file noted at the bottom of the generate_certificate output.
 *  `AZ_IOT_REGISTRATION_ID`: This should be `paho-sample-device1`.
@@ -97,7 +97,7 @@ This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/i
 ## Build and Run the Sample
 
 1. Compile the code:
-  * Enter the directory `/azure-sdk-for-c/cmake`.  If it does not exist, please create it.
+  * Enter the directory `/azure-sdk-for-c/cmake`. If it does not exist, please create it.
   * Build the directory structure and the samples:
 
     ```bash
