@@ -3,12 +3,12 @@
 
 #include "az_http_header_validation_private.h"
 #include "az_test_definitions.h"
-#include <azure/core/az_http.h>
-#include <azure/core/internal/az_http_internal.h>
 #include <az_http_private.h>
+#include <azure/core/az_http.h>
 #include <azure/core/az_http_transport.h>
 #include <azure/core/az_json.h>
 #include <azure/core/az_span.h>
+#include <azure/core/internal/az_http_internal.h>
 
 #include <azure/core/az_precondition.h>
 #include <azure/core/internal/az_precondition_internal.h>
@@ -179,6 +179,148 @@ static void test_http_request(void** state)
     // Empty header
     assert_return_code(
         az_http_request_append_header(&request, AZ_SPAN_FROM_STR("header"), AZ_SPAN_NULL), AZ_OK);
+  }
+  { // Test adding duplicated query parameters
+    uint8_t buf[100];
+    uint8_t header_buf[(2 * sizeof(az_pair))];
+    memset(buf, 0, sizeof(buf));
+    memset(header_buf, 0, sizeof(header_buf));
+
+    az_span url_span = AZ_SPAN_FROM_BUFFER(buf);
+    az_span initial_url = AZ_SPAN_FROM_STR("http://example.com");
+    az_span remainder = az_span_copy(url_span, initial_url);
+    assert_int_equal(az_span_size(remainder), 100 - az_span_size(initial_url));
+    az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
+    _az_http_request request;
+
+    TEST_EXPECT_SUCCESS(az_http_request_init(
+        &request,
+        &az_context_app,
+        az_http_method_get(),
+        url_span,
+        az_span_size(initial_url),
+        header_span,
+        AZ_SPAN_FROM_STR("body")));
+
+    // set qp
+    assert_return_code(
+        az_http_request_set_query_parameter(
+            &request, AZ_SPAN_FROM_STR("q1"), AZ_SPAN_FROM_STR("v1")),
+        AZ_OK);
+
+    // set same qp new value
+    assert_return_code(
+        az_http_request_set_query_parameter(
+            &request, AZ_SPAN_FROM_STR("q1"), AZ_SPAN_FROM_STR("value1")),
+        AZ_OK);
+
+    az_span expected_url = AZ_SPAN_FROM_STR("http://example.com?q1=value1");
+    uint8_t result[100];
+    az_span url_result = AZ_SPAN_FROM_BUFFER(result);
+    assert_return_code(az_http_request_get_url(&request, &url_result), AZ_OK);
+    assert_true(az_span_is_content_equal(url_result, expected_url));
+  }
+  { // Test adding duplicated query parameters
+    uint8_t buf[100];
+    uint8_t header_buf[(2 * sizeof(az_pair))];
+    memset(buf, 0, sizeof(buf));
+    memset(header_buf, 0, sizeof(header_buf));
+
+    az_span url_span = AZ_SPAN_FROM_BUFFER(buf);
+    az_span initial_url = AZ_SPAN_FROM_STR("http://example.com?q1=");
+    az_span remainder = az_span_copy(url_span, initial_url);
+    assert_int_equal(az_span_size(remainder), 100 - az_span_size(initial_url));
+    az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
+    _az_http_request request;
+
+    TEST_EXPECT_SUCCESS(az_http_request_init(
+        &request,
+        &az_context_app,
+        az_http_method_get(),
+        url_span,
+        az_span_size(initial_url),
+        header_span,
+        AZ_SPAN_FROM_STR("body")));
+
+    // set same qp new value
+    assert_return_code(
+        az_http_request_set_query_parameter(
+            &request, AZ_SPAN_FROM_STR("q1"), AZ_SPAN_FROM_STR("value1")),
+        AZ_OK);
+
+    az_span expected_url = AZ_SPAN_FROM_STR("http://example.com?q1=value1");
+    uint8_t result[100];
+    az_span url_result = AZ_SPAN_FROM_BUFFER(result);
+    assert_return_code(az_http_request_get_url(&request, &url_result), AZ_OK);
+    assert_true(az_span_is_content_equal(url_result, expected_url));
+  }
+  { // Test adding duplicated query parameters same value
+    uint8_t buf[100];
+    uint8_t header_buf[(2 * sizeof(az_pair))];
+    memset(buf, 0, sizeof(buf));
+    memset(header_buf, 0, sizeof(header_buf));
+
+    az_span url_span = AZ_SPAN_FROM_BUFFER(buf);
+    az_span initial_url = AZ_SPAN_FROM_STR("http://example.com?q1=123");
+    az_span remainder = az_span_copy(url_span, initial_url);
+    assert_int_equal(az_span_size(remainder), 100 - az_span_size(initial_url));
+    az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
+    _az_http_request request;
+
+    TEST_EXPECT_SUCCESS(az_http_request_init(
+        &request,
+        &az_context_app,
+        az_http_method_get(),
+        url_span,
+        az_span_size(initial_url),
+        header_span,
+        AZ_SPAN_FROM_STR("body")));
+
+    // set same qp new value
+    assert_return_code(
+        az_http_request_set_query_parameter(
+            &request, AZ_SPAN_FROM_STR("q1"), AZ_SPAN_FROM_STR("123")),
+        AZ_OK);
+
+    az_span expected_url = AZ_SPAN_FROM_STR("http://example.com?q1=123");
+    uint8_t result[100];
+    az_span url_result = AZ_SPAN_FROM_BUFFER(result);
+    assert_return_code(az_http_request_get_url(&request, &url_result), AZ_OK);
+    assert_true(az_span_is_content_equal(url_result, expected_url));
+  }
+  { // Test adding duplicated query parameter multiple qp
+    uint8_t buf[100];
+    uint8_t header_buf[(2 * sizeof(az_pair))];
+    memset(buf, 0, sizeof(buf));
+    memset(header_buf, 0, sizeof(header_buf));
+
+    az_span url_span = AZ_SPAN_FROM_BUFFER(buf);
+    az_span initial_url = AZ_SPAN_FROM_STR("http://example.com?q1=123&q2=456");
+    az_span remainder = az_span_copy(url_span, initial_url);
+    assert_int_equal(az_span_size(remainder), 100 - az_span_size(initial_url));
+    az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
+    _az_http_request request;
+
+    TEST_EXPECT_SUCCESS(az_http_request_init(
+        &request,
+        &az_context_app,
+        az_http_method_get(),
+        url_span,
+        az_span_size(initial_url),
+        header_span,
+        AZ_SPAN_FROM_STR("body")));
+
+    // set same qp new value
+    assert_return_code(
+        az_http_request_set_query_parameter(
+            &request, AZ_SPAN_FROM_STR("q1"), AZ_SPAN_FROM_STR("value1")),
+        AZ_OK);
+
+    az_span expected_url = AZ_SPAN_FROM_STR("http://example.com?q1=value1&q2=456");
+    uint8_t result[100];
+    az_span url_result = AZ_SPAN_FROM_BUFFER(result);
+    assert_return_code(az_http_request_get_url(&request, &url_result), AZ_OK);
+    assert_true(az_span_is_content_equal(url_result, expected_url));
   }
   {
     uint8_t buf[100];
