@@ -101,10 +101,10 @@ AZ_NODISCARD az_result az_http_request_append_path(_az_http_request* ref_request
   return AZ_OK;
 }
 
-// returns the query parameter value from a query paramenter name.
+// returns the query parameter value from a query parameter name.
 // Or returns AZ_SPAN_NULL if query parameter name is not found
 static AZ_NODISCARD az_span
-_az_http_request_find_query_parameter(_az_http_request* ref_request, az_span query_paramenter_name)
+_az_http_request_find_query_parameter(_az_http_request* ref_request, az_span query_parameter_name)
 {
   if (ref_request->_internal.query_start == 0)
   {
@@ -113,8 +113,8 @@ _az_http_request_find_query_parameter(_az_http_request* ref_request, az_span que
 
   az_span url = ref_request->_internal.url;
   uint8_t* query_params_ptr = az_span_ptr(url);
-  uint8_t* new_qp_name_ptr = az_span_ptr(query_paramenter_name);
-  int32_t new_qp_name_size = az_span_size(query_paramenter_name);
+  uint8_t* new_qp_name_ptr = az_span_ptr(query_parameter_name);
+  int32_t new_qp_name_size = az_span_size(query_parameter_name);
 
   // will be set to the start of the value of a qp equal to the new qp
   int32_t value_index_start = -1;
@@ -134,12 +134,12 @@ _az_http_request_find_query_parameter(_az_http_request* ref_request, az_span que
     }
     if (is_query_start == 1 && query_params_ptr[index] == new_qp_name_ptr[0])
     { // at this point, a qp name start with the same letter as the new qp
-      // Check if they have same size before comparing content by cheking if
+      // Check if they have same size before comparing content by checking if
       // adding the size of the new qp we get to the `=` delimiter
       if (query_params_ptr[index + new_qp_name_size] == '=')
       { // at this point, we know size is the same, now check the contents
         az_span existing_pq = az_span_slice(url, index, index + new_qp_name_size);
-        if (az_span_is_content_equal(existing_pq, query_paramenter_name))
+        if (az_span_is_content_equal(existing_pq, query_parameter_name))
         {
           // advance index to value start
           index = index + new_qp_name_size + 1; // +1 to jump '='
@@ -157,7 +157,7 @@ _az_http_request_find_query_parameter(_az_http_request* ref_request, az_span que
     return az_span_slice(url, value_index_start, ref_request->_internal.url_length);
   }
 
-  // didn't find the query paramenter, return null
+  // didn't find the query parameter, return null
   return AZ_SPAN_NULL;
 }
 
@@ -172,29 +172,32 @@ az_http_request_set_query_parameter(_az_http_request* ref_request, az_span name,
   _az_PRECONDITION(az_span_size(name) > 0 && az_span_size(value) > 0);
 
   // check if query parameter is already in url
-  az_span prexisting_query_parameter_value
+  az_span pre_existing_query_parameter_value
       = _az_http_request_find_query_parameter(ref_request, name);
   az_span url_remainder
       = az_span_slice_to_end(ref_request->_internal.url, ref_request->_internal.url_length);
 
-  if (az_span_ptr(prexisting_query_parameter_value) != NULL)
+  if (az_span_ptr(pre_existing_query_parameter_value) != NULL)
   { // a negative difference means shifting left and no required length.
     // a positive difference means new value will require shifting right.
-    int32_t prexisting_query_parameter_value_size = az_span_size(prexisting_query_parameter_value);
-    int32_t difference = az_span_size(value) - prexisting_query_parameter_value_size;
+    int32_t pre_existing_query_parameter_value_size
+        = az_span_size(pre_existing_query_parameter_value);
+    int32_t difference = az_span_size(value) - pre_existing_query_parameter_value_size;
     int32_t required_length = difference > 0 ? difference : 0;
     AZ_RETURN_IF_NOT_ENOUGH_SIZE(url_remainder, required_length);
 
     // There is already a query parameter name. update the value if different
-    if (az_span_is_content_equal(value, prexisting_query_parameter_value))
+    if (az_span_is_content_equal(value, pre_existing_query_parameter_value))
     {
       // No need to do anything, existing value is equal to the new one
       return AZ_OK;
     }
 
+    // ptr difference should work because value is always inside url, same memory
     uint8_t* url_prt_start = az_span_ptr(ref_request->_internal.url);
     // ptr difference should work because value is always inside url, same memory
-    int32_t value_index = (int32_t)(az_span_ptr(prexisting_query_parameter_value) - url_prt_start);
+    int32_t value_index
+        = (int32_t)(az_span_ptr(pre_existing_query_parameter_value) - url_prt_start);
 
     // Replace the value content. This might shift right or left the url contents.
     // No need to check
@@ -202,7 +205,7 @@ az_http_request_set_query_parameter(_az_http_request* ref_request, az_span name,
         ref_request->_internal.url,
         ref_request->_internal.url_length,
         value_index,
-        value_index + prexisting_query_parameter_value_size,
+        value_index + pre_existing_query_parameter_value_size,
         value));
     ref_request->_internal.url_length += difference;
     return AZ_OK;
