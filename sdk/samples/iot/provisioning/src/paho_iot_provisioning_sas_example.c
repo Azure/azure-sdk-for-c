@@ -29,10 +29,21 @@
 #include <azure/core/az_span.h>
 #include <azure/iot/az_iot_provisioning_client.h>
 
+#define TIMEOUT_MQTT_RECEIVE_MS (60 * 1000)
+#define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
+
 #ifdef _MSC_VER
 // "'getenv': This function or variable may be unsafe. Consider using _dupenv_s instead."
 #pragma warning(disable : 4996)
 #endif
+
+// DO NOT MODIFY: Service information
+#define ENV_GLOBAL_PROVISIONING_ENDPOINT_DEFAULT "ssl://global.azure-devices-provisioning.net:8883"
+#define ENV_GLOBAL_PROVISIONING_ENDPOINT "AZ_IOT_GLOBAL_PROVISIONING_ENDPOINT"
+#define ENV_ID_SCOPE "AZ_IOT_ID_SCOPE"
+
+// DO NOT MODIFY: Device information
+#define ENV_REGISTRATION_ID_SAS "AZ_IOT_REGISTRATION_ID_SAS"
 
 // DO NOT MODIFY: IoT Provisioning SAS Key
 #define ENV_IOT_PROVISIONING_SAS_KEY "AZ_IOT_PROVISIONING_SAS_KEY"
@@ -43,17 +54,6 @@
 // DO NOT MODIFY: the path to a PEM file containing the server trusted CA
 // This is usually not needed on Linux or Mac but needs to be set on Windows.
 #define ENV_DEVICE_X509_TRUST_PEM_FILE_PATH "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE"
-
-// DO NOT MODIFY: Service information
-#define ENV_GLOBAL_PROVISIONING_ENDPOINT_DEFAULT "ssl://global.azure-devices-provisioning.net:8883"
-#define ENV_GLOBAL_PROVISIONING_ENDPOINT "AZ_IOT_GLOBAL_PROVISIONING_ENDPOINT"
-#define ENV_ID_SCOPE "AZ_IOT_ID_SCOPE"
-
-// DO NOT MODIFY: Device information
-#define ENV_REGISTRATION_ID_SAS "AZ_IOT_REGISTRATION_ID_SAS"
-
-#define TIMEOUT_MQTT_RECEIVE_MS (60 * 1000)
-#define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
 
 // Logging with formatting
 #define LOG_ERROR(...) \
@@ -88,13 +88,13 @@
   }
 
 // Store environment variables
+static char global_provisioning_endpoint_buffer[256];
+static char id_scope_buffer[16];
+static char registration_id_buffer[256];
 static char iot_provisioning_sas_key_buffer[128];
 static az_span iot_provisioning_sas_key;
 static uint32_t iot_provisioning_sas_key_duration;
 static char x509_trust_pem_file_path_buffer[256];
-static char global_provisioning_endpoint_buffer[256];
-static char id_scope_buffer[16];
-static char registration_id_buffer[256];
 
 // Generate SAS key variables
 static char sas_signature_buffer[128];
@@ -109,13 +109,14 @@ static MQTTClient mqtt_client;
 static char mqtt_client_id_buffer[128];
 static char mqtt_client_username_buffer[128];
 
+// Topics
 static char register_publish_topic_buffer[128];
 static char query_topic_buffer[256];
 
 // Functions
 static void create_and_configure_client();
 static az_result read_environment_variables(
-    az_span* endpoint,
+    az_span* global_provisioning_endpoint,
     az_span* id_scope,
     az_span* registration_id);
 static az_result read_configuration_entry(
@@ -218,7 +219,23 @@ static az_result read_environment_variables(
     az_span* id_scope,
     az_span* registration_id)
 {
-  // Certification and SAS variables
+  // Connection variables
+  *global_provisioning_endpoint = AZ_SPAN_FROM_BUFFER(global_provisioning_endpoint_buffer);
+  AZ_RETURN_IF_FAILED(read_configuration_entry(
+      ENV_GLOBAL_PROVISIONING_ENDPOINT,
+      ENV_GLOBAL_PROVISIONING_ENDPOINT_DEFAULT,
+      false,
+      *global_provisioning_endpoint,
+      global_provisioning_endpoint));
+
+  *id_scope = AZ_SPAN_FROM_BUFFER(id_scope_buffer);
+  AZ_RETURN_IF_FAILED(read_configuration_entry(ENV_ID_SCOPE, NULL, false, *id_scope, id_scope));
+
+  *registration_id = AZ_SPAN_FROM_BUFFER(registration_id_buffer);
+  AZ_RETURN_IF_FAILED(read_configuration_entry(
+      ENV_REGISTRATION_ID_SAS, NULL, false, *registration_id, registration_id));
+
+  // SAS and Certification variables
   iot_provisioning_sas_key = AZ_SPAN_FROM_BUFFER(iot_provisioning_sas_key_buffer);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
       ENV_IOT_PROVISIONING_SAS_KEY,
@@ -240,22 +257,6 @@ static az_result read_environment_variables(
       false,
       x509_trust_pem_file_path,
       &x509_trust_pem_file_path));
-
-  // Connection variables
-  *global_provisioning_endpoint = AZ_SPAN_FROM_BUFFER(global_provisioning_endpoint_buffer);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_GLOBAL_PROVISIONING_ENDPOINT,
-      ENV_GLOBAL_PROVISIONING_ENDPOINT_DEFAULT,
-      false,
-      *global_provisioning_endpoint,
-      global_provisioning_endpoint));
-
-  *id_scope = AZ_SPAN_FROM_BUFFER(id_scope_buffer);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(ENV_ID_SCOPE, NULL, false, *id_scope, id_scope));
-
-  *registration_id = AZ_SPAN_FROM_BUFFER(registration_id_buffer);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_REGISTRATION_ID_SAS, NULL, false, *registration_id, registration_id));
 
   LOG(" "); // Log formatting
   return AZ_OK;
@@ -400,7 +401,11 @@ static void connect_client_to_provisioning_service()
 
   if ((rc = MQTTClient_connect(mqtt_client, &mqtt_connect_options)) != MQTTCLIENT_SUCCESS)
   {
-    LOG_ERROR("Failed to connect: MQTTClient return code %d.", rc);
+    LOG_ERROR(
+        "Failed to connect: MQTTClient return code %d.\n"
+        "If on Windows, confirm the AZ_IOT_DEVICE_X509_TRUST_PEM_FILE environment variable is set "
+        "correctly.",
+        rc);
     exit(rc);
   }
 

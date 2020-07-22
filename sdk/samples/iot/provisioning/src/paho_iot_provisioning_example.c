@@ -82,25 +82,27 @@
     (void)printf("\n"); \
   }
 
-// Buffers
-static char x509_cert_pem_file_path_buffer[256];
-static char x509_trust_pem_file_path_buffer[256];
+// Store environment variables
 static char global_provisioning_endpoint_buffer[256];
 static char id_scope_buffer[16];
 static char registration_id_buffer[256];
-static char mqtt_client_id_buffer[128];
-static char mqtt_username_buffer[128];
-static char register_publish_topic_buffer[128];
-static char query_topic_buffer[256];
+static char x509_cert_pem_file_path_buffer[256];
+static char x509_trust_pem_file_path_buffer[256];
 
 // Clients
 static az_iot_provisioning_client provisioning_client;
 static MQTTClient mqtt_client;
+static char mqtt_client_id_buffer[128];
+static char mqtt_username_buffer[128];
+
+// Topics
+static char register_publish_topic_buffer[128];
+static char query_topic_buffer[256];
 
 // Functions
 static void create_and_configure_client();
 static az_result read_environment_variables(
-    az_span* endpoint,
+    az_span* global_provisioning_endpoint,
     az_span* id_scope,
     az_span* registration_id);
 static az_result read_configuration_entry(
@@ -150,11 +152,13 @@ int main()
 static void create_and_configure_client()
 {
   int rc;
-  az_span endpoint;
+  az_span global_provisioning_endpoint;
   az_span id_scope;
   az_span registration_id;
 
-  if (az_failed(rc = read_environment_variables(&endpoint, &id_scope, &registration_id)))
+  if (az_failed(
+          rc
+          = read_environment_variables(&global_provisioning_endpoint, &id_scope, &registration_id)))
   {
     LOG_ERROR("Failed to read evironment variables: az_result return code 0x%04x.", rc);
     exit(rc);
@@ -162,7 +166,7 @@ static void create_and_configure_client()
 
   if (az_failed(
           rc = az_iot_provisioning_client_init(
-              &provisioning_client, endpoint, id_scope, registration_id, NULL)))
+              &provisioning_client, global_provisioning_endpoint, id_scope, registration_id, NULL)))
   {
     LOG_ERROR("Failed to initialize provisioning client: az_result return code 0x%04x.", rc);
     exit(rc);
@@ -178,7 +182,7 @@ static void create_and_configure_client()
 
   if ((rc = MQTTClient_create(
            &mqtt_client,
-           (char*)az_span_ptr(endpoint),
+           (char*)az_span_ptr(global_provisioning_endpoint),
            mqtt_client_id_buffer,
            MQTTCLIENT_PERSISTENCE_NONE,
            NULL))
@@ -190,27 +194,18 @@ static void create_and_configure_client()
 }
 
 static az_result read_environment_variables(
-    az_span* endpoint,
+    az_span* global_provisioning_endpoint,
     az_span* id_scope,
     az_span* registration_id)
 {
-  // Certification variables
-  az_span device_cert = AZ_SPAN_FROM_BUFFER(x509_cert_pem_file_path_buffer);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_DEVICE_X509_CERT_PEM_FILE_PATH, NULL, false, device_cert, &device_cert));
-
-  az_span trusted_cert = AZ_SPAN_FROM_BUFFER(x509_trust_pem_file_path_buffer);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_DEVICE_X509_TRUST_PEM_FILE_PATH, "", false, trusted_cert, &trusted_cert));
-
   // Connection variables
-  *endpoint = AZ_SPAN_FROM_BUFFER(global_provisioning_endpoint_buffer);
+  *global_provisioning_endpoint = AZ_SPAN_FROM_BUFFER(global_provisioning_endpoint_buffer);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
       ENV_GLOBAL_PROVISIONING_ENDPOINT,
       ENV_GLOBAL_PROVISIONING_ENDPOINT_DEFAULT,
       false,
-      *endpoint,
-      endpoint));
+      *global_provisioning_endpoint,
+      global_provisioning_endpoint));
 
   *id_scope = AZ_SPAN_FROM_BUFFER(id_scope_buffer);
   AZ_RETURN_IF_FAILED(read_configuration_entry(ENV_ID_SCOPE_ENV, NULL, false, *id_scope, id_scope));
@@ -218,6 +213,23 @@ static az_result read_environment_variables(
   *registration_id = AZ_SPAN_FROM_BUFFER(registration_id_buffer);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
       ENV_REGISTRATION_ID_ENV, NULL, false, *registration_id, registration_id));
+
+  // Certification variables
+  az_span x509_cert_pem_file_path = AZ_SPAN_FROM_BUFFER(x509_cert_pem_file_path_buffer);
+  AZ_RETURN_IF_FAILED(read_configuration_entry(
+      ENV_DEVICE_X509_CERT_PEM_FILE_PATH,
+      NULL,
+      false,
+      x509_cert_pem_file_path,
+      &x509_cert_pem_file_path));
+
+  az_span x509_trust_pem_file_path = AZ_SPAN_FROM_BUFFER(x509_trust_pem_file_path_buffer);
+  AZ_RETURN_IF_FAILED(read_configuration_entry(
+      ENV_DEVICE_X509_TRUST_PEM_FILE_PATH,
+      "",
+      false,
+      x509_trust_pem_file_path,
+      &x509_trust_pem_file_path));
 
   LOG(" "); // Log formatting
   return AZ_OK;
@@ -282,7 +294,11 @@ static void connect_client_to_provisioning_service()
 
   if ((rc = MQTTClient_connect(mqtt_client, &mqtt_connect_options)) != MQTTCLIENT_SUCCESS)
   {
-    LOG_ERROR("Failed to connect: MQTTClient return code %d.", rc);
+    LOG_ERROR(
+        "Failed to connect: MQTTClient return code %d.\n"
+        "If on Windows, confirm the AZ_IOT_DEVICE_X509_TRUST_PEM_FILE environment variable is set "
+        "correctly.",
+        rc);
     exit(rc);
   }
 
