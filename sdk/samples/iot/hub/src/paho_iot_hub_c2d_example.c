@@ -21,6 +21,7 @@
 
 #define TIMEOUT_MQTT_RECEIVE_MS (60 * 1000)
 #define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
+#define MAX_MESSAGE_COUNT 5
 
 #ifdef _MSC_VER
 // "'getenv': This function or variable may be unsafe. Consider using _dupenv_s instead."
@@ -105,11 +106,11 @@ static int subscribe();
 //
 // Messaging functions
 //
-static void receive_message();
+static void receive_messages();
 static void parse_message(
     char* topic,
     int topic_len,
-    MQTTClient_message const* message,
+    const MQTTClient_message* message,
     az_iot_hub_client_c2d_request* c2d_request);
 
 int main()
@@ -160,7 +161,7 @@ int main()
 
   // Wait for any incoming C2D message
   printf("Waiting for activity.\n\n");
-  receive_message();
+  receive_messages();
 
   // Gracefully disconnect: send the disconnect packet and close the socket
   if ((rc = MQTTClient_disconnect(mqtt_client, TIMEOUT_MQTT_DISCONNECT_MS)) != MQTTCLIENT_SUCCESS)
@@ -320,8 +321,7 @@ static int subscribe()
   return MQTTCLIENT_SUCCESS;
 }
 
-static void receive_message()
-//(void* context, char* topicName, int topicLen, MQTTClient_message* message)
+static void receive_messages()
 {
   int rc;
   char* topic = NULL;
@@ -329,28 +329,31 @@ static void receive_message()
   MQTTClient_message* message = NULL;
   az_iot_hub_client_c2d_request c2d_request;
 
-  // Wait until receive a message from service or timeout expires.
-  if (((rc
+  // Wait until max # messages received or timeout to receive a single message expires.
+  for(uint8_t message_count = 0; message_count < MAX_MESSAGE_COUNT; message_count++)
+  {
+    if (((rc
           = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, TIMEOUT_MQTT_RECEIVE_MS))
-         != MQTTCLIENT_SUCCESS)
-        && (MQTTCLIENT_TOPICNAME_TRUNCATED != rc))
-  {
-    LOG_ERROR("Failed to receive message: MQTTClient return code %d.", rc);
-    exit(rc);
-  }
-  else if (NULL == message)
-  {
-    LOG_ERROR("Timeout expired: MQTTClient return code %d.", rc);
-    exit(rc);
-  }
-  else if (MQTTCLIENT_TOPICNAME_TRUNCATED == rc)
-  {
-    topic_len = (int)strlen(topic);
-  }
-  LOG_SUCCESS("Client received a message from the service.\n");
+          != MQTTCLIENT_SUCCESS)
+          && (MQTTCLIENT_TOPICNAME_TRUNCATED != rc))
+    {
+      LOG_ERROR("Failed to receive message: MQTTClient return code %d.", rc);
+      exit(rc);
+    }
+    else if (NULL == message)
+    {
+      LOG_ERROR("Timeout expired: MQTTClient return code %d.", rc);
+      exit(rc);
+    }
+    else if (MQTTCLIENT_TOPICNAME_TRUNCATED == rc)
+    {
+      topic_len = (int)strlen(topic);
+    }
+    LOG_SUCCESS("Message #%d: Client received message from the service.", message_count + 1);
 
-  parse_message(topic, topic_len, message, &c2d_request);
-  LOG_SUCCESS("Client parsed message.");
+    parse_message(topic, topic_len, message, &c2d_request);
+    LOG_SUCCESS("Client parsed message.\n");
+  }
 
   MQTTClient_freeMessage(&message);
   MQTTClient_free(topic);
@@ -360,7 +363,7 @@ static void receive_message()
 static void parse_message(
     char* topic,
     int topic_len,
-    MQTTClient_message const* message,
+    const MQTTClient_message* message,
     az_iot_hub_client_c2d_request* c2d_request)
 {
   int rc;
@@ -372,11 +375,9 @@ static void parse_message(
     LOG_ERROR("Message from unknown topic: az_result return code 0x%04x.", rc);
     exit(rc);
   }
-
   LOG_SUCCESS("Client received a valid topic response:");
   LOG_AZ_SPAN("Topic:", topic_span);
   LOG_AZ_SPAN("Payload:", message_span);
-  //LOG("Response status: %d", response->status);
 
   return;
 }
