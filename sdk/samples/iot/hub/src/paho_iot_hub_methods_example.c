@@ -347,17 +347,17 @@ static void receive_messages()
     if (((rc
           = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, TIMEOUT_MQTT_RECEIVE_MS))
           != MQTTCLIENT_SUCCESS)
-          && (MQTTCLIENT_TOPICNAME_TRUNCATED != rc))
+          && (rc != MQTTCLIENT_TOPICNAME_TRUNCATED))
     {
       LOG_ERROR("Failed to receive message: MQTTClient return code %d.", rc);
       exit(rc);
     }
-    else if (NULL == message)
+    else if (message == NULL)
     {
       LOG_ERROR("Timeout expired: MQTTClient return code %d.", rc);
       exit(rc);
     }
-    else if (MQTTCLIENT_TOPICNAME_TRUNCATED == rc)
+    else if (rc = MQTTCLIENT_TOPICNAME_TRUNCATED)
     {
       topic_len = (int)strlen(topic);
     }
