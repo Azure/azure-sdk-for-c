@@ -22,6 +22,7 @@
 
 #define TIMEOUT_MQTT_RECEIVE_MS (60 * 1000)
 #define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
+#define MAX_MESSAGE_COUNT 5
 
 #ifdef _MSC_VER
 // "'getenv': This function or variable may be unsafe. Consider using _dupenv_s instead."
@@ -74,7 +75,6 @@
     (void)printf("\n"); \
   }
 
-
 static const uint8_t null_terminator = '\0';
 static char device_id[64];
 static char iot_hub_hostname[128];
@@ -99,7 +99,6 @@ static az_span version_name = AZ_SPAN_LITERAL_FROM_STR("$version");
 static az_iot_hub_client client;
 static MQTTClient mqtt_client;
 
-
 //
 // Configuration and connection functions
 //
@@ -119,17 +118,15 @@ static int subscribe();
 //
 static void get_twin_document();
 static void send_reported_property();
+static az_result build_reported_property(az_span* reported_property_payload);
 static void get_desired_property();
-
+static az_result update_property(az_span desired_payload);
 static void receive_message();
 static void parse_message(
     char* topic,
     int topic_len,
     const MQTTClient_message* message,
     az_iot_hub_client_twin_response* twin_response);
-
-static az_result build_reported_property(az_span* reported_property_payload);
-static az_result update_property(az_span desired_payload);
 
 int main()
 {
@@ -175,12 +172,7 @@ int main()
   }
 
   get_twin_document();
-
-  // publish reported properties
-  // receive server acknowledgement
   send_reported_property();
-
-  // receive desired properties
   get_desired_property();
 
   // Gracefully disconnect: send the disconnect packet and close the socket
@@ -357,14 +349,14 @@ static int subscribe()
 static void get_twin_document()
 {
   int rc;
-  printf("Device requesting twin document from service.\n");
+  LOG("Device requesting twin document from service.");
 
   // Get the topic to send a twin GET publish message to service.
   if (az_failed(
           rc = az_iot_hub_client_twin_document_get_publish_topic(
               &client, get_twin_topic_request_id, get_twin_topic, sizeof(get_twin_topic), NULL)))
   {
-    LOG_ERROR("Unable to get twin document publish topic, az_result return code %04x\n", rc);
+    LOG_ERROR("Unable to get twin document publish topic, az_result return code %04x", rc);
     exit(rc);
   }
 
@@ -373,7 +365,7 @@ static void get_twin_document()
   if ((rc = MQTTClient_publish(mqtt_client, get_twin_topic, 0, NULL, 0, 0, NULL))
       != MQTTCLIENT_SUCCESS)
   {
-    LOG_ERROR("Failed to publish twin document request, MQTTClient return code %d\n", rc);
+    LOG_ERROR("Failed to publish twin document request, MQTTClient return code %d", rc);
     exit(rc);
   }
 
@@ -386,19 +378,7 @@ static void send_reported_property()
 {
   int rc;
   az_span reported_property_payload;
-  printf("Device building reported property payload and sending to service.\n");
-
-  if (az_failed(rc = build_reported_property(&reported_property_payload)))
-  {
-    printf("Unable to build reported property payload to send, az_result return code %04x\n", rc);
-    exit(rc);
-  }
-
-  printf("Device sending reported property to service.\n");
-  printf(
-      "Sending payload:\n%.*s\n",
-      az_span_size(reported_property_payload),
-      az_span_ptr(reported_property_payload));
+  LOG("Device sending reported property to service.");
 
   // Get the topic used to send a reported property update
   if (az_failed(
@@ -409,9 +389,16 @@ static void send_reported_property()
               sizeof(reported_property_topic),
               NULL)))
   {
-    printf("Unable to get reported property publish topic, az_result return code %04x\n", rc);
+    LOG_ERROR("Unable to get reported property publish topic, az_result return code %04x", rc);
     exit(rc);
   }
+
+  if (az_failed(rc = build_reported_property(&reported_property_payload)))
+  {
+    LOG_ERROR("Unable to build reported property payload to send, az_result return code %04x", rc);
+    exit(rc);
+  }
+  LOG_AZ_SPAN("Sending payload:", reported_property_payload);
 
   // Publish the reported property payload to IoT Hub. This will trigger the service to send back a
   // response to this device. The response is handled in the receive_message function.
@@ -425,7 +412,7 @@ static void send_reported_property()
            NULL))
       != MQTTCLIENT_SUCCESS)
   {
-    printf("Failed to publish reported property, MQTTClient return code %d\n", rc);
+    LOG_ERROR("Failed to publish reported property, MQTTClient return code %d", rc);
     exit(rc);
   }
 
@@ -450,69 +437,17 @@ static az_result build_reported_property(az_span* reported_property_payload)
   return AZ_OK;
 }
 
-
-
-
-
 static void get_desired_property()
 {
-  LOG("Device waiting for desired property twin message from service.");
-
-  receive_message();
-  send_reported_property();
+  // Wait until max # messages received
+  for(uint8_t message_count = 0; message_count < MAX_MESSAGE_COUNT; message_count++)
+  {
+    LOG("Device waiting for desired property twin message #%d from service.", message_count + 1);
+    receive_message();
+    send_reported_property();
+  }
 
   return;
-}
-
-static az_result update_property(az_span desired_payload)
-{
-  // Parse desired property payload
-  az_json_reader json_reader;
-  AZ_RETURN_IF_FAILED(az_json_reader_init(&json_reader, desired_payload, NULL));
-
-  AZ_RETURN_IF_FAILED(az_json_reader_next_token(&json_reader));
-  if (json_reader.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
-  {
-    return AZ_ERROR_UNEXPECTED_CHAR;
-  }
-
-  AZ_RETURN_IF_FAILED(az_json_reader_next_token(&json_reader));
-
-  // Update property locally if found
-  while (json_reader.token.kind != AZ_JSON_TOKEN_END_OBJECT)
-  {
-    if (az_json_token_is_text_equal(&json_reader.token, version_name))
-    {
-      break;
-    }
-    else if (az_json_token_is_text_equal(&json_reader.token, reported_property_name))
-    {
-      // Move to the value token
-      AZ_RETURN_IF_FAILED(az_json_reader_next_token(&json_reader));
-
-      AZ_RETURN_IF_FAILED(az_json_token_get_int32(&json_reader.token, &reported_property_value));
-
-      printf(
-          "Updated \"%.*s\" locally to %d.\n",
-          az_span_size(reported_property_name),
-          az_span_ptr(reported_property_name), reported_property_value);
-
-      return AZ_OK;
-    }
-    else
-    {
-      // ignore other tokens
-      AZ_RETURN_IF_FAILED(az_json_reader_skip_children(&json_reader));
-    }
-
-    AZ_RETURN_IF_FAILED(az_json_reader_next_token(&json_reader));
-  }
-
-  printf(
-      "Did not find \"%.*s\" in desired property payload.\n",
-      az_span_size(reported_property_name),
-      az_span_ptr(reported_property_name));
-  return AZ_ERROR_ITEM_NOT_FOUND;
 }
 
 static void receive_message()
@@ -523,10 +458,9 @@ static void receive_message()
   MQTTClient_message* message = NULL;
   az_iot_hub_client_twin_response twin_response;
 
-  if (((rc
-        = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, TIMEOUT_MQTT_RECEIVE_MS))
-        != MQTTCLIENT_SUCCESS)
-        && (rc != MQTTCLIENT_TOPICNAME_TRUNCATED))
+  if (((rc = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, TIMEOUT_MQTT_RECEIVE_MS))
+       != MQTTCLIENT_SUCCESS)
+      && (rc != MQTTCLIENT_TOPICNAME_TRUNCATED))
   {
     LOG_ERROR("Failed to receive message: MQTTClient return code %d.", rc);
     exit(rc);
@@ -545,7 +479,7 @@ static void receive_message()
   parse_message(topic, topic_len, message, &twin_response);
   LOG_SUCCESS("Client parsed message.");
 
-  LOG(" "); //formatting
+  LOG(" "); // formatting
 
   MQTTClient_freeMessage(&message);
   MQTTClient_free(topic);
@@ -562,7 +496,8 @@ static void parse_message(
   az_span topic_span = az_span_init((uint8_t*)topic, topic_len);
   az_span message_span = az_span_init((uint8_t*)message->payload, message->payloadlen);
 
-  if (az_failed(rc = az_iot_hub_client_twin_parse_received_topic(&client, topic_span, twin_response)))
+  if (az_failed(
+          rc = az_iot_hub_client_twin_parse_received_topic(&client, topic_span, twin_response)))
   {
     LOG_ERROR("Message from unknown topic: az_result return code 0x%04x.", rc);
     LOG_AZ_SPAN("Topic:", topic_span);
@@ -595,4 +530,56 @@ static void parse_message(
   }
 
   return;
+}
+
+static az_result update_property(az_span desired_payload)
+{
+  // Parse desired property payload
+  az_json_reader json_reader;
+  AZ_RETURN_IF_FAILED(az_json_reader_init(&json_reader, desired_payload, NULL));
+
+  AZ_RETURN_IF_FAILED(az_json_reader_next_token(&json_reader));
+  if (json_reader.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
+  {
+    return AZ_ERROR_UNEXPECTED_CHAR;
+  }
+
+  AZ_RETURN_IF_FAILED(az_json_reader_next_token(&json_reader));
+
+  // Update property locally if found
+  while (json_reader.token.kind != AZ_JSON_TOKEN_END_OBJECT)
+  {
+    if (az_json_token_is_text_equal(&json_reader.token, version_name))
+    {
+      break;
+    }
+    else if (az_json_token_is_text_equal(&json_reader.token, reported_property_name))
+    {
+      // Move to the value token
+      AZ_RETURN_IF_FAILED(az_json_reader_next_token(&json_reader));
+
+      AZ_RETURN_IF_FAILED(az_json_token_get_int32(&json_reader.token, &reported_property_value));
+
+      LOG_SUCCESS(
+          "Client updated \"%.*s\" locally to %d.",
+          az_span_size(reported_property_name),
+          az_span_ptr(reported_property_name),
+          reported_property_value);
+
+      return AZ_OK;
+    }
+    else
+    {
+      // ignore other tokens
+      AZ_RETURN_IF_FAILED(az_json_reader_skip_children(&json_reader));
+    }
+
+    AZ_RETURN_IF_FAILED(az_json_reader_next_token(&json_reader));
+  }
+
+  LOG("Did not find \"%.*s\" in desired property payload. Nothing to update.",
+      az_span_size(reported_property_name),
+      az_span_ptr(reported_property_name));
+
+  return AZ_OK;
 }
