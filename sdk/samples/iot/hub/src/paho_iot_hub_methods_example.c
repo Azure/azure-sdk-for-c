@@ -357,7 +357,7 @@ static void receive_messages()
       LOG_ERROR("Timeout expired: MQTTClient return code %d.", rc);
       exit(rc);
     }
-    else if (rc = MQTTCLIENT_TOPICNAME_TRUNCATED)
+    else if (rc == MQTTCLIENT_TOPICNAME_TRUNCATED)
     {
       topic_len = (int)strlen(topic);
     }
