@@ -119,7 +119,7 @@ static int subscribe();
 static void get_twin_document();
 static void send_reported_property();
 static az_result build_reported_property(az_span* reported_property_payload);
-static void get_desired_property();
+static void receive_desired_property();
 static az_result update_property(az_span desired_payload);
 static void receive_message();
 static void parse_message(
@@ -173,7 +173,7 @@ int main()
 
   get_twin_document();
   send_reported_property();
-  get_desired_property();
+  receive_desired_property();
 
   // Gracefully disconnect: send the disconnect packet and close the socket
   if ((rc = MQTTClient_disconnect(mqtt_client, TIMEOUT_MQTT_DISCONNECT_MS)) != MQTTCLIENT_SUCCESS)
@@ -437,7 +437,7 @@ static az_result build_reported_property(az_span* reported_property_payload)
   return AZ_OK;
 }
 
-static void get_desired_property()
+static void receive_desired_property()
 {
   // Wait until max # messages received
   for(uint8_t message_count = 0; message_count < MAX_MESSAGE_COUNT; message_count++)
