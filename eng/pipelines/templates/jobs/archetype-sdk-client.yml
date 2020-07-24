@@ -273,8 +273,8 @@ jobs:
       checkCoverage: true
       coverageFailOption: fixed
       coverageType: branch
-      # 70% minimum branch coverage
-      coverageThreshold: 70
+      # 65% minimum branch coverage
+      coverageThreshold: 65
     condition: eq(variables['AZ_SDK_CODE_COV'], 1)
 
 - job: GenerateReleaseArtifacts
