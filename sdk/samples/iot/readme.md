@@ -42,7 +42,9 @@ This section provides an overivew of the different samples available to run and 
 **IoT Hub Twin Sample**
 * *Executable:* `paho_iot_hub_twin_sample`
 
-  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_twin_sample.c) gets the twin document, reports its property, and receives desired property messages, all from or to the Azure IoT Hub. X509 self-certification is used.  A property named `device_count` is used for this purpose. To send a device twin desired property message from the service to the device, open the device twin document in your Azure IoT Hub.  Add the property `device_count` along with a corresponding value to the `desired` section of the JSON.
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_twin_sample.c) gets the twin document, reports its property, and receives desired property messages, all from or to the Azure IoT Hub. X509 self-certification is used.  A property named `device_count` is used for this purpose.
+
+* To send a device twin desired property message from the service to the device, open the device twin document in your Azure IoT Hub.  Add the property `device_count` along with a corresponding value to the `desired` section of the JSON.
 
   ```json
   {
@@ -62,16 +64,16 @@ This section provides an overivew of the different samples available to run and 
 
   In short, the capabilities are listed here:
 * **Methods**: Invoke a method called `getMaxMinReport` with JSON payload value `"since"` with an [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) value for start time for the report. The method sends a response containing the following JSON payload:
-```json
-{
-  "maxTemp": 20,
-  "minTemp": 20,
-  "avgTemp": 20,
-  "startTime": "<ISO8601 time>",
-  "endTime": "<ISO8601 time>"
-}
-```
-with correct values substituted for each field.
+  ```json
+  {
+    "maxTemp": 20,
+    "minTemp": 20,
+    "avgTemp": 20,
+    "startTime": "<ISO8601 time>",
+    "endTime": "<ISO8601 time>"
+  }
+  ```
+  with correct values substituted for each field.
 * **Telemetry**: Device sends a JSON message with the field name `temperature` and the `double` value of the temperature.
 * **Twin**: Desired property with the field name `targetTemperature` and the `double` value for the desired temperature. Reported property with the field name `maxTempSinceLastReboot` and the `double` value for the highest temperature.Note that part of the PnP spec is a response to a desired property update from the service. The device will send back a reported property with a similarly named property and a set of "ack" values: `ac` for the HTTP-like ack code, `av` for ack version of the property, and an optional `ad` for an ack description.
 
