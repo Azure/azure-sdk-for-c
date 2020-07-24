@@ -111,7 +111,7 @@ To run the samples, ensure you have the following programs or tools installed on
 
 ## Getting Started
 ### Environment Variables
-Samples use environment variables for a variety of purposes, including filepaths and connection parameters. Please keep in mind, every time a new terminal is opened, the environment variables will have to be reset. Setting a variable will take the following form:
+Samples use environment variables for a variety of purposes, including filepaths and connection parameters. Please keep in mind, **every time a new terminal is opened, the environment variables will have to be reset**. Setting a variable will take the following form:
 
 Linux:
 ```bash
@@ -125,7 +125,7 @@ set ENV_VARIABLE_NAME=VALUE
 
 Set the following environment variables for all samples:
   * `VCPKG_DEFAULT_TRIPLET` and `VCPKG_ROOT`: Refer to these [directions](https://github.com/Azure/azure-sdk-for-c#development-environment).
-  * `AZ_IOT_DEVICE_X509_TRUST_PEM_FILE`: **Only for Windows or if required by OS.** Download [BaltimoreCyberTrustRoot.crt.pem](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem) to `/azure-sdk-for-c/sdk/samples/iot/`. Copy the full filepath to this downloaded .pem file, e.g. `C:/azure-sdk-for-c/sdk/samples/iot/BaltimoreCyberTrustRoot.crt.pem`.
+  * `AZ_IOT_DEVICE_X509_TRUST_PEM_FILE`: **Only for Windows or if required by OS.** Download [BaltimoreCyberTrustRoot.crt.pem](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem) to `\azure-sdk-for-c\sdk\samples\iot\`. Copy the full filepath to this downloaded .pem file, e.g. `C:\azure-sdk-for-c\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem`.
 
 ### Certificate Samples
 The following samples use x509 authentication to connect to Azure IoT Hub or Azure IoT Hub DPS. To easily run these samples, we have provided a script to generate a self-signed device certification used for device authentication. **This script is intended for sample use only and not to be used in production code**.
@@ -140,7 +140,7 @@ The following samples use x509 authentication to connect to Azure IoT Hub or Azu
 	  generate_certificate.cmd
 	  ```
 2. Set the following environment variable:
-  * `AZ_IOT_DEVICE_X509_CERT_PEM_FILE`: Copy the path of the generated .pem file noted near the bottom of the generate_certificate output.
+  * `AZ_IOT_DEVICE_X509_CERT_PEM_FILE`: Copy the path of the generated .pem file noted in the generate_certificate output.
 
 **IoT Hub Certificate Samples**
 *Executables:* `paho_iot_hub_c2d_sample`, `paho_iot_hub_methods_sample`, `paho_iot_hub_telemetry_sample`, `paho_iot_hub_twin_sample`, `paho_iot_hub_pnp_sample`
@@ -196,7 +196,7 @@ The following samples use SAS authentication to connect to Azure IoT Hub or Azur
 
     Linux:
     ```bash
-    ./sdk/samples/iot/provisioning/<sample executable here>
+    ./sdk/samples/iot/<sample executable here>
     ```
     Windows:
     ```cmd
