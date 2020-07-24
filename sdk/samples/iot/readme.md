@@ -15,19 +15,21 @@ More detailed step-by-step guides on how to run an IoT Hub Client sample from sc
 ## Sample Descriptions
 This section provides an overivew of the different samples available to run and what to expect from each.
 
-**IoT Hub C2D Sample** - This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_c2d_sample.c) receives incoming cloud-to-device (C2D) messages invoked from the Azure IoT Hub. X509 self-certification is used.
+**IoT Hub C2D Sample**
 * *Executable:* `paho_iot_hub_c2d_sample`
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_c2d_sample.c) receives incoming cloud-to-device (C2D) messages invoked from the Azure IoT Hub. X509 self-certification is used.
 
-**IoT Hub Methods Sample** - This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_methods_sample.c) receives incoming method commands invoked from the the Azure IoT Hub.  X509 self-certification is used.
+**IoT Hub Methods Sample**
 * *Executable:* `paho_iot_hub_methods_sample`
-* A method named "ping" is supported, which if successful will return a json payload of the following:
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_methods_sample.c) receives incoming method commands invoked from the the Azure IoT Hub.  X509 self-certification is used. A method named "ping" is supported, which if successful will return a json payload of the following:
 
   ```json
   {"response": "pong"}
   ```
 
-**IoT Hub Telemetry Sample** - This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_telemetry_sample.c) sends five telemetry messages to the Azure IoT Hub. X509 self-certification is used.
+**IoT Hub Telemetry Sample**
 * *Executable:* `paho_iot_hub_telemetry_sample`
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_telemetry_sample.c) sends five telemetry messages to the Azure IoT Hub. X509 self-certification is used.
 
 **IoT Hub SAS Telemetry Sample** - This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_sas_telemetry_sample.c) sends five telemetry messages to the Azure IoT Hub. SAS certification is used.
 * *Executable:* `paho_iot_hub_sas_telemetry_sample`
@@ -50,8 +52,8 @@ This section provides an overivew of the different samples available to run and 
 **IoT Hub PnP Sample** - Connect a PnP enabled device with the Digital Twin Model ID (DTMI) detailed [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/Thermostat.json). X509 self-certification is used.
 * *Executable:* `paho_iot_hub_pnp_sample`
 
-In short, the capabilities are listed here:
-- **Methods**: Invoke a method called `getMaxMinReport` with JSON payload value `"since"` with an [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) value for start time for the report. The method sends a response containing the following JSON payload:
+  In short, the capabilities are listed here:
+* **Methods**: Invoke a method called `getMaxMinReport` with JSON payload value `"since"` with an [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) value for start time for the report. The method sends a response containing the following JSON payload:
 ```json
 {
   "maxTemp": 20,
@@ -62,8 +64,8 @@ In short, the capabilities are listed here:
 }
 ```
 with correct values substituted for each field.
-- **Telemetry**: Device sends a JSON message with the field name `temperature` and the `double` value of the temperature.
-- **Twin**: Desired property with the field name `targetTemperature` and the `double` value for the desired temperature. Reported property with the field name `maxTempSinceLastReboot` and the `double` value for the highest temperature.Note that part of the PnP spec is a response to a desired property update from the service. The device will send back a reported property with a similarly named property and a set of "ack" values: `ac` for the HTTP-like ack code, `av` for ack version of the property, and an optional `ad` for an ack description.
+* **Telemetry**: Device sends a JSON message with the field name `temperature` and the `double` value of the temperature.
+* **Twin**: Desired property with the field name `targetTemperature` and the `double` value for the desired temperature. Reported property with the field name `maxTempSinceLastReboot` and the `double` value for the highest temperature.Note that part of the PnP spec is a response to a desired property update from the service. The device will send back a reported property with a similarly named property and a set of "ack" values: `ac` for the HTTP-like ack code, `av` for ack version of the property, and an optional `ad` for an ack description.
 
 **IoT Provisioning Sample** - This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/provisioning/src/paho_iot_provisioning_example.c) uses x509 authentication to connect to Azure IoT Hub DPS.
 * *Executable:* `paho_iot_provisioning_sample`
