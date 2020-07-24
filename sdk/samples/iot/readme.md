@@ -200,9 +200,6 @@ The following samples use SAS authentication to connect to Azure IoT Hub or Azur
     * Make it the default startup project (right-click on the sample project, then click on Set as Startup Project).
     * Build and run the project (F5 on most installations).
 
-## Troubleshooting
-
-The error policy for the Embedded C SDK client library is documented [here](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/mqtt_state_machine.md#error-policy).
 
 ## Next Steps and Additional Documentation
 
@@ -214,8 +211,9 @@ Start using the IoT Provisioning Client in your solutions!
 * For extensive documentation on Azure IoT Hub, see the [Microsoft API reference documentation](https://docs.microsoft.com/en-us/azure/iot-hub/about-iot-hub).
 * For extensive documentation on Azure IoT Hub Device Provisioning Service, see the [Microsoft API reference documentation](https://docs.microsoft.com/en-us/azure/iot-dps/).
 
-## Need Help?
+## Troubleshooting
 
+* The error policy for the Embedded C SDK client library is documented [here](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/mqtt_state_machine.md#error-policy).
 * File an issue via [Github Issues](https://github.com/Azure/azure-sdk-for-c/issues/new/choose).
 * Check [previous questions](https://stackoverflow.com/questions/tagged/azure+c) or ask new ones on StackOverflow using
   the `azure` and `c` tags.
