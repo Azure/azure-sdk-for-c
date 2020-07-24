@@ -16,12 +16,15 @@ More detailed step-by-step guides on how to run an IoT Hub Client sample from sc
 This section provides an overivew of the different samples available to run and what to expect from each.
 
 **IoT Hub C2D Sample**
+
 *Executable:* `paho_iot_hub_c2d_sample`
+
 This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_c2d_sample.c) receives incoming cloud-to-device (C2D) messages invoked from the Azure IoT Hub. X509 self-certification is used.
 
 **IoT Hub Methods Sample**
-*Executable:* `paho_iot_hub_methods_sample`
-This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_methods_sample.c) receives incoming method commands invoked from the the Azure IoT Hub.  X509 self-certification is used.
+
+* *Executable:* `paho_iot_hub_methods_sample`
+* This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_methods_sample.c) receives incoming method commands invoked from the the Azure IoT Hub.  X509 self-certification is used.
 A method named "ping" is supported, which if successful will return a json payload of the following:
 
 ```json
@@ -30,12 +33,14 @@ A method named "ping" is supported, which if successful will return a json paylo
 
 
 **IoT Hub Telemetry Sample**
-*Executable:* `paho_iot_hub_telemetry_sample`
-This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_telemetry_sample.c) sends five telemetry messages to the Azure IoT Hub. X509 self-certification is used.
+* *Executable:* `paho_iot_hub_telemetry_sample`
+* This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_telemetry_sample.c) sends five telemetry messages to the Azure IoT Hub. X509 self-certification is used.
 
 **IoT Hub SAS Telemetry Sample**
-*Executable:* `paho_iot_hub_sas_telemetry_sample`
-This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_sas_telemetry_sample.c) sends five telemetry messages to the Azure IoT Hub. SAS certification is used.
+
+* *Executable:* `paho_iot_hub_sas_telemetry_sample`
+
+* This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_sas_telemetry_sample.c) sends five telemetry messages to the Azure IoT Hub. SAS certification is used.
 
 **IoT Hub Twin Sample**
 *Executable:* `paho_iot_hub_twin_sample`
