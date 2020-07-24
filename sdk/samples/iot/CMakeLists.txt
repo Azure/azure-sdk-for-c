@@ -21,12 +21,7 @@ endif()
 
 # Azure IoT Samples Library
 add_library (az_iot_samples_common
-  ${CMAKE_CURRENT_LIST_DIR}/src/sample_sas_utility.c
-)
-
-target_include_directories (az_iot_samples_common
-  PUBLIC
-  ${CMAKE_CURRENT_LIST_DIR}/inc
+  ${CMAKE_CURRENT_LIST_DIR}/sample_sas_utility.c
 )
 
 # Internal deps
@@ -46,8 +41,86 @@ target_link_libraries(az_iot_samples_common
 
 add_library (az::iot::samples::common ALIAS az_iot_samples_common)
 
-add_subdirectory(hub)
-add_subdirectory(provisioning)
+# Azure IoT Samples Executables
+
+# C2D Sample
+add_executable (paho_iot_hub_c2d_sample
+  ${CMAKE_CURRENT_LIST_DIR}/paho_iot_hub_c2d_sample.c
+)
+
+target_link_libraries(paho_iot_hub_c2d_sample
+  PRIVATE
+    az::iot::samples::common
+)
+
+# Methods Sample
+add_executable (paho_iot_hub_methods_sample
+  ${CMAKE_CURRENT_LIST_DIR}/paho_iot_hub_methods_sample.c
+)
+
+target_link_libraries(paho_iot_hub_methods_sample
+  PRIVATE
+    az::iot::samples::common
+)
+
+# PnP Sample
+add_executable (paho_iot_hub_pnp_sample
+  ${CMAKE_CURRENT_LIST_DIR}/paho_iot_hub_pnp_sample.c
+)
+
+target_link_libraries(paho_iot_hub_pnp_sample
+  PRIVATE
+    az::iot::samples::common
+)
+
+# Telemetry (Certificates) Sample
+add_executable (paho_iot_hub_telemetry_sample
+  ${CMAKE_CURRENT_LIST_DIR}/paho_iot_hub_telemetry_sample.c
+)
+
+target_link_libraries(paho_iot_hub_telemetry_sample
+  PRIVATE
+    az::iot::samples::common
+)
+
+# Telemetry (SAS) Sample
+add_executable (paho_iot_hub_sas_telemetry_sample
+  ${CMAKE_CURRENT_LIST_DIR}/paho_iot_hub_sas_telemetry_sample.c
+)
+
+target_link_libraries(paho_iot_hub_sas_telemetry_sample
+  PRIVATE
+    az::iot::samples::common
+)
+
+# Twin Sample
+add_executable (paho_iot_hub_twin_sample
+  ${CMAKE_CURRENT_LIST_DIR}/paho_iot_hub_twin_sample.c
+)
+
+target_link_libraries(paho_iot_hub_twin_sample
+  PRIVATE
+    az::iot::samples::common
+)
+
+# Provisioning (Certificates) Sample
+add_executable (paho_iot_provisioning_sample
+  ${CMAKE_CURRENT_LIST_DIR}/paho_iot_provisioning_sample.c
+)
+
+target_link_libraries(paho_iot_provisioning_sample
+  PRIVATE
+    az::iot::samples::common
+)
+
+# Provisioning (SAS) Sample
+add_executable (paho_iot_provisioning_sas_sample
+  ${CMAKE_CURRENT_LIST_DIR}/paho_iot_provisioning_sas_sample.c
+)
+
+target_link_libraries(paho_iot_provisioning_sas_sample
+  PRIVATE
+    az::iot::samples::common
+)
 
 endif() # TRANSPORT_PAHO
-
