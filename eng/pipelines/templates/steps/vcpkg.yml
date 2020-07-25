@@ -6,28 +6,8 @@ parameters:
   # invocations
   DependenciesVariableName: vcpkg.deps
 
-  # Ref at which to check out (can be commit SHA or tag in the form of
-  # `tags/<tag>`)
-  VcpkgVersion: tags/2020.06
-
 steps:
-  # Set VCPKG_INSTALLATION_ROOT location for cache on Mac OS hosts
-  - task: Bash@3
-    inputs:
-      targetType: inline
-      workingDirectory: $(Agent.TempDirectory)
-      script: |
-        echo "##vso[task.prependpath]$(Agent.TempDirectory)/vcpkg"
-        echo "##vso[task.setvariable variable=VCPKG_INSTALLATION_ROOT;]$(Agent.TempDirectory)/vcpkg"
-    displayName: MacOS - Set VCPKG_INSTALLATION_ROOT
-    condition: >-
-      and(
-        succeeded(),
-        not(eq(variables['${{ parameters.DependenciesVariableName }}'], '')),
-        contains(variables['OSVmImage'], 'macOS')
-      )
-
-  # Set MacOS specific build environment features for vcpkg
+  # Mac OS specific requirements
   - task: Bash@3
     inputs:
       targetType: inline
@@ -39,56 +19,10 @@ steps:
         # Install gcc 9
         brew install gcc@9
         gcc --version
-    displayName: MacOS - Set tools versions
-    condition: >-
-      and(
-        succeeded(),
-        not(eq(variables['${{ parameters.DependenciesVariableName }}'], '')),
-        contains(variables['OSVmImage'], 'macOS')
-      )
 
-  # Clear the vcpkg folder so the cache can successfully deploy to that location
-  - bash: |
-      id
-      sudo rm -rf $(VCPKG_INSTALLATION_ROOT)
-      sudo mkdir -p $(VCPKG_INSTALLATION_ROOT)
-      sudo chown `id --name -u`.`id --name -g` $(VCPKG_INSTALLATION_ROOT)
-    displayName: Linux - Clear vcpkg folder
-    condition: >-
-      and(
-        succeeded(),
-        not(eq(variables['${{ parameters.DependenciesVariableName }}'], '')),
-        contains(variables['OSVmImage'], 'ubuntu')
-      )
-
-  # Attempt to restore vcpkg from the cache
-  - task: Cache@2
-    inputs:
-      key: >-
-        $(Agent.JobName)
-        | "${{ parameters.VcpkgVersion }}"
-        | $(Agent.Os)
-        | $(${{ parameters.DependenciesVariableName }})
-      path: $(VCPKG_INSTALLATION_ROOT)
-      cacheHitVar: VcpkgRestoredFromCache
-    displayName: Vcpkg Cache
-    condition: >-
-      and(
-        succeeded(),
-        not(eq(variables['${{ parameters.DependenciesVariableName }}'], '')),
-        not(eq(variables['Skip.VcpkgCache'], 'true'))
-      )
-
-  # Install vcpkg on MacOS
-  - task: Bash@3
-    inputs:
-      targetType: inline
-      workingDirectory: $(Agent.TempDirectory)
-      script: |
         git clone https://github.com/Microsoft/vcpkg.git
         cd vcpkg
         git rev-parse --verify HEAD
-        git checkout ${{ parameters.VcpkgVersion }}
         git status
 
         ./bootstrap-vcpkg.sh
@@ -103,14 +37,9 @@ steps:
 
         echo "##vso[task.prependpath]$(pwd)"
         echo "##vso[task.setvariable variable=VCPKG_INSTALLATION_ROOT;]$(pwd)"
-    condition: >-
-      and(
-        succeeded(),
-        ne(variables['VcpkgRestoredFromCache'], 'true'),
-        not(contains(variables['OSVmImage'], 'windows')),
-        not(eq(variables['${{ parameters.DependenciesVariableName }}'], ''))
-      )
-    displayName: MacOS & Linux - vcpkg bootstrap
+    # Execute only for Mac and if there is at least one dependency to be installed
+    condition: and(succeeded(), contains(variables['OSVmImage'], 'macOS'), not(eq(variables['${{ parameters.DependenciesVariableName }}'], '')))
+    displayName: vcpkg bootstrap (Mac)
 
   # Update vcpkg and re-bootstrap on non-Mac OS'. Vcpkg is installed on the
   # image at a given time stamp and not moved forward until some update
@@ -125,32 +54,16 @@ steps:
         # then pull
         git reset --hard HEAD
         git pull origin master
-        git checkout ${{ parameters.VcpkgVersion }}
 
         ./bootstrap-vcpkg.sh
-    condition: >-
-      and(
-        succeeded(),
-        ne(variables['VcpkgRestoredFromCache'], 'true'),
-        not(contains(variables['OSVmImage'], 'macOS')),
-        not(eq(variables['${{ parameters.DependenciesVariableName }}'], ''))
-      )
-    displayName: Non-MacOS - vcpkg bootstrap
+    condition: and(succeeded(), not(contains(variables['OSVmImage'], 'macOS')), not(eq(variables['${{ parameters.DependenciesVariableName }}'], '')))
+    displayName: Upgrade vcpkg
 
   - script: vcpkg version
     displayName: vcpkg version
-    condition: >-
-      and(
-        succeeded(),
-        not(eq(variables['${{ parameters.DependenciesVariableName }}'], ''))
-      )
 
   - script: |
       vcpkg install $(${{ parameters.DependenciesVariableName }})
-    displayName: Install Dependencies (vcpkg)
+    displayName: vcpkg install dependencies
     # Execute only if there is at least one dependency to be installed
-    condition: >-
-      and(
-        succeeded(),
-        not(eq(variables['${{ parameters.DependenciesVariableName }}'], ''))
-      )
+    condition: and(succeeded(), not(eq(variables['${{ parameters.DependenciesVariableName }}'], '')))
