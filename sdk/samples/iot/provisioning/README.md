@@ -61,7 +61,6 @@ Set the following environment variables:
   * `VCPKG_DEFAULT_TRIPLET` and `VCPKG_ROOT`: Refer to these [directions](https://github.com/Azure/azure-sdk-for-c#development-environment).
   * `AZ_IOT_DEVICE_X509_TRUST_PEM_FILE`: **Only for Windows or if required by OS.** Download [BaltimoreCyberTrustRoot.crt.pem](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem) to `/azure-sdk-for-c/sdk/samples/iot/`. Copy the full filepath to this downloaded .pem file, e.g. `C:/azure-sdk-for-c/sdk/samples/iot/BaltimoreCyberTrustRoot.crt.pem`.
 
-
 ### Paho IoT Provisioning (Certificates)
 **Executable:** paho_iot_provisioning_example
 
@@ -131,7 +130,6 @@ Start using the IoT Provisioning Client in your solutions!
 * More SDK details pertaining to IoT Client can be found in the [Azure IoT Client README](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot#azure-iot-clients).
 * The [Azure IoT Client MQTT State Machine](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/mqtt_state_machine.md) provides a high-level architecture and API information.
 * For extensive documentation on the Azure IoT Hub Device Provisioning Service, see the [Microsoft reference documentation](https://docs.microsoft.com/en-us/azure/iot-dps/).
-
 
 ## Contributing
 

@@ -1,27 +1,29 @@
 # How to Setup and Run Azure SDK for Embedded C IoT Hub Samples on Microsoft Windows
 
-This is a step-by-step documentation of how to start from scratch and get the Azure SDK for Embedded C IoT Hub Samples running on Microsoft Windows. 
+This is a step-by-step documentation of how to start from scratch and get the Azure SDK for Embedded C IoT Hub Samples running on Microsoft Windows.
 
-Pre-requisites:
+Prerequisites:
+
 - [Having created an Azure account](https://github.com/ewertons/azure-sdk-for-c/wiki/How-to-create-an-Azure-account)
 - [Having created an Azure IoT Hub](https://github.com/ewertons/azure-sdk-for-c/wiki/How-to-create-an-Azure-IoT-Hub)
 - Microsoft Visual Studio installed in the local machine.
 
 What is covered:
+
 - Downloading and building the Azure SDK for Embedded C suite
 - Configuring and running the IoT Hub client samples.
 
 _The following was run on Microsoft Windows 10.0.18363.836._
 
-01. Install git
+1. Install git
 
     Get the installer from the official git [page](https://git-scm.com/download/win)
 
-02. Install the latest CMake
+2. Install the latest CMake
 
     Check the latest version available on https://cmake.org/download/.
 
-    After installing, check if cmake works correctly: 
+    After installing, check if cmake works correctly:
 
     ```shell
     C:\>cmake --version
@@ -29,17 +31,17 @@ _The following was run on Microsoft Windows 10.0.18363.836._
 
     CMake suite maintained and supported by Kitware (kitware.com/cmake).
 
-    C:\> 
+    C:\>
     ```
 
-03. Install Paho using vcpkg
+3. Install Paho using vcpkg
 
     The Azure IoT SDK for C uses Eclipse Paho installed via [vcpkg](https://github.com/Microsoft/vcpkg) (for the cmake integration).
 
     ```shell
     C:\> git clone https://github.com/Microsoft/vcpkg
     C:\> cd vcpkg/
-    C:\vcpkg> bootstrap-vcpkg.bat 
+    C:\vcpkg> bootstrap-vcpkg.bat
     C:\vcpkg> vcpkg install --triplet x64-windows-static curl[winssl] cmocka paho-mqtt
     C:\vcpkg> vcpkg integrate install
     ...
@@ -49,7 +51,7 @@ _The following was run on Microsoft Windows 10.0.18363.836._
 
     > Make sure `VCPKG_ROOT` has the path where vcpkg was cloned.
 
-04. Add openssl to the PATH enviroment variable
+4. Add openssl to the PATH enviroment variable
 
     OpenSSL will be used for generating self-signed certificates.
     It gets installed by vcpkg as a dependency for Eclipse Paho.
@@ -66,14 +68,14 @@ _The following was run on Microsoft Windows 10.0.18363.836._
 
     > Note: This applies only the current command window being used. If you open a new one, this step must be done again.
 
-05. Clone the Azure Embedded SDK for C
+5. Clone the Azure Embedded SDK for C
 
     ```shell
     C:\>cd..
     C:\>git clone https://github.com/azure/azure-sdk-for-c
     ```
 
-05. Generate a self-signed certificate
+6. Generate a self-signed certificate
 
     The Azure Embedded SDK for C IoT Client samples use a self-signed certificate.
 
@@ -136,8 +138,8 @@ _The following was run on Microsoft Windows 10.0.18363.836._
 
     The fingerprint has also been placed in fingerprint.txt for future reference
     ```
-    </details>
 
+    </details>
 
     **Important**: Set the environment variables, as per the output shown above (make sure it maps to your local path as shown).
 
@@ -167,35 +169,34 @@ _The following was run on Microsoft Windows 10.0.18363.836._
     ...
     ```
 
-06. Create a logical device
+7. Create a logical device
 
     - Log into your Azure account on [Azure Portal](https://portal.azure.com)
     - On the menu on the left, click on "IoT devices" under "Explorers".
     - Click on "New".
     - Type an unique ID for your device.
-    - Select "X.509 Self-Signed" for "Authentication type". 
+    - Select "X.509 Self-Signed" for "Authentication type".
     - Type the fingerprint obtained in the previous step (in this case, the same should be used for primary and secondary Thumbprints).
     - Click on "Save".
 
-07. Collect information about Azure IoT Hub and device
+8. Collect information about Azure IoT Hub and device
 
     For the Azure IoT Embedded SDK for C samples, we will need the Azure IoT Hub name and device ID.
 
     - Get the Azure IoT Hub FQDN.
         - On your Azure IoT Hub page, click on "Overview".
         - Copy and save the "Hostname" value (in this example, "myiothub.azure-devices.net").
-    - Get the device ID. 
+    - Get the device ID.
     - On your Azure IoT Hub page, click on "IoT devices" under "Explorers".
     - On the list of devices, click on the device created on the previous step (in this example, "paho-sample-device1").
-    - Copy and save the "Device ID" value (in this example, "paho-sample-device1"). 
+    - Copy and save the "Device ID" value (in this example, "paho-sample-device1").
 
-
-08. Set the environment variables needed for the samples
+9. Set the environment variables needed for the samples
 
     According the the [readme documentation](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/samples/iot/hub) for the Azure Embedded SDK for C IoT client samples require the following environment variables.
 
     ```shell
-    set AZ_IOT_DEVICE_ID=<device ID obtained on step 7> 
+    set AZ_IOT_DEVICE_ID=<device ID obtained on step 7>
     set AZ_IOT_HUB_HOSTNAME=<FQDN obtained on step 7>
     ```
 
@@ -208,7 +209,7 @@ _The following was run on Microsoft Windows 10.0.18363.836._
     C:\azure-sdk-for-c>set AZ_IOT_HUB_HOSTNAME=myiothub.azure-devices.net
     ```
 
-9.  Create and open the solution for the Azure Embedded SDK for C
+10. Create and open the solution for the Azure Embedded SDK for C
 
     Back into the folder where the Azure SDK for C was cloned...
 
@@ -220,8 +221,7 @@ _The following was run on Microsoft Windows 10.0.18363.836._
     C:\azure-sdk-for-c\cmake>az.sln
     ```
 
-10. Build and run the samples.
-
+11. Build and run the samples.
 
     ### Telemetry (device-to-cloud messages)
 
@@ -245,11 +245,10 @@ _The following was run on Microsoft Windows 10.0.18363.836._
     Messages Sent [Press ENTER to shut down]
     ```
 
-
     ### Cloud-to-Device (c2d) messages
 
-    This sample requires two actions: 
-    - connecting the Azure IoT SDK device client to the hub, and 
+    This sample requires two actions:
+    - connecting the Azure IoT SDK device client to the hub, and
     - sending a c2d message through the Azure Portal.
 
     First, run the sample:
@@ -282,16 +281,15 @@ _The following was run on Microsoft Windows 10.0.18363.836._
 
     Note: the sample does not terminate automatically. In the output above Enter has been pressed.
 
-
     ### Direct Methods
 
-    This sample requires two actions: 
-    - connecting the Azure IoT SDK device client to the hub, and 
+    This sample requires two actions:
+    - connecting the Azure IoT SDK device client to the hub, and
     - triggering the direct method through the Azure Portal.
 
     First, run the sample:
 
-    On the `az.sln` solution open on Visual Studio, 
+    On the `az.sln` solution open on Visual Studio,
     - Navigate on the Solution Explorer panel to `paho_iot_hub_methods_example` solution;
     - Make it the default startup project (right-click on `paho_iot_hub_methods_example` project, then click on `Set as StartUp Project`);
     - Build and run the project (`F5` on most installations).
@@ -305,7 +303,6 @@ _The following was run on Microsoft Windows 10.0.18363.836._
     - On "Payload", type `{ "somevalue": 1234 }` (the payload MUST be a valid Json).
     - Click on "Invoke Method".
     - See the reply from the sample on "Result" (bottom of the page).
-
 
     Back to the Visual Studio Command prompt, verify that the direct method has been received by the sample:
 
@@ -323,7 +320,6 @@ _The following was run on Microsoft Windows 10.0.18363.836._
     ```
 
     Note: the sample does not terminate automatically. In the output above Enter has been pressed.
-
 
     ### Device Twin
 
@@ -378,8 +374,8 @@ _The following was run on Microsoft Windows 10.0.18363.836._
 
 ## Need Help?
 
-* File an issue via [Github Issues](https://github.com/Azure/azure-sdk-for-c/issues/new/choose).
-* Check [previous questions](https://stackoverflow.com/questions/tagged/azure+c) or ask new ones on StackOverflow using
+- File an issue via [Github Issues](https://github.com/Azure/azure-sdk-for-c/issues/new/choose).
+- Check [previous questions](https://stackoverflow.com/questions/tagged/azure+c) or ask new ones on StackOverflow using
   the `azure` and `c` tags.
 
 ## Contributing

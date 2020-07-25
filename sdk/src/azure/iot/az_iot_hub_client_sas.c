@@ -32,7 +32,6 @@ static const az_span sr_string = AZ_SPAN_LITERAL_FROM_STR(SAS_TOKEN_SR);
 static const az_span sig_string = AZ_SPAN_LITERAL_FROM_STR(SAS_TOKEN_SIG);
 static const az_span se_string = AZ_SPAN_LITERAL_FROM_STR(SAS_TOKEN_SE);
 
-
 AZ_NODISCARD az_result az_iot_hub_client_sas_get_signature(
     az_iot_hub_client const* client,
     uint64_t token_expiration_epoch_time,
@@ -95,7 +94,6 @@ AZ_NODISCARD az_result az_iot_hub_client_sas_get_password(
   //               plus, if key_name size > 0, "&skn=" key_name
 
   az_span mqtt_password_span = az_span_init((uint8_t*)mqtt_password, (int32_t)mqtt_password_size);
-
 
   // SharedAccessSignature
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_password_span, az_span_size(sr_string) + 1 /* EQUAL_SIGN */);

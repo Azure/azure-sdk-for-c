@@ -1,24 +1,26 @@
 # How to Setup and Run Azure SDK for Embedded C IoT Hub Samples on Linux
 
-This is a step-by-step guide of how to start from scratch and get the Azure SDK for Embedded C IoT Hub Samples running. 
+This is a step-by-step guide of how to start from scratch and get the Azure SDK for Embedded C IoT Hub Samples running.
 
-Pre-requisites:
+Prerequisites:
+
 - [Having created an Azure account](https://github.com/ewertons/azure-sdk-for-c/wiki/How-to-create-an-Azure-account)
 - [Having created an Azure IoT Hub](https://github.com/ewertons/azure-sdk-for-c/wiki/How-to-create-an-Azure-IoT-Hub)
 
 What is covered:
+
 - Downloading and building the Azure SDK for Embedded C suite
 - Configuring and running the IoT Hub client samples.  
 
 _The following was run on an Ubuntu Desktop 18.04 environment, but it also works on WSL 1 and 2 (Windows Subsystem for Linux)_
 
-01. Install library dependencies
+1. Install library dependencies
 
-    ```
+    ```shell
     sudo apt-get install unzip git build-essential pkg-config libssl-dev
     ```
 
-02. Install the latest cmake
+2. Install the latest cmake
 
     Check the latest version available on https://cmake.org/download/.
 
@@ -27,31 +29,31 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     ```shell
     $ sudo apt-get purge cmake
     $ wget https://github.com/Kitware/CMake/releases/download/v3.17.2/cmake-3.17.2.tar.gz
-    $ tar -xvzf cmake-3.17.2.tar.gz 
+    $ tar -xvzf cmake-3.17.2.tar.gz
     $ cd cmake-3.17.2/
-    /cmake-3.17.2$ ./bootstrap 
+    /cmake-3.17.2$ ./bootstrap
     /cmake-3.17.2$ sudo make install
     ```
 
-    Now we need to check if Cmake was correctly installed: 
+    Now we need to check if Cmake was correctly installed:
 
     ```shell
     cmake-3.17.2$ cmake --version
     cmake version 3.17.2
 
     CMake suite maintained and supported by Kitware (kitware.com/cmake).
-    /cmake-3.17.2$ 
+    /cmake-3.17.2$
     ```
 
-03. Install Paho using vcpkg
- 
+3. Install Paho using vcpkg
+
     The Azure IoT SDK for C uses Eclipse Paho for C installed via vcpkg (for the cmake integration).
 
     ```shell
     $ cd
     $ git clone https://github.com/Microsoft/vcpkg
     $ cd vcpkg/
-    /vcpkg$ ./bootstrap-vcpkg.sh 
+    /vcpkg$ ./bootstrap-vcpkg.sh
     /vcpkg$ ./vcpkg install paho-mqtt
     ...
     Total elapsed time: 2.835 min
@@ -68,22 +70,22 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     CMake projects should use: "-DCMAKE_TOOLCHAIN_FILE=/vcpkg/scripts/buildsystems/vcpkg.cmake"
     ```
 
-04. Clone the Azure SDK for C
+4. Clone the Azure SDK for C
 
     ```shell
     $ cd
     $ git clone https://github.com/azure/azure-sdk-for-c
     ```
 
-05. Generate a self-signed certificate
+5. Generate a self-signed certificate
 
     The Azure Embedded SDK for C IoT Client samples use a self-signed certificate.
 
-    A script is provided for creating that certificate. 
+    A script is provided for creating that certificate.
 
     ```shell
     $ cd azure-sdk-for-c/sdk/samples/iot/hub/src
-    azure-sdk-for-c/sdk/samples/iot/hub/src$ ./generate_certificate.sh 
+    azure-sdk-for-c/sdk/samples/iot/hub/src$ ./generate_certificate.sh
     ```
 
     <details>
@@ -92,7 +94,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     </summary>
 
     ```shell
-    azure-sdk-for-c/sdk/samples/iot/hub/src$ ./generate_certificate.sh 
+    azure-sdk-for-c/sdk/samples/iot/hub/src$ ./generate_certificate.sh
     Certificate:
         Data:
             Version: 1 (0x0)
@@ -133,12 +135,13 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
 
     Sample certificate generated
     Use the device_cert_store.pem file within the sample:
-    export AZ_IOT_DEVICE_X509_CERT_PEM_FILE=/azure-sdk-for-c/sdk/samples/iot/hub/src/device_cert_store.pem	
+    export AZ_IOT_DEVICE_X509_CERT_PEM_FILE=/azure-sdk-for-c/sdk/samples/iot/hub/src/device_cert_store.pem
 
     Use the following fingerprint when creating your device in IoT Hub (must remove colons):
     SHA1 Fingerprint=C8DC8780C64FFBB5A66D8BC5D39D3C1BBB03FB69
     /azure-sdk-for-c/sdk/samples/iot/hub/src$
     ```
+
     </details>
 
     Do not forget to set the environment variable above, making sure it maps to your local path.
@@ -150,31 +153,29 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     Save the certificate Fingerprint above (in this example, `C8DC8780C64FFBB5A66D8BC5D39D3C1BBB03FB69`).
     It will be used to create the logical device on your Azure IoT Hub.
 
-
-06. Create a logical device
+6. Create a logical device
 
     - Log into your Azure account on [Azure Portal](https://portal.azure.com)
     - On the menu on the left, click on "IoT devices" under "Explorers".
     - Click on "New".
     - Type an unique ID for your device.
-    - Select "X.509 Self-Signed" for "Authentication type". 
+    - Select "X.509 Self-Signed" for "Authentication type".
     - Type the fingerprint obtained in the previous step (the same can be used for primary and secondary Thumbprints; no colons!).
     - Click on "Save".
 
-07. Collect information about Azure IoT Hub and device
+7. Collect information about Azure IoT Hub and device
 
     For the Azure IoT Embedded SDK for C samples, we will need the Azure IoT Hub name and device ID.
 
     - Get the Azure IoT Hub FQDN.
         - On your Azure IoT Hub page, click on "Overview".
         - Copy and save the "Hostname" value (in this example, "myiothub.azure-devices.net").
-    - Get the device ID. 
+    - Get the device ID.
       - On your Azure IoT Hub page, click on "IoT devices" under "Explorers".
       - On the list of devices, click on the device created on the previous step (in this example, "testdevice-x509").
-      - Copy and save the "Device ID" value (in this example, "testdevice-x509"). 
+      - Copy and save the "Device ID" value (in this example, "testdevice-x509").
 
-
-08. Build the Azure SDK for C
+8. Build the Azure SDK for C
 
     Back into the folder where the Azure SDK for C was cloned...
 
@@ -186,8 +187,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     /azure-sdk-for-c/cmake$ make -j
     ```
 
-
-09. Set the environment variables needed for the samples
+9. Set the environment variables needed for the samples
 
     According the the [readme documentation](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/samples/iot/hub) for the Azure Embedded SDK for C IoT client samples require the following environment variables.
 
@@ -231,9 +231,9 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     ### Telemetry (device-to-cloud messages)
 
     ```shell
-    /azure-sdk-for-c/cmake/sdk/samples/iot/hub/$ ./paho_iot_hub_telemetry_example 
+    /azure-sdk-for-c/cmake/sdk/samples/iot/hub/$ ./paho_iot_hub_telemetry_example
     X509 Certificate PEM Store File = /azure-sdk-for-c/sdk/samples/iot/hub/src/device_cert_store.pem
-    X509 Trusted PEM Store File = 
+    X509 Trusted PEM Store File =
     Device ID = testdevice-x509
     IoT Hub Hostname = myiothub.azure-devices.net
     Sending Message 1
@@ -247,19 +247,18 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     /azure-sdk-for-c/cmake/sdk/samples/iot/hub/$
     ```
 
-
     ### Cloud-to-Device (c2d) messages
 
-    This sample requires two actions: 
-    - connecting the Azure IoT SDK device client to the hub, and 
+    This sample requires two actions:
+    - connecting the Azure IoT SDK device client to the hub, and
     - sending a c2d message through the Azure Portal.
 
     First, run the sample:
 
     ```shell
-    /azure-sdk-for-c/cmake/sdk/samples/iot/hub/$ ./paho_iot_hub_c2d_example 
+    /azure-sdk-for-c/cmake/sdk/samples/iot/hub/$ ./paho_iot_hub_c2d_example
     X509 Certificate PEM Store File = /azure-sdk-for-c/sdk/samples/iot/hub/src/device_cert_store.pem
-    X509 Trusted PEM Store File = 
+    X509 Trusted PEM Store File =
     Device ID = testdevice-x509
     IoT Hub Hostname = myiothub.azure-devices.net
     Posting connect semaphore for client testdevice-x509 rc 0Subscribed to topics.
@@ -281,9 +280,9 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     Back to the shell, verify that the message has been received by the sample:
 
     ```shell
-    /azure-sdk-for-c/cmake/sdk/samples/iot/hub/$ ./paho_iot_hub_c2d_example 
+    /azure-sdk-for-c/cmake/sdk/samples/iot/hub/$ ./paho_iot_hub_c2d_example
     X509 Certificate PEM Store File = /azure-sdk-for-c/sdk/samples/iot/hub/src/device_cert_store.pem
-    X509 Trusted PEM Store File = 
+    X509 Trusted PEM Store File =
     Device ID = testdevice-x509
     IoT Hub Hostname = myiothub.azure-devices.net
     Posting connect semaphore for client testdevice-x509 rc 0Subscribed to topics.
@@ -293,10 +292,9 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
 
     Disconnected.
     /azure-sdk-for-c/cmake/sdk/samples/iot/hub/$
-    ``` 
+    ```
 
     Note: the sample does not terminate automatically. In the output above Enter has been pressed.
-
 
     ### Direct Methods
 
@@ -327,7 +325,6 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     - See the reply from the sample on "Result" (bottom of the page).
       ![Response](../../../../docs/iot/resources/embc_samples_05_methods_response.png)
 
-
     Back to the shell, verify that the message has been received by the sample:
 
     ```shell
@@ -349,13 +346,12 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
 
     Note: the sample does not terminate automatically. In the output above Enter has been pressed.
 
-
     ### Device Twin
 
     ```shell
-    /azure-sdk-for-c/cmake/sdk/samples/iot/hub/$ ./paho_iot_hub_twin_example 
+    /azure-sdk-for-c/cmake/sdk/samples/iot/hub/$ ./paho_iot_hub_twin_example
     X509 Certificate PEM Store File = /azure-sdk-for-c/sdk/samples/iot/hub/src/device_cert_store.pem
-    X509 Trusted PEM Store File = 
+    X509 Trusted PEM Store File =
     Device ID = testdevice-x509
     IoT Hub Hostname = myiothub.azure-devices.net
     Posting connect semaphore for client testdevice-x509 rc 0Subscribed to topics.
@@ -397,8 +393,8 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
 
 ## Need Help?
 
-* File an issue via [Github Issues](https://github.com/Azure/azure-sdk-for-c/issues/new/choose).
-* Check [previous questions](https://stackoverflow.com/questions/tagged/azure+c) or ask new ones on StackOverflow using
+- File an issue via [Github Issues](https://github.com/Azure/azure-sdk-for-c/issues/new/choose).
+- Check [previous questions](https://stackoverflow.com/questions/tagged/azure+c) or ask new ones on StackOverflow using
   the `azure` and `c` tags.
 
 ## Contributing
