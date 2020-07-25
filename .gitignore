@@ -312,6 +312,3 @@ build/
 
 # Cert fingerprint output
 fingerprint.txt
-
-# Swap Files
-*.swp
