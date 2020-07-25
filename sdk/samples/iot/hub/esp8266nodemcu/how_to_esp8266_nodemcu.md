@@ -25,7 +25,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, with Arduino IDE 
 01. Create an Arduino library for Azure Embedded SDK for C 
 
     ```
-    $ wget https://raw.githubusercontent.com/Azure/azure-sdk-for-c/master/sdk/samples/iot/hub/aziot_esp8266/generate_arduino_zip_library.sh
+    $ wget https://raw.githubusercontent.com/Azure/azure-sdk-for-c/master/sdk/samples/iot/hub/esp8266nodemcu/generate_arduino_zip_library.sh
     $ chmod 777 generate_arduino_zip_library.sh
     $ ./generate_arduino_zip_library.sh
     ```
@@ -53,9 +53,41 @@ _The following was run on an Ubuntu Desktop 18.04 environment, with Arduino IDE 
     - Search for `PubSubClient` (by Nick O'Leary)
     - Hover over the library item on the result list, then click on Install.
 
-05. Create a sketch on Arduino IDE for the IoT Hub client telemetry sample
+05. Fix PubSubClient library locally
 
-    Clone the [azure-sdk-for-c](https://github.com/Azure/azure-sdk-for-c) repo locally then open the [ESP8266 sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/hub/aziot_esp8266) (from local clone) on Arduino IDE. 
+    PubSubClient defines the default MQTT maximum packet size to be 128 bytes.
+
+    That is not enough to send and receive packets to/from the Azure IoT Hub.
+
+    Currently the library also does not provide a dynamic way to change the maximum MQTT packet size ([see known issue](https://github.com/knolleary/pubsubclient/issues/110)).
+
+    Also, the Arduino IDE does not propage #defines into the library dependencies (they get compiled before the sketch).
+
+    Finally, the Arduino IDE does not take compiler flags.
+
+    So the PubSubClient library code must be changed to make `MQTT_MAX_PACKET_SIZE` larger (e.g, 1024).
+
+    To make the change, search for the file in your system
+
+    ```
+    find / -iname PubSubClient.h
+    ```
+
+    Open the PubSubClient.h file in your favorite text editor.
+
+    Search for the line that defines the macro `MQTT_MAX_PACKET_SIZE`.
+
+    Change the value of the macro to a higher number, like 1024.
+
+    ```c
+    #define MQTT_MAX_PACKET_SIZE 1024
+    ```
+
+    Save and close the `PubSubClient.h` file.
+
+06. Create a sketch on Arduino IDE for the IoT Hub client telemetry sample
+
+    Copy the code from the [ESP8266 Node MCU sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/hub/esp8266nodemcu) into your sketch.
     
     Edit the following parameters in `iot_configs.h`, filling in your own information:
 
@@ -72,14 +104,14 @@ _The following was run on an Ubuntu Desktop 18.04 environment, with Arduino IDE 
 
     Save the file.
 
-06. Connect the Esp8266 NodeMCU microcontroller to your USB port
+07. Connect the Esp8266 NodeMCU microcontroller to your USB port
 
-07. On the Arduino IDE, select the board and port
+08. On the Arduino IDE, select the board and port
 
     - Go to menu `Tools`, `Board` and select `NodeMCU 1.0 (ESP-12E Module)`
     - Go to menu `Tools`, `Port` and select the port where the microcontroller is connected to.
 
-08. Upload the sketch
+09. Upload the sketch
 
     - Go to menu `Sketch` and click on `Upload`.
 
@@ -135,7 +167,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, with Arduino IDE 
     Hard resetting via RTS pin...
     </details>
 
-09. Monitor the micro-controller
+10. Monitor the micro-controller
 
     Go to menu `Tools`, `Serial Monitor`.
 
@@ -154,7 +186,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, with Arduino IDE 
 
     ```
 
-10. Monitor the telemetry messages sent to the Azure IoT Hub 
+11. Monitor the telemetry messages sent to the Azure IoT Hub 
 
     ```
     $ az iot hub monitor-events --login <your Azure IoT Hub connection string in quotes> --device-id <your device id>
