@@ -192,7 +192,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     According the the [readme documentation](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/samples/iot/hub) for the Azure Embedded SDK for C IoT client samples require the following environment variables.
 
     ```shell
-    export AZ_IOT_DEVICE_ID=<device ID obtained on step 7> 
+    export AZ_IOT_DEVICE_ID=<device ID obtained on step 7>
     export AZ_IOT_HUB_HOSTNAME=<FQDN obtained on step 7>
     ```
 
@@ -269,7 +269,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     On the Azure Portal,
     - Go to your Azure IoT hub page.
     - Click on "IoT devices" under "Explorers".
-    - From the list of devices, click on your device (created on step 8).
+    - From the list of devices, click on your device (created on step 6).
       ![Device page](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot/resources/embc_samples_01_device.png)
     - Click on "Message to Device".
     - On "Message Body", type "Hello world!" (too cheesy? how about "Lorem Ipsum"?)
@@ -303,7 +303,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     First, run the sample:
 
     ```shell
-    /azure-sdk-for-c/cmake/sdk/samples/iot/hub/$ ./paho_iot_hub_methods_example 
+    /azure-sdk-for-c/cmake/sdk/samples/iot/hub/$ ./paho_iot_hub_methods_example
     X509 Certificate PEM Store File = /azure-sdk-for-c/sdk/samples/iot/hub/src/device_cert_store.pem
     X509 Trusted PEM Store File = 
     Device ID = testdevice-x509
@@ -316,7 +316,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     On the Azure Portal,
     - Go to your Azure IoT hub page.
     - Click on "IoT devices" under "Explorers".
-    - From the list of devices, click on your device (created on step Z).
+    - From the list of devices, click on your device (created on step 6).
     - Click on "Direct Method".
       ![Methods](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot/resources/embc_samples_04_methods.png)
     - On "Method Name", type "ping" (the sample expects the name "ping").
@@ -328,7 +328,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     Back to the shell, verify that the message has been received by the sample:
 
     ```shell
-    /azure-sdk-for-c/cmake/sdk/samples/iot/hub/$ ./paho_iot_hub_methods_example 
+    /azure-sdk-for-c/cmake/sdk/samples/iot/hub/$ ./paho_iot_hub_methods_example
     X509 Certificate PEM Store File = /azure-sdk-for-c/sdk/samples/iot/hub/src/device_cert_store.pem
     X509 Trusted PEM Store File = 
     Device ID = testdevice-x509

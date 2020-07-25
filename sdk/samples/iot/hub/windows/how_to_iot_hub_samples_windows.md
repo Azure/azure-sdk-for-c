@@ -196,11 +196,11 @@ _The following was run on Microsoft Windows 10.0.18363.836._
     According the the [readme documentation](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/samples/iot/hub) for the Azure Embedded SDK for C IoT client samples require the following environment variables.
 
     ```shell
-    set AZ_IOT_DEVICE_ID=<device ID obtained on step 7>
-    set AZ_IOT_HUB_HOSTNAME=<FQDN obtained on step 7>
+    set AZ_IOT_DEVICE_ID=<device ID obtained on step 8>
+    set AZ_IOT_HUB_HOSTNAME=<FQDN obtained on step 8>
     ```
 
-    AZ_IOT_DEVICE_X509_CERT_PEM_FILE and AZ_IOT_DEVICE_X509_TRUST_PEM_FILE have already been set on step 5.
+    AZ_IOT_DEVICE_X509_CERT_PEM_FILE and AZ_IOT_DEVICE_X509_TRUST_PEM_FILE have already been set on step 6.
 
     Using the values from the example above, the export command would look like this (don't run these command lines, you should use your own device ID and hostname)
 
@@ -261,7 +261,7 @@ _The following was run on Microsoft Windows 10.0.18363.836._
     On the Azure Portal,
     - Go to your Azure IoT hub page.
     - Click on "IoT devices" under "Explorers".
-    - From the list of devices, click on your device (created on step 6).
+    - From the list of devices, click on your device (created on step 7).
     - Click on "Message to Device".
     - On "Message Body", type "Hello world!" (too cheesy? how about "Lorem Ipsum"?)
     - Click on "Send Message".
@@ -297,7 +297,7 @@ _The following was run on Microsoft Windows 10.0.18363.836._
     On the Azure Portal,
     - Go to your Azure IoT hub page.
     - Click on "IoT devices" under "Explorers".
-    - From the list of devices, click on your device (created on step 6).
+    - From the list of devices, click on your device (created on step 7).
     - Click on "Direct Method".
     - On "Method Name", type `ping` (the sample expects the name `ping`).
     - On "Payload", type `{ "somevalue": 1234 }` (the payload MUST be a valid Json).

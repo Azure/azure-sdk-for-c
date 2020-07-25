@@ -44,7 +44,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, with Arduino IDE 
 4. Install the Azure SDK for C zip library
 
     - On the Arduino IDE, go to `Sketch`, `Include Library`, `Add .ZIP Library...`
-    - Search for the `azure-sdk-for-c.zip` created on step 01
+    - Search for the `azure-sdk-for-c.zip` created on step 1
     - Select the file `azure-sdk-for-c.zip` and click on `OK`
 
 5. Install the Arduino PubSubClient library
