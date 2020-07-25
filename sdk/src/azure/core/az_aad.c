@@ -4,9 +4,9 @@
 #include "az_aad_private.h"
 #include "az_credential_token_private.h"
 #include <azure/core/az_http.h>
+#include <azure/core/internal/az_http_internal.h>
 #include <azure/core/az_json.h>
 #include <azure/core/az_platform.h>
-#include <azure/core/internal/az_http_internal.h>
 #include <azure/core/internal/az_precondition_internal.h>
 #include <azure/core/internal/az_span_internal.h>
 
@@ -77,55 +77,6 @@ AZ_NODISCARD az_result _az_aad_build_body(
   return AZ_OK;
 }
 
-AZ_NODISCARD static az_result _az_parse_json_payload(
-    az_span body,
-    uint64_t* expires_in_seconds,
-    az_json_token* json_access_token)
-{
-  az_json_parser jp;
-  AZ_RETURN_IF_FAILED(az_json_parser_init(&jp, body, NULL));
-
-  AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
-  if (jp.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
-  {
-    return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
-  }
-
-  bool found_expires_in = false;
-  bool found_access_token = false;
-
-  AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
-
-  while (jp.token.kind != AZ_JSON_TOKEN_END_OBJECT)
-  {
-    if (az_json_token_is_text_equal(&jp.token, AZ_SPAN_FROM_STR("expires_in")))
-    {
-      AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
-      AZ_RETURN_IF_FAILED(az_json_token_get_uint64(&jp.token, expires_in_seconds));
-      found_expires_in = true;
-    }
-    else if (az_json_token_is_text_equal(&jp.token, AZ_SPAN_FROM_STR("access_token")))
-    {
-      AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
-      *json_access_token = jp.token;
-      found_access_token = true;
-    }
-    else
-    {
-      // ignore other tokens
-      AZ_RETURN_IF_FAILED(az_json_parser_skip_children(&jp));
-    }
-    AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
-  }
-
-  if (!found_expires_in || !found_access_token)
-  {
-    return AZ_ERROR_ITEM_NOT_FOUND;
-  }
-
-  return AZ_OK;
-}
-
 AZ_NODISCARD az_result _az_aad_request_token(_az_http_request* request, _az_token* out_token)
 {
   AZ_RETURN_IF_FAILED(az_http_request_append_header(
@@ -170,14 +121,24 @@ AZ_NODISCARD az_result _az_aad_request_token(_az_http_request* request, _az_toke
   az_span body = { 0 };
   AZ_RETURN_IF_FAILED(az_http_response_get_body(&response, &body));
 
-  uint64_t expires_in_seconds = 0;
-  az_json_token json_access_token = { 0 };
-  AZ_RETURN_IF_FAILED(_az_parse_json_payload(body, &expires_in_seconds, &json_access_token));
+  // Expiration
+  az_json_token json_token;
+  AZ_RETURN_IF_FAILED(az_json_parse_by_pointer(body, AZ_SPAN_FROM_STR("/expires_in"), &json_token));
+
+  double expires_in_seconds = 0;
+  AZ_RETURN_IF_FAILED(az_json_token_get_number(&json_token, &expires_in_seconds));
 
   // We'll assume the token expires 3 minutes prior to its actual expiration.
   int64_t const expires_in_msec
       = (((int64_t)expires_in_seconds) - (3 * _az_TIME_SECONDS_PER_MINUTE))
       * _az_TIME_MILLISECONDS_PER_SECOND;
+
+  // Access token
+  AZ_RETURN_IF_FAILED(
+      az_json_parse_by_pointer(body, AZ_SPAN_FROM_STR("/access_token"), &json_token));
+
+  az_span access_token = { 0 };
+  AZ_RETURN_IF_FAILED(az_json_token_get_string(&json_token, &access_token));
 
   _az_token new_token = {
     ._internal = {
@@ -189,14 +150,10 @@ AZ_NODISCARD az_result _az_aad_request_token(_az_http_request* request, _az_toke
 
   az_span new_token_span = AZ_SPAN_FROM_BUFFER(new_token._internal.token);
   az_span remainder = az_span_copy(new_token_span, AZ_SPAN_FROM_STR("Bearer "));
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, az_span_size(access_token));
+  remainder = az_span_copy(remainder, access_token);
 
-  int32_t bytes_written = 0;
-  AZ_RETURN_IF_FAILED(az_json_token_get_string(
-      &json_access_token, (char*)az_span_ptr(remainder), az_span_size(remainder), &bytes_written));
-
-  new_token._internal.token_length
-      = (int16_t)(_az_span_diff(remainder, new_token_span) + bytes_written);
-
+  new_token._internal.token_length = (int16_t)_az_span_diff(remainder, new_token_span);
   *out_token = new_token;
 
   return AZ_OK;

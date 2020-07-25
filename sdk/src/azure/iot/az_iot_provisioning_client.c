@@ -251,13 +251,15 @@ https://docs.microsoft.com/en-us/rest/api/iot-dps/runtimeregistration/registerde
     "etag":"IjYxMDA4ZDQ2LTAwMDAtMDEwMC0wMDAwLTVlOGZlM2QxMDAwMCI="}}
 */
 AZ_INLINE az_result _az_iot_provisioning_client_parse_payload_error_code(
-    az_json_parser* jp,
+    az_json_token_member* tm,
     az_iot_provisioning_client_registration_result* out_state)
 {
-  if (az_json_token_is_text_equal(&jp->token, AZ_SPAN_FROM_STR("errorCode")))
+  if (az_span_is_content_equal(AZ_SPAN_FROM_STR("errorCode"), tm->name))
   {
-    AZ_RETURN_IF_FAILED(az_json_parser_next_token(jp));
-    AZ_RETURN_IF_FAILED(az_json_token_get_uint32(&jp->token, &out_state->extended_error_code));
+    double value;
+    AZ_RETURN_IF_FAILED(az_json_token_get_number(&tm->token, &value));
+    // TODO: #612 - non-FPU based JSON parser should be used instead.
+    out_state->extended_error_code = (uint32_t)value;
     out_state->error_code = _az_iot_status_from_extended_status(out_state->extended_error_code);
 
     return AZ_OK;
@@ -268,9 +270,10 @@ AZ_INLINE az_result _az_iot_provisioning_client_parse_payload_error_code(
 
 AZ_INLINE az_result _az_iot_provisioning_client_payload_registration_result_parse(
     az_json_parser* jp,
+    az_json_token_member* tm,
     az_iot_provisioning_client_registration_result* out_state)
 {
-  if (jp->token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
+  if (tm->token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
   {
     return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
@@ -278,59 +281,35 @@ AZ_INLINE az_result _az_iot_provisioning_client_payload_registration_result_pars
   bool found_assigned_hub = false;
   bool found_device_id = false;
 
-  AZ_RETURN_IF_FAILED(az_json_parser_next_token(jp));
-
-  while (jp->token.kind != AZ_JSON_TOKEN_END_OBJECT)
+  while ((!(found_device_id && found_assigned_hub))
+         && az_succeeded(az_json_parser_parse_token_member(jp, tm)))
   {
-    if (az_json_token_is_text_equal(&jp->token, AZ_SPAN_FROM_STR("assignedHub")))
+    if (az_span_is_content_equal(AZ_SPAN_FROM_STR("assignedHub"), tm->name))
     {
-      AZ_RETURN_IF_FAILED(az_json_parser_next_token(jp));
-      if (jp->token.kind != AZ_JSON_TOKEN_STRING)
-      {
-        return AZ_ERROR_ITEM_NOT_FOUND;
-      }
-      out_state->assigned_hub_hostname = jp->token.slice;
       found_assigned_hub = true;
+      AZ_RETURN_IF_FAILED(az_json_token_get_string(&tm->token, &out_state->assigned_hub_hostname));
     }
-    else if (az_json_token_is_text_equal(&jp->token, AZ_SPAN_FROM_STR("deviceId")))
+    else if (az_span_is_content_equal(AZ_SPAN_FROM_STR("deviceId"), tm->name))
     {
-      AZ_RETURN_IF_FAILED(az_json_parser_next_token(jp));
-      if (jp->token.kind != AZ_JSON_TOKEN_STRING)
-      {
-        return AZ_ERROR_ITEM_NOT_FOUND;
-      }
-      out_state->device_id = jp->token.slice;
       found_device_id = true;
+      AZ_RETURN_IF_FAILED(az_json_token_get_string(&tm->token, &out_state->device_id));
     }
-    else if (az_json_token_is_text_equal(&jp->token, AZ_SPAN_FROM_STR("errorMessage")))
+    else if (az_span_is_content_equal(AZ_SPAN_FROM_STR("errorMessage"), tm->name))
     {
-      AZ_RETURN_IF_FAILED(az_json_parser_next_token(jp));
-      if (jp->token.kind != AZ_JSON_TOKEN_STRING)
-      {
-        return AZ_ERROR_ITEM_NOT_FOUND;
-      }
-      out_state->error_message = jp->token.slice;
+      AZ_RETURN_IF_FAILED(az_json_token_get_string(&tm->token, &out_state->error_message));
     }
-    else if (az_json_token_is_text_equal(&jp->token, AZ_SPAN_FROM_STR("lastUpdatedDateTimeUtc")))
+    else if (az_span_is_content_equal(AZ_SPAN_FROM_STR("lastUpdatedDateTimeUtc"), tm->name))
     {
-      AZ_RETURN_IF_FAILED(az_json_parser_next_token(jp));
-      if (jp->token.kind != AZ_JSON_TOKEN_STRING)
-      {
-        return AZ_ERROR_ITEM_NOT_FOUND;
-      }
-      out_state->error_timestamp = jp->token.slice;
+      AZ_RETURN_IF_FAILED(az_json_token_get_string(&tm->token, &out_state->error_timestamp));
     }
-    else if (az_succeeded(_az_iot_provisioning_client_parse_payload_error_code(jp, out_state)))
+    else if (tm->token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT)
     {
-      // Do nothing
+      AZ_RETURN_IF_FAILED(az_json_parser_skip_children(jp, tm->token));
     }
     else
     {
-      // ignore other tokens
-      AZ_RETURN_IF_FAILED(az_json_parser_skip_children(jp));
+      (void)_az_iot_provisioning_client_parse_payload_error_code(tm, out_state);
     }
-
-    AZ_RETURN_IF_FAILED(az_json_parser_next_token(jp));
   }
 
   if (found_assigned_hub != found_device_id)
@@ -347,89 +326,63 @@ AZ_INLINE az_result az_iot_provisioning_client_parse_payload(
 {
   // Parse the payload:
   az_json_parser jp;
-  AZ_RETURN_IF_FAILED(az_json_parser_init(&jp, received_payload, NULL));
+  az_json_token_member tm;
+  bool found_operation_id = false;
+  bool found_operation_status = false;
+  bool found_error = false;
 
-  AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
-  if (jp.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
+  AZ_RETURN_IF_FAILED(az_json_parser_init(&jp, received_payload));
+  AZ_RETURN_IF_FAILED(az_json_parser_parse_token(&jp, &tm.token));
+  if (tm.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
   {
     return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
 
   out_response->registration_result = _az_iot_provisioning_registration_result_default();
 
-  bool found_operation_id = false;
-  bool found_operation_status = false;
-  bool found_error = false;
-
-  AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
-
-  while (jp.token.kind != AZ_JSON_TOKEN_END_OBJECT)
+  while (az_succeeded(az_json_parser_parse_token_member(&jp, &tm)))
   {
-    if (az_json_token_is_text_equal(&jp.token, AZ_SPAN_FROM_STR("operationId")))
+    if (az_span_is_content_equal(AZ_SPAN_FROM_STR("operationId"), tm.name))
     {
-      AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
-      if (jp.token.kind != AZ_JSON_TOKEN_STRING)
-      {
-        return AZ_ERROR_ITEM_NOT_FOUND;
-      }
-      out_response->operation_id = jp.token.slice;
       found_operation_id = true;
+      AZ_RETURN_IF_FAILED(az_json_token_get_string(&tm.token, &out_response->operation_id));
     }
-    else if (az_json_token_is_text_equal(&jp.token, AZ_SPAN_FROM_STR("status")))
+    else if (az_span_is_content_equal(AZ_SPAN_FROM_STR("status"), tm.name))
     {
-      AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
-      if (jp.token.kind != AZ_JSON_TOKEN_STRING)
-      {
-        return AZ_ERROR_ITEM_NOT_FOUND;
-      }
-      out_response->operation_status = jp.token.slice;
       found_operation_status = true;
+      AZ_RETURN_IF_FAILED(az_json_token_get_string(&tm.token, &out_response->operation_status));
     }
-    else if (az_json_token_is_text_equal(&jp.token, AZ_SPAN_FROM_STR("registrationState")))
+    else if (az_span_is_content_equal(AZ_SPAN_FROM_STR("registrationState"), tm.name))
     {
-      AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
       AZ_RETURN_IF_FAILED(_az_iot_provisioning_client_payload_registration_result_parse(
-          &jp, &out_response->registration_result));
+          &jp, &tm, &out_response->registration_result));
     }
-    else if (az_json_token_is_text_equal(&jp.token, AZ_SPAN_FROM_STR("trackingId")))
+    else if (az_span_is_content_equal(AZ_SPAN_FROM_STR("trackingId"), tm.name))
     {
-      AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
-      if (jp.token.kind != AZ_JSON_TOKEN_STRING)
-      {
-        return AZ_ERROR_ITEM_NOT_FOUND;
-      }
-      out_response->registration_result.error_tracking_id = jp.token.slice;
+      AZ_RETURN_IF_FAILED(az_json_token_get_string(
+          &tm.token, &out_response->registration_result.error_tracking_id));
     }
-    else if (az_json_token_is_text_equal(&jp.token, AZ_SPAN_FROM_STR("message")))
+    else if (az_span_is_content_equal(AZ_SPAN_FROM_STR("message"), tm.name))
     {
-      AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
-      if (jp.token.kind != AZ_JSON_TOKEN_STRING)
-      {
-        return AZ_ERROR_ITEM_NOT_FOUND;
-      }
-      out_response->registration_result.error_message = jp.token.slice;
+      AZ_RETURN_IF_FAILED(
+          az_json_token_get_string(&tm.token, &out_response->registration_result.error_message));
     }
-    else if (az_json_token_is_text_equal(&jp.token, AZ_SPAN_FROM_STR("timestampUtc")))
+    else if (az_span_is_content_equal(AZ_SPAN_FROM_STR("timestampUtc"), tm.name))
     {
-      AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
-      if (jp.token.kind != AZ_JSON_TOKEN_STRING)
-      {
-        return AZ_ERROR_ITEM_NOT_FOUND;
-      }
-      out_response->registration_result.error_timestamp = jp.token.slice;
+      AZ_RETURN_IF_FAILED(
+          az_json_token_get_string(&tm.token, &out_response->registration_result.error_timestamp));
+    }
+    else if (tm.token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT)
+    {
+      AZ_RETURN_IF_FAILED(az_json_parser_skip_children(&jp, tm.token));
     }
     else if (az_succeeded(_az_iot_provisioning_client_parse_payload_error_code(
-                 &jp, &out_response->registration_result)))
+                 &tm, &out_response->registration_result)))
     {
       found_error = true;
     }
-    else
-    {
-      // ignore other tokens
-      AZ_RETURN_IF_FAILED(az_json_parser_skip_children(&jp));
-    }
 
-    AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
+    // else ignore token.
   }
 
   if (!(found_operation_status && found_operation_id))
