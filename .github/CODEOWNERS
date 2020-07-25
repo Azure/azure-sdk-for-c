@@ -6,13 +6,13 @@
 ###########
 
 # Catch all for non-code project files
-* @rickwinter @joshfree
+* @rickwinter @jeffreyrichter @joshfree
 
 # SDK team
-/sdk/ @ahsonkhan @antkmsft @rickwinter @vhvb1989
+/sdk/ @ahsonkhan @antkmsft @rickwinter @jeffreyrichter @vhvb1989
 
 # Samples
-/samples/ @rickwinter
+/samples/ @rickwinter @jeffreyrichter
 
 # Service teams
 # Core
@@ -29,8 +29,11 @@ sdk/samples/iot/              @CIPop @danewalton @ericwol-msft @ewertons @hihigu
 sdk/src/azure/iot/            @CIPop @danewalton @ericwol-msft @ewertons @hihigupt @jspaith @momuno
 sdk/tests/iot/                @CIPop @danewalton @ericwol-msft @ewertons @hihigupt @jspaith @momuno
 
+# Keyvault
+sdk/samples/keyvault/         @vhvb1989
+
 # Platform
-sdk/src/azure/platform/       @ahsonkhan @antkmsft @rickwinter @vhvb1989
+sdk/src/azure/platform/       @antkmsft @jeffreyrichter @vhvb1989
 
 # Storage
 sdk/docs/storage/             @rickwinter
@@ -42,5 +45,5 @@ sdk/tests/storage/            @rickwinter
 ###########
 # Eng Sys
 ###########
-/eng/       @danieljurek @azure/azure-sdk-eng
-/**/ci.yml  @danieljurek @azure/azure-sdk-eng
+/eng/       @danieljurek @damirault @azure/azure-sdk-eng
+/**/ci.yml  @danieljurek @damirault @azure/azure-sdk-eng
