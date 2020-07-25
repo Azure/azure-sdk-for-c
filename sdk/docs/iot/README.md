@@ -2,24 +2,6 @@
 
 Azure SDK for Embedded C official IoT client libraries.
 
-## Table of Contents
-- [Azure IoT Clients](#azure-iot-clients)
-  - [Table of Contents](#table-of-contents)
-  - [Getting Started](#getting-started)
-    - [Docs](#docs)
-    - [Build](#build)
-    - [Samples](#samples)
-    - [Prerequisites](#prerequisites)
-  - [Key Features](#key-features)
-  - [Examples](#examples)
-    - [IoT Hub Client Initialization](#iot-hub-client-initialization)
-    - [Properties](#properties)
-    - [Telemetry](#telemetry)
-    - [IoT Hub Client with MQTT Stack](#iot-hub-client-with-mqtt-stack)
-  - [Need Help?](#need-help)
-  - [Contributing](#contributing)
-    - [License](#license)
-
 ## Getting Started
 
 The Azure IoT Client library is created to facilitate connectivity to Azure IoT services alongside an MQTT and TLS stack of the user's choice. This means that this SDK is **NOT** a platform but instead is a true SDK library.
