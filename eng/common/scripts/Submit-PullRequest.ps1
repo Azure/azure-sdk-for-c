@@ -58,9 +58,6 @@ $resp | Write-Verbose
 
 if ($resp.Count -gt 0) {
     Write-Host -f green "Pull request already exists $($resp[0].html_url)"
-
-    # setting variable to reference the pull request by number
-    Write-Host "##vso[task.setvariable variable=Submitted.PullRequest.Number]$($resp[0].number)"
 }
 else {
   $data = @{
@@ -83,7 +80,4 @@ else {
 
   $resp | Write-Verbose
   Write-Host -f green "Pull request created https://github.com/$RepoOwner/$RepoName/pull/$($resp.number)"
-
-  # setting variable to reference the pull request by number
-  Write-Host "##vso[task.setvariable variable=Submitted.PullRequest.Number]$($resp.number)"
 }
