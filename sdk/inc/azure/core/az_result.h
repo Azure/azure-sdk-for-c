@@ -100,6 +100,8 @@ typedef enum
   AZ_ERROR_NOT_SUPPORTED = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 7),
 
   // Platform
+  AZ_ERROR_MUTEX = _az_RESULT_MAKE_ERROR(_az_FACILITY_PLATFORM, 1), ///< Mutex operation error.
+
   AZ_ERROR_OUT_OF_MEMORY = _az_RESULT_MAKE_ERROR(
       _az_FACILITY_PLATFORM,
       2), ///< Dynamic memory allocation request was not successful.
