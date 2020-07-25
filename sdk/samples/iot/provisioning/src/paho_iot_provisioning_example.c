@@ -26,9 +26,6 @@
 #include <azure/core/az_span.h>
 #include <azure/iot/az_iot_provisioning_client.h>
 
-#define TIMEOUT_MQTT_RECEIVE_MS (60 * 1000)
-#define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
-
 #ifdef _MSC_VER
 // "'getenv': This function or variable may be unsafe. Consider using _dupenv_s instead."
 #pragma warning(disable : 4996)
@@ -44,11 +41,14 @@
 
 // DO NOT MODIFY: the path to a PEM file containing the device certificate and
 // key as well as any intermediate certificates chaining to an uploaded group certificate.
-#define ENV_DEVICE_X509_CERT_PEM_FILE_PATH "AZ_IOT_DEVICE_X509_CERT_PEM_FILE"
+#define ENV_DEVICE_X509_CERT_PEM_FILE_PATH "AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH"
 
 // DO NOT MODIFY: the path to a PEM file containing the server trusted CA
 // This is usually not needed on Linux or Mac but needs to be set on Windows.
-#define ENV_DEVICE_X509_TRUST_PEM_FILE_PATH "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE"
+#define ENV_DEVICE_X509_TRUST_PEM_FILE_PATH "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH"
+
+#define TIMEOUT_MQTT_RECEIVE_MS (60 * 1000)
+#define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
 
 // Logging with formatting
 #define LOG_ERROR(...) \
@@ -196,12 +196,12 @@ static az_result read_environment_variables(
 {
   // Certification variables
   az_span device_cert = AZ_SPAN_FROM_BUFFER(x509_cert_pem_file_path_buffer);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_DEVICE_X509_CERT_PEM_FILE_PATH, NULL, false, device_cert, &device_cert));
+  AZ_RETURN_IF_FAILED(
+      read_configuration_entry(ENV_DEVICE_X509_CERT_PEM_FILE_PATH, NULL, false, device_cert, &device_cert));
 
   az_span trusted_cert = AZ_SPAN_FROM_BUFFER(x509_trust_pem_file_path_buffer);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_DEVICE_X509_TRUST_PEM_FILE_PATH, "", false, trusted_cert, &trusted_cert));
+  AZ_RETURN_IF_FAILED(
+      read_configuration_entry(ENV_DEVICE_X509_TRUST_PEM_FILE_PATH, "", false, trusted_cert, &trusted_cert));
 
   // Connection variables
   *endpoint = AZ_SPAN_FROM_BUFFER(global_provisioning_endpoint_buffer);
@@ -219,7 +219,7 @@ static az_result read_environment_variables(
   AZ_RETURN_IF_FAILED(read_configuration_entry(
       ENV_REGISTRATION_ID_ENV, NULL, false, *registration_id, registration_id));
 
-  LOG(" "); // Log formatting
+  LOG(" "); //Log formatting
   return AZ_OK;
 }
 
@@ -376,11 +376,10 @@ static void receive_registration_status()
     if (!is_operation_complete)
     {
       LOG("Operation is still pending.");
-
-      send_operation_query_message(&response);
-
       MQTTClient_freeMessage(&message);
       MQTTClient_free(topic);
+
+      send_operation_query_message(&response);
       LOG_SUCCESS("Client sent operation query message.");
     }
   } while (!is_operation_complete);
@@ -449,11 +448,7 @@ static void send_operation_query_message(
 
   if (az_failed(
           rc = az_iot_provisioning_client_query_status_get_publish_topic(
-              &provisioning_client,
-              response,
-              query_topic_buffer,
-              sizeof(query_topic_buffer),
-              NULL)))
+              &provisioning_client, response, query_topic_buffer, sizeof(query_topic_buffer), NULL)))
   {
     LOG_ERROR("Unable to get query status publish topic: az_result return code 0x%04x.", rc);
     exit(rc);
