@@ -160,7 +160,7 @@ static void create_and_configure_client()
           rc
           = read_environment_variables(&global_provisioning_endpoint, &id_scope, &registration_id)))
   {
-    LOG_ERROR("Failed to read evironment variables: az_result return code 0x%04x.", rc);
+    LOG_ERROR("Failed to read environment variables: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
@@ -408,7 +408,7 @@ static void receive_registration_status()
     LOG_AZ_SPAN("Hub Hostname:", response.registration_result.assigned_hub_hostname);
     LOG_AZ_SPAN("Device Id:", response.registration_result.device_id);
   }
-  else // Unsuccesful assignment (unassigned, failed or disabled states)
+  else // Unsuccessful assignment (unassigned, failed or disabled states)
   {
     LOG_ERROR("Client provisioning failed:");
     LOG_AZ_SPAN("Registration state:", response.operation_status);

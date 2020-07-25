@@ -151,7 +151,7 @@ The error policy in using the Embedded C SDK client library is documented [here]
 
 Start using the IoT Provisioning Client in your solutions!
 
-* A general overivew of the Embedded C SDK and additional background on running samples can be found in the [Azure SDK for Embedded C README](https://github.com/Azure/azure-sdk-for-c#azure-sdk-for-embedded-c).
+* A general overview of the Embedded C SDK and additional background on running samples can be found in the [Azure SDK for Embedded C README](https://github.com/Azure/azure-sdk-for-c#azure-sdk-for-embedded-c).
 * More SDK details pertaining to IoT Client can be found in the [Azure IoT Client README](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot#azure-iot-clients).
 * The [Azure IoT Client MQTT State Machine](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/mqtt_state_machine.md) provides a high-level architecture and API information.
 * For extensive documentation on the Azure IoT Hub Device Provisioning Service, see the [Microsoft reference documentation](https://docs.microsoft.com/en-us/azure/iot-dps/).

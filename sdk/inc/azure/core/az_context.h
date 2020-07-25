@@ -45,7 +45,7 @@ struct az_context
 
 /**
  * @brief az_context_app is the ultimate root of all az_context instances. It allows you to cancel
- * your entire application. The az_context_app never expires but you can explciit cancel it by
+ * your entire application. The az_context_app never expires but you can explicitly cancel it by
  * passing its address to az_context_cancel which effectively cancels all the az_context child
  * nodes.
  */

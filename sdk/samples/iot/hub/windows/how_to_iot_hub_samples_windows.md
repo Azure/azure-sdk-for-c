@@ -51,7 +51,7 @@ _The following was run on Microsoft Windows 10.0.18363.836._
 
     > Make sure `VCPKG_ROOT` has the path where vcpkg was cloned.
 
-4. Add openssl to the PATH enviroment variable
+4. Add openssl to the PATH environment variable
 
     OpenSSL will be used for generating self-signed certificates.
     It gets installed by vcpkg as a dependency for Eclipse Paho.

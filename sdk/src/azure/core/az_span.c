@@ -257,7 +257,7 @@ AZ_NODISCARD az_result az_span_atod(az_span source, double* out_number)
 AZ_NODISCARD int32_t az_span_find(az_span source, az_span target)
 {
   /* This function implements the Naive string-search algorithm.
-   * The rationale to use this algorithm instead of other potentialy more
+   * The rationale to use this algorithm instead of other potentially more
    * performing ones (Rabin-Karp, e.g.) is due to no additional space needed.
    * The logic:
    * 1. The function will look into each position of `source` if it contains the same value as the
@@ -272,7 +272,7 @@ AZ_NODISCARD int32_t az_span_find(az_span source, az_span target)
    * go back to step 1. from  the next position in `source`.
    *   The loop in 5. gets interrupted if
    *     - a byte in `target` is different than `source`, in the expected corresponding position;
-   *     - the loop has reached the end of `source` (and there are still remaing bytes of `target`
+   *     - the loop has reached the end of `source` (and there are still remaining bytes of `target`
    *         to be checked).
    */
 
