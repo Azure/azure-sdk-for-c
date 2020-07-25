@@ -77,7 +77,7 @@ AZ_NODISCARD static az_result _az_json_reader_process_container_end(
       || (token_kind == AZ_JSON_TOKEN_END_ARRAY
           && _az_json_stack_peek(&json_reader->_internal.bit_stack) != _az_JSON_STACK_ARRAY))
   {
-    return AZ_ERROR_UNEXPECTED_CHAR;
+    return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
 
   az_span token = _get_remaining_json(json_reader);
@@ -180,7 +180,7 @@ AZ_NODISCARD static az_result _az_json_reader_process_string(az_json_reader* jso
 
         if (!_az_validate_hex_digits(token_ptr, string_length))
         {
-          return AZ_ERROR_UNEXPECTED_CHAR;
+          return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
         }
 
         // Skip past the 4 hex digits, the loop accounts for incrementing by 1 more.
@@ -190,7 +190,7 @@ AZ_NODISCARD static az_result _az_json_reader_process_string(az_json_reader* jso
       {
         if (!_az_is_valid_escaped_character(next_byte))
         {
-          return AZ_ERROR_UNEXPECTED_CHAR;
+          return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
         }
       }
     }
@@ -199,7 +199,7 @@ AZ_NODISCARD static az_result _az_json_reader_process_string(az_json_reader* jso
       // Control characters are invalid within a JSON string and should be correctly escaped.
       if (next_byte < 0x20)
       {
-        return AZ_ERROR_UNEXPECTED_CHAR;
+        return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
       }
     }
 
@@ -232,7 +232,7 @@ AZ_NODISCARD static az_result _az_json_reader_process_property_name(az_json_read
   }
   if (az_span_ptr(json)[0] != ':')
   {
-    return AZ_ERROR_UNEXPECTED_CHAR;
+    return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
 
   // We don't need to set the json_reader->token.slice since that was already done
@@ -271,7 +271,7 @@ AZ_NODISCARD static bool _az_finished_consuming_json_number(
   index = az_span_find(expected_next_bytes, next_byte_span);
   if (index == -1)
   {
-    *result = AZ_ERROR_UNEXPECTED_CHAR;
+    *result = AZ_ERROR_PARSER_UNEXPECTED_CHAR;
     return true;
   }
 
@@ -324,7 +324,7 @@ AZ_NODISCARD static az_result _az_validate_next_byte_is_digit(az_span remaining_
 
   if (!isdigit(az_span_ptr(remaining_number)[0]))
   {
-    return AZ_ERROR_UNEXPECTED_CHAR;
+    return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
 
   return AZ_OK;
@@ -482,7 +482,7 @@ AZ_NODISCARD static az_result _az_json_reader_process_number(az_json_reader* jso
   int32_t index = az_span_find(json_delimiters, az_span_init(&next_byte, 1));
   if (index == -1)
   {
-    return AZ_ERROR_UNEXPECTED_CHAR;
+    return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
 
   _az_json_reader_update_state(
@@ -513,7 +513,7 @@ AZ_NODISCARD static az_result _az_json_reader_process_literal(
     _az_json_reader_update_state(json_reader, kind, token, expected_literal_size);
     return AZ_OK;
   }
-  return AZ_ERROR_UNEXPECTED_CHAR;
+  return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
 }
 
 AZ_NODISCARD static az_result _az_json_reader_process_value(
@@ -540,7 +540,7 @@ AZ_NODISCARD static az_result _az_json_reader_process_value(
     return _az_json_reader_process_literal(
         json_reader, AZ_SPAN_FROM_STR("null"), AZ_JSON_TOKEN_NULL);
   else
-    return AZ_ERROR_UNEXPECTED_CHAR;
+    return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
 }
 
 AZ_NODISCARD static az_result _az_json_reader_read_first_token(
@@ -578,7 +578,7 @@ AZ_NODISCARD static az_result _az_json_reader_process_next_byte(
   // invalid. Expected end of data.
   if (json_reader->_internal.bit_stack._internal.current_depth == 0)
   {
-    return AZ_ERROR_UNEXPECTED_CHAR;
+    return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
 
   bool within_object
@@ -603,7 +603,7 @@ AZ_NODISCARD static az_result _az_json_reader_process_next_byte(
       // Expected start of a property name after the comma since we are within a JSON object.
       if (next_byte != '"')
       {
-        return AZ_ERROR_UNEXPECTED_CHAR;
+        return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
       }
       return _az_json_reader_process_property_name(json_reader);
     }
@@ -623,7 +623,7 @@ AZ_NODISCARD static az_result _az_json_reader_process_next_byte(
   else
   {
     // No other character is a valid token delimiter within JSON.
-    return AZ_ERROR_UNEXPECTED_CHAR;
+    return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
 }
 
@@ -663,7 +663,7 @@ AZ_NODISCARD az_result az_json_reader_next_token(az_json_reader* json_reader)
         // JSON object.
         if (first_byte != '"')
         {
-          return AZ_ERROR_UNEXPECTED_CHAR;
+          return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
         }
         return _az_json_reader_process_property_name(json_reader);
       }

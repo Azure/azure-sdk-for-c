@@ -272,7 +272,7 @@ AZ_INLINE az_result _az_iot_provisioning_client_payload_registration_result_pars
 {
   if (jr->token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
   {
-    return AZ_ERROR_UNEXPECTED_CHAR;
+    return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
 
   bool found_assigned_hub = false;
@@ -349,7 +349,7 @@ AZ_INLINE az_result az_iot_provisioning_client_parse_payload(
   AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
   if (jr.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
   {
-    return AZ_ERROR_UNEXPECTED_CHAR;
+    return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
 
   out_response->registration_result = _az_iot_provisioning_registration_result_default();
@@ -538,7 +538,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_parse_operation_status(
   }
   else
   {
-    return AZ_ERROR_UNEXPECTED_CHAR;
+    return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
 
   return AZ_OK;

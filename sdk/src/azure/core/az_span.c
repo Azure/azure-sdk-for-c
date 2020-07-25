@@ -180,7 +180,7 @@ AZ_NODISCARD az_result az_span_atou64(az_span source, uint64_t* out_number)
   bool success = false;
   _az_span_ato_number_helper(source, false, format_template, out_number, &success);
 
-  return success ? AZ_OK : AZ_ERROR_UNEXPECTED_CHAR;
+  return success ? AZ_OK : AZ_ERROR_PARSER_UNEXPECTED_CHAR;
 }
 
 AZ_NODISCARD az_result az_span_atou32(az_span source, uint32_t* out_number)
@@ -199,7 +199,7 @@ AZ_NODISCARD az_result az_span_atou32(az_span source, uint32_t* out_number)
 
   if (placeholder > UINT32_MAX || !success)
   {
-    return AZ_ERROR_UNEXPECTED_CHAR;
+    return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
 
   *out_number = (uint32_t)placeholder;
@@ -216,7 +216,7 @@ AZ_NODISCARD az_result az_span_atoi64(az_span source, int64_t* out_number)
   bool success = false;
   _az_span_ato_number_helper(source, true, format_template, out_number, &success);
 
-  return success ? AZ_OK : AZ_ERROR_UNEXPECTED_CHAR;
+  return success ? AZ_OK : AZ_ERROR_PARSER_UNEXPECTED_CHAR;
 }
 
 AZ_NODISCARD az_result az_span_atoi32(az_span source, int32_t* out_number)
@@ -235,7 +235,7 @@ AZ_NODISCARD az_result az_span_atoi32(az_span source, int32_t* out_number)
 
   if (placeholder > INT32_MAX || placeholder < INT32_MIN || !success)
   {
-    return AZ_ERROR_UNEXPECTED_CHAR;
+    return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
 
   *out_number = (int32_t)placeholder;
@@ -252,7 +252,7 @@ AZ_NODISCARD az_result az_span_atod(az_span source, double* out_number)
   bool success = false;
   _az_span_ato_number_helper(source, true, format_template, out_number, &success);
 
-  return success ? AZ_OK : AZ_ERROR_UNEXPECTED_CHAR;
+  return success ? AZ_OK : AZ_ERROR_PARSER_UNEXPECTED_CHAR;
 }
 
 AZ_NODISCARD int32_t az_span_find(az_span source, az_span target)
@@ -736,7 +736,7 @@ AZ_NODISCARD az_result _az_is_expected_span(az_span* ref_span, az_span expected)
 
   if (!az_span_is_content_equal(actual_span, expected))
   {
-    return AZ_ERROR_UNEXPECTED_CHAR;
+    return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
   // move reader after the expected span (means it was parsed as expected)
   *ref_span = az_span_slice_to_end(*ref_span, expected_size);

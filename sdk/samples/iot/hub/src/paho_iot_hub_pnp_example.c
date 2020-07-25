@@ -621,7 +621,7 @@ static az_result parse_twin_desired_temperature_property(
   AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jp));
   if (jp.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
   {
-    return AZ_ERROR_UNEXPECTED_CHAR;
+    return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
 
   if (is_twin_get)
@@ -658,7 +658,7 @@ static az_result parse_twin_desired_temperature_property(
 
   if (jp.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
   {
-    return AZ_ERROR_UNEXPECTED_CHAR;
+    return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
   AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jp));
 

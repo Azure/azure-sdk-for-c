@@ -89,7 +89,7 @@ AZ_NODISCARD az_result az_json_token_get_boolean(az_json_token const* json_token
  * @param out_value A pointer to a variable to receive the value.
  * @return AZ_OK if the number is returned.<br>
  * AZ_ERROR_JSON_INVALID_STATE if the kind != AZ_JSON_TOKEN_NUMBER.<br>
- * AZ_ERROR_UNEXPECTED_CHAR if a non-ASCII digit is found within the token or if it contains
+ * AZ_ERROR_PARSER_UNEXPECTED_CHAR if a non-ASCII digit is found within the token or if it contains
  * a number that would overflow or underflow uint64
  */
 AZ_NODISCARD az_result
@@ -102,7 +102,7 @@ az_json_token_get_uint64(az_json_token const* json_token, uint64_t* out_value);
  * @param out_value A pointer to a variable to receive the value.
  * @return AZ_OK if the number is returned.<br>
  * AZ_ERROR_JSON_INVALID_STATE if the kind != AZ_JSON_TOKEN_NUMBER.<br>
- * AZ_ERROR_UNEXPECTED_CHAR if a non-ASCII digit is found within the token or if it contains
+ * AZ_ERROR_PARSER_UNEXPECTED_CHAR if a non-ASCII digit is found within the token or if it contains
  * a number that would overflow or underflow uint32
  */
 AZ_NODISCARD az_result
@@ -115,7 +115,7 @@ az_json_token_get_uint32(az_json_token const* json_token, uint32_t* out_value);
  * @param out_value A pointer to a variable to receive the value.
  * @return AZ_OK if the number is returned.<br>
  * AZ_ERROR_JSON_INVALID_STATE if the kind != AZ_JSON_TOKEN_NUMBER.<br>
- * AZ_ERROR_UNEXPECTED_CHAR if a non-ASCII digit is found within the token or if it contains
+ * AZ_ERROR_PARSER_UNEXPECTED_CHAR if a non-ASCII digit is found within the token or if it contains
  * a number that would overflow or underflow int64
  */
 AZ_NODISCARD az_result az_json_token_get_int64(az_json_token const* json_token, int64_t* out_value);
@@ -127,7 +127,7 @@ AZ_NODISCARD az_result az_json_token_get_int64(az_json_token const* json_token, 
  * @param out_value A pointer to a variable to receive the value.
  * @return AZ_OK if the number is returned.<br>
  * AZ_ERROR_JSON_INVALID_STATE if the kind != AZ_JSON_TOKEN_NUMBER.<br>
- * AZ_ERROR_UNEXPECTED_CHAR if a non-ASCII digit is found within the token or if it contains
+ * AZ_ERROR_PARSER_UNEXPECTED_CHAR if a non-ASCII digit is found within the token or if it contains
  * a number that would overflow or underflow int32
  */
 AZ_NODISCARD az_result az_json_token_get_int32(az_json_token const* json_token, int32_t* out_value);
@@ -499,7 +499,7 @@ AZ_NODISCARD az_result az_json_reader_init(
  *
  * @return AZ_OK if the token was read successfully.<br>
  *         AZ_ERROR_EOF when the end of the JSON document is reached.<br>
- *         AZ_ERROR_UNEXPECTED_CHAR when an invalid character is detected.
+ *         AZ_ERROR_PARSER_UNEXPECTED_CHAR when an invalid character is detected.
  */
 AZ_NODISCARD az_result az_json_reader_next_token(az_json_reader* json_reader);
 
@@ -510,7 +510,7 @@ AZ_NODISCARD az_result az_json_reader_next_token(az_json_reader* json_reader);
  *
  * @return AZ_OK if the children of the current JSON token are skipped successfully.<br>
  *         AZ_ERROR_EOF when the end of the JSON document is reached.<br>
- *         AZ_ERROR_UNEXPECTED_CHAR when an invalid character is detected.
+ *         AZ_ERROR_PARSER_UNEXPECTED_CHAR when an invalid character is detected.
  *
  * @remarks If the current token kind is a property name, the reader first moves to the property
  * value. Then, if the token kind is start of an object or array, the reader moves to the matching
