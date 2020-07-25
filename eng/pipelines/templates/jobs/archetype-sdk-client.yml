@@ -263,8 +263,8 @@ jobs:
       checkCoverage: true
       coverageFailOption: fixed
       coverageType: line
-      # 90% minimum line coverage
-      coverageThreshold: 90
+      # 85% minimum line coverage
+      coverageThreshold: 85
     condition: eq(variables['AZ_SDK_CODE_COV'], 1)
 
   - task: mspremier.BuildQualityChecks.QualityChecks-task.BuildQualityChecks@6
@@ -273,8 +273,8 @@ jobs:
       checkCoverage: true
       coverageFailOption: fixed
       coverageType: branch
-      # 65% minimum branch coverage
-      coverageThreshold: 65
+      # 60% minimum branch coverage
+      coverageThreshold: 60
     condition: eq(variables['AZ_SDK_CODE_COV'], 1)
 
 - job: GenerateReleaseArtifacts
