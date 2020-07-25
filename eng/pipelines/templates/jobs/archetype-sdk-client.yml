@@ -267,6 +267,7 @@ jobs:
       contents: "**/*.map"
       targetFolder: $(Build.ArtifactStagingDirectory)
       flattenFolders: true
+    condition: eq(variables['PublishMapFiles'], 'true')
 
   - task: PublishPipelineArtifact@1
     inputs:
