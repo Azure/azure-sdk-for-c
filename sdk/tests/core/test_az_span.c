@@ -271,15 +271,6 @@ static void az_span_atou64_test(void** state)
   assert_int_equal(
       az_span_atou64(AZ_SPAN_FROM_STR("18446744073709551616"), &value),
       AZ_ERROR_PARSER_UNEXPECTED_CHAR);
-  assert_int_equal(
-      az_span_atou64(AZ_SPAN_FROM_STR("-9223372036854775809"), &value),
-      AZ_ERROR_PARSER_UNEXPECTED_CHAR);
-  assert_int_equal(
-      az_span_atou64(AZ_SPAN_FROM_STR("-42"), &value), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
-  assert_int_equal(
-      az_span_atou64(AZ_SPAN_FROM_STR("1.2"), &value), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
-  assert_int_equal(
-      az_span_atou64(AZ_SPAN_FROM_STR("-1.2"), &value), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
 }
 
 static void az_span_atoi64_test(void** state)
@@ -318,10 +309,6 @@ static void az_span_atoi64_test(void** state)
   assert_int_equal(
       az_span_atoi64(AZ_SPAN_FROM_STR("-9223372036854775809"), &value),
       AZ_ERROR_PARSER_UNEXPECTED_CHAR);
-  assert_int_equal(
-      az_span_atoi64(AZ_SPAN_FROM_STR("1.2"), &value), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
-  assert_int_equal(
-      az_span_atoi64(AZ_SPAN_FROM_STR("-1.2"), &value), AZ_ERROR_PARSER_UNEXPECTED_CHAR);
 }
 
 // Disable warning for float comparisons, for this particular test
@@ -1136,9 +1123,12 @@ static void az_span_i64toa_negative_number_test(void** state)
 
   assert_true(az_span_is_content_equal(b_span, number_str));
 
-  int64_t reverse = 0;
-  assert_int_equal(az_span_atoi64(b_span, &reverse), AZ_OK);
+  // convert back TODO: az_span_ato64 should support negative numbers since az_span_i64toa support
+  // it. https://github.com/Azure/azure-sdk-for-c/issues/598
+  /* uint64_t reverse = 0;
+  assert_int_equal(az_span_atou64(b_span, &reverse), AZ_OK);
   assert_int_equal(reverse, number);
+  */
 }
 
 static void az_span_slice_to_end_test(void** state)

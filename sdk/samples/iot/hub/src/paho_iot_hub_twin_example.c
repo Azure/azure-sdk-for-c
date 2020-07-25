@@ -483,7 +483,7 @@ static az_result build_reported_property(az_span* reported_property_payload)
       az_json_builder_init(&json_builder, AZ_SPAN_FROM_BUFFER(reported_property_buffer), NULL));
   AZ_RETURN_IF_FAILED(az_json_builder_append_begin_object(&json_builder));
   AZ_RETURN_IF_FAILED(az_json_builder_append_property_name(&json_builder, reported_property_name));
-  AZ_RETURN_IF_FAILED(az_json_builder_append_int32(&json_builder, reported_property_value));
+  AZ_RETURN_IF_FAILED(az_json_builder_append_int32_number(&json_builder, reported_property_value));
   AZ_RETURN_IF_FAILED(az_json_builder_append_end_object(&json_builder));
 
   *reported_property_payload = az_json_builder_get_json(&json_builder);

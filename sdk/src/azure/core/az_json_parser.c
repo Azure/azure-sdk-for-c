@@ -15,7 +15,6 @@ AZ_NODISCARD az_result az_json_parser_init(
     az_span json_buffer,
     az_json_parser_options const* options)
 {
-  _az_PRECONDITION_NOT_NULL(json_parser);
   _az_PRECONDITION(az_span_size(json_buffer) >= 1);
 
   *json_parser = (az_json_parser){

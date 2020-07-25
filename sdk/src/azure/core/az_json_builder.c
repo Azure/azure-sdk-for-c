@@ -6,29 +6,8 @@
 #include "az_span_private.h"
 #include <azure/core/az_json.h>
 #include <azure/core/internal/az_span_internal.h>
-#include <math.h>
 
 #include <azure/core/_az_cfg.h>
-
-AZ_NODISCARD az_result az_json_builder_init(
-    az_json_builder* json_builder,
-    az_span destination_buffer,
-    az_json_builder_options const* options)
-{
-  _az_PRECONDITION_NOT_NULL(json_builder);
-
-  *json_builder
-      = (az_json_builder){ ._internal = {
-                               .destination_buffer = destination_buffer,
-                               .bytes_written = 0,
-                               .need_comma = false,
-                               .token_kind = AZ_JSON_TOKEN_NONE,
-                               .bit_stack = { 0 },
-                               .options
-                               = options == NULL ? az_json_builder_options_default() : *options,
-                           } };
-  return AZ_OK;
-}
 
 static AZ_NODISCARD az_span _get_remaining_span(az_json_builder* json_builder)
 {
@@ -481,7 +460,8 @@ AZ_NODISCARD az_result az_json_builder_append_null(az_json_builder* json_builder
       json_builder, AZ_SPAN_FROM_STR("null"), AZ_JSON_TOKEN_NULL);
 }
 
-AZ_NODISCARD az_result az_json_builder_append_int32(az_json_builder* json_builder, int32_t value)
+AZ_NODISCARD az_result
+az_json_builder_append_int32_number(az_json_builder* json_builder, int32_t value)
 {
   _az_PRECONDITION_NOT_NULL(json_builder);
   _az_PRECONDITION(_az_is_appending_value_valid(json_builder));
@@ -504,46 +484,6 @@ AZ_NODISCARD az_result az_json_builder_append_int32(az_json_builder* json_builde
 
   az_span leftover;
   AZ_RETURN_IF_FAILED(az_span_i32toa(remaining_json, value, &leftover));
-
-  // We already accounted for the first digit above, so therefore subtract one.
-  _az_update_json_builder_state(
-      json_builder,
-      required_size + _az_span_diff(leftover, remaining_json) - 1,
-      true,
-      AZ_JSON_TOKEN_NUMBER);
-  return AZ_OK;
-}
-
-AZ_NODISCARD az_result az_json_builder_append_double(
-    az_json_builder* json_builder,
-    double value,
-    int32_t fractional_digits)
-{
-  _az_PRECONDITION_NOT_NULL(json_builder);
-  _az_PRECONDITION(_az_is_appending_value_valid(json_builder));
-  // Non-finite numbers are not supported because they lead to invalid JSON.
-  // Unquoted strings such as nan and -inf are invalid as JSON numbers.
-  _az_PRECONDITION(isfinite(value));
-  _az_PRECONDITION_RANGE(0, fractional_digits, _az_MAX_SUPPORTED_FRACTIONAL_DIGITS);
-
-  az_span remaining_json = _get_remaining_span(json_builder);
-
-  int32_t required_size = 1; // Need space to write at least one digit.
-
-  if (json_builder->_internal.need_comma)
-  {
-    required_size++; // For the leading comma separator.
-  }
-
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(remaining_json, required_size);
-
-  if (json_builder->_internal.need_comma)
-  {
-    remaining_json = az_span_copy_u8(remaining_json, ',');
-  }
-
-  az_span leftover;
-  AZ_RETURN_IF_FAILED(az_span_dtoa(remaining_json, value, fractional_digits, &leftover));
 
   // We already accounted for the first digit above, so therefore subtract one.
   _az_update_json_builder_state(

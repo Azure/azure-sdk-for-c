@@ -5,24 +5,13 @@
 #define _az_SPAN_PRIVATE_H
 
 #include <azure/core/az_precondition.h>
+#include <azure/core/internal/az_precondition_internal.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
-#include <azure/core/internal/az_precondition_internal.h>
 
 #include <stdbool.h>
 
 #include <azure/core/_az_cfg_prefix.h>
-
-enum
-{
-  _az_ASCII_LOWER_DIF = 'a' - 'A',
-
-  // One less than the number of digits in _az_MAX_SAFE_INTEGER
-  // This many digits can roundtrip between double and uint64_t without loss of precision
-  // or causing integer overflow. We can't choose 16, because 9999999999999999 is larger than
-  // _az_MAX_SAFE_INTEGER.
-  _az_MAX_SUPPORTED_FRACTIONAL_DIGITS = 15,
-};
 
 /**
  * @brief Replace all contents from a starting position to an end position with the content of a

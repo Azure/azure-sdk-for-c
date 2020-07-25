@@ -88,9 +88,7 @@ AZ_NODISCARD az_result az_json_token_get_boolean(az_json_token const* json_token
  * @param json_token A pointer to an #az_json_token instance.
  * @param out_value A pointer to a variable to receive the value.
  * @return AZ_OK if the number is returned.<br>
- * AZ_ERROR_JSON_INVALID_STATE if the kind != AZ_JSON_TOKEN_NUMBER.<br>
- * AZ_ERROR_PARSER_UNEXPECTED_CHAR if a non-ASCII digit is found within the token or if it contains
- * a number that would overflow or underflow uint64
+ * AZ_ERROR_JSON_INVALID_STATE if the kind != AZ_JSON_TOKEN_NUMBER.
  */
 AZ_NODISCARD az_result
 az_json_token_get_uint64(az_json_token const* json_token, uint64_t* out_value);
@@ -101,46 +99,10 @@ az_json_token_get_uint64(az_json_token const* json_token, uint64_t* out_value);
  * @param json_token A pointer to an #az_json_token instance.
  * @param out_value A pointer to a variable to receive the value.
  * @return AZ_OK if the number is returned.<br>
- * AZ_ERROR_JSON_INVALID_STATE if the kind != AZ_JSON_TOKEN_NUMBER.<br>
- * AZ_ERROR_PARSER_UNEXPECTED_CHAR if a non-ASCII digit is found within the token or if it contains
- * a number that would overflow or underflow uint32
+ * AZ_ERROR_JSON_INVALID_STATE if the kind != AZ_JSON_TOKEN_NUMBER.
  */
 AZ_NODISCARD az_result
 az_json_token_get_uint32(az_json_token const* json_token, uint32_t* out_value);
-
-/**
- * @brief Returns the JSON token's number as a 64-bit signed integer.
- *
- * @param json_token A pointer to an #az_json_token instance.
- * @param out_value A pointer to a variable to receive the value.
- * @return AZ_OK if the number is returned.<br>
- * AZ_ERROR_JSON_INVALID_STATE if the kind != AZ_JSON_TOKEN_NUMBER.<br>
- * AZ_ERROR_PARSER_UNEXPECTED_CHAR if a non-ASCII digit is found within the token or if it contains
- * a number that would overflow or underflow int64
- */
-AZ_NODISCARD az_result az_json_token_get_int64(az_json_token const* json_token, int64_t* out_value);
-
-/**
- * @brief Returns the JSON token's number as a 32-bit signed integer.
- *
- * @param json_token A pointer to an #az_json_token instance.
- * @param out_value A pointer to a variable to receive the value.
- * @return AZ_OK if the number is returned.<br>
- * AZ_ERROR_JSON_INVALID_STATE if the kind != AZ_JSON_TOKEN_NUMBER.<br>
- * AZ_ERROR_PARSER_UNEXPECTED_CHAR if a non-ASCII digit is found within the token or if it contains
- * a number that would overflow or underflow int32
- */
-AZ_NODISCARD az_result az_json_token_get_int32(az_json_token const* json_token, int32_t* out_value);
-
-/**
- * @brief Returns the JSON token's number as a double.
- *
- * @param json_token A pointer to an #az_json_token instance.
- * @param out_value A pointer to a variable to receive the value.
- * @return AZ_OK if the number is returned.<br>
- * AZ_ERROR_JSON_INVALID_STATE if the kind != AZ_JSON_TOKEN_NUMBER.
- */
-AZ_NODISCARD az_result az_json_token_get_double(az_json_token const* json_token, double* out_value);
 
 /**
  * @brief Returns the JSON token's string after unescaping it, if required.
@@ -247,10 +209,23 @@ typedef struct
  * @return An #az_result value indicating the result of the operation:
  *         - #AZ_OK if the az_json_builder is initialized successfully
  */
-AZ_NODISCARD az_result az_json_builder_init(
+AZ_NODISCARD AZ_INLINE az_result az_json_builder_init(
     az_json_builder* json_builder,
     az_span destination_buffer,
-    az_json_builder_options const* options);
+    az_json_builder_options const* options)
+{
+  *json_builder = (az_json_builder){
+    ._internal = {
+      .destination_buffer = destination_buffer,
+      .bytes_written = 0,
+      .need_comma = false,
+      .token_kind = AZ_JSON_TOKEN_NONE,
+      .bit_stack = { 0 },
+      .options = options == NULL ? az_json_builder_options_default() : *options,
+    },
+  };
+  return AZ_OK;
+}
 
 /**
  * @brief Returns the #az_span containing the JSON text written to the underlying buffer so far.
@@ -325,35 +300,8 @@ AZ_NODISCARD az_result az_json_builder_append_bool(az_json_builder* json_builder
  *         - #AZ_OK if the number was appended successfully
  *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the buffer is too small
  */
-AZ_NODISCARD az_result az_json_builder_append_int32(az_json_builder* json_builder, int32_t value);
-
-/**
- * @brief Appends a double number value.
- *
- * @param[in] json_builder A pointer to an #az_json_builder instance containing the buffer to append
- * the number to.
- * @param[in] value The value to be written as a JSON number.
- * @param[in] fractional_digits The number of digits of the \p value to write after the decimal
- * point and truncate the rest.
- * @return An #az_result value indicating the result of the operation:
- *         - #AZ_OK if the number was appended successfully
- *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the buffer is too small
- *         - #AZ_ERROR_NOT_SUPPORTED if the \p value contains an integer component that is too
- * large and would overflow beyond 2^53 - 1
- *
- * @remark Only finite double values are supported. Values such as NAN and INFINITY are not allowed
- * and would lead to invalid JSON being written.
- *
- * @remark Non-significant trailing zeros (after the decimal point) are not written, even if \p
- * fractional_digits is large enough to allow the zero padding.
- *
- * @remark The \p fractional_digits must be between 0 and 15 (inclusive). Any value passed in that
- * is larger will be clamped down to 15.
- */
-AZ_NODISCARD az_result az_json_builder_append_double(
-    az_json_builder* json_builder,
-    double value,
-    int32_t fractional_digits);
+AZ_NODISCARD az_result
+az_json_builder_append_int32_number(az_json_builder* json_builder, int32_t value);
 
 /**
  * @brief Appends the JSON literal `null`.
