@@ -271,7 +271,7 @@ jobs:
 
   - task: PublishPipelineArtifact@1
     inputs:
-      artifactName: map-files/$(VCPKG_DEFAULT_TRIPLET)
+      artifactName: map-files-$(VCPKG_DEFAULT_TRIPLET)
       path: $(Build.ArtifactStagingDirectory)
     condition: eq(variables['PublishMapFiles'], 'true')
 
