@@ -82,11 +82,11 @@ AZ_NODISCARD static az_result _az_parse_json_payload(
     int64_t* expires_in_seconds,
     az_json_token* json_access_token)
 {
-  az_json_reader jr;
-  AZ_RETURN_IF_FAILED(az_json_reader_init(&jr, body, NULL));
+  az_json_parser jp;
+  AZ_RETURN_IF_FAILED(az_json_parser_init(&jp, body, NULL));
 
-  AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
-  if (jr.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
+  AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
+  if (jp.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
   {
     return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
   }
@@ -94,28 +94,28 @@ AZ_NODISCARD static az_result _az_parse_json_payload(
   bool found_expires_in = false;
   bool found_access_token = false;
 
-  AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
+  AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
 
-  while (jr.token.kind != AZ_JSON_TOKEN_END_OBJECT)
+  while (jp.token.kind != AZ_JSON_TOKEN_END_OBJECT)
   {
-    if (az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("expires_in")))
+    if (az_json_token_is_text_equal(&jp.token, AZ_SPAN_FROM_STR("expires_in")))
     {
-      AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
-      AZ_RETURN_IF_FAILED(az_json_token_get_int64(&jr.token, expires_in_seconds));
+      AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
+      AZ_RETURN_IF_FAILED(az_json_token_get_int64(&jp.token, expires_in_seconds));
       found_expires_in = true;
     }
-    else if (az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("access_token")))
+    else if (az_json_token_is_text_equal(&jp.token, AZ_SPAN_FROM_STR("access_token")))
     {
-      AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
-      *json_access_token = jr.token;
+      AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
+      *json_access_token = jp.token;
       found_access_token = true;
     }
     else
     {
       // ignore other tokens
-      AZ_RETURN_IF_FAILED(az_json_reader_skip_children(&jr));
+      AZ_RETURN_IF_FAILED(az_json_parser_skip_children(&jp));
     }
-    AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
+    AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
   }
 
   if (!found_expires_in || !found_access_token)
