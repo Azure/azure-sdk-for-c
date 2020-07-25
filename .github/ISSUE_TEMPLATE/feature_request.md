@@ -21,5 +21,6 @@ Add any other context or screenshots about the feature request here.
 
 **Information Checklist**
 Kindly make sure that you have added all the following information above and checkoff the required fields otherwise we will treat the issuer as an incomplete report
+
 - [ ] Description Added
 - [ ] Expected solution specified
