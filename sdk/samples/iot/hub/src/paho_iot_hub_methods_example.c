@@ -20,9 +20,7 @@
 #include <azure/core/az_span.h>
 #include <azure/iot/az_iot_hub_client.h>
 
-#define TIMEOUT_MQTT_RECEIVE_MS (60 * 1000)
 #define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
-#define MAX_MESSAGE_COUNT 5
 
 #ifdef _MSC_VER
 // "'getenv': This function or variable may be unsafe. Consider using _dupenv_s instead."
@@ -42,38 +40,6 @@
 // DO NOT MODIFY: the path to a PEM file containing the server trusted CA
 // This is usually not needed on Linux or Mac but needs to be set on Windows.
 #define ENV_DEVICE_X509_TRUST_PEM_FILE "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE"
-
-// Logging with formatting
-#define LOG_ERROR(...) \
-  { \
-    (void)fprintf(stderr, "ERROR:\t\t%s:%s():%d: ", __FILE__, __func__, __LINE__); \
-    (void)fprintf(stderr, __VA_ARGS__); \
-    (void)fprintf(stderr, "\n"); \
-    fflush(stdout); \
-    fflush(stderr); \
-  }
-#define LOG_SUCCESS(...) \
-  { \
-    (void)printf("SUCCESS:\t"); \
-    (void)printf(__VA_ARGS__); \
-    (void)printf("\n"); \
-  }
-#define LOG(...) \
-  { \
-    (void)printf("\t\t"); \
-    (void)printf(__VA_ARGS__); \
-    (void)printf("\n"); \
-  }
-#define LOG_AZ_SPAN(span_description, span) \
-  { \
-    (void)printf("\t\t%s ", span_description); \
-    char* buffer = (char*)az_span_ptr(span); \
-    for (int32_t i = 0; i < az_span_size(span); i++) \
-    { \
-      putchar(*buffer++); \
-    } \
-    (void)printf("\n"); \
-  }
 
 static const uint8_t null_terminator = '\0';
 static char device_id[64];
@@ -112,16 +78,10 @@ static int subscribe();
 //
 // Messaging functions
 //
-static void receive_messages();
-static void parse_message(
-    char* topic,
-    int topic_len,
-    const MQTTClient_message* message,
-    az_iot_hub_client_method_request* method_request);
-static void invoke_method(const az_iot_hub_client_method_request* method_request);
+static int on_received(void* context, char* topicName, int topicLen, MQTTClient_message* message);
 static az_span ping_method(void);
-static void send_method_response(
-    const az_iot_hub_client_method_request* request,
+static int send_method_response(
+    az_iot_hub_client_method_request* request,
     uint16_t status,
     az_span response);
 
@@ -157,6 +117,14 @@ int main()
     return rc;
   }
 
+  // Set the callback for incoming MQTT messages
+  if ((rc = MQTTClient_setCallbacks(mqtt_client, NULL, NULL, on_received, NULL))
+      != MQTTCLIENT_SUCCESS)
+  {
+    printf("Failed to set MQTT callbacks, MQTTClient return code %d\n", rc);
+    return rc;
+  }
+
   // Connect to IoT Hub
   if ((rc = connect_device()) != MQTTCLIENT_SUCCESS)
   {
@@ -172,8 +140,8 @@ int main()
   printf("Subscribed to topics.\n");
 
   // Wait for any incoming method invocations
-  printf("Waiting for activity.\n\n");
-  receive_messages();
+  printf("Waiting for activity. [Press any key to abort]\n");
+  (void)getchar();
 
   // Gracefully disconnect: send the disconnect packet and close the socket
   if ((rc = MQTTClient_disconnect(mqtt_client, TIMEOUT_MQTT_DISCONNECT_MS)) != MQTTCLIENT_SUCCESS)
@@ -333,100 +301,74 @@ static int subscribe()
   return MQTTCLIENT_SUCCESS;
 }
 
-static void receive_messages()
+static int on_received(void* context, char* topicName, int topicLen, MQTTClient_message* message)
 {
+  (void)context;
   int rc;
-  char* topic = NULL;
-  int topic_len = 0;
-  MQTTClient_message* message = NULL;
+
+  printf("Received a message from service.\n");
+  printf("Topic: %s\n", topicName);
+
+  if (topicLen == 0)
+  {
+    // The length of the topic if there are one or more NULL characters embedded in topicName,
+    // otherwise topicLen is 0.
+    topicLen = (int)strlen(topicName);
+  }
+  az_span topic_span = az_span_init((uint8_t*)topicName, topicLen);
+
+  // Parse the incoming message topic and check to make sure it is a methods message
   az_iot_hub_client_method_request method_request;
-
-  // Wait until max # messages received or timeout to receive a single message expires.
-  for(uint8_t message_count = 0; message_count < MAX_MESSAGE_COUNT; message_count++)
+  if (az_failed(
+          rc
+          = az_iot_hub_client_methods_parse_received_topic(&client, topic_span, &method_request)))
   {
-    if (((rc
-          = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, TIMEOUT_MQTT_RECEIVE_MS))
-          != MQTTCLIENT_SUCCESS)
-          && (rc != MQTTCLIENT_TOPICNAME_TRUNCATED))
-    {
-      LOG_ERROR("Failed to receive message: MQTTClient return code %d.", rc);
-      exit(rc);
-    }
-    else if (message == NULL)
-    {
-      LOG_ERROR("Timeout expired: MQTTClient return code %d.", rc);
-      exit(rc);
-    }
-    else if (rc == MQTTCLIENT_TOPICNAME_TRUNCATED)
-    {
-      topic_len = (int)strlen(topic);
-    }
-    LOG_SUCCESS("Message #%d: Client received message from the service.", message_count + 1);
-
-    parse_message(topic, topic_len, message, &method_request);
-    LOG_SUCCESS("Client parsed message.");
-
-    invoke_method(&method_request);
-    LOG(" "); //formatting
-  }
-
-  MQTTClient_freeMessage(&message);
-  MQTTClient_free(topic);
-  return;
-}
-
-static void parse_message(
-    char* topic,
-    int topic_len,
-    const MQTTClient_message* message,
-    az_iot_hub_client_method_request* method_request)
-{
-  int rc;
-  az_span topic_span = az_span_init((uint8_t*)topic, topic_len);
-  az_span message_span = az_span_init((uint8_t*)message->payload, message->payloadlen);
-
-  if (az_failed(rc = az_iot_hub_client_methods_parse_received_topic(&client, topic_span, method_request)))
-  {
-    LOG_ERROR("Message from unknown topic: az_result return code 0x%04x.", rc);
-    LOG_AZ_SPAN("Topic:", topic_span);
-    exit(rc);
-  }
-  LOG_SUCCESS("Client received a valid topic response:");
-  LOG_AZ_SPAN("Topic:", topic_span);
-  LOG_AZ_SPAN("Payload:", message_span);
-
-  return;
-}
-
-static void invoke_method(const az_iot_hub_client_method_request* method_request)
-{
-  if (az_span_is_content_equal(ping_method_name_span, method_request->name))
-  {
-    // Invoke Method
-    az_span response = ping_method();
-    LOG_SUCCESS("Client invoked method.");
-
-    // Send a response
-    send_method_response(method_request, AZ_IOT_STATUS_OK, response);
+    printf("Topic is not a methods message, az_result return code %04x\n", rc);
   }
   else
   {
-    // Unsupported Method
-    LOG_AZ_SPAN("Method not found:", method_request->name);
-    send_method_response(method_request, AZ_IOT_STATUS_NOT_FOUND, ping_method_fail_response);
+    if (az_span_is_content_equal(ping_method_name_span, method_request.name))
+    {
+      // Invoke Method
+      az_span response = ping_method();
+
+      // Send a response
+      if ((send_method_response(&method_request, AZ_IOT_STATUS_OK, response)) != MQTTCLIENT_SUCCESS)
+      {
+        printf("Unable to send %d response.\n", AZ_IOT_STATUS_OK);
+      }
+    }
+    else
+    {
+      // Unsupported Method
+      printf(
+          "Method %.*s not found\n",
+          az_span_size(method_request.name),
+          az_span_ptr(method_request.name));
+      if ((send_method_response(
+              &method_request, AZ_IOT_STATUS_NOT_FOUND, ping_method_fail_response))
+          != MQTTCLIENT_SUCCESS)
+      {
+        printf("Unable to send %d response.\n", AZ_IOT_STATUS_NOT_FOUND);
+      }
+    }
   }
 
-  return;
+  putchar('\n');
+  MQTTClient_freeMessage(&message);
+  MQTTClient_free(topicName);
+
+  return 1;
 }
 
 static az_span ping_method(void)
 {
-  LOG("PING!");
+  printf("PING!\n");
   return ping_method_success_response;
 }
 
-static void send_method_response(
-    const az_iot_hub_client_method_request* request,
+static int send_method_response(
+    az_iot_hub_client_method_request* request,
     uint16_t status,
     az_span response)
 {
@@ -442,9 +384,17 @@ static void send_method_response(
               sizeof(methods_response_topic),
               NULL)))
   {
-    LOG_ERROR("Unable to get method response publish topic, az_result return code %04x", rc);
-    exit(rc);
+    printf("Unable to get method response publish topic, az_result return code %04x", rc);
+    return rc;
   }
+
+  printf("Status: %u\tPayload: ", status);
+  char* payload_char = (char*)az_span_ptr(response);
+  for (int32_t i = 0; i < az_span_size(response); i++)
+  {
+    putchar(*payload_char++);
+  }
+  putchar('\n');
 
   // Send the methods response
   if ((rc = MQTTClient_publish(
@@ -457,12 +407,11 @@ static void send_method_response(
            NULL))
       != MQTTCLIENT_SUCCESS)
   {
-    LOG_ERROR("Failed to publish method response, MQTTClient return code %d\n", rc);
-    exit(rc);
+    printf("Failed to publish method response, MQTTClient return code %d\n", rc);
+    return rc;
   }
-  LOG_SUCCESS("Client published method response:");
-  LOG("Status: %u", status);
-  LOG_AZ_SPAN("Payload:", response);
 
-  return;
+  printf("Sent response\n");
+
+  return MQTTCLIENT_SUCCESS;
 }
