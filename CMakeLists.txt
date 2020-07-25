@@ -49,6 +49,8 @@ enable_testing ()
 
 include(eng/cmake/global_compile_options.txt)
 
+include(cmake-modules/GenerateMapFiles.cmake)
+
 # Include function for creating code coverage targets
 include(CreateCodeCoverageTargets)
 

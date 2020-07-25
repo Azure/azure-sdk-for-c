@@ -9,6 +9,16 @@ set(CMAKE_C_STANDARD 99)
 
 include(AddTestCMocka)
 
+# Generate map file
+if(MSVC)
+    add_link_options(/MAP)
+elseif(CMAKE_C_COMPILER_ID MATCHES "Clang")
+    add_link_options(-Wl,-map,az_storage_blobs_test.map)
+else()
+    add_link_options(-Xlinker -Map=az_storage_blobs_test.map)
+endif()
+
+
 add_cmocka_test(az_storage_blobs_test SOURCES
                 main.c
                 az_storage_blobs_unit_tests.c
@@ -19,3 +29,4 @@ add_cmocka_test(az_storage_blobs_test SOURCES
                     az_nohttp
                     ${PAL}
                 )
+
