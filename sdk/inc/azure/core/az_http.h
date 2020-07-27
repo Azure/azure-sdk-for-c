@@ -229,7 +229,7 @@ az_http_response_get_next_header(az_http_response* response, az_pair* out_header
  *
  * @param response A pointer to an az_http_response instance.
  * @param out_body A pointer to an az_span to receive the HTTP response's body.
- * @return AZ_OK = An az_span over the reponse body was returned<br>
+ * @return AZ_OK = An az_span over the response body was returned<br>
  * Other value = Error while trying to read and parse body
  */
 AZ_NODISCARD az_result az_http_response_get_body(az_http_response* response, az_span* out_body);

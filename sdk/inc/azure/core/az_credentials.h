@@ -28,7 +28,7 @@
 #include <azure/core/_az_cfg_prefix.h>
 
 /**
- * @brief AZ_CREDENTIAL_ANONYMOUS is equivallent to no credential (NULL).
+ * @brief AZ_CREDENTIAL_ANONYMOUS is equivalent to no credential (NULL).
  *
  */
 #define AZ_CREDENTIAL_ANONYMOUS NULL
