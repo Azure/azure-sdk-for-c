@@ -88,6 +88,7 @@ jobs:
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON'
+        PublishMapFiles: 'true'
       Win_x86_with_samples_and_unit_test:
         OSVmImage: 'windows-2019'
         vcpkg.deps: 'curl[winssl] paho-mqtt cmocka'
@@ -95,6 +96,7 @@ jobs:
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: Win32
         build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=WIN32 -DUNIT_TESTING=ON'
+        PublishMapFiles: 'true'
       Win_x64_with_samples_and_unit_test:
         OSVmImage: 'windows-2019'
         vcpkg.deps: 'curl[winssl] paho-mqtt cmocka'
@@ -102,11 +104,13 @@ jobs:
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: x64
         build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=WIN32 -DUNIT_TESTING=ON'
+        PublishMapFiles: 'true'
       MacOS_x64_with_samples_and_unit_test:
         OSVmImage: 'macOS-10.15'
         vcpkg.deps: 'curl[ssl] paho-mqtt cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
         build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON'
+        PublishMapFiles: 'true'
 
       # Build with unit testing only. No samples [cmocka] - PRECONDITIONS ON
       # WARNINGS_AS_ERRORS          ON
@@ -125,7 +129,6 @@ jobs:
         build.args: ' -DUNIT_TESTING=ON -DCMAKE_BUILD_TYPE=Debug -DUNIT_TESTING_MOCKS=ON'
         AZ_SDK_CODE_COV: 1
         AZ_SDK_C_NO_SAMPLES: 'true'
-        PublishMapFiles: 'true'
       Win_x86_with_unit_test:
         OSVmImage: 'windows-2019'
         vcpkg.deps: 'cmocka'
@@ -134,7 +137,6 @@ jobs:
         CMAKE_GENERATOR_PLATFORM: Win32
         build.args: ' -DUNIT_TESTING=ON'
         AZ_SDK_C_NO_SAMPLES: 'true'
-        PublishMapFiles: 'true'
       Win_x64_with_unit_test:
         OSVmImage: 'windows-2019'
         vcpkg.deps: 'cmocka'
@@ -143,14 +145,12 @@ jobs:
         CMAKE_GENERATOR_PLATFORM: x64
         build.args: ' -DUNIT_TESTING=ON'
         AZ_SDK_C_NO_SAMPLES: 'true'
-        PublishMapFiles: 'true'
       MacOS_x64_with_unit_test:
         OSVmImage: 'macOS-10.15'
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
         build.args: ' -DUNIT_TESTING=ON'
         AZ_SDK_C_NO_SAMPLES: 'true'
-        PublishMapFiles: 'true'
 
       # Build with unit testing only. No samples [cmocka] - PRECONDITIONS OFF
       # WARNINGS_AS_ERRORS          ON
