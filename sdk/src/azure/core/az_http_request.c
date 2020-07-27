@@ -219,7 +219,8 @@ az_http_request_set_query_parameter(_az_http_request* ref_request, az_span name,
     return AZ_OK;
   }
 
-  // Adding new query parameter
+  // Adding new query parameter. Adding +2 to required length to include extra required symbols `=`
+  // and `?` or `&`.
   int32_t required_length = az_span_size(name) + az_span_size(value) + 2;
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(url_remainder, required_length);
 
