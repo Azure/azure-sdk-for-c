@@ -139,7 +139,6 @@ static az_result read_configuration_entry(
 static az_result create_mqtt_endpoint(char* destination, int32_t destination_size, az_span iot_hub);
 static int connect_device(void);
 static int subscribe(void);
-static void sleep_for_seconds(uint32_t seconds);
 
 //
 // Messaging functions
@@ -253,8 +252,6 @@ int main(void)
 
     // Send a telemetry message
     send_telemetry_message();
-
-    sleep_for_seconds(DEVICE_DO_WORK_SLEEP_MS);
   }
 
   // Gracefully disconnect: send the disconnect packet and close the socket
@@ -272,15 +269,6 @@ int main(void)
   MQTTClient_destroy(&mqtt_client);
 
   return 0;
-}
-
-static void sleep_for_seconds(uint32_t seconds)
-{
-#ifdef _WIN32
-  Sleep((DWORD)seconds * 1000);
-#else
-  sleep(seconds);
-#endif
 }
 
 // Read OS environment variables using stdlib function
