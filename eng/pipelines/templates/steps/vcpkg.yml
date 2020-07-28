@@ -39,28 +39,7 @@ steps:
         echo "##vso[task.setvariable variable=VCPKG_INSTALLATION_ROOT;]$(pwd)"
     # Execute only for Mac and if there is at least one dependency to be installed
     condition: and(succeeded(), contains(variables['OSVmImage'], 'macOS'), not(eq(variables['${{ parameters.DependenciesVariableName }}'], '')))
-    displayName: vcpkg bootstrap (Mac)
-
-  # Update vcpkg and re-bootstrap on non-Mac OS'. Vcpkg is installed on the
-  # image at a given time stamp and not moved forward until some update
-  # procedure is run.
-  - task: Bash@3
-    inputs:
-      targetType: inline
-      script: |
-        cd $VCPKG_INSTALLATION_ROOT
-
-        # Sometimes the image has changes in the git tree. Reset to HEAD and
-        # then pull
-        git reset --hard HEAD
-        git pull origin master
-
-        ./bootstrap-vcpkg.sh
-    condition: and(succeeded(), not(contains(variables['OSVmImage'], 'macOS')), not(eq(variables['${{ parameters.DependenciesVariableName }}'], '')))
-    displayName: Upgrade vcpkg
-
-  - script: vcpkg version
-    displayName: vcpkg version
+    displayName: vcpkg bootstrap
 
   - script: |
       vcpkg install $(${{ parameters.DependenciesVariableName }})
