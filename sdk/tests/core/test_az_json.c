@@ -14,12 +14,6 @@
 
 #define TEST_EXPECT_SUCCESS(exp) assert_true(az_succeeded(exp))
 
-az_result test_allocator(az_allocator_context* allocator_context, az_span* out_next_destination);
-
-az_result test_allocator_never_called(
-    az_allocator_context* allocator_context,
-    az_span* out_next_destination);
-
 static void test_json_token_helper(
     az_json_token token,
     az_json_token_kind expected_token_kind,
