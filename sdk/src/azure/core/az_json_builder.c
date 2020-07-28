@@ -49,7 +49,7 @@ _get_remaining_span(az_json_builder* json_builder, int32_t required_size)
 
   az_span remaining = az_span_slice_to_end(destination, json_builder->_internal.bytes_written);
 
-  // If we need more space, get the user to provide more, if they provided a callback.
+  // We need more space. Get the user to provide more, if they provided a callback.
   int32_t remaining_size = az_span_size(remaining);
   if (remaining_size < required_size && json_builder->_internal.allocator_callback != NULL)
   {
