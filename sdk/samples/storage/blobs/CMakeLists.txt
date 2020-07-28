@@ -22,10 +22,12 @@ add_executable (${TARGET_NAME} src/blobs_client_example.c)
 
 target_link_libraries(${TARGET_NAME} PRIVATE az_storage_blobs az_core)
 
+# Workaround for linker warning LNK4098: defaultlib 'LIBCMTD' conflicts with use of other libs
 if (MSVC)
     set_target_properties(${TARGET_NAME}
         PROPERTIES LINK_FLAGS
-        "/NODEFAULTLIB:libcmtd.lib"
+        "/VERBOSE:LIB"
+        #"/NODEFAULTLIB:libcmtd.lib"
     )
 endif()
 
