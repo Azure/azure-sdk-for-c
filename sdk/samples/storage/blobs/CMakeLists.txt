@@ -31,5 +31,5 @@ else()
   target_compile_definitions(blobs_client_example PRIVATE AZ_NO_HTTP)
 endif()
 
-# get the appropiate PAL lib to link
+# get the appropriate PAL lib to link
 target_link_libraries(blobs_client_example PRIVATE ${PAL})

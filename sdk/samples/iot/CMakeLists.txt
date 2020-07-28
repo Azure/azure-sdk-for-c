@@ -50,4 +50,3 @@ add_subdirectory(hub)
 add_subdirectory(provisioning)
 
 endif() # TRANSPORT_PAHO
-

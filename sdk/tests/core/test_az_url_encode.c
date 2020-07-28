@@ -229,7 +229,7 @@ static void test_url_encode_preconditions(void** state)
       assert_true(az_span_is_content_equal(buffer5, AZ_SPAN_FROM_STR("*****")));
     }
     {
-      // Ipnut is empty, so the output is also empty BUT the output span is null.
+      // Input is empty, so the output is also empty BUT the output span is null.
       int32_t url_length = 0xFF;
       assert_true(az_succeeded(_az_span_url_encode(AZ_SPAN_NULL, AZ_SPAN_NULL, &url_length)));
       assert_int_equal(url_length, 0);
