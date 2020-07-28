@@ -246,9 +246,11 @@ static void test_json_builder_chunked(void** state)
     az_span_allocator_fn allocator = &test_allocator;
     int32_t previous = 0;
     _az_user_context user_context = { .current_index = &previous };
+    az_allocator_context context
+        = { .remaining_size = 0, .required_size = 0, .user_context = (void*)&user_context };
 
-    TEST_EXPECT_SUCCESS(az_json_builder_chunked_init(
-        &builder, AZ_SPAN_NULL, allocator, (void*)&user_context, NULL));
+    TEST_EXPECT_SUCCESS(
+        az_json_builder_chunked_init(&builder, AZ_SPAN_NULL, allocator, &context, NULL));
 
     // 0___________________________________________________________________________________________________1
     // 0_________1_________2_________3_________4_________5_________6_________7_________8_________9_________0
@@ -312,9 +314,11 @@ static void test_json_builder_chunked(void** state)
     az_span_allocator_fn allocator = &test_allocator;
     int32_t previous = 0;
     _az_user_context user_context = { .current_index = &previous };
+    az_allocator_context context
+        = { .remaining_size = 0, .required_size = 0, .user_context = (void*)&user_context };
 
-    TEST_EXPECT_SUCCESS(az_json_builder_chunked_init(
-        &builder, AZ_SPAN_NULL, allocator, (void*)&user_context, NULL));
+    TEST_EXPECT_SUCCESS(
+        az_json_builder_chunked_init(&builder, AZ_SPAN_NULL, allocator, &context, NULL));
 
     // this json { "span": "\" } would be scaped to { "span": "\\"" }
     uint8_t single_char[1] = { '\\' }; // char = '\'
@@ -343,9 +347,11 @@ static void test_json_builder_chunked(void** state)
     az_span_allocator_fn allocator = &test_allocator;
     int32_t previous = 0;
     _az_user_context user_context = { .current_index = &previous };
+    az_allocator_context context
+        = { .remaining_size = 0, .required_size = 0, .user_context = (void*)&user_context };
 
-    TEST_EXPECT_SUCCESS(az_json_builder_chunked_init(
-        &builder, AZ_SPAN_NULL, allocator, (void*)&user_context, NULL));
+    TEST_EXPECT_SUCCESS(
+        az_json_builder_chunked_init(&builder, AZ_SPAN_NULL, allocator, &context, NULL));
 
     // this json { "array": [1, 2, {}, 3 ] }
     TEST_EXPECT_SUCCESS(az_json_builder_append_begin_object(&builder));
@@ -378,9 +384,11 @@ static void test_json_builder_chunked(void** state)
     az_span_allocator_fn allocator = &test_allocator;
     int32_t previous = 0;
     _az_user_context user_context = { .current_index = &previous };
+    az_allocator_context context
+        = { .remaining_size = 0, .required_size = 0, .user_context = (void*)&user_context };
 
     TEST_EXPECT_SUCCESS(az_json_builder_chunked_init(
-        &nested_object_builder, AZ_SPAN_NULL, allocator, (void*)&user_context, NULL));
+        &nested_object_builder, AZ_SPAN_NULL, allocator, &context, NULL));
 
     {
       // 0___________________________________________________________________________________________________1
@@ -410,9 +418,11 @@ static void test_json_builder_chunked(void** state)
   {
     az_json_builder builder = { 0 };
     az_span_allocator_fn allocator = &test_allocator_always_null;
+    az_allocator_context context
+        = { .remaining_size = 0, .required_size = 0, .user_context = NULL };
 
     TEST_EXPECT_SUCCESS(
-        az_json_builder_chunked_init(&builder, AZ_SPAN_NULL, allocator, NULL, NULL));
+        az_json_builder_chunked_init(&builder, AZ_SPAN_NULL, allocator, &context, NULL));
     assert_int_equal(
         az_json_builder_append_int32_number(&builder, 1), AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
   }
@@ -437,9 +447,11 @@ static void test_json_builder_chunked_no_callback(void** state)
     az_json_builder builder = { 0 };
 
     az_span_allocator_fn allocator = &test_allocator_never_called;
+    az_allocator_context context
+        = { .remaining_size = 0, .required_size = 0, .user_context = NULL };
 
-    TEST_EXPECT_SUCCESS(
-        az_json_builder_chunked_init(&builder, AZ_SPAN_FROM_BUFFER(array), allocator, NULL, NULL));
+    TEST_EXPECT_SUCCESS(az_json_builder_chunked_init(
+        &builder, AZ_SPAN_FROM_BUFFER(array), allocator, &context, NULL));
 
     // 0___________________________________________________________________________________________________1
     // 0_________1_________2_________3_________4_________5_________6_________7_________8_________9_________0
@@ -497,9 +509,11 @@ static void test_json_builder_chunked_no_callback(void** state)
     az_json_builder builder = { 0 };
 
     az_span_allocator_fn allocator = &test_allocator_never_called;
+    az_allocator_context context
+        = { .remaining_size = 0, .required_size = 0, .user_context = NULL };
 
-    TEST_EXPECT_SUCCESS(
-        az_json_builder_chunked_init(&builder, AZ_SPAN_FROM_BUFFER(array), allocator, NULL, NULL));
+    TEST_EXPECT_SUCCESS(az_json_builder_chunked_init(
+        &builder, AZ_SPAN_FROM_BUFFER(array), allocator, &context, NULL));
 
     // this json { "span": "\" } would be scaped to { "span": "\\"" }
     uint8_t single_char[1] = { '\\' }; // char = '\'
@@ -524,9 +538,11 @@ static void test_json_builder_chunked_no_callback(void** state)
     az_json_builder builder = { 0 };
 
     az_span_allocator_fn allocator = &test_allocator_never_called;
+    az_allocator_context context
+        = { .remaining_size = 0, .required_size = 0, .user_context = NULL };
 
-    TEST_EXPECT_SUCCESS(
-        az_json_builder_chunked_init(&builder, AZ_SPAN_FROM_BUFFER(array), allocator, NULL, NULL));
+    TEST_EXPECT_SUCCESS(az_json_builder_chunked_init(
+        &builder, AZ_SPAN_FROM_BUFFER(array), allocator, &context, NULL));
 
     // this json { "array": [1, 2, {}, 3 ] }
     TEST_EXPECT_SUCCESS(az_json_builder_append_begin_object(&builder));
@@ -557,9 +573,15 @@ static void test_json_builder_chunked_no_callback(void** state)
     az_json_builder nested_object_builder = { 0 };
 
     az_span_allocator_fn allocator = &test_allocator_never_called;
+    az_allocator_context context
+        = { .remaining_size = 0, .required_size = 0, .user_context = NULL };
 
     TEST_EXPECT_SUCCESS(az_json_builder_chunked_init(
-        &nested_object_builder, AZ_SPAN_FROM_BUFFER(nested_object_array), allocator, NULL, NULL));
+        &nested_object_builder,
+        AZ_SPAN_FROM_BUFFER(nested_object_array),
+        allocator,
+        &context,
+        NULL));
 
     {
       // 0___________________________________________________________________________________________________1

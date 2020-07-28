@@ -195,7 +195,7 @@ typedef struct
     int32_t
         total_bytes_written; // For single contiguous buffer, bytes_written == total_bytes_written
     az_span_allocator_fn allocator_callback;
-    void* user_context;
+    az_allocator_context* context;
     bool need_comma;
     az_json_token_kind token_kind; // needed for validation, potentially #if/def with preconditions.
     _az_json_bit_stack bit_stack; // needed for validation, potentially #if/def with preconditions.
@@ -226,7 +226,7 @@ AZ_NODISCARD AZ_INLINE az_result az_json_builder_init(
       .first_destination_buffer = destination_buffer,
       .destination_buffer = AZ_SPAN_NULL,
       .allocator_callback = NULL,
-      .user_context = NULL,
+      .context = NULL,
       .bytes_written = 0,
       .total_bytes_written = 0,
       .need_comma = false,
@@ -250,8 +250,8 @@ AZ_NODISCARD AZ_INLINE az_result az_json_builder_init(
  * @param[in] allocator_callback An #az_span_allocator_fn callback function that provides the
  * destination span to write the JSON text to once the previous buffer is full or too small to
  * contain the next token.
- * @param[in] user_context A context specific user-defined struct or set of fields that is passed
- * through to calls to the #az_span_allocator_fn.
+ * @param[in] context An #az_allocator_context containing user-defined and other fields that are
+ * passed through to the #az_span_allocator_fn.
  * @param[in] options __[nullable]__ A reference to an #az_json_builder_options
  * structure which defines custom behavior of the #az_json_builder. If `NULL` is passed, the builder
  * will use the default options (i.e. #az_json_builder_options_default()).
@@ -263,7 +263,7 @@ AZ_NODISCARD az_result az_json_builder_chunked_init(
     az_json_builder* json_builder,
     az_span first_destination_buffer,
     az_span_allocator_fn allocator_callback,
-    void* user_context,
+    az_allocator_context* context,
     az_json_builder_options const* options);
 
 /**
