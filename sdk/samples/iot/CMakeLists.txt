@@ -5,7 +5,9 @@ if (TRANSPORT_PAHO)
 
 cmake_minimum_required (VERSION 3.10)
 
-project (az_iot_samples_common LANGUAGES C)
+set(TARGET_NAME "az_iot_samples_common")
+
+project (${TARGET_NAME} LANGUAGES C)
 
 set(CMAKE_C_STANDARD 99)
 
@@ -20,31 +22,38 @@ if(NOT OpenSSL_FOUND)
 endif()
 
 # Azure IoT Samples Library
-add_library (az_iot_samples_common
+add_library (${TARGET_NAME}
   ${CMAKE_CURRENT_LIST_DIR}/src/sample_sas_utility.c
 )
 
-target_include_directories (az_iot_samples_common
+target_include_directories (${TARGET_NAME}
   PUBLIC
   ${CMAKE_CURRENT_LIST_DIR}/inc
 )
 
+if (MSVC)
+    set_target_properties(${TARGET_NAME}
+        PROPERTIES LINK_FLAGS
+        "/NODEFAULTLIB:libcmtd.lib"
+    )
+endif()
+
 # Internal deps
-target_link_libraries(az_iot_samples_common
+target_link_libraries(${TARGET_NAME}
   PUBLIC
     az::iot::hub
     az::iot::provisioning
 )
 
 # External deps
-target_link_libraries(az_iot_samples_common
+target_link_libraries(${TARGET_NAME}
   PUBLIC
     eclipse-paho-mqtt-c::paho-mqtt3cs-static
     OpenSSL::SSL
     OpenSSL::Crypto
 )
 
-add_library (az::iot::samples::common ALIAS az_iot_samples_common)
+add_library (az::iot::samples::common ALIAS ${TARGET_NAME})
 
 add_subdirectory(hub)
 add_subdirectory(provisioning)
