@@ -213,6 +213,8 @@ AZ_NODISCARD AZ_INLINE az_json_writer_options az_json_writer_options_default()
   return options;
 }
 
+// TODO: Should total_bytes_written be made public or should az_json_writer_get_json take a
+// destination buffer?
 /**
  * @brief Provides forward-only, non-cached writing of UTF-8 encoded JSON text into the provided
  * buffer.
@@ -225,8 +227,13 @@ typedef struct
 {
   struct
   {
+    az_span first_destination_buffer; // This field is readonly. Do NOT modify.
     az_span destination_buffer;
     int32_t bytes_written;
+    int32_t
+        total_bytes_written; // For single contiguous buffer, bytes_written == total_bytes_written
+    az_span_allocator_fn allocator_callback;
+    void* user_context;
     bool need_comma;
     az_json_token_kind token_kind; // needed for validation, potentially #if/def with preconditions.
     _az_json_bit_stack bit_stack; // needed for validation, potentially #if/def with preconditions.
@@ -252,21 +259,62 @@ AZ_NODISCARD az_result az_json_writer_init(
     az_span destination_buffer,
     az_json_writer_options const* options);
 
+// TODO: Should this accept void* user_context instead of az_allocator_context* and create the
+// allocator context internally?
 /**
- * @brief Returns the #az_span containing the JSON text written to the underlying buffer so far.
+ * @brief Initializes an #az_json_writer which writes JSON text into a destination that can contain
+ * non-contiguous buffers.
  *
- * @param[in] json_writer A pointer to an #az_json_writer instance wrapping the destination
- * buffer.
+ * @param[out] json_writer A pointer to an #az_json_writer the instance to initialize.
+ * @param[in] first_destination_buffer An #az_span over the byte buffer where the JSON text is to be
+ * written at the start.
+ * @param[in] allocator_callback An #az_span_allocator_fn callback function that provides the
+ * destination span to write the JSON text to once the previous buffer is full or too small to
+ * contain the next token.
+ * @param[in] user_context A context specific user-defined struct or set of fields that is passed
+ * through to calls to the #az_span_allocator_fn.
+ * @param[in] options __[nullable]__ A reference to an #az_json_writer_options
+ * structure which defines custom behavior of the #az_json_writer. If `NULL` is passed, the writer
+ * will use the default options (i.e. #az_json_writer_options_default()).
+ *
+ * @return An #az_result value indicating the result of the operation:
+ *         - #AZ_OK if the az_json_writer is initialized successfully
+ */
+AZ_NODISCARD az_result az_json_writer_chunked_init(
+    az_json_writer* json_writer,
+    az_span first_destination_buffer,
+    az_span_allocator_fn allocator_callback,
+    void* user_context,
+    az_json_writer_options const* options);
+
+/**
+ * @brief Returns the #az_span containing the JSON text written to the underlying buffer so far, or
+ * #AZ_SPAN_NULL if the text can't fit within the provided destination buffer.
+ *
+ * @param[in] json_writer A pointer to an #az_json_writer instance wrapping the destination buffer.
  *
  * @note Do NOT modify or override the contents of the returned #az_span unless you are no longer
  * writing JSON text into it.
  *
  * @return An #az_span containing the JSON text built so far.
+ *
+ * @remarks This method is useful when the destination is a single, contiguous buffer or the JSON
+ * text fits in the first buffer. When the destination can be a set of non-contiguous buffers, and
+ * the JSON is larger than the first provided destination span, this method return #AZ_SPAN_NULL.
  */
 AZ_NODISCARD AZ_INLINE az_span az_json_writer_get_json(az_json_writer const* json_writer)
 {
+  // In the case of discontiguous buffers, where the callback provided a destination buffer beyond
+  // the first one, the JSON won't fit within a single provided span.
+  if (json_writer->_internal.total_bytes_written
+      > az_span_size(json_writer->_internal.first_destination_buffer))
+  {
+    return AZ_SPAN_NULL;
+  }
   return az_span_slice(
-      json_writer->_internal.destination_buffer, 0, json_writer->_internal.bytes_written);
+      json_writer->_internal.first_destination_buffer,
+      0,
+      json_writer->_internal.total_bytes_written);
 }
 
 /**
