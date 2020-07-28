@@ -101,6 +101,13 @@ function(ADD_CMOCKA_TEST _TARGET_NAME)
         )
     endif()
 
+    if (MSVC)
+     set_target_properties(${_TARGET_NAME}
+            PROPERTIES LINK_FLAGS
+            "/NODEFAULTLIB:libcmtd.lib"
+        )
+    endif()
+
     target_include_directories(${_TARGET_NAME} PRIVATE ${CMOCKA_INCLUDE_DIR})
     
     if (DEFINED _add_cmocka_test_PRIVATE_ACCESS)
