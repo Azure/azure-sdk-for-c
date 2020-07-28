@@ -9,66 +9,12 @@
 
 #include <azure/core/_az_cfg.h>
 
-AZ_NODISCARD az_result az_json_builder_init_chunked(
-    az_json_builder* json_builder,
-    az_span first_destination_buffer,
-    az_span_allocator_fn allocator_callback,
-    az_allocator_context* context,
-    az_json_builder_options const* options)
-{
-  _az_PRECONDITION_NOT_NULL(allocator_callback);
-  _az_PRECONDITION_NOT_NULL(context);
-
-  *json_builder = (az_json_builder){
-    ._internal = {
-      .first_destination_buffer = first_destination_buffer,
-      .destination_buffer = AZ_SPAN_NULL,
-      .allocator_callback = allocator_callback,
-      .context = context,
-      .bytes_written = 0,
-      .total_bytes_written = 0,
-      .need_comma = false,
-      .token_kind = AZ_JSON_TOKEN_NONE,
-      .bit_stack = { 0 },
-      .options = options == NULL ? az_json_builder_options_default() : *options,
-    },
-  };
-  return AZ_OK;
-}
-static AZ_NODISCARD az_span
-_get_remaining_span(az_json_builder* json_builder, int32_t required_size)
+static AZ_NODISCARD az_span _get_remaining_span(az_json_builder* json_builder)
 {
   _az_PRECONDITION_NOT_NULL(json_builder);
-  _az_PRECONDITION(required_size > 0);
 
-  // Only use the first_destination_buffer field (which is read-only) when we have not yet called
-  // the allocator_callback. After that, use the read-write destination_buffer field.
-  az_span destination = az_span_ptr(json_builder->_internal.destination_buffer) == NULL
-      ? json_builder->_internal.first_destination_buffer
-      : json_builder->_internal.destination_buffer;
-
-  az_span remaining = az_span_slice_to_end(destination, json_builder->_internal.bytes_written);
-
-  // We need more space. Get the user to provide more, if they provided a callback.
-  int32_t remaining_size = az_span_size(remaining);
-  if (remaining_size < required_size && json_builder->_internal.allocator_callback != NULL)
-  {
-    // If the callback is not null, the context is guaranteed to not be null as well.
-    json_builder->_internal.context->remaining_size = remaining_size;
-    json_builder->_internal.context->required_size = required_size;
-
-    // No more space left in the destination, let the caller fail with
-    // AZ_ERROR_INSUFFICIENT_SPAN_SIZE
-    if (!az_succeeded(json_builder->_internal.allocator_callback(
-            json_builder->_internal.context, &remaining)))
-    {
-      return AZ_SPAN_NULL;
-    }
-    json_builder->_internal.destination_buffer = remaining;
-    json_builder->_internal.bytes_written = 0;
-  }
-
-  return remaining;
+  return az_span_slice_to_end(
+      json_builder->_internal.destination_buffer, json_builder->_internal.bytes_written);
 }
 
 #ifndef AZ_NO_PRECONDITION_CHECKING
@@ -351,7 +297,6 @@ AZ_INLINE void _az_update_json_builder_state(
     az_json_token_kind token_kind)
 {
   json_builder->_internal.bytes_written += required_size;
-  json_builder->_internal.total_bytes_written += required_size;
   json_builder->_internal.need_comma = need_comma;
   json_builder->_internal.token_kind = token_kind;
 }
@@ -364,6 +309,8 @@ AZ_NODISCARD az_result az_json_builder_append_string(az_json_builder* json_build
   _az_PRECONDITION(az_span_size(value) <= _az_MAX_UNESCAPED_STRING_SIZE);
   _az_PRECONDITION(_az_is_appending_value_valid(json_builder));
 
+  az_span remaining_json = _get_remaining_span(json_builder);
+
   int32_t required_size = 2; // For the surrounding quotes.
 
   if (json_builder->_internal.need_comma)
@@ -374,7 +321,6 @@ AZ_NODISCARD az_result az_json_builder_append_string(az_json_builder* json_build
   int32_t index_of_first_escaped_char = -1;
   required_size += _az_json_builder_escaped_length(value, &index_of_first_escaped_char);
 
-  az_span remaining_json = _get_remaining_span(json_builder, required_size);
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(remaining_json, required_size);
 
   if (json_builder->_internal.need_comma)
@@ -414,6 +360,8 @@ az_json_builder_append_property_name(az_json_builder* json_builder, az_span name
   _az_PRECONDITION(az_span_size(name) <= _az_MAX_UNESCAPED_STRING_SIZE);
   _az_PRECONDITION(_az_is_appending_property_name_valid(json_builder));
 
+  az_span remaining_json = _get_remaining_span(json_builder);
+
   int32_t required_size = 3; // For the surrounding quotes and the key:value separator colon.
 
   if (json_builder->_internal.need_comma)
@@ -424,7 +372,6 @@ az_json_builder_append_property_name(az_json_builder* json_builder, az_span name
   int32_t index_of_first_escaped_char = -1;
   required_size += _az_json_builder_escaped_length(name, &index_of_first_escaped_char);
 
-  az_span remaining_json = _get_remaining_span(json_builder, required_size);
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(remaining_json, required_size);
 
   if (json_builder->_internal.need_comma)
@@ -469,6 +416,8 @@ static AZ_NODISCARD az_result _az_json_builder_append_literal(
   _az_PRECONDITION(az_span_size(literal) <= 5); // null, true, or false
   _az_PRECONDITION(_az_is_appending_value_valid(json_builder));
 
+  az_span remaining_json = _get_remaining_span(json_builder);
+
   int32_t required_size = az_span_size(literal);
 
   if (json_builder->_internal.need_comma)
@@ -476,7 +425,6 @@ static AZ_NODISCARD az_result _az_json_builder_append_literal(
     required_size++; // For the leading comma separator.
   }
 
-  az_span remaining_json = _get_remaining_span(json_builder, required_size);
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(remaining_json, required_size);
 
   if (json_builder->_internal.need_comma)
@@ -518,14 +466,15 @@ az_json_builder_append_int32_number(az_json_builder* json_builder, int32_t value
   _az_PRECONDITION_NOT_NULL(json_builder);
   _az_PRECONDITION(_az_is_appending_value_valid(json_builder));
 
-  int32_t required_size = _az_MAX_SIZE_FOR_INT32; // Need enough space to write any 32-bit integer.
+  az_span remaining_json = _get_remaining_span(json_builder);
+
+  int32_t required_size = 1; // Need space to write at least one digit.
 
   if (json_builder->_internal.need_comma)
   {
     required_size++; // For the leading comma separator.
   }
 
-  az_span remaining_json = _get_remaining_span(json_builder, required_size);
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(remaining_json, required_size);
 
   if (json_builder->_internal.need_comma)
@@ -533,17 +482,13 @@ az_json_builder_append_int32_number(az_json_builder* json_builder, int32_t value
     remaining_json = az_span_copy_u8(remaining_json, ',');
   }
 
-  // Since we asked for the maximum needed space above, this is guaranteed not to fail due to
-  // AZ_ERROR_INSUFFICIENT_SPAN_SIZE. Still checking the returned az_result, for other potential
-  // failure cases.
   az_span leftover;
   AZ_RETURN_IF_FAILED(az_span_i32toa(remaining_json, value, &leftover));
 
-  // We already accounted for the maximum size needed in required_size, so subtract that to get the
-  // actual bytes written.
+  // We already accounted for the first digit above, so therefore subtract one.
   _az_update_json_builder_state(
       json_builder,
-      required_size + _az_span_diff(leftover, remaining_json) - _az_MAX_SIZE_FOR_INT32,
+      required_size + _az_span_diff(leftover, remaining_json) - 1,
       true,
       AZ_JSON_TOKEN_NUMBER);
   return AZ_OK;
@@ -566,6 +511,8 @@ static AZ_NODISCARD az_result _az_json_builder_append_container_start(
     return AZ_ERROR_JSON_NESTING_OVERFLOW;
   }
 
+  az_span remaining_json = _get_remaining_span(json_builder);
+
   int32_t required_size = 1; // For the start object or array byte.
 
   if (json_builder->_internal.need_comma)
@@ -573,7 +520,6 @@ static AZ_NODISCARD az_result _az_json_builder_append_container_start(
     required_size++; // For the leading comma separator.
   }
 
-  az_span remaining_json = _get_remaining_span(json_builder, required_size);
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(remaining_json, required_size);
 
   if (json_builder->_internal.need_comma)
@@ -616,9 +562,10 @@ static AZ_NODISCARD az_result az_json_builder_append_container_end(
       container_kind == AZ_JSON_TOKEN_END_OBJECT || container_kind == AZ_JSON_TOKEN_END_ARRAY);
   _az_PRECONDITION(_az_is_appending_container_end_valid(json_builder, byte));
 
+  az_span remaining_json = _get_remaining_span(json_builder);
+
   int32_t required_size = 1; // For the end object or array byte.
 
-  az_span remaining_json = _get_remaining_span(json_builder, required_size);
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(remaining_json, required_size);
 
   remaining_json = az_span_copy_u8(remaining_json, byte);
