@@ -35,8 +35,7 @@ target_include_directories (${TARGET_NAME}
 if (MSVC)
     set_target_properties(${TARGET_NAME}
         PROPERTIES LINK_FLAGS
-        "/VERBOSE:LIB"
-        #"/NODEFAULTLIB:libcmtd.lib"
+        "/NODEFAULTLIB:libcmtd.lib"
     )
 endif()
 

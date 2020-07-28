@@ -26,8 +26,7 @@ target_link_libraries(${TARGET_NAME} PRIVATE az_storage_blobs az_core)
 if (MSVC)
     set_target_properties(${TARGET_NAME}
         PROPERTIES LINK_FLAGS
-        "/VERBOSE:LIB"
-        #"/NODEFAULTLIB:libcmtd.lib"
+        "/NODEFAULTLIB:libcmtd.lib"
     )
 endif()
 

@@ -105,8 +105,7 @@ function(ADD_CMOCKA_TEST _TARGET_NAME)
     if (MSVC)
      set_target_properties(${_TARGET_NAME}
             PROPERTIES LINK_FLAGS
-            "/VERBOSE:LIB"
-            #"/NODEFAULTLIB:libcmtd.lib"
+            "/NODEFAULTLIB:libcmtd.lib"
         )
     endif()
 
