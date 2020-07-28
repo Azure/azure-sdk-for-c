@@ -1,30 +1,33 @@
 # How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Espressif ESP8266 NodeMCU
 
-This is a to-the-point documentation of how to run an Azure SDK for Embedded C IoT Hub Telemetry Samples on an Esp8266 NodeMCU microcontroller. 
+This is a to-the-point documentation of how to run an Azure SDK for Embedded C IoT Hub Telemetry Samples on an Esp8266 NodeMCU microcontroller.
 
-Pre-requisites:
+Prerequisites:
+
 - [Having created an Azure account](https://github.com/ewertons/azure-sdk-for-c/wiki/How-to-create-an-Azure-account)
 - [Having created an Azure IoT Hub](https://github.com/ewertons/azure-sdk-for-c/wiki/How-to-create-an-Azure-IoT-Hub)
 - Create a logical device using Authentication Type "Symmetric Key"
 - Latest [Arduino IDE](https://www.arduino.cc/en/Main/Software) installed
 - [Azure Command Line Interface utility](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-apt?view=azure-cli-latest#install-with-one-command) and the IoT extension
+
   ```shell
   $ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
   $ az extension add --name azure-iot
   ```
+
   Alternatively, you can use [azure-iot-explorer](https://github.com/Azure/azure-iot-explorer).
 
 What is covered:
+
 - Configuring Arduino IDE to compile a sample using Azure Embedded SDK for C
 - Configuring and running an IoT Hub client telemetry sample.
 - The sample uses device keys to automatically generate a SAS token for authentication (which is valid by default for one hour).
 
 _The following was run on an Ubuntu Desktop 18.04 environment, with Arduino IDE 1.8.12._
 
+1. Create an Arduino library for Azure Embedded SDK for C
 
-01. Create an Arduino library for Azure Embedded SDK for C 
-
-    ```
+    ```shell
     $ wget https://raw.githubusercontent.com/Azure/azure-sdk-for-c/master/sdk/samples/iot/hub/aziot_esp8266/generate_arduino_zip_library.sh
     $ chmod 777 generate_arduino_zip_library.sh
     $ ./generate_arduino_zip_library.sh
@@ -32,31 +35,30 @@ _The following was run on an Ubuntu Desktop 18.04 environment, with Arduino IDE 
 
     This will create a local file named `azure-sdk-for-c.zip` containing the whole [Azure SDK for C](https://github.com/Azure/azure-sdk-for-c) as an Arduino library.
 
+2. Run the Arduino IDE
 
-02. Run the Arduino IDE
-
-03. Install the Esp8266 board
+3. Install the Esp8266 board
 
     Follow [instructions](https://github.com/esp8266/Arduino#installing-with-boards-manager) in the official Esp8266 repository.
 
-03. Install the Azure SDK for C zip library
+4. Install the Azure SDK for C zip library
 
     - On the Arduino IDE, go to `Sketch`, `Include Library`, `Add .ZIP Library...`
-    - Search for the `azure-sdk-for-c.zip` created on step 01
-    - Select the file `azure-sdk-for-c.zip` and click on `OK` 
+    - Search for the `azure-sdk-for-c.zip` created on step 1
+    - Select the file `azure-sdk-for-c.zip` and click on `OK`
 
-04. Install the Arduino PubSubClient library
+5. Install the Arduino PubSubClient library
 
     PubSubClient is a popular MQTT client for Arduino.
 
-    - On Arduino IDE, go to menu `Sketch`, `Include Library`, `Manage Libraries...` 
+    - On Arduino IDE, go to menu `Sketch`, `Include Library`, `Manage Libraries...`
     - Search for `PubSubClient` (by Nick O'Leary)
     - Hover over the library item on the result list, then click on Install.
 
-05. Create a sketch on Arduino IDE for the IoT Hub client telemetry sample
+6. Create a sketch on Arduino IDE for the IoT Hub client telemetry sample
 
-    Clone the [azure-sdk-for-c](https://github.com/Azure/azure-sdk-for-c) repo locally then open the [ESP8266 sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/hub/aziot_esp8266) (from local clone) on Arduino IDE. 
-    
+    Clone the [azure-sdk-for-c](https://github.com/Azure/azure-sdk-for-c) repo locally then open the [ESP8266 sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/hub/aziot_esp8266) (from local clone) on Arduino IDE.
+
     Edit the following parameters in `iot_configs.h`, filling in your own information:
 
     ```c
@@ -72,28 +74,28 @@ _The following was run on an Ubuntu Desktop 18.04 environment, with Arduino IDE 
 
     Save the file.
 
-06. Connect the Esp8266 NodeMCU microcontroller to your USB port
+7. Connect the Esp8266 NodeMCU microcontroller to your USB port
 
-07. On the Arduino IDE, select the board and port
+8. On the Arduino IDE, select the board and port
 
     - Go to menu `Tools`, `Board` and select `NodeMCU 1.0 (ESP-12E Module)`
     - Go to menu `Tools`, `Port` and select the port where the microcontroller is connected to.
 
-08. Upload the sketch
+9. Upload the sketch
 
     - Go to menu `Sketch` and click on `Upload`.
 
     <details>
     <summary>Expected output of the upload</summary>
     Executable segment sizes:
-    IROM   : 361788          - code in flash         (default or ICACHE_FLASH_ATTR) 
-    IRAM   : 26972   / 32768 - code in IRAM          (ICACHE_RAM_ATTR, ISRs...) 
-    DATA   : 1360  )         - initialized variables (global, static) in RAM/HEAP 
-    RODATA : 2152  ) / 81920 - constants             (global, static) in RAM/HEAP 
-    BSS    : 26528 )         - zeroed variables      (global, static) in RAM/HEAP 
+    IROM   : 361788          - code in flash         (default or ICACHE_FLASH_ATTR)
+    IRAM   : 26972   / 32768 - code in IRAM          (ICACHE_RAM_ATTR, ISRs...)
+    DATA   : 1360  )         - initialized variables (global, static) in RAM/HEAP
+    RODATA : 2152  ) / 81920 - constants             (global, static) in RAM/HEAP
+    BSS    : 26528 )         - zeroed variables      (global, static) in RAM/HEAP
     Sketch uses 392272 bytes (37%) of program storage space. Maximum is 1044464 bytes.
     Global variables use 30040 bytes (36%) of dynamic memory, leaving 51880 bytes for local variables. Maximum is 81920 bytes.
-    /home/user/.arduino15/packages/esp8266/tools/python3/3.7.2-post1/python3 /home/user/.arduino15/packages/esp8266/hardware/esp8266/2.7.1/tools/upload.py --chip esp8266 --port /dev/ttyUSB0 --baud 230400 --before default_reset --after hard_reset write_flash 0x0 /tmp/arduino_build_826987/azure_iot_hub_telemetry.ino.bin 
+    /home/user/.arduino15/packages/esp8266/tools/python3/3.7.2-post1/python3 /home/user/.arduino15/packages/esp8266/hardware/esp8266/2.7.1/tools/upload.py --chip esp8266 --port /dev/ttyUSB0 --baud 230400 --before default_reset --after hard_reset write_flash 0x0 /tmp/arduino_build_826987/azure_iot_hub_telemetry.ino.bin
     esptool.py v2.8
     Serial port /dev/ttyUSB0
     Connecting....
@@ -135,15 +137,15 @@ _The following was run on an Ubuntu Desktop 18.04 environment, with Arduino IDE 
     Hard resetting via RTS pin...
     </details>
 
-09. Monitor the micro-controller
+10. Monitor the micro-controller
 
     Go to menu `Tools`, `Serial Monitor`.
 
     If you run that right away after uploading the sketch, the serial monitor will show a similar output on success:
 
-    ```
+    ```text
     Connecting to WIFI SSID buckaroo
-    .......................WiFi connected, IP address: 
+    .......................WiFi connected, IP address:
     192.168.1.123
     Setting time using SNTP..............................done!
     Current time: Thu May 28 02:55:05 2020
@@ -154,9 +156,9 @@ _The following was run on an Ubuntu Desktop 18.04 environment, with Arduino IDE 
 
     ```
 
-10. Monitor the telemetry messages sent to the Azure IoT Hub 
+11. Monitor the telemetry messages sent to the Azure IoT Hub
 
-    ```
+    ```shell
     $ az iot hub monitor-events --login <your Azure IoT Hub connection string in quotes> --device-id <your device id>
     ```
 
@@ -204,12 +206,10 @@ _The following was run on an Ubuntu Desktop 18.04 environment, with Arduino IDE 
     ```
     </details>
 
-
-
 ## Need Help?
 
-* File an issue via [Github Issues](https://github.com/Azure/azure-sdk-for-c/issues/new/choose).
-* Check [previous questions](https://stackoverflow.com/questions/tagged/azure+c) or ask new ones on StackOverflow using
+- File an issue via [Github Issues](https://github.com/Azure/azure-sdk-for-c/issues/new/choose).
+- Check [previous questions](https://stackoverflow.com/questions/tagged/azure+c) or ask new ones on StackOverflow using
   the `azure` and `c` tags.
 
 ## Contributing

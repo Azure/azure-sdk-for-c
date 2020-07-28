@@ -41,5 +41,5 @@ else()
   target_compile_definitions(${TARGET_NAME} PRIVATE AZ_NO_HTTP)
 endif()
 
-# get the appropiate PAL lib to link
+# get the appropriate PAL lib to link
 target_link_libraries(${TARGET_NAME} PRIVATE ${PAL})

@@ -122,7 +122,7 @@ AZ_INLINE AZ_NODISCARD az_result _az_http_policy_retry_get_retry_after(
       }
       else if (az_span_is_content_equal_ignoring_case(header.key, AZ_SPAN_FROM_STR("Retry-After")))
       {
-        // The vaule is either seconds or date.
+        // The value is either seconds or date.
         int32_t const seconds = _az_uint32_span_to_int32(header.value);
         if (seconds >= 0) // int32_t max == ~68 years
         {
