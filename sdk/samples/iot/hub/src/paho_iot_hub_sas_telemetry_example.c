@@ -34,8 +34,15 @@
 #pragma warning(disable : 4996)
 #endif
 
+// Comment to use MQTT without WebSockets.
+#define USE_WEB_SOCKET
+#define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
+#define TELEMETRY_SEND_INTERVAL 1
+#define NUMBER_OF_MESSAGES 5
+#define SAS_TOKEN_EXPIRATION_TIME_DIGITS 4
+
 // DO NOT MODIFY: Device ID Environment Variable Name
-#define ENV_DEVICE_ID "AZ_IOT_DEVICE_ID"
+#define ENV_DEVICE_ID "AZ_IOT_DEVICE_ID_SAS"
 
 // DO NOT MODIFY: IoT Hub Hostname Environment Variable Name
 #define ENV_IOT_HUB_HOSTNAME "AZ_IOT_HUB_HOSTNAME"
@@ -44,21 +51,16 @@
 #define ENV_IOT_HUB_SAS_KEY "AZ_IOT_HUB_DEVICE_SAS_KEY"
 
 // DO NOT MODIFY: IoT Hub SAS Key Duration Environment Variable Name (defaults to 2 hours)
-#define ENV_IOT_HUB_SAS_KEY_DURATION "AZ_IOT_HUB_DEVICE_SAS_KEY_DURATION"
+#define ENV_IOT_HUB_SAS_KEY_DURATION_MINUTES "AZ_IOT_HUB_DEVICE_SAS_KEY_DURATION_MINUTES"
 
 // DO NOT MODIFY: the path to a PEM file containing the server trusted CA
 // This is usually not needed on Linux or Mac but needs to be set on Windows.
 #define ENV_DEVICE_X509_TRUST_PEM_FILE "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE"
 
-#define SAS_TOKEN_EXPIRATION_TIME_DIGITS 4
-#define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
-#define TELEMETRY_SEND_INTERVAL 1
-#define NUMBER_OF_MESSAGES 5
-
 static const uint8_t null_terminator = '\0';
 static char device_id[64];
 static char iot_hub_hostname[128];
-static uint32_t iot_hub_sas_key_expiration;
+static uint32_t iot_hub_sas_key_expiration_minutes;
 static char iot_hub_sas_key[128];
 static az_span iot_hub_sas_key_span;
 static char x509_trust_pem_file[256];
@@ -72,8 +74,15 @@ static char sas_b64_decoded_key[32];
 static char sas_signature_buf[128];
 static char sas_signature_hmac_encoded_buf[128];
 static char sas_signature_encoded_buf_b64[128];
+
+#ifdef USE_WEB_SOCKET
+static az_span mqtt_url_prefix = AZ_SPAN_LITERAL_FROM_STR("wss://");
+// Note: Paho fails to connect to Hub when using AZ_IOT_HUB_CLIENT_WEB_SOCKET_PATH or an X509 certificate.
+static az_span mqtt_url_suffix = AZ_SPAN_LITERAL_FROM_STR(":443" AZ_IOT_HUB_CLIENT_WEB_SOCKET_PATH_NO_X509_CLIENT_CERT);
+#else
 static az_span mqtt_url_prefix = AZ_SPAN_LITERAL_FROM_STR("ssl://");
 static az_span mqtt_url_suffix = AZ_SPAN_LITERAL_FROM_STR(":8883");
+#endif
 
 static const char* telemetry_message_payloads[NUMBER_OF_MESSAGES] = {
   "Message One", "Message Two", "Message Three", "Message Four", "Message Five",
@@ -94,7 +103,7 @@ static az_result read_configuration_entry(
     az_span* out_value);
 static az_result create_mqtt_endpoint(char* destination, int32_t destination_size, az_span iot_hub);
 static az_result generate_sas_key();
-static uint32_t get_epoch_expiration_time_from_hours(uint32_t hours);
+static uint64_t get_epoch_expiration_time_from_minutes(uint32_t minutes);
 static int connect_device();
 
 //
@@ -152,9 +161,6 @@ int main()
     return rc;
   }
 
-  printf("Messages Sent [Press any key to shut down]\n");
-  (void)getchar();
-
   // Gracefully disconnect: send the disconnect packet and close the socket
   if ((rc = MQTTClient_disconnect(mqtt_client, TIMEOUT_MQTT_DISCONNECT_MS)) != MQTTCLIENT_SUCCESS)
   {
@@ -179,13 +185,13 @@ static az_result read_configuration_and_init_client()
   char iot_hub_sas_key_expiration_char[SAS_TOKEN_EXPIRATION_TIME_DIGITS];
   az_span iot_hub_sas_expiration_span = AZ_SPAN_FROM_BUFFER(iot_hub_sas_key_expiration_char);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_IOT_HUB_SAS_KEY_DURATION,
-      "2",
+      ENV_IOT_HUB_SAS_KEY_DURATION_MINUTES,
+      "120",
       false,
       iot_hub_sas_expiration_span,
       &iot_hub_sas_expiration_span));
 
-  AZ_RETURN_IF_FAILED(az_span_atou32(iot_hub_sas_expiration_span, &iot_hub_sas_key_expiration));
+  AZ_RETURN_IF_FAILED(az_span_atou32(iot_hub_sas_expiration_span, &iot_hub_sas_key_expiration_minutes));
 
   iot_hub_sas_key_span = AZ_SPAN_FROM_BUFFER(iot_hub_sas_key);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
@@ -272,7 +278,7 @@ static az_result generate_sas_key()
   az_result rc;
 
   // Create the POSIX expiration time from input hours
-  uint32_t sas_expiration = get_epoch_expiration_time_from_hours(iot_hub_sas_key_expiration);
+  uint64_t sas_expiration = get_epoch_expiration_time_from_minutes(iot_hub_sas_key_expiration_minutes);
 
   // Decode the base64 encoded SAS key to use for HMAC signing
   az_span decoded_key_span;
@@ -338,9 +344,9 @@ static az_result generate_sas_key()
   return AZ_OK;
 }
 
-static uint32_t get_epoch_expiration_time_from_hours(uint32_t hours)
+static uint64_t get_epoch_expiration_time_from_minutes(uint32_t minutes)
 {
-  return (uint32_t)(time(NULL) + hours * 60 * 60);
+  return (uint64_t)(time(NULL) + minutes * 60);
 }
 
 static int connect_device()

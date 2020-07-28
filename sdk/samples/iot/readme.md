@@ -3,17 +3,17 @@
 Samples for the Embedded C client for Azure IoT are divided into:
 
 - [IoT Hub Samples](./hub/README.md): Device samples for the common IoT Hub operations like D2C, C2D, Direct Methods, and Device Twin.
-- [Provisioning Samples](./provisioning/README.md): Device samples for the Device Provisioning service. 
+- [Provisioning Samples](./provisioning/README.md): Device samples for the Device Provisioning service.
 
 ## Getting Started
 
-- **Docs**: If you're new to the Azure SDK for Embedded C take a look at the [State Machine diagram](../../../sdk/docs/iot/mqtt_state_machine.md) that explains the high-level architecture, SDK components, and a clear view of SDK x Application responsibilities. 
+- **Docs**: If you're new to the Azure SDK for Embedded C take a look at the [State Machine diagram](../../../sdk/docs/iot/mqtt_state_machine.md) that explains the high-level architecture, SDK components, and a clear view of SDK x Application responsibilities.
 - **Samples**: [This page](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/samples/iot/hub/) explains samples for the Azure SDK for Embedded C and how to use them.
 
 ## Need Help?
 
-* File an issue via [Github Issues](https://github.com/Azure/azure-sdk-for-c/issues/new/choose).
-* Check [previous questions](https://stackoverflow.com/questions/tagged/azure+c) or ask new ones on StackOverflow using
+- File an issue via [Github Issues](https://github.com/Azure/azure-sdk-for-c/issues/new/choose).
+- Check [previous questions](https://stackoverflow.com/questions/tagged/azure+c) or ask new ones on StackOverflow using
   the `azure` and `c` tags.
 
 ## Contributing

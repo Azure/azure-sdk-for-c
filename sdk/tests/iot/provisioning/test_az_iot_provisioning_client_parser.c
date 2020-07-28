@@ -278,7 +278,7 @@ test_az_iot_provisioning_client_received_topic_and_payload_parse_invalid_json_pa
   az_iot_provisioning_client_register_response response;
   az_result ret = az_iot_provisioning_client_parse_received_topic_and_payload(
       &client, received_topic, received_payload, &response);
-  assert_int_equal(AZ_ERROR_PARSER_UNEXPECTED_CHAR, ret);
+  assert_int_equal(AZ_ERROR_UNEXPECTED_CHAR, ret);
 }
 
 static void
@@ -353,7 +353,7 @@ test_az_iot_provisioning_client_received_topic_and_payload_parse_invalid_operati
   az_iot_provisioning_client_register_response response;
   az_result ret = az_iot_provisioning_client_parse_received_topic_and_payload(
       &client, received_topic, received_payload, &response);
-  assert_int_equal(AZ_ERROR_PARSER_UNEXPECTED_CHAR, ret);
+  assert_int_equal(AZ_ERROR_UNEXPECTED_CHAR, ret);
 }
 
 static void
@@ -369,7 +369,7 @@ test_az_iot_provisioning_client_received_topic_and_payload_parse_invalid_result_
   az_iot_provisioning_client_register_response response;
   az_result ret = az_iot_provisioning_client_parse_received_topic_and_payload(
       &client, received_topic, received_payload, &response);
-  assert_int_equal(AZ_ERROR_EOF, ret);
+  assert_int_equal(AZ_ERROR_ITEM_NOT_FOUND, ret);
 }
 
 static void test_az_iot_provisioning_client_received_topic_and_payload_parse_hub_not_found_fails()

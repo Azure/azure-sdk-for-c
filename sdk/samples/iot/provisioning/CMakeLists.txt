@@ -9,32 +9,24 @@ project (az_iot_provisioning_samples LANGUAGES C)
 
 set(CMAKE_C_STANDARD 99)
 
-find_package(eclipse-paho-mqtt-c CONFIG)
-if(NOT eclipse-paho-mqtt-c_FOUND)
-  find_package(eclipse-paho-mqtt-c REQUIRED)
-endif()
-
-find_package(OpenSSL CONFIG)
-if(NOT OpenSSL_FOUND)
-  find_package(OpenSSL REQUIRED)
-endif()
-
+# Provisioning (Certificates) Sample
 add_executable (paho_iot_provisioning_example 
-  src/paho_iot_provisioning_example.c
+  ${CMAKE_CURRENT_LIST_DIR}/src/paho_iot_provisioning_example.c
 )
 
-# SDK deps
 target_link_libraries(paho_iot_provisioning_example
     PRIVATE
-      az::iot::provisioning
+      az::iot::samples::common
 )
 
-# External deps
-target_link_libraries(paho_iot_provisioning_example
+# Provisioning (SAS) Sample
+add_executable (paho_iot_provisioning_sas_example
+  ${CMAKE_CURRENT_LIST_DIR}/src/paho_iot_provisioning_sas_example.c
+)
+
+target_link_libraries(paho_iot_provisioning_sas_example
   PRIVATE
-    eclipse-paho-mqtt-c::paho-mqtt3cs-static
-    OpenSSL::SSL
-    OpenSSL::Crypto
+    az::iot::samples::common
 )
 
-endif()
+endif() # TRANSPORT_PAHO

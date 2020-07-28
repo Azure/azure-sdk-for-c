@@ -79,43 +79,43 @@ AZ_NODISCARD az_result _az_aad_build_body(
 
 AZ_NODISCARD static az_result _az_parse_json_payload(
     az_span body,
-    uint64_t* expires_in_seconds,
+    int64_t* expires_in_seconds,
     az_json_token* json_access_token)
 {
-  az_json_parser jp;
-  AZ_RETURN_IF_FAILED(az_json_parser_init(&jp, body, NULL));
+  az_json_reader jr;
+  AZ_RETURN_IF_FAILED(az_json_reader_init(&jr, body, NULL));
 
-  AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
-  if (jp.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
+  AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
+  if (jr.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
   {
-    return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
+    return AZ_ERROR_UNEXPECTED_CHAR;
   }
 
   bool found_expires_in = false;
   bool found_access_token = false;
 
-  AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
+  AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
 
-  while (jp.token.kind != AZ_JSON_TOKEN_END_OBJECT)
+  while (jr.token.kind != AZ_JSON_TOKEN_END_OBJECT)
   {
-    if (az_json_token_is_text_equal(&jp.token, AZ_SPAN_FROM_STR("expires_in")))
+    if (az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("expires_in")))
     {
-      AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
-      AZ_RETURN_IF_FAILED(az_json_token_get_uint64(&jp.token, expires_in_seconds));
+      AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
+      AZ_RETURN_IF_FAILED(az_json_token_get_int64(&jr.token, expires_in_seconds));
       found_expires_in = true;
     }
-    else if (az_json_token_is_text_equal(&jp.token, AZ_SPAN_FROM_STR("access_token")))
+    else if (az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("access_token")))
     {
-      AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
-      *json_access_token = jp.token;
+      AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
+      *json_access_token = jr.token;
       found_access_token = true;
     }
     else
     {
       // ignore other tokens
-      AZ_RETURN_IF_FAILED(az_json_parser_skip_children(&jp));
+      AZ_RETURN_IF_FAILED(az_json_reader_skip_children(&jr));
     }
-    AZ_RETURN_IF_FAILED(az_json_parser_next_token(&jp));
+    AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
   }
 
   if (!found_expires_in || !found_access_token)
@@ -170,13 +170,12 @@ AZ_NODISCARD az_result _az_aad_request_token(_az_http_request* request, _az_toke
   az_span body = { 0 };
   AZ_RETURN_IF_FAILED(az_http_response_get_body(&response, &body));
 
-  uint64_t expires_in_seconds = 0;
+  int64_t expires_in_seconds = 0;
   az_json_token json_access_token = { 0 };
   AZ_RETURN_IF_FAILED(_az_parse_json_payload(body, &expires_in_seconds, &json_access_token));
 
   // We'll assume the token expires 3 minutes prior to its actual expiration.
-  int64_t const expires_in_msec
-      = (((int64_t)expires_in_seconds) - (3 * _az_TIME_SECONDS_PER_MINUTE))
+  int64_t const expires_in_msec = ((expires_in_seconds) - (3 * _az_TIME_SECONDS_PER_MINUTE))
       * _az_TIME_MILLISECONDS_PER_SECOND;
 
   _az_token new_token = {
