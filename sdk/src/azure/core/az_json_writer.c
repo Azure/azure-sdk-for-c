@@ -73,12 +73,10 @@ static AZ_NODISCARD az_span _get_remaining_span(az_json_writer* json_writer, int
 
   az_span remaining = az_span_slice_to_end(destination, json_writer->_internal.bytes_written);
 
-  // If we need more space, get the user to provide more, if they provided a callback.
-  int32_t remaining_size = az_span_size(remaining);
-  if (remaining_size < required_size && json_writer->_internal.allocator_callback != NULL)
+  if (az_span_size(remaining) < required_size && json_writer->_internal.allocator_callback != NULL)
   {
-    az_allocator_context context = { .remaining_size = remaining_size,
-                                     .required_size = required_size,
+    az_allocator_context context = { .bytes_used = json_writer->_internal.bytes_written,
+                                     .minimum_required_size = required_size,
                                      .user_context = json_writer->_internal.user_context };
 
     // No more space left in the destination, let the caller fail with

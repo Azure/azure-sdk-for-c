@@ -454,11 +454,11 @@ az_span_dtoa(az_span destination, double source, int32_t fractional_digits, az_s
  */
 typedef struct
 {
-  int32_t remaining_size; ///< The amount of space left within the previously provided destination,
-                          ///< which can be used to infer the number of bytes that have already been
-                          ///< written into that #az_span.
-  int32_t required_size; ///< The minimum length of the destination #az_span required to be provided
-                         ///< by the callback. If 0, any non-empty sized buffer must be returned.
+  int32_t bytes_used; ///< The amount of space consumed (i.e. written into) within the previously
+                      ///< provided destination, which can be used to infer the remaining number of
+                      ///< bytes of the #az_span that are leftover.
+  int32_t minimum_required_size; ///< The minimum length of the destination #az_span required to be provided
+                                 ///< by the callback. If 0, any non-empty sized buffer must be returned.
   void* user_context; ///< Any struct or set of fields that are provied by the user for their
                       ///< specific implementation, passed through to the #az_span_allocator_fn.
 } az_allocator_context;

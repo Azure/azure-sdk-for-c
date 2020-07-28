@@ -233,20 +233,20 @@ typedef struct
 az_result test_allocator(az_allocator_context* allocator_context, az_span* out_next_destination)
 {
   _az_user_context* user_context = (_az_user_context*)allocator_context->user_context;
-  int32_t current_index = *user_context->current_index - allocator_context->remaining_size;
+  int32_t current_index = *user_context->current_index + allocator_context->bytes_used;
 
-  if (current_index + allocator_context->required_size > 200)
+  if (current_index + allocator_context->minimum_required_size > 200)
   {
     current_index = 0;
   }
-  assert_true(current_index + allocator_context->required_size <= 200);
+  assert_true(current_index + allocator_context->minimum_required_size <= 200);
 
   *out_next_destination = az_span_slice(
       AZ_SPAN_FROM_BUFFER(json_array),
       current_index,
-      current_index + allocator_context->required_size);
+      current_index + allocator_context->minimum_required_size);
 
-  *user_context->current_index = current_index + allocator_context->required_size;
+  *user_context->current_index = current_index;
 
   return AZ_OK;
 }
