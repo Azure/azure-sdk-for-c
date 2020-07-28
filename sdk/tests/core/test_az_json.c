@@ -20,10 +20,6 @@ az_result test_allocator_never_called(
     az_allocator_context* allocator_context,
     az_span* out_next_destination);
 
-az_result test_allocator_always_null(
-    az_allocator_context* allocator_context,
-    az_span* out_next_destination);
-
 static void test_json_token_helper(
     az_json_token token,
     az_json_token_kind expected_token_kind,
@@ -192,12 +188,6 @@ static void test_json_builder(void** state)
               "}")));
     }
   }
-  {
-    az_json_builder builder = { 0 };
-    TEST_EXPECT_SUCCESS(az_json_builder_init(&builder, AZ_SPAN_NULL, NULL));
-    assert_int_equal(
-        az_json_builder_append_int32_number(&builder, 1), AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
-  }
 }
 
 static uint8_t json_array[200] = { 0 };
@@ -224,16 +214,6 @@ az_result test_allocator(az_allocator_context* allocator_context, az_span* out_n
       current_index + allocator_context->required_size);
 
   *user_context->current_index = current_index + allocator_context->required_size;
-
-  return AZ_OK;
-}
-
-az_result test_allocator_always_null(
-    az_allocator_context* allocator_context,
-    az_span* out_next_destination)
-{
-  (void)allocator_context;
-  *out_next_destination = AZ_SPAN_NULL;
 
   return AZ_OK;
 }
@@ -414,17 +394,6 @@ static void test_json_builder_chunked(void** state)
               "\"bar\":true"
               "}")));
     }
-  }
-  {
-    az_json_builder builder = { 0 };
-    az_span_allocator_fn allocator = &test_allocator_always_null;
-    az_allocator_context context
-        = { .remaining_size = 0, .required_size = 0, .user_context = NULL };
-
-    TEST_EXPECT_SUCCESS(
-        az_json_builder_init_chunked(&builder, AZ_SPAN_NULL, allocator, &context, NULL));
-    assert_int_equal(
-        az_json_builder_append_int32_number(&builder, 1), AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
   }
 }
 
