@@ -29,4 +29,14 @@ target_link_libraries(paho_iot_provisioning_sas_example
     az::iot::samples::common
 )
 
+# Workaround for linker warning LNK4098: defaultlib 'LIBCMTD' conflicts with use of other libs
+if (MSVC)
+    set_target_properties(
+        paho_iot_provisioning_example
+        paho_iot_provisioning_sas_example
+        PROPERTIES LINK_FLAGS
+        "/NODEFAULTLIB:libcmtd.lib"
+    )
+endif()
+
 endif() # TRANSPORT_PAHO

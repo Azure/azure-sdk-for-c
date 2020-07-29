@@ -69,4 +69,18 @@ target_link_libraries(paho_iot_hub_twin_example
     az::iot::samples::common
 )
 
+# Workaround for linker warning LNK4098: defaultlib 'LIBCMTD' conflicts with use of other libs
+if (MSVC)
+    set_target_properties(
+        paho_iot_hub_c2d_example
+        paho_iot_hub_methods_example
+        paho_iot_hub_pnp_example
+        paho_iot_hub_telemetry_example
+        paho_iot_hub_sas_telemetry_example
+        paho_iot_hub_twin_example
+        PROPERTIES LINK_FLAGS
+        "/NODEFAULTLIB:libcmtd.lib"
+    )
+endif()
+
 endif() # TRANSPORT_PAHO
