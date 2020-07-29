@@ -227,6 +227,10 @@ typedef struct
   {
     az_span destination_buffer;
     int32_t bytes_written;
+    // For single contiguous buffer, bytes_written == total_bytes_written
+    int32_t total_bytes_written; // Currently, this is primarily used for testing.
+    az_span_allocator_fn allocator_callback;
+    void* user_context;
     bool need_comma;
     az_json_token_kind token_kind; // needed for validation, potentially #if/def with preconditions.
     _az_json_bit_stack bit_stack; // needed for validation, potentially #if/def with preconditions.
@@ -253,17 +257,50 @@ AZ_NODISCARD az_result az_json_writer_init(
     az_json_writer_options const* options);
 
 /**
- * @brief Returns the #az_span containing the JSON text written to the underlying buffer so far.
+ * @brief Initializes an #az_json_writer which writes JSON text into a destination that can contain
+ * non-contiguous buffers.
  *
- * @param[in] json_writer A pointer to an #az_json_writer instance wrapping the destination
- * buffer.
+ * @param[out] json_writer A pointer to an #az_json_writer the instance to initialize.
+ * @param[in] first_destination_buffer An #az_span over the byte buffer where the JSON text is to be
+ * written at the start.
+ * @param[in] allocator_callback An #az_span_allocator_fn callback function that provides the
+ * destination span to write the JSON text to once the previous buffer is full or too small to
+ * contain the next token.
+ * @param[in] user_context A context specific user-defined struct or set of fields that is passed
+ * through to calls to the #az_span_allocator_fn.
+ * @param[in] options __[nullable]__ A reference to an #az_json_writer_options
+ * structure which defines custom behavior of the #az_json_writer. If `NULL` is passed, the writer
+ * will use the default options (i.e. #az_json_writer_options_default()).
+ *
+ * @return An #az_result value indicating the result of the operation:
+ *         - #AZ_OK if the az_json_writer is initialized successfully
+ */
+AZ_NODISCARD az_result az_json_writer_chunked_init(
+    az_json_writer* json_writer,
+    az_span first_destination_buffer,
+    az_span_allocator_fn allocator_callback,
+    void* user_context,
+    az_json_writer_options const* options);
+
+/**
+ * @brief Returns the #az_span containing the JSON text written to the underlying buffer so far, in
+ * the last provided destination buffer.
+ *
+ * @param[in] json_writer A pointer to an #az_json_writer instance wrapping the destination buffer.
  *
  * @note Do NOT modify or override the contents of the returned #az_span unless you are no longer
  * writing JSON text into it.
  *
  * @return An #az_span containing the JSON text built so far.
+ *
+ * @remarks This method returns the entire JSON tet when it fits in the first provided buffer, where
+ * the destination is a single, contiguous buffer. When the destination can be a set of
+ * non-contiguous buffers (using `az_json_writer_chunked_init`), and the JSON is larger than the
+ * first provided destination span, this method only returns the text written into the last provided
+ * destination buffer from the allocator callback.
  */
-AZ_NODISCARD AZ_INLINE az_span az_json_writer_get_json(az_json_writer const* json_writer)
+AZ_NODISCARD AZ_INLINE az_span
+az_json_writer_get_bytes_used_in_destination(az_json_writer const* json_writer)
 {
   return az_span_slice(
       json_writer->_internal.destination_buffer, 0, json_writer->_internal.bytes_written);
