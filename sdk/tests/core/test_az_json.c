@@ -320,7 +320,7 @@ static void test_json_writer_chunked(void** state)
     uint8_t array[200] = { 0 };
 
     az_span_to_str((char*)array, 200, az_json_writer_get_bytes_used_in_destination(&writer));
-    assert_string_equal(array, "}");
+    assert_string_equal(array, "\",\"u\":\"a\\u001Fb\"}");
 
     az_span_to_str(
         (char*)array,
@@ -719,7 +719,7 @@ az_result test_allocator_chunked(
   if (current_index > 0)
   {
     json_buffers[current_index - 1] = az_span_slice(
-        AZ_SPAN_FROM_BUFFER(json_chunked_array_256[current_index]),
+        AZ_SPAN_FROM_BUFFER(json_chunked_array_256[current_index - 1]),
         0,
         allocator_context->bytes_used);
   }
@@ -766,7 +766,9 @@ static void test_json_writer_large_string_chunked(void** state)
       az_span next_span = json_buffers[i];
       entire_json = az_span_copy(entire_json, next_span);
     }
-    entire_json = az_span_copy(entire_json, az_json_writer_get_bytes_used_in_destination(&writer));
+    az_span leftover = az_json_writer_get_bytes_used_in_destination(&writer);
+    assert_int_equal(az_span_size(leftover), 20);
+    entire_json = az_span_copy(entire_json, leftover);
 
     assert_true(
         az_span_is_content_equal(AZ_SPAN_FROM_BUFFER(array), AZ_SPAN_FROM_BUFFER(expected)));
@@ -1586,7 +1588,7 @@ int test_az_json()
                                       cmocka_unit_test(test_json_writer),
                                       cmocka_unit_test(test_json_writer_chunked),
                                       cmocka_unit_test(test_json_writer_chunked_no_callback),
-                                      /*cmocka_unit_test(test_json_writer_large_string_chunked),*/
+                                      cmocka_unit_test(test_json_writer_large_string_chunked),
                                       cmocka_unit_test(test_json_reader),
                                       cmocka_unit_test(test_json_reader_invalid),
                                       cmocka_unit_test(test_json_skip_children),
