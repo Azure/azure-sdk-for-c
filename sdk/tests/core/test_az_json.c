@@ -706,7 +706,6 @@ static void test_json_writer_chunked_no_callback(void** state)
 }
 
 static uint8_t json_chunked_array_256[10][256] = { 0 };
-static uint8_t json_chunked_array_64[10][256] = { 0 };
 static az_span json_buffers[10] = { 0 };
 
 az_result test_allocator_chunked(

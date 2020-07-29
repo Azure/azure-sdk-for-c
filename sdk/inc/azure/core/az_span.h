@@ -457,9 +457,10 @@ typedef struct
   int32_t bytes_used; ///< The amount of space consumed (i.e. written into) within the previously
                       ///< provided destination, which can be used to infer the remaining number of
                       ///< bytes of the #az_span that are leftover.
-  int32_t minimum_required_size; ///< The minimum length of the destination #az_span required to be provided
-                                 ///< by the callback. If 0, any non-empty sized buffer must be returned.
-  void* user_context; ///< Any struct or set of fields that are provied by the user for their
+  int32_t minimum_required_size; ///< The minimum length of the destination #az_span required to be
+                                 ///< provided by the callback. If 0, any non-empty sized buffer
+                                 ///< must be returned.
+  void* user_context; ///< Any struct or set of fields that are provided by the user for their
                       ///< specific implementation, passed through to the #az_span_allocator_fn.
 } az_allocator_context;
 

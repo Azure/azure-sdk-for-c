@@ -878,8 +878,8 @@ static int connect_device(void)
 
   // Get the MQTT username used to connect to IoT Hub
   if (az_failed(
-          rc = az_iot_hub_client_get_user_name(
-              &client, mqtt_username, sizeof(mqtt_username), NULL)))
+          rc
+          = az_iot_hub_client_get_user_name(&client, mqtt_username, sizeof(mqtt_username), NULL)))
 
   {
     printf("Failed to get MQTT username, return code %d\n", rc);
@@ -1017,4 +1017,3 @@ static az_span get_request_id(void)
   (void)result;
   return out_span;
 }
-
