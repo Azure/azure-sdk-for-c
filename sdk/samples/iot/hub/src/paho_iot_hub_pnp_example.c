@@ -407,7 +407,7 @@ static az_result build_command_response_payload(
   AZ_RETURN_IF_FAILED(az_json_writer_append_string(json_builder, end_time_span));
   AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(json_builder));
 
-  *response_payload = az_json_writer_get_json(json_builder);
+  *response_payload = az_json_writer_get_bytes_used_in_destination(json_builder);
 
   return AZ_OK;
 }
@@ -586,7 +586,7 @@ static int send_reported_temperature_property(
       return rc;
     }
   }
-  az_span json_payload = az_json_writer_get_json(&json_builder);
+  az_span json_payload = az_json_writer_get_bytes_used_in_destination(&json_builder);
 
   printf("Payload: %.*s\n", az_span_size(json_payload), (char*)az_span_ptr(json_payload));
 
@@ -975,7 +975,7 @@ static az_result build_telemetry_message(az_span* out_payload)
   AZ_RETURN_IF_FAILED(az_json_writer_append_double(
       &json_builder, current_device_temp, DOUBLE_DECIMAL_PLACE_DIGITS));
   AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&json_builder));
-  *out_payload = az_json_writer_get_json(&json_builder);
+  *out_payload = az_json_writer_get_bytes_used_in_destination(&json_builder);
 
   return AZ_OK;
 }

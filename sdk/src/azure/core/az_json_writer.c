@@ -19,8 +19,7 @@ AZ_NODISCARD az_result az_json_writer_init(
 
   *json_writer = (az_json_writer){
     ._internal = {
-      .first_destination_buffer = destination_buffer,
-      .destination_buffer = AZ_SPAN_NULL,
+      .destination_buffer = destination_buffer,
       .allocator_callback = NULL,
       .user_context = NULL,
       .bytes_written = 0,
@@ -41,12 +40,12 @@ AZ_NODISCARD az_result az_json_writer_chunked_init(
     void* user_context,
     az_json_writer_options const* options)
 {
+  _az_PRECONDITION_NOT_NULL(json_writer);
   _az_PRECONDITION_NOT_NULL(allocator_callback);
 
   *json_writer = (az_json_writer){
     ._internal = {
-      .first_destination_buffer = first_destination_buffer,
-      .destination_buffer = AZ_SPAN_NULL,
+      .destination_buffer = first_destination_buffer,
       .allocator_callback = allocator_callback,
       .user_context = user_context,
       .bytes_written = 0,
@@ -65,13 +64,8 @@ static AZ_NODISCARD az_span _get_remaining_span(az_json_writer* json_writer, int
   _az_PRECONDITION_NOT_NULL(json_writer);
   _az_PRECONDITION(required_size > 0);
 
-  // Only use the first_destination_buffer field (which is read-only) when we have not yet called
-  // the allocator_callback. After that, use the read-write destination_buffer field.
-  az_span destination = az_span_ptr(json_writer->_internal.destination_buffer) == NULL
-      ? json_writer->_internal.first_destination_buffer
-      : json_writer->_internal.destination_buffer;
-
-  az_span remaining = az_span_slice_to_end(destination, json_writer->_internal.bytes_written);
+  az_span remaining = az_span_slice_to_end(
+      json_writer->_internal.destination_buffer, json_writer->_internal.bytes_written);
 
   if (az_span_size(remaining) < required_size && json_writer->_internal.allocator_callback != NULL)
   {

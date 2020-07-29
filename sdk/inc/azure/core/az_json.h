@@ -213,8 +213,6 @@ AZ_NODISCARD AZ_INLINE az_json_writer_options az_json_writer_options_default()
   return options;
 }
 
-// TODO: Should total_bytes_written be made public or should az_json_writer_get_json take a
-// destination buffer?
 /**
  * @brief Provides forward-only, non-cached writing of UTF-8 encoded JSON text into the provided
  * buffer.
@@ -227,11 +225,10 @@ typedef struct
 {
   struct
   {
-    az_span first_destination_buffer; // This field is readonly. Do NOT modify.
     az_span destination_buffer;
     int32_t bytes_written;
-    int32_t
-        total_bytes_written; // For single contiguous buffer, bytes_written == total_bytes_written
+    // For single contiguous buffer, bytes_written == total_bytes_written
+    int32_t total_bytes_written; // Currently, this is primarily used for testing.
     az_span_allocator_fn allocator_callback;
     void* user_context;
     bool need_comma;
@@ -259,8 +256,6 @@ AZ_NODISCARD az_result az_json_writer_init(
     az_span destination_buffer,
     az_json_writer_options const* options);
 
-// TODO: Should this accept void* user_context instead of az_allocator_context* and create the
-// allocator context internally?
 /**
  * @brief Initializes an #az_json_writer which writes JSON text into a destination that can contain
  * non-contiguous buffers.
@@ -288,8 +283,8 @@ AZ_NODISCARD az_result az_json_writer_chunked_init(
     az_json_writer_options const* options);
 
 /**
- * @brief Returns the #az_span containing the JSON text written to the underlying buffer so far, or
- * #AZ_SPAN_NULL if the text can't fit within the provided destination buffer.
+ * @brief Returns the #az_span containing the JSON text written to the underlying buffer so far, in
+ * the last provided destination buffer.
  *
  * @param[in] json_writer A pointer to an #az_json_writer instance wrapping the destination buffer.
  *
@@ -298,23 +293,17 @@ AZ_NODISCARD az_result az_json_writer_chunked_init(
  *
  * @return An #az_span containing the JSON text built so far.
  *
- * @remarks This method is useful when the destination is a single, contiguous buffer or the JSON
- * text fits in the first buffer. When the destination can be a set of non-contiguous buffers, and
- * the JSON is larger than the first provided destination span, this method return #AZ_SPAN_NULL.
+ * @remarks This method returns the entire JSON tet when it fits in the first provided buffer, where
+ * the destination is a single, contiguous buffer. When the destination can be a set of
+ * non-contiguous buffers (using `az_json_writer_chunked_init`), and the JSON is larger than the
+ * first provided destination span, this method only returns the text written into the last provided
+ * destination buffer from the allocator callback.
  */
-AZ_NODISCARD AZ_INLINE az_span az_json_writer_get_json(az_json_writer const* json_writer)
+AZ_NODISCARD AZ_INLINE az_span
+az_json_writer_get_bytes_used_in_destination(az_json_writer const* json_writer)
 {
-  // In the case of discontiguous buffers, where the callback provided a destination buffer beyond
-  // the first one, the JSON won't fit within a single provided span.
-  if (json_writer->_internal.total_bytes_written
-      > az_span_size(json_writer->_internal.first_destination_buffer))
-  {
-    return AZ_SPAN_NULL;
-  }
   return az_span_slice(
-      json_writer->_internal.first_destination_buffer,
-      0,
-      json_writer->_internal.total_bytes_written);
+      json_writer->_internal.destination_buffer, 0, json_writer->_internal.bytes_written);
 }
 
 /**

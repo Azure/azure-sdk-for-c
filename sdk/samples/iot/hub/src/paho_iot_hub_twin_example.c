@@ -432,7 +432,7 @@ static az_result build_reported_property(az_span* reported_property_payload)
   AZ_RETURN_IF_FAILED(az_json_writer_append_int32(&json_writer, reported_property_value));
   AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&json_writer));
 
-  *reported_property_payload = az_json_writer_get_json(&json_writer);
+  *reported_property_payload = az_json_writer_get_bytes_used_in_destination(&json_writer);
 
   return AZ_OK;
 }
