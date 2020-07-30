@@ -322,12 +322,10 @@ jobs:
     # Generate Documentation
     - pwsh: |
         $setupFile="doxygen-1.8.18-setup.exe";
+        $url = "https://azuresdktooling.blob.core.windows.net/dependencies/$setupFile"
+        $outputPath = Join-Path -Path (Get-Location) -ChildPath "./$setupFile"
 
-        Invoke-WebRequest `
-          -MaximumRetryCount 10 `
-          -Uri "https://azuresdktooling.blob.core.windows.net/dependencies/$setupFile" `
-          -OutFile $setupFile `
-        | Wait-Process;
+        (New-Object System.Net.WebClient).DownloadFile($url, $outputPath)
 
         Start-Process -Filepath .\$setupFile -ArgumentList @("/VERYSILENT") -Wait
       workingDirectory: $(Agent.TempDirectory)
