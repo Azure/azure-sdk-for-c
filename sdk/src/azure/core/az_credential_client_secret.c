@@ -126,4 +126,6 @@ az_credential_set_authority(az_credential_client_secret* ref_credential, az_span
   _az_PRECONDITION_VALID_SPAN(authority, 1, false);
 
   ref_credential->_internal.authority = authority;
+
+  return AZ_OK;
 }
