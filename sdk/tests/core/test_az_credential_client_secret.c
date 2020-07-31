@@ -29,16 +29,24 @@ static void test_credential_client_secret(void** state)
   {
     az_credential_client_secret credential = { 0 };
 
-    assert_true(az_succeeded(az_credential_client_secret_init(
-        &credential,
-        AZ_SPAN_FROM_STR("TenantID"),
-        AZ_SPAN_FROM_STR("ClientID"),
-        AZ_SPAN_FROM_STR("ClientSecret"))));
-
-    if (i >= 0)
+    if (i < 0)
+    {
+      assert_true(az_succeeded(az_credential_client_secret_init(
+          &credential,
+          AZ_SPAN_FROM_STR("TenantID"),
+          AZ_SPAN_FROM_STR("ClientID"),
+          AZ_SPAN_FROM_STR("ClientSecret"))));
+    }
+    else
     {
       authority = authorities[i];
-      assert_true(az_succeeded(az_credential_set_authority(&credential, authority)));
+
+      assert_true(az_succeeded(az_credential_client_secret_init(
+          &credential,
+          AZ_SPAN_FROM_STR("TenantID"),
+          AZ_SPAN_FROM_STR("ClientID"),
+          AZ_SPAN_FROM_STR("ClientSecret"),
+          authority)));
     }
 
     assert_true(az_succeeded(
