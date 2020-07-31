@@ -37,10 +37,10 @@
             "preLaunchTask": "build",
             // Add ids and secrets here to use it when debuging KeyVaultPOC
             "env": {
-                "tenant_id": "",
-                "client_id": "",
-                "client_secret": "",
-                "test_uri": ""
+                "tenant_id": "f4e3aec7-73b0-49d5-a5bd-35b76e1adcf6",
+                "client_id": "c6cdb252-5b3f-4a10-a86d-ced7216d9548",
+                "client_secret": "45-Wzchs@Q97vZmXkhoB?[tYYWi7AR3W",
+                "test_uri": "https://XXXX.vault.azure.net"
             },
         },
         {
