@@ -17,7 +17,7 @@
 
 #include <azure/core/_az_cfg.h>
 
-static az_span authority = AZ_SPAN_FROM_STR("https://login.microsoftonline.com/");
+static az_span authority = AZ_SPAN_LITERAL_FROM_STR("https://login.microsoftonline.com/");
 
 static void test_credential_client_secret(void** state)
 {
@@ -25,7 +25,7 @@ static void test_credential_client_secret(void** state)
   az_span const authorities[] = { AZ_SPAN_FROM_STR("https://login.microsoftonline.com/"),
                                   AZ_SPAN_FROM_STR("https://somesite.contoso.com/") };
 
-  for (int i = -1; i < sizeof(authorities); ++i)
+  for (int i = -1; i < (int)sizeof(authorities); ++i)
   {
     az_credential_client_secret credential = { 0 };
 
@@ -141,7 +141,8 @@ az_result send_request(_az_http_request const* request, az_http_response* respon
 
       {
         az_span auth_url_remainder = az_span_copy(az_auth_url, authority);
-        az_span auth_url_remainder
+        
+        auth_url_remainder
             = az_span_copy(az_auth_url, AZ_SPAN_FROM_STR("TenantID/oauth2/v2.0/token"));
 
         az_auth_url = az_span_slice(
