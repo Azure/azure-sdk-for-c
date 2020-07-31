@@ -128,10 +128,13 @@ AZ_NODISCARD az_result az_credential_client_secret_init(
     az_span client_secret);
 
 /**
- * @brief Sets authentication authority URL for the client secret credential.
+ * @brief Initializes an az_credential_client_secret instance with the specified tenant ID, client
+ * ID, client secret, and Azure AD authority URL.
  *
- * @param ref_credential Reference to an #az_credential_client_secret instance to set the authority
- * URL for.
+ * @param out_credential Reference to an #az_credential_client_secret instance to initialize,
+ * @param tenant_id An Azure tenant ID.
+ * @param client_id An Azure client ID.
+ * @param client_secret An Azure client secret.
  * @param authority Authentication authority URL to set.
  *
  * @note #authority example: "https://login.microsoftonline.us/".
@@ -142,8 +145,12 @@ AZ_NODISCARD az_result az_credential_client_secret_init(
  *         - #AZ_OK if successful.
  *         - Other error code if initialization failed.
  */
-AZ_NODISCARD az_result
-az_credential_set_authority(az_credential_client_secret* ref_credential, az_span authority);
+AZ_NODISCARD az_result az_credential_client_secret_init_with_authority(
+    az_credential_client_secret* out_credential,
+    az_span tenant_id,
+    az_span client_id,
+    az_span client_secret,
+    az_span authority);
 
 #include <azure/core/_az_cfg_suffix.h>
 

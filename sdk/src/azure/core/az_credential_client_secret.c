@@ -91,13 +91,26 @@ AZ_NODISCARD az_result az_credential_client_secret_init(
     az_span client_id,
     az_span client_secret)
 {
+  return az_credential_client_secret_init_with_authority(
+      out_credential,
+      tenant_id,
+      client_id,
+      client_secret,
+      AZ_SPAN_FROM_STR("https://login.microsoftonline.com/"));
+}
+
+AZ_NODISCARD az_result az_credential_client_secret_init_with_authority(
+    az_credential_client_secret* out_credential,
+    az_span tenant_id,
+    az_span client_id,
+    az_span client_secret,
+    az_span authority)
+{
   _az_PRECONDITION_NOT_NULL(out_credential);
   _az_PRECONDITION_VALID_SPAN(tenant_id, 1, false);
   _az_PRECONDITION_VALID_SPAN(client_id, 1, false);
   _az_PRECONDITION_VALID_SPAN(client_secret, 1, false);
-
-  static az_span const microsoft_aad_authority
-      = AZ_SPAN_LITERAL_FROM_STR("https://login.microsoftonline.com/");
+  _az_PRECONDITION_VALID_SPAN(authority, 1, false);
 
   *out_credential = (az_credential_client_secret){
     ._internal = {
@@ -112,20 +125,9 @@ AZ_NODISCARD az_result az_credential_client_secret_init(
         .client_id = client_id,
         .client_secret = client_secret,
         .scopes = { 0 },
-        .authority = microsoft_aad_authority,
+        .authority = authority,
       },
     };
-
-  return AZ_OK;
-}
-
-AZ_NODISCARD az_result
-az_credential_set_authority(az_credential_client_secret* ref_credential, az_span authority)
-{
-  _az_PRECONDITION_NOT_NULL(ref_credential);
-  _az_PRECONDITION_VALID_SPAN(authority, 1, false);
-
-  ref_credential->_internal.authority = authority;
 
   return AZ_OK;
 }
