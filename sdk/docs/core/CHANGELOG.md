@@ -16,7 +16,7 @@
   - Redesign JSON reader and JSON token APIs with lazy evaluation of tokens, proper unescaping support, and hardened validation
 - Update samples, README docs along with deep dive video, and VSCode and CMake instructions
 - Add log classification for IoT Convenience layer
-- Fixes on SAS token generation - iImplemented URL-encoding of components of SAS tokens
+- Fixes on SAS token generation - implemented URL-encoding of components of SAS tokens
 - Rename the http response function `az_http_response_write_span` to `az_http_response_append`
 - Add thread safety for Client Secret Credential
 - Transform apply_credential into a HTTP policy
