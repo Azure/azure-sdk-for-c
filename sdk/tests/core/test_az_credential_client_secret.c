@@ -22,8 +22,8 @@ static az_span authority = AZ_SPAN_FROM_STR("https://login.microsoftonline.com/"
 static void test_credential_client_secret(void** state)
 {
   (void)state;
-  az_span const authorities[]{ AZ_SPAN_FROM_STR("https://login.microsoftonline.com/"),
-                               AZ_SPAN_FROM_STR("https://somesite.contoso.com/") };
+  az_span const authorities[] = { AZ_SPAN_FROM_STR("https://login.microsoftonline.com/"),
+                                  AZ_SPAN_FROM_STR("https://somesite.contoso.com/") };
 
   for (int i = -1; i < sizeof(authorities); ++i)
   {
