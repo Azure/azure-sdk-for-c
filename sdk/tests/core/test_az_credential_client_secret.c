@@ -41,7 +41,7 @@ static void test_credential_client_secret(void** state)
     {
       authority = authorities[i];
 
-      assert_true(az_succeeded(az_credential_client_secret_init(
+      assert_true(az_succeeded(az_credential_client_secret_init_with_authority(
           &credential,
           AZ_SPAN_FROM_STR("TenantID"),
           AZ_SPAN_FROM_STR("ClientID"),
