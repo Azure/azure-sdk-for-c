@@ -109,17 +109,17 @@ typedef struct
 } az_credential_client_secret;
 
 /**
- * @brief az_credential_client_secret_init initializes an az_credential_client_secret instance
- * with the specified tenant ID, client ID and client secret.
+ * @brief Initializes an az_credential_client_secret instance with the specified tenant ID, client
+ * ID and client secret.
  *
- * @param out_credential reference to an az_credential_client_secret instance to initialize
- * @param tenant_id an Azure tenant ID
- * @param client_id an Azure client ID
- * @param client_secret an Azure client secret
+ * @param out_credential Reference to an #az_credential_client_secret instance to initialize,
+ * @param tenant_id An Azure tenant ID.
+ * @param client_id An Azure client ID.
+ * @param client_secret An Azure client secret.
  *
  * @return An #az_result value indicating the result of the operation:
- *         - #AZ_OK if successful
- *         - Other error code if initialization failed
+ *         - #AZ_OK if successful.
+ *         - Other error code if initialization failed.
  */
 AZ_NODISCARD az_result az_credential_client_secret_init(
     az_credential_client_secret* out_credential,
@@ -128,15 +128,19 @@ AZ_NODISCARD az_result az_credential_client_secret_init(
     az_span client_secret);
 
 /**
- * @brief sets authentication authority URL for the client secret credential.
+ * @brief Sets authentication authority URL for the client secret credential.
  *
- * @param ref_credential reference to an az_credential_client_secret instance to set the authority
- * URL for
- * @param authority authentication authority URL to set
+ * @param ref_credential Reference to an #az_credential_client_secret instance to set the authority
+ * URL for.
+ * @param authority Authentication authority URL to set.
+ *
+ * @note #authority example: "https://login.microsoftonline.us/".
+ * See national clouds' Azure AD authentication endpoints:
+ * https://docs.microsoft.com/en-us/azure/active-directory/develop/authentication-national-cloud.
  *
  * @return An #az_result value indicating the result of the operation:
- *         - #AZ_OK if successful
- *         - Other error code if initialization failed
+ *         - #AZ_OK if successful.
+ *         - Other error code if initialization failed.
  */
 AZ_NODISCARD az_result
 az_credential_set_authority(az_credential_client_secret* ref_credential, az_span authority);

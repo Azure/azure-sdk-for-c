@@ -23,7 +23,7 @@ static void test_credential_client_secret(void** state)
 {
   (void)state;
   az_span const authorities[] = { AZ_SPAN_FROM_STR("https://login.microsoftonline.com/"),
-                                  AZ_SPAN_FROM_STR("https://somesite.contoso.com/") };
+                                  AZ_SPAN_FROM_STR("https://login.microsoftonline.us/") };
 
   for (int i = -1; i < (int)sizeof(authorities); ++i)
   {
@@ -70,7 +70,7 @@ static void test_credential_client_secret(void** state)
     };
 
     // Some value that is big enough so that when you add 3600000 milliseconds to it (1 hour),
-    // and while in debuger, the vallue you see is seen as "103600000", which is easy to debug.
+    // and while in debugger, the value you see is seen as "103600000", which is easy to debug.
     int const clock_value[] = {
       100000000, // first - initial request. Token will be obtained
       100000000, // the token is not expected to expire, cached value will be used.
@@ -141,7 +141,7 @@ az_result send_request(_az_http_request const* request, az_http_response* respon
 
       {
         az_span auth_url_remainder = az_span_copy(az_auth_url, authority);
-        
+
         auth_url_remainder
             = az_span_copy(az_auth_url, AZ_SPAN_FROM_STR("TenantID/oauth2/v2.0/token"));
 
