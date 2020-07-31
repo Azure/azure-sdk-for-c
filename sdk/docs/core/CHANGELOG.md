@@ -15,11 +15,13 @@
   - Add double parsing and formatting support to JSON reader and JSON writer.
   - Redesign JSON reader and JSON token APIs with lazy evaluation of tokens, proper unescaping support, and hardened validation.
 - Update samples, README docs along with deep dive video, and VSCode and CMake instructions.
+  - Add PnP sample for Azure IoT Hub.
 - Add log classification for the IoT convenience layer.
 - Fixed SAS token generation by URL-encoding the components.
 - Rename the http response function `az_http_response_write_span` to `az_http_response_append`.
 - Add thread safety for client secret credential.
 - Transform `apply_credential` into an HTTP policy.
+- Default behavior for failed preconditions changed to infinite loop instead of thread sleep.
 
 ## 1.0.0-preview.2 (2020-05-18)
 - Update top-level CMakeLists.txt to only add subdirectory for specified platform.
