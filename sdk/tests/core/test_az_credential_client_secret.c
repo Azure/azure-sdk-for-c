@@ -25,7 +25,7 @@ static void test_credential_client_secret(void** state)
   az_span const authorities[] = { AZ_SPAN_FROM_STR("https://login.microsoftonline.com/"),
                                   AZ_SPAN_FROM_STR("https://login.microsoftonline.us/") };
 
-  for (int i = -1; i < (int)sizeof(authorities); ++i)
+  for (int i = -1; i < (int)(sizeof(authorities) / sizeof(authorities[0])); ++i)
   {
     az_credential_client_secret credential = { 0 };
 
@@ -143,10 +143,10 @@ az_result send_request(_az_http_request const* request, az_http_response* respon
         az_span auth_url_remainder = az_span_copy(az_auth_url, authority);
 
         auth_url_remainder
-            = az_span_copy(az_auth_url, AZ_SPAN_FROM_STR("TenantID/oauth2/v2.0/token"));
+            = az_span_copy(auth_url_remainder, AZ_SPAN_FROM_STR("TenantID/oauth2/v2.0/token"));
 
         az_auth_url = az_span_slice(
-            az_auth_url, 0, az_span_size(az_auth_url) - az_span_size(auth_url_remainder));
+            az_auth_url, 0, (int32_t)(az_span_ptr(auth_url_remainder) - az_span_ptr(az_auth_url)));
       }
       assert_true(az_span_is_content_equal(az_auth_url, request_url));
     }
@@ -258,7 +258,7 @@ az_result send_request(_az_http_request const* request, az_http_response* respon
     else if (attempt == 4 && redo_auth)
     {
       response->_internal.http_response = AZ_SPAN_FROM_STR("HTTP/1.1 200 OK\r\n\r\nResponse4");
-      redo_auth = false;
+      attempt = 0;
     }
   }
 
