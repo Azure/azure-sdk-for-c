@@ -231,7 +231,7 @@ AZ_NODISCARD az_result az_span_atoi64(az_span source, int64_t* out_number)
   // else, (-1 * sign + 1) / 2 = 0
   // This is necessary to correctly account for the fact that the absolute value of INT64_MIN is 1
   // more than than the absolute value of INT64_MAX.
-  uint64_t sign_factor = (-1 * sign + 1) / 2;
+  uint64_t sign_factor = (uint64_t)(-1 * sign + 1) / 2;
 
   // Using unsigned int while parsing to account for potential overflow.
   uint64_t value = 0;
@@ -243,9 +243,9 @@ AZ_NODISCARD az_result az_span_atoi64(az_span source, int64_t* out_number)
     {
       return AZ_ERROR_UNEXPECTED_CHAR;
     }
-    int64_t const d = (int64_t)next_byte - '0';
+    uint64_t const d = (uint64_t)next_byte - '0';
 
-    if ((INT64_MAX - d + sign_factor) / 10 < value)
+    if ((uint64_t)(INT64_MAX - d + sign_factor) / 10 < value)
     {
       return AZ_ERROR_UNEXPECTED_CHAR;
     }
@@ -292,7 +292,7 @@ AZ_NODISCARD az_result az_span_atoi32(az_span source, int32_t* out_number)
   // else, (-1 * sign + 1) / 2 = 0
   // This is necessary to correctly account for the fact that the absolute value of INT32_MIN is 1
   // more than than the absolute value of INT32_MAX.
-  uint32_t sign_factor = (-1 * sign + 1) / 2;
+  uint32_t sign_factor = (uint32_t)(-1 * sign + 1) / 2;
 
   // Using unsigned int while parsing to account for potential overflow.
   uint32_t value = 0;
@@ -304,9 +304,9 @@ AZ_NODISCARD az_result az_span_atoi32(az_span source, int32_t* out_number)
     {
       return AZ_ERROR_UNEXPECTED_CHAR;
     }
-    int32_t const d = (int32_t)next_byte - '0';
+    uint32_t const d = (uint32_t)next_byte - '0';
 
-    if ((INT32_MAX - d + sign_factor) / 10 < value)
+    if ((uint32_t)(INT32_MAX - d + sign_factor) / 10 < value)
     {
       return AZ_ERROR_UNEXPECTED_CHAR;
     }
