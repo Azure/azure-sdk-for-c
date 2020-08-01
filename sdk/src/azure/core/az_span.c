@@ -138,6 +138,9 @@ AZ_NODISCARD az_result az_span_atou64(az_span source, uint64_t* out_number)
       return AZ_ERROR_UNEXPECTED_CHAR;
     }
     uint64_t const d = (uint64_t)next_byte - '0';
+
+    // Check whether the next digit will cause an integer overflow.
+    // Before actually doing the math below, this is checking whether value * 10 + d > UINT64_MAX.
     if ((UINT64_MAX - d) / 10 < value)
     {
       return AZ_ERROR_UNEXPECTED_CHAR;
@@ -169,6 +172,8 @@ AZ_NODISCARD az_result az_span_atou32(az_span source, uint32_t* out_number)
 
   if (!isdigit(next_byte))
   {
+    // There must be another byte after a sign.
+    // The loop below checks that it must be a digit.
     if (next_byte != '+' || span_size < 2)
     {
       return AZ_ERROR_UNEXPECTED_CHAR;
@@ -186,6 +191,9 @@ AZ_NODISCARD az_result az_span_atou32(az_span source, uint32_t* out_number)
       return AZ_ERROR_UNEXPECTED_CHAR;
     }
     uint32_t const d = (uint32_t)next_byte - '0';
+
+    // Check whether the next digit will cause an integer overflow.
+    // Before actually doing the math below, this is checking whether value * 10 + d > UINT32_MAX.
     if ((UINT32_MAX - d) / 10 < value)
     {
       return AZ_ERROR_UNEXPECTED_CHAR;
@@ -253,6 +261,9 @@ AZ_NODISCARD az_result az_span_atoi64(az_span source, int64_t* out_number)
     }
     uint64_t const d = (uint64_t)next_byte - '0';
 
+    // Check whether the next digit will cause an integer overflow.
+    // Before actually doing the math below, this is checking whether value * 10 + d > INT64_MAX, or
+    // in the case of negative numbers, checking whether value * 10 + d > INT64_MAX + 1.
     if ((uint64_t)(INT64_MAX - d + sign_factor) / 10 < value)
     {
       return AZ_ERROR_UNEXPECTED_CHAR;
@@ -320,6 +331,9 @@ AZ_NODISCARD az_result az_span_atoi32(az_span source, int32_t* out_number)
     }
     uint32_t const d = (uint32_t)next_byte - '0';
 
+    // Check whether the next digit will cause an integer overflow.
+    // Before actually doing the math below, this is checking whether value * 10 + d > INT32_MAX, or
+    // in the case of negative numbers, checking whether value * 10 + d > INT32_MAX + 1.
     if ((uint32_t)(INT32_MAX - d + sign_factor) / 10 < value)
     {
       return AZ_ERROR_UNEXPECTED_CHAR;
@@ -366,7 +380,8 @@ AZ_NODISCARD az_result az_span_atod(az_span source, double* out_number)
     return AZ_ERROR_UNEXPECTED_CHAR;
   }
 
-  // Stack based string to allow thread-safe mutation by _az_span_ato_number_helper
+  // Stack based string to allow thread-safe mutation.
+  // The length is 8 to allow space for the null-terminating character.
   char format[8] = "%00lf%n";
 
   // Starting at 1 to skip the '%' character
