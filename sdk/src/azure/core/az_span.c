@@ -119,7 +119,9 @@ AZ_NODISCARD az_result az_span_atou64(az_span source, uint64_t* out_number)
 
   if (!isdigit(next_byte))
   {
-    if (next_byte != '+')
+    // There must be another byte after a sign.
+    // The loop below checks that it must be a digit.
+    if (next_byte != '+' || span_size < 2)
     {
       return AZ_ERROR_UNEXPECTED_CHAR;
     }
@@ -167,7 +169,7 @@ AZ_NODISCARD az_result az_span_atou32(az_span source, uint32_t* out_number)
 
   if (!isdigit(next_byte))
   {
-    if (next_byte != '+')
+    if (next_byte != '+' || span_size < 2)
     {
       return AZ_ERROR_UNEXPECTED_CHAR;
     }
@@ -212,10 +214,12 @@ AZ_NODISCARD az_result az_span_atoi64(az_span source, int64_t* out_number)
   int32_t starting_index = 0;
   uint8_t* source_ptr = az_span_ptr(source);
   uint8_t next_byte = source_ptr[0];
-  int32_t sign = 1;
+  int64_t sign = 1;
 
   if (!isdigit(next_byte))
   {
+    // There must be another byte after a sign.
+    // The loop below checks that it must be a digit.
     if (next_byte != '+')
     {
       if (next_byte != '-')
@@ -223,6 +227,10 @@ AZ_NODISCARD az_result az_span_atoi64(az_span source, int64_t* out_number)
         return AZ_ERROR_UNEXPECTED_CHAR;
       }
       sign = -1;
+    }
+    if (span_size < 2)
+    {
+      return AZ_ERROR_UNEXPECTED_CHAR;
     }
     starting_index++;
   }
@@ -277,6 +285,8 @@ AZ_NODISCARD az_result az_span_atoi32(az_span source, int32_t* out_number)
 
   if (!isdigit(next_byte))
   {
+    // There must be another byte after a sign.
+    // The loop below checks that it must be a digit.
     if (next_byte != '+')
     {
       if (next_byte != '-')
@@ -284,6 +294,10 @@ AZ_NODISCARD az_result az_span_atoi32(az_span source, int32_t* out_number)
         return AZ_ERROR_UNEXPECTED_CHAR;
       }
       sign = -1;
+    }
+    if (span_size < 2)
+    {
+      return AZ_ERROR_UNEXPECTED_CHAR;
     }
     starting_index++;
   }

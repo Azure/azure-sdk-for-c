@@ -164,12 +164,23 @@ static void az_span_atox_return_errors(void** state)
 
   az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("test"));
   az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR(" "));
+  az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR(" 1"));
+  az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("-"));
+  az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("+"));
+  az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("--1"));
+  az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("++1"));
+  az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("-+"));
+  az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("+-"));
+  az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("-0+"));
+  az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("0-"));
+  az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("+0-"));
   az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("1-"));
   az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("123a"));
   az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("123,"));
   az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("123 "));
   az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("--123"));
   az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("-+123"));
+  az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("+-123"));
   az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("  -1-"));
   az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("- INFINITY"));
   az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("- 0"));
@@ -177,6 +188,9 @@ static void az_span_atox_return_errors(void** state)
   az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("1.-e3"));
   az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("1.-e/3"));
   az_span_atox_return_errors_helper_exclude_double(AZ_SPAN_FROM_STR("1.23"));
+  az_span_atox_return_errors_helper_exclude_double(AZ_SPAN_FROM_STR("-1.23"));
+  az_span_atox_return_errors_helper_exclude_double(AZ_SPAN_FROM_STR("11e2"));
+  az_span_atox_return_errors_helper_exclude_double(AZ_SPAN_FROM_STR("-1.1e+2"));
   az_span_atox_return_errors_helper_exclude_double(AZ_SPAN_FROM_STR("1.23e3"));
   az_span_atox_return_errors_helper_exclude_double(AZ_SPAN_FROM_STR("99999999999999999999"));
   az_span_atox_return_errors_helper_exclude_double(AZ_SPAN_FROM_STR("999999999999999999999"));
@@ -223,11 +237,6 @@ static void az_span_atou32_test(void** state)
       az_span_atou32(AZ_SPAN_FROM_STR("9223372036854775808"), &value), AZ_ERROR_UNEXPECTED_CHAR);
   assert_int_equal(
       az_span_atou32(AZ_SPAN_FROM_STR("18446744073709551615"), &value), AZ_ERROR_UNEXPECTED_CHAR);
-  assert_int_equal(az_span_atou32(AZ_SPAN_FROM_STR("-42"), &value), AZ_ERROR_UNEXPECTED_CHAR);
-  assert_int_equal(az_span_atou32(AZ_SPAN_FROM_STR("1.2"), &value), AZ_ERROR_UNEXPECTED_CHAR);
-  assert_int_equal(az_span_atou32(AZ_SPAN_FROM_STR("-1.2"), &value), AZ_ERROR_UNEXPECTED_CHAR);
-  assert_int_equal(az_span_atou32(AZ_SPAN_FROM_STR("11e2"), &value), AZ_ERROR_UNEXPECTED_CHAR);
-  assert_int_equal(az_span_atou32(AZ_SPAN_FROM_STR("1.1e2"), &value), AZ_ERROR_UNEXPECTED_CHAR);
 }
 
 static void az_span_atoi32_test(void** state)
@@ -264,10 +273,6 @@ static void az_span_atoi32_test(void** state)
       az_span_atoi32(AZ_SPAN_FROM_STR("-4294967296"), &value), AZ_ERROR_UNEXPECTED_CHAR);
   assert_int_equal(
       az_span_atoi32(AZ_SPAN_FROM_STR("9223372036854775807"), &value), AZ_ERROR_UNEXPECTED_CHAR);
-  assert_int_equal(az_span_atoi32(AZ_SPAN_FROM_STR("1.2"), &value), AZ_ERROR_UNEXPECTED_CHAR);
-  assert_int_equal(az_span_atoi32(AZ_SPAN_FROM_STR("-1.2"), &value), AZ_ERROR_UNEXPECTED_CHAR);
-  assert_int_equal(az_span_atoi32(AZ_SPAN_FROM_STR("11e2"), &value), AZ_ERROR_UNEXPECTED_CHAR);
-  assert_int_equal(az_span_atoi32(AZ_SPAN_FROM_STR("1.1e2"), &value), AZ_ERROR_UNEXPECTED_CHAR);
 }
 
 static void az_span_atou64_test(void** state)
@@ -294,17 +299,13 @@ static void az_span_atou64_test(void** state)
   assert_int_equal(az_span_atou64(AZ_SPAN_FROM_STR("000018446744073709551615"), &value), AZ_OK);
   assert_int_equal(value, 18446744073709551615UL);
 
+  assert_int_equal(az_span_atou64(AZ_SPAN_FROM_STR("-123"), &value), AZ_ERROR_UNEXPECTED_CHAR);
   assert_int_equal(
       az_span_atou64(AZ_SPAN_FROM_STR("184467440737095516150"), &value), AZ_ERROR_UNEXPECTED_CHAR);
   assert_int_equal(
       az_span_atou64(AZ_SPAN_FROM_STR("18446744073709551616"), &value), AZ_ERROR_UNEXPECTED_CHAR);
   assert_int_equal(
       az_span_atou64(AZ_SPAN_FROM_STR("-9223372036854775809"), &value), AZ_ERROR_UNEXPECTED_CHAR);
-  assert_int_equal(az_span_atou64(AZ_SPAN_FROM_STR("-42"), &value), AZ_ERROR_UNEXPECTED_CHAR);
-  assert_int_equal(az_span_atou64(AZ_SPAN_FROM_STR("1.2"), &value), AZ_ERROR_UNEXPECTED_CHAR);
-  assert_int_equal(az_span_atou64(AZ_SPAN_FROM_STR("-1.2"), &value), AZ_ERROR_UNEXPECTED_CHAR);
-  assert_int_equal(az_span_atou64(AZ_SPAN_FROM_STR("11e2"), &value), AZ_ERROR_UNEXPECTED_CHAR);
-  assert_int_equal(az_span_atou64(AZ_SPAN_FROM_STR("1.1e2"), &value), AZ_ERROR_UNEXPECTED_CHAR);
 }
 
 static void az_span_atoi64_test(void** state)
@@ -349,10 +350,6 @@ static void az_span_atoi64_test(void** state)
       az_span_atoi64(AZ_SPAN_FROM_STR("18446744073709551616"), &value), AZ_ERROR_UNEXPECTED_CHAR);
   assert_int_equal(
       az_span_atoi64(AZ_SPAN_FROM_STR("-9223372036854775809"), &value), AZ_ERROR_UNEXPECTED_CHAR);
-  assert_int_equal(az_span_atoi64(AZ_SPAN_FROM_STR("1.2"), &value), AZ_ERROR_UNEXPECTED_CHAR);
-  assert_int_equal(az_span_atoi64(AZ_SPAN_FROM_STR("-1.2"), &value), AZ_ERROR_UNEXPECTED_CHAR);
-  assert_int_equal(az_span_atoi64(AZ_SPAN_FROM_STR("11e2"), &value), AZ_ERROR_UNEXPECTED_CHAR);
-  assert_int_equal(az_span_atoi64(AZ_SPAN_FROM_STR("1.1e2"), &value), AZ_ERROR_UNEXPECTED_CHAR);
 }
 
 // Disable warning for float comparisons, for this particular test
