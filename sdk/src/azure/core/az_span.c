@@ -9,7 +9,6 @@
 #include <azure/core/internal/az_span_internal.h>
 
 #include <ctype.h>
-#include <errno.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -348,10 +347,8 @@ AZ_NODISCARD az_result az_span_atoi32(az_span source, int32_t* out_number)
 
 static bool _is_valid_start_of_double(uint8_t first_byte)
 {
-  // ".123" or "  123" are considered invalid
-  // 'n'/'N' is for "nan" and 'i'/'I' is for "inf"
-  bool result = isdigit(first_byte) || first_byte == '+' || first_byte == '-' || first_byte == 'n'
-      || first_byte == 'N' || first_byte == 'i' || first_byte == 'I';
+  // ".123", "  123", "nan", or "inf" are considered invalid
+  bool result = isdigit(first_byte) || first_byte == '+' || first_byte == '-';
 
   return result;
 }
@@ -388,21 +385,12 @@ AZ_NODISCARD az_result az_span_atod(az_span source, double* out_number)
   format[1] = (char)((size / 10) + '0');
   format[2] = (char)((size % 10) + '0');
 
-  // sscanf might set errno, so save it to restore later.
-  int32_t previous_err_no = errno;
-  errno = 0;
-
   int32_t chars_consumed = 0;
   int32_t n = sscanf((char*)source_ptr, format, out_number, &chars_consumed);
 
-  // True if the entire source was consumed by sscanf, it set the out_number argument, and it didn't
-  // set errno to some non-zero value.
-  bool success = size == chars_consumed && n == 1 && errno == 0;
-
-  // Restore errno back to its original value before the call to sscanf potentially changed it.
-  errno = previous_err_no;
-
-  return success ? AZ_OK : AZ_ERROR_UNEXPECTED_CHAR;
+  // Success if the entire source was consumed by sscanf and it set the out_number argument.
+  return (size == chars_consumed && n == 1 && isfinite(*out_number)) ? AZ_OK
+                                                                     : AZ_ERROR_UNEXPECTED_CHAR;
 }
 
 #ifdef _MSC_VER
@@ -757,6 +745,8 @@ AZ_NODISCARD az_result
 az_span_dtoa(az_span destination, double source, int32_t fractional_digits, az_span* out_span)
 {
   _az_PRECONDITION_VALID_SPAN(destination, 0, false);
+  // Inputs that are either positive or negative infinity, or not a number, are not supported.
+  _az_PRECONDITION(isfinite(source));
   _az_PRECONDITION_RANGE(0, fractional_digits, _az_MAX_SUPPORTED_FRACTIONAL_DIGITS);
   _az_PRECONDITION_NOT_NULL(out_span);
 
@@ -765,27 +755,7 @@ az_span_dtoa(az_span destination, double source, int32_t fractional_digits, az_s
   // The input is either positive or negative infinity, or not a number.
   if (!isfinite(source))
   {
-    AZ_RETURN_IF_NOT_ENOUGH_SIZE(*out_span, 3);
-
-    // Check if source == -INFINITY, which is the only non-finite value that is less than 0, without
-    // using exact equality. Workaround for -Wfloat-equal.
-    if (source < 0)
-    {
-      AZ_RETURN_IF_NOT_ENOUGH_SIZE(*out_span, 4);
-      *out_span = az_span_copy(*out_span, AZ_SPAN_FROM_STR("-inf"));
-    }
-    else
-    {
-      if (isnan(source))
-      {
-        *out_span = az_span_copy(*out_span, AZ_SPAN_FROM_STR("nan"));
-      }
-      else
-      {
-        *out_span = az_span_copy(*out_span, AZ_SPAN_FROM_STR("inf"));
-      }
-    }
-    return AZ_OK;
+    return AZ_ERROR_NOT_SUPPORTED;
   }
 
   if (source < 0)

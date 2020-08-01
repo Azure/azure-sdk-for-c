@@ -983,50 +983,26 @@ static void test_json_reader(void** state)
     assert_true(_is_double_equal(actual_d, 10000000000000000000000e17, 1e-2));
   }
   {
-    // exp inf -> Any value above double MAX range would be translated to positive inf
+    // exp inf -> Any value above double MAX range which would be translated to positive inf, is not
+    // supported
     az_json_reader reader = { 0 };
     TEST_EXPECT_SUCCESS(az_json_reader_init(&reader, AZ_SPAN_FROM_STR("1e309"), NULL));
     TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader));
     test_json_token_helper(reader.token, AZ_JSON_TOKEN_NUMBER, AZ_SPAN_FROM_STR("1e309"));
 
     double actual_d = 0;
-
-    // https://github.com/Azure/azure-sdk-for-c/issues/893
-    // The result of this depends on the compiler.
-#ifdef _MSC_VER
-    TEST_EXPECT_SUCCESS(az_json_token_get_double(&reader.token, &actual_d));
-    assert_true(!isfinite(actual_d));
-
-    // Create inf number with  IEEE 754 standard
-    // floating point number containing all zeroes in the mantissa (first twenty-three bits), and
-    // all ones in the exponent (next eight bits)
-    unsigned int p = 0x7F800000; // 0xFF << 23
-    float positiveInfinity = *(float*)&p;
-    double const expected = positiveInfinity;
-    uint64_t const* const expected_bin_rep_view = (uint64_t const*)&expected;
-    uint64_t const* const token_value_number_bin_rep_view = (uint64_t*)&actual_d;
-    assert_true(*token_value_number_bin_rep_view == *expected_bin_rep_view);
-#else
     assert_int_equal(az_json_token_get_double(&reader.token, &actual_d), AZ_ERROR_UNEXPECTED_CHAR);
-#endif // _MSC_VER
   }
   {
-    // exp inf -> Any value below double MIN range would be translated 0
+    // exp negative inf -> Any value below double MIN range would be translated 0
     az_json_reader reader = { 0 };
     TEST_EXPECT_SUCCESS(az_json_reader_init(&reader, AZ_SPAN_FROM_STR("1e-400"), NULL));
     TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader));
     test_json_token_helper(reader.token, AZ_JSON_TOKEN_NUMBER, AZ_SPAN_FROM_STR("1e-400"));
 
     double actual_d = 0;
-
-    // https://github.com/Azure/azure-sdk-for-c/issues/893
-    // The result of this depends on the compiler.
-#ifdef _MSC_VER
     TEST_EXPECT_SUCCESS(az_json_token_get_double(&reader.token, &actual_d));
     assert_true(_is_double_equal(actual_d, 0.0, 1e-2));
-#else
-    assert_int_equal(az_json_token_get_double(&reader.token, &actual_d), AZ_ERROR_UNEXPECTED_CHAR);
-#endif // _MSC_VER
   }
   {
     // negative exp

@@ -403,22 +403,27 @@ static void az_span_atod_test(void** state)
   assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("123.456e+78"), &value), AZ_OK);
   assert_true(value == 123.456e+78);
 
-  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("nan"), &value), AZ_OK);
-  assert_true(isnan(value));
-  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("inf"), &value), AZ_OK);
-  assert_true(value == INFINITY);
-  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-inf"), &value), AZ_OK);
-  assert_true(value == -INFINITY);
-  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("NAN"), &value), AZ_OK);
-  assert_true(isnan(value));
-  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("INF"), &value), AZ_OK);
-  assert_true(value == INFINITY);
-  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-INF"), &value), AZ_OK);
-  assert_true(value == -INFINITY);
-  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("INFINITY"), &value), AZ_OK);
-  assert_true(value == INFINITY);
-  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-INFINITY"), &value), AZ_OK);
-  assert_true(value == -INFINITY);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("nan"), &value), AZ_ERROR_UNEXPECTED_CHAR);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-nan"), &value), AZ_ERROR_UNEXPECTED_CHAR);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("+nan"), &value), AZ_ERROR_UNEXPECTED_CHAR);
+  // assert_true(isnan(value));
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("inf"), &value), AZ_ERROR_UNEXPECTED_CHAR);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("+inf"), &value), AZ_ERROR_UNEXPECTED_CHAR);
+  // assert_true(value == INFINITY);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-inf"), &value), AZ_ERROR_UNEXPECTED_CHAR);
+  // assert_true(value == -INFINITY);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("NAN"), &value), AZ_ERROR_UNEXPECTED_CHAR);
+  // assert_true(isnan(value));
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("INF"), &value), AZ_ERROR_UNEXPECTED_CHAR);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("+INF"), &value), AZ_ERROR_UNEXPECTED_CHAR);
+  // assert_true(value == INFINITY);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-INF"), &value), AZ_ERROR_UNEXPECTED_CHAR);
+  // assert_true(value == -INFINITY);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("INFINITY"), &value), AZ_ERROR_UNEXPECTED_CHAR);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("+INFINITY"), &value), AZ_ERROR_UNEXPECTED_CHAR);
+  // assert_true(value == INFINITY);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-INFINITY"), &value), AZ_ERROR_UNEXPECTED_CHAR);
+  // assert_true(value == -INFINITY);
   assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("0"), &value), AZ_OK);
   assert_true(value == 0);
   assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-0"), &value), AZ_OK);
@@ -589,15 +594,22 @@ static void az_span_atod_test(void** state)
   assert_true(value == -1e300);
   assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("1.7e308"), &value), AZ_OK);
   assert_true(value == 1.7e308);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-1.7e308"), &value), AZ_OK);
+  assert_true(value == -1.7e308);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("2.22507e-308"), &value), AZ_OK);
+  assert_true(value == 2.22507e-308);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-2.22507e-308"), &value), AZ_OK);
+  assert_true(value == -2.22507e-308);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("4.94e-325"), &value), AZ_OK);
+  assert_true(value == 0);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("1e-400"), &value), AZ_OK);
+  assert_true(value == 0);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-1e-400"), &value), AZ_OK);
+  assert_true(value == 0);
 
-  // https://github.com/Azure/azure-sdk-for-c/issues/893
-  // The result of this depends on the compiler.
-#ifdef _MSC_VER
-  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("1.8e309"), &value), AZ_OK);
-  assert_true(value == INFINITY);
-#else
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("1.8e308"), &value), AZ_ERROR_UNEXPECTED_CHAR);
+  assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("-1.8e308"), &value), AZ_ERROR_UNEXPECTED_CHAR);
   assert_int_equal(az_span_atod(AZ_SPAN_FROM_STR("1.8e309"), &value), AZ_ERROR_UNEXPECTED_CHAR);
-#endif // _MSC_VER
 }
 
 #ifdef __GNUC__
@@ -1387,9 +1399,9 @@ static void az_span_dtoa_succeeds(void** state)
   // [-][0-9]{16}.[0-9]{15}, i.e. 1+16+1+15
   uint8_t raw_buffer[33] = { 0 };
 
-  az_span_dtoa_succeeds_helper(NAN, 15, AZ_SPAN_FROM_STR("nan"));
+  /*az_span_dtoa_succeeds_helper(NAN, 15, AZ_SPAN_FROM_STR("nan"));
   az_span_dtoa_succeeds_helper(INFINITY, 15, AZ_SPAN_FROM_STR("inf"));
-  az_span_dtoa_succeeds_helper(-INFINITY, 15, AZ_SPAN_FROM_STR("-inf"));
+  az_span_dtoa_succeeds_helper(-INFINITY, 15, AZ_SPAN_FROM_STR("-inf"));*/
   az_span_dtoa_succeeds_helper(0, 15, AZ_SPAN_FROM_STR("0"));
   az_span_dtoa_succeeds_helper(1., 15, AZ_SPAN_FROM_STR("1"));
   az_span_dtoa_succeeds_helper(1.e3, 15, AZ_SPAN_FROM_STR("1000"));
@@ -1457,9 +1469,9 @@ static void az_span_dtoa_succeeds(void** state)
       12345.12300000010e5, 15, AZ_SPAN_FROM_STR("1234512300.000010013580322"));
   az_span_dtoa_succeeds_helper(1e-300, 15, AZ_SPAN_FROM_STR("0"));
 
-  az_span_dtoa_succeeds_helper(NAN, 2, AZ_SPAN_FROM_STR("nan"));
-  az_span_dtoa_succeeds_helper(INFINITY, 2, AZ_SPAN_FROM_STR("inf"));
-  az_span_dtoa_succeeds_helper(-INFINITY, 2, AZ_SPAN_FROM_STR("-inf"));
+  /* az_span_dtoa_succeeds_helper(NAN, 2, AZ_SPAN_FROM_STR("nan"));
+   az_span_dtoa_succeeds_helper(INFINITY, 2, AZ_SPAN_FROM_STR("inf"));
+   az_span_dtoa_succeeds_helper(-INFINITY, 2, AZ_SPAN_FROM_STR("-inf"));*/
   az_span_dtoa_succeeds_helper(0, 2, AZ_SPAN_FROM_STR("0"));
   az_span_dtoa_succeeds_helper(1., 2, AZ_SPAN_FROM_STR("1"));
   az_span_dtoa_succeeds_helper(1.e3, 2, AZ_SPAN_FROM_STR("1000"));
@@ -1536,12 +1548,13 @@ static void az_span_dtoa_overflow_fails(void** state)
   az_span buff = AZ_SPAN_FROM_BUFFER(raw_buffer);
   az_span o;
 
-  assert_int_equal(
+  /*assert_int_equal(
       az_span_dtoa(az_span_slice(buff, 0, 2), NAN, 15, &o), AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
   assert_int_equal(
       az_span_dtoa(az_span_slice(buff, 0, 2), INFINITY, 15, &o), AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
   assert_int_equal(
-      az_span_dtoa(az_span_slice(buff, 0, 3), -INFINITY, 15, &o), AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+      az_span_dtoa(az_span_slice(buff, 0, 3), -INFINITY, 15, &o),
+  AZ_ERROR_INSUFFICIENT_SPAN_SIZE);*/
   assert_int_equal(
       az_span_dtoa(az_span_slice(buff, 0, 0), 0, 15, &o), AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
   assert_int_equal(
