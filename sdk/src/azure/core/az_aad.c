@@ -15,11 +15,11 @@
 #include <azure/core/_az_cfg.h>
 
 // https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow#request-an-access-token
-AZ_NODISCARD az_result _az_aad_build_url(az_span url, az_span tenant_id, az_span* out_url)
+AZ_NODISCARD az_result
+_az_aad_build_url(az_span url, az_span authority, az_span tenant_id, az_span* out_url)
 {
-  az_span const root_url = AZ_SPAN_FROM_STR("https://login.microsoftonline.com/");
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(url, az_span_size(root_url));
-  az_span remainder = az_span_copy(url, root_url);
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(url, az_span_size(authority));
+  az_span remainder = az_span_copy(url, authority);
 
   {
     int32_t url_length = 0;

@@ -139,7 +139,6 @@ static az_result read_configuration_entry(
 static az_result create_mqtt_endpoint(char* destination, int32_t destination_size, az_span iot_hub);
 static int connect_device(void);
 static int subscribe(void);
-static void sleep_for_seconds(uint32_t seconds);
 
 //
 // Messaging functions
@@ -253,8 +252,6 @@ int main(void)
 
     // Send a telemetry message
     send_telemetry_message();
-
-    sleep_for_seconds(DEVICE_DO_WORK_SLEEP_MS);
   }
 
   // Gracefully disconnect: send the disconnect packet and close the socket
@@ -272,15 +269,6 @@ int main(void)
   MQTTClient_destroy(&mqtt_client);
 
   return 0;
-}
-
-static void sleep_for_seconds(uint32_t seconds)
-{
-#ifdef _WIN32
-  Sleep((DWORD)seconds * 1000);
-#else
-  sleep(seconds);
-#endif
 }
 
 // Read OS environment variables using stdlib function
@@ -419,7 +407,7 @@ static az_result build_command_response_payload(
   AZ_RETURN_IF_FAILED(az_json_writer_append_string(json_builder, end_time_span));
   AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(json_builder));
 
-  *response_payload = az_json_writer_get_json(json_builder);
+  *response_payload = az_json_writer_get_bytes_used_in_destination(json_builder);
 
   return AZ_OK;
 }
@@ -598,7 +586,7 @@ static int send_reported_temperature_property(
       return rc;
     }
   }
-  az_span json_payload = az_json_writer_get_json(&json_builder);
+  az_span json_payload = az_json_writer_get_bytes_used_in_destination(&json_builder);
 
   printf("Payload: %.*s\n", az_span_size(json_payload), (char*)az_span_ptr(json_payload));
 
@@ -890,8 +878,8 @@ static int connect_device(void)
 
   // Get the MQTT username used to connect to IoT Hub
   if (az_failed(
-          rc = az_iot_hub_client_get_user_name(
-              &client, mqtt_username, sizeof(mqtt_username), NULL)))
+          rc
+          = az_iot_hub_client_get_user_name(&client, mqtt_username, sizeof(mqtt_username), NULL)))
 
   {
     printf("Failed to get MQTT username, return code %d\n", rc);
@@ -987,7 +975,7 @@ static az_result build_telemetry_message(az_span* out_payload)
   AZ_RETURN_IF_FAILED(az_json_writer_append_double(
       &json_builder, current_device_temp, DOUBLE_DECIMAL_PLACE_DIGITS));
   AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&json_builder));
-  *out_payload = az_json_writer_get_json(&json_builder);
+  *out_payload = az_json_writer_get_bytes_used_in_destination(&json_builder);
 
   return AZ_OK;
 }
@@ -1029,4 +1017,3 @@ static az_span get_request_id(void)
   (void)result;
   return out_span;
 }
-

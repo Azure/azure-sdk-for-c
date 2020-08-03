@@ -122,7 +122,7 @@ _Example:_
 
     if (az_succeeded(az_iot_hub_client_c2d_parse_received_topic(client, received_topic, &c2d_request)))
     {
-        // This is a C2D message: 
+        // This is a C2D message:
         //  c2d_request.properties contain the properties of the message.
         //  the MQTT message payload contains the data.
     }

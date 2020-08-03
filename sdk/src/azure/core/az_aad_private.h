@@ -5,11 +5,11 @@
 #define _az_AAD_PRIVATE_H
 
 #include <azure/core/az_config.h>
-#include <azure/core/internal/az_config_internal.h>
 #include <azure/core/az_credentials.h>
 #include <azure/core/az_http.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
+#include <azure/core/internal/az_config_internal.h>
 
 #include <stdbool.h>
 
@@ -23,7 +23,8 @@ enum
   _az_AAD_RESPONSE_BUF_SIZE = 3 * 1024,
 };
 
-AZ_NODISCARD az_result _az_aad_build_url(az_span url, az_span tenant_id, az_span* out_url);
+AZ_NODISCARD az_result
+_az_aad_build_url(az_span url, az_span authority, az_span tenant_id, az_span* out_url);
 
 AZ_NODISCARD az_result _az_aad_build_body(
     az_span body,

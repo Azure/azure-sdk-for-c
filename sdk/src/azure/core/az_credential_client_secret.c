@@ -5,8 +5,9 @@
 #include "az_credential_token_private.h"
 #include <azure/core/az_credentials.h>
 #include <azure/core/az_http.h>
-#include <azure/core/internal/az_http_internal.h>
 #include <azure/core/az_http_transport.h>
+#include <azure/core/internal/az_http_internal.h>
+#include <azure/core/internal/az_precondition_internal.h>
 
 #include <stddef.h>
 
@@ -20,7 +21,9 @@ static AZ_NODISCARD az_result _az_credential_client_secret_request_token(
   uint8_t url_buf[_az_AAD_REQUEST_URL_BUF_SIZE] = { 0 };
   az_span url_span = AZ_SPAN_FROM_BUFFER(url_buf);
   az_span url;
-  AZ_RETURN_IF_FAILED(_az_aad_build_url(url_span, credential->_internal.tenant_id, &url));
+
+  AZ_RETURN_IF_FAILED(_az_aad_build_url(
+      url_span, credential->_internal.authority, credential->_internal.tenant_id, &url));
 
   uint8_t body_buf[_az_AAD_REQUEST_BODY_BUF_SIZE] = { 0 };
   az_span body = AZ_SPAN_FROM_BUFFER(body_buf);
@@ -88,6 +91,27 @@ AZ_NODISCARD az_result az_credential_client_secret_init(
     az_span client_id,
     az_span client_secret)
 {
+  return az_credential_client_secret_init_with_authority(
+      out_credential,
+      tenant_id,
+      client_id,
+      client_secret,
+      AZ_SPAN_FROM_STR("https://login.microsoftonline.com/"));
+}
+
+AZ_NODISCARD az_result az_credential_client_secret_init_with_authority(
+    az_credential_client_secret* out_credential,
+    az_span tenant_id,
+    az_span client_id,
+    az_span client_secret,
+    az_span authority)
+{
+  _az_PRECONDITION_NOT_NULL(out_credential);
+  _az_PRECONDITION_VALID_SPAN(tenant_id, 1, false);
+  _az_PRECONDITION_VALID_SPAN(client_id, 1, false);
+  _az_PRECONDITION_VALID_SPAN(client_secret, 1, false);
+  _az_PRECONDITION_VALID_SPAN(authority, 1, false);
+
   *out_credential = (az_credential_client_secret){
     ._internal = {
       .credential = {
@@ -101,6 +125,7 @@ AZ_NODISCARD az_result az_credential_client_secret_init(
         .client_id = client_id,
         .client_secret = client_secret,
         .scopes = { 0 },
+        .authority = authority,
       },
     };
 

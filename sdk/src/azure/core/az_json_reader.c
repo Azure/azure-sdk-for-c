@@ -266,7 +266,7 @@ AZ_NODISCARD static bool _az_finished_consuming_json_number(
 
   // The next character after a "0" or a set of digits must either be a decimal or 'e'/'E' to
   // indicate scientific notation. For example "01" or "123f" is invalid.
-  // The next charcter after "[-][digits].[digits]" must be 'e'/'E' if we haven't reached the end of
+  // The next character after "[-][digits].[digits]" must be 'e'/'E' if we haven't reached the end of
   // the number yet. For example, "1.1f" or "1.1-" are invalid.
   index = az_span_find(expected_next_bytes, next_byte_span);
   if (index == -1)

@@ -62,7 +62,7 @@ and then call this function to get the address of the 0-terminated string:
 char* str = (char*) az_span_ptr(span); // str points to a 0-terminated string
 ```
 
-Or, you can call this function to copy the string in the `az_span` to your own `char*` buffer; this function will 0-termiante the string in the `char*` buffer:
+Or, you can call this function to copy the string in the `az_span` to your own `char*` buffer; this function will 0-terminate the string in the `char*` buffer:
 
 ```C
 void az_span_to_str(char* destination, int32_t destination_max_size, az_span source);

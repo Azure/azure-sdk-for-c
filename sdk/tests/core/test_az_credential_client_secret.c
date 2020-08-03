@@ -3,10 +3,10 @@
 
 #include "az_test_definitions.h"
 #include <azure/core/az_credentials.h>
-#include <azure/core/internal/az_credentials_internal.h>
-#include <azure/core/internal/az_http_internal.h>
 #include <azure/core/az_http_transport.h>
 #include <azure/core/az_span.h>
+#include <azure/core/internal/az_credentials_internal.h>
+#include <azure/core/internal/az_http_internal.h>
 
 #include <stddef.h>
 
@@ -17,22 +17,42 @@
 
 #include <azure/core/_az_cfg.h>
 
+static az_span authority = AZ_SPAN_LITERAL_FROM_STR("https://login.microsoftonline.com/");
+
 static void test_credential_client_secret(void** state)
 {
   (void)state;
+  az_span const authorities[] = { AZ_SPAN_FROM_STR("https://login.microsoftonline.com/"),
+                                  AZ_SPAN_FROM_STR("https://login.microsoftonline.us/") };
 
-  az_credential_client_secret credential = { 0 };
+  for (int i = -1; i < (int)(sizeof(authorities) / sizeof(authorities[0])); ++i)
+  {
+    az_credential_client_secret credential = { 0 };
 
-  assert_true(az_succeeded(az_credential_client_secret_init(
-      &credential,
-      AZ_SPAN_FROM_STR("TenantID"),
-      AZ_SPAN_FROM_STR("ClientID"),
-      AZ_SPAN_FROM_STR("ClientSecret"))));
+    if (i < 0)
+    {
+      assert_true(az_succeeded(az_credential_client_secret_init(
+          &credential,
+          AZ_SPAN_FROM_STR("TenantID"),
+          AZ_SPAN_FROM_STR("ClientID"),
+          AZ_SPAN_FROM_STR("ClientSecret"))));
+    }
+    else
+    {
+      authority = authorities[i];
 
-  assert_true(az_succeeded(
-      _az_credential_set_scopes((_az_credential*)&credential, AZ_SPAN_FROM_STR("Scopes"))));
+      assert_true(az_succeeded(az_credential_client_secret_init_with_authority(
+          &credential,
+          AZ_SPAN_FROM_STR("TenantID"),
+          AZ_SPAN_FROM_STR("ClientID"),
+          AZ_SPAN_FROM_STR("ClientSecret"),
+          authority)));
+    }
 
-  _az_http_pipeline pipeline = (_az_http_pipeline){
+    assert_true(az_succeeded(
+        _az_credential_set_scopes((_az_credential*)&credential, AZ_SPAN_FROM_STR("Scopes"))));
+
+    _az_http_pipeline pipeline = (_az_http_pipeline){
     ._internal = {
       .policies = {
         {._internal = { .process = az_http_pipeline_policy_credential, .options = &credential, }, },
@@ -41,63 +61,65 @@ static void test_credential_client_secret(void** state)
     },
   };
 
-  az_span const expected_responses[] = {
-    AZ_SPAN_FROM_STR("HTTP/1.1 200 OK\r\n\r\nResponse1"),
-    AZ_SPAN_FROM_STR("HTTP/1.1 200 OK\r\n\r\nResponse2"),
-    AZ_SPAN_FROM_STR("HTTP/1.1 200 OK\r\n\r\nResponse3"),
-    AZ_SPAN_FROM_STR("HTTP/1.1 200 OK\r\n\r\nResponse4"),
-  };
+    az_span const expected_responses[] = {
+      AZ_SPAN_FROM_STR("HTTP/1.1 200 OK\r\n\r\nResponse1"),
+      AZ_SPAN_FROM_STR("HTTP/1.1 200 OK\r\n\r\nResponse2"),
+      AZ_SPAN_FROM_STR("HTTP/1.1 200 OK\r\n\r\nResponse3"),
+      AZ_SPAN_FROM_STR("HTTP/1.1 200 OK\r\n\r\nResponse4"),
+    };
 
-  // Cmocka works in a way that you have to pre-load it with a value for every time it will be
-  // invoked (it does not return previously set value).
-  int const clock_nrequests[] = {
-    2, // wait to retry, set token expiration
-    1, // check if token has expired
-    3, // check if token has expired, wait to retry, set token expiration
-    1, // check if token has expired
-  };
+    // Cmocka works in a way that you have to pre-load it with a value for every time it will be
+    // invoked (it does not return previously set value).
+    int const clock_nrequests[] = {
+      2, // wait to retry, set token expiration
+      1, // check if token has expired
+      3, // check if token has expired, wait to retry, set token expiration
+      1, // check if token has expired
+    };
 
-  // Some value that is big enough so that when you add 3600000 milliseconds to it (1 hour),
-  // and while in debuger, the vallue you see is seen as "103600000", which is easy to debug.
-  int const clock_value[] = {
-    100000000, // first - initial request. Token will be obtained
-    100000000, // the token is not expected to expire, cached value will be used.
-    200000000, // token should be considered expired, when clock is this, so it should refresh.
-    200000000, // use cached refreshed token.
-  };
+    // Some value that is big enough so that when you add 3600000 milliseconds to it (1 hour),
+    // and while in debugger, the value you see is seen as "103600000", which is easy to debug.
+    int const clock_value[] = {
+      100000000, // first - initial request. Token will be obtained
+      100000000, // the token is not expected to expire, cached value will be used.
+      200000000, // token should be considered expired, when clock is this, so it should refresh.
+      200000000, // use cached refreshed token.
+    };
 
-  az_span const request_url = AZ_SPAN_FROM_STR("https://www.microsoft.com/test/request");
-  for (int i = 0; i < 4; ++i)
-  {
-    az_result ignore = { 0 };
+    az_span const request_url = AZ_SPAN_FROM_STR("https://www.microsoft.com/test/request");
+    for (int j = 0; j < 4; ++j)
+    {
+      az_result ignore = { 0 };
 
-    uint8_t header_buf[500] = { 0 };
-    uint8_t body_buf[500] = { 0 };
-    _az_http_request request = { 0 };
-    ignore = az_http_request_init(
-        &request,
-        &az_context_app,
-        az_http_method_get(),
-        request_url,
-        az_span_size(request_url),
-        AZ_SPAN_FROM_BUFFER(header_buf),
-        AZ_SPAN_FROM_BUFFER(body_buf));
+      uint8_t header_buf[500] = { 0 };
+      uint8_t body_buf[500] = { 0 };
+      _az_http_request request = { 0 };
+      ignore = az_http_request_init(
+          &request,
+          &az_context_app,
+          az_http_method_get(),
+          request_url,
+          az_span_size(request_url),
+          AZ_SPAN_FROM_BUFFER(header_buf),
+          AZ_SPAN_FROM_BUFFER(body_buf));
 
-    az_http_response response = { 0 };
-    uint8_t response_buf[500] = { 0 };
-    ignore = az_http_response_init(&response, AZ_SPAN_FROM_BUFFER(response_buf));
+      az_http_response response = { 0 };
+      uint8_t response_buf[500] = { 0 };
+      ignore = az_http_response_init(&response, AZ_SPAN_FROM_BUFFER(response_buf));
 
 #ifdef _az_MOCK_ENABLED
-    will_return_count(__wrap_az_platform_clock_msec, clock_value[i], clock_nrequests[i]);
-    ignore = az_http_pipeline_process(&pipeline, &request, &response);
-    assert_true(az_span_is_content_equal(expected_responses[i], response._internal.http_response));
+      will_return_count(__wrap_az_platform_clock_msec, clock_value[j], clock_nrequests[j]);
+      ignore = az_http_pipeline_process(&pipeline, &request, &response);
+      assert_true(
+          az_span_is_content_equal(expected_responses[j], response._internal.http_response));
 #else // _az_MOCK_ENABLED
-    (void)pipeline;
-    (void)expected_responses;
-    (void)clock_nrequests;
-    (void)clock_value;
+      (void)pipeline;
+      (void)expected_responses;
+      (void)clock_nrequests;
+      (void)clock_value;
 #endif // _az_MOCK_ENABLED
-    (void)ignore;
+      (void)ignore;
+    }
   }
 }
 
@@ -121,9 +143,21 @@ az_result send_request(_az_http_request const* request, az_http_response* respon
           AZ_SPAN_FROM_STR("https://www.microsoft.com/test/request"),
           request_url)) // Auth request
   {
-    assert_true(az_span_is_content_equal(
-        AZ_SPAN_FROM_STR("https://login.microsoftonline.com/TenantID/oauth2/v2.0/token"),
-        request_url));
+    {
+      uint8_t auth_url_buf[200] = { 0 };
+      az_span az_auth_url = AZ_SPAN_FROM_BUFFER(auth_url_buf);
+
+      {
+        az_span auth_url_remainder = az_span_copy(az_auth_url, authority);
+
+        auth_url_remainder
+            = az_span_copy(auth_url_remainder, AZ_SPAN_FROM_STR("TenantID/oauth2/v2.0/token"));
+
+        az_auth_url = az_span_slice(
+            az_auth_url, 0, (int32_t)(az_span_ptr(auth_url_remainder) - az_span_ptr(az_auth_url)));
+      }
+      assert_true(az_span_is_content_equal(az_auth_url, request_url));
+    }
 
     assert_true(az_span_is_content_equal(
         AZ_SPAN_FROM_STR("grant_type=client_credentials"
@@ -232,7 +266,7 @@ az_result send_request(_az_http_request const* request, az_http_response* respon
     else if (attempt == 4 && redo_auth)
     {
       response->_internal.http_response = AZ_SPAN_FROM_STR("HTTP/1.1 200 OK\r\n\r\nResponse4");
-      redo_auth = false;
+      attempt = 0;
     }
   }
 
@@ -240,10 +274,14 @@ az_result send_request(_az_http_request const* request, az_http_response* respon
 }
 
 #ifdef _az_MOCK_ENABLED
-az_result __wrap_az_http_client_send_request(_az_http_request const* request, az_http_response* ref_response);
+az_result __wrap_az_http_client_send_request(
+    _az_http_request const* request,
+    az_http_response* ref_response);
 int64_t __wrap_az_platform_clock_msec();
 
-az_result __wrap_az_http_client_send_request(_az_http_request const* request, az_http_response* ref_response)
+az_result __wrap_az_http_client_send_request(
+    _az_http_request const* request,
+    az_http_response* ref_response)
 {
   return send_request(request, ref_response);
 }

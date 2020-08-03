@@ -432,7 +432,7 @@ static az_result build_reported_property(az_span* reported_property_payload)
   AZ_RETURN_IF_FAILED(az_json_writer_append_int32(&json_writer, reported_property_value));
   AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&json_writer));
 
-  *reported_property_payload = az_json_writer_get_json(&json_writer);
+  *reported_property_payload = az_json_writer_get_bytes_used_in_destination(&json_writer);
 
   return AZ_OK;
 }
@@ -440,7 +440,7 @@ static az_result build_reported_property(az_span* reported_property_payload)
 static void receive_desired_property()
 {
   // Wait until max # messages received
-  for(uint8_t message_count = 0; message_count < MAX_MESSAGE_COUNT; message_count++)
+  for (uint8_t message_count = 0; message_count < MAX_MESSAGE_COUNT; message_count++)
   {
     LOG("Device waiting for desired property twin message #%d from service.", message_count + 1);
     receive_message();

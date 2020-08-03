@@ -9,10 +9,11 @@
 
 #include <azure/core/_az_cfg_prefix.h>
 
-#define _az_JSON_TOKEN_DEFAULT (az_json_token){ \
-  .kind = AZ_JSON_TOKEN_NONE, \
-  ._internal = { 0 } \
-}
+#define _az_JSON_TOKEN_DEFAULT \
+  (az_json_token) \
+  { \
+    .kind = AZ_JSON_TOKEN_NONE, ._internal = { 0 } \
+  }
 
 enum
 {
@@ -36,6 +37,26 @@ enum
 
   _az_MAX_UNESCAPED_STRING_SIZE
   = _az_MAX_ESCAPED_STRING_SIZE / _az_MAX_EXPANSION_FACTOR_WHILE_ESCAPING, // 166_666_666 bytes
+
+  _az_MAX_SIZE_FOR_INT32 = 11, // 10 + sign (i.e. -2147483648)
+
+  // [-][0-9]{16}.[0-9]{15}, i.e. 1+16+1+15 since _az_MAX_SUPPORTED_FRACTIONAL_DIGITS is 15
+  _az_MAX_SIZE_FOR_DOUBLE = 33,
+
+  // When writing large JSON strings in chunks, ask for at least 64 bytes, to avoid writing one
+  // character at a time.
+  // This value should be between 12 and 512 (inclusive).
+  // In the worst case, a 4-byte UTF-8 character, that needs to be escaped using the \uXXXX UTF-16
+  // format, will need 12 bytes, for the two UTF-16 escaped characters (high/low surrogate pairs).
+  // Anything larger than 512 is not feasible since it is difficult for embedded devices to have
+  // such large blocks of contiguous memory available.
+  _az_MINIMUM_STRING_CHUNK_SIZE = 64,
+
+  // We need 2 bytes for the quotes, potentially one more for the comma to separate items, and one
+  // more for the colon if writing a property name. Therefore, only a maximum of 10 character
+  // strings are guaranteed to fit into a single 64 byte chunk, if all 10 needed to be escaped (i.e.
+  // multiply by 6). 10 * 6 + 4 = 64, and that fits within _az_MINIMUM_STRING_CHUNK_SIZE
+  _az_MAX_UNESCAPED_STRING_SIZE_PER_CHUNK = 10,
 };
 
 typedef enum
@@ -61,7 +82,8 @@ AZ_INLINE _az_json_stack_item _az_json_stack_pop(_az_json_bit_stack* json_stack)
   }
 
   // true (i.e. 1) means _az_JSON_STACK_OBJECT, while false (i.e. 0) means _az_JSON_STACK_ARRAY
-  return (json_stack->_internal.az_json_stack & 1) != 0 ? _az_JSON_STACK_OBJECT : _az_JSON_STACK_ARRAY;
+  return (json_stack->_internal.az_json_stack & 1) != 0 ? _az_JSON_STACK_OBJECT
+                                                        : _az_JSON_STACK_ARRAY;
 }
 
 AZ_INLINE void _az_json_stack_push(_az_json_bit_stack* json_stack, _az_json_stack_item item)
@@ -82,7 +104,8 @@ AZ_NODISCARD AZ_INLINE _az_json_stack_item _az_json_stack_peek(_az_json_bit_stac
       && json_stack->_internal.current_depth <= _az_MAX_JSON_STACK_SIZE);
 
   // true (i.e. 1) means _az_JSON_STACK_OBJECT, while false (i.e. 0) means _az_JSON_STACK_ARRAY
-  return (json_stack->_internal.az_json_stack & 1) != 0 ? _az_JSON_STACK_OBJECT : _az_JSON_STACK_ARRAY;
+  return (json_stack->_internal.az_json_stack & 1) != 0 ? _az_JSON_STACK_OBJECT
+                                                        : _az_JSON_STACK_ARRAY;
 }
 
 #include <azure/core/_az_cfg_suffix.h>
