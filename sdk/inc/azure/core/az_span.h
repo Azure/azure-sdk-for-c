@@ -350,7 +350,10 @@ AZ_NODISCARD az_result az_span_atoi32(az_span source, int32_t* out_number);
  * @return An #az_result value indicating the result of the operation:
  *         - #AZ_OK if successful
  *         - #AZ_ERROR_UNEXPECTED_CHAR if a non-ASCII digit or an invalid character is found
- * within the span
+ * within the span, or if the resulting \p out_number wouldn't be a finite double number
+ *
+ * @remark The #az_span being parsed must contain a number that is finite. Values such as NAN,
+ * INFINITY, and those that would overflow a double to +/-inf are not allowed.
  */
 AZ_NODISCARD az_result az_span_atod(az_span source, double* out_number);
 
@@ -433,8 +436,10 @@ AZ_NODISCARD az_result az_span_u64toa(az_span destination, uint64_t source, az_s
  *         - #AZ_OK if successful
  *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the \p destination is not big enough to contain the
  * copied bytes
- *         - #AZ_ERROR_NOT_SUPPORTED if the \p source contains an integer component that is too
- * large and would overflow beyond 2^53 - 1.
+ *         - #AZ_ERROR_NOT_SUPPORTED if the \p source is not a finite decimal number or contains an
+ * integer component that is too large and would overflow beyond 2^53 - 1.
+ *
+ * @remark Only finite double values are supported. Values such as NAN and INFINITY are not allowed.
  *
  * @remark Non-significant trailing zeros (after the decimal point) are not written, even if \p
  * fractional_digits is large enough to allow the zero padding.

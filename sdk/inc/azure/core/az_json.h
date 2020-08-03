@@ -138,7 +138,8 @@ AZ_NODISCARD az_result az_json_token_get_int32(az_json_token const* json_token, 
  * @param json_token A pointer to an #az_json_token instance.
  * @param out_value A pointer to a variable to receive the value.
  * @return AZ_OK if the number is returned.<br>
- * AZ_ERROR_JSON_INVALID_STATE if the kind != AZ_JSON_TOKEN_NUMBER.
+ * AZ_ERROR_JSON_INVALID_STATE if the kind != AZ_JSON_TOKEN_NUMBER.<br>
+ * AZ_ERROR_UNEXPECTED_CHAR if the resulting \p out_value wouldn't be a finite double number
  */
 AZ_NODISCARD az_result az_json_token_get_double(az_json_token const* json_token, double* out_value);
 
