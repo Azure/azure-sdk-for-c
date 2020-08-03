@@ -74,7 +74,8 @@ az_result pnp_helper_parse_command_name(
  * @param[in] json_buffer The span into which the json payload will be placed.
  * @param[in] component_name The name of the component for the reported_property.
  * @param[in] property_name The name of the property to which to send an update.
- * @param[in] property_json_value The value of the property as valid JSON.
+ * @param[in] append_callback The user callback to invoke to add the property value.
+ * @param[in] context The user context which is passed to the callback.
  * @param[out] out_span The #az_span pointer to the output json payload.
  */
 az_result pnp_helper_create_reported_property(
@@ -91,7 +92,8 @@ az_result pnp_helper_create_reported_property(
  * @param[in] json_buffer The span into which the json payload will be placed.
  * @param[in] component_name The name of the component for the reported_property.
  * @param[in] property_name The name of the property to which to send an update.
- * @param[in] property_json_value The value of the property as valid JSON.
+ * @param[in] append_callback The user callback to invoke to add the property value.
+ * @param[in] context The user context which is passed to the callback.
  * @param[in] ack_code The return value for the reported property.
  * @param[in] ack_version The ack version for the reported property.
  * @param[in] ack_description The optional description for the reported property.

@@ -12,6 +12,11 @@
 #include "pnp_helper.h"
 #include "sample_pnp_thermostat_component.h"
 
+#ifdef _MSC_VER
+// "'getenv': This function or variable may be unsafe. Consider using _dupenv_s instead."
+#pragma warning(disable : 4996)
+#endif
+
 #define DOUBLE_DECIMAL_PLACE_DIGITS 2
 
 // IoT Telemetry Values
