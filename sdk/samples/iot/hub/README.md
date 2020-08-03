@@ -140,9 +140,9 @@ On failure, a status of `404` will be returned with an empty JSON payload.
 
 Receive and view incoming C2D messages using the IoT Hub Client.
 
-### [IoT Hub PnP (Certificates)][pnp_sample]
+### [IoT Hub Plug and Play (Certificates)][pnp_sample]
 
-Connect a PnP enabled device with the Digital Twin Model ID (DTMI) detailed [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/Thermostat.json).
+Connect an IoT Plug and Play enabled device with the Digital Twin Model ID (DTMI) detailed [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/Thermostat.json).
 In short, the capabilities are listed here:
 
 - **Methods**: Invoke a method called `getMaxMinReport` with JSON payload value `"since"` with an [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) value for start time for the report. The method sends a response containing the following JSON payload:
@@ -160,7 +160,7 @@ In short, the capabilities are listed here:
 with correct values substituted for each field.
 
 - **Telemetry**: Device sends a JSON message with the field name `temperature` and the `double` value of the temperature.
-- **Twin**: Desired property with the field name `targetTemperature` and the `double` value for the desired temperature. Reported property with the field name `maxTempSinceLastReboot` and the `double` value for the highest temperature.Note that part of the PnP spec is a response to a desired property update from the service. The device will send back a reported property with a similarly named property and a set of "ack" values: `ac` for the HTTP-like ack code, `av` for ack version of the property, and an optional `ad` for an ack description.
+- **Twin**: Desired property with the field name `targetTemperature` and the `double` value for the desired temperature. Reported property with the field name `maxTempSinceLastReboot` and the `double` value for the highest temperature. Note that part of the IoT Plug and Play spec is a response to a desired property update from the service. The device will send back a reported property with a similarly named property and a set of "ack" values: `ac` for the HTTP-like ack code, `av` for ack version of the property, and an optional `ad` for an ack description.
 
 ## Troubleshooting
 
