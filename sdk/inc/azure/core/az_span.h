@@ -350,7 +350,7 @@ AZ_NODISCARD az_result az_span_atoi32(az_span source, int32_t* out_number);
  * @return An #az_result value indicating the result of the operation:
  *         - #AZ_OK if successful
  *         - #AZ_ERROR_UNEXPECTED_CHAR if a non-ASCII digit or an invalid character is found
- * within the span, or if the resulting \p out_number wouldn't be a finite number
+ * within the span, or if the resulting \p out_number wouldn't be a finite double number
  *
  * @remark The #az_span being parsed must contain a number that is finite. Values such as NAN,
  * INFINITY, and those that would overflow a double to +/-inf are not allowed.
