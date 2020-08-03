@@ -13,7 +13,7 @@ More detailed step-by-step guides on how to run an IoT Hub Client sample from sc
   - ESP8266: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Esp8266 NodeMCU](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/docs/how_to_iot_hub_esp8266_nodemcu.md)
 
 ## Sample Descriptions
-This section provides an overivew of the different samples available to run and what to expect from each.
+This section provides an overview of the different samples available to run and what to expect from each.
 
 **IoT Hub C2D Sample**
 * *Executable:* `paho_iot_hub_c2d_sample`
@@ -212,7 +212,7 @@ The following samples use SAS authentication to connect to Azure IoT Hub or Azur
 
 Start using the IoT Provisioning Client in your solutions!
 
-* A general overivew of the Embedded C SDK and additional background on running samples can be found in the [Azure SDK for Embedded C README](https://github.com/Azure/azure-sdk-for-c#azure-sdk-for-embedded-c).
+* A general overview of the Embedded C SDK and additional background on running samples can be found in the [Azure SDK for Embedded C README](https://github.com/Azure/azure-sdk-for-c#azure-sdk-for-embedded-c).
 * More SDK details pertaining to the Azure IoT Client library can be found in the [Azure IoT Client README](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot#azure-iot-clients).
 * The [Azure IoT Client MQTT State Machine](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/docs/iot/mqtt_state_machine.md) provides a high-level architecture and API information.
 * For extensive documentation on Azure IoT Hub, see the [Microsoft API reference documentation](https://docs.microsoft.com/en-us/azure/iot-hub/about-iot-hub).
