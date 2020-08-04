@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include "pnp_helper.h"
+
 #include <stdint.h>
 #include <stdio.h>
 
@@ -8,8 +10,6 @@
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
 #include <azure/iot/az_iot_hub_client.h>
-
-#include "pnp_helper.h"
 
 #define JSON_DOUBLE_DIGITS 2
 

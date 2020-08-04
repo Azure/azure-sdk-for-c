@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef _az_PNP_HELPER_H
-#define _az_PNP_HELPER_H
+#ifndef PNP_HELPER_H
+#define PNP_HELPER_H
 
 #include <stdint.h>
 
@@ -10,8 +10,6 @@
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
 #include <azure/iot/az_iot_hub_client.h>
-
-#include "sample_pnp_thermostat_component.h"
 
 #define PNP_STATUS_SUCCESS 200
 #define PNP_STATUS_BAD_FORMAT 400
@@ -72,7 +70,7 @@ az_result pnp_helper_parse_command_name(
  * @brief Build a reported property
  *
  * @param[in] json_buffer The span into which the json payload will be placed.
- * @param[in] component_name The name of the component for the reported_property.
+ * @param[in] component_name The name of the component for the reported property.
  * @param[in] property_name The name of the property to which to send an update.
  * @param[in] append_callback The user callback to invoke to add the property value.
  * @param[in] context The user context which is passed to the callback.
@@ -87,10 +85,10 @@ az_result pnp_helper_create_reported_property(
     az_span* out_span);
 
 /**
- * @brief Build a reported property
+ * @brief Build a reported property with the ack status
  *
  * @param[in] json_buffer The span into which the json payload will be placed.
- * @param[in] component_name The name of the component for the reported_property.
+ * @param[in] component_name The name of the component for the reported property.
  * @param[in] property_name The name of the property to which to send an update.
  * @param[in] append_callback The user callback to invoke to add the property value.
  * @param[in] context The user context which is passed to the callback.
@@ -134,4 +132,4 @@ az_result pnp_helper_process_twin_data(
     pnp_helper_property_callback property_callback,
     void* context_ptr);
 
-#endif // _az_PNP_HELPER_H
+#endif // PNP_HELPER_H

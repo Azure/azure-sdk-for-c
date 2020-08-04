@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef _az_SAMPLE_PNP_THERMOSTAT_COMPONENT_H
-#define _az_SAMPLE_PNP_THERMOSTAT_COMPONENT_H
+#ifndef SAMPLE_PNP_THERMOSTAT_COMPONENT_H
+#define SAMPLE_PNP_THERMOSTAT_COMPONENT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -66,5 +66,5 @@ az_result sample_pnp_thermostat_process_command(
 }
 #endif
 
-#endif // _az_SAMPLE_PNP_THERMOSTAT_COMPONENT_H
+#endif // SAMPLE_PNP_THERMOSTAT_COMPONENT_H
 

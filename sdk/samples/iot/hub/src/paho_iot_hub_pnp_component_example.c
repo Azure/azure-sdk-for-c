@@ -3,11 +3,12 @@
 
 #ifdef _MSC_VER
 // warning C4201: nonstandard extension used: nameless struct/union
+#pragma warning(push)
 #pragma warning(disable : 4201)
 #endif
 #include <paho-mqtt/MQTTClient.h>
 #ifdef _MSC_VER
-#pragma warning(default : 4201)
+#pragma warning(pop)
 #endif
 
 #include <stdio.h>
@@ -84,7 +85,7 @@
 #define DEFAULT_START_TEMP_CELSIUS 22.0
 #define DOUBLE_DECIMAL_PLACE_DIGITS 2
 
-bool device_operational = true;
+bool is_device_operational = true;
 static const uint8_t null_terminator = '\0';
 static char start_time_str[32];
 static az_span start_time_span;
@@ -92,7 +93,7 @@ static az_span start_time_span;
 // * PnP Values *
 // The model id is the JSON document (also called the Digital Twins Model Identifier or DTMI)
 // which defines the capability of your device. The functionality of the device should match what
-// is described in the coresponding DTMI. Should you choose to program your own PnP capable device,
+// is described in the corresponding DTMI. Should you choose to program your own PnP capable device,
 // the functionality would need to match the DTMI and you would need to update the below 'model_id'.
 // Please see the sample README for more information on this DTMI.
 static const az_span model_id
@@ -102,11 +103,11 @@ static const az_span sample_thermostat_1_component_name = AZ_SPAN_LITERAL_FROM_S
 static sample_pnp_thermostat_component sample_thermostat_2;
 static const az_span sample_thermostat_2_component_name = AZ_SPAN_LITERAL_FROM_STR("thermostat2");
 static const az_span sample_device_info_component = AZ_SPAN_LITERAL_FROM_STR("deviceInformation");
-static const az_span* sample_components[] = { &sample_thermostat_1_component_name,
+static const az_span* sample_pnp_components[] = { &sample_thermostat_1_component_name,
                                               &sample_thermostat_2_component_name,
                                               &sample_device_info_component };
-static const int32_t sample_components_num
-    = sizeof(sample_components) / sizeof(sample_components[0]);
+static const int32_t sample_pnp_components_num
+    = sizeof(sample_pnp_components) / sizeof(sample_pnp_components[0]);
 static char scratch_buf[32];
 
 // ISO8601 Time Format
@@ -134,7 +135,7 @@ static sample_pnp_mqtt_message publish_message;
 
 // IoT Hub Command
 static const az_span reboot_command_name = AZ_SPAN_LITERAL_FROM_STR("reboot");
-static const az_span empty_json_payload = AZ_SPAN_LITERAL_FROM_STR("{}");
+static const az_span empty_json_object = AZ_SPAN_LITERAL_FROM_STR("{}");
 
 //
 // Configuration and connection functions
@@ -226,17 +227,15 @@ int main(void)
   // Initialize PnP Components
   components_init();
 
-  // Send device info once on start up
+  // On device start up, send device info
   send_device_info();
 
-  // Receive response for device info publish
-  mqtt_receive_message();
 
   // Get the twin document to check for updated desired properties. Will then parse desired
   // property and update accordingly.
   send_twin_get_message();
 
-  while (device_operational)
+  while (is_device_operational)
   {
     // Receive any incoming messages from twin or commands
     mqtt_receive_message();
@@ -259,7 +258,7 @@ int main(void)
   if ((rc = MQTTClient_disconnect(mqtt_client, TIMEOUT_MQTT_DISCONNECT_MS)) != MQTTCLIENT_SUCCESS)
   {
     LOG_ERROR("Failed to disconnect MQTT client, return code %d", rc);
-    return rc;
+    exit(rc);
   }
   else
   {
@@ -440,6 +439,9 @@ static void send_device_info(void)
 
   // Send the MQTT message to the endpoint
   mqtt_publish_message(publish_message.topic, publish_message.out_payload_span, 0);
+
+  // Receive response for device info publish
+  mqtt_receive_message();
 }
 
 // Callback invoked by pnp functions each time it finds a property in the twin document
@@ -454,8 +456,8 @@ static void sample_property_callback(
   if (az_span_ptr(component_name) == NULL || az_span_size(component_name) == 0)
   {
     LOG_ERROR(
-        "Property=%.*s arrived for Control component itself.  This does not support\
-                writeable properties on it (all properties are on subcomponents)",
+        "Property=%.*s arrived for Control component itself. This does not support\
+                writable properties on it (all properties are on sub-components)",
         az_span_size(property_name),
         az_span_ptr(property_name));
   }
@@ -514,6 +516,7 @@ static void handle_twin_message(
     if ((result = az_json_reader_init(&json_reader, twin_payload_span, NULL)) != AZ_OK)
     {
       LOG_ERROR("Could not initialize JSON reader");
+      return;
     }
   }
   // Determine what type of incoming twin message this is. Print relevant data for the message.
@@ -525,8 +528,8 @@ static void handle_twin_message(
       pnp_helper_process_twin_data(
           &json_reader,
           false,
-          sample_components,
-          sample_components_num,
+          sample_pnp_components,
+          sample_pnp_components_num,
           scratch_buf,
           sizeof(scratch_buf),
           sample_property_callback,
@@ -538,15 +541,15 @@ static void handle_twin_message(
       pnp_helper_process_twin_data(
           &json_reader,
           true,
-          sample_components,
-          sample_components_num,
+          sample_pnp_components,
+          sample_pnp_components_num,
           scratch_buf,
           sizeof(scratch_buf),
           sample_property_callback,
           NULL);
       break;
 
-    // A response from a twin reported properties publish message. With a successfull update of
+    // A response from a twin reported properties publish message. With a successful update of
     // the reported properties, the payload will be empty and the status will be 204.
     case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES:
       LOG_SUCCESS("A twin reported properties response message was received");
@@ -578,11 +581,11 @@ static az_result sample_pnp_temp_controller_process_command(
                 mqtt_message->topic_length,
                 NULL)))
     {
-      LOG_ERROR("Unable to get twin document publish topic");
+      LOG_ERROR("Unable to get methods response publish topic");
       return result;
     }
 
-    mqtt_message->out_payload_span = empty_json_payload;
+    mqtt_message->out_payload_span = empty_json_object;
   }
   else
   {
@@ -648,7 +651,7 @@ static void handle_command_message(
 
     mqtt_publish_message(publish_message.topic, publish_message.out_payload_span, 0);
 
-    LOG_SUCCESS("Sent response");
+    LOG_SUCCESS("Sent command response");
   }
   else if (
       (result = sample_pnp_temp_controller_process_command(
@@ -661,7 +664,7 @@ static void handle_command_message(
         az_span_ptr(command_name));
     mqtt_publish_message(publish_message.topic, publish_message.out_payload_span, 0);
 
-    LOG_SUCCESS("Sent response");
+    LOG_SUCCESS("Sent command response");
   }
   else
   {
@@ -680,11 +683,11 @@ static void handle_command_message(
     }
     else
     {
-      publish_message.out_payload_span = empty_json_payload;
+      publish_message.out_payload_span = empty_json_object;
 
       mqtt_publish_message(publish_message.topic, publish_message.out_payload_span, 0);
 
-      LOG_SUCCESS("Sent response");
+      LOG_SUCCESS("Sent command response");
     }
   }
 }

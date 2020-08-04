@@ -31,7 +31,7 @@ static const az_span report_start_time_name_span = AZ_SPAN_LITERAL_FROM_STR("sta
 static const az_span report_end_time_name_span = AZ_SPAN_LITERAL_FROM_STR("endTime");
 static const az_span report_error_payload = AZ_SPAN_LITERAL_FROM_STR("{}");
 static char end_time_buffer[32];
-static char incoming_since_value[32];
+static char incoming_since_value_buffer[32];
 
 // Twin Values
 static const az_span desired_temp_property_name = AZ_SPAN_LITERAL_FROM_STR("targetTemperature");
@@ -88,10 +88,14 @@ static az_result invoke_getMaxMinReport(
   az_json_reader jp;
   AZ_RETURN_IF_FAILED(az_json_reader_init(&jp, payload, NULL));
   AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jp));
-  int32_t incoming_since_value_len;
+  int32_t incoming_since_value_buffer_len;
   AZ_RETURN_IF_FAILED(az_json_token_get_string(
-      &jp.token, incoming_since_value, sizeof(incoming_since_value), &incoming_since_value_len));
-  start_time_span = az_span_init((uint8_t*)incoming_since_value, incoming_since_value_len);
+      &jp.token,
+      incoming_since_value_buffer,
+      sizeof(incoming_since_value_buffer),
+      &incoming_since_value_buffer_len));
+  start_time_span
+      = az_span_init((uint8_t*)incoming_since_value_buffer, incoming_since_value_buffer_len);
 
   // Set the response payload to error if the "since" field was not sent
   if (az_span_ptr(start_time_span) == NULL)
@@ -122,8 +126,7 @@ static az_result build_telemetry_message(
     az_span* out_payload)
 {
   az_json_writer json_builder;
-  AZ_RETURN_IF_FAILED(
-      az_json_writer_init(&json_builder, payload, NULL));
+  AZ_RETURN_IF_FAILED(az_json_writer_init(&json_builder, payload, NULL));
   AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&json_builder));
   AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&json_builder, telemetry_name));
   AZ_RETURN_IF_FAILED(az_json_writer_append_double(
@@ -210,7 +213,12 @@ az_result sample_pnp_thermostat_get_telemetry_message(
   az_result result;
   if (az_failed(
           result = pnp_helper_get_telemetry_topic(
-              client, NULL, handle->component_name, mqtt_message->topic, mqtt_message->topic_length, NULL)))
+              client,
+              NULL,
+              handle->component_name,
+              mqtt_message->topic,
+              mqtt_message->topic_length,
+              NULL)))
   {
     return result;
   }
@@ -327,10 +335,7 @@ az_result sample_pnp_thermostat_process_command(
     // Invoke command
     uint16_t return_code;
     az_result response = invoke_getMaxMinReport(
-        handle,
-        command_payload,
-        mqtt_message->payload_span,
-        &mqtt_message->out_payload_span);
+        handle, command_payload, mqtt_message->payload_span, &mqtt_message->out_payload_span);
     if (response != AZ_OK)
     {
       return_code = 400;

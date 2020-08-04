@@ -1,16 +1,17 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include "sample_pnp_component_mqtt.h"
+
 #include <stdint.h>
 
 #include <azure/core/az_span.h>
 
-#include "sample_pnp_component_mqtt.h"
-
 static int32_t request_id_int;
 static char request_id_buf[8];
 
-// Create request id span which increments source int each call. Capable of holding 8 digit number.
+// Create request id span which increments request id integer each call. Capable of holding 8 digit
+// number.
 az_span get_request_id(void)
 {
   az_span remainder;
