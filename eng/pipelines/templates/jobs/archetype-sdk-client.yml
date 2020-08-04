@@ -39,13 +39,6 @@ jobs:
        vcpkg.deps: ''
        VCPKG_DEFAULT_TRIPLET: 'x64-osx'
        AZ_SDK_C_NO_SAMPLES: 'true'
-      Debian_Stretch:
-        OSVmImage: 'ubuntu-18.04'
-        vcpkg.deps: ''
-        ContainerImage: 'debian:stretch'
-        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        AZ_SDK_C_NO_SAMPLES: 'true'
-
 
       # # Build with sample dependencies [curl for transport] - PRECONDITIONS ON
       # # WARNINGS_AS_ERRORS          ON
@@ -209,8 +202,6 @@ jobs:
       #  build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON -DPRECONDITIONS=OFF -DLOGGING=OFF'
   pool:
     vmImage: $(OSVmImage)
-  container:
-    image: $(ContainerImage)
   variables:
     CMOCKA_XML_FILE: "%g-test-results.xml"
     CMOCKA_MESSAGE_OUTPUT: "xml"
@@ -218,6 +209,99 @@ jobs:
   steps:
   - checkout: self
     submodules: recursive
+
+  - template: /eng/pipelines/templates/steps/vcpkg.yml
+    parameters:
+      DependenciesVariableName: vcpkg.deps
+
+  # Install gcovr and lcov for coverage information where appropriate
+  - script: |
+      sudo apt install -y gcovr lcov
+      dotnet tool install -g dotnet-reportgenerator-globaltool
+      dotnet tool install dotnet-reportgenerator-globaltool --tool-path tools
+    displayName: Install coverage tools
+    condition: eq(variables['AZ_SDK_CODE_COV'], 1)
+
+  - template: /eng/pipelines/templates/steps/cmake-build.yml
+    parameters:
+      BuildArgs: $(build.args)
+
+  # Run unit tests
+  - script: |
+      ctest -V
+    workingDirectory: build
+    displayName: ctest
+
+  # Publish test results to Azure Pipelines
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: 'JUnit'
+      testResultsFiles: '**/*-test-results.xml'
+      mergeTestResults: true
+      testRunTitle: 'C99 - $(Agent.JobName)'
+    condition: contains(variables['vcpkg.deps'], 'cmocka')
+
+  # Make coverage targets (specified in coverage_targets.txt) and assemble
+  # coverage report
+  - bash: |
+      make `cat coverage_targets.txt`
+      ../tools/reportgenerator "-reports:sdk/*/*/*/*cov_xml.xml" "-targetdir:." "-reporttypes:Cobertura"
+    workingDirectory: build
+    displayName: Generate Code Coverage Data
+    condition: eq(variables['AZ_SDK_CODE_COV'], 1)
+
+  - task: PublishCodeCoverageResults@1
+    inputs:
+        codeCoverageTool: Cobertura
+        summaryFileLocation: '$(Build.SourcesDirectory)/**/Cobertura.xml'
+    displayName: Publish Code Coverage to DevOps
+    condition: eq(variables['AZ_SDK_CODE_COV'], 1)
+
+  - task: mspremier.BuildQualityChecks.QualityChecks-task.BuildQualityChecks@6
+    displayName: Check line coverage
+    inputs:
+      checkCoverage: true
+      coverageFailOption: fixed
+      coverageType: line
+      # 90% minimum line coverage
+      coverageThreshold: 90
+    condition: eq(variables['AZ_SDK_CODE_COV'], 1)
+
+  - task: mspremier.BuildQualityChecks.QualityChecks-task.BuildQualityChecks@6
+    displayName: Check branch coverage
+    inputs:
+      checkCoverage: true
+      coverageFailOption: fixed
+      coverageType: branch
+      # 65% minimum branch coverage
+      coverageThreshold: 65
+    condition: eq(variables['AZ_SDK_CODE_COV'], 1)
+
+- job: Validate_Containers
+  condition: and(succeededOrFailed(), ne(variables['Skip.Test'], 'true'))
+  strategy:
+    matrix:
+      Debian_Stretch:
+        OSVmImage: 'ubuntu-18.04'
+        vcpkg.deps: ''
+        ContainerImage: 'debian:stretch'
+        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
+        AZ_SDK_C_NO_SAMPLES: 'true'
+  pool:
+    vmImage: $(OSVmImage)
+  container:
+    image: $(ContainerImage)
+  variables:
+    CMOCKA_XML_FILE: "%g-test-results.xml"
+    CMOCKA_MESSAGE_OUTPUT: "xml"
+
+
+  steps:
+  - checkout: self
+    submodules: recursive
+
+  - script: sudo apt install build-essential g++-9; gcc --version
+    displayName: Install GCC
 
   - template: /eng/pipelines/templates/steps/vcpkg.yml
     parameters:
