@@ -376,8 +376,7 @@ static void mqtt_publish_message(char* topic, az_span payload, int qos)
 // Create mqtt endpoint e.g: ssl//contoso.azure-devices.net:8883
 static az_result create_mqtt_endpoint(char* destination, int32_t destination_size, az_span iot_hub)
 {
-  int32_t iot_hub_length = (int32_t)strlen(iot_hub_hostname);
-  int32_t required_size = az_span_size(mqtt_url_prefix) + iot_hub_length
+  int32_t required_size = az_span_size(mqtt_url_prefix) + az_span_size(iot_hub)
       + az_span_size(mqtt_url_suffix) + (int32_t)sizeof(null_terminator);
 
   if (required_size > destination_size)
@@ -387,7 +386,7 @@ static az_result create_mqtt_endpoint(char* destination, int32_t destination_siz
 
   az_span destination_span = az_span_init((uint8_t*)destination, destination_size);
   az_span remainder = az_span_copy(destination_span, mqtt_url_prefix);
-  remainder = az_span_copy(remainder, az_span_slice(iot_hub, 0, iot_hub_length));
+  remainder = az_span_copy(remainder, az_span_slice(iot_hub, 0, az_span_size(iot_hub)));
   remainder = az_span_copy(remainder, mqtt_url_suffix);
   az_span_copy_u8(remainder, null_terminator);
 

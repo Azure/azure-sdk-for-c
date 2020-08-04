@@ -138,11 +138,11 @@ static az_result build_telemetry_message(
   return AZ_OK;
 }
 
-static az_result append_double(az_json_writer* json_writer, void* context)
+static az_result append_double(az_json_writer* json_writer, void* value)
 {
-  double value = *(double*)context;
+  double value_as_double = *(double*)value;
 
-  return az_json_writer_append_double(json_writer, value, DOUBLE_DECIMAL_PLACE_DIGITS);
+  return az_json_writer_append_double(json_writer, value_as_double, DOUBLE_DECIMAL_PLACE_DIGITS);
 }
 
 az_result sample_pnp_thermostat_init(

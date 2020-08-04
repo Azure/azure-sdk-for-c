@@ -44,6 +44,18 @@ static az_result visit_component_properties(
   {
     if (json_reader->token.kind == AZ_JSON_TOKEN_PROPERTY_NAME)
     {
+      if (az_json_token_is_text_equal(&(json_reader->token), component_specifier_name)
+          || az_json_token_is_text_equal(
+              &(json_reader->token), sample_iot_hub_twin_desired_version))
+      {
+        if (az_failed(az_json_reader_next_token(json_reader)))
+        {
+          printf("Failed to next token\r\n");
+          return AZ_ERROR_UNEXPECTED_CHAR;
+        }
+        continue;
+      }
+
       if (az_failed(az_json_token_get_string(
               &(json_reader->token), (char*)scratch_buf, (int32_t)scratch_buf_len, (int32_t*)&len)))
       {
@@ -55,24 +67,6 @@ static az_result visit_component_properties(
       {
         printf("Failed to get next token\r\n");
         return AZ_ERROR_UNEXPECTED_CHAR;
-      }
-
-      if (memcmp(
-              (void*)scratch_buf,
-              (void*)az_span_ptr(component_specifier_name),
-              (size_t)az_span_size(component_specifier_name))
-          == 0)
-      {
-        continue;
-      }
-
-      if ((memcmp(
-               (void*)scratch_buf,
-               (void*)az_span_ptr(sample_iot_hub_twin_desired_version),
-               (size_t)az_span_size(sample_iot_hub_twin_desired_version))
-           == 0))
-      {
-        continue;
       }
 
       property_callback(
@@ -361,6 +355,16 @@ az_result pnp_process_twin_data(
   {
     if (json_reader->token.kind == AZ_JSON_TOKEN_PROPERTY_NAME)
     {
+      if (az_json_token_is_text_equal(&(json_reader->token), sample_iot_hub_twin_desired_version))
+      {
+        if (az_failed(az_json_reader_next_token(json_reader)))
+        {
+          printf("Failed to next token\r\n");
+          return AZ_ERROR_UNEXPECTED_CHAR;
+        }
+        continue;
+      }
+
       if (az_failed(az_json_token_get_string(
               &(json_reader->token), (char*)scratch_buf, (int32_t)scratch_buf_len, (int32_t*)&len)))
       {
@@ -372,16 +376,6 @@ az_result pnp_process_twin_data(
       {
         printf("Failed to next token\r\n");
         return AZ_ERROR_UNEXPECTED_CHAR;
-      }
-
-      if ((len == (int32_t)az_span_size(sample_iot_hub_twin_desired_version))
-          && (memcmp(
-                  (void*)az_span_ptr(sample_iot_hub_twin_desired_version),
-                  (void*)scratch_buf,
-                  (size_t)az_span_size(sample_iot_hub_twin_desired_version))
-              == 0))
-      {
-        continue;
       }
 
       if (json_reader->token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT && sample_components_ptr != NULL
