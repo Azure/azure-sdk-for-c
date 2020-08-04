@@ -300,7 +300,7 @@ jobs:
   - checkout: self
     submodules: recursive
 
-  - script: sudo apt install build-essential g++-9; gcc --version
+  - script: apt install build-essential g++-9; gcc --version
     displayName: Install GCC
 
   - template: /eng/pipelines/templates/steps/vcpkg.yml
