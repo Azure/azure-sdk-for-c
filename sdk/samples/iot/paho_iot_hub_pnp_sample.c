@@ -466,7 +466,7 @@ static int send_command_response(
               sizeof(commands_response_topic),
               NULL)))
   {
-    printf("Unable to get twin document publish topic\n");
+    printf("Unable to get method response publish topic\n");
     return rc;
   }
 
