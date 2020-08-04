@@ -10,7 +10,7 @@ Prerequisites:
 What is covered:
 
 - Downloading and building the Azure SDK for Embedded C suite
-- Configuring and running the IoT Hub client samples.  
+- Configuring and running the IoT Hub client samples.
 
 _The following was run on an Ubuntu Desktop 18.04 environment, but it also works on WSL 1 and 2 (Windows Subsystem for Linux)_
 
@@ -84,8 +84,8 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     A script is provided for creating that certificate.
 
     ```shell
-    $ cd azure-sdk-for-c/sdk/samples/iot/hub/src
-    azure-sdk-for-c/sdk/samples/iot/hub/src$ ./generate_certificate.sh
+    $ cd azure-sdk-for-c/sdk/samples/iot
+    azure-sdk-for-c/sdk/samples/iot$ ./generate_certificate.sh
     ```
 
     <details>
@@ -94,7 +94,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     </summary>
 
     ```shell
-    azure-sdk-for-c/sdk/samples/iot/hub/src$ ./generate_certificate.sh
+    azure-sdk-for-c/sdk/samples/iot$ ./generate_certificate.sh
     Certificate:
         Data:
             Version: 1 (0x0)
@@ -131,15 +131,15 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
 
     If using OpenSSL, it is recommended to use the OpenSSL Trusted CA store configured on your system.
     If required (for example on Windows), download the Baltimore PEM CA from https://www.digicert.com/digicert-root-certificates.htm to the current folder.
-    export AZ_IOT_DEVICE_X509_TRUST_PEM_FILE=/azure-sdk-for-c/sdk/samples/iot/hub/src/BaltimoreCyberTrustRoot.crt.pem
+    export AZ_IOT_DEVICE_X509_TRUST_PEM_FILE=/azure-sdk-for-c/sdk/samples/iot/BaltimoreCyberTrustRoot.crt.pem
 
     Sample certificate generated
     Use the device_cert_store.pem file within the sample:
-    export AZ_IOT_DEVICE_X509_CERT_PEM_FILE=/azure-sdk-for-c/sdk/samples/iot/hub/src/device_cert_store.pem
+    export AZ_IOT_DEVICE_X509_CERT_PEM_FILE=/azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem
 
     Use the following fingerprint when creating your device in IoT Hub (must remove colons):
     SHA1 Fingerprint=C8DC8780C64FFBB5A66D8BC5D39D3C1BBB03FB69
-    /azure-sdk-for-c/sdk/samples/iot/hub/src$
+    /azure-sdk-for-c/sdk/samples/iot$
     ```
 
     </details>
@@ -147,7 +147,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     Do not forget to set the environment variable above, making sure it maps to your local path.
 
     ```shell
-    $ export AZ_IOT_DEVICE_X509_CERT_PEM_FILE=/azure-sdk-for-c/sdk/samples/iot/hub/src/device_cert_store.pem
+    $ export AZ_IOT_DEVICE_X509_CERT_PEM_FILE=/azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem
     ```
 
     Save the certificate Fingerprint above (in this example, `C8DC8780C64FFBB5A66D8BC5D39D3C1BBB03FB69`).
@@ -189,7 +189,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
 
 9. Set the environment variables needed for the samples
 
-    According the the [readme documentation](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/samples/iot/hub) for the Azure Embedded SDK for C IoT client samples require the following environment variables.
+    According the the [readme documentation](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/samples/iot) for the Azure Embedded SDK for C IoT Hub client certificate samples require the following environment variables.
 
     ```shell
     export AZ_IOT_DEVICE_ID=<device ID obtained on step 7>
@@ -212,8 +212,8 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     This is a similar list of files you should see in your computer:
 
     ```shell
-    /azure-sdk-for-c/cmake$ cd sdk/samples/iot/hub/
-    /azure-sdk-for-c/cmake/sdk/samples/iot/hub/$ ll
+    /azure-sdk-for-c/cmake$ cd sdk/samples/iot/
+    /azure-sdk-for-c/cmake/sdk/samples/iot/$ ll
     total 14772
     drwxr-xr-x 3 user user    4096 May  7 22:18 ./
     drwxr-xr-x 4 user user    4096 May  7 22:18 ../
@@ -225,14 +225,14 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     -rwxr-xr-x 1 user user 3771544 May  7 22:18 paho_iot_hub_methods_example*
     -rwxr-xr-x 1 user user 3766688 May  7 22:18 paho_iot_hub_telemetry_example*
     -rwxr-xr-x 1 user user 3776704 May  7 22:18 paho_iot_hub_twin_example*
-    /azure-sdk-for-c/cmake/sdk/samples/iot/hub/$
+    /azure-sdk-for-c/cmake/sdk/samples/iot/$
     ```
 
     ### Telemetry (device-to-cloud messages)
 
     ```shell
-    /azure-sdk-for-c/cmake/sdk/samples/iot/hub/$ ./paho_iot_hub_telemetry_example
-    X509 Certificate PEM Store File = /azure-sdk-for-c/sdk/samples/iot/hub/src/device_cert_store.pem
+    /azure-sdk-for-c/cmake/sdk/samples/iot/$ ./paho_iot_hub_telemetry_example
+    X509 Certificate PEM Store File = /azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem
     X509 Trusted PEM Store File =
     Device ID = testdevice-x509
     IoT Hub Hostname = myiothub.azure-devices.net
@@ -244,7 +244,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     Messages Sent [Press ENTER to shut down]
 
     Disconnected.
-    /azure-sdk-for-c/cmake/sdk/samples/iot/hub/$
+    /azure-sdk-for-c/cmake/sdk/samples/iot/$
     ```
 
     ### Cloud-to-Device (c2d) messages
@@ -256,8 +256,8 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     First, run the sample:
 
     ```shell
-    /azure-sdk-for-c/cmake/sdk/samples/iot/hub/$ ./paho_iot_hub_c2d_example
-    X509 Certificate PEM Store File = /azure-sdk-for-c/sdk/samples/iot/hub/src/device_cert_store.pem
+    /azure-sdk-for-c/cmake/sdk/samples/iot/$ ./paho_iot_hub_c2d_example
+    X509 Certificate PEM Store File = /azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem
     X509 Trusted PEM Store File =
     Device ID = testdevice-x509
     IoT Hub Hostname = myiothub.azure-devices.net
@@ -280,8 +280,8 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     Back to the shell, verify that the message has been received by the sample:
 
     ```shell
-    /azure-sdk-for-c/cmake/sdk/samples/iot/hub/$ ./paho_iot_hub_c2d_example
-    X509 Certificate PEM Store File = /azure-sdk-for-c/sdk/samples/iot/hub/src/device_cert_store.pem
+    /azure-sdk-for-c/cmake/sdk/samples/iot/$ ./paho_iot_hub_c2d_example
+    X509 Certificate PEM Store File = /azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem
     X509 Trusted PEM Store File =
     Device ID = testdevice-x509
     IoT Hub Hostname = myiothub.azure-devices.net
@@ -291,7 +291,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     Hello world!
 
     Disconnected.
-    /azure-sdk-for-c/cmake/sdk/samples/iot/hub/$
+    /azure-sdk-for-c/cmake/sdk/samples/iot/$
     ```
 
     Note: the sample does not terminate automatically. In the output above Enter has been pressed.
@@ -303,9 +303,9 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     First, run the sample:
 
     ```shell
-    /azure-sdk-for-c/cmake/sdk/samples/iot/hub/$ ./paho_iot_hub_methods_example
-    X509 Certificate PEM Store File = /azure-sdk-for-c/sdk/samples/iot/hub/src/device_cert_store.pem
-    X509 Trusted PEM Store File = 
+    /azure-sdk-for-c/cmake/sdk/samples/iot/$ ./paho_iot_hub_methods_example
+    X509 Certificate PEM Store File = /azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem
+    X509 Trusted PEM Store File =
     Device ID = testdevice-x509
     IoT Hub Hostname = myiothub.azure-devices.net
     Posting connect semaphore for client testdevice-x509 rc 0Subscribed to topics.
@@ -328,9 +328,9 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     Back to the shell, verify that the message has been received by the sample:
 
     ```shell
-    /azure-sdk-for-c/cmake/sdk/samples/iot/hub/$ ./paho_iot_hub_methods_example
-    X509 Certificate PEM Store File = /azure-sdk-for-c/sdk/samples/iot/hub/src/device_cert_store.pem
-    X509 Trusted PEM Store File = 
+    /azure-sdk-for-c/cmake/sdk/samples/iot/$ ./paho_iot_hub_methods_example
+    X509 Certificate PEM Store File = /azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem
+    X509 Trusted PEM Store File =
     Device ID = testdevice-x509
     IoT Hub Hostname = myiothub.azure-devices.net
     Posting connect semaphore for client testdevice-x509 rc 0Subscribed to topics.
@@ -341,7 +341,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     Sent response
 
     Disconnected.
-    /azure-sdk-for-c/cmake/sdk/samples/iot/hub/$
+    /azure-sdk-for-c/cmake/sdk/samples/iot/$
     ```
 
     Note: the sample does not terminate automatically. In the output above Enter has been pressed.
@@ -349,8 +349,8 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     ### Device Twin
 
     ```shell
-    /azure-sdk-for-c/cmake/sdk/samples/iot/hub/$ ./paho_iot_hub_twin_example
-    X509 Certificate PEM Store File = /azure-sdk-for-c/sdk/samples/iot/hub/src/device_cert_store.pem
+    /azure-sdk-for-c/cmake/sdk/samples/iot/$ ./paho_iot_hub_twin_example
+    X509 Certificate PEM Store File = /azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem
     X509 Trusted PEM Store File =
     Device ID = testdevice-x509
     IoT Hub Hostname = myiothub.azure-devices.net
@@ -388,7 +388,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
 
     q
     Disconnected.
-    /azure-sdk-for-c/cmake/sdk/samples/iot/hub/$
+    /azure-sdk-for-c/cmake/sdk/samples/iot/$
     ```
 
 ## Need Help?
@@ -406,10 +406,10 @@ If you'd like to contribute to this library, please read the [contributing guide
 Azure SDK for Embedded C is licensed under the [MIT][azure_sdk_for_c_license] license.
 
 <!-- LINKS -->
-[azure_sdk_for_c_contributing]: ../../../../../CONTRIBUTING.md
+[azure_sdk_for_c_contributing]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md
 [azure_sdk_for_c_license]: https://github.com/Azure/azure-sdk-for-c/blob/master/LICENSE
-[azure_sdk_for_c_contributing_developer_guide]: ../../../../../CONTRIBUTING.md#developer-guide
-[azure_sdk_for_c_contributing_pull_requests]: ../../../../../CONTRIBUTING.md#pull-requests
+[azure_sdk_for_c_contributing_developer_guide]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md#developer-guide
+[azure_sdk_for_c_contributing_pull_requests]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md#pull-requests
 [azure_cli]: https://docs.microsoft.com/cli/azure
 [azure_pattern_circuit_breaker]: https://docs.microsoft.com/azure/architecture/patterns/circuit-breaker
 [azure_pattern_retry]: https://docs.microsoft.com/azure/architecture/patterns/retry

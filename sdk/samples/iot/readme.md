@@ -227,7 +227,7 @@ Start using the IoT Provisioning Client in your solutions!
 
 ## Contributing
 
-This project welcomes contributions and suggestions. Find more contributing details [here](https://github.com/Azure/azure-sdk-for-c/tree/master#contributing).
+This project welcomes contributions and suggestions. Find more contributing details [here](https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md).
 
 ### License
 
