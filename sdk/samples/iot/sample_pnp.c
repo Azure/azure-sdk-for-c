@@ -224,6 +224,7 @@ az_result pnp_parse_command_name(
     *component_name = AZ_SPAN_NULL;
     *pnp_command_name = component_command;
   }
+
   return AZ_OK;
 }
 
@@ -236,16 +237,12 @@ az_result pnp_create_reported_property(
     void* context,
     az_span* out_span)
 {
-  az_result result;
-
   az_json_writer json_writer;
-  result = az_json_writer_init(&json_writer, json_buffer, NULL);
-
-  bool has_component = az_span_ptr(component_name) != NULL;
+  AZ_RETURN_IF_FAILED(az_json_writer_init(&json_writer, json_buffer, NULL));
 
   AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&json_writer));
 
-  if (has_component)
+  if (az_span_ptr(component_name) != NULL)
   {
     AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&json_writer, component_name));
     AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&json_writer));
@@ -257,7 +254,7 @@ az_result pnp_create_reported_property(
   AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&json_writer, property_name));
   AZ_RETURN_IF_FAILED(append_callback(&json_writer, context));
 
-  if (has_component)
+  if (az_span_ptr(component_name) != NULL)
   {
     AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&json_writer));
   }
@@ -266,7 +263,7 @@ az_result pnp_create_reported_property(
 
   *out_span = az_json_writer_get_bytes_used_in_destination(&json_writer);
 
-  return result;
+  return AZ_OK;
 }
 
 // Create a reported property payload with status
@@ -281,10 +278,9 @@ az_result pnp_create_reported_property_with_status(
     az_span ack_description,
     az_span* out_span)
 {
-  az_result result;
-
   az_json_writer json_writer;
-  result = az_json_writer_init(&json_writer, json_buffer, NULL);
+
+  AZ_RETURN_IF_FAILED(az_json_writer_init(&json_writer, json_buffer, NULL));
   AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&json_writer));
   if (az_span_ptr(component_name) != NULL)
   {
@@ -324,7 +320,7 @@ az_result pnp_create_reported_property_with_status(
 
   *out_span = az_json_writer_get_bytes_used_in_destination(&json_writer);
 
-  return result;
+  return AZ_OK;
 }
 
 // Process the twin properties and invoke user callback for each property

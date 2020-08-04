@@ -51,6 +51,7 @@ static az_result build_command_response_payload(
     az_span* response_payload)
 {
   double avg_temp = thermostat_component->device_temperature_avg_total / thermostat_component->device_temperature_avg_count;
+
   // Build the command response payload
   AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(json_builder));
   AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(json_builder, report_max_temp_name_span));
@@ -172,37 +173,36 @@ bool sample_pnp_thermostat_get_max_temp_report(
     sample_pnp_mqtt_message* mqtt_message)
 {
   az_result result;
-  if (thermostat_component->send_max_temp_property)
-  {
-    if ((result = pnp_create_reported_property(
-             mqtt_message->payload_span,
-             thermostat_component->component_name,
-             max_temp_reported_property_name,
-             append_double,
-             &thermostat_component->max_temperature,
-             &mqtt_message->out_payload_span))
-        != AZ_OK)
-    {
-      printf("Could not get reported property: error code = 0x%08x\n", result);
-      return false;
-    }
-    else if (
-        (result = az_iot_hub_client_twin_patch_get_publish_topic(
-             client, get_request_id(), mqtt_message->topic, mqtt_message->topic_length, NULL))
-        != AZ_OK)
-    {
-      printf("Error to get reported property topic with status: error code = 0x%08x\n", result);
-      return false;
-    }
 
-    thermostat_component->send_max_temp_property = false;
-
-    return true;
-  }
-  else
+  if (!thermostat_component->send_max_temp_property)
   {
     return false;
   }
+
+  if ((result = pnp_create_reported_property(
+           mqtt_message->payload_span,
+           thermostat_component->component_name,
+           max_temp_reported_property_name,
+           append_double,
+           &thermostat_component->max_temperature,
+           &mqtt_message->out_payload_span))
+      != AZ_OK)
+  {
+    printf("Could not get reported property: error code = 0x%08x\n", result);
+    return false;
+  }
+  else if (
+      (result = az_iot_hub_client_twin_patch_get_publish_topic(
+           client, get_request_id(), mqtt_message->topic, mqtt_message->topic_length, NULL))
+      != AZ_OK)
+  {
+    printf("Error to get reported property topic with status: error code = 0x%08x\n", result);
+    return false;
+  }
+
+  thermostat_component->send_max_temp_property = false;
+
+  return true;
 }
 
 az_result sample_pnp_thermostat_get_telemetry_message(
@@ -220,6 +220,7 @@ az_result sample_pnp_thermostat_get_telemetry_message(
               mqtt_message->topic_length,
               NULL)))
   {
+    printf("Could not get pnp telemetry topic: error code = 0x%08x\n", result);
     return result;
   }
 
@@ -253,7 +254,7 @@ az_result sample_pnp_thermostat_process_property_update(
   if (!az_span_is_content_equal(desired_temp_property_name, property_name))
   {
     printf(
-        "PnP property=%.*s is not supported on thermostat component\r\n",
+        "PnP property=%.*s is not supported on thermostat component\n",
         az_span_size(property_name),
         az_span_ptr(property_name));
   }
@@ -304,7 +305,7 @@ az_result sample_pnp_thermostat_process_property_update(
              &mqtt_message->out_payload_span))
         != AZ_OK)
     {
-      printf("Error to get reported property payload with status: error code = 0x%08x", result);
+      printf("Error to get reported property payload with status: error code = 0x%08x\n", result);
     }
   }
 
@@ -312,7 +313,7 @@ az_result sample_pnp_thermostat_process_property_update(
            client, get_request_id(), mqtt_message->topic, mqtt_message->topic_length, NULL))
       != AZ_OK)
   {
-    printf("Error to get reported property topic with status: error code = 0x%08x", result);
+    printf("Error to get reported property topic with status: error code = 0x%08x\n", result);
   }
 
   return result;
@@ -354,7 +355,7 @@ az_result sample_pnp_thermostat_process_command(
                 mqtt_message->topic_length,
                 mqtt_message->out_topic_length)))
     {
-      printf("Unable to get twin document publish topic\n");
+      printf("Unable to get methods response publish topic: error code = 0x%08x\n", result);
       return result;
     }
   }

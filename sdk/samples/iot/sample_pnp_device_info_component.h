@@ -13,6 +13,8 @@
  *
  * @param client The `az_iot_hub_client` pointer to the hub client.
  * @param mqtt_message The `sample_pnp_mqtt_message` pointer to the struct to be populated.
+ * 
+ * @return An #az_result with the result of the operation.
  */
 az_result sample_pnp_device_info_get_report_data(
     az_iot_hub_client* client,
