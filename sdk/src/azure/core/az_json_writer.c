@@ -806,7 +806,7 @@ az_json_writer_append_double(az_json_writer* json_writer, double value, int32_t 
   _az_PRECONDITION(_az_is_appending_value_valid(json_writer));
   // Non-finite numbers are not supported because they lead to invalid JSON.
   // Unquoted strings such as nan and -inf are invalid as JSON numbers.
-  _az_PRECONDITION(isfinite(value));
+  _az_PRECONDITION(_az_is_finite(value));
   _az_PRECONDITION_RANGE(0, fractional_digits, _az_MAX_SUPPORTED_FRACTIONAL_DIGITS);
 
   int32_t required_size = _az_MAX_SIZE_FOR_DOUBLE; // Need enough space to write any double number.
