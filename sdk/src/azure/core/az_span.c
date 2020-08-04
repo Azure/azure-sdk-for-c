@@ -389,8 +389,9 @@ AZ_NODISCARD az_result az_span_atod(az_span source, double* out_number)
   int32_t n = sscanf((char*)source_ptr, format, out_number, &chars_consumed);
 
   // Success if the entire source was consumed by sscanf and it set the out_number argument.
-  return (size == chars_consumed && n == 1 && isfinite(*out_number)) ? AZ_OK
-                                                                     : AZ_ERROR_UNEXPECTED_CHAR;
+  return (size == chars_consumed && n == 1 && _az_is_finite(*out_number))
+      ? AZ_OK
+      : AZ_ERROR_UNEXPECTED_CHAR;
 }
 
 #ifdef _MSC_VER
@@ -550,6 +551,22 @@ void az_span_to_str(char* destination, int32_t destination_max_size, az_span sou
 
   memmove((void*)destination, (void const*)az_span_ptr(source), (size_t)size_to_write);
   destination[size_to_write] = 0;
+}
+
+AZ_NODISCARD bool _az_is_finite(double value)
+{
+  uint64_t binary_value = *(uint64_t*)&value;
+
+  // These are the binary representations of the various non-finite value ranges,
+  // according to the IEEE 754 standard:
+  // +inf - 0x7FF0000000000000
+  // -inf - 0xFFF0000000000000 Anything in the following
+  // nan - 0x7FF0000000000001 to 0x7FFFFFFFFFFFFFFF and 0xFFF0000000000001 to 0xFFFFFFFFFFFFFFFF
+
+  // This is equivalent to checking the following ranges, condensed into a single check:
+  // (binary_value < 0x7FF0000000000000 ||
+  //   (binary_value > 0x7FFFFFFFFFFFFFFF && binary_value < 0xFFF0000000000000))
+  return ((binary_value & 0x7FF0000000000000) != 0x7FF0000000000000);
 }
 
 /**
@@ -746,14 +763,14 @@ az_span_dtoa(az_span destination, double source, int32_t fractional_digits, az_s
 {
   _az_PRECONDITION_VALID_SPAN(destination, 0, false);
   // Inputs that are either positive or negative infinity, or not a number, are not supported.
-  _az_PRECONDITION(isfinite(source));
+  _az_PRECONDITION(_az_is_finite(source));
   _az_PRECONDITION_RANGE(0, fractional_digits, _az_MAX_SUPPORTED_FRACTIONAL_DIGITS);
   _az_PRECONDITION_NOT_NULL(out_span);
 
   *out_span = destination;
 
   // The input is either positive or negative infinity, or not a number.
-  if (!isfinite(source))
+  if (!_az_is_finite(source))
   {
     return AZ_ERROR_NOT_SUPPORTED;
   }

@@ -25,6 +25,16 @@ enum
 };
 
 /**
+ * @brief A portable implementation of the standard isfinite implementation, which may not be
+ * available on certain embedded systems that use older compilers.
+ *
+ * @param value The floating point value to test.
+ * @return `true` if the \p value is finite (that is, it is not infinite or not a number), otherwise
+ * return `false`.
+ */
+AZ_NODISCARD bool _az_is_finite(double value);
+
+/**
  * @brief Replace all contents from a starting position to an end position with the content of a
  * provided span
  *
