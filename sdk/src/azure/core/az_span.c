@@ -553,22 +553,6 @@ void az_span_to_str(char* destination, int32_t destination_max_size, az_span sou
   destination[size_to_write] = 0;
 }
 
-AZ_NODISCARD bool _az_is_finite(double value)
-{
-  uint64_t binary_value = *(uint64_t*)&value;
-
-  // These are the binary representations of the various non-finite value ranges,
-  // according to the IEEE 754 standard:
-  // +inf - 0x7FF0000000000000
-  // -inf - 0xFFF0000000000000 Anything in the following
-  // nan - 0x7FF0000000000001 to 0x7FFFFFFFFFFFFFFF and 0xFFF0000000000001 to 0xFFFFFFFFFFFFFFFF
-
-  // This is equivalent to checking the following ranges, condensed into a single check:
-  // (binary_value < 0x7FF0000000000000 ||
-  //   (binary_value > 0x7FFFFFFFFFFFFFFF && binary_value < 0xFFF0000000000000))
-  return ((binary_value & 0x7FF0000000000000) != 0x7FF0000000000000);
-}
-
 /**
  * @brief Replace all contents from a starting position to an end position with the content of a
  * provided span
