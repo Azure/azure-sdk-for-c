@@ -39,6 +39,13 @@ jobs:
        vcpkg.deps: ''
        VCPKG_DEFAULT_TRIPLET: 'x64-osx'
        AZ_SDK_C_NO_SAMPLES: 'true'
+      Debian_Stretch:
+        OSVmImage: 'ubuntu-18.04'
+        vcpkg.deps: ''
+        ContainerImage: 'debian:stretch'
+        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
+        AZ_SDK_C_NO_SAMPLES: 'true'
+
 
       # # Build with sample dependencies [curl for transport] - PRECONDITIONS ON
       # # WARNINGS_AS_ERRORS          ON
@@ -202,6 +209,8 @@ jobs:
       #  build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX -DUNIT_TESTING=ON -DPRECONDITIONS=OFF -DLOGGING=OFF'
   pool:
     vmImage: $(OSVmImage)
+  container:
+    image: $(ContainerImage)
   variables:
     CMOCKA_XML_FILE: "%g-test-results.xml"
     CMOCKA_MESSAGE_OUTPUT: "xml"
