@@ -21,7 +21,7 @@
 #include <azure/core/az_span.h>
 #include <azure/iot/az_iot_hub_client.h>
 
-#include "pnp_helper.h"
+#include "sample_pnp.h"
 #include "sample_pnp_component_mqtt.h"
 #include "sample_pnp_device_info_component.h"
 #include "sample_pnp_thermostat_component.h"
@@ -84,6 +84,7 @@
 #define TELEMETRY_SEND_INTERVAL 1
 #define DEFAULT_START_TEMP_CELSIUS 22.0
 #define DOUBLE_DECIMAL_PLACE_DIGITS 2
+#define SAMPLE_PUBLISH_QOS 0
 
 bool is_device_operational = true;
 static const uint8_t null_terminator = '\0';
@@ -104,8 +105,8 @@ static sample_pnp_thermostat_component sample_thermostat_2;
 static const az_span sample_thermostat_2_component_name = AZ_SPAN_LITERAL_FROM_STR("thermostat2");
 static const az_span sample_device_info_component = AZ_SPAN_LITERAL_FROM_STR("deviceInformation");
 static const az_span* sample_pnp_components[] = { &sample_thermostat_1_component_name,
-                                              &sample_thermostat_2_component_name,
-                                              &sample_device_info_component };
+                                                  &sample_thermostat_2_component_name,
+                                                  &sample_device_info_component };
 static const int32_t sample_pnp_components_num
     = sizeof(sample_pnp_components) / sizeof(sample_pnp_components[0]);
 static char scratch_buf[32];
@@ -230,7 +231,6 @@ int main(void)
   // On device start up, send device info
   send_device_info();
 
-
   // Get the twin document to check for updated desired properties. Will then parse desired
   // property and update accordingly.
   send_twin_get_message();
@@ -243,11 +243,13 @@ int main(void)
     // Send max temp for each component since boot if needed
     if (sample_pnp_thermostat_get_max_temp_report(&client, &sample_thermostat_1, &publish_message))
     {
-      mqtt_publish_message(publish_message.topic, publish_message.out_payload_span, 0);
+      mqtt_publish_message(
+          publish_message.topic, publish_message.out_payload_span, SAMPLE_PUBLISH_QOS);
     }
     if (sample_pnp_thermostat_get_max_temp_report(&client, &sample_thermostat_2, &publish_message))
     {
-      mqtt_publish_message(publish_message.topic, publish_message.out_payload_span, 0);
+      mqtt_publish_message(
+          publish_message.topic, publish_message.out_payload_span, SAMPLE_PUBLISH_QOS);
     }
 
     // Send a telemetry message
@@ -438,7 +440,7 @@ static void send_device_info(void)
   }
 
   // Send the MQTT message to the endpoint
-  mqtt_publish_message(publish_message.topic, publish_message.out_payload_span, 0);
+  mqtt_publish_message(publish_message.topic, publish_message.out_payload_span, SAMPLE_PUBLISH_QOS);
 
   // Receive response for device info publish
   mqtt_receive_message();
@@ -475,7 +477,8 @@ static void sample_property_callback(
     LOG_SUCCESS("Updated property on thermostat 1");
 
     // Send response to the updated property
-    mqtt_publish_message(publish_message.topic, publish_message.out_payload_span, 0);
+    mqtt_publish_message(
+        publish_message.topic, publish_message.out_payload_span, SAMPLE_PUBLISH_QOS);
   }
   else if (
       sample_pnp_thermostat_process_property_update(
@@ -491,7 +494,8 @@ static void sample_property_callback(
     LOG_SUCCESS("Updated property on thermostat 2");
 
     // Send response to the updated property
-    mqtt_publish_message(publish_message.topic, publish_message.out_payload_span, 0);
+    mqtt_publish_message(
+        publish_message.topic, publish_message.out_payload_span, SAMPLE_PUBLISH_QOS);
   }
   else
   {
@@ -525,7 +529,7 @@ static void handle_twin_message(
     // A response from a twin GET publish message with the twin document as a payload.
     case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_GET:
       LOG_SUCCESS("A twin GET response was received");
-      pnp_helper_process_twin_data(
+      pnp_process_twin_data(
           &json_reader,
           false,
           sample_pnp_components,
@@ -538,7 +542,7 @@ static void handle_twin_message(
     // An update to the desired properties with the properties as a JSON payload.
     case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES:
       LOG_SUCCESS("A twin desired properties message was received");
-      pnp_helper_process_twin_data(
+      pnp_process_twin_data(
           &json_reader,
           true,
           sample_pnp_components,
@@ -607,8 +611,7 @@ static void handle_command_message(
   az_span command_payload = az_span_init(message->payload, message->payloadlen);
   az_span component_name;
   az_span command_name;
-  if ((result
-       = pnp_helper_parse_command_name(command_request->name, &component_name, &command_name))
+  if ((result = pnp_parse_command_name(command_request->name, &component_name, &command_name))
       != AZ_OK)
   {
     LOG_ERROR("Failed to parse command name: error code = 0x%08x", result);
@@ -629,7 +632,8 @@ static void handle_command_message(
         az_span_size(command_name),
         az_span_ptr(command_name));
 
-    mqtt_publish_message(publish_message.topic, publish_message.out_payload_span, 0);
+    mqtt_publish_message(
+        publish_message.topic, publish_message.out_payload_span, SAMPLE_PUBLISH_QOS);
 
     LOG_SUCCESS("Sent response");
   }
@@ -649,7 +653,8 @@ static void handle_command_message(
         az_span_size(command_name),
         az_span_ptr(command_name));
 
-    mqtt_publish_message(publish_message.topic, publish_message.out_payload_span, 0);
+    mqtt_publish_message(
+        publish_message.topic, publish_message.out_payload_span, SAMPLE_PUBLISH_QOS);
 
     LOG_SUCCESS("Sent command response");
   }
@@ -662,7 +667,8 @@ static void handle_command_message(
         "Successfully executed command %.*s on controller",
         az_span_size(command_name),
         az_span_ptr(command_name));
-    mqtt_publish_message(publish_message.topic, publish_message.out_payload_span, 0);
+    mqtt_publish_message(
+        publish_message.topic, publish_message.out_payload_span, SAMPLE_PUBLISH_QOS);
 
     LOG_SUCCESS("Sent command response");
   }
@@ -685,7 +691,8 @@ static void handle_command_message(
     {
       publish_message.out_payload_span = empty_json_object;
 
-      mqtt_publish_message(publish_message.topic, publish_message.out_payload_span, 0);
+      mqtt_publish_message(
+          publish_message.topic, publish_message.out_payload_span, SAMPLE_PUBLISH_QOS);
 
       LOG_SUCCESS("Sent command response");
     }
@@ -827,7 +834,7 @@ static void send_twin_get_message(void)
   }
 
   LOG_SUCCESS("Sending twin get request");
-  mqtt_publish_message(publish_message.topic, AZ_SPAN_NULL, 0);
+  mqtt_publish_message(publish_message.topic, AZ_SPAN_NULL, SAMPLE_PUBLISH_QOS);
 }
 
 // Send JSON formatted telemetry messages
@@ -835,7 +842,8 @@ static void send_telemetry_message(void)
 {
   az_result result;
 
-  if ((result = sample_pnp_thermostat_get_telemetry_message(&client, &sample_thermostat_1, &publish_message))
+  if ((result = sample_pnp_thermostat_get_telemetry_message(
+           &client, &sample_thermostat_1, &publish_message))
       != AZ_OK)
   {
     LOG_ERROR("Error getting message and topic for thermostat 1");
@@ -844,9 +852,10 @@ static void send_telemetry_message(void)
 
   LOG_SUCCESS("Sending Telemetry Message for thermostat 1");
 
-  mqtt_publish_message(publish_message.topic, publish_message.out_payload_span, 0);
+  mqtt_publish_message(publish_message.topic, publish_message.out_payload_span, SAMPLE_PUBLISH_QOS);
 
-  if ((result = sample_pnp_thermostat_get_telemetry_message(&client, &sample_thermostat_2, &publish_message))
+  if ((result = sample_pnp_thermostat_get_telemetry_message(
+           &client, &sample_thermostat_2, &publish_message))
       != AZ_OK)
   {
     LOG_ERROR("Error getting message and topic for thermostat 2");
@@ -855,7 +864,7 @@ static void send_telemetry_message(void)
 
   LOG_SUCCESS("Sending Telemetry Message for thermostat 2");
 
-  mqtt_publish_message(publish_message.topic, publish_message.out_payload_span, 0);
+  mqtt_publish_message(publish_message.topic, publish_message.out_payload_span, SAMPLE_PUBLISH_QOS);
 
   // New line to separate messages on the console
   putchar('\n');

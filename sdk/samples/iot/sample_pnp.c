@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "pnp_helper.h"
+#include "sample_pnp.h"
 
 #include <stdint.h>
 #include <stdio.h>
@@ -35,7 +35,7 @@ static az_result visit_component_properties(
     int32_t version,
     char* scratch_buf,
     int32_t scratch_buf_len,
-    pnp_helper_property_callback property_callback,
+    pnp_property_callback property_callback,
     void* context_ptr)
 {
   int32_t len;
@@ -167,7 +167,7 @@ static az_result is_component_in_model(
 }
 
 // Get the telemetry topic for PnP
-az_result pnp_helper_get_telemetry_topic(
+az_result pnp_get_telemetry_topic(
     az_iot_hub_client const* client,
     az_iot_hub_client_properties* properties,
     az_span component_name,
@@ -207,7 +207,7 @@ az_result pnp_helper_get_telemetry_topic(
 }
 
 // Parse the component name and command name from a span
-az_result pnp_helper_parse_command_name(
+az_result pnp_parse_command_name(
     az_span component_command,
     az_span* component_name,
     az_span* pnp_command_name)
@@ -228,7 +228,7 @@ az_result pnp_helper_parse_command_name(
 }
 
 // Create a reported property payload
-az_result pnp_helper_create_reported_property(
+az_result pnp_create_reported_property(
     az_span json_buffer,
     az_span component_name,
     az_span property_name,
@@ -270,7 +270,7 @@ az_result pnp_helper_create_reported_property(
 }
 
 // Create a reported property payload with status
-az_result pnp_helper_create_reported_property_with_status(
+az_result pnp_create_reported_property_with_status(
     az_span json_buffer,
     az_span component_name,
     az_span property_name,
@@ -328,14 +328,14 @@ az_result pnp_helper_create_reported_property_with_status(
 }
 
 // Process the twin properties and invoke user callback for each property
-az_result pnp_helper_process_twin_data(
+az_result pnp_process_twin_data(
     az_json_reader* json_reader,
     bool is_partial,
     const az_span** sample_components_ptr,
     int32_t sample_components_num,
     char* scratch_buf,
     int32_t scratch_buf_len,
-    pnp_helper_property_callback property_callback,
+    pnp_property_callback property_callback,
     void* context_ptr)
 {
   az_json_reader copy_json_reader;

@@ -9,7 +9,7 @@
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
 
-#include "pnp_helper.h"
+#include "sample_pnp.h"
 #include "sample_pnp_thermostat_component.h"
 
 #ifdef _MSC_VER
@@ -174,7 +174,7 @@ bool sample_pnp_thermostat_get_max_temp_report(
   az_result result;
   if (handle->send_max_temp_property)
   {
-    if ((result = pnp_helper_create_reported_property(
+    if ((result = pnp_create_reported_property(
              mqtt_message->payload_span,
              handle->component_name,
              max_temp_reported_property_name,
@@ -212,7 +212,7 @@ az_result sample_pnp_thermostat_get_telemetry_message(
 {
   az_result result;
   if (az_failed(
-          result = pnp_helper_get_telemetry_topic(
+          result = pnp_get_telemetry_topic(
               client,
               NULL,
               handle->component_name,
@@ -261,7 +261,7 @@ az_result sample_pnp_thermostat_process_property_update(
   double parsed_value = 0;
   if (az_failed(az_json_token_get_double(property_value, &parsed_value)))
   {
-    result = pnp_helper_create_reported_property_with_status(
+    result = pnp_create_reported_property_with_status(
         mqtt_message->payload_span,
         component_name,
         property_name,
@@ -292,7 +292,7 @@ az_result sample_pnp_thermostat_process_property_update(
     handle->avg_temperature
         = handle->device_temperature_avg_total / handle->device_temperature_avg_count;
 
-    if ((result = pnp_helper_create_reported_property_with_status(
+    if ((result = pnp_create_reported_property_with_status(
              mqtt_message->payload_span,
              component_name,
              property_name,
