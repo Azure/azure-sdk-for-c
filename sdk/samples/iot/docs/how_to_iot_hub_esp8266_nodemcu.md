@@ -28,7 +28,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, with Arduino IDE 
 1. Create an Arduino library for Azure Embedded SDK for C
 
     ```shell
-    $ wget https://raw.githubusercontent.com/Azure/azure-sdk-for-c/master/sdk/samples/iot/hub/aziot_esp8266/generate_arduino_zip_library.sh
+    $ wget https://raw.githubusercontent.com/Azure/azure-sdk-for-c/master/sdk/samples/iot/aziot_esp8266/generate_arduino_zip_library.sh
     $ chmod 777 generate_arduino_zip_library.sh
     $ ./generate_arduino_zip_library.sh
     ```
@@ -57,7 +57,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, with Arduino IDE 
 
 6. Create a sketch on Arduino IDE for the IoT Hub client telemetry sample
 
-    Clone the [azure-sdk-for-c](https://github.com/Azure/azure-sdk-for-c) repo locally then open the [ESP8266 sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/hub/aziot_esp8266) (from local clone) on Arduino IDE.
+    Clone the [azure-sdk-for-c](https://github.com/Azure/azure-sdk-for-c) repo locally then open the [ESP8266 sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/aziot_esp8266) (from local clone) on Arduino IDE.
 
     Edit the following parameters in `iot_configs.h`, filling in your own information:
 
@@ -221,5 +221,5 @@ If you'd like to contribute to this library, please read the [contributing guide
 Azure SDK for Embedded C is licensed under the [MIT][azure_sdk_for_c_license] license.
 
 <!-- LINKS -->
-[azure_sdk_for_c_contributing]: ../../../../../CONTRIBUTING.md
+[azure_sdk_for_c_contributing]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md
 [azure_sdk_for_c_license]: https://github.com/Azure/azure-sdk-for-c/blob/master/LICENSE

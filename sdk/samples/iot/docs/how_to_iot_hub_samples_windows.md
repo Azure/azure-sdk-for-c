@@ -80,7 +80,7 @@ _The following was run on Microsoft Windows 10.0.18363.836._
     The Azure Embedded SDK for C IoT Client samples use a self-signed certificate.
 
     ```shell
-    C:\azure-sdk-for-c\sdk\samples\iot\hub\src>generate_certificate.cmd
+    C:\azure-sdk-for-c\sdk\samples\iot>generate_certificate.cmd
     ```
 
     <details>
@@ -126,12 +126,12 @@ _The following was run on Microsoft Windows 10.0.18363.836._
     If required (for example on Windows), download the Baltimore PEM CA from https://www.digicert.com/digicert-root-certificates.htm to the current folder.
     Once it is downloaded, run the following command to set the environment variable for the samples:
 
-    set "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE=C:\azure-sdk-for-c\sdk\samples\iot\hub\src\BaltimoreCyberTrustRoot.crt.pem"
+    set "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE=C:\azure-sdk-for-c\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem"
 
     Sample certificate generated
     Use the following command to set the environment variable for the samples:
 
-    set "AZ_IOT_DEVICE_X509_CERT_PEM_FILE=C:\azure-sdk-for-c\sdk\samples\iot\hub\src\device_cert_store.pem"
+    set "AZ_IOT_DEVICE_X509_CERT_PEM_FILE=C:\azure-sdk-for-c\sdk\samples\iot\device_cert_store.pem"
 
     Use the following fingerprint when creating your device in IoT Hub:
     SHA1 Fingerprint=53748606517027078B5FE00E7A0D2A31F9AF4C31
@@ -146,8 +146,8 @@ _The following was run on Microsoft Windows 10.0.18363.836._
     The example below shows what you should execute (but don't use these examples, use the ones you got on your output)
 
     ```shell
-    C:\azure-sdk-for-c\sdk\samples\iot\hub\src>set "AZ_IOT_DEVICE_X509_CERT_PEM_FILE=C:\azure-sdk-for-c\sdk\samples\iot\hub\src\device_cert_store.pem"
-    C:\azure-sdk-for-c\sdk\samples\iot\hub\src>set "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE=C:\azure-sdk-for-c\sdk\samples\iot\hub\src\BaltimoreCyberTrustRoot.crt.pem"
+    C:\azure-sdk-for-c\sdk\samples\iot>set "AZ_IOT_DEVICE_X509_CERT_PEM_FILE=C:\azure-sdk-for-c\sdk\samples\iot\device_cert_store.pem"
+    C:\azure-sdk-for-c\sdk\samples\iot>set "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE=C:\azure-sdk-for-c\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem"
     ```
 
     Save the certificate Fingerprint above (in this example, "53748606517027078B5FE00E7A0D2A31F9AF4C31").
@@ -158,11 +158,11 @@ _The following was run on Microsoft Windows 10.0.18363.836._
     You should have it saved as shown bellow:
 
     ```shell
-    C:\azure-sdk-for-c\sdk\samples\iot\hub\src>dir BaltimoreCyberTrustRoot.crt.pem
+    C:\azure-sdk-for-c\sdk\samples\iot>dir BaltimoreCyberTrustRoot.crt.pem
     Volume in drive C is OSDisk
     Volume Serial Number is AAAA-BBBB
 
-    Directory of C:\azure-sdk-for-c\sdk\samples\iot\hub\src
+    Directory of C:\azure-sdk-for-c\sdk\samples\iot
 
     06/03/2020  03:33 PM             1,262 BaltimoreCyberTrustRoot.crt.pem
                 1 File(s)          1,262 bytes
@@ -193,7 +193,7 @@ _The following was run on Microsoft Windows 10.0.18363.836._
 
 9. Set the environment variables needed for the samples
 
-    According the the [readme documentation](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/samples/iot/hub) for the Azure Embedded SDK for C IoT client samples require the following environment variables.
+    According the the [readme documentation](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/samples/iot) for the Azure Embedded SDK for C IoT Hub client certificate samples require the following environment variables.
 
     ```shell
     set AZ_IOT_DEVICE_ID=<device ID obtained on step 8>
@@ -225,7 +225,7 @@ _The following was run on Microsoft Windows 10.0.18363.836._
 
     ### Telemetry (device-to-cloud messages)
 
-    On the `az.sln` solution open on Visual Studio, 
+    On the `az.sln` solution open on Visual Studio,
     - Navigate on the Solution Explorer panel to `paho_iot_hub_telemetry_example` solution;
     - Make it the default startup project (right-click on `paho_iot_hub_telemetry_example` project, then click on `Set as StartUp Project`);
     - Build and run the project (`F5` on most installations).
@@ -233,8 +233,8 @@ _The following was run on Microsoft Windows 10.0.18363.836._
     The following traces shall be seen on the Visual Studio Command prompt:
 
     ```shell
-    X509 Certificate PEM Store File = C:\azure-sdk-for-c\sdk\samples\iot\hub\src\device_cert_store.pem
-    X509 Trusted PEM Store File = C:\azure-sdk-for-c\sdk\samples\iot\hub\src\BaltimoreCyberTrustRoot.crt.pem
+    X509 Certificate PEM Store File = C:\azure-sdk-for-c\sdk\samples\iot\device_cert_store.pem
+    X509 Trusted PEM Store File = C:\azure-sdk-for-c\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem
     Device ID = paho-sample-device1
     IoT Hub Hostname = myiothub.azure-devices.net
     Sending Message 1
@@ -253,7 +253,7 @@ _The following was run on Microsoft Windows 10.0.18363.836._
 
     First, run the sample:
 
-    On the `az.sln` solution open on Visual Studio, 
+    On the `az.sln` solution open on Visual Studio,
     - Navigate on the Solution Explorer panel to `paho_iot_hub_c2d_example` solution;
     - Make it the default startup project (right-click on `paho_iot_hub_c2d_example` project, then click on `Set as StartUp Project`);
     - Build and run the project (`F5` on most installations).
@@ -269,15 +269,15 @@ _The following was run on Microsoft Windows 10.0.18363.836._
     Back to the Visual Studio Command prompt, verify that the message has been received by the sample:
 
     ```shell
-    X509 Certificate PEM Store File = C:\azure-sdk-for-c\sdk\samples\iot\hub\src\device_cert_store.pem
-    X509 Trusted PEM Store File = C:\azure-sdk-for-c\sdk\samples\iot\hub\src\BaltimoreCyberTrustRoot.crt.pem
+    X509 Certificate PEM Store File = C:\azure-sdk-for-c\sdk\samples\iot\device_cert_store.pem
+    X509 Trusted PEM Store File = C:\azure-sdk-for-c\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem
     Device ID = paho-sample-device1
     IoT Hub Hostname = myiothub.azure-devices.net
     Posting connect semaphore for client paho-sample-device1 rc 0Subscribed to topics.
     Waiting for activity. [Press ENTER to abort]
     C2D Message arrived
     Hello world!
-    ``` 
+    ```
 
     Note: the sample does not terminate automatically. In the output above Enter has been pressed.
 
@@ -307,8 +307,8 @@ _The following was run on Microsoft Windows 10.0.18363.836._
     Back to the Visual Studio Command prompt, verify that the direct method has been received by the sample:
 
     ```shell
-    X509 Certificate PEM Store File = C:\azure-sdk-for-c\sdk\samples\iot\hub\src\device_cert_store.pem
-    X509 Trusted PEM Store File = C:\azure-sdk-for-c\sdk\samples\iot\hub\src\BaltimoreCyberTrustRoot.crt.pem
+    X509 Certificate PEM Store File = C:\azure-sdk-for-c\sdk\samples\iot\device_cert_store.pem
+    X509 Trusted PEM Store File = C:\azure-sdk-for-c\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem
     Device ID = paho-sample-device1
     IoT Hub Hostname = myiothub.azure-devices.net
     Posting connect semaphore for client paho-sample-device1 rc 0Subscribed to topics.
@@ -323,7 +323,7 @@ _The following was run on Microsoft Windows 10.0.18363.836._
 
     ### Device Twin
 
-    On the `az.sln` solution open on Visual Studio, 
+    On the `az.sln` solution open on Visual Studio,
     - Navigate on the Solution Explorer panel to `paho_iot_hub_twin_example` solution;
     - Make it the default startup project (right-click on `paho_iot_hub_twin_example` project, then click on `Set as StartUp Project`);
     - Build and run the project (`F5` on most installations).
@@ -331,8 +331,8 @@ _The following was run on Microsoft Windows 10.0.18363.836._
     Then interact with the sample as bellow:
 
     ```shell
-    X509 Certificate PEM Store File = C:\azure-sdk-for-c\sdk\samples\iot\hub\src\device_cert_store.pem
-    X509 Trusted PEM Store File = C:\azure-sdk-for-c\sdk\samples\iot\hub\src\BaltimoreCyberTrustRoot.crt.pem
+    X509 Certificate PEM Store File = C:\azure-sdk-for-c\sdk\samples\iot\device_cert_store.pem
+    X509 Trusted PEM Store File = C:\azure-sdk-for-c\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem
     Device ID = paho-sample-device1
     IoT Hub Hostname = myiothub.azure-devices.net
     Posting connect semaphore for client paho-sample-device1 rc 0Subscribed to topics.
@@ -387,10 +387,10 @@ If you'd like to contribute to this library, please read the [contributing guide
 Azure SDK for Embedded C is licensed under the [MIT][azure_sdk_for_c_license] license.
 
 <!-- LINKS -->
-[azure_sdk_for_c_contributing]: ../../../../../CONTRIBUTING.md
+[azure_sdk_for_c_contributing]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md
 [azure_sdk_for_c_license]: https://github.com/Azure/azure-sdk-for-c/blob/master/LICENSE
-[azure_sdk_for_c_contributing_developer_guide]: ../../../../../CONTRIBUTING.md#developer-guide
-[azure_sdk_for_c_contributing_pull_requests]: ../../../../../CONTRIBUTING.md#pull-requests
+[azure_sdk_for_c_contributing_developer_guide]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md#developer-guide
+[azure_sdk_for_c_contributing_pull_requests]: https://github.com/Azure/azure-sdk-for-c/blob/master/CONTRIBUTING.md#pull-requests
 [azure_cli]: https://docs.microsoft.com/cli/azure
 [azure_pattern_circuit_breaker]: https://docs.microsoft.com/azure/architecture/patterns/circuit-breaker
 [azure_pattern_retry]: https://docs.microsoft.com/azure/architecture/patterns/retry
