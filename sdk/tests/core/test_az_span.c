@@ -373,15 +373,15 @@ static void test_az_is_finite(void** state)
   source = 0x7FEFFFFFFFFFFFFF;
   test_az_is_finite_helper(source, true);
 
-  source = 0x7FF0000000000000;
+  source = 0x7FF0000000000000; // +inf
   test_az_is_finite_helper(source, false);
-  source = 0x7FF0000000000001;
+  source = 0x7FF0000000000001; // nan
   test_az_is_finite_helper(source, false);
-  source = 0x7FF7FFFFFFFFFFFF;
+  source = 0x7FF7FFFFFFFFFFFF; // nan
   test_az_is_finite_helper(source, false);
-  source = 0x7FF8000000000000;
+  source = 0x7FF8000000000000; // nan
   test_az_is_finite_helper(source, false);
-  source = 0x7FFFFFFFFFFFFFFF;
+  source = 0x7FFFFFFFFFFFFFFF; // nan
   test_az_is_finite_helper(source, false);
 
   source = 0x8000000000000000;
@@ -389,13 +389,13 @@ static void test_az_is_finite(void** state)
   source = 0xFFEFFFFFFFFFFFFF;
   test_az_is_finite_helper(source, true);
 
-  source = 0xFFF0000000000000;
+  source = 0xFFF0000000000000; // -inf
   test_az_is_finite_helper(source, false);
-  source = 0xFFF7FFFFFFFFFFFF;
+  source = 0xFFF7FFFFFFFFFFFF; // nan
   test_az_is_finite_helper(source, false);
-  source = 0xFFF8000000000000;
+  source = 0xFFF8000000000000; // nan
   test_az_is_finite_helper(source, false);
-  source = 0xFFFFFFFFFFFFFFFF;
+  source = 0xFFFFFFFFFFFFFFFF; // nan
   test_az_is_finite_helper(source, false);
 
   source = 0xFFFFFFFFFFFFFFFF + 1;
