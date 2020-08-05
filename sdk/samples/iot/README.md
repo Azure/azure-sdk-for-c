@@ -94,13 +94,13 @@ This section provides an overview of the different samples available to run and 
 
 - *Executable:* `paho_iot_provisioning_sample`
 
-  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/provisioning/src/paho_iot_provisioning_example.c) uses x509 authentication to connect to Azure IoT Hub DPS.
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_provisioning_sample.c) uses x509 authentication to connect to Azure IoT Hub DPS.
 
 ### IoT Provisioning SAS Sample
 
 - *Executable:* `paho_iot_provisioning_sas_sample`
 
-  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/provisioning/src/paho_iot_provisioning_sas_example.c) uses SAS authentication to connect to Azure IoT Hub DPS.
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_provisioning_sas_sample.c) uses SAS authentication to connect to Azure IoT Hub DPS.
 
 ## Prerequisites
 
