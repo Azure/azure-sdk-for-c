@@ -127,7 +127,7 @@ typedef struct
  * credential with default authority (Azure AD global authority -
  * "https://login.microsoftonline.com/")
  *
- * @note non-NULL #authority example: "https://login.microsoftonline.us/".
+ * @note Example of a non-NULL \p authority string: "https://login.microsoftonline.us/".
  * See national clouds' Azure AD authentication endpoints:
  * https://docs.microsoft.com/en-us/azure/active-directory/develop/authentication-national-cloud.
  *
