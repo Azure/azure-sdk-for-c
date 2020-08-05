@@ -20,7 +20,7 @@ stages:
                 - checkout: self
                 - pwsh: |
                     $pkgInfo = Get-Content $(Pipeline.Workspace)/release-info/package-info.json | ConvertFrom-Json
-                    ./eng/common/scripts/Verify-Changelog.ps1 -ChangeLogLocation $(Pipeline.Workspace)/release-info/CHANGELOG.md -VersionString $pkgInfo.version
+                    ./eng/common/scripts/Verify-Changelog.ps1 -ChangeLogLocation $(Pipeline.Workspace)/release-info/CHANGELOG.md -VersionString $pkgInfo.version -ForRelease $true
                   displayName: Verify CHANGELOG.md contents
                 - template: /eng/common/pipelines/templates/steps/create-tags-and-git-release.yml
                   parameters:
