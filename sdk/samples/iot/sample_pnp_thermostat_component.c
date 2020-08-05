@@ -50,7 +50,8 @@ static az_result build_command_response_payload(
     az_span end_time_span,
     az_span* response_payload)
 {
-  double avg_temp = thermostat_component->device_temperature_avg_total / thermostat_component->device_temperature_avg_count;
+  double avg_temp = thermostat_component->device_temperature_avg_total
+      / thermostat_component->device_temperature_avg_count;
 
   // Build the command response payload
   AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(json_builder));
@@ -179,22 +180,25 @@ bool sample_pnp_thermostat_get_max_temp_report(
     return false;
   }
 
-  if ((result = pnp_create_reported_property(
-           mqtt_message->payload_span,
-           thermostat_component->component_name,
-           max_temp_reported_property_name,
-           append_double,
-           &thermostat_component->max_temperature,
-           &mqtt_message->out_payload_span))
-      != AZ_OK)
+  if (az_failed(
+          result = pnp_create_reported_property(
+              mqtt_message->payload_span,
+              thermostat_component->component_name,
+              max_temp_reported_property_name,
+              append_double,
+              &thermostat_component->max_temperature,
+              &mqtt_message->out_payload_span)))
   {
     printf("Could not get reported property: error code = 0x%08x\n", result);
     return false;
   }
-  else if (
-      (result = az_iot_hub_client_twin_patch_get_publish_topic(
-           client, get_request_id(), mqtt_message->topic, mqtt_message->topic_length, NULL))
-      != AZ_OK)
+  else if (az_failed(
+               result = az_iot_hub_client_twin_patch_get_publish_topic(
+                   client,
+                   get_request_id(),
+                   mqtt_message->topic,
+                   mqtt_message->topic_length,
+                   NULL)))
   {
     printf("Error to get reported property topic with status: error code = 0x%08x\n", result);
     return false;
@@ -290,28 +294,28 @@ az_result sample_pnp_thermostat_process_property_update(
     /* Increment the avg count, add the new temp to the total, and calculate the new avg */
     thermostat_component->device_temperature_avg_count++;
     thermostat_component->device_temperature_avg_total += thermostat_component->current_temperature;
-    thermostat_component->avg_temperature
-        = thermostat_component->device_temperature_avg_total / thermostat_component->device_temperature_avg_count;
+    thermostat_component->avg_temperature = thermostat_component->device_temperature_avg_total
+        / thermostat_component->device_temperature_avg_count;
 
-    if ((result = pnp_create_reported_property_with_status(
-             mqtt_message->payload_span,
-             component_name,
-             property_name,
-             append_double,
-             (void*)&parsed_value,
-             200,
-             version,
-             temp_response_description_success,
-             &mqtt_message->out_payload_span))
-        != AZ_OK)
+    if (az_failed(
+            result = pnp_create_reported_property_with_status(
+                mqtt_message->payload_span,
+                component_name,
+                property_name,
+                append_double,
+                (void*)&parsed_value,
+                200,
+                version,
+                temp_response_description_success,
+                &mqtt_message->out_payload_span)))
     {
       printf("Error to get reported property payload with status: error code = 0x%08x\n", result);
     }
   }
 
-  if ((result = az_iot_hub_client_twin_patch_get_publish_topic(
-           client, get_request_id(), mqtt_message->topic, mqtt_message->topic_length, NULL))
-      != AZ_OK)
+  if (az_failed(
+          result = az_iot_hub_client_twin_patch_get_publish_topic(
+              client, get_request_id(), mqtt_message->topic, mqtt_message->topic_length, NULL)))
   {
     printf("Error to get reported property topic with status: error code = 0x%08x\n", result);
   }
@@ -336,7 +340,10 @@ az_result sample_pnp_thermostat_process_command(
     // Invoke command
     uint16_t return_code;
     az_result response = invoke_getMaxMinReport(
-        thermostat_component, command_payload, mqtt_message->payload_span, &mqtt_message->out_payload_span);
+        thermostat_component,
+        command_payload,
+        mqtt_message->payload_span,
+        &mqtt_message->out_payload_span);
     if (response != AZ_OK)
     {
       return_code = 400;

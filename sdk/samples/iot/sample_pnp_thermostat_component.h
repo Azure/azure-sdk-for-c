@@ -4,10 +4,6 @@
 #ifndef SAMPLE_PNP_THERMOSTAT_COMPONENT_H
 #define SAMPLE_PNP_THERMOSTAT_COMPONENT_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <stdint.h>
 
 #include <azure/core/az_json.h>
@@ -62,9 +58,4 @@ az_result sample_pnp_thermostat_process_command(
     az_span command_payload,
     sample_pnp_mqtt_message* mqtt_message);
 
-#ifdef __cplusplus
-}
-#endif
-
 #endif // SAMPLE_PNP_THERMOSTAT_COMPONENT_H
-

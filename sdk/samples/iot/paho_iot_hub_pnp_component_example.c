@@ -287,18 +287,21 @@ static void components_init()
 {
   az_result result;
 
-  if ((result = sample_pnp_thermostat_init(
-           &sample_thermostat_1, sample_thermostat_1_component_name, DEFAULT_START_TEMP_CELSIUS))
-      != AZ_OK)
+  if (az_failed(
+          result = sample_pnp_thermostat_init(
+              &sample_thermostat_1,
+              sample_thermostat_1_component_name,
+              DEFAULT_START_TEMP_CELSIUS)))
   {
     LOG_ERROR("Could not initialize thermostat 1: error code = 0x%08x", result);
     exit(result);
   }
 
-  else if (
-      (result = sample_pnp_thermostat_init(
-           &sample_thermostat_2, sample_thermostat_2_component_name, DEFAULT_START_TEMP_CELSIUS))
-      != AZ_OK)
+  else if (az_failed(
+               result = sample_pnp_thermostat_init(
+                   &sample_thermostat_2,
+                   sample_thermostat_2_component_name,
+                   DEFAULT_START_TEMP_CELSIUS)))
   {
     LOG_ERROR("Could not initialize thermostat 2: error code = 0x%08x", result);
     exit(result);
@@ -450,22 +453,25 @@ static void send_device_serial_number(void)
 {
   az_result result;
 
-  if ((result = pnp_create_reported_property(
-           publish_message.payload_span,
-           AZ_SPAN_NULL,
-           serial_number_name,
-           append_string,
-           (void*)&serial_number_value,
-           &publish_message.out_payload_span))
-      != AZ_OK)
+  if (az_failed(
+          result = pnp_create_reported_property(
+              publish_message.payload_span,
+              AZ_SPAN_NULL,
+              serial_number_name,
+              append_string,
+              (void*)&serial_number_value,
+              &publish_message.out_payload_span)))
   {
     LOG_ERROR("Could not get serial number property payload");
     exit(result);
   }
-  else if (
-      (result = az_iot_hub_client_twin_patch_get_publish_topic(
-           &client, get_request_id(), publish_message.topic, publish_message.topic_length, NULL))
-      != AZ_OK)
+  else if (az_failed(
+               result = az_iot_hub_client_twin_patch_get_publish_topic(
+                   &client,
+                   get_request_id(),
+                   publish_message.topic,
+                   publish_message.topic_length,
+                   NULL)))
   {
     LOG_ERROR("Error to get reported property topic with status: error code = 0x%08x", result);
     exit(result);
@@ -483,7 +489,7 @@ static void send_device_info(void)
 {
   // Get the device info in a JSON payload and the topic to which to send it
   az_result result;
-  if ((result = sample_pnp_device_info_get_report_data(&client, &publish_message)) != AZ_OK)
+  if (az_failed(result = sample_pnp_device_info_get_report_data(&client, &publish_message)))
   {
     LOG_ERROR("Could not get the device info data: error code = 0x%08x", result);
     exit(result);
@@ -567,7 +573,7 @@ static void handle_twin_message(
   {
     LOG_SUCCESS("Payload: %.*s", message->payloadlen, (char*)message->payload);
     twin_payload_span = az_span_init((uint8_t*)message->payload, (int32_t)message->payloadlen);
-    if ((result = az_json_reader_init(&json_reader, twin_payload_span, NULL)) != AZ_OK)
+    if (az_failed(result = az_json_reader_init(&json_reader, twin_payload_span, NULL)))
     {
       LOG_ERROR("Could not initialize JSON reader");
       return;
@@ -661,8 +667,8 @@ static void handle_command_message(
   az_span command_payload = az_span_init(message->payload, message->payloadlen);
   az_span component_name;
   az_span command_name;
-  if ((result = pnp_parse_command_name(command_request->name, &component_name, &command_name))
-      != AZ_OK)
+  if (az_failed(
+          result = pnp_parse_command_name(command_request->name, &component_name, &command_name)))
   {
     LOG_ERROR("Failed to parse command name: error code = 0x%08x", result);
   }
@@ -895,12 +901,7 @@ static az_result temperature_controller_get_telemetry_message(sample_pnp_mqtt_me
   az_result result;
   if (az_failed(
           result = pnp_get_telemetry_topic(
-              &client,
-              NULL,
-              AZ_SPAN_NULL,
-              message->topic,
-              message->topic_length,
-              NULL)))
+              &client, NULL, AZ_SPAN_NULL, message->topic, message->topic_length, NULL)))
   {
     printf("Could not get pnp telemetry topic: error code = 0x%08x\n", result);
     return result;
@@ -924,9 +925,9 @@ static void send_telemetry_messages(void)
 {
   az_result result;
 
-  if ((result = sample_pnp_thermostat_get_telemetry_message(
-           &client, &sample_thermostat_1, &publish_message))
-      != AZ_OK)
+  if (az_failed(
+          result = sample_pnp_thermostat_get_telemetry_message(
+              &client, &sample_thermostat_1, &publish_message)))
   {
     LOG_ERROR("Error getting message and topic for thermostat 1");
     exit(result);
@@ -936,9 +937,9 @@ static void send_telemetry_messages(void)
 
   mqtt_publish_message(publish_message.topic, publish_message.out_payload_span, SAMPLE_PUBLISH_QOS);
 
-  if ((result = sample_pnp_thermostat_get_telemetry_message(
-           &client, &sample_thermostat_2, &publish_message))
-      != AZ_OK)
+  if (az_failed(
+          result = sample_pnp_thermostat_get_telemetry_message(
+              &client, &sample_thermostat_2, &publish_message)))
   {
     LOG_ERROR("Error getting message and topic for thermostat 2");
     exit(result);
@@ -948,7 +949,7 @@ static void send_telemetry_messages(void)
 
   mqtt_publish_message(publish_message.topic, publish_message.out_payload_span, SAMPLE_PUBLISH_QOS);
 
-  if ((result = temperature_controller_get_telemetry_message(&publish_message)) != AZ_OK)
+  if (az_failed(result = temperature_controller_get_telemetry_message(&publish_message)))
   {
     LOG_ERROR("Error getting message and topic for root component");
     exit(result);

@@ -143,12 +143,7 @@ static az_result is_component_in_model(
 
   while (index < sample_components_num)
   {
-    if ((az_span_size(component_name) == az_span_size(*sample_components_ptr[index]))
-        && (memcmp(
-                (void*)az_span_ptr(component_name),
-                (void*)az_span_ptr(*sample_components_ptr[index]),
-                (size_t)az_span_size(component_name))
-            == 0))
+    if (az_span_is_content_equal(component_name, *sample_components_ptr[index]))
     {
       *out_index = index;
       return AZ_OK;
@@ -333,15 +328,15 @@ az_result pnp_process_twin_data(
   AZ_RETURN_IF_FAILED(az_json_reader_next_token(json_reader));
 
   if (!is_partial
-      && (sample_json_child_token_move(json_reader, sample_iot_hub_twin_desired) != AZ_OK))
+      && az_failed(sample_json_child_token_move(json_reader, sample_iot_hub_twin_desired)))
   {
     printf("Failed to get desired property\r\n");
     return AZ_ERROR_UNEXPECTED_CHAR;
   }
 
   copy_json_reader = *json_reader;
-  if ((sample_json_child_token_move(&copy_json_reader, sample_iot_hub_twin_desired_version)
-       != AZ_OK)
+  if (az_failed(
+          sample_json_child_token_move(&copy_json_reader, sample_iot_hub_twin_desired_version))
       || az_failed(az_json_token_get_int32(&(copy_json_reader.token), (int32_t*)&version)))
   {
     printf("Failed to get version\r\n");
@@ -383,15 +378,14 @@ az_result pnp_process_twin_data(
                   &index)
               == AZ_OK))
       {
-        if (visit_component_properties(
+        if (az_failed(visit_component_properties(
                 *sample_components_ptr[index],
                 json_reader,
                 version,
                 scratch_buf,
                 scratch_buf_len,
                 property_callback,
-                context_ptr)
-            != AZ_OK)
+                context_ptr)))
         {
           printf("Failed to visit component properties\r\n");
           return AZ_ERROR_UNEXPECTED_CHAR;
