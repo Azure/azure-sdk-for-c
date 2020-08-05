@@ -13,6 +13,9 @@
 
 #include <azure/core/_az_cfg.h>
 
+static az_span const az_aad_global_authority
+    = AZ_SPAN_LITERAL_FROM_STR("https://login.microsoftonline.com/");
+
 static AZ_NODISCARD az_result _az_credential_client_secret_request_token(
     az_credential_client_secret const* credential,
     az_context* context,
@@ -98,9 +101,6 @@ AZ_NODISCARD az_result az_credential_client_secret_init(
   _az_PRECONDITION_VALID_SPAN(client_secret, 1, false);
   _az_PRECONDITION_VALID_SPAN(authority, 0, true);
 
-  static az_span const azure_ad_global_authority
-      = AZ_SPAN_LITERAL_FROM_STR("https://login.microsoftonline.com/");
-
   *out_credential = (az_credential_client_secret){
     ._internal = {
       .credential = {
@@ -114,7 +114,7 @@ AZ_NODISCARD az_result az_credential_client_secret_init(
         .client_id = client_id,
         .client_secret = client_secret,
         .scopes = { 0 },
-        .authority = az_span_size(authority) > 0 ? authority : azure_ad_global_authority,
+        .authority = az_span_size(authority) > 0 ? authority : az_aad_global_authority,
       },
     };
 
