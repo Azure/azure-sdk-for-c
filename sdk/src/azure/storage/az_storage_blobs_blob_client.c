@@ -1,14 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <azure/core/internal/az_config_internal.h>
-#include <azure/core/internal/az_credentials_internal.h>
 #include <azure/core/az_http.h>
-#include <azure/core/internal/az_http_internal.h>
 #include <azure/core/az_http_transport.h>
 #include <azure/core/az_json.h>
 #include <azure/core/az_precondition.h>
+#include <azure/core/internal/az_config_internal.h>
+#include <azure/core/internal/az_credentials_internal.h>
 #include <azure/core/internal/az_precondition_internal.h>
+#include <azure/core/internal/az_http_internal.h>
 #include <azure/core/internal/az_span_internal.h>
 #include <azure/storage/az_storage_blobs.h>
 
@@ -41,14 +41,14 @@ AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_o
           .version = AZ_STORAGE_API_VERSION,
         },
       },
-      ._telemetry_options = _az_http_policy_telemetry_options_default(),
+      .telemetry_options = _az_http_policy_telemetry_options_default(),
     },
-    .retry = _az_http_policy_retry_options_default(),
+    .retry_options = _az_http_policy_retry_options_default(),
   };
 
-  options.retry.max_retries = 5;
-  options.retry.retry_delay_msec = 1 * _az_TIME_MILLISECONDS_PER_SECOND;
-  options.retry.max_retry_delay_msec = 30 * _az_TIME_MILLISECONDS_PER_SECOND;
+  options.retry_options.max_retries = 5;
+  options.retry_options.retry_delay_msec = 1 * _az_TIME_MILLISECONDS_PER_SECOND;
+  options.retry_options.max_retry_delay_msec = 30 * _az_TIME_MILLISECONDS_PER_SECOND;
 
   return options;
 }
@@ -81,13 +81,13 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
             {
               ._internal = {
                 .process = az_http_pipeline_policy_telemetry,
-                .options = &client->_internal.options._internal._telemetry_options,
+                .options = &client->_internal.options._internal.telemetry_options,
               },
             },
             {
               ._internal = {
                 .process = az_http_pipeline_policy_retry,
-                .options = &client->_internal.options.retry,
+                .options = &client->_internal.options.retry_options,
               },
             },
             {
