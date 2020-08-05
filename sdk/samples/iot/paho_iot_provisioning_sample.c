@@ -1,86 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifdef _MSC_VER
-// warning C4201: nonstandard extension used: nameless struct/union
-#pragma warning(push)
-#pragma warning(disable : 4201)
-#endif
-#include <paho-mqtt/MQTTClient.h>
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#ifdef _WIN32
-// Required for Sleep(DWORD)
-#include <Windows.h>
-#else
-// Required for sleep(unsigned int)
-#include <unistd.h>
-#endif
-
-#include <azure/core/az_result.h>
-#include <azure/core/az_span.h>
-#include <azure/iot/az_iot_provisioning_client.h>
-
-#define TIMEOUT_MQTT_RECEIVE_MS (60 * 1000)
-#define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
-
-#ifdef _MSC_VER
-// "'getenv': This function or variable may be unsafe. Consider using _dupenv_s instead."
-#pragma warning(disable : 4996)
-#endif
-
-// DO NOT MODIFY: Service information
-#define ENV_GLOBAL_PROVISIONING_ENDPOINT_DEFAULT "ssl://global.azure-devices-provisioning.net:8883"
-#define ENV_GLOBAL_PROVISIONING_ENDPOINT "AZ_IOT_GLOBAL_PROVISIONING_ENDPOINT"
-#define ENV_ID_SCOPE_ENV "AZ_IOT_ID_SCOPE"
-
-// DO NOT MODIFY: Device information
-#define ENV_REGISTRATION_ID_ENV "AZ_IOT_REGISTRATION_ID"
-
-// DO NOT MODIFY: the path to a PEM file containing the device certificate and
-// key as well as any intermediate certificates chaining to an uploaded group certificate.
-#define ENV_DEVICE_X509_CERT_PEM_FILE_PATH "AZ_IOT_DEVICE_X509_CERT_PEM_FILE"
-
-// DO NOT MODIFY: the path to a PEM file containing the server trusted CA
-// This is usually not needed on Linux or Mac but needs to be set on Windows.
-#define ENV_DEVICE_X509_TRUST_PEM_FILE_PATH "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE"
-
-// Logging with formatting
-#define LOG_ERROR(...) \
-  { \
-    (void)fprintf(stderr, "ERROR:\t\t%s:%s():%d: ", __FILE__, __func__, __LINE__); \
-    (void)fprintf(stderr, __VA_ARGS__); \
-    (void)fprintf(stderr, "\n"); \
-    fflush(stdout); \
-    fflush(stderr); \
-  }
-#define LOG_SUCCESS(...) \
-  { \
-    (void)printf("SUCCESS:\t"); \
-    (void)printf(__VA_ARGS__); \
-    (void)printf("\n"); \
-  }
-#define LOG(...) \
-  { \
-    (void)printf("\t\t"); \
-    (void)printf(__VA_ARGS__); \
-    (void)printf("\n"); \
-  }
-#define LOG_AZ_SPAN(span_description, span) \
-  { \
-    (void)printf("\t\t%s ", span_description); \
-    char* buffer = (char*)az_span_ptr(span); \
-    for (int32_t i = 0; i < az_span_size(span); i++) \
-    { \
-      putchar(*buffer++); \
-    } \
-    (void)printf("\n"); \
-  }
+#include <sample.h>
 
 // Store environment variables
 static char global_provisioning_endpoint_buffer[256];
@@ -101,20 +22,12 @@ static char query_topic_buffer[256];
 
 // Functions
 static void create_and_configure_client();
-static az_result read_environment_variables(
-    az_span* global_provisioning_endpoint,
-    az_span* id_scope,
-    az_span* registration_id);
-static az_result read_configuration_entry(
-    const char* env_name,
-    char* default_value,
-    bool hide_value,
-    az_span buffer,
-    az_span* out_value);
 static void connect_client_to_provisioning_service();
 static void subscribe_client_to_provisioning_service_topics();
 static void register_client_with_provisioning_service();
 static void receive_registration_status();
+static void disconnect_client_from_provisioning_service();
+
 static void parse_operation_message(
     char* topic,
     int topic_len,
@@ -123,8 +36,7 @@ static void parse_operation_message(
     az_iot_provisioning_client_operation_status* operation_status);
 static void send_operation_query_message(
     const az_iot_provisioning_client_register_response* response);
-static void disconnect_client_from_provisioning_service();
-static void sleep_for_seconds(uint32_t seconds);
+
 
 int main()
 {
@@ -232,37 +144,6 @@ static az_result read_environment_variables(
       &x509_trust_pem_file_path));
 
   LOG(" "); // Log formatting
-  return AZ_OK;
-}
-
-static az_result read_configuration_entry(
-    const char* env_name,
-    char* default_value,
-    bool hide_value,
-    az_span buffer,
-    az_span* out_value)
-{
-  char* env_value = getenv(env_name);
-
-  if (env_value == NULL && default_value != NULL)
-  {
-    env_value = default_value;
-  }
-
-  if (env_value != NULL)
-  {
-    (void)printf("%s = %s\n", env_name, hide_value ? "***" : env_value);
-    az_span env_span = az_span_from_str(env_value);
-    AZ_RETURN_IF_NOT_ENOUGH_SIZE(buffer, az_span_size(env_span));
-    az_span_copy(buffer, env_span);
-    *out_value = az_span_slice(buffer, 0, az_span_size(env_span));
-  }
-  else
-  {
-    LOG_ERROR("(missing) Please set the %s environment variable.", env_name);
-    return AZ_ERROR_ARG;
-  }
-
   return AZ_OK;
 }
 
@@ -501,15 +382,5 @@ static void disconnect_client_from_provisioning_service()
 
   MQTTClient_destroy(&mqtt_client);
 
-  return;
-}
-
-static void sleep_for_seconds(uint32_t seconds)
-{
-#ifdef _WIN32
-  Sleep((DWORD)seconds * 1000);
-#else
-  sleep(seconds);
-#endif
   return;
 }
