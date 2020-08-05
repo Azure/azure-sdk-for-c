@@ -111,6 +111,10 @@ static const int32_t sample_pnp_components_num
     = sizeof(sample_pnp_components) / sizeof(sample_pnp_components[0]);
 static char scratch_buf[32];
 
+// Root Component Values
+static const az_span working_set_name = AZ_SPAN_LITERAL_FROM_STR("workingSet");
+static int32_t working_set_ram_in_kibibytes;
+
 // ISO8601 Time Format
 static const char iso_spec_time_format[] = "%Y-%m-%dT%H:%M:%S%z";
 
@@ -160,7 +164,7 @@ static void mqtt_publish_message(char* topic, az_span payload, int qos);
 static void mqtt_receive_message(void);
 static int on_received(char* topicName, int topicLen, MQTTClient_message* message);
 static void send_device_info(void);
-static void send_telemetry_message(void);
+static void send_telemetry_messages(void);
 static void send_twin_get_message(void);
 static void handle_twin_message(
     MQTTClient_message* message,
@@ -253,7 +257,7 @@ int main(void)
     }
 
     // Send a telemetry message
-    send_telemetry_message();
+    send_telemetry_messages();
   }
 
   // Gracefully disconnect: send the disconnect packet and close the socket
@@ -836,8 +840,37 @@ static void send_twin_get_message(void)
   mqtt_publish_message(publish_message.topic, AZ_SPAN_NULL, SAMPLE_PUBLISH_QOS);
 }
 
+static az_result temperature_controller_get_telemetry_message(sample_pnp_mqtt_message* message)
+{
+  az_result result;
+  if (az_failed(
+          result = pnp_get_telemetry_topic(
+              &client,
+              NULL,
+              AZ_SPAN_NULL,
+              message->topic,
+              message->topic_length,
+              NULL)))
+  {
+    printf("Could not get pnp telemetry topic: error code = 0x%08x\n", result);
+    return result;
+  }
+
+  working_set_ram_in_kibibytes = rand() % 128;
+
+  az_json_writer json_builder;
+  AZ_RETURN_IF_FAILED(az_json_writer_init(&json_builder, message->payload_span, NULL));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&json_builder));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&json_builder, working_set_name));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_int32(&json_builder, working_set_ram_in_kibibytes));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&json_builder));
+  message->out_payload_span = az_json_writer_get_bytes_used_in_destination(&json_builder);
+
+  return result;
+}
+
 // Send JSON formatted telemetry messages
-static void send_telemetry_message(void)
+static void send_telemetry_messages(void)
 {
   az_result result;
 
@@ -862,6 +895,16 @@ static void send_telemetry_message(void)
   }
 
   LOG_SUCCESS("Sending Telemetry Message for thermostat 2");
+
+  mqtt_publish_message(publish_message.topic, publish_message.out_payload_span, SAMPLE_PUBLISH_QOS);
+
+  if ((result = temperature_controller_get_telemetry_message(&publish_message)) != AZ_OK)
+  {
+    LOG_ERROR("Error getting message and topic for root component");
+    exit(result);
+  }
+
+  LOG_SUCCESS("Sending Telemetry Message for temperature controller");
 
   mqtt_publish_message(publish_message.topic, publish_message.out_payload_span, SAMPLE_PUBLISH_QOS);
 

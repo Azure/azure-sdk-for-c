@@ -169,35 +169,32 @@ az_result pnp_get_telemetry_topic(
     size_t mqtt_topic_size,
     size_t* out_mqtt_topic_length)
 {
-  az_result result;
-
   az_iot_hub_client_properties pnp_properties;
 
-  if (properties == NULL)
+  if (az_span_ptr(component_name) != NULL)
   {
-    AZ_RETURN_IF_FAILED(az_iot_hub_client_properties_init(
-        &pnp_properties, AZ_SPAN_FROM_BUFFER(pnp_properties_buffer), 0));
+    if (properties == NULL)
+    {
+      properties = &pnp_properties;
+
+      AZ_RETURN_IF_FAILED(az_iot_hub_client_properties_init(
+          properties, AZ_SPAN_FROM_BUFFER(pnp_properties_buffer), 0));
+    }
+
+    AZ_RETURN_IF_FAILED(az_iot_hub_client_properties_append(
+        properties,
+        component_telemetry_prop_span,
+        component_name));
   }
 
-  if ((result = az_iot_hub_client_properties_append(
-           properties != NULL ? properties : &pnp_properties,
-           component_telemetry_prop_span,
-           component_name))
-      != AZ_OK)
-  {
-    return result;
-  }
-  else
-  {
-    result = az_iot_hub_client_telemetry_get_publish_topic(
-        client,
-        properties != NULL ? properties : &pnp_properties,
-        mqtt_topic,
-        mqtt_topic_size,
-        out_mqtt_topic_length);
-  }
+  AZ_RETURN_IF_FAILED(az_iot_hub_client_telemetry_get_publish_topic(
+      client,
+      az_span_ptr(component_name) != NULL ? properties : NULL,
+      mqtt_topic,
+      mqtt_topic_size,
+      out_mqtt_topic_length));
 
-  return result;
+  return AZ_OK;
 }
 
 // Parse the component name and command name from a span
