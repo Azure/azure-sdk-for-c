@@ -2,6 +2,8 @@
 
 ## 1.0.0-dev.1 (2020-08-05)
 
+- Validating release infrastructure
+
 ## 1.0.0-preview.4 (Unreleased)
 
 
