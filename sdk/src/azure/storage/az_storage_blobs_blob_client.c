@@ -1,13 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <azure/core/internal/az_config_internal.h>
-#include <azure/core/internal/az_credentials_internal.h>
 #include <azure/core/az_http.h>
-#include <azure/core/internal/az_http_internal.h>
 #include <azure/core/az_http_transport.h>
 #include <azure/core/az_json.h>
 #include <azure/core/az_precondition.h>
+#include <azure/core/internal/az_config_internal.h>
+#include <azure/core/internal/az_credentials_internal.h>
+#include <azure/core/internal/az_http_internal.h>
 #include <azure/core/internal/az_precondition_internal.h>
 #include <azure/core/internal/az_span_internal.h>
 #include <azure/storage/az_storage_blobs.h>
@@ -160,7 +160,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
   az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
 
   // create request
-  _az_http_request request;
+  az_http_request request;
   AZ_RETURN_IF_FAILED(az_http_request_init(
       &request,
       context,

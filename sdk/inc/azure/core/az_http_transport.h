@@ -50,7 +50,7 @@ AZ_INLINE az_http_method az_http_method_patch() { return AZ_SPAN_FROM_STR("PATCH
 typedef az_span _az_http_request_headers;
 
 /**
- * @brief _az_http_request is an internal structure used to perform an HTTP request.
+ * @brief az_http_request is an internal structure used to perform an HTTP request.
  * It contains an HTTP method, url, headers and body. It also contains
  * another utility variables. User should never access field _internal directly
  */
@@ -69,7 +69,7 @@ typedef struct
     int32_t retry_headers_start_byte_offset;
     az_span body;
   } _internal;
-} _az_http_request;
+} az_http_request;
 
 /**
  * @brief Declaring az_http_policy for using it to create policy process callback
@@ -80,7 +80,7 @@ typedef struct _az_http_policy _az_http_policy;
 
 /**
  * @brief Defines the callback signature of a policy process which should receive an
- * _az_http_policy, options reference (as void *), an _az_http_request and az_http_response.
+ * _az_http_policy, options reference (as void *), an az_http_request and az_http_response.
  *
  * void * is used as polymorphic solution for any policy. Each policy implementation would know the
  * specif pointer type to cast options to.
@@ -89,7 +89,7 @@ typedef struct _az_http_policy _az_http_policy;
 typedef AZ_NODISCARD az_result (*_az_http_policy_process_fn)(
     _az_http_policy* ref_policies,
     void* ref_options,
-    _az_http_request* ref_request,
+    az_http_request* ref_request,
     az_http_response* ref_response);
 
 /**
@@ -120,7 +120,7 @@ struct _az_http_policy
  * @retval AZ_ERROR_ARG \a index is out of range.
  */
 AZ_NODISCARD az_result
-az_http_request_get_header(_az_http_request const* request, int32_t index, az_pair* out_header);
+az_http_request_get_header(az_http_request const* request, int32_t index, az_pair* out_header);
 
 /**
  * @brief Get method of an HTTP request.
@@ -134,7 +134,7 @@ az_http_request_get_header(_az_http_request const* request, int32_t index, az_pa
  *         - #AZ_OK if successful
  */
 AZ_NODISCARD az_result
-az_http_request_get_method(_az_http_request const* request, az_http_method* out_method);
+az_http_request_get_method(az_http_request const* request, az_http_method* out_method);
 
 /**
  * @brief Get url from an HTTP request.
@@ -147,7 +147,7 @@ az_http_request_get_method(_az_http_request const* request, az_http_method* out_
  * @retval An #az_result value indicating the result of the operation:
  *         - #AZ_OK if successful
  */
-AZ_NODISCARD az_result az_http_request_get_url(_az_http_request const* request, az_span* out_url);
+AZ_NODISCARD az_result az_http_request_get_url(az_http_request const* request, az_span* out_url);
 
 /**
  * @brief Get body from an HTTP request.
@@ -160,7 +160,7 @@ AZ_NODISCARD az_result az_http_request_get_url(_az_http_request const* request, 
  * @retval An #az_result value indicating the result of the operation:
  *         - #AZ_OK if successful
  */
-AZ_NODISCARD az_result az_http_request_get_body(_az_http_request const* request, az_span* out_body);
+AZ_NODISCARD az_result az_http_request_get_body(az_http_request const* request, az_span* out_body);
 
 /**
  * @brief This function is expected to be used by transport adapters like curl. Use it to write
@@ -184,7 +184,7 @@ AZ_NODISCARD az_result az_http_response_append(az_http_response* response, az_sp
  * @param[in] request Pointer to an az_http_request to be used by this function.
  * @return Number of headers in the request.
  */
-AZ_NODISCARD int32_t az_http_request_headers_count(_az_http_request const* request);
+AZ_NODISCARD int32_t az_http_request_headers_count(az_http_request const* request);
 
 /**
  * @brief Send an HTTP request through the wire and write the response into \p ref_response.
@@ -204,7 +204,7 @@ AZ_NODISCARD int32_t az_http_request_headers_count(_az_http_request const* reque
  *
  */
 AZ_NODISCARD az_result
-az_http_client_send_request(_az_http_request const* request, az_http_response* ref_response);
+az_http_client_send_request(az_http_request const* request, az_http_response* ref_response);
 
 #include <azure/core/_az_cfg_suffix.h>
 

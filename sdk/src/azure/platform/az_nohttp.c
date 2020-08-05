@@ -14,7 +14,7 @@
  *         - #AZ_OK if successful
  */
 AZ_NODISCARD az_result
-az_http_client_send_request(_az_http_request const* request, az_http_response* ref_response)
+az_http_client_send_request(az_http_request const* request, az_http_response* ref_response)
 {
   (void)request;
   (void)ref_response;
