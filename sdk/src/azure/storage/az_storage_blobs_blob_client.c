@@ -149,7 +149,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
 
   // Request buffer
   // create request buffer TODO: define size for a blob upload
-  uint8_t url_buffer[AZ_HTTP_REQUEST_URL_BUF_SIZE];
+  uint8_t url_buffer[AZ_HTTP_REQUEST_URL_BUFFER_SIZE];
   az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
   // copy url from client
   int32_t uri_size = az_span_size(client->_internal.endpoint);
