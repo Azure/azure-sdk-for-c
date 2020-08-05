@@ -93,7 +93,7 @@ static void test_az_log(void** state)
   az_span url = AZ_SPAN_FROM_STR("https://www.example.com");
   TEST_EXPECT_SUCCESS(az_http_request_init(
       &request,
-      &az_context_app,
+      &az_context_application,
       az_http_method_get(),
       url,
       az_span_size(url),

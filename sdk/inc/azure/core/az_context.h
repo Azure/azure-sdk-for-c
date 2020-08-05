@@ -27,8 +27,8 @@ typedef struct az_context az_context;
 /**
  * @brief A context is a node within a tree that represents expiration times and key/value
  * pairs.
- * @details The root node in the tree (ultimate parent) is #az_context_app which is a context for
- * the entire application. Each new node is a child of some parent.
+ * @details The root node in the tree (ultimate parent) is #az_context_application which is a
+ * context for the entire application. Each new node is a child of some parent.
  */
 struct az_context
 {
@@ -45,32 +45,33 @@ struct az_context
 
 /**
  * @brief The ultimate root of all #az_context instances. It allows you to cancel
- * your entire application. The #az_context_app never expires but you can explicitly cancel it by
- * passing its address to #az_context_cancel which effectively cancels all the #az_context child
- * nodes.
+ * your entire application. The #az_context_application never expires but you can explicitly cancel
+ * it by passing its address to #az_context_cancel which effectively cancels all the #az_context
+ * child nodes.
  */
-extern az_context az_context_app;
+extern az_context az_context_application;
 
 /**
  * @brief Creates a new expiring #az_context node that is a child of the specified parent.
  *
  * @param[in] parent The #az_context node that the new node is to be a child of; passing `NULL` sets
- * the parent to #az_context_app.
+ * the parent to #az_context_application.
  * @param[in] expiration The time when this new child node should be canceled.
  * @return The new child #az_context node.
  */
 AZ_NODISCARD AZ_INLINE az_context
 az_context_create_with_expiration(az_context const* parent, int64_t expiration)
 {
-  return (az_context){ ._internal = { .parent = ((parent != NULL) ? parent : &az_context_app),
-                                      .expiration = expiration } };
+  return (az_context){ ._internal
+                       = { .parent = ((parent != NULL) ? parent : &az_context_application),
+                           .expiration = expiration } };
 }
 
 /**
  * @brief Creates a new key/value az_context node that is a child of the specified parent.
  *
  * @param[in] parent The #az_context node that the new node is to be a child of; passing `NULL` sets
- * the parent to #az_context_app.
+ * the parent to #az_context_application.
  * @param[in] key A pointer to the key of this new #az_context node.
  * @param[in] value A pointer to the value of this new #az_context node.
  * @return The new child #az_context node.
@@ -78,7 +79,7 @@ az_context_create_with_expiration(az_context const* parent, int64_t expiration)
 AZ_NODISCARD AZ_INLINE az_context
 az_context_create_with_value(az_context const* parent, void const* key, void const* value)
 {
-  return (az_context){ ._internal = { .parent = (parent != NULL) ? parent : &az_context_app,
+  return (az_context){ ._internal = { .parent = (parent != NULL) ? parent : &az_context_application,
                                       .expiration = _az_CONTEXT_MAX_EXPIRATION,
                                       .key = key,
                                       .value = value } };
@@ -92,7 +93,7 @@ az_context_create_with_value(az_context const* parent, void const* key, void con
  */
 AZ_INLINE void az_context_cancel(az_context* context)
 {
-  context = ((context != NULL) ? context : &az_context_app);
+  context = ((context != NULL) ? context : &az_context_application);
   context->_internal.expiration = 0; // The beginning of time
 }
 
@@ -109,7 +110,7 @@ AZ_NODISCARD int64_t az_context_get_expiration(az_context const* context);
  * current time.
  *
  * @param[in] context A pointer to the #az_context node to check; passing `NULL` checks the root
- * #az_context_app.
+ * #az_context_application.
  * @param[in] current_time The current time.
  */
 AZ_NODISCARD AZ_INLINE bool az_context_has_expired(az_context const* context, int64_t current_time)

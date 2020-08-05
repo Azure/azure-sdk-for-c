@@ -2,18 +2,20 @@
 
 
 ## 1.0.0-preview.4 (Unreleased)
-- `az_context`:
-  - `key` and `value` are `const`.
-  - `az_context_with_expiration()` is renamed to `az_context_create_with_expiration()`.
-  - `az_context_with_value()` is renamed to `az_context_create_with_value()`.
-- `az_credential_client_secret_init()` now takes fourth parameter, `authority`.
-- `az_http_policy_retry_options`:
-  - `status_codes` now should be terminated by `AZ_HTTP_STATUS_CODE_END_OF_LIST`.
-  - `max_retries` is now `int32_t` instead of `int16_t`.
-- `az_config.h`:
-  -  `AZ_HTTP_REQUEST_URL_BUF_SIZE` renamed to `AZ_HTTP_REQUEST_URL_BUFFER_SIZE`.
-  - `AZ_HTTP_REQUEST_BODY_BUF_SIZE` renamed to `AZ_HTTP_REQUEST_BODY_BUFFER_SIZE`.
-  - `AZ_LOG_MSG_BUF_SIZE` renamed to `AZ_LOG_MESSAGE_BUFFER_SIZE`.
+- API breaking changes:
+  - `az_context`:
+    - `key` and `value` are `const`.
+    - `az_context_with_expiration()` is renamed to `az_context_create_with_expiration()`.
+    - `az_context_with_value()` is renamed to `az_context_create_with_value()`.
+    - `az_context_app` is renamed to `az_context_application`.
+  - `az_credential_client_secret_init()` now takes fourth parameter, `authority`.
+  - `az_http_policy_retry_options`:
+    - `status_codes` now should be terminated by `AZ_HTTP_STATUS_CODE_END_OF_LIST`.
+    - `max_retries` is now `int32_t` instead of `int16_t`.
+  - `az_config.h`:
+    -  `AZ_HTTP_REQUEST_URL_BUF_SIZE` renamed to `AZ_HTTP_REQUEST_URL_BUFFER_SIZE`.
+    - `AZ_HTTP_REQUEST_BODY_BUF_SIZE` renamed to `AZ_HTTP_REQUEST_BODY_BUFFER_SIZE`.
+    - `AZ_LOG_MSG_BUF_SIZE` renamed to `AZ_LOG_MESSAGE_BUFFER_SIZE`.
 
 ## 1.0.0-preview.3 (2020-07-20)
 - Updated `az_result` values:

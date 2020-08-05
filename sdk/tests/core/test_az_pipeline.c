@@ -3,9 +3,9 @@
 
 #include "az_test_definitions.h"
 #include <azure/core/az_http.h>
-#include <azure/core/internal/az_http_internal.h>
 #include <azure/core/az_http_transport.h>
 #include <azure/core/az_span.h>
+#include <azure/core/internal/az_http_internal.h>
 
 #include <setjmp.h>
 #include <stdarg.h>
@@ -51,7 +51,13 @@ void test_az_http_pipeline_process()
 
   assert_return_code(
       az_http_request_init(
-          &request, &az_context_app, az_http_method_get(), url_span, 3, header_span, AZ_SPAN_NULL),
+          &request,
+          &az_context_application,
+          az_http_method_get(),
+          url_span,
+          3,
+          header_span,
+          AZ_SPAN_NULL),
       AZ_OK);
 
   _az_http_pipeline pipeline = (_az_http_pipeline){
