@@ -9,7 +9,7 @@
 - `az_credential_client_secret_init()` now takes fourth parameter, `authority`.
 - `az_http_policy_retry_options`:
   - `status_codes` now should be terminated by `AZ_HTTP_STATUS_CODE_END_OF_LIST`.
-  - `max_retries` are now `int32_t` instead of `int16_t`.
+  - `max_retries` is now `int32_t` instead of `int16_t`.
 - `az_config.h`:
   -  `AZ_HTTP_REQUEST_URL_BUF_SIZE` renamed to `AZ_HTTP_REQUEST_URL_BUFFER_SIZE`.
   - `AZ_HTTP_REQUEST_BODY_BUF_SIZE` renamed to `AZ_HTTP_REQUEST_BODY_BUFFER_SIZE`.
