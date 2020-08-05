@@ -114,10 +114,10 @@ typedef enum
  */
 typedef struct
 {
-  int16_t max_retries;
+  az_http_status_code const* status_codes;
   int32_t retry_delay_msec;
   int32_t max_retry_delay_msec;
-  az_http_status_code const* status_codes;
+  int16_t max_retries;
 } az_http_policy_retry_options;
 
 typedef enum
