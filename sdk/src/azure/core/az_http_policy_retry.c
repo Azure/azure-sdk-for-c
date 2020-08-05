@@ -39,7 +39,7 @@ AZ_NODISCARD az_http_policy_retry_options _az_http_policy_retry_options_default(
 
 // TODO: Add unit tests
 AZ_INLINE az_result _az_http_policy_retry_append_http_retry_msg(
-    int16_t attempt,
+    int32_t attempt,
     int32_t delay_msec,
     az_span* ref_log_msg)
 {
@@ -47,7 +47,7 @@ AZ_INLINE az_result _az_http_policy_retry_append_http_retry_msg(
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(*ref_log_msg, az_span_size(retry_count_string));
   az_span remainder = az_span_copy(*ref_log_msg, retry_count_string);
 
-  AZ_RETURN_IF_FAILED(az_span_i32toa(remainder, (int32_t)attempt, &remainder));
+  AZ_RETURN_IF_FAILED(az_span_i32toa(remainder, attempt, &remainder));
 
   az_span infix_string = AZ_SPAN_FROM_STR(" will be made in ");
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, az_span_size(infix_string));
@@ -64,7 +64,7 @@ AZ_INLINE az_result _az_http_policy_retry_append_http_retry_msg(
   return AZ_OK;
 }
 
-AZ_INLINE void _az_http_policy_retry_log(int16_t attempt, int32_t delay_msec)
+AZ_INLINE void _az_http_policy_retry_log(int32_t attempt, int32_t delay_msec)
 {
   uint8_t log_msg_buf[AZ_LOG_MESSAGE_BUFFER_SIZE] = { 0 };
   az_span log_msg = AZ_SPAN_FROM_BUFFER(log_msg_buf);
@@ -157,7 +157,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
   az_http_policy_retry_options const* const retry_options
       = (az_http_policy_retry_options const*)ref_options;
 
-  int16_t const max_retries = retry_options->max_retries;
+  int32_t const max_retries = retry_options->max_retries;
   int32_t const retry_delay_msec = retry_options->retry_delay_msec;
   int32_t const max_retry_delay_msec = retry_options->max_retry_delay_msec;
   az_http_status_code const* const status_codes = retry_options->status_codes;
@@ -168,7 +168,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
 
   bool const should_log = _az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_RETRY);
   az_result result = AZ_OK;
-  int16_t attempt = 1;
+  int32_t attempt = 1;
   while (true)
   {
     AZ_RETURN_IF_FAILED(az_http_response_init(ref_response, ref_response->_internal.http_response));
