@@ -50,7 +50,7 @@ AZ_INLINE az_http_method az_http_method_patch() { return AZ_SPAN_FROM_STR("PATCH
 typedef az_span _az_http_request_headers;
 
 /**
- * @brief az_http_request is an internal structure used to perform an HTTP request.
+ * @brief az_http_request is an structure used to perform an HTTP request.
  * It contains an HTTP method, url, headers and body. It also contains
  * another utility variables. User should never access field _internal directly
  */
