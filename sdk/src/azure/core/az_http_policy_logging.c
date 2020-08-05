@@ -199,7 +199,7 @@ static az_result _az_http_policy_logging_append_http_response_msg(
 
 void _az_http_policy_logging_log_http_request(_az_http_request const* request)
 {
-  uint8_t log_msg_buf[AZ_LOG_MSG_BUF_SIZE] = { 0 };
+  uint8_t log_msg_buf[AZ_LOG_MESSAGE_BUFFER_SIZE] = { 0 };
   az_span log_msg = AZ_SPAN_FROM_BUFFER(log_msg_buf);
 
   (void)_az_http_policy_logging_append_http_request_msg(request, &log_msg);
@@ -212,7 +212,7 @@ void _az_http_policy_logging_log_http_response(
     int64_t duration_msec,
     _az_http_request const* request)
 {
-  uint8_t log_msg_buf[AZ_LOG_MSG_BUF_SIZE] = { 0 };
+  uint8_t log_msg_buf[AZ_LOG_MESSAGE_BUFFER_SIZE] = { 0 };
   az_span log_msg = AZ_SPAN_FROM_BUFFER(log_msg_buf);
 
   az_http_response response_copy = *response;
