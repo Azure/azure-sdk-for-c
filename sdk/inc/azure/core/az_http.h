@@ -185,6 +185,7 @@ AZ_NODISCARD AZ_INLINE az_result az_http_response_init(az_http_response* respons
  *
  * @see https://tools.ietf.org/html/rfc7230#section-3.1.2
  */
+// Member order is optimized for alignment.
 typedef struct
 {
   az_span reason_phrase;
