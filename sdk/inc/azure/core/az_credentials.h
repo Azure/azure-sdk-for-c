@@ -15,7 +15,6 @@
 #ifndef _az_CREDENTIALS_H
 #define _az_CREDENTIALS_H
 
-#include <azure/core/_az_spinlock.h>
 #include <azure/core/az_http.h>
 #include <azure/core/az_http_transport.h>
 #include <azure/core/az_result.h>
@@ -52,6 +51,14 @@ typedef struct
     uint8_t token[_az_TOKEN_BUF_SIZE]; /*!< Base64-encoded token */
   } _internal;
 } _az_token;
+
+typedef struct
+{
+  struct
+  {
+    volatile uintptr_t state;
+  } _internal;
+} _az_spinlock;
 
 /**
  * @brief Definition of token credential. Token credential pairs token with the thread-safety lock.
