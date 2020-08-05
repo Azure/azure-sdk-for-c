@@ -36,8 +36,8 @@ struct az_context
   {
     az_context const* parent; // Pointer to parent context (or NULL); immutable after creation
     int64_t expiration; // Time when context expires
-    void* key; // Pointers to the key & value (usually NULL)
-    void* value;
+    void const* key; // Pointers to the key & value (usually NULL)
+    void const* value;
   } _internal;
 };
 
@@ -78,7 +78,7 @@ az_context_create_with_expiration(az_context const* parent, int64_t expiration)
  * @return The new child az_context node
  */
 AZ_NODISCARD AZ_INLINE az_context
-az_context_create_with_value(az_context const* parent, void* key, void* value)
+az_context_create_with_value(az_context const* parent, void const* key, void const* value)
 {
   return (az_context){ ._internal = { .parent = (parent != NULL) ? parent : &az_context_app,
                                       .expiration = _az_CONTEXT_MAX_EXPIRATION,
