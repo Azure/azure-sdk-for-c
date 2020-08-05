@@ -52,7 +52,7 @@ struct az_context
 extern az_context az_context_app;
 
 /**
- * @brief Creates a newexpiring az_context node that is a child of the specified parent.
+ * @brief Creates a new expiring az_context node that is a child of the specified parent.
  *
  * @param[in] parent The #az_context node that the new node is to be a child of; passing `NULL` sets
  * the parent to #az_context_app.
