@@ -18,14 +18,14 @@ static AZ_NODISCARD az_result _az_credential_client_secret_request_token(
     az_context* context,
     _az_token* out_token)
 {
-  uint8_t url_buf[_az_AAD_REQUEST_URL_BUF_SIZE] = { 0 };
+  uint8_t url_buf[_az_AAD_REQUEST_URL_BUFFER_SIZE] = { 0 };
   az_span url_span = AZ_SPAN_FROM_BUFFER(url_buf);
   az_span url;
 
   AZ_RETURN_IF_FAILED(_az_aad_build_url(
       url_span, credential->_internal.authority, credential->_internal.tenant_id, &url));
 
-  uint8_t body_buf[_az_AAD_REQUEST_BODY_BUF_SIZE] = { 0 };
+  uint8_t body_buf[_az_AAD_REQUEST_BODY_BUFFER_SIZE] = { 0 };
   az_span body = AZ_SPAN_FROM_BUFFER(body_buf);
   AZ_RETURN_IF_FAILED(_az_aad_build_body(
       body,
@@ -34,7 +34,7 @@ static AZ_NODISCARD az_result _az_credential_client_secret_request_token(
       credential->_internal.client_secret,
       &body));
 
-  uint8_t header_buf[_az_AAD_REQUEST_HEADER_BUF_SIZE];
+  uint8_t header_buf[_az_AAD_REQUEST_HEADER_BUFFER_SIZE];
   _az_http_request request = { 0 };
   AZ_RETURN_IF_FAILED(az_http_request_init(
       &request,

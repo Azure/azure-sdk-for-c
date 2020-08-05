@@ -3,10 +3,10 @@
 
 #include "az_http_private.h"
 #include <azure/core/az_config.h>
+#include <azure/core/az_platform.h>
 #include <azure/core/internal/az_config_internal.h>
 #include <azure/core/internal/az_http_internal.h>
 #include <azure/core/internal/az_log_internal.h>
-#include <azure/core/az_platform.h>
 #include <azure/core/internal/az_retry_internal.h>
 #include <azure/core/internal/az_span_internal.h>
 

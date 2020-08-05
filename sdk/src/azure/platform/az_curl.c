@@ -305,8 +305,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_get_request(CURL* ref_cu
 /**
  * handles DELETE request
  */
-static AZ_NODISCARD az_result
-_az_http_client_curl_send_delete_request(CURL* ref_curl)
+static AZ_NODISCARD az_result _az_http_client_curl_send_delete_request(CURL* ref_curl)
 {
   _az_PRECONDITION_NOT_NULL(ref_curl);
 

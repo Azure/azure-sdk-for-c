@@ -19,10 +19,10 @@
 #include <azure/core/az_context.h>
 #include <azure/core/az_credentials.h>
 #include <azure/core/az_http.h>
-#include <azure/core/internal/az_http_internal.h>
 #include <azure/core/az_http_transport.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
+#include <azure/core/internal/az_http_internal.h>
 
 #include <stdint.h>
 

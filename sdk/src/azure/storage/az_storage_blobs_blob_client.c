@@ -1,13 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <azure/core/internal/az_config_internal.h>
-#include <azure/core/internal/az_credentials_internal.h>
 #include <azure/core/az_http.h>
-#include <azure/core/internal/az_http_internal.h>
 #include <azure/core/az_http_transport.h>
 #include <azure/core/az_json.h>
 #include <azure/core/az_precondition.h>
+#include <azure/core/internal/az_config_internal.h>
+#include <azure/core/internal/az_credentials_internal.h>
+#include <azure/core/internal/az_http_internal.h>
 #include <azure/core/internal/az_precondition_internal.h>
 #include <azure/core/internal/az_span_internal.h>
 #include <azure/storage/az_storage_blobs.h>
@@ -18,7 +18,7 @@
 
 enum
 {
-  _az_STORAGE_HTTP_REQUEST_HEADER_BUF_SIZE = 10 * sizeof(az_pair),
+  _az_STORAGE_HTTP_REQUEST_HEADER_BUFFER_SIZE = 10 * sizeof(az_pair),
 };
 
 static az_span const AZ_STORAGE_BLOBS_BLOB_HEADER_X_MS_BLOB_TYPE
@@ -156,7 +156,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(request_url_span, uri_size);
   az_span_copy(request_url_span, client->_internal.endpoint);
 
-  uint8_t headers_buffer[_az_STORAGE_HTTP_REQUEST_HEADER_BUF_SIZE];
+  uint8_t headers_buffer[_az_STORAGE_HTTP_REQUEST_HEADER_BUFFER_SIZE];
   az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
 
   // create request
@@ -175,7 +175,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
       &request, AZ_STORAGE_BLOBS_BLOB_HEADER_X_MS_BLOB_TYPE, AZ_STORAGE_BLOBS_BLOB_TYPE_BLOCKBLOB));
 
   //
-  uint8_t content_length[_az_INT64_AS_STR_BUF_SIZE] = { 0 };
+  uint8_t content_length[_az_INT64_AS_STR_BUFFER_SIZE] = { 0 };
   az_span content_length_span = AZ_SPAN_FROM_BUFFER(content_length);
   az_span remainder;
   AZ_RETURN_IF_FAILED(az_span_i64toa(content_length_span, az_span_size(content), &remainder));

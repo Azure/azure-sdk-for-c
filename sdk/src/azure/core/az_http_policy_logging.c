@@ -3,10 +3,10 @@
 
 #include "az_http_policy_logging_private.h"
 #include "az_span_private.h"
-#include <azure/core/internal/az_http_internal.h>
 #include <azure/core/az_http_transport.h>
-#include <azure/core/internal/az_log_internal.h>
 #include <azure/core/az_platform.h>
+#include <azure/core/internal/az_http_internal.h>
+#include <azure/core/internal/az_log_internal.h>
 #include <azure/core/internal/az_span_internal.h>
 
 #include <azure/core/_az_cfg.h>
