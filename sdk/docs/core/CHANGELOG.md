@@ -1,6 +1,6 @@
 # Release History
 
-## 1.0.0-dev.1 (Unreleased)
+## 1.0.0-dev.1 (2020-08-05)
 
 ## 1.0.0-preview.4 (Unreleased)
 
