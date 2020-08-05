@@ -19,9 +19,9 @@ static void az_context_test(void** state)
 
   void* const key = "k";
   void* value = "v";
-  az_context ctx1 = az_context_with_expiration(&az_context_app, 100);
-  az_context ctx2 = az_context_with_value(&ctx1, key, value);
-  az_context ctx3 = az_context_with_expiration(&ctx2, 250);
+  az_context ctx1 = az_context_create_with_expiration(&az_context_app, 100);
+  az_context ctx2 = az_context_create_with_value(&ctx1, key, value);
+  az_context ctx3 = az_context_create_with_expiration(&ctx2, 250);
 
   int64_t expiration = az_context_get_expiration(&ctx3);
   void* value2 = NULL;

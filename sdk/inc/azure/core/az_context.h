@@ -27,8 +27,8 @@ typedef struct az_context az_context;
 /**
  * @brief A context is a node within a tree that represents expiration times and key/value
  * pairs.
- * @details The root node in the tree (ultimate parent) is #az_context_app which is a context for the
- * entire application. Each new node is a child of some parent.
+ * @details The root node in the tree (ultimate parent) is #az_context_app which is a context for
+ * the entire application. Each new node is a child of some parent.
  */
 struct az_context
 {
@@ -52,8 +52,8 @@ struct az_context
 extern az_context az_context_app;
 
 /**
- * @brief az_context_with_expiration creates a newexpiring az_context node that is a child of the
- * specified parent.
+ * @brief az_context_create_with_expiration creates a newexpiring az_context node that is a child of
+ * the specified parent.
  *
  * @param[in] parent The az_context node that the new node is to be a child of; passing NULL sets
  * the parent to az_context_app.
@@ -61,15 +61,15 @@ extern az_context az_context_app;
  * @return The new child az_context node
  */
 AZ_NODISCARD AZ_INLINE az_context
-az_context_with_expiration(az_context const* parent, int64_t expiration)
+az_context_create_with_expiration(az_context const* parent, int64_t expiration)
 {
   return (az_context){ ._internal = { .parent = ((parent != NULL) ? parent : &az_context_app),
                                       .expiration = expiration } };
 }
 
 /**
- * @brief az_context_with_value creates a new key/value az_context node that is a child of the
- * specified parent.
+ * @brief az_context_create_with_value creates a new key/value az_context node that is a child of
+ * the specified parent.
  *
  * @param[in] parent The az_context node that the new node is to be a child of; passing NULL sets
  * the parent to az_context_app.
@@ -78,7 +78,7 @@ az_context_with_expiration(az_context const* parent, int64_t expiration)
  * @return The new child az_context node
  */
 AZ_NODISCARD AZ_INLINE az_context
-az_context_with_value(az_context const* parent, void* key, void* value)
+az_context_create_with_value(az_context const* parent, void* key, void* value)
 {
   return (az_context){ ._internal = { .parent = (parent != NULL) ? parent : &az_context_app,
                                       .expiration = _az_CONTEXT_MAX_EXPIRATION,

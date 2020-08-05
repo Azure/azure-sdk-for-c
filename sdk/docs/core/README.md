@@ -143,10 +143,10 @@ Note however that cancellation is performed as a best effort; it is not guarante
 
    ```C
    // Some function creates a child with a 10-second expiration:
-   az_context child = az_context_with_expiration(&az_context_app, 10);
+   az_context child = az_context_create_with_expiration(&az_context_app, 10);
 
    // Some function creates a grandchild with a 60-second expiration:
-   az_context grandchild = az_context_with_expiration(&child, 60);
+   az_context grandchild = az_context_create_with_expiration(&child, 60);
 
    // Some other function (perhaps in response to a SIGINT) cancels the application root:
    az_context_cancel(&az_context_app);
