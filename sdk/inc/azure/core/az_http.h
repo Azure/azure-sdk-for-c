@@ -184,10 +184,10 @@ AZ_NODISCARD AZ_INLINE az_result az_http_response_init(az_http_response* respons
  */
 typedef struct
 {
+  az_span reason_phrase;
+  az_http_status_code status_code;
   uint8_t major_version;
   uint8_t minor_version;
-  az_http_status_code status_code;
-  az_span reason_phrase;
 } az_http_response_status_line;
 
 /**
