@@ -33,13 +33,9 @@ static az_result visit_component_properties(
     az_span component_name,
     az_json_reader* json_reader,
     int32_t version,
-    char* scratch_buf,
-    int32_t scratch_buf_len,
     pnp_property_callback property_callback,
     void* context_ptr)
 {
-  int32_t len;
-
   while (az_succeeded(az_json_reader_next_token(json_reader)))
   {
     if (json_reader->token.kind == AZ_JSON_TOKEN_PROPERTY_NAME)
@@ -56,12 +52,7 @@ static az_result visit_component_properties(
         continue;
       }
 
-      if (az_failed(az_json_token_get_string(
-              &(json_reader->token), (char*)scratch_buf, (int32_t)scratch_buf_len, (int32_t*)&len)))
-      {
-        printf("Failed to get string property value\r\n");
-        return AZ_ERROR_UNEXPECTED_CHAR;
-      }
+      az_json_token property_name = json_reader->token;
 
       if (az_failed(az_json_reader_next_token(json_reader)))
       {
@@ -71,7 +62,7 @@ static az_result visit_component_properties(
 
       property_callback(
           component_name,
-          az_span_init((uint8_t*)scratch_buf, len),
+          &property_name,
           &(json_reader->token),
           version,
           context_ptr);
@@ -315,14 +306,11 @@ az_result pnp_process_twin_data(
     bool is_partial,
     const az_span** sample_components_ptr,
     int32_t sample_components_num,
-    char* scratch_buf,
-    int32_t scratch_buf_len,
     pnp_property_callback property_callback,
     void* context_ptr)
 {
   az_json_reader copy_json_reader;
   int32_t version;
-  int32_t len;
   int32_t index;
 
   AZ_RETURN_IF_FAILED(az_json_reader_next_token(json_reader));
@@ -343,6 +331,8 @@ az_result pnp_process_twin_data(
     return AZ_ERROR_UNEXPECTED_CHAR;
   }
 
+  az_json_token property_name;
+
   while (az_succeeded(az_json_reader_next_token(json_reader)))
   {
     if (json_reader->token.kind == AZ_JSON_TOKEN_PROPERTY_NAME)
@@ -357,12 +347,7 @@ az_result pnp_process_twin_data(
         continue;
       }
 
-      if (az_failed(az_json_token_get_string(
-              &(json_reader->token), (char*)scratch_buf, (int32_t)scratch_buf_len, (int32_t*)&len)))
-      {
-        printf("Failed to string value for property name\r\n");
-        return AZ_ERROR_UNEXPECTED_CHAR;
-      }
+      property_name = json_reader->token;
 
       if (az_failed(az_json_reader_next_token(json_reader)))
       {
@@ -372,7 +357,7 @@ az_result pnp_process_twin_data(
 
       if (json_reader->token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT && sample_components_ptr != NULL
           && (is_component_in_model(
-                  az_span_init((uint8_t*)scratch_buf, len),
+                  property_name.slice,
                   sample_components_ptr,
                   sample_components_num,
                   &index)
@@ -382,8 +367,6 @@ az_result pnp_process_twin_data(
                 *sample_components_ptr[index],
                 json_reader,
                 version,
-                scratch_buf,
-                scratch_buf_len,
                 property_callback,
                 context_ptr)))
         {
@@ -395,7 +378,7 @@ az_result pnp_process_twin_data(
       {
         property_callback(
             AZ_SPAN_NULL,
-            az_span_init((uint8_t*)scratch_buf, (int32_t)len),
+            &property_name,
             &(json_reader->token),
             version,
             context_ptr);

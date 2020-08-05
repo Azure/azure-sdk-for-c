@@ -243,7 +243,7 @@ az_result sample_pnp_thermostat_process_property_update(
     az_iot_hub_client* client,
     sample_pnp_thermostat_component* thermostat_component,
     az_span component_name,
-    az_span property_name,
+    az_json_token* property_name,
     az_json_token* property_value,
     int32_t version,
     sample_pnp_mqtt_message* mqtt_message)
@@ -255,12 +255,12 @@ az_result sample_pnp_thermostat_process_property_update(
     return AZ_ERROR_ITEM_NOT_FOUND;
   }
 
-  if (!az_span_is_content_equal(desired_temp_property_name, property_name))
+  if (!az_json_token_is_text_equal(property_name, desired_temp_property_name))
   {
     printf(
         "PnP property=%.*s is not supported on thermostat component\n",
-        az_span_size(property_name),
-        az_span_ptr(property_name));
+        az_span_size(property_name->slice),
+        az_span_ptr(property_name->slice));
   }
 
   double parsed_value = 0;
@@ -269,7 +269,7 @@ az_result sample_pnp_thermostat_process_property_update(
     result = pnp_create_reported_property_with_status(
         mqtt_message->payload_span,
         component_name,
-        property_name,
+        property_name->slice,
         append_double,
         (void*)&parsed_value,
         401,
@@ -301,7 +301,7 @@ az_result sample_pnp_thermostat_process_property_update(
             result = pnp_create_reported_property_with_status(
                 mqtt_message->payload_span,
                 component_name,
-                property_name,
+                property_name->slice,
                 append_double,
                 (void*)&parsed_value,
                 200,

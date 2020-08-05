@@ -18,7 +18,7 @@
 
 typedef void (*pnp_property_callback)(
     az_span component_name,
-    az_span property_name,
+    az_json_token* property_name,
     az_json_token* property_value,
     int32_t version,
     void* user_context_callback);
@@ -117,8 +117,6 @@ az_result pnp_create_reported_property_with_status(
  * names for components.
  * @param[in] sample_components_num Number of components in the set pointed to by
  * `sample_components_ptr`.
- * @param[in] scratch_buf Scratch buffer to place parsed JSON values.
- * @param[in] scratch_buf_len Length of `scratch_buf`.
  * @param[in] property_callback The callback which is called on each twin property.
  * @param[in] context_ptr Pointer to user context.
  */
@@ -127,8 +125,6 @@ az_result pnp_process_twin_data(
     bool is_partial,
     const az_span** sample_components_ptr,
     int32_t sample_components_num,
-    char* scratch_buf,
-    int32_t scratch_buf_len,
     pnp_property_callback property_callback,
     void* context_ptr);
 

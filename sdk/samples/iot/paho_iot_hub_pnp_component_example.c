@@ -109,7 +109,6 @@ static const az_span* sample_pnp_components[] = { &sample_thermostat_1_component
                                                   &sample_device_info_component };
 static const int32_t sample_pnp_components_num
     = sizeof(sample_pnp_components) / sizeof(sample_pnp_components[0]);
-static char scratch_buf[32];
 
 // Root Component Values
 static const az_span working_set_name = AZ_SPAN_LITERAL_FROM_STR("workingSet");
@@ -505,7 +504,7 @@ static void send_device_info(void)
 // Callback invoked by pnp functions each time it finds a property in the twin document
 static void sample_property_callback(
     az_span component_name,
-    az_span property_name,
+    az_json_token* property_name,
     az_json_token* property_value,
     int32_t version,
     void* user_context_callback)
@@ -516,8 +515,8 @@ static void sample_property_callback(
     LOG_ERROR(
         "Property=%.*s arrived for Control component itself. This does not support\
                 writable properties on it (all properties are on sub-components)",
-        az_span_size(property_name),
-        az_span_ptr(property_name));
+        az_span_size(property_name->slice),
+        az_span_ptr(property_name->slice));
   }
   else if (
       sample_pnp_thermostat_process_property_update(
@@ -590,8 +589,6 @@ static void handle_twin_message(
           false,
           sample_pnp_components,
           sample_pnp_components_num,
-          scratch_buf,
-          sizeof(scratch_buf),
           sample_property_callback,
           NULL);
       break;
@@ -603,8 +600,6 @@ static void handle_twin_message(
           true,
           sample_pnp_components,
           sample_pnp_components_num,
-          scratch_buf,
-          sizeof(scratch_buf),
           sample_property_callback,
           NULL);
       break;
