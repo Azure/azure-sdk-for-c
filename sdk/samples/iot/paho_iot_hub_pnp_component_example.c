@@ -114,6 +114,8 @@ static char scratch_buf[32];
 // Root Component Values
 static const az_span working_set_name = AZ_SPAN_LITERAL_FROM_STR("workingSet");
 static int32_t working_set_ram_in_kibibytes;
+static const az_span serial_number_name = AZ_SPAN_LITERAL_FROM_STR("serialNumber");
+static az_span serial_number_value = AZ_SPAN_LITERAL_FROM_STR("ABCDEFG");
 
 // ISO8601 Time Format
 static const char iso_spec_time_format[] = "%Y-%m-%dT%H:%M:%S%z";
@@ -163,6 +165,7 @@ static void subscribe(void);
 static void mqtt_publish_message(char* topic, az_span payload, int qos);
 static void mqtt_receive_message(void);
 static int on_received(char* topicName, int topicLen, MQTTClient_message* message);
+static void send_device_serial_number(void);
 static void send_device_info(void);
 static void send_telemetry_messages(void);
 static void send_twin_get_message(void);
@@ -235,6 +238,9 @@ int main(void)
   // On device start up, send device info
   send_device_info();
 
+  // On device start up, send device serial number
+  send_device_serial_number();
+
   // Get the twin document to check for updated desired properties. Will then parse desired
   // property and update accordingly.
   send_twin_get_message();
@@ -299,6 +305,9 @@ static void components_init()
   }
 
   LOG_SUCCESS("Initialized PnP components");
+
+  // Formatting for log
+  putchar('\n');
 }
 
 // Read OS environment variables using stdlib function
@@ -430,6 +439,44 @@ static az_result read_configuration_and_init_client(void)
       &options));
 
   return AZ_OK;
+}
+
+static az_result append_string(az_json_writer* json_writer, void* value)
+{
+  return az_json_writer_append_string(json_writer, *(az_span*)value);
+}
+
+static void send_device_serial_number(void)
+{
+  az_result result;
+
+  if ((result = pnp_create_reported_property(
+           publish_message.payload_span,
+           AZ_SPAN_NULL,
+           serial_number_name,
+           append_string,
+           (void*)&serial_number_value,
+           &publish_message.out_payload_span))
+      != AZ_OK)
+  {
+    LOG_ERROR("Could not get serial number property payload");
+    exit(result);
+  }
+  else if (
+      (result = az_iot_hub_client_twin_patch_get_publish_topic(
+           &client, get_request_id(), publish_message.topic, publish_message.topic_length, NULL))
+      != AZ_OK)
+  {
+    LOG_ERROR("Error to get reported property topic with status: error code = 0x%08x", result);
+    exit(result);
+  }
+
+  LOG_SUCCESS("Sending device serial number property");
+
+  mqtt_publish_message(publish_message.topic, publish_message.out_payload_span, SAMPLE_PUBLISH_QOS);
+
+  // Formatting for log
+  putchar('\n');
 }
 
 static void send_device_info(void)
@@ -838,6 +885,9 @@ static void send_twin_get_message(void)
 
   LOG_SUCCESS("Sending twin get request");
   mqtt_publish_message(publish_message.topic, AZ_SPAN_NULL, SAMPLE_PUBLISH_QOS);
+
+  // Formatting for log
+  putchar('\n');
 }
 
 static az_result temperature_controller_get_telemetry_message(sample_pnp_mqtt_message* message)
