@@ -2,10 +2,20 @@
 
 
 ## 1.0.0-preview.4 (Unreleased)
-
+- `az_context`:
+  - `key` and `value` are `const`.
+  - `az_context_with_expiration()` is renamed to `az_context_create_with_expiration()`.
+  - `az_context_with_value()` is renamed to `az_context_create_with_value()`.
+- `az_credential_client_secret_init()` now takes fourth parameter, `authority`.
+- `az_http_policy_retry_options`:
+  - `status_codes` now should be terminated by `AZ_HTTP_STATUS_CODE_END_OF_LIST`.
+  - `max_retries` are now `int32_t` instead of `int16_t`.
+- `az_config.h`:
+  -  `AZ_HTTP_REQUEST_URL_BUF_SIZE` renamed to `AZ_HTTP_REQUEST_URL_BUFFER_SIZE`.
+  - `AZ_HTTP_REQUEST_BODY_BUF_SIZE` renamed to `AZ_HTTP_REQUEST_BODY_BUFFER_SIZE`
+  - `AZ_LOG_MSG_BUF_SIZE` renamed to `AZ_LOG_MESSAGE_BUFFER_SIZE`.
 
 ## 1.0.0-preview.3 (2020-07-20)
-
 - Updated `az_result` values:
   - Rename `az_result` value `AZ_ERROR_PARSER_UNEXPECTED_CHAR` to `AZ_ERROR_UNEXPECTED_CHAR`.
   - Remove unused `az_result` error codes: `AZ_ERROR_JSON_STRING_END`, `AZ_ERROR_JSON_POINTER_TOKEN_END`, and `AZ_ERROR_MUTEX`.
