@@ -31,6 +31,8 @@
  */
 typedef enum
 {
+  AZ_HTTP_STATUS_CODE_NONE = 0,
+
   // 1xx (information) Status Codes:
   AZ_HTTP_STATUS_CODE_CONTINUE = 100,
   AZ_HTTP_STATUS_CODE_SWITCHING_PROTOCOLS = 101,

@@ -123,8 +123,9 @@ typedef struct
  * @param tenant_id An Azure tenant ID.
  * @param client_id An Azure client ID.
  * @param client_secret An Azure client secret.
- * @param authority Authentication authority URL to set. Passing AZ_SPAN_NULL initializes credential
- * with default authority (Azure AD global authority - "https://login.microsoftonline.com/")
+ * @param authority Authentication authority URL to set. Passing #AZ_SPAN_NULL initializes
+ * credential with default authority (Azure AD global authority -
+ * "https://login.microsoftonline.com/")
  *
  * @note non-NULL #authority example: "https://login.microsoftonline.us/".
  * See national clouds' Azure AD authentication endpoints:
