@@ -4,7 +4,7 @@
 #ifndef _az_SPINLOCK_INTERNAL_H
 #define _az_SPINLOCK_INTERNAL_H
 
-#include <azure/core/az_credentials.h>
+#include <azure/core/_az_spinlock.h>
 
 #include <azure/core/_az_cfg_prefix.h>
 
