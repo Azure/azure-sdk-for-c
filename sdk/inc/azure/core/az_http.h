@@ -31,8 +31,6 @@
  */
 typedef enum
 {
-  AZ_HTTP_STATUS_CODE_NONE = 0,
-
   // 1xx (information) Status Codes:
   AZ_HTTP_STATUS_CODE_CONTINUE = 100,
   AZ_HTTP_STATUS_CODE_SWITCHING_PROTOCOLS = 101,
@@ -103,6 +101,9 @@ typedef enum
   AZ_HTTP_STATUS_CODE_LOOP_DETECTED = 508,
   AZ_HTTP_STATUS_CODE_NOT_EXTENDED = 510,
   AZ_HTTP_STATUS_CODE_NETWORK_AUTHENTICATION_REQUIRED = 511,
+
+  // Used in az_http_policy_retry_options to indicate the end of the list
+  AZ_HTTP_STATUS_CODE_END_OF_LIST = -1,
 } az_http_status_code;
 
 /**
