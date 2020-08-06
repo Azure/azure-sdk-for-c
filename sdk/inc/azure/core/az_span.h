@@ -529,20 +529,6 @@ AZ_NODISCARD AZ_INLINE az_pair az_pair_init(az_span key, az_span value)
   return (az_pair){ .key = key, .value = value };
 }
 
-/**
- * @brief Returns an #az_pair with its key and value fields initialized to spans over the specified
- * key and value 0-terminated string parameters.
- *
- * @param[in] key A string representing the key.
- * @param[in] value A string representing the key's value.
- * @return  An #az_pair with the fields initialized to the #az_span instances over the passed-in
- * strings.
- */
-AZ_NODISCARD AZ_INLINE az_pair az_pair_from_str(char* key, char* value)
-{
-  return az_pair_init(az_span_create_from_str(key), az_span_create_from_str(value));
-}
-
 #include <azure/core/_az_cfg_suffix.h>
 
 #endif // _az_SPAN_H
