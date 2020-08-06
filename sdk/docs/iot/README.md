@@ -87,7 +87,7 @@ Feature | Azure SDK for Embedded C | Description
  [DPS - Device Provisioning Service](https://docs.microsoft.com/azure/iot-dps/) | &radic; | This SDK supports connecting your device to the Device Provisioning Service via, for example, [individual enrollment](https://docs.microsoft.com/azure/iot-dps/concepts-service#enrollment) using an [X.509 leaf certificate](https://docs.microsoft.com/azure/iot-dps/concepts-security#leaf-certificate).  
  Protocol | MQTT | The Azure SDK for Embedded C supports only MQTT.  
  Retry Policies | &radic;* | The Azure SDK for Embedded C provides guidelines for retries, but actual retries should be handled by the application.
- [Plug and Play](https://docs.microsoft.com/en-us/azure/iot-pnp/overview-iot-plug-and-play) | &times; | IoT Plug and Play Preview enables solution developers to integrate devices with their solutions without writing any embedded code.
+ [IoT Plug and Play](https://docs.microsoft.com/en-us/azure/iot-pnp/overview-iot-plug-and-play) | &radic; | IoT Plug and Play Preview enables solution developers to integrate devices with their solutions without writing any embedded code.
 
 ## Examples
 
@@ -147,7 +147,7 @@ void my_property_func()
 {
   //Allocate a span to put the properties
   uint8_t property_buffer[64];
-  az_span property_span = az_span_init(property_buffer, sizeof(property_buffer));
+  az_span property_span = az_span_create(property_buffer, sizeof(property_buffer));
   
   //Initialize the property struct with the span
   az_iot_hub_client_properties props;
@@ -292,7 +292,7 @@ void send_telemetry_message()
 void handle_iot_message(mqtt_client_message* msg)
 {
   //Initialize the incoming topic to a span
-  az_span incoming_topic = az_span_init(msg->topic, msg->topic_len);
+  az_span incoming_topic = az_span_create(msg->topic, msg->topic_len);
 
   //The message could be for three features so parse the topic to see which it is for
   az_iot_hub_client_method_request method_request;

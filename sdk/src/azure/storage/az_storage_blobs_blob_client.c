@@ -1,13 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <azure/core/internal/az_config_internal.h>
-#include <azure/core/internal/az_credentials_internal.h>
 #include <azure/core/az_http.h>
-#include <azure/core/internal/az_http_internal.h>
 #include <azure/core/az_http_transport.h>
 #include <azure/core/az_json.h>
 #include <azure/core/az_precondition.h>
+#include <azure/core/internal/az_config_internal.h>
+#include <azure/core/internal/az_credentials_internal.h>
+#include <azure/core/internal/az_http_internal.h>
 #include <azure/core/internal/az_precondition_internal.h>
 #include <azure/core/internal/az_span_internal.h>
 #include <azure/storage/az_storage_blobs.h>
@@ -18,7 +18,7 @@
 
 enum
 {
-  _az_STORAGE_HTTP_REQUEST_HEADER_BUF_SIZE = 10 * sizeof(az_pair),
+  _az_STORAGE_HTTP_REQUEST_HEADER_BUFFER_SIZE = 10 * sizeof(az_pair),
 };
 
 static az_span const AZ_STORAGE_BLOBS_BLOB_HEADER_X_MS_BLOB_TYPE
@@ -41,14 +41,14 @@ AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_o
           .version = AZ_STORAGE_API_VERSION,
         },
       },
-      ._telemetry_options = _az_http_policy_telemetry_options_default(),
+      .telemetry_options = _az_http_policy_telemetry_options_default(),
     },
-    .retry = _az_http_policy_retry_options_default(),
+    .retry_options = _az_http_policy_retry_options_default(),
   };
 
-  options.retry.max_retries = 5;
-  options.retry.retry_delay_msec = 1 * _az_TIME_MILLISECONDS_PER_SECOND;
-  options.retry.max_retry_delay_msec = 30 * _az_TIME_MILLISECONDS_PER_SECOND;
+  options.retry_options.max_retries = 5;
+  options.retry_options.retry_delay_msec = 1 * _az_TIME_MILLISECONDS_PER_SECOND;
+  options.retry_options.max_retry_delay_msec = 30 * _az_TIME_MILLISECONDS_PER_SECOND;
 
   return options;
 }
@@ -81,13 +81,13 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
             {
               ._internal = {
                 .process = az_http_pipeline_policy_telemetry,
-                .options = &client->_internal.options._internal._telemetry_options,
+                .options = &client->_internal.options._internal.telemetry_options,
               },
             },
             {
               ._internal = {
                 .process = az_http_pipeline_policy_retry,
-                .options = &client->_internal.options.retry,
+                .options = &client->_internal.options.retry_options,
               },
             },
             {
@@ -149,18 +149,18 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
 
   // Request buffer
   // create request buffer TODO: define size for a blob upload
-  uint8_t url_buffer[AZ_HTTP_REQUEST_URL_BUF_SIZE];
+  uint8_t url_buffer[AZ_HTTP_REQUEST_URL_BUFFER_SIZE];
   az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
   // copy url from client
   int32_t uri_size = az_span_size(client->_internal.endpoint);
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(request_url_span, uri_size);
   az_span_copy(request_url_span, client->_internal.endpoint);
 
-  uint8_t headers_buffer[_az_STORAGE_HTTP_REQUEST_HEADER_BUF_SIZE];
+  uint8_t headers_buffer[_az_STORAGE_HTTP_REQUEST_HEADER_BUFFER_SIZE];
   az_span request_headers_span = AZ_SPAN_FROM_BUFFER(headers_buffer);
 
   // create request
-  _az_http_request request;
+  az_http_request request;
   AZ_RETURN_IF_FAILED(az_http_request_init(
       &request,
       context,
@@ -175,7 +175,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
       &request, AZ_STORAGE_BLOBS_BLOB_HEADER_X_MS_BLOB_TYPE, AZ_STORAGE_BLOBS_BLOB_TYPE_BLOCKBLOB));
 
   //
-  uint8_t content_length[_az_INT64_AS_STR_BUF_SIZE] = { 0 };
+  uint8_t content_length[_az_INT64_AS_STR_BUFFER_SIZE] = { 0 };
   az_span content_length_span = AZ_SPAN_FROM_BUFFER(content_length);
   az_span remainder;
   AZ_RETURN_IF_FAILED(az_span_i64toa(content_length_span, az_span_size(content), &remainder));

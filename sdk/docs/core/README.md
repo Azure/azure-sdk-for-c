@@ -131,25 +131,25 @@ Also, if you define the `AZ_NO_PRECONDITION_CHECKING` symbol when compiling the 
 
 `Azure Core` provides a rich cancellation mechanism by way of its `az_context` type (defined in the [az_context.h](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/inc/azure/core/az_context.h) file). As your code executes and functions call other functions, a pointer to an `az_context` is passed as an argument through the functions. At any point, a function can create a new `az_context` specifying a parent `az_context` and a timeout period and then, this new `az_context` is passed down to more functions. When a parent `az_context` instance expires or is canceled, all of its children are canceled as well.
 
-There is a special singleton instance of the `az_context` type called `az_context_app`. This instance represents your entire application and this `az_context` instance never expires. It is common to use this instance as the ultimate root of all `az_context` instances. So then, as functions call other functions, these functions can create child `az_context` instances and pass the child down through the call tree. Imagine you have the following `az_context` tree:
+There is a special singleton instance of the `az_context` type called `az_context_application`. This instance represents your entire application and this `az_context` instance never expires. It is common to use this instance as the ultimate root of all `az_context` instances. So then, as functions call other functions, these functions can create child `az_context` instances and pass the child down through the call tree. Imagine you have the following `az_context` tree:
 
-- `az_context_app`; never expires
+- `az_context_application`; never expires
   - `az_context_child`; expires in 10 seconds
     - `az_context_grandchild`; expires in 60 seconds
 
-Any code using `az_context_grandchild` expires in 10 seconds (not 60 seconds) because it has a parent that expires in 10 seconds. In other words, each child can specify its own expiration time but when a parent expires, all its children also expire. While `az_context_app` never expires, your code can explicitly cancel it thereby canceling all the children `az_context` instances. This is a great way to cleanly cancel all operations in your application allowing it to terminate quickly.
+Any code using `az_context_grandchild` expires in 10 seconds (not 60 seconds) because it has a parent that expires in 10 seconds. In other words, each child can specify its own expiration time but when a parent expires, all its children also expire. While `az_context_application` never expires, your code can explicitly cancel it thereby canceling all the children `az_context` instances. This is a great way to cleanly cancel all operations in your application allowing it to terminate quickly.
 
 Note however that cancellation is performed as a best effort; it is not guaranteed to work in a timely fashion. For example, the HTTP stack that you use may not support cancellation. In this case, cancellation will be detected only after the I/O operation completes or before the next I/O operation starts.
 
    ```C
    // Some function creates a child with a 10-second expiration:
-   az_context child = az_context_with_expiration(&az_context_app, 10);
+   az_context child = az_context_create_with_expiration(&az_context_application, 10);
 
    // Some function creates a grandchild with a 60-second expiration:
-   az_context grandchild = az_context_with_expiration(&child, 60);
+   az_context grandchild = az_context_create_with_expiration(&child, 60);
 
    // Some other function (perhaps in response to a SIGINT) cancels the application root:
-   az_context_cancel(&az_context_app);
+   az_context_cancel(&az_context_application);
    // All children are now in the canceled state & the threads will start unwinding
    ```
 

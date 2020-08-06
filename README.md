@@ -203,7 +203,7 @@ The following CMake options are available for adding/removing project features.
 
 ### VSCode
 
-For convenience, you can quickly get started using [VSCode](https://code.visualstudio.com/) and the [CMake Extension by Microsoft](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools&ssr=false#overview). Included in the repo is a `settings.json` file [here](https://github.com/Azure/azure-sdk-for-c/blob/master/.vscode/settings.json) which the extension will use to configure a CMake project. With this, you can run and debug samples and tests. Modify the variables in the file to your liking or as instructed by sample documentation and then select the following button in the extension:
+For convenience, you can quickly get started using [VSCode](https://code.visualstudio.com/) and the [CMake Extension by Microsoft](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools&ssr=false#overview). Included in the repo is a `settings.json` file [here](https://github.com/Azure/azure-sdk-for-c/blob/master/.vscode-config/settings.json) which the extension will use to configure a CMake project. To use it, copy the `settings.json` file from `.vscode-config` to your own `.vscode` directory. With this, you can run and debug samples and tests. Modify the variables in the file to your liking or as instructed by sample documentation and then select the following button in the extension:
 
 ![VSCode CMake Config](./sdk/docs/resources/vscode_cmake_config.png)
 
@@ -433,10 +433,10 @@ The second component is an **HTTP transport adapter**. This is the implementatio
 
 ```c
 AZ_NODISCARD az_result
-az_http_client_send_request(_az_http_request const* request, az_http_response* ref_response);
+az_http_client_send_request(az_http_request const* request, az_http_response* ref_response);
 ```
 
-For example, Azure SDK provides a cmake target `az_curl` (find it [here](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/src/azure/platform/az_curl.c)) with the implementation code for the contract function mentioned before. It uses an `_az_http_request` reference to create an specific `libcurl` request and send it though the wire. Then it uses `libcurl` response to fill the `az_http_response` reference structure.
+For example, Azure SDK provides a cmake target `az_curl` (find it [here](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/src/azure/platform/az_curl.c)) with the implementation code for the contract function mentioned before. It uses an `az_http_request` reference to create an specific `libcurl` request and send it though the wire. Then it uses `libcurl` response to fill the `az_http_response` reference structure.
 
 ### Link your application with your own HTTP stack
 

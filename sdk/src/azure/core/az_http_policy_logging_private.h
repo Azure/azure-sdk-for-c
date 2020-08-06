@@ -11,12 +11,12 @@
 
 #include <azure/core/_az_cfg_prefix.h>
 
-void _az_http_policy_logging_log_http_request(_az_http_request const* request);
+void _az_http_policy_logging_log_http_request(az_http_request const* request);
 
 void _az_http_policy_logging_log_http_response(
     az_http_response const* response,
     int64_t duration_msec,
-    _az_http_request const* request);
+    az_http_request const* request);
 
 #include <azure/core/_az_cfg_suffix.h>
 

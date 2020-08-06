@@ -4,8 +4,8 @@
 #include "az_http_private.h"
 #include <azure/core/az_credentials.h>
 #include <azure/core/az_http.h>
-#include <azure/core/internal/az_http_internal.h>
 #include <azure/core/az_span.h>
+#include <azure/core/internal/az_http_internal.h>
 
 #include <azure/core/_az_cfg.h>
 
@@ -14,7 +14,7 @@ static const az_span AZ_HTTP_HEADER_USER_AGENT = AZ_SPAN_LITERAL_FROM_STR("User-
 AZ_NODISCARD az_result az_http_pipeline_policy_apiversion(
     _az_http_policy* ref_policies,
     void* ref_options,
-    _az_http_request* ref_request,
+    az_http_request* ref_request,
     az_http_response* ref_response)
 {
 
@@ -43,7 +43,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_apiversion(
 AZ_NODISCARD az_result az_http_pipeline_policy_telemetry(
     _az_http_policy* ref_policies,
     void* ref_options,
-    _az_http_request* ref_request,
+    az_http_request* ref_request,
     az_http_response* ref_response)
 {
 
@@ -58,7 +58,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_telemetry(
 AZ_NODISCARD az_result az_http_pipeline_policy_credential(
     _az_http_policy* ref_policies,
     void* ref_options,
-    _az_http_request* ref_request,
+    az_http_request* ref_request,
     az_http_response* ref_response)
 {
   _az_credential* const credential = (_az_credential*)ref_options;
@@ -76,7 +76,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_credential(
 AZ_NODISCARD az_result az_http_pipeline_policy_transport(
     _az_http_policy* ref_policies,
     void* ref_options,
-    _az_http_request* ref_request,
+    az_http_request* ref_request,
     az_http_response* ref_response)
 {
   (void)ref_policies; // this is the last policy in the pipeline, we just void it

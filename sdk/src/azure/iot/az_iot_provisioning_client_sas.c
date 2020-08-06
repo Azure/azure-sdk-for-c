@@ -1,11 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <azure/iot/internal/az_iot_common_internal.h>
-#include <azure/iot/az_iot_provisioning_client.h>
 #include <azure/core/az_precondition.h>
 #include <azure/core/az_span.h>
 #include <azure/core/internal/az_span_internal.h>
+#include <azure/iot/az_iot_provisioning_client.h>
+#include <azure/iot/internal/az_iot_common_internal.h>
 
 #include <azure/core/internal/az_log_internal.h>
 #include <azure/core/internal/az_precondition_internal.h>
@@ -90,7 +90,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_password(
   // Where:
   // resource-string: <scope-id>/registrations/<registration-id>
 
-  az_span mqtt_password_span = az_span_init((uint8_t*)mqtt_password, (int32_t)mqtt_password_size);
+  az_span mqtt_password_span = az_span_create((uint8_t*)mqtt_password, (int32_t)mqtt_password_size);
 
   // SharedAccessSignature
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_password_span, az_span_size(sr_string) + 1 /* EQUAL SIGN */);
