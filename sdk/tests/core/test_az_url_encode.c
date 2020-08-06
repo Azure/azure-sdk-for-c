@@ -3,6 +3,7 @@
 
 #include "az_test_definitions.h"
 #include <azure/core/internal/az_span_internal.h>
+
 #include <az_test_precondition.h>
 
 #include <stdarg.h>
@@ -83,6 +84,10 @@ static void test_url_encode_basic(void** state)
     assert_int_equal(url_length, sizeof("aBc%2Fg") - 1);
     assert_true(az_span_is_content_equal(
         AZ_SPAN_FROM_BUFFER(buf20), AZ_SPAN_FROM_STR("aBc%2Fg*************")));
+  }
+  {
+    int32_t url_length = _az_span_url_encode_calc_length(AZ_SPAN_FROM_STR("aBc/g"));
+    assert_int_equal(url_length, sizeof("aBc%2Fg") - 1);
   }
   {
     // Could've been enough space to encode, but the character needs percent-encoding.

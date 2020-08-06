@@ -4,25 +4,13 @@
 #include <azure/core/az_http.h>
 #include <azure/core/az_http_transport.h>
 #include <azure/core/az_span.h>
+#include <azure/core/internal/az_span_internal.h>
 
 #include <stdlib.h>
 
 #include <curl/curl.h>
 
 #include <azure/core/_az_cfg.h>
-
-/*Copying AZ_CONTRACT on purpose from AZ_CORE because 3rd parties can define this and should not
- * depend on internal CORE headers */
-#define _az_PRECONDITION(condition, error) \
-  do \
-  { \
-    if (!(condition)) \
-    { \
-      return error; \
-    } \
-  } while (0)
-
-#define _az_PRECONDITION_NOT_NULL(arg) _az_PRECONDITION((arg) != NULL, AZ_ERROR_ARG)
 
 static AZ_NODISCARD az_result _az_span_malloc(int32_t size, az_span* out)
 {
@@ -245,12 +233,10 @@ _az_http_client_curl_build_headers(_az_http_request const* request, struct curl_
 static AZ_NODISCARD az_result
 _az_http_client_curl_append_url(az_span writable_buffer, az_span url_from_request)
 {
-  int32_t required_length = az_span_size(url_from_request) + 1;
-
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(writable_buffer, required_length);
-
-  writable_buffer = az_span_copy(writable_buffer, url_from_request);
-  az_span_copy_u8(writable_buffer, 0);
+  int32_t length;
+  AZ_RETURN_IF_FAILED(_az_span_url_encode(writable_buffer, url_from_request, &length));
+  az_span remainder = az_span_slice_to_end(writable_buffer, length);
+  az_span_copy_u8(remainder, 0);
 
   return AZ_OK;
 }
@@ -305,8 +291,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_get_request(CURL* ref_cu
 /**
  * handles DELETE request
  */
-static AZ_NODISCARD az_result
-_az_http_client_curl_send_delete_request(CURL* ref_curl)
+static AZ_NODISCARD az_result _az_http_client_curl_send_delete_request(CURL* ref_curl)
 {
   _az_PRECONDITION_NOT_NULL(ref_curl);
 
@@ -480,7 +465,7 @@ _az_http_client_curl_setup_url(CURL* ref_curl, _az_http_request const* request)
   az_span request_url = { 0 };
   // get request_url. It will have the size of what it has written in it only
   AZ_RETURN_IF_FAILED(az_http_request_get_url(request, &request_url));
-  int32_t request_url_size = az_span_size(request_url);
+  int32_t request_url_size = _az_span_url_encode_calc_length(request_url);
 
   az_span writable_buffer;
   {
