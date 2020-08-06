@@ -210,6 +210,10 @@ jobs:
   - checkout: self
     submodules: recursive
 
+  - template: /eng/common/pipelines/templates/steps/verify-links.yml
+      parameters:
+        Directory: ''
+
   - template: /eng/pipelines/templates/steps/vcpkg.yml
     parameters:
       DependenciesVariableName: vcpkg.deps
