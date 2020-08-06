@@ -97,7 +97,7 @@ static az_result invoke_getMaxMinReport(
       sizeof(incoming_since_value_buffer),
       &incoming_since_value_buffer_len));
   start_time_span
-      = az_span_init((uint8_t*)incoming_since_value_buffer, incoming_since_value_buffer_len);
+      = az_span_create((uint8_t*)incoming_since_value_buffer, incoming_since_value_buffer_len);
 
   // Set the response payload to error if the "since" field was not sent
   if (az_span_ptr(start_time_span) == NULL)
@@ -112,7 +112,7 @@ static az_result invoke_getMaxMinReport(
   time(&rawtime);
   timeinfo = localtime(&rawtime);
   size_t len = strftime(end_time_buffer, sizeof(end_time_buffer), iso_spec_time_format, timeinfo);
-  az_span end_time_span = az_span_init((uint8_t*)end_time_buffer, (int32_t)len);
+  az_span end_time_span = az_span_create((uint8_t*)end_time_buffer, (int32_t)len);
 
   az_json_writer json_builder;
   AZ_RETURN_IF_FAILED(az_json_writer_init(&json_builder, response, NULL));
