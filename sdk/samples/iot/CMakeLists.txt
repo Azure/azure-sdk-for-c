@@ -22,7 +22,7 @@ if(NOT OpenSSL_FOUND)
 endif()
 
 # Azure IoT Samples Library
-add_library (az_iot_samples_common
+add_library (${TARGET_NAME}
   ${CMAKE_CURRENT_LIST_DIR}/sample_sas_utility.c
 )
 
