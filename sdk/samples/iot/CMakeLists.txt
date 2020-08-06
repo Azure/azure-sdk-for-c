@@ -161,6 +161,7 @@ if (MSVC)
     set_target_properties(
         paho_iot_hub_c2d_sample
         paho_iot_hub_methods_sample
+        paho_iot_hub_pnp_component_example
         paho_iot_hub_pnp_sample
         paho_iot_hub_telemetry_sample
         paho_iot_hub_sas_telemetry_sample
