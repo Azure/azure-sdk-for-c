@@ -2,6 +2,7 @@
 
 
 ## 1.0.0-preview.4 (Unreleased)
+
 - API breaking changes:
   - `az_context`:
     - `key` and `value` are `const`.
@@ -18,6 +19,7 @@
     - `AZ_LOG_MSG_BUF_SIZE` renamed to `AZ_LOG_MESSAGE_BUFFER_SIZE`.
 
 ## 1.0.0-preview.3 (2020-07-20)
+
 - Updated `az_result` values:
   - Rename `az_result` value `AZ_ERROR_PARSER_UNEXPECTED_CHAR` to `AZ_ERROR_UNEXPECTED_CHAR`.
   - Remove unused `az_result` error codes: `AZ_ERROR_JSON_STRING_END`, `AZ_ERROR_JSON_POINTER_TOKEN_END`, and `AZ_ERROR_MUTEX`.
