@@ -41,14 +41,14 @@ AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_o
           .version = AZ_STORAGE_API_VERSION,
         },
       },
-      ._telemetry_options = _az_http_policy_telemetry_options_default(),
+      .telemetry_options = _az_http_policy_telemetry_options_default(),
     },
-    .retry = _az_http_policy_retry_options_default(),
+    .retry_options = _az_http_policy_retry_options_default(),
   };
 
-  options.retry.max_retries = 5;
-  options.retry.retry_delay_msec = 1 * _az_TIME_MILLISECONDS_PER_SECOND;
-  options.retry.max_retry_delay_msec = 30 * _az_TIME_MILLISECONDS_PER_SECOND;
+  options.retry_options.max_retries = 5;
+  options.retry_options.retry_delay_msec = 1 * _az_TIME_MILLISECONDS_PER_SECOND;
+  options.retry_options.max_retry_delay_msec = 30 * _az_TIME_MILLISECONDS_PER_SECOND;
 
   return options;
 }
@@ -81,13 +81,13 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
             {
               ._internal = {
                 .process = az_http_pipeline_policy_telemetry,
-                .options = &client->_internal.options._internal._telemetry_options,
+                .options = &client->_internal.options._internal.telemetry_options,
               },
             },
             {
               ._internal = {
                 .process = az_http_pipeline_policy_retry,
-                .options = &client->_internal.options.retry,
+                .options = &client->_internal.options.retry_options,
               },
             },
             {
