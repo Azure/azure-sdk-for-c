@@ -986,6 +986,9 @@ AZ_NODISCARD AZ_INLINE bool _az_span_url_should_encode(uint8_t c)
 AZ_NODISCARD int32_t _az_span_url_encode_calc_length(az_span source)
 {
   _az_PRECONDITION_VALID_SPAN(source, 0, true);
+  // trying to calculate the number of bytes to encode more than INT32_MAX / 3 might overflow an
+  // int32 and return an erroneous number back
+  _az_PRECONDITION_RANGE(0, az_span_size(source), INT32_MAX / 3);
 
   int32_t const source_size = az_span_size(source);
   if (source_size == 0)
@@ -1002,7 +1005,7 @@ AZ_NODISCARD int32_t _az_span_url_encode_calc_length(az_span source)
     if (_az_span_url_should_encode(c))
     {
       // Adding '%' plus 2 digits (minus 1 as original symbol is counted as 1)
-      required_symbols_to_be_added += 2; 
+      required_symbols_to_be_added += 2;
     }
     ++src_idx;
   } while (src_idx < source_size);

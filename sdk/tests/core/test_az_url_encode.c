@@ -374,6 +374,16 @@ static void test_url_encode_preconditions(void** state)
       ASSERT_PRECONDITION_CHECKED(_az_span_url_encode(buffer0, AZ_SPAN_NULL, NULL));
       assert_true(az_span_is_content_equal(AZ_SPAN_FROM_BUFFER(buf1), AZ_SPAN_FROM_STR("*")));
     }
+    {
+      // precondition -> bigger than INT32_MAX / 3
+      az_span simulate_span = { ._internal = { .ptr = NULL, .size = INT32_MAX / 3 + 1 } };
+      ASSERT_PRECONDITION_CHECKED(_az_span_url_encode_calc_length(simulate_span));
+    }
+    {
+      // precondition -> less than 0
+      az_span simulate_span = { ._internal = { .ptr = NULL, .size = -1 } };
+      ASSERT_PRECONDITION_CHECKED(_az_span_url_encode_calc_length(simulate_span));
+    }
   }
 #endif // AZ_NO_PRECONDITION_CHECKING
 }
