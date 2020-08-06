@@ -61,11 +61,7 @@ static az_result visit_component_properties(
       }
 
       property_callback(
-          component_name,
-          &property_name,
-          &(json_reader->token),
-          version,
-          context_ptr);
+          component_name, &property_name, &(json_reader->token), version, context_ptr);
     }
 
     if (json_reader->token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT)
@@ -168,9 +164,7 @@ az_result pnp_get_telemetry_topic(
     }
 
     AZ_RETURN_IF_FAILED(az_iot_hub_client_properties_append(
-        properties,
-        component_telemetry_prop_span,
-        component_name));
+        properties, component_telemetry_prop_span, component_name));
   }
 
   AZ_RETURN_IF_FAILED(az_iot_hub_client_telemetry_get_publish_topic(
@@ -356,12 +350,8 @@ az_result pnp_process_twin_data(
       }
 
       if (json_reader->token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT && sample_components_ptr != NULL
-          && (is_component_in_model(
-                  property_name.slice,
-                  sample_components_ptr,
-                  sample_components_num,
-                  &index)
-              == AZ_OK))
+          && (az_succeeded(is_component_in_model(
+              property_name.slice, sample_components_ptr, sample_components_num, &index))))
       {
         if (az_failed(visit_component_properties(
                 *sample_components_ptr[index],
@@ -377,11 +367,7 @@ az_result pnp_process_twin_data(
       else
       {
         property_callback(
-            AZ_SPAN_NULL,
-            &property_name,
-            &(json_reader->token),
-            version,
-            context_ptr);
+            AZ_SPAN_NULL, &property_name, &(json_reader->token), version, context_ptr);
       }
     }
     else if (json_reader->token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT)

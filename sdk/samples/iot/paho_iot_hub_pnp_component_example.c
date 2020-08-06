@@ -115,6 +115,7 @@ static const az_span working_set_name = AZ_SPAN_LITERAL_FROM_STR("workingSet");
 static int32_t working_set_ram_in_kibibytes;
 static const az_span serial_number_name = AZ_SPAN_LITERAL_FROM_STR("serialNumber");
 static az_span serial_number_value = AZ_SPAN_LITERAL_FROM_STR("ABCDEFG");
+static const az_span property_response_description_failed = AZ_SPAN_LITERAL_FROM_STR("failed");
 
 // ISO8601 Time Format
 static const char iso_spec_time_format[] = "%Y-%m-%dT%H:%M:%S%z";
@@ -448,6 +449,29 @@ static az_result append_string(az_json_writer* json_writer, void* value)
   return az_json_writer_append_string(json_writer, *(az_span*)value);
 }
 
+static az_result append_json_token(az_json_writer* json_writer, void* value)
+{
+  az_json_token value_token = *(az_json_token*)value;
+
+  double value_as_double;
+
+  switch (value_token.kind)
+  {
+    case AZ_JSON_TOKEN_NUMBER:
+      AZ_RETURN_IF_FAILED(az_json_token_get_double(&value_token, &value_as_double));
+      AZ_RETURN_IF_FAILED(
+          az_json_writer_append_double(json_writer, value_as_double, DOUBLE_DECIMAL_PLACE_DIGITS));
+      break;
+    case AZ_JSON_TOKEN_STRING:
+      AZ_RETURN_IF_FAILED(az_json_writer_append_string(json_writer, value_token.slice));
+      break;
+    default:
+      return AZ_ERROR_ITEM_NOT_FOUND;
+  }
+
+  return AZ_OK;
+}
+
 static void send_device_serial_number(void)
 {
   az_result result;
@@ -512,22 +536,44 @@ static void sample_property_callback(
   (void)user_context_callback;
   if (az_span_ptr(component_name) == NULL || az_span_size(component_name) == 0)
   {
-    LOG_ERROR(
-        "Property=%.*s arrived for Control component itself. This does not support\
-                writable properties on it (all properties are on sub-components)",
+    LOG("Property=%.*s arrived for Control component itself. This does not support writable "
+        "properties on it(all properties are on sub - components) ",
         az_span_size(property_name->slice),
         az_span_ptr(property_name->slice));
+
+    az_result err_result;
+    if (az_failed(
+            err_result = pnp_create_reported_property_with_status(
+                publish_message.payload_span,
+                component_name,
+                property_name->slice,
+                append_json_token,
+                (void*)property_value,
+                404,
+                version,
+                property_response_description_failed,
+                &publish_message.out_payload_span)))
+    {
+      LOG_ERROR(
+          "Could not create root component property error payload: error code = 0x%08x", err_result)
+    }
+    else
+    {
+      LOG_SUCCESS("Sending error status for root component property");
+
+      // Send error response to the updated property
+      mqtt_publish_message(
+          publish_message.topic, publish_message.out_payload_span, SAMPLE_PUBLISH_QOS);
+    }
   }
-  else if (
-      sample_pnp_thermostat_process_property_update(
-          &client,
-          &sample_thermostat_1,
-          component_name,
-          property_name,
-          property_value,
-          version,
-          &publish_message)
-      == AZ_OK)
+  else if (az_succeeded(sample_pnp_thermostat_process_property_update(
+               &client,
+               &sample_thermostat_1,
+               component_name,
+               property_name,
+               property_value,
+               version,
+               &publish_message)))
   {
     LOG_SUCCESS("Updated property on thermostat 1");
 
@@ -535,16 +581,14 @@ static void sample_property_callback(
     mqtt_publish_message(
         publish_message.topic, publish_message.out_payload_span, SAMPLE_PUBLISH_QOS);
   }
-  else if (
-      sample_pnp_thermostat_process_property_update(
-          &client,
-          &sample_thermostat_2,
-          component_name,
-          property_name,
-          property_value,
-          version,
-          &publish_message)
-      == AZ_OK)
+  else if (az_succeeded(sample_pnp_thermostat_process_property_update(
+               &client,
+               &sample_thermostat_2,
+               component_name,
+               property_name,
+               property_value,
+               version,
+               &publish_message)))
   {
     LOG_SUCCESS("Updated property on thermostat 2");
 
@@ -667,16 +711,15 @@ static void handle_command_message(
   {
     LOG_ERROR("Failed to parse command name: error code = 0x%08x", result);
   }
-  else if (
-      (result = sample_pnp_thermostat_process_command(
-           &client,
-           &sample_thermostat_1,
-           command_request,
-           component_name,
-           command_name,
-           command_payload,
-           &publish_message))
-      == AZ_OK)
+  else if (az_succeeded(
+               result = sample_pnp_thermostat_process_command(
+                   &client,
+                   &sample_thermostat_1,
+                   command_request,
+                   component_name,
+                   command_name,
+                   command_payload,
+                   &publish_message)))
   {
     LOG_SUCCESS(
         "Successfully executed command %.*s on thermostat 1",
@@ -688,16 +731,15 @@ static void handle_command_message(
 
     LOG_SUCCESS("Sent response");
   }
-  else if (
-      (result = sample_pnp_thermostat_process_command(
-           &client,
-           &sample_thermostat_2,
-           command_request,
-           component_name,
-           command_name,
-           command_payload,
-           &publish_message))
-      == AZ_OK)
+  else if (az_succeeded(
+               result = sample_pnp_thermostat_process_command(
+                   &client,
+                   &sample_thermostat_2,
+                   command_request,
+                   component_name,
+                   command_name,
+                   command_payload,
+                   &publish_message)))
   {
     LOG_SUCCESS(
         "Successfully executed command %.*s on thermostat 2",
@@ -709,10 +751,13 @@ static void handle_command_message(
 
     LOG_SUCCESS("Sent command response");
   }
-  else if (
-      (result = sample_pnp_temp_controller_process_command(
-           command_request, component_name, command_name, command_payload, &publish_message))
-      == AZ_OK)
+  else if (az_succeeded(
+               result = sample_pnp_temp_controller_process_command(
+                   command_request,
+                   component_name,
+                   command_name,
+                   command_payload,
+                   &publish_message)))
   {
     LOG_SUCCESS(
         "Successfully executed command %.*s on controller",
