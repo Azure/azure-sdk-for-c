@@ -5,10 +5,10 @@
 
 - API breaking changes:
   - `az_span.h`:
-    - `az_span_init(...)` is renamed to `az_span_create(...)`
-    - `az_span_from_str(...)` is renamed to `az_span_create_from_str(...)`
-    - `az_allocator_context` is renamed to `az_span_allocator_context`
-    - Removed `az_pair_from_str(...)`
+    - `az_span_init()` is renamed to `az_span_create()`.
+    - `az_span_from_str()` is renamed to `az_span_create_from_str()`.
+    - `az_allocator_context` is renamed to `az_span_allocator_context`.
+    - Removed `az_pair_from_str()`.
   - `az_context`:
     - `key` and `value` are `const`.
     - `az_context_with_expiration()` is renamed to `az_context_create_with_expiration()`.
