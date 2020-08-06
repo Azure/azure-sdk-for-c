@@ -46,7 +46,7 @@ AZ_NODISCARD az_result
 _az_span_url_encode(az_span destination, az_span source, int32_t* out_length);
 
 /**
- * @brief Calculates what would it be the length of \p source #az_span after url-encoding it.
+ * @brief Calculates what would be the length of \p source #az_span after url-encoding it.
  *
  * @param[in] source The #az_span containing the non-URL-encoded bytes.
  * @return The length of source if it would be url-encoded.
