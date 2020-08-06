@@ -29,7 +29,7 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_get_publish_topic(
 
   const az_span* const module_id = &(client->_internal.options.module_id);
 
-  az_span mqtt_topic_span = az_span_init((uint8_t*) mqtt_topic, (int32_t)mqtt_topic_size);
+  az_span mqtt_topic_span = az_span_create((uint8_t*) mqtt_topic, (int32_t)mqtt_topic_size);
   int32_t required_length = az_span_size(telemetry_topic_prefix)
       + az_span_size(client->_internal.device_id) + az_span_size(telemetry_topic_suffix);
   int32_t module_id_length = az_span_size(*module_id);

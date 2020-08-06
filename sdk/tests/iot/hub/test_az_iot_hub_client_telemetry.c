@@ -167,7 +167,7 @@ static void test_az_iot_hub_client_telemetry_get_publish_topic_with_props_unfill
   uint8_t test_prop_unfilled_buf[TEST_SPAN_BUFFER_SIZE];
   memset(test_prop_unfilled_buf, 0xFF, sizeof(test_prop_unfilled_buf));
   az_span test_prop_unfilled_span
-      = az_span_init(test_prop_unfilled_buf, sizeof(test_prop_unfilled_buf));
+      = az_span_create(test_prop_unfilled_buf, sizeof(test_prop_unfilled_buf));
   assert_int_equal(az_iot_hub_client_properties_init(&props, test_prop_unfilled_span, 0), AZ_OK);
   assert_int_equal(
       az_iot_hub_client_properties_append(

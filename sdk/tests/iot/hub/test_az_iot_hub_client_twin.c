@@ -62,7 +62,7 @@ static void test_az_iot_hub_client_twin_document_get_publish_topic_NULL_request_
 
   uint8_t test_bad_request_id_buf[1];
   az_span test_bad_request_id
-      = az_span_init(test_bad_request_id_buf, _az_COUNTOF(test_bad_request_id_buf));
+      = az_span_create(test_bad_request_id_buf, _az_COUNTOF(test_bad_request_id_buf));
   test_bad_request_id._internal.ptr = NULL;
 
   ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_twin_document_get_publish_topic(
@@ -115,7 +115,7 @@ static void test_az_iot_hub_client_twin_patch_get_publish_topic_invalid_request_
 
   uint8_t test_bad_request_id_buf[1];
   az_span test_bad_request_id
-      = az_span_init(test_bad_request_id_buf, _az_COUNTOF(test_bad_request_id_buf));
+      = az_span_create(test_bad_request_id_buf, _az_COUNTOF(test_bad_request_id_buf));
   test_bad_request_id._internal.ptr = NULL;
 
   ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_twin_patch_get_publish_topic(

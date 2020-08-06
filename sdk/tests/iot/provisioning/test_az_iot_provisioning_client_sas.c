@@ -70,7 +70,7 @@ static void az_iot_provisioning_client_sas_get_signature_NULL_signature_span_fai
 static void az_iot_provisioning_client_sas_get_signature_NULL_client_fails()
 {
   uint8_t signature_buffer[TEST_SPAN_BUFFER_SIZE];
-  az_span signature = az_span_init(signature_buffer, _az_COUNTOF(signature_buffer));
+  az_span signature = az_span_create(signature_buffer, _az_COUNTOF(signature_buffer));
 
   ASSERT_PRECONDITION_CHECKED(az_iot_provisioning_client_sas_get_signature(
       NULL, test_sas_expiry_time_secs, signature, &signature));
@@ -260,7 +260,7 @@ static void az_iot_provisioning_client_sas_get_signature_device_signature_overfl
       AZ_OK);
 
   uint8_t signature_buffer[54];
-  az_span signature = az_span_init(signature_buffer, _az_COUNTOF(signature_buffer));
+  az_span signature = az_span_create(signature_buffer, _az_COUNTOF(signature_buffer));
 
   assert_int_equal(
       az_iot_provisioning_client_sas_get_signature(
@@ -299,7 +299,7 @@ static void test_az_iot_provisioning_client_sas_logging_succeed()
       AZ_OK);
 
   uint8_t signature_buffer[TEST_SPAN_BUFFER_SIZE];
-  az_span signature = az_span_init(signature_buffer, _az_COUNTOF(signature_buffer));
+  az_span signature = az_span_create(signature_buffer, _az_COUNTOF(signature_buffer));
   az_span out_signature;
 
   assert_true(az_succeeded(az_iot_provisioning_client_sas_get_signature(

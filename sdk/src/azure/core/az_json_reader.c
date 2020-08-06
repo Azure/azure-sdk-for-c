@@ -254,7 +254,7 @@ AZ_NODISCARD static bool _az_finished_consuming_json_number(
     az_span expected_next_bytes,
     az_result* result)
 {
-  az_span next_byte_span = az_span_init(&next_byte, 1);
+  az_span next_byte_span = az_span_create(&next_byte, 1);
 
   // Checking if we are done processing a JSON number
   int32_t index = az_span_find(json_delimiters, next_byte_span);
@@ -479,7 +479,7 @@ AZ_NODISCARD static az_result _az_json_reader_process_number(az_json_reader* jso
 
   // Checking if we are done processing a JSON number
   next_byte = next_byte_ptr[consumed_count];
-  int32_t index = az_span_find(json_delimiters, az_span_init(&next_byte, 1));
+  int32_t index = az_span_find(json_delimiters, az_span_create(&next_byte, 1));
   if (index == -1)
   {
     return AZ_ERROR_UNEXPECTED_CHAR;

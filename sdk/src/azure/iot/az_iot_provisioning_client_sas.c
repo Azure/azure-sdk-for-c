@@ -90,7 +90,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_password(
   // Where:
   // resource-string: <scope-id>/registrations/<registration-id>
 
-  az_span mqtt_password_span = az_span_init((uint8_t*)mqtt_password, (int32_t)mqtt_password_size);
+  az_span mqtt_password_span = az_span_create((uint8_t*)mqtt_password, (int32_t)mqtt_password_size);
 
   // SharedAccessSignature
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_password_span, az_span_size(sr_string) + 1 /* EQUAL SIGN */);

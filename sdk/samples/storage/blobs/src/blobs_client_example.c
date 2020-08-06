@@ -73,7 +73,7 @@ int main()
   az_storage_blobs_blob_client_options options = az_storage_blobs_blob_client_options_default();
 
   if (az_storage_blobs_blob_client_init(
-          &client, az_span_from_str(getenv(URI_ENV)), AZ_CREDENTIAL_ANONYMOUS, &options)
+          &client, az_span_create_from_str(getenv(URI_ENV)), AZ_CREDENTIAL_ANONYMOUS, &options)
       != AZ_OK)
   {
     printf("\nFailed to init blob client\n");

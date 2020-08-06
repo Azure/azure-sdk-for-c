@@ -58,7 +58,7 @@ az_result sample_base64_decode(az_span base64_encoded, az_span in_span, az_span*
   // Set the output span
   if (read_data > 0)
   {
-    *out_span = az_span_init(az_span_ptr(in_span), (int32_t)read_data);
+    *out_span = az_span_create(az_span_ptr(in_span), (int32_t)read_data);
     result = AZ_OK;
   }
   else
@@ -127,7 +127,7 @@ az_result sample_base64_encode(az_span bytes, az_span in_span, az_span* out_span
   {
     // Copy the bytes to the output and initialize output span
     memcpy(az_span_ptr(in_span), encoded_mem_ptr->data, encoded_mem_ptr->length);
-    *out_span = az_span_init(az_span_ptr(in_span), (int32_t)encoded_mem_ptr->length);
+    *out_span = az_span_create(az_span_ptr(in_span), (int32_t)encoded_mem_ptr->length);
 
     result = AZ_OK;
   }
@@ -159,7 +159,7 @@ az_result sample_hmac_sha256_sign(az_span key, az_span bytes, az_span in_span, a
 
   if (hmac != NULL)
   {
-    *out_span = az_span_init(az_span_ptr(in_span), (int32_t)hmac_encode_len);
+    *out_span = az_span_create(az_span_ptr(in_span), (int32_t)hmac_encode_len);
     result = AZ_OK;
   }
   else

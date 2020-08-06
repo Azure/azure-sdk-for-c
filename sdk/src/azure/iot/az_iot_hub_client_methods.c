@@ -86,7 +86,7 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_response_get_publish_topic(
 
   (void)client;
 
-  az_span mqtt_topic_span = az_span_init((uint8_t*)mqtt_topic, (int32_t)mqtt_topic_size);
+  az_span mqtt_topic_span = az_span_create((uint8_t*)mqtt_topic, (int32_t)mqtt_topic_size);
   int32_t required_length = az_span_size(methods_topic_prefix)
       + az_span_size(methods_response_topic_result) + _az_iot_u32toa_size(status)
       + az_span_size(methods_response_topic_properties) + az_span_size(request_id);

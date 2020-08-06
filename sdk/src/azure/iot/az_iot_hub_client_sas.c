@@ -93,7 +93,7 @@ AZ_NODISCARD az_result az_iot_hub_client_sas_get_password(
   // Concatenates: "SharedAccessSignature sr=" scope "&sig=" sig  "&se=" expiration_time_secs
   //               plus, if key_name size > 0, "&skn=" key_name
 
-  az_span mqtt_password_span = az_span_init((uint8_t*)mqtt_password, (int32_t)mqtt_password_size);
+  az_span mqtt_password_span = az_span_create((uint8_t*)mqtt_password, (int32_t)mqtt_password_size);
 
   // SharedAccessSignature
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_password_span, az_span_size(sr_string) + 1 /* EQUAL_SIGN */);

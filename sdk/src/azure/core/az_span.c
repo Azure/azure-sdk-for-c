@@ -23,7 +23,7 @@
 #ifndef AZ_NO_PRECONDITION_CHECKING
 // Note: If you are modifying this method, make sure to modify the inline version in the az_span.h
 // file as well.
-AZ_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t size)
+AZ_NODISCARD az_span az_span_create(uint8_t* ptr, int32_t size)
 {
   // If ptr is not null, then:
   //   size >= 0
@@ -35,7 +35,7 @@ AZ_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t size)
 }
 #endif // AZ_NO_PRECONDITION_CHECKING
 
-AZ_NODISCARD az_span az_span_from_str(char* str)
+AZ_NODISCARD az_span az_span_create_from_str(char* str)
 {
   _az_PRECONDITION_NOT_NULL(str);
 
@@ -49,7 +49,7 @@ AZ_NODISCARD az_span az_span_from_str(char* str)
 
   _az_PRECONDITION(length >= 0);
 
-  return az_span_init((uint8_t*)str, length);
+  return az_span_create((uint8_t*)str, length);
 }
 
 AZ_NODISCARD az_span az_span_slice(az_span span, int32_t start_index, int32_t end_index)
@@ -63,7 +63,7 @@ AZ_NODISCARD az_span az_span_slice(az_span span, int32_t start_index, int32_t en
   _az_PRECONDITION_RANGE(0, end_index, az_span_size(span));
   _az_PRECONDITION((uint32_t)start_index <= (uint32_t)end_index);
 
-  return az_span_init(az_span_ptr(span) + start_index, end_index - start_index);
+  return az_span_create(az_span_ptr(span) + start_index, end_index - start_index);
 }
 
 AZ_NODISCARD az_span az_span_slice_to_end(az_span span, int32_t start_index)
@@ -513,7 +513,7 @@ az_span az_span_copy_u8(az_span destination, uint8_t byte)
 
   uint8_t* dst_ptr = az_span_ptr(destination);
   dst_ptr[0] = byte;
-  return az_span_init(dst_ptr + 1, dest_size - 1);
+  return az_span_create(dst_ptr + 1, dest_size - 1);
 }
 
 void az_span_to_str(char* destination, int32_t destination_max_size, az_span source)

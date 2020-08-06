@@ -339,7 +339,7 @@ static void test_az_iot_hub_client_methods_parse_received_topic_topic_filter_fai
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
 
-  az_span received_topic = az_span_init(
+  az_span received_topic = az_span_create(
       g_expected_methods_subscribe_topic, _az_COUNTOF(g_expected_methods_subscribe_topic));
 
   az_iot_hub_client_method_request out_request;

@@ -64,12 +64,12 @@ AZ_NODISCARD AZ_INLINE int32_t az_span_size(az_span span) { return span._interna
 // Note: If you are modifying this method, make sure to modify the non-inline version in the
 // az_span.c file as well, and the _az_ version right below.
 #ifdef AZ_NO_PRECONDITION_CHECKING
-AZ_NODISCARD AZ_INLINE az_span az_span_init(uint8_t* ptr, int32_t size)
+AZ_NODISCARD AZ_INLINE az_span az_span_create(uint8_t* ptr, int32_t size)
 {
   return (az_span){ ._internal = { .ptr = ptr, .size = size } };
 }
 #else
-AZ_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t size);
+AZ_NODISCARD az_span az_span_create(uint8_t* ptr, int32_t size);
 #endif // AZ_NO_PRECONDITION_CHECKING
 
 /**
@@ -144,7 +144,7 @@ AZ_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t size);
  */
 // Force a division by 0 that gets detected by compilers for anything that isn't a byte array.
 #define AZ_SPAN_FROM_BUFFER(BYTE_BUFFER) \
-  az_span_init( \
+  az_span_create( \
       (uint8_t*)BYTE_BUFFER, (sizeof(BYTE_BUFFER) / (_az_IS_BYTE_ARRAY(BYTE_BUFFER) ? 1 : 0)))
 
 /**
@@ -154,7 +154,7 @@ AZ_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t size);
  * @return An #az_span over the byte buffer where the size is set to the string's length not
  * including the \0 terminator.
  */
-AZ_NODISCARD az_span az_span_from_str(char* str);
+AZ_NODISCARD az_span az_span_create_from_str(char* str);
 
 /******************************  SPAN MANIPULATION */
 
@@ -459,15 +459,15 @@ az_span_dtoa(az_span destination, double source, int32_t fractional_digits, az_s
  */
 typedef struct
 {
+  void* user_context; ///< Any struct that was provided by the user for their specific
+                      ///< implementation, passed through to the #az_span_allocator_fn.
   int32_t bytes_used; ///< The amount of space consumed (i.e. written into) within the previously
                       ///< provided destination, which can be used to infer the remaining number of
                       ///< bytes of the #az_span that are leftover.
   int32_t minimum_required_size; ///< The minimum length of the destination #az_span required to be
                                  ///< provided by the callback. If 0, any non-empty sized buffer
                                  ///< must be returned.
-  void* user_context; ///< Any struct or set of fields that are provided by the user for their
-                      ///< specific implementation, passed through to the #az_span_allocator_fn.
-} az_allocator_context;
+} az_span_allocator_context;
 
 /**
  * @brief Defines the signature of the callback function that the caller must implement to provide
@@ -488,8 +488,9 @@ typedef struct
  * @remarks The caller must check the return value using #az_succeeded() before continuing to use
  * the \p out_next_destination.
  */
-typedef az_result (
-    *az_span_allocator_fn)(az_allocator_context* allocator_context, az_span* out_next_destination);
+typedef az_result (*az_span_allocator_fn)(
+    az_span_allocator_context* allocator_context,
+    az_span* out_next_destination);
 
 /******************************  SPAN PAIR  */
 
@@ -539,7 +540,7 @@ AZ_NODISCARD AZ_INLINE az_pair az_pair_init(az_span key, az_span value)
  */
 AZ_NODISCARD AZ_INLINE az_pair az_pair_from_str(char* key, char* value)
 {
-  return az_pair_init(az_span_from_str(key), az_span_from_str(value));
+  return az_pair_init(az_span_create_from_str(key), az_span_create_from_str(value));
 }
 
 #include <azure/core/_az_cfg_suffix.h>

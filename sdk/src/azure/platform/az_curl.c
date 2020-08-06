@@ -33,7 +33,7 @@ static AZ_NODISCARD az_result _az_span_malloc(int32_t size, az_span* out)
   {
     return AZ_ERROR_OUT_OF_MEMORY;
   }
-  *out = az_span_init(p, size);
+  *out = az_span_create(p, size);
   return AZ_OK;
 }
 
@@ -275,7 +275,7 @@ static size_t _az_http_client_curl_write_to_span(
   size_t const expected_size = size * nmemb;
   az_http_response* response = (az_http_response*)userp;
 
-  az_span const span_for_content = az_span_init((uint8_t*)contents, (int32_t)expected_size);
+  az_span const span_for_content = az_span_create((uint8_t*)contents, (int32_t)expected_size);
 
   az_result write_response_result = az_http_response_append(response, span_for_content);
 
