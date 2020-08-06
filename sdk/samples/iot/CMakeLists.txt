@@ -5,8 +5,6 @@ if (TRANSPORT_PAHO)
 
 cmake_minimum_required (VERSION 3.10)
 
-set(TARGET_NAME "az_iot_samples_common")
-
 project (az_iot_samples LANGUAGES C)
 
 set(CMAKE_C_STANDARD 99)
@@ -22,34 +20,34 @@ if(NOT OpenSSL_FOUND)
 endif()
 
 # Azure IoT Samples Library
-add_library (${TARGET_NAME}
+add_library (az_iot_samples_common
   ${CMAKE_CURRENT_LIST_DIR}/sample_sas_utility.c
 )
 
 # Workaround for linker warning LNK4098: defaultlib 'LIBCMTD' conflicts with use of other libs
 if (MSVC)
-    set_target_properties(${TARGET_NAME}
+    set_target_properties(az_iot_samples_common
         PROPERTIES LINK_FLAGS
         "/NODEFAULTLIB:libcmtd.lib"
     )
 endif()
 
 # Internal deps
-target_link_libraries(${TARGET_NAME}
+target_link_libraries(az_iot_samples_common
   PUBLIC
     az::iot::hub
     az::iot::provisioning
 )
 
 # External deps
-target_link_libraries(${TARGET_NAME}
+target_link_libraries(az_iot_samples_common
   PUBLIC
     eclipse-paho-mqtt-c::paho-mqtt3cs-static
     OpenSSL::SSL
     OpenSSL::Crypto
 )
 
-add_library (az::iot::samples::common ALIAS ${TARGET_NAME})
+add_library (az::iot::samples::common ALIAS az_iot_samples_common)
 
 # Azure IoT Samples Executables
 
