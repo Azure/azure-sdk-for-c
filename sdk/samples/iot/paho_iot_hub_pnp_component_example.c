@@ -529,7 +529,7 @@ static void send_device_info(void)
 static void sample_property_callback(
     az_span component_name,
     az_json_token* property_name,
-    az_json_token* property_value,
+    az_json_reader* property_value,
     int32_t version,
     void* user_context_callback)
 {

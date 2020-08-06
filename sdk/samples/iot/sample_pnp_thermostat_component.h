@@ -45,7 +45,7 @@ az_result sample_pnp_thermostat_process_property_update(
     sample_pnp_thermostat_component* handle,
     az_span component_name,
     az_json_token* property_name,
-    az_json_token* property_value,
+    az_json_reader* property_value,
     int32_t version,
     sample_pnp_mqtt_message* mqtt_message);
 

@@ -16,16 +16,19 @@
 #define PNP_STATUS_NOT_FOUND 404
 #define PNP_STATUS_INTERNAL_ERROR 500
 
+/**
+ * @brief Callback which is called for each property found by the #pnp_process_twin_data()
+ * API.
+ */
 typedef void (*pnp_property_callback)(
     az_span component_name,
     az_json_token* property_name,
-    az_json_token* property_value,
+    az_json_reader* property_value,
     int32_t version,
     void* user_context_callback);
 
 /**
- * @brief Callback which is called for each property found by the #pnp_process_twin_data()
- * API.
+ * @brief Callback which is invoked to append user properties to a payload.
  */
 typedef az_result (*pnp_append_property_callback)(az_json_writer* json_writer, void* context);
 
