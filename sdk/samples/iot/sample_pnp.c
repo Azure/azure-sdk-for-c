@@ -36,7 +36,6 @@ static az_result visit_component_properties(
     pnp_property_callback property_callback,
     void* context_ptr)
 {
-  az_json_reader copy_json_reader;
   while (az_succeeded(az_json_reader_next_token(json_reader)))
   {
     if (json_reader->token.kind == AZ_JSON_TOKEN_PROPERTY_NAME)
@@ -61,8 +60,7 @@ static az_result visit_component_properties(
         return AZ_ERROR_UNEXPECTED_CHAR;
       }
 
-      copy_json_reader = *json_reader;
-      property_callback(component_name, &property_name, &copy_json_reader, version, context_ptr);
+      property_callback(component_name, &property_name, *json_reader, version, context_ptr);
     }
 
     if (json_reader->token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT)
@@ -367,7 +365,7 @@ az_result pnp_process_twin_data(
       }
       else
       {
-        property_callback(AZ_SPAN_NULL, &property_name, json_reader, version, context_ptr);
+        property_callback(AZ_SPAN_NULL, &property_name, *json_reader, version, context_ptr);
       }
     }
     else if (json_reader->token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT)

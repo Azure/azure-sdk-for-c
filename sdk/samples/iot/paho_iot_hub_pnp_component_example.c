@@ -534,7 +534,7 @@ static void send_device_info(void)
 static void sample_property_callback(
     az_span component_name,
     az_json_token* property_name,
-    az_json_reader* property_value,
+    az_json_reader property_value,
     int32_t version,
     void* user_context_callback)
 {
@@ -553,7 +553,7 @@ static void sample_property_callback(
                 component_name,
                 property_name->slice,
                 append_json_token,
-                (void*)property_value,
+                (void*)&property_value,
                 404,
                 version,
                 property_response_description_failed,
@@ -576,7 +576,7 @@ static void sample_property_callback(
                &sample_thermostat_1,
                component_name,
                property_name,
-               property_value,
+               &property_value,
                version,
                &publish_message)))
   {
@@ -591,7 +591,7 @@ static void sample_property_callback(
                &sample_thermostat_2,
                component_name,
                property_name,
-               property_value,
+               &property_value,
                version,
                &publish_message)))
   {
