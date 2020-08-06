@@ -9,7 +9,7 @@
 
 AZ_NODISCARD az_result az_http_pipeline_process(
     _az_http_pipeline* ref_pipeline,
-    _az_http_request* ref_request,
+    az_http_request* ref_request,
     az_http_response* ref_response)
 {
   _az_PRECONDITION_NOT_NULL(ref_request);

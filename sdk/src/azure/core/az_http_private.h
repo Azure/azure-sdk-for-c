@@ -7,8 +7,8 @@
 #include <azure/core/az_http.h>
 #include <azure/core/az_http_transport.h>
 #include <azure/core/az_precondition.h>
-#include <azure/core/internal/az_precondition_internal.h>
 #include <azure/core/az_span.h>
+#include <azure/core/internal/az_precondition_internal.h>
 
 #include <stdbool.h>
 
@@ -25,7 +25,7 @@
  *   - *`AZ_ERROR_ARG`* `ref_request` is _NULL_.
  */
 AZ_NODISCARD AZ_INLINE az_result
-_az_http_request_mark_retry_headers_start(_az_http_request* ref_request)
+_az_http_request_mark_retry_headers_start(az_http_request* ref_request)
 {
   _az_PRECONDITION_NOT_NULL(ref_request);
   ref_request->_internal.retry_headers_start_byte_offset
@@ -33,8 +33,7 @@ _az_http_request_mark_retry_headers_start(_az_http_request* ref_request)
   return AZ_OK;
 }
 
-AZ_NODISCARD AZ_INLINE az_result
-_az_http_request_remove_retry_headers(_az_http_request* ref_request)
+AZ_NODISCARD AZ_INLINE az_result _az_http_request_remove_retry_headers(az_http_request* ref_request)
 {
   _az_PRECONDITION_NOT_NULL(ref_request);
   ref_request->_internal.headers_length

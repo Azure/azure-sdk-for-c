@@ -126,7 +126,7 @@ AZ_NODISCARD static az_result _az_parse_json_payload(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result _az_aad_request_token(_az_http_request* request, _az_token* out_token)
+AZ_NODISCARD az_result _az_aad_request_token(az_http_request* request, _az_token* out_token)
 {
   AZ_RETURN_IF_FAILED(az_http_request_append_header(
       request,

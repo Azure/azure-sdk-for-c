@@ -3,9 +3,9 @@
 
 #include "az_test_definitions.h"
 #include <azure/core/az_http.h>
-#include <azure/core/internal/az_http_internal.h>
 #include <azure/core/az_http_transport.h>
 #include <azure/core/az_span.h>
+#include <azure/core/internal/az_http_internal.h>
 
 #include <setjmp.h>
 #include <stdarg.h>
@@ -18,13 +18,13 @@
 az_result test_policy_1(
     _az_http_policy* ref_policies,
     void* ref_options,
-    _az_http_request* ref_request,
+    az_http_request* ref_request,
     az_http_response* ref_response);
 
 az_result test_policy_2(
     _az_http_policy* ref_policies,
     void* ref_options,
-    _az_http_request* ref_request,
+    az_http_request* ref_request,
     az_http_response* ref_response);
 
 void test_az_http_pipeline_process();
@@ -47,7 +47,7 @@ void test_az_http_pipeline_process()
   az_span remainder = az_span_copy(url_span, AZ_SPAN_FROM_STR("url"));
   assert_int_equal(az_span_size(remainder), 97);
   az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-  _az_http_request request;
+  az_http_request request;
 
   assert_return_code(
       az_http_request_init(
@@ -84,7 +84,7 @@ void test_az_http_pipeline_process()
 az_result test_policy_1(
     _az_http_policy* ref_policies,
     void* ref_options,
-    _az_http_request* ref_request,
+    az_http_request* ref_request,
     az_http_response* ref_response)
 {
   (void)ref_policies;
@@ -97,7 +97,7 @@ az_result test_policy_1(
 az_result test_policy_2(
     _az_http_policy* ref_policies,
     void* ref_options,
-    _az_http_request* ref_request,
+    az_http_request* ref_request,
     az_http_response* ref_response)
 {
   (void)ref_policies;
