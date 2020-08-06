@@ -4,9 +4,12 @@
 #ifndef _az_TEST_PRECONDITION_H
 #define _az_TEST_PRECONDITION_H
 
-#include <assert.h>
+// These headers must be included prior to including cmocka.h.
 #include <setjmp.h>
 #include <stdarg.h>
+#include <stddef.h>
+
+#include <assert.h>
 #include <stdint.h>
 
 #include <cmocka.h>
