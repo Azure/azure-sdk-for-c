@@ -38,7 +38,7 @@ static AZ_NODISCARD az_result _az_credential_client_secret_request_token(
       &body));
 
   uint8_t header_buf[_az_AAD_REQUEST_HEADER_BUFFER_SIZE];
-  _az_http_request request = { 0 };
+  az_http_request request = { 0 };
   AZ_RETURN_IF_FAILED(az_http_request_init(
       &request,
       context,
