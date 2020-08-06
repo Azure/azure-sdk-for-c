@@ -133,7 +133,7 @@ AZ_NODISCARD az_result _az_aad_request_token(az_http_request* request, _az_token
       AZ_SPAN_FROM_STR("Content-Type"),
       AZ_SPAN_FROM_STR("application/x-www-form-urlencoded")));
 
-  uint8_t response_buf[_az_AAD_RESPONSE_BUF_SIZE] = { 0 };
+  uint8_t response_buf[_az_AAD_RESPONSE_BUFFER_SIZE] = { 0 };
   az_http_response response = { 0 };
   AZ_RETURN_IF_FAILED(az_http_response_init(&response, AZ_SPAN_FROM_BUFFER(response_buf)));
 

@@ -56,7 +56,7 @@ typedef struct
   struct
   {
     // buffer to copy customer url. Then it stays immutable
-    uint8_t endpoint_buffer[AZ_HTTP_REQUEST_URL_BUF_SIZE];
+    uint8_t endpoint_buffer[AZ_HTTP_REQUEST_URL_BUFFER_SIZE];
     // this url will point to endpoint_buffer
     az_span endpoint;
     _az_http_pipeline pipeline;
