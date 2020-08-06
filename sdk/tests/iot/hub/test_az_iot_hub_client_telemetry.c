@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 #include "test_az_iot_hub_client.h"
-#include <azure/iot/az_iot_hub_client.h>
 #include <az_test_span.h>
+#include <azure/iot/az_iot_hub_client.h>
 
 #include <azure/core/az_precondition.h>
 #include <azure/core/internal/az_precondition_internal.h>
@@ -75,8 +75,8 @@ static void test_az_iot_hub_client_telemetry_get_publish_topic_NULL_out_mqtt_top
   char test_buf[TEST_SPAN_BUFFER_SIZE];
   size_t test_length;
 
-  ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_telemetry_get_publish_topic(
-      &client, NULL, test_buf, 0, &test_length));
+  ASSERT_PRECONDITION_CHECKED(
+      az_iot_hub_client_telemetry_get_publish_topic(&client, NULL, test_buf, 0, &test_length));
 }
 
 #endif // AZ_NO_PRECONDITION_CHECKING
@@ -162,12 +162,12 @@ static void test_az_iot_hub_client_telemetry_get_publish_topic_with_props_unfill
   assert_int_equal(
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL), AZ_OK);
 
-  //Create unfilled property span
+  // Create unfilled property span
   az_iot_hub_client_properties props;
   uint8_t test_prop_unfilled_buf[TEST_SPAN_BUFFER_SIZE];
   memset(test_prop_unfilled_buf, 0xFF, sizeof(test_prop_unfilled_buf));
   az_span test_prop_unfilled_span
-      = az_span_init(test_prop_unfilled_buf, sizeof(test_prop_unfilled_buf));
+      = az_span_create(test_prop_unfilled_buf, sizeof(test_prop_unfilled_buf));
   assert_int_equal(az_iot_hub_client_properties_init(&props, test_prop_unfilled_span, 0), AZ_OK);
   assert_int_equal(
       az_iot_hub_client_properties_append(

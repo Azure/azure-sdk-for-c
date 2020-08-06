@@ -184,7 +184,7 @@ int main(void)
     printf("Insufficient buffer size for program start time.\n");
     return -1;
   }
-  boot_time_span = az_span_init((uint8_t*)boot_time_str, (int32_t)len);
+  boot_time_span = az_span_create((uint8_t*)boot_time_str, (int32_t)len);
 
   // Read in the necessary environment variables and initialize the az_iot_hub_client
   if (az_failed(rc = read_configuration_and_init_client()))
@@ -290,7 +290,7 @@ static az_result read_configuration_entry(
   if (env_value != NULL)
   {
     printf("%s\n", hide_value ? "***" : env_value);
-    az_span env_span = az_span_from_str(env_value);
+    az_span env_span = az_span_create_from_str(env_value);
     AZ_RETURN_IF_NOT_ENOUGH_SIZE(buffer, az_span_size(env_span));
     az_span_copy(buffer, env_span);
     *out_value = az_span_slice(buffer, 0, az_span_size(env_span));
@@ -339,7 +339,7 @@ static az_result create_mqtt_endpoint(char* destination, int32_t destination_siz
     return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
   }
 
-  az_span destination_span = az_span_init((uint8_t*)destination, destination_size);
+  az_span destination_span = az_span_create((uint8_t*)destination, destination_size);
   az_span remainder = az_span_copy(destination_span, mqtt_url_prefix);
   remainder = az_span_copy(remainder, az_span_slice(iot_hub, 0, iot_hub_length));
   remainder = az_span_copy(remainder, mqtt_url_suffix);
@@ -424,7 +424,7 @@ static az_result invoke_getMaxMinReport(az_span payload, az_span response, az_sp
   int32_t incoming_since_value_len;
   AZ_RETURN_IF_FAILED(az_json_token_get_string(
       &jp.token, incoming_since_value, sizeof(incoming_since_value), &incoming_since_value_len));
-  start_time_span = az_span_init((uint8_t*)incoming_since_value, incoming_since_value_len);
+  start_time_span = az_span_create((uint8_t*)incoming_since_value, incoming_since_value_len);
 
   // Set the response payload to error if the "since" field was not sent
   if (az_span_ptr(start_time_span) == NULL)
@@ -439,7 +439,7 @@ static az_result invoke_getMaxMinReport(az_span payload, az_span response, az_sp
   time(&rawtime);
   timeinfo = localtime(&rawtime);
   size_t len = strftime(end_time_buffer, sizeof(end_time_buffer), iso_spec_time_format, timeinfo);
-  az_span end_time_span = az_span_init((uint8_t*)end_time_buffer, (int32_t)len);
+  az_span end_time_span = az_span_create((uint8_t*)end_time_buffer, (int32_t)len);
 
   az_json_writer json_builder;
   AZ_RETURN_IF_FAILED(az_json_writer_init(&json_builder, response, NULL));
@@ -723,7 +723,7 @@ static void handle_twin_message(
   double desired_temp;
   int32_t version_num;
   az_span twin_payload_span
-      = az_span_init((uint8_t*)message->payload, (int32_t)message->payloadlen);
+      = az_span_create((uint8_t*)message->payload, (int32_t)message->payloadlen);
   // Determine what type of incoming twin message this is. Print relevant data for the message.
   switch (twin_response->response_type)
   {
@@ -787,7 +787,7 @@ static void handle_command_message(
   {
     az_span command_response_span = AZ_SPAN_FROM_BUFFER(commands_response_payload);
     az_span command_response_payload_span
-        = az_span_init((uint8_t*)message->payload, (int32_t)message->payloadlen);
+        = az_span_create((uint8_t*)message->payload, (int32_t)message->payloadlen);
 
     // Invoke command
     uint16_t return_code;
@@ -837,7 +837,7 @@ static int on_received(char* topicName, int topicLen, MQTTClient_message* messag
 
   printf("Topic: %s\n", topicName);
 
-  az_span topic_span = az_span_init((uint8_t*)topicName, topicLen);
+  az_span topic_span = az_span_create((uint8_t*)topicName, topicLen);
 
   // Parse the incoming message topic and check which feature it is for
   az_iot_hub_client_twin_response twin_response;
@@ -852,7 +852,7 @@ static int on_received(char* topicName, int topicLen, MQTTClient_message* messag
     handle_twin_message(message, &twin_response);
   }
   else if (az_succeeded(az_iot_hub_client_methods_parse_received_topic(
-               &client, az_span_init((uint8_t*)topicName, topicLen), &command_request)))
+               &client, az_span_create((uint8_t*)topicName, topicLen), &command_request)))
   {
     printf("Command arrived\n");
 
@@ -1011,7 +1011,7 @@ static int send_telemetry_message(void)
 static az_span get_request_id(void)
 {
   az_span remainder;
-  az_span out_span = az_span_init((uint8_t*)request_id_buf, sizeof(request_id_buf));
+  az_span out_span = az_span_create((uint8_t*)request_id_buf, sizeof(request_id_buf));
   az_result result = az_span_i32toa(out_span, request_id_int++, &remainder);
   (void)remainder;
   (void)result;

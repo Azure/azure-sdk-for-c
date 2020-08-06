@@ -69,9 +69,11 @@ static AZ_NODISCARD az_span _get_remaining_span(az_json_writer* json_writer, int
 
   if (az_span_size(remaining) < required_size && json_writer->_internal.allocator_callback != NULL)
   {
-    az_allocator_context context = { .bytes_used = json_writer->_internal.bytes_written,
-                                     .minimum_required_size = required_size,
-                                     .user_context = json_writer->_internal.user_context };
+    az_span_allocator_context context = {
+      .user_context = json_writer->_internal.user_context,
+      .bytes_used = json_writer->_internal.bytes_written,
+      .minimum_required_size = required_size,
+    };
 
     // No more space left in the destination, let the caller fail with
     // AZ_ERROR_INSUFFICIENT_SPAN_SIZE

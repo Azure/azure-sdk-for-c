@@ -192,7 +192,7 @@ int main(void)
     LOG_ERROR("Insufficient buffer size for program start time.");
     exit(-1);
   }
-  start_time_span = az_span_init((uint8_t*)start_time_str, (int32_t)len);
+  start_time_span = az_span_create((uint8_t*)start_time_str, (int32_t)len);
 
   // Read in the necessary environment variables and initialize the az_iot_hub_client
   if (az_failed(rc = read_configuration_and_init_client()))
@@ -332,7 +332,7 @@ static az_result read_configuration_entry(
   if (env_value != NULL)
   {
     LOG_SUCCESS("%s = %s", env_name, hide_value ? "***" : env_value);
-    az_span env_span = az_span_from_str(env_value);
+    az_span env_span = az_span_create_from_str(env_value);
     AZ_RETURN_IF_NOT_ENOUGH_SIZE(buffer, az_span_size(env_span));
     az_span_copy(buffer, env_span);
     *out_value = az_span_slice(buffer, 0, az_span_size(env_span));
@@ -401,7 +401,7 @@ static az_result create_mqtt_endpoint(char* destination, int32_t destination_siz
     return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
   }
 
-  az_span destination_span = az_span_init((uint8_t*)destination, destination_size);
+  az_span destination_span = az_span_create((uint8_t*)destination, destination_size);
   az_span remainder = az_span_copy(destination_span, mqtt_url_prefix);
   remainder = az_span_copy(remainder, az_span_slice(iot_hub, 0, az_span_size(iot_hub)));
   remainder = az_span_copy(remainder, mqtt_url_suffix);
@@ -468,7 +468,7 @@ static az_result append_json_token(az_json_writer* json_writer, void* value)
       AZ_RETURN_IF_FAILED(az_json_token_get_string(
           &value_token, property_scratch_buffer, sizeof(property_scratch_buffer), &string_length));
       AZ_RETURN_IF_FAILED(az_json_writer_append_string(
-          json_writer, az_span_init((uint8_t*)property_scratch_buffer, string_length)));
+          json_writer, az_span_create((uint8_t*)property_scratch_buffer, string_length)));
       break;
     default:
       return AZ_ERROR_ITEM_NOT_FOUND;
@@ -620,7 +620,7 @@ static void handle_twin_message(
   if (message->payloadlen)
   {
     LOG_SUCCESS("Payload: %.*s", message->payloadlen, (char*)message->payload);
-    twin_payload_span = az_span_init((uint8_t*)message->payload, (int32_t)message->payloadlen);
+    twin_payload_span = az_span_create((uint8_t*)message->payload, (int32_t)message->payloadlen);
     if (az_failed(result = az_json_reader_init(&json_reader, twin_payload_span, NULL)))
     {
       LOG_ERROR("Could not initialize JSON reader");
@@ -708,7 +708,7 @@ static void handle_command_message(
 
   (void)message;
 
-  az_span command_payload = az_span_init(message->payload, message->payloadlen);
+  az_span command_payload = az_span_create(message->payload, message->payloadlen);
   az_span component_name;
   az_span command_name;
   if (az_failed(
@@ -812,7 +812,7 @@ static int on_received(char* topicName, int topicLen, MQTTClient_message* messag
 
   LOG_SUCCESS("Topic: %s", topicName);
 
-  az_span topic_span = az_span_init((uint8_t*)topicName, topicLen);
+  az_span topic_span = az_span_create((uint8_t*)topicName, topicLen);
 
   // Parse the incoming message topic and check which feature it is for
   az_iot_hub_client_twin_response twin_response;
@@ -827,7 +827,7 @@ static int on_received(char* topicName, int topicLen, MQTTClient_message* messag
     handle_twin_message(message, &twin_response);
   }
   else if (az_succeeded(az_iot_hub_client_methods_parse_received_topic(
-               &client, az_span_init((uint8_t*)topicName, topicLen), &command_request)))
+               &client, az_span_create((uint8_t*)topicName, topicLen), &command_request)))
   {
     LOG_SUCCESS("Command arrived");
 

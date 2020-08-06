@@ -36,7 +36,7 @@ AZ_NODISCARD az_result az_http_request_init(
 
   int32_t query_start = 0;
   az_result url_with_query = _az_span_scan_until(
-      az_span_init(az_span_ptr(url), url_length), _az_is_question_mark, &query_start);
+      az_span_create(az_span_ptr(url), url_length), _az_is_question_mark, &query_start);
 
   *out_request
       = (az_http_request){ ._internal = {
@@ -276,7 +276,7 @@ az_http_request_append_header(az_http_request* ref_request, az_span key, az_span
   az_span_copy(
       az_span_slice_to_end(
           headers, (int32_t)sizeof(az_pair) * ref_request->_internal.headers_length),
-      az_span_init((uint8_t*)&header_to_append, sizeof header_to_append));
+      az_span_create((uint8_t*)&header_to_append, sizeof header_to_append));
 
   ref_request->_internal.headers_length++;
 

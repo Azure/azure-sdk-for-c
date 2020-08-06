@@ -76,7 +76,7 @@ static AZ_NODISCARD az_result _az_credential_client_secret_apply_policy(
   int16_t const token_length = token._internal.token_length;
 
   AZ_RETURN_IF_FAILED(az_http_request_append_header(
-      ref_request, _az_auth_header_name, az_span_init(token._internal.token, token_length)));
+      ref_request, _az_auth_header_name, az_span_create(token._internal.token, token_length)));
 
   return _az_http_pipeline_nextpolicy(policies, ref_request, response);
 }
