@@ -21,5 +21,5 @@ az_span get_request_id(void)
   az_result result = az_span_u32toa(out_span, request_id_int++, &remainder);
   (void)result;
 
-  return az_span_slice(out_span, 0, (int32_t)(az_span_size(out_span) - az_span_size(remainder)));
+  return az_span_slice(out_span, 0, az_span_size(out_span) - az_span_size(remainder));
 }
