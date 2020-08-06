@@ -23,7 +23,7 @@
 typedef void (*pnp_property_callback)(
     az_span component_name,
     az_json_token* property_name,
-    az_json_reader* property_value,
+    az_json_reader* property_value_as_json,
     int32_t version,
     void* user_context_callback);
 

@@ -143,6 +143,7 @@ static sample_pnp_mqtt_message publish_message;
 // IoT Hub Command
 static const az_span reboot_command_name = AZ_SPAN_LITERAL_FROM_STR("reboot");
 static const az_span empty_json_object = AZ_SPAN_LITERAL_FROM_STR("{}");
+static char property_scratch_buffer[64];
 
 //
 // Configuration and connection functions
@@ -454,6 +455,7 @@ static az_result append_json_token(az_json_writer* json_writer, void* value)
   az_json_token value_token = *(az_json_token*)value;
 
   double value_as_double;
+  int32_t string_length;
 
   switch (value_token.kind)
   {
@@ -463,7 +465,10 @@ static az_result append_json_token(az_json_writer* json_writer, void* value)
           az_json_writer_append_double(json_writer, value_as_double, DOUBLE_DECIMAL_PLACE_DIGITS));
       break;
     case AZ_JSON_TOKEN_STRING:
-      AZ_RETURN_IF_FAILED(az_json_writer_append_string(json_writer, value_token.slice));
+      AZ_RETURN_IF_FAILED(az_json_token_get_string(
+          &value_token, property_scratch_buffer, sizeof(property_scratch_buffer), &string_length));
+      AZ_RETURN_IF_FAILED(az_json_writer_append_string(
+          json_writer, az_span_init((uint8_t*)property_scratch_buffer, string_length)));
       break;
     default:
       return AZ_ERROR_ITEM_NOT_FOUND;
@@ -537,7 +542,7 @@ static void sample_property_callback(
   if (az_span_ptr(component_name) == NULL || az_span_size(component_name) == 0)
   {
     LOG("Property=%.*s arrived for Control component itself. This does not support writable "
-        "properties on it(all properties are on sub - components) ",
+        "properties on it(all properties are on sub-components) ",
         az_span_size(property_name->slice),
         az_span_ptr(property_name->slice));
 
