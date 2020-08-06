@@ -64,12 +64,12 @@ AZ_NODISCARD AZ_INLINE int32_t az_span_size(az_span span) { return span._interna
 // Note: If you are modifying this method, make sure to modify the non-inline version in the
 // az_span.c file as well, and the _az_ version right below.
 #ifdef AZ_NO_PRECONDITION_CHECKING
-AZ_NODISCARD AZ_INLINE az_span az_span_init(uint8_t* ptr, int32_t size)
+AZ_NODISCARD AZ_INLINE az_span az_span_create(uint8_t* ptr, int32_t size)
 {
   return (az_span){ ._internal = { .ptr = ptr, .size = size } };
 }
 #else
-AZ_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t size);
+AZ_NODISCARD az_span az_span_create(uint8_t* ptr, int32_t size);
 #endif // AZ_NO_PRECONDITION_CHECKING
 
 /**
@@ -144,7 +144,7 @@ AZ_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t size);
  */
 // Force a division by 0 that gets detected by compilers for anything that isn't a byte array.
 #define AZ_SPAN_FROM_BUFFER(BYTE_BUFFER) \
-  az_span_init( \
+  az_span_create( \
       (uint8_t*)BYTE_BUFFER, (sizeof(BYTE_BUFFER) / (_az_IS_BYTE_ARRAY(BYTE_BUFFER) ? 1 : 0)))
 
 /**
@@ -154,7 +154,7 @@ AZ_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t size);
  * @return An #az_span over the byte buffer where the size is set to the string's length not
  * including the \0 terminator.
  */
-AZ_NODISCARD az_span az_span_from_str(char* str);
+AZ_NODISCARD az_span az_span_create_from_str(char* str);
 
 /******************************  SPAN MANIPULATION */
 
@@ -350,7 +350,10 @@ AZ_NODISCARD az_result az_span_atoi32(az_span source, int32_t* out_number);
  * @return An #az_result value indicating the result of the operation:
  *         - #AZ_OK if successful
  *         - #AZ_ERROR_UNEXPECTED_CHAR if a non-ASCII digit or an invalid character is found
- * within the span
+ * within the span, or if the resulting \p out_number wouldn't be a finite double number
+ *
+ * @remark The #az_span being parsed must contain a number that is finite. Values such as NAN,
+ * INFINITY, and those that would overflow a double to +/-inf are not allowed.
  */
 AZ_NODISCARD az_result az_span_atod(az_span source, double* out_number);
 
@@ -433,8 +436,10 @@ AZ_NODISCARD az_result az_span_u64toa(az_span destination, uint64_t source, az_s
  *         - #AZ_OK if successful
  *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the \p destination is not big enough to contain the
  * copied bytes
- *         - #AZ_ERROR_NOT_SUPPORTED if the \p source contains an integer component that is too
- * large and would overflow beyond 2^53 - 1.
+ *         - #AZ_ERROR_NOT_SUPPORTED if the \p source is not a finite decimal number or contains an
+ * integer component that is too large and would overflow beyond 2^53 - 1.
+ *
+ * @remark Only finite double values are supported. Values such as NAN and INFINITY are not allowed.
  *
  * @remark Non-significant trailing zeros (after the decimal point) are not written, even if \p
  * fractional_digits is large enough to allow the zero padding.
@@ -444,6 +449,48 @@ AZ_NODISCARD az_result az_span_u64toa(az_span destination, uint64_t source, az_s
  */
 AZ_NODISCARD az_result
 az_span_dtoa(az_span destination, double source, int32_t fractional_digits, az_span* out_span);
+
+/******************************  NON-CONTIGUOUS SPAN  */
+
+/**
+ * @brief Defines a container of required and user-defined fields that provide the
+ * necessary information and parameters for the implementation of the #az_span_allocator_fn
+ * callback.
+ */
+typedef struct
+{
+  void* user_context; ///< Any struct that was provided by the user for their specific
+                      ///< implementation, passed through to the #az_span_allocator_fn.
+  int32_t bytes_used; ///< The amount of space consumed (i.e. written into) within the previously
+                      ///< provided destination, which can be used to infer the remaining number of
+                      ///< bytes of the #az_span that are leftover.
+  int32_t minimum_required_size; ///< The minimum length of the destination #az_span required to be
+                                 ///< provided by the callback. If 0, any non-empty sized buffer
+                                 ///< must be returned.
+} az_span_allocator_context;
+
+/**
+ * @brief Defines the signature of the callback function that the caller must implement to provide
+ * the potentially discontiguous destination buffers where output can be written into.
+ *
+ * @param[in] allocator_context A container of required and user-defined fields that provide the
+ * necessary information and parameters for the implementation of the callback.
+ * @param[out] out_next_destination A pointer to an #az_span that can be used as a destination to
+ * write data into, that is at least the required size specified within the allocator_context.
+ *
+ * @remarks The caller must no longer hold onto, use, or write to the previously provided #az_span
+ * after this allocator returns a new destination #az_span.
+ *
+ * @remarks There is no guarantee that successive calls will return the same or same-sized buffer.
+ * This method must never return an empty #az_span, unless the requested buffer size is not
+ * available. In which case, it must return an error #az_result.
+ *
+ * @remarks The caller must check the return value using #az_succeeded() before continuing to use
+ * the \p out_next_destination.
+ */
+typedef az_result (*az_span_allocator_fn)(
+    az_span_allocator_context* allocator_context,
+    az_span* out_next_destination);
 
 /******************************  SPAN PAIR  */
 
@@ -480,20 +527,6 @@ typedef struct
 AZ_NODISCARD AZ_INLINE az_pair az_pair_init(az_span key, az_span value)
 {
   return (az_pair){ .key = key, .value = value };
-}
-
-/**
- * @brief Returns an #az_pair with its key and value fields initialized to spans over the specified
- * key and value 0-terminated string parameters.
- *
- * @param[in] key A string representing the key.
- * @param[in] value A string representing the key's value.
- * @return  An #az_pair with the fields initialized to the #az_span instances over the passed-in
- * strings.
- */
-AZ_NODISCARD AZ_INLINE az_pair az_pair_from_str(char* key, char* value)
-{
-  return az_pair_init(az_span_from_str(key), az_span_from_str(value));
 }
 
 #include <azure/core/_az_cfg_suffix.h>

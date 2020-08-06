@@ -3,7 +3,7 @@
 
 cmake_minimum_required (VERSION 3.10)
 
-project (az_storage_blobs_samples LANGUAGES C)
+project (blobs_client_example LANGUAGES C)
 
 set(CMAKE_C_STANDARD 99)
 
@@ -20,6 +20,14 @@ add_executable (blobs_client_example src/blobs_client_example.c)
 
 target_link_libraries(blobs_client_example PRIVATE az_storage_blobs az_core)
 
+# Workaround for linker warning LNK4098: defaultlib 'LIBCMTD' conflicts with use of other libs
+if (MSVC)
+    set_target_properties(blobs_client_example
+        PROPERTIES LINK_FLAGS
+        "/NODEFAULTLIB:libcmtd.lib"
+    )
+endif()
+
 # link libcurl impl when option is on
 # When using a different HTTP transport adapter implementation, link it here instead of az_curl and libcurl
 if(TRANSPORT_CURL)
@@ -31,5 +39,5 @@ else()
   target_compile_definitions(blobs_client_example PRIVATE AZ_NO_HTTP)
 endif()
 
-# get the appropiate PAL lib to link
+# get the appropriate PAL lib to link
 target_link_libraries(blobs_client_example PRIVATE ${PAL})

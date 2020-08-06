@@ -98,7 +98,7 @@ _az_get_http_status_line(az_span* ref_span, az_http_response_status_line* out_st
   // status-code = 3DIGIT
   {
     uint64_t code = 0;
-    AZ_RETURN_IF_FAILED(az_span_atou64(az_span_init(az_span_ptr(*ref_span), 3), &code));
+    AZ_RETURN_IF_FAILED(az_span_atou64(az_span_create(az_span_ptr(*ref_span), 3), &code));
     out_status_line->status_code = (az_http_status_code)code;
     // move reader
     *ref_span = az_span_slice_to_end(*ref_span, 3);

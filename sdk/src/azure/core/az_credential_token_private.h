@@ -17,7 +17,6 @@ _az_credential_token_set_token(_az_credential_token* ref_credential, _az_token c
 AZ_NODISCARD az_result
 _az_credential_token_get_token(_az_credential_token* ref_credential, _az_token* out_token);
 
-
 // Do not invoke on the _az_credential_token directly, i.e. _az_token_expired(&token_credential->_internal.token).
 // Instead, call _az_credential_token_get_token() to get the copy first, i.e.:
 // _az_token token;

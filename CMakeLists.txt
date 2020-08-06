@@ -88,7 +88,7 @@ if(NOT DEFINED ENV{AZ_SDK_C_NO_SAMPLES})
 endif()
 
 # default for Unit testing with cmocka is OFF, however, this will be ON on CI and tests must
-# pass before commiting changes
+# pass before committing changes
 if (UNIT_TESTING)
   # Core
   add_subdirectory(sdk/tests/core)
