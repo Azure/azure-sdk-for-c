@@ -1001,8 +1001,8 @@ AZ_NODISCARD int32_t _az_span_url_encode_calc_length(az_span source)
     uint8_t c = src_ptr[src_idx];
     if (_az_span_url_should_encode(c))
     {
-      required_symbols_to_be_added
-          += 2; // Adding '%' plus 2 digits (minus 1 as original symbol is counted as 1)
+      // Adding '%' plus 2 digits (minus 1 as original symbol is counted as 1)
+      required_symbols_to_be_added += 2; 
     }
     ++src_idx;
   } while (src_idx < source_size);
