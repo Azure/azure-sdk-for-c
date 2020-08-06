@@ -52,7 +52,7 @@ The library targets made available via CMake are the following:
 
 ### Samples
 
-[This page](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/README.md) explains samples for the Azure Embedded C SDK IoT Hub Client and the Provisioning Clients and how to use them.
+[This page](../../../sdk/samples/iot/README.md) explains samples for the Azure Embedded C SDK IoT Hub Client and the Provisioning Clients and how to use them.
 
  For step-by-step guides starting from scratch, you may refer to these documents:
 
