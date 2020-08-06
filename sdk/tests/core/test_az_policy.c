@@ -78,7 +78,13 @@ void test_az_http_pipeline_policy_telemetry(void** state)
 
   assert_return_code(
       az_http_request_init(
-          &request, &az_context_app, az_http_method_get(), url_span, 3, header_span, AZ_SPAN_NULL),
+          &request,
+          &az_context_application,
+          az_http_method_get(),
+          url_span,
+          3,
+          header_span,
+          AZ_SPAN_NULL),
       AZ_OK);
 
   // Create policy options
@@ -114,7 +120,13 @@ void test_az_http_pipeline_policy_apiversion(void** state)
 
   assert_return_code(
       az_http_request_init(
-          &request, &az_context_app, az_http_method_get(), url_span, 3, header_span, AZ_SPAN_NULL),
+          &request,
+          &az_context_application,
+          az_http_method_get(),
+          url_span,
+          3,
+          header_span,
+          AZ_SPAN_NULL),
       AZ_OK);
 
   // Create policy options
@@ -224,7 +236,13 @@ void test_az_http_pipeline_policy_retry(void** state)
 
   assert_return_code(
       az_http_request_init(
-          &request, &az_context_app, az_http_method_get(), url_span, 3, header_span, AZ_SPAN_NULL),
+          &request,
+          &az_context_application,
+          az_http_method_get(),
+          url_span,
+          3,
+          header_span,
+          AZ_SPAN_NULL),
       AZ_OK);
 
   // Create policy options
@@ -263,7 +281,13 @@ void test_az_http_pipeline_policy_retry_with_header(void** state)
 
   assert_return_code(
       az_http_request_init(
-          &request, &az_context_app, az_http_method_get(), url_span, 3, header_span, AZ_SPAN_NULL),
+          &request,
+          &az_context_application,
+          az_http_method_get(),
+          url_span,
+          3,
+          header_span,
+          AZ_SPAN_NULL),
       AZ_OK);
 
   // Create policy options
@@ -304,7 +328,13 @@ void test_az_http_pipeline_policy_retry_with_header_2(void** state)
 
   assert_return_code(
       az_http_request_init(
-          &request, &az_context_app, az_http_method_get(), url_span, 3, header_span, AZ_SPAN_NULL),
+          &request,
+          &az_context_application,
+          az_http_method_get(),
+          url_span,
+          3,
+          header_span,
+          AZ_SPAN_NULL),
       AZ_OK);
 
   // Create policy options

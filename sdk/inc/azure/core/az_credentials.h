@@ -35,7 +35,7 @@
 
 enum
 {
-  _az_TOKEN_BUF_SIZE = 2 * 1024,
+  _az_TOKEN_BUFFER_SIZE = 2 * 1024,
 };
 
 /**
@@ -49,7 +49,7 @@ typedef struct
   {
     int64_t expires_at_msec;
     int16_t token_length;
-    uint8_t token[_az_TOKEN_BUF_SIZE]; /*!< Base64-encoded token */
+    uint8_t token[_az_TOKEN_BUFFER_SIZE]; /*!< Base64-encoded token */
   } _internal;
 } _az_token;
 
@@ -110,34 +110,17 @@ typedef struct
 
 /**
  * @brief Initializes an az_credential_client_secret instance with the specified tenant ID, client
- * ID and client secret.
- *
- * @param out_credential Reference to an #az_credential_client_secret instance to initialize,
- * @param tenant_id An Azure tenant ID.
- * @param client_id An Azure client ID.
- * @param client_secret An Azure client secret.
- *
- * @return An #az_result value indicating the result of the operation:
- *         - #AZ_OK if successful.
- *         - Other error code if initialization failed.
- */
-AZ_NODISCARD az_result az_credential_client_secret_init(
-    az_credential_client_secret* out_credential,
-    az_span tenant_id,
-    az_span client_id,
-    az_span client_secret);
-
-/**
- * @brief Initializes an az_credential_client_secret instance with the specified tenant ID, client
  * ID, client secret, and Azure AD authority URL.
  *
  * @param out_credential Reference to an #az_credential_client_secret instance to initialize,
  * @param tenant_id An Azure tenant ID.
  * @param client_id An Azure client ID.
  * @param client_secret An Azure client secret.
- * @param authority Authentication authority URL to set.
+ * @param authority Authentication authority URL to set. Passing #AZ_SPAN_NULL initializes
+ * credential with default authority (Azure AD global authority -
+ * "https://login.microsoftonline.com/")
  *
- * @note #authority example: "https://login.microsoftonline.us/".
+ * @note Example of a non-NULL \p authority string: "https://login.microsoftonline.us/".
  * See national clouds' Azure AD authentication endpoints:
  * https://docs.microsoft.com/en-us/azure/active-directory/develop/authentication-national-cloud.
  *
@@ -145,7 +128,7 @@ AZ_NODISCARD az_result az_credential_client_secret_init(
  *         - #AZ_OK if successful.
  *         - Other error code if initialization failed.
  */
-AZ_NODISCARD az_result az_credential_client_secret_init_with_authority(
+AZ_NODISCARD az_result az_credential_client_secret_init(
     az_credential_client_secret* out_credential,
     az_span tenant_id,
     az_span client_id,

@@ -35,13 +35,14 @@ static void test_credential_client_secret(void** state)
           &credential,
           AZ_SPAN_FROM_STR("TenantID"),
           AZ_SPAN_FROM_STR("ClientID"),
-          AZ_SPAN_FROM_STR("ClientSecret"))));
+          AZ_SPAN_FROM_STR("ClientSecret"),
+          AZ_SPAN_NULL)));
     }
     else
     {
       authority = authorities[i];
 
-      assert_true(az_succeeded(az_credential_client_secret_init_with_authority(
+      assert_true(az_succeeded(az_credential_client_secret_init(
           &credential,
           AZ_SPAN_FROM_STR("TenantID"),
           AZ_SPAN_FROM_STR("ClientID"),
@@ -96,7 +97,7 @@ static void test_credential_client_secret(void** state)
       az_http_request request = { 0 };
       ignore = az_http_request_init(
           &request,
-          &az_context_app,
+          &az_context_application,
           az_http_method_get(),
           request_url,
           az_span_size(request_url),
