@@ -2,14 +2,14 @@
 // SPDX-License-Identifier: MIT
 
 #include "test_az_iot_provisioning_client.h"
-#include <azure/iot/az_iot_provisioning_client.h>
-#include <azure/core/az_log.h>
-#include <azure/core/az_precondition.h>
-#include <azure/core/internal/az_precondition_internal.h>
-#include <azure/core/az_span.h>
 #include <az_test_log.h>
 #include <az_test_precondition.h>
 #include <az_test_span.h>
+#include <azure/core/az_log.h>
+#include <azure/core/az_precondition.h>
+#include <azure/core/az_span.h>
+#include <azure/core/internal/az_precondition_internal.h>
+#include <azure/iot/az_iot_provisioning_client.h>
 
 #include <setjmp.h>
 #include <stdarg.h>
@@ -174,9 +174,8 @@ static void az_iot_provisioning_client_sas_get_password_device_succeeds()
           &client, test_global_device_endpoint, test_id_scope, test_registration_id, NULL),
       AZ_OK);
 
-  const char expected_password[]
-      = "SharedAccessSignature sr=" TEST_URL_ENCODED_RESOURCE_URI
-        "&sig=" TEST_URL_ENC_SIG "&se=" TEST_EXPIRATION_STR;
+  const char expected_password[] = "SharedAccessSignature sr=" TEST_URL_ENCODED_RESOURCE_URI
+                                   "&sig=" TEST_URL_ENC_SIG "&se=" TEST_EXPIRATION_STR;
 
   az_span key_name = AZ_SPAN_NULL;
 
@@ -205,8 +204,8 @@ static void az_iot_provisioning_client_sas_get_password_device_with_keyname_succ
       AZ_OK);
 
   const char expected_password[]
-      = "SharedAccessSignature sr=" TEST_URL_ENCODED_RESOURCE_URI
-        "&sig=" TEST_URL_ENC_SIG "&se=" TEST_EXPIRATION_STR "&skn=" TEST_KEY_NAME;
+      = "SharedAccessSignature sr=" TEST_URL_ENCODED_RESOURCE_URI "&sig=" TEST_URL_ENC_SIG
+        "&se=" TEST_EXPIRATION_STR "&skn=" TEST_KEY_NAME;
 
   az_span key_name = AZ_SPAN_FROM_STR(TEST_KEY_NAME);
 

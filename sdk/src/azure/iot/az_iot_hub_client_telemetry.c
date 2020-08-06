@@ -3,11 +3,11 @@
 
 #include <stdint.h>
 
-#include <azure/iot/az_iot_hub_client.h>
 #include <azure/core/az_precondition.h>
-#include <azure/core/internal/az_precondition_internal.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
+#include <azure/core/internal/az_precondition_internal.h>
+#include <azure/iot/az_iot_hub_client.h>
 
 #include <azure/core/_az_cfg.h>
 
@@ -29,7 +29,7 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_get_publish_topic(
 
   const az_span* const module_id = &(client->_internal.options.module_id);
 
-  az_span mqtt_topic_span = az_span_create((uint8_t*) mqtt_topic, (int32_t)mqtt_topic_size);
+  az_span mqtt_topic_span = az_span_create((uint8_t*)mqtt_topic, (int32_t)mqtt_topic_size);
   int32_t required_length = az_span_size(telemetry_topic_prefix)
       + az_span_size(client->_internal.device_id) + az_span_size(telemetry_topic_suffix);
   int32_t module_id_length = az_span_size(*module_id);
@@ -65,7 +65,7 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_get_publish_topic(
 
   az_span_copy_u8(remainder, null_terminator);
 
-  if(out_mqtt_topic_length)
+  if (out_mqtt_topic_length)
   {
     *out_mqtt_topic_length = (size_t)required_length;
   }

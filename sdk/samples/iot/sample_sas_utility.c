@@ -6,8 +6,8 @@
 #include <openssl/evp.h>
 #include <openssl/hmac.h>
 
-#include <azure/core/az_span.h>
 #include "sample_sas_utility.h"
+#include <azure/core/az_span.h>
 
 /*
  * This serves as an example for fundamental functionality needed to use SAS key authentication.
@@ -33,7 +33,7 @@ az_result sample_base64_decode(az_span base64_encoded, az_span in_span, az_span*
 
   // Get the source BIO to push through the filter
   source_mem_bio = BIO_new_mem_buf(az_span_ptr(base64_encoded), (int)az_span_size(base64_encoded));
-  if(source_mem_bio == NULL)
+  if (source_mem_bio == NULL)
   {
     BIO_free(b64_decoder);
     return AZ_ERROR_OUT_OF_MEMORY;
@@ -41,7 +41,7 @@ az_result sample_base64_decode(az_span base64_encoded, az_span in_span, az_span*
 
   // Push the memory through the filter
   source_mem_bio = BIO_push(b64_decoder, source_mem_bio);
-  if(source_mem_bio == NULL)
+  if (source_mem_bio == NULL)
   {
     BIO_free(b64_decoder);
     BIO_free(source_mem_bio);
@@ -83,14 +83,14 @@ az_result sample_base64_encode(az_span bytes, az_span in_span, az_span* out_span
 
   // Create a BIO filter to process the bytes
   b64_encoder = BIO_new(BIO_f_base64());
-  if(b64_encoder == NULL)
+  if (b64_encoder == NULL)
   {
     return AZ_ERROR_OUT_OF_MEMORY;
   }
 
   // Create a memory sink BIO to process bytes to
   sink_mem_bio = BIO_new(BIO_s_mem());
-  if(sink_mem_bio == NULL)
+  if (sink_mem_bio == NULL)
   {
     BIO_free(b64_encoder);
     return AZ_ERROR_OUT_OF_MEMORY;
@@ -98,7 +98,7 @@ az_result sample_base64_encode(az_span bytes, az_span in_span, az_span* out_span
 
   // Push the sink to the encoder
   b64_encoder = BIO_push(b64_encoder, sink_mem_bio);
-  if(b64_encoder == NULL)
+  if (b64_encoder == NULL)
   {
     BIO_free(sink_mem_bio);
     BIO_free(b64_encoder);
@@ -110,7 +110,7 @@ az_result sample_base64_encode(az_span bytes, az_span in_span, az_span* out_span
 
   // Write the bytes to be encoded
   int bytes_written = BIO_write(b64_encoder, az_span_ptr(bytes), (int)az_span_size(bytes));
-  if(bytes_written < 1)
+  if (bytes_written < 1)
   {
     BIO_free(sink_mem_bio);
     BIO_free(b64_encoder);

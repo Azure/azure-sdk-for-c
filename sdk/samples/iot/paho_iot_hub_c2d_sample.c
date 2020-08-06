@@ -330,12 +330,12 @@ static void receive_messages()
   az_iot_hub_client_c2d_request c2d_request;
 
   // Wait until max # messages received or timeout to receive a single message expires.
-  for(uint8_t message_count = 0; message_count < MAX_MESSAGE_COUNT; message_count++)
+  for (uint8_t message_count = 0; message_count < MAX_MESSAGE_COUNT; message_count++)
   {
     if (((rc
           = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, TIMEOUT_MQTT_RECEIVE_MS))
-          != MQTTCLIENT_SUCCESS)
-          && (rc != MQTTCLIENT_TOPICNAME_TRUNCATED))
+         != MQTTCLIENT_SUCCESS)
+        && (rc != MQTTCLIENT_TOPICNAME_TRUNCATED))
     {
       LOG_ERROR("Failed to receive message: MQTTClient return code %d.", rc);
       exit(rc);

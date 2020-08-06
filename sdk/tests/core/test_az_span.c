@@ -1807,11 +1807,15 @@ static void test_az_span_overlap(void** state)
 {
   (void)state;
 
-  assert_false(_az_span_overlap(az_span_create((uint8_t*)10, 10), az_span_create((uint8_t*)30, 10)));
-  assert_false(_az_span_overlap(az_span_create((uint8_t*)30, 10), az_span_create((uint8_t*)10, 10)));
+  assert_false(
+      _az_span_overlap(az_span_create((uint8_t*)10, 10), az_span_create((uint8_t*)30, 10)));
+  assert_false(
+      _az_span_overlap(az_span_create((uint8_t*)30, 10), az_span_create((uint8_t*)10, 10)));
 
-  assert_false(_az_span_overlap(az_span_create((uint8_t*)10, 10), az_span_create((uint8_t*)20, 10)));
-  assert_false(_az_span_overlap(az_span_create((uint8_t*)20, 10), az_span_create((uint8_t*)10, 10)));
+  assert_false(
+      _az_span_overlap(az_span_create((uint8_t*)10, 10), az_span_create((uint8_t*)20, 10)));
+  assert_false(
+      _az_span_overlap(az_span_create((uint8_t*)20, 10), az_span_create((uint8_t*)10, 10)));
 
   assert_false(_az_span_overlap(az_span_create((uint8_t*)10, 0), az_span_create((uint8_t*)10, 0)));
 

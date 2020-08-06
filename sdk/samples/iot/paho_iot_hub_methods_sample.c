@@ -342,12 +342,12 @@ static void receive_messages()
   az_iot_hub_client_method_request method_request;
 
   // Wait until max # messages received or timeout to receive a single message expires.
-  for(uint8_t message_count = 0; message_count < MAX_MESSAGE_COUNT; message_count++)
+  for (uint8_t message_count = 0; message_count < MAX_MESSAGE_COUNT; message_count++)
   {
     if (((rc
           = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, TIMEOUT_MQTT_RECEIVE_MS))
-          != MQTTCLIENT_SUCCESS)
-          && (rc != MQTTCLIENT_TOPICNAME_TRUNCATED))
+         != MQTTCLIENT_SUCCESS)
+        && (rc != MQTTCLIENT_TOPICNAME_TRUNCATED))
     {
       LOG_ERROR("Failed to receive message: MQTTClient return code %d.", rc);
       exit(rc);
@@ -367,7 +367,7 @@ static void receive_messages()
     LOG_SUCCESS("Client parsed message.");
 
     invoke_method(&method_request);
-    LOG(" "); //formatting
+    LOG(" "); // formatting
   }
 
   MQTTClient_freeMessage(&message);
@@ -385,7 +385,8 @@ static void parse_message(
   az_span topic_span = az_span_create((uint8_t*)topic, topic_len);
   az_span message_span = az_span_create((uint8_t*)message->payload, message->payloadlen);
 
-  if (az_failed(rc = az_iot_hub_client_methods_parse_received_topic(&client, topic_span, method_request)))
+  if (az_failed(
+          rc = az_iot_hub_client_methods_parse_received_topic(&client, topic_span, method_request)))
   {
     LOG_ERROR("Message from unknown topic: az_result return code 0x%04x.", rc);
     LOG_AZ_SPAN("Topic:", topic_span);

@@ -3,11 +3,11 @@
 
 #include <stdint.h>
 
-#include <azure/iot/az_iot_hub_client.h>
 #include <azure/core/az_precondition.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
 #include <azure/core/internal/az_span_internal.h>
+#include <azure/iot/az_iot_hub_client.h>
 
 #include <azure/core/internal/az_log_internal.h>
 #include <azure/core/internal/az_precondition_internal.h>

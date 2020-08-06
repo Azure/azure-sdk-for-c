@@ -1,14 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <azure/iot/az_iot_hub_client.h>
-#include <azure/iot/internal/az_iot_common_internal.h>
 #include <azure/core/az_precondition.h>
 #include <azure/core/az_span.h>
+#include <azure/iot/az_iot_hub_client.h>
+#include <azure/iot/internal/az_iot_common_internal.h>
 
-#include <azure/core/internal/az_span_internal.h>
-#include <azure/core/internal/az_precondition_internal.h>
 #include <azure/core/internal/az_log_internal.h>
+#include <azure/core/internal/az_precondition_internal.h>
+#include <azure/core/internal/az_span_internal.h>
 
 #include <stdint.h>
 
@@ -46,11 +46,12 @@ AZ_NODISCARD az_result az_iot_hub_client_sas_get_signature(
   az_span remainder = signature;
   int32_t signature_size = az_span_size(signature);
 
-  AZ_RETURN_IF_FAILED(_az_span_copy_url_encode(remainder, client->_internal.iot_hub_hostname, &remainder));
+  AZ_RETURN_IF_FAILED(
+      _az_span_copy_url_encode(remainder, client->_internal.iot_hub_hostname, &remainder));
 
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, az_span_size(devices_string));
   remainder = az_span_copy(remainder, devices_string);
-  
+
   AZ_RETURN_IF_FAILED(_az_span_copy_url_encode(remainder, client->_internal.device_id, &remainder));
 
   if (az_span_size(client->_internal.options.module_id) > 0)
@@ -58,12 +59,14 @@ AZ_NODISCARD az_result az_iot_hub_client_sas_get_signature(
     AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, az_span_size(modules_string));
     remainder = az_span_copy(remainder, modules_string);
 
-    AZ_RETURN_IF_FAILED(_az_span_copy_url_encode(remainder, client->_internal.options.module_id, &remainder));
+    AZ_RETURN_IF_FAILED(
+        _az_span_copy_url_encode(remainder, client->_internal.options.module_id, &remainder));
   }
 
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, 
-    1 + // LF
-    _az_iot_u64toa_size(token_expiration_epoch_time));
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(
+      remainder,
+      1 + // LF
+          _az_iot_u64toa_size(token_expiration_epoch_time));
 
   remainder = az_span_copy_u8(remainder, LF);
 
@@ -100,13 +103,15 @@ AZ_NODISCARD az_result az_iot_hub_client_sas_get_password(
   mqtt_password_span = az_span_copy(mqtt_password_span, sr_string);
   mqtt_password_span = az_span_copy_u8(mqtt_password_span, EQUAL_SIGN);
 
-  AZ_RETURN_IF_FAILED(_az_span_copy_url_encode(mqtt_password_span, client->_internal.iot_hub_hostname, &mqtt_password_span));
+  AZ_RETURN_IF_FAILED(_az_span_copy_url_encode(
+      mqtt_password_span, client->_internal.iot_hub_hostname, &mqtt_password_span));
 
   // Device ID
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_password_span, az_span_size(devices_string));
   mqtt_password_span = az_span_copy(mqtt_password_span, devices_string);
 
-  AZ_RETURN_IF_FAILED(_az_span_copy_url_encode(mqtt_password_span, client->_internal.device_id, &mqtt_password_span));
+  AZ_RETURN_IF_FAILED(_az_span_copy_url_encode(
+      mqtt_password_span, client->_internal.device_id, &mqtt_password_span));
 
   // Module ID
   if (az_span_size(client->_internal.options.module_id) > 0)
@@ -114,30 +119,37 @@ AZ_NODISCARD az_result az_iot_hub_client_sas_get_password(
     AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_password_span, az_span_size(modules_string));
     mqtt_password_span = az_span_copy(mqtt_password_span, modules_string);
 
-    AZ_RETURN_IF_FAILED(_az_span_copy_url_encode(mqtt_password_span, client->_internal.options.module_id, &mqtt_password_span));
+    AZ_RETURN_IF_FAILED(_az_span_copy_url_encode(
+        mqtt_password_span, client->_internal.options.module_id, &mqtt_password_span));
   }
 
   // Signature
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_password_span, 1 /* AMPERSAND */ + az_span_size(sig_string) + 1 /* EQUAL_SIGN */);
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(
+      mqtt_password_span, 1 /* AMPERSAND */ + az_span_size(sig_string) + 1 /* EQUAL_SIGN */);
 
   mqtt_password_span = az_span_copy_u8(mqtt_password_span, AMPERSAND);
   mqtt_password_span = az_span_copy(mqtt_password_span, sig_string);
   mqtt_password_span = az_span_copy_u8(mqtt_password_span, EQUAL_SIGN);
 
-  AZ_RETURN_IF_FAILED(_az_span_copy_url_encode(mqtt_password_span, base64_hmac_sha256_signature, &mqtt_password_span));
+  AZ_RETURN_IF_FAILED(_az_span_copy_url_encode(
+      mqtt_password_span, base64_hmac_sha256_signature, &mqtt_password_span));
 
   // Expiration
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_password_span, 1 /* AMPERSAND */ + az_span_size(se_string) + 1 /* EQUAL_SIGN */);
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(
+      mqtt_password_span, 1 /* AMPERSAND */ + az_span_size(se_string) + 1 /* EQUAL_SIGN */);
   mqtt_password_span = az_span_copy_u8(mqtt_password_span, AMPERSAND);
   mqtt_password_span = az_span_copy(mqtt_password_span, se_string);
   mqtt_password_span = az_span_copy_u8(mqtt_password_span, EQUAL_SIGN);
 
-  AZ_RETURN_IF_FAILED(az_span_u64toa(mqtt_password_span, token_expiration_epoch_time, &mqtt_password_span));
+  AZ_RETURN_IF_FAILED(
+      az_span_u64toa(mqtt_password_span, token_expiration_epoch_time, &mqtt_password_span));
 
   if (az_span_size(key_name) > 0)
   {
     // Key Name
-    AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_password_span, 1 /* AMPERSAND */ + az_span_size(skn_string) + 1 /* EQUAL_SIGN */ + az_span_size(key_name));
+    AZ_RETURN_IF_NOT_ENOUGH_SIZE(
+        mqtt_password_span,
+        1 /* AMPERSAND */ + az_span_size(skn_string) + 1 /* EQUAL_SIGN */ + az_span_size(key_name));
     mqtt_password_span = az_span_copy_u8(mqtt_password_span, AMPERSAND);
     mqtt_password_span = az_span_copy(mqtt_password_span, skn_string);
     mqtt_password_span = az_span_copy_u8(mqtt_password_span, EQUAL_SIGN);
@@ -150,7 +162,8 @@ AZ_NODISCARD az_result az_iot_hub_client_sas_get_password(
 
   if (out_mqtt_password_length != NULL)
   {
-    *out_mqtt_password_length = mqtt_password_size - (size_t)az_span_size(mqtt_password_span) - 1 /* NULL TERMINATOR */;
+    *out_mqtt_password_length
+        = mqtt_password_size - (size_t)az_span_size(mqtt_password_span) - 1 /* NULL TERMINATOR */;
   }
 
   return AZ_OK;
