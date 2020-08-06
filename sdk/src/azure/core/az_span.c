@@ -993,22 +993,21 @@ AZ_NODISCARD int32_t _az_span_url_encode_calc_length(az_span source)
     return 0;
   }
 
-  // We may or may not have enough space, given whether the input needs much encoding or not.
   uint8_t* const src_ptr = az_span_ptr(source);
-  int32_t extra_space_used = 0;
+  int32_t required_symbols_to_be_added = 0;
   int32_t src_idx = 0;
   do
   {
     uint8_t c = src_ptr[src_idx];
     if (_az_span_url_should_encode(c))
     {
-      extra_space_used
+      required_symbols_to_be_added
           += 2; // Adding '%' plus 2 digits (minus 1 as original symbol is counted as 1)
     }
     ++src_idx;
   } while (src_idx < source_size);
 
-  return source_size + extra_space_used;
+  return source_size + required_symbols_to_be_added;
 }
 
 AZ_NODISCARD az_result _az_span_url_encode(az_span destination, az_span source, int32_t* out_length)

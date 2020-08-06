@@ -90,6 +90,38 @@ static void test_url_encode_basic(void** state)
     assert_int_equal(url_length, sizeof("aBc%2Fg") - 1);
   }
   {
+    // Empty span
+    int32_t url_length = _az_span_url_encode_calc_length(AZ_SPAN_NULL);
+    assert_int_equal(url_length, 0);
+    url_length = _az_span_url_encode_calc_length(AZ_SPAN_FROM_STR(""));
+    assert_int_equal(url_length, 0);
+  }
+  {
+    // Nothing gets encoded
+    int32_t url_length = _az_span_url_encode_calc_length(AZ_SPAN_FROM_STR("123"));
+    assert_int_equal(url_length, 3);
+  }
+  {
+    // first last encoded
+    int32_t url_length = _az_span_url_encode_calc_length(AZ_SPAN_FROM_STR(" 123 "));
+    assert_int_equal(url_length, 9);
+  }
+  {
+    // every character is encoded
+    int32_t url_length = _az_span_url_encode_calc_length(AZ_SPAN_FROM_STR("   "));
+    assert_int_equal(url_length, 9);
+  }
+  {
+    // % character, which in itself is encoded as %25
+    int32_t url_length = _az_span_url_encode_calc_length(AZ_SPAN_FROM_STR("%"));
+    assert_int_equal(url_length, 3);
+  }
+  {
+    // a single length span with the \0 NULL character
+    int32_t url_length = _az_span_url_encode_calc_length(AZ_SPAN_FROM_STR("\0"));
+    assert_int_equal(url_length, 3);
+  }
+  {
     // Could've been enough space to encode, but the character needs percent-encoding.
     uint8_t buf20[20] = {
       '*', '*', '*', '*', '*', '*', '*', '*', '*', '*',
