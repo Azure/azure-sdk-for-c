@@ -352,54 +352,54 @@ static void az_span_atoi64_test(void** state)
       az_span_atoi64(AZ_SPAN_FROM_STR("-9223372036854775809"), &value), AZ_ERROR_UNEXPECTED_CHAR);
 }
 
-#define test_az_is_finite_helper(source, expected) \
+#define test_az_isfinite_helper(source, expected) \
   do \
   { \
     double decimal = *(double*)&source; \
-    assert_int_equal(_az_is_finite(decimal), expected); \
+    assert_int_equal(_az_isfinite(decimal), expected); \
   } while (0)
 
-static void test_az_is_finite(void** state)
+static void test_az_isfinite(void** state)
 {
   (void)state;
 
   uint64_t source = 0;
 
-  test_az_is_finite_helper(source, true);
+  test_az_isfinite_helper(source, true);
   source = 1;
-  test_az_is_finite_helper(source, true);
+  test_az_isfinite_helper(source, true);
   source = 0x6FFFFFFFFFFFFFFF;
-  test_az_is_finite_helper(source, true);
+  test_az_isfinite_helper(source, true);
   source = 0x7FEFFFFFFFFFFFFF;
-  test_az_is_finite_helper(source, true);
+  test_az_isfinite_helper(source, true);
 
   source = 0x7FF0000000000000; // +inf
-  test_az_is_finite_helper(source, false);
+  test_az_isfinite_helper(source, false);
   source = 0x7FF0000000000001; // nan
-  test_az_is_finite_helper(source, false);
+  test_az_isfinite_helper(source, false);
   source = 0x7FF7FFFFFFFFFFFF; // nan
-  test_az_is_finite_helper(source, false);
+  test_az_isfinite_helper(source, false);
   source = 0x7FF8000000000000; // nan
-  test_az_is_finite_helper(source, false);
+  test_az_isfinite_helper(source, false);
   source = 0x7FFFFFFFFFFFFFFF; // nan
-  test_az_is_finite_helper(source, false);
+  test_az_isfinite_helper(source, false);
 
   source = 0x8000000000000000;
-  test_az_is_finite_helper(source, true);
+  test_az_isfinite_helper(source, true);
   source = 0xFFEFFFFFFFFFFFFF;
-  test_az_is_finite_helper(source, true);
+  test_az_isfinite_helper(source, true);
 
   source = 0xFFF0000000000000; // -inf
-  test_az_is_finite_helper(source, false);
+  test_az_isfinite_helper(source, false);
   source = 0xFFF7FFFFFFFFFFFF; // nan
-  test_az_is_finite_helper(source, false);
+  test_az_isfinite_helper(source, false);
   source = 0xFFF8000000000000; // nan
-  test_az_is_finite_helper(source, false);
+  test_az_isfinite_helper(source, false);
   source = 0xFFFFFFFFFFFFFFFF; // nan
-  test_az_is_finite_helper(source, false);
+  test_az_isfinite_helper(source, false);
 
   source = 0xFFFFFFFFFFFFFFFF + 1;
-  test_az_is_finite_helper(source, true);
+  test_az_isfinite_helper(source, true);
 }
 
 // Disable warning for float comparisons, for this particular test
@@ -2026,7 +2026,7 @@ int test_az_span()
     cmocka_unit_test(az_span_atoi32_test),
     cmocka_unit_test(az_span_atou64_test),
     cmocka_unit_test(az_span_atoi64_test),
-    cmocka_unit_test(test_az_is_finite),
+    cmocka_unit_test(test_az_isfinite),
     cmocka_unit_test(az_span_atod_test),
     cmocka_unit_test(az_span_atod_non_finite_not_allowed),
     cmocka_unit_test(az_span_ato_number_whitespace_or_invalid_not_allowed),

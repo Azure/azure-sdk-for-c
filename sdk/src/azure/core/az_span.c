@@ -389,7 +389,7 @@ AZ_NODISCARD az_result az_span_atod(az_span source, double* out_number)
   int32_t n = sscanf((char*)source_ptr, format, out_number, &chars_consumed);
 
   // Success if the entire source was consumed by sscanf and it set the out_number argument.
-  return (size == chars_consumed && n == 1 && _az_is_finite(*out_number))
+  return (size == chars_consumed && n == 1 && _az_isfinite(*out_number))
       ? AZ_OK
       : AZ_ERROR_UNEXPECTED_CHAR;
 }
@@ -747,14 +747,14 @@ az_span_dtoa(az_span destination, double source, int32_t fractional_digits, az_s
 {
   _az_PRECONDITION_VALID_SPAN(destination, 0, false);
   // Inputs that are either positive or negative infinity, or not a number, are not supported.
-  _az_PRECONDITION(_az_is_finite(source));
+  _az_PRECONDITION(_az_isfinite(source));
   _az_PRECONDITION_RANGE(0, fractional_digits, _az_MAX_SUPPORTED_FRACTIONAL_DIGITS);
   _az_PRECONDITION_NOT_NULL(out_span);
 
   *out_span = destination;
 
   // The input is either positive or negative infinity, or not a number.
-  if (!_az_is_finite(source))
+  if (!_az_isfinite(source))
   {
     return AZ_ERROR_NOT_SUPPORTED;
   }
