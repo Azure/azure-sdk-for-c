@@ -21,7 +21,7 @@ static AZ_NODISCARD az_result _az_is_question_mark(az_span slice)
 }
 
 AZ_NODISCARD az_result az_http_request_init(
-    _az_http_request* out_request,
+    az_http_request* out_request,
     az_context* context,
     az_span method,
     az_span url,
@@ -39,28 +39,28 @@ AZ_NODISCARD az_result az_http_request_init(
       az_span_init(az_span_ptr(url), url_length), _az_is_question_mark, &query_start);
 
   *out_request
-      = (_az_http_request){ ._internal = {
-                                .context = context,
-                                .method = method,
-                                .url = url,
-                                .url_length = url_length,
-                                /* query start is set to 0 if there is not a question mark so the
-                                   next time query parameter is appended, a question mark will be
-                                   added at url length. (+1 jumps the `?`) */
-                                .query_start
-                                = url_with_query == AZ_ERROR_ITEM_NOT_FOUND ? 0 : query_start + 1,
-                                .headers = headers_buffer,
-                                .headers_length = 0,
-                                .max_headers
-                                = az_span_size(headers_buffer) / (int32_t)sizeof(az_pair),
-                                .retry_headers_start_byte_offset = 0,
-                                .body = body,
-                            } };
+      = (az_http_request){ ._internal = {
+                               .context = context,
+                               .method = method,
+                               .url = url,
+                               .url_length = url_length,
+                               /* query start is set to 0 if there is not a question mark so the
+                                  next time query parameter is appended, a question mark will be
+                                  added at url length. (+1 jumps the `?`) */
+                               .query_start
+                               = url_with_query == AZ_ERROR_ITEM_NOT_FOUND ? 0 : query_start + 1,
+                               .headers = headers_buffer,
+                               .headers_length = 0,
+                               .max_headers
+                               = az_span_size(headers_buffer) / (int32_t)sizeof(az_pair),
+                               .retry_headers_start_byte_offset = 0,
+                               .body = body,
+                           } };
 
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_http_request_append_path(_az_http_request* ref_request, az_span path)
+AZ_NODISCARD az_result az_http_request_append_path(az_http_request* ref_request, az_span path)
 {
   _az_PRECONDITION_NOT_NULL(ref_request);
 
@@ -104,7 +104,7 @@ AZ_NODISCARD az_result az_http_request_append_path(_az_http_request* ref_request
 // returns the query parameter value from a query parameter name.
 // Or returns AZ_SPAN_NULL if query parameter name is not found
 static AZ_NODISCARD az_span _az_http_request_find_query_parameter(
-    _az_http_request* ref_request,
+    az_http_request* ref_request,
     az_span query_parameter_name,
     int32_t* out_query_parameter_index)
 {
@@ -164,7 +164,7 @@ static AZ_NODISCARD az_span _az_http_request_find_query_parameter(
 }
 
 AZ_NODISCARD az_result
-az_http_request_set_query_parameter(_az_http_request* ref_request, az_span name, az_span value)
+az_http_request_set_query_parameter(az_http_request* ref_request, az_span name, az_span value)
 {
   _az_PRECONDITION_NOT_NULL(ref_request);
   _az_PRECONDITION_VALID_SPAN(name, 1, false);
@@ -255,7 +255,7 @@ az_http_request_set_query_parameter(_az_http_request* ref_request, az_span name,
 }
 
 AZ_NODISCARD az_result
-az_http_request_append_header(_az_http_request* ref_request, az_span key, az_span value)
+az_http_request_append_header(az_http_request* ref_request, az_span key, az_span value)
 {
   _az_PRECONDITION_NOT_NULL(ref_request);
 
@@ -284,7 +284,7 @@ az_http_request_append_header(_az_http_request* ref_request, az_span key, az_spa
 }
 
 AZ_NODISCARD az_result
-az_http_request_get_header(_az_http_request const* request, int32_t index, az_pair* out_header)
+az_http_request_get_header(az_http_request const* request, int32_t index, az_pair* out_header)
 {
   _az_PRECONDITION_NOT_NULL(request);
   _az_PRECONDITION_NOT_NULL(out_header);
@@ -299,7 +299,7 @@ az_http_request_get_header(_az_http_request const* request, int32_t index, az_pa
 }
 
 AZ_NODISCARD az_result
-az_http_request_get_method(_az_http_request const* request, az_http_method* out_method)
+az_http_request_get_method(az_http_request const* request, az_http_method* out_method)
 {
   _az_PRECONDITION_NOT_NULL(request);
   _az_PRECONDITION_NOT_NULL(out_method);
@@ -309,7 +309,7 @@ az_http_request_get_method(_az_http_request const* request, az_http_method* out_
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_http_request_get_url(_az_http_request const* request, az_span* out_url)
+AZ_NODISCARD az_result az_http_request_get_url(az_http_request const* request, az_span* out_url)
 {
   _az_PRECONDITION_NOT_NULL(request);
   _az_PRECONDITION_NOT_NULL(out_url);
@@ -319,7 +319,7 @@ AZ_NODISCARD az_result az_http_request_get_url(_az_http_request const* request, 
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_http_request_get_body(_az_http_request const* request, az_span* out_body)
+AZ_NODISCARD az_result az_http_request_get_body(az_http_request const* request, az_span* out_body)
 {
   _az_PRECONDITION_NOT_NULL(request);
   _az_PRECONDITION_NOT_NULL(out_body);
@@ -328,7 +328,7 @@ AZ_NODISCARD az_result az_http_request_get_body(_az_http_request const* request,
   return AZ_OK;
 }
 
-AZ_NODISCARD int32_t az_http_request_headers_count(_az_http_request const* request)
+AZ_NODISCARD int32_t az_http_request_headers_count(az_http_request const* request)
 {
   return request->_internal.headers_length;
 }

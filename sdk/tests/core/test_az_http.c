@@ -60,7 +60,7 @@ static void test_http_request(void** state)
     az_span remainder = az_span_copy(url_span, request_url);
     assert_int_equal(az_span_size(remainder), 100 - az_span_size(request_url));
     az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-    _az_http_request request;
+    az_http_request request;
 
     TEST_EXPECT_SUCCESS(az_http_request_init(
         &request,
@@ -165,7 +165,7 @@ static void test_http_request(void** state)
     az_span remainder = az_span_copy(url_span, request_url);
     assert_int_equal(az_span_size(remainder), 100 - az_span_size(request_url));
     az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-    _az_http_request request;
+    az_http_request request;
 
     TEST_EXPECT_SUCCESS(az_http_request_init(
         &request,
@@ -191,7 +191,7 @@ static void test_http_request(void** state)
     az_span remainder = az_span_copy(url_span, initial_url);
     assert_int_equal(az_span_size(remainder), 100 - az_span_size(initial_url));
     az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-    _az_http_request request;
+    az_http_request request;
 
     TEST_EXPECT_SUCCESS(az_http_request_init(
         &request,
@@ -239,7 +239,7 @@ static void test_http_request(void** state)
     az_span remainder = az_span_copy(url_span, initial_url);
     assert_int_equal(az_span_size(remainder), 100 - az_span_size(initial_url));
     az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-    _az_http_request request;
+    az_http_request request;
 
     TEST_EXPECT_SUCCESS(az_http_request_init(
         &request,
@@ -273,7 +273,7 @@ static void test_http_request(void** state)
     az_span remainder = az_span_copy(url_span, initial_url);
     assert_int_equal(az_span_size(remainder), 100 - az_span_size(initial_url));
     az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-    _az_http_request request;
+    az_http_request request;
 
     TEST_EXPECT_SUCCESS(az_http_request_init(
         &request,
@@ -307,7 +307,7 @@ static void test_http_request(void** state)
     az_span remainder = az_span_copy(url_span, initial_url);
     assert_int_equal(az_span_size(remainder), 100 - az_span_size(initial_url));
     az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-    _az_http_request request;
+    az_http_request request;
 
     TEST_EXPECT_SUCCESS(az_http_request_init(
         &request,
@@ -341,7 +341,7 @@ static void test_http_request(void** state)
     az_span remainder = az_span_copy(url_span, initial_url);
     assert_int_equal(az_span_size(remainder), 100 - az_span_size(initial_url));
     az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-    _az_http_request request;
+    az_http_request request;
 
     TEST_EXPECT_SUCCESS(az_http_request_init(
         &request,
@@ -379,7 +379,7 @@ static void test_http_request(void** state)
     az_span remainder = az_span_copy(url_span, initial_url);
     assert_int_equal(az_span_size(remainder), 100 - az_span_size(initial_url));
     az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-    _az_http_request request;
+    az_http_request request;
 
     TEST_EXPECT_SUCCESS(az_http_request_init(
         &request,
@@ -417,7 +417,7 @@ static void test_http_request(void** state)
     az_span ignore = az_span_copy(url_span, AZ_SPAN_FROM_STR("http://example.com?q1=123&q2=456"));
     (void)ignore;
     az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-    _az_http_request request;
+    az_http_request request;
 
     TEST_EXPECT_SUCCESS(az_http_request_init(
         &request,
@@ -454,7 +454,7 @@ static void test_http_request(void** state)
     az_span remainder = az_span_copy(url_span, request_url);
     assert_int_equal(az_span_size(remainder), 100 - az_span_size(request_url));
     az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-    _az_http_request request;
+    az_http_request request;
 
     TEST_EXPECT_SUCCESS(az_http_request_init(
         &request,
@@ -607,7 +607,7 @@ static void test_http_request_removing_left_white_spaces(void** state)
   az_span remainder = az_span_copy(url_span, request_url);
   assert_int_equal(az_span_size(remainder), 100 - az_span_size(request_url));
   az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-  _az_http_request request;
+  az_http_request request;
 
   TEST_EXPECT_SUCCESS(az_http_request_init(
       &request,
@@ -632,7 +632,7 @@ static void test_http_request_header_validation(void** state)
 
     az_span url_span = AZ_SPAN_FROM_STR("some.url.com");
     az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-    _az_http_request request;
+    az_http_request request;
 
     TEST_EXPECT_SUCCESS(az_http_request_init(
         &request,
@@ -663,7 +663,7 @@ static void test_http_request_header_validation_above_127(void** state)
 
     az_span url_span = AZ_SPAN_FROM_STR("some.url.com");
     az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-    _az_http_request request;
+    az_http_request request;
 
     TEST_EXPECT_SUCCESS(az_http_request_init(
         &request,

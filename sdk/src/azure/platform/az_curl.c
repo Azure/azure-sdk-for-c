@@ -219,7 +219,7 @@ _az_http_client_curl_add_expect_header(CURL* ref_curl, struct curl_slist** ref_l
  * @return az_result
  */
 static AZ_NODISCARD az_result
-_az_http_client_curl_build_headers(_az_http_request const* request, struct curl_slist** ref_headers)
+_az_http_client_curl_build_headers(az_http_request const* request, struct curl_slist** ref_headers)
 {
   _az_PRECONDITION_NOT_NULL(request);
 
@@ -321,7 +321,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_delete_request(CURL* ref
  * handles POST request. It handles seting up a body for request
  */
 static AZ_NODISCARD az_result
-_az_http_client_curl_send_post_request(CURL* ref_curl, _az_http_request const* request)
+_az_http_client_curl_send_post_request(CURL* ref_curl, az_http_request const* request)
 {
   _az_PRECONDITION_NOT_NULL(ref_curl);
   _az_PRECONDITION_NOT_NULL(request);
@@ -406,7 +406,7 @@ static int32_t _az_http_client_curl_upload_read_callback(
  * As of CURL 7.12.1 CURLOPT_PUT is deprecated.  PUT requests should be made using CURLOPT_UPLOAD
  */
 static AZ_NODISCARD az_result
-_az_http_client_curl_send_upload_request(CURL* ref_curl, _az_http_request const* request)
+_az_http_client_curl_send_upload_request(CURL* ref_curl, az_http_request const* request)
 {
   _az_PRECONDITION_NOT_NULL(ref_curl);
   _az_PRECONDITION_NOT_NULL(request);
@@ -444,7 +444,7 @@ _az_http_client_curl_send_upload_request(CURL* ref_curl, _az_http_request const*
 static AZ_NODISCARD az_result _az_http_client_curl_setup_headers(
     CURL* ref_curl,
     struct curl_slist** ref_list,
-    _az_http_request const* request)
+    az_http_request const* request)
 {
   _az_PRECONDITION_NOT_NULL(ref_curl);
   _az_PRECONDITION_NOT_NULL(request);
@@ -471,7 +471,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_setup_headers(
  * @return az_result
  */
 static AZ_NODISCARD az_result
-_az_http_client_curl_setup_url(CURL* ref_curl, _az_http_request const* request)
+_az_http_client_curl_setup_url(CURL* ref_curl, az_http_request const* request)
 {
   _az_PRECONDITION_NOT_NULL(ref_curl);
   _az_PRECONDITION_NOT_NULL(request);
@@ -545,7 +545,7 @@ _az_http_client_curl_setup_response_redirect(CURL* ref_curl, az_http_response* r
  */
 static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
     CURL* ref_curl,
-    _az_http_request const* request,
+    az_http_request const* request,
     az_http_response* ref_response)
 {
   _az_PRECONDITION_NOT_NULL(ref_curl);
@@ -602,7 +602,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
  * @return az_result
  */
 AZ_NODISCARD az_result
-az_http_client_send_request(_az_http_request const* request, az_http_response* ref_response)
+az_http_client_send_request(az_http_request const* request, az_http_response* ref_response)
 {
   _az_PRECONDITION_NOT_NULL(request);
   _az_PRECONDITION_NOT_NULL(ref_response);

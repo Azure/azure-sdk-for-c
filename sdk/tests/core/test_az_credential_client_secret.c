@@ -94,7 +94,7 @@ static void test_credential_client_secret(void** state)
 
       uint8_t header_buf[500] = { 0 };
       uint8_t body_buf[500] = { 0 };
-      _az_http_request request = { 0 };
+      az_http_request request = { 0 };
       ignore = az_http_request_init(
           &request,
           &az_context_application,
@@ -124,9 +124,9 @@ static void test_credential_client_secret(void** state)
   }
 }
 
-az_result send_request(_az_http_request const* request, az_http_response* response);
+az_result send_request(az_http_request const* request, az_http_response* response);
 
-az_result send_request(_az_http_request const* request, az_http_response* response)
+az_result send_request(az_http_request const* request, az_http_response* response)
 {
   // This function handles requests to both auth service and to the supposed service itself.
   // (we only can inject at compile time).
@@ -276,12 +276,12 @@ az_result send_request(_az_http_request const* request, az_http_response* respon
 
 #ifdef _az_MOCK_ENABLED
 az_result __wrap_az_http_client_send_request(
-    _az_http_request const* request,
+    az_http_request const* request,
     az_http_response* ref_response);
 int64_t __wrap_az_platform_clock_msec();
 
 az_result __wrap_az_http_client_send_request(
-    _az_http_request const* request,
+    az_http_request const* request,
     az_http_response* ref_response)
 {
   return send_request(request, ref_response);

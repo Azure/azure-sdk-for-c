@@ -57,7 +57,7 @@ az_span const _az_auth_header_name = AZ_SPAN_LITERAL_FROM_STR("authorization");
 static AZ_NODISCARD az_result _az_credential_client_secret_apply_policy(
     _az_http_policy* policies,
     az_credential_client_secret* credential,
-    _az_http_request* ref_request,
+    az_http_request* ref_request,
     az_http_response* response)
 {
   _az_token token = { 0 };

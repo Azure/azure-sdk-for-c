@@ -33,16 +33,24 @@
  */
 static az_span const AZ_STORAGE_API_VERSION = AZ_SPAN_LITERAL_FROM_STR("2019-02-02");
 
+/**
+ * @brief Azure Storage Blobs blob client options
+ * @remark Allows customization of the blob client.
+ */
 typedef struct
 {
-  az_http_policy_retry_options retry;
+  az_http_policy_retry_options retry_options; /**< Optional values used to override the default retry policy options **/
   struct
   {
     _az_http_policy_apiversion_options api_version;
-    _az_http_policy_telemetry_options _telemetry_options;
+    _az_http_policy_telemetry_options telemetry_options;
   } _internal;
 } az_storage_blobs_blob_client_options;
 
+/**
+ * @brief Azure Storage Blobs Blob Client.
+ *
+ */
 typedef struct
 {
   struct
@@ -64,7 +72,7 @@ typedef struct
  * @param endpoint A url to a blob storage account.
  * @param credential The object used for authentication.
  *         #AZ_CREDENTIAL_ANONYMOUS should be used for SAS.
- * @param options  A reference to an #az_storage_blobs_blob_client_options structure which defines
+ * @param options A reference to an #az_storage_blobs_blob_client_options structure which defines
  * custom behavior of the client.
  *
  * @return An #az_result value indicating the result of the operation:
@@ -76,17 +84,20 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
     void* credential,
     az_storage_blobs_blob_client_options* options);
 
+/**
+ * @brief Azure Storage Blobs Blob upload options.
+ * @remark Reserved for future use
+ */
 typedef struct
 {
   struct
   {
-    az_span option;
+    az_span unused;
   } _internal;
 } az_storage_blobs_blob_upload_options;
 
 /**
  * @brief Gets the default blob storage options.
- *
  * @details Call this to obtain an initialized #az_storage_blobs_blob_client_options structure that
  * can be modified and passed to #az_storage_blobs_blob_client_init().
  *
@@ -107,7 +118,7 @@ AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_o
 AZ_NODISCARD AZ_INLINE az_storage_blobs_blob_upload_options
 az_storage_blobs_blob_upload_options_default()
 {
-  return (az_storage_blobs_blob_upload_options){ ._internal = { .option = AZ_SPAN_NULL } };
+  return (az_storage_blobs_blob_upload_options){ ._internal = { .unused = AZ_SPAN_NULL } };
 }
 
 /**

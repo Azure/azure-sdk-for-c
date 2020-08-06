@@ -433,10 +433,10 @@ The second component is an **HTTP transport adapter**. This is the implementatio
 
 ```c
 AZ_NODISCARD az_result
-az_http_client_send_request(_az_http_request const* request, az_http_response* ref_response);
+az_http_client_send_request(az_http_request const* request, az_http_response* ref_response);
 ```
 
-For example, Azure SDK provides a cmake target `az_curl` (find it [here](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/src/azure/platform/az_curl.c)) with the implementation code for the contract function mentioned before. It uses an `_az_http_request` reference to create an specific `libcurl` request and send it though the wire. Then it uses `libcurl` response to fill the `az_http_response` reference structure.
+For example, Azure SDK provides a cmake target `az_curl` (find it [here](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/src/azure/platform/az_curl.c)) with the implementation code for the contract function mentioned before. It uses an `az_http_request` reference to create an specific `libcurl` request and send it though the wire. Then it uses `libcurl` response to fill the `az_http_response` reference structure.
 
 ### Link your application with your own HTTP stack
 

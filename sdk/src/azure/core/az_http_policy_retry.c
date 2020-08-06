@@ -151,7 +151,7 @@ AZ_INLINE AZ_NODISCARD az_result _az_http_policy_retry_get_retry_after(
 AZ_NODISCARD az_result az_http_pipeline_policy_retry(
     _az_http_policy* ref_policies,
     void* ref_options,
-    _az_http_request* ref_request,
+    az_http_request* ref_request,
     az_http_response* ref_response)
 {
   az_http_policy_retry_options const* const retry_options
