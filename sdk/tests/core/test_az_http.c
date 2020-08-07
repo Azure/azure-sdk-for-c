@@ -594,7 +594,7 @@ static void test_http_response(void** state)
 #ifndef AZ_NO_PRECONDITION_CHECKING
 ENABLE_PRECONDITION_CHECK_TESTS()
 
-static void test_http_request_removing_left_whitespaces(void** state)
+static void test_http_request_removing_left_whitespace_chars(void** state)
 {
   (void)state;
 
@@ -848,7 +848,7 @@ int test_az_http()
 
   const struct CMUnitTest tests[] = {
 #ifndef AZ_NO_PRECONDITION_CHECKING
-    cmocka_unit_test(test_http_request_removing_left_whitespaces),
+    cmocka_unit_test(test_http_request_removing_left_whitespace_chars),
     cmocka_unit_test(test_http_request_header_validation),
     cmocka_unit_test(test_http_request_header_validation_above_127),
     cmocka_unit_test(test_http_response_append_null_response),
