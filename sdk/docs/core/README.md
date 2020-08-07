@@ -16,7 +16,7 @@ Many SDK functions return an `az_result` as defined in [inc/az_result.h](https:/
 
 ### Working with Spans
 
-An `az_span` is a small data structure (defined in our [az_span.h](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/inc/azure/core/az_span.h) file) wrapping a byte buffer. Specifically, an `az_span` instance contains:
+An `az_span` is a small data structure (defined in our [az_span.h](../../../sdk/inc/azure/core/az_span.h) file) wrapping a byte buffer. Specifically, an `az_span` instance contains:
 
 - a byte pointer
 - an integer size
@@ -72,7 +72,7 @@ There are many functions to manipulate `az_span` instances. You can slice (subse
 
 ### Strings
 
-A string is a span of UTF-8 characters. It's not a zero-terminated string. Defined in [inc/az_span.h](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/inc/azure/core/az_span.h).
+A string is a span of UTF-8 characters. It's not a zero-terminated string. Defined in [inc/az_span.h](../../../sdk/inc/azure/core/az_span.h).
 
 ```c
 az_span hello_world = AZ_SPAN_FROM_STR("Hello world!");
