@@ -32,7 +32,7 @@ enum
  * @return `true` if the \p value is finite (that is, it is not infinite or not a number), otherwise
  * return `false`.
  */
-AZ_NODISCARD AZ_INLINE bool _az_is_finite(double value)
+AZ_NODISCARD AZ_INLINE bool _az_isfinite(double value)
 {
   uint64_t binary_value = *(uint64_t*)&value;
 
