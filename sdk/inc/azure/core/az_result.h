@@ -104,10 +104,6 @@ typedef enum
       _az_FACILITY_PLATFORM,
       2), ///< Dynamic memory allocation request was not successful.
 
-  AZ_ERROR_HTTP_PLATFORM = _az_RESULT_MAKE_ERROR(
-      _az_FACILITY_PLATFORM,
-      3), ///< Generic error in the HTTP Client layer implementation.
-
   // JSON error codes
   AZ_ERROR_JSON_INVALID_STATE = _az_RESULT_MAKE_ERROR(_az_FACILITY_JSON, 1),
   AZ_ERROR_JSON_NESTING_OVERFLOW
@@ -118,6 +114,11 @@ typedef enum
   AZ_ERROR_HTTP_INVALID_STATE = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 1),
   AZ_ERROR_HTTP_PIPELINE_INVALID_POLICY = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 2),
   AZ_ERROR_HTTP_INVALID_METHOD_VERB = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 3),
+
+  // HTTP Adapter error codes
+  AZ_ERROR_HTTP_ADAPTER = _az_RESULT_MAKE_ERROR(
+      _az_FACILITY_HTTP,
+      5), ///< Generic error in the HTTP transport adapter implementation.
 
   AZ_ERROR_HTTP_AUTHENTICATION_FAILED
   = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 4), ///< Authentication failed.
