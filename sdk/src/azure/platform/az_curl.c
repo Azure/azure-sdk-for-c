@@ -238,6 +238,7 @@ _az_http_client_curl_append_url(az_span writable_buffer, az_span url_from_reques
   int32_t length;
   AZ_RETURN_IF_FAILED(_az_span_url_encode(writable_buffer, url_from_request, &length));
    */
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(writable_buffer, az_span_size(url_from_request) + 1);
   az_span remainder = az_span_copy(writable_buffer, url_from_request);
   az_span_copy_u8(remainder, 0);
 
