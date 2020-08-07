@@ -72,9 +72,9 @@ az_context_create_with_expiration(az_context const* parent, int64_t expiration)
  *
  * @param[in] parent The #az_context node that the new node is to be a child of; passing `NULL` sets
  * the parent to #az_context_application.
- * @param[in] key A pointer to the key of this new #az_context node
- * @param[in] value A pointer to the value of this new #az_context node
- * @return The new child #az_context node
+ * @param[in] key A pointer to the key of this new #az_context node.
+ * @param[in] value A pointer to the value of this new #az_context node.
+ * @return The new child #az_context node.
  */
 AZ_NODISCARD AZ_INLINE az_context
 az_context_create_with_value(az_context const* parent, void const* key, void const* value)
