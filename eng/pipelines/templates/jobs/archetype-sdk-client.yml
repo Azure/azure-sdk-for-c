@@ -281,6 +281,10 @@ jobs:
   pool:
     vmImage: windows-2019
   steps:
+    - template: /eng/common/pipelines/templates/steps/verify-links.yml
+      parameters:
+        Directory: ''
+
     # Generate release-info
     - pwsh: >-
         New-Item
