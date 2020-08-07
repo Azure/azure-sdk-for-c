@@ -8,7 +8,7 @@ The Azure SDK Storage Blobs Library for Embedded C can be used for the following
 
 ## Getting Started
 
-The Azure Storage Blobs Client library is created to facilitate connectivity to Azure Storage Blobs services using the HTTP stack of the user's choice. This means that this SDK is **NOT** a platform but instead is a true SDK library.
+The Azure Storage Blobs Client library facilitates connectivity to the Azure Storage Blobs service. Since this service uses HTTP, you must plug in an HTTP adapter capable of sending the HTTP request to your device's HTTP stack. For information on how to do this, please see [this page][docs_platform_readme].
 
 ### Docs
 
@@ -90,6 +90,7 @@ Azure SDK for Embedded C is licensed under the [MIT][azure_sdk_for_c_license] li
 [azure_sdk_for_c_readme]: ../../../README.md
 [azure_sdk_for_c_readme_getting_started]:../../../README.md#getting-started-using-the-sdk
 [samples_storage_blobs_readme]: ../../samples/storage/blobs/README.md
+[docs_platform_readme]: ../platform/README.md
 [storage_access_control_sas]: https://docs.microsoft.com/en-us/rest/api/storageservices/delegate-access-with-shared-access-signature
 [storage_account_create]: https://docs.microsoft.com/en-us/azure/storage/common/storage-account-create?tabs=azure-portal
 [storage_blobs]: https://docs.microsoft.com/en-us/azure/storage/blobs/storage-blobs-overview
