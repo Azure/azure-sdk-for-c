@@ -198,7 +198,7 @@ static az_result read_configuration_entry(
   if (env_value != NULL)
   {
     printf("%s\n", hide_value ? "***" : env_value);
-    az_span env_span = az_span_from_str(env_value);
+    az_span env_span = az_span_create_from_str(env_value);
     AZ_RETURN_IF_NOT_ENOUGH_SIZE(buffer, az_span_size(env_span));
     az_span_copy(buffer, env_span);
     *out_value = az_span_slice(buffer, 0, az_span_size(env_span));
@@ -224,7 +224,7 @@ static az_result create_mqtt_endpoint(char* destination, int32_t destination_siz
     return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
   }
 
-  az_span destination_span = az_span_init((uint8_t*)destination, destination_size);
+  az_span destination_span = az_span_create((uint8_t*)destination, destination_size);
   az_span remainder = az_span_copy(destination_span, mqtt_url_prefix);
   remainder = az_span_copy(remainder, az_span_slice(iot_hub, 0, iot_hub_length));
   remainder = az_span_copy(remainder, mqtt_url_suffix);

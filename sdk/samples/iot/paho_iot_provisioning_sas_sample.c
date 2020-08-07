@@ -279,7 +279,7 @@ static az_result read_configuration_entry(
   if (env_value != NULL)
   {
     (void)printf("%s = %s\n", env_name, hide_value ? "***" : env_value);
-    az_span env_span = az_span_from_str(env_value);
+    az_span env_span = az_span_create_from_str(env_value);
     AZ_RETURN_IF_NOT_ENOUGH_SIZE(buffer, az_span_size(env_span));
     az_span_copy(buffer, env_span);
     *out_value = az_span_slice(buffer, 0, az_span_size(env_span));
@@ -541,8 +541,8 @@ static void parse_operation_message(
     az_iot_provisioning_client_operation_status* operation_status)
 {
   int rc;
-  az_span topic_span = az_span_init((uint8_t*)topic, topic_len);
-  az_span message_span = az_span_init((uint8_t*)message->payload, message->payloadlen);
+  az_span topic_span = az_span_create((uint8_t*)topic, topic_len);
+  az_span message_span = az_span_create((uint8_t*)message->payload, message->payloadlen);
 
   if (az_failed(
           rc = az_iot_provisioning_client_parse_received_topic_and_payload(

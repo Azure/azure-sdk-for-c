@@ -98,7 +98,7 @@ _az_get_http_status_line(az_span* ref_span, az_http_response_status_line* out_st
   // status-code = 3DIGIT
   {
     uint64_t code = 0;
-    AZ_RETURN_IF_FAILED(az_span_atou64(az_span_init(az_span_ptr(*ref_span), 3), &code));
+    AZ_RETURN_IF_FAILED(az_span_atou64(az_span_create(az_span_ptr(*ref_span), 3), &code));
     out_status_line->status_code = (az_http_status_code)code;
     // move reader
     *ref_span = az_span_slice_to_end(*ref_span, 3);
@@ -194,10 +194,11 @@ az_http_response_get_next_header(az_http_response* ref_response, az_pair* out_he
     // update reader to next position after colon (add one)
     *reader = az_span_slice_to_end(*reader, field_name_length + 1);
 
-    // Remove white spaces from header name https://github.com/Azure/azure-sdk-for-c/issues/604
-    out_header->key = _az_span_trim_white_space(out_header->key);
+    // Remove whitespace characters from header name
+    // https://github.com/Azure/azure-sdk-for-c/issues/604
+    out_header->key = _az_span_trim_whitespace(out_header->key);
 
-    // OWS -> remove the optional white spaces before header value
+    // OWS -> remove the optional whitespace characters before header value
     int32_t ows_len = 0;
     AZ_RETURN_IF_FAILED(_az_span_scan_until(*reader, _az_slice_is_not_http_whitespace, &ows_len));
     *reader = az_span_slice_to_end(*reader, ows_len);
@@ -224,7 +225,7 @@ az_http_response_get_next_header(az_http_response* ref_response, az_pair* out_he
       }
       if (_az_is_http_whitespace(c))
       {
-        continue; // white space or tab is accepted. It can be any number after value (OWS)
+        continue; // whitespace or tab is accepted. It can be any number after value (OWS)
       }
       if (c <= ' ')
       {
@@ -236,8 +237,8 @@ az_http_response_get_next_header(az_http_response* ref_response, az_pair* out_he
     // moving reader. It is currently after \r was found
     *reader = az_span_slice_to_end(*reader, offset);
 
-    // Remove white spaces from value https://github.com/Azure/azure-sdk-for-c/issues/604
-    out_header->value = _az_span_trim_white_space_from_end(out_header->value);
+    // Remove whitespace characters from value https://github.com/Azure/azure-sdk-for-c/issues/604
+    out_header->value = _az_span_trim_whitespace_from_end(out_header->value);
   }
 
   AZ_RETURN_IF_FAILED(_az_is_expected_span(reader, AZ_SPAN_FROM_STR("\n")));

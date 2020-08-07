@@ -69,9 +69,11 @@ static AZ_NODISCARD az_span _get_remaining_span(az_json_writer* json_writer, int
 
   if (az_span_size(remaining) < required_size && json_writer->_internal.allocator_callback != NULL)
   {
-    az_allocator_context context = { .bytes_used = json_writer->_internal.bytes_written,
-                                     .minimum_required_size = required_size,
-                                     .user_context = json_writer->_internal.user_context };
+    az_span_allocator_context context = {
+      .user_context = json_writer->_internal.user_context,
+      .bytes_used = json_writer->_internal.bytes_written,
+      .minimum_required_size = required_size,
+    };
 
     // No more space left in the destination, let the caller fail with
     // AZ_ERROR_INSUFFICIENT_SPAN_SIZE
@@ -806,7 +808,7 @@ az_json_writer_append_double(az_json_writer* json_writer, double value, int32_t 
   _az_PRECONDITION(_az_is_appending_value_valid(json_writer));
   // Non-finite numbers are not supported because they lead to invalid JSON.
   // Unquoted strings such as nan and -inf are invalid as JSON numbers.
-  _az_PRECONDITION(_az_is_finite(value));
+  _az_PRECONDITION(_az_isfinite(value));
   _az_PRECONDITION_RANGE(0, fractional_digits, _az_MAX_SUPPORTED_FRACTIONAL_DIGITS);
 
   int32_t required_size = _az_MAX_SIZE_FOR_DOUBLE; // Need enough space to write any double number.

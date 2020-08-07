@@ -4,25 +4,13 @@
 #include <azure/core/az_http.h>
 #include <azure/core/az_http_transport.h>
 #include <azure/core/az_span.h>
+#include <azure/core/internal/az_span_internal.h>
 
 #include <stdlib.h>
 
 #include <curl/curl.h>
 
 #include <azure/core/_az_cfg.h>
-
-/*Copying AZ_CONTRACT on purpose from AZ_CORE because 3rd parties can define this and should not
- * depend on internal CORE headers */
-#define _az_PRECONDITION(condition, error) \
-  do \
-  { \
-    if (!(condition)) \
-    { \
-      return error; \
-    } \
-  } while (0)
-
-#define _az_PRECONDITION_NOT_NULL(arg) _az_PRECONDITION((arg) != NULL, AZ_ERROR_ARG)
 
 static AZ_NODISCARD az_result _az_span_malloc(int32_t size, az_span* out)
 {
@@ -33,7 +21,7 @@ static AZ_NODISCARD az_result _az_span_malloc(int32_t size, az_span* out)
   {
     return AZ_ERROR_OUT_OF_MEMORY;
   }
-  *out = az_span_init(p, size);
+  *out = az_span_create(p, size);
   return AZ_OK;
 }
 
@@ -219,7 +207,7 @@ _az_http_client_curl_add_expect_header(CURL* ref_curl, struct curl_slist** ref_l
  * @return az_result
  */
 static AZ_NODISCARD az_result
-_az_http_client_curl_build_headers(_az_http_request const* request, struct curl_slist** ref_headers)
+_az_http_client_curl_build_headers(az_http_request const* request, struct curl_slist** ref_headers)
 {
   _az_PRECONDITION_NOT_NULL(request);
 
@@ -245,12 +233,10 @@ _az_http_client_curl_build_headers(_az_http_request const* request, struct curl_
 static AZ_NODISCARD az_result
 _az_http_client_curl_append_url(az_span writable_buffer, az_span url_from_request)
 {
-  int32_t required_length = az_span_size(url_from_request) + 1;
-
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(writable_buffer, required_length);
-
-  writable_buffer = az_span_copy(writable_buffer, url_from_request);
-  az_span_copy_u8(writable_buffer, 0);
+  int32_t length;
+  AZ_RETURN_IF_FAILED(_az_span_url_encode(writable_buffer, url_from_request, &length));
+  az_span remainder = az_span_slice_to_end(writable_buffer, length);
+  az_span_copy_u8(remainder, 0);
 
   return AZ_OK;
 }
@@ -275,7 +261,7 @@ static size_t _az_http_client_curl_write_to_span(
   size_t const expected_size = size * nmemb;
   az_http_response* response = (az_http_response*)userp;
 
-  az_span const span_for_content = az_span_init((uint8_t*)contents, (int32_t)expected_size);
+  az_span const span_for_content = az_span_create((uint8_t*)contents, (int32_t)expected_size);
 
   az_result write_response_result = az_http_response_append(response, span_for_content);
 
@@ -305,8 +291,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_get_request(CURL* ref_cu
 /**
  * handles DELETE request
  */
-static AZ_NODISCARD az_result
-_az_http_client_curl_send_delete_request(CURL* ref_curl)
+static AZ_NODISCARD az_result _az_http_client_curl_send_delete_request(CURL* ref_curl)
 {
   _az_PRECONDITION_NOT_NULL(ref_curl);
 
@@ -322,7 +307,7 @@ _az_http_client_curl_send_delete_request(CURL* ref_curl)
  * handles POST request. It handles seting up a body for request
  */
 static AZ_NODISCARD az_result
-_az_http_client_curl_send_post_request(CURL* ref_curl, _az_http_request const* request)
+_az_http_client_curl_send_post_request(CURL* ref_curl, az_http_request const* request)
 {
   _az_PRECONDITION_NOT_NULL(ref_curl);
   _az_PRECONDITION_NOT_NULL(request);
@@ -407,7 +392,7 @@ static int32_t _az_http_client_curl_upload_read_callback(
  * As of CURL 7.12.1 CURLOPT_PUT is deprecated.  PUT requests should be made using CURLOPT_UPLOAD
  */
 static AZ_NODISCARD az_result
-_az_http_client_curl_send_upload_request(CURL* ref_curl, _az_http_request const* request)
+_az_http_client_curl_send_upload_request(CURL* ref_curl, az_http_request const* request)
 {
   _az_PRECONDITION_NOT_NULL(ref_curl);
   _az_PRECONDITION_NOT_NULL(request);
@@ -445,7 +430,7 @@ _az_http_client_curl_send_upload_request(CURL* ref_curl, _az_http_request const*
 static AZ_NODISCARD az_result _az_http_client_curl_setup_headers(
     CURL* ref_curl,
     struct curl_slist** ref_list,
-    _az_http_request const* request)
+    az_http_request const* request)
 {
   _az_PRECONDITION_NOT_NULL(ref_curl);
   _az_PRECONDITION_NOT_NULL(request);
@@ -472,7 +457,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_setup_headers(
  * @return az_result
  */
 static AZ_NODISCARD az_result
-_az_http_client_curl_setup_url(CURL* ref_curl, _az_http_request const* request)
+_az_http_client_curl_setup_url(CURL* ref_curl, az_http_request const* request)
 {
   _az_PRECONDITION_NOT_NULL(ref_curl);
   _az_PRECONDITION_NOT_NULL(request);
@@ -480,7 +465,7 @@ _az_http_client_curl_setup_url(CURL* ref_curl, _az_http_request const* request)
   az_span request_url = { 0 };
   // get request_url. It will have the size of what it has written in it only
   AZ_RETURN_IF_FAILED(az_http_request_get_url(request, &request_url));
-  int32_t request_url_size = az_span_size(request_url);
+  int32_t request_url_size = _az_span_url_encode_calc_length(request_url);
 
   az_span writable_buffer;
   {
@@ -546,7 +531,7 @@ _az_http_client_curl_setup_response_redirect(CURL* ref_curl, az_http_response* r
  */
 static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
     CURL* ref_curl,
-    _az_http_request const* request,
+    az_http_request const* request,
     az_http_response* ref_response)
 {
   _az_PRECONDITION_NOT_NULL(ref_curl);
@@ -603,7 +588,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_send_request_impl_process(
  * @return az_result
  */
 AZ_NODISCARD az_result
-az_http_client_send_request(_az_http_request const* request, az_http_response* ref_response)
+az_http_client_send_request(az_http_request const* request, az_http_response* ref_response)
 {
   _az_PRECONDITION_NOT_NULL(request);
   _az_PRECONDITION_NOT_NULL(ref_response);

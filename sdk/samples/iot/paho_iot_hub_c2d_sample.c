@@ -229,7 +229,7 @@ static az_result read_configuration_entry(
   if (env_value != NULL)
   {
     printf("%s\n", hide_value ? "***" : env_value);
-    az_span env_span = az_span_from_str(env_value);
+    az_span env_span = az_span_create_from_str(env_value);
     AZ_RETURN_IF_NOT_ENOUGH_SIZE(buffer, az_span_size(env_span));
     az_span_copy(buffer, env_span);
     *out_value = az_span_slice(buffer, 0, az_span_size(env_span));
@@ -255,7 +255,7 @@ static az_result create_mqtt_endpoint(char* destination, int32_t destination_siz
     return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
   }
 
-  az_span destination_span = az_span_init((uint8_t*)destination, destination_size);
+  az_span destination_span = az_span_create((uint8_t*)destination, destination_size);
   az_span remainder = az_span_copy(destination_span, mqtt_url_prefix);
   remainder = az_span_copy(remainder, az_span_slice(iot_hub, 0, iot_hub_length));
   remainder = az_span_copy(remainder, mqtt_url_suffix);
@@ -330,12 +330,12 @@ static void receive_messages()
   az_iot_hub_client_c2d_request c2d_request;
 
   // Wait until max # messages received or timeout to receive a single message expires.
-  for(uint8_t message_count = 0; message_count < MAX_MESSAGE_COUNT; message_count++)
+  for (uint8_t message_count = 0; message_count < MAX_MESSAGE_COUNT; message_count++)
   {
     if (((rc
           = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, TIMEOUT_MQTT_RECEIVE_MS))
-          != MQTTCLIENT_SUCCESS)
-          && (rc != MQTTCLIENT_TOPICNAME_TRUNCATED))
+         != MQTTCLIENT_SUCCESS)
+        && (rc != MQTTCLIENT_TOPICNAME_TRUNCATED))
     {
       LOG_ERROR("Failed to receive message: MQTTClient return code %d.", rc);
       exit(rc);
@@ -367,8 +367,8 @@ static void parse_message(
     az_iot_hub_client_c2d_request* c2d_request)
 {
   int rc;
-  az_span topic_span = az_span_init((uint8_t*)topic, topic_len);
-  az_span message_span = az_span_init((uint8_t*)message->payload, message->payloadlen);
+  az_span topic_span = az_span_create((uint8_t*)topic, topic_len);
+  az_span message_span = az_span_create((uint8_t*)message->payload, message->payloadlen);
 
   if (az_failed(rc = az_iot_hub_client_c2d_parse_received_topic(&client, topic_span, c2d_request)))
   {
