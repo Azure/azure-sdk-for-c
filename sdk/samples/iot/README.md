@@ -22,7 +22,7 @@ This section provides an overview of the different samples available to run and 
 
 - *Executable:* `paho_iot_hub_c2d_sample`
 
-  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_c2d_sample.c) receives incoming cloud-to-device (C2D) messages invoked from the Azure IoT Hub. It will successfully receive up to 5 messages sent from the service. If a timeout occurs of while waiting for a message, the sample will exit. X509 self-certification is used.
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_c2d_sample.c) receives incoming cloud-to-device (C2D) messages invoked from the Azure IoT Hub. It will successfully receive up to 5 messages sent from the service. If a timeout occurs while waiting for a message, the sample will exit. X509 self-certification is used.
 
   To send C2D messages, select your device's Message to Device tab in your Azure IoT Hub. Enter a message in the Message Body and select Send Message.
 
@@ -30,7 +30,7 @@ This section provides an overview of the different samples available to run and 
 
 - *Executable:* `paho_iot_hub_methods_sample`
 
-  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_methods_sample.c) receives incoming method commands invoked from the the Azure IoT Hub. It will successfully receive up to 5 method commands sent from the service. If a timeout occurs of while waiting for a message, the sample will exit. X509 self-certification is used.
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_methods_sample.c) receives incoming method commands invoked from the the Azure IoT Hub. It will successfully receive up to 5 method commands sent from the service. If a timeout occurs while waiting for a message, the sample will exit. X509 self-certification is used.
 
   To send a method command, select your device's Direct Method tab in your Azure IoT Hub. Enter a method name and select Invoke Method. A method named `ping` is supported, which if successful will return a json payload of the following:
 
