@@ -10,7 +10,7 @@
 // This is a global az_context node representing the entire application. By default, this node
 // never expires. Call az_context_cancel passing a pointer to this node to cancel the entire
 // application (which cancels all the child nodes).
-az_context az_context_app = {
+az_context az_context_application = {
   ._internal
   = { .parent = NULL, .expiration = _az_CONTEXT_MAX_EXPIRATION, .key = NULL, .value = NULL }
 };

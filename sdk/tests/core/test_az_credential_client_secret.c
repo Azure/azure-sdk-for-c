@@ -96,7 +96,7 @@ static void test_credential_client_secret(void** state)
       _az_http_request request = { 0 };
       ignore = az_http_request_init(
           &request,
-          &az_context_app,
+          &az_context_application,
           az_http_method_get(),
           request_url,
           az_span_size(request_url),

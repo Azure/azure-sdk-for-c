@@ -92,7 +92,7 @@ int main()
   // 3) upload content
   printf("Uploading blob...\n");
   az_result const blob_upload_result = az_storage_blobs_blob_upload(
-      &client, &az_context_app, content_to_upload, NULL, &http_response);
+      &client, content_to_upload, NULL, &http_response);
 
   // This validation is only for the first time SDK client is used. API will return not implemented
   // if samples were built with no_http lib.

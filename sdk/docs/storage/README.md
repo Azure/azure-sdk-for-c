@@ -2,7 +2,7 @@
 
 Azure Storage Blobs library (`az_storage_blobs`) provides abstractions, and helpers for communicating with Azure Storage Blobs in the C programming language. This library follows the Azure SDK Design Guidelines for Embedded C.
 
-Use the Azure SDK Storage Blobs Library for Embedded C to work with Azure Storage Blobs.
+The Azure SDK Storage Blobs Library for Embedded C can be used for the following actions:
 
 * Upload blobs
 
@@ -42,7 +42,7 @@ The client credential should be set to `AZ_CREDENTIAL_ANONYMOUS` when using SAS 
 
 ### Creating the Storage Client
 
-To use the storage client the first action is to initialize the client with `az_storage_blobs_blob_client_init`.
+To use the storage client, the first action is to initialize the client with `az_storage_blobs_blob_client_init`.
 ```C
   az_storage_blobs_blob_client client;
   az_storage_blobs_blob_client_options options = az_storage_blobs_blob_client_options_default();
@@ -56,7 +56,7 @@ To use the storage client the first action is to initialize the client with `az_
 Once the client is created it can be used to upload blobs.
 ```C
   az_result const blob_upload_result = az_storage_blobs_blob_upload(
-      &client, &az_context_app, content_to_upload, NULL, &http_response)
+      &client, &az_context_application, content_to_upload, NULL, &http_response)
 ```
 
 ### Retry Policy

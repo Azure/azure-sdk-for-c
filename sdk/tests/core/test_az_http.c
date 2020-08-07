@@ -64,7 +64,7 @@ static void test_http_request(void** state)
 
     TEST_EXPECT_SUCCESS(az_http_request_init(
         &request,
-        &az_context_app,
+        &az_context_application,
         az_http_method_get(),
         url_span,
         az_span_size(request_url),
@@ -169,7 +169,7 @@ static void test_http_request(void** state)
 
     TEST_EXPECT_SUCCESS(az_http_request_init(
         &request,
-        &az_context_app,
+        &az_context_application,
         az_http_method_get(),
         url_span,
         az_span_size(request_url),
@@ -195,7 +195,7 @@ static void test_http_request(void** state)
 
     TEST_EXPECT_SUCCESS(az_http_request_init(
         &request,
-        &az_context_app,
+        &az_context_application,
         az_http_method_get(),
         url_span,
         az_span_size(initial_url),
@@ -243,7 +243,7 @@ static void test_http_request(void** state)
 
     TEST_EXPECT_SUCCESS(az_http_request_init(
         &request,
-        &az_context_app,
+        &az_context_application,
         az_http_method_get(),
         url_span,
         az_span_size(initial_url),
@@ -277,7 +277,7 @@ static void test_http_request(void** state)
 
     TEST_EXPECT_SUCCESS(az_http_request_init(
         &request,
-        &az_context_app,
+        &az_context_application,
         az_http_method_get(),
         url_span,
         az_span_size(initial_url),
@@ -311,7 +311,7 @@ static void test_http_request(void** state)
 
     TEST_EXPECT_SUCCESS(az_http_request_init(
         &request,
-        &az_context_app,
+        &az_context_application,
         az_http_method_get(),
         url_span,
         az_span_size(initial_url),
@@ -345,7 +345,7 @@ static void test_http_request(void** state)
 
     TEST_EXPECT_SUCCESS(az_http_request_init(
         &request,
-        &az_context_app,
+        &az_context_application,
         az_http_method_get(),
         url_span,
         az_span_size(initial_url),
@@ -383,7 +383,7 @@ static void test_http_request(void** state)
 
     TEST_EXPECT_SUCCESS(az_http_request_init(
         &request,
-        &az_context_app,
+        &az_context_application,
         az_http_method_get(),
         url_span,
         az_span_size(initial_url),
@@ -421,7 +421,7 @@ static void test_http_request(void** state)
 
     TEST_EXPECT_SUCCESS(az_http_request_init(
         &request,
-        &az_context_app,
+        &az_context_application,
         az_http_method_get(),
         url_span,
         az_span_size(url_span),
@@ -458,7 +458,7 @@ static void test_http_request(void** state)
 
     TEST_EXPECT_SUCCESS(az_http_request_init(
         &request,
-        &az_context_app,
+        &az_context_application,
         az_http_method_get(),
         url_span,
         az_span_size(request_url),
@@ -611,7 +611,7 @@ static void test_http_request_removing_left_white_spaces(void** state)
 
   TEST_EXPECT_SUCCESS(az_http_request_init(
       &request,
-      &az_context_app,
+      &az_context_application,
       az_http_method_get(),
       url_span,
       az_span_size(request_url),
@@ -636,7 +636,7 @@ static void test_http_request_header_validation(void** state)
 
     TEST_EXPECT_SUCCESS(az_http_request_init(
         &request,
-        &az_context_app,
+        &az_context_application,
         az_http_method_get(),
         url_span,
         az_span_size(url_span),
@@ -667,7 +667,7 @@ static void test_http_request_header_validation_above_127(void** state)
 
     TEST_EXPECT_SUCCESS(az_http_request_init(
         &request,
-        &az_context_app,
+        &az_context_application,
         az_http_method_get(),
         url_span,
         az_span_size(url_span),
