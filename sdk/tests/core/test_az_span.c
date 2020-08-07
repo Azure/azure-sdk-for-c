@@ -1861,7 +1861,7 @@ static void az_span_trim_right(void** state)
   assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("   abc")));
 }
 
-static void az_span_trim_all_white(void** state)
+static void az_span_trim_all_whitespace(void** state)
 {
   (void)state;
   az_span source = _az_span_trim_whitespace(AZ_SPAN_FROM_STR("\t\n\r       "));
@@ -2054,7 +2054,7 @@ int test_az_span()
     cmocka_unit_test(az_span_trim),
     cmocka_unit_test(az_span_trim_left),
     cmocka_unit_test(az_span_trim_right),
-    cmocka_unit_test(az_span_trim_all_white),
+    cmocka_unit_test(az_span_trim_all_whitespace),
     cmocka_unit_test(az_span_trim_none),
     cmocka_unit_test(az_span_trim_spaced),
     cmocka_unit_test(az_span_trim_zero),

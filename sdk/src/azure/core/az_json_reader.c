@@ -659,7 +659,7 @@ AZ_NODISCARD az_result az_json_reader_next_token(az_json_reader* json_reader)
       }
       else
       {
-        // We expect the start of a property name as the first non-white-space character within a
+        // We expect the start of a property name as the first non-whitespace character within a
         // JSON object.
         if (first_byte != '"')
         {

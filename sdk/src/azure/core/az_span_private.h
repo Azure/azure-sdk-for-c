@@ -76,10 +76,10 @@ AZ_NODISCARD az_result _az_is_expected_span(az_span* ref_span, az_span expected)
 
 /**
  * @brief Removes all leading and trailing whitespace characters from the \p span. Function will
- * create a new #az_span pointing to the first non-white-space (` `, \\n, \\r, \\t) character found
- * in \p span and up to the last non-white-space character.
+ * create a new #az_span pointing to the first non-whitespace (` `, \\n, \\r, \\t) character found
+ * in \p span and up to the last non-whitespace character.
  *
- * @remarks If \p span is full of non-white-space characters, this function will return empty
+ * @remarks If \p span is full of non-whitespace characters, this function will return empty
  * #az_span.
  *
  * Example:
@@ -96,10 +96,10 @@ AZ_NODISCARD az_span _az_span_trim_whitespace(az_span source);
 
 /**
  * @brief Removes all leading whitespace characters from the start of \p span.
- * Function will create a new #az_span pointing to the first non-white-space (` `, \\n, \\r, \\t)
+ * Function will create a new #az_span pointing to the first non-whitespace (` `, \\n, \\r, \\t)
  * character found in \p span and up to the last character.
  *
- * @remarks If \p span is full of non-white-space characters, this function will return empty
+ * @remarks If \p span is full of non-whitespace characters, this function will return empty
  * #az_span.
  *
  * Example:
@@ -117,9 +117,9 @@ AZ_NODISCARD az_span _az_span_trim_whitespace_from_start(az_span source);
 /**
  * @brief Removes all trailing whitespace characters from the end of \p span.
  * Function will create a new #az_span pointing to the first character in \p span and up to the last
- * non-white-space (` `, \\n, \\r, \\t) character.
+ * non-whitespace (` `, \\n, \\r, \\t) character.
  *
- * @remarks If \p span is full of non-white-space characters, this function will return empty
+ * @remarks If \p span is full of non-whitespace characters, this function will return empty
  * #az_span.
  *
  * Example:
