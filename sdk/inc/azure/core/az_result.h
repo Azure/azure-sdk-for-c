@@ -60,13 +60,13 @@ enum
     } \
   } while (0)
 
-/**
- * The type represents success and error conditions.
- * Bits:
- * - 31 Severity (0 - success, 1 - failure).
- * - 16..30 Facility.
- * - 0..15 Code.
- */
+///
+/// The type represents success and error conditions.
+/// Bits:
+/// - 31 Severity (0 - success, 1 - failure).
+/// - 16..30 Facility.
+/// - 0..15 Code.
+///
 typedef enum
 {
   // Core: Success results
