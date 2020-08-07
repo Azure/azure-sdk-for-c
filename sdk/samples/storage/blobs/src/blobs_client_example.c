@@ -21,12 +21,12 @@
 #include <azure/storage/az_storage_blobs.h>
 
 // Uncomment below lines when working with libcurl
-// #include <curl/curl.h>
+#include <curl/curl.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 // Uncomment below code to enable logging (and the first lines of main function)
-// #include <azure/core/az_log.h>
+#include <azure/core/az_log.h>
 
 #define URI_ENV "AZURE_STORAGE_URL"
 
@@ -38,34 +38,30 @@ static az_span content_to_upload = AZ_SPAN_LITERAL_FROM_STR("Some test content")
 #endif
 
 // Uncomment below code to enable logging (and the first lines of main function)
-/*
 static void test_log_func(az_log_classification classification, az_span message)
 {
   (void)classification;
   printf("%.*s\n", az_span_size(message), az_span_ptr(message));
 }
-*/
 
 int main()
 {
   // Uncomment below lines when working with libcurl
-  /*
-    // If running with libcurl, call global init. See project Readme for more info
-    if (curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK)
-    {
-      printf("\nCouldn't init libcurl\n");
-      return 1;
-    }
-    // Set up libcurl cleaning callback as to be called before ending program
-    atexit(curl_global_cleanup);
-  */
+
+  // If running with libcurl, call global init. See project Readme for more info
+  if (curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK)
+  {
+    printf("\nCouldn't init libcurl\n");
+    return 1;
+  }
+  // Set up libcurl cleaning callback as to be called before ending program
+  atexit(curl_global_cleanup);
 
   // Uncomment below code to enable logging
-  /*
+
   az_log_classification const classifications[] = { AZ_LOG_HTTP_RESPONSE, AZ_LOG_END_OF_LIST };
   az_log_set_classifications(classifications);
   az_log_set_callback(test_log_func);
-  */
 
   // 1) Init client.
   // Example expects AZURE_STORAGE_URL in env to be a URL w/ SAS token
