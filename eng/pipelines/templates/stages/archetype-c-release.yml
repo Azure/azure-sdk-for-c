@@ -27,14 +27,16 @@ stages:
                       -ForRelease $true
                     pwsh: true
                   displayName: Verify CHANGELOG.md contents
-                - template: /eng/common/pipelines/templates/steps/create-tags-and-git-release.yml
-                  parameters:
-                    ArtifactLocation: $(Pipeline.Workspace)/release-info
-                    PackageRepository: C
-                    ReleaseSha: $(Build.SourceVersion)
-                    RepoId: $(Build.Repository.Name)
-                    WorkingDirectory: $(Build.SourcesDirectory)
-                    ScriptDirectory: $(Build.SourcesDirectory)/eng/common/scripts/
+                - script: echo "Would have published"
+                  displayName: If green tag would have been published
+                # - template: /eng/common/pipelines/templates/steps/create-tags-and-git-release.yml
+                #   parameters:
+                #     ArtifactLocation: $(Pipeline.Workspace)/release-info
+                #     PackageRepository: C
+                #     ReleaseSha: $(Build.SourceVersion)
+                #     RepoId: $(Build.Repository.Name)
+                #     WorkingDirectory: $(Build.SourcesDirectory)
+                #     ScriptDirectory: $(Build.SourcesDirectory)/eng/common/scripts/
 
       - deployment: PublishDocs
         displayName: Publish Docs to GitHub pages

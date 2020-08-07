@@ -18,7 +18,7 @@
 // @brief Version in string format for telemetry.
 //   Follows semver.org standard.
 //   https://semver.org
-#define AZ_SDK_VERSION_STRING "1.0.0-preview.4"
+#define AZ_SDK_VERSION_STRING "1.0.0-dev.1"
 
 // @brief Major numeric identifier.
 #define AZ_SDK_VERSION_MAJOR 1
@@ -31,6 +31,6 @@
 
 // @brief Optional pre-release identifier.
 //  SDK is in a prerelease state when present.
-#define AZ_SDK_VERSION_PRERELEASE "preview.4"
+#define AZ_SDK_VERSION_PRERELEASE "dev.1"
 
 #endif //_az_VERSION_H
