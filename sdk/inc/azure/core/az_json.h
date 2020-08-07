@@ -61,16 +61,35 @@ typedef struct
  * @brief Represents a JSON token. The kind field indicates the type of the JSON token and the slice
  * represents the portion of the JSON payload that points to the token value.
  */
+// Token cannot outlive the lifetime of the reader.
+// The reader cannot outlive the lifetime of the JSON payload (spans).
 typedef struct
 {
   az_json_token_kind kind;
+
+  // AZ_SPAN_NULL if the token straddles, call copy_into_span if you want in contiguous
   az_span slice;
+  // int32_t token_size;
 
   struct
   {
     bool string_has_escaped_chars;
+
+    // az_span* pointer_to_first_buffer;
+    // az_span buffer_array[]; // Use AZ_SPAN_NULL as a terminator
+
+    // int32_t start_buffer_index;
+    // int32_t start_buffer_offset;
+    // int32_t end_buffer_index;
+    // int32_t end_buffer_offset;
+
   } _internal;
 } az_json_token;
+
+// az_span az_json_token_get_span(az_json_token token);
+// az_span az_json_token_copy_into_span(az_json_token token, az_span destination_buffer);
+// az_result az_json_token_copy_into_span(az_json_token token, az_span destination_buffer, az_span*
+// out_slice);
 
 /**
  * @brief Returns the JSON token's boolean.
@@ -504,7 +523,11 @@ typedef struct
   struct
   {
     az_span json_buffer;
+    az_span* json_buffers;
+    int32_t number_of_buffers;
+    int32_t buffer_index;
     int32_t bytes_consumed;
+    int32_t total_bytes_consumed;
     bool is_complex_json;
     _az_json_bit_stack bit_stack;
     az_json_reader_options options;
@@ -523,11 +546,38 @@ typedef struct
  *
  * @return An #az_result value indicating the result of the operation:
  *         - #AZ_OK if the az_json_reader is initialized successfully
- *         - #AZ_ERROR_EOF if the provided json buffer is empty
+ *
+ * @remarks The provided json buffer must not be empty, as that is invalid JSON.
  */
 AZ_NODISCARD az_result az_json_reader_init(
     az_json_reader* json_reader,
     az_span json_buffer,
+    az_json_reader_options const* options);
+
+/**
+ * @brief Initializes an #az_json_reader to read the JSON payload contained within the provided
+ * set of discontiguous buffers.
+ *
+ * @param[out] az_json_reader A pointer to an #az_json_reader instance to initialize.
+ * @param[in] json_buffers An array of non-contiguous byte buffers, as spans, containing the JSON
+ * text to parse.
+ * @param[in] number_of_buffers The number of buffer segments provided, i.e. the length of the \p
+ * json_buffers array.
+ * @param[in] options __[nullable]__ A reference to an #az_json_reader_options
+ * structure which defines custom behavior of the #az_json_reader. If `NULL` is passed, the reader
+ * will use the default options (i.e. #az_json_reader_options_default()).
+ *
+ * @return An #az_result value indicating the result of the operation:
+ *         - #AZ_OK if the az_json_parser is initialized successfully
+ *
+ * @remarks The provided array of json buffers must not be empty, as that is invalid JSON, and
+ * therefore \p number_of_buffers must also be greater than 0. The array must also not contain any
+ * empty span segments.
+ */
+AZ_NODISCARD az_result az_json_reader_chunked_init(
+    az_json_reader* json_parser,
+    az_span json_buffers[],
+    int32_t number_of_buffers,
     az_json_reader_options const* options);
 
 /**

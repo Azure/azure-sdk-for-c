@@ -15,7 +15,9 @@
 
 #define TEST_EXPECT_SUCCESS(exp) assert_true(az_succeeded(exp))
 
-az_result test_allocator(az_span_allocator_context* allocator_context, az_span* out_next_destination);
+az_result test_allocator(
+    az_span_allocator_context* allocator_context,
+    az_span* out_next_destination);
 
 az_result test_allocator_never_called(
     az_span_allocator_context* allocator_context,
@@ -29,14 +31,12 @@ az_result test_allocator_chunked(
     az_span_allocator_context* allocator_context,
     az_span* out_next_destination);
 
-static void test_json_token_helper(
-    az_json_token token,
-    az_json_token_kind expected_token_kind,
-    az_span expected_token_slice)
-{
-  assert_int_equal(token.kind, expected_token_kind);
-  assert_true(az_span_is_content_equal(token.slice, expected_token_slice));
-}
+#define test_json_token_helper(token, expected_token_kind, expected_token_slice) \
+  do \
+  { \
+    assert_int_equal(token.kind, expected_token_kind); \
+    assert_true(az_span_is_content_equal(token.slice, expected_token_slice)); \
+  } while (0)
 
 static void test_json_reader_init(void** state)
 {
@@ -235,7 +235,9 @@ typedef struct
   int32_t* current_index;
 } _az_user_context;
 
-az_result test_allocator(az_span_allocator_context* allocator_context, az_span* out_next_destination)
+az_result test_allocator(
+    az_span_allocator_context* allocator_context,
+    az_span* out_next_destination)
 {
   _az_user_context* user_context = (_az_user_context*)allocator_context->user_context;
   int32_t current_index = *user_context->current_index + allocator_context->bytes_used;
@@ -1321,7 +1323,6 @@ static void test_json_reader_invalid(void** state)
   test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("trUe"), AZ_ERROR_UNEXPECTED_CHAR);
   test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("False"), AZ_ERROR_UNEXPECTED_CHAR);
   test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("age"), AZ_ERROR_UNEXPECTED_CHAR);
-  test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("\""), AZ_ERROR_UNEXPECTED_CHAR);
   test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("\"age\":"), AZ_ERROR_UNEXPECTED_CHAR);
 
   // Invalid numbers
@@ -1518,7 +1519,8 @@ static void test_json_value(void** state)
         az_span_is_content_equal(az_span_create_from_str(string_value), AZ_SPAN_FROM_STR("Hello")));
 
     TEST_EXPECT_SUCCESS(az_json_token_get_string(&json_property_name, string_value, 10, NULL));
-    assert_true(az_span_is_content_equal(az_span_create_from_str(string_value), AZ_SPAN_FROM_STR("Name")));
+    assert_true(
+        az_span_is_content_equal(az_span_create_from_str(string_value), AZ_SPAN_FROM_STR("Name")));
   }
   // string from boolean
   {
