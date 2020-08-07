@@ -545,7 +545,7 @@ typedef struct
  * will use the default options (i.e. #az_json_reader_options_default()).
  *
  * @return An #az_result value indicating the result of the operation:
- *         - #AZ_OK if the az_json_reader is initialized successfully
+ *         - #AZ_OK if the #az_json_reader is initialized successfully
  *
  * @remarks The provided json buffer must not be empty, as that is invalid JSON.
  */
@@ -560,7 +560,7 @@ AZ_NODISCARD az_result az_json_reader_init(
  *
  * @param[out] az_json_reader A pointer to an #az_json_reader instance to initialize.
  * @param[in] json_buffers An array of non-contiguous byte buffers, as spans, containing the JSON
- * text to parse.
+ * text to read.
  * @param[in] number_of_buffers The number of buffer segments provided, i.e. the length of the \p
  * json_buffers array.
  * @param[in] options __[nullable]__ A reference to an #az_json_reader_options
@@ -568,14 +568,14 @@ AZ_NODISCARD az_result az_json_reader_init(
  * will use the default options (i.e. #az_json_reader_options_default()).
  *
  * @return An #az_result value indicating the result of the operation:
- *         - #AZ_OK if the az_json_parser is initialized successfully
+ *         - #AZ_OK if the #az_json_reader is initialized successfully
  *
  * @remarks The provided array of json buffers must not be empty, as that is invalid JSON, and
  * therefore \p number_of_buffers must also be greater than 0. The array must also not contain any
  * empty span segments.
  */
 AZ_NODISCARD az_result az_json_reader_chunked_init(
-    az_json_reader* json_parser,
+    az_json_reader* json_reader,
     az_span json_buffers[],
     int32_t number_of_buffers,
     az_json_reader_options const* options);
