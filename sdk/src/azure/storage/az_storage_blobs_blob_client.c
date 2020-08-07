@@ -130,7 +130,6 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
 
 AZ_NODISCARD az_result az_storage_blobs_blob_upload(
     az_storage_blobs_blob_client* client,
-    az_context* context,
     az_span content, /* Buffer of content*/
     az_storage_blobs_blob_upload_options* options,
     az_http_response* response)
@@ -163,7 +162,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
   az_http_request request;
   AZ_RETURN_IF_FAILED(az_http_request_init(
       &request,
-      context,
+      opt.context,
       az_http_method_put(),
       request_url_span,
       uri_size,
