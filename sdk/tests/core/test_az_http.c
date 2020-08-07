@@ -60,11 +60,11 @@ static void test_http_request(void** state)
     az_span remainder = az_span_copy(url_span, request_url);
     assert_int_equal(az_span_size(remainder), 100 - az_span_size(request_url));
     az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-    _az_http_request request;
+    az_http_request request;
 
     TEST_EXPECT_SUCCESS(az_http_request_init(
         &request,
-        &az_context_app,
+        &az_context_application,
         az_http_method_get(),
         url_span,
         az_span_size(request_url),
@@ -165,11 +165,11 @@ static void test_http_request(void** state)
     az_span remainder = az_span_copy(url_span, request_url);
     assert_int_equal(az_span_size(remainder), 100 - az_span_size(request_url));
     az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-    _az_http_request request;
+    az_http_request request;
 
     TEST_EXPECT_SUCCESS(az_http_request_init(
         &request,
-        &az_context_app,
+        &az_context_application,
         az_http_method_get(),
         url_span,
         az_span_size(request_url),
@@ -191,11 +191,11 @@ static void test_http_request(void** state)
     az_span remainder = az_span_copy(url_span, initial_url);
     assert_int_equal(az_span_size(remainder), 100 - az_span_size(initial_url));
     az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-    _az_http_request request;
+    az_http_request request;
 
     TEST_EXPECT_SUCCESS(az_http_request_init(
         &request,
-        &az_context_app,
+        &az_context_application,
         az_http_method_get(),
         url_span,
         az_span_size(initial_url),
@@ -239,11 +239,11 @@ static void test_http_request(void** state)
     az_span remainder = az_span_copy(url_span, initial_url);
     assert_int_equal(az_span_size(remainder), 100 - az_span_size(initial_url));
     az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-    _az_http_request request;
+    az_http_request request;
 
     TEST_EXPECT_SUCCESS(az_http_request_init(
         &request,
-        &az_context_app,
+        &az_context_application,
         az_http_method_get(),
         url_span,
         az_span_size(initial_url),
@@ -273,11 +273,11 @@ static void test_http_request(void** state)
     az_span remainder = az_span_copy(url_span, initial_url);
     assert_int_equal(az_span_size(remainder), 100 - az_span_size(initial_url));
     az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-    _az_http_request request;
+    az_http_request request;
 
     TEST_EXPECT_SUCCESS(az_http_request_init(
         &request,
-        &az_context_app,
+        &az_context_application,
         az_http_method_get(),
         url_span,
         az_span_size(initial_url),
@@ -307,11 +307,11 @@ static void test_http_request(void** state)
     az_span remainder = az_span_copy(url_span, initial_url);
     assert_int_equal(az_span_size(remainder), 100 - az_span_size(initial_url));
     az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-    _az_http_request request;
+    az_http_request request;
 
     TEST_EXPECT_SUCCESS(az_http_request_init(
         &request,
-        &az_context_app,
+        &az_context_application,
         az_http_method_get(),
         url_span,
         az_span_size(initial_url),
@@ -341,11 +341,11 @@ static void test_http_request(void** state)
     az_span remainder = az_span_copy(url_span, initial_url);
     assert_int_equal(az_span_size(remainder), 100 - az_span_size(initial_url));
     az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-    _az_http_request request;
+    az_http_request request;
 
     TEST_EXPECT_SUCCESS(az_http_request_init(
         &request,
-        &az_context_app,
+        &az_context_application,
         az_http_method_get(),
         url_span,
         az_span_size(initial_url),
@@ -379,11 +379,11 @@ static void test_http_request(void** state)
     az_span remainder = az_span_copy(url_span, initial_url);
     assert_int_equal(az_span_size(remainder), 100 - az_span_size(initial_url));
     az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-    _az_http_request request;
+    az_http_request request;
 
     TEST_EXPECT_SUCCESS(az_http_request_init(
         &request,
-        &az_context_app,
+        &az_context_application,
         az_http_method_get(),
         url_span,
         az_span_size(initial_url),
@@ -417,11 +417,11 @@ static void test_http_request(void** state)
     az_span ignore = az_span_copy(url_span, AZ_SPAN_FROM_STR("http://example.com?q1=123&q2=456"));
     (void)ignore;
     az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-    _az_http_request request;
+    az_http_request request;
 
     TEST_EXPECT_SUCCESS(az_http_request_init(
         &request,
-        &az_context_app,
+        &az_context_application,
         az_http_method_get(),
         url_span,
         az_span_size(url_span),
@@ -454,11 +454,11 @@ static void test_http_request(void** state)
     az_span remainder = az_span_copy(url_span, request_url);
     assert_int_equal(az_span_size(remainder), 100 - az_span_size(request_url));
     az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-    _az_http_request request;
+    az_http_request request;
 
     TEST_EXPECT_SUCCESS(az_http_request_init(
         &request,
-        &az_context_app,
+        &az_context_application,
         az_http_method_get(),
         url_span,
         az_span_size(request_url),
@@ -594,7 +594,7 @@ static void test_http_response(void** state)
 #ifndef AZ_NO_PRECONDITION_CHECKING
 ENABLE_PRECONDITION_CHECK_TESTS()
 
-static void test_http_request_removing_left_white_spaces(void** state)
+static void test_http_request_removing_left_whitespace_chars(void** state)
 {
   (void)state;
 
@@ -607,11 +607,11 @@ static void test_http_request_removing_left_white_spaces(void** state)
   az_span remainder = az_span_copy(url_span, request_url);
   assert_int_equal(az_span_size(remainder), 100 - az_span_size(request_url));
   az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-  _az_http_request request;
+  az_http_request request;
 
   TEST_EXPECT_SUCCESS(az_http_request_init(
       &request,
-      &az_context_app,
+      &az_context_application,
       az_http_method_get(),
       url_span,
       az_span_size(request_url),
@@ -632,11 +632,11 @@ static void test_http_request_header_validation(void** state)
 
     az_span url_span = AZ_SPAN_FROM_STR("some.url.com");
     az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-    _az_http_request request;
+    az_http_request request;
 
     TEST_EXPECT_SUCCESS(az_http_request_init(
         &request,
-        &az_context_app,
+        &az_context_application,
         az_http_method_get(),
         url_span,
         az_span_size(url_span),
@@ -663,11 +663,11 @@ static void test_http_request_header_validation_above_127(void** state)
 
     az_span url_span = AZ_SPAN_FROM_STR("some.url.com");
     az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-    _az_http_request request;
+    az_http_request request;
 
     TEST_EXPECT_SUCCESS(az_http_request_init(
         &request,
-        &az_context_app,
+        &az_context_application,
         az_http_method_get(),
         url_span,
         az_span_size(url_span),
@@ -848,7 +848,7 @@ int test_az_http()
 
   const struct CMUnitTest tests[] = {
 #ifndef AZ_NO_PRECONDITION_CHECKING
-    cmocka_unit_test(test_http_request_removing_left_white_spaces),
+    cmocka_unit_test(test_http_request_removing_left_whitespace_chars),
     cmocka_unit_test(test_http_request_header_validation),
     cmocka_unit_test(test_http_request_header_validation_above_127),
     cmocka_unit_test(test_http_response_append_null_response),

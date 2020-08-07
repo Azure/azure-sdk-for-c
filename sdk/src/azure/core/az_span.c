@@ -23,7 +23,7 @@
 #ifndef AZ_NO_PRECONDITION_CHECKING
 // Note: If you are modifying this method, make sure to modify the inline version in the az_span.h
 // file as well.
-AZ_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t size)
+AZ_NODISCARD az_span az_span_create(uint8_t* ptr, int32_t size)
 {
   // If ptr is not null, then:
   //   size >= 0
@@ -35,7 +35,7 @@ AZ_NODISCARD az_span az_span_init(uint8_t* ptr, int32_t size)
 }
 #endif // AZ_NO_PRECONDITION_CHECKING
 
-AZ_NODISCARD az_span az_span_from_str(char* str)
+AZ_NODISCARD az_span az_span_create_from_str(char* str)
 {
   _az_PRECONDITION_NOT_NULL(str);
 
@@ -49,7 +49,7 @@ AZ_NODISCARD az_span az_span_from_str(char* str)
 
   _az_PRECONDITION(length >= 0);
 
-  return az_span_init((uint8_t*)str, length);
+  return az_span_create((uint8_t*)str, length);
 }
 
 AZ_NODISCARD az_span az_span_slice(az_span span, int32_t start_index, int32_t end_index)
@@ -63,7 +63,7 @@ AZ_NODISCARD az_span az_span_slice(az_span span, int32_t start_index, int32_t en
   _az_PRECONDITION_RANGE(0, end_index, az_span_size(span));
   _az_PRECONDITION((uint32_t)start_index <= (uint32_t)end_index);
 
-  return az_span_init(az_span_ptr(span) + start_index, end_index - start_index);
+  return az_span_create(az_span_ptr(span) + start_index, end_index - start_index);
 }
 
 AZ_NODISCARD az_span az_span_slice_to_end(az_span span, int32_t start_index)
@@ -389,7 +389,7 @@ AZ_NODISCARD az_result az_span_atod(az_span source, double* out_number)
   int32_t n = sscanf((char*)source_ptr, format, out_number, &chars_consumed);
 
   // Success if the entire source was consumed by sscanf and it set the out_number argument.
-  return (size == chars_consumed && n == 1 && _az_is_finite(*out_number))
+  return (size == chars_consumed && n == 1 && _az_isfinite(*out_number))
       ? AZ_OK
       : AZ_ERROR_UNEXPECTED_CHAR;
 }
@@ -513,7 +513,7 @@ az_span az_span_copy_u8(az_span destination, uint8_t byte)
 
   uint8_t* dst_ptr = az_span_ptr(destination);
   dst_ptr[0] = byte;
-  return az_span_init(dst_ptr + 1, dest_size - 1);
+  return az_span_create(dst_ptr + 1, dest_size - 1);
 }
 
 void az_span_to_str(char* destination, int32_t destination_max_size, az_span source)
@@ -747,14 +747,14 @@ az_span_dtoa(az_span destination, double source, int32_t fractional_digits, az_s
 {
   _az_PRECONDITION_VALID_SPAN(destination, 0, false);
   // Inputs that are either positive or negative infinity, or not a number, are not supported.
-  _az_PRECONDITION(_az_is_finite(source));
+  _az_PRECONDITION(_az_isfinite(source));
   _az_PRECONDITION_RANGE(0, fractional_digits, _az_MAX_SUPPORTED_FRACTIONAL_DIGITS);
   _az_PRECONDITION_NOT_NULL(out_span);
 
   *out_span = destination;
 
   // The input is either positive or negative infinity, or not a number.
-  if (!_az_is_finite(source))
+  if (!_az_isfinite(source))
   {
     return AZ_ERROR_NOT_SUPPORTED;
   }
@@ -898,13 +898,13 @@ _az_span_scan_until(az_span span, _az_predicate predicate, int32_t* out_index)
   return AZ_ERROR_ITEM_NOT_FOUND;
 }
 
-AZ_NODISCARD az_span _az_span_trim_white_space(az_span source)
+AZ_NODISCARD az_span _az_span_trim_whitespace(az_span source)
 {
   // Trim from end after trim from start
-  return _az_span_trim_white_space_from_end(_az_span_trim_white_space_from_start(source));
+  return _az_span_trim_whitespace_from_end(_az_span_trim_whitespace_from_start(source));
 }
 
-AZ_NODISCARD AZ_INLINE bool _az_is_white_space(uint8_t c)
+AZ_NODISCARD AZ_INLINE bool _az_is_whitespace(uint8_t c)
 {
   switch (c)
   {
@@ -940,7 +940,7 @@ AZ_NODISCARD static az_span _az_span_trim_side(az_span source, az_span_trim_side
   int32_t index = 0;
   for (; index < source_size; index++)
   {
-    if (!_az_is_white_space(*source_ptr))
+    if (!_az_is_whitespace(*source_ptr))
     {
       break;
     }
@@ -959,12 +959,12 @@ AZ_NODISCARD static az_span _az_span_trim_side(az_span source, az_span_trim_side
   return az_span_slice_to_end(source, index); // worst case index would be source_size
 }
 
-AZ_NODISCARD az_span _az_span_trim_white_space_from_start(az_span source)
+AZ_NODISCARD az_span _az_span_trim_whitespace_from_start(az_span source)
 {
   return _az_span_trim_side(source, LEFT);
 }
 
-AZ_NODISCARD az_span _az_span_trim_white_space_from_end(az_span source)
+AZ_NODISCARD az_span _az_span_trim_whitespace_from_end(az_span source)
 {
   return _az_span_trim_side(source, RIGHT);
 }
@@ -981,6 +981,36 @@ AZ_NODISCARD AZ_INLINE bool _az_span_url_should_encode(uint8_t c)
     default:
       return !(('0' <= c && c <= '9') || ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z'));
   }
+}
+
+AZ_NODISCARD int32_t _az_span_url_encode_calc_length(az_span source)
+{
+  _az_PRECONDITION_VALID_SPAN(source, 0, true);
+  // trying to calculate the number of bytes to encode more than INT32_MAX / 3 might overflow an
+  // int32 and return an erroneous number back
+  _az_PRECONDITION_RANGE(0, az_span_size(source), INT32_MAX / 3);
+
+  int32_t const source_size = az_span_size(source);
+  if (source_size == 0)
+  {
+    return 0;
+  }
+
+  uint8_t* const src_ptr = az_span_ptr(source);
+  int32_t required_symbols_to_be_added = 0;
+  int32_t src_idx = 0;
+  do
+  {
+    uint8_t c = src_ptr[src_idx];
+    if (_az_span_url_should_encode(c))
+    {
+      // Adding '%' plus 2 digits (minus 1 as original symbol is counted as 1)
+      required_symbols_to_be_added += 2;
+    }
+    ++src_idx;
+  } while (src_idx < source_size);
+
+  return source_size + required_symbols_to_be_added;
 }
 
 AZ_NODISCARD az_result _az_span_url_encode(az_span destination, az_span source, int32_t* out_length)

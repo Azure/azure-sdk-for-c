@@ -90,6 +90,20 @@ This section provides an overview of the different samples available to run and 
 - **Telemetry**: Device sends a JSON message with the field name `temperature` and the `double` value of the temperature.
 - **Twin**: Desired property with the field name `targetTemperature` and the `double` value for the desired temperature. Reported property with the field name `maxTempSinceLastReboot` and the `double` value for the highest temperature. Note that part of the IoT Plug and Play spec is a response to a desired property update from the service. The device will send back a reported property with a similarly named property and a set of "ack" values: `ac` for the HTTP-like ack code, `av` for ack version of the property, and an optional `ad` for an ack description.
 
+### IoT Hub Plug and Play Multiple Component
+
+- *Executable:* `paho_iot_hub_pnp_component_example`
+
+This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_pnp_component_example.c) connects an IoT Plug and Play enabled device with the Digital Twin Model ID (DTMI) detailed [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/TemperatureController.json). X509 self-certification is used.
+
+This temperature controller is made up of the following sub-components
+
+- Temperature Sensor 1
+- Temperature Sensor 2
+- Device Info
+
+Link to the component DTMI can be found [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/TemperatureController.json).
+
 ### IoT Provisioning Sample
 
 - *Executable:* `paho_iot_provisioning_sample`

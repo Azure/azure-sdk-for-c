@@ -112,8 +112,8 @@ static void initializeClients()
 
   if (az_failed(az_iot_hub_client_init(
           &client,
-          az_span_init((uint8_t*)host, strlen(host)),
-          az_span_init((uint8_t*)device_id, strlen(device_id)),
+          az_span_create((uint8_t*)host, strlen(host)),
+          az_span_create((uint8_t*)device_id, strlen(device_id)),
           NULL)))
   {
     Serial.println("Failed initializing Azure IoT Hub client");
@@ -131,10 +131,10 @@ static uint32_t getSecondsSinceEpoch()
 
 static int generateSasToken(char* sas_token, size_t size)
 {
-  az_span signature_span = az_span_init((uint8_t*)signature, sizeofarray(signature));
+  az_span signature_span = az_span_create((uint8_t*)signature, sizeofarray(signature));
   az_span out_signature_span;
   az_span encrypted_signature_span
-      = az_span_init((uint8_t*)encrypted_signature, sizeofarray(encrypted_signature));
+      = az_span_create((uint8_t*)encrypted_signature, sizeofarray(encrypted_signature));
 
   uint32_t expiration = getSecondsSinceEpoch() + ONE_HOUR_IN_SECS;
 
@@ -169,7 +169,7 @@ static int generateSasToken(char* sas_token, size_t size)
   // Base64 encode encrypted signature
   String b64enc_hmacsha256_signature = base64::encode(encrypted_signature, br_hmac_size(&hmac_ctx));
 
-  az_span b64enc_hmacsha256_signature_span = az_span_init(
+  az_span b64enc_hmacsha256_signature_span = az_span_create(
       (uint8_t*)b64enc_hmacsha256_signature.c_str(), b64enc_hmacsha256_signature.length());
 
   // URl-encode base64 encoded encrypted signature

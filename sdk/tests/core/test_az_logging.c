@@ -2,15 +2,15 @@
 // SPDX-License-Identifier: MIT
 
 #include "az_test_definitions.h"
-#include <azure/core/az_context.h>
-#include <azure/core/az_http.h>
-#include <azure/core/internal/az_http_internal.h>
 #include <az_http_policy_logging_private.h>
 #include <az_http_private.h>
+#include <az_test_log.h>
+#include <azure/core/az_context.h>
+#include <azure/core/az_http.h>
 #include <azure/core/az_http_transport.h>
 #include <azure/core/az_log.h>
+#include <azure/core/internal/az_http_internal.h>
 #include <azure/core/internal/az_log_internal.h>
-#include <az_test_log.h>
 
 #include <setjmp.h>
 #include <stdarg.h>
@@ -89,11 +89,11 @@ static void test_az_log(void** state)
   (void)state;
   // Set up test values etc.
   uint8_t headers[4 * 1024] = { 0 };
-  _az_http_request request = { 0 };
+  az_http_request request = { 0 };
   az_span url = AZ_SPAN_FROM_STR("https://www.example.com");
   TEST_EXPECT_SUCCESS(az_http_request_init(
       &request,
-      &az_context_app,
+      &az_context_application,
       az_http_method_get(),
       url,
       az_span_size(url),

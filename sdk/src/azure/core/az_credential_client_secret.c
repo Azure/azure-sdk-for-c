@@ -13,19 +13,22 @@
 
 #include <azure/core/_az_cfg.h>
 
+static az_span const az_aad_global_authority
+    = AZ_SPAN_LITERAL_FROM_STR("https://login.microsoftonline.com/");
+
 static AZ_NODISCARD az_result _az_credential_client_secret_request_token(
     az_credential_client_secret const* credential,
     az_context* context,
     _az_token* out_token)
 {
-  uint8_t url_buf[_az_AAD_REQUEST_URL_BUF_SIZE] = { 0 };
+  uint8_t url_buf[_az_AAD_REQUEST_URL_BUFFER_SIZE] = { 0 };
   az_span url_span = AZ_SPAN_FROM_BUFFER(url_buf);
   az_span url;
 
   AZ_RETURN_IF_FAILED(_az_aad_build_url(
       url_span, credential->_internal.authority, credential->_internal.tenant_id, &url));
 
-  uint8_t body_buf[_az_AAD_REQUEST_BODY_BUF_SIZE] = { 0 };
+  uint8_t body_buf[_az_AAD_REQUEST_BODY_BUFFER_SIZE] = { 0 };
   az_span body = AZ_SPAN_FROM_BUFFER(body_buf);
   AZ_RETURN_IF_FAILED(_az_aad_build_body(
       body,
@@ -34,8 +37,8 @@ static AZ_NODISCARD az_result _az_credential_client_secret_request_token(
       credential->_internal.client_secret,
       &body));
 
-  uint8_t header_buf[_az_AAD_REQUEST_HEADER_BUF_SIZE];
-  _az_http_request request = { 0 };
+  uint8_t header_buf[_az_AAD_REQUEST_HEADER_BUFFER_SIZE];
+  az_http_request request = { 0 };
   AZ_RETURN_IF_FAILED(az_http_request_init(
       &request,
       context,
@@ -54,7 +57,7 @@ az_span const _az_auth_header_name = AZ_SPAN_LITERAL_FROM_STR("authorization");
 static AZ_NODISCARD az_result _az_credential_client_secret_apply_policy(
     _az_http_policy* policies,
     az_credential_client_secret* credential,
-    _az_http_request* ref_request,
+    az_http_request* ref_request,
     az_http_response* response)
 {
   _az_token token = { 0 };
@@ -73,7 +76,7 @@ static AZ_NODISCARD az_result _az_credential_client_secret_apply_policy(
   int16_t const token_length = token._internal.token_length;
 
   AZ_RETURN_IF_FAILED(az_http_request_append_header(
-      ref_request, _az_auth_header_name, az_span_init(token._internal.token, token_length)));
+      ref_request, _az_auth_header_name, az_span_create(token._internal.token, token_length)));
 
   return _az_http_pipeline_nextpolicy(policies, ref_request, response);
 }
@@ -89,20 +92,6 @@ AZ_NODISCARD az_result az_credential_client_secret_init(
     az_credential_client_secret* out_credential,
     az_span tenant_id,
     az_span client_id,
-    az_span client_secret)
-{
-  return az_credential_client_secret_init_with_authority(
-      out_credential,
-      tenant_id,
-      client_id,
-      client_secret,
-      AZ_SPAN_FROM_STR("https://login.microsoftonline.com/"));
-}
-
-AZ_NODISCARD az_result az_credential_client_secret_init_with_authority(
-    az_credential_client_secret* out_credential,
-    az_span tenant_id,
-    az_span client_id,
     az_span client_secret,
     az_span authority)
 {
@@ -110,7 +99,7 @@ AZ_NODISCARD az_result az_credential_client_secret_init_with_authority(
   _az_PRECONDITION_VALID_SPAN(tenant_id, 1, false);
   _az_PRECONDITION_VALID_SPAN(client_id, 1, false);
   _az_PRECONDITION_VALID_SPAN(client_secret, 1, false);
-  _az_PRECONDITION_VALID_SPAN(authority, 1, false);
+  _az_PRECONDITION_VALID_SPAN(authority, 0, true);
 
   *out_credential = (az_credential_client_secret){
     ._internal = {
@@ -125,7 +114,7 @@ AZ_NODISCARD az_result az_credential_client_secret_init_with_authority(
         .client_id = client_id,
         .client_secret = client_secret,
         .scopes = { 0 },
-        .authority = authority,
+        .authority = az_span_size(authority) > 0 ? authority : az_aad_global_authority,
       },
     };
 

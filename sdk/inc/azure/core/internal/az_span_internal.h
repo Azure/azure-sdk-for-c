@@ -4,9 +4,9 @@
 #ifndef _az_SPAN_INTERNAL_H
 #define _az_SPAN_INTERNAL_H
 
-#include <azure/core/internal/az_precondition_internal.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
+#include <azure/core/internal/az_precondition_internal.h>
 
 #include <stdint.h>
 
@@ -44,6 +44,15 @@ AZ_INLINE AZ_NODISCARD int32_t _az_span_diff(az_span sliced_span, az_span origin
  */
 AZ_NODISCARD az_result
 _az_span_url_encode(az_span destination, az_span source, int32_t* out_length);
+
+/**
+ * @brief Calculates what would be the length of \p source #az_span after url-encoding it.
+ *
+ * @param[in] source The #az_span containing the non-URL-encoded bytes.
+ * @return The length of source if it would be url-encoded.
+ *
+ */
+AZ_NODISCARD int32_t _az_span_url_encode_calc_length(az_span source);
 
 /**
  * @brief String tokenizer for #az_span.
