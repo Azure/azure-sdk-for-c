@@ -77,8 +77,10 @@ static char sas_signature_encoded_buf_b64[128];
 
 #ifdef USE_WEB_SOCKET
 static az_span mqtt_url_prefix = AZ_SPAN_LITERAL_FROM_STR("wss://");
-// Note: Paho fails to connect to Hub when using AZ_IOT_HUB_CLIENT_WEB_SOCKET_PATH or an X509 certificate.
-static az_span mqtt_url_suffix = AZ_SPAN_LITERAL_FROM_STR(":443" AZ_IOT_HUB_CLIENT_WEB_SOCKET_PATH_NO_X509_CLIENT_CERT);
+// Note: Paho fails to connect to Hub when using AZ_IOT_HUB_CLIENT_WEB_SOCKET_PATH or an X509
+// certificate.
+static az_span mqtt_url_suffix
+    = AZ_SPAN_LITERAL_FROM_STR(":443" AZ_IOT_HUB_CLIENT_WEB_SOCKET_PATH_NO_X509_CLIENT_CERT);
 #else
 static az_span mqtt_url_prefix = AZ_SPAN_LITERAL_FROM_STR("ssl://");
 static az_span mqtt_url_suffix = AZ_SPAN_LITERAL_FROM_STR(":8883");
@@ -191,7 +193,8 @@ static az_result read_configuration_and_init_client()
       iot_hub_sas_expiration_span,
       &iot_hub_sas_expiration_span));
 
-  AZ_RETURN_IF_FAILED(az_span_atou32(iot_hub_sas_expiration_span, &iot_hub_sas_key_expiration_minutes));
+  AZ_RETURN_IF_FAILED(
+      az_span_atou32(iot_hub_sas_expiration_span, &iot_hub_sas_key_expiration_minutes));
 
   iot_hub_sas_key_span = AZ_SPAN_FROM_BUFFER(iot_hub_sas_key);
   AZ_RETURN_IF_FAILED(read_configuration_entry(
@@ -238,7 +241,7 @@ static az_result read_configuration_entry(
   if (env_value != NULL)
   {
     printf("%s\n", hide_value ? "***" : env_value);
-    az_span env_span = az_span_from_str(env_value);
+    az_span env_span = az_span_create_from_str(env_value);
     AZ_RETURN_IF_NOT_ENOUGH_SIZE(buffer, az_span_size(env_span));
     az_span_copy(buffer, env_span);
     *out_value = az_span_slice(buffer, 0, az_span_size(env_span));
@@ -264,7 +267,7 @@ static az_result create_mqtt_endpoint(char* destination, int32_t destination_siz
     return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
   }
 
-  az_span destination_span = az_span_init((uint8_t*)destination, destination_size);
+  az_span destination_span = az_span_create((uint8_t*)destination, destination_size);
   az_span remainder = az_span_copy(destination_span, mqtt_url_prefix);
   remainder = az_span_copy(remainder, az_span_slice(iot_hub, 0, iot_hub_length));
   remainder = az_span_copy(remainder, mqtt_url_suffix);
@@ -278,7 +281,8 @@ static az_result generate_sas_key()
   az_result rc;
 
   // Create the POSIX expiration time from input hours
-  uint64_t sas_expiration = get_epoch_expiration_time_from_minutes(iot_hub_sas_key_expiration_minutes);
+  uint64_t sas_expiration
+      = get_epoch_expiration_time_from_minutes(iot_hub_sas_key_expiration_minutes);
 
   // Decode the base64 encoded SAS key to use for HMAC signing
   az_span decoded_key_span;

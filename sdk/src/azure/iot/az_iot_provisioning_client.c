@@ -80,7 +80,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_get_user_name(
   az_span user_agent_version_prefix = AZ_SPAN_LITERAL_FROM_STR("&ClientVersion=");
 
   az_span mqtt_user_name_span
-      = az_span_init((uint8_t*)mqtt_user_name, (int32_t)mqtt_user_name_size);
+      = az_span_create((uint8_t*)mqtt_user_name, (int32_t)mqtt_user_name_size);
 
   const az_span* const user_agent = &(client->_internal.options.user_agent);
   az_span str_registrations = _az_iot_provisioning_get_str_registrations();
@@ -129,7 +129,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_get_client_id(
   _az_PRECONDITION(mqtt_client_id_size > 0);
 
   az_span mqtt_client_id_span
-      = az_span_init((uint8_t*)mqtt_client_id, (int32_t)mqtt_client_id_size);
+      = az_span_create((uint8_t*)mqtt_client_id, (int32_t)mqtt_client_id_size);
 
   int32_t required_length = az_span_size(client->_internal.registration_id);
 
@@ -160,7 +160,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_register_get_publish_topic(
   _az_PRECONDITION_NOT_NULL(mqtt_topic);
   _az_PRECONDITION(mqtt_topic_size > 0);
 
-  az_span mqtt_topic_span = az_span_init((uint8_t*)mqtt_topic, (int32_t)mqtt_topic_size);
+  az_span mqtt_topic_span = az_span_create((uint8_t*)mqtt_topic, (int32_t)mqtt_topic_size);
   az_span str_dps_registrations = _az_iot_provisioning_get_str_dps_registrations();
 
   int32_t required_length
@@ -197,7 +197,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_query_status_get_publish_topic
   _az_PRECONDITION_NOT_NULL(register_response);
   _az_PRECONDITION_VALID_SPAN(register_response->operation_id, 1, false);
 
-  az_span mqtt_topic_span = az_span_init((uint8_t*)mqtt_topic, (int32_t)mqtt_topic_size);
+  az_span mqtt_topic_span = az_span_create((uint8_t*)mqtt_topic, (int32_t)mqtt_topic_size);
   az_span str_dps_registrations = _az_iot_provisioning_get_str_dps_registrations();
 
   int32_t required_length = az_span_size(str_dps_registrations)

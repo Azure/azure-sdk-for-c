@@ -5,9 +5,7 @@ if (TRANSPORT_PAHO)
 
 cmake_minimum_required (VERSION 3.10)
 
-set(TARGET_NAME "az_iot_samples_common")
-
-project (${TARGET_NAME} LANGUAGES C)
+project (az_iot_samples LANGUAGES C)
 
 set(CMAKE_C_STANDARD 99)
 
@@ -28,28 +26,28 @@ add_library (${TARGET_NAME}
 
 # Workaround for linker warning LNK4098: defaultlib 'LIBCMTD' conflicts with use of other libs
 if (MSVC)
-    set_target_properties(${TARGET_NAME}
+    set_target_properties(az_iot_samples_common
         PROPERTIES LINK_FLAGS
         "/NODEFAULTLIB:libcmtd.lib"
     )
 endif()
 
 # Internal deps
-target_link_libraries(${TARGET_NAME}
+target_link_libraries(az_iot_samples_common
   PUBLIC
     az::iot::hub
     az::iot::provisioning
 )
 
 # External deps
-target_link_libraries(${TARGET_NAME}
+target_link_libraries(az_iot_samples_common
   PUBLIC
     eclipse-paho-mqtt-c::paho-mqtt3cs-static
     OpenSSL::SSL
     OpenSSL::Crypto
 )
 
-add_library (az::iot::samples::common ALIAS ${TARGET_NAME})
+add_library (az::iot::samples::common ALIAS az_iot_samples_common)
 
 # Azure IoT Samples Executables
 
@@ -81,6 +79,29 @@ add_executable (paho_iot_hub_pnp_sample
 target_link_libraries(paho_iot_hub_pnp_sample
   PRIVATE
     az::iot::samples::common
+)
+
+# PnP Component Sample
+add_executable (paho_iot_hub_pnp_component_example
+  ${CMAKE_CURRENT_LIST_DIR}/sample_pnp_component_mqtt.c
+  ${CMAKE_CURRENT_LIST_DIR}/sample_pnp_device_info_component.c
+  ${CMAKE_CURRENT_LIST_DIR}/sample_pnp_thermostat_component.c
+  ${CMAKE_CURRENT_LIST_DIR}/paho_iot_hub_pnp_component_example.c
+  ${CMAKE_CURRENT_LIST_DIR}/sample_pnp.c
+)
+
+# SDK deps
+target_link_libraries(paho_iot_hub_pnp_component_example
+  PRIVATE
+    az::iot::hub
+)
+
+# External deps
+target_link_libraries(paho_iot_hub_pnp_component_example
+  PRIVATE
+    eclipse-paho-mqtt-c::paho-mqtt3cs-static
+    OpenSSL::SSL
+    OpenSSL::Crypto
 )
 
 # Telemetry (Certificates) Sample
@@ -138,6 +159,7 @@ if (MSVC)
     set_target_properties(
         paho_iot_hub_c2d_sample
         paho_iot_hub_methods_sample
+        paho_iot_hub_pnp_component_example
         paho_iot_hub_pnp_sample
         paho_iot_hub_telemetry_sample
         paho_iot_hub_sas_telemetry_sample

@@ -73,7 +73,7 @@ int main()
   az_storage_blobs_blob_client_options options = az_storage_blobs_blob_client_options_default();
 
   if (az_storage_blobs_blob_client_init(
-          &client, az_span_from_str(getenv(URI_ENV)), AZ_CREDENTIAL_ANONYMOUS, &options)
+          &client, az_span_create_from_str(getenv(URI_ENV)), AZ_CREDENTIAL_ANONYMOUS, &options)
       != AZ_OK)
   {
     printf("\nFailed to init blob client\n");
@@ -92,7 +92,7 @@ int main()
   // 3) upload content
   printf("Uploading blob...\n");
   az_result const blob_upload_result = az_storage_blobs_blob_upload(
-      &client, &az_context_app, content_to_upload, NULL, &http_response);
+      &client, &az_context_application, content_to_upload, NULL, &http_response);
 
   // This validation is only for the first time SDK client is used. API will return not implemented
   // if samples were built with no_http lib.

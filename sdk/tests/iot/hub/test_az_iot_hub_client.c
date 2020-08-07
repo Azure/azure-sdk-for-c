@@ -263,7 +263,8 @@ static void test_az_iot_hub_client_get_default_options_succeed(void** state)
 
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   assert_true(az_span_is_content_equal(options.module_id, AZ_SPAN_NULL));
-  assert_true(az_span_is_content_equal(options.user_agent, az_span_from_str(PLATFORM_USER_AGENT)));
+  assert_true(
+      az_span_is_content_equal(options.user_agent, az_span_create_from_str(PLATFORM_USER_AGENT)));
 }
 
 static void test_az_iot_hub_client_init_succeed(void** state)
@@ -397,17 +398,15 @@ static void test_az_iot_hub_client_get_user_name_with_model_id_succeed(void** st
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.model_id = AZ_SPAN_FROM_STR(TEST_MODEL_ID);
 
-  assert_int_equal(az_iot_hub_client_init(&client, test_hub_hostname, test_device_id, &options), AZ_OK);
+  assert_int_equal(
+      az_iot_hub_client_init(&client, test_hub_hostname, test_device_id, &options), AZ_OK);
 
   char mqtt_topic_buf[TEST_SPAN_BUFFER_SIZE];
   size_t test_length;
 
   assert_int_equal(
       az_iot_hub_client_get_user_name(
-          &client,
-          mqtt_topic_buf,
-          sizeof(mqtt_topic_buf),
-          &test_length),
+          &client, mqtt_topic_buf, sizeof(mqtt_topic_buf), &test_length),
       AZ_OK);
 
   assert_string_equal(test_correct_user_name_with_model_id, mqtt_topic_buf);
@@ -422,17 +421,15 @@ static void test_az_iot_hub_client_get_user_name_with_model_id_small_buffer_fail
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.model_id = AZ_SPAN_FROM_STR(TEST_MODEL_ID);
 
-  assert_int_equal(az_iot_hub_client_init(&client, test_hub_hostname, test_device_id, &options), AZ_OK);
+  assert_int_equal(
+      az_iot_hub_client_init(&client, test_hub_hostname, test_device_id, &options), AZ_OK);
 
   char mqtt_topic_buf[sizeof(test_correct_user_name_with_model_id) - 2];
   size_t test_length;
 
   assert_int_equal(
       az_iot_hub_client_get_user_name(
-          &client,
-          mqtt_topic_buf,
-          sizeof(mqtt_topic_buf),
-          &test_length),
+          &client, mqtt_topic_buf, sizeof(mqtt_topic_buf), &test_length),
       AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
 }
 
@@ -445,7 +442,8 @@ static void test_az_iot_hub_client_get_user_name_with_model_id_small_buffer_firs
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.model_id = AZ_SPAN_FROM_STR(TEST_MODEL_ID);
 
-  assert_int_equal(az_iot_hub_client_init(&client, test_hub_hostname, test_device_id, &options), AZ_OK);
+  assert_int_equal(
+      az_iot_hub_client_init(&client, test_hub_hostname, test_device_id, &options), AZ_OK);
 
   char mqtt_topic_buf[sizeof(test_correct_user_name) + 2];
   size_t test_length;
@@ -580,7 +578,7 @@ static void test_az_iot_hub_client_properties_init_succeed(void** state)
   (void)state;
 
   uint8_t test_span_buf[TEST_SPAN_BUFFER_SIZE] = { 0 };
-  az_span test_span = az_span_init(test_span_buf, sizeof(test_span_buf));
+  az_span test_span = az_span_create(test_span_buf, sizeof(test_span_buf));
   az_iot_hub_client_properties props;
 
   assert_int_equal(az_iot_hub_client_properties_init(&props, test_span, 0), AZ_OK);
@@ -591,7 +589,7 @@ static void test_az_iot_hub_client_properties_init_user_set_params_succeed(void*
 {
   (void)state;
 
-  az_span test_span = az_span_from_str(TEST_KEY_VALUE_ONE);
+  az_span test_span = az_span_create_from_str(TEST_KEY_VALUE_ONE);
   az_iot_hub_client_properties props;
 
   assert_int_equal(
@@ -619,7 +617,7 @@ static void test_az_iot_hub_client_properties_append_succeed(void** state)
       az_span_slice(props._internal.properties_buffer, 0, props._internal.properties_written),
       test_correct_one_key_value,
       _az_COUNTOF(test_correct_one_key_value) - 1,
-      az_span_init(test_span_buf, _az_COUNTOF(test_span_buf)),
+      az_span_create(test_span_buf, _az_COUNTOF(test_span_buf)),
       TEST_SPAN_BUFFER_SIZE);
 }
 
@@ -640,7 +638,7 @@ static void test_az_iot_hub_client_properties_append_small_buffer_fail(void** st
   (void)state;
 
   uint8_t test_span_buf[sizeof(test_correct_one_key_value) - 2];
-  az_span test_span = az_span_init(test_span_buf, sizeof(test_span_buf));
+  az_span test_span = az_span_create(test_span_buf, sizeof(test_span_buf));
   az_iot_hub_client_properties props;
 
   assert_int_equal(az_iot_hub_client_properties_init(&props, test_span, 0), AZ_OK);
@@ -669,7 +667,7 @@ static void test_az_iot_hub_client_properties_append_twice_succeed(void** state)
       az_span_slice(props._internal.properties_buffer, 0, props._internal.properties_written),
       test_correct_two_key_value,
       _az_COUNTOF(test_correct_two_key_value) - 1,
-      az_span_init(test_span_buf, _az_COUNTOF(test_span_buf)),
+      az_span_create(test_span_buf, _az_COUNTOF(test_span_buf)),
       TEST_SPAN_BUFFER_SIZE);
 }
 
@@ -678,7 +676,7 @@ static void test_az_iot_hub_client_properties_append_twice_small_buffer_fail(voi
   (void)state;
 
   uint8_t test_span_buf[sizeof(test_correct_two_key_value) - 2];
-  az_span test_span = az_span_init(test_span_buf, sizeof(test_span_buf));
+  az_span test_span = az_span_create(test_span_buf, sizeof(test_span_buf));
   az_iot_hub_client_properties props;
 
   assert_int_equal(az_iot_hub_client_properties_init(&props, test_span, 0), AZ_OK);
@@ -696,7 +694,7 @@ static void test_az_iot_hub_client_properties_find_succeed(void** state)
 {
   (void)state;
 
-  az_span test_span = az_span_from_str(TEST_KEY_VALUE_ONE);
+  az_span test_span = az_span_create_from_str(TEST_KEY_VALUE_ONE);
   az_iot_hub_client_properties props;
 
   assert_int_equal(
@@ -712,7 +710,7 @@ static void test_az_iot_hub_client_properties_find_middle_succeed(void** state)
 {
   (void)state;
 
-  az_span test_span = az_span_from_str(TEST_KEY_VALUE_THREE);
+  az_span test_span = az_span_create_from_str(TEST_KEY_VALUE_THREE);
   az_iot_hub_client_properties props;
 
   assert_int_equal(
@@ -728,7 +726,7 @@ static void test_az_iot_hub_client_properties_find_end_succeed(void** state)
 {
   (void)state;
 
-  az_span test_span = az_span_from_str(TEST_KEY_VALUE_TWO);
+  az_span test_span = az_span_create_from_str(TEST_KEY_VALUE_TWO);
   az_iot_hub_client_properties props;
 
   assert_int_equal(
@@ -744,7 +742,7 @@ static void test_az_iot_hub_client_properties_find_substring_succeed(void** stat
 {
   (void)state;
 
-  az_span test_span = az_span_from_str(TEST_KEY_VALUE_SUBSTRING);
+  az_span test_span = az_span_create_from_str(TEST_KEY_VALUE_SUBSTRING);
   az_iot_hub_client_properties props;
 
   assert_int_equal(
@@ -760,7 +758,7 @@ static void test_az_iot_hub_client_properties_find_name_value_same_succeed(void*
 {
   (void)state;
 
-  az_span test_span = az_span_from_str(TEST_KEY_VALUE_SAME);
+  az_span test_span = az_span_create_from_str(TEST_KEY_VALUE_SAME);
   az_iot_hub_client_properties props;
 
   assert_int_equal(
@@ -789,7 +787,7 @@ static void test_az_iot_hub_client_properties_find_fail(void** state)
 {
   (void)state;
 
-  az_span test_span = az_span_from_str(TEST_KEY_VALUE_ONE);
+  az_span test_span = az_span_create_from_str(TEST_KEY_VALUE_ONE);
   az_iot_hub_client_properties props;
 
   assert_int_equal(
@@ -805,7 +803,7 @@ static void test_az_iot_hub_client_properties_find_substring_fail(void** state)
 {
   (void)state;
 
-  az_span test_span = az_span_from_str(TEST_KEY_VALUE_TWO);
+  az_span test_span = az_span_create_from_str(TEST_KEY_VALUE_TWO);
   az_iot_hub_client_properties props;
 
   assert_int_equal(
@@ -821,7 +819,7 @@ static void test_az_iot_hub_client_properties_find_substring_suffix_fail(void** 
 {
   (void)state;
 
-  az_span test_span = az_span_from_str(TEST_KEY_VALUE_TWO);
+  az_span test_span = az_span_create_from_str(TEST_KEY_VALUE_TWO);
   az_iot_hub_client_properties props;
 
   assert_int_equal(
@@ -837,7 +835,7 @@ static void test_az_iot_hub_client_properties_find_value_match_fail(void** state
 {
   (void)state;
 
-  az_span test_span = az_span_from_str(TEST_KEY_VALUE_THREE);
+  az_span test_span = az_span_create_from_str(TEST_KEY_VALUE_THREE);
   az_iot_hub_client_properties props;
 
   assert_int_equal(
@@ -853,7 +851,7 @@ static void test_az_iot_hub_client_properties_find_value_match_end_fail(void** s
 {
   (void)state;
 
-  az_span test_span = az_span_from_str(TEST_KEY_VALUE_THREE);
+  az_span test_span = az_span_create_from_str(TEST_KEY_VALUE_THREE);
   az_iot_hub_client_properties props;
 
   assert_int_equal(
@@ -869,7 +867,7 @@ static void test_az_iot_hub_client_properties_next_succeed(void** state)
 {
   (void)state;
 
-  az_span test_span = az_span_from_str(TEST_KEY_VALUE_THREE);
+  az_span test_span = az_span_create_from_str(TEST_KEY_VALUE_THREE);
   az_iot_hub_client_properties props;
   assert_int_equal(
       az_iot_hub_client_properties_init(&props, test_span, az_span_size(test_span)), AZ_OK);
@@ -907,7 +905,7 @@ static void test_az_iot_hub_client_properties_next_twice_succeed(void** state)
 {
   (void)state;
 
-  az_span test_span = az_span_from_str(TEST_KEY_VALUE_TWO);
+  az_span test_span = az_span_create_from_str(TEST_KEY_VALUE_TWO);
   az_iot_hub_client_properties props;
   assert_int_equal(
       az_iot_hub_client_properties_init(&props, test_span, az_span_size(test_span)), AZ_OK);
