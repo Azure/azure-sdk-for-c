@@ -983,6 +983,36 @@ AZ_NODISCARD AZ_INLINE bool _az_span_url_should_encode(uint8_t c)
   }
 }
 
+AZ_NODISCARD int32_t _az_span_url_encode_calc_length(az_span source)
+{
+  _az_PRECONDITION_VALID_SPAN(source, 0, true);
+  // trying to calculate the number of bytes to encode more than INT32_MAX / 3 might overflow an
+  // int32 and return an erroneous number back
+  _az_PRECONDITION_RANGE(0, az_span_size(source), INT32_MAX / 3);
+
+  int32_t const source_size = az_span_size(source);
+  if (source_size == 0)
+  {
+    return 0;
+  }
+
+  uint8_t* const src_ptr = az_span_ptr(source);
+  int32_t required_symbols_to_be_added = 0;
+  int32_t src_idx = 0;
+  do
+  {
+    uint8_t c = src_ptr[src_idx];
+    if (_az_span_url_should_encode(c))
+    {
+      // Adding '%' plus 2 digits (minus 1 as original symbol is counted as 1)
+      required_symbols_to_be_added += 2;
+    }
+    ++src_idx;
+  } while (src_idx < source_size);
+
+  return source_size + required_symbols_to_be_added;
+}
+
 AZ_NODISCARD az_result _az_span_url_encode(az_span destination, az_span source, int32_t* out_length)
 {
   _az_PRECONDITION_NOT_NULL(out_length);

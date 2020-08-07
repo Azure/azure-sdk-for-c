@@ -21,11 +21,8 @@ _az_aad_build_url(az_span url, az_span authority, az_span tenant_id, az_span* ou
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(url, az_span_size(authority));
   az_span remainder = az_span_copy(url, authority);
 
-  {
-    int32_t url_length = 0;
-    AZ_RETURN_IF_FAILED(_az_span_url_encode(remainder, tenant_id, &url_length));
-    remainder = az_span_slice_to_end(remainder, url_length);
-  }
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, az_span_size(tenant_id));
+  remainder = az_span_copy(remainder, tenant_id);
 
   az_span const oath_token = AZ_SPAN_FROM_STR("/oauth2/v2.0/token");
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, az_span_size(oath_token));
@@ -49,18 +46,18 @@ AZ_NODISCARD az_result _az_aad_build_body(
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(body, az_span_size(grant_type_and_client_id_key));
 
   az_span remainder = az_span_copy(body, grant_type_and_client_id_key);
-  int32_t url_length = 0;
+  int32_t body_length = 0;
 
-  AZ_RETURN_IF_FAILED(_az_span_url_encode(remainder, client_id, &url_length));
-  remainder = az_span_slice_to_end(remainder, url_length);
+  AZ_RETURN_IF_FAILED(_az_span_url_encode(remainder, client_id, &body_length));
+  remainder = az_span_slice_to_end(remainder, body_length);
 
   az_span const scope_key = AZ_SPAN_FROM_STR("&scope=");
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, az_span_size(scope_key));
 
   remainder = az_span_copy(remainder, scope_key);
 
-  AZ_RETURN_IF_FAILED(_az_span_url_encode(remainder, scopes, &url_length));
-  remainder = az_span_slice_to_end(remainder, url_length);
+  AZ_RETURN_IF_FAILED(_az_span_url_encode(remainder, scopes, &body_length));
+  remainder = az_span_slice_to_end(remainder, body_length);
 
   if (az_span_size(client_secret) > 0)
   {
@@ -69,8 +66,8 @@ AZ_NODISCARD az_result _az_aad_build_body(
 
     remainder = az_span_copy(remainder, client_secret_key);
 
-    AZ_RETURN_IF_FAILED(_az_span_url_encode(remainder, client_secret, &url_length));
-    remainder = az_span_slice_to_end(remainder, url_length);
+    AZ_RETURN_IF_FAILED(_az_span_url_encode(remainder, client_secret, &body_length));
+    remainder = az_span_slice_to_end(remainder, body_length);
   }
 
   *out_body = az_span_slice(body, 0, _az_span_diff(remainder, body));
