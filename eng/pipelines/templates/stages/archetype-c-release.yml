@@ -18,9 +18,14 @@ stages:
             deploy:
               steps:
                 - checkout: self
-                - pwsh: |
-                    $pkgInfo = Get-Content $(Pipeline.Workspace)/release-info/package-info.json | ConvertFrom-Json
-                    ./eng/common/scripts/Verify-Changelog.ps1 -ChangeLogLocation $(Pipeline.Workspace)/release-info/CHANGELOG.md -VersionString $pkgInfo.version -ForRelease $true
+                - task: Powershell@2
+                  inputs:
+                    filePath: $(Build.SourcesDirectory)/eng/common/scripts/Verify-ChangeLog.ps1
+                    arguments: >
+                      -ChangeLogLocation $(Pipeline.Workspace)/release-info/CHANGELOG.md
+                      -VersionString (Get-Content $(Pipeline.Workspace)/release-info/package-info.json | ConvertFrom-Json).version
+                      -ForRelease $true
+                    pwsh: true
                   displayName: Verify CHANGELOG.md contents
                 - template: /eng/common/pipelines/templates/steps/create-tags-and-git-release.yml
                   parameters:
