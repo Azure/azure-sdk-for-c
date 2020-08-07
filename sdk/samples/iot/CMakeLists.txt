@@ -82,22 +82,22 @@ target_link_libraries(paho_iot_hub_pnp_sample
 )
 
 # PnP Component Sample
-add_executable (paho_iot_hub_pnp_component_example
+add_executable (paho_iot_hub_pnp_component_sample
   ${CMAKE_CURRENT_LIST_DIR}/sample_pnp_component_mqtt.c
   ${CMAKE_CURRENT_LIST_DIR}/sample_pnp_device_info_component.c
   ${CMAKE_CURRENT_LIST_DIR}/sample_pnp_thermostat_component.c
-  ${CMAKE_CURRENT_LIST_DIR}/paho_iot_hub_pnp_component_example.c
+  ${CMAKE_CURRENT_LIST_DIR}/paho_iot_hub_pnp_component_sample.c
   ${CMAKE_CURRENT_LIST_DIR}/sample_pnp.c
 )
 
 # SDK deps
-target_link_libraries(paho_iot_hub_pnp_component_example
+target_link_libraries(paho_iot_hub_pnp_component_sample
   PRIVATE
     az::iot::hub
 )
 
 # External deps
-target_link_libraries(paho_iot_hub_pnp_component_example
+target_link_libraries(paho_iot_hub_pnp_component_sample
   PRIVATE
     eclipse-paho-mqtt-c::paho-mqtt3cs-static
     OpenSSL::SSL
@@ -159,7 +159,7 @@ if (MSVC)
     set_target_properties(
         paho_iot_hub_c2d_sample
         paho_iot_hub_methods_sample
-        paho_iot_hub_pnp_component_example
+        paho_iot_hub_pnp_component_sample
         paho_iot_hub_pnp_sample
         paho_iot_hub_telemetry_sample
         paho_iot_hub_sas_telemetry_sample
