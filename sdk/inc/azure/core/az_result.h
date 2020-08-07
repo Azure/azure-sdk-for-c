@@ -102,7 +102,7 @@ typedef enum
   // Platform
   AZ_ERROR_OUT_OF_MEMORY = _az_RESULT_MAKE_ERROR(
       _az_FACILITY_PLATFORM,
-      2), ///< Dynamic memory allocation request was not successful.
+      1), ///< Dynamic memory allocation request was not successful.
 
   // JSON error codes
   AZ_ERROR_JSON_INVALID_STATE = _az_RESULT_MAKE_ERROR(_az_FACILITY_JSON, 1),
@@ -115,11 +115,6 @@ typedef enum
   AZ_ERROR_HTTP_PIPELINE_INVALID_POLICY = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 2),
   AZ_ERROR_HTTP_INVALID_METHOD_VERB = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 3),
 
-  // HTTP Adapter error codes
-  AZ_ERROR_HTTP_ADAPTER = _az_RESULT_MAKE_ERROR(
-      _az_FACILITY_HTTP,
-      5), ///< Generic error in the HTTP transport adapter implementation.
-
   AZ_ERROR_HTTP_AUTHENTICATION_FAILED
   = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 4), ///< Authentication failed.
 
@@ -127,6 +122,11 @@ typedef enum
   AZ_ERROR_HTTP_RESPONSE_COULDNT_RESOLVE_HOST = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 6),
 
   AZ_ERROR_HTTP_CORRUPT_RESPONSE_HEADER = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 7),
+
+  // HTTP Adapter error codes
+  AZ_ERROR_HTTP_ADAPTER = _az_RESULT_MAKE_ERROR(
+      _az_FACILITY_HTTP,
+      8), ///< Generic error in the HTTP transport adapter implementation.
 
   // IoT error codes
   AZ_ERROR_IOT_TOPIC_NO_MATCH = _az_RESULT_MAKE_ERROR(_az_FACILITY_IOT, 1),
