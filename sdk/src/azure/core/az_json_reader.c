@@ -59,7 +59,7 @@ static void _az_json_reader_update_state(
 AZ_NODISCARD static az_span _az_json_reader_skip_whitespace(az_json_reader* json_reader)
 {
   az_span remaining = _get_remaining_json(json_reader);
-  az_span json = _az_span_trim_white_space_from_start(remaining);
+  az_span json = _az_span_trim_whitespace_from_start(remaining);
 
   // Find out how many whitespace characters were trimmed.
   json_reader->_internal.bytes_consumed += az_span_size(remaining) - az_span_size(json);
@@ -659,7 +659,7 @@ AZ_NODISCARD az_result az_json_reader_next_token(az_json_reader* json_reader)
       }
       else
       {
-        // We expect the start of a property name as the first non-white-space character within a
+        // We expect the start of a property name as the first non-whitespace character within a
         // JSON object.
         if (first_byte != '"')
         {

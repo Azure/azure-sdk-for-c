@@ -898,13 +898,13 @@ _az_span_scan_until(az_span span, _az_predicate predicate, int32_t* out_index)
   return AZ_ERROR_ITEM_NOT_FOUND;
 }
 
-AZ_NODISCARD az_span _az_span_trim_white_space(az_span source)
+AZ_NODISCARD az_span _az_span_trim_whitespace(az_span source)
 {
   // Trim from end after trim from start
-  return _az_span_trim_white_space_from_end(_az_span_trim_white_space_from_start(source));
+  return _az_span_trim_whitespace_from_end(_az_span_trim_whitespace_from_start(source));
 }
 
-AZ_NODISCARD AZ_INLINE bool _az_is_white_space(uint8_t c)
+AZ_NODISCARD AZ_INLINE bool _az_is_whitespace(uint8_t c)
 {
   switch (c)
   {
@@ -940,7 +940,7 @@ AZ_NODISCARD static az_span _az_span_trim_side(az_span source, az_span_trim_side
   int32_t index = 0;
   for (; index < source_size; index++)
   {
-    if (!_az_is_white_space(*source_ptr))
+    if (!_az_is_whitespace(*source_ptr))
     {
       break;
     }
@@ -959,12 +959,12 @@ AZ_NODISCARD static az_span _az_span_trim_side(az_span source, az_span_trim_side
   return az_span_slice_to_end(source, index); // worst case index would be source_size
 }
 
-AZ_NODISCARD az_span _az_span_trim_white_space_from_start(az_span source)
+AZ_NODISCARD az_span _az_span_trim_whitespace_from_start(az_span source)
 {
   return _az_span_trim_side(source, LEFT);
 }
 
-AZ_NODISCARD az_span _az_span_trim_white_space_from_end(az_span source)
+AZ_NODISCARD az_span _az_span_trim_whitespace_from_end(az_span source)
 {
   return _az_span_trim_side(source, RIGHT);
 }

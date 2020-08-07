@@ -1843,70 +1843,70 @@ static void test_az_span_overlap(void** state)
 static void az_span_trim(void** state)
 {
   (void)state;
-  az_span source = _az_span_trim_white_space(AZ_SPAN_FROM_STR("   abc   "));
+  az_span source = _az_span_trim_whitespace(AZ_SPAN_FROM_STR("   abc   "));
   assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("abc")));
 }
 
 static void az_span_trim_left(void** state)
 {
   (void)state;
-  az_span source = _az_span_trim_white_space_from_start(AZ_SPAN_FROM_STR("   abc   "));
+  az_span source = _az_span_trim_whitespace_from_start(AZ_SPAN_FROM_STR("   abc   "));
   assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("abc   ")));
 }
 
 static void az_span_trim_right(void** state)
 {
   (void)state;
-  az_span source = _az_span_trim_white_space_from_end(AZ_SPAN_FROM_STR("   abc   "));
+  az_span source = _az_span_trim_whitespace_from_end(AZ_SPAN_FROM_STR("   abc   "));
   assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("   abc")));
 }
 
-static void az_span_trim_all_white(void** state)
+static void az_span_trim_all_whitespace(void** state)
 {
   (void)state;
-  az_span source = _az_span_trim_white_space(AZ_SPAN_FROM_STR("\t\n\r       "));
+  az_span source = _az_span_trim_whitespace(AZ_SPAN_FROM_STR("\t\n\r       "));
   assert_int_equal(az_span_size(source), 0);
 }
 
 static void az_span_trim_none(void** state)
 {
   (void)state;
-  az_span source = _az_span_trim_white_space(AZ_SPAN_FROM_STR("abc"));
+  az_span source = _az_span_trim_whitespace(AZ_SPAN_FROM_STR("abc"));
   assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("abc")));
 }
 
 static void az_span_trim_spaced(void** state)
 {
   (void)state;
-  az_span source = _az_span_trim_white_space(AZ_SPAN_FROM_STR("\ta\n b     c    "));
+  az_span source = _az_span_trim_whitespace(AZ_SPAN_FROM_STR("\ta\n b     c    "));
   assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("a\n b     c")));
 }
 
 static void az_span_trim_zero(void** state)
 {
   (void)state;
-  az_span source = _az_span_trim_white_space(AZ_SPAN_FROM_STR(""));
+  az_span source = _az_span_trim_whitespace(AZ_SPAN_FROM_STR(""));
   assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("")));
 }
 
 static void az_span_trim_null(void** state)
 {
   (void)state;
-  az_span source = _az_span_trim_white_space(AZ_SPAN_NULL);
+  az_span source = _az_span_trim_whitespace(AZ_SPAN_NULL);
   assert_int_equal(az_span_size(source), 0);
 }
 
 static void az_span_trim_start(void** state)
 {
   (void)state;
-  az_span source = _az_span_trim_white_space_from_start(AZ_SPAN_NULL);
+  az_span source = _az_span_trim_whitespace_from_start(AZ_SPAN_NULL);
   assert_int_equal(az_span_size(source), 0);
 }
 
 static void az_span_trim_end(void** state)
 {
   (void)state;
-  az_span source = _az_span_trim_white_space_from_end(AZ_SPAN_FROM_STR("\ta\n b     c    "));
+  az_span source = _az_span_trim_whitespace_from_end(AZ_SPAN_FROM_STR("\ta\n b     c    "));
   assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("\ta\n b     c")));
 }
 
@@ -1914,34 +1914,34 @@ static void az_span_trim_unicode(void** state)
 {
   (void)state;
   az_span source
-      = _az_span_trim_white_space_from_end(AZ_SPAN_FROM_STR("  \\U+00A0a\n b     c\\U+2028    "));
+      = _az_span_trim_whitespace_from_end(AZ_SPAN_FROM_STR("  \\U+00A0a\n b     c\\U+2028    "));
   assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("  \\U+00A0a\n b     c\\U+2028")));
 }
 
 static void az_span_trim_two_calls(void** state)
 {
   (void)state;
-  az_span source = _az_span_trim_white_space_from_start(
-      _az_span_trim_white_space_from_end(AZ_SPAN_FROM_STR("  \\U+00A0a\n b     c\\U+2028    ")));
+  az_span source = _az_span_trim_whitespace_from_start(
+      _az_span_trim_whitespace_from_end(AZ_SPAN_FROM_STR("  \\U+00A0a\n b     c\\U+2028    ")));
   assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("\\U+00A0a\n b     c\\U+2028")));
 }
 
 static void az_span_trim_two_calls_inverse(void** state)
 {
   (void)state;
-  az_span source = _az_span_trim_white_space_from_end(
-      _az_span_trim_white_space_from_start(AZ_SPAN_FROM_STR("  \\U+00A0a\n b     c\\U+2028    ")));
+  az_span source = _az_span_trim_whitespace_from_end(
+      _az_span_trim_whitespace_from_start(AZ_SPAN_FROM_STR("  \\U+00A0a\n b     c\\U+2028    ")));
   assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("\\U+00A0a\n b     c\\U+2028")));
 }
 
 static void az_span_trim_repeat_calls(void** state)
 {
   (void)state;
-  az_span source = _az_span_trim_white_space_from_end(
-      _az_span_trim_white_space_from_start(AZ_SPAN_FROM_STR("  1234    ")));
-  source = _az_span_trim_white_space(source);
-  source = _az_span_trim_white_space(source);
-  source = _az_span_trim_white_space(source);
+  az_span source = _az_span_trim_whitespace_from_end(
+      _az_span_trim_whitespace_from_start(AZ_SPAN_FROM_STR("  1234    ")));
+  source = _az_span_trim_whitespace(source);
+  source = _az_span_trim_whitespace(source);
+  source = _az_span_trim_whitespace(source);
   assert_true(az_span_is_content_equal(source, AZ_SPAN_FROM_STR("1234")));
 }
 
@@ -2054,7 +2054,7 @@ int test_az_span()
     cmocka_unit_test(az_span_trim),
     cmocka_unit_test(az_span_trim_left),
     cmocka_unit_test(az_span_trim_right),
-    cmocka_unit_test(az_span_trim_all_white),
+    cmocka_unit_test(az_span_trim_all_whitespace),
     cmocka_unit_test(az_span_trim_none),
     cmocka_unit_test(az_span_trim_spaced),
     cmocka_unit_test(az_span_trim_zero),

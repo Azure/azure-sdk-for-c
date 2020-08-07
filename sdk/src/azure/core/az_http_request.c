@@ -259,9 +259,9 @@ az_http_request_append_header(az_http_request* ref_request, az_span key, az_span
 {
   _az_PRECONDITION_NOT_NULL(ref_request);
 
-  // remove white spaces from key and value
-  key = _az_span_trim_white_space(key);
-  value = _az_span_trim_white_space(value);
+  // remove whitespace characters from key and value
+  key = _az_span_trim_whitespace(key);
+  value = _az_span_trim_whitespace(value);
 
   _az_PRECONDITION_VALID_SPAN(key, 1, false);
 
