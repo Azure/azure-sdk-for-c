@@ -55,7 +55,7 @@ void create_and_configure_client()
 {
   int rc;
 
-  // Reads in environment variables set by user for purposes of running sample
+  // Reads in environment variables set by user for purposes of running sample.
   if (az_failed(rc = read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars)))
   {
     LOG_ERROR(
@@ -64,7 +64,7 @@ void create_and_configure_client()
     exit(rc);
   }
 
-  // Set mqtt endpoint as null terminated in buffer
+  // Build an MQTT endpoint c-string.
   char hub_mqtt_endpoint_buffer[128];
   if (az_failed(
           rc = create_mqtt_endpoint(
@@ -74,7 +74,7 @@ void create_and_configure_client()
     exit(rc);
   }
 
-  // Initialize the hub client with the default connection options
+  // Initialize the hub client with the default connection options.
   if (az_failed(
           rc = az_iot_hub_client_init(
               &hub_client, env_vars.hub_hostname, env_vars.hub_device_id, NULL)))
@@ -83,7 +83,7 @@ void create_and_configure_client()
     exit(rc);
   }
 
-  // Get the MQTT client id used for the MQTT connection
+  // Get the MQTT client id used for the MQTT connection.
   char mqtt_client_id_buffer[128];
   if (az_failed(
           rc = az_iot_hub_client_get_client_id(
@@ -93,7 +93,7 @@ void create_and_configure_client()
     exit(rc);
   }
 
-  // Create the Paho MQTT client
+  // Create the Paho MQTT client.
   if ((rc = MQTTClient_create(
            &mqtt_client,
            hub_mqtt_endpoint_buffer,

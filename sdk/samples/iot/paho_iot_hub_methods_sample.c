@@ -6,15 +6,13 @@
 #define SAMPLE_TYPE PAHO_IOT_HUB
 #define SAMPLE_NAME PAHO_IOT_HUB_METHODS_SAMPLE
 
-#define MAX_MESSAGE_COUNT 5
+#define MAX_METHOD_MESSAGE_COUNT 5
+#define TIMEOUT_MQTT_RECEIVE_MS (60 * 1000)
 
 static const az_span ping_method_name = AZ_SPAN_LITERAL_FROM_STR("ping");
 static const az_span method_fail_response = AZ_SPAN_LITERAL_FROM_STR("{}");
 
-// Environment variables
 static sample_environment_variables env_vars;
-
-// Clients
 static az_iot_hub_client hub_client;
 static MQTTClient mqtt_client;
 static char mqtt_client_username_buffer[128];
@@ -38,6 +36,18 @@ void send_method_response(
     uint16_t status,
     az_span response);
 
+// This sample receives incoming method commands invoked from the the Azure IoT Hub.
+// It will successfully receive up to MAX_METHOD_MESSAGE_COUNT method commands sent from the service.
+// If a timeout occurs of TIMEOUT_MQTT_RECEIVE_MS while waiting for a message, the sample will exit.
+// X509 self-certification is used.
+
+  To send a method command, select your device's Direct Method tab in your Azure IoT Hub. Enter a method name and select Invoke Method. A method named `ping` is supported, which if successful will return a json payload of the following:
+
+  ```json
+  {"response": "pong"}
+  ```
+
+  No other method commands are supported. If any are attempted to be invoked, the log will report the method is not found.
 int main()
 {
   create_and_configure_client();
