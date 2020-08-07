@@ -1,42 +1,35 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <sample.h>
+#include "sample.h"
 
-// Store environment variables
-static char global_provisioning_endpoint_buffer[256];
-static char id_scope_buffer[16];
-static char registration_id_buffer[256];
-static char x509_cert_pem_file_path_buffer[256];
-static char x509_trust_pem_file_path_buffer[256];
+#define SAMPLE_TYPE PAHO_IOT_PROVISIONING
+#define SAMPLE_NAME PAHO_IOT_PROVISIONING_SAMPLE
+
+// Environment variables
+static sample_environment_variables env_vars;
 
 // Clients
 static az_iot_provisioning_client provisioning_client;
 static MQTTClient mqtt_client;
-static char mqtt_client_id_buffer[128];
-static char mqtt_username_buffer[128];
-
-// Topics
-static char register_publish_topic_buffer[128];
-static char query_topic_buffer[256];
+static char mqtt_client_username_buffer[128];
 
 // Functions
-static void create_and_configure_client();
-static void connect_client_to_provisioning_service();
-static void subscribe_client_to_provisioning_service_topics();
-static void register_client_with_provisioning_service();
-static void receive_registration_status();
-static void disconnect_client_from_provisioning_service();
+void create_and_configure_client();
+void connect_client_to_provisioning_service();
+void subscribe_client_to_provisioning_service_topics();
+void register_client_with_provisioning_service();
+void receive_registration_status();
+void disconnect_client_from_provisioning_service();
 
-static void parse_operation_message(
+void parse_operation_message(
     char* topic,
     int topic_len,
     const MQTTClient_message* message,
     az_iot_provisioning_client_register_response* response,
     az_iot_provisioning_client_operation_status* operation_status);
-static void send_operation_query_message(
+void send_operation_query_message(
     const az_iot_provisioning_client_register_response* response);
-
 
 int main()
 {
@@ -44,7 +37,7 @@ int main()
   LOG_SUCCESS("Client created and configured.");
 
   connect_client_to_provisioning_service();
-  LOG_SUCCESS("Client connected to \"%s\".", global_provisioning_endpoint_buffer);
+  LOG_SUCCESS("Client connected to provisioning service.");
 
   subscribe_client_to_provisioning_service_topics();
   LOG_SUCCESS("Client subscribed to provisioning service topics.");
@@ -61,29 +54,45 @@ int main()
   return 0;
 }
 
-static void create_and_configure_client()
+void create_and_configure_client()
 {
   int rc;
-  az_span global_provisioning_endpoint;
-  az_span id_scope;
-  az_span registration_id;
 
-  if (az_failed(
-          rc
-          = read_environment_variables(&global_provisioning_endpoint, &id_scope, &registration_id)))
+  // Reads in environment variables set by user for purposes of running sample
+  if (az_failed(rc = read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars)))
   {
     LOG_ERROR("Failed to read environment variables: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
+  // Set mqtt endpoint as null terminated in buffer
+  char provisioning_global_endpoint_buffer[256];
+  if (az_failed(
+          rc = create_mqtt_endpoint(
+              SAMPLE_TYPE,
+              provisioning_global_endpoint_buffer,
+              sizeof(provisioning_global_endpoint_buffer))))
+  {
+    LOG_ERROR("Failed to create MQTT endpoint: az_result return code 0x%04x.", rc);
+    exit(rc);
+  }
+
+  // Initialize the provisioning client with the provisioning global endpoint and the default
+  // connection options
   if (az_failed(
           rc = az_iot_provisioning_client_init(
-              &provisioning_client, global_provisioning_endpoint, id_scope, registration_id, NULL)))
+              &provisioning_client,
+              az_span_from_str(provisioning_global_endpoint_buffer),
+              env_vars.provisioning_id_scope,
+              env_vars.provisioning_registration_id,
+              NULL)))
   {
     LOG_ERROR("Failed to initialize provisioning client: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
+  // Get the MQTT client id used for the MQTT connection
+  char mqtt_client_id_buffer[128];
   if (az_failed(
           rc = az_iot_provisioning_client_get_client_id(
               &provisioning_client, mqtt_client_id_buffer, sizeof(mqtt_client_id_buffer), NULL)))
@@ -92,9 +101,10 @@ static void create_and_configure_client()
     exit(rc);
   }
 
+  // Create the Paho MQTT client
   if ((rc = MQTTClient_create(
            &mqtt_client,
-           (char*)az_span_ptr(global_provisioning_endpoint),
+           provisioning_global_endpoint_buffer,
            mqtt_client_id_buffer,
            MQTTCLIENT_PERSISTENCE_NONE,
            NULL))
@@ -103,71 +113,31 @@ static void create_and_configure_client()
     LOG_ERROR("Failed to create MQTT client: MQTTClient return code %d.", rc);
     exit(rc);
   }
+
+  return;
 }
 
-static az_result read_environment_variables(
-    az_span* global_provisioning_endpoint,
-    az_span* id_scope,
-    az_span* registration_id)
-{
-  // Connection variables
-  *global_provisioning_endpoint = AZ_SPAN_FROM_BUFFER(global_provisioning_endpoint_buffer);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_GLOBAL_PROVISIONING_ENDPOINT,
-      ENV_GLOBAL_PROVISIONING_ENDPOINT_DEFAULT,
-      false,
-      *global_provisioning_endpoint,
-      global_provisioning_endpoint));
-
-  *id_scope = AZ_SPAN_FROM_BUFFER(id_scope_buffer);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(ENV_ID_SCOPE_ENV, NULL, false, *id_scope, id_scope));
-
-  *registration_id = AZ_SPAN_FROM_BUFFER(registration_id_buffer);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_REGISTRATION_ID_ENV, NULL, false, *registration_id, registration_id));
-
-  // Certification variables
-  az_span x509_cert_pem_file_path = AZ_SPAN_FROM_BUFFER(x509_cert_pem_file_path_buffer);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_DEVICE_X509_CERT_PEM_FILE_PATH,
-      NULL,
-      false,
-      x509_cert_pem_file_path,
-      &x509_cert_pem_file_path));
-
-  az_span x509_trust_pem_file_path = AZ_SPAN_FROM_BUFFER(x509_trust_pem_file_path_buffer);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_DEVICE_X509_TRUST_PEM_FILE_PATH,
-      "",
-      false,
-      x509_trust_pem_file_path,
-      &x509_trust_pem_file_path));
-
-  LOG(" "); // Log formatting
-  return AZ_OK;
-}
-
-static void connect_client_to_provisioning_service()
+void connect_client_to_provisioning_service()
 {
   int rc;
 
   if (az_failed(
           rc = az_iot_provisioning_client_get_user_name(
-              &provisioning_client, mqtt_username_buffer, sizeof(mqtt_username_buffer), NULL)))
+              &provisioning_client, mqtt_client_username_buffer, sizeof(mqtt_client_username_buffer), NULL)))
   {
     LOG_ERROR("Failed to get MQTT username: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
   MQTTClient_connectOptions mqtt_connect_options = MQTTClient_connectOptions_initializer;
-  mqtt_connect_options.username = mqtt_username_buffer;
+  mqtt_connect_options.username = mqtt_client_username_buffer;
   mqtt_connect_options.password = NULL; // This sample uses x509 authentication.
   mqtt_connect_options.cleansession = false; // Set to false so can receive any pending messages.
   mqtt_connect_options.keepAliveInterval = AZ_IOT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS;
 
   MQTTClient_SSLOptions mqtt_ssl_options = MQTTClient_SSLOptions_initializer;
   mqtt_ssl_options.keyStore = (char*)x509_cert_pem_file_path_buffer;
-  if (*x509_trust_pem_file_path_buffer != '\0')
+  if (*az_span_ptr(env_vars.x509_trust_pem_file_path) != '\0')
   {
     mqtt_ssl_options.trustStore = (char*)x509_trust_pem_file_path_buffer;
   }
@@ -186,7 +156,7 @@ static void connect_client_to_provisioning_service()
   return;
 }
 
-static void subscribe_client_to_provisioning_service_topics()
+void subscribe_client_to_provisioning_service_topics()
 {
   int rc;
 
@@ -201,10 +171,11 @@ static void subscribe_client_to_provisioning_service_topics()
   return;
 }
 
-static void register_client_with_provisioning_service()
+void register_client_with_provisioning_service()
 {
   int rc;
 
+  char register_publish_topic_buffer[128];
   if (az_failed(
           rc = az_iot_provisioning_client_register_get_publish_topic(
               &provisioning_client,
@@ -232,7 +203,7 @@ static void register_client_with_provisioning_service()
   return;
 }
 
-static void receive_registration_status()
+void receive_registration_status()
 {
   int rc;
   char* topic = NULL;
@@ -307,7 +278,22 @@ static void receive_registration_status()
   return;
 }
 
-static void parse_operation_message(
+void disconnect_client_from_provisioning_service()
+{
+  int rc;
+
+  if ((rc = MQTTClient_disconnect(mqtt_client, TIMEOUT_MQTT_DISCONNECT_MS)) != MQTTCLIENT_SUCCESS)
+  {
+    LOG_ERROR("Failed to disconnect MQTT client: MQTTClient return code %d.", rc);
+    exit(rc);
+  }
+
+  MQTTClient_destroy(&mqtt_client);
+
+  return;
+}
+
+void parse_operation_message(
     char* topic,
     int topic_len,
     MQTTClient_message const* message,
@@ -339,11 +325,12 @@ static void parse_operation_message(
   return;
 }
 
-static void send_operation_query_message(
+void send_operation_query_message(
     az_iot_provisioning_client_register_response const* response)
 {
   int rc;
 
+  char query_topic_buffer[256];
   if (az_failed(
           rc = az_iot_provisioning_client_query_status_get_publish_topic(
               &provisioning_client,
@@ -366,21 +353,6 @@ static void send_operation_query_message(
     LOG_ERROR("Failed to publish query status request: MQTTClient return code %d.", rc);
     exit(rc);
   }
-
-  return;
-}
-
-static void disconnect_client_from_provisioning_service()
-{
-  int rc;
-
-  if ((rc = MQTTClient_disconnect(mqtt_client, TIMEOUT_MQTT_DISCONNECT_MS)) != MQTTCLIENT_SUCCESS)
-  {
-    LOG_ERROR("Failed to disconnect MQTT client: MQTTClient return code %d.", rc);
-    exit(rc);
-  }
-
-  MQTTClient_destroy(&mqtt_client);
 
   return;
 }

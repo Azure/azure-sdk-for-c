@@ -1,100 +1,18 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifdef _MSC_VER
-// warning C4201: nonstandard extension used: nameless struct/union
-#pragma warning(push)
-#pragma warning(disable : 4201)
-#endif
-#include <paho-mqtt/MQTTClient.h>
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+#include "sample.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-#ifdef _WIN32
-// Required for Sleep(DWORD)
-#include <Windows.h>
-#else
-// Required for sleep(unsigned int)
-#include <unistd.h>
-#endif
+#define SAMPLE_TYPE PAHO_IOT_PROVISIONING
+#define SAMPLE_NAME PAHO_IOT_PROVISIONING_SAS_SAMPLE
 
-#include "sample_sas_utility.h"
+// Environment variables
+static sample_environment_variables env_vars;
 
-#include <azure/core/az_result.h>
-#include <azure/core/az_span.h>
-#include <azure/iot/az_iot_provisioning_client.h>
-
-#define TIMEOUT_MQTT_RECEIVE_MS (60 * 1000)
-#define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
-
-#ifdef _MSC_VER
-// "'getenv': This function or variable may be unsafe. Consider using _dupenv_s instead."
-#pragma warning(disable : 4996)
-#endif
-
-// DO NOT MODIFY: Service information
-#define ENV_GLOBAL_PROVISIONING_ENDPOINT_DEFAULT "ssl://global.azure-devices-provisioning.net:8883"
-#define ENV_GLOBAL_PROVISIONING_ENDPOINT "AZ_IOT_GLOBAL_PROVISIONING_ENDPOINT"
-#define ENV_ID_SCOPE "AZ_IOT_ID_SCOPE"
-
-// DO NOT MODIFY: Device information
-#define ENV_REGISTRATION_ID_SAS "AZ_IOT_REGISTRATION_ID_SAS"
-
-// DO NOT MODIFY: IoT Provisioning SAS Key
-#define ENV_IOT_PROVISIONING_SAS_KEY "AZ_IOT_PROVISIONING_SAS_KEY"
-#define ENV_IOT_PROVISIONING_SAS_KEY_DURATION_MINUTES \
-  "AZ_IOT_PROVISIONING_SAS_KEY_DURATION_MINUTES" // default is 2 hrs.
-#define SAS_KEY_DURATION_TIME_DIGITS 4
-
-// DO NOT MODIFY: the path to a PEM file containing the server trusted CA
-// This is usually not needed on Linux or Mac but needs to be set on Windows.
-#define ENV_DEVICE_X509_TRUST_PEM_FILE_PATH "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE"
-
-// Logging with formatting
-#define LOG_ERROR(...) \
-  { \
-    (void)fprintf(stderr, "ERROR:\t\t%s:%s():%d: ", __FILE__, __func__, __LINE__); \
-    (void)fprintf(stderr, __VA_ARGS__); \
-    (void)fprintf(stderr, "\n"); \
-    fflush(stdout); \
-    fflush(stderr); \
-  }
-#define LOG_SUCCESS(...) \
-  { \
-    (void)printf("SUCCESS:\t"); \
-    (void)printf(__VA_ARGS__); \
-    (void)printf("\n"); \
-  }
-#define LOG(...) \
-  { \
-    (void)printf("\t\t"); \
-    (void)printf(__VA_ARGS__); \
-    (void)printf("\n"); \
-  }
-#define LOG_AZ_SPAN(span_description, span) \
-  { \
-    (void)printf("\t\t%s ", span_description); \
-    char* buffer = (char*)az_span_ptr(span); \
-    for (int32_t i = 0; i < az_span_size(span); i++) \
-    { \
-      putchar(*buffer++); \
-    } \
-    (void)printf("\n"); \
-  }
-
-// Store environment variables
-static char global_provisioning_endpoint_buffer[256];
-static char id_scope_buffer[16];
-static char registration_id_buffer[256];
-static char iot_provisioning_sas_key_buffer[128];
-static az_span iot_provisioning_sas_key;
-static uint32_t iot_provisioning_sas_key_duration;
-static char x509_trust_pem_file_path_buffer[256];
+// Clients
+static az_iot_provisioning_client provisioning_client;
+static MQTTClient mqtt_client;
+static char mqtt_client_username_buffer[128];
 
 // Generate SAS key variables
 static char sas_signature_buffer[128];
@@ -103,44 +21,23 @@ static char sas_encoded_hmac256_signed_signature_buffer[128];
 static char sas_b64_encoded_hmac256_signed_signature_buffer[128];
 static char mqtt_password_buffer[256];
 
-// Clients
-static az_iot_provisioning_client provisioning_client;
-static MQTTClient mqtt_client;
-static char mqtt_client_id_buffer[128];
-static char mqtt_client_username_buffer[128];
-
-// Topics
-static char register_publish_topic_buffer[128];
-static char query_topic_buffer[256];
-
 // Functions
-static void create_and_configure_client();
-static az_result read_environment_variables(
-    az_span* global_provisioning_endpoint,
-    az_span* id_scope,
-    az_span* registration_id);
-static az_result read_configuration_entry(
-    const char* env_name,
-    char* default_value,
-    bool hide_value,
-    az_span buffer,
-    az_span* out_value);
-static void generate_sas_key();
-static uint32_t get_epoch_expiration_time_from_hours(uint32_t hours);
-static void connect_client_to_provisioning_service();
-static void subscribe_client_to_provisioning_service_topics();
-static void register_client_with_provisioning_service();
-static void receive_registration_status();
-static void parse_operation_message(
+void create_and_configure_client();
+void connect_client_to_provisioning_service();
+void subscribe_client_to_provisioning_service_topics();
+void register_client_with_provisioning_service();
+void receive_registration_status();
+void disconnect_client_from_provisioning_service();
+
+void parse_operation_message(
     char* topic,
     int topic_len,
     const MQTTClient_message* message,
     az_iot_provisioning_client_register_response* response,
     az_iot_provisioning_client_operation_status* operation_status);
-static void send_operation_query_message(
+void send_operation_query_message(
     const az_iot_provisioning_client_register_response* response);
-static void disconnect_client_from_provisioning_service();
-static void sleep_for_seconds(uint32_t seconds);
+void generate_sas_key();
 
 int main()
 {
@@ -148,7 +45,7 @@ int main()
   LOG_SUCCESS("Client created and configured.");
 
   connect_client_to_provisioning_service();
-  LOG_SUCCESS("Client connected to \"%s\".", global_provisioning_endpoint_buffer);
+  LOG_SUCCESS("Client connected to provisioning service.");
 
   subscribe_client_to_provisioning_service_topics();
   LOG_SUCCESS("Client subscribed to provisioning service topics.");
@@ -165,16 +62,12 @@ int main()
   return 0;
 }
 
-static void create_and_configure_client()
+void create_and_configure_client()
 {
   int rc;
-  az_span global_provisioning_endpoint;
-  az_span id_scope;
-  az_span registration_id;
 
-  if (az_failed(
-          rc
-          = read_environment_variables(&global_provisioning_endpoint, &id_scope, &registration_id)))
+  // Reads in environment variables set by user for purposes of running sample
+  if (az_failed(rc = read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars)))
   {
     LOG_ERROR(
         "Failed to read configuration from environment variables: az_result return code 0x%04x.",
@@ -182,14 +75,34 @@ static void create_and_configure_client()
     exit(rc);
   }
 
+  // Set mqtt endpoint as null terminated in buffer
+  char provisioning_global_endpoint_buffer[256];
+  if (az_failed(
+          rc = create_mqtt_endpoint(
+              SAMPLE_TYPE,
+              provisioning_global_endpoint_buffer,
+              sizeof(provisioning_global_endpoint_buffer))))
+  {
+    LOG_ERROR("Failed to create MQTT endpoint: az_result return code 0x%04x.", rc);
+    exit(rc);
+  }
+
+  // Initialize the provisioning client with the provisioning global endpoint and the default
+  // connection options
   if (az_failed(
           rc = az_iot_provisioning_client_init(
-              &provisioning_client, global_provisioning_endpoint, id_scope, registration_id, NULL)))
+              &provisioning_client,
+              az_span_from_str(provisioning_global_endpoint_buffer),
+              env_vars.provisioning_id_scope,
+              env_vars.provisioning_registration_id,
+              NULL)))
   {
     LOG_ERROR("Failed to initialize provisioning client: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
+  // Get the MQTT client id used for the MQTT connection
+  char mqtt_client_id_buffer[128];
   if (az_failed(
           rc = az_iot_provisioning_client_get_client_id(
               &provisioning_client, mqtt_client_id_buffer, sizeof(mqtt_client_id_buffer), NULL)))
@@ -198,9 +111,10 @@ static void create_and_configure_client()
     exit(rc);
   }
 
+  // Create the Paho MQTT client
   if ((rc = MQTTClient_create(
            &mqtt_client,
-           (char*)az_span_ptr(global_provisioning_endpoint),
+           provisioning_global_endpoint_buffer,
            mqtt_client_id_buffer,
            MQTTCLIENT_PERSISTENCE_NONE,
            NULL))
@@ -212,166 +126,11 @@ static void create_and_configure_client()
 
   generate_sas_key();
   LOG_SUCCESS("Client generated SAS Key.");
-}
-
-static az_result read_environment_variables(
-    az_span* global_provisioning_endpoint,
-    az_span* id_scope,
-    az_span* registration_id)
-{
-  // Connection variables
-  *global_provisioning_endpoint = AZ_SPAN_FROM_BUFFER(global_provisioning_endpoint_buffer);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_GLOBAL_PROVISIONING_ENDPOINT,
-      ENV_GLOBAL_PROVISIONING_ENDPOINT_DEFAULT,
-      false,
-      *global_provisioning_endpoint,
-      global_provisioning_endpoint));
-
-  *id_scope = AZ_SPAN_FROM_BUFFER(id_scope_buffer);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(ENV_ID_SCOPE, NULL, false, *id_scope, id_scope));
-
-  *registration_id = AZ_SPAN_FROM_BUFFER(registration_id_buffer);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_REGISTRATION_ID_SAS, NULL, false, *registration_id, registration_id));
-
-  // SAS and Certification variables
-  iot_provisioning_sas_key = AZ_SPAN_FROM_BUFFER(iot_provisioning_sas_key_buffer);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_IOT_PROVISIONING_SAS_KEY,
-      NULL,
-      true,
-      iot_provisioning_sas_key,
-      &iot_provisioning_sas_key));
-
-  char duration_buffer[SAS_KEY_DURATION_TIME_DIGITS];
-  az_span duration = AZ_SPAN_FROM_BUFFER(duration_buffer);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_IOT_PROVISIONING_SAS_KEY_DURATION_MINUTES, "120", false, duration, &duration));
-  AZ_RETURN_IF_FAILED(az_span_atou32(duration, &iot_provisioning_sas_key_duration));
-
-  az_span x509_trust_pem_file_path = AZ_SPAN_FROM_BUFFER(x509_trust_pem_file_path_buffer);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_DEVICE_X509_TRUST_PEM_FILE_PATH,
-      "",
-      false,
-      x509_trust_pem_file_path,
-      &x509_trust_pem_file_path));
-
-  LOG(" "); // Log formatting
-  return AZ_OK;
-}
-
-static az_result read_configuration_entry(
-    const char* env_name,
-    char* default_value,
-    bool hide_value,
-    az_span buffer,
-    az_span* out_value)
-{
-  char* env_value = getenv(env_name);
-
-  if (env_value == NULL && default_value != NULL)
-  {
-    env_value = default_value;
-  }
-
-  if (env_value != NULL)
-  {
-    (void)printf("%s = %s\n", env_name, hide_value ? "***" : env_value);
-    az_span env_span = az_span_from_str(env_value);
-    AZ_RETURN_IF_NOT_ENOUGH_SIZE(buffer, az_span_size(env_span));
-    az_span_copy(buffer, env_span);
-    *out_value = az_span_slice(buffer, 0, az_span_size(env_span));
-  }
-  else
-  {
-    LOG_ERROR("(missing) Please set the %s environment variable", env_name);
-    return AZ_ERROR_ARG;
-  }
-
-  return AZ_OK;
-}
-
-static void generate_sas_key()
-{
-  int rc;
-
-  // Create the POSIX expiration time from input hours
-  uint32_t sas_duration = get_epoch_expiration_time_from_hours(iot_provisioning_sas_key_duration);
-
-  // Get the signature which will be signed with the decoded key
-  az_span sas_signature = AZ_SPAN_FROM_BUFFER(sas_signature_buffer);
-  if (az_failed(
-          rc = az_iot_provisioning_client_sas_get_signature(
-              &provisioning_client, sas_duration, sas_signature, &sas_signature)))
-  {
-    LOG_ERROR("Could not get the signature for SAS key: az_result return code 0x%04x.", rc);
-    exit(rc);
-  }
-
-  // Decode the base64 encoded SAS key to use for HMAC signing
-  az_span sas_b64_decoded_key = AZ_SPAN_FROM_BUFFER(sas_b64_decoded_key_buffer);
-  if (az_failed(
-          rc = sample_base64_decode(
-              iot_provisioning_sas_key, sas_b64_decoded_key, &sas_b64_decoded_key)))
-  {
-    LOG_ERROR("Could not decode the SAS key: az_result return code 0x%04x.", rc);
-    exit(rc);
-  }
-
-  // HMAC-SHA256 sign the signature with the decoded key
-  az_span sas_encoded_hmac256_signed_signature
-      = AZ_SPAN_FROM_BUFFER(sas_encoded_hmac256_signed_signature_buffer);
-  if (az_failed(
-          rc = sample_hmac_sha256_sign(
-              sas_b64_decoded_key,
-              sas_signature,
-              sas_encoded_hmac256_signed_signature,
-              &sas_encoded_hmac256_signed_signature)))
-  {
-    LOG_ERROR("Could not sign the signature: az_result return code 0x%04x.", rc);
-    exit(rc);
-  }
-
-  // base64 encode the result of the HMAC signing
-  az_span sas_b64_encoded_hmac256_signed_signature
-      = AZ_SPAN_FROM_BUFFER(sas_b64_encoded_hmac256_signed_signature_buffer);
-  if (az_failed(
-          rc = sample_base64_encode(
-              sas_encoded_hmac256_signed_signature,
-              sas_b64_encoded_hmac256_signed_signature,
-              &sas_b64_encoded_hmac256_signed_signature)))
-  {
-    LOG_ERROR("Could not base64 encode the password: az_result return code 0x%04x.", rc);
-    exit(rc);
-  }
-
-  // Get the resulting password, passing the base64 encoded, HMAC signed bytes
-  size_t mqtt_password_length;
-  if (az_failed(
-          rc = az_iot_provisioning_client_sas_get_password(
-              &provisioning_client,
-              sas_b64_encoded_hmac256_signed_signature,
-              sas_duration,
-              AZ_SPAN_NULL,
-              mqtt_password_buffer,
-              sizeof(mqtt_password_buffer),
-              &mqtt_password_length)))
-  {
-    LOG_ERROR("Could not get the password: az_result return code 0x%04x.", rc);
-    exit(rc);
-  }
 
   return;
 }
 
-static uint32_t get_epoch_expiration_time_from_hours(uint32_t hours)
-{
-  return (uint32_t)(time(NULL) + hours * 60 * 60);
-}
-
-static void connect_client_to_provisioning_service()
+void connect_client_to_provisioning_service()
 {
   int rc;
 
@@ -393,7 +152,7 @@ static void connect_client_to_provisioning_service()
   mqtt_connect_options.keepAliveInterval = AZ_IOT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS;
 
   MQTTClient_SSLOptions mqtt_ssl_options = MQTTClient_SSLOptions_initializer;
-  if (*x509_trust_pem_file_path_buffer != '\0')
+  if (*az_span_ptr(env_vars.x509_trust_pem_file_path) != '\0')
   {
     mqtt_ssl_options.trustStore = (char*)x509_trust_pem_file_path_buffer;
   }
@@ -412,7 +171,7 @@ static void connect_client_to_provisioning_service()
   return;
 }
 
-static void subscribe_client_to_provisioning_service_topics()
+void subscribe_client_to_provisioning_service_topics()
 {
   int rc;
 
@@ -427,10 +186,11 @@ static void subscribe_client_to_provisioning_service_topics()
   return;
 }
 
-static void register_client_with_provisioning_service()
+void register_client_with_provisioning_service()
 {
   int rc;
 
+  char register_publish_topic_buffer[128];
   if (az_failed(
           rc = az_iot_provisioning_client_register_get_publish_topic(
               &provisioning_client,
@@ -458,7 +218,7 @@ static void register_client_with_provisioning_service()
   return;
 }
 
-static void receive_registration_status()
+void receive_registration_status()
 {
   int rc;
   char* topic = NULL;
@@ -533,7 +293,22 @@ static void receive_registration_status()
   return;
 }
 
-static void parse_operation_message(
+void disconnect_client_from_provisioning_service()
+{
+  int rc;
+
+  if ((rc = MQTTClient_disconnect(mqtt_client, TIMEOUT_MQTT_DISCONNECT_MS)) != MQTTCLIENT_SUCCESS)
+  {
+    LOG_ERROR("Failed to disconnect MQTT client: MQTTClient return code %d.", rc);
+    exit(rc);
+  }
+
+  MQTTClient_destroy(&mqtt_client);
+
+  return;
+}
+
+void parse_operation_message(
     char* topic,
     int topic_len,
     MQTTClient_message const* message,
@@ -565,11 +340,12 @@ static void parse_operation_message(
   return;
 }
 
-static void send_operation_query_message(
+void send_operation_query_message(
     az_iot_provisioning_client_register_response const* response)
 {
   int rc;
 
+  char query_topic_buffer[256];
   if (az_failed(
           rc = az_iot_provisioning_client_query_status_get_publish_topic(
               &provisioning_client,
@@ -596,27 +372,75 @@ static void send_operation_query_message(
   return;
 }
 
-static void disconnect_client_from_provisioning_service()
+void generate_sas_key()
 {
   int rc;
 
-  if ((rc = MQTTClient_disconnect(mqtt_client, TIMEOUT_MQTT_DISCONNECT_MS)) != MQTTCLIENT_SUCCESS)
+  // Create the POSIX expiration time from input hours
+  uint32_t sas_duration = get_epoch_expiration_time_from_hours(env_vars.sas_key_duration_minutes);
+
+  // Get the signature which will be signed with the decoded key
+  az_span sas_signature = AZ_SPAN_FROM_BUFFER(sas_signature_buffer);
+  if (az_failed(
+          rc = az_iot_provisioning_client_sas_get_signature(
+              &provisioning_client, sas_duration, sas_signature, &sas_signature)))
   {
-    LOG_ERROR("Failed to disconnect MQTT client: MQTTClient return code %d.", rc);
+    LOG_ERROR("Could not get the signature for SAS key: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
-  MQTTClient_destroy(&mqtt_client);
+  // Decode the base64 encoded SAS key to use for HMAC signing
+  az_span sas_b64_decoded_key = AZ_SPAN_FROM_BUFFER(sas_b64_decoded_key_buffer);
+  if (az_failed(
+          rc = sample_base64_decode(
+              env_vars.provisioning_sas_key, sas_b64_decoded_key, &sas_b64_decoded_key)))
+  {
+    LOG_ERROR("Could not decode the SAS key: az_result return code 0x%04x.", rc);
+    exit(rc);
+  }
 
-  return;
-}
+  // HMAC-SHA256 sign the signature with the decoded key
+  az_span sas_encoded_hmac256_signed_signature
+      = AZ_SPAN_FROM_BUFFER(sas_encoded_hmac256_signed_signature_buffer);
+  if (az_failed(
+          rc = sample_hmac_sha256_sign(
+              sas_b64_decoded_key,
+              sas_signature,
+              sas_encoded_hmac256_signed_signature,
+              &sas_encoded_hmac256_signed_signature)))
+  {
+    LOG_ERROR("Could not sign the signature: az_result return code 0x%04x.", rc);
+    exit(rc);
+  }
 
-static void sleep_for_seconds(uint32_t seconds)
-{
-#ifdef _WIN32
-  Sleep((DWORD)seconds * 1000);
-#else
-  sleep(seconds);
-#endif
+  // base64 encode the result of the HMAC signing
+  az_span sas_b64_encoded_hmac256_signed_signature
+      = AZ_SPAN_FROM_BUFFER(sas_b64_encoded_hmac256_signed_signature_buffer);
+  if (az_failed(
+          rc = sample_base64_encode(
+              sas_encoded_hmac256_signed_signature,
+              sas_b64_encoded_hmac256_signed_signature,
+              &sas_b64_encoded_hmac256_signed_signature)))
+  {
+    LOG_ERROR("Could not base64 encode the password: az_result return code 0x%04x.", rc);
+    exit(rc);
+  }
+
+  // Get the resulting password, passing the base64 encoded, HMAC signed bytes
+  size_t mqtt_password_length;
+  if (az_failed(
+          rc = az_iot_provisioning_client_sas_get_password(
+              &provisioning_client,
+              sas_b64_encoded_hmac256_signed_signature,
+              sas_duration,
+              AZ_SPAN_NULL,
+              mqtt_password_buffer,
+              sizeof(mqtt_password_buffer),
+              &mqtt_password_length)))
+  {
+    LOG_ERROR("Could not get the password: az_result return code 0x%04x.", rc);
+    exit(rc);
+  }
+
   return;
 }
