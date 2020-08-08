@@ -22,7 +22,7 @@ This section provides an overview of the different samples available to run and 
 
 - *Executable:* `paho_iot_hub_c2d_sample`
 
-  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_c2d_sample.c) receives incoming cloud-to-device (C2D) messages invoked from the Azure IoT Hub. X509 self-certification is used.
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_c2d_sample.c) receives incoming cloud-to-device (C2D) messages sent from the Azure IoT Hub. X509 self-certification is used.
 
 ### IoT Hub Methods Sample
 
@@ -150,7 +150,7 @@ set ENV_VARIABLE_NAME=VALUE
 Set the following environment variables for all samples:
 
 - `VCPKG_DEFAULT_TRIPLET` and `VCPKG_ROOT`: Refer to these [directions](https://github.com/Azure/azure-sdk-for-c#development-environment).
-- `AZ_IOT_DEVICE_X509_TRUST_PEM_FILE`: **Only for Windows or if required by OS.** Download [BaltimoreCyberTrustRoot.crt.pem](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem) to `\azure-sdk-for-c\sdk\samples\iot\`. Copy the full filepath to this downloaded .pem file, e.g. `C:\azure-sdk-for-c\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem`.
+- `AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH`: **Only for Windows or if required by OS.** Download [BaltimoreCyberTrustRoot.crt.pem](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem) to `\azure-sdk-for-c\sdk\samples\iot\`. Copy the full filepath to this downloaded .pem file, e.g. `C:\azure-sdk-for-c\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem`.
 
 ### Certificate Samples
 
@@ -172,7 +172,7 @@ The following samples use x509 authentication to connect to Azure IoT Hub or Azu
 
 2. Set the following environment variable:
 
-    - `AZ_IOT_DEVICE_X509_CERT_PEM_FILE`: Copy the path of the generated .pem file noted in the generate_certificate output.
+    - `AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH`: Copy the path of the generated .pem file noted in the generate_certificate output.
 
 #### IoT Hub Certificate Samples
 
@@ -182,7 +182,7 @@ The following samples use x509 authentication to connect to Azure IoT Hub or Azu
 
 2. Set the following environment variables:
 
-    - `AZ_IOT_DEVICE_ID`: Select your device from the IoT Devices page and copy its Device Id.
+    - `AZ_IOT_HUB_DEVICE_ID`: Select your device from the IoT Devices page and copy its Device Id.
     - `AZ_IOT_HUB_HOSTNAME`: Copy the Hostname from the Overview tab in your Azure IoT Hub.
 
 #### IoT Hub DPS Certificate Sample
@@ -193,8 +193,8 @@ The following samples use x509 authentication to connect to Azure IoT Hub or Azu
 
 2. Set the following environment variables:
 
-    - `AZ_IOT_REGISTRATION_ID`: This should be `paho-sample-device1`.
-    - `AZ_IOT_ID_SCOPE`: Copy the Id Scope from the Overview tab in your Azure IoT Hub DPS.
+    - `AZ_IOT_PROVISIONING_REGISTRATION_ID`: This should be `paho-sample-device1`.
+    - `AZ_IOT_PROVISIONING_ID_SCOPE`: Copy the Id Scope from the Overview tab in your Azure IoT Hub DPS.
 
 ### SAS Samples
 
@@ -208,8 +208,8 @@ The following samples use SAS authentication to connect to Azure IoT Hub or Azur
 
 2. Set the following environment variables:
 
-    - `AZ_IOT_DEVICE_ID_SAS`: Select your device from the IoT Devices page and copy its Device Id.
-    - `AZ_IOT_HUB_DEVICE_SAS_KEY`: Copy its Primary Key from the same page.
+    - `AZ_IOT_HUB_DEVICE_ID_SAS`: Select your device from the IoT Devices page and copy its Device Id.
+    - `AZ_IOT_HUB_SAS_KEY`: Copy its Primary Key from the same page.
     - `AZ_IOT_HUB_HOSTNAME`: Copy the Hostname from the Overview tab in your Azure IoT Hub.
 
 #### IoT Hub DPS SAS Sample
@@ -220,9 +220,9 @@ The following samples use SAS authentication to connect to Azure IoT Hub or Azur
 
 2. Set the following environment variables:
 
-    - `AZ_IOT_REGISTRATION_ID_SAS`: Copy the Registration Id of your SAS device from the Individual Enrollments tab.
+    - `AZ_IOT_PROVISIONING_REGISTRATION_ID_SAS`: Copy the Registration Id of your SAS device from the Individual Enrollments tab.
     - `AZ_IOT_PROVISIONING_SAS_KEY`: Select your SAS device from the Individual Enrollments tab and copy its Primary Key.
-    - `AZ_IOT_ID_SCOPE`: Copy the Id Scope from the Overview tab in your Azure IoT Hub DPS.
+    - `AZ_IOT_PROVISIONING_ID_SCOPE`: Copy the Id Scope from the Overview tab in your Azure IoT Hub DPS.
 
 ## Build and Run the Sample
 

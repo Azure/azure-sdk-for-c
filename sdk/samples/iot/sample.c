@@ -6,6 +6,7 @@
 //
 // MQTT endpoints
 //
+#define USE_WEB_SOCKET // Comment to use MQTT without WebSockets.
 #ifdef USE_WEB_SOCKET
 az_span mqtt_url_prefix = AZ_SPAN_LITERAL_FROM_STR("wss://");
 // Note: Paho fails to connect to Hub when using AZ_IOT_HUB_CLIENT_WEB_SOCKET_PATH or an X509
@@ -20,6 +21,12 @@ az_span provisioning_global_endpoint
     = AZ_SPAN_LITERAL_FROM_STR("ssl://global.azure-devices-provisioning.net:8883");
 
 //
+// SAS key generation buffers
+//
+static char sas_b64_decoded_key_buffer[32];
+static char sas_hmac256_signed_signature_buffer[128];
+
+//
 // Functions
 //
 az_result read_environment_variables(
@@ -27,6 +34,8 @@ az_result read_environment_variables(
     sample_name name,
     sample_environment_variables* env_vars)
 {
+  _az_PRECONDITION_NOT_NULL(env_vars);
+
   if (type == PAHO_IOT_HUB)
   {
     env_vars->hub_hostname = AZ_SPAN_FROM_BUFFER(hub_hostname_buffer);
@@ -146,6 +155,10 @@ az_result read_configuration_entry(
     bool hide_value,
     az_span* out_value)
 {
+  _az_PRECONDITION_NOT_NULL(env_name);
+  _az_PRECONDITION_NOT_NULL(out_value);
+  _az_PRECONDITION_VALID_SPAN(*out_value, 1, false);
+
   char* env_value = getenv(env_name);
 
   if (env_value == NULL && default_value != NULL)
@@ -173,6 +186,8 @@ az_result read_configuration_entry(
 
 az_result create_mqtt_endpoint(sample_type type, char* endpoint, size_t endpoint_size)
 {
+  _az_PRECONDITION_NOT_NULL(endpoint);
+
   if (type == PAHO_IOT_HUB)
   {
     int32_t hub_hostname_length = (int32_t)strlen(hub_hostname_buffer);
@@ -226,15 +241,80 @@ void sleep_for_seconds(uint32_t seconds)
   return;
 }
 
-uint32_t get_epoch_expiration_time_from_hours(uint32_t hours)
+uint32_t get_epoch_expiration_time_from_minutes(uint32_t minutes)
 {
-  return (uint32_t)(time(NULL) + hours * 60 * 60);
+  return (uint32_t)(time(NULL) + minutes * 60 * 60);
 }
+
+void sas_generate_encoded_signed_signature(const az_span* sas_key, const az_span* sas_signature, az_span* sas_b64_encoded_hmac256_signed_signature)
+{
+  _az_PRECONDITION_NOT_NULL(sas_key);
+  _az_PRECONDITION_NOT_NULL(sas_signature);
+  _az_PRECONDITION_NOT_NULL(sas_b64_encoded_hmac256_signed_signature);
+
+  int rc;
+
+  // Decode the base64 encoded SAS key to use for HMAC signing
+  az_span sas_b64_decoded_key = AZ_SPAN_FROM_BUFFER(sas_b64_decoded_key_buffer);
+  if (az_failed(
+          rc
+          = sample_base64_decode(*sas_key, sas_b64_decoded_key, &sas_b64_decoded_key)))
+  {
+    LOG_ERROR("Could not decode the SAS key: az_result return code 0x%04x.", rc);
+    exit(rc);
+  }
+
+  // HMAC-SHA256 sign the signature with the decoded key
+  az_span sas_hmac256_signed_signature
+      = AZ_SPAN_FROM_BUFFER(sas_hmac256_signed_signature_buffer);
+  if (az_failed(
+          rc = sample_hmac_sha256_sign(
+              sas_b64_decoded_key,
+              *sas_signature,
+              sas_hmac256_signed_signature,
+              &sas_hmac256_signed_signature)))
+  {
+    LOG_ERROR("Could not sign the signature: az_result return code 0x%04x.", rc);
+    exit(rc);
+  }
+
+  // Base64 encode the result of the HMAC signing
+  if (az_failed(
+          rc = sample_base64_encode(
+              sas_hmac256_signed_signature,
+              *sas_b64_encoded_hmac256_signed_signature,
+              sas_b64_encoded_hmac256_signed_signature)))
+  {
+    LOG_ERROR("Could not base64 encode the password: az_result return code 0x%04x.", rc);
+    exit(rc);
+  }
+
+  return;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
 az_result sample_base64_decode(az_span base64_encoded, az_span in_span, az_span* out_span)
 {
-  az_result result;
+  _az_PRECONDITION_NOT_NULL(out_span);
 
+  az_result result;
   BIO* b64_decoder;
   BIO* source_mem_bio;
 
@@ -290,6 +370,8 @@ az_result sample_base64_decode(az_span base64_encoded, az_span in_span, az_span*
 
 az_result sample_base64_encode(az_span bytes, az_span in_span, az_span* out_span)
 {
+  _az_PRECONDITION_NOT_NULL(out_span);
+
   az_result result;
 
   BIO* sink_mem_bio;
@@ -359,6 +441,8 @@ az_result sample_base64_encode(az_span bytes, az_span in_span, az_span* out_span
 
 az_result sample_hmac_sha256_sign(az_span key, az_span bytes, az_span in_span, az_span* out_span)
 {
+  _az_PRECONDITION_NOT_NULL(out_span);
+
   az_result result;
 
   unsigned int hmac_encode_len;

@@ -29,6 +29,7 @@
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
 #include <azure/core/az_json.h>
+#include <azure/core/internal/az_precondition_internal.h>
 #include <azure/iot/az_iot_hub_client.h>
 #include <azure/iot/az_iot_provisioning_client.h>
 
@@ -39,7 +40,6 @@
 
 #include <paho-mqtt/MQTTClient.h>
 
-#define USE_WEB_SOCKET // Comment to use MQTT without WebSockets.
 #define SAS_KEY_DURATION_TIME_DIGITS 4
 #define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
 
@@ -165,10 +165,10 @@ az_result read_environment_variables(
 /*
  * @brief      Reads a single environment variable and stores in az_span.
  *
- * @param[in]  env_name        Name of environment variable.
- * @param[in]  default_value   Default value if envionment variable has not been set.  May be NULL.
- * @param[in]  hide_value      True if value should not be printed to console.
- * @param[out] out_value       Pointer to az_span that contains envrionment variable value.
+ * @param[in]  env_name       Name of environment variable.
+ * @param[in]  default_value  Default value if envionment variable has not been set.  May be NULL.
+ * @param[in]  hide_value     True if value should not be printed to console.
+ * @param[out] out_value      Pointer to az_span that contains envrionment variable value.
  * az_span's size reflects actual size of content in az_span, not size of buffer used to create
  * az_span.
  * @return     Error if buffer size is not large enough to hold environment variable value, or if
@@ -181,7 +181,7 @@ az_result read_configuration_entry(
     az_span* out_value);
 
 /*
- * @brief      Builds an MQTT endpoint c-string for an IoT Hub or provisioning service.
+ * @brief      Builds an MQTT endpoint c-string for an Azure IoT Hub or provisioning service.
  *
  * @param[in]  type          Enumerated type of the sample.
  * @param[out] endpoint      Pointer to char buffer. Will include null termination character.
@@ -198,12 +198,20 @@ az_result create_mqtt_endpoint(sample_type type, char* endpoint, size_t endpoint
 void sleep_for_seconds(uint32_t seconds);
 
 /*
- * @brief      Returns total seconds passed including given hours.
+ * @brief      Returns total seconds passed including given minutes.
  *
- * @param[in]  hours     Number of hours to include in total seconds returned.
+ * @param[in]  minutes  Number of minutes to include in total seconds returned.
  * @return     Total time in seconds.
  */
-uint32_t get_epoch_expiration_time_from_hours(uint32_t hours);
+uint32_t get_epoch_expiration_time_from_minutes(uint32_t minutes);
+
+
+
+
+
+
+
+void sas_generate_encoded_signed_signature(const az_span* sas_key, const az_span* sas_signature, az_span* sas_b64_encoded_hmac256_signed_signature);
 
 /*
  * This serves as an example for fundamental functionality needed to use SAS key authentication.

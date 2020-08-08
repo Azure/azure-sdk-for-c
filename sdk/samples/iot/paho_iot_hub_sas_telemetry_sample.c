@@ -9,23 +9,15 @@
 #define TELEMETRY_SEND_INTERVAL 1
 #define TELEMETRY_NUMBER_OF_MESSAGES 5
 
-// Environment variables
 static sample_environment_variables env_vars;
-
-// Clients
 static az_iot_hub_client hub_client;
 static MQTTClient mqtt_client;
 static char mqtt_client_username_buffer[128];
 
 // Generate SAS key variables
 static char sas_signature_buffer[128];
-static char sas_b64_decoded_key_buffer[32];
-static char sas_encoded_hmac256_signed_signature_buffer[128];
-static char sas_b64_encoded_hmac256_signed_signature_buffer[128];
+static char sas_encoded_signed_signature_buffer[128];
 static char mqtt_password_buffer[256];
-
-// Topics
-char telemetry_topic_buffer[128];
 
 // Functions
 void create_and_configure_client();
@@ -35,6 +27,10 @@ void disconnect_client_from_iot_hub();
 
 void generate_sas_key();
 
+/*
+ * This sample sends five telemetry messages to the Azure IoT Hub.
+ * SAS certification is used.
+ */
 int main()
 {
   create_and_configure_client();
@@ -56,7 +52,7 @@ void create_and_configure_client()
 {
   int rc;
 
-  // Reads in environment variables set by user for purposes of running sample
+  // Reads in environment variables set by user for purposes of running sample.
   if (az_failed(rc = read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars)))
   {
     LOG_ERROR(
@@ -65,17 +61,17 @@ void create_and_configure_client()
     exit(rc);
   }
 
-  // Set mqtt endpoint as null terminated in buffer
-  char hub_mqtt_endpoint_buffer[128];
+  // Build an MQTT endpoint c-string.
+  char mqtt_endpoint_buffer[128];
   if (az_failed(
           rc = create_mqtt_endpoint(
-              SAMPLE_TYPE, hub_mqtt_endpoint_buffer, sizeof(hub_mqtt_endpoint_buffer))))
+              SAMPLE_TYPE, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer))))
   {
     LOG_ERROR("Failed to create MQTT endpoint: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
-  // Initialize the hub client with the default connection options
+  // Initialize the hub client with the default connection options.
   if (az_failed(
           rc = az_iot_hub_client_init(
               &hub_client, env_vars.hub_hostname, env_vars.hub_device_id, NULL)))
@@ -84,7 +80,7 @@ void create_and_configure_client()
     exit(rc);
   }
 
-  // Get the MQTT client id used for the MQTT connection
+  // Get the MQTT client id used for the MQTT connection.
   char mqtt_client_id_buffer[128];
   if (az_failed(
           rc = az_iot_hub_client_get_client_id(
@@ -94,10 +90,10 @@ void create_and_configure_client()
     exit(rc);
   }
 
-  // Create the Paho MQTT client
+  // Create the Paho MQTT client.
   if ((rc = MQTTClient_create(
            &mqtt_client,
-           hub_mqtt_endpoint_buffer,
+           mqtt_endpoint_buffer,
            mqtt_client_id_buffer,
            MQTTCLIENT_PERSISTENCE_NONE,
            NULL))
@@ -117,14 +113,16 @@ void connect_client_to_iot_hub()
 {
   int rc;
 
+  // Get the MQTT client username.
   if (az_failed(
           rc = az_iot_hub_client_get_user_name(
               &hub_client, mqtt_client_username_buffer, sizeof(mqtt_client_username_buffer), NULL)))
   {
-    LOG_ERROR("Failed to get MQTT username: az_result return code 0x%04x.", rc);
+    LOG_ERROR("Failed to get MQTT client username: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
+  // Set MQTT connection options.
   MQTTClient_connectOptions mqtt_connect_options = MQTTClient_connectOptions_initializer;
   mqtt_connect_options.username = mqtt_client_username_buffer;
   mqtt_connect_options.password = mqtt_password_buffer;
@@ -132,12 +130,13 @@ void connect_client_to_iot_hub()
   mqtt_connect_options.keepAliveInterval = AZ_IOT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS;
 
   MQTTClient_SSLOptions mqtt_ssl_options = MQTTClient_SSLOptions_initializer;
-  if (*az_span_ptr(env_vars.x509_trust_pem_file_path) != '\0')
+  if (*az_span_ptr(env_vars.x509_trust_pem_file_path) != '\0') // Should only be set if required by OS.
   {
     mqtt_ssl_options.trustStore = (char*)x509_trust_pem_file_path_buffer;
   }
   mqtt_connect_options.ssl = &mqtt_ssl_options;
 
+  // Connect MQTT client to the Azure IoT Hub.
   if ((rc = MQTTClient_connect(mqtt_client, &mqtt_connect_options)) != MQTTCLIENT_SUCCESS)
   {
     LOG_ERROR(
@@ -155,11 +154,13 @@ void send_telemetry_messages_to_iot_hub()
 {
   int rc;
 
+  // Get the Telemetry topic to publish the telemetry messages.
+  char telemetry_topic_buffer[128];
   if (az_failed(
           rc = az_iot_hub_client_telemetry_get_publish_topic(
               &hub_client, NULL, telemetry_topic_buffer, sizeof(telemetry_topic_buffer), NULL)))
   {
-    LOG_ERROR("Failed to get telemetry publish topic: az_result return code 0x%04x.", rc);
+    LOG_ERROR("Failed to get Telemetry publish topic: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
@@ -167,6 +168,7 @@ void send_telemetry_messages_to_iot_hub()
     "Message One", "Message Two", "Message Three", "Message Four", "Message Five",
   };
 
+  // Publish # of telemetry messages.
   for (int i = 0; i < TELEMETRY_NUMBER_OF_MESSAGES; ++i)
   {
     LOG("Sending Message %d", i + 1);
@@ -206,12 +208,12 @@ void disconnect_client_from_iot_hub()
 
 void generate_sas_key()
 {
-  az_result rc;
+  int rc;
 
-  // Create the POSIX expiration time from input hours
-  uint64_t sas_duration = get_epoch_expiration_time_from_hours(env_vars.sas_key_duration_minutes);
+  // Create the POSIX expiration time from input minutes.
+  uint64_t sas_duration = get_epoch_expiration_time_from_minutes(env_vars.sas_key_duration_minutes);
 
-  // Get the signature which will be signed with the decoded key
+  // Get the signature.
   az_span sas_signature = AZ_SPAN_FROM_BUFFER(sas_signature_buffer);
   if (az_failed(
           rc = az_iot_hub_client_sas_get_signature(
@@ -221,49 +223,16 @@ void generate_sas_key()
     exit(rc);
   }
 
-  // Decode the base64 encoded SAS key to use for HMAC signing
-  az_span sas_b64_decoded_key = AZ_SPAN_FROM_BUFFER(sas_b64_decoded_key_buffer);
-  if (az_failed(
-          rc
-          = sample_base64_decode(env_vars.hub_sas_key, sas_b64_decoded_key, &sas_b64_decoded_key)))
-  {
-    LOG_ERROR("Could not decode the SAS key: az_result return code 0x%04x.", rc);
-    exit(rc);
-  }
-
-  // HMAC-SHA256 sign the signature with the decoded key
-  az_span sas_encoded_hmac256_signed_signature
-      = AZ_SPAN_FROM_BUFFER(sas_encoded_hmac256_signed_signature_buffer);
-  if (az_failed(
-          rc = sample_hmac_sha256_sign(
-              sas_b64_decoded_key,
-              sas_signature,
-              sas_encoded_hmac256_signed_signature,
-              &sas_encoded_hmac256_signed_signature)))
-  {
-    LOG_ERROR("Could not sign the signature: az_result return code 0x%04x.", rc);
-    exit(rc);
-  }
-
-  // base64 encode the result of the HMAC signing
-  az_span sas_b64_encoded_hmac256_signed_signature
-      = AZ_SPAN_FROM_BUFFER(sas_b64_encoded_hmac256_signed_signature_buffer);
-  if (az_failed(
-          rc = sample_base64_encode(
-              sas_encoded_hmac256_signed_signature,
-              sas_b64_encoded_hmac256_signed_signature,
-              &sas_b64_encoded_hmac256_signed_signature)))
-  {
-    LOG_ERROR("Could not base64 encode the password: az_result return code 0x%04x.", rc);
-    exit(rc);
-  }
+  // Generate the encoded, signed signature (b64 encoded, HMAC-SHA256 signing)
+  az_span sas_encoded_signed_signature = AZ_SPAN_FROM_BUFFER(sas_encoded_signed_signature_buffer);
+  sas_generate_encoded_signed_signature(&(env_vars.hub_sas_key), &sas_signature, &sas_encoded_signed_signature);
 
   // Get the resulting password, passing the base64 encoded, HMAC signed bytes
   size_t mqtt_password_length;
   if (az_failed(
           rc = az_iot_hub_client_sas_get_password(
               &hub_client,
-              sas_b64_encoded_hmac256_signed_signature,
+              sas_encoded_signed_signature,
               sas_duration,
               AZ_SPAN_NULL,
               mqtt_password_buffer,

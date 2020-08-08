@@ -31,7 +31,7 @@ echo.
 echo SAMPLE CERTIFICATE GENERATED:
 echo Use the following command to set the environment variable for the samples:
 echo.
-echo		set AZ_IOT_DEVICE_X509_CERT_PEM_FILE=%CD%\device_cert_store.pem
+echo		set AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=%CD%\device_cert_store.pem
 echo.
 echo DPS SAMPLE:
 echo Upload device_ec_cert.pem when enrolling your device with the Device Provisioning Service.
