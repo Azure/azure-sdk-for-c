@@ -169,7 +169,7 @@ az_result read_configuration_entry(
   if (env_value != NULL)
   {
     (void)printf("%s = %s\n", env_name, hide_value ? "***" : env_value);
-    az_span env_span = az_span_from_str(env_value);
+    az_span env_span = az_span_create_from_str(env_value);
     AZ_RETURN_IF_NOT_ENOUGH_SIZE(*out_value, az_span_size(env_span));
     az_span_copy(*out_value, env_span);
     *out_value = az_span_slice(

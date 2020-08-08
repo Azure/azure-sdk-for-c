@@ -174,7 +174,7 @@ void get_program_start_time()
     printf("Insufficient buffer size for program start time.\n");
     exit(1);
   }
-  boot_time_span = az_span_init((uint8_t*)boot_time_str, (int32_t)len);
+  boot_time_span = az_span_create((uint8_t*)boot_time_str, (int32_t)len);
 
   return;
 }
@@ -390,8 +390,8 @@ void disconnect_client_from_iot_hub()
 void on_received(char* topic, int topic_len, MQTTClient_message* message)
 {
   int rc;
-  az_span topic_span = az_span_init((uint8_t*)topic, topic_len);
-  az_span message_span = az_span_init((uint8_t*)message->payload, message->payloadlen);
+  az_span topic_span = az_span_create((uint8_t*)topic, topic_len);
+  az_span message_span = az_span_create((uint8_t*)message->payload, message->payloadlen);
   az_iot_hub_client_twin_response twin_response;
   az_iot_hub_client_method_request method_request;
 
@@ -687,7 +687,7 @@ static az_result invoke_getMaxMinReport(az_span payload, az_span response, az_sp
   int32_t incoming_since_value_len;
   AZ_RETURN_IF_FAILED(az_json_token_get_string(
       &jp.token, incoming_since_value, sizeof(incoming_since_value), &incoming_since_value_len));
-  start_time_span = az_span_init((uint8_t*)incoming_since_value, incoming_since_value_len);
+  start_time_span = az_span_create((uint8_t*)incoming_since_value, incoming_since_value_len);
 
   // Set the response payload to error if the "since" field was not sent
   if (az_span_ptr(start_time_span) == NULL)
@@ -702,7 +702,7 @@ static az_result invoke_getMaxMinReport(az_span payload, az_span response, az_sp
   time(&rawtime);
   timeinfo = localtime(&rawtime);
   size_t len = strftime(end_time_buffer, sizeof(end_time_buffer), iso_spec_time_format, timeinfo);
-  az_span end_time_span = az_span_init((uint8_t*)end_time_buffer, (int32_t)len);
+  az_span end_time_span = az_span_create((uint8_t*)end_time_buffer, (int32_t)len);
 
   az_json_writer json_builder;
   AZ_RETURN_IF_FAILED(az_json_writer_init(&json_builder, response, NULL));
@@ -937,7 +937,7 @@ static int send_telemetry_message(void)
 static az_span get_request_id(void)
 {
   az_span remainder;
-  az_span out_span = az_span_init((uint8_t*)request_id_buf, sizeof(request_id_buf));
+  az_span out_span = az_span_create((uint8_t*)request_id_buf, sizeof(request_id_buf));
   az_result result = az_span_i32toa(out_span, request_id_int++, &remainder);
   (void)remainder;
   (void)result;

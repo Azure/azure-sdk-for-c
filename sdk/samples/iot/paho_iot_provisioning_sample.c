@@ -83,7 +83,7 @@ void create_and_configure_client()
   if (az_failed(
           rc = az_iot_provisioning_client_init(
               &provisioning_client,
-              az_span_from_str(mqtt_endpoint_buffer),
+              az_span_create_from_str(mqtt_endpoint_buffer),
               env_vars.provisioning_id_scope,
               env_vars.provisioning_registration_id,
               NULL)))
