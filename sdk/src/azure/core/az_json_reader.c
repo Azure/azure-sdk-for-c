@@ -27,10 +27,10 @@ AZ_NODISCARD az_result az_json_reader_init(
       ._internal = {
         .string_has_escaped_chars = false,
         .pointer_to_first_buffer = &AZ_SPAN_NULL,
-        .start_buffer_index = 0,
-        .start_buffer_offset = 0,
-        .end_buffer_index = 0,
-        .end_buffer_offset = 0,
+        .start_buffer_index = -1,
+        .start_buffer_offset = -1,
+        .end_buffer_index = -1,
+        .end_buffer_offset = -1,
       },
     },
     ._internal = {
@@ -65,10 +65,10 @@ AZ_NODISCARD az_result az_json_reader_chunked_init(
       ._internal = {
         .string_has_escaped_chars = false,
         .pointer_to_first_buffer = json_buffers,
-        .start_buffer_index = 0,
-        .start_buffer_offset = 0,
-        .end_buffer_index = 0,
-        .end_buffer_offset = 0,
+        .start_buffer_index = -1,
+        .start_buffer_offset = -1,
+        .end_buffer_index = -1,
+        .end_buffer_offset = -1,
       },
     },
     ._internal = {
@@ -102,23 +102,44 @@ static void _az_json_reader_update_state(
     int32_t consumed)
 {
   json_reader->token.kind = token_kind;
-  json_reader->token.slice = token_slice;
-  json_reader->token.size = az_span_size(token_slice);
+  json_reader->token.size = consumed;
+
   json_reader->_internal.bytes_consumed += current_segment_consumed;
   json_reader->_internal.total_bytes_consumed += consumed;
+
+  // We should have already set start_buffer_index and offset before moving to the next buffer.
+  json_reader->token._internal.end_buffer_index = json_reader->_internal.buffer_index;
+  json_reader->token._internal.end_buffer_offset = json_reader->_internal.bytes_consumed;
+
+  // Token straddles more than one segment
+  int32_t start_index = json_reader->token._internal.start_buffer_index;
+  if (start_index != -1 && start_index < json_reader->token._internal.end_buffer_index)
+  {
+    json_reader->token.slice = AZ_SPAN_NULL;
+  }
+  else
+  {
+    json_reader->token.slice = token_slice;
+  }
 }
 
 AZ_NODISCARD static az_result _az_json_reader_get_next_buffer(
     az_json_reader* json_reader,
     az_span* remaining)
 {
-  json_reader->_internal.buffer_index++;
-
   // If we only had one buffer, or we ran out of the set of discontiguous buffers, return error.
-  if (json_reader->_internal.buffer_index >= json_reader->_internal.number_of_buffers)
+  if (json_reader->_internal.buffer_index >= json_reader->_internal.number_of_buffers - 1)
   {
     return AZ_ERROR_EOF;
   }
+
+  if (json_reader->token._internal.start_buffer_index == -1)
+  {
+    json_reader->token._internal.start_buffer_index = json_reader->_internal.buffer_index;
+    json_reader->token._internal.start_buffer_offset = json_reader->_internal.bytes_consumed;
+  }
+
+  json_reader->_internal.buffer_index++;
 
   json_reader->_internal.json_buffer
       = json_reader->_internal.json_buffers[json_reader->_internal.buffer_index];
@@ -319,13 +340,16 @@ AZ_NODISCARD static az_result _az_json_reader_process_string(az_json_reader* jso
     next_byte = token_ptr[current_index];
   }
 
-  // Add 1 to number of bytes consumed to account for the last '"' character.
   _az_json_reader_update_state(
       json_reader,
       AZ_JSON_TOKEN_STRING,
       az_span_slice(token, 0, current_index),
-      current_index + 1,
-      string_length + 1);
+      current_index,
+      string_length);
+
+  // Add 1 to number of bytes consumed to account for the last '"' character.
+  json_reader->_internal.bytes_consumed++;
+  json_reader->_internal.total_bytes_consumed++;
 
   return AZ_OK;
 }
@@ -351,8 +375,8 @@ AZ_NODISCARD static az_result _az_json_reader_process_property_name(az_json_read
   // in _az_json_reader_process_string when processing the string portion of the property name.
   // Therefore, we don't call _az_json_reader_update_state here.
   json_reader->token.kind = AZ_JSON_TOKEN_PROPERTY_NAME;
-  json_reader->_internal.bytes_consumed += 1; // For the name / value separator
-  json_reader->_internal.total_bytes_consumed += 1; // For the name / value separator
+  json_reader->_internal.bytes_consumed++; // For the name / value separator
+  json_reader->_internal.total_bytes_consumed++; // For the name / value separator
 
   return AZ_OK;
 }
@@ -836,6 +860,12 @@ AZ_NODISCARD az_result az_json_reader_next_token(az_json_reader* json_reader)
       return AZ_ERROR_JSON_READER_DONE;
     }
   }
+
+  // Clear the internal state of any previous token.
+  json_reader->token._internal.start_buffer_index = -1;
+  json_reader->token._internal.start_buffer_offset = -1;
+  json_reader->token._internal.end_buffer_index = -1;
+  json_reader->token._internal.end_buffer_offset = -1;
 
   uint8_t const first_byte = az_span_ptr(json)[0];
 

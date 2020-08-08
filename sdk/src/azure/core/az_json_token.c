@@ -75,7 +75,10 @@ AZ_NODISCARD static uint8_t _az_json_unescape_single_byte(uint8_t ch)
   }
 }
 
-AZ_NODISCARD bool _az_json_token_is_text_equal_helper(az_span token_slice, az_span* expected_text)
+AZ_NODISCARD static bool _az_json_token_is_text_equal_helper(
+    az_span token_slice,
+    az_span* expected_text,
+    bool* next_char_escaped)
 {
   int32_t token_size = az_span_size(token_slice);
   uint8_t* token_ptr = az_span_ptr(token_slice);
@@ -93,16 +96,24 @@ AZ_NODISCARD bool _az_json_token_is_text_equal_helper(az_span token_slice, az_sp
     }
     uint8_t token_byte = token_ptr[token_idx];
 
-    if (token_byte == '\\')
+    if (token_byte == '\\' || *next_char_escaped)
     {
-      token_idx++;
-      if (token_idx >= token_size)
+      if (*next_char_escaped)
       {
-        *expected_text = az_span_slice_to_end(*expected_text, i);
-        return false;
+        token_byte = _az_json_unescape_single_byte(token_byte);
       }
-      token_byte = token_ptr[token_idx];
-      token_byte = _az_json_unescape_single_byte(token_byte);
+      else
+      {
+        token_idx++;
+        if (token_idx >= token_size)
+        {
+          *next_char_escaped = true;
+          *expected_text = az_span_slice_to_end(*expected_text, i);
+          return false;
+        }
+        token_byte = _az_json_unescape_single_byte(token_ptr[token_idx]);
+      }
+      *next_char_escaped = false;
 
       // TODO: Characters escaped in the form of \uXXXX where XXXX is the UTF-16 code point, is
       // not currently supported.
@@ -114,7 +125,7 @@ AZ_NODISCARD bool _az_json_token_is_text_equal_helper(az_span token_slice, az_sp
       }
     }
 
-    if (token_ptr[i] != expected_ptr[i])
+    if (token_byte != expected_ptr[i])
     {
       *expected_text = AZ_SPAN_NULL;
       return false;
@@ -175,10 +186,11 @@ AZ_NODISCARD bool az_json_token_is_text_equal(
       }
       expected_text = az_span_slice_to_end(expected_text, source_size);
     }
-    return true;
+    // Only return true if we have gone through and compared the entire expected_text.
+    return az_span_size(expected_text) == 0;
   }
 
-  int32_t token_size = az_span_size(token_slice);
+  int32_t token_size = json_token->size;
   int32_t expected_size = az_span_size(expected_text);
 
   // No need to try to unescape the token slice, since the lengths won't match anyway.
@@ -189,10 +201,12 @@ AZ_NODISCARD bool az_json_token_is_text_equal(
     return false;
   }
 
+  bool next_char_escaped = false;
+
   // Contiguous token
   if (az_span_ptr(token_slice) != NULL)
   {
-    return _az_json_token_is_text_equal_helper(token_slice, &expected_text);
+    return _az_json_token_is_text_equal_helper(token_slice, &expected_text, &next_char_escaped);
   }
 
   // Token straddles more than one segment
@@ -210,7 +224,7 @@ AZ_NODISCARD bool az_json_token_is_text_equal(
       source = az_span_slice(source, 0, json_token->_internal.end_buffer_offset);
     }
 
-    if (!_az_json_token_is_text_equal_helper(source, &expected_text)
+    if (!_az_json_token_is_text_equal_helper(source, &expected_text, &next_char_escaped)
         && az_span_ptr(expected_text) == NULL)
     {
       return false;
@@ -252,11 +266,12 @@ AZ_NODISCARD az_result az_json_token_get_boolean(az_json_token const* json_token
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result _az_json_token_get_string_helper(
+AZ_NODISCARD static az_result _az_json_token_get_string_helper(
     az_span source,
     char* destination,
     int32_t destination_max_size,
-    int32_t* dest_idx)
+    int32_t* dest_idx,
+    bool* next_char_escaped)
 {
   int32_t source_size = az_span_size(source);
   uint8_t* source_ptr = az_span_ptr(source);
@@ -268,11 +283,23 @@ AZ_NODISCARD az_result _az_json_token_get_string_helper(
     }
     uint8_t token_byte = source_ptr[i];
 
-    if (token_byte == '\\')
+    if (token_byte == '\\' || *next_char_escaped)
     {
-      i++;
-      // For all valid JSON tokens, this is guaranteed to be within the bounds.
-      token_byte = _az_json_unescape_single_byte(source_ptr[i]);
+      if (*next_char_escaped)
+      {
+        token_byte = _az_json_unescape_single_byte(token_byte);
+      }
+      else
+      {
+        i++;
+        if (i >= source_size)
+        {
+          *next_char_escaped = true;
+          break;
+        }
+        token_byte = _az_json_unescape_single_byte(source_ptr[i]);
+      }
+      *next_char_escaped = false;
 
       // TODO: Characters escaped in the form of \uXXXX where XXXX is the UTF-16 code point, is
       // not currently supported.
@@ -283,7 +310,8 @@ AZ_NODISCARD az_result _az_json_token_get_string_helper(
       }
     }
 
-    destination[*dest_idx++] = (char)token_byte;
+    destination[*dest_idx] = (char)token_byte;
+    *dest_idx = *dest_idx + 1;
   }
 
   return AZ_OK;
@@ -348,12 +376,13 @@ AZ_NODISCARD az_result az_json_token_get_string(
   }
 
   int32_t dest_idx = 0;
+  bool next_char_escaped = false;
 
   // Contiguous token
   if (az_span_ptr(token_slice) != NULL)
   {
     AZ_RETURN_IF_FAILED(_az_json_token_get_string_helper(
-        token_slice, destination, destination_max_size, &dest_idx));
+        token_slice, destination, destination_max_size, &dest_idx, &next_char_escaped));
   }
   else
   {
@@ -372,8 +401,8 @@ AZ_NODISCARD az_result az_json_token_get_string(
         source = az_span_slice(source, 0, json_token->_internal.end_buffer_offset);
       }
 
-      AZ_RETURN_IF_FAILED(
-          _az_json_token_get_string_helper(source, destination, destination_max_size, &dest_idx));
+      AZ_RETURN_IF_FAILED(_az_json_token_get_string_helper(
+          source, destination, destination_max_size, &dest_idx, &next_char_escaped));
     }
   }
 
