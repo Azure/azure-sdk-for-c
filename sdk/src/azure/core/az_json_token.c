@@ -235,7 +235,20 @@ AZ_NODISCARD az_result az_json_token_get_boolean(az_json_token const* json_token
   // az_json_reader and that if json_token->kind == AZ_JSON_TOKEN_TRUE, then the slice contains the
   // characters "true", otherwise it contains "false". Therefore, there is no need to check the
   // contents again.
-  *out_value = json_token->size == _az_STRING_LITERAL_LEN("true");
+
+  az_span token_slice = json_token->slice;
+
+  // Contiguous token
+  if (az_span_ptr(token_slice) != NULL)
+  {
+    *out_value = az_span_size(token_slice) == _az_STRING_LITERAL_LEN("true");
+  }
+  else
+  {
+    // Token straddles more than one segment
+    *out_value = json_token->size == _az_STRING_LITERAL_LEN("true");
+  }
+
   return AZ_OK;
 }
 

@@ -7,7 +7,6 @@
 #include <azure/core/internal/az_span_internal.h>
 
 #include <ctype.h>
-#include <stdlib.h>
 
 #include <azure/core/_az_cfg.h>
 
@@ -24,8 +23,14 @@ AZ_NODISCARD az_result az_json_reader_init(
     .token = (az_json_token){
       .kind = AZ_JSON_TOKEN_NONE,
       .slice = AZ_SPAN_NULL,
+      .size = 0,
       ._internal = {
         .string_has_escaped_chars = false,
+        .pointer_to_first_buffer = &AZ_SPAN_NULL,
+        .start_buffer_index = 0,
+        .start_buffer_offset = 0,
+        .end_buffer_index = 0,
+        .end_buffer_offset = 0,
       },
     },
     ._internal = {
@@ -56,8 +61,14 @@ AZ_NODISCARD az_result az_json_reader_chunked_init(
     .token = (az_json_token){
       .kind = AZ_JSON_TOKEN_NONE,
       .slice = AZ_SPAN_NULL,
+      .size = 0,
       ._internal = {
         .string_has_escaped_chars = false,
+        .pointer_to_first_buffer = json_buffers,
+        .start_buffer_index = 0,
+        .start_buffer_offset = 0,
+        .end_buffer_index = 0,
+        .end_buffer_offset = 0,
       },
     },
     ._internal = {
@@ -92,6 +103,7 @@ static void _az_json_reader_update_state(
 {
   json_reader->token.kind = token_kind;
   json_reader->token.slice = token_slice;
+  json_reader->token.size = az_span_size(token_slice);
   json_reader->_internal.bytes_consumed += current_segment_consumed;
   json_reader->_internal.total_bytes_consumed += consumed;
 }
