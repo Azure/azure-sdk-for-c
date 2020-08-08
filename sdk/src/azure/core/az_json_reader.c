@@ -710,7 +710,7 @@ AZ_NODISCARD static az_result _az_json_reader_process_literal(
 
     // Return if the subslice that can be compared contains a mismatch.
     if (!az_span_is_content_equal(
-            token, az_span_slice(literal, already_matched, max_comparable_size)))
+            token, az_span_slice(literal, already_matched, already_matched + max_comparable_size)))
     {
       return AZ_ERROR_UNEXPECTED_CHAR;
     }

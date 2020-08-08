@@ -3,7 +3,7 @@
 
 #include "az_test_definitions.h"
 #include <azure/core/az_json.h>
-#include <azure/core/az_span.h>
+#include <azure/core/internal/az_span_internal.h>
 
 #include <math.h>
 #include <setjmp.h>
@@ -1553,9 +1553,16 @@ static void test_json_value(void** state)
   }
   // number from string
   {
-    uint64_t number_value = 1;
-    assert_true(
-        az_json_token_get_uint64(&json_string, &number_value) == AZ_ERROR_JSON_INVALID_STATE);
+    uint64_t number_u64 = 1;
+    assert_true(az_json_token_get_uint64(&json_string, &number_u64) == AZ_ERROR_JSON_INVALID_STATE);
+    int64_t number_i64 = 1;
+    assert_true(az_json_token_get_int64(&json_string, &number_i64) == AZ_ERROR_JSON_INVALID_STATE);
+    uint32_t number_u32 = 1;
+    assert_true(az_json_token_get_uint32(&json_string, &number_u32) == AZ_ERROR_JSON_INVALID_STATE);
+    int32_t number_i32 = 1;
+    assert_true(az_json_token_get_int32(&json_string, &number_i32) == AZ_ERROR_JSON_INVALID_STATE);
+    double number_d = 1;
+    assert_true(az_json_token_get_double(&json_string, &number_d) == AZ_ERROR_JSON_INVALID_STATE);
   }
   // az_json_token_is_text_equal
   {
@@ -1691,41 +1698,6 @@ static void test_az_json_token_get_string_and_text_equal(void** state)
   assert_int_equal(str_length, 20);
   assert_true(az_json_token_is_text_equal(&json_string, az_span_create_from_str(dest)));
   _az_json_token_is_text_equal_name_helper(json_string);
-
-  // TODO: Characters escaped in the form of \uXXXX where XXXX is the UTF-16 code point, is not
-  // currently supported.
-  /*json_string = (az_json_token){
-      .kind = AZ_JSON_TOKEN_STRING,
-      .slice = AZ_SPAN_FROM_STR("\\u0048\\u0065\\u006C\\u006C\\u006F"),
-      ._internal = {
-        .string_has_escaped_chars = true,
-      },
-    };
-  assert_int_equal(az_json_token_get_string(&json_string, dest, 128, &str_length), AZ_OK);
-  assert_true(az_json_token_is_text_equal(&json_string, az_span_create_from_str(dest)));
-  _az_json_token_is_text_equal_hello_helper(json_string);
-
-  json_string = (az_json_token){
-      .kind = AZ_JSON_TOKEN_STRING,
-      .slice = AZ_SPAN_FROM_STR("\\u0048ello"),
-      ._internal = {
-        .string_has_escaped_chars = true,
-      },
-    };
-  assert_int_equal(az_json_token_get_string(&json_string, dest, 128, &str_length), AZ_OK);
-  assert_true(az_json_token_is_text_equal(&json_string, az_span_create_from_str(dest)));
-  _az_json_token_is_text_equal_hello_helper(json_string);
-
-  json_string = (az_json_token){
-      .kind = AZ_JSON_TOKEN_STRING,
-      .slice = AZ_SPAN_FROM_STR("Hell\\u006F"),
-      ._internal = {
-        .string_has_escaped_chars = true,
-      },
-    };
-  assert_int_equal(az_json_token_get_string(&json_string, dest, 128, &str_length), AZ_OK);
-  assert_true(az_json_token_is_text_equal(&json_string, az_span_create_from_str(dest)));
-  _az_json_token_is_text_equal_hello_helper(json_string);*/
 }
 
 static void _az_split_buffers(az_span input, az_span* output)
@@ -1814,10 +1786,10 @@ static void test_az_json_token_get_string_and_text_equal_discontiguous(void** st
   assert_true(az_json_token_is_text_equal(&json_string, az_span_create_from_str(dest)));
   _az_json_token_is_text_equal_hello_helper(json_string);
 
-  az_span buffers12_one[12] = { 0 };
-  _az_split_buffers_single_byte(json, buffers12_one);
+  az_span buffers11_one[11] = { 0 };
+  _az_split_buffers_single_byte(json, buffers11_one);
 
-  TEST_EXPECT_SUCCESS(az_json_reader_chunked_init(&reader, buffers12_one, 12, NULL));
+  TEST_EXPECT_SUCCESS(az_json_reader_chunked_init(&reader, buffers11_one, 11, NULL));
   TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader));
   TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader));
 
@@ -1852,10 +1824,10 @@ static void test_az_json_token_get_string_and_text_equal_discontiguous(void** st
   assert_true(az_json_token_is_text_equal(&json_string, az_span_create_from_str(dest)));
   _az_json_token_is_text_equal_name_helper(json_string);
 
-  az_span buffers26_one[26] = { 0 };
-  _az_split_buffers_single_byte(json, buffers26_one);
+  az_span buffers25_one[25] = { 0 };
+  _az_split_buffers_single_byte(json, buffers25_one);
 
-  TEST_EXPECT_SUCCESS(az_json_reader_chunked_init(&reader, buffers26_one, 26, NULL));
+  TEST_EXPECT_SUCCESS(az_json_reader_chunked_init(&reader, buffers25_one, 25, NULL));
   TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader));
 
   json_string = reader.token;
@@ -1891,10 +1863,10 @@ static void test_az_json_token_get_string_and_text_equal_discontiguous(void** st
   assert_true(az_json_token_is_text_equal(&json_string, az_span_create_from_str(dest)));
   _az_json_token_is_text_equal_name_helper(json_string);
 
-  az_span buffers30_one[30] = { 0 };
-  _az_split_buffers_single_byte(json, buffers30_one);
+  az_span buffers29_one[29] = { 0 };
+  _az_split_buffers_single_byte(json, buffers29_one);
 
-  TEST_EXPECT_SUCCESS(az_json_reader_chunked_init(&reader, buffers30_one, 30, NULL));
+  TEST_EXPECT_SUCCESS(az_json_reader_chunked_init(&reader, buffers29_one, 29, NULL));
   TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader));
   TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader));
 
@@ -1904,6 +1876,598 @@ static void test_az_json_token_get_string_and_text_equal_discontiguous(void** st
   assert_int_equal(str_length, 20);
   assert_true(az_json_token_is_text_equal(&json_string, az_span_create_from_str(dest)));
   _az_json_token_is_text_equal_name_helper(json_string);
+}
+
+static az_span _az_buffers64_one[64] = { 0 };
+static uint8_t _az_buffer_for_complex_json[64] = { 0 };
+
+#define _az_json_reader_double_helper(json, expected) \
+  do \
+  { \
+\
+    TEST_EXPECT_SUCCESS(az_json_reader_init(&reader, json, NULL)); \
+    TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader)); \
+\
+    actual_d = 0; \
+    json_number = reader.token; \
+    assert_int_equal(json_number.size, az_span_size(json)); \
+    assert_int_equal(az_json_token_get_double(&json_number, &actual_d), AZ_OK); \
+    assert_true(_is_double_equal(actual_d, expected, 1e-2)); \
+\
+    az_span buffers_half[2] = { 0 }; \
+    _az_split_buffers(json, buffers_half); \
+\
+    TEST_EXPECT_SUCCESS(az_json_reader_chunked_init(&reader, buffers_half, 2, NULL)); \
+    TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader)); \
+\
+    actual_d = 0; \
+    json_number = reader.token; \
+    assert_int_equal(json_number.size, az_span_size(json)); \
+    assert_int_equal(az_json_token_get_double(&json_number, &actual_d), AZ_OK); \
+    assert_true(_is_double_equal(actual_d, expected, 1e-2)); \
+\
+    _az_split_buffers_single_byte(json, _az_buffers64_one); \
+\
+    TEST_EXPECT_SUCCESS( \
+        az_json_reader_chunked_init(&reader, _az_buffers64_one, az_span_size(json), NULL)); \
+    TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader)); \
+\
+    actual_d = 0; \
+    json_number = reader.token; \
+    assert_int_equal(json_number.size, az_span_size(json)); \
+    assert_int_equal(az_json_token_get_double(&json_number, &actual_d), AZ_OK); \
+    assert_true(_is_double_equal(actual_d, expected, 1e-2)); \
+\
+    json_nested_array = AZ_SPAN_FROM_BUFFER(_az_buffer_for_complex_json); \
+    remainder = az_span_copy(json_nested_array, AZ_SPAN_FROM_STR("[")); \
+    remainder = az_span_copy(remainder, json); \
+    remainder = az_span_copy_u8(remainder, ']'); \
+\
+    json_nested_array \
+        = az_span_slice(json_nested_array, 0, _az_span_diff(remainder, json_nested_array)); \
+\
+    TEST_EXPECT_SUCCESS(az_json_reader_init(&reader, json_nested_array, NULL)); \
+    TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader)); \
+    TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader)); \
+\
+    actual_d = 0; \
+    json_number = reader.token; \
+    assert_int_equal(json_number.size, az_span_size(json)); \
+    assert_int_equal(az_json_token_get_double(&json_number, &actual_d), AZ_OK); \
+    assert_true(_is_double_equal(actual_d, expected, 1e-2)); \
+\
+    _az_split_buffers(json_nested_array, buffers_half); \
+\
+    TEST_EXPECT_SUCCESS(az_json_reader_chunked_init(&reader, buffers_half, 2, NULL)); \
+    TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader)); \
+    TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader)); \
+\
+    actual_d = 0; \
+    json_number = reader.token; \
+    assert_int_equal(json_number.size, az_span_size(json)); \
+    assert_int_equal(az_json_token_get_double(&json_number, &actual_d), AZ_OK); \
+    assert_true(_is_double_equal(actual_d, expected, 1e-2)); \
+\
+    _az_split_buffers_single_byte(json_nested_array, _az_buffers64_one); \
+\
+    TEST_EXPECT_SUCCESS(az_json_reader_chunked_init( \
+        &reader, _az_buffers64_one, az_span_size(json_nested_array), NULL)); \
+    TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader)); \
+    TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader)); \
+\
+    actual_d = 0; \
+    json_number = reader.token; \
+    assert_int_equal(json_number.size, az_span_size(json)); \
+    assert_int_equal(az_json_token_get_double(&json_number, &actual_d), AZ_OK); \
+    assert_true(_is_double_equal(actual_d, expected, 1e-2)); \
+\
+    json_object = AZ_SPAN_FROM_BUFFER(_az_buffer_for_complex_json); \
+    remainder = az_span_copy(json_object, AZ_SPAN_FROM_STR("{\"name\":")); \
+    remainder = az_span_copy(remainder, json); \
+    remainder = az_span_copy_u8(remainder, '}'); \
+\
+    json_object = az_span_slice(json_object, 0, _az_span_diff(remainder, json_object)); \
+\
+    TEST_EXPECT_SUCCESS(az_json_reader_init(&reader, json_object, NULL)); \
+    TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader)); \
+    TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader)); \
+    TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader)); \
+\
+    actual_d = 0; \
+    json_number = reader.token; \
+    assert_int_equal(json_number.size, az_span_size(json)); \
+    assert_int_equal(az_json_token_get_double(&json_number, &actual_d), AZ_OK); \
+    assert_true(_is_double_equal(actual_d, expected, 1e-2)); \
+\
+    _az_split_buffers(json_object, buffers_half); \
+\
+    TEST_EXPECT_SUCCESS(az_json_reader_chunked_init(&reader, buffers_half, 2, NULL)); \
+    TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader)); \
+    TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader)); \
+    TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader)); \
+\
+    actual_d = 0; \
+    json_number = reader.token; \
+    assert_int_equal(json_number.size, az_span_size(json)); \
+    assert_int_equal(az_json_token_get_double(&json_number, &actual_d), AZ_OK); \
+    assert_true(_is_double_equal(actual_d, expected, 1e-2)); \
+\
+    _az_split_buffers_single_byte(json_object, _az_buffers64_one); \
+\
+    TEST_EXPECT_SUCCESS( \
+        az_json_reader_chunked_init(&reader, _az_buffers64_one, az_span_size(json_object), NULL)); \
+    TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader)); \
+    TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader)); \
+    TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader)); \
+\
+    actual_d = 0; \
+    json_number = reader.token; \
+    assert_int_equal(json_number.size, az_span_size(json)); \
+    assert_int_equal(az_json_token_get_double(&json_number, &actual_d), AZ_OK); \
+    assert_true(_is_double_equal(actual_d, expected, 1e-2)); \
+  } while (0)
+
+static void test_az_json_reader_double(void** state)
+{
+  (void)state;
+
+  az_json_reader reader = { 0 };
+  double actual_d = 0;
+  az_json_token json_number = reader.token;
+  az_span json_nested_array = { 0 };
+  az_span json_object = { 0 };
+  az_span remainder = { 0 };
+
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("-0"), 0);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("1024"), 1024);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("-1024"), -1024);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("2147483647"), 2147483647);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("-2147483648"), -2147483647 - 1);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("4294967295"), 4294967295);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("-4294967296"), -4294967296);
+  _az_json_reader_double_helper(
+      AZ_SPAN_FROM_STR("9223372036854775807"), (double)9223372036854775807);
+  _az_json_reader_double_helper(
+      AZ_SPAN_FROM_STR("-9223372036854775808"), -2147483647 * (double)4294967298);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("1.23e3"), 1.23e3);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("1.23"), 1.23);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("-123.456e-78"), -123.456e-78);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("123.456e+78"), 123.456e+78);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("0.0"), 0);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("0.0e0"), 0);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("0.0e-0"), 0);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("0.0e+0"), 0);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("0.0e-1"), 0);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("0.0e+1"), 0);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("-1"), -1);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("1.0"), 1);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("-1.0"), -1);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("123.123"), 123.123);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("123.1230"), 123.1230);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("123.0100"), 123.0100);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("123.01"), 123.01);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("123.001"), 123.001);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("0.000000000000001"), 0.000000000000001);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("1.0000000001"), 1.0000000001);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("-1.0000000001"), -1.0000000001);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("100.001"), 100.001);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("100.00100"), 100.00100);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("0.001"), 0.001);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("0.0012"), 0.0012);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("1.2e4"), 1.2e4);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("1.2e-4"), 1.2e-4);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("1.2e+4"), 1.2e+4);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("-1.2e4"), -1.2e4);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("-1.2e-4"), -1.2e-4);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("0.0001"), 0.0001);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("0.00102"), 0.00102);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("0.34567"), .34567);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("-0.34567"), -.34567);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("9876.54321"), 9876.54321);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("-9876.54321"), -9876.54321);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("987654.321"), 987654.321);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("-987654.321"), -987654.321);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("987654.0000321"), 987654.0000321);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("4503599627370496"), 4503599627370496);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("9007199254740991"), 9007199254740991);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("4503599627370496.2"), 4503599627370496.2);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("1e15"), 1e15);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("-1e15"), -1e15);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("1.8e10"), 1.8e10);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("-1.8e10"), -1.8e10);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("1e-15"), 1e-15);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("1e-10"), 1e-10);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("1e-5"), 1e-5);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("0.1234567890123456"), 0.1234567890123456);
+  _az_json_reader_double_helper(
+      AZ_SPAN_FROM_STR("123456789012345.123456789012340000"), 123456789012345.123456789012340000);
+  _az_json_reader_double_helper(
+      AZ_SPAN_FROM_STR("1000000000000.123456789012340000"), 1000000000000.123456789012340000);
+  _az_json_reader_double_helper(
+      AZ_SPAN_FROM_STR("123456789012345.1234567890123400001"), 123456789012345.1234567890123400001);
+  _az_json_reader_double_helper(
+      AZ_SPAN_FROM_STR("1000000000000.1234567890123400001"), 1000000000000.1234567890123400001);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("12345.123e-15"), 12345.123e-15);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("12345.12300000010e5"), 12345.12300000010e5);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("1e-300"), 1e-300);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("9007199254740992"), 9007199254740992);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("9007199254740993"), (double)9007199254740993);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("45035996273704961"), (double)45035996273704961);
+  _az_json_reader_double_helper(
+      AZ_SPAN_FROM_STR("9223372036854775806"), (double)9223372036854775806);
+  _az_json_reader_double_helper(
+      AZ_SPAN_FROM_STR("-9223372036854775806"), (double)-9223372036854775806);
+  _az_json_reader_double_helper(
+      AZ_SPAN_FROM_STR("1844674407370955100"), (double)1844674407370955100);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("1.844674407370955e+19"), 1.844674407370955e+19);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("1.8446744073709551e+19"), 1.8446744073709551e+19);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("1.8446744073709552e+19"), 1.8446744073709552e+19);
+  _az_json_reader_double_helper(
+      AZ_SPAN_FROM_STR("18446744073709551615"), (double)18446744073709551615UL);
+  _az_json_reader_double_helper(
+      AZ_SPAN_FROM_STR("18446744073709551615.18446744073709551615"),
+      18446744073709551615.18446744073709551615);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("1e16"), 1e16);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("12345.123e15"), 12345.123e15);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("-12345.123e15"), -12345.123e15);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("1e300"), 1e300);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("-1e300"), -1e300);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("1.7e308"), 1.7e308);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("-1.7e308"), -1.7e308);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("2.22507e-308"), 2.22507e-308);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("-2.22507e-308"), -2.22507e-308);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("4.94e-325"), 0);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("1e-400"), 0);
+  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("-1e-400"), 0);
+}
+
+static void test_az_json_token_number_too_large(void** state)
+{
+  (void)state;
+
+  az_json_reader reader = { 0 };
+  az_span json = AZ_SPAN_FROM_STR("9999999999999999999999999999999999999999999999999999999999999999"
+                                  "999999999999999999999999999999999999");
+  TEST_EXPECT_SUCCESS(az_json_reader_init(&reader, json, NULL));
+  TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader));
+
+  az_json_token json_number = reader.token;
+  assert_int_equal(json_number.size, az_span_size(json));
+
+  int32_t actual_i32 = 0;
+  assert_int_equal(az_json_token_get_int32(&json_number, &actual_i32), AZ_ERROR_UNEXPECTED_CHAR);
+
+  uint32_t actual_u32 = 0;
+  assert_int_equal(az_json_token_get_uint32(&json_number, &actual_u32), AZ_ERROR_UNEXPECTED_CHAR);
+
+  int64_t actual_i64 = 0;
+  assert_int_equal(az_json_token_get_int64(&json_number, &actual_i64), AZ_ERROR_UNEXPECTED_CHAR);
+
+  uint64_t actual_u64 = 0;
+  assert_int_equal(az_json_token_get_uint64(&json_number, &actual_u64), AZ_ERROR_UNEXPECTED_CHAR);
+
+  // double actual_d = 0;
+  // assert_int_equal(az_json_token_get_double(&json_number, &actual_d), AZ_ERROR_UNEXPECTED_CHAR);
+
+  az_span buffers_half[2] = { 0 };
+  _az_split_buffers(json, buffers_half);
+
+  TEST_EXPECT_SUCCESS(az_json_reader_chunked_init(&reader, buffers_half, 2, NULL));
+  TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader));
+
+  json_number = reader.token;
+  assert_int_equal(json_number.size, az_span_size(json));
+
+  assert_int_equal(az_json_token_get_int32(&json_number, &actual_i32), AZ_ERROR_UNEXPECTED_CHAR);
+  assert_int_equal(az_json_token_get_uint32(&json_number, &actual_u32), AZ_ERROR_UNEXPECTED_CHAR);
+  assert_int_equal(az_json_token_get_int64(&json_number, &actual_i64), AZ_ERROR_UNEXPECTED_CHAR);
+  assert_int_equal(az_json_token_get_uint64(&json_number, &actual_u64), AZ_ERROR_UNEXPECTED_CHAR);
+  // assert_int_equal(az_json_token_get_double(&json_number, &actual_d), AZ_ERROR_UNEXPECTED_CHAR);
+}
+
+static void _az_json_token_literal_helper(az_span json, bool expected)
+{
+  az_json_reader reader = { 0 };
+  az_json_token json_literal = { 0 };
+  bool value = false;
+  az_span json_nested_array = { 0 };
+  az_span json_object = { 0 };
+  az_span remainder = { 0 };
+
+  TEST_EXPECT_SUCCESS(az_json_reader_init(&reader, json, NULL));
+  TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader));
+
+  json_literal = reader.token;
+  assert_int_equal(json_literal.size, az_span_size(json));
+
+  if (json_literal.kind != AZ_JSON_TOKEN_NULL)
+  {
+    value = false;
+    assert_int_equal(az_json_token_get_boolean(&json_literal, &value), AZ_OK);
+    assert_true(value == expected);
+  }
+  else
+  {
+    assert_int_equal(az_json_token_get_boolean(&json_literal, &value), AZ_ERROR_JSON_INVALID_STATE);
+  }
+
+  az_span buffers_half[2] = { 0 };
+  _az_split_buffers(json, buffers_half);
+
+  TEST_EXPECT_SUCCESS(az_json_reader_chunked_init(&reader, buffers_half, 2, NULL));
+  TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader));
+
+  json_literal = reader.token;
+  assert_int_equal(json_literal.size, az_span_size(json));
+
+  if (json_literal.kind != AZ_JSON_TOKEN_NULL)
+  {
+    value = false;
+    assert_int_equal(az_json_token_get_boolean(&json_literal, &value), AZ_OK);
+    assert_true(value == expected);
+  }
+  else
+  {
+    assert_int_equal(az_json_token_get_boolean(&json_literal, &value), AZ_ERROR_JSON_INVALID_STATE);
+  }
+
+  _az_split_buffers_single_byte(json, _az_buffers64_one);
+
+  TEST_EXPECT_SUCCESS(
+      az_json_reader_chunked_init(&reader, _az_buffers64_one, az_span_size(json), NULL));
+  TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader));
+
+  json_literal = reader.token;
+  assert_int_equal(json_literal.size, az_span_size(json));
+
+  if (json_literal.kind != AZ_JSON_TOKEN_NULL)
+  {
+    value = false;
+    assert_int_equal(az_json_token_get_boolean(&json_literal, &value), AZ_OK);
+    assert_true(value == expected);
+  }
+  else
+  {
+    assert_int_equal(az_json_token_get_boolean(&json_literal, &value), AZ_ERROR_JSON_INVALID_STATE);
+  }
+
+  json_nested_array = AZ_SPAN_FROM_BUFFER(_az_buffer_for_complex_json);
+  remainder = az_span_copy(json_nested_array, AZ_SPAN_FROM_STR("["));
+  remainder = az_span_copy(remainder, json);
+  remainder = az_span_copy_u8(remainder, ']');
+
+  json_nested_array
+      = az_span_slice(json_nested_array, 0, _az_span_diff(remainder, json_nested_array));
+
+  TEST_EXPECT_SUCCESS(az_json_reader_init(&reader, json_nested_array, NULL));
+  TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader));
+  TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader));
+
+  json_literal = reader.token;
+  assert_int_equal(json_literal.size, az_span_size(json));
+
+  if (json_literal.kind != AZ_JSON_TOKEN_NULL)
+  {
+    value = false;
+    assert_int_equal(az_json_token_get_boolean(&json_literal, &value), AZ_OK);
+    assert_true(value == expected);
+  }
+  else
+  {
+    assert_int_equal(az_json_token_get_boolean(&json_literal, &value), AZ_ERROR_JSON_INVALID_STATE);
+  }
+
+  _az_split_buffers(json_nested_array, buffers_half);
+
+  TEST_EXPECT_SUCCESS(az_json_reader_chunked_init(&reader, buffers_half, 2, NULL));
+  TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader));
+  TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader));
+
+  json_literal = reader.token;
+  assert_int_equal(json_literal.size, az_span_size(json));
+
+  if (json_literal.kind != AZ_JSON_TOKEN_NULL)
+  {
+    value = false;
+    assert_int_equal(az_json_token_get_boolean(&json_literal, &value), AZ_OK);
+    assert_true(value == expected);
+  }
+  else
+  {
+    assert_int_equal(az_json_token_get_boolean(&json_literal, &value), AZ_ERROR_JSON_INVALID_STATE);
+  }
+
+  _az_split_buffers_single_byte(json_nested_array, _az_buffers64_one);
+
+  TEST_EXPECT_SUCCESS(az_json_reader_chunked_init(
+      &reader, _az_buffers64_one, az_span_size(json_nested_array), NULL));
+  TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader));
+  TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader));
+
+  json_literal = reader.token;
+  assert_int_equal(json_literal.size, az_span_size(json));
+
+  if (json_literal.kind != AZ_JSON_TOKEN_NULL)
+  {
+    value = false;
+    assert_int_equal(az_json_token_get_boolean(&json_literal, &value), AZ_OK);
+    assert_true(value == expected);
+  }
+  else
+  {
+    assert_int_equal(az_json_token_get_boolean(&json_literal, &value), AZ_ERROR_JSON_INVALID_STATE);
+  }
+
+  json_object = AZ_SPAN_FROM_BUFFER(_az_buffer_for_complex_json);
+  remainder = az_span_copy(json_object, AZ_SPAN_FROM_STR("{\"name\":"));
+  remainder = az_span_copy(remainder, json);
+  remainder = az_span_copy_u8(remainder, '}');
+
+  json_object = az_span_slice(json_object, 0, _az_span_diff(remainder, json_object));
+
+  TEST_EXPECT_SUCCESS(az_json_reader_init(&reader, json_object, NULL));
+  TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader));
+  TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader));
+  TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader));
+
+  json_literal = reader.token;
+  assert_int_equal(json_literal.size, az_span_size(json));
+
+  if (json_literal.kind != AZ_JSON_TOKEN_NULL)
+  {
+    value = false;
+    assert_int_equal(az_json_token_get_boolean(&json_literal, &value), AZ_OK);
+    assert_true(value == expected);
+  }
+  else
+  {
+    assert_int_equal(az_json_token_get_boolean(&json_literal, &value), AZ_ERROR_JSON_INVALID_STATE);
+  }
+
+  _az_split_buffers(json_object, buffers_half);
+
+  TEST_EXPECT_SUCCESS(az_json_reader_chunked_init(&reader, buffers_half, 2, NULL));
+  TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader));
+  TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader));
+  TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader));
+
+  json_literal = reader.token;
+  assert_int_equal(json_literal.size, az_span_size(json));
+
+  if (json_literal.kind != AZ_JSON_TOKEN_NULL)
+  {
+    value = false;
+    assert_int_equal(az_json_token_get_boolean(&json_literal, &value), AZ_OK);
+    assert_true(value == expected);
+  }
+  else
+  {
+    assert_int_equal(az_json_token_get_boolean(&json_literal, &value), AZ_ERROR_JSON_INVALID_STATE);
+  }
+
+  _az_split_buffers_single_byte(json_object, _az_buffers64_one);
+
+  TEST_EXPECT_SUCCESS(
+      az_json_reader_chunked_init(&reader, _az_buffers64_one, az_span_size(json_object), NULL));
+  TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader));
+  TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader));
+  TEST_EXPECT_SUCCESS(az_json_reader_next_token(&reader));
+
+  json_literal = reader.token;
+  assert_int_equal(json_literal.size, az_span_size(json));
+
+  if (json_literal.kind != AZ_JSON_TOKEN_NULL)
+  {
+    value = false;
+    assert_int_equal(az_json_token_get_boolean(&json_literal, &value), AZ_OK);
+    assert_true(value == expected);
+  }
+  else
+  {
+    assert_int_equal(az_json_token_get_boolean(&json_literal, &value), AZ_ERROR_JSON_INVALID_STATE);
+  }
+}
+
+static void test_az_json_token_literal(void** state)
+{
+  (void)state;
+
+  _az_json_token_literal_helper(AZ_SPAN_FROM_STR("true"), true);
+  _az_json_token_literal_helper(AZ_SPAN_FROM_STR("false"), false);
+  _az_json_token_literal_helper(AZ_SPAN_FROM_STR("null"), false);
+}
+
+static void test_az_json_token_copy(void** state)
+{
+  (void)state;
+
+  az_span json = AZ_SPAN_FROM_STR("abcdefghijkl");
+  uint8_t dest_buffer[128] = { 0 };
+  az_span destination = AZ_SPAN_FROM_BUFFER(dest_buffer);
+
+  az_json_token json_string = (az_json_token){
+    .slice = json,
+    .size = 12,
+  };
+
+  az_span remainder = az_json_token_copy_into_span(&json_string, destination);
+  assert_int_equal(az_span_size(remainder), 128 - 12);
+  assert_true(az_span_is_content_equal(json, az_span_slice(destination, 0, 12)));
+
+  // Split in 2
+  {
+    uint8_t split1[7] = { 0 };
+    uint8_t split2[13] = { 0 };
+    az_span buffers[2] = { AZ_SPAN_FROM_BUFFER(split1), AZ_SPAN_FROM_BUFFER(split2) };
+    az_span_copy(buffers[0], az_span_slice(json, 0, 7));
+    az_span_copy(buffers[1], az_span_slice_to_end(json, 7));
+
+    json_string = (az_json_token){
+      .slice = AZ_SPAN_NULL,
+      .size = 12,
+      ._internal = {
+        .pointer_to_first_buffer = buffers,
+        .start_buffer_index = 0,
+        .start_buffer_offset = 0,
+        .end_buffer_index = 1,
+        .end_buffer_offset = 5,
+      },
+    };
+
+    remainder = az_json_token_copy_into_span(&json_string, destination);
+    assert_int_equal(az_span_size(remainder), 128 - 12);
+    assert_true(az_span_is_content_equal(json, az_span_slice(destination, 0, 12)));
+  }
+  // Split in 3
+  {
+
+    uint8_t split1[7] = { 0 };
+    uint8_t split2[3] = { 0 };
+    uint8_t split3[5] = { 0 };
+    az_span buffers[3]
+        = { AZ_SPAN_FROM_BUFFER(split1), AZ_SPAN_FROM_BUFFER(split2), AZ_SPAN_FROM_BUFFER(split3) };
+    az_span_copy(az_span_slice_to_end(buffers[0], 1), az_span_slice(json, 0, 6));
+    az_span_copy(buffers[1], az_span_slice(json, 6, 9));
+    az_span_copy(buffers[2], az_span_slice_to_end(json, 9));
+
+    json_string = (az_json_token){
+      .slice = AZ_SPAN_NULL,
+      .size = 12,
+      ._internal = {
+        .pointer_to_first_buffer = buffers,
+        .start_buffer_index = 0,
+        .start_buffer_offset = 1,
+        .end_buffer_index = 2,
+        .end_buffer_offset = 3,
+      },
+    };
+
+    remainder = az_json_token_copy_into_span(&json_string, destination);
+    assert_int_equal(az_span_size(remainder), 128 - 12);
+    assert_true(az_span_is_content_equal(json, az_span_slice(destination, 0, 12)));
+  }
+  // Split in n
+  {
+    _az_split_buffers_single_byte(json, _az_buffers64_one);
+
+    json_string = (az_json_token){
+      .kind = AZ_JSON_TOKEN_STRING,
+      .slice = AZ_SPAN_NULL,
+      .size = 12,
+      ._internal = {
+        .string_has_escaped_chars = false,
+        .pointer_to_first_buffer = _az_buffers64_one,
+        .start_buffer_index = 0,
+        .start_buffer_offset = 0,
+        .end_buffer_index = az_span_size(json) - 1,
+        .end_buffer_offset = 1,
+      },
+    };
+
+    remainder = az_json_token_copy_into_span(&json_string, destination);
+    assert_int_equal(az_span_size(remainder), 128 - 12);
+    assert_true(az_span_is_content_equal(json, az_span_slice(destination, 0, 12)));
+  }
 }
 
 int test_az_json()
@@ -1919,6 +2483,10 @@ int test_az_json()
           cmocka_unit_test(test_json_skip_children),
           cmocka_unit_test(test_json_value),
           cmocka_unit_test(test_az_json_token_get_string_and_text_equal),
-          cmocka_unit_test(test_az_json_token_get_string_and_text_equal_discontiguous) };
+          cmocka_unit_test(test_az_json_token_get_string_and_text_equal_discontiguous),
+          cmocka_unit_test(test_az_json_reader_double),
+          cmocka_unit_test(test_az_json_token_number_too_large),
+          cmocka_unit_test(test_az_json_token_literal),
+          cmocka_unit_test(test_az_json_token_copy) };
   return cmocka_run_group_tests_name("az_core_json", tests, NULL, NULL);
 }
