@@ -23,10 +23,9 @@
 // Uncomment below lines when working with libcurl
 // #include <curl/curl.h>
 
+#include <azure/core/az_log.h>
 #include <stdio.h>
 #include <stdlib.h>
-// Uncomment below code to enable logging (and the first lines of main function)
-// #include <azure/core/az_log.h>
 
 #define URI_ENV "AZURE_STORAGE_URL"
 
@@ -37,14 +36,12 @@ static az_span content_to_upload = AZ_SPAN_LITERAL_FROM_STR("Some test content")
 #pragma warning(disable : 4996)
 #endif
 
-// Uncomment below code to enable logging (and the first lines of main function)
-/*
+// Enable logging
 static void test_log_func(az_log_classification classification, az_span message)
 {
   (void)classification;
   printf("%.*s\n", az_span_size(message), az_span_ptr(message));
 }
-*/
 
 int main()
 {
@@ -60,12 +57,11 @@ int main()
     atexit(curl_global_cleanup);
   */
 
-  // Uncomment below code to enable logging
-  /*
-  az_log_classification const classifications[] = { AZ_LOG_HTTP_RESPONSE, AZ_LOG_END_OF_LIST };
+  // enable logging
+  az_log_classification const classifications[]
+      = { AZ_LOG_HTTP_REQUEST, AZ_LOG_HTTP_RESPONSE, AZ_LOG_END_OF_LIST };
   az_log_set_classifications(classifications);
   az_log_set_callback(test_log_func);
-  */
 
   // 1) Init client.
   // Example expects AZURE_STORAGE_URL in env to be a URL w/ SAS token
@@ -91,8 +87,8 @@ int main()
 
   // 3) upload content
   printf("Uploading blob...\n");
-  az_result const blob_upload_result = az_storage_blobs_blob_upload(
-      &client, content_to_upload, NULL, &http_response);
+  az_result const blob_upload_result
+      = az_storage_blobs_blob_upload(&client, content_to_upload, NULL, &http_response);
 
   // This validation is only for the first time SDK client is used. API will return not implemented
   // if samples were built with no_http lib.
