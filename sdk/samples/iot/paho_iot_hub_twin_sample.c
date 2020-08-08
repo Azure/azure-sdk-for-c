@@ -422,17 +422,11 @@ az_result build_reported_property(az_span* reported_property_payload)
   az_json_writer json_writer;
 
   az_span temp = AZ_SPAN_FROM_BUFFER(reported_property_buffer);
-  printf("size of az_span: %d\n", az_span_size(temp));
   AZ_RETURN_IF_FAILED(az_json_writer_init(&json_writer, temp, NULL));
-  printf("1\n");
   AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&json_writer));
-  printf("2\n");
   AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&json_writer, reported_property_name));
-  printf("3\n");
   AZ_RETURN_IF_FAILED(az_json_writer_append_int32(&json_writer, reported_property_value));
-  printf("4\n");
   AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&json_writer));
-  printf("5\n");
   *reported_property_payload = az_json_writer_get_bytes_used_in_destination(&json_writer);
 
   return AZ_OK;
