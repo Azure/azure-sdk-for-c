@@ -246,7 +246,7 @@ The following samples use SAS authentication to connect to Azure IoT Hub or Azur
 
 1. Compile the code:
 
-    - Enter the directory `/azure-sdk-for-c/cmake`. If it does not exist, please create it.
+    - From the sdk root, create a build directory (eg `/build`). Change directory into your build directory.
     - Build the directory structure and the samples:
 
       ```bash
