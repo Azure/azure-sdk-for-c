@@ -26,9 +26,9 @@
 #include <string.h>
 #include <time.h>
 
+#include <azure/core/az_json.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
-#include <azure/core/az_json.h>
 #include <azure/core/internal/az_precondition_internal.h>
 #include <azure/iot/az_iot_hub_client.h>
 #include <azure/iot/az_iot_provisioning_client.h>
@@ -205,13 +205,10 @@ void sleep_for_seconds(uint32_t seconds);
  */
 uint32_t get_epoch_expiration_time_from_minutes(uint32_t minutes);
 
-
-
-
-
-
-
-void sas_generate_encoded_signed_signature(const az_span* sas_key, const az_span* sas_signature, az_span* sas_b64_encoded_hmac256_signed_signature);
+void sas_generate_encoded_signed_signature(
+    const az_span* sas_key,
+    const az_span* sas_signature,
+    az_span* sas_b64_encoded_hmac256_signed_signature);
 
 /*
  * This serves as an example for fundamental functionality needed to use SAS key authentication.

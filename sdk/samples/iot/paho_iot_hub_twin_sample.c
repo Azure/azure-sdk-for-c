@@ -40,15 +40,16 @@ void parse_message(
     az_iot_hub_client_twin_response* twin_response);
 
 /*
- * This sample utilizes the Azure IoT Hub to get the twin document, send a reported property message,
- * and receive up to 5 desired property messages. If a timeout occurs while waiting for a message from
- * the Azure IoT Hub, the sample will exit. Upon receiving a desired property message, the sample will
- * update the property locally and send a reported property message back to the service.
- * X509 self-certification is used.
+ * This sample utilizes the Azure IoT Hub to get the twin document, send a reported property
+ * message, and receive up to 5 desired property messages. If a timeout occurs while waiting for a
+ * message from the Azure IoT Hub, the sample will exit. Upon receiving a desired property message,
+ * the sample will update the property locally and send a reported property message back to the
+ * service. X509 self-certification is used.
  *
- * A property named `device_count` is supported for this sample. To send a device twin desired property
- * message, select your device's Device Twin tab in your Azure IoT Hub. Add the property `device_count`
- * along with a corresponding value to the `desired` section of the JSON. Select Save to send the message.
+ * A property named `device_count` is supported for this sample. To send a device twin desired
+ * property message, select your device's Device Twin tab in your Azure IoT Hub. Add the property
+ * `device_count` along with a corresponding value to the `desired` section of the JSON. Select Save
+ * to send the message.
  *
  * {
  *   "properties": {
@@ -58,8 +59,8 @@ void parse_message(
  *   }
  * }
  *
- * No other property names sent in a desired property message are supported. If any are sent, the log
- * will report there is nothing to update.
+ * No other property names sent in a desired property message are supported. If any are sent, the
+ * log will report there is nothing to update.
  */
 int main()
 {
@@ -103,8 +104,8 @@ void create_and_configure_client()
   // Build an MQTT endpoint c-string.
   char mqtt_endpoint_buffer[128];
   if (az_failed(
-          rc = create_mqtt_endpoint(
-              SAMPLE_TYPE, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer))))
+          rc
+          = create_mqtt_endpoint(SAMPLE_TYPE, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer))))
   {
     LOG_ERROR("Failed to create MQTT endpoint: az_result return code 0x%04x.", rc);
     exit(rc);
@@ -167,7 +168,8 @@ void connect_client_to_iot_hub()
 
   MQTTClient_SSLOptions mqtt_ssl_options = MQTTClient_SSLOptions_initializer;
   mqtt_ssl_options.keyStore = (char*)x509_cert_pem_file_path_buffer;
-  if (*az_span_ptr(env_vars.x509_trust_pem_file_path) != '\0') // Should only be set if required by OS.
+  if (*az_span_ptr(env_vars.x509_trust_pem_file_path)
+      != '\0') // Should only be set if required by OS.
   {
     mqtt_ssl_options.trustStore = (char*)x509_trust_pem_file_path_buffer;
   }
@@ -220,7 +222,11 @@ void get_twin_document()
   char twin_document_topic[128];
   if (az_failed(
           rc = az_iot_hub_client_twin_document_get_publish_topic(
-              &hub_client, twin_document_topic_request_id, twin_document_topic, sizeof(twin_document_topic), NULL)))
+              &hub_client,
+              twin_document_topic_request_id,
+              twin_document_topic,
+              sizeof(twin_document_topic),
+              NULL)))
   {
     LOG_ERROR("Failed to get Twin Document publish topic: az_result return code %04x", rc);
     exit(rc);
@@ -234,7 +240,7 @@ void get_twin_document()
     exit(rc);
   }
 
-  //Receive the twin document message from the server.
+  // Receive the twin document message from the server.
   receive_message();
 
   return;
@@ -285,7 +291,7 @@ void send_reported_property()
   LOG_SUCCESS("Client sent reported property message:");
   LOG_AZ_SPAN("Payload:", reported_property_payload);
 
-  //Receive the server resonse.
+  // Receive the server resonse.
   receive_message();
 
   return;
@@ -368,8 +374,8 @@ void parse_message(
   _az_PRECONDITION_NOT_NULL(twin_response);
 
   int rc;
-  az_span topic_span = az_span_init((uint8_t*)topic, topic_len);
-  az_span message_span = az_span_init((uint8_t*)message->payload, message->payloadlen);
+  az_span topic_span = az_span_create((uint8_t*)topic, topic_len);
+  az_span message_span = az_span_create((uint8_t*)message->payload, message->payloadlen);
 
   // Parse message and retrieve twin_response info.
   if (az_failed(
@@ -415,8 +421,7 @@ az_result build_reported_property(az_span* reported_property_payload)
 
   az_json_writer json_writer;
 
-  AZ_RETURN_IF_FAILED(
-      az_json_writer_init(&json_writer, *reported_property_payload, NULL));
+  AZ_RETURN_IF_FAILED(az_json_writer_init(&json_writer, *reported_property_payload, NULL));
   AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&json_writer));
   AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&json_writer, reported_property_name));
   AZ_RETURN_IF_FAILED(az_json_writer_append_int32(&json_writer, reported_property_value));

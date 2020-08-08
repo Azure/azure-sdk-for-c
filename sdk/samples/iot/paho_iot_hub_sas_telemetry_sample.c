@@ -64,8 +64,8 @@ void create_and_configure_client()
   // Build an MQTT endpoint c-string.
   char mqtt_endpoint_buffer[128];
   if (az_failed(
-          rc = create_mqtt_endpoint(
-              SAMPLE_TYPE, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer))))
+          rc
+          = create_mqtt_endpoint(SAMPLE_TYPE, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer))))
   {
     LOG_ERROR("Failed to create MQTT endpoint: az_result return code 0x%04x.", rc);
     exit(rc);
@@ -130,7 +130,8 @@ void connect_client_to_iot_hub()
   mqtt_connect_options.keepAliveInterval = AZ_IOT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS;
 
   MQTTClient_SSLOptions mqtt_ssl_options = MQTTClient_SSLOptions_initializer;
-  if (*az_span_ptr(env_vars.x509_trust_pem_file_path) != '\0') // Should only be set if required by OS.
+  if (*az_span_ptr(env_vars.x509_trust_pem_file_path)
+      != '\0') // Should only be set if required by OS.
   {
     mqtt_ssl_options.trustStore = (char*)x509_trust_pem_file_path_buffer;
   }
@@ -225,7 +226,8 @@ void generate_sas_key()
 
   // Generate the encoded, signed signature (b64 encoded, HMAC-SHA256 signing)
   az_span sas_encoded_signed_signature = AZ_SPAN_FROM_BUFFER(sas_encoded_signed_signature_buffer);
-  sas_generate_encoded_signed_signature(&(env_vars.hub_sas_key), &sas_signature, &sas_encoded_signed_signature);
+  sas_generate_encoded_signed_signature(
+      &(env_vars.hub_sas_key), &sas_signature, &sas_encoded_signed_signature);
 
   // Get the resulting password, passing the base64 encoded, HMAC signed bytes
   size_t mqtt_password_length;

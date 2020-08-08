@@ -32,7 +32,7 @@ enum
  * @return `true` if the \p value is finite (that is, it is not infinite or not a number), otherwise
  * return `false`.
  */
-AZ_NODISCARD AZ_INLINE bool _az_is_finite(double value)
+AZ_NODISCARD AZ_INLINE bool _az_isfinite(double value)
 {
   uint64_t binary_value = *(uint64_t*)&value;
 
@@ -75,64 +75,64 @@ _az_span_scan_until(az_span span, _az_predicate predicate, int32_t* out_index);
 AZ_NODISCARD az_result _az_is_expected_span(az_span* ref_span, az_span expected);
 
 /**
- * @brief Removes all leading and trailing white space characters from the \p span. Function will
- * create a new #az_span pointing to the first non-white-space (` `, \\n, \\r, \\t) character found
- * in \p span and up to the last non-white-space character.
+ * @brief Removes all leading and trailing whitespace characters from the \p span. Function will
+ * create a new #az_span pointing to the first non-whitespace (` `, \\n, \\r, \\t) character found
+ * in \p span and up to the last non-whitespace character.
  *
- * @remarks If \p span is full of non-white-space characters, this function will return empty
+ * @remarks If \p span is full of non-whitespace characters, this function will return empty
  * #az_span.
  *
  * Example:
  * \code{.c}
  *  az_span a = AZ_SPAN_FROM_STR("  text with   \\n spaces   ");
- *  az_span b = _az_span_trim_white_space(a);
+ *  az_span b = _az_span_trim_whitespace(a);
  *  // assert( b ==  AZ_SPAN_FROM_STR("text with   \\n spaces"));
  * \endcode
  *
- * @param[in] source #az_span pointing to a memory address that might contain white spaces.
+ * @param[in] source #az_span pointing to a memory address that might contain whitespace characters.
  * @return The trimmed #az_span.
  */
-AZ_NODISCARD az_span _az_span_trim_white_space(az_span source);
+AZ_NODISCARD az_span _az_span_trim_whitespace(az_span source);
 
 /**
- * @brief Removes all leading white space characters from the start of \p span.
- * Function will create a new #az_span pointing to the first non-white-space (` `, \\n, \\r, \\t)
+ * @brief Removes all leading whitespace characters from the start of \p span.
+ * Function will create a new #az_span pointing to the first non-whitespace (` `, \\n, \\r, \\t)
  * character found in \p span and up to the last character.
  *
- * @remarks If \p span is full of non-white-space characters, this function will return empty
+ * @remarks If \p span is full of non-whitespace characters, this function will return empty
  * #az_span.
  *
  * Example:
  * \code{.c}
  *  az_span a = AZ_SPAN_FROM_STR("  text with   \\n spaces   ");
- *  az_span b = _az_span_trim_white_space_from_start(a);
+ *  az_span b = _az_span_trim_whitespace_from_start(a);
  *  // assert( b ==  AZ_SPAN_FROM_STR("text with   \\n spaces   "));
  * \endcode
  *
- * @param[in] source #az_span pointing to a memory address that might contain white spaces.
+ * @param[in] source #az_span pointing to a memory address that might contain whitespace characters.
  * @return The trimmed #az_span.
  */
-AZ_NODISCARD az_span _az_span_trim_white_space_from_start(az_span source);
+AZ_NODISCARD az_span _az_span_trim_whitespace_from_start(az_span source);
 
 /**
- * @brief Removes all trailing white space characters from the end of \p span.
+ * @brief Removes all trailing whitespace characters from the end of \p span.
  * Function will create a new #az_span pointing to the first character in \p span and up to the last
- * non-white-space (` `, \\n, \\r, \\t) character.
+ * non-whitespace (` `, \\n, \\r, \\t) character.
  *
- * @remarks If \p span is full of non-white-space characters, this function will return empty
+ * @remarks If \p span is full of non-whitespace characters, this function will return empty
  * #az_span.
  *
  * Example:
  * \code{.c}
  *  az_span a = AZ_SPAN_FROM_STR("  text with   \\n spaces   ");
- *  az_span b = _az_span_trim_white_space_from_end(a);
+ *  az_span b = _az_span_trim_whitespace_from_end(a);
  *  // assert( b ==  AZ_SPAN_FROM_STR("  text with   \\n spaces"));
  * \endcode
  *
- * @param[in] source #az_span pointing to a memory address that might contain white spaces.
+ * @param[in] source #az_span pointing to a memory address that might contain whitespace characters.
  * @return The trimmed #az_span.
  */
-AZ_NODISCARD az_span _az_span_trim_white_space_from_end(az_span source);
+AZ_NODISCARD az_span _az_span_trim_whitespace_from_end(az_span source);
 
 #include <azure/core/_az_cfg_suffix.h>
 

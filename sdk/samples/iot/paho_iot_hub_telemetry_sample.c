@@ -57,8 +57,8 @@ void create_and_configure_client()
   // Build an MQTT endpoint c-string.
   char mqtt_endpoint_buffer[128];
   if (az_failed(
-          rc = create_mqtt_endpoint(
-              SAMPLE_TYPE, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer))))
+          rc
+          = create_mqtt_endpoint(SAMPLE_TYPE, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer))))
   {
     LOG_ERROR("Failed to create MQTT endpoint: az_result return code 0x%04x.", rc);
     exit(rc);
@@ -121,7 +121,8 @@ void connect_client_to_iot_hub()
 
   MQTTClient_SSLOptions mqtt_ssl_options = MQTTClient_SSLOptions_initializer;
   mqtt_ssl_options.keyStore = (char*)x509_cert_pem_file_path_buffer;
-  if (*az_span_ptr(env_vars.x509_trust_pem_file_path) != '\0') // Should only be set if required by OS.
+  if (*az_span_ptr(env_vars.x509_trust_pem_file_path)
+      != '\0') // Should only be set if required by OS.
   {
     mqtt_ssl_options.trustStore = (char*)x509_trust_pem_file_path_buffer;
   }

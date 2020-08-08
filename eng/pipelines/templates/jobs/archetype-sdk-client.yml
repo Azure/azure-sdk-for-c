@@ -281,6 +281,10 @@ jobs:
   pool:
     vmImage: windows-2019
   steps:
+    - template: /eng/common/pipelines/templates/steps/verify-links.yml
+      parameters:
+        Directory: ''
+
     # Generate release-info
     - pwsh: >-
         New-Item
@@ -302,7 +306,7 @@ jobs:
 
     - pwsh: >-
         Copy-Item
-        sdk/docs/core/CHANGELOG.md
+        CHANGELOG.md
         (Join-Path $(Build.ArtifactStagingDirectory) release-info/CHANGELOG.md)
       displayName: Copy CHANGELOG.md to package artifact output
 

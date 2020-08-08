@@ -15,18 +15,18 @@
 
 #define TEST_EXPECT_SUCCESS(exp) assert_true(az_succeeded(exp))
 
-az_result test_allocator(az_allocator_context* allocator_context, az_span* out_next_destination);
+az_result test_allocator(az_span_allocator_context* allocator_context, az_span* out_next_destination);
 
 az_result test_allocator_never_called(
-    az_allocator_context* allocator_context,
+    az_span_allocator_context* allocator_context,
     az_span* out_next_destination);
 
 az_result test_allocator_always_null(
-    az_allocator_context* allocator_context,
+    az_span_allocator_context* allocator_context,
     az_span* out_next_destination);
 
 az_result test_allocator_chunked(
-    az_allocator_context* allocator_context,
+    az_span_allocator_context* allocator_context,
     az_span* out_next_destination);
 
 static void test_json_token_helper(
@@ -235,7 +235,7 @@ typedef struct
   int32_t* current_index;
 } _az_user_context;
 
-az_result test_allocator(az_allocator_context* allocator_context, az_span* out_next_destination)
+az_result test_allocator(az_span_allocator_context* allocator_context, az_span* out_next_destination)
 {
   _az_user_context* user_context = (_az_user_context*)allocator_context->user_context;
   int32_t current_index = *user_context->current_index + allocator_context->bytes_used;
@@ -257,7 +257,7 @@ az_result test_allocator(az_allocator_context* allocator_context, az_span* out_n
 }
 
 az_result test_allocator_always_null(
-    az_allocator_context* allocator_context,
+    az_span_allocator_context* allocator_context,
     az_span* out_next_destination)
 {
   (void)allocator_context;
@@ -513,7 +513,7 @@ static void test_json_writer_chunked(void** state)
 }
 
 az_result test_allocator_never_called(
-    az_allocator_context* allocator_context,
+    az_span_allocator_context* allocator_context,
     az_span* out_next_destination)
 {
   assert_true(false);
@@ -709,7 +709,7 @@ static uint8_t json_chunked_array_256[10][256] = { 0 };
 static az_span json_buffers[10] = { 0 };
 
 az_result test_allocator_chunked(
-    az_allocator_context* allocator_context,
+    az_span_allocator_context* allocator_context,
     az_span* out_next_destination)
 {
   _az_user_context* user_context = (_az_user_context*)allocator_context->user_context;
@@ -1515,10 +1515,10 @@ static void test_json_value(void** state)
     char string_value[10] = { 0 };
     TEST_EXPECT_SUCCESS(az_json_token_get_string(&json_string, string_value, 10, NULL));
     assert_true(
-        az_span_is_content_equal(az_span_from_str(string_value), AZ_SPAN_FROM_STR("Hello")));
+        az_span_is_content_equal(az_span_create_from_str(string_value), AZ_SPAN_FROM_STR("Hello")));
 
     TEST_EXPECT_SUCCESS(az_json_token_get_string(&json_property_name, string_value, 10, NULL));
-    assert_true(az_span_is_content_equal(az_span_from_str(string_value), AZ_SPAN_FROM_STR("Name")));
+    assert_true(az_span_is_content_equal(az_span_create_from_str(string_value), AZ_SPAN_FROM_STR("Name")));
   }
   // string from boolean
   {

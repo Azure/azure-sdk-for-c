@@ -19,10 +19,10 @@
 #include <azure/core/az_context.h>
 #include <azure/core/az_credentials.h>
 #include <azure/core/az_http.h>
-#include <azure/core/internal/az_http_internal.h>
 #include <azure/core/az_http_transport.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
+#include <azure/core/internal/az_http_internal.h>
 
 #include <stdint.h>
 
@@ -33,22 +33,30 @@
  */
 static az_span const AZ_STORAGE_API_VERSION = AZ_SPAN_LITERAL_FROM_STR("2019-02-02");
 
+/**
+ * @brief Azure Storage Blobs blob client options
+ * @remark Allows customization of the blob client.
+ */
 typedef struct
 {
-  az_http_policy_retry_options retry;
+  az_http_policy_retry_options retry_options; /**< Optional values used to override the default retry policy options **/
   struct
   {
     _az_http_policy_apiversion_options api_version;
-    _az_http_policy_telemetry_options _telemetry_options;
+    _az_http_policy_telemetry_options telemetry_options;
   } _internal;
 } az_storage_blobs_blob_client_options;
 
+/**
+ * @brief Azure Storage Blobs Blob Client.
+ *
+ */
 typedef struct
 {
   struct
   {
     // buffer to copy customer url. Then it stays immutable
-    uint8_t endpoint_buffer[AZ_HTTP_REQUEST_URL_BUF_SIZE];
+    uint8_t endpoint_buffer[AZ_HTTP_REQUEST_URL_BUFFER_SIZE];
     // this url will point to endpoint_buffer
     az_span endpoint;
     _az_http_pipeline pipeline;
@@ -64,7 +72,7 @@ typedef struct
  * @param endpoint A url to a blob storage account.
  * @param credential The object used for authentication.
  *         #AZ_CREDENTIAL_ANONYMOUS should be used for SAS.
- * @param options  A reference to an #az_storage_blobs_blob_client_options structure which defines
+ * @param options A reference to an #az_storage_blobs_blob_client_options structure which defines
  * custom behavior of the client.
  *
  * @return An #az_result value indicating the result of the operation:
@@ -76,17 +84,21 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
     void* credential,
     az_storage_blobs_blob_client_options* options);
 
+/**
+ * @brief Azure Storage Blobs Blob upload options.
+ * @remark Reserved for future use
+ */
 typedef struct
 {
+  az_context* context;
   struct
   {
-    az_span option;
+    az_span unused;
   } _internal;
 } az_storage_blobs_blob_upload_options;
 
 /**
  * @brief Gets the default blob storage options.
- *
  * @details Call this to obtain an initialized #az_storage_blobs_blob_client_options structure that
  * can be modified and passed to #az_storage_blobs_blob_client_init().
  *
@@ -107,14 +119,14 @@ AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_o
 AZ_NODISCARD AZ_INLINE az_storage_blobs_blob_upload_options
 az_storage_blobs_blob_upload_options_default()
 {
-  return (az_storage_blobs_blob_upload_options){ ._internal = { .option = AZ_SPAN_NULL } };
+  return (az_storage_blobs_blob_upload_options){ .context = &az_context_application,
+                                                ._internal = { .unused = AZ_SPAN_NULL } };
 }
 
 /**
  * @brief Uploads the contents to blob storage.
  *
  * @param client A storage blobs client structure.
- * @param context Supports cancelling long running operations.
  * @param content The blob content to upload.
  * @param options __[nullable]__ A reference to an #az_storage_blobs_blob_upload_options
  * structure which defines custom behavior for uploading the blob. If `NULL` is passed, the client
@@ -126,7 +138,6 @@ az_storage_blobs_blob_upload_options_default()
  */
 AZ_NODISCARD az_result az_storage_blobs_blob_upload(
     az_storage_blobs_blob_client* client,
-    az_context* context,
     az_span content, /* Buffer of content*/
     az_storage_blobs_blob_upload_options* options,
     az_http_response* response);

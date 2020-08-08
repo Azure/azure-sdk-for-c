@@ -39,9 +39,9 @@ void send_method_response(
 
 /*
  * This sample receives incoming method commands invoked from the the Azure IoT Hub.
- * It will successfully receive up to MAX_METHOD_MESSAGE_COUNT method commands sent from the service.
- * If a timeout occurs of TIMEOUT_MQTT_RECEIVE_MS while waiting for a message, the sample will exit.
- * X509 self-certification is used.
+ * It will successfully receive up to MAX_METHOD_MESSAGE_COUNT method commands sent from the
+ * service. If a timeout occurs of TIMEOUT_MQTT_RECEIVE_MS while waiting for a message, the sample
+ * will exit. X509 self-certification is used.
  *
  * To send a method command, select your device's Direct Method tab in your Azure IoT Hub.
  * Enter a method name and select Invoke Method. A method named `ping` is supported, which if
@@ -49,8 +49,8 @@ void send_method_response(
  *
  *  {"response": "pong"}
  *
- * No other method commands are supported. If any are attempted to be invoked, the log will report the
- * method is not found.
+ * No other method commands are supported. If any are attempted to be invoked, the log will report
+ * the method is not found.
  */
 int main()
 {
@@ -88,8 +88,8 @@ void create_and_configure_client()
   // Build an MQTT endpoint c-string.
   char mqtt_endpoint_buffer[128];
   if (az_failed(
-          rc = create_mqtt_endpoint(
-              SAMPLE_TYPE, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer))))
+          rc
+          = create_mqtt_endpoint(SAMPLE_TYPE, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer))))
   {
     LOG_ERROR("Failed to create MQTT endpoint: az_result return code 0x%04x.", rc);
     exit(rc);
@@ -152,7 +152,7 @@ void connect_client_to_iot_hub()
 
   MQTTClient_SSLOptions mqtt_ssl_options = MQTTClient_SSLOptions_initializer;
   mqtt_ssl_options.keyStore = (char*)x509_cert_pem_file_path_buffer;
-  if (*az_span_ptr(env_vars.x509_trust_pem_file_path) != '\0') // Should only be set if required by OS.
+  if (*az_span_ptr(env_vars.x509_trust_pem_file_path) != '\0') // Is only set if required by OS.
   {
     mqtt_ssl_options.trustStore = (char*)x509_trust_pem_file_path_buffer;
   }
@@ -195,14 +195,14 @@ void receive_messages()
   MQTTClient_message* message = NULL;
 
   // Continue until max # messages received or timeout expires to receive a single message.
-  for(uint8_t message_count = 0; message_count < MAX_METHOD_MESSAGE_COUNT; message_count++)
+  for (uint8_t message_count = 0; message_count < MAX_METHOD_MESSAGE_COUNT; message_count++)
   {
     LOG("Waiting for message.");
 
     if (((rc
           = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, TIMEOUT_MQTT_RECEIVE_MS))
-          != MQTTCLIENT_SUCCESS)
-          && (rc != MQTTCLIENT_TOPICNAME_TRUNCATED))
+         != MQTTCLIENT_SUCCESS)
+        && (rc != MQTTCLIENT_TOPICNAME_TRUNCATED))
     {
       LOG_ERROR("Failed to receive message: MQTTClient return code %d.", rc);
       exit(rc);
@@ -259,11 +259,13 @@ void parse_message(
   _az_PRECONDITION_NOT_NULL(method_request);
 
   int rc;
-  az_span topic_span = az_span_init((uint8_t*)topic, topic_len);
-  az_span message_span = az_span_init((uint8_t*)message->payload, message->payloadlen);
+  az_span topic_span = az_span_create((uint8_t*)topic, topic_len);
+  az_span message_span = az_span_create((uint8_t*)message->payload, message->payloadlen);
 
   // Parse message and retrieve method_request info.
-  if (az_failed(rc = az_iot_hub_client_methods_parse_received_topic(&hub_client, topic_span, method_request)))
+  if (az_failed(
+          rc = az_iot_hub_client_methods_parse_received_topic(
+              &hub_client, topic_span, method_request)))
   {
     LOG_ERROR("Message from unknown topic: az_result return code 0x%04x.", rc);
     LOG_AZ_SPAN("Topic:", topic_span);

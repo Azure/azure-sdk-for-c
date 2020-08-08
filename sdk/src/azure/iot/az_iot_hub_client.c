@@ -64,7 +64,7 @@ AZ_NODISCARD az_result az_iot_hub_client_get_user_name(
   const az_span* const model_id = &(client->_internal.options.model_id);
 
   az_span mqtt_user_name_span
-      = az_span_init((uint8_t*)mqtt_user_name, (int32_t)mqtt_user_name_size);
+      = az_span_create((uint8_t*)mqtt_user_name, (int32_t)mqtt_user_name_size);
 
   int32_t required_length = az_span_size(client->_internal.iot_hub_hostname)
       + az_span_size(client->_internal.device_id) + (int32_t)sizeof(hub_client_forward_slash);
@@ -151,7 +151,7 @@ AZ_NODISCARD az_result az_iot_hub_client_get_client_id(
   _az_PRECONDITION(mqtt_client_id_size > 0);
 
   az_span mqtt_client_id_span
-      = az_span_init((uint8_t*)mqtt_client_id, (int32_t)mqtt_client_id_size);
+      = az_span_create((uint8_t*)mqtt_client_id, (int32_t)mqtt_client_id_size);
   const az_span* const module_id = &(client->_internal.options.module_id);
 
   int32_t required_length = az_span_size(client->_internal.device_id);

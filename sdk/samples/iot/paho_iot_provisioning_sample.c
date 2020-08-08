@@ -27,8 +27,7 @@ void parse_message(
     const MQTTClient_message* message,
     az_iot_provisioning_client_register_response* response,
     az_iot_provisioning_client_operation_status* operation_status);
-void send_operation_query_message(
-    const az_iot_provisioning_client_register_response* response);
+void send_operation_query_message(const az_iot_provisioning_client_register_response* response);
 
 /*
  * This sample registers a device with the Azure IoT Hub Device Provisioning Service.
@@ -72,10 +71,8 @@ void create_and_configure_client()
   // Build an MQTT endpoint c-string.
   char mqtt_endpoint_buffer[256];
   if (az_failed(
-          rc = create_mqtt_endpoint(
-              SAMPLE_TYPE,
-              mqtt_endpoint_buffer,
-              sizeof(mqtt_endpoint_buffer))))
+          rc
+          = create_mqtt_endpoint(SAMPLE_TYPE, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer))))
   {
     LOG_ERROR("Failed to create MQTT endpoint: az_result return code 0x%04x.", rc);
     exit(rc);
@@ -128,7 +125,10 @@ void connect_client_to_provisioning_service()
   // Get the MQTT client username.
   if (az_failed(
           rc = az_iot_provisioning_client_get_user_name(
-              &provisioning_client, mqtt_client_username_buffer, sizeof(mqtt_client_username_buffer), NULL)))
+              &provisioning_client,
+              mqtt_client_username_buffer,
+              sizeof(mqtt_client_username_buffer),
+              NULL)))
   {
     LOG_ERROR("Failed to get MQTT client username: az_result return code 0x%04x.", rc);
     exit(rc);
@@ -143,7 +143,8 @@ void connect_client_to_provisioning_service()
 
   MQTTClient_SSLOptions mqtt_ssl_options = MQTTClient_SSLOptions_initializer;
   mqtt_ssl_options.keyStore = (char*)x509_cert_pem_file_path_buffer;
-  if (*az_span_ptr(env_vars.x509_trust_pem_file_path) != '\0') // Should only be set if required by OS.
+  if (*az_span_ptr(env_vars.x509_trust_pem_file_path)
+      != '\0') // Should only be set if required by OS.
   {
     mqtt_ssl_options.trustStore = (char*)x509_trust_pem_file_path_buffer;
   }
@@ -318,8 +319,8 @@ void parse_message(
   _az_PRECONDITION_NOT_NULL(operation_status);
 
   int rc;
-  az_span topic_span = az_span_init((uint8_t*)topic, topic_len);
-  az_span message_span = az_span_init((uint8_t*)message->payload, message->payloadlen);
+  az_span topic_span = az_span_create((uint8_t*)topic, topic_len);
+  az_span message_span = az_span_create((uint8_t*)message->payload, message->payloadlen);
 
   // Parse message and retrieve register_response info.
   if (az_failed(
@@ -336,7 +337,9 @@ void parse_message(
   LOG("Status: %d", register_response->status);
 
   // Retrieve operation_status.
-  if (az_failed(rc = az_iot_provisioning_client_parse_operation_status(register_response, operation_status)))
+  if (az_failed(
+          rc
+          = az_iot_provisioning_client_parse_operation_status(register_response, operation_status)))
   {
     LOG_ERROR("Failed to parse operation_status: az_result return code 0x%04x.", rc);
     exit(rc);

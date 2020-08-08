@@ -14,8 +14,8 @@ az_span mqtt_url_prefix = AZ_SPAN_LITERAL_FROM_STR("wss://");
 az_span mqtt_url_suffix
     = AZ_SPAN_LITERAL_FROM_STR(":443" AZ_IOT_HUB_CLIENT_WEB_SOCKET_PATH_NO_X509_CLIENT_CERT);
 #else
-//az_span mqtt_url_prefix = AZ_SPAN_LITERAL_FROM_STR("ssl://");
-//az_span mqtt_url_suffix = AZ_SPAN_LITERAL_FROM_STR(":8883");
+// az_span mqtt_url_prefix = AZ_SPAN_LITERAL_FROM_STR("ssl://");
+// az_span mqtt_url_suffix = AZ_SPAN_LITERAL_FROM_STR(":8883");
 #endif
 az_span provisioning_global_endpoint
     = AZ_SPAN_LITERAL_FROM_STR("ssl://global.azure-devices-provisioning.net:8883");
@@ -199,7 +199,7 @@ az_result create_mqtt_endpoint(sample_type type, char* endpoint, size_t endpoint
       return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
     }
 
-    az_span hub_mqtt_endpoint = az_span_init((uint8_t*)endpoint, (int32_t)endpoint_size);
+    az_span hub_mqtt_endpoint = az_span_create((uint8_t*)endpoint, (int32_t)endpoint_size);
     az_span remainder = az_span_copy(hub_mqtt_endpoint, mqtt_url_prefix);
     remainder = az_span_copy(
         remainder, az_span_slice(AZ_SPAN_FROM_BUFFER(hub_hostname_buffer), 0, hub_hostname_length));
@@ -215,7 +215,7 @@ az_result create_mqtt_endpoint(sample_type type, char* endpoint, size_t endpoint
       return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
     }
 
-    az_span provisioning_mqtt_endpoint = az_span_init((uint8_t*)endpoint, (int32_t)endpoint_size);
+    az_span provisioning_mqtt_endpoint = az_span_create((uint8_t*)endpoint, (int32_t)endpoint_size);
     az_span remainder = az_span_copy(provisioning_mqtt_endpoint, provisioning_global_endpoint);
     az_span_copy_u8(remainder, '\0');
     ;
@@ -246,7 +246,10 @@ uint32_t get_epoch_expiration_time_from_minutes(uint32_t minutes)
   return (uint32_t)(time(NULL) + minutes * 60 * 60);
 }
 
-void sas_generate_encoded_signed_signature(const az_span* sas_key, const az_span* sas_signature, az_span* sas_b64_encoded_hmac256_signed_signature)
+void sas_generate_encoded_signed_signature(
+    const az_span* sas_key,
+    const az_span* sas_signature,
+    az_span* sas_b64_encoded_hmac256_signed_signature)
 {
   _az_PRECONDITION_NOT_NULL(sas_key);
   _az_PRECONDITION_NOT_NULL(sas_signature);
@@ -256,17 +259,14 @@ void sas_generate_encoded_signed_signature(const az_span* sas_key, const az_span
 
   // Decode the base64 encoded SAS key to use for HMAC signing
   az_span sas_b64_decoded_key = AZ_SPAN_FROM_BUFFER(sas_b64_decoded_key_buffer);
-  if (az_failed(
-          rc
-          = sample_base64_decode(*sas_key, sas_b64_decoded_key, &sas_b64_decoded_key)))
+  if (az_failed(rc = sample_base64_decode(*sas_key, sas_b64_decoded_key, &sas_b64_decoded_key)))
   {
     LOG_ERROR("Could not decode the SAS key: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
   // HMAC-SHA256 sign the signature with the decoded key
-  az_span sas_hmac256_signed_signature
-      = AZ_SPAN_FROM_BUFFER(sas_hmac256_signed_signature_buffer);
+  az_span sas_hmac256_signed_signature = AZ_SPAN_FROM_BUFFER(sas_hmac256_signed_signature_buffer);
   if (az_failed(
           rc = sample_hmac_sha256_sign(
               sas_b64_decoded_key,
@@ -292,23 +292,7 @@ void sas_generate_encoded_signed_signature(const az_span* sas_key, const az_span
   return;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //////////////////////////////////////////////////////////////////////////////////////////////
-
-
 
 az_result sample_base64_decode(az_span base64_encoded, az_span in_span, az_span* out_span)
 {
@@ -354,7 +338,7 @@ az_result sample_base64_decode(az_span base64_encoded, az_span in_span, az_span*
   // Set the output span
   if (read_data > 0)
   {
-    *out_span = az_span_init(az_span_ptr(in_span), (int32_t)read_data);
+    *out_span = az_span_create(az_span_ptr(in_span), (int32_t)read_data);
     result = AZ_OK;
   }
   else
@@ -424,7 +408,7 @@ az_result sample_base64_encode(az_span bytes, az_span in_span, az_span* out_span
   {
     // Copy the bytes to the output and initialize output span
     memcpy(az_span_ptr(in_span), encoded_mem_ptr->data, encoded_mem_ptr->length);
-    *out_span = az_span_init(az_span_ptr(in_span), (int32_t)encoded_mem_ptr->length);
+    *out_span = az_span_create(az_span_ptr(in_span), (int32_t)encoded_mem_ptr->length);
 
     result = AZ_OK;
   }
@@ -457,7 +441,7 @@ az_result sample_hmac_sha256_sign(az_span key, az_span bytes, az_span in_span, a
 
   if (hmac != NULL)
   {
-    *out_span = az_span_init(az_span_ptr(in_span), (int32_t)hmac_encode_len);
+    *out_span = az_span_create(az_span_ptr(in_span), (int32_t)hmac_encode_len);
     result = AZ_OK;
   }
   else

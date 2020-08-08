@@ -24,7 +24,7 @@ enum
  */
 enum
 {
-  _az_INT64_AS_STR_BUF_SIZE = 20,
+  _az_INT64_AS_STR_BUFFER_SIZE = 20,
 };
 
 #include <azure/core/_az_cfg_suffix.h>
