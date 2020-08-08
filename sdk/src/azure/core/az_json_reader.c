@@ -125,7 +125,8 @@ static void _az_json_reader_update_state(
 
 AZ_NODISCARD static az_result _az_json_reader_get_next_buffer(
     az_json_reader* json_reader,
-    az_span* remaining)
+    az_span* remaining,
+    bool skip_whitespace)
 {
   // If we only had one buffer, or we ran out of the set of discontiguous buffers, return error.
   if (json_reader->_internal.buffer_index >= json_reader->_internal.number_of_buffers - 1)
@@ -133,7 +134,7 @@ AZ_NODISCARD static az_result _az_json_reader_get_next_buffer(
     return AZ_ERROR_EOF;
   }
 
-  if (json_reader->token._internal.start_buffer_index == -1)
+  if (!skip_whitespace && json_reader->token._internal.start_buffer_index == -1)
   {
     json_reader->token._internal.start_buffer_index = json_reader->_internal.buffer_index;
     json_reader->token._internal.start_buffer_offset = json_reader->_internal.bytes_consumed;
@@ -173,7 +174,7 @@ AZ_NODISCARD static az_span _az_json_reader_skip_whitespace(az_json_reader* json
     json_reader->_internal.total_bytes_consumed += consumed;
 
     if (az_span_size(json) >= 1
-        || az_failed(_az_json_reader_get_next_buffer(json_reader, &remaining)))
+        || az_failed(_az_json_reader_get_next_buffer(json_reader, &remaining, true)))
     {
       break;
     }
@@ -248,7 +249,7 @@ AZ_NODISCARD static az_result _az_json_reader_process_string(az_json_reader* jso
 
   if (remaining_size < 1)
   {
-    AZ_RETURN_IF_FAILED(_az_json_reader_get_next_buffer(json_reader, &token));
+    AZ_RETURN_IF_FAILED(_az_json_reader_get_next_buffer(json_reader, &token, false));
     remaining_size = az_span_size(token);
   }
 
@@ -273,7 +274,7 @@ AZ_NODISCARD static az_result _az_json_reader_process_string(az_json_reader* jso
       string_length++;
       if (current_index >= remaining_size)
       {
-        AZ_RETURN_IF_FAILED(_az_json_reader_get_next_buffer(json_reader, &token));
+        AZ_RETURN_IF_FAILED(_az_json_reader_get_next_buffer(json_reader, &token, false));
         current_index = 0;
         token_ptr = az_span_ptr(token);
         remaining_size = az_span_size(token);
@@ -290,7 +291,7 @@ AZ_NODISCARD static az_result _az_json_reader_process_string(az_json_reader* jso
         {
           if (current_index > remaining_size)
           {
-            AZ_RETURN_IF_FAILED(_az_json_reader_get_next_buffer(json_reader, &token));
+            AZ_RETURN_IF_FAILED(_az_json_reader_get_next_buffer(json_reader, &token, false));
             current_index = 0;
             token_ptr = az_span_ptr(token);
             remaining_size = az_span_size(token);
@@ -332,7 +333,7 @@ AZ_NODISCARD static az_result _az_json_reader_process_string(az_json_reader* jso
 
     if (current_index >= remaining_size)
     {
-      AZ_RETURN_IF_FAILED(_az_json_reader_get_next_buffer(json_reader, &token));
+      AZ_RETURN_IF_FAILED(_az_json_reader_get_next_buffer(json_reader, &token, false));
       current_index = 0;
       token_ptr = az_span_ptr(token);
       remaining_size = az_span_size(token);
@@ -440,7 +441,8 @@ static void _az_json_reader_consume_digits(
         break;
       }
     }
-    if (counter == token_size && az_succeeded(_az_json_reader_get_next_buffer(json_reader, token)))
+    if (counter == token_size
+        && az_succeeded(_az_json_reader_get_next_buffer(json_reader, token, false)))
     {
       *total_consumed += counter;
       counter = 0;
@@ -480,7 +482,7 @@ AZ_NODISCARD static az_result _az_validate_next_byte_is_digit(
   az_span current = az_span_slice_to_end(*remaining_number, *current_consumed);
   if (az_span_size(current) < 1)
   {
-    AZ_RETURN_IF_FAILED(_az_json_reader_get_next_buffer(json_reader, remaining_number));
+    AZ_RETURN_IF_FAILED(_az_json_reader_get_next_buffer(json_reader, remaining_number, false));
     current = *remaining_number;
     *current_consumed = 0;
   }
@@ -519,7 +521,7 @@ AZ_NODISCARD static az_result _az_json_reader_process_number(az_json_reader* jso
 
     if (current_consumed >= az_span_size(token))
     {
-      if (az_failed(_az_json_reader_get_next_buffer(json_reader, &token)))
+      if (az_failed(_az_json_reader_get_next_buffer(json_reader, &token, false)))
       {
         // If there is no more JSON, this is a valid end state only when the JSON payload contains a
         // single value: "[-]0"
@@ -558,7 +560,7 @@ AZ_NODISCARD static az_result _az_json_reader_process_number(az_json_reader* jso
 
     if (current_consumed >= az_span_size(token))
     {
-      if (az_failed(_az_json_reader_get_next_buffer(json_reader, &token)))
+      if (az_failed(_az_json_reader_get_next_buffer(json_reader, &token, false)))
       {
         // If there is no more JSON, this is a valid end state only when the JSON payload contains a
         // single value: "[-][digits]"
@@ -602,7 +604,7 @@ AZ_NODISCARD static az_result _az_json_reader_process_number(az_json_reader* jso
 
     if (current_consumed >= az_span_size(token))
     {
-      if (az_failed(_az_json_reader_get_next_buffer(json_reader, &token)))
+      if (az_failed(_az_json_reader_get_next_buffer(json_reader, &token, false)))
       {
         // If there is no more JSON, this is a valid end state only when the JSON payload contains a
         // single value: "[-][digits].[digits]"
@@ -640,7 +642,7 @@ AZ_NODISCARD static az_result _az_json_reader_process_number(az_json_reader* jso
   // The 'e'/'E' character must be followed by a sign or at least one digit.
   if (current_consumed >= az_span_size(token))
   {
-    AZ_RETURN_IF_FAILED(_az_json_reader_get_next_buffer(json_reader, &token));
+    AZ_RETURN_IF_FAILED(_az_json_reader_get_next_buffer(json_reader, &token, false));
     current_consumed = 0;
   }
 
@@ -659,7 +661,7 @@ AZ_NODISCARD static az_result _az_json_reader_process_number(az_json_reader* jso
 
   if (current_consumed >= az_span_size(token))
   {
-    if (az_failed(_az_json_reader_get_next_buffer(json_reader, &token)))
+    if (az_failed(_az_json_reader_get_next_buffer(json_reader, &token, false)))
     {
 
       // If there is no more JSON, this is a valid end state only when the JSON payload contains a
@@ -722,7 +724,7 @@ AZ_NODISCARD static az_result _az_json_reader_process_literal(
     }
 
     // If there is no more data, return EOF because the token is smaller than the expected literal.
-    AZ_RETURN_IF_FAILED(_az_json_reader_get_next_buffer(json_reader, &token));
+    AZ_RETURN_IF_FAILED(_az_json_reader_get_next_buffer(json_reader, &token, false));
   }
 
   _az_json_reader_update_state(

@@ -1894,7 +1894,6 @@ static uint8_t _az_buffer_for_complex_json[64] = { 0 };
     assert_int_equal(az_json_token_get_double(&json_number, &actual_d), AZ_OK); \
     assert_true(_is_double_equal(actual_d, expected, 1e-2)); \
 \
-    az_span buffers_half[2] = { 0 }; \
     _az_split_buffers(json, buffers_half); \
 \
     TEST_EXPECT_SUCCESS(az_json_reader_chunked_init(&reader, buffers_half, 2, NULL)); \
@@ -2017,6 +2016,7 @@ static void test_az_json_reader_double(void** state)
   az_span json_nested_array = { 0 };
   az_span json_object = { 0 };
   az_span remainder = { 0 };
+  az_span buffers_half[2] = { 0 };
 
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("-0"), 0);
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("1024"), 1024);
@@ -2470,6 +2470,115 @@ static void test_az_json_token_copy(void** state)
   }
 }
 
+// Imagine your JSON input to parse is "{\"name\":\"some value string\", \"code\": 123456}"
+// Either in one contiguous buffer, or split up within multiple non-contiguous ones.
+typedef struct
+{
+  char* name_string;
+  int32_t name_length;
+  az_span name_value_span; // optional, for demonstration purposes only
+  int32_t code;
+} model;
+
+static uint8_t available_scratch[64] = { 0 };
+
+az_result process_contiguous_json(az_span* input, int32_t number_of_buffers, model* output)
+{
+  az_span scratch_span = AZ_SPAN_FROM_BUFFER(available_scratch);
+
+  az_json_reader jr = { 0 };
+  AZ_RETURN_IF_FAILED(az_json_reader_chunked_init(&jr, input, number_of_buffers, NULL));
+
+  AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
+  if (jr.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
+  {
+    return AZ_ERROR_UNEXPECTED_CHAR;
+  }
+
+  while (az_succeeded(az_json_reader_next_token(&jr)) && jr.token.kind != AZ_JSON_TOKEN_END_OBJECT)
+  {
+    if (az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("name")))
+    {
+      AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
+      if (jr.token.kind != AZ_JSON_TOKEN_STRING)
+      {
+        return AZ_ERROR_ITEM_NOT_FOUND;
+      }
+
+      az_span remainder = az_json_token_copy_into_span(&jr.token, scratch_span);
+      output->name_value_span
+          = az_span_slice(scratch_span, 0, _az_span_diff(remainder, scratch_span));
+
+      AZ_RETURN_IF_FAILED(az_json_token_get_string(
+          &jr.token, output->name_string, output->name_length, &output->name_length));
+    }
+    else if (az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("code")))
+    {
+      AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
+      if (jr.token.kind != AZ_JSON_TOKEN_NUMBER)
+      {
+        return AZ_ERROR_ITEM_NOT_FOUND;
+      }
+      AZ_RETURN_IF_FAILED(az_json_token_get_int32(&jr.token, &output->code));
+    }
+    else
+    {
+      // ignore other tokens
+      AZ_RETURN_IF_FAILED(az_json_reader_skip_children(&jr));
+    }
+  }
+
+  return AZ_OK;
+}
+
+static void test_az_json_reader_chunked(void** state)
+{
+  (void)state;
+
+  char property_value[32] = { 0 };
+  az_span expected = AZ_SPAN_FROM_STR("some value string");
+
+  model original = (model){
+    .name_string = property_value,
+    .name_length = 32,
+    .name_value_span = AZ_SPAN_NULL,
+    .code = 0,
+  };
+
+  model m = original;
+  az_span json = AZ_SPAN_FROM_STR(" { \"name\": \"some value string\" , \"code\" : 123456 } ");
+
+  process_contiguous_json(&json, 1, &m);
+
+  assert_int_equal(m.code, 123456);
+  assert_int_equal(m.name_length, 17);
+  assert_true(az_span_is_content_equal(expected, m.name_value_span));
+  assert_true(az_span_is_content_equal(expected, az_span_create_from_str(m.name_string)));
+
+  m = original;
+  property_value[0] = 0;
+  az_span buffers_half[2] = { 0 };
+  _az_split_buffers(json, buffers_half);
+
+  process_contiguous_json(buffers_half, 2, &m);
+
+  assert_int_equal(m.code, 123456);
+  assert_int_equal(m.name_length, 17);
+  assert_true(az_span_is_content_equal(expected, m.name_value_span));
+  assert_true(az_span_is_content_equal(expected, az_span_create_from_str(m.name_string)));
+
+  m = original;
+  property_value[0] = 0;
+  _az_split_buffers_single_byte(json, _az_buffers64_one);
+
+  process_contiguous_json(_az_buffers64_one, az_span_size(json), &m);
+
+  assert_int_equal(m.code, 123456);
+  assert_int_equal(m.name_length, 17);
+  assert_true(az_span_is_content_equal(expected, m.name_value_span));
+  assert_true(az_span_is_content_equal(expected, az_span_create_from_str(m.name_string)));
+}
+
 int test_az_json()
 {
   const struct CMUnitTest tests[]
@@ -2487,6 +2596,7 @@ int test_az_json()
           cmocka_unit_test(test_az_json_reader_double),
           cmocka_unit_test(test_az_json_token_number_too_large),
           cmocka_unit_test(test_az_json_token_literal),
-          cmocka_unit_test(test_az_json_token_copy) };
+          cmocka_unit_test(test_az_json_token_copy),
+          cmocka_unit_test(test_az_json_reader_chunked) };
   return cmocka_run_group_tests_name("az_core_json", tests, NULL, NULL);
 }
