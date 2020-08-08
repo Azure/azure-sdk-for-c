@@ -2019,8 +2019,6 @@ static void test_az_json_reader_double(void** state)
   az_span buffers_half[2] = { 0 };
 
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("-0"), 0);
-  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("1024"), 1024);
-  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("-1024"), -1024);
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("2147483647"), 2147483647);
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("-2147483648"), -2147483647 - 1);
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("4294967295"), 4294967295);
@@ -2030,22 +2028,15 @@ static void test_az_json_reader_double(void** state)
   _az_json_reader_double_helper(
       AZ_SPAN_FROM_STR("-9223372036854775808"), -2147483647 * (double)4294967298);
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("1.23e3"), 1.23e3);
-  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("1.23"), 1.23);
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("-123.456e-78"), -123.456e-78);
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("123.456e+78"), 123.456e+78);
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("0.0"), 0);
-  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("0.0e0"), 0);
-  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("0.0e-0"), 0);
-  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("0.0e+0"), 0);
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("0.0e-1"), 0);
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("0.0e+1"), 0);
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("-1"), -1);
-  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("1.0"), 1);
-  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("-1.0"), -1);
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("123.123"), 123.123);
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("123.1230"), 123.1230);
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("123.0100"), 123.0100);
-  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("123.01"), 123.01);
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("123.001"), 123.001);
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("0.000000000000001"), 0.000000000000001);
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("1.0000000001"), 1.0000000001);
@@ -2059,25 +2050,12 @@ static void test_az_json_reader_double(void** state)
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("1.2e+4"), 1.2e+4);
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("-1.2e4"), -1.2e4);
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("-1.2e-4"), -1.2e-4);
-  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("0.0001"), 0.0001);
-  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("0.00102"), 0.00102);
-  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("0.34567"), .34567);
-  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("-0.34567"), -.34567);
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("9876.54321"), 9876.54321);
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("-9876.54321"), -9876.54321);
-  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("987654.321"), 987654.321);
-  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("-987654.321"), -987654.321);
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("987654.0000321"), 987654.0000321);
-  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("4503599627370496"), 4503599627370496);
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("9007199254740991"), 9007199254740991);
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("4503599627370496.2"), 4503599627370496.2);
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("1e15"), 1e15);
-  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("-1e15"), -1e15);
-  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("1.8e10"), 1.8e10);
-  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("-1.8e10"), -1.8e10);
-  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("1e-15"), 1e-15);
-  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("1e-10"), 1e-10);
-  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("1e-5"), 1e-5);
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("0.1234567890123456"), 0.1234567890123456);
   _az_json_reader_double_helper(
       AZ_SPAN_FROM_STR("123456789012345.123456789012340000"), 123456789012345.123456789012340000);
@@ -2087,33 +2065,22 @@ static void test_az_json_reader_double(void** state)
       AZ_SPAN_FROM_STR("123456789012345.1234567890123400001"), 123456789012345.1234567890123400001);
   _az_json_reader_double_helper(
       AZ_SPAN_FROM_STR("1000000000000.1234567890123400001"), 1000000000000.1234567890123400001);
-  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("12345.123e-15"), 12345.123e-15);
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("12345.12300000010e5"), 12345.12300000010e5);
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("1e-300"), 1e-300);
-  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("9007199254740992"), 9007199254740992);
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("9007199254740993"), (double)9007199254740993);
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("45035996273704961"), (double)45035996273704961);
-  _az_json_reader_double_helper(
-      AZ_SPAN_FROM_STR("9223372036854775806"), (double)9223372036854775806);
-  _az_json_reader_double_helper(
-      AZ_SPAN_FROM_STR("-9223372036854775806"), (double)-9223372036854775806);
   _az_json_reader_double_helper(
       AZ_SPAN_FROM_STR("1844674407370955100"), (double)1844674407370955100);
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("1.844674407370955e+19"), 1.844674407370955e+19);
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("1.8446744073709551e+19"), 1.8446744073709551e+19);
-  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("1.8446744073709552e+19"), 1.8446744073709552e+19);
   _az_json_reader_double_helper(
       AZ_SPAN_FROM_STR("18446744073709551615"), (double)18446744073709551615UL);
   _az_json_reader_double_helper(
       AZ_SPAN_FROM_STR("18446744073709551615.18446744073709551615"),
       18446744073709551615.18446744073709551615);
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("1e16"), 1e16);
-  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("12345.123e15"), 12345.123e15);
-  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("-12345.123e15"), -12345.123e15);
-  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("1e300"), 1e300);
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("-1e300"), -1e300);
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("1.7e308"), 1.7e308);
-  _az_json_reader_double_helper(AZ_SPAN_FROM_STR("-1.7e308"), -1.7e308);
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("2.22507e-308"), 2.22507e-308);
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("-2.22507e-308"), -2.22507e-308);
   _az_json_reader_double_helper(AZ_SPAN_FROM_STR("4.94e-325"), 0);
@@ -2470,7 +2437,7 @@ static void test_az_json_token_copy(void** state)
   }
 }
 
-// Imagine your JSON input to parse is "{\"name\":\"some value string\", \"code\": 123456}"
+// Imagine your JSON input to parse is " { \"name\": \"some value string\" , \"code\" : 123456 } "
 // Either in one contiguous buffer, or split up within multiple non-contiguous ones.
 typedef struct
 {
