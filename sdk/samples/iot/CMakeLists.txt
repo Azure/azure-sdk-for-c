@@ -5,9 +5,7 @@ if (TRANSPORT_PAHO)
 
 cmake_minimum_required (VERSION 3.10)
 
-set(TARGET_NAME "az_iot_samples_common")
-
-project (az_iot_samples_common LANGUAGES C)
+project (az_iot_samples LANGUAGES C)
 
 set(CMAKE_C_STANDARD 99)
 
