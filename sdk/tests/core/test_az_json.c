@@ -2482,7 +2482,7 @@ typedef struct
 
 static uint8_t available_scratch[64] = { 0 };
 
-az_result process_contiguous_json(az_span* input, int32_t number_of_buffers, model* output)
+static az_result _az_process_json(az_span* input, int32_t number_of_buffers, model* output)
 {
   az_span scratch_span = AZ_SPAN_FROM_BUFFER(available_scratch);
 
@@ -2505,9 +2505,8 @@ az_result process_contiguous_json(az_span* input, int32_t number_of_buffers, mod
         return AZ_ERROR_ITEM_NOT_FOUND;
       }
 
-      az_span remainder = az_json_token_copy_into_span(&jr.token, scratch_span);
-      output->name_value_span
-          = az_span_slice(scratch_span, 0, _az_span_diff(remainder, scratch_span));
+      az_json_token_copy_into_span(&jr.token, az_span_slice(scratch_span, 0, jr.token.size));
+      output->name_value_span = az_span_slice(scratch_span, 0, jr.token.size);
 
       AZ_RETURN_IF_FAILED(az_json_token_get_string(
           &jr.token, output->name_string, output->name_length, &output->name_length));
@@ -2548,7 +2547,7 @@ static void test_az_json_reader_chunked(void** state)
   model m = original;
   az_span json = AZ_SPAN_FROM_STR(" { \"name\": \"some value string\" , \"code\" : 123456 } ");
 
-  process_contiguous_json(&json, 1, &m);
+  _az_process_json(&json, 1, &m);
 
   assert_int_equal(m.code, 123456);
   assert_int_equal(m.name_length, 17);
@@ -2560,7 +2559,7 @@ static void test_az_json_reader_chunked(void** state)
   az_span buffers_half[2] = { 0 };
   _az_split_buffers(json, buffers_half);
 
-  process_contiguous_json(buffers_half, 2, &m);
+  _az_process_json(buffers_half, 2, &m);
 
   assert_int_equal(m.code, 123456);
   assert_int_equal(m.name_length, 17);
@@ -2571,7 +2570,7 @@ static void test_az_json_reader_chunked(void** state)
   property_value[0] = 0;
   _az_split_buffers_single_byte(json, _az_buffers64_one);
 
-  process_contiguous_json(_az_buffers64_one, az_span_size(json), &m);
+  _az_process_json(_az_buffers64_one, az_span_size(json), &m);
 
   assert_int_equal(m.code, 123456);
   assert_int_equal(m.name_length, 17);
