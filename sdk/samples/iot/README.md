@@ -359,13 +359,13 @@ The following samples use x509 authentication to connect to Azure IoT Hub or Azu
     Linux:
 
     ```bash
-    ./generate_certificate.sh
+    pwsh ./generate_certificate.ps1
     ```
 
     Windows:
 
     ```cmd
-    generate_certificate.cmd
+    .\generate_certificate.ps1
     ```
 
 2. Set the following environment variable:
