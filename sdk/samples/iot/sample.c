@@ -6,7 +6,7 @@
 //
 // MQTT endpoints
 //
-#define USE_WEB_SOCKET // Comment to use MQTT without WebSockets.
+//#define USE_WEB_SOCKET // Comment to use MQTT without WebSockets.
 #ifdef USE_WEB_SOCKET
 az_span mqtt_url_prefix = AZ_SPAN_LITERAL_FROM_STR("wss://");
 // Note: Paho fails to connect to Hub when using AZ_IOT_HUB_CLIENT_WEB_SOCKET_PATH or an X509
@@ -14,8 +14,8 @@ az_span mqtt_url_prefix = AZ_SPAN_LITERAL_FROM_STR("wss://");
 az_span mqtt_url_suffix
     = AZ_SPAN_LITERAL_FROM_STR(":443" AZ_IOT_HUB_CLIENT_WEB_SOCKET_PATH_NO_X509_CLIENT_CERT);
 #else
-// az_span mqtt_url_prefix = AZ_SPAN_LITERAL_FROM_STR("ssl://");
-// az_span mqtt_url_suffix = AZ_SPAN_LITERAL_FROM_STR(":8883");
+az_span mqtt_url_prefix = AZ_SPAN_LITERAL_FROM_STR("ssl://");
+az_span mqtt_url_suffix = AZ_SPAN_LITERAL_FROM_STR(":8883");
 #endif
 az_span provisioning_global_endpoint
     = AZ_SPAN_LITERAL_FROM_STR("ssl://global.azure-devices-provisioning.net:8883");
@@ -184,14 +184,13 @@ az_result read_configuration_entry(
   return AZ_OK;
 }
 
-az_result create_mqtt_endpoint(sample_type type, char* endpoint, size_t endpoint_size)
+az_result create_mqtt_endpoint(sample_type type, const sample_environment_variables* env_vars, char* endpoint, size_t endpoint_size)
 {
   _az_PRECONDITION_NOT_NULL(endpoint);
 
   if (type == PAHO_IOT_HUB)
   {
-    int32_t hub_hostname_length = (int32_t)strlen(hub_hostname_buffer);
-    int32_t required_size = az_span_size(mqtt_url_prefix) + hub_hostname_length
+    int32_t required_size = az_span_size(mqtt_url_prefix) + az_span_size(env_vars->hub_hostname)
         + az_span_size(mqtt_url_suffix) + (int32_t)sizeof('\0');
 
     if (required_size > (int32_t)endpoint_size)
@@ -201,8 +200,7 @@ az_result create_mqtt_endpoint(sample_type type, char* endpoint, size_t endpoint
 
     az_span hub_mqtt_endpoint = az_span_create((uint8_t*)endpoint, (int32_t)endpoint_size);
     az_span remainder = az_span_copy(hub_mqtt_endpoint, mqtt_url_prefix);
-    remainder = az_span_copy(
-        remainder, az_span_slice(AZ_SPAN_FROM_BUFFER(hub_hostname_buffer), 0, hub_hostname_length));
+    remainder = az_span_copy(remainder, env_vars->hub_hostname);
     remainder = az_span_copy(remainder, mqtt_url_suffix);
     az_span_copy_u8(remainder, '\0');
   }

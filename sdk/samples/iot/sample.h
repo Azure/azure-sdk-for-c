@@ -8,9 +8,15 @@
 // warning C4201: nonstandard extension used: nameless struct/union
 #pragma warning(push)
 #pragma warning(disable : 4201)
+#endif
+#include <paho-mqtt/MQTTClient.h>
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
+#ifdef _MSC_VER
 // "'getenv': This function or variable may be unsafe. Consider using _dupenv_s instead."
 #pragma warning(disable : 4996)
-#pragma warning(pop)
 #endif
 
 #ifdef _WIN32
@@ -37,8 +43,6 @@
 #include <openssl/buffer.h>
 #include <openssl/evp.h>
 #include <openssl/hmac.h>
-
-#include <paho-mqtt/MQTTClient.h>
 
 #define SAS_KEY_DURATION_TIME_DIGITS 4
 #define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
@@ -184,11 +188,13 @@ az_result read_configuration_entry(
  * @brief      Builds an MQTT endpoint c-string for an Azure IoT Hub or provisioning service.
  *
  * @param[in]  type          Enumerated type of the sample.
+ * @param[in]  env_vars      Pointer to environment variable struct.
  * @param[out] endpoint      Pointer to char buffer. Will include null termination character.
  * @param[in]  endpoint_size Size of the char buffer to be filled.
+
  * @result     Error if buffer size is not large enough to hold endpoint c-string.
  */
-az_result create_mqtt_endpoint(sample_type type, char* endpoint, size_t endpoint_size);
+az_result create_mqtt_endpoint(sample_type type, const sample_environment_variables* env_vars, char* endpoint, size_t endpoint_size);
 
 /*
  * @brief      Sleeps for given seconds.

@@ -80,7 +80,7 @@ void create_and_configure_client()
   char mqtt_endpoint_buffer[256];
   if (az_failed(
           rc
-          = create_mqtt_endpoint(SAMPLE_TYPE, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer))))
+          = create_mqtt_endpoint(SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer))))
   {
     LOG_ERROR("Failed to create MQTT endpoint: az_result return code 0x%04x.", rc);
     exit(rc);

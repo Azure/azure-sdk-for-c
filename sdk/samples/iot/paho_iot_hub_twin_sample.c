@@ -12,7 +12,7 @@
 static const az_span twin_document_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("get_twin");
 static const az_span twin_patch_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("reported_prop");
 static const az_span version_name = AZ_SPAN_LITERAL_FROM_STR("$version");
-static const az_span reported_property_name = AZ_SPAN_LITERAL_FROM_STR("device_count");
+static az_span reported_property_name = AZ_SPAN_LITERAL_FROM_STR("device_count");
 static int32_t reported_property_value = 0;
 static char reported_property_buffer[64];
 
@@ -105,7 +105,7 @@ void create_and_configure_client()
   char mqtt_endpoint_buffer[128];
   if (az_failed(
           rc
-          = create_mqtt_endpoint(SAMPLE_TYPE, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer))))
+          = create_mqtt_endpoint(SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer))))
   {
     LOG_ERROR("Failed to create MQTT endpoint: az_result return code 0x%04x.", rc);
     exit(rc);
@@ -266,8 +266,8 @@ void send_reported_property()
     exit(rc);
   }
 
-  // Build the udated reported property message.
-  az_span reported_property_payload = AZ_SPAN_FROM_BUFFER(reported_property_buffer);
+  // Build the updated reported property message.
+  az_span reported_property_payload;
   if (az_failed(rc = build_reported_property(&reported_property_payload)))
   {
     LOG_ERROR("Failed to build reported property payload to send: az_result return code %04x", rc);
@@ -421,12 +421,18 @@ az_result build_reported_property(az_span* reported_property_payload)
 
   az_json_writer json_writer;
 
-  AZ_RETURN_IF_FAILED(az_json_writer_init(&json_writer, *reported_property_payload, NULL));
+  az_span temp = AZ_SPAN_FROM_BUFFER(reported_property_buffer);
+  printf("size of az_span: %d\n", az_span_size(temp));
+  AZ_RETURN_IF_FAILED(az_json_writer_init(&json_writer, temp, NULL));
+  printf("1\n");
   AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&json_writer));
+  printf("2\n");
   AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&json_writer, reported_property_name));
+  printf("3\n");
   AZ_RETURN_IF_FAILED(az_json_writer_append_int32(&json_writer, reported_property_value));
+  printf("4\n");
   AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&json_writer));
-
+  printf("5\n");
   *reported_property_payload = az_json_writer_get_bytes_used_in_destination(&json_writer);
 
   return AZ_OK;
