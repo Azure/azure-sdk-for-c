@@ -267,7 +267,7 @@ void send_reported_property()
   }
 
   // Build the updated reported property message.
-  az_span reported_property_payload;
+  az_span reported_property_payload = AZ_SPAN_FROM_BUFFER(reported_property_buffer);
   if (az_failed(rc = build_reported_property(&reported_property_payload)))
   {
     LOG_ERROR("Failed to build reported property payload to send: az_result return code %04x", rc);
@@ -421,8 +421,7 @@ az_result build_reported_property(az_span* reported_property_payload)
 
   az_json_writer json_writer;
 
-  az_span temp = AZ_SPAN_FROM_BUFFER(reported_property_buffer);
-  AZ_RETURN_IF_FAILED(az_json_writer_init(&json_writer, temp, NULL));
+  AZ_RETURN_IF_FAILED(az_json_writer_init(&json_writer, *reported_property_payload, NULL));
   AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&json_writer));
   AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&json_writer, reported_property_name));
   AZ_RETURN_IF_FAILED(az_json_writer_append_int32(&json_writer, reported_property_value));

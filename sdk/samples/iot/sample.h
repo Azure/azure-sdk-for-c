@@ -8,13 +8,7 @@
 // warning C4201: nonstandard extension used: nameless struct/union
 #pragma warning(push)
 #pragma warning(disable : 4201)
-#endif
-#include <paho-mqtt/MQTTClient.h>
-#ifdef _MSC_VER
 #pragma warning(pop)
-#endif
-
-#ifdef _MSC_VER
 // "'getenv': This function or variable may be unsafe. Consider using _dupenv_s instead."
 #pragma warning(disable : 4996)
 #endif
@@ -43,6 +37,8 @@
 #include <openssl/buffer.h>
 #include <openssl/evp.h>
 #include <openssl/hmac.h>
+
+#include <paho-mqtt/MQTTClient.h>
 
 #define SAS_KEY_DURATION_TIME_DIGITS 4
 #define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
