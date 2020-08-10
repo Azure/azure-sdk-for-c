@@ -18,6 +18,15 @@ stages:
             deploy:
               steps:
                 - checkout: self
+                - task: Powershell@2
+                  inputs:
+                    filePath: $(Build.SourcesDirectory)/eng/common/scripts/Verify-ChangeLog.ps1
+                    arguments: >
+                      -ChangeLogLocation $(Pipeline.Workspace)/release-info/CHANGELOG.md
+                      -VersionString (Get-Content $(Pipeline.Workspace)/release-info/package-info.json | ConvertFrom-Json).version
+                      -ForRelease $true
+                    pwsh: true
+                  displayName: Verify CHANGELOG.md contents
                 - template: /eng/common/pipelines/templates/steps/create-tags-and-git-release.yml
                   parameters:
                     ArtifactLocation: $(Pipeline.Workspace)/release-info

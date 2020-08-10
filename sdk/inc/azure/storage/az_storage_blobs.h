@@ -90,6 +90,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
  */
 typedef struct
 {
+  az_context* context;
   struct
   {
     az_span unused;
@@ -118,14 +119,14 @@ AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_o
 AZ_NODISCARD AZ_INLINE az_storage_blobs_blob_upload_options
 az_storage_blobs_blob_upload_options_default()
 {
-  return (az_storage_blobs_blob_upload_options){ ._internal = { .unused = AZ_SPAN_NULL } };
+  return (az_storage_blobs_blob_upload_options){ .context = &az_context_application,
+                                                ._internal = { .unused = AZ_SPAN_NULL } };
 }
 
 /**
  * @brief Uploads the contents to blob storage.
  *
  * @param client A storage blobs client structure.
- * @param context Supports cancelling long running operations.
  * @param content The blob content to upload.
  * @param options __[nullable]__ A reference to an #az_storage_blobs_blob_upload_options
  * structure which defines custom behavior for uploading the blob. If `NULL` is passed, the client
@@ -137,7 +138,6 @@ az_storage_blobs_blob_upload_options_default()
  */
 AZ_NODISCARD az_result az_storage_blobs_blob_upload(
     az_storage_blobs_blob_client* client,
-    az_context* context,
     az_span content, /* Buffer of content*/
     az_storage_blobs_blob_upload_options* options,
     az_http_response* response);

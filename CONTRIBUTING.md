@@ -12,25 +12,26 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
 contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
-### Additional Helpful Links for Contributors  
+## Additional Helpful Links for Contributors
+
 Many people all over the world have helped make this project better.  You'll want to check out:
 
-* [What are some good first issues for new contributors to the repo?](https://github.com/azure/azure-sdk-for-c/issues?q=is%3Aopen+is%3Aissue+label%3Aup-for-grabs)
-* [How to build and test your change](#developer-guide)
-* [How you can make a change happen!](#pull-requests)
-* Conceptual Topics in the detailed [Azure SDK for Embedded C docs](https://azure.github.io/azure-sdk-for-c).
+- [What are some good first issues for new contributors to the repo?](https://github.com/azure/azure-sdk-for-c/issues?q=is%3Aopen+is%3Aissue+label%3Aup-for-grabs)
+- [How to build and test your change](#developer-guide)
+- [How you can make a change happen!](#pull-requests)
+- Conceptual Topics in the detailed [Azure SDK for Embedded C docs](https://azure.github.io/azure-sdk-for-c).
 
-### Community
+## Community
 
-* Chat with other community members [![Join the chat at https://gitter.im/azure/azure-sdk-for-c](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/azure/azure-sdk-for-c?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+- Chat with other community members [![Join the chat at https://gitter.im/azure/azure-sdk-for-c](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/azure/azure-sdk-for-c?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-### Reporting Security Issues and Security Bugs
+## Reporting Security Issues and Security Bugs
 
 Security issues and bugs should be reported privately, via email, to the Microsoft Security Response Center (MSRC) <secure@microsoft.com>. You should receive a response within 24 hours. If for some reason you do not, please follow up via email to ensure we received your original message. Further information, including the MSRC PGP key, can be found in the [Security TechCenter](https://www.microsoft.com/msrc/faqs-report-an-issue).
 
-# How to Contribute to the Azure SDK for Embedded C
+## How to Contribute to the Azure SDK for Embedded C
 
-There are manay ways that you can contribute to the Azure SDK for Embedded C project.
+There are many ways that you can contribute to the Azure SDK for Embedded C project.
 
 - For reporting bugs, requesting features, or asking for support, please file an issue in the [issues](https://github.com/Azure/azure-sdk-for-c/issues) section of the project.
 
@@ -40,7 +41,7 @@ There are manay ways that you can contribute to the Azure SDK for Embedded C pro
 
 - Refer to the [wiki](https://github.com/Azure/azure-sdk-for-c/wiki) to learn about how Azure SDK for Embedded C generates lint checker, doxygen, and code coverage reports.
 
-## Pull Requests
+### Pull Requests
 
 - **DO** submit all code changes via pull requests (PRs) rather than through a direct commit. PRs will be reviewed and potentially merged by the repo maintainers after a peer review that includes at least one maintainer.
 - **DO NOT** submit "work in progress" PRs.  A PR should only be submitted when it is considered ready for review and subsequent merging by the contributor.
@@ -53,7 +54,7 @@ There are manay ways that you can contribute to the Azure SDK for Embedded C pro
 - **DO NOT** fix merge conflicts using a merge commit. Prefer `git rebase`.
 - **DO NOT** mix independent, unrelated changes in one PR. Separate real product/test code changes from larger code formatting/dead code removal changes. Separate unrelated fixes into separate PRs, especially if they are in different assemblies.
 
-### Merging Pull Requests (for project contributors with write access)
+#### Merging Pull Requests (for project contributors with write access)
 
 - **DO** use ["Squash and Merge"](https://github.com/blog/2141-squash-your-commits) by default for individual contributions unless requested by the PR author.
   Do so, even if the PR contains only one commit. It creates a simpler history than "Create a Merge Commit".
@@ -63,27 +64,30 @@ There are manay ways that you can contribute to the Azure SDK for Embedded C pro
   - Contributor is using an e-mail address other than the primary GitHub address and wants that preserved in the history. Contributor must be willing to squash
     the commits manually before acceptance.
 
-## Developer Guide
+### Developer Guide
 
-### Prerequisites
+#### Prerequisites
 
 - [CMake](https://cmake.org/download/) version 3.10 or later
 - C compiler: [MSVC](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2019), [gcc](https://gcc.gnu.org/) or [clang](https://clang.llvm.org/) are recommended
 - [git](https://git-scm.com/downloads) to clone our Azure SDK repository with the desired tag
 - [cmocka](https://cmocka.org/) for building and running unit tests. By default, building unit tests is disabled, so, unless you want to add unit tests or run then, you don't need to install this. See how `vcpkg` can be used to install dependencies [here][vcpkg].
 - [libcurl](https://curl.haxx.se/download.html) which is used as an http stack, and is required for building and running service samples (storage). You don't need to install libcurl if you are not building samples, or if you will provide another HTTP stack implementation. The minimum required version of libcurl is 7.1.
+
 > Note: Using libcurl requires a global init and clean up that needs to happen in application code. Take a look into Azure SDK Storage samples for how global init is done before sending http requests to Azure. See more info in Running Samples section.
 
 See how `vcpkg` can be used to install dependencies [here][vcpkg].
+
 - [doxygen](http://www.doxygen.nl/download.html) if you need to generate and view documentation.
 
-## Running Tests
+### Running Tests
 
-### Unit Tests
+#### Unit Tests
 
 See [compiler options section](#compiler-options) to learn about how to build and run unit tests.
 
 After compiling project with unit test enabled, run tests with:
+
 ```bash
 cmake -DUNIT_TESTING=ON ..
 cmake --build .
@@ -92,8 +96,7 @@ cmake --build .
 ctest -V
 ```
 
-
-### Test with Mocked Functions
+#### Test with Mocked Functions
 
 Some test uses linker option ld to wrap functions and mock the implementation for it to do unit testing. Specially for PAL-related functions, mocking functions becomes a convenient way to break dependency between functions.
 
@@ -105,7 +108,7 @@ To enable building project and linking with this option, as well as adding tests
 cmake -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON ..
 ```
 
-## Build Docs
+### Build Docs
 
 Running below command from root folder will create a new folder `docs` containing html file with documentation about CORE headers. Make sure you have `doxygen` installed on the system.
 
@@ -113,11 +116,11 @@ Running below command from root folder will create a new folder `docs` containin
 doxygen Doxyfile
 ```
 
-## Code Coverage Reports
+### Code Coverage Reports
 
 Code coverage reports can be generated after running unit tests for each project. Follow below instructions will generate code coverage reports.
 
-### Requirements
+#### Requirements
 
 - **gcc** - clang/MSVC are not supported
 - **Debug** - Build files for debug `cmake -DCMAKE_BUILD_TYPE=Debug ..`

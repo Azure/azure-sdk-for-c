@@ -898,7 +898,7 @@ static void test_az_iot_hub_client_properties_next_succeed(void** state)
       az_span_ptr(test_value_three),
       (size_t)az_span_size(test_value_three));
 
-  assert_int_equal(az_iot_hub_client_properties_next(&props, &pair_out), AZ_ERROR_EOF);
+  assert_int_equal(az_iot_hub_client_properties_next(&props, &pair_out), AZ_ERROR_UNEXPECTED_END);
 }
 
 static void test_az_iot_hub_client_properties_next_twice_succeed(void** state)
@@ -928,7 +928,7 @@ static void test_az_iot_hub_client_properties_next_twice_succeed(void** state)
       az_span_ptr(test_value_two),
       (size_t)az_span_size(test_value_two));
 
-  assert_int_equal(az_iot_hub_client_properties_next(&props, &pair_out), AZ_ERROR_EOF);
+  assert_int_equal(az_iot_hub_client_properties_next(&props, &pair_out), AZ_ERROR_UNEXPECTED_END);
 
   // Reset to beginning of span
   assert_int_equal(
@@ -950,7 +950,7 @@ static void test_az_iot_hub_client_properties_next_twice_succeed(void** state)
       az_span_ptr(test_value_two),
       (size_t)az_span_size(test_value_two));
 
-  assert_int_equal(az_iot_hub_client_properties_next(&props, &pair_out), AZ_ERROR_EOF);
+  assert_int_equal(az_iot_hub_client_properties_next(&props, &pair_out), AZ_ERROR_UNEXPECTED_END);
 }
 
 static void test_az_iot_hub_client_properties_next_empty_succeed(void** state)
@@ -962,7 +962,7 @@ static void test_az_iot_hub_client_properties_next_empty_succeed(void** state)
 
   az_pair pair_out;
 
-  assert_int_equal(az_iot_hub_client_properties_next(&props, &pair_out), AZ_ERROR_EOF);
+  assert_int_equal(az_iot_hub_client_properties_next(&props, &pair_out), AZ_ERROR_UNEXPECTED_END);
 }
 
 int test_iot_hub_client()

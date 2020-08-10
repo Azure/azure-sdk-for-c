@@ -53,7 +53,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_code_to_result(CURLcode code)
 
     default:
       // let any other error code be an HTTP PAL ERROR
-      return AZ_ERROR_HTTP_PLATFORM;
+      return AZ_ERROR_HTTP_ADAPTER;
   }
 }
 
@@ -112,7 +112,7 @@ _az_http_client_curl_slist_append(struct curl_slist** ref_list, char const* str)
   {
     // free any previous allocates custom headers
     curl_slist_free_all(*ref_list);
-    return AZ_ERROR_HTTP_PLATFORM;
+    return AZ_ERROR_HTTP_ADAPTER;
   }
 
   *ref_list = new_list;
@@ -233,9 +233,13 @@ _az_http_client_curl_build_headers(az_http_request const* request, struct curl_s
 static AZ_NODISCARD az_result
 _az_http_client_curl_append_url(az_span writable_buffer, az_span url_from_request)
 {
+  /*
+  TODO: url-encode query parameters only. Not all the url
   int32_t length;
   AZ_RETURN_IF_FAILED(_az_span_url_encode(writable_buffer, url_from_request, &length));
-  az_span remainder = az_span_slice_to_end(writable_buffer, length);
+   */
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(writable_buffer, az_span_size(url_from_request) + 1);
+  az_span remainder = az_span_copy(writable_buffer, url_from_request);
   az_span_copy_u8(remainder, 0);
 
   return AZ_OK;
@@ -465,7 +469,9 @@ _az_http_client_curl_setup_url(CURL* ref_curl, az_http_request const* request)
   az_span request_url = { 0 };
   // get request_url. It will have the size of what it has written in it only
   AZ_RETURN_IF_FAILED(az_http_request_get_url(request, &request_url));
-  int32_t request_url_size = _az_span_url_encode_calc_length(request_url);
+  // TODO: url-encode, encode only query parameters.
+  // int32_t request_url_size = _az_span_url_encode_calc_length(request_url);
+  int32_t request_url_size = az_span_size(request_url);
 
   az_span writable_buffer;
   {

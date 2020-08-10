@@ -89,7 +89,7 @@ az_context_create_with_value(az_context const* parent, void const* key, void con
  * @brief Cancels the specified #az_context node; this cancels all the child nodes as well.
  *
  * @param[in] context A pointer to the #az_context node to be canceled; passing `NULL` cancels the
- * root #az_context_app.
+ * root #az_context.
  */
 AZ_INLINE void az_context_cancel(az_context* context)
 {

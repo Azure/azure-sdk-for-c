@@ -276,7 +276,7 @@ az_iot_hub_client_properties_next(az_iot_hub_client_properties* properties, az_p
   if (index == prop_length)
   {
     *out = AZ_PAIR_NULL;
-    return AZ_ERROR_EOF;
+    return AZ_ERROR_UNEXPECTED_END;
   }
 
   az_span remainder;
