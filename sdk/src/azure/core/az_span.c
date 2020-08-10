@@ -854,7 +854,7 @@ AZ_NODISCARD az_result _az_is_expected_span(az_span* ref_span, az_span expected)
   // EOF because ref_span is smaller than the expected span
   if (expected_size > az_span_size(*ref_span))
   {
-    return AZ_ERROR_EOF;
+    return AZ_ERROR_UNEXPECTED_END;
   }
 
   actual_span = az_span_slice(*ref_span, 0, expected_size);

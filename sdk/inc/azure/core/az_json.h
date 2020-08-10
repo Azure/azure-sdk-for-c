@@ -609,7 +609,7 @@ AZ_NODISCARD az_result az_json_reader_chunked_init(
  * @param json_reader A pointer to an #az_json_reader instance containing the JSON to read.
  *
  * @return AZ_OK if the token was read successfully.<br>
- *         AZ_ERROR_EOF when the end of the JSON document is reached.<br>
+ *         AZ_ERROR_UNEXPECTED_END when the end of the JSON document is reached.<br>
  *         AZ_ERROR_UNEXPECTED_CHAR when an invalid character is detected.
  */
 AZ_NODISCARD az_result az_json_reader_next_token(az_json_reader* json_reader);
@@ -620,7 +620,7 @@ AZ_NODISCARD az_result az_json_reader_next_token(az_json_reader* json_reader);
  * @param json_reader A pointer to an #az_json_reader instance containing the JSON to read.
  *
  * @return AZ_OK if the children of the current JSON token are skipped successfully.<br>
- *         AZ_ERROR_EOF when the end of the JSON document is reached.<br>
+ *         AZ_ERROR_UNEXPECTED_END when the end of the JSON document is reached.<br>
  *         AZ_ERROR_UNEXPECTED_CHAR when an invalid character is detected.
  *
  * @remarks If the current token kind is a property name, the reader first moves to the property
