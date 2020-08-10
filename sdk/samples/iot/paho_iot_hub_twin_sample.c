@@ -93,7 +93,7 @@ static char reported_property_topic[128];
 static az_span reported_property_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("reported_prop");
 static az_span reported_property_name = AZ_SPAN_LITERAL_FROM_STR("device_count");
 static int32_t reported_property_value = 0;
-static char reported_property_buffer[64];
+static char reported_property_buffer[128];
 static az_span version_name = AZ_SPAN_LITERAL_FROM_STR("$version");
 
 static az_iot_hub_client client;
