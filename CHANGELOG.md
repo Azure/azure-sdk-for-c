@@ -45,6 +45,7 @@
 
 - Remove support for non-finite double values while parsing/formatting.
 - Use custom, portable implementation of IEEE 754 compliant `isfinite()` since some embedded platforms don't have it.
+- Limit use of `sscanf` only to double parsing, using a custom implementation for {u}int{32|64} parsing because of incompatibility with `sscanf` format and the `GCC newlib-nano` implementation.
 
 ### Other Changes and Improvements
 
