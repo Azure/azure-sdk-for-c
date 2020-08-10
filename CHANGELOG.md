@@ -6,6 +6,7 @@
 
 - Support for writing JSON to non-contiguous buffers.
 - Support for reading JSON from non-contiguous buffers.
+- Add support for national cloud auth URLs.
 
 ### Breaking Changes
 
@@ -27,14 +28,25 @@
   - `AZ_HTTP_REQUEST_URL_BUF_SIZE` renamed to `AZ_HTTP_REQUEST_URL_BUFFER_SIZE`.
   - `AZ_HTTP_REQUEST_BODY_BUF_SIZE` renamed to `AZ_HTTP_REQUEST_BODY_BUFFER_SIZE`.
   - `AZ_LOG_MSG_BUF_SIZE` renamed to `AZ_LOG_MESSAGE_BUFFER_SIZE`.
-- `az_result.h`:
+- `az_result`:
   - `AZ_ERROR_HTTP_PLATFORM` renamed to `AZ_ERROR_HTTP_ADAPTER`.
   - `AZ_ERROR_EOF` renamed to `AZ_ERROR_UNEXPECTED_END`.
   - Removed `AZ_CONTINUE`.
+- `az_storage_blobs_blob_client`:
+  - `retry` field renamed to `retry_options` in `az_storage_blobs_blob_client_options`.
+  - Moved `az_context* context` parameter from `az_storage_blobs_blob_upload` into a public field on `az_storage_blobs_blob_upload_options`.
+- `az_json_writer`:
+  - `az_json_writer_get_json()` is renamed to `az_json_writer_get_bytes_used_in_destination()`.
 
 ### Bug Fixes
 
+- Remove support for non-finite double values while parsing/formatting.
+- Use custom, portable implementation of IEEE 754 compliant `isfinite()` since some embedded platforms don't have it.
+
 ### Other Changes and Improvements
+
+- Made `az_http_request` and related APIs to get URL, body, and headers, public.
+- Add and update IoT samples, including DPS.
 
 ## 1.0.0-preview.3 (2020-07-20)
 
