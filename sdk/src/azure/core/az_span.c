@@ -873,16 +873,18 @@ AZ_NODISCARD az_result _az_is_expected_span(az_span* ref_span, az_span expected)
 AZ_NODISCARD az_result
 _az_span_scan_until(az_span span, _az_predicate predicate, int32_t* out_index)
 {
-  for (int32_t index = 0; index < az_span_size(span); ++index)
+  int32_t size = az_span_size(span);
+  uint8_t* ptr = az_span_ptr(span);
+  for (int32_t index = 0; index < size; ++index)
   {
-    az_span s = az_span_slice_to_end(span, index);
-    if (predicate(s))
+    uint8_t next_byte = ptr[index];
+    if (predicate(next_byte))
     {
       *out_index = index;
       return AZ_OK;
     }
   }
-  *out_index = az_span_size(span);
+  *out_index = size;
   return AZ_ERROR_ITEM_NOT_FOUND;
 }
 

@@ -14,12 +14,12 @@
 
 // HTTP Response utility functions
 
-AZ_NODISCARD AZ_INLINE bool _az_is_char(az_span slice, uint8_t c)
+AZ_NODISCARD AZ_INLINE bool _az_is_char(uint8_t actual, uint8_t expected)
 {
-  return az_span_ptr(slice)[0] == c;
+  return actual == expected;
 }
 
-static AZ_NODISCARD bool _az_is_new_line(az_span slice) { return _az_is_char(slice, '\n'); }
+static AZ_NODISCARD bool _az_is_new_line(uint8_t next_byte) { return _az_is_char(next_byte, '\n'); }
 
 static AZ_NODISCARD bool _az_is_http_whitespace(uint8_t c)
 {
@@ -34,9 +34,9 @@ static AZ_NODISCARD bool _az_is_http_whitespace(uint8_t c)
   }
 }
 
-static AZ_NODISCARD bool _az_slice_is_not_http_whitespace(az_span slice)
+static AZ_NODISCARD bool _az_slice_is_not_http_whitespace(uint8_t c)
 {
-  return _az_is_http_whitespace(az_span_ptr(slice)[0]) != true;
+  return !_az_is_http_whitespace(c);
 }
 
 /* PRIVATE Function. parse next  */
