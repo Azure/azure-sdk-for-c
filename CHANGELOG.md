@@ -1,6 +1,6 @@
 # Release History
 
-## 1.0.0-preview.4 (Unreleased)
+## 1.0.0-preview.4 (2020-08-10)
 
 - API breaking changes:
   - `az_span.h`:
