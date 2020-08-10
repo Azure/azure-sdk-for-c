@@ -299,7 +299,7 @@ created resource group.
 An optional cleanup process can delete resource groups whose "DeleteAfter"
 timestamp is less than the current time.
 
-This issued for CI automation.
+This is used for CI automation.
 
 ```yaml
 Type: Int32
