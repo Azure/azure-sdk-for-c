@@ -71,7 +71,6 @@ typedef enum
 {
   // Core: Success results
   AZ_OK = _az_RESULT_MAKE_SUCCESS(_az_FACILITY_CORE, 0), ///< Success.
-  AZ_CONTINUE = _az_RESULT_MAKE_SUCCESS(_az_FACILITY_CORE, 1),
 
   // Core: Error results
   AZ_ERROR_CANCELED = _az_RESULT_MAKE_ERROR(
@@ -95,7 +94,8 @@ typedef enum
   AZ_ERROR_UNEXPECTED_CHAR
   = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 5), ///< Input can't be successfully parsed.
 
-  AZ_ERROR_UNEXPECTED_END = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 6), ///< Unexpected end of the input data.
+  AZ_ERROR_UNEXPECTED_END
+  = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 6), ///< Unexpected end of the input data.
 
   AZ_ERROR_NOT_SUPPORTED = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 7),
 
