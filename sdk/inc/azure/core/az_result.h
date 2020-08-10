@@ -60,13 +60,17 @@ enum
     } \
   } while (0)
 
-///
-/// The type represents success and error conditions.
-/// Bits:
-/// - 31 Severity (0 - success, 1 - failure).
-/// - 16..30 Facility.
-/// - 0..15 Code.
-///
+/**
+ *
+ * @brief The type represents success and error conditions.
+ *
+ */
+/*
+  Bits:
+    - 31 Severity (0 - success, 1 - failure).
+    - 16..30 Facility.
+    - 0..15 Code.
+*/
 typedef enum
 {
   // Core: Success results
@@ -95,7 +99,8 @@ typedef enum
   AZ_ERROR_UNEXPECTED_CHAR
   = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 5), ///< Input can't be successfully parsed.
 
-  AZ_ERROR_UNEXPECTED_END = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 6), ///< Unexpected end of the input data.
+  AZ_ERROR_UNEXPECTED_END
+  = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 6), ///< Unexpected end of the input data.
 
   AZ_ERROR_NOT_SUPPORTED = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 7),
 
