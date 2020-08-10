@@ -876,17 +876,13 @@ _az_span_scan_until(az_span span, _az_predicate predicate, int32_t* out_index)
   for (int32_t index = 0; index < az_span_size(span); ++index)
   {
     az_span s = az_span_slice_to_end(span, index);
-    bool predicate_result = predicate(s);
-    if (predicate_result)
+    if (predicate(s))
     {
       *out_index = index;
       return AZ_OK;
     }
-    else
-    {
-      continue;
-    }
   }
+  *out_index = az_span_size(span);
   return AZ_ERROR_ITEM_NOT_FOUND;
 }
 
