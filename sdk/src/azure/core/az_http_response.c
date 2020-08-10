@@ -130,7 +130,7 @@ AZ_NODISCARD az_result az_http_response_get_status_line(
   _az_PRECONDITION_NOT_NULL(ref_response);
   _az_PRECONDITION_NOT_NULL(out_status_line);
 
-  // Restart parser to the beggining
+  // Restart parser to the beginning
   ref_response->_internal.parser.remaining = ref_response->_internal.http_response;
 
   // read an HTTP status line.

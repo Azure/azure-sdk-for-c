@@ -131,7 +131,7 @@ AZ_NODISCARD static az_result _az_json_reader_get_next_buffer(
   // If we only had one buffer, or we ran out of the set of discontiguous buffers, return error.
   if (json_reader->_internal.buffer_index >= json_reader->_internal.number_of_buffers - 1)
   {
-    return AZ_ERROR_EOF;
+    return AZ_ERROR_UNEXPECTED_END;
   }
 
   if (!skip_whitespace && json_reader->token._internal.start_buffer_index == -1)
@@ -151,7 +151,7 @@ AZ_NODISCARD static az_result _az_json_reader_get_next_buffer(
   // Found an empty segment in the json_buffers array, which isn't allowed.
   if (az_span_size(place_holder) < 1)
   {
-    return AZ_ERROR_EOF;
+    return AZ_ERROR_UNEXPECTED_END;
   }
 
   *remaining = place_holder;
@@ -365,7 +365,7 @@ AZ_NODISCARD static az_result _az_json_reader_process_property_name(az_json_read
   // either reached end of data or some other character, which is invalid.
   if (az_span_size(json) < 1)
   {
-    return AZ_ERROR_EOF;
+    return AZ_ERROR_UNEXPECTED_END;
   }
   if (az_span_ptr(json)[0] != ':')
   {
@@ -465,7 +465,7 @@ AZ_NODISCARD static az_result _az_json_reader_update_number_state_if_single_valu
 {
   if (json_reader->_internal.is_complex_json)
   {
-    return AZ_ERROR_EOF;
+    return AZ_ERROR_UNEXPECTED_END;
   }
 
   _az_json_reader_update_state(
@@ -809,7 +809,7 @@ AZ_NODISCARD static az_result _az_json_reader_process_next_byte(
     // Expected start of a property name or value, but instead reached end of data.
     if (az_span_size(json) < 1)
     {
-      return AZ_ERROR_EOF;
+      return AZ_ERROR_UNEXPECTED_END;
     }
 
     next_byte = az_span_ptr(json)[0];
@@ -854,7 +854,7 @@ AZ_NODISCARD az_result az_json_reader_next_token(az_json_reader* json_reader)
     if (json_reader->token.kind == AZ_JSON_TOKEN_NONE)
     {
       // An empty JSON payload is invalid.
-      return AZ_ERROR_EOF;
+      return AZ_ERROR_UNEXPECTED_END;
     }
     else
     {

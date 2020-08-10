@@ -824,7 +824,7 @@ static void test_json_reader(void** state)
   {
     az_json_reader reader = { 0 };
     TEST_EXPECT_SUCCESS(az_json_reader_init(&reader, AZ_SPAN_FROM_STR("    "), NULL));
-    assert_true(az_json_reader_next_token(&reader) == AZ_ERROR_EOF);
+    assert_true(az_json_reader_next_token(&reader) == AZ_ERROR_UNEXPECTED_END);
     test_json_token_helper(reader.token, AZ_JSON_TOKEN_NONE, AZ_SPAN_NULL);
   }
   {
@@ -836,7 +836,7 @@ static void test_json_reader(void** state)
   {
     az_json_reader reader = { 0 };
     TEST_EXPECT_SUCCESS(az_json_reader_init(&reader, AZ_SPAN_FROM_STR("  nul"), NULL));
-    assert_true(az_json_reader_next_token(&reader) == AZ_ERROR_EOF);
+    assert_true(az_json_reader_next_token(&reader) == AZ_ERROR_UNEXPECTED_END);
     test_json_token_helper(reader.token, AZ_JSON_TOKEN_NONE, AZ_SPAN_NULL);
   }
   {

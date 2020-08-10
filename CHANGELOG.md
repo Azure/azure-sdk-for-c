@@ -1,6 +1,5 @@
 # Release History
 
-
 ## 1.0.0-preview.4 (Unreleased)
 
 ### New Features
@@ -29,8 +28,9 @@
   - `AZ_HTTP_REQUEST_BODY_BUF_SIZE` renamed to `AZ_HTTP_REQUEST_BODY_BUFFER_SIZE`.
   - `AZ_LOG_MSG_BUF_SIZE` renamed to `AZ_LOG_MESSAGE_BUFFER_SIZE`.
 - `az_result.h`:
-  - `AZ_ERROR_EOF` renamed to `AZ_ERROR_UNEXPECTED_END`
-  - Removed `AZ_CONTINUE`
+  - `AZ_ERROR_HTTP_PLATFORM` renamed to `AZ_ERROR_HTTP_ADAPTER`.
+  - `AZ_ERROR_EOF` renamed to `AZ_ERROR_UNEXPECTED_END`.
+  - Removed `AZ_CONTINUE`.
 
 ### Bug Fixes
 
@@ -56,8 +56,10 @@
 - Default behavior for failed preconditions changed to infinite loop instead of thread sleep.
 
 ## 1.0.0-preview.2 (2020-05-18)
+
 - Update top-level CMakeLists.txt to only add subdirectory for specified platform.
 - Add compilation option to remove all logging from SDK code.
 
 ## 1.0.0-preview.1 (2020-05-12)
+
 Initial release. Please see the [README](https://github.com/Azure/azure-sdk-for-c/blob/master/README.md) for more information.

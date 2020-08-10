@@ -53,7 +53,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_code_to_result(CURLcode code)
 
     default:
       // let any other error code be an HTTP PAL ERROR
-      return AZ_ERROR_HTTP_PLATFORM;
+      return AZ_ERROR_HTTP_ADAPTER;
   }
 }
 
@@ -112,7 +112,7 @@ _az_http_client_curl_slist_append(struct curl_slist** ref_list, char const* str)
   {
     // free any previous allocates custom headers
     curl_slist_free_all(*ref_list);
-    return AZ_ERROR_HTTP_PLATFORM;
+    return AZ_ERROR_HTTP_ADAPTER;
   }
 
   *ref_list = new_list;

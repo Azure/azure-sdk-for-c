@@ -26,7 +26,7 @@
 <div id="collapsible-{{id}}" class="collapse in">
 <div class="markdown level1 summary">{{{summary}}}</div>
 <div class="markdown level1 conceptual">{{{conceptual}}}</div>
-<h5 class="decalaration">{{__global.declaration}}</h5>
+<h5 class="declaration">{{__global.declaration}}</h5>
 
 {{#syntax}}
 <div class="codewrapper">
