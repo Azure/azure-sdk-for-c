@@ -47,6 +47,7 @@
 
 - Made `az_http_request` and related APIs to get URL, body, and headers, public.
 - Add and update IoT samples, including DPS.
+- Add samples for IoT Hub Plug and Play.
 
 ## 1.0.0-preview.3 (2020-07-20)
 
