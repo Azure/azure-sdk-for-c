@@ -75,7 +75,6 @@ typedef enum
 {
   // Core: Success results
   AZ_OK = _az_RESULT_MAKE_SUCCESS(_az_FACILITY_CORE, 0), ///< Success.
-  AZ_CONTINUE = _az_RESULT_MAKE_SUCCESS(_az_FACILITY_CORE, 1),
 
   // Core: Error results
   AZ_ERROR_CANCELED = _az_RESULT_MAKE_ERROR(

@@ -15,9 +15,9 @@
 
 #include <azure/core/_az_cfg.h>
 
-static AZ_NODISCARD az_result _az_is_question_mark(az_span slice)
+static AZ_NODISCARD bool _az_is_question_mark(az_span slice)
 {
-  return az_span_ptr(slice)[0] == '?' ? AZ_OK : AZ_CONTINUE;
+  return az_span_ptr(slice)[0] == '?';
 }
 
 AZ_NODISCARD az_result az_http_request_init(

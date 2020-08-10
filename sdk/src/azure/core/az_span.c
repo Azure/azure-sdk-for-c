@@ -389,9 +389,8 @@ AZ_NODISCARD az_result az_span_atod(az_span source, double* out_number)
   int32_t n = sscanf((char*)source_ptr, format, out_number, &chars_consumed);
 
   // Success if the entire source was consumed by sscanf and it set the out_number argument.
-  return (size == chars_consumed && n == 1 && _az_isfinite(*out_number))
-      ? AZ_OK
-      : AZ_ERROR_UNEXPECTED_CHAR;
+  return (size == chars_consumed && n == 1 && _az_isfinite(*out_number)) ? AZ_OK
+                                                                         : AZ_ERROR_UNEXPECTED_CHAR;
 }
 
 #ifdef _MSC_VER
@@ -877,22 +876,15 @@ _az_span_scan_until(az_span span, _az_predicate predicate, int32_t* out_index)
   for (int32_t index = 0; index < az_span_size(span); ++index)
   {
     az_span s = az_span_slice_to_end(span, index);
-    az_result predicate_result = predicate(s);
-    switch (predicate_result)
+    bool predicate_result = predicate(s);
+    if (predicate_result)
     {
-      case AZ_OK:
-      {
-        *out_index = index;
-        return AZ_OK;
-      }
-      case AZ_CONTINUE:
-      {
-        break;
-      }
-      default:
-      {
-        return predicate_result;
-      }
+      *out_index = index;
+      return AZ_OK;
+    }
+    else
+    {
+      continue;
     }
   }
   return AZ_ERROR_ITEM_NOT_FOUND;
