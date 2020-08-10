@@ -60,17 +60,53 @@ typedef struct
 /**
  * @brief Represents a JSON token. The kind field indicates the type of the JSON token and the slice
  * represents the portion of the JSON payload that points to the token value.
+ *
+ * @remarks An instance of #az_json_token must not outlive the lifetime of the #az_json_reader it
+ * came from.
  */
 typedef struct
 {
-  az_json_token_kind kind;
-  az_span slice;
+  az_json_token_kind kind; ///< This read-only field gives access to the type of the token returned
+                           ///< by the #az_json_reader, and it shouldn't be modified by the caller.
+  az_span slice; ///< This read-only field gives access to the slice of the JSON text that
+                 ///< represents the token value, and it shouldn't be modified by the caller.
+                 ///< If the token straddles non-contiguous buffers, this is set to #AZ_SPAN_NULL.
+                 ///< The user can call #az_json_token_copy_into_span() to get the token value into
+                 ///< a contiguous buffer.
+                 ///< In the case of JSON strings, the slice does not include the surrounding
+                 ///< quotes.
+  int32_t size; ///< This read-only field gives access to the size of the JSON text slice that
+                ///< represents the token value, and it shouldn't be modified by the caller. This is
+                ///< useful of the token straddles non-contiguous buffers, to figure out what sized
+                ///< destination buffer to provide when calling #az_json_token_copy_into_span().
 
   struct
   {
     bool string_has_escaped_chars;
+    az_span* pointer_to_first_buffer;
+    int32_t start_buffer_index;
+    int32_t start_buffer_offset;
+    int32_t end_buffer_index;
+    int32_t end_buffer_offset;
   } _internal;
 } az_json_token;
+
+// TODO: Should the parameters be reversed?
+/**
+ * @brief Copies the content of the \p token #az_json_token to the \p destination #az_span.
+ *
+ * @param[in] json_token A pointer to an #az_json_token instance containing the JSON text to copy to
+ * the destination.
+ * @param[in] destination The #az_span whose bytes will be replaced by the JSON text from the \p
+ * token.
+ * @return An #az_span that is a slice of the \p destination #az_span (i.e. the remainder) after the
+ * token bytes have been copied.
+ *
+ * @remarks The method assumes that the \p destination has a large enough size to hold the contents
+ * of \p token.
+ * @remarks If \p token doesn't contain any text, this function will just return \p destination.
+ */
+az_span az_json_token_copy_into_span(az_json_token const* json_token, az_span destination);
 
 /**
  * @brief Returns the JSON token's boolean.
@@ -497,14 +533,18 @@ AZ_NODISCARD AZ_INLINE az_json_reader_options az_json_reader_options_default()
  */
 typedef struct
 {
-  az_json_token
-      token; ///< This read-only field gives access to the current token that the #az_json_reader
-             ///< has processed, and it shouldn't be modified by the caller.
+  az_json_token token; ///< This read-only field gives access to the current token that the
+                       ///< #az_json_reader has processed, and it shouldn't be modified by the
+                       ///< caller.
 
   struct
   {
     az_span json_buffer;
+    az_span* json_buffers;
+    int32_t number_of_buffers;
+    int32_t buffer_index;
     int32_t bytes_consumed;
+    int32_t total_bytes_consumed;
     bool is_complex_json;
     _az_json_bit_stack bit_stack;
     az_json_reader_options options;
@@ -522,12 +562,45 @@ typedef struct
  * will use the default options (i.e. #az_json_reader_options_default()).
  *
  * @return An #az_result value indicating the result of the operation:
- *         - #AZ_OK if the az_json_reader is initialized successfully
- *         - #AZ_ERROR_EOF if the provided json buffer is empty
+ *         - #AZ_OK if the #az_json_reader is initialized successfully
+ *
+ * @remarks The provided json buffer must not be empty, as that is invalid JSON.
+ *
+ * @remarks An instance of #az_json_reader must not outlive the lifetime of the JSON payload within
+ * the \p json_buffer.
  */
 AZ_NODISCARD az_result az_json_reader_init(
     az_json_reader* json_reader,
     az_span json_buffer,
+    az_json_reader_options const* options);
+
+/**
+ * @brief Initializes an #az_json_reader to read the JSON payload contained within the provided
+ * set of discontiguous buffers.
+ *
+ * @param[out] json_reader A pointer to an #az_json_reader instance to initialize.
+ * @param[in] json_buffers An array of non-contiguous byte buffers, as spans, containing the JSON
+ * text to read.
+ * @param[in] number_of_buffers The number of buffer segments provided, i.e. the length of the \p
+ * json_buffers array.
+ * @param[in] options __[nullable]__ A reference to an #az_json_reader_options
+ * structure which defines custom behavior of the #az_json_reader. If `NULL` is passed, the reader
+ * will use the default options (i.e. #az_json_reader_options_default()).
+ *
+ * @return An #az_result value indicating the result of the operation:
+ *         - #AZ_OK if the #az_json_reader is initialized successfully
+ *
+ * @remarks The provided array of json buffers must not be empty, as that is invalid JSON, and
+ * therefore \p number_of_buffers must also be greater than 0. The array must also not contain any
+ * empty span segments.
+ *
+ * @remarks An instance of #az_json_reader must not outlive the lifetime of the JSON payload within
+ * the \p json_buffers.
+ */
+AZ_NODISCARD az_result az_json_reader_chunked_init(
+    az_json_reader* json_reader,
+    az_span json_buffers[],
+    int32_t number_of_buffers,
     az_json_reader_options const* options);
 
 /**
@@ -536,7 +609,7 @@ AZ_NODISCARD az_result az_json_reader_init(
  * @param json_reader A pointer to an #az_json_reader instance containing the JSON to read.
  *
  * @return AZ_OK if the token was read successfully.<br>
- *         AZ_ERROR_EOF when the end of the JSON document is reached.<br>
+ *         AZ_ERROR_UNEXPECTED_END when the end of the JSON document is reached.<br>
  *         AZ_ERROR_UNEXPECTED_CHAR when an invalid character is detected.
  */
 AZ_NODISCARD az_result az_json_reader_next_token(az_json_reader* json_reader);
@@ -547,7 +620,7 @@ AZ_NODISCARD az_result az_json_reader_next_token(az_json_reader* json_reader);
  * @param json_reader A pointer to an #az_json_reader instance containing the JSON to read.
  *
  * @return AZ_OK if the children of the current JSON token are skipped successfully.<br>
- *         AZ_ERROR_EOF when the end of the JSON document is reached.<br>
+ *         AZ_ERROR_UNEXPECTED_END when the end of the JSON document is reached.<br>
  *         AZ_ERROR_UNEXPECTED_CHAR when an invalid character is detected.
  *
  * @remarks If the current token kind is a property name, the reader first moves to the property

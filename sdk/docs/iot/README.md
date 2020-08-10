@@ -52,15 +52,15 @@ The library targets made available via CMake are the following:
 
 ### Samples
 
-[This page](../../../sdk/samples/iot/readme.md) explains samples for the Azure Embedded C SDK IoT Hub Client and the Provisioning Clients and how to use them.
+[This page](../../../sdk/samples/iot/README.md) explains samples for the Azure Embedded C SDK IoT Hub Client and the Provisioning Clients and how to use them.
 
  For step-by-step guides starting from scratch, you may refer to these documents:
 
-- Linux: [How to Setup and Run Azure SDK for Embedded C IoT Hub Samples on Linux](../../../sdk/samples/iot/hub/linux/how_to_iot_hub_samples_linux.md)
+- Linux: [How to Setup and Run Azure SDK for Embedded C IoT Hub Samples on Linux](../../../sdk/samples/iot/docs/how_to_iot_hub_samples_linux.md)
 
-- Windows: [How to Setup and Run Azure SDK for Embedded C IoT Hub Samples on Microsoft Windows](../../../sdk/samples/iot/hub/windows/how_to_iot_hub_samples_windows.md).
+- Windows: [How to Setup and Run Azure SDK for Embedded C IoT Hub Samples on Microsoft Windows](../../../sdk/samples/iot/docs/how_to_iot_hub_samples_windows.md).
 
-- ESP8266: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Esp8266 NodeMCU](../../../sdk/samples/iot/hub/aziot_esp8266/how_to_esp8266_nodemcu.md)
+- ESP8266: [How to Setup and Run Azure SDK for Embedded C IoT Hub Client on Esp8266 NodeMCU](../../../sdk/samples/iot/docs/how_to_iot_hub_esp8266_nodemcu.md)
 
   **Note**: While Windows and Linux devices are not likely to be considered as constrained ones, these samples were created to make it simpler to test the Azure SDK for Embedded C libraries, even without a real device.
 
