@@ -16,7 +16,6 @@
 - `az_span.h`:
   - `az_span_init()` is renamed to `az_span_create()`.
   - `az_span_from_str()` is renamed to `az_span_create_from_str()`.
-  - `az_allocator_context` is renamed to `az_span_allocator_context`.
   - Removed `az_pair_from_str()`.
 - `az_context`:
   - `key` and `value` are `const`.
@@ -37,7 +36,7 @@
   - Removed `AZ_CONTINUE`.
 - `az_storage_blobs_blob_client`:
   - `retry` field renamed to `retry_options` in `az_storage_blobs_blob_client_options`.
-  - Moved `az_context* context` parameter from `az_storage_blobs_blob_upload` into a public field on `az_storage_blobs_blob_upload_options`.
+  - Moved `az_context* context` parameter from `az_storage_blobs_blob_upload()` into a public field on `az_storage_blobs_blob_upload_options`.
 - `az_json_writer`:
   - `az_json_writer_get_json()` is renamed to `az_json_writer_get_bytes_used_in_destination()`.
 
