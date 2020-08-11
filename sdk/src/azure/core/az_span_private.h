@@ -65,7 +65,7 @@ AZ_NODISCARD az_result _az_span_replace(
     int32_t end,
     az_span replacement);
 
-typedef bool (*_az_predicate)(az_span slice);
+typedef bool (*_az_predicate)(uint8_t next_byte);
 
 // PRIVATE. read until condition is true on character.
 // Then return number of positions read with output parameter
