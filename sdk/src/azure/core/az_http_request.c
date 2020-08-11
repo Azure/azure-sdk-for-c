@@ -15,8 +15,6 @@
 
 #include <azure/core/_az_cfg.h>
 
-static AZ_NODISCARD bool _az_is_question_mark(uint8_t ch) { return ch == '?'; }
-
 AZ_NODISCARD az_result az_http_request_init(
     az_http_request* out_request,
     az_context* context,
@@ -32,8 +30,15 @@ AZ_NODISCARD az_result az_http_request_init(
   _az_PRECONDITION_VALID_SPAN(headers_buffer, 0, false);
 
   int32_t query_start = 0;
-  az_result url_with_query = _az_span_scan_until(
-      az_span_create(az_span_ptr(url), url_length), _az_is_question_mark, &query_start);
+  uint8_t* ptr = az_span_ptr(url);
+  for (; query_start < url_length; ++query_start)
+  {
+    uint8_t next_byte = ptr[query_start];
+    if (next_byte == '?')
+    {
+      break;
+    }
+  }
 
   *out_request
       = (az_http_request){ ._internal = {
@@ -44,8 +49,7 @@ AZ_NODISCARD az_result az_http_request_init(
                                /* query start is set to 0 if there is not a question mark so the
                                   next time query parameter is appended, a question mark will be
                                   added at url length. (+1 jumps the `?`) */
-                               .query_start
-                               = url_with_query == AZ_ERROR_ITEM_NOT_FOUND ? 0 : query_start + 1,
+                               .query_start = query_start == url_length ? 0 : query_start + 1,
                                .headers = headers_buffer,
                                .headers_length = 0,
                                .max_headers

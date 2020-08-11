@@ -14,13 +14,6 @@
 
 // HTTP Response utility functions
 
-AZ_NODISCARD AZ_INLINE bool _az_is_char(uint8_t actual, uint8_t expected)
-{
-  return actual == expected;
-}
-
-static AZ_NODISCARD bool _az_is_new_line(uint8_t next_byte) { return _az_is_char(next_byte, '\n'); }
-
 static AZ_NODISCARD bool _az_is_http_whitespace(uint8_t c)
 {
   switch (c)
@@ -32,11 +25,6 @@ static AZ_NODISCARD bool _az_is_http_whitespace(uint8_t c)
     default:
       return false;
   }
-}
-
-static AZ_NODISCARD bool _az_slice_is_not_http_whitespace(uint8_t c)
-{
-  return !_az_is_http_whitespace(c);
 }
 
 /* PRIVATE Function. parse next  */
@@ -91,12 +79,26 @@ _az_get_http_status_line(az_span* ref_span, az_http_response_status_line* out_st
 
   // SP
   AZ_RETURN_IF_FAILED(_az_is_expected_span(ref_span, space));
+
   // get a pointer to read response until end of reason-phrase is found
   // reason-phrase = *(HTAB / SP / VCHAR / obs-text)
   // HTAB = "\t"
   // VCHAR or obs-text is %x21-FF,
   int32_t offset = 0;
-  AZ_RETURN_IF_FAILED(_az_span_scan_until(*ref_span, _az_is_new_line, &offset));
+  int32_t input_size = az_span_size(*ref_span);
+  uint8_t* ptr = az_span_ptr(*ref_span);
+  for (; offset < input_size; ++offset)
+  {
+    uint8_t next_byte = ptr[offset];
+    if (next_byte == '\n')
+    {
+      break;
+    }
+  }
+  if (offset == input_size)
+  {
+    return AZ_ERROR_ITEM_NOT_FOUND;
+  }
 
   // save reason-phrase in status line now that we got the offset. Remove 1 last chars(\r)
   out_status_line->reason_phrase = az_span_slice(*ref_span, 0, offset - 1);
@@ -164,18 +166,18 @@ az_http_response_get_next_header(az_http_response* ref_response, az_pair* out_he
   // header-field   = field-name ":" OWS field-value OWS
   // field-name     = token
   {
-    int32_t field_name_length = 0;
     // https://tools.ietf.org/html/rfc7230#section-3.2.6
     // token = 1*tchar
     // tchar = "!" / "#" / "$" / "%" / "&" / "'" / "*" / "+" / "-" / "." / "^" /
     //         "_" / "`" / "|" / "~" / DIGIT / ALPHA;
     // any VCHAR,
     //    except delimiters
-
+    int32_t field_name_length = 0;
     int32_t input_size = az_span_size(*reader);
+    uint8_t* ptr = az_span_ptr(*reader);
     for (; field_name_length < input_size; ++field_name_length)
     {
-      uint8_t next_byte = az_span_ptr(*reader)[field_name_length];
+      uint8_t next_byte = ptr[field_name_length];
       if (next_byte == ':')
       {
         break;
@@ -185,7 +187,6 @@ az_http_response_get_next_header(az_http_response* ref_response, az_pair* out_he
         return AZ_ERROR_HTTP_CORRUPT_RESPONSE_HEADER;
       }
     }
-
     if (field_name_length == input_size)
     {
       return AZ_ERROR_ITEM_NOT_FOUND;
@@ -202,7 +203,21 @@ az_http_response_get_next_header(az_http_response* ref_response, az_pair* out_he
 
     // OWS -> remove the optional whitespace characters before header value
     int32_t ows_len = 0;
-    AZ_RETURN_IF_FAILED(_az_span_scan_until(*reader, _az_slice_is_not_http_whitespace, &ows_len));
+    input_size = az_span_size(*reader);
+    ptr = az_span_ptr(*reader);
+    for (; ows_len < input_size; ++ows_len)
+    {
+      uint8_t next_byte = ptr[ows_len];
+      if (next_byte != ' ' && next_byte != '\t')
+      {
+        break;
+      }
+    }
+    if (ows_len == input_size)
+    {
+      return AZ_ERROR_ITEM_NOT_FOUND;
+    }
+
     *reader = az_span_slice_to_end(*reader, ows_len);
   }
   // field-value    = *( field-content / obs-fold )
