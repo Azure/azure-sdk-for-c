@@ -14,7 +14,7 @@ static const az_span twin_patch_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("rep
 static const az_span version_name = AZ_SPAN_LITERAL_FROM_STR("$version");
 static az_span reported_property_name = AZ_SPAN_LITERAL_FROM_STR("device_count");
 static int32_t reported_property_value = 0;
-static char reported_property_buffer[64];
+static char reported_property_buffer[128];
 
 static sample_environment_variables env_vars;
 static az_iot_hub_client hub_client;
@@ -142,8 +142,6 @@ void create_and_configure_client()
     LOG_ERROR("Failed to create MQTT client: MQTTClient return code %d.", rc);
     exit(rc);
   }
-
-  return;
 }
 
 void connect_client_to_iot_hub()
@@ -185,8 +183,6 @@ void connect_client_to_iot_hub()
         rc);
     exit(rc);
   }
-
-  return;
 }
 
 void subscribe_client_to_iot_hub_topics()
@@ -208,8 +204,6 @@ void subscribe_client_to_iot_hub_topics()
     LOG_ERROR("Failed to subscribe to the Twin Response topic: MQTTClient return code %d.", rc);
     exit(rc);
   }
-
-  return;
 }
 
 void get_twin_document()
@@ -242,8 +236,6 @@ void get_twin_document()
 
   // Receive the twin document message from the server.
   receive_message();
-
-  return;
 }
 
 void send_reported_property()
@@ -293,8 +285,6 @@ void send_reported_property()
 
   // Receive the server resonse.
   receive_message();
-
-  return;
 }
 
 void receive_desired_property()
@@ -305,8 +295,6 @@ void receive_desired_property()
     receive_message();
     send_reported_property();
   }
-
-  return;
 }
 
 void disconnect_client_from_iot_hub()
@@ -320,8 +308,6 @@ void disconnect_client_from_iot_hub()
   }
 
   MQTTClient_destroy(&mqtt_client);
-
-  return;
 }
 
 void receive_message()
@@ -360,7 +346,6 @@ void receive_message()
 
   MQTTClient_freeMessage(&message);
   MQTTClient_free(topic);
-  return;
 }
 
 void parse_message(
@@ -411,8 +396,6 @@ void parse_message(
       }
       break;
   }
-
-  return;
 }
 
 az_result build_reported_property(az_span* reported_property_payload)

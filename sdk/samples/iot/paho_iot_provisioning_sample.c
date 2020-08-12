@@ -114,8 +114,6 @@ void create_and_configure_client()
     LOG_ERROR("Failed to create MQTT client: MQTTClient return code %d.", rc);
     exit(rc);
   }
-
-  return;
 }
 
 void connect_client_to_provisioning_service()
@@ -160,8 +158,6 @@ void connect_client_to_provisioning_service()
         rc);
     exit(rc);
   }
-
-  return;
 }
 
 void subscribe_client_to_provisioning_service_topics()
@@ -176,8 +172,6 @@ void subscribe_client_to_provisioning_service_topics()
     LOG_ERROR("Failed to subscribe to the Register topic: MQTTClient return code %d.", rc);
     exit(rc);
   }
-
-  return;
 }
 
 void register_client_with_provisioning_service()
@@ -211,8 +205,6 @@ void register_client_with_provisioning_service()
     LOG_ERROR("Failed to publish register request: MQTTClient return code %d.", rc);
     exit(rc);
   }
-
-  return;
 }
 
 void receive_registration_status()
@@ -288,7 +280,6 @@ void receive_registration_status()
 
   MQTTClient_freeMessage(&message);
   MQTTClient_free(topic);
-  return;
 }
 
 void disconnect_client_from_provisioning_service()
@@ -302,8 +293,6 @@ void disconnect_client_from_provisioning_service()
   }
 
   MQTTClient_destroy(&mqtt_client);
-
-  return;
 }
 
 void parse_message(
@@ -344,8 +333,6 @@ void parse_message(
     LOG_ERROR("Failed to parse operation_status: az_result return code 0x%04x.", rc);
     exit(rc);
   }
-
-  return;
 }
 
 void send_operation_query_message(
@@ -380,6 +367,4 @@ void send_operation_query_message(
     LOG_ERROR("Failed to publish query status request: MQTTClient return code %d.", rc);
     exit(rc);
   }
-
-  return;
 }

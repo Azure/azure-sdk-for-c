@@ -107,8 +107,6 @@ void create_and_configure_client()
     LOG_ERROR("Failed to create MQTT client: MQTTClient return code %d.", rc);
     exit(rc);
   }
-
-  return;
 }
 
 void connect_client_to_iot_hub()
@@ -149,8 +147,6 @@ void connect_client_to_iot_hub()
         rc);
     exit(rc);
   }
-
-  return;
 }
 
 void subscribe_client_to_iot_hub_topics()
@@ -164,8 +160,6 @@ void subscribe_client_to_iot_hub_topics()
     LOG_ERROR("Failed to subscribe to the C2D topic: MQTTClient return code %d.", rc);
     exit(rc);
   }
-
-  return;
 }
 
 void receive_messages()
@@ -209,7 +203,6 @@ void receive_messages()
     MQTTClient_freeMessage(&message);
     MQTTClient_free(topic);
   }
-  return;
 }
 
 void disconnect_client_from_iot_hub()
@@ -223,8 +216,6 @@ void disconnect_client_from_iot_hub()
   }
 
   MQTTClient_destroy(&mqtt_client);
-
-  return;
 }
 
 void parse_message(
@@ -252,6 +243,4 @@ void parse_message(
   LOG_SUCCESS("Client received a valid topic response:");
   LOG_AZ_SPAN("Topic:", topic_span);
   LOG_AZ_SPAN("Payload:", message_span);
-
-  return;
 }

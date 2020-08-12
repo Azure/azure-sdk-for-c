@@ -95,8 +95,6 @@ void create_and_configure_client()
     LOG_ERROR("Failed to create MQTT client: MQTTClient return code %d.", rc);
     exit(rc);
   }
-
-  return;
 }
 
 void connect_client_to_iot_hub()
@@ -138,8 +136,6 @@ void connect_client_to_iot_hub()
         rc);
     exit(rc);
   }
-
-  return;
 }
 
 void send_telemetry_messages_to_iot_hub()
@@ -179,8 +175,6 @@ void send_telemetry_messages_to_iot_hub()
     }
     sleep_for_seconds(TELEMETRY_SEND_INTERVAL);
   }
-
-  return;
 }
 
 void disconnect_client_from_iot_hub()
@@ -194,6 +188,4 @@ void disconnect_client_from_iot_hub()
   }
 
   MQTTClient_destroy(&mqtt_client);
-
-  return;
 }
