@@ -61,17 +61,20 @@ enum
   } while (0)
 
 /**
- * The type represents success and error conditions.
- * Bits:
- * - 31 Severity (0 - success, 1 - failure).
- * - 16..30 Facility.
- * - 0..15 Code.
+ *
+ * @brief The type represents success and error conditions.
+ *
  */
+/*
+  Bits:
+    - 31 Severity (0 - success, 1 - failure).
+    - 16..30 Facility.
+    - 0..15 Code.
+*/
 typedef enum
 {
   // Core: Success results
   AZ_OK = _az_RESULT_MAKE_SUCCESS(_az_FACILITY_CORE, 0), ///< Success.
-  AZ_CONTINUE = _az_RESULT_MAKE_SUCCESS(_az_FACILITY_CORE, 1),
 
   // Core: Error results
   AZ_ERROR_CANCELED = _az_RESULT_MAKE_ERROR(
@@ -95,18 +98,15 @@ typedef enum
   AZ_ERROR_UNEXPECTED_CHAR
   = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 5), ///< Input can't be successfully parsed.
 
-  AZ_ERROR_EOF = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 6), ///< Unexpected end of the input data.
+  AZ_ERROR_UNEXPECTED_END
+  = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 6), ///< Unexpected end of the input data.
 
   AZ_ERROR_NOT_SUPPORTED = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 7),
 
   // Platform
   AZ_ERROR_OUT_OF_MEMORY = _az_RESULT_MAKE_ERROR(
       _az_FACILITY_PLATFORM,
-      2), ///< Dynamic memory allocation request was not successful.
-
-  AZ_ERROR_HTTP_PLATFORM = _az_RESULT_MAKE_ERROR(
-      _az_FACILITY_PLATFORM,
-      3), ///< Generic error in the HTTP Client layer implementation.
+      1), ///< Dynamic memory allocation request was not successful.
 
   // JSON error codes
   AZ_ERROR_JSON_INVALID_STATE = _az_RESULT_MAKE_ERROR(_az_FACILITY_JSON, 1),
@@ -126,6 +126,11 @@ typedef enum
   AZ_ERROR_HTTP_RESPONSE_COULDNT_RESOLVE_HOST = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 6),
 
   AZ_ERROR_HTTP_CORRUPT_RESPONSE_HEADER = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 7),
+
+  // HTTP Adapter error codes
+  AZ_ERROR_HTTP_ADAPTER = _az_RESULT_MAKE_ERROR(
+      _az_FACILITY_HTTP,
+      8), ///< Generic error in the HTTP transport adapter implementation.
 
   // IoT error codes
   AZ_ERROR_IOT_TOPIC_NO_MATCH = _az_RESULT_MAKE_ERROR(_az_FACILITY_IOT, 1),

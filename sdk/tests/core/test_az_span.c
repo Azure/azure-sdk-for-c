@@ -1019,7 +1019,7 @@ static void test_az_span_replace(void** state)
     assert_true(az_span_is_content_equal(result, expected));
   }
   {
-    // Replace content with smaller content at the beggining -> right shift
+    // Replace content with smaller content at the beginning -> right shift
     uint8_t array[200];
     az_span builder = AZ_SPAN_FROM_BUFFER(array);
     az_span initial_state = AZ_SPAN_FROM_STR("12345678");

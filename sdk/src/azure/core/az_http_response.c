@@ -14,27 +14,12 @@
 
 // HTTP Response utility functions
 
-AZ_NODISCARD AZ_INLINE az_result _az_is_char(az_span slice, uint8_t c)
+AZ_NODISCARD AZ_INLINE bool _az_is_char(uint8_t actual, uint8_t expected)
 {
-  return az_span_ptr(slice)[0] == c ? AZ_OK : AZ_CONTINUE;
+  return actual == expected;
 }
 
-static AZ_NODISCARD az_result _az_valid_header_name_to_colon(az_span slice)
-{
-  az_result is_colon_result = _az_is_char(slice, ':');
-  if (is_colon_result == AZ_OK)
-  {
-    return is_colon_result;
-  }
-
-  if (!az_http_valid_token[az_span_ptr(slice)[0]])
-  {
-    return AZ_ERROR_HTTP_CORRUPT_RESPONSE_HEADER;
-  }
-
-  return is_colon_result;
-}
-static AZ_NODISCARD az_result _az_is_new_line(az_span slice) { return _az_is_char(slice, '\n'); }
+static AZ_NODISCARD bool _az_is_new_line(uint8_t next_byte) { return _az_is_char(next_byte, '\n'); }
 
 static AZ_NODISCARD bool _az_is_http_whitespace(uint8_t c)
 {
@@ -49,9 +34,9 @@ static AZ_NODISCARD bool _az_is_http_whitespace(uint8_t c)
   }
 }
 
-static AZ_NODISCARD az_result _az_slice_is_not_http_whitespace(az_span slice)
+static AZ_NODISCARD bool _az_slice_is_not_http_whitespace(uint8_t c)
 {
-  return _az_is_http_whitespace(az_span_ptr(slice)[0]) == true ? AZ_CONTINUE : AZ_OK;
+  return !_az_is_http_whitespace(c);
 }
 
 /* PRIVATE Function. parse next  */
@@ -130,7 +115,7 @@ AZ_NODISCARD az_result az_http_response_get_status_line(
   _az_PRECONDITION_NOT_NULL(ref_response);
   _az_PRECONDITION_NOT_NULL(out_status_line);
 
-  // Restart parser to the beggining
+  // Restart parser to the beginning
   ref_response->_internal.parser.remaining = ref_response->_internal.http_response;
 
   // read an HTTP status line.
@@ -186,8 +171,25 @@ az_http_response_get_next_header(az_http_response* ref_response, az_pair* out_he
     //         "_" / "`" / "|" / "~" / DIGIT / ALPHA;
     // any VCHAR,
     //    except delimiters
-    AZ_RETURN_IF_FAILED(
-        _az_span_scan_until(*reader, _az_valid_header_name_to_colon, &field_name_length));
+
+    int32_t input_size = az_span_size(*reader);
+    for (; field_name_length < input_size; ++field_name_length)
+    {
+      uint8_t next_byte = az_span_ptr(*reader)[field_name_length];
+      if (next_byte == ':')
+      {
+        break;
+      }
+      if (!az_http_valid_token[next_byte])
+      {
+        return AZ_ERROR_HTTP_CORRUPT_RESPONSE_HEADER;
+      }
+    }
+
+    if (field_name_length == input_size)
+    {
+      return AZ_ERROR_ITEM_NOT_FOUND;
+    }
 
     // form a header name. Reader is currently at char ':'
     out_header->key = az_span_slice(*reader, 0, field_name_length);

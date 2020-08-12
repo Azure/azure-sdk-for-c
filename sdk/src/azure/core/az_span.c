@@ -389,9 +389,8 @@ AZ_NODISCARD az_result az_span_atod(az_span source, double* out_number)
   int32_t n = sscanf((char*)source_ptr, format, out_number, &chars_consumed);
 
   // Success if the entire source was consumed by sscanf and it set the out_number argument.
-  return (size == chars_consumed && n == 1 && _az_isfinite(*out_number))
-      ? AZ_OK
-      : AZ_ERROR_UNEXPECTED_CHAR;
+  return (size == chars_consumed && n == 1 && _az_isfinite(*out_number)) ? AZ_OK
+                                                                         : AZ_ERROR_UNEXPECTED_CHAR;
 }
 
 #ifdef _MSC_VER
@@ -854,7 +853,7 @@ AZ_NODISCARD az_result _az_is_expected_span(az_span* ref_span, az_span expected)
   // EOF because ref_span is smaller than the expected span
   if (expected_size > az_span_size(*ref_span))
   {
-    return AZ_ERROR_EOF;
+    return AZ_ERROR_UNEXPECTED_END;
   }
 
   actual_span = az_span_slice(*ref_span, 0, expected_size);
@@ -874,27 +873,18 @@ AZ_NODISCARD az_result _az_is_expected_span(az_span* ref_span, az_span expected)
 AZ_NODISCARD az_result
 _az_span_scan_until(az_span span, _az_predicate predicate, int32_t* out_index)
 {
-  for (int32_t index = 0; index < az_span_size(span); ++index)
+  int32_t size = az_span_size(span);
+  uint8_t* ptr = az_span_ptr(span);
+  for (int32_t index = 0; index < size; ++index)
   {
-    az_span s = az_span_slice_to_end(span, index);
-    az_result predicate_result = predicate(s);
-    switch (predicate_result)
+    uint8_t next_byte = ptr[index];
+    if (predicate(next_byte))
     {
-      case AZ_OK:
-      {
-        *out_index = index;
-        return AZ_OK;
-      }
-      case AZ_CONTINUE:
-      {
-        break;
-      }
-      default:
-      {
-        return predicate_result;
-      }
+      *out_index = index;
+      return AZ_OK;
     }
   }
+  *out_index = size;
   return AZ_ERROR_ITEM_NOT_FOUND;
 }
 
