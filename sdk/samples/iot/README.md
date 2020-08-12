@@ -61,12 +61,11 @@ This section provides an overview of the different samples available to run and 
   A property named `device_count` is supported for this sample. To send a device twin desired property message, select your device's Device Twin tab in your Azure IoT Hub. Add the property `device_count` along with a corresponding value to the `desired` section of the JSON. Select Save to send the message.
 
   ```json
-  {
-    "properties": {
+  "properties": {
       "desired": {
-        "device_count": 42,
+          "device_count": 42,
+          ...
       }
-    }
   }
   ```
 

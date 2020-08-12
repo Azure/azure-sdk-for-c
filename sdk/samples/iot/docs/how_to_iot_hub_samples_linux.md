@@ -88,7 +88,7 @@ What is covered:
     azure-sdk-for-c/sdk/samples/iot$ ./generate_certificate.sh
     ```
 
-    <details>
+    <details allowed_elements>
     <summary>
     Complete output of the `generate_certificate.sh` script.
     </summary>
@@ -152,7 +152,7 @@ What is covered:
     Do not forget to set the environment variable above, making sure it maps to your local path.
 
     ```shell
-    $ export AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=/azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem
+    export AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=/azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem
     ```
 
     Save the certificate Fingerprint above (in this example, `C8DC8780C64FFBB5A66D8BC5D39D3C1BBB03FB69`).
@@ -208,8 +208,8 @@ What is covered:
     Using the values from the example above, the export command would look like this (don't run these command lines, you should use your own device ID and hostname)
 
     ```shell
-    $ export AZ_IOT_HUB_DEVICE_ID=testdevice-x509
-    $ export AZ_IOT_HUB_HOSTNAME=myiothub.azure-devices.net
+    export AZ_IOT_HUB_DEVICE_ID=testdevice-x509
+    export AZ_IOT_HUB_HOSTNAME=myiothub.azure-devices.net
     ```
 
 10. Run the samples.
@@ -297,17 +297,6 @@ What is covered:
     Back to the shell, verify that the message has been received by the sample:
 
     ```shell
-    /azure-sdk-for-c/cmake/sdk/samples/iot/$ ./paho_iot_hub_c2d_example
-    AZ_IOT_HUB_HOSTNAME = myiothub.azure-devices.net
-    AZ_IOT_HUB_DEVICE_ID = testdevice-x509
-    AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH = /azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem
-    AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH =
-
-    SUCCESS:        MQTT endpoint created at "ssl://myiothub.azure-devices.net:8883".
-    SUCCESS:        Client created and configured.
-    SUCCESS:        Client connected to IoT Hub.
-    SUCCESS:        Client subscribed to IoT Hub topics.
-                    Waiting for message.
     SUCCESS:        Message #1: Client received message from the service.
     SUCCESS:        Client received a valid topic response:
                     Topic: devices/testdevice-x509/messages/devicebound/%24.to=%2Fdevices%2Ftestdevice-x509%2Fmessages%2FdeviceBound
@@ -354,17 +343,6 @@ What is covered:
     Back to the shell, verify that the message has been received by the sample:
 
     ```shell
-    /azure-sdk-for-c/cmake/sdk/samples/iot/$ ./paho_iot_hub_methods_example
-    AZ_IOT_HUB_HOSTNAME = myiothub.azure-devices.net
-    AZ_IOT_HUB_DEVICE_ID = testdevice-x509
-    AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH = /azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem
-    AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH =
-
-    SUCCESS:        MQTT endpoint created at "ssl://myiothub.azure-devices.net:8883".
-    SUCCESS:        Client created and configured.
-    SUCCESS:        Client connected to IoT Hub.
-    SUCCESS:        Client subscribed to IoT Hub topics.
-                    Waiting for message.
     SUCCESS:        Message #1: Client received message from the service.
     SUCCESS:        Client received a valid topic response:
                     Topic: $iothub/methods/POST/ping/?$rid=1
@@ -384,47 +362,90 @@ What is covered:
     ### Device Twin
 
     ```shell
-    /azure-sdk-for-c/cmake/sdk/samples/iot/$ ./paho_iot_hub_twin_example
-    X509 Certificate PEM Store File = /azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem
-    X509 Trusted PEM Store File =
-    Device ID = testdevice-x509
-    IoT Hub Hostname = myiothub.azure-devices.net
-    Posting connect semaphore for client testdevice-x509 rc 0Subscribed to topics.
+    /azure-sdk-for-c/cmake/sdk/samples/iot/$ ./paho_iot_hub_twin_sample
+    AZ_IOT_HUB_HOSTNAME = myiothub.azure-devices.net
+    AZ_IOT_HUB_DEVICE_ID = testdevice-x509
+    AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH = /azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem
+    AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH =
 
-    Waiting for activity:
-    Press 'g' to get the twin document
-    Press 'r' to send a reported property
-    [Press 'q' to quit]
-    g
-    Requesting twin document
-    Topic: $iothub/twin/res/200/?$rid=get_twin
-    Twin Message Arrived
-    A twin GET response was received
-    Payload:
-    {"desired":{"$version":1},"reported":{"$version":1}}
-    Response status was 200
+    SUCCESS:        MQTT endpoint created at "ssl://myiothub.azure-devices.net:8883".
+    SUCCESS:        Client created and configured.
+    SUCCESS:        Client connected to IoT Hub.
+    SUCCESS:        Client subscribed to IoT Hub topics.
+                    Client requesting twin document from service.
+                    Waiting for message.
+    SUCCESS:        Client received message from the service.
+    SUCCESS:        Client received a valid topic response:
+                    Topic: $iothub/twin/res/200/?$rid=get_twin
+                    Payload: {"desired":{"$version":1},"reported":{"$version":1}}
+                    Status: 200
+                    Type: GET
+    SUCCESS:        Client parsed message.
 
-    r
-    Sending reported property
-    Payload: {"foo":0}
-    Topic: $iothub/twin/res/204/?$rid=reported_prop&$version=2
-    Twin Message Arrived
-    A twin reported properties message was received
-    Response status was 204
+    SUCCESS:        Client got twin document.
+                    Client sending reported property to service.
+    SUCCESS:        Client sent reported property message:
+                    Payload: {"device_count":0}
+                    Waiting for message.
+    SUCCESS:        Client received message from the service.
+    SUCCESS:        Client received a valid topic response:
+                    Topic: $iothub/twin/res/204/?$rid=reported_prop&$version=2
+                    Payload:
+                    Status: 204
+                    Type: Reported Properties
+    SUCCESS:        Client parsed message.
 
-    g
-    Requesting twin document
-    Topic: $iothub/twin/res/200/?$rid=get_twin
-    Twin Message Arrived
-    A twin GET response was received
-    Payload:
-    {"desired":{"$version":1},"reported":{"foo":0,"$version":2}}
-    Response status was 200
-
-    q
-    Disconnected.
-    /azure-sdk-for-c/cmake/sdk/samples/iot/$
+    SUCCESS:        Client sent reported property.
+                    Waiting for message.
     ```
+
+    On the Azure Portal,
+    - Go to your Azure IoT hub page.
+    - Click on "IoT devices" under "Explorers".
+    - From the list of devices, click on your device (created on step 6).
+    - Click on "Device Twin".
+    - Update the desired properties section of the JSON to include `device_count` and a value:
+
+    ```json
+    "properties": {
+        "desired": {
+            "device_count": 42,
+            ...
+        }
+    }
+    ```
+
+    - Click on "Save".
+    - See the reply from the sample on "Result" (bottom of the page).
+
+    Back to the shell, verify that the message has been received by the sample:
+
+    ```shell
+    SUCCESS:        Client received message from the service.
+    SUCCESS:        Client received a valid topic response:
+                    Topic: $iothub/twin/PATCH/properties/desired/?$version=2
+                    Payload: {"device_count":42,"$version":2}
+                    Status: 200
+                    Type: Desired Properties
+    SUCCESS:        Client updated "device_count" locally to 42.
+    SUCCESS:        Client parsed message.
+
+                    Client sending reported property to service.
+    SUCCESS:        Client sent reported property message:
+                    Payload: {"device_count":42}
+                    Waiting for message.
+    SUCCESS:        Client received message from the service.
+    SUCCESS:        Client received a valid topic response:
+                    Topic: $iothub/twin/res/204/?$rid=reported_prop&$version=3
+                    Payload:
+                    Status: 204
+                    Type: Reported Properties
+    SUCCESS:        Client parsed message.
+
+                    Waiting for message.
+    ```
+
+    Note: the sample does not terminate automatically. The sample will terminate after 5 twin device updates have been sent or there is a timeout.
 
 ## Need Help?
 
