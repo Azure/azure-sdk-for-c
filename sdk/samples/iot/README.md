@@ -22,23 +22,23 @@ This section provides an overview of the different samples available to run and 
 
 - *Executable:* `paho_iot_hub_c2d_sample`
 
-  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_c2d_sample.c) receives incoming cloud-to-device (C2D) messages invoked from the Azure IoT Hub. It will successfully receive up to 5 messages sent from the service. If a timeout occurs while waiting for a message, the sample will exit. X509 self-certification is used.
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_c2d_sample.c) receives incoming cloud-to-device (C2D) messages sent from the Azure IoT Hub to the device. It will successfully receive up to 5 messages sent from the service. If a timeout occurs while waiting for a message, the sample will exit. X509 self-certification is used.
 
-  To send C2D messages, select your device's Message to Device tab in your Azure IoT Hub. Enter a message in the Message Body and select Send Message.
+  To send a C2D message, select your device's Message to Device tab in the Azure Portal for your IoT Hub. Enter a message in the Message Body and select Send Message.
 
 ### IoT Hub Methods Sample
 
 - *Executable:* `paho_iot_hub_methods_sample`
 
-  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_methods_sample.c) receives incoming method commands invoked from the the Azure IoT Hub. It will successfully receive up to 5 method commands sent from the service. If a timeout occurs while waiting for a message, the sample will exit. X509 self-certification is used.
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_methods_sample.c) receives incoming method commands invoked from the the Azure IoT Hub to the device. It will successfully receive up to 5 method commands sent from the service. If a timeout occurs while waiting for a message, the sample will exit. X509 self-certification is used.
 
-  To send a method command, select your device's Direct Method tab in your Azure IoT Hub. Enter a method name and select Invoke Method. A method named `ping` is supported, which if successful will return a json payload of the following:
+  To send a method command, select your device's Direct Method tab in the Azure Portal for your IoT Hub. Enter a method name and select Invoke Method. A method named `ping` is only supported, which if successful will return a JSON payload of the following:
 
   ```json
   {"response": "pong"}
   ```
 
-  No other method commands are supported. If any are attempted to be invoked, the log will report the method is not found.
+  No other method commands are supported. If any other methods are attempted to be invoked, the log will report the method is not found.
 
 ### IoT Hub Telemetry Sample
 
@@ -56,9 +56,9 @@ This section provides an overview of the different samples available to run and 
 
 - *Executable:* `paho_iot_hub_twin_sample`
 
-  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_twin_sample.c) utilizes the Azure IoT Hub to get the twin document, send a reported property message, and receive up to 5 desired property messages. If a timeout occurs while waiting for a message from the Azure IoT Hub, the sample will exit. Upon receiving a desired property message, the sample will update the property locally and send a reported property message back to the service. X509 self-certification is used.
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_twin_sample.c) utilizes the Azure IoT Hub to get the device twin document, send a reported property message, and receive up to 5 desired property messages. If a timeout occurs while waiting for a message from the Azure IoT Hub, the sample will exit. Upon receiving a desired property message, the sample will update the twin property locally and send a reported property message back to the service. X509 self-certification is used.
 
-  A property named `device_count` is supported for this sample. To send a device twin desired property message, select your device's Device Twin tab in your Azure IoT Hub. Add the property `device_count` along with a corresponding value to the `desired` section of the JSON. Select Save to send the message.
+  A property named `device_count` is supported for this sample. To send a device twin desired property message, select your device's Device Twin tab in the Azure Portal of your IoT Hub. Add the property `device_count` along with a corresponding value to the `desired` section of the JSON. Select Save to update the twin document and send the twin message to the device.
 
   ```json
   "properties": {
@@ -112,13 +112,13 @@ Link to the component DTMI can be found [here](https://github.com/Azure/opendigi
 
 - *Executable:* `paho_iot_provisioning_sample`
 
-  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_provisioning_sample.c) registers a device with the Azure IoT Hub Device Provisioning Service. It will wait to receive the registration status before disconnecting. X509 self-certification is used.
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_provisioning_sample.c) registers a device with the Azure IoT Device Provisioning Service. It will wait to receive the registration status before disconnecting. X509 self-certification is used.
 
 ### IoT Provisioning SAS Sample
 
 - *Executable:* `paho_iot_provisioning_sas_sample`
 
-  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_provisioning_sas_sample.c) registers a device with the Azure IoT Hub Device Provisioning Service. It will wait to receive the registration status before disconnecting. SAS certification is used.
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_provisioning_sas_sample.c) registers a device with the Azure IoT Device Provisioning Service. It will wait to receive the registration status before disconnecting. SAS certification is used.
 
 ## Prerequisites
 

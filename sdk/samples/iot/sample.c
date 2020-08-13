@@ -48,7 +48,6 @@ az_result read_environment_variables(
       case PAHO_IOT_HUB_METHODS_SAMPLE:
       case PAHO_IOT_HUB_TELEMETRY_SAMPLE:
       case PAHO_IOT_HUB_TWIN_SAMPLE:
-
         env_vars->hub_device_id = AZ_SPAN_FROM_BUFFER(hub_device_id_buffer);
         AZ_RETURN_IF_FAILED(read_configuration_entry(
             ENV_IOT_HUB_DEVICE_ID, NULL, false, &(env_vars->hub_device_id)));
@@ -62,7 +61,6 @@ az_result read_environment_variables(
         break;
 
       case PAHO_IOT_HUB_SAS_TELEMETRY_SAMPLE:
-
         env_vars->hub_device_id = AZ_SPAN_FROM_BUFFER(hub_device_id_buffer);
         AZ_RETURN_IF_FAILED(read_configuration_entry(
             ENV_IOT_HUB_DEVICE_ID_SAS, NULL, false, &(env_vars->hub_device_id)));
@@ -79,7 +77,7 @@ az_result read_environment_variables(
         break;
 
       default:
-        LOG_ERROR("Sample name undefined.");
+        LOG_ERROR("Hub sample name undefined.");
         return AZ_ERROR_ARG;
     }
   }
@@ -92,7 +90,6 @@ az_result read_environment_variables(
     switch (name)
     {
       case PAHO_IOT_PROVISIONING_SAMPLE:
-
         env_vars->provisioning_registration_id
             = AZ_SPAN_FROM_BUFFER(provisioning_registration_id_buffer);
         AZ_RETURN_IF_FAILED(read_configuration_entry(
@@ -110,7 +107,6 @@ az_result read_environment_variables(
         break;
 
       case PAHO_IOT_PROVISIONING_SAS_SAMPLE:
-
         env_vars->provisioning_registration_id
             = AZ_SPAN_FROM_BUFFER(provisioning_registration_id_buffer);
         AZ_RETURN_IF_FAILED(read_configuration_entry(
@@ -131,7 +127,7 @@ az_result read_environment_variables(
         break;
 
       default:
-        LOG_ERROR("Sample name undefined.");
+        LOG_ERROR("Provisioning sample name undefined.");
         return AZ_ERROR_ARG;
     }
   }
@@ -247,7 +243,7 @@ void sleep_for_seconds(uint32_t seconds)
 
 uint32_t get_epoch_expiration_time_from_minutes(uint32_t minutes)
 {
-  return (uint32_t)(time(NULL) + minutes * 60 * 60);
+  return (uint32_t)(time(NULL) + minutes * 60);
 }
 
 az_result base64_decode(const az_span* base64_encoded, az_span* out_span)
@@ -255,7 +251,7 @@ az_result base64_decode(const az_span* base64_encoded, az_span* out_span)
   PRECONDITION_NOT_NULL(base64_encoded);
   PRECONDITION_NOT_NULL(out_span);
 
-  az_result result;
+  az_result rc;
   BIO* b64_decoder;
   BIO* source_mem_bio;
 
@@ -297,17 +293,17 @@ az_result base64_decode(const az_span* base64_encoded, az_span* out_span)
   if (read_data > 0)
   {
     *out_span = az_span_create(az_span_ptr(*out_span), (int32_t)read_data);
-    result = AZ_OK;
+    rc = AZ_OK;
   }
   else
   {
-    result = AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
+    rc = AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
   }
 
   // Free the BIO chain
   BIO_free_all(source_mem_bio);
 
-  return result;
+  return rc;
 }
 
 az_result hmac_sha256_sign(const az_span* decoded_key, const az_span* signature, az_span* out_span)
@@ -316,7 +312,7 @@ az_result hmac_sha256_sign(const az_span* decoded_key, const az_span* signature,
   PRECONDITION_NOT_NULL(signature);
   PRECONDITION_NOT_NULL(out_span);
 
-  az_result result;
+  az_result rc;
 
   unsigned int hmac_encode_len;
   unsigned char* hmac = HMAC(
@@ -331,14 +327,14 @@ az_result hmac_sha256_sign(const az_span* decoded_key, const az_span* signature,
   if (hmac != NULL)
   {
     *out_span = az_span_create(az_span_ptr(*out_span), (int32_t)hmac_encode_len);
-    result = AZ_OK;
+    rc = AZ_OK;
   }
   else
   {
-    result = AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
+    rc = AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
   }
 
-  return result;
+  return rc;
 }
 
 az_result base64_encode(const az_span* bytes, az_span* out_span)
@@ -346,7 +342,7 @@ az_result base64_encode(const az_span* bytes, az_span* out_span)
   PRECONDITION_NOT_NULL(bytes);
   PRECONDITION_NOT_NULL(out_span);
 
-  az_result result;
+  az_result rc;
   BIO* sink_mem_bio;
   BIO* b64_encoder;
   BUF_MEM* encoded_mem_ptr;
@@ -399,17 +395,17 @@ az_result base64_encode(const az_span* bytes, az_span* out_span)
     memcpy(az_span_ptr(*out_span), encoded_mem_ptr->data, encoded_mem_ptr->length);
     *out_span = az_span_create(az_span_ptr(*out_span), (int32_t)encoded_mem_ptr->length);
 
-    result = AZ_OK;
+    rc = AZ_OK;
   }
   else
   {
-    result = AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
+    rc = AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
   }
 
   // Free the BIO chain
   BIO_free_all(b64_encoder);
 
-  return result;
+  return rc;
 }
 
 void sas_generate_encoded_signed_signature(

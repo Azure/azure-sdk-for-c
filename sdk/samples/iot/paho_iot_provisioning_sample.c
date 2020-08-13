@@ -14,14 +14,14 @@ static MQTTClient mqtt_client;
 static char mqtt_client_username_buffer[128];
 
 // Functions
-void create_and_configure_client();
-void connect_client_to_provisioning_service();
-void subscribe_client_to_provisioning_service_topics();
-void register_client_with_provisioning_service();
-void receive_registration_status();
-void disconnect_client_from_provisioning_service();
+void create_and_configure_mqtt_client();
+void connect_mqtt_client_to_provisioning_service();
+void subscribe_mqtt_client_to_provisioning_service_topics();
+void register_device_with_provisioning_service();
+void receive_device_registration_status();
+void disconnect_mqtt_client_from_provisioning_service();
 
-void parse_message(
+void parse_registration_message(
     char* topic,
     int topic_len,
     const MQTTClient_message* message,
@@ -30,34 +30,34 @@ void parse_message(
 void send_operation_query_message(const az_iot_provisioning_client_register_response* response);
 
 /*
- * This sample registers a device with the Azure IoT Hub Device Provisioning Service.
+ * This sample registers a device with the Azure IoT Device Provisioning Service.
  * It will wait to receive the registration status before disconnecting.
  * X509 self-certification is used.
  */
 int main()
 {
-  create_and_configure_client();
+  create_and_configure_mqtt_client();
   LOG_SUCCESS("Client created and configured.");
 
-  connect_client_to_provisioning_service();
+  connect_mqtt_client_to_provisioning_service();
   LOG_SUCCESS("Client connected to provisioning service.");
 
-  subscribe_client_to_provisioning_service_topics();
+  subscribe_mqtt_client_to_provisioning_service_topics();
   LOG_SUCCESS("Client subscribed to provisioning service topics.");
 
-  register_client_with_provisioning_service();
+  register_device_with_provisioning_service();
   LOG_SUCCESS("Client registering with provisioning service.");
 
-  receive_registration_status();
+  receive_device_registration_status();
   LOG_SUCCESS("Client received registration status.")
 
-  disconnect_client_from_provisioning_service();
+  disconnect_mqtt_client_from_provisioning_service();
   LOG_SUCCESS("Client disconnected from provisioning service.");
 
   return 0;
 }
 
-void create_and_configure_client()
+void create_and_configure_mqtt_client()
 {
   int rc;
 
@@ -116,7 +116,7 @@ void create_and_configure_client()
   }
 }
 
-void connect_client_to_provisioning_service()
+void connect_mqtt_client_to_provisioning_service()
 {
   int rc;
 
@@ -148,20 +148,19 @@ void connect_client_to_provisioning_service()
   }
   mqtt_connect_options.ssl = &mqtt_ssl_options;
 
-  // Connect MQTT client to the Azure IoT Hub Device Provisioning Service.
+  // Connect MQTT client to the Azure IoT Device Provisioning Service.
   if ((rc = MQTTClient_connect(mqtt_client, &mqtt_connect_options)) != MQTTCLIENT_SUCCESS)
   {
     LOG_ERROR(
         "Failed to connect: MQTTClient return code %d.\n"
         "If on Windows, confirm the AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH environment variable is "
-        "set "
-        "correctly.",
+        "set correctly.",
         rc);
     exit(rc);
   }
 }
 
-void subscribe_client_to_provisioning_service_topics()
+void subscribe_mqtt_client_to_provisioning_service_topics()
 {
   int rc;
 
@@ -175,7 +174,7 @@ void subscribe_client_to_provisioning_service_topics()
   }
 }
 
-void register_client_with_provisioning_service()
+void register_device_with_provisioning_service()
 {
   int rc;
 
@@ -208,7 +207,7 @@ void register_client_with_provisioning_service()
   }
 }
 
-void receive_registration_status()
+void receive_device_registration_status()
 {
   int rc;
   char* topic = NULL;
@@ -241,8 +240,10 @@ void receive_registration_status()
     }
     LOG_SUCCESS("Client received a message from provisioning service.");
 
-    // Parse message.
-    parse_message(topic, topic_len, message, &register_response, &operation_status);
+    // Parse registration message.
+    az_iot_provisioning_client_register_response register_response;
+    az_iot_provisioning_client_operation_status operation_status;
+    parse_registration_message(topic, topic_len, message, &register_response, &operation_status);
     LOG_SUCCESS("Client parsed operation message.");
 
     // If operation is not complete, send query and loop to receive operation message.
@@ -262,13 +263,13 @@ void receive_registration_status()
   // Operation is complete.
   if (AZ_IOT_PROVISIONING_STATUS_ASSIGNED == operation_status) // Successful assignment
   {
-    LOG_SUCCESS("Client provisioned:");
+    LOG_SUCCESS("Device provisioned:");
     LOG_AZ_SPAN("Hub Hostname:", register_response.registration_result.assigned_hub_hostname);
     LOG_AZ_SPAN("Device Id:", register_response.registration_result.device_id);
   }
   else // Unsuccessful assignment (unassigned, failed or disabled states)
   {
-    LOG_ERROR("Client provisioning failed:");
+    LOG_ERROR("Device provisioning failed:");
     LOG_AZ_SPAN("Registration state:", register_response.operation_status);
     LOG("Last operation status: %d", register_response.status);
     LOG_AZ_SPAN("Operation ID:", register_response.operation_id);
@@ -283,7 +284,7 @@ void receive_registration_status()
   MQTTClient_free(topic);
 }
 
-void disconnect_client_from_provisioning_service()
+void disconnect_mqtt_client_from_provisioning_service()
 {
   int rc;
 
@@ -296,7 +297,7 @@ void disconnect_client_from_provisioning_service()
   MQTTClient_destroy(&mqtt_client);
 }
 
-void parse_message(
+void parse_registration_message(
     char* topic,
     int topic_len,
     const MQTTClient_message* message,
