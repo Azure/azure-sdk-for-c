@@ -369,7 +369,6 @@ What is covered:
     "properties": {
         "desired": {
             "device_count": 42,
-            ...
         }
     }
     ```

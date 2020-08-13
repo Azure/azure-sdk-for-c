@@ -64,7 +64,6 @@ This section provides an overview of the different samples available to run and 
   "properties": {
       "desired": {
           "device_count": 42,
-          ...
       }
   }
   ```
