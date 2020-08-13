@@ -4,15 +4,15 @@ This is a step-by-step guide of how to start from scratch and get the Azure SDK 
 
 Prerequisites:
 
-- [Having created an Azure account](https://github.com/ewertons/azure-sdk-for-c/wiki/How-to-create-an-Azure-account)
-- [Having created an Azure IoT Hub](https://github.com/ewertons/azure-sdk-for-c/wiki/How-to-create-an-Azure-IoT-Hub)
+- [Having created an Azure account](https://azure.microsoft.com/en-us/)
+- [Having created an Azure IoT Hub](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal)
 
 What is covered:
 
 - Downloading and building the Azure SDK for Embedded C suite
 - Configuring and running the IoT Hub client samples.
 
-_The following was run on an Ubuntu Desktop 18.04 environment, but it also works on WSL 1 and 2 (Windows Subsystem for Linux)_
+    _The following was run on an Ubuntu Desktop 18.04 environment, but it also works on WSL 1 and 2 (Windows Subsystem for Linux)_
 
 1. Install library dependencies
 
@@ -88,7 +88,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     azure-sdk-for-c/sdk/samples/iot$ ./generate_certificate.sh
     ```
 
-    <details>
+    <details allowed_elements>
     <summary>
     Complete output of the `generate_certificate.sh` script.
     </summary>
@@ -99,46 +99,51 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
         Data:
             Version: 1 (0x0)
             Serial Number:
-                5c:71:ff:0e:39:87:c3:1b:82:52:09:5d:b7:3c:a2:60:6c:73:92:30
+                5d:29:5b:fd:d7:6c:e0:a0:c3:a5:a9:ee:4d:92:4c:56:fc:bd:4e:f5
             Signature Algorithm: ecdsa-with-SHA256
             Issuer: CN = paho-sample-device1
             Validity
-                Not Before: May  8 05:24:45 2020 GMT
-                Not After : May  8 05:24:45 2021 GMT
+                Not Before: Aug  8 21:07:29 2020 GMT
+                Not After : Aug  8 21:07:29 2021 GMT
             Subject: CN = paho-sample-device1
             Subject Public Key Info:
                 Public Key Algorithm: id-ecPublicKey
                     Public-Key: (256 bit)
                     pub:
-                        04:b4:17:28:5f:03:59:d1:87:82:83:6e:ac:38:6e:
-                        1b:60:11:bb:0c:45:b0:a3:4a:a4:83:60:37:73:7b:
-                        a4:5b:4c:4e:61:8a:3b:eb:a6:1f:bf:a1:c9:90:d6:
-                        7a:64:c4:92:3b:1d:b8:5c:38:2c:21:18:5b:93:5e:
-                        1e:16:79:90:b8
+                        04:6d:fd:c8:5d:d4:7e:99:b0:44:81:bb:66:20:52:
+                        d6:22:b6:32:81:91:5d:e3:99:8f:93:bb:35:c8:ac:
+                        47:48:d7:76:89:7b:02:f4:00:5a:1f:8d:e9:62:5b:
+                        a7:b0:12:a9:b8:51:ca:24:0d:72:17:81:f8:9f:ae:
+                        09:26:68:c6:36
                     ASN1 OID: prime256v1
                     NIST CURVE: P-256
         Signature Algorithm: ecdsa-with-SHA256
-            30:44:02:20:16:c7:43:c8:8a:88:da:77:18:45:1b:97:65:8e:
-            a7:b7:50:6a:d8:77:51:b9:8f:23:2f:36:a1:74:6c:75:cd:cc:
-            02:20:5c:b5:19:28:b9:64:07:14:8f:cf:28:0b:17:9e:16:6a:
-            8a:d5:3e:91:64:79:39:c6:94:0d:9d:66:e5:45:3f:75
-    rm: cannot remove 'device_cert_store.pem': No such file or directory
+            30:45:02:20:15:4f:49:cd:ff:08:3e:0e:7d:5d:8f:a6:3a:b3:
+            87:62:01:b2:ad:17:6a:bc:cf:b0:d6:2d:e1:85:25:d6:65:0e:
+            02:21:00:8a:2e:e5:d4:33:8e:91:9d:71:b1:ee:78:cf:c5:ff:
+            06:7e:92:9c:66:71:38:95:06:82:82:8c:5a:7c:90:a3:9d
 
+    IMPORTANT:
     It is NOT recommended to use OpenSSL on Windows or OSX. Recommended TLS stacks are:
     Microsoft Windows SChannel: https://docs.microsoft.com/en-us/windows/win32/com/schannel
     OR
     Apple Secure Transport : https://developer.apple.com/documentation/security/secure_transport
-
     If using OpenSSL, it is recommended to use the OpenSSL Trusted CA store configured on your system.
-    If required (for example on Windows), download the Baltimore PEM CA from https://www.digicert.com/digicert-root-certificates.htm to the current folder.
-    export AZ_IOT_DEVICE_X509_TRUST_PEM_FILE=/azure-sdk-for-c/sdk/samples/iot/BaltimoreCyberTrustRoot.crt.pem
 
-    Sample certificate generated
-    Use the device_cert_store.pem file within the sample:
-    export AZ_IOT_DEVICE_X509_CERT_PEM_FILE=/azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem
+    SAMPLE CERTIFICATE GENERATED:
+    Use the following command to set the environment variable for the samples:
 
-    Use the following fingerprint when creating your device in IoT Hub (must remove colons):
-    SHA1 Fingerprint=C8DC8780C64FFBB5A66D8BC5D39D3C1BBB03FB69
+            export AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=/azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem
+
+    DPS SAMPLE:
+    Upload device_ec_cert.pem when enrolling your device with the Device Provisioning Service.
+
+    IOT HUB SAMPLES:
+    Use the following fingerprint when creating your device in IoT Hub.
+    (The fingerprint has also been placed in fingerprint.txt for future reference.)
+
+            SHA1 Fingerprint=D0A4AB23D52BB6FE5EF06FC0718D6F3743F00364
+
     /azure-sdk-for-c/sdk/samples/iot$
     ```
 
@@ -147,7 +152,7 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     Do not forget to set the environment variable above, making sure it maps to your local path.
 
     ```shell
-    $ export AZ_IOT_DEVICE_X509_CERT_PEM_FILE=/azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem
+    export AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=/azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem
     ```
 
     Save the certificate Fingerprint above (in this example, `C8DC8780C64FFBB5A66D8BC5D39D3C1BBB03FB69`).
@@ -192,19 +197,19 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     According the the [readme documentation](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/samples/iot) for the Azure Embedded SDK for C IoT Hub client certificate samples require the following environment variables.
 
     ```shell
-    export AZ_IOT_DEVICE_ID=<device ID obtained on step 7>
+    export AZ_IOT_HUB_DEVICE_ID=<device ID obtained on step 7>
     export AZ_IOT_HUB_HOSTNAME=<FQDN obtained on step 7>
     ```
 
-    `AZ_IOT_DEVICE_X509_TRUST_PEM_FILE` is not required for all platforms (like Linux).
+    `AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH` is not required for all platforms (like Linux).
 
-    `AZ_IOT_DEVICE_X509_CERT_PEM_FILE` has already been set on step 5.
+    `AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH` has already been set on step 5.
 
     Using the values from the example above, the export command would look like this (don't run these command lines, you should use your own device ID and hostname)
 
     ```shell
-    $ export AZ_IOT_DEVICE_ID=testdevice-x509
-    $ export AZ_IOT_HUB_HOSTNAME=myiothub.azure-devices.net
+    export AZ_IOT_HUB_DEVICE_ID=testdevice-x509
+    export AZ_IOT_HUB_HOSTNAME=myiothub.azure-devices.net
     ```
 
 10. Run the samples.
@@ -214,36 +219,45 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     ```shell
     /azure-sdk-for-c/cmake$ cd sdk/samples/iot/
     /azure-sdk-for-c/cmake/sdk/samples/iot/$ ll
-    total 14772
-    drwxr-xr-x 3 user user    4096 May  7 22:18 ./
-    drwxr-xr-x 4 user user    4096 May  7 22:18 ../
-    drwxr-xr-x 6 user user    4096 May  7 22:17 CMakeFiles/
-    -rw-r--r-- 1 user user    1145 May  7 22:17 cmake_install.cmake
-    -rw-r--r-- 1 user user     329 May  7 22:17 CTestTestfile.cmake
-    -rw-r--r-- 1 user user   14656 May  7 22:17 Makefile
-    -rwxr-xr-x 1 user user 3766736 May  7 22:18 paho_iot_hub_c2d_example*
-    -rwxr-xr-x 1 user user 3771544 May  7 22:18 paho_iot_hub_methods_example*
-    -rwxr-xr-x 1 user user 3766688 May  7 22:18 paho_iot_hub_telemetry_example*
-    -rwxr-xr-x 1 user user 3776704 May  7 22:18 paho_iot_hub_twin_example*
+    total 34544
+    drwxrwxrwx 1 user user    4096 Aug  8 14:19 ./
+    drwxrwxrwx 1 user user    4096 Aug  8 14:19 ../
+    drwxrwxrwx 1 user user    4096 Aug  8 14:19 CMakeFiles/
+    -rwxrwxrwx 1 user user     321 Aug  8 14:19 CTestTestfile.cmake*
+    -rwxrwxrwx 1 user user   33792 Aug  8 14:19 Makefile*
+    -rwxrwxrwx 1 user user    1265 Aug  8 14:19 cmake_install.cmake*
+    -rwxrwxrwx 1 user user   19044 Aug  8 14:19 libaz_iot_samples_common.a*
+    -rwxrwxrwx 1 user user 3901712 Aug  8 14:19 paho_iot_hub_c2d_sample*
+    -rwxrwxrwx 1 user user 3906368 Aug  8 14:19 paho_iot_hub_methods_sample*
+    -rwxrwxrwx 1 user user 3956192 Aug  8 14:19 paho_iot_hub_pnp_component_sample*
+    -rwxrwxrwx 1 user user 3940352 Aug  8 14:19 paho_iot_hub_pnp_sample*
+    -rwxrwxrwx 1 user user 3906416 Aug  8 14:19 paho_iot_hub_sas_telemetry_sample*
+    -rwxrwxrwx 1 user user 3901688 Aug  8 14:19 paho_iot_hub_telemetry_sample*
+    -rwxrwxrwx 1 user user 3939000 Aug  8 14:19 paho_iot_hub_twin_sample*
+    -rwxrwxrwx 1 user user 3923656 Aug  8 14:19 paho_iot_provisioning_sample*
+    -rwxrwxrwx 1 user user 3928584 Aug  8 14:19 paho_iot_provisioning_sas_sample*
     /azure-sdk-for-c/cmake/sdk/samples/iot/$
     ```
 
     ### Telemetry (device-to-cloud messages)
 
     ```shell
-    /azure-sdk-for-c/cmake/sdk/samples/iot/$ ./paho_iot_hub_telemetry_example
-    X509 Certificate PEM Store File = /azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem
-    X509 Trusted PEM Store File =
-    Device ID = testdevice-x509
-    IoT Hub Hostname = myiothub.azure-devices.net
-    Sending Message 1
-    Sending Message 2
-    Sending Message 3
-    Sending Message 4
-    Sending Message 5
-    Messages Sent [Press ENTER to shut down]
+    /azure-sdk-for-c/cmake/sdk/samples/iot/$ ./paho_iot_hub_telemetry_sample
+    AZ_IOT_HUB_HOSTNAME = myiothub.azure-devices.net
+    AZ_IOT_HUB_DEVICE_ID = testdevice-x509
+    AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH = /azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem
+    AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH =
 
-    Disconnected.
+    SUCCESS:        MQTT endpoint created at "ssl://myiothub.azure-devices.net:8883".
+    SUCCESS:        Client created and configured.
+    SUCCESS:        Client connected to IoT Hub.
+                    Sending Message 1
+                    Sending Message 2
+                    Sending Message 3
+                    Sending Message 4
+                    Sending Message 5
+    SUCCESS:        Client sent telemetry messages to IoT Hub.
+    SUCCESS:        Client disconnected from IoT Hub.
     /azure-sdk-for-c/cmake/sdk/samples/iot/$
     ```
 
@@ -256,14 +270,17 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     First, run the sample:
 
     ```shell
-    /azure-sdk-for-c/cmake/sdk/samples/iot/$ ./paho_iot_hub_c2d_example
-    X509 Certificate PEM Store File = /azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem
-    X509 Trusted PEM Store File =
-    Device ID = testdevice-x509
-    IoT Hub Hostname = myiothub.azure-devices.net
-    Posting connect semaphore for client testdevice-x509 rc 0Subscribed to topics.
-    Waiting for activity. [Press ENTER to abort]
+    /azure-sdk-for-c/cmake/sdk/samples/iot/$ ./paho_iot_hub_c2d_sample
+    AZ_IOT_HUB_HOSTNAME = myiothub.azure-devices.net
+    AZ_IOT_HUB_DEVICE_ID = testdevice-x509
+    AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH = /azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem
+    AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH =
 
+    SUCCESS:        MQTT endpoint created at "ssl://myiothub.azure-devices.net:8883".
+    SUCCESS:        Client created and configured.
+    SUCCESS:        Client connected to IoT Hub.
+    SUCCESS:        Client subscribed to IoT Hub topics.
+                    Waiting for message.
     ```
 
     On the Azure Portal,
@@ -280,21 +297,16 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     Back to the shell, verify that the message has been received by the sample:
 
     ```shell
-    /azure-sdk-for-c/cmake/sdk/samples/iot/$ ./paho_iot_hub_c2d_example
-    X509 Certificate PEM Store File = /azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem
-    X509 Trusted PEM Store File =
-    Device ID = testdevice-x509
-    IoT Hub Hostname = myiothub.azure-devices.net
-    Posting connect semaphore for client testdevice-x509 rc 0Subscribed to topics.
-    Waiting for activity. [Press ENTER to abort]
-    C2D Message arrived
-    Hello world!
+    SUCCESS:        Message #1: Client received message from the service.
+    SUCCESS:        Client received a valid topic response:
+                    Topic: devices/testdevice-x509/messages/devicebound/%24.to=%2Fdevices%2Ftestdevice-x509%2Fmessages%2FdeviceBound
+                    Payload: Hello world!
+    SUCCESS:        Client parsed message.
 
-    Disconnected.
-    /azure-sdk-for-c/cmake/sdk/samples/iot/$
+                    Waiting for message.
     ```
 
-    Note: the sample does not terminate automatically. In the output above Enter has been pressed.
+    Note: The sample does not terminate automatically. The sample will terminate after 5 messages have been sent or there is a timeout.
 
     ### Direct Methods
 
@@ -303,14 +315,17 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     First, run the sample:
 
     ```shell
-    /azure-sdk-for-c/cmake/sdk/samples/iot/$ ./paho_iot_hub_methods_example
-    X509 Certificate PEM Store File = /azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem
-    X509 Trusted PEM Store File =
-    Device ID = testdevice-x509
-    IoT Hub Hostname = myiothub.azure-devices.net
-    Posting connect semaphore for client testdevice-x509 rc 0Subscribed to topics.
-    Waiting for activity. [Press ENTER to abort]
+    /azure-sdk-for-c/cmake/sdk/samples/iot/$ ./paho_iot_hub_methods_sample
+    AZ_IOT_HUB_HOSTNAME = myiothub.azure-devices.net
+    AZ_IOT_HUB_DEVICE_ID = testdevice-x509
+    AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH = /azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem
+    AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH =
 
+    SUCCESS:        MQTT endpoint created at "ssl://myiothub.azure-devices.net:8883".
+    SUCCESS:        Client created and configured.
+    SUCCESS:        Client connected to IoT Hub.
+    SUCCESS:        Client subscribed to IoT Hub topics.
+                    Waiting for message.
     ```
 
     On the Azure Portal,
@@ -328,68 +343,108 @@ _The following was run on an Ubuntu Desktop 18.04 environment, but it also works
     Back to the shell, verify that the message has been received by the sample:
 
     ```shell
-    /azure-sdk-for-c/cmake/sdk/samples/iot/$ ./paho_iot_hub_methods_example
-    X509 Certificate PEM Store File = /azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem
-    X509 Trusted PEM Store File =
-    Device ID = testdevice-x509
-    IoT Hub Hostname = myiothub.azure-devices.net
-    Posting connect semaphore for client testdevice-x509 rc 0Subscribed to topics.
-    Waiting for activity. [Press ENTER to abort]
-    Topic: $iothub/methods/POST/ping/?$rid=1
-    Direct Method arrived
-    Status: 200	Payload:{"response": "pong"}
-    Sent response
+    SUCCESS:        Message #1: Client received message from the service.
+    SUCCESS:        Client received a valid topic response:
+                    Topic: $iothub/methods/POST/ping/?$rid=1
+                    Payload: null
+    SUCCESS:        Client parsed message.
+                    PING!
+    SUCCESS:        Client invoked ping method.
+    SUCCESS:        Client published method response:
+                    Status: 200
+                    Payload: {"response": "pong"}
 
-    Disconnected.
-    /azure-sdk-for-c/cmake/sdk/samples/iot/$
+                    Waiting for message.
     ```
 
-    Note: the sample does not terminate automatically. In the output above Enter has been pressed.
+    Note: The sample does not terminate automatically. The sample will terminate after 5 messages have been sent or there is a timeout.
 
     ### Device Twin
 
     ```shell
-    /azure-sdk-for-c/cmake/sdk/samples/iot/$ ./paho_iot_hub_twin_example
-    X509 Certificate PEM Store File = /azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem
-    X509 Trusted PEM Store File =
-    Device ID = testdevice-x509
-    IoT Hub Hostname = myiothub.azure-devices.net
-    Posting connect semaphore for client testdevice-x509 rc 0Subscribed to topics.
+    /azure-sdk-for-c/cmake/sdk/samples/iot/$ ./paho_iot_hub_twin_sample
+    AZ_IOT_HUB_HOSTNAME = myiothub.azure-devices.net
+    AZ_IOT_HUB_DEVICE_ID = testdevice-x509
+    AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH = /azure-sdk-for-c/sdk/samples/iot/device_cert_store.pem
+    AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH =
 
-    Waiting for activity:
-    Press 'g' to get the twin document
-    Press 'r' to send a reported property
-    [Press 'q' to quit]
-    g
-    Requesting twin document
-    Topic: $iothub/twin/res/200/?$rid=get_twin
-    Twin Message Arrived
-    A twin GET response was received
-    Payload:
-    {"desired":{"$version":1},"reported":{"$version":1}}
-    Response status was 200
+    SUCCESS:        MQTT endpoint created at "ssl://myiothub.azure-devices.net:8883".
+    SUCCESS:        Client created and configured.
+    SUCCESS:        Client connected to IoT Hub.
+    SUCCESS:        Client subscribed to IoT Hub topics.
+                    Client requesting twin document from service.
+                    Waiting for message.
+    SUCCESS:        Client received message from the service.
+    SUCCESS:        Client received a valid topic response:
+                    Topic: $iothub/twin/res/200/?$rid=get_twin
+                    Payload: {"desired":{"$version":1},"reported":{"$version":1}}
+                    Status: 200
+                    Type: GET
+    SUCCESS:        Client parsed message.
 
-    r
-    Sending reported property
-    Payload: {"foo":0}
-    Topic: $iothub/twin/res/204/?$rid=reported_prop&$version=2
-    Twin Message Arrived
-    A twin reported properties message was received
-    Response status was 204
+    SUCCESS:        Client got twin document.
+                    Client sending reported property to service.
+    SUCCESS:        Client sent reported property message:
+                    Payload: {"device_count":0}
+                    Waiting for message.
+    SUCCESS:        Client received message from the service.
+    SUCCESS:        Client received a valid topic response:
+                    Topic: $iothub/twin/res/204/?$rid=reported_prop&$version=2
+                    Payload:
+                    Status: 204
+                    Type: Reported Properties
+    SUCCESS:        Client parsed message.
 
-    g
-    Requesting twin document
-    Topic: $iothub/twin/res/200/?$rid=get_twin
-    Twin Message Arrived
-    A twin GET response was received
-    Payload:
-    {"desired":{"$version":1},"reported":{"foo":0,"$version":2}}
-    Response status was 200
-
-    q
-    Disconnected.
-    /azure-sdk-for-c/cmake/sdk/samples/iot/$
+    SUCCESS:        Client sent reported property.
+                    Waiting for message.
     ```
+
+    On the Azure Portal,
+    - Go to your Azure IoT hub page.
+    - Click on "IoT devices" under "Explorers".
+    - From the list of devices, click on your device (created on step 6).
+    - Click on "Device Twin".
+    - Update the desired properties section of the JSON to include `device_count` and a value:
+
+    ```json
+    "properties": {
+        "desired": {
+            "device_count": 42,
+        }
+    }
+    ```
+
+    - Click on "Save".
+    - See the reply from the sample on "Result" (bottom of the page).
+
+    Back to the shell, verify that the message has been received by the sample:
+
+    ```shell
+    SUCCESS:        Client received message from the service.
+    SUCCESS:        Client received a valid topic response:
+                    Topic: $iothub/twin/PATCH/properties/desired/?$version=2
+                    Payload: {"device_count":42,"$version":2}
+                    Status: 200
+                    Type: Desired Properties
+    SUCCESS:        Client updated "device_count" locally to 42.
+    SUCCESS:        Client parsed message.
+
+                    Client sending reported property to service.
+    SUCCESS:        Client sent reported property message:
+                    Payload: {"device_count":42}
+                    Waiting for message.
+    SUCCESS:        Client received message from the service.
+    SUCCESS:        Client received a valid topic response:
+                    Topic: $iothub/twin/res/204/?$rid=reported_prop&$version=3
+                    Payload:
+                    Status: 204
+                    Type: Reported Properties
+    SUCCESS:        Client parsed message.
+
+                    Waiting for message.
+    ```
+
+    Note: The sample does not terminate automatically. The sample will terminate after 5 twin device updates have been sent or there is a timeout.
 
 ## Need Help?
 

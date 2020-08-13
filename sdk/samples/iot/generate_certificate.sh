@@ -22,7 +22,7 @@ echo "If using OpenSSL, it is recommended to use the OpenSSL Trusted CA store co
 
 echo -e "\nSAMPLE CERTIFICATE GENERATED:"
 echo "Use the following command to set the environment variable for the samples:"
-echo -e "\n\texport AZ_IOT_DEVICE_X509_CERT_PEM_FILE=$(pwd)/device_cert_store.pem"
+echo -e "\n\texport AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(pwd)/device_cert_store.pem"
 
 echo -e "\nDPS SAMPLE:"
 echo "Upload device_ec_cert.pem when enrolling your device with the Device Provisioning Service."
