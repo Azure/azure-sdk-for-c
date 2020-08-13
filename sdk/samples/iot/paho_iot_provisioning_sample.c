@@ -241,8 +241,6 @@ void receive_device_registration_status()
     LOG_SUCCESS("Client received a message from provisioning service.");
 
     // Parse registration message.
-    az_iot_provisioning_client_register_response register_response;
-    az_iot_provisioning_client_operation_status operation_status;
     parse_registration_message(topic, topic_len, message, &register_response, &operation_status);
     LOG_SUCCESS("Client parsed operation message.");
 

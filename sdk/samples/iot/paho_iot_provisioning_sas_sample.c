@@ -51,7 +51,7 @@ int main()
   subscribe_mqtt_client_to_provisioning_service_topics();
   LOG_SUCCESS("Client subscribed to provisioning service topics.");
 
-  register_client_with_provisioning_service();
+  register_device_with_provisioning_service();
   LOG_SUCCESS("Client registering with provisioning service.");
 
   receive_device_registration_status();
@@ -219,6 +219,8 @@ void receive_device_registration_status()
   char* topic = NULL;
   int topic_len = 0;
   MQTTClient_message* message = NULL;
+  az_iot_provisioning_client_register_response register_response;
+  az_iot_provisioning_client_operation_status operation_status;
   bool is_operation_complete = false;
 
   // Continue to parse incoming responses from the provisioning service until the device
@@ -245,8 +247,6 @@ void receive_device_registration_status()
     LOG_SUCCESS("Client received a message from provisioning service.");
 
     // Parse registration message.
-    az_iot_provisioning_client_register_response register_response;
-    az_iot_provisioning_client_operation_status operation_status;
     parse_registration_message(topic, topic_len, message, &register_response, &operation_status);
     LOG_SUCCESS("Client parsed operation message.");
 

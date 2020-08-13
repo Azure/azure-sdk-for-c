@@ -181,7 +181,7 @@ void subscribe_mqtt_client_to_iot_hub_topics()
   }
 }
 
-void receive_messages()
+void receive_method_messages()
 {
   int rc;
   char* topic = NULL;
