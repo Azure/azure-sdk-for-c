@@ -23,7 +23,7 @@ const az_span provisioning_global_endpoint
 //
 // SAS key generation buffers
 //
-static char sas_b64_decoded_key_buffer[32];
+static char sas_b64_decoded_key_buffer[64];
 static char sas_hmac256_signed_signature_buffer[128];
 
 //
