@@ -178,7 +178,7 @@ void connect_client_to_iot_hub()
   {
     LOG_ERROR(
         "Failed to connect: MQTTClient return code %d.\n"
-        "If on Windows, confirm the AZ_IOT_DEVICE_X509_TRUST_PEM_FILE environment variable is set "
+        "If on Windows, confirm the AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH environment variable is set "
         "correctly.",
         rc);
     exit(rc);
@@ -354,9 +354,9 @@ void parse_message(
     const MQTTClient_message* message,
     az_iot_hub_client_twin_response* twin_response)
 {
-  _az_PRECONDITION_NOT_NULL(topic);
-  _az_PRECONDITION_NOT_NULL(message);
-  _az_PRECONDITION_NOT_NULL(twin_response);
+  PRECONDITION_NOT_NULL(topic);
+  PRECONDITION_NOT_NULL(message);
+  PRECONDITION_NOT_NULL(twin_response);
 
   int rc;
   az_span topic_span = az_span_create((uint8_t*)topic, topic_len);
@@ -400,7 +400,7 @@ void parse_message(
 
 az_result build_reported_property(az_span* reported_property_payload)
 {
-  _az_PRECONDITION_NOT_NULL(reported_property_payload);
+  PRECONDITION_NOT_NULL(reported_property_payload);
 
   az_json_writer json_writer;
 
@@ -416,7 +416,7 @@ az_result build_reported_property(az_span* reported_property_payload)
 
 az_result update_property(const az_span* desired_payload)
 {
-  _az_PRECONDITION_NOT_NULL(desired_payload);
+  PRECONDITION_NOT_NULL(desired_payload);
 
   // Parse desired property payload.
   az_json_reader json_reader;

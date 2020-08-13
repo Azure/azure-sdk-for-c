@@ -131,7 +131,7 @@ void connect_client_to_iot_hub()
   {
     LOG_ERROR(
         "Failed to connect: MQTTClient return code %d.\n"
-        "If on Windows, confirm the AZ_IOT_DEVICE_X509_TRUST_PEM_FILE environment variable is set "
+        "If on Windows, confirm the AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH environment variable is set "
         "correctly.",
         rc);
     exit(rc);

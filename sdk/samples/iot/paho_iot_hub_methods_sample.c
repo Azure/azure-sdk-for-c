@@ -161,7 +161,7 @@ void connect_client_to_iot_hub()
   {
     LOG_ERROR(
         "Failed to connect: MQTTClient return code %d.\n"
-        "If on Windows, confirm the AZ_IOT_DEVICE_X509_TRUST_PEM_FILE environment variable is set "
+        "If on Windows, confirm the AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH environment variable is set "
         "correctly.",
         rc);
     exit(rc);
@@ -244,9 +244,9 @@ void parse_message(
     const MQTTClient_message* message,
     az_iot_hub_client_method_request* method_request)
 {
-  _az_PRECONDITION_NOT_NULL(topic);
-  _az_PRECONDITION_NOT_NULL(message);
-  _az_PRECONDITION_NOT_NULL(method_request);
+  PRECONDITION_NOT_NULL(topic);
+  PRECONDITION_NOT_NULL(message);
+  PRECONDITION_NOT_NULL(method_request);
 
   int rc;
   az_span topic_span = az_span_create((uint8_t*)topic, topic_len);
@@ -268,7 +268,7 @@ void parse_message(
 
 void invoke_method(const az_iot_hub_client_method_request* method_request)
 {
-  _az_PRECONDITION_NOT_NULL(method_request);
+  PRECONDITION_NOT_NULL(method_request);
 
   if (az_span_is_content_equal(ping_method_name, method_request->name))
   {
@@ -295,8 +295,8 @@ void send_method_response(
     uint16_t status,
     const az_span* response)
 {
-  _az_PRECONDITION_NOT_NULL(method_request);
-  _az_PRECONDITION_NOT_NULL(response);
+  PRECONDITION_NOT_NULL(method_request);
+  PRECONDITION_NOT_NULL(response);
 
   int rc;
 

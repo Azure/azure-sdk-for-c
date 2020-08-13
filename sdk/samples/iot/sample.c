@@ -23,7 +23,7 @@ az_span provisioning_global_endpoint
 //
 // SAS key generation buffers
 //
-static char sas_b64_decoded_key_buffer[32];
+static char sas_b64_decoded_key_buffer[64];
 static char sas_hmac256_signed_signature_buffer[128];
 
 //
@@ -34,7 +34,7 @@ az_result read_environment_variables(
     sample_name name,
     sample_environment_variables* env_vars)
 {
-  _az_PRECONDITION_NOT_NULL(env_vars);
+  PRECONDITION_NOT_NULL(env_vars);
 
   if (type == PAHO_IOT_HUB)
   {
@@ -155,9 +155,8 @@ az_result read_configuration_entry(
     bool hide_value,
     az_span* out_value)
 {
-  _az_PRECONDITION_NOT_NULL(env_name);
-  _az_PRECONDITION_NOT_NULL(out_value);
-  _az_PRECONDITION_VALID_SPAN(*out_value, 1, false);
+  PRECONDITION_NOT_NULL(env_name);
+  PRECONDITION_NOT_NULL(out_value);
 
   char* env_value = getenv(env_name);
 
@@ -170,6 +169,8 @@ az_result read_configuration_entry(
   {
     (void)printf("%s = %s\n", env_name, hide_value ? "***" : env_value);
     az_span env_span = az_span_create_from_str(env_value);
+
+    // assumes *out_value is a valid span
     AZ_RETURN_IF_NOT_ENOUGH_SIZE(*out_value, az_span_size(env_span));
     az_span_copy(*out_value, env_span);
     *out_value = az_span_slice(
@@ -184,9 +185,14 @@ az_result read_configuration_entry(
   return AZ_OK;
 }
 
-az_result create_mqtt_endpoint(sample_type type, const sample_environment_variables* env_vars, char* endpoint, size_t endpoint_size)
+az_result create_mqtt_endpoint(
+    sample_type type,
+    const sample_environment_variables* env_vars,
+    char* endpoint,
+    size_t endpoint_size)
 {
-  _az_PRECONDITION_NOT_NULL(endpoint);
+  PRECONDITION_NOT_NULL(env_vars);
+  PRECONDITION_NOT_NULL(endpoint);
 
   if (type == PAHO_IOT_HUB)
   {
@@ -244,63 +250,16 @@ uint32_t get_epoch_expiration_time_from_minutes(uint32_t minutes)
   return (uint32_t)(time(NULL) + minutes * 60 * 60);
 }
 
-void sas_generate_encoded_signed_signature(
-    const az_span* sas_key,
-    const az_span* sas_signature,
-    az_span* sas_b64_encoded_hmac256_signed_signature)
+az_result base64_decode(const az_span* base64_encoded, az_span* out_span)
 {
-  _az_PRECONDITION_NOT_NULL(sas_key);
-  _az_PRECONDITION_NOT_NULL(sas_signature);
-  _az_PRECONDITION_NOT_NULL(sas_b64_encoded_hmac256_signed_signature);
-
-  int rc;
-
-  // Decode the base64 encoded SAS key to use for HMAC signing
-  az_span sas_b64_decoded_key = AZ_SPAN_FROM_BUFFER(sas_b64_decoded_key_buffer);
-  if (az_failed(rc = sample_base64_decode(*sas_key, sas_b64_decoded_key, &sas_b64_decoded_key)))
-  {
-    LOG_ERROR("Could not decode the SAS key: az_result return code 0x%04x.", rc);
-    exit(rc);
-  }
-
-  // HMAC-SHA256 sign the signature with the decoded key
-  az_span sas_hmac256_signed_signature = AZ_SPAN_FROM_BUFFER(sas_hmac256_signed_signature_buffer);
-  if (az_failed(
-          rc = sample_hmac_sha256_sign(
-              sas_b64_decoded_key,
-              *sas_signature,
-              sas_hmac256_signed_signature,
-              &sas_hmac256_signed_signature)))
-  {
-    LOG_ERROR("Could not sign the signature: az_result return code 0x%04x.", rc);
-    exit(rc);
-  }
-
-  // Base64 encode the result of the HMAC signing
-  if (az_failed(
-          rc = sample_base64_encode(
-              sas_hmac256_signed_signature,
-              *sas_b64_encoded_hmac256_signed_signature,
-              sas_b64_encoded_hmac256_signed_signature)))
-  {
-    LOG_ERROR("Could not base64 encode the password: az_result return code 0x%04x.", rc);
-    exit(rc);
-  }
-
-  return;
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////
-
-az_result sample_base64_decode(az_span base64_encoded, az_span in_span, az_span* out_span)
-{
-  _az_PRECONDITION_NOT_NULL(out_span);
+  PRECONDITION_NOT_NULL(base64_encoded);
+  PRECONDITION_NOT_NULL(out_span);
 
   az_result result;
   BIO* b64_decoder;
   BIO* source_mem_bio;
 
-  memset(az_span_ptr(in_span), 0, (size_t)az_span_size(in_span));
+  memset(az_span_ptr(*out_span), 0, (size_t)az_span_size(*out_span));
 
   // Create a BIO filter to process the bytes
   b64_decoder = BIO_new(BIO_f_base64());
@@ -310,7 +269,7 @@ az_result sample_base64_decode(az_span base64_encoded, az_span in_span, az_span*
   }
 
   // Get the source BIO to push through the filter
-  source_mem_bio = BIO_new_mem_buf(az_span_ptr(base64_encoded), (int)az_span_size(base64_encoded));
+  source_mem_bio = BIO_new_mem_buf(az_span_ptr(*base64_encoded), (int)az_span_size(*base64_encoded));
   if (source_mem_bio == NULL)
   {
     BIO_free(b64_decoder);
@@ -331,12 +290,12 @@ az_result sample_base64_decode(az_span base64_encoded, az_span in_span, az_span*
   BIO_set_close(source_mem_bio, BIO_CLOSE);
 
   // Read the memory which was pushed through the filter
-  int read_data = BIO_read(source_mem_bio, az_span_ptr(in_span), az_span_size(in_span));
+  int read_data = BIO_read(source_mem_bio, az_span_ptr(*out_span), az_span_size(*out_span));
 
   // Set the output span
   if (read_data > 0)
   {
-    *out_span = az_span_create(az_span_ptr(in_span), (int32_t)read_data);
+    *out_span = az_span_create(az_span_ptr(*out_span), (int32_t)read_data);
     result = AZ_OK;
   }
   else
@@ -350,12 +309,43 @@ az_result sample_base64_decode(az_span base64_encoded, az_span in_span, az_span*
   return result;
 }
 
-az_result sample_base64_encode(az_span bytes, az_span in_span, az_span* out_span)
+az_result hmac_sha256_sign(const az_span* key, const az_span* bytes, az_span* out_span)
 {
-  _az_PRECONDITION_NOT_NULL(out_span);
+  PRECONDITION_NOT_NULL(key);
+  PRECONDITION_NOT_NULL(bytes);
+  PRECONDITION_NOT_NULL(out_span);
 
   az_result result;
 
+  unsigned int hmac_encode_len;
+  unsigned char* hmac = HMAC(
+      EVP_sha256(),
+      (void*)az_span_ptr(*key),
+      az_span_size(*key),
+      az_span_ptr(*bytes),
+      (size_t)az_span_size(*bytes),
+      az_span_ptr(*out_span),
+      &hmac_encode_len);
+
+  if (hmac != NULL)
+  {
+    *out_span = az_span_create(az_span_ptr(*out_span), (int32_t)hmac_encode_len);
+    result = AZ_OK;
+  }
+  else
+  {
+    result = AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
+  }
+
+  return result;
+}
+
+az_result base64_encode(const az_span* bytes, az_span* out_span)
+{
+  PRECONDITION_NOT_NULL(bytes);
+  PRECONDITION_NOT_NULL(out_span);
+
+  az_result result;
   BIO* sink_mem_bio;
   BIO* b64_encoder;
   BUF_MEM* encoded_mem_ptr;
@@ -388,7 +378,7 @@ az_result sample_base64_encode(az_span bytes, az_span in_span, az_span* out_span
   BIO_set_flags(b64_encoder, BIO_FLAGS_BASE64_NO_NL);
 
   // Write the bytes to be encoded
-  int bytes_written = BIO_write(b64_encoder, az_span_ptr(bytes), (int)az_span_size(bytes));
+  int bytes_written = BIO_write(b64_encoder, az_span_ptr(*bytes), (int)az_span_size(*bytes));
   if (bytes_written < 1)
   {
     BIO_free(sink_mem_bio);
@@ -402,11 +392,11 @@ az_result sample_base64_encode(az_span bytes, az_span in_span, az_span* out_span
   // Get the pointer to the encoded bytes
   BIO_get_mem_ptr(b64_encoder, &encoded_mem_ptr);
 
-  if ((size_t)az_span_size(in_span) >= encoded_mem_ptr->length)
+  if ((size_t)az_span_size(*out_span) >= encoded_mem_ptr->length)
   {
     // Copy the bytes to the output and initialize output span
-    memcpy(az_span_ptr(in_span), encoded_mem_ptr->data, encoded_mem_ptr->length);
-    *out_span = az_span_create(az_span_ptr(in_span), (int32_t)encoded_mem_ptr->length);
+    memcpy(az_span_ptr(*out_span), encoded_mem_ptr->data, encoded_mem_ptr->length);
+    *out_span = az_span_create(az_span_ptr(*out_span), (int32_t)encoded_mem_ptr->length);
 
     result = AZ_OK;
   }
@@ -421,31 +411,46 @@ az_result sample_base64_encode(az_span bytes, az_span in_span, az_span* out_span
   return result;
 }
 
-az_result sample_hmac_sha256_sign(az_span key, az_span bytes, az_span in_span, az_span* out_span)
+void sas_generate_encoded_signed_signature(
+    const az_span* sas_key,
+    const az_span* sas_signature,
+    az_span* sas_b64_encoded_hmac256_signed_signature)
 {
-  _az_PRECONDITION_NOT_NULL(out_span);
+  PRECONDITION_NOT_NULL(sas_key);
+  PRECONDITION_NOT_NULL(sas_signature);
+  PRECONDITION_NOT_NULL(sas_b64_encoded_hmac256_signed_signature);
 
-  az_result result;
+  int rc;
 
-  unsigned int hmac_encode_len;
-  unsigned char* hmac = HMAC(
-      EVP_sha256(),
-      (void*)az_span_ptr(key),
-      az_span_size(key),
-      az_span_ptr(bytes),
-      (size_t)az_span_size(bytes),
-      az_span_ptr(in_span),
-      &hmac_encode_len);
-
-  if (hmac != NULL)
+  // Decode the base64 encoded SAS key to use for HMAC signing.
+  az_span sas_b64_decoded_key = AZ_SPAN_FROM_BUFFER(sas_b64_decoded_key_buffer);
+  if (az_failed(rc = base64_decode(sas_key, &sas_b64_decoded_key)))
   {
-    *out_span = az_span_create(az_span_ptr(in_span), (int32_t)hmac_encode_len);
-    result = AZ_OK;
-  }
-  else
-  {
-    result = AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
+    LOG_ERROR("Could not decode the SAS key: az_result return code 0x%04x.", rc);
+    exit(rc);
   }
 
-  return result;
+  // HMAC-SHA256 sign the signature with the decoded key.
+  az_span sas_hmac256_signed_signature = AZ_SPAN_FROM_BUFFER(sas_hmac256_signed_signature_buffer);
+  if (az_failed(
+          rc = hmac_sha256_sign(
+              &sas_b64_decoded_key,
+              sas_signature,
+              &sas_hmac256_signed_signature)))
+  {
+    LOG_ERROR("Could not sign the signature: az_result return code 0x%04x.", rc);
+    exit(rc);
+  }
+
+  // Base64 encode the result of the HMAC signing.
+  if (az_failed(
+          rc = base64_encode(
+              &sas_hmac256_signed_signature,
+              sas_b64_encoded_hmac256_signed_signature)))
+  {
+    LOG_ERROR("Could not base64 encode the password: az_result return code 0x%04x.", rc);
+    exit(rc);
+  }
+
+  return;
 }

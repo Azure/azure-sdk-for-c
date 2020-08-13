@@ -162,7 +162,7 @@ void connect_client_to_provisioning_service()
   {
     LOG_ERROR(
         "Failed to connect: MQTTClient return code %d.\n"
-        "If on Windows, confirm the AZ_IOT_DEVICE_X509_TRUST_PEM_FILE environment variable is set "
+        "If on Windows, confirm the AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH environment variable is set "
         "correctly.",
         rc);
     exit(rc);
@@ -308,10 +308,10 @@ void parse_message(
     az_iot_provisioning_client_register_response* register_response,
     az_iot_provisioning_client_operation_status* operation_status)
 {
-  _az_PRECONDITION_NOT_NULL(topic);
-  _az_PRECONDITION_NOT_NULL(message);
-  _az_PRECONDITION_NOT_NULL(register_response);
-  _az_PRECONDITION_NOT_NULL(operation_status);
+  PRECONDITION_NOT_NULL(topic);
+  PRECONDITION_NOT_NULL(message);
+  PRECONDITION_NOT_NULL(register_response);
+  PRECONDITION_NOT_NULL(operation_status);
 
   int rc;
   az_span topic_span = az_span_create((uint8_t*)topic, topic_len);
@@ -344,7 +344,7 @@ void parse_message(
 void send_operation_query_message(
     const az_iot_provisioning_client_register_response* register_response)
 {
-  _az_PRECONDITION_NOT_NULL(register_response);
+  PRECONDITION_NOT_NULL(register_response);
 
   int rc;
 

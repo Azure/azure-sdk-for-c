@@ -140,7 +140,7 @@ void connect_client_to_iot_hub()
   {
     LOG_ERROR(
         "Failed to connect: MQTTClient return code %d.\n"
-        "If on Windows, confirm the AZ_IOT_DEVICE_X509_TRUST_PEM_FILE environment variable is set "
+        "If on Windows, confirm the AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH environment variable is set "
         "correctly.",
         rc);
     exit(rc);
@@ -206,7 +206,7 @@ void generate_sas_key()
   // Create the POSIX expiration time from input minutes.
   uint64_t sas_duration = get_epoch_expiration_time_from_minutes(env_vars.sas_key_duration_minutes);
 
-  // Get the signature.
+  // Get the signature that will later be signed.
   az_span sas_signature = AZ_SPAN_FROM_BUFFER(sas_signature_buffer);
   if (az_failed(
           rc = az_iot_hub_client_sas_get_signature(
