@@ -6,25 +6,7 @@
 #define SAMPLE_TYPE PAHO_IOT_PROVISIONING
 #define SAMPLE_NAME PAHO_IOT_PROVISIONING_SAS_SAMPLE
 
-<<<<<<< HEAD
 #define TIMEOUT_MQTT_RECEIVE_MS (60 * 1000)
-=======
-// Store environment variables
-static char global_provisioning_endpoint_buffer[256];
-static char id_scope_buffer[16];
-static char registration_id_buffer[256];
-static char iot_provisioning_sas_key_buffer[128];
-static az_span iot_provisioning_sas_key;
-static uint32_t iot_provisioning_sas_key_duration;
-static char x509_trust_pem_file_path_buffer[256];
-
-// Generate SAS key variables
-static char sas_signature_buffer[128];
-static char sas_b64_decoded_key_buffer[64];
-static char sas_encoded_hmac256_signed_signature_buffer[128];
-static char sas_b64_encoded_hmac256_signed_signature_buffer[128];
-static char mqtt_password_buffer[256];
->>>>>>> master
 
 static sample_environment_variables env_vars;
 static az_iot_provisioning_client provisioning_client;
