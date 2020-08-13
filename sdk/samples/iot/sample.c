@@ -8,22 +8,22 @@
 //
 //#define USE_WEB_SOCKET // Comment to use MQTT without WebSockets.
 #ifdef USE_WEB_SOCKET
-az_span mqtt_url_prefix = AZ_SPAN_LITERAL_FROM_STR("wss://");
+const az_span mqtt_url_prefix = AZ_SPAN_LITERAL_FROM_STR("wss://");
 // Note: Paho fails to connect to Hub when using AZ_IOT_HUB_CLIENT_WEB_SOCKET_PATH or an X509
 // certificate.
-az_span mqtt_url_suffix
+const az_span mqtt_url_suffix
     = AZ_SPAN_LITERAL_FROM_STR(":443" AZ_IOT_HUB_CLIENT_WEB_SOCKET_PATH_NO_X509_CLIENT_CERT);
 #else
-az_span mqtt_url_prefix = AZ_SPAN_LITERAL_FROM_STR("ssl://");
-az_span mqtt_url_suffix = AZ_SPAN_LITERAL_FROM_STR(":8883");
+const az_span mqtt_url_prefix = AZ_SPAN_LITERAL_FROM_STR("ssl://");
+const az_span mqtt_url_suffix = AZ_SPAN_LITERAL_FROM_STR(":8883");
 #endif
-az_span provisioning_global_endpoint
+const az_span provisioning_global_endpoint
     = AZ_SPAN_LITERAL_FROM_STR("ssl://global.azure-devices-provisioning.net:8883");
 
 //
 // SAS key generation buffers
 //
-static char sas_b64_decoded_key_buffer[64];
+static char sas_b64_decoded_key_buffer[32];
 static char sas_hmac256_signed_signature_buffer[128];
 
 //
