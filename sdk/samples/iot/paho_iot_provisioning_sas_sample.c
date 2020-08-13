@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "sample.h"
+#include "iot_sample_foundation.h"
 
 #define SAMPLE_TYPE PAHO_IOT_PROVISIONING
 #define SAMPLE_NAME PAHO_IOT_PROVISIONING_SAS_SAMPLE
