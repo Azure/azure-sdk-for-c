@@ -173,7 +173,7 @@ void subscribe_client_to_iot_hub_topics()
 {
   int rc;
 
-  // Messages received on the Methods topic will method commands to be invoked.
+  // Messages received on the Methods topic will be method commands to be invoked.
   if ((rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_HUB_CLIENT_METHODS_SUBSCRIBE_TOPIC, 1))
       != MQTTCLIENT_SUCCESS)
   {

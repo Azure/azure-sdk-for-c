@@ -26,9 +26,31 @@ const az_span provisioning_global_endpoint
 static char sas_b64_decoded_key_buffer[64];
 static char sas_hmac256_signed_signature_buffer[128];
 
+// Program Time
+static const char iso_spec_time_format[] = "%Y-%m-%dT%H:%M:%S%z"; // ISO8601 Time Format
+static char program_start_time_buffer[32];
+static az_span program_start_time;
+
 //
 // Functions
 //
+void set_program_start_time()
+{
+  time_t rawtime;
+  struct tm* timeinfo;
+
+  time(&rawtime);
+  timeinfo = localtime(&rawtime);
+  size_t len = strftime(program_start_time_buffer, sizeof(program_start_time_buffer), iso_spec_time_format, timeinfo);
+  if (len == 0)
+  {
+    LOG_ERROR("Insufficient buffer size for program start time.");
+    exit(1);
+  }
+
+  program_start_time = az_span_create((uint8_t*)program_start_time_buffer, (int32_t)len);
+}
+
 az_result read_environment_variables(
     sample_type type,
     sample_name name,

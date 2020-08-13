@@ -12,7 +12,7 @@
 static const az_span twin_document_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("get_twin");
 static const az_span twin_patch_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("reported_prop");
 static const az_span version_name = AZ_SPAN_LITERAL_FROM_STR("$version");
-static az_span reported_property_name = AZ_SPAN_LITERAL_FROM_STR("device_count");
+static const az_span reported_property_name = AZ_SPAN_LITERAL_FROM_STR("device_count");
 static int32_t reported_property_value = 0;
 static char reported_property_buffer[128];
 

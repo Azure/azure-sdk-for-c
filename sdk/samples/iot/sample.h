@@ -156,6 +156,12 @@ typedef enum sample_name
 } sample_name;
 
 /*
+ *
+ *
+ */
+void set_program_start_time();
+
+/*
  * @brief      Reads in environment variables set by user for purposes of running sample.
  *
  * @param[in]  type      Enumerated type of the sample.
