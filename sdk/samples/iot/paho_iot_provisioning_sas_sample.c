@@ -98,7 +98,7 @@ static char x509_trust_pem_file_path_buffer[256];
 
 // Generate SAS key variables
 static char sas_signature_buffer[128];
-static char sas_b64_decoded_key_buffer[32];
+static char sas_b64_decoded_key_buffer[64];
 static char sas_encoded_hmac256_signed_signature_buffer[128];
 static char sas_b64_encoded_hmac256_signed_signature_buffer[128];
 static char mqtt_password_buffer[256];
