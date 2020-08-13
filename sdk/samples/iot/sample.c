@@ -269,7 +269,8 @@ az_result base64_decode(const az_span* base64_encoded, az_span* out_span)
   }
 
   // Get the source BIO to push through the filter
-  source_mem_bio = BIO_new_mem_buf(az_span_ptr(*base64_encoded), (int)az_span_size(*base64_encoded));
+  source_mem_bio
+      = BIO_new_mem_buf(az_span_ptr(*base64_encoded), (int)az_span_size(*base64_encoded));
   if (source_mem_bio == NULL)
   {
     BIO_free(b64_decoder);
@@ -309,10 +310,10 @@ az_result base64_decode(const az_span* base64_encoded, az_span* out_span)
   return result;
 }
 
-az_result hmac_sha256_sign(const az_span* key, const az_span* bytes, az_span* out_span)
+az_result hmac_sha256_sign(const az_span* decoded_key, const az_span* signature, az_span* out_span)
 {
-  PRECONDITION_NOT_NULL(key);
-  PRECONDITION_NOT_NULL(bytes);
+  PRECONDITION_NOT_NULL(decoded_key);
+  PRECONDITION_NOT_NULL(signature);
   PRECONDITION_NOT_NULL(out_span);
 
   az_result result;
@@ -320,10 +321,10 @@ az_result hmac_sha256_sign(const az_span* key, const az_span* bytes, az_span* ou
   unsigned int hmac_encode_len;
   unsigned char* hmac = HMAC(
       EVP_sha256(),
-      (void*)az_span_ptr(*key),
-      az_span_size(*key),
-      az_span_ptr(*bytes),
-      (size_t)az_span_size(*bytes),
+      (void*)az_span_ptr(*decoded_key),
+      az_span_size(*decoded_key),
+      az_span_ptr(*signature),
+      (size_t)az_span_size(*signature),
       az_span_ptr(*out_span),
       &hmac_encode_len);
 
@@ -433,10 +434,8 @@ void sas_generate_encoded_signed_signature(
   // HMAC-SHA256 sign the signature with the decoded key.
   az_span sas_hmac256_signed_signature = AZ_SPAN_FROM_BUFFER(sas_hmac256_signed_signature_buffer);
   if (az_failed(
-          rc = hmac_sha256_sign(
-              &sas_b64_decoded_key,
-              sas_signature,
-              &sas_hmac256_signed_signature)))
+          rc
+          = hmac_sha256_sign(&sas_b64_decoded_key, sas_signature, &sas_hmac256_signed_signature)))
   {
     LOG_ERROR("Could not sign the signature: az_result return code 0x%04x.", rc);
     exit(rc);
@@ -444,9 +443,8 @@ void sas_generate_encoded_signed_signature(
 
   // Base64 encode the result of the HMAC signing.
   if (az_failed(
-          rc = base64_encode(
-              &sas_hmac256_signed_signature,
-              sas_b64_encoded_hmac256_signed_signature)))
+          rc
+          = base64_encode(&sas_hmac256_signed_signature, sas_b64_encoded_hmac256_signed_signature)))
   {
     LOG_ERROR("Could not base64 encode the password: az_result return code 0x%04x.", rc);
     exit(rc);

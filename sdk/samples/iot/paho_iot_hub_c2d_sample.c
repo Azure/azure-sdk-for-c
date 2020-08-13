@@ -69,8 +69,8 @@ void create_and_configure_client()
   // Build an MQTT endpoint c-string.
   char mqtt_endpoint_buffer[128];
   if (az_failed(
-          rc
-          = create_mqtt_endpoint(SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer))))
+          rc = create_mqtt_endpoint(
+              SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer))))
   {
     LOG_ERROR("Failed to create MQTT endpoint: az_result return code 0x%04x.", rc);
     exit(rc);
@@ -142,7 +142,8 @@ void connect_client_to_iot_hub()
   {
     LOG_ERROR(
         "Failed to connect: MQTTClient return code %d.\n"
-        "If on Windows, confirm the AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH environment variable is set "
+        "If on Windows, confirm the AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH environment variable is "
+        "set "
         "correctly.",
         rc);
     exit(rc);

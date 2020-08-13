@@ -160,7 +160,8 @@ typedef enum sample_name
  *
  * @param[in]  type      Enumerated type of the sample.
  * @param[in]  name      Enumerated name of the sample.
- * @param[out] env_vars  Pointer to struct that will contain all read-in environment variables. May NOT be NULL.
+ * @param[out] env_vars  Pointer to struct that will contain all read-in environment variables. May
+ * NOT be NULL.
  * @return     AZ_OK if all environment variables required are successfully read and values stored.
  */
 az_result read_environment_variables(
@@ -175,9 +176,9 @@ az_result read_environment_variables(
  * @param[in]  env_name       Name of environment variable. May NOT be NULL.
  * @param[in]  default_value  Default value if envionment variable has not been set. May be NULL.
  * @param[in]  hide_value     True if value should not be printed to console.
- * @param[out] out_value      Pointer to az_span that will contain the envrionment variable value.  May NOT
- * be NULL. az_span's size reflects actual size of content in az_span, not size of buffer used to
- * create az_span.
+ * @param[out] out_value      Pointer to az_span that will contain the envrionment variable value.
+ * May NOT be NULL. az_span's size reflects actual size of content in az_span, not size of buffer
+ * used to create az_span.
  * @return     AZ_ERROR_INSUFFICIENT_SPAN_SIZE if buffer size is not large enough to hold
  * environment variable value. AZ_ERROR_ARG if required environment variable not set. Else AZ_OK.
  */
@@ -229,29 +230,33 @@ uint32_t get_epoch_expiration_time_from_minutes(uint32_t minutes);
  * @brief      Decodes an input az_span from base64 to bytes.
  *             Assumes *out_span is a valid span.
  *
- * @param[in]  base64_encoded       May NOT be NULL.
- * @param[out] out_span             May NOT be NULL.
+ * @param[in]  base64_encoded   Pointer to az_span to be decoded. May NOT be NULL.
+ * @param[out] out_span         Pointer to the az_span that will contain the decoded input. May NOT
+ * be NULL.
  * @return
  */
 az_result base64_decode(const az_span* base64_encoded, az_span* out_span);
 
 /*
- * @brief      HMAC256 an input az_span with an input key.
+ * @brief      HMAC256 signing of the signature with a decoded key.
  *             Assumes *out_span is a valid span.
  *
- * @param[in]  key
- * @param[in]  bytes
- * @param[out] out_span
+ * @param[in]  decoded_key  Pointer to az_span containing the decoded key for signing. May NOT be
+ * NULL.
+ * @param[in]  signature    Pointer to az_span containing the signature for signing. May NOT be
+ * NULL.
+ * @param[out] out_span     Pointer to az_span that will contain the HMAC256 signed signature. May
+ * NOT be NULL.
  * @return
  */
-az_result hmac_sha256_sign(const az_span* key, const az_span* bytes, az_span* out_span);
+az_result hmac_sha256_sign(const az_span* decoded_key, const az_span* signature, az_span* out_span);
 
 /*
  * @brief      Encodes an input az_span from bytes to base64.
  *             Assumes *out_span is a valid span.
  *
- * @param[in]  bytes
- * @param[out] out_span
+ * @param[in]  bytes      Pointer to az_span containing the bytes to be encoded. May NOT be NULL.
+ * @param[out] out_span   Pointer to az_span that will contain the encoded bytes. May NOT be NULL.
  * @return
  */
 az_result base64_encode(const az_span* bytes, az_span* out_span);
@@ -260,10 +265,12 @@ az_result base64_encode(const az_span* bytes, az_span* out_span);
  * @brief      Generate the b64 encoded and signed signature using HMAC-SHA256 signing.
  *             Assumes *sas_b64_encoded_hmac256_signed_signature is a valid span.
  *
- * @param[in]  sas_key        Pointer to az_span that contains the SAS key that will be used for signing. May NOT be NULL.
- * @param[in]  sas_signature  Pointer to az_san that contains the signature. May NOT be NULL.
+ * @param[in]  sas_key        Pointer to az_span containing the SAS key that will be used for
+ * signing. May NOT be NULL.
+ * @param[in]  sas_signature  Pointer to az_span containing the signature. May NOT be NULL.
  * @param[out] sas_b64_encoded_hmac256_signed_signature
- *                            Pointer to az_span that will contain the encoded and signed signature. May NOT be NULL.
+ *                            Pointer to az_span that will contain the encoded and signed signature.
+ * May NOT be NULL.
  */
 void sas_generate_encoded_signed_signature(
     const az_span* sas_key,
