@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "sample.h"
+#include "iot_sample_foundation.h"
 
 #define SAMPLE_TYPE PAHO_IOT_HUB
 #define SAMPLE_NAME PAHO_IOT_HUB_C2D_SAMPLE
@@ -15,45 +15,48 @@ static MQTTClient mqtt_client;
 static char mqtt_client_username_buffer[128];
 
 // Functions
-void create_and_configure_client();
-void connect_client_to_iot_hub();
-void subscribe_client_to_iot_hub_topics();
-void receive_messages();
-void disconnect_client_from_iot_hub();
+void create_and_configure_mqtt_client();
+void connect_mqtt_client_to_iot_hub();
+void subscribe_mqtt_client_to_iot_hub_topics();
+void receive_c2d_messages();
+void disconnect_mqtt_client_from_iot_hub();
 
-void parse_message(
+void parse_c2d_message(
     char* topic,
     int topic_len,
     const MQTTClient_message* message,
     az_iot_hub_client_c2d_request* c2d_request);
 
 /*
- * This sample receives incoming cloud-to-device (C2D) messages invoked from the Azure IoT Hub.
- * It will successfully receive up to MAX_C2D_MESSAGE_COUNT messages sent from the service.
- * If a timeout occurs of TIMEOUT_MQTT_RECEIVE_MS while waiting for a message, the sample will exit.
- * X509 self-certification is used.
+ * This sample receives incoming cloud-to-device (C2D) messages sent from the Azure IoT Hub to
+ * the device. It will successfully receive up to MAX_C2D_MESSAGE_COUNT messages sent from the
+ * service. If a timeout occurs of TIMEOUT_MQTT_RECEIVE_MS while waiting for a message, the sample
+ * will exit. X509 self-certification is used.
+ *
+ * To send a C2D message, select your device's Message to Device tab in the Azure Portal for your
+ * IoT Hub. Enter a message in the Message Body and select Send Message.
  */
 int main()
 {
-  create_and_configure_client();
+  create_and_configure_mqtt_client();
   LOG_SUCCESS("Client created and configured.");
 
-  connect_client_to_iot_hub();
+  connect_mqtt_client_to_iot_hub();
   LOG_SUCCESS("Client connected to IoT Hub.");
 
-  subscribe_client_to_iot_hub_topics();
-  LOG_SUCCESS("Client subscribed to IoT Hub topics.");
+  subscribe_mqtt_client_to_iot_hub_topics();
+  LOG_SUCCESS("Client subscribed to IoT Hub topics and is ready to receive C2D messages.");
 
-  receive_messages();
+  receive_c2d_messages();
   LOG_SUCCESS("Client received messages.")
 
-  disconnect_client_from_iot_hub();
+  disconnect_mqtt_client_from_iot_hub();
   LOG_SUCCESS("Client disconnected from IoT Hub.");
 
   return 0;
 }
 
-void create_and_configure_client()
+void create_and_configure_mqtt_client()
 {
   int rc;
 
@@ -109,7 +112,7 @@ void create_and_configure_client()
   }
 }
 
-void connect_client_to_iot_hub()
+void connect_mqtt_client_to_iot_hub()
 {
   int rc;
 
@@ -143,14 +146,13 @@ void connect_client_to_iot_hub()
     LOG_ERROR(
         "Failed to connect: MQTTClient return code %d.\n"
         "If on Windows, confirm the AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH environment variable is "
-        "set "
-        "correctly.",
+        "set correctly.",
         rc);
     exit(rc);
   }
 }
 
-void subscribe_client_to_iot_hub_topics()
+void subscribe_mqtt_client_to_iot_hub_topics()
 {
   int rc;
 
@@ -163,17 +165,17 @@ void subscribe_client_to_iot_hub_topics()
   }
 }
 
-void receive_messages()
+void receive_c2d_messages()
 {
   int rc;
   char* topic = NULL;
   int topic_len = 0;
   MQTTClient_message* message = NULL;
 
-  // Continue until max # messages received or timeout expires to receive a single message.
+  // Continue until max # messages received or timeout expires.
   for (uint8_t message_count = 0; message_count < MAX_C2D_MESSAGE_COUNT; message_count++)
   {
-    LOG("Waiting for message.");
+    LOG("Waiting for C2D message.");
 
     if (((rc
           = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, TIMEOUT_MQTT_RECEIVE_MS))
@@ -194,9 +196,9 @@ void receive_messages()
     }
     LOG_SUCCESS("Message #%d: Client received message from the service.", message_count + 1);
 
-    // Parse message.
+    // Parse c2d message.
     az_iot_hub_client_c2d_request c2d_request;
-    parse_message(topic, topic_len, message, &c2d_request);
+    parse_c2d_message(topic, topic_len, message, &c2d_request);
     LOG_SUCCESS("Client parsed message.");
 
     LOG(" "); // formatting
@@ -206,7 +208,7 @@ void receive_messages()
   }
 }
 
-void disconnect_client_from_iot_hub()
+void disconnect_mqtt_client_from_iot_hub()
 {
   int rc;
 
@@ -219,7 +221,7 @@ void disconnect_client_from_iot_hub()
   MQTTClient_destroy(&mqtt_client);
 }
 
-void parse_message(
+void parse_c2d_message(
     char* topic,
     int topic_len,
     const MQTTClient_message* message,

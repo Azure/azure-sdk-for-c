@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "sample.h"
+#include "iot_sample_foundation.h"
 
 #define SAMPLE_TYPE PAHO_IOT_HUB
 #define SAMPLE_NAME PAHO_IOT_HUB_TWIN_SAMPLE
@@ -22,34 +22,34 @@ static MQTTClient mqtt_client;
 static char mqtt_client_username_buffer[128];
 
 // Functions
-void create_and_configure_client();
-void connect_client_to_iot_hub();
-void subscribe_client_to_iot_hub_topics();
-void get_twin_document();
+void create_and_configure_mqtt_client();
+void connect_mqtt_client_to_iot_hub();
+void subscribe_mqtt_client_to_iot_hub_topics();
+void get_device_twin_document();
 void send_reported_property();
 void receive_desired_property();
-void disconnect_client_from_iot_hub();
+void disconnect_mqtt_client_from_iot_hub();
 
 az_result build_reported_property(az_span* reported_property_payload);
 az_result update_property(const az_span* desired_payload);
-void receive_message();
-void parse_message(
+void receive_device_twin_message();
+void parse_device_twin_message(
     char* topic,
     int topic_len,
     const MQTTClient_message* message,
     az_iot_hub_client_twin_response* twin_response);
 
 /*
- * This sample utilizes the Azure IoT Hub to get the twin document, send a reported property
+ * This sample utilizes the Azure IoT Hub to get the device twin document, send a reported property
  * message, and receive up to 5 desired property messages. If a timeout occurs while waiting for a
  * message from the Azure IoT Hub, the sample will exit. Upon receiving a desired property message,
- * the sample will update the property locally and send a reported property message back to the
+ * the sample will update the twin property locally and send a reported property message back to the
  * service. X509 self-certification is used.
  *
  * A property named `device_count` is supported for this sample. To send a device twin desired
- * property message, select your device's Device Twin tab in your Azure IoT Hub. Add the property
- * `device_count` along with a corresponding value to the `desired` section of the JSON. Select Save
- * to send the message.
+ * property message, select your device's Device Twin tab in the Azure Portal of your IoT Hub. Add
+ * the property `device_count` along with a corresponding value to the `desired` section of the
+ * JSON. Select Save to udate the twin document and send the twin message to the device.
  *
  * {
  *   "properties": {
@@ -64,16 +64,16 @@ void parse_message(
  */
 int main()
 {
-  create_and_configure_client();
+  create_and_configure_mqtt_client();
   LOG_SUCCESS("Client created and configured.");
 
-  connect_client_to_iot_hub();
+  connect_mqtt_client_to_iot_hub();
   LOG_SUCCESS("Client connected to IoT Hub.");
 
-  subscribe_client_to_iot_hub_topics();
+  subscribe_mqtt_client_to_iot_hub_topics();
   LOG_SUCCESS("Client subscribed to IoT Hub topics.");
 
-  get_twin_document();
+  get_device_twin_document();
   LOG_SUCCESS("Client got twin document.");
 
   send_reported_property();
@@ -82,13 +82,13 @@ int main()
   receive_desired_property();
   LOG_SUCCESS("Client received desired property.");
 
-  disconnect_client_from_iot_hub();
+  disconnect_mqtt_client_from_iot_hub();
   LOG_SUCCESS("Client disconnected from IoT Hub.");
 
   return 0;
 }
 
-void create_and_configure_client()
+void create_and_configure_mqtt_client()
 {
   int rc;
 
@@ -144,7 +144,7 @@ void create_and_configure_client()
   }
 }
 
-void connect_client_to_iot_hub()
+void connect_mqtt_client_to_iot_hub()
 {
   int rc;
 
@@ -179,14 +179,13 @@ void connect_client_to_iot_hub()
     LOG_ERROR(
         "Failed to connect: MQTTClient return code %d.\n"
         "If on Windows, confirm the AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH environment variable is "
-        "set "
-        "correctly.",
+        "set correctly.",
         rc);
     exit(rc);
   }
 }
 
-void subscribe_client_to_iot_hub_topics()
+void subscribe_mqtt_client_to_iot_hub_topics()
 {
   int rc;
 
@@ -207,7 +206,7 @@ void subscribe_client_to_iot_hub_topics()
   }
 }
 
-void get_twin_document()
+void get_device_twin_document()
 {
   int rc;
 
@@ -223,7 +222,7 @@ void get_twin_document()
               sizeof(twin_document_topic),
               NULL)))
   {
-    LOG_ERROR("Failed to get Twin Document publish topic: az_result return code %04x", rc);
+    LOG_ERROR("Failed to get Twin Document publish topic: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
@@ -231,12 +230,12 @@ void get_twin_document()
   if ((rc = MQTTClient_publish(mqtt_client, twin_document_topic, 0, NULL, 0, 0, NULL))
       != MQTTCLIENT_SUCCESS)
   {
-    LOG_ERROR("Failed to publish twin document request: MQTTClient return code %d", rc);
+    LOG_ERROR("Failed to publish twin document request: MQTTClient return code %d.", rc);
     exit(rc);
   }
 
   // Receive the twin document message from the server.
-  receive_message();
+  receive_device_twin_message();
 }
 
 void send_reported_property()
@@ -255,7 +254,7 @@ void send_reported_property()
               sizeof(twin_patch_topic),
               NULL)))
   {
-    LOG_ERROR("Failed to get Twin Patch publish topic: az_result return code %04x", rc);
+    LOG_ERROR("Failed to get Twin Patch publish topic: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
@@ -263,7 +262,7 @@ void send_reported_property()
   az_span reported_property_payload = AZ_SPAN_FROM_BUFFER(reported_property_buffer);
   if (az_failed(rc = build_reported_property(&reported_property_payload)))
   {
-    LOG_ERROR("Failed to build reported property payload to send: az_result return code %04x", rc);
+    LOG_ERROR("Failed to build reported property payload to send: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
@@ -278,27 +277,27 @@ void send_reported_property()
            NULL))
       != MQTTCLIENT_SUCCESS)
   {
-    LOG_ERROR("Failed to publish reported property update: MQTTClient return code %d", rc);
+    LOG_ERROR("Failed to publish reported property update: MQTTClient return code %d.", rc);
     exit(rc);
   }
-  LOG_SUCCESS("Client sent reported property message:");
+  LOG_SUCCESS("Client sent reported property message.");
   LOG_AZ_SPAN("Payload:", reported_property_payload);
 
   // Receive the server resonse.
-  receive_message();
+  receive_device_twin_message();
 }
 
 void receive_desired_property()
 {
-  // Continue until max # messages received
+  // Continue until max # messages received or timeout expires.
   for (uint8_t message_count = 0; message_count < MAX_TWIN_MESSAGE_COUNT; message_count++)
   {
-    receive_message();
+    receive_device_twin_message();
     send_reported_property();
   }
 }
 
-void disconnect_client_from_iot_hub()
+void disconnect_mqtt_client_from_iot_hub()
 {
   int rc;
 
@@ -311,14 +310,14 @@ void disconnect_client_from_iot_hub()
   MQTTClient_destroy(&mqtt_client);
 }
 
-void receive_message()
+void receive_device_twin_message()
 {
   int rc;
   char* topic = NULL;
   int topic_len = 0;
   MQTTClient_message* message = NULL;
 
-  LOG("Waiting for message.");
+  LOG("Waiting for device twin message.");
 
   if (((rc = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, TIMEOUT_MQTT_RECEIVE_MS))
        != MQTTCLIENT_SUCCESS)
@@ -336,20 +335,20 @@ void receive_message()
   {
     topic_len = (int)strlen(topic);
   }
-  LOG_SUCCESS("Client received message from the service.");
+  LOG_SUCCESS("Client received device twin message from the service.");
 
-  // Parse message.
+  // Parse device twin message.
   az_iot_hub_client_twin_response twin_response;
-  parse_message(topic, topic_len, message, &twin_response);
-  LOG_SUCCESS("Client parsed message.");
+  parse_device_twin_message(topic, topic_len, message, &twin_response);
+  LOG_SUCCESS("Client parsed device twin message.");
 
-  LOG(" "); // formatting
+  LOG(" "); // Formatting
 
   MQTTClient_freeMessage(&message);
   MQTTClient_free(topic);
 }
 
-void parse_message(
+void parse_device_twin_message(
     char* topic,
     int topic_len,
     const MQTTClient_message* message,

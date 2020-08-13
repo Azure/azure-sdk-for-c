@@ -1,12 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "sample.h"
+#include "iot_sample_foundation.h"
 
 #define SAMPLE_TYPE PAHO_IOT_HUB
 #define SAMPLE_NAME PAHO_IOT_HUB_SAS_TELEMETRY_SAMPLE
 
-#define TELEMETRY_SEND_INTERVAL 1
+#define TELEMETRY_SEND_INTERVAL_SEC 1
 #define TELEMETRY_NUMBER_OF_MESSAGES 5
 
 static sample_environment_variables env_vars;
@@ -20,10 +20,10 @@ static char sas_encoded_signed_signature_buffer[128];
 static char mqtt_password_buffer[256];
 
 // Functions
-void create_and_configure_client();
-void connect_client_to_iot_hub();
+void create_and_configure_mqtt_client();
+void connect_mqtt_client_to_iot_hub();
 void send_telemetry_messages_to_iot_hub();
-void disconnect_client_from_iot_hub();
+void disconnect_mqtt_client_from_iot_hub();
 
 void generate_sas_key();
 
@@ -33,22 +33,22 @@ void generate_sas_key();
  */
 int main()
 {
-  create_and_configure_client();
+  create_and_configure_mqtt_client();
   LOG_SUCCESS("Client created and configured.");
 
-  connect_client_to_iot_hub();
+  connect_mqtt_client_to_iot_hub();
   LOG_SUCCESS("Client connected to IoT Hub.");
 
   send_telemetry_messages_to_iot_hub();
   LOG_SUCCESS("Client sent telemetry messages to IoT Hub.");
 
-  disconnect_client_from_iot_hub();
+  disconnect_mqtt_client_from_iot_hub();
   LOG_SUCCESS("Client disconnected from IoT Hub.");
 
   return 0;
 }
 
-void create_and_configure_client()
+void create_and_configure_mqtt_client()
 {
   int rc;
 
@@ -107,7 +107,7 @@ void create_and_configure_client()
   LOG_SUCCESS("Client generated SAS Key.");
 }
 
-void connect_client_to_iot_hub()
+void connect_mqtt_client_to_iot_hub()
 {
   int rc;
 
@@ -141,8 +141,7 @@ void connect_client_to_iot_hub()
     LOG_ERROR(
         "Failed to connect: MQTTClient return code %d.\n"
         "If on Windows, confirm the AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH environment variable is "
-        "set "
-        "correctly.",
+        "set correctly.",
         rc);
     exit(rc);
   }
@@ -169,7 +168,7 @@ void send_telemetry_messages_to_iot_hub()
   // Publish # of telemetry messages.
   for (int i = 0; i < TELEMETRY_NUMBER_OF_MESSAGES; ++i)
   {
-    LOG("Sending Message %d", i + 1);
+    LOG("Sending message %d.", i + 1);
     if ((rc = MQTTClient_publish(
              mqtt_client,
              telemetry_topic_buffer,
@@ -180,14 +179,14 @@ void send_telemetry_messages_to_iot_hub()
              NULL))
         != MQTTCLIENT_SUCCESS)
     {
-      LOG_ERROR("Failed to publish telemetry message %d, MQTTClient return code %d\n", i + 1, rc);
+      LOG_ERROR("Failed to publish telemetry message %d, MQTTClient return code %d.", i + 1, rc);
       exit(rc);
     }
-    sleep_for_seconds(TELEMETRY_SEND_INTERVAL);
+    sleep_for_seconds(TELEMETRY_SEND_INTERVAL_SEC);
   }
 }
 
-void disconnect_client_from_iot_hub()
+void disconnect_mqtt_client_from_iot_hub()
 {
   int rc;
 
@@ -222,7 +221,7 @@ void generate_sas_key()
   sas_generate_encoded_signed_signature(
       &(env_vars.hub_sas_key), &sas_signature, &sas_encoded_signed_signature);
 
-  // Get the resulting password, passing the base64 encoded, HMAC signed bytes
+  // Get the resulting MQTT password, passing the base64 encoded, HMAC signed bytes
   size_t mqtt_password_length;
   if (az_failed(
           rc = az_iot_hub_client_sas_get_password(

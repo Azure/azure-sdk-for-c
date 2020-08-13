@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "sample.h"
+#include "iot_sample_foundation.h"
 
 #define SAMPLE_TYPE PAHO_IOT_HUB
 #define SAMPLE_NAME PAHO_IOT_HUB_METHODS_SAMPLE
@@ -19,13 +19,13 @@ static MQTTClient mqtt_client;
 static char mqtt_client_username_buffer[128];
 
 // Functions
-void create_and_configure_client();
-void connect_client_to_iot_hub();
-void subscribe_client_to_iot_hub_topics();
-void receive_messages();
-void disconnect_client_from_iot_hub();
+void create_and_configure_mqtt_client();
+void connect_mqtt_client_to_iot_hub();
+void subscribe_mqtt_client_to_iot_hub_topics();
+void receive_method_messages();
+void disconnect_mqtt_client_from_iot_hub();
 
-void parse_message(
+void parse_method_message(
     char* topic,
     int topic_len,
     const MQTTClient_message* message,
@@ -38,41 +38,41 @@ void send_method_response(
     const az_span* response);
 
 /*
- * This sample receives incoming method commands invoked from the the Azure IoT Hub.
+ * This sample receives incoming method commands invoked from the the Azure IoT Hub to the device.
  * It will successfully receive up to MAX_METHOD_MESSAGE_COUNT method commands sent from the
  * service. If a timeout occurs of TIMEOUT_MQTT_RECEIVE_MS while waiting for a message, the sample
  * will exit. X509 self-certification is used.
  *
- * To send a method command, select your device's Direct Method tab in your Azure IoT Hub.
- * Enter a method name and select Invoke Method. A method named `ping` is supported, which if
- * successful will return a json payload of the following:
+ * To send a method command, select your device's Direct Method tab in the Azure Portal for your IoT
+ * Hub. Enter a method name and select Invoke Method. A method named `ping` is only supported, which
+ * if successful will return a JSON payload of the following:
  *
  *  {"response": "pong"}
  *
- * No other method commands are supported. If any are attempted to be invoked, the log will report
- * the method is not found.
+ * No other method commands are supported. If any other methods are attempted to be invoked, the log
+ * will report the method is not found.
  */
 int main()
 {
-  create_and_configure_client();
+  create_and_configure_mqtt_client();
   LOG_SUCCESS("Client created and configured.");
 
-  connect_client_to_iot_hub();
+  connect_mqtt_client_to_iot_hub();
   LOG_SUCCESS("Client connected to IoT Hub.");
 
-  subscribe_client_to_iot_hub_topics();
-  LOG_SUCCESS("Client subscribed to IoT Hub topics.");
+  subscribe_mqtt_client_to_iot_hub_topics();
+  LOG_SUCCESS("Client subscribed to IoT Hub topics and is ready to receive Methods messages.");
 
-  receive_messages();
+  receive_method_messages();
   LOG_SUCCESS("Client received messages.")
 
-  disconnect_client_from_iot_hub();
+  disconnect_mqtt_client_from_iot_hub();
   LOG_SUCCESS("Client disconnected from IoT Hub.");
 
   return 0;
 }
 
-void create_and_configure_client()
+void create_and_configure_mqtt_client()
 {
   int rc;
 
@@ -128,7 +128,7 @@ void create_and_configure_client()
   }
 }
 
-void connect_client_to_iot_hub()
+void connect_mqtt_client_to_iot_hub()
 {
   int rc;
 
@@ -162,14 +162,13 @@ void connect_client_to_iot_hub()
     LOG_ERROR(
         "Failed to connect: MQTTClient return code %d.\n"
         "If on Windows, confirm the AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH environment variable is "
-        "set "
-        "correctly.",
+        "set correctly.",
         rc);
     exit(rc);
   }
 }
 
-void subscribe_client_to_iot_hub_topics()
+void subscribe_mqtt_client_to_iot_hub_topics()
 {
   int rc;
 
@@ -182,17 +181,17 @@ void subscribe_client_to_iot_hub_topics()
   }
 }
 
-void receive_messages()
+void receive_method_messages()
 {
   int rc;
   char* topic = NULL;
   int topic_len = 0;
   MQTTClient_message* message = NULL;
 
-  // Continue until max # messages received or timeout expires to receive a single message.
+  // Continue until max # messages received or timeout expires.
   for (uint8_t message_count = 0; message_count < MAX_METHOD_MESSAGE_COUNT; message_count++)
   {
-    LOG("Waiting for message.");
+    LOG("Waiting for Method message.");
 
     if (((rc
           = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, TIMEOUT_MQTT_RECEIVE_MS))
@@ -213,9 +212,9 @@ void receive_messages()
     }
     LOG_SUCCESS("Message #%d: Client received message from the service.", message_count + 1);
 
-    // Parse message and invoke method.
+    // Parse method message and invoke method.
     az_iot_hub_client_method_request method_request;
-    parse_message(topic, topic_len, message, &method_request);
+    parse_method_message(topic, topic_len, message, &method_request);
     LOG_SUCCESS("Client parsed message.");
 
     invoke_method(&method_request);
@@ -226,7 +225,7 @@ void receive_messages()
   }
 }
 
-void disconnect_client_from_iot_hub()
+void disconnect_mqtt_client_from_iot_hub()
 {
   int rc;
 
@@ -239,7 +238,7 @@ void disconnect_client_from_iot_hub()
   MQTTClient_destroy(&mqtt_client);
 }
 
-void parse_message(
+void parse_method_message(
     char* topic,
     int topic_len,
     const MQTTClient_message* message,
@@ -274,7 +273,7 @@ void invoke_method(const az_iot_hub_client_method_request* method_request)
   if (az_span_is_content_equal(ping_method_name, method_request->name))
   {
     az_span response = ping_method();
-    LOG_SUCCESS("Client invoked ping method.");
+    LOG_SUCCESS("Client invoked 'ping' method.");
 
     send_method_response(method_request, AZ_IOT_STATUS_OK, &response);
   }
@@ -312,7 +311,7 @@ void send_method_response(
               sizeof(methods_response_topic_buffer),
               NULL)))
   {
-    LOG_ERROR("Failed to get Methods response publish topic: az_result return code 0x%04x", rc);
+    LOG_ERROR("Failed to get Methods response publish topic: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
@@ -327,7 +326,7 @@ void send_method_response(
            NULL))
       != MQTTCLIENT_SUCCESS)
   {
-    LOG_ERROR("Failed to publish method response: MQTTClient return code %d", rc);
+    LOG_ERROR("Failed to publish method response: MQTTClient return code %d.", rc);
     exit(rc);
   }
   LOG_SUCCESS("Client published method response:");

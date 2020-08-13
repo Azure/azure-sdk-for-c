@@ -21,7 +21,7 @@ endif()
 
 # Azure IoT Samples Library
 add_library (az_iot_samples_common
-  ${CMAKE_CURRENT_LIST_DIR}/sample.c
+  ${CMAKE_CURRENT_LIST_DIR}/iot_sample_foundation.c
 )
 
 # Internal deps
