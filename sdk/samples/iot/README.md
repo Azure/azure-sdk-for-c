@@ -309,7 +309,7 @@ To run the samples, ensure you have the following programs or tools installed on
     ```
 
   - For non-Linux based systems, download the [OpenSSL 1.1.1 LTS](https://www.openssl.org/source/openssl-1.1.1g.tar.gz) command line utility and follow the downloaded INSTALL document.
-- To use the certificate generation script (`generate_certificate.ps1`), you must have Powershell 7 installed. Please follow the installation instructions for your platform [here](https://github.com/PowerShell/PowerShell/tree/v7.0.3#get-powershell).
+- Have [Powershell](https://github.com/PowerShell/PowerShell/tree/v7.0.3#get-powershell) installed if running the certificate samples. This is required to run the certificate generation script generate_certificate.ps1.
 - Have the following build setup:
   - For Linux based systems, have make installed:
 
