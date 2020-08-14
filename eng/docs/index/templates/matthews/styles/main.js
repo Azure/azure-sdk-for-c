@@ -74,35 +74,8 @@ function httpGetAsync(targetUrl, callback) {
     xmlHttp.send(null);
 }
 
-function populateOptions(selector, packageName) {
-    var versionRequestUrl = BLOB_URI_PREFIX + packageName + "/versioning/versions"
-
-    httpGetAsync(versionRequestUrl, function (responseText) {
-        var versionselector = document.createElement("select")
-        versionselector.className = 'navbar-version-select'
-        if (responseText) {
-            options = responseText.match(/[^\r\n]+/g)
-
-            for (var i in options) {
-                $(versionselector).append('<option value="' + options[i] + '">' + options[i] + '</option>')
-            }
-        }
-        $(versionselector).val(WINDOW_CONTENTS[6]);
-        $(selector).append(versionselector)
-
-        $(versionselector).change(function () {
-            targetVersion = $(this).val()
-            url = WINDOW_CONTENTS.slice()
-            url[6] = targetVersion
-            window.location.href = url.join('/')
-        });
-
-    })
-}
-
-
 function populateIndexList(selector, packageName) {
-    url = BLOB_URI_PREFIX + packageName + "/versioning/versions"
+    url = BLOB_URI_PREFIX + "docs/versioning/versions"
 
     httpGetAsync(url, function (responseText) {
 
@@ -111,7 +84,7 @@ function populateIndexList(selector, packageName) {
             options = responseText.match(/[^\r\n]+/g)
 
             for (var i in options) {
-                $(publishedversions).append('<li><a href="' + getPackageUrl(SELECTED_LANGUAGE, packageName, options[i]) + '" target="_blank">' + options[i] + '</a></li>')
+                $(publishedversions).append('<li><a href="' + getPackageUrl(SELECTED_LANGUAGE, options[i]) + '" target="_blank">' + options[i] + '</a></li>')
             }
         }
         else {
@@ -121,23 +94,21 @@ function populateIndexList(selector, packageName) {
     })
 }
 
-function getPackageUrl(language, package, version) {
-    return "https://" + STORAGE_ACCOUNT_NAME + ".blob.core.windows.net/$web/" + language + "/" + package + "/" + version + "/index.html";
+function getPackageUrl(language, version) {
+    return "https://" + STORAGE_ACCOUNT_NAME + ".blob.core.windows.net/$web/" + language + "/docs/" + version + "/index.html";
 }
 
 // Populate Versions
 $(function () {
-    if (WINDOW_CONTENTS.length < 7 && WINDOW_CONTENTS[WINDOW_CONTENTS.length - 1] != 'index.html') {
+    // If this is not the index page (e.g. api/index.html) then it is an api
+    // page (e.g. /api/core.html) and we should populate the list of packge
+    // versions
+    if (WINDOW_CONTENTS[WINDOW_CONTENTS.length - 1] != 'index.html') {
         console.log("Run PopulateList")
 
-        $('h4').each(function () {
+        $('article.content > h1').each(function () {
             var pkgName = $(this).text()
             populateIndexList($(this), pkgName)
         })
-    }
-
-    if (WINDOW_CONTENTS.length > 7) {
-        var pkgName = WINDOW_CONTENTS[5]
-        populateOptions($('#navbar'), pkgName)
     }
 })

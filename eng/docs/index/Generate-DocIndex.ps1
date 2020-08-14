@@ -8,6 +8,7 @@ Param (
 
 $ServiceMapping = @{
     "core"="Core";
+    "iot"="IoT";
     "storage"="Storage";
 }
 
@@ -24,7 +25,7 @@ Copy-Item "${DocGenDir}/templates/*" -Destination "${DocOutDir}/templates" -Forc
 Copy-Item "${DocGenDir}/docfx.json" -Destination "${DocOutDir}/" -Force
 
 Write-Verbose "Creating Index using service directory and package names from repo..."
-$ServiceList = Get-ChildItem "$($RepoRoot)/sdk" -Directory -Exclude eng, mgmtcommon, template | Sort-Object
+$ServiceList = Get-ChildItem "$($RepoRoot)/sdk/inc/azure" -Directory -Exclude eng, mgmtcommon, template | Sort-Object
 $YmlPath = "${DocOutDir}/api"
 New-Item -Path $YmlPath -Name "toc.yml" -Force
 
@@ -73,5 +74,7 @@ Copy-Item "$($RepoRoot)/CONTRIBUTING.md" -Destination "${DocOutDir}/api/CONTRIBU
 Write-Verbose "Building site..."
 & "${DocFxTool}" build "${DocOutDir}/docfx.json"
 
+Copy-Item "${DocGenDir}/assets/logo.svg" -Destination "${DocOutDir}/" -Force
+Copy-Item "${DocGenDir}/assets/toc.yml" -Destination "${DocOutDir}/" -Force
 Copy-Item "${DocGenDir}/assets/logo.svg" -Destination "${DocOutDir}/_site/" -Force
 Copy-Item "${DocGenDir}/assets/toc.yml" -Destination "${DocOutDir}/_site/" -Force
