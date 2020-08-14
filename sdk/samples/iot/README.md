@@ -153,19 +153,19 @@ To run the samples, ensure you have the following programs or tools installed on
 
 Samples use environment variables for a variety of purposes, including filepaths and connection parameters. Please keep in mind, **every time a new terminal is opened, the environment variables will have to be reset**. Setting a variable will take the following form:
 
-**Linux**:
+#### Linux
 
 ```bash
 export ENV_VARIABLE_NAME=VALUE
 ```
 
-**Windows (CMD)**:
+#### Windows (CMD)
 
 ```cmd
 set ENV_VARIABLE_NAME=VALUE
 ```
 
-**Windows (Powershell)**:
+#### Windows (Powershell)
 
 ```powershell
 $env:ENV_VARIABLE_NAME=NAME
@@ -174,7 +174,7 @@ $env:ENV_VARIABLE_NAME=NAME
 Set the following environment variables for all samples:
 
 - `VCPKG_DEFAULT_TRIPLET` and `VCPKG_ROOT`: Refer to these [directions](https://github.com/Azure/azure-sdk-for-c#development-environment).
-- `AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH`: **Only for Windows or if required by OS.** Download [BaltimoreCyberTrustRoot.crt.pem](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem) to `\azure-sdk-for-c\sdk\samples\iot\`. Copy the full filepath to this downloaded .pem file, e.g. `C:\<FULL PATH TO REPO>\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem`.
+- `AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH`: **Only for Windows or if required by OS.** Download [BaltimoreCyberTrustRoot.crt.pem](https://cacerts.digicert.com/BaltimoreCyberTrustRoot.crt.pem) to `<FULL PATH TO azure-sdk-for-c REPO>\sdk\samples\iot\`. Copy the full filepath to this downloaded .pem file, e.g. `<FULL PATH TO azure-sdk-for-c REPO>\sdk\samples\iot\BaltimoreCyberTrustRoot.crt.pem`.
 
 ### Certificate Samples
 
@@ -281,7 +281,7 @@ The following samples use SAS authentication to connect to Azure IoT Hub or Azur
 
 ## Next Steps and Additional Documentation
 
-Start using the IoT Clients in your solutions!
+Start using the Azure Embedded C SDK IoT Clients in your solutions!
 
 - A general overview of the Embedded C SDK and additional background on running samples can be found in the [Azure SDK for Embedded C README](https://github.com/Azure/azure-sdk-for-c#azure-sdk-for-embedded-c).
 - More SDK details pertaining to the Azure IoT Client library can be found in the [Azure IoT Client README](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/iot#azure-iot-clients).
