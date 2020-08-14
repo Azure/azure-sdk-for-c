@@ -1,18 +1,19 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "sample.h"
+#include "iot_sample_foundation.h"
 
 #define SAMPLE_TYPE PAHO_IOT_HUB
 #define SAMPLE_NAME PAHO_IOT_HUB_PNP_SAMPLE
 
 #define TELEMETRY_SEND_INTERVAL 1
-#define DEFAULT_START_TEMP_CELSIUS 22.0
+
 #define TIMEOUT_MQTT_RECEIVE_MS (8 * 1000)
 #define TIMEOUT_MQTT_WAIT_FOR_COMPLETION_MS 1000
 
 /*
 #define DEVICE_DO_WORK_SLEEP_MS 2
+#define DEFAULT_START_TEMP_CELSIUS 22.0
 #define DOUBLE_DECIMAL_PLACE_DIGITS 2
 */
 
@@ -30,8 +31,6 @@ static sample_environment_variables env_vars;
 static az_iot_hub_client hub_client;
 static MQTTClient mqtt_client;
 static char mqtt_client_username_buffer[128];
-
-// IoT Hub Connection Values
 static int32_t topic_request_id_int;
 static char topic_request_id_buffer[8];
 
@@ -76,21 +75,25 @@ static double device_min_temp = DEFAULT_START_TEMP_CELSIUS;
 static double device_avg_temp = DEFAULT_START_TEMP_CELSIUS;
 
 // Functions
-void create_and_configure_client();
-void connect_client_to_iot_hub();
-void subscribe_client_to_iot_hub_topics();
-void request_twin_document();
+void create_and_configure_mqtt_client();
+void connect_mqtt_client_to_iot_hub();
+void subscribe_mqtt_client_to_iot_hub_topics();
+void request_device_twin_document();
 void receive_messages();
-void disconnect_client_from_iot_hub();
+void disconnect_mqtt_client_from_iot_hub();
 
 void mqtt_publish_message(const char* topic, const az_span* payload, int qos);
-void on_received(char* topic, int topic_len, const MQTTClient_message* message);
-void handle_twin_message(
+void on_message_received(char* topic, int topic_len, const MQTTClient_message* message);
+void handle_device_twin_message(
     const az_span* message_span,
     const az_iot_hub_client_twin_response* twin_response);
+az_result parse_device_twin_desired_temperature_property(
+    az_span twin_payload_span,
+    bool is_twin_get,
+    double* parsed_temp,
+    int32_t* version_number);
 
 az_span get_topic_request_id();
-
 
 static int send_telemetry_message(void);
 static int send_command_response(
@@ -104,13 +107,12 @@ static int send_reported_temperature_property(
 static void handle_command_message(
     MQTTClient_message* message,
     az_iot_hub_client_method_request* command_request);
-static az_result parse_twin_desired_temperature_property(
+static az_result parse_device_twin_desired_temperature_property(
     az_span twin_payload_span,
     bool is_twin_get,
     double* parsed_value,
     int32_t* version_number);
 static az_result invoke_getMaxMinReport(az_span payload, az_span response, az_span* out_response);
-
 
 /*
  * This sample connects an IoT Plug and Play enabled device with the Digital Twin Model ID (DTMI).
@@ -124,28 +126,28 @@ int main(void)
 {
   set_program_start_time(); // Set the program start time for command response
 
-  create_and_configure_client();
+  create_and_configure_mqtt_client();
   LOG_SUCCESS("Client created and configured.");
 
-  connect_client_to_iot_hub();
+  connect_mqtt_client_to_iot_hub();
   LOG_SUCCESS("Client connected to IoT Hub.");
 
-  subscribe_client_to_iot_hub_topics();
+  subscribe_mqtt_client_to_iot_hub_topics();
   LOG_SUCCESS("Client subscribed to IoT Hub topics.");
 
-  request_twin_document();
-  LOG_SUCCESS("Client reqeusted Twin document.")
+  request_device_twin_document();
+  LOG_SUCCESS("Client reqeusted twin document.")
 
   receive_messages();
   LOG_SUCCESS("Client received messages.")
 
-  disconnect_client_from_iot_hub();
+  disconnect_mqtt_client_from_iot_hub();
   LOG_SUCCESS("Client disconnected from IoT Hub.");
 
   return 0;
 }
 
-void create_and_configure_client()
+void create_and_configure_mqtt_client()
 {
   int rc;
 
@@ -203,7 +205,7 @@ void create_and_configure_client()
   }
 }
 
-void connect_client_to_iot_hub()
+void connect_mqtt_client_to_iot_hub()
 {
   int rc;
 
@@ -245,7 +247,7 @@ void connect_client_to_iot_hub()
   }
 }
 
-void subscribe_client_to_iot_hub_topics()
+void subscribe_mqtt_client_to_iot_hub_topics()
 {
   int rc;
 
@@ -274,11 +276,11 @@ void subscribe_client_to_iot_hub_topics()
   }
 }
 
-void request_twin_document()
+void request_device_twin_document()
 {
   int rc;
 
-  LOG("Client requesting twin document from service.");
+  LOG("Client requesting device twin document from service.");
 
   // Get the Twin Document topic to publish the twin document request.
   char twin_document_topic[128];
@@ -333,7 +335,7 @@ void receive_messges()
     }
     LOG_SUCCESS("Client received message from the service.", message_count + 1);
 
-    on_received(topic, topic_len, message);
+    on_message_received(topic, topic_len, message);
 
     MQTTClient_freeMessage(&message);
     MQTTClient_free(incoming_message_topic);
@@ -344,7 +346,7 @@ void receive_messges()
   }
 }
 
-void disconnect_client_from_iot_hub()
+void disconnect_mqtt_client_from_iot_hub()
 {
   int rc;
 
@@ -384,7 +386,7 @@ void mqtt_publish_message(const char* topic, const az_span* payload, int qos)
   }
 }
 
-void on_received(char* topic, int topic_len, const MQTTClient_message* message)
+void on_message_received(char* topic, int topic_len, const MQTTClient_message* message)
 {
   PRECONDITION_NOT_NULL(topic);
   PRECONDITION_NOT_NULL(message);
@@ -407,7 +409,7 @@ void on_received(char* topic, int topic_len, const MQTTClient_message* message)
     LOG_AZ_SPAN("Payload:", message_span);
     LOG("Status: %d", twin_response->status);
 
-    handle_twin_message(message_span, &twin_response);
+    handle_device_twin_message(message_span, &twin_response);
   }
   else if (az_succeeded(az_iot_hub_client_methods_parse_received_topic(
                &hub_client, topic_span, &method_request)))
@@ -428,15 +430,14 @@ void on_received(char* topic, int topic_len, const MQTTClient_message* message)
   LOG(" "); // Formatting
 }
 
-void handle_twin_message(
+void handle_device_twin_message(
     const az_span* message_span,
     const az_iot_hub_client_twin_response* twin_response)
 {
   PRECONDITION_NOT_NULL(message_span);
   PRECONDITION_NOT_NULL(twin_response);
 
-  az_result result;
-  bool is_get = false;
+  bool is_twin_get = false;
   bool max_temp_changed = false;
   double desired_temp = 0.0;
   int32_t version_num = 0;
@@ -446,7 +447,7 @@ void handle_twin_message(
   {
     case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_GET:
       LOG("Type: GET");
-      is_get = true;
+      is_twin_get = true;
       break;
 
     case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES:
@@ -465,9 +466,8 @@ void handle_twin_message(
   if (twin_response->response_type == AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_GET
       || twin_response->response_type == AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES)
   {
-    if (az_succeeded(
-            result = parse_twin_desired_temperature_property(
-                message_span, is_get, &desired_temp, &version_num)))
+    if (az_succeeded(parse_device_twin_desired_temperature_property(
+            message_span, is_twin_get, &desired_temp, &version_num)))
     {
       // send_reported_temperature_property(desired_temp, version_num, false);  why send this?
       update_device_temp(desired_temp, &max_temp_changed);
@@ -481,114 +481,87 @@ void handle_twin_message(
   }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// Parse the desired temperature property from the incoming JSON
-static az_result parse_twin_desired_temperature_property(
-    az_span twin_payload_span,
+az_result parse_device_twin_desired_temperature_property(
+    const az_span* twin_payload_span,
     bool is_twin_get,
-    double* parsed_value,
+    double* parsed_temp,
     int32_t* version_number)
 {
-  az_json_reader jp;
-  bool desired_found = false;
-  AZ_RETURN_IF_FAILED(az_json_reader_init(&jp, twin_payload_span, NULL));
-  AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jp));
-  if (jp.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
+  PRECONDITION_NOT_NULL(twin_payload_span);
+
+  az_json_reader jr;
+
+  AZ_RETURN_IF_FAILED(az_json_reader_init(&jr, *twin_payload_span, NULL));
+  AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
+  if (jr.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
   {
     return AZ_ERROR_UNEXPECTED_CHAR;
   }
 
+  // Device twin GET response: Parse to the "desired" wrapper if it exists.
+  bool desired_found = false;
   if (is_twin_get)
   {
-    // If is twin get payload, we have to parse one level deeper for "desired" wrapper
-    AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jp));
-    while (jp.token.kind != AZ_JSON_TOKEN_END_OBJECT)
+    AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
+    while (jr.token.kind != AZ_JSON_TOKEN_END_OBJECT)
     {
-      if (az_json_token_is_text_equal(&jp.token, desired_property_name))
+      if (az_json_token_is_text_equal(&jr.token, desired_property_name))
       {
         desired_found = true;
-        AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jp));
+        AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
         break;
       }
       else
       {
-        // else ignore token.
-        AZ_RETURN_IF_FAILED(az_json_reader_skip_children(&jp));
+        AZ_RETURN_IF_FAILED(az_json_reader_skip_children(&jr)); // Ignore children tokens.
       }
 
-      AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jp));
+      AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr)); // Check next sibling token.
+    }
+
+    if (!desired_found)
+    {
+      LOG_ERROR("Desired property object not found in device twin GET response.");
+      return AZ_ERROR_ITEM_NOT_FOUND;
     }
   }
-  else
-  {
-    desired_found = true;
-  }
 
-  if (!desired_found)
-  {
-    printf("Desired property object not found in twin");
-    return AZ_ERROR_ITEM_NOT_FOUND;
-  }
-
-  if (jp.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
-  {
-    return AZ_ERROR_UNEXPECTED_CHAR;
-  }
-  AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jp));
-
+  // Device twin get response OR desired property response:
+  // Parse for the desired temperature property
   bool temp_found = false;
   bool version_found = false;
-  while (!(temp_found && version_found) || (jp.token.kind != AZ_JSON_TOKEN_END_OBJECT))
+
+  AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
+  while (!(temp_found && version_found) && (jr.token.kind != AZ_JSON_TOKEN_END_OBJECT))
   {
-    if (az_json_token_is_text_equal(&jp.token, desired_temp_property_name))
+    if (az_json_token_is_text_equal(&jr.token, desired_temp_property_name))
     {
-      AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jp));
-      AZ_RETURN_IF_FAILED(az_json_token_get_double(&jp.token, parsed_value));
+      AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
+      AZ_RETURN_IF_FAILED(az_json_token_get_double(&jr.token, parsed_temp));
       temp_found = true;
     }
-    else if (az_json_token_is_text_equal(&jp.token, desired_property_version_name))
+    else if (az_json_token_is_text_equal(&jr.token, desired_property_version_name))
     {
-      AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jp));
-      AZ_RETURN_IF_FAILED(az_json_token_get_uint32(&jp.token, (uint32_t*)version_number));
+      AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
+      AZ_RETURN_IF_FAILED(az_json_token_get_uint32(&jr.token, (uint32_t*)version_number));
       version_found = true;
     }
     else
     {
-      // else ignore token.
-      AZ_RETURN_IF_FAILED(az_json_reader_skip_children(&jp));
+      AZ_RETURN_IF_FAILED(az_json_reader_skip_children(&jr)); // Ignore children tokens.
     }
-    AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jp));
+    AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr)); // Check next sibling token.
   }
 
-  if (temp_found && version_found)
+  if (!(temp_found && version_found))
   {
-    printf("Desired temperature: %2f\tVersion number: %d\n", *parsed_value, *version_number);
-    return AZ_OK;
+    LOG_ERROR("Temperature or version properties were not found in desired property response.");
+    return AZ_ERROR_ITEM_NOT_FOUND;
   }
 
-  return AZ_ERROR_ITEM_NOT_FOUND;
+  LOG("Parsed desired temperature: %2f", *parsed_temp);
+  LOG("Parsed version number: %d", *version_number);
+  return AZ_OK;
 }
 
 static az_result build_command_response_payload(
@@ -923,7 +896,8 @@ static int send_telemetry_message(void)
 az_span get_topic_request_id(void)
 {
   az_span remainder;
-  az_span out_span = az_span_create((uint8_t*)topic_request_id_buffer, sizeof(topic_request_id_buffer));
+  az_span out_span
+      = az_span_create((uint8_t*)topic_request_id_buffer, sizeof(topic_request_id_buffer));
   az_result result = az_span_i32toa(out_span, topic_request_id_int++, &remainder);
   (void)remainder;
   (void)result;

@@ -433,11 +433,7 @@ az_result update_property(const az_span* desired_payload)
   // Update property locally if found.
   while (json_reader.token.kind != AZ_JSON_TOKEN_END_OBJECT)
   {
-    if (az_json_token_is_text_equal(&json_reader.token, version_name))
-    {
-      break; // Desired property not found in payload.
-    }
-    else if (az_json_token_is_text_equal(&json_reader.token, reported_property_name))
+    if (az_json_token_is_text_equal(&json_reader.token, reported_property_name))
     {
       // Move to the value token and store value.
       AZ_RETURN_IF_FAILED(az_json_reader_next_token(&json_reader));
@@ -449,6 +445,10 @@ az_result update_property(const az_span* desired_payload)
           reported_property_value);
 
       return AZ_OK;
+    }
+    else if (az_json_token_is_text_equal(&json_reader.token, version_name))
+    {
+      break; // Desired property not found in payload.
     }
     else
     {
