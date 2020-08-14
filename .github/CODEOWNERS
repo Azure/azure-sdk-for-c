@@ -44,3 +44,6 @@ sdk/tests/storage/            @rickwinter
 ###########
 /eng/       @danieljurek @azure/azure-sdk-eng
 /**/ci.yml  @danieljurek @azure/azure-sdk-eng
+
+# Alerts for pipeline failures
+eng/pipelines/gates           @rickwinter @antkmsft @ahsonkhan @vhvb1989
