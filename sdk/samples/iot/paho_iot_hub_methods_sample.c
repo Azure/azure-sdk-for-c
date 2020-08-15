@@ -269,12 +269,12 @@ static void invoke_method(const az_iot_hub_client_method_request* method_request
     az_span response = ping_method();
     LOG_SUCCESS("Client invoked 'ping' method.");
 
-    send_method_response(method_request, AZ_IOT_STATUS_OK, &response);
+    send_method_response(method_request, AZ_IOT_STATUS_OK, response);
   }
   else
   {
     LOG_AZ_SPAN("Method not found:", method_request->name);
-    send_method_response(method_request, AZ_IOT_STATUS_NOT_FOUND, &method_fail_response);
+    send_method_response(method_request, AZ_IOT_STATUS_NOT_FOUND, method_fail_response);
   }
 }
 

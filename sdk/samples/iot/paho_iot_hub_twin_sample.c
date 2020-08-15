@@ -385,7 +385,7 @@ static void parse_device_twin_message(
     case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES:
       LOG("Type: Desired Properties");
 
-      if (az_failed(rc = update_property(&message_span)))
+      if (az_failed(rc = update_property(message_span)))
       {
         LOG_ERROR("Failed to update property locally: az_result return code 0x%04x.", rc);
         exit(rc);
