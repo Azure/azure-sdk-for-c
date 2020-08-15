@@ -66,7 +66,7 @@ typedef struct
 /**
  * @brief Initialize a client with default options.
  *
- * @param[out] client The blob client instance to initialize.
+ * @param[out] out_client The blob client instance to initialize.
  * @param[in] endpoint A URL to a blob storage account.
  * @param credential The object used for authentication. #AZ_CREDENTIAL_ANONYMOUS should be used for
  * SAS.
