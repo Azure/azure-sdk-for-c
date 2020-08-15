@@ -14,7 +14,7 @@ static const az_span twin_patch_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("rep
 static const az_span version_name = AZ_SPAN_LITERAL_FROM_STR("$version");
 static const az_span reported_property_name = AZ_SPAN_LITERAL_FROM_STR("device_count");
 static int32_t reported_property_value = 0;
-static char reported_property_buffer[128];
+static char reported_property_payload_buffer[128];
 
 static sample_environment_variables env_vars;
 static az_iot_hub_client hub_client;
@@ -245,13 +245,13 @@ void send_reported_property()
   LOG("Client sending reported property to service.");
 
   // Get the Twin Patch topic to send a reported property update.
-  char twin_patch_topic[128];
+  char twin_patch_topic_buffer[128];
   if (az_failed(
           rc = az_iot_hub_client_twin_patch_get_publish_topic(
               &hub_client,
               twin_patch_topic_request_id,
-              twin_patch_topic,
-              sizeof(twin_patch_topic),
+              twin_patch_topic_buffer,
+              sizeof(twin_patch_topic_buffer),
               NULL)))
   {
     LOG_ERROR("Failed to get Twin Patch publish topic: az_result return code 0x%04x.", rc);
@@ -259,10 +259,10 @@ void send_reported_property()
   }
 
   // Build the updated reported property message.
-  az_span reported_property_payload = AZ_SPAN_FROM_BUFFER(reported_property_buffer);
+  az_span reported_property_payload = AZ_SPAN_FROM_BUFFER(reported_property_payload_buffer);
   if (az_failed(rc = build_reported_property(&reported_property_payload)))
   {
-    LOG_ERROR("Failed to build reported property payload to send: az_result return code 0x%04x.", rc);
+    LOG_ERROR("Failed to build reported property payload: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 

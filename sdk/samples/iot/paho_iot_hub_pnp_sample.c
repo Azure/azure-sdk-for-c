@@ -11,10 +11,13 @@
 #define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
 #define TIMEOUT_MQTT_WAIT_FOR_COMPLETION_MS 1000
 
-/*
-#define DEVICE_DO_WORK_SLEEP_MS 2
+#define DEFAULT_START_TEMP_AVG_COUNT 1
 #define DEFAULT_START_TEMP_CELSIUS 22.0
 #define DOUBLE_DECIMAL_PLACE_DIGITS 2
+
+/*
+#define DEVICE_DO_WORK_SLEEP_MS 2
+
 */
 
 // * PnP Values *
@@ -34,45 +37,55 @@ static char mqtt_client_username_buffer[128];
 static int32_t topic_request_id_int;
 static char topic_request_id_buffer[8];
 
+// PnP Device Values
+static double current_device_temp = DEFAULT_START_TEMP_CELSIUS;
+static double device_temperature_avg_total = DEFAULT_START_TEMP_CELSIUS;
+static uint32_t device_temperature_avg_count = DEFAULT_START_TEMP_AVG_COUNT;
+static double device_max_temp = DEFAULT_START_TEMP_CELSIUS;
+static double device_min_temp = DEFAULT_START_TEMP_CELSIUS;
+static double device_avg_temp = DEFAULT_START_TEMP_CELSIUS;
+
+static const az_span desired_name = AZ_SPAN_LITERAL_FROM_STR("desired");
+static const az_span version_name = AZ_SPAN_LITERAL_FROM_STR("$version");
+static const az_span success_name = AZ_SPAN_LITERAL_FROM_STR("success");
+static const az_span value_name = AZ_SPAN_LITERAL_FROM_STR("value");
+static const az_span ack_code_name = AZ_SPAN_LITERAL_FROM_STR("ac");
+static const az_span ack_version_name = AZ_SPAN_LITERAL_FROM_STR("av");
+static const az_span ack_description_name = AZ_SPAN_LITERAL_FROM_STR("ad");
+
+// IoT Hub Twin Values
+static char reported_property_payload_buffer[128];
+static const az_span desired_temp_property_name = AZ_SPAN_LITERAL_FROM_STR("targetTemperature");
+static const az_span max_temp_reported_property_name
+    = AZ_SPAN_LITERAL_FROM_STR("maxTempSinceLastReboot");
+
+// IoT Hub Method Values
+static char method_response_payload_buffer[256];
+static const az_span report_method_name = AZ_SPAN_LITERAL_FROM_STR("getMaxMinReport");
+static const az_span report_error_payload = AZ_SPAN_LITERAL_FROM_STR("{}");
+
+
+
+
+
+
 // IoT Hub Telemetry Values
 char telemetry_topic[128];
 static const az_span telemetry_name = AZ_SPAN_LITERAL_FROM_STR("temperature");
-static char telemetry_payload[32];
+
 
 // IoT Hub Commands Values
-static char commands_response_topic[128];
-static const az_span report_command_name_span = AZ_SPAN_LITERAL_FROM_STR("getMaxMinReport");
 static const az_span report_max_temp_name_span = AZ_SPAN_LITERAL_FROM_STR("maxTemp");
 static const az_span report_min_temp_name_span = AZ_SPAN_LITERAL_FROM_STR("minTemp");
 static const az_span report_avg_temp_name_span = AZ_SPAN_LITERAL_FROM_STR("avgTemp");
 static const az_span report_start_time_name_span = AZ_SPAN_LITERAL_FROM_STR("startTime");
 static const az_span report_end_time_name_span = AZ_SPAN_LITERAL_FROM_STR("endTime");
-static const az_span report_error_payload = AZ_SPAN_LITERAL_FROM_STR("{}");
+
 static char end_time_buffer[32];
-static char commands_response_payload[256];
+
 static char incoming_since_value[32];
 
 // IoT Hub Twin Values
-
-static char reported_property_topic[128];
-static const az_span desired_property_name = AZ_SPAN_LITERAL_FROM_STR("desired");
-static const az_span desired_property_version_name = AZ_SPAN_LITERAL_FROM_STR("$version");
-static const az_span desired_temp_property_name = AZ_SPAN_LITERAL_FROM_STR("targetTemperature");
-static const az_span desired_temp_response_value_name = AZ_SPAN_LITERAL_FROM_STR("value");
-static const az_span desired_temp_ack_code_name = AZ_SPAN_LITERAL_FROM_STR("ac");
-static const az_span desired_temp_ack_version_name = AZ_SPAN_LITERAL_FROM_STR("av");
-static const az_span desired_temp_ack_description_name = AZ_SPAN_LITERAL_FROM_STR("ad");
-static const az_span max_temp_reported_property_name
-    = AZ_SPAN_LITERAL_FROM_STR("maxTempSinceLastReboot");
-static char reported_property_payload[128];
-
-// PnP Device Values
-static double current_device_temp = DEFAULT_START_TEMP_CELSIUS;
-static double device_temperature_avg_total = DEFAULT_START_TEMP_CELSIUS;
-static uint32_t device_temperature_avg_count = 1;
-static double device_max_temp = DEFAULT_START_TEMP_CELSIUS;
-static double device_min_temp = DEFAULT_START_TEMP_CELSIUS;
-static double device_avg_temp = DEFAULT_START_TEMP_CELSIUS;
 
 // Functions
 void create_and_configure_mqtt_client();
@@ -87,32 +100,54 @@ void on_message_received(char* topic, int topic_len, const MQTTClient_message* m
 void handle_device_twin_message(
     const az_span* message_span,
     const az_iot_hub_client_twin_response* twin_response);
+static void handle_method_message(
+    const az_span* message_span,
+    const az_iot_hub_client_method_request* method_request);
+
 az_result parse_device_twin_desired_temperature_property(
     az_span twin_payload_span,
     bool is_twin_get,
     double* parsed_temp,
     int32_t* version_number);
+static void update_device_temp(double temp, bool* is_max_temp_changed);
+static void send_reported_property(
+    az_span name,
+    double value,
+    int32_t version,
+    bool is_confirm_required);
+
+static az_result invoke_get_max_min_report_method(az_span payload, az_span response, az_span* out_response);
+
+static az_result build_reported_property(
+    az_span* reported_property_payload,
+    az_span name,
+    double value);
+static az_result build_reported_property_confirm(
+    az_span* reported_property_payload,
+    az_span name,
+    double value,
+    int32_t ack_code_value,
+    int32_t ack_version_value,
+    az_span ack_description_value)
 
 az_span get_topic_request_id();
+
+
+
+
+
+
+
 
 static int send_telemetry_message(void);
 static int send_command_response(
     az_iot_hub_client_method_request* request,
     uint16_t status,
     az_span response);
-static int send_reported_temperature_property(
-    double temp_value,
-    int32_t version,
-    bool is_max_reported_prop);
-static void handle_command_message(
-    MQTTClient_message* message,
-    az_iot_hub_client_method_request* command_request);
-static az_result parse_device_twin_desired_temperature_property(
-    az_span twin_payload_span,
-    bool is_twin_get,
-    double* parsed_value,
-    int32_t* version_number);
-static az_result invoke_getMaxMinReport(az_span payload, az_span response, az_span* out_response);
+
+
+
+
 
 /*
  * This sample connects an IoT Plug and Play enabled device with the Digital Twin Model ID (DTMI).
@@ -283,14 +318,14 @@ void request_device_twin_document()
   LOG("Client requesting device twin document from service.");
 
   // Get the Twin Document topic to publish the twin document request.
-  char twin_document_topic[128];
+  char twin_document_topic_buffer[128];
   az_span topic_request_id = get_topic_request_id();
   if (az_failed(
           rc = az_iot_hub_client_twin_document_get_publish_topic(
               &hub_client,
               topic_request_id,
-              twin_document_topic,
-              sizeof(twin_document_topic),
+              twin_document_topic_buffer,
+              sizeof(twin_document_topic_buffer),
               NULL)))
   {
     LOG_ERROR("Failed to get Twin Document publish topic: az_result return code %04x", rc);
@@ -299,7 +334,7 @@ void request_device_twin_document()
 
   // Publish the twin document request.
   az_span payload = AZ_SPAN_NULL;
-  mqtt_publish_message(twin_document_topic, &payload, 0);
+  mqtt_publish_message(twin_document_topic_buffer, &payload, 0);
 
   return rc;
 }
@@ -434,15 +469,9 @@ void handle_device_twin_message(
     const az_span* message_span,
     const az_iot_hub_client_twin_response* twin_response)
 {
-  PRECONDITION_NOT_NULL(message_span);
-  PRECONDITION_NOT_NULL(twin_response);
-
-  bool is_twin_get = false;
-  bool max_temp_changed = false;
-  double desired_temp = 0.0;
-  int32_t version_num = 0;
-
   // Invoke appropriate action per response type (3 Types only).
+  bool is_twin_get = false;
+
   switch (twin_response->response_type)
   {
     case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_GET:
@@ -463,21 +492,60 @@ void handle_device_twin_message(
   // 1. Parse for the desired temperature
   // 2. Update device temperature locally
   // 3. Report updated temperature to server
+  double desired_temp = 0.0;
+  int32_t version_num = 0;
+
   if (twin_response->response_type == AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_GET
       || twin_response->response_type == AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES)
   {
     if (az_succeeded(parse_device_twin_desired_temperature_property(
             message_span, is_twin_get, &desired_temp, &version_num)))
     {
-      // send_reported_temperature_property(desired_temp, version_num, false);  why send this?
-      update_device_temp(desired_temp, &max_temp_changed);
+      bool confirm = true;
+      bool is_max_temp_changed = false;
 
-      if (max_temp_changed)
+      update_device_temp(desired_temp, &is_max_temp_changed);
+      LOG_SUCCESS("Client updated desired temperature locally.");
+
+      send_reported_property(desired_temp_property_name, desired_temp, version_num, confirm);
+      LOG_SUCCESS("Client sent temperature reported property message.");
+
+      if (is_max_temp_changed)
       {
-        send_reported_temperature_property(device_max_temp, -1, true);
+        confirm = false;
+        send_reported_property(
+            max_temp_reported_property_name, device_max_temp, version_num, confirm);
+        LOG_SUCCESS("Client sent max temperature reported property message.");
       }
     }
     // else Desired property not found in payload. Do nothing.
+  }
+}
+
+static void handle_method_message(
+    const az_span* message_span,
+    const az_iot_hub_client_method_request* method_request)
+{
+  if (az_span_is_content_equal(report_method_name, method_request->name))
+  {
+    az_iot_status status;
+    az_span method_response_payload = AZ_SPAN_FROM_BUFFER(method_response_payload_buffer);
+    if (az_failed(invoke_get_max_min_report_method(*message_span, method_response_payload, &method_response_payload)))
+    {
+      status = AZ_IOT_STATUS_BAD_REQUEST;
+    }
+    else
+    {
+      status = AZ_IOT_STATUS_OK;
+    }
+    LOG_SUCCESS("Client invoked 'get_max_min_report' method.");
+
+    send_method_response(method_request, status, method_response_payload);
+  }
+  else
+  {
+    LOG_AZ_SPAN("Method not supported:", method_request->name);
+    send_method_response(method_request, AZ_IOT_STATUS_NOT_FOUND, report_error_payload);
   }
 }
 
@@ -505,7 +573,7 @@ az_result parse_device_twin_desired_temperature_property(
     AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
     while (jr.token.kind != AZ_JSON_TOKEN_END_OBJECT)
     {
-      if (az_json_token_is_text_equal(&jr.token, desired_property_name))
+      if (az_json_token_is_text_equal(&jr.token, desired_name))
       {
         desired_found = true;
         AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
@@ -540,7 +608,7 @@ az_result parse_device_twin_desired_temperature_property(
       AZ_RETURN_IF_FAILED(az_json_token_get_double(&jr.token, parsed_temp));
       temp_found = true;
     }
-    else if (az_json_token_is_text_equal(&jr.token, desired_property_version_name))
+    else if (az_json_token_is_text_equal(&jr.token, version_name))
     {
       AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
       AZ_RETURN_IF_FAILED(az_json_token_get_uint32(&jr.token, (uint32_t*)version_number));
@@ -564,38 +632,112 @@ az_result parse_device_twin_desired_temperature_property(
   return AZ_OK;
 }
 
-static az_result build_command_response_payload(
-    az_json_writer* json_builder,
-    az_span start_time_span,
-    az_span end_time_span,
-    az_span* response_payload)
+static void update_device_temp(double temp, bool* is_max_temp_changed)
 {
-  // Build the command response payload
-  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(json_builder));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(json_builder, report_max_temp_name_span));
-  AZ_RETURN_IF_FAILED(
-      az_json_writer_append_double(json_builder, device_max_temp, DOUBLE_DECIMAL_PLACE_DIGITS));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(json_builder, report_min_temp_name_span));
-  AZ_RETURN_IF_FAILED(
-      az_json_writer_append_double(json_builder, device_min_temp, DOUBLE_DECIMAL_PLACE_DIGITS));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(json_builder, report_avg_temp_name_span));
-  AZ_RETURN_IF_FAILED(
-      az_json_writer_append_double(json_builder, device_avg_temp, DOUBLE_DECIMAL_PLACE_DIGITS));
-  AZ_RETURN_IF_FAILED(
-      az_json_writer_append_property_name(json_builder, report_start_time_name_span));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_string(json_builder, start_time_span));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(json_builder, report_end_time_name_span));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_string(json_builder, end_time_span));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(json_builder));
+  current_device_temp = temp;
 
-  *response_payload = az_json_writer_get_bytes_used_in_destination(json_builder);
+  bool ret = false;
+  if (current_device_temp > device_max_temp)
+  {
+    device_max_temp = current_device_temp;
+    ret = true;
+  }
+  if (current_device_temp < device_min_temp)
+  {
+    device_min_temp = current_device_temp;
+  }
 
-  return AZ_OK;
+  // Increment the avg count, add the new temp to the total, and calculate the new avg
+  device_temperature_avg_count++;
+  device_temperature_avg_total += current_device_temp;
+  device_avg_temp = device_temperature_avg_total / device_temperature_avg_count;
+
+  *is_max_temp_changed = ret;
 }
 
-// Invoke the command requested from the service. Here, it generates a report for max, min, and avg
-// temperatures.
-static az_result invoke_getMaxMinReport(az_span payload, az_span response, az_span* out_response)
+static void send_reported_property(
+    az_span name,
+    double value,
+    int32_t version,
+    bool confirm)
+{
+  int rc;
+
+  LOG("Client sending reported property to service.");
+
+  // Get the Twin Patch topic to send a reported property update.
+  char twin_patch_topic_buffer[128];
+  az_span request_id_span = get_request_id();
+  if (az_failed(
+          rc = az_iot_hub_client_twin_patch_get_publish_topic(
+              &hub_client,
+              request_id_span,
+              twin_patch_topic_buffer,
+              sizeof(twin_patch_topic_buffer),
+              NULL)))
+  {
+    LOG_ERROR("Failed to get Twin Patch publish topic: az_result return code 0x%04x.", rc);
+    exit(rc);
+  }
+
+  // Build the updated reported property message.
+  az_span reported_property_payload = AZ_SPAN_FROM_BUFFER(reported_property_payload_buffer);
+  if (confirm)
+  {
+    if (az_failed(
+            rc = build_reported_property_confirm(
+                &reported_property_payload, name, value, AZ_IOT_STATUS_OK, version, success_name)))
+    {
+      LOG_ERROR("Failed to build reported property payload: az_result return code 0x%04x.", rc);
+      exit(rc);
+    }
+  }
+  else
+  {
+    if (az_failed(rc = build_reported_property(&reported_property_payload, name, value)))
+    {
+      LOG_ERROR("Failed to build reported property payload: az_result return code 0x%04x.", rc);
+      exit(rc);
+    }
+  }
+
+  // Publish the reported property update.
+  mqtt_publish_message(reported_property_topic, reported_property_payload, 0);
+  LOG_AZ_SPAN("Payload:", reported_property_payload);
+
+  return rc;
+}
+
+static void send_method_response(
+    const az_iot_hub_client_method_request* method_request,
+    uint16_t status,
+    az_span response_payload)
+{
+  int rc;
+
+  // Get the Methods response topic to publish the method response.
+  char methods_response_topic_buffer[128];
+  if (az_failed(
+          rc = az_iot_hub_client_methods_response_get_publish_topic(
+              &hub_client,
+              method_request->request_id,
+              status,
+              methods_response_topic_buffer,
+              sizeof(methods_response_topic_buffer),
+              NULL)))
+  {
+    LOG_ERROR("Failed to get Methods response publish topic: az_result return code 0x%04x.", rc);
+    exit(rc);
+  }
+
+  // Publish the method response.
+  mqtt_publish_message(methods_response_topic_buffer, response_payload, 0)) == 0)
+  LOG_SUCCESS("Client published method response:");
+  LOG("Status: %u", status);
+  LOG_AZ_SPAN("Payload:", *response);
+}
+
+static az_result invoke_get_max_min_report_method(az_span payload, az_span response, az_span* out_response)
 {
   // Parse the "since" field in the payload.
   az_span start_time_span = AZ_SPAN_NULL;
@@ -630,240 +772,68 @@ static az_result invoke_getMaxMinReport(az_span payload, az_span response, az_sp
   return AZ_OK;
 }
 
-// Send the response of the command invocation
-static int send_command_response(
-    az_iot_hub_client_method_request* request,
-    uint16_t status,
-    az_span response)
-{
-  int rc;
-  // Get the response topic to publish the command response
-  if (az_failed(
-          rc = az_iot_hub_client_methods_response_get_publish_topic(
-              &client,
-              request->request_id,
-              status,
-              commands_response_topic,
-              sizeof(commands_response_topic),
-              NULL)))
-  {
-    printf("Unable to get method response publish topic\n");
-    return rc;
-  }
 
-  printf("Status: %u\tPayload:", status);
-  char* payload_char = (char*)az_span_ptr(response);
-  if (payload_char != NULL)
-  {
-    for (int32_t i = 0; i < az_span_size(response); i++)
-    {
-      putchar(*(payload_char + i));
-    }
-  }
-  putchar('\n');
 
-  // Send the commands response
-  if ((rc = mqtt_publish_message(commands_response_topic, response, 0)) == 0)
-  {
-    printf("Sent response\n");
-  }
 
-  return rc;
-}
 
-// Build the JSON payload for the reported property
-static az_result build_confirmed_reported_property(
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+static az_result build_command_response_payload(
     az_json_writer* json_builder,
-    az_span property_name,
-    double property_val,
-    int32_t ack_code_value,
-    int32_t ack_version_value,
-    az_span ack_description_value)
+    az_span start_time_span,
+    az_span end_time_span,
+    az_span* response_payload)
 {
-  AZ_RETURN_IF_FAILED(
-      az_json_writer_init(json_builder, AZ_SPAN_FROM_BUFFER(reported_property_payload), NULL));
+  // Build the command response payload
   AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(json_builder));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(json_builder, property_name));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(json_builder));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(json_builder, report_max_temp_name_span));
   AZ_RETURN_IF_FAILED(
-      az_json_writer_append_property_name(json_builder, desired_temp_response_value_name));
+      az_json_writer_append_double(json_builder, device_max_temp, DOUBLE_DECIMAL_PLACE_DIGITS));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(json_builder, report_min_temp_name_span));
   AZ_RETURN_IF_FAILED(
-      az_json_writer_append_double(json_builder, property_val, DOUBLE_DECIMAL_PLACE_DIGITS));
+      az_json_writer_append_double(json_builder, device_min_temp, DOUBLE_DECIMAL_PLACE_DIGITS));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(json_builder, report_avg_temp_name_span));
   AZ_RETURN_IF_FAILED(
-      az_json_writer_append_property_name(json_builder, desired_temp_ack_code_name));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_int32(json_builder, ack_code_value));
+      az_json_writer_append_double(json_builder, device_avg_temp, DOUBLE_DECIMAL_PLACE_DIGITS));
   AZ_RETURN_IF_FAILED(
-      az_json_writer_append_property_name(json_builder, desired_temp_ack_version_name));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_int32(json_builder, ack_version_value));
-  AZ_RETURN_IF_FAILED(
-      az_json_writer_append_property_name(json_builder, desired_temp_ack_description_name));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_string(json_builder, ack_description_value));
+      az_json_writer_append_property_name(json_builder, report_start_time_name_span));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_string(json_builder, start_time_span));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(json_builder, report_end_time_name_span));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_string(json_builder, end_time_span));
   AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(json_builder));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(json_builder));
+
+  *response_payload = az_json_writer_get_bytes_used_in_destination(json_builder);
 
   return AZ_OK;
 }
 
-static az_result build_reported_property(
-    az_json_writer* json_builder,
-    az_span property_name,
-    double property_val)
-{
-  AZ_RETURN_IF_FAILED(
-      az_json_writer_init(json_builder, AZ_SPAN_FROM_BUFFER(reported_property_payload), NULL));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(json_builder));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(json_builder, property_name));
-  AZ_RETURN_IF_FAILED(
-      az_json_writer_append_double(json_builder, property_val, DOUBLE_DECIMAL_PLACE_DIGITS));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(json_builder));
 
-  return AZ_OK;
-}
-// Send the twin reported property to the service
-static int send_reported_temperature_property(
-    double temp_value,
-    int32_t version,
-    bool is_max_reported_prop)
-{
-  int rc;
-  printf("Sending reported property\n");
 
-  // Get the topic used to send a reported property update
-  az_span request_id_span = get_request_id();
-  if (az_failed(
-          rc = az_iot_hub_client_twin_patch_get_publish_topic(
-              &client,
-              request_id_span,
-              reported_property_topic,
-              sizeof(reported_property_topic),
-              NULL)))
-  {
-    printf("Unable to get twin document publish topic, return code %d\n", rc);
-    return rc;
-  }
 
-  // Twin reported properties must be in JSON format. The payload is constructed here.
-  az_json_writer json_builder;
-  if (is_max_reported_prop)
-  {
-    if (az_failed(
-            rc
-            = build_reported_property(&json_builder, max_temp_reported_property_name, temp_value)))
-    {
-      return rc;
-    }
-  }
-  else
-  {
-    if (az_failed(
-            rc = build_confirmed_reported_property(
-                &json_builder,
-                desired_temp_property_name,
-                temp_value,
-                200,
-                version,
-                AZ_SPAN_FROM_STR("success"))))
-    {
-      return rc;
-    }
-  }
-  az_span json_payload = az_json_writer_get_bytes_used_in_destination(&json_builder);
 
-  printf("Payload: %.*s\n", az_span_size(json_payload), (char*)az_span_ptr(json_payload));
 
-  // Publish the reported property payload to IoT Hub
-  rc = mqtt_publish_message(reported_property_topic, json_payload, 0);
 
-  return rc;
-}
 
-static void update_device_temp(double temp, bool* max_temp_changed)
-{
-  current_device_temp = temp;
 
-  bool ret = false;
-  if (current_device_temp > device_max_temp)
-  {
-    device_max_temp = current_device_temp;
-    ret = true;
-  }
-  if (current_device_temp < device_min_temp)
-  {
-    device_min_temp = current_device_temp;
-  }
 
-  // Increment the avg count, add the new temp to the total, and calculate the new avg
-  device_temperature_avg_count++;
-  device_temperature_avg_total += current_device_temp;
-  device_avg_temp = device_temperature_avg_total / device_temperature_avg_count;
-
-  *max_temp_changed = ret;
-}
-
-// Invoke the requested command if supported and return status | Return error otherwise
-static void handle_command_message(
-    MQTTClient_message* message,
-    az_iot_hub_client_method_request* command_request)
-{
-
-  if (az_span_is_content_equal(report_command_name_span, command_request->name))
-  {
-    az_span command_response_span = AZ_SPAN_FROM_BUFFER(commands_response_payload);
-    az_span command_response_payload_span
-        = az_span_create((uint8_t*)message->payload, (int32_t)message->payloadlen);
-
-    // Invoke command
-    uint16_t return_code;
-    az_result response = invoke_getMaxMinReport(
-        command_response_payload_span, command_response_span, &command_response_span);
-    if (response != AZ_OK)
-    {
-      return_code = 400;
-    }
-    else
-    {
-      return_code = 200;
-    }
-
-    // Send command response with report as JSON payload
-    int rc;
-    if ((rc = send_command_response(command_request, return_code, command_response_span)) != 0)
-    {
-      printf("Unable to send %u response, status %d\n", return_code, rc);
-    }
-  }
-  else
-  {
-    // Unsupported command
-    printf(
-        "Unsupported command received: %.*s.\n",
-        az_span_size(command_request->name),
-        az_span_ptr(command_request->name));
-
-    int rc;
-    if ((rc = send_command_response(command_request, 404, report_error_payload)) != 0)
-    {
-      printf("Unable to send %d response, status %d\n", 404, rc);
-    }
-  }
-}
-
-/
-
-    static az_result build_telemetry_message(az_span* out_payload)
-{
-  az_json_writer json_builder;
-  AZ_RETURN_IF_FAILED(
-      az_json_writer_init(&json_builder, AZ_SPAN_FROM_BUFFER(telemetry_payload), NULL));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&json_builder));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&json_builder, telemetry_name));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_double(
-      &json_builder, current_device_temp, DOUBLE_DECIMAL_PLACE_DIGITS));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&json_builder));
-  *out_payload = az_json_writer_get_bytes_used_in_destination(&json_builder);
-
-  return AZ_OK;
-}
 
 // Send JSON formatted telemetry messages
 static int send_telemetry_message(void)
@@ -877,7 +847,8 @@ static int send_telemetry_message(void)
     return rc;
   }
 
-  az_span telemetry_payload_span;
+  char telemetry_payload[32];
+  az_span telemetry_payload_span = AZ_SPAN_FROM_BUFFER(telemetry_payload);
   if (az_failed(rc = build_telemetry_message(&telemetry_payload_span)))
   {
     printf("Could not build telemetry payload, az_result %d\n", rc);
@@ -902,4 +873,74 @@ az_span get_topic_request_id(void)
   (void)remainder;
   (void)result;
   return out_span;
+}
+
+
+
+
+
+
+
+
+static az_result build_telemetry_message(az_span* out_payload)
+{
+  az_json_writer jw;
+
+  AZ_RETURN_IF_FAILED(az_json_writer_init(&jw, AZ_SPAN_FROM_BUFFER(telemetry_payload), NULL));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, telemetry_name));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_double(
+      &jw, current_device_temp, DOUBLE_DECIMAL_PLACE_DIGITS));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
+  *out_payload = az_json_writer_get_bytes_used_in_destination(&jw);
+
+  return AZ_OK;
+}
+
+static az_result build_reported_property_confirm(
+    az_span* reported_property_payload,
+    az_span name,
+    double value,
+    int32_t ack_code_value,
+    int32_t ack_version_value,
+    az_span ack_description_value)
+{
+  az_json_writer jw;
+
+  AZ_RETURN_IF_FAILED(az_json_writer_init(&jw, *reported_property_payload, NULL));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, name));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, value_name));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_double(&jw, value, DOUBLE_DECIMAL_PLACE_DIGITS));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, ack_code_name));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_int32(&jw, ack_code_value));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, ack_version_name));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_int32(&jw, ack_version_value));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, ack_description_name));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_string(&jw, ack_description_value));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
+
+  *reported_property_payload = az_json_writer_get_bytes_used_in_destination(&jw);
+
+  return AZ_OK;
+}
+
+static az_result build_reported_property(
+    az_span* reported_property_payload,
+    az_span name,
+    double value)
+{
+  az_json_writer jw;
+
+  AZ_RETURN_IF_FAILED(az_json_writer_init(&jw, *reported_property_payload, NULL));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, name));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_double(&jw, value, DOUBLE_DECIMAL_PLACE_DIGITS));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
+
+  *reported_property_payload = az_json_writer_get_bytes_used_in_destination(&jw);
+
+  return AZ_OK;
 }
