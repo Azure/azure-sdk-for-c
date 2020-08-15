@@ -54,19 +54,19 @@ AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_o
 }
 
 AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
-    az_storage_blobs_blob_client* client,
-    az_span uri,
+    az_storage_blobs_blob_client* out_client,
+    az_span endpoint,
     void* credential,
-    az_storage_blobs_blob_client_options* options)
+    az_storage_blobs_blob_client_options const* options)
 {
-  _az_PRECONDITION_NOT_NULL(client);
+  _az_PRECONDITION_NOT_NULL(out_client);
   _az_PRECONDITION_NOT_NULL(options);
 
   _az_credential* const cred = (_az_credential*)credential;
 
-  *client = (az_storage_blobs_blob_client) {
+  *out_client = (az_storage_blobs_blob_client) {
     ._internal = {
-      .endpoint = AZ_SPAN_FROM_BUFFER(client->_internal.endpoint_buffer),
+      .endpoint = AZ_SPAN_FROM_BUFFER(out_client->_internal.endpoint_buffer),
       .options = *options,
       .credential = cred,
       .pipeline = (_az_http_pipeline){
@@ -75,19 +75,19 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
             {
               ._internal = {
                 .process = az_http_pipeline_policy_apiversion,
-                .options= &client->_internal.options._internal.api_version,
+                .options= &out_client->_internal.options._internal.api_version,
               },
             },
             {
               ._internal = {
                 .process = az_http_pipeline_policy_telemetry,
-                .options = &client->_internal.options._internal.telemetry_options,
+                .options = &out_client->_internal.options._internal.telemetry_options,
               },
             },
             {
               ._internal = {
                 .process = az_http_pipeline_policy_retry,
-                .options = &client->_internal.options.retry_options,
+                .options = &out_client->_internal.options.retry_options,
               },
             },
             {
@@ -117,10 +117,10 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
   };
 
   // Copy url to client buffer so customer can re-use buffer on his/her side
-  int32_t uri_size = az_span_size(uri);
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(client->_internal.endpoint, uri_size);
-  az_span_copy(client->_internal.endpoint, uri);
-  client->_internal.endpoint = az_span_slice(client->_internal.endpoint, 0, uri_size);
+  int32_t const uri_size = az_span_size(endpoint);
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(out_client->_internal.endpoint, uri_size);
+  az_span_copy(out_client->_internal.endpoint, endpoint);
+  out_client->_internal.endpoint = az_span_slice(out_client->_internal.endpoint, 0, uri_size);
 
   AZ_RETURN_IF_FAILED(
       _az_credential_set_scopes(cred, AZ_SPAN_FROM_STR("https://storage.azure.com/.default")));
@@ -131,7 +131,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
 AZ_NODISCARD az_result az_storage_blobs_blob_upload(
     az_storage_blobs_blob_client* client,
     az_span content, /* Buffer of content*/
-    az_storage_blobs_blob_upload_options* options,
+    az_storage_blobs_blob_upload_options const* options,
     az_http_response* response)
 {
 

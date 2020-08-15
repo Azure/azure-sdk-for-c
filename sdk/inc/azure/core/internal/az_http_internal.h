@@ -16,7 +16,7 @@
  *
  * Defines the number of policies inside a pipeline.
  *
- * Users @b should @b not access _internal field.
+ * Users @b should @b not access `_internal` field.
  *
  */
 typedef struct
@@ -36,7 +36,7 @@ typedef enum
 /**
  * @brief Defines the options structure used by the api version policy
  *
- * Users @b should @b not access _internal field.
+ * Users @b should @b not access `_internal` field.
  *
  */
 typedef struct
