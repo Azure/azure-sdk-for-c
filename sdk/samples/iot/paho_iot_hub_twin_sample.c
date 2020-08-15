@@ -14,7 +14,6 @@ static const az_span twin_patch_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("rep
 static const az_span version_name = AZ_SPAN_LITERAL_FROM_STR("$version");
 static const az_span reported_property_name = AZ_SPAN_LITERAL_FROM_STR("device_count");
 static int32_t reported_property_value = 0;
-static char reported_property_payload_buffer[128];
 
 static sample_environment_variables env_vars;
 static az_iot_hub_client hub_client;
@@ -259,6 +258,7 @@ void send_reported_property()
   }
 
   // Build the updated reported property message.
+  char reported_property_payload_buffer[128];
   az_span reported_property_payload = AZ_SPAN_FROM_BUFFER(reported_property_payload_buffer);
   if (az_failed(rc = build_reported_property(&reported_property_payload)))
   {
