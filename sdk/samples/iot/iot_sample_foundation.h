@@ -41,7 +41,7 @@
 #define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
 
 //
-// Logging and Pre-condition Check
+// Logging
 //
 #define LOG_ERROR(...) \
   { \
@@ -77,15 +77,6 @@
     (void)printf("\n"); \
   }
 
-#define PRECONDITION_NOT_NULL(arg) \
-  { \
-    if (arg == NULL) \
-    { \
-      LOG_ERROR("Pointer is NULL."); \
-      exit(1); \
-    } \
-  }
-
 //
 // Environment Variables
 //
@@ -112,19 +103,19 @@
 // This is usually not needed on Linux or Mac but needs to be set on Windows.
 #define ENV_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH"
 
-char hub_hostname_buffer[128];
-char provisioning_id_scope_buffer[16];
+char iot_hub_hostname_buffer[128];
+char iot_provisioning_id_scope_buffer[16];
 
-char hub_device_id_buffer[64];
-char provisioning_registration_id_buffer[256];
+char iot_hub_device_id_buffer[64];
+char iot_provisioning_registration_id_buffer[256];
 
-char hub_sas_key_buffer[128];
-char provisioning_sas_key_buffer[128];
+char iot_hub_sas_key_buffer[128];
+char iot_provisioning_sas_key_buffer[128];
 
-char x509_cert_pem_file_path_buffer[256];
-char x509_trust_pem_file_path_buffer[256];
+char iot_x509_cert_pem_file_path_buffer[256];
+char iot_x509_trust_pem_file_path_buffer[256];
 
-typedef struct environment_variables
+typedef struct
 {
   az_span hub_hostname;
   az_span provisioning_id_scope;
@@ -135,15 +126,15 @@ typedef struct environment_variables
   uint32_t sas_key_duration_minutes;
   az_span x509_cert_pem_file_path;
   az_span x509_trust_pem_file_path;
-} sample_environment_variables;
+} iot_sample_environment_variables;
 
-typedef enum sample_type
+typedef enum
 {
   PAHO_IOT_HUB,
   PAHO_IOT_PROVISIONING
-} sample_type;
+} iot_sample_type;
 
-typedef enum sample_name
+typedef enum
 {
   PAHO_IOT_HUB_C2D_SAMPLE,
   PAHO_IOT_HUB_METHODS_SAMPLE,
@@ -153,7 +144,7 @@ typedef enum sample_name
   PAHO_IOT_HUB_TWIN_SAMPLE,
   PAHO_IOT_PROVISIONING_SAMPLE,
   PAHO_IOT_PROVISIONING_SAS_SAMPLE
-} sample_name;
+} iot_sample_name;
 
 /*
  * @brief      Reads in environment variables set by user for purposes of running sample.
@@ -165,28 +156,9 @@ typedef enum sample_name
  * @return     AZ_OK if all environment variables required are successfully read and values stored.
  */
 az_result read_environment_variables(
-    sample_type type,
-    sample_name name,
-    sample_environment_variables* env_vars);
-
-/*
- * @brief      Reads a single environment variable and stores in an az_span.
- *             Assumes *out_value is a valid span.
- *
- * @param[in]  env_name       Name of environment variable. May NOT be NULL.
- * @param[in]  default_value  Default value if envionment variable has not been set. May be NULL.
- * @param[in]  hide_value     True if value should not be printed to console.
- * @param[out] out_value      Pointer to az_span that will contain the envrionment variable value.
- * May NOT be NULL. az_span's size reflects actual size of content in az_span, not size of buffer
- * used to create az_span.
- * @return     AZ_ERROR_INSUFFICIENT_SPAN_SIZE if buffer size is not large enough to hold
- * environment variable value. AZ_ERROR_ARG if required environment variable not set. Else AZ_OK.
- */
-az_result read_configuration_entry(
-    const char* env_name,
-    char* default_value,
-    bool hide_value,
-    az_span* out_value);
+    iot_sample_type type,
+    iot_sample_name name,
+    iot_sample_environment_variables* env_vars);
 
 /*
  * @brief      Builds an MQTT endpoint c-string for an Azure IoT Hub or provisioning service.
@@ -201,8 +173,8 @@ az_result read_configuration_entry(
  * c-string. AZ_ERROR_ARG is sample type is undefined. Else AZ_OK.
  */
 az_result create_mqtt_endpoint(
-    sample_type type,
-    const sample_environment_variables* env_vars,
+    iot_sample_type type,
+    const iot_sample_environment_variables* env_vars,
     char* endpoint,
     size_t endpoint_size);
 
@@ -222,59 +194,21 @@ void sleep_for_seconds(uint32_t seconds);
 uint32_t get_epoch_expiration_time_from_minutes(uint32_t minutes);
 
 /*
- * The following functions serve as an example for fundamental functionality needed to use SAS key
- * authentication. This implementation uses OpenSSL.
- */
-
-/*
- * @brief      Decodes an input az_span from base64 to bytes.
- *             Assumes *out_span is a valid span.
- *
- * @param[in]  base64_encoded   Pointer to az_span to be decoded. May NOT be NULL.
- * @param[out] out_span         Pointer to the az_span that will contain the decoded input. May NOT
- * be NULL.
- * @return
- */
-az_result base64_decode(const az_span* base64_encoded, az_span* out_span);
-
-/*
- * @brief      HMAC256 signing of the signature with a decoded key.
- *             Assumes *out_span is a valid span.
- *
- * @param[in]  decoded_key  Pointer to az_span containing the decoded key for signing. May NOT be
- * NULL.
- * @param[in]  signature    Pointer to az_span containing the signature for signing. May NOT be
- * NULL.
- * @param[out] out_span     Pointer to az_span that will contain the HMAC256 signed signature. May
- * NOT be NULL.
- * @return
- */
-az_result hmac_sha256_sign(const az_span* decoded_key, const az_span* signature, az_span* out_span);
-
-/*
- * @brief      Encodes an input az_span from bytes to base64.
- *             Assumes *out_span is a valid span.
- *
- * @param[in]  bytes      Pointer to az_span containing the bytes to be encoded. May NOT be NULL.
- * @param[out] out_span   Pointer to az_span that will contain the encoded bytes. May NOT be NULL.
- * @return
- */
-az_result base64_encode(const az_span* bytes, az_span* out_span);
-
-/*
  * @brief      Generate the b64 encoded and signed signature using HMAC-SHA256 signing.
  *             Assumes *sas_b64_encoded_hmac256_signed_signature is a valid span.
  *
- * @param[in]  sas_key        Pointer to az_span containing the SAS key that will be used for
- * signing. May NOT be NULL.
- * @param[in]  sas_signature  Pointer to az_span containing the signature. May NOT be NULL.
- * @param[out] sas_b64_encoded_hmac256_signed_signature
- *                            Pointer to az_span that will contain the encoded and signed signature.
- * May NOT be NULL.
+ * @param[in]  sas_key        az_span containing the SAS key that will be used for signing.
+ * @param[in]  sas_signature  az_span containing the signature.
+ * @param[in]  sas_b64_encoded_destination
+ *                            az_span where the encoded and signed signature will be written to.
+ * @param[out] sas_b64_encoded_out
+ *                            Pointer to az_span that receives the remainder of the destination
+ * az_span after the signature has been written. May NOT be NULL.
  */
 void sas_generate_encoded_signed_signature(
-    const az_span* sas_key,
-    const az_span* sas_signature,
-    az_span* sas_b64_encoded_hmac256_signed_signature);
+    az_span sas_key,
+    az_span sas_signature,
+    az_span sas_b64_encoded_destination,
+    az_span* sas_b64_encoded_out);
 
 #endif // SAMPLE_H

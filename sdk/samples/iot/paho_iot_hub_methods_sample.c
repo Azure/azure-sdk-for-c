@@ -13,26 +13,26 @@ static const az_span ping_method_name = AZ_SPAN_LITERAL_FROM_STR("ping");
 static const az_span ping_response = AZ_SPAN_LITERAL_FROM_STR("{\"response\": \"pong\"}");
 static const az_span method_fail_response = AZ_SPAN_LITERAL_FROM_STR("{}");
 
-static sample_environment_variables env_vars;
+static iot_sample_environment_variables env_vars;
 static az_iot_hub_client hub_client;
 static MQTTClient mqtt_client;
 static char mqtt_client_username_buffer[128];
 
 // Functions
-void create_and_configure_mqtt_client();
-void connect_mqtt_client_to_iot_hub();
-void subscribe_mqtt_client_to_iot_hub_topics();
-void receive_method_messages();
-void disconnect_mqtt_client_from_iot_hub();
+static void create_and_configure_mqtt_client(void);
+static void connect_mqtt_client_to_iot_hub(void);
+static void subscribe_mqtt_client_to_iot_hub_topics(void);
+static void receive_method_messages(void);
+static void disconnect_mqtt_client_from_iot_hub(void);
 
-void parse_method_message(
+static void parse_method_message(
     char* topic,
     int topic_len,
     const MQTTClient_message* message,
     az_iot_hub_client_method_request* method_request);
-void invoke_method(const az_iot_hub_client_method_request* method_request);
-az_span ping_method(void);
-void send_method_response(
+static void invoke_method(const az_iot_hub_client_method_request* method_request);
+static az_span ping_method(void);
+static void send_method_response(
     const az_iot_hub_client_method_request* request,
     uint16_t status,
     const az_span* response);
@@ -52,7 +52,7 @@ void send_method_response(
  * No other method commands are supported. If any other methods are attempted to be invoked, the log
  * will report the method is not found.
  */
-int main()
+int main(void)
 {
   create_and_configure_mqtt_client();
   LOG_SUCCESS("Client created and configured.");
@@ -72,7 +72,7 @@ int main()
   return 0;
 }
 
-void create_and_configure_mqtt_client()
+static void create_and_configure_mqtt_client(void)
 {
   int rc;
 
@@ -128,7 +128,7 @@ void create_and_configure_mqtt_client()
   }
 }
 
-void connect_mqtt_client_to_iot_hub()
+static void connect_mqtt_client_to_iot_hub(void)
 {
   int rc;
 
@@ -149,10 +149,10 @@ void connect_mqtt_client_to_iot_hub()
   mqtt_connect_options.keepAliveInterval = AZ_IOT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS;
 
   MQTTClient_SSLOptions mqtt_ssl_options = MQTTClient_SSLOptions_initializer;
-  mqtt_ssl_options.keyStore = (char*)x509_cert_pem_file_path_buffer;
+  mqtt_ssl_options.keyStore = (char*)az_span_ptr(env_vars.x509_cert_pem_file_path);
   if (*az_span_ptr(env_vars.x509_trust_pem_file_path) != '\0') // Is only set if required by OS.
   {
-    mqtt_ssl_options.trustStore = (char*)x509_trust_pem_file_path_buffer;
+    mqtt_ssl_options.trustStore = (char*)az_span_ptr(env_vars.x509_trust_pem_file_path);
   }
   mqtt_connect_options.ssl = &mqtt_ssl_options;
 
@@ -168,7 +168,7 @@ void connect_mqtt_client_to_iot_hub()
   }
 }
 
-void subscribe_mqtt_client_to_iot_hub_topics()
+static void subscribe_mqtt_client_to_iot_hub_topics(void)
 {
   int rc;
 
@@ -181,7 +181,7 @@ void subscribe_mqtt_client_to_iot_hub_topics()
   }
 }
 
-void receive_method_messages()
+static void receive_method_messages(void)
 {
   int rc;
   char* topic = NULL;
@@ -225,7 +225,7 @@ void receive_method_messages()
   }
 }
 
-void disconnect_mqtt_client_from_iot_hub()
+static void disconnect_mqtt_client_from_iot_hub(void)
 {
   int rc;
 
@@ -238,16 +238,12 @@ void disconnect_mqtt_client_from_iot_hub()
   MQTTClient_destroy(&mqtt_client);
 }
 
-void parse_method_message(
+static void parse_method_message(
     char* topic,
     int topic_len,
     const MQTTClient_message* message,
     az_iot_hub_client_method_request* method_request)
 {
-  PRECONDITION_NOT_NULL(topic);
-  PRECONDITION_NOT_NULL(message);
-  PRECONDITION_NOT_NULL(method_request);
-
   int rc;
   az_span topic_span = az_span_create((uint8_t*)topic, topic_len);
   az_span message_span = az_span_create((uint8_t*)message->payload, message->payloadlen);
@@ -266,10 +262,8 @@ void parse_method_message(
   LOG_AZ_SPAN("Payload:", message_span);
 }
 
-void invoke_method(const az_iot_hub_client_method_request* method_request)
+static void invoke_method(const az_iot_hub_client_method_request* method_request)
 {
-  PRECONDITION_NOT_NULL(method_request);
-
   if (az_span_is_content_equal(ping_method_name, method_request->name))
   {
     az_span response = ping_method();
@@ -284,20 +278,17 @@ void invoke_method(const az_iot_hub_client_method_request* method_request)
   }
 }
 
-az_span ping_method(void)
+static az_span ping_method(void)
 {
   LOG("PING!");
   return ping_response;
 }
 
-void send_method_response(
+static void send_method_response(
     const az_iot_hub_client_method_request* method_request,
     uint16_t status,
     const az_span* response)
 {
-  PRECONDITION_NOT_NULL(method_request);
-  PRECONDITION_NOT_NULL(response);
-
   int rc;
 
   // Get the Methods response topic to publish the method response.

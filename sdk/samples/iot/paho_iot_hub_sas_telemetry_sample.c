@@ -9,7 +9,7 @@
 #define TELEMETRY_SEND_INTERVAL_SEC 1
 #define TELEMETRY_NUMBER_OF_MESSAGES 5
 
-static sample_environment_variables env_vars;
+static iot_sample_environment_variables env_vars;
 static az_iot_hub_client hub_client;
 static MQTTClient mqtt_client;
 static char mqtt_client_username_buffer[128];
@@ -20,18 +20,18 @@ static char sas_encoded_signed_signature_buffer[128];
 static char mqtt_password_buffer[256];
 
 // Functions
-void create_and_configure_mqtt_client();
-void connect_mqtt_client_to_iot_hub();
-void send_telemetry_messages_to_iot_hub();
-void disconnect_mqtt_client_from_iot_hub();
+static void create_and_configure_mqtt_client(void);
+static void connect_mqtt_client_to_iot_hub(void);
+static void send_telemetry_messages_to_iot_hub(void);
+static void disconnect_mqtt_client_from_iot_hub(void);
 
-void generate_sas_key();
+static void generate_sas_key(void);
 
 /*
  * This sample sends five telemetry messages to the Azure IoT Hub.
  * SAS certification is used.
  */
-int main()
+int main(void)
 {
   create_and_configure_mqtt_client();
   LOG_SUCCESS("Client created and configured.");
@@ -48,7 +48,7 @@ int main()
   return 0;
 }
 
-void create_and_configure_mqtt_client()
+static void create_and_configure_mqtt_client(void)
 {
   int rc;
 
@@ -107,7 +107,7 @@ void create_and_configure_mqtt_client()
   LOG_SUCCESS("Client generated SAS Key.");
 }
 
-void connect_mqtt_client_to_iot_hub()
+static void connect_mqtt_client_to_iot_hub(void)
 {
   int rc;
 
@@ -131,7 +131,7 @@ void connect_mqtt_client_to_iot_hub()
   if (*az_span_ptr(env_vars.x509_trust_pem_file_path)
       != '\0') // Should only be set if required by OS.
   {
-    mqtt_ssl_options.trustStore = (char*)x509_trust_pem_file_path_buffer;
+    mqtt_ssl_options.trustStore = (char*)az_span_ptr(env_vars.x509_trust_pem_file_path);
   }
   mqtt_connect_options.ssl = &mqtt_ssl_options;
 
@@ -147,7 +147,7 @@ void connect_mqtt_client_to_iot_hub()
   }
 }
 
-void send_telemetry_messages_to_iot_hub()
+static void send_telemetry_messages_to_iot_hub(void)
 {
   int rc;
 
@@ -186,7 +186,7 @@ void send_telemetry_messages_to_iot_hub()
   }
 }
 
-void disconnect_mqtt_client_from_iot_hub()
+static void disconnect_mqtt_client_from_iot_hub(void)
 {
   int rc;
 
@@ -199,7 +199,7 @@ void disconnect_mqtt_client_from_iot_hub()
   MQTTClient_destroy(&mqtt_client);
 }
 
-void generate_sas_key()
+static void generate_sas_key(void)
 {
   int rc;
 
@@ -219,7 +219,7 @@ void generate_sas_key()
   // Generate the encoded, signed signature (b64 encoded, HMAC-SHA256 signing)
   az_span sas_encoded_signed_signature = AZ_SPAN_FROM_BUFFER(sas_encoded_signed_signature_buffer);
   sas_generate_encoded_signed_signature(
-      &(env_vars.hub_sas_key), &sas_signature, &sas_encoded_signed_signature);
+      env_vars.hub_sas_key, sas_signature, sas_encoded_signed_signature, &sas_encoded_signed_signature);
 
   // Get the resulting MQTT password, passing the base64 encoded, HMAC signed bytes
   size_t mqtt_password_length;
