@@ -35,7 +35,7 @@ static az_span ping_method(void);
 static void send_method_response(
     const az_iot_hub_client_method_request* request,
     uint16_t status,
-    const az_span* response);
+    az_span response);
 
 /*
  * This sample receives incoming method commands invoked from the the Azure IoT Hub to the device.
@@ -287,7 +287,7 @@ static az_span ping_method(void)
 static void send_method_response(
     const az_iot_hub_client_method_request* method_request,
     uint16_t status,
-    const az_span* response)
+    az_span response)
 {
   int rc;
 
@@ -310,8 +310,8 @@ static void send_method_response(
   if ((rc = MQTTClient_publish(
            mqtt_client,
            methods_response_topic_buffer,
-           az_span_size(*response),
-           az_span_ptr(*response),
+           az_span_size(response),
+           az_span_ptr(response),
            0,
            0,
            NULL))
@@ -322,5 +322,5 @@ static void send_method_response(
   }
   LOG_SUCCESS("Client published method response:");
   LOG("Status: %u", status);
-  LOG_AZ_SPAN("Payload:", *response);
+  LOG_AZ_SPAN("Payload:", response);
 }

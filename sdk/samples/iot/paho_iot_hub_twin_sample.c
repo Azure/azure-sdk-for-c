@@ -30,8 +30,8 @@ static void send_reported_property(void);
 static void receive_desired_property(void);
 static void disconnect_mqtt_client_from_iot_hub(void);
 
-static az_result build_reported_property(az_span* reported_property_payload);
-static az_result update_property(const az_span* desired_payload);
+static az_result build_reported_property(az_span destination, az_span* json_out);
+static az_result update_property(az_span desired_payload);
 static void receive_device_twin_message(void);
 static void parse_device_twin_message(
     char* topic,
@@ -260,7 +260,7 @@ static void send_reported_property(void)
 
   // Build the updated reported property message.
   az_span reported_property_payload = AZ_SPAN_FROM_BUFFER(reported_property_buffer);
-  if (az_failed(rc = build_reported_property(&reported_property_payload)))
+  if (az_failed(rc = build_reported_property(reported_property_payload, &reported_property_payload)))
   {
     LOG_ERROR("Failed to build reported property payload to send: az_result return code 0x%04x.", rc);
     exit(rc);
@@ -394,25 +394,26 @@ static void parse_device_twin_message(
   }
 }
 
-static az_result build_reported_property(az_span* reported_property_payload)
+static az_result build_reported_property(az_span destination, az_span* json_out)
 {
   az_json_writer json_writer;
 
-  AZ_RETURN_IF_FAILED(az_json_writer_init(&json_writer, *reported_property_payload, NULL));
+  AZ_RETURN_IF_FAILED(az_json_writer_init(&json_writer, destination, NULL));
   AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&json_writer));
   AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&json_writer, reported_property_name));
   AZ_RETURN_IF_FAILED(az_json_writer_append_int32(&json_writer, reported_property_value));
   AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&json_writer));
-  *reported_property_payload = az_json_writer_get_bytes_used_in_destination(&json_writer);
+
+  *json_out = az_json_writer_get_bytes_used_in_destination(&json_writer);
 
   return AZ_OK;
 }
 
-static az_result update_property(const az_span* desired_payload)
+static az_result update_property(az_span desired_payload)
 {
   // Parse desired property payload.
   az_json_reader json_reader;
-  AZ_RETURN_IF_FAILED(az_json_reader_init(&json_reader, *desired_payload, NULL));
+  AZ_RETURN_IF_FAILED(az_json_reader_init(&json_reader, desired_payload, NULL));
 
   AZ_RETURN_IF_FAILED(az_json_reader_next_token(&json_reader));
   if (json_reader.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
