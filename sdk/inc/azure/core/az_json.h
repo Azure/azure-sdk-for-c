@@ -352,8 +352,8 @@ az_json_writer_get_bytes_used_in_destination(az_json_writer const* json_writer)
 /**
  * @brief Appends the UTF-8 text value (as a JSON string) into the buffer.
  *
- * @param[in] json_writer A pointer to an #az_json_writer instance containing the buffer to append
- * the string value to.
+ * @param[in,out] ref_json_writer A pointer to an #az_json_writer instance containing the buffer to
+ * append the string value to.
  * @param[in] value The UTF-8 encoded value to be written as a JSON string. The value is escaped
  * before writing.
  *
@@ -363,7 +363,7 @@ az_json_writer_get_bytes_used_in_destination(az_json_writer const* json_writer)
  * @retval #AZ_OK The string value was appended successfully.
  * @retval #AZ_ERROR_INSUFFICIENT_SPAN_SIZE The buffer is too small.
  */
-AZ_NODISCARD az_result az_json_writer_append_string(az_json_writer* json_writer, az_span value);
+AZ_NODISCARD az_result az_json_writer_append_string(az_json_writer* ref_json_writer, az_span value);
 
 /**
  * @brief Appends the UTF-8 property name (as a JSON string) which is the first part of a name/value
@@ -491,7 +491,7 @@ AZ_NODISCARD az_result az_json_writer_append_end_object(az_json_writer* ref_json
 /**
  * @brief Appends the end of the current JSON array (i.e. `]`).
  *
- * @param[in,out] json_writer A pointer to an #az_json_writer instance containing the buffer to
+ * @param[in,out] ref_json_writer A pointer to an #az_json_writer instance containing the buffer to
  * append the closing character to.
  *
  * @return An #az_result value indicating the result of the operation.
