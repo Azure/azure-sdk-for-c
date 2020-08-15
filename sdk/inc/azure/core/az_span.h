@@ -408,8 +408,8 @@ AZ_NODISCARD az_result az_span_i32toa(az_span destination, int32_t source, az_sp
 AZ_NODISCARD az_result az_span_u32toa(az_span destination, uint32_t source, az_span* out_span);
 
 /**
- * @brief Converts an `int64_t` into its digit characters and copies them to the \p destination
- * #az_span starting at its 0-th index.
+ * @brief Converts an `int64_t` into its digit characters (base 10) and copies them to the \p
+ * destination #az_span starting at its 0-th index.
  *
  * @param destination The #az_span where the bytes should be copied to.
  * @param[in] source The `int64_t` whose number is copied to the \p destination #az_span as ASCII
@@ -425,8 +425,8 @@ AZ_NODISCARD az_result az_span_u32toa(az_span destination, uint32_t source, az_s
 AZ_NODISCARD az_result az_span_i64toa(az_span destination, int64_t source, az_span* out_span);
 
 /**
- * @brief Converts a `uint64_t` into its digit characters and copies them to the \p destination
- * #az_span starting at its 0-th index.
+ * @brief Converts a `uint64_t` into its digit characters (base 10) and copies them to the \p
+ * destination #az_span starting at its 0-th index.
  *
  * @param destination The #az_span where the bytes should be copied to.
  * @param[in] source The `uint64_t` whose number is copied to the \p destination #az_span as ASCII
@@ -442,8 +442,8 @@ AZ_NODISCARD az_result az_span_i64toa(az_span destination, int64_t source, az_sp
 AZ_NODISCARD az_result az_span_u64toa(az_span destination, uint64_t source, az_span* out_span);
 
 /**
- * @brief Converts a `double` into its digit characters and copies them to the \p destination
- * #az_span starting at its 0-th index.
+ * @brief Converts a `double` into its digit characters (base 10 decimal notation) and copies them
+ * to the \p destination #az_span starting at its 0-th index.
  *
  * @param destination The #az_span where the bytes should be copied to.
  * @param[in] source The `double` whose number is copied to the \p destination #az_span as ASCII
