@@ -12,7 +12,11 @@
 static const az_span twin_document_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("get_twin");
 static const az_span twin_patch_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("reported_prop");
 static const az_span version_name = AZ_SPAN_LITERAL_FROM_STR("$version");
+<<<<<<< HEAD
 static const az_span reported_property_name = AZ_SPAN_LITERAL_FROM_STR("device_count");
+=======
+static az_span reported_property_name = AZ_SPAN_LITERAL_FROM_STR("device_count");
+>>>>>>> master
 static int32_t reported_property_value = 0;
 static char reported_property_buffer[128];
 
@@ -66,6 +70,7 @@ int main()
 {
   create_and_configure_mqtt_client();
   LOG_SUCCESS("Client created and configured.");
+<<<<<<< HEAD
 
   connect_mqtt_client_to_iot_hub();
   LOG_SUCCESS("Client connected to IoT Hub.");
@@ -76,6 +81,18 @@ int main()
   get_device_twin_document();
   LOG_SUCCESS("Client got twin document.");
 
+=======
+
+  connect_mqtt_client_to_iot_hub();
+  LOG_SUCCESS("Client connected to IoT Hub.");
+
+  subscribe_mqtt_client_to_iot_hub_topics();
+  LOG_SUCCESS("Client subscribed to IoT Hub topics.");
+
+  get_device_twin_document();
+  LOG_SUCCESS("Client got twin document.");
+
+>>>>>>> master
   send_reported_property();
   LOG_SUCCESS("Client sent reported property.");
 
@@ -435,6 +452,13 @@ az_result update_property(const az_span* desired_payload)
   {
     if (az_json_token_is_text_equal(&json_reader.token, reported_property_name))
     {
+<<<<<<< HEAD
+=======
+      break; // Desired property not found in payload.
+    }
+    else if (az_json_token_is_text_equal(&json_reader.token, reported_property_name))
+    {
+>>>>>>> master
       // Move to the value token and store value.
       AZ_RETURN_IF_FAILED(az_json_reader_next_token(&json_reader));
       AZ_RETURN_IF_FAILED(az_json_token_get_int32(&json_reader.token, &reported_property_value));
