@@ -16,8 +16,8 @@
 
 #include "iot_samples_common.h"
 
-#include <time.h>
 #include <string.h>
+#include <time.h>
 
 #include <openssl/bio.h>
 #include <openssl/buffer.h>
