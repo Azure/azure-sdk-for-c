@@ -39,7 +39,8 @@ static const az_span gl_end_time_name = AZ_SPAN_LITERAL_FROM_STR("endTime");
 
 // IoT Hub Twin Values
 static const az_span desired_temp_property_name = AZ_SPAN_LITERAL_FROM_STR("targetTemperature");
-static const az_span reported_max_temp_property_name = AZ_SPAN_LITERAL_FROM_STR("maxTempSinceLastReboot");
+static const az_span reported_max_temp_property_name
+    = AZ_SPAN_LITERAL_FROM_STR("maxTempSinceLastReboot");
 
 // IoT Hub Method Values
 static const az_span report_method_name = AZ_SPAN_LITERAL_FROM_STR("getMaxMinReport");
@@ -56,6 +57,7 @@ static double device_avg_temp = DEFAULT_START_TEMP_CELSIUS;
 static char request_id_buffer[16];
 static int32_t request_id_int = 0;
 static bool device_operational = true;
+static const char iso_spec_time_format[] = "%Y-%m-%dT%H:%M:%S%z"; // ISO8601 Time Format
 
 typedef enum
 {
@@ -77,16 +79,15 @@ static void request_device_twin_document();
 static void receive_messages();
 static void disconnect_mqtt_client_from_iot_hub();
 
-static void mqtt_publish_message(const char* topic, const az_span* payload, iot_quality_of_service qos);
 static void on_message_received(char* topic, int topic_len, const MQTTClient_message* message);
 static void handle_device_twin_message(
-    const az_span* message_span,
+    const az_span message_span,
     const az_iot_hub_client_twin_response* twin_response);
 static void handle_method_message(
-    const az_span* message_span,
+    const az_span message_span,
     const az_iot_hub_client_method_request* method_request);
 
-staticaz_result parse_device_twin_desired_temperature_property(
+static az_result parse_device_twin_desired_temperature_property(
     az_span twin_payload_span,
     bool is_twin_get,
     double* parsed_temp,
@@ -97,18 +98,24 @@ static void send_reported_property(
     double value,
     int32_t version,
     bool is_confirm_required);
-
-
-
-static az_result get_max_min_report_method(az_span payload, az_span response_destination, az_span* response_out);
+static void send_method_response(
+    const az_iot_hub_client_method_request* method_request,
+    uint16_t status,
+    az_span response_payload);
+static az_result get_max_min_report_method(
+    az_span payload,
+    az_span response_destination,
+    az_span* response_out);
 static void send_telemetry_message(void);
+
+static void mqtt_publish_message(const char* topic, az_span payload, iot_quality_of_service qos);
 static az_span get_request_id(void);
+
 static az_result build_payload(
     uint8_t property_count,
     const az_span* name,
     const double* value,
-    bool include_time,
-    const char* times,
+    const az_span* times,
     az_span payload_destination,
     az_span* payload_out);
 static az_result build_payload_confirm(
@@ -120,19 +127,9 @@ static az_result build_payload_confirm(
     az_span payload_destination,
     az_span* payload_out);
 
-
-
-
-
-
-
-
-
 /*
  * This sample connects an IoT Plug and Play enabled device with the Digital Twin Model ID (DTMI).
  * X509 self-certification is used.  In short, the capabilities are listed here:
- *
- *
  *
  *
  */
@@ -298,7 +295,7 @@ static void request_device_twin_document()
 
   // Get the Twin Document topic to publish the twin document request.
   char twin_document_topic_buffer[128];
-  az_span topic_request_id = get_topic_request_id();
+  az_span topic_request_id = get_request_id();
   if (az_failed(
           rc = az_iot_hub_client_twin_document_get_publish_topic(
               &hub_client,
@@ -313,12 +310,10 @@ static void request_device_twin_document()
 
   // Publish the twin document request.
   az_span payload = AZ_SPAN_NULL;
-  mqtt_publish_message(twin_document_topic_buffer, &payload, 0);
-
-  return rc;
+  mqtt_publish_message(twin_document_topic_buffer, payload, 0);
 }
 
-static void receive_messges()
+static void receive_messages()
 {
   int rc;
   char* topic = NULL;
@@ -347,12 +342,12 @@ static void receive_messges()
     {
       topic_len = (int)strlen(topic);
     }
-    LOG_SUCCESS("Client received message from the service.", message_count + 1);
+    LOG_SUCCESS("Client received message from the service.");
 
     on_message_received(topic, topic_len, message);
 
     MQTTClient_freeMessage(&message);
-    MQTTClient_free(incoming_message_topic);
+    MQTTClient_free(topic);
 
     // Send a telemetry message
     send_telemetry_message();
@@ -373,16 +368,13 @@ static void disconnect_mqtt_client_from_iot_hub()
   MQTTClient_destroy(&mqtt_client);
 }
 
-static void mqtt_publish_message(const char* topic, const az_span* payload, iot_quality_of_service qos)
+static void mqtt_publish_message(const char* topic, az_span payload, iot_quality_of_service qos)
 {
-  PRECONDITION_NOT_NULL(topic);
-  PRECONDITION_NOT_NULL(payload);
-
   int rc;
   MQTTClient_deliveryToken token;
 
   if ((rc = MQTTClient_publish(
-           mqtt_client, topic, az_span_size(*payload), az_span_ptr(*payload), qos, 0, &token))
+           mqtt_client, topic, az_span_size(payload), az_span_ptr(payload), qos, 0, &token))
       != MQTTCLIENT_SUCCESS)
   {
     LOG_ERROR("Failed to publish twin document request: MQTTClient return code %d", rc);
@@ -402,9 +394,6 @@ static void mqtt_publish_message(const char* topic, const az_span* payload, iot_
 
 static void on_message_received(char* topic, int topic_len, const MQTTClient_message* message)
 {
-  PRECONDITION_NOT_NULL(topic);
-  PRECONDITION_NOT_NULL(message);
-
   int rc;
 
   az_span topic_span = az_span_create((uint8_t*)topic, topic_len);
@@ -421,7 +410,7 @@ static void on_message_received(char* topic, int topic_len, const MQTTClient_mes
     LOG_SUCCESS("Client received a valid topic response:");
     LOG_AZ_SPAN("Topic:", topic_span);
     LOG_AZ_SPAN("Payload:", message_span);
-    LOG("Status: %d", twin_response->status);
+    LOG("Status: %d", twin_response.status);
 
     handle_device_twin_message(message_span, &twin_response);
   }
@@ -445,7 +434,7 @@ static void on_message_received(char* topic, int topic_len, const MQTTClient_mes
 }
 
 static void handle_device_twin_message(
-    const az_span* message_span,
+    const az_span message_span,
     const az_iot_hub_client_twin_response* twin_response)
 {
   // Invoke appropriate action per response type (3 Types only).
@@ -502,7 +491,7 @@ static void handle_device_twin_message(
 }
 
 static void handle_method_message(
-    const az_span* message_span,
+    const az_span message_span,
     const az_iot_hub_client_method_request* method_request)
 {
   if (az_span_is_content_equal(report_method_name, method_request->name))
@@ -510,7 +499,8 @@ static void handle_method_message(
     az_iot_status status;
     char method_response_payload_buffer[256];
     az_span method_response_payload = AZ_SPAN_FROM_BUFFER(method_response_payload_buffer);
-    if (az_failed(get_max_min_report_method(*message_span, method_response_payload, &method_response_payload)))
+    if (az_failed(get_max_min_report_method(
+            message_span, method_response_payload, &method_response_payload)))
     {
       status = AZ_IOT_STATUS_BAD_REQUEST;
     }
@@ -530,16 +520,14 @@ static void handle_method_message(
 }
 
 static az_result parse_device_twin_desired_temperature_property(
-    const az_span* twin_payload_span,
+    const az_span twin_payload_span,
     bool is_twin_get,
     double* parsed_temp,
     int32_t* version_number)
 {
-  PRECONDITION_NOT_NULL(twin_payload_span);
-
   az_json_reader jr;
 
-  AZ_RETURN_IF_FAILED(az_json_reader_init(&jr, *twin_payload_span, NULL));
+  AZ_RETURN_IF_FAILED(az_json_reader_init(&jr, twin_payload_span, NULL));
   AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
   if (jr.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
   {
@@ -553,7 +541,7 @@ static az_result parse_device_twin_desired_temperature_property(
     AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
     while (jr.token.kind != AZ_JSON_TOKEN_END_OBJECT)
     {
-      if (az_json_token_is_text_equal(&jr.token, desired_name))
+      if (az_json_token_is_text_equal(&jr.token, gl_desired_name))
       {
         desired_found = true;
         AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
@@ -588,7 +576,7 @@ static az_result parse_device_twin_desired_temperature_property(
       AZ_RETURN_IF_FAILED(az_json_token_get_double(&jr.token, parsed_temp));
       temp_found = true;
     }
-    else if (az_json_token_is_text_equal(&jr.token, version_name))
+    else if (az_json_token_is_text_equal(&jr.token, gl_version_name))
     {
       AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
       AZ_RETURN_IF_FAILED(az_json_token_get_uint32(&jr.token, (uint32_t*)version_number));
@@ -614,32 +602,28 @@ static az_result parse_device_twin_desired_temperature_property(
 
 static void update_device_temp(double temp, bool* is_max_temp_changed)
 {
-  current_device_temp = temp;
+  device_current_temp = temp;
 
   bool ret = false;
-  if (current_device_temp > device_max_temp)
+  if (device_current_temp > device_max_temp)
   {
-    device_max_temp = current_device_temp;
+    device_max_temp = device_current_temp;
     ret = true;
   }
-  if (current_device_temp < device_min_temp)
+  if (device_current_temp < device_min_temp)
   {
-    device_min_temp = current_device_temp;
+    device_min_temp = device_current_temp;
   }
 
   // Increment the avg count, add the new temp to the total, and calculate the new avg
-  device_temperature_avg_count++;
-  device_temperature_avg_total += current_device_temp;
-  device_avg_temp = device_temperature_avg_total / device_temperature_avg_count;
+  device_temp_avg_count++;
+  device_temp_avg_total += device_current_temp;
+  device_avg_temp = device_temp_avg_total / device_temp_avg_count;
 
   *is_max_temp_changed = ret;
 }
 
-static void send_reported_property(
-    az_span name,
-    double value,
-    int32_t version,
-    bool confirm)
+static void send_reported_property(az_span name, double value, int32_t version, bool confirm)
 {
   int rc;
 
@@ -666,7 +650,14 @@ static void send_reported_property(
   if (confirm)
   {
     if (az_failed(
-            rc = build_payload_confirm(name, value, AZ_IOT_STATUS_OK, version, success_name, reported_property_payload, &reported_property_payload)))
+            rc = build_payload_confirm(
+                name,
+                value,
+                AZ_IOT_STATUS_OK,
+                version,
+                gl_success_name,
+                reported_property_payload,
+                &reported_property_payload)))
     {
       LOG_ERROR("Failed to build confirmed payload : az_result return code 0x%04x.", rc);
       exit(rc);
@@ -674,11 +665,13 @@ static void send_reported_property(
   }
   else
   {
-    int count = 1;
-    az_span names[count] = name;
-    double values[count] = value;
+    const uint8_t count = 1;
+    az_span names[1] = { name };
+    double values[1] = { value };
 
-    if (az_failed(rc = build_payload(count, names, values, NULL, reported_property_payload, &reported_property_payload)))
+    if (az_failed(
+            rc = build_payload(
+                count, names, values, NULL, reported_property_payload, &reported_property_payload)))
     {
       LOG_ERROR("Failed to build payload: az_result return code 0x%04x.", rc);
       exit(rc);
@@ -686,10 +679,8 @@ static void send_reported_property(
   }
 
   // Publish the reported property update.
-  mqtt_publish_message(reported_property_topic, reported_property_payload, 0);
+  mqtt_publish_message(twin_patch_topic_buffer, reported_property_payload, 0);
   LOG_AZ_SPAN("Payload:", reported_property_payload);
-
-  return rc;
 }
 
 static void send_method_response(
@@ -715,13 +706,16 @@ static void send_method_response(
   }
 
   // Publish the method response.
-  mqtt_publish_message(methods_response_topic_buffer, response_payload, 0)) == 0)
+  mqtt_publish_message(methods_response_topic_buffer, response_payload, 0);
   LOG_SUCCESS("Client published method response:");
   LOG("Status: %u", status);
-  LOG_AZ_SPAN("Payload:", *response);
+  LOG_AZ_SPAN("Payload:", response_payload);
 }
 
-static az_result get_max_min_report_method(az_span payload, az_span response_destination, az_span* response_out)
+static az_result get_max_min_report_method(
+    az_span payload,
+    az_span response_destination,
+    az_span* response_out)
 {
   // Parse the "since" field in the payload.
   char incoming_since_value_buffer[32];
@@ -731,8 +725,12 @@ static az_result get_max_min_report_method(az_span payload, az_span response_des
   AZ_RETURN_IF_FAILED(az_json_reader_init(&jr, payload, NULL));
   AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
   AZ_RETURN_IF_FAILED(az_json_token_get_string(
-      &jr.token, incoming_since_value_buffer, sizeof(incoming_since_value_buffer), &incoming_since_value_len));
-  az_span start_time_span = az_span_create((uint8_t*)incoming_since_value, incoming_since_value_len);
+      &jr.token,
+      incoming_since_value_buffer,
+      sizeof(incoming_since_value_buffer),
+      &incoming_since_value_len));
+  az_span start_time_span
+      = az_span_create((uint8_t*)incoming_since_value_buffer, incoming_since_value_len);
 
   // Set the response payload to error if the "since" field was not sent
   if (az_span_ptr(start_time_span) == NULL)
@@ -748,20 +746,19 @@ static az_result get_max_min_report_method(az_span payload, az_span response_des
 
   time(&rawtime);
   timeinfo = localtime(&rawtime);
-  size_t length = strftime(end_time_buffer, sizeof(end_time_buffer), iso_spec_time_format, timeinfo);
+  size_t length
+      = strftime(end_time_buffer, sizeof(end_time_buffer), iso_spec_time_format, timeinfo);
   az_span end_time_span = az_span_create((uint8_t*)end_time_buffer, (int32_t)length);
 
-
-  AZ_RETURN_IF_FAILED(
-      build_method_response_payload(&json_builder, start_time_span, end_time_span, out_response));
-
   // Build method response message.
-  const int count = 3;
-  const az_span names[count] = {gl_max_temp_name, gl_min_temp_name, gl_avg_temp_name};
-  const double values[count] = {device_max_temp, device_min_temp, device_avg_temp};
-  const az_span times[2] = {start_time_span, end_time_span};
+  const uint8_t count = 3;
+  const az_span names[3] = { gl_max_temp_name, gl_min_temp_name, gl_avg_temp_name };
+  const double values[3] = { device_max_temp, device_min_temp, device_avg_temp };
+  const az_span times[2] = { start_time_span, end_time_span };
 
-  if (az_failed(rc = build_payload(count, names, values, times, response_destination, response_out)))
+  int rc;
+  if (az_failed(
+          rc = build_payload(count, names, values, times, response_destination, response_out)))
   {
     LOG_ERROR("Failed to build method response payload: az_result return code 0x%04x.", rc);
     exit(rc);
@@ -785,25 +782,25 @@ static void send_telemetry_message(void)
   }
 
   // Build the telemetry message.
-  const int count = 1;
-  const az_span names[count] = gl_temperature_name;
-  const double values[count] = device_current_temp;
+  const uint8_t count = 1;
+  const az_span names[1] = { gl_temperature_name };
+  const double values[1] = { device_current_temp };
 
   char telemetry_payload_buffer[32];
   az_span telemetry_payload = AZ_SPAN_FROM_BUFFER(telemetry_payload_buffer);
-  if (az_failed(rc = build_payload(count, names, values, NULL, telemetry_payload, &telemetry_payload)))
+  if (az_failed(
+          rc = build_payload(count, names, values, NULL, telemetry_payload, &telemetry_payload)))
   {
     LOG_ERROR("Failed to build telemetry payload: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
   // Publish the telemetry message.
-  rc = mqtt_publish_message(telemetry_topic_buffer, telemetry_payload, 0);
+  mqtt_publish_message(telemetry_topic_buffer, telemetry_payload, 0);
   LOG_AZ_SPAN("Payload:", telemetry_payload);
 
   LOG(" "); // Formatting
 }
-
 
 static az_span get_request_id(void)
 {
@@ -821,7 +818,7 @@ static az_span get_request_id(void)
 }
 
 static az_result build_payload(
-  uint8_t property_count,
+    uint8_t property_count,
     const az_span* name,
     const double* value,
     const az_span* times,

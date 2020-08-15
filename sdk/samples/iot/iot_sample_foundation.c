@@ -27,9 +27,9 @@ static char sas_b64_decoded_key_buffer[64];
 static char sas_hmac256_signed_signature_buffer[128];
 
 // Program Time
-static const char iso_spec_time_format[] = "%Y-%m-%dT%H:%M:%S%z"; // ISO8601 Time Format
 static char program_start_time_buffer[32];
 static az_span program_start_time;
+static const char iso_spec_time_format[] = "%Y-%m-%dT%H:%M:%S%z"; // ISO8601 Time Format
 
 //
 // Functions
@@ -68,6 +68,7 @@ az_result read_environment_variables(
     {
       case PAHO_IOT_HUB_C2D_SAMPLE:
       case PAHO_IOT_HUB_METHODS_SAMPLE:
+      case PAHO_IOT_HUB_PNP_SAMPLE:
       case PAHO_IOT_HUB_TELEMETRY_SAMPLE:
       case PAHO_IOT_HUB_TWIN_SAMPLE:
         env_vars->hub_device_id = AZ_SPAN_FROM_BUFFER(hub_device_id_buffer);

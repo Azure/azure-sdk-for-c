@@ -269,7 +269,7 @@ void send_reported_property()
   // Publish the reported property update.
   if ((rc = MQTTClient_publish(
            mqtt_client,
-           twin_patch_topic,
+           twin_patch_topic_buffer,
            az_span_size(reported_property_payload),
            az_span_ptr(reported_property_payload),
            0,
