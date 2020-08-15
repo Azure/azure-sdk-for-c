@@ -72,7 +72,7 @@
   { \
     (void)printf("\t\t%s ", span_description); \
     char* buffer = (char*)az_span_ptr(span); \
-    for (int32_t i = 0; i < az_span_size(span); i++) \
+    for (int32_t j = 0; j < az_span_size(span); j++) \
     { \
       putchar(*buffer++); \
     } \
@@ -156,6 +156,9 @@ typedef enum sample_name
   PAHO_IOT_PROVISIONING_SAMPLE,
   PAHO_IOT_PROVISIONING_SAS_SAMPLE
 } sample_name;
+
+char program_start_time_buffer[32];
+az_span program_start_time;
 
 /*
  *

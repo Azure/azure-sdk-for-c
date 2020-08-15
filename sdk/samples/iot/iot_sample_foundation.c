@@ -27,8 +27,6 @@ static char sas_b64_decoded_key_buffer[64];
 static char sas_hmac256_signed_signature_buffer[128];
 
 // Program Time
-static char program_start_time_buffer[32];
-static az_span program_start_time;
 static const char iso_spec_time_format[] = "%Y-%m-%dT%H:%M:%S%z"; // ISO8601 Time Format
 
 //

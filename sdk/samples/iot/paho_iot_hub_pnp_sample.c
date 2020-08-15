@@ -7,7 +7,7 @@
 #define SAMPLE_NAME PAHO_IOT_HUB_PNP_SAMPLE
 
 #define TELEMETRY_SEND_INTERVAL 1
-#define TIMEOUT_MQTT_RECEIVE_MS (8 * 1000)
+#define TIMEOUT_MQTT_RECEIVE_MS (20 * 1000)
 #define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
 #define TIMEOUT_MQTT_WAIT_FOR_COMPLETION_MS 1000
 
@@ -45,6 +45,9 @@ static const az_span reported_max_temp_property_name
 // IoT Hub Method Values
 static const az_span report_method_name = AZ_SPAN_LITERAL_FROM_STR("getMaxMinReport");
 static const az_span report_error_payload = AZ_SPAN_LITERAL_FROM_STR("{}");
+static char incoming_since_value_buffer[32];
+static char end_time_buffer[32];
+static char method_response_payload_buffer[256];
 
 // PnP Device Values
 static double device_current_temp = DEFAULT_START_TEMP_CELSIUS;
@@ -69,7 +72,7 @@ typedef enum
 static sample_environment_variables env_vars;
 static az_iot_hub_client hub_client;
 static MQTTClient mqtt_client;
-static char mqtt_client_username_buffer[128];
+static char mqtt_client_username_buffer[256];
 
 // Functions
 static void create_and_configure_mqtt_client();
@@ -108,7 +111,7 @@ static az_result get_max_min_report_method(
     az_span* response_out);
 static void send_telemetry_message(void);
 
-static void mqtt_publish_message(const char* topic, az_span payload, iot_quality_of_service qos);
+static void mqtt_publish_message(char* topic, az_span payload, int qos);
 static az_span get_request_id(void);
 
 static az_result build_payload(
@@ -295,11 +298,11 @@ static void request_device_twin_document()
 
   // Get the Twin Document topic to publish the twin document request.
   char twin_document_topic_buffer[128];
-  az_span topic_request_id = get_request_id();
+  az_span request_id = get_request_id();
   if (az_failed(
           rc = az_iot_hub_client_twin_document_get_publish_topic(
               &hub_client,
-              topic_request_id,
+              request_id,
               twin_document_topic_buffer,
               sizeof(twin_document_topic_buffer),
               NULL)))
@@ -309,8 +312,7 @@ static void request_device_twin_document()
   }
 
   // Publish the twin document request.
-  az_span payload = AZ_SPAN_NULL;
-  mqtt_publish_message(twin_document_topic_buffer, payload, 0);
+  mqtt_publish_message(twin_document_topic_buffer, AZ_SPAN_NULL, 0);
 }
 
 static void receive_messages()
@@ -351,6 +353,7 @@ static void receive_messages()
 
     // Send a telemetry message
     send_telemetry_message();
+
     LOG_SUCCESS("Client sent telemetry message to the service.");
   }
 }
@@ -368,7 +371,7 @@ static void disconnect_mqtt_client_from_iot_hub()
   MQTTClient_destroy(&mqtt_client);
 }
 
-static void mqtt_publish_message(const char* topic, az_span payload, iot_quality_of_service qos)
+static void mqtt_publish_message(char* topic, az_span payload, int qos)
 {
   int rc;
   MQTTClient_deliveryToken token;
@@ -377,11 +380,11 @@ static void mqtt_publish_message(const char* topic, az_span payload, iot_quality
            mqtt_client, topic, az_span_size(payload), az_span_ptr(payload), qos, 0, &token))
       != MQTTCLIENT_SUCCESS)
   {
-    LOG_ERROR("Failed to publish twin document request: MQTTClient return code %d", rc);
+    LOG_ERROR("Failed to publish message: MQTTClient return code %d", rc);
     exit(rc);
   }
 
-  if (qos == MSG_DELIVERED_AT_LEAST_ONCE || qos == MSG_DELIVERED_EXACTLY_ONCE)
+  if (qos > 0)
   {
     if ((rc = MQTTClient_waitForCompletion(mqtt_client, token, TIMEOUT_MQTT_WAIT_FOR_COMPLETION_MS))
         != MQTTCLIENT_SUCCESS)
@@ -497,8 +500,9 @@ static void handle_method_message(
   if (az_span_is_content_equal(report_method_name, method_request->name))
   {
     az_iot_status status;
-    char method_response_payload_buffer[256];
     az_span method_response_payload = AZ_SPAN_FROM_BUFFER(method_response_payload_buffer);
+
+    LOG_AZ_SPAN("message span:", message_span);
     if (az_failed(get_max_min_report_method(
             message_span, method_response_payload, &method_response_payload)))
     {
@@ -717,8 +721,8 @@ static az_result get_max_min_report_method(
     az_span response_destination,
     az_span* response_out)
 {
+  LOG("in max min report");
   // Parse the "since" field in the payload.
-  char incoming_since_value_buffer[32];
   int32_t incoming_since_value_len = 0;
   az_json_reader jr;
 
@@ -732,6 +736,8 @@ static az_result get_max_min_report_method(
   az_span start_time_span
       = az_span_create((uint8_t*)incoming_since_value_buffer, incoming_since_value_len);
 
+   LOG_AZ_SPAN("start time:", start_time_span);
+
   // Set the response payload to error if the "since" field was not sent
   if (az_span_ptr(start_time_span) == NULL)
   {
@@ -740,7 +746,7 @@ static az_result get_max_min_report_method(
   }
 
   // Get the current time as a string
-  char end_time_buffer[32];
+
   time_t rawtime;
   struct tm* timeinfo;
 
@@ -749,6 +755,9 @@ static az_result get_max_min_report_method(
   size_t length
       = strftime(end_time_buffer, sizeof(end_time_buffer), iso_spec_time_format, timeinfo);
   az_span end_time_span = az_span_create((uint8_t*)end_time_buffer, (int32_t)length);
+
+
+  LOG_AZ_SPAN("end time:", end_time_span);
 
   // Build method response message.
   const uint8_t count = 3;
@@ -786,7 +795,7 @@ static void send_telemetry_message(void)
   const az_span names[1] = { gl_temperature_name };
   const double values[1] = { device_current_temp };
 
-  char telemetry_payload_buffer[32];
+  char telemetry_payload_buffer[128];
   az_span telemetry_payload = AZ_SPAN_FROM_BUFFER(telemetry_payload_buffer);
   if (az_failed(
           rc = build_payload(count, names, values, NULL, telemetry_payload, &telemetry_payload)))
@@ -814,7 +823,7 @@ static az_span get_request_id(void)
     exit(rc);
   }
 
-  return out_span;
+  return destination;
 }
 
 static az_result build_payload(
@@ -826,7 +835,7 @@ static az_result build_payload(
     az_span* payload_out)
 {
   az_json_writer jw;
-
+  LOG("building payload");
   AZ_RETURN_IF_FAILED(az_json_writer_init(&jw, payload_destination, NULL));
   AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
 
@@ -834,14 +843,20 @@ static az_result build_payload(
   {
     AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, name[i]));
     AZ_RETURN_IF_FAILED(az_json_writer_append_double(&jw, value[i], DOUBLE_DECIMAL_PLACE_DIGITS));
+    LOG_AZ_SPAN("name:", name[i]);
+    LOG("value: %f", value[i]);
   }
 
   if (times != NULL)
   {
     AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, gl_start_time_name));
     AZ_RETURN_IF_FAILED(az_json_writer_append_string(&jw, times[0]));
+    LOG_AZ_SPAN("name:", gl_start_time_name);
+    LOG_AZ_SPAN("value:", times[0]);
     AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, gl_end_time_name));
     AZ_RETURN_IF_FAILED(az_json_writer_append_string(&jw, times[1]));
+    LOG_AZ_SPAN("name:", gl_end_time_name);
+    LOG_AZ_SPAN("value:", times[1]);
   }
 
   AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
