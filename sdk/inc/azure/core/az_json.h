@@ -621,6 +621,7 @@ AZ_NODISCARD az_result az_json_reader_chunked_init(
  * @retval #AZ_OK The token was read successfully.
  * @retval #AZ_ERROR_UNEXPECTED_END The end of the JSON document is reached.
  * @retval #AZ_ERROR_UNEXPECTED_CHAR An invalid character is detected.
+ * @retval #AZ_ERROR_JSON_READER_DONE No more JSON text left to process.
  */
 AZ_NODISCARD az_result az_json_reader_next_token(az_json_reader* ref_json_reader);
 

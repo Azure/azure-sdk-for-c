@@ -112,6 +112,7 @@ typedef enum
   AZ_ERROR_JSON_NESTING_OVERFLOW
   = _az_RESULT_MAKE_ERROR(_az_FACILITY_JSON, 2), ///< The JSON depth is too large.
 
+  /// No more JSON text left to process.
   AZ_ERROR_JSON_READER_DONE = _az_RESULT_MAKE_ERROR(_az_FACILITY_JSON, 3),
 
   // HTTP error codes
@@ -119,7 +120,10 @@ typedef enum
       _az_FACILITY_HTTP,
       1), ///< The #az_http_response instance is in an invalid state.
 
+  /// HTTP pipeline is malformed.
   AZ_ERROR_HTTP_PIPELINE_INVALID_POLICY = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 2),
+
+  /// Unknown HTTP method verb.
   AZ_ERROR_HTTP_INVALID_METHOD_VERB = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 3),
 
   AZ_ERROR_HTTP_AUTHENTICATION_FAILED
@@ -131,6 +135,7 @@ typedef enum
   AZ_ERROR_HTTP_RESPONSE_COULDNT_RESOLVE_HOST
   = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 6), ///< Couldn't reslove host.
 
+  // Error while parsing HTTP response header.
   AZ_ERROR_HTTP_CORRUPT_RESPONSE_HEADER = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 7),
 
   // HTTP Adapter error codes
@@ -139,6 +144,8 @@ typedef enum
       8), ///< Generic error in the HTTP transport adapter implementation.
 
   // IoT error codes
+
+  /// The IoT topic is not matching the expected format.
   AZ_ERROR_IOT_TOPIC_NO_MATCH = _az_RESULT_MAKE_ERROR(_az_FACILITY_IOT, 1),
 } az_result;
 
