@@ -110,7 +110,7 @@ typedef struct
 az_span az_json_token_copy_into_span(az_json_token const* json_token, az_span destination);
 
 /**
- * @brief Returns the JSON token's boolean.
+ * @brief Gets (as an output parameter) the JSON token's boolean.
  *
  * @param[in] json_token A pointer to an #az_json_token instance.
  * @param[out] out_value A pointer to a variable to receive the value.
@@ -121,7 +121,7 @@ az_span az_json_token_copy_into_span(az_json_token const* json_token, az_span de
 AZ_NODISCARD az_result az_json_token_get_boolean(az_json_token const* json_token, bool* out_value);
 
 /**
- * @brief Returns the JSON token's number as a 64-bit unsigned integer.
+ * @brief Gets (as an output parameter) the JSON token's number as a 64-bit unsigned integer.
  *
  * @param[in] json_token A pointer to an #az_json_token instance.
  * @param[out] out_value A pointer to a variable to receive the value.
@@ -135,7 +135,7 @@ AZ_NODISCARD az_result
 az_json_token_get_uint64(az_json_token const* json_token, uint64_t* out_value);
 
 /**
- * @brief Returns the JSON token's number as a 32-bit unsigned integer.
+ * @brief Gets (as an output parameter) the JSON token's number as a 32-bit unsigned integer.
  *
  * @param[in] json_token A pointer to an #az_json_token instance.
  * @param[out] out_value A pointer to a variable to receive the value.
@@ -149,7 +149,7 @@ AZ_NODISCARD az_result
 az_json_token_get_uint32(az_json_token const* json_token, uint32_t* out_value);
 
 /**
- * @brief Returns the JSON token's number as a 64-bit signed integer.
+ * @brief Gets (as an output parameter) the JSON token's number as a 64-bit signed integer.
  *
  * @param[in] json_token A pointer to an #az_json_token instance.
  * @param[out] out_value A pointer to a variable to receive the value.
@@ -162,7 +162,7 @@ az_json_token_get_uint32(az_json_token const* json_token, uint32_t* out_value);
 AZ_NODISCARD az_result az_json_token_get_int64(az_json_token const* json_token, int64_t* out_value);
 
 /**
- * @brief Returns the JSON token's number as a 32-bit signed integer.
+ * @brief Gets (as an output parameter) the JSON token's number as a 32-bit signed integer.
  *
  * @param[in] json_token A pointer to an #az_json_token instance.
  * @param[out] out_value A pointer to a variable to receive the value.
@@ -175,7 +175,7 @@ AZ_NODISCARD az_result az_json_token_get_int64(az_json_token const* json_token, 
 AZ_NODISCARD az_result az_json_token_get_int32(az_json_token const* json_token, int32_t* out_value);
 
 /**
- * @brief Returns the JSON token's number as a double.
+ * @brief Gets (as an output parameter) the JSON token's number as a `double`.
  *
  * @param[in] json_token A pointer to an #az_json_token instance.
  * @param[out] out_value A pointer to a variable to receive the value.
@@ -187,7 +187,7 @@ AZ_NODISCARD az_result az_json_token_get_int32(az_json_token const* json_token, 
 AZ_NODISCARD az_result az_json_token_get_double(az_json_token const* json_token, double* out_value);
 
 /**
- * @brief Returns the JSON token's string after unescaping it, if required.
+ * @brief Gets (as an output parameter) the JSON token's string after unescaping it, if required.
  *
  * @param[in] json_token A pointer to an #az_json_token instance.
  * @param destination A pointer to a buffer where the string should be copied into.
