@@ -1,13 +1,34 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "iot_sample_foundation.h"
+#ifdef _MSC_VER
+// warning C4201: nonstandard extension used: nameless struct/union
+#pragma warning(disable : 4201)
+#endif
+#include <paho-mqtt/MQTTClient.h>
+#ifdef _MSC_VER
+#pragma warning(default : 4201)
+#endif
+
+#include "iot_samples_common.h"
+
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <azure/core/az_json.h>
+#include <azure/core/az_result.h>
+#include <azure/core/az_span.h>
+#include <azure/iot/az_iot_hub_client.h>
 
 #define SAMPLE_TYPE PAHO_IOT_HUB
 #define SAMPLE_NAME PAHO_IOT_HUB_TWIN_SAMPLE
 
 #define MAX_TWIN_MESSAGE_COUNT 5
 #define TIMEOUT_MQTT_RECEIVE_MS (60 * 1000)
+#define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
 
 static const az_span twin_document_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("get_twin");
 static const az_span twin_patch_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("reported_prop");
@@ -15,24 +36,24 @@ static const az_span version_name = AZ_SPAN_LITERAL_FROM_STR("$version");
 static const az_span reported_property_name = AZ_SPAN_LITERAL_FROM_STR("device_count");
 static int32_t reported_property_value = 0;
 
-static sample_environment_variables env_vars;
+static iot_sample_environment_variables env_vars;
 static az_iot_hub_client hub_client;
 static MQTTClient mqtt_client;
 static char mqtt_client_username_buffer[128];
 
 // Functions
-void create_and_configure_mqtt_client();
-void connect_mqtt_client_to_iot_hub();
-void subscribe_mqtt_client_to_iot_hub_topics();
-void get_device_twin_document();
-void send_reported_property();
-void receive_desired_property();
-void disconnect_mqtt_client_from_iot_hub();
+static void create_and_configure_mqtt_client(void);
+static void connect_mqtt_client_to_iot_hub(void);
+static void subscribe_mqtt_client_to_iot_hub_topics(void);
+static void get_device_twin_document(void);
+static void send_reported_property(void);
+static void receive_desired_property(void);
+static void disconnect_mqtt_client_from_iot_hub(void);
 
-az_result build_reported_property(az_span* reported_property_payload);
-az_result update_property(const az_span* desired_payload);
-void receive_device_twin_message();
-void parse_device_twin_message(
+static az_result build_reported_property(az_span destination, az_span* json_out);
+static az_result update_property(az_span desired_payload);
+static void receive_device_twin_message(void);
+static void parse_device_twin_message(
     char* topic,
     int topic_len,
     const MQTTClient_message* message,
@@ -61,7 +82,7 @@ void parse_device_twin_message(
  * No other property names sent in a desired property message are supported. If any are sent, the
  * log will report there is nothing to update.
  */
-int main()
+int main(void)
 {
   create_and_configure_mqtt_client();
   LOG_SUCCESS("Client created and configured.");
@@ -87,7 +108,7 @@ int main()
   return 0;
 }
 
-void create_and_configure_mqtt_client()
+static void create_and_configure_mqtt_client(void)
 {
   int rc;
 
@@ -143,7 +164,7 @@ void create_and_configure_mqtt_client()
   }
 }
 
-void connect_mqtt_client_to_iot_hub()
+static void connect_mqtt_client_to_iot_hub(void)
 {
   int rc;
 
@@ -164,11 +185,11 @@ void connect_mqtt_client_to_iot_hub()
   mqtt_connect_options.keepAliveInterval = AZ_IOT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS;
 
   MQTTClient_SSLOptions mqtt_ssl_options = MQTTClient_SSLOptions_initializer;
-  mqtt_ssl_options.keyStore = (char*)x509_cert_pem_file_path_buffer;
+  mqtt_ssl_options.keyStore = (char*)az_span_ptr(env_vars.x509_cert_pem_file_path);
   if (*az_span_ptr(env_vars.x509_trust_pem_file_path)
       != '\0') // Should only be set if required by OS.
   {
-    mqtt_ssl_options.trustStore = (char*)x509_trust_pem_file_path_buffer;
+    mqtt_ssl_options.trustStore = (char*)az_span_ptr(env_vars.x509_trust_pem_file_path);
   }
   mqtt_connect_options.ssl = &mqtt_ssl_options;
 
@@ -184,7 +205,7 @@ void connect_mqtt_client_to_iot_hub()
   }
 }
 
-void subscribe_mqtt_client_to_iot_hub_topics()
+static void subscribe_mqtt_client_to_iot_hub_topics(void)
 {
   int rc;
 
@@ -205,7 +226,7 @@ void subscribe_mqtt_client_to_iot_hub_topics()
   }
 }
 
-void get_device_twin_document()
+static void get_device_twin_document(void)
 {
   int rc;
 
@@ -237,7 +258,7 @@ void get_device_twin_document()
   receive_device_twin_message();
 }
 
-void send_reported_property()
+static void send_reported_property(void)
 {
   int rc;
 
@@ -260,7 +281,7 @@ void send_reported_property()
   // Build the updated reported property message.
   char reported_property_payload_buffer[128];
   az_span reported_property_payload = AZ_SPAN_FROM_BUFFER(reported_property_payload_buffer);
-  if (az_failed(rc = build_reported_property(&reported_property_payload)))
+  if (az_failed(rc = build_reported_property(reported_property_payload, &reported_property_payload)))
   {
     LOG_ERROR("Failed to build reported property payload: az_result return code 0x%04x.", rc);
     exit(rc);
@@ -287,7 +308,7 @@ void send_reported_property()
   receive_device_twin_message();
 }
 
-void receive_desired_property()
+static void receive_desired_property(void)
 {
   // Continue until max # messages received or timeout expires.
   for (uint8_t message_count = 0; message_count < MAX_TWIN_MESSAGE_COUNT; message_count++)
@@ -297,7 +318,7 @@ void receive_desired_property()
   }
 }
 
-void disconnect_mqtt_client_from_iot_hub()
+static void disconnect_mqtt_client_from_iot_hub(void)
 {
   int rc;
 
@@ -310,7 +331,7 @@ void disconnect_mqtt_client_from_iot_hub()
   MQTTClient_destroy(&mqtt_client);
 }
 
-void receive_device_twin_message()
+static void receive_device_twin_message(void)
 {
   int rc;
   char* topic = NULL;
@@ -348,16 +369,12 @@ void receive_device_twin_message()
   MQTTClient_free(topic);
 }
 
-void parse_device_twin_message(
+static void parse_device_twin_message(
     char* topic,
     int topic_len,
     const MQTTClient_message* message,
     az_iot_hub_client_twin_response* twin_response)
 {
-  PRECONDITION_NOT_NULL(topic);
-  PRECONDITION_NOT_NULL(message);
-  PRECONDITION_NOT_NULL(twin_response);
-
   int rc;
   az_span topic_span = az_span_create((uint8_t*)topic, topic_len);
   az_span message_span = az_span_create((uint8_t*)message->payload, message->payloadlen);
@@ -389,7 +406,7 @@ void parse_device_twin_message(
     case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES:
       LOG("Type: Desired Properties");
 
-      if (az_failed(rc = update_property(&message_span)))
+      if (az_failed(rc = update_property(message_span)))
       {
         LOG_ERROR("Failed to update property locally: az_result return code 0x%04x.", rc);
         exit(rc);
@@ -398,29 +415,26 @@ void parse_device_twin_message(
   }
 }
 
-az_result build_reported_property(az_span* reported_property_payload)
+static az_result build_reported_property(az_span destination, az_span* json_out)
 {
-  PRECONDITION_NOT_NULL(reported_property_payload);
-
   az_json_writer json_writer;
 
-  AZ_RETURN_IF_FAILED(az_json_writer_init(&json_writer, *reported_property_payload, NULL));
+  AZ_RETURN_IF_FAILED(az_json_writer_init(&json_writer, destination, NULL));
   AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&json_writer));
   AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&json_writer, reported_property_name));
   AZ_RETURN_IF_FAILED(az_json_writer_append_int32(&json_writer, reported_property_value));
   AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&json_writer));
-  *reported_property_payload = az_json_writer_get_bytes_used_in_destination(&json_writer);
+
+  *json_out = az_json_writer_get_bytes_used_in_destination(&json_writer);
 
   return AZ_OK;
 }
 
-az_result update_property(const az_span* desired_payload)
+static az_result update_property(az_span desired_payload)
 {
-  PRECONDITION_NOT_NULL(desired_payload);
-
   // Parse desired property payload.
   az_json_reader json_reader;
-  AZ_RETURN_IF_FAILED(az_json_reader_init(&json_reader, *desired_payload, NULL));
+  AZ_RETURN_IF_FAILED(az_json_reader_init(&json_reader, desired_payload, NULL));
 
   AZ_RETURN_IF_FAILED(az_json_reader_next_token(&json_reader));
   if (json_reader.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)

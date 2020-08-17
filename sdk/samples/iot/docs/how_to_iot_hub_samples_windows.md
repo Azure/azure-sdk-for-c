@@ -298,7 +298,7 @@ What is covered:
                     Waiting for message.
     ```
 
-    Note: The sample does not terminate automatically. The sample will terminate after 5 messages have been sent or there is a timeout.
+    Note: The sample will terminate after 5 messages have been sent or there is a timeout.
 
     ### Direct Methods
 
@@ -349,7 +349,7 @@ What is covered:
                     Waiting for message.
     ```
 
-    Note: The sample does not terminate automatically. The sample will terminate after 5 messages have been sent or there is a timeout.
+    Note: The sample will terminate after 5 messages have been sent or there is a timeout.
 
     ### Device Twin
 
@@ -437,7 +437,7 @@ What is covered:
                     Waiting for message.
 
     ```
-     Note: The sample does not terminate automatically. The sample will terminate after 5 twin device updates have been sent or there is a timeout.
+     Note: The sample will terminate after 5 twin device updates have been sent or there is a timeout.
 
 ## Need Help?
 

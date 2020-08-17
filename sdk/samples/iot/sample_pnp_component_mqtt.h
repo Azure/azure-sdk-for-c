@@ -8,7 +8,7 @@
 
 #include <azure/core/az_span.h>
 
-typedef struct sample_pnp_mqtt_message_tag
+typedef struct
 {
   char* topic;
   size_t topic_length;

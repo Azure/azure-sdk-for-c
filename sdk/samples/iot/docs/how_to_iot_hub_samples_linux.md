@@ -12,7 +12,7 @@ What is covered:
 - Downloading and building the Azure SDK for Embedded C suite
 - Configuring and running the IoT Hub client samples.
 
-    _The following was run on an Ubuntu Desktop 18.04 environment, but it also works on WSL 1 and 2 (Windows Subsystem for Linux)_
+_The following was run on an Ubuntu Desktop 18.04 environment, but it also works on WSL 1 and 2 (Windows Subsystem for Linux)._
 
 1. Install library dependencies
 
@@ -306,7 +306,7 @@ What is covered:
                     Waiting for message.
     ```
 
-    Note: The sample does not terminate automatically. The sample will terminate after 5 messages have been sent or there is a timeout.
+    Note: The sample will terminate after 5 messages have been sent or there is a timeout.
 
     ### Direct Methods
 
@@ -357,7 +357,7 @@ What is covered:
                     Waiting for message.
     ```
 
-    Note: The sample does not terminate automatically. The sample will terminate after 5 messages have been sent or there is a timeout.
+    Note: The sample will terminate after 5 messages have been sent or there is a timeout.
 
     ### Device Twin
 
@@ -444,7 +444,7 @@ What is covered:
                     Waiting for message.
     ```
 
-    Note: The sample does not terminate automatically. The sample will terminate after 5 twin device updates have been sent or there is a timeout.
+    Note: The sample will terminate after 5 twin device updates have been sent or there is a timeout.
 
 ## Need Help?
 

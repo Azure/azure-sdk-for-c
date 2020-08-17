@@ -1,40 +1,60 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "iot_sample_foundation.h"
+#ifdef _MSC_VER
+// warning C4201: nonstandard extension used: nameless struct/union
+#pragma warning(disable : 4201)
+#endif
+#include <paho-mqtt/MQTTClient.h>
+#ifdef _MSC_VER
+#pragma warning(default : 4201)
+#endif
+
+#include "iot_samples_common.h"
+
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <azure/core/az_result.h>
+#include <azure/core/az_span.h>
+#include <azure/iot/az_iot_provisioning_client.h>
 
 #define SAMPLE_TYPE PAHO_IOT_PROVISIONING
 #define SAMPLE_NAME PAHO_IOT_PROVISIONING_SAMPLE
 
 #define TIMEOUT_MQTT_RECEIVE_MS (60 * 1000)
+#define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
 
-static sample_environment_variables env_vars;
+static iot_sample_environment_variables env_vars;
 static az_iot_provisioning_client provisioning_client;
 static MQTTClient mqtt_client;
 static char mqtt_client_username_buffer[128];
 
 // Functions
-void create_and_configure_mqtt_client();
-void connect_mqtt_client_to_provisioning_service();
-void subscribe_mqtt_client_to_provisioning_service_topics();
-void register_device_with_provisioning_service();
-void receive_device_registration_status();
-void disconnect_mqtt_client_from_provisioning_service();
+static void create_and_configure_mqtt_client(void);
+static void connect_mqtt_client_to_provisioning_service(void);
+static void subscribe_mqtt_client_to_provisioning_service_topics(void);
+static void register_device_with_provisioning_service(void);
+static void receive_device_registration_status(void);
+static void disconnect_mqtt_client_from_provisioning_service(void);
 
-void parse_registration_message(
+static void parse_registration_message(
     char* topic,
     int topic_len,
     const MQTTClient_message* message,
     az_iot_provisioning_client_register_response* response,
     az_iot_provisioning_client_operation_status* operation_status);
-void send_operation_query_message(const az_iot_provisioning_client_register_response* response);
+static void send_operation_query_message(const az_iot_provisioning_client_register_response* response);
 
 /*
  * This sample registers a device with the Azure IoT Device Provisioning Service.
  * It will wait to receive the registration status before disconnecting.
  * X509 self-certification is used.
  */
-int main()
+int main(void)
 {
   create_and_configure_mqtt_client();
   LOG_SUCCESS("Client created and configured.");
@@ -57,7 +77,7 @@ int main()
   return 0;
 }
 
-void create_and_configure_mqtt_client()
+static void create_and_configure_mqtt_client(void)
 {
   int rc;
 
@@ -116,7 +136,7 @@ void create_and_configure_mqtt_client()
   }
 }
 
-void connect_mqtt_client_to_provisioning_service()
+static void connect_mqtt_client_to_provisioning_service(void)
 {
   int rc;
 
@@ -140,11 +160,11 @@ void connect_mqtt_client_to_provisioning_service()
   mqtt_connect_options.keepAliveInterval = AZ_IOT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS;
 
   MQTTClient_SSLOptions mqtt_ssl_options = MQTTClient_SSLOptions_initializer;
-  mqtt_ssl_options.keyStore = (char*)x509_cert_pem_file_path_buffer;
+  mqtt_ssl_options.keyStore = (char*)az_span_ptr(env_vars.x509_cert_pem_file_path);
   if (*az_span_ptr(env_vars.x509_trust_pem_file_path)
       != '\0') // Should only be set if required by OS.
   {
-    mqtt_ssl_options.trustStore = (char*)x509_trust_pem_file_path_buffer;
+    mqtt_ssl_options.trustStore = (char*)az_span_ptr(env_vars.x509_trust_pem_file_path);
   }
   mqtt_connect_options.ssl = &mqtt_ssl_options;
 
@@ -160,7 +180,7 @@ void connect_mqtt_client_to_provisioning_service()
   }
 }
 
-void subscribe_mqtt_client_to_provisioning_service_topics()
+static void subscribe_mqtt_client_to_provisioning_service_topics(void)
 {
   int rc;
 
@@ -174,7 +194,7 @@ void subscribe_mqtt_client_to_provisioning_service_topics()
   }
 }
 
-void register_device_with_provisioning_service()
+static void register_device_with_provisioning_service(void)
 {
   int rc;
 
@@ -207,7 +227,7 @@ void register_device_with_provisioning_service()
   }
 }
 
-void receive_device_registration_status()
+static void receive_device_registration_status(void)
 {
   int rc;
   char* topic = NULL;
@@ -282,7 +302,7 @@ void receive_device_registration_status()
   MQTTClient_free(topic);
 }
 
-void disconnect_mqtt_client_from_provisioning_service()
+static void disconnect_mqtt_client_from_provisioning_service(void)
 {
   int rc;
 
@@ -295,18 +315,13 @@ void disconnect_mqtt_client_from_provisioning_service()
   MQTTClient_destroy(&mqtt_client);
 }
 
-void parse_registration_message(
+static void parse_registration_message(
     char* topic,
     int topic_len,
     const MQTTClient_message* message,
     az_iot_provisioning_client_register_response* register_response,
     az_iot_provisioning_client_operation_status* operation_status)
 {
-  PRECONDITION_NOT_NULL(topic);
-  PRECONDITION_NOT_NULL(message);
-  PRECONDITION_NOT_NULL(register_response);
-  PRECONDITION_NOT_NULL(operation_status);
-
   int rc;
   az_span topic_span = az_span_create((uint8_t*)topic, topic_len);
   az_span message_span = az_span_create((uint8_t*)message->payload, message->payloadlen);
@@ -335,11 +350,9 @@ void parse_registration_message(
   }
 }
 
-void send_operation_query_message(
+static void send_operation_query_message(
     const az_iot_provisioning_client_register_response* register_response)
 {
-  PRECONDITION_NOT_NULL(register_response);
-
   int rc;
 
   // Get the Query Status topic to publish the query status request.

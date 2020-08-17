@@ -41,7 +41,7 @@ enum
  * @brief Azure IoT Hub Client options.
  *
  */
-typedef struct az_iot_hub_client_options
+typedef struct
 {
   az_span module_id; /**< The module name (if a module identity is used). */
   az_span user_agent; /**< The user-agent is a formatted string that will be used for Azure IoT
@@ -54,7 +54,7 @@ typedef struct az_iot_hub_client_options
  * @brief Azure IoT Hub Client.
  *
  */
-typedef struct az_iot_hub_client
+typedef struct
 {
   struct
   {
@@ -223,7 +223,7 @@ AZ_NODISCARD az_result az_iot_hub_client_sas_get_password(
  * @brief Telemetry or C2D properties.
  *
  */
-typedef struct az_iot_hub_client_properties
+typedef struct
 {
   struct
   {
@@ -349,7 +349,7 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_get_publish_topic(
  * @brief The Cloud-To-Device Request.
  *
  */
-typedef struct az_iot_hub_client_c2d_request
+typedef struct
 {
   az_iot_hub_client_properties properties; /**< The properties associated with this C2D request. */
 } az_iot_hub_client_c2d_request;
@@ -385,7 +385,7 @@ AZ_NODISCARD az_result az_iot_hub_client_c2d_parse_received_topic(
  * @brief A method request received from IoT Hub.
  *
  */
-typedef struct az_iot_hub_client_method_request
+typedef struct
 {
   az_span request_id; /**< The request id.
                        * @note The application must match the method request and method response. */
@@ -463,7 +463,7 @@ typedef enum
  * @brief Twin response.
  *
  */
-typedef struct az_iot_hub_client_twin_response
+typedef struct
 {
   az_iot_hub_client_twin_response_type response_type; /**< Twin response type. */
   az_iot_status status; /**< The operation status. */
