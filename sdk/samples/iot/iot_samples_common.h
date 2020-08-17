@@ -1,44 +1,19 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef SAMPLE_H
-#define SAMPLE_H
+#ifndef IOT_SAMPLES_COMMON_H
+#define IOT_SAMPLES_COMMON_H
 
-#ifdef _MSC_VER
-// warning C4201: nonstandard extension used: nameless struct/union
-#pragma warning(disable : 4201)
-// "'getenv': This function or variable may be unsafe. Consider using _dupenv_s instead."
-#pragma warning(disable : 4996)
-#endif
-
-#ifdef _WIN32
-// Required for Sleep(DWORD)
-#include <Windows.h>
-#else
-// Required for sleep(unsigned int)
-#include <unistd.h>
-#endif
-
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <time.h>
 
-#include <azure/core/az_json.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
-#include <azure/iot/az_iot_hub_client.h>
-#include <azure/iot/az_iot_provisioning_client.h>
-
-#include <openssl/bio.h>
-#include <openssl/buffer.h>
-#include <openssl/evp.h>
-#include <openssl/hmac.h>
-
-#include <paho-mqtt/MQTTClient.h>
 
 #define SAS_KEY_DURATION_TIME_DIGITS 4
-#define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
 
 //
 // Logging
@@ -86,9 +61,9 @@
 
 // DO NOT MODIFY: Device information
 #define ENV_IOT_HUB_DEVICE_ID "AZ_IOT_HUB_DEVICE_ID"
-#define ENV_IOT_HUB_DEVICE_ID_SAS "AZ_IOT_HUB_DEVICE_ID_SAS"
+#define ENV_IOT_HUB_SAS_DEVICE_ID "AZ_IOT_HUB_SAS_DEVICE_ID"
 #define ENV_IOT_PROVISIONING_REGISTRATION_ID "AZ_IOT_PROVISIONING_REGISTRATION_ID"
-#define ENV_IOT_PROVISIONING_REGISTRATION_ID_SAS "AZ_IOT_PROVISIONING_REGISTRATION_ID_SAS"
+#define ENV_IOT_PROVISIONING_SAS_REGISTRATION_ID "AZ_IOT_PROVISIONING_SAS_REGISTRATION_ID"
 
 // DO NOT MODIFY: SAS Key
 #define ENV_IOT_HUB_SAS_KEY "AZ_IOT_HUB_SAS_KEY"
@@ -211,4 +186,4 @@ void sas_generate_encoded_signed_signature(
     az_span sas_b64_encoded_destination,
     az_span* sas_b64_encoded_out);
 
-#endif // SAMPLE_H
+#endif // IOT_SAMPLES_COMMON_H

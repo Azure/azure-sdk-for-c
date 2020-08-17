@@ -232,7 +232,7 @@ The following samples use SAS authentication to connect to Azure IoT Hub or Azur
 
 2. Set the following environment variables:
 
-    - `AZ_IOT_HUB_DEVICE_ID_SAS`: Select your device from the IoT Devices page and copy its Device Id.
+    - `AZ_IOT_HUB_SAS_DEVICE_ID`: Select your device from the IoT Devices page and copy its Device Id.
     - `AZ_IOT_HUB_SAS_KEY`: Copy its Primary Key from the same page.
     - `AZ_IOT_HUB_HOSTNAME`: Copy the Hostname from the Overview tab in your Azure IoT Hub.
 
@@ -244,7 +244,7 @@ The following samples use SAS authentication to connect to Azure IoT Hub or Azur
 
 2. Set the following environment variables:
 
-    - `AZ_IOT_PROVISIONING_REGISTRATION_ID_SAS`: Copy the Registration Id of your SAS device from the Individual Enrollments tab.
+    - `AZ_IOT_PROVISIONING_SAS_REGISTRATION_ID`: Copy the Registration Id of your SAS device from the Individual Enrollments tab.
     - `AZ_IOT_PROVISIONING_SAS_KEY`: Select your SAS device from the Individual Enrollments tab and copy its Primary Key.
     - `AZ_IOT_PROVISIONING_ID_SCOPE`: Copy the Id Scope from the Overview tab in your Azure IoT Hub DPS.
 

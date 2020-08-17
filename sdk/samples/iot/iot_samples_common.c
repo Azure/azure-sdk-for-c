@@ -1,7 +1,36 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "iot_sample_foundation.h"
+#ifdef _MSC_VER
+// "'getenv': This function or variable may be unsafe. Consider using _dupenv_s instead."
+#pragma warning(disable : 4996)
+#endif
+
+#ifdef _WIN32
+// Required for Sleep(DWORD)
+#include <Windows.h>
+#else
+// Required for sleep(unsigned int)
+#include <unistd.h>
+#endif
+
+#include "iot_samples_common.h"
+
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
+#include <azure/core/az_result.h>
+#include <azure/core/az_span.h>
+
+#include <openssl/bio.h>
+#include <openssl/buffer.h>
+#include <openssl/evp.h>
+#include <openssl/hmac.h>
 
 #define PRECONDITION_NOT_NULL(arg) \
   { \
@@ -103,7 +132,7 @@ az_result read_environment_variables(
       case PAHO_IOT_HUB_SAS_TELEMETRY_SAMPLE:
         env_vars->hub_device_id = AZ_SPAN_FROM_BUFFER(iot_hub_device_id_buffer);
         AZ_RETURN_IF_FAILED(read_configuration_entry(
-            ENV_IOT_HUB_DEVICE_ID_SAS,
+            ENV_IOT_HUB_SAS_DEVICE_ID,
             NULL,
             false,
             env_vars->hub_device_id,
@@ -160,7 +189,7 @@ az_result read_environment_variables(
         env_vars->provisioning_registration_id
             = AZ_SPAN_FROM_BUFFER(iot_provisioning_registration_id_buffer);
         AZ_RETURN_IF_FAILED(read_configuration_entry(
-            ENV_IOT_PROVISIONING_REGISTRATION_ID_SAS,
+            ENV_IOT_PROVISIONING_SAS_REGISTRATION_ID,
             NULL,
             false,
             env_vars->provisioning_registration_id,
