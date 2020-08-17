@@ -13,7 +13,7 @@
 
 #include "sample_pnp_component_mqtt.h"
 
-typedef struct sample_pnp_thermostat_component_tag
+typedef struct
 {
   az_span component_name;
   double current_temperature;
