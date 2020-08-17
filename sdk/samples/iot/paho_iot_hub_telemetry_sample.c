@@ -29,22 +29,22 @@
 #define TELEMETRY_NUMBER_OF_MESSAGES 5
 #define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
 
-static sample_environment_variables env_vars;
+static iot_sample_environment_variables env_vars;
 static az_iot_hub_client hub_client;
 static MQTTClient mqtt_client;
 static char mqtt_client_username_buffer[128];
 
 // Functions
-void create_and_configure_mqtt_client();
-void connect_mqtt_client_to_iot_hub();
-void send_telemetry_messages_to_iot_hub();
-void disconnect_mqtt_client_from_iot_hub();
+static void create_and_configure_mqtt_client(void);
+static void connect_mqtt_client_to_iot_hub(void);
+static void send_telemetry_messages_to_iot_hub(void);
+static void disconnect_mqtt_client_from_iot_hub(void);
 
 /*
  * This sample sends five telemetry messages to the Azure IoT Hub.
  * X509 self-certification is used.
  */
-int main()
+int main(void)
 {
   create_and_configure_mqtt_client();
   LOG_SUCCESS("Client created and configured.");
@@ -61,7 +61,7 @@ int main()
   return 0;
 }
 
-void create_and_configure_mqtt_client()
+static void create_and_configure_mqtt_client(void)
 {
   int rc;
 
@@ -117,7 +117,7 @@ void create_and_configure_mqtt_client()
   }
 }
 
-void connect_mqtt_client_to_iot_hub()
+static void connect_mqtt_client_to_iot_hub(void)
 {
   int rc;
 
@@ -138,11 +138,11 @@ void connect_mqtt_client_to_iot_hub()
   mqtt_connect_options.keepAliveInterval = AZ_IOT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS;
 
   MQTTClient_SSLOptions mqtt_ssl_options = MQTTClient_SSLOptions_initializer;
-  mqtt_ssl_options.keyStore = (char*)x509_cert_pem_file_path_buffer;
+  mqtt_ssl_options.keyStore = (char*)az_span_ptr(env_vars.x509_cert_pem_file_path);
   if (*az_span_ptr(env_vars.x509_trust_pem_file_path)
       != '\0') // Should only be set if required by OS.
   {
-    mqtt_ssl_options.trustStore = (char*)x509_trust_pem_file_path_buffer;
+    mqtt_ssl_options.trustStore = (char*)az_span_ptr(env_vars.x509_trust_pem_file_path);
   }
   mqtt_connect_options.ssl = &mqtt_ssl_options;
 
@@ -158,7 +158,7 @@ void connect_mqtt_client_to_iot_hub()
   }
 }
 
-void send_telemetry_messages_to_iot_hub()
+static void send_telemetry_messages_to_iot_hub(void)
 {
   int rc;
 
@@ -197,7 +197,7 @@ void send_telemetry_messages_to_iot_hub()
   }
 }
 
-void disconnect_mqtt_client_from_iot_hub()
+static void disconnect_mqtt_client_from_iot_hub(void)
 {
   int rc;
 
