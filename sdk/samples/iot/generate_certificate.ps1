@@ -31,7 +31,7 @@ Invoke-IoTCommand -Command 'openssl x509 -noout -text -in device_ec_cert.pem'
 
 Get-Content device_ec_cert.pem, device_ec_key.pem | Set-Content device_cert_store.pem
 
-if ($IsWindows || $IsMacOS) {
+if ($IsWindows -or $IsMacOS) {
   Write-Warning "IMPORTANT:"
   Write-Warning "It is NOT recommended to use OpenSSL on Windows or OSX. Recommended TLS stacks are:"
   Write-Warning "Microsoft Windows SChannel: https://docs.microsoft.com/en-us/windows/win32/com/schannel"
