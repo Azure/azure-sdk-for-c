@@ -63,6 +63,7 @@ steps:
 
   # Attempt to restore vcpkg from the cache
   - task: Cache@2
+    timeoutInMinutes: 1
     inputs:
       key: >-
         $(Agent.JobName)
@@ -71,6 +72,7 @@ steps:
         | $(${{ parameters.DependenciesVariableName }})
       path: $(VCPKG_INSTALLATION_ROOT)
       cacheHitVar: VcpkgRestoredFromCache
+    
     displayName: Vcpkg Cache
     condition: >-
       and(
