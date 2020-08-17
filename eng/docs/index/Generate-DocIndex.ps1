@@ -28,18 +28,18 @@ $YmlPath = "${DocOutDir}/api"
 New-Item -Path $YmlPath -Name "toc.yml" -Force
 
 Write-Verbose "Creating Index for client packages..."
-foreach ($Dir in $ServiceMapping.Keys)
+foreach ($ServiceKey in $ServiceMapping.Keys)
 {
     # Generate a new top-level md file for the service
-    New-Item -Path $YmlPath -Name "$($Dir).md" -Force
+    New-Item -Path $YmlPath -Name "$($ServiceKey).md" -Force
 
     # Add service to toc.yml
-    $ServiceName = $ServiceMapping[$Dir]
-    Add-Content -Path "$($YmlPath)/toc.yml" -Value "- name: $($ServiceName)`r`n  href: $($Dir.Name).md"
+    $ServiceName = $ServiceMapping[$ServiceKey]
+    Add-Content -Path "$($YmlPath)/toc.yml" -Value "- name: $($ServiceName)`r`n  href: $($ServiceKey).md"
 
-    Add-Content -Path "$($YmlPath)/$($Dir.Name).md" -Value "# Client"
-    Add-Content -Path "$($YmlPath)/$($Dir.Name).md" -Value "---"
-    Write-Verbose "Operating on Client Packages for $($Dir.Name)"
+    Add-Content -Path "$($YmlPath)/$($ServiceKey).md" -Value "# Client"
+    Add-Content -Path "$($YmlPath)/$($ServiceKey).md" -Value "---"
+    Write-Verbose "Operating on Client Packages for $($ServiceKey)"
 }
 
 Write-Verbose "Creating Site Title and Navigation..."
