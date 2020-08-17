@@ -70,7 +70,7 @@
   } while (0)
 #endif // __GNUC__ >= 7
 
-/// @brief Enforce that the return value get handled (if compiler supports the feature).
+/// @brief Enforce that the return value is handled (only applicable on supported compilers).
 #ifdef _MSC_VER
 #define AZ_NODISCARD _Check_return_
 #elif defined(__GNUC__) || defined(__clang__) // !_MSC_VER
