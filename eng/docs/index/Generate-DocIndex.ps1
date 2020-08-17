@@ -28,7 +28,7 @@ $YmlPath = "${DocOutDir}/api"
 New-Item -Path $YmlPath -Name "toc.yml" -Force
 
 Write-Verbose "Creating Index for client packages..."
-foreach ($ServiceKey in $ServiceMapping.Keys)
+foreach ($ServiceKey in $ServiceMapping.Keys | Sort-Object)
 {
     # Generate a new top-level md file for the service
     New-Item -Path $YmlPath -Name "$($ServiceKey).md" -Force
