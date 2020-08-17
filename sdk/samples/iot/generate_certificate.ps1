@@ -27,16 +27,19 @@ function Invoke-IoTCommand {
 
 Invoke-IoTCommand -Command 'openssl ecparam -out device_ec_key.pem -name prime256v1 -genkey'
 Invoke-IoTCommand -Command 'openssl req -new -days 365 -nodes -x509 -key device_ec_key.pem -out device_ec_cert.pem -config x509_config.cfg -subj "/CN=paho-sample-device1"'
-Invoke-IoTCommand -Command 'openssl -noout -text -in device_ec_cert.pem'
+Invoke-IoTCommand -Command 'openssl x509 -noout -text -in device_ec_cert.pem'
 
 Get-Content device_ec_cert.pem, device_ec_key.pem | Set-Content device_cert_store.pem
 
-Write-Output "IMPORTANT:"
-Write-Output "It is NOT recommended to use OpenSSL on Windows or OSX. Recommended TLS stacks are:"
-Write-Output "Microsoft Windows SChannel: https://docs.microsoft.com/en-us/windows/win32/com/schannel"
-Write-Output "OR"
-Write-Output "Apple Secure Transport : https://developer.apple.com/documentation/security/secure_transport"
-Write-Output "If using OpenSSL, it is recommended to use the OpenSSL Trusted CA store configured on your system."
+if ($IsWindows || $IsMacOS) {
+  Write-Output "IMPORTANT:"
+  Write-Output "It is NOT recommended to use OpenSSL on Windows or OSX. Recommended TLS stacks are:"
+  Write-Output "Microsoft Windows SChannel: https://docs.microsoft.com/en-us/windows/win32/com/schannel"
+  Write-Output "OR"
+  Write-Output "Apple Secure Transport : https://developer.apple.com/documentation/security/secure_transport"
+  Write-Output "If using OpenSSL, it is recommended to use the OpenSSL Trusted CA store configured on your system."
+
+}
 
 Write-Output "`nSAMPLE CERTIFICATE GENERATED:"
 Write-Output "Use the following command to set the environment variable for the samples:"
