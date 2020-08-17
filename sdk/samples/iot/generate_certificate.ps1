@@ -32,6 +32,7 @@ Invoke-IoTCommand -Command 'openssl x509 -noout -text -in device_ec_cert.pem'
 Get-Content device_ec_cert.pem, device_ec_key.pem | Set-Content device_cert_store.pem
 
 if ($IsWindows -or $IsMacOS) {
+  Write-Output "`n"
   Write-Warning "IMPORTANT:"
   Write-Warning "It is NOT recommended to use OpenSSL on Windows or OSX. Recommended TLS stacks are:"
   Write-Warning "Microsoft Windows SChannel: https://docs.microsoft.com/en-us/windows/win32/com/schannel"
@@ -45,7 +46,7 @@ Write-Output "`nSAMPLE CERTIFICATE GENERATED:"
 Write-Output "Use the following command to set the environment variable for the samples:"
 
 if ($IsWindows) {
-  Write-Output "`n`t$env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE=$(Resolve-Path device_cert_store.pem)"
+  Write-Output "`n`t`$env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE=$(Resolve-Path device_cert_store.pem)"
 }
 else {
   Write-Output "`n`texport AZ_IOT_DEVICE_X509_CERT_PEM_FILE=$(Resolve-Path device_cert_store.pem)"
