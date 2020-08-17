@@ -1,12 +1,32 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "iot_sample_foundation.h"
+#ifdef _MSC_VER
+// warning C4201: nonstandard extension used: nameless struct/union
+#pragma warning(disable : 4201)
+#endif
+#include <paho-mqtt/MQTTClient.h>
+#ifdef _MSC_VER
+#pragma warning(default : 4201)
+#endif
+
+#include "iot_samples_common.h"
+
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <azure/core/az_result.h>
+#include <azure/core/az_span.h>
+#include <azure/iot/az_iot_provisioning_client.h>
 
 #define SAMPLE_TYPE PAHO_IOT_PROVISIONING
 #define SAMPLE_NAME PAHO_IOT_PROVISIONING_SAS_SAMPLE
 
 #define TIMEOUT_MQTT_RECEIVE_MS (60 * 1000)
+#define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
 
 static sample_environment_variables env_vars;
 static az_iot_provisioning_client provisioning_client;

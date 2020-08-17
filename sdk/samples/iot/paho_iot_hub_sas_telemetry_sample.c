@@ -1,13 +1,33 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "iot_sample_foundation.h"
+#ifdef _MSC_VER
+// warning C4201: nonstandard extension used: nameless struct/union
+#pragma warning(disable : 4201)
+#endif
+#include <paho-mqtt/MQTTClient.h>
+#ifdef _MSC_VER
+#pragma warning(default : 4201)
+#endif
+
+#include "iot_samples_common.h"
+
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <azure/core/az_result.h>
+#include <azure/core/az_span.h>
+#include <azure/iot/az_iot_hub_client.h>
 
 #define SAMPLE_TYPE PAHO_IOT_HUB
 #define SAMPLE_NAME PAHO_IOT_HUB_SAS_TELEMETRY_SAMPLE
 
 #define TELEMETRY_SEND_INTERVAL_SEC 1
 #define TELEMETRY_NUMBER_OF_MESSAGES 5
+#define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
 
 static sample_environment_variables env_vars;
 static az_iot_hub_client hub_client;
@@ -166,7 +186,7 @@ void send_telemetry_messages_to_iot_hub()
   };
 
   // Publish # of telemetry messages.
-  for (int i = 0; i < TELEMETRY_NUMBER_OF_MESSAGES; ++i)
+  for (uint8_t i = 0; i < TELEMETRY_NUMBER_OF_MESSAGES; ++i)
   {
     LOG("Sending message %d.", i + 1);
     if ((rc = MQTTClient_publish(
