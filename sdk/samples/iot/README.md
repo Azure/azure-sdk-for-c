@@ -333,12 +333,6 @@ Samples use environment variables for a variety of purposes, including filepaths
 export ENV_VARIABLE_NAME=VALUE
 ```
 
-#### Windows (CMD)
-
-```powershell
-set ENV_VARIABLE_NAME=VALUE
-```
-
 #### Windows (Powershell)
 
 ```powershell
@@ -444,7 +438,7 @@ The following samples use SAS authentication to connect to Azure IoT Hub or Azur
 
     Windows:
 
-    ```cmd
+    ```powershell
     az.sln
     ```
 
