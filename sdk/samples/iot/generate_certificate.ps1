@@ -1,6 +1,10 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # SPDX-License-Identifier: MIT
 
+Write-Warning "Certificates created by these scripts MUST NOT be used for production."
+Write-Warning "They expire after 30 days, and most importantly are provided for demonstration purposes to help you quickly understand CA Certificates."
+Write-Warning "When productizing against CA Certificates, you'll need to use your own security best practices for certification creation and lifetime management."
+
 # Check to make sure openssl is installed
 if (-Not (Get-Command "openssl" -ErrorAction SilentlyContinue)) {
   throw "openssl is not availabe. You will need to install it or add it to the PATH to proceed"
