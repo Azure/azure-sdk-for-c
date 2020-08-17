@@ -92,7 +92,7 @@ az_result read_environment_variables(
       case PAHO_IOT_HUB_SAS_TELEMETRY_SAMPLE:
         env_vars->hub_device_id = AZ_SPAN_FROM_BUFFER(hub_device_id_buffer);
         AZ_RETURN_IF_FAILED(read_configuration_entry(
-            ENV_IOT_HUB_DEVICE_ID_SAS, NULL, false, &(env_vars->hub_device_id)));
+            ENV_IOT_HUB_SAS_DEVICE_ID, NULL, false, &(env_vars->hub_device_id)));
 
         env_vars->hub_sas_key = AZ_SPAN_FROM_BUFFER(hub_sas_key_buffer);
         AZ_RETURN_IF_FAILED(
@@ -139,7 +139,7 @@ az_result read_environment_variables(
         env_vars->provisioning_registration_id
             = AZ_SPAN_FROM_BUFFER(provisioning_registration_id_buffer);
         AZ_RETURN_IF_FAILED(read_configuration_entry(
-            ENV_IOT_PROVISIONING_REGISTRATION_ID_SAS,
+            ENV_IOT_PROVISIONING_SAS_REGISTRATION_ID,
             NULL,
             false,
             &(env_vars->provisioning_registration_id)));
