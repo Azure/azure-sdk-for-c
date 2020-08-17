@@ -335,7 +335,7 @@ export ENV_VARIABLE_NAME=VALUE
 
 #### Windows (CMD)
 
-```cmd
+```powershell
 set ENV_VARIABLE_NAME=VALUE
 ```
 
@@ -364,7 +364,7 @@ The following samples use x509 authentication to connect to Azure IoT Hub or Azu
 
     Windows:
 
-    ```cmd
+    ```powershell
     .\generate_certificate.ps1
     ```
 

@@ -42,7 +42,7 @@ Write-Output "`nSAMPLE CERTIFICATE GENERATED:"
 Write-Output "Use the following command to set the environment variable for the samples:"
 
 if ($IsWindows) {
-  Write-Output "`n`tset AZ_IOT_DEVICE_X509_CERT_PEM_FILE=$(Resolve-Path device_cert_store.pem)"
+  Write-Output "`n`t$env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE=$(Resolve-Path device_cert_store.pem)"
 }
 else {
   Write-Output "`n`texport AZ_IOT_DEVICE_X509_CERT_PEM_FILE=$(Resolve-Path device_cert_store.pem)"
