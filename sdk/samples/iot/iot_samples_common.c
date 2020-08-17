@@ -1,7 +1,36 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "iot_sample_foundation.h"
+#ifdef _MSC_VER
+// "'getenv': This function or variable may be unsafe. Consider using _dupenv_s instead."
+#pragma warning(disable : 4996)
+#endif
+
+#ifdef _WIN32
+// Required for Sleep(DWORD)
+#include <Windows.h>
+#else
+// Required for sleep(unsigned int)
+#include <unistd.h>
+#endif
+
+#include "iot_samples_common.h"
+
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
+#include <azure/core/az_result.h>
+#include <azure/core/az_span.h>
+
+#include <openssl/bio.h>
+#include <openssl/buffer.h>
+#include <openssl/evp.h>
+#include <openssl/hmac.h>
 
 //
 // MQTT endpoints
