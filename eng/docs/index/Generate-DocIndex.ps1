@@ -24,44 +24,23 @@ New-Item -Path "${DocOutDir}" -Name "templates" -ItemType "directory"
 Copy-Item "${DocGenDir}/templates/*" -Destination "${DocOutDir}/templates" -Force -Recurse
 Copy-Item "${DocGenDir}/docfx.json" -Destination "${DocOutDir}/" -Force
 
-Write-Verbose "Creating Index using service directory and package names from repo..."
-$ServiceList = Get-ChildItem "$($RepoRoot)/sdk/inc/azure" -Directory -Exclude eng, mgmtcommon, template | Sort-Object
 $YmlPath = "${DocOutDir}/api"
 New-Item -Path $YmlPath -Name "toc.yml" -Force
 
-$TargetServices = $ServiceList | Where-Object { $ServiceMapping.Contains($_.Name) }
-
 Write-Verbose "Creating Index for client packages..."
-foreach ($Dir in $TargetServices)
+foreach ($Dir in $ServiceMapping.Keys)
 {
     # Generate a new top-level md file for the service
-    New-Item -Path $YmlPath -Name "$($Dir.Name).md" -Force
+    New-Item -Path $YmlPath -Name "$($Dir).md" -Force
 
     # Add service to toc.yml
-    $ServiceName = If ($ServiceMapping.Contains($Dir.Name)) { $ServiceMapping[$Dir.Name] } Else { $Dir.Name }
+    $ServiceName = $ServiceMapping[$Dir]
     Add-Content -Path "$($YmlPath)/toc.yml" -Value "- name: $($ServiceName)`r`n  href: $($Dir.Name).md"
 
-    $PkgList = Get-ChildItem $Dir.FullName -Directory -Exclude .vs, .vscode
-
-    if (($PkgList | Measure-Object).count -eq 0)
-    {
-        continue
-    }
     Add-Content -Path "$($YmlPath)/$($Dir.Name).md" -Value "# Client"
     Add-Content -Path "$($YmlPath)/$($Dir.Name).md" -Value "---"
     Write-Verbose "Operating on Client Packages for $($Dir.Name)"
-
-    # Generate a new md file for each package in the service
-    foreach ($Pkg in $PkgList)
-    {
-        if (Test-Path "$($pkg.FullName)\package.txt")
-        {
-            $ProjectName = Get-Content "$($pkg.FullName)\package.txt"
-            Add-Content -Path "$($YmlPath)/$($Dir.Name).md" -Value "#### $($ProjectName)"
-        }
-    }
 }
-
 
 Write-Verbose "Creating Site Title and Navigation..."
 New-Item -Path "${DocOutDir}" -Name "toc.yml" -Force
