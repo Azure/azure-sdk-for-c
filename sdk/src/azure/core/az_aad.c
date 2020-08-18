@@ -21,8 +21,11 @@ _az_aad_build_url(az_span url, az_span authority, az_span tenant_id, az_span* ou
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(url, az_span_size(authority));
   az_span remainder = az_span_copy(url, authority);
 
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, az_span_size(tenant_id));
-  remainder = az_span_copy(remainder, tenant_id);
+  {
+    int32_t url_length = 0;
+    AZ_RETURN_IF_FAILED(_az_span_url_encode(remainder, tenant_id, &url_length));
+    remainder = az_span_slice_to_end(remainder, url_length);
+  }
 
   az_span const oath_token = AZ_SPAN_FROM_STR("/oauth2/v2.0/token");
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, az_span_size(oath_token));
