@@ -77,7 +77,7 @@ This section provides an overview of the different samples available to run and 
   This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_pnp_sample.c) connects an IoT Plug and Play enabled device with the Digital Twin Model ID (DTMI) detailed [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/Thermostat.json). X509 self-certification is used.
 
   In short, the capabilities are listed here:
-- **Methods**: Invoke a method called `getMaxMinReport` with JSON payload value `"since"` with an [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) value for start time for the report. The method sends a response containing the following JSON payload:
+- **Methods**: Invoke a method called `getMaxMinReport` with JSON payload value `since` using an [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) value for the report's `startTime`. The method sends a response containing the following JSON payload:
 
   ```json
   {
