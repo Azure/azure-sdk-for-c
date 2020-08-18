@@ -132,7 +132,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
     az_storage_blobs_blob_client* client,
     az_span content, /* Buffer of content*/
     az_storage_blobs_blob_upload_options const* options,
-    az_http_response* response)
+    az_http_response* ref_response)
 {
 
   az_storage_blobs_blob_upload_options opt;
@@ -190,5 +190,5 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
       &request, AZ_HTTP_HEADER_CONTENT_TYPE, AZ_SPAN_FROM_STR("text/plain")));
 
   // start pipeline
-  return az_http_pipeline_process(&client->_internal.pipeline, &request, response);
+  return az_http_pipeline_process(&client->_internal.pipeline, &request, ref_response);
 }

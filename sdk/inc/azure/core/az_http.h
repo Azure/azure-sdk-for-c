@@ -247,8 +247,8 @@ az_http_response_get_next_header(az_http_response* ref_response, az_pair* out_he
 /**
  * @brief Returns a span over the HTTP body within an HTTP response.
  *
- * @param ref_response A pointer to an az_http_response instance.
- * @param out_body A pointer to an az_span to receive the HTTP response's body.
+ * @param[in,out] ref_response A pointer to an az_http_response instance.
+ * @param[out] out_body A pointer to an az_span to receive the HTTP response's body.
  *
  * @retval #AZ_OK An #az_span over the response body was returned.
  * @retval other Error while trying to read and parse body.

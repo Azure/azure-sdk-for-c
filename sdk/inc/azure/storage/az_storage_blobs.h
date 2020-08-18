@@ -68,8 +68,8 @@ typedef struct
  *
  * @param[out] out_client The blob client instance to initialize.
  * @param[in] endpoint A URL to a blob storage account.
- * @param credential The object used for authentication. #AZ_CREDENTIAL_ANONYMOUS should be used for
- * SAS.
+ * @param[in] credential The object used for authentication. #AZ_CREDENTIAL_ANONYMOUS should be used
+ * for SAS.
  * @param[in] options A reference to an #az_storage_blobs_blob_client_options structure which
  * defines custom behavior of the client.
  *
@@ -125,12 +125,12 @@ az_storage_blobs_blob_upload_options_default()
 /**
  * @brief Uploads the contents to blob storage.
  *
- * @param client An #az_storage_blobs_blob_client structure.
+ * @param[in] client An #az_storage_blobs_blob_client structure.
  * @param[in] content The blob content to upload.
  * @param[in] options __[nullable]__ A reference to an #az_storage_blobs_blob_upload_options
  * structure which defines custom behavior for uploading the blob. If `NULL` is passed, the client
  * will use the default options (i.e. #az_storage_blobs_blob_upload_options_default).
- * @param response A pre-allocated buffer where to write HTTP response into.
+ * @param[in,out] response An initialized `az_http_response` where to write HTTP response into.
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK Success.
@@ -140,7 +140,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
     az_storage_blobs_blob_client* client,
     az_span content, /* Buffer of content*/
     az_storage_blobs_blob_upload_options const* options,
-    az_http_response* response);
+    az_http_response* ref_response);
 
 #include <azure/core/_az_cfg_suffix.h>
 
