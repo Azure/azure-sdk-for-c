@@ -91,7 +91,7 @@ az_http_request_append_path(az_http_request* ref_request, az_span path, bool is_
       query_start,
       query_start,
       path,
-      is_path_url_encoded,
+      !is_path_url_encoded,
       &path_size));
 
   query_start += path_size;
