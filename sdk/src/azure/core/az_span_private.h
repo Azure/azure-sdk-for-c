@@ -63,7 +63,9 @@ AZ_NODISCARD az_result _az_span_replace(
     int32_t current_size,
     int32_t start,
     int32_t end,
-    az_span replacement);
+    az_span replacement,
+    bool url_encode,
+    int32_t* out_url_encode_size);
 
 typedef bool (*_az_predicate)(uint8_t next_byte);
 

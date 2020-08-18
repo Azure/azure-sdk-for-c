@@ -948,7 +948,8 @@ static void test_az_span_replace(void** state)
     assert_int_equal(az_span_size(remainder), expected_remainder_size);
 
     assert_true(
-        _az_span_replace(builder, az_span_size(initial_state), 1, 6, AZ_SPAN_FROM_STR("X"))
+        _az_span_replace(
+            builder, az_span_size(initial_state), 1, 6, AZ_SPAN_FROM_STR("X"), false, NULL)
         == AZ_OK);
 
     az_span const result = az_span_slice(builder, 0, 4);
@@ -964,7 +965,8 @@ static void test_az_span_replace(void** state)
     assert_int_equal(az_span_size(remainder), 200 - az_span_size(initial_state));
 
     assert_true(
-        _az_span_replace(builder, az_span_size(initial_state), 2, 2, AZ_SPAN_FROM_STR("X"))
+        _az_span_replace(
+            builder, az_span_size(initial_state), 2, 2, AZ_SPAN_FROM_STR("X"), false, NULL)
         == AZ_OK);
 
     az_span const result = az_span_slice(builder, 0, 9);
@@ -980,7 +982,8 @@ static void test_az_span_replace(void** state)
     assert_int_equal(az_span_size(remainder), 200 - az_span_size(initial_state));
 
     assert_true(
-        _az_span_replace(builder, az_span_size(initial_state), 8, 8, AZ_SPAN_FROM_STR("90"))
+        _az_span_replace(
+            builder, az_span_size(initial_state), 8, 8, AZ_SPAN_FROM_STR("90"), false, NULL)
         == AZ_OK);
 
     az_span const result = az_span_slice(builder, 0, 10);
@@ -996,7 +999,8 @@ static void test_az_span_replace(void** state)
     assert_int_equal(az_span_size(remainder), 200 - az_span_size(initial_state));
 
     assert_true(
-        _az_span_replace(builder, az_span_size(initial_state), 0, 8, AZ_SPAN_FROM_STR("X"))
+        _az_span_replace(
+            builder, az_span_size(initial_state), 0, 8, AZ_SPAN_FROM_STR("X"), false, NULL)
         == AZ_OK);
 
     az_span const result = az_span_slice(builder, 0, 1);
@@ -1012,7 +1016,8 @@ static void test_az_span_replace(void** state)
     assert_int_equal(az_span_size(remainder), 200 - az_span_size(initial_state));
 
     assert_true(
-        _az_span_replace(builder, az_span_size(initial_state), 0, 8, AZ_SPAN_FROM_STR("X12345678X"))
+        _az_span_replace(
+            builder, az_span_size(initial_state), 0, 8, AZ_SPAN_FROM_STR("X12345678X"), false, NULL)
         == AZ_OK);
 
     az_span const result = az_span_slice(builder, 0, 10);
@@ -1028,7 +1033,8 @@ static void test_az_span_replace(void** state)
     assert_int_equal(az_span_size(remainder), 200 - az_span_size(initial_state));
 
     assert_true(
-        _az_span_replace(builder, az_span_size(initial_state), 0, 0, AZ_SPAN_FROM_STR("XXX"))
+        _az_span_replace(
+            builder, az_span_size(initial_state), 0, 0, AZ_SPAN_FROM_STR("XXX"), false, NULL)
         == AZ_OK);
 
     az_span const result = az_span_slice(builder, 0, 11);
@@ -1044,7 +1050,8 @@ static void test_az_span_replace(void** state)
     assert_int_equal(az_span_size(remainder), 200 - az_span_size(initial_state));
 
     assert_true(
-        _az_span_replace(builder, az_span_size(initial_state), 0, 1, AZ_SPAN_FROM_STR("2"))
+        _az_span_replace(
+            builder, az_span_size(initial_state), 0, 1, AZ_SPAN_FROM_STR("2"), false, NULL)
         == AZ_OK);
 
     az_span const result = az_span_slice(builder, 0, 1);
@@ -1060,7 +1067,8 @@ static void test_az_span_replace(void** state)
     assert_int_equal(az_span_size(remainder), 4 - az_span_size(initial_state));
 
     assert_true(
-        _az_span_replace(builder, az_span_size(initial_state), 0, 4, AZ_SPAN_FROM_STR("4321"))
+        _az_span_replace(
+            builder, az_span_size(initial_state), 0, 4, AZ_SPAN_FROM_STR("4321"), false, NULL)
         == AZ_OK);
 
     az_span const result = az_span_slice(builder, 0, 4);
@@ -1075,8 +1083,8 @@ static void test_az_span_replace(void** state)
     az_span remainder = az_span_copy(builder, initial_state);
     assert_int_equal(az_span_size(remainder), 10 - az_span_size(initial_state));
 
-    TEST_EXPECT_SUCCESS(
-        _az_span_replace(builder, az_span_size(initial_state), 1, 2, AZ_SPAN_FROM_STR("X")));
+    TEST_EXPECT_SUCCESS(_az_span_replace(
+        builder, az_span_size(initial_state), 1, 2, AZ_SPAN_FROM_STR("X"), false, NULL));
 
     remainder = az_span_copy(remainder, AZ_SPAN_FROM_STR("AB"));
 
@@ -1097,8 +1105,8 @@ static void test_az_span_replace(void** state)
     az_span remainder = az_span_copy(builder, initial_state);
     assert_int_equal(az_span_size(remainder), 4 - az_span_size(initial_state));
 
-    TEST_EXPECT_SUCCESS(
-        _az_span_replace(builder, az_span_size(initial_state), 3, 3, AZ_SPAN_FROM_STR("4")));
+    TEST_EXPECT_SUCCESS(_az_span_replace(
+        builder, az_span_size(initial_state), 3, 3, AZ_SPAN_FROM_STR("4"), false, NULL));
 
     az_span const result = az_span_slice(builder, 0, 4);
     assert_true(az_span_is_content_equal(result, expected));
@@ -1112,20 +1120,22 @@ static void test_az_span_replace(void** state)
     assert_int_equal(az_span_size(remainder), 4 - az_span_size(initial_state));
 
     assert_true(
-        _az_span_replace(builder, az_span_size(initial_state), 0, 4, AZ_SPAN_FROM_STR("4321X"))
+        _az_span_replace(
+            builder, az_span_size(initial_state), 0, 4, AZ_SPAN_FROM_STR("4321X"), false, NULL)
         == AZ_ERROR_ARG);
   }
   {
     // Fail on builder empty -> try to replace content from empty builder
     uint8_t array[200];
     az_span builder = AZ_SPAN_FROM_BUFFER(array);
-    assert_true(_az_span_replace(builder, 0, 0, 1, AZ_SPAN_FROM_STR("2")) == AZ_ERROR_ARG);
+    assert_true(
+        _az_span_replace(builder, 0, 0, 1, AZ_SPAN_FROM_STR("2"), false, NULL) == AZ_ERROR_ARG);
   }
   {
     // Replace content on empty builder -> insert at the end
     uint8_t array[200];
     az_span builder = AZ_SPAN_FROM_BUFFER(array);
-    assert_true(_az_span_replace(builder, 0, 0, 0, AZ_SPAN_FROM_STR("2")) == AZ_OK);
+    assert_true(_az_span_replace(builder, 0, 0, 0, AZ_SPAN_FROM_STR("2"), false, NULL) == AZ_OK);
     az_span const result = az_span_slice(builder, 0, 1);
     az_span const expected = AZ_SPAN_FROM_STR("2");
     assert_true(az_span_is_content_equal(result, expected));
@@ -1139,7 +1149,8 @@ static void test_az_span_replace(void** state)
     assert_int_equal(az_span_size(remainder), 400 - az_span_size(initial_state));
 
     assert_true(
-        _az_span_replace(builder, az_span_size(initial_state), 30, 31, AZ_SPAN_FROM_STR("4321X"))
+        _az_span_replace(
+            builder, az_span_size(initial_state), 30, 31, AZ_SPAN_FROM_STR("4321X"), false, NULL)
         == AZ_ERROR_ARG);
   }
   {
@@ -1151,7 +1162,8 @@ static void test_az_span_replace(void** state)
     assert_int_equal(az_span_size(remainder), 40 - az_span_size(initial_state));
 
     assert_true(
-        _az_span_replace(builder, az_span_size(initial_state), 4, 5, AZ_SPAN_FROM_STR("4321X"))
+        _az_span_replace(
+            builder, az_span_size(initial_state), 4, 5, AZ_SPAN_FROM_STR("4321X"), false, NULL)
         == AZ_ERROR_ARG);
   }
   {
@@ -1163,7 +1175,8 @@ static void test_az_span_replace(void** state)
     assert_int_equal(az_span_size(remainder), 40 - az_span_size(initial_state));
 
     assert_true(
-        _az_span_replace(builder, az_span_size(initial_state), 3, 1, AZ_SPAN_FROM_STR("4321X"))
+        _az_span_replace(
+            builder, az_span_size(initial_state), 3, 1, AZ_SPAN_FROM_STR("4321X"), false, NULL)
         == AZ_ERROR_ARG);
   }
 }

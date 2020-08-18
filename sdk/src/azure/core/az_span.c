@@ -554,12 +554,19 @@ void az_span_to_str(char* destination, int32_t destination_max_size, az_span sou
 
 /**
  * @brief Replace all contents from a starting position to an end position with the content of a
- * provided span
+ * provided span.
  *
- * @param destination src span where to replace content
- * @param start starting position where to replace
- * @param end end position where to replace
- * @param replacement content to use for replacement
+ * @remarks
+ *
+ * @param[in] destination src span where to replace content
+ * @param[in] start starting position where to replace
+ * @param[in] end end position where to replace
+ * @param[in] replacement content to use for replacement
+ * @param[in] url_encode when true, the replacement value will be url-encoded before using it to
+ * replace content
+ * @param[out] out_url_encode_size when url_encode is true, the size of the url-encoded replacement
+ * is recorded in this ptr. Using null when \p url_encode is fine, but it should not be null if \p
+ * url_encode is true.
  * @return AZ_NODISCARD az_span_replace
  */
 AZ_NODISCARD az_result _az_span_replace(
@@ -567,11 +574,19 @@ AZ_NODISCARD az_result _az_span_replace(
     int32_t current_size,
     int32_t start,
     int32_t end,
-    az_span replacement)
+    az_span replacement,
+    bool url_encode,
+    int32_t* out_url_encode_size)
 {
-  int32_t const replacement_size = az_span_size(replacement);
+  int32_t const replacement_size
+      = url_encode ? _az_span_url_encode_calc_length(replacement) : az_span_size(replacement);
   int32_t const replaced_size = end - start;
   int32_t const size_after_replace = current_size - replaced_size + replacement_size;
+
+  if (url_encode)
+  {
+    _az_PRECONDITION_NOT_NULL(out_url_encode_size);
+  }
 
   // Start and end position must be within the destination span and be positive.
   // Start position must be less or equal than end position.
@@ -592,6 +607,11 @@ AZ_NODISCARD az_result _az_span_replace(
   // insert at the end case (no need to make left or right shift)
   if (start == current_size)
   {
+    if (url_encode)
+    {
+      return _az_span_url_encode(
+          az_span_slice_to_end(destination, start), replacement, out_url_encode_size);
+    }
     destination = az_span_copy(az_span_slice_to_end(destination, start), replacement);
     return AZ_OK;
   }
@@ -599,6 +619,10 @@ AZ_NODISCARD az_result _az_span_replace(
   // TODO: Verify and fix this check, if needed.
   if (current_size == replaced_size)
   {
+    if (url_encode)
+    {
+      return _az_span_url_encode(destination, replacement, out_url_encode_size);
+    }
     destination = az_span_copy(destination, replacement);
     return AZ_OK;
   }
@@ -611,6 +635,11 @@ AZ_NODISCARD az_result _az_span_replace(
     // move content left or right so new span can be added
     az_span_copy(dst, src);
     // add the new span
+    if (url_encode)
+    {
+      return _az_span_url_encode(
+          az_span_slice_to_end(destination, start), replacement, out_url_encode_size);
+    }
     az_span_copy(az_span_slice_to_end(destination, start), replacement);
   }
 
