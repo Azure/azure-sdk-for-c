@@ -216,7 +216,7 @@ static void subscribe_mqtt_client_to_iot_hub_topics(void)
     exit(rc);
   }
 
-  // Messages received on Response topic will be response statuses from the server.
+  // Messages received on Twin Response topic will be response statuses from the server.
   if ((rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_SUBSCRIBE_TOPIC, 1))
       != MQTTCLIENT_SUCCESS)
   {
@@ -229,16 +229,16 @@ static void get_device_twin_document(void)
 {
   int rc;
 
-  LOG("Client requesting twin document from service.");
+  LOG("Client requesting device twin document from service.");
 
   // Get the Twin Document topic to publish the twin document request.
-  char twin_document_topic[128];
+  char twin_document_topic_buffer[128];
   if (az_failed(
           rc = az_iot_hub_client_twin_document_get_publish_topic(
               &hub_client,
               twin_document_topic_request_id,
-              twin_document_topic,
-              sizeof(twin_document_topic),
+              twin_document_topic_buffer,
+              sizeof(twin_document_topic_buffer),
               NULL)))
   {
     LOG_ERROR("Failed to get Twin Document publish topic: az_result return code 0x%04x.", rc);
@@ -246,7 +246,7 @@ static void get_device_twin_document(void)
   }
 
   // Publish the twin document request.
-  if ((rc = MQTTClient_publish(mqtt_client, twin_document_topic, 0, NULL, 0, 0, NULL))
+  if ((rc = MQTTClient_publish(mqtt_client, twin_document_topic_buffer, 0, NULL, 0, 0, NULL))
       != MQTTCLIENT_SUCCESS)
   {
     LOG_ERROR("Failed to publish twin document request: MQTTClient return code %d.", rc);
@@ -348,7 +348,7 @@ static void receive_device_twin_message(void)
   }
   else if (message == NULL)
   {
-    LOG_ERROR("Timeout expired: MQTTClient return code %d.", rc);
+    LOG_ERROR("Receive message timeout expired: MQTTClient return code %d.", rc);
     exit(rc);
   }
   else if (rc == MQTTCLIENT_TOPICNAME_TRUNCATED)
