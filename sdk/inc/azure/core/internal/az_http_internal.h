@@ -219,7 +219,7 @@ az_http_request_append_path(az_http_request* ref_request, az_span path, bool is_
 /**
  * @brief Set a query parameter at the end of url.
  *
- * @remark Since query parameters are storaged with url-encoding, this function will not check if
+ * @remark Query parameters are stored url-encoded.  This function will not check if
  * the a query parameter already exists in the URL. Calling this function twice with same \p name
  * would duplicate the query parameter.
  *
