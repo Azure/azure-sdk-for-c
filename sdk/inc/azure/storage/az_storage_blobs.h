@@ -130,7 +130,7 @@ az_storage_blobs_blob_upload_options_default()
  * @param[in] options __[nullable]__ A reference to an #az_storage_blobs_blob_upload_options
  * structure which defines custom behavior for uploading the blob. If `NULL` is passed, the client
  * will use the default options (i.e. #az_storage_blobs_blob_upload_options_default).
- * @param[in,out] response An initialized `az_http_response` where to write HTTP response into.
+ * @param[in,out] ref_response An initialized `az_http_response` where to write HTTP response into.
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK Success.
