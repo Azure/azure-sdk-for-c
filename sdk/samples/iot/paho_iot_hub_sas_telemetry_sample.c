@@ -148,8 +148,7 @@ static void connect_mqtt_client_to_iot_hub(void)
   mqtt_connect_options.keepAliveInterval = AZ_IOT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS;
 
   MQTTClient_SSLOptions mqtt_ssl_options = MQTTClient_SSLOptions_initializer;
-  if (*az_span_ptr(env_vars.x509_trust_pem_file_path)
-      != '\0') // Should only be set if required by OS.
+  if (az_span_size(env_vars.x509_trust_pem_file_path) != 0) // Is only set if required by OS.
   {
     mqtt_ssl_options.trustStore = (char*)az_span_ptr(env_vars.x509_trust_pem_file_path);
   }
