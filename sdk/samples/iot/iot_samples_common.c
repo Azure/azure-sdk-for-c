@@ -58,9 +58,6 @@ const az_span mqtt_url_suffix = AZ_SPAN_LITERAL_FROM_STR(":8883");
 const az_span provisioning_global_endpoint
     = AZ_SPAN_LITERAL_FROM_STR("ssl://global.azure-devices-provisioning.net:8883");
 
-// Program Time
-static const char iso_spec_time_format[] = "%Y-%m-%dT%H:%M:%S%z"; // ISO8601 Time Format
-
 //
 // Functions
 //
@@ -71,7 +68,7 @@ void set_program_start_time()
 
   time(&rawtime);
   timeinfo = localtime(&rawtime);
-  size_t len = strftime(program_start_time_buffer, sizeof(program_start_time_buffer), iso_spec_time_format, timeinfo);
+  size_t len = strftime(program_start_time_buffer, sizeof(program_start_time_buffer), ISO_SPEC_TIME_FORMAT, timeinfo);
   if (len == 0)
   {
     LOG_ERROR("Insufficient buffer size for program start time.");
@@ -79,6 +76,8 @@ void set_program_start_time()
   }
 
   program_start_time = az_span_create((uint8_t*)program_start_time_buffer, (int32_t)len);
+
+  LOG_AZ_SPAN("start_time:", program_start_time);
 }
 
 static az_result read_configuration_entry(

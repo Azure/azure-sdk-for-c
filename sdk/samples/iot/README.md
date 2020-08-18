@@ -80,7 +80,7 @@ This section provides an overview of the different samples available to run and 
 
 - **Twin**: Desired property with the field name `targetTemperature` and the `double` value for the desired temperature. Reported property with the field name `maxTempSinceLastReboot` and the `double` value for the highest temperature. Note that part of the IoT Plug and Play spec is a response to a desired property update from the service. The device will send back a reported property with a similarly named property and a set of "ack" values: `ac` for the HTTP-like ack code, `av` for ack version of the property, and an optional `ad` for an ack description.
 
-- **Method**: Invoke a method called `getMaxMinReport` with JSON payload value `since` using an [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) value for the report's `startTime`. The method sends a response containing the following JSON payload:
+- **Method**: Invoke a method called `getMaxMinReport` with JSON payload value `since` using an [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) value. The method sends a response containing the following JSON payload:
 
   ```json
   {
@@ -95,7 +95,6 @@ This section provides an overview of the different samples available to run and 
 with correct values substituted for each field.
 
 - **Telemetry**: Device sends a JSON message with the field name `temperature` and the `double` value of the temperature.
-
 
 ### IoT Hub Plug and Play Multiple Component
 

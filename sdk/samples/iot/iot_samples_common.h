@@ -14,7 +14,7 @@
 #include <azure/core/az_span.h>
 
 #define SAS_KEY_DURATION_TIME_DIGITS 4
-
+#define ISO_SPEC_TIME_FORMAT "%Y-%m-%dT%H:%M:%S%z" // ISO8601 Time Format
 //
 // Logging
 //
@@ -121,6 +121,7 @@ typedef enum
   PAHO_IOT_PROVISIONING_SAS_SAMPLE
 } iot_sample_name;
 
+// Program Time
 char program_start_time_buffer[32];
 az_span program_start_time;
 

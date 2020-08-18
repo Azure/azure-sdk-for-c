@@ -37,7 +37,6 @@
 #define DOUBLE_DECIMAL_PLACE_DIGITS 2
 
 static bool device_operational = true;
-static const char iso_spec_time_format[] = "%Y-%m-%dT%H:%M:%S%z"; // ISO8601 Time Format
 
 // * PnP Values *
 // The model id is the JSON document (also called the Digital Twins Model Identifier or DTMI)
@@ -812,7 +811,7 @@ static az_result get_max_min_report_method(
   time(&rawtime);
   timeinfo = localtime(&rawtime);
   size_t length
-      = strftime(method_report_end_time_value_buffer, sizeof(method_report_end_time_value_buffer), iso_spec_time_format, timeinfo);
+      = strftime(method_report_end_time_value_buffer, sizeof(method_report_end_time_value_buffer), ISO_SPEC_TIME_FORMAT, timeinfo);
   az_span end_time_span = az_span_create((uint8_t*)method_report_end_time_value_buffer, (int32_t)length);
 
   LOG_AZ_SPAN("end time:", end_time_span);
