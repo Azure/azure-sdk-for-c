@@ -31,7 +31,7 @@
 
 static const az_span ping_method_name = AZ_SPAN_LITERAL_FROM_STR("ping");
 static const az_span ping_response = AZ_SPAN_LITERAL_FROM_STR("{\"response\": \"pong\"}");
-static const az_span report_error_payload = AZ_SPAN_LITERAL_FROM_STR("{}");
+static const az_span method_error_payload = AZ_SPAN_LITERAL_FROM_STR("{}");
 
 static iot_sample_environment_variables env_vars;
 static az_iot_hub_client hub_client;
