@@ -134,7 +134,7 @@ static void handle_command_message(
     const az_iot_hub_client_method_request* command_request);
 static void send_command_response(
     const az_iot_hub_client_method_request* command_request,
-    uint16_t status,
+    az_iot_status status,
     az_span response_payload);
 static az_result get_max_min_report_command(
     az_span payload,
@@ -473,7 +473,7 @@ static void mqtt_publish_message(char* topic, az_span payload, iot_quality_of_se
   MQTTClient_deliveryToken token;
 
   if ((rc = MQTTClient_publish(
-           mqtt_client, topic, az_span_size(payload), az_span_ptr(payload), qos, 0, &token))
+           mqtt_client, topic, az_span_size(payload), az_span_ptr(payload), (int)qos, 0, &token))
       != MQTTCLIENT_SUCCESS)
   {
     LOG_ERROR("Failed to publish message: MQTTClient return code %d", rc);
@@ -780,7 +780,7 @@ static void handle_command_message(
 
 static void send_command_response(
     const az_iot_hub_client_method_request* command_request,
-    uint16_t status,
+    az_iot_status status,
     az_span response_payload)
 {
   int rc;
@@ -791,7 +791,7 @@ static void send_command_response(
           rc = az_iot_hub_client_methods_response_get_publish_topic(
               &hub_client,
               command_request->request_id,
-              status,
+              (uint16_t )status,
               methods_response_topic_buffer,
               sizeof(methods_response_topic_buffer),
               NULL)))
@@ -803,7 +803,7 @@ static void send_command_response(
   // Publish the command response.
   mqtt_publish_message(methods_response_topic_buffer, response_payload, 0);
   LOG_SUCCESS("Client published command response:");
-  LOG("Status: %u", status);
+  LOG("Status: %d", status);
   LOG_AZ_SPAN("Payload:", response_payload);
 }
 
