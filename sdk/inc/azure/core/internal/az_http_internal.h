@@ -169,14 +169,14 @@ AZ_NODISCARD AZ_INLINE az_result _az_http_pipeline_nextpolicy(
  * @param[out] out_request HTTP request to initialize.
  * @param[in] context A pointer to an #az_context node.
  * @param[in] method HTTP verb: `"GET"`, `"POST"`, etc.
- * @param[in] url The #az_span to be used for storing the url. An initial value is expected to be in the
- * buffer containing url schema and the server address. It can contain query parameters (like
+ * @param[in] url The #az_span to be used for storing the url. An initial value is expected to be in
+ * the buffer containing url schema and the server address. It can contain query parameters (like
  * https://service.azure.com?query=1). This value is expected to be url-encoded.
  * @param[in] url_length The size of the initial url value within url #az_span.
  * @param[in] headers_buffer The #az_span to be used for storing headers for the request. The total
  * number of headers are calculated automatically based on the size of the buffer.
- * @param[in] body The #az_span buffer that contains a payload for the request. Use #AZ_SPAN_NULL for
- * requests that don't have a body.
+ * @param[in] body The #az_span buffer that contains a payload for the request. Use #AZ_SPAN_NULL
+ * for requests that don't have a body.
  *
  * @return
  *   - *`AZ_OK`* success.

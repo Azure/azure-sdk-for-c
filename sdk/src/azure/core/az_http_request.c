@@ -124,10 +124,8 @@ AZ_NODISCARD az_result az_http_request_set_query_parameter(
 
   // Adding query parameter. Adding +2 to required length to include extra required symbols `=`
   // and `?` or `&`.
-  int32_t required_length = 2
-      + (is_query_url_encoded
-             ? (az_span_size(name) + az_span_size(value))
-             : (_az_span_url_encode_calc_length(name) + _az_span_url_encode_calc_length(value)));
+  int32_t required_length = 2 + az_span_size(name)
+      + (is_value_url_encoded ? az_span_size(value) : _az_span_url_encode_calc_length(value));
 
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(url_remainder, required_length);
 
@@ -146,29 +144,19 @@ AZ_NODISCARD az_result az_http_request_set_query_parameter(
   }
 
   url_remainder = az_span_copy_u8(url_remainder, separator);
-
-  int32_t encoding_size = 0;
-  // Append parameter name
-  if (is_query_url_encoded)
-  {
-    url_remainder = az_span_copy(url_remainder, name);
-  }
-  else
-  {
-    AZ_RETURN_IF_FAILED(_az_span_url_encode(url_remainder, name, &encoding_size));
-    url_remainder = az_span_slice_to_end(url_remainder, encoding_size);
-  }
+  url_remainder = az_span_copy(url_remainder, name);
 
   // Append equal sym
   url_remainder = az_span_copy_u8(url_remainder, '=');
 
   // Parameter value
-  if (is_query_url_encoded)
+  if (is_value_url_encoded)
   {
     url_remainder = az_span_copy(url_remainder, value);
   }
   else
   {
+    int32_t encoding_size = 0;
     AZ_RETURN_IF_FAILED(_az_span_url_encode(url_remainder, value, &encoding_size));
   }
 

@@ -393,10 +393,10 @@ static void test_http_request(void** state)
 
     assert_return_code(
         az_http_request_set_query_parameter(
-            &request, AZ_SPAN_FROM_STR("q\n1"), AZ_SPAN_FROM_STR("space here"), false),
+            &request, AZ_SPAN_FROM_STR("q1"), AZ_SPAN_FROM_STR("space here"), false),
         AZ_OK);
 
-    az_span expected_url = AZ_SPAN_FROM_STR("http://example.com?q%0A1=space%20here");
+    az_span expected_url = AZ_SPAN_FROM_STR("http://example.com?q1=space%20here");
     uint8_t result[100];
     az_span url_result = AZ_SPAN_FROM_BUFFER(result);
     assert_return_code(az_http_request_get_url(&request, &url_result), AZ_OK);
