@@ -1,5 +1,31 @@
 # Azure Embedded C SDK IoT Samples
 
+## Table of Contents
+
+- [Azure Embedded C SDK IoT Samples](#azure-embedded-c-sdk-iot-samples)
+  - [Table of Contents](#table-of-contents)
+  - [Introduction](#introduction)
+  - [Sample Descriptions](#sample-descriptions)
+    - [IoT Hub C2D Sample](#iot-hub-c2d-sample)
+    - [IoT Hub Methods Sample](#iot-hub-methods-sample)
+    - [IoT Hub Telemetry Sample](#iot-hub-telemetry-sample)
+    - [IoT Hub SAS Telemetry Sample](#iot-hub-sas-telemetry-sample)
+    - [IoT Hub Twin Sample](#iot-hub-twin-sample)
+    - [IoT Hub Plug and Play Sample](#iot-hub-plug-and-play-sample)
+    - [IoT Hub Plug and Play Multiple Component](#iot-hub-plug-and-play-multiple-component)
+    - [IoT Provisioning Sample](#iot-provisioning-sample)
+    - [IoT Provisioning SAS Sample](#iot-provisioning-sas-sample)
+  - [Prerequisites](#prerequisites)
+  - [Getting Started](#getting-started)
+    - [Environment Variables](#environment-variables)
+    - [Certificate Samples](#certificate-samples)
+    - [SAS Samples](#sas-samples)
+  - [Build and Run the Sample](#build-and-run-the-sample)
+  - [Next Steps and Additional Documentation](#next-steps-and-additional-documentation)
+  - [Troubleshooting](#troubleshooting)
+  - [Contributing](#contributing)
+    - [License](#license)
+
 ## Introduction
 
 This document explains samples for the Azure Embedded C SDK IoT Hub Client and Device Provisioning Client.
