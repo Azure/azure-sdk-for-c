@@ -95,16 +95,13 @@ static void create_and_configure_mqtt_client(void);
 static void connect_mqtt_client_to_iot_hub(void);
 static void subscribe_mqtt_client_to_iot_hub_topics(void);
 static void initialize_pnp_components(void);
+static void send_device_info(void);
+static void send_device_serial_number(void);
 
 
 static void request_device_twin_document(void);
 static void receive_messages(void);
 static void disconnect_mqtt_client_from_iot_hub(void);
-
-
-
-
-
 
 //
 // Messaging functions
@@ -112,8 +109,8 @@ static void disconnect_mqtt_client_from_iot_hub(void);
 static void mqtt_publish_message(char* topic, az_span payload, int qos);
 static void mqtt_receive_message(void);
 static int on_received(char* topicName, int topicLen, MQTTClient_message* message);
-static void send_device_serial_number(void);
-static void send_device_info(void);
+
+
 static void send_telemetry_messages(void);
 static void send_twin_get_message(void);
 static void handle_twin_message(
@@ -135,20 +132,16 @@ int main(void)
   LOG_SUCCESS("Client subscribed to IoT Hub topics.");
 
   initialize_pnp_components();
-  LOG_SUCCESS("Initialized Plug and Play components");
+  LOG_SUCCESS("Initialized Plug and Play components.");
 
-
-
-
-  // On device start up, send device info
   send_device_info();
+  LOG_SUCCESS("Client sent device info to IoT Hub.")
 
-  // On device start up, send device serial number
   send_device_serial_number();
+  LOG_SUCCESS("Client sent device serial number to IoT Hub.")
 
-  // Get the twin document to check for updated desired properties. Will then parse desired
-  // property and update accordingly.
-  send_twin_get_message();
+  request_device_twin_document();
+  LOG_SUCCESS("Client requested twin document.")
 
   while (is_device_operational)
   {
@@ -321,10 +314,9 @@ static void initialize_pnp_components(void)
 
   if (az_failed(rc = sample_pnp_mqtt_message_init(&publish_message)))
   {
-    LOG_ERROR("Could not initialize publish_message: error code = 0x%08x", rc);
+    LOG_ERROR("Could not initialize publish_message: az_result return code 0x%08x.", rc);
     exit(rc);
   }
-
 
   if (az_failed(
           rc = sample_pnp_thermostat_init(
@@ -332,20 +324,96 @@ static void initialize_pnp_components(void)
               sample_thermostat_1_component_name,
               DEFAULT_START_TEMP_CELSIUS)))
   {
-    LOG_ERROR("Could not initialize thermostat 1: error code = 0x%08x", rc);
+    LOG_ERROR("Could not initialize thermostat 1: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
-  else if (az_failed(
+  if (az_failed(
                rc = sample_pnp_thermostat_init(
                    &sample_thermostat_2,
                    sample_thermostat_2_component_name,
                    DEFAULT_START_TEMP_CELSIUS)))
   {
-    LOG_ERROR("Could not initialize thermostat 2: error code = 0x%08x", rc);
+    LOG_ERROR("Could not initialize thermostat 2: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 }
+
+static void send_device_info(void)
+{
+  // Get the device info in a JSON payload and the topic to which to send it
+  az_result rc;
+  if (az_failed(rc = sample_pnp_device_info_get_report_data(&client, &publish_message)))
+  {
+    LOG_ERROR("Could not get the device info data: az_result return code 0x%08x.", rc);
+    exit(rc);
+  }
+
+  // Send the MQTT message to the endpoint
+  mqtt_publish_message(publish_message.topic, publish_message.out_payload_span, SAMPLE_PUBLISH_QOS);
+
+  // Receive response for device info publish
+  mqtt_receive_message();
+}
+
+static void send_device_serial_number(void)
+{
+  az_result result;
+
+  if (az_failed(
+          result = pnp_create_reported_property(
+              publish_message.payload_span,
+              AZ_SPAN_NULL,
+              serial_number_name,
+              append_string,
+              (void*)&serial_number_value,
+              &publish_message.out_payload_span)))
+  {
+    LOG_ERROR("Could not get serial number property payload");
+    exit(result);
+  }
+  else if (az_failed(
+               result = az_iot_hub_client_twin_patch_get_publish_topic(
+                   &client,
+                   get_request_id(),
+                   publish_message.topic,
+                   publish_message.topic_length,
+                   NULL)))
+  {
+    LOG_ERROR("Error to get reported property topic with status: error code = 0x%08x", result);
+    exit(result);
+  }
+
+  LOG_SUCCESS("Sending device serial number property");
+
+  mqtt_publish_message(publish_message.topic, publish_message.out_payload_span, SAMPLE_PUBLISH_QOS);
+}
+
+static void request_device_twin_document(void)
+{
+  int rc;
+
+  az_span request_id_span = get_request_id();
+  if (az_failed(
+          rc = az_iot_hub_client_twin_document_get_publish_topic(
+              &client, request_id_span, publish_message.topic, publish_message.topic_length, NULL)))
+  {
+    LOG_ERROR("Could not get twin get publish topic, az_result %d", rc);
+    exit(rc);
+  }
+
+  LOG_SUCCESS("Sending twin get request");
+  mqtt_publish_message(publish_message.topic, AZ_SPAN_NULL, SAMPLE_PUBLISH_QOS);
+}
+
+
+
+
+
+
+
+
+
 
 
 
@@ -426,58 +494,9 @@ static az_result append_json_token(az_json_writer* json_writer, void* value)
   return AZ_OK;
 }
 
-static void send_device_serial_number(void)
-{
-  az_result result;
 
-  if (az_failed(
-          result = pnp_create_reported_property(
-              publish_message.payload_span,
-              AZ_SPAN_NULL,
-              serial_number_name,
-              append_string,
-              (void*)&serial_number_value,
-              &publish_message.out_payload_span)))
-  {
-    LOG_ERROR("Could not get serial number property payload");
-    exit(result);
-  }
-  else if (az_failed(
-               result = az_iot_hub_client_twin_patch_get_publish_topic(
-                   &client,
-                   get_request_id(),
-                   publish_message.topic,
-                   publish_message.topic_length,
-                   NULL)))
-  {
-    LOG_ERROR("Error to get reported property topic with status: error code = 0x%08x", result);
-    exit(result);
-  }
 
-  LOG_SUCCESS("Sending device serial number property");
 
-  mqtt_publish_message(publish_message.topic, publish_message.out_payload_span, SAMPLE_PUBLISH_QOS);
-
-  // Formatting for log
-  putchar('\n');
-}
-
-static void send_device_info(void)
-{
-  // Get the device info in a JSON payload and the topic to which to send it
-  az_result result;
-  if (az_failed(result = sample_pnp_device_info_get_report_data(&client, &publish_message)))
-  {
-    LOG_ERROR("Could not get the device info data: error code = 0x%08x", result);
-    exit(result);
-  }
-
-  // Send the MQTT message to the endpoint
-  mqtt_publish_message(publish_message.topic, publish_message.out_payload_span, SAMPLE_PUBLISH_QOS);
-
-  // Receive response for device info publish
-  mqtt_receive_message();
-}
 
 // Callback invoked by pnp functions each time it finds a property in the twin document
 static void sample_property_callback(
@@ -792,25 +811,7 @@ static int on_received(char* topicName, int topicLen, MQTTClient_message* messag
 
 
 
-static void send_twin_get_message(void)
-{
-  int rc;
 
-  az_span request_id_span = get_request_id();
-  if (az_failed(
-          rc = az_iot_hub_client_twin_document_get_publish_topic(
-              &client, request_id_span, publish_message.topic, publish_message.topic_length, NULL)))
-  {
-    LOG_ERROR("Could not get twin get publish topic, az_result %d", rc);
-    exit(rc);
-  }
-
-  LOG_SUCCESS("Sending twin get request");
-  mqtt_publish_message(publish_message.topic, AZ_SPAN_NULL, SAMPLE_PUBLISH_QOS);
-
-  // Formatting for log
-  putchar('\n');
-}
 
 static az_result temperature_controller_get_telemetry_message(sample_pnp_mqtt_message* message)
 {
