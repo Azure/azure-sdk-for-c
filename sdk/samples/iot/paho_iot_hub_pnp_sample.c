@@ -96,7 +96,7 @@ typedef enum
 static iot_sample_environment_variables env_vars;
 static az_iot_hub_client hub_client;
 static MQTTClient mqtt_client;
-static char mqtt_client_username_buffer[256]; // 128 in other sammpes. ?
+static char mqtt_client_username_buffer[256];
 
 //
 // Functions
