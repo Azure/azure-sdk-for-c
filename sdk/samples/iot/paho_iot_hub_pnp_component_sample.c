@@ -3,15 +3,18 @@
 
 #ifdef _MSC_VER
 // warning C4201: nonstandard extension used: nameless struct/union
-#pragma warning(push)
 #pragma warning(disable : 4201)
 #endif
 #include <paho-mqtt/MQTTClient.h>
 #ifdef _MSC_VER
-#pragma warning(pop)
+#pragma warning(default : 4201)
 #endif
 
-#include <stdio.h>
+#include "iot_samples_common.h"
+
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -26,70 +29,22 @@
 #include "sample_pnp_device_info_component.h"
 #include "sample_pnp_thermostat_component.h"
 
-#ifdef _MSC_VER
-// "'getenv': This function or variable may be unsafe. Consider using _dupenv_s instead."
-#pragma warning(disable : 4996)
-#endif
+#define SAMPLE_TYPE PAHO_IOT_HUB
+#define SAMPLE_NAME PAHO_IOT_HUB_PNP_COMPONENT_SAMPLE
 
-// DO NOT MODIFY: Device ID Environment Variable Name
-#define ENV_DEVICE_ID "AZ_IOT_DEVICE_ID"
-
-// DO NOT MODIFY: IoT Hub Hostname Environment Variable Name
-#define ENV_IOT_HUB_HOSTNAME "AZ_IOT_HUB_HOSTNAME"
-
-// DO NOT MODIFY: The path to a PEM file containing the device certificate and
-// key as well as any intermediate certificates chaining to an uploaded group certificate.
-#define ENV_DEVICE_X509_CERT_PEM_FILE "AZ_IOT_DEVICE_X509_CERT_PEM_FILE"
-
-// DO NOT MODIFY: the path to a PEM file containing the server trusted CA
-// This is usually not needed on Linux or Mac but needs to be set on Windows.
-#define ENV_DEVICE_X509_TRUST_PEM_FILE "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE"
-
-// Logging with formatting
-#define LOG_ERROR(...) \
-  { \
-    (void)fprintf(stderr, "ERROR:\t\t%s:%s():%d: ", __FILE__, __func__, __LINE__); \
-    (void)fprintf(stderr, __VA_ARGS__); \
-    (void)fprintf(stderr, "\n"); \
-    fflush(stdout); \
-    fflush(stderr); \
-  }
-#define LOG_SUCCESS(...) \
-  { \
-    (void)printf("SUCCESS:\t"); \
-    (void)printf(__VA_ARGS__); \
-    (void)printf("\n"); \
-  }
-#define LOG(...) \
-  { \
-    (void)printf("\t\t"); \
-    (void)printf(__VA_ARGS__); \
-    (void)printf("\n"); \
-  }
-#define LOG_AZ_SPAN(span_description, span) \
-  { \
-    (void)printf("\t\t%s ", span_description); \
-    char* buffer = (char*)az_span_ptr(span); \
-    for (int32_t i = 0; i < az_span_size(span); i++) \
-    { \
-      putchar(*buffer++); \
-    } \
-    (void)printf("\n"); \
-  }
-
-#define TIMEOUT_WAIT_FOR_RECEIVE_MESSAGE_MS (8 * 1000)
-#define TIMEOUT_WAIT_FOR_COMPLETION_MS 1000
-#define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
-#define DEVICE_DO_WORK_SLEEP_MS 2
 #define TELEMETRY_SEND_INTERVAL 1
+#define TIMEOUT_MQTT_RECEIVE_MAX_COUNT 3
+#define TIMEOUT_MQTT_RECEIVE_MS (8 * 1000)
+#define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
+#define TIMEOUT_MQTT_WAIT_FOR_COMPLETION_MS 1000
+
+#define DEFAULT_START_TEMP_AVG_COUNT 1
 #define DEFAULT_START_TEMP_CELSIUS 22.0
 #define DOUBLE_DECIMAL_PLACE_DIGITS 2
 #define SAMPLE_PUBLISH_QOS 0
 
 bool is_device_operational = true;
-static const uint8_t null_terminator = '\0';
-static char start_time_str[32];
-static az_span start_time_span;
+static const char iso_spec_time_format[] = "%Y-%m-%dT%H:%M:%S%z"; // ISO8601 Time Format
 
 // * PnP Values *
 // The model id is the JSON document (also called the Digital Twins Model Identifier or DTMI)
@@ -97,8 +52,8 @@ static az_span start_time_span;
 // is described in the corresponding DTMI. Should you choose to program your own PnP capable device,
 // the functionality would need to match the DTMI and you would need to update the below 'model_id'.
 // Please see the sample README for more information on this DTMI.
-static const az_span model_id
-    = AZ_SPAN_LITERAL_FROM_STR("dtmi:com:example:TemperatureController;1");
+static const az_span model_id = AZ_SPAN_LITERAL_FROM_STR("dtmi:com:example:TemperatureController;1");
+
 static sample_pnp_thermostat_component sample_thermostat_1;
 static const az_span sample_thermostat_1_component_name = AZ_SPAN_LITERAL_FROM_STR("thermostat1");
 static sample_pnp_thermostat_component sample_thermostat_2;
@@ -117,24 +72,6 @@ static const az_span serial_number_name = AZ_SPAN_LITERAL_FROM_STR("serialNumber
 static az_span serial_number_value = AZ_SPAN_LITERAL_FROM_STR("ABCDEFG");
 static const az_span property_response_description_failed = AZ_SPAN_LITERAL_FROM_STR("failed");
 
-// ISO8601 Time Format
-static const char iso_spec_time_format[] = "%Y-%m-%dT%H:%M:%S%z";
-
-// IoT Hub Connection Values
-static az_iot_hub_client client;
-static char device_id[64];
-static char iot_hub_hostname[128];
-static char x509_cert_pem_file[512];
-static char x509_trust_pem_file[256];
-
-// MQTT Client Values
-static MQTTClient mqtt_client;
-static char mqtt_client_id[128];
-static char mqtt_username[256];
-static char mqtt_endpoint[128];
-static az_span mqtt_url_prefix = AZ_SPAN_LITERAL_FROM_STR("ssl://");
-static az_span mqtt_url_suffix = AZ_SPAN_LITERAL_FROM_STR(":8883");
-
 // Reuse topic and payload buffers since API's are synchronous
 static char publish_topic[128];
 static char publish_payload[512];
@@ -145,20 +82,26 @@ static const az_span reboot_command_name = AZ_SPAN_LITERAL_FROM_STR("reboot");
 static const az_span empty_json_object = AZ_SPAN_LITERAL_FROM_STR("{}");
 static char property_scratch_buffer[64];
 
+
+static iot_sample_environment_variables env_vars;
+static az_iot_hub_client hub_client;
+static MQTTClient mqtt_client;
+static char mqtt_client_username_buffer[256];
+
 //
-// Configuration and connection functions
+// Functions
 //
+static void create_and_configure_mqtt_client(void);
+static void connect_mqtt_client_to_iot_hub(void);
+static void subscribe_mqtt_client_to_iot_hub_topics(void);
+static void request_device_twin_document(void);
+static void receive_messages(void);
+static void disconnect_mqtt_client_from_iot_hub(void);
+
+
+
 static void components_init(void);
-static az_result read_configuration_and_init_client(void);
-static az_result read_configuration_entry(
-    const char* env_name,
-    char* default_value,
-    bool hide_value,
-    az_span buffer,
-    az_span* out_value);
-static az_result create_mqtt_endpoint(char* destination, int32_t destination_size, az_span iot_hub);
-static void connect_device(void);
-static void subscribe(void);
+
 
 //
 // Messaging functions
@@ -179,59 +122,19 @@ static void handle_command_message(
 
 int main(void)
 {
-  int rc;
+  create_and_configure_mqtt_client();
+  LOG_SUCCESS("Client created and configured.");
 
-  // Get the program start time for command response
-  time_t rawtime;
-  struct tm* timeinfo;
-  time(&rawtime);
-  timeinfo = localtime(&rawtime);
-  size_t len = strftime(start_time_str, sizeof(start_time_str), iso_spec_time_format, timeinfo);
-  if (len == 0)
-  {
-    LOG_ERROR("Insufficient buffer size for program start time.");
-    exit(-1);
-  }
-  start_time_span = az_span_create((uint8_t*)start_time_str, (int32_t)len);
+  connect_mqtt_client_to_iot_hub();
+  LOG_SUCCESS("Client connected to IoT Hub.");
 
-  // Read in the necessary environment variables and initialize the az_iot_hub_client
-  if (az_failed(rc = read_configuration_and_init_client()))
-  {
-    LOG_ERROR("Failed to read configuration from environment variables, return code %d", rc);
-    exit(rc);
-  }
+  subscribe_mqtt_client_to_iot_hub_topics();
+  LOG_SUCCESS("Client subscribed to IoT Hub topics.");
 
-  // Get the MQTT client id used for the MQTT connection
-  size_t client_id_length;
-  if (az_failed(
-          rc = az_iot_hub_client_get_client_id(
-              &client, mqtt_client_id, sizeof(mqtt_client_id), &client_id_length)))
-  {
-    LOG_ERROR("Failed to get MQTT client id, return code %d", rc);
-    exit(rc);
-  }
 
-  // Create the Paho MQTT client
-  if ((rc = MQTTClient_create(
-           &mqtt_client, mqtt_endpoint, mqtt_client_id, MQTTCLIENT_PERSISTENCE_NONE, NULL))
-      != MQTTCLIENT_SUCCESS)
-  {
-    LOG_ERROR("Failed to create MQTT client, return code %d", rc);
-    exit(rc);
-  }
 
-  // Setup MQTT Message Struct
-  publish_message.topic = publish_topic;
-  publish_message.topic_length = sizeof(publish_topic);
-  publish_message.out_topic_length = 0;
-  publish_message.payload_span = AZ_SPAN_FROM_BUFFER(publish_payload);
-  publish_message.out_payload_span = publish_message.payload_span;
 
-  // Connect to IoT Hub
-  connect_device();
 
-  // Subscribe to the necessary twin and commands topics to receive twin updates and responses
-  subscribe();
 
   // Initialize PnP Components
   components_init();
@@ -284,7 +187,143 @@ int main(void)
   return 0;
 }
 
-static void components_init()
+static void create_and_configure_mqtt_client(void)
+{
+  int rc;
+
+  // Reads in environment variables set by user for purposes of running sample.
+  if (az_failed(rc = read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars)))
+  {
+    LOG_ERROR(
+        "Failed to read configuration from environment variables: az_result return code 0x%04x.",
+        rc);
+    exit(rc);
+  }
+
+  // Build an MQTT endpoint c-string.
+  char mqtt_endpoint_buffer[128];
+  if (az_failed(
+          rc = create_mqtt_endpoint(
+              SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer))))
+  {
+    LOG_ERROR("Failed to create MQTT endpoint: az_result return code 0x%04x.", rc);
+    exit(rc);
+  }
+
+  // Initialize the hub client with the connection options.
+  az_iot_hub_client_options options = az_iot_hub_client_options_default();
+  options.model_id = model_id;
+  if (az_failed(
+          rc = az_iot_hub_client_init(
+              &hub_client, env_vars.hub_hostname, env_vars.hub_device_id, &options)))
+  {
+    LOG_ERROR("Failed to initialize hub client: az_result return code 0x%04x.", rc);
+    exit(rc);
+  }
+
+  // Get the MQTT client id used for the MQTT connection.
+  char mqtt_client_id_buffer[128];
+  if (az_failed(
+          rc = az_iot_hub_client_get_client_id(
+              &hub_client, mqtt_client_id_buffer, sizeof(mqtt_client_id_buffer), NULL)))
+  {
+    LOG_ERROR("Failed to get MQTT client id: az_result return code 0x%04x.", rc);
+    exit(rc);
+  }
+
+  // Create the Paho MQTT client.
+  if ((rc = MQTTClient_create(
+           &mqtt_client,
+           mqtt_endpoint_buffer,
+           mqtt_client_id_buffer,
+           MQTTCLIENT_PERSISTENCE_NONE,
+           NULL))
+      != MQTTCLIENT_SUCCESS)
+  {
+    LOG_ERROR("Failed to create MQTT client: MQTTClient return code %d.", rc);
+    exit(rc);
+  }
+
+    // Setup MQTT Message Struct
+  publish_message.topic = publish_topic;
+  publish_message.topic_length = sizeof(publish_topic);
+  publish_message.out_topic_length = 0;
+  publish_message.payload_span = AZ_SPAN_FROM_BUFFER(publish_payload);
+  publish_message.out_payload_span = publish_message.payload_span;
+}
+
+static void connect_mqtt_client_to_iot_hub(void)
+{
+  int rc;
+
+  // Get the MQTT client username.
+  if (az_failed(
+          rc = az_iot_hub_client_get_user_name(
+              &hub_client, mqtt_client_username_buffer, sizeof(mqtt_client_username_buffer), NULL)))
+  {
+    LOG_ERROR("Failed to get MQTT client username: az_result return code 0x%04x.", rc);
+    exit(rc);
+  }
+
+  // Set MQTT connection options.
+  MQTTClient_connectOptions mqtt_connect_options = MQTTClient_connectOptions_initializer;
+  mqtt_connect_options.username = mqtt_client_username_buffer;
+  mqtt_connect_options.password = NULL; // This sample uses x509 authentication.
+  mqtt_connect_options.cleansession = false; // Set to false so can receive any pending messages.
+  mqtt_connect_options.keepAliveInterval = AZ_IOT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS;
+
+  MQTTClient_SSLOptions mqtt_ssl_options = MQTTClient_SSLOptions_initializer;
+  mqtt_ssl_options.keyStore = (char*)az_span_ptr(env_vars.x509_cert_pem_file_path);
+  if (az_span_size(env_vars.x509_trust_pem_file_path) != 0) // Is only set if required by OS.
+  {
+    mqtt_ssl_options.trustStore = (char*)az_span_ptr(env_vars.x509_trust_pem_file_path);
+  }
+  mqtt_connect_options.ssl = &mqtt_ssl_options;
+
+  // Connect MQTT client to the Azure IoT Hub.
+  if ((rc = MQTTClient_connect(mqtt_client, &mqtt_connect_options)) != MQTTCLIENT_SUCCESS)
+  {
+    LOG_ERROR(
+        "Failed to connect: MQTTClient return code %d.\n"
+        "If on Windows, confirm the AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH environment variable is "
+        "set correctly.",
+        rc);
+    exit(rc);
+  }
+}
+
+static void subscribe_mqtt_client_to_iot_hub_topics(void)
+{
+  int rc;
+
+  // Messages received on the Methods topic will be commands to be invoked.
+  if ((rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_HUB_CLIENT_METHODS_SUBSCRIBE_TOPIC, 1))
+      != MQTTCLIENT_SUCCESS)
+  {
+    LOG_ERROR("Failed to subscribe to the Methods topic: MQTTClient return code %d.", rc);
+    exit(rc);
+  }
+
+  // Messages received on the Twin Patch topic will be updates to the desired properties.
+  if ((rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_HUB_CLIENT_TWIN_PATCH_SUBSCRIBE_TOPIC, 1))
+      != MQTTCLIENT_SUCCESS)
+  {
+    LOG_ERROR("Failed to subscribe to the Twin Patch topic: MQTTClient return code %d.", rc);
+    exit(rc);
+  }
+
+  // Messages received on Twin Response topic will be response statuses from the server.
+  if ((rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_SUBSCRIBE_TOPIC, 1))
+      != MQTTCLIENT_SUCCESS)
+  {
+    LOG_ERROR("Failed to subscribe to the Twin Response topic: MQTTClient return code %d.", rc);
+    exit(rc);
+  }
+}
+
+
+
+static void components_init(void)
 {
   az_result result;
 
@@ -314,37 +353,7 @@ static void components_init()
   putchar('\n');
 }
 
-// Read OS environment variables using stdlib function
-static az_result read_configuration_entry(
-    const char* env_name,
-    char* default_value,
-    bool hide_value,
-    az_span buffer,
-    az_span* out_value)
-{
-  char* env_value = getenv(env_name);
 
-  if (env_value == NULL && default_value != NULL)
-  {
-    env_value = default_value;
-  }
-
-  if (env_value != NULL)
-  {
-    LOG_SUCCESS("%s = %s", env_name, hide_value ? "***" : env_value);
-    az_span env_span = az_span_create_from_str(env_value);
-    AZ_RETURN_IF_NOT_ENOUGH_SIZE(buffer, az_span_size(env_span));
-    az_span_copy(buffer, env_span);
-    *out_value = az_span_slice(buffer, 0, az_span_size(env_span));
-  }
-  else
-  {
-    LOG_ERROR("(missing) Please set the %s environment variable.", env_name);
-    return AZ_ERROR_ARG;
-  }
-
-  return AZ_OK;
-}
 
 static void mqtt_receive_message(void)
 {
@@ -390,60 +399,6 @@ static void mqtt_publish_message(char* topic, az_span payload, int qos)
   }
 }
 
-// Create mqtt endpoint e.g: ssl//contoso.azure-devices.net:8883
-static az_result create_mqtt_endpoint(char* destination, int32_t destination_size, az_span iot_hub)
-{
-  int32_t required_size = az_span_size(mqtt_url_prefix) + az_span_size(iot_hub)
-      + az_span_size(mqtt_url_suffix) + (int32_t)sizeof(null_terminator);
-
-  if (required_size > destination_size)
-  {
-    return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
-  }
-
-  az_span destination_span = az_span_create((uint8_t*)destination, destination_size);
-  az_span remainder = az_span_copy(destination_span, mqtt_url_prefix);
-  remainder = az_span_copy(remainder, az_span_slice(iot_hub, 0, az_span_size(iot_hub)));
-  remainder = az_span_copy(remainder, mqtt_url_suffix);
-  az_span_copy_u8(remainder, null_terminator);
-
-  return AZ_OK;
-}
-
-// Read the user environment variables used to connect to IoT Hub
-static az_result read_configuration_and_init_client(void)
-{
-  az_span cert = AZ_SPAN_FROM_BUFFER(x509_cert_pem_file);
-  AZ_RETURN_IF_FAILED(
-      read_configuration_entry(ENV_DEVICE_X509_CERT_PEM_FILE, NULL, false, cert, &cert));
-
-  az_span trusted = AZ_SPAN_FROM_BUFFER(x509_trust_pem_file);
-  AZ_RETURN_IF_FAILED(
-      read_configuration_entry(ENV_DEVICE_X509_TRUST_PEM_FILE, "", false, trusted, &trusted));
-
-  az_span device_id_span = AZ_SPAN_FROM_BUFFER(device_id);
-  AZ_RETURN_IF_FAILED(
-      read_configuration_entry(ENV_DEVICE_ID, NULL, false, device_id_span, &device_id_span));
-
-  az_span iot_hub_hostname_span = AZ_SPAN_FROM_BUFFER(iot_hub_hostname);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_IOT_HUB_HOSTNAME, NULL, false, iot_hub_hostname_span, &iot_hub_hostname_span));
-
-  // Paho requires that the MQTT endpoint be of the form ssl://<HUB ENDPOINT>:8883
-  AZ_RETURN_IF_FAILED(
-      create_mqtt_endpoint(mqtt_endpoint, (int32_t)sizeof(mqtt_endpoint), iot_hub_hostname_span));
-
-  // Initialize the hub client with the hub host endpoint and the default connection options
-  az_iot_hub_client_options options = az_iot_hub_client_options_default();
-  options.model_id = model_id;
-  AZ_RETURN_IF_FAILED(az_iot_hub_client_init(
-      &client,
-      az_span_slice(iot_hub_hostname_span, 0, (int32_t)strlen(iot_hub_hostname)),
-      az_span_slice(device_id_span, 0, (int32_t)strlen(device_id)),
-      &options));
-
-  return AZ_OK;
-}
 
 static az_result append_string(az_json_writer* json_writer, void* value)
 {
@@ -840,86 +795,8 @@ static int on_received(char* topicName, int topicLen, MQTTClient_message* messag
   return 1;
 }
 
-static void connect_device(void)
-{
-  int rc;
 
-  MQTTClient_SSLOptions mqtt_ssl_options = MQTTClient_SSLOptions_initializer;
-  MQTTClient_connectOptions mqtt_connect_options = MQTTClient_connectOptions_initializer;
 
-  // NOTE: We recommend setting clean session to false in order to receive any pending messages
-  mqtt_connect_options.cleansession = false;
-  mqtt_connect_options.keepAliveInterval = AZ_IOT_DEFAULT_MQTT_CONNECT_KEEPALIVE_SECONDS;
-
-  // Get the MQTT username used to connect to IoT Hub
-  if (az_failed(
-          rc
-          = az_iot_hub_client_get_user_name(&client, mqtt_username, sizeof(mqtt_username), NULL)))
-
-  {
-    LOG_ERROR("Failed to get MQTT username, return code %d", rc);
-    exit(rc);
-  }
-
-  LOG_SUCCESS("MQTT username: %s", mqtt_username);
-
-  // This sample uses X509 authentication so the password field is set to NULL
-  mqtt_connect_options.username = mqtt_username;
-  mqtt_connect_options.password = NULL;
-
-  // Set the device cert for tls mutual authentication
-  mqtt_ssl_options.keyStore = (char*)x509_cert_pem_file;
-  if (*x509_trust_pem_file != '\0')
-  {
-    mqtt_ssl_options.trustStore = (char*)x509_trust_pem_file;
-  }
-
-  mqtt_connect_options.ssl = &mqtt_ssl_options;
-
-  // Connect to IoT Hub
-  if ((rc = MQTTClient_connect(mqtt_client, &mqtt_connect_options)) != MQTTCLIENT_SUCCESS)
-  {
-    LOG_ERROR("Failed to connect, return code %d", rc);
-    exit(rc);
-  }
-
-  LOG_SUCCESS("Connected to IoT Hub");
-}
-
-static void subscribe(void)
-{
-  int rc;
-
-  // Subscribe to the commands topic. Messages received on this topic are commands to be invoked
-  // on the device.
-  if ((rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_HUB_CLIENT_METHODS_SUBSCRIBE_TOPIC, 1))
-      != MQTTCLIENT_SUCCESS)
-  {
-    LOG_ERROR("Failed to subscribe to the commands subscribe topic filter, return code %d", rc);
-    exit(rc);
-  }
-
-  // Subscribe to the desired properties PATCH topic. Messages received on this topic will be
-  // updates to the desired properties.
-  if ((rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_HUB_CLIENT_TWIN_PATCH_SUBSCRIBE_TOPIC, 1))
-      != MQTTCLIENT_SUCCESS)
-  {
-    LOG_ERROR("Failed to subscribe to the twin patch topic filter, return code %d", rc);
-    exit(rc);
-  }
-
-  // Subscribe to the twin response topic. Messages received on this topic will be response statuses
-  // from published reported properties or the requested twin document from twin GET publish
-  // messages.
-  if ((rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_SUBSCRIBE_TOPIC, 1))
-      != MQTTCLIENT_SUCCESS)
-  {
-    LOG_ERROR("Failed to subscribe to twin response topic filter, return code %d", rc);
-    exit(rc);
-  }
-
-  LOG_SUCCESS("Subscribed to IoT Hub topics");
-}
 
 static void send_twin_get_message(void)
 {
