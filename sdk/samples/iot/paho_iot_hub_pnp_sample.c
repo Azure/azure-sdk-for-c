@@ -165,7 +165,8 @@ static az_result build_payload_confirm(
 /*
  * This sample connects an IoT Plug and Play enabled device with the Digital Twin Model ID (DTMI)
  * detailed here. If a timeout occurs while waiting for a message from the Azure IoT Explorer, the
- * sample will exit. X509 self-certification is used.
+ * sample will continue. If TIMEOUT_MQTT_RECEIVE_MAX_COUNT timeouts occur consecutively, the sample
+ * will disconnect. X509 self-certification is used.
  *
  * To interact with this sample, you must use the Azure IoT Explorer. The capabilities are Device
  * Twin, Direct Method (Command), and Telemetry:
@@ -421,11 +422,13 @@ static void receive_messages(void)
     }
     else if (message == NULL)
     {
+      MQTTClient_free(topic);
+
       // Allow up to TIMEOUT_MQTT_RECEIVE_MAX_COUNT before disconnecting
       if (++timeoutCounter >= TIMEOUT_MQTT_RECEIVE_MAX_COUNT)
       {
         LOG("Receive message timeout count of %d reached.", TIMEOUT_MQTT_RECEIVE_MAX_COUNT);
-        break;
+        return;
       }
     }
     else
@@ -436,6 +439,8 @@ static void receive_messages(void)
       {
         topic_len = (int)strlen(topic);
       }
+
+      timeoutCounter = 0; // Reset.
 
       on_message_received(topic, topic_len, message);
       LOG(" "); // Formatting
