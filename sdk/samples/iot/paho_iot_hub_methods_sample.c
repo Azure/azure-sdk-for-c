@@ -31,7 +31,7 @@
 
 static const az_span ping_method_name = AZ_SPAN_LITERAL_FROM_STR("ping");
 static const az_span ping_response = AZ_SPAN_LITERAL_FROM_STR("{\"response\": \"pong\"}");
-static const az_span method_fail_response = AZ_SPAN_LITERAL_FROM_STR("{}");
+static const az_span method_error_payload = AZ_SPAN_LITERAL_FROM_STR("{}");
 
 static iot_sample_environment_variables env_vars;
 static az_iot_hub_client hub_client;
@@ -192,7 +192,7 @@ static void subscribe_mqtt_client_to_iot_hub_topics(void)
 {
   int rc;
 
-  // Messages received on the Methods topic will method commands to be invoked.
+  // Messages received on the Methods topic will be method commands to be invoked.
   if ((rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_HUB_CLIENT_METHODS_SUBSCRIBE_TOPIC, 1))
       != MQTTCLIENT_SUCCESS)
   {
@@ -293,8 +293,8 @@ static void invoke_method(const az_iot_hub_client_method_request* method_request
   }
   else
   {
-    LOG_AZ_SPAN("Method not found:", method_request->name);
-    send_method_response(method_request, AZ_IOT_STATUS_NOT_FOUND, method_fail_response);
+    LOG_AZ_SPAN("Method not supported:", method_request->name);
+    send_method_response(method_request, AZ_IOT_STATUS_NOT_FOUND, method_error_payload);
   }
 }
 
