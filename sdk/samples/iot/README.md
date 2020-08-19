@@ -32,7 +32,7 @@ This section provides an overview of the different samples available to run and 
 
   This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_methods_sample.c) receives incoming method commands invoked from the the Azure IoT Hub to the device. It will successfully receive up to 5 method commands sent from the service. If a timeout occurs while waiting for a message, the sample will exit. X509 self-certification is used.
 
-  To send a method command, select your device's Direct Method tab in the Azure Portal for your IoT Hub. Enter a method name and select Invoke Method. A method named `ping` is only supported, which if successful will return a JSON payload of the following:
+  To invoke a method, select your device's Direct Method tab in the Azure Portal for your IoT Hub. Enter a method name and select Invoke Method. A method named `ping` is only supported, which if successful will return a JSON payload of the following:
 
   ```json
   {"response": "pong"}
@@ -58,7 +58,7 @@ This section provides an overview of the different samples available to run and 
 
   This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_twin_sample.c) utilizes the Azure IoT Hub to get the device twin document, send a reported property message, and receive up to 5 desired property messages. If a timeout occurs while waiting for a message from the Azure IoT Hub, the sample will exit. Upon receiving a desired property message, the sample will update the twin property locally and send a reported property message back to the service. X509 self-certification is used.
 
-  A property named `device_count` is supported for this sample. To send a device twin desired property message, select your device's Device Twin tab in the Azure Portal of your IoT Hub. Add the property `device_count` along with a corresponding value to the `desired` section of the JSON. Select Save to update the twin document and send the twin message to the device.
+  A desired property named `device_count` is supported for this sample. To send a device twin desired property message, select your device's Device Twin tab in the Azure Portal of your IoT Hub. Add the property `device_count` along with a corresponding value to the `desired` section of the JSON. Select Save to update the twin document and send the twin message to the device.
 
   ```json
   "properties": {
@@ -74,25 +74,59 @@ This section provides an overview of the different samples available to run and 
 
 - *Executable:* `paho_iot_hub_pnp_sample`
 
-  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_pnp_sample.c) connects an IoT Plug and Play enabled device with the Digital Twin Model ID (DTMI) detailed [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/Thermostat.json). X509 self-certification is used.
+  This [sample](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/samples/iot/paho_iot_hub_pnp_sample.c) connects an IoT Plug and Play enabled device with the Digital Twin Model ID (DTMI) detailed [here](https://github.com/Azure/opendigitaltwins-dtdl/blob/master/DTDL/v2/samples/Thermostat.json). If a timeout occurs while waiting for a message from the Azure IoT Explorer, the sample will exit. X509 self-certification is used.
 
-  In short, the capabilities are listed here:
-- **Methods**: Invoke a method called `getMaxMinReport` with JSON payload value `"since"` with an [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) value for start time for the report. The method sends a response containing the following JSON payload:
+  To interact with this sample, **you must use the Azure IoT Explorer**. The capabilities are listed below:
+
+- **Device Twin**: Two device twin properties are supported in this sample.
+  - A desired property named `targetTemperature` with a `double` value for the desired temperature.
+  - A reported property named `maxTempSinceLastReboot` with a `double` value for the highest temperature.
+
+  To send a device twin desired property message, select your device's Device Twin tab in the Azure IoT Explorer. Add the property `targetTemperature` along with a corresponding value to the `desired` section of the JSON. Select Save to update the twin document and send the twin message to the device.
 
   ```json
-  {
-    "maxTemp": 20,
-    "minTemp": 20,
-    "avgTemp": 20,
-    "startTime": "<ISO8601 time>",
-    "endTime": "<ISO8601 time>"
+  "properties": {
+      "desired": {
+          "targetTemperature": 68.5,
+      }
   }
   ```
 
-  with correct values substituted for each field.
+  Upon receiving a desired property message, the sample will update the twin property locally and send a reported property of the same name back to the service. This message will include a set of "ack" values: `ac` for the HTTP-like ack code, `av` for ack version of the property, and an optional `ad` for an ack description.
 
-- **Telemetry**: Device sends a JSON message with the field name `temperature` and the `double` value of the temperature.
-- **Twin**: Desired property with the field name `targetTemperature` and the `double` value for the desired temperature. Reported property with the field name `maxTempSinceLastReboot` and the `double` value for the highest temperature. Note that part of the IoT Plug and Play spec is a response to a desired property update from the service. The device will send back a reported property with a similarly named property and a set of "ack" values: `ac` for the HTTP-like ack code, `av` for ack version of the property, and an optional `ad` for an ack description.
+  ```json
+  "properties": {
+      "reported": {
+          "targetTemperature": {
+            "value": 68.5,
+            "ac": 200,
+            "av": 14,
+            "ad": "success"
+          },
+          "maxTempSinceLastReboot": 74.3,
+      }
+  }
+  ```
+
+- **Direct Method (Command)**: One method is supported in this sample: `getMaxMinReport`. If any other methods are attempted to be invoked, the log will report the method is not found. To invoke a method, select your device's Direct Method tab in the Azure IoT Explorer. Enter the method name `getMaxMinReport` along with a payload using an [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) time format and select Invoke method.
+
+  ```json
+  "2020-08-18T17:09:29-0700"
+   ```
+
+  The method will send back to the service a response containing the following JSON payload with updated values in each field:
+
+  ```json
+  {
+    "maxTemp": 74.3,
+    "minTemp": 65.2,
+    "avgTemp": 68.79,
+    "startTime": "2020-08-18T17:09:29-0700",
+    "endTime": "2020-08-18T17:24:32-0700"
+  }
+  ```
+
+- **Telemetry**: Device sends a JSON message with the property name `temperature` and a `double` value for the current temperature.
 
 ### IoT Hub Plug and Play Multiple Component
 
@@ -126,7 +160,8 @@ To run the samples, ensure you have the following programs or tools installed on
 
 - Have an [Azure account](https://azure.microsoft.com/en-us/) created.
 - Have an [Azure IoT Hub](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal) created.
-- Have an [Azure IoT Hub Device Provisioning Service (DPS)](https://docs.microsoft.com/en-us/azure/iot-dps/quick-setup-auto-provision) created if using a DPS sample.
+- Have the most recent version of [Azure IoT Explorer](https://github.com/Azure/azure-iot-explorer/releases) installed and connected to your Azure IoT Hub if using a Plug and Play sample: `paho_iot_hub_pnp_sample`, `paho_iot_hub_pnp_component_sample`. More instructions can be found [here](https://docs.microsoft.com/en-us/azure/iot-pnp/howto-use-iot-explorer).
+- Have an [Azure IoT Hub Device Provisioning Service (DPS)](https://docs.microsoft.com/en-us/azure/iot-dps/quick-setup-auto-provision) created if using a DPS sample: `paho_iot_provisioning_sample`, `paho_iot_provisioning_sas_sample`.
 - Have [git](https://git-scm.com/download) installed.
 - Have [OpenSSL](https://www.openssl.org/source/) installed:
   - For Linux based systems, we recommend:
