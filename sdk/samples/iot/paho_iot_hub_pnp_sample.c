@@ -799,7 +799,7 @@ static void send_command_response(
           rc = az_iot_hub_client_methods_response_get_publish_topic(
               &hub_client,
               command_request->request_id,
-              (uint16_t )status,
+              (uint16_t)status,
               methods_response_topic_buffer,
               sizeof(methods_response_topic_buffer),
               NULL)))
