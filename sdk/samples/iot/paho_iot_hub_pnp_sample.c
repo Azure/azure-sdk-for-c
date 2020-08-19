@@ -32,7 +32,8 @@
 #define SAMPLE_NAME PAHO_IOT_HUB_PNP_SAMPLE
 
 #define TELEMETRY_SEND_INTERVAL 1
-#define TIMEOUT_MQTT_RECEIVE_MS (120 * 1000)
+#define TIMEOUT_MQTT_RECEIVE_MAX_COUNT 10
+#define TIMEOUT_MQTT_RECEIVE_MS (8 * 1000)
 #define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
 #define TIMEOUT_MQTT_WAIT_FOR_COMPLETION_MS 1000
 
@@ -402,6 +403,7 @@ static void receive_messages(void)
   char* topic = NULL;
   int topic_len = 0;
   MQTTClient_message* message = NULL;
+  uint8_t timeoutCounter = 0;
 
   // Continue to receive commands or device twin messages while device is operational
   while (device_operational)
@@ -419,19 +421,28 @@ static void receive_messages(void)
     }
     else if (message == NULL)
     {
-      LOG_ERROR("Receive message timeout expired: MQTTClient return code %d.", rc);
-      exit(rc);
+      // Allow up to TIMEOUT_MQTT_RECEIVE_MAX_COUNT before disconnecting
+      if (++timeoutCounter >= TIMEOUT_MQTT_RECEIVE_MAX_COUNT)
+      {
+        LOG("Receive message timeout count of %d reached.", TIMEOUT_MQTT_RECEIVE_MAX_COUNT);
+        break;
+      }
     }
-    else if (rc == MQTTCLIENT_TOPICNAME_TRUNCATED)
+    else
     {
-      topic_len = (int)strlen(topic);
+      LOG_SUCCESS("Client received message from the service.");
+
+      if (rc == MQTTCLIENT_TOPICNAME_TRUNCATED)
+      {
+        topic_len = (int)strlen(topic);
+      }
+
+      on_message_received(topic, topic_len, message);
+      LOG(" "); // Formatting
+
+      MQTTClient_freeMessage(&message);
+      MQTTClient_free(topic);
     }
-    LOG_SUCCESS("Client received message from the service.");
-
-    on_message_received(topic, topic_len, message);
-
-    MQTTClient_freeMessage(&message);
-    MQTTClient_free(topic);
 
     // Send a telemetry message
     send_telemetry_message();
