@@ -294,7 +294,7 @@ static void invoke_method(const az_iot_hub_client_method_request* method_request
   else
   {
     LOG_AZ_SPAN("Method not supported:", method_request->name);
-    send_method_response(method_request, AZ_IOT_STATUS_NOT_FOUND, report_error_payload);
+    send_method_response(method_request, AZ_IOT_STATUS_NOT_FOUND, method_error_payload);
   }
 }
 

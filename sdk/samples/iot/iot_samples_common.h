@@ -121,16 +121,6 @@ typedef enum
   PAHO_IOT_PROVISIONING_SAS_SAMPLE
 } iot_sample_name;
 
-// Program Time
-char program_start_time_buffer[32];
-az_span program_start_time;
-
-/*
- *
- *
- */
-void set_program_start_time();
-
 /*
  * @brief      Reads in environment variables set by user for purposes of running sample.
  *

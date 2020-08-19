@@ -61,25 +61,6 @@ const az_span provisioning_global_endpoint
 //
 // Functions
 //
-void set_program_start_time()
-{
-  time_t rawtime;
-  struct tm* timeinfo;
-
-  time(&rawtime);
-  timeinfo = localtime(&rawtime);
-  size_t len = strftime(program_start_time_buffer, sizeof(program_start_time_buffer), ISO_SPEC_TIME_FORMAT, timeinfo);
-  if (len == 0)
-  {
-    LOG_ERROR("Insufficient buffer size for program start time.");
-    exit(1);
-  }
-
-  program_start_time = az_span_create((uint8_t*)program_start_time_buffer, (int32_t)len);
-
-  LOG_AZ_SPAN("start_time:", program_start_time);
-}
-
 static az_result read_configuration_entry(
     const char* env_name,
     char* default_value,
