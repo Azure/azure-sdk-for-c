@@ -198,13 +198,13 @@ AZ_NODISCARD az_result az_http_request_init(
  * For instance, if url in request is `http://example.net?qp=1` and this function is called with
  * path equals to `test`, then request url will be updated to `http://example.net/test?qp=1`.
  *
- * @remarks if \p is_path_url_encoded is set to false, before appending the path, it would be
+ * @remarks if \p is_url_encoded is set to false, before appending the path, it would be
  * url-encoded.
  *
  *
  * @param[out] ref_request http request reference
  * @param[in] path span to a path to be appended into url
- * @param[in] \p is_path_url_encoded boolean value that defines if the value to be appended is
+ * @param[in] \p is_url_encoded boolean value that defines if the value to be appended is
  * url-encoded or not.
  * @return
  *   - *`AZ_OK`* success.
@@ -214,7 +214,7 @@ AZ_NODISCARD az_result az_http_request_init(
  *     - `ref_request` is _NULL_.
  */
 AZ_NODISCARD az_result
-az_http_request_append_path(az_http_request* ref_request, az_span path, bool is_path_url_encoded);
+az_http_request_append_path(az_http_request* ref_request, az_span path, bool is_url_encoded);
 
 /**
  * @brief Set a query parameter at the end of url.
@@ -226,10 +226,10 @@ az_http_request_append_path(az_http_request* ref_request, az_span path, bool is_
  * @param[out] ref_request HTTP request that holds the URL to set the query parameter to.
  * @param[in] name URL parameter name.
  * @param[in] value URL parameter value.
- * @param[in] \p is_query_url_encoded boolean value that defines if the query parameter (name and
+ * @param[in] \p is_value_url_encoded boolean value that defines if the query parameter (name and
  * value) is url-encoded or not.
  *
- * @remarks if \p is_query_url_encoded is set to false, before setting query parameter, it would be
+ * @remarks if \p is_value_url_encoded is set to false, before setting query parameter, it would be
  * url-encoded.
  *
  * @return
@@ -246,7 +246,7 @@ AZ_NODISCARD az_result az_http_request_set_query_parameter(
     az_http_request* ref_request,
     az_span name,
     az_span value,
-    bool is_query_url_encoded);
+    bool is_value_url_encoded);
 
 /**
  * @brief Add a new HTTP header for the request.

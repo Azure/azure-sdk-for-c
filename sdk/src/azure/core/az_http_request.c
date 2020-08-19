@@ -59,7 +59,7 @@ AZ_NODISCARD az_result az_http_request_init(
 }
 
 AZ_NODISCARD az_result
-az_http_request_append_path(az_http_request* ref_request, az_span path, bool is_path_url_encoded)
+az_http_request_append_path(az_http_request* ref_request, az_span path, bool is_url_encoded)
 {
   _az_PRECONDITION_NOT_NULL(ref_request);
 
@@ -91,7 +91,7 @@ az_http_request_append_path(az_http_request* ref_request, az_span path, bool is_
       query_start,
       query_start,
       path,
-      !is_path_url_encoded,
+      !is_url_encoded,
       &path_size));
 
   query_start += path_size;
@@ -110,7 +110,7 @@ AZ_NODISCARD az_result az_http_request_set_query_parameter(
     az_http_request* ref_request,
     az_span name,
     az_span value,
-    bool is_query_url_encoded)
+    bool is_value_url_encoded)
 {
   _az_PRECONDITION_NOT_NULL(ref_request);
   _az_PRECONDITION_VALID_SPAN(name, 1, false);
