@@ -164,19 +164,19 @@ AZ_NODISCARD AZ_INLINE az_result _az_http_pipeline_nextpolicy(
 /**
  * @brief Format buffer as a http request containing URL and header spans.
  *
- * @remark The initial URL is expected to be url-encoded.
+ * @remark The initial \p url provided by the caller is expected to already be url-encoded.
  *
  * @param[out] out_request HTTP request to initialize.
  * @param[in] context A pointer to an #az_context node.
  * @param[in] method HTTP verb: `"GET"`, `"POST"`, etc.
- * @param[in] url az_pan to be used for storing the url. An initial value is expected to be in the
+ * @param[in] url The #az_span to be used for storing the url. An initial value is expected to be in the
  * buffer containing url schema and the server address. It can contain query parameters (like
  * https://service.azure.com?query=1). This value is expected to be url-encoded.
- * @param[in] url_length The size of the initial url value within url az_span
- * @param[in] headers_buffer az_span to be used for storing headers for the request. The total
+ * @param[in] url_length The size of the initial url value within url #az_span.
+ * @param[in] headers_buffer The #az_span to be used for storing headers for the request. The total
  * number of headers are calculated automatically based on the size of the buffer.
- * @param[in] body az_span buffer that contains a payload for the request. Use AZ_SPAN_NULL for
- * no-body requests.
+ * @param[in] body The #az_span buffer that contains a payload for the request. Use #AZ_SPAN_NULL for
+ * requests that don't have a body.
  *
  * @return
  *   - *`AZ_OK`* success.
@@ -219,7 +219,7 @@ az_http_request_append_path(az_http_request* ref_request, az_span path, bool is_
 /**
  * @brief Set a query parameter at the end of url.
  *
- * @remark Since query parameters are storaged with url-encoding, this function will not check if
+ * @remark Query parameters are stored url-encoded. This function will not check if
  * the a query parameter already exists in the URL. Calling this function twice with same \p name
  * would duplicate the query parameter.
  *
