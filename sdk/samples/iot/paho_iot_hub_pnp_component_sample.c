@@ -94,13 +94,16 @@ static char mqtt_client_username_buffer[256];
 static void create_and_configure_mqtt_client(void);
 static void connect_mqtt_client_to_iot_hub(void);
 static void subscribe_mqtt_client_to_iot_hub_topics(void);
+static void initialize_pnp_components(void);
+
+
 static void request_device_twin_document(void);
 static void receive_messages(void);
 static void disconnect_mqtt_client_from_iot_hub(void);
 
 
 
-static void components_init(void);
+
 
 
 //
@@ -131,13 +134,11 @@ int main(void)
   subscribe_mqtt_client_to_iot_hub_topics();
   LOG_SUCCESS("Client subscribed to IoT Hub topics.");
 
+  initialize_pnp_components();
+  LOG_SUCCESS("Initialized Plug and Play components");
 
 
 
-
-
-  // Initialize PnP Components
-  components_init();
 
   // On device start up, send device info
   send_device_info();
@@ -243,13 +244,6 @@ static void create_and_configure_mqtt_client(void)
     LOG_ERROR("Failed to create MQTT client: MQTTClient return code %d.", rc);
     exit(rc);
   }
-
-    // Setup MQTT Message Struct
-  publish_message.topic = publish_topic;
-  publish_message.topic_length = sizeof(publish_topic);
-  publish_message.out_topic_length = 0;
-  publish_message.payload_span = AZ_SPAN_FROM_BUFFER(publish_payload);
-  publish_message.out_payload_span = publish_message.payload_span;
 }
 
 static void connect_mqtt_client_to_iot_hub(void)
@@ -321,36 +315,36 @@ static void subscribe_mqtt_client_to_iot_hub_topics(void)
   }
 }
 
-
-
-static void components_init(void)
+static void initialize_pnp_components(void)
 {
-  az_result result;
+  az_result rc;
+
+  if (az_failed(rc = sample_pnp_mqtt_message_init(&publish_message)))
+  {
+    LOG_ERROR("Could not initialize publish_message: error code = 0x%08x", rc);
+    exit(rc);
+  }
+
 
   if (az_failed(
-          result = sample_pnp_thermostat_init(
+          rc = sample_pnp_thermostat_init(
               &sample_thermostat_1,
               sample_thermostat_1_component_name,
               DEFAULT_START_TEMP_CELSIUS)))
   {
-    LOG_ERROR("Could not initialize thermostat 1: error code = 0x%08x", result);
-    exit(result);
+    LOG_ERROR("Could not initialize thermostat 1: error code = 0x%08x", rc);
+    exit(rc);
   }
 
   else if (az_failed(
-               result = sample_pnp_thermostat_init(
+               rc = sample_pnp_thermostat_init(
                    &sample_thermostat_2,
                    sample_thermostat_2_component_name,
                    DEFAULT_START_TEMP_CELSIUS)))
   {
-    LOG_ERROR("Could not initialize thermostat 2: error code = 0x%08x", result);
-    exit(result);
+    LOG_ERROR("Could not initialize thermostat 2: error code = 0x%08x", rc);
+    exit(rc);
   }
-
-  LOG_SUCCESS("Initialized PnP components");
-
-  // Formatting for log
-  putchar('\n');
 }
 
 

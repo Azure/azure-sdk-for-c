@@ -23,3 +23,19 @@ az_span get_request_id(void)
 
   return az_span_slice(out_span, 0, az_span_size(out_span) - az_span_size(remainder));
 }
+
+az_result sample_pnp_mqtt_message_init(sample_pnp_mqtt_message* self)
+{
+  if (self == NULL)
+  {
+    return AZ_ERROR_ARG;
+  }
+
+  self->topic = publish_topic;
+  self->topic_length = sizeof(publish_topic);
+  self->out_topic_length = 0;
+  self->payload_span = AZ_SPAN_FROM_BUFFER(publish_payload);
+  self->out_payload_span = self->payload_span;
+
+  return AZ_OK;
+}
