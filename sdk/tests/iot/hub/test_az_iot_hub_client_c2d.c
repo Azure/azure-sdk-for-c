@@ -239,7 +239,7 @@ static void test_az_iot_hub_client_c2d_logging_succeed()
 #pragma warning(disable : 4113)
 #endif
 
-int test_iot_hub_c2d()
+int test_iot_hub_client_c2d()
 {
 #ifndef AZ_NO_PRECONDITION_CHECKING
   SETUP_PRECONDITION_CHECK_TESTS();

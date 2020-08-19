@@ -319,7 +319,7 @@ test_az_iot_hub_client_telemetry_get_publish_topic_with_options_module_id_with_p
       == AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
 }
 
-int test_iot_hub_telemetry()
+int test_iot_hub_client_telemetry()
 {
 #ifndef AZ_NO_PRECONDITION_CHECKING
   SETUP_PRECONDITION_CHECK_TESTS();
