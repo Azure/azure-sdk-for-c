@@ -14,7 +14,6 @@
 #include <azure/core/az_span.h>
 
 #define SAS_KEY_DURATION_TIME_DIGITS 4
-#define ISO_SPEC_TIME_FORMAT "%Y-%m-%dT%H:%M:%S%z" // ISO8601 Time Format
 //
 // Logging
 //
@@ -45,7 +44,7 @@
   { \
     (void)printf("\t\t%s ", span_description); \
     char* buffer = (char*)az_span_ptr(span); \
-    for (int32_t j = 0; j < az_span_size(span); j++) \
+    for (int32_t az_span_i = 0; az_span_i < az_span_size(span); az_span_i++) \
     { \
       putchar(*buffer++); \
     } \
