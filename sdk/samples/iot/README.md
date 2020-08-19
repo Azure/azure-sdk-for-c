@@ -92,7 +92,7 @@ This section provides an overview of the different samples available to run and 
   }
   ```
 
-  Upon receiving a desired property message, the sample will update the twin property locally and send a reported property   of the same name back to the service.  This message will include a set of "ack" values: `ac` for the HTTP-like ack code, `av` for ack version of the property, and an optional `ad` for an ack description.send a reported property message back to the service.
+  Upon receiving a desired property message, the sample will update the twin property locally and send a reported property of the same name back to the service. This message will include a set of "ack" values: `ac` for the HTTP-like ack code, `av` for ack version of the property, and an optional `ad` for an ack description.send a reported property message back to the service.
 
   ```json
   "properties": {
@@ -108,7 +108,7 @@ This section provides an overview of the different samples available to run and 
   }
   ```
 
-- **Direct Method (Command)**:  One method is supported in this sample: `getMaxMinReport`. If any other methods are attempted to be invoked, the log will report the method is not found. To invoke a method, select your device's Direct Method tab in the Azure IoT Explorer. Enter the method name `getMaxMinReport` along with a payload using an ISO8062 time format and select Invoke method.
+- **Direct Method (Command)**: One method is supported in this sample: `getMaxMinReport`. If any other methods are attempted to be invoked, the log will report the method is not found. To invoke a method, select your device's Direct Method tab in the Azure IoT Explorer. Enter the method name `getMaxMinReport` along with a payload using an [ISO8061](https://en.wikipedia.org/wiki/ISO_8601) time format and select Invoke method.
 
   ```json
   "2020-08-18T17:09:29-0700"
