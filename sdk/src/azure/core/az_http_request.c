@@ -124,11 +124,11 @@ AZ_NODISCARD az_result az_http_request_set_query_parameter(
 
   // Adding query parameter. Adding +2 to required length to include extra required symbols `=`
   // and `?` or `&`.
-  int32_t required_length
-      = (is_query_url_encoded
+  int32_t required_length = 2
+      + (is_query_url_encoded
              ? (az_span_size(name) + az_span_size(value))
-             : (_az_span_url_encode_calc_length(name) + _az_span_url_encode_calc_length(value)))
-      + 2;
+             : (_az_span_url_encode_calc_length(name) + _az_span_url_encode_calc_length(value)));
+
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(url_remainder, required_length);
 
   // Append either '?' or '&'
