@@ -32,7 +32,7 @@
 #define SAMPLE_NAME PAHO_IOT_HUB_PNP_SAMPLE
 
 #define TELEMETRY_SEND_INTERVAL 1
-#define TIMEOUT_MQTT_RECEIVE_MAX_COUNT 10
+#define TIMEOUT_MQTT_RECEIVE_MAX_COUNT 3
 #define TIMEOUT_MQTT_RECEIVE_MS (8 * 1000)
 #define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
 #define TIMEOUT_MQTT_WAIT_FOR_COMPLETION_MS 1000
@@ -131,7 +131,7 @@ static void send_command_response(
     const az_iot_hub_client_method_request* command_request,
     az_iot_status status,
     az_span response_payload);
-static az_result get_max_min_report_command(
+static az_result invoke_getMaxMinReport(
     az_span payload,
     az_span response_destination,
     az_span* out_response);
@@ -416,8 +416,6 @@ static void receive_messages(void)
     }
     else if (message == NULL)
     {
-      MQTTClient_free(topic);
-
       // Allow up to TIMEOUT_MQTT_RECEIVE_MAX_COUNT before disconnecting
       if (++timeoutCounter >= TIMEOUT_MQTT_RECEIVE_MAX_COUNT)
       {
@@ -474,7 +472,7 @@ static az_span get_request_id(void)
     exit(rc);
   }
 
-  return destination;
+  return az_span_slice(destination, 0, az_span_size(destination) - az_span_size(out_span));
 }
 
 static void mqtt_publish_message(char* topic, az_span payload, int qos)
@@ -570,8 +568,8 @@ static void handle_device_twin_message(
   if (twin_response->response_type == AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_GET
       || twin_response->response_type == AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES)
   {
-    double desired_temp = 0.0;
-    int32_t version_num = -1;
+    double desired_temp;
+    int32_t version_num;
 
     if (az_succeeded(parse_device_twin_desired_temperature_property(
             twin_message_span, is_twin_get, &desired_temp, &version_num)))
@@ -740,8 +738,8 @@ static void send_reported_property(az_span name, double value, int32_t version, 
   else
   {
     const uint8_t count = 1;
-    az_span names[1] = { name };
-    double values[1] = { value };
+    const az_span names[1] = { name };
+    const double values[1] = { value };
 
     if (az_failed(
             rc = build_property_payload(
@@ -768,7 +766,7 @@ static void handle_command_message(
     az_span command_response_payload = AZ_SPAN_FROM_BUFFER(command_response_payload_buffer);
 
     // Invoke command.
-    if (az_failed(get_max_min_report_command(
+    if (az_failed(invoke_getMaxMinReport(
             command_message_span, command_response_payload, &command_response_payload)))
     {
       status = AZ_IOT_STATUS_BAD_REQUEST;
@@ -777,7 +775,7 @@ static void handle_command_message(
     {
       status = AZ_IOT_STATUS_OK;
     }
-    LOG_SUCCESS("Client invoked 'get_max_min_report_command'.");
+    LOG_SUCCESS("Client invoked 'invoke_getMaxMinReport'.");
 
     send_command_response(command_request, status, command_response_payload);
   }
@@ -817,7 +815,7 @@ static void send_command_response(
   LOG_AZ_SPAN("Payload:", response_payload);
 }
 
-static az_result get_max_min_report_command(
+static az_result invoke_getMaxMinReport(
     az_span payload,
     az_span response_destination,
     az_span* out_response)
