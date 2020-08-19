@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #ifdef _MSC_VER
-// "'getenv': This function or variable may be unsafe. Consider using _dupenv_s instead."
+// warning C4996: 'getenv': This function or variable may be unsafe. Consider using _dupenv_s instead.
 #pragma warning(disable : 4996)
 #endif
 
