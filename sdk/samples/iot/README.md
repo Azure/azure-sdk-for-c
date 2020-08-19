@@ -92,7 +92,7 @@ This section provides an overview of the different samples available to run and 
   }
   ```
 
-  Upon receiving a desired property message, the sample will update the twin property locally and send a reported property of the same name back to the service. This message will include a set of "ack" values: `ac` for the HTTP-like ack code, `av` for ack version of the property, and an optional `ad` for an ack description.send a reported property message back to the service.
+  Upon receiving a desired property message, the sample will update the twin property locally and send a reported property of the same name back to the service. This message will include a set of "ack" values: `ac` for the HTTP-like ack code, `av` for ack version of the property, and an optional `ad` for an ack description.
 
   ```json
   "properties": {
