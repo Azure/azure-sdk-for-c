@@ -298,8 +298,6 @@ test_az_iot_hub_client_telemetry_get_publish_topic_with_options_with_props_small
 
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.module_id = test_module_id;
-  options.content_encoding = test_content_encoding;
-  options.content_type = test_content_type;
 
   az_iot_hub_client client;
   assert_int_equal(
@@ -309,7 +307,7 @@ test_az_iot_hub_client_telemetry_get_publish_topic_with_options_with_props_small
   assert_int_equal(
       az_iot_hub_client_properties_init(&props, test_props, az_span_size(test_props)), AZ_OK);
 
-  char test_buf[sizeof(g_test_correct_topic_with_options_with_ct_and_ce_with_props) - 2];
+  char test_buf[sizeof(g_test_correct_topic_with_options_with_props) - 2];
   size_t test_length;
 
   assert_true(
