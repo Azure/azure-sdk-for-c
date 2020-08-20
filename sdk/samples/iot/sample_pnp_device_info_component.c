@@ -1,13 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include "sample_pnp_device_info_component.h"
+#include "sample_pnp_mqtt_component.h"
+
 #include <azure/core/az_json.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
 #include <azure/iot/az_iot_hub_client.h>
-
-#include "sample_pnp_component_mqtt.h"
-#include "sample_pnp_device_info_component.h"
 
 #define DOUBLE_DECIMAL_PLACE_DIGITS 2
 
@@ -32,7 +32,7 @@ static const az_span sample_pnp_device_info_total_memory_property_name
 static const double sample_pnp_device_info_total_memory_property_value = 128;
 
 az_result sample_pnp_device_info_get_report_data(
-    az_iot_hub_client* client,
+    const az_iot_hub_client* client,
     sample_pnp_mqtt_message* mqtt_message)
 {
   az_json_writer json_writer;

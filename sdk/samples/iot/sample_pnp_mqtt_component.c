@@ -1,10 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "sample_pnp_component_mqtt.h"
+#include "sample_pnp_mqtt_component.h"
 
+#include <stddef.h>
 #include <stdint.h>
 
+#include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
 
 static uint32_t request_id_int;

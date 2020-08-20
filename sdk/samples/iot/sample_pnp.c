@@ -1,10 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include "iot_samples_common.h"
 #include "sample_pnp.h"
 
+#include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
-#include <stdio.h>
 
 #include <azure/core/az_json.h>
 #include <azure/core/az_result.h>
@@ -33,7 +35,7 @@ static az_result visit_component_properties(
     az_span component_name,
     az_json_reader* json_reader,
     int32_t version,
-    pnp_property_callback property_callback,
+    sample_pnp_property_callback property_callback,
     void* context_ptr)
 {
   while (az_succeeded(az_json_reader_next_token(json_reader)))
@@ -46,7 +48,7 @@ static az_result visit_component_properties(
       {
         if (az_failed(az_json_reader_next_token(json_reader)))
         {
-          printf("Failed to next token\r\n");
+          LOG_ERROR("Failed to next token.");
           return AZ_ERROR_UNEXPECTED_CHAR;
         }
         continue;
@@ -56,7 +58,7 @@ static az_result visit_component_properties(
 
       if (az_failed(az_json_reader_next_token(json_reader)))
       {
-        printf("Failed to get next token\r\n");
+        LOG_ERROR("Failed to get next token.");
         return AZ_ERROR_UNEXPECTED_CHAR;
       }
 
@@ -67,7 +69,7 @@ static az_result visit_component_properties(
     {
       if (az_failed(az_json_reader_skip_children(json_reader)))
       {
-        printf("Failed to skip children of object\r\n");
+        LOG_ERROR("Failed to skip children of object.");
         return AZ_ERROR_UNEXPECTED_CHAR;
       }
     }
@@ -90,7 +92,7 @@ static az_result sample_json_child_token_move(az_json_reader* json_reader, az_sp
     {
       if (az_failed(az_json_reader_next_token(json_reader)))
       {
-        printf("Failed to read next token\r\n");
+        LOG_ERROR("Failed to read next token.");
         return AZ_ERROR_UNEXPECTED_CHAR;
       }
 
@@ -100,7 +102,7 @@ static az_result sample_json_child_token_move(az_json_reader* json_reader, az_sp
     {
       if (az_failed(az_json_reader_skip_children(json_reader)))
       {
-        printf("Failed to skip child of complex object\r\n");
+        LOG_ERROR("Failed to skip child of complex object.");
         return AZ_ERROR_UNEXPECTED_CHAR;
       }
     }
@@ -142,8 +144,8 @@ static az_result is_component_in_model(
 }
 
 // Get the telemetry topic for PnP
-az_result pnp_get_telemetry_topic(
-    az_iot_hub_client const* client,
+az_result sample_pnp_get_telemetry_topic(
+    const az_iot_hub_client* client,
     az_iot_hub_client_properties* properties,
     az_span component_name,
     char* mqtt_topic,
@@ -177,7 +179,7 @@ az_result pnp_get_telemetry_topic(
 }
 
 // Parse the component name and command name from a span
-az_result pnp_parse_command_name(
+az_result sample_pnp_parse_command_name(
     az_span component_command,
     az_span* component_name,
     az_span* pnp_command_name)
@@ -199,11 +201,11 @@ az_result pnp_parse_command_name(
 }
 
 // Create a reported property payload
-az_result pnp_create_reported_property(
+az_result sample_pnp_create_reported_property(
     az_span json_buffer,
     az_span component_name,
     az_span property_name,
-    pnp_append_property_callback append_callback,
+    sample_pnp_append_property_callback append_callback,
     void* context,
     az_span* out_span)
 {
@@ -237,11 +239,11 @@ az_result pnp_create_reported_property(
 }
 
 // Create a reported property payload with status
-az_result pnp_create_reported_property_with_status(
+az_result sample_pnp_create_reported_property_with_status(
     az_span json_buffer,
     az_span component_name,
     az_span property_name,
-    pnp_append_property_callback append_callback,
+    sample_pnp_append_property_callback append_callback,
     void* context,
     int32_t ack_code,
     int32_t ack_version,
@@ -294,12 +296,12 @@ az_result pnp_create_reported_property_with_status(
 }
 
 // Process the twin properties and invoke user callback for each property
-az_result pnp_process_twin_data(
+az_result sample_pnp_process_twin_data(
     az_json_reader* json_reader,
     bool is_partial,
     const az_span** sample_components_ptr,
     int32_t sample_components_num,
-    pnp_property_callback property_callback,
+    sample_pnp_property_callback property_callback,
     void* context_ptr)
 {
   az_json_reader copy_json_reader;
@@ -311,7 +313,7 @@ az_result pnp_process_twin_data(
   if (!is_partial
       && az_failed(sample_json_child_token_move(json_reader, sample_iot_hub_twin_desired)))
   {
-    printf("Failed to get desired property\r\n");
+    LOG_ERROR("Failed to get desired property.");
     return AZ_ERROR_UNEXPECTED_CHAR;
   }
 
@@ -320,7 +322,7 @@ az_result pnp_process_twin_data(
           sample_json_child_token_move(&copy_json_reader, sample_iot_hub_twin_desired_version))
       || az_failed(az_json_token_get_int32(&(copy_json_reader.token), (int32_t*)&version)))
   {
-    printf("Failed to get version\r\n");
+    LOG_ERROR("Failed to get version.");
     return AZ_ERROR_UNEXPECTED_CHAR;
   }
 
@@ -334,7 +336,7 @@ az_result pnp_process_twin_data(
       {
         if (az_failed(az_json_reader_next_token(json_reader)))
         {
-          printf("Failed to next token\r\n");
+          LOG_ERROR("Failed to next token.");
           return AZ_ERROR_UNEXPECTED_CHAR;
         }
         continue;
@@ -344,7 +346,7 @@ az_result pnp_process_twin_data(
 
       if (az_failed(az_json_reader_next_token(json_reader)))
       {
-        printf("Failed to next token\r\n");
+        LOG_ERROR("Failed to next token.");
         return AZ_ERROR_UNEXPECTED_CHAR;
       }
 
@@ -359,7 +361,7 @@ az_result pnp_process_twin_data(
                 property_callback,
                 context_ptr)))
         {
-          printf("Failed to visit component properties\r\n");
+          LOG_ERROR("Failed to visit component properties.");
           return AZ_ERROR_UNEXPECTED_CHAR;
         }
       }
@@ -372,7 +374,7 @@ az_result pnp_process_twin_data(
     {
       if (az_failed(az_json_reader_skip_children(json_reader)))
       {
-        printf("Failed to skip children of object\r\n");
+        LOG_ERROR("Failed to skip children of object.");
         return AZ_ERROR_UNEXPECTED_CHAR;
       }
     }

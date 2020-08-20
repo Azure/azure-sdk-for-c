@@ -109,12 +109,12 @@ static void receive_messages(void);
 static void disconnect_mqtt_client_from_iot_hub(void);
 
 static az_span get_request_id(void);
-static void mqtt_publish_message(char* topic, az_span payload, int qos);
+static void mqtt_publish_message(const char* topic, az_span payload, int qos);
 static void on_message_received(char* topic, int topic_len, const MQTTClient_message* message);
 
 // Device Twin functions
 static void handle_device_twin_message(
-    const az_span twin_message_span,
+    az_span twin_message_span,
     const az_iot_hub_client_twin_response* twin_response);
 static az_result parse_device_twin_desired_temperature_property(
     az_span twin_message_span,
@@ -126,7 +126,7 @@ static void send_reported_property(az_span name, double value, int32_t version, 
 
 // Command functions
 static void handle_command_message(
-    const az_span command_message_span,
+    az_span command_message_span,
     const az_iot_hub_client_method_request* command_request);
 static void send_command_response(
     const az_iot_hub_client_method_request* command_request,
@@ -475,7 +475,7 @@ static az_span get_request_id(void)
   return az_span_slice(destination, 0, az_span_size(destination) - az_span_size(out_span));
 }
 
-static void mqtt_publish_message(char* topic, az_span payload, int qos)
+static void mqtt_publish_message(const char* topic, az_span payload, int qos)
 {
   int rc;
   MQTTClient_deliveryToken token;
@@ -539,7 +539,7 @@ static void on_message_received(char* topic, int topic_len, const MQTTClient_mes
 }
 
 static void handle_device_twin_message(
-    const az_span twin_message_span,
+    az_span twin_message_span,
     const az_iot_hub_client_twin_response* twin_response)
 {
   // Invoke appropriate action per response type (3 Types only).
@@ -594,7 +594,7 @@ static void handle_device_twin_message(
 }
 
 static az_result parse_device_twin_desired_temperature_property(
-    const az_span twin_message_span,
+    az_span twin_message_span,
     bool is_twin_get,
     double* parsed_temp,
     int32_t* version_number)

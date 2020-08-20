@@ -4,6 +4,8 @@
 #ifndef SAMPLE_PNP_H
 #define SAMPLE_PNP_H
 
+#include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 
 #include <azure/core/az_json.h>
@@ -17,7 +19,7 @@
  */
 typedef void (*sample_pnp_property_callback)(
     az_span component_name,
-    az_json_token* property_name,
+    const az_json_token* property_name,
     az_json_reader property_value_as_json,
     int32_t version,
     void* user_context_callback);
@@ -45,7 +47,7 @@ typedef az_result (*sample_pnp_append_property_callback)(az_json_writer* json_wr
  * @return #az_result
  */
 az_result sample_pnp_get_telemetry_topic(
-    az_iot_hub_client const* client,
+    const az_iot_hub_client* client,
     az_iot_hub_client_properties* properties,
     az_span component_name,
     char* mqtt_topic,
