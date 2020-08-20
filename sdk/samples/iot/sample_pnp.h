@@ -11,16 +11,11 @@
 #include <azure/core/az_span.h>
 #include <azure/iot/az_iot_hub_client.h>
 
-#define PNP_STATUS_SUCCESS 200
-#define PNP_STATUS_BAD_FORMAT 400
-#define PNP_STATUS_NOT_FOUND 404
-#define PNP_STATUS_INTERNAL_ERROR 500
-
 /**
  * @brief Callback which is called for each property found by the #pnp_process_twin_data()
  * API.
  */
-typedef void (*pnp_property_callback)(
+typedef void (*sample_pnp_property_callback)(
     az_span component_name,
     az_json_token* property_name,
     az_json_reader property_value_as_json,
@@ -30,7 +25,7 @@ typedef void (*pnp_property_callback)(
 /**
  * @brief Callback which is invoked to append user properties to a payload.
  */
-typedef az_result (*pnp_append_property_callback)(az_json_writer* json_writer, void* context);
+typedef az_result (*sample_pnp_append_property_callback)(az_json_writer* json_writer, void* context);
 
 /**
  * @brief Gets the MQTT topic that must be used for device to cloud telemetry messages.
@@ -49,7 +44,7 @@ typedef az_result (*pnp_append_property_callback)(az_json_writer* json_writer, v
  *                                                  \p mqtt_topic. Can be `NULL`.
  * @return #az_result
  */
-az_result pnp_get_telemetry_topic(
+az_result sample_pnp_get_telemetry_topic(
     az_iot_hub_client const* client,
     az_iot_hub_client_properties* properties,
     az_span component_name,
@@ -64,7 +59,7 @@ az_result pnp_get_telemetry_topic(
  * @param[out] component_name The parsed component name (if it exists).
  * @param[out] command_name The parsed command name.
  */
-az_result pnp_parse_command_name(
+az_result sample_pnp_parse_command_name(
     az_span component_command,
     az_span* component_name,
     az_span* command_name);
@@ -79,11 +74,11 @@ az_result pnp_parse_command_name(
  * @param[in] context The user context which is passed to the callback.
  * @param[out] out_span The #az_span pointer to the output json payload.
  */
-az_result pnp_create_reported_property(
+az_result sample_pnp_create_reported_property(
     az_span json_buffer,
     az_span component_name,
     az_span property_name,
-    pnp_append_property_callback append_callback,
+    sample_pnp_append_property_callback append_callback,
     void* context,
     az_span* out_span);
 
@@ -100,11 +95,11 @@ az_result pnp_create_reported_property(
  * @param[in] ack_description The optional description for the reported property.
  * @param[out] out_span The #az_span pointer to the output json payload.
  */
-az_result pnp_create_reported_property_with_status(
+az_result sample_pnp_create_reported_property_with_status(
     az_span json_buffer,
     az_span component_name,
     az_span property_name,
-    pnp_append_property_callback append_callback,
+    sample_pnp_append_property_callback append_callback,
     void* context,
     int32_t ack_code,
     int32_t ack_version,
@@ -123,12 +118,12 @@ az_result pnp_create_reported_property_with_status(
  * @param[in] property_callback The callback which is called on each twin property.
  * @param[in] context_ptr Pointer to user context.
  */
-az_result pnp_process_twin_data(
+az_result sample_pnp_process_twin_data(
     az_json_reader* json_reader,
     bool is_partial,
     const az_span** sample_components_ptr,
     int32_t sample_components_num,
-    pnp_property_callback property_callback,
+    sample_pnp_property_callback property_callback,
     void* context_ptr);
 
 #endif // SAMPLE_PNP_H

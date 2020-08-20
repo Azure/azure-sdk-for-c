@@ -330,7 +330,8 @@ az_result sample_pnp_thermostat_process_command(
     az_span component_name,
     az_span command_name,
     az_span command_payload,
-    sample_pnp_mqtt_message* mqtt_message)
+    sample_pnp_mqtt_message* mqtt_message,
+    az_iot_status* status)
 {
   az_result result;
 
@@ -338,7 +339,6 @@ az_result sample_pnp_thermostat_process_command(
       && az_span_is_content_equal(report_command_name_span, command_name))
   {
     // Invoke command
-    uint16_t return_code;
     az_result response = invoke_getMaxMinReport(
         thermostat_component,
         command_payload,
@@ -346,18 +346,18 @@ az_result sample_pnp_thermostat_process_command(
         &mqtt_message->out_payload_span);
     if (response != AZ_OK)
     {
-      return_code = 400;
+      status = AZ_IOT_STATUS_BAD_REQUEST;
     }
     else
     {
-      return_code = 200;
+      satuts = AZ_IOT_STATUS_OK;
     }
 
     if (az_failed(
             result = az_iot_hub_client_methods_response_get_publish_topic(
                 client,
                 command_request->request_id,
-                return_code,
+                (uint16_t)status,
                 mqtt_message->topic,
                 mqtt_message->topic_length,
                 mqtt_message->out_topic_length)))

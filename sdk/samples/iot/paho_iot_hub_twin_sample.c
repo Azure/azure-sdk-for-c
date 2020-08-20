@@ -94,7 +94,7 @@ int main(void)
   LOG_SUCCESS("Client subscribed to IoT Hub topics.");
 
   get_device_twin_document();
-  LOG_SUCCESS("Client got twin document.");
+  LOG_SUCCESS("Client received device twin document.");
 
   send_reported_property();
   LOG_SUCCESS("Client sent reported property.");

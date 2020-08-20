@@ -40,8 +40,9 @@
 #define DEFAULT_START_TEMP_AVG_COUNT 1
 #define DEFAULT_START_TEMP_CELSIUS 22.0
 #define DOUBLE_DECIMAL_PLACE_DIGITS 2
+#define SAMPLE_PUBLISH_QOS 0
 
-static bool device_operational = true;
+static bool is_device_operational = true;
 static const char iso_spec_time_format[] = "%Y-%m-%dT%H:%M:%S%z"; // ISO8601 Time Format
 
 // * PnP Values *
@@ -229,7 +230,7 @@ int main(void)
   LOG_SUCCESS("Client subscribed to IoT Hub topics.");
 
   request_device_twin_document();
-  LOG_SUCCESS("Client requested twin document.")
+  LOG_SUCCESS("Client requested device twin document.")
 
   receive_messages();
   LOG_SUCCESS("Client received messages.")
@@ -375,11 +376,10 @@ static void request_device_twin_document(void)
 
   // Get the Twin Document topic to publish the twin document request.
   char twin_document_topic_buffer[128];
-  az_span request_id = get_request_id();
   if (az_failed(
           rc = az_iot_hub_client_twin_document_get_publish_topic(
               &hub_client,
-              request_id,
+              get_request_id(),
               twin_document_topic_buffer,
               sizeof(twin_document_topic_buffer),
               NULL)))
@@ -389,7 +389,7 @@ static void request_device_twin_document(void)
   }
 
   // Publish the twin document request.
-  mqtt_publish_message(twin_document_topic_buffer, AZ_SPAN_NULL, 0);
+  mqtt_publish_message(twin_document_topic_buffer, AZ_SPAN_NULL, SAMPLE_PUBLISH_QOS);
 }
 
 static void receive_messages(void)
@@ -400,8 +400,8 @@ static void receive_messages(void)
   MQTTClient_message* message = NULL;
   uint8_t timeoutCounter = 0;
 
-  // Continue to receive commands or device twin messages while device is operational
-  while (device_operational)
+  // Continue to receive commands or device twin messages while device is operational.
+  while (is_device_operational)
   {
     LOG(" "); // Formatting.
     LOG("Waiting for Command or Device Twin message.\n");
@@ -416,7 +416,7 @@ static void receive_messages(void)
     }
     else if (message == NULL)
     {
-      // Allow up to TIMEOUT_MQTT_RECEIVE_MAX_COUNT before disconnecting
+      // Allow up to TIMEOUT_MQTT_RECEIVE_MAX_COUNT before disconnecting.
       if (++timeoutCounter >= TIMEOUT_MQTT_RECEIVE_MAX_COUNT)
       {
         LOG("Receive message timeout count of %d reached.", TIMEOUT_MQTT_RECEIVE_MAX_COUNT);
@@ -435,13 +435,13 @@ static void receive_messages(void)
       timeoutCounter = 0; // Reset.
 
       on_message_received(topic, topic_len, message);
-      LOG(" "); // Formatting
+      LOG(" "); // Formatting.
 
       MQTTClient_freeMessage(&message);
       MQTTClient_free(topic);
     }
 
-    // Send a telemetry message
+    // Send a telemetry message.
     send_telemetry_message();
   }
 }
@@ -521,7 +521,7 @@ static void on_message_received(char* topic, int topic_len, const MQTTClient_mes
 
     handle_device_twin_message(message_span, &twin_response);
   }
-  else if (az_succeeded(az_iot_hub_client_methods_parse_received_topic(
+  else if (az_succeeded(rc = az_iot_hub_client_methods_parse_received_topic(
                &hub_client, topic_span, &command_request)))
   {
     LOG_SUCCESS("Client received a valid topic response:");
@@ -547,15 +547,18 @@ static void handle_device_twin_message(
 
   switch (twin_response->response_type)
   {
+    // A response from a twin GET publish message with the twin document as a payload.
     case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_GET:
       LOG("Type: GET");
       is_twin_get = true;
       break;
 
+    // An update to the desired properties with the properties as a payload.
     case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES:
       LOG("Type: Desired Properties");
       break;
 
+    // A response from a twin reported properties publish message.
     case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES:
       LOG("Type: Reported Properties");
       break;
@@ -703,11 +706,10 @@ static void send_reported_property(az_span name, double value, int32_t version, 
 
   // Get the Twin Patch topic to send a reported property update.
   char twin_patch_topic_buffer[128];
-  az_span request_id_span = get_request_id();
   if (az_failed(
           rc = az_iot_hub_client_twin_patch_get_publish_topic(
               &hub_client,
-              request_id_span,
+              get_request_id(),
               twin_patch_topic_buffer,
               sizeof(twin_patch_topic_buffer),
               NULL)))
@@ -731,7 +733,7 @@ static void send_reported_property(az_span name, double value, int32_t version, 
                 reported_property_payload,
                 &reported_property_payload)))
     {
-      LOG_ERROR("Failed to build confirmed payload : az_result return code 0x%04x.", rc);
+      LOG_ERROR("Failed to build reported property confirmed payload : az_result return code 0x%04x.", rc);
       exit(rc);
     }
   }
@@ -745,13 +747,13 @@ static void send_reported_property(az_span name, double value, int32_t version, 
             rc = build_property_payload(
                 count, names, values, NULL, reported_property_payload, &reported_property_payload)))
     {
-      LOG_ERROR("Failed to build payload: az_result return code 0x%04x.", rc);
+      LOG_ERROR("Failed to build reported property payload: az_result return code 0x%04x.", rc);
       exit(rc);
     }
   }
 
   // Publish the reported property update.
-  mqtt_publish_message(twin_patch_topic_buffer, reported_property_payload, 0);
+  mqtt_publish_message(twin_patch_topic_buffer, reported_property_payload, SAMPLE_PUBLISH_QOS);
   LOG_SUCCESS("Client sent reported property message:");
   LOG_AZ_SPAN("Payload:", reported_property_payload);
 }
@@ -781,7 +783,7 @@ static void handle_command_message(
   }
   else
   {
-    LOG_AZ_SPAN("command not supported:", command_request->name);
+    LOG_AZ_SPAN("Command not supported:", command_request->name);
     send_command_response(command_request, AZ_IOT_STATUS_NOT_FOUND, command_error_response_payload);
   }
 }
@@ -791,7 +793,7 @@ static void send_command_response(
     az_iot_status status,
     az_span response_payload)
 {
-  int rc;
+  az_result rc;
 
   // Get the Methods response topic to publish the command response.
   char methods_response_topic_buffer[128];
@@ -809,7 +811,7 @@ static void send_command_response(
   }
 
   // Publish the command response.
-  mqtt_publish_message(methods_response_topic_buffer, response_payload, 0);
+  mqtt_publish_message(methods_response_topic_buffer, response_payload, SAMPLE_PUBLISH_QOS);
   LOG_SUCCESS("Client published command response:");
   LOG("Status: %d", status);
   LOG_AZ_SPAN("Payload:", response_payload);
@@ -876,7 +878,7 @@ static az_result invoke_getMaxMinReport(
 
 static void send_telemetry_message(void)
 {
-  int rc;
+  az_result rc;
 
   // Get the Telemetry topic to publish the telemetry message.
   char telemetry_topic_buffer[128];
@@ -903,7 +905,7 @@ static void send_telemetry_message(void)
   }
 
   // Publish the telemetry message.
-  mqtt_publish_message(telemetry_topic_buffer, telemetry_payload, 0);
+  mqtt_publish_message(telemetry_topic_buffer, telemetry_payload, SAMPLE_PUBLISH_QOS);
   LOG_SUCCESS("Client sent telemetry message to the service:");
   LOG_AZ_SPAN("Payload:", telemetry_payload);
 }

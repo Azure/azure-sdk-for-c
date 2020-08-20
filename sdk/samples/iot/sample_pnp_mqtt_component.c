@@ -10,6 +10,9 @@
 static uint32_t request_id_int;
 static char request_id_buf[10];
 
+static char publish_topic[128];
+static char publish_payload[512];
+
 // Create request id span which increments request id integer each call. Capable of holding 8 digit
 // number.
 az_span get_request_id(void)
