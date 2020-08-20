@@ -233,7 +233,7 @@ bool sample_pnp_thermostat_get_max_temp_report(
                    mqtt_message->topic_length,
                    NULL)))
   {
-    LOG_ERROR("Faied to get reported property topic with status: az_result return code 0x%08x.", result);
+    LOG_ERROR("Failed to get reported property topic with status: az_result return code 0x%08x.", result);
     return false;
   }
 
