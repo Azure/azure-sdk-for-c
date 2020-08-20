@@ -383,8 +383,6 @@ static void request_device_twin_document(void)
 {
   az_result rc;
 
-  LOG("Client requesting device twin document from service.");
-
   // Get the Twin Document topic to publish the twin document request.
   if (az_failed(
           rc = az_iot_hub_client_twin_document_get_publish_topic(
@@ -400,11 +398,11 @@ static void request_device_twin_document(void)
 
 static void receive_messages(void)
 {
+  mqtt_receive_message();
+
   // Continue to receive commands or device twin messages while device is operational.
   while (is_device_operational)
   {
-    mqtt_receive_message();
-
     // Send max temp for each component since boot if needed.
     if (sample_pnp_thermostat_get_max_temp_report(&hub_client, &sample_thermostat_1, &publish_message))
     {
@@ -420,6 +418,8 @@ static void receive_messages(void)
 
     // Send telemetry messages.
     send_telemetry_messages();
+
+    mqtt_receive_message();
   }
 }
 
@@ -466,7 +466,7 @@ static void mqtt_receive_message(void)
   char* topic = NULL;
   int topic_len = 0;
   MQTTClient_message* message = NULL;
-  uint8_t timeoutCounter = 0;
+  static int8_t timeoutCounter;
 
   LOG(" "); // Formatting.
   LOG("Waiting for Command or Device Twin message.\n");
@@ -485,7 +485,7 @@ static void mqtt_receive_message(void)
     if (++timeoutCounter >= TIMEOUT_MQTT_RECEIVE_MAX_COUNT)
     {
       LOG("Receive message timeout count of %d reached.", TIMEOUT_MQTT_RECEIVE_MAX_COUNT);
-      return;
+      is_device_operational = false;
     }
   }
   else

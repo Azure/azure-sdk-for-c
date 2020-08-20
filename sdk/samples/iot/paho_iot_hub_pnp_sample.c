@@ -372,8 +372,6 @@ static void request_device_twin_document(void)
 {
   az_result rc;
 
-  LOG("Client requesting device twin document from service.");
-
   // Get the Twin Document topic to publish the twin document request.
   char twin_document_topic_buffer[128];
   if (az_failed(
