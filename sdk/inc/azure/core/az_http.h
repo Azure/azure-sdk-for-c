@@ -103,6 +103,9 @@ typedef enum
   AZ_HTTP_STATUS_CODE_LOOP_DETECTED = 508,
   AZ_HTTP_STATUS_CODE_NOT_EXTENDED = 510,
   AZ_HTTP_STATUS_CODE_NETWORK_AUTHENTICATION_REQUIRED = 511,
+
+  // Used in az_http_policy_retry_options to indicate the end of the list
+  AZ_HTTP_STATUS_CODE_END_OF_LIST = -1,
 } az_http_status_code;
 
 /**
@@ -114,10 +117,10 @@ typedef enum
  */
 typedef struct
 {
-  int16_t max_retries;
+  az_http_status_code const* status_codes;
   int32_t retry_delay_msec;
   int32_t max_retry_delay_msec;
-  az_http_status_code const* status_codes;
+  int32_t max_retries;
 } az_http_policy_retry_options;
 
 typedef enum
@@ -182,12 +185,13 @@ AZ_NODISCARD AZ_INLINE az_result az_http_response_init(az_http_response* respons
  *
  * @see https://tools.ietf.org/html/rfc7230#section-3.1.2
  */
+// Member order is optimized for alignment.
 typedef struct
 {
+  az_span reason_phrase;
+  az_http_status_code status_code;
   uint8_t major_version;
   uint8_t minor_version;
-  az_http_status_code status_code;
-  az_span reason_phrase;
 } az_http_response_status_line;
 
 /**
@@ -229,7 +233,7 @@ az_http_response_get_next_header(az_http_response* response, az_pair* out_header
  *
  * @param response A pointer to an az_http_response instance.
  * @param out_body A pointer to an az_span to receive the HTTP response's body.
- * @return AZ_OK = An az_span over the reponse body was returned<br>
+ * @return AZ_OK = An az_span over the response body was returned<br>
  * Other value = Error while trying to read and parse body
  */
 AZ_NODISCARD az_result az_http_response_get_body(az_http_response* response, az_span* out_body);

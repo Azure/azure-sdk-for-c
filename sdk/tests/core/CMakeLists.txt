@@ -2,15 +2,21 @@
 # SPDX-License-Identifier: MIT
 
 cmake_minimum_required (VERSION 3.10)
-set(TARGET_NAME "az_core_test")
 
-project (${TARGET_NAME} LANGUAGES C)
+project (az_core_test LANGUAGES C)
 
 set(CMAKE_C_STANDARD 99)
 
 include(AddTestCMocka)
 
-add_cmocka_test(${TARGET_NAME} SOURCES
+# -ld link option is only available for gcc
+if(UNIT_TESTING_MOCKS)
+    set(WRAP_FUNCTIONS "-Wl,--wrap=az_platform_clock_msec -Wl,--wrap=az_http_client_send_request")
+else()
+    set(WRAP_FUNCTIONS "")
+endif()
+
+add_cmocka_test(az_core_test SOURCES
                 main.c
                 test_az_context.c
                 test_az_credential_client_secret.c

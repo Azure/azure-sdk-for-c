@@ -2,14 +2,14 @@
 // SPDX-License-Identifier: MIT
 
 #include "test_az_iot_hub_client.h"
-#include <azure/iot/az_iot_hub_client.h>
-#include <azure/core/az_log.h>
-#include <azure/core/az_precondition.h>
-#include <azure/core/internal/az_precondition_internal.h>
-#include <azure/core/az_span.h>
 #include <az_test_log.h>
 #include <az_test_precondition.h>
 #include <az_test_span.h>
+#include <azure/core/az_log.h>
+#include <azure/core/az_precondition.h>
+#include <azure/core/az_span.h>
+#include <azure/core/internal/az_precondition_internal.h>
+#include <azure/iot/az_iot_hub_client.h>
 
 #include <setjmp.h>
 #include <stdarg.h>
@@ -62,7 +62,7 @@ static void az_iot_hub_client_sas_get_signature_NULL_signature_span_fails()
 static void az_iot_hub_client_sas_get_signature_NULL_client_fails()
 {
   uint8_t signature_buffer[TEST_SPAN_BUFFER_SIZE];
-  az_span signature = az_span_init(signature_buffer, _az_COUNTOF(signature_buffer));
+  az_span signature = az_span_create(signature_buffer, _az_COUNTOF(signature_buffer));
 
   ASSERT_PRECONDITION_CHECKED(
       az_iot_hub_client_sas_get_signature(NULL, test_sas_expiry_time_secs, signature, &signature));
@@ -154,8 +154,9 @@ static void az_iot_hub_client_sas_get_signature_module_succeeds()
   assert_true(
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, &options) == AZ_OK);
 
-  const char* expected_signature = TEST_DEVICE_HOSTNAME_STR
-      "%2Fdevices%2F" TEST_DEVICE_ID_STR "%2Fmodules%2F" TEST_MODULE_ID_STR "\n" TEST_EXPIRATION_STR;
+  const char* expected_signature
+      = TEST_DEVICE_HOSTNAME_STR "%2Fdevices%2F" TEST_DEVICE_ID_STR
+                                 "%2Fmodules%2F" TEST_MODULE_ID_STR "\n" TEST_EXPIRATION_STR;
 
   uint8_t signature_buffer[TEST_SPAN_BUFFER_SIZE];
   az_span signature = az_span_for_test_init(signature_buffer, _az_COUNTOF(signature_buffer));
@@ -395,7 +396,7 @@ static void az_iot_hub_client_sas_get_signature_device_signature_overflow_fails(
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
 
   uint8_t signature_buffer[54];
-  az_span signature = az_span_init(signature_buffer, _az_COUNTOF(signature_buffer));
+  az_span signature = az_span_create(signature_buffer, _az_COUNTOF(signature_buffer));
 
   assert_int_equal(
       az_iot_hub_client_sas_get_signature(
@@ -412,7 +413,7 @@ static void az_iot_hub_client_sas_get_signature_module_signature_overflow_fails(
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, &options) == AZ_OK);
 
   uint8_t signature_buffer[72];
-  az_span signature = az_span_init(signature_buffer, _az_COUNTOF(signature_buffer));
+  az_span signature = az_span_create(signature_buffer, _az_COUNTOF(signature_buffer));
 
   assert_int_equal(
       az_iot_hub_client_sas_get_signature(
@@ -450,7 +451,7 @@ static void test_az_iot_hub_client_sas_logging_succeed()
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
 
   uint8_t signature_buffer[TEST_SPAN_BUFFER_SIZE];
-  az_span signature = az_span_init(signature_buffer, _az_COUNTOF(signature_buffer));
+  az_span signature = az_span_create(signature_buffer, _az_COUNTOF(signature_buffer));
   az_span out_signature;
 
   assert_true(az_succeeded(az_iot_hub_client_sas_get_signature(
@@ -467,7 +468,7 @@ static void test_az_iot_hub_client_sas_logging_succeed()
 #pragma warning(disable : 4113)
 #endif
 
-int test_iot_sas_token()
+int test_az_iot_hub_client_sas_token()
 {
 #ifndef AZ_NO_PRECONDITION_CHECKING
   SETUP_PRECONDITION_CHECK_TESTS();

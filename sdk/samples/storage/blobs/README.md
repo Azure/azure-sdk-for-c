@@ -10,31 +10,35 @@ urlFragment: storage-blob-samples
 ---
 
 # Azure Storage Blob Samples client Library for Embedded C
-This document explains samples and how to use them.
 
-## Key Concepts
-Key concepts are explained in detail [here][SDK_README_KEY_CONCEPTS].
-
-# Samples Azure Storage Blob APIs
 This document describes how to use samples and what is done in each sample.
 
+## Key Concepts
+
+Key concepts are explained in detail [here][SDK_README_KEY_CONCEPTS].
+
 ## Getting Started
+
 Getting started explained in detail [here][SDK_README_GETTING_STARTED].
 
 ## Examples
+
    Following section document various examples.
 
 1. [Basic Examples][samples_basic]: Create storage blob client. Upload blob.
 
 ## Troubleshooting
+
 When interacting with blobs using this C client library, errors returned by the service correspond to the same HTTP
 status codes returned for [REST API][error_codes] requests. For example, if you try to retrieve a container or blob that
 doesn't exist in your Storage Account, a `404` error is returned, indicating `Not Found`
 
 ## Next Steps
-Start using Storage blob C SDK in your solutions. Our SDK details could be found at [SDK README][BLOB_SDK_README]. 
 
-###  Additional Documentation
+Start using Storage blob C SDK in your solutions. Our SDK details could be found at [SDK README][BLOB_SDK_README].
+
+### Additional Documentation
+
 For more extensive documentation on Azure Storage blob, see the [API reference documentation][storageblob_rest].
 
 ## Contributing

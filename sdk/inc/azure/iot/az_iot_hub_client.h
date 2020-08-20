@@ -5,9 +5,9 @@
  * @file az_iot_hub_client.h
  *
  * @brief definition for the Azure IoT Hub client.
- * @remark The IoT Hub MQTT protocol is described at 
+ * @remark The IoT Hub MQTT protocol is described at
  * https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-mqtt-support
- * 
+ *
  * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
  * prefixed with an underscore ('_') directly in your application code. These symbols
  * are part of Azure SDK's internal implementation; we do not document these symbols
@@ -17,9 +17,9 @@
 #ifndef _az_IOT_HUB_CLIENT_H
 #define _az_IOT_HUB_CLIENT_H
 
-#include <azure/iot/az_iot_common.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
+#include <azure/iot/az_iot_common.h>
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -41,18 +41,20 @@ enum
  * @brief Azure IoT Hub Client options.
  *
  */
-typedef struct az_iot_hub_client_options
+typedef struct
 {
   az_span module_id; /**< The module name (if a module identity is used). */
   az_span user_agent; /**< The user-agent is a formatted string that will be used for Azure IoT
                          usage statistics. */
+  az_span model_id; /**< The model id used to identify the capabilities of a device based on the
+                       Digital Twin document */
 } az_iot_hub_client_options;
 
 /**
  * @brief Azure IoT Hub Client.
  *
  */
-typedef struct az_iot_hub_client
+typedef struct
 {
   struct
   {
@@ -88,6 +90,20 @@ AZ_NODISCARD az_result az_iot_hub_client_init(
     az_iot_hub_client_options const* options);
 
 /**
+ * @brief The HTTP URI Path necessary when connecting to IoT Hub using WebSockets.
+ */
+#define AZ_IOT_HUB_CLIENT_WEB_SOCKET_PATH "/$iothub/websocket"
+
+/**
+ * @brief The HTTP URI Path necessary when connecting to IoT Hub using WebSockets without an X509
+ * client certificate.
+ * @remark Most devices should use #AZ_IOT_HUB_CLIENT_WEB_SOCKET_PATH. This option is available for
+ * devices not using X509 client certificates that fail to connect to IoT Hub.
+ */
+#define AZ_IOT_HUB_CLIENT_WEB_SOCKET_PATH_NO_X509_CLIENT_CERT \
+  AZ_IOT_HUB_CLIENT_WEB_SOCKET_PATH "?iothub-no-client-cert=true"
+
+/**
  * @brief Gets the MQTT user name.
  *
  * The user name will be of the following format:
@@ -111,31 +127,6 @@ AZ_NODISCARD az_result az_iot_hub_client_get_user_name(
     size_t* out_mqtt_user_name_length);
 
 /**
- * @brief Gets the MQTT user name with Digital Twin model id.
- *
- * @warning THIS FUNCTION IS TEMPORARY. IT IS SUBJECT TO CHANGE OR BE REMOVED IN THE FUTURE.
- * 
- * The user name will be of the following format:
- * {iothubhostname}/{device_id}/?api-version=2020-05-31-preview&{user_agent}&digital-twin-model-id={model_id}
- *
- * @param[in] client The #az_iot_hub_client to use for this call.
- * @param[in] model_id A span with the model id of the device.
- * @param[out] mqtt_user_name A buffer with sufficient capacity to hold the MQTT user name.
- *                            If successful, contains a null-terminated string with the user name
- *                            that needs to be passed to the MQTT client.
- * @param[in] mqtt_user_name_size The size, in bytes of \p mqtt_user_name.
- * @param[out] out_mqtt_user_name_length __[nullable]__ Contains the string length, in bytes, of
- *                                                      \p mqtt_user_name. Can be `NULL`.
- * @return #az_result.
- */
-AZ_NODISCARD az_result az_iot_hub_client_get_user_name_with_model_id(
-    az_iot_hub_client const* client,
-    az_span model_id,
-    char* mqtt_user_name,
-    size_t mqtt_user_name_size,
-    size_t* out_mqtt_user_name_length);
-
-/**
  * @brief Gets the MQTT client id.
  *
  * The client id will be of the following format:
@@ -153,7 +144,7 @@ AZ_NODISCARD az_result az_iot_hub_client_get_user_name_with_model_id(
  */
 AZ_NODISCARD az_result az_iot_hub_client_get_client_id(
     az_iot_hub_client const* client,
-    char*  mqtt_client_id,
+    char* mqtt_client_id,
     size_t mqtt_client_id_size,
     size_t* out_mqtt_client_id_length);
 
@@ -173,7 +164,7 @@ AZ_NODISCARD az_result az_iot_hub_client_get_client_id(
  *
  * @remark More information available at
  * https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-devguide-security#security-tokens
- * 
+ *
  * @param[in] client The #az_iot_hub_client to use for this call.
  * @param[in] token_expiration_epoch_time The time, in seconds, from 1/1/1970.
  * @param[in] signature An empty #az_span with sufficient capacity to hold the SAS signature.
@@ -182,7 +173,7 @@ AZ_NODISCARD az_result az_iot_hub_client_get_client_id(
  */
 AZ_NODISCARD az_result az_iot_hub_client_sas_get_signature(
     az_iot_hub_client const* client,
-    uint32_t token_expiration_epoch_time,
+    uint64_t token_expiration_epoch_time,
     az_span signature,
     az_span* out_signature);
 
@@ -213,7 +204,7 @@ AZ_NODISCARD az_result az_iot_hub_client_sas_get_signature(
 AZ_NODISCARD az_result az_iot_hub_client_sas_get_password(
     az_iot_hub_client const* client,
     az_span base64_hmac_sha256_signature,
-    uint32_t token_expiration_epoch_time,
+    uint64_t token_expiration_epoch_time,
     az_span key_name,
     char* mqtt_password,
     size_t mqtt_password_size,
@@ -232,7 +223,7 @@ AZ_NODISCARD az_result az_iot_hub_client_sas_get_password(
  * @brief Telemetry or C2D properties.
  *
  */
-typedef struct az_iot_hub_client_properties
+typedef struct
 {
   struct
   {
@@ -291,8 +282,8 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_append(
 
 /**
  * @brief Finds the value of a property.
- * @remark This will return the first value of the property with the given name if multiple properties
- *       with the same key exist.
+ * @remark This will return the first value of the property with the given name if multiple
+ * properties with the same key exist.
  *
  * @param[in] properties The #az_iot_hub_client_properties to use for this call
  * @param[in] name The name of the property.
@@ -358,7 +349,7 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_get_publish_topic(
  * @brief The Cloud-To-Device Request.
  *
  */
-typedef struct az_iot_hub_client_c2d_request
+typedef struct
 {
   az_iot_hub_client_properties properties; /**< The properties associated with this C2D request. */
 } az_iot_hub_client_c2d_request;
@@ -394,7 +385,7 @@ AZ_NODISCARD az_result az_iot_hub_client_c2d_parse_received_topic(
  * @brief A method request received from IoT Hub.
  *
  */
-typedef struct az_iot_hub_client_method_request
+typedef struct
 {
   az_span request_id; /**< The request id.
                        * @note The application must match the method request and method response. */
@@ -472,7 +463,7 @@ typedef enum
  * @brief Twin response.
  *
  */
-typedef struct az_iot_hub_client_twin_response
+typedef struct
 {
   az_iot_hub_client_twin_response_type response_type; /**< Twin response type. */
   az_iot_status status; /**< The operation status. */

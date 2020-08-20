@@ -3,6 +3,7 @@
 
 #include "az_test_definitions.h"
 #include <azure/core/internal/az_span_internal.h>
+
 #include <az_test_precondition.h>
 
 #include <stdarg.h>
@@ -204,6 +205,42 @@ static void test_url_encode_basic(void** state)
     assert_true(az_span_is_content_equal(
         AZ_SPAN_FROM_BUFFER(buf20), AZ_SPAN_FROM_STR("AbC%2F%2F%2F********")));
   }
+  {
+    int32_t url_length = _az_span_url_encode_calc_length(AZ_SPAN_FROM_STR("aBc/g"));
+    assert_int_equal(url_length, sizeof("aBc%2Fg") - 1);
+  }
+  {
+    // Empty span
+    int32_t url_length = _az_span_url_encode_calc_length(AZ_SPAN_NULL);
+    assert_int_equal(url_length, 0);
+    url_length = _az_span_url_encode_calc_length(AZ_SPAN_FROM_STR(""));
+    assert_int_equal(url_length, 0);
+  }
+  {
+    // Nothing gets encoded
+    int32_t url_length = _az_span_url_encode_calc_length(AZ_SPAN_FROM_STR("123"));
+    assert_int_equal(url_length, 3);
+  }
+  {
+    // first last encoded
+    int32_t url_length = _az_span_url_encode_calc_length(AZ_SPAN_FROM_STR(" 123 "));
+    assert_int_equal(url_length, 9);
+  }
+  {
+    // every character is encoded
+    int32_t url_length = _az_span_url_encode_calc_length(AZ_SPAN_FROM_STR("   "));
+    assert_int_equal(url_length, 9);
+  }
+  {
+    // % character, which in itself is encoded as %25
+    int32_t url_length = _az_span_url_encode_calc_length(AZ_SPAN_FROM_STR("%"));
+    assert_int_equal(url_length, 3);
+  }
+  {
+    // a single length span with the \0 NULL character
+    int32_t url_length = _az_span_url_encode_calc_length(AZ_SPAN_FROM_STR("\0"));
+    assert_int_equal(url_length, 3);
+  }
 }
 
 #ifndef AZ_NO_PRECONDITION_CHECKING
@@ -229,7 +266,7 @@ static void test_url_encode_preconditions(void** state)
       assert_true(az_span_is_content_equal(buffer5, AZ_SPAN_FROM_STR("*****")));
     }
     {
-      // Ipnut is empty, so the output is also empty BUT the output span is null.
+      // Input is empty, so the output is also empty BUT the output span is null.
       int32_t url_length = 0xFF;
       assert_true(az_succeeded(_az_span_url_encode(AZ_SPAN_NULL, AZ_SPAN_NULL, &url_length)));
       assert_int_equal(url_length, 0);
@@ -336,6 +373,16 @@ static void test_url_encode_preconditions(void** state)
       az_span const buffer0 = az_span_slice(AZ_SPAN_FROM_BUFFER(buf1), 0, 0);
       ASSERT_PRECONDITION_CHECKED(_az_span_url_encode(buffer0, AZ_SPAN_NULL, NULL));
       assert_true(az_span_is_content_equal(AZ_SPAN_FROM_BUFFER(buf1), AZ_SPAN_FROM_STR("*")));
+    }
+    {
+      // precondition -> bigger than INT32_MAX / 3
+      az_span simulate_span = { ._internal = { .ptr = NULL, .size = INT32_MAX / 3 + 1 } };
+      ASSERT_PRECONDITION_CHECKED(_az_span_url_encode_calc_length(simulate_span));
+    }
+    {
+      // precondition -> less than 0
+      az_span simulate_span = { ._internal = { .ptr = NULL, .size = -1 } };
+      ASSERT_PRECONDITION_CHECKED(_az_span_url_encode_calc_length(simulate_span));
     }
   }
 #endif // AZ_NO_PRECONDITION_CHECKING

@@ -14,27 +14,12 @@
 
 // HTTP Response utility functions
 
-AZ_NODISCARD AZ_INLINE az_result _az_is_char(az_span slice, uint8_t c)
+AZ_NODISCARD AZ_INLINE bool _az_is_char(uint8_t actual, uint8_t expected)
 {
-  return az_span_ptr(slice)[0] == c ? AZ_OK : AZ_CONTINUE;
+  return actual == expected;
 }
 
-static AZ_NODISCARD az_result _az_valid_header_name_to_colon(az_span slice)
-{
-  az_result is_colon_result = _az_is_char(slice, ':');
-  if (is_colon_result == AZ_OK)
-  {
-    return is_colon_result;
-  }
-
-  if (!az_http_valid_token[az_span_ptr(slice)[0]])
-  {
-    return AZ_ERROR_HTTP_CORRUPT_RESPONSE_HEADER;
-  }
-
-  return is_colon_result;
-}
-static AZ_NODISCARD az_result _az_is_new_line(az_span slice) { return _az_is_char(slice, '\n'); }
+static AZ_NODISCARD bool _az_is_new_line(uint8_t next_byte) { return _az_is_char(next_byte, '\n'); }
 
 static AZ_NODISCARD bool _az_is_http_whitespace(uint8_t c)
 {
@@ -49,9 +34,9 @@ static AZ_NODISCARD bool _az_is_http_whitespace(uint8_t c)
   }
 }
 
-static AZ_NODISCARD az_result _az_slice_is_not_http_whitespace(az_span slice)
+static AZ_NODISCARD bool _az_slice_is_not_http_whitespace(uint8_t c)
 {
-  return _az_is_http_whitespace(az_span_ptr(slice)[0]) == true ? AZ_CONTINUE : AZ_OK;
+  return !_az_is_http_whitespace(c);
 }
 
 /* PRIVATE Function. parse next  */
@@ -61,7 +46,7 @@ static AZ_NODISCARD az_result _az_get_digit(az_span* ref_span, uint8_t* save_her
   uint8_t c_ptr = az_span_ptr(*ref_span)[0];
   if (!isdigit(c_ptr))
   {
-    return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
+    return AZ_ERROR_UNEXPECTED_CHAR;
   }
   //
   *save_here = (uint8_t)(c_ptr - '0');
@@ -98,7 +83,7 @@ _az_get_http_status_line(az_span* ref_span, az_http_response_status_line* out_st
   // status-code = 3DIGIT
   {
     uint64_t code = 0;
-    AZ_RETURN_IF_FAILED(az_span_atou64(az_span_init(az_span_ptr(*ref_span), 3), &code));
+    AZ_RETURN_IF_FAILED(az_span_atou64(az_span_create(az_span_ptr(*ref_span), 3), &code));
     out_status_line->status_code = (az_http_status_code)code;
     // move reader
     *ref_span = az_span_slice_to_end(*ref_span, 3);
@@ -130,7 +115,7 @@ AZ_NODISCARD az_result az_http_response_get_status_line(
   _az_PRECONDITION_NOT_NULL(ref_response);
   _az_PRECONDITION_NOT_NULL(out_status_line);
 
-  // Restart parser to the beggining
+  // Restart parser to the beginning
   ref_response->_internal.parser.remaining = ref_response->_internal.http_response;
 
   // read an HTTP status line.
@@ -186,18 +171,36 @@ az_http_response_get_next_header(az_http_response* ref_response, az_pair* out_he
     //         "_" / "`" / "|" / "~" / DIGIT / ALPHA;
     // any VCHAR,
     //    except delimiters
-    AZ_RETURN_IF_FAILED(
-        _az_span_scan_until(*reader, _az_valid_header_name_to_colon, &field_name_length));
+
+    int32_t input_size = az_span_size(*reader);
+    for (; field_name_length < input_size; ++field_name_length)
+    {
+      uint8_t next_byte = az_span_ptr(*reader)[field_name_length];
+      if (next_byte == ':')
+      {
+        break;
+      }
+      if (!az_http_valid_token[next_byte])
+      {
+        return AZ_ERROR_HTTP_CORRUPT_RESPONSE_HEADER;
+      }
+    }
+
+    if (field_name_length == input_size)
+    {
+      return AZ_ERROR_ITEM_NOT_FOUND;
+    }
 
     // form a header name. Reader is currently at char ':'
     out_header->key = az_span_slice(*reader, 0, field_name_length);
     // update reader to next position after colon (add one)
     *reader = az_span_slice_to_end(*reader, field_name_length + 1);
 
-    // Remove white spaces from header name https://github.com/Azure/azure-sdk-for-c/issues/604
-    out_header->key = _az_span_trim_white_space(out_header->key);
+    // Remove whitespace characters from header name
+    // https://github.com/Azure/azure-sdk-for-c/issues/604
+    out_header->key = _az_span_trim_whitespace(out_header->key);
 
-    // OWS -> remove the optional white spaces before header value
+    // OWS -> remove the optional whitespace characters before header value
     int32_t ows_len = 0;
     AZ_RETURN_IF_FAILED(_az_span_scan_until(*reader, _az_slice_is_not_http_whitespace, &ows_len));
     *reader = az_span_slice_to_end(*reader, ows_len);
@@ -224,11 +227,11 @@ az_http_response_get_next_header(az_http_response* ref_response, az_pair* out_he
       }
       if (_az_is_http_whitespace(c))
       {
-        continue; // white space or tab is accepted. It can be any number after value (OWS)
+        continue; // whitespace or tab is accepted. It can be any number after value (OWS)
       }
       if (c <= ' ')
       {
-        return AZ_ERROR_PARSER_UNEXPECTED_CHAR;
+        return AZ_ERROR_UNEXPECTED_CHAR;
       }
       offset_value_end = offset; // increasing index only for valid chars,
     }
@@ -236,8 +239,8 @@ az_http_response_get_next_header(az_http_response* ref_response, az_pair* out_he
     // moving reader. It is currently after \r was found
     *reader = az_span_slice_to_end(*reader, offset);
 
-    // Remove white spaces from value https://github.com/Azure/azure-sdk-for-c/issues/604
-    out_header->value = _az_span_trim_white_space_from_end(out_header->value);
+    // Remove whitespace characters from value https://github.com/Azure/azure-sdk-for-c/issues/604
+    out_header->value = _az_span_trim_whitespace_from_end(out_header->value);
   }
 
   AZ_RETURN_IF_FAILED(_az_is_expected_span(reader, AZ_SPAN_FROM_STR("\n")));

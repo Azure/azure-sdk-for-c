@@ -90,13 +90,12 @@ add_subdirectory(sdk/src/azure/storage)
 if(NOT DEFINED ENV{AZ_SDK_C_NO_SAMPLES})
   add_subdirectory(sdk/samples/storage/blobs)
   if(TRANSPORT_PAHO)
-    add_subdirectory(sdk/samples/iot/provisioning)
-    add_subdirectory(sdk/samples/iot/hub)
+    add_subdirectory(sdk/samples/iot)
   endif()
 endif()
 
 # default for Unit testing with cmocka is OFF, however, this will be ON on CI and tests must
-# pass before commiting changes
+# pass before committing changes
 if (UNIT_TESTING)
   # Core
   add_subdirectory(sdk/tests/core)
@@ -108,4 +107,17 @@ if (UNIT_TESTING)
 
   # Storage
   add_subdirectory(sdk/tests/storage/blobs)
+endif()
+
+# Fail generation when setting MOCKS ON without GCC
+if(UNIT_TESTING_MOCKS)
+  if(UNIT_TESTING)
+    if(NOT CMAKE_C_COMPILER_ID MATCHES "GNU")
+      # Fail generation when asking for MOCK without GCC
+      message(FATAL_ERROR "Unsupported Compiler Option.\nOption `UNIT_TESTING_MOCKS` is not supported on ${CMAKE_C_COMPILER_ID}. It is only supported by GNU gcc.\nRemove option `UNIT_TESTING_MOCKS` to build tests without using MOCK.")
+    endif()
+  else()
+    # Mention MOCK is ignored
+    message(WARNING "UNIT_TESTING_MOCKS will be ignored because UNIT_TESTING is not enabled.")
+  endif()
 endif()

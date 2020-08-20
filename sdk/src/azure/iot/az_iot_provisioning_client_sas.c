@@ -1,11 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <azure/iot/internal/az_iot_common_internal.h>
-#include <azure/iot/az_iot_provisioning_client.h>
 #include <azure/core/az_precondition.h>
 #include <azure/core/az_span.h>
 #include <azure/core/internal/az_span_internal.h>
+#include <azure/iot/az_iot_provisioning_client.h>
+#include <azure/iot/internal/az_iot_common_internal.h>
 
 #include <azure/core/internal/az_log_internal.h>
 #include <azure/core/internal/az_precondition_internal.h>
@@ -32,7 +32,7 @@ static const az_span se_string = AZ_SPAN_LITERAL_FROM_STR(SAS_TOKEN_SE);
 
 AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_signature(
     az_iot_provisioning_client const* client,
-    uint32_t token_expiration_epoch_time,
+    uint64_t token_expiration_epoch_time,
     az_span signature,
     az_span* out_signature)
 {
@@ -60,7 +60,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_signature(
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, 1 /* LF */);
   remainder = az_span_copy_u8(remainder, LF);
 
-  AZ_RETURN_IF_FAILED(az_span_u32toa(remainder, token_expiration_epoch_time, &remainder));
+  AZ_RETURN_IF_FAILED(az_span_u64toa(remainder, token_expiration_epoch_time, &remainder));
 
   *out_signature = az_span_slice(signature, 0, signature_size - az_span_size(remainder));
   _az_LOG_WRITE(AZ_LOG_IOT_SAS_TOKEN, *out_signature);
@@ -71,7 +71,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_signature(
 AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_password(
     az_iot_provisioning_client const* client,
     az_span base64_hmac_sha256_signature,
-    uint32_t token_expiration_epoch_time,
+    uint64_t token_expiration_epoch_time,
     az_span key_name,
     char* mqtt_password,
     size_t mqtt_password_size,
@@ -90,7 +90,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_password(
   // Where:
   // resource-string: <scope-id>/registrations/<registration-id>
 
-  az_span mqtt_password_span = az_span_init((uint8_t*)mqtt_password, (int32_t)mqtt_password_size);
+  az_span mqtt_password_span = az_span_create((uint8_t*)mqtt_password, (int32_t)mqtt_password_size);
 
   // SharedAccessSignature
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_password_span, az_span_size(sr_string) + 1 /* EQUAL SIGN */);
@@ -122,12 +122,12 @@ AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_password(
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(
       mqtt_password_span,
       1 /* AMPERSAND */ + az_span_size(se_string)
-          + 1 /* EQUAL_SIGN */ + _az_iot_u32toa_size(token_expiration_epoch_time));
+          + 1 /* EQUAL_SIGN */ + _az_iot_u64toa_size(token_expiration_epoch_time));
   mqtt_password_span = az_span_copy_u8(mqtt_password_span, AMPERSAND);
   mqtt_password_span = az_span_copy(mqtt_password_span, se_string);
   mqtt_password_span = az_span_copy_u8(mqtt_password_span, EQUAL_SIGN);
   AZ_RETURN_IF_FAILED(
-      az_span_u32toa(mqtt_password_span, token_expiration_epoch_time, &mqtt_password_span));
+      az_span_u64toa(mqtt_password_span, token_expiration_epoch_time, &mqtt_password_span));
 
   if (az_span_size(key_name) > 0)
   {

@@ -32,7 +32,7 @@
  * @brief Azure IoT Provisioning Client options.
  *
  */
-typedef struct az_iot_provisioning_client_options
+typedef struct
 {
   az_span user_agent; /**< The user-agent is a formatted string that will be used for Azure IoT
                          usage statistics. */
@@ -42,7 +42,7 @@ typedef struct az_iot_provisioning_client_options
  * @brief Azure IoT Provisioning Client.
  *
  */
-typedef struct az_iot_provisioning_client
+typedef struct
 {
   struct
   {
@@ -147,7 +147,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_get_client_id(
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_signature(
     az_iot_provisioning_client const* client,
-    uint32_t token_expiration_epoch_time,
+    uint64_t token_expiration_epoch_time,
     az_span signature,
     az_span* out_signature);
 
@@ -175,7 +175,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_signature(
 AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_password(
     az_iot_provisioning_client const* client,
     az_span base64_hmac_sha256_signature,
-    uint32_t token_expiration_epoch_time,
+    uint64_t token_expiration_epoch_time,
     az_span key_name,
     char* mqtt_password,
     size_t mqtt_password_size,
@@ -201,7 +201,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_password(
  * @remark This is returned only when the operation completed.
  *
  */
-typedef struct az_iot_provisioning_client_registration_result
+typedef struct
 {
   az_span assigned_hub_hostname; /**< Assigned Azure IoT Hub hostname. @remark This is only
                                     available if error_code is success. */
@@ -218,7 +218,7 @@ typedef struct az_iot_provisioning_client_registration_result
  * @brief Register or query operation response.
  *
  */
-typedef struct az_iot_provisioning_client_register_response
+typedef struct
 {
   az_iot_status status; /**< The current request status.
                          * @remark The authoritative response for the device registration operation
@@ -279,7 +279,7 @@ typedef enum
  *                     call to #az_iot_provisioning_client_parse_received_topic_and_payload.
  * @param[out] out_operation_status The registration operation status.
  * @return #az_result
- *         - #AZ_ERROR_PARSER_UNEXPECTED_CHAR if the string contains an unexpected value.
+ *         - #AZ_ERROR_UNEXPECTED_CHAR if the string contains an unexpected value.
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_parse_operation_status(
     az_iot_provisioning_client_register_response* response,

@@ -3,7 +3,7 @@
 
 cmake_minimum_required (VERSION 3.10)
 
-project (${TARGET_NAME} LANGUAGES C)
+project (az_iot LANGUAGES C)
 
 set(CMAKE_C_STANDARD 99)
 

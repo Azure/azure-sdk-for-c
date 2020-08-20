@@ -21,10 +21,10 @@
 
 enum
 {
-  AZ_HTTP_REQUEST_URL_BUF_SIZE = 2 * 1024, ///< Default maximum length a URL can have.
-  AZ_HTTP_REQUEST_BODY_BUF_SIZE = 1024, ///< Default maximum buffer size for an HTTP request body.
+  AZ_HTTP_REQUEST_URL_BUFFER_SIZE = 2 * 1024, ///< The maximum buffer size for a URL.
+  AZ_HTTP_REQUEST_BODY_BUFFER_SIZE = 1024, ///< The maximum buffer size for an HTTP request body.
 
-  AZ_LOG_MSG_BUF_SIZE = 1024, ///< The maximum size of a log message.
+  AZ_LOG_MESSAGE_BUFFER_SIZE = 1024, ///< The maximum buffer size for a log message.
 };
 
 #include <azure/core/_az_cfg_suffix.h>
