@@ -48,6 +48,8 @@ typedef struct
                          usage statistics. */
   az_span model_id; /**< The model id used to identify the capabilities of a device based on the
                        Digital Twin document */
+  az_span content_type; /**< Content type specified in MQTT topic of telemetry messages. MUST be URL encoded */
+  az_span content_encoding; /**< Content encoding specified in MQTT topic of telemetry messages */
 } az_iot_hub_client_options;
 
 /**

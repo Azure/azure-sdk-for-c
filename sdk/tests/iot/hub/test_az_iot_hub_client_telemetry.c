@@ -21,6 +21,8 @@
 static const az_span test_device_id = AZ_SPAN_LITERAL_FROM_STR("my_device");
 static const az_span test_device_hostname = AZ_SPAN_LITERAL_FROM_STR("myiothub.azure-devices.net");
 static const az_span test_module_id = AZ_SPAN_LITERAL_FROM_STR("my_module_id");
+static const az_span test_content_type = AZ_SPAN_LITERAL_FROM_STR("text%2Fplain");
+static const az_span test_content_encoding = AZ_SPAN_LITERAL_FROM_STR("utf8");
 static const az_span test_props = AZ_SPAN_LITERAL_FROM_STR("key=value&key_two=value2");
 
 static const char g_test_correct_topic_no_options_no_props[] = "devices/my_device/messages/events/";
@@ -29,6 +31,15 @@ static const char g_test_correct_topic_with_options_no_props[]
 static const char g_test_correct_topic_with_options_with_props[]
     = "devices/my_device/modules/my_module_id/messages/events/"
       "key=value&key_two=value2";
+static const char g_test_correct_topic_with_options_with_ct_and_ce_with_props[]
+    = "devices/my_device/modules/my_module_id/messages/events/"
+      "ct=text%2Fplain&ce=utf8&key=value&key_two=value2";
+static const char g_test_correct_topic_with_content_encoding_with_props[]
+    = "devices/my_device/modules/my_module_id/messages/events/"
+      "ce=utf8&key=value&key_two=value2";
+static const char g_test_correct_topic_with_content_type_with_props[]
+    = "devices/my_device/modules/my_module_id/messages/events/"
+      "ct=text%2Fplain&key=value&key_two=value2";
 static const char g_test_correct_topic_no_options_with_props[]
     = "devices/my_device/messages/events/"
       "key=value&key_two=value2";
@@ -153,6 +164,95 @@ static void test_az_iot_hub_client_telemetry_get_publish_topic_with_options_with
   assert_int_equal(sizeof(g_test_correct_topic_with_options_with_props) - 1, test_length);
 }
 
+static void test_az_iot_hub_client_telemetry_get_publish_topic_with_ct_and_ce_with_options_with_props_succeed(
+    void** state)
+{
+  (void)state;
+
+  az_iot_hub_client_options options = az_iot_hub_client_options_default();
+  options.module_id = test_module_id;
+  options.content_encoding = test_content_encoding;
+  options.content_type = test_content_type;
+
+  az_iot_hub_client client;
+  assert_int_equal(
+      az_iot_hub_client_init(&client, test_device_hostname, test_device_id, &options), AZ_OK);
+
+  az_iot_hub_client_properties props;
+  assert_int_equal(
+      az_iot_hub_client_properties_init(&props, test_props, az_span_size(test_props)), AZ_OK);
+
+  char test_buf[TEST_SPAN_BUFFER_SIZE];
+  size_t test_length;
+
+  assert_true(
+      az_iot_hub_client_telemetry_get_publish_topic(
+          &client, &props, test_buf, sizeof(test_buf), &test_length)
+      == AZ_OK);
+
+  assert_string_equal(g_test_correct_topic_with_options_with_ct_and_ce_with_props, test_buf);
+  assert_int_equal(sizeof(g_test_correct_topic_with_options_with_ct_and_ce_with_props) - 1, test_length);
+}
+
+static void
+test_az_iot_hub_client_telemetry_get_publish_topic_with_content_encoding_with_props_succeed(
+    void** state)
+{
+  (void)state;
+
+  az_iot_hub_client_options options = az_iot_hub_client_options_default();
+  options.module_id = test_module_id;
+  options.content_encoding = test_content_encoding;
+
+  az_iot_hub_client client;
+  assert_int_equal(
+      az_iot_hub_client_init(&client, test_device_hostname, test_device_id, &options), AZ_OK);
+
+  az_iot_hub_client_properties props;
+  assert_int_equal(
+      az_iot_hub_client_properties_init(&props, test_props, az_span_size(test_props)), AZ_OK);
+
+  char test_buf[TEST_SPAN_BUFFER_SIZE];
+  size_t test_length;
+
+  assert_true(
+      az_iot_hub_client_telemetry_get_publish_topic(
+          &client, &props, test_buf, sizeof(test_buf), &test_length)
+      == AZ_OK);
+
+  assert_string_equal(g_test_correct_topic_with_content_encoding_with_props, test_buf);
+  assert_int_equal(sizeof(g_test_correct_topic_with_content_encoding_with_props) - 1, test_length);
+}
+
+static void test_az_iot_hub_client_telemetry_get_publish_topic_with_content_type_with_props_succeed(
+    void** state)
+{
+  (void)state;
+
+  az_iot_hub_client_options options = az_iot_hub_client_options_default();
+  options.module_id = test_module_id;
+  options.content_type = test_content_type;
+
+  az_iot_hub_client client;
+  assert_int_equal(
+      az_iot_hub_client_init(&client, test_device_hostname, test_device_id, &options), AZ_OK);
+
+  az_iot_hub_client_properties props;
+  assert_int_equal(
+      az_iot_hub_client_properties_init(&props, test_props, az_span_size(test_props)), AZ_OK);
+
+  char test_buf[TEST_SPAN_BUFFER_SIZE];
+  size_t test_length;
+
+  assert_true(
+      az_iot_hub_client_telemetry_get_publish_topic(
+          &client, &props, test_buf, sizeof(test_buf), &test_length)
+      == AZ_OK);
+
+  assert_string_equal(g_test_correct_topic_with_content_type_with_props, test_buf);
+  assert_int_equal(sizeof(g_test_correct_topic_with_content_type_with_props) - 1, test_length);
+}
+
 static void test_az_iot_hub_client_telemetry_get_publish_topic_with_props_unfilled_succeed(
     void** state)
 {
@@ -198,6 +298,8 @@ test_az_iot_hub_client_telemetry_get_publish_topic_with_options_with_props_small
 
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.module_id = test_module_id;
+  options.content_encoding = test_content_encoding;
+  options.content_type = test_content_type;
 
   az_iot_hub_client client;
   assert_int_equal(
@@ -207,7 +309,7 @@ test_az_iot_hub_client_telemetry_get_publish_topic_with_options_with_props_small
   assert_int_equal(
       az_iot_hub_client_properties_init(&props, test_props, az_span_size(test_props)), AZ_OK);
 
-  char test_buf[sizeof(g_test_correct_topic_with_options_with_props) - 2];
+  char test_buf[sizeof(g_test_correct_topic_with_options_with_ct_and_ce_with_props) - 2];
   size_t test_length;
 
   assert_true(
@@ -337,6 +439,12 @@ int test_az_iot_hub_client_telemetry()
         test_az_iot_hub_client_telemetry_get_publish_topic_with_options_no_props_succeed),
     cmocka_unit_test(
         test_az_iot_hub_client_telemetry_get_publish_topic_with_options_with_props_succeed),
+    cmocka_unit_test(
+        test_az_iot_hub_client_telemetry_get_publish_topic_with_ct_and_ce_with_options_with_props_succeed),
+    cmocka_unit_test(
+        test_az_iot_hub_client_telemetry_get_publish_topic_with_content_encoding_with_props_succeed),
+    cmocka_unit_test(
+        test_az_iot_hub_client_telemetry_get_publish_topic_with_content_type_with_props_succeed),
     cmocka_unit_test(
         test_az_iot_hub_client_telemetry_get_publish_topic_with_props_unfilled_succeed),
     cmocka_unit_test(
