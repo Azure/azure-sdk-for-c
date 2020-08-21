@@ -24,7 +24,9 @@
 
 #include <azure/core/_az_cfg_prefix.h>
 
-/// @brief Defines symbols for the various kinds of JSON tokens that make up any JSON text.
+/**
+ * @brief Defines symbols for the various kinds of JSON tokens that make up any JSON text.
+ */
 typedef enum
 {
   AZ_JSON_TOKEN_NONE, ///< There is no value (as distinct from #AZ_JSON_TOKEN_NULL).
@@ -40,7 +42,9 @@ typedef enum
   AZ_JSON_TOKEN_NULL, ///< The token kind is the JSON literal `null`.
 } az_json_token_kind;
 
-/// @brief A limited stack used by the #az_json_writer to track state information for validation.
+/**
+ * @brief A limited stack used by the #az_json_writer to track state information for validation.
+ */
 typedef struct
 {
   struct
@@ -233,7 +237,9 @@ AZ_NODISCARD bool az_json_token_is_text_equal(
 
 /************************************ JSON WRITER ******************/
 
-/// @brief Allows the user to define custom behavior when writing JSON using the #az_json_writer.
+/**
+ * @brief Allows the user to define custom behavior when writing JSON using the #az_json_writer.
+ */
 typedef struct
 {
   struct
@@ -509,7 +515,9 @@ AZ_NODISCARD az_result az_json_writer_append_end_array(az_json_writer* ref_json_
 
 /************************************ JSON READER ******************/
 
-/// @brief Allows the user to define custom behavior when reading JSON using the #az_json_reader.
+/**
+ * @brief Allows the user to define custom behavior when reading JSON using the #az_json_reader.
+ */
 typedef struct
 {
   struct

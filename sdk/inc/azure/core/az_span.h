@@ -75,7 +75,9 @@ AZ_NODISCARD AZ_INLINE az_span az_span_create(uint8_t* ptr, int32_t size)
 AZ_NODISCARD az_span az_span_create(uint8_t* ptr, int32_t size);
 #endif // AZ_NO_PRECONDITION_CHECKING
 
-/// @brief An empty #az_span.
+/**
+ * @brief An empty #az_span with `NULL` buffer pointer.
+ */
 // When updating this macro, also update AZ_PAIR_NULL, which should be using this macro, but can't
 // due to warnings, and so it is using an expansion of this macro instead.
 #define AZ_SPAN_NULL \
@@ -533,7 +535,9 @@ typedef struct
   az_span value; ///< Value.
 } az_pair;
 
-/// @brief An #az_pair instance whose key and value fields are initialized to #AZ_SPAN_NULL.
+/**
+ * @brief An #az_pair instance whose key and value fields are initialized to #AZ_SPAN_NULL.
+ */
 #define AZ_PAIR_NULL \
   (az_pair) \
   { \
