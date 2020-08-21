@@ -63,46 +63,59 @@ az_http_request_append_path(az_http_request* ref_request, az_span path, bool is_
 {
   _az_PRECONDITION_NOT_NULL(ref_request);
 
-  // get the query starting point.
-  bool url_with_question_mark = ref_request->_internal.query_start > 0;
-  int32_t query_start = url_with_question_mark ? ref_request->_internal.query_start - 1
-                                               : ref_request->_internal.url_length;
+  int32_t const path_size
+      = is_path_url_encoded ? az_span_size(path) : _az_span_url_encode_calc_length(path);
 
-  /* use replace twice. Yes, we will have 2 right shift (one on each replace), but we rely on
-   * replace function for doing this movements only and avoid updating manually. We could also
-   * create a temp buffer to join "/" and path and then use replace. But that will cost us more
-   * stack memory.
-   */
-  AZ_RETURN_IF_FAILED(_az_span_replace(
-      ref_request->_internal.url,
-      ref_request->_internal.url_length,
-      query_start,
-      query_start,
-      AZ_SPAN_FROM_STR("/"),
-      false,
-      NULL));
-  query_start += 1; // a size of "/"
-  ++ref_request->_internal.url_length;
-
-  int32_t path_size = az_span_size(path);
-  AZ_RETURN_IF_FAILED(_az_span_replace(
-      ref_request->_internal.url,
-      ref_request->_internal.url_length,
-      query_start,
-      query_start,
-      path,
-      !is_path_url_encoded,
-      &path_size));
-
-  query_start += path_size;
-  ref_request->_internal.url_length += path_size;
-
-  // update query start
-  if (url_with_question_mark)
+  // Add 1 for the /.
+  int32_t const size_after_insert = ref_request->_internal.url_length + 1 + path_size;
+  if (az_span_size(ref_request->_internal.url) < size_after_insert)
   {
-    ref_request->_internal.query_start = query_start + 1;
+    return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
   }
 
+  int32_t query_start = 0;
+
+  // There is an existing query parameter (i.e. URL with a question mark).
+  if (ref_request->_internal.query_start > 0)
+  {
+    // We are appending in the middle of the URL, so, we will need to shift some existing content to
+    // the right.
+    query_start = ref_request->_internal.query_start - 1;
+
+    // Get the span where to move the content, leaving enough room for the path and /.
+    az_span shifted_dst
+        = az_span_slice_to_end(ref_request->_internal.url, query_start + 1 + path_size);
+    // Get the span slice needed to be moved before appending the path.
+    az_span shifted_src
+        = az_span_slice(ref_request->_internal.url, query_start, ref_request->_internal.url_length);
+    // Move content left or right so there is room for path to be added.
+    az_span_copy(shifted_dst, shifted_src);
+
+    // Move past the /, path, and ? since that will be the new start of the next query.
+    ref_request->_internal.query_start = query_start + 2 + path_size;
+  }
+  else
+  {
+    // We are appending at the end of the URL, no need to shift.
+    query_start = ref_request->_internal.url_length;
+  }
+
+  // Add the path delimiter.
+  az_span_copy_u8(az_span_slice_to_end(ref_request->_internal.url, query_start), '/');
+
+  // Account for the '/' we just added and copy the path, after URL encoding it if necessary.
+  az_span destination = az_span_slice_to_end(ref_request->_internal.url, query_start + 1);
+  if (!is_path_url_encoded)
+  {
+    int32_t ignored = 0;
+    AZ_RETURN_IF_FAILED(_az_span_url_encode(destination, path, &ignored));
+  }
+  else
+  {
+    az_span_copy(destination, path);
+  }
+
+  ref_request->_internal.url_length = size_after_insert;
   return AZ_OK;
 }
 
