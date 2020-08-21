@@ -779,7 +779,7 @@ az_json_writer_append_json_text(az_json_writer* json_writer, az_span json_text)
   // comma before appending subsequent tokens.
   // However, there is no valid, complete, single JSON value where the last token would be property
   // name, or start object/array.
-  // Therefore, need_comma must be true after apending the json_text.
+  // Therefore, need_comma must be true after appending the json_text.
 
   // We already tracked and updated bytes_written while writing, so no need to update it here.
   _az_update_json_writer_state(json_writer, 0, az_span_size(json_text), true, last_token_kind);
