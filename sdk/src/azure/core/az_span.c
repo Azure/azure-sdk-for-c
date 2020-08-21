@@ -803,26 +803,6 @@ AZ_NODISCARD az_result _az_is_expected_span(az_span* ref_span, az_span expected)
   return AZ_OK;
 }
 
-// PRIVATE. read until condition is true on character.
-// Then return number of positions read with output parameter
-AZ_NODISCARD az_result
-_az_span_scan_until(az_span span, _az_predicate predicate, int32_t* out_index)
-{
-  int32_t size = az_span_size(span);
-  uint8_t* ptr = az_span_ptr(span);
-  for (int32_t index = 0; index < size; ++index)
-  {
-    uint8_t next_byte = ptr[index];
-    if (predicate(next_byte))
-    {
-      *out_index = index;
-      return AZ_OK;
-    }
-  }
-  *out_index = size;
-  return AZ_ERROR_ITEM_NOT_FOUND;
-}
-
 AZ_NODISCARD az_span _az_span_trim_whitespace(az_span source)
 {
   // Trim from end after trim from start

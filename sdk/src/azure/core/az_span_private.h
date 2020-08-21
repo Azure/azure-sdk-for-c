@@ -48,13 +48,6 @@ AZ_NODISCARD AZ_INLINE bool _az_isfinite(double value)
   return ((binary_value & 0x7FF0000000000000) != 0x7FF0000000000000);
 }
 
-typedef bool (*_az_predicate)(uint8_t next_byte);
-
-// PRIVATE. read until condition is true on character.
-// Then return number of positions read with output parameter
-AZ_NODISCARD az_result
-_az_span_scan_until(az_span span, _az_predicate predicate, int32_t* out_index);
-
 AZ_NODISCARD az_result _az_is_expected_span(az_span* ref_span, az_span expected);
 
 /**

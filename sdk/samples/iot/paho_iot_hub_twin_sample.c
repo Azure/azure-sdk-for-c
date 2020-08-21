@@ -33,9 +33,8 @@
 static const az_span twin_document_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("get_twin");
 static const az_span twin_patch_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("reported_prop");
 static const az_span version_name = AZ_SPAN_LITERAL_FROM_STR("$version");
-static az_span reported_property_name = AZ_SPAN_LITERAL_FROM_STR("device_count");
+static const az_span reported_property_name = AZ_SPAN_LITERAL_FROM_STR("device_count");
 static int32_t reported_property_value = 0;
-static char reported_property_buffer[128];
 
 static iot_sample_environment_variables env_vars;
 static az_iot_hub_client hub_client;
@@ -187,8 +186,7 @@ static void connect_mqtt_client_to_iot_hub(void)
 
   MQTTClient_SSLOptions mqtt_ssl_options = MQTTClient_SSLOptions_initializer;
   mqtt_ssl_options.keyStore = (char*)az_span_ptr(env_vars.x509_cert_pem_file_path);
-  if (*az_span_ptr(env_vars.x509_trust_pem_file_path)
-      != '\0') // Should only be set if required by OS.
+  if (az_span_size(env_vars.x509_trust_pem_file_path) != 0) // Is only set if required by OS.
   {
     mqtt_ssl_options.trustStore = (char*)az_span_ptr(env_vars.x509_trust_pem_file_path);
   }
@@ -218,7 +216,7 @@ static void subscribe_mqtt_client_to_iot_hub_topics(void)
     exit(rc);
   }
 
-  // Messages received on Response topic will be response statuses from the server.
+  // Messages received on Twin Response topic will be response statuses from the server.
   if ((rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_SUBSCRIBE_TOPIC, 1))
       != MQTTCLIENT_SUCCESS)
   {
@@ -231,16 +229,16 @@ static void get_device_twin_document(void)
 {
   int rc;
 
-  LOG("Client requesting twin document from service.");
+  LOG("Client requesting device twin document from service.");
 
   // Get the Twin Document topic to publish the twin document request.
-  char twin_document_topic[128];
+  char twin_document_topic_buffer[128];
   if (az_failed(
           rc = az_iot_hub_client_twin_document_get_publish_topic(
               &hub_client,
               twin_document_topic_request_id,
-              twin_document_topic,
-              sizeof(twin_document_topic),
+              twin_document_topic_buffer,
+              sizeof(twin_document_topic_buffer),
               NULL)))
   {
     LOG_ERROR("Failed to get Twin Document publish topic: az_result return code 0x%04x.", rc);
@@ -248,7 +246,7 @@ static void get_device_twin_document(void)
   }
 
   // Publish the twin document request.
-  if ((rc = MQTTClient_publish(mqtt_client, twin_document_topic, 0, NULL, 0, 0, NULL))
+  if ((rc = MQTTClient_publish(mqtt_client, twin_document_topic_buffer, 0, NULL, 0, 0, NULL))
       != MQTTCLIENT_SUCCESS)
   {
     LOG_ERROR("Failed to publish twin document request: MQTTClient return code %d.", rc);
@@ -266,13 +264,13 @@ static void send_reported_property(void)
   LOG("Client sending reported property to service.");
 
   // Get the Twin Patch topic to send a reported property update.
-  char twin_patch_topic[128];
+  char twin_patch_topic_buffer[128];
   if (az_failed(
           rc = az_iot_hub_client_twin_patch_get_publish_topic(
               &hub_client,
               twin_patch_topic_request_id,
-              twin_patch_topic,
-              sizeof(twin_patch_topic),
+              twin_patch_topic_buffer,
+              sizeof(twin_patch_topic_buffer),
               NULL)))
   {
     LOG_ERROR("Failed to get Twin Patch publish topic: az_result return code 0x%04x.", rc);
@@ -280,17 +278,18 @@ static void send_reported_property(void)
   }
 
   // Build the updated reported property message.
-  az_span reported_property_payload = AZ_SPAN_FROM_BUFFER(reported_property_buffer);
+  char reported_property_payload_buffer[128];
+  az_span reported_property_payload = AZ_SPAN_FROM_BUFFER(reported_property_payload_buffer);
   if (az_failed(rc = build_reported_property(reported_property_payload, &reported_property_payload)))
   {
-    LOG_ERROR("Failed to build reported property payload to send: az_result return code 0x%04x.", rc);
+    LOG_ERROR("Failed to build reported property payload: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
   // Publish the reported property update.
   if ((rc = MQTTClient_publish(
            mqtt_client,
-           twin_patch_topic,
+           twin_patch_topic_buffer,
            az_span_size(reported_property_payload),
            az_span_ptr(reported_property_payload),
            0,
@@ -349,7 +348,7 @@ static void receive_device_twin_message(void)
   }
   else if (message == NULL)
   {
-    LOG_ERROR("Timeout expired: MQTTClient return code %d.", rc);
+    LOG_ERROR("Receive message timeout expired: MQTTClient return code %d.", rc);
     exit(rc);
   }
   else if (rc == MQTTCLIENT_TOPICNAME_TRUNCATED)
@@ -447,11 +446,7 @@ static az_result update_property(az_span desired_payload)
   // Update property locally if found.
   while (json_reader.token.kind != AZ_JSON_TOKEN_END_OBJECT)
   {
-    if (az_json_token_is_text_equal(&json_reader.token, version_name))
-    {
-      break; // Desired property not found in payload.
-    }
-    else if (az_json_token_is_text_equal(&json_reader.token, reported_property_name))
+    if (az_json_token_is_text_equal(&json_reader.token, reported_property_name))
     {
       // Move to the value token and store value.
       AZ_RETURN_IF_FAILED(az_json_reader_next_token(&json_reader));
@@ -463,6 +458,10 @@ static az_result update_property(az_span desired_payload)
           reported_property_value);
 
       return AZ_OK;
+    }
+    else if (az_json_token_is_text_equal(&json_reader.token, version_name))
+    {
+      break; // Desired property not found in payload.
     }
     else
     {

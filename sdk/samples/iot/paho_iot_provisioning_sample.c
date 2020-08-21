@@ -161,8 +161,7 @@ static void connect_mqtt_client_to_provisioning_service(void)
 
   MQTTClient_SSLOptions mqtt_ssl_options = MQTTClient_SSLOptions_initializer;
   mqtt_ssl_options.keyStore = (char*)az_span_ptr(env_vars.x509_cert_pem_file_path);
-  if (*az_span_ptr(env_vars.x509_trust_pem_file_path)
-      != '\0') // Should only be set if required by OS.
+  if (az_span_size(env_vars.x509_trust_pem_file_path) != 0) // Is only set if required by OS.
   {
     mqtt_ssl_options.trustStore = (char*)az_span_ptr(env_vars.x509_trust_pem_file_path);
   }
