@@ -88,7 +88,8 @@ static AZ_NODISCARD az_span _get_remaining_span(az_json_writer* json_writer, int
   return remaining;
 }
 
-#ifndef AZ_NO_PRECONDITION_CHECKING
+// This validation method is used outside of just preconditions, within
+// az_json_writer_append_json_text.
 static AZ_NODISCARD bool _az_is_appending_value_valid(az_json_writer* json_writer)
 {
   _az_PRECONDITION_NOT_NULL(json_writer);
@@ -131,6 +132,7 @@ static AZ_NODISCARD bool _az_is_appending_value_valid(az_json_writer* json_write
   return true;
 }
 
+#ifndef AZ_NO_PRECONDITION_CHECKING
 static AZ_NODISCARD bool _az_is_appending_property_name_valid(az_json_writer* json_writer)
 {
   _az_PRECONDITION_NOT_NULL(json_writer);
@@ -725,10 +727,13 @@ static AZ_NODISCARD az_result _az_validate_json(
   AZ_RETURN_IF_FAILED(az_json_reader_next_token(&reader));
 
   // This is guaranteed not to be a property name or end object/array.
-  // The  first token of a valid JSON must either be a value or start object/array.
+  // The first token of a valid JSON must either be a value or start object/array.
   *first_token_kind = reader.token.kind;
 
   AZ_RETURN_IF_FAILED(az_json_reader_skip_children(&reader));
+
+  // This is guaranteed not to be a property name or start object/array.
+  // The last token of a valid JSON must either be a value or end object/array.
   *last_token_kind = reader.token.kind;
 
   return AZ_OK;
@@ -748,26 +753,16 @@ az_json_writer_append_json_text(az_json_writer* json_writer, az_span json_text)
   // This cannot be caught at dev time by a precondition, especially since they can be turned off.
   AZ_RETURN_IF_FAILED(_az_validate_json(json_text, &first_token_kind, &last_token_kind));
 
+  // It is guaranteed that first_token_kind is NOT:
+  // AZ_JSON_TOKEN_NONE, AZ_JSON_TOKEN_END_ARRAY, AZ_JSON_TOKEN_END_OBJECT,
+  // AZ_JSON_TOKEN_PROPERTY_NAME
+  // And that last_token_kind is NOT:
+  // AZ_JSON_TOKEN_NONE, AZ_JSON_TOKEN_START_ARRAY, AZ_JSON_TOKEN_START_OBJECT,
+  // AZ_JSON_TOKEN_PROPERTY_NAME
+
   // The JSON text is valid, but appending it to the the JSON writer at the current state still may
   // not be valid.
-  if (first_token_kind == AZ_JSON_TOKEN_END_ARRAY
-      && !_az_is_appending_container_end_valid(json_writer, ']'))
-  {
-    return AZ_ERROR_JSON_INVALID_STATE;
-  }
-  else if (
-      first_token_kind == AZ_JSON_TOKEN_END_OBJECT
-      && !_az_is_appending_container_end_valid(json_writer, '}'))
-  {
-    return AZ_ERROR_JSON_INVALID_STATE;
-  }
-  else if (
-      first_token_kind == AZ_JSON_TOKEN_PROPERTY_NAME
-      && !_az_is_appending_property_name_valid(json_writer))
-  {
-    return AZ_ERROR_JSON_INVALID_STATE;
-  }
-  else if (!_az_is_appending_value_valid(json_writer))
+  if (!_az_is_appending_value_valid(json_writer))
   {
     // All other tokens, including start array and object are validated here.
     // Also first_token_kind cannot be AZ_JSON_TOKEN_NONE at this point.
@@ -782,13 +777,12 @@ az_json_writer_append_json_text(az_json_writer* json_writer, az_span json_text)
   // We only need to add a comma if the last token we append is a value or end of object/array.
   // If the last token is a property name or the start of an object/array, we don't need to add a
   // comma before appending subsequent tokens.
-  bool need_comma = !(
-      last_token_kind == AZ_JSON_TOKEN_PROPERTY_NAME || last_token_kind == AZ_JSON_TOKEN_BEGIN_ARRAY
-      || last_token_kind == AZ_JSON_TOKEN_BEGIN_OBJECT);
+  // However, there is no valid, complete, single JSON value where the last token would be property
+  // name, or start object/array.
+  // Therefore, need_comma must be true after apending the json_text.
 
   // We already tracked and updated bytes_written while writing, so no need to update it here.
-  _az_update_json_writer_state(
-      json_writer, 0, az_span_size(json_text), need_comma, last_token_kind);
+  _az_update_json_writer_state(json_writer, 0, az_span_size(json_text), true, last_token_kind);
   return AZ_OK;
 }
 
