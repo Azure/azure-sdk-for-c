@@ -369,7 +369,7 @@ AZ_NODISCARD az_result az_json_writer_append_string(az_json_writer* json_writer,
  * is. No modifications are made to this text, including escaping.
  *
  * @remarks A single, possibly nested, JSON value is one that starts and ends with {} or [] or is a
- * single primitive value. The JSON cannot start with an end object or array, or a property name, or
+ * single primitive token. The JSON cannot start with an end object or array, or a property name, or
  * be incomplete.
  *
  * @remarks The caller must make sure that the JSON to be appended provided by \p json_text is valid
