@@ -66,7 +66,7 @@ enum
 //   - 0..15 Code.
 
 /**
- * @brief The type represents success and error conditions.
+ * @brief The type represents the various success and error conditions.
  */
 typedef enum
 {
