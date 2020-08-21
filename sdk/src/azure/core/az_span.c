@@ -583,10 +583,7 @@ AZ_NODISCARD az_result _az_span_replace(
   int32_t const replaced_size = end - start;
   int32_t const size_after_replace = current_size - replaced_size + replacement_size;
 
-  if (url_encode)
-  {
-    _az_PRECONDITION_NOT_NULL(out_url_encode_size);
-  }
+  _az_PRECONDITION(!url_encode || (url_encode && out_url_encode_size != NULL));
 
   // Start and end position must be within the destination span and be positive.
   // Start position must be less or equal than end position.
