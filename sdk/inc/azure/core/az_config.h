@@ -4,9 +4,10 @@
 /**
  * @file
  *
- * @brief Configurable constants used by the Azure SDK. Typically, these constants are correct as is
- * but depending on how your application uses an Azure service, the constants may need to be
- * adjusted.
+ * @brief Configurable constants used by the Azure SDK.
+ *
+ * Typically, these constants do not need to be modified but depending on how your application uses
+ * an Azure service, they can be adjusted.
  *
  * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
  * prefixed with an underscore ('_') directly in your application code. These symbols

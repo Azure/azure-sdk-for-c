@@ -26,18 +26,21 @@
 
 #include <azure/core/_az_cfg_prefix.h>
 
-/// @brief Defines the possible HTTP status codes.
+/**
+ * @brief Defines the possible HTTP status codes.
+ */
 typedef enum
 {
-  AZ_HTTP_STATUS_CODE_NONE = 0, ///< No HTTP status code.
+  /// No HTTP status code.
+  AZ_HTTP_STATUS_CODE_NONE = 0,
 
-  // 1xx (information) Status Codes:
+  // === 1xx (information) Status Codes: ===
   AZ_HTTP_STATUS_CODE_CONTINUE = 100, ///< HTTP 100 Continue.
   AZ_HTTP_STATUS_CODE_SWITCHING_PROTOCOLS = 101, ///< HTTP 101 Switching Protocols.
   AZ_HTTP_STATUS_CODE_PROCESSING = 102, ///< HTTP 102 Processing.
   AZ_HTTP_STATUS_CODE_EARLY_HINTS = 103, ///< HTTP 103 Early Hints.
 
-  // 2xx (successful) Status Codes:
+  // === 2xx (successful) Status Codes: ===
   AZ_HTTP_STATUS_CODE_OK = 200, ///< HTTP 200 OK.
   AZ_HTTP_STATUS_CODE_CREATED = 201, ///< HTTP 201 Created.
   AZ_HTTP_STATUS_CODE_ACCEPTED = 202, ///< HTTP 202 Accepted.
@@ -50,7 +53,7 @@ typedef enum
   AZ_HTTP_STATUS_CODE_ALREADY_REPORTED = 208, ///< HTTP 208 Already Reported.
   AZ_HTTP_STATUS_CODE_IM_USED = 226, ///< HTTP 226 IM Used.
 
-  // 3xx (redirection) Status Codes:
+  // === 3xx (redirection) Status Codes: ===
   AZ_HTTP_STATUS_CODE_MULTIPLE_CHOICES = 300, ///< HTTP 300 Multiple Choices.
   AZ_HTTP_STATUS_CODE_MOVED_PERMANENTLY = 301, ///< HTTP 301 Moved Permanently.
   AZ_HTTP_STATUS_CODE_FOUND = 302, ///< HTTP 302 Found.
@@ -60,7 +63,7 @@ typedef enum
   AZ_HTTP_STATUS_CODE_TEMPORARY_REDIRECT = 307, ///< HTTP 307 Temporary Redirect.
   AZ_HTTP_STATUS_CODE_PERMANENT_REDIRECT = 308, ///< HTTP 308 Permanent Redirect.
 
-  // 4xx (client error) Status Codes:
+  // === 4xx (client error) Status Codes: ===
   AZ_HTTP_STATUS_CODE_BAD_REQUEST = 400, ///< HTTP 400 Bad Request.
   AZ_HTTP_STATUS_CODE_UNAUTHORIZED = 401, ///< HTTP 401 Unauthorized.
   AZ_HTTP_STATUS_CODE_PAYMENT_REQUIRED = 402, ///< HTTP 402 Payment Required.
@@ -93,7 +96,7 @@ typedef enum
   AZ_HTTP_STATUS_CODE_UNAVAILABLE_FOR_LEGAL_REASONS
   = 451, ///< HTTP 451 Unavailable For Legal Reasons.
 
-  // 5xx (server error) Status Codes:
+  // === 5xx (server error) Status Codes: ===
   AZ_HTTP_STATUS_CODE_INTERNAL_SERVER_ERROR = 500, ///< HTTP 500 Internal Server Error.
   AZ_HTTP_STATUS_CODE_NOT_IMPLEMENTED = 501, ///< HTTP 501 Not Implemented.
   AZ_HTTP_STATUS_CODE_BAD_GATEWAY = 502, ///< HTTP 502 Bad Gateway.
@@ -107,8 +110,8 @@ typedef enum
   AZ_HTTP_STATUS_CODE_NETWORK_AUTHENTICATION_REQUIRED
   = 511, ///< HTTP 511 Network Authentication Required.
 
-  AZ_HTTP_STATUS_CODE_END_OF_LIST
-  = -1, ///< Used in #az_http_policy_retry_options to indicate the end of the list.
+  /// Used in #az_http_policy_retry_options to indicate the end of the list.
+  AZ_HTTP_STATUS_CODE_END_OF_LIST = -1,
 } az_http_status_code;
 
 /**
@@ -216,7 +219,8 @@ typedef struct
  * @param[out] out_status_line The pointer to an #az_http_response_status_line structure to be
  * filled in by this function.
  *
- * @retval #AZ_OK Inline code is parsed and returned.
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK Response status line was parsed to \p out_status_line.
  * @retval other HTTP response was not parsed.
  */
 AZ_NODISCARD az_result az_http_response_get_status_line(
@@ -226,6 +230,7 @@ AZ_NODISCARD az_result az_http_response_get_status_line(
 /**
  * @brief Returns the next HTTP response header.
  *
+ * @details
  * When called right after #az_http_response_get_status_line(), this function returns the first
  * header. When called after calling #az_http_response_get_next_header(), this function returns the
  * next header.
@@ -233,9 +238,10 @@ AZ_NODISCARD az_result az_http_response_get_status_line(
  * If called after parsing HTTP body or before parsing status line, this function
  * will return #AZ_ERROR_HTTP_INVALID_STATE.
  *
- * @param[in,out] ref_response A pointer to an az_http_response instance.
+ * @param[in,out] ref_response A pointer to an #az_http_response instance.
  * @param[out] out_header A pointer to an az_pair to receive the header's key and value.
  *
+ * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK A header was returned.
  * @retval #AZ_ERROR_ITEM_NOT_FOUND There are no more headers.
  * @retval #AZ_ERROR_HTTP_INVALID_STATE The #az_http_response instance is in an invalid state.
@@ -247,9 +253,10 @@ az_http_response_get_next_header(az_http_response* ref_response, az_pair* out_he
 /**
  * @brief Returns a span over the HTTP body within an HTTP response.
  *
- * @param[in,out] ref_response A pointer to an az_http_response instance.
+ * @param[in,out] ref_response A pointer to an #az_http_response instance.
  * @param[out] out_body A pointer to an az_span to receive the HTTP response's body.
  *
+ * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK An #az_span over the response body was returned.
  * @retval other Error while trying to read and parse body.
  */

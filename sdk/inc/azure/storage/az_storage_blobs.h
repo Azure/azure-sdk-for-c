@@ -138,7 +138,7 @@ az_storage_blobs_blob_upload_options_default()
  */
 AZ_NODISCARD az_result az_storage_blobs_blob_upload(
     az_storage_blobs_blob_client* client,
-    az_span content, /* Buffer of content*/
+    az_span content,
     az_storage_blobs_blob_upload_options const* options,
     az_http_response* ref_response);
 

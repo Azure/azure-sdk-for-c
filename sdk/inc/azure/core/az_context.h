@@ -129,6 +129,7 @@ AZ_NODISCARD AZ_INLINE bool az_context_has_expired(az_context const* context, in
  * @param[out] out_value A pointer to a `void const*` that will receive the key's associated value
  * if the key is found.
  *
+ * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK if the key is found.
  * @retval #AZ_ERROR_ITEM_NOT_FOUND if no nodes are found with the specified key.
  */

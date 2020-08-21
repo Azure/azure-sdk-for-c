@@ -115,6 +115,7 @@ az_span az_json_token_copy_into_span(az_json_token const* json_token, az_span de
  * @param[in] json_token A pointer to an #az_json_token instance.
  * @param[out] out_value A pointer to a variable to receive the value.
  *
+ * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The boolean value is returned.
  * @retval #AZ_ERROR_JSON_INVALID_STATE The kind is not #AZ_JSON_TOKEN_BOOLEAN.
  */
@@ -126,6 +127,7 @@ AZ_NODISCARD az_result az_json_token_get_boolean(az_json_token const* json_token
  * @param[in] json_token A pointer to an #az_json_token instance.
  * @param[out] out_value A pointer to a variable to receive the value.
  *
+ * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The number is returned.
  * @retval #AZ_ERROR_JSON_INVALID_STATE The kind is not #AZ_JSON_TOKEN_NUMBER.
  * @retval #AZ_ERROR_UNEXPECTED_CHAR A non-ASCII digit is found within the \p json_token or \p
@@ -140,6 +142,7 @@ az_json_token_get_uint64(az_json_token const* json_token, uint64_t* out_value);
  * @param[in] json_token A pointer to an #az_json_token instance.
  * @param[out] out_value A pointer to a variable to receive the value.
  *
+ * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The number is returned.
  * @retval #AZ_ERROR_JSON_INVALID_STATE The kind is not #AZ_JSON_TOKEN_NUMBER.
  * @retval #AZ_ERROR_UNEXPECTED_CHAR A non-ASCII digit is found within the token or if it contains a
@@ -154,6 +157,7 @@ az_json_token_get_uint32(az_json_token const* json_token, uint32_t* out_value);
  * @param[in] json_token A pointer to an #az_json_token instance.
  * @param[out] out_value A pointer to a variable to receive the value.
  *
+ * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The number is returned.
  * @retval #AZ_ERROR_JSON_INVALID_STATE The kind is not #AZ_JSON_TOKEN_NUMBER.
  * @retval #AZ_ERROR_UNEXPECTED_CHAR A non-ASCII digit is found within the token or if it contains
@@ -167,6 +171,7 @@ AZ_NODISCARD az_result az_json_token_get_int64(az_json_token const* json_token, 
  * @param[in] json_token A pointer to an #az_json_token instance.
  * @param[out] out_value A pointer to a variable to receive the value.
  *
+ * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The number is returned.
  * @retval #AZ_ERROR_JSON_INVALID_STATE The kind is not #AZ_JSON_TOKEN_NUMBER.
  * @retval #AZ_ERROR_UNEXPECTED_CHAR A non-ASCII digit is found within the token or if it contains a
@@ -180,6 +185,7 @@ AZ_NODISCARD az_result az_json_token_get_int32(az_json_token const* json_token, 
  * @param[in] json_token A pointer to an #az_json_token instance.
  * @param[out] out_value A pointer to a variable to receive the value.
  *
+ * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The number is returned.
  * @retval #AZ_ERROR_JSON_INVALID_STATE The kind is not #AZ_JSON_TOKEN_NUMBER.
  * @retval #AZ_ERROR_UNEXPECTED_CHAR The resulting \p out_value wouldn't be a finite double number.
@@ -197,6 +203,7 @@ AZ_NODISCARD az_result az_json_token_get_double(az_json_token const* json_token,
  * destination which denote the length of the unescaped string. If `NULL` is passed, the parameter
  * is ignored.
  *
+ * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The string is returned.
  * @retval #AZ_ERROR_JSON_INVALID_STATE The kind is not #AZ_JSON_TOKEN_STRING.
  * @retval #AZ_ERROR_INSUFFICIENT_SPAN_SIZE \p destination does not have enough size.
@@ -618,6 +625,7 @@ AZ_NODISCARD az_result az_json_reader_chunked_init(
  * @param[in,out] ref_json_reader A pointer to an #az_json_reader instance containing the JSON to
  * read.
  *
+ * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The token was read successfully.
  * @retval #AZ_ERROR_UNEXPECTED_END The end of the JSON document is reached.
  * @retval #AZ_ERROR_UNEXPECTED_CHAR An invalid character is detected.
@@ -631,6 +639,7 @@ AZ_NODISCARD az_result az_json_reader_next_token(az_json_reader* ref_json_reader
  * @param[in,out] ref_json_reader A pointer to an #az_json_reader instance containing the JSON to
  * read.
  *
+ * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The children of the current JSON token are skipped successfully.
  * @retval #AZ_ERROR_UNEXPECTED_END The end of the JSON document is reached.
  * @retval #AZ_ERROR_UNEXPECTED_CHAR An invalid character is detected.

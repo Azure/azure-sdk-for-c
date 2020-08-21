@@ -59,8 +59,8 @@ AZ_NODISCARD AZ_INLINE int32_t az_span_size(az_span span) { return span._interna
 /**
  * @brief Returns an #az_span over a byte buffer.
  *
- * @param[in] ptr Memory address of the first byte in the byte buffer.
- * @param[in] size Total number of bytes in the byte buffer.
+ * @param[in] ptr The memory address of the first byte in the byte buffer.
+ * @param[in] size The total number of bytes in the byte buffer.
  *
  * @return The "view" over the byte buffer.
  */
@@ -252,8 +252,8 @@ void az_span_to_str(char* destination, int32_t destination_max_size, az_span sou
  *
  * @return The position of \p target in \p source if \p source contains the \p target within it.
  * @retval 0 \p target is empty (if its size is equal zero).
- * @retval -1 \p source is empty (if its size is equal zero) and \p target is non-empty.
- * @retval -1 \p target is not found in `source`.
+ * @retval -1 \p target is not found in `source` OR \p source is empty (if its size is zero) and \p
+ * target is non-empty.
  * @retval other The position of \p target in \p source.
  */
 AZ_NODISCARD int32_t az_span_find(az_span source, az_span target);
@@ -514,7 +514,7 @@ typedef struct
  * This method must never return an empty #az_span, unless the requested buffer size is not
  * available. In which case, it must return an error #az_result.
  *
- * @remarks The caller must check the return value using #az_succeeded before continuing to use
+ * @remarks The caller must check the return value using #az_succeeded() before continuing to use
  * the \p out_next_destination.
  */
 typedef az_result (*az_span_allocator_fn)(

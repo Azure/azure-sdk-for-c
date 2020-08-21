@@ -4,8 +4,8 @@
 /**
  * @file
  *
- * @brief Spinlock structure. Do not include this file directly. This file may get removed in the
- * future versions of the SDK.
+ * @brief Spinlock structure, used for thread-safe access.
+ * Do not include this file directly.
  *
  * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
  * prefixed with an underscore ('_') directly in your application code. These symbols

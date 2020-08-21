@@ -27,7 +27,9 @@
 
 #include <azure/core/_az_cfg_prefix.h>
 
-/// @brief Equivalent to no credential (NULL).
+/**
+ * @brief Equivalent to no credential (NULL).
+ */
 #define AZ_CREDENTIAL_ANONYMOUS NULL
 
 enum
@@ -35,8 +37,9 @@ enum
   _az_TOKEN_BUFFER_SIZE = 2 * 1024,
 };
 
-// Definition of an auth token. It is used by the auth policy from http pipeline as part of a
-// provided credential. User should not access `_internal` field.
+/**
+ * @brief Authentication token.
+ */
 typedef struct
 {
   struct
@@ -44,14 +47,15 @@ typedef struct
     int64_t expires_at_msec;
     int16_t token_length;
 
-    // Base64-encoded token
+    /// Base64-encoded token.
     uint8_t token[_az_TOKEN_BUFFER_SIZE];
   } _internal;
 } _az_token;
 
-// Definition of token credential. Token credential pairs token with the thread-safety lock. Users
-// should not access the token directly, without first using the corresponding thread-safe get and
-// set functions which update or get the copy of a token. User should not access `_internal` field.
+/**
+ * @brief Token credential.
+ * Token credential pairs authentication token with the thread-safety lock.
+ */
 typedef struct
 {
   struct
@@ -61,18 +65,24 @@ typedef struct
   } _internal;
 } _az_credential_token;
 
-// Function callback definition as a contract to be implemented for a credential to set credential
-// scopes when the credential supports it.
+/**
+ * @brief Function callback definition as a contract to be implemented for a credential to set
+ * authentication scopes when it is supported by the type of the credential.
+ */
 typedef AZ_NODISCARD az_result (*_az_credential_set_scopes_fn)(void* credential, az_span scopes);
 
-// Credential definition. It is used internally to authenticate an SDK client with Azure. All types
-// of credentials must contain this structure as their first member.
+/**
+ * @brief Credential definition. It is used internally to authenticate an SDK client with Azure. All
+ * types of credentials must contain this structure as their first member.
+ */
 typedef struct
 {
   struct
   {
     _az_http_policy_process_fn apply_credential_policy;
-    _az_credential_set_scopes_fn set_scopes; // NULL if this credential doesn't support scopes.
+
+    /// If the credential doesn't support scopes, this function pointer is `NULL`.
+    _az_credential_set_scopes_fn set_scopes;
   } _internal;
 } _az_credential;
 
@@ -84,7 +94,9 @@ typedef struct
 {
   struct
   {
-    _az_credential credential; // must be the first field in every credential structure
+    /// Must be the first field in every credential structure.
+    _az_credential credential;
+
     _az_credential_token token_credential;
     az_span tenant_id;
     az_span client_id;
