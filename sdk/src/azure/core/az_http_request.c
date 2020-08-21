@@ -30,7 +30,7 @@ AZ_NODISCARD az_result az_http_request_init(
   _az_PRECONDITION_VALID_SPAN(headers_buffer, 0, false);
 
   int32_t query_start = 0;
-  uint8_t* ptr = az_span_ptr(url);
+  uint8_t const* const ptr = az_span_ptr(url);
   for (; query_start < url_length; ++query_start)
   {
     uint8_t next_byte = ptr[query_start];

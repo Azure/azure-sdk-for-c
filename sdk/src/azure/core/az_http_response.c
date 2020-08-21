@@ -86,7 +86,7 @@ _az_get_http_status_line(az_span* ref_span, az_http_response_status_line* out_st
   // VCHAR or obs-text is %x21-FF,
   int32_t offset = 0;
   int32_t input_size = az_span_size(*ref_span);
-  uint8_t* ptr = az_span_ptr(*ref_span);
+  uint8_t const* const ptr = az_span_ptr(*ref_span);
   for (; offset < input_size; ++offset)
   {
     uint8_t next_byte = ptr[offset];
@@ -174,7 +174,7 @@ az_http_response_get_next_header(az_http_response* ref_response, az_pair* out_he
     //    except delimiters
     int32_t field_name_length = 0;
     int32_t input_size = az_span_size(*reader);
-    uint8_t* ptr = az_span_ptr(*reader);
+    uint8_t const* const ptr = az_span_ptr(*reader);
     for (; field_name_length < input_size; ++field_name_length)
     {
       uint8_t next_byte = ptr[field_name_length];
@@ -204,10 +204,10 @@ az_http_response_get_next_header(az_http_response* ref_response, az_pair* out_he
     // OWS -> remove the optional whitespace characters before header value
     int32_t ows_len = 0;
     input_size = az_span_size(*reader);
-    ptr = az_span_ptr(*reader);
+    uint8_t const* const ptr_space = az_span_ptr(*reader);
     for (; ows_len < input_size; ++ows_len)
     {
-      uint8_t next_byte = ptr[ows_len];
+      uint8_t next_byte = ptr_space[ows_len];
       if (next_byte != ' ' && next_byte != '\t')
       {
         break;
