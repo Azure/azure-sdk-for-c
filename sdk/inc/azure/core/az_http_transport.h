@@ -47,7 +47,7 @@ typedef az_span _az_http_request_headers;
 /**
  * @brief Structure used to represent an HTTP request.
  * It contains an HTTP method, URL, headers and body. It also contains
- * another utility variables. User should never access `_internal` field directly.
+ * another utility variables.
  */
 typedef struct
 {
@@ -71,7 +71,7 @@ typedef struct
 typedef struct _az_http_policy _az_http_policy;
 
 // @brief Defines the callback signature of a policy process which should receive an
-// #_az_http_policy, options reference (as `void*`), an #az_http_request and #az_http_response.
+// #_az_http_policy, options reference (as `void*`), an #az_http_request and an #az_http_response.
 //
 // `void*` is used as polymorphic solution for any policy. Each policy implementation would know the
 // specific pointer type to cast options to.
