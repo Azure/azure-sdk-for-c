@@ -301,11 +301,13 @@ cd vcpkg
 
 If you previously installed VCPKG and dependencies, you may need to run `.\vcpkg.exe upgrade --no-dry-run` to upgrade to the latest packages.
 
+> Note: Setting up a development environment in windows without VCPKG is not supported. It requires installing all dev-dependencies globally and manually setting cmake files to link each of them.
+
 Follow next steps to build project from command prompt:
 
 ```bash
 # cd to project folder
-cd azure_sdk_for_c
+cd azure-sdk-for-c
 # create a new folder to generate cmake files for building (i.e. build)
 mkdir build
 cd build
@@ -359,7 +361,7 @@ Alternatively, for Ubuntu 18.04 you can use:
 
 ```bash
 # cd to project folder
-cd azure_sdk_for_c
+cd azure-sdk-for-c
 # create a new folder to generate cmake files for building (i.e. build)
 mkdir build
 cd build
@@ -410,7 +412,7 @@ If you previously installed VCPKG and dependencies, you may need to run `./vcpkg
 
 ```bash
 # cd to project folder
-cd azure_sdk_for_c
+cd azure-sdk-for-c
 # create a new folder to generate cmake files for building (i.e. build)
 mkdir build
 cd build

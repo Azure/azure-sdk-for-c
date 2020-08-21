@@ -965,7 +965,7 @@ static void test_az_iot_hub_client_properties_next_empty_succeed(void** state)
   assert_int_equal(az_iot_hub_client_properties_next(&props, &pair_out), AZ_ERROR_UNEXPECTED_END);
 }
 
-int test_iot_hub_client()
+int test_az_iot_hub_client()
 {
 #ifndef AZ_NO_PRECONDITION_CHECKING
   SETUP_PRECONDITION_CHECK_TESTS();

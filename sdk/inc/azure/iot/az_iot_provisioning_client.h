@@ -32,7 +32,7 @@
  * @brief Azure IoT Provisioning Client options.
  *
  */
-typedef struct az_iot_provisioning_client_options
+typedef struct
 {
   az_span user_agent; /**< The user-agent is a formatted string that will be used for Azure IoT
                          usage statistics. */
@@ -42,7 +42,7 @@ typedef struct az_iot_provisioning_client_options
  * @brief Azure IoT Provisioning Client.
  *
  */
-typedef struct az_iot_provisioning_client
+typedef struct
 {
   struct
   {
@@ -201,7 +201,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_password(
  * @remark This is returned only when the operation completed.
  *
  */
-typedef struct az_iot_provisioning_client_registration_result
+typedef struct
 {
   az_span assigned_hub_hostname; /**< Assigned Azure IoT Hub hostname. @remark This is only
                                     available if error_code is success. */
@@ -218,7 +218,7 @@ typedef struct az_iot_provisioning_client_registration_result
  * @brief Register or query operation response.
  *
  */
-typedef struct az_iot_provisioning_client_register_response
+typedef struct
 {
   az_iot_status status; /**< The current request status.
                          * @remark The authoritative response for the device registration operation

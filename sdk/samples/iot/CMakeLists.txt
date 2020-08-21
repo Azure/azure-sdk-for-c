@@ -21,16 +21,8 @@ endif()
 
 # Azure IoT Samples Library
 add_library (az_iot_samples_common
-  ${CMAKE_CURRENT_LIST_DIR}/sample_sas_utility.c
+  ${CMAKE_CURRENT_LIST_DIR}/iot_samples_common.c
 )
-
-# Workaround for linker warning LNK4098: defaultlib 'LIBCMTD' conflicts with use of other libs
-if (MSVC)
-    set_target_properties(az_iot_samples_common
-        PROPERTIES LINK_FLAGS
-        "/NODEFAULTLIB:libcmtd.lib"
-    )
-endif()
 
 # Internal deps
 target_link_libraries(az_iot_samples_common
@@ -46,6 +38,14 @@ target_link_libraries(az_iot_samples_common
     OpenSSL::SSL
     OpenSSL::Crypto
 )
+
+# Workaround for linker warning LNK4098: defaultlib 'LIBCMTD' conflicts with use of other libs
+if (MSVC)
+    set_target_properties(az_iot_samples_common
+        PROPERTIES LINK_FLAGS
+        "/NODEFAULTLIB:libcmtd.lib"
+    )
+endif()
 
 add_library (az::iot::samples::common ALIAS az_iot_samples_common)
 
