@@ -106,7 +106,7 @@ $(function () {
     if (WINDOW_CONTENTS[WINDOW_CONTENTS.length - 1] != 'index.html') {
         console.log("Run PopulateList")
 
-        $('article.content > h1').each(function () {
+        $('article.content > h3').each(function () {
             var pkgName = $(this).text()
             populateIndexList($(this), pkgName)
         })

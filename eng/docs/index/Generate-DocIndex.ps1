@@ -39,6 +39,7 @@ foreach ($ServiceKey in $ServiceMapping.Keys | Sort-Object)
 
     Add-Content -Path "$($YmlPath)/$($ServiceKey).md" -Value "# Client"
     Add-Content -Path "$($YmlPath)/$($ServiceKey).md" -Value "---"
+    Add-Content -Path "$($YmlPath)/$($ServiceKey).md" -Value "### Azure SDK for Embedded C"
     Write-Verbose "Operating on Client Packages for $($ServiceKey)"
 }
 
