@@ -130,8 +130,8 @@ AZ_NODISCARD AZ_INLINE bool az_context_has_expired(az_context const* context, in
  * if the key is found.
  *
  * @return An #az_result value indicating the result of the operation.
- * @retval #AZ_OK if the key is found.
- * @retval #AZ_ERROR_ITEM_NOT_FOUND if no nodes are found with the specified key.
+ * @retval #AZ_OK The key is found.
+ * @retval #AZ_ERROR_ITEM_NOT_FOUND No nodes are found with the specified key.
  */
 AZ_NODISCARD az_result
 az_context_get_value(az_context const* context, void const* key, void const** out_value);
