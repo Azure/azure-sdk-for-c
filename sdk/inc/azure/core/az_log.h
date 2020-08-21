@@ -8,8 +8,8 @@
  * SDK client library log messages.
  *
  * If you define the `AZ_NO_LOGGING` symbol when compiling the SDK code (or adding option
- * `-DLOGGING=OFF` with cmake), all of the Azure SDK logging checking will be excluded making the
- * binary code smaller and faster.
+ * `-DLOGGING=OFF` with cmake), all of the Azure SDK logging functionality will be excluded making
+ * the binary code smaller and faster.
  *
  * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
  * prefixed with an underscore ('_') directly in your application code. These symbols
@@ -31,8 +31,7 @@
   ((int32_t)((uint32_t)(facility) << 16) | (uint32_t)(code))
 
 /**
- * @brief Identifies the classifications of log messages that the Azure SDK Core or Azure SDK client
- * libraries produce.
+ * @brief Identifies the classifications of log messages produced by the SDK.
  */
 typedef enum
 {
@@ -75,7 +74,9 @@ typedef void (*az_log_message_fn)(az_log_classification classification, az_span 
 
 /**
  * @brief Allows the application to specify which #az_log_classification types it is interested in
- * receiving. If no classifications are set (`NULL`), the application will receive log messages for
+ * receiving.
+ *
+ * @details If no classifications are set (`NULL`), the application will receive log messages for
  * all #az_log_classification values.
  *
  * @param[in] classifications __[nullable]__ An array of az_log_classification values, terminated by
@@ -91,12 +92,12 @@ AZ_INLINE void az_log_set_classifications(az_log_classification const classifica
 #endif // AZ_NO_LOGGING
 
 /**
- * @brief Sets the function that will be invoked to report an Azure SDK Core or client library log
- * message.
+ * @brief Sets the function that will be invoked to report an SDK log message.
  *
  * @param[in] az_log_message_callback __[nullable]__ A pointer to the function that will be invoked
  * when an Azure SDK Core or an Azure SDK client library reports a log message matching one of the
- * #az_log_classification passed to #az_log_set_classifications().
+ * #az_log_classification passed to #az_log_set_classifications(). If `NULL`, no function will be
+ * invoked.
  */
 #ifndef AZ_NO_LOGGING
 void az_log_set_callback(az_log_message_fn az_log_message_callback);

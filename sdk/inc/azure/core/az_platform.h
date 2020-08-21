@@ -46,7 +46,7 @@ void az_platform_sleep_msec(int32_t milliseconds);
 /**
  * @brief Conditionally exchanges values of two pointers in a thread-safe manner.
  *
- * @param[in,out] ref_obj A pointer to a pointer that needs to be changed.
+ * @param[in,out] ref_obj A pointer to a `volatile` pointer that needs to be changed.
  * @param[in] expected An expected value of a value that \p obj is pointing to, prior to exchange.
  * @param[in] desired A value to assign to the value that is pointed by \p obj, if its value equals
  * to \p expected.

@@ -28,7 +28,9 @@
 
 #include <azure/core/_az_cfg_prefix.h>
 
-/// Client is fixed to a specific version of the Azure Storage Blobs service.
+/**
+ * @brief Client is fixed to a specific version of the Azure Storage Blobs service.
+ */
 static az_span const AZ_STORAGE_API_VERSION = AZ_SPAN_LITERAL_FROM_STR("2019-02-02");
 
 /**

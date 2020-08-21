@@ -28,7 +28,7 @@
 #include <azure/core/_az_cfg_prefix.h>
 
 /**
- * @brief Equivalent to no credential (NULL).
+ * @brief Equivalent to no credential (`NULL`).
  */
 #define AZ_CREDENTIAL_ANONYMOUS NULL
 
@@ -55,6 +55,10 @@ typedef struct
 /**
  * @brief Token credential.
  * Token credential pairs authentication token with the thread-safety lock.
+ *
+ * @remark
+ * Users should not access the token directly, without first using the corresponding thread-safe get
+ * and set functions which update or get the copy of a token.
  */
 typedef struct
 {

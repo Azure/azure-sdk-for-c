@@ -256,7 +256,7 @@ void az_span_to_str(char* destination, int32_t destination_max_size, az_span sou
  * @retval 0 \p target is empty (if its size is equal zero).
  * @retval -1 \p target is not found in `source` OR \p source is empty (if its size is zero) and \p
  * target is non-empty.
- * @retval other The position of \p target in \p source.
+ * @retval >0 The position of \p target in \p source.
  */
 AZ_NODISCARD int32_t az_span_find(az_span source, az_span target);
 

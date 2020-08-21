@@ -105,8 +105,7 @@ typedef enum
 
   // === JSON error codes ===
 
-  /// The kind of the token being read is not compatible with the type of the value attempted being
-  /// read.
+  /// The kind of the token being read is not compatible with the expected type of the value.
   AZ_ERROR_JSON_INVALID_STATE = _az_RESULT_MAKE_ERROR(_az_FACILITY_JSON, 1),
 
   /// The JSON depth is too large.
