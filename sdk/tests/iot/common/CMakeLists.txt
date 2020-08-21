@@ -27,4 +27,3 @@ add_cmocka_test(az_iot_common_test SOURCES
                     az_core
                     ${PAL}                
                 )
-

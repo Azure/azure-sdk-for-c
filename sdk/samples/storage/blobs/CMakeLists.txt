@@ -24,7 +24,6 @@ else()
     add_link_options(-Xlinker -Map=blobs_client_example.map)
 endif()
 
-
 # make keys client example
 add_executable (blobs_client_example src/blobs_client_example.c)
 
