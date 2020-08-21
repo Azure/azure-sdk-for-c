@@ -198,17 +198,18 @@ AZ_NODISCARD az_result az_http_request_init(
  * For instance, if url in request is `http://example.net?qp=1` and this function is called with
  * path equals to `test`, then request url will be updated to `http://example.net/test?qp=1`.
  *
- * @remarks If \p is_url_encoded is set to false, before appending the path, it would be
+ * @remarks If \p is_path_url_encoded is set to false, before appending the path, it would be
  * url-encoded.
  *
  *
  * @param[out] ref_request A reference to an HTTP request.
  * @param[in] path The #az_span to a path to be appended into the URL.
- * @param[in] is_url_encoded The boolean value that defines if the value to be appended is
+ * @param[in] is_path_url_encoded The boolean value that defines if the value to be appended is
  * url-encoded or not.
  * @return An #az_result value indicating the result of the operation:
  *         - #AZ_OK if successful
- *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the \p path wouldn't fit into the URL buffer provided.
+ *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the \p path wouldn't fit into the URL buffer
+ * provided.
  */
 AZ_NODISCARD az_result
 az_http_request_append_path(az_http_request* ref_request, az_span path, bool is_path_url_encoded);
