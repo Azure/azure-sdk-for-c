@@ -35,49 +35,29 @@ az_result sample_pnp_device_info_get_report_data(
     const az_iot_hub_client* client,
     sample_pnp_mqtt_message* mqtt_message)
 {
-  az_json_writer json_writer;
-  AZ_RETURN_IF_FAILED(az_json_writer_init(&json_writer, mqtt_message->payload_span, NULL));
+  az_json_writer jw;
+  AZ_RETURN_IF_FAILED(az_json_writer_init(&jw, mqtt_message->payload_span, NULL));
 
-  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&json_writer));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(
-      &json_writer, sample_pnp_device_info_manufacturer_property_name));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_string(
-      &json_writer, sample_pnp_device_info_manufacturer_property_value));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(
-      &json_writer, sample_pnp_device_info_model_property_name));
-  AZ_RETURN_IF_FAILED(
-      az_json_writer_append_string(&json_writer, sample_pnp_device_info_model_property_value));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(
-      &json_writer, sample_pnp_device_info_software_version_property_name));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_string(
-      &json_writer, sample_pnp_device_info_software_version_property_value));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(
-      &json_writer, sample_pnp_device_info_os_name_property_name));
-  AZ_RETURN_IF_FAILED(
-      az_json_writer_append_string(&json_writer, sample_pnp_device_info_os_name_property_value));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(
-      &json_writer, sample_pnp_device_info_processor_architecture_property_name));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_string(
-      &json_writer, sample_pnp_device_info_processor_architecture_property_value));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(
-      &json_writer, sample_pnp_device_info_processor_manufacturer_property_name));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_string(
-      &json_writer, sample_pnp_device_info_processor_manufacturer_property_value));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(
-      &json_writer, sample_pnp_device_info_total_storage_property_name));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_double(
-      &json_writer,
-      sample_pnp_device_info_total_storage_property_value,
-      DOUBLE_DECIMAL_PLACE_DIGITS));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(
-      &json_writer, sample_pnp_device_info_total_memory_property_name));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_double(
-      &json_writer,
-      sample_pnp_device_info_total_memory_property_value,
-      DOUBLE_DECIMAL_PLACE_DIGITS));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&json_writer));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, sample_pnp_device_info_manufacturer_property_name));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_string(&jw, sample_pnp_device_info_manufacturer_property_value));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, sample_pnp_device_info_model_property_name));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_string(&jw, sample_pnp_device_info_model_property_value));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, sample_pnp_device_info_software_version_property_name));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_string(&jw, sample_pnp_device_info_software_version_property_value));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, sample_pnp_device_info_os_name_property_name));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_string(&jw, sample_pnp_device_info_os_name_property_value));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, sample_pnp_device_info_processor_architecture_property_name));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_string(&jw, sample_pnp_device_info_processor_architecture_property_value));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, sample_pnp_device_info_processor_manufacturer_property_name));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_string(&jw, sample_pnp_device_info_processor_manufacturer_property_value));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, sample_pnp_device_info_total_storage_property_name));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_double(&jw, sample_pnp_device_info_total_storage_property_value, DOUBLE_DECIMAL_PLACE_DIGITS));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, sample_pnp_device_info_total_memory_property_name));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_double(&jw, sample_pnp_device_info_total_memory_property_value, DOUBLE_DECIMAL_PLACE_DIGITS));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
 
-  mqtt_message->out_payload_span = az_json_writer_get_bytes_used_in_destination(&json_writer);
+  mqtt_message->out_payload_span = az_json_writer_get_bytes_used_in_destination(&jw);
 
   AZ_RETURN_IF_FAILED(az_iot_hub_client_twin_patch_get_publish_topic(
       client,

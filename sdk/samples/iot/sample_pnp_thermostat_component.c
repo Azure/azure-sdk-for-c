@@ -57,26 +57,26 @@ static az_result build_command_response_payload(
       / thermostat_component->device_temperature_avg_count;
 
   // Build the command response payload
-  az_json_writer json_builder;
-  AZ_RETURN_IF_FAILED(az_json_writer_init(&json_builder, payload, NULL));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&json_builder));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&json_builder, report_max_temp_name_span));
+  az_json_writer jw;
+  AZ_RETURN_IF_FAILED(az_json_writer_init(&jw, payload, NULL));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, report_max_temp_name_span));
   AZ_RETURN_IF_FAILED(az_json_writer_append_double(
-      &json_builder, thermostat_component->max_temperature, DOUBLE_DECIMAL_PLACE_DIGITS));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&json_builder, report_min_temp_name_span));
+      &jw, thermostat_component->max_temperature, DOUBLE_DECIMAL_PLACE_DIGITS));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, report_min_temp_name_span));
   AZ_RETURN_IF_FAILED(az_json_writer_append_double(
-      &json_builder, thermostat_component->min_temperature, DOUBLE_DECIMAL_PLACE_DIGITS));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&json_builder, report_avg_temp_name_span));
+      &jw, thermostat_component->min_temperature, DOUBLE_DECIMAL_PLACE_DIGITS));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, report_avg_temp_name_span));
   AZ_RETURN_IF_FAILED(
-      az_json_writer_append_double(&json_builder, avg_temp, DOUBLE_DECIMAL_PLACE_DIGITS));
+      az_json_writer_append_double(&jw, avg_temp, DOUBLE_DECIMAL_PLACE_DIGITS));
   AZ_RETURN_IF_FAILED(
-      az_json_writer_append_property_name(&json_builder, report_start_time_name_span));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_string(&json_builder, start_time_span));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&json_builder, report_end_time_name_span));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_string(&json_builder, end_time_span));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&json_builder));
+      az_json_writer_append_property_name(&jw, report_start_time_name_span));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_string(&jw, start_time_span));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, report_end_time_name_span));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_string(&jw, end_time_span));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
 
-  *out_payload = az_json_writer_get_bytes_used_in_destination(&json_builder);
+  *out_payload = az_json_writer_get_bytes_used_in_destination(&jw);
 
   return AZ_OK;
 }
@@ -86,14 +86,14 @@ static az_result build_telemetry_message(
     az_span payload,
     az_span* out_payload)
 {
-  az_json_writer json_builder;
-  AZ_RETURN_IF_FAILED(az_json_writer_init(&json_builder, payload, NULL));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&json_builder));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&json_builder, telemetry_name));
+  az_json_writer jw;
+  AZ_RETURN_IF_FAILED(az_json_writer_init(&jw, payload, NULL));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, telemetry_name));
   AZ_RETURN_IF_FAILED(az_json_writer_append_double(
-      &json_builder, thermostat_component->current_temperature, DOUBLE_DECIMAL_PLACE_DIGITS));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&json_builder));
-  *out_payload = az_json_writer_get_bytes_used_in_destination(&json_builder);
+      &jw, thermostat_component->current_temperature, DOUBLE_DECIMAL_PLACE_DIGITS));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
+  *out_payload = az_json_writer_get_bytes_used_in_destination(&jw);
 
   return AZ_OK;
 }
@@ -109,12 +109,12 @@ static az_result invoke_getMaxMinReport(
   // az_result result;
   // Parse the "since" field in the payload.
   az_span start_time_span = AZ_SPAN_NULL;
-  az_json_reader jp;
-  AZ_RETURN_IF_FAILED(az_json_reader_init(&jp, payload, NULL));
-  AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jp));
+  az_json_reader jr;
+  AZ_RETURN_IF_FAILED(az_json_reader_init(&jr, payload, NULL));
+  AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
   int32_t incoming_since_value_buffer_len;
   AZ_RETURN_IF_FAILED(az_json_token_get_string(
-      &jp.token,
+      &jr.token,
       incoming_since_value_buffer,
       sizeof(incoming_since_value_buffer),
       &incoming_since_value_buffer_len));
@@ -142,11 +142,11 @@ static az_result invoke_getMaxMinReport(
   return AZ_OK;
 }
 
-static az_result append_double(az_json_writer* json_writer, void* value)
+static az_result append_double(az_json_writer* jw, void* value)
 {
   double value_as_double = *(double*)value;
 
-  return az_json_writer_append_double(json_writer, value_as_double, DOUBLE_DECIMAL_PLACE_DIGITS);
+  return az_json_writer_append_double(jw, value_as_double, DOUBLE_DECIMAL_PLACE_DIGITS);
 }
 
 az_result sample_pnp_thermostat_init(

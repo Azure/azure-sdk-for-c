@@ -6,7 +6,8 @@
 #pragma warning(disable : 4201)
 // warning C4204: nonstandard extension used: non-constant aggregate initializer
 #pragma warning(disable : 4204)
-// warning C4996: 'localtime': This function or variable may be unsafe.  Consider using localtime_s instead.
+// warning C4996: 'localtime': This function or variable may be unsafe.  Consider using localtime_s
+// instead.
 #pragma warning(disable : 4996)
 #endif
 #include <paho-mqtt/MQTTClient.h>
@@ -249,7 +250,7 @@ static void create_and_configure_mqtt_client(void)
   if (az_failed(rc = read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars)))
   {
     LOG_ERROR(
-        "Failed to read configuration from environment variables: az_result return code 0x%04x.",
+        "Failed to read configuration from environment variables: az_result return code 0x%08x.",
         rc);
     exit(rc);
   }
@@ -260,7 +261,7 @@ static void create_and_configure_mqtt_client(void)
           rc = create_mqtt_endpoint(
               SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer))))
   {
-    LOG_ERROR("Failed to create MQTT endpoint: az_result return code 0x%04x.", rc);
+    LOG_ERROR("Failed to create MQTT endpoint: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -271,7 +272,7 @@ static void create_and_configure_mqtt_client(void)
           rc = az_iot_hub_client_init(
               &hub_client, env_vars.hub_hostname, env_vars.hub_device_id, &options)))
   {
-    LOG_ERROR("Failed to initialize hub client: az_result return code 0x%04x.", rc);
+    LOG_ERROR("Failed to initialize hub client: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -281,7 +282,7 @@ static void create_and_configure_mqtt_client(void)
           rc = az_iot_hub_client_get_client_id(
               &hub_client, mqtt_client_id_buffer, sizeof(mqtt_client_id_buffer), NULL)))
   {
-    LOG_ERROR("Failed to get MQTT client id: az_result return code 0x%04x.", rc);
+    LOG_ERROR("Failed to get MQTT client id: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -308,7 +309,7 @@ static void connect_mqtt_client_to_iot_hub(void)
           rc = az_iot_hub_client_get_user_name(
               &hub_client, mqtt_client_username_buffer, sizeof(mqtt_client_username_buffer), NULL)))
   {
-    LOG_ERROR("Failed to get MQTT client username: az_result return code 0x%04x.", rc);
+    LOG_ERROR("Failed to get MQTT client username: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -466,7 +467,7 @@ static az_span get_request_id(void)
 
   if (az_failed(rc = az_span_i32toa(destination, connection_request_id_int++, &out_span)))
   {
-    LOG_ERROR("Failed to get request id: az_result return code 0x%04x.", rc);
+    LOG_ERROR("Failed to get request id: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -519,8 +520,9 @@ static void on_message_received(char* topic, int topic_len, const MQTTClient_mes
 
     handle_device_twin_message(message_span, &twin_response);
   }
-  else if (az_succeeded(rc = az_iot_hub_client_methods_parse_received_topic(
-               &hub_client, topic_span, &command_request)))
+  else if (az_succeeded(
+               rc = az_iot_hub_client_methods_parse_received_topic(
+                   &hub_client, topic_span, &command_request)))
   {
     LOG_SUCCESS("Client received a valid topic response:");
     LOG_AZ_SPAN("Topic:", topic_span);
@@ -530,7 +532,7 @@ static void on_message_received(char* topic, int topic_len, const MQTTClient_mes
   }
   else
   {
-    LOG_ERROR("Message from unknown topic: az_result return code 0x%04x.", rc);
+    LOG_ERROR("Message from unknown topic: az_result return code 0x%08x.", rc);
     LOG_AZ_SPAN("Topic:", topic_span);
     exit(rc);
   }
@@ -712,7 +714,7 @@ static void send_reported_property(az_span name, double value, int32_t version, 
               sizeof(twin_patch_topic_buffer),
               NULL)))
   {
-    LOG_ERROR("Failed to get Twin Patch publish topic: az_result return code 0x%04x.", rc);
+    LOG_ERROR("Failed to get Twin Patch publish topic: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -731,7 +733,9 @@ static void send_reported_property(az_span name, double value, int32_t version, 
                 reported_property_payload,
                 &reported_property_payload)))
     {
-      LOG_ERROR("Failed to build reported property confirmed payload : az_result return code 0x%04x.", rc);
+      LOG_ERROR(
+          "Failed to build reported property confirmed payload : az_result return code 0x%08x.",
+          rc);
       exit(rc);
     }
   }
@@ -745,7 +749,7 @@ static void send_reported_property(az_span name, double value, int32_t version, 
             rc = build_property_payload(
                 count, names, values, NULL, reported_property_payload, &reported_property_payload)))
     {
-      LOG_ERROR("Failed to build reported property payload: az_result return code 0x%04x.", rc);
+      LOG_ERROR("Failed to build reported property payload: az_result return code 0x%08x.", rc);
       exit(rc);
     }
   }
@@ -804,7 +808,7 @@ static void send_command_response(
               sizeof(methods_response_topic_buffer),
               NULL)))
   {
-    LOG_ERROR("Failed to get Methods response publish topic: az_result return code 0x%04x.", rc);
+    LOG_ERROR("Failed to get Methods response publish topic: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -863,11 +867,12 @@ static az_result invoke_getMaxMinReport(
   const double values[3] = { device_max_temp, device_min_temp, device_avg_temp };
   const az_span times[2] = { start_time_span, end_time_span };
 
-  int rc;
+  az_result rc;
   if (az_failed(
-          rc = build_property_payload(count, names, values, times, response_destination, out_response)))
+          rc = build_property_payload(
+              count, names, values, times, response_destination, out_response)))
   {
-    LOG_ERROR("Failed to build command response payload: az_result return code 0x%04x.", rc);
+    LOG_ERROR("Failed to build command response payload: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -884,7 +889,7 @@ static void send_telemetry_message(void)
           rc = az_iot_hub_client_telemetry_get_publish_topic(
               &hub_client, NULL, telemetry_topic_buffer, sizeof(telemetry_topic_buffer), NULL)))
   {
-    LOG_ERROR("Failed to get Telemetry publish topic: az_result return code 0x%04x.", rc);
+    LOG_ERROR("Failed to get Telemetry publish topic: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -896,9 +901,10 @@ static void send_telemetry_message(void)
   char telemetry_payload_buffer[128];
   az_span telemetry_payload = AZ_SPAN_FROM_BUFFER(telemetry_payload_buffer);
   if (az_failed(
-          rc = build_property_payload(count, names, values, NULL, telemetry_payload, &telemetry_payload)))
+          rc = build_property_payload(
+              count, names, values, NULL, telemetry_payload, &telemetry_payload)))
   {
-    LOG_ERROR("Failed to build telemetry payload: az_result return code 0x%04x.", rc);
+    LOG_ERROR("Failed to build telemetry payload: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 

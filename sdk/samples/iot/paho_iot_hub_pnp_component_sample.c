@@ -25,8 +25,8 @@
 #include <azure/iot/az_iot_hub_client.h>
 
 #include "sample_pnp.h"
-#include "sample_pnp_mqtt_component.h"
 #include "sample_pnp_device_info_component.h"
+#include "sample_pnp_mqtt_component.h"
 #include "sample_pnp_thermostat_component.h"
 
 #define SAMPLE_TYPE PAHO_IOT_HUB
@@ -51,7 +51,8 @@ bool is_device_operational = true;
 // is described in the corresponding DTMI. Should you choose to program your own PnP capable device,
 // the functionality would need to match the DTMI and you would need to update the below 'model_id'.
 // Please see the sample README for more information on this DTMI.
-static const az_span model_id = AZ_SPAN_LITERAL_FROM_STR("dtmi:com:example:TemperatureController;1");
+static const az_span model_id
+    = AZ_SPAN_LITERAL_FROM_STR("dtmi:com:example:TemperatureController;1");
 
 // Components
 static sample_pnp_thermostat_component sample_thermostat_1;
@@ -121,8 +122,8 @@ static void send_telemetry_messages(void);
 static az_result temp_controller_get_telemetry_message(sample_pnp_mqtt_message* message);
 
 // Callbacks
-static az_result append_string(az_json_writer* json_writer, void* value);
-static az_result append_json_token(az_json_writer* json_writer, void* value);
+static az_result append_string(az_json_writer* jw, void* value);
+static az_result append_json_token(az_json_writer* jw, void* value);
 static void sample_property_callback(
     az_span component_name,
     const az_json_token* property_name,
@@ -312,10 +313,10 @@ static void initialize_components(void)
   }
 
   if (az_failed(
-               rc = sample_pnp_thermostat_init(
-                   &sample_thermostat_2,
-                   sample_thermostat_2_component_name,
-                   DEFAULT_START_TEMP_CELSIUS)))
+          rc = sample_pnp_thermostat_init(
+              &sample_thermostat_2,
+              sample_thermostat_2_component_name,
+              DEFAULT_START_TEMP_CELSIUS)))
   {
     LOG_ERROR("Could not initialize thermostat 2: az_result return code 0x%08x.", rc);
     exit(rc);
@@ -329,7 +330,10 @@ static void send_device_info(void)
   az_result rc;
   if (az_failed(rc = sample_pnp_device_info_get_report_data(&hub_client, &publish_message)))
   {
-    LOG_ERROR("Failed to get Twin Patch publish topic or build device info reported property payload: az_result return code 0x%08x.", rc);
+    LOG_ERROR(
+        "Failed to get Twin Patch publish topic or build device info reported property payload: "
+        "az_result return code 0x%08x.",
+        rc);
     exit(rc);
   }
 
@@ -348,12 +352,12 @@ static void send_device_serial_number(void)
 
   // Get the Twin Patch topic to send a reported property update.
   if (az_failed(
-               rc = az_iot_hub_client_twin_patch_get_publish_topic(
-                   &hub_client,
-                   get_request_id(),
-                   publish_message.topic,
-                   publish_message.topic_length,
-                   NULL)))
+          rc = az_iot_hub_client_twin_patch_get_publish_topic(
+              &hub_client,
+              get_request_id(),
+              publish_message.topic,
+              publish_message.topic_length,
+              NULL)))
   {
     LOG_ERROR("Failed to get Twin Patch publish topic: az_result return code 0x%08x.", rc);
     exit(rc);
@@ -369,7 +373,9 @@ static void send_device_serial_number(void)
               (void*)&serial_number_value,
               &publish_message.out_payload_span)))
   {
-    LOG_ERROR("Failed to build serial number reported property payload: az_result return code 0x%08x.", rc);
+    LOG_ERROR(
+        "Failed to build serial number reported property payload: az_result return code 0x%08x.",
+        rc);
     exit(rc);
   }
 
@@ -386,7 +392,11 @@ static void request_device_twin_document(void)
   // Get the Twin Document topic to publish the twin document request.
   if (az_failed(
           rc = az_iot_hub_client_twin_document_get_publish_topic(
-              &hub_client, get_request_id(), publish_message.topic, publish_message.topic_length, NULL)))
+              &hub_client,
+              get_request_id(),
+              publish_message.topic,
+              publish_message.topic_length,
+              NULL)))
   {
     LOG_ERROR("Failed to get Twin Document publish topic: az_result return code 0x%08x.", rc);
     exit(rc);
@@ -404,13 +414,15 @@ static void receive_messages(void)
   while (is_device_operational)
   {
     // Send max temp for each component since boot if needed.
-    if (sample_pnp_thermostat_get_max_temp_report(&hub_client, &sample_thermostat_1, &publish_message))
+    if (sample_pnp_thermostat_get_max_temp_report(
+            &hub_client, &sample_thermostat_1, &publish_message))
     {
       mqtt_publish_message(
           publish_message.topic, publish_message.out_payload_span, SAMPLE_PUBLISH_QOS);
     }
 
-    if (sample_pnp_thermostat_get_max_temp_report(&hub_client, &sample_thermostat_2, &publish_message))
+    if (sample_pnp_thermostat_get_max_temp_report(
+            &hub_client, &sample_thermostat_2, &publish_message))
     {
       mqtt_publish_message(
           publish_message.topic, publish_message.out_payload_span, SAMPLE_PUBLISH_QOS);
@@ -471,9 +483,8 @@ static void mqtt_receive_message(void)
   LOG(" "); // Formatting.
   LOG("Waiting for Command or Device Twin message.\n");
 
-  if (((rc
-        = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, TIMEOUT_MQTT_RECEIVE_MS))
-        != MQTTCLIENT_SUCCESS)
+  if (((rc = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, TIMEOUT_MQTT_RECEIVE_MS))
+       != MQTTCLIENT_SUCCESS)
       && (rc != MQTTCLIENT_TOPICNAME_TRUNCATED))
   {
     LOG_ERROR("Failed to receive message: MQTTClient return code %d.", rc);
@@ -518,7 +529,9 @@ static void on_message_received(char* topic, int topic_len, const MQTTClient_mes
   az_iot_hub_client_method_request command_request;
 
   // Parse the incoming message topic and check which feature it is for.
-  if (az_succeeded(rc = az_iot_hub_client_twin_parse_received_topic(&hub_client, topic_span, &twin_response)))
+  if (az_succeeded(
+          rc
+          = az_iot_hub_client_twin_parse_received_topic(&hub_client, topic_span, &twin_response)))
   {
     LOG_SUCCESS("Client received a valid topic response:");
     LOG_AZ_SPAN("Topic:", topic_span);
@@ -527,8 +540,9 @@ static void on_message_received(char* topic, int topic_len, const MQTTClient_mes
 
     handle_device_twin_message(message_span, &twin_response);
   }
-  else if (az_succeeded(rc = az_iot_hub_client_methods_parse_received_topic(
-               &hub_client, topic_span, &command_request)))
+  else if (az_succeeded(
+               rc = az_iot_hub_client_methods_parse_received_topic(
+                   &hub_client, topic_span, &command_request)))
   {
     LOG_SUCCESS("Client received a valid topic response:");
     LOG_AZ_SPAN("Topic:", topic_span);
@@ -549,11 +563,11 @@ static void handle_device_twin_message(
     const az_iot_hub_client_twin_response* twin_response)
 {
   az_result rc;
-  az_json_reader json_reader;
+  az_json_reader jr;
 
   if (az_span_size(twin_message_span))
   {
-    if (az_failed(rc = az_json_reader_init(&json_reader, twin_message_span, NULL)))
+    if (az_failed(rc = az_json_reader_init(&jr, twin_message_span, NULL)))
     {
       LOG_ERROR("Could not initialize JSON reader: az_result return code 0x%08x.", rc);
       exit(rc);
@@ -567,7 +581,7 @@ static void handle_device_twin_message(
     case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_GET:
       LOG("Type: GET");
       sample_pnp_process_twin_data(
-          &json_reader,
+          &jr,
           false,
           sample_pnp_components,
           sample_pnp_components_num,
@@ -578,7 +592,7 @@ static void handle_device_twin_message(
     case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES:
       LOG("Type: Desired Properties");
       sample_pnp_process_twin_data(
-          &json_reader,
+          &jr,
           true,
           sample_pnp_components,
           sample_pnp_components_num,
@@ -604,7 +618,8 @@ static void handle_command_message(
   az_iot_status status = AZ_IOT_STATUS_UNKNOWN;
 
   if (az_failed(
-          rc = sample_pnp_parse_command_name(command_request->name, &component_name, &command_name)))
+          rc
+          = sample_pnp_parse_command_name(command_request->name, &component_name, &command_name)))
   {
     LOG_ERROR("Failed to parse command name: az_result return code 0x%08x.", rc);
     exit(rc);
@@ -612,38 +627,38 @@ static void handle_command_message(
 
   // Invoke command and retrieve response to send to server.
   if (az_succeeded(sample_pnp_thermostat_process_command(
-                   &hub_client,
-                   &sample_thermostat_1,
-                   command_request,
-                   component_name,
-                   command_name,
-                   command_message_span,
-                   &publish_message,
-                   &status)))
+          &hub_client,
+          &sample_thermostat_1,
+          command_request,
+          component_name,
+          command_name,
+          command_message_span,
+          &publish_message,
+          &status)))
   {
     LOG_AZ_SPAN("Client invoked command on thermostat 1:", command_name);
     command_response_payload = publish_message.out_payload_span;
   }
   else if (az_succeeded(sample_pnp_thermostat_process_command(
-                   &hub_client,
-                   &sample_thermostat_2,
-                   command_request,
-                   component_name,
-                   command_name,
-                   command_message_span,
-                   &publish_message,
-                   &status)))
+               &hub_client,
+               &sample_thermostat_2,
+               command_request,
+               component_name,
+               command_name,
+               command_message_span,
+               &publish_message,
+               &status)))
   {
     LOG_AZ_SPAN("Client invoked command on thermostat 2:", command_name);
     command_response_payload = publish_message.out_payload_span;
   }
   else if (az_succeeded(temp_controller_process_command(
-                   command_request,
-                   component_name,
-                   command_name,
-                   command_message_span,
-                   &publish_message,
-                   &status)))
+               command_request,
+               component_name,
+               command_name,
+               command_message_span,
+               &publish_message,
+               &status)))
   {
     LOG_AZ_SPAN("Client invoked command on controller:", command_name);
     command_response_payload = publish_message.out_payload_span;
@@ -670,12 +685,10 @@ static void handle_command_message(
   }
 
   // Publish the command response
-  mqtt_publish_message(
-        publish_message.topic, command_response_payload, SAMPLE_PUBLISH_QOS);
+  mqtt_publish_message(publish_message.topic, command_response_payload, SAMPLE_PUBLISH_QOS);
   LOG_SUCCESS("Client published command response:");
   LOG("Status: %d", status);
   LOG_AZ_SPAN("Payload:", command_response_payload);
-
 }
 
 static az_result temp_controller_process_command(
@@ -690,7 +703,8 @@ static az_result temp_controller_process_command(
 
   (void)command_payload;
 
-  if (az_span_size(component_name) == 0 && az_span_is_content_equal(reboot_command_name, command_name))
+  if (az_span_size(component_name) == 0
+      && az_span_is_content_equal(reboot_command_name, command_name))
   {
     *status = AZ_IOT_STATUS_OK;
 
@@ -727,7 +741,10 @@ static void send_telemetry_messages(void)
           rc = sample_pnp_thermostat_get_telemetry_message(
               &hub_client, &sample_thermostat_1, &publish_message)))
   {
-    LOG_ERROR("Failed to get Telemetry publish topic or build telemetry message: az_result return code 0x%08x.", rc);
+    LOG_ERROR(
+        "Failed to get Telemetry publish topic or build telemetry message: az_result return code "
+        "0x%08x.",
+        rc);
     exit(rc);
   }
 
@@ -741,7 +758,10 @@ static void send_telemetry_messages(void)
           rc = sample_pnp_thermostat_get_telemetry_message(
               &hub_client, &sample_thermostat_2, &publish_message)))
   {
-    LOG_ERROR("Failed to get Telemetry publish topic or build telemetry message: az_result return code 0x%08x.", rc);
+    LOG_ERROR(
+        "Failed to get Telemetry publish topic or build telemetry message: az_result return code "
+        "0x%08x.",
+        rc);
     exit(rc);
   }
 
@@ -753,7 +773,10 @@ static void send_telemetry_messages(void)
   // Get the Telemetry topic to publish the telemetry message and build the telemetry message.
   if (az_failed(rc = temp_controller_get_telemetry_message(&publish_message)))
   {
-    LOG_ERROR("Failed to get Telemetry publish topic or build telemetry message: az_result return code 0x%08x.", rc);
+    LOG_ERROR(
+        "Failed to get Telemetry publish topic or build telemetry message: az_result return code "
+        "0x%08x.",
+        rc);
     exit(rc);
   }
 
@@ -779,23 +802,23 @@ static az_result temp_controller_get_telemetry_message(sample_pnp_mqtt_message* 
   int32_t working_set_ram_in_kibibytes = rand() % 128;
 
   // Build the telemetry message.
-  az_json_writer json_builder;
-  AZ_RETURN_IF_FAILED(az_json_writer_init(&json_builder, message->payload_span, NULL));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&json_builder));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&json_builder, working_set_name));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_int32(&json_builder, working_set_ram_in_kibibytes));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&json_builder));
-  message->out_payload_span = az_json_writer_get_bytes_used_in_destination(&json_builder);
+  az_json_writer jw;
+  AZ_RETURN_IF_FAILED(az_json_writer_init(&jw, message->payload_span, NULL));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, working_set_name));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_int32(&jw, working_set_ram_in_kibibytes));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
+  message->out_payload_span = az_json_writer_get_bytes_used_in_destination(&jw);
 
   return rc;
 }
 
-static az_result append_string(az_json_writer* json_writer, void* value)
+static az_result append_string(az_json_writer* jw, void* value)
 {
-  return az_json_writer_append_string(json_writer, *(az_span*)value);
+  return az_json_writer_append_string(jw, *(az_span*)value);
 }
 
-static az_result append_json_token(az_json_writer* json_writer, void* value)
+static az_result append_json_token(az_json_writer* jw, void* value)
 {
   az_json_token value_token = *(az_json_token*)value;
 
@@ -807,13 +830,13 @@ static az_result append_json_token(az_json_writer* json_writer, void* value)
     case AZ_JSON_TOKEN_NUMBER:
       AZ_RETURN_IF_FAILED(az_json_token_get_double(&value_token, &value_as_double));
       AZ_RETURN_IF_FAILED(
-          az_json_writer_append_double(json_writer, value_as_double, DOUBLE_DECIMAL_PLACE_DIGITS));
+          az_json_writer_append_double(jw, value_as_double, DOUBLE_DECIMAL_PLACE_DIGITS));
       break;
     case AZ_JSON_TOKEN_STRING:
       AZ_RETURN_IF_FAILED(az_json_token_get_string(
           &value_token, property_scratch_buffer, sizeof(property_scratch_buffer), &string_length));
       AZ_RETURN_IF_FAILED(az_json_writer_append_string(
-          json_writer, az_span_create((uint8_t*)property_scratch_buffer, string_length)));
+          jw, az_span_create((uint8_t*)property_scratch_buffer, string_length)));
       break;
     default:
       return AZ_ERROR_ITEM_NOT_FOUND;
@@ -834,7 +857,8 @@ static void sample_property_callback(
 
   if (az_span_ptr(component_name) == NULL || az_span_size(component_name) == 0)
   {
-    LOG("Property=%.*s arrived for Control component itself. The Control component does not support writable properties on it (all properties are on sub-components).",
+    LOG("Property=%.*s arrived for Control component itself. The Control component does not "
+        "support writable properties on it (all properties are on sub-components).",
         az_span_size(property_name->slice),
         az_span_ptr(property_name->slice));
 
@@ -850,37 +874,44 @@ static void sample_property_callback(
                 property_response_description_failed,
                 &publish_message.out_payload_span)))
     {
-      LOG_ERROR("Failed to create root component property error payload: az_result return code 0x%08x.", rc)
+      LOG_ERROR(
+          "Failed to create root component property error payload: az_result return code 0x%08x.",
+          rc)
       exit(rc);
     }
     // Send error response to the updated property.
-    mqtt_publish_message(publish_message.topic, publish_message.out_payload_span, SAMPLE_PUBLISH_QOS);
+    mqtt_publish_message(
+        publish_message.topic, publish_message.out_payload_span, SAMPLE_PUBLISH_QOS);
     LOG_SUCCESS("Client sent error status for root component property.");
   }
-  else if (az_succeeded(rc = sample_pnp_thermostat_process_property_update(
-               &hub_client,
-               &sample_thermostat_1,
-               component_name,
-               property_name,
-               &property_value,
-               version,
-               &publish_message)))
+  else if (az_succeeded(
+               rc = sample_pnp_thermostat_process_property_update(
+                   &hub_client,
+                   &sample_thermostat_1,
+                   component_name,
+                   property_name,
+                   &property_value,
+                   version,
+                   &publish_message)))
   {
     // Send response to the updated property.
-    mqtt_publish_message(publish_message.topic, publish_message.out_payload_span, SAMPLE_PUBLISH_QOS);
+    mqtt_publish_message(
+        publish_message.topic, publish_message.out_payload_span, SAMPLE_PUBLISH_QOS);
     LOG_SUCCESS("Client updated property on thermostat 1.");
   }
-  else if (az_succeeded(rc = sample_pnp_thermostat_process_property_update(
-               &hub_client,
-               &sample_thermostat_2,
-               component_name,
-               property_name,
-               &property_value,
-               version,
-               &publish_message)))
+  else if (az_succeeded(
+               rc = sample_pnp_thermostat_process_property_update(
+                   &hub_client,
+                   &sample_thermostat_2,
+                   component_name,
+                   property_name,
+                   &property_value,
+                   version,
+                   &publish_message)))
   {
     // Send response to the updated property
-    mqtt_publish_message(publish_message.topic, publish_message.out_payload_span, SAMPLE_PUBLISH_QOS);
+    mqtt_publish_message(
+        publish_message.topic, publish_message.out_payload_span, SAMPLE_PUBLISH_QOS);
     LOG_SUCCESS("Client updated property on thermostat 2.");
   }
   else

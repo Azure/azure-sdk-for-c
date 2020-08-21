@@ -27,7 +27,7 @@ typedef void (*sample_pnp_property_callback)(
 /**
  * @brief Callback which is invoked to append user properties to a payload.
  */
-typedef az_result (*sample_pnp_append_property_callback)(az_json_writer* json_writer, void* context);
+typedef az_result (*sample_pnp_append_property_callback)(az_json_writer* jw, void* context);
 
 /**
  * @brief Gets the MQTT topic that must be used for device to cloud telemetry messages.
@@ -111,7 +111,7 @@ az_result sample_pnp_create_reported_property_with_status(
 /**
  * @brief Iteratively get the next desired property.
  *
- * @param[in] json_reader A pointer to the json reader from which the properties will be retrieved.
+ * @param[in] jr A pointer to the json reader from which the properties will be retrieved.
  * @param[in] is_partial Boolean stating whether the JSON document is partial or not.
  * @param[in] sample_components_ptr A pointer to a set of `az_span` pointers containing all the
  * names for components.
@@ -121,7 +121,7 @@ az_result sample_pnp_create_reported_property_with_status(
  * @param[in] context_ptr Pointer to user context.
  */
 az_result sample_pnp_process_twin_data(
-    az_json_reader* json_reader,
+    az_json_reader* jr,
     bool is_partial,
     const az_span** sample_components_ptr,
     int32_t sample_components_num,
