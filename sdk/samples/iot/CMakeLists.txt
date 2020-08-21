@@ -42,8 +42,11 @@ target_link_libraries(az_iot_samples_common
 # Workaround for linker warning LNK4098: defaultlib 'LIBCMTD' conflicts with use of other libs
 if (MSVC)
     set_target_properties(az_iot_samples_common
-        PROPERTIES LINK_FLAGS
+        PROPERTIES
+        LINK_FLAGS
         "/NODEFAULTLIB:libcmtd.lib"
+        LINK_FLAGS_RELEASE
+        "/NODEFAULTLIB:libcmt.lib"
     )
 endif()
 
