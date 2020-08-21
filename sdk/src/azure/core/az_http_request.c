@@ -133,8 +133,8 @@ AZ_NODISCARD az_result az_http_request_set_query_parameter(
   // name or value can't be empty
   _az_PRECONDITION(az_span_size(name) > 0 && az_span_size(value) > 0);
 
-  az_span url_remainder
-      = az_span_slice_to_end(ref_request->_internal.url, ref_request->_internal.url_length);
+  int32_t const initial_url_length = ref_request->_internal.url_length;
+  az_span url_remainder = az_span_slice_to_end(ref_request->_internal.url, initial_url_length);
 
   // Adding query parameter. Adding +2 to required length to include extra required symbols `=`
   // and `?` or `&`.
@@ -144,17 +144,13 @@ AZ_NODISCARD az_result az_http_request_set_query_parameter(
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(url_remainder, required_length);
 
   // Append either '?' or '&'
-  uint8_t separator;
+  uint8_t separator = '&';
   if (ref_request->_internal.query_start == 0)
   {
     separator = '?';
 
     // update QPs starting position when it's 0
-    ref_request->_internal.query_start = ref_request->_internal.url_length + 1;
-  }
-  else
-  {
-    separator = '&';
+    ref_request->_internal.query_start = initial_url_length + 1;
   }
 
   url_remainder = az_span_copy_u8(url_remainder, separator);

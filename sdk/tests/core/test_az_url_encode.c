@@ -253,7 +253,7 @@ static void test_url_encode_preconditions(void** state)
 #ifdef AZ_NO_PRECONDITION_CHECKING
   {
     {
-      // URL encode could never succeed.
+      // URL encode wouldn't succeed, but encode/copy what would fit.
       uint8_t buf5[5] = { '*', '*', '*', '*', '*' };
       az_span const buffer5 = AZ_SPAN_FROM_BUFFER(buf5);
 
@@ -263,7 +263,7 @@ static void test_url_encode_preconditions(void** state)
           == AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
 
       assert_int_equal(url_length, 0);
-      assert_true(az_span_is_content_equal(buffer5, AZ_SPAN_FROM_STR("*****")));
+      assert_true(az_span_is_content_equal(buffer5, AZ_SPAN_FROM_STR("12345")));
     }
     {
       // Input is empty, so the output is also empty BUT the output span is null.
