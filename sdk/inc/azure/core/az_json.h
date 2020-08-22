@@ -581,7 +581,7 @@ typedef struct
  * @param[in] json_buffer An #az_span over the byte buffer containing the JSON text to read.
  * @param[in] options __[nullable]__ A reference to an #az_json_reader_options structure which
  * defines custom behavior of the #az_json_reader. If `NULL` is passed, the reader will use the
- * default options (i.e. #az_json_reader_options_default).
+ * default options (i.e. #az_json_reader_options_default()).
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The #az_json_reader is initialized successfully.
@@ -608,7 +608,7 @@ AZ_NODISCARD az_result az_json_reader_init(
  * json_buffers array.
  * @param[in] options __[nullable]__ A reference to an #az_json_reader_options
  * structure which defines custom behavior of the #az_json_reader. If `NULL` is passed, the reader
- * will use the default options (i.e. #az_json_reader_options_default).
+ * will use the default options (i.e. #az_json_reader_options_default()).
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The #az_json_reader is initialized successfully.
