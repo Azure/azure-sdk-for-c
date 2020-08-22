@@ -258,7 +258,7 @@ static void receive_device_registration_status(void)
     {
       topic_len = (int)strlen(topic);
     }
-    LOG_SUCCESS("Client received a message from provisioning service.");
+    LOG_SUCCESS("Client received a message from the provisioning service.");
 
     // Parse registration message.
     parse_registration_message(topic, topic_len, message, &register_response, &operation_status);

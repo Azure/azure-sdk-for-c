@@ -23,7 +23,7 @@ typedef struct
   double device_temperature_avg_total;
   double avg_temperature;
   bool send_max_temp_property;
-} sample_pnp_thermostat_component;
+} pnp_thermostat_component;
 
 az_result sample_pnp_thermostat_init(
     sample_pnp_thermostat_component* thermostat_component,

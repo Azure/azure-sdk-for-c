@@ -33,7 +33,7 @@
 #define SAMPLE_NAME PAHO_IOT_HUB_PNP_SAMPLE
 
 #define TELEMETRY_SEND_INTERVAL 1
-#define TIMEOUT_MQTT_RECEIVE_MAX_COUNT 3
+#define TIMEOUT_MQTT_RECEIVE_MAX_MESSAGE_COUNT 3
 #define TIMEOUT_MQTT_RECEIVE_MS (8 * 1000)
 #define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
 #define TIMEOUT_MQTT_WAIT_FOR_COMPLETION_MS 1000
@@ -78,7 +78,7 @@ static const az_span command_min_temp_name = AZ_SPAN_LITERAL_FROM_STR("minTemp")
 static const az_span command_avg_temp_name = AZ_SPAN_LITERAL_FROM_STR("avgTemp");
 static const az_span command_start_time_name = AZ_SPAN_LITERAL_FROM_STR("startTime");
 static const az_span command_end_time_name = AZ_SPAN_LITERAL_FROM_STR("endTime");
-static const az_span command_error_response_payload = AZ_SPAN_LITERAL_FROM_STR("{}");
+static const az_span command_empty_response_payload = AZ_SPAN_LITERAL_FROM_STR("{}");
 static char command_start_time_value_buffer[32];
 static char command_end_time_value_buffer[32];
 static char command_response_payload_buffer[256];
@@ -117,6 +117,7 @@ static void on_message_received(char* topic, int topic_len, const MQTTClient_mes
 static void handle_device_twin_message(
     az_span twin_message_span,
     const az_iot_hub_client_twin_response* twin_response);
+static void process_device_twin_message(az_span twin_message_span, bool is_twin_get);
 static az_result parse_device_twin_desired_temperature_property(
     az_span twin_message_span,
     bool is_twin_get,
@@ -416,15 +417,15 @@ static void receive_messages(void)
     else if (message == NULL)
     {
       // Allow up to TIMEOUT_MQTT_RECEIVE_MAX_COUNT before disconnecting.
-      if (++timeoutCounter >= TIMEOUT_MQTT_RECEIVE_MAX_COUNT)
+      if (++timeoutCounter >= TIMEOUT_MQTT_RECEIVE_MAX_MESSAGE_COUNT)
       {
-        LOG("Receive message timeout count of %d reached.", TIMEOUT_MQTT_RECEIVE_MAX_COUNT);
+        LOG("Receive message timeout count of %d reached.", TIMEOUT_MQTT_RECEIVE_MAX_MESSAGE_COUNT);
         return;
       }
     }
     else
     {
-      LOG_SUCCESS("Client received message from the service.");
+      LOG_SUCCESS("Client received a message from the service.");
 
       if (rc == MQTTCLIENT_TOPICNAME_TRUNCATED)
       {
@@ -542,55 +543,54 @@ static void handle_device_twin_message(
     az_span twin_message_span,
     const az_iot_hub_client_twin_response* twin_response)
 {
-  // Invoke appropriate action per response type (3 Types only).
   bool is_twin_get = false;
 
+  // Invoke appropriate action per response type (3 Types only).
   switch (twin_response->response_type)
   {
     // A response from a twin GET publish message with the twin document as a payload.
     case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_GET:
-      LOG("Type: GET");
+      LOG("Message Type: GET");
       is_twin_get = true;
+      process_twin_message(twin_message_span, is_twin_get);
       break;
 
     // An update to the desired properties with the properties as a payload.
     case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES:
-      LOG("Type: Desired Properties");
+      LOG("Message Type: Desired Properties");
+      process_twin_message(twin_message_span, is_twin_get);
       break;
 
     // A response from a twin reported properties publish message.
     case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES:
-      LOG("Type: Reported Properties");
+      LOG("Message Type: Reported Properties");
       break;
   }
+}
 
-  // For a GET response OR a Desired Properties response from the server:
-  // 1. Parse for the desired temperature
-  // 2. Update device temperature locally
-  // 3. Report updated temperature to server
-  if (twin_response->response_type == AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_GET
-      || twin_response->response_type == AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES)
+static void process_device_twin_message(az_span twin_message_span, bool is_twin_get)
+{
+  double desired_temp;
+  int32_t version_num;
+
+  // Parse for the desired temperature
+  if (az_succeeded(parse_device_twin_desired_temperature_property(
+          twin_message_span, is_twin_get, &desired_temp, &version_num)))
   {
-    double desired_temp;
-    int32_t version_num;
+    bool confirm = true;
+    bool is_max_temp_changed = false;
 
-    if (az_succeeded(parse_device_twin_desired_temperature_property(
-            twin_message_span, is_twin_get, &desired_temp, &version_num)))
+    // Update device temperature locally and report update to server
+    update_device_temp(desired_temp, &is_max_temp_changed);
+    send_reported_property(twin_desired_temp_property_name, desired_temp, version_num, confirm);
+
+    if (is_max_temp_changed)
     {
-      bool confirm = true;
-      bool is_max_temp_changed = false;
-
-      update_device_temp(desired_temp, &is_max_temp_changed);
-      send_reported_property(twin_desired_temp_property_name, desired_temp, version_num, confirm);
-
-      if (is_max_temp_changed)
-      {
-        confirm = false;
-        send_reported_property(twin_reported_max_temp_property_name, device_max_temp, -1, confirm);
-      }
+      confirm = false;
+      send_reported_property(twin_reported_max_temp_property_name, device_max_temp, -1, confirm);
     }
-    // else Desired property not found in payload. Do nothing.
   }
+  // Else desired property not found in payload. Do nothing.
 }
 
 static az_result parse_device_twin_desired_temperature_property(
@@ -786,7 +786,7 @@ static void handle_command_message(
   else
   {
     LOG_AZ_SPAN("Command not supported:", command_request->name);
-    send_command_response(command_request, AZ_IOT_STATUS_NOT_FOUND, command_error_response_payload);
+    send_command_response(command_request, AZ_IOT_STATUS_NOT_FOUND, command_empty_response_payload);
   }
 }
 
@@ -843,7 +843,7 @@ static az_result invoke_getMaxMinReport(
   // Set the response payload to error if the "since" value was empty.
   if (az_span_ptr(start_time_span) == NULL)
   {
-    *out_response = command_error_response_payload;
+    *out_response = command_empty_response_payload;
     return AZ_ERROR_ITEM_NOT_FOUND;
   }
 

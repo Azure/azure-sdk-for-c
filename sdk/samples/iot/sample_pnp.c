@@ -47,7 +47,7 @@ static az_result visit_component_properties(
       {
         if (az_failed(az_json_reader_next_token(jr)))
         {
-          LOG_ERROR("Failed to next token.");
+          LOG_ERROR("Failed to get next token.");
           return AZ_ERROR_UNEXPECTED_CHAR;
         }
         continue;
@@ -90,7 +90,7 @@ static az_result sample_json_child_token_move(az_json_reader* jr, az_span proper
     {
       if (az_failed(az_json_reader_next_token(jr)))
       {
-        LOG_ERROR("Failed to read next token.");
+        LOG_ERROR("Failed to get next token.");
         return AZ_ERROR_UNEXPECTED_CHAR;
       }
 
@@ -177,7 +177,7 @@ az_result sample_pnp_get_telemetry_topic(
 }
 
 // Parse the component name and command name from a span
-az_result sample_pnp_parse_command_name(
+void pnp_parse_command_name(
     az_span component_command,
     az_span* component_name,
     az_span* pnp_command_name)
@@ -194,8 +194,6 @@ az_result sample_pnp_parse_command_name(
     *component_name = AZ_SPAN_NULL;
     *pnp_command_name = component_command;
   }
-
-  return AZ_OK;
 }
 
 // Create a reported property payload
@@ -288,28 +286,29 @@ az_result sample_pnp_create_reported_property_with_status(
 }
 
 // Process the twin properties and invoke user callback for each property
-az_result sample_pnp_process_twin_data(
-    az_json_reader* jr,
+az_result pnp_process_device_twin_message(
+    az_span twin_message_span,
     bool is_partial,
-    const az_span** sample_components_ptr,
-    int32_t sample_components_num,
-    sample_pnp_property_callback property_callback,
+    const az_span** components_ptr,
+    int32_t components_num,
+    pnp_property_callback property_callback,
     void* context_ptr)
 {
   az_json_reader copy_jr;
   int32_t version;
   int32_t index;
 
+  AZ_RETURN_IF_FAILED(az_json_reader_init(&jr, twin_message_span, NULL));
   AZ_RETURN_IF_FAILED(az_json_reader_next_token(jr));
 
-  if (!is_partial && az_failed(sample_json_child_token_move(jr, sample_iot_hub_twin_desired)))
+  if (!is_partial && az_failed(json_child_token_move(jr, iot_hub_twin_desired)))
   {
     LOG_ERROR("Failed to get desired property.");
     return AZ_ERROR_UNEXPECTED_CHAR;
   }
 
   copy_jr = *jr;
-  if (az_failed(sample_json_child_token_move(&copy_jr, sample_iot_hub_twin_desired_version))
+  if (az_failed(json_child_token_move(&copy_jr, iot_hub_twin_desired_version))
       || az_failed(az_json_token_get_int32(&(copy_jr.token), (int32_t*)&version)))
   {
     LOG_ERROR("Failed to get version.");
@@ -322,11 +321,11 @@ az_result sample_pnp_process_twin_data(
   {
     if (jr->token.kind == AZ_JSON_TOKEN_PROPERTY_NAME)
     {
-      if (az_json_token_is_text_equal(&(jr->token), sample_iot_hub_twin_desired_version))
+      if (az_json_token_is_text_equal(&(jr->token), iot_hub_twin_desired_version))
       {
         if (az_failed(az_json_reader_next_token(jr)))
         {
-          LOG_ERROR("Failed to next token.");
+          LOG_ERROR("Failed to get next token.");
           return AZ_ERROR_UNEXPECTED_CHAR;
         }
         continue;
@@ -336,7 +335,7 @@ az_result sample_pnp_process_twin_data(
 
       if (az_failed(az_json_reader_next_token(jr)))
       {
-        LOG_ERROR("Failed to next token.");
+        LOG_ERROR("Failed to get next token.");
         return AZ_ERROR_UNEXPECTED_CHAR;
       }
 

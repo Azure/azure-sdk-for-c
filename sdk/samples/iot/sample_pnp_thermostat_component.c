@@ -125,7 +125,6 @@ static az_result invoke_getMaxMinReport(
   if (az_span_ptr(start_time_span) == NULL)
   {
     response = report_error_payload;
-      LOG("here!");
     return AZ_ERROR_ITEM_NOT_FOUND;
   }
 
@@ -177,9 +176,9 @@ az_result sample_pnp_thermostat_get_telemetry_message(
     const sample_pnp_thermostat_component* thermostat_component,
     sample_pnp_mqtt_message* mqtt_message)
 {
-  az_result result;
+  az_result rc;
   if (az_failed(
-          result = sample_pnp_get_telemetry_topic(
+          rc = sample_pnp_get_telemetry_topic(
               client,
               NULL,
               thermostat_component->component_name,
@@ -187,19 +186,19 @@ az_result sample_pnp_thermostat_get_telemetry_message(
               mqtt_message->topic_length,
               NULL)))
   {
-    LOG_ERROR("Failed to get pnp Telemetry topic: az_result return code 0x%08x.", result);
-    return result;
+    LOG_ERROR("Failed to get pnp Telemetry topic: az_result return code 0x%08x.", rc);
+    return rc;
   }
 
   if (az_failed(
-          result = build_telemetry_message(
+          rc = build_telemetry_message(
               thermostat_component, mqtt_message->payload_span, &mqtt_message->out_payload_span)))
   {
-    LOG_ERROR("Failed to build telemetry payload: az_result return code 0x%08x.", result);
-    return result;
+    LOG_ERROR("Failed to build telemetry payload: az_result return code 0x%08x.", rc);
+    return rc;
   }
 
-  return result;
+  return rc;
 }
 
 bool sample_pnp_thermostat_get_max_temp_report(
@@ -207,7 +206,7 @@ bool sample_pnp_thermostat_get_max_temp_report(
     sample_pnp_thermostat_component* thermostat_component,
     sample_pnp_mqtt_message* mqtt_message)
 {
-  az_result result;
+  az_result rc;
 
   if (!thermostat_component->send_max_temp_property)
   {
@@ -215,7 +214,7 @@ bool sample_pnp_thermostat_get_max_temp_report(
   }
 
   if (az_failed(
-          result = sample_pnp_create_reported_property(
+          rc = sample_pnp_create_reported_property(
               mqtt_message->payload_span,
               thermostat_component->component_name,
               max_temp_reported_property_name,
@@ -223,18 +222,18 @@ bool sample_pnp_thermostat_get_max_temp_report(
               &thermostat_component->max_temperature,
               &mqtt_message->out_payload_span)))
   {
-    LOG_ERROR("Failed to get reported property: az_result return code 0x%08x.", result);
+    LOG_ERROR("Failed to get reported property: az_result return code 0x%08x.", rc);
     return false;
   }
   else if (az_failed(
-               result = az_iot_hub_client_twin_patch_get_publish_topic(
+               rc = az_iot_hub_client_twin_patch_get_publish_topic(
                    client,
                    get_request_id(),
                    mqtt_message->topic,
                    mqtt_message->topic_length,
                    NULL)))
   {
-    LOG_ERROR("Failed to get reported property topic with status: az_result return code 0x%08x.", result);
+    LOG_ERROR("Failed to get reported property topic with status: az_result return code 0x%08x.", rc);
     return false;
   }
 

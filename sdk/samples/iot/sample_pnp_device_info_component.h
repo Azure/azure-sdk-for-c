@@ -9,6 +9,11 @@
 #include <azure/core/az_result.h>
 #include <azure/iot/az_iot_hub_client.h>
 
+typedef struct
+{
+  az_span component_name;
+} pnp_device_info_component;
+
 /**
  * @brief Get the payload to send for device info
  *

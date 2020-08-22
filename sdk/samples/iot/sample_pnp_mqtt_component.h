@@ -16,7 +16,7 @@ typedef struct
   size_t* out_topic_length;
   az_span payload_span;
   az_span out_payload_span;
-} sample_pnp_mqtt_message;
+} pnp_mqtt_message;
 
 az_result sample_pnp_mqtt_message_init(sample_pnp_mqtt_message* mqtt_message);
 

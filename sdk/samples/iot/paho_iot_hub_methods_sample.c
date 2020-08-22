@@ -230,7 +230,7 @@ static void receive_method_messages(void)
     {
       topic_len = (int)strlen(topic);
     }
-    LOG_SUCCESS("Message #%d: Client received message from the service.", message_count + 1);
+    LOG_SUCCESS("Message #%d: Client received a message from the service.", message_count + 1);
 
     // Parse method message and invoke method.
     az_iot_hub_client_method_request method_request;

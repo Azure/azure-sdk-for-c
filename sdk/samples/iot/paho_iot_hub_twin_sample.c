@@ -356,7 +356,7 @@ static void receive_device_twin_message(void)
   {
     topic_len = (int)strlen(topic);
   }
-  LOG_SUCCESS("Client received device twin message from the service.");
+  LOG_SUCCESS("Client received a device twin message from the service.");
 
   // Parse device twin message.
   az_iot_hub_client_twin_response twin_response;
@@ -396,15 +396,15 @@ static void parse_device_twin_message(
   switch (twin_response->response_type)
   {
     case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_GET:
-      LOG("Type: GET");
+      LOG("Message Type: GET");
       break;
 
     case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES:
-      LOG("Type: Reported Properties");
+      LOG("Message Type: Reported Properties");
       break;
 
     case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES:
-      LOG("Type: Desired Properties");
+      LOG("Message Type: Desired Properties");
 
       if (az_failed(rc = update_property(message_span)))
       {

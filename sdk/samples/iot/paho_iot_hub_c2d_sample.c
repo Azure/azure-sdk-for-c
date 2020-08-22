@@ -214,7 +214,7 @@ static void receive_c2d_messages(void)
     {
       topic_len = (int)strlen(topic);
     }
-    LOG_SUCCESS("Message #%d: Client received message from the service.", message_count + 1);
+    LOG_SUCCESS("Message #%d: Client received a message from the service.", message_count + 1);
 
     // Parse c2d message.
     az_iot_hub_client_c2d_request c2d_request;
