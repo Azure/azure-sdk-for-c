@@ -43,15 +43,10 @@
 #define SETUP_PRECONDITION_CHECK_TESTS() \
   az_precondition_failed_set_callback(az_precondition_test_failed_fn);
 
-// Using (void) to cast away the return value does not work for GCC.
-// Therefore, explicitly suppressing this warning.
-// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=25509
-// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66425
-//#ifdef __GNUC__
-//#pragma GCC diagnostic push
-//#pragma GCC diagnostic ignored "-Wunused-result"
-//#endif
-
+// In release builds, the compiler optimizes out 'ASSERT_PRECONDITION_CHECKED' which could result in
+// function parameters not being used. Explicitly storing the function result as a bool and using
+// (void) to cast it away so that we don't get a warning related to unused variables, particularly
+// in release configurations.
 #define ASSERT_PRECONDITION_CHECKED(fn) \
   do \
   { \
@@ -59,14 +54,11 @@
     (void)setjmp(g_precond_test_jmp_buf); \
     if (precondition_test_count == 0) \
     { \
-      assert(fn); \
-      (void)!(fn); \
+      bool const result = (fn); \
+      assert(result); \
+      (void)result; \
     } \
     assert_int_equal(1, precondition_test_count); \
   } while (0)
-
-//#ifdef __GNUC__
-//#pragma GCC diagnostic pop
-//#endif // __GNUC__
 
 #endif // _az_TEST_PRECONDITION_H
