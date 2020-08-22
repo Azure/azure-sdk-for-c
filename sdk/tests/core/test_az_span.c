@@ -355,7 +355,8 @@ static void az_span_atoi64_test(void** state)
 #define test_az_isfinite_helper(source, expected) \
   do \
   { \
-    double decimal = *(double*)&source; \
+    double decimal = 0.0; \
+    memcpy(&decimal, &source, sizeof(decimal)); \
     assert_int_equal(_az_isfinite(decimal), expected); \
   } while (0)
 
