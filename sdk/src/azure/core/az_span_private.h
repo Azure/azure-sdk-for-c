@@ -34,7 +34,10 @@ enum
  */
 AZ_NODISCARD AZ_INLINE bool _az_isfinite(double value)
 {
-  uint64_t binary_value = *(uint64_t*)&value;
+  uint64_t binary_value = 0;
+
+  // Workaround for strict-aliasing rules.
+  memcpy(&binary_value, &value, sizeof(binary_value));
 
   // These are the binary representations of the various non-finite value ranges,
   // according to the IEEE 754 standard:
