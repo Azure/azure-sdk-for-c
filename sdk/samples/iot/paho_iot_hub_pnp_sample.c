@@ -178,8 +178,8 @@ static az_result build_property_payload_with_status(
  * message to the device.
  *   {
  *     "properties": {
- *        "desired": {
- *          "targetTemperature": 68.5,
+ *       "desired": {
+ *         "targetTemperature": 68.5,
  *       }
  *     }
  *   }
@@ -206,7 +206,9 @@ static az_result build_property_payload_with_status(
  * commands are attempted to be invoked, the log will report the command is not found. To invoke a
  * command, select your device's Direct Method tab in the Azure IoT Explorer. Enter the command name
  * getMaxMinReport along with a payload using an ISO8061 time format and select Invoke method.
+ *
  *   "2020-08-18T17:09:29-0700"
+ *
  * The command will send back to the service a response containing the following JSON payload with
  * updated values in each field:
  *   {

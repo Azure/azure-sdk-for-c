@@ -237,14 +237,19 @@ static void handle_command_message(
  *     }
  *   }
  *
- * To send a device twin desired property message, select your device's Device Twin tab
- * in the Azure IoT Explorer. Add the property targetTemperature along with a corresponding value to
- * the desired section of the JSON. Select Save to update the twin document and send the twin
- * message to the device.
+ * To send a Temperature Sensor device twin desired property message, select your device's Device Twin
+ * tab in the Azure IoT Explorer. Add the property targetTemperature along with a corresponding value
+ * to the corresponding thermostat in the desired section of the JSON. Select Save to update the twin
+ * document and send the twin message to the device.
  *   {
  *     "properties": {
- *        "desired": {
- *          "targetTemperature": 68.5,
+ *       "desired": {
+ *         "thermostat1": {
+ *			     "targetTemperature": 34.8
+ * 		     },
+ *         "thermostat2": {
+ *			     "targetTemperature": 68.5
+ *		     }
  *       }
  *     }
  *   }
@@ -256,13 +261,25 @@ static void handle_command_message(
  *   {
  *     "properties": {
  *       "reported": {
- *         "targetTemperature": {
- *           "value": 68.5,
- *           "ac": 200,
- *           "av": 14,
- *           "ad": "success"
- *         },
- *         "maxTempSinceLastReboot": 74.3,
+ *         "thermostat1": {
+ *				   "__t": "c",
+ *				   "maxTempSinceLastReboot": 38.2,
+ *				   "targetTemperature": {
+ *					   "value": 34.8,
+ *					   "ac": 200,
+ *					   "av": 27,
+ *					   "ad": "success"
+ *				   }
+ *			   },
+ *			   "thermostat2": {
+ *				   "__t": "c",
+ *				   "maxTempSinceLastReboot": 69.1
+  *				   "targetTemperature": {
+ *					   "value": 68.5,
+ *					   "ac": 200,
+ *					   "av": 28,
+ *					   "ad": "success"
+ *			   },
  *       }
  *     }
  *   }
@@ -279,7 +296,9 @@ static void handle_command_message(
  * method.
  * - To invoke `getMaxMinReport` on Temperature Sensor 2, enter the method name
  * `thermostat2/getMaxMinReport` along with a payload using an ISO8601 time format. Select Invoke
- * method. "2020-08-18T17:09:29-0700"
+ * method.
+ *
+ *   "2020-08-18T17:09:29-0700"
  *
  * The command will send back to the service a response containing the following JSON payload with
  * updated values in each field:

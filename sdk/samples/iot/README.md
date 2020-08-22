@@ -207,7 +207,52 @@ This section provides an overview of the different samples available to run and 
   }
   ```
 
-  To send a Temperature Sensor device twin desired property message or view a Temperature Sensor reported property, see the [Device Twin instructions](https://github.com/Azure/azure-sdk-for-c/tree/1bd2c8731cf42c7da05e12a3792f1710eae8b3e8/sdk/samples/iot#iot-hub-plug-and-play-sample) in the IoT Hub Plug and Play Sample above.
+  To send a device twin desired property message, select your device's Device Twin tab in the Azure IoT Explorer. Add the property targetTemperature along with a corresponding value to the desired section of the JSON. Select Save to update the twin document and send the twin message to the device.
+
+  ```json
+  "properties": {
+      "desired": {
+          "thermostat1": {
+              "targetTemperature": 34.8
+          },
+          "thermostat2": {
+              "targetTemperature": 68.5
+          }
+      }
+  }
+  ```
+
+  Upon receiving a desired property message, the sample will update the twin property locally and
+  send a reported property of the same name back to the service. This message will include a set of
+  "ack" values: `ac` for the HTTP-like ack code, `av` for ack version of the property, and an
+  optional `ad` for an ack description.
+
+  ```json
+  "properties": {
+      "reported": {
+          "thermostat1": {
+              "__t": "c",
+              "maxTempSinceLastReboot": 38.2,
+              "targetTemperature": {
+                  "value": 34.8,
+                  "ac": 200,
+                  "av": 27,
+                  "ad": "success"
+              }
+          },
+          "thermostat2": {
+              "__t": "c",
+              "maxTempSinceLastReboot": 69.1
+              "targetTemperature": {
+                  "value": 68.5,
+                  "ac": 200,
+                  "av": 28,
+                  "ad": "success"
+              },
+          }
+      }
+  }
+  ```
 
 - **Direct Method (Command)**: Two methods are supported in this sample: `reboot` and `getMaxMinReport`.
 
@@ -217,7 +262,21 @@ This section provides an overview of the different samples available to run and 
   - To invoke `getMaxMinReport` on Temperature Sensor 1, enter the method name `thermostat1/getMaxMinReport` along with a payload using an [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) time format. Select Invoke method.
   - To invoke `getMaxMinReport` on Temperature Sensor 2, enter the method name `thermostat2/getMaxMinReport` along with a payload using an [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) time format. Select Invoke method.
 
-  For futher information on `getMaxMinReport`, see the [Direct Method (Command) instructions](https://github.com/Azure/azure-sdk-for-c/tree/1bd2c8731cf42c7da05e12a3792f1710eae8b3e8/sdk/samples/iot#iot-hub-plug-and-play-sample) in the IoT Hub Plug and Play Sample above.
+  ```json
+  "2020-08-18T17:09:29-0700"
+  ```
+
+  The command will send back to the service a response containing the following JSON payload with updated values in each field:
+
+  ```json
+    {
+      "maxTemp": 74.3,
+      "minTemp": 65.2,
+      "avgTemp": 68.79,
+      "startTime": "2020-08-18T17:09:29-0700",
+      "endTime": "2020-08-18T17:24:32-0700"
+    }
+  ```
 
 - **Telemetry**: The Temperature Controller sends a JSON message with the property name `workingSet` and a `double` value for the current working set of the device memory in KiB.  Each Temperature Sensor sends a JSON message with the property name `temperature` and a `double` value for the current temperature.
 
