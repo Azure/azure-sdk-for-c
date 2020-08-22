@@ -238,7 +238,7 @@ static void receive_method_messages(void)
     LOG_SUCCESS("Client parsed message.");
 
     invoke_method(&method_request);
-    LOG(" "); // formatting
+    LOG(" "); // formatting.
 
     MQTTClient_freeMessage(&message);
     MQTTClient_free(topic);

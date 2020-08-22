@@ -231,7 +231,7 @@ az_result read_environment_variables(
       env_vars->x509_trust_pem_file_path,
       &(env_vars->x509_trust_pem_file_path)));
 
-  LOG(" "); // Log formatting
+  LOG(" "); // Formatting.
   return AZ_OK;
 }
 

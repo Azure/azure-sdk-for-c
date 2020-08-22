@@ -363,7 +363,7 @@ static void receive_device_twin_message(void)
   parse_device_twin_message(topic, topic_len, message, &twin_response);
   LOG_SUCCESS("Client parsed device twin message.");
 
-  LOG(" "); // Formatting
+  LOG(" "); // Formatting.
 
   MQTTClient_freeMessage(&message);
   MQTTClient_free(topic);

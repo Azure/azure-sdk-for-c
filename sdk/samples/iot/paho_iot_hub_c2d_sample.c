@@ -221,7 +221,7 @@ static void receive_c2d_messages(void)
     parse_c2d_message(topic, topic_len, message, &c2d_request);
     LOG_SUCCESS("Client parsed message.");
 
-    LOG(" "); // formatting
+    LOG(" "); // formatting.
 
     MQTTClient_freeMessage(&message);
     MQTTClient_free(topic);

@@ -125,6 +125,7 @@ static az_result invoke_getMaxMinReport(
   if (az_span_ptr(start_time_span) == NULL)
   {
     response = report_error_payload;
+      LOG("here!");
     return AZ_ERROR_ITEM_NOT_FOUND;
   }
 

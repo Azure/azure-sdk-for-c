@@ -26,7 +26,7 @@ static const az_span desired_temp_ack_version_name = AZ_SPAN_LITERAL_FROM_STR("a
 static const az_span desired_temp_ack_description_name = AZ_SPAN_LITERAL_FROM_STR("ad");
 static const az_span component_specifier_name = AZ_SPAN_LITERAL_FROM_STR("__t");
 static const az_span component_specifier_value = AZ_SPAN_LITERAL_FROM_STR("c");
-static const az_span command_separator = AZ_SPAN_LITERAL_FROM_STR("*");
+static const az_span command_separator = AZ_SPAN_LITERAL_FROM_STR("/");
 static const az_span sample_iot_hub_twin_desired_version = AZ_SPAN_LITERAL_FROM_STR("$version");
 static const az_span sample_iot_hub_twin_desired = AZ_SPAN_LITERAL_FROM_STR("desired");
 
