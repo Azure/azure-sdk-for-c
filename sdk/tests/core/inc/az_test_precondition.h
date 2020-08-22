@@ -49,6 +49,7 @@
   if (precondition_test_count == 0) \
   { \
     assert(fn); \
+    (void)fn; \
   } \
   assert_int_equal(1, precondition_test_count);
 
