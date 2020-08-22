@@ -78,7 +78,7 @@ typedef struct
   az_span slice;
 
   /// This read-only field gives access to the size of the JSON text slice that represents the token
-  /// value, and it shouldn't be modified by the caller. This is useful of the token straddles
+  /// value, and it shouldn't be modified by the caller. This is useful if the token straddles
   /// non-contiguous buffers, to figure out what sized destination buffer to provide when calling
   /// #az_json_token_copy_into_span().
   int32_t size;
@@ -106,8 +106,9 @@ typedef struct
  * @return An #az_span that is a slice of the \p destination #az_span (i.e. the remainder) after the
  * token bytes have been copied.
  *
- * @remarks The method assumes that the \p destination has a large enough size to hold the contents
- * of \p json_token.
+ * @remarks The function assumes that the \p destination has a large enough size to hold the
+ * contents of \p json_token.
+ *
  * @remarks If \p json_token doesn't contain any text, this function will just return \p
  * destination.
  */
@@ -304,7 +305,7 @@ typedef struct
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK #az_json_writer is initialized successfully.
- * @retval other Initialization failure.
+ * @retval other Initialization failed.
  */
 AZ_NODISCARD az_result az_json_writer_init(
     az_json_writer* out_json_writer,
@@ -349,11 +350,11 @@ AZ_NODISCARD az_result az_json_writer_chunked_init(
  *
  * @return An #az_span containing the JSON text built so far.
  *
- * @remarks This method returns the entire JSON text when it fits in the first provided buffer,
+ * @remarks This function returns the entire JSON text when it fits in the first provided buffer,
  * where the destination is a single, contiguous buffer. When the destination can be a set of
  * non-contiguous buffers (using #az_json_writer_chunked_init()), and the JSON is larger than the
- * first provided destination span, this method only returns the text written into the last provided
- * destination buffer from the allocator callback.
+ * first provided destination span, this function only returns the text written into the last
+ * provided destination buffer from the allocator callback.
  */
 AZ_NODISCARD AZ_INLINE az_span
 az_json_writer_get_bytes_used_in_destination(az_json_writer const* json_writer)

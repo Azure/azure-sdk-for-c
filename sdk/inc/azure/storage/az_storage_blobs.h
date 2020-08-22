@@ -72,8 +72,8 @@ typedef struct
  *
  * @param[out] out_client The blob client instance to initialize.
  * @param[in] endpoint A URL to a blob storage account.
- * @param[in] credential The object used for authentication. #AZ_CREDENTIAL_ANONYMOUS should be used
- * for SAS.
+ * @param credential The object used for authentication. #AZ_CREDENTIAL_ANONYMOUS should be
+ * used for SAS.
  * @param[in] options A reference to an #az_storage_blobs_blob_client_options structure which
  * defines custom behavior of the client.
  *
@@ -106,8 +106,8 @@ typedef struct
  * @details Call this to obtain an initialized #az_storage_blobs_blob_client_options structure that
  * can be modified and passed to #az_storage_blobs_blob_client_init().
  *
- * @remark Use this, for instance, when only caring about setting one option by calling this method
- * and then overriding that specific option.
+ * @remark Use this, for instance, when only caring about setting one option by calling this
+ * function and then overriding that specific option.
  */
 AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_options_default();
 
@@ -116,8 +116,8 @@ AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_o
  *
  * @details Call this to obtain an initialized #az_storage_blobs_blob_upload_options structure.
  *
- * @remark Use this, for instance, when only caring about setting one option by calling this method
- * and then overriding that specific option.
+ * @remark Use this, for instance, when only caring about setting one option by calling this
+ * function and then overriding that specific option.
  */
 AZ_NODISCARD AZ_INLINE az_storage_blobs_blob_upload_options
 az_storage_blobs_blob_upload_options_default()
@@ -129,19 +129,19 @@ az_storage_blobs_blob_upload_options_default()
 /**
  * @brief Uploads the contents to blob storage.
  *
- * @param[in] client An #az_storage_blobs_blob_client structure.
+ * @param[in,out] ref_client An #az_storage_blobs_blob_client structure.
  * @param[in] content The blob content to upload.
  * @param[in] options __[nullable]__ A reference to an #az_storage_blobs_blob_upload_options
  * structure which defines custom behavior for uploading the blob. If `NULL` is passed, the client
- * will use the default options (i.e. #az_storage_blobs_blob_upload_options_default).
- * @param[in,out] ref_response An initialized `az_http_response` where to write HTTP response into.
+ * will use the default options (i.e. #az_storage_blobs_blob_upload_options_default()).
+ * @param[in,out] ref_response An initialized #az_http_response where to write HTTP response into.
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK Success.
  * @retval other Failure.
  */
 AZ_NODISCARD az_result az_storage_blobs_blob_upload(
-    az_storage_blobs_blob_client* client,
+    az_storage_blobs_blob_client* ref_client,
     az_span content,
     az_storage_blobs_blob_upload_options const* options,
     az_http_response* ref_response);

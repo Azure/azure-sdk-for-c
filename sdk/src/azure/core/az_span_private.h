@@ -25,7 +25,7 @@ enum
 };
 
 /**
- * @brief A portable implementation of the standard isfinite method, which may not be available on
+ * @brief A portable implementation of the standard isfinite function, which may not be available on
  * certain embedded systems that use older compilers.
  *
  * @param value The 64-bit floating point value to test.

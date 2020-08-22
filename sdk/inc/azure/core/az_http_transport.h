@@ -85,7 +85,7 @@ typedef struct
 /**
  * @brief Used to declare policy process callback #_az_http_policy_process_fn definition.
  */
-// Definitlion is below.
+// Definition is below.
 typedef struct _az_http_policy _az_http_policy;
 
 /**
@@ -193,7 +193,7 @@ AZ_NODISCARD az_result az_http_response_append(az_http_response* ref_response, a
  *
  * @param[in] request Pointer to an #az_http_request to be used by this function.
  *
- * @return Number of headers in the /p request.
+ * @return Number of headers in the \p request.
  */
 AZ_NODISCARD int32_t az_http_request_headers_count(az_http_request const* request);
 

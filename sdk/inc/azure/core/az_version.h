@@ -15,7 +15,8 @@
 #ifndef _az_VERSION_H
 #define _az_VERSION_H
 
-/// Version in string format for telemetry. Follows semver.org standard (https://semver.org)
+/// The version in string format used for telemetry following the semver.org standard
+/// (https://semver.org).
 #define AZ_SDK_VERSION_STRING "1.0.0-preview.5"
 
 /// Major numeric identifier.

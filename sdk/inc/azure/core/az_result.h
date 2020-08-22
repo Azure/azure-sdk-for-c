@@ -4,7 +4,7 @@
 /**
  * @file
  *
- * @brief #az_result definition.
+ * @brief Definition of #az_result and helper functions.
  *
  * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
  * prefixed with an underscore ('_') directly in your application code. These symbols
@@ -78,7 +78,7 @@ typedef enum
   /// A context was canceled, and a function had to return before result was ready.
   AZ_ERROR_CANCELED = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 0),
 
-  /// Input argument does not comply with the requested range of values.
+  /// Input argument does not comply with the expected range of values.
   AZ_ERROR_ARG = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 1),
 
   /// The size of the provided span is too small.
@@ -104,7 +104,6 @@ typedef enum
   AZ_ERROR_OUT_OF_MEMORY = _az_RESULT_MAKE_ERROR(_az_FACILITY_PLATFORM, 1),
 
   // === JSON error codes ===
-
   /// The kind of the token being read is not compatible with the expected type of the value.
   AZ_ERROR_JSON_INVALID_STATE = _az_RESULT_MAKE_ERROR(_az_FACILITY_JSON, 1),
 
@@ -130,7 +129,7 @@ typedef enum
   /// HTTP response overflow.
   AZ_ERROR_HTTP_RESPONSE_OVERFLOW = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 5),
 
-  /// Couldn't reolve host.
+  /// Couldn't resolve host.
   AZ_ERROR_HTTP_RESPONSE_COULDNT_RESOLVE_HOST = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 6),
 
   /// Error while parsing HTTP response header.
@@ -150,8 +149,8 @@ typedef enum
  *
  * @param[in] result Result value to check for failure.
  *
- * @retval true \p result indicates a failure.
- * @retval false \p result is successful.
+ * @retval true The operation that returned this \p result failed.
+ * @retval false The operation that returned this \p result was successful.
  */
 AZ_NODISCARD AZ_INLINE bool az_failed(az_result result)
 {
@@ -163,8 +162,8 @@ AZ_NODISCARD AZ_INLINE bool az_failed(az_result result)
  *
  * @param[in] result Result value to check for success.
  *
- * @retval true \p result indicates success.
- * @retval false \p result is a failure.
+ * @retval `true` The operation that returned this \p result failed.
+ * @retval `false` The operation that returned this \p result was successful.
  */
 AZ_NODISCARD AZ_INLINE bool az_succeeded(az_result result) { return !az_failed(result); }
 

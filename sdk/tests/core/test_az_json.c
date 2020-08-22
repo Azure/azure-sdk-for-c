@@ -1258,7 +1258,7 @@ az_result write_str(az_span span, az_span s, az_span* out, int32_t* written)
   return AZ_OK;
 }
 
-// Using a macro instead of a helper method to retain line number
+// Using a macro instead of a helper function to retain line number
 // in call stack to help debug which line/test case failed.
 #define test_json_reader_invalid_helper(json, expected_result) \
   do \

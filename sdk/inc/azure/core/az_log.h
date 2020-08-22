@@ -7,9 +7,9 @@
  * @brief This header defines the types and functions your application uses to be notified of Azure
  * SDK client library log messages.
  *
- * If you define the `AZ_NO_LOGGING` symbol when compiling the SDK code (or adding option
- * `-DLOGGING=OFF` with cmake), all of the Azure SDK logging functionality will be excluded making
- * the binary code smaller and faster.
+ * @details If you define the `AZ_NO_LOGGING` symbol when compiling the SDK code (or adding option
+ * `-DLOGGING=OFF` with cmake), all of the Azure SDK logging functionality will be excluded, making
+ * the resulting compiled code smaller and faster.
  *
  * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
  * prefixed with an underscore ('_') directly in your application code. These symbols
@@ -95,9 +95,8 @@ AZ_INLINE void az_log_set_classifications(az_log_classification const classifica
  * @brief Sets the function that will be invoked to report an SDK log message.
  *
  * @param[in] az_log_message_callback __[nullable]__ A pointer to the function that will be invoked
- * when an Azure SDK Core or an Azure SDK client library reports a log message matching one of the
- * #az_log_classification passed to #az_log_set_classifications(). If `NULL`, no function will be
- * invoked.
+ * when the SDK reports a log message matching one of the #az_log_classification passed to
+ * #az_log_set_classifications(). If `NULL`, no function will be invoked.
  */
 #ifndef AZ_NO_LOGGING
 void az_log_set_callback(az_log_message_fn az_log_message_callback);

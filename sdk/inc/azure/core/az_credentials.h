@@ -39,6 +39,9 @@ enum
 
 /**
  * @brief Authentication token.
+ *
+ * @details It is used by the authentication policy from the HTTP pipeline as part of a provided
+ * credential.
  */
 typedef struct
 {
@@ -73,7 +76,8 @@ typedef struct
  * @brief Function callback definition as a contract to be implemented for a credential to set
  * authentication scopes when it is supported by the type of the credential.
  */
-typedef AZ_NODISCARD az_result (*_az_credential_set_scopes_fn)(void* credential, az_span scopes);
+typedef AZ_NODISCARD az_result (
+    *_az_credential_set_scopes_fn)(void* ref_credential, az_span scopes);
 
 /**
  * @brief Credential definition. It is used internally to authenticate an SDK client with Azure. All

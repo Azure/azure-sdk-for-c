@@ -239,7 +239,7 @@ AZ_NODISCARD az_result az_http_response_get_status_line(
  * will return #AZ_ERROR_HTTP_INVALID_STATE.
  *
  * @param[in,out] ref_response A pointer to an #az_http_response instance.
- * @param[out] out_header A pointer to an az_pair to receive the header's key and value.
+ * @param[out] out_header A pointer to an #az_pair to receive the header's key and value.
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK A header was returned.

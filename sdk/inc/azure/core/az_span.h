@@ -42,14 +42,14 @@ typedef struct
 
 /**
  * @brief Returns the #az_span byte buffer's starting memory address.
- * @param[in] span An #az_span to get the buffer's starting memory address of.
+ * @param[in] span The #az_span whose starting memory address to return.
  * @return Starting memory address of \p span buffer.
  */
 AZ_NODISCARD AZ_INLINE uint8_t* az_span_ptr(az_span span) { return span._internal.ptr; }
 
 /**
  * @brief Returns the number of bytes within the #az_span.
- * @param[in] span An #az_span to get the buffer's size of.
+ * @param[in] span The #az_span whose size to return.
  * @return Size of \p span buffer.
  */
 AZ_NODISCARD AZ_INLINE int32_t az_span_size(az_span span) { return span._internal.size; }
@@ -64,7 +64,7 @@ AZ_NODISCARD AZ_INLINE int32_t az_span_size(az_span span) { return span._interna
  *
  * @return The "view" over the byte buffer.
  */
-// Note: If you are modifying this method, make sure to modify the non-inline version in the
+// Note: If you are modifying this function, make sure to modify the non-inline version in the
 // az_span.c file as well, and the _az_ version right below.
 #ifdef AZ_NO_PRECONDITION_CHECKING
 AZ_NODISCARD AZ_INLINE az_span az_span_create(uint8_t* ptr, int32_t size)
@@ -76,7 +76,7 @@ AZ_NODISCARD az_span az_span_create(uint8_t* ptr, int32_t size);
 #endif // AZ_NO_PRECONDITION_CHECKING
 
 /**
- * @brief An empty #az_span with `NULL` buffer pointer.
+ * @brief An empty #az_span.
  */
 // When updating this macro, also update AZ_PAIR_NULL, which should be using this macro, but can't
 // due to warnings, and so it is using an expansion of this macro instead.
@@ -256,7 +256,7 @@ void az_span_to_str(char* destination, int32_t destination_max_size, az_span sou
  * @retval 0 \p target is empty (if its size is equal zero).
  * @retval -1 \p target is not found in `source` OR \p source is empty (if its size is zero) and \p
  * target is non-empty.
- * @retval >0 The position of \p target in \p source.
+ * @retval >=0 The position of \p target in \p source.
  */
 AZ_NODISCARD int32_t az_span_find(az_span source, az_span target);
 
@@ -271,10 +271,10 @@ AZ_NODISCARD int32_t az_span_find(az_span source, az_span target);
  * @return An #az_span that is a slice of the \p destination #az_span (i.e. the remainder) after the
  * source bytes have been copied.
  *
- * @remarks The method assumes that the \p destination has a large enough size to hold the \p
+ * @remarks This function assumes that the \p destination has a large enough size to hold the \p
  * source.
  *
- * @remarks This method copies all of \p source into the \p destination even if they overlap.
+ * @remarks This function copies all of \p source into the \p destination even if they overlap.
  * @remarks If \p source is an empty #az_span or #AZ_SPAN_NULL, this function will just return
  * \p destination.
  */
@@ -289,7 +289,7 @@ az_span az_span_copy(az_span destination, az_span source);
  * @return An #az_span that is a slice of the \p destination #az_span (i.e. the remainder) after the
  * \p byte has been copied.
  *
- * @remarks The method assumes that the \p destination has a large enough size to hold one more
+ * @remarks The function assumes that the \p destination has a large enough size to hold one more
  * byte.
  */
 az_span az_span_copy_u8(az_span destination, uint8_t byte);
@@ -513,7 +513,7 @@ typedef struct
  * after this allocator returns a new destination #az_span.
  *
  * @remarks There is no guarantee that successive calls will return the same or same-sized buffer.
- * This method must never return an empty #az_span, unless the requested buffer size is not
+ * This function must never return an empty #az_span, unless the requested buffer size is not
  * available. In which case, it must return an error #az_result.
  *
  * @remarks The caller must check the return value using #az_succeeded() before continuing to use
