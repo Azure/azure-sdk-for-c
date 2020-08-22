@@ -273,13 +273,14 @@ static void handle_command_message(
  *         },
  *         "thermostat2": {
  *           "__t": "c",
- *           "maxTempSinceLastReboot": 69.1
+ *           "maxTempSinceLastReboot": 69.1,
  *           "targetTemperature": {
  *             "value": 68.5,
  *             "ac": 200,
  *             "av": 28,
  *             "ad": "success"
- *         },
+ *           }
+ *         }
  *       }
  *     }
  *   }
