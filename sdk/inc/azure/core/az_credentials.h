@@ -56,12 +56,10 @@ typedef struct
 } _az_token;
 
 /**
- * @brief Token credential.
- * Token credential pairs authentication token with the thread-safety lock.
+ * @brief A token credential which pairs authentication token with the thread-safety lock.
  *
- * @remark
- * Users should not access the token directly, without first using the corresponding thread-safe get
- * and set functions which update or get the copy of a token.
+ * @remark Users should not access the token directly, without first using the corresponding
+ * thread-safe get and set functions which update or get the copy of a token.
  */
 typedef struct
 {
