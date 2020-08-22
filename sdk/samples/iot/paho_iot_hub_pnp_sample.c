@@ -6,7 +6,8 @@
 #pragma warning(disable : 4201)
 // warning C4204: nonstandard extension used: non-constant aggregate initializer
 #pragma warning(disable : 4204)
-// warning C4996: 'localtime': This function or variable may be unsafe.  Consider using localtime_s instead.
+// warning C4996: 'localtime': This function or variable may be unsafe.  Consider using localtime_s
+// instead.
 #pragma warning(disable : 4996)
 #endif
 #include <paho-mqtt/MQTTClient.h>
@@ -157,10 +158,10 @@ static az_result build_property_payload_with_status(
     az_span* out_payload);
 
 /*
- * This sample connects an IoT Plug and Play enabled device with the Digital Twin Model ID (DTMI)
- * detailed here. If a timeout occurs while waiting for a message from the Azure IoT Explorer, the
- * sample will continue. If TIMEOUT_MQTT_RECEIVE_MAX_COUNT timeouts occur consecutively, the sample
- * will disconnect. X509 self-certification is used.
+ * This sample connects an IoT Plug and Play enabled device with the Digital Twin Model ID (DTMI).
+ * If a timeout occurs while waiting for a message from the Azure IoT Explorer, the sample will
+ * continue. If TIMEOUT_MQTT_RECEIVE_MAX_COUNT timeouts occur consecutively, the sample will
+ * disconnect. X509 self-certification is used.
  *
  * To interact with this sample, you must use the Azure IoT Explorer. The capabilities are Device
  * Twin, Direct Method (Command), and Telemetry:
@@ -170,6 +171,7 @@ static az_result build_property_payload_with_status(
  * temperature.
  *   - A reported property named `maxTempSinceLastReboot` with a `double` value for the highest
  * temperature.
+ *
  * To send a device twin desired property message, select your device's Device Twin tab
  * in the Azure IoT Explorer. Add the property targetTemperature along with a corresponding value to
  * the desired section of the JSON. Select Save to update the twin document and send the twin
@@ -181,6 +183,7 @@ static az_result build_property_payload_with_status(
  *       }
  *     }
  *   }
+ *
  * Upon receiving a desired property message, the sample will update the twin property locally and
  * send a reported property of the same name back to the service. This message will include a set of
  * "ack" values: `ac` for the HTTP-like ack code, `av` for ack version of the property, and an
@@ -865,7 +868,8 @@ static az_result invoke_getMaxMinReport(
 
   int rc;
   if (az_failed(
-          rc = build_property_payload(count, names, values, times, response_destination, out_response)))
+          rc = build_property_payload(
+              count, names, values, times, response_destination, out_response)))
   {
     LOG_ERROR("Failed to build command response payload: az_result return code 0x%04x.", rc);
     exit(rc);
@@ -896,7 +900,8 @@ static void send_telemetry_message(void)
   char telemetry_payload_buffer[128];
   az_span telemetry_payload = AZ_SPAN_FROM_BUFFER(telemetry_payload_buffer);
   if (az_failed(
-          rc = build_property_payload(count, names, values, NULL, telemetry_payload, &telemetry_payload)))
+          rc = build_property_payload(
+              count, names, values, NULL, telemetry_payload, &telemetry_payload)))
   {
     LOG_ERROR("Failed to build telemetry payload: az_result return code 0x%04x.", rc);
     exit(rc);
