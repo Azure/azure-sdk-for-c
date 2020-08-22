@@ -29,9 +29,10 @@ AZ_NODISCARD az_result az_http_pipeline_policy_apiversion(
           ref_request, options->_internal.name, options->_internal.version));
       break;
     case _az_http_policy_apiversion_option_location_queryparameter:
-      // Add the version as a query parameter
+      // Add the version as a query parameter. This value doesn't need url-encoding. Use `true` for
+      // url-encode to avoid encoding.
       AZ_RETURN_IF_FAILED(az_http_request_set_query_parameter(
-          ref_request, options->_internal.name, options->_internal.version));
+          ref_request, options->_internal.name, options->_internal.version, true));
       break;
     default:
       return AZ_ERROR_ARG;

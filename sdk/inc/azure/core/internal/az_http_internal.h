@@ -164,20 +164,25 @@ AZ_NODISCARD AZ_INLINE az_result _az_http_pipeline_nextpolicy(
 /**
  * @brief Format buffer as a http request containing URL and header spans.
  *
- * @param out_request HTTP request builder to initialize.
- * @param method HTTP verb: `"GET"`, `"POST"`, etc.
- * @param url Maximum URL length (see @ref az_http_request_set_query_parameter).
- * @param headers_buffer HTTP verb: `"GET"`, `"POST"`, etc.
- * @param body URL.
+ * @remark The initial \p url provided by the caller is expected to already be url-encoded.
+ *
+ * @param[out] out_request HTTP request to initialize.
+ * @param[in] context A pointer to an #az_context node.
+ * @param[in] method HTTP verb: `"GET"`, `"POST"`, etc.
+ * @param[in] url The #az_span to be used for storing the url. An initial value is expected to be in
+ * the buffer containing url schema and the server address. It can contain query parameters (like
+ * https://service.azure.com?query=1). This value is expected to be url-encoded.
+ * @param[in] url_length The size of the initial url value within url #az_span.
+ * @param[in] headers_buffer The #az_span to be used for storing headers for the request. The total
+ * number of headers are calculated automatically based on the size of the buffer.
+ * @param[in] body The #az_span buffer that contains a payload for the request. Use #AZ_SPAN_NULL
+ * for requests that don't have a body.
  *
  * @return
  *   - *`AZ_OK`* success.
- *   - *`AZ_ERROR_INSUFFICIENT_SPAN_SIZE`* `buffer` does not have enough space to fit the
- * `max_url_size`.
  *   - *`AZ_ERROR_ARG`*
- *     - `ref_request` is _NULL_.
- *     - `buffer`, `method_verb`, or `initial_url` are invalid spans (see @ref _az_span_is_valid).
- *     - `max_url_size` is less than `initial_url.size`.
+ *     - `out_request` is _NULL_.
+ *     - `url`, `method`, or `headers_buffer` are invalid spans (see @ref _az_span_is_valid).
  */
 AZ_NODISCARD az_result az_http_request_init(
     az_http_request* out_request,
@@ -193,19 +198,37 @@ AZ_NODISCARD az_result az_http_request_init(
  * For instance, if url in request is `http://example.net?qp=1` and this function is called with
  * path equals to `test`, then request url will be updated to `http://example.net/test?qp=1`.
  *
+ * @remarks If \p is_path_url_encoded is set to false, before appending the path, it would be
+ * url-encoded.
  *
- * @param ref_request http request builder reference
- * @param path span to a path to be appended into url
- * @return AZ_NODISCARD az_http_request_append_path
+ *
+ * @param[out] ref_request A reference to an HTTP request.
+ * @param[in] path The #az_span to a path to be appended into the URL.
+ * @param[in] is_path_url_encoded The boolean value that defines if the value to be appended is
+ * url-encoded or not.
+ * @return An #az_result value indicating the result of the operation:
+ *         - #AZ_OK if successful
+ *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the \p path wouldn't fit into the URL buffer
+ * provided.
  */
-AZ_NODISCARD az_result az_http_request_append_path(az_http_request* ref_request, az_span path);
+AZ_NODISCARD az_result
+az_http_request_append_path(az_http_request* ref_request, az_span path, bool is_path_url_encoded);
 
 /**
- * @brief Set query parameter.
+ * @brief Set a query parameter at the end of url.
  *
- * @param ref_request HTTP request builder that holds the URL to set the query parameter to.
- * @param name URL parameter name.
- * @param value URL parameter value.
+ * @remark Query parameters are stored url-encoded. This function will not check if
+ * the a query parameter already exists in the URL. Calling this function twice with same \p name
+ * would duplicate the query parameter.
+ *
+ * @param[out] ref_request HTTP request that holds the URL to set the query parameter to.
+ * @param[in] name URL parameter name.
+ * @param[in] value URL parameter value.
+ * @param[in] \p is_value_url_encoded boolean value that defines if the query parameter (name and
+ * value) is url-encoded or not.
+ *
+ * @remarks if \p is_value_url_encoded is set to false, before setting query parameter, it would be
+ * url-encoded.
  *
  * @return
  *   - *`AZ_OK`* success.
@@ -217,8 +240,11 @@ AZ_NODISCARD az_result az_http_request_append_path(az_http_request* ref_request,
  *     - `name` or `value` are empty.
  *     - `name`'s or `value`'s buffer overlap resulting `url`'s buffer.
  */
-AZ_NODISCARD az_result
-az_http_request_set_query_parameter(az_http_request* ref_request, az_span name, az_span value);
+AZ_NODISCARD az_result az_http_request_set_query_parameter(
+    az_http_request* ref_request,
+    az_span name,
+    az_span value,
+    bool is_value_url_encoded);
 
 /**
  * @brief Add a new HTTP header for the request.

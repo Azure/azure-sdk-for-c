@@ -48,30 +48,6 @@ AZ_NODISCARD AZ_INLINE bool _az_isfinite(double value)
   return ((binary_value & 0x7FF0000000000000) != 0x7FF0000000000000);
 }
 
-/**
- * @brief Replace all contents from a starting position to an end position with the content of a
- * provided span
- *
- * @param destination src span where to replace content
- * @param start starting position where to replace
- * @param end end position where to replace
- * @param replacement content to use for replacement
- * @return AZ_NODISCARD az_span_replace
- */
-AZ_NODISCARD az_result _az_span_replace(
-    az_span destination,
-    int32_t current_size,
-    int32_t start,
-    int32_t end,
-    az_span replacement);
-
-typedef bool (*_az_predicate)(uint8_t next_byte);
-
-// PRIVATE. read until condition is true on character.
-// Then return number of positions read with output parameter
-AZ_NODISCARD az_result
-_az_span_scan_until(az_span span, _az_predicate predicate, int32_t* out_index);
-
 AZ_NODISCARD az_result _az_is_expected_span(az_span* ref_span, az_span expected);
 
 /**
