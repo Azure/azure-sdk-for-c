@@ -34,9 +34,6 @@ enum
  */
 AZ_NODISCARD AZ_INLINE bool _az_isfinite(double value)
 {
-  // double is an 8-byte numeric type.
-  _az_PRECONDITION(sizeof(double) == sizeof(uint64_t));
-
   uint64_t binary_value = 0;
 
   // Workaround for strict-aliasing rules.
