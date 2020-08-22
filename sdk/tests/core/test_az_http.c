@@ -668,6 +668,11 @@ static void test_http_request_header_validation_above_127(void** state)
     ASSERT_PRECONDITION_CHECKED(
         az_http_request_append_header(&request, header_name, request_header_content_type_token));
 
+    // In release builds, the compiler optimizes out the 'ASSERT_PRECONDITION_CHECKED' and complains
+    // that ptr is not used.
+    // error: unused variable 'header_name' [-Werror,-Wunused-variable]
+    (void)header_name;
+
     // make sure about header was not added
     assert_int_equal(az_http_request_headers_count(&request), 0);
     _az_http_request_headers headers = request._internal.headers;
@@ -682,6 +687,11 @@ static void test_http_response_append_null_response(void** state)
   {
     az_http_response* ptr = NULL;
     ASSERT_PRECONDITION_CHECKED(az_http_response_append(ptr, AZ_SPAN_FROM_STR("test")));
+
+    // In release builds, the compiler optimizes out the 'ASSERT_PRECONDITION_CHECKED' and complains
+    // that ptr is not used.
+    // error: unused variable 'ptr' [-Werror,-Wunused-variable]
+    (void)ptr;
   }
 }
 
