@@ -169,8 +169,11 @@ if (MSVC)
         paho_iot_hub_twin_sample
         paho_iot_provisioning_sample
         paho_iot_provisioning_sas_sample
-        PROPERTIES LINK_FLAGS
+        PROPERTIES
+        LINK_FLAGS
         "/NODEFAULTLIB:libcmtd.lib"
+        LINK_FLAGS_RELEASE
+        "/NODEFAULTLIB:libcmt.lib"
     )
 endif()
 
