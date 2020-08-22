@@ -43,13 +43,22 @@
 #define SETUP_PRECONDITION_CHECK_TESTS() \
   az_precondition_failed_set_callback(az_precondition_test_failed_fn);
 
+// In release builds, the compiler optimizes out 'ASSERT_PRECONDITION_CHECKED' which could result in
+// function parameters not being used. Explicitly storing the function result as a bool and using
+// (void) to cast it away so that we don't get a warning related to unused variables, particularly
+// in release configurations.
 #define ASSERT_PRECONDITION_CHECKED(fn) \
-  precondition_test_count = 0; \
-  (void)setjmp(g_precond_test_jmp_buf); \
-  if (precondition_test_count == 0) \
+  do \
   { \
-    assert(fn); \
-  } \
-  assert_int_equal(1, precondition_test_count);
+    precondition_test_count = 0; \
+    (void)setjmp(g_precond_test_jmp_buf); \
+    if (precondition_test_count == 0) \
+    { \
+      bool const result = (fn); \
+      assert(result); \
+      (void)result; \
+    } \
+    assert_int_equal(1, precondition_test_count); \
+  } while (0)
 
 #endif // _az_TEST_PRECONDITION_H

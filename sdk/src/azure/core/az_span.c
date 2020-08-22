@@ -355,9 +355,11 @@ static bool _is_valid_start_of_double(uint8_t first_byte)
 
 // Disable the following warning just for this particular use case.
 // C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead.
+// C4710: 'sscanf': function not inlined
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4996)
+#pragma warning(disable : 4710)
 #endif
 
 AZ_NODISCARD az_result az_span_atod(az_span source, double* out_number)
