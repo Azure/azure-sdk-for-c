@@ -65,36 +65,36 @@ typedef enum
   _az_JSON_STACK_ARRAY = 0,
 } _az_json_stack_item;
 
-AZ_INLINE _az_json_stack_item _az_json_stack_pop(_az_json_bit_stack* json_stack)
+AZ_INLINE _az_json_stack_item _az_json_stack_pop(_az_json_bit_stack* ref_json_stack)
 {
   _az_PRECONDITION(
-      json_stack->_internal.current_depth > 0
-      && json_stack->_internal.current_depth <= _az_MAX_JSON_STACK_SIZE);
+      ref_json_stack->_internal.current_depth > 0
+      && ref_json_stack->_internal.current_depth <= _az_MAX_JSON_STACK_SIZE);
 
   // Don't do the right bit shift if we are at the last bit in the stack.
-  if (json_stack->_internal.current_depth != 0)
+  if (ref_json_stack->_internal.current_depth != 0)
   {
-    json_stack->_internal.az_json_stack >>= 1;
+    ref_json_stack->_internal.az_json_stack >>= 1;
 
     // We don't want current_depth to become negative, in case preconditions are off, and if
     // append_container_end is called before append_X_start.
-    json_stack->_internal.current_depth--;
+    ref_json_stack->_internal.current_depth--;
   }
 
   // true (i.e. 1) means _az_JSON_STACK_OBJECT, while false (i.e. 0) means _az_JSON_STACK_ARRAY
-  return (json_stack->_internal.az_json_stack & 1) != 0 ? _az_JSON_STACK_OBJECT
-                                                        : _az_JSON_STACK_ARRAY;
+  return (ref_json_stack->_internal.az_json_stack & 1) != 0 ? _az_JSON_STACK_OBJECT
+                                                            : _az_JSON_STACK_ARRAY;
 }
 
-AZ_INLINE void _az_json_stack_push(_az_json_bit_stack* json_stack, _az_json_stack_item item)
+AZ_INLINE void _az_json_stack_push(_az_json_bit_stack* ref_json_stack, _az_json_stack_item item)
 {
   _az_PRECONDITION(
-      json_stack->_internal.current_depth >= 0
-      && json_stack->_internal.current_depth < _az_MAX_JSON_STACK_SIZE);
+      ref_json_stack->_internal.current_depth >= 0
+      && ref_json_stack->_internal.current_depth < _az_MAX_JSON_STACK_SIZE);
 
-  json_stack->_internal.current_depth++;
-  json_stack->_internal.az_json_stack <<= 1;
-  json_stack->_internal.az_json_stack |= item;
+  ref_json_stack->_internal.current_depth++;
+  ref_json_stack->_internal.az_json_stack <<= 1;
+  ref_json_stack->_internal.az_json_stack |= item;
 }
 
 AZ_NODISCARD AZ_INLINE _az_json_stack_item _az_json_stack_peek(_az_json_bit_stack const* json_stack)

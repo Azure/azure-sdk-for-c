@@ -10,8 +10,9 @@
  *
  * @param request An internal HTTP builder with data to build and send HTTP request.
  * @param ref_response A pre-allocated buffer where the HTTP response will be written.
- * @retval An #az_result value indicating the result of the operation:
- *         - #AZ_OK if successful
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK Success.
+ * @retval other Failure.
  */
 AZ_NODISCARD az_result
 az_http_client_send_request(az_http_request const* request, az_http_response* ref_response)
