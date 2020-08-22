@@ -47,10 +47,10 @@
 // Therefore, explicitly suppressing this warning.
 // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=25509
 // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66425
-#ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-result"
-#endif // __GNUC__
+//#ifdef __GNUC__
+//#pragma GCC diagnostic push
+//#pragma GCC diagnostic ignored "-Wunused-result"
+//#endif
 
 #define ASSERT_PRECONDITION_CHECKED(fn) \
   do \
@@ -60,13 +60,13 @@
     if (precondition_test_count == 0) \
     { \
       assert(fn); \
-      (void)fn; \
+      (void)!(fn); \
     } \
     assert_int_equal(1, precondition_test_count); \
   } while (0)
 
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
-#endif // __GNUC__
+//#ifdef __GNUC__
+//#pragma GCC diagnostic pop
+//#endif // __GNUC__
 
 #endif // _az_TEST_PRECONDITION_H
