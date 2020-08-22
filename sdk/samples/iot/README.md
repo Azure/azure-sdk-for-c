@@ -242,7 +242,7 @@ This section provides an overview of the different samples available to run and 
           },
           "thermostat2": {
               "__t": "c",
-              "maxTempSinceLastReboot": 69.1
+              "maxTempSinceLastReboot": 69.1,
               "targetTemperature": {
                   "value": 68.5,
                   "ac": 200,
