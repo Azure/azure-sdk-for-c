@@ -162,8 +162,8 @@ AZ_NODISCARD AZ_INLINE bool az_failed(az_result result)
  *
  * @param[in] result Result value to check for success.
  *
- * @retval `true` The operation that returned this \p result failed.
- * @retval `false` The operation that returned this \p result was successful.
+ * @retval `true` The operation that returned this \p result was successful.
+ * @retval `false` The operation that returned this \p result failed.
  */
 AZ_NODISCARD AZ_INLINE bool az_succeeded(az_result result) { return !az_failed(result); }
 
