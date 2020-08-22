@@ -245,11 +245,11 @@ static void handle_command_message(
  *     "properties": {
  *       "desired": {
  *         "thermostat1": {
- *			     "targetTemperature": 34.8
- * 		     },
+ *           "targetTemperature": 34.8
+ *         },
  *         "thermostat2": {
- *			     "targetTemperature": 68.5
- *		     }
+ *           "targetTemperature": 68.5
+ *         }
  *       }
  *     }
  *   }
@@ -262,24 +262,24 @@ static void handle_command_message(
  *     "properties": {
  *       "reported": {
  *         "thermostat1": {
- *				   "__t": "c",
- *				   "maxTempSinceLastReboot": 38.2,
- *				   "targetTemperature": {
- *					   "value": 34.8,
- *					   "ac": 200,
- *					   "av": 27,
- *					   "ad": "success"
- *				   }
- *			   },
- *			   "thermostat2": {
- *				   "__t": "c",
- *				   "maxTempSinceLastReboot": 69.1
-  *				   "targetTemperature": {
- *					   "value": 68.5,
- *					   "ac": 200,
- *					   "av": 28,
- *					   "ad": "success"
- *			   },
+ *           "__t": "c",
+ *           "maxTempSinceLastReboot": 38.2,
+ *           "targetTemperature": {
+ *             "value": 34.8,
+ *             "ac": 200,
+ *             "av": 27,
+ *             "ad": "success"
+ *           }
+ *         },
+ *         "thermostat2": {
+ *           "__t": "c",
+ *           "maxTempSinceLastReboot": 69.1
+ *           "targetTemperature": {
+ *             "value": 68.5,
+ *             "ac": 200,
+ *             "av": 28,
+ *             "ad": "success"
+ *         },
  *       }
  *     }
  *   }
