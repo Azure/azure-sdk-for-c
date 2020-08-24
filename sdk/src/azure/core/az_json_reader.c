@@ -864,7 +864,8 @@ AZ_NODISCARD az_result az_json_reader_next_token(az_json_reader* ref_json_reader
 
   if (az_span_size(json) < 1)
   {
-    if (ref_json_reader->token.kind == AZ_JSON_TOKEN_NONE)
+    if (ref_json_reader->token.kind == AZ_JSON_TOKEN_NONE
+        || ref_json_reader->_internal.bit_stack._internal.current_depth != 0)
     {
       // An empty JSON payload is invalid.
       return AZ_ERROR_UNEXPECTED_END;
