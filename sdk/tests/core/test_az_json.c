@@ -1080,7 +1080,7 @@ static void test_json_reader(void** state)
           "[[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ [[[[[ "
           "[[[[[ [[[[");
       az_result const result = read_write(json, &output, &o);
-      assert_int_equal(result, AZ_ERROR_JSON_READER_DONE);
+      assert_int_equal(result, AZ_ERROR_UNEXPECTED_END);
     }
     {
       int32_t o = 0;
@@ -1383,6 +1383,63 @@ static void test_json_reader_invalid(void** state)
 
   test_json_reader_invalid_helper(
       AZ_SPAN_FROM_STR("{\r\n\"isActive\":false \"\r\n}"), AZ_ERROR_UNEXPECTED_CHAR);
+}
+
+// Using a macro instead of a helper function to retain line number
+// in call stack to help debug which line/test case failed.
+#define test_json_reader_invalid_helper(json, expected_result) \
+  do \
+  { \
+    az_json_reader reader = { 0 }; \
+    TEST_EXPECT_SUCCESS(az_json_reader_init(&reader, json, NULL)); \
+    az_result result = AZ_OK; \
+    while (result == AZ_OK) \
+    { \
+      result = az_json_reader_next_token(&reader); \
+    } \
+    assert_int_equal(result, expected_result); \
+  } while (0)
+
+static void test_json_reader_incomplete(void** state)
+{
+  (void)state;
+
+  test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("{"), AZ_ERROR_UNEXPECTED_END);
+  test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("["), AZ_ERROR_UNEXPECTED_END);
+  test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("[1, 2,"), AZ_ERROR_UNEXPECTED_END);
+  test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("[1, 2, "), AZ_ERROR_UNEXPECTED_END);
+  test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("{  "), AZ_ERROR_UNEXPECTED_END);
+  test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("[ "), AZ_ERROR_UNEXPECTED_END);
+  test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("t"), AZ_ERROR_UNEXPECTED_END);
+  test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("tru"), AZ_ERROR_UNEXPECTED_END);
+  test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("n"), AZ_ERROR_UNEXPECTED_END);
+  test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("nu"), AZ_ERROR_UNEXPECTED_END);
+  test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("f"), AZ_ERROR_UNEXPECTED_END);
+  test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("fals"), AZ_ERROR_UNEXPECTED_END);
+  test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("\"name"), AZ_ERROR_UNEXPECTED_END);
+  test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("-"), AZ_ERROR_UNEXPECTED_END);
+  test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("-123."), AZ_ERROR_UNEXPECTED_END);
+  test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("-123.1e"), AZ_ERROR_UNEXPECTED_END);
+  test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("-123e+"), AZ_ERROR_UNEXPECTED_END);
+  test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("-123.1e+"), AZ_ERROR_UNEXPECTED_END);
+  test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("0."), AZ_ERROR_UNEXPECTED_END);
+  test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("{\"name"), AZ_ERROR_UNEXPECTED_END);
+  test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("{  \"name"), AZ_ERROR_UNEXPECTED_END);
+  test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("{  \"name\"  "), AZ_ERROR_UNEXPECTED_END);
+  test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("{\"name\" :"), AZ_ERROR_UNEXPECTED_END);
+  test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("{\"name\":  "), AZ_ERROR_UNEXPECTED_END);
+  test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("{\"name\": 123"), AZ_ERROR_UNEXPECTED_END);
+  test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("{\"name\": 123  "), AZ_ERROR_UNEXPECTED_END);
+  test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("{\"name\": 123,"), AZ_ERROR_UNEXPECTED_END);
+  test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("{\"name\": 123,  "), AZ_ERROR_UNEXPECTED_END);
+  test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("{\"name\": 123 ,  "), AZ_ERROR_UNEXPECTED_END);
+  test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("{\"name\":\"value}"), AZ_ERROR_UNEXPECTED_END);
+  test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("{\"name\":\"value\""), AZ_ERROR_UNEXPECTED_END);
+  test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("{\"name\":\"value\","), AZ_ERROR_UNEXPECTED_END);
+  test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("{\"name\":{}"), AZ_ERROR_UNEXPECTED_END);
+  test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("{\"name\":[]"), AZ_ERROR_UNEXPECTED_END);
+  test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("{\"name\":[[]"), AZ_ERROR_UNEXPECTED_END);
+  test_json_reader_invalid_helper(AZ_SPAN_FROM_STR("{\"name\":[1, 2, [], 3] "), AZ_ERROR_UNEXPECTED_END);
 }
 
 static void test_json_skip_children(void** state)
@@ -2555,6 +2612,7 @@ int test_az_json()
           cmocka_unit_test(test_json_writer_large_string_chunked),
           cmocka_unit_test(test_json_reader),
           cmocka_unit_test(test_json_reader_invalid),
+          cmocka_unit_test(test_json_reader_incomplete),
           cmocka_unit_test(test_json_skip_children),
           cmocka_unit_test(test_json_value),
           cmocka_unit_test(test_az_json_token_get_string_and_text_equal),
