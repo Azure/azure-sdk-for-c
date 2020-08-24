@@ -4,6 +4,8 @@
 
 ### New Features
 
+- Add `az_json_writer_append_json_text()` to support appending existing JSON with the JSON writer.
+
 ### Breaking Changes
 
 ### Bug Fixes
