@@ -111,7 +111,7 @@ az_result pnp_create_reported_property_with_status(
 /**
  * @brief Iteratively get the next desired property.
  *
- * @param[in] jr A pointer to the json reader from which the properties will be retrieved.
+ * @param[in] twin_message_span The #az_span of the received message to process.
  * @param[in] is_partial Boolean stating whether the JSON document is partial or not.
  * @param[in] components_ptr A pointer to a set of `az_span` pointers containing all the
  * names for components.
