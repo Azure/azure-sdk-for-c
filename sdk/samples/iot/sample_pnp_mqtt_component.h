@@ -18,7 +18,7 @@ typedef struct
   az_span out_payload_span;
 } pnp_mqtt_message;
 
-az_result pnp_mqtt_message_init(pnp_mqtt_message* mqtt_message);
+void pnp_mqtt_message_init(pnp_mqtt_message* mqtt_message);
 
 // Create request id span which increments request id integer each call. Capable of holding 8 digit
 // number.

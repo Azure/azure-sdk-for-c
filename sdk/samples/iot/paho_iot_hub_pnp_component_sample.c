@@ -142,6 +142,8 @@ int main(void)
   subscribe_mqtt_client_to_iot_hub_topics();
   LOG_SUCCESS("Client subscribed to IoT Hub topics.");
 
+  pnp_mqtt_message_init(&mqtt_message);
+
   initialize_components();
   LOG_SUCCESS("Client initialized components.");
 
@@ -289,14 +291,7 @@ static void initialize_components(void)
 {
   az_result rc;
 
-  // Initialize the sample publish message.
-  if (az_failed(rc = pnp_mqtt_message_init(&mqtt_message)))
-  {
-    LOG_ERROR("Could not initialize mqtt_message: az_result return code 0x%08x.", rc);
-    exit(rc);
-  }
-
-  // Initialize the thermostats 1 and 2.
+  // Initialize thermostats 1 and 2.
   if (az_failed(
           rc = pnp_thermostat_init(&thermostat_1, thermostat_1_name, DEFAULT_START_TEMP_CELSIUS)))
   {
