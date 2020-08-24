@@ -21,7 +21,7 @@ void az_platform_sleep_msec(int32_t milliseconds)
 }
 
 AZ_NODISCARD bool az_platform_atomic_compare_exchange(
-    uintptr_t volatile* obj,
+    uintptr_t volatile* ref_obj,
     uintptr_t expected,
     uintptr_t desired)
 {
@@ -33,7 +33,7 @@ AZ_NODISCARD bool az_platform_atomic_compare_exchange(
   // https://gcc.gnu.org/onlinedocs/gcc-4.1.0/gcc/C-Extensions.html
   // https://gcc.gnu.org/onlinedocs/gcc-4.1.0/gcc/Atomic-Builtins.html#Atomic-Builtins
 
-  return __sync_bool_compare_and_swap(obj, expected, desired);
+  return __sync_bool_compare_and_swap(ref_obj, expected, desired);
 #else
   return AZ_ERROR_NOT_IMPLEMENTED;
 #endif // __GNUC__ >= 4.1
