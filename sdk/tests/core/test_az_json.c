@@ -244,7 +244,6 @@ static void test_json_writer_append_nested(void** state)
           &writer, AZ_SPAN_FROM_STR("{\"name\":  \"f\\u0065o\", \"values\": [1, 2, 3,{}]}")));
 
       az_span_to_str((char*)array, 200, az_json_writer_get_bytes_used_in_destination(&writer));
-
       assert_string_equal(array, "{\"name\":  \"f\\u0065o\", \"values\": [1, 2, 3,{}]}");
     }
 
@@ -255,7 +254,6 @@ static void test_json_writer_append_nested(void** state)
       TEST_EXPECT_SUCCESS(az_json_writer_append_end_array(&writer));
 
       az_span_to_str((char*)array, 200, az_json_writer_get_bytes_used_in_destination(&writer));
-
       assert_string_equal(array, "[123  ]");
     }
 
@@ -264,15 +262,12 @@ static void test_json_writer_append_nested(void** state)
       TEST_EXPECT_SUCCESS(az_json_writer_append_begin_object(&writer));
       TEST_EXPECT_SUCCESS(az_json_writer_append_property_name(&writer, AZ_SPAN_FROM_STR("name")));
       TEST_EXPECT_SUCCESS(az_json_writer_append_bool(&writer, true));
-
       TEST_EXPECT_SUCCESS(az_json_writer_append_property_name(&writer, AZ_SPAN_FROM_STR("foo")));
       TEST_EXPECT_SUCCESS(az_json_writer_append_json_text(
           &writer, AZ_SPAN_FROM_STR("[\"bar\",null,0,-12,12,9007199254740991]")));
-
       TEST_EXPECT_SUCCESS(az_json_writer_append_end_object(&writer));
 
       az_span_to_str((char*)array, 200, az_json_writer_get_bytes_used_in_destination(&writer));
-
       assert_string_equal(
           array,
           "{"
