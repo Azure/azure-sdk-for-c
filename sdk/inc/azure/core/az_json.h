@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: MIT
 
 /**
- * @file az_json.h
+ * @file
  *
- * @brief This header defines the types and functions your application uses
- *        to read or write JSON objects.
+ * @brief This header defines the types and functions your application uses to read or write JSON
+ * objects.
  *
  * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
  * prefixed with an underscore ('_') directly in your application code. These symbols
@@ -66,19 +66,22 @@ typedef struct
  */
 typedef struct
 {
-  az_json_token_kind kind; ///< This read-only field gives access to the type of the token returned
-                           ///< by the #az_json_reader, and it shouldn't be modified by the caller.
-  az_span slice; ///< This read-only field gives access to the slice of the JSON text that
-                 ///< represents the token value, and it shouldn't be modified by the caller.
-                 ///< If the token straddles non-contiguous buffers, this is set to #AZ_SPAN_NULL.
-                 ///< The user can call #az_json_token_copy_into_span() to get the token value into
-                 ///< a contiguous buffer.
-                 ///< In the case of JSON strings, the slice does not include the surrounding
-                 ///< quotes.
-  int32_t size; ///< This read-only field gives access to the size of the JSON text slice that
-                ///< represents the token value, and it shouldn't be modified by the caller. This is
-                ///< useful of the token straddles non-contiguous buffers, to figure out what sized
-                ///< destination buffer to provide when calling #az_json_token_copy_into_span().
+  /// This read-only field gives access to the type of the token returned by the #az_json_reader,
+  /// and it shouldn't be modified by the caller.
+  az_json_token_kind kind;
+
+  /// This read-only field gives access to the slice of the JSON text that represents the token
+  /// value, and it shouldn't be modified by the caller.
+  /// If the token straddles non-contiguous buffers, this is set to #AZ_SPAN_NULL.
+  /// The user can call #az_json_token_copy_into_span() to get the token value into a contiguous
+  /// buffer. In the case of JSON strings, the slice does not include the surrounding quotes.
+  az_span slice;
+
+  /// This read-only field gives access to the size of the JSON text slice that represents the token
+  /// value, and it shouldn't be modified by the caller. This is useful if the token straddles
+  /// non-contiguous buffers, to figure out what sized destination buffer to provide when calling
+  /// #az_json_token_copy_into_span().
+  int32_t size;
 
   struct
   {
@@ -96,102 +99,119 @@ typedef struct
  * @brief Copies the content of the \p token #az_json_token to the \p destination #az_span.
  *
  * @param[in] json_token A pointer to an #az_json_token instance containing the JSON text to copy to
- * the destination.
- * @param[in] destination The #az_span whose bytes will be replaced by the JSON text from the \p
- * token.
+ * the \p destination.
+ * @param destination The #az_span whose bytes will be replaced by the JSON text from the \p
+ * json_token.
+ *
  * @return An #az_span that is a slice of the \p destination #az_span (i.e. the remainder) after the
  * token bytes have been copied.
  *
- * @remarks The method assumes that the \p destination has a large enough size to hold the contents
- * of \p token.
- * @remarks If \p token doesn't contain any text, this function will just return \p destination.
+ * @remarks The function assumes that the \p destination has a large enough size to hold the
+ * contents of \p json_token.
+ *
+ * @remarks If \p json_token doesn't contain any text, this function will just return \p
+ * destination.
  */
 az_span az_json_token_copy_into_span(az_json_token const* json_token, az_span destination);
 
 /**
- * @brief Returns the JSON token's boolean.
+ * @brief Gets the JSON token's boolean.
  *
- * @param json_token A pointer to an #az_json_token instance.
- * @param out_value A pointer to a variable to receive the value.
- * @return AZ_OK if the boolean is returned.<br>
- * AZ_ERROR_JSON_INVALID_STATE if the kind is not AZ_JSON_TOKEN_BOOLEAN.
+ * @param[in] json_token A pointer to an #az_json_token instance.
+ * @param[out] out_value A pointer to a variable to receive the value.
+ *
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The boolean value is returned.
+ * @retval #AZ_ERROR_JSON_INVALID_STATE The kind is not #AZ_JSON_TOKEN_BOOLEAN.
  */
 AZ_NODISCARD az_result az_json_token_get_boolean(az_json_token const* json_token, bool* out_value);
 
 /**
- * @brief Returns the JSON token's number as a 64-bit unsigned integer.
+ * @brief Gets the JSON token's number as a 64-bit unsigned integer.
  *
- * @param json_token A pointer to an #az_json_token instance.
- * @param out_value A pointer to a variable to receive the value.
- * @return AZ_OK if the number is returned.<br>
- * AZ_ERROR_JSON_INVALID_STATE if the kind != AZ_JSON_TOKEN_NUMBER.<br>
- * AZ_ERROR_UNEXPECTED_CHAR if a non-ASCII digit is found within the token or if it contains
- * a number that would overflow or underflow uint64
+ * @param[in] json_token A pointer to an #az_json_token instance.
+ * @param[out] out_value A pointer to a variable to receive the value.
+ *
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The number is returned.
+ * @retval #AZ_ERROR_JSON_INVALID_STATE The kind is not #AZ_JSON_TOKEN_NUMBER.
+ * @retval #AZ_ERROR_UNEXPECTED_CHAR A non-ASCII digit is found within the \p json_token or \p
+ * json_token contains a number that would overflow or underflow `uint64_t`.
  */
 AZ_NODISCARD az_result
 az_json_token_get_uint64(az_json_token const* json_token, uint64_t* out_value);
 
 /**
- * @brief Returns the JSON token's number as a 32-bit unsigned integer.
+ * @brief Gets the JSON token's number as a 32-bit unsigned integer.
  *
- * @param json_token A pointer to an #az_json_token instance.
- * @param out_value A pointer to a variable to receive the value.
- * @return AZ_OK if the number is returned.<br>
- * AZ_ERROR_JSON_INVALID_STATE if the kind != AZ_JSON_TOKEN_NUMBER.<br>
- * AZ_ERROR_UNEXPECTED_CHAR if a non-ASCII digit is found within the token or if it contains
- * a number that would overflow or underflow uint32
+ * @param[in] json_token A pointer to an #az_json_token instance.
+ * @param[out] out_value A pointer to a variable to receive the value.
+ *
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The number is returned.
+ * @retval #AZ_ERROR_JSON_INVALID_STATE The kind is not #AZ_JSON_TOKEN_NUMBER.
+ * @retval #AZ_ERROR_UNEXPECTED_CHAR A non-ASCII digit is found within the token or if it contains a
+ * number that would overflow or underflow `uint32_t`.
  */
 AZ_NODISCARD az_result
 az_json_token_get_uint32(az_json_token const* json_token, uint32_t* out_value);
 
 /**
- * @brief Returns the JSON token's number as a 64-bit signed integer.
+ * @brief Gets the JSON token's number as a 64-bit signed integer.
  *
- * @param json_token A pointer to an #az_json_token instance.
- * @param out_value A pointer to a variable to receive the value.
- * @return AZ_OK if the number is returned.<br>
- * AZ_ERROR_JSON_INVALID_STATE if the kind != AZ_JSON_TOKEN_NUMBER.<br>
- * AZ_ERROR_UNEXPECTED_CHAR if a non-ASCII digit is found within the token or if it contains
- * a number that would overflow or underflow int64
+ * @param[in] json_token A pointer to an #az_json_token instance.
+ * @param[out] out_value A pointer to a variable to receive the value.
+ *
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The number is returned.
+ * @retval #AZ_ERROR_JSON_INVALID_STATE The kind is not #AZ_JSON_TOKEN_NUMBER.
+ * @retval #AZ_ERROR_UNEXPECTED_CHAR A non-ASCII digit is found within the token or if it contains
+ * a number that would overflow or underflow `int64_t`.
  */
 AZ_NODISCARD az_result az_json_token_get_int64(az_json_token const* json_token, int64_t* out_value);
 
 /**
- * @brief Returns the JSON token's number as a 32-bit signed integer.
+ * @brief Gets the JSON token's number as a 32-bit signed integer.
  *
- * @param json_token A pointer to an #az_json_token instance.
- * @param out_value A pointer to a variable to receive the value.
- * @return AZ_OK if the number is returned.<br>
- * AZ_ERROR_JSON_INVALID_STATE if the kind != AZ_JSON_TOKEN_NUMBER.<br>
- * AZ_ERROR_UNEXPECTED_CHAR if a non-ASCII digit is found within the token or if it contains
- * a number that would overflow or underflow int32
+ * @param[in] json_token A pointer to an #az_json_token instance.
+ * @param[out] out_value A pointer to a variable to receive the value.
+ *
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The number is returned.
+ * @retval #AZ_ERROR_JSON_INVALID_STATE The kind is not #AZ_JSON_TOKEN_NUMBER.
+ * @retval #AZ_ERROR_UNEXPECTED_CHAR A non-ASCII digit is found within the token or if it contains a
+ * number that would overflow or underflow `int32_t`.
  */
 AZ_NODISCARD az_result az_json_token_get_int32(az_json_token const* json_token, int32_t* out_value);
 
 /**
- * @brief Returns the JSON token's number as a double.
+ * @brief Gets the JSON token's number as a `double`.
  *
- * @param json_token A pointer to an #az_json_token instance.
- * @param out_value A pointer to a variable to receive the value.
- * @return AZ_OK if the number is returned.<br>
- * AZ_ERROR_JSON_INVALID_STATE if the kind != AZ_JSON_TOKEN_NUMBER.<br>
- * AZ_ERROR_UNEXPECTED_CHAR if the resulting \p out_value wouldn't be a finite double number
+ * @param[in] json_token A pointer to an #az_json_token instance.
+ * @param[out] out_value A pointer to a variable to receive the value.
+ *
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The number is returned.
+ * @retval #AZ_ERROR_JSON_INVALID_STATE The kind is not #AZ_JSON_TOKEN_NUMBER.
+ * @retval #AZ_ERROR_UNEXPECTED_CHAR The resulting \p out_value wouldn't be a finite double number.
  */
 AZ_NODISCARD az_result az_json_token_get_double(az_json_token const* json_token, double* out_value);
 
 /**
- * @brief Returns the JSON token's string after unescaping it, if required.
+ * @brief Gets the JSON token's string after unescaping it, if required.
  *
- * @param json_token A pointer to an #az_json_token instance.
+ * @param[in] json_token A pointer to an #az_json_token instance.
  * @param destination A pointer to a buffer where the string should be copied into.
- * @param destination_max_size The maximum available space within the buffer referred to by
+ * @param[in] destination_max_size The maximum available space within the buffer referred to by
  * \p destination.
  * @param[out] out_string_length __[nullable]__ Contains the number of bytes written to the \p
  * destination which denote the length of the unescaped string. If `NULL` is passed, the parameter
  * is ignored.
- * @return AZ_OK if the string is returned.<br>
- * AZ_ERROR_JSON_INVALID_STATE if the kind != AZ_JSON_TOKEN_STRING.<br>
- * AZ_ERROR_INSUFFICIENT_SPAN_SIZE if \p destination does not have enough size.
+ *
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The string is returned.
+ * @retval #AZ_ERROR_JSON_INVALID_STATE The kind is not #AZ_JSON_TOKEN_STRING.
+ * @retval #AZ_ERROR_INSUFFICIENT_SPAN_SIZE \p destination does not have enough size.
  */
 AZ_NODISCARD az_result az_json_token_get_string(
     az_json_token const* json_token,
@@ -207,7 +227,7 @@ AZ_NODISCARD az_result az_json_token_get_string(
  * @param[in] expected_text The lookup text to compare the token against.
  *
  * @return `true` if the current JSON token value in the JSON source semantically matches the
- * expected lookup text, with the exact casing; otherwise, false.
+ * expected lookup text, with the exact casing; otherwise, `false`.
  *
  * @remarks This operation is only valid for the string and property name token kinds. For all other
  * token kinds, it returns false.
@@ -220,7 +240,6 @@ AZ_NODISCARD bool az_json_token_is_text_equal(
 
 /**
  * @brief Allows the user to define custom behavior when writing JSON using the #az_json_writer.
- *
  */
 typedef struct
 {
@@ -234,6 +253,7 @@ typedef struct
 /**
  * @brief Gets the default json writer options which builds minimized JSON (with no extra white
  * space) according to the JSON RFC.
+ *
  * @details Call this to obtain an initialized #az_json_writer_options structure that can be
  * modified and passed to #az_json_writer_init().
  *
@@ -256,7 +276,6 @@ AZ_NODISCARD AZ_INLINE az_json_writer_options az_json_writer_options_default()
  *
  * @remarks #az_json_writer builds the text sequentially with no caching and by default adheres to
  * the JSON RFC: https://tools.ietf.org/html/rfc8259.
- *
  */
 typedef struct
 {
@@ -278,18 +297,18 @@ typedef struct
 /**
  * @brief Initializes an #az_json_writer which writes JSON text into a buffer.
  *
- * @param[out] json_writer A pointer to an #az_json_writer instance to initialize.
- * @param[in] destination_buffer An #az_span over the byte buffer where the JSON text is to be
- * written.
+ * @param[out] out_json_writer A pointer to an #az_json_writer instance to initialize.
+ * @param destination_buffer An #az_span over the byte buffer where the JSON text is to be written.
  * @param[in] options __[nullable]__ A reference to an #az_json_writer_options
  * structure which defines custom behavior of the #az_json_writer. If `NULL` is passed, the writer
  * will use the default options (i.e. #az_json_writer_options_default()).
  *
- * @return An #az_result value indicating the result of the operation:
- *         - #AZ_OK if the az_json_writer is initialized successfully
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK #az_json_writer is initialized successfully.
+ * @retval other Initialization failed.
  */
 AZ_NODISCARD az_result az_json_writer_init(
-    az_json_writer* json_writer,
+    az_json_writer* out_json_writer,
     az_span destination_buffer,
     az_json_writer_options const* options);
 
@@ -297,23 +316,24 @@ AZ_NODISCARD az_result az_json_writer_init(
  * @brief Initializes an #az_json_writer which writes JSON text into a destination that can contain
  * non-contiguous buffers.
  *
- * @param[out] json_writer A pointer to an #az_json_writer the instance to initialize.
+ * @param[out] out_json_writer A pointer to an #az_json_writer the instance to initialize.
  * @param[in] first_destination_buffer An #az_span over the byte buffer where the JSON text is to be
  * written at the start.
  * @param[in] allocator_callback An #az_span_allocator_fn callback function that provides the
  * destination span to write the JSON text to once the previous buffer is full or too small to
  * contain the next token.
- * @param[in] user_context A context specific user-defined struct or set of fields that is passed
+ * @param user_context A context specific user-defined struct or set of fields that is passed
  * through to calls to the #az_span_allocator_fn.
  * @param[in] options __[nullable]__ A reference to an #az_json_writer_options
  * structure which defines custom behavior of the #az_json_writer. If `NULL` is passed, the writer
  * will use the default options (i.e. #az_json_writer_options_default()).
  *
- * @return An #az_result value indicating the result of the operation:
- *         - #AZ_OK if the az_json_writer is initialized successfully
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The #az_json_writer is initialized successfully.
+ * @retval other Failure.
  */
 AZ_NODISCARD az_result az_json_writer_chunked_init(
-    az_json_writer* json_writer,
+    az_json_writer* out_json_writer,
     az_span first_destination_buffer,
     az_span_allocator_fn allocator_callback,
     void* user_context,
@@ -330,11 +350,11 @@ AZ_NODISCARD az_result az_json_writer_chunked_init(
  *
  * @return An #az_span containing the JSON text built so far.
  *
- * @remarks This method returns the entire JSON tet when it fits in the first provided buffer, where
- * the destination is a single, contiguous buffer. When the destination can be a set of
- * non-contiguous buffers (using `az_json_writer_chunked_init`), and the JSON is larger than the
- * first provided destination span, this method only returns the text written into the last provided
- * destination buffer from the allocator callback.
+ * @remarks This function returns the entire JSON text when it fits in the first provided buffer,
+ * where the destination is a single, contiguous buffer. When the destination can be a set of
+ * non-contiguous buffers (using #az_json_writer_chunked_init()), and the JSON is larger than the
+ * first provided destination span, this function only returns the text written into the last
+ * provided destination buffer from the allocator callback.
  */
 AZ_NODISCARD AZ_INLINE az_span
 az_json_writer_get_bytes_used_in_destination(az_json_writer const* json_writer)
@@ -346,18 +366,18 @@ az_json_writer_get_bytes_used_in_destination(az_json_writer const* json_writer)
 /**
  * @brief Appends the UTF-8 text value (as a JSON string) into the buffer.
  *
- * @param[in] json_writer A pointer to an #az_json_writer instance containing the buffer to append
- * the string value to.
+ * @param[in,out] ref_json_writer A pointer to an #az_json_writer instance containing the buffer to
+ * append the string value to.
  * @param[in] value The UTF-8 encoded value to be written as a JSON string. The value is escaped
  * before writing.
  *
  * @remarks If \p value is #AZ_SPAN_NULL, the empty JSON string value is written (i.e. "").
  *
- * @return An #az_result value indicating the result of the operation:
- *         - #AZ_OK if the string value was appended successfully
- *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the buffer is too small
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The string value was appended successfully.
+ * @retval #AZ_ERROR_INSUFFICIENT_SPAN_SIZE The buffer is too small.
  */
-AZ_NODISCARD az_result az_json_writer_append_string(az_json_writer* json_writer, az_span value);
+AZ_NODISCARD az_result az_json_writer_append_string(az_json_writer* ref_json_writer, az_span value);
 
 /**
  * @brief Appends an existing UTF-8 encoded JSON text into the buffer, useful for appending nested
@@ -391,60 +411,61 @@ az_json_writer_append_json_text(az_json_writer* json_writer, az_span json_text);
  * @brief Appends the UTF-8 property name (as a JSON string) which is the first part of a name/value
  * pair of a JSON object.
  *
- * @param[in] json_writer A pointer to an #az_json_writer instance containing the buffer to append
- * the property name to.
+ * @param[in,out] ref_json_writer A pointer to an #az_json_writer instance containing the buffer to
+ * append the property name to.
  * @param[in] name The UTF-8 encoded property name of the JSON value to be written. The name is
  * escaped before writing.
  *
- * @return An #az_result value indicating the result of the operation:
- *         - #AZ_OK if the property name was appended successfully
- *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the buffer is too small
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The property name was appended successfully.
+ * @retval #AZ_ERROR_INSUFFICIENT_SPAN_SIZE The buffer is too small.
  */
 AZ_NODISCARD az_result
-az_json_writer_append_property_name(az_json_writer* json_writer, az_span name);
+az_json_writer_append_property_name(az_json_writer* ref_json_writer, az_span name);
 
 /**
  * @brief Appends a boolean value (as a JSON literal `true` or `false`).
  *
- * @param[in] json_writer A pointer to an #az_json_writer instance containing the buffer to append
- * the boolean to.
- * @param[in] value The value to be written as a JSON literal true or false.
+ * @param[in,out] ref_json_writer A pointer to an #az_json_writer instance containing the buffer to
+ * append the boolean to.
+ * @param[in] value The value to be written as a JSON literal `true` or `false`.
  *
- * @return An #az_result value indicating the result of the operation:
- *         - #AZ_OK if the boolean was appended successfully
- *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the buffer is too small
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The boolean was appended successfully.
+ * @retval #AZ_ERROR_INSUFFICIENT_SPAN_SIZE The buffer is too small.
  */
-AZ_NODISCARD az_result az_json_writer_append_bool(az_json_writer* json_writer, bool value);
+AZ_NODISCARD az_result az_json_writer_append_bool(az_json_writer* ref_json_writer, bool value);
 
 /**
- * @brief Appends an int32_t number value.
+ * @brief Appends an `int32_t` number value.
  *
- * @param[in] json_writer A pointer to an #az_json_writer instance containing the buffer to append
- * the number to.
+ * @param[in,out] ref_json_writer A pointer to an #az_json_writer instance containing the buffer to
+ * append the number to.
  * @param[in] value The value to be written as a JSON number.
  *
- * @return An #az_result value indicating the result of the operation:
- *         - #AZ_OK if the number was appended successfully
- *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the buffer is too small
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The number was appended successfully.
+ * @retval #AZ_ERROR_INSUFFICIENT_SPAN_SIZE The buffer is too small.
  */
-AZ_NODISCARD az_result az_json_writer_append_int32(az_json_writer* json_writer, int32_t value);
+AZ_NODISCARD az_result az_json_writer_append_int32(az_json_writer* ref_json_writer, int32_t value);
 
 /**
- * @brief Appends a double number value.
+ * @brief Appends a `double` number value.
  *
- * @param[in] json_writer A pointer to an #az_json_writer instance containing the buffer to append
- * the number to.
+ * @param[in,out] ref_json_writer A pointer to an #az_json_writer instance containing the buffer to
+ * append the number to.
  * @param[in] value The value to be written as a JSON number.
  * @param[in] fractional_digits The number of digits of the \p value to write after the decimal
  * point and truncate the rest.
- * @return An #az_result value indicating the result of the operation:
- *         - #AZ_OK if the number was appended successfully
- *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the buffer is too small
- *         - #AZ_ERROR_NOT_SUPPORTED if the \p value contains an integer component that is too
- * large and would overflow beyond 2^53 - 1
  *
- * @remark Only finite double values are supported. Values such as NAN and INFINITY are not allowed
- * and would lead to invalid JSON being written.
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The number was appended successfully.
+ * @retval #AZ_ERROR_INSUFFICIENT_SPAN_SIZE The buffer is too small.
+ * @retval #AZ_ERROR_NOT_SUPPORTED The \p value contains an integer component that is too large and
+ * would overflow beyond `2^53 - 1`.
+ *
+ * @remark Only finite double values are supported. Values such as `NAN` and `INFINITY` are not
+ * allowed and would lead to invalid JSON being written.
  *
  * @remark Non-significant trailing zeros (after the decimal point) are not written, even if \p
  * fractional_digits is large enough to allow the zero padding.
@@ -452,78 +473,79 @@ AZ_NODISCARD az_result az_json_writer_append_int32(az_json_writer* json_writer, 
  * @remark The \p fractional_digits must be between 0 and 15 (inclusive). Any value passed in that
  * is larger will be clamped down to 15.
  */
-AZ_NODISCARD az_result
-az_json_writer_append_double(az_json_writer* json_writer, double value, int32_t fractional_digits);
+AZ_NODISCARD az_result az_json_writer_append_double(
+    az_json_writer* ref_json_writer,
+    double value,
+    int32_t fractional_digits);
 
 /**
  * @brief Appends the JSON literal `null`.
  *
- * @param[in] json_writer A pointer to an #az_json_writer instance containing the buffer to append
- * the `null` literal to.
+ * @param[in,out] ref_json_writer A pointer to an #az_json_writer instance containing the buffer to
+ * append the `null` literal to.
  *
- * @return An #az_result value indicating the result of the operation:
- *         - #AZ_OK if `null` was appended successfully
- *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the buffer is too small
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK `null` was appended successfully.
+ * @retval #AZ_ERROR_INSUFFICIENT_SPAN_SIZE The buffer is too small.
  */
-AZ_NODISCARD az_result az_json_writer_append_null(az_json_writer* json_writer);
+AZ_NODISCARD az_result az_json_writer_append_null(az_json_writer* ref_json_writer);
 
 /**
  * @brief Appends the beginning of a JSON object (i.e. `{`).
  *
- * @param[in] json_writer A pointer to an #az_json_writer instance containing the buffer to append
- * the start of object to.
+ * @param[in,out] ref_json_writer A pointer to an #az_json_writer instance containing the buffer to
+ * append the start of object to.
  *
- * @return An #az_result value indicating the result of the operation:
- *         - #AZ_OK if object start was appended successfully
- *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the buffer is too small
- *         - #AZ_ERROR_JSON_NESTING_OVERFLOW if the depth of the JSON exceeds the maximum allowed
- *           depth of 64
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK Object start was appended successfully.
+ * @retval #AZ_ERROR_INSUFFICIENT_SPAN_SIZE The buffer is too small.
+ * @retval #AZ_ERROR_JSON_NESTING_OVERFLOW The depth of the JSON exceeds the maximum allowed
+ * depth of 64.
  */
-AZ_NODISCARD az_result az_json_writer_append_begin_object(az_json_writer* json_writer);
+AZ_NODISCARD az_result az_json_writer_append_begin_object(az_json_writer* ref_json_writer);
 
 /**
  * @brief Appends the beginning of a JSON array (i.e. `[`).
  *
- * @param[in] json_writer A pointer to an #az_json_writer instance containing the buffer to append
- * the start of array to.
+ * @param[in,out] ref_json_writer A pointer to an #az_json_writer instance containing the buffer to
+ * append the start of array to.
  *
- * @return An #az_result value indicating the result of the operation:
- *         - #AZ_OK if array start was appended successfully
- *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the buffer is too small
- *         - #AZ_ERROR_JSON_NESTING_OVERFLOW if the depth of the JSON exceeds the maximum allowed
- *           depth of 64
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK Array start was appended successfully.
+ * @retval #AZ_ERROR_INSUFFICIENT_SPAN_SIZE The buffer is too small.
+ * @retval #AZ_ERROR_JSON_NESTING_OVERFLOW The depth of the JSON exceeds the maximum allowed depth
+ * of 64.
  */
-AZ_NODISCARD az_result az_json_writer_append_begin_array(az_json_writer* json_writer);
+AZ_NODISCARD az_result az_json_writer_append_begin_array(az_json_writer* ref_json_writer);
 
 /**
  * @brief Appends the end of the current JSON object (i.e. `}`).
  *
- * @param[in] json_writer A pointer to an #az_json_writer instance containing the buffer to append
- * the closing character to.
+ * @param[in,out] ref_json_writer A pointer to an #az_json_writer instance containing the buffer to
+ * append the closing character to.
  *
- * @return An #az_result value indicating the result of the operation:
- *         - #AZ_OK if object end was appended successfully
- *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the buffer is too small
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK Object end was appended successfully.
+ * @retval #AZ_ERROR_INSUFFICIENT_SPAN_SIZE The buffer is too small.
  */
-AZ_NODISCARD az_result az_json_writer_append_end_object(az_json_writer* json_writer);
+AZ_NODISCARD az_result az_json_writer_append_end_object(az_json_writer* ref_json_writer);
 
 /**
  * @brief Appends the end of the current JSON array (i.e. `]`).
  *
- * @param[in] json_writer A pointer to an #az_json_writer instance containing the buffer to append
- * the closing character to.
+ * @param[in,out] ref_json_writer A pointer to an #az_json_writer instance containing the buffer to
+ * append the closing character to.
  *
- * @return An #az_result value indicating the result of the operation:
- *         - #AZ_OK if array end was appended successfully
- *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the buffer is too small
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK Array end was appended successfully.
+ * @retval #AZ_ERROR_INSUFFICIENT_SPAN_SIZE The buffer is too small.
  */
-AZ_NODISCARD az_result az_json_writer_append_end_array(az_json_writer* json_writer);
+AZ_NODISCARD az_result az_json_writer_append_end_array(az_json_writer* ref_json_writer);
 
 /************************************ JSON READER ******************/
 
 /**
  * @brief Allows the user to define custom behavior when reading JSON using the #az_json_reader.
- *
  */
 typedef struct
 {
@@ -537,6 +559,7 @@ typedef struct
 /**
  * @brief Gets the default json reader options which reads the JSON strictly according to the JSON
  * RFC.
+ *
  * @details Call this to obtain an initialized #az_json_reader_options structure that can be
  * modified and passed to #az_json_reader_init().
  *
@@ -561,9 +584,9 @@ AZ_NODISCARD AZ_INLINE az_json_reader_options az_json_reader_options_default()
  */
 typedef struct
 {
-  az_json_token token; ///< This read-only field gives access to the current token that the
-                       ///< #az_json_reader has processed, and it shouldn't be modified by the
-                       ///< caller.
+  /// This read-only field gives access to the current token that the #az_json_reader has processed,
+  /// and it shouldn't be modified by the caller.
+  az_json_token token;
 
   struct
   {
@@ -583,14 +606,15 @@ typedef struct
  * @brief Initializes an #az_json_reader to read the JSON payload contained within the provided
  * buffer.
  *
- * @param[out] json_reader A pointer to an #az_json_reader instance to initialize.
+ * @param[out] out_json_reader A pointer to an #az_json_reader instance to initialize.
  * @param[in] json_buffer An #az_span over the byte buffer containing the JSON text to read.
- * @param[in] options __[nullable]__ A reference to an #az_json_reader_options
- * structure which defines custom behavior of the #az_json_reader. If `NULL` is passed, the reader
- * will use the default options (i.e. #az_json_reader_options_default()).
+ * @param[in] options __[nullable]__ A reference to an #az_json_reader_options structure which
+ * defines custom behavior of the #az_json_reader. If `NULL` is passed, the reader will use the
+ * default options (i.e. #az_json_reader_options_default()).
  *
- * @return An #az_result value indicating the result of the operation:
- *         - #AZ_OK if the #az_json_reader is initialized successfully
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The #az_json_reader is initialized successfully.
+ * @retval other Initialization failed.
  *
  * @remarks The provided json buffer must not be empty, as that is invalid JSON.
  *
@@ -598,7 +622,7 @@ typedef struct
  * the \p json_buffer.
  */
 AZ_NODISCARD az_result az_json_reader_init(
-    az_json_reader* json_reader,
+    az_json_reader* out_json_reader,
     az_span json_buffer,
     az_json_reader_options const* options);
 
@@ -606,7 +630,7 @@ AZ_NODISCARD az_result az_json_reader_init(
  * @brief Initializes an #az_json_reader to read the JSON payload contained within the provided
  * set of discontiguous buffers.
  *
- * @param[out] json_reader A pointer to an #az_json_reader instance to initialize.
+ * @param[out] out_json_reader A pointer to an #az_json_reader instance to initialize.
  * @param[in] json_buffers An array of non-contiguous byte buffers, as spans, containing the JSON
  * text to read.
  * @param[in] number_of_buffers The number of buffer segments provided, i.e. the length of the \p
@@ -615,8 +639,9 @@ AZ_NODISCARD az_result az_json_reader_init(
  * structure which defines custom behavior of the #az_json_reader. If `NULL` is passed, the reader
  * will use the default options (i.e. #az_json_reader_options_default()).
  *
- * @return An #az_result value indicating the result of the operation:
- *         - #AZ_OK if the #az_json_reader is initialized successfully
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The #az_json_reader is initialized successfully.
+ * @retval other Initialization failed.
  *
  * @remarks The provided array of json buffers must not be empty, as that is invalid JSON, and
  * therefore \p number_of_buffers must also be greater than 0. The array must also not contain any
@@ -626,7 +651,7 @@ AZ_NODISCARD az_result az_json_reader_init(
  * the \p json_buffers.
  */
 AZ_NODISCARD az_result az_json_reader_chunked_init(
-    az_json_reader* json_reader,
+    az_json_reader* out_json_reader,
     az_span json_buffers[],
     int32_t number_of_buffers,
     az_json_reader_options const* options);
@@ -634,28 +659,33 @@ AZ_NODISCARD az_result az_json_reader_chunked_init(
 /**
  * @brief Reads the next token in the JSON text and updates the reader state.
  *
- * @param json_reader A pointer to an #az_json_reader instance containing the JSON to read.
+ * @param[in,out] ref_json_reader A pointer to an #az_json_reader instance containing the JSON to
+ * read.
  *
- * @return AZ_OK if the token was read successfully.<br>
- *         AZ_ERROR_UNEXPECTED_END when the end of the JSON document is reached.<br>
- *         AZ_ERROR_UNEXPECTED_CHAR when an invalid character is detected.
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The token was read successfully.
+ * @retval #AZ_ERROR_UNEXPECTED_END The end of the JSON document is reached.
+ * @retval #AZ_ERROR_UNEXPECTED_CHAR An invalid character is detected.
+ * @retval #AZ_ERROR_JSON_READER_DONE No more JSON text left to process.
  */
-AZ_NODISCARD az_result az_json_reader_next_token(az_json_reader* json_reader);
+AZ_NODISCARD az_result az_json_reader_next_token(az_json_reader* ref_json_reader);
 
 /**
  * @brief Reads and skips over any nested JSON elements.
  *
- * @param json_reader A pointer to an #az_json_reader instance containing the JSON to read.
+ * @param[in,out] ref_json_reader A pointer to an #az_json_reader instance containing the JSON to
+ * read.
  *
- * @return AZ_OK if the children of the current JSON token are skipped successfully.<br>
- *         AZ_ERROR_UNEXPECTED_END when the end of the JSON document is reached.<br>
- *         AZ_ERROR_UNEXPECTED_CHAR when an invalid character is detected.
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The children of the current JSON token are skipped successfully.
+ * @retval #AZ_ERROR_UNEXPECTED_END The end of the JSON document is reached.
+ * @retval #AZ_ERROR_UNEXPECTED_CHAR An invalid character is detected.
  *
  * @remarks If the current token kind is a property name, the reader first moves to the property
  * value. Then, if the token kind is start of an object or array, the reader moves to the matching
  * end object or array. For all other token kinds, the reader doesn't move and returns #AZ_OK.
  */
-AZ_NODISCARD az_result az_json_reader_skip_children(az_json_reader* json_reader);
+AZ_NODISCARD az_result az_json_reader_skip_children(az_json_reader* ref_json_reader);
 
 #include <azure/core/_az_cfg_suffix.h>
 

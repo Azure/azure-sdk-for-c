@@ -13,11 +13,7 @@
 
 /**
  * @brief Internal definition of an HTTP pipeline.
- *
  * Defines the number of policies inside a pipeline.
- *
- * Users @b should @b not access _internal field.
- *
  */
 typedef struct
 {
@@ -34,10 +30,7 @@ typedef enum
 } _az_http_policy_apiversion_option_location;
 
 /**
- * @brief Defines the options structure used by the api version policy
- *
- * Users @b should @b not access _internal field.
- *
+ * @brief Defines the options structure used by the API Version policy.
  */
 typedef struct
 {

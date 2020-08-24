@@ -67,56 +67,53 @@ az_http_request_append_path(az_http_request* ref_request, az_span path, bool is_
 {
   _az_PRECONDITION_NOT_NULL(ref_request);
 
+  int32_t const initial_url_length = ref_request->_internal.url_length;
+  int32_t const initial_query_start = ref_request->_internal.query_start;
+  az_span const url = ref_request->_internal.url;
+
   int32_t const path_size
       = is_path_url_encoded ? az_span_size(path) : _az_span_url_encode_calc_length(path);
 
   // Add 1 for the /.
-  int32_t const size_after_insert = ref_request->_internal.url_length + 1 + path_size;
-  if (az_span_size(ref_request->_internal.url) < size_after_insert)
+  int32_t const size_after_insert = initial_url_length + 1 + path_size;
+  if (az_span_size(url) < size_after_insert)
   {
     return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
   }
 
-  int32_t query_start = 0;
+  // To begin, assume we are appending at the end of the url.
+  int32_t query_start = initial_url_length;
 
   // There is an existing query parameter (i.e. URL with a question mark).
-  if (ref_request->_internal.query_start > 0)
+  if (initial_query_start > 0)
   {
     // We are appending in the middle of the URL, so, we will need to shift some existing content to
     // the right.
-    query_start = ref_request->_internal.query_start - 1;
+    query_start = initial_query_start - 1;
 
     // Get the span where to move the content, leaving enough room for the path and /.
-    az_span shifted_dst
-        = az_span_slice_to_end(ref_request->_internal.url, query_start + 1 + path_size);
+    az_span shifted_dst = az_span_slice_to_end(url, query_start + 1 + path_size);
     // Get the span slice needed to be moved before appending the path.
-    az_span shifted_src
-        = az_span_slice(ref_request->_internal.url, query_start, ref_request->_internal.url_length);
+    az_span shifted_src = az_span_slice(url, query_start, initial_url_length);
     // Move content left or right so there is room for path to be added.
     az_span_copy(shifted_dst, shifted_src);
 
     // Move past the /, path, and ? since that will be the new start of the next query.
     ref_request->_internal.query_start = query_start + 2 + path_size;
   }
-  else
-  {
-    // We are appending at the end of the URL, no need to shift.
-    query_start = ref_request->_internal.url_length;
-  }
 
   // Add the path delimiter.
-  az_span_copy_u8(az_span_slice_to_end(ref_request->_internal.url, query_start), '/');
+  az_span destination = az_span_copy_u8(az_span_slice_to_end(url, query_start), '/');
 
-  // Account for the '/' we just added and copy the path, after URL encoding it if necessary.
-  az_span destination = az_span_slice_to_end(ref_request->_internal.url, query_start + 1);
-  if (!is_path_url_encoded)
+  // Copy the path, after url encoding it, if necessary.
+  if (is_path_url_encoded)
+  {
+    az_span_copy(destination, path);
+  }
+  else
   {
     int32_t ignored = 0;
     AZ_RETURN_IF_FAILED(_az_span_url_encode(destination, path, &ignored));
-  }
-  else
-  {
-    az_span_copy(destination, path);
   }
 
   ref_request->_internal.url_length = size_after_insert;
@@ -136,8 +133,8 @@ AZ_NODISCARD az_result az_http_request_set_query_parameter(
   // name or value can't be empty
   _az_PRECONDITION(az_span_size(name) > 0 && az_span_size(value) > 0);
 
-  az_span url_remainder
-      = az_span_slice_to_end(ref_request->_internal.url, ref_request->_internal.url_length);
+  int32_t const initial_url_length = ref_request->_internal.url_length;
+  az_span url_remainder = az_span_slice_to_end(ref_request->_internal.url, initial_url_length);
 
   // Adding query parameter. Adding +2 to required length to include extra required symbols `=`
   // and `?` or `&`.
@@ -147,17 +144,13 @@ AZ_NODISCARD az_result az_http_request_set_query_parameter(
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(url_remainder, required_length);
 
   // Append either '?' or '&'
-  uint8_t separator;
+  uint8_t separator = '&';
   if (ref_request->_internal.query_start == 0)
   {
     separator = '?';
 
     // update QPs starting position when it's 0
-    ref_request->_internal.query_start = ref_request->_internal.url_length + 1;
-  }
-  else
-  {
-    separator = '&';
+    ref_request->_internal.query_start = initial_url_length + 1;
   }
 
   url_remainder = az_span_copy_u8(url_remainder, separator);

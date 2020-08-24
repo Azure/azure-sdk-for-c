@@ -21,7 +21,7 @@
 #define _az_MAX_SAFE_INTEGER 9007199254740991
 
 #ifndef AZ_NO_PRECONDITION_CHECKING
-// Note: If you are modifying this method, make sure to modify the inline version in the az_span.h
+// Note: If you are modifying this function, make sure to modify the inline version in the az_span.h
 // file as well.
 AZ_NODISCARD az_span az_span_create(uint8_t* ptr, int32_t size)
 {
@@ -355,9 +355,11 @@ static bool _is_valid_start_of_double(uint8_t first_byte)
 
 // Disable the following warning just for this particular use case.
 // C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead.
+// C4710: 'sscanf': function not inlined
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4996)
+#pragma warning(disable : 4710)
 #endif
 
 AZ_NODISCARD az_result az_span_atod(az_span source, double* out_number)
@@ -484,8 +486,8 @@ az_span az_span_copy(az_span destination, az_span source)
     return destination;
   }
 
-  // Even though the contract of this method is that the destination must be larger than source, cap
-  // the data move if the source is too large, to avoid memory corruption.
+  // Even though the contract of this function is that the destination must be larger than source,
+  // cap the data move if the source is too large, to avoid memory corruption.
   int32_t dest_size = az_span_size(destination);
   if (src_size > dest_size)
   {
@@ -502,7 +504,7 @@ az_span az_span_copy_u8(az_span destination, uint8_t byte)
 {
   _az_PRECONDITION_VALID_SPAN(destination, 1, false);
 
-  // Even though the contract of the method is that the destination must be at least 1 byte large,
+  // Even though the contract of the function is that the destination must be at least 1 byte large,
   // no-op if it is empty to avoid memory corruption.
   int32_t dest_size = az_span_size(destination);
   if (dest_size < 1)
@@ -529,7 +531,7 @@ void az_span_to_str(char* destination, int32_t destination_max_size, az_span sou
 
   _az_PRECONDITION(size_to_write < destination_max_size);
 
-  // Even though the contract of this method is that the destination_max_size must be larger than
+  // Even though the contract of this function is that the destination_max_size must be larger than
   // source to be able to copy all of the source to the char buffer including an extra null
   // terminating character, cap the data move if the source is too large, to avoid memory
   // corruption.
@@ -874,6 +876,17 @@ AZ_NODISCARD az_span _az_span_trim_whitespace_from_end(az_span source)
   return _az_span_trim_side(source, RIGHT);
 }
 
+// [0-9]
+AZ_NODISCARD AZ_INLINE bool _az_span_is_byte_digit(uint8_t c) { return '0' <= c && c <= '9'; }
+
+// [A-Za-z]
+AZ_NODISCARD AZ_INLINE bool _az_span_is_byte_letter(uint8_t c)
+{
+  // This is equivalent to ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z')
+  // This works because upper case and lower case letters are 0x20 away from each other.
+  return ((uint32_t)(c - 'A') & ~0x20u) <= 'Z' - 'A';
+}
+
 AZ_NODISCARD AZ_INLINE bool _az_span_url_should_encode(uint8_t c)
 {
   switch (c)
@@ -884,38 +897,33 @@ AZ_NODISCARD AZ_INLINE bool _az_span_url_should_encode(uint8_t c)
     case '~':
       return false;
     default:
-      return !(('0' <= c && c <= '9') || ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z'));
+      return !(_az_span_is_byte_digit(c) || _az_span_is_byte_letter(c));
   }
 }
 
 AZ_NODISCARD int32_t _az_span_url_encode_calc_length(az_span source)
 {
   _az_PRECONDITION_VALID_SPAN(source, 0, true);
-  // trying to calculate the number of bytes to encode more than INT32_MAX / 3 might overflow an
-  // int32 and return an erroneous number back
+  // Trying to calculate the number of bytes to encode more than INT32_MAX / 3 might overflow an
+  // int32 and return an erroneous number back.
   _az_PRECONDITION_RANGE(0, az_span_size(source), INT32_MAX / 3);
 
   int32_t const source_size = az_span_size(source);
-  if (source_size == 0)
-  {
-    return 0;
-  }
+  uint8_t const* const src_ptr = az_span_ptr(source);
 
-  uint8_t* const src_ptr = az_span_ptr(source);
-  int32_t required_symbols_to_be_added = 0;
-  int32_t src_idx = 0;
-  do
+  int32_t encoded_length = source_size;
+  for (int32_t i = 0; i < source_size; i++)
   {
-    uint8_t c = src_ptr[src_idx];
+    uint8_t c = src_ptr[i];
     if (_az_span_url_should_encode(c))
     {
       // Adding '%' plus 2 digits (minus 1 as original symbol is counted as 1)
-      required_symbols_to_be_added += 2;
+      encoded_length += 2;
     }
-    ++src_idx;
-  } while (src_idx < source_size);
+  }
 
-  return source_size + required_symbols_to_be_added;
+  // If source_size is 0, this will return 0.
+  return encoded_length;
 }
 
 AZ_NODISCARD az_result _az_span_url_encode(az_span destination, az_span source, int32_t* out_length)
@@ -928,81 +936,39 @@ AZ_NODISCARD az_result _az_span_url_encode(az_span destination, az_span source, 
 
   _az_PRECONDITION_NO_OVERLAP_SPANS(destination, source);
 
-  if (source_size == 0)
-  {
-    *out_length = 0;
-    return AZ_OK;
-  }
-
-  int32_t const destination_size = az_span_size(destination);
-  if (destination_size < source_size)
-  {
-    *out_length = 0;
-    return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
-  }
-
-  // "Extra space" is measured in units of 2 additional characters
-  // per single source character ('/' => "%2F").
-  int32_t const extra_space_have = (destination_size - source_size) / 2;
-
   uint8_t* const dest_begin = az_span_ptr(destination);
+  uint8_t* const dest_end = dest_begin + az_span_size(destination);
 
   uint8_t* const src_ptr = az_span_ptr(source);
   uint8_t* dest_ptr = dest_begin;
 
-  if (extra_space_have >= source_size)
+  for (int32_t i = 0; i < source_size; i++)
   {
-    // We know that there's enough space even if every character gets encoded.
-    int32_t src_idx = 0;
-    do
+    uint8_t c = src_ptr[i];
+    if (!_az_span_url_should_encode(c))
     {
-      uint8_t c = src_ptr[src_idx];
-      if (!_az_span_url_should_encode(c))
+      if (dest_ptr >= dest_end)
       {
-        *dest_ptr = c;
-        ++dest_ptr;
-      }
-      else
-      {
-        dest_ptr[0] = '%';
-        dest_ptr[1] = _az_number_to_upper_hex(c >> 4);
-        dest_ptr[2] = _az_number_to_upper_hex(c & 0x0F);
-        dest_ptr += 3;
+        *out_length = 0;
+        return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
       }
 
-      ++src_idx;
-    } while (src_idx < source_size);
-  }
-  else
-  {
-    // We may or may not have enough space, given whether the input needs much encoding or not.
-    int32_t extra_space_used = 0;
-    int32_t src_idx = 0;
-    do
+      *dest_ptr = c;
+      ++dest_ptr;
+    }
+    else
     {
-      uint8_t c = src_ptr[src_idx];
-      if (!_az_span_url_should_encode(c))
+      if (dest_ptr >= dest_end - 2)
       {
-        *dest_ptr = c;
-        ++dest_ptr;
-      }
-      else
-      {
-        ++extra_space_used;
-        if (extra_space_used > extra_space_have)
-        {
-          *out_length = 0;
-          return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
-        }
-
-        dest_ptr[0] = '%';
-        dest_ptr[1] = _az_number_to_upper_hex(c >> 4);
-        dest_ptr[2] = _az_number_to_upper_hex(c & 0x0F);
-        dest_ptr += 3;
+        *out_length = 0;
+        return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
       }
 
-      ++src_idx;
-    } while (src_idx < source_size);
+      dest_ptr[0] = '%';
+      dest_ptr[1] = _az_number_to_upper_hex(c >> 4);
+      dest_ptr[2] = _az_number_to_upper_hex(c & 0x0F);
+      dest_ptr += 3;
+    }
   }
 
   *out_length = (int32_t)(dest_ptr - dest_begin);
