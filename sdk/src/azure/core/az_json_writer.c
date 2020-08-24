@@ -732,7 +732,17 @@ static AZ_NODISCARD az_result _az_validate_json(
   // The first token of a valid JSON must either be a value or start object/array.
   *first_token_kind = reader.token.kind;
 
-  AZ_RETURN_IF_FAILED(az_json_reader_skip_children(&reader));
+  // Keep reading until we have finished validating the entire JSON text and make sure it isn't
+  // incomplete.
+  while (true)
+  {
+    az_result result = az_json_reader_next_token(&reader);
+    if (result == AZ_ERROR_JSON_READER_DONE)
+    {
+      break;
+    }
+    AZ_RETURN_IF_FAILED(result);
+  }
 
   // This is guaranteed not to be a property name or start object/array.
   // The last token of a valid JSON must either be a value or end object/array.
