@@ -386,23 +386,26 @@ AZ_NODISCARD az_result az_json_writer_append_string(az_json_writer* ref_json_wri
  * @param[in] json_writer A pointer to an #az_json_writer instance containing the buffer to append
  * the JSON text to.
  * @param[in] json_text A single, possibly nested, valid, UTF-8 encoded, JSON value to be written as
- * is. No modifications are made to this text, including escaping.
+ * is, without any formatting or spacing changes. No modifications are made to this text, including
+ * escaping.
  *
  * @remarks A single, possibly nested, JSON value is one that starts and ends with {} or [] or is a
  * single primitive token. The JSON cannot start with an end object or array, or a property name, or
  * be incomplete.
  *
- * @remarks The caller must make sure that the JSON to be appended provided by \p json_text is valid
- * and properly escaped.
+ * @remarks The function validates that the provided JSON to be appended is valid and properly
+ * escaped, and fails otherwise.
  *
- * @return An #az_result value indicating the result of the operation:
- *         - #AZ_OK if the JSON text value was appended successfully
- *         - #AZ_ERROR_INSUFFICIENT_SPAN_SIZE if the buffer is too small
- *         - #AZ_ERROR_JSON_INVALID_STATE if the \p json_writer is in a state where the \p json_text
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The provided \p json_text was appended successfully.
+ * @retval #AZ_ERROR_INSUFFICIENT_SPAN_SIZE The destination is too small for the provided \p
+ * json_text.
+ * @retval #AZ_ERROR_JSON_INVALID_STATE The \p json_writer is in a state where the \p json_text
  * cannot be appended because it would result in invalid JSON.
- *         - #AZ_ERROR_UNEXPECTED_END when the JSON is invalid, because we reached the end of the
- * JSON document too early
- *         - #AZ_ERROR_UNEXPECTED_CHAR when the JSON is invalid, because of an invalid character
+ * @retval #AZ_ERROR_UNEXPECTED_END The provided \p json_text is invalid because it is incomplete
+ * and ends too early.
+ * @retval #AZ_ERROR_UNEXPECTED_CHAR The provided \p json_text is invalid because of an unexpected
+ * character.
  */
 AZ_NODISCARD az_result
 az_json_writer_append_json_text(az_json_writer* json_writer, az_span json_text);
