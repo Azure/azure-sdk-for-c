@@ -383,7 +383,7 @@ AZ_NODISCARD az_result az_json_writer_append_string(az_json_writer* ref_json_wri
  * @brief Appends an existing UTF-8 encoded JSON text into the buffer, useful for appending nested
  * JSON.
  *
- * @param[in] json_writer A pointer to an #az_json_writer instance containing the buffer to append
+ * @param[in,out] ref_json_writer A pointer to an #az_json_writer instance containing the buffer to append
  * the JSON text to.
  * @param[in] json_text A single, possibly nested, valid, UTF-8 encoded, JSON value to be written as
  * is, without any formatting or spacing changes. No modifications are made to this text, including
@@ -400,7 +400,7 @@ AZ_NODISCARD az_result az_json_writer_append_string(az_json_writer* ref_json_wri
  * @retval #AZ_OK The provided \p json_text was appended successfully.
  * @retval #AZ_ERROR_INSUFFICIENT_SPAN_SIZE The destination is too small for the provided \p
  * json_text.
- * @retval #AZ_ERROR_JSON_INVALID_STATE The \p json_writer is in a state where the \p json_text
+ * @retval #AZ_ERROR_JSON_INVALID_STATE The \p ref_json_writer is in a state where the \p json_text
  * cannot be appended because it would result in invalid JSON.
  * @retval #AZ_ERROR_UNEXPECTED_END The provided \p json_text is invalid because it is incomplete
  * and ends too early.
@@ -408,7 +408,7 @@ AZ_NODISCARD az_result az_json_writer_append_string(az_json_writer* ref_json_wri
  * character.
  */
 AZ_NODISCARD az_result
-az_json_writer_append_json_text(az_json_writer* json_writer, az_span json_text);
+az_json_writer_append_json_text(az_json_writer* ref_json_writer, az_span json_text);
 
 /**
  * @brief Appends the UTF-8 property name (as a JSON string) which is the first part of a name/value
