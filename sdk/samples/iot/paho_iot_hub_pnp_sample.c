@@ -552,13 +552,13 @@ static void handle_device_twin_message(
     case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_GET:
       LOG("Message Type: GET");
       is_twin_get = true;
-      process_twin_message(twin_message_span, is_twin_get);
+      process_device_twin_message(twin_message_span, is_twin_get);
       break;
 
     // An update to the desired properties with the properties as a payload.
     case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES:
       LOG("Message Type: Desired Properties");
-      process_twin_message(twin_message_span, is_twin_get);
+      process_device_twin_message(twin_message_span, is_twin_get);
       break;
 
     // A response from a twin reported properties publish message.

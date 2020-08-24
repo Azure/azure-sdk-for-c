@@ -27,15 +27,15 @@ static const az_span desired_temp_ack_description_name = AZ_SPAN_LITERAL_FROM_ST
 static const az_span component_specifier_name = AZ_SPAN_LITERAL_FROM_STR("__t");
 static const az_span component_specifier_value = AZ_SPAN_LITERAL_FROM_STR("c");
 static const az_span command_separator = AZ_SPAN_LITERAL_FROM_STR("/");
-static const az_span sample_iot_hub_twin_desired_version = AZ_SPAN_LITERAL_FROM_STR("$version");
-static const az_span sample_iot_hub_twin_desired = AZ_SPAN_LITERAL_FROM_STR("desired");
+static const az_span iot_hub_twin_desired_version = AZ_SPAN_LITERAL_FROM_STR("$version");
+static const az_span iot_hub_twin_desired = AZ_SPAN_LITERAL_FROM_STR("desired");
 
 // Visit each valid property for the component
 static az_result visit_component_properties(
     az_span component_name,
     az_json_reader* jr,
     int32_t version,
-    sample_pnp_property_callback property_callback,
+    pnp_property_callback property_callback,
     void* context_ptr)
 {
   while (az_succeeded(az_json_reader_next_token(jr)))
@@ -43,7 +43,7 @@ static az_result visit_component_properties(
     if (jr->token.kind == AZ_JSON_TOKEN_PROPERTY_NAME)
     {
       if (az_json_token_is_text_equal(&(jr->token), component_specifier_name)
-          || az_json_token_is_text_equal(&(jr->token), sample_iot_hub_twin_desired_version))
+          || az_json_token_is_text_equal(&(jr->token), iot_hub_twin_desired_version))
       {
         if (az_failed(az_json_reader_next_token(jr)))
         {
@@ -82,7 +82,7 @@ static az_result visit_component_properties(
 }
 
 // Move reader to the value of property name
-static az_result sample_json_child_token_move(az_json_reader* jr, az_span property_name)
+static az_result json_child_token_move(az_json_reader* jr, az_span property_name)
 {
   while (az_succeeded(az_json_reader_next_token(jr)))
   {
@@ -116,8 +116,8 @@ static az_result sample_json_child_token_move(az_json_reader* jr, az_span proper
 // Check if the component name is in the model
 static az_result is_component_in_model(
     az_span component_name,
-    const az_span** sample_components_ptr,
-    int32_t sample_components_num,
+    const az_span** components_ptr,
+    int32_t components_num,
     int32_t* out_index)
 {
   int32_t index = 0;
@@ -127,9 +127,9 @@ static az_result is_component_in_model(
     return AZ_ERROR_UNEXPECTED_CHAR;
   }
 
-  while (index < sample_components_num)
+  while (index < components_num)
   {
-    if (az_span_is_content_equal(component_name, *sample_components_ptr[index]))
+    if (az_span_is_content_equal(component_name, *components_ptr[index]))
     {
       *out_index = index;
       return AZ_OK;
@@ -142,7 +142,7 @@ static az_result is_component_in_model(
 }
 
 // Get the telemetry topic for PnP
-az_result sample_pnp_get_telemetry_topic(
+az_result pnp_get_telemetry_topic(
     const az_iot_hub_client* client,
     az_iot_hub_client_properties* properties,
     az_span component_name,
@@ -197,11 +197,11 @@ void pnp_parse_command_name(
 }
 
 // Create a reported property payload
-az_result sample_pnp_create_reported_property(
+az_result pnp_create_reported_property(
     az_span json_buffer,
     az_span component_name,
     az_span property_name,
-    sample_pnp_append_property_callback append_callback,
+    pnp_append_property_callback append_callback,
     void* context,
     az_span* out_span)
 {
@@ -234,11 +234,11 @@ az_result sample_pnp_create_reported_property(
 }
 
 // Create a reported property payload with status
-az_result sample_pnp_create_reported_property_with_status(
+az_result pnp_create_reported_property_with_status(
     az_span json_buffer,
     az_span component_name,
     az_span property_name,
-    sample_pnp_append_property_callback append_callback,
+    pnp_append_property_callback append_callback,
     void* context,
     int32_t ack_code,
     int32_t ack_version,
@@ -294,20 +294,21 @@ az_result pnp_process_device_twin_message(
     pnp_property_callback property_callback,
     void* context_ptr)
 {
+  az_json_reader jr;
   az_json_reader copy_jr;
   int32_t version;
   int32_t index;
 
   AZ_RETURN_IF_FAILED(az_json_reader_init(&jr, twin_message_span, NULL));
-  AZ_RETURN_IF_FAILED(az_json_reader_next_token(jr));
+  AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
 
-  if (!is_partial && az_failed(json_child_token_move(jr, iot_hub_twin_desired)))
+  if (!is_partial && az_failed(json_child_token_move(&jr, iot_hub_twin_desired)))
   {
     LOG_ERROR("Failed to get desired property.");
     return AZ_ERROR_UNEXPECTED_CHAR;
   }
 
-  copy_jr = *jr;
+  copy_jr = jr;
   if (az_failed(json_child_token_move(&copy_jr, iot_hub_twin_desired_version))
       || az_failed(az_json_token_get_int32(&(copy_jr.token), (int32_t*)&version)))
   {
@@ -317,13 +318,13 @@ az_result pnp_process_device_twin_message(
 
   az_json_token property_name;
 
-  while (az_succeeded(az_json_reader_next_token(jr)))
+  while (az_succeeded(az_json_reader_next_token(&jr)))
   {
-    if (jr->token.kind == AZ_JSON_TOKEN_PROPERTY_NAME)
+    if (jr.token.kind == AZ_JSON_TOKEN_PROPERTY_NAME)
     {
-      if (az_json_token_is_text_equal(&(jr->token), iot_hub_twin_desired_version))
+      if (az_json_token_is_text_equal(&(jr.token), iot_hub_twin_desired_version))
       {
-        if (az_failed(az_json_reader_next_token(jr)))
+        if (az_failed(az_json_reader_next_token(&jr)))
         {
           LOG_ERROR("Failed to get next token.");
           return AZ_ERROR_UNEXPECTED_CHAR;
@@ -331,20 +332,20 @@ az_result pnp_process_device_twin_message(
         continue;
       }
 
-      property_name = jr->token;
+      property_name = jr.token;
 
-      if (az_failed(az_json_reader_next_token(jr)))
+      if (az_failed(az_json_reader_next_token(&jr)))
       {
         LOG_ERROR("Failed to get next token.");
         return AZ_ERROR_UNEXPECTED_CHAR;
       }
 
-      if (jr->token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT && sample_components_ptr != NULL
-          && (az_succeeded(is_component_in_model(property_name.slice, sample_components_ptr, sample_components_num, &index))))
+      if (jr.token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT && components_ptr != NULL
+          && (az_succeeded(is_component_in_model(property_name.slice, components_ptr, components_num, &index))))
       {
         if (az_failed(visit_component_properties(
-                *sample_components_ptr[index],
-                jr,
+                *components_ptr[index],
+                &jr,
                 version,
                 property_callback,
                 context_ptr)))
@@ -355,18 +356,18 @@ az_result pnp_process_device_twin_message(
       }
       else
       {
-        property_callback(AZ_SPAN_NULL, &property_name, *jr, version, context_ptr);
+        property_callback(AZ_SPAN_NULL, &property_name, jr, version, context_ptr);
       }
     }
-    else if (jr->token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT)
+    else if (jr.token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT)
     {
-      if (az_failed(az_json_reader_skip_children(jr)))
+      if (az_failed(az_json_reader_skip_children(&jr)))
       {
         LOG_ERROR("Failed to skip children of object.");
         return AZ_ERROR_UNEXPECTED_CHAR;
       }
     }
-    else if (jr->token.kind == AZ_JSON_TOKEN_END_OBJECT)
+    else if (jr.token.kind == AZ_JSON_TOKEN_END_OBJECT)
     {
       break;
     }

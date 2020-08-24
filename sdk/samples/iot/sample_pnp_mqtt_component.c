@@ -29,7 +29,7 @@ az_span get_request_id(void)
   return az_span_slice(out_span, 0, az_span_size(out_span) - az_span_size(remainder));
 }
 
-az_result sample_pnp_mqtt_message_init(sample_pnp_mqtt_message* mqtt_message)
+az_result pnp_mqtt_message_init(pnp_mqtt_message* mqtt_message)
 {
   if (mqtt_message == NULL)
   {

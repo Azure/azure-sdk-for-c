@@ -47,7 +47,7 @@ static const az_span max_temp_reported_property_name
 static const char iso_spec_time_format[] = "%Y-%m-%dT%H:%M:%S%z";
 
 static az_result build_command_response_payload(
-    const sample_pnp_thermostat_component* thermostat_component,
+    const pnp_thermostat_component* thermostat_component,
     az_span start_time_span,
     az_span end_time_span,
     az_span payload,
@@ -82,7 +82,7 @@ static az_result build_command_response_payload(
 }
 
 static az_result build_telemetry_message(
-    const sample_pnp_thermostat_component* thermostat_component,
+    const pnp_thermostat_component* thermostat_component,
     az_span payload,
     az_span* out_payload)
 {
@@ -101,7 +101,7 @@ static az_result build_telemetry_message(
 // Invoke the command requested from the service. Here, it generates a report for max, min, and avg
 // temperatures.
 static az_result invoke_getMaxMinReport(
-    const sample_pnp_thermostat_component* thermostat_component,
+    const pnp_thermostat_component* thermostat_component,
     az_span payload,
     az_span response,
     az_span* out_response)
@@ -149,8 +149,8 @@ static az_result append_double(az_json_writer* jw, void* value)
   return az_json_writer_append_double(jw, value_as_double, DOUBLE_DECIMAL_PLACE_DIGITS);
 }
 
-az_result sample_pnp_thermostat_init(
-    sample_pnp_thermostat_component* thermostat_component,
+az_result pnp_thermostat_init(
+    pnp_thermostat_component* thermostat_component,
     az_span component_name,
     double initial_temp)
 {
@@ -171,14 +171,14 @@ az_result sample_pnp_thermostat_init(
   return AZ_OK;
 }
 
-az_result sample_pnp_thermostat_get_telemetry_message(
+az_result pnp_thermostat_get_telemetry_message(
     const az_iot_hub_client* client,
-    const sample_pnp_thermostat_component* thermostat_component,
-    sample_pnp_mqtt_message* mqtt_message)
+    const pnp_thermostat_component* thermostat_component,
+    pnp_mqtt_message* mqtt_message)
 {
   az_result rc;
   if (az_failed(
-          rc = sample_pnp_get_telemetry_topic(
+          rc = pnp_get_telemetry_topic(
               client,
               NULL,
               thermostat_component->component_name,
@@ -201,10 +201,10 @@ az_result sample_pnp_thermostat_get_telemetry_message(
   return rc;
 }
 
-bool sample_pnp_thermostat_get_max_temp_report(
+bool pnp_thermostat_get_max_temp_report(
     const az_iot_hub_client* client,
-    sample_pnp_thermostat_component* thermostat_component,
-    sample_pnp_mqtt_message* mqtt_message)
+    pnp_thermostat_component* thermostat_component,
+    pnp_mqtt_message* mqtt_message)
 {
   az_result rc;
 
@@ -214,7 +214,7 @@ bool sample_pnp_thermostat_get_max_temp_report(
   }
 
   if (az_failed(
-          rc = sample_pnp_create_reported_property(
+          rc = pnp_create_reported_property(
               mqtt_message->payload_span,
               thermostat_component->component_name,
               max_temp_reported_property_name,
@@ -242,14 +242,14 @@ bool sample_pnp_thermostat_get_max_temp_report(
   return true;
 }
 
-az_result sample_pnp_thermostat_process_property_update(
+az_result pnp_thermostat_process_property_update(
     const az_iot_hub_client* client,
-    sample_pnp_thermostat_component* thermostat_component,
+    pnp_thermostat_component* thermostat_component,
     az_span component_name,
     const az_json_token* property_name,
     const az_json_reader* property_value,
     int32_t version,
-    sample_pnp_mqtt_message* mqtt_message)
+    pnp_mqtt_message* mqtt_message)
 {
   az_result result;
 
@@ -266,7 +266,7 @@ az_result sample_pnp_thermostat_process_property_update(
   double parsed_value = 0;
   if (az_failed(az_json_token_get_double(&(property_value->token), &parsed_value)))
   {
-    result = sample_pnp_create_reported_property_with_status(
+    result = pnp_create_reported_property_with_status(
         mqtt_message->payload_span,
         component_name,
         property_name->slice,
@@ -298,7 +298,7 @@ az_result sample_pnp_thermostat_process_property_update(
         / thermostat_component->device_temperature_avg_count;
 
     if (az_failed(
-            result = sample_pnp_create_reported_property_with_status(
+            result = pnp_create_reported_property_with_status(
                 mqtt_message->payload_span,
                 component_name,
                 property_name->slice,
@@ -323,14 +323,14 @@ az_result sample_pnp_thermostat_process_property_update(
   return result;
 }
 
-az_result sample_pnp_thermostat_process_command(
+az_result pnp_thermostat_process_command(
     const az_iot_hub_client* client,
-    const sample_pnp_thermostat_component* thermostat_component,
+    const pnp_thermostat_component* thermostat_component,
     const az_iot_hub_client_method_request* command_request,
     az_span component_name,
     az_span command_name,
     az_span command_payload,
-    sample_pnp_mqtt_message* mqtt_message,
+    pnp_mqtt_message* mqtt_message,
     az_iot_status* status)
 {
   az_result result;
