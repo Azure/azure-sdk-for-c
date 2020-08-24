@@ -140,9 +140,6 @@ static void test_http_request(void** state)
       assert_true(az_span_is_content_equal(header.value, expected_headers2[i].value));
     }
 
-    assert_return_code(
-        az_http_request_append_path(&request, AZ_SPAN_FROM_STR("path"), true), AZ_OK);
-
     az_http_method method;
     az_span body;
     az_span url;
@@ -153,8 +150,8 @@ static void test_http_request(void** state)
     assert_string_equal(az_span_ptr(body), az_span_ptr(AZ_SPAN_FROM_STR("body")));
     assert_string_equal(
         az_span_ptr(url),
-        az_span_ptr(AZ_SPAN_FROM_STR("https://antk-keyvault.vault.azure.net/secrets/Password/"
-                                     "path?api-version=7.0&test-param=token")));
+        az_span_ptr(AZ_SPAN_FROM_STR("https://antk-keyvault.vault.azure.net/secrets/Password"
+                                     "?api-version=7.0&test-param=token")));
   }
   {
     uint8_t buf[100];
@@ -397,37 +394,6 @@ static void test_http_request(void** state)
         AZ_OK);
 
     az_span expected_url = AZ_SPAN_FROM_STR("http://example.com?q1=space%20here");
-    uint8_t result[100];
-    az_span url_result = AZ_SPAN_FROM_BUFFER(result);
-    assert_return_code(az_http_request_get_url(&request, &url_result), AZ_OK);
-    assert_true(az_span_is_content_equal(url_result, expected_url));
-  }
-  { // Test append path url encode
-    uint8_t buf[100];
-    uint8_t header_buf[(2 * sizeof(az_pair))];
-    memset(buf, 0, sizeof(buf));
-    memset(header_buf, 0, sizeof(header_buf));
-
-    az_span url_span = AZ_SPAN_FROM_BUFFER(buf);
-    az_span initial_url = AZ_SPAN_FROM_STR("http://example.com");
-    az_span remainder = az_span_copy(url_span, initial_url);
-    assert_int_equal(az_span_size(remainder), 100 - az_span_size(initial_url));
-    az_span header_span = AZ_SPAN_FROM_BUFFER(header_buf);
-    az_http_request request;
-
-    TEST_EXPECT_SUCCESS(az_http_request_init(
-        &request,
-        &az_context_application,
-        az_http_method_get(),
-        url_span,
-        az_span_size(initial_url),
-        header_span,
-        AZ_SPAN_FROM_STR("body")));
-
-    assert_return_code(
-        az_http_request_append_path(&request, AZ_SPAN_FROM_STR("path with space"), false), AZ_OK);
-
-    az_span expected_url = AZ_SPAN_FROM_STR("http://example.com/path%20with%20space");
     uint8_t result[100];
     az_span url_result = AZ_SPAN_FROM_BUFFER(result);
     assert_return_code(az_http_request_get_url(&request, &url_result), AZ_OK);
