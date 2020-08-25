@@ -673,7 +673,7 @@ static void test_az_iot_message_properties_next_empty_succeed(void** state)
 
 int test_az_iot_common()
 {
-  #ifndef AZ_NO_PRECONDITION_CHECKING
+#ifndef AZ_NO_PRECONDITION_CHECKING
   SETUP_PRECONDITION_CHECK_TESTS();
 #endif // AZ_NO_PRECONDITION_CHECKING
 
