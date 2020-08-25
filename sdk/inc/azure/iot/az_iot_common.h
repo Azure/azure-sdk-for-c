@@ -61,6 +61,15 @@ typedef enum
   AZ_IOT_STATUS_TIMEOUT = 504,
 } az_iot_status;
 
+
+/**
+ *
+ * Properties APIs
+ *
+ *   IoT Hub message properties are used for Device-to-Cloud (D2C) as well as Cloud-to-Device (C2D).
+ *   Properties are always appended to the MQTT topic of the published or received message and
+ *   must contain Uri-encoded keys and values.
+ */
 /**
  * @brief Supported IoT Hub message properties
  */
@@ -72,6 +81,92 @@ https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-distributed-tracing */
 #define AZ_IOT_HUB_MESSAGE_PROPERTIES_CONTENT_TYPE \
   "%24.ct" /**< URL encoded and of the form text%2Fplain or application%2Fjson, etc */
 #define AZ_IOT_HUB_MESSAGE_PROPERTIES_CONTENT_ENCODING "%24.ce" /**< UTF-8, UTF-16, etc */
+
+/**
+ * @brief Telemetry or C2D properties.
+ *
+ */
+typedef struct
+{
+  struct
+  {
+    az_span properties_buffer;
+    int32_t properties_written;
+    uint32_t current_property_index;
+  } _internal;
+} az_iot_message_properties;
+
+/**
+ * @brief Initializes the Telemetry or C2D properties.
+ *
+ * @note The properties init API will not encode properties. In order to support
+ *       the following characters, they must be percent-encoded (RFC3986) as follows:
+ *          `/` : `%2F`
+ *          `%` : `%25`
+ *          `#` : `%23`
+ *          `&` : `%26`
+ *       Only these characters would have to be encoded. If you would like to avoid the need to
+ *       encode the names/values, avoid using these characters in names and values.
+ *
+ * @param[in] properties The #az_iot_message_properties to initialize
+ * @param[in] buffer Can either be an empty #az_span or an #az_span containing properly formatted
+ *                   (with above mentioned characters encoded if applicable) properties with the
+ *                   following format: {key}={value}&{key}={value}.
+ * @param[in] written_length The length of the properly formatted properties already initialized
+ * within the buffer. If the \p buffer is empty (uninitialized), this should be 0.
+ * @return #az_result
+ */
+AZ_NODISCARD az_result az_iot_message_properties_init(
+    az_iot_message_properties* properties,
+    az_span buffer,
+    int32_t written_length);
+
+/**
+ * @brief Appends a key-value property to the list of properties.
+ *
+ * @note The properties append API will not encode properties. In order to support
+ *       the following characters, they must be percent-encoded (RFC3986) as follows:
+ *          `/` : `%2F`
+ *          `%` : `%25`
+ *          `#` : `%23`
+ *          `&` : `%26`
+ *       Only these characters would have to be encoded. If you would like to avoid the need to
+ *       encode the names/values, avoid using these characters in names and values.
+ *
+ * @param[in] properties The #az_iot_message_properties to use for this call
+ * @param[in] name The name of the property.
+ * @param[in] value The value of the property.
+ * @return #az_result
+ */
+AZ_NODISCARD az_result az_iot_message_properties_append(
+    az_iot_message_properties* properties,
+    az_span name,
+    az_span value);
+
+/**
+ * @brief Finds the value of a property.
+ * @remark This will return the first value of the property with the given name if multiple
+ * properties with the same key exist.
+ *
+ * @param[in] properties The #az_iot_message_properties to use for this call
+ * @param[in] name The name of the property.
+ * @param[out] out_value An #az_span containing the value of the property.
+ * @return #az_result.
+ */
+AZ_NODISCARD az_result az_iot_message_properties_find(
+    az_iot_message_properties* properties,
+    az_span name,
+    az_span* out_value);
+
+/**
+ * @brief Iterates over the list of properties.
+ *
+ * @param[in] properties The #az_iot_message_properties to use for this call
+ * @param[out] out An #az_pair containing the key and the value of the next property.
+ * @return #az_result
+ */
+AZ_NODISCARD az_result
+az_iot_message_properties_next(az_iot_message_properties* properties, az_pair* out);
 
 /**
  * @brief Checks if the status indicates a successful operation.
