@@ -325,7 +325,8 @@ static void send_method_response(
               sizeof(methods_response_topic_buffer),
               NULL)))
   {
-    LOG_ERROR("Failed to get the Methods Response publish-topic: az_result return code 0x%08x.", rc);
+    LOG_ERROR(
+        "Failed to get the Methods Response publish-topic: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 

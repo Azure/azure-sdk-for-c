@@ -255,7 +255,8 @@ static void parse_c2d_message(
 
   // Parse message and retrieve c2d_request info.
   if (az_failed(
-          rc = az_iot_hub_client_c2d_parse_received_topic(&hub_client, topic_span, out_c2d_request)))
+          rc
+          = az_iot_hub_client_c2d_parse_received_topic(&hub_client, topic_span, out_c2d_request)))
   {
     LOG_ERROR("Message from unknown topic: az_result return code 0x%08x.", rc);
     LOG_AZ_SPAN("Topic:", topic_span);

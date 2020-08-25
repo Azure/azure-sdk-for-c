@@ -189,7 +189,10 @@ static void send_telemetry_messages_to_iot_hub(void)
              NULL))
         != MQTTCLIENT_SUCCESS)
     {
-      LOG_ERROR("Failed to publish Telemetry message #%d: MQTTClient return code %d.", message_count + 1, rc);
+      LOG_ERROR(
+          "Failed to publish Telemetry message #%d: MQTTClient return code %d.",
+          message_count + 1,
+          rc);
       exit(rc);
     }
 

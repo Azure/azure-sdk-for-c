@@ -105,7 +105,11 @@ az_result iot_sample_read_environment_variables(
   {
     out_env_vars->hub_hostname = AZ_SPAN_FROM_BUFFER(iot_sample_hub_hostname_buffer);
     AZ_RETURN_IF_FAILED(read_configuration_entry(
-        IOT_SAMPLE_ENV_HUB_HOSTNAME, NULL, false, out_env_vars->hub_hostname, &(out_env_vars->hub_hostname)));
+        IOT_SAMPLE_ENV_HUB_HOSTNAME,
+        NULL,
+        false,
+        out_env_vars->hub_hostname,
+        &(out_env_vars->hub_hostname)));
 
     switch (name)
     {
@@ -164,7 +168,8 @@ az_result iot_sample_read_environment_variables(
   }
   else if (type == PAHO_IOT_PROVISIONING)
   {
-    out_env_vars->provisioning_id_scope = AZ_SPAN_FROM_BUFFER(iot_sample_provisioning_id_scope_buffer);
+    out_env_vars->provisioning_id_scope
+        = AZ_SPAN_FROM_BUFFER(iot_sample_provisioning_id_scope_buffer);
     AZ_RETURN_IF_FAILED(read_configuration_entry(
         IOT_SAMPLE_ENV_PROVISIONING_ID_SCOPE,
         NULL,
@@ -280,7 +285,8 @@ az_result iot_sample_create_mqtt_endpoint(
       return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
     }
 
-    az_span provisioning_mqtt_endpoint = az_span_create((uint8_t*)out_endpoint, (int32_t)endpoint_size);
+    az_span provisioning_mqtt_endpoint
+        = az_span_create((uint8_t*)out_endpoint, (int32_t)endpoint_size);
     az_span remainder = az_span_copy(provisioning_mqtt_endpoint, provisioning_global_endpoint);
     az_span_copy_u8(remainder, '\0');
   }
