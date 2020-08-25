@@ -25,6 +25,8 @@ if (MSVC)
     set_target_properties(blobs_client_example
         PROPERTIES LINK_FLAGS
         "/NODEFAULTLIB:libcmtd.lib"
+        LINK_FLAGS_RELEASE
+        "/NODEFAULTLIB:libcmt.lib"
     )
 endif()
 

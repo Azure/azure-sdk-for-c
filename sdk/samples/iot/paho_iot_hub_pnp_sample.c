@@ -160,10 +160,10 @@ static az_result build_property_payload_with_status(
     az_span* out_payload);
 
 /*
- * This sample connects an IoT Plug and Play enabled device with the Digital Twin Model ID (DTMI)
- * detailed here. If a timeout occurs while waiting for a message from the Azure IoT Explorer, the
- * sample will continue. If TIMEOUT_MQTT_RECEIVE_MAX_COUNT timeouts occur consecutively, the sample
- * will disconnect. X509 self-certification is used.
+ * This sample connects an IoT Plug and Play enabled device with the Digital Twin Model ID (DTMI).
+ * If a timeout occurs while waiting for a message from the Azure IoT Explorer, the sample will
+ * continue. If TIMEOUT_MQTT_RECEIVE_MAX_COUNT timeouts occur consecutively, the sample will
+ * disconnect. X509 self-certification is used.
  *
  * To interact with this sample, you must use the Azure IoT Explorer. The capabilities are Device
  * Twin, Direct Method (Command), and Telemetry:
@@ -172,18 +172,20 @@ static az_result build_property_payload_with_status(
  *   - A desired property named `targetTemperature` with a `double` value for the desired
  * temperature.
  *   - A reported property named `maxTempSinceLastReboot` with a `double` value for the highest
- * temperature.
+ * temperature reached since device boot.
+ *
  * To send a device twin desired property message, select your device's Device Twin tab
  * in the Azure IoT Explorer. Add the property targetTemperature along with a corresponding value to
  * the desired section of the JSON. Select Save to update the twin document and send the twin
  * message to the device.
  *   {
  *     "properties": {
- *        "desired": {
- *          "targetTemperature": 68.5,
+ *       "desired": {
+ *         "targetTemperature": 68.5,
  *       }
  *     }
  *   }
+ *
  * Upon receiving a desired property message, the sample will update the twin property locally and
  * send a reported property of the same name back to the service. This message will include a set of
  * "ack" values: `ac` for the HTTP-like ack code, `av` for ack version of the property, and an
@@ -202,11 +204,13 @@ static az_result build_property_payload_with_status(
  *     }
  *   }
  *
- * Direct Method (Command): One command is supported in this sample: `getMaxMinReport`. If any other
+ * Direct Method (Command): One device command is supported in this sample: `getMaxMinReport`. If any other
  * commands are attempted to be invoked, the log will report the command is not found. To invoke a
  * command, select your device's Direct Method tab in the Azure IoT Explorer. Enter the command name
- * getMaxMinReport along with a payload using an ISO8061 time format and select Invoke method.
+ * `getMaxMinReport` along with a payload using an ISO8061 time format and select Invoke method.
+ *
  *   "2020-08-18T17:09:29-0700"
+ *
  * The command will send back to the service a response containing the following JSON payload with
  * updated values in each field:
  *   {

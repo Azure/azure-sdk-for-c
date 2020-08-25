@@ -25,8 +25,8 @@ enum
 };
 
 /**
- * @brief A portable implementation of the standard isfinite method, which may not be available on
- * certain embedded systems that use older compilers.
+ * @brief A portable implementation of the standard `isfinite()` function, which may not be
+ * available on certain embedded systems that use older compilers.
  *
  * @param value The 64-bit floating point value to test.
  * @return `true` if the \p value is finite (that is, it is not infinite or not a number), otherwise
@@ -34,7 +34,11 @@ enum
  */
 AZ_NODISCARD AZ_INLINE bool _az_isfinite(double value)
 {
-  uint64_t binary_value = *(uint64_t*)&value;
+  uint64_t binary_value = 0;
+
+  // Workaround for strict-aliasing rules.
+  // Get the 8-byte binary representation of the double value, by re-interpreting it as an uint64_t.
+  memcpy(&binary_value, &value, sizeof(binary_value));
 
   // These are the binary representations of the various non-finite value ranges,
   // according to the IEEE 754 standard:

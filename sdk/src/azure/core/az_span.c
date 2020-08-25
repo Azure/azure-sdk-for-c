@@ -21,7 +21,7 @@
 #define _az_MAX_SAFE_INTEGER 9007199254740991
 
 #ifndef AZ_NO_PRECONDITION_CHECKING
-// Note: If you are modifying this method, make sure to modify the inline version in the az_span.h
+// Note: If you are modifying this function, make sure to modify the inline version in the az_span.h
 // file as well.
 AZ_NODISCARD az_span az_span_create(uint8_t* ptr, int32_t size)
 {
@@ -355,9 +355,11 @@ static bool _is_valid_start_of_double(uint8_t first_byte)
 
 // Disable the following warning just for this particular use case.
 // C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead.
+// C4710: 'sscanf': function not inlined
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4996)
+#pragma warning(disable : 4710)
 #endif
 
 AZ_NODISCARD az_result az_span_atod(az_span source, double* out_number)
@@ -484,8 +486,8 @@ az_span az_span_copy(az_span destination, az_span source)
     return destination;
   }
 
-  // Even though the contract of this method is that the destination must be larger than source, cap
-  // the data move if the source is too large, to avoid memory corruption.
+  // Even though the contract of this function is that the destination must be larger than source,
+  // cap the data move if the source is too large, to avoid memory corruption.
   int32_t dest_size = az_span_size(destination);
   if (src_size > dest_size)
   {
@@ -502,7 +504,7 @@ az_span az_span_copy_u8(az_span destination, uint8_t byte)
 {
   _az_PRECONDITION_VALID_SPAN(destination, 1, false);
 
-  // Even though the contract of the method is that the destination must be at least 1 byte large,
+  // Even though the contract of the function is that the destination must be at least 1 byte large,
   // no-op if it is empty to avoid memory corruption.
   int32_t dest_size = az_span_size(destination);
   if (dest_size < 1)
@@ -529,7 +531,7 @@ void az_span_to_str(char* destination, int32_t destination_max_size, az_span sou
 
   _az_PRECONDITION(size_to_write < destination_max_size);
 
-  // Even though the contract of this method is that the destination_max_size must be larger than
+  // Even though the contract of this function is that the destination_max_size must be larger than
   // source to be able to copy all of the source to the char buffer including an extra null
   // terminating character, cap the data move if the source is too large, to avoid memory
   // corruption.
