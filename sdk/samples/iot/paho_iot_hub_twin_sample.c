@@ -2,15 +2,16 @@
 // SPDX-License-Identifier: MIT
 
 #ifdef _MSC_VER
+#pragma warning(push)
 // warning C4201: nonstandard extension used: nameless struct/union
 #pragma warning(disable : 4201)
 #endif
 #include <paho-mqtt/MQTTClient.h>
 #ifdef _MSC_VER
-#pragma warning(default : 4201)
+#pragma warning(pop)
 #endif
 
-#include "iot_samples_common.h"
+#include "iot_sample_common.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -94,7 +95,7 @@ int main(void)
   LOG_SUCCESS("Client subscribed to IoT Hub topics.");
 
   get_device_twin_document();
-  LOG_SUCCESS("Client got twin document.");
+  LOG_SUCCESS("Client received device twin document.");
 
   send_reported_property();
   LOG_SUCCESS("Client sent reported property.");
@@ -113,10 +114,10 @@ static void create_and_configure_mqtt_client(void)
   int rc;
 
   // Reads in environment variables set by user for purposes of running sample.
-  if (az_failed(rc = read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars)))
+  if (az_failed(rc = iot_sample_read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars)))
   {
     LOG_ERROR(
-        "Failed to read configuration from environment variables: az_result return code 0x%04x.",
+        "Failed to read configuration from environment variables: az_result return code 0x%08x.",
         rc);
     exit(rc);
   }
@@ -124,10 +125,10 @@ static void create_and_configure_mqtt_client(void)
   // Build an MQTT endpoint c-string.
   char mqtt_endpoint_buffer[128];
   if (az_failed(
-          rc = create_mqtt_endpoint(
+          rc = iot_sample_create_mqtt_endpoint(
               SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer))))
   {
-    LOG_ERROR("Failed to create MQTT endpoint: az_result return code 0x%04x.", rc);
+    LOG_ERROR("Failed to create MQTT endpoint: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -136,7 +137,7 @@ static void create_and_configure_mqtt_client(void)
           rc = az_iot_hub_client_init(
               &hub_client, env_vars.hub_hostname, env_vars.hub_device_id, NULL)))
   {
-    LOG_ERROR("Failed to initialize hub client: az_result return code 0x%04x.", rc);
+    LOG_ERROR("Failed to initialize hub client: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -146,7 +147,7 @@ static void create_and_configure_mqtt_client(void)
           rc = az_iot_hub_client_get_client_id(
               &hub_client, mqtt_client_id_buffer, sizeof(mqtt_client_id_buffer), NULL)))
   {
-    LOG_ERROR("Failed to get MQTT client id: az_result return code 0x%04x.", rc);
+    LOG_ERROR("Failed to get MQTT client id: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -173,7 +174,7 @@ static void connect_mqtt_client_to_iot_hub(void)
           rc = az_iot_hub_client_get_user_name(
               &hub_client, mqtt_client_username_buffer, sizeof(mqtt_client_username_buffer), NULL)))
   {
-    LOG_ERROR("Failed to get MQTT client username: az_result return code 0x%04x.", rc);
+    LOG_ERROR("Failed to get MQTT client username: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -241,7 +242,7 @@ static void get_device_twin_document(void)
               sizeof(twin_document_topic_buffer),
               NULL)))
   {
-    LOG_ERROR("Failed to get Twin Document publish topic: az_result return code 0x%04x.", rc);
+    LOG_ERROR("Failed to get Twin Document publish topic: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -273,16 +274,17 @@ static void send_reported_property(void)
               sizeof(twin_patch_topic_buffer),
               NULL)))
   {
-    LOG_ERROR("Failed to get Twin Patch publish topic: az_result return code 0x%04x.", rc);
+    LOG_ERROR("Failed to get Twin Patch publish topic: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
   // Build the updated reported property message.
   char reported_property_payload_buffer[128];
   az_span reported_property_payload = AZ_SPAN_FROM_BUFFER(reported_property_payload_buffer);
-  if (az_failed(rc = build_reported_property(reported_property_payload, &reported_property_payload)))
+  if (az_failed(
+          rc = build_reported_property(reported_property_payload, &reported_property_payload)))
   {
-    LOG_ERROR("Failed to build reported property payload: az_result return code 0x%04x.", rc);
+    LOG_ERROR("Failed to build reported property payload: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -355,14 +357,14 @@ static void receive_device_twin_message(void)
   {
     topic_len = (int)strlen(topic);
   }
-  LOG_SUCCESS("Client received device twin message from the service.");
+  LOG_SUCCESS("Client received a device twin message from the service.");
 
   // Parse device twin message.
   az_iot_hub_client_twin_response twin_response;
   parse_device_twin_message(topic, topic_len, message, &twin_response);
   LOG_SUCCESS("Client parsed device twin message.");
 
-  LOG(" "); // Formatting
+  LOG(" "); // Formatting.
 
   MQTTClient_freeMessage(&message);
   MQTTClient_free(topic);
@@ -374,7 +376,7 @@ static void parse_device_twin_message(
     const MQTTClient_message* message,
     az_iot_hub_client_twin_response* twin_response)
 {
-  int rc;
+  az_result rc;
   az_span topic_span = az_span_create((uint8_t*)topic, topic_len);
   az_span message_span = az_span_create((uint8_t*)message->payload, message->payloadlen);
 
@@ -382,7 +384,7 @@ static void parse_device_twin_message(
   if (az_failed(
           rc = az_iot_hub_client_twin_parse_received_topic(&hub_client, topic_span, twin_response)))
   {
-    LOG_ERROR("Message from unknown topic: az_result return code 0x%04x.", rc);
+    LOG_ERROR("Message from unknown topic: az_result return code 0x%08x.", rc);
     LOG_AZ_SPAN("Topic:", topic_span);
     exit(rc);
   }
@@ -391,23 +393,23 @@ static void parse_device_twin_message(
   LOG_AZ_SPAN("Payload:", message_span);
   LOG("Status: %d", twin_response->status);
 
-  // Invoke appropriate action per response type (3 Types only).
+  // Invoke appropriate action per response type (3 types only).
   switch (twin_response->response_type)
   {
     case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_GET:
-      LOG("Type: GET");
+      LOG("Message Type: GET");
       break;
 
     case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES:
-      LOG("Type: Reported Properties");
+      LOG("Message Type: Reported Properties");
       break;
 
     case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES:
-      LOG("Type: Desired Properties");
+      LOG("Message Type: Desired Properties");
 
       if (az_failed(rc = update_property(message_span)))
       {
-        LOG_ERROR("Failed to update property locally: az_result return code 0x%04x.", rc);
+        LOG_ERROR("Failed to update property locally: az_result return code 0x%08x.", rc);
         exit(rc);
       }
       break;

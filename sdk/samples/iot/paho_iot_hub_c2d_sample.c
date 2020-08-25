@@ -2,15 +2,16 @@
 // SPDX-License-Identifier: MIT
 
 #ifdef _MSC_VER
+#pragma warning(push)
 // warning C4201: nonstandard extension used: nameless struct/union
 #pragma warning(disable : 4201)
 #endif
 #include <paho-mqtt/MQTTClient.h>
 #ifdef _MSC_VER
-#pragma warning(default : 4201)
+#pragma warning(pop)
 #endif
 
-#include "iot_samples_common.h"
+#include "iot_sample_common.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -80,10 +81,10 @@ static void create_and_configure_mqtt_client(void)
   int rc;
 
   // Reads in environment variables set by user for purposes of running sample.
-  if (az_failed(rc = read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars)))
+  if (az_failed(rc = iot_sample_read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars)))
   {
     LOG_ERROR(
-        "Failed to read configuration from environment variables: az_result return code 0x%04x.",
+        "Failed to read configuration from environment variables: az_result return code 0x%08x.",
         rc);
     exit(rc);
   }
@@ -91,10 +92,10 @@ static void create_and_configure_mqtt_client(void)
   // Build an MQTT endpoint c-string.
   char mqtt_endpoint_buffer[128];
   if (az_failed(
-          rc = create_mqtt_endpoint(
+          rc = iot_sample_create_mqtt_endpoint(
               SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer))))
   {
-    LOG_ERROR("Failed to create MQTT endpoint: az_result return code 0x%04x.", rc);
+    LOG_ERROR("Failed to create MQTT endpoint: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -103,7 +104,7 @@ static void create_and_configure_mqtt_client(void)
           rc = az_iot_hub_client_init(
               &hub_client, env_vars.hub_hostname, env_vars.hub_device_id, NULL)))
   {
-    LOG_ERROR("Failed to initialize hub client: az_result return code 0x%04x.", rc);
+    LOG_ERROR("Failed to initialize hub client: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -113,7 +114,7 @@ static void create_and_configure_mqtt_client(void)
           rc = az_iot_hub_client_get_client_id(
               &hub_client, mqtt_client_id_buffer, sizeof(mqtt_client_id_buffer), NULL)))
   {
-    LOG_ERROR("Failed to get MQTT client id: az_result return code 0x%04x.", rc);
+    LOG_ERROR("Failed to get MQTT client id: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -140,7 +141,7 @@ static void connect_mqtt_client_to_iot_hub(void)
           rc = az_iot_hub_client_get_user_name(
               &hub_client, mqtt_client_username_buffer, sizeof(mqtt_client_username_buffer), NULL)))
   {
-    LOG_ERROR("Failed to get MQTT client username: az_result return code 0x%04x.", rc);
+    LOG_ERROR("Failed to get MQTT client username: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -214,7 +215,7 @@ static void receive_c2d_messages(void)
     {
       topic_len = (int)strlen(topic);
     }
-    LOG_SUCCESS("Message #%d: Client received message from the service.", message_count + 1);
+    LOG_SUCCESS("Message #%d: Client received a message from the service.", message_count + 1);
 
     // Parse c2d message.
     az_iot_hub_client_c2d_request c2d_request;
@@ -248,7 +249,7 @@ static void parse_c2d_message(
     MQTTClient_message const* message,
     az_iot_hub_client_c2d_request* out_c2d_request)
 {
-  int rc;
+  az_result rc;
   az_span const topic_span = az_span_create((uint8_t*)topic, topic_len);
   az_span const message_span = az_span_create((uint8_t*)message->payload, message->payloadlen);
 
@@ -256,7 +257,7 @@ static void parse_c2d_message(
   if (az_failed(
           rc = az_iot_hub_client_c2d_parse_received_topic(&hub_client, topic_span, out_c2d_request)))
   {
-    LOG_ERROR("Message from unknown topic: az_result return code 0x%04x.", rc);
+    LOG_ERROR("Message from unknown topic: az_result return code 0x%08x.", rc);
     LOG_AZ_SPAN("Topic:", topic_span);
     exit(rc);
   }
