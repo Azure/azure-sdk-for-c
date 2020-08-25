@@ -170,7 +170,7 @@ static az_result build_property_payload_with_status(
  *   - A desired property named `targetTemperature` with a `double` value for the desired
  * temperature.
  *   - A reported property named `maxTempSinceLastReboot` with a `double` value for the highest
- * temperature.
+ * temperature reached since device boot.
  *
  * To send a device twin desired property message, select your device's Device Twin tab
  * in the Azure IoT Explorer. Add the property targetTemperature along with a corresponding value to
@@ -202,10 +202,10 @@ static az_result build_property_payload_with_status(
  *     }
  *   }
  *
- * Direct Method (Command): One command is supported in this sample: `getMaxMinReport`. If any other
+ * Direct Method (Command): One device command is supported in this sample: `getMaxMinReport`. If any other
  * commands are attempted to be invoked, the log will report the command is not found. To invoke a
  * command, select your device's Direct Method tab in the Azure IoT Explorer. Enter the command name
- * getMaxMinReport along with a payload using an ISO8061 time format and select Invoke method.
+ * `getMaxMinReport` along with a payload using an ISO8061 time format and select Invoke method.
  *
  *   "2020-08-18T17:09:29-0700"
  *
