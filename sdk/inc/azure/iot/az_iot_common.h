@@ -71,16 +71,16 @@ typedef enum
  *   must contain Uri-encoded keys and values.
  */
 /**
- * @brief Supported IoT Hub message properties
+ * @brief Supported IoT message properties
  */
-#define AZ_IOT_HUB_MESSAGE_PROPERTIES_MESSAGE_ID \
+#define AZ_IOT_MESSAGE_PROPERTIES_MESSAGE_ID \
   "%24.mid" /**< Add unique identification to a message */
-#define AZ_IOT_HUB_MESSAGE_PROPERTIES_CORRELATION_ID \
+#define AZ_IOT_MESSAGE_PROPERTIES_CORRELATION_ID \
   "%24.cid" /**< Used in distributed tracing. More information here: \
 https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-distributed-tracing */
-#define AZ_IOT_HUB_MESSAGE_PROPERTIES_CONTENT_TYPE \
+#define AZ_IOT_MESSAGE_PROPERTIES_CONTENT_TYPE \
   "%24.ct" /**< URL encoded and of the form text%2Fplain or application%2Fjson, etc */
-#define AZ_IOT_HUB_MESSAGE_PROPERTIES_CONTENT_ENCODING "%24.ce" /**< UTF-8, UTF-16, etc */
+#define AZ_IOT_MESSAGE_PROPERTIES_CONTENT_ENCODING "%24.ce" /**< UTF-8, UTF-16, etc */
 
 /**
  * @brief Telemetry or C2D properties.
