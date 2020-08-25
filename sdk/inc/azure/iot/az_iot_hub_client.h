@@ -236,14 +236,14 @@ typedef struct
 /**
  * @brief Supported IoT Hub properties
  */
-const az_span az_iot_hub_client_message_id_prop
+static const az_span az_iot_hub_client_properties_message_id
     = AZ_SPAN_LITERAL_FROM_STR("%24.mid"); /**< Add unique identification to a message */
-const az_span az_iot_hub_client_correlation_id_prop = AZ_SPAN_LITERAL_FROM_STR(
+static const az_span az_iot_hub_client_properties_correlation_id = AZ_SPAN_LITERAL_FROM_STR(
     "%24.cid"); /**< Used in distributed tracing. More information here:
                    https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-distributed-tracing */
-const az_span az_iot_hub_client_content_type_prop = AZ_SPAN_LITERAL_FROM_STR(
+static const az_span az_iot_hub_client_properties_content_type = AZ_SPAN_LITERAL_FROM_STR(
     "%24.ct"); /**< URL encoded and of the form text%2Fplain or application%2Fjson, etc */
-const az_span az_iot_hub_client_content_encoding_prop
+static const az_span az_iot_hub_client_properties_content_encoding
     = AZ_SPAN_LITERAL_FROM_STR("%24.ce"); /**< utf-8, utf-16, etc */
 
 /**
