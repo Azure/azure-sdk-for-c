@@ -18,7 +18,7 @@ static const az_span telemetry_topic_suffix = AZ_SPAN_LITERAL_FROM_STR("/message
 
 AZ_NODISCARD az_result az_iot_hub_client_telemetry_get_publish_topic(
     az_iot_hub_client const* client,
-    az_iot_hub_client_properties const* properties,
+    az_iot_message_properties const* properties,
     char* mqtt_topic,
     size_t mqtt_topic_size,
     size_t* out_mqtt_topic_length)

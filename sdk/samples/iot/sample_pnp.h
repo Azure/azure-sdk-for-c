@@ -35,7 +35,7 @@ typedef az_result (*pnp_append_property_callback)(az_json_writer* jw, void* cont
  * @remark This topic can also be used to set the MQTT Will message in the Connect message.
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
- * @param[in] properties An optional #az_iot_hub_client_properties object (can be NULL).
+ * @param[in] properties An optional #az_iot_message_properties object (can be NULL).
  * @param[in] component_name An optional component name if the telemetry is being sent from a
  *                           sub-component.
  * @param[out] mqtt_topic A buffer with sufficient capacity to hold the MQTT topic. If
@@ -48,7 +48,7 @@ typedef az_result (*pnp_append_property_callback)(az_json_writer* jw, void* cont
  */
 az_result pnp_get_telemetry_topic(
     const az_iot_hub_client* client,
-    az_iot_hub_client_properties* properties,
+    az_iot_message_properties* properties,
     az_span component_name,
     char* mqtt_topic,
     size_t mqtt_topic_size,
