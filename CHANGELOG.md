@@ -5,6 +5,7 @@
 ### New Features
 
 - Add `az_json_writer_append_json_text()` to support appending existing JSON with the JSON writer.
+- Add supported, system properties for IoT Hub messages to az_iot_common.h
 
 ### Breaking Changes
 

@@ -71,7 +71,7 @@ typedef enum
 https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-distributed-tracing */
 #define AZ_IOT_HUB_MESSAGE_PROPERTIES_CONTENT_TYPE \
   "%24.ct" /**< URL encoded and of the form text%2Fplain or application%2Fjson, etc */
-#define AZ_IOT_HUB_MESSAGE_PROPERTIES_CONTENT_ENCODING "%24.ce" /**< utf-8, utf-16, etc */
+#define AZ_IOT_HUB_MESSAGE_PROPERTIES_CONTENT_ENCODING "%24.ce" /**< UTF-8, UTF-16, etc */
 
 /**
  * @brief Checks if the status indicates a successful operation.
