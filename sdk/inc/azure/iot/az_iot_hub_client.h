@@ -234,19 +234,6 @@ typedef struct
 } az_iot_hub_client_properties;
 
 /**
- * @brief Supported IoT Hub properties
- */
-static const az_span az_iot_hub_client_properties_message_id
-    = AZ_SPAN_LITERAL_FROM_STR("%24.mid"); /**< Add unique identification to a message */
-static const az_span az_iot_hub_client_properties_correlation_id = AZ_SPAN_LITERAL_FROM_STR(
-    "%24.cid"); /**< Used in distributed tracing. More information here:
-                   https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-distributed-tracing */
-static const az_span az_iot_hub_client_properties_content_type = AZ_SPAN_LITERAL_FROM_STR(
-    "%24.ct"); /**< URL encoded and of the form text%2Fplain or application%2Fjson, etc */
-static const az_span az_iot_hub_client_properties_content_encoding
-    = AZ_SPAN_LITERAL_FROM_STR("%24.ce"); /**< utf-8, utf-16, etc */
-
-/**
  * @brief Initializes the Telemetry or C2D properties.
  *
  * @note The properties init API will not encode properties. In order to support
