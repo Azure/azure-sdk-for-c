@@ -8,11 +8,13 @@
 #pragma warning(disable : 4204)
 // warning C4996: 'localtime': This function or variable may be unsafe.  Consider using localtime_s
 // instead.
-#pragma warning(disable : 4996)
+#pragma warning(push)
+// warning C4201: nonstandard extension used: nameless struct/union
+#pragma warning(disable : 4201)
 #endif
 #include <paho-mqtt/MQTTClient.h>
 #ifdef _MSC_VER
-#pragma warning(default : 4201)
+#pragma warning(pop)
 #endif
 
 #include "iot_samples_common.h"
@@ -204,10 +206,11 @@ static az_result build_property_payload_with_status(
  *     }
  *   }
  *
- * Direct Method (Command): One device command is supported in this sample: `getMaxMinReport`. If any other
- * commands are attempted to be invoked, the log will report the command is not found. To invoke a
- * command, select your device's Direct Method tab in the Azure IoT Explorer. Enter the command name
- * `getMaxMinReport` along with a payload using an ISO8061 time format and select Invoke method.
+ * Direct Method (Command): One device command is supported in this sample: `getMaxMinReport`. If
+ * any other commands are attempted to be invoked, the log will report the command is not found. To
+ * invoke a command, select your device's Direct Method tab in the Azure IoT Explorer. Enter the
+ * command name `getMaxMinReport` along with a payload using an ISO8061 time format and select
+ * Invoke method.
  *
  *   "2020-08-18T17:09:29-0700"
  *
@@ -402,7 +405,7 @@ static void receive_messages(void)
   char* topic = NULL;
   int topic_len = 0;
   MQTTClient_message* message = NULL;
-  uint8_t timeoutCounter = 0;
+  uint8_t timeout_counter = 0;
 
   // Continue to receive commands or device twin messages while device is operational.
   while (is_device_operational)
@@ -421,7 +424,7 @@ static void receive_messages(void)
     else if (message == NULL)
     {
       // Allow up to TIMEOUT_MQTT_RECEIVE_MAX_COUNT before disconnecting.
-      if (++timeoutCounter >= TIMEOUT_MQTT_RECEIVE_MAX_MESSAGE_COUNT)
+      if (++timeout_counter >= TIMEOUT_MQTT_RECEIVE_MAX_MESSAGE_COUNT)
       {
         LOG("Receive message timeout count of %d reached.", TIMEOUT_MQTT_RECEIVE_MAX_MESSAGE_COUNT);
         return;
@@ -436,7 +439,7 @@ static void receive_messages(void)
         topic_len = (int)strlen(topic);
       }
 
-      timeoutCounter = 0; // Reset.
+      timeout_counter = 0; // Reset.
 
       on_message_received(topic, topic_len, message);
       LOG(" "); // Formatting.
@@ -518,7 +521,7 @@ static void on_message_received(char* topic, int topic_len, const MQTTClient_mes
           rc
           = az_iot_hub_client_twin_parse_received_topic(&hub_client, topic_span, &twin_response)))
   {
-    LOG_SUCCESS("Client received a valid topic response:");
+    LOG_SUCCESS("Client received a valid topic response.");
     LOG_AZ_SPAN("Topic:", topic_span);
     LOG_AZ_SPAN("Payload:", message_span);
     LOG("Status: %d", twin_response.status);
@@ -529,7 +532,7 @@ static void on_message_received(char* topic, int topic_len, const MQTTClient_mes
                rc = az_iot_hub_client_methods_parse_received_topic(
                    &hub_client, topic_span, &command_request)))
   {
-    LOG_SUCCESS("Client received a valid topic response:");
+    LOG_SUCCESS("Client received a valid topic response.");
     LOG_AZ_SPAN("Topic:", topic_span);
     LOG_AZ_SPAN("Payload:", message_span);
 
@@ -549,7 +552,7 @@ static void handle_device_twin_message(
 {
   bool is_twin_get = false;
 
-  // Invoke appropriate action per response type (3 Types only).
+  // Invoke appropriate action per response type (3 types only).
   switch (twin_response->response_type)
   {
     // A response from a twin GET publish message with the twin document as a payload.
@@ -760,7 +763,7 @@ static void send_reported_property(az_span name, double value, int32_t version, 
 
   // Publish the reported property update.
   mqtt_publish_message(twin_patch_topic_buffer, reported_property_payload, SAMPLE_PUBLISH_QOS);
-  LOG_SUCCESS("Client sent reported property message:");
+  LOG_SUCCESS("Client sent reported property message.");
   LOG_AZ_SPAN("Payload:", reported_property_payload);
 }
 

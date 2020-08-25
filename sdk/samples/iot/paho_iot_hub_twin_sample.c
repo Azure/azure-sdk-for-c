@@ -2,12 +2,13 @@
 // SPDX-License-Identifier: MIT
 
 #ifdef _MSC_VER
+#pragma warning(push)
 // warning C4201: nonstandard extension used: nameless struct/union
 #pragma warning(disable : 4201)
 #endif
 #include <paho-mqtt/MQTTClient.h>
 #ifdef _MSC_VER
-#pragma warning(default : 4201)
+#pragma warning(pop)
 #endif
 
 #include "iot_samples_common.h"
@@ -392,7 +393,7 @@ static void parse_device_twin_message(
   LOG_AZ_SPAN("Payload:", message_span);
   LOG("Status: %d", twin_response->status);
 
-  // Invoke appropriate action per response type (3 Types only).
+  // Invoke appropriate action per response type (3 types only).
   switch (twin_response->response_type)
   {
     case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_GET:

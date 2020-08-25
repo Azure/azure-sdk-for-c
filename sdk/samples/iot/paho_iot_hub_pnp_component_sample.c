@@ -2,12 +2,13 @@
 // SPDX-License-Identifier: MIT
 
 #ifdef _MSC_VER
+#pragma warning(push)
 // warning C4201: nonstandard extension used: nameless struct/union
 #pragma warning(disable : 4201)
 #endif
 #include <paho-mqtt/MQTTClient.h>
 #ifdef _MSC_VER
-#pragma warning(default : 4201)
+#pragma warning(pop)
 #endif
 
 #include "iot_samples_common.h"
@@ -54,14 +55,14 @@ bool is_device_operational = true;
 static const az_span model_id
     = AZ_SPAN_LITERAL_FROM_STR("dtmi:com:example:TemperatureController;1");
 
-
 // Components
 static pnp_thermostat_component thermostat_1;
 static pnp_thermostat_component thermostat_2;
 static const az_span thermostat_1_name = AZ_SPAN_LITERAL_FROM_STR("thermostat1");
 static const az_span thermostat_2_name = AZ_SPAN_LITERAL_FROM_STR("thermostat2");
 static const az_span device_info_name = AZ_SPAN_LITERAL_FROM_STR("deviceInformation");
-static const az_span* pnp_components[] = { &thermostat_1_name, &thermostat_2_name, &device_info_name };
+static const az_span* pnp_components[]
+    = { &thermostat_1_name, &thermostat_2_name, &device_info_name };
 static const int32_t pnp_components_num = sizeof(pnp_components) / sizeof(pnp_components[0]);
 
 // IoT Hub Device Twin Values
@@ -122,8 +123,8 @@ static void send_telemetry_messages(void);
 static az_result temp_controller_get_telemetry_message(pnp_mqtt_message* message);
 
 // Callbacks
-static az_result append_string(az_json_writer* jw, void* value);
-static az_result append_json_token(az_json_writer* jw, void* value);
+static az_result append_string_callback(az_json_writer* jw, void* value);
+static az_result append_json_token_callback(az_json_writer* jw, void* value);
 static void property_callback(
     az_span component_name,
     const az_json_token* property_name,
@@ -477,11 +478,7 @@ static void send_device_serial_number(void)
   // Get the Twin Patch topic to send a reported property update.
   if (az_failed(
           rc = az_iot_hub_client_twin_patch_get_publish_topic(
-              &hub_client,
-              get_request_id(),
-              mqtt_message.topic,
-              mqtt_message.topic_length,
-              NULL)))
+              &hub_client, get_request_id(), mqtt_message.topic, mqtt_message.topic_length, NULL)))
   {
     LOG_ERROR("Failed to get Twin Patch publish topic: az_result return code 0x%08x.", rc);
     exit(rc);
@@ -493,7 +490,7 @@ static void send_device_serial_number(void)
               mqtt_message.payload_span,
               AZ_SPAN_NULL,
               reported_serial_num_property_name,
-              append_string,
+              append_string_callback,
               (void*)&reported_serial_num_property_value,
               &mqtt_message.out_payload_span)))
   {
@@ -520,11 +517,7 @@ static void request_device_twin_document(void)
   // Get the Twin Document topic to publish the twin document request.
   if (az_failed(
           rc = az_iot_hub_client_twin_document_get_publish_topic(
-              &hub_client,
-              get_request_id(),
-              mqtt_message.topic,
-              mqtt_message.topic_length,
-              NULL)))
+              &hub_client, get_request_id(), mqtt_message.topic, mqtt_message.topic_length, NULL)))
   {
     LOG_ERROR("Failed to get Twin Document publish topic: az_result return code 0x%08x.", rc);
     exit(rc);
@@ -545,24 +538,22 @@ static void receive_messages(void)
   while (is_device_operational)
   {
     // Send max temp for each thermostat since boot if needed.
-    if (pnp_thermostat_get_max_temp_report(
-            &hub_client, &thermostat_1, &mqtt_message))
+    if (pnp_thermostat_get_max_temp_report(&hub_client, &thermostat_1, &mqtt_message))
     {
-      mqtt_publish_message(
-          mqtt_message.topic, mqtt_message.out_payload_span, MQTT_PUBLISH_QOS);
-      LOG_SUCCESS("Client sent Temperature Sensor 1 the `maxTempSinceLastReboot` reported property message.");
+      mqtt_publish_message(mqtt_message.topic, mqtt_message.out_payload_span, MQTT_PUBLISH_QOS);
+      LOG_SUCCESS("Client sent Temperature Sensor 1 the `maxTempSinceLastReboot` reported property "
+                  "message.");
       LOG_AZ_SPAN("Payload:", mqtt_message.out_payload_span);
 
       // Receive the response from the server.
       mqtt_receive_message();
     }
 
-    if (pnp_thermostat_get_max_temp_report(
-            &hub_client, &thermostat_2, &mqtt_message))
+    if (pnp_thermostat_get_max_temp_report(&hub_client, &thermostat_2, &mqtt_message))
     {
-      mqtt_publish_message(
-          mqtt_message.topic, mqtt_message.out_payload_span, MQTT_PUBLISH_QOS);
-      LOG_SUCCESS("Client sent Temperature Sensor 2 the `maxTempSinceLastReboot` reported property message.");
+      mqtt_publish_message(mqtt_message.topic, mqtt_message.out_payload_span, MQTT_PUBLISH_QOS);
+      LOG_SUCCESS("Client sent Temperature Sensor 2 the `maxTempSinceLastReboot` reported property "
+                  "message.");
       LOG_AZ_SPAN("Payload:", mqtt_message.out_payload_span);
 
       // Receive the response from the server.
@@ -610,7 +601,7 @@ static void mqtt_receive_message(void)
   char* topic = NULL;
   int topic_len = 0;
   MQTTClient_message* message = NULL;
-  static int8_t timeoutCounter;
+  static int8_t timeout_counter;
 
   LOG("Waiting for Command or Device Twin message.\n");
 
@@ -624,7 +615,7 @@ static void mqtt_receive_message(void)
   else if (message == NULL)
   {
     // Allow up to TIMEOUT_MQTT_RECEIVE_MAX_COUNT before disconnecting.
-    if (++timeoutCounter >= TIMEOUT_MQTT_RECEIVE_MAX_MESSAGE_COUNT)
+    if (++timeout_counter >= TIMEOUT_MQTT_RECEIVE_MAX_MESSAGE_COUNT)
     {
       LOG("Receive message timeout count of %d reached.", TIMEOUT_MQTT_RECEIVE_MAX_MESSAGE_COUNT);
       is_device_operational = false;
@@ -639,7 +630,7 @@ static void mqtt_receive_message(void)
       topic_len = (int)strlen(topic);
     }
 
-    timeoutCounter = 0; // Reset.
+    timeout_counter = 0; // Reset.
 
     on_message_received(topic, topic_len, message);
     LOG(" "); // Formatting.
@@ -664,7 +655,7 @@ static void on_message_received(char* topic, int topic_len, const MQTTClient_mes
           rc
           = az_iot_hub_client_twin_parse_received_topic(&hub_client, topic_span, &twin_response)))
   {
-    LOG_SUCCESS("Client received a valid topic response:");
+    LOG_SUCCESS("Client received a valid topic response.");
     LOG_AZ_SPAN("Topic:", topic_span);
     LOG_AZ_SPAN("Payload:", message_span);
     LOG("Status: %d", twin_response.status);
@@ -675,7 +666,7 @@ static void on_message_received(char* topic, int topic_len, const MQTTClient_mes
                rc = az_iot_hub_client_methods_parse_received_topic(
                    &hub_client, topic_span, &command_request)))
   {
-    LOG_SUCCESS("Client received a valid topic response:");
+    LOG_SUCCESS("Client received a valid topic response.");
     LOG_AZ_SPAN("Topic:", topic_span);
     LOG_AZ_SPAN("Payload:", message_span);
 
@@ -693,19 +684,21 @@ static void handle_device_twin_message(
     az_span twin_message_span,
     const az_iot_hub_client_twin_response* twin_response)
 {
-  // Invoke appropriate action per response type (3 Types only).
+  // Invoke appropriate action per response type (3 types only).
   switch (twin_response->response_type)
   {
     // A response from a twin GET publish message with the twin document as a payload.
     case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_GET:
       LOG("Message Type: GET");
-      (void)pnp_process_device_twin_message(twin_message_span, false, pnp_components, pnp_components_num, property_callback, NULL);
+      (void)pnp_process_device_twin_message(
+          twin_message_span, false, pnp_components, pnp_components_num, property_callback, NULL);
       break;
 
     // An update to the desired properties with the properties as a payload.
     case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES:
       LOG("Message Type: Desired Properties");
-      (void)pnp_process_device_twin_message(twin_message_span, true, pnp_components, pnp_components_num, property_callback, NULL);
+      (void)pnp_process_device_twin_message(
+          twin_message_span, true, pnp_components, pnp_components_num, property_callback, NULL);
       break;
 
     // A response from a twin reported properties publish message.
@@ -762,7 +755,7 @@ static void handle_command_message(
                &mqtt_message,
                &status)))
   {
-    LOG_AZ_SPAN("Client invoked command on controller:", command_name);
+    LOG_AZ_SPAN("Client invoked command on temperature controller:", command_name);
     command_response_payload = mqtt_message.out_payload_span;
   }
   else
@@ -788,7 +781,7 @@ static void handle_command_message(
 
   // Publish the command response
   mqtt_publish_message(mqtt_message.topic, command_response_payload, MQTT_PUBLISH_QOS);
-  LOG_SUCCESS("Client published command response:");
+  LOG_SUCCESS("Client published command response.");
   LOG("Status: %d", status);
   LOG_AZ_SPAN("Payload:", command_response_payload);
 }
@@ -855,7 +848,8 @@ static void send_telemetry_messages(void)
   LOG_AZ_SPAN("Payload:", mqtt_message.out_payload_span);
 
   // Get the Telemetry topic to publish the telemetry message and build the telemetry message.
-  if (az_failed(rc = pnp_thermostat_get_telemetry_message(&hub_client, &thermostat_2, &mqtt_message)))
+  if (az_failed(
+          rc = pnp_thermostat_get_telemetry_message(&hub_client, &thermostat_2, &mqtt_message)))
   {
     LOG_ERROR(
         "Failed to get Telemetry publish topic or build telemetry message: az_result return code "
@@ -890,7 +884,9 @@ static az_result temp_controller_get_telemetry_message(pnp_mqtt_message* message
   az_result rc;
 
   // Get the Telemetry topic to publish the telemetry messages.
-  if (az_failed(rc = pnp_get_telemetry_topic(&hub_client, NULL, AZ_SPAN_NULL, message->topic, message->topic_length, NULL)))
+  if (az_failed(
+          rc = pnp_get_telemetry_topic(
+              &hub_client, NULL, AZ_SPAN_NULL, message->topic, message->topic_length, NULL)))
   {
     LOG_ERROR("Failed to get pnp Telemetry publish topic: az_result return code 0x%08x.", rc);
     exit(rc);
@@ -910,12 +906,12 @@ static az_result temp_controller_get_telemetry_message(pnp_mqtt_message* message
   return rc;
 }
 
-static az_result append_string(az_json_writer* jw, void* value)
+static az_result append_string_callback(az_json_writer* jw, void* value)
 {
   return az_json_writer_append_string(jw, *(az_span*)value);
 }
 
-static az_result append_json_token(az_json_writer* jw, void* value)
+static az_result append_json_token_callback(az_json_writer* jw, void* value)
 {
   az_json_token value_token = *(az_json_token*)value;
 
@@ -954,7 +950,9 @@ static void property_callback(
 
   if (az_span_ptr(component_name) == NULL || az_span_size(component_name) == 0)
   {
-    LOG_ERROR("Temerature Controller does not support writable property \"%.*s\". All writeable properties are on sub-components.",
+    LOG_ERROR(
+        "Temperature Controller does not support writable property \"%.*s\". All writeable "
+        "properties are on sub-components.",
         az_span_size(property_name->slice),
         az_span_ptr(property_name->slice));
 
@@ -977,7 +975,7 @@ static void property_callback(
                 mqtt_message.payload_span,
                 component_name,
                 property_name->slice,
-                append_json_token,
+                append_json_token_callback,
                 (void*)&property_value,
                 AZ_IOT_STATUS_NOT_FOUND,
                 version,
@@ -985,14 +983,14 @@ static void property_callback(
                 &mqtt_message.out_payload_span)))
     {
       LOG_ERROR(
-          "Failed to build Temperature Controller property error payload: az_result return code 0x%08x.",
+          "Failed to build Temperature Controller property error payload: az_result return code "
+          "0x%08x.",
           rc)
       exit(rc);
     }
 
     // Send error response to the updated property.
-    mqtt_publish_message(
-        mqtt_message.topic, mqtt_message.out_payload_span, MQTT_PUBLISH_QOS);
+    mqtt_publish_message(mqtt_message.topic, mqtt_message.out_payload_span, MQTT_PUBLISH_QOS);
     LOG_SUCCESS("Client sent Temperature Controller error status reported property message:");
     LOG_AZ_SPAN("Payload:", mqtt_message.out_payload_span);
 
@@ -1010,8 +1008,7 @@ static void property_callback(
                    &mqtt_message)))
   {
     // Send response to the updated property.
-    mqtt_publish_message(
-        mqtt_message.topic, mqtt_message.out_payload_span, MQTT_PUBLISH_QOS);
+    mqtt_publish_message(mqtt_message.topic, mqtt_message.out_payload_span, MQTT_PUBLISH_QOS);
     LOG_SUCCESS("Client sent Temperature Sensor 1 reported property message:");
     LOG_AZ_SPAN("Payload:", mqtt_message.out_payload_span);
 
@@ -1029,8 +1026,7 @@ static void property_callback(
                    &mqtt_message)))
   {
     // Send response to the updated property
-    mqtt_publish_message(
-        mqtt_message.topic, mqtt_message.out_payload_span, MQTT_PUBLISH_QOS);
+    mqtt_publish_message(mqtt_message.topic, mqtt_message.out_payload_span, MQTT_PUBLISH_QOS);
     LOG_SUCCESS("Client sent Temperature Sensor 2 reported property message.");
     LOG_AZ_SPAN("Payload:", mqtt_message.out_payload_span);
 
