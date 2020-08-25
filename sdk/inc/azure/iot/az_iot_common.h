@@ -66,7 +66,7 @@ typedef enum
  *
  * Properties APIs
  *
- *   IoT Hub message properties are used for Device-to-Cloud (D2C) as well as Cloud-to-Device (C2D).
+ *   IoT message properties are used for Device-to-Cloud (D2C) as well as Cloud-to-Device (C2D).
  *   Properties are always appended to the MQTT topic of the published or received message and
  *   must contain Uri-encoded keys and values.
  */
