@@ -26,12 +26,12 @@
 #define SAMPLE_NAME PAHO_IOT_HUB_METHODS_SAMPLE
 
 #define MAX_METHOD_MESSAGE_COUNT 5
-#define TIMEOUT_MQTT_RECEIVE_MS (60 * 1000)
-#define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
+#define MQTT_TIMEOUT_RECEIVE_MS (60 * 1000)
+#define MQTT_TIMEOUT_DISCONNECT_MS (10 * 1000)
 
-static const az_span ping_method_name = AZ_SPAN_LITERAL_FROM_STR("ping");
-static const az_span ping_response = AZ_SPAN_LITERAL_FROM_STR("{\"response\": \"pong\"}");
-static const az_span method_error_payload = AZ_SPAN_LITERAL_FROM_STR("{}");
+static az_span const ping_method_name = AZ_SPAN_LITERAL_FROM_STR("ping");
+static az_span const ping_response = AZ_SPAN_LITERAL_FROM_STR("{\"response\": \"pong\"}");
+static az_span const method_error_payload = AZ_SPAN_LITERAL_FROM_STR("{}");
 
 static iot_sample_environment_variables env_vars;
 static az_iot_hub_client hub_client;
@@ -47,13 +47,13 @@ static void disconnect_mqtt_client_from_iot_hub(void);
 
 static void parse_method_message(
     char* topic,
-    int topic_len,
-    const MQTTClient_message* message,
+    int const topic_len,
+    MQTTClient_message const* message,
     az_iot_hub_client_method_request* method_request);
-static void invoke_method(const az_iot_hub_client_method_request* method_request);
+static void invoke_method(az_iot_hub_client_method_request const* method_request);
 static az_span ping_method(void);
 static void send_method_response(
-    const az_iot_hub_client_method_request* request,
+    az_iot_hub_client_method_request const* request,
     uint16_t status,
     az_span response);
 
@@ -84,7 +84,6 @@ int main(void)
   LOG_SUCCESS("Client subscribed to IoT Hub topics and is ready to receive Methods messages.");
 
   receive_method_messages();
-  LOG_SUCCESS("Client received messages.")
 
   disconnect_mqtt_client_from_iot_hub();
   LOG_SUCCESS("Client disconnected from IoT Hub.");
@@ -211,20 +210,21 @@ static void receive_method_messages(void)
   // Continue until max # messages received or timeout expires.
   for (uint8_t message_count = 0; message_count < MAX_METHOD_MESSAGE_COUNT; message_count++)
   {
-    LOG("Waiting for Method message.");
+    LOG(" "); // Formatting
+    LOG("Waiting for Method message.\n");
 
     if (((rc
-          = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, TIMEOUT_MQTT_RECEIVE_MS))
+          = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, MQTT_TIMEOUT_RECEIVE_MS))
          != MQTTCLIENT_SUCCESS)
         && (rc != MQTTCLIENT_TOPICNAME_TRUNCATED))
     {
-      LOG_ERROR("Failed to receive message: MQTTClient return code %d.", rc);
+      LOG_ERROR("Failed to receive message #%d: MQTTClient return code %d.", message_count + 1, rc);
       exit(rc);
     }
     else if (message == NULL)
     {
       LOG_ERROR("Timeout expired: MQTTClient return code %d.", rc);
-      exit(rc);
+      return;
     }
     else if (rc == MQTTCLIENT_TOPICNAME_TRUNCATED)
     {
@@ -238,18 +238,20 @@ static void receive_method_messages(void)
     LOG_SUCCESS("Client parsed message.");
 
     invoke_method(&method_request);
-    LOG(" "); // formatting
 
     MQTTClient_freeMessage(&message);
     MQTTClient_free(topic);
   }
+
+  LOG(" "); // Formatting
+  LOG_SUCCESS("Client received messages.")
 }
 
 static void disconnect_mqtt_client_from_iot_hub(void)
 {
   int rc;
 
-  if ((rc = MQTTClient_disconnect(mqtt_client, TIMEOUT_MQTT_DISCONNECT_MS)) != MQTTCLIENT_SUCCESS)
+  if ((rc = MQTTClient_disconnect(mqtt_client, MQTT_TIMEOUT_DISCONNECT_MS)) != MQTTCLIENT_SUCCESS)
   {
     LOG_ERROR("Failed to disconnect MQTT client: MQTTClient return code %d.", rc);
     exit(rc);
@@ -260,8 +262,8 @@ static void disconnect_mqtt_client_from_iot_hub(void)
 
 static void parse_method_message(
     char* topic,
-    int topic_len,
-    const MQTTClient_message* message,
+    int const topic_len,
+    MQTTClient_message const* message,
     az_iot_hub_client_method_request* method_request)
 {
   int rc;
@@ -277,12 +279,12 @@ static void parse_method_message(
     LOG_AZ_SPAN("Topic:", topic_span);
     exit(rc);
   }
-  LOG_SUCCESS("Client received a valid topic response:");
+  LOG_SUCCESS("Client received a valid topic response.");
   LOG_AZ_SPAN("Topic:", topic_span);
   LOG_AZ_SPAN("Payload:", message_span);
 }
 
-static void invoke_method(const az_iot_hub_client_method_request* method_request)
+static void invoke_method(az_iot_hub_client_method_request const* method_request)
 {
   if (az_span_is_content_equal(ping_method_name, method_request->name))
   {
@@ -305,7 +307,7 @@ static az_span ping_method(void)
 }
 
 static void send_method_response(
-    const az_iot_hub_client_method_request* method_request,
+    az_iot_hub_client_method_request const* method_request,
     uint16_t status,
     az_span response)
 {
@@ -322,7 +324,7 @@ static void send_method_response(
               sizeof(methods_response_topic_buffer),
               NULL)))
   {
-    LOG_ERROR("Failed to get Methods response publish topic: az_result return code 0x%04x.", rc);
+    LOG_ERROR("Failed to get the Methods Response publish-topic: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
@@ -337,10 +339,10 @@ static void send_method_response(
            NULL))
       != MQTTCLIENT_SUCCESS)
   {
-    LOG_ERROR("Failed to publish method response: MQTTClient return code %d.", rc);
+    LOG_ERROR("Failed to publish the Methods response: MQTTClient return code %d.", rc);
     exit(rc);
   }
-  LOG_SUCCESS("Client published method response:");
+  LOG_SUCCESS("Client published the Methods response.");
   LOG("Status: %u", status);
   LOG_AZ_SPAN("Payload:", response);
 }

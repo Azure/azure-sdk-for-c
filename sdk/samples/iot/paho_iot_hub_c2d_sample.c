@@ -26,8 +26,8 @@
 #define SAMPLE_NAME PAHO_IOT_HUB_C2D_SAMPLE
 
 #define MAX_C2D_MESSAGE_COUNT 5
-#define TIMEOUT_MQTT_RECEIVE_MS (60 * 1000)
-#define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
+#define MQTT_TIMEOUT_RECEIVE_MS (60 * 1000)
+#define MQTT_TIMEOUT_DISCONNECT_MS (10 * 1000)
 
 static iot_sample_environment_variables env_vars;
 static az_iot_hub_client hub_client;
@@ -43,9 +43,9 @@ static void disconnect_mqtt_client_from_iot_hub(void);
 
 static void parse_c2d_message(
     char* topic,
-    int topic_len,
-    const MQTTClient_message* message,
-    az_iot_hub_client_c2d_request* c2d_request);
+    int const topic_len,
+    MQTTClient_message const* message,
+    az_iot_hub_client_c2d_request* out_c2d_request);
 
 /*
  * This sample receives incoming cloud-to-device (C2D) messages sent from the Azure IoT Hub to
@@ -68,7 +68,6 @@ int main(void)
   LOG_SUCCESS("Client subscribed to IoT Hub topics and is ready to receive C2D messages.");
 
   receive_c2d_messages();
-  LOG_SUCCESS("Client received messages.")
 
   disconnect_mqtt_client_from_iot_hub();
   LOG_SUCCESS("Client disconnected from IoT Hub.");
@@ -195,20 +194,21 @@ static void receive_c2d_messages(void)
   // Continue until max # messages received or timeout expires.
   for (uint8_t message_count = 0; message_count < MAX_C2D_MESSAGE_COUNT; message_count++)
   {
-    LOG("Waiting for C2D message.");
+    LOG(" "); // Formatting
+    LOG("Waiting for C2D message.\n");
 
     if (((rc
-          = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, TIMEOUT_MQTT_RECEIVE_MS))
+          = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, MQTT_TIMEOUT_RECEIVE_MS))
          != MQTTCLIENT_SUCCESS)
         && (rc != MQTTCLIENT_TOPICNAME_TRUNCATED))
     {
-      LOG_ERROR("Failed to receive message: MQTTClient return code %d.", rc);
+      LOG_ERROR("Failed to receive message #%d: MQTTClient return code %d.", message_count + 1, rc);
       exit(rc);
     }
     else if (message == NULL)
     {
       LOG_ERROR("Timeout expired: MQTTClient return code %d.", rc);
-      exit(rc);
+      return;
     }
     else if (rc == MQTTCLIENT_TOPICNAME_TRUNCATED)
     {
@@ -221,18 +221,19 @@ static void receive_c2d_messages(void)
     parse_c2d_message(topic, topic_len, message, &c2d_request);
     LOG_SUCCESS("Client parsed message.");
 
-    LOG(" "); // formatting
-
     MQTTClient_freeMessage(&message);
     MQTTClient_free(topic);
   }
+
+  LOG(" "); // Formatting
+  LOG_SUCCESS("Client received messages.")
 }
 
 static void disconnect_mqtt_client_from_iot_hub(void)
 {
   int rc;
 
-  if ((rc = MQTTClient_disconnect(mqtt_client, TIMEOUT_MQTT_DISCONNECT_MS)) != MQTTCLIENT_SUCCESS)
+  if ((rc = MQTTClient_disconnect(mqtt_client, MQTT_TIMEOUT_DISCONNECT_MS)) != MQTTCLIENT_SUCCESS)
   {
     LOG_ERROR("Failed to disconnect MQTT client: MQTTClient return code %d.", rc);
     exit(rc);
@@ -243,23 +244,23 @@ static void disconnect_mqtt_client_from_iot_hub(void)
 
 static void parse_c2d_message(
     char* topic,
-    int topic_len,
-    const MQTTClient_message* message,
-    az_iot_hub_client_c2d_request* c2d_request)
+    int const topic_len,
+    MQTTClient_message const* message,
+    az_iot_hub_client_c2d_request* out_c2d_request)
 {
   int rc;
-  az_span topic_span = az_span_create((uint8_t*)topic, topic_len);
-  az_span message_span = az_span_create((uint8_t*)message->payload, message->payloadlen);
+  az_span const topic_span = az_span_create((uint8_t*)topic, topic_len);
+  az_span const message_span = az_span_create((uint8_t*)message->payload, message->payloadlen);
 
   // Parse message and retrieve c2d_request info.
   if (az_failed(
-          rc = az_iot_hub_client_c2d_parse_received_topic(&hub_client, topic_span, c2d_request)))
+          rc = az_iot_hub_client_c2d_parse_received_topic(&hub_client, topic_span, out_c2d_request)))
   {
     LOG_ERROR("Message from unknown topic: az_result return code 0x%04x.", rc);
     LOG_AZ_SPAN("Topic:", topic_span);
     exit(rc);
   }
-  LOG_SUCCESS("Client received a valid topic response:");
+  LOG_SUCCESS("Client received a valid topic response.");
   LOG_AZ_SPAN("Topic:", topic_span);
   LOG_AZ_SPAN("Payload:", message_span);
 }
