@@ -1,8 +1,11 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # SPDX-License-Identifier: MIT
 
+Set-StrictMode -Version 3.0
+$errorActionPreference="stop"
+
 Write-Warning "Certificates created by this script MUST NOT be used for production."
-Write-Warning "They expire after 30 days, and most importantly are provided for demonstration purposes to help you quickly understand CA Certificates."
+Write-Warning "They expire after 365 days, and most importantly are provided for demonstration purposes to help you quickly understand CA Certificates."
 Write-Warning "When productizing against CA Certificates, you'll need to use your own security best practices for certification creation and lifetime management."
 
 # Check to make sure openssl is installed
@@ -39,7 +42,7 @@ if ($IsWindows -or $IsMacOS) {
   Write-Output "`n"
   Write-Warning "IMPORTANT:"
   Write-Warning "It is NOT recommended to use OpenSSL on Windows or OSX. Recommended TLS stacks are:"
-  Write-Warning "Microsoft Windows SChannel: https://docs.microsoft.com/en-us/windows/win32/com/schannel"
+  Write-Warning "Microsoft Windows Schannel: https://docs.microsoft.com/en-us/windows/win32/com/schannel"
   Write-Warning "OR"
   Write-Warning "Apple Secure Transport : https://developer.apple.com/documentation/security/secure_transport"
   Write-Warning "If using OpenSSL, it is recommended to use the OpenSSL Trusted CA store configured on your system."
