@@ -147,18 +147,18 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
       out_twin_response->status = (az_iot_status)status_int;
 
       // Get request id prop value
-      az_iot_hub_client_properties props;
+      az_iot_message_properties props;
       az_span prop_span = az_span_slice(remainder, 1, az_span_size(remainder));
       _az_RETURN_IF_FAILED(
-          az_iot_hub_client_properties_init(&props, prop_span, az_span_size(prop_span)));
-      _az_RETURN_IF_FAILED(az_iot_hub_client_properties_find(
+          az_iot_message_properties_init(&props, prop_span, az_span_size(prop_span)));
+      _az_RETURN_IF_FAILED(az_iot_message_properties_find(
           &props, az_iot_hub_client_request_id_span, &out_twin_response->request_id));
 
       if (out_twin_response->status == AZ_IOT_STATUS_NO_CONTENT)
       {
         // Is a reported prop response
         out_twin_response->response_type = AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES;
-        _az_RETURN_IF_FAILED(az_iot_hub_client_properties_find(
+        _az_RETURN_IF_FAILED(az_iot_message_properties_find(
             &props, az_iot_hub_twin_version_prop, &out_twin_response->version));
       }
       else
@@ -175,15 +175,15 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
         >= 0)
     {
       // Is a /PATCH case (desired props)
-      az_iot_hub_client_properties props;
+      az_iot_message_properties props;
       az_span prop_span = az_span_slice(
           received_topic,
           twin_feature_index + az_span_size(az_iot_hub_twin_patch_sub_topic)
               + (int32_t)sizeof(az_iot_hub_client_twin_question),
           az_span_size(received_topic));
       _az_RETURN_IF_FAILED(
-          az_iot_hub_client_properties_init(&props, prop_span, az_span_size(prop_span)));
-      _az_RETURN_IF_FAILED(az_iot_hub_client_properties_find(
+          az_iot_message_properties_init(&props, prop_span, az_span_size(prop_span)));
+      _az_RETURN_IF_FAILED(az_iot_message_properties_find(
           &props, az_iot_hub_twin_version_prop, &out_twin_response->version));
 
       out_twin_response->response_type = AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES;

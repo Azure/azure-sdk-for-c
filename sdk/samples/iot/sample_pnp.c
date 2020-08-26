@@ -145,13 +145,13 @@ static bool is_component_in_model(
 // Get the telemetry topic for PnP
 bool pnp_get_telemetry_topic(
     const az_iot_hub_client* client,
-    az_iot_hub_client_properties* properties,
+    az_iot_message_properties* properties,
     az_span component_name,
     char* mqtt_topic,
     size_t mqtt_topic_size,
     size_t* out_mqtt_topic_length)
 {
-  az_iot_hub_client_properties pnp_properties;
+  az_iot_message_properties pnp_properties;
 
   if (az_span_ptr(component_name) != NULL)
   {
@@ -159,15 +159,15 @@ bool pnp_get_telemetry_topic(
     {
       properties = &pnp_properties;
 
-      if (az_failed(az_iot_hub_client_properties_init(
-              properties, AZ_SPAN_FROM_BUFFER(pnp_properties_buffer), 0)))
+      if (az_failed(az_iot_message_properties_init(
+          properties, AZ_SPAN_FROM_BUFFER(pnp_properties_buffer), 0)))
       {
         return false;
       }
     }
 
-    if (az_failed(az_iot_hub_client_properties_append(
-            properties, component_telemetry_prop_span, component_name)))
+    if (az_failed(az_iot_message_properties_append(
+        properties, component_telemetry_prop_span, component_name)))
     {
       return false;
     }

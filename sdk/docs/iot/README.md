@@ -137,7 +137,7 @@ int main()
 
 ### Properties
 
-Included in the Azure SDK for Embedded C are helper functions to form and manage properties for IoT Hub services. Implementation starts by using the `az_iot_hub_client_properties_init()` API. The user is free to initialize using an empty, but appropriately sized, span to later append properties or an already populated span containing a properly formatted property buffer. "Properly formatted" properties follow the form `{key}={value}&{key}={value}`.
+Included in the Azure SDK for Embedded C are helper functions to form and manage properties for IoT Hub services. Implementation starts by using the `az_iot_message_properties_init()` API. The user is free to initialize using an empty, but appropriately sized, span to later append properties or an already populated span containing a properly formatted property buffer. "Properly formatted" properties follow the form `{key}={value}&{key}={value}`.
 
 Below is an example use case of appending properties.
 
@@ -150,10 +150,10 @@ void my_property_func()
   az_span property_span = az_span_create(property_buffer, sizeof(property_buffer));
   
   //Initialize the property struct with the span
-  az_iot_hub_client_properties props;
-  az_iot_hub_client_properties_init(&props, property_span, 0);
+  az_iot_message_properties props;
+  az_iot_message_properties_init(&props, property_span, 0);
   //Append properties
-  az_iot_hub_client_properties_append(&props, AZ_SPAN_FROM_STR("key"), AZ_SPAN_FROM_STR("value"));
+  az_iot_message_properties_append(&props, AZ_SPAN_FROM_STR("key"), AZ_SPAN_FROM_STR("value"));
   //At this point, you are able to pass the `props` to other APIs with property parameters.
 }
 ```
@@ -166,8 +166,8 @@ static az_span my_prop_span = AZ_SPAN_LITERAL_FROM_STR("my_device=contoso&my_key
 void my_property_func()
 {
   //Initialize the property struct with the span
-  az_iot_hub_client_properties props;
-  az_iot_hub_client_properties_init(&props, my_prop_span, az_span_size(my_prop_span));
+  az_iot_message_properties props;
+  az_iot_message_properties_init(&props, my_prop_span, az_span_size(my_prop_span));
   //At this point, you are able to pass the `props` to other APIs with property parameters.
 }
 ```
