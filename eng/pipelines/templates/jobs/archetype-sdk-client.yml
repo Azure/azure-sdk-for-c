@@ -338,7 +338,7 @@ jobs:
       displayName: Download and Install Doxygen
 
       # Assumes AZURE_SDK_VERSION is set in the environment
-    - script: '"C:/Program Files/doxygen/bin/doxygen.exe" Doxyfile'
+    - script: '"C:/Program Files/doxygen/bin/doxygen.exe" Doxyfile && [ -f "DoxygenWarningLog.txt" ] && (cat "DoxygenWarningLog.txt")'
       displayName: Generate docs
 
     - pwsh: New-Item -ItemType directory -Path $(Build.ArtifactStagingDirectory) -Name docs
