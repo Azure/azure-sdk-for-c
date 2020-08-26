@@ -19,7 +19,6 @@ endif()
 add_cmocka_test(az_core_test SOURCES
                 main.c
                 test_az_context.c
-                test_az_credential_client_secret.c
                 test_az_http.c
                 test_az_json.c
                 test_az_logging.c
