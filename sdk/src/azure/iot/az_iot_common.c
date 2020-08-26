@@ -53,7 +53,7 @@ az_iot_message_properties_append(az_iot_message_properties* properties, az_span 
     required_length += 1;
   }
 
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, required_length);
+  _az_RETURN_IF_NOT_ENOUGH_SIZE(remainder, required_length);
 
   if (prop_length > 0)
   {
