@@ -340,7 +340,7 @@ jobs:
       # Assumes AZURE_SDK_VERSION is set in the environment
       # If doxygen produces any warnings, fail the step.
     - pwsh: |
-        doxygen.exe Doxyfile
+        & 'C:\Program Files\doxygen\bin\doxygen.exe' Doxyfile
         if (Test-Path "DoxygenWarningLog.txt" -PathType leaf)
         {
           Get-Content "DoxygenWarningLog.txt"
