@@ -32,7 +32,7 @@
 #include <openssl/buffer.h>
 #include <openssl/evp.h>
 #include <openssl/hmac.h>
-
+/*
 #define IOT_SAMPLE_PRECONDITION_NOT_NULL(arg) \
 do {                                          \
     if (arg == NULL)                          \
@@ -41,6 +41,16 @@ do {                                          \
       exit(1);                                \
     }                                         \
 } while (0)
+*/
+
+static inline void precondition_not_null(void const* arg)
+{
+  if (arg == NULL)
+  {
+    LOG_ERROR("Pointer is NULL.");
+    exit(1);
+  }
+}
 
 //
 // MQTT endpoints
@@ -99,7 +109,7 @@ az_result iot_sample_read_environment_variables(
     iot_sample_name name,
     iot_sample_environment_variables* out_env_vars)
 {
-  IOT_SAMPLE_PRECONDITION_NOT_NULL(out_env_vars);
+  precondition_not_null(out_env_vars);
 
   if (type == PAHO_IOT_HUB)
   {
@@ -255,8 +265,8 @@ az_result iot_sample_create_mqtt_endpoint(
     char* out_endpoint,
     size_t endpoint_size)
 {
-  IOT_SAMPLE_PRECONDITION_NOT_NULL(env_vars);
-  IOT_SAMPLE_PRECONDITION_NOT_NULL(out_endpoint);
+  precondition_not_null(env_vars);
+  precondition_not_null(out_endpoint);
 
   if (type == PAHO_IOT_HUB)
   {
@@ -485,7 +495,7 @@ void iot_sample_generate_sas_base64_encoded_signed_signature(
     az_span sas_base64_encoded_signed_signature,
     az_span* out_sas_base64_encoded_signed_signature)
 {
-  IOT_SAMPLE_PRECONDITION_NOT_NULL(out_sas_base64_encoded_signed_signature);
+  precondition_not_null(out_sas_base64_encoded_signed_signature);
 
   int rc;
 
