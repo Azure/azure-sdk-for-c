@@ -48,7 +48,7 @@ static void disconnect_mqtt_client_from_iot_hub(void);
 
 static void parse_method_message(
     char* topic,
-    int const topic_len,
+    int topic_len,
     MQTTClient_message const* message,
     az_iot_hub_client_method_request* method_request);
 static void invoke_method(az_iot_hub_client_method_request const* method_request);
@@ -263,7 +263,7 @@ static void disconnect_mqtt_client_from_iot_hub(void)
 
 static void parse_method_message(
     char* topic,
-    int const topic_len,
+    int topic_len,
     MQTTClient_message const* message,
     az_iot_hub_client_method_request* method_request)
 {

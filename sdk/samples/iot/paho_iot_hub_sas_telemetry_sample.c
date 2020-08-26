@@ -37,7 +37,7 @@ static char mqtt_client_username_buffer[128];
 
 // Generate SAS key variables
 static char sas_signature_buffer[128];
-static char sas_encoded_signed_signature_buffer[128];
+static char sas_base64_encoded_signed_signature_buffer[128];
 static char mqtt_password_buffer[256];
 
 // Functions
@@ -237,19 +237,19 @@ static void generate_sas_key(void)
   }
 
   // Generate the encoded, signed signature (b64 encoded, HMAC-SHA256 signing)
-  az_span sas_encoded_signed_signature = AZ_SPAN_FROM_BUFFER(sas_encoded_signed_signature_buffer);
-  iot_sample_sas_generate_encoded_signed_signature(
+  az_span sas_base64_encoded_signed_signature = AZ_SPAN_FROM_BUFFER(sas_base64_encoded_signed_signature_buffer);
+  iot_sample_generate_sas_base64_encoded_signed_signature(
       env_vars.hub_sas_key,
       sas_signature,
-      sas_encoded_signed_signature,
-      &sas_encoded_signed_signature);
+      sas_base64_encoded_signed_signature,
+      &sas_base64_encoded_signed_signature);
 
   // Get the resulting MQTT password, passing the base64 encoded, HMAC signed bytes
   size_t mqtt_password_length;
   if (az_failed(
           rc = az_iot_hub_client_sas_get_password(
               &hub_client,
-              sas_encoded_signed_signature,
+              sas_base64_encoded_signed_signature,
               sas_duration,
               AZ_SPAN_NULL,
               mqtt_password_buffer,

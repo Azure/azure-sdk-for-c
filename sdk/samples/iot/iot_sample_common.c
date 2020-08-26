@@ -33,30 +33,30 @@
 #include <openssl/evp.h>
 #include <openssl/hmac.h>
 
-#define PRECONDITION_NOT_NULL(arg) \
-  { \
-    if (arg == NULL) \
-    { \
-      LOG_ERROR("Pointer is NULL."); \
-      exit(1); \
-    } \
-  }
+#define IOT_SAMPLE_PRECONDITION_NOT_NULL(arg) \
+do {                                          \
+    if (arg == NULL)                          \
+    {                                         \
+      LOG_ERROR("Pointer is NULL.");          \
+      exit(1);                                \
+    }                                         \
+} while (0)
 
 //
 // MQTT endpoints
 //
 //#define USE_WEB_SOCKET // Comment to use MQTT without WebSockets.
 #ifdef USE_WEB_SOCKET
-az_span const mqtt_url_prefix = AZ_SPAN_LITERAL_FROM_STR("wss://");
+az_span const IOT_SAMPLE_MQTT_URL_PREFIX = AZ_SPAN_LITERAL_FROM_STR("wss://");
 // Note: Paho fails to connect to Hub when using AZ_IOT_HUB_CLIENT_WEB_SOCKET_PATH or an X509
 // certificate.
-az_span const mqtt_url_suffix
+az_span const IOT_SAMPLE_MQTT_URL_SUFFIX
     = AZ_SPAN_LITERAL_FROM_STR(":443" AZ_IOT_HUB_CLIENT_WEB_SOCKET_PATH_NO_X509_CLIENT_CERT);
 #else
-az_span const mqtt_url_prefix = AZ_SPAN_LITERAL_FROM_STR("ssl://");
-az_span const mqtt_url_suffix = AZ_SPAN_LITERAL_FROM_STR(":8883");
+az_span const IOT_SAMPLE_MQTT_URL_PREFIX = AZ_SPAN_LITERAL_FROM_STR("ssl://");
+az_span const IOT_SAMPLE_MQTT_URL_SUFFIX = AZ_SPAN_LITERAL_FROM_STR(":8883");
 #endif
-az_span const provisioning_global_endpoint
+az_span const IOT_SAMPLE_PROVISIONING_GLOBAL_ENDPOINT
     = AZ_SPAN_LITERAL_FROM_STR("ssl://global.azure-devices-provisioning.net:8883");
 
 //
@@ -99,7 +99,7 @@ az_result iot_sample_read_environment_variables(
     iot_sample_name name,
     iot_sample_environment_variables* out_env_vars)
 {
-  PRECONDITION_NOT_NULL(out_env_vars);
+  IOT_SAMPLE_PRECONDITION_NOT_NULL(out_env_vars);
 
   if (type == PAHO_IOT_HUB)
   {
@@ -255,13 +255,13 @@ az_result iot_sample_create_mqtt_endpoint(
     char* out_endpoint,
     size_t endpoint_size)
 {
-  PRECONDITION_NOT_NULL(env_vars);
-  PRECONDITION_NOT_NULL(out_endpoint);
+  IOT_SAMPLE_PRECONDITION_NOT_NULL(env_vars);
+  IOT_SAMPLE_PRECONDITION_NOT_NULL(out_endpoint);
 
   if (type == PAHO_IOT_HUB)
   {
-    int32_t const required_size = az_span_size(mqtt_url_prefix)
-        + az_span_size(env_vars->hub_hostname) + az_span_size(mqtt_url_suffix)
+    int32_t const required_size = az_span_size(IOT_SAMPLE_MQTT_URL_PREFIX)
+        + az_span_size(env_vars->hub_hostname) + az_span_size(IOT_SAMPLE_MQTT_URL_SUFFIX)
         + (int32_t)sizeof('\0');
 
     if ((size_t)required_size > endpoint_size)
@@ -270,15 +270,15 @@ az_result iot_sample_create_mqtt_endpoint(
     }
 
     az_span hub_mqtt_endpoint = az_span_create((uint8_t*)out_endpoint, (int32_t)endpoint_size);
-    az_span remainder = az_span_copy(hub_mqtt_endpoint, mqtt_url_prefix);
+    az_span remainder = az_span_copy(hub_mqtt_endpoint, IOT_SAMPLE_MQTT_URL_PREFIX);
     remainder = az_span_copy(remainder, env_vars->hub_hostname);
-    remainder = az_span_copy(remainder, mqtt_url_suffix);
+    remainder = az_span_copy(remainder, IOT_SAMPLE_MQTT_URL_SUFFIX);
     az_span_copy_u8(remainder, '\0');
   }
   else if (type == PAHO_IOT_PROVISIONING)
   {
     int32_t const required_size
-        = az_span_size(provisioning_global_endpoint) + (int32_t)sizeof('\0');
+        = az_span_size(IOT_SAMPLE_PROVISIONING_GLOBAL_ENDPOINT) + (int32_t)sizeof('\0');
 
     if ((size_t)required_size > endpoint_size)
     {
@@ -287,7 +287,7 @@ az_result iot_sample_create_mqtt_endpoint(
 
     az_span provisioning_mqtt_endpoint
         = az_span_create((uint8_t*)out_endpoint, (int32_t)endpoint_size);
-    az_span remainder = az_span_copy(provisioning_mqtt_endpoint, provisioning_global_endpoint);
+    az_span remainder = az_span_copy(provisioning_mqtt_endpoint, IOT_SAMPLE_PROVISIONING_GLOBAL_ENDPOINT);
     az_span_copy_u8(remainder, '\0');
   }
   else
@@ -316,37 +316,37 @@ uint32_t iot_sample_get_epoch_expiration_time_from_minutes(uint32_t minutes)
   return (uint32_t)(time(NULL) + minutes * 60);
 }
 
-static az_result base64_decode(
-    az_span base64_encoded,
+static az_result decode_base64_bytes(
+    az_span base64_encoded_bytes,
     az_span decoded_bytes,
     az_span* out_decoded_bytes)
 {
   az_result rc;
-  BIO* b64_decoder;
+  BIO* base64_decoder;
   BIO* source_mem_bio;
 
   memset(az_span_ptr(decoded_bytes), 0, (size_t)az_span_size(decoded_bytes));
 
   // Create a BIO filter to process the bytes
-  b64_decoder = BIO_new(BIO_f_base64());
-  if (b64_decoder == NULL)
+  base64_decoder = BIO_new(BIO_f_base64());
+  if (base64_decoder == NULL)
   {
     return AZ_ERROR_OUT_OF_MEMORY;
   }
 
   // Get the source BIO to push through the filter
-  source_mem_bio = BIO_new_mem_buf(az_span_ptr(base64_encoded), (int)az_span_size(base64_encoded));
+  source_mem_bio = BIO_new_mem_buf(az_span_ptr(base64_encoded_bytes), (int)az_span_size(base64_encoded_bytes));
   if (source_mem_bio == NULL)
   {
-    BIO_free(b64_decoder);
+    BIO_free(base64_decoder);
     return AZ_ERROR_OUT_OF_MEMORY;
   }
 
   // Push the memory through the filter
-  source_mem_bio = BIO_push(b64_decoder, source_mem_bio);
+  source_mem_bio = BIO_push(base64_decoder, source_mem_bio);
   if (source_mem_bio == NULL)
   {
-    BIO_free(b64_decoder);
+    BIO_free(base64_decoder);
     BIO_free(source_mem_bio);
     return AZ_ERROR_OUT_OF_MEMORY;
   }
@@ -375,7 +375,7 @@ static az_result base64_decode(
   return rc;
 }
 
-static az_result hmac_sha256_sign(
+static az_result hmac_sha256_sign_signature(
     az_span decoded_key,
     az_span signature,
     az_span signed_signature,
@@ -406,19 +406,19 @@ static az_result hmac_sha256_sign(
   return rc;
 }
 
-static az_result base64_encode(
-    az_span bytes_to_encode,
-    az_span encoded_bytes,
-    az_span* out_encoded_bytes)
+static az_result base64_encode_bytes(
+    az_span decoded_bytes,
+    az_span base64_encoded_bytes,
+    az_span* out_base64_encoded_bytes)
 {
   az_result rc;
-  BIO* b64_encoder;
+  BIO* base64_encoder;
   BIO* sink_mem_bio;
   BUF_MEM* encoded_mem_ptr;
 
   // Create a BIO filter to process the bytes
-  b64_encoder = BIO_new(BIO_f_base64());
-  if (b64_encoder == NULL)
+  base64_encoder = BIO_new(BIO_f_base64());
+  if (base64_encoder == NULL)
   {
     return AZ_ERROR_OUT_OF_MEMORY;
   }
@@ -427,44 +427,44 @@ static az_result base64_encode(
   sink_mem_bio = BIO_new(BIO_s_mem());
   if (sink_mem_bio == NULL)
   {
-    BIO_free(b64_encoder);
+    BIO_free(base64_encoder);
     return AZ_ERROR_OUT_OF_MEMORY;
   }
 
   // Push the sink to the encoder
-  b64_encoder = BIO_push(b64_encoder, sink_mem_bio);
-  if (b64_encoder == NULL)
+  base64_encoder = BIO_push(base64_encoder, sink_mem_bio);
+  if (base64_encoder == NULL)
   {
     BIO_free(sink_mem_bio);
-    BIO_free(b64_encoder);
+    BIO_free(base64_encoder);
     return AZ_ERROR_OUT_OF_MEMORY;
   }
 
   // Set no newline flag for the encoder
-  BIO_set_flags(b64_encoder, BIO_FLAGS_BASE64_NO_NL);
+  BIO_set_flags(base64_encoder, BIO_FLAGS_BASE64_NO_NL);
 
   // Write the bytes to be encoded
   int const bytes_written
-      = BIO_write(b64_encoder, az_span_ptr(bytes_to_encode), (int)az_span_size(bytes_to_encode));
+      = BIO_write(base64_encoder, az_span_ptr(decoded_bytes), (int)az_span_size(decoded_bytes));
   if (bytes_written < 1)
   {
     BIO_free(sink_mem_bio);
-    BIO_free(b64_encoder);
+    BIO_free(base64_encoder);
     return AZ_ERROR_OUT_OF_MEMORY;
   }
 
   // Flush the BIO
-  BIO_flush(b64_encoder);
+  BIO_flush(base64_encoder);
 
   // Get the pointer to the encoded bytes
-  BIO_get_mem_ptr(b64_encoder, &encoded_mem_ptr);
+  BIO_get_mem_ptr(base64_encoder, &encoded_mem_ptr);
 
-  if ((size_t)az_span_size(encoded_bytes) >= encoded_mem_ptr->length)
+  if ((size_t)az_span_size(base64_encoded_bytes) >= encoded_mem_ptr->length)
   {
     // Copy the bytes to the output and initialize output span
-    memcpy(az_span_ptr(encoded_bytes), encoded_mem_ptr->data, encoded_mem_ptr->length);
-    *out_encoded_bytes
-        = az_span_create(az_span_ptr(encoded_bytes), (int32_t)encoded_mem_ptr->length);
+    memcpy(az_span_ptr(base64_encoded_bytes), encoded_mem_ptr->data, encoded_mem_ptr->length);
+    *out_base64_encoded_bytes
+        = az_span_create(az_span_ptr(base64_encoded_bytes), (int32_t)encoded_mem_ptr->length);
 
     rc = AZ_OK;
   }
@@ -474,25 +474,25 @@ static az_result base64_encode(
   }
 
   // Free the BIO chain
-  BIO_free_all(b64_encoder);
+  BIO_free_all(base64_encoder);
 
   return rc;
 }
 
-void iot_sample_sas_generate_encoded_signed_signature(
-    az_span sas_key,
+void iot_sample_generate_sas_base64_encoded_signed_signature(
+    az_span sas_base64_encoded_key,
     az_span sas_signature,
-    az_span sas_b64_encoded,
-    az_span* out_sas_b64_encoded)
+    az_span sas_base64_encoded_signed_signature,
+    az_span* out_sas_base64_encoded_signed_signature)
 {
-  PRECONDITION_NOT_NULL(out_sas_b64_encoded);
+  IOT_SAMPLE_PRECONDITION_NOT_NULL(out_sas_base64_encoded_signed_signature);
 
   int rc;
 
-  // Decode the base64 encoded SAS key to use for HMAC signing.
-  char sas_b64_decoded_key_buffer[64];
-  az_span sas_b64_decoded_key = AZ_SPAN_FROM_BUFFER(sas_b64_decoded_key_buffer);
-  if (az_failed(rc = base64_decode(sas_key, sas_b64_decoded_key, &sas_b64_decoded_key)))
+  // Decode the sas base64 encoded key to use for HMAC signing.
+  char sas_decoded_key_buffer[64];
+  az_span sas_decoded_key = AZ_SPAN_FROM_BUFFER(sas_decoded_key_buffer);
+  if (az_failed(rc = decode_base64_bytes(sas_base64_encoded_key, sas_decoded_key, &sas_decoded_key)))
   {
     LOG_ERROR("Could not decode the SAS key: az_result return code 0x%04x.", rc);
     exit(rc);
@@ -502,8 +502,8 @@ void iot_sample_sas_generate_encoded_signed_signature(
   char sas_hmac256_signed_signature_buffer[128];
   az_span sas_hmac256_signed_signature = AZ_SPAN_FROM_BUFFER(sas_hmac256_signed_signature_buffer);
   if (az_failed(
-          rc = hmac_sha256_sign(
-              sas_b64_decoded_key,
+          rc = hmac_sha256_sign_signature(
+              sas_decoded_key,
               sas_signature,
               sas_hmac256_signed_signature,
               &sas_hmac256_signed_signature)))
@@ -514,7 +514,7 @@ void iot_sample_sas_generate_encoded_signed_signature(
 
   // Base64 encode the result of the HMAC signing.
   if (az_failed(
-          rc = base64_encode(sas_hmac256_signed_signature, sas_b64_encoded, out_sas_b64_encoded)))
+          rc = base64_encode_bytes(sas_hmac256_signed_signature, sas_base64_encoded_signed_signature, out_sas_base64_encoded_signed_signature)))
   {
     LOG_ERROR("Could not base64 encode the password: az_result return code 0x%04x.", rc);
     exit(rc);

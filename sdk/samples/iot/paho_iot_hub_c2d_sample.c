@@ -44,7 +44,7 @@ static void disconnect_mqtt_client_from_iot_hub(void);
 
 static void parse_c2d_message(
     char* topic,
-    int const topic_len,
+    int topic_len,
     MQTTClient_message const* message,
     az_iot_hub_client_c2d_request* out_c2d_request);
 
@@ -245,7 +245,7 @@ static void disconnect_mqtt_client_from_iot_hub(void)
 
 static void parse_c2d_message(
     char* topic,
-    int const topic_len,
+    int topic_len,
     MQTTClient_message const* message,
     az_iot_hub_client_c2d_request* out_c2d_request)
 {

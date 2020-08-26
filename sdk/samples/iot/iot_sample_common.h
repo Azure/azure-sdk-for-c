@@ -130,7 +130,7 @@ typedef enum
  * @param[out] out_env_vars A pointer to the struct containing all read-in environment variables.
  *
  * @return An #az_result value indicating the result of the operation.
- * @retval #AZ_OK All required environment variables successfuly read-in.
+ * @retval #AZ_OK All required environment variables successfully read-in.
  * @retval #AZ_ERROR_ARG Sample type or name is undefined, or environment variable is not set.
  * @retval #AZ_RETURN_IF_NOT_ENOUGH_SIZE Not enough space set aside to store environment variable.
  */
@@ -174,17 +174,17 @@ void iot_sample_sleep_for_seconds(uint32_t seconds);
 uint32_t iot_sample_get_epoch_expiration_time_from_minutes(uint32_t minutes);
 
 /*
- * @brief Generate the b64 encoded and signed signature using HMAC-SHA256 signing.
+ * @brief Generate the base64 encoded and signed signature using HMAC-SHA256 signing.
  *
- * @param[in] sas_key An #az_span containing the SAS key that will be used for signing.
+ * @param[in] sas_base64_encoded_key An #az_span containing the SAS key that will be used for signing.
  * @param[in] sas_signature An #az_span containing the signature.
- * @param sas_b64_encoded An #az_span with sufficient capacity to hold the encoded bytes.
- * @param[out] out_sas_b64_encoded A pointer to the #az_span containing the encoded bytes.
+ * @param sas_base64_encoded_signed_signature An #az_span with sufficient capacity to hold the encoded signed signature.
+ * @param[out] out_sas_base64_encoded_signed_signature A pointer to the #az_span containing the encoded signed signature.
  */
-void iot_sample_sas_generate_encoded_signed_signature(
-    az_span sas_key,
+void iot_sample_generate_sas_base64_encoded_signed_signature(
+    az_span sas_base64_encoded_key,
     az_span sas_signature,
-    az_span sas_b64_encoded,
-    az_span* out_sas_b64_encoded);
+    az_span sas_base64_encoded_signed_signature,
+    az_span* out_sas_base64_encoded_signed_signature);
 
 #endif // IOT_SAMPLE_COMMON_H
