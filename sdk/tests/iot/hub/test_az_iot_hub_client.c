@@ -53,7 +53,7 @@ static void test_az_iot_hub_client_init_NULL_client_fails(void** state)
   (void)state;
 
   ASSERT_PRECONDITION_CHECKED(
-      az_iot_hub_client_init(NULL, test_device_id, test_hub_hostname, NULL));
+      az_iot_hub_client_init(NULL, test_hub_hostname, test_device_id, NULL));
 }
 
 static void test_az_iot_hub_client_init_NULL_device_id_fails(void** state)
@@ -63,7 +63,7 @@ static void test_az_iot_hub_client_init_NULL_device_id_fails(void** state)
   az_iot_hub_client client;
 
   ASSERT_PRECONDITION_CHECKED(
-      az_iot_hub_client_init(&client, AZ_SPAN_NULL, test_hub_hostname, NULL));
+      az_iot_hub_client_init(&client, test_hub_hostname, AZ_SPAN_NULL, NULL));
 }
 
 static void test_az_iot_hub_client_init_NULL_hub_hostname_id_fails(void** state)
@@ -72,7 +72,7 @@ static void test_az_iot_hub_client_init_NULL_hub_hostname_id_fails(void** state)
 
   az_iot_hub_client client;
 
-  ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_init(&client, test_device_id, AZ_SPAN_NULL, NULL));
+  ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_init(&client, AZ_SPAN_NULL, test_device_id, NULL));
 }
 
 static void test_az_iot_hub_client_get_user_name_NULL_client_fails(void** state)
