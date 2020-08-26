@@ -10,7 +10,7 @@
 ### Breaking Changes
 
 - Rename `az_iot_hub_client_properties` to `az_iot_message_properties` and move it from `az_iot_hub_client.h` to `az_iot_common.h`.
-- Remove `az_pair` from IoT message property API's in favor of individual az_spans for name and value.
+- Remove `az_pair` from `az_iot_message_properties_next()` in favor of individual name and value `az_span` parameters.
 
 ### Bug Fixes
 

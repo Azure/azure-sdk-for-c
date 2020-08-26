@@ -162,8 +162,8 @@ AZ_NODISCARD az_result az_iot_message_properties_find(
  * @brief Iterates over the list of properties.
  *
  * @param[in] properties The #az_iot_message_properties to use for this call
- * @param[out] out_name An #az_span* containing the name of the next property.
- * @param[out] out_value An #az_span* containing the value of the next property.
+ * @param[out] out_name A pointer to an #az_span containing the name of the next property.
+ * @param[out] out_value A pointer to an #az_span containing the value of the next property.
  * @return #az_result
  */
 AZ_NODISCARD az_result
