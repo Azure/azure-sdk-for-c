@@ -339,12 +339,13 @@ jobs:
 
       # Assumes AZURE_SDK_VERSION is set in the environment
       # If doxygen produces any warnings, fail the step.
-    - script: |
+    - pwsh: |
         "C:/Program Files/doxygen/bin/doxygen.exe" Doxyfile
-        if exist "DoxygenWarningLog.txt" (
-          type "DoxygenWarningLog.txt"
-          exit(1)
-        )
+        if (Test-Path "DoxygenWarningLog.txt" -PathType leaf)
+        {
+          Get-Content "DoxygenWarningLog.txt"
+          exit 1
+        }
       displayName: Generate docs
 
     - pwsh: New-Item -ItemType directory -Path $(Build.ArtifactStagingDirectory) -Name docs
