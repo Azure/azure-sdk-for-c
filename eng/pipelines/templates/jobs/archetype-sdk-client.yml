@@ -338,9 +338,13 @@ jobs:
       displayName: Download and Install Doxygen
 
       # Assumes AZURE_SDK_VERSION is set in the environment
+      # If doxygen produces any warnings, fail the step.
     - script: |
         "C:/Program Files/doxygen/bin/doxygen.exe" Doxyfile
-        if test -f "DoxygenWarningLog.txt"; then cat "DoxygenWarningLog.txt"; exit 1; fi
+        if exist "DoxygenWarningLog.txt" (
+          type "DoxygenWarningLog.txt"
+          exit(1)
+        )
       displayName: Generate docs
 
     - pwsh: New-Item -ItemType directory -Path $(Build.ArtifactStagingDirectory) -Name docs
