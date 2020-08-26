@@ -35,11 +35,18 @@ foreach ($ServiceKey in $ServiceMapping.Keys | Sort-Object)
 
     # Add service to toc.yml
     $ServiceName = $ServiceMapping[$ServiceKey]
+    $CmakeContent = Get-Content "sdk/src/azure/$ServiceKey/CMakeLists.txt" -Raw
+    $ProjectName = if ($CmakeContent -match 'project\s.*\(([\w].*?)\s') {
+        $Matches[1]
+    } else {
+        "Azure SDK for Embedded C"
+    }
+
     Add-Content -Path "$($YmlPath)/toc.yml" -Value "- name: $($ServiceName)`r`n  href: $($ServiceKey).md"
 
     Add-Content -Path "$($YmlPath)/$($ServiceKey).md" -Value "# Client"
     Add-Content -Path "$($YmlPath)/$($ServiceKey).md" -Value "---"
-    Add-Content -Path "$($YmlPath)/$($ServiceKey).md" -Value "### Azure SDK for Embedded C"
+    Add-Content -Path "$($YmlPath)/$($ServiceKey).md" -Value "### $ProjectName"
     Write-Verbose "Operating on Client Packages for $($ServiceKey)"
 }
 
