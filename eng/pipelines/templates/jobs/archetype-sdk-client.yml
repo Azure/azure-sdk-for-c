@@ -340,7 +340,7 @@ jobs:
       # Assumes AZURE_SDK_VERSION is set in the environment
     - script: |
         "C:/Program Files/doxygen/bin/doxygen.exe" Doxyfile
-        if [ -f "DoxygenWarningLog.txt" ]; then
+        if [[ -f "DoxygenWarningLog.txt" ]]; then
           cat "DoxygenWarningLog.txt"
           exit(1)
         fi
