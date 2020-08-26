@@ -45,7 +45,11 @@ typedef struct
 
   struct
   {
+    /// Services pass API versions in the header or in query parameters used by the API Version
+    /// policy.
     _az_http_policy_apiversion_options api_version;
+
+    /// Options for the telemetry policy.
     _az_http_policy_telemetry_options telemetry_options;
   } _internal;
 } az_storage_blobs_blob_client_options;
