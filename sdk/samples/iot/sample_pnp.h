@@ -27,7 +27,7 @@ typedef void (*pnp_property_callback)(
 /**
  * @brief Callback which is invoked to append user properties to a payload.
  */
-typedef az_result (*pnp_append_property_callback)(az_json_writer* jw, void* context);
+typedef bool (*pnp_append_property_callback)(az_json_writer* jw, void* context);
 
 /**
  * @brief Gets the MQTT topic that must be used for device to cloud telemetry messages.
@@ -44,9 +44,9 @@ typedef az_result (*pnp_append_property_callback)(az_json_writer* jw, void* cont
  * @param[in] mqtt_topic_size The size, in bytes of \p mqtt_topic.
  * @param[out] out_mqtt_topic_length __[nullable]__ Contains the string length, in bytes, of
  *                                                  \p mqtt_topic. Can be `NULL`.
- * @return #az_result
+ * @return `true` if succeeded, `false` if failed.
  */
-az_result pnp_get_telemetry_topic(
+bool pnp_get_telemetry_topic(
     const az_iot_hub_client* client,
     az_iot_hub_client_properties* properties,
     az_span component_name,
@@ -76,7 +76,7 @@ void pnp_parse_command_name(
  * @param[in] context The user context which is passed to the callback.
  * @param[out] out_span The #az_span pointer to the output json payload.
  */
-az_result pnp_create_reported_property(
+bool pnp_create_reported_property(
     az_span json_buffer,
     az_span component_name,
     az_span property_name,
@@ -97,7 +97,7 @@ az_result pnp_create_reported_property(
  * @param[in] ack_description The optional description for the reported property.
  * @param[out] out_span The #az_span pointer to the output json payload.
  */
-az_result pnp_create_reported_property_with_status(
+bool pnp_create_reported_property_with_status(
     az_span json_buffer,
     az_span component_name,
     az_span property_name,
@@ -120,7 +120,7 @@ az_result pnp_create_reported_property_with_status(
  * @param[in] property_callback The callback which is called on each twin property.
  * @param[in] context_ptr Pointer to user context.
  */
-az_result pnp_process_device_twin_message(
+bool pnp_process_device_twin_message(
     az_span twin_message_span,
     bool is_partial,
     const az_span** components_ptr,

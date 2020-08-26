@@ -41,25 +41,6 @@ enum
 #define _az_RESULT_MAKE_SUCCESS(facility, code) \
   ((int32_t)(((int32_t)(facility) << 16) | (int32_t)(code)))
 
-#define AZ_RETURN_IF_FAILED(exp) \
-  do \
-  { \
-    az_result const _result = (exp); \
-    if (az_failed(_result)) \
-    { \
-      return _result; \
-    } \
-  } while (0)
-
-#define AZ_RETURN_IF_NOT_ENOUGH_SIZE(span, required_size) \
-  do \
-  { \
-    if (az_span_size(span) < required_size || required_size < 0) \
-    { \
-      return AZ_ERROR_INSUFFICIENT_SPAN_SIZE; \
-    } \
-  } while (0)
-
 // az_result Bits:
 //   - 31 Severity (0 - success, 1 - failure).
 //   - 16..30 Facility.

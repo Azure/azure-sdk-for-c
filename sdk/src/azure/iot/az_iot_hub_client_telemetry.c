@@ -7,6 +7,7 @@
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
 #include <azure/core/internal/az_precondition_internal.h>
+#include <azure/core/internal/az_result_internal.h>
 #include <azure/iot/az_iot_hub_client.h>
 
 #include <azure/core/_az_cfg.h>
@@ -42,7 +43,8 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_get_publish_topic(
     required_length += properties->_internal.properties_written;
   }
 
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_topic_span, required_length + (int32_t)sizeof(null_terminator));
+  _az_RETURN_IF_NOT_ENOUGH_SIZE(
+      mqtt_topic_span, required_length + (int32_t)sizeof(null_terminator));
 
   az_span remainder = az_span_copy(mqtt_topic_span, telemetry_topic_prefix);
   remainder = az_span_copy(remainder, client->_internal.device_id);

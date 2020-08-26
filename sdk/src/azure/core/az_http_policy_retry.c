@@ -7,6 +7,7 @@
 #include <azure/core/internal/az_config_internal.h>
 #include <azure/core/internal/az_http_internal.h>
 #include <azure/core/internal/az_log_internal.h>
+#include <azure/core/internal/az_result_internal.h>
 #include <azure/core/internal/az_retry_internal.h>
 #include <azure/core/internal/az_span_internal.h>
 
@@ -17,12 +18,12 @@
 #include <azure/core/_az_cfg.h>
 
 static az_http_status_code const _default_status_codes[] = {
-  AZ_HTTP_STATUS_CODE_REQUEST_TIMEOUT,
-  AZ_HTTP_STATUS_CODE_TOO_MANY_REQUESTS,
-  AZ_HTTP_STATUS_CODE_INTERNAL_SERVER_ERROR,
-  AZ_HTTP_STATUS_CODE_BAD_GATEWAY,
-  AZ_HTTP_STATUS_CODE_SERVICE_UNAVAILABLE,
-  AZ_HTTP_STATUS_CODE_GATEWAY_TIMEOUT,
+  AZ_HTTP_STATUS_CODE_REQUEST_TIMEOUT, // 408
+  AZ_HTTP_STATUS_CODE_TOO_MANY_REQUESTS, // 429
+  AZ_HTTP_STATUS_CODE_INTERNAL_SERVER_ERROR, // 500
+  AZ_HTTP_STATUS_CODE_BAD_GATEWAY, // 502
+  AZ_HTTP_STATUS_CODE_SERVICE_UNAVAILABLE, // 503
+  AZ_HTTP_STATUS_CODE_GATEWAY_TIMEOUT, // 504
   AZ_HTTP_STATUS_CODE_END_OF_LIST,
 };
 
@@ -44,19 +45,19 @@ AZ_INLINE az_result _az_http_policy_retry_append_http_retry_msg(
     az_span* ref_log_msg)
 {
   az_span retry_count_string = AZ_SPAN_FROM_STR("HTTP Retry attempt #");
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(*ref_log_msg, az_span_size(retry_count_string));
+  _az_RETURN_IF_NOT_ENOUGH_SIZE(*ref_log_msg, az_span_size(retry_count_string));
   az_span remainder = az_span_copy(*ref_log_msg, retry_count_string);
 
-  AZ_RETURN_IF_FAILED(az_span_i32toa(remainder, attempt, &remainder));
+  _az_RETURN_IF_FAILED(az_span_i32toa(remainder, attempt, &remainder));
 
   az_span infix_string = AZ_SPAN_FROM_STR(" will be made in ");
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, az_span_size(infix_string));
+  _az_RETURN_IF_NOT_ENOUGH_SIZE(remainder, az_span_size(infix_string));
   remainder = az_span_copy(remainder, infix_string);
 
-  AZ_RETURN_IF_FAILED(az_span_i32toa(remainder, delay_msec, &remainder));
+  _az_RETURN_IF_FAILED(az_span_i32toa(remainder, delay_msec, &remainder));
 
   az_span suffix_string = AZ_SPAN_FROM_STR("ms.");
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, az_span_size(suffix_string));
+  _az_RETURN_IF_NOT_ENOUGH_SIZE(remainder, az_span_size(suffix_string));
   remainder = az_span_copy(remainder, suffix_string);
 
   *ref_log_msg = az_span_slice(*ref_log_msg, 0, _az_span_diff(remainder, *ref_log_msg));
@@ -92,7 +93,7 @@ AZ_INLINE AZ_NODISCARD az_result _az_http_policy_retry_get_retry_after(
     int32_t* retry_after_msec)
 {
   az_http_response_status_line status_line = { 0 };
-  AZ_RETURN_IF_FAILED(az_http_response_get_status_line(ref_response, &status_line));
+  _az_RETURN_IF_FAILED(az_http_response_get_status_line(ref_response, &status_line));
   az_http_status_code const response_code = status_line.status_code;
 
   for (; *status_codes != AZ_HTTP_STATUS_CODE_END_OF_LIST; ++status_codes)
@@ -162,7 +163,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
   int32_t const max_retry_delay_msec = retry_options->max_retry_delay_msec;
   az_http_status_code const* const status_codes = retry_options->status_codes;
 
-  AZ_RETURN_IF_FAILED(_az_http_request_mark_retry_headers_start(ref_request));
+  _az_RETURN_IF_FAILED(_az_http_request_mark_retry_headers_start(ref_request));
 
   az_context* const context = ref_request->_internal.context;
 
@@ -171,8 +172,9 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
   int32_t attempt = 1;
   while (true)
   {
-    AZ_RETURN_IF_FAILED(az_http_response_init(ref_response, ref_response->_internal.http_response));
-    AZ_RETURN_IF_FAILED(_az_http_request_remove_retry_headers(ref_request));
+    _az_RETURN_IF_FAILED(
+        az_http_response_init(ref_response, ref_response->_internal.http_response));
+    _az_RETURN_IF_FAILED(_az_http_request_remove_retry_headers(ref_request));
 
     result = _az_http_pipeline_nextpolicy(ref_policies, ref_request, ref_response);
 
@@ -185,7 +187,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
     int32_t retry_after_msec = -1;
     bool should_retry = false;
     az_http_response response_copy = *ref_response;
-    AZ_RETURN_IF_FAILED(_az_http_policy_retry_get_retry_after(
+    _az_RETURN_IF_FAILED(_az_http_policy_retry_get_retry_after(
         &response_copy, status_codes, &should_retry, &retry_after_msec));
 
     if (!should_retry)

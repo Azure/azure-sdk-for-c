@@ -51,8 +51,8 @@ static void send_reported_property(void);
 static void receive_desired_property(void);
 static void disconnect_mqtt_client_from_iot_hub(void);
 
-static az_result build_reported_property(az_span destination, az_span* json_out);
-static az_result update_property(az_span desired_payload);
+static bool build_reported_property(az_span destination, az_span* json_out);
+static bool update_property(az_span desired_payload);
 static void receive_device_twin_message(void);
 static void parse_device_twin_message(
     char* topic,
@@ -111,26 +111,23 @@ int main(void)
 
 static void create_and_configure_mqtt_client(void)
 {
-  int rc;
-
   // Reads in environment variables set by user for purposes of running sample.
-  if (az_failed(rc = read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars)))
+  if (!read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars))
   {
-    LOG_ERROR(
-        "Failed to read configuration from environment variables: az_result return code 0x%08x.",
-        rc);
-    exit(rc);
+    LOG_ERROR("Failed to read configuration from environment variables.");
+    exit(1);
   }
 
   // Build an MQTT endpoint c-string.
   char mqtt_endpoint_buffer[128];
-  if (az_failed(
-          rc = create_mqtt_endpoint(
-              SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer))))
+  if (!create_mqtt_endpoint(
+          SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer)))
   {
-    LOG_ERROR("Failed to create MQTT endpoint: az_result return code 0x%08x.", rc);
-    exit(rc);
+    LOG_ERROR("Failed to create MQTT endpoint.");
+    exit(1);
   }
+
+  int rc;
 
   // Initialize the hub client with the default connection options.
   if (az_failed(
@@ -281,11 +278,10 @@ static void send_reported_property(void)
   // Build the updated reported property message.
   char reported_property_payload_buffer[128];
   az_span reported_property_payload = AZ_SPAN_FROM_BUFFER(reported_property_payload_buffer);
-  if (az_failed(
-          rc = build_reported_property(reported_property_payload, &reported_property_payload)))
+  if (!build_reported_property(reported_property_payload, &reported_property_payload))
   {
-    LOG_ERROR("Failed to build reported property payload: az_result return code 0x%08x.", rc);
-    exit(rc);
+    LOG_ERROR("Failed to build reported property payload.");
+    exit(1);
   }
 
   // Publish the reported property update.
@@ -407,43 +403,44 @@ static void parse_device_twin_message(
     case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES:
       LOG("Message Type: Desired Properties");
 
-      if (az_failed(rc = update_property(message_span)))
+      if (!update_property(message_span))
       {
-        LOG_ERROR("Failed to update property locally: az_result return code 0x%08x.", rc);
-        exit(rc);
+        LOG_ERROR("Failed to update property locally.");
+        exit(1);
       }
       break;
   }
 }
 
-static az_result build_reported_property(az_span destination, az_span* json_out)
+static bool build_reported_property(az_span destination, az_span* json_out)
 {
   az_json_writer json_writer;
 
-  AZ_RETURN_IF_FAILED(az_json_writer_init(&json_writer, destination, NULL));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&json_writer));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&json_writer, reported_property_name));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_int32(&json_writer, reported_property_value));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&json_writer));
+  if (az_failed(az_json_writer_init(&json_writer, destination, NULL))
+      || az_failed(az_json_writer_append_begin_object(&json_writer))
+      || az_failed(az_json_writer_append_property_name(&json_writer, reported_property_name))
+      || az_failed(az_json_writer_append_int32(&json_writer, reported_property_value))
+      || az_failed(az_json_writer_append_end_object(&json_writer)))
+  {
+    return false;
+  }
 
   *json_out = az_json_writer_get_bytes_used_in_destination(&json_writer);
 
-  return AZ_OK;
+  return true;
 }
 
-static az_result update_property(az_span desired_payload)
+static bool update_property(az_span desired_payload)
 {
   // Parse desired property payload.
   az_json_reader json_reader;
-  AZ_RETURN_IF_FAILED(az_json_reader_init(&json_reader, desired_payload, NULL));
-
-  AZ_RETURN_IF_FAILED(az_json_reader_next_token(&json_reader));
-  if (json_reader.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
+  if (az_failed(az_json_reader_init(&json_reader, desired_payload, NULL))
+      || az_failed(az_json_reader_next_token(&json_reader))
+      || json_reader.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT
+      || az_failed(az_json_reader_next_token(&json_reader)))
   {
-    return AZ_ERROR_UNEXPECTED_CHAR;
+    return false;
   }
-
-  AZ_RETURN_IF_FAILED(az_json_reader_next_token(&json_reader));
 
   // Update property locally if found.
   while (json_reader.token.kind != AZ_JSON_TOKEN_END_OBJECT)
@@ -451,15 +448,19 @@ static az_result update_property(az_span desired_payload)
     if (az_json_token_is_text_equal(&json_reader.token, reported_property_name))
     {
       // Move to the value token and store value.
-      AZ_RETURN_IF_FAILED(az_json_reader_next_token(&json_reader));
-      AZ_RETURN_IF_FAILED(az_json_token_get_int32(&json_reader.token, &reported_property_value));
+      if (az_failed(az_json_reader_next_token(&json_reader))
+          || az_failed(az_json_token_get_int32(&json_reader.token, &reported_property_value)))
+      {
+        return false;
+      }
+
       LOG_SUCCESS(
           "Client updated \"%.*s\" locally to %d.",
           az_span_size(reported_property_name),
           az_span_ptr(reported_property_name),
           reported_property_value);
 
-      return AZ_OK;
+      return true;
     }
     else if (az_json_token_is_text_equal(&json_reader.token, version_name))
     {
@@ -467,15 +468,23 @@ static az_result update_property(az_span desired_payload)
     }
     else
     {
-      AZ_RETURN_IF_FAILED(az_json_reader_skip_children(&json_reader)); // Ignore children tokens.
+      // Ignore children tokens.
+      if (az_failed(az_json_reader_skip_children(&json_reader)))
+      {
+        return false;
+      }
     }
 
-    AZ_RETURN_IF_FAILED(az_json_reader_next_token(&json_reader)); // Check next sibling token.
+    // Check next sibling token.
+    if (az_failed(az_json_reader_next_token(&json_reader)))
+    {
+      return false;
+    }
   }
 
   LOG("Did not find \"%.*s\" in desired property payload. Nothing to update.",
       az_span_size(reported_property_name),
       az_span_ptr(reported_property_name));
 
-  return AZ_OK;
+  return false;
 }

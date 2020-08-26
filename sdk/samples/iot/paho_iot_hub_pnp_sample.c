@@ -119,7 +119,7 @@ static void handle_device_twin_message(
     az_span twin_message_span,
     const az_iot_hub_client_twin_response* twin_response);
 static void process_device_twin_message(az_span twin_message_span, bool is_twin_get);
-static az_result parse_device_twin_desired_temperature_property(
+static bool parse_device_twin_desired_temperature_property(
     az_span twin_message_span,
     bool is_twin_get,
     double* parsed_temp,
@@ -135,7 +135,8 @@ static void send_command_response(
     const az_iot_hub_client_method_request* command_request,
     az_iot_status status,
     az_span response_payload);
-static az_result invoke_getMaxMinReport(
+
+static bool invoke_getMaxMinReport(
     az_span payload,
     az_span response_destination,
     az_span* out_response);
@@ -144,14 +145,14 @@ static az_result invoke_getMaxMinReport(
 static void send_telemetry_message(void);
 
 // JSON build functions
-static az_result build_property_payload(
+static bool build_property_payload(
     uint8_t property_count,
     const az_span names[],
     const double values[],
     const az_span times[],
     az_span payload_destination,
     az_span* out_payload);
-static az_result build_property_payload_with_status(
+static bool build_property_payload_with_status(
     az_span name,
     double value,
     int32_t ack_code_value,
@@ -251,30 +252,26 @@ int main(void)
 
 static void create_and_configure_mqtt_client(void)
 {
-  int rc;
-
   // Reads in environment variables set by user for purposes of running sample.
-  if (az_failed(rc = read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars)))
+  if (!read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars))
   {
-    LOG_ERROR(
-        "Failed to read configuration from environment variables: az_result return code 0x%08x.",
-        rc);
-    exit(rc);
+    LOG_ERROR("Failed to read configuration from environment variables.");
+    exit(1);
   }
 
   // Build an MQTT endpoint c-string.
   char mqtt_endpoint_buffer[128];
-  if (az_failed(
-          rc = create_mqtt_endpoint(
-              SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer))))
+  if (!create_mqtt_endpoint(
+          SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer)))
   {
-    LOG_ERROR("Failed to create MQTT endpoint: az_result return code 0x%08x.", rc);
-    exit(rc);
+    LOG_ERROR("Failed to create MQTT endpoint.");
+    exit(1);
   }
 
   // Initialize the hub client with the connection options.
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.model_id = model_id;
+  int rc;
   if (az_failed(
           rc = az_iot_hub_client_init(
               &hub_client, env_vars.hub_hostname, env_vars.hub_device_id, &options)))
@@ -599,7 +596,7 @@ static void process_device_twin_message(az_span twin_message_span, bool is_twin_
   // Else desired property not found in payload. Do nothing.
 }
 
-static az_result parse_device_twin_desired_temperature_property(
+static bool parse_device_twin_desired_temperature_property(
     az_span twin_message_span,
     bool is_twin_get,
     double* parsed_temp,
@@ -607,38 +604,53 @@ static az_result parse_device_twin_desired_temperature_property(
 {
   az_json_reader jr;
 
-  AZ_RETURN_IF_FAILED(az_json_reader_init(&jr, twin_message_span, NULL));
-  AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
-  if (jr.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
+  if (az_failed(az_json_reader_init(&jr, twin_message_span, NULL))
+      || az_failed(az_json_reader_next_token(&jr)) || jr.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
   {
-    return AZ_ERROR_UNEXPECTED_CHAR;
+    return false;
   }
 
   // Device twin GET response: Parse to the "desired" wrapper if it exists.
   bool desired_found = false;
   if (is_twin_get)
   {
-    AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
+    if(az_failed(az_json_reader_next_token(&jr))
+    {
+      return false;
+    }
+
     while (jr.token.kind != AZ_JSON_TOKEN_END_OBJECT)
     {
       if (az_json_token_is_text_equal(&jr.token, twin_desired_name))
       {
         desired_found = true;
-        AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
+        if (az_failed(az_json_reader_next_token(&jr)))
+        {
+          return false;
+        }
+
         break;
       }
       else
       {
-        AZ_RETURN_IF_FAILED(az_json_reader_skip_children(&jr)); // Ignore children tokens.
+        // Ignore children tokens.
+        if(az_failed(az_json_reader_skip_children(&jr))
+        {
+          return false;
+        }
       }
 
-      AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr)); // Check next sibling token.
+      // Check next sibling token.
+      if (az_failed(az_json_reader_next_token(&jr)))
+      {
+        return false;
+      }
     }
 
     if (!desired_found)
     {
       LOG("Desired property object not found in device twin GET response.");
-      return AZ_ERROR_ITEM_NOT_FOUND;
+      return false;
     }
   }
 
@@ -647,38 +659,58 @@ static az_result parse_device_twin_desired_temperature_property(
   bool temp_found = false;
   bool version_found = false;
 
-  AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
+  if (az_failed(az_json_reader_next_token(&jr)))
+  {
+    return false;
+  }
+
   while (!(temp_found && version_found) && (jr.token.kind != AZ_JSON_TOKEN_END_OBJECT))
   {
     if (az_json_token_is_text_equal(&jr.token, twin_desired_temp_property_name))
     {
-      AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
-      AZ_RETURN_IF_FAILED(az_json_token_get_double(&jr.token, parsed_temp));
+      if (az_failed(az_json_reader_next_token(&jr))
+          || az_failed(az_json_token_get_double(&jr.token, parsed_temp)))
+      {
+        return false;
+      }
+
       temp_found = true;
     }
     else if (az_json_token_is_text_equal(&jr.token, twin_version_name))
     {
-      AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
-      AZ_RETURN_IF_FAILED(az_json_token_get_uint32(&jr.token, (uint32_t*)version_number));
+      if (az_failed(az_json_reader_next_token(&jr))
+              az_failed(az_json_token_get_uint32(&jr.token, (uint32_t*)version_number)))
+      {
+        return false;
+      }
+
       version_found = true;
     }
     else
     {
-      AZ_RETURN_IF_FAILED(az_json_reader_skip_children(&jr)); // Ignore children tokens.
+      // Ignore children tokens.
+      if (az_failed(az_json_reader_skip_children(&jr)))
+      {
+        return false;
+      }
     }
-    AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr)); // Check next sibling token.
+    // Check next sibling token.
+    if (az_failed(az_json_reader_next_token(&jr)))
+    {
+      return false;
+    }
   }
 
   if (!(temp_found && version_found))
   {
     LOG("Either targetTemperature property or the $version property were not found in desired "
         "property response.");
-    return AZ_ERROR_ITEM_NOT_FOUND;
+    return false;
   }
 
   LOG("Parsed desired targetTemperature: %2f", *parsed_temp);
   LOG("Parsed version number: %d", *version_number);
-  return AZ_OK;
+  return true;
 }
 
 static void update_device_temp(double temp, bool* is_max_temp_changed)
@@ -729,20 +761,17 @@ static void send_reported_property(az_span name, double value, int32_t version, 
   az_span reported_property_payload = AZ_SPAN_FROM_BUFFER(reported_property_payload_buffer);
   if (confirm)
   {
-    if (az_failed(
-            rc = build_property_payload_with_status(
-                name,
-                value,
-                AZ_IOT_STATUS_OK,
-                version,
-                twin_success_name,
-                reported_property_payload,
-                &reported_property_payload)))
+    if (!build_property_payload_with_status(
+            name,
+            value,
+            AZ_IOT_STATUS_OK,
+            version,
+            twin_success_name,
+            reported_property_payload,
+            &reported_property_payload))
     {
-      LOG_ERROR(
-          "Failed to build reported property confirmed payload : az_result return code 0x%08x.",
-          rc);
-      exit(rc);
+      LOG_ERROR("Failed to build reported property confirmed payload.");
+      exit(1);
     }
   }
   else
@@ -751,12 +780,11 @@ static void send_reported_property(az_span name, double value, int32_t version, 
     const az_span names[1] = { name };
     const double values[1] = { value };
 
-    if (az_failed(
-            rc = build_property_payload(
-                count, names, values, NULL, reported_property_payload, &reported_property_payload)))
+    if (!build_property_payload(
+            count, names, values, NULL, reported_property_payload, &reported_property_payload))
     {
-      LOG_ERROR("Failed to build reported property payload: az_result return code 0x%08x.", rc);
-      exit(rc);
+      LOG_ERROR("Failed to build reported property payload.");
+      exit(1);
     }
   }
 
@@ -776,8 +804,8 @@ static void handle_command_message(
     az_span command_response_payload = AZ_SPAN_FROM_BUFFER(command_response_payload_buffer);
 
     // Invoke command.
-    if (az_failed(invoke_getMaxMinReport(
-            command_message_span, command_response_payload, &command_response_payload)))
+    if (!invoke_getMaxMinReport(
+            command_message_span, command_response_payload, &command_response_payload))
     {
       status = AZ_IOT_STATUS_BAD_REQUEST;
     }
@@ -825,7 +853,7 @@ static void send_command_response(
   LOG_AZ_SPAN("Payload:", response_payload);
 }
 
-static az_result invoke_getMaxMinReport(
+static bool invoke_getMaxMinReport(
     az_span payload,
     az_span response_destination,
     az_span* out_response)
@@ -834,13 +862,17 @@ static az_result invoke_getMaxMinReport(
   az_json_reader jr;
 
   // Parse the "since" field in the payload.
-  AZ_RETURN_IF_FAILED(az_json_reader_init(&jr, payload, NULL));
-  AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
-  AZ_RETURN_IF_FAILED(az_json_token_get_string(
-      &jr.token,
-      command_start_time_value_buffer,
-      sizeof(command_start_time_value_buffer),
-      &incoming_since_value_len));
+  if (az_failed(az_json_reader_init(&jr, payload, NULL))
+      || az_failed(az_json_reader_next_token(&jr))
+      || az_failed(az_json_token_get_string(
+          &jr.token,
+          command_start_time_value_buffer,
+          sizeof(command_start_time_value_buffer),
+          &incoming_since_value_len)))
+  {
+    return false;
+  }
+
   az_span start_time_span
       = az_span_create((uint8_t*)command_start_time_value_buffer, incoming_since_value_len);
 
@@ -850,7 +882,7 @@ static az_result invoke_getMaxMinReport(
   if (az_span_ptr(start_time_span) == NULL)
   {
     *out_response = command_empty_response_payload;
-    return AZ_ERROR_ITEM_NOT_FOUND;
+    return false;
   }
 
   // Get the current time as a string.
@@ -873,24 +905,20 @@ static az_result invoke_getMaxMinReport(
   const double values[3] = { device_max_temp, device_min_temp, device_avg_temp };
   const az_span times[2] = { start_time_span, end_time_span };
 
-  az_result rc;
-  if (az_failed(
-          rc = build_property_payload(
-              count, names, values, times, response_destination, out_response)))
+  if (build_property_payload(count, names, values, times, response_destination, out_response))
   {
-    LOG_ERROR("Failed to build command response payload: az_result return code 0x%08x.", rc);
-    exit(rc);
+    LOG_ERROR("Failed to build command response payload.");
+    exit(1);
   }
 
-  return AZ_OK;
+  return true;
 }
 
 static void send_telemetry_message(void)
 {
-  az_result rc;
-
   // Get the Telemetry topic to publish the telemetry message.
   char telemetry_topic_buffer[128];
+  az_result rc;
   if (az_failed(
           rc = az_iot_hub_client_telemetry_get_publish_topic(
               &hub_client, NULL, telemetry_topic_buffer, sizeof(telemetry_topic_buffer), NULL)))
@@ -906,11 +934,9 @@ static void send_telemetry_message(void)
 
   char telemetry_payload_buffer[128];
   az_span telemetry_payload = AZ_SPAN_FROM_BUFFER(telemetry_payload_buffer);
-  if (az_failed(
-          rc = build_property_payload(
-              count, names, values, NULL, telemetry_payload, &telemetry_payload)))
+  if (!build_property_payload(count, names, values, NULL, telemetry_payload, &telemetry_payload))
   {
-    LOG_ERROR("Failed to build telemetry payload: az_result return code 0x%08x.", rc);
+    LOG_ERROR("Failed to build telemetry payload.");
     exit(rc);
   }
 
@@ -920,7 +946,7 @@ static void send_telemetry_message(void)
   LOG_AZ_SPAN("Payload:", telemetry_payload);
 }
 
-static az_result build_property_payload(
+static bool build_property_payload(
     uint8_t property_count,
     const az_span names[],
     const double values[],
@@ -930,30 +956,42 @@ static az_result build_property_payload(
 {
   az_json_writer jw;
 
-  AZ_RETURN_IF_FAILED(az_json_writer_init(&jw, payload_destination, NULL));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
+  if (az_failed(az_json_writer_init(&jw, payload_destination, NULL))
+      || az_failed(az_json_writer_append_begin_object(&jw)))
+  {
+    return false;
+  }
 
   for (uint8_t i = 0; i < property_count; i++)
   {
-    AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, names[i]));
-    AZ_RETURN_IF_FAILED(az_json_writer_append_double(&jw, values[i], DOUBLE_DECIMAL_PLACE_DIGITS));
+    if (az_failed(az_json_writer_append_property_name(&jw, names[i]))
+        || az_failed(az_json_writer_append_double(&jw, values[i], DOUBLE_DECIMAL_PLACE_DIGITS)))
+    {
+      return false;
+    }
   }
 
   if (times != NULL)
   {
-    AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, command_start_time_name));
-    AZ_RETURN_IF_FAILED(az_json_writer_append_string(&jw, times[0]));
-    AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, command_end_time_name));
-    AZ_RETURN_IF_FAILED(az_json_writer_append_string(&jw, times[1]));
+    if (az_failed(az_json_writer_append_property_name(&jw, command_start_time_name))
+        || az_failed(az_json_writer_append_string(&jw, times[0]))
+        || az_failed(az_json_writer_append_property_name(&jw, command_end_time_name))
+        || az_failed(az_json_writer_append_string(&jw, times[1])))
+    {
+      return false;
+    }
   }
 
-  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
-  *payload_out = az_json_writer_get_bytes_used_in_destination(&jw);
+  if (az_failed(az_json_writer_append_end_object(&jw)))
+  {
+    return false;
+  }
 
-  return AZ_OK;
+  *payload_out = az_json_writer_get_bytes_used_in_destination(&jw);
+  return true;
 }
 
-static az_result build_property_payload_with_status(
+static bool build_property_payload_with_status(
     az_span name,
     double value,
     int32_t ack_code_value,
@@ -964,22 +1002,24 @@ static az_result build_property_payload_with_status(
 {
   az_json_writer jw;
 
-  AZ_RETURN_IF_FAILED(az_json_writer_init(&jw, payload_destination, NULL));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, name));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, twin_value_name));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_double(&jw, value, DOUBLE_DECIMAL_PLACE_DIGITS));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, twin_ack_code_name));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_int32(&jw, ack_code_value));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, twin_ack_version_name));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_int32(&jw, ack_version_value));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, twin_ack_description_name));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_string(&jw, ack_description_value));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
+  if (az_failed(az_json_writer_init(&jw, payload_destination, NULL))
+      || az_failed(az_json_writer_append_begin_object(&jw))
+      || az_failed(az_json_writer_append_property_name(&jw, name))
+      || az_failed(az_json_writer_append_begin_object(&jw))
+      || az_failed(az_json_writer_append_property_name(&jw, twin_value_name))
+      || az_failed(az_json_writer_append_double(&jw, value, DOUBLE_DECIMAL_PLACE_DIGITS))
+      || az_failed(az_json_writer_append_property_name(&jw, twin_ack_code_name))
+      || az_failed(az_json_writer_append_int32(&jw, ack_code_value))
+      || az_failed(az_json_writer_append_property_name(&jw, twin_ack_version_name))
+      || az_failed(az_json_writer_append_int32(&jw, ack_version_value))
+      || az_failed(az_json_writer_append_property_name(&jw, twin_ack_description_name))
+      || az_failed(az_json_writer_append_string(&jw, ack_description_value))
+      || az_failed(az_json_writer_append_end_object(&jw))
+      || az_failed(az_json_writer_append_end_object(&jw)))
+  {
+    return false;
+  }
 
   *payload_out = az_json_writer_get_bytes_used_in_destination(&jw);
-
-  return AZ_OK;
+  return true;
 }

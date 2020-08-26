@@ -25,12 +25,12 @@ typedef struct
   bool send_max_temp_property;
 } pnp_thermostat_component;
 
-az_result pnp_thermostat_init(
+bool pnp_thermostat_init(
     pnp_thermostat_component* thermostat_component,
     az_span component_name,
     double initial_temp);
 
-az_result pnp_thermostat_get_telemetry_message(
+bool pnp_thermostat_get_telemetry_message(
     const az_iot_hub_client* client,
     const pnp_thermostat_component* thermostat_component,
     pnp_mqtt_message* mqtt_message);
@@ -40,7 +40,7 @@ bool pnp_thermostat_get_max_temp_report(
     pnp_thermostat_component* thermostat_component,
     pnp_mqtt_message* mqtt_message);
 
-az_result pnp_thermostat_process_property_update(
+bool pnp_thermostat_process_property_update(
     const az_iot_hub_client* client,
     pnp_thermostat_component* thermostat_component,
     az_span component_name,
@@ -49,7 +49,7 @@ az_result pnp_thermostat_process_property_update(
     int32_t version,
     pnp_mqtt_message* mqtt_message);
 
-az_result pnp_thermostat_process_command(
+bool pnp_thermostat_process_command(
     const az_iot_hub_client* client,
     const pnp_thermostat_component* thermostat_component,
     const az_iot_hub_client_method_request* command_request,

@@ -128,9 +128,9 @@ typedef enum
  * @param[in]  name      Enumerated name of the sample.
  * @param[out] env_vars  Pointer to struct that will contain all read-in environment variables. May
  * NOT be NULL.
- * @return     AZ_OK if all environment variables required are successfully read and values stored.
+ * @return     `true` if all environment variables required are successfully read and values stored.
  */
-az_result read_environment_variables(
+bool read_environment_variables(
     iot_sample_type type,
     iot_sample_name name,
     iot_sample_environment_variables* env_vars);
@@ -144,10 +144,10 @@ az_result read_environment_variables(
  * NOT be NULL.
  * @param[in]  endpoint_size Size of the char buffer to be filled.
 
- * @return     AZ_ERROR_INSUFFICIENT_SPAN_SIZE if buffer size is not large enough to hold endpoint
- * c-string. AZ_ERROR_ARG is sample type is undefined. Else AZ_OK.
+ * @return     `false` if buffer size is not large enough to hold endpoint
+ * c-string or if sample type is undefined. Else `true`.
  */
-az_result create_mqtt_endpoint(
+bool create_mqtt_endpoint(
     iot_sample_type type,
     const iot_sample_environment_variables* env_vars,
     char* endpoint,

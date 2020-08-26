@@ -3,14 +3,15 @@
 
 #include <stdint.h>
 
-#include <azure/iot/az_iot_common.h>
-#include <azure/iot/internal/az_iot_common_internal.h>
-#include <azure/core/internal/az_precondition_internal.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
+#include <azure/core/internal/az_precondition_internal.h>
 #include <azure/core/internal/az_span_internal.h>
+#include <azure/iot/az_iot_common.h>
+#include <azure/iot/internal/az_iot_common_internal.h>
 
 #include <azure/core/internal/az_log_internal.h>
+#include <azure/core/internal/az_result_internal.h>
 #include <azure/core/internal/az_retry_internal.h>
 
 #include <azure/core/_az_cfg.h>
@@ -87,10 +88,11 @@ AZ_NODISCARD int32_t _az_iot_u64toa_size(uint64_t number)
   }
 }
 
-AZ_NODISCARD az_result _az_span_copy_url_encode(az_span destination, az_span source, az_span* out_remainder)
+AZ_NODISCARD az_result
+_az_span_copy_url_encode(az_span destination, az_span source, az_span* out_remainder)
 {
   int32_t length;
-  AZ_RETURN_IF_FAILED(_az_span_url_encode(destination, source, &length));
+  _az_RETURN_IF_FAILED(_az_span_url_encode(destination, source, &length));
   *out_remainder = az_span_slice(destination, length, az_span_size(destination));
   return AZ_OK;
 }

@@ -81,23 +81,22 @@ int main(void)
 
 static void create_and_configure_mqtt_client(void)
 {
-  int rc;
-
   // Reads in environment variables set by user for purposes of running sample.
-  if (az_failed(rc = read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars)))
+  if (!read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars))
   {
-    LOG_ERROR("Failed to read environment variables: az_result return code 0x%08x.", rc);
-    exit(rc);
+    LOG_ERROR("Failed to read environment variables.");
+    exit(1);
   }
+
+  int rc;
 
   // Build an MQTT endpoint c-string.
   char mqtt_endpoint_buffer[256];
-  if (az_failed(
-          rc = create_mqtt_endpoint(
-              SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer))))
+  if (!create_mqtt_endpoint(
+          SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer)))
   {
-    LOG_ERROR("Failed to create MQTT endpoint: az_result return code 0x%08x.", rc);
-    exit(rc);
+    LOG_ERROR("Failed to create MQTT endpoint.");
+    exit(1);
   }
 
   // Initialize the provisioning client with the provisioning global endpoint and the default

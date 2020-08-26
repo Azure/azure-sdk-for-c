@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 #ifdef _MSC_VER
-// warning C4996: 'getenv': This function or variable may be unsafe. Consider using _dupenv_s instead.
+// warning C4996: 'getenv': This function or variable may be unsafe. Consider using _dupenv_s
+// instead.
 #pragma warning(disable : 4996)
 #endif
 
@@ -61,7 +62,7 @@ const az_span provisioning_global_endpoint
 //
 // Functions
 //
-static az_result read_configuration_entry(
+static bool read_configuration_entry(
     const char* env_name,
     char* default_value,
     bool hide_value,
@@ -80,20 +81,24 @@ static az_result read_configuration_entry(
     (void)printf("%s = %s\n", env_name, hide_value ? "***" : env_value);
     az_span env_span = az_span_create_from_str(env_value);
 
-    AZ_RETURN_IF_NOT_ENOUGH_SIZE(destination, az_span_size(env_span));
+    if (az_span_size(destination) < az_span_size(env_span))
+    {
+      return false;
+    }
+
     az_span_copy(destination, env_span);
     *out_value = az_span_slice(destination, 0, az_span_size(env_span));
   }
   else
   {
     LOG_ERROR("(missing) Please set the %s environment variable.", env_name);
-    return AZ_ERROR_ARG;
+    return false;
   }
 
-  return AZ_OK;
+  return true;
 }
 
-az_result read_environment_variables(
+bool read_environment_variables(
     iot_sample_type type,
     iot_sample_name name,
     iot_sample_environment_variables* env_vars)
@@ -103,8 +108,11 @@ az_result read_environment_variables(
   if (type == PAHO_IOT_HUB)
   {
     env_vars->hub_hostname = AZ_SPAN_FROM_BUFFER(iot_hub_hostname_buffer);
-    AZ_RETURN_IF_FAILED(read_configuration_entry(
-        ENV_IOT_HUB_HOSTNAME, NULL, false, env_vars->hub_hostname, &(env_vars->hub_hostname)));
+    if (!read_configuration_entry(
+            ENV_IOT_HUB_HOSTNAME, NULL, false, env_vars->hub_hostname, &(env_vars->hub_hostname)))
+    {
+      return false;
+    }
 
     switch (name)
     {
@@ -115,127 +123,164 @@ az_result read_environment_variables(
       case PAHO_IOT_HUB_TELEMETRY_SAMPLE:
       case PAHO_IOT_HUB_TWIN_SAMPLE:
         env_vars->hub_device_id = AZ_SPAN_FROM_BUFFER(iot_hub_device_id_buffer);
-        AZ_RETURN_IF_FAILED(read_configuration_entry(
-            ENV_IOT_HUB_DEVICE_ID,
-            NULL,
-            false,
-            env_vars->hub_device_id,
-            &(env_vars->hub_device_id)));
+        if (!read_configuration_entry(
+                ENV_IOT_HUB_DEVICE_ID,
+                NULL,
+                false,
+                env_vars->hub_device_id,
+                &(env_vars->hub_device_id)))
+        {
+          return false;
+        }
 
         env_vars->x509_cert_pem_file_path = AZ_SPAN_FROM_BUFFER(iot_x509_cert_pem_file_path_buffer);
-        AZ_RETURN_IF_FAILED(read_configuration_entry(
-            ENV_IOT_DEVICE_X509_CERT_PEM_FILE_PATH,
-            NULL,
-            false,
-            env_vars->x509_cert_pem_file_path,
-            &(env_vars->x509_cert_pem_file_path)));
+        if (!read_configuration_entry(
+                ENV_IOT_DEVICE_X509_CERT_PEM_FILE_PATH,
+                NULL,
+                false,
+                env_vars->x509_cert_pem_file_path,
+                &(env_vars->x509_cert_pem_file_path)))
+        {
+          return false;
+        }
         break;
 
       case PAHO_IOT_HUB_SAS_TELEMETRY_SAMPLE:
         env_vars->hub_device_id = AZ_SPAN_FROM_BUFFER(iot_hub_device_id_buffer);
-        AZ_RETURN_IF_FAILED(read_configuration_entry(
-            ENV_IOT_HUB_SAS_DEVICE_ID,
-            NULL,
-            false,
-            env_vars->hub_device_id,
-            &(env_vars->hub_device_id)));
+        if (!read_configuration_entry(
+                ENV_IOT_HUB_SAS_DEVICE_ID,
+                NULL,
+                false,
+                env_vars->hub_device_id,
+                &(env_vars->hub_device_id)))
+        {
+          return false;
+        }
 
         env_vars->hub_sas_key = AZ_SPAN_FROM_BUFFER(iot_hub_sas_key_buffer);
-        AZ_RETURN_IF_FAILED(read_configuration_entry(
-            ENV_IOT_HUB_SAS_KEY, NULL, true, env_vars->hub_sas_key, &(env_vars->hub_sas_key)));
+        if (!read_configuration_entry(
+                ENV_IOT_HUB_SAS_KEY, NULL, true, env_vars->hub_sas_key, &(env_vars->hub_sas_key)))
+        {
+          return false;
+        }
 
         char duration_buffer[SAS_KEY_DURATION_TIME_DIGITS];
         az_span duration = AZ_SPAN_FROM_BUFFER(duration_buffer);
-        AZ_RETURN_IF_FAILED(read_configuration_entry(
-            ENV_IOT_SAS_KEY_DURATION_MINUTES, "120", false, duration, &duration));
-        AZ_RETURN_IF_FAILED(az_span_atou32(duration, &(env_vars->sas_key_duration_minutes)));
+        if (!read_configuration_entry(
+                ENV_IOT_SAS_KEY_DURATION_MINUTES, "120", false, duration, &duration)
+            || az_failed(az_span_atou32(duration, &(env_vars->sas_key_duration_minutes))))
+        {
+          return false;
+        }
+
         break;
 
       default:
         LOG_ERROR("Hub sample name undefined.");
-        return AZ_ERROR_ARG;
+        return false;
     }
   }
   else if (type == PAHO_IOT_PROVISIONING)
   {
     env_vars->provisioning_id_scope = AZ_SPAN_FROM_BUFFER(iot_provisioning_id_scope_buffer);
-    AZ_RETURN_IF_FAILED(read_configuration_entry(
-        ENV_IOT_PROVISIONING_ID_SCOPE,
-        NULL,
-        false,
-        env_vars->provisioning_id_scope,
-        &(env_vars->provisioning_id_scope)));
+    if (!read_configuration_entry(
+            ENV_IOT_PROVISIONING_ID_SCOPE,
+            NULL,
+            false,
+            env_vars->provisioning_id_scope,
+            &(env_vars->provisioning_id_scope)))
+    {
+      return false;
+    }
 
     switch (name)
     {
       case PAHO_IOT_PROVISIONING_SAMPLE:
         env_vars->provisioning_registration_id
             = AZ_SPAN_FROM_BUFFER(iot_provisioning_registration_id_buffer);
-        AZ_RETURN_IF_FAILED(read_configuration_entry(
-            ENV_IOT_PROVISIONING_REGISTRATION_ID,
-            NULL,
-            false,
-            env_vars->provisioning_registration_id,
-            &(env_vars->provisioning_registration_id)));
+        if (!read_configuration_entry(
+                ENV_IOT_PROVISIONING_REGISTRATION_ID,
+                NULL,
+                false,
+                env_vars->provisioning_registration_id,
+                &(env_vars->provisioning_registration_id)))
+        {
+          return false;
+        }
 
         env_vars->x509_cert_pem_file_path = AZ_SPAN_FROM_BUFFER(iot_x509_cert_pem_file_path_buffer);
-        AZ_RETURN_IF_FAILED(read_configuration_entry(
-            ENV_IOT_DEVICE_X509_CERT_PEM_FILE_PATH,
-            NULL,
-            false,
-            env_vars->x509_cert_pem_file_path,
-            &(env_vars->x509_cert_pem_file_path)));
+        if (!read_configuration_entry(
+                ENV_IOT_DEVICE_X509_CERT_PEM_FILE_PATH,
+                NULL,
+                false,
+                env_vars->x509_cert_pem_file_path,
+                &(env_vars->x509_cert_pem_file_path)))
+        {
+          return false;
+        }
         break;
 
       case PAHO_IOT_PROVISIONING_SAS_SAMPLE:
         env_vars->provisioning_registration_id
             = AZ_SPAN_FROM_BUFFER(iot_provisioning_registration_id_buffer);
-        AZ_RETURN_IF_FAILED(read_configuration_entry(
-            ENV_IOT_PROVISIONING_SAS_REGISTRATION_ID,
-            NULL,
-            false,
-            env_vars->provisioning_registration_id,
-            &(env_vars->provisioning_registration_id)));
+        if (!read_configuration_entry(
+                ENV_IOT_PROVISIONING_SAS_REGISTRATION_ID,
+                NULL,
+                false,
+                env_vars->provisioning_registration_id,
+                &(env_vars->provisioning_registration_id)))
+        {
+          return false;
+        }
 
         env_vars->provisioning_sas_key = AZ_SPAN_FROM_BUFFER(iot_provisioning_sas_key_buffer);
-        AZ_RETURN_IF_FAILED(read_configuration_entry(
-            ENV_IOT_PROVISIONING_SAS_KEY,
-            NULL,
-            true,
-            env_vars->provisioning_sas_key,
-            &(env_vars->provisioning_sas_key)));
+        if (!read_configuration_entry(
+                ENV_IOT_PROVISIONING_SAS_KEY,
+                NULL,
+                true,
+                env_vars->provisioning_sas_key,
+                &(env_vars->provisioning_sas_key)))
+        {
+          return false;
+        }
 
         char duration_buffer[SAS_KEY_DURATION_TIME_DIGITS];
         az_span duration = AZ_SPAN_FROM_BUFFER(duration_buffer);
-        AZ_RETURN_IF_FAILED(read_configuration_entry(
-            ENV_IOT_SAS_KEY_DURATION_MINUTES, "120", false, duration, &duration));
-        AZ_RETURN_IF_FAILED(az_span_atou32(duration, &(env_vars->sas_key_duration_minutes)));
+        if (!read_configuration_entry(
+                ENV_IOT_SAS_KEY_DURATION_MINUTES, "120", false, duration, &duration)
+            || az_failed(az_span_atou32(duration, &(env_vars->sas_key_duration_minutes))))
+        {
+          return false;
+        }
         break;
 
       default:
         LOG_ERROR("Provisioning sample name undefined.");
-        return AZ_ERROR_ARG;
+        return false;
     }
   }
   else
   {
     LOG_ERROR("Sample type undefined.");
-    return AZ_ERROR_ARG;
+    return false;
   }
 
   env_vars->x509_trust_pem_file_path = AZ_SPAN_FROM_BUFFER(iot_x509_trust_pem_file_path_buffer);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(
-      ENV_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH,
-      "",
-      false,
-      env_vars->x509_trust_pem_file_path,
-      &(env_vars->x509_trust_pem_file_path)));
+  if (!read_configuration_entry(
+          ENV_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH,
+          "",
+          false,
+          env_vars->x509_trust_pem_file_path,
+          &(env_vars->x509_trust_pem_file_path)))
+  {
+    return false;
+  }
 
   LOG(" "); // Formatting.
-  return AZ_OK;
+  return true;
 }
 
-az_result create_mqtt_endpoint(
+bool create_mqtt_endpoint(
     iot_sample_type type,
     const iot_sample_environment_variables* env_vars,
     char* endpoint,
@@ -251,7 +296,7 @@ az_result create_mqtt_endpoint(
 
     if (required_size > (int32_t)endpoint_size)
     {
-      return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
+      return false;
     }
 
     az_span hub_mqtt_endpoint = az_span_create((uint8_t*)endpoint, (int32_t)endpoint_size);
@@ -266,7 +311,7 @@ az_result create_mqtt_endpoint(
 
     if (required_size > (int32_t)endpoint_size)
     {
-      return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
+      return false;
     }
 
     az_span provisioning_mqtt_endpoint = az_span_create((uint8_t*)endpoint, (int32_t)endpoint_size);
@@ -276,12 +321,12 @@ az_result create_mqtt_endpoint(
   else
   {
     LOG_ERROR("Sample type undefined.");
-    return AZ_ERROR_ARG;
+    return false;
   }
 
   LOG_SUCCESS("MQTT endpoint created at \"%s\".", endpoint);
 
-  return AZ_OK;
+  return true;
 }
 
 void sleep_for_seconds(uint32_t seconds)
@@ -299,9 +344,8 @@ uint32_t get_epoch_expiration_time_from_minutes(uint32_t minutes)
   return (uint32_t)(time(NULL) + minutes * 60);
 }
 
-static az_result base64_decode(az_span base64_encoded, az_span destination, az_span* out_span)
+static bool base64_decode(az_span base64_encoded, az_span destination, az_span* out_span)
 {
-  az_result rc;
   BIO* b64_decoder;
   BIO* source_mem_bio;
 
@@ -311,7 +355,7 @@ static az_result base64_decode(az_span base64_encoded, az_span destination, az_s
   b64_decoder = BIO_new(BIO_f_base64());
   if (b64_decoder == NULL)
   {
-    return AZ_ERROR_OUT_OF_MEMORY;
+    return false;
   }
 
   // Get the source BIO to push through the filter
@@ -319,7 +363,7 @@ static az_result base64_decode(az_span base64_encoded, az_span destination, az_s
   if (source_mem_bio == NULL)
   {
     BIO_free(b64_decoder);
-    return AZ_ERROR_OUT_OF_MEMORY;
+    return false;
   }
 
   // Push the memory through the filter
@@ -328,7 +372,7 @@ static az_result base64_decode(az_span base64_encoded, az_span destination, az_s
   {
     BIO_free(b64_decoder);
     BIO_free(source_mem_bio);
-    return AZ_ERROR_OUT_OF_MEMORY;
+    return false;
   }
 
   // Set flags to not have a newline and close the BIO
@@ -339,30 +383,25 @@ static az_result base64_decode(az_span base64_encoded, az_span destination, az_s
   int read_data = BIO_read(source_mem_bio, az_span_ptr(destination), az_span_size(destination));
 
   // Set the output span
+  bool result = false;
   if (read_data > 0)
   {
     *out_span = az_span_create(az_span_ptr(destination), (int32_t)read_data);
-    rc = AZ_OK;
-  }
-  else
-  {
-    rc = AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
+    result = true;
   }
 
   // Free the BIO chain
   BIO_free_all(source_mem_bio);
 
-  return rc;
+  return result;
 }
 
-static az_result hmac_sha256_sign(
+static bool hmac_sha256_sign(
     az_span decoded_key,
     az_span signature,
     az_span destination,
     az_span* out_span)
 {
-  az_result rc;
-
   unsigned int hmac_encode_len;
   unsigned char* hmac = HMAC(
       EVP_sha256(),
@@ -373,22 +412,18 @@ static az_result hmac_sha256_sign(
       az_span_ptr(destination),
       &hmac_encode_len);
 
+  bool result = false;
   if (hmac != NULL)
   {
     *out_span = az_span_create(az_span_ptr(destination), (int32_t)hmac_encode_len);
-    rc = AZ_OK;
-  }
-  else
-  {
-    rc = AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
+    result = true;
   }
 
-  return rc;
+  return result;
 }
 
-static az_result base64_encode(az_span bytes, az_span destination, az_span* out_span)
+static bool base64_encode(az_span bytes, az_span destination, az_span* out_span)
 {
-  az_result rc;
   BIO* sink_mem_bio;
   BIO* b64_encoder;
   BUF_MEM* encoded_mem_ptr;
@@ -397,7 +432,7 @@ static az_result base64_encode(az_span bytes, az_span destination, az_span* out_
   b64_encoder = BIO_new(BIO_f_base64());
   if (b64_encoder == NULL)
   {
-    return AZ_ERROR_OUT_OF_MEMORY;
+    return false;
   }
 
   // Create a memory sink BIO to process bytes to
@@ -405,7 +440,7 @@ static az_result base64_encode(az_span bytes, az_span destination, az_span* out_
   if (sink_mem_bio == NULL)
   {
     BIO_free(b64_encoder);
-    return AZ_ERROR_OUT_OF_MEMORY;
+    return false;
   }
 
   // Push the sink to the encoder
@@ -414,7 +449,7 @@ static az_result base64_encode(az_span bytes, az_span destination, az_span* out_
   {
     BIO_free(sink_mem_bio);
     BIO_free(b64_encoder);
-    return AZ_ERROR_OUT_OF_MEMORY;
+    return false;
   }
 
   // Set no newline flag for the encoder
@@ -426,7 +461,7 @@ static az_result base64_encode(az_span bytes, az_span destination, az_span* out_
   {
     BIO_free(sink_mem_bio);
     BIO_free(b64_encoder);
-    return AZ_ERROR_OUT_OF_MEMORY;
+    return false;
   }
 
   // Flush the BIO
@@ -435,23 +470,20 @@ static az_result base64_encode(az_span bytes, az_span destination, az_span* out_
   // Get the pointer to the encoded bytes
   BIO_get_mem_ptr(b64_encoder, &encoded_mem_ptr);
 
+  bool result = false;
   if ((size_t)az_span_size(destination) >= encoded_mem_ptr->length)
   {
     // Copy the bytes to the output and initialize output span
     memcpy(az_span_ptr(destination), encoded_mem_ptr->data, encoded_mem_ptr->length);
     *out_span = az_span_create(az_span_ptr(destination), (int32_t)encoded_mem_ptr->length);
 
-    rc = AZ_OK;
-  }
-  else
-  {
-    rc = AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
+    result = true;
   }
 
   // Free the BIO chain
   BIO_free_all(b64_encoder);
 
-  return rc;
+  return result;
 }
 
 void sas_generate_encoded_signed_signature(
@@ -467,33 +499,31 @@ void sas_generate_encoded_signed_signature(
   // Decode the base64 encoded SAS key to use for HMAC signing.
   char sas_b64_decoded_key_buffer[64];
   az_span sas_b64_decoded_key = AZ_SPAN_FROM_BUFFER(sas_b64_decoded_key_buffer);
-  if (az_failed(rc = base64_decode(sas_key, sas_b64_decoded_key, &sas_b64_decoded_key)))
+  if (!base64_decode(sas_key, sas_b64_decoded_key, &sas_b64_decoded_key))
   {
-    LOG_ERROR("Could not decode the SAS key: az_result return code 0x%04x.", rc);
-    exit(rc);
+    LOG_ERROR("Could not decode the SAS key.");
+    exit(1);
   }
 
   // HMAC-SHA256 sign the signature with the decoded key.
   char sas_hmac256_signed_signature_buffer[128];
   az_span sas_hmac256_signed_signature = AZ_SPAN_FROM_BUFFER(sas_hmac256_signed_signature_buffer);
-  if (az_failed(
-          rc = hmac_sha256_sign(
-              sas_b64_decoded_key,
-              sas_signature,
-              sas_hmac256_signed_signature,
-              &sas_hmac256_signed_signature)))
+  if (!hmac_sha256_sign(
+          sas_b64_decoded_key,
+          sas_signature,
+          sas_hmac256_signed_signature,
+          &sas_hmac256_signed_signature))
   {
-    LOG_ERROR("Could not sign the signature: az_result return code 0x%04x.", rc);
-    exit(rc);
+    LOG_ERROR("Could not sign the signature.");
+    exit(1);
   }
 
   // Base64 encode the result of the HMAC signing.
-  if (az_failed(
-          rc = base64_encode(
-              sas_hmac256_signed_signature, sas_b64_encoded_destination, sas_b64_encoded_out)))
+  if (!base64_encode(
+          sas_hmac256_signed_signature, sas_b64_encoded_destination, sas_b64_encoded_out))
   {
-    LOG_ERROR("Could not base64 encode the password: az_result return code 0x%04x.", rc);
-    exit(rc);
+    LOG_ERROR("Could not base64 encode the password.");
+    exit(1);
   }
 
   return;

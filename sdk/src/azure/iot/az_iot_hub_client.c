@@ -7,6 +7,7 @@
 #include <azure/core/az_span.h>
 #include <azure/core/az_version.h>
 #include <azure/core/internal/az_precondition_internal.h>
+#include <azure/core/internal/az_result_internal.h>
 #include <azure/core/internal/az_span_internal.h>
 #include <azure/iot/az_iot_hub_client.h>
 #include <azure/iot/internal/az_iot_common_internal.h>
@@ -86,7 +87,7 @@ AZ_NODISCARD az_result az_iot_hub_client_get_user_name(
         + az_span_size(hub_client_param_equals_span);
   }
 
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(
+  _az_RETURN_IF_NOT_ENOUGH_SIZE(
       mqtt_user_name_span, required_length + (int32_t)sizeof(null_terminator));
 
   az_span remainder = az_span_copy(mqtt_user_name_span, client->_internal.iot_hub_hostname);
@@ -120,7 +121,7 @@ AZ_NODISCARD az_result az_iot_hub_client_get_user_name(
     remainder = az_span_copy(remainder, hub_digital_twin_model_id);
     remainder = az_span_copy_u8(remainder, *az_span_ptr(hub_client_param_equals_span));
 
-    AZ_RETURN_IF_FAILED(_az_span_copy_url_encode(remainder, *model_id, &remainder));
+    _az_RETURN_IF_FAILED(_az_span_copy_url_encode(remainder, *model_id, &remainder));
   }
   if (az_span_size(remainder) > 0)
   {
@@ -160,7 +161,7 @@ AZ_NODISCARD az_result az_iot_hub_client_get_client_id(
     required_length += az_span_size(*module_id) + (int32_t)sizeof(hub_client_forward_slash);
   }
 
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(
+  _az_RETURN_IF_NOT_ENOUGH_SIZE(
       mqtt_client_id_span, required_length + (int32_t)sizeof(null_terminator));
 
   az_span remainder = az_span_copy(mqtt_client_id_span, client->_internal.device_id);
@@ -217,7 +218,7 @@ AZ_NODISCARD az_result az_iot_hub_client_properties_append(
     required_length += 1;
   }
 
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, required_length);
+  _az_RETURN_IF_NOT_ENOUGH_SIZE(remainder, required_length);
 
   if (prop_length > 0)
   {
