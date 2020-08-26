@@ -32,7 +32,7 @@
 #include <openssl/buffer.h>
 #include <openssl/evp.h>
 #include <openssl/hmac.h>
-/*
+
 #define IOT_SAMPLE_PRECONDITION_NOT_NULL(arg) \
 do {                                          \
     if (arg == NULL)                          \
@@ -41,32 +41,22 @@ do {                                          \
       exit(1);                                \
     }                                         \
 } while (0)
-*/
-
-static inline void precondition_not_null(void const* arg)
-{
-  if (arg == NULL)
-  {
-    LOG_ERROR("Pointer is NULL.");
-    exit(1);
-  }
-}
 
 //
 // MQTT endpoints
 //
 //#define USE_WEB_SOCKET // Comment to use MQTT without WebSockets.
 #ifdef USE_WEB_SOCKET
-az_span const IOT_SAMPLE_MQTT_URL_PREFIX = AZ_SPAN_LITERAL_FROM_STR("wss://");
+static az_span const mqtt_url_prefix = AZ_SPAN_LITERAL_FROM_STR("wss://");
 // Note: Paho fails to connect to Hub when using AZ_IOT_HUB_CLIENT_WEB_SOCKET_PATH or an X509
 // certificate.
-az_span const IOT_SAMPLE_MQTT_URL_SUFFIX
+static az_span const mqtt_url_suffix
     = AZ_SPAN_LITERAL_FROM_STR(":443" AZ_IOT_HUB_CLIENT_WEB_SOCKET_PATH_NO_X509_CLIENT_CERT);
 #else
-az_span const IOT_SAMPLE_MQTT_URL_PREFIX = AZ_SPAN_LITERAL_FROM_STR("ssl://");
-az_span const IOT_SAMPLE_MQTT_URL_SUFFIX = AZ_SPAN_LITERAL_FROM_STR(":8883");
+static az_span const mqtt_url_prefix = AZ_SPAN_LITERAL_FROM_STR("ssl://");
+static az_span const mqtt_url_suffix = AZ_SPAN_LITERAL_FROM_STR(":8883");
 #endif
-az_span const IOT_SAMPLE_PROVISIONING_GLOBAL_ENDPOINT
+static az_span const provisioning_global_endpoint
     = AZ_SPAN_LITERAL_FROM_STR("ssl://global.azure-devices-provisioning.net:8883");
 
 //
@@ -109,7 +99,7 @@ az_result iot_sample_read_environment_variables(
     iot_sample_name name,
     iot_sample_environment_variables* out_env_vars)
 {
-  precondition_not_null(out_env_vars);
+  IOT_SAMPLE_PRECONDITION_NOT_NULL(out_env_vars);
 
   if (type == PAHO_IOT_HUB)
   {
@@ -265,13 +255,13 @@ az_result iot_sample_create_mqtt_endpoint(
     char* out_endpoint,
     size_t endpoint_size)
 {
-  precondition_not_null(env_vars);
-  precondition_not_null(out_endpoint);
+  IOT_SAMPLE_PRECONDITION_NOT_NULL(env_vars);
+  IOT_SAMPLE_PRECONDITION_NOT_NULL(out_endpoint);
 
   if (type == PAHO_IOT_HUB)
   {
-    int32_t const required_size = az_span_size(IOT_SAMPLE_MQTT_URL_PREFIX)
-        + az_span_size(env_vars->hub_hostname) + az_span_size(IOT_SAMPLE_MQTT_URL_SUFFIX)
+    int32_t const required_size = az_span_size(mqtt_url_prefix)
+        + az_span_size(env_vars->hub_hostname) + az_span_size(mqtt_url_suffix)
         + (int32_t)sizeof('\0');
 
     if ((size_t)required_size > endpoint_size)
@@ -280,15 +270,15 @@ az_result iot_sample_create_mqtt_endpoint(
     }
 
     az_span hub_mqtt_endpoint = az_span_create((uint8_t*)out_endpoint, (int32_t)endpoint_size);
-    az_span remainder = az_span_copy(hub_mqtt_endpoint, IOT_SAMPLE_MQTT_URL_PREFIX);
+    az_span remainder = az_span_copy(hub_mqtt_endpoint, mqtt_url_prefix);
     remainder = az_span_copy(remainder, env_vars->hub_hostname);
-    remainder = az_span_copy(remainder, IOT_SAMPLE_MQTT_URL_SUFFIX);
+    remainder = az_span_copy(remainder, mqtt_url_suffix);
     az_span_copy_u8(remainder, '\0');
   }
   else if (type == PAHO_IOT_PROVISIONING)
   {
     int32_t const required_size
-        = az_span_size(IOT_SAMPLE_PROVISIONING_GLOBAL_ENDPOINT) + (int32_t)sizeof('\0');
+        = az_span_size(provisioning_global_endpoint) + (int32_t)sizeof('\0');
 
     if ((size_t)required_size > endpoint_size)
     {
@@ -297,7 +287,7 @@ az_result iot_sample_create_mqtt_endpoint(
 
     az_span provisioning_mqtt_endpoint
         = az_span_create((uint8_t*)out_endpoint, (int32_t)endpoint_size);
-    az_span remainder = az_span_copy(provisioning_mqtt_endpoint, IOT_SAMPLE_PROVISIONING_GLOBAL_ENDPOINT);
+    az_span remainder = az_span_copy(provisioning_mqtt_endpoint, provisioning_global_endpoint);
     az_span_copy_u8(remainder, '\0');
   }
   else
@@ -495,7 +485,7 @@ void iot_sample_generate_sas_base64_encoded_signed_signature(
     az_span sas_base64_encoded_signed_signature,
     az_span* out_sas_base64_encoded_signed_signature)
 {
-  precondition_not_null(out_sas_base64_encoded_signed_signature);
+  IOT_SAMPLE_PRECONDITION_NOT_NULL(out_sas_base64_encoded_signed_signature);
 
   int rc;
 
