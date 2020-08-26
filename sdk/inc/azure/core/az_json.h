@@ -122,7 +122,7 @@ az_span az_json_token_copy_into_span(az_json_token const* json_token, az_span de
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The boolean value is returned.
- * @retval #AZ_ERROR_JSON_INVALID_STATE The kind is not #AZ_JSON_TOKEN_BOOLEAN.
+ * @retval #AZ_ERROR_JSON_INVALID_STATE The kind is not #AZ_JSON_TOKEN_TRUE or #AZ_JSON_TOKEN_FALSE.
  */
 AZ_NODISCARD az_result az_json_token_get_boolean(az_json_token const* json_token, bool* out_value);
 
