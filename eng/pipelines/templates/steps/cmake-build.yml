@@ -1,5 +1,6 @@
 parameters:
   BuildArgs: ''
+  BuildType: Debug
 
 steps:
   - script: mkdir build
@@ -9,10 +10,10 @@ steps:
     workingDirectory: build
     displayName: cmake --version
 
-  - script: cmake ${{ parameters.BuildArgs }} ..
+  - script: cmake ${{ parameters.BuildArgs }} .. -DCMAKE_BUILD_TYPE=${{ parameters.BuildType }}
     workingDirectory: build
     displayName: cmake generate
 
-  - script: cmake --build .
+  - script: cmake --build . --config ${{ parameters.BuildType }}
     workingDirectory: build
     displayName: cmake build

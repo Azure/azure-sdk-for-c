@@ -122,7 +122,7 @@ jobs:
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         # This is the only platform where we run mocking functions and generate CodeCoverage
-        build.args: ' -DUNIT_TESTING=ON -DCMAKE_BUILD_TYPE=Debug -DUNIT_TESTING_MOCKS=ON'
+        build.args: ' -DUNIT_TESTING=ON -DUNIT_TESTING_MOCKS=ON'
         AZ_SDK_CODE_COV: 1
         AZ_SDK_C_NO_SAMPLES: 'true'
       Win_x86_with_unit_test:
@@ -161,7 +161,8 @@ jobs:
         OSVmImage: 'ubuntu-18.04'
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        build.args: ' -DUNIT_TESTING=ON -DPRECONDITIONS=OFF -DCMAKE_BUILD_TYPE=Release'
+        build.args: ' -DUNIT_TESTING=ON -DPRECONDITIONS=OFF'
+        BuildType: Release
         AZ_SDK_C_NO_SAMPLES: 'true'
         PublishMapFiles: 'true'
       Win_x86_with_unit_test_no_preconditions:
@@ -170,7 +171,8 @@ jobs:
         VCPKG_DEFAULT_TRIPLET: 'x86-windows-static'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: Win32
-        build.args: ' -DUNIT_TESTING=ON -DPRECONDITIONS=OFF -DCMAKE_BUILD_TYPE=Release'
+        build.args: ' -DUNIT_TESTING=ON -DPRECONDITIONS=OFF'
+        BuildType: Release
         AZ_SDK_C_NO_SAMPLES: 'true'
         PublishMapFiles: 'true'
       Win_x64_with_unit_test_no_preconditions:
@@ -179,14 +181,16 @@ jobs:
         VCPKG_DEFAULT_TRIPLET: 'x64-windows-static'
         CMAKE_GENERATOR: 'Visual Studio 16 2019'
         CMAKE_GENERATOR_PLATFORM: x64
-        build.args: ' -DUNIT_TESTING=ON -DPRECONDITIONS=OFF -DCMAKE_BUILD_TYPE=Release'
+        build.args: ' -DUNIT_TESTING=ON -DPRECONDITIONS=OFF'
+        BuildType: Release
         AZ_SDK_C_NO_SAMPLES: 'true'
         PublishMapFiles: 'true'
       MacOS_x64_with_unit_test_no_preconditions:
         OSVmImage: 'macOS-10.15'
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-osx'
-        build.args: ' -DUNIT_TESTING=ON -DPRECONDITIONS=OFF -DCMAKE_BUILD_TYPE=Release'
+        build.args: ' -DUNIT_TESTING=ON -DPRECONDITIONS=OFF'
+        BuildType: Release
         AZ_SDK_C_NO_SAMPLES: 'true'
         PublishMapFiles: 'true'
 
@@ -209,6 +213,7 @@ jobs:
   variables:
     CMOCKA_XML_FILE: "%g-test-results.xml"
     CMOCKA_MESSAGE_OUTPUT: "xml"
+    BuildType: Debug
 
   steps:
   - checkout: self
@@ -229,6 +234,7 @@ jobs:
   - template: /eng/pipelines/templates/steps/cmake-build.yml
     parameters:
       BuildArgs: $(build.args)
+      BuildType: $(BuildType)
 
   # Run unit tests
   - script: |
