@@ -33,11 +33,6 @@
                     "name": "UNIT_TESTING",
                     "value": "True",
                     "type": "BOOL"
-                },
-                {
-                    "name": "UNIT_TESTING_MOCKS",
-                    "value": "False",
-                    "type": "BOOL"
                 }
             ]
         }
