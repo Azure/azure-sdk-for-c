@@ -6,6 +6,19 @@ jobs:
   condition: and(succeededOrFailed(), ne(variables['Skip.Test'], 'true'))
   strategy:
     matrix:
+      Linux_ARM_with_samples:
+        OSVmImage: 'ubuntu-18.04'
+        vcpkg.deps: ''
+        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
+        AptDependencies: 'gcc-arm-none-eabi'
+        build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake'
+      Linux_ARM_with_samples_no_preconditions:
+        OSVmImage: 'ubuntu-18.04'
+        vcpkg.deps: ''
+        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
+        AptDependencies: 'gcc-arm-none-eabi'
+        build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake -DPRECONDITIONS=OFF'
+
       # Build with no dependencies at all (No samples) - PRECONDITIONS ON
       # WARNINGS_AS_ERRORS          ON
       # TRANSPORT_CURL              OFF
@@ -15,14 +28,6 @@ jobs:
       # PRECONDITIONS               ON
       # LOGGING                     ON
       # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_NONE
-      Linux_ARM:
-        OSVmImage: 'ubuntu-18.04'
-        vcpkg.deps: ''
-        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        AZ_SDK_C_NO_SAMPLES: 'true'
-        # Install ARM compiler
-        AptDependencies: 'gcc-arm-none-eabi'
-        build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake'
       Linux_x64:
         OSVmImage: 'ubuntu-18.04'
         vcpkg.deps: ''
