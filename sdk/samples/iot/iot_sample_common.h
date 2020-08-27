@@ -184,7 +184,7 @@ uint32_t iot_sample_get_epoch_expiration_time_from_minutes(uint32_t minutes);
  * @param[in] sas_base64_encoded_key An #az_span containing the SAS key that will be used for
  * signing.
  * @param[in] sas_signature An #az_span containing the signature.
- * @param sas_base64_encoded_signed_signature An #az_span with sufficient capacity to hold the
+ * @param[out] sas_base64_encoded_signed_signature An #az_span with sufficient capacity to hold the
  * encoded signed signature.
  * @param[out] out_sas_base64_encoded_signed_signature A pointer to the #az_span containing the
  * encoded signed signature.

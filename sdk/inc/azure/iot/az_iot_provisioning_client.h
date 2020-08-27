@@ -26,6 +26,9 @@
 
 #include <azure/core/_az_cfg_prefix.h>
 
+/**
+ * @brief The client is fixed to a specific version of the Azure IoT Provisioning service.
+ */
 #define AZ_IOT_PROVISIONING_SERVICE_VERSION "2019-03-31"
 
 /**

@@ -34,14 +34,13 @@
 #include <openssl/hmac.h>
 
 #define IOT_SAMPLE_PRECONDITION_NOT_NULL(arg) \
-  do \
-  { \
-    if (arg == NULL) \
-    { \
-      IOT_SAMPLE_LOG_ERROR("Pointer is NULL."); \
-      exit(1); \
-    } \
-  } while (0)
+do {                                          \
+    if (arg == NULL)                          \
+    {                                         \
+      LOG_ERROR("Pointer is NULL.");          \
+      exit(1);                                \
+    }                                         \
+} while (0)
 
 //
 // MQTT endpoints
@@ -336,8 +335,7 @@ static az_result decode_base64_bytes(
   }
 
   // Get the source BIO to push through the filter
-  source_mem_bio
-      = BIO_new_mem_buf(az_span_ptr(base64_encoded_bytes), (int)az_span_size(base64_encoded_bytes));
+  source_mem_bio = BIO_new_mem_buf(az_span_ptr(base64_encoded_bytes), (int)az_span_size(base64_encoded_bytes));
   if (source_mem_bio == NULL)
   {
     BIO_free(base64_decoder);
