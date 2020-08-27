@@ -43,7 +43,8 @@ typedef enum
 } az_json_token_kind;
 
 /**
- * @brief A limited stack used by the #az_json_writer to track state information for validation.
+ * @brief A limited stack used by the #az_json_writer and #az_json_reader to track state information
+ * for processing and validation.
  */
 typedef struct
 {
@@ -85,11 +86,24 @@ typedef struct
 
   struct
   {
+    /// A flag to indicate whether the JSON string contained any escaped characters, used as an
+    /// optimization to avoid redundant checks. It is meaningless for any other token kind.
     bool string_has_escaped_chars;
+
+    /// This is the first segment in the entire JSON payload, if it was non-contiguous. Otherwise,
+    /// its set to #AZ_SPAN_NULL.
     az_span* pointer_to_first_buffer;
+
+    /// The segment index within the non-contiguous JSON payload where this token starts.
     int32_t start_buffer_index;
+
+    /// The offset within the particular segment within which this token starts.
     int32_t start_buffer_offset;
+
+    /// The segment index within the non-contiguous JSON payload where this token ends.
     int32_t end_buffer_index;
+
+    /// The offset within the particular segment within which this token ends.
     int32_t end_buffer_offset;
   } _internal;
 } az_json_token;
@@ -122,7 +136,7 @@ az_span az_json_token_copy_into_span(az_json_token const* json_token, az_span de
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The boolean value is returned.
- * @retval #AZ_ERROR_JSON_INVALID_STATE The kind is not #AZ_JSON_TOKEN_BOOLEAN.
+ * @retval #AZ_ERROR_JSON_INVALID_STATE The kind is not #AZ_JSON_TOKEN_TRUE or #AZ_JSON_TOKEN_FALSE.
  */
 AZ_NODISCARD az_result az_json_token_get_boolean(az_json_token const* json_token, bool* out_value);
 
@@ -245,7 +259,7 @@ typedef struct
 {
   struct
   {
-    // Currently, this is unused, but needed as a placeholder since we can't have an empty struct.
+    /// Currently, this is unused, but needed as a placeholder since we can't have an empty struct.
     bool unused;
   } _internal;
 } az_json_writer_options;
@@ -383,8 +397,8 @@ AZ_NODISCARD az_result az_json_writer_append_string(az_json_writer* ref_json_wri
  * @brief Appends an existing UTF-8 encoded JSON text into the buffer, useful for appending nested
  * JSON.
  *
- * @param[in,out] ref_json_writer A pointer to an #az_json_writer instance containing the buffer to append
- * the JSON text to.
+ * @param[in,out] ref_json_writer A pointer to an #az_json_writer instance containing the buffer to
+ * append the JSON text to.
  * @param[in] json_text A single, possibly nested, valid, UTF-8 encoded, JSON value to be written as
  * is, without any formatting or spacing changes. No modifications are made to this text, including
  * escaping.
@@ -554,7 +568,7 @@ typedef struct
 {
   struct
   {
-    // Currently, this is unused, but needed as a placeholder since we can't have an empty struct.
+    /// Currently, this is unused, but needed as a placeholder since we can't have an empty struct.
     bool unused;
   } _internal;
 } az_json_reader_options;
@@ -593,14 +607,36 @@ typedef struct
 
   struct
   {
+    /// The first buffer containing the JSON payload.
     az_span json_buffer;
+
+    /// The array of non-contiguous buffers containing the JSON payload, which will be null for the
+    /// single buffer case.
     az_span* json_buffers;
+
+    /// The number of non-contiguous buffer segments in the array. It is set to one for the single
+    /// buffer case.
     int32_t number_of_buffers;
+
+    /// The current buffer segment being processed while reading the JSON in non-contiguous buffer
+    /// segments.
     int32_t buffer_index;
+
+    /// The number of bytes consumed so far in the current buffer segment.
     int32_t bytes_consumed;
+
+    /// The total bytes consumed from the input JSON payload. In the case of a single buffer, this
+    /// is identical to bytes_consumed.
     int32_t total_bytes_consumed;
+
+    /// Flag which indicates that we have a JSON object or array in the payload, rather than a
+    /// single primitive token (string, number, true, false, null).
     bool is_complex_json;
+
+    /// A limited stack to track the depth and nested JSON objects or arrays read so far.
     _az_json_bit_stack bit_stack;
+
+    /// A copy of the options provided by the user.
     az_json_reader_options options;
   } _internal;
 } az_json_reader;

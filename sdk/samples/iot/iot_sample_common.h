@@ -18,42 +18,42 @@
 //
 // Logging
 //
-#define IOT_SAMPLE_LOG_ERROR(...) \
-  do \
-  { \
+#define IOT_SAMPLE_LOG_ERROR(...)                                                  \
+  do                                                                               \
+  {                                                                                \
     (void)fprintf(stderr, "ERROR:\t\t%s:%s():%d: ", __FILE__, __func__, __LINE__); \
-    (void)fprintf(stderr, __VA_ARGS__); \
-    (void)fprintf(stderr, "\n"); \
-    fflush(stdout); \
-    fflush(stderr); \
+    (void)fprintf(stderr, __VA_ARGS__);                                            \
+    (void)fprintf(stderr, "\n");                                                   \
+    fflush(stdout);                                                                \
+    fflush(stderr);                                                                \
   } while (0)
 
 #define IOT_SAMPLE_LOG_SUCCESS(...) \
-  do \
-  { \
-    (void)printf("SUCCESS:\t"); \
-    (void)printf(__VA_ARGS__); \
-    (void)printf("\n"); \
+  do                                \
+  {                                 \
+    (void)printf("SUCCESS:\t");     \
+    (void)printf(__VA_ARGS__);      \
+    (void)printf("\n");             \
   } while (0)
 
-#define IOT_SAMPLE_LOG(...) \
-  do \
-  { \
-    (void)printf("\t\t"); \
+#define IOT_SAMPLE_LOG(...)    \
+  do                           \
+  {                            \
+    (void)printf("\t\t");      \
     (void)printf(__VA_ARGS__); \
-    (void)printf("\n"); \
+    (void)printf("\n");        \
   } while (0)
 
-#define IOT_SAMPLE_LOG_AZ_SPAN(span_description, span) \
-  do \
-  { \
-    (void)printf("\t\t%s ", span_description); \
-    char* buffer = (char*)az_span_ptr(span); \
+#define IOT_SAMPLE_LOG_AZ_SPAN(span_description, span)                       \
+  do                                                                         \
+  {                                                                          \
+    (void)printf("\t\t%s ", span_description);                               \
+    char* buffer = (char*)az_span_ptr(span);                                 \
     for (int32_t az_span_i = 0; az_span_i < az_span_size(span); az_span_i++) \
-    { \
-      putchar(*buffer++); \
-    } \
-    (void)printf("\n"); \
+    {                                                                        \
+      putchar(*buffer++);                                                    \
+    }                                                                        \
+    (void)printf("\n");                                                      \
   } while (0)
 
 //
@@ -184,7 +184,7 @@ uint32_t iot_sample_get_epoch_expiration_time_from_minutes(uint32_t minutes);
  * @param[in] sas_base64_encoded_key An #az_span containing the SAS key that will be used for
  * signing.
  * @param[in] sas_signature An #az_span containing the signature.
- * @param sas_base64_encoded_signed_signature An #az_span with sufficient capacity to hold the
+ * @param[out] sas_base64_encoded_signed_signature An #az_span with sufficient capacity to hold the
  * encoded signed signature.
  * @param[out] out_sas_base64_encoded_signed_signature A pointer to the #az_span containing the
  * encoded signed signature.
