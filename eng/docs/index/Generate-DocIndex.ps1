@@ -8,6 +8,7 @@ Param (
 
 $ServiceMapping = @{
     "core"="Core";
+    "iot"="IoT";
     "storage"="Storage";
 }
 
@@ -23,44 +24,31 @@ New-Item -Path "${DocOutDir}" -Name "templates" -ItemType "directory"
 Copy-Item "${DocGenDir}/templates/*" -Destination "${DocOutDir}/templates" -Force -Recurse
 Copy-Item "${DocGenDir}/docfx.json" -Destination "${DocOutDir}/" -Force
 
-Write-Verbose "Creating Index using service directory and package names from repo..."
-$ServiceList = Get-ChildItem "$($RepoRoot)/sdk" -Directory -Exclude eng, mgmtcommon, template | Sort-Object
 $YmlPath = "${DocOutDir}/api"
 New-Item -Path $YmlPath -Name "toc.yml" -Force
 
-$TargetServices = $ServiceList | Where-Object { $ServiceMapping.Contains($_.Name) }
-
 Write-Verbose "Creating Index for client packages..."
-foreach ($Dir in $TargetServices)
+foreach ($ServiceKey in $ServiceMapping.Keys | Sort-Object)
 {
     # Generate a new top-level md file for the service
-    New-Item -Path $YmlPath -Name "$($Dir.Name).md" -Force
+    New-Item -Path $YmlPath -Name "$($ServiceKey).md" -Force
 
     # Add service to toc.yml
-    $ServiceName = If ($ServiceMapping.Contains($Dir.Name)) { $ServiceMapping[$Dir.Name] } Else { $Dir.Name }
-    Add-Content -Path "$($YmlPath)/toc.yml" -Value "- name: $($ServiceName)`r`n  href: $($Dir.Name).md"
-
-    $PkgList = Get-ChildItem $Dir.FullName -Directory -Exclude .vs, .vscode
-
-    if (($PkgList | Measure-Object).count -eq 0)
-    {
-        continue
+    $ServiceName = $ServiceMapping[$ServiceKey]
+    $CmakeContent = Get-Content "sdk/src/azure/$ServiceKey/CMakeLists.txt" -Raw
+    $ProjectName = if ($CmakeContent -match 'project\s.*\(([\w].*?)\s') {
+        $Matches[1]
+    } else {
+        "Azure SDK for Embedded C"
     }
-    Add-Content -Path "$($YmlPath)/$($Dir.Name).md" -Value "# Client"
-    Add-Content -Path "$($YmlPath)/$($Dir.Name).md" -Value "---"
-    Write-Verbose "Operating on Client Packages for $($Dir.Name)"
 
-    # Generate a new md file for each package in the service
-    foreach ($Pkg in $PkgList)
-    {
-        if (Test-Path "$($pkg.FullName)\package.txt")
-        {
-            $ProjectName = Get-Content "$($pkg.FullName)\package.txt"
-            Add-Content -Path "$($YmlPath)/$($Dir.Name).md" -Value "#### $($ProjectName)"
-        }
-    }
+    Add-Content -Path "$($YmlPath)/toc.yml" -Value "- name: $($ServiceName)`r`n  href: $($ServiceKey).md"
+
+    Add-Content -Path "$($YmlPath)/$($ServiceKey).md" -Value "# Client"
+    Add-Content -Path "$($YmlPath)/$($ServiceKey).md" -Value "---"
+    Add-Content -Path "$($YmlPath)/$($ServiceKey).md" -Value "### $ProjectName"
+    Write-Verbose "Operating on Client Packages for $($ServiceKey)"
 }
-
 
 Write-Verbose "Creating Site Title and Navigation..."
 New-Item -Path "${DocOutDir}" -Name "toc.yml" -Force
@@ -73,5 +61,7 @@ Copy-Item "$($RepoRoot)/CONTRIBUTING.md" -Destination "${DocOutDir}/api/CONTRIBU
 Write-Verbose "Building site..."
 & "${DocFxTool}" build "${DocOutDir}/docfx.json"
 
+Copy-Item "${DocGenDir}/assets/logo.svg" -Destination "${DocOutDir}/" -Force
+Copy-Item "${DocGenDir}/assets/toc.yml" -Destination "${DocOutDir}/" -Force
 Copy-Item "${DocGenDir}/assets/logo.svg" -Destination "${DocOutDir}/_site/" -Force
 Copy-Item "${DocGenDir}/assets/toc.yml" -Destination "${DocOutDir}/_site/" -Force
