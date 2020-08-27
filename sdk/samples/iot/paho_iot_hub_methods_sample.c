@@ -70,8 +70,8 @@ static void send_method_response(
  *
  *  {"response": "pong"}
  *
- * No other method commands are supported. If any other methods are attempted to be invoked, the
- * IOT_SAMPLE_LOG will report the method is not found.
+ * No other method commands are supported. If any other methods are attempted to be invoked, the log
+ * will report the method is not found.
  */
 int main(void)
 {
