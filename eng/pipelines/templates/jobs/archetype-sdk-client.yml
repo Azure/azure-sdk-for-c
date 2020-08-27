@@ -338,7 +338,15 @@ jobs:
       displayName: Download and Install Doxygen
 
       # Assumes AZURE_SDK_VERSION is set in the environment
-    - script: '"C:/Program Files/doxygen/bin/doxygen.exe" Doxyfile && [ -f "DoxygenWarningLog.txt" ] && (cat "DoxygenWarningLog.txt" | head -n 1 | tr -d "\n")'
+      # If doxygen produces any warnings, fail the step.
+    - pwsh: |
+        & 'C:\Program Files\doxygen\bin\doxygen.exe' Doxyfile
+        if (Test-Path "DoxygenWarningLog.txt" -PathType leaf)
+        {
+          Get-Content "DoxygenWarningLog.txt"
+          Write-Error "Warnings from the doxygen docs generation step are treated as error."
+          exit 1
+        }
       displayName: Generate docs
 
     - pwsh: New-Item -ItemType directory -Path $(Build.ArtifactStagingDirectory) -Name docs
