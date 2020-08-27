@@ -220,7 +220,7 @@ static void register_device_with_provisioning_service(void)
           rc = az_iot_provisioning_client_register_get_publish_topic(
               &provisioning_client, register_topic_buffer, sizeof(register_topic_buffer), NULL)))
   {
-    IOT_SAMPLE_LOG_ERROR("Failed to get thr Register topic: az_result return code 0x%08x.", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to get the Register topic: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -330,8 +330,8 @@ static void parse_device_registration_status_message(
 
   // Retrieve operation_status.
   if (az_failed(
-          rc
-          = az_iot_provisioning_client_parse_operation_status(out_register_response, out_operation_status)))
+          rc = az_iot_provisioning_client_parse_operation_status(
+              out_register_response, out_operation_status)))
   {
     IOT_SAMPLE_LOG_ERROR("Failed to parse operation_status: az_result return code 0x%08x.", rc);
     exit(rc);
