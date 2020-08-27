@@ -47,7 +47,7 @@ static az_result visit_component_properties(
       {
         if (az_failed(az_json_reader_next_token(jr)))
         {
-          LOG_ERROR("Failed to get next token.");
+          IOT_SAMPLE_LOG_ERROR("Failed to get next token.");
           return AZ_ERROR_UNEXPECTED_CHAR;
         }
         continue;
@@ -57,7 +57,7 @@ static az_result visit_component_properties(
 
       if (az_failed(az_json_reader_next_token(jr)))
       {
-        LOG_ERROR("Failed to get next token.");
+        IOT_SAMPLE_LOG_ERROR("Failed to get next token.");
         return AZ_ERROR_UNEXPECTED_CHAR;
       }
 
@@ -68,7 +68,7 @@ static az_result visit_component_properties(
     {
       if (az_failed(az_json_reader_skip_children(jr)))
       {
-        LOG_ERROR("Failed to skip children of object.");
+        IOT_SAMPLE_LOG_ERROR("Failed to skip children of object.");
         return AZ_ERROR_UNEXPECTED_CHAR;
       }
     }
@@ -90,7 +90,7 @@ static az_result json_child_token_move(az_json_reader* jr, az_span property_name
     {
       if (az_failed(az_json_reader_next_token(jr)))
       {
-        LOG_ERROR("Failed to get next token.");
+        IOT_SAMPLE_LOG_ERROR("Failed to get next token.");
         return AZ_ERROR_UNEXPECTED_CHAR;
       }
 
@@ -100,7 +100,7 @@ static az_result json_child_token_move(az_json_reader* jr, az_span property_name
     {
       if (az_failed(az_json_reader_skip_children(jr)))
       {
-        LOG_ERROR("Failed to skip child of complex object.");
+        IOT_SAMPLE_LOG_ERROR("Failed to skip child of complex object.");
         return AZ_ERROR_UNEXPECTED_CHAR;
       }
     }
@@ -304,7 +304,7 @@ az_result pnp_process_device_twin_message(
 
   if (!is_partial && az_failed(json_child_token_move(&jr, iot_hub_twin_desired)))
   {
-    LOG_ERROR("Failed to get desired property.");
+    IOT_SAMPLE_LOG_ERROR("Failed to get desired property.");
     return AZ_ERROR_UNEXPECTED_CHAR;
   }
 
@@ -312,7 +312,7 @@ az_result pnp_process_device_twin_message(
   if (az_failed(json_child_token_move(&copy_jr, iot_hub_twin_desired_version))
       || az_failed(az_json_token_get_int32(&(copy_jr.token), (int32_t*)&version)))
   {
-    LOG_ERROR("Failed to get version.");
+    IOT_SAMPLE_LOG_ERROR("Failed to get version.");
     return AZ_ERROR_UNEXPECTED_CHAR;
   }
 
@@ -326,7 +326,7 @@ az_result pnp_process_device_twin_message(
       {
         if (az_failed(az_json_reader_next_token(&jr)))
         {
-          LOG_ERROR("Failed to get next token.");
+          IOT_SAMPLE_LOG_ERROR("Failed to get next token.");
           return AZ_ERROR_UNEXPECTED_CHAR;
         }
         continue;
@@ -336,7 +336,7 @@ az_result pnp_process_device_twin_message(
 
       if (az_failed(az_json_reader_next_token(&jr)))
       {
-        LOG_ERROR("Failed to get next token.");
+        IOT_SAMPLE_LOG_ERROR("Failed to get next token.");
         return AZ_ERROR_UNEXPECTED_CHAR;
       }
 
@@ -350,7 +350,7 @@ az_result pnp_process_device_twin_message(
                 property_callback,
                 context_ptr)))
         {
-          LOG_ERROR("Failed to visit component properties.");
+          IOT_SAMPLE_LOG_ERROR("Failed to visit component properties.");
           return AZ_ERROR_UNEXPECTED_CHAR;
         }
       }
@@ -363,7 +363,7 @@ az_result pnp_process_device_twin_message(
     {
       if (az_failed(az_json_reader_skip_children(&jr)))
       {
-        LOG_ERROR("Failed to skip children of object.");
+        IOT_SAMPLE_LOG_ERROR("Failed to skip children of object.");
         return AZ_ERROR_UNEXPECTED_CHAR;
       }
     }
