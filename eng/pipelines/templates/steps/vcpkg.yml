@@ -111,13 +111,28 @@ steps:
         git reset --hard HEAD
         echo git pull origin master
         git pull origin master
+
+        echo git fetch
+        git fetch
+
+        echo git tag
+        git tag
+
         echo git checkout ${{ parameters.VcpkgVersion }}
         git checkout ${{ parameters.VcpkgVersion }}
 
-        git log
+        echo git remote -v
         git remote -v
+        echo git status
         git status
+        echo git branch
         git branch
+        echo git tag
+        git tag
+
+        echo git fetch --all --tags
+        git fetch --all --tags
+        git tag
 
         echo ./bootstrap-vcpkg.sh
         ./bootstrap-vcpkg.sh
