@@ -59,7 +59,6 @@ az_precondition_failed_fn az_precondition_failed_get_callback();
 #endif
 
 #ifdef AZ_NO_PRECONDITION_CHECKING
-#define _az_PRECONDITION(condition)
 #define _az_PRECONDITION(condition) _az_ANALYSIS_ASSUME(condition)
 #else
 #define _az_PRECONDITION(condition) \
