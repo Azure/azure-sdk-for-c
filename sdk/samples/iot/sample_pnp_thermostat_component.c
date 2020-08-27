@@ -1,24 +1,21 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifdef _MSC_VER
-// warning C4996: 'localtime': This function or variable may be unsafe.  Consider using localtime_s instead.
-#pragma warning(disable : 4996)
-#endif
-
-#include "iot_samples_common.h"
-#include "sample_pnp.h"
-#include "sample_pnp_mqtt_component.h"
-#include "sample_pnp_thermostat_component.h"
-
-#include <stdbool.h>
-#include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <time.h>
 
 #include <azure/core/az_json.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
+
+#include "sample_pnp.h"
+#include "sample_pnp_thermostat_component.h"
+
+#ifdef _MSC_VER
+// "'getenv': This function or variable may be unsafe. Consider using _dupenv_s instead."
+#pragma warning(disable : 4996)
+#endif
 
 #define DOUBLE_DECIMAL_PLACE_DIGITS 2
 
@@ -47,53 +44,34 @@ static const az_span max_temp_reported_property_name
 static const char iso_spec_time_format[] = "%Y-%m-%dT%H:%M:%S%z";
 
 static az_result build_command_response_payload(
-    const pnp_thermostat_component* thermostat_component,
+    sample_pnp_thermostat_component* thermostat_component,
+    az_json_writer* json_builder,
     az_span start_time_span,
     az_span end_time_span,
-    az_span payload,
-    az_span* out_payload)
+    az_span* response_payload)
 {
   double avg_temp = thermostat_component->device_temperature_avg_total
       / thermostat_component->device_temperature_avg_count;
 
   // Build the command response payload
-  az_json_writer jw;
-  AZ_RETURN_IF_FAILED(az_json_writer_init(&jw, payload, NULL));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, report_max_temp_name_span));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(json_builder));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(json_builder, report_max_temp_name_span));
   AZ_RETURN_IF_FAILED(az_json_writer_append_double(
-      &jw, thermostat_component->max_temperature, DOUBLE_DECIMAL_PLACE_DIGITS));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, report_min_temp_name_span));
+      json_builder, thermostat_component->max_temperature, DOUBLE_DECIMAL_PLACE_DIGITS));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(json_builder, report_min_temp_name_span));
   AZ_RETURN_IF_FAILED(az_json_writer_append_double(
-      &jw, thermostat_component->min_temperature, DOUBLE_DECIMAL_PLACE_DIGITS));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, report_avg_temp_name_span));
+      json_builder, thermostat_component->min_temperature, DOUBLE_DECIMAL_PLACE_DIGITS));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(json_builder, report_avg_temp_name_span));
   AZ_RETURN_IF_FAILED(
-      az_json_writer_append_double(&jw, avg_temp, DOUBLE_DECIMAL_PLACE_DIGITS));
+      az_json_writer_append_double(json_builder, avg_temp, DOUBLE_DECIMAL_PLACE_DIGITS));
   AZ_RETURN_IF_FAILED(
-      az_json_writer_append_property_name(&jw, report_start_time_name_span));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_string(&jw, start_time_span));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, report_end_time_name_span));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_string(&jw, end_time_span));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
+      az_json_writer_append_property_name(json_builder, report_start_time_name_span));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_string(json_builder, start_time_span));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(json_builder, report_end_time_name_span));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_string(json_builder, end_time_span));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(json_builder));
 
-  *out_payload = az_json_writer_get_bytes_used_in_destination(&jw);
-
-  return AZ_OK;
-}
-
-static az_result build_telemetry_message(
-    const pnp_thermostat_component* thermostat_component,
-    az_span payload,
-    az_span* out_payload)
-{
-  az_json_writer jw;
-  AZ_RETURN_IF_FAILED(az_json_writer_init(&jw, payload, NULL));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, telemetry_name));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_double(
-      &jw, thermostat_component->current_temperature, DOUBLE_DECIMAL_PLACE_DIGITS));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
-  *out_payload = az_json_writer_get_bytes_used_in_destination(&jw);
+  *response_payload = az_json_writer_get_bytes_used_in_destination(json_builder);
 
   return AZ_OK;
 }
@@ -101,7 +79,7 @@ static az_result build_telemetry_message(
 // Invoke the command requested from the service. Here, it generates a report for max, min, and avg
 // temperatures.
 static az_result invoke_getMaxMinReport(
-    const pnp_thermostat_component* thermostat_component,
+    sample_pnp_thermostat_component* thermostat_component,
     az_span payload,
     az_span response,
     az_span* out_response)
@@ -109,12 +87,12 @@ static az_result invoke_getMaxMinReport(
   // az_result result;
   // Parse the "since" field in the payload.
   az_span start_time_span = AZ_SPAN_NULL;
-  az_json_reader jr;
-  AZ_RETURN_IF_FAILED(az_json_reader_init(&jr, payload, NULL));
-  AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
+  az_json_reader jp;
+  AZ_RETURN_IF_FAILED(az_json_reader_init(&jp, payload, NULL));
+  AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jp));
   int32_t incoming_since_value_buffer_len;
   AZ_RETURN_IF_FAILED(az_json_token_get_string(
-      &jr.token,
+      &jp.token,
       incoming_since_value_buffer,
       sizeof(incoming_since_value_buffer),
       &incoming_since_value_buffer_len));
@@ -136,21 +114,40 @@ static az_result invoke_getMaxMinReport(
   size_t len = strftime(end_time_buffer, sizeof(end_time_buffer), iso_spec_time_format, timeinfo);
   az_span end_time_span = az_span_create((uint8_t*)end_time_buffer, (int32_t)len);
 
+  az_json_writer json_builder;
+  AZ_RETURN_IF_FAILED(az_json_writer_init(&json_builder, response, NULL));
   AZ_RETURN_IF_FAILED(build_command_response_payload(
-      thermostat_component, start_time_span, end_time_span, response, out_response));
+      thermostat_component, &json_builder, start_time_span, end_time_span, out_response));
 
   return AZ_OK;
 }
 
-static az_result append_double(az_json_writer* jw, void* value)
+static az_result build_telemetry_message(
+    sample_pnp_thermostat_component* thermostat_component,
+    az_span payload,
+    az_span* out_payload)
+{
+  az_json_writer json_builder;
+  AZ_RETURN_IF_FAILED(az_json_writer_init(&json_builder, payload, NULL));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&json_builder));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&json_builder, telemetry_name));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_double(
+      &json_builder, thermostat_component->current_temperature, DOUBLE_DECIMAL_PLACE_DIGITS));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&json_builder));
+  *out_payload = az_json_writer_get_bytes_used_in_destination(&json_builder);
+
+  return AZ_OK;
+}
+
+static az_result append_double(az_json_writer* json_writer, void* value)
 {
   double value_as_double = *(double*)value;
 
-  return az_json_writer_append_double(jw, value_as_double, DOUBLE_DECIMAL_PLACE_DIGITS);
+  return az_json_writer_append_double(json_writer, value_as_double, DOUBLE_DECIMAL_PLACE_DIGITS);
 }
 
-az_result pnp_thermostat_init(
-    pnp_thermostat_component* thermostat_component,
+az_result sample_pnp_thermostat_init(
+    sample_pnp_thermostat_component* thermostat_component,
     az_span component_name,
     double initial_temp)
 {
@@ -171,42 +168,12 @@ az_result pnp_thermostat_init(
   return AZ_OK;
 }
 
-az_result pnp_thermostat_get_telemetry_message(
-    const az_iot_hub_client* client,
-    const pnp_thermostat_component* thermostat_component,
-    pnp_mqtt_message* mqtt_message)
+bool sample_pnp_thermostat_get_max_temp_report(
+    az_iot_hub_client* client,
+    sample_pnp_thermostat_component* thermostat_component,
+    sample_pnp_mqtt_message* mqtt_message)
 {
-  az_result rc;
-  if (az_failed(
-          rc = pnp_get_telemetry_topic(
-              client,
-              NULL,
-              thermostat_component->component_name,
-              mqtt_message->topic,
-              mqtt_message->topic_length,
-              NULL)))
-  {
-    LOG_ERROR("Failed to get pnp Telemetry topic: az_result return code 0x%08x.", rc);
-    return rc;
-  }
-
-  if (az_failed(
-          rc = build_telemetry_message(
-              thermostat_component, mqtt_message->payload_span, &mqtt_message->out_payload_span)))
-  {
-    LOG_ERROR("Failed to build telemetry payload: az_result return code 0x%08x.", rc);
-    return rc;
-  }
-
-  return rc;
-}
-
-bool pnp_thermostat_get_max_temp_report(
-    const az_iot_hub_client* client,
-    pnp_thermostat_component* thermostat_component,
-    pnp_mqtt_message* mqtt_message)
-{
-  az_result rc;
+  az_result result;
 
   if (!thermostat_component->send_max_temp_property)
   {
@@ -214,7 +181,7 @@ bool pnp_thermostat_get_max_temp_report(
   }
 
   if (az_failed(
-          rc = pnp_create_reported_property(
+          result = pnp_create_reported_property(
               mqtt_message->payload_span,
               thermostat_component->component_name,
               max_temp_reported_property_name,
@@ -222,18 +189,18 @@ bool pnp_thermostat_get_max_temp_report(
               &thermostat_component->max_temperature,
               &mqtt_message->out_payload_span)))
   {
-    LOG_ERROR("Failed to get reported property: az_result return code 0x%08x.", rc);
+    printf("Could not get reported property: error code = 0x%08x\n", result);
     return false;
   }
   else if (az_failed(
-               rc = az_iot_hub_client_twin_patch_get_publish_topic(
+               result = az_iot_hub_client_twin_patch_get_publish_topic(
                    client,
                    get_request_id(),
                    mqtt_message->topic,
                    mqtt_message->topic_length,
                    NULL)))
   {
-    LOG_ERROR("Failed to get reported property topic with status: az_result return code 0x%08x.", rc);
+    printf("Error to get reported property topic with status: error code = 0x%08x\n", result);
     return false;
   }
 
@@ -242,14 +209,44 @@ bool pnp_thermostat_get_max_temp_report(
   return true;
 }
 
-az_result pnp_thermostat_process_property_update(
-    const az_iot_hub_client* client,
-    pnp_thermostat_component* thermostat_component,
+az_result sample_pnp_thermostat_get_telemetry_message(
+    az_iot_hub_client* client,
+    sample_pnp_thermostat_component* thermostat_component,
+    sample_pnp_mqtt_message* mqtt_message)
+{
+  az_result result;
+  if (az_failed(
+          result = pnp_get_telemetry_topic(
+              client,
+              NULL,
+              thermostat_component->component_name,
+              mqtt_message->topic,
+              mqtt_message->topic_length,
+              NULL)))
+  {
+    printf("Could not get pnp telemetry topic: error code = 0x%08x\n", result);
+    return result;
+  }
+
+  if (az_failed(
+          result = build_telemetry_message(
+              thermostat_component, mqtt_message->payload_span, &mqtt_message->out_payload_span)))
+  {
+    printf("Could not build telemetry payload: error code = 0x%08x\n", result);
+    return result;
+  }
+
+  return result;
+}
+
+az_result sample_pnp_thermostat_process_property_update(
+    az_iot_hub_client* client,
+    sample_pnp_thermostat_component* thermostat_component,
     az_span component_name,
-    const az_json_token* property_name,
-    const az_json_reader* property_value,
+    az_json_token* property_name,
+    az_json_reader* property_value,
     int32_t version,
-    pnp_mqtt_message* mqtt_message)
+    sample_pnp_mqtt_message* mqtt_message)
 {
   az_result result;
 
@@ -260,7 +257,10 @@ az_result pnp_thermostat_process_property_update(
 
   if (!az_json_token_is_text_equal(property_name, desired_temp_property_name))
   {
-    LOG_AZ_SPAN("PnP property is not supported on thermostat component:", property_name->slice);
+    printf(
+        "PnP property=%.*s is not supported on thermostat component\n",
+        az_span_size(property_name->slice),
+        az_span_ptr(property_name->slice));
   }
 
   double parsed_value = 0;
@@ -309,7 +309,7 @@ az_result pnp_thermostat_process_property_update(
                 temp_response_description_success,
                 &mqtt_message->out_payload_span)))
     {
-      LOG_ERROR("Failed to get reported property payload with status: az_result return code 0x%08x.", result);
+      printf("Error to get reported property payload with status: error code = 0x%08x\n", result);
     }
   }
 
@@ -317,21 +317,20 @@ az_result pnp_thermostat_process_property_update(
           result = az_iot_hub_client_twin_patch_get_publish_topic(
               client, get_request_id(), mqtt_message->topic, mqtt_message->topic_length, NULL)))
   {
-    LOG_ERROR("Failed to get reported property topic with status: az_result return code 0x%08x.", result);
+    printf("Error to get reported property topic with status: error code = 0x%08x\n", result);
   }
 
   return result;
 }
 
-az_result pnp_thermostat_process_command(
-    const az_iot_hub_client* client,
-    const pnp_thermostat_component* thermostat_component,
-    const az_iot_hub_client_method_request* command_request,
+az_result sample_pnp_thermostat_process_command(
+    az_iot_hub_client* client,
+    sample_pnp_thermostat_component* thermostat_component,
+    az_iot_hub_client_method_request* command_request,
     az_span component_name,
     az_span command_name,
     az_span command_payload,
-    pnp_mqtt_message* mqtt_message,
-    az_iot_status* status)
+    sample_pnp_mqtt_message* mqtt_message)
 {
   az_result result;
 
@@ -339,6 +338,7 @@ az_result pnp_thermostat_process_command(
       && az_span_is_content_equal(report_command_name_span, command_name))
   {
     // Invoke command
+    uint16_t return_code;
     az_result response = invoke_getMaxMinReport(
         thermostat_component,
         command_payload,
@@ -346,23 +346,23 @@ az_result pnp_thermostat_process_command(
         &mqtt_message->out_payload_span);
     if (response != AZ_OK)
     {
-      *status = AZ_IOT_STATUS_BAD_REQUEST;
+      return_code = 400;
     }
     else
     {
-      *status = AZ_IOT_STATUS_OK;
+      return_code = 200;
     }
 
     if (az_failed(
             result = az_iot_hub_client_methods_response_get_publish_topic(
                 client,
                 command_request->request_id,
-                (uint16_t)*status,
+                return_code,
                 mqtt_message->topic,
                 mqtt_message->topic_length,
                 mqtt_message->out_topic_length)))
     {
-      LOG_ERROR("Failed to get methods response publish topic: az_result return code 0x%08x.", result);
+      printf("Unable to get methods response publish topic: error code = 0x%08x\n", result);
       return result;
     }
   }

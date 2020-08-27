@@ -1,12 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "iot_samples_common.h"
 #include "sample_pnp.h"
 
-#include <stdbool.h>
-#include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #include <azure/core/az_json.h>
 #include <azure/core/az_result.h>
@@ -26,53 +24,54 @@ static const az_span desired_temp_ack_version_name = AZ_SPAN_LITERAL_FROM_STR("a
 static const az_span desired_temp_ack_description_name = AZ_SPAN_LITERAL_FROM_STR("ad");
 static const az_span component_specifier_name = AZ_SPAN_LITERAL_FROM_STR("__t");
 static const az_span component_specifier_value = AZ_SPAN_LITERAL_FROM_STR("c");
-static const az_span command_separator = AZ_SPAN_LITERAL_FROM_STR("/");
-static const az_span iot_hub_twin_desired_version = AZ_SPAN_LITERAL_FROM_STR("$version");
-static const az_span iot_hub_twin_desired = AZ_SPAN_LITERAL_FROM_STR("desired");
+static const az_span command_separator = AZ_SPAN_LITERAL_FROM_STR("*");
+static const az_span sample_iot_hub_twin_desired_version = AZ_SPAN_LITERAL_FROM_STR("$version");
+static const az_span sample_iot_hub_twin_desired = AZ_SPAN_LITERAL_FROM_STR("desired");
 
 // Visit each valid property for the component
 static az_result visit_component_properties(
     az_span component_name,
-    az_json_reader* jr,
+    az_json_reader* json_reader,
     int32_t version,
     pnp_property_callback property_callback,
     void* context_ptr)
 {
-  while (az_succeeded(az_json_reader_next_token(jr)))
+  while (az_succeeded(az_json_reader_next_token(json_reader)))
   {
-    if (jr->token.kind == AZ_JSON_TOKEN_PROPERTY_NAME)
+    if (json_reader->token.kind == AZ_JSON_TOKEN_PROPERTY_NAME)
     {
-      if (az_json_token_is_text_equal(&(jr->token), component_specifier_name)
-          || az_json_token_is_text_equal(&(jr->token), iot_hub_twin_desired_version))
+      if (az_json_token_is_text_equal(&(json_reader->token), component_specifier_name)
+          || az_json_token_is_text_equal(
+              &(json_reader->token), sample_iot_hub_twin_desired_version))
       {
-        if (az_failed(az_json_reader_next_token(jr)))
+        if (az_failed(az_json_reader_next_token(json_reader)))
         {
-          LOG_ERROR("Failed to get next token.");
+          printf("Failed to next token\r\n");
           return AZ_ERROR_UNEXPECTED_CHAR;
         }
         continue;
       }
 
-      az_json_token property_name = jr->token;
+      az_json_token property_name = json_reader->token;
 
-      if (az_failed(az_json_reader_next_token(jr)))
+      if (az_failed(az_json_reader_next_token(json_reader)))
       {
-        LOG_ERROR("Failed to get next token.");
+        printf("Failed to get next token\r\n");
         return AZ_ERROR_UNEXPECTED_CHAR;
       }
 
-      property_callback(component_name, &property_name, *jr, version, context_ptr);
+      property_callback(component_name, &property_name, *json_reader, version, context_ptr);
     }
 
-    if (jr->token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT)
+    if (json_reader->token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT)
     {
-      if (az_failed(az_json_reader_skip_children(jr)))
+      if (az_failed(az_json_reader_skip_children(json_reader)))
       {
-        LOG_ERROR("Failed to skip children of object.");
+        printf("Failed to skip children of object\r\n");
         return AZ_ERROR_UNEXPECTED_CHAR;
       }
     }
-    else if (jr->token.kind == AZ_JSON_TOKEN_END_OBJECT)
+    else if (json_reader->token.kind == AZ_JSON_TOKEN_END_OBJECT)
     {
       break;
     }
@@ -82,29 +81,30 @@ static az_result visit_component_properties(
 }
 
 // Move reader to the value of property name
-static az_result json_child_token_move(az_json_reader* jr, az_span property_name)
+static az_result sample_json_child_token_move(az_json_reader* json_reader, az_span property_name)
 {
-  while (az_succeeded(az_json_reader_next_token(jr)))
+  while (az_succeeded(az_json_reader_next_token(json_reader)))
   {
-    if ((jr->token.kind == AZ_JSON_TOKEN_PROPERTY_NAME) && az_json_token_is_text_equal(&(jr->token), property_name))
+    if ((json_reader->token.kind == AZ_JSON_TOKEN_PROPERTY_NAME)
+        && az_json_token_is_text_equal(&(json_reader->token), property_name))
     {
-      if (az_failed(az_json_reader_next_token(jr)))
+      if (az_failed(az_json_reader_next_token(json_reader)))
       {
-        LOG_ERROR("Failed to get next token.");
+        printf("Failed to read next token\r\n");
         return AZ_ERROR_UNEXPECTED_CHAR;
       }
 
       return AZ_OK;
     }
-    else if (jr->token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT)
+    else if (json_reader->token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT)
     {
-      if (az_failed(az_json_reader_skip_children(jr)))
+      if (az_failed(az_json_reader_skip_children(json_reader)))
       {
-        LOG_ERROR("Failed to skip child of complex object.");
+        printf("Failed to skip child of complex object\r\n");
         return AZ_ERROR_UNEXPECTED_CHAR;
       }
     }
-    else if (jr->token.kind == AZ_JSON_TOKEN_END_OBJECT)
+    else if (json_reader->token.kind == AZ_JSON_TOKEN_END_OBJECT)
     {
       return AZ_ERROR_ITEM_NOT_FOUND;
     }
@@ -116,8 +116,8 @@ static az_result json_child_token_move(az_json_reader* jr, az_span property_name
 // Check if the component name is in the model
 static az_result is_component_in_model(
     az_span component_name,
-    const az_span** components_ptr,
-    int32_t components_num,
+    const az_span** sample_components_ptr,
+    int32_t sample_components_num,
     int32_t* out_index)
 {
   int32_t index = 0;
@@ -127,9 +127,9 @@ static az_result is_component_in_model(
     return AZ_ERROR_UNEXPECTED_CHAR;
   }
 
-  while (index < components_num)
+  while (index < sample_components_num)
   {
-    if (az_span_is_content_equal(component_name, *components_ptr[index]))
+    if (az_span_is_content_equal(component_name, *sample_components_ptr[index]))
     {
       *out_index = index;
       return AZ_OK;
@@ -143,14 +143,14 @@ static az_result is_component_in_model(
 
 // Get the telemetry topic for PnP
 az_result pnp_get_telemetry_topic(
-    const az_iot_hub_client* client,
-    az_iot_message_properties* properties,
+    az_iot_hub_client const* client,
+    az_iot_hub_client_properties* properties,
     az_span component_name,
     char* mqtt_topic,
     size_t mqtt_topic_size,
     size_t* out_mqtt_topic_length)
 {
-  az_iot_message_properties pnp_properties;
+  az_iot_hub_client_properties pnp_properties;
 
   if (az_span_ptr(component_name) != NULL)
   {
@@ -158,11 +158,11 @@ az_result pnp_get_telemetry_topic(
     {
       properties = &pnp_properties;
 
-      AZ_RETURN_IF_FAILED(az_iot_message_properties_init(
+      AZ_RETURN_IF_FAILED(az_iot_hub_client_properties_init(
           properties, AZ_SPAN_FROM_BUFFER(pnp_properties_buffer), 0));
     }
 
-    AZ_RETURN_IF_FAILED(az_iot_message_properties_append(
+    AZ_RETURN_IF_FAILED(az_iot_hub_client_properties_append(
         properties, component_telemetry_prop_span, component_name));
   }
 
@@ -177,7 +177,7 @@ az_result pnp_get_telemetry_topic(
 }
 
 // Parse the component name and command name from a span
-void pnp_parse_command_name(
+az_result pnp_parse_command_name(
     az_span component_command,
     az_span* component_name,
     az_span* pnp_command_name)
@@ -194,6 +194,8 @@ void pnp_parse_command_name(
     *component_name = AZ_SPAN_NULL;
     *pnp_command_name = component_command;
   }
+
+  return AZ_OK;
 }
 
 // Create a reported property payload
@@ -205,30 +207,31 @@ az_result pnp_create_reported_property(
     void* context,
     az_span* out_span)
 {
-  az_json_writer jw;
-  AZ_RETURN_IF_FAILED(az_json_writer_init(&jw, json_buffer, NULL));
+  az_json_writer json_writer;
+  AZ_RETURN_IF_FAILED(az_json_writer_init(&json_writer, json_buffer, NULL));
 
-  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
-
-  if (az_span_ptr(component_name) != NULL)
-  {
-    AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, component_name));
-    AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
-    AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, component_specifier_name));
-    AZ_RETURN_IF_FAILED(az_json_writer_append_string(&jw, component_specifier_value));
-  }
-
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, property_name));
-  AZ_RETURN_IF_FAILED(append_callback(&jw, context));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&json_writer));
 
   if (az_span_ptr(component_name) != NULL)
   {
-    AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
+    AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&json_writer, component_name));
+    AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&json_writer));
+    AZ_RETURN_IF_FAILED(
+        az_json_writer_append_property_name(&json_writer, component_specifier_name));
+    AZ_RETURN_IF_FAILED(az_json_writer_append_string(&json_writer, component_specifier_value));
   }
 
-  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&json_writer, property_name));
+  AZ_RETURN_IF_FAILED(append_callback(&json_writer, context));
 
-  *out_span = az_json_writer_get_bytes_used_in_destination(&jw);
+  if (az_span_ptr(component_name) != NULL)
+  {
+    AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&json_writer));
+  }
+
+  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&json_writer));
+
+  *out_span = az_json_writer_get_bytes_used_in_destination(&json_writer);
 
   return AZ_OK;
 }
@@ -245,129 +248,135 @@ az_result pnp_create_reported_property_with_status(
     az_span ack_description,
     az_span* out_span)
 {
-  az_json_writer jw;
+  az_json_writer json_writer;
 
-  AZ_RETURN_IF_FAILED(az_json_writer_init(&jw, json_buffer, NULL));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
+  AZ_RETURN_IF_FAILED(az_json_writer_init(&json_writer, json_buffer, NULL));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&json_writer));
   if (az_span_ptr(component_name) != NULL)
   {
-    AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, component_name));
-    AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
-    AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, component_specifier_name));
-    AZ_RETURN_IF_FAILED(az_json_writer_append_string(&jw, component_specifier_value));
+    AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&json_writer, component_name));
+    AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&json_writer));
+    AZ_RETURN_IF_FAILED(
+        az_json_writer_append_property_name(&json_writer, component_specifier_name));
+    AZ_RETURN_IF_FAILED(az_json_writer_append_string(&json_writer, component_specifier_value));
   }
 
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, property_name));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, desired_temp_response_value_name));
-  AZ_RETURN_IF_FAILED(append_callback(&jw, context));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, desired_temp_ack_code_name));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_int32(&jw, ack_code));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, desired_temp_ack_version_name));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_int32(&jw, ack_version));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&json_writer, property_name));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&json_writer));
+  AZ_RETURN_IF_FAILED(
+      az_json_writer_append_property_name(&json_writer, desired_temp_response_value_name));
+  AZ_RETURN_IF_FAILED(append_callback(&json_writer, context));
+  AZ_RETURN_IF_FAILED(
+      az_json_writer_append_property_name(&json_writer, desired_temp_ack_code_name));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_int32(&json_writer, ack_code));
+  AZ_RETURN_IF_FAILED(
+      az_json_writer_append_property_name(&json_writer, desired_temp_ack_version_name));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_int32(&json_writer, ack_version));
 
   if (az_span_ptr(ack_description) != NULL)
   {
-    AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, desired_temp_ack_description_name));
-    AZ_RETURN_IF_FAILED(az_json_writer_append_string(&jw, ack_description));
+    AZ_RETURN_IF_FAILED(
+        az_json_writer_append_property_name(&json_writer, desired_temp_ack_description_name));
+    AZ_RETURN_IF_FAILED(az_json_writer_append_string(&json_writer, ack_description));
   }
 
-  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&json_writer));
+  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&json_writer));
 
   if (az_span_ptr(component_name) != NULL)
   {
-    AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
+    AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&json_writer));
   }
 
-  *out_span = az_json_writer_get_bytes_used_in_destination(&jw);
+  *out_span = az_json_writer_get_bytes_used_in_destination(&json_writer);
 
   return AZ_OK;
 }
 
 // Process the twin properties and invoke user callback for each property
-az_result pnp_process_device_twin_message(
-    az_span twin_message_span,
+az_result pnp_process_twin_data(
+    az_json_reader* json_reader,
     bool is_partial,
-    const az_span** components_ptr,
-    int32_t components_num,
+    const az_span** sample_components_ptr,
+    int32_t sample_components_num,
     pnp_property_callback property_callback,
     void* context_ptr)
 {
-  az_json_reader jr;
-  az_json_reader copy_jr;
+  az_json_reader copy_json_reader;
   int32_t version;
   int32_t index;
 
-  AZ_RETURN_IF_FAILED(az_json_reader_init(&jr, twin_message_span, NULL));
-  AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
+  AZ_RETURN_IF_FAILED(az_json_reader_next_token(json_reader));
 
-  if (!is_partial && az_failed(json_child_token_move(&jr, iot_hub_twin_desired)))
+  if (!is_partial
+      && az_failed(sample_json_child_token_move(json_reader, sample_iot_hub_twin_desired)))
   {
-    LOG_ERROR("Failed to get desired property.");
+    printf("Failed to get desired property\r\n");
     return AZ_ERROR_UNEXPECTED_CHAR;
   }
 
-  copy_jr = jr;
-  if (az_failed(json_child_token_move(&copy_jr, iot_hub_twin_desired_version))
-      || az_failed(az_json_token_get_int32(&(copy_jr.token), (int32_t*)&version)))
+  copy_json_reader = *json_reader;
+  if (az_failed(
+          sample_json_child_token_move(&copy_json_reader, sample_iot_hub_twin_desired_version))
+      || az_failed(az_json_token_get_int32(&(copy_json_reader.token), (int32_t*)&version)))
   {
-    LOG_ERROR("Failed to get version.");
+    printf("Failed to get version\r\n");
     return AZ_ERROR_UNEXPECTED_CHAR;
   }
 
   az_json_token property_name;
 
-  while (az_succeeded(az_json_reader_next_token(&jr)))
+  while (az_succeeded(az_json_reader_next_token(json_reader)))
   {
-    if (jr.token.kind == AZ_JSON_TOKEN_PROPERTY_NAME)
+    if (json_reader->token.kind == AZ_JSON_TOKEN_PROPERTY_NAME)
     {
-      if (az_json_token_is_text_equal(&(jr.token), iot_hub_twin_desired_version))
+      if (az_json_token_is_text_equal(&(json_reader->token), sample_iot_hub_twin_desired_version))
       {
-        if (az_failed(az_json_reader_next_token(&jr)))
+        if (az_failed(az_json_reader_next_token(json_reader)))
         {
-          LOG_ERROR("Failed to get next token.");
+          printf("Failed to next token\r\n");
           return AZ_ERROR_UNEXPECTED_CHAR;
         }
         continue;
       }
 
-      property_name = jr.token;
+      property_name = json_reader->token;
 
-      if (az_failed(az_json_reader_next_token(&jr)))
+      if (az_failed(az_json_reader_next_token(json_reader)))
       {
-        LOG_ERROR("Failed to get next token.");
+        printf("Failed to next token\r\n");
         return AZ_ERROR_UNEXPECTED_CHAR;
       }
 
-      if (jr.token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT && components_ptr != NULL
-          && (az_succeeded(is_component_in_model(property_name.slice, components_ptr, components_num, &index))))
+      if (json_reader->token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT && sample_components_ptr != NULL
+          && (az_succeeded(is_component_in_model(
+              property_name.slice, sample_components_ptr, sample_components_num, &index))))
       {
         if (az_failed(visit_component_properties(
-                *components_ptr[index],
-                &jr,
+                *sample_components_ptr[index],
+                json_reader,
                 version,
                 property_callback,
                 context_ptr)))
         {
-          LOG_ERROR("Failed to visit component properties.");
+          printf("Failed to visit component properties\r\n");
           return AZ_ERROR_UNEXPECTED_CHAR;
         }
       }
       else
       {
-        property_callback(AZ_SPAN_NULL, &property_name, jr, version, context_ptr);
+        property_callback(AZ_SPAN_NULL, &property_name, *json_reader, version, context_ptr);
       }
     }
-    else if (jr.token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT)
+    else if (json_reader->token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT)
     {
-      if (az_failed(az_json_reader_skip_children(&jr)))
+      if (az_failed(az_json_reader_skip_children(json_reader)))
       {
-        LOG_ERROR("Failed to skip children of object.");
+        printf("Failed to skip children of object\r\n");
         return AZ_ERROR_UNEXPECTED_CHAR;
       }
     }
-    else if (jr.token.kind == AZ_JSON_TOKEN_END_OBJECT)
+    else if (json_reader->token.kind == AZ_JSON_TOKEN_END_OBJECT)
     {
       break;
     }

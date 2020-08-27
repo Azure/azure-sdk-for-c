@@ -210,6 +210,100 @@ AZ_NODISCARD az_result az_iot_hub_client_sas_get_password(
     size_t mqtt_password_size,
     size_t* out_mqtt_password_length);
 
+/**
+ *
+ * Properties APIs
+ *
+ *   IoT Hub message properties are used for Device-to-Cloud (D2C) as well as Cloud-to-Device (C2D).
+ *   Properties are always appended to the MQTT topic of the published or received message and
+ *   must contain Uri-encoded keys and values.
+ */
+
+/**
+ * @brief Telemetry or C2D properties.
+ *
+ */
+typedef struct
+{
+  struct
+  {
+    az_span properties_buffer;
+    int32_t properties_written;
+    uint32_t current_property_index;
+  } _internal;
+} az_iot_hub_client_properties;
+
+/**
+ * @brief Initializes the Telemetry or C2D properties.
+ *
+ * @note The properties init API will not encode properties. In order to support
+ *       the following characters, they must be percent-encoded (RFC3986) as follows:
+ *          `/` : `%2F`
+ *          `%` : `%25`
+ *          `#` : `%23`
+ *          `&` : `%26`
+ *       Only these characters would have to be encoded. If you would like to avoid the need to
+ *       encode the names/values, avoid using these characters in names and values.
+ *
+ * @param[in] properties The #az_iot_hub_client_properties to initialize
+ * @param[in] buffer Can either be an empty #az_span or an #az_span containing properly formatted
+ *                   (with above mentioned characters encoded if applicable) properties with the
+ *                   following format: {key}={value}&{key}={value}.
+ * @param[in] written_length The length of the properly formatted properties already initialized
+ * within the buffer. If the \p buffer is empty (uninitialized), this should be 0.
+ * @return #az_result
+ */
+AZ_NODISCARD az_result az_iot_hub_client_properties_init(
+    az_iot_hub_client_properties* properties,
+    az_span buffer,
+    int32_t written_length);
+
+/**
+ * @brief Appends a key-value property to the list of properties.
+ *
+ * @note The properties append API will not encode properties. In order to support
+ *       the following characters, they must be percent-encoded (RFC3986) as follows:
+ *          `/` : `%2F`
+ *          `%` : `%25`
+ *          `#` : `%23`
+ *          `&` : `%26`
+ *       Only these characters would have to be encoded. If you would like to avoid the need to
+ *       encode the names/values, avoid using these characters in names and values.
+ *
+ * @param[in] properties The #az_iot_hub_client_properties to use for this call
+ * @param[in] name The name of the property.
+ * @param[in] value The value of the property.
+ * @return #az_result
+ */
+AZ_NODISCARD az_result az_iot_hub_client_properties_append(
+    az_iot_hub_client_properties* properties,
+    az_span name,
+    az_span value);
+
+/**
+ * @brief Finds the value of a property.
+ * @remark This will return the first value of the property with the given name if multiple
+ * properties with the same key exist.
+ *
+ * @param[in] properties The #az_iot_hub_client_properties to use for this call
+ * @param[in] name The name of the property.
+ * @param[out] out_value An #az_span containing the value of the property.
+ * @return #az_result.
+ */
+AZ_NODISCARD az_result az_iot_hub_client_properties_find(
+    az_iot_hub_client_properties* properties,
+    az_span name,
+    az_span* out_value);
+
+/**
+ * @brief Iterates over the list of properties.
+ *
+ * @param[in] properties The #az_iot_hub_client_properties to use for this call
+ * @param[out] out An #az_pair containing the key and the value of the next property.
+ * @return #az_result
+ */
+AZ_NODISCARD az_result
+az_iot_hub_client_properties_next(az_iot_hub_client_properties* properties, az_pair* out);
 
 /**
  *
@@ -223,7 +317,7 @@ AZ_NODISCARD az_result az_iot_hub_client_sas_get_password(
  * @remark This topic can also be used to set the MQTT Will message in the Connect message.
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
- * @param[in] properties An optional #az_iot_message_properties object (can be NULL).
+ * @param[in] properties An optional #az_iot_hub_client_properties object (can be NULL).
  * @param[out] mqtt_topic A buffer with sufficient capacity to hold the MQTT topic. If
  *                        successful, contains a null-terminated string with the topic that
  *                        needs to be passed to the MQTT client.
@@ -234,7 +328,7 @@ AZ_NODISCARD az_result az_iot_hub_client_sas_get_password(
  */
 AZ_NODISCARD az_result az_iot_hub_client_telemetry_get_publish_topic(
     az_iot_hub_client const* client,
-    az_iot_message_properties const* properties,
+    az_iot_hub_client_properties const* properties,
     char* mqtt_topic,
     size_t mqtt_topic_size,
     size_t* out_mqtt_topic_length);
@@ -257,7 +351,7 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_get_publish_topic(
  */
 typedef struct
 {
-  az_iot_message_properties properties; /**< The properties associated with this C2D request. */
+  az_iot_hub_client_properties properties; /**< The properties associated with this C2D request. */
 } az_iot_hub_client_c2d_request;
 
 /**

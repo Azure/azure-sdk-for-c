@@ -36,7 +36,7 @@ AZ_NODISCARD az_result az_iot_hub_client_c2d_parse_received_topic(
 
   token = _az_span_token(reminder, c2d_topic_suffix, &reminder);
   AZ_RETURN_IF_FAILED(
-      az_iot_message_properties_init(&out_request->properties, token, az_span_size(token)));
+      az_iot_hub_client_properties_init(&out_request->properties, token, az_span_size(token)));
 
   return AZ_OK;
 }

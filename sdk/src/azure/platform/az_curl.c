@@ -520,8 +520,8 @@ _az_http_client_curl_setup_response_redirect(CURL* ref_curl, az_http_response* r
 }
 
 /**
- * @brief use this function to group all the actions that we do with CURL so we can clean it after
- * it no matter is there is an error at any step.
+ * @brief use this method to group all the actions that we do with CURL so we can clean it after it
+ * no matter is there is an error at any step.
  *
  * @param ref_curl curl specific structure used to send an http request
  * @param request http builder with specific data to build an http request

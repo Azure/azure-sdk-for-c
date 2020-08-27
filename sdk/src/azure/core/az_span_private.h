@@ -25,8 +25,8 @@ enum
 };
 
 /**
- * @brief A portable implementation of the standard `isfinite()` function, which may not be
- * available on certain embedded systems that use older compilers.
+ * @brief A portable implementation of the standard isfinite method, which may not be available on
+ * certain embedded systems that use older compilers.
  *
  * @param value The 64-bit floating point value to test.
  * @return `true` if the \p value is finite (that is, it is not infinite or not a number), otherwise

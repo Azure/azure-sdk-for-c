@@ -62,6 +62,64 @@ AZ_NODISCARD az_result az_http_request_init(
   return AZ_OK;
 }
 
+AZ_NODISCARD az_result
+az_http_request_append_path(az_http_request* ref_request, az_span path, bool is_path_url_encoded)
+{
+  _az_PRECONDITION_NOT_NULL(ref_request);
+
+  int32_t const initial_url_length = ref_request->_internal.url_length;
+  int32_t const initial_query_start = ref_request->_internal.query_start;
+  az_span const url = ref_request->_internal.url;
+
+  int32_t const path_size
+      = is_path_url_encoded ? az_span_size(path) : _az_span_url_encode_calc_length(path);
+
+  // Add 1 for the /.
+  int32_t const size_after_insert = initial_url_length + 1 + path_size;
+  if (az_span_size(url) < size_after_insert)
+  {
+    return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
+  }
+
+  // To begin, assume we are appending at the end of the url.
+  int32_t query_start = initial_url_length;
+
+  // There is an existing query parameter (i.e. URL with a question mark).
+  if (initial_query_start > 0)
+  {
+    // We are appending in the middle of the URL, so, we will need to shift some existing content to
+    // the right.
+    query_start = initial_query_start - 1;
+
+    // Get the span where to move the content, leaving enough room for the path and /.
+    az_span shifted_dst = az_span_slice_to_end(url, query_start + 1 + path_size);
+    // Get the span slice needed to be moved before appending the path.
+    az_span shifted_src = az_span_slice(url, query_start, initial_url_length);
+    // Move content left or right so there is room for path to be added.
+    az_span_copy(shifted_dst, shifted_src);
+
+    // Move past the /, path, and ? since that will be the new start of the next query.
+    ref_request->_internal.query_start = query_start + 2 + path_size;
+  }
+
+  // Add the path delimiter.
+  az_span destination = az_span_copy_u8(az_span_slice_to_end(url, query_start), '/');
+
+  // Copy the path, after url encoding it, if necessary.
+  if (is_path_url_encoded)
+  {
+    az_span_copy(destination, path);
+  }
+  else
+  {
+    int32_t ignored = 0;
+    AZ_RETURN_IF_FAILED(_az_span_url_encode(destination, path, &ignored));
+  }
+
+  ref_request->_internal.url_length = size_after_insert;
+  return AZ_OK;
+}
+
 AZ_NODISCARD az_result az_http_request_set_query_parameter(
     az_http_request* ref_request,
     az_span name,

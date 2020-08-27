@@ -2,13 +2,12 @@
 // SPDX-License-Identifier: MIT
 
 #ifdef _MSC_VER
-#pragma warning(push)
 // warning C4201: nonstandard extension used: nameless struct/union
 #pragma warning(disable : 4201)
 #endif
 #include <paho-mqtt/MQTTClient.h>
 #ifdef _MSC_VER
-#pragma warning(pop)
+#pragma warning(default : 4201)
 #endif
 
 #include "iot_samples_common.h"
@@ -101,7 +100,7 @@ static void create_and_configure_mqtt_client(void)
   if (az_failed(rc = read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars)))
   {
     LOG_ERROR(
-        "Failed to read configuration from environment variables: az_result return code 0x%08x.",
+        "Failed to read configuration from environment variables: az_result return code 0x%04x.",
         rc);
     exit(rc);
   }
@@ -112,7 +111,7 @@ static void create_and_configure_mqtt_client(void)
           rc = create_mqtt_endpoint(
               SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer))))
   {
-    LOG_ERROR("Failed to create MQTT endpoint: az_result return code 0x%08x.", rc);
+    LOG_ERROR("Failed to create MQTT endpoint: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
@@ -121,7 +120,7 @@ static void create_and_configure_mqtt_client(void)
           rc = az_iot_hub_client_init(
               &hub_client, env_vars.hub_hostname, env_vars.hub_device_id, NULL)))
   {
-    LOG_ERROR("Failed to initialize hub client: az_result return code 0x%08x.", rc);
+    LOG_ERROR("Failed to initialize hub client: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
@@ -131,7 +130,7 @@ static void create_and_configure_mqtt_client(void)
           rc = az_iot_hub_client_get_client_id(
               &hub_client, mqtt_client_id_buffer, sizeof(mqtt_client_id_buffer), NULL)))
   {
-    LOG_ERROR("Failed to get MQTT client id: az_result return code 0x%08x.", rc);
+    LOG_ERROR("Failed to get MQTT client id: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
@@ -158,7 +157,7 @@ static void connect_mqtt_client_to_iot_hub(void)
           rc = az_iot_hub_client_get_user_name(
               &hub_client, mqtt_client_username_buffer, sizeof(mqtt_client_username_buffer), NULL)))
   {
-    LOG_ERROR("Failed to get MQTT client username: az_result return code 0x%08x.", rc);
+    LOG_ERROR("Failed to get MQTT client username: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
@@ -231,7 +230,7 @@ static void receive_method_messages(void)
     {
       topic_len = (int)strlen(topic);
     }
-    LOG_SUCCESS("Message #%d: Client received a message from the service.", message_count + 1);
+    LOG_SUCCESS("Message #%d: Client received message from the service.", message_count + 1);
 
     // Parse method message and invoke method.
     az_iot_hub_client_method_request method_request;
@@ -239,7 +238,7 @@ static void receive_method_messages(void)
     LOG_SUCCESS("Client parsed message.");
 
     invoke_method(&method_request);
-    LOG(" "); // formatting.
+    LOG(" "); // formatting
 
     MQTTClient_freeMessage(&message);
     MQTTClient_free(topic);
@@ -265,7 +264,7 @@ static void parse_method_message(
     const MQTTClient_message* message,
     az_iot_hub_client_method_request* method_request)
 {
-  az_result rc;
+  int rc;
   az_span topic_span = az_span_create((uint8_t*)topic, topic_len);
   az_span message_span = az_span_create((uint8_t*)message->payload, message->payloadlen);
 
@@ -274,7 +273,7 @@ static void parse_method_message(
           rc = az_iot_hub_client_methods_parse_received_topic(
               &hub_client, topic_span, method_request)))
   {
-    LOG_ERROR("Message from unknown topic: az_result return code 0x%08x.", rc);
+    LOG_ERROR("Message from unknown topic: az_result return code 0x%04x.", rc);
     LOG_AZ_SPAN("Topic:", topic_span);
     exit(rc);
   }
@@ -323,7 +322,7 @@ static void send_method_response(
               sizeof(methods_response_topic_buffer),
               NULL)))
   {
-    LOG_ERROR("Failed to get Methods response publish topic: az_result return code 0x%08x.", rc);
+    LOG_ERROR("Failed to get Methods response publish topic: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 

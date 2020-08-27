@@ -2,13 +2,12 @@
 // SPDX-License-Identifier: MIT
 
 #ifdef _MSC_VER
-#pragma warning(push)
 // warning C4201: nonstandard extension used: nameless struct/union
 #pragma warning(disable : 4201)
 #endif
 #include <paho-mqtt/MQTTClient.h>
 #ifdef _MSC_VER
-#pragma warning(pop)
+#pragma warning(default : 4201)
 #endif
 
 #include "iot_samples_common.h"
@@ -48,8 +47,7 @@ static void parse_registration_message(
     const MQTTClient_message* message,
     az_iot_provisioning_client_register_response* response,
     az_iot_provisioning_client_operation_status* operation_status);
-static void send_operation_query_message(
-    const az_iot_provisioning_client_register_response* response);
+static void send_operation_query_message(const az_iot_provisioning_client_register_response* response);
 
 /*
  * This sample registers a device with the Azure IoT Device Provisioning Service.
@@ -86,7 +84,7 @@ static void create_and_configure_mqtt_client(void)
   // Reads in environment variables set by user for purposes of running sample.
   if (az_failed(rc = read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars)))
   {
-    LOG_ERROR("Failed to read environment variables: az_result return code 0x%08x.", rc);
+    LOG_ERROR("Failed to read environment variables: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
@@ -96,7 +94,7 @@ static void create_and_configure_mqtt_client(void)
           rc = create_mqtt_endpoint(
               SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer))))
   {
-    LOG_ERROR("Failed to create MQTT endpoint: az_result return code 0x%08x.", rc);
+    LOG_ERROR("Failed to create MQTT endpoint: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
@@ -110,7 +108,7 @@ static void create_and_configure_mqtt_client(void)
               env_vars.provisioning_registration_id,
               NULL)))
   {
-    LOG_ERROR("Failed to initialize provisioning client: az_result return code 0x%08x.", rc);
+    LOG_ERROR("Failed to initialize provisioning client: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
@@ -120,7 +118,7 @@ static void create_and_configure_mqtt_client(void)
           rc = az_iot_provisioning_client_get_client_id(
               &provisioning_client, mqtt_client_id_buffer, sizeof(mqtt_client_id_buffer), NULL)))
   {
-    LOG_ERROR("Failed to get MQTT client id: az_result return code 0x%08x.", rc);
+    LOG_ERROR("Failed to get MQTT client id: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
@@ -150,7 +148,7 @@ static void connect_mqtt_client_to_provisioning_service(void)
               sizeof(mqtt_client_username_buffer),
               NULL)))
   {
-    LOG_ERROR("Failed to get MQTT client username: az_result return code 0x%08x.", rc);
+    LOG_ERROR("Failed to get MQTT client username: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
@@ -208,7 +206,7 @@ static void register_device_with_provisioning_service(void)
               sizeof(register_publish_topic_buffer),
               NULL)))
   {
-    LOG_ERROR("Failed to get MQTT register publish topic: az_result return code 0x%08x.", rc);
+    LOG_ERROR("Failed to get MQTT register publish topic: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
@@ -259,7 +257,7 @@ static void receive_device_registration_status(void)
     {
       topic_len = (int)strlen(topic);
     }
-    LOG_SUCCESS("Client received a message from the provisioning service.");
+    LOG_SUCCESS("Client received a message from provisioning service.");
 
     // Parse registration message.
     parse_registration_message(topic, topic_len, message, &register_response, &operation_status);
@@ -323,7 +321,7 @@ static void parse_registration_message(
     az_iot_provisioning_client_register_response* register_response,
     az_iot_provisioning_client_operation_status* operation_status)
 {
-  az_result rc;
+  int rc;
   az_span topic_span = az_span_create((uint8_t*)topic, topic_len);
   az_span message_span = az_span_create((uint8_t*)message->payload, message->payloadlen);
 
@@ -332,7 +330,7 @@ static void parse_registration_message(
           rc = az_iot_provisioning_client_parse_received_topic_and_payload(
               &provisioning_client, topic_span, message_span, register_response)))
   {
-    LOG_ERROR("Message from unknown topic: az_result return code 0x%08x.", rc);
+    LOG_ERROR("Message from unknown topic: az_result return code 0x%04x.", rc);
     LOG_AZ_SPAN("Topic:", topic_span);
     exit(rc);
   }
@@ -346,7 +344,7 @@ static void parse_registration_message(
           rc
           = az_iot_provisioning_client_parse_operation_status(register_response, operation_status)))
   {
-    LOG_ERROR("Failed to parse operation_status: az_result return code 0x%08x.", rc);
+    LOG_ERROR("Failed to parse operation_status: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 }
@@ -366,7 +364,7 @@ static void send_operation_query_message(
               sizeof(query_topic_buffer),
               NULL)))
   {
-    LOG_ERROR("Unable to get query status publish topic: az_result return code 0x%08x.", rc);
+    LOG_ERROR("Unable to get query status publish topic: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 

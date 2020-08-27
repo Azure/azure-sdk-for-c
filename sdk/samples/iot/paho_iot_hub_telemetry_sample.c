@@ -2,13 +2,12 @@
 // SPDX-License-Identifier: MIT
 
 #ifdef _MSC_VER
-#pragma warning(push)
 // warning C4201: nonstandard extension used: nameless struct/union
 #pragma warning(disable : 4201)
 #endif
 #include <paho-mqtt/MQTTClient.h>
 #ifdef _MSC_VER
-#pragma warning(pop)
+#pragma warning(default : 4201)
 #endif
 
 #include "iot_samples_common.h"
@@ -70,7 +69,7 @@ static void create_and_configure_mqtt_client(void)
   if (az_failed(rc = read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars)))
   {
     LOG_ERROR(
-        "Failed to read configuration from environment variables: az_result return code 0x%08x.",
+        "Failed to read configuration from environment variables: az_result return code 0x%04x.",
         rc);
     exit(rc);
   }
@@ -81,7 +80,7 @@ static void create_and_configure_mqtt_client(void)
           rc = create_mqtt_endpoint(
               SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer))))
   {
-    LOG_ERROR("Failed to create MQTT endpoint: az_result return code 0x%08x.", rc);
+    LOG_ERROR("Failed to create MQTT endpoint: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
@@ -90,7 +89,7 @@ static void create_and_configure_mqtt_client(void)
           rc = az_iot_hub_client_init(
               &hub_client, env_vars.hub_hostname, env_vars.hub_device_id, NULL)))
   {
-    LOG_ERROR("Failed to initialize hub client: az_result return code 0x%08x.", rc);
+    LOG_ERROR("Failed to initialize hub client: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
@@ -100,7 +99,7 @@ static void create_and_configure_mqtt_client(void)
           rc = az_iot_hub_client_get_client_id(
               &hub_client, mqtt_client_id_buffer, sizeof(mqtt_client_id_buffer), NULL)))
   {
-    LOG_ERROR("Failed to get MQTT client id: az_result return code 0x%08x.", rc);
+    LOG_ERROR("Failed to get MQTT client id: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
@@ -127,7 +126,7 @@ static void connect_mqtt_client_to_iot_hub(void)
           rc = az_iot_hub_client_get_user_name(
               &hub_client, mqtt_client_username_buffer, sizeof(mqtt_client_username_buffer), NULL)))
   {
-    LOG_ERROR("Failed to get MQTT username: az_result return code 0x%08x.", rc);
+    LOG_ERROR("Failed to get MQTT username: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
@@ -168,7 +167,7 @@ static void send_telemetry_messages_to_iot_hub(void)
           rc = az_iot_hub_client_telemetry_get_publish_topic(
               &hub_client, NULL, telemetry_topic_buffer, sizeof(telemetry_topic_buffer), NULL)))
   {
-    LOG_ERROR("Failed to get Telemetry publish topic: az_result return code 0x%08x.", rc);
+    LOG_ERROR("Failed to get Telemetry publish topic: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 

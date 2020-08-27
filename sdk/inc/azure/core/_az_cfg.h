@@ -2,10 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 /**
- * @file
+ * @file _az_cfg.h
  *
- * @brief Warnings configuration and common macros for Azure SDK code.
- * Do not include this file directly.
+ * @brief Disable warnings.
  *
  * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
  * prefixed with an underscore ('_') directly in your application code. These symbols
@@ -52,9 +51,6 @@
 #ifndef _az_CFG_H
 #define _az_CFG_H
 
-/**
- * @brief Inline function.
- */
 #ifdef _MSC_VER
 #define AZ_INLINE static __forceinline
 #elif defined(__GNUC__) || defined(__clang__) // !_MSC_VER
@@ -72,9 +68,6 @@
   } while (0)
 #endif // __GNUC__ >= 7
 
-/**
- * @brief Enforce that the return value is handled (only applicable on supported compilers).
- */
 #ifdef _MSC_VER
 #define AZ_NODISCARD _Check_return_
 #elif defined(__GNUC__) || defined(__clang__) // !_MSC_VER

@@ -18,20 +18,12 @@ steps:
         --kusto-database-var KUSTO_DB `
         --kusto-table-var KUSTO_TABLE `
         --identity "$(Build.QueuedBy)"
+      $resolvedIdentity = $result[-1] | ConvertFrom-Json
 
-      $resolvedIdentity = ""
-      try { $resolvedIdentity = $result[-1] | ConvertFrom-Json } catch {}
+      Write-Host $resolvedIdentity
 
-      if($resolvedIdentity) {
-        Write-Host $resolvedIdentity
-
-        Write-Host "##vso[task.setvariable variable=${{ parameters.TargetVariable }}]$($resolvedIdentity.GithubUserName)"
-      }
-      else {
-        Write-Host "Unable to locate a github user for identity $(Build.QueuedBy)"
-      }
+      Write-Output "##vso[task.setvariable variable=${{ parameters.TargetVariable }}]$($resolvedIdentity.GithubUserName)"
     displayName: 'Resolving Queuing User'
-    continueOnError: true
     workingDirectory: $(Build.SourcesDirectory)/tools_repo/tools/notification-configuration/identity-resolver
     env:
       APP_ID: $(notification-aad-app-id)
@@ -49,6 +41,6 @@ steps:
       $originalValue = "$(${{ parameters.TargetVariable }})"
       $result = $(Build.SourcesDirectory)/eng/common/scripts/get-codeowners.ps1 -TargetDirectory /sdk/${{ parameters.ServiceDirectory }}/ -RootDirectory $(Build.SourcesDirectory)
       if ($result) {
-        Write-Host "##vso[task.setvariable variable=${{ parameters.TargetVariable }}]$originalValue,$result"
+        Write-Output "##vso[task.setvariable variable=${{ parameters.TargetVariable }}]$originalValue,$result"
       }
     displayName: Add CodeOwners if Present

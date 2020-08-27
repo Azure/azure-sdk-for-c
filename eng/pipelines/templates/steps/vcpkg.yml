@@ -61,6 +61,24 @@ steps:
         contains(variables['OSVmImage'], 'ubuntu')
       )
 
+  # Attempt to restore vcpkg from the cache
+  - task: Cache@2
+    inputs:
+      key: >-
+        $(Agent.JobName)
+        | "${{ parameters.VcpkgVersion }}"
+        | $(Agent.Os)
+        | $(${{ parameters.DependenciesVariableName }})
+      path: $(VCPKG_INSTALLATION_ROOT)
+      cacheHitVar: VcpkgRestoredFromCache
+    displayName: Vcpkg Cache
+    condition: >-
+      and(
+        succeeded(),
+        not(eq(variables['${{ parameters.DependenciesVariableName }}'], '')),
+        not(eq(variables['Skip.VcpkgCache'], 'true'))
+      )
+
   # Install vcpkg on MacOS
   - task: Bash@3
     inputs:
@@ -70,10 +88,6 @@ steps:
         git clone https://github.com/Microsoft/vcpkg.git
         cd vcpkg
         git rev-parse --verify HEAD
-
-        # Make sure to fetch all the tags to avoid failures on checkout.
-        git fetch --all --tags
-
         git checkout ${{ parameters.VcpkgVersion }}
         git status
 
@@ -111,10 +125,6 @@ steps:
         # then pull
         git reset --hard HEAD
         git pull origin master
-
-        # Make sure to fetch all the tags to avoid failures on checkout.
-        git fetch --all --tags
-
         git checkout ${{ parameters.VcpkgVersion }}
 
         ./bootstrap-vcpkg.sh

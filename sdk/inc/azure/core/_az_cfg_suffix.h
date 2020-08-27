@@ -2,10 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 /**
- * @file
+ * @file _az_cfg_suffix.h
  *
- * @brief Closes "extern C" and restores warnings state.
- * Do not include this file directly.
+ * @brief Close "extern C" and restore warnings state.
  *
  * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
  * prefixed with an underscore ('_') directly in your application code. These symbols

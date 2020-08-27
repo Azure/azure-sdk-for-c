@@ -11,13 +11,13 @@
 #include <azure/core/_az_cfg.h>
 
 AZ_NODISCARD az_result az_json_writer_init(
-    az_json_writer* out_json_writer,
+    az_json_writer* json_writer,
     az_span destination_buffer,
     az_json_writer_options const* options)
 {
-  _az_PRECONDITION_NOT_NULL(out_json_writer);
+  _az_PRECONDITION_NOT_NULL(json_writer);
 
-  *out_json_writer = (az_json_writer){
+  *json_writer = (az_json_writer){
     ._internal = {
       .destination_buffer = destination_buffer,
       .allocator_callback = NULL,
@@ -34,16 +34,16 @@ AZ_NODISCARD az_result az_json_writer_init(
 }
 
 AZ_NODISCARD az_result az_json_writer_chunked_init(
-    az_json_writer* out_json_writer,
+    az_json_writer* json_writer,
     az_span first_destination_buffer,
     az_span_allocator_fn allocator_callback,
     void* user_context,
     az_json_writer_options const* options)
 {
-  _az_PRECONDITION_NOT_NULL(out_json_writer);
+  _az_PRECONDITION_NOT_NULL(json_writer);
   _az_PRECONDITION_NOT_NULL(allocator_callback);
 
-  *out_json_writer = (az_json_writer){
+  *json_writer = (az_json_writer){
     ._internal = {
       .destination_buffer = first_destination_buffer,
       .allocator_callback = allocator_callback,
@@ -59,40 +59,37 @@ AZ_NODISCARD az_result az_json_writer_chunked_init(
   return AZ_OK;
 }
 
-static AZ_NODISCARD az_span
-_get_remaining_span(az_json_writer* ref_json_writer, int32_t required_size)
+static AZ_NODISCARD az_span _get_remaining_span(az_json_writer* json_writer, int32_t required_size)
 {
-  _az_PRECONDITION_NOT_NULL(ref_json_writer);
+  _az_PRECONDITION_NOT_NULL(json_writer);
   _az_PRECONDITION(required_size > 0);
 
   az_span remaining = az_span_slice_to_end(
-      ref_json_writer->_internal.destination_buffer, ref_json_writer->_internal.bytes_written);
+      json_writer->_internal.destination_buffer, json_writer->_internal.bytes_written);
 
-  if (az_span_size(remaining) < required_size
-      && ref_json_writer->_internal.allocator_callback != NULL)
+  if (az_span_size(remaining) < required_size && json_writer->_internal.allocator_callback != NULL)
   {
     az_span_allocator_context context = {
-      .user_context = ref_json_writer->_internal.user_context,
-      .bytes_used = ref_json_writer->_internal.bytes_written,
+      .user_context = json_writer->_internal.user_context,
+      .bytes_used = json_writer->_internal.bytes_written,
       .minimum_required_size = required_size,
     };
 
     // No more space left in the destination, let the caller fail with
     // AZ_ERROR_INSUFFICIENT_SPAN_SIZE
-    if (!az_succeeded(ref_json_writer->_internal.allocator_callback(&context, &remaining)))
+    if (!az_succeeded(json_writer->_internal.allocator_callback(&context, &remaining)))
     {
       return AZ_SPAN_NULL;
     }
-    ref_json_writer->_internal.destination_buffer = remaining;
-    ref_json_writer->_internal.bytes_written = 0;
+    json_writer->_internal.destination_buffer = remaining;
+    json_writer->_internal.bytes_written = 0;
   }
 
   return remaining;
 }
 
-// This validation method is used outside of just preconditions, within
-// az_json_writer_append_json_text.
-static AZ_NODISCARD bool _az_is_appending_value_valid(az_json_writer const* json_writer)
+#ifndef AZ_NO_PRECONDITION_CHECKING
+static AZ_NODISCARD bool _az_is_appending_value_valid(az_json_writer* json_writer)
 {
   _az_PRECONDITION_NOT_NULL(json_writer);
 
@@ -134,8 +131,7 @@ static AZ_NODISCARD bool _az_is_appending_value_valid(az_json_writer const* json
   return true;
 }
 
-#ifndef AZ_NO_PRECONDITION_CHECKING
-static AZ_NODISCARD bool _az_is_appending_property_name_valid(az_json_writer const* json_writer)
+static AZ_NODISCARD bool _az_is_appending_property_name_valid(az_json_writer* json_writer)
 {
   _az_PRECONDITION_NOT_NULL(json_writer);
 
@@ -155,7 +151,7 @@ static AZ_NODISCARD bool _az_is_appending_property_name_valid(az_json_writer con
 }
 
 static AZ_NODISCARD bool _az_is_appending_container_end_valid(
-    az_json_writer const* json_writer,
+    az_json_writer* json_writer,
     uint8_t byte)
 {
   _az_PRECONDITION_NOT_NULL(json_writer);
@@ -383,27 +379,27 @@ static AZ_NODISCARD az_span _az_json_writer_escape_and_copy(az_span destination,
 }
 
 AZ_INLINE void _az_update_json_writer_state(
-    az_json_writer* ref_json_writer,
+    az_json_writer* json_writer,
     int32_t bytes_written_in_last,
     int32_t total_bytes_written,
     bool need_comma,
     az_json_token_kind token_kind)
 {
-  ref_json_writer->_internal.bytes_written += bytes_written_in_last;
-  ref_json_writer->_internal.total_bytes_written += total_bytes_written;
-  ref_json_writer->_internal.need_comma = need_comma;
-  ref_json_writer->_internal.token_kind = token_kind;
+  json_writer->_internal.bytes_written += bytes_written_in_last;
+  json_writer->_internal.total_bytes_written += total_bytes_written;
+  json_writer->_internal.need_comma = need_comma;
+  json_writer->_internal.token_kind = token_kind;
 }
 
 static AZ_NODISCARD az_result az_json_writer_span_copy_chunked(
-    az_json_writer* ref_json_writer,
+    az_json_writer* json_writer,
     az_span* remaining_json,
     az_span value)
 {
   if (az_span_size(value) < az_span_size(*remaining_json))
   {
     *remaining_json = az_span_copy(*remaining_json, value);
-    ref_json_writer->_internal.bytes_written += az_span_size(value);
+    json_writer->_internal.bytes_written += az_span_size(value);
   }
   else
   {
@@ -417,10 +413,10 @@ static AZ_NODISCARD az_result az_json_writer_span_copy_chunked(
       }
 
       az_span_copy(*remaining_json, value_slice_that_fits);
-      ref_json_writer->_internal.bytes_written += az_span_size(value_slice_that_fits);
+      json_writer->_internal.bytes_written += az_span_size(value_slice_that_fits);
 
       value = az_span_slice_to_end(value, az_span_size(value_slice_that_fits));
-      *remaining_json = _get_remaining_span(ref_json_writer, _az_MINIMUM_STRING_CHUNK_SIZE);
+      *remaining_json = _get_remaining_span(json_writer, _az_MINIMUM_STRING_CHUNK_SIZE);
       AZ_RETURN_IF_NOT_ENOUGH_SIZE(*remaining_json, _az_MINIMUM_STRING_CHUNK_SIZE);
     }
   }
@@ -428,13 +424,13 @@ static AZ_NODISCARD az_result az_json_writer_span_copy_chunked(
 }
 
 static AZ_NODISCARD az_result
-az_json_writer_append_string_small(az_json_writer* ref_json_writer, az_span value)
+az_json_writer_append_string_small(az_json_writer* json_writer, az_span value)
 {
   _az_PRECONDITION(az_span_size(value) <= _az_MAX_UNESCAPED_STRING_SIZE_PER_CHUNK);
 
   int32_t required_size = 2; // For the surrounding quotes.
 
-  if (ref_json_writer->_internal.need_comma)
+  if (json_writer->_internal.need_comma)
   {
     required_size++; // For the leading comma separator.
   }
@@ -444,10 +440,10 @@ az_json_writer_append_string_small(az_json_writer* ref_json_writer, az_span valu
 
   _az_PRECONDITION(required_size <= _az_MINIMUM_STRING_CHUNK_SIZE);
 
-  az_span remaining_json = _get_remaining_span(ref_json_writer, required_size);
+  az_span remaining_json = _get_remaining_span(json_writer, required_size);
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(remaining_json, required_size);
 
-  if (ref_json_writer->_internal.need_comma)
+  if (json_writer->_internal.need_comma)
   {
     remaining_json = az_span_copy_u8(remaining_json, ',');
   }
@@ -472,28 +468,28 @@ az_json_writer_append_string_small(az_json_writer* ref_json_writer, az_span valu
   az_span_copy_u8(remaining_json, '"');
 
   _az_update_json_writer_state(
-      ref_json_writer, required_size, required_size, true, AZ_JSON_TOKEN_STRING);
+      json_writer, required_size, required_size, true, AZ_JSON_TOKEN_STRING);
   return AZ_OK;
 }
 
 static AZ_NODISCARD az_result
-az_json_writer_append_string_chunked(az_json_writer* ref_json_writer, az_span value)
+az_json_writer_append_string_chunked(az_json_writer* json_writer, az_span value)
 {
   _az_PRECONDITION(az_span_size(value) > _az_MAX_UNESCAPED_STRING_SIZE_PER_CHUNK);
 
-  az_span remaining_json = _get_remaining_span(ref_json_writer, _az_MINIMUM_STRING_CHUNK_SIZE);
+  az_span remaining_json = _get_remaining_span(json_writer, _az_MINIMUM_STRING_CHUNK_SIZE);
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(remaining_json, _az_MINIMUM_STRING_CHUNK_SIZE);
 
   int32_t required_size = 2; // For the surrounding quotes.
-  if (ref_json_writer->_internal.need_comma)
+  if (json_writer->_internal.need_comma)
   {
     remaining_json = az_span_copy_u8(remaining_json, ',');
     required_size++;
-    ref_json_writer->_internal.bytes_written++;
+    json_writer->_internal.bytes_written++;
   }
 
   remaining_json = az_span_copy_u8(remaining_json, '"');
-  ref_json_writer->_internal.bytes_written++;
+  json_writer->_internal.bytes_written++;
 
   int32_t consumed = 0;
   do
@@ -506,7 +502,7 @@ az_json_writer_append_string_chunked(az_json_writer* ref_json_writer, az_span va
     if (index_of_first_escaped_char == -1)
     {
       AZ_RETURN_IF_FAILED(
-          az_json_writer_span_copy_chunked(ref_json_writer, &remaining_json, value_slice));
+          az_json_writer_span_copy_chunked(json_writer, &remaining_json, value_slice));
       consumed += az_span_size(value_slice);
     }
     else
@@ -514,7 +510,7 @@ az_json_writer_append_string_chunked(az_json_writer* ref_json_writer, az_span va
       // Bulk copy the characters that didn't need to be escaped before dropping to the byte-by-byte
       // encode and copy.
       AZ_RETURN_IF_FAILED(az_json_writer_span_copy_chunked(
-          ref_json_writer,
+          json_writer,
           &remaining_json,
           az_span_slice(value_slice, 0, index_of_first_escaped_char)));
 
@@ -523,11 +519,11 @@ az_json_writer_append_string_chunked(az_json_writer* ref_json_writer, az_span va
       uint8_t* value_ptr = az_span_ptr(value_slice);
       uint8_t const ch = value_ptr[index_of_first_escaped_char];
 
-      remaining_json = _get_remaining_span(ref_json_writer, _az_MINIMUM_STRING_CHUNK_SIZE);
+      remaining_json = _get_remaining_span(json_writer, _az_MINIMUM_STRING_CHUNK_SIZE);
       AZ_RETURN_IF_NOT_ENOUGH_SIZE(remaining_json, _az_MINIMUM_STRING_CHUNK_SIZE);
 
       int32_t written = _az_json_writer_escape_next_byte_and_copy(&remaining_json, ch);
-      ref_json_writer->_internal.bytes_written += written;
+      json_writer->_internal.bytes_written += written;
 
       // Only account for the difference in the number of bytes written when escaped
       // compared to when the bytes are copied as is.
@@ -537,47 +533,47 @@ az_json_writer_append_string_chunked(az_json_writer* ref_json_writer, az_span va
     }
   } while (consumed < az_span_size(value));
 
-  remaining_json = _get_remaining_span(ref_json_writer, _az_MINIMUM_STRING_CHUNK_SIZE);
+  remaining_json = _get_remaining_span(json_writer, _az_MINIMUM_STRING_CHUNK_SIZE);
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(remaining_json, _az_MINIMUM_STRING_CHUNK_SIZE);
 
   az_span_copy_u8(remaining_json, '"');
-  ref_json_writer->_internal.bytes_written++;
+  json_writer->_internal.bytes_written++;
 
   // Currently, required_size only counts the escaped bytes, so add back the length of the input
   // string (consumed == az_span_size(value));
   required_size += consumed;
 
   // We already tracked and updated bytes_written while writing, so no need to update it here.
-  _az_update_json_writer_state(ref_json_writer, 0, required_size, true, AZ_JSON_TOKEN_STRING);
+  _az_update_json_writer_state(json_writer, 0, required_size, true, AZ_JSON_TOKEN_STRING);
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_json_writer_append_string(az_json_writer* ref_json_writer, az_span value)
+AZ_NODISCARD az_result az_json_writer_append_string(az_json_writer* json_writer, az_span value)
 {
-  _az_PRECONDITION_NOT_NULL(ref_json_writer);
+  _az_PRECONDITION_NOT_NULL(json_writer);
   // A null span is allowed, and we write an empty JSON string for it.
   _az_PRECONDITION_VALID_SPAN(value, 0, true);
   _az_PRECONDITION(az_span_size(value) <= _az_MAX_UNESCAPED_STRING_SIZE);
-  _az_PRECONDITION(_az_is_appending_value_valid(ref_json_writer));
+  _az_PRECONDITION(_az_is_appending_value_valid(json_writer));
 
   if (az_span_size(value) <= _az_MAX_UNESCAPED_STRING_SIZE_PER_CHUNK)
   {
-    return az_json_writer_append_string_small(ref_json_writer, value);
+    return az_json_writer_append_string_small(json_writer, value);
   }
   else
   {
-    return az_json_writer_append_string_chunked(ref_json_writer, value);
+    return az_json_writer_append_string_chunked(json_writer, value);
   }
 }
 
 static AZ_NODISCARD az_result
-az_json_writer_append_property_name_small(az_json_writer* ref_json_writer, az_span value)
+az_json_writer_append_property_name_small(az_json_writer* json_writer, az_span value)
 {
   _az_PRECONDITION(az_span_size(value) <= _az_MAX_UNESCAPED_STRING_SIZE_PER_CHUNK);
 
   int32_t required_size = 3; // For the surrounding quotes and the key:value separator colon.
 
-  if (ref_json_writer->_internal.need_comma)
+  if (json_writer->_internal.need_comma)
   {
     required_size++; // For the leading comma separator.
   }
@@ -587,10 +583,10 @@ az_json_writer_append_property_name_small(az_json_writer* ref_json_writer, az_sp
 
   _az_PRECONDITION(required_size <= _az_MINIMUM_STRING_CHUNK_SIZE);
 
-  az_span remaining_json = _get_remaining_span(ref_json_writer, required_size);
+  az_span remaining_json = _get_remaining_span(json_writer, required_size);
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(remaining_json, required_size);
 
-  if (ref_json_writer->_internal.need_comma)
+  if (json_writer->_internal.need_comma)
   {
     remaining_json = az_span_copy_u8(remaining_json, ',');
   }
@@ -616,28 +612,28 @@ az_json_writer_append_property_name_small(az_json_writer* ref_json_writer, az_sp
   remaining_json = az_span_copy_u8(remaining_json, ':');
 
   _az_update_json_writer_state(
-      ref_json_writer, required_size, required_size, false, AZ_JSON_TOKEN_PROPERTY_NAME);
+      json_writer, required_size, required_size, false, AZ_JSON_TOKEN_PROPERTY_NAME);
   return AZ_OK;
 }
 
 static AZ_NODISCARD az_result
-az_json_writer_append_property_name_chunked(az_json_writer* ref_json_writer, az_span value)
+az_json_writer_append_property_name_chunked(az_json_writer* json_writer, az_span value)
 {
   _az_PRECONDITION(az_span_size(value) > _az_MAX_UNESCAPED_STRING_SIZE_PER_CHUNK);
 
-  az_span remaining_json = _get_remaining_span(ref_json_writer, _az_MINIMUM_STRING_CHUNK_SIZE);
+  az_span remaining_json = _get_remaining_span(json_writer, _az_MINIMUM_STRING_CHUNK_SIZE);
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(remaining_json, _az_MINIMUM_STRING_CHUNK_SIZE);
 
   int32_t required_size = 3; // For the surrounding quotes and the key:value separator colon.
-  if (ref_json_writer->_internal.need_comma)
+  if (json_writer->_internal.need_comma)
   {
     remaining_json = az_span_copy_u8(remaining_json, ',');
     required_size++;
-    ref_json_writer->_internal.bytes_written++;
+    json_writer->_internal.bytes_written++;
   }
 
   remaining_json = az_span_copy_u8(remaining_json, '"');
-  ref_json_writer->_internal.bytes_written++;
+  json_writer->_internal.bytes_written++;
 
   int32_t consumed = 0;
   do
@@ -650,7 +646,7 @@ az_json_writer_append_property_name_chunked(az_json_writer* ref_json_writer, az_
     if (index_of_first_escaped_char == -1)
     {
       AZ_RETURN_IF_FAILED(
-          az_json_writer_span_copy_chunked(ref_json_writer, &remaining_json, value_slice));
+          az_json_writer_span_copy_chunked(json_writer, &remaining_json, value_slice));
       consumed += az_span_size(value_slice);
     }
     else
@@ -658,7 +654,7 @@ az_json_writer_append_property_name_chunked(az_json_writer* ref_json_writer, az_
       // Bulk copy the characters that didn't need to be escaped before dropping to the byte-by-byte
       // encode and copy.
       AZ_RETURN_IF_FAILED(az_json_writer_span_copy_chunked(
-          ref_json_writer,
+          json_writer,
           &remaining_json,
           az_span_slice(value_slice, 0, index_of_first_escaped_char)));
 
@@ -667,11 +663,11 @@ az_json_writer_append_property_name_chunked(az_json_writer* ref_json_writer, az_
       uint8_t* value_ptr = az_span_ptr(value_slice);
       uint8_t const ch = value_ptr[index_of_first_escaped_char];
 
-      remaining_json = _get_remaining_span(ref_json_writer, _az_MINIMUM_STRING_CHUNK_SIZE);
+      remaining_json = _get_remaining_span(json_writer, _az_MINIMUM_STRING_CHUNK_SIZE);
       AZ_RETURN_IF_NOT_ENOUGH_SIZE(remaining_json, _az_MINIMUM_STRING_CHUNK_SIZE);
 
       int32_t written = _az_json_writer_escape_next_byte_and_copy(&remaining_json, ch);
-      ref_json_writer->_internal.bytes_written += written;
+      json_writer->_internal.bytes_written += written;
 
       // Only account for the difference in the number of bytes written when escaped
       // compared to when the bytes are copied as is.
@@ -681,197 +677,112 @@ az_json_writer_append_property_name_chunked(az_json_writer* ref_json_writer, az_
     }
   } while (consumed < az_span_size(value));
 
-  remaining_json = _get_remaining_span(ref_json_writer, _az_MINIMUM_STRING_CHUNK_SIZE);
+  remaining_json = _get_remaining_span(json_writer, _az_MINIMUM_STRING_CHUNK_SIZE);
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(remaining_json, _az_MINIMUM_STRING_CHUNK_SIZE);
 
   remaining_json = az_span_copy_u8(remaining_json, '"');
   remaining_json = az_span_copy_u8(remaining_json, ':');
-  ref_json_writer->_internal.bytes_written += 2;
+  json_writer->_internal.bytes_written += 2;
 
   // Currently, required_size only counts the escaped bytes, so add back the length of the input
   // string (consumed == az_span_size(value));
   required_size += consumed;
 
   // We already tracked and updated bytes_written while writing, so no need to update it here.
-  _az_update_json_writer_state(
-      ref_json_writer, 0, required_size, false, AZ_JSON_TOKEN_PROPERTY_NAME);
+  _az_update_json_writer_state(json_writer, 0, required_size, false, AZ_JSON_TOKEN_PROPERTY_NAME);
   return AZ_OK;
 }
 
 AZ_NODISCARD az_result
-az_json_writer_append_property_name(az_json_writer* ref_json_writer, az_span name)
+az_json_writer_append_property_name(az_json_writer* json_writer, az_span name)
 {
   // TODO: Consider refactoring to reduce duplication between writing property name and string.
-  _az_PRECONDITION_NOT_NULL(ref_json_writer);
+  _az_PRECONDITION_NOT_NULL(json_writer);
   _az_PRECONDITION_VALID_SPAN(name, 0, false);
   _az_PRECONDITION(az_span_size(name) <= _az_MAX_UNESCAPED_STRING_SIZE);
-  _az_PRECONDITION(_az_is_appending_property_name_valid(ref_json_writer));
+  _az_PRECONDITION(_az_is_appending_property_name_valid(json_writer));
 
   if (az_span_size(name) <= _az_MAX_UNESCAPED_STRING_SIZE_PER_CHUNK)
   {
-    return az_json_writer_append_property_name_small(ref_json_writer, name);
+    return az_json_writer_append_property_name_small(json_writer, name);
   }
   else
   {
-    return az_json_writer_append_property_name_chunked(ref_json_writer, name);
+    return az_json_writer_append_property_name_chunked(json_writer, name);
   }
-}
-
-static AZ_NODISCARD az_result _az_validate_json(
-    az_span json_text,
-    az_json_token_kind* first_token_kind,
-    az_json_token_kind* last_token_kind)
-{
-  _az_PRECONDITION_NOT_NULL(first_token_kind);
-
-  az_json_reader reader = { 0 };
-  AZ_RETURN_IF_FAILED(az_json_reader_init(&reader, json_text, NULL));
-
-  az_result result = az_json_reader_next_token(&reader);
-  AZ_RETURN_IF_FAILED(result);
-
-  // This is guaranteed not to be a property name or end object/array.
-  // The first token of a valid JSON must either be a value or start object/array.
-  *first_token_kind = reader.token.kind;
-
-  // Keep reading until we have finished validating the entire JSON text and make sure it isn't
-  // incomplete.
-  while (az_succeeded(result = az_json_reader_next_token(&reader)))
-  {
-  }
-
-  if (result != AZ_ERROR_JSON_READER_DONE)
-  {
-    return result;
-  }
-
-  // This is guaranteed not to be a property name or start object/array.
-  // The last token of a valid JSON must either be a value or end object/array.
-  *last_token_kind = reader.token.kind;
-
-  return AZ_OK;
-}
-
-AZ_NODISCARD az_result
-az_json_writer_append_json_text(az_json_writer* ref_json_writer, az_span json_text)
-{
-  _az_PRECONDITION_NOT_NULL(ref_json_writer);
-  // A null or empty span is not allowed since that is invalid JSON.
-  _az_PRECONDITION_VALID_SPAN(json_text, 0, false);
-
-  az_json_token_kind first_token_kind = AZ_JSON_TOKEN_NONE;
-  az_json_token_kind last_token_kind = AZ_JSON_TOKEN_NONE;
-
-  // This runtime validation is necessary since the input could be user defined and malformed.
-  // This cannot be caught at dev time by a precondition, especially since they can be turned off.
-  AZ_RETURN_IF_FAILED(_az_validate_json(json_text, &first_token_kind, &last_token_kind));
-
-  // It is guaranteed that first_token_kind is NOT:
-  // AZ_JSON_TOKEN_NONE, AZ_JSON_TOKEN_END_ARRAY, AZ_JSON_TOKEN_END_OBJECT,
-  // AZ_JSON_TOKEN_PROPERTY_NAME
-  // And that last_token_kind is NOT:
-  // AZ_JSON_TOKEN_NONE, AZ_JSON_TOKEN_START_ARRAY, AZ_JSON_TOKEN_START_OBJECT,
-  // AZ_JSON_TOKEN_PROPERTY_NAME
-
-  // The JSON text is valid, but appending it to the the JSON writer at the current state still may
-  // not be valid.
-  if (!_az_is_appending_value_valid(ref_json_writer))
-  {
-    // All other tokens, including start array and object are validated here.
-    // Also first_token_kind cannot be AZ_JSON_TOKEN_NONE at this point.
-    return AZ_ERROR_JSON_INVALID_STATE;
-  }
-
-  az_span remaining_json = _get_remaining_span(ref_json_writer, _az_MINIMUM_STRING_CHUNK_SIZE);
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(remaining_json, _az_MINIMUM_STRING_CHUNK_SIZE);
-
-  AZ_RETURN_IF_FAILED(
-      az_json_writer_span_copy_chunked(ref_json_writer, &remaining_json, json_text));
-
-  // We only need to add a comma if the last token we append is a value or end of object/array.
-  // If the last token is a property name or the start of an object/array, we don't need to add a
-  // comma before appending subsequent tokens.
-  // However, there is no valid, complete, single JSON value where the last token would be property
-  // name, or start object/array.
-  // Therefore, need_comma must be true after appending the json_text.
-
-  // We already tracked and updated bytes_written while writing, so no need to update it here.
-  _az_update_json_writer_state(ref_json_writer, 0, az_span_size(json_text), true, last_token_kind);
-  return AZ_OK;
 }
 
 static AZ_NODISCARD az_result _az_json_writer_append_literal(
-    az_json_writer* ref_json_writer,
+    az_json_writer* json_writer,
     az_span literal,
     az_json_token_kind literal_kind)
 {
-  _az_PRECONDITION_NOT_NULL(ref_json_writer);
+  _az_PRECONDITION_NOT_NULL(json_writer);
   _az_PRECONDITION(
       literal_kind == AZ_JSON_TOKEN_NULL || literal_kind == AZ_JSON_TOKEN_TRUE
       || literal_kind == AZ_JSON_TOKEN_FALSE);
   _az_PRECONDITION_VALID_SPAN(literal, 4, false);
   _az_PRECONDITION(az_span_size(literal) <= 5); // null, true, or false
-  _az_PRECONDITION(_az_is_appending_value_valid(ref_json_writer));
+  _az_PRECONDITION(_az_is_appending_value_valid(json_writer));
 
   int32_t required_size = az_span_size(literal);
 
-  if (ref_json_writer->_internal.need_comma)
+  if (json_writer->_internal.need_comma)
   {
     required_size++; // For the leading comma separator.
   }
 
-  az_span remaining_json = _get_remaining_span(ref_json_writer, required_size);
+  az_span remaining_json = _get_remaining_span(json_writer, required_size);
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(remaining_json, required_size);
 
-  if (ref_json_writer->_internal.need_comma)
+  if (json_writer->_internal.need_comma)
   {
     remaining_json = az_span_copy_u8(remaining_json, ',');
   }
 
   remaining_json = az_span_copy(remaining_json, literal);
 
-  _az_update_json_writer_state(ref_json_writer, required_size, required_size, true, literal_kind);
+  _az_update_json_writer_state(json_writer, required_size, required_size, true, literal_kind);
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_json_writer_append_bool(az_json_writer* ref_json_writer, bool value)
+AZ_NODISCARD az_result az_json_writer_append_bool(az_json_writer* json_writer, bool value)
 {
   az_result result;
   if (value)
   {
-    result = _az_json_writer_append_literal(
-        ref_json_writer, AZ_SPAN_FROM_STR("true"), AZ_JSON_TOKEN_TRUE);
+    result
+        = _az_json_writer_append_literal(json_writer, AZ_SPAN_FROM_STR("true"), AZ_JSON_TOKEN_TRUE);
   }
   else
   {
     result = _az_json_writer_append_literal(
-        ref_json_writer, AZ_SPAN_FROM_STR("false"), AZ_JSON_TOKEN_FALSE);
+        json_writer, AZ_SPAN_FROM_STR("false"), AZ_JSON_TOKEN_FALSE);
   }
   return result;
 }
 
-AZ_NODISCARD az_result az_json_writer_append_null(az_json_writer* ref_json_writer)
+AZ_NODISCARD az_result az_json_writer_append_null(az_json_writer* json_writer)
 {
-  return _az_json_writer_append_literal(
-      ref_json_writer, AZ_SPAN_FROM_STR("null"), AZ_JSON_TOKEN_NULL);
+  return _az_json_writer_append_literal(json_writer, AZ_SPAN_FROM_STR("null"), AZ_JSON_TOKEN_NULL);
 }
 
-AZ_NODISCARD az_result az_json_writer_append_int32(az_json_writer* ref_json_writer, int32_t value)
+AZ_NODISCARD az_result az_json_writer_append_int32(az_json_writer* json_writer, int32_t value)
 {
-  _az_PRECONDITION_NOT_NULL(ref_json_writer);
-  _az_PRECONDITION(_az_is_appending_value_valid(ref_json_writer));
+  _az_PRECONDITION_NOT_NULL(json_writer);
+  _az_PRECONDITION(_az_is_appending_value_valid(json_writer));
 
   int32_t required_size = _az_MAX_SIZE_FOR_INT32; // Need enough space to write any 32-bit integer.
 
-  if (ref_json_writer->_internal.need_comma)
+  if (json_writer->_internal.need_comma)
   {
     required_size++; // For the leading comma separator.
   }
 
-  az_span remaining_json = _get_remaining_span(ref_json_writer, required_size);
+  az_span remaining_json = _get_remaining_span(json_writer, required_size);
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(remaining_json, required_size);
 
-  if (ref_json_writer->_internal.need_comma)
+  if (json_writer->_internal.need_comma)
   {
     remaining_json = az_span_copy_u8(remaining_json, ',');
   }
@@ -886,17 +797,15 @@ AZ_NODISCARD az_result az_json_writer_append_int32(az_json_writer* ref_json_writ
   // actual bytes written.
   int32_t written
       = required_size + _az_span_diff(leftover, remaining_json) - _az_MAX_SIZE_FOR_INT32;
-  _az_update_json_writer_state(ref_json_writer, written, written, true, AZ_JSON_TOKEN_NUMBER);
+  _az_update_json_writer_state(json_writer, written, written, true, AZ_JSON_TOKEN_NUMBER);
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_json_writer_append_double(
-    az_json_writer* ref_json_writer,
-    double value,
-    int32_t fractional_digits)
+AZ_NODISCARD az_result
+az_json_writer_append_double(az_json_writer* json_writer, double value, int32_t fractional_digits)
 {
-  _az_PRECONDITION_NOT_NULL(ref_json_writer);
-  _az_PRECONDITION(_az_is_appending_value_valid(ref_json_writer));
+  _az_PRECONDITION_NOT_NULL(json_writer);
+  _az_PRECONDITION(_az_is_appending_value_valid(json_writer));
   // Non-finite numbers are not supported because they lead to invalid JSON.
   // Unquoted strings such as nan and -inf are invalid as JSON numbers.
   _az_PRECONDITION(_az_isfinite(value));
@@ -904,15 +813,15 @@ AZ_NODISCARD az_result az_json_writer_append_double(
 
   int32_t required_size = _az_MAX_SIZE_FOR_DOUBLE; // Need enough space to write any double number.
 
-  if (ref_json_writer->_internal.need_comma)
+  if (json_writer->_internal.need_comma)
   {
     required_size++; // For the leading comma separator.
   }
 
-  az_span remaining_json = _get_remaining_span(ref_json_writer, required_size);
+  az_span remaining_json = _get_remaining_span(json_writer, required_size);
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(remaining_json, required_size);
 
-  if (ref_json_writer->_internal.need_comma)
+  if (json_writer->_internal.need_comma)
   {
     remaining_json = az_span_copy_u8(remaining_json, ',');
   }
@@ -927,97 +836,96 @@ AZ_NODISCARD az_result az_json_writer_append_double(
   // actual bytes written.
   int32_t written
       = required_size + _az_span_diff(leftover, remaining_json) - _az_MAX_SIZE_FOR_DOUBLE;
-  _az_update_json_writer_state(ref_json_writer, written, written, true, AZ_JSON_TOKEN_NUMBER);
+  _az_update_json_writer_state(json_writer, written, written, true, AZ_JSON_TOKEN_NUMBER);
   return AZ_OK;
 }
 
 static AZ_NODISCARD az_result _az_json_writer_append_container_start(
-    az_json_writer* ref_json_writer,
+    az_json_writer* json_writer,
     uint8_t byte,
     az_json_token_kind container_kind)
 {
-  _az_PRECONDITION_NOT_NULL(ref_json_writer);
+  _az_PRECONDITION_NOT_NULL(json_writer);
   _az_PRECONDITION(
       container_kind == AZ_JSON_TOKEN_BEGIN_OBJECT || container_kind == AZ_JSON_TOKEN_BEGIN_ARRAY);
-  _az_PRECONDITION(_az_is_appending_value_valid(ref_json_writer));
+  _az_PRECONDITION(_az_is_appending_value_valid(json_writer));
 
   // The current depth is equal to or larger than the maximum allowed depth of 64. Cannot write the
   // next JSON object or array.
-  if (ref_json_writer->_internal.bit_stack._internal.current_depth >= _az_MAX_JSON_STACK_SIZE)
+  if (json_writer->_internal.bit_stack._internal.current_depth >= _az_MAX_JSON_STACK_SIZE)
   {
     return AZ_ERROR_JSON_NESTING_OVERFLOW;
   }
 
   int32_t required_size = 1; // For the start object or array byte.
 
-  if (ref_json_writer->_internal.need_comma)
+  if (json_writer->_internal.need_comma)
   {
     required_size++; // For the leading comma separator.
   }
 
-  az_span remaining_json = _get_remaining_span(ref_json_writer, required_size);
+  az_span remaining_json = _get_remaining_span(json_writer, required_size);
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(remaining_json, required_size);
 
-  if (ref_json_writer->_internal.need_comma)
+  if (json_writer->_internal.need_comma)
   {
     remaining_json = az_span_copy_u8(remaining_json, ',');
   }
 
   remaining_json = az_span_copy_u8(remaining_json, byte);
 
-  _az_update_json_writer_state(
-      ref_json_writer, required_size, required_size, false, container_kind);
+  _az_update_json_writer_state(json_writer, required_size, required_size, false, container_kind);
   if (container_kind == AZ_JSON_TOKEN_BEGIN_OBJECT)
   {
-    _az_json_stack_push(&ref_json_writer->_internal.bit_stack, _az_JSON_STACK_OBJECT);
+    _az_json_stack_push(&json_writer->_internal.bit_stack, _az_JSON_STACK_OBJECT);
   }
   else
   {
-    _az_json_stack_push(&ref_json_writer->_internal.bit_stack, _az_JSON_STACK_ARRAY);
+    _az_json_stack_push(&json_writer->_internal.bit_stack, _az_JSON_STACK_ARRAY);
   }
 
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_json_writer_append_begin_object(az_json_writer* ref_json_writer)
+AZ_NODISCARD az_result az_json_writer_append_begin_object(az_json_writer* json_writer)
 {
-  return _az_json_writer_append_container_start(ref_json_writer, '{', AZ_JSON_TOKEN_BEGIN_OBJECT);
+  return _az_json_writer_append_container_start(json_writer, '{', AZ_JSON_TOKEN_BEGIN_OBJECT);
 }
 
-AZ_NODISCARD az_result az_json_writer_append_begin_array(az_json_writer* ref_json_writer)
+AZ_NODISCARD az_result az_json_writer_append_begin_array(az_json_writer* json_writer)
 {
-  return _az_json_writer_append_container_start(ref_json_writer, '[', AZ_JSON_TOKEN_BEGIN_ARRAY);
+  return _az_json_writer_append_container_start(json_writer, '[', AZ_JSON_TOKEN_BEGIN_ARRAY);
 }
 
 static AZ_NODISCARD az_result az_json_writer_append_container_end(
-    az_json_writer* ref_json_writer,
+    az_json_writer* json_writer,
     uint8_t byte,
     az_json_token_kind container_kind)
 {
-  _az_PRECONDITION_NOT_NULL(ref_json_writer);
+  _az_PRECONDITION_NOT_NULL(json_writer);
   _az_PRECONDITION(
       container_kind == AZ_JSON_TOKEN_END_OBJECT || container_kind == AZ_JSON_TOKEN_END_ARRAY);
-  _az_PRECONDITION(_az_is_appending_container_end_valid(ref_json_writer, byte));
+  _az_PRECONDITION(_az_is_appending_container_end_valid(json_writer, byte));
 
   int32_t required_size = 1; // For the end object or array byte.
 
-  az_span remaining_json = _get_remaining_span(ref_json_writer, required_size);
+  az_span remaining_json = _get_remaining_span(json_writer, required_size);
   AZ_RETURN_IF_NOT_ENOUGH_SIZE(remaining_json, required_size);
 
   remaining_json = az_span_copy_u8(remaining_json, byte);
 
-  _az_update_json_writer_state(ref_json_writer, required_size, required_size, true, container_kind);
-  _az_json_stack_pop(&ref_json_writer->_internal.bit_stack);
+  _az_update_json_writer_state(json_writer, required_size, required_size, true, container_kind);
+  _az_json_stack_pop(&json_writer->_internal.bit_stack);
 
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result az_json_writer_append_end_object(az_json_writer* ref_json_writer)
+AZ_NODISCARD az_result az_json_writer_append_end_object(az_json_writer* json_writer)
 {
-  return az_json_writer_append_container_end(ref_json_writer, '}', AZ_JSON_TOKEN_END_OBJECT);
+  return az_json_writer_append_container_end(json_writer, '}', AZ_JSON_TOKEN_END_OBJECT);
 }
 
-AZ_NODISCARD az_result az_json_writer_append_end_array(az_json_writer* ref_json_writer)
+AZ_NODISCARD az_result az_json_writer_append_end_array(az_json_writer* json_writer)
 {
-  return az_json_writer_append_container_end(ref_json_writer, ']', AZ_JSON_TOKEN_END_ARRAY);
+  return az_json_writer_append_container_end(json_writer, ']', AZ_JSON_TOKEN_END_ARRAY);
 }

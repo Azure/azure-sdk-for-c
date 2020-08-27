@@ -110,7 +110,6 @@ az_result read_environment_variables(
     {
       case PAHO_IOT_HUB_C2D_SAMPLE:
       case PAHO_IOT_HUB_METHODS_SAMPLE:
-      case PAHO_IOT_HUB_PNP_COMPONENT_SAMPLE:
       case PAHO_IOT_HUB_PNP_SAMPLE:
       case PAHO_IOT_HUB_TELEMETRY_SAMPLE:
       case PAHO_IOT_HUB_TWIN_SAMPLE:
@@ -231,7 +230,7 @@ az_result read_environment_variables(
       env_vars->x509_trust_pem_file_path,
       &(env_vars->x509_trust_pem_file_path)));
 
-  LOG(" "); // Formatting.
+  LOG(" "); // Log formatting
   return AZ_OK;
 }
 
