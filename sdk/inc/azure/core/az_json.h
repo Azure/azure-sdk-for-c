@@ -636,7 +636,7 @@ typedef struct
     /// A limited stack to track the depth and nested JSON objects or arrays read so far.
     _az_json_bit_stack bit_stack;
 
-    /// A copy of the options provied by the user.
+    /// A copy of the options provided by the user.
     az_json_reader_options options;
   } _internal;
 } az_json_reader;
