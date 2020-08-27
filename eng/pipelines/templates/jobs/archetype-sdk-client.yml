@@ -6,18 +6,20 @@ jobs:
   condition: and(succeededOrFailed(), ne(variables['Skip.Test'], 'true'))
   strategy:
     matrix:
-      Linux_ARM_with_samples:
+      Linux_ARM:
         OSVmImage: 'ubuntu-18.04'
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
         build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake'
-      Linux_ARM_with_samples_no_preconditions:
+        AZ_SDK_C_NO_SAMPLES: 'true'
+      Linux_ARM_no_preconditions:
         OSVmImage: 'ubuntu-18.04'
         vcpkg.deps: ''
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         AptDependencies: 'gcc-arm-none-eabi'
         build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake -DPRECONDITIONS=OFF'
+        AZ_SDK_C_NO_SAMPLES: 'true'
 
       # Build with no dependencies at all (No samples) - PRECONDITIONS ON
       # WARNINGS_AS_ERRORS          ON
