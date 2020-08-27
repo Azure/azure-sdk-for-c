@@ -160,8 +160,9 @@ static az_result _az_http_policy_logging_append_http_response_msg(
 
   az_span new_line_tab_string = AZ_SPAN_FROM_STR("\n\t");
 
-  for (az_pair header;
-       az_http_response_get_next_header(ref_response, &header) != AZ_ERROR_ITEM_NOT_FOUND;)
+  az_result result;
+  az_pair header;
+  while (az_succeeded(result = az_http_response_get_next_header(ref_response, &header)))
   {
     int32_t required_length = az_span_size(new_line_tab_string) + az_span_size(header.key);
     if (az_span_size(header.value) > 0)
@@ -179,6 +180,12 @@ static az_result _az_http_policy_logging_append_http_response_msg(
       remainder = az_span_copy(remainder, colon_separator_string);
       remainder = _az_http_policy_logging_copy_lengthy_value(remainder, header.value);
     }
+  }
+
+  // Response payload was invalid or corrupted in some way.
+  if (result != AZ_ERROR_HTTP_NO_MORE_HEADERS)
+  {
+    return result;
   }
 
   az_span new_lines_string = AZ_SPAN_FROM_STR("\n\n");

@@ -84,6 +84,23 @@ static void _log_listener_NULL(az_log_classification classification, az_span mes
   }
 }
 
+static void _log_listener_no_op(az_log_classification classification, az_span message)
+{
+  (void)message;
+  switch (classification)
+  {
+    case AZ_LOG_HTTP_REQUEST:
+      _log_invoked_for_http_request = true;
+      break;
+    case AZ_LOG_HTTP_RESPONSE:
+      _log_invoked_for_http_response = true;
+      break;
+    default:
+      assert_true(false);
+      break;
+  }
+}
+
 static void test_az_log(void** state)
 {
   (void)state;
@@ -212,10 +229,49 @@ static void test_az_log(void** state)
   az_log_set_callback(NULL);
 }
 
+static void test_az_log_corrupted_response(void** state)
+{
+  (void)state;
+  // Set up test values etc.
+  uint8_t headers[1024] = { 0 };
+  az_http_request request = { 0 };
+  az_span url = AZ_SPAN_FROM_STR("https://www.example.com");
+  TEST_EXPECT_SUCCESS(az_http_request_init(
+      &request,
+      &az_context_application,
+      az_http_method_get(),
+      url,
+      az_span_size(url),
+      AZ_SPAN_FROM_BUFFER(headers),
+      AZ_SPAN_FROM_STR("AAAAABBBBBCCCCCDDDDDEEEEEFFFFFGGGGGHHHHHIIIIIJJJJJKKKKK")));
+
+  az_span response_span = AZ_SPAN_FROM_STR("HTTP/1.1 404 Not Found\r\n"
+                                           "\r\n");
+  az_http_response response = { 0 };
+  TEST_EXPECT_SUCCESS(az_http_response_init(&response, response_span));
+
+  _reset_log_invocation_status();
+  az_log_set_callback(_log_listener_no_op);
+  assert_true(_log_invoked_for_http_request == false);
+  assert_true(_log_invoked_for_http_response == false);
+
+  _az_http_policy_logging_log_http_request(&request);
+  assert_true(_log_invoked_for_http_request == _az_BUILT_WITH_LOGGING(true, false));
+  assert_true(_log_invoked_for_http_response == false);
+
+  _az_http_policy_logging_log_http_response(&response, 3456, &request);
+  assert_true(_log_invoked_for_http_request == _az_BUILT_WITH_LOGGING(true, false));
+  assert_true(_log_invoked_for_http_response == _az_BUILT_WITH_LOGGING(true, false));
+
+  az_log_set_classifications(NULL);
+  az_log_set_callback(NULL);
+}
+
 int test_az_logging()
 {
   const struct CMUnitTest tests[] = {
     cmocka_unit_test(test_az_log),
+    cmocka_unit_test(test_az_log_corrupted_response),
   };
   return cmocka_run_group_tests_name("az_core_logging", tests, NULL, NULL);
 }

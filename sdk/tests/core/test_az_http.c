@@ -463,7 +463,7 @@ static void test_http_response(void** state)
     {
       az_pair header = { 0 };
       result = az_http_response_get_next_header(&response, &header);
-      assert_true(result == AZ_ERROR_ITEM_NOT_FOUND);
+      assert_true(result == AZ_ERROR_HTTP_NO_MORE_HEADERS);
     }
     // read a body
     {
@@ -516,7 +516,13 @@ static void test_http_response(void** state)
     {
       az_pair header = { 0 };
       result = az_http_response_get_next_header(&response, &header);
-      assert_true(result == AZ_ERROR_ITEM_NOT_FOUND);
+      assert_true(result == AZ_ERROR_HTTP_NO_MORE_HEADERS);
+
+      // Subsequent reads do nothing.
+      result = az_http_response_get_next_header(&response, &header);
+      assert_true(result == AZ_ERROR_HTTP_NO_MORE_HEADERS);
+      result = az_http_response_get_next_header(&response, &header);
+      assert_true(result == AZ_ERROR_HTTP_NO_MORE_HEADERS);
     }
     // read a body
     {
@@ -685,7 +691,7 @@ static void test_http_response_header_validation(void** state)
     az_http_response_status_line status_line = { 0 };
     assert_return_code(az_http_response_get_status_line(&response, &status_line), AZ_OK);
     for (az_pair header;
-         az_http_response_get_next_header(&response, &header) != AZ_ERROR_ITEM_NOT_FOUND;)
+         az_http_response_get_next_header(&response, &header) != AZ_ERROR_HTTP_NO_MORE_HEADERS;)
     {
       // all valid headers
       assert_true(az_span_ptr(header.key) != NULL);
@@ -707,6 +713,58 @@ static void test_http_response_header_validation_fail(void** state)
                              "(Header11): Value11\r\n"
                              "\r\n"
                              "KKKKKJJJJJIIIIIHHHHHGGGGGFFFFFEEEEEDDDDDCCCCCBBBBBAAAAA")),
+        AZ_OK);
+
+    // Can't read the header first, before the status line.
+    az_pair header = { 0 };
+    assert_int_equal(
+        az_http_response_get_next_header(&response, &header), AZ_ERROR_HTTP_INVALID_STATE);
+
+    az_http_response_status_line status_line = { 0 };
+    assert_return_code(az_http_response_get_status_line(&response, &status_line), AZ_OK);
+
+    az_result fail_header_result = az_http_response_get_next_header(&response, &header);
+    assert_true(AZ_ERROR_HTTP_CORRUPT_RESPONSE_HEADER == fail_header_result);
+  }
+
+  // Invalid end of header.
+  {
+    az_http_response response = { 0 };
+    assert_return_code(
+        az_http_response_init(
+            &response,
+            AZ_SPAN_FROM_STR("HTTP/1.1 404 Not Found\r\n"
+                             "Header11")),
+        AZ_OK);
+
+    az_http_response_status_line status_line = { 0 };
+    assert_return_code(az_http_response_get_status_line(&response, &status_line), AZ_OK);
+    az_pair header = { 0 };
+    az_result fail_header_result = az_http_response_get_next_header(&response, &header);
+    assert_true(AZ_ERROR_HTTP_CORRUPT_RESPONSE_HEADER == fail_header_result);
+  }
+  {
+    az_http_response response = { 0 };
+    assert_return_code(
+        az_http_response_init(
+            &response,
+            AZ_SPAN_FROM_STR("HTTP/1.1 404 Not Found\r\n"
+                             "Header11: ")),
+        AZ_OK);
+
+    az_http_response_status_line status_line = { 0 };
+    assert_return_code(az_http_response_get_status_line(&response, &status_line), AZ_OK);
+    az_pair header = { 0 };
+    az_result fail_header_result = az_http_response_get_next_header(&response, &header);
+    assert_true(AZ_ERROR_HTTP_CORRUPT_RESPONSE_HEADER == fail_header_result);
+  }
+  {
+    az_http_response response = { 0 };
+    assert_return_code(
+        az_http_response_init(
+            &response,
+            AZ_SPAN_FROM_STR("HTTP/1.1 404 Not Found\r\n"
+                             "Header11: Value11\n")),
         AZ_OK);
 
     az_http_response_status_line status_line = { 0 };

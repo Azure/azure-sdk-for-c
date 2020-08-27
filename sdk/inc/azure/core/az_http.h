@@ -243,7 +243,9 @@ AZ_NODISCARD az_result az_http_response_get_status_line(
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK A header was returned.
- * @retval #AZ_ERROR_ITEM_NOT_FOUND There are no more headers.
+ * @retval #AZ_ERROR_HTTP_NO_MORE_HEADERS There are no more headers within the HTTP response payload.
+ * @retval #AZ_ERROR_HTTP_CORRUPT_RESPONSE_HEADER The HTTP response contains an unexpected invalid
+ * character or is incomplete.
  * @retval #AZ_ERROR_HTTP_INVALID_STATE The #az_http_response instance is in an invalid state.
  * Consider calling #az_http_response_get_status_line() to reset its state.
  */
