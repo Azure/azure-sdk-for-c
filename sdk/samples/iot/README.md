@@ -309,6 +309,7 @@ To run the samples, ensure you have the following programs or tools installed on
     ```
 
   - For non-Linux based systems, download the [OpenSSL 1.1.1 LTS](https://www.openssl.org/source/openssl-1.1.1g.tar.gz) command line utility and follow the downloaded INSTALL document.
+- Have [Powershell](https://github.com/PowerShell/PowerShell/tree/v7.0.3#get-powershell) installed if running the certificate samples. This is required to run the certificate generation script generate_certificate.ps1.
 - Have the following build setup:
   - For Linux based systems, have make installed:
 
@@ -332,12 +333,6 @@ Samples use environment variables for a variety of purposes, including filepaths
 export ENV_VARIABLE_NAME=VALUE
 ```
 
-#### Windows (CMD)
-
-```cmd
-set ENV_VARIABLE_NAME=VALUE
-```
-
 #### Windows (Powershell)
 
 ```powershell
@@ -358,13 +353,13 @@ The following samples use x509 authentication to connect to Azure IoT Hub or Azu
     Linux:
 
     ```bash
-    ./generate_certificate.sh
+    pwsh ./generate_certificate.ps1
     ```
 
     Windows:
 
-    ```cmd
-    generate_certificate.cmd
+    ```powershell
+    .\generate_certificate.ps1
     ```
 
 2. Set the following environment variable:
@@ -443,7 +438,7 @@ The following samples use SAS authentication to connect to Azure IoT Hub or Azur
 
     Windows:
 
-    ```cmd
+    ```powershell
     az.sln
     ```
 
