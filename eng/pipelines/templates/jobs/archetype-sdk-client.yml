@@ -344,7 +344,9 @@ jobs:
         if (Test-Path "DoxygenWarningLog.txt" -PathType leaf)
         {
           $LogContent = Get-Content "DoxygenWarningLog.txt"
+
           Remove-Item "DoxygenWarningLog.txt"
+
           If ($LogContent -ne $Null)
           {
             Write-Output $LogContent
