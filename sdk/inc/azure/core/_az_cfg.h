@@ -25,8 +25,10 @@
 // automatic variable '...'
 #pragma warning(disable : 4221)
 
-// warning C6011: Dereferencing NULL pointer. Using _az_PRECONDITION_NOT_NULL
-#pragma warning(disable : 6011)
+// warning C28278 : Function appears with no prototype in scope. Only limited analysis can be
+// performed. Include the appropriate header or add a prototype. This warning also occurs if
+// parameter or return types are omitted in a function definition.
+#pragma warning(disable : 28278)
 
 // Treat warnings as errors:
 // -------------------------
