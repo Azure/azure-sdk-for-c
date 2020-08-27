@@ -254,7 +254,7 @@ static void create_and_configure_mqtt_client(void)
   int rc;
 
   // Reads in environment variables set by user for purposes of running sample.
-  if (az_failed(rc = read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars)))
+  if (az_result_failed(rc = read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars)))
   {
     LOG_ERROR(
         "Failed to read configuration from environment variables: az_result return code 0x%08x.",
@@ -264,7 +264,7 @@ static void create_and_configure_mqtt_client(void)
 
   // Build an MQTT endpoint c-string.
   char mqtt_endpoint_buffer[128];
-  if (az_failed(
+  if (az_result_failed(
           rc = create_mqtt_endpoint(
               SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer))))
   {
@@ -275,7 +275,7 @@ static void create_and_configure_mqtt_client(void)
   // Initialize the hub client with the connection options.
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
   options.model_id = model_id;
-  if (az_failed(
+  if (az_result_failed(
           rc = az_iot_hub_client_init(
               &hub_client, env_vars.hub_hostname, env_vars.hub_device_id, &options)))
   {
@@ -285,7 +285,7 @@ static void create_and_configure_mqtt_client(void)
 
   // Get the MQTT client id used for the MQTT connection.
   char mqtt_client_id_buffer[128];
-  if (az_failed(
+  if (az_result_failed(
           rc = az_iot_hub_client_get_client_id(
               &hub_client, mqtt_client_id_buffer, sizeof(mqtt_client_id_buffer), NULL)))
   {
@@ -312,7 +312,7 @@ static void connect_mqtt_client_to_iot_hub(void)
   int rc;
 
   // Get the MQTT client username.
-  if (az_failed(
+  if (az_result_failed(
           rc = az_iot_hub_client_get_user_name(
               &hub_client, mqtt_client_username_buffer, sizeof(mqtt_client_username_buffer), NULL)))
   {
@@ -382,7 +382,7 @@ static void request_device_twin_document(void)
 
   // Get the Twin Document topic to publish the twin document request.
   char twin_document_topic_buffer[128];
-  if (az_failed(
+  if (az_result_failed(
           rc = az_iot_hub_client_twin_document_get_publish_topic(
               &hub_client,
               get_request_id(),
@@ -472,7 +472,7 @@ static az_span get_request_id(void)
   az_span destination = az_span_create(
       (uint8_t*)connection_request_id_buffer, sizeof(connection_request_id_buffer));
 
-  if (az_failed(rc = az_span_i32toa(destination, connection_request_id_int++, &out_span)))
+  if (az_result_failed(rc = az_span_i32toa(destination, connection_request_id_int++, &out_span)))
   {
     LOG_ERROR("Failed to get request id: az_result return code 0x%08x.", rc);
     exit(rc);
@@ -516,7 +516,7 @@ static void on_message_received(char* topic, int topic_len, const MQTTClient_mes
   az_iot_hub_client_method_request command_request;
 
   // Parse the incoming message topic and check which feature it is for.
-  if (az_succeeded(
+  if (az_result_succeeded(
           rc
           = az_iot_hub_client_twin_parse_received_topic(&hub_client, topic_span, &twin_response)))
   {
@@ -527,7 +527,7 @@ static void on_message_received(char* topic, int topic_len, const MQTTClient_mes
 
     handle_device_twin_message(message_span, &twin_response);
   }
-  else if (az_succeeded(
+  else if (az_result_succeeded(
                rc = az_iot_hub_client_methods_parse_received_topic(
                    &hub_client, topic_span, &command_request)))
   {
@@ -580,7 +580,7 @@ static void process_device_twin_message(az_span twin_message_span, bool is_twin_
   int32_t version_num;
 
   // Parse for the desired temperature
-  if (az_succeeded(parse_device_twin_desired_temperature_property(
+  if (az_result_succeeded(parse_device_twin_desired_temperature_property(
           twin_message_span, is_twin_get, &desired_temp, &version_num)))
   {
     bool confirm = true;
@@ -712,7 +712,7 @@ static void send_reported_property(az_span name, double value, int32_t version, 
 
   // Get the Twin Patch topic to send a reported property update.
   char twin_patch_topic_buffer[128];
-  if (az_failed(
+  if (az_result_failed(
           rc = az_iot_hub_client_twin_patch_get_publish_topic(
               &hub_client,
               get_request_id(),
@@ -729,7 +729,7 @@ static void send_reported_property(az_span name, double value, int32_t version, 
   az_span reported_property_payload = AZ_SPAN_FROM_BUFFER(reported_property_payload_buffer);
   if (confirm)
   {
-    if (az_failed(
+    if (az_result_failed(
             rc = build_property_payload_with_status(
                 name,
                 value,
@@ -751,7 +751,7 @@ static void send_reported_property(az_span name, double value, int32_t version, 
     const az_span names[1] = { name };
     const double values[1] = { value };
 
-    if (az_failed(
+    if (az_result_failed(
             rc = build_property_payload(
                 count, names, values, NULL, reported_property_payload, &reported_property_payload)))
     {
@@ -776,7 +776,7 @@ static void handle_command_message(
     az_span command_response_payload = AZ_SPAN_FROM_BUFFER(command_response_payload_buffer);
 
     // Invoke command.
-    if (az_failed(invoke_getMaxMinReport(
+    if (az_result_failed(invoke_getMaxMinReport(
             command_message_span, command_response_payload, &command_response_payload)))
     {
       status = AZ_IOT_STATUS_BAD_REQUEST;
@@ -805,7 +805,7 @@ static void send_command_response(
 
   // Get the Methods response topic to publish the command response.
   char methods_response_topic_buffer[128];
-  if (az_failed(
+  if (az_result_failed(
           rc = az_iot_hub_client_methods_response_get_publish_topic(
               &hub_client,
               command_request->request_id,
@@ -874,7 +874,7 @@ static az_result invoke_getMaxMinReport(
   const az_span times[2] = { start_time_span, end_time_span };
 
   az_result rc;
-  if (az_failed(
+  if (az_result_failed(
           rc = build_property_payload(
               count, names, values, times, response_destination, out_response)))
   {
@@ -891,7 +891,7 @@ static void send_telemetry_message(void)
 
   // Get the Telemetry topic to publish the telemetry message.
   char telemetry_topic_buffer[128];
-  if (az_failed(
+  if (az_result_failed(
           rc = az_iot_hub_client_telemetry_get_publish_topic(
               &hub_client, NULL, telemetry_topic_buffer, sizeof(telemetry_topic_buffer), NULL)))
   {
@@ -906,7 +906,7 @@ static void send_telemetry_message(void)
 
   char telemetry_payload_buffer[128];
   az_span telemetry_payload = AZ_SPAN_FROM_BUFFER(telemetry_payload_buffer);
-  if (az_failed(
+  if (az_result_failed(
           rc = build_property_payload(
               count, names, values, NULL, telemetry_payload, &telemetry_payload)))
   {

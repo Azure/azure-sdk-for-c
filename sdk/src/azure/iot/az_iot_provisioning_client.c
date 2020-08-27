@@ -278,7 +278,8 @@ AZ_INLINE az_result _az_iot_provisioning_client_payload_registration_result_pars
   bool found_assigned_hub = false;
   bool found_device_id = false;
 
-  while ((!(found_device_id && found_assigned_hub)) && az_succeeded(az_json_reader_next_token(jr))
+  while ((!(found_device_id && found_assigned_hub))
+         && az_result_succeeded(az_json_reader_next_token(jr))
          && jr->token.kind != AZ_JSON_TOKEN_END_OBJECT)
   {
     if (az_json_token_is_text_equal(&jr->token, AZ_SPAN_FROM_STR("assignedHub")))
@@ -319,7 +320,8 @@ AZ_INLINE az_result _az_iot_provisioning_client_payload_registration_result_pars
       }
       out_state->error_timestamp = jr->token.slice;
     }
-    else if (az_succeeded(_az_iot_provisioning_client_parse_payload_error_code(jr, out_state)))
+    else if (az_result_succeeded(
+                 _az_iot_provisioning_client_parse_payload_error_code(jr, out_state)))
     {
       // Do nothing
     }
@@ -358,7 +360,8 @@ AZ_INLINE az_result az_iot_provisioning_client_parse_payload(
   bool found_operation_status = false;
   bool found_error = false;
 
-  while (az_succeeded(az_json_reader_next_token(&jr)) && jr.token.kind != AZ_JSON_TOKEN_END_OBJECT)
+  while (az_result_succeeded(az_json_reader_next_token(&jr))
+         && jr.token.kind != AZ_JSON_TOKEN_END_OBJECT)
   {
     if (az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("operationId")))
     {
@@ -413,7 +416,7 @@ AZ_INLINE az_result az_iot_provisioning_client_parse_payload(
       }
       out_response->registration_result.error_timestamp = jr.token.slice;
     }
-    else if (az_succeeded(_az_iot_provisioning_client_parse_payload_error_code(
+    else if (az_result_succeeded(_az_iot_provisioning_client_parse_payload_error_code(
                  &jr, &out_response->registration_result)))
     {
       found_error = true;

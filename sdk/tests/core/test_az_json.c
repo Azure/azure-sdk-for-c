@@ -13,7 +13,7 @@
 
 #include <azure/core/_az_cfg.h>
 
-#define TEST_EXPECT_SUCCESS(exp) assert_true(az_succeeded(exp))
+#define TEST_EXPECT_SUCCESS(exp) assert_true(az_result_succeeded(exp))
 
 az_result test_allocator(
     az_span_allocator_context* allocator_context,
@@ -2666,7 +2666,8 @@ static az_result _az_process_json(az_span* input, int32_t number_of_buffers, mod
     return AZ_ERROR_UNEXPECTED_CHAR;
   }
 
-  while (az_succeeded(az_json_reader_next_token(&jr)) && jr.token.kind != AZ_JSON_TOKEN_END_OBJECT)
+  while (az_result_succeeded(az_json_reader_next_token(&jr))
+         && jr.token.kind != AZ_JSON_TOKEN_END_OBJECT)
   {
     if (az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("name")))
     {

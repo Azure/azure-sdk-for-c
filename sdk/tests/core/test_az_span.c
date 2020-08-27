@@ -19,7 +19,7 @@
 
 #include <azure/core/_az_cfg.h>
 
-#define TEST_EXPECT_SUCCESS(exp) assert_true(az_succeeded(exp))
+#define TEST_EXPECT_SUCCESS(exp) assert_true(az_result_succeeded(exp))
 
 static void test_az_span_getters(void** state)
 {
@@ -1075,7 +1075,7 @@ static void az_span_i32toa_succeeds(void** state)
   az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer);
   az_span out_span;
 
-  assert_true(az_succeeded(az_span_i32toa(buffer, v, &out_span)));
+  assert_true(az_result_succeeded(az_span_i32toa(buffer, v, &out_span)));
   assert_int_equal(az_span_size(out_span), 10);
   assert_true(az_span_is_content_equal(
       az_span_slice(AZ_SPAN_FROM_BUFFER(raw_buffer), 0, 5), AZ_SPAN_FROM_STR("12345")));
@@ -1089,7 +1089,7 @@ static void az_span_i32toa_negative_succeeds(void** state)
   az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer);
   az_span out_span;
 
-  assert_true(az_succeeded(az_span_i32toa(buffer, v, &out_span)));
+  assert_true(az_result_succeeded(az_span_i32toa(buffer, v, &out_span)));
   assert_int_equal(az_span_size(out_span), 9);
   assert_true(az_span_is_content_equal(
       az_span_slice(AZ_SPAN_FROM_BUFFER(raw_buffer), 0, 6), AZ_SPAN_FROM_STR("-12345")));
@@ -1103,7 +1103,7 @@ static void az_span_i32toa_zero_succeeds(void** state)
   az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer);
   az_span out_span;
 
-  assert_true(az_succeeded(az_span_i32toa(buffer, v, &out_span)));
+  assert_true(az_result_succeeded(az_span_i32toa(buffer, v, &out_span)));
   assert_int_equal(az_span_size(out_span), 14);
   assert_true(az_span_is_content_equal(
       az_span_slice(AZ_SPAN_FROM_BUFFER(raw_buffer), 0, 1), AZ_SPAN_FROM_STR("0")));
@@ -1117,7 +1117,7 @@ static void az_span_i32toa_max_int_succeeds(void** state)
   az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer);
   az_span out_span;
 
-  assert_true(az_succeeded(az_span_i32toa(buffer, v, &out_span)));
+  assert_true(az_result_succeeded(az_span_i32toa(buffer, v, &out_span)));
   assert_int_equal(az_span_size(out_span), 5);
   assert_true(az_span_is_content_equal(
       az_span_slice(AZ_SPAN_FROM_BUFFER(raw_buffer), 0, 10), AZ_SPAN_FROM_STR("2147483647")));
@@ -1142,7 +1142,7 @@ static void az_span_u32toa_succeeds(void** state)
   az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer);
   az_span out_span;
 
-  assert_true(az_succeeded(az_span_u32toa(buffer, v, &out_span)));
+  assert_true(az_result_succeeded(az_span_u32toa(buffer, v, &out_span)));
   assert_int_equal(az_span_size(out_span), 10);
   assert_true(az_span_is_content_equal(
       az_span_slice(AZ_SPAN_FROM_BUFFER(raw_buffer), 0, 5), AZ_SPAN_FROM_STR("12345")));
@@ -1156,7 +1156,7 @@ static void az_span_u32toa_zero_succeeds(void** state)
   az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer);
   az_span out_span;
 
-  assert_true(az_succeeded(az_span_u32toa(buffer, v, &out_span)));
+  assert_true(az_result_succeeded(az_span_u32toa(buffer, v, &out_span)));
   assert_int_equal(az_span_size(out_span), 14);
   assert_true(az_span_is_content_equal(
       az_span_slice(AZ_SPAN_FROM_BUFFER(raw_buffer), 0, 1), AZ_SPAN_FROM_STR("0")));
@@ -1170,7 +1170,7 @@ static void az_span_u32toa_max_uint_succeeds(void** state)
   az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer);
   az_span out_span;
 
-  assert_true(az_succeeded(az_span_u32toa(buffer, v, &out_span)));
+  assert_true(az_result_succeeded(az_span_u32toa(buffer, v, &out_span)));
   assert_int_equal(az_span_size(out_span), 5);
   assert_true(az_span_is_content_equal(
       az_span_slice(AZ_SPAN_FROM_BUFFER(raw_buffer), 0, 10), AZ_SPAN_FROM_STR("4294967295")));
@@ -1192,13 +1192,13 @@ static void az_span_u32toa_overflow_fails(void** state)
   { \
     az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer); \
     az_span out_span = AZ_SPAN_NULL; \
-    assert_true(az_succeeded(az_span_dtoa(buffer, v, fractional_digits, &out_span))); \
+    assert_true(az_result_succeeded(az_span_dtoa(buffer, v, fractional_digits, &out_span))); \
     az_span output = az_span_slice(buffer, 0, _az_span_diff(out_span, buffer)); \
     assert_memory_equal( \
         az_span_ptr(output), az_span_ptr(expected), (size_t)az_span_size(expected)); \
-    assert_true(az_succeeded(az_span_dtoa(buffer, v, fractional_digits, &out_span))); \
+    assert_true(az_result_succeeded(az_span_dtoa(buffer, v, fractional_digits, &out_span))); \
     double round_trip = 0; \
-    assert_true(az_succeeded(az_span_atod(output, &round_trip))); \
+    assert_true(az_result_succeeded(az_span_atod(output, &round_trip))); \
     assert_true(fabs(v - round_trip) < 0.01); \
   } while (0)
 

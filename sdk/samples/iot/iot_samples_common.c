@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 #ifdef _MSC_VER
-// warning C4996: 'getenv': This function or variable may be unsafe. Consider using _dupenv_s instead.
+// warning C4996: 'getenv': This function or variable may be unsafe. Consider using _dupenv_s
+// instead.
 #pragma warning(disable : 4996)
 #endif
 
@@ -467,7 +468,7 @@ void sas_generate_encoded_signed_signature(
   // Decode the base64 encoded SAS key to use for HMAC signing.
   char sas_b64_decoded_key_buffer[64];
   az_span sas_b64_decoded_key = AZ_SPAN_FROM_BUFFER(sas_b64_decoded_key_buffer);
-  if (az_failed(rc = base64_decode(sas_key, sas_b64_decoded_key, &sas_b64_decoded_key)))
+  if (az_result_failed(rc = base64_decode(sas_key, sas_b64_decoded_key, &sas_b64_decoded_key)))
   {
     LOG_ERROR("Could not decode the SAS key: az_result return code 0x%04x.", rc);
     exit(rc);
@@ -476,7 +477,7 @@ void sas_generate_encoded_signed_signature(
   // HMAC-SHA256 sign the signature with the decoded key.
   char sas_hmac256_signed_signature_buffer[128];
   az_span sas_hmac256_signed_signature = AZ_SPAN_FROM_BUFFER(sas_hmac256_signed_signature_buffer);
-  if (az_failed(
+  if (az_result_failed(
           rc = hmac_sha256_sign(
               sas_b64_decoded_key,
               sas_signature,
@@ -488,7 +489,7 @@ void sas_generate_encoded_signed_signature(
   }
 
   // Base64 encode the result of the HMAC signing.
-  if (az_failed(
+  if (az_result_failed(
           rc = base64_encode(
               sas_hmac256_signed_signature, sas_b64_encoded_destination, sas_b64_encoded_out)))
   {

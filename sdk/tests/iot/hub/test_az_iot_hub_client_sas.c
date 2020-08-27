@@ -135,7 +135,7 @@ static void az_iot_hub_client_sas_get_signature_device_succeeds()
   az_span signature = az_span_for_test_init(signature_buffer, _az_COUNTOF(signature_buffer));
   az_span out_signature;
 
-  assert_true(az_succeeded(az_iot_hub_client_sas_get_signature(
+  assert_true(az_result_succeeded(az_iot_hub_client_sas_get_signature(
       &client, test_sas_expiry_time_secs, signature, &out_signature)));
 
   az_span_for_test_verify(
@@ -162,7 +162,7 @@ static void az_iot_hub_client_sas_get_signature_module_succeeds()
   az_span signature = az_span_for_test_init(signature_buffer, _az_COUNTOF(signature_buffer));
   az_span out_signature;
 
-  assert_true(az_succeeded(az_iot_hub_client_sas_get_signature(
+  assert_true(az_result_succeeded(az_iot_hub_client_sas_get_signature(
       &client, test_sas_expiry_time_secs, signature, &out_signature)));
 
   az_span_for_test_verify(
@@ -187,7 +187,7 @@ static void az_iot_hub_client_sas_get_password_device_succeeds()
   char password[TEST_SPAN_BUFFER_SIZE];
   size_t length = 0;
 
-  assert_true(az_succeeded(az_iot_hub_client_sas_get_password(
+  assert_true(az_result_succeeded(az_iot_hub_client_sas_get_password(
       &client,
       test_signature,
       test_sas_expiry_time_secs,
@@ -213,7 +213,7 @@ static void az_iot_hub_client_sas_get_password_device_no_out_length_succeeds()
 
   char password[TEST_SPAN_BUFFER_SIZE];
 
-  assert_true(az_succeeded(az_iot_hub_client_sas_get_password(
+  assert_true(az_result_succeeded(az_iot_hub_client_sas_get_password(
       &client,
       test_signature,
       test_sas_expiry_time_secs,
@@ -243,7 +243,7 @@ static void az_iot_hub_client_sas_get_password_module_succeeds()
   char password[TEST_SPAN_BUFFER_SIZE];
   size_t length = 0;
 
-  assert_true(az_succeeded(az_iot_hub_client_sas_get_password(
+  assert_true(az_result_succeeded(az_iot_hub_client_sas_get_password(
       &client,
       test_signature,
       test_sas_expiry_time_secs,
@@ -272,7 +272,7 @@ static void az_iot_hub_client_sas_get_password_module_no_length_succeeds()
 
   char password[TEST_SPAN_BUFFER_SIZE];
 
-  assert_true(az_succeeded(az_iot_hub_client_sas_get_password(
+  assert_true(az_result_succeeded(az_iot_hub_client_sas_get_password(
       &client,
       test_signature,
       test_sas_expiry_time_secs,
@@ -299,7 +299,7 @@ static void az_iot_hub_client_sas_get_password_device_with_keyname_succeeds()
   char password[TEST_SPAN_BUFFER_SIZE];
   size_t length = 0;
 
-  assert_true(az_succeeded(az_iot_hub_client_sas_get_password(
+  assert_true(az_result_succeeded(az_iot_hub_client_sas_get_password(
       &client,
       test_signature,
       test_sas_expiry_time_secs,
@@ -330,7 +330,7 @@ static void az_iot_hub_client_sas_get_password_module_with_keyname_succeeds()
   char password[TEST_SPAN_BUFFER_SIZE];
   size_t length = 0;
 
-  assert_true(az_succeeded(az_iot_hub_client_sas_get_password(
+  assert_true(az_result_succeeded(az_iot_hub_client_sas_get_password(
       &client,
       test_signature,
       test_sas_expiry_time_secs,
@@ -454,7 +454,7 @@ static void test_az_iot_hub_client_sas_logging_succeed()
   az_span signature = az_span_create(signature_buffer, _az_COUNTOF(signature_buffer));
   az_span out_signature;
 
-  assert_true(az_succeeded(az_iot_hub_client_sas_get_signature(
+  assert_true(az_result_succeeded(az_iot_hub_client_sas_get_signature(
       &client, test_sas_expiry_time_secs, signature, &out_signature)));
 
   assert_int_equal(_az_BUILT_WITH_LOGGING(1, 0), _log_invoked_sas);

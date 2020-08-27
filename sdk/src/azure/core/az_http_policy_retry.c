@@ -17,12 +17,9 @@
 #include <azure/core/_az_cfg.h>
 
 static az_http_status_code const _default_status_codes[] = {
-  AZ_HTTP_STATUS_CODE_REQUEST_TIMEOUT,
-  AZ_HTTP_STATUS_CODE_TOO_MANY_REQUESTS,
-  AZ_HTTP_STATUS_CODE_INTERNAL_SERVER_ERROR,
-  AZ_HTTP_STATUS_CODE_BAD_GATEWAY,
-  AZ_HTTP_STATUS_CODE_SERVICE_UNAVAILABLE,
-  AZ_HTTP_STATUS_CODE_GATEWAY_TIMEOUT,
+  AZ_HTTP_STATUS_CODE_REQUEST_TIMEOUT,       AZ_HTTP_STATUS_CODE_TOO_MANY_REQUESTS,
+  AZ_HTTP_STATUS_CODE_INTERNAL_SERVER_ERROR, AZ_HTTP_STATUS_CODE_BAD_GATEWAY,
+  AZ_HTTP_STATUS_CODE_SERVICE_UNAVAILABLE,   AZ_HTTP_STATUS_CODE_GATEWAY_TIMEOUT,
   AZ_HTTP_STATUS_CODE_END_OF_LIST,
 };
 
@@ -77,7 +74,7 @@ AZ_INLINE void _az_http_policy_retry_log(int32_t attempt, int32_t delay_msec)
 AZ_INLINE AZ_NODISCARD int32_t _az_uint32_span_to_int32(az_span span)
 {
   uint32_t value = 0;
-  if (az_succeeded(az_span_atou32(span, &value)))
+  if (az_result_succeeded(az_span_atou32(span, &value)))
   {
     return value < INT32_MAX ? (int32_t)value : INT32_MAX;
   }
@@ -177,7 +174,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_retry(
     result = _az_http_pipeline_nextpolicy(ref_policies, ref_request, ref_response);
 
     // Even HTTP 429, or 502 are expected to be AZ_OK, so the failed result is not retriable.
-    if (attempt > max_retries || az_failed(result))
+    if (attempt > max_retries || az_result_failed(result))
     {
       return result;
     }
