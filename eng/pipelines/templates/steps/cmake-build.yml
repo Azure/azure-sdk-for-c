@@ -16,3 +16,4 @@ steps:
   - script: cmake --build . --config Release
     workingDirectory: build
     displayName: cmake build
+    

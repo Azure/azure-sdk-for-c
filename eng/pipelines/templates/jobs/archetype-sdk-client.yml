@@ -122,7 +122,7 @@ jobs:
         vcpkg.deps: 'cmocka'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         # This is the only platform where we run mocking functions and generate CodeCoverage
-        build.args: ' -DUNIT_TESTING=ON -DCMAKE_BUILD_TYPE=Release -DUNIT_TESTING_MOCKS=ON'
+        build.args: ' -DUNIT_TESTING=ON -DCMAKE_BUILD_TYPE=Debug -DUNIT_TESTING_MOCKS=ON'
         AZ_SDK_CODE_COV: 1
         AZ_SDK_C_NO_SAMPLES: 'true'
       Win_x86_with_unit_test:
