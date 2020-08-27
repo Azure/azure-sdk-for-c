@@ -242,7 +242,7 @@ static void receive_method_messages(void)
     parse_method_message(topic, topic_len, message, &method_request);
     IOT_SAMPLE_LOG_SUCCESS("Client parsed Method message.");
 
-    handle_method_message(&method_request);
+    handle_method_request(&method_request);
 
     MQTTClient_freeMessage(&message);
     MQTTClient_free(topic);
