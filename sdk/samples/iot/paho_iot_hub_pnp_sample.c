@@ -206,7 +206,7 @@ static az_result build_property_payload_with_status(
  *   }
  *
  * Direct Method (Command): One device command is supported in this sample: `getMaxMinReport`. If
- * any other commands are attempted to be invoked, the IOT_SAMPLE_LOG will report the command is not found. To
+ * any other commands are attempted to be invoked, the log will report the command is not found. To
  * invoke a command, select your device's Direct Method tab in the Azure IoT Explorer. Enter the
  * command name `getMaxMinReport` along with a payload using an ISO8061 time format and select
  * Invoke method.

@@ -70,8 +70,8 @@ static void send_method_response(
  *
  *  {"response": "pong"}
  *
- * No other method commands are supported. If any other methods are attempted to be invoked, the
- * IOT_SAMPLE_LOG will report the method is not found.
+ * No other method commands are supported. If any other methods are attempted to be invoked, the log
+ * will report the method is not found.
  */
 int main(void)
 {
@@ -289,7 +289,7 @@ static void parse_method_message(
   IOT_SAMPLE_LOG_AZ_SPAN("Payload:", message_span);
 }
 
-static void handle_method_message(az_iot_hub_client_method_request const* method_request)
+static void handle_method_request(az_iot_hub_client_method_request const* method_request)
 {
   if (az_span_is_content_equal(ping_method_name, method_request->name))
   {

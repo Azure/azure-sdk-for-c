@@ -241,7 +241,7 @@ static void property_callback(
  *   }
  *
  * Direct Method (Command): Two device commnds are supported in this sample: `reboot` and
- * `getMaxMinReport`. If any other commands are attempted to be invoked, the IOT_SAMPLE_LOG will report the
+ * `getMaxMinReport`. If any other commands are attempted to be invoked, the log will report the
  * command is not found. To invoke a command, select your device's Direct Method tab in the Azure
  * IoT Explorer.
  *
