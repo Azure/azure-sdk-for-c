@@ -70,6 +70,10 @@ steps:
         git clone https://github.com/Microsoft/vcpkg.git
         cd vcpkg
         git rev-parse --verify HEAD
+
+        # Make sure to fetch all the tags to avoid failures on checkout.
+        git fetch --all --tags
+
         git checkout ${{ parameters.VcpkgVersion }}
         git status
 
@@ -101,39 +105,19 @@ steps:
     inputs:
       targetType: inline
       script: |
-        echo cd $VCPKG_INSTALLATION_ROOT
         cd $VCPKG_INSTALLATION_ROOT
-        pwd
 
         # Sometimes the image has changes in the git tree. Reset to HEAD and
         # then pull
-        echo git reset --hard HEAD
         git reset --hard HEAD
-        echo git pull origin master
         git pull origin master
 
-        echo git fetch
-        git fetch
-
-        echo git fetch --all --tags
+        # Make sure to fetch all the tags to avoid failures on checkout.
         git fetch --all --tags
-        git tag
 
-        echo git checkout ${{ parameters.VcpkgVersion }}
         git checkout ${{ parameters.VcpkgVersion }}
 
-        echo git remote -v
-        git remote -v
-        echo git status
-        git status
-        echo git branch
-        git branch
-        echo git tag
-        git tag
-
-        echo ./bootstrap-vcpkg.sh
         ./bootstrap-vcpkg.sh
-
     condition: >-
       and(
         succeeded(),
