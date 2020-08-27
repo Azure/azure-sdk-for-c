@@ -234,7 +234,7 @@ static void generate_sas_key(void)
   uint64_t sas_duration
       = iot_sample_get_epoch_expiration_time_from_minutes(env_vars.sas_key_duration_minutes);
 
-  // Get the signature that will later be signed.
+  // Get the signature that will later be signed with the decoded key.
   az_span sas_signature = AZ_SPAN_FROM_BUFFER(sas_signature_buffer);
   if (az_failed(
           rc = az_iot_hub_client_sas_get_signature(

@@ -268,7 +268,9 @@ static void receive_device_registration_status_message(void)
     // Parse registration status message.
     az_iot_provisioning_client_register_response register_response;
     az_iot_provisioning_client_operation_status operation_status;
-    parse_device_registration_status_message(topic, topic_len, message, &register_response, &operation_status);
+    parse_device_registration_status_message(
+        topic, topic_len, message, &register_response, &operation_status);
+    IOT_SAMPLE_LOG_SUCCESS("Client parsed registration status message.");
 
     handle_device_registration_status_message(
         &register_response, &operation_status, &is_operation_complete);
@@ -300,8 +302,8 @@ static void parse_device_registration_status_message(
     az_iot_provisioning_client_operation_status* out_operation_status)
 {
   az_result rc;
-  az_span topic_span = az_span_create((uint8_t*)topic, topic_len);
-  az_span message_span = az_span_create((uint8_t*)message->payload, message->payloadlen);
+  az_span const topic_span = az_span_create((uint8_t*)topic, topic_len);
+  az_span const message_span = az_span_create((uint8_t*)message->payload, message->payloadlen);
 
   // Parse message and retrieve register_response info.
   if (az_failed(
@@ -351,6 +353,7 @@ static void handle_device_registration_status_message(
       IOT_SAMPLE_LOG_AZ_SPAN(
           "Hub Hostname:", register_response->registration_result.assigned_hub_hostname);
       IOT_SAMPLE_LOG_AZ_SPAN("Device Id:", register_response->registration_result.device_id);
+      IOT_SAMPLE_LOG(" "); // Formatting
     }
     else // Unsuccessful assignment (unassigned, failed or disabled states)
     {
