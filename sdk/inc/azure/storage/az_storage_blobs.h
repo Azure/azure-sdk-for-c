@@ -100,6 +100,7 @@ typedef struct
   az_context* context; ///< Operation context.
   struct
   {
+    /// Currently, this is unused, but needed as a placeholder since we can't have an empty struct.
     az_span unused;
   } _internal;
 } az_storage_blobs_blob_upload_options;

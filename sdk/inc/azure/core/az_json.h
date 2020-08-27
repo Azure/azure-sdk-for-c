@@ -259,7 +259,7 @@ typedef struct
 {
   struct
   {
-    // Currently, this is unused, but needed as a placeholder since we can't have an empty struct.
+    /// Currently, this is unused, but needed as a placeholder since we can't have an empty struct.
     bool unused;
   } _internal;
 } az_json_writer_options;
@@ -568,7 +568,7 @@ typedef struct
 {
   struct
   {
-    // Currently, this is unused, but needed as a placeholder since we can't have an empty struct.
+    /// Currently, this is unused, but needed as a placeholder since we can't have an empty struct.
     bool unused;
   } _internal;
 } az_json_reader_options;
