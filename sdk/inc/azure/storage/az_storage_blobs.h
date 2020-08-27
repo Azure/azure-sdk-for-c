@@ -97,6 +97,7 @@ typedef struct
   az_context* context; ///< Operation context.
   struct
   {
+    /// Currently, this is unused, but needed as a placeholder since we can't have an empty struct.
     bool unused;
   } _internal;
 } az_storage_blobs_blob_upload_options;
