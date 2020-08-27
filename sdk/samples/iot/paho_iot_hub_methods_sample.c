@@ -51,7 +51,7 @@ static void parse_method_message(
     int topic_len,
     MQTTClient_message const* message,
     az_iot_hub_client_method_request* out_method_request);
-static void handle_method_message(az_iot_hub_client_method_request const* method_request);
+static void handle_method_request(az_iot_hub_client_method_request const* method_request);
 static az_span invoke_ping(void);
 static void send_method_response(
     az_iot_hub_client_method_request const* request,
@@ -242,7 +242,7 @@ static void receive_method_messages(void)
     parse_method_message(topic, topic_len, message, &method_request);
     IOT_SAMPLE_LOG_SUCCESS("Client parsed Method message.");
 
-    handle_method_message(&method_request);
+    handle_method_request(&method_request);
 
     MQTTClient_freeMessage(&message);
     MQTTClient_free(topic);
@@ -289,7 +289,7 @@ static void parse_method_message(
   IOT_SAMPLE_LOG_AZ_SPAN("Payload:", message_span);
 }
 
-static void handle_method_message(az_iot_hub_client_method_request const* method_request)
+static void handle_method_request(az_iot_hub_client_method_request const* method_request)
 {
   if (az_span_is_content_equal(ping_method_name, method_request->name))
   {
