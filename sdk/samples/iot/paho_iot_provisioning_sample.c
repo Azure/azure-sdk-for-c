@@ -110,7 +110,8 @@ static void create_and_configure_mqtt_client(void)
               env_vars.provisioning_registration_id,
               NULL)))
   {
-    IOT_SAMPLE_LOG_ERROR("Failed to initialize provisioning client: az_result return code 0x%08x.", rc);
+    IOT_SAMPLE_LOG_ERROR(
+        "Failed to initialize provisioning client: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -190,7 +191,8 @@ static void subscribe_mqtt_client_to_provisioning_service_topics(void)
        = MQTTClient_subscribe(mqtt_client, AZ_IOT_PROVISIONING_CLIENT_REGISTER_SUBSCRIBE_TOPIC, 1))
       != MQTTCLIENT_SUCCESS)
   {
-    IOT_SAMPLE_LOG_ERROR("Failed to subscribe to the Register topic: MQTTClient return code %d.", rc);
+    IOT_SAMPLE_LOG_ERROR(
+        "Failed to subscribe to the Register topic: MQTTClient return code %d.", rc);
     exit(rc);
   }
 }
@@ -208,7 +210,8 @@ static void register_device_with_provisioning_service(void)
               sizeof(register_publish_topic_buffer),
               NULL)))
   {
-    IOT_SAMPLE_LOG_ERROR("Failed to get MQTT register publish topic: az_result return code 0x%08x.", rc);
+    IOT_SAMPLE_LOG_ERROR(
+        "Failed to get MQTT register publish topic: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -283,7 +286,8 @@ static void receive_device_registration_status(void)
   if (AZ_IOT_PROVISIONING_STATUS_ASSIGNED == operation_status) // Successful assignment
   {
     IOT_SAMPLE_LOG_SUCCESS("Device provisioned:");
-    IOT_SAMPLE_LOG_AZ_SPAN("Hub Hostname:", register_response.registration_result.assigned_hub_hostname);
+    IOT_SAMPLE_LOG_AZ_SPAN(
+        "Hub Hostname:", register_response.registration_result.assigned_hub_hostname);
     IOT_SAMPLE_LOG_AZ_SPAN("Device Id:", register_response.registration_result.device_id);
   }
   else // Unsuccessful assignment (unassigned, failed or disabled states)
@@ -294,8 +298,10 @@ static void receive_device_registration_status(void)
     IOT_SAMPLE_LOG_AZ_SPAN("Operation ID:", register_response.operation_id);
     IOT_SAMPLE_LOG("Error code: %u", register_response.registration_result.extended_error_code);
     IOT_SAMPLE_LOG_AZ_SPAN("Error message:", register_response.registration_result.error_message);
-    IOT_SAMPLE_LOG_AZ_SPAN("Error timestamp:", register_response.registration_result.error_timestamp);
-    IOT_SAMPLE_LOG_AZ_SPAN("Error tracking ID:", register_response.registration_result.error_tracking_id);
+    IOT_SAMPLE_LOG_AZ_SPAN(
+        "Error timestamp:", register_response.registration_result.error_timestamp);
+    IOT_SAMPLE_LOG_AZ_SPAN(
+        "Error tracking ID:", register_response.registration_result.error_tracking_id);
     exit((int)register_response.registration_result.extended_error_code);
   }
 
@@ -366,7 +372,8 @@ static void send_operation_query_message(
               sizeof(query_topic_buffer),
               NULL)))
   {
-    IOT_SAMPLE_LOG_ERROR("Unable to get query status publish topic: az_result return code 0x%08x.", rc);
+    IOT_SAMPLE_LOG_ERROR(
+        "Unable to get query status publish topic: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 

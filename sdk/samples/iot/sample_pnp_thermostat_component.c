@@ -231,7 +231,8 @@ bool pnp_thermostat_get_max_temp_report(
                    mqtt_message->topic_length,
                    NULL)))
   {
-    IOT_SAMPLE_LOG_ERROR("Failed to get reported property topic with status: az_result return code 0x%08x.", rc);
+    IOT_SAMPLE_LOG_ERROR(
+        "Failed to get reported property topic with status: az_result return code 0x%08x.", rc);
     return false;
   }
 
@@ -258,7 +259,8 @@ az_result pnp_thermostat_process_property_update(
 
   if (!az_json_token_is_text_equal(property_name, desired_temp_property_name))
   {
-    IOT_SAMPLE_LOG_AZ_SPAN("PnP property is not supported on thermostat component:", property_name->slice);
+    IOT_SAMPLE_LOG_AZ_SPAN(
+        "PnP property is not supported on thermostat component:", property_name->slice);
   }
 
   double parsed_value = 0;
@@ -307,7 +309,9 @@ az_result pnp_thermostat_process_property_update(
                 temp_response_description_success,
                 &mqtt_message->out_payload_span)))
     {
-      IOT_SAMPLE_LOG_ERROR("Failed to get reported property payload with status: az_result return code 0x%08x.", result);
+      IOT_SAMPLE_LOG_ERROR(
+          "Failed to get reported property payload with status: az_result return code 0x%08x.",
+          result);
     }
   }
 
@@ -315,7 +319,8 @@ az_result pnp_thermostat_process_property_update(
           result = az_iot_hub_client_twin_patch_get_publish_topic(
               client, get_request_id(), mqtt_message->topic, mqtt_message->topic_length, NULL)))
   {
-    IOT_SAMPLE_LOG_ERROR("Failed to get reported property topic with status: az_result return code 0x%08x.", result);
+    IOT_SAMPLE_LOG_ERROR(
+        "Failed to get reported property topic with status: az_result return code 0x%08x.", result);
   }
 
   return result;
@@ -360,7 +365,8 @@ az_result pnp_thermostat_process_command(
                 mqtt_message->topic_length,
                 mqtt_message->out_topic_length)))
     {
-      IOT_SAMPLE_LOG_ERROR("Failed to get methods response publish topic: az_result return code 0x%08x.", result);
+      IOT_SAMPLE_LOG_ERROR(
+          "Failed to get methods response publish topic: az_result return code 0x%08x.", result);
       return result;
     }
   }
