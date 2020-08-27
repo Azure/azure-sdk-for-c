@@ -115,7 +115,8 @@ steps:
         echo git fetch
         git fetch
 
-        echo git tag
+        echo git fetch --all --tags
+        git fetch --all --tags
         git tag
 
         echo git checkout ${{ parameters.VcpkgVersion }}
@@ -128,10 +129,6 @@ steps:
         echo git branch
         git branch
         echo git tag
-        git tag
-
-        echo git fetch --all --tags
-        git fetch --all --tags
         git tag
 
         echo ./bootstrap-vcpkg.sh
