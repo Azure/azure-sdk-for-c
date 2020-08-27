@@ -2,19 +2,21 @@
 // SPDX-License-Identifier: MIT
 
 #ifdef _MSC_VER
-// warning C4201: nonstandard extension used: nameless struct/union
-#pragma warning(disable : 4201)
 // warning C4204: nonstandard extension used: non-constant aggregate initializer
 #pragma warning(disable : 4204)
-// warning C4996: 'localtime': This function or variable may be unsafe.  Consider using localtime_s instead.
+// warning C4996: 'localtime': This function or variable may be unsafe.  Consider using localtime_s
+// instead.
 #pragma warning(disable : 4996)
+#pragma warning(push)
+// warning C4201: nonstandard extension used: nameless struct/union
+#pragma warning(disable : 4201)
 #endif
 #include <paho-mqtt/MQTTClient.h>
 #ifdef _MSC_VER
-#pragma warning(default : 4201)
+#pragma warning(pop)
 #endif
 
-#include "iot_samples_common.h"
+#include "iot_sample_common.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -32,7 +34,7 @@
 #define SAMPLE_NAME PAHO_IOT_HUB_PNP_SAMPLE
 
 #define TELEMETRY_SEND_INTERVAL 1
-#define TIMEOUT_MQTT_RECEIVE_MAX_COUNT 3
+#define TIMEOUT_MQTT_RECEIVE_MAX_MESSAGE_COUNT 3
 #define TIMEOUT_MQTT_RECEIVE_MS (8 * 1000)
 #define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
 #define TIMEOUT_MQTT_WAIT_FOR_COMPLETION_MS 1000
@@ -40,8 +42,9 @@
 #define DEFAULT_START_TEMP_AVG_COUNT 1
 #define DEFAULT_START_TEMP_CELSIUS 22.0
 #define DOUBLE_DECIMAL_PLACE_DIGITS 2
+#define SAMPLE_PUBLISH_QOS 0
 
-static bool device_operational = true;
+static bool is_device_operational = true;
 static const char iso_spec_time_format[] = "%Y-%m-%dT%H:%M:%S%z"; // ISO8601 Time Format
 
 // * PnP Values *
@@ -76,7 +79,7 @@ static const az_span command_min_temp_name = AZ_SPAN_LITERAL_FROM_STR("minTemp")
 static const az_span command_avg_temp_name = AZ_SPAN_LITERAL_FROM_STR("avgTemp");
 static const az_span command_start_time_name = AZ_SPAN_LITERAL_FROM_STR("startTime");
 static const az_span command_end_time_name = AZ_SPAN_LITERAL_FROM_STR("endTime");
-static const az_span command_error_response_payload = AZ_SPAN_LITERAL_FROM_STR("{}");
+static const az_span command_empty_response_payload = AZ_SPAN_LITERAL_FROM_STR("{}");
 static char command_start_time_value_buffer[32];
 static char command_end_time_value_buffer[32];
 static char command_response_payload_buffer[256];
@@ -108,13 +111,14 @@ static void receive_messages(void);
 static void disconnect_mqtt_client_from_iot_hub(void);
 
 static az_span get_request_id(void);
-static void mqtt_publish_message(char* topic, az_span payload, int qos);
+static void mqtt_publish_message(const char* topic, az_span payload, int qos);
 static void on_message_received(char* topic, int topic_len, const MQTTClient_message* message);
 
 // Device Twin functions
 static void handle_device_twin_message(
-    const az_span twin_message_span,
+    az_span twin_message_span,
     const az_iot_hub_client_twin_response* twin_response);
+static void process_device_twin_message(az_span twin_message_span, bool is_twin_get);
 static az_result parse_device_twin_desired_temperature_property(
     az_span twin_message_span,
     bool is_twin_get,
@@ -125,7 +129,7 @@ static void send_reported_property(az_span name, double value, int32_t version, 
 
 // Command functions
 static void handle_command_message(
-    const az_span command_message_span,
+    az_span command_message_span,
     const az_iot_hub_client_method_request* command_request);
 static void send_command_response(
     const az_iot_hub_client_method_request* command_request,
@@ -157,10 +161,10 @@ static az_result build_property_payload_with_status(
     az_span* out_payload);
 
 /*
- * This sample connects an IoT Plug and Play enabled device with the Digital Twin Model ID (DTMI)
- * detailed here. If a timeout occurs while waiting for a message from the Azure IoT Explorer, the
- * sample will continue. If TIMEOUT_MQTT_RECEIVE_MAX_COUNT timeouts occur consecutively, the sample
- * will disconnect. X509 self-certification is used.
+ * This sample connects an IoT Plug and Play enabled device with the Digital Twin Model ID (DTMI).
+ * If a timeout occurs while waiting for a message from the Azure IoT Explorer, the sample will
+ * continue. If TIMEOUT_MQTT_RECEIVE_MAX_COUNT timeouts occur consecutively, the sample will
+ * disconnect. X509 self-certification is used.
  *
  * To interact with this sample, you must use the Azure IoT Explorer. The capabilities are Device
  * Twin, Direct Method (Command), and Telemetry:
@@ -169,18 +173,20 @@ static az_result build_property_payload_with_status(
  *   - A desired property named `targetTemperature` with a `double` value for the desired
  * temperature.
  *   - A reported property named `maxTempSinceLastReboot` with a `double` value for the highest
- * temperature.
+ * temperature reached since device boot.
+ *
  * To send a device twin desired property message, select your device's Device Twin tab
  * in the Azure IoT Explorer. Add the property targetTemperature along with a corresponding value to
  * the desired section of the JSON. Select Save to update the twin document and send the twin
  * message to the device.
  *   {
  *     "properties": {
- *        "desired": {
- *          "targetTemperature": 68.5,
+ *       "desired": {
+ *         "targetTemperature": 68.5,
  *       }
  *     }
  *   }
+ *
  * Upon receiving a desired property message, the sample will update the twin property locally and
  * send a reported property of the same name back to the service. This message will include a set of
  * "ack" values: `ac` for the HTTP-like ack code, `av` for ack version of the property, and an
@@ -199,11 +205,14 @@ static az_result build_property_payload_with_status(
  *     }
  *   }
  *
- * Direct Method (Command): One command is supported in this sample: `getMaxMinReport`. If any other
- * commands are attempted to be invoked, the log will report the command is not found. To invoke a
- * command, select your device's Direct Method tab in the Azure IoT Explorer. Enter the command name
- * getMaxMinReport along with a payload using an ISO8061 time format and select Invoke method.
+ * Direct Method (Command): One device command is supported in this sample: `getMaxMinReport`. If
+ * any other commands are attempted to be invoked, the log will report the command is not found. To
+ * invoke a command, select your device's Direct Method tab in the Azure IoT Explorer. Enter the
+ * command name `getMaxMinReport` along with a payload using an ISO8061 time format and select
+ * Invoke method.
+ *
  *   "2020-08-18T17:09:29-0700"
+ *
  * The command will send back to the service a response containing the following JSON payload with
  * updated values in each field:
  *   {
@@ -220,22 +229,22 @@ static az_result build_property_payload_with_status(
 int main(void)
 {
   create_and_configure_mqtt_client();
-  LOG_SUCCESS("Client created and configured.");
+  IOT_SAMPLE_LOG_SUCCESS("Client created and configured.");
 
   connect_mqtt_client_to_iot_hub();
-  LOG_SUCCESS("Client connected to IoT Hub.");
+  IOT_SAMPLE_LOG_SUCCESS("Client connected to IoT Hub.");
 
   subscribe_mqtt_client_to_iot_hub_topics();
-  LOG_SUCCESS("Client subscribed to IoT Hub topics.");
+  IOT_SAMPLE_LOG_SUCCESS("Client subscribed to IoT Hub topics.");
 
   request_device_twin_document();
-  LOG_SUCCESS("Client requested twin document.")
+  IOT_SAMPLE_LOG_SUCCESS("Client requested device twin document.");
 
   receive_messages();
-  LOG_SUCCESS("Client received messages.")
+  IOT_SAMPLE_LOG_SUCCESS("Client received messages.");
 
   disconnect_mqtt_client_from_iot_hub();
-  LOG_SUCCESS("Client disconnected from IoT Hub.");
+  IOT_SAMPLE_LOG_SUCCESS("Client disconnected from IoT Hub.");
 
   return 0;
 }
@@ -245,10 +254,10 @@ static void create_and_configure_mqtt_client(void)
   int rc;
 
   // Reads in environment variables set by user for purposes of running sample.
-  if (az_failed(rc = read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars)))
+  if (az_failed(rc = iot_sample_read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars)))
   {
-    LOG_ERROR(
-        "Failed to read configuration from environment variables: az_result return code 0x%04x.",
+    IOT_SAMPLE_LOG_ERROR(
+        "Failed to read configuration from environment variables: az_result return code 0x%08x.",
         rc);
     exit(rc);
   }
@@ -256,10 +265,10 @@ static void create_and_configure_mqtt_client(void)
   // Build an MQTT endpoint c-string.
   char mqtt_endpoint_buffer[128];
   if (az_failed(
-          rc = create_mqtt_endpoint(
+          rc = iot_sample_create_mqtt_endpoint(
               SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer))))
   {
-    LOG_ERROR("Failed to create MQTT endpoint: az_result return code 0x%04x.", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to create MQTT endpoint: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -270,7 +279,7 @@ static void create_and_configure_mqtt_client(void)
           rc = az_iot_hub_client_init(
               &hub_client, env_vars.hub_hostname, env_vars.hub_device_id, &options)))
   {
-    LOG_ERROR("Failed to initialize hub client: az_result return code 0x%04x.", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to initialize hub client: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -280,7 +289,7 @@ static void create_and_configure_mqtt_client(void)
           rc = az_iot_hub_client_get_client_id(
               &hub_client, mqtt_client_id_buffer, sizeof(mqtt_client_id_buffer), NULL)))
   {
-    LOG_ERROR("Failed to get MQTT client id: az_result return code 0x%04x.", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to get MQTT client id: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -293,7 +302,7 @@ static void create_and_configure_mqtt_client(void)
            NULL))
       != MQTTCLIENT_SUCCESS)
   {
-    LOG_ERROR("Failed to create MQTT client: MQTTClient return code %d.", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to create MQTT client: MQTTClient return code %d.", rc);
     exit(rc);
   }
 }
@@ -307,7 +316,7 @@ static void connect_mqtt_client_to_iot_hub(void)
           rc = az_iot_hub_client_get_user_name(
               &hub_client, mqtt_client_username_buffer, sizeof(mqtt_client_username_buffer), NULL)))
   {
-    LOG_ERROR("Failed to get MQTT client username: az_result return code 0x%04x.", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to get MQTT client username: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -329,7 +338,7 @@ static void connect_mqtt_client_to_iot_hub(void)
   // Connect MQTT client to the Azure IoT Hub.
   if ((rc = MQTTClient_connect(mqtt_client, &mqtt_connect_options)) != MQTTCLIENT_SUCCESS)
   {
-    LOG_ERROR(
+    IOT_SAMPLE_LOG_ERROR(
         "Failed to connect: MQTTClient return code %d.\n"
         "If on Windows, confirm the AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH environment variable is "
         "set correctly.",
@@ -346,7 +355,7 @@ static void subscribe_mqtt_client_to_iot_hub_topics(void)
   if ((rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_HUB_CLIENT_METHODS_SUBSCRIBE_TOPIC, 1))
       != MQTTCLIENT_SUCCESS)
   {
-    LOG_ERROR("Failed to subscribe to the Methods topic: MQTTClient return code %d.", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to subscribe to the Methods topic: MQTTClient return code %d.", rc);
     exit(rc);
   }
 
@@ -354,7 +363,7 @@ static void subscribe_mqtt_client_to_iot_hub_topics(void)
   if ((rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_HUB_CLIENT_TWIN_PATCH_SUBSCRIBE_TOPIC, 1))
       != MQTTCLIENT_SUCCESS)
   {
-    LOG_ERROR("Failed to subscribe to the Twin Patch topic: MQTTClient return code %d.", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to subscribe to the Twin Patch topic: MQTTClient return code %d.", rc);
     exit(rc);
   }
 
@@ -362,7 +371,7 @@ static void subscribe_mqtt_client_to_iot_hub_topics(void)
   if ((rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_SUBSCRIBE_TOPIC, 1))
       != MQTTCLIENT_SUCCESS)
   {
-    LOG_ERROR("Failed to subscribe to the Twin Response topic: MQTTClient return code %d.", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to subscribe to the Twin Response topic: MQTTClient return code %d.", rc);
     exit(rc);
   }
 }
@@ -371,25 +380,22 @@ static void request_device_twin_document(void)
 {
   az_result rc;
 
-  LOG("Client requesting device twin document from service.");
-
   // Get the Twin Document topic to publish the twin document request.
   char twin_document_topic_buffer[128];
-  az_span request_id = get_request_id();
   if (az_failed(
           rc = az_iot_hub_client_twin_document_get_publish_topic(
               &hub_client,
-              request_id,
+              get_request_id(),
               twin_document_topic_buffer,
               sizeof(twin_document_topic_buffer),
               NULL)))
   {
-    LOG_ERROR("Failed to get Twin Document publish topic: az_result return code %04x", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to get Twin Document publish topic: az_result return code %04x", rc);
     exit(rc);
   }
 
   // Publish the twin document request.
-  mqtt_publish_message(twin_document_topic_buffer, AZ_SPAN_NULL, 0);
+  mqtt_publish_message(twin_document_topic_buffer, AZ_SPAN_NULL, SAMPLE_PUBLISH_QOS);
 }
 
 static void receive_messages(void)
@@ -398,50 +404,50 @@ static void receive_messages(void)
   char* topic = NULL;
   int topic_len = 0;
   MQTTClient_message* message = NULL;
-  uint8_t timeoutCounter = 0;
+  uint8_t timeout_counter = 0;
 
-  // Continue to receive commands or device twin messages while device is operational
-  while (device_operational)
+  // Continue to receive commands or device twin messages while device is operational.
+  while (is_device_operational)
   {
-    LOG(" "); // Formatting.
-    LOG("Waiting for Command or Device Twin message.\n");
+    IOT_SAMPLE_LOG(" "); // Formatting.
+    IOT_SAMPLE_LOG("Waiting for Command or Device Twin message.\n");
 
     if (((rc
           = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, TIMEOUT_MQTT_RECEIVE_MS))
          != MQTTCLIENT_SUCCESS)
         && (rc != MQTTCLIENT_TOPICNAME_TRUNCATED))
     {
-      LOG_ERROR("Failed to receive message: MQTTClient return code %d.", rc);
+      IOT_SAMPLE_LOG_ERROR("Failed to receive message: MQTTClient return code %d.", rc);
       exit(rc);
     }
     else if (message == NULL)
     {
-      // Allow up to TIMEOUT_MQTT_RECEIVE_MAX_COUNT before disconnecting
-      if (++timeoutCounter >= TIMEOUT_MQTT_RECEIVE_MAX_COUNT)
+      // Allow up to TIMEOUT_MQTT_RECEIVE_MAX_COUNT before disconnecting.
+      if (++timeout_counter >= TIMEOUT_MQTT_RECEIVE_MAX_MESSAGE_COUNT)
       {
-        LOG("Receive message timeout count of %d reached.", TIMEOUT_MQTT_RECEIVE_MAX_COUNT);
+        IOT_SAMPLE_LOG("Receive message timeout count of %d reached.", TIMEOUT_MQTT_RECEIVE_MAX_MESSAGE_COUNT);
         return;
       }
     }
     else
     {
-      LOG_SUCCESS("Client received message from the service.");
+      IOT_SAMPLE_LOG_SUCCESS("Client received a message from the service.");
 
       if (rc == MQTTCLIENT_TOPICNAME_TRUNCATED)
       {
         topic_len = (int)strlen(topic);
       }
 
-      timeoutCounter = 0; // Reset.
+      timeout_counter = 0; // Reset.
 
       on_message_received(topic, topic_len, message);
-      LOG(" "); // Formatting
+      IOT_SAMPLE_LOG(" "); // Formatting.
 
       MQTTClient_freeMessage(&message);
       MQTTClient_free(topic);
     }
 
-    // Send a telemetry message
+    // Send a telemetry message.
     send_telemetry_message();
   }
 }
@@ -452,7 +458,7 @@ static void disconnect_mqtt_client_from_iot_hub(void)
 
   if ((rc = MQTTClient_disconnect(mqtt_client, TIMEOUT_MQTT_DISCONNECT_MS)) != MQTTCLIENT_SUCCESS)
   {
-    LOG_ERROR("Failed to disconnect MQTT client: MQTTClient return code %d.", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to disconnect MQTT client: MQTTClient return code %d.", rc);
     exit(rc);
   }
 
@@ -468,14 +474,14 @@ static az_span get_request_id(void)
 
   if (az_failed(rc = az_span_i32toa(destination, connection_request_id_int++, &out_span)))
   {
-    LOG_ERROR("Failed to get request id: az_result return code 0x%04x.", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to get request id: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
   return az_span_slice(destination, 0, az_span_size(destination) - az_span_size(out_span));
 }
 
-static void mqtt_publish_message(char* topic, az_span payload, int qos)
+static void mqtt_publish_message(const char* topic, az_span payload, int qos)
 {
   int rc;
   MQTTClient_deliveryToken token;
@@ -484,7 +490,7 @@ static void mqtt_publish_message(char* topic, az_span payload, int qos)
            mqtt_client, topic, az_span_size(payload), az_span_ptr(payload), qos, 0, &token))
       != MQTTCLIENT_SUCCESS)
   {
-    LOG_ERROR("Failed to publish message: MQTTClient return code %d", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to publish message: MQTTClient return code %d", rc);
     exit(rc);
   }
 
@@ -493,7 +499,7 @@ static void mqtt_publish_message(char* topic, az_span payload, int qos)
     if ((rc = MQTTClient_waitForCompletion(mqtt_client, token, TIMEOUT_MQTT_WAIT_FOR_COMPLETION_MS))
         != MQTTCLIENT_SUCCESS)
     {
-      LOG_ERROR("Wait for message completion time out expired: MQTTClient return code %d", rc);
+      IOT_SAMPLE_LOG_ERROR("Wait for message completion time out expired: MQTTClient return code %d", rc);
       exit(rc);
     }
   }
@@ -514,84 +520,87 @@ static void on_message_received(char* topic, int topic_len, const MQTTClient_mes
           rc
           = az_iot_hub_client_twin_parse_received_topic(&hub_client, topic_span, &twin_response)))
   {
-    LOG_SUCCESS("Client received a valid topic response:");
-    LOG_AZ_SPAN("Topic:", topic_span);
-    LOG_AZ_SPAN("Payload:", message_span);
-    LOG("Status: %d", twin_response.status);
+    IOT_SAMPLE_LOG_SUCCESS("Client received a valid topic response.");
+    IOT_SAMPLE_LOG_AZ_SPAN("Topic:", topic_span);
+    IOT_SAMPLE_LOG_AZ_SPAN("Payload:", message_span);
+    IOT_SAMPLE_LOG("Status: %d", twin_response.status);
 
     handle_device_twin_message(message_span, &twin_response);
   }
-  else if (az_succeeded(az_iot_hub_client_methods_parse_received_topic(
-               &hub_client, topic_span, &command_request)))
+  else if (az_succeeded(
+               rc = az_iot_hub_client_methods_parse_received_topic(
+                   &hub_client, topic_span, &command_request)))
   {
-    LOG_SUCCESS("Client received a valid topic response:");
-    LOG_AZ_SPAN("Topic:", topic_span);
-    LOG_AZ_SPAN("Payload:", message_span);
+    IOT_SAMPLE_LOG_SUCCESS("Client received a valid topic response.");
+    IOT_SAMPLE_LOG_AZ_SPAN("Topic:", topic_span);
+    IOT_SAMPLE_LOG_AZ_SPAN("Payload:", message_span);
 
     handle_command_message(message_span, &command_request);
   }
   else
   {
-    LOG_ERROR("Message from unknown topic: az_result return code 0x%04x.", rc);
-    LOG_AZ_SPAN("Topic:", topic_span);
+    IOT_SAMPLE_LOG_ERROR("Message from unknown topic: az_result return code 0x%08x.", rc);
+    IOT_SAMPLE_LOG_AZ_SPAN("Topic:", topic_span);
     exit(rc);
   }
 }
 
 static void handle_device_twin_message(
-    const az_span twin_message_span,
+    az_span twin_message_span,
     const az_iot_hub_client_twin_response* twin_response)
 {
-  // Invoke appropriate action per response type (3 Types only).
   bool is_twin_get = false;
 
+  // Invoke appropriate action per response type (3 types only).
   switch (twin_response->response_type)
   {
+    // A response from a twin GET publish message with the twin document as a payload.
     case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_GET:
-      LOG("Type: GET");
+      IOT_SAMPLE_LOG("Message Type: GET");
       is_twin_get = true;
+      process_device_twin_message(twin_message_span, is_twin_get);
       break;
 
+    // An update to the desired properties with the properties as a payload.
     case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES:
-      LOG("Type: Desired Properties");
+      IOT_SAMPLE_LOG("Message Type: Desired Properties");
+      process_device_twin_message(twin_message_span, is_twin_get);
       break;
 
+    // A response from a twin reported properties publish message.
     case AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES:
-      LOG("Type: Reported Properties");
+      IOT_SAMPLE_LOG("Message Type: Reported Properties");
       break;
-  }
-
-  // For a GET response OR a Desired Properties response from the server:
-  // 1. Parse for the desired temperature
-  // 2. Update device temperature locally
-  // 3. Report updated temperature to server
-  if (twin_response->response_type == AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_GET
-      || twin_response->response_type == AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES)
-  {
-    double desired_temp;
-    int32_t version_num;
-
-    if (az_succeeded(parse_device_twin_desired_temperature_property(
-            twin_message_span, is_twin_get, &desired_temp, &version_num)))
-    {
-      bool confirm = true;
-      bool is_max_temp_changed = false;
-
-      update_device_temp(desired_temp, &is_max_temp_changed);
-      send_reported_property(twin_desired_temp_property_name, desired_temp, version_num, confirm);
-
-      if (is_max_temp_changed)
-      {
-        confirm = false;
-        send_reported_property(twin_reported_max_temp_property_name, device_max_temp, -1, confirm);
-      }
-    }
-    // else Desired property not found in payload. Do nothing.
   }
 }
 
+static void process_device_twin_message(az_span twin_message_span, bool is_twin_get)
+{
+  double desired_temp;
+  int32_t version_num;
+
+  // Parse for the desired temperature
+  if (az_succeeded(parse_device_twin_desired_temperature_property(
+          twin_message_span, is_twin_get, &desired_temp, &version_num)))
+  {
+    bool confirm = true;
+    bool is_max_temp_changed = false;
+
+    // Update device temperature locally and report update to server
+    update_device_temp(desired_temp, &is_max_temp_changed);
+    send_reported_property(twin_desired_temp_property_name, desired_temp, version_num, confirm);
+
+    if (is_max_temp_changed)
+    {
+      confirm = false;
+      send_reported_property(twin_reported_max_temp_property_name, device_max_temp, -1, confirm);
+    }
+  }
+  // Else desired property not found in payload. Do nothing.
+}
+
 static az_result parse_device_twin_desired_temperature_property(
-    const az_span twin_message_span,
+    az_span twin_message_span,
     bool is_twin_get,
     double* parsed_temp,
     int32_t* version_number)
@@ -628,7 +637,7 @@ static az_result parse_device_twin_desired_temperature_property(
 
     if (!desired_found)
     {
-      LOG("Desired property object not found in device twin GET response.");
+      IOT_SAMPLE_LOG("Desired property object not found in device twin GET response.");
       return AZ_ERROR_ITEM_NOT_FOUND;
     }
   }
@@ -662,13 +671,13 @@ static az_result parse_device_twin_desired_temperature_property(
 
   if (!(temp_found && version_found))
   {
-    LOG("Either targetTemperature property or the $version property were not found in desired "
+    IOT_SAMPLE_LOG("Either targetTemperature property or the $version property were not found in desired "
         "property response.");
     return AZ_ERROR_ITEM_NOT_FOUND;
   }
 
-  LOG("Parsed desired targetTemperature: %2f", *parsed_temp);
-  LOG("Parsed version number: %d", *version_number);
+  IOT_SAMPLE_LOG("Parsed desired targetTemperature: %2f", *parsed_temp);
+  IOT_SAMPLE_LOG("Parsed version number: %d", *version_number);
   return AZ_OK;
 }
 
@@ -694,7 +703,7 @@ static void update_device_temp(double temp, bool* is_max_temp_changed)
 
   *is_max_temp_changed = ret;
 
-  LOG_SUCCESS("Client updated desired temperature locally.");
+  IOT_SAMPLE_LOG_SUCCESS("Client updated desired temperature locally.");
 }
 
 static void send_reported_property(az_span name, double value, int32_t version, bool confirm)
@@ -703,16 +712,15 @@ static void send_reported_property(az_span name, double value, int32_t version, 
 
   // Get the Twin Patch topic to send a reported property update.
   char twin_patch_topic_buffer[128];
-  az_span request_id_span = get_request_id();
   if (az_failed(
           rc = az_iot_hub_client_twin_patch_get_publish_topic(
               &hub_client,
-              request_id_span,
+              get_request_id(),
               twin_patch_topic_buffer,
               sizeof(twin_patch_topic_buffer),
               NULL)))
   {
-    LOG_ERROR("Failed to get Twin Patch publish topic: az_result return code 0x%04x.", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to get Twin Patch publish topic: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -731,7 +739,9 @@ static void send_reported_property(az_span name, double value, int32_t version, 
                 reported_property_payload,
                 &reported_property_payload)))
     {
-      LOG_ERROR("Failed to build confirmed payload : az_result return code 0x%04x.", rc);
+      IOT_SAMPLE_LOG_ERROR(
+          "Failed to build reported property confirmed payload : az_result return code 0x%08x.",
+          rc);
       exit(rc);
     }
   }
@@ -745,15 +755,15 @@ static void send_reported_property(az_span name, double value, int32_t version, 
             rc = build_property_payload(
                 count, names, values, NULL, reported_property_payload, &reported_property_payload)))
     {
-      LOG_ERROR("Failed to build payload: az_result return code 0x%04x.", rc);
+      IOT_SAMPLE_LOG_ERROR("Failed to build reported property payload: az_result return code 0x%08x.", rc);
       exit(rc);
     }
   }
 
   // Publish the reported property update.
-  mqtt_publish_message(twin_patch_topic_buffer, reported_property_payload, 0);
-  LOG_SUCCESS("Client sent reported property message:");
-  LOG_AZ_SPAN("Payload:", reported_property_payload);
+  mqtt_publish_message(twin_patch_topic_buffer, reported_property_payload, SAMPLE_PUBLISH_QOS);
+  IOT_SAMPLE_LOG_SUCCESS("Client sent reported property message.");
+  IOT_SAMPLE_LOG_AZ_SPAN("Payload:", reported_property_payload);
 }
 
 static void handle_command_message(
@@ -775,14 +785,14 @@ static void handle_command_message(
     {
       status = AZ_IOT_STATUS_OK;
     }
-    LOG_SUCCESS("Client invoked 'invoke_getMaxMinReport'.");
+    IOT_SAMPLE_LOG_SUCCESS("Client invoked 'invoke_getMaxMinReport'.");
 
     send_command_response(command_request, status, command_response_payload);
   }
   else
   {
-    LOG_AZ_SPAN("command not supported:", command_request->name);
-    send_command_response(command_request, AZ_IOT_STATUS_NOT_FOUND, command_error_response_payload);
+    IOT_SAMPLE_LOG_AZ_SPAN("Command not supported:", command_request->name);
+    send_command_response(command_request, AZ_IOT_STATUS_NOT_FOUND, command_empty_response_payload);
   }
 }
 
@@ -791,7 +801,7 @@ static void send_command_response(
     az_iot_status status,
     az_span response_payload)
 {
-  int rc;
+  az_result rc;
 
   // Get the Methods response topic to publish the command response.
   char methods_response_topic_buffer[128];
@@ -804,15 +814,15 @@ static void send_command_response(
               sizeof(methods_response_topic_buffer),
               NULL)))
   {
-    LOG_ERROR("Failed to get Methods response publish topic: az_result return code 0x%04x.", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to get Methods response publish topic: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
   // Publish the command response.
-  mqtt_publish_message(methods_response_topic_buffer, response_payload, 0);
-  LOG_SUCCESS("Client published command response:");
-  LOG("Status: %d", status);
-  LOG_AZ_SPAN("Payload:", response_payload);
+  mqtt_publish_message(methods_response_topic_buffer, response_payload, SAMPLE_PUBLISH_QOS);
+  IOT_SAMPLE_LOG_SUCCESS("Client published command response:");
+  IOT_SAMPLE_LOG("Status: %d", status);
+  IOT_SAMPLE_LOG_AZ_SPAN("Payload:", response_payload);
 }
 
 static az_result invoke_getMaxMinReport(
@@ -834,12 +844,12 @@ static az_result invoke_getMaxMinReport(
   az_span start_time_span
       = az_span_create((uint8_t*)command_start_time_value_buffer, incoming_since_value_len);
 
-  LOG_AZ_SPAN("start time:", start_time_span);
+  IOT_SAMPLE_LOG_AZ_SPAN("start time:", start_time_span);
 
   // Set the response payload to error if the "since" value was empty.
   if (az_span_ptr(start_time_span) == NULL)
   {
-    *out_response = command_error_response_payload;
+    *out_response = command_empty_response_payload;
     return AZ_ERROR_ITEM_NOT_FOUND;
   }
 
@@ -855,7 +865,7 @@ static az_result invoke_getMaxMinReport(
       timeinfo);
   az_span end_time_span = az_span_create((uint8_t*)command_end_time_value_buffer, (int32_t)length);
 
-  LOG_AZ_SPAN("end time:", end_time_span);
+  IOT_SAMPLE_LOG_AZ_SPAN("end time:", end_time_span);
 
   // Build command response message.
   const uint8_t count = 3;
@@ -863,11 +873,12 @@ static az_result invoke_getMaxMinReport(
   const double values[3] = { device_max_temp, device_min_temp, device_avg_temp };
   const az_span times[2] = { start_time_span, end_time_span };
 
-  int rc;
+  az_result rc;
   if (az_failed(
-          rc = build_property_payload(count, names, values, times, response_destination, out_response)))
+          rc = build_property_payload(
+              count, names, values, times, response_destination, out_response)))
   {
-    LOG_ERROR("Failed to build command response payload: az_result return code 0x%04x.", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to build command response payload: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -876,7 +887,7 @@ static az_result invoke_getMaxMinReport(
 
 static void send_telemetry_message(void)
 {
-  int rc;
+  az_result rc;
 
   // Get the Telemetry topic to publish the telemetry message.
   char telemetry_topic_buffer[128];
@@ -884,7 +895,7 @@ static void send_telemetry_message(void)
           rc = az_iot_hub_client_telemetry_get_publish_topic(
               &hub_client, NULL, telemetry_topic_buffer, sizeof(telemetry_topic_buffer), NULL)))
   {
-    LOG_ERROR("Failed to get Telemetry publish topic: az_result return code 0x%04x.", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to get Telemetry publish topic: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -896,16 +907,17 @@ static void send_telemetry_message(void)
   char telemetry_payload_buffer[128];
   az_span telemetry_payload = AZ_SPAN_FROM_BUFFER(telemetry_payload_buffer);
   if (az_failed(
-          rc = build_property_payload(count, names, values, NULL, telemetry_payload, &telemetry_payload)))
+          rc = build_property_payload(
+              count, names, values, NULL, telemetry_payload, &telemetry_payload)))
   {
-    LOG_ERROR("Failed to build telemetry payload: az_result return code 0x%04x.", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to build telemetry payload: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
   // Publish the telemetry message.
-  mqtt_publish_message(telemetry_topic_buffer, telemetry_payload, 0);
-  LOG_SUCCESS("Client sent telemetry message to the service:");
-  LOG_AZ_SPAN("Payload:", telemetry_payload);
+  mqtt_publish_message(telemetry_topic_buffer, telemetry_payload, SAMPLE_PUBLISH_QOS);
+  IOT_SAMPLE_LOG_SUCCESS("Client sent telemetry message to the service:");
+  IOT_SAMPLE_LOG_AZ_SPAN("Payload:", telemetry_payload);
 }
 
 static az_result build_property_payload(

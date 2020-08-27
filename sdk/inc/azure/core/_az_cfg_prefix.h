@@ -2,9 +2,10 @@
 // SPDX-License-Identifier: MIT
 
 /**
- * @file _az_cfg_prefix.h
+ * @file
  *
- * @brief Open "extern C" and save warnings state.
+ * @brief Opens "extern C" and saves warnings state.
+ * Do not include this file directly.
  *
  * @note You MUST NOT use any symbols (macros, functions, structures, enums, etc.)
  * prefixed with an underscore ('_') directly in your application code. These symbols

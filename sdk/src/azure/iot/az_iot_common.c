@@ -3,17 +3,138 @@
 
 #include <stdint.h>
 
-#include <azure/iot/az_iot_common.h>
-#include <azure/iot/internal/az_iot_common_internal.h>
-#include <azure/core/internal/az_precondition_internal.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
+#include <azure/core/internal/az_precondition_internal.h>
 #include <azure/core/internal/az_span_internal.h>
+#include <azure/iot/az_iot_common.h>
+#include <azure/iot/internal/az_iot_common_internal.h>
 
 #include <azure/core/internal/az_log_internal.h>
 #include <azure/core/internal/az_retry_internal.h>
 
 #include <azure/core/_az_cfg.h>
+
+static const az_span hub_client_param_separator_span = AZ_SPAN_LITERAL_FROM_STR("&");
+static const az_span hub_client_param_equals_span = AZ_SPAN_LITERAL_FROM_STR("=");
+
+AZ_NODISCARD az_result az_iot_message_properties_init(
+    az_iot_message_properties* properties,
+    az_span buffer,
+    int32_t written_length)
+{
+  _az_PRECONDITION_NOT_NULL(properties);
+  _az_PRECONDITION_VALID_SPAN(buffer, 0, true);
+  _az_PRECONDITION(written_length >= 0);
+
+  properties->_internal.properties_buffer = buffer;
+  properties->_internal.properties_written = written_length;
+  properties->_internal.current_property_index = 0;
+
+  return AZ_OK;
+}
+
+AZ_NODISCARD az_result
+az_iot_message_properties_append(az_iot_message_properties* properties, az_span name, az_span value)
+{
+  _az_PRECONDITION_NOT_NULL(properties);
+  _az_PRECONDITION_VALID_SPAN(name, 1, false);
+  _az_PRECONDITION_VALID_SPAN(value, 1, false);
+
+  int32_t prop_length = properties->_internal.properties_written;
+
+  az_span remainder = az_span_slice_to_end(properties->_internal.properties_buffer, prop_length);
+
+  int32_t required_length = az_span_size(name) + az_span_size(value) + 1;
+
+  if (prop_length > 0)
+  {
+    required_length += 1;
+  }
+
+  AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, required_length);
+
+  if (prop_length > 0)
+  {
+    remainder = az_span_copy_u8(remainder, *az_span_ptr(hub_client_param_separator_span));
+  }
+
+  remainder = az_span_copy(remainder, name);
+  remainder = az_span_copy_u8(remainder, *az_span_ptr(hub_client_param_equals_span));
+  az_span_copy(remainder, value);
+
+  properties->_internal.properties_written += required_length;
+
+  return AZ_OK;
+}
+
+AZ_NODISCARD az_result az_iot_message_properties_find(
+    az_iot_message_properties* properties,
+    az_span name,
+    az_span* out_value)
+{
+  _az_PRECONDITION_NOT_NULL(properties);
+  _az_PRECONDITION_VALID_SPAN(name, 1, false);
+  _az_PRECONDITION_NOT_NULL(out_value);
+
+  az_span remaining = az_span_slice(
+      properties->_internal.properties_buffer, 0, properties->_internal.properties_written);
+
+  while (az_span_size(remaining) != 0)
+  {
+    az_span delim_span = _az_span_token(remaining, hub_client_param_equals_span, &remaining);
+    if (az_span_is_content_equal(delim_span, name))
+    {
+      *out_value = _az_span_token(remaining, hub_client_param_separator_span, &remaining);
+      return AZ_OK;
+    }
+    else
+    {
+      az_span value;
+      value = _az_span_token(remaining, hub_client_param_separator_span, &remaining);
+      (void)value;
+    }
+  }
+
+  return AZ_ERROR_ITEM_NOT_FOUND;
+}
+
+AZ_NODISCARD az_result az_iot_message_properties_next(
+    az_iot_message_properties* properties,
+    az_span* out_name,
+    az_span* out_value)
+{
+  _az_PRECONDITION_NOT_NULL(properties);
+  _az_PRECONDITION_NOT_NULL(out_name);
+  _az_PRECONDITION_NOT_NULL(out_value);
+
+  int32_t index = (int32_t)properties->_internal.current_property_index;
+  int32_t prop_length = properties->_internal.properties_written;
+
+  if (index == prop_length)
+  {
+    *out_name = AZ_SPAN_NULL;
+    *out_value = AZ_SPAN_NULL;
+    return AZ_ERROR_UNEXPECTED_END;
+  }
+
+  az_span remainder;
+  az_span prop_span = az_span_slice(properties->_internal.properties_buffer, index, prop_length);
+
+  *out_name = _az_span_token(prop_span, hub_client_param_equals_span, &remainder);
+  *out_value = _az_span_token(remainder, hub_client_param_separator_span, &remainder);
+  if (az_span_size(remainder) == 0)
+  {
+    properties->_internal.current_property_index = (uint32_t)prop_length;
+  }
+  else
+  {
+    properties->_internal.current_property_index
+        = (uint32_t)(az_span_ptr(remainder) - az_span_ptr(properties->_internal.properties_buffer));
+  }
+
+  return AZ_OK;
+}
 
 AZ_NODISCARD int32_t az_iot_retry_calc_delay(
     int32_t operation_msec,
@@ -87,7 +208,8 @@ AZ_NODISCARD int32_t _az_iot_u64toa_size(uint64_t number)
   }
 }
 
-AZ_NODISCARD az_result _az_span_copy_url_encode(az_span destination, az_span source, az_span* out_remainder)
+AZ_NODISCARD az_result
+_az_span_copy_url_encode(az_span destination, az_span source, az_span* out_remainder)
 {
   int32_t length;
   AZ_RETURN_IF_FAILED(_az_span_url_encode(destination, source, &length));

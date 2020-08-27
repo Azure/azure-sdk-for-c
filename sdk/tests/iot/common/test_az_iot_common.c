@@ -2,14 +2,15 @@
 // SPDX-License-Identifier: MIT
 
 #include "test_az_iot_common.h"
-#include <azure/iot/az_iot_common.h>
-#include <azure/iot/internal/az_iot_common_internal.h>
-#include <azure/core/az_log.h>
-#include <azure/core/az_precondition.h>
-#include <azure/core/internal/az_precondition_internal.h>
-#include <azure/core/az_span.h>
 #include <az_test_log.h>
 #include <az_test_precondition.h>
+#include <az_test_span.h>
+#include <azure/core/az_log.h>
+#include <azure/core/az_precondition.h>
+#include <azure/core/az_span.h>
+#include <azure/core/internal/az_precondition_internal.h>
+#include <azure/iot/az_iot_common.h>
+#include <azure/iot/internal/az_iot_common_internal.h>
 
 #include <setjmp.h>
 #include <stdarg.h>
@@ -17,6 +18,133 @@
 #include <stdint.h>
 
 #include <cmocka.h>
+
+#define TEST_SPAN_BUFFER_SIZE 256
+
+// Properties
+#define TEST_KEY "key"
+#define TEST_KEY_ONE "key_one"
+#define TEST_KEY_TWO "key_two"
+#define TEST_KEY_THREE "key_three"
+#define TEST_VALUE_ONE "value_one"
+#define TEST_VALUE_TWO "value_two"
+#define TEST_VALUE_THREE "value_three"
+#define TEST_KEY_VALUE_ONE "key_one=value_one"
+#define TEST_KEY_VALUE_TWO "key_one=value_one&key_two=value_two"
+#define TEST_KEY_VALUE_SUBSTRING "key_one=value_one&key=value_two"
+#define TEST_KEY_VALUE_SAME "key_one=key&key=value_two"
+#define TEST_KEY_VALUE_THREE "key_one=value_one&key_two=value_two&key_three=value_three"
+
+static const az_span test_key = AZ_SPAN_LITERAL_FROM_STR(TEST_KEY);
+static const az_span test_key_one = AZ_SPAN_LITERAL_FROM_STR(TEST_KEY_ONE);
+static const az_span test_key_two = AZ_SPAN_LITERAL_FROM_STR(TEST_KEY_TWO);
+static const az_span test_key_three = AZ_SPAN_LITERAL_FROM_STR(TEST_KEY_THREE);
+static const az_span test_value_one = AZ_SPAN_LITERAL_FROM_STR(TEST_VALUE_ONE);
+static const az_span test_value_two = AZ_SPAN_LITERAL_FROM_STR(TEST_VALUE_TWO);
+static const az_span test_value_three = AZ_SPAN_LITERAL_FROM_STR(TEST_VALUE_THREE);
+
+static const char test_correct_one_key_value[] = "key_one=value_one";
+static const char test_correct_two_key_value[] = "key_one=value_one&key_two=value_two";
+
+#ifndef AZ_NO_PRECONDITION_CHECKING
+ENABLE_PRECONDITION_CHECK_TESTS()
+
+static void test_az_iot_message_properties_init_NULL_props_fails(void** state)
+{
+  (void)state;
+
+  uint8_t test_span_buf[TEST_SPAN_BUFFER_SIZE];
+  az_span test_span = az_span_for_test_init(test_span_buf, _az_COUNTOF(test_span_buf));
+
+  ASSERT_PRECONDITION_CHECKED(az_iot_message_properties_init(NULL, test_span, 0));
+}
+
+static void test_az_iot_message_properties_append_get_NULL_props_fails(void** state)
+{
+  (void)state;
+
+  ASSERT_PRECONDITION_CHECKED(az_iot_message_properties_append(NULL, test_key_one, test_value_one));
+}
+
+static void test_az_iot_message_properties_append_NULL_name_span_fails(void** state)
+{
+  (void)state;
+
+  az_iot_message_properties props;
+
+  ASSERT_PRECONDITION_CHECKED(
+      az_iot_message_properties_append(&props, AZ_SPAN_NULL, test_value_one));
+}
+
+static void test_az_iot_message_properties_append_NULL_value_span_fails(void** state)
+{
+  (void)state;
+
+  az_iot_message_properties props;
+
+  ASSERT_PRECONDITION_CHECKED(az_iot_message_properties_append(&props, test_key_one, AZ_SPAN_NULL));
+}
+
+static void test_az_iot_message_properties_find_NULL_props_fail(void** state)
+{
+  (void)state;
+
+  az_span out_value;
+
+  ASSERT_PRECONDITION_CHECKED(az_iot_message_properties_find(NULL, test_key_one, &out_value));
+}
+
+static void test_az_iot_message_properties_find_NULL_name_fail(void** state)
+{
+  (void)state;
+
+  az_iot_message_properties props;
+
+  az_span out_value;
+
+  ASSERT_PRECONDITION_CHECKED(az_iot_message_properties_find(&props, AZ_SPAN_NULL, &out_value));
+}
+
+static void test_az_iot_message_properties_find_NULL_value_fail(void** state)
+{
+  (void)state;
+
+  az_iot_message_properties props;
+
+  ASSERT_PRECONDITION_CHECKED(az_iot_message_properties_find(&props, test_key_one, NULL));
+}
+
+static void test_az_iot_message_properties_next_NULL_props_fail(void** state)
+{
+  (void)state;
+
+  az_span name;
+  az_span value;
+
+  ASSERT_PRECONDITION_CHECKED(az_iot_message_properties_next(NULL, &name, &value));
+}
+
+static void test_az_iot_message_properties_next_NULL_out_name_fail(void** state)
+{
+  (void)state;
+
+  az_iot_message_properties props;
+  az_span value;
+
+  ASSERT_PRECONDITION_CHECKED(az_iot_message_properties_next(&props, NULL, &value));
+}
+
+static void test_az_iot_message_properties_next_NULL_out_value_fail(void** state)
+{
+  (void)state;
+
+  az_iot_message_properties props;
+  az_span name;
+
+  ASSERT_PRECONDITION_CHECKED(az_iot_message_properties_next(&props, &name, NULL));
+}
+
+#endif // AZ_NO_PRECONDITION_CHECKING
 
 static void test_az_iot_u32toa_size_success()
 {
@@ -144,7 +272,8 @@ static void test_az_span_copy_url_encode_succeed()
 
   assert_int_equal(_az_span_copy_url_encode(url_encoded_span, url_decoded_span, &remaining), AZ_OK);
   assert_int_equal(az_span_size(remaining), 0);
-  assert_int_equal(az_span_size(url_encoded_span) - az_span_size(remaining), _az_COUNTOF(expected_result) - 1);
+  assert_int_equal(
+      az_span_size(url_encoded_span) - az_span_size(remaining), _az_COUNTOF(expected_result) - 1);
 }
 
 static void test_az_span_copy_url_encode_insufficient_size_fail()
@@ -156,7 +285,400 @@ static void test_az_span_copy_url_encode_insufficient_size_fail()
 
   az_span remaining;
 
-  assert_int_equal(_az_span_copy_url_encode(url_encoded_span, url_decoded_span, &remaining), AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+  assert_int_equal(
+      _az_span_copy_url_encode(url_encoded_span, url_decoded_span, &remaining),
+      AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+}
+
+static void test_az_iot_message_properties_init_succeed(void** state)
+{
+  (void)state;
+
+  uint8_t test_span_buf[TEST_SPAN_BUFFER_SIZE] = { 0 };
+  az_span test_span = az_span_create(test_span_buf, sizeof(test_span_buf));
+  az_iot_message_properties props;
+
+  assert_int_equal(az_iot_message_properties_init(&props, test_span, 0), AZ_OK);
+  assert_int_equal(props._internal.current_property_index, 0);
+}
+
+static void test_az_iot_message_properties_init_user_set_params_succeed(void** state)
+{
+  (void)state;
+
+  az_span test_span = az_span_create_from_str(TEST_KEY_VALUE_ONE);
+  az_iot_message_properties props;
+
+  assert_int_equal(
+      az_iot_message_properties_init(&props, test_span, az_span_size(test_span)), AZ_OK);
+
+  assert_memory_equal(
+      az_span_ptr(props._internal.properties_buffer),
+      test_correct_one_key_value,
+      sizeof(test_correct_one_key_value) - 1);
+}
+
+static void test_az_iot_message_properties_append_succeed(void** state)
+{
+  (void)state;
+
+  uint8_t test_span_buf[TEST_SPAN_BUFFER_SIZE];
+  az_span test_span = az_span_for_test_init(test_span_buf, sizeof(test_span_buf));
+
+  az_iot_message_properties props;
+  assert_int_equal(az_iot_message_properties_init(&props, test_span, 0), AZ_OK);
+
+  assert_int_equal(az_iot_message_properties_append(&props, test_key_one, test_value_one), AZ_OK);
+  az_span_for_test_verify(
+      az_span_slice(props._internal.properties_buffer, 0, props._internal.properties_written),
+      test_correct_one_key_value,
+      _az_COUNTOF(test_correct_one_key_value) - 1,
+      az_span_create(test_span_buf, _az_COUNTOF(test_span_buf)),
+      TEST_SPAN_BUFFER_SIZE);
+}
+
+static void test_az_iot_message_properties_append_empty_buffer_fail(void** state)
+{
+  (void)state;
+
+  az_iot_message_properties props;
+  assert_int_equal(az_iot_message_properties_init(&props, AZ_SPAN_NULL, 0), AZ_OK);
+
+  assert_int_equal(
+      az_iot_message_properties_append(&props, test_key_one, test_value_one),
+      AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+}
+
+static void test_az_iot_message_properties_append_small_buffer_fail(void** state)
+{
+  (void)state;
+
+  uint8_t test_span_buf[sizeof(test_correct_one_key_value) - 2];
+  az_span test_span = az_span_create(test_span_buf, sizeof(test_span_buf));
+  az_iot_message_properties props;
+
+  assert_int_equal(az_iot_message_properties_init(&props, test_span, 0), AZ_OK);
+  assert_int_equal(
+      az_iot_message_properties_append(&props, test_key_one, test_value_one),
+      AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+  assert_int_equal(
+      az_span_size(props._internal.properties_buffer), sizeof(test_correct_one_key_value) - 2);
+}
+
+static void test_az_iot_message_properties_append_twice_succeed(void** state)
+{
+  (void)state;
+
+  uint8_t test_span_buf[TEST_SPAN_BUFFER_SIZE];
+  az_span test_span = az_span_for_test_init(test_span_buf, sizeof(test_span_buf));
+
+  az_iot_message_properties props;
+  assert_int_equal(az_iot_message_properties_init(&props, test_span, 0), AZ_OK);
+
+  assert_int_equal(az_iot_message_properties_append(&props, test_key_one, test_value_one), AZ_OK);
+  assert_int_equal(az_iot_message_properties_append(&props, test_key_two, test_value_two), AZ_OK);
+  az_span_for_test_verify(
+      az_span_slice(props._internal.properties_buffer, 0, props._internal.properties_written),
+      test_correct_two_key_value,
+      _az_COUNTOF(test_correct_two_key_value) - 1,
+      az_span_create(test_span_buf, _az_COUNTOF(test_span_buf)),
+      TEST_SPAN_BUFFER_SIZE);
+}
+
+static void test_az_iot_message_properties_append_twice_small_buffer_fail(void** state)
+{
+  (void)state;
+
+  uint8_t test_span_buf[sizeof(test_correct_two_key_value) - 2];
+  az_span test_span = az_span_create(test_span_buf, sizeof(test_span_buf));
+  az_iot_message_properties props;
+
+  assert_int_equal(az_iot_message_properties_init(&props, test_span, 0), AZ_OK);
+  assert_int_equal(az_iot_message_properties_append(&props, test_key_one, test_value_one), AZ_OK);
+  assert_int_equal(
+      az_iot_message_properties_append(&props, test_key_two, test_value_two),
+      AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+  assert_int_equal(props._internal.properties_written, sizeof(test_correct_one_key_value) - 1);
+  assert_int_equal(
+      az_span_size(props._internal.properties_buffer), sizeof(test_correct_two_key_value) - 2);
+}
+
+static void test_az_iot_message_properties_find_succeed(void** state)
+{
+  (void)state;
+
+  az_span test_span = az_span_create_from_str(TEST_KEY_VALUE_ONE);
+  az_iot_message_properties props;
+
+  assert_int_equal(
+      az_iot_message_properties_init(&props, test_span, az_span_size(test_span)), AZ_OK);
+
+  az_span out_value;
+  assert_int_equal(az_iot_message_properties_find(&props, test_key_one, &out_value), AZ_OK);
+  assert_memory_equal(
+      az_span_ptr(out_value), az_span_ptr(test_value_one), (size_t)az_span_size(test_value_one));
+}
+
+static void test_az_iot_message_properties_find_middle_succeed(void** state)
+{
+  (void)state;
+
+  az_span test_span = az_span_create_from_str(TEST_KEY_VALUE_THREE);
+  az_iot_message_properties props;
+
+  assert_int_equal(
+      az_iot_message_properties_init(&props, test_span, az_span_size(test_span)), AZ_OK);
+
+  az_span out_value;
+  assert_int_equal(az_iot_message_properties_find(&props, test_key_two, &out_value), AZ_OK);
+  assert_memory_equal(
+      az_span_ptr(out_value), az_span_ptr(test_value_two), (size_t)az_span_size(test_value_two));
+}
+
+static void test_az_iot_message_properties_find_end_succeed(void** state)
+{
+  (void)state;
+
+  az_span test_span = az_span_create_from_str(TEST_KEY_VALUE_TWO);
+  az_iot_message_properties props;
+
+  assert_int_equal(
+      az_iot_message_properties_init(&props, test_span, az_span_size(test_span)), AZ_OK);
+
+  az_span out_value;
+  assert_int_equal(az_iot_message_properties_find(&props, test_key_two, &out_value), AZ_OK);
+  assert_memory_equal(
+      az_span_ptr(out_value), az_span_ptr(test_value_two), (size_t)az_span_size(test_value_two));
+}
+
+static void test_az_iot_message_properties_find_substring_succeed(void** state)
+{
+  (void)state;
+
+  az_span test_span = az_span_create_from_str(TEST_KEY_VALUE_SUBSTRING);
+  az_iot_message_properties props;
+
+  assert_int_equal(
+      az_iot_message_properties_init(&props, test_span, az_span_size(test_span)), AZ_OK);
+
+  az_span out_value;
+  assert_int_equal(az_iot_message_properties_find(&props, test_key, &out_value), AZ_OK);
+  assert_memory_equal(
+      az_span_ptr(out_value), az_span_ptr(test_value_two), (size_t)az_span_size(test_value_two));
+}
+
+static void test_az_iot_message_properties_find_name_value_same_succeed(void** state)
+{
+  (void)state;
+
+  az_span test_span = az_span_create_from_str(TEST_KEY_VALUE_SAME);
+  az_iot_message_properties props;
+
+  assert_int_equal(
+      az_iot_message_properties_init(&props, test_span, az_span_size(test_span)), AZ_OK);
+
+  az_span out_value;
+  assert_int_equal(az_iot_message_properties_find(&props, test_key, &out_value), AZ_OK);
+  assert_memory_equal(
+      az_span_ptr(out_value), az_span_ptr(test_value_two), (size_t)az_span_size(test_value_two));
+}
+
+static void test_az_iot_message_properties_find_empty_buffer_fail(void** state)
+{
+  (void)state;
+
+  az_iot_message_properties props;
+
+  assert_int_equal(az_iot_message_properties_init(&props, AZ_SPAN_NULL, 0), AZ_OK);
+
+  az_span out_value;
+  assert_int_equal(
+      az_iot_message_properties_find(&props, test_key_one, &out_value), AZ_ERROR_ITEM_NOT_FOUND);
+}
+
+static void test_az_iot_message_properties_find_fail(void** state)
+{
+  (void)state;
+
+  az_span test_span = az_span_create_from_str(TEST_KEY_VALUE_ONE);
+  az_iot_message_properties props;
+
+  assert_int_equal(
+      az_iot_message_properties_init(&props, test_span, az_span_size(test_span)), AZ_OK);
+
+  az_span out_value;
+  assert_int_equal(
+      az_iot_message_properties_find(&props, AZ_SPAN_FROM_STR("key_foo"), &out_value),
+      AZ_ERROR_ITEM_NOT_FOUND);
+}
+
+static void test_az_iot_message_properties_find_substring_fail(void** state)
+{
+  (void)state;
+
+  az_span test_span = az_span_create_from_str(TEST_KEY_VALUE_TWO);
+  az_iot_message_properties props;
+
+  assert_int_equal(
+      az_iot_message_properties_init(&props, test_span, az_span_size(test_span)), AZ_OK);
+
+  az_span out_value;
+  assert_int_equal(
+      az_iot_message_properties_find(&props, AZ_SPAN_FROM_STR("key"), &out_value),
+      AZ_ERROR_ITEM_NOT_FOUND);
+}
+
+static void test_az_iot_message_properties_find_substring_suffix_fail(void** state)
+{
+  (void)state;
+
+  az_span test_span = az_span_create_from_str(TEST_KEY_VALUE_TWO);
+  az_iot_message_properties props;
+
+  assert_int_equal(
+      az_iot_message_properties_init(&props, test_span, az_span_size(test_span)), AZ_OK);
+
+  az_span out_value;
+  assert_int_equal(
+      az_iot_message_properties_find(&props, AZ_SPAN_FROM_STR("one"), &out_value),
+      AZ_ERROR_ITEM_NOT_FOUND);
+}
+
+static void test_az_iot_message_properties_find_value_match_fail(void** state)
+{
+  (void)state;
+
+  az_span test_span = az_span_create_from_str(TEST_KEY_VALUE_THREE);
+  az_iot_message_properties props;
+
+  assert_int_equal(
+      az_iot_message_properties_init(&props, test_span, az_span_size(test_span)), AZ_OK);
+
+  az_span out_value;
+  assert_int_equal(
+      az_iot_message_properties_find(&props, AZ_SPAN_FROM_STR("value_two"), &out_value),
+      AZ_ERROR_ITEM_NOT_FOUND);
+}
+
+static void test_az_iot_message_properties_find_value_match_end_fail(void** state)
+{
+  (void)state;
+
+  az_span test_span = az_span_create_from_str(TEST_KEY_VALUE_THREE);
+  az_iot_message_properties props;
+
+  assert_int_equal(
+      az_iot_message_properties_init(&props, test_span, az_span_size(test_span)), AZ_OK);
+
+  az_span out_value;
+  assert_int_equal(
+      az_iot_message_properties_find(&props, AZ_SPAN_FROM_STR("value_three"), &out_value),
+      AZ_ERROR_ITEM_NOT_FOUND);
+}
+
+static void test_az_iot_message_properties_next_succeed(void** state)
+{
+  (void)state;
+
+  az_span test_span = az_span_create_from_str(TEST_KEY_VALUE_THREE);
+  az_iot_message_properties props;
+  assert_int_equal(
+      az_iot_message_properties_init(&props, test_span, az_span_size(test_span)), AZ_OK);
+
+  az_span name;
+  az_span value;
+
+  assert_int_equal(az_iot_message_properties_next(&props, &name, &value), AZ_OK);
+  assert_memory_equal(
+      az_span_ptr(name), az_span_ptr(test_key_one), (size_t)az_span_size(test_key_one));
+  assert_memory_equal(
+      az_span_ptr(value),
+      az_span_ptr(test_value_one),
+      (size_t)az_span_size(test_value_one));
+
+  assert_int_equal(az_iot_message_properties_next(&props, &name, &value), AZ_OK);
+  assert_memory_equal(
+      az_span_ptr(name), az_span_ptr(test_key_two), (size_t)az_span_size(test_key_two));
+  assert_memory_equal(
+      az_span_ptr(value),
+      az_span_ptr(test_value_two),
+      (size_t)az_span_size(test_value_two));
+
+  assert_int_equal(az_iot_message_properties_next(&props, &name, &value), AZ_OK);
+  assert_memory_equal(
+      az_span_ptr(name), az_span_ptr(test_key_three), (size_t)az_span_size(test_key_three));
+  assert_memory_equal(
+      az_span_ptr(value),
+      az_span_ptr(test_value_three),
+      (size_t)az_span_size(test_value_three));
+
+  assert_int_equal(az_iot_message_properties_next(&props, &name, &value), AZ_ERROR_UNEXPECTED_END);
+}
+
+static void test_az_iot_message_properties_next_twice_succeed(void** state)
+{
+  (void)state;
+
+  az_span test_span = az_span_create_from_str(TEST_KEY_VALUE_TWO);
+  az_iot_message_properties props;
+  assert_int_equal(
+      az_iot_message_properties_init(&props, test_span, az_span_size(test_span)), AZ_OK);
+
+  az_span name;
+  az_span value;
+
+  assert_int_equal(az_iot_message_properties_next(&props, &name, &value), AZ_OK);
+  assert_memory_equal(
+      az_span_ptr(name), az_span_ptr(test_key_one), (size_t)az_span_size(test_key_one));
+  assert_memory_equal(
+      az_span_ptr(value),
+      az_span_ptr(test_value_one),
+      (size_t)az_span_size(test_value_one));
+
+  assert_int_equal(az_iot_message_properties_next(&props, &name, &value), AZ_OK);
+  assert_memory_equal(
+      az_span_ptr(name), az_span_ptr(test_key_two), (size_t)az_span_size(test_key_two));
+  assert_memory_equal(
+      az_span_ptr(value),
+      az_span_ptr(test_value_two),
+      (size_t)az_span_size(test_value_two));
+
+  assert_int_equal(az_iot_message_properties_next(&props, &name, &value), AZ_ERROR_UNEXPECTED_END);
+
+  // Reset to beginning of span
+  assert_int_equal(
+      az_iot_message_properties_init(&props, test_span, az_span_size(test_span)), AZ_OK);
+
+  assert_int_equal(az_iot_message_properties_next(&props, &name, &value), AZ_OK);
+  assert_memory_equal(
+      az_span_ptr(name), az_span_ptr(test_key_one), (size_t)az_span_size(test_key_one));
+  assert_memory_equal(
+      az_span_ptr(value),
+      az_span_ptr(test_value_one),
+      (size_t)az_span_size(test_value_one));
+
+  assert_int_equal(az_iot_message_properties_next(&props, &name, &value), AZ_OK);
+  assert_memory_equal(
+      az_span_ptr(name), az_span_ptr(test_key_two), (size_t)az_span_size(test_key_two));
+  assert_memory_equal(
+      az_span_ptr(value),
+      az_span_ptr(test_value_two),
+      (size_t)az_span_size(test_value_two));
+
+  assert_int_equal(az_iot_message_properties_next(&props, &name, &value), AZ_ERROR_UNEXPECTED_END);
+}
+
+static void test_az_iot_message_properties_next_empty_succeed(void** state)
+{
+  (void)state;
+
+  az_iot_message_properties props;
+  assert_int_equal(az_iot_message_properties_init(&props, AZ_SPAN_NULL, 0), AZ_OK);
+
+  az_span name;
+  az_span value;
+
+  assert_int_equal(az_iot_message_properties_next(&props, &name, &value), AZ_ERROR_UNEXPECTED_END);
 }
 
 #ifdef _MSC_VER
@@ -166,7 +688,23 @@ static void test_az_span_copy_url_encode_insufficient_size_fail()
 
 int test_az_iot_common()
 {
+#ifndef AZ_NO_PRECONDITION_CHECKING
+  SETUP_PRECONDITION_CHECK_TESTS();
+#endif // AZ_NO_PRECONDITION_CHECKING
+
   const struct CMUnitTest tests[] = {
+#ifndef AZ_NO_PRECONDITION_CHECKING
+    cmocka_unit_test(test_az_iot_message_properties_init_NULL_props_fails),
+    cmocka_unit_test(test_az_iot_message_properties_append_get_NULL_props_fails),
+    cmocka_unit_test(test_az_iot_message_properties_append_NULL_name_span_fails),
+    cmocka_unit_test(test_az_iot_message_properties_append_NULL_value_span_fails),
+    cmocka_unit_test(test_az_iot_message_properties_find_NULL_props_fail),
+    cmocka_unit_test(test_az_iot_message_properties_find_NULL_name_fail),
+    cmocka_unit_test(test_az_iot_message_properties_find_NULL_value_fail),
+    cmocka_unit_test(test_az_iot_message_properties_next_NULL_props_fail),
+    cmocka_unit_test(test_az_iot_message_properties_next_NULL_out_name_fail),
+    cmocka_unit_test(test_az_iot_message_properties_next_NULL_out_value_fail),
+#endif // AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_az_iot_u32toa_size_success),
     cmocka_unit_test(test_az_iot_u64toa_size_success),
     cmocka_unit_test(test_az_iot_is_success_status_translate_success),
@@ -176,6 +714,27 @@ int test_az_iot_common()
     cmocka_unit_test(test_az_iot_provisioning_client_logging_succeed),
     cmocka_unit_test(test_az_span_copy_url_encode_succeed),
     cmocka_unit_test(test_az_span_copy_url_encode_insufficient_size_fail),
+    cmocka_unit_test(test_az_iot_message_properties_init_succeed),
+    cmocka_unit_test(test_az_iot_message_properties_init_user_set_params_succeed),
+    cmocka_unit_test(test_az_iot_message_properties_append_succeed),
+    cmocka_unit_test(test_az_iot_message_properties_append_empty_buffer_fail),
+    cmocka_unit_test(test_az_iot_message_properties_append_small_buffer_fail),
+    cmocka_unit_test(test_az_iot_message_properties_append_twice_succeed),
+    cmocka_unit_test(test_az_iot_message_properties_append_twice_small_buffer_fail),
+    cmocka_unit_test(test_az_iot_message_properties_find_succeed),
+    cmocka_unit_test(test_az_iot_message_properties_find_middle_succeed),
+    cmocka_unit_test(test_az_iot_message_properties_find_end_succeed),
+    cmocka_unit_test(test_az_iot_message_properties_find_substring_succeed),
+    cmocka_unit_test(test_az_iot_message_properties_find_name_value_same_succeed),
+    cmocka_unit_test(test_az_iot_message_properties_find_empty_buffer_fail),
+    cmocka_unit_test(test_az_iot_message_properties_find_fail),
+    cmocka_unit_test(test_az_iot_message_properties_find_substring_fail),
+    cmocka_unit_test(test_az_iot_message_properties_find_substring_suffix_fail),
+    cmocka_unit_test(test_az_iot_message_properties_find_value_match_fail),
+    cmocka_unit_test(test_az_iot_message_properties_find_value_match_end_fail),
+    cmocka_unit_test(test_az_iot_message_properties_next_succeed),
+    cmocka_unit_test(test_az_iot_message_properties_next_twice_succeed),
+    cmocka_unit_test(test_az_iot_message_properties_next_empty_succeed),
   };
   return cmocka_run_group_tests_name("az_iot_common", tests, NULL, NULL);
 }

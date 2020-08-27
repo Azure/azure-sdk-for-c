@@ -27,12 +27,13 @@
 #include <azure/core/_az_cfg_prefix.h>
 
 /**
- * @brief az_span_for_test_init returns a span over a byte buffer, directly invoking
- * #az_span_create.  The buffer is initialized with 0xcc to help tests check against buffer overflow.
+ * @brief Returns a span over a byte buffer, directly invoking #az_span_create. The buffer is
+ * initialized with `0xCC` to help tests check against buffer overflow.
  *
  * @param[in] ptr The memory address of the 1st byte in the byte buffer.
  * @param[in] size The number of total bytes in the byte buffer.
- * @return az_span The "view" over the byte buffer, with the buffer filled with 0xcc.
+ *
+ * @return #az_span The "view" over the byte buffer, with the buffer filled with `0xCC`.
  */
 AZ_NODISCARD AZ_INLINE az_span az_span_for_test_init(uint8_t* ptr, int32_t size)
 {
@@ -42,7 +43,7 @@ AZ_NODISCARD AZ_INLINE az_span az_span_for_test_init(uint8_t* ptr, int32_t size)
 }
 
 /**
- * @brief az_span_for_test_verify verifies that the span has been correctly set during the test.
+ * @brief Verifies that the span has been correctly set during the test.
  * In addition to memcmp of expected/actual data, it also checks against buffer overflow.
  *
  * The function will assert on any unexpected results.
