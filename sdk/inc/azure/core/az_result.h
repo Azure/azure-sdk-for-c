@@ -41,6 +41,9 @@ enum
 #define _az_RESULT_MAKE_SUCCESS(facility, code) \
   ((int32_t)(((int32_t)(facility) << 16) | (int32_t)(code)))
 
+/**
+ * @brief Convenience macro to return if an operation failed.
+ */
 #define AZ_RETURN_IF_FAILED(exp) \
   do \
   { \
@@ -51,6 +54,9 @@ enum
     } \
   } while (0)
 
+/**
+ * @brief Convenience macro to return if the provided span is not of the expected, required size.
+ */
 #define AZ_RETURN_IF_NOT_ENOUGH_SIZE(span, required_size) \
   do \
   { \
