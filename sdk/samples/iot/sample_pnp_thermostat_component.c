@@ -7,6 +7,7 @@
 #pragma warning(disable : 4996)
 #endif
 
+#include "sample_pnp_thermostat_component.h"
 #include "iot_sample_common.h"
 #include "sample_pnp.h"
 #include "sample_pnp_mqtt_component.h"
