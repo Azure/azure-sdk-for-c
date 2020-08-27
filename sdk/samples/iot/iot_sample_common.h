@@ -14,33 +14,38 @@
 #include <azure/core/az_span.h>
 
 #define IOT_SAMPLE_SAS_KEY_DURATION_TIME_DIGITS 4
+
 //
 // Logging
 //
-#define LOG_ERROR(...) \
+#define IOT_SAMPLE_LOG_ERROR(...) \
+  do \
   { \
     (void)fprintf(stderr, "ERROR:\t\t%s:%s():%d: ", __FILE__, __func__, __LINE__); \
     (void)fprintf(stderr, __VA_ARGS__); \
     (void)fprintf(stderr, "\n"); \
     fflush(stdout); \
     fflush(stderr); \
-  }
+  } while (0)
 
-#define LOG_SUCCESS(...) \
+#define IOT_SAMPLE_LOG_SUCCESS(...) \
+  do \
   { \
     (void)printf("SUCCESS:\t"); \
     (void)printf(__VA_ARGS__); \
     (void)printf("\n"); \
-  }
+  } while (0)
 
-#define LOG(...) \
+#define IOT_SAMPLE_LOG(...) \
+  do \
   { \
     (void)printf("\t\t"); \
     (void)printf(__VA_ARGS__); \
     (void)printf("\n"); \
-  }
+  } while (0)
 
-#define LOG_AZ_SPAN(span_description, span) \
+#define IOT_SAMPLE_LOG_AZ_SPAN(span_description, span) \
+  do \
   { \
     (void)printf("\t\t%s ", span_description); \
     char* buffer = (char*)az_span_ptr(span); \
@@ -49,7 +54,7 @@
       putchar(*buffer++); \
     } \
     (void)printf("\n"); \
-  }
+  } while (0)
 
 //
 // Environment Variables
@@ -176,10 +181,13 @@ uint32_t iot_sample_get_epoch_expiration_time_from_minutes(uint32_t minutes);
 /*
  * @brief Generate the base64 encoded and signed signature using HMAC-SHA256 signing.
  *
- * @param[in] sas_base64_encoded_key An #az_span containing the SAS key that will be used for signing.
+ * @param[in] sas_base64_encoded_key An #az_span containing the SAS key that will be used for
+ * signing.
  * @param[in] sas_signature An #az_span containing the signature.
- * @param sas_base64_encoded_signed_signature An #az_span with sufficient capacity to hold the encoded signed signature.
- * @param[out] out_sas_base64_encoded_signed_signature A pointer to the #az_span containing the encoded signed signature.
+ * @param sas_base64_encoded_signed_signature An #az_span with sufficient capacity to hold the
+ * encoded signed signature.
+ * @param[out] out_sas_base64_encoded_signed_signature A pointer to the #az_span containing the
+ * encoded signed signature.
  */
 void iot_sample_generate_sas_base64_encoded_signed_signature(
     az_span sas_base64_encoded_key,

@@ -65,22 +65,22 @@ static void generate_sas_key(void);
 int main(void)
 {
   create_and_configure_mqtt_client();
-  LOG_SUCCESS("Client created and configured.");
+  IOT_SAMPLE_LOG_SUCCESS("Client created and configured.");
 
   connect_mqtt_client_to_provisioning_service();
-  LOG_SUCCESS("Client connected to provisioning service.");
+  IOT_SAMPLE_LOG_SUCCESS("Client connected to provisioning service.");
 
   subscribe_mqtt_client_to_provisioning_service_topics();
-  LOG_SUCCESS("Client subscribed to provisioning service topics.");
+  IOT_SAMPLE_LOG_SUCCESS("Client subscribed to provisioning service topics.");
 
   register_device_with_provisioning_service();
-  LOG_SUCCESS("Client registering with provisioning service.");
+  IOT_SAMPLE_LOG_SUCCESS("Client registering with provisioning service.");
 
   receive_device_registration_status();
-  LOG_SUCCESS("Client received registration status.")
+  IOT_SAMPLE_LOG_SUCCESS("Client received registration status.");
 
   disconnect_mqtt_client_from_provisioning_service();
-  LOG_SUCCESS("Client disconnected from provisioning service.");
+  IOT_SAMPLE_LOG_SUCCESS("Client disconnected from provisioning service.");
 
   return 0;
 }
@@ -92,7 +92,7 @@ static void create_and_configure_mqtt_client(void)
   // Reads in environment variables set by user for purposes of running sample.
   if (az_failed(rc = iot_sample_read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars)))
   {
-    LOG_ERROR(
+    IOT_SAMPLE_LOG_ERROR(
         "Failed to read configuration from environment variables: az_result return code 0x%08x.",
         rc);
     exit(rc);
@@ -104,7 +104,7 @@ static void create_and_configure_mqtt_client(void)
           rc = iot_sample_create_mqtt_endpoint(
               SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer))))
   {
-    LOG_ERROR("Failed to create MQTT endpoint: az_result return code 0x%08x.", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to create MQTT endpoint: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -117,7 +117,7 @@ static void create_and_configure_mqtt_client(void)
               env_vars.provisioning_registration_id,
               NULL)))
   {
-    LOG_ERROR("Failed to initialize provisioning client: az_result return code 0x%08x.", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to initialize provisioning client: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -127,7 +127,7 @@ static void create_and_configure_mqtt_client(void)
           rc = az_iot_provisioning_client_get_client_id(
               &provisioning_client, mqtt_client_id_buffer, sizeof(mqtt_client_id_buffer), NULL)))
   {
-    LOG_ERROR("Failed to get MQTT client id: az_result return code 0x%08x.", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to get MQTT client id: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -140,12 +140,12 @@ static void create_and_configure_mqtt_client(void)
            NULL))
       != MQTTCLIENT_SUCCESS)
   {
-    LOG_ERROR("Failed to create MQTT client: MQTTClient return code %d.", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to create MQTT client: MQTTClient return code %d.", rc);
     exit(rc);
   }
 
   generate_sas_key();
-  LOG_SUCCESS("Client generated SAS Key.");
+  IOT_SAMPLE_LOG_SUCCESS("Client generated SAS Key.");
 }
 
 static void connect_mqtt_client_to_provisioning_service(void)
@@ -160,7 +160,7 @@ static void connect_mqtt_client_to_provisioning_service(void)
               sizeof(mqtt_client_username_buffer),
               NULL)))
   {
-    LOG_ERROR("Failed to get MQTT client username: az_result return code 0x%08x.", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to get MQTT client username: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -181,7 +181,7 @@ static void connect_mqtt_client_to_provisioning_service(void)
   // Connect MQTT client to the Azure IoT Device Provisioning Service.
   if ((rc = MQTTClient_connect(mqtt_client, &mqtt_connect_options)) != MQTTCLIENT_SUCCESS)
   {
-    LOG_ERROR(
+    IOT_SAMPLE_LOG_ERROR(
         "Failed to connect: MQTTClient return code %d.\n"
         "If on Windows, confirm the AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH environment variable is "
         "set correctly.",
@@ -199,7 +199,7 @@ static void subscribe_mqtt_client_to_provisioning_service_topics(void)
        = MQTTClient_subscribe(mqtt_client, AZ_IOT_PROVISIONING_CLIENT_REGISTER_SUBSCRIBE_TOPIC, 1))
       != MQTTCLIENT_SUCCESS)
   {
-    LOG_ERROR("Failed to subscribe to the register topic: MQTTClient return code %d.", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to subscribe to the register topic: MQTTClient return code %d.", rc);
     exit(rc);
   }
 }
@@ -214,7 +214,7 @@ static void register_device_with_provisioning_service(void)
           rc = az_iot_provisioning_client_register_get_publish_topic(
               &provisioning_client, register_topic_buffer, sizeof(register_topic_buffer), NULL)))
   {
-    LOG_ERROR("Failed to get Register publish topic: az_result return code 0x%08x.", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to get Register publish topic: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -229,7 +229,7 @@ static void register_device_with_provisioning_service(void)
   if ((rc = MQTTClient_publishMessage(mqtt_client, register_topic_buffer, &pubmsg, NULL))
       != MQTTCLIENT_SUCCESS)
   {
-    LOG_ERROR("Failed to publish register request: MQTTClient return code %d.", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to publish register request: MQTTClient return code %d.", rc);
     exit(rc);
   }
 }
@@ -253,32 +253,32 @@ static void receive_device_registration_status(void)
          != MQTTCLIENT_SUCCESS)
         && (MQTTCLIENT_TOPICNAME_TRUNCATED != rc))
     {
-      LOG_ERROR("Failed to receive message: MQTTClient return code %d.", rc);
+      IOT_SAMPLE_LOG_ERROR("Failed to receive message: MQTTClient return code %d.", rc);
       exit(rc);
     }
     else if (NULL == message)
     {
-      LOG_ERROR("Timeout expired: MQTTClient return code %d.", rc);
+      IOT_SAMPLE_LOG_ERROR("Timeout expired: MQTTClient return code %d.", rc);
       exit(rc);
     }
     else if (MQTTCLIENT_TOPICNAME_TRUNCATED == rc)
     {
       topic_len = (int)strlen(topic);
     }
-    LOG_SUCCESS("Client received a message from the provisioning service.");
+    IOT_SAMPLE_LOG_SUCCESS("Client received a message from the provisioning service.");
 
     // Parse registration message.
     parse_registration_message(topic, topic_len, message, &register_response, &operation_status);
-    LOG_SUCCESS("Client parsed operation message.");
+    IOT_SAMPLE_LOG_SUCCESS("Client parsed operation message.");
 
     // If operation is not complete, send query and loop to receive operation message.
     is_operation_complete = az_iot_provisioning_client_operation_complete(operation_status);
     if (!is_operation_complete)
     {
-      LOG("Operation is still pending.");
+      IOT_SAMPLE_LOG("Operation is still pending.");
 
       send_operation_query_message(&register_response);
-      LOG_SUCCESS("Client sent operation query message.");
+      IOT_SAMPLE_LOG_SUCCESS("Client sent operation query message.");
 
       MQTTClient_freeMessage(&message);
       MQTTClient_free(topic);
@@ -288,20 +288,20 @@ static void receive_device_registration_status(void)
   // Operation is complete.
   if (operation_status == AZ_IOT_PROVISIONING_STATUS_ASSIGNED) // Successful assignment
   {
-    LOG_SUCCESS("Device provisioned:");
-    LOG_AZ_SPAN("Hub Hostname:", register_response.registration_result.assigned_hub_hostname);
-    LOG_AZ_SPAN("Device Id:", register_response.registration_result.device_id);
+    IOT_SAMPLE_LOG_SUCCESS("Device provisioned:");
+    IOT_SAMPLE_LOG_AZ_SPAN("Hub Hostname:", register_response.registration_result.assigned_hub_hostname);
+    IOT_SAMPLE_LOG_AZ_SPAN("Device Id:", register_response.registration_result.device_id);
   }
   else // Unsuccessful assignment (unassigned, failed or disabled states)
   {
-    LOG_ERROR("Device provisioning failed:");
-    LOG_AZ_SPAN("Registration state:", register_response.operation_status);
-    LOG("Last operation status: %d", register_response.status);
-    LOG_AZ_SPAN("Operation ID:", register_response.operation_id);
-    LOG("Error code: %u", register_response.registration_result.extended_error_code);
-    LOG_AZ_SPAN("Error message:", register_response.registration_result.error_message);
-    LOG_AZ_SPAN("Error timestamp:", register_response.registration_result.error_timestamp);
-    LOG_AZ_SPAN("Error tracking ID:", register_response.registration_result.error_tracking_id);
+    IOT_SAMPLE_LOG_ERROR("Device provisioning failed:");
+    IOT_SAMPLE_LOG_AZ_SPAN("Registration state:", register_response.operation_status);
+    IOT_SAMPLE_LOG("Last operation status: %d", register_response.status);
+    IOT_SAMPLE_LOG_AZ_SPAN("Operation ID:", register_response.operation_id);
+    IOT_SAMPLE_LOG("Error code: %u", register_response.registration_result.extended_error_code);
+    IOT_SAMPLE_LOG_AZ_SPAN("Error message:", register_response.registration_result.error_message);
+    IOT_SAMPLE_LOG_AZ_SPAN("Error timestamp:", register_response.registration_result.error_timestamp);
+    IOT_SAMPLE_LOG_AZ_SPAN("Error tracking ID:", register_response.registration_result.error_tracking_id);
     exit((int)register_response.registration_result.extended_error_code);
   }
 
@@ -315,7 +315,7 @@ static void disconnect_mqtt_client_from_provisioning_service(void)
 
   if ((rc = MQTTClient_disconnect(mqtt_client, TIMEOUT_MQTT_DISCONNECT_MS)) != MQTTCLIENT_SUCCESS)
   {
-    LOG_ERROR("Failed to disconnect MQTT client: MQTTClient return code %d.", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to disconnect MQTT client: MQTTClient return code %d.", rc);
     exit(rc);
   }
 
@@ -338,21 +338,21 @@ static void parse_registration_message(
           rc = az_iot_provisioning_client_parse_received_topic_and_payload(
               &provisioning_client, topic_span, message_span, register_response)))
   {
-    LOG_ERROR("Message from unknown topic: az_result return code 0x%08x.", rc);
-    LOG_AZ_SPAN("Topic:", topic_span);
+    IOT_SAMPLE_LOG_ERROR("Message from unknown topic: az_result return code 0x%08x.", rc);
+    IOT_SAMPLE_LOG_AZ_SPAN("Topic:", topic_span);
     exit(rc);
   }
-  LOG_SUCCESS("Client received a valid topic response:");
-  LOG_AZ_SPAN("Topic:", topic_span);
-  LOG_AZ_SPAN("Payload:", message_span);
-  LOG("Status: %d", register_response->status);
+  IOT_SAMPLE_LOG_SUCCESS("Client received a valid topic response:");
+  IOT_SAMPLE_LOG_AZ_SPAN("Topic:", topic_span);
+  IOT_SAMPLE_LOG_AZ_SPAN("Payload:", message_span);
+  IOT_SAMPLE_LOG("Status: %d", register_response->status);
 
   // Retrieve operation_status.
   if (az_failed(
           rc
           = az_iot_provisioning_client_parse_operation_status(register_response, operation_status)))
   {
-    LOG_ERROR("Failed to parse operation_status: az_result return code 0x%08x.", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to parse operation_status: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 }
@@ -372,19 +372,19 @@ static void send_operation_query_message(
               sizeof(query_status_topic_buffer),
               NULL)))
   {
-    LOG_ERROR("Unable to get query status publish topic: az_result return code 0x%08x.", rc);
+    IOT_SAMPLE_LOG_ERROR("Unable to get query status publish topic: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
   // IMPORTANT: Wait the recommended retry-after number of seconds before query
-  LOG("Querying after %u seconds...", register_response->retry_after_seconds);
+  IOT_SAMPLE_LOG("Querying after %u seconds...", register_response->retry_after_seconds);
   iot_sample_sleep_for_seconds(register_response->retry_after_seconds);
 
   // Publish the query status request.
   if ((rc = MQTTClient_publish(mqtt_client, query_status_topic_buffer, 0, NULL, 0, 0, NULL))
       != MQTTCLIENT_SUCCESS)
   {
-    LOG_ERROR("Failed to publish query status request: MQTTClient return code %d.", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to publish query status request: MQTTClient return code %d.", rc);
     exit(rc);
   }
 }
@@ -402,7 +402,7 @@ static void generate_sas_key(void)
           rc = az_iot_provisioning_client_sas_get_signature(
               &provisioning_client, sas_duration, sas_signature, &sas_signature)))
   {
-    LOG_ERROR("Could not get the signature for SAS key: az_result return code 0x%08x.", rc);
+    IOT_SAMPLE_LOG_ERROR("Could not get the signature for SAS key: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -426,7 +426,7 @@ static void generate_sas_key(void)
               sizeof(mqtt_password_buffer),
               &mqtt_password_length)))
   {
-    LOG_ERROR("Could not get the password: az_result return code 0x%08x.", rc);
+    IOT_SAMPLE_LOG_ERROR("Could not get the password: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 }

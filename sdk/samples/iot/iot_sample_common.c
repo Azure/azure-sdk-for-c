@@ -34,13 +34,14 @@
 #include <openssl/hmac.h>
 
 #define IOT_SAMPLE_PRECONDITION_NOT_NULL(arg) \
-do {                                          \
-    if (arg == NULL)                          \
-    {                                         \
-      LOG_ERROR("Pointer is NULL.");          \
-      exit(1);                                \
-    }                                         \
-} while (0)
+  do \
+  { \
+    if (arg == NULL) \
+    { \
+      IOT_SAMPLE_LOG_ERROR("Pointer is NULL."); \
+      exit(1); \
+    } \
+  } while (0)
 
 //
 // MQTT endpoints
@@ -87,7 +88,7 @@ static az_result read_configuration_entry(
   }
   else
   {
-    LOG_ERROR("(missing) Please set the %s environment variable.", env_name);
+    IOT_SAMPLE_LOG_ERROR("(missing) Please set the %s environment variable.", env_name);
     return AZ_ERROR_ARG;
   }
 
@@ -162,7 +163,7 @@ az_result iot_sample_read_environment_variables(
         break;
 
       default:
-        LOG_ERROR("Hub sample name undefined.");
+        IOT_SAMPLE_LOG_ERROR("Hub sample name undefined.");
         return AZ_ERROR_ARG;
     }
   }
@@ -226,13 +227,13 @@ az_result iot_sample_read_environment_variables(
         break;
 
       default:
-        LOG_ERROR("Provisioning sample name undefined.");
+        IOT_SAMPLE_LOG_ERROR("Provisioning sample name undefined.");
         return AZ_ERROR_ARG;
     }
   }
   else
   {
-    LOG_ERROR("Sample type undefined.");
+    IOT_SAMPLE_LOG_ERROR("Sample type undefined.");
     return AZ_ERROR_ARG;
   }
 
@@ -245,7 +246,7 @@ az_result iot_sample_read_environment_variables(
       out_env_vars->x509_trust_pem_file_path,
       &(out_env_vars->x509_trust_pem_file_path)));
 
-  LOG(" "); // Formatting.
+  IOT_SAMPLE_LOG(" "); // Formatting.
   return AZ_OK;
 }
 
@@ -292,11 +293,11 @@ az_result iot_sample_create_mqtt_endpoint(
   }
   else
   {
-    LOG_ERROR("Sample type undefined.");
+    IOT_SAMPLE_LOG_ERROR("Sample type undefined.");
     return AZ_ERROR_ARG;
   }
 
-  LOG_SUCCESS("MQTT endpoint created at \"%s\".", out_endpoint);
+  IOT_SAMPLE_LOG_SUCCESS("MQTT endpoint created at \"%s\".", out_endpoint);
 
   return AZ_OK;
 }
@@ -335,7 +336,8 @@ static az_result decode_base64_bytes(
   }
 
   // Get the source BIO to push through the filter
-  source_mem_bio = BIO_new_mem_buf(az_span_ptr(base64_encoded_bytes), (int)az_span_size(base64_encoded_bytes));
+  source_mem_bio
+      = BIO_new_mem_buf(az_span_ptr(base64_encoded_bytes), (int)az_span_size(base64_encoded_bytes));
   if (source_mem_bio == NULL)
   {
     BIO_free(base64_decoder);
@@ -492,9 +494,10 @@ void iot_sample_generate_sas_base64_encoded_signed_signature(
   // Decode the sas base64 encoded key to use for HMAC signing.
   char sas_decoded_key_buffer[64];
   az_span sas_decoded_key = AZ_SPAN_FROM_BUFFER(sas_decoded_key_buffer);
-  if (az_failed(rc = decode_base64_bytes(sas_base64_encoded_key, sas_decoded_key, &sas_decoded_key)))
+  if (az_failed(
+          rc = decode_base64_bytes(sas_base64_encoded_key, sas_decoded_key, &sas_decoded_key)))
   {
-    LOG_ERROR("Could not decode the SAS key: az_result return code 0x%04x.", rc);
+    IOT_SAMPLE_LOG_ERROR("Could not decode the SAS key: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
@@ -508,15 +511,18 @@ void iot_sample_generate_sas_base64_encoded_signed_signature(
               sas_hmac256_signed_signature,
               &sas_hmac256_signed_signature)))
   {
-    LOG_ERROR("Could not sign the signature: az_result return code 0x%04x.", rc);
+    IOT_SAMPLE_LOG_ERROR("Could not sign the signature: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
   // Base64 encode the result of the HMAC signing.
   if (az_failed(
-          rc = base64_encode_bytes(sas_hmac256_signed_signature, sas_base64_encoded_signed_signature, out_sas_base64_encoded_signed_signature)))
+          rc = base64_encode_bytes(
+              sas_hmac256_signed_signature,
+              sas_base64_encoded_signed_signature,
+              out_sas_base64_encoded_signed_signature)))
   {
-    LOG_ERROR("Could not base64 encode the password: az_result return code 0x%04x.", rc);
+    IOT_SAMPLE_LOG_ERROR("Could not base64 encode the password: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
