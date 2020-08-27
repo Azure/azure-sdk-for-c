@@ -214,7 +214,7 @@ static void receive_method_messages(void)
   for (uint8_t message_count = 0; message_count < MAX_METHOD_MESSAGE_COUNT; message_count++)
   {
     IOT_SAMPLE_LOG(" "); // Formatting
-    IOT_SAMPLE_LOG("Waiting for Method message.\n");
+    IOT_SAMPLE_LOG("Waiting for method message.\n");
 
     if (((rc
           = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, MQTT_TIMEOUT_RECEIVE_MS))
@@ -235,12 +235,12 @@ static void receive_method_messages(void)
       topic_len = (int)strlen(topic);
     }
     IOT_SAMPLE_LOG_SUCCESS(
-        "Message #%d: Client received a Method message from the service.", message_count + 1);
+        "Message #%d: Client received a method message from the service.", message_count + 1);
 
     // Parse method message and invoke method.
     az_iot_hub_client_method_request method_request;
     parse_method_message(topic, topic_len, message, &method_request);
-    IOT_SAMPLE_LOG_SUCCESS("Client parsed Method message.");
+    IOT_SAMPLE_LOG_SUCCESS("Client parsed method message.");
 
     handle_method_message(&method_request);
 

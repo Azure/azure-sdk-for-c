@@ -26,8 +26,8 @@
 #define SAMPLE_TYPE PAHO_IOT_PROVISIONING
 #define SAMPLE_NAME PAHO_IOT_PROVISIONING_SAMPLE
 
-#define TIMEOUT_MQTT_RECEIVE_MS (60 * 1000)
-#define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
+#define MQTT_TIMEOUT_RECEIVE_MS (60 * 1000)
+#define MQTT_TIMEOUT_DISCONNECT_MS (10 * 1000)
 
 static iot_sample_environment_variables env_vars;
 static az_iot_provisioning_client provisioning_client;
@@ -45,11 +45,15 @@ static void disconnect_mqtt_client_from_provisioning_service(void);
 static void parse_registration_message(
     char* topic,
     int topic_len,
-    const MQTTClient_message* message,
-    az_iot_provisioning_client_register_response* response,
-    az_iot_provisioning_client_operation_status* operation_status);
+    MQTTClient_message const* message,
+    az_iot_provisioning_client_register_response* out_register_response,
+    az_iot_provisioning_client_operation_status* out_operation_status);
+static void handle_device_registration_status_message(
+    az_iot_provisioning_client_register_response const* register_response,
+    az_iot_provisioning_client_operation_status const* operation_status,
+    bool* ref_is_operation_complete);
 static void send_operation_query_message(
-    const az_iot_provisioning_client_register_response* response);
+    az_iot_provisioning_client_register_response const* response);
 
 /*
  * This sample registers a device with the Azure IoT Device Provisioning Service.
@@ -110,7 +114,8 @@ static void create_and_configure_mqtt_client(void)
               env_vars.provisioning_registration_id,
               NULL)))
   {
-    IOT_SAMPLE_LOG_ERROR("Failed to initialize provisioning client: az_result return code 0x%08x.", rc);
+    IOT_SAMPLE_LOG_ERROR(
+        "Failed to initialize provisioning client: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -190,7 +195,8 @@ static void subscribe_mqtt_client_to_provisioning_service_topics(void)
        = MQTTClient_subscribe(mqtt_client, AZ_IOT_PROVISIONING_CLIENT_REGISTER_SUBSCRIBE_TOPIC, 1))
       != MQTTCLIENT_SUCCESS)
   {
-    IOT_SAMPLE_LOG_ERROR("Failed to subscribe to the Register topic: MQTTClient return code %d.", rc);
+    IOT_SAMPLE_LOG_ERROR(
+        "Failed to subscribe to the Register topic: MQTTClient return code %d.", rc);
     exit(rc);
   }
 }
@@ -200,15 +206,12 @@ static void register_device_with_provisioning_service(void)
   int rc;
 
   // Get the Register topic to publish the register request.
-  char register_publish_topic_buffer[128];
+  char register_topic_buffer[128];
   if (az_failed(
           rc = az_iot_provisioning_client_register_get_publish_topic(
-              &provisioning_client,
-              register_publish_topic_buffer,
-              sizeof(register_publish_topic_buffer),
-              NULL)))
+              &provisioning_client, register_topic_buffer, sizeof(register_topic_buffer), NULL)))
   {
-    IOT_SAMPLE_LOG_ERROR("Failed to get MQTT register publish topic: az_result return code 0x%08x.", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to get the Register topic: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -220,10 +223,10 @@ static void register_device_with_provisioning_service(void)
   pubmsg.retained = 0;
 
   // Publish the register request.
-  if ((rc = MQTTClient_publishMessage(mqtt_client, register_publish_topic_buffer, &pubmsg, NULL))
+  if ((rc = MQTTClient_publishMessage(mqtt_client, register_topic_buffer, &pubmsg, NULL))
       != MQTTCLIENT_SUCCESS)
   {
-    IOT_SAMPLE_LOG_ERROR("Failed to publish register request: MQTTClient return code %d.", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to publish Register request: MQTTClient return code %d.", rc);
     exit(rc);
   }
 }
@@ -234,16 +237,17 @@ static void receive_device_registration_status(void)
   char* topic = NULL;
   int topic_len = 0;
   MQTTClient_message* message = NULL;
-  az_iot_provisioning_client_register_response register_response;
-  az_iot_provisioning_client_operation_status operation_status;
   bool is_operation_complete = false;
 
   // Continue to parse incoming responses from the provisioning pervice until the device
   // has been successfully provisioned or an error occurs.
   do
   {
+    IOT_SAMPLE_LOG(" "); // Formatting
+    IOT_SAMPLE_LOG("Waiting for registration status message.\n");
+
     if (((rc
-          = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, TIMEOUT_MQTT_RECEIVE_MS))
+          = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, MQTT_TIMEOUT_RECEIVE_MS))
          != MQTTCLIENT_SUCCESS)
         && (MQTTCLIENT_TOPICNAME_TRUNCATED != rc))
     {
@@ -252,7 +256,7 @@ static void receive_device_registration_status(void)
     }
     else if (NULL == message)
     {
-      IOT_SAMPLE_LOG_ERROR("Timeout expired: MQTTClient return code %d.", rc);
+      IOT_SAMPLE_LOG_ERROR("Receive message timeout expired: MQTTClient return code %d.", rc);
       exit(rc);
     }
     else if (MQTTCLIENT_TOPICNAME_TRUNCATED == rc)
@@ -262,52 +266,68 @@ static void receive_device_registration_status(void)
     IOT_SAMPLE_LOG_SUCCESS("Client received a message from the provisioning service.");
 
     // Parse registration message.
+    az_iot_provisioning_client_register_response register_response;
+    az_iot_provisioning_client_operation_status operation_status;
     parse_registration_message(topic, topic_len, message, &register_response, &operation_status);
     IOT_SAMPLE_LOG_SUCCESS("Client parsed operation message.");
 
-    // If operation is not complete, send query and loop to receive operation message.
-    is_operation_complete = az_iot_provisioning_client_operation_complete(operation_status);
-    if (!is_operation_complete)
+    handle_device_registration_status_message(
+        &register_response, &operation_status, &is_operation_complete);
+
+    MQTTClient_freeMessage(&message);
+    MQTTClient_free(topic);
+
+  } while (!is_operation_complete); // Will loop to receive new operation message.
+}
+
+static void handle_device_registration_status_message(
+    az_iot_provisioning_client_register_response const* register_response,
+    az_iot_provisioning_client_operation_status const* operation_status,
+    bool* ref_is_operation_complete)
+{
+  *ref_is_operation_complete = az_iot_provisioning_client_operation_complete(*operation_status);
+
+  // If operation is not complete, send query. On return, will loop to receive new operation
+  // message.
+  if (!*ref_is_operation_complete)
+  {
+    IOT_SAMPLE_LOG("Operation is still pending.");
+
+    send_operation_query_message(register_response);
+    IOT_SAMPLE_LOG_SUCCESS("Client sent operation query message.");
+  }
+  else // Operation is complete.
+  {
+    if (AZ_IOT_PROVISIONING_STATUS_ASSIGNED == *operation_status) // Successful assignment
     {
-      IOT_SAMPLE_LOG("Operation is still pending.");
-
-      send_operation_query_message(&register_response);
-      IOT_SAMPLE_LOG_SUCCESS("Client sent operation query message.");
-
-      MQTTClient_freeMessage(&message);
-      MQTTClient_free(topic);
+      IOT_SAMPLE_LOG_SUCCESS("Device provisioned:");
+      IOT_SAMPLE_LOG_AZ_SPAN(
+          "Hub Hostname:", register_response->registration_result.assigned_hub_hostname);
+      IOT_SAMPLE_LOG_AZ_SPAN("Device Id:", register_response->registration_result.device_id);
     }
-  } while (!is_operation_complete);
-
-  // Operation is complete.
-  if (AZ_IOT_PROVISIONING_STATUS_ASSIGNED == operation_status) // Successful assignment
-  {
-    IOT_SAMPLE_LOG_SUCCESS("Device provisioned:");
-    IOT_SAMPLE_LOG_AZ_SPAN("Hub Hostname:", register_response.registration_result.assigned_hub_hostname);
-    IOT_SAMPLE_LOG_AZ_SPAN("Device Id:", register_response.registration_result.device_id);
+    else // Unsuccessful assignment (unassigned, failed or disabled states)
+    {
+      IOT_SAMPLE_LOG_ERROR("Device provisioning failed:");
+      IOT_SAMPLE_LOG_AZ_SPAN("Registration state:", register_response->operation_status);
+      IOT_SAMPLE_LOG("Last operation status: %d", register_response->status);
+      IOT_SAMPLE_LOG_AZ_SPAN("Operation ID:", register_response->operation_id);
+      IOT_SAMPLE_LOG("Error code: %u", register_response->registration_result.extended_error_code);
+      IOT_SAMPLE_LOG_AZ_SPAN(
+          "Error message:", register_response->registration_result.error_message);
+      IOT_SAMPLE_LOG_AZ_SPAN(
+          "Error timestamp:", register_response->registration_result.error_timestamp);
+      IOT_SAMPLE_LOG_AZ_SPAN(
+          "Error tracking ID:", register_response->registration_result.error_tracking_id);
+      exit((int)register_response->registration_result.extended_error_code);
+    }
   }
-  else // Unsuccessful assignment (unassigned, failed or disabled states)
-  {
-    IOT_SAMPLE_LOG_ERROR("Device provisioning failed:");
-    IOT_SAMPLE_LOG_AZ_SPAN("Registration state:", register_response.operation_status);
-    IOT_SAMPLE_LOG("Last operation status: %d", register_response.status);
-    IOT_SAMPLE_LOG_AZ_SPAN("Operation ID:", register_response.operation_id);
-    IOT_SAMPLE_LOG("Error code: %u", register_response.registration_result.extended_error_code);
-    IOT_SAMPLE_LOG_AZ_SPAN("Error message:", register_response.registration_result.error_message);
-    IOT_SAMPLE_LOG_AZ_SPAN("Error timestamp:", register_response.registration_result.error_timestamp);
-    IOT_SAMPLE_LOG_AZ_SPAN("Error tracking ID:", register_response.registration_result.error_tracking_id);
-    exit((int)register_response.registration_result.extended_error_code);
-  }
-
-  MQTTClient_freeMessage(&message);
-  MQTTClient_free(topic);
 }
 
 static void disconnect_mqtt_client_from_provisioning_service(void)
 {
   int rc;
 
-  if ((rc = MQTTClient_disconnect(mqtt_client, TIMEOUT_MQTT_DISCONNECT_MS)) != MQTTCLIENT_SUCCESS)
+  if ((rc = MQTTClient_disconnect(mqtt_client, MQTT_TIMEOUT_DISCONNECT_MS)) != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR("Failed to disconnect MQTT client: MQTTClient return code %d.", rc);
     exit(rc);
@@ -319,9 +339,9 @@ static void disconnect_mqtt_client_from_provisioning_service(void)
 static void parse_registration_message(
     char* topic,
     int topic_len,
-    const MQTTClient_message* message,
-    az_iot_provisioning_client_register_response* register_response,
-    az_iot_provisioning_client_operation_status* operation_status)
+    MQTTClient_message const* message,
+    az_iot_provisioning_client_register_response* out_register_response,
+    az_iot_provisioning_client_operation_status* out_operation_status)
 {
   az_result rc;
   az_span topic_span = az_span_create((uint8_t*)topic, topic_len);
@@ -330,7 +350,7 @@ static void parse_registration_message(
   // Parse message and retrieve register_response info.
   if (az_failed(
           rc = az_iot_provisioning_client_parse_received_topic_and_payload(
-              &provisioning_client, topic_span, message_span, register_response)))
+              &provisioning_client, topic_span, message_span, out_register_response)))
   {
     IOT_SAMPLE_LOG_ERROR("Message from unknown topic: az_result return code 0x%08x.", rc);
     IOT_SAMPLE_LOG_AZ_SPAN("Topic:", topic_span);
@@ -339,12 +359,12 @@ static void parse_registration_message(
   IOT_SAMPLE_LOG_SUCCESS("Client received a valid topic response:");
   IOT_SAMPLE_LOG_AZ_SPAN("Topic:", topic_span);
   IOT_SAMPLE_LOG_AZ_SPAN("Payload:", message_span);
-  IOT_SAMPLE_LOG("Status: %d", register_response->status);
+  IOT_SAMPLE_LOG("Status: %d", out_register_response->status);
 
   // Retrieve operation_status.
   if (az_failed(
-          rc
-          = az_iot_provisioning_client_parse_operation_status(register_response, operation_status)))
+          rc = az_iot_provisioning_client_parse_operation_status(
+              out_register_response, out_operation_status)))
   {
     IOT_SAMPLE_LOG_ERROR("Failed to parse operation_status: az_result return code 0x%08x.", rc);
     exit(rc);
@@ -352,7 +372,7 @@ static void parse_registration_message(
 }
 
 static void send_operation_query_message(
-    const az_iot_provisioning_client_register_response* register_response)
+    az_iot_provisioning_client_register_response const* register_response)
 {
   int rc;
 
@@ -366,7 +386,8 @@ static void send_operation_query_message(
               sizeof(query_topic_buffer),
               NULL)))
   {
-    IOT_SAMPLE_LOG_ERROR("Unable to get query status publish topic: az_result return code 0x%08x.", rc);
+    IOT_SAMPLE_LOG_ERROR(
+        "Unable to get query status publish topic: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
