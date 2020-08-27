@@ -59,8 +59,8 @@
     "cleanupCacheHistory": false,
     "disableGitFeatures": false,
     "globalMetadata": {
-      "_appTitle": "Azure SDK for C",
-      "_appFooter": "Azure SDK for C",
+      "_appTitle": "Azure SDK for Embedded C",
+      "_appFooter": "Azure SDK for Embedded C",
       "_appFaviconPath": "https://c.s-microsoft.com/favicon.ico?v2",
       "_enableSearch": true,
       "_enableNewTab": true
