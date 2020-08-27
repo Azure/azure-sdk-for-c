@@ -11,7 +11,7 @@
 #pragma warning(pop)
 #endif
 
-#include "iot_samples_common.h"
+#include "iot_sample_common.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -27,8 +27,8 @@
 #define SAMPLE_NAME PAHO_IOT_HUB_TELEMETRY_SAMPLE
 
 #define TELEMETRY_SEND_INTERVAL_SEC 1
-#define TELEMETRY_NUMBER_OF_MESSAGES 5
-#define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
+#define MAX_TELEMETRY_MESSAGE_COUNT 5
+#define MQTT_TIMEOUT_DISCONNECT_MS (10 * 1000)
 
 static iot_sample_environment_variables env_vars;
 static az_iot_hub_client hub_client;
@@ -67,7 +67,7 @@ static void create_and_configure_mqtt_client(void)
   int rc;
 
   // Reads in environment variables set by user for purposes of running sample.
-  if (az_failed(rc = read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars)))
+  if (az_failed(rc = iot_sample_read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars)))
   {
     LOG_ERROR(
         "Failed to read configuration from environment variables: az_result return code 0x%08x.",
@@ -78,7 +78,7 @@ static void create_and_configure_mqtt_client(void)
   // Build an MQTT endpoint c-string.
   char mqtt_endpoint_buffer[128];
   if (az_failed(
-          rc = create_mqtt_endpoint(
+          rc = iot_sample_create_mqtt_endpoint(
               SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer))))
   {
     LOG_ERROR("Failed to create MQTT endpoint: az_result return code 0x%08x.", rc);
@@ -168,32 +168,36 @@ static void send_telemetry_messages_to_iot_hub(void)
           rc = az_iot_hub_client_telemetry_get_publish_topic(
               &hub_client, NULL, telemetry_topic_buffer, sizeof(telemetry_topic_buffer), NULL)))
   {
-    LOG_ERROR("Failed to get Telemetry publish topic: az_result return code 0x%08x.", rc);
+    LOG_ERROR("Failed to get the Telemetry publish-topic: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
-  const char* telemetry_message_payloads[TELEMETRY_NUMBER_OF_MESSAGES] = {
+  const char* telemetry_message_payloads[MAX_TELEMETRY_MESSAGE_COUNT] = {
     "Message One", "Message Two", "Message Three", "Message Four", "Message Five",
   };
 
   // Publish # of telemetry messages.
-  for (uint8_t i = 0; i < TELEMETRY_NUMBER_OF_MESSAGES; ++i)
+  for (uint8_t message_count = 0; message_count < MAX_TELEMETRY_MESSAGE_COUNT; message_count++)
   {
-    LOG("Sending message %d.", i + 1);
     if ((rc = MQTTClient_publish(
              mqtt_client,
              telemetry_topic_buffer,
-             (int)strlen(telemetry_message_payloads[i]),
-             telemetry_message_payloads[i],
+             (int)strlen(telemetry_message_payloads[message_count]),
+             telemetry_message_payloads[message_count],
              0,
              0,
              NULL))
         != MQTTCLIENT_SUCCESS)
     {
-      LOG_ERROR("Failed to publish telemetry message %d: MQTTClient return code %d.", i + 1, rc);
+      LOG_ERROR(
+          "Failed to publish Telemetry message #%d: MQTTClient return code %d.",
+          message_count + 1,
+          rc);
       exit(rc);
     }
-    sleep_for_seconds(TELEMETRY_SEND_INTERVAL_SEC);
+
+    LOG_SUCCESS("Message #%d: Client published message to the service.", message_count + 1);
+    iot_sample_sleep_for_seconds(TELEMETRY_SEND_INTERVAL_SEC);
   }
 }
 
@@ -201,7 +205,7 @@ static void disconnect_mqtt_client_from_iot_hub(void)
 {
   int rc;
 
-  if ((rc = MQTTClient_disconnect(mqtt_client, TIMEOUT_MQTT_DISCONNECT_MS)) != MQTTCLIENT_SUCCESS)
+  if ((rc = MQTTClient_disconnect(mqtt_client, MQTT_TIMEOUT_DISCONNECT_MS)) != MQTTCLIENT_SUCCESS)
   {
     LOG_ERROR("Failed to disconnect MQTT client: MQTTClient return code %d.", rc);
     exit(rc);

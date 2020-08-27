@@ -11,7 +11,7 @@
 #pragma warning(pop)
 #endif
 
-#include "iot_samples_common.h"
+#include "iot_sample_common.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -305,7 +305,7 @@ static void create_and_configure_mqtt_client(void)
   int rc;
 
   // Reads in environment variables set by user for purposes of running sample.
-  if (az_failed(rc = read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars)))
+  if (az_failed(rc = iot_sample_read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars)))
   {
     LOG_ERROR(
         "Failed to read configuration from environment variables: az_result return code 0x%08x.",
@@ -316,7 +316,7 @@ static void create_and_configure_mqtt_client(void)
   // Build an MQTT endpoint c-string.
   char mqtt_endpoint_buffer[128];
   if (az_failed(
-          rc = create_mqtt_endpoint(
+          rc = iot_sample_create_mqtt_endpoint(
               SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer))))
   {
     LOG_ERROR("Failed to create MQTT endpoint: az_result return code 0x%08x.", rc);

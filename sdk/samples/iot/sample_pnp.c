@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "iot_samples_common.h"
+#include "iot_sample_common.h"
 #include "sample_pnp.h"
 
 #include <stdbool.h>

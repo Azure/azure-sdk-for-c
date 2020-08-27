@@ -11,7 +11,7 @@
 #pragma warning(pop)
 #endif
 
-#include "iot_samples_common.h"
+#include "iot_sample_common.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -36,7 +36,7 @@ static char mqtt_client_username_buffer[128];
 
 // Generate SAS key variables
 static char sas_signature_buffer[128];
-static char sas_encoded_signed_signature_buffer[128];
+static char sas_base64_encoded_signed_signature_buffer[128];
 static char mqtt_password_buffer[256];
 
 // Functions
@@ -90,7 +90,7 @@ static void create_and_configure_mqtt_client(void)
   int rc;
 
   // Reads in environment variables set by user for purposes of running sample.
-  if (az_failed(rc = read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars)))
+  if (az_failed(rc = iot_sample_read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars)))
   {
     LOG_ERROR(
         "Failed to read configuration from environment variables: az_result return code 0x%08x.",
@@ -101,7 +101,7 @@ static void create_and_configure_mqtt_client(void)
   // Build an MQTT endpoint c-string.
   char mqtt_endpoint_buffer[256];
   if (az_failed(
-          rc = create_mqtt_endpoint(
+          rc = iot_sample_create_mqtt_endpoint(
               SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer))))
   {
     LOG_ERROR("Failed to create MQTT endpoint: az_result return code 0x%08x.", rc);
@@ -378,7 +378,7 @@ static void send_operation_query_message(
 
   // IMPORTANT: Wait the recommended retry-after number of seconds before query
   LOG("Querying after %u seconds...", register_response->retry_after_seconds);
-  sleep_for_seconds(register_response->retry_after_seconds);
+  iot_sample_sleep_for_seconds(register_response->retry_after_seconds);
 
   // Publish the query status request.
   if ((rc = MQTTClient_publish(mqtt_client, query_status_topic_buffer, 0, NULL, 0, 0, NULL))
@@ -394,7 +394,7 @@ static void generate_sas_key(void)
   az_result rc;
 
   // Create the POSIX expiration time from input minutes.
-  uint64_t sas_duration = get_epoch_expiration_time_from_minutes(env_vars.sas_key_duration_minutes);
+  uint64_t sas_duration = iot_sample_get_epoch_expiration_time_from_minutes(env_vars.sas_key_duration_minutes);
 
   // Get the signature which will be signed with the decoded key
   az_span sas_signature = AZ_SPAN_FROM_BUFFER(sas_signature_buffer);
@@ -407,19 +407,19 @@ static void generate_sas_key(void)
   }
 
   // Generate the encoded, signed signature (b64 encoded, HMAC-SHA256 signing)
-  az_span sas_encoded_signed_signature = AZ_SPAN_FROM_BUFFER(sas_encoded_signed_signature_buffer);
-  sas_generate_encoded_signed_signature(
+  az_span sas_base64_encoded_signed_signature = AZ_SPAN_FROM_BUFFER(sas_base64_encoded_signed_signature_buffer);
+  iot_sample_generate_sas_base64_encoded_signed_signature(
       env_vars.provisioning_sas_key,
       sas_signature,
-      sas_encoded_signed_signature,
-      &sas_encoded_signed_signature);
+      sas_base64_encoded_signed_signature,
+      &sas_base64_encoded_signed_signature);
 
   // Get the resulting MQTT password, passing the base64 encoded, HMAC signed bytes
   size_t mqtt_password_length;
   if (az_failed(
           rc = az_iot_provisioning_client_sas_get_password(
               &provisioning_client,
-              sas_encoded_signed_signature,
+              sas_base64_encoded_signed_signature,
               sas_duration,
               AZ_SPAN_NULL,
               mqtt_password_buffer,
