@@ -55,7 +55,7 @@ enum
   } while (0)
 
 /**
- * @brief Convenience macro to return if the provided span is not of th expected, required size.
+ * @brief Convenience macro to return if the provided span is not of the expected, required size.
  */
 #define AZ_RETURN_IF_NOT_ENOUGH_SIZE(span, required_size) \
   do \

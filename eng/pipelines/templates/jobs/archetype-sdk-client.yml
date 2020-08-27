@@ -343,9 +343,16 @@ jobs:
         Invoke-Expression "& `"C:\Program Files\doxygen\bin\doxygen.exe`" Doxyfile"
         if (Test-Path "DoxygenWarningLog.txt" -PathType leaf)
         {
-          Get-Content "DoxygenWarningLog.txt"
-          Write-Error "Warnings from the doxygen docs generation step are treated as error."
-          exit 1
+          $LogContent = Get-Content "DoxygenWarningLog.txt"
+
+          Remove-Item "DoxygenWarningLog.txt"
+
+          If ($LogContent -ne $Null)
+          {
+            Write-Output $LogContent
+            Write-Error "Warnings from the doxygen docs generation step are treated as error."
+            exit 1
+          }
         }
       displayName: Generate docs
 
