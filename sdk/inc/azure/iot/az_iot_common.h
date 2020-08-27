@@ -165,6 +165,8 @@ AZ_NODISCARD az_result az_iot_message_properties_find(
  * @param[out] out_name A pointer to an #az_span containing the name of the next property.
  * @param[out] out_value A pointer to an #az_span containing the value of the next property.
  * @return #az_result
+ *   @retval AZ_OK If properties were retrieved successfully.
+ *   @retval AZ_ERROR_IOT_NO_MORE_PROPERTIES If the API reached the end of the properties to retrieve.
  */
 AZ_NODISCARD az_result
 az_iot_message_properties_next(az_iot_message_properties* properties, az_span* out_name, az_span* out_value);
