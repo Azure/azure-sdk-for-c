@@ -91,9 +91,15 @@ static void _log_listener_no_op(az_log_classification classification, az_span me
   {
     case AZ_LOG_HTTP_REQUEST:
       _log_invoked_for_http_request = true;
+      assert_string_equal(
+          az_span_ptr(message),
+          az_span_ptr(AZ_SPAN_FROM_STR("HTTP Request : GET https://www.example.com")));
       break;
     case AZ_LOG_HTTP_RESPONSE:
       _log_invoked_for_http_response = true;
+      assert_string_equal(
+          az_span_ptr(message),
+          az_span_ptr(AZ_SPAN_FROM_STR("HTTP Response (3456ms) : 404 Not Found\n")));
       break;
     default:
       assert_true(false);
@@ -232,7 +238,6 @@ static void test_az_log(void** state)
 static void test_az_log_corrupted_response(void** state)
 {
   (void)state;
-  // Set up test values etc.
   uint8_t headers[1024] = { 0 };
   az_http_request request = { 0 };
   az_span url = AZ_SPAN_FROM_STR("https://www.example.com");
@@ -246,7 +251,7 @@ static void test_az_log_corrupted_response(void** state)
       AZ_SPAN_FROM_STR("AAAAABBBBBCCCCCDDDDDEEEEEFFFFFGGGGGHHHHHIIIIIJJJJJKKKKK")));
 
   az_span response_span = AZ_SPAN_FROM_STR("HTTP/1.1 404 Not Found\r\n"
-                                           "\r\n");
+                                           "key:\n");
   az_http_response response = { 0 };
   TEST_EXPECT_SUCCESS(az_http_response_init(&response, response_span));
 
