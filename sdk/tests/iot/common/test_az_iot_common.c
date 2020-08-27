@@ -613,6 +613,8 @@ static void test_az_iot_message_properties_next_succeed(void** state)
       (size_t)az_span_size(test_value_three));
 
   assert_int_equal(az_iot_message_properties_next(&props, &name, &value), AZ_ERROR_IOT_NO_MORE_PROPERTIES);
+  //Call again to show subsequent calls do nothing
+  assert_int_equal(az_iot_message_properties_next(&props, &name, &value), AZ_ERROR_IOT_NO_MORE_PROPERTIES);
 }
 
 static void test_az_iot_message_properties_next_twice_succeed(void** state)
