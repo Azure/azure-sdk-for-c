@@ -48,7 +48,7 @@ enum
   do \
   { \
     az_result const _result = (exp); \
-    if (az_failed(_result)) \
+    if (az_result_failed(_result)) \
     { \
       return _result; \
     } \
@@ -161,7 +161,7 @@ typedef enum
  * @retval true The operation that returned this \p result failed.
  * @retval false The operation that returned this \p result was successful.
  */
-AZ_NODISCARD AZ_INLINE bool az_failed(az_result result)
+AZ_NODISCARD AZ_INLINE bool az_result_failed(az_result result)
 {
   return ((int32_t)result & (int32_t)_az_ERROR_FLAG) != 0;
 }
@@ -174,7 +174,10 @@ AZ_NODISCARD AZ_INLINE bool az_failed(az_result result)
  * @retval `true` The operation that returned this \p result was successful.
  * @retval `false` The operation that returned this \p result failed.
  */
-AZ_NODISCARD AZ_INLINE bool az_succeeded(az_result result) { return !az_failed(result); }
+AZ_NODISCARD AZ_INLINE bool az_result_succeeded(az_result result)
+{
+  return !az_result_failed(result);
+}
 
 #include <azure/core/_az_cfg_suffix.h>
 

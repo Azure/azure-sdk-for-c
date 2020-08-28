@@ -177,7 +177,7 @@ AZ_NODISCARD static az_span _az_json_reader_skip_whitespace(az_json_reader* ref_
     ref_json_reader->_internal.total_bytes_consumed += consumed;
 
     if (az_span_size(json) >= 1
-        || az_failed(_az_json_reader_get_next_buffer(ref_json_reader, &remaining, true)))
+        || az_result_failed(_az_json_reader_get_next_buffer(ref_json_reader, &remaining, true)))
     {
       break;
     }
@@ -445,7 +445,7 @@ static void _az_json_reader_consume_digits(
       }
     }
     if (counter == token_size
-        && az_succeeded(_az_json_reader_get_next_buffer(ref_json_reader, token, false)))
+        && az_result_succeeded(_az_json_reader_get_next_buffer(ref_json_reader, token, false)))
     {
       *total_consumed += counter;
       counter = 0;
@@ -525,7 +525,7 @@ AZ_NODISCARD static az_result _az_json_reader_process_number(az_json_reader* ref
 
     if (current_consumed >= az_span_size(token))
     {
-      if (az_failed(_az_json_reader_get_next_buffer(ref_json_reader, &token, false)))
+      if (az_result_failed(_az_json_reader_get_next_buffer(ref_json_reader, &token, false)))
       {
         // If there is no more JSON, this is a valid end state only when the JSON payload contains a
         // single value: "[-]0"
@@ -564,7 +564,7 @@ AZ_NODISCARD static az_result _az_json_reader_process_number(az_json_reader* ref
 
     if (current_consumed >= az_span_size(token))
     {
-      if (az_failed(_az_json_reader_get_next_buffer(ref_json_reader, &token, false)))
+      if (az_result_failed(_az_json_reader_get_next_buffer(ref_json_reader, &token, false)))
       {
         // If there is no more JSON, this is a valid end state only when the JSON payload contains a
         // single value: "[-][digits]"
@@ -609,7 +609,7 @@ AZ_NODISCARD static az_result _az_json_reader_process_number(az_json_reader* ref
 
     if (current_consumed >= az_span_size(token))
     {
-      if (az_failed(_az_json_reader_get_next_buffer(ref_json_reader, &token, false)))
+      if (az_result_failed(_az_json_reader_get_next_buffer(ref_json_reader, &token, false)))
       {
         // If there is no more JSON, this is a valid end state only when the JSON payload contains a
         // single value: "[-][digits].[digits]"
@@ -667,7 +667,7 @@ AZ_NODISCARD static az_result _az_json_reader_process_number(az_json_reader* ref
 
   if (current_consumed >= az_span_size(token))
   {
-    if (az_failed(_az_json_reader_get_next_buffer(ref_json_reader, &token, false)))
+    if (az_result_failed(_az_json_reader_get_next_buffer(ref_json_reader, &token, false)))
     {
 
       // If there is no more JSON, this is a valid end state only when the JSON payload contains a
