@@ -142,7 +142,7 @@ az_http_response_get_next_header(az_http_response* ref_response, az_pair* out_he
     // AZ_ERROR_HTTP_NO_MORE_HEADERS so we know we reach end of headers
     if (kind == _az_HTTP_RESPONSE_KIND_BODY)
     {
-      return AZ_ERROR_HTTP_NO_MORE_HEADERS;
+      return AZ_ERROR_END_OF_HEADERS;
     }
     // Can't read a header if status line was not previously called,
     // User needs to call az_http_response_status_line() which would reset parser and set kind to
@@ -159,7 +159,7 @@ az_http_response_get_next_header(az_http_response* ref_response, az_pair* out_he
   {
     AZ_RETURN_IF_FAILED(_az_is_expected_span(reader, AZ_SPAN_FROM_STR("\r\n")));
     ref_response->_internal.parser.next_kind = _az_HTTP_RESPONSE_KIND_BODY;
-    return AZ_ERROR_HTTP_NO_MORE_HEADERS;
+    return AZ_ERROR_END_OF_HEADERS;
   }
 
   // https://tools.ietf.org/html/rfc7230#section-3.2

@@ -463,7 +463,7 @@ static void test_http_response(void** state)
     {
       az_pair header = { 0 };
       result = az_http_response_get_next_header(&response, &header);
-      assert_true(result == AZ_ERROR_HTTP_NO_MORE_HEADERS);
+      assert_true(result == AZ_ERROR_END_OF_HEADERS);
     }
     // read a body
     {
@@ -516,13 +516,13 @@ static void test_http_response(void** state)
     {
       az_pair header = { 0 };
       result = az_http_response_get_next_header(&response, &header);
-      assert_true(result == AZ_ERROR_HTTP_NO_MORE_HEADERS);
+      assert_true(result == AZ_ERROR_END_OF_HEADERS);
 
       // Subsequent reads do nothing.
       result = az_http_response_get_next_header(&response, &header);
-      assert_true(result == AZ_ERROR_HTTP_NO_MORE_HEADERS);
+      assert_true(result == AZ_ERROR_END_OF_HEADERS);
       result = az_http_response_get_next_header(&response, &header);
-      assert_true(result == AZ_ERROR_HTTP_NO_MORE_HEADERS);
+      assert_true(result == AZ_ERROR_END_OF_HEADERS);
     }
     // read a body
     {
@@ -691,7 +691,7 @@ static void test_http_response_header_validation(void** state)
     az_http_response_status_line status_line = { 0 };
     assert_return_code(az_http_response_get_status_line(&response, &status_line), AZ_OK);
     for (az_pair header;
-         az_http_response_get_next_header(&response, &header) != AZ_ERROR_HTTP_NO_MORE_HEADERS;)
+         az_http_response_get_next_header(&response, &header) != AZ_ERROR_END_OF_HEADERS;)
     {
       // all valid headers
       assert_true(az_span_ptr(header.key) != NULL);

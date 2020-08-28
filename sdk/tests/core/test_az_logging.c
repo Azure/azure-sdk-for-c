@@ -84,29 +84,6 @@ static void _log_listener_NULL(az_log_classification classification, az_span mes
   }
 }
 
-static void _log_listener_no_op(az_log_classification classification, az_span message)
-{
-  (void)message;
-  switch (classification)
-  {
-    case AZ_LOG_HTTP_REQUEST:
-      _log_invoked_for_http_request = true;
-      assert_string_equal(
-          az_span_ptr(message),
-          az_span_ptr(AZ_SPAN_FROM_STR("HTTP Request : GET https://www.example.com")));
-      break;
-    case AZ_LOG_HTTP_RESPONSE:
-      _log_invoked_for_http_response = true;
-      assert_string_equal(
-          az_span_ptr(message),
-          az_span_ptr(AZ_SPAN_FROM_STR("HTTP Response (3456ms) : 404 Not Found")));
-      break;
-    default:
-      assert_true(false);
-      break;
-  }
-}
-
 static void test_az_log(void** state)
 {
   (void)state;
@@ -235,6 +212,31 @@ static void test_az_log(void** state)
   az_log_set_callback(NULL);
 }
 
+static void _log_listener_stop_logging_corrupted_response(
+    az_log_classification classification,
+    az_span message)
+{
+  (void)message;
+  switch (classification)
+  {
+    case AZ_LOG_HTTP_REQUEST:
+      _log_invoked_for_http_request = true;
+      assert_string_equal(
+          az_span_ptr(message),
+          az_span_ptr(AZ_SPAN_FROM_STR("HTTP Request : GET https://www.example.com")));
+      break;
+    case AZ_LOG_HTTP_RESPONSE:
+      _log_invoked_for_http_response = true;
+      assert_string_equal(
+          az_span_ptr(message),
+          az_span_ptr(AZ_SPAN_FROM_STR("HTTP Response (3456ms) : 404 Not Found")));
+      break;
+    default:
+      assert_true(false);
+      break;
+  }
+}
+
 static void test_az_log_corrupted_response(void** state)
 {
   (void)state;
@@ -256,7 +258,7 @@ static void test_az_log_corrupted_response(void** state)
   TEST_EXPECT_SUCCESS(az_http_response_init(&response, response_span));
 
   _reset_log_invocation_status();
-  az_log_set_callback(_log_listener_no_op);
+  az_log_set_callback(_log_listener_stop_logging_corrupted_response);
   assert_true(_log_invoked_for_http_request == false);
   assert_true(_log_invoked_for_http_response == false);
 

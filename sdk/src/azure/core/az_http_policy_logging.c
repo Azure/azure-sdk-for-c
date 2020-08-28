@@ -160,8 +160,8 @@ static az_result _az_http_policy_logging_append_http_response_msg(
 
   az_span new_line_tab_string = AZ_SPAN_FROM_STR("\n\t");
 
-  az_result result;
-  az_pair header;
+  az_result result = AZ_OK;
+  az_pair header = { 0 };
   while (az_succeeded(result = az_http_response_get_next_header(ref_response, &header)))
   {
     int32_t required_length = az_span_size(new_line_tab_string) + az_span_size(header.key);
@@ -183,7 +183,7 @@ static az_result _az_http_policy_logging_append_http_response_msg(
   }
 
   // Response payload was invalid or corrupted in some way.
-  if (result != AZ_ERROR_HTTP_NO_MORE_HEADERS)
+  if (result != AZ_ERROR_END_OF_HEADERS)
   {
     return result;
   }
