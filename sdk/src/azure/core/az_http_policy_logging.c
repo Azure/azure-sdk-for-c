@@ -162,7 +162,7 @@ static az_result _az_http_policy_logging_append_http_response_msg(
 
   az_result result = AZ_OK;
   az_pair header = { 0 };
-  while (az_succeeded(result = az_http_response_get_next_header(ref_response, &header)))
+  while (az_result_succeeded(result = az_http_response_get_next_header(ref_response, &header)))
   {
     int32_t required_length = az_span_size(new_line_tab_string) + az_span_size(header.key);
     if (az_span_size(header.value) > 0)

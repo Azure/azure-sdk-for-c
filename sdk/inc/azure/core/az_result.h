@@ -146,7 +146,7 @@ typedef enum
 
   // === HTTP Adapter error codes ===
   /// Generic error in the HTTP transport adapter implementation.
-  AZ_ERROR_HTTP_ADAPTER = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 8),
+  AZ_ERROR_HTTP_ADAPTER = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 9),
 
   // === IoT error codes ===
   /// The IoT topic is not matching the expected format.
