@@ -7,7 +7,7 @@
 - Add `az_json_writer_append_json_text()` to support appending existing JSON with the JSON writer.
 - Add support for system properties for IoT Hub messages to `az_iot_common.h`.
 - Add new HTTP result named `AZ_ERROR_HTTP_END_OF_HEADERS` to designate the end of the headers iterated over by `az_http_response_get_next_header()`.
-- Add new IoT result named `AZ_ERROR_IOT_NO_MORE_PROPERTIES` to designate the end of the properties iterated over by `az_iot_message_properties_next()`.
+- Add new IoT result named `AZ_ERROR_IOT_END_OF_PROPERTIES` to designate the end of the properties iterated over by `az_iot_message_properties_next()`.
 
 ### Breaking Changes
 
