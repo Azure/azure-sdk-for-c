@@ -1,10 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef SAMPLE_PNP_DEVICE_INFO_COMPONENT_H
-#define SAMPLE_PNP_DEVICE_INFO_COMPONENT_H
+#ifndef PNP_DEVICE_INFO_COMPONENT_H
+#define PNP_DEVICE_INFO_COMPONENT_H
 
-#include "sample_pnp_mqtt_component.h"
+#include "pnp_mqtt_message.h"
 
 #include <azure/core/az_result.h>
 #include <azure/iot/az_iot_hub_client.h>
@@ -21,4 +21,4 @@ az_result pnp_device_info_get_report_data(
     const az_iot_hub_client* client,
     pnp_mqtt_message* mqtt_message);
 
-#endif // SAMPLE_PNP_DEVICE_INFO_COMPONENT_H
+#endif // PNP_DEVICE_INFO_COMPONENT_H

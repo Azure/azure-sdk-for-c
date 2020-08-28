@@ -34,9 +34,7 @@
 static az_span const AZ_STORAGE_API_VERSION = AZ_SPAN_LITERAL_FROM_STR("2019-02-02");
 
 /**
- * @brief Azure Storage Blobs blob client options.
- *
- * @remark Allows customization of the blob client.
+ * @brief Allows customization of the blob client.
  */
 typedef struct
 {
@@ -92,8 +90,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
     az_storage_blobs_blob_client_options const* options);
 
 /**
- * @brief Azure Storage Blobs Blob upload options.
- * @remark Reserved for future use.
+ * @brief Allows customization of the upload operation.
  */
 typedef struct
 {
@@ -101,7 +98,7 @@ typedef struct
   struct
   {
     /// Currently, this is unused, but needed as a placeholder since we can't have an empty struct.
-    az_span unused;
+    bool unused;
   } _internal;
 } az_storage_blobs_blob_upload_options;
 
@@ -128,7 +125,7 @@ AZ_NODISCARD AZ_INLINE az_storage_blobs_blob_upload_options
 az_storage_blobs_blob_upload_options_default()
 {
   return (az_storage_blobs_blob_upload_options){ .context = &az_context_application,
-                                                 ._internal = { .unused = AZ_SPAN_EMPTY } };
+                                                 ._internal = { .unused = false } };
 }
 
 /**

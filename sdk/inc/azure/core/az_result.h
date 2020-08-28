@@ -153,7 +153,7 @@ typedef enum
   AZ_ERROR_IOT_TOPIC_NO_MATCH = _az_RESULT_MAKE_ERROR(_az_FACILITY_IOT, 1),
 
   /// While iterating, there are no more properties to return.
-  AZ_ERROR_IOT_NO_MORE_PROPERTIES = _az_RESULT_MAKE_ERROR(_az_FACILITY_IOT, 2),
+  AZ_ERROR_IOT_END_OF_PROPERTIES = _az_RESULT_MAKE_ERROR(_az_FACILITY_IOT, 2),
 } az_result;
 
 /**

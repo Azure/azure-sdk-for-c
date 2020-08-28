@@ -25,10 +25,10 @@
 #include <azure/core/az_span.h>
 #include <azure/iot/az_iot_hub_client.h>
 
-#include "sample_pnp.h"
-#include "sample_pnp_device_info_component.h"
-#include "sample_pnp_mqtt_component.h"
-#include "sample_pnp_thermostat_component.h"
+#include "pnp/pnp_protocol.h"
+#include "pnp/pnp_device_info_component.h"
+#include "pnp/pnp_mqtt_message.h"
+#include "pnp/pnp_thermostat_component.h"
 
 #define SAMPLE_TYPE PAHO_IOT_HUB
 #define SAMPLE_NAME PAHO_IOT_HUB_PNP_COMPONENT_SAMPLE

@@ -115,7 +115,7 @@ AZ_NODISCARD az_result az_iot_message_properties_next(
   {
     *out_name = AZ_SPAN_EMPTY;
     *out_value = AZ_SPAN_EMPTY;
-    return AZ_ERROR_IOT_NO_MORE_PROPERTIES;
+    return AZ_ERROR_IOT_END_OF_PROPERTIES;
   }
 
   az_span remainder;
