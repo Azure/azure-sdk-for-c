@@ -99,7 +99,7 @@ static void _log_listener_no_op(az_log_classification classification, az_span me
       _log_invoked_for_http_response = true;
       assert_string_equal(
           az_span_ptr(message),
-          az_span_ptr(AZ_SPAN_FROM_STR("HTTP Response (3456ms) : 404 Not Found\n")));
+          az_span_ptr(AZ_SPAN_FROM_STR("HTTP Response (3456ms) : 404 Not Found")));
       break;
     default:
       assert_true(false);
