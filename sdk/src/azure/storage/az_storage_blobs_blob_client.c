@@ -144,7 +144,6 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
   {
     opt = *options;
   }
-  (void)opt;
 
   // Request buffer
   // create request buffer TODO: define size for a blob upload
@@ -173,7 +172,6 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
   AZ_RETURN_IF_FAILED(az_http_request_append_header(
       &request, AZ_STORAGE_BLOBS_BLOB_HEADER_X_MS_BLOB_TYPE, AZ_STORAGE_BLOBS_BLOB_TYPE_BLOCKBLOB));
 
-  //
   uint8_t content_length[_az_INT64_AS_STR_BUFFER_SIZE] = { 0 };
   az_span content_length_span = AZ_SPAN_FROM_BUFFER(content_length);
   az_span remainder;
