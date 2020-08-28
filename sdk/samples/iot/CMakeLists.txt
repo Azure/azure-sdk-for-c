@@ -99,6 +99,11 @@ target_link_libraries(paho_iot_hub_pnp_component_sample
     az::iot::sample::common
 )
 
+target_include_directories(paho_iot_hub_pnp_component_sample
+  PRIVATE
+    ${CMAKE_CURRENT_LIST_DIR}
+)
+
 # Telemetry (Certificates) Sample
 add_executable (paho_iot_hub_telemetry_sample
   ${CMAKE_CURRENT_LIST_DIR}/paho_iot_hub_telemetry_sample.c

@@ -7,7 +7,7 @@
 #pragma warning(disable : 4996)
 #endif
 
-#include "../iot_sample_common.h"
+#include <iot_sample_common.h>
 #include "pnp_protocol.h"
 #include "pnp_mqtt_message.h"
 
