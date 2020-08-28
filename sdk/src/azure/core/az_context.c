@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include <azure/core/az_context.h>
+#include <azure/core/internal/az_precondition_internal.h>
 
 #include <stddef.h>
 
@@ -48,3 +49,36 @@ az_context_get_value(az_context const* context, void const* key, void const** ou
   *out_value = NULL;
   return AZ_ERROR_ITEM_NOT_FOUND;
 }
+
+AZ_NODISCARD az_context
+az_context_create_with_expiration(az_context const* parent, int64_t expiration)
+{
+  _az_PRECONDITION_NOT_NULL(parent);
+
+  return (az_context){ ._internal = { .parent = parent, .expiration = expiration } };
+}
+
+AZ_NODISCARD az_context
+az_context_create_with_value(az_context const* parent, void const* key, void const* value)
+{
+  _az_PRECONDITION_NOT_NULL(parent);
+  return (az_context){
+    ._internal
+    = { .parent = parent, .expiration = _az_CONTEXT_MAX_EXPIRATION, .key = key, .value = value }
+  };
+}
+
+void az_context_cancel(az_context* ref_context)
+{
+  _az_PRECONDITION_NOT_NULL(ref_context);
+
+  ref_context->_internal.expiration = 0; // The beginning of time
+}
+
+AZ_NODISCARD bool az_context_has_expired(az_context const* context, int64_t current_time)
+{
+  _az_PRECONDITION_NOT_NULL(context);
+
+  return az_context_get_expiration(context) < current_time;
+}
+
