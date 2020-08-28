@@ -25,7 +25,7 @@
 /**
  * @brief A context is a node within a tree that represents expiration times and key/value pairs.
  *
- * @details The root node in the tree (ultimate parent)..
+ * @details The root node in the tree (ultimate parent).
  */
 // Definition is below. Defining the typedef first is necessary here since there is a cycle.
 typedef struct az_context az_context;
