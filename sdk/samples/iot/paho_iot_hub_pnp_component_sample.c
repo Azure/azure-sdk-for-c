@@ -467,7 +467,7 @@ static void send_device_info(void)
   }
 
   // Publish the device info reported property update.
-  mqtt_publish_message(mqtt_message.topic, mqtt_message.out_payload_span, MQTT_PUBLISH_QOS);
+  mqtt_publish_message(mqtt_message.topic, mqtt_message.out_payload_span, IOT_SAMPLE_MQTT_PUBLISH_QOS);
   IOT_SAMPLE_LOG_SUCCESS("Client sent `device info` reported property message.");
   IOT_SAMPLE_LOG_AZ_SPAN("Payload:", mqtt_message.out_payload_span);
   IOT_SAMPLE_LOG(" "); // Formatting.
@@ -507,7 +507,7 @@ static void send_device_serial_number(void)
   }
 
   // Publish the serial number reported property update.
-  mqtt_publish_message(mqtt_message.topic, mqtt_message.out_payload_span, MQTT_PUBLISH_QOS);
+  mqtt_publish_message(mqtt_message.topic, mqtt_message.out_payload_span, IOT_SAMPLE_MQTT_PUBLISH_QOS);
   IOT_SAMPLE_LOG_SUCCESS("Client sent `serial number` reported property message.");
   IOT_SAMPLE_LOG_AZ_SPAN("Payload:", mqtt_message.out_payload_span);
   IOT_SAMPLE_LOG(" "); // Formatting.
@@ -531,7 +531,7 @@ static void request_device_twin_document(void)
   }
 
   // Publish the twin document request.
-  mqtt_publish_message(mqtt_message.topic, AZ_SPAN_NULL, MQTT_PUBLISH_QOS);
+  mqtt_publish_message(mqtt_message.topic, AZ_SPAN_NULL, IOT_SAMPLE_MQTT_PUBLISH_QOS);
   IOT_SAMPLE_LOG_SUCCESS("Client requested twin document.");
   IOT_SAMPLE_LOG(" "); // Formatting.
 
@@ -547,7 +547,7 @@ static void receive_messages(void)
     // Send max temp for each thermostat since boot if needed.
     if (pnp_thermostat_get_max_temp_report(&hub_client, &thermostat_1, &mqtt_message))
     {
-      mqtt_publish_message(mqtt_message.topic, mqtt_message.out_payload_span, MQTT_PUBLISH_QOS);
+      mqtt_publish_message(mqtt_message.topic, mqtt_message.out_payload_span, IOT_SAMPLE_MQTT_PUBLISH_QOS);
       IOT_SAMPLE_LOG_SUCCESS(
           "Client sent Temperature Sensor 1 the `maxTempSinceLastReboot` reported property "
           "message.");
@@ -559,7 +559,7 @@ static void receive_messages(void)
 
     if (pnp_thermostat_get_max_temp_report(&hub_client, &thermostat_2, &mqtt_message))
     {
-      mqtt_publish_message(mqtt_message.topic, mqtt_message.out_payload_span, MQTT_PUBLISH_QOS);
+      mqtt_publish_message(mqtt_message.topic, mqtt_message.out_payload_span, IOT_SAMPLE_MQTT_PUBLISH_QOS);
       IOT_SAMPLE_LOG_SUCCESS(
           "Client sent Temperature Sensor 2 the `maxTempSinceLastReboot` reported property "
           "message.");
@@ -791,7 +791,7 @@ static void handle_command_message(
   }
 
   // Publish the command response
-  mqtt_publish_message(mqtt_message.topic, command_response_payload, MQTT_PUBLISH_QOS);
+  mqtt_publish_message(mqtt_message.topic, command_response_payload, IOT_SAMPLE_MQTT_PUBLISH_QOS);
   IOT_SAMPLE_LOG_SUCCESS("Client published command response.");
   IOT_SAMPLE_LOG("Status: %d", status);
   IOT_SAMPLE_LOG_AZ_SPAN("Payload:", command_response_payload);
@@ -855,7 +855,7 @@ static void send_telemetry_messages(void)
   }
 
   // Publish the telemetry message.
-  mqtt_publish_message(mqtt_message.topic, mqtt_message.out_payload_span, MQTT_PUBLISH_QOS);
+  mqtt_publish_message(mqtt_message.topic, mqtt_message.out_payload_span, IOT_SAMPLE_MQTT_PUBLISH_QOS);
   IOT_SAMPLE_LOG_SUCCESS("Client sent telemetry message for Temperature Sensor 1:");
   IOT_SAMPLE_LOG_AZ_SPAN("Payload:", mqtt_message.out_payload_span);
 
@@ -871,7 +871,7 @@ static void send_telemetry_messages(void)
   }
 
   // Publish the telemetry message.
-  mqtt_publish_message(mqtt_message.topic, mqtt_message.out_payload_span, MQTT_PUBLISH_QOS);
+  mqtt_publish_message(mqtt_message.topic, mqtt_message.out_payload_span, IOT_SAMPLE_MQTT_PUBLISH_QOS);
   IOT_SAMPLE_LOG_SUCCESS("Client sent telemetry message for Temperature Sensor 2:");
   IOT_SAMPLE_LOG_AZ_SPAN("Payload:", mqtt_message.out_payload_span);
 
@@ -886,7 +886,7 @@ static void send_telemetry_messages(void)
   }
 
   // Publish the telemetry message.
-  mqtt_publish_message(mqtt_message.topic, mqtt_message.out_payload_span, MQTT_PUBLISH_QOS);
+  mqtt_publish_message(mqtt_message.topic, mqtt_message.out_payload_span, IOT_SAMPLE_MQTT_PUBLISH_QOS);
   IOT_SAMPLE_LOG_SUCCESS("Client sent telemetry message for Temperature Controller:");
   IOT_SAMPLE_LOG_AZ_SPAN("Payload:", mqtt_message.out_payload_span);
 }
@@ -1004,7 +1004,7 @@ static void property_callback(
     }
 
     // Send error response to the updated property.
-    mqtt_publish_message(mqtt_message.topic, mqtt_message.out_payload_span, MQTT_PUBLISH_QOS);
+    mqtt_publish_message(mqtt_message.topic, mqtt_message.out_payload_span, IOT_SAMPLE_MQTT_PUBLISH_QOS);
     IOT_SAMPLE_LOG_SUCCESS(
         "Client sent Temperature Controller error status reported property message:");
     IOT_SAMPLE_LOG_AZ_SPAN("Payload:", mqtt_message.out_payload_span);
@@ -1023,7 +1023,7 @@ static void property_callback(
                    &mqtt_message)))
   {
     // Send response to the updated property.
-    mqtt_publish_message(mqtt_message.topic, mqtt_message.out_payload_span, MQTT_PUBLISH_QOS);
+    mqtt_publish_message(mqtt_message.topic, mqtt_message.out_payload_span, IOT_SAMPLE_MQTT_PUBLISH_QOS);
     IOT_SAMPLE_LOG_SUCCESS("Client sent Temperature Sensor 1 reported property message:");
     IOT_SAMPLE_LOG_AZ_SPAN("Payload:", mqtt_message.out_payload_span);
 
@@ -1041,7 +1041,7 @@ static void property_callback(
                    &mqtt_message)))
   {
     // Send response to the updated property
-    mqtt_publish_message(mqtt_message.topic, mqtt_message.out_payload_span, MQTT_PUBLISH_QOS);
+    mqtt_publish_message(mqtt_message.topic, mqtt_message.out_payload_span, IOT_SAMPLE_MQTT_PUBLISH_QOS);
     IOT_SAMPLE_LOG_SUCCESS("Client sent Temperature Sensor 2 reported property message.");
     IOT_SAMPLE_LOG_AZ_SPAN("Payload:", mqtt_message.out_payload_span);
 

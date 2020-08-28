@@ -282,7 +282,7 @@ static void get_device_twin_document(void)
   }
 
   // Publish the twin document request.
-  if ((rc = MQTTClient_publish(mqtt_client, twin_document_topic_buffer, 0, NULL, 0, 0, NULL))
+  if ((rc = MQTTClient_publish(mqtt_client, twin_document_topic_buffer, 0, NULL, IOT_SAMPLE_MQTT_PUBLISH_QOS, 0, NULL))
       != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR(
@@ -328,7 +328,7 @@ static void send_reported_property(void)
            twin_patch_topic_buffer,
            az_span_size(reported_property_payload),
            az_span_ptr(reported_property_payload),
-           0,
+           IOT_SAMPLE_MQTT_PUBLISH_QOS,
            0,
            NULL))
       != MQTTCLIENT_SUCCESS)

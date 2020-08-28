@@ -14,6 +14,7 @@
 #include <azure/core/az_span.h>
 
 #define IOT_SAMPLE_SAS_KEY_DURATION_TIME_DIGITS 4
+#define IOT_SAMPLE_MQTT_PUBLISH_QOS 0
 
 //
 // Logging

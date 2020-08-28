@@ -55,7 +55,7 @@ static void handle_method_request(az_iot_hub_client_method_request const* method
 static az_span invoke_ping(void);
 static void send_method_response(
     az_iot_hub_client_method_request const* request,
-    uint16_t status,
+    az_iot_status status,
     az_span response);
 
 /*
@@ -313,7 +313,7 @@ static az_span invoke_ping(void)
 
 static void send_method_response(
     az_iot_hub_client_method_request const* method_request,
-    uint16_t status,
+    az_iot_status status,
     az_span response)
 {
   int rc;
@@ -324,7 +324,7 @@ static void send_method_response(
           rc = az_iot_hub_client_methods_response_get_publish_topic(
               &hub_client,
               method_request->request_id,
-              status,
+              (uint16_t)status,
               methods_response_topic_buffer,
               sizeof(methods_response_topic_buffer),
               NULL)))
@@ -340,7 +340,7 @@ static void send_method_response(
            methods_response_topic_buffer,
            az_span_size(response),
            az_span_ptr(response),
-           0,
+           IOT_SAMPLE_MQTT_PUBLISH_QOS,
            0,
            NULL))
       != MQTTCLIENT_SUCCESS)

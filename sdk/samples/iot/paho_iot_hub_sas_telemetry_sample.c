@@ -194,7 +194,7 @@ static void send_telemetry_messages_to_iot_hub(void)
              telemetry_topic_buffer,
              (int)strlen(telemetry_message_payloads[message_count]),
              telemetry_message_payloads[message_count],
-             0,
+             IOT_SAMPLE_MQTT_PUBLISH_QOS,
              0,
              NULL))
         != MQTTCLIENT_SUCCESS)
