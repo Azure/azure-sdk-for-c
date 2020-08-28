@@ -79,7 +79,7 @@ _get_remaining_span(az_json_writer* ref_json_writer, int32_t required_size)
 
     // No more space left in the destination, let the caller fail with
     // AZ_ERROR_INSUFFICIENT_SPAN_SIZE
-    if (!az_succeeded(ref_json_writer->_internal.allocator_callback(&context, &remaining)))
+    if (!az_result_succeeded(ref_json_writer->_internal.allocator_callback(&context, &remaining)))
     {
       return AZ_SPAN_NULL;
     }
@@ -736,7 +736,7 @@ static AZ_NODISCARD az_result _az_validate_json(
 
   // Keep reading until we have finished validating the entire JSON text and make sure it isn't
   // incomplete.
-  while (az_succeeded(result = az_json_reader_next_token(&reader)))
+  while (az_result_succeeded(result = az_json_reader_next_token(&reader)))
   {
   }
 

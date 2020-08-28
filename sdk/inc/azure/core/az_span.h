@@ -516,8 +516,8 @@ typedef struct
  * This function must never return an empty #az_span, unless the requested buffer size is not
  * available. In which case, it must return an error #az_result.
  *
- * @remarks The caller must check the return value using #az_succeeded() before continuing to use
- * the \p out_next_destination.
+ * @remarks The caller must check the return value using #az_result_succeeded() before continuing to
+ * use the \p out_next_destination.
  */
 typedef az_result (*az_span_allocator_fn)(
     az_span_allocator_context* allocator_context,

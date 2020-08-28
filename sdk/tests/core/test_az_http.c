@@ -21,7 +21,7 @@
 
 #include <azure/core/_az_cfg.h>
 
-#define TEST_EXPECT_SUCCESS(exp) assert_true(az_succeeded(exp))
+#define TEST_EXPECT_SUCCESS(exp) assert_true(az_result_succeeded(exp))
 
 static az_span request_url
     = AZ_SPAN_LITERAL_FROM_STR("https://antk-keyvault.vault.azure.net/secrets/Password");

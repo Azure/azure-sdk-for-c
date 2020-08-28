@@ -56,14 +56,14 @@ If SAS tokens are used the following APIs provide a way to create as well as ref
 _Example:_
 
 ```C
-if(az_failed(az_iot_hub_client_sas_get_signature(client, unix_time + 3600, signature, &signature)));
+if(az_result_failed(az_iot_hub_client_sas_get_signature(client, unix_time + 3600, signature, &signature)));
 {
     // error.
 }
 
 // Application will Base64Encode the HMAC256 of the az_span_ptr(signature) containing az_span_size(signature) bytes with the Shared Access Key.
 
-if(az_failed(az_iot_hub_client_sas_get_password(client, base64_hmac_sha256_signature, NULL, password, password_size, &password_length)))
+if(az_result_failed(az_iot_hub_client_sas_get_password(client, base64_hmac_sha256_signature, NULL, password, password_size, &password_length)))
 {
     // error.
 }
@@ -99,7 +99,7 @@ The application is responsible for filling in the MQTT payload with the format e
 _Example:_
 
 ```C
-if(az_failed(az_iot_hub_client_telemetry_get_publish_topic(client, NULL, topic, topic_size, NULL)))
+if(az_result_failed(az_iot_hub_client_telemetry_get_publish_topic(client, NULL, topic, topic_size, NULL)))
 {
     // error.
 }
@@ -120,19 +120,19 @@ _Example:_
 
     //az_span received_topic is filled by the application.
 
-    if (az_succeeded(az_iot_hub_client_c2d_parse_received_topic(client, received_topic, &c2d_request)))
+    if (az_result_succeeded(az_iot_hub_client_c2d_parse_received_topic(client, received_topic, &c2d_request)))
     {
         // This is a C2D message:
         //  c2d_request.properties contain the properties of the message.
         //  the MQTT message payload contains the data.
     }
-    else if (az_succeeded(ret = az_iot_hub_client_methods_parse_received_topic(client, received_topic, &method_request)))
+    else if (az_result_succeeded(ret = az_iot_hub_client_methods_parse_received_topic(client, received_topic, &method_request)))
     {
         // This is a Method request:
         //  method_request.name contains the method
         //  method_request.request_id contains the request ID that must be used to submit the response using az_iot_hub_client_methods_response_get_publish_topic()
     }
-    else if (az_succeeded(ret = az_iot_hub_client_twin_parse_received_topic(client, received_topic, &twin_response)))
+    else if (az_result_succeeded(ret = az_iot_hub_client_twin_parse_received_topic(client, received_topic, &twin_response)))
     {
         // This is a Twin operation.
         switch (twin_response.response_type)

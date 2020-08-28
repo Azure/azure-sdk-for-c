@@ -74,7 +74,8 @@ static void create_and_configure_mqtt_client(void)
   int rc;
 
   // Reads in environment variables set by user for purposes of running sample.
-  if (az_failed(rc = iot_sample_read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars)))
+  if (az_result_failed(
+          rc = iot_sample_read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars)))
   {
     IOT_SAMPLE_LOG_ERROR(
         "Failed to read configuration from environment variables: az_result return code 0x%08x.",
@@ -84,7 +85,7 @@ static void create_and_configure_mqtt_client(void)
 
   // Build an MQTT endpoint c-string.
   char mqtt_endpoint_buffer[128];
-  if (az_failed(
+  if (az_result_failed(
           rc = iot_sample_create_mqtt_endpoint(
               SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer))))
   {
@@ -93,7 +94,7 @@ static void create_and_configure_mqtt_client(void)
   }
 
   // Initialize the hub client with the default connection options.
-  if (az_failed(
+  if (az_result_failed(
           rc = az_iot_hub_client_init(
               &hub_client, env_vars.hub_hostname, env_vars.hub_device_id, NULL)))
   {
@@ -103,7 +104,7 @@ static void create_and_configure_mqtt_client(void)
 
   // Get the MQTT client id used for the MQTT connection.
   char mqtt_client_id_buffer[128];
-  if (az_failed(
+  if (az_result_failed(
           rc = az_iot_hub_client_get_client_id(
               &hub_client, mqtt_client_id_buffer, sizeof(mqtt_client_id_buffer), NULL)))
   {
@@ -133,7 +134,7 @@ static void connect_mqtt_client_to_iot_hub(void)
   int rc;
 
   // Get the MQTT client username.
-  if (az_failed(
+  if (az_result_failed(
           rc = az_iot_hub_client_get_user_name(
               &hub_client, mqtt_client_username_buffer, sizeof(mqtt_client_username_buffer), NULL)))
   {
@@ -173,7 +174,7 @@ static void send_telemetry_messages_to_iot_hub(void)
 
   // Get the Telemetry topic to publish the telemetry messages.
   char telemetry_topic_buffer[128];
-  if (az_failed(
+  if (az_result_failed(
           rc = az_iot_hub_client_telemetry_get_publish_topic(
               &hub_client, NULL, telemetry_topic_buffer, sizeof(telemetry_topic_buffer), NULL)))
   {
@@ -236,7 +237,7 @@ static void generate_sas_key(void)
 
   // Get the signature that will later be signed.
   az_span sas_signature = AZ_SPAN_FROM_BUFFER(sas_signature_buffer);
-  if (az_failed(
+  if (az_result_failed(
           rc = az_iot_hub_client_sas_get_signature(
               &hub_client, sas_duration, sas_signature, &sas_signature)))
   {
@@ -264,7 +265,7 @@ static void generate_sas_key(void)
       mqtt_password_buffer,
       sizeof(mqtt_password_buffer),
       &mqtt_password_length);
-  if (az_failed(rc))
+  if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR("Could not get the password: az_result return code 0x%08x.", rc);
     exit(rc);

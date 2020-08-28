@@ -33,14 +33,15 @@
 #include <openssl/evp.h>
 #include <openssl/hmac.h>
 
-#define IOT_SAMPLE_PRECONDITION_NOT_NULL(arg)   \
-do {                                            \
-    if (arg == NULL)                            \
-    {                                           \
+#define IOT_SAMPLE_PRECONDITION_NOT_NULL(arg) \
+  do \
+  { \
+    if (arg == NULL) \
+    { \
       IOT_SAMPLE_LOG_ERROR("Pointer is NULL."); \
-      exit(1);                                  \
-    }                                           \
-} while (0)
+      exit(1); \
+    } \
+  } while (0)
 
 //
 // MQTT endpoints
@@ -335,7 +336,8 @@ static az_result decode_base64_bytes(
   }
 
   // Get the source BIO to push through the filter
-  source_mem_bio = BIO_new_mem_buf(az_span_ptr(base64_encoded_bytes), (int)az_span_size(base64_encoded_bytes));
+  source_mem_bio
+      = BIO_new_mem_buf(az_span_ptr(base64_encoded_bytes), (int)az_span_size(base64_encoded_bytes));
   if (source_mem_bio == NULL)
   {
     BIO_free(base64_decoder);
@@ -492,7 +494,7 @@ void iot_sample_generate_sas_base64_encoded_signed_signature(
   // Decode the sas base64 encoded key to use for HMAC signing.
   char sas_decoded_key_buffer[64];
   az_span sas_decoded_key = AZ_SPAN_FROM_BUFFER(sas_decoded_key_buffer);
-  if (az_failed(
+  if (az_result_failed(
           rc = decode_base64_bytes(sas_base64_encoded_key, sas_decoded_key, &sas_decoded_key)))
   {
     IOT_SAMPLE_LOG_ERROR("Could not decode the SAS key: az_result return code 0x%04x.", rc);
@@ -502,7 +504,7 @@ void iot_sample_generate_sas_base64_encoded_signed_signature(
   // HMAC-SHA256 sign the signature with the decoded key.
   char sas_hmac256_signed_signature_buffer[128];
   az_span sas_hmac256_signed_signature = AZ_SPAN_FROM_BUFFER(sas_hmac256_signed_signature_buffer);
-  if (az_failed(
+  if (az_result_failed(
           rc = hmac_sha256_sign_signature(
               sas_decoded_key,
               sas_signature,
@@ -514,7 +516,7 @@ void iot_sample_generate_sas_base64_encoded_signed_signature(
   }
 
   // Base64 encode the result of the HMAC signing.
-  if (az_failed(
+  if (az_result_failed(
           rc = base64_encode_bytes(
               sas_hmac256_signed_signature,
               sas_base64_encoded_signed_signature,

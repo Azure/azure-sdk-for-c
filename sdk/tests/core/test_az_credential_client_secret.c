@@ -31,7 +31,7 @@ static void test_credential_client_secret(void** state)
 
     if (i < 0)
     {
-      assert_true(az_succeeded(az_credential_client_secret_init(
+      assert_true(az_result_succeeded(az_credential_client_secret_init(
           &credential,
           AZ_SPAN_FROM_STR("TenantID"),
           AZ_SPAN_FROM_STR("ClientID"),
@@ -42,7 +42,7 @@ static void test_credential_client_secret(void** state)
     {
       authority = authorities[i];
 
-      assert_true(az_succeeded(az_credential_client_secret_init(
+      assert_true(az_result_succeeded(az_credential_client_secret_init(
           &credential,
           AZ_SPAN_FROM_STR("TenantID"),
           AZ_SPAN_FROM_STR("ClientID"),
@@ -50,7 +50,7 @@ static void test_credential_client_secret(void** state)
           authority)));
     }
 
-    assert_true(az_succeeded(
+    assert_true(az_result_succeeded(
         _az_credential_set_scopes((_az_credential*)&credential, AZ_SPAN_FROM_STR("Scopes"))));
 
     _az_http_pipeline pipeline = (_az_http_pipeline){
@@ -136,9 +136,9 @@ az_result send_request(az_http_request const* request, az_http_response* respons
   static bool redo_auth = false;
 
   az_span request_url = { 0 };
-  assert_true(az_succeeded(az_http_request_get_url(request, &request_url)));
+  assert_true(az_result_succeeded(az_http_request_get_url(request, &request_url)));
   az_span body = { 0 };
-  assert_true(az_succeeded(az_http_request_get_body(request, &body)));
+  assert_true(az_result_succeeded(az_http_request_get_body(request, &body)));
 
   if (!az_span_is_content_equal(
           AZ_SPAN_FROM_STR("https://www.microsoft.com/test/request"),

@@ -19,7 +19,7 @@
 
 #include <azure/core/_az_cfg.h>
 
-#define TEST_EXPECT_SUCCESS(exp) assert_true(az_succeeded(exp))
+#define TEST_EXPECT_SUCCESS(exp) assert_true(az_result_succeeded(exp))
 
 static bool _log_invoked_for_http_request = false;
 static bool _log_invoked_for_http_response = false;
