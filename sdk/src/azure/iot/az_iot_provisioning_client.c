@@ -39,7 +39,7 @@ AZ_INLINE az_span _az_iot_provisioning_get_str_dps_registrations()
 
 AZ_NODISCARD az_iot_provisioning_client_options az_iot_provisioning_client_options_default()
 {
-  return (az_iot_provisioning_client_options){ .user_agent = AZ_SPAN_NULL };
+  return (az_iot_provisioning_client_options){ .user_agent = AZ_SPAN_EMPTY };
 }
 
 AZ_NODISCARD az_result az_iot_provisioning_client_init(
@@ -222,13 +222,13 @@ AZ_NODISCARD az_result az_iot_provisioning_client_query_status_get_publish_topic
 AZ_INLINE az_iot_provisioning_client_registration_result
 _az_iot_provisioning_registration_result_default()
 {
-  return (az_iot_provisioning_client_registration_result){ .assigned_hub_hostname = AZ_SPAN_NULL,
-                                                           .device_id = AZ_SPAN_NULL,
+  return (az_iot_provisioning_client_registration_result){ .assigned_hub_hostname = AZ_SPAN_EMPTY,
+                                                           .device_id = AZ_SPAN_EMPTY,
                                                            .error_code = AZ_IOT_STATUS_UNKNOWN,
                                                            .extended_error_code = 0,
-                                                           .error_message = AZ_SPAN_NULL,
-                                                           .error_tracking_id = AZ_SPAN_NULL,
-                                                           .error_timestamp = AZ_SPAN_NULL };
+                                                           .error_message = AZ_SPAN_EMPTY,
+                                                           .error_tracking_id = AZ_SPAN_EMPTY,
+                                                           .error_timestamp = AZ_SPAN_EMPTY };
 }
 
 AZ_INLINE az_iot_status _az_iot_status_from_extended_status(uint32_t extended_status)
@@ -430,7 +430,7 @@ AZ_INLINE az_result az_iot_provisioning_client_parse_payload(
 
   if (!(found_operation_status && found_operation_id))
   {
-    out_response->operation_id = AZ_SPAN_NULL;
+    out_response->operation_id = AZ_SPAN_EMPTY;
     out_response->operation_status = AZ_SPAN_FROM_STR("failed");
 
     if (!found_error)

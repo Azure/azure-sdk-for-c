@@ -108,7 +108,7 @@ static az_result invoke_getMaxMinReport(
 {
   // az_result result;
   // Parse the "since" field in the payload.
-  az_span start_time_span = AZ_SPAN_NULL;
+  az_span start_time_span = AZ_SPAN_EMPTY;
   az_json_reader jr;
   AZ_RETURN_IF_FAILED(az_json_reader_init(&jr, payload, NULL));
   AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));

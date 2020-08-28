@@ -77,10 +77,13 @@ AZ_NODISCARD az_span az_span_create(uint8_t* ptr, int32_t size);
 
 /**
  * @brief An empty #az_span.
+ *
+ * @remark There is no guarantee that the pointer backing this span will be `NULL` and the caller
+ * shouldn't rely on it. However, the size will be 0.
  */
 // When updating this macro, also update AZ_PAIR_NULL, which should be using this macro, but can't
 // due to warnings, and so it is using an expansion of this macro instead.
-#define AZ_SPAN_NULL \
+#define AZ_SPAN_EMPTY \
   (az_span) \
   { \
     ._internal = {.ptr = NULL, .size = 0 } \
@@ -275,7 +278,7 @@ AZ_NODISCARD int32_t az_span_find(az_span source, az_span target);
  * source.
  *
  * @remarks This function copies all of \p source into the \p destination even if they overlap.
- * @remarks If \p source is an empty #az_span or #AZ_SPAN_NULL, this function will just return
+ * @remarks If \p source is an empty #az_span or #AZ_SPAN_EMPTY, this function will just return
  * \p destination.
  */
 az_span az_span_copy(az_span destination, az_span source);
@@ -536,7 +539,7 @@ typedef struct
 } az_pair;
 
 /**
- * @brief An #az_pair instance whose key and value fields are initialized to #AZ_SPAN_NULL.
+ * @brief An #az_pair instance whose key and value fields are initialized to #AZ_SPAN_EMPTY.
  */
 #define AZ_PAIR_NULL \
   (az_pair) \

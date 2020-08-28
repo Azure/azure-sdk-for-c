@@ -128,7 +128,7 @@ AZ_NODISCARD AZ_INLINE az_storage_blobs_blob_upload_options
 az_storage_blobs_blob_upload_options_default()
 {
   return (az_storage_blobs_blob_upload_options){ .context = &az_context_application,
-                                                 ._internal = { .unused = AZ_SPAN_NULL } };
+                                                 ._internal = { .unused = AZ_SPAN_EMPTY } };
 }
 
 /**

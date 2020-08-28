@@ -32,7 +32,7 @@ static void _az_span_free(az_span* p)
     return;
   }
   free(az_span_ptr(*p));
-  *p = AZ_SPAN_NULL;
+  *p = AZ_SPAN_EMPTY;
 }
 
 /**

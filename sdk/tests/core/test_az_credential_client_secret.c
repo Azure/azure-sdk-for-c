@@ -36,7 +36,7 @@ static void test_credential_client_secret(void** state)
           AZ_SPAN_FROM_STR("TenantID"),
           AZ_SPAN_FROM_STR("ClientID"),
           AZ_SPAN_FROM_STR("ClientSecret"),
-          AZ_SPAN_NULL)));
+          AZ_SPAN_EMPTY)));
     }
     else
     {

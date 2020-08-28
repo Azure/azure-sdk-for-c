@@ -162,7 +162,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
       {
         // Is a twin GET response
         out_twin_response->response_type = AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_GET;
-        out_twin_response->version = AZ_SPAN_NULL;
+        out_twin_response->version = AZ_SPAN_EMPTY;
       }
 
       result = AZ_OK;
@@ -184,7 +184,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
           &props, az_iot_hub_twin_version_prop, &out_twin_response->version));
 
       out_twin_response->response_type = AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES;
-      out_twin_response->request_id = AZ_SPAN_NULL;
+      out_twin_response->request_id = AZ_SPAN_EMPTY;
       out_twin_response->status = AZ_IOT_STATUS_OK;
 
       result = AZ_OK;

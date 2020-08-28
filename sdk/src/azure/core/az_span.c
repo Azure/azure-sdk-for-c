@@ -42,7 +42,7 @@ AZ_NODISCARD az_span az_span_create_from_str(char* str)
   // Avoid passing in null pointer to strlen to avoid memory access violation.
   if (str == NULL)
   {
-    return AZ_SPAN_NULL;
+    return AZ_SPAN_EMPTY;
   }
 
   int32_t const length = (int32_t)strlen(str);
@@ -982,7 +982,7 @@ AZ_NODISCARD az_span _az_span_token(az_span source, az_span delimiter, az_span* 
 
   if (az_span_size(source) == 0)
   {
-    return AZ_SPAN_NULL;
+    return AZ_SPAN_EMPTY;
   }
 
   int32_t index = az_span_find(source, delimiter);
@@ -995,7 +995,7 @@ AZ_NODISCARD az_span _az_span_token(az_span source, az_span delimiter, az_span* 
   }
   else
   {
-    *out_remainder = AZ_SPAN_NULL;
+    *out_remainder = AZ_SPAN_EMPTY;
 
     return source;
   }

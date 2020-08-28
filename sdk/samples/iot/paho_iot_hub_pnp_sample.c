@@ -400,7 +400,7 @@ static void request_device_twin_document(void)
   }
 
   // Publish the twin document request.
-  mqtt_publish_message(twin_document_topic_buffer, AZ_SPAN_NULL, SAMPLE_PUBLISH_QOS);
+  mqtt_publish_message(twin_document_topic_buffer, AZ_SPAN_EMPTY, SAMPLE_PUBLISH_QOS);
 }
 
 static void receive_messages(void)

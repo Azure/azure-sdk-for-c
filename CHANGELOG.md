@@ -14,6 +14,7 @@
 - Rename `az_iot_hub_client_properties` to `az_iot_message_properties` and move it from `az_iot_hub_client.h` to `az_iot_common.h`.
 - Remove `az_pair` from `az_iot_message_properties_next()` in favor of individual name and value `az_span` parameters.
 - In `az_result.h`, rename `az_failed()` to `az_result_failed()` and `az_succeeded()` to `az_result_succeeded()`.
+- Renamed the macro `AZ_SPAN_NULL` to `AZ_SPAN_EMPTY`.
 
 ### Bug Fixes
 

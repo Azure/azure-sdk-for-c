@@ -47,7 +47,7 @@ static void az_iot_provisioning_client_sas_get_signature_NULL_signature_fails()
           &client, test_global_device_endpoint, test_id_scope, test_registration_id, NULL),
       AZ_OK);
 
-  az_span signature = AZ_SPAN_NULL;
+  az_span signature = AZ_SPAN_EMPTY;
 
   ASSERT_PRECONDITION_CHECKED(az_iot_provisioning_client_sas_get_signature(
       &client, test_sas_expiry_time_secs, signature, NULL));
@@ -61,7 +61,7 @@ static void az_iot_provisioning_client_sas_get_signature_NULL_signature_span_fai
           &client, test_global_device_endpoint, test_id_scope, test_registration_id, NULL),
       AZ_OK);
 
-  az_span signature = AZ_SPAN_NULL;
+  az_span signature = AZ_SPAN_EMPTY;
 
   ASSERT_PRECONDITION_CHECKED(az_iot_provisioning_client_sas_get_signature(
       &client, test_sas_expiry_time_secs, signature, &signature));
@@ -84,8 +84,8 @@ static void az_iot_provisioning_client_sas_get_password_EMPTY_signature_fails()
           &client, test_global_device_endpoint, test_id_scope, test_registration_id, NULL),
       AZ_OK);
 
-  az_span key_name = AZ_SPAN_NULL;
-  az_span signature = AZ_SPAN_NULL;
+  az_span key_name = AZ_SPAN_EMPTY;
+  az_span signature = AZ_SPAN_EMPTY;
 
   char password[TEST_SPAN_BUFFER_SIZE];
   size_t length = 0;
@@ -108,7 +108,7 @@ static void az_iot_provisioning_client_sas_get_password_NULL_password_span_fails
           &client, test_global_device_endpoint, test_id_scope, test_registration_id, NULL),
       AZ_OK);
 
-  az_span key_name = AZ_SPAN_NULL;
+  az_span key_name = AZ_SPAN_EMPTY;
   size_t length = 0;
   char password[TEST_SPAN_BUFFER_SIZE];
 
@@ -130,7 +130,7 @@ static void az_iot_provisioning_client_sas_get_password_empty_password_buffer_fa
           &client, test_global_device_endpoint, test_id_scope, test_registration_id, NULL),
       AZ_OK);
 
-  az_span key_name = AZ_SPAN_NULL;
+  az_span key_name = AZ_SPAN_EMPTY;
 
   char password[TEST_SPAN_BUFFER_SIZE];
   size_t length = 0;
@@ -177,7 +177,7 @@ static void az_iot_provisioning_client_sas_get_password_device_succeeds()
   const char expected_password[] = "SharedAccessSignature sr=" TEST_URL_ENCODED_RESOURCE_URI
                                    "&sig=" TEST_URL_ENC_SIG "&se=" TEST_EXPIRATION_STR;
 
-  az_span key_name = AZ_SPAN_NULL;
+  az_span key_name = AZ_SPAN_EMPTY;
 
   char password[TEST_SPAN_BUFFER_SIZE];
   size_t length = 0;
@@ -233,7 +233,7 @@ static void az_iot_provisioning_client_sas_get_password_device_overflow_fails()
           &client, test_global_device_endpoint, test_id_scope, test_registration_id, NULL),
       AZ_OK);
 
-  az_span key_name = AZ_SPAN_NULL;
+  az_span key_name = AZ_SPAN_EMPTY;
 
   char password[132];
   size_t length = 0;

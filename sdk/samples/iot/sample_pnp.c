@@ -193,7 +193,7 @@ void pnp_parse_command_name(
   }
   else
   {
-    *component_name = AZ_SPAN_NULL;
+    *component_name = AZ_SPAN_EMPTY;
     *pnp_command_name = component_command;
   }
 }
@@ -356,7 +356,7 @@ az_result pnp_process_device_twin_message(
       }
       else
       {
-        property_callback(AZ_SPAN_NULL, &property_name, jr, version, context_ptr);
+        property_callback(AZ_SPAN_EMPTY, &property_name, jr, version, context_ptr);
       }
     }
     else if (jr.token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT)

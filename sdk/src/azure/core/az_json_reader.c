@@ -22,11 +22,11 @@ AZ_NODISCARD az_result az_json_reader_init(
   *out_json_reader = (az_json_reader){
     .token = (az_json_token){
       .kind = AZ_JSON_TOKEN_NONE,
-      .slice = AZ_SPAN_NULL,
+      .slice = AZ_SPAN_EMPTY,
       .size = 0,
       ._internal = {
         .string_has_escaped_chars = false,
-        .pointer_to_first_buffer = &AZ_SPAN_NULL,
+        .pointer_to_first_buffer = &AZ_SPAN_EMPTY,
         .start_buffer_index = -1,
         .start_buffer_offset = -1,
         .end_buffer_index = -1,
@@ -35,7 +35,7 @@ AZ_NODISCARD az_result az_json_reader_init(
     },
     ._internal = {
       .json_buffer = json_buffer,
-      .json_buffers = &AZ_SPAN_NULL,
+      .json_buffers = &AZ_SPAN_EMPTY,
       .number_of_buffers = 1,
       .buffer_index = 0,
       .bytes_consumed = 0,
@@ -60,7 +60,7 @@ AZ_NODISCARD az_result az_json_reader_chunked_init(
   *out_json_reader = (az_json_reader){
     .token = (az_json_token){
       .kind = AZ_JSON_TOKEN_NONE,
-      .slice = AZ_SPAN_NULL,
+      .slice = AZ_SPAN_EMPTY,
       .size = 0,
       ._internal = {
         .string_has_escaped_chars = false,
@@ -115,7 +115,7 @@ static void _az_json_reader_update_state(
   int32_t start_index = ref_json_reader->token._internal.start_buffer_index;
   if (start_index != -1 && start_index < ref_json_reader->token._internal.end_buffer_index)
   {
-    ref_json_reader->token.slice = AZ_SPAN_NULL;
+    ref_json_reader->token.slice = AZ_SPAN_EMPTY;
   }
   else
   {

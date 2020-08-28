@@ -66,7 +66,7 @@ AZ_NODISCARD int32_t _az_span_url_encode_calc_length(az_span source);
  * `out_remainder` is set to an empty #az_span.
  * @return The #az_span pointing to the token delimited by the beginning of `source` up to the first
  * occurrence of (but not including the) `delimiter`, or the end of `source` if `delimiter` is not
- * found. If `source` is empty, AZ_SPAN_NULL is returned instead.
+ * found. If `source` is empty, AZ_SPAN_EMPTY is returned instead.
  */
 AZ_NODISCARD az_span _az_span_token(az_span source, az_span delimiter, az_span* out_remainder);
 

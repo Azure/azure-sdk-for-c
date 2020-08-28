@@ -130,21 +130,21 @@ AZ_NODISCARD static bool _az_json_token_is_text_equal_helper(
       // To do this, we need to encode UTF-16 codepoints (including surrogate pairs) into UTF-8.
       if (token_byte == 'u')
       {
-        *expected_text = AZ_SPAN_NULL;
+        *expected_text = AZ_SPAN_EMPTY;
         return false;
       }
     }
 
     if (token_byte != expected_ptr[i])
     {
-      *expected_text = AZ_SPAN_NULL;
+      *expected_text = AZ_SPAN_EMPTY;
       return false;
     }
 
     token_idx++;
   }
 
-  *expected_text = AZ_SPAN_NULL;
+  *expected_text = AZ_SPAN_EMPTY;
 
   // Only return true if the size of the unescaped token matches the expected size exactly.
   return token_idx == token_size;

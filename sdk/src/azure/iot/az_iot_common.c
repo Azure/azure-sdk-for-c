@@ -113,8 +113,8 @@ AZ_NODISCARD az_result az_iot_message_properties_next(
 
   if (index == prop_length)
   {
-    *out_name = AZ_SPAN_NULL;
-    *out_value = AZ_SPAN_NULL;
+    *out_name = AZ_SPAN_EMPTY;
+    *out_value = AZ_SPAN_EMPTY;
     return AZ_ERROR_IOT_NO_MORE_PROPERTIES;
   }
 
@@ -149,7 +149,7 @@ AZ_NODISCARD int32_t az_iot_retry_calc_delay(
   _az_PRECONDITION_RANGE(0, max_retry_delay_msec, INT32_MAX - 1);
   _az_PRECONDITION_RANGE(0, random_msec, INT32_MAX - 1);
 
-  _az_LOG_WRITE(AZ_LOG_IOT_RETRY, AZ_SPAN_NULL);
+  _az_LOG_WRITE(AZ_LOG_IOT_RETRY, AZ_SPAN_EMPTY);
 
   int32_t delay = _az_retry_calc_delay(attempt, min_retry_delay_msec, max_retry_delay_msec);
 

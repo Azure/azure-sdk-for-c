@@ -73,7 +73,7 @@ typedef struct
 
   /// This read-only field gives access to the slice of the JSON text that represents the token
   /// value, and it shouldn't be modified by the caller.
-  /// If the token straddles non-contiguous buffers, this is set to #AZ_SPAN_NULL.
+  /// If the token straddles non-contiguous buffers, this is set to #AZ_SPAN_EMPTY.
   /// The user can call #az_json_token_copy_into_span() to get the token value into a contiguous
   /// buffer. In the case of JSON strings, the slice does not include the surrounding quotes.
   az_span slice;
@@ -91,7 +91,7 @@ typedef struct
     bool string_has_escaped_chars;
 
     /// This is the first segment in the entire JSON payload, if it was non-contiguous. Otherwise,
-    /// its set to #AZ_SPAN_NULL.
+    /// its set to #AZ_SPAN_EMPTY.
     az_span* pointer_to_first_buffer;
 
     /// The segment index within the non-contiguous JSON payload where this token starts.
@@ -385,7 +385,7 @@ az_json_writer_get_bytes_used_in_destination(az_json_writer const* json_writer)
  * @param[in] value The UTF-8 encoded value to be written as a JSON string. The value is escaped
  * before writing.
  *
- * @remarks If \p value is #AZ_SPAN_NULL, the empty JSON string value is written (i.e. "").
+ * @remarks If \p value is #AZ_SPAN_EMPTY, the empty JSON string value is written (i.e. "").
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The string value was appended successfully.

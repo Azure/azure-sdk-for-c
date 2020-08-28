@@ -81,7 +81,7 @@ _get_remaining_span(az_json_writer* ref_json_writer, int32_t required_size)
     // AZ_ERROR_INSUFFICIENT_SPAN_SIZE
     if (!az_result_succeeded(ref_json_writer->_internal.allocator_callback(&context, &remaining)))
     {
-      return AZ_SPAN_NULL;
+      return AZ_SPAN_EMPTY;
     }
     ref_json_writer->_internal.destination_buffer = remaining;
     ref_json_writer->_internal.bytes_written = 0;
@@ -555,7 +555,7 @@ az_json_writer_append_string_chunked(az_json_writer* ref_json_writer, az_span va
 AZ_NODISCARD az_result az_json_writer_append_string(az_json_writer* ref_json_writer, az_span value)
 {
   _az_PRECONDITION_NOT_NULL(ref_json_writer);
-  // A null span is allowed, and we write an empty JSON string for it.
+  // An empty span is allowed, and we write an empty JSON string for it.
   _az_PRECONDITION_VALID_SPAN(value, 0, true);
   _az_PRECONDITION(az_span_size(value) <= _az_MAX_UNESCAPED_STRING_SIZE);
   _az_PRECONDITION(_az_is_appending_value_valid(ref_json_writer));

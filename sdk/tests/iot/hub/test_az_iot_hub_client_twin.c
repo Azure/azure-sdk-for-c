@@ -165,7 +165,7 @@ static void test_az_iot_hub_client_twin_parse_received_topic_NULL_rec_topic_fail
   az_iot_hub_client_twin_response response;
 
   ASSERT_PRECONDITION_CHECKED(
-      az_iot_hub_client_twin_parse_received_topic(&client, AZ_SPAN_NULL, &response));
+      az_iot_hub_client_twin_parse_received_topic(&client, AZ_SPAN_EMPTY, &response));
 }
 
 static void test_az_iot_hub_client_twin_parse_received_topic_NULL_response_fails()
@@ -257,7 +257,7 @@ static void test_az_iot_hub_client_twin_parse_received_topic_desired_found_succe
           &client, test_twin_received_topic_desired_success, &response),
       AZ_OK);
   assert_true(az_span_is_content_equal((response.version), test_device_request_id));
-  assert_true(az_span_is_content_equal(response.request_id, AZ_SPAN_NULL));
+  assert_true(az_span_is_content_equal(response.request_id, AZ_SPAN_EMPTY));
   assert_int_equal(response.status, AZ_IOT_STATUS_OK);
   assert_int_equal(response.response_type, AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES);
 }
@@ -274,7 +274,7 @@ static void test_az_iot_hub_client_twin_parse_received_topic_get_response_found_
           &client, test_twin_received_get_response, &response),
       AZ_OK);
   assert_true(az_span_is_content_equal(response.request_id, test_device_request_id));
-  assert_true(az_span_is_content_equal(response.version, AZ_SPAN_NULL));
+  assert_true(az_span_is_content_equal(response.version, AZ_SPAN_EMPTY));
   assert_int_equal(response.status, AZ_IOT_STATUS_OK);
   assert_int_equal(response.response_type, AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_GET);
 }
