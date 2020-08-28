@@ -4,7 +4,7 @@
 #ifndef PNP_THERMOSTAT_COMPONENT_H
 #define PNP_THERMOSTAT_COMPONENT_H
 
-#include "pnp_mqtt_component.h"
+#include "pnp_mqtt_message.h"
 
 #include <stdbool.h>
 #include <stdint.h>

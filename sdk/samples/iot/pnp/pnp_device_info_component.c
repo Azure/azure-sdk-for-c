@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "pnp_device_info_component.h"
-#include "pnp_mqtt_component.h"
+#include "pnp_mqtt_message.h"
 
 #include <azure/core/az_json.h>
 #include <azure/core/az_result.h>

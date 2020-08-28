@@ -9,7 +9,7 @@
 
 #include "../iot_sample_common.h"
 #include "pnp_protocol.h"
-#include "pnp_mqtt_component.h"
+#include "pnp_mqtt_message.h"
 
 #include "pnp_thermostat_component.h"
 

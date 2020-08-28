@@ -27,7 +27,7 @@
 
 #include "pnp/pnp_protocol.h"
 #include "pnp/pnp_device_info_component.h"
-#include "pnp/pnp_mqtt_component.h"
+#include "pnp/pnp_mqtt_message.h"
 #include "pnp/pnp_thermostat_component.h"
 
 #define SAMPLE_TYPE PAHO_IOT_HUB

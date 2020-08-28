@@ -4,7 +4,7 @@
 #ifndef PNP_DEVICE_INFO_COMPONENT_H
 #define PNP_DEVICE_INFO_COMPONENT_H
 
-#include "pnp_mqtt_component.h"
+#include "pnp_mqtt_message.h"
 
 #include <azure/core/az_result.h>
 #include <azure/iot/az_iot_hub_client.h>
