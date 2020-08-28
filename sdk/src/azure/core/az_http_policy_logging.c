@@ -183,7 +183,7 @@ static az_result _az_http_policy_logging_append_http_response_msg(
   }
 
   // Response payload was invalid or corrupted in some way.
-  if (result != AZ_ERROR_END_OF_HEADERS)
+  if (result != AZ_ERROR_HTTP_END_OF_HEADERS)
   {
     return result;
   }

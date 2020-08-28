@@ -142,7 +142,7 @@ typedef enum
   AZ_ERROR_HTTP_CORRUPT_RESPONSE_HEADER = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 7),
 
   /// There are no more headers within the HTTP response payload.
-  AZ_ERROR_END_OF_HEADERS = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 8),
+  AZ_ERROR_HTTP_END_OF_HEADERS = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 8),
 
   // === HTTP Adapter error codes ===
   /// Generic error in the HTTP transport adapter implementation.
