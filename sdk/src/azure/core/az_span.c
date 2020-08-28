@@ -6,6 +6,7 @@
 #include <azure/core/az_precondition.h>
 #include <azure/core/az_span.h>
 #include <azure/core/internal/az_precondition_internal.h>
+#include <azure/core/internal/az_result_internal.h>
 #include <azure/core/internal/az_span_internal.h>
 
 #include <ctype.h>
@@ -558,7 +559,7 @@ AZ_INLINE uint8_t _az_decimal_to_ascii(uint8_t d) { return (uint8_t)(('0' + d) &
 
 static AZ_NODISCARD az_result _az_span_builder_append_uint64(az_span* ref_span, uint64_t n)
 {
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(*ref_span, 1);
+  _az_RETURN_IF_NOT_ENOUGH_SIZE(*ref_span, 1);
 
   if (n == 0)
   {
@@ -575,7 +576,7 @@ static AZ_NODISCARD az_result _az_span_builder_append_uint64(az_span* ref_span, 
     digit_count--;
   }
 
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(*ref_span, digit_count);
+  _az_RETURN_IF_NOT_ENOUGH_SIZE(*ref_span, digit_count);
 
   while (div > 1)
   {
@@ -605,7 +606,7 @@ AZ_NODISCARD az_result az_span_i64toa(az_span destination, int64_t source, az_sp
 
   if (source < 0)
   {
-    AZ_RETURN_IF_NOT_ENOUGH_SIZE(destination, 1);
+    _az_RETURN_IF_NOT_ENOUGH_SIZE(destination, 1);
     *out_span = az_span_copy_u8(destination, '-');
     return _az_span_builder_append_uint64(out_span, (uint64_t)-source);
   }
@@ -619,7 +620,7 @@ AZ_NODISCARD az_result az_span_i64toa(az_span destination, int64_t source, az_sp
 static AZ_NODISCARD az_result
 _az_span_builder_append_u32toa(az_span destination, uint32_t n, az_span* out_span)
 {
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(destination, 1);
+  _az_RETURN_IF_NOT_ENOUGH_SIZE(destination, 1);
 
   if (n == 0)
   {
@@ -636,7 +637,7 @@ _az_span_builder_append_u32toa(az_span destination, uint32_t n, az_span* out_spa
     digit_count--;
   }
 
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(destination, digit_count);
+  _az_RETURN_IF_NOT_ENOUGH_SIZE(destination, digit_count);
 
   *out_span = destination;
 
@@ -670,7 +671,7 @@ AZ_NODISCARD az_result az_span_i32toa(az_span destination, int32_t source, az_sp
 
   if (source < 0)
   {
-    AZ_RETURN_IF_NOT_ENOUGH_SIZE(*out_span, 1);
+    _az_RETURN_IF_NOT_ENOUGH_SIZE(*out_span, 1);
     *out_span = az_span_copy_u8(*out_span, '-');
     source = -source;
   }
@@ -697,7 +698,7 @@ az_span_dtoa(az_span destination, double source, int32_t fractional_digits, az_s
 
   if (source < 0)
   {
-    AZ_RETURN_IF_NOT_ENOUGH_SIZE(*out_span, 1);
+    _az_RETURN_IF_NOT_ENOUGH_SIZE(*out_span, 1);
     *out_span = az_span_copy_u8(*out_span, '-');
     source = -source;
   }
@@ -712,7 +713,7 @@ az_span_dtoa(az_span destination, double source, int32_t fractional_digits, az_s
 
   // The double to uint64_t cast should be safe without loss of precision.
   // Append the integer part.
-  AZ_RETURN_IF_FAILED(_az_span_builder_append_uint64(out_span, (uint64_t)integer_part));
+  _az_RETURN_IF_FAILED(_az_span_builder_append_uint64(out_span, (uint64_t)integer_part));
 
   // Only print decimal digits if the user asked for at least one to be printed.
   // Or if the decimal part is non-zero.
@@ -768,7 +769,7 @@ az_span_dtoa(az_span destination, double source, int32_t fractional_digits, az_s
     fractional_part /= 10;
   }
 
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(*out_span, 1 + leading_zeros);
+  _az_RETURN_IF_NOT_ENOUGH_SIZE(*out_span, 1 + leading_zeros);
   *out_span = az_span_copy_u8(*out_span, '.');
 
   for (int32_t z = 0; z < leading_zeros; z++)
