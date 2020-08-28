@@ -565,15 +565,21 @@ static void handle_device_twin_message(
   }
 }
 
-static void process_device_twin_message(az_span twin_message_span, bool is_twin_get)
+static void process_device_twin_message(az_span message_span, bool is_twin_get)
 {
+  az_result rc;
+  bool property_found;
   double desired_temp;
   int32_t version_num;
 
   // Parse for the desired temperature
-  if (az_succeeded(parse_device_twin_desired_temperature_property(
-          twin_message_span, is_twin_get, &desired_temp, &version_num)))
+  if (az_failed(rc = parse_desired_temperature_property(
+          message_span, is_twin_get, &property_found, &desired_temp, &version_num)))
   {
+    IOT_SAMPLE_LOG_ERROR(
+            "Failed to update property locally: az_result return code 0x%08x.", rc);
+        exit(rc);
+  }
     bool confirm = true;
     bool is_max_temp_changed = false;
 
@@ -585,16 +591,17 @@ static void process_device_twin_message(az_span twin_message_span, bool is_twin_
     {
       confirm = false;
       send_reported_property(twin_reported_max_temp_property_name, device_max_temp, -1, confirm);
-    }
+
   }
   // Else desired property not found in payload. Do nothing.
 }
 
-static az_result parse_device_twin_desired_temperature_property(
-    az_span twin_message_span,
+static az_result parse_desired_temperature_property(
+    az_span message_span,
     bool is_twin_get,
-    double* parsed_temp,
-    int32_t* version_number)
+    bool* out_property_found,
+    double* out_parsed_temperature,
+    int32_t* out_parsed_version_number)
 {
   az_json_reader jr;
 

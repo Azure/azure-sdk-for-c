@@ -431,7 +431,8 @@ static void handle_device_twin_message(
       IOT_SAMPLE_LOG("Message Type: Desired Properties");
 
       bool property_found;
-      if (az_failed(rc = update_local_property(message_span, &property_found)))
+      int32_t device_count;
+      if (az_failed(rc = parse_desired_device_count_property(message_span, &property_found, &device_count)))
       {
         IOT_SAMPLE_LOG_ERROR(
             "Failed to update property locally: az_result return code 0x%08x.", rc);
@@ -441,11 +442,20 @@ static void handle_device_twin_message(
       if (property_found)
       {
         IOT_SAMPLE_LOG(" "); // Formatting.
+        update_local_property();
         send_reported_property();
         receive_device_twin_message();
       }
       break;
   }
+}
+
+static void parse_desired_device_count_property(
+    az_span message_span,
+    bool* out_property_found,
+    int32_t* out_parsed_device_count)
+{
+
 }
 
 static az_result build_reported_property(
