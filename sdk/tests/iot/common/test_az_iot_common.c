@@ -184,16 +184,16 @@ static void test_az_iot_u64toa_size_success()
   assert_int_equal(_az_iot_u64toa_size(18446744073709551615ul), 20);
 }
 
-static void test_az_iot_is_success_status_translate_success()
+static void test_az_iot_is_status_succeeded_translate_success()
 {
   assert_true(az_iot_is_success_status(AZ_IOT_STATUS_OK));
-  assert_true(az_iot_is_success_status(AZ_IOT_STATUS_NO_CONTENT));
-  assert_true(az_iot_is_success_status(0));
-  assert_true(az_iot_is_success_status(350));
+  assert_true(az_iot_status_succeeded(AZ_IOT_STATUS_NO_CONTENT));
+  assert_true(az_iot_status_succeeded(0));
+  assert_true(az_iot_status_succeeded(350));
 
-  assert_false(az_iot_is_success_status(AZ_IOT_STATUS_BAD_REQUEST));
-  assert_false(az_iot_is_success_status(AZ_IOT_STATUS_TIMEOUT));
-  assert_false(az_iot_is_success_status(600));
+  assert_false(az_iot_status_succeeded(AZ_IOT_STATUS_BAD_REQUEST));
+  assert_false(az_iot_status_succeeded(AZ_IOT_STATUS_TIMEOUT));
+  assert_false(az_iot_status_succeeded(600));
 }
 
 static void test_az_iot_is_retriable_status_translate_success()
@@ -709,7 +709,7 @@ int test_az_iot_common()
 #endif // AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_az_iot_u32toa_size_success),
     cmocka_unit_test(test_az_iot_u64toa_size_success),
-    cmocka_unit_test(test_az_iot_is_success_status_translate_success),
+    cmocka_unit_test(test_az_iot_is_status_succeeded_translate_success),
     cmocka_unit_test(test_az_iot_is_retriable_status_translate_success),
     cmocka_unit_test(test_az_iot_retry_calc_delay_common_timings_success),
     cmocka_unit_test(test_az_iot_retry_calc_delay_overflow_time_success),

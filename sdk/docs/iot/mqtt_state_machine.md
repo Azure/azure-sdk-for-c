@@ -175,7 +175,7 @@ The following APIs may be used to determine if the status indicates an error and
 
 ```C
 az_iot_status status = response.status;
-if (az_iot_is_success_status(status))
+if (az_iot_status_succeeded(status))
 {
     // success case
 }

@@ -31,6 +31,8 @@ enum
 
 /**
  * @brief Azure IoT service status codes.
+ * 
+ * @note https://docs.microsoft.com/en-us/azure/iot-central/core/troubleshoot-connection#error-codes
  *
  */
 typedef enum
@@ -177,7 +179,7 @@ az_iot_message_properties_next(az_iot_message_properties* properties, az_span* o
  * @param[in] status The #az_iot_status to verify.
  * @return `true` if the status indicates success. `false` otherwise.
  */
-AZ_NODISCARD AZ_INLINE bool az_iot_is_success_status(az_iot_status status)
+AZ_NODISCARD AZ_INLINE bool az_iot_status_succeeded(az_iot_status status)
 {
   return status < AZ_IOT_STATUS_BAD_REQUEST;
 }
