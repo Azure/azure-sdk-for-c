@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef SAMPLE_PNP_MQTT_COMPONENT_H
-#define SAMPLE_PNP_MQTT_COMPONENT_H
+#ifndef PNP_MQTT_MESSAGE_H
+#define PNP_MQTT_MESSAGE_H
 
 #include <stddef.h>
 
@@ -24,4 +24,4 @@ void pnp_mqtt_message_init(pnp_mqtt_message* mqtt_message);
 // number.
 az_span get_request_id(void);
 
-#endif // SAMPLE_PNP_MQTT_COMPONENT_H
+#endif // PNP_MQTT_MESSAGE_H
