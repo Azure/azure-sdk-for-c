@@ -239,7 +239,7 @@ static void receive_device_registration_status_message(void)
   MQTTClient_message* message = NULL;
   bool is_operation_complete = false;
 
-  // Continue to parse incoming responses from the provisioning pervice until the device
+  // Continue to parse incoming responses from the provisioning service until the device
   // has been successfully provisioned or an error occurs.
   do
   {
