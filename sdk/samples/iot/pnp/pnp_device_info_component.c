@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
+#include <iot_sample_common.h>
+
 #include "pnp_device_info_component.h"
 #include "pnp_mqtt_message.h"
 
