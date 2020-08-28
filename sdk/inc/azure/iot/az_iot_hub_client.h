@@ -210,7 +210,6 @@ AZ_NODISCARD az_result az_iot_hub_client_sas_get_password(
     size_t mqtt_password_size,
     size_t* out_mqtt_password_length);
 
-
 /**
  *
  * Telemetry APIs

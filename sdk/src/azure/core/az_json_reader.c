@@ -11,8 +11,6 @@
 
 #include <azure/core/_az_cfg.h>
 
-#define MIN(a, b) (((a) < (b)) ? (a) : (b))
-
 AZ_NODISCARD az_result az_json_reader_init(
     az_json_reader* out_json_reader,
     az_span json_buffer,
@@ -701,6 +699,8 @@ AZ_NODISCARD static az_result _az_json_reader_process_number(az_json_reader* ref
   return AZ_OK;
 }
 
+AZ_INLINE int32_t _az_min(int32_t a, int32_t b) { return a < b ? a : b; }
+
 AZ_NODISCARD static az_result _az_json_reader_process_literal(
     az_json_reader* ref_json_reader,
     az_span literal,
@@ -716,7 +716,7 @@ AZ_NODISCARD static az_result _az_json_reader_process_literal(
   while (true)
   {
     int32_t token_size = az_span_size(token);
-    max_comparable_size = MIN(token_size, expected_literal_size - already_matched);
+    max_comparable_size = _az_min(token_size, expected_literal_size - already_matched);
 
     token = az_span_slice(token, 0, max_comparable_size);
 
