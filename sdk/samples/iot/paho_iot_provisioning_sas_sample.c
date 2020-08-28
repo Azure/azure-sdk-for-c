@@ -117,7 +117,8 @@ static void create_and_configure_mqtt_client(void)
               env_vars.provisioning_registration_id,
               NULL)))
   {
-    IOT_SAMPLE_LOG_ERROR("Failed to initialize provisioning client: az_result return code 0x%08x.", rc);
+    IOT_SAMPLE_LOG_ERROR(
+        "Failed to initialize provisioning client: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -199,7 +200,8 @@ static void subscribe_mqtt_client_to_provisioning_service_topics(void)
        = MQTTClient_subscribe(mqtt_client, AZ_IOT_PROVISIONING_CLIENT_REGISTER_SUBSCRIBE_TOPIC, 1))
       != MQTTCLIENT_SUCCESS)
   {
-    IOT_SAMPLE_LOG_ERROR("Failed to subscribe to the register topic: MQTTClient return code %d.", rc);
+    IOT_SAMPLE_LOG_ERROR(
+        "Failed to subscribe to the register topic: MQTTClient return code %d.", rc);
     exit(rc);
   }
 }
@@ -289,7 +291,8 @@ static void receive_device_registration_status(void)
   if (operation_status == AZ_IOT_PROVISIONING_STATUS_ASSIGNED) // Successful assignment
   {
     IOT_SAMPLE_LOG_SUCCESS("Device provisioned:");
-    IOT_SAMPLE_LOG_AZ_SPAN("Hub Hostname:", register_response.registration_result.assigned_hub_hostname);
+    IOT_SAMPLE_LOG_AZ_SPAN(
+        "Hub Hostname:", register_response.registration_result.assigned_hub_hostname);
     IOT_SAMPLE_LOG_AZ_SPAN("Device Id:", register_response.registration_result.device_id);
   }
   else // Unsuccessful assignment (unassigned, failed or disabled states)
@@ -300,8 +303,10 @@ static void receive_device_registration_status(void)
     IOT_SAMPLE_LOG_AZ_SPAN("Operation ID:", register_response.operation_id);
     IOT_SAMPLE_LOG("Error code: %u", register_response.registration_result.extended_error_code);
     IOT_SAMPLE_LOG_AZ_SPAN("Error message:", register_response.registration_result.error_message);
-    IOT_SAMPLE_LOG_AZ_SPAN("Error timestamp:", register_response.registration_result.error_timestamp);
-    IOT_SAMPLE_LOG_AZ_SPAN("Error tracking ID:", register_response.registration_result.error_tracking_id);
+    IOT_SAMPLE_LOG_AZ_SPAN(
+        "Error timestamp:", register_response.registration_result.error_timestamp);
+    IOT_SAMPLE_LOG_AZ_SPAN(
+        "Error tracking ID:", register_response.registration_result.error_tracking_id);
     exit((int)register_response.registration_result.extended_error_code);
   }
 
@@ -372,7 +377,8 @@ static void send_operation_query_message(
               sizeof(query_status_topic_buffer),
               NULL)))
   {
-    IOT_SAMPLE_LOG_ERROR("Unable to get query status publish topic: az_result return code 0x%08x.", rc);
+    IOT_SAMPLE_LOG_ERROR(
+        "Unable to get query status publish topic: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -394,7 +400,8 @@ static void generate_sas_key(void)
   az_result rc;
 
   // Create the POSIX expiration time from input minutes.
-  uint64_t sas_duration = iot_sample_get_epoch_expiration_time_from_minutes(env_vars.sas_key_duration_minutes);
+  uint64_t sas_duration
+      = iot_sample_get_epoch_expiration_time_from_minutes(env_vars.sas_key_duration_minutes);
 
   // Get the signature which will be signed with the decoded key
   az_span sas_signature = AZ_SPAN_FROM_BUFFER(sas_signature_buffer);
@@ -402,12 +409,14 @@ static void generate_sas_key(void)
           rc = az_iot_provisioning_client_sas_get_signature(
               &provisioning_client, sas_duration, sas_signature, &sas_signature)))
   {
-    IOT_SAMPLE_LOG_ERROR("Could not get the signature for SAS key: az_result return code 0x%08x.", rc);
+    IOT_SAMPLE_LOG_ERROR(
+        "Could not get the signature for SAS key: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
   // Generate the encoded, signed signature (b64 encoded, HMAC-SHA256 signing)
-  az_span sas_base64_encoded_signed_signature = AZ_SPAN_FROM_BUFFER(sas_base64_encoded_signed_signature_buffer);
+  az_span sas_base64_encoded_signed_signature
+      = AZ_SPAN_FROM_BUFFER(sas_base64_encoded_signed_signature_buffer);
   iot_sample_generate_sas_base64_encoded_signed_signature(
       env_vars.provisioning_sas_key,
       sas_signature,
@@ -416,15 +425,15 @@ static void generate_sas_key(void)
 
   // Get the resulting MQTT password, passing the base64 encoded, HMAC signed bytes
   size_t mqtt_password_length;
-  if (az_failed(
-          rc = az_iot_provisioning_client_sas_get_password(
-              &provisioning_client,
-              sas_base64_encoded_signed_signature,
-              sas_duration,
-              AZ_SPAN_NULL,
-              mqtt_password_buffer,
-              sizeof(mqtt_password_buffer),
-              &mqtt_password_length)))
+  rc = az_iot_provisioning_client_sas_get_password(
+      &provisioning_client,
+      sas_base64_encoded_signed_signature,
+      sas_duration,
+      AZ_SPAN_NULL,
+      mqtt_password_buffer,
+      sizeof(mqtt_password_buffer),
+      &mqtt_password_length);
+  if (az_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR("Could not get the password: az_result return code 0x%08x.", rc);
     exit(rc);
