@@ -1,10 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef SAMPLE_PNP_THERMOSTAT_COMPONENT_H
-#define SAMPLE_PNP_THERMOSTAT_COMPONENT_H
+#ifndef PNP_THERMOSTAT_COMPONENT_H
+#define PNP_THERMOSTAT_COMPONENT_H
 
-#include "sample_pnp_mqtt_component.h"
+#include "pnp_mqtt_component.h"
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -59,4 +59,4 @@ az_result pnp_thermostat_process_command(
     pnp_mqtt_message* mqtt_message,
     az_iot_status* status);
 
-#endif // SAMPLE_PNP_THERMOSTAT_COMPONENT_H
+#endif // PNP_THERMOSTAT_COMPONENT_H

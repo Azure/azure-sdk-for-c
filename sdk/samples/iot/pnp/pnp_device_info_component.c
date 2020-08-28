@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "sample_pnp_device_info_component.h"
-#include "sample_pnp_mqtt_component.h"
+#include "pnp_device_info_component.h"
+#include "pnp_mqtt_component.h"
 
 #include <azure/core/az_json.h>
 #include <azure/core/az_result.h>
