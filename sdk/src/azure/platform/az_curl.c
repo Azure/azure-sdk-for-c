@@ -149,7 +149,7 @@ static AZ_NODISCARD az_result _az_http_client_curl_add_header_to_curl_list(
   az_result result = _az_span_append_header_to_buffer(writable_buffer, header, separator);
 
   // attach header only when write was OK
-  if (az_succeeded(result))
+  if (az_result_succeeded(result))
   {
     char const* const buffer = (char const*)az_span_ptr(writable_buffer);
     result = _az_http_client_curl_slist_append(ref_list, buffer);
@@ -264,7 +264,7 @@ static size_t _az_http_client_curl_write_to_span(
 
   az_result write_response_result = az_http_response_append(response, span_for_content);
 
-  if (az_failed(write_response_result))
+  if (az_result_failed(write_response_result))
   {
     return expected_size
         + 1; // Adding any constant to return value will tell curl that this function failed
@@ -324,7 +324,7 @@ _az_http_client_curl_send_post_request(CURL* ref_curl, az_http_request const* re
 
   az_result res_code
       = _az_http_client_curl_code_to_result(curl_easy_setopt(ref_curl, CURLOPT_POSTFIELDS, b));
-  if (az_succeeded(res_code))
+  if (az_result_succeeded(res_code))
   {
     res_code = _az_http_client_curl_code_to_result(curl_easy_perform(ref_curl));
   }
@@ -480,7 +480,7 @@ _az_http_client_curl_setup_url(CURL* ref_curl, az_http_request const* request)
   // request_url is already the right size containing only what has been written into it
   az_result result = _az_http_client_curl_append_url(writable_buffer, request_url);
 
-  if (az_succeeded(result))
+  if (az_result_succeeded(result))
   {
     char* buffer = (char*)az_span_ptr(writable_buffer);
     result = _az_http_client_curl_code_to_result(curl_easy_setopt(ref_curl, CURLOPT_URL, buffer));

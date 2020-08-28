@@ -88,7 +88,8 @@ static void create_and_configure_mqtt_client(void)
   int rc;
 
   // Reads in environment variables set by user for purposes of running sample.
-  if (az_failed(rc = iot_sample_read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars)))
+  if (az_result_failed(
+          rc = iot_sample_read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars)))
   {
     IOT_SAMPLE_LOG_ERROR("Failed to read environment variables: az_result return code 0x%08x.", rc);
     exit(rc);
@@ -96,7 +97,7 @@ static void create_and_configure_mqtt_client(void)
 
   // Build an MQTT endpoint c-string.
   char mqtt_endpoint_buffer[256];
-  if (az_failed(
+  if (az_result_failed(
           rc = iot_sample_create_mqtt_endpoint(
               SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer))))
   {
@@ -106,7 +107,7 @@ static void create_and_configure_mqtt_client(void)
 
   // Initialize the provisioning client with the provisioning global endpoint and the default
   // connection options.
-  if (az_failed(
+  if (az_result_failed(
           rc = az_iot_provisioning_client_init(
               &provisioning_client,
               az_span_create_from_str(mqtt_endpoint_buffer),
@@ -121,7 +122,7 @@ static void create_and_configure_mqtt_client(void)
 
   // Get the MQTT client id used for the MQTT connection.
   char mqtt_client_id_buffer[128];
-  if (az_failed(
+  if (az_result_failed(
           rc = az_iot_provisioning_client_get_client_id(
               &provisioning_client, mqtt_client_id_buffer, sizeof(mqtt_client_id_buffer), NULL)))
   {
@@ -148,7 +149,7 @@ static void connect_mqtt_client_to_provisioning_service(void)
   int rc;
 
   // Get the MQTT client username.
-  if (az_failed(
+  if (az_result_failed(
           rc = az_iot_provisioning_client_get_user_name(
               &provisioning_client,
               mqtt_client_username_buffer,
@@ -207,7 +208,7 @@ static void register_device_with_provisioning_service(void)
 
   // Get the Register topic to publish the register request.
   char register_topic_buffer[128];
-  if (az_failed(
+  if (az_result_failed(
           rc = az_iot_provisioning_client_register_get_publish_topic(
               &provisioning_client, register_topic_buffer, sizeof(register_topic_buffer), NULL)))
   {
@@ -306,7 +307,7 @@ static void parse_device_registration_status_message(
   az_span const message_span = az_span_create((uint8_t*)message->payload, message->payloadlen);
 
   // Parse message and retrieve register_response info.
-  if (az_failed(
+  if (az_result_failed(
           rc = az_iot_provisioning_client_parse_received_topic_and_payload(
               &provisioning_client, topic_span, message_span, out_register_response)))
   {
@@ -320,7 +321,7 @@ static void parse_device_registration_status_message(
   IOT_SAMPLE_LOG("Status: %d", out_register_response->status);
 
   // Retrieve operation_status.
-  if (az_failed(
+  if (az_result_failed(
           rc = az_iot_provisioning_client_parse_operation_status(
               out_register_response, out_operation_status)))
   {
@@ -380,7 +381,7 @@ static void send_operation_query_message(
 
   // Get the Query Status topic to publish the query status request.
   char query_topic_buffer[256];
-  if (az_failed(
+  if (az_result_failed(
           rc = az_iot_provisioning_client_query_status_get_publish_topic(
               &provisioning_client,
               register_response,

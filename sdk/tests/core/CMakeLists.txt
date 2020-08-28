@@ -16,6 +16,18 @@ else()
     set(WRAP_FUNCTIONS "")
 endif()
 
+
+# Generate map file
+if(MSVC)
+    add_link_options(/MAP)
+elseif(CMAKE_C_COMPILER_ID MATCHES "Clang")
+    add_link_options(-Wl,-map,az_core_test.map)
+    add_link_options(-Os)
+else()
+    add_link_options(-Xlinker -Map=az_core_test.map)
+    add_link_options(-Os)
+endif()
+
 add_cmocka_test(az_core_test SOURCES
                 main.c
                 test_az_context.c

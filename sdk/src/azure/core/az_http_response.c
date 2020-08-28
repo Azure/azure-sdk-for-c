@@ -138,11 +138,11 @@ az_http_response_get_next_header(az_http_response* ref_response, az_pair* out_he
   az_span* reader = &ref_response->_internal.parser.remaining;
   {
     _az_http_response_kind const kind = ref_response->_internal.parser.next_kind;
-    // if reader is expecting to read body (all headers were read), return ITEM_NOT_FOUND so we
-    // know we reach end of headers
+    // if reader is expecting to read body (all headers were read), return
+    // AZ_ERROR_HTTP_END_OF_HEADERS so we know we reach end of headers
     if (kind == _az_HTTP_RESPONSE_KIND_BODY)
     {
-      return AZ_ERROR_ITEM_NOT_FOUND;
+      return AZ_ERROR_HTTP_END_OF_HEADERS;
     }
     // Can't read a header if status line was not previously called,
     // User needs to call az_http_response_status_line() which would reset parser and set kind to
@@ -159,7 +159,7 @@ az_http_response_get_next_header(az_http_response* ref_response, az_pair* out_he
   {
     AZ_RETURN_IF_FAILED(_az_is_expected_span(reader, AZ_SPAN_FROM_STR("\r\n")));
     ref_response->_internal.parser.next_kind = _az_HTTP_RESPONSE_KIND_BODY;
-    return AZ_ERROR_ITEM_NOT_FOUND;
+    return AZ_ERROR_HTTP_END_OF_HEADERS;
   }
 
   // https://tools.ietf.org/html/rfc7230#section-3.2
@@ -189,7 +189,7 @@ az_http_response_get_next_header(az_http_response* ref_response, az_pair* out_he
     }
     if (field_name_length == input_size)
     {
-      return AZ_ERROR_ITEM_NOT_FOUND;
+      return AZ_ERROR_HTTP_CORRUPT_RESPONSE_HEADER;
     }
 
     // form a header name. Reader is currently at char ':'
@@ -215,7 +215,7 @@ az_http_response_get_next_header(az_http_response* ref_response, az_pair* out_he
     }
     if (ows_len == input_size)
     {
-      return AZ_ERROR_ITEM_NOT_FOUND;
+      return AZ_ERROR_HTTP_CORRUPT_RESPONSE_HEADER;
     }
 
     *reader = az_span_slice_to_end(*reader, ows_len);
@@ -244,9 +244,9 @@ az_http_response_get_next_header(az_http_response* ref_response, az_pair* out_he
       {
         continue; // whitespace or tab is accepted. It can be any number after value (OWS)
       }
-      if (c <= ' ')
+      if (c < ' ')
       {
-        return AZ_ERROR_UNEXPECTED_CHAR;
+        return AZ_ERROR_HTTP_CORRUPT_RESPONSE_HEADER;
       }
       offset_value_end = offset; // increasing index only for valid chars,
     }
