@@ -426,15 +426,15 @@ static void generate_sas_key(void)
 
   // Get the resulting MQTT password, passing the base64 encoded, HMAC signed bytes
   size_t mqtt_password_length;
-  if (az_result_failed(
-          rc = az_iot_provisioning_client_sas_get_password(
-              &provisioning_client,
-              sas_base64_encoded_signed_signature,
-              sas_duration,
-              AZ_SPAN_NULL,
-              mqtt_password_buffer,
-              sizeof(mqtt_password_buffer),
-              &mqtt_password_length)))
+  rc = az_iot_provisioning_client_sas_get_password(
+      &provisioning_client,
+      sas_base64_encoded_signed_signature,
+      sas_duration,
+      AZ_SPAN_NULL,
+      mqtt_password_buffer,
+      sizeof(mqtt_password_buffer),
+      &mqtt_password_length);
+  if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR("Could not get the password: az_result return code 0x%08x.", rc);
     exit(rc);

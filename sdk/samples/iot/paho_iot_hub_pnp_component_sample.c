@@ -492,14 +492,14 @@ static void send_device_serial_number(void)
   }
 
   // Build the serial number reported property message.
-  if (az_result_failed(
-          rc = pnp_create_reported_property(
-              mqtt_message.payload_span,
-              AZ_SPAN_NULL,
-              reported_serial_num_property_name,
-              append_string_callback,
-              (void*)&reported_serial_num_property_value,
-              &mqtt_message.out_payload_span)))
+  rc = pnp_create_reported_property(
+      mqtt_message.payload_span,
+      AZ_SPAN_NULL,
+      reported_serial_num_property_name,
+      append_string_callback,
+      (void*)&reported_serial_num_property_value,
+      &mqtt_message.out_payload_span);
+  if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR(
         "Failed to build `serial number` reported property payload: az_result return code 0x%08x.",
@@ -897,9 +897,9 @@ static az_result temp_controller_get_telemetry_message(pnp_mqtt_message* message
   az_result rc;
 
   // Get the Telemetry topic to publish the telemetry messages.
-  if (az_result_failed(
-          rc = pnp_get_telemetry_topic(
-              &hub_client, NULL, AZ_SPAN_NULL, message->topic, message->topic_length, NULL)))
+  rc = pnp_get_telemetry_topic(
+      &hub_client, NULL, AZ_SPAN_NULL, message->topic, message->topic_length, NULL);
+  if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR(
         "Failed to get pnp Telemetry publish topic: az_result return code 0x%08x.", rc);

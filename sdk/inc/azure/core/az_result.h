@@ -148,6 +148,9 @@ typedef enum
   // === IoT error codes ===
   /// The IoT topic is not matching the expected format.
   AZ_ERROR_IOT_TOPIC_NO_MATCH = _az_RESULT_MAKE_ERROR(_az_FACILITY_IOT, 1),
+
+  /// While iterating, there are no more properties to return.
+  AZ_ERROR_IOT_NO_MORE_PROPERTIES = _az_RESULT_MAKE_ERROR(_az_FACILITY_IOT, 2),
 } az_result;
 
 /**
