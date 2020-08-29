@@ -73,9 +73,11 @@ typedef struct
 
   /// This read-only field gives access to the slice of the JSON text that represents the token
   /// value, and it shouldn't be modified by the caller.
-  /// If the token straddles non-contiguous buffers, this is set to #AZ_SPAN_EMPTY.
+  /// If the token straddles non-contiguous buffers, this is set to the partial token value
+  /// available in the last segment.
   /// The user can call #az_json_token_copy_into_span() to get the token value into a contiguous
-  /// buffer. In the case of JSON strings, the slice does not include the surrounding quotes.
+  /// buffer.
+  /// In the case of JSON strings, the slice does not include the surrounding quotes.
   az_span slice;
 
   /// This read-only field gives access to the size of the JSON text slice that represents the token
