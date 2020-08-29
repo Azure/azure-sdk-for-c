@@ -37,6 +37,8 @@ AZ_NODISCARD az_result
 az_context_get_value(az_context const* context, void const* key, void const** out_value)
 {
   _az_PRECONDITION_NOT_NULL(context);
+  _az_PRECONDITION_NOT_NULL(out_value);
+  _az_PRECONDITION_NOT_NULL(*out_value);
   _az_PRECONDITION_NOT_NULL(key);
 
   for (; context != NULL; context = context->_internal.parent)
