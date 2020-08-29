@@ -351,6 +351,6 @@ static void send_method_response(
     exit(rc);
   }
   IOT_SAMPLE_LOG_SUCCESS("Client published the Methods response.");
-  IOT_SAMPLE_LOG("Status: %u", status);
+  IOT_SAMPLE_LOG("Status: %u", (uint16_t)status);
   IOT_SAMPLE_LOG_AZ_SPAN("Payload:", response);
 }

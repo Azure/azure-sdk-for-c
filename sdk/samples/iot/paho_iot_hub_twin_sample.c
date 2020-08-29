@@ -439,7 +439,7 @@ static void handle_device_twin_message(
       bool property_found;
       int32_t desired_device_count;
 
-      // Parse fot the device count property.
+      // Parse for the device count property.
       if (az_result_failed(
               rc = parse_desired_device_count_property(
                   message_span, &property_found, &desired_device_count)))
