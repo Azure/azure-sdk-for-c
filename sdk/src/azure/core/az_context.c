@@ -82,7 +82,7 @@ void az_context_cancel(az_context* ref_context)
 AZ_NODISCARD bool az_context_has_expired(az_context const* context, int64_t current_time)
 {
   _az_PRECONDITION_NOT_NULL(context);
+  _az_PRECONDITION(current_time >= 0);
 
   return az_context_get_expiration(context) < current_time;
 }
-
