@@ -6,6 +6,7 @@
 #include <azure/core/az_http.h>
 #include <azure/core/az_span.h>
 #include <azure/core/internal/az_http_internal.h>
+#include <azure/core/internal/az_result_internal.h>
 
 #include <azure/core/_az_cfg.h>
 
@@ -25,13 +26,13 @@ AZ_NODISCARD az_result az_http_pipeline_policy_apiversion(
   {
     case _az_http_policy_apiversion_option_location_header:
       // Add the version as a header
-      AZ_RETURN_IF_FAILED(az_http_request_append_header(
+      _az_RETURN_IF_FAILED(az_http_request_append_header(
           ref_request, options->_internal.name, options->_internal.version));
       break;
     case _az_http_policy_apiversion_option_location_queryparameter:
       // Add the version as a query parameter. This value doesn't need url-encoding. Use `true` for
       // url-encode to avoid encoding.
-      AZ_RETURN_IF_FAILED(az_http_request_set_query_parameter(
+      _az_RETURN_IF_FAILED(az_http_request_set_query_parameter(
           ref_request, options->_internal.name, options->_internal.version, true));
       break;
     default:
@@ -50,7 +51,7 @@ AZ_NODISCARD az_result az_http_pipeline_policy_telemetry(
 
   _az_http_policy_telemetry_options* options = (_az_http_policy_telemetry_options*)(ref_options);
 
-  AZ_RETURN_IF_FAILED(
+  _az_RETURN_IF_FAILED(
       az_http_request_append_header(ref_request, AZ_HTTP_HEADER_USER_AGENT, options->os));
 
   return _az_http_pipeline_nextpolicy(ref_policies, ref_request, ref_response);
