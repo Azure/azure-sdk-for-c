@@ -50,8 +50,7 @@
     (void)printf("\t\t%s ", span_description);                            \
     (void)fwrite(s, sizeof(uint8_t), (size_t)az_span_size(span), stdout); \
     (void)printf("\n");                                                   \
-  }
-while (0)
+  } while (0)
 
 //
 // Error handling
@@ -103,7 +102,7 @@ while (0)
 // This is usually not needed on Linux or Mac but needs to be set on Windows.
 #define IOT_SAMPLE_ENV_DEVICE_X509_TRUST_PEM_FILE_PATH "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH"
 
-  char iot_sample_hub_hostname_buffer[128];
+char iot_sample_hub_hostname_buffer[128];
 char iot_sample_provisioning_id_scope_buffer[16];
 
 char iot_sample_hub_device_id_buffer[64];
