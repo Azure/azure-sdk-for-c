@@ -13,7 +13,7 @@
       "variables": [
         {
           "name": "UNIT_TESTING",
-          "value": "False",
+          "value": "True",
           "type": "BOOL"
         }
       ]

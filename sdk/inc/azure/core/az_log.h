@@ -33,6 +33,8 @@
 /**
  * @brief Identifies the classifications of log messages produced by the SDK.
  */
+// Make sure to update #_az_is_valid_log_classification() whenever a new value is added to this
+// enum.
 typedef enum
 {
   AZ_LOG_END_OF_LIST
