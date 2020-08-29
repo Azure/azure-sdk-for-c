@@ -33,14 +33,15 @@
 #include <openssl/evp.h>
 #include <openssl/hmac.h>
 
-#define IOT_SAMPLE_PRECONDITION_NOT_NULL(arg)   \
-do {                                            \
-    if (arg == NULL)                            \
-    {                                           \
+#define IOT_SAMPLE_PRECONDITION_NOT_NULL(arg) \
+  do \
+  { \
+    if (arg == NULL) \
+    { \
       IOT_SAMPLE_LOG_ERROR("Pointer is NULL."); \
-      exit(1);                                  \
-    }                                           \
-} while (0)
+      exit(1); \
+    } \
+  } while (0)
 
 //
 // MQTT endpoints
@@ -81,7 +82,7 @@ static az_result read_configuration_entry(
     (void)printf("%s = %s\n", env_name, hide_value ? "***" : env_value);
     az_span env_span = az_span_create_from_str(env_value);
 
-    AZ_RETURN_IF_NOT_ENOUGH_SIZE(destination, az_span_size(env_span));
+    IOT_SAMPLE_RETURN_IF_NOT_ENOUGH_SIZE(destination, az_span_size(env_span));
     az_span_copy(destination, env_span);
     *out_env_value = az_span_slice(destination, 0, az_span_size(env_span));
   }
@@ -104,7 +105,7 @@ az_result iot_sample_read_environment_variables(
   if (type == PAHO_IOT_HUB)
   {
     out_env_vars->hub_hostname = AZ_SPAN_FROM_BUFFER(iot_sample_hub_hostname_buffer);
-    AZ_RETURN_IF_FAILED(read_configuration_entry(
+    IOT_SAMPLE_RETURN_IF_FAILED(read_configuration_entry(
         IOT_SAMPLE_ENV_HUB_HOSTNAME,
         NULL,
         false,
@@ -120,7 +121,7 @@ az_result iot_sample_read_environment_variables(
       case PAHO_IOT_HUB_TELEMETRY_SAMPLE:
       case PAHO_IOT_HUB_TWIN_SAMPLE:
         out_env_vars->hub_device_id = AZ_SPAN_FROM_BUFFER(iot_sample_hub_device_id_buffer);
-        AZ_RETURN_IF_FAILED(read_configuration_entry(
+        IOT_SAMPLE_RETURN_IF_FAILED(read_configuration_entry(
             IOT_SAMPLE_ENV_HUB_DEVICE_ID,
             NULL,
             false,
@@ -129,7 +130,7 @@ az_result iot_sample_read_environment_variables(
 
         out_env_vars->x509_cert_pem_file_path
             = AZ_SPAN_FROM_BUFFER(iot_sample_x509_cert_pem_file_path_buffer);
-        AZ_RETURN_IF_FAILED(read_configuration_entry(
+        IOT_SAMPLE_RETURN_IF_FAILED(read_configuration_entry(
             IOT_SAMPLE_ENV_DEVICE_X509_CERT_PEM_FILE_PATH,
             NULL,
             false,
@@ -139,7 +140,7 @@ az_result iot_sample_read_environment_variables(
 
       case PAHO_IOT_HUB_SAS_TELEMETRY_SAMPLE:
         out_env_vars->hub_device_id = AZ_SPAN_FROM_BUFFER(iot_sample_hub_device_id_buffer);
-        AZ_RETURN_IF_FAILED(read_configuration_entry(
+        IOT_SAMPLE_RETURN_IF_FAILED(read_configuration_entry(
             IOT_SAMPLE_ENV_HUB_SAS_DEVICE_ID,
             NULL,
             false,
@@ -147,7 +148,7 @@ az_result iot_sample_read_environment_variables(
             &(out_env_vars->hub_device_id)));
 
         out_env_vars->hub_sas_key = AZ_SPAN_FROM_BUFFER(iot_sample_hub_sas_key_buffer);
-        AZ_RETURN_IF_FAILED(read_configuration_entry(
+        IOT_SAMPLE_RETURN_IF_FAILED(read_configuration_entry(
             IOT_SAMPLE_ENV_HUB_SAS_KEY,
             NULL,
             true,
@@ -156,9 +157,10 @@ az_result iot_sample_read_environment_variables(
 
         char duration_buffer[IOT_SAMPLE_SAS_KEY_DURATION_TIME_DIGITS];
         az_span duration = AZ_SPAN_FROM_BUFFER(duration_buffer);
-        AZ_RETURN_IF_FAILED(read_configuration_entry(
+        IOT_SAMPLE_RETURN_IF_FAILED(read_configuration_entry(
             IOT_SAMPLE_ENV_SAS_KEY_DURATION_MINUTES, "120", false, duration, &duration));
-        AZ_RETURN_IF_FAILED(az_span_atou32(duration, &(out_env_vars->sas_key_duration_minutes)));
+        IOT_SAMPLE_RETURN_IF_FAILED(
+            az_span_atou32(duration, &(out_env_vars->sas_key_duration_minutes)));
         break;
 
       default:
@@ -170,7 +172,7 @@ az_result iot_sample_read_environment_variables(
   {
     out_env_vars->provisioning_id_scope
         = AZ_SPAN_FROM_BUFFER(iot_sample_provisioning_id_scope_buffer);
-    AZ_RETURN_IF_FAILED(read_configuration_entry(
+    IOT_SAMPLE_RETURN_IF_FAILED(read_configuration_entry(
         IOT_SAMPLE_ENV_PROVISIONING_ID_SCOPE,
         NULL,
         false,
@@ -182,7 +184,7 @@ az_result iot_sample_read_environment_variables(
       case PAHO_IOT_PROVISIONING_SAMPLE:
         out_env_vars->provisioning_registration_id
             = AZ_SPAN_FROM_BUFFER(iot_sample_provisioning_registration_id_buffer);
-        AZ_RETURN_IF_FAILED(read_configuration_entry(
+        IOT_SAMPLE_RETURN_IF_FAILED(read_configuration_entry(
             IOT_SAMPLE_ENV_PROVISIONING_REGISTRATION_ID,
             NULL,
             false,
@@ -191,7 +193,7 @@ az_result iot_sample_read_environment_variables(
 
         out_env_vars->x509_cert_pem_file_path
             = AZ_SPAN_FROM_BUFFER(iot_sample_x509_cert_pem_file_path_buffer);
-        AZ_RETURN_IF_FAILED(read_configuration_entry(
+        IOT_SAMPLE_RETURN_IF_FAILED(read_configuration_entry(
             IOT_SAMPLE_ENV_DEVICE_X509_CERT_PEM_FILE_PATH,
             NULL,
             false,
@@ -202,7 +204,7 @@ az_result iot_sample_read_environment_variables(
       case PAHO_IOT_PROVISIONING_SAS_SAMPLE:
         out_env_vars->provisioning_registration_id
             = AZ_SPAN_FROM_BUFFER(iot_sample_provisioning_registration_id_buffer);
-        AZ_RETURN_IF_FAILED(read_configuration_entry(
+        IOT_SAMPLE_RETURN_IF_FAILED(read_configuration_entry(
             IOT_SAMPLE_ENV_PROVISIONING_SAS_REGISTRATION_ID,
             NULL,
             false,
@@ -211,7 +213,7 @@ az_result iot_sample_read_environment_variables(
 
         out_env_vars->provisioning_sas_key
             = AZ_SPAN_FROM_BUFFER(iot_sample_provisioning_sas_key_buffer);
-        AZ_RETURN_IF_FAILED(read_configuration_entry(
+        IOT_SAMPLE_RETURN_IF_FAILED(read_configuration_entry(
             IOT_SAMPLE_ENV_PROVISIONING_SAS_KEY,
             NULL,
             true,
@@ -220,9 +222,10 @@ az_result iot_sample_read_environment_variables(
 
         char duration_buffer[IOT_SAMPLE_SAS_KEY_DURATION_TIME_DIGITS];
         az_span duration = AZ_SPAN_FROM_BUFFER(duration_buffer);
-        AZ_RETURN_IF_FAILED(read_configuration_entry(
+        IOT_SAMPLE_RETURN_IF_FAILED(read_configuration_entry(
             IOT_SAMPLE_ENV_SAS_KEY_DURATION_MINUTES, "120", false, duration, &duration));
-        AZ_RETURN_IF_FAILED(az_span_atou32(duration, &(out_env_vars->sas_key_duration_minutes)));
+        IOT_SAMPLE_RETURN_IF_FAILED(
+            az_span_atou32(duration, &(out_env_vars->sas_key_duration_minutes)));
         break;
 
       default:
@@ -238,7 +241,7 @@ az_result iot_sample_read_environment_variables(
 
   out_env_vars->x509_trust_pem_file_path
       = AZ_SPAN_FROM_BUFFER(iot_sample_x509_trust_pem_file_path_buffer);
-  AZ_RETURN_IF_FAILED(read_configuration_entry(
+  IOT_SAMPLE_RETURN_IF_FAILED(read_configuration_entry(
       IOT_SAMPLE_ENV_DEVICE_X509_TRUST_PEM_FILE_PATH,
       "",
       false,
@@ -493,7 +496,7 @@ void iot_sample_generate_sas_base64_encoded_signed_signature(
   // Decode the sas base64 encoded key to use for HMAC signing.
   char sas_decoded_key_buffer[64];
   az_span sas_decoded_key = AZ_SPAN_FROM_BUFFER(sas_decoded_key_buffer);
-  if (az_failed(
+  if (az_result_failed(
           rc = decode_base64_bytes(sas_base64_encoded_key, sas_decoded_key, &sas_decoded_key)))
   {
     IOT_SAMPLE_LOG_ERROR("Could not decode the SAS key: az_result return code 0x%04x.", rc);
@@ -503,7 +506,7 @@ void iot_sample_generate_sas_base64_encoded_signed_signature(
   // HMAC-SHA256 sign the signature with the decoded key.
   char sas_hmac256_signed_signature_buffer[128];
   az_span sas_hmac256_signed_signature = AZ_SPAN_FROM_BUFFER(sas_hmac256_signed_signature_buffer);
-  if (az_failed(
+  if (az_result_failed(
           rc = hmac_sha256_sign_signature(
               sas_decoded_key,
               sas_signature,
@@ -515,7 +518,7 @@ void iot_sample_generate_sas_base64_encoded_signed_signature(
   }
 
   // Base64 encode the result of the HMAC signing.
-  if (az_failed(
+  if (az_result_failed(
           rc = base64_encode_bytes(
               sas_hmac256_signed_signature,
               sas_base64_encoded_signed_signature,

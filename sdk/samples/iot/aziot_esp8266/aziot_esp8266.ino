@@ -110,7 +110,7 @@ static void initializeClients()
   // It has been disabled for simplifying the sample.
   wifi_client.setInsecure();
 
-  if (az_failed(az_iot_hub_client_init(
+  if (az_result_failed(az_iot_hub_client_init(
           &client,
           az_span_create((uint8_t*)host, strlen(host)),
           az_span_create((uint8_t*)device_id, strlen(device_id)),
@@ -139,7 +139,7 @@ static int generateSasToken(char* sas_token, size_t size)
   uint32_t expiration = getSecondsSinceEpoch() + ONE_HOUR_IN_SECS;
 
   // Get signature
-  if (az_failed(az_iot_hub_client_sas_get_signature(
+  if (az_result_failed(az_iot_hub_client_sas_get_signature(
           &client, expiration, signature_span, &out_signature_span)))
   {
     Serial.println("Failed getting SAS signature");
@@ -173,7 +173,7 @@ static int generateSasToken(char* sas_token, size_t size)
       (uint8_t*)b64enc_hmacsha256_signature.c_str(), b64enc_hmacsha256_signature.length());
 
   // URl-encode base64 encoded encrypted signature
-  if (az_failed(az_iot_hub_client_sas_get_password(
+  if (az_result_failed(az_iot_hub_client_sas_get_password(
           &client,
           b64enc_hmacsha256_signature_span,
           expiration,
@@ -193,7 +193,7 @@ static int connectToAzureIoTHub()
 {
   size_t client_id_length;
   char mqtt_client_id[128];
-  if (az_failed(az_iot_hub_client_get_client_id(
+  if (az_result_failed(az_iot_hub_client_get_client_id(
           &client, mqtt_client_id, sizeof(mqtt_client_id) - 1, &client_id_length)))
   {
     Serial.println("Failed getting client id");
@@ -204,7 +204,7 @@ static int connectToAzureIoTHub()
 
   char mqtt_username[128];
   // Get the MQTT user name used to connect to IoT Hub
-  if (az_failed(az_iot_hub_client_get_user_name(
+  if (az_result_failed(az_iot_hub_client_get_user_name(
           &client, mqtt_username, sizeofarray(mqtt_username), NULL)))
   {
     printf("Failed to get MQTT clientId, return code\n");
@@ -266,7 +266,7 @@ void setup()
 
 static void sendTelemetry()
 {
-  if (az_failed(az_iot_hub_client_telemetry_get_publish_topic(
+  if (az_result_failed(az_iot_hub_client_telemetry_get_publish_topic(
           &client, NULL, telemetry_topic, sizeof(telemetry_topic), NULL)))
   {
     Serial.println("Failed az_iot_hub_client_telemetry_get_publish_topic");

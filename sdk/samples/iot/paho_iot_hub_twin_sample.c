@@ -116,7 +116,8 @@ static void create_and_configure_mqtt_client(void)
   int rc;
 
   // Reads in environment variables set by user for purposes of running sample.
-  if (az_failed(rc = iot_sample_read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars)))
+  if (az_result_failed(
+          rc = iot_sample_read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars)))
   {
     IOT_SAMPLE_LOG_ERROR(
         "Failed to read configuration from environment variables: az_result return code 0x%08x.",
@@ -126,7 +127,7 @@ static void create_and_configure_mqtt_client(void)
 
   // Build an MQTT endpoint c-string.
   char mqtt_endpoint_buffer[128];
-  if (az_failed(
+  if (az_result_failed(
           rc = iot_sample_create_mqtt_endpoint(
               SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer))))
   {
@@ -135,7 +136,7 @@ static void create_and_configure_mqtt_client(void)
   }
 
   // Initialize the hub client with the default connection options.
-  if (az_failed(
+  if (az_result_failed(
           rc = az_iot_hub_client_init(
               &hub_client, env_vars.hub_hostname, env_vars.hub_device_id, NULL)))
   {
@@ -145,7 +146,7 @@ static void create_and_configure_mqtt_client(void)
 
   // Get the MQTT client id used for the MQTT connection.
   char mqtt_client_id_buffer[128];
-  if (az_failed(
+  if (az_result_failed(
           rc = az_iot_hub_client_get_client_id(
               &hub_client, mqtt_client_id_buffer, sizeof(mqtt_client_id_buffer), NULL)))
   {
@@ -172,7 +173,7 @@ static void connect_mqtt_client_to_iot_hub(void)
   int rc;
 
   // Get the MQTT client username.
-  if (az_failed(
+  if (az_result_failed(
           rc = az_iot_hub_client_get_user_name(
               &hub_client, mqtt_client_username_buffer, sizeof(mqtt_client_username_buffer), NULL)))
   {
@@ -272,7 +273,7 @@ static void get_device_twin_document(void)
 
   // Get the Twin Document topic to publish the twin document request.
   char twin_document_topic_buffer[128];
-  if (az_failed(
+  if (az_result_failed(
           rc = az_iot_hub_client_twin_document_get_publish_topic(
               &hub_client,
               twin_document_topic_request_id,
@@ -303,7 +304,7 @@ static void send_reported_property(void)
 
   // Get the Twin Patch topic to publish a reported property update.
   char twin_patch_topic_buffer[128];
-  if (az_failed(
+  if (az_result_failed(
           rc = az_iot_hub_client_twin_patch_get_publish_topic(
               &hub_client,
               twin_patch_topic_request_id,
@@ -318,7 +319,7 @@ static void send_reported_property(void)
   // Build the updated reported property message.
   char reported_property_payload_buffer[128];
   az_span reported_property_payload = AZ_SPAN_FROM_BUFFER(reported_property_payload_buffer);
-  if (az_failed(
+  if (az_result_failed(
           rc = build_reported_property(reported_property_payload, &reported_property_payload)))
   {
     IOT_SAMPLE_LOG_ERROR(
@@ -399,7 +400,7 @@ static void parse_device_twin_message(
   az_span const message_span = az_span_create((uint8_t*)message->payload, message->payloadlen);
 
   // Parse message and retrieve twin_response info.
-  if (az_failed(
+  if (az_result_failed(
           rc = az_iot_hub_client_twin_parse_received_topic(
               &hub_client, topic_span, out_twin_response)))
   {
@@ -438,7 +439,7 @@ static void handle_device_twin_message(
       int32_t desired_device_count;
 
       // Parse fot the device count property.
-      if (az_failed(rc = parse_desired_device_count_property(message_span, &property_found, &desired_device_count)))
+      if (az_result_failed(rc = parse_desired_device_count_property(message_span, &property_found, &desired_device_count)))
       {
         IOT_SAMPLE_LOG_ERROR(
             "Failed to parse for desired devie_count property: az_result return code 0x%08x.", rc);
@@ -469,21 +470,21 @@ static az_result parse_desired_device_count_property(
   az_json_reader jr;
 
   // Parse message_span.
-  AZ_RETURN_IF_FAILED(az_json_reader_init(&jr, message_span, NULL));
-  AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_init(&jr, message_span, NULL));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
   if (jr.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
   {
     return AZ_ERROR_UNEXPECTED_CHAR;
   }
 
-  AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
   while (!*out_property_found && (jr.token.kind != AZ_JSON_TOKEN_END_OBJECT))
   {
     if (az_json_token_is_text_equal(&jr.token, desired_device_count_property_name))
     {
       // Move to the value token.
-      AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
-      AZ_RETURN_IF_FAILED(az_json_token_get_int32(&jr.token, out_parsed_device_count));
+      IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
+      IOT_SAMPLE_RETURN_IF_FAILED(az_json_token_get_int32(&jr.token, out_parsed_device_count));
       *out_property_found = true;
     }
     else if (az_json_token_is_text_equal(&jr.token, version_name))
@@ -492,9 +493,9 @@ static az_result parse_desired_device_count_property(
     }
     else
     {
-      AZ_RETURN_IF_FAILED(az_json_reader_skip_children(&jr)); // Ignore children tokens.
+      IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_skip_children(&jr)); // Ignore children tokens.
     }
-    AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr)); // Check next sibling token.
+    IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_next_token(&jr)); // Check next sibling token.
   }
 
   if (*out_property_found)
@@ -521,11 +522,11 @@ static az_result build_reported_property(
 {
   az_json_writer jw;
 
-  AZ_RETURN_IF_FAILED(az_json_writer_init(&jw, reported_property_payload, NULL));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, desired_device_count_property_name));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_int32(&jw, device_count_value));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_init(&jw, reported_property_payload, NULL));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, desired_device_count_property_name));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_int32(&jw, device_count_value));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
 
   *out_reported_property_payload = az_json_writer_get_bytes_used_in_destination(&jw);
 

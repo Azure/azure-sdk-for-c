@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include "sample_pnp_mqtt_component.h"
+#include "pnp_mqtt_message.h"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -16,7 +16,7 @@ static char request_id_buf[10];
 static char publish_topic[128];
 static char publish_payload[512];
 
- void pnp_mqtt_message_init(pnp_mqtt_message* mqtt_message)
+void pnp_mqtt_message_init(pnp_mqtt_message* mqtt_message)
 {
   if (mqtt_message == NULL)
   {

@@ -98,7 +98,8 @@ static void create_and_configure_mqtt_client(void)
   int rc;
 
   // Reads in environment variables set by user for purposes of running sample.
-  if (az_failed(rc = iot_sample_read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars)))
+  if (az_result_failed(
+          rc = iot_sample_read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars)))
   {
     IOT_SAMPLE_LOG_ERROR(
         "Failed to read configuration from environment variables: az_result return code 0x%08x.",
@@ -108,7 +109,7 @@ static void create_and_configure_mqtt_client(void)
 
   // Build an MQTT endpoint c-string.
   char mqtt_endpoint_buffer[128];
-  if (az_failed(
+  if (az_result_failed(
           rc = iot_sample_create_mqtt_endpoint(
               SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer))))
   {
@@ -117,7 +118,7 @@ static void create_and_configure_mqtt_client(void)
   }
 
   // Initialize the hub client with the default connection options.
-  if (az_failed(
+  if (az_result_failed(
           rc = az_iot_hub_client_init(
               &hub_client, env_vars.hub_hostname, env_vars.hub_device_id, NULL)))
   {
@@ -127,7 +128,7 @@ static void create_and_configure_mqtt_client(void)
 
   // Get the MQTT client id used for the MQTT connection.
   char mqtt_client_id_buffer[128];
-  if (az_failed(
+  if (az_result_failed(
           rc = az_iot_hub_client_get_client_id(
               &hub_client, mqtt_client_id_buffer, sizeof(mqtt_client_id_buffer), NULL)))
   {
@@ -154,7 +155,7 @@ static void connect_mqtt_client_to_iot_hub(void)
   int rc;
 
   // Get the MQTT client username.
-  if (az_failed(
+  if (az_result_failed(
           rc = az_iot_hub_client_get_user_name(
               &hub_client, mqtt_client_username_buffer, sizeof(mqtt_client_username_buffer), NULL)))
   {
@@ -276,7 +277,7 @@ static void parse_method_message(
   az_span const message_span = az_span_create((uint8_t*)message->payload, message->payloadlen);
 
   // Parse message and retrieve method_request info.
-  if (az_failed(
+  if (az_result_failed(
           rc = az_iot_hub_client_methods_parse_received_topic(
               &hub_client, topic_span, out_method_request)))
   {
@@ -321,7 +322,7 @@ static void send_method_response(
 
   // Get the Methods Response topic to publish the method response.
   char methods_response_topic_buffer[128];
-  if (az_failed(
+  if (az_result_failed(
           rc = az_iot_hub_client_methods_response_get_publish_topic(
               &hub_client,
               method_request->request_id,

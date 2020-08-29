@@ -7,6 +7,7 @@
 #include <azure/core/az_platform.h>
 #include <azure/core/internal/az_http_internal.h>
 #include <azure/core/internal/az_log_internal.h>
+#include <azure/core/internal/az_result_internal.h>
 #include <azure/core/internal/az_span_internal.h>
 
 #include <azure/core/_az_cfg.h>
@@ -72,7 +73,7 @@ static az_result _az_http_policy_logging_append_http_request_msg(
     required_length = az_span_size(request->_internal.method) + request->_internal.url_length + 1;
   }
 
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(*ref_log_msg, required_length);
+  _az_RETURN_IF_NOT_ENOUGH_SIZE(*ref_log_msg, required_length);
 
   az_span remainder = az_span_copy(*ref_log_msg, http_request_string);
 
@@ -96,7 +97,7 @@ static az_result _az_http_policy_logging_append_http_request_msg(
   for (int32_t index = 0; index < headers_count; ++index)
   {
     az_pair header = { 0 };
-    AZ_RETURN_IF_FAILED(az_http_request_get_header(request, index, &header));
+    _az_RETURN_IF_FAILED(az_http_request_get_header(request, index, &header));
 
     required_length = az_span_size(new_line_tab_string) + az_span_size(header.key);
     if (az_span_size(header.value) > 0)
@@ -104,7 +105,7 @@ static az_result _az_http_policy_logging_append_http_request_msg(
       required_length += _az_LOG_LENGTHY_VALUE_MAX_LENGTH + az_span_size(colon_separator_string);
     }
 
-    AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, required_length);
+    _az_RETURN_IF_NOT_ENOUGH_SIZE(remainder, required_length);
     remainder = az_span_copy(remainder, new_line_tab_string);
     remainder = az_span_copy(remainder, header.key);
 
@@ -127,19 +128,19 @@ static az_result _az_http_policy_logging_append_http_response_msg(
     az_span* ref_log_msg)
 {
   az_span http_response_string = AZ_SPAN_FROM_STR("HTTP Response (");
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(*ref_log_msg, az_span_size(http_response_string));
+  _az_RETURN_IF_NOT_ENOUGH_SIZE(*ref_log_msg, az_span_size(http_response_string));
   az_span remainder = az_span_copy(*ref_log_msg, http_response_string);
 
-  AZ_RETURN_IF_FAILED(az_span_i64toa(remainder, duration_msec, &remainder));
+  _az_RETURN_IF_FAILED(az_span_i64toa(remainder, duration_msec, &remainder));
 
   az_span ms_string = AZ_SPAN_FROM_STR("ms)");
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, az_span_size(ms_string));
+  _az_RETURN_IF_NOT_ENOUGH_SIZE(remainder, az_span_size(ms_string));
   remainder = az_span_copy(remainder, ms_string);
 
   if (ref_response == NULL || az_span_size(ref_response->_internal.http_response) == 0)
   {
     az_span is_empty_string = AZ_SPAN_FROM_STR(" is empty");
-    AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, az_span_size(is_empty_string));
+    _az_RETURN_IF_NOT_ENOUGH_SIZE(remainder, az_span_size(is_empty_string));
     remainder = az_span_copy(remainder, is_empty_string);
 
     *ref_log_msg = az_span_slice(*ref_log_msg, 0, _az_span_diff(remainder, *ref_log_msg));
@@ -147,21 +148,22 @@ static az_result _az_http_policy_logging_append_http_response_msg(
   }
 
   az_span colon_separator_string = AZ_SPAN_FROM_STR(" : ");
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, az_span_size(colon_separator_string));
+  _az_RETURN_IF_NOT_ENOUGH_SIZE(remainder, az_span_size(colon_separator_string));
   remainder = az_span_copy(remainder, colon_separator_string);
 
   az_http_response_status_line status_line = { 0 };
-  AZ_RETURN_IF_FAILED(az_http_response_get_status_line(ref_response, &status_line));
-  AZ_RETURN_IF_FAILED(az_span_u64toa(remainder, (uint64_t)status_line.status_code, &remainder));
+  _az_RETURN_IF_FAILED(az_http_response_get_status_line(ref_response, &status_line));
+  _az_RETURN_IF_FAILED(az_span_u64toa(remainder, (uint64_t)status_line.status_code, &remainder));
 
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, az_span_size(status_line.reason_phrase) + 1);
+  _az_RETURN_IF_NOT_ENOUGH_SIZE(remainder, az_span_size(status_line.reason_phrase) + 1);
   remainder = az_span_copy_u8(remainder, ' ');
   remainder = az_span_copy(remainder, status_line.reason_phrase);
 
   az_span new_line_tab_string = AZ_SPAN_FROM_STR("\n\t");
 
-  for (az_pair header;
-       az_http_response_get_next_header(ref_response, &header) != AZ_ERROR_ITEM_NOT_FOUND;)
+  az_result result = AZ_OK;
+  az_pair header = { 0 };
+  while (az_result_succeeded(result = az_http_response_get_next_header(ref_response, &header)))
   {
     int32_t required_length = az_span_size(new_line_tab_string) + az_span_size(header.key);
     if (az_span_size(header.value) > 0)
@@ -169,7 +171,7 @@ static az_result _az_http_policy_logging_append_http_response_msg(
       required_length += _az_LOG_LENGTHY_VALUE_MAX_LENGTH + az_span_size(colon_separator_string);
     }
 
-    AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, required_length);
+    _az_RETURN_IF_NOT_ENOUGH_SIZE(remainder, required_length);
 
     remainder = az_span_copy(remainder, new_line_tab_string);
     remainder = az_span_copy(remainder, header.key);
@@ -181,16 +183,22 @@ static az_result _az_http_policy_logging_append_http_response_msg(
     }
   }
 
+  // Response payload was invalid or corrupted in some way.
+  if (result != AZ_ERROR_HTTP_END_OF_HEADERS)
+  {
+    return result;
+  }
+
   az_span new_lines_string = AZ_SPAN_FROM_STR("\n\n");
   az_span arrow_separator_string = AZ_SPAN_FROM_STR(" -> ");
   int32_t required_length = az_span_size(new_lines_string) + az_span_size(arrow_separator_string);
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, required_length);
+  _az_RETURN_IF_NOT_ENOUGH_SIZE(remainder, required_length);
 
   remainder = az_span_copy(remainder, new_lines_string);
   remainder = az_span_copy(remainder, arrow_separator_string);
 
   az_span append_request = remainder;
-  AZ_RETURN_IF_FAILED(_az_http_policy_logging_append_http_request_msg(request, &append_request));
+  _az_RETURN_IF_FAILED(_az_http_policy_logging_append_http_request_msg(request, &append_request));
 
   *ref_log_msg = az_span_slice(
       *ref_log_msg, 0, _az_span_diff(remainder, *ref_log_msg) + az_span_size(append_request));

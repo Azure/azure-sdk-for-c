@@ -41,31 +41,6 @@ enum
 #define _az_RESULT_MAKE_SUCCESS(facility, code) \
   ((int32_t)(((int32_t)(facility) << 16) | (int32_t)(code)))
 
-/**
- * @brief Convenience macro to return if an operation failed.
- */
-#define AZ_RETURN_IF_FAILED(exp) \
-  do \
-  { \
-    az_result const _result = (exp); \
-    if (az_failed(_result)) \
-    { \
-      return _result; \
-    } \
-  } while (0)
-
-/**
- * @brief Convenience macro to return if the provided span is not of the expected, required size.
- */
-#define AZ_RETURN_IF_NOT_ENOUGH_SIZE(span, required_size) \
-  do \
-  { \
-    if (az_span_size(span) < required_size || required_size < 0) \
-    { \
-      return AZ_ERROR_INSUFFICIENT_SPAN_SIZE; \
-    } \
-  } while (0)
-
 // az_result Bits:
 //   - 31 Severity (0 - success, 1 - failure).
 //   - 16..30 Facility.
@@ -141,13 +116,19 @@ typedef enum
   /// Error while parsing HTTP response header.
   AZ_ERROR_HTTP_CORRUPT_RESPONSE_HEADER = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 7),
 
+  /// There are no more headers within the HTTP response payload.
+  AZ_ERROR_HTTP_END_OF_HEADERS = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 8),
+
   // === HTTP Adapter error codes ===
   /// Generic error in the HTTP transport adapter implementation.
-  AZ_ERROR_HTTP_ADAPTER = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 8),
+  AZ_ERROR_HTTP_ADAPTER = _az_RESULT_MAKE_ERROR(_az_FACILITY_HTTP, 9),
 
   // === IoT error codes ===
   /// The IoT topic is not matching the expected format.
   AZ_ERROR_IOT_TOPIC_NO_MATCH = _az_RESULT_MAKE_ERROR(_az_FACILITY_IOT, 1),
+
+  /// While iterating, there are no more properties to return.
+  AZ_ERROR_IOT_END_OF_PROPERTIES = _az_RESULT_MAKE_ERROR(_az_FACILITY_IOT, 2),
 } az_result;
 
 /**
@@ -158,7 +139,7 @@ typedef enum
  * @retval true The operation that returned this \p result failed.
  * @retval false The operation that returned this \p result was successful.
  */
-AZ_NODISCARD AZ_INLINE bool az_failed(az_result result)
+AZ_NODISCARD AZ_INLINE bool az_result_failed(az_result result)
 {
   return ((int32_t)result & (int32_t)_az_ERROR_FLAG) != 0;
 }
@@ -171,7 +152,10 @@ AZ_NODISCARD AZ_INLINE bool az_failed(az_result result)
  * @retval `true` The operation that returned this \p result was successful.
  * @retval `false` The operation that returned this \p result failed.
  */
-AZ_NODISCARD AZ_INLINE bool az_succeeded(az_result result) { return !az_failed(result); }
+AZ_NODISCARD AZ_INLINE bool az_result_succeeded(az_result result)
+{
+  return !az_result_failed(result);
+}
 
 #include <azure/core/_az_cfg_suffix.h>
 

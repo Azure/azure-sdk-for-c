@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: MIT
 
 #include "test_az_iot_provisioning_client.h"
-#include <azure/iot/az_iot_provisioning_client.h>
-#include <azure/core/az_log.h>
-#include <azure/core/az_span.h>
 #include <az_test_log.h>
 #include <az_test_span.h>
+#include <azure/core/az_log.h>
+#include <azure/core/az_span.h>
+#include <azure/iot/az_iot_provisioning_client.h>
 
 #include <setjmp.h>
 #include <stdarg.h>
@@ -429,32 +429,32 @@ static void test_az_iot_provisioning_client_parse_operation_status_translate_suc
 
   az_iot_provisioning_client_operation_status operation_status = 0xBAADC0DE;
 
-  assert_true(
-      az_failed(az_iot_provisioning_client_parse_operation_status(&response, &operation_status)));
+  assert_true(az_result_failed(
+      az_iot_provisioning_client_parse_operation_status(&response, &operation_status)));
   assert_int_equal((uint32_t)0xBAADC0DE, (uint32_t)operation_status);
 
   response.operation_status = AZ_SPAN_FROM_STR(TEST_STATUS_UNASSIGNED);
-  assert_true(az_succeeded(
+  assert_true(az_result_succeeded(
       az_iot_provisioning_client_parse_operation_status(&response, &operation_status)));
   assert_int_equal(AZ_IOT_PROVISIONING_STATUS_UNASSIGNED, operation_status);
 
   response.operation_status = AZ_SPAN_FROM_STR(TEST_STATUS_ASSIGNING);
-  assert_true(az_succeeded(
+  assert_true(az_result_succeeded(
       az_iot_provisioning_client_parse_operation_status(&response, &operation_status)));
   assert_int_equal(AZ_IOT_PROVISIONING_STATUS_ASSIGNING, operation_status);
 
   response.operation_status = AZ_SPAN_FROM_STR(TEST_STATUS_ASSIGNED);
-  assert_true(az_succeeded(
+  assert_true(az_result_succeeded(
       az_iot_provisioning_client_parse_operation_status(&response, &operation_status)));
   assert_int_equal(AZ_IOT_PROVISIONING_STATUS_ASSIGNED, operation_status);
 
   response.operation_status = AZ_SPAN_FROM_STR(TEST_STATUS_FAILED);
-  assert_true(az_succeeded(
+  assert_true(az_result_succeeded(
       az_iot_provisioning_client_parse_operation_status(&response, &operation_status)));
   assert_int_equal(AZ_IOT_PROVISIONING_STATUS_FAILED, operation_status);
 
   response.operation_status = AZ_SPAN_FROM_STR(TEST_STATUS_DISABLED);
-  assert_true(az_succeeded(
+  assert_true(az_result_succeeded(
       az_iot_provisioning_client_parse_operation_status(&response, &operation_status)));
   assert_int_equal(AZ_IOT_PROVISIONING_STATUS_DISABLED, operation_status);
 }
@@ -508,7 +508,7 @@ static void test_az_iot_provisioning_client_logging_succeed()
 
   az_iot_provisioning_client client;
   az_iot_provisioning_client_register_response response;
-  assert_true(az_failed(az_iot_provisioning_client_parse_received_topic_and_payload(
+  assert_true(az_result_failed(az_iot_provisioning_client_parse_received_topic_and_payload(
       &client, _log_received_topic, _log_received_payload, &response)));
 
   assert_int_equal(_az_BUILT_WITH_LOGGING(1, 0), _log_invoked_topic);

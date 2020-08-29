@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifndef SAMPLE_PNP_H
-#define SAMPLE_PNP_H
+#ifndef PNP_PROTOCOL_H
+#define PNP_PROTOCOL_H
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -128,4 +128,4 @@ az_result pnp_process_device_twin_message(
     pnp_property_callback property_callback,
     void* context_ptr);
 
-#endif // SAMPLE_PNP_H
+#endif // PNP_PROTOCOL_H

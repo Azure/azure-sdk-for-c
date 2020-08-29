@@ -127,7 +127,7 @@ int main()
   {
     az_pair header;
     az_result const header_get_result = az_http_response_get_next_header(&http_response, &header);
-    if (header_get_result == AZ_ERROR_ITEM_NOT_FOUND)
+    if (header_get_result == AZ_ERROR_HTTP_END_OF_HEADERS)
     {
       break;
     }
