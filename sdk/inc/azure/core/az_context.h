@@ -56,8 +56,8 @@ extern az_context az_context_application;
 /**
  * @brief Creates a new expiring #az_context node that is a child of the specified parent.
  *
- * @param[in] parent The #az_context node that the new node is to be a child of.
- * @param[in] expiration The time when this new child node should be canceled.
+ * @param[in] parent The #az_context node that is the parent to the new node.
+ * @param[in] expiration The time when this new node should be canceled.
  *
  * @return The new child #az_context node.
  */
