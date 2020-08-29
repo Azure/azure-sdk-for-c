@@ -287,7 +287,8 @@ static void get_device_twin_document(void)
   }
 
   // Publish the twin document request.
-  if ((rc = MQTTClient_publish(mqtt_client, twin_document_topic_buffer, 0, NULL, IOT_SAMPLE_MQTT_PUBLISH_QOS, 0, NULL))
+  if ((rc = MQTTClient_publish(
+           mqtt_client, twin_document_topic_buffer, 0, NULL, IOT_SAMPLE_MQTT_PUBLISH_QOS, 0, NULL))
       != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR(
@@ -439,7 +440,9 @@ static void handle_device_twin_message(
       int32_t desired_device_count;
 
       // Parse fot the device count property.
-      if (az_result_failed(rc = parse_desired_device_count_property(message_span, &property_found, &desired_device_count)))
+      if (az_result_failed(
+              rc = parse_desired_device_count_property(
+                  message_span, &property_found, &desired_device_count)))
       {
         IOT_SAMPLE_LOG_ERROR(
             "Failed to parse for desired devie_count property: az_result return code 0x%08x.", rc);
@@ -524,7 +527,8 @@ static az_result build_reported_property(
 
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_init(&jw, reported_property_payload, NULL));
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
-  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, desired_device_count_property_name));
+  IOT_SAMPLE_RETURN_IF_FAILED(
+      az_json_writer_append_property_name(&jw, desired_device_count_property_name));
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_int32(&jw, device_count_value));
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
 

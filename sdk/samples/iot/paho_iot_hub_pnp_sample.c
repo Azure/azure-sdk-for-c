@@ -134,10 +134,7 @@ static void send_command_response(
     az_iot_hub_client_method_request const* command_request,
     az_iot_status status,
     az_span response);
-static az_result invoke_getMaxMinReport(
-    az_span payload,
-    az_span response,
-    az_span* out_response);
+static az_result invoke_getMaxMinReport(az_span payload, az_span response, az_span* out_response);
 
 // Telemetry functions
 static void send_telemetry_message(void);
@@ -428,7 +425,8 @@ static void receive_messages(void)
       if (++timeout_counter >= MQTT_TIMEOUT_RECEIVE_MAX_MESSAGE_COUNT)
       {
         IOT_SAMPLE_LOG(
-            "Receive message timeout expiration count of %d reached.", MQTT_TIMEOUT_RECEIVE_MAX_MESSAGE_COUNT);
+            "Receive message timeout expiration count of %d reached.",
+            MQTT_TIMEOUT_RECEIVE_MAX_MESSAGE_COUNT);
         return;
       }
     }
@@ -574,8 +572,9 @@ static void process_device_twin_message(az_span message_span, bool is_twin_get)
   int32_t version_number;
 
   // Parse for the desired temperature property.
-  if (az_result_failed(rc = parse_desired_temperature_property(
-          message_span, is_twin_get, &property_found, &desired_temperature, &version_number)))
+  if (az_result_failed(
+          rc = parse_desired_temperature_property(
+              message_span, is_twin_get, &property_found, &desired_temperature, &version_number)))
   {
     IOT_SAMPLE_LOG_ERROR(
         "Failed to parse for desired temperature property: az_result return code 0x%08x.", rc);
@@ -591,12 +590,14 @@ static void process_device_twin_message(az_span message_span, bool is_twin_get)
 
     // Update device temperature locally and report update to server.
     update_device_temperature_property(desired_temperature, &is_max_temp_changed);
-    send_reported_property(twin_desired_temp_property_name, desired_temperature, version_number, confirm);
+    send_reported_property(
+        twin_desired_temp_property_name, desired_temperature, version_number, confirm);
 
     if (is_max_temp_changed)
     {
       confirm = false;
-      send_reported_property(twin_reported_max_temp_property_name, device_maximum_temperature, -1, confirm);
+      send_reported_property(
+          twin_reported_max_temp_property_name, device_maximum_temperature, -1, confirm);
     }
   }
 }
@@ -782,7 +783,8 @@ static void send_reported_property(az_span name, double value, int32_t version, 
   }
 
   // Publish the reported property update.
-  mqtt_publish_message(twin_patch_topic_buffer, reported_property_payload, IOT_SAMPLE_MQTT_PUBLISH_QOS);
+  mqtt_publish_message(
+      twin_patch_topic_buffer, reported_property_payload, IOT_SAMPLE_MQTT_PUBLISH_QOS);
   IOT_SAMPLE_LOG_SUCCESS("Client published the Twin Patch reported property message.");
   IOT_SAMPLE_LOG_AZ_SPAN("Payload:", reported_property_payload);
 }
@@ -837,7 +839,8 @@ static void send_command_response(
               sizeof(methods_response_topic_buffer),
               NULL)))
   {
-    IOT_SAMPLE_LOG_ERROR("Failed to get the Methods Response topic: az_result return code 0x%08x.", rc);
+    IOT_SAMPLE_LOG_ERROR(
+        "Failed to get the Methods Response topic: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -848,10 +851,7 @@ static void send_command_response(
   IOT_SAMPLE_LOG_AZ_SPAN("Payload:", response);
 }
 
-static az_result invoke_getMaxMinReport(
-    az_span payload,
-    az_span response,
-    az_span* out_response)
+static az_result invoke_getMaxMinReport(az_span payload, az_span response, az_span* out_response)
 {
   int32_t incoming_since_value_len = 0;
   az_json_reader jr;
@@ -892,16 +892,19 @@ static az_result invoke_getMaxMinReport(
 
   // Build command response message.
   uint8_t count = 3;
-  az_span const names[3] = { command_maximum_temperature_name, command_minimum_temperature_name, command_average_temperature_name };
-  double const values[3] = { device_maximum_temperature, device_minimum_temperature, device_average_temperature };
+  az_span const names[3] = { command_maximum_temperature_name,
+                             command_minimum_temperature_name,
+                             command_average_temperature_name };
+  double const values[3]
+      = { device_maximum_temperature, device_minimum_temperature, device_average_temperature };
   az_span const times[2] = { start_time_span, end_time_span };
 
   az_result rc;
   if (az_result_failed(
-          rc = build_property_payload(
-              count, names, values, times, response, out_response)))
+          rc = build_property_payload(count, names, values, times, response, out_response)))
   {
-    IOT_SAMPLE_LOG_ERROR("Failed to build the Command Response payload: az_result return code 0x%08x.", rc);
+    IOT_SAMPLE_LOG_ERROR(
+        "Failed to build the Command Response payload: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -933,7 +936,8 @@ static void send_telemetry_message(void)
           rc = build_property_payload(
               count, names, values, NULL, telemetry_payload, &telemetry_payload)))
   {
-    IOT_SAMPLE_LOG_ERROR("Failed to build the Telemetry payload: az_result return code 0x%08x.", rc);
+    IOT_SAMPLE_LOG_ERROR(
+        "Failed to build the Telemetry payload: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -993,7 +997,8 @@ static az_result build_property_payload_with_status(
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, name));
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, twin_value_name));
-  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_double(&jw, value, DOUBLE_DECIMAL_PLACE_DIGITS));
+  IOT_SAMPLE_RETURN_IF_FAILED(
+      az_json_writer_append_double(&jw, value, DOUBLE_DECIMAL_PLACE_DIGITS));
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, twin_ack_code_name));
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_int32(&jw, ack_code_value));
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, twin_ack_version_name));

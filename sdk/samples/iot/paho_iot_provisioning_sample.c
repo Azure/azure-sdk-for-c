@@ -321,7 +321,9 @@ static void parse_device_registration_status_message(
   IOT_SAMPLE_LOG("Status: %d", out_register_response->status);
 
   // Retrieve operation_status.
-  if (az_result_failed(rc = az_iot_provisioning_client_parse_operation_status(out_register_response, out_operation_status)))
+  if (az_result_failed(
+          rc = az_iot_provisioning_client_parse_operation_status(
+              out_register_response, out_operation_status)))
   {
     IOT_SAMPLE_LOG_ERROR("Failed to parse operation_status: az_result return code 0x%08x.", rc);
     exit(rc);
@@ -397,7 +399,8 @@ static void send_operation_query_message(
   iot_sample_sleep_for_seconds(register_response->retry_after_seconds);
 
   // Publish the query status request.
-  if ((rc = MQTTClient_publish(mqtt_client, query_topic_buffer, 0, NULL, IOT_SAMPLE_MQTT_PUBLISH_QOS, 0, NULL))
+  if ((rc = MQTTClient_publish(
+           mqtt_client, query_topic_buffer, 0, NULL, IOT_SAMPLE_MQTT_PUBLISH_QOS, 0, NULL))
       != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR("Failed to publish query status request: MQTTClient return code %d.", rc);
