@@ -181,7 +181,7 @@ if (az_iot_status_succeeded(status))
 }
 else
 {
-    if (az_iot_is_retriable_status(status))
+    if (az_iot_status_retriable(status))
     {
         // retry
     }
@@ -202,7 +202,7 @@ For connectivity issues at all layers (TCP, TLS, MQTT) as well as cases where th
 // The previous operation took operation_msec.
 // The application calculates random_msec between 0 and max_random_msec.
 
-int32_t delay_msec = az_iot_retry_calc_delay(operation_msec, attempt, min_retry_delay_msec, max_retry_delay_msec, random_msec);
+int32_t delay_msec = az_iot_calculate_retry_delay(operation_msec, attempt, min_retry_delay_msec, max_retry_delay_msec, random_msec);
 ```
 
 _Note 1_: The network stack may have used more time than the recommended delay before timing out. (e.g. The operation timed out after 2 minutes while the delay between operations is 1 second). In this case there is no need to delay the next operation.
@@ -229,7 +229,7 @@ if ( response.retry_after_seconds > 0 )
 }
 else
 {
-    delay_ms = az_iot_retry_calc_delay(operation_msec, attempt, min_retry_delay_msec, max_retry_delay_msec, random_msec);
+    delay_ms = az_iot_calculate_retry_delay(operation_msec, attempt, min_retry_delay_msec, max_retry_delay_msec, random_msec);
 }
 ```
 

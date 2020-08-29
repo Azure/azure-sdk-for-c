@@ -136,7 +136,7 @@ AZ_NODISCARD az_result az_iot_message_properties_next(
   return AZ_OK;
 }
 
-AZ_NODISCARD int32_t az_iot_retry_calc_delay(
+AZ_NODISCARD int32_t az_iot_calculate_retry_delay(
     int32_t operation_msec,
     int16_t attempt,
     int32_t min_retry_delay_msec,
