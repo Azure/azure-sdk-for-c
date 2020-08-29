@@ -124,7 +124,7 @@ static az_result is_component_in_model(
 {
   int32_t index = 0;
 
-  if (az_span_ptr(component_name) == NULL || az_span_size(component_name) == 0)
+  if (az_span_size(component_name) == 0)
   {
     return AZ_ERROR_UNEXPECTED_CHAR;
   }
@@ -154,7 +154,7 @@ az_result pnp_get_telemetry_topic(
 {
   az_iot_message_properties pnp_properties;
 
-  if (az_span_ptr(component_name) != NULL)
+  if (az_span_size(component_name) != 0)
   {
     if (properties == NULL)
     {
@@ -170,7 +170,7 @@ az_result pnp_get_telemetry_topic(
 
   AZ_RETURN_IF_FAILED(az_iot_hub_client_telemetry_get_publish_topic(
       client,
-      az_span_ptr(component_name) != NULL ? properties : NULL,
+      az_span_size(component_name) != 0 ? properties : NULL,
       mqtt_topic,
       mqtt_topic_size,
       out_mqtt_topic_length));
@@ -212,7 +212,7 @@ az_result pnp_create_reported_property(
 
   AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
 
-  if (az_span_ptr(component_name) != NULL)
+  if (az_span_size(component_name) != 0)
   {
     AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, component_name));
     AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
@@ -223,7 +223,7 @@ az_result pnp_create_reported_property(
   AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, property_name));
   AZ_RETURN_IF_FAILED(append_callback(&jw, context));
 
-  if (az_span_ptr(component_name) != NULL)
+  if (az_span_size(component_name) != 0)
   {
     AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
   }
@@ -251,7 +251,7 @@ az_result pnp_create_reported_property_with_status(
 
   AZ_RETURN_IF_FAILED(az_json_writer_init(&jw, json_buffer, NULL));
   AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
-  if (az_span_ptr(component_name) != NULL)
+  if (az_span_size(component_name) != NULL)
   {
     AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, component_name));
     AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
@@ -268,7 +268,7 @@ az_result pnp_create_reported_property_with_status(
   AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, desired_temp_ack_version_name));
   AZ_RETURN_IF_FAILED(az_json_writer_append_int32(&jw, ack_version));
 
-  if (az_span_ptr(ack_description) != NULL)
+  if (az_span_size(ack_description) != 0)
   {
     AZ_RETURN_IF_FAILED(
         az_json_writer_append_property_name(&jw, desired_temp_ack_description_name));
@@ -278,7 +278,7 @@ az_result pnp_create_reported_property_with_status(
   AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
   AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
 
-  if (az_span_ptr(component_name) != NULL)
+  if (az_span_size(component_name) != 0)
   {
     AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
   }

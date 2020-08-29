@@ -852,17 +852,18 @@ static az_result invoke_getMaxMinReport(
       command_start_time_value_buffer,
       sizeof(command_start_time_value_buffer),
       &incoming_since_value_len));
-  az_span start_time_span
-      = az_span_create((uint8_t*)command_start_time_value_buffer, incoming_since_value_len);
-
-  IOT_SAMPLE_LOG_AZ_SPAN("start time:", start_time_span);
 
   // Set the response payload to error if the "since" value was empty.
-  if (az_span_ptr(start_time_span) == NULL)
+  if (incoming_since_value_len == 0)
   {
     *out_response = command_empty_response_payload;
     return AZ_ERROR_ITEM_NOT_FOUND;
   }
+
+  az_span start_time_span
+      = az_span_create((uint8_t*)command_start_time_value_buffer, incoming_since_value_len);
+
+  IOT_SAMPLE_LOG_AZ_SPAN("start time:", start_time_span);
 
   // Get the current time as a string.
   time_t rawtime;

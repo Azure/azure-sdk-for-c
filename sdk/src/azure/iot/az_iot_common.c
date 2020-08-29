@@ -82,17 +82,20 @@ AZ_NODISCARD az_result az_iot_message_properties_find(
 
   while (az_span_size(remaining) != 0)
   {
-    az_span delim_span = _az_span_token(remaining, hub_client_param_equals_span, &remaining);
-    if (az_span_is_content_equal(delim_span, name))
+    int32_t index = 0;
+    az_span delim_span
+        = _az_span_token(remaining, hub_client_param_equals_span, &remaining, &index);
+    if (index != -1)
     {
-      *out_value = _az_span_token(remaining, hub_client_param_separator_span, &remaining);
-      return AZ_OK;
-    }
-    else
-    {
-      az_span value;
-      value = _az_span_token(remaining, hub_client_param_separator_span, &remaining);
-      (void)value;
+      if (az_span_is_content_equal(delim_span, name))
+      {
+        *out_value = _az_span_token(remaining, hub_client_param_separator_span, &remaining, &index);
+        return AZ_OK;
+      }
+      else
+      {
+        _az_span_token(remaining, hub_client_param_separator_span, &remaining, &index);
+      }
     }
   }
 
@@ -121,8 +124,9 @@ AZ_NODISCARD az_result az_iot_message_properties_next(
   az_span remainder;
   az_span prop_span = az_span_slice(properties->_internal.properties_buffer, index, prop_length);
 
-  *out_name = _az_span_token(prop_span, hub_client_param_equals_span, &remainder);
-  *out_value = _az_span_token(remainder, hub_client_param_separator_span, &remainder);
+  int32_t location = 0;
+  *out_name = _az_span_token(prop_span, hub_client_param_equals_span, &remainder, &location);
+  *out_value = _az_span_token(remainder, hub_client_param_separator_span, &remainder, &location);
   if (az_span_size(remainder) == 0)
   {
     properties->_internal.current_property_index = (uint32_t)prop_length;
@@ -130,7 +134,7 @@ AZ_NODISCARD az_result az_iot_message_properties_next(
   else
   {
     properties->_internal.current_property_index
-        = (uint32_t)(az_span_ptr(remainder) - az_span_ptr(properties->_internal.properties_buffer));
+        = (uint32_t)(_az_span_diff(remainder, properties->_internal.properties_buffer));
   }
 
   return AZ_OK;

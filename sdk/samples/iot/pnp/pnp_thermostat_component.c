@@ -7,9 +7,9 @@
 #pragma warning(disable : 4996)
 #endif
 
-#include <iot_sample_common.h>
-#include "pnp_protocol.h"
 #include "pnp_mqtt_message.h"
+#include "pnp_protocol.h"
+#include <iot_sample_common.h>
 
 #include "pnp_thermostat_component.h"
 
@@ -118,15 +118,16 @@ static az_result invoke_getMaxMinReport(
       incoming_since_value_buffer,
       sizeof(incoming_since_value_buffer),
       &incoming_since_value_buffer_len));
-  start_time_span
-      = az_span_create((uint8_t*)incoming_since_value_buffer, incoming_since_value_buffer_len);
 
   // Set the response payload to error if the "since" field was not sent
-  if (az_span_ptr(start_time_span) == NULL)
+  if (incoming_since_value_buffer_len == 0)
   {
     response = report_error_payload;
     return AZ_ERROR_ITEM_NOT_FOUND;
   }
+
+  start_time_span
+      = az_span_create((uint8_t*)incoming_since_value_buffer, incoming_since_value_buffer_len);
 
   // Get the current time as a string
   time_t rawtime;

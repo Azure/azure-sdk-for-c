@@ -237,7 +237,6 @@ static void _log_listener(az_log_classification classification, az_span message)
   {
     case AZ_LOG_IOT_RETRY:
       _log_retry++;
-      assert_ptr_equal(az_span_ptr(message), (void*)0);
       assert_int_equal(az_span_size(message), 0);
       break;
     default:

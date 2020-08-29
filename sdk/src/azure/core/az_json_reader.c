@@ -25,6 +25,7 @@ AZ_NODISCARD az_result az_json_reader_init(
       .slice = AZ_SPAN_EMPTY,
       .size = 0,
       ._internal = {
+        .is_multisegment = false,
         .string_has_escaped_chars = false,
         .pointer_to_first_buffer = &AZ_SPAN_EMPTY,
         .start_buffer_index = -1,
@@ -63,6 +64,7 @@ AZ_NODISCARD az_result az_json_reader_chunked_init(
       .slice = AZ_SPAN_EMPTY,
       .size = 0,
       ._internal = {
+        .is_multisegment = false,
         .string_has_escaped_chars = false,
         .pointer_to_first_buffer = json_buffers,
         .start_buffer_index = -1,
@@ -111,16 +113,16 @@ static void _az_json_reader_update_state(
   ref_json_reader->token._internal.end_buffer_index = ref_json_reader->_internal.buffer_index;
   ref_json_reader->token._internal.end_buffer_offset = ref_json_reader->_internal.bytes_consumed;
 
+  ref_json_reader->token._internal.is_multisegment = false;
+
   // Token straddles more than one segment
   int32_t start_index = ref_json_reader->token._internal.start_buffer_index;
   if (start_index != -1 && start_index < ref_json_reader->token._internal.end_buffer_index)
   {
-    ref_json_reader->token.slice = AZ_SPAN_EMPTY;
+    ref_json_reader->token._internal.is_multisegment = true;
   }
-  else
-  {
-    ref_json_reader->token.slice = token_slice;
-  }
+
+  ref_json_reader->token.slice = token_slice;
 }
 
 AZ_NODISCARD static az_result _az_json_reader_get_next_buffer(

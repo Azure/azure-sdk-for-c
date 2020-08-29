@@ -25,9 +25,9 @@
 #include <azure/core/az_span.h>
 #include <azure/iot/az_iot_hub_client.h>
 
-#include "pnp/pnp_protocol.h"
 #include "pnp/pnp_device_info_component.h"
 #include "pnp/pnp_mqtt_message.h"
+#include "pnp/pnp_protocol.h"
 #include "pnp/pnp_thermostat_component.h"
 
 #define SAMPLE_TYPE PAHO_IOT_HUB
@@ -962,7 +962,7 @@ static void property_callback(
   az_result rc;
   (void)user_context_callback;
 
-  if (az_span_ptr(component_name) == NULL || az_span_size(component_name) == 0)
+  if (az_span_size(component_name) == 0)
   {
     IOT_SAMPLE_LOG_ERROR(
         "Temperature Controller does not support writable property \"%.*s\". All writeable "

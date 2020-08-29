@@ -86,6 +86,11 @@ typedef struct
 
   struct
   {
+    /// A flag to indicate whether the JSON token straddles more than one buffer segment and is
+    /// split amongst non-contiguous buffers. For tokens created from input JSON payloads within a
+    /// contiguous buffer, this field is always false.
+    bool is_multisegment;
+
     /// A flag to indicate whether the JSON string contained any escaped characters, used as an
     /// optimization to avoid redundant checks. It is meaningless for any other token kind.
     bool string_has_escaped_chars;

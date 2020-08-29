@@ -1718,9 +1718,11 @@ static void test_az_span_token_success(void** state)
   az_span delim = AZ_SPAN_FROM_STR("abc");
   az_span token;
   az_span out_span;
+  int32_t index = 0;
 
   // token: ""
-  token = _az_span_token(span, delim, &out_span);
+  token = _az_span_token(span, delim, &out_span, &index);
+  assert_int_equal(index, 0);
   assert_non_null(az_span_ptr(token));
   assert_true(az_span_size(token) == 0);
   assert_true(az_span_ptr(out_span) == (az_span_ptr(span) + az_span_size(delim)));
@@ -1729,7 +1731,8 @@ static void test_az_span_token_success(void** state)
   // token: "defg" (span+3)
   span = out_span;
 
-  token = _az_span_token(span, delim, &out_span);
+  token = _az_span_token(span, delim, &out_span, &index);
+  assert_int_equal(index, 4);
   assert_true(az_span_ptr(token) == az_span_ptr(span));
   assert_int_equal(az_span_size(token), 4);
   assert_true(
@@ -1740,7 +1743,8 @@ static void test_az_span_token_success(void** state)
   // token: "defg" (span+10)
   span = out_span;
 
-  token = _az_span_token(span, delim, &out_span);
+  token = _az_span_token(span, delim, &out_span, &index);
+  assert_int_equal(index, 4);
   assert_true(az_span_ptr(token) == az_span_ptr(span));
   assert_int_equal(az_span_size(token), 4);
   assert_true(
@@ -1751,17 +1755,11 @@ static void test_az_span_token_success(void** state)
   // token: "defg" (span+17)
   span = out_span;
 
-  token = _az_span_token(span, delim, &out_span);
+  token = _az_span_token(span, delim, &out_span, &index);
+  assert_int_equal(index, -1);
   assert_true(az_span_ptr(token) == az_span_ptr(span));
   assert_int_equal(az_span_size(token), 4);
-  assert_true(az_span_ptr(out_span) == NULL);
   assert_true(az_span_size(out_span) == 0);
-
-  // Out_span is empty.
-  span = out_span;
-
-  token = _az_span_token(span, delim, &out_span);
-  assert_true(az_span_is_content_equal(token, AZ_SPAN_EMPTY));
 }
 
 int test_az_span()

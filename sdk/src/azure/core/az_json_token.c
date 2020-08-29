@@ -16,7 +16,7 @@ static az_span _az_json_token_copy_into_span_helper(
     az_json_token const* json_token,
     az_span destination)
 {
-  _az_PRECONDITION_IS_NULL(az_span_ptr(json_token->slice));
+  _az_PRECONDITION(json_token->_internal.is_multisegment);
 
   if (json_token->size == 0)
   {
@@ -49,7 +49,7 @@ az_span az_json_token_copy_into_span(az_json_token const* json_token, az_span de
   az_span token_slice = json_token->slice;
 
   // Contiguous token
-  if (az_span_ptr(token_slice) != NULL)
+  if (!json_token->_internal.is_multisegment)
   {
     return az_span_copy(destination, token_slice);
   }
@@ -168,7 +168,7 @@ AZ_NODISCARD bool az_json_token_is_text_equal(
   if (!json_token->_internal.string_has_escaped_chars)
   {
     // Contiguous token
-    if (az_span_ptr(token_slice) != NULL)
+    if (!json_token->_internal.is_multisegment)
     {
       return az_span_is_content_equal(token_slice, expected_text);
     }
@@ -214,7 +214,7 @@ AZ_NODISCARD bool az_json_token_is_text_equal(
   bool next_char_escaped = false;
 
   // Contiguous token
-  if (az_span_ptr(token_slice) != NULL)
+  if (!json_token->_internal.is_multisegment)
   {
     return _az_json_token_is_text_equal_helper(token_slice, &expected_text, &next_char_escaped);
   }
@@ -235,14 +235,14 @@ AZ_NODISCARD bool az_json_token_is_text_equal(
     }
 
     if (!_az_json_token_is_text_equal_helper(source, &expected_text, &next_char_escaped)
-        && az_span_ptr(expected_text) == NULL)
+        && az_span_size(expected_text) == 0)
     {
       return false;
     }
   }
 
   // Only return true if we have gone through and compared the entire expected_text.
-  return az_span_ptr(expected_text) == NULL;
+  return az_span_size(expected_text) == 0;
 }
 
 AZ_NODISCARD az_result az_json_token_get_boolean(az_json_token const* json_token, bool* out_value)
@@ -263,7 +263,7 @@ AZ_NODISCARD az_result az_json_token_get_boolean(az_json_token const* json_token
   az_span token_slice = json_token->slice;
 
   // Contiguous token
-  if (az_span_ptr(token_slice) != NULL)
+  if (!json_token->_internal.is_multisegment)
   {
     *out_value = az_span_size(token_slice) == _az_STRING_LITERAL_LEN("true");
   }
@@ -355,7 +355,7 @@ AZ_NODISCARD az_result az_json_token_get_string(
     }
 
     // Contiguous token
-    if (az_span_ptr(token_slice) != NULL)
+    if (!json_token->_internal.is_multisegment)
     {
       // This will add a null terminator.
       az_span_to_str(destination, destination_max_size, token_slice);
@@ -389,7 +389,7 @@ AZ_NODISCARD az_result az_json_token_get_string(
   bool next_char_escaped = false;
 
   // Contiguous token
-  if (az_span_ptr(token_slice) != NULL)
+  if (!json_token->_internal.is_multisegment)
   {
     AZ_RETURN_IF_FAILED(_az_json_token_get_string_helper(
         token_slice, destination, destination_max_size, &dest_idx, &next_char_escaped));
@@ -444,7 +444,7 @@ az_json_token_get_uint64(az_json_token const* json_token, uint64_t* out_value)
   az_span token_slice = json_token->slice;
 
   // Contiguous token
-  if (az_span_ptr(token_slice) != NULL)
+  if (!json_token->_internal.is_multisegment)
   {
     return az_span_atou64(token_slice, out_value);
   }
@@ -477,7 +477,7 @@ az_json_token_get_uint32(az_json_token const* json_token, uint32_t* out_value)
   az_span token_slice = json_token->slice;
 
   // Contiguous token
-  if (az_span_ptr(token_slice) != NULL)
+  if (!json_token->_internal.is_multisegment)
   {
     return az_span_atou32(token_slice, out_value);
   }
@@ -509,7 +509,7 @@ AZ_NODISCARD az_result az_json_token_get_int64(az_json_token const* json_token, 
   az_span token_slice = json_token->slice;
 
   // Contiguous token
-  if (az_span_ptr(token_slice) != NULL)
+  if (!json_token->_internal.is_multisegment)
   {
     return az_span_atoi64(token_slice, out_value);
   }
@@ -541,7 +541,7 @@ AZ_NODISCARD az_result az_json_token_get_int32(az_json_token const* json_token, 
   az_span token_slice = json_token->slice;
 
   // Contiguous token
-  if (az_span_ptr(token_slice) != NULL)
+  if (!json_token->_internal.is_multisegment)
   {
     return az_span_atoi32(token_slice, out_value);
   }
@@ -573,7 +573,7 @@ AZ_NODISCARD az_result az_json_token_get_double(az_json_token const* json_token,
   az_span token_slice = json_token->slice;
 
   // Contiguous token
-  if (az_span_ptr(token_slice) != NULL)
+  if (!json_token->_internal.is_multisegment)
   {
     return az_span_atod(token_slice, out_value);
   }

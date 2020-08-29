@@ -333,6 +333,9 @@ static void test_url_encode_preconditions(void** state)
 
     {
       // Input is empty, so the output is also empty BUT the output span is null.
+      // This precondition assert relies on the ptr of an empty span be null, which is not
+      // guaranteed. However, it is a reasonable assumption for tests as part of span validation,
+      // only for precondition checking.
       int32_t url_length = 0xFF;
       ASSERT_PRECONDITION_CHECKED(_az_span_url_encode(AZ_SPAN_EMPTY, AZ_SPAN_EMPTY, &url_length));
       assert_int_equal(url_length, 0xFF);

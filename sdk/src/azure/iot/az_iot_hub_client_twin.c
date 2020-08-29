@@ -129,6 +129,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
         >= 0)
     {
       // Is a res case
+      int32_t index = 0;
       az_span remainder;
       az_span status_str = _az_span_token(
           az_span_slice(
@@ -136,12 +137,18 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
               twin_feature_index + az_span_size(az_iot_hub_twin_response_sub_topic),
               az_span_size(received_topic)),
           AZ_SPAN_FROM_STR("/"),
-          &remainder);
+          &remainder,
+          &index);
 
       // Get status and convert to enum
       uint32_t status_int;
       AZ_RETURN_IF_FAILED(az_span_atou32(status_str, &status_int));
       out_twin_response->status = (az_iot_status)status_int;
+
+      if (index == -1)
+      {
+        return AZ_ERROR_UNEXPECTED_END;
+      }
 
       // Get request id prop value
       az_iot_message_properties props;

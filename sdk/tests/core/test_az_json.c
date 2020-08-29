@@ -2577,6 +2577,7 @@ static void test_az_json_token_copy(void** state)
       .slice = AZ_SPAN_EMPTY,
       .size = 12,
       ._internal = {
+        .is_multisegment = true,
         .pointer_to_first_buffer = buffers,
         .start_buffer_index = 0,
         .start_buffer_offset = 0,
@@ -2605,6 +2606,7 @@ static void test_az_json_token_copy(void** state)
       .slice = AZ_SPAN_EMPTY,
       .size = 12,
       ._internal = {
+        .is_multisegment = true,
         .pointer_to_first_buffer = buffers,
         .start_buffer_index = 0,
         .start_buffer_offset = 1,
@@ -2626,6 +2628,7 @@ static void test_az_json_token_copy(void** state)
       .slice = AZ_SPAN_EMPTY,
       .size = 12,
       ._internal = {
+        .is_multisegment = true,
         .string_has_escaped_chars = false,
         .pointer_to_first_buffer = _az_buffers64_one,
         .start_buffer_index = 0,
