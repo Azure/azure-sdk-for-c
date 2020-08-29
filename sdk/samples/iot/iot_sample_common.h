@@ -18,65 +18,62 @@
 //
 // Logging
 //
-#define IOT_SAMPLE_LOG_ERROR(...) \
-  do \
-  { \
+#define IOT_SAMPLE_LOG_ERROR(...)                                                  \
+  do                                                                               \
+  {                                                                                \
     (void)fprintf(stderr, "ERROR:\t\t%s:%s():%d: ", __FILE__, __func__, __LINE__); \
-    (void)fprintf(stderr, __VA_ARGS__); \
-    (void)fprintf(stderr, "\n"); \
-    fflush(stdout); \
-    fflush(stderr); \
+    (void)fprintf(stderr, __VA_ARGS__);                                            \
+    (void)fprintf(stderr, "\n");                                                   \
+    fflush(stdout);                                                                \
+    fflush(stderr);                                                                \
   } while (0)
 
 #define IOT_SAMPLE_LOG_SUCCESS(...) \
-  do \
-  { \
-    (void)printf("SUCCESS:\t"); \
-    (void)printf(__VA_ARGS__); \
-    (void)printf("\n"); \
+  do                                \
+  {                                 \
+    (void)printf("SUCCESS:\t");     \
+    (void)printf(__VA_ARGS__);      \
+    (void)printf("\n");             \
   } while (0)
 
-#define IOT_SAMPLE_LOG(...) \
-  do \
-  { \
-    (void)printf("\t\t"); \
+#define IOT_SAMPLE_LOG(...)    \
+  do                           \
+  {                            \
+    (void)printf("\t\t");      \
     (void)printf(__VA_ARGS__); \
-    (void)printf("\n"); \
+    (void)printf("\n");        \
   } while (0)
 
-#define IOT_SAMPLE_LOG_AZ_SPAN(span_description, span) \
-  do \
-  { \
-    (void)printf("\t\t%s ", span_description); \
-    char* buffer = (char*)az_span_ptr(span); \
-    for (int32_t az_span_i = 0; az_span_i < az_span_size(span); az_span_i++) \
-    { \
-      putchar(*buffer++); \
-    } \
-    (void)printf("\n"); \
-  } while (0)
+#define IOT_SAMPLE_LOG_AZ_SPAN(span_description, span)                    \
+  do                                                                      \
+  {                                                                       \
+    (void)printf("\t\t%s ", span_description);                            \
+    (void)fwrite(s, sizeof(uint8_t), (size_t)az_span_size(span), stdout); \
+    (void)printf("\n");                                                   \
+  }
+while (0)
 
 //
 // Error handling
 //
-#define IOT_SAMPLE_RETURN_IF_FAILED(exp) \
-  do \
-  { \
+#define IOT_SAMPLE_RETURN_IF_FAILED(exp)        \
+  do                                            \
+  {                                             \
     az_result const _iot_sample_result = (exp); \
-    if (az_result_failed(_iot_sample_result)) \
-    { \
-      return _iot_sample_result; \
-    } \
+    if (az_result_failed(_iot_sample_result))   \
+    {                                           \
+      return _iot_sample_result;                \
+    }                                           \
   } while (0)
 
-#define IOT_SAMPLE_RETURN_IF_NOT_ENOUGH_SIZE(span, required_size) \
-  do \
-  { \
-    int32_t _iot_sample_req_sz = (required_size); \
+#define IOT_SAMPLE_RETURN_IF_NOT_ENOUGH_SIZE(span, required_size)          \
+  do                                                                       \
+  {                                                                        \
+    int32_t _iot_sample_req_sz = (required_size);                          \
     if (az_span_size(span) < _iot_sample_req_sz || _iot_sample_req_sz < 0) \
-    { \
-      return AZ_ERROR_INSUFFICIENT_SPAN_SIZE; \
-    } \
+    {                                                                      \
+      return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;                              \
+    }                                                                      \
   } while (0)
 
 //
@@ -106,7 +103,7 @@
 // This is usually not needed on Linux or Mac but needs to be set on Windows.
 #define IOT_SAMPLE_ENV_DEVICE_X509_TRUST_PEM_FILE_PATH "AZ_IOT_DEVICE_X509_TRUST_PEM_FILE_PATH"
 
-char iot_sample_hub_hostname_buffer[128];
+  char iot_sample_hub_hostname_buffer[128];
 char iot_sample_provisioning_id_scope_buffer[16];
 
 char iot_sample_hub_device_id_buffer[64];
