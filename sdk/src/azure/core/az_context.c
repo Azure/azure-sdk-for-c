@@ -37,6 +37,7 @@ AZ_NODISCARD az_result
 az_context_get_value(az_context const* context, void const* key, void const** out_value)
 {
   _az_PRECONDITION_NOT_NULL(context);
+  _az_PRECONDITION_NOT_NULL(key);
 
   for (; context != NULL; context = context->_internal.parent)
   {
@@ -54,6 +55,7 @@ AZ_NODISCARD az_context
 az_context_create_with_expiration(az_context const* parent, int64_t expiration)
 {
   _az_PRECONDITION_NOT_NULL(parent);
+  _az_PRECONDITION(expiration >= 0);
 
   return (az_context){ ._internal = { .parent = parent, .expiration = expiration } };
 }
@@ -62,6 +64,8 @@ AZ_NODISCARD az_context
 az_context_create_with_value(az_context const* parent, void const* key, void const* value)
 {
   _az_PRECONDITION_NOT_NULL(parent);
+  _az_PRECONDITION_NOT_NULL(key);
+
   return (az_context){
     ._internal
     = { .parent = parent, .expiration = _az_CONTEXT_MAX_EXPIRATION, .key = key, .value = value }

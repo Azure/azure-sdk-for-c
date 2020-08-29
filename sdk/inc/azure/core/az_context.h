@@ -24,8 +24,6 @@
 
 /**
  * @brief A context is a node within a tree that represents expiration times and key/value pairs.
- *
- * @details The root node in the tree (ultimate parent).
  */
 // Definition is below. Defining the typedef first is necessary here since there is a cycle.
 typedef struct az_context az_context;
@@ -49,10 +47,9 @@ struct az_context
 #define _az_CONTEXT_MAX_EXPIRATION 0x7FFFFFFFFFFFFFFF
 
 /**
- * @brief The ultimate root of all #az_context instances. It allows you to cancel your entire
- * application. The #az_context_application never expires but you can explicitly cancel it by
- * passing its address to #az_context_cancel which effectively cancels all the #az_context child
- * nodes.
+ * @brief The application root #az_context instances. The #az_context_application never expires but
+ * you can explicitly cancel it by passing its address to #az_context_cancel which effectively
+ * cancels all the #az_context child nodes.
  */
 extern az_context az_context_application;
 
