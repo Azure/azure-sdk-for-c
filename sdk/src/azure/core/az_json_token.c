@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include <azure/core/internal/az_precondition_internal.h>
+#include <azure/core/internal/az_result_internal.h>
 #include <azure/core/internal/az_span_internal.h>
 
 #include "az_json_private.h"
@@ -391,7 +392,7 @@ AZ_NODISCARD az_result az_json_token_get_string(
   // Contiguous token
   if (!json_token->_internal.is_multisegment)
   {
-    AZ_RETURN_IF_FAILED(_az_json_token_get_string_helper(
+    _az_RETURN_IF_FAILED(_az_json_token_get_string_helper(
         token_slice, destination, destination_max_size, &dest_idx, &next_char_escaped));
   }
   else
@@ -411,7 +412,7 @@ AZ_NODISCARD az_result az_json_token_get_string(
         source = az_span_slice(source, 0, json_token->_internal.end_buffer_offset);
       }
 
-      AZ_RETURN_IF_FAILED(_az_json_token_get_string_helper(
+      _az_RETURN_IF_FAILED(_az_json_token_get_string_helper(
           source, destination, destination_max_size, &dest_idx, &next_char_escaped));
     }
   }

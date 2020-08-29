@@ -5,6 +5,7 @@
 
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
+#include <azure/core/internal/az_result_internal.h>
 #include <azure/core/internal/az_span_internal.h>
 #include <azure/iot/az_iot_hub_client.h>
 
@@ -39,7 +40,7 @@ AZ_NODISCARD az_result az_iot_hub_client_c2d_parse_received_topic(
       ? AZ_SPAN_EMPTY
       : _az_span_token(remainder, c2d_topic_suffix, &remainder, &index);
 
-  AZ_RETURN_IF_FAILED(
+  _az_RETURN_IF_FAILED(
       az_iot_message_properties_init(&out_request->properties, token, az_span_size(token)));
 
   return AZ_OK;

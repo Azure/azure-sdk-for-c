@@ -910,11 +910,11 @@ static az_result temp_controller_get_telemetry_message(pnp_mqtt_message* message
 
   // Build the telemetry message.
   az_json_writer jw;
-  AZ_RETURN_IF_FAILED(az_json_writer_init(&jw, message->payload_span, NULL));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, working_set_name));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_int32(&jw, working_set_ram_in_kibibytes));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_init(&jw, message->payload_span, NULL));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, working_set_name));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_int32(&jw, working_set_ram_in_kibibytes));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
   message->out_payload_span = az_json_writer_get_bytes_used_in_destination(&jw);
 
   return rc;
@@ -935,14 +935,14 @@ static az_result append_json_token_callback(az_json_writer* jw, void* value)
   switch (value_token.kind)
   {
     case AZ_JSON_TOKEN_NUMBER:
-      AZ_RETURN_IF_FAILED(az_json_token_get_double(&value_token, &value_as_double));
-      AZ_RETURN_IF_FAILED(
+      IOT_SAMPLE_RETURN_IF_FAILED(az_json_token_get_double(&value_token, &value_as_double));
+      IOT_SAMPLE_RETURN_IF_FAILED(
           az_json_writer_append_double(jw, value_as_double, DOUBLE_DECIMAL_PLACE_DIGITS));
       break;
     case AZ_JSON_TOKEN_STRING:
-      AZ_RETURN_IF_FAILED(az_json_token_get_string(
+      IOT_SAMPLE_RETURN_IF_FAILED(az_json_token_get_string(
           &value_token, property_scratch_buffer, sizeof(property_scratch_buffer), &string_length));
-      AZ_RETURN_IF_FAILED(az_json_writer_append_string(
+      IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_string(
           jw, az_span_create((uint8_t*)property_scratch_buffer, string_length)));
       break;
     default:

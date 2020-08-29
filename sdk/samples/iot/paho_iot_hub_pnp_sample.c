@@ -614,8 +614,8 @@ static az_result parse_device_twin_desired_temperature_property(
 {
   az_json_reader jr;
 
-  AZ_RETURN_IF_FAILED(az_json_reader_init(&jr, twin_message_span, NULL));
-  AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_init(&jr, twin_message_span, NULL));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
   if (jr.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
   {
     return AZ_ERROR_UNEXPECTED_CHAR;
@@ -625,21 +625,21 @@ static az_result parse_device_twin_desired_temperature_property(
   bool desired_found = false;
   if (is_twin_get)
   {
-    AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
+    IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
     while (jr.token.kind != AZ_JSON_TOKEN_END_OBJECT)
     {
       if (az_json_token_is_text_equal(&jr.token, twin_desired_name))
       {
         desired_found = true;
-        AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
+        IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
         break;
       }
       else
       {
-        AZ_RETURN_IF_FAILED(az_json_reader_skip_children(&jr)); // Ignore children tokens.
+        IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_skip_children(&jr)); // Ignore children tokens.
       }
 
-      AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr)); // Check next sibling token.
+      IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_next_token(&jr)); // Check next sibling token.
     }
 
     if (!desired_found)
@@ -654,26 +654,26 @@ static az_result parse_device_twin_desired_temperature_property(
   bool temp_found = false;
   bool version_found = false;
 
-  AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
   while (!(temp_found && version_found) && (jr.token.kind != AZ_JSON_TOKEN_END_OBJECT))
   {
     if (az_json_token_is_text_equal(&jr.token, twin_desired_temp_property_name))
     {
-      AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
-      AZ_RETURN_IF_FAILED(az_json_token_get_double(&jr.token, parsed_temp));
+      IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
+      IOT_SAMPLE_RETURN_IF_FAILED(az_json_token_get_double(&jr.token, parsed_temp));
       temp_found = true;
     }
     else if (az_json_token_is_text_equal(&jr.token, twin_version_name))
     {
-      AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
-      AZ_RETURN_IF_FAILED(az_json_token_get_uint32(&jr.token, (uint32_t*)version_number));
+      IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
+      IOT_SAMPLE_RETURN_IF_FAILED(az_json_token_get_uint32(&jr.token, (uint32_t*)version_number));
       version_found = true;
     }
     else
     {
-      AZ_RETURN_IF_FAILED(az_json_reader_skip_children(&jr)); // Ignore children tokens.
+      IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_skip_children(&jr)); // Ignore children tokens.
     }
-    AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr)); // Check next sibling token.
+    IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_next_token(&jr)); // Check next sibling token.
   }
 
   if (!(temp_found && version_found))
@@ -845,9 +845,9 @@ static az_result invoke_getMaxMinReport(
   az_json_reader jr;
 
   // Parse the "since" field in the payload.
-  AZ_RETURN_IF_FAILED(az_json_reader_init(&jr, payload, NULL));
-  AZ_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
-  AZ_RETURN_IF_FAILED(az_json_token_get_string(
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_init(&jr, payload, NULL));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_token_get_string(
       &jr.token,
       command_start_time_value_buffer,
       sizeof(command_start_time_value_buffer),
@@ -944,24 +944,25 @@ static az_result build_property_payload(
 {
   az_json_writer jw;
 
-  AZ_RETURN_IF_FAILED(az_json_writer_init(&jw, payload_destination, NULL));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_init(&jw, payload_destination, NULL));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
 
   for (uint8_t i = 0; i < property_count; i++)
   {
-    AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, names[i]));
-    AZ_RETURN_IF_FAILED(az_json_writer_append_double(&jw, values[i], DOUBLE_DECIMAL_PLACE_DIGITS));
+    IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, names[i]));
+    IOT_SAMPLE_RETURN_IF_FAILED(
+        az_json_writer_append_double(&jw, values[i], DOUBLE_DECIMAL_PLACE_DIGITS));
   }
 
   if (times != NULL)
   {
-    AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, command_start_time_name));
-    AZ_RETURN_IF_FAILED(az_json_writer_append_string(&jw, times[0]));
-    AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, command_end_time_name));
-    AZ_RETURN_IF_FAILED(az_json_writer_append_string(&jw, times[1]));
+    IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, command_start_time_name));
+    IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_string(&jw, times[0]));
+    IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, command_end_time_name));
+    IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_string(&jw, times[1]));
   }
 
-  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
   *payload_out = az_json_writer_get_bytes_used_in_destination(&jw);
 
   return AZ_OK;
@@ -978,20 +979,21 @@ static az_result build_property_payload_with_status(
 {
   az_json_writer jw;
 
-  AZ_RETURN_IF_FAILED(az_json_writer_init(&jw, payload_destination, NULL));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, name));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, twin_value_name));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_double(&jw, value, DOUBLE_DECIMAL_PLACE_DIGITS));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, twin_ack_code_name));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_int32(&jw, ack_code_value));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, twin_ack_version_name));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_int32(&jw, ack_version_value));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, twin_ack_description_name));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_string(&jw, ack_description_value));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_init(&jw, payload_destination, NULL));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, name));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, twin_value_name));
+  IOT_SAMPLE_RETURN_IF_FAILED(
+      az_json_writer_append_double(&jw, value, DOUBLE_DECIMAL_PLACE_DIGITS));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, twin_ack_code_name));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_int32(&jw, ack_code_value));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, twin_ack_version_name));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_int32(&jw, ack_version_value));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, twin_ack_description_name));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_string(&jw, ack_description_value));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
 
   *payload_out = az_json_writer_get_bytes_used_in_destination(&jw);
 
