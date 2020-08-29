@@ -455,11 +455,12 @@ static az_result build_reported_property(
 {
   az_json_writer json_writer;
 
-  AZ_RETURN_IF_FAILED(az_json_writer_init(&json_writer, reported_property_payload, NULL));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&json_writer));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&json_writer, reported_property_name));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_int32(&json_writer, reported_property_value));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&json_writer));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_init(&json_writer, reported_property_payload, NULL));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_begin_object(&json_writer));
+  IOT_SAMPLE_RETURN_IF_FAILED(
+      az_json_writer_append_property_name(&json_writer, reported_property_name));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_int32(&json_writer, reported_property_value));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_end_object(&json_writer));
 
   *out_reported_property_payload = az_json_writer_get_bytes_used_in_destination(&json_writer);
 
@@ -472,15 +473,15 @@ static az_result update_local_property(az_span desired_payload, bool* out_proper
 
   // Parse desired property payload.
   az_json_reader json_reader;
-  AZ_RETURN_IF_FAILED(az_json_reader_init(&json_reader, desired_payload, NULL));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_init(&json_reader, desired_payload, NULL));
 
-  AZ_RETURN_IF_FAILED(az_json_reader_next_token(&json_reader));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_next_token(&json_reader));
   if (json_reader.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
   {
     return AZ_ERROR_UNEXPECTED_CHAR;
   }
 
-  AZ_RETURN_IF_FAILED(az_json_reader_next_token(&json_reader));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_next_token(&json_reader));
 
   // Update property locally if found.
   while (json_reader.token.kind != AZ_JSON_TOKEN_END_OBJECT)
@@ -488,8 +489,9 @@ static az_result update_local_property(az_span desired_payload, bool* out_proper
     if (az_json_token_is_text_equal(&json_reader.token, reported_property_name))
     {
       // Move to the value token and store value.
-      AZ_RETURN_IF_FAILED(az_json_reader_next_token(&json_reader));
-      AZ_RETURN_IF_FAILED(az_json_token_get_int32(&json_reader.token, &reported_property_value));
+      IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_next_token(&json_reader));
+      IOT_SAMPLE_RETURN_IF_FAILED(
+          az_json_token_get_int32(&json_reader.token, &reported_property_value));
       IOT_SAMPLE_LOG_SUCCESS(
           "Client updated \"%.*s\" locally to %d.",
           az_span_size(reported_property_name),
@@ -505,10 +507,12 @@ static az_result update_local_property(az_span desired_payload, bool* out_proper
     }
     else
     {
-      AZ_RETURN_IF_FAILED(az_json_reader_skip_children(&json_reader)); // Ignore children tokens.
+      IOT_SAMPLE_RETURN_IF_FAILED(
+          az_json_reader_skip_children(&json_reader)); // Ignore children tokens.
     }
 
-    AZ_RETURN_IF_FAILED(az_json_reader_next_token(&json_reader)); // Check next sibling token.
+    IOT_SAMPLE_RETURN_IF_FAILED(
+        az_json_reader_next_token(&json_reader)); // Check next sibling token.
   }
 
   IOT_SAMPLE_LOG(
