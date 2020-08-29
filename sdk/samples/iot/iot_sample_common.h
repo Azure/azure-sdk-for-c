@@ -44,12 +44,12 @@
     (void)printf("\n");        \
   } while (0)
 
-#define IOT_SAMPLE_LOG_AZ_SPAN(span_description, span)                    \
-  do                                                                      \
-  {                                                                       \
-    (void)printf("\t\t%s ", span_description);                            \
-    (void)fwrite(s, sizeof(uint8_t), (size_t)az_span_size(span), stdout); \
-    (void)printf("\n");                                                   \
+#define IOT_SAMPLE_LOG_AZ_SPAN(span_description, span)                                    \
+  do                                                                                      \
+  {                                                                                       \
+    (void)printf("\t\t%s ", span_description);                                            \
+    (void)fwrite(az_span_ptr(span), sizeof(uint8_t), (size_t)az_span_size(span), stdout); \
+    (void)printf("\n");                                                                   \
   } while (0)
 
 //
