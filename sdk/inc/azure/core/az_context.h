@@ -47,9 +47,9 @@ struct az_context
 #define _az_CONTEXT_MAX_EXPIRATION 0x7FFFFFFFFFFFFFFF
 
 /**
- * @brief The application root #az_context instances. The #az_context_application never expires but
- * you can explicitly cancel it by passing its address to #az_context_cancel which effectively
- * cancels all the #az_context child nodes.
+ * @brief The application root #az_context instances.
+ * @details The #az_context_application never expires but you can explicitly cancel it by passing its address to 
+ * #az_context_cancel() which effectively cancels all its #az_context child nodes.
  */
 extern az_context az_context_application;
 
