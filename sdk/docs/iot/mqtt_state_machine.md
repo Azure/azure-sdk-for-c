@@ -63,7 +63,7 @@ if(az_result_failed(az_iot_hub_client_sas_get_signature(client, unix_time + 3600
 
 // Application will Base64Encode the HMAC256 of the az_span_ptr(signature) containing az_span_size(signature) bytes with the Shared Access Key.
 
-if(az_result_failed(az_iot_hub_client_sas_get_password(client, base64_hmac_sha256_signature, NULL, password, password_size, &password_length)))
+if(az_result_failed(az_iot_hub_client_sas_get_password(client, NULL, base64_hmac_sha256_signature, password, password_size, &password_length)))
 {
     // error.
 }
