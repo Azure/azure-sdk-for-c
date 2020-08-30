@@ -186,7 +186,7 @@ static void test_az_iot_u64toa_size_success()
 
 static void test_az_iot_is_status_succeeded_translate_success()
 {
-  assert_true(az_iot_is_success_status(AZ_IOT_STATUS_OK));
+  assert_true(az_iot_status_succeeded(AZ_IOT_STATUS_OK));
   assert_true(az_iot_status_succeeded(AZ_IOT_STATUS_NO_CONTENT));
   assert_true(az_iot_status_succeeded(0));
   assert_true(az_iot_status_succeeded(350));

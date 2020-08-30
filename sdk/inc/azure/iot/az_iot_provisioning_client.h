@@ -69,7 +69,7 @@ AZ_NODISCARD az_iot_provisioning_client_options az_iot_provisioning_client_optio
  * @brief Initializes an Azure IoT Provisioning Client.
  *
  * @param[in] client The #az_iot_provisioning_client to use for this call.
- * @param[in] global_device_endpoint The global device endpoint.
+ * @param[in] global_device_hostname The global device endpoint.
  * @param[in] id_scope The ID Scope.
  * @param[in] registration_id The Registration ID. This must match the client certificate name (CN
  *                            part of the certificate subject).
@@ -80,7 +80,7 @@ AZ_NODISCARD az_iot_provisioning_client_options az_iot_provisioning_client_optio
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_init(
     az_iot_provisioning_client* client,
-    az_span global_device_endpoint,
+    az_span global_device_hostname,
     az_span id_scope,
     az_span registration_id,
     az_iot_provisioning_client_options const* options);
@@ -215,7 +215,7 @@ typedef struct
   az_span error_tracking_id; /**< Submit this ID when asking for Azure IoT service-desk help. */
   az_span
       error_timestamp; /**< Submit this timestamp when asking for Azure IoT service-desk help. */
-} az_iot_provisioning_client_registration_result;
+} az_iot_provisioning_client_registration_state;
 
 /**
  * @brief Register or query operation response.
@@ -235,7 +235,7 @@ typedef struct
                              * be used to convert this into
                              * the #az_iot_provisioning_client_operation_status enum. */
   uint32_t retry_after_seconds; /**< Recommended timeout before sending the next MQTT publish. */
-  az_iot_provisioning_client_registration_result
+  az_iot_provisioning_client_registration_state
       registration_result; /**< If the operation is complete (success or error), the
                                    registration state will contain the hub and device id in case of
                                    success. */
@@ -290,7 +290,9 @@ AZ_NODISCARD az_result az_iot_provisioning_client_parse_operation_status(
 
 /**
  * @brief Checks if the status indicates that the service has an authoritative result of the
- * register operation. The operation may have completed in either success or error.
+ * register operation. The operation may have completed in either success or error. Compleated
+ * states are AZ_IOT_PROVISIONING_STATUS_ASSIGNED, AZ_IOT_PROVISIONING_STATUS_FAILED, or 
+ * AZ_IOT_PROVISIONING_STATUS_DISABLED.
  *
  * @param[in] operation_status The #az_iot_provisioning_client_operation_status obtained by calling
  * #az_iot_provisioning_client_parse_operation_status.
@@ -340,7 +342,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_register_get_publish_topic(
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_query_status_get_publish_topic(
     az_iot_provisioning_client const* client,
-    az_iot_provisioning_client_register_response const* register_response,
+    az_span operation_id,
     char* mqtt_topic,
     size_t mqtt_topic_size,
     size_t* out_mqtt_topic_length);

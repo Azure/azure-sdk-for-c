@@ -373,7 +373,7 @@ static void send_operation_query_message(
   if (az_result_failed(
           rc = az_iot_provisioning_client_query_status_get_publish_topic(
               &provisioning_client,
-              register_response,
+              register_response->operation_id,
               query_status_topic_buffer,
               sizeof(query_status_topic_buffer),
               NULL)))

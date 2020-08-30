@@ -201,8 +201,8 @@ AZ_NODISCARD az_result az_iot_hub_client_sas_get_signature(
  */
 AZ_NODISCARD az_result az_iot_hub_client_sas_get_password(
     az_iot_hub_client const* client,
-    az_span base64_hmac_sha256_signature,
     uint64_t token_expiration_epoch_time,
+    az_span base64_hmac_sha256_signature,
     az_span key_name,
     char* mqtt_password,
     size_t mqtt_password_size,
