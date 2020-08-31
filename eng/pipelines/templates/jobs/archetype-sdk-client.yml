@@ -384,6 +384,10 @@ jobs:
       inputs:
         targetType: filePath
         filePath: eng/scripts/New-DocsMsArtifact.ps1
+        ignoreLASTEXITCODE: flattenFolders
+        pwsh: true
+        errorActionPreference: stop
+
       displayName: Generate artifacts for docs.ms
 
 
