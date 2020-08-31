@@ -79,8 +79,7 @@ static bool _az_log_write_engine(bool log_it, az_log_classification classificati
                            // is going to succeed and return from the function.
   }
 
-  az_log_classification const* cls = classifications;
-  while (*cls != AZ_LOG_END_OF_LIST)
+  for (az_log_classification const* cls = classifications; *cls != AZ_LOG_END_OF_LIST; ++cls)
   {
     if (!_az_is_valid_log_classification(cls))
     {
@@ -97,8 +96,6 @@ static bool _az_log_write_engine(bool log_it, az_log_classification classificati
 
       return true;
     }
-
-    cls++;
   }
 
   // This message's classification is not in the customer-provided list; we should not log it.
