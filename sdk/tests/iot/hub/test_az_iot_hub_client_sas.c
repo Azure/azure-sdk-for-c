@@ -81,8 +81,8 @@ static void az_iot_hub_client_sas_get_password_EMPTY_signature_fails()
 
   ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_sas_get_password(
       &client,
-      signature,
       test_sas_expiry_time_secs,
+      signature,
       key_name,
       password,
       _az_COUNTOF(password),
@@ -100,8 +100,8 @@ static void az_iot_hub_client_sas_get_password_NULL_password_span_fails()
 
   ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_sas_get_password(
       &client,
-      test_signature,
       test_sas_expiry_time_secs,
+      test_signature,
       key_name,
       NULL,
       _az_COUNTOF(password),
@@ -118,7 +118,7 @@ static void az_iot_hub_client_sas_get_password_empty_password_buffer_span_fails(
   size_t length = 0;
 
   ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_sas_get_password(
-      &client, test_signature, test_sas_expiry_time_secs, key_name, password, 0, &length));
+      &client, test_sas_expiry_time_secs, test_signature, key_name, password, 0, &length));
 }
 
 #endif // AZ_NO_PRECONDITION_CHECKING
@@ -189,8 +189,8 @@ static void az_iot_hub_client_sas_get_password_device_succeeds()
 
   assert_true(az_result_succeeded(az_iot_hub_client_sas_get_password(
       &client,
-      test_signature,
       test_sas_expiry_time_secs,
+      test_signature,
       key_name,
       password,
       _az_COUNTOF(password),
@@ -215,8 +215,8 @@ static void az_iot_hub_client_sas_get_password_device_no_out_length_succeeds()
 
   assert_true(az_result_succeeded(az_iot_hub_client_sas_get_password(
       &client,
-      test_signature,
       test_sas_expiry_time_secs,
+      test_signature,
       key_name,
       password,
       _az_COUNTOF(password),
@@ -245,8 +245,8 @@ static void az_iot_hub_client_sas_get_password_module_succeeds()
 
   assert_true(az_result_succeeded(az_iot_hub_client_sas_get_password(
       &client,
-      test_signature,
       test_sas_expiry_time_secs,
+      test_signature,
       key_name,
       password,
       _az_COUNTOF(password),
@@ -274,8 +274,8 @@ static void az_iot_hub_client_sas_get_password_module_no_length_succeeds()
 
   assert_true(az_result_succeeded(az_iot_hub_client_sas_get_password(
       &client,
-      test_signature,
       test_sas_expiry_time_secs,
+      test_signature,
       key_name,
       password,
       _az_COUNTOF(password),
@@ -301,8 +301,8 @@ static void az_iot_hub_client_sas_get_password_device_with_keyname_succeeds()
 
   assert_true(az_result_succeeded(az_iot_hub_client_sas_get_password(
       &client,
-      test_signature,
       test_sas_expiry_time_secs,
+      test_signature,
       key_name,
       password,
       _az_COUNTOF(password),
@@ -332,8 +332,8 @@ static void az_iot_hub_client_sas_get_password_module_with_keyname_succeeds()
 
   assert_true(az_result_succeeded(az_iot_hub_client_sas_get_password(
       &client,
-      test_signature,
       test_sas_expiry_time_secs,
+      test_signature,
       key_name,
       password,
       _az_COUNTOF(password),
@@ -356,8 +356,8 @@ static void az_iot_hub_client_sas_get_password_device_overflow_fails()
   assert_int_equal(
       az_iot_hub_client_sas_get_password(
           &client,
-          test_signature,
           test_sas_expiry_time_secs,
+          test_signature,
           key_name,
           password,
           _az_COUNTOF(password),
@@ -381,8 +381,8 @@ static void az_iot_hub_client_sas_get_password_module_overflow_fails()
   assert_int_equal(
       az_iot_hub_client_sas_get_password(
           &client,
-          test_signature,
           test_sas_expiry_time_secs,
+          test_signature,
           key_name,
           password,
           _az_COUNTOF(password),
