@@ -108,7 +108,7 @@ static bool _az_log_write_engine(bool log_it, az_log_classification classificati
 // This function returns whether or not the passed-in message should be logged.
 bool _az_log_should_write(az_log_classification classification)
 {
-  return _az_log_write_engine(false, classification, AZ_SPAN_NULL);
+  return _az_log_write_engine(false, classification, AZ_SPAN_EMPTY);
 }
 
 // This function attempts to log the passed-in message.

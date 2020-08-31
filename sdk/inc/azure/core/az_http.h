@@ -188,7 +188,7 @@ az_http_response_init(az_http_response* out_response, az_span buffer)
       .http_response = buffer,
       .written = 0,
       .parser = {
-        .remaining = AZ_SPAN_NULL,
+        .remaining = AZ_SPAN_EMPTY,
         .next_kind = _az_HTTP_RESPONSE_KIND_STATUS_LINE,
       },
     },

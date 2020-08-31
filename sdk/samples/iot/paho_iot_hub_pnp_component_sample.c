@@ -25,10 +25,10 @@
 #include <azure/core/az_span.h>
 #include <azure/iot/az_iot_hub_client.h>
 
-#include "sample_pnp.h"
-#include "sample_pnp_device_info_component.h"
-#include "sample_pnp_mqtt_component.h"
-#include "sample_pnp_thermostat_component.h"
+#include "pnp/pnp_device_info_component.h"
+#include "pnp/pnp_mqtt_message.h"
+#include "pnp/pnp_protocol.h"
+#include "pnp/pnp_thermostat_component.h"
 
 #define SAMPLE_TYPE PAHO_IOT_HUB
 #define SAMPLE_NAME PAHO_IOT_HUB_PNP_COMPONENT_SAMPLE
@@ -494,7 +494,7 @@ static void send_device_serial_number(void)
   // Build the serial number reported property message.
   rc = pnp_create_reported_property(
       mqtt_message.payload_span,
-      AZ_SPAN_NULL,
+      AZ_SPAN_EMPTY,
       reported_serial_num_property_name,
       append_string_callback,
       (void*)&reported_serial_num_property_value,
@@ -532,7 +532,7 @@ static void request_device_twin_document(void)
   }
 
   // Publish the twin document request.
-  mqtt_publish_message(mqtt_message.topic, AZ_SPAN_NULL, MQTT_PUBLISH_QOS);
+  mqtt_publish_message(mqtt_message.topic, AZ_SPAN_EMPTY, MQTT_PUBLISH_QOS);
   IOT_SAMPLE_LOG_SUCCESS("Client requested twin document.");
   IOT_SAMPLE_LOG(" "); // Formatting.
 
@@ -898,7 +898,7 @@ static az_result temp_controller_get_telemetry_message(pnp_mqtt_message* message
 
   // Get the Telemetry topic to publish the telemetry messages.
   rc = pnp_get_telemetry_topic(
-      &hub_client, NULL, AZ_SPAN_NULL, message->topic, message->topic_length, NULL);
+      &hub_client, NULL, AZ_SPAN_EMPTY, message->topic, message->topic_length, NULL);
   if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR(
@@ -910,11 +910,11 @@ static az_result temp_controller_get_telemetry_message(pnp_mqtt_message* message
 
   // Build the telemetry message.
   az_json_writer jw;
-  AZ_RETURN_IF_FAILED(az_json_writer_init(&jw, message->payload_span, NULL));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, working_set_name));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_int32(&jw, working_set_ram_in_kibibytes));
-  AZ_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_init(&jw, message->payload_span, NULL));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, working_set_name));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_int32(&jw, working_set_ram_in_kibibytes));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
   message->out_payload_span = az_json_writer_get_bytes_used_in_destination(&jw);
 
   return rc;
@@ -935,14 +935,14 @@ static az_result append_json_token_callback(az_json_writer* jw, void* value)
   switch (value_token.kind)
   {
     case AZ_JSON_TOKEN_NUMBER:
-      AZ_RETURN_IF_FAILED(az_json_token_get_double(&value_token, &value_as_double));
-      AZ_RETURN_IF_FAILED(
+      IOT_SAMPLE_RETURN_IF_FAILED(az_json_token_get_double(&value_token, &value_as_double));
+      IOT_SAMPLE_RETURN_IF_FAILED(
           az_json_writer_append_double(jw, value_as_double, DOUBLE_DECIMAL_PLACE_DIGITS));
       break;
     case AZ_JSON_TOKEN_STRING:
-      AZ_RETURN_IF_FAILED(az_json_token_get_string(
+      IOT_SAMPLE_RETURN_IF_FAILED(az_json_token_get_string(
           &value_token, property_scratch_buffer, sizeof(property_scratch_buffer), &string_length));
-      AZ_RETURN_IF_FAILED(az_json_writer_append_string(
+      IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_string(
           jw, az_span_create((uint8_t*)property_scratch_buffer, string_length)));
       break;
     default:
@@ -962,7 +962,7 @@ static void property_callback(
   az_result rc;
   (void)user_context_callback;
 
-  if (az_span_ptr(component_name) == NULL || az_span_size(component_name) == 0)
+  if (az_span_size(component_name) == 0)
   {
     IOT_SAMPLE_LOG_ERROR(
         "Temperature Controller does not support writable property \"%.*s\". All writeable "

@@ -61,21 +61,21 @@ az_precondition_failed_fn az_precondition_failed_get_callback();
 #ifdef AZ_NO_PRECONDITION_CHECKING
 #define _az_PRECONDITION(condition)
 #else
-#define _az_PRECONDITION(condition) \
-  do \
-  { \
-    _az_ANALYSIS_ASSUME(condition); \
-    if (!(condition)) \
-    { \
+#define _az_PRECONDITION(condition)            \
+  do                                           \
+  {                                            \
+    if (!(condition))                          \
+    {                                          \
       az_precondition_failed_get_callback()(); \
-    } \
+    }                                          \
+    _az_ANALYSIS_ASSUME(condition);            \
   } while (0)
 #endif // AZ_NO_PRECONDITION_CHECKING
 
-#define _az_PRECONDITION_RANGE(low, arg, max) _az_PRECONDITION((low <= arg && arg <= max))
+#define _az_PRECONDITION_RANGE(low, arg, max) _az_PRECONDITION((low) <= (arg) && (arg) <= (max))
 
-#define _az_PRECONDITION_NOT_NULL(arg) _az_PRECONDITION((arg != NULL))
-#define _az_PRECONDITION_IS_NULL(arg) _az_PRECONDITION((arg == NULL))
+#define _az_PRECONDITION_NOT_NULL(arg) _az_PRECONDITION((arg) != NULL)
+#define _az_PRECONDITION_IS_NULL(arg) _az_PRECONDITION((arg) == NULL)
 
 AZ_NODISCARD AZ_INLINE bool _az_span_is_valid(az_span span, int32_t min_size, bool null_is_valid)
 {

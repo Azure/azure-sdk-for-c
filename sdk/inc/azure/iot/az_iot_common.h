@@ -61,7 +61,6 @@ typedef enum
   AZ_IOT_STATUS_TIMEOUT = 504,
 } az_iot_status;
 
-
 /**
  *
  * Properties APIs
@@ -75,7 +74,7 @@ typedef enum
  */
 #define AZ_IOT_MESSAGE_PROPERTIES_MESSAGE_ID \
   "%24.mid" /**< Add unique identification to a message */
-#define AZ_IOT_MESSAGE_PROPERTIES_CORRELATION_ID \
+#define AZ_IOT_MESSAGE_PROPERTIES_CORRELATION_ID                     \
   "%24.cid" /**< Used in distributed tracing. More information here: \
 https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-distributed-tracing */
 #define AZ_IOT_MESSAGE_PROPERTIES_CONTENT_TYPE \
@@ -166,10 +165,12 @@ AZ_NODISCARD az_result az_iot_message_properties_find(
  * @param[out] out_value A pointer to an #az_span containing the value of the next property.
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK A property was retrieved successfully.
- * @retval #AZ_ERROR_IOT_NO_MORE_PROPERTIES The API reached the end of the properties to retrieve.
+ * @retval #AZ_ERROR_IOT_END_OF_PROPERTIES The API reached the end of the properties to retrieve.
  */
-AZ_NODISCARD az_result
-az_iot_message_properties_next(az_iot_message_properties* properties, az_span* out_name, az_span* out_value);
+AZ_NODISCARD az_result az_iot_message_properties_next(
+    az_iot_message_properties* properties,
+    az_span* out_name,
+    az_span* out_value);
 
 /**
  * @brief Checks if the status indicates a successful operation.

@@ -9,6 +9,7 @@
 #include <azure/core/internal/az_credentials_internal.h>
 #include <azure/core/internal/az_http_internal.h>
 #include <azure/core/internal/az_precondition_internal.h>
+#include <azure/core/internal/az_result_internal.h>
 #include <azure/core/internal/az_span_internal.h>
 #include <azure/storage/az_storage_blobs.h>
 
@@ -118,11 +119,11 @@ AZ_NODISCARD az_result az_storage_blobs_blob_client_init(
 
   // Copy url to client buffer so customer can re-use buffer on his/her side
   int32_t const uri_size = az_span_size(endpoint);
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(out_client->_internal.endpoint, uri_size);
+  _az_RETURN_IF_NOT_ENOUGH_SIZE(out_client->_internal.endpoint, uri_size);
   az_span_copy(out_client->_internal.endpoint, endpoint);
   out_client->_internal.endpoint = az_span_slice(out_client->_internal.endpoint, 0, uri_size);
 
-  AZ_RETURN_IF_FAILED(
+  _az_RETURN_IF_FAILED(
       _az_credential_set_scopes(cred, AZ_SPAN_FROM_STR("https://storage.azure.com/.default")));
 
   return AZ_OK;
@@ -144,7 +145,6 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
   {
     opt = *options;
   }
-  (void)opt;
 
   // Request buffer
   // create request buffer TODO: define size for a blob upload
@@ -152,7 +152,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
   az_span request_url_span = AZ_SPAN_FROM_BUFFER(url_buffer);
   // copy url from client
   int32_t uri_size = az_span_size(ref_client->_internal.endpoint);
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(request_url_span, uri_size);
+  _az_RETURN_IF_NOT_ENOUGH_SIZE(request_url_span, uri_size);
   az_span_copy(request_url_span, ref_client->_internal.endpoint);
 
   uint8_t headers_buffer[_az_STORAGE_HTTP_REQUEST_HEADER_BUFFER_SIZE];
@@ -160,7 +160,7 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
 
   // create request
   az_http_request request;
-  AZ_RETURN_IF_FAILED(az_http_request_init(
+  _az_RETURN_IF_FAILED(az_http_request_init(
       &request,
       opt.context,
       az_http_method_put(),
@@ -170,23 +170,22 @@ AZ_NODISCARD az_result az_storage_blobs_blob_upload(
       content));
 
   // add blob type to request
-  AZ_RETURN_IF_FAILED(az_http_request_append_header(
+  _az_RETURN_IF_FAILED(az_http_request_append_header(
       &request, AZ_STORAGE_BLOBS_BLOB_HEADER_X_MS_BLOB_TYPE, AZ_STORAGE_BLOBS_BLOB_TYPE_BLOCKBLOB));
 
-  //
   uint8_t content_length[_az_INT64_AS_STR_BUFFER_SIZE] = { 0 };
   az_span content_length_span = AZ_SPAN_FROM_BUFFER(content_length);
   az_span remainder;
-  AZ_RETURN_IF_FAILED(az_span_i64toa(content_length_span, az_span_size(content), &remainder));
+  _az_RETURN_IF_FAILED(az_span_i64toa(content_length_span, az_span_size(content), &remainder));
   content_length_span
       = az_span_slice(content_length_span, 0, _az_span_diff(remainder, content_length_span));
 
   // add Content-Length to request
-  AZ_RETURN_IF_FAILED(
+  _az_RETURN_IF_FAILED(
       az_http_request_append_header(&request, AZ_HTTP_HEADER_CONTENT_LENGTH, content_length_span));
 
   // add blob type to request
-  AZ_RETURN_IF_FAILED(az_http_request_append_header(
+  _az_RETURN_IF_FAILED(az_http_request_append_header(
       &request, AZ_HTTP_HEADER_CONTENT_TYPE, AZ_SPAN_FROM_STR("text/plain")));
 
   // start pipeline
