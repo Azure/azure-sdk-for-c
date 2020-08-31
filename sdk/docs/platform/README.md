@@ -8,7 +8,7 @@ Azure SDK Core depends on some system-specific functions. These functions are no
 
 Azure SDK provides three platform implementations for you, one for Windows (`az_win32`), another for Linux and MacOS (`az_posix`) and an empty implementation (`az_noplatform`).
 
-See [cmake options][azure_sdk_cmake_options] to learn about how to build and use each of these available targets or how to use your own platform implementation.
+See [CMake Options][azure_sdk_cmake_options] to learn about how to build and use each of these available targets or how to use your own platform implementation.
 
 >Note: `az_noplatform` can be used to link your application and enable Azure Core to run. However, this is not recommended for a production application. It is suggested to be used for testing or just for getting started.
 
