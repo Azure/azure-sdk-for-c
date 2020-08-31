@@ -221,7 +221,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_query_status_get_publish_topic
 AZ_INLINE az_iot_provisioning_client_registration_state
 _az_iot_provisioning_registration_result_default()
 {
-  return (az_iot_provisioning_client_registration_state){ .assigned_hub_hostname = AZ_SPAN_NULL,
+  return (az_iot_provisioning_client_registration_state){ .assigned_hub_hostname = AZ_SPAN_EMPTY,
                                                            .device_id = AZ_SPAN_EMPTY,
                                                            .error_code = AZ_IOT_STATUS_UNKNOWN,
                                                            .extended_error_code = 0,
