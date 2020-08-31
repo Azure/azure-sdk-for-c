@@ -64,11 +64,18 @@ AZ_NODISCARD int32_t _az_span_url_encode_calc_length(az_span source);
  * @param[out] out_remainder The #az_span pointing to the remaining bytes in `source`, starting
  * after the occurrence of `delimiter`. If the position after `delimiter` is the end of `source`,
  * `out_remainder` is set to an empty #az_span.
+ * @param[out] out_index The position of \p delimiter in \p source if \p source contains the \p
+ * delimiter within it. Otherwise, it is set to -1.
+ *
  * @return The #az_span pointing to the token delimited by the beginning of `source` up to the first
  * occurrence of (but not including the) `delimiter`, or the end of `source` if `delimiter` is not
- * found. If `source` is empty, AZ_SPAN_NULL is returned instead.
+ * found. If `source` is empty, #AZ_SPAN_EMPTY is returned instead.
  */
-AZ_NODISCARD az_span _az_span_token(az_span source, az_span delimiter, az_span* out_remainder);
+az_span _az_span_token(
+    az_span source,
+    az_span delimiter,
+    az_span* out_remainder,
+    int32_t* out_index);
 
 #include <azure/core/_az_cfg_suffix.h>
 

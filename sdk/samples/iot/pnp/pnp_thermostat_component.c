@@ -111,7 +111,7 @@ static az_result invoke_getMaxMinReport(
 {
   // az_result result;
   // Parse the "since" field in the payload.
-  az_span start_time_span = AZ_SPAN_NULL;
+  az_span start_time_span = AZ_SPAN_EMPTY;
   az_json_reader jr;
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_init(&jr, payload, NULL));
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
@@ -121,15 +121,16 @@ static az_result invoke_getMaxMinReport(
       incoming_since_value_buffer,
       sizeof(incoming_since_value_buffer),
       &incoming_since_value_buffer_len));
-  start_time_span
-      = az_span_create((uint8_t*)incoming_since_value_buffer, incoming_since_value_buffer_len);
 
   // Set the response payload to error if the "since" field was not sent
-  if (az_span_ptr(start_time_span) == NULL)
+  if (incoming_since_value_buffer_len == 0)
   {
     response = report_error_payload;
     return AZ_ERROR_ITEM_NOT_FOUND;
   }
+
+  start_time_span
+      = az_span_create((uint8_t*)incoming_since_value_buffer, incoming_since_value_buffer_len);
 
   // Get the current time as a string
   time_t rawtime;

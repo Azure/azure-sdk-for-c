@@ -57,7 +57,7 @@ void test_az_http_pipeline_process()
           url_span,
           3,
           header_span,
-          AZ_SPAN_NULL),
+          AZ_SPAN_EMPTY),
       AZ_OK);
 
   _az_http_pipeline pipeline = (_az_http_pipeline){

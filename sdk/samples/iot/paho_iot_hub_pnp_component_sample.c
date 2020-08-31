@@ -494,7 +494,7 @@ static void send_device_serial_number(void)
   // Build the serial number reported property message.
   rc = pnp_create_reported_property(
       mqtt_message.payload_span,
-      AZ_SPAN_NULL,
+      AZ_SPAN_EMPTY,
       reported_serial_num_property_name,
       append_string_callback,
       (void*)&reported_serial_num_property_value,
@@ -532,7 +532,7 @@ static void request_device_twin_document(void)
   }
 
   // Publish the twin document request.
-  mqtt_publish_message(mqtt_message.topic, AZ_SPAN_NULL, MQTT_PUBLISH_QOS);
+  mqtt_publish_message(mqtt_message.topic, AZ_SPAN_EMPTY, MQTT_PUBLISH_QOS);
   IOT_SAMPLE_LOG_SUCCESS("Client requested twin document.");
   IOT_SAMPLE_LOG(" "); // Formatting.
 
@@ -898,7 +898,7 @@ static az_result temp_controller_get_telemetry_message(pnp_mqtt_message* message
 
   // Get the Telemetry topic to publish the telemetry messages.
   rc = pnp_get_telemetry_topic(
-      &hub_client, NULL, AZ_SPAN_NULL, message->topic, message->topic_length, NULL);
+      &hub_client, NULL, AZ_SPAN_EMPTY, message->topic, message->topic_length, NULL);
   if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR(
@@ -962,7 +962,7 @@ static void property_callback(
   az_result rc;
   (void)user_context_callback;
 
-  if (az_span_ptr(component_name) == NULL || az_span_size(component_name) == 0)
+  if (az_span_size(component_name) == 0)
   {
     IOT_SAMPLE_LOG_ERROR(
         "Temperature Controller does not support writable property \"%.*s\". All writeable "
