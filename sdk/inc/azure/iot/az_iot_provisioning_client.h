@@ -290,7 +290,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_parse_operation_status(
 
 /**
  * @brief Checks if the status indicates that the service has an authoritative result of the
- * register operation. The operation may have completed in either success or error. Compleated
+ * register operation. The operation may have completed in either success or error. Completed
  * states are AZ_IOT_PROVISIONING_STATUS_ASSIGNED, AZ_IOT_PROVISIONING_STATUS_FAILED, or 
  * AZ_IOT_PROVISIONING_STATUS_DISABLED.
  *
