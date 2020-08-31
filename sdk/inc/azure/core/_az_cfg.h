@@ -69,8 +69,8 @@
 #define _az_FALLTHROUGH __attribute__((fallthrough))
 #else // !__GNUC__ >= 7
 #define _az_FALLTHROUGH \
-  do \
-  { \
+  do                    \
+  {                     \
   } while (0)
 #endif // __GNUC__ >= 7
 

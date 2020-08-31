@@ -63,7 +63,7 @@ static void test_az_iot_hub_client_init_NULL_device_id_fails(void** state)
   az_iot_hub_client client;
 
   ASSERT_PRECONDITION_CHECKED(
-      az_iot_hub_client_init(&client, test_hub_hostname, AZ_SPAN_NULL, NULL));
+      az_iot_hub_client_init(&client, test_hub_hostname, AZ_SPAN_EMPTY, NULL));
 }
 
 static void test_az_iot_hub_client_init_NULL_hub_hostname_id_fails(void** state)
@@ -72,7 +72,7 @@ static void test_az_iot_hub_client_init_NULL_hub_hostname_id_fails(void** state)
 
   az_iot_hub_client client;
 
-  ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_init(&client, AZ_SPAN_NULL, test_device_id, NULL));
+  ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_init(&client, AZ_SPAN_EMPTY, test_device_id, NULL));
 }
 
 static void test_az_iot_hub_client_get_user_name_NULL_client_fails(void** state)
@@ -152,7 +152,7 @@ static void test_az_iot_hub_client_get_default_options_succeed(void** state)
   (void)state;
 
   az_iot_hub_client_options options = az_iot_hub_client_options_default();
-  assert_true(az_span_is_content_equal(options.module_id, AZ_SPAN_NULL));
+  assert_true(az_span_is_content_equal(options.module_id, AZ_SPAN_EMPTY));
   assert_true(
       az_span_is_content_equal(options.user_agent, az_span_create_from_str(PLATFORM_USER_AGENT)));
 }

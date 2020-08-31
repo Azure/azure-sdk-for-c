@@ -67,8 +67,8 @@ test_az_iot_provisioning_client_parse_received_topic_and_payload_topic_not_match
 
   az_iot_provisioning_client_register_response response = { .status = AZ_IOT_STATUS_FORBIDDEN,
                                                             .retry_after_seconds = 0xBAADC0DE,
-                                                            .operation_id = AZ_SPAN_NULL,
-                                                            .operation_status = AZ_SPAN_NULL,
+                                                            .operation_id = AZ_SPAN_EMPTY,
+                                                            .operation_status = AZ_SPAN_EMPTY,
                                                             .registration_result = { 0 } };
 
   az_result ret = az_iot_provisioning_client_parse_received_topic_and_payload(
@@ -423,8 +423,8 @@ static void test_az_iot_provisioning_client_parse_operation_status_translate_suc
 {
   az_iot_provisioning_client_register_response response = { .status = AZ_IOT_STATUS_FORBIDDEN,
                                                             .retry_after_seconds = 0xBAADC0DE,
-                                                            .operation_id = AZ_SPAN_NULL,
-                                                            .operation_status = AZ_SPAN_NULL,
+                                                            .operation_id = AZ_SPAN_EMPTY,
+                                                            .operation_status = AZ_SPAN_EMPTY,
                                                             .registration_result = { 0 } };
 
   az_iot_provisioning_client_operation_status operation_status = 0xBAADC0DE;

@@ -88,7 +88,8 @@ static void test_az_iot_hub_client_methods_response_get_publish_topic_EMPTY_requ
       &client, request_id, status, test_buf, sizeof(test_buf), &test_length));
 }
 
-static void test_az_iot_hub_client_methods_response_get_publish_topic_AZ_SPAN_NULL_request_id_fail()
+static void
+test_az_iot_hub_client_methods_response_get_publish_topic_AZ_SPAN_EMPTY_request_id_fail()
 {
   char test_buf[TEST_SPAN_BUFFER_SIZE];
   size_t test_length;
@@ -96,7 +97,7 @@ static void test_az_iot_hub_client_methods_response_get_publish_topic_AZ_SPAN_NU
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
 
-  az_span request_id = AZ_SPAN_NULL;
+  az_span request_id = AZ_SPAN_EMPTY;
   uint16_t status = 200;
 
   ASSERT_PRECONDITION_CHECKED(az_iot_hub_client_methods_response_get_publish_topic(
@@ -126,12 +127,12 @@ static void test_az_iot_hub_client_methods_parse_received_topic_EMPTY_received_t
       az_iot_hub_client_methods_parse_received_topic(&client, received_topic, &out_request));
 }
 
-static void test_az_iot_hub_client_methods_parse_received_topic_AZ_SPAN_NULL_received_topic_fail()
+static void test_az_iot_hub_client_methods_parse_received_topic_AZ_SPAN_EMPTY_received_topic_fail()
 {
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
 
-  az_span received_topic = AZ_SPAN_NULL;
+  az_span received_topic = AZ_SPAN_EMPTY;
 
   az_iot_hub_client_method_request out_request;
 
@@ -425,11 +426,11 @@ int test_az_iot_hub_client_methods()
     cmocka_unit_test(
         test_az_iot_hub_client_methods_response_get_publish_topic_EMPTY_request_id_fail),
     cmocka_unit_test(
-        test_az_iot_hub_client_methods_response_get_publish_topic_AZ_SPAN_NULL_request_id_fail),
+        test_az_iot_hub_client_methods_response_get_publish_topic_AZ_SPAN_EMPTY_request_id_fail),
     cmocka_unit_test(test_az_iot_hub_client_methods_parse_received_topic_NULL_client_fail),
     cmocka_unit_test(test_az_iot_hub_client_methods_parse_received_topic_EMPTY_received_topic_fail),
     cmocka_unit_test(
-        test_az_iot_hub_client_methods_parse_received_topic_AZ_SPAN_NULL_received_topic_fail),
+        test_az_iot_hub_client_methods_parse_received_topic_AZ_SPAN_EMPTY_received_topic_fail),
     cmocka_unit_test(test_az_iot_hub_client_methods_parse_received_topic_NULL_out_request_fail),
 #endif // AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_az_iot_hub_client_methods_response_get_publish_topic_succeed),
