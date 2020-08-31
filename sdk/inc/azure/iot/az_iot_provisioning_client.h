@@ -331,7 +331,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_register_get_publish_topic(
  * @remark The payload of the MQTT publish message should be empty.
  *
  * @param[in] client The #az_iot_provisioning_client to use for this call.
- * @param[in] operation_id The received #az_iot_provisioning_client_register_response response.
+ * @param[in] operation_id The received operation_id from the #az_iot_provisioning_client_register_response response.
  * @param[out] mqtt_topic A buffer with sufficient capacity to hold the MQTT topic filter. If
  *                        successful, contains a null-terminated string with the topic filter that
  *                        needs to be passed to the MQTT client.
