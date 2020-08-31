@@ -4,9 +4,8 @@
 Set-StrictMode -Version 3.0
 $errorActionPreference="stop"
 
-if($PSVersionTable.PSEdition -ne "Core")
-{
- Write-Error "This script requires Powershell Core. Please install Powershell Core at aka.ms/pscore6."
+if ($PSVersionTable.PSEdition -ne "Core") {
+  throw "This script requires Powershell Core. Please install Powershell Core at aka.ms/pscore6."
 }
 
 Write-Warning "Certificates created by this script MUST NOT be used for production."
