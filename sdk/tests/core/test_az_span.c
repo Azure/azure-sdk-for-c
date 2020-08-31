@@ -130,31 +130,31 @@ static void test_az_span_is_content_equal(void** state)
   assert_true(az_span_is_content_equal(AZ_SPAN_FROM_STR(""), az_span_slice_to_end(a, 3)));
 }
 
-#define az_span_atox_return_errors_helper_exclude_double(source) \
-  do \
-  { \
-    uint32_t ui32 = 0; \
-    int32_t i32 = 0; \
-    uint64_t ui64 = 0; \
-    int64_t i64 = 0; \
+#define az_SPAN_ATOX_RETURN_ERRORS_HELPER_EXCLUDE_DOUBLE(source)            \
+  do                                                                        \
+  {                                                                         \
+    uint32_t ui32 = 0;                                                      \
+    int32_t i32 = 0;                                                        \
+    uint64_t ui64 = 0;                                                      \
+    int64_t i64 = 0;                                                        \
     assert_true(az_span_atou32(source, &ui32) == AZ_ERROR_UNEXPECTED_CHAR); \
-    assert_true(az_span_atoi32(source, &i32) == AZ_ERROR_UNEXPECTED_CHAR); \
+    assert_true(az_span_atoi32(source, &i32) == AZ_ERROR_UNEXPECTED_CHAR);  \
     assert_true(az_span_atou64(source, &ui64) == AZ_ERROR_UNEXPECTED_CHAR); \
-    assert_true(az_span_atoi64(source, &i64) == AZ_ERROR_UNEXPECTED_CHAR); \
+    assert_true(az_span_atoi64(source, &i64) == AZ_ERROR_UNEXPECTED_CHAR);  \
   } while (0)
 
-#define az_span_atox_return_errors_helper(source) \
-  do \
-  { \
-    uint32_t ui32 = 0; \
-    int32_t i32 = 0; \
-    uint64_t ui64 = 0; \
-    int64_t i64 = 0; \
-    double decimal = 0; \
-    assert_true(az_span_atou32(source, &ui32) == AZ_ERROR_UNEXPECTED_CHAR); \
-    assert_true(az_span_atoi32(source, &i32) == AZ_ERROR_UNEXPECTED_CHAR); \
-    assert_true(az_span_atou64(source, &ui64) == AZ_ERROR_UNEXPECTED_CHAR); \
-    assert_true(az_span_atoi64(source, &i64) == AZ_ERROR_UNEXPECTED_CHAR); \
+#define AZ_SPAN_ATOX_RETURN_ERRORS_HELPER(source)                            \
+  do                                                                         \
+  {                                                                          \
+    uint32_t ui32 = 0;                                                       \
+    int32_t i32 = 0;                                                         \
+    uint64_t ui64 = 0;                                                       \
+    int64_t i64 = 0;                                                         \
+    double decimal = 0;                                                      \
+    assert_true(az_span_atou32(source, &ui32) == AZ_ERROR_UNEXPECTED_CHAR);  \
+    assert_true(az_span_atoi32(source, &i32) == AZ_ERROR_UNEXPECTED_CHAR);   \
+    assert_true(az_span_atou64(source, &ui64) == AZ_ERROR_UNEXPECTED_CHAR);  \
+    assert_true(az_span_atoi64(source, &i64) == AZ_ERROR_UNEXPECTED_CHAR);   \
     assert_true(az_span_atod(source, &decimal) == AZ_ERROR_UNEXPECTED_CHAR); \
   } while (0)
 
@@ -162,40 +162,40 @@ static void az_span_atox_return_errors(void** state)
 {
   (void)state;
 
-  az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("test"));
-  az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR(" "));
-  az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR(" 1"));
-  az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("-"));
-  az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("+"));
-  az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("--1"));
-  az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("++1"));
-  az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("-+"));
-  az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("+-"));
-  az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("-0+"));
-  az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("0-"));
-  az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("+0-"));
-  az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("1-"));
-  az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("123a"));
-  az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("123,"));
-  az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("123 "));
-  az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("--123"));
-  az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("-+123"));
-  az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("+-123"));
-  az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("  -1-"));
-  az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("- INFINITY"));
-  az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("- 0"));
-  az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("+ 1"));
-  az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("1.-e3"));
-  az_span_atox_return_errors_helper(AZ_SPAN_FROM_STR("1.-e/3"));
-  az_span_atox_return_errors_helper_exclude_double(AZ_SPAN_FROM_STR("1.23"));
-  az_span_atox_return_errors_helper_exclude_double(AZ_SPAN_FROM_STR("-1.23"));
-  az_span_atox_return_errors_helper_exclude_double(AZ_SPAN_FROM_STR("11e2"));
-  az_span_atox_return_errors_helper_exclude_double(AZ_SPAN_FROM_STR("-1.1e+2"));
-  az_span_atox_return_errors_helper_exclude_double(AZ_SPAN_FROM_STR("1.23e3"));
-  az_span_atox_return_errors_helper_exclude_double(AZ_SPAN_FROM_STR("99999999999999999999"));
-  az_span_atox_return_errors_helper_exclude_double(AZ_SPAN_FROM_STR("999999999999999999999"));
-  az_span_atox_return_errors_helper_exclude_double(AZ_SPAN_FROM_STR("18446744073709551616"));
-  az_span_atox_return_errors_helper_exclude_double(AZ_SPAN_FROM_STR("-18446744073709551616"));
+  AZ_SPAN_ATOX_RETURN_ERRORS_HELPER(AZ_SPAN_FROM_STR("test"));
+  AZ_SPAN_ATOX_RETURN_ERRORS_HELPER(AZ_SPAN_FROM_STR(" "));
+  AZ_SPAN_ATOX_RETURN_ERRORS_HELPER(AZ_SPAN_FROM_STR(" 1"));
+  AZ_SPAN_ATOX_RETURN_ERRORS_HELPER(AZ_SPAN_FROM_STR("-"));
+  AZ_SPAN_ATOX_RETURN_ERRORS_HELPER(AZ_SPAN_FROM_STR("+"));
+  AZ_SPAN_ATOX_RETURN_ERRORS_HELPER(AZ_SPAN_FROM_STR("--1"));
+  AZ_SPAN_ATOX_RETURN_ERRORS_HELPER(AZ_SPAN_FROM_STR("++1"));
+  AZ_SPAN_ATOX_RETURN_ERRORS_HELPER(AZ_SPAN_FROM_STR("-+"));
+  AZ_SPAN_ATOX_RETURN_ERRORS_HELPER(AZ_SPAN_FROM_STR("+-"));
+  AZ_SPAN_ATOX_RETURN_ERRORS_HELPER(AZ_SPAN_FROM_STR("-0+"));
+  AZ_SPAN_ATOX_RETURN_ERRORS_HELPER(AZ_SPAN_FROM_STR("0-"));
+  AZ_SPAN_ATOX_RETURN_ERRORS_HELPER(AZ_SPAN_FROM_STR("+0-"));
+  AZ_SPAN_ATOX_RETURN_ERRORS_HELPER(AZ_SPAN_FROM_STR("1-"));
+  AZ_SPAN_ATOX_RETURN_ERRORS_HELPER(AZ_SPAN_FROM_STR("123a"));
+  AZ_SPAN_ATOX_RETURN_ERRORS_HELPER(AZ_SPAN_FROM_STR("123,"));
+  AZ_SPAN_ATOX_RETURN_ERRORS_HELPER(AZ_SPAN_FROM_STR("123 "));
+  AZ_SPAN_ATOX_RETURN_ERRORS_HELPER(AZ_SPAN_FROM_STR("--123"));
+  AZ_SPAN_ATOX_RETURN_ERRORS_HELPER(AZ_SPAN_FROM_STR("-+123"));
+  AZ_SPAN_ATOX_RETURN_ERRORS_HELPER(AZ_SPAN_FROM_STR("+-123"));
+  AZ_SPAN_ATOX_RETURN_ERRORS_HELPER(AZ_SPAN_FROM_STR("  -1-"));
+  AZ_SPAN_ATOX_RETURN_ERRORS_HELPER(AZ_SPAN_FROM_STR("- INFINITY"));
+  AZ_SPAN_ATOX_RETURN_ERRORS_HELPER(AZ_SPAN_FROM_STR("- 0"));
+  AZ_SPAN_ATOX_RETURN_ERRORS_HELPER(AZ_SPAN_FROM_STR("+ 1"));
+  AZ_SPAN_ATOX_RETURN_ERRORS_HELPER(AZ_SPAN_FROM_STR("1.-e3"));
+  AZ_SPAN_ATOX_RETURN_ERRORS_HELPER(AZ_SPAN_FROM_STR("1.-e/3"));
+  az_SPAN_ATOX_RETURN_ERRORS_HELPER_EXCLUDE_DOUBLE(AZ_SPAN_FROM_STR("1.23"));
+  az_SPAN_ATOX_RETURN_ERRORS_HELPER_EXCLUDE_DOUBLE(AZ_SPAN_FROM_STR("-1.23"));
+  az_SPAN_ATOX_RETURN_ERRORS_HELPER_EXCLUDE_DOUBLE(AZ_SPAN_FROM_STR("11e2"));
+  az_SPAN_ATOX_RETURN_ERRORS_HELPER_EXCLUDE_DOUBLE(AZ_SPAN_FROM_STR("-1.1e+2"));
+  az_SPAN_ATOX_RETURN_ERRORS_HELPER_EXCLUDE_DOUBLE(AZ_SPAN_FROM_STR("1.23e3"));
+  az_SPAN_ATOX_RETURN_ERRORS_HELPER_EXCLUDE_DOUBLE(AZ_SPAN_FROM_STR("99999999999999999999"));
+  az_SPAN_ATOX_RETURN_ERRORS_HELPER_EXCLUDE_DOUBLE(AZ_SPAN_FROM_STR("999999999999999999999"));
+  az_SPAN_ATOX_RETURN_ERRORS_HELPER_EXCLUDE_DOUBLE(AZ_SPAN_FROM_STR("18446744073709551616"));
+  az_SPAN_ATOX_RETURN_ERRORS_HELPER_EXCLUDE_DOUBLE(AZ_SPAN_FROM_STR("-18446744073709551616"));
 }
 
 static void az_span_atou32_test(void** state)
@@ -352,11 +352,11 @@ static void az_span_atoi64_test(void** state)
       az_span_atoi64(AZ_SPAN_FROM_STR("-9223372036854775809"), &value), AZ_ERROR_UNEXPECTED_CHAR);
 }
 
-#define test_az_isfinite_helper(source, expected) \
-  do \
-  { \
-    double decimal = 0.0; \
-    memcpy(&decimal, &source, sizeof(decimal)); \
+#define TEST_AZ_ISFINITE_HELPER(source, expected)      \
+  do                                                   \
+  {                                                    \
+    double decimal = 0.0;                              \
+    memcpy(&decimal, &source, sizeof(decimal));        \
     assert_int_equal(_az_isfinite(decimal), expected); \
   } while (0)
 
@@ -366,41 +366,41 @@ static void test_az_isfinite(void** state)
 
   uint64_t source = 0;
 
-  test_az_isfinite_helper(source, true);
+  TEST_AZ_ISFINITE_HELPER(source, true);
   source = 1;
-  test_az_isfinite_helper(source, true);
+  TEST_AZ_ISFINITE_HELPER(source, true);
   source = 0x6FFFFFFFFFFFFFFF;
-  test_az_isfinite_helper(source, true);
+  TEST_AZ_ISFINITE_HELPER(source, true);
   source = 0x7FEFFFFFFFFFFFFF;
-  test_az_isfinite_helper(source, true);
+  TEST_AZ_ISFINITE_HELPER(source, true);
 
   source = 0x7FF0000000000000; // +inf
-  test_az_isfinite_helper(source, false);
+  TEST_AZ_ISFINITE_HELPER(source, false);
   source = 0x7FF0000000000001; // nan
-  test_az_isfinite_helper(source, false);
+  TEST_AZ_ISFINITE_HELPER(source, false);
   source = 0x7FF7FFFFFFFFFFFF; // nan
-  test_az_isfinite_helper(source, false);
+  TEST_AZ_ISFINITE_HELPER(source, false);
   source = 0x7FF8000000000000; // nan
-  test_az_isfinite_helper(source, false);
+  TEST_AZ_ISFINITE_HELPER(source, false);
   source = 0x7FFFFFFFFFFFFFFF; // nan
-  test_az_isfinite_helper(source, false);
+  TEST_AZ_ISFINITE_HELPER(source, false);
 
   source = 0x8000000000000000;
-  test_az_isfinite_helper(source, true);
+  TEST_AZ_ISFINITE_HELPER(source, true);
   source = 0xFFEFFFFFFFFFFFFF;
-  test_az_isfinite_helper(source, true);
+  TEST_AZ_ISFINITE_HELPER(source, true);
 
   source = 0xFFF0000000000000; // -inf
-  test_az_isfinite_helper(source, false);
+  TEST_AZ_ISFINITE_HELPER(source, false);
   source = 0xFFF7FFFFFFFFFFFF; // nan
-  test_az_isfinite_helper(source, false);
+  TEST_AZ_ISFINITE_HELPER(source, false);
   source = 0xFFF8000000000000; // nan
-  test_az_isfinite_helper(source, false);
+  TEST_AZ_ISFINITE_HELPER(source, false);
   source = 0xFFFFFFFFFFFFFFFF; // nan
-  test_az_isfinite_helper(source, false);
+  TEST_AZ_ISFINITE_HELPER(source, false);
 
   source = 0xFFFFFFFFFFFFFFFF + 1;
-  test_az_isfinite_helper(source, true);
+  TEST_AZ_ISFINITE_HELPER(source, true);
 }
 
 // Disable warning for float comparisons, for this particular test
@@ -1187,19 +1187,19 @@ static void az_span_u32toa_overflow_fails(void** state)
   assert_true(az_span_u32toa(buffer, v, &out_span) == AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
 }
 
-#define az_span_dtoa_succeeds_helper(v, fractional_digits, expected) \
-  do \
-  { \
-    az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer); \
-    az_span out_span = AZ_SPAN_NULL; \
+#define AZ_SPAN_DTOA_SUCCEEDS_HELPER(v, fractional_digits, expected)                         \
+  do                                                                                         \
+  {                                                                                          \
+    az_span buffer = AZ_SPAN_FROM_BUFFER(raw_buffer);                                        \
+    az_span out_span = AZ_SPAN_NULL;                                                         \
     assert_true(az_result_succeeded(az_span_dtoa(buffer, v, fractional_digits, &out_span))); \
-    az_span output = az_span_slice(buffer, 0, _az_span_diff(out_span, buffer)); \
-    assert_memory_equal( \
-        az_span_ptr(output), az_span_ptr(expected), (size_t)az_span_size(expected)); \
+    az_span output = az_span_slice(buffer, 0, _az_span_diff(out_span, buffer));              \
+    assert_memory_equal(                                                                     \
+        az_span_ptr(output), az_span_ptr(expected), (size_t)az_span_size(expected));         \
     assert_true(az_result_succeeded(az_span_dtoa(buffer, v, fractional_digits, &out_span))); \
-    double round_trip = 0; \
-    assert_true(az_result_succeeded(az_span_atod(output, &round_trip))); \
-    assert_true(fabs(v - round_trip) < 0.01); \
+    double round_trip = 0;                                                                   \
+    assert_true(az_result_succeeded(az_span_atod(output, &round_trip)));                     \
+    assert_true(fabs(v - round_trip) < 0.01);                                                \
   } while (0)
 
 static void az_span_dtoa_succeeds(void** state)
@@ -1210,137 +1210,137 @@ static void az_span_dtoa_succeeds(void** state)
   // [-][0-9]{16}.[0-9]{15}, i.e. 1+16+1+15
   uint8_t raw_buffer[33] = { 0 };
 
-  az_span_dtoa_succeeds_helper(0, 15, AZ_SPAN_FROM_STR("0"));
-  az_span_dtoa_succeeds_helper(1., 15, AZ_SPAN_FROM_STR("1"));
-  az_span_dtoa_succeeds_helper(1.e3, 15, AZ_SPAN_FROM_STR("1000"));
-  az_span_dtoa_succeeds_helper(-0, 15, AZ_SPAN_FROM_STR("0"));
-  az_span_dtoa_succeeds_helper(0.0, 15, AZ_SPAN_FROM_STR("0"));
-  az_span_dtoa_succeeds_helper(1, 15, AZ_SPAN_FROM_STR("1"));
-  az_span_dtoa_succeeds_helper(-1, 15, AZ_SPAN_FROM_STR("-1"));
-  az_span_dtoa_succeeds_helper(1.0, 15, AZ_SPAN_FROM_STR("1"));
-  az_span_dtoa_succeeds_helper(-1.0, 15, AZ_SPAN_FROM_STR("-1"));
-  az_span_dtoa_succeeds_helper(12345, 15, AZ_SPAN_FROM_STR("12345"));
-  az_span_dtoa_succeeds_helper(-12345, 15, AZ_SPAN_FROM_STR("-12345"));
-  az_span_dtoa_succeeds_helper(123.123, 15, AZ_SPAN_FROM_STR("123.123000000000004"));
-  az_span_dtoa_succeeds_helper(123.1230, 15, AZ_SPAN_FROM_STR("123.123000000000004"));
-  az_span_dtoa_succeeds_helper(123.0100, 15, AZ_SPAN_FROM_STR("123.010000000000005"));
-  az_span_dtoa_succeeds_helper(123.001, 15, AZ_SPAN_FROM_STR("123.001000000000004"));
-  az_span_dtoa_succeeds_helper(0.000000000000001, 15, AZ_SPAN_FROM_STR("0.000000000000001"));
-  az_span_dtoa_succeeds_helper(1.0000000001, 15, AZ_SPAN_FROM_STR("1.0000000001"));
-  az_span_dtoa_succeeds_helper(-1.0000000001, 15, AZ_SPAN_FROM_STR("-1.0000000001"));
-  az_span_dtoa_succeeds_helper(100.001, 15, AZ_SPAN_FROM_STR("100.001000000000004"));
-  az_span_dtoa_succeeds_helper(100.00100, 15, AZ_SPAN_FROM_STR("100.001000000000004"));
-  az_span_dtoa_succeeds_helper(00100.001, 15, AZ_SPAN_FROM_STR("100.001000000000004"));
-  az_span_dtoa_succeeds_helper(00100.00100, 15, AZ_SPAN_FROM_STR("100.001000000000004"));
-  az_span_dtoa_succeeds_helper(0.001, 15, AZ_SPAN_FROM_STR("0.001"));
-  az_span_dtoa_succeeds_helper(0.0012, 15, AZ_SPAN_FROM_STR("0.001199999999999"));
-  az_span_dtoa_succeeds_helper(1.2e4, 15, AZ_SPAN_FROM_STR("12000"));
-  az_span_dtoa_succeeds_helper(1.2e-4, 15, AZ_SPAN_FROM_STR("0.00012"));
-  az_span_dtoa_succeeds_helper(1.2e+4, 15, AZ_SPAN_FROM_STR("12000"));
-  az_span_dtoa_succeeds_helper(-1.2e4, 15, AZ_SPAN_FROM_STR("-12000"));
-  az_span_dtoa_succeeds_helper(-1.2e-4, 15, AZ_SPAN_FROM_STR("-0.00012"));
-  az_span_dtoa_succeeds_helper(0.0001, 15, AZ_SPAN_FROM_STR("0.0001"));
-  az_span_dtoa_succeeds_helper(0.00102, 15, AZ_SPAN_FROM_STR("0.00102"));
-  az_span_dtoa_succeeds_helper(.34567, 15, AZ_SPAN_FROM_STR("0.34567"));
-  az_span_dtoa_succeeds_helper(+.34567, 15, AZ_SPAN_FROM_STR("0.34567"));
-  az_span_dtoa_succeeds_helper(-.34567, 15, AZ_SPAN_FROM_STR("-0.34567"));
-  az_span_dtoa_succeeds_helper(9876.54321, 15, AZ_SPAN_FROM_STR("9876.543209999999817"));
-  az_span_dtoa_succeeds_helper(-9876.54321, 15, AZ_SPAN_FROM_STR("-9876.543209999999817"));
-  az_span_dtoa_succeeds_helper(987654.321, 15, AZ_SPAN_FROM_STR("987654.320999999996274"));
-  az_span_dtoa_succeeds_helper(-987654.321, 15, AZ_SPAN_FROM_STR("-987654.320999999996274"));
-  az_span_dtoa_succeeds_helper(987654.0000321, 15, AZ_SPAN_FROM_STR("987654.000032100011594"));
-  az_span_dtoa_succeeds_helper(2147483647, 15, AZ_SPAN_FROM_STR("2147483647"));
-  az_span_dtoa_succeeds_helper(2 * (double)1073741824, 15, AZ_SPAN_FROM_STR("2147483648"));
-  az_span_dtoa_succeeds_helper(-2147483647 - 1, 15, AZ_SPAN_FROM_STR("-2147483648"));
-  az_span_dtoa_succeeds_helper(4503599627370496, 15, AZ_SPAN_FROM_STR("4503599627370496"));
-  az_span_dtoa_succeeds_helper(9007199254740991, 15, AZ_SPAN_FROM_STR("9007199254740991"));
-  az_span_dtoa_succeeds_helper(
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(0, 15, AZ_SPAN_FROM_STR("0"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(1., 15, AZ_SPAN_FROM_STR("1"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(1.e3, 15, AZ_SPAN_FROM_STR("1000"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(-0, 15, AZ_SPAN_FROM_STR("0"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(0.0, 15, AZ_SPAN_FROM_STR("0"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(1, 15, AZ_SPAN_FROM_STR("1"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(-1, 15, AZ_SPAN_FROM_STR("-1"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(1.0, 15, AZ_SPAN_FROM_STR("1"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(-1.0, 15, AZ_SPAN_FROM_STR("-1"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(12345, 15, AZ_SPAN_FROM_STR("12345"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(-12345, 15, AZ_SPAN_FROM_STR("-12345"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(123.123, 15, AZ_SPAN_FROM_STR("123.123000000000004"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(123.1230, 15, AZ_SPAN_FROM_STR("123.123000000000004"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(123.0100, 15, AZ_SPAN_FROM_STR("123.010000000000005"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(123.001, 15, AZ_SPAN_FROM_STR("123.001000000000004"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(0.000000000000001, 15, AZ_SPAN_FROM_STR("0.000000000000001"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(1.0000000001, 15, AZ_SPAN_FROM_STR("1.0000000001"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(-1.0000000001, 15, AZ_SPAN_FROM_STR("-1.0000000001"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(100.001, 15, AZ_SPAN_FROM_STR("100.001000000000004"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(100.00100, 15, AZ_SPAN_FROM_STR("100.001000000000004"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(00100.001, 15, AZ_SPAN_FROM_STR("100.001000000000004"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(00100.00100, 15, AZ_SPAN_FROM_STR("100.001000000000004"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(0.001, 15, AZ_SPAN_FROM_STR("0.001"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(0.0012, 15, AZ_SPAN_FROM_STR("0.001199999999999"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(1.2e4, 15, AZ_SPAN_FROM_STR("12000"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(1.2e-4, 15, AZ_SPAN_FROM_STR("0.00012"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(1.2e+4, 15, AZ_SPAN_FROM_STR("12000"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(-1.2e4, 15, AZ_SPAN_FROM_STR("-12000"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(-1.2e-4, 15, AZ_SPAN_FROM_STR("-0.00012"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(0.0001, 15, AZ_SPAN_FROM_STR("0.0001"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(0.00102, 15, AZ_SPAN_FROM_STR("0.00102"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(.34567, 15, AZ_SPAN_FROM_STR("0.34567"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(+.34567, 15, AZ_SPAN_FROM_STR("0.34567"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(-.34567, 15, AZ_SPAN_FROM_STR("-0.34567"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(9876.54321, 15, AZ_SPAN_FROM_STR("9876.543209999999817"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(-9876.54321, 15, AZ_SPAN_FROM_STR("-9876.543209999999817"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(987654.321, 15, AZ_SPAN_FROM_STR("987654.320999999996274"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(-987654.321, 15, AZ_SPAN_FROM_STR("-987654.320999999996274"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(987654.0000321, 15, AZ_SPAN_FROM_STR("987654.000032100011594"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(2147483647, 15, AZ_SPAN_FROM_STR("2147483647"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(2 * (double)1073741824, 15, AZ_SPAN_FROM_STR("2147483648"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(-2147483647 - 1, 15, AZ_SPAN_FROM_STR("-2147483648"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(4503599627370496, 15, AZ_SPAN_FROM_STR("4503599627370496"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(9007199254740991, 15, AZ_SPAN_FROM_STR("9007199254740991"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(
       (double)4503599627370496.2, 15, AZ_SPAN_FROM_STR("4503599627370496"));
-  az_span_dtoa_succeeds_helper(1e15, 15, AZ_SPAN_FROM_STR("1000000000000000"));
-  az_span_dtoa_succeeds_helper(-1e15, 15, AZ_SPAN_FROM_STR("-1000000000000000"));
-  az_span_dtoa_succeeds_helper(1.8e10, 15, AZ_SPAN_FROM_STR("18000000000"));
-  az_span_dtoa_succeeds_helper(-1.8e10, 15, AZ_SPAN_FROM_STR("-18000000000"));
-  az_span_dtoa_succeeds_helper(1e-15, 15, AZ_SPAN_FROM_STR("0.000000000000001"));
-  az_span_dtoa_succeeds_helper(1e-10, 15, AZ_SPAN_FROM_STR("0.0000000001"));
-  az_span_dtoa_succeeds_helper(1e-5, 15, AZ_SPAN_FROM_STR("0.00001"));
-  az_span_dtoa_succeeds_helper(0.1234567890123456, 15, AZ_SPAN_FROM_STR("0.123456789012345"));
-  az_span_dtoa_succeeds_helper(
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(1e15, 15, AZ_SPAN_FROM_STR("1000000000000000"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(-1e15, 15, AZ_SPAN_FROM_STR("-1000000000000000"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(1.8e10, 15, AZ_SPAN_FROM_STR("18000000000"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(-1.8e10, 15, AZ_SPAN_FROM_STR("-18000000000"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(1e-15, 15, AZ_SPAN_FROM_STR("0.000000000000001"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(1e-10, 15, AZ_SPAN_FROM_STR("0.0000000001"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(1e-5, 15, AZ_SPAN_FROM_STR("0.00001"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(0.1234567890123456, 15, AZ_SPAN_FROM_STR("0.123456789012345"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(
       123456789012345.123456789012340000, 15, AZ_SPAN_FROM_STR("123456789012345.125"));
-  az_span_dtoa_succeeds_helper(
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(
       1000000000000.123456789012340000, 15, AZ_SPAN_FROM_STR("1000000000000.1234130859375"));
-  az_span_dtoa_succeeds_helper(
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(
       123456789012345.1234567890123400001, 15, AZ_SPAN_FROM_STR("123456789012345.125"));
-  az_span_dtoa_succeeds_helper(
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(
       1000000000000.1234567890123400001, 15, AZ_SPAN_FROM_STR("1000000000000.1234130859375"));
-  az_span_dtoa_succeeds_helper(12345.123e-15, 15, AZ_SPAN_FROM_STR("0.000000000012345"));
-  az_span_dtoa_succeeds_helper(
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(12345.123e-15, 15, AZ_SPAN_FROM_STR("0.000000000012345"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(
       12345.12300000010e5, 15, AZ_SPAN_FROM_STR("1234512300.000010013580322"));
-  az_span_dtoa_succeeds_helper(1e-300, 15, AZ_SPAN_FROM_STR("0"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(1e-300, 15, AZ_SPAN_FROM_STR("0"));
 
-  az_span_dtoa_succeeds_helper(0, 2, AZ_SPAN_FROM_STR("0"));
-  az_span_dtoa_succeeds_helper(1., 2, AZ_SPAN_FROM_STR("1"));
-  az_span_dtoa_succeeds_helper(1.e3, 2, AZ_SPAN_FROM_STR("1000"));
-  az_span_dtoa_succeeds_helper(-0, 2, AZ_SPAN_FROM_STR("0"));
-  az_span_dtoa_succeeds_helper(0.0, 2, AZ_SPAN_FROM_STR("0"));
-  az_span_dtoa_succeeds_helper(1, 2, AZ_SPAN_FROM_STR("1"));
-  az_span_dtoa_succeeds_helper(-1, 2, AZ_SPAN_FROM_STR("-1"));
-  az_span_dtoa_succeeds_helper(1.0, 2, AZ_SPAN_FROM_STR("1"));
-  az_span_dtoa_succeeds_helper(-1.0, 2, AZ_SPAN_FROM_STR("-1"));
-  az_span_dtoa_succeeds_helper(12345, 2, AZ_SPAN_FROM_STR("12345"));
-  az_span_dtoa_succeeds_helper(-12345, 2, AZ_SPAN_FROM_STR("-12345"));
-  az_span_dtoa_succeeds_helper(123.123, 2, AZ_SPAN_FROM_STR("123.12"));
-  az_span_dtoa_succeeds_helper(123.1230, 2, AZ_SPAN_FROM_STR("123.12"));
-  az_span_dtoa_succeeds_helper(123.0100, 2, AZ_SPAN_FROM_STR("123.01"));
-  az_span_dtoa_succeeds_helper(123.001, 2, AZ_SPAN_FROM_STR("123"));
-  az_span_dtoa_succeeds_helper(0.000000000000001, 2, AZ_SPAN_FROM_STR("0"));
-  az_span_dtoa_succeeds_helper(1.0000000001, 2, AZ_SPAN_FROM_STR("1"));
-  az_span_dtoa_succeeds_helper(-1.0000000001, 2, AZ_SPAN_FROM_STR("-1"));
-  az_span_dtoa_succeeds_helper(100.001, 2, AZ_SPAN_FROM_STR("100"));
-  az_span_dtoa_succeeds_helper(100.00100, 2, AZ_SPAN_FROM_STR("100"));
-  az_span_dtoa_succeeds_helper(00100.001, 2, AZ_SPAN_FROM_STR("100"));
-  az_span_dtoa_succeeds_helper(00100.00100, 2, AZ_SPAN_FROM_STR("100"));
-  az_span_dtoa_succeeds_helper(0.001, 2, AZ_SPAN_FROM_STR("0"));
-  az_span_dtoa_succeeds_helper(0.0012, 2, AZ_SPAN_FROM_STR("0"));
-  az_span_dtoa_succeeds_helper(1.2e4, 2, AZ_SPAN_FROM_STR("12000"));
-  az_span_dtoa_succeeds_helper(1.2e-4, 2, AZ_SPAN_FROM_STR("0"));
-  az_span_dtoa_succeeds_helper(1.2e+4, 2, AZ_SPAN_FROM_STR("12000"));
-  az_span_dtoa_succeeds_helper(-1.2e4, 2, AZ_SPAN_FROM_STR("-12000"));
-  az_span_dtoa_succeeds_helper(-1.2e-4, 2, AZ_SPAN_FROM_STR("-0"));
-  az_span_dtoa_succeeds_helper(0.0001, 2, AZ_SPAN_FROM_STR("0"));
-  az_span_dtoa_succeeds_helper(0.00102, 2, AZ_SPAN_FROM_STR("0"));
-  az_span_dtoa_succeeds_helper(.34567, 2, AZ_SPAN_FROM_STR("0.34"));
-  az_span_dtoa_succeeds_helper(+.34567, 2, AZ_SPAN_FROM_STR("0.34"));
-  az_span_dtoa_succeeds_helper(-.34567, 2, AZ_SPAN_FROM_STR("-0.34"));
-  az_span_dtoa_succeeds_helper(9876.54321, 2, AZ_SPAN_FROM_STR("9876.54"));
-  az_span_dtoa_succeeds_helper(-9876.54321, 2, AZ_SPAN_FROM_STR("-9876.54"));
-  az_span_dtoa_succeeds_helper(987654.321, 2, AZ_SPAN_FROM_STR("987654.32"));
-  az_span_dtoa_succeeds_helper(-987654.321, 2, AZ_SPAN_FROM_STR("-987654.32"));
-  az_span_dtoa_succeeds_helper(987654.0000321, 2, AZ_SPAN_FROM_STR("987654"));
-  az_span_dtoa_succeeds_helper(2147483647, 2, AZ_SPAN_FROM_STR("2147483647"));
-  az_span_dtoa_succeeds_helper(2 * (double)1073741824, 2, AZ_SPAN_FROM_STR("2147483648"));
-  az_span_dtoa_succeeds_helper(-2147483647 - 1, 2, AZ_SPAN_FROM_STR("-2147483648"));
-  az_span_dtoa_succeeds_helper(4503599627370496, 2, AZ_SPAN_FROM_STR("4503599627370496"));
-  az_span_dtoa_succeeds_helper(9007199254740991, 2, AZ_SPAN_FROM_STR("9007199254740991"));
-  az_span_dtoa_succeeds_helper((double)4503599627370496.2, 2, AZ_SPAN_FROM_STR("4503599627370496"));
-  az_span_dtoa_succeeds_helper(1e15, 2, AZ_SPAN_FROM_STR("1000000000000000"));
-  az_span_dtoa_succeeds_helper(-1e15, 2, AZ_SPAN_FROM_STR("-1000000000000000"));
-  az_span_dtoa_succeeds_helper(1.8e10, 2, AZ_SPAN_FROM_STR("18000000000"));
-  az_span_dtoa_succeeds_helper(-1.8e10, 2, AZ_SPAN_FROM_STR("-18000000000"));
-  az_span_dtoa_succeeds_helper(1e-15, 2, AZ_SPAN_FROM_STR("0"));
-  az_span_dtoa_succeeds_helper(1e-10, 2, AZ_SPAN_FROM_STR("0"));
-  az_span_dtoa_succeeds_helper(1e-5, 2, AZ_SPAN_FROM_STR("0"));
-  az_span_dtoa_succeeds_helper(0.1234567890123456, 2, AZ_SPAN_FROM_STR("0.12"));
-  az_span_dtoa_succeeds_helper(
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(0, 2, AZ_SPAN_FROM_STR("0"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(1., 2, AZ_SPAN_FROM_STR("1"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(1.e3, 2, AZ_SPAN_FROM_STR("1000"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(-0, 2, AZ_SPAN_FROM_STR("0"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(0.0, 2, AZ_SPAN_FROM_STR("0"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(1, 2, AZ_SPAN_FROM_STR("1"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(-1, 2, AZ_SPAN_FROM_STR("-1"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(1.0, 2, AZ_SPAN_FROM_STR("1"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(-1.0, 2, AZ_SPAN_FROM_STR("-1"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(12345, 2, AZ_SPAN_FROM_STR("12345"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(-12345, 2, AZ_SPAN_FROM_STR("-12345"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(123.123, 2, AZ_SPAN_FROM_STR("123.12"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(123.1230, 2, AZ_SPAN_FROM_STR("123.12"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(123.0100, 2, AZ_SPAN_FROM_STR("123.01"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(123.001, 2, AZ_SPAN_FROM_STR("123"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(0.000000000000001, 2, AZ_SPAN_FROM_STR("0"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(1.0000000001, 2, AZ_SPAN_FROM_STR("1"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(-1.0000000001, 2, AZ_SPAN_FROM_STR("-1"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(100.001, 2, AZ_SPAN_FROM_STR("100"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(100.00100, 2, AZ_SPAN_FROM_STR("100"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(00100.001, 2, AZ_SPAN_FROM_STR("100"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(00100.00100, 2, AZ_SPAN_FROM_STR("100"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(0.001, 2, AZ_SPAN_FROM_STR("0"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(0.0012, 2, AZ_SPAN_FROM_STR("0"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(1.2e4, 2, AZ_SPAN_FROM_STR("12000"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(1.2e-4, 2, AZ_SPAN_FROM_STR("0"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(1.2e+4, 2, AZ_SPAN_FROM_STR("12000"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(-1.2e4, 2, AZ_SPAN_FROM_STR("-12000"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(-1.2e-4, 2, AZ_SPAN_FROM_STR("-0"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(0.0001, 2, AZ_SPAN_FROM_STR("0"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(0.00102, 2, AZ_SPAN_FROM_STR("0"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(.34567, 2, AZ_SPAN_FROM_STR("0.34"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(+.34567, 2, AZ_SPAN_FROM_STR("0.34"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(-.34567, 2, AZ_SPAN_FROM_STR("-0.34"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(9876.54321, 2, AZ_SPAN_FROM_STR("9876.54"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(-9876.54321, 2, AZ_SPAN_FROM_STR("-9876.54"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(987654.321, 2, AZ_SPAN_FROM_STR("987654.32"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(-987654.321, 2, AZ_SPAN_FROM_STR("-987654.32"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(987654.0000321, 2, AZ_SPAN_FROM_STR("987654"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(2147483647, 2, AZ_SPAN_FROM_STR("2147483647"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(2 * (double)1073741824, 2, AZ_SPAN_FROM_STR("2147483648"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(-2147483647 - 1, 2, AZ_SPAN_FROM_STR("-2147483648"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(4503599627370496, 2, AZ_SPAN_FROM_STR("4503599627370496"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(9007199254740991, 2, AZ_SPAN_FROM_STR("9007199254740991"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER((double)4503599627370496.2, 2, AZ_SPAN_FROM_STR("4503599627370496"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(1e15, 2, AZ_SPAN_FROM_STR("1000000000000000"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(-1e15, 2, AZ_SPAN_FROM_STR("-1000000000000000"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(1.8e10, 2, AZ_SPAN_FROM_STR("18000000000"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(-1.8e10, 2, AZ_SPAN_FROM_STR("-18000000000"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(1e-15, 2, AZ_SPAN_FROM_STR("0"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(1e-10, 2, AZ_SPAN_FROM_STR("0"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(1e-5, 2, AZ_SPAN_FROM_STR("0"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(0.1234567890123456, 2, AZ_SPAN_FROM_STR("0.12"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(
       123456789012345.123456789012340000, 2, AZ_SPAN_FROM_STR("123456789012345.12"));
-  az_span_dtoa_succeeds_helper(
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(
       1000000000000.123456789012340000, 2, AZ_SPAN_FROM_STR("1000000000000.12"));
-  az_span_dtoa_succeeds_helper(
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(
       123456789012345.1234567890123400001, 2, AZ_SPAN_FROM_STR("123456789012345.12"));
-  az_span_dtoa_succeeds_helper(
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(
       1000000000000.1234567890123400001, 2, AZ_SPAN_FROM_STR("1000000000000.12"));
-  az_span_dtoa_succeeds_helper(12345.123e-15, 2, AZ_SPAN_FROM_STR("0"));
-  az_span_dtoa_succeeds_helper(12345.12300000010e5, 2, AZ_SPAN_FROM_STR("1234512300"));
-  az_span_dtoa_succeeds_helper(1e-300, 2, AZ_SPAN_FROM_STR("0"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(12345.123e-15, 2, AZ_SPAN_FROM_STR("0"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(12345.12300000010e5, 2, AZ_SPAN_FROM_STR("1234512300"));
+  AZ_SPAN_DTOA_SUCCEEDS_HELPER(1e-300, 2, AZ_SPAN_FROM_STR("0"));
 }
 
 static void az_span_dtoa_overflow_fails(void** state)
