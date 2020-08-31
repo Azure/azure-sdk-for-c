@@ -69,7 +69,7 @@ AZ_NODISCARD az_iot_provisioning_client_options az_iot_provisioning_client_optio
  * @brief Initializes an Azure IoT Provisioning Client.
  *
  * @param[in] client The #az_iot_provisioning_client to use for this call.
- * @param[in] global_device_hostname The global device endpoint.
+ * @param[in] global_device_hostname The device provisioning services global host name.
  * @param[in] id_scope The ID Scope.
  * @param[in] registration_id The Registration ID. This must match the client certificate name (CN
  *                            part of the certificate subject).
