@@ -10,6 +10,7 @@
 #include <azure/core/az_precondition.h>
 #include <azure/core/internal/az_http_internal.h>
 #include <azure/core/internal/az_precondition_internal.h>
+#include <azure/core/internal/az_result_internal.h>
 #include <azure/core/internal/az_span_internal.h>
 
 #include <assert.h>
@@ -83,7 +84,7 @@ AZ_NODISCARD az_result az_http_request_set_query_parameter(
   int32_t required_length = 2 + az_span_size(name)
       + (is_value_url_encoded ? az_span_size(value) : _az_span_url_encode_calc_length(value));
 
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(url_remainder, required_length);
+  _az_RETURN_IF_NOT_ENOUGH_SIZE(url_remainder, required_length);
 
   // Append either '?' or '&'
   uint8_t separator = '&';
@@ -109,7 +110,7 @@ AZ_NODISCARD az_result az_http_request_set_query_parameter(
   else
   {
     int32_t encoding_size = 0;
-    AZ_RETURN_IF_FAILED(_az_span_url_encode(url_remainder, value, &encoding_size));
+    _az_RETURN_IF_FAILED(_az_span_url_encode(url_remainder, value, &encoding_size));
   }
 
   ref_request->_internal.url_length += required_length;
@@ -134,7 +135,7 @@ az_http_request_append_header(az_http_request* ref_request, az_span key, az_span
   az_span headers = ref_request->_internal.headers;
   az_pair header_to_append = az_pair_init(key, value);
 
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(headers, (int32_t)sizeof header_to_append);
+  _az_RETURN_IF_NOT_ENOUGH_SIZE(headers, (int32_t)sizeof header_to_append);
 
   az_span_copy(
       az_span_slice_to_end(

@@ -19,6 +19,7 @@
 - `az_iot_retry_calc_delay()` renamed to `az_iot_calculate_retry_delay()`.
 - `az_iot_hub_client_sas_get_password()` parameter `token_expiration_epoch_time` moved to second parameter.
 - `az_iot_provisioning_client_init()` parameter `global_device_endpoint` renamed to `global_device_hostname`.
+- Renamed the macro `AZ_SPAN_NULL` to `AZ_SPAN_EMPTY`.
 
 ### Bug Fixes
 

@@ -177,7 +177,7 @@ static int generateSasToken(char* sas_token, size_t size)
           &client,
           expiration,
           b64enc_hmacsha256_signature_span,
-          AZ_SPAN_NULL,
+          AZ_SPAN_EMPTY,
           sas_token,
           size,
           NULL)))

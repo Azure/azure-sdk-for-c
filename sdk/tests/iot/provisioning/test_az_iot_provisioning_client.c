@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 #include "test_az_iot_provisioning_client.h"
-#include <azure/iot/az_iot_provisioning_client.h>
-#include <azure/core/az_span.h>
 #include <az_test_span.h>
+#include <azure/core/az_span.h>
+#include <azure/iot/az_iot_provisioning_client.h>
 
 #include <setjmp.h>
 #include <stdarg.h>
@@ -28,7 +28,7 @@ static const az_span test_global_device_hostname
 static void test_az_iot_provisioning_client_options_default_succeed()
 {
   az_iot_provisioning_client_options options = az_iot_provisioning_client_options_default();
-  assert_true(az_span_is_content_equal(options.user_agent, AZ_SPAN_NULL));
+  assert_true(az_span_is_content_equal(options.user_agent, AZ_SPAN_EMPTY));
 }
 
 static void test_az_iot_provisioning_client_default_options_get_connect_info_succeed()
@@ -58,7 +58,7 @@ static void test_az_iot_provisioning_client_default_options_get_connect_info_suc
   assert_int_equal(strlen(TEST_REGISTRATION_ID), client_id_len);
 
   char expected_username[] = TEST_ID_SCOPE "/registrations/" TEST_REGISTRATION_ID
-                                          "/api-version=" AZ_IOT_PROVISIONING_SERVICE_VERSION;
+                                           "/api-version=" AZ_IOT_PROVISIONING_SERVICE_VERSION;
 
   char user_name[sizeof(expected_username) + 1];
   memset(user_name, 0xCC, sizeof(user_name));

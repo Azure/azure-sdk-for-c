@@ -25,10 +25,10 @@ Our SDK passes `az_span` instances to functions to ensure that a buffer’s addr
 
 Since many of our SDK functions require `az_span` parameters, customers must know how to create `az_span` instances so that you can call functions in our SDK. Here are some examples.
 
-Create an empty (or NULL) `az_span`:
+Create an empty `az_span`:
 
 ```C
-az_span span_null = AZ_SPAN_NULL; // size = 0
+az_span empty_span = AZ_SPAN_EMPTY; // size = 0
 ```
 
 Create an `az_span` expression from a byte buffer:

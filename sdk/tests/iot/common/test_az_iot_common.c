@@ -73,7 +73,7 @@ static void test_az_iot_message_properties_append_NULL_name_span_fails(void** st
   az_iot_message_properties props;
 
   ASSERT_PRECONDITION_CHECKED(
-      az_iot_message_properties_append(&props, AZ_SPAN_NULL, test_value_one));
+      az_iot_message_properties_append(&props, AZ_SPAN_EMPTY, test_value_one));
 }
 
 static void test_az_iot_message_properties_append_NULL_value_span_fails(void** state)
@@ -82,7 +82,8 @@ static void test_az_iot_message_properties_append_NULL_value_span_fails(void** s
 
   az_iot_message_properties props;
 
-  ASSERT_PRECONDITION_CHECKED(az_iot_message_properties_append(&props, test_key_one, AZ_SPAN_NULL));
+  ASSERT_PRECONDITION_CHECKED(
+      az_iot_message_properties_append(&props, test_key_one, AZ_SPAN_EMPTY));
 }
 
 static void test_az_iot_message_properties_find_NULL_props_fail(void** state)
@@ -102,7 +103,7 @@ static void test_az_iot_message_properties_find_NULL_name_fail(void** state)
 
   az_span out_value;
 
-  ASSERT_PRECONDITION_CHECKED(az_iot_message_properties_find(&props, AZ_SPAN_NULL, &out_value));
+  ASSERT_PRECONDITION_CHECKED(az_iot_message_properties_find(&props, AZ_SPAN_EMPTY, &out_value));
 }
 
 static void test_az_iot_message_properties_find_NULL_value_fail(void** state)
@@ -236,7 +237,6 @@ static void _log_listener(az_log_classification classification, az_span message)
   {
     case AZ_LOG_IOT_RETRY:
       _log_retry++;
-      assert_ptr_equal(az_span_ptr(message), (void*)0);
       assert_int_equal(az_span_size(message), 0);
       break;
     default:
@@ -342,7 +342,7 @@ static void test_az_iot_message_properties_append_empty_buffer_fail(void** state
   (void)state;
 
   az_iot_message_properties props;
-  assert_int_equal(az_iot_message_properties_init(&props, AZ_SPAN_NULL, 0), AZ_OK);
+  assert_int_equal(az_iot_message_properties_init(&props, AZ_SPAN_EMPTY, 0), AZ_OK);
 
   assert_int_equal(
       az_iot_message_properties_append(&props, test_key_one, test_value_one),
@@ -489,7 +489,7 @@ static void test_az_iot_message_properties_find_empty_buffer_fail(void** state)
 
   az_iot_message_properties props;
 
-  assert_int_equal(az_iot_message_properties_init(&props, AZ_SPAN_NULL, 0), AZ_OK);
+  assert_int_equal(az_iot_message_properties_init(&props, AZ_SPAN_EMPTY, 0), AZ_OK);
 
   az_span out_value;
   assert_int_equal(
@@ -592,29 +592,25 @@ static void test_az_iot_message_properties_next_succeed(void** state)
   assert_memory_equal(
       az_span_ptr(name), az_span_ptr(test_key_one), (size_t)az_span_size(test_key_one));
   assert_memory_equal(
-      az_span_ptr(value),
-      az_span_ptr(test_value_one),
-      (size_t)az_span_size(test_value_one));
+      az_span_ptr(value), az_span_ptr(test_value_one), (size_t)az_span_size(test_value_one));
 
   assert_int_equal(az_iot_message_properties_next(&props, &name, &value), AZ_OK);
   assert_memory_equal(
       az_span_ptr(name), az_span_ptr(test_key_two), (size_t)az_span_size(test_key_two));
   assert_memory_equal(
-      az_span_ptr(value),
-      az_span_ptr(test_value_two),
-      (size_t)az_span_size(test_value_two));
+      az_span_ptr(value), az_span_ptr(test_value_two), (size_t)az_span_size(test_value_two));
 
   assert_int_equal(az_iot_message_properties_next(&props, &name, &value), AZ_OK);
   assert_memory_equal(
       az_span_ptr(name), az_span_ptr(test_key_three), (size_t)az_span_size(test_key_three));
   assert_memory_equal(
-      az_span_ptr(value),
-      az_span_ptr(test_value_three),
-      (size_t)az_span_size(test_value_three));
+      az_span_ptr(value), az_span_ptr(test_value_three), (size_t)az_span_size(test_value_three));
 
-  assert_int_equal(az_iot_message_properties_next(&props, &name, &value), AZ_ERROR_IOT_END_OF_PROPERTIES);
-  //Call again to show subsequent calls do nothing
-  assert_int_equal(az_iot_message_properties_next(&props, &name, &value), AZ_ERROR_IOT_END_OF_PROPERTIES);
+  assert_int_equal(
+      az_iot_message_properties_next(&props, &name, &value), AZ_ERROR_IOT_END_OF_PROPERTIES);
+  // Call again to show subsequent calls do nothing
+  assert_int_equal(
+      az_iot_message_properties_next(&props, &name, &value), AZ_ERROR_IOT_END_OF_PROPERTIES);
 }
 
 static void test_az_iot_message_properties_next_twice_succeed(void** state)
@@ -633,19 +629,16 @@ static void test_az_iot_message_properties_next_twice_succeed(void** state)
   assert_memory_equal(
       az_span_ptr(name), az_span_ptr(test_key_one), (size_t)az_span_size(test_key_one));
   assert_memory_equal(
-      az_span_ptr(value),
-      az_span_ptr(test_value_one),
-      (size_t)az_span_size(test_value_one));
+      az_span_ptr(value), az_span_ptr(test_value_one), (size_t)az_span_size(test_value_one));
 
   assert_int_equal(az_iot_message_properties_next(&props, &name, &value), AZ_OK);
   assert_memory_equal(
       az_span_ptr(name), az_span_ptr(test_key_two), (size_t)az_span_size(test_key_two));
   assert_memory_equal(
-      az_span_ptr(value),
-      az_span_ptr(test_value_two),
-      (size_t)az_span_size(test_value_two));
+      az_span_ptr(value), az_span_ptr(test_value_two), (size_t)az_span_size(test_value_two));
 
-  assert_int_equal(az_iot_message_properties_next(&props, &name, &value), AZ_ERROR_IOT_END_OF_PROPERTIES);
+  assert_int_equal(
+      az_iot_message_properties_next(&props, &name, &value), AZ_ERROR_IOT_END_OF_PROPERTIES);
 
   // Reset to beginning of span
   assert_int_equal(
@@ -655,19 +648,16 @@ static void test_az_iot_message_properties_next_twice_succeed(void** state)
   assert_memory_equal(
       az_span_ptr(name), az_span_ptr(test_key_one), (size_t)az_span_size(test_key_one));
   assert_memory_equal(
-      az_span_ptr(value),
-      az_span_ptr(test_value_one),
-      (size_t)az_span_size(test_value_one));
+      az_span_ptr(value), az_span_ptr(test_value_one), (size_t)az_span_size(test_value_one));
 
   assert_int_equal(az_iot_message_properties_next(&props, &name, &value), AZ_OK);
   assert_memory_equal(
       az_span_ptr(name), az_span_ptr(test_key_two), (size_t)az_span_size(test_key_two));
   assert_memory_equal(
-      az_span_ptr(value),
-      az_span_ptr(test_value_two),
-      (size_t)az_span_size(test_value_two));
+      az_span_ptr(value), az_span_ptr(test_value_two), (size_t)az_span_size(test_value_two));
 
-  assert_int_equal(az_iot_message_properties_next(&props, &name, &value), AZ_ERROR_IOT_END_OF_PROPERTIES);
+  assert_int_equal(
+      az_iot_message_properties_next(&props, &name, &value), AZ_ERROR_IOT_END_OF_PROPERTIES);
 }
 
 static void test_az_iot_message_properties_next_empty_succeed(void** state)
@@ -675,12 +665,13 @@ static void test_az_iot_message_properties_next_empty_succeed(void** state)
   (void)state;
 
   az_iot_message_properties props;
-  assert_int_equal(az_iot_message_properties_init(&props, AZ_SPAN_NULL, 0), AZ_OK);
+  assert_int_equal(az_iot_message_properties_init(&props, AZ_SPAN_EMPTY, 0), AZ_OK);
 
   az_span name;
   az_span value;
 
-  assert_int_equal(az_iot_message_properties_next(&props, &name, &value), AZ_ERROR_IOT_END_OF_PROPERTIES);
+  assert_int_equal(
+      az_iot_message_properties_next(&props, &name, &value), AZ_ERROR_IOT_END_OF_PROPERTIES);
 }
 
 #ifdef _MSC_VER

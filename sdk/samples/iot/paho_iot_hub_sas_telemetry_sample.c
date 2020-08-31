@@ -261,7 +261,7 @@ static void generate_sas_key(void)
       &hub_client,
       sas_duration,
       sas_base64_encoded_signed_signature,
-      AZ_SPAN_NULL,
+      AZ_SPAN_EMPTY,
       mqtt_password_buffer,
       sizeof(mqtt_password_buffer),
       &mqtt_password_length);

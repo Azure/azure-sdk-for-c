@@ -3,10 +3,11 @@
 
 #include <stdint.h>
 
-#include <azure/iot/az_iot_hub_client.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
+#include <azure/core/internal/az_result_internal.h>
 #include <azure/core/internal/az_span_internal.h>
+#include <azure/iot/az_iot_hub_client.h>
 
 #include <azure/core/internal/az_log_internal.h>
 #include <azure/core/internal/az_precondition_internal.h>
@@ -25,17 +26,21 @@ AZ_NODISCARD az_result az_iot_hub_client_c2d_parse_received_topic(
   _az_PRECONDITION_NOT_NULL(out_request);
   (void)client;
 
-  az_span reminder;
-  az_span token = _az_span_token(received_topic, c2d_topic_suffix, &reminder);
-  if (az_span_ptr(reminder) == NULL)
+  int32_t index = 0;
+  az_span remainder;
+  az_span token = _az_span_token(received_topic, c2d_topic_suffix, &remainder, &index);
+  if (index == -1)
   {
     return AZ_ERROR_IOT_TOPIC_NO_MATCH;
   }
 
   _az_LOG_WRITE(AZ_LOG_MQTT_RECEIVED_TOPIC, received_topic);
 
-  token = _az_span_token(reminder, c2d_topic_suffix, &reminder);
-  AZ_RETURN_IF_FAILED(
+  token = az_span_size(remainder) == 0
+      ? AZ_SPAN_EMPTY
+      : _az_span_token(remainder, c2d_topic_suffix, &remainder, &index);
+
+  _az_RETURN_IF_FAILED(
       az_iot_message_properties_init(&out_request->properties, token, az_span_size(token)));
 
   return AZ_OK;

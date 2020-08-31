@@ -6,6 +6,7 @@
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
 #include <azure/core/internal/az_precondition_internal.h>
+#include <azure/core/internal/az_result_internal.h>
 #include <azure/core/internal/az_span_internal.h>
 #include <azure/iot/az_iot_common.h>
 #include <azure/iot/internal/az_iot_common_internal.h>
@@ -52,7 +53,7 @@ az_iot_message_properties_append(az_iot_message_properties* properties, az_span 
     required_length += 1;
   }
 
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(remainder, required_length);
+  _az_RETURN_IF_NOT_ENOUGH_SIZE(remainder, required_length);
 
   if (prop_length > 0)
   {
@@ -82,17 +83,20 @@ AZ_NODISCARD az_result az_iot_message_properties_find(
 
   while (az_span_size(remaining) != 0)
   {
-    az_span delim_span = _az_span_token(remaining, hub_client_param_equals_span, &remaining);
-    if (az_span_is_content_equal(delim_span, name))
+    int32_t index = 0;
+    az_span delim_span
+        = _az_span_token(remaining, hub_client_param_equals_span, &remaining, &index);
+    if (index != -1)
     {
-      *out_value = _az_span_token(remaining, hub_client_param_separator_span, &remaining);
-      return AZ_OK;
-    }
-    else
-    {
-      az_span value;
-      value = _az_span_token(remaining, hub_client_param_separator_span, &remaining);
-      (void)value;
+      if (az_span_is_content_equal(delim_span, name))
+      {
+        *out_value = _az_span_token(remaining, hub_client_param_separator_span, &remaining, &index);
+        return AZ_OK;
+      }
+      else
+      {
+        _az_span_token(remaining, hub_client_param_separator_span, &remaining, &index);
+      }
     }
   }
 
@@ -113,16 +117,17 @@ AZ_NODISCARD az_result az_iot_message_properties_next(
 
   if (index == prop_length)
   {
-    *out_name = AZ_SPAN_NULL;
-    *out_value = AZ_SPAN_NULL;
+    *out_name = AZ_SPAN_EMPTY;
+    *out_value = AZ_SPAN_EMPTY;
     return AZ_ERROR_IOT_END_OF_PROPERTIES;
   }
 
   az_span remainder;
   az_span prop_span = az_span_slice(properties->_internal.properties_buffer, index, prop_length);
 
-  *out_name = _az_span_token(prop_span, hub_client_param_equals_span, &remainder);
-  *out_value = _az_span_token(remainder, hub_client_param_separator_span, &remainder);
+  int32_t location = 0;
+  *out_name = _az_span_token(prop_span, hub_client_param_equals_span, &remainder, &location);
+  *out_value = _az_span_token(remainder, hub_client_param_separator_span, &remainder, &location);
   if (az_span_size(remainder) == 0)
   {
     properties->_internal.current_property_index = (uint32_t)prop_length;
@@ -130,7 +135,7 @@ AZ_NODISCARD az_result az_iot_message_properties_next(
   else
   {
     properties->_internal.current_property_index
-        = (uint32_t)(az_span_ptr(remainder) - az_span_ptr(properties->_internal.properties_buffer));
+        = (uint32_t)(_az_span_diff(remainder, properties->_internal.properties_buffer));
   }
 
   return AZ_OK;
@@ -149,7 +154,7 @@ AZ_NODISCARD int32_t az_iot_calculate_retry_delay(
   _az_PRECONDITION_RANGE(0, max_retry_delay_msec, INT32_MAX - 1);
   _az_PRECONDITION_RANGE(0, random_msec, INT32_MAX - 1);
 
-  _az_LOG_WRITE(AZ_LOG_IOT_RETRY, AZ_SPAN_NULL);
+  _az_LOG_WRITE(AZ_LOG_IOT_RETRY, AZ_SPAN_EMPTY);
 
   int32_t delay = _az_retry_calc_delay(attempt, min_retry_delay_msec, max_retry_delay_msec);
 
@@ -212,7 +217,7 @@ AZ_NODISCARD az_result
 _az_span_copy_url_encode(az_span destination, az_span source, az_span* out_remainder)
 {
   int32_t length;
-  AZ_RETURN_IF_FAILED(_az_span_url_encode(destination, source, &length));
+  _az_RETURN_IF_FAILED(_az_span_url_encode(destination, source, &length));
   *out_remainder = az_span_slice(destination, length, az_span_size(destination));
   return AZ_OK;
 }
