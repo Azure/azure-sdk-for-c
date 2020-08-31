@@ -265,7 +265,6 @@ static void test_az_log_incomplete_list_fails_gracefully()
   az_log_set_callback(_log_listener);
 
   _log_retry = 0;
-  assert_int_equal(0, _log_retry);
   assert_int_equal(2229, az_iot_retry_calc_delay(5, 1, 500, 100000, 1234));
   assert_int_equal(0, _log_retry);
 
