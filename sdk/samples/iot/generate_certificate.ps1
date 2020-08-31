@@ -6,7 +6,7 @@ $errorActionPreference="stop"
 
 if($PSVersionTable.PSEdition -ne "Core")
 {
-  Write-Error "Please install Powershell Core at aka.ms/pscore6."
+ Write-Error "This script requires Powershell Core. Please install Powershell Core at aka.ms/pscore6."
 }
 
 Write-Warning "Certificates created by this script MUST NOT be used for production."
