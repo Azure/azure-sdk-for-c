@@ -315,3 +315,4 @@ fingerprint.txt
 
 # Swap Files
 *.swp
+/cmake
