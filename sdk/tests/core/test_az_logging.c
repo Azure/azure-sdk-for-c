@@ -290,7 +290,7 @@ static void test_az_log_incorrect_list_fails_gracefully(void** state)
     az_log_set_callback(_log_listener_no_op);
 
     assert_false(_az_LOG_SHOULD_WRITE(AZ_LOG_IOT_RETRY));
-    _az_LOG_WRITE(AZ_LOG_IOT_RETRY, AZ_SPAN_NULL);
+    _az_LOG_WRITE(AZ_LOG_IOT_RETRY, AZ_SPAN_EMPTY);
 
     az_log_set_callback(NULL);
     az_log_set_classifications(NULL);
@@ -302,7 +302,7 @@ static void test_az_log_incorrect_list_fails_gracefully(void** state)
     az_log_set_callback(_log_listener_no_op);
 
     assert_false(_az_LOG_SHOULD_WRITE(AZ_LOG_IOT_RETRY));
-    _az_LOG_WRITE(AZ_LOG_IOT_RETRY, AZ_SPAN_NULL);
+    _az_LOG_WRITE(AZ_LOG_IOT_RETRY, AZ_SPAN_EMPTY);
 
     az_log_set_callback(NULL);
     az_log_set_classifications(NULL);
@@ -314,7 +314,7 @@ static void test_az_log_incorrect_list_fails_gracefully(void** state)
     az_log_set_callback(_log_listener_no_op);
 
     assert_false(_az_LOG_SHOULD_WRITE(AZ_LOG_IOT_RETRY));
-    _az_LOG_WRITE(AZ_LOG_IOT_RETRY, AZ_SPAN_NULL);
+    _az_LOG_WRITE(AZ_LOG_IOT_RETRY, AZ_SPAN_EMPTY);
 
     az_log_set_callback(NULL);
     az_log_set_classifications(NULL);
@@ -326,7 +326,7 @@ static void test_az_log_incorrect_list_fails_gracefully(void** state)
     az_log_set_callback(_log_listener_no_op);
 
     assert_false(_az_LOG_SHOULD_WRITE(AZ_LOG_IOT_RETRY));
-    _az_LOG_WRITE(AZ_LOG_IOT_RETRY, AZ_SPAN_NULL);
+    _az_LOG_WRITE(AZ_LOG_IOT_RETRY, AZ_SPAN_EMPTY);
 
     az_log_set_callback(NULL);
     az_log_set_classifications(NULL);
@@ -338,7 +338,7 @@ static void test_az_log_incorrect_list_fails_gracefully(void** state)
     az_log_set_callback(_log_listener_no_op);
 
     assert_false(_az_LOG_SHOULD_WRITE((az_log_classification)12345));
-    _az_LOG_WRITE((az_log_classification)12345, AZ_SPAN_NULL);
+    _az_LOG_WRITE((az_log_classification)12345, AZ_SPAN_EMPTY);
 
     az_log_set_callback(NULL);
     az_log_set_classifications(NULL);
@@ -370,12 +370,12 @@ static void test_az_log_everything_on_null(void** state)
     assert_false(_az_LOG_SHOULD_WRITE((az_log_classification)12345));
     assert_true(_az_LOG_SHOULD_WRITE(AZ_LOG_MQTT_RECEIVED_PAYLOAD));
 
-    _az_LOG_WRITE(AZ_LOG_IOT_RETRY, AZ_SPAN_NULL);
-    _az_LOG_WRITE(AZ_LOG_HTTP_REQUEST, AZ_SPAN_NULL);
-    _az_LOG_WRITE(AZ_LOG_IOT_AZURERTOS, AZ_SPAN_NULL);
-    _az_LOG_WRITE(AZ_LOG_END_OF_LIST, AZ_SPAN_NULL);
-    _az_LOG_WRITE((az_log_classification)12345, AZ_SPAN_NULL);
-    _az_LOG_WRITE(AZ_LOG_MQTT_RECEIVED_PAYLOAD, AZ_SPAN_NULL);
+    _az_LOG_WRITE(AZ_LOG_IOT_RETRY, AZ_SPAN_EMPTY);
+    _az_LOG_WRITE(AZ_LOG_HTTP_REQUEST, AZ_SPAN_EMPTY);
+    _az_LOG_WRITE(AZ_LOG_IOT_AZURERTOS, AZ_SPAN_EMPTY);
+    _az_LOG_WRITE(AZ_LOG_END_OF_LIST, AZ_SPAN_EMPTY);
+    _az_LOG_WRITE((az_log_classification)12345, AZ_SPAN_EMPTY);
+    _az_LOG_WRITE(AZ_LOG_MQTT_RECEIVED_PAYLOAD, AZ_SPAN_EMPTY);
 
     assert_int_equal(4, _log_retry);
 
