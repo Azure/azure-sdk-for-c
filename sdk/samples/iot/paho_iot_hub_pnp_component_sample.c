@@ -33,16 +33,13 @@
 #define SAMPLE_TYPE PAHO_IOT_HUB
 #define SAMPLE_NAME PAHO_IOT_HUB_PNP_COMPONENT_SAMPLE
 
-#define TELEMETRY_SEND_INTERVAL 1
-#define TIMEOUT_MQTT_RECEIVE_MAX_MESSAGE_COUNT 3
-#define TIMEOUT_MQTT_RECEIVE_MS (8 * 1000)
-#define TIMEOUT_MQTT_DISCONNECT_MS (10 * 1000)
-#define TIMEOUT_MQTT_WAIT_FOR_COMPLETION_MS 1000
+#define MQTT_TIMEOUT_RECEIVE_MAX_MESSAGE_COUNT 3
+#define MQTT_TIMEOUT_RECEIVE_MS (8 * 1000)
+#define MQTT_TIMEOUT_DISCONNECT_MS (10 * 1000)
 
-#define DEFAULT_START_TEMP_AVG_COUNT 1
+#define DEFAULT_START_TEMP_COUNT 1
 #define DEFAULT_START_TEMP_CELSIUS 22.0
 #define DOUBLE_DECIMAL_PLACE_DIGITS 2
-#define MQTT_PUBLISH_QOS 0
 
 bool is_device_operational = true;
 
@@ -52,31 +49,31 @@ bool is_device_operational = true;
 // is described in the corresponding DTMI. Should you choose to program your own PnP capable device,
 // the functionality would need to match the DTMI and you would need to update the below 'model_id'.
 // Please see the sample README for more information on this DTMI.
-static const az_span model_id
+static az_span const model_id
     = AZ_SPAN_LITERAL_FROM_STR("dtmi:com:example:TemperatureController;1");
 
 // Components
 static pnp_thermostat_component thermostat_1;
 static pnp_thermostat_component thermostat_2;
-static const az_span thermostat_1_name = AZ_SPAN_LITERAL_FROM_STR("thermostat1");
-static const az_span thermostat_2_name = AZ_SPAN_LITERAL_FROM_STR("thermostat2");
-static const az_span device_info_name = AZ_SPAN_LITERAL_FROM_STR("deviceInformation");
-static const az_span* pnp_components[]
+static az_span const thermostat_1_name = AZ_SPAN_LITERAL_FROM_STR("thermostat1");
+static az_span const thermostat_2_name = AZ_SPAN_LITERAL_FROM_STR("thermostat2");
+static az_span const device_information_name = AZ_SPAN_LITERAL_FROM_STR("deviceInformation");
+static az_span const* pnp_components[]
     = { &thermostat_1_name, &thermostat_2_name, &device_info_name };
-static const int32_t pnp_components_num = sizeof(pnp_components) / sizeof(pnp_components[0]);
+static int32_t const pnp_components_num = sizeof(pnp_components) / sizeof(pnp_components[0]);
 
 // IoT Hub Device Twin Values
-static const az_span reported_serial_num_property_name = AZ_SPAN_LITERAL_FROM_STR("serialNumber");
-static az_span reported_serial_num_property_value = AZ_SPAN_LITERAL_FROM_STR("ABCDEFG");
-static const az_span property_response_description_failed = AZ_SPAN_LITERAL_FROM_STR("failed");
+static az_span const reported_serial_number_property_name = AZ_SPAN_LITERAL_FROM_STR("serialNumber");
+static az_span reported_serial_number_property_value = AZ_SPAN_LITERAL_FROM_STR("ABCDEFG");
+static az_span const property_response_description_failed = AZ_SPAN_LITERAL_FROM_STR("failed");
 
 // IoT Hub Method (Command) Values
-static const az_span reboot_command_name = AZ_SPAN_LITERAL_FROM_STR("reboot");
-static const az_span empty_response_payload = AZ_SPAN_LITERAL_FROM_STR("{}");
-static char property_scratch_buffer[64];
+static az_span const command_reboot_name = AZ_SPAN_LITERAL_FROM_STR("reboot");
+static az_span const command_empty_response_payload = AZ_SPAN_LITERAL_FROM_STR("{}");
+static char command_property_scratch_buffer[64];
 
 // IoT Hub Telemetry Values
-static const az_span working_set_name = AZ_SPAN_LITERAL_FROM_STR("workingSet");
+static az_span const telemetry_working_set_name = AZ_SPAN_LITERAL_FROM_STR("workingSet");
 
 static iot_sample_environment_variables env_vars;
 static az_iot_hub_client hub_client;
@@ -92,7 +89,7 @@ static void connect_mqtt_client_to_iot_hub(void);
 static void subscribe_mqtt_client_to_iot_hub_topics(void);
 static void initialize_components(void);
 static void send_device_info(void);
-static void send_device_serial_number(void);
+static void send_serial_number(void);
 static void request_device_twin_document(void);
 static void receive_messages(void);
 static void disconnect_mqtt_client_from_iot_hub(void);
@@ -103,23 +100,25 @@ static void on_message_received(char* topic, int topic_len, const MQTTClient_mes
 
 // Device Twin functions
 static void handle_device_twin_message(
-    const az_span twin_message_span,
-    const az_iot_hub_client_twin_response* twin_response);
+    MQTTClient_message const* message,
+    az_iot_hub_client_twin_response const* twin_response);
 
 // Command functions
-static void handle_command_message(
-    const az_span command_message_span,
-    const az_iot_hub_client_method_request* command_request);
+static void handle_command_request(
+    MQTTClient_message const* message,
+    az_iot_hub_client_method_request const* command_request);
+
+// Telemetry functions
+static void send_telemetry_messages(void);
+
+// Temperature controller functions
 static az_result temp_controller_process_command(
-    const az_iot_hub_client_method_request* command_request,
+    az_iot_hub_client_method_request const* command_request,
     az_span component_name,
     az_span command_name,
     az_span command_payload,
     pnp_mqtt_message* mqtt_message,
     az_iot_status* status);
-
-// Telemetry functions
-static void send_telemetry_messages(void);
 static az_result temp_controller_get_telemetry_message(pnp_mqtt_message* message);
 
 // Callbacks
@@ -127,7 +126,7 @@ static az_result append_string_callback(az_json_writer* jw, void* value);
 static az_result append_json_token_callback(az_json_writer* jw, void* value);
 static void property_callback(
     az_span component_name,
-    const az_json_token* property_name,
+    az_json_token const* property_name,
     az_json_reader property_value,
     int32_t version,
     void* user_context_callback);
@@ -136,7 +135,7 @@ static void property_callback(
  * This sample extends the IoT Hub Plug and Play Sample above to mimic a Temperature Controller
  * and connects the IoT Plug and Play enabled device (the Temperature Controller) with the Digital
  * Twin Model ID (DTMI). If a timeout occurs while waiting for a message from the Azure IoT
- * Explorer, the sample will continue. If TIMEOUT_MQTT_RECEIVE_MAX_COUNT timeouts occur
+ * Explorer, the sample will continue. If MQTT_TIMEOUT_RECEIVE_MAX_COUNT timeouts occur
  * consecutively, the sample will disconnect. X509 self-certification is used.
  *
  * This Temperature Controller is made up of the following components:
@@ -282,17 +281,15 @@ int main(void)
   subscribe_mqtt_client_to_iot_hub_topics();
   IOT_SAMPLE_LOG_SUCCESS("Client subscribed to IoT Hub topics.");
 
+  // Initializations
   pnp_mqtt_message_init(&mqtt_message);
-
   initialize_components();
-  IOT_SAMPLE_LOG_SUCCESS("Client initialized components.");
 
+  // Messaging
   send_device_info();
-  send_device_serial_number();
+  send_serial_number();
   request_device_twin_document();
-
   receive_messages();
-  IOT_SAMPLE_LOG_SUCCESS("Client received messages.");
 
   disconnect_mqtt_client_from_iot_hub();
   IOT_SAMPLE_LOG_SUCCESS("Client disconnected from IoT Hub.");
@@ -586,7 +583,7 @@ static void disconnect_mqtt_client_from_iot_hub(void)
 {
   int rc;
 
-  if ((rc = MQTTClient_disconnect(mqtt_client, TIMEOUT_MQTT_DISCONNECT_MS)) != MQTTCLIENT_SUCCESS)
+  if ((rc = MQTTClient_disconnect(mqtt_client, MQTT_TIMEOUT_DISCONNECT_MS)) != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR("Failed to disconnect MQTT client: MQTTClient return code %d.", rc);
     exit(rc);
@@ -619,7 +616,7 @@ static void mqtt_receive_message(void)
 
   IOT_SAMPLE_LOG("Waiting for Command or Device Twin message.\n");
 
-  if (((rc = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, TIMEOUT_MQTT_RECEIVE_MS))
+  if (((rc = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, MQTT_TIMEOUT_RECEIVE_MS))
        != MQTTCLIENT_SUCCESS)
       && (rc != MQTTCLIENT_TOPICNAME_TRUNCATED))
   {
@@ -629,10 +626,10 @@ static void mqtt_receive_message(void)
   else if (message == NULL)
   {
     // Allow up to TIMEOUT_MQTT_RECEIVE_MAX_COUNT before disconnecting.
-    if (++timeout_counter >= TIMEOUT_MQTT_RECEIVE_MAX_MESSAGE_COUNT)
+    if (++timeout_counter >= MQTT_TIMEOUT_RECEIVE_MAX_MESSAGE_COUNT)
     {
       IOT_SAMPLE_LOG(
-          "Receive message timeout count of %d reached.", TIMEOUT_MQTT_RECEIVE_MAX_MESSAGE_COUNT);
+          "Receive message timeout count of %d reached.", MQTT_TIMEOUT_RECEIVE_MAX_MESSAGE_COUNT);
       is_device_operational = false;
     }
   }

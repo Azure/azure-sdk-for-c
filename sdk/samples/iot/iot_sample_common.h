@@ -147,6 +147,8 @@ typedef enum
   PAHO_IOT_PROVISIONING_SAS_SAMPLE
 } iot_sample_name;
 
+extern bool is_device_operational;
+
 /*
  * @brief Reads in environment variables set by user for purposes of running sample.
  *

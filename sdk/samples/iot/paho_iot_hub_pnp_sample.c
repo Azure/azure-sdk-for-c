@@ -33,7 +33,6 @@
 #define SAMPLE_TYPE PAHO_IOT_HUB
 #define SAMPLE_NAME PAHO_IOT_HUB_PNP_SAMPLE
 
-#define TELEMETRY_SEND_INTERVAL_SEC 1
 #define MQTT_TIMEOUT_RECEIVE_MAX_MESSAGE_COUNT 3
 #define MQTT_TIMEOUT_RECEIVE_MS (8 * 1000)
 #define MQTT_TIMEOUT_DISCONNECT_MS (10 * 1000)
@@ -42,7 +41,7 @@
 #define DEFAULT_START_TEMP_CELSIUS 22.0
 #define DOUBLE_DECIMAL_PLACE_DIGITS 2
 
-static bool is_device_operational = true;
+bool is_device_operational = true;
 static char const iso_spec_time_format[] = "%Y-%m-%dT%H:%M:%S%z"; // ISO8601 Time Format
 
 // * PnP Values *
