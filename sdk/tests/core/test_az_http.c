@@ -431,8 +431,8 @@ static void test_http_request(void** state)
   }
 }
 
-#define EXAMPLE_BODY \
-  "{\r\n" \
+#define EXAMPLE_BODY    \
+  "{\r\n"               \
   "  \"somejson\":45\r" \
   "}\n"
 

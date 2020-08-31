@@ -303,6 +303,7 @@ build/
 
 #Doxygen
 /[Dd]ocs/
+DoxygenWarningLog.txt
 
 # VS Code Files
 .vscode

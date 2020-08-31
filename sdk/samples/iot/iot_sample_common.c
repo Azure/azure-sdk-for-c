@@ -33,14 +33,14 @@
 #include <openssl/evp.h>
 #include <openssl/hmac.h>
 
-#define IOT_SAMPLE_PRECONDITION_NOT_NULL(arg) \
-  do \
-  { \
-    if (arg == NULL) \
-    { \
+#define IOT_SAMPLE_PRECONDITION_NOT_NULL(arg)   \
+  do                                            \
+  {                                             \
+    if ((arg) == NULL)                          \
+    {                                           \
       IOT_SAMPLE_LOG_ERROR("Pointer is NULL."); \
-      exit(1); \
-    } \
+      exit(1);                                  \
+    }                                           \
   } while (0)
 
 //
