@@ -22,6 +22,11 @@ enum
   // or causing integer overflow. We can't choose 16, because 9999999999999999 is larger than
   // _az_MAX_SAFE_INTEGER.
   _az_MAX_SUPPORTED_FRACTIONAL_DIGITS = 15,
+
+  _az_MAX_SIZE_FOR_INT32_T = 11,
+  _az_MAX_SIZE_FOR_UINT32_T = 10,
+  _az_MAX_SIZE_FOR_INT64_T = 20,
+  _az_MAX_SIZE_FOR_UINT64_T = 20,
 };
 
 /**
