@@ -259,9 +259,9 @@ static void generate_sas_key(void)
   size_t mqtt_password_length;
   rc = az_iot_hub_client_sas_get_password(
       &hub_client,
-      sas_base64_encoded_signed_signature,
       sas_duration,
-      AZ_SPAN_NULL,
+      sas_base64_encoded_signed_signature,
+      AZ_SPAN_EMPTY,
       mqtt_password_buffer,
       sizeof(mqtt_password_buffer),
       &mqtt_password_length);

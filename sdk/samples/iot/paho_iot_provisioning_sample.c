@@ -50,7 +50,7 @@ static void parse_device_registration_status_message(
     az_iot_provisioning_client_operation_status* out_operation_status);
 static void handle_device_registration_status_message(
     az_iot_provisioning_client_register_response const* register_response,
-    az_iot_provisioning_client_operation_status const* operation_status,
+    az_iot_provisioning_client_operation_status operation_status,
     bool* ref_is_operation_complete);
 static void send_operation_query_message(
     az_iot_provisioning_client_register_response const* response);
@@ -240,7 +240,7 @@ static void receive_device_registration_status_message(void)
   MQTTClient_message* message = NULL;
   bool is_operation_complete = false;
 
-  // Continue to parse incoming responses from the provisioning pervice until the device
+  // Continue to parse incoming responses from the provisioning service until the device
   // has been successfully provisioned or an error occurs.
   do
   {
@@ -274,7 +274,7 @@ static void receive_device_registration_status_message(void)
     IOT_SAMPLE_LOG_SUCCESS("Client parsed registration status message.");
 
     handle_device_registration_status_message(
-        &register_response, &operation_status, &is_operation_complete);
+        &register_response, operation_status, &is_operation_complete);
 
     MQTTClient_freeMessage(&message);
     MQTTClient_free(topic);
@@ -332,10 +332,10 @@ static void parse_device_registration_status_message(
 
 static void handle_device_registration_status_message(
     az_iot_provisioning_client_register_response const* register_response,
-    az_iot_provisioning_client_operation_status const* operation_status,
+    az_iot_provisioning_client_operation_status operation_status,
     bool* ref_is_operation_complete)
 {
-  *ref_is_operation_complete = az_iot_provisioning_client_operation_complete(*operation_status);
+  *ref_is_operation_complete = az_iot_provisioning_client_operation_complete(operation_status);
 
   // If operation is not complete, send query. On return, will loop to receive new operation
   // message.
@@ -348,7 +348,7 @@ static void handle_device_registration_status_message(
   }
   else // Operation is complete.
   {
-    if (AZ_IOT_PROVISIONING_STATUS_ASSIGNED == *operation_status) // Successful assignment
+    if (operation_status == AZ_IOT_PROVISIONING_STATUS_ASSIGNED) // Successful assignment
     {
       IOT_SAMPLE_LOG_SUCCESS("Device provisioned:");
       IOT_SAMPLE_LOG_AZ_SPAN(
@@ -384,7 +384,7 @@ static void send_operation_query_message(
   if (az_result_failed(
           rc = az_iot_provisioning_client_query_status_get_publish_topic(
               &provisioning_client,
-              register_response,
+              register_response->operation_id,
               query_topic_buffer,
               sizeof(query_topic_buffer),
               NULL)))

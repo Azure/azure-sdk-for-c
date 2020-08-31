@@ -131,6 +131,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
         >= 0)
     {
       // Is a res case
+      int32_t index = 0;
       az_span remainder;
       az_span status_str = _az_span_token(
           az_span_slice(
@@ -138,12 +139,18 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
               twin_feature_index + az_span_size(az_iot_hub_twin_response_sub_topic),
               az_span_size(received_topic)),
           AZ_SPAN_FROM_STR("/"),
-          &remainder);
+          &remainder,
+          &index);
 
       // Get status and convert to enum
       uint32_t status_int;
       _az_RETURN_IF_FAILED(az_span_atou32(status_str, &status_int));
       out_twin_response->status = (az_iot_status)status_int;
+
+      if (index == -1)
+      {
+        return AZ_ERROR_UNEXPECTED_END;
+      }
 
       // Get request id prop value
       az_iot_message_properties props;
@@ -164,7 +171,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
       {
         // Is a twin GET response
         out_twin_response->response_type = AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_GET;
-        out_twin_response->version = AZ_SPAN_NULL;
+        out_twin_response->version = AZ_SPAN_EMPTY;
       }
 
       result = AZ_OK;
@@ -186,7 +193,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
           &props, az_iot_hub_twin_version_prop, &out_twin_response->version));
 
       out_twin_response->response_type = AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES;
-      out_twin_response->request_id = AZ_SPAN_NULL;
+      out_twin_response->request_id = AZ_SPAN_EMPTY;
       out_twin_response->status = AZ_IOT_STATUS_OK;
 
       result = AZ_OK;

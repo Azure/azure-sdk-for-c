@@ -67,8 +67,8 @@ _az_http_policy_apiversion_options_default()
 {
   return (_az_http_policy_apiversion_options){
     ._internal = { .option_location = _az_http_policy_apiversion_option_location_header,
-                   .name = AZ_SPAN_NULL,
-                   .version = AZ_SPAN_NULL }
+                   .name = AZ_SPAN_EMPTY,
+                   .version = AZ_SPAN_EMPTY }
   };
 }
 
@@ -168,7 +168,7 @@ AZ_NODISCARD AZ_INLINE az_result _az_http_pipeline_nextpolicy(
  * @param[in] url_length The size of the initial url value within url #az_span.
  * @param[in] headers_buffer The #az_span to be used for storing headers for the request. The total
  * number of headers are calculated automatically based on the size of the buffer.
- * @param[in] body The #az_span buffer that contains a payload for the request. Use #AZ_SPAN_NULL
+ * @param[in] body The #az_span buffer that contains a payload for the request. Use #AZ_SPAN_EMPTY
  * for requests that don't have a body.
  *
  * @return

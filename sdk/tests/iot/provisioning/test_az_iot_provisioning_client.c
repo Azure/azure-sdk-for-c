@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 #include "test_az_iot_provisioning_client.h"
-#include <azure/iot/az_iot_provisioning_client.h>
-#include <azure/core/az_span.h>
 #include <az_test_span.h>
+#include <azure/core/az_span.h>
+#include <azure/iot/az_iot_provisioning_client.h>
 
 #include <setjmp.h>
 #include <stdarg.h>
@@ -15,7 +15,7 @@
 
 #include <azure/core/_az_cfg.h>
 
-static const az_span test_global_device_endpoint
+static const az_span test_global_device_hostname
     = AZ_SPAN_LITERAL_FROM_STR("global.azure-devices-provisioning.net");
 
 #define TEST_ID_SCOPE "0neFEEDC0DE"
@@ -28,7 +28,7 @@ static const az_span test_global_device_endpoint
 static void test_az_iot_provisioning_client_options_default_succeed()
 {
   az_iot_provisioning_client_options options = az_iot_provisioning_client_options_default();
-  assert_true(az_span_is_content_equal(options.user_agent, AZ_SPAN_NULL));
+  assert_true(az_span_is_content_equal(options.user_agent, AZ_SPAN_EMPTY));
 }
 
 static void test_az_iot_provisioning_client_default_options_get_connect_info_succeed()
@@ -36,7 +36,7 @@ static void test_az_iot_provisioning_client_default_options_get_connect_info_suc
   az_iot_provisioning_client client;
   az_result ret = az_iot_provisioning_client_init(
       &client,
-      test_global_device_endpoint,
+      test_global_device_hostname,
       AZ_SPAN_FROM_STR(TEST_ID_SCOPE),
       AZ_SPAN_FROM_STR(TEST_REGISTRATION_ID),
       NULL);
@@ -58,7 +58,7 @@ static void test_az_iot_provisioning_client_default_options_get_connect_info_suc
   assert_int_equal(strlen(TEST_REGISTRATION_ID), client_id_len);
 
   char expected_username[] = TEST_ID_SCOPE "/registrations/" TEST_REGISTRATION_ID
-                                          "/api-version=" AZ_IOT_PROVISIONING_SERVICE_VERSION;
+                                           "/api-version=" AZ_IOT_PROVISIONING_SERVICE_VERSION;
 
   char user_name[sizeof(expected_username) + 1];
   memset(user_name, 0xCC, sizeof(user_name));
@@ -84,7 +84,7 @@ static void test_az_iot_provisioning_client_custom_options_get_username_succeed(
 
   az_result ret = az_iot_provisioning_client_init(
       &client,
-      test_global_device_endpoint,
+      test_global_device_hostname,
       AZ_SPAN_FROM_STR(TEST_ID_SCOPE),
       AZ_SPAN_FROM_STR(TEST_REGISTRATION_ID),
       &options);
@@ -113,7 +113,7 @@ static void test_az_iot_provisioning_client_get_connect_info_insufficient_space_
 
   az_result ret = az_iot_provisioning_client_init(
       &client,
-      test_global_device_endpoint,
+      test_global_device_hostname,
       AZ_SPAN_FROM_STR(TEST_ID_SCOPE),
       AZ_SPAN_FROM_STR(TEST_REGISTRATION_ID),
       &options);
@@ -209,7 +209,7 @@ static void test_az_iot_provisioning_client_get_operation_status_publish_topic_s
   response.operation_id = operation_id;
 
   az_result ret = az_iot_provisioning_client_query_status_get_publish_topic(
-      &client, &response, topic, sizeof(topic), NULL);
+      &client, response.operation_id, topic, sizeof(topic), NULL);
 
   assert_int_equal(AZ_OK, ret);
   assert_string_equal(expected_topic, topic);
@@ -217,7 +217,7 @@ static void test_az_iot_provisioning_client_get_operation_status_publish_topic_s
 
   size_t topic_len;
   ret = az_iot_provisioning_client_query_status_get_publish_topic(
-      &client, &response, topic, sizeof(topic), &topic_len);
+      &client, response.operation_id, topic, sizeof(topic), &topic_len);
 
   assert_int_equal(AZ_OK, ret);
   assert_string_equal(expected_topic, topic);
@@ -241,7 +241,7 @@ test_az_iot_provisioning_client_get_operation_status_publish_topic_insufficient_
 
   size_t topic_len = 0xBAADC0DE;
   az_result ret = az_iot_provisioning_client_query_status_get_publish_topic(
-      &client, &response, topic, sizeof(topic), &topic_len);
+      &client, response.operation_id, topic, sizeof(topic), &topic_len);
 
   assert_int_equal(AZ_ERROR_INSUFFICIENT_SPAN_SIZE, ret);
   for (size_t i = 0; i < sizeof(topic); i++)

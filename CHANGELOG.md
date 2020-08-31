@@ -14,6 +14,12 @@
 - Rename `az_iot_hub_client_properties` to `az_iot_message_properties` and move it from `az_iot_hub_client.h` to `az_iot_common.h`.
 - Remove `az_pair` from `az_iot_message_properties_next()` in favor of individual name and value `az_span` parameters.
 - In `az_result.h`, rename `az_failed()` to `az_result_failed()` and `az_succeeded()` to `az_result_succeeded()`.
+- `az_iot_is_success_status()` renamed to `az_iot_status_succeeded()`.
+- `az_iot_is_retriable_status()` renamed to `az_iot_status_retriable()`.
+- `az_iot_retry_calc_delay()` renamed to `az_iot_calculate_retry_delay()`.
+- `az_iot_hub_client_sas_get_password()` parameter `token_expiration_epoch_time` moved to second parameter.
+- `az_iot_provisioning_client_init()` parameter `global_device_endpoint` renamed to `global_device_hostname`.
+- Renamed the macro `AZ_SPAN_NULL` to `AZ_SPAN_EMPTY`.
 
 ### Bug Fixes
 

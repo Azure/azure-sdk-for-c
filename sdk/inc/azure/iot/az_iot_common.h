@@ -31,6 +31,8 @@ enum
 
 /**
  * @brief Azure IoT service status codes.
+ * 
+ * @note https://docs.microsoft.com/en-us/azure/iot-central/core/troubleshoot-connection#error-codes
  *
  */
 typedef enum
@@ -61,7 +63,6 @@ typedef enum
   AZ_IOT_STATUS_TIMEOUT = 504,
 } az_iot_status;
 
-
 /**
  *
  * Properties APIs
@@ -75,7 +76,7 @@ typedef enum
  */
 #define AZ_IOT_MESSAGE_PROPERTIES_MESSAGE_ID \
   "%24.mid" /**< Add unique identification to a message */
-#define AZ_IOT_MESSAGE_PROPERTIES_CORRELATION_ID \
+#define AZ_IOT_MESSAGE_PROPERTIES_CORRELATION_ID                     \
   "%24.cid" /**< Used in distributed tracing. More information here: \
 https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-distributed-tracing */
 #define AZ_IOT_MESSAGE_PROPERTIES_CONTENT_TYPE \
@@ -168,8 +169,10 @@ AZ_NODISCARD az_result az_iot_message_properties_find(
  * @retval #AZ_OK A property was retrieved successfully.
  * @retval #AZ_ERROR_IOT_END_OF_PROPERTIES The API reached the end of the properties to retrieve.
  */
-AZ_NODISCARD az_result
-az_iot_message_properties_next(az_iot_message_properties* properties, az_span* out_name, az_span* out_value);
+AZ_NODISCARD az_result az_iot_message_properties_next(
+    az_iot_message_properties* properties,
+    az_span* out_name,
+    az_span* out_value);
 
 /**
  * @brief Checks if the status indicates a successful operation.
@@ -177,7 +180,7 @@ az_iot_message_properties_next(az_iot_message_properties* properties, az_span* o
  * @param[in] status The #az_iot_status to verify.
  * @return `true` if the status indicates success. `false` otherwise.
  */
-AZ_NODISCARD AZ_INLINE bool az_iot_is_success_status(az_iot_status status)
+AZ_NODISCARD AZ_INLINE bool az_iot_status_succeeded(az_iot_status status)
 {
   return status < AZ_IOT_STATUS_BAD_REQUEST;
 }
@@ -189,7 +192,7 @@ AZ_NODISCARD AZ_INLINE bool az_iot_is_success_status(az_iot_status status)
  * @param[in] status The #az_iot_status to verify.
  * @return `true` if the operation should be retried. `false` otherwise.
  */
-AZ_NODISCARD AZ_INLINE bool az_iot_is_retriable_status(az_iot_status status)
+AZ_NODISCARD AZ_INLINE bool az_iot_status_retriable(az_iot_status status)
 {
   return ((status == AZ_IOT_STATUS_THROTTLED) || (status == AZ_IOT_STATUS_SERVER_ERROR));
 }
@@ -205,7 +208,7 @@ AZ_NODISCARD AZ_INLINE bool az_iot_is_retriable_status(az_iot_status status)
  * @param[in] random_msec A random value between 0 and the maximum allowed jitter, in milliseconds.
  * @return The recommended delay in milliseconds.
  */
-AZ_NODISCARD int32_t az_iot_retry_calc_delay(
+AZ_NODISCARD int32_t az_iot_calculate_retry_delay(
     int32_t operation_msec,
     int16_t attempt,
     int32_t min_retry_delay_msec,

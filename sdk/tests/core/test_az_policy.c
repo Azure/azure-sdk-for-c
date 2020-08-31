@@ -84,7 +84,7 @@ void test_az_http_pipeline_policy_telemetry(void** state)
           url_span,
           3,
           header_span,
-          AZ_SPAN_NULL),
+          AZ_SPAN_EMPTY),
       AZ_OK);
 
   // Create policy options
@@ -126,7 +126,7 @@ void test_az_http_pipeline_policy_apiversion(void** state)
           url_span,
           3,
           header_span,
-          AZ_SPAN_NULL),
+          AZ_SPAN_EMPTY),
       AZ_OK);
 
   // Create policy options
@@ -242,7 +242,7 @@ void test_az_http_pipeline_policy_retry(void** state)
           url_span,
           3,
           header_span,
-          AZ_SPAN_NULL),
+          AZ_SPAN_EMPTY),
       AZ_OK);
 
   // Create policy options
@@ -287,7 +287,7 @@ void test_az_http_pipeline_policy_retry_with_header(void** state)
           url_span,
           3,
           header_span,
-          AZ_SPAN_NULL),
+          AZ_SPAN_EMPTY),
       AZ_OK);
 
   // Create policy options
@@ -334,7 +334,7 @@ void test_az_http_pipeline_policy_retry_with_header_2(void** state)
           url_span,
           3,
           header_span,
-          AZ_SPAN_NULL),
+          AZ_SPAN_EMPTY),
       AZ_OK);
 
   // Create policy options

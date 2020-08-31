@@ -27,6 +27,8 @@ static const az_span test_twin_received_topic_desired_success
     = AZ_SPAN_LITERAL_FROM_STR("$iothub/twin/PATCH/properties/desired/?$version=id_one");
 static const az_span test_twin_received_topic_fail
     = AZ_SPAN_LITERAL_FROM_STR("$iothub/twin/rez/200");
+static const az_span test_twin_received_topic_incomplete_fail
+    = AZ_SPAN_LITERAL_FROM_STR("$iothub/twin/res/200");
 static const az_span test_twin_received_topic_prefix_fail
     = AZ_SPAN_LITERAL_FROM_STR("$iothub/contoso/res/200");
 
@@ -165,7 +167,7 @@ static void test_az_iot_hub_client_twin_parse_received_topic_NULL_rec_topic_fail
   az_iot_hub_client_twin_response response;
 
   ASSERT_PRECONDITION_CHECKED(
-      az_iot_hub_client_twin_parse_received_topic(&client, AZ_SPAN_NULL, &response));
+      az_iot_hub_client_twin_parse_received_topic(&client, AZ_SPAN_EMPTY, &response));
 }
 
 static void test_az_iot_hub_client_twin_parse_received_topic_NULL_response_fails()
@@ -257,7 +259,7 @@ static void test_az_iot_hub_client_twin_parse_received_topic_desired_found_succe
           &client, test_twin_received_topic_desired_success, &response),
       AZ_OK);
   assert_true(az_span_is_content_equal((response.version), test_device_request_id));
-  assert_true(az_span_is_content_equal(response.request_id, AZ_SPAN_NULL));
+  assert_true(az_span_is_content_equal(response.request_id, AZ_SPAN_EMPTY));
   assert_int_equal(response.status, AZ_IOT_STATUS_OK);
   assert_int_equal(response.response_type, AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES);
 }
@@ -274,7 +276,7 @@ static void test_az_iot_hub_client_twin_parse_received_topic_get_response_found_
           &client, test_twin_received_get_response, &response),
       AZ_OK);
   assert_true(az_span_is_content_equal(response.request_id, test_device_request_id));
-  assert_true(az_span_is_content_equal(response.version, AZ_SPAN_NULL));
+  assert_true(az_span_is_content_equal(response.version, AZ_SPAN_EMPTY));
   assert_int_equal(response.status, AZ_IOT_STATUS_OK);
   assert_int_equal(response.response_type, AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_GET);
 }
@@ -307,6 +309,19 @@ static void test_az_iot_hub_client_twin_parse_received_topic_not_found_fails()
       az_iot_hub_client_twin_parse_received_topic(
           &client, test_twin_received_topic_fail, &response),
       AZ_ERROR_IOT_TOPIC_NO_MATCH);
+}
+
+static void test_az_iot_hub_client_twin_parse_received_topic_not_found_incomplete_fails()
+{
+  az_iot_hub_client client;
+  assert_int_equal(
+      az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL), AZ_OK);
+  az_iot_hub_client_twin_response response;
+
+  assert_int_equal(
+      az_iot_hub_client_twin_parse_received_topic(
+          &client, test_twin_received_topic_incomplete_fail, &response),
+      AZ_ERROR_UNEXPECTED_END);
 }
 
 static void test_az_iot_hub_client_twin_parse_received_topic_not_found_prefix_fails()
@@ -398,6 +413,7 @@ int test_az_iot_hub_client_twin()
     cmocka_unit_test(test_az_iot_hub_client_twin_parse_received_topic_get_response_found_succeed),
     cmocka_unit_test(test_az_iot_hub_client_twin_parse_received_topic_reported_props_found_succeed),
     cmocka_unit_test(test_az_iot_hub_client_twin_parse_received_topic_not_found_fails),
+    cmocka_unit_test(test_az_iot_hub_client_twin_parse_received_topic_not_found_incomplete_fails),
     cmocka_unit_test(test_az_iot_hub_client_twin_parse_received_topic_not_found_prefix_fails),
     cmocka_unit_test(test_az_iot_hub_client_twin_logging_succeed),
   };
