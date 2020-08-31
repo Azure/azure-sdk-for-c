@@ -44,16 +44,35 @@
     (void)printf("\n");        \
   } while (0)
 
-#define IOT_SAMPLE_LOG_AZ_SPAN(span_description, span)                       \
-  do                                                                         \
-  {                                                                          \
-    (void)printf("\t\t%s ", span_description);                               \
-    char* buffer = (char*)az_span_ptr(span);                                 \
-    for (int32_t az_span_i = 0; az_span_i < az_span_size(span); az_span_i++) \
-    {                                                                        \
-      putchar(*buffer++);                                                    \
-    }                                                                        \
-    (void)printf("\n");                                                      \
+#define IOT_SAMPLE_LOG_AZ_SPAN(span_description, span)                                           \
+  do                                                                                             \
+  {                                                                                              \
+    (void)printf("\t\t%s ", span_description);                                                   \
+    (void)fwrite((char*)az_span_ptr(span), sizeof(uint8_t), (size_t)az_span_size(span), stdout); \
+    (void)printf("\n");                                                                          \
+  } while (0)
+
+//
+// Error handling
+//
+#define IOT_SAMPLE_RETURN_IF_FAILED(exp)        \
+  do                                            \
+  {                                             \
+    az_result const _iot_sample_result = (exp); \
+    if (az_result_failed(_iot_sample_result))   \
+    {                                           \
+      return _iot_sample_result;                \
+    }                                           \
+  } while (0)
+
+#define IOT_SAMPLE_RETURN_IF_NOT_ENOUGH_SIZE(span, required_size)          \
+  do                                                                       \
+  {                                                                        \
+    int32_t _iot_sample_req_sz = (required_size);                          \
+    if (az_span_size(span) < _iot_sample_req_sz || _iot_sample_req_sz < 0) \
+    {                                                                      \
+      return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;                              \
+    }                                                                      \
   } while (0)
 
 //
@@ -137,7 +156,8 @@ typedef enum
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK All required environment variables successfully read-in.
  * @retval #AZ_ERROR_ARG Sample type or name is undefined, or environment variable is not set.
- * @retval #AZ_RETURN_IF_NOT_ENOUGH_SIZE Not enough space set aside to store environment variable.
+ * @retval #AZ_ERROR_INSUFFICIENT_SPAN_SIZE Not enough space set aside to store environment
+ * variable.
  */
 az_result iot_sample_read_environment_variables(
     iot_sample_type type,

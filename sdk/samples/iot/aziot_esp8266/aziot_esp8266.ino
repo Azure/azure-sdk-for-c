@@ -175,9 +175,9 @@ static int generateSasToken(char* sas_token, size_t size)
   // URl-encode base64 encoded encrypted signature
   if (az_result_failed(az_iot_hub_client_sas_get_password(
           &client,
-          b64enc_hmacsha256_signature_span,
           expiration,
-          AZ_SPAN_NULL,
+          b64enc_hmacsha256_signature_span,
+          AZ_SPAN_EMPTY,
           sas_token,
           size,
           NULL)))

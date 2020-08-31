@@ -4,6 +4,11 @@
 Set-StrictMode -Version 3.0
 $errorActionPreference="stop"
 
+if($PSVersionTable.PSEdition -ne "Core")
+{
+ Write-Error "This script requires Powershell Core. Please install Powershell Core at aka.ms/pscore6."
+}
+
 Write-Warning "Certificates created by this script MUST NOT be used for production."
 Write-Warning "They expire after 365 days, and most importantly are provided for demonstration purposes to help you quickly understand CA Certificates."
 Write-Warning "When productizing against CA Certificates, you'll need to use your own security best practices for certification creation and lifetime management."
@@ -53,10 +58,10 @@ Write-Output "`nSAMPLE CERTIFICATE GENERATED:"
 Write-Output "Use the following command to set the environment variable for the samples:"
 
 if ($IsWindows) {
-  Write-Output "`n`t`$env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE=$(Resolve-Path device_cert_store.pem)"
+  Write-Output "`n`t`$env:AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(Resolve-Path device_cert_store.pem)"
 }
 else {
-  Write-Output "`n`texport AZ_IOT_DEVICE_X509_CERT_PEM_FILE=$(Resolve-Path device_cert_store.pem)"
+  Write-Output "`n`texport AZ_IOT_DEVICE_X509_CERT_PEM_FILE_PATH=$(Resolve-Path device_cert_store.pem)"
 }
 
 Write-Output "`nDPS SAMPLE:"

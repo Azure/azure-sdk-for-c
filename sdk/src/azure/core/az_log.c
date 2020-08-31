@@ -4,11 +4,11 @@
 #include "az_span_private.h"
 #include <azure/core/az_config.h>
 #include <azure/core/az_http.h>
-#include <azure/core/internal/az_http_internal.h>
 #include <azure/core/az_http_transport.h>
 #include <azure/core/az_log.h>
-#include <azure/core/internal/az_log_internal.h>
 #include <azure/core/az_span.h>
+#include <azure/core/internal/az_http_internal.h>
+#include <azure/core/internal/az_log_internal.h>
 
 #include <stddef.h>
 
@@ -78,7 +78,7 @@ static bool _az_log_write_engine(bool log_it, az_log_classification classificati
 // This function returns whether or not the passed-in message should be logged.
 bool _az_log_should_write(az_log_classification classification)
 {
-  return _az_log_write_engine(false, classification, AZ_SPAN_NULL);
+  return _az_log_write_engine(false, classification, AZ_SPAN_EMPTY);
 }
 
 // This function attempts to log the passed-in message.

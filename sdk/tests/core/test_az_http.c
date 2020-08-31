@@ -176,7 +176,7 @@ static void test_http_request(void** state)
 
     // Empty header
     assert_return_code(
-        az_http_request_append_header(&request, AZ_SPAN_FROM_STR("header"), AZ_SPAN_NULL), AZ_OK);
+        az_http_request_append_header(&request, AZ_SPAN_FROM_STR("header"), AZ_SPAN_EMPTY), AZ_OK);
   }
   { // Test adding duplicated query parameters
     uint8_t buf[100];
@@ -422,7 +422,7 @@ static void test_http_request(void** state)
 
     // Remove empty spaces from the left of header name
     assert_return_code(
-        az_http_request_append_header(&request, AZ_SPAN_FROM_STR(" \t\r\nheader"), AZ_SPAN_NULL),
+        az_http_request_append_header(&request, AZ_SPAN_FROM_STR(" \t\r\nheader"), AZ_SPAN_EMPTY),
         AZ_OK);
 
     az_pair header = { 0 };
@@ -431,8 +431,8 @@ static void test_http_request(void** state)
   }
 }
 
-#define EXAMPLE_BODY \
-  "{\r\n" \
+#define EXAMPLE_BODY    \
+  "{\r\n"               \
   "  \"somejson\":45\r" \
   "}\n"
 
@@ -581,7 +581,7 @@ static void test_http_request_removing_left_whitespace_chars(void** state)
 
   // Nothing but empty name - should hit precondion
   ASSERT_PRECONDITION_CHECKED(
-      az_http_request_append_header(&request, AZ_SPAN_FROM_STR(" \t\r"), AZ_SPAN_NULL));
+      az_http_request_append_header(&request, AZ_SPAN_FROM_STR(" \t\r"), AZ_SPAN_EMPTY));
 }
 
 static void test_http_request_header_validation(void** state)

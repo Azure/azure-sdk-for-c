@@ -30,7 +30,7 @@ static void test_url_encode_basic(void** state)
     az_span const buffer0 = az_span_slice(AZ_SPAN_FROM_BUFFER(buf20), 0, 0);
 
     int32_t url_length = 0xFF;
-    assert_true(az_result_succeeded(_az_span_url_encode(buffer0, AZ_SPAN_NULL, &url_length)));
+    assert_true(az_result_succeeded(_az_span_url_encode(buffer0, AZ_SPAN_EMPTY, &url_length)));
     assert_int_equal(url_length, 0);
     assert_true(az_span_is_content_equal(
         AZ_SPAN_FROM_BUFFER(buf20), AZ_SPAN_FROM_STR("********************")));
@@ -216,7 +216,7 @@ static void test_url_encode_basic(void** state)
   }
   {
     // Empty span
-    int32_t url_length = _az_span_url_encode_calc_length(AZ_SPAN_NULL);
+    int32_t url_length = _az_span_url_encode_calc_length(AZ_SPAN_EMPTY);
     assert_int_equal(url_length, 0);
     url_length = _az_span_url_encode_calc_length(AZ_SPAN_FROM_STR(""));
     assert_int_equal(url_length, 0);
@@ -274,7 +274,7 @@ static void test_url_encode_preconditions(void** state)
       // Input is empty, so the output is also empty BUT the output span is null.
       int32_t url_length = 0xFF;
       assert_true(
-          az_result_succeeded(_az_span_url_encode(AZ_SPAN_NULL, AZ_SPAN_NULL, &url_length)));
+          az_result_succeeded(_az_span_url_encode(AZ_SPAN_EMPTY, AZ_SPAN_EMPTY, &url_length)));
       assert_int_equal(url_length, 0);
     }
     { // Overlapping buffers, same pointer.
@@ -333,8 +333,11 @@ static void test_url_encode_preconditions(void** state)
 
     {
       // Input is empty, so the output is also empty BUT the output span is null.
+      // This precondition assert relies on the ptr of an empty span be null, which is not
+      // guaranteed. However, it is a reasonable assumption for tests as part of span validation,
+      // only for precondition checking.
       int32_t url_length = 0xFF;
-      ASSERT_PRECONDITION_CHECKED(_az_span_url_encode(AZ_SPAN_NULL, AZ_SPAN_NULL, &url_length));
+      ASSERT_PRECONDITION_CHECKED(_az_span_url_encode(AZ_SPAN_EMPTY, AZ_SPAN_EMPTY, &url_length));
       assert_int_equal(url_length, 0xFF);
     }
     {
@@ -377,7 +380,7 @@ static void test_url_encode_preconditions(void** state)
       // NULL out_size parameter.
       uint8_t buf1[1] = { '*' };
       az_span const buffer0 = az_span_slice(AZ_SPAN_FROM_BUFFER(buf1), 0, 0);
-      ASSERT_PRECONDITION_CHECKED(_az_span_url_encode(buffer0, AZ_SPAN_NULL, NULL));
+      ASSERT_PRECONDITION_CHECKED(_az_span_url_encode(buffer0, AZ_SPAN_EMPTY, NULL));
       assert_true(az_span_is_content_equal(AZ_SPAN_FROM_BUFFER(buf1), AZ_SPAN_FROM_STR("*")));
     }
     {

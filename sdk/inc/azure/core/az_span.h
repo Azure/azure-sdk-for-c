@@ -77,12 +77,15 @@ AZ_NODISCARD az_span az_span_create(uint8_t* ptr, int32_t size);
 
 /**
  * @brief An empty #az_span.
+ *
+ * @remark There is no guarantee that the pointer backing this span will be `NULL` and the caller
+ * shouldn't rely on it. However, the size will be 0.
  */
 // When updating this macro, also update AZ_PAIR_NULL, which should be using this macro, but can't
 // due to warnings, and so it is using an expansion of this macro instead.
-#define AZ_SPAN_NULL \
-  (az_span) \
-  { \
+#define AZ_SPAN_EMPTY                      \
+  (az_span)                                \
+  {                                        \
     ._internal = {.ptr = NULL, .size = 0 } \
   }
 
@@ -101,12 +104,12 @@ AZ_NODISCARD az_span az_span_create(uint8_t* ptr, int32_t size);
  *
  * @remarks An empty ("") literal string results in an #az_span with size set to 0.
  */
-#define AZ_SPAN_LITERAL_FROM_STR(STRING_LITERAL) \
-  { \
-    ._internal = { \
-      .ptr = (uint8_t*)STRING_LITERAL, \
+#define AZ_SPAN_LITERAL_FROM_STR(STRING_LITERAL)      \
+  {                                                   \
+    ._internal = {                                    \
+      .ptr = (uint8_t*)STRING_LITERAL,                \
       .size = _az_STRING_LITERAL_LEN(STRING_LITERAL), \
-    }, \
+    },                                                \
   }
 
 /**
@@ -146,7 +149,7 @@ AZ_NODISCARD az_span az_span_create(uint8_t* ptr, int32_t size);
  */
 // Force a division by 0 that gets detected by compilers for anything that isn't a byte array.
 #define AZ_SPAN_FROM_BUFFER(BYTE_BUFFER) \
-  az_span_create( \
+  az_span_create(                        \
       (uint8_t*)BYTE_BUFFER, (sizeof(BYTE_BUFFER) / (_az_IS_BYTE_ARRAY(BYTE_BUFFER) ? 1 : 0)))
 
 /**
@@ -275,7 +278,7 @@ AZ_NODISCARD int32_t az_span_find(az_span source, az_span target);
  * source.
  *
  * @remarks This function copies all of \p source into the \p destination even if they overlap.
- * @remarks If \p source is an empty #az_span or #AZ_SPAN_NULL, this function will just return
+ * @remarks If \p source is an empty #az_span or #AZ_SPAN_EMPTY, this function will just return
  * \p destination.
  */
 az_span az_span_copy(az_span destination, az_span source);
@@ -536,14 +539,14 @@ typedef struct
 } az_pair;
 
 /**
- * @brief An #az_pair instance whose key and value fields are initialized to #AZ_SPAN_NULL.
+ * @brief An #az_pair instance whose key and value fields are initialized to #AZ_SPAN_EMPTY.
  */
-#define AZ_PAIR_NULL \
-  (az_pair) \
-  { \
+#define AZ_PAIR_NULL                                    \
+  (az_pair)                                             \
+  {                                                     \
     .key = { ._internal = { .ptr = NULL, .size = 0 } }, \
-    .value \
-        = {._internal = { .ptr = NULL, .size = 0 } } \
+    .value                                              \
+        = {._internal = { .ptr = NULL, .size = 0 } }    \
   }
 
 /**

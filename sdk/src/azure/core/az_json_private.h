@@ -9,9 +9,9 @@
 
 #include <azure/core/_az_cfg_prefix.h>
 
-#define _az_JSON_TOKEN_DEFAULT \
-  (az_json_token) \
-  { \
+#define _az_JSON_TOKEN_DEFAULT                     \
+  (az_json_token)                                  \
+  {                                                \
     .kind = AZ_JSON_TOKEN_NONE, ._internal = { 0 } \
   }
 
