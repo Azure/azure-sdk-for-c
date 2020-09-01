@@ -16,11 +16,11 @@ static char request_id_buf[10];
 static char publish_topic[128];
 static char publish_payload[512];
 
-void pnp_mqtt_message_init(pnp_mqtt_message* mqtt_message)
+az_result pnp_mqtt_message_init(pnp_mqtt_message* mqtt_message)
 {
   if (mqtt_message == NULL)
   {
-    exit(1);
+    return AZ_ERROR_ARG;
   }
 
   mqtt_message->topic = publish_topic;
@@ -28,6 +28,8 @@ void pnp_mqtt_message_init(pnp_mqtt_message* mqtt_message)
   mqtt_message->out_topic_length = 0;
   mqtt_message->payload_span = AZ_SPAN_FROM_BUFFER(publish_payload);
   mqtt_message->out_payload_span = mqtt_message->payload_span;
+
+  return AZ_OK;
 }
 
 // Create request id span which increments request id integer each call. Capable of holding 8 digit

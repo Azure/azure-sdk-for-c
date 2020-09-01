@@ -43,11 +43,11 @@ static const az_span pnp_device_info_total_memory_property_name
 static const double pnp_device_info_total_memory_property_value = 128;
 
 az_result pnp_device_info_get_report_data(
-    const az_iot_hub_client* client,
-    pnp_mqtt_message* mqtt_message)
+    az_span payload_span,
+    az_span* out_payload_span)
 {
   az_json_writer jw;
-  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_init(&jw, mqtt_message->payload_span, NULL));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_init(&jw, payload_span, NULL));
 
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
   IOT_SAMPLE_RETURN_IF_FAILED(
@@ -84,14 +84,7 @@ az_result pnp_device_info_get_report_data(
       &jw, pnp_device_info_total_memory_property_value, DOUBLE_DECIMAL_PLACE_DIGITS));
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
 
-  mqtt_message->out_payload_span = az_json_writer_get_bytes_used_in_destination(&jw);
-
-  IOT_SAMPLE_RETURN_IF_FAILED(az_iot_hub_client_twin_patch_get_publish_topic(
-      client,
-      get_request_id(),
-      mqtt_message->topic,
-      mqtt_message->topic_length,
-      mqtt_message->out_topic_length));
+  out_payload_span = az_json_writer_get_bytes_used_in_destination(&jw);
 
   return AZ_OK;
 }

@@ -205,7 +205,7 @@ az_result pnp_thermostat_get_telemetry_message(
   return rc;
 }
 
-bool pnp_thermostat_get_max_temp_report(
+bool pnp_thermostat_send_max_temp_reported_property(
     const az_iot_hub_client* client,
     pnp_thermostat_component* thermostat_component,
     pnp_mqtt_message* mqtt_message)
@@ -243,6 +243,10 @@ bool pnp_thermostat_get_max_temp_report(
   }
 
   thermostat_component->send_max_temp_property = false;
+
+        mqtt_publish_message(
+          mqtt_message.topic, mqtt_message.out_payload_span, IOT_SAMPLE_MQTT_PUBLISH_QOS);
+
 
   return true;
 }

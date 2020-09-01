@@ -108,7 +108,7 @@ static void receive_messages(void);
 static void disconnect_mqtt_client_from_iot_hub(void);
 
 static az_span get_request_id(void);
-static void mqtt_publish_message(char const* topic, az_span payload, int qos);
+static void publish_mqtt_message(char const* topic, az_span payload, int qos);
 static void on_message_received(char* topic, int topic_len, MQTTClient_message const* message);
 
 // Device Twin functions
@@ -393,7 +393,7 @@ static void request_device_twin_document(void)
   }
 
   // Publish the twin document request.
-  mqtt_publish_message(twin_document_topic_buffer, AZ_SPAN_EMPTY, IOT_SAMPLE_MQTT_PUBLISH_QOS);
+  publish_mqtt_message(twin_document_topic_buffer, AZ_SPAN_EMPTY, IOT_SAMPLE_MQTT_PUBLISH_QOS);
 }
 
 static void receive_messages(void)
@@ -479,7 +479,7 @@ static az_span get_request_id(void)
   return az_span_slice(destination, 0, az_span_size(destination) - az_span_size(out_span));
 }
 
-static void mqtt_publish_message(const char* topic, az_span payload, int qos)
+static void publish_mqtt_message(const char* topic, az_span payload, int qos)
 {
   int rc;
   MQTTClient_deliveryToken token;
@@ -782,7 +782,7 @@ static void send_reported_property(az_span name, double value, int32_t version, 
   }
 
   // Publish the reported property update.
-  mqtt_publish_message(
+  publish_mqtt_message(
       twin_patch_topic_buffer, reported_property_payload, IOT_SAMPLE_MQTT_PUBLISH_QOS);
   IOT_SAMPLE_LOG_SUCCESS("Client published the Twin Patch reported property message.");
   IOT_SAMPLE_LOG_AZ_SPAN("Payload:", reported_property_payload);
@@ -844,7 +844,7 @@ static void send_command_response(
   }
 
   // Publish the command response.
-  mqtt_publish_message(methods_response_topic_buffer, response, IOT_SAMPLE_MQTT_PUBLISH_QOS);
+  publish_mqtt_message(methods_response_topic_buffer, response, IOT_SAMPLE_MQTT_PUBLISH_QOS);
   IOT_SAMPLE_LOG_SUCCESS("Client published the Command response.");
   IOT_SAMPLE_LOG("Status: %d", status);
   IOT_SAMPLE_LOG_AZ_SPAN("Payload:", response);
@@ -942,7 +942,7 @@ static void send_telemetry_message(void)
   }
 
   // Publish the telemetry message.
-  mqtt_publish_message(telemetry_topic_buffer, telemetry_payload, IOT_SAMPLE_MQTT_PUBLISH_QOS);
+  publish_mqtt_message(telemetry_topic_buffer, telemetry_payload, IOT_SAMPLE_MQTT_PUBLISH_QOS);
   IOT_SAMPLE_LOG_SUCCESS("Client published the Telemetry message.");
   IOT_SAMPLE_LOG_AZ_SPAN("Payload:", telemetry_payload);
 }

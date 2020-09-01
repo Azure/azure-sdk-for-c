@@ -9,6 +9,10 @@
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
 
+#define MQTT_TIMEOUT_RECEIVE_MAX_MESSAGE_COUNT 3
+#define MQTT_TIMEOUT_RECEIVE_MS (8 * 1000)
+#define MQTT_TIMEOUT_DISCONNECT_MS (10 * 1000)
+
 typedef struct
 {
   char* topic;
@@ -18,7 +22,10 @@ typedef struct
   az_span out_payload_span;
 } pnp_mqtt_message;
 
-void pnp_mqtt_message_init(pnp_mqtt_message* mqtt_message);
+az_result pnp_mqtt_message_init(pnp_mqtt_message* mqtt_message);
+
+static void pnp_mqtt_publish_message(const char* topic, az_span payload, int qos);
+static void pnp_mqtt_receive_message(void);
 
 // Create request id span which increments request id integer each call. Capable of holding 8 digit
 // number.
