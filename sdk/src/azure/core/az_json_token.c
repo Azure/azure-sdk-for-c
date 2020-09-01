@@ -453,7 +453,8 @@ az_json_token_get_uint64(az_json_token const* json_token, uint64_t* out_value)
     return AZ_ERROR_UNEXPECTED_CHAR;
   }
 
-  // Token straddles more than one segment
+  // Token straddles more than one segment.
+  // Used to copy discontiguous token values into a contiguous buffer, for number parsing.
   uint8_t scratch_buffer[_az_MAX_SIZE_FOR_UINT64] = { 0 };
   az_span scratch = AZ_SPAN_FROM_BUFFER(scratch_buffer);
 
@@ -487,7 +488,8 @@ az_json_token_get_uint32(az_json_token const* json_token, uint32_t* out_value)
     return AZ_ERROR_UNEXPECTED_CHAR;
   }
 
-  // Token straddles more than one segment
+  // Token straddles more than one segment.
+  // Used to copy discontiguous token values into a contiguous buffer, for number parsing.
   uint8_t scratch_buffer[_az_MAX_SIZE_FOR_UINT32] = { 0 };
   az_span scratch = AZ_SPAN_FROM_BUFFER(scratch_buffer);
 
@@ -520,7 +522,8 @@ AZ_NODISCARD az_result az_json_token_get_int64(az_json_token const* json_token, 
     return AZ_ERROR_UNEXPECTED_CHAR;
   }
 
-  // Token straddles more than one segment
+  // Token straddles more than one segment.
+  // Used to copy discontiguous token values into a contiguous buffer, for number parsing.
   uint8_t scratch_buffer[_az_MAX_SIZE_FOR_INT64] = { 0 };
   az_span scratch = AZ_SPAN_FROM_BUFFER(scratch_buffer);
 
@@ -553,7 +556,8 @@ AZ_NODISCARD az_result az_json_token_get_int32(az_json_token const* json_token, 
     return AZ_ERROR_UNEXPECTED_CHAR;
   }
 
-  // Token straddles more than one segment
+  // Token straddles more than one segment.
+  // Used to copy discontiguous token values into a contiguous buffer, for number parsing.
   uint8_t scratch_buffer[_az_MAX_SIZE_FOR_INT32] = { 0 };
   az_span scratch = AZ_SPAN_FROM_BUFFER(scratch_buffer);
 
@@ -586,7 +590,8 @@ AZ_NODISCARD az_result az_json_token_get_double(az_json_token const* json_token,
     return AZ_ERROR_UNEXPECTED_CHAR;
   }
 
-  // Token straddles more than one segment
+  // Token straddles more than one segment.
+  // Used to copy discontiguous token values into a contiguous buffer, for number parsing.
   uint8_t scratch_buffer[_az_MAX_SIZE_FOR_PARSING_DOUBLE] = { 0 };
   az_span scratch = AZ_SPAN_FROM_BUFFER(scratch_buffer);
 
