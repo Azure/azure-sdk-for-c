@@ -348,7 +348,7 @@ static void test_az_log_everything_on_null(void** state)
     az_log_set_classifications(classifications);
     az_log_set_callback(_log_listener_count_logs);
 
-    _log_retry = 0;
+    _number_of_log_attempts = 0;
 
     assert_true(_az_BUILT_WITH_LOGGING(true, false) == _az_LOG_SHOULD_WRITE(AZ_LOG_IOT_RETRY));
     assert_true(_az_BUILT_WITH_LOGGING(true, false) == _az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_REQUEST));
@@ -366,7 +366,7 @@ static void test_az_log_everything_on_null(void** state)
     _az_LOG_WRITE((az_log_classification)12345, AZ_SPAN_EMPTY);
     _az_LOG_WRITE(AZ_LOG_MQTT_RECEIVED_PAYLOAD, AZ_SPAN_EMPTY);
 
-    assert_int_equal(_az_BUILT_WITH_LOGGING(5, 0), _log_retry);
+    assert_int_equal(_az_BUILT_WITH_LOGGING(5, 0), _number_of_log_attempts);
 
     az_log_set_callback(NULL);
     az_log_set_classifications(NULL);
