@@ -370,7 +370,7 @@ AZ_NODISCARD az_result az_span_atod(az_span source, double* out_number)
 
   int32_t size = az_span_size(source);
 
-  _az_PRECONDITION_RANGE(1, size, 99);
+  _az_PRECONDITION_RANGE(1, size, _az_MAX_SIZE_FOR_PARSING_DOUBLE);
 
   // This check is necessary to prevent sscanf from reading bytes past the end of the span, when the
   // span might contain whitespace or other invalid bytes at the start.

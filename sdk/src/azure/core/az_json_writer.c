@@ -904,7 +904,8 @@ AZ_NODISCARD az_result az_json_writer_append_double(
   _az_PRECONDITION(_az_isfinite(value));
   _az_PRECONDITION_RANGE(0, fractional_digits, _az_MAX_SUPPORTED_FRACTIONAL_DIGITS);
 
-  int32_t required_size = _az_MAX_SIZE_FOR_DOUBLE; // Need enough space to write any double number.
+  // Need enough space to write any double number.
+  int32_t required_size = _az_MAX_SIZE_FOR_WRITING_DOUBLE;
 
   if (ref_json_writer->_internal.need_comma)
   {
@@ -928,7 +929,7 @@ AZ_NODISCARD az_result az_json_writer_append_double(
   // We already accounted for the maximum size needed in required_size, so subtract that to get the
   // actual bytes written.
   int32_t written
-      = required_size + _az_span_diff(leftover, remaining_json) - _az_MAX_SIZE_FOR_DOUBLE;
+      = required_size + _az_span_diff(leftover, remaining_json) - _az_MAX_SIZE_FOR_WRITING_DOUBLE;
   _az_update_json_writer_state(ref_json_writer, written, written, true, AZ_JSON_TOKEN_NUMBER);
   return AZ_OK;
 }

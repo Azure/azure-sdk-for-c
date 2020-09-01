@@ -23,10 +23,20 @@ enum
   // _az_MAX_SAFE_INTEGER.
   _az_MAX_SUPPORTED_FRACTIONAL_DIGITS = 15,
 
-  _az_MAX_SIZE_FOR_INT32_T = 11,
-  _az_MAX_SIZE_FOR_UINT32_T = 10,
-  _az_MAX_SIZE_FOR_INT64_T = 20,
-  _az_MAX_SIZE_FOR_UINT64_T = 20,
+  // 10 + sign (i.e. -2,147,483,648)
+  _az_MAX_SIZE_FOR_INT32 = 11,
+
+  // For example: 2,147,483,648
+  _az_MAX_SIZE_FOR_UINT32 = 10,
+
+  // 19 + sign (i.e. -9,223,372,036,854,775,808)
+  _az_MAX_SIZE_FOR_INT64 = 20,
+
+  // For example: 18,446,744,073,709,551,615
+  _az_MAX_SIZE_FOR_UINT64 = 20,
+
+  // Two digit length to create the "format" passed to sscanf.
+  _az_MAX_SIZE_FOR_PARSING_DOUBLE = 99,
 };
 
 /**

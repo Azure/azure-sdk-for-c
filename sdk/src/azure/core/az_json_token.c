@@ -447,15 +447,15 @@ az_json_token_get_uint64(az_json_token const* json_token, uint64_t* out_value)
     return az_span_atou64(token_slice, out_value);
   }
 
-  // Token straddles more than one segment
-  uint8_t scratch_buffer[_az_MAX_SIZE_FOR_UINT64_T] = { 0 };
-  az_span scratch = AZ_SPAN_FROM_BUFFER(scratch_buffer);
-
   // Any number that won't fit in the scratch buffer, will overflow.
-  if (az_span_size(scratch) < json_token->size)
+  if (json_token->size > _az_MAX_SIZE_FOR_UINT64)
   {
     return AZ_ERROR_UNEXPECTED_CHAR;
   }
+
+  // Token straddles more than one segment
+  uint8_t scratch_buffer[_az_MAX_SIZE_FOR_UINT64] = { 0 };
+  az_span scratch = AZ_SPAN_FROM_BUFFER(scratch_buffer);
 
   az_span remainder = _az_json_token_copy_into_span_helper(json_token, scratch);
 
@@ -481,15 +481,15 @@ az_json_token_get_uint32(az_json_token const* json_token, uint32_t* out_value)
     return az_span_atou32(token_slice, out_value);
   }
 
-  // Token straddles more than one segment
-  uint8_t scratch_buffer[_az_MAX_SIZE_FOR_UINT32_T] = { 0 };
-  az_span scratch = AZ_SPAN_FROM_BUFFER(scratch_buffer);
-
   // Any number that won't fit in the scratch buffer, will overflow.
-  if (az_span_size(scratch) < json_token->size)
+  if (json_token->size > _az_MAX_SIZE_FOR_UINT32)
   {
     return AZ_ERROR_UNEXPECTED_CHAR;
   }
+
+  // Token straddles more than one segment
+  uint8_t scratch_buffer[_az_MAX_SIZE_FOR_UINT32] = { 0 };
+  az_span scratch = AZ_SPAN_FROM_BUFFER(scratch_buffer);
 
   az_span remainder = _az_json_token_copy_into_span_helper(json_token, scratch);
 
@@ -514,15 +514,15 @@ AZ_NODISCARD az_result az_json_token_get_int64(az_json_token const* json_token, 
     return az_span_atoi64(token_slice, out_value);
   }
 
-  // Token straddles more than one segment
-  uint8_t scratch_buffer[_az_MAX_SIZE_FOR_INT64_T] = { 0 };
-  az_span scratch = AZ_SPAN_FROM_BUFFER(scratch_buffer);
-
   // Any number that won't fit in the scratch buffer, will overflow.
-  if (az_span_size(scratch) < json_token->size)
+  if (json_token->size > _az_MAX_SIZE_FOR_INT64)
   {
     return AZ_ERROR_UNEXPECTED_CHAR;
   }
+
+  // Token straddles more than one segment
+  uint8_t scratch_buffer[_az_MAX_SIZE_FOR_INT64] = { 0 };
+  az_span scratch = AZ_SPAN_FROM_BUFFER(scratch_buffer);
 
   az_span remainder = _az_json_token_copy_into_span_helper(json_token, scratch);
 
@@ -547,15 +547,15 @@ AZ_NODISCARD az_result az_json_token_get_int32(az_json_token const* json_token, 
     return az_span_atoi32(token_slice, out_value);
   }
 
-  // Token straddles more than one segment
-  uint8_t scratch_buffer[_az_MAX_SIZE_FOR_INT32_T] = { 0 };
-  az_span scratch = AZ_SPAN_FROM_BUFFER(scratch_buffer);
-
   // Any number that won't fit in the scratch buffer, will overflow.
-  if (az_span_size(scratch) < json_token->size)
+  if (json_token->size > _az_MAX_SIZE_FOR_INT32)
   {
     return AZ_ERROR_UNEXPECTED_CHAR;
   }
+
+  // Token straddles more than one segment
+  uint8_t scratch_buffer[_az_MAX_SIZE_FOR_INT32] = { 0 };
+  az_span scratch = AZ_SPAN_FROM_BUFFER(scratch_buffer);
 
   az_span remainder = _az_json_token_copy_into_span_helper(json_token, scratch);
 
@@ -580,15 +580,15 @@ AZ_NODISCARD az_result az_json_token_get_double(az_json_token const* json_token,
     return az_span_atod(token_slice, out_value);
   }
 
-  // Token straddles more than one segment
-  uint8_t scratch_buffer[99] = { 0 };
-  az_span scratch = AZ_SPAN_FROM_BUFFER(scratch_buffer);
-
   // Any number that won't fit in the scratch buffer, will overflow.
-  if (az_span_size(scratch) < json_token->size)
+  if (json_token->size > _az_MAX_SIZE_FOR_PARSING_DOUBLE)
   {
     return AZ_ERROR_UNEXPECTED_CHAR;
   }
+
+  // Token straddles more than one segment
+  uint8_t scratch_buffer[_az_MAX_SIZE_FOR_PARSING_DOUBLE] = { 0 };
+  az_span scratch = AZ_SPAN_FROM_BUFFER(scratch_buffer);
 
   az_span remainder = _az_json_token_copy_into_span_helper(json_token, scratch);
 
