@@ -573,7 +573,7 @@ static void test_http_request_removing_left_whitespace_chars(void** state)
       header_span,
       AZ_SPAN_FROM_STR("body")));
 
-  // Nothing but empty name - should hit precondion
+  // Nothing but empty name - should hit precondition
   ASSERT_PRECONDITION_CHECKED(
       az_http_request_append_header(&request, AZ_SPAN_FROM_STR(" \t\r"), AZ_SPAN_NULL));
 }
