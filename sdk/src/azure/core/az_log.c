@@ -19,35 +19,44 @@
 static az_log_classification const* volatile _az_log_classifications = NULL;
 static az_log_message_fn volatile _az_log_message_callback = NULL;
 
+// Verifies that the classification that the user provided is one of the valid possibilties and
+// guards against looping past the end of the classification array.
+// Make sure to update the switch statement whenever new classifications are added.
+static bool _az_is_valid_log_classification(az_log_classification const* classifications)
+{
+  if (classifications == NULL)
+  {
+    return true;
+  }
+  for (az_log_classification const* cls = classifications; *cls != AZ_LOG_END_OF_LIST; ++cls)
+  {
+    switch (*cls)
+    {
+      case AZ_LOG_HTTP_REQUEST:
+      case AZ_LOG_HTTP_RESPONSE:
+      case AZ_LOG_HTTP_RETRY:
+      case AZ_LOG_MQTT_RECEIVED_TOPIC:
+      case AZ_LOG_MQTT_RECEIVED_PAYLOAD:
+      case AZ_LOG_IOT_RETRY:
+      case AZ_LOG_IOT_SAS_TOKEN:
+      case AZ_LOG_IOT_AZURERTOS:
+        continue;
+      default:
+        return false;
+    }
+  }
+  return true;
+}
+
 void az_log_set_classifications(az_log_classification const classifications[])
 {
+  _az_PRECONDITION(_az_is_valid_log_classification(classifications));
   _az_log_classifications = classifications;
 }
 
 void az_log_set_callback(az_log_message_fn az_log_message_callback)
 {
   _az_log_message_callback = az_log_message_callback;
-}
-
-// Verifies that  the classification that the user provided is one of the valid possibilties
-// and guards against looping past the end of the classification array.
-// Make sure to update the switch statement whenever new classifications are added.
-static bool _az_is_valid_log_classification(az_log_classification const* classification)
-{
-  switch (*classification)
-  {
-    case AZ_LOG_HTTP_REQUEST:
-    case AZ_LOG_HTTP_RESPONSE:
-    case AZ_LOG_HTTP_RETRY:
-    case AZ_LOG_MQTT_RECEIVED_TOPIC:
-    case AZ_LOG_MQTT_RECEIVED_PAYLOAD:
-    case AZ_LOG_IOT_RETRY:
-    case AZ_LOG_IOT_SAS_TOKEN:
-    case AZ_LOG_IOT_AZURERTOS:
-      return true;
-    default:
-      return false;
-  }
 }
 
 // _az_LOG_WRITE_engine is a function private to this .c file; it contains the code to handle
@@ -80,11 +89,6 @@ static bool _az_log_write_engine(bool log_it, az_log_classification classificati
 
   for (az_log_classification const* cls = classifications; *cls != AZ_LOG_END_OF_LIST; ++cls)
   {
-    if (!_az_is_valid_log_classification(cls))
-    {
-      break;
-    }
-
     // If this message's classification is in the customer-provided list, we should log it.
     if (*cls == classification)
     {

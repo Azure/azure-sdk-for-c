@@ -258,20 +258,6 @@ static void test_az_iot_provisioning_client_logging_succeed()
   az_log_set_classifications(NULL);
 }
 
-static void test_az_log_incomplete_list_fails_gracefully()
-{
-  az_log_classification const classifications[] = { AZ_LOG_HTTP_REQUEST };
-  az_log_set_classifications(classifications);
-  az_log_set_callback(_log_listener);
-
-  _log_retry = 0;
-  assert_int_equal(2229, az_iot_retry_calc_delay(5, 1, 500, 100000, 1234));
-  assert_int_equal(0, _log_retry);
-
-  az_log_set_callback(NULL);
-  az_log_set_classifications(NULL);
-}
-
 static void test_az_span_copy_url_encode_succeed()
 {
   az_span url_decoded_span = AZ_SPAN_FROM_STR("abc/=%012");
@@ -718,7 +704,6 @@ int test_az_iot_common()
     cmocka_unit_test(test_az_iot_retry_calc_delay_common_timings_success),
     cmocka_unit_test(test_az_iot_retry_calc_delay_overflow_time_success),
     cmocka_unit_test(test_az_iot_provisioning_client_logging_succeed),
-    cmocka_unit_test(test_az_log_incomplete_list_fails_gracefully),
     cmocka_unit_test(test_az_span_copy_url_encode_succeed),
     cmocka_unit_test(test_az_span_copy_url_encode_insufficient_size_fail),
     cmocka_unit_test(test_az_iot_message_properties_init_succeed),

@@ -285,54 +285,6 @@ static void test_az_log_incorrect_list_fails_gracefully(void** state)
 {
   (void)state;
   {
-    az_log_classification const classifications[] = { 0 };
-    az_log_set_classifications(classifications);
-    az_log_set_callback(_log_listener_no_op);
-
-    assert_false(_az_LOG_SHOULD_WRITE(AZ_LOG_IOT_RETRY));
-    _az_LOG_WRITE(AZ_LOG_IOT_RETRY, AZ_SPAN_EMPTY);
-
-    az_log_set_callback(NULL);
-    az_log_set_classifications(NULL);
-  }
-
-  {
-    az_log_classification const classifications[] = { AZ_LOG_HTTP_REQUEST };
-    az_log_set_classifications(classifications);
-    az_log_set_callback(_log_listener_no_op);
-
-    assert_false(_az_LOG_SHOULD_WRITE(AZ_LOG_IOT_RETRY));
-    _az_LOG_WRITE(AZ_LOG_IOT_RETRY, AZ_SPAN_EMPTY);
-
-    az_log_set_callback(NULL);
-    az_log_set_classifications(NULL);
-  }
-
-  {
-    az_log_classification const classifications[] = { (az_log_classification)12345 };
-    az_log_set_classifications(classifications);
-    az_log_set_callback(_log_listener_no_op);
-
-    assert_false(_az_LOG_SHOULD_WRITE(AZ_LOG_IOT_RETRY));
-    _az_LOG_WRITE(AZ_LOG_IOT_RETRY, AZ_SPAN_EMPTY);
-
-    az_log_set_callback(NULL);
-    az_log_set_classifications(NULL);
-  }
-
-  {
-    az_log_classification const classifications[] = { (az_log_classification)-12345 };
-    az_log_set_classifications(classifications);
-    az_log_set_callback(_log_listener_no_op);
-
-    assert_false(_az_LOG_SHOULD_WRITE(AZ_LOG_IOT_RETRY));
-    _az_LOG_WRITE(AZ_LOG_IOT_RETRY, AZ_SPAN_EMPTY);
-
-    az_log_set_callback(NULL);
-    az_log_set_classifications(NULL);
-  }
-
-  {
     az_log_classification const classifications[] = { AZ_LOG_IOT_RETRY, AZ_LOG_END_OF_LIST };
     az_log_set_classifications(classifications);
     az_log_set_callback(_log_listener_no_op);
@@ -402,7 +354,8 @@ static void test_az_log_everything_on_null(void** state)
     assert_true(_az_BUILT_WITH_LOGGING(true, false) == _az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_REQUEST));
     assert_true(_az_BUILT_WITH_LOGGING(true, false) == _az_LOG_SHOULD_WRITE(AZ_LOG_IOT_AZURERTOS));
     assert_false(_az_LOG_SHOULD_WRITE(AZ_LOG_END_OF_LIST));
-    assert_false(_az_LOG_SHOULD_WRITE((az_log_classification)12345));
+    assert_true(
+        _az_BUILT_WITH_LOGGING(true, false) == _az_LOG_SHOULD_WRITE((az_log_classification)12345));
     assert_true(
         _az_BUILT_WITH_LOGGING(true, false) == _az_LOG_SHOULD_WRITE(AZ_LOG_MQTT_RECEIVED_PAYLOAD));
 
@@ -413,7 +366,7 @@ static void test_az_log_everything_on_null(void** state)
     _az_LOG_WRITE((az_log_classification)12345, AZ_SPAN_EMPTY);
     _az_LOG_WRITE(AZ_LOG_MQTT_RECEIVED_PAYLOAD, AZ_SPAN_EMPTY);
 
-    assert_int_equal(_az_BUILT_WITH_LOGGING(4, 0), _log_retry);
+    assert_int_equal(_az_BUILT_WITH_LOGGING(5, 0), _log_retry);
 
     az_log_set_callback(NULL);
     az_log_set_classifications(NULL);
