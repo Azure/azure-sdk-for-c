@@ -34,8 +34,8 @@
 static az_span const twin_document_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("get_twin");
 static az_span const twin_patch_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("reported_prop");
 static az_span const version_name = AZ_SPAN_LITERAL_FROM_STR("$version");
-static az_span const reported_property_name = AZ_SPAN_LITERAL_FROM_STR("device_count");
-static int32_t reported_property_value = 0;
+static az_span const desired_device_count_property_name = AZ_SPAN_LITERAL_FROM_STR("device_count");
+static int32_t device_count_value = 0;
 
 static iot_sample_environment_variables env_vars;
 static az_iot_hub_client hub_client;
@@ -60,10 +60,14 @@ static void parse_device_twin_message(
 static void handle_device_twin_message(
     MQTTClient_message const* message,
     az_iot_hub_client_twin_response const* twin_response);
+static az_result parse_desired_device_count_property(
+    az_span message_span,
+    bool* out_property_found,
+    int32_t* out_parsed_device_count);
+static void update_device_count_property(int32_t device_count);
 static az_result build_reported_property(
     az_span reported_property_payload,
     az_span* out_reported_property_payload);
-static az_result update_local_property(az_span desired_payload, bool* out_property_found);
 
 /*
  * This sample utilizes the Azure IoT Hub to get the device twin document, send a reported property
@@ -283,7 +287,8 @@ static void get_device_twin_document(void)
   }
 
   // Publish the twin document request.
-  if ((rc = MQTTClient_publish(mqtt_client, twin_document_topic_buffer, 0, NULL, 0, 0, NULL))
+  if ((rc = MQTTClient_publish(
+           mqtt_client, twin_document_topic_buffer, 0, NULL, IOT_SAMPLE_MQTT_PUBLISH_QOS, 0, NULL))
       != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR(
@@ -329,7 +334,7 @@ static void send_reported_property(void)
            twin_patch_topic_buffer,
            az_span_size(reported_property_payload),
            az_span_ptr(reported_property_payload),
-           0,
+           IOT_SAMPLE_MQTT_PUBLISH_QOS,
            0,
            NULL))
       != MQTTCLIENT_SUCCESS)
@@ -432,16 +437,24 @@ static void handle_device_twin_message(
       IOT_SAMPLE_LOG("Message Type: Desired Properties");
 
       bool property_found;
-      if (az_result_failed(rc = update_local_property(message_span, &property_found)))
+      int32_t desired_device_count;
+
+      // Parse for the device count property.
+      if (az_result_failed(
+              rc = parse_desired_device_count_property(
+                  message_span, &property_found, &desired_device_count)))
       {
         IOT_SAMPLE_LOG_ERROR(
-            "Failed to update property locally: az_result return code 0x%08x.", rc);
+            "Failed to parse for desired devie_count property: az_result return code 0x%08x.", rc);
         exit(rc);
       }
 
       if (property_found)
       {
         IOT_SAMPLE_LOG(" "); // Formatting.
+
+        // Update device count locally and report update to server.
+        update_device_count_property(desired_device_count);
         send_reported_property();
         receive_device_twin_message();
       }
@@ -449,76 +462,77 @@ static void handle_device_twin_message(
   }
 }
 
-static az_result build_reported_property(
-    az_span reported_property_payload,
-    az_span* out_reported_property_payload)
-{
-  az_json_writer json_writer;
-
-  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_init(&json_writer, reported_property_payload, NULL));
-  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_begin_object(&json_writer));
-  IOT_SAMPLE_RETURN_IF_FAILED(
-      az_json_writer_append_property_name(&json_writer, reported_property_name));
-  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_int32(&json_writer, reported_property_value));
-  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_end_object(&json_writer));
-
-  *out_reported_property_payload = az_json_writer_get_bytes_used_in_destination(&json_writer);
-
-  return AZ_OK;
-}
-
-static az_result update_local_property(az_span desired_payload, bool* out_property_found)
+static az_result parse_desired_device_count_property(
+    az_span message_span,
+    bool* out_property_found,
+    int32_t* out_parsed_device_count)
 {
   *out_property_found = false;
+  *out_parsed_device_count = 0;
 
-  // Parse desired property payload.
-  az_json_reader json_reader;
-  IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_init(&json_reader, desired_payload, NULL));
+  az_json_reader jr;
 
-  IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_next_token(&json_reader));
-  if (json_reader.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
+  // Parse message_span.
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_init(&jr, message_span, NULL));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
+  if (jr.token.kind != AZ_JSON_TOKEN_BEGIN_OBJECT)
   {
     return AZ_ERROR_UNEXPECTED_CHAR;
   }
 
-  IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_next_token(&json_reader));
-
-  // Update property locally if found.
-  while (json_reader.token.kind != AZ_JSON_TOKEN_END_OBJECT)
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
+  while (!*out_property_found && (jr.token.kind != AZ_JSON_TOKEN_END_OBJECT))
   {
-    if (az_json_token_is_text_equal(&json_reader.token, reported_property_name))
+    if (az_json_token_is_text_equal(&jr.token, desired_device_count_property_name))
     {
-      // Move to the value token and store value.
-      IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_next_token(&json_reader));
-      IOT_SAMPLE_RETURN_IF_FAILED(
-          az_json_token_get_int32(&json_reader.token, &reported_property_value));
-      IOT_SAMPLE_LOG_SUCCESS(
-          "Client updated \"%.*s\" locally to %d.",
-          az_span_size(reported_property_name),
-          az_span_ptr(reported_property_name),
-          reported_property_value);
+      // Move to the value token.
+      IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
+      IOT_SAMPLE_RETURN_IF_FAILED(az_json_token_get_int32(&jr.token, out_parsed_device_count));
       *out_property_found = true;
-
-      return AZ_OK;
     }
-    else if (az_json_token_is_text_equal(&json_reader.token, version_name))
+    else if (az_json_token_is_text_equal(&jr.token, version_name))
     {
-      break; // Desired property not found in payload.
+      break;
     }
     else
     {
-      IOT_SAMPLE_RETURN_IF_FAILED(
-          az_json_reader_skip_children(&json_reader)); // Ignore children tokens.
+      IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_skip_children(&jr)); // Ignore children tokens.
     }
-
-    IOT_SAMPLE_RETURN_IF_FAILED(
-        az_json_reader_next_token(&json_reader)); // Check next sibling token.
+    IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_next_token(&jr)); // Check next sibling token.
   }
 
-  IOT_SAMPLE_LOG(
-      "Did not find \"%.*s\" in desired property payload. Nothing to update.",
-      az_span_size(reported_property_name),
-      az_span_ptr(reported_property_name));
+  if (*out_property_found)
+  {
+    IOT_SAMPLE_LOG("Parsed desired `device_count`: %d", *out_parsed_device_count);
+  }
+  else
+  {
+    IOT_SAMPLE_LOG("`device_count` property was not found in desired property response.");
+  }
+
+  return AZ_OK;
+}
+
+static void update_device_count_property(int32_t device_count)
+{
+  device_count_value = device_count;
+  IOT_SAMPLE_LOG_SUCCESS("Client updated device_count locally to %d.", device_count_value);
+}
+
+static az_result build_reported_property(
+    az_span reported_property_payload,
+    az_span* out_reported_property_payload)
+{
+  az_json_writer jw;
+
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_init(&jw, reported_property_payload, NULL));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
+  IOT_SAMPLE_RETURN_IF_FAILED(
+      az_json_writer_append_property_name(&jw, desired_device_count_property_name));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_int32(&jw, device_count_value));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
+
+  *out_reported_property_payload = az_json_writer_get_bytes_used_in_destination(&jw);
 
   return AZ_OK;
 }

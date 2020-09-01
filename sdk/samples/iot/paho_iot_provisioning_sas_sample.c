@@ -408,7 +408,8 @@ static void send_operation_query_message(
   iot_sample_sleep_for_seconds(register_response->retry_after_seconds);
 
   // Publish the query status request.
-  if ((rc = MQTTClient_publish(mqtt_client, query_status_topic_buffer, 0, NULL, 0, 0, NULL))
+  if ((rc = MQTTClient_publish(
+           mqtt_client, query_status_topic_buffer, 0, NULL, IOT_SAMPLE_MQTT_PUBLISH_QOS, 0, NULL))
       != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR("Failed to publish query status request: MQTTClient return code %d.", rc);
