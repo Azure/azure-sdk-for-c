@@ -22,7 +22,8 @@ static az_log_message_fn volatile _az_log_message_callback = NULL;
 // Verifies that the classification that the user provided is one of the valid possibilties and
 // guards against looping past the end of the classification array.
 // Make sure to update the switch statement whenever new classifications are added.
-static bool _az_is_valid_log_classification(az_log_classification const* classifications)
+#ifndef AZ_NO_PRECONDITION_CHECKING
+AZ_INLINE bool _az_log_classifications_are_valid(az_log_classification const* classifications)
 {
   if (classifications == NULL)
   {
@@ -47,10 +48,11 @@ static bool _az_is_valid_log_classification(az_log_classification const* classif
   }
   return true;
 }
+#endif // AZ_NO_PRECONDITION_CHECKING
 
 void az_log_set_classifications(az_log_classification const classifications[])
 {
-  _az_PRECONDITION(_az_is_valid_log_classification(classifications));
+  _az_PRECONDITION(_az_log_classifications_are_valid(classifications));
   _az_log_classifications = classifications;
 }
 
