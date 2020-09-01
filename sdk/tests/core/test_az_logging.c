@@ -353,6 +353,41 @@ static void _log_listener_count_logs(az_log_classification classification, az_sp
   (void)message;
 }
 
+static void test_az_log_everything(void** state)
+{
+  (void)state;
+  {
+    az_log_classification const classifications[]
+        = { AZ_LOG_IOT_AZURERTOS,         AZ_LOG_IOT_SAS_TOKEN,       AZ_LOG_IOT_RETRY,
+            AZ_LOG_MQTT_RECEIVED_PAYLOAD, AZ_LOG_MQTT_RECEIVED_TOPIC, AZ_LOG_HTTP_RETRY,
+            AZ_LOG_HTTP_RESPONSE,         AZ_LOG_HTTP_REQUEST,        AZ_LOG_END_OF_LIST };
+    az_log_set_classifications(classifications);
+    az_log_set_callback(_log_listener_count_logs);
+
+    _log_retry = 0;
+
+    assert_true(_az_BUILT_WITH_LOGGING(true, false) == _az_LOG_SHOULD_WRITE(AZ_LOG_IOT_RETRY));
+    assert_true(_az_BUILT_WITH_LOGGING(true, false) == _az_LOG_SHOULD_WRITE(AZ_LOG_HTTP_REQUEST));
+    assert_true(_az_BUILT_WITH_LOGGING(true, false) == _az_LOG_SHOULD_WRITE(AZ_LOG_IOT_AZURERTOS));
+    assert_false(_az_LOG_SHOULD_WRITE(AZ_LOG_END_OF_LIST));
+    assert_false(_az_LOG_SHOULD_WRITE((az_log_classification)12345));
+    assert_true(
+        _az_BUILT_WITH_LOGGING(true, false) == _az_LOG_SHOULD_WRITE(AZ_LOG_MQTT_RECEIVED_PAYLOAD));
+
+    _az_LOG_WRITE(AZ_LOG_IOT_RETRY, AZ_SPAN_EMPTY);
+    _az_LOG_WRITE(AZ_LOG_HTTP_REQUEST, AZ_SPAN_EMPTY);
+    _az_LOG_WRITE(AZ_LOG_IOT_AZURERTOS, AZ_SPAN_EMPTY);
+    _az_LOG_WRITE(AZ_LOG_END_OF_LIST, AZ_SPAN_EMPTY);
+    _az_LOG_WRITE((az_log_classification)12345, AZ_SPAN_EMPTY);
+    _az_LOG_WRITE(AZ_LOG_MQTT_RECEIVED_PAYLOAD, AZ_SPAN_EMPTY);
+
+    assert_int_equal(_az_BUILT_WITH_LOGGING(4, 0), _log_retry);
+
+    az_log_set_callback(NULL);
+    az_log_set_classifications(NULL);
+  }
+}
+
 static void test_az_log_everything_on_null(void** state)
 {
   (void)state;
@@ -391,6 +426,7 @@ int test_az_logging()
     cmocka_unit_test(test_az_log),
     cmocka_unit_test(test_az_log_corrupted_response),
     cmocka_unit_test(test_az_log_incorrect_list_fails_gracefully),
+    cmocka_unit_test(test_az_log_everything),
     cmocka_unit_test(test_az_log_everything_on_null),
   };
   return cmocka_run_group_tests_name("az_core_logging", tests, NULL, NULL);

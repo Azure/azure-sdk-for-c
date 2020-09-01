@@ -36,7 +36,6 @@ static bool _az_is_valid_log_classification(az_log_classification const* classif
 {
   switch (*classification)
   {
-    case AZ_LOG_END_OF_LIST:
     case AZ_LOG_HTTP_REQUEST:
     case AZ_LOG_HTTP_RESPONSE:
     case AZ_LOG_HTTP_RETRY:
