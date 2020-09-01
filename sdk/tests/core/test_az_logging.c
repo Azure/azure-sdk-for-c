@@ -305,7 +305,7 @@ static void _log_listener_count_logs(az_log_classification classification, az_sp
   (void)message;
 }
 
-static void test_az_log_everything(void** state)
+static void test_az_log_everything_valid(void** state)
 {
   (void)state;
   {
@@ -379,7 +379,7 @@ int test_az_logging()
     cmocka_unit_test(test_az_log),
     cmocka_unit_test(test_az_log_corrupted_response),
     cmocka_unit_test(test_az_log_incorrect_list_fails_gracefully),
-    cmocka_unit_test(test_az_log_everything),
+    cmocka_unit_test(test_az_log_everything_valid),
     cmocka_unit_test(test_az_log_everything_on_null),
   };
   return cmocka_run_group_tests_name("az_core_logging", tests, NULL, NULL);
