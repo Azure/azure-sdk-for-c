@@ -50,4 +50,6 @@ typedef struct
   } _internal;
 } _az_credential;
 
+#include <azure/core/_az_cfg_suffix.h>
+
 #endif // _az_CREDENTIALS_H
