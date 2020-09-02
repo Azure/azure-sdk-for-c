@@ -306,7 +306,7 @@ jobs:
       shopt -s globstar
 
       files_with_non_ascii=0
-      for file in /sdk/* sdk/**/* ; do
+      for file in . ./* ./**/* ; do
         if [ ! -d "$file" ]; then
           echo "Validating that $file file only contains ASCII bytes..."
           if grep -I --color='auto' -P -n "[^\x00-\x7F]" $file ; then
