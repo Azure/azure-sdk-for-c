@@ -301,6 +301,25 @@ jobs:
       coverageThreshold: 70
     condition: eq(variables['AZ_SDK_CODE_COV'], 1)
 
+  # Validate all the files are saved as ASCII only without a UTF-8 BOM.
+  - bash: |
+      shopt -s globstar
+
+      files_with_non_ascii=0
+      for file in /sdk/* sdk/**/* ; do
+        if [ ! -d "$file" ]; then
+          echo "Validating that $file file only contains ASCII bytes..."
+          if grep -I --color='auto' -P -n "[^\x00-\x7F]" $file ; then
+            ((files_with_non_ascii++))
+          fi
+        fi
+      done
+
+      echo Files found with non-ASCII characters: $files_with_non_ascii
+      exit $files_with_non_ascii
+      
+    displayName: Validate Characters are ASCII
+
 - job: GenerateReleaseArtifacts
   pool:
     vmImage: windows-2019
