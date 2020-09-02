@@ -82,6 +82,8 @@ https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-distributed-tracing */
 #define AZ_IOT_MESSAGE_PROPERTIES_CONTENT_TYPE \
   "%24.ct" /**< URL encoded and of the form text%2Fplain or application%2Fjson, etc */
 #define AZ_IOT_MESSAGE_PROPERTIES_CONTENT_ENCODING "%24.ce" /**< UTF-8, UTF-16, etc */
+#define AZ_IOT_MESSAGE_PROPERTIES_USER_ID "%24.uid" /**< User ID field */
+#define AZ_IOT_MESSAGE_PROPERTIES_CREATION_TIME "%24.ctime" /**< Creation time of the message */
 
 /**
  * @brief Telemetry or C2D properties.
