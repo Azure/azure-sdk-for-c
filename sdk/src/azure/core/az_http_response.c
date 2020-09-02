@@ -131,11 +131,15 @@ AZ_NODISCARD az_result az_http_response_get_status_line(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result
-az_http_response_get_next_header(az_http_response* ref_response, az_pair* out_header)
+AZ_NODISCARD az_result az_http_response_get_next_header(
+    az_http_response* ref_response,
+    az_span* out_name,
+    az_span* out_value)
 {
   _az_PRECONDITION_NOT_NULL(ref_response);
-  _az_PRECONDITION_NOT_NULL(out_header);
+  _az_PRECONDITION_NOT_NULL(out_name);
+  _az_PRECONDITION_NOT_NULL(out_value);
+
   az_span* reader = &ref_response->_internal.parser.remaining;
   {
     _az_http_response_kind const kind = ref_response->_internal.parser.next_kind;
@@ -194,13 +198,13 @@ az_http_response_get_next_header(az_http_response* ref_response, az_pair* out_he
     }
 
     // form a header name. Reader is currently at char ':'
-    out_header->key = az_span_slice(*reader, 0, field_name_length);
+    *out_name = az_span_slice(*reader, 0, field_name_length);
     // update reader to next position after colon (add one)
     *reader = az_span_slice_to_end(*reader, field_name_length + 1);
 
     // Remove whitespace characters from header name
     // https://github.com/Azure/azure-sdk-for-c/issues/604
-    out_header->key = _az_span_trim_whitespace(out_header->key);
+    *out_name = _az_span_trim_whitespace(*out_name);
 
     // OWS -> remove the optional whitespace characters before header value
     int32_t ows_len = 0;
@@ -251,12 +255,12 @@ az_http_response_get_next_header(az_http_response* ref_response, az_pair* out_he
       }
       offset_value_end = offset; // increasing index only for valid chars,
     }
-    out_header->value = az_span_slice(*reader, 0, offset_value_end);
+    *out_value = az_span_slice(*reader, 0, offset_value_end);
     // moving reader. It is currently after \r was found
     *reader = az_span_slice_to_end(*reader, offset);
 
     // Remove whitespace characters from value https://github.com/Azure/azure-sdk-for-c/issues/604
-    out_header->value = _az_span_trim_whitespace_from_end(out_header->value);
+    *out_value = _az_span_trim_whitespace_from_end(*out_value);
   }
 
   _az_RETURN_IF_FAILED(_az_is_expected_span(reader, AZ_SPAN_FROM_STR("\n")));
@@ -287,7 +291,8 @@ AZ_NODISCARD az_result az_http_response_get_body(az_http_response* ref_response,
     if (current_parsing_section == _az_HTTP_RESPONSE_KIND_HEADER)
     {
       // Parse and ignore all remaining headers
-      for (az_pair h; az_http_response_get_next_header(ref_response, &h) == AZ_OK;)
+      for (az_span n = { 0 }, v = { 0 };
+           az_http_response_get_next_header(ref_response, &n, &v) == AZ_OK;)
       {
         // ignoring header
       }

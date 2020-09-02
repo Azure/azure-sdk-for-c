@@ -96,23 +96,25 @@ static az_result _az_http_policy_logging_append_http_request_msg(
 
   for (int32_t index = 0; index < headers_count; ++index)
   {
-    az_pair header = { 0 };
-    _az_RETURN_IF_FAILED(az_http_request_get_header(request, index, &header));
+    az_span header_name = { 0 };
+    az_span header_value = { 0 };
+    _az_RETURN_IF_FAILED(az_http_request_get_header(request, index, &header_name, &header_value));
 
-    required_length = az_span_size(new_line_tab_string) + az_span_size(header.key);
-    if (az_span_size(header.value) > 0)
+    required_length = az_span_size(new_line_tab_string) + az_span_size(header_name);
+    if (az_span_size(header_value) > 0)
     {
       required_length += _az_LOG_LENGTHY_VALUE_MAX_LENGTH + az_span_size(colon_separator_string);
     }
 
     _az_RETURN_IF_NOT_ENOUGH_SIZE(remainder, required_length);
     remainder = az_span_copy(remainder, new_line_tab_string);
-    remainder = az_span_copy(remainder, header.key);
+    remainder = az_span_copy(remainder, header_name);
 
-    if (az_span_size(header.value) > 0 && !az_span_is_content_equal(header.key, auth_header_name))
+    if (az_span_size(header_value) > 0
+        && !az_span_is_content_equal(header_name, auth_header_name))
     {
       remainder = az_span_copy(remainder, colon_separator_string);
-      remainder = _az_http_policy_logging_copy_lengthy_value(remainder, header.value);
+      remainder = _az_http_policy_logging_copy_lengthy_value(remainder, header_value);
     }
   }
   *ref_log_msg = az_span_slice(*ref_log_msg, 0, _az_span_diff(remainder, *ref_log_msg));
@@ -161,11 +163,13 @@ static az_result _az_http_policy_logging_append_http_response_msg(
   az_span new_line_tab_string = AZ_SPAN_FROM_STR("\n\t");
 
   az_result result = AZ_OK;
-  az_pair header = { 0 };
-  while (az_result_succeeded(result = az_http_response_get_next_header(ref_response, &header)))
+  az_span header_name = { 0 };
+  az_span header_value = { 0 };
+  while (az_result_succeeded(
+      result = az_http_response_get_next_header(ref_response, &header_name, &header_value)))
   {
-    int32_t required_length = az_span_size(new_line_tab_string) + az_span_size(header.key);
-    if (az_span_size(header.value) > 0)
+    int32_t required_length = az_span_size(new_line_tab_string) + az_span_size(header_name);
+    if (az_span_size(header_value) > 0)
     {
       required_length += _az_LOG_LENGTHY_VALUE_MAX_LENGTH + az_span_size(colon_separator_string);
     }
@@ -173,12 +177,12 @@ static az_result _az_http_policy_logging_append_http_response_msg(
     _az_RETURN_IF_NOT_ENOUGH_SIZE(remainder, required_length);
 
     remainder = az_span_copy(remainder, new_line_tab_string);
-    remainder = az_span_copy(remainder, header.key);
+    remainder = az_span_copy(remainder, header_name);
 
-    if (az_span_size(header.value) > 0)
+    if (az_span_size(header_value) > 0)
     {
       remainder = az_span_copy(remainder, colon_separator_string);
-      remainder = _az_http_policy_logging_copy_lengthy_value(remainder, header.value);
+      remainder = _az_http_policy_logging_copy_lengthy_value(remainder, header_value);
     }
   }
 
