@@ -58,7 +58,6 @@ AZ_INLINE az_http_method az_http_method_patch() { return AZ_SPAN_FROM_STR("PATCH
 
 /**
  * @brief Represents a name/value pair of #az_span instances.
- * This is typically used for HTTP query parameters and headers.
  */
 typedef struct
 {
