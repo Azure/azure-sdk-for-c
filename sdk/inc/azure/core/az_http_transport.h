@@ -17,6 +17,7 @@
 
 #include <azure/core/az_http.h>
 #include <azure/core/az_span.h>
+#include <azure/core/internal/az_span_internal.h>
 
 #include <azure/core/_az_cfg_prefix.h>
 
@@ -56,7 +57,17 @@ AZ_INLINE az_http_method az_http_method_delete() { return AZ_SPAN_FROM_STR("DELE
 AZ_INLINE az_http_method az_http_method_patch() { return AZ_SPAN_FROM_STR("PATCH"); }
 
 /**
- * @brief A type representing a buffer of #az_pair instances for HTTP request headers.
+ * @brief Represents a name/value pair of #az_span instances.
+ * This is typically used for HTTP query parameters and headers.
+ */
+typedef struct
+{
+  az_span name; ///< Name.
+  az_span value; ///< Value.
+} _az_http_request_header;
+
+/**
+ * @brief A type representing a buffer of #_az_http_header instances for HTTP request headers.
  */
 typedef az_span _az_http_request_headers;
 
@@ -74,7 +85,7 @@ typedef struct
     az_span url;
     int32_t url_length;
     int32_t query_start;
-    _az_http_request_headers headers; // Contains az_pairs
+    _az_http_request_headers headers; // Contains instances of _az_http_request_header
     int32_t headers_length;
     int32_t max_headers;
     int32_t retry_headers_start_byte_offset;
@@ -119,14 +130,18 @@ struct _az_http_policy
  *
  * @param[in] request HTTP request to get HTTP header from.
  * @param[in] index Index of the HTTP header to get.
- * @param[out] out_header Pointer to write the result to.
+ * @param[out] out_name Pointer to an #az_span to write the header's name.
+ * @param[out] out_value Pointer to an #az_span to write the header's value.
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK Success.
  * @retval #AZ_ERROR_ARG \p index is out of range.
  */
-AZ_NODISCARD az_result
-az_http_request_get_header(az_http_request const* request, int32_t index, az_pair* out_header);
+AZ_NODISCARD az_result az_http_request_get_header(
+    az_http_request const* request,
+    int32_t index,
+    az_span* out_name,
+    az_span* out_value);
 
 /**
  * @brief Get method of an HTTP request.
@@ -189,7 +204,6 @@ AZ_NODISCARD az_result az_http_response_append(az_http_response* ref_response, a
 
 /**
  * @brief Returns the number of headers within the request.
- * Each header is an #az_pair.
  *
  * @param[in] request Pointer to an #az_http_request to be used by this function.
  *

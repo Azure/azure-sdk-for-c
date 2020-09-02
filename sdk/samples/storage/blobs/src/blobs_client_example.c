@@ -125,8 +125,10 @@ int main()
   // loop all headers from response
   while (true)
   {
-    az_pair header;
-    az_result const header_get_result = az_http_response_get_next_header(&http_response, &header);
+    az_span header_name = { 0 };
+    az_span header_value = { 0 };
+    az_result const header_get_result
+        = az_http_response_get_next_header(&http_response, &header_name, &header_value);
     if (header_get_result == AZ_ERROR_HTTP_END_OF_HEADERS)
     {
       break;
@@ -139,10 +141,10 @@ int main()
 
     printf(
         "\t%.*s : %.*s\n",
-        az_span_size(header.key),
-        az_span_ptr(header.key),
-        az_span_size(header.value),
-        az_span_ptr(header.value));
+        az_span_size(header_name),
+        az_span_ptr(header_name),
+        az_span_size(header_value),
+        az_span_ptr(header_value));
   }
 
   return 0;

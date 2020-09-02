@@ -170,14 +170,15 @@ az_result send_request(az_http_request const* request, az_http_response* respons
 
     assert_int_equal(1, az_http_request_headers_count(request));
     {
-      az_pair header = { 0 };
+      az_span header_name = { 0 };
+      az_span header_value = { 0 };
 
-      az_result const ignore = az_http_request_get_header(request, 0, &header);
+      az_result const ignore = az_http_request_get_header(request, 0, &header_name, &header_value);
       (void)ignore;
 
-      assert_true(az_span_is_content_equal(AZ_SPAN_FROM_STR("Content-Type"), header.key));
+      assert_true(az_span_is_content_equal(AZ_SPAN_FROM_STR("Content-Type"), header_name));
       assert_true(az_span_is_content_equal(
-          AZ_SPAN_FROM_STR("application/x-www-form-urlencoded"), header.value));
+          AZ_SPAN_FROM_STR("application/x-www-form-urlencoded"), header_value));
     }
 
     static int auth_attempt = 0;
@@ -223,22 +224,23 @@ az_result send_request(az_http_request const* request, az_http_response* respons
     int32_t const header_count = az_http_request_headers_count(request);
     for (int32_t i = 0; i < header_count; ++i)
     {
-      az_pair header = { 0 };
+      az_span header_name = { 0 };
+      az_span header_value = { 0 };
 
-      az_result const ignore = az_http_request_get_header(request, i, &header);
+      az_result const ignore = az_http_request_get_header(request, i, &header_name, &header_value);
       (void)ignore;
 
-      if (az_span_is_content_equal(AZ_SPAN_FROM_STR("authorization"), header.key))
+      if (az_span_is_content_equal(AZ_SPAN_FROM_STR("authorization"), header_name))
       {
         if (!redo_auth)
         {
           assert_true(
-              az_span_is_content_equal(AZ_SPAN_FROM_STR("Bearer AccessToken"), header.value));
+              az_span_is_content_equal(AZ_SPAN_FROM_STR("Bearer AccessToken"), header_value));
         }
         else // Verify that we've got the refreshed token
         {
           assert_true(
-              az_span_is_content_equal(AZ_SPAN_FROM_STR("Bearer NewAccessToken"), header.value));
+              az_span_is_content_equal(AZ_SPAN_FROM_STR("Bearer NewAccessToken"), header_value));
         }
 
         has_auth_header = true;

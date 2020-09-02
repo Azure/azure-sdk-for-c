@@ -7,6 +7,7 @@
 #include <azure/core/az_config.h>
 #include <azure/core/az_credentials.h>
 #include <azure/core/az_http.h>
+#include <azure/core/az_http_transport.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
 #include <azure/core/internal/az_config_internal.h>
@@ -18,7 +19,7 @@
 enum
 {
   _az_AAD_REQUEST_URL_BUFFER_SIZE = AZ_HTTP_REQUEST_URL_BUFFER_SIZE,
-  _az_AAD_REQUEST_HEADER_BUFFER_SIZE = 10 * sizeof(az_pair),
+  _az_AAD_REQUEST_HEADER_BUFFER_SIZE = 10 * sizeof(_az_http_request_header),
   _az_AAD_REQUEST_BODY_BUFFER_SIZE = AZ_HTTP_REQUEST_BODY_BUFFER_SIZE,
   _az_AAD_RESPONSE_BUFFER_SIZE = 3 * 1024,
 };

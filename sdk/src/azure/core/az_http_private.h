@@ -29,15 +29,15 @@ _az_http_request_mark_retry_headers_start(az_http_request* ref_request)
 {
   _az_PRECONDITION_NOT_NULL(ref_request);
   ref_request->_internal.retry_headers_start_byte_offset
-      = ref_request->_internal.headers_length * (int32_t)sizeof(az_pair);
+      = ref_request->_internal.headers_length * (int32_t)sizeof(_az_http_request_header);
   return AZ_OK;
 }
 
 AZ_NODISCARD AZ_INLINE az_result _az_http_request_remove_retry_headers(az_http_request* ref_request)
 {
   _az_PRECONDITION_NOT_NULL(ref_request);
-  ref_request->_internal.headers_length
-      = ref_request->_internal.retry_headers_start_byte_offset / (int32_t)sizeof(az_pair);
+  ref_request->_internal.headers_length = ref_request->_internal.retry_headers_start_byte_offset
+      / (int32_t)sizeof(_az_http_request_header);
   return AZ_OK;
 }
 
