@@ -128,7 +128,7 @@ _az_http_client_curl_slist_append(struct curl_slist** ref_list, char const* str)
 /**
  * @brief allocate a buffer for a header. Then reads the header name and value and writes a buffer.
  * Then uses that buffer to set curl header. Header is set only if write operations were OK. Buffer
- * is free after setting curl header.
+ * can be reused after setting setting curl header.
  *
  * @param header_name http header name
  * @param header_value http header value
