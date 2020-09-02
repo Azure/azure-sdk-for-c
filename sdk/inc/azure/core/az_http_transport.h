@@ -17,7 +17,6 @@
 
 #include <azure/core/az_http.h>
 #include <azure/core/az_span.h>
-#include <azure/core/internal/az_span_internal.h>
 
 #include <azure/core/_az_cfg_prefix.h>
 
