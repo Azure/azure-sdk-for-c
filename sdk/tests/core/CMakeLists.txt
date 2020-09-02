@@ -11,7 +11,7 @@ include(AddTestCMocka)
 
 # -ld link option is only available for gcc
 if(UNIT_TESTING_MOCKS)
-    set(WRAP_FUNCTIONS "-Wl,--wrap=az_platform_clock_msec")
+    set(WRAP_FUNCTIONS "-Wl,--wrap=az_platform_clock_msec -Wl,--wrap=az_http_client_send_request")
 else()
     set(WRAP_FUNCTIONS "")
 endif()
