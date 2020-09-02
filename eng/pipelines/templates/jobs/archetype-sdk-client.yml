@@ -310,7 +310,11 @@ jobs:
         if [ ! -d "$file" ]; then
           echo "Validating that $file file only contains ASCII bytes..."
           if grep -I --color='auto' -P -n "[^\x00-\x7F]" $file ; then
-            ((files_with_non_ascii++))
+            if [[ $file == *"CodeCoverage.cmake"* ]]; then
+              echo "Skipping errors from $file since it contains a name."
+            else
+              ((files_with_non_ascii++))
+            fi
           fi
         fi
       done
@@ -319,6 +323,7 @@ jobs:
       exit $files_with_non_ascii
       
     displayName: Validate Characters are ASCII
+    condition: eq(variables['AZ_SDK_CODE_COV'], 1)
 
 - job: GenerateReleaseArtifacts
   pool:
