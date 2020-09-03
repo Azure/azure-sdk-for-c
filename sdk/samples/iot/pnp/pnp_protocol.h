@@ -13,6 +13,15 @@
 #include <azure/core/az_span.h>
 #include <azure/iot/az_iot_hub_client.h>
 
+
+enum
+{
+  PNP_METHODS_PUBLISH_TOPIC,
+  PNP_TELEMETRY_PUBLISH_TOPIC,
+  PNP_TWIN_DOCUMENT_PUBLISH_TOPIC,
+  PNP_TWIN_PATCH_PUBLISH_TOPIC
+} pnp_publish_topic;
+
 /**
  * @brief Callback which is called for each property found by the #pnp_process_twin_data()
  * API.
@@ -28,6 +37,7 @@ typedef void (*pnp_property_callback)(
  * @brief Callback which is invoked to append user properties to a payload.
  */
 typedef az_result (*pnp_append_property_callback)(az_json_writer* jw, void* context);
+
 
 /**
  * @brief Gets the MQTT topic that must be used for device to cloud telemetry messages.
@@ -76,7 +86,7 @@ void pnp_parse_command_name(
  * @param[in] context The user context which is passed to the callback.
  * @param[out] out_span The #az_span pointer to the output json payload.
  */
-az_result pnp_create_reported_property(
+***az_result pnp_build_reported_property(
     az_span json_buffer,
     az_span component_name,
     az_span property_name,
@@ -97,7 +107,7 @@ az_result pnp_create_reported_property(
  * @param[in] ack_description The optional description for the reported property.
  * @param[out] out_span The #az_span pointer to the output json payload.
  */
-az_result pnp_create_reported_property_with_status(
+az_result pnp_build_reported_property_with_status(
     az_span json_buffer,
     az_span component_name,
     az_span property_name,
@@ -107,6 +117,10 @@ az_result pnp_create_reported_property_with_status(
     int32_t ack_version,
     az_span ack_description,
     az_span* out_span);
+
+az_result pnp_build_telemetry_message_double(az_span property_name, double property_value, az_span payload, az_span* out_payload)
+
+az_result pnp_build_telemetry_message_int32(az_span property_name, int32_t property_value, az_span payload, az_span* out_payload)
 
 /**
  * @brief Iteratively get the next desired property.
@@ -127,5 +141,6 @@ az_result pnp_process_device_twin_message(
     int32_t components_num,
     pnp_property_callback property_callback,
     void* context_ptr);
+
 
 #endif // PNP_PROTOCOL_H

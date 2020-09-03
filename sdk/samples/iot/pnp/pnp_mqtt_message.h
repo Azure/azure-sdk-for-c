@@ -16,16 +16,26 @@
 typedef struct
 {
   char* topic;
-  size_t topic_length;
   size_t* out_topic_length;
-  az_span payload_span;
+  size_t topic_length;
   az_span out_payload_span;
+  az_span payload_span;
 } pnp_mqtt_message;
 
-az_result pnp_mqtt_message_init(pnp_mqtt_message* mqtt_message);
+/*
+ *
+ *
+ *
+ */
+az_result pnp_mqtt_message_init(pnp_mqtt_message* out_mqtt_message);
 
 // Create request id span which increments request id integer each call. Capable of holding 8 digit
 // number.
+/*
+ *
+ *
+ *
+ */
 az_span pnp_mqtt_get_request_id(void);
 
 #endif // PNP_MQTT_MESSAGE_H

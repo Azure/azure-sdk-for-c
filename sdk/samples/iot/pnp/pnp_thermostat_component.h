@@ -17,47 +17,55 @@
 typedef struct
 {
   az_span component_name;
+  double average_temperature;
   double current_temperature;
-  double min_temperature;
-  double max_temperature;
-  int32_t device_temperature_avg_count;
-  double device_temperature_avg_total;
-  double avg_temperature;
-  bool send_max_temp_property;
+  double maximum_temperature;
+  double minimum_temperature;
+  double temperature_summation;
+  uint32_t temperature_count;
+  bool send_maximum_temperature_property;
 } pnp_thermostat_component;
 
 az_result pnp_thermostat_init(
-    pnp_thermostat_component* thermostat_component,
+    pnp_thermostat_component* out_thermostat_component,
     az_span component_name,
-    double initial_temp);
+    double initial_temperature);
 
-az_result pnp_thermostat_get_telemetry_message(
-    const az_iot_hub_client* client,
-    const pnp_thermostat_component* thermostat_component,
-    pnp_mqtt_message* mqtt_message);
+void pnp_thermostat_build_maximum_temperature_reported_property(
+    pnp_thermostat_component const* thermostat_component,
+    az_span* out_property_name,
+    az_span payload,
+    az_span* out_payload);
 
-bool pnp_thermostat_get_max_temp_report(
-    const az_iot_hub_client* client,
-    pnp_thermostat_component* thermostat_component,
-    pnp_mqtt_message* mqtt_message);
+void pnp_thermostat_build_error_reported_property_with_status(
+    az_span component_name,
+    az_span property_name,
+    az_json_reader* property_value,
+    az_iot_status status,
+    int32_t version,
+    az_span payload,
+    az_span* out_payload);
+
+az_result pnp_thermostat_process_command_request(
+    pnp_thermostat_component const* thermostat_component,
+    az_iot_hub_client_method_request const* command_request,
+    az_span command_payload,
+    az_iot_status* out_status
+    paz_span payload,
+    az_span* out_payload);
+
+void pnp_thermostat_build_telemetry_message(
+    pnp_thermostat_component const* thermostat_component,
+    az_span payload,
+    az_span* out_payload)
 
 az_result pnp_thermostat_process_property_update(
-    const az_iot_hub_client* client,
-    pnp_thermostat_component* thermostat_component,
+    pnp_thermostat_component* ref_thermostat_component,
     az_span component_name,
-    const az_json_token* property_name,
-    const az_json_reader* property_value,
+    az_json_token const* property_name,
+    az_json_reader const* property_value,
     int32_t version,
-    pnp_mqtt_message* mqtt_message);
-
-az_result pnp_thermostat_process_command(
-    const az_iot_hub_client* client,
-    const pnp_thermostat_component* thermostat_component,
-    const az_iot_hub_client_method_request* command_request,
-    az_span component_name,
-    az_span command_name,
-    az_span command_payload,
-    pnp_mqtt_message* mqtt_message,
-    az_iot_status* status);
+    az_span payload,
+    az_span* out_payload);
 
 #endif // PNP_THERMOSTAT_COMPONENT_H

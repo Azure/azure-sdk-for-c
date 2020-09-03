@@ -24,59 +24,56 @@
 #include <azure/core/az_span.h>
 
 #define DOUBLE_DECIMAL_PLACE_DIGITS 2
+#define DEFAULT_START_TEMP_COUNT 1
 
-// IoT Telemetry Values
-static const az_span telemetry_name = AZ_SPAN_LITERAL_FROM_STR("temperature");
+static char const iso_spec_time_format[] = "%Y-%m-%dT%H:%M:%S%z"; // ISO8601 Time Format
+
+// IoT Hub Device Twin Values
+static az_span const twin_desired_temperature_property_name
+    = AZ_SPAN_LITERAL_FROM_STR("targetTemperature");
+static az_span const twin_reported_maximum_temperature_property_name
+    = AZ_SPAN_LITERAL_FROM_STR("maxTempSinceLastReboot");
+static az_span const twin_response_success = AZ_SPAN_LITERAL_FROM_STR("success");
+static az_span const twin_response_failed = AZ_SPAN_LITERAL_FROM_STR("failed");
 
 // IoT Hub Commands Values
-static const az_span report_command_name_span = AZ_SPAN_LITERAL_FROM_STR("getMaxMinReport");
-static const az_span report_max_temp_name_span = AZ_SPAN_LITERAL_FROM_STR("maxTemp");
-static const az_span report_min_temp_name_span = AZ_SPAN_LITERAL_FROM_STR("minTemp");
-static const az_span report_avg_temp_name_span = AZ_SPAN_LITERAL_FROM_STR("avgTemp");
-static const az_span report_start_time_name_span = AZ_SPAN_LITERAL_FROM_STR("startTime");
-static const az_span report_end_time_name_span = AZ_SPAN_LITERAL_FROM_STR("endTime");
-static const az_span report_error_payload = AZ_SPAN_LITERAL_FROM_STR("{}");
-static char end_time_buffer[32];
-static char incoming_since_value_buffer[32];
+static az_span const command_getMaxMinReport_name = AZ_SPAN_LITERAL_FROM_STR("getMaxMinReport");
+static az_span const command_max_temp_name = AZ_SPAN_LITERAL_FROM_STR("maxTemp");
+static az_span const command_min_temp_name = AZ_SPAN_LITERAL_FROM_STR("minTemp");
+static az_span const command_avg_temp_name = AZ_SPAN_LITERAL_FROM_STR("avgTemp");
+static az_span const command_start_time_name = AZ_SPAN_LITERAL_FROM_STR("startTime");
+static az_span const command_end_time_name = AZ_SPAN_LITERAL_FROM_STR("endTime");
+static az_span const command_empty_response_payload = AZ_SPAN_LITERAL_FROM_STR("{}");
+static char command_start_time_value_buffer[32];
+static char command_end_time_value_buffer[32];
 
-// Twin Values
-static const az_span desired_temp_property_name = AZ_SPAN_LITERAL_FROM_STR("targetTemperature");
-static const az_span temp_response_description_success = AZ_SPAN_LITERAL_FROM_STR("success");
-static const az_span temp_response_description_failed = AZ_SPAN_LITERAL_FROM_STR("failed");
-static const az_span max_temp_reported_property_name
-    = AZ_SPAN_LITERAL_FROM_STR("maxTempSinceLastReboot");
-
-// ISO8601 Time Format
-static const char iso_spec_time_format[] = "%Y-%m-%dT%H:%M:%S%z";
+// IoT Hub Telemetry Values
+static az_span const telemetry_temperature_name = AZ_SPAN_LITERAL_FROM_STR("temperature");
 
 static az_result build_command_response_payload(
-    const pnp_thermostat_component* thermostat_component,
-    az_span start_time_span,
-    az_span end_time_span,
+    pnp_thermostat_component const* thermostat_component,
+    az_span start_time,
+    az_span end_time,
     az_span payload,
     az_span* out_payload)
 {
-  double avg_temp = thermostat_component->device_temperature_avg_total
-      / thermostat_component->device_temperature_avg_count;
-
-  // Build the command response payload
   az_json_writer jw;
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_init(&jw, payload, NULL));
+
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
-  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, report_max_temp_name_span));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, command_max_temp_name));
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_double(
-      &jw, thermostat_component->max_temperature, DOUBLE_DECIMAL_PLACE_DIGITS));
-  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, report_min_temp_name_span));
+      &jw, thermostat_component->maximum_temperature, DOUBLE_DECIMAL_PLACE_DIGITS));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, command_min_temp_name));
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_double(
-      &jw, thermostat_component->min_temperature, DOUBLE_DECIMAL_PLACE_DIGITS));
-  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, report_avg_temp_name_span));
-  IOT_SAMPLE_RETURN_IF_FAILED(
-      az_json_writer_append_double(&jw, avg_temp, DOUBLE_DECIMAL_PLACE_DIGITS));
-  IOT_SAMPLE_RETURN_IF_FAILED(
-      az_json_writer_append_property_name(&jw, report_start_time_name_span));
-  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_string(&jw, start_time_span));
-  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, report_end_time_name_span));
-  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_string(&jw, end_time_span));
+      &jw, thermostat_component->minimum_temperature, DOUBLE_DECIMAL_PLACE_DIGITS));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, command_avg_temp_name));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_double(
+      &jw, thermostat_component->average_temperature, DOUBLE_DECIMAL_PLACE_DIGITS));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, command_start_time_name));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_string(&jw, start_time));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, command_end_time_name));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_string(&jw, end_time));
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
 
   *out_payload = az_json_writer_get_bytes_used_in_destination(&jw);
@@ -84,69 +81,58 @@ static az_result build_command_response_payload(
   return AZ_OK;
 }
 
-static az_result build_telemetry_message(
-    const pnp_thermostat_component* thermostat_component,
-    az_span payload,
-    az_span* out_payload)
-{
-  az_json_writer jw;
-  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_init(&jw, payload, NULL));
-  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
-  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, telemetry_name));
-  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_double(
-      &jw, thermostat_component->current_temperature, DOUBLE_DECIMAL_PLACE_DIGITS));
-  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
-  *out_payload = az_json_writer_get_bytes_used_in_destination(&jw);
-
-  return AZ_OK;
-}
-
-// Invoke the command requested from the service. Here, it generates a report for max, min, and avg
-// temperatures.
 static az_result invoke_getMaxMinReport(
     const pnp_thermostat_component* thermostat_component,
     az_span payload,
     az_span response,
     az_span* out_response)
 {
-  // az_result result;
-  // Parse the "since" field in the payload.
-  az_span start_time_span = AZ_SPAN_EMPTY;
+  int32_t incoming_since_value_len = 0;
   az_json_reader jr;
+
+  // Parse the "since" field in the payload.
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_init(&jr, payload, NULL));
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
-  int32_t incoming_since_value_buffer_len;
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_token_get_string(
       &jr.token,
-      incoming_since_value_buffer,
-      sizeof(incoming_since_value_buffer),
-      &incoming_since_value_buffer_len));
+      command_start_time_value_buffer,
+      sizeof(command_start_time_value_buffer),
+      &incoming_since_value_len));
 
-  // Set the response payload to error if the "since" field was not sent
-  if (incoming_since_value_buffer_len == 0)
+  // Set the response payload to error if the "since" field was empty.
+  if (incoming_since_value_len == 0)
   {
-    response = report_error_payload;
+    *out_response = command_empty_response_payload;
     return AZ_ERROR_ITEM_NOT_FOUND;
   }
 
-  start_time_span
-      = az_span_create((uint8_t*)incoming_since_value_buffer, incoming_since_value_buffer_len);
+  az_span start_time_span
+      = az_span_create((uint8_t*)command_start_time_value_buffer, incoming_since_value_len);
 
-  // Get the current time as a string
+  IOT_SAMPLE_LOG_AZ_SPAN("Start time:", start_time_span);
+
+  // Get the current time as a string.
   time_t rawtime;
   struct tm* timeinfo;
   time(&rawtime);
   timeinfo = localtime(&rawtime);
-  size_t len = strftime(end_time_buffer, sizeof(end_time_buffer), iso_spec_time_format, timeinfo);
-  az_span end_time_span = az_span_create((uint8_t*)end_time_buffer, (int32_t)len);
+  size_t length = strftime(
+      command_end_time_value_buffer,
+      sizeof(command_end_time_value_buffer),
+      iso_spec_time_format,
+      timeinfo);
+  az_span end_time_span = az_span_create((uint8_t*)command_end_time_value_buffer, (int32_t)length);
 
+  IOT_SAMPLE_LOG_AZ_SPAN("End Time:", end_time_span);
+
+  // Build command response message.
   IOT_SAMPLE_RETURN_IF_FAILED(build_command_response_payload(
       thermostat_component, start_time_span, end_time_span, response, out_response));
 
   return AZ_OK;
 }
 
-static az_result append_double(az_json_writer* jw, void* value)
+static az_result append_double_callback(az_json_writer* jw, void* value)
 {
   double value_as_double = *(double*)value;
 
@@ -154,237 +140,206 @@ static az_result append_double(az_json_writer* jw, void* value)
 }
 
 az_result pnp_thermostat_init(
-    pnp_thermostat_component* thermostat_component,
+    pnp_thermostat_component* out_thermostat_component,
     az_span component_name,
-    double initial_temp)
+    double initial_temperature)
 {
-  if (thermostat_component == NULL)
+  if (out_thermostat_component == NULL)
   {
     return AZ_ERROR_ARG;
   }
 
-  thermostat_component->component_name = component_name;
-  thermostat_component->current_temperature = initial_temp;
-  thermostat_component->min_temperature = initial_temp;
-  thermostat_component->max_temperature = initial_temp;
-  thermostat_component->device_temperature_avg_count = 1;
-  thermostat_component->device_temperature_avg_total = initial_temp;
-  thermostat_component->avg_temperature = initial_temp;
-  thermostat_component->send_max_temp_property = true;
+  out_thermostat_component->component_name = component_name;
+  out_thermostat_component->average_temperature = initial_temperature;
+  out_thermostat_component->current_temperature = initial_temperature;
+  out_thermostat_component->maximum_temperature = initial_temperature;
+  out_thermostat_component->minimum_temperature = initial_temperature;
+  out_thermostat_component->temperature_count = DEFAULT_START_TEMP_COUNT;
+  out_thermostat_component->temperature_summation = initial_temperature;
+  out_thermostat_component->send_maximum_temperature_property = true;
 
   return AZ_OK;
 }
 
-az_result pnp_thermostat_get_telemetry_message(
-    const az_iot_hub_client* client,
-    const pnp_thermostat_component* thermostat_component,
-    pnp_mqtt_message* mqtt_message)
+void pnp_thermostat_build_maximum_temperature_reported_property(
+    pnp_thermostat_component const* thermostat_component,
+    az_span* out_property_name,
+    az_span payload,
+    az_span* out_payload)
 {
   az_result rc;
-  if (az_result_failed(
-          rc = pnp_get_telemetry_topic(
-              client,
-              NULL,
-              thermostat_component->component_name,
-              mqtt_message->topic,
-              mqtt_message->topic_length,
-              NULL)))
-  {
-    IOT_SAMPLE_LOG_ERROR("Failed to get pnp Telemetry topic: az_result return code 0x%08x.", rc);
-    return rc;
-  }
+  *out_property_name = reported_maximum_temperature_property_name;
 
   if (az_result_failed(
-          rc = build_telemetry_message(
-              thermostat_component, mqtt_message->payload_span, &mqtt_message->out_payload_span)))
+          rc = pnp_build_reported_property(
+              payload,
+              thermostat_component->component_name,
+              reported_maximum_temperature_property_name,
+              append_double_callback,
+              &thermostat_component->maximum_temperature,
+              out_payload)))
   {
-    IOT_SAMPLE_LOG_ERROR("Failed to build telemetry payload: az_result return code 0x%08x.", rc);
-    return rc;
+    IOT_SAMPLE_LOG_ERROR(
+        "Failed to build `%.*s` reported property payload: az_result return code 0x%08x.",
+        az_span_size(reported_maximum_temperature_property_name),
+        az_span_ptr(reported_maximum_temperature_property_name),
+        rc);
+    exit(rc);
+  }
+}
+
+void pnp_thermostat_build_error_reported_property_with_status(
+    az_span component_name,
+    az_span property_name,
+    az_json_reader* property_value,
+    az_iot_status status,
+    int32_t version,
+    az_span payload,
+    az_span* out_payload)
+{
+  az_result rc;
+
+  if (az_result_failed(
+          rc = pnp_build_reported_property_with_status(
+              payload,
+              component_name,
+              property_name,
+              append_double_callback,
+              (void*)property_value,
+              status,
+              version,
+              twin_response_failed,
+              out_payload)))
+  {
+    IOT_SAMPLE_LOG_ERROR(
+        "Failed to build Temperature Sensor error payload: az_result return code 0x%08x.", rc);
+    exit(rc);
+  }
+}
+
+az_result pnp_thermostat_process_command_request(
+    pnp_thermostat_component const* thermostat_component,
+    az_iot_hub_client_method_request const* command_request,
+    az_span command_payload,
+    az_iot_status* out_status,
+    az_span payload,
+    az_span* out_payload)
+{
+  az_result rc;
+  az_span component_name;
+  az_span command_name;
+
+  pnp_parse_command_name(command_request->name, &component_name, &command_name);
+
+  if (az_span_is_content_equal(thermostat_component->component_name, component_name)
+      && az_span_is_content_equal(report_command_name_span, command_name))
+  {
+    // Invoke command.
+    rc = invoke_getMaxMinReport(thermostat_component, command_payload, payload, out_payload);
+    if (rc != AZ_OK)
+    {
+      *out_status = AZ_IOT_STATUS_BAD_REQUEST;
+    }
+    else
+    {
+      *out_status = AZ_IOT_STATUS_OK;
+    }
+  }
+  else
+  {
+    rc = AZ_ERROR_ITEM_NOT_FOUND; // Unsupported command or not this component's command
   }
 
   return rc;
 }
 
-bool pnp_thermostat_send_max_temp_reported_property(
-    const az_iot_hub_client* client,
-    pnp_thermostat_component* thermostat_component,
-    pnp_mqtt_message* mqtt_message)
+void pnp_thermostat_build_telemetry_message(
+    pnp_thermostat_component const* thermostat_component,
+    az_span payload,
+    az_span* out_payload)
 {
-  az_result rc;
-
-  if (!thermostat_component->send_max_temp_property)
-  {
-    return false;
-  }
-
   if (az_result_failed(
-          rc = pnp_create_reported_property(
-              mqtt_message->payload_span,
-              thermostat_component->component_name,
-              max_temp_reported_property_name,
-              append_double,
-              &thermostat_component->max_temperature,
-              &mqtt_message->out_payload_span)))
-  {
-    IOT_SAMPLE_LOG_ERROR("Failed to get reported property: az_result return code 0x%08x.", rc);
-    return false;
-  }
-  else if (az_result_failed(
-               rc = az_iot_hub_client_twin_patch_get_publish_topic(
-                   client,
-                   get_request_id(),
-                   mqtt_message->topic,
-                   mqtt_message->topic_length,
-                   NULL)))
+          rc = pnp_build_telemetry_message_double(
+              telemetry_temperature_name,
+              thermostat_component->current_temperature,
+              publish_message.payload,
+              &publish_message.out_payload)))
   {
     IOT_SAMPLE_LOG_ERROR(
-        "Failed to get reported property topic with status: az_result return code 0x%08x.", rc);
-    return false;
+        "Failed to build Telemetry message for %*.s: az_result return code 0x%08x.",
+        thermostat_component->component_name,
+        rc);
+    exit(rc);
   }
-
-  thermostat_component->send_max_temp_property = false;
-
-        mqtt_publish_message(
-          mqtt_message.topic, mqtt_message.out_payload_span, IOT_SAMPLE_MQTT_PUBLISH_QOS);
-
-
-  return true;
 }
 
 az_result pnp_thermostat_process_property_update(
-    const az_iot_hub_client* client,
-    pnp_thermostat_component* thermostat_component,
+    pnp_thermostat_component* ref_thermostat_component,
     az_span component_name,
-    const az_json_token* property_name,
-    const az_json_reader* property_value,
+    az_json_token const* property_name,
+    az_json_reader const* property_value,
     int32_t version,
-    pnp_mqtt_message* mqtt_message)
+    az_span payload,
+    az_span* out_payload)
 {
-  az_result result;
+  az_result rc;
+  az_iot_status status = AZ_IOT_STATUS_OK;
+  double parsed_property_value = 0;
 
-  if (!az_span_is_content_equal(thermostat_component->component_name, component_name))
+  if (!az_json_token_is_text_equal(property_name, twin_desired_temperature_property_name))
   {
     return AZ_ERROR_ITEM_NOT_FOUND;
   }
-
-  if (!az_json_token_is_text_equal(property_name, desired_temp_property_name))
-  {
-    IOT_SAMPLE_LOG_AZ_SPAN(
-        "PnP property is not supported on thermostat component:", property_name->slice);
-  }
-
-  double parsed_value = 0;
-  if (az_result_failed(az_json_token_get_double(&(property_value->token), &parsed_value)))
-  {
-    result = pnp_create_reported_property_with_status(
-        mqtt_message->payload_span,
-        component_name,
-        property_name->slice,
-        append_double,
-        (void*)&parsed_value,
-        401,
-        version,
-        temp_response_description_failed,
-        &mqtt_message->out_payload_span);
-  }
   else
   {
-    thermostat_component->current_temperature = parsed_value;
-    if (thermostat_component->current_temperature > thermostat_component->max_temperature)
+    IOT_SAMPLE_RETURN_IF_FAILED(az_json_token_get_double(&(property_value->token), &parsed_property_value)))
+
+    // Update variables locally.
+    ref_thermostat_component->current_temperature = parsed_property_value;
+    if (ref_thermostat_component->current_temperature
+        > ref_thermostat_component->maximum_temperature)
     {
-      thermostat_component->max_temperature = thermostat_component->current_temperature;
-      thermostat_component->send_max_temp_property = true;
+      ref_thermostat_component->maximum_temperature = ref_thermostat_component->current_temperature;
+      ref_thermostat_component->send_maximum_temperature_property = true;
     }
 
-    if (thermostat_component->current_temperature < thermostat_component->min_temperature)
+    if (ref_thermostat_component->current_temperature
+        < ref_thermostat_component->minimum_temperature)
     {
-      thermostat_component->min_temperature = thermostat_component->current_temperature;
+      ref_thermostat_component->minimum_temperature = ref_thermostat_component->current_temperature;
     }
 
-    /* Increment the avg count, add the new temp to the total, and calculate the new avg */
-    thermostat_component->device_temperature_avg_count++;
-    thermostat_component->device_temperature_avg_total += thermostat_component->current_temperature;
-    thermostat_component->avg_temperature = thermostat_component->device_temperature_avg_total
-        / thermostat_component->device_temperature_avg_count;
+    // Calculate and update the new average temperature.
+    ref_thermostat_component->temperature_count++;
+    ref_thermostat_component->temperature_summation
+        += ref_thermostat_component->current_temperature;
+    ref_thermostat_component->average_temperature = ref_thermostat_component->temperature_summation
+        / ref_thermostat_component->temperature_count;
 
+    IOT_SAMPLE_LOG_SUCCESS("Client updated desired temperature variables locally.");
+    IOT_SAMPLE_LOG("Current Temperature: %2f", ref_thermostat_component->current_temperature);
+    IOT_SAMPLE_LOG("Maximum Temperature: %2f", ref_thermostat_component->maximum_temperature);
+    IOT_SAMPLE_LOG("Minimum Temperature: %2f", ref_thermostat_component->minimum_temperature);
+    IOT_SAMPLE_LOG("Average Temperature: %2f", ref_thermostat_component->average_temperature);
+
+    // Build reported property message with status.
     if (az_result_failed(
-            result = pnp_create_reported_property_with_status(
-                mqtt_message->payload_span,
+            rc = pnp_build_reported_property_with_status(
+                payload,
                 component_name,
                 property_name->slice,
-                append_double,
-                (void*)&parsed_value,
-                200,
+                append_double_callback,
+                (void*)&parsed_property_value,
+                AZ_IOT_STATUS_OK,
                 version,
-                temp_response_description_success,
-                &mqtt_message->out_payload_span)))
+                temp_response_success,
+                out_payload)))
     {
       IOT_SAMPLE_LOG_ERROR(
-          "Failed to get reported property payload with status: az_result return code 0x%08x.",
-          result);
+          "Failed to get reported property payload with status: az_result return code 0x%08x.", rc);
+      exit(rc);
     }
   }
 
-  if (az_result_failed(
-          result = az_iot_hub_client_twin_patch_get_publish_topic(
-              client, get_request_id(), mqtt_message->topic, mqtt_message->topic_length, NULL)))
-  {
-    IOT_SAMPLE_LOG_ERROR(
-        "Failed to get reported property topic with status: az_result return code 0x%08x.", result);
-  }
-
-  return result;
-}
-
-az_result pnp_thermostat_process_command(
-    const az_iot_hub_client* client,
-    const pnp_thermostat_component* thermostat_component,
-    const az_iot_hub_client_method_request* command_request,
-    az_span component_name,
-    az_span command_name,
-    az_span command_payload,
-    pnp_mqtt_message* mqtt_message,
-    az_iot_status* status)
-{
-  az_result result;
-
-  if (az_span_is_content_equal(thermostat_component->component_name, component_name)
-      && az_span_is_content_equal(report_command_name_span, command_name))
-  {
-    // Invoke command
-    az_result response = invoke_getMaxMinReport(
-        thermostat_component,
-        command_payload,
-        mqtt_message->payload_span,
-        &mqtt_message->out_payload_span);
-    if (response != AZ_OK)
-    {
-      *status = AZ_IOT_STATUS_BAD_REQUEST;
-    }
-    else
-    {
-      *status = AZ_IOT_STATUS_OK;
-    }
-
-    if (az_result_failed(
-            result = az_iot_hub_client_methods_response_get_publish_topic(
-                client,
-                command_request->request_id,
-                (uint16_t)*status,
-                mqtt_message->topic,
-                mqtt_message->topic_length,
-                mqtt_message->out_topic_length)))
-    {
-      IOT_SAMPLE_LOG_ERROR(
-          "Failed to get methods response publish topic: az_result return code 0x%08x.", result);
-      return result;
-    }
-  }
-  else
-  {
-    // Unsupported command or not this component's command
-    result = AZ_ERROR_ITEM_NOT_FOUND;
-  }
-
-  return result;
+  return AZ_OK;
 }

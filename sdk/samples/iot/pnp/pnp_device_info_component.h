@@ -4,10 +4,8 @@
 #ifndef PNP_DEVICE_INFO_COMPONENT_H
 #define PNP_DEVICE_INFO_COMPONENT_H
 
-#include "pnp_mqtt_message.h"
-
 #include <azure/core/az_result.h>
-#include <azure/iot/az_iot_hub_client.h>
+#include <azure/core/az_span.h>
 
 /**
  * @brief Get the payload to send for device info
@@ -17,8 +15,6 @@
  *
  * @return An #az_result with the result of the operation.
  */
-az_result pnp_device_info_get_report_data(
-    const az_iot_hub_client* client,
-    pnp_mqtt_message* mqtt_message);
+az_result pnp_device_info_build_reported_property(az_span payload, az_span* out_payload);
 
 #endif // PNP_DEVICE_INFO_COMPONENT_H
