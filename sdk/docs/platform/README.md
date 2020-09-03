@@ -22,7 +22,7 @@ Azure SDK provides one implementation for libcurl (`az_curl`). To consume this i
 
 The Azure SDK also provides empty HTTP adapter (`az_nohttp`). This transport allows you to build `az_core` without any specific HTTP adapter. Use this option when the application is not using HTTP based Azure SDK services.
 
->Note: An `AZ_ERROR_NOT_IMPLEMENTED` will be returned from the `az_nohttp` transport APIs.
+>Note: An `AZ_ERROR_DEPENDENCY_NOT_PROVIDED` will be returned from the `az_nohttp` transport APIs.
 
 You can also implement your own HTTP transport adapter and use it. This allows you to use a different HTTP stack other than `libcurl`. Follow the instructions on [using your own HTTP stack implementation](https://github.com/Azure/azure-sdk-for-c/blob/master/README.md#using-your-own-http-stack-implementation).
 
