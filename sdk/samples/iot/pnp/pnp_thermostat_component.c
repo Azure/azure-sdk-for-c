@@ -353,7 +353,7 @@ az_result pnp_thermostat_process_command(
         command_payload,
         mqtt_message->payload_span,
         &mqtt_message->out_payload_span);
-    if (response != AZ_OK)
+    if (az_result_failed(response)
     {
       *status = AZ_IOT_STATUS_BAD_REQUEST;
     }
