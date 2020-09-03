@@ -63,7 +63,7 @@ typedef enum
   AZ_IOT_STATUS_TIMEOUT = 504,
 } az_iot_status;
 
-/**
+/*
  *
  * Properties APIs
  *
@@ -71,8 +71,12 @@ typedef enum
  *   Properties are always appended to the MQTT topic of the published or received message and
  *   must contain percent-encoded names and values.
  */
+
 /**
  * @brief Supported IoT message properties.
+ *
+ * @note These can be used with IoT message property API's by wrapping the macros in a
+ * #AZ_SPAN_FROM_STR marco as a parameter where needed.
  */
 #define AZ_IOT_MESSAGE_PROPERTIES_MESSAGE_ID \
   "%24.mid" /**< Add unique identification to a message. */
@@ -104,19 +108,19 @@ typedef struct
  *
  * @note The properties init API will not encode properties. In order to support
  *       the following characters, they must be percent-encoded (RFC3986) as follows:
- *          `/` : `%2F`
- *          `%` : `%25`
- *          `#` : `%23`
- *          `&` : `%26`
+ *         - `/` : `%2F`
+ *         - `%` : `%25`
+ *         - `#` : `%23`
+ *         - `&` : `%26`
  *       Only these characters would have to be encoded. If you would like to avoid the need to
  *       encode the names/values, avoid using these characters in names and values.
  *
  * @param[in] properties The #az_iot_message_properties to initialize.
- * @param[in] buffer Can either be an empty #az_span or an #az_span containing properly formatted
+ * @param[in] buffer Can either be an unfilled (but properly sized) #az_span or an #az_span containing properly formatted
  *                   (with above mentioned characters encoded if applicable) properties with the
  *                   following format: {name}={value}&{name}={value}.
  * @param[in] written_length The length of the properly formatted properties already initialized
- * within the buffer. If the \p buffer is empty (uninitialized), this should be 0.
+ * within the buffer. If the \p buffer is unfilled (uninitialized), this should be 0.
  * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_iot_message_properties_init(
@@ -154,7 +158,7 @@ AZ_NODISCARD az_result az_iot_message_properties_append(
  * @param[in] properties The #az_iot_message_properties to use for this call.
  * @param[in] name The name of the property to search for.
  * @param[out] out_value An #az_span containing the value of the found property.
- * @return An #az_result value indicating the result of the operation..
+ * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_iot_message_properties_find(
     az_iot_message_properties* properties,

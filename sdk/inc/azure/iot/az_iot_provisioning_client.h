@@ -4,7 +4,7 @@
 /**
  * @file az_iot_provisioning_client.h
  *
- * @brief definition for the Azure Device Provisioning client.
+ * @brief Definition for the Azure Device Provisioning client.
  * @remark The Device Provisioning MQTT protocol is described at
  * https://docs.microsoft.com/en-us/azure/iot-dps/iot-dps-mqtt-support
  *
@@ -59,7 +59,7 @@ typedef struct
 /**
  * @brief Gets the default Azure IoT Provisioning Client options.
  * @details Call this to obtain an initialized #az_iot_provisioning_client_options structure that
- *          can be afterwards modified and passed to #az_iot_provisioning_client_init.
+ *          can be afterwards modified and passed to az_iot_provisioning_client_init().
  *
  * @return #az_iot_provisioning_client_options.
  */
@@ -121,7 +121,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_get_client_id(
     size_t mqtt_client_id_size,
     size_t* out_mqtt_client_id_length);
 
-/**
+/*
  *
  * SAS Token APIs
  *
@@ -184,7 +184,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_sas_get_password(
     size_t mqtt_password_size,
     size_t* out_mqtt_password_length);
 
-/**
+/*
  *
  * Register APIs
  *
@@ -231,7 +231,7 @@ typedef struct
   az_span operation_status; /**< An #az_span containing the status of the register operation.
                              * @details This can be one of the following: `unassigned`,
                              * `assigning`, `assigned`, `failed`, `disabled`.
-                             * #az_iot_provisioning_client_parse_operation_status can optionally
+                             * az_iot_provisioning_client_parse_operation_status() can optionally
                              * be used to convert this into
                              * the #az_iot_provisioning_client_operation_status enum. */
   uint32_t retry_after_seconds; /**< Recommended timeout before sending the next MQTT publish. */
@@ -250,7 +250,7 @@ typedef struct
  * @param[out] out_response If the message is register-operation related, this will contain the
  *                          #az_iot_provisioning_client_register_response.
  * @return An #az_result value indicating the result of the operation.
- *         - `AZ_ERROR_IOT_TOPIC_NO_MATCH` if the topic is not matching the expected format.
+ * @retval #AZ_ERROR_IOT_TOPIC_NO_MATCH If the topic is not matching the expected format.
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_parse_received_topic_and_payload(
     az_iot_provisioning_client const* client,
@@ -279,10 +279,10 @@ typedef enum
  * #az_iot_provisioning_client_register_response object.
  *
  * @param[in] response The #az_iot_provisioning_client_register_response obtained after a successful
- *                     call to #az_iot_provisioning_client_parse_received_topic_and_payload.
+ *                     call to az_iot_provisioning_client_parse_received_topic_and_payload().
  * @param[out] out_operation_status The registration operation status.
  * @return An #az_result value indicating the result of the operation.
- *         - #AZ_ERROR_UNEXPECTED_CHAR if the string contains an unexpected value.
+ * @retval #AZ_ERROR_UNEXPECTED_CHAR If the string contains an unexpected value.
  */
 AZ_NODISCARD az_result az_iot_provisioning_client_parse_operation_status(
     az_iot_provisioning_client_register_response* response,
