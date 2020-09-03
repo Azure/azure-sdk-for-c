@@ -31,7 +31,7 @@ enum
 
 /**
  * @brief Azure IoT service status codes.
- * 
+ *
  * @note https://docs.microsoft.com/en-us/azure/iot-central/core/troubleshoot-connection#error-codes
  *
  */
@@ -116,9 +116,9 @@ typedef struct
  *       encode the names/values, avoid using these characters in names and values.
  *
  * @param[in] properties The #az_iot_message_properties to initialize.
- * @param[in] buffer Can either be an unfilled (but properly sized) #az_span or an #az_span containing properly formatted
- *                   (with above mentioned characters encoded if applicable) properties with the
- *                   following format: {name}={value}&{name}={value}.
+ * @param[in] buffer Can either be an unfilled (but properly sized) #az_span or an #az_span
+ * containing properly formatted (with above mentioned characters encoded if applicable) properties
+ * with the following format: {name}={value}&{name}={value}.
  * @param[in] written_length The length of the properly formatted properties already initialized
  * within the buffer. If the \p buffer is unfilled (uninitialized), this should be 0.
  * @return An #az_result value indicating the result of the operation.

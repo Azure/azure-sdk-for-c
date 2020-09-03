@@ -17,9 +17,9 @@
 #ifndef _az_IOT_PROVISIONING_CLIENT_H
 #define _az_IOT_PROVISIONING_CLIENT_H
 
-#include <azure/iot/az_iot_common.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
+#include <azure/iot/az_iot_common.h>
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -260,14 +260,14 @@ AZ_NODISCARD az_result az_iot_provisioning_client_parse_received_topic_and_paylo
 
 /**
  * @brief Azure IoT Provisioning Service operation status.
- * 
+ *
  */
 typedef enum
 {
   // Device assignment in progress.
   AZ_IOT_PROVISIONING_STATUS_UNASSIGNED,
   AZ_IOT_PROVISIONING_STATUS_ASSIGNING,
-  
+
   // Device assignment operation complete.
   AZ_IOT_PROVISIONING_STATUS_ASSIGNED,
   AZ_IOT_PROVISIONING_STATUS_FAILED,
@@ -291,7 +291,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_parse_operation_status(
 /**
  * @brief Checks if the status indicates that the service has an authoritative result of the
  * register operation. The operation may have completed in either success or error. Completed
- * states are AZ_IOT_PROVISIONING_STATUS_ASSIGNED, AZ_IOT_PROVISIONING_STATUS_FAILED, or 
+ * states are AZ_IOT_PROVISIONING_STATUS_ASSIGNED, AZ_IOT_PROVISIONING_STATUS_FAILED, or
  * AZ_IOT_PROVISIONING_STATUS_DISABLED.
  *
  * @param[in] operation_status The #az_iot_provisioning_client_operation_status obtained by calling
@@ -331,7 +331,8 @@ AZ_NODISCARD az_result az_iot_provisioning_client_register_get_publish_topic(
  * @remark The payload of the MQTT publish message should be empty.
  *
  * @param[in] client The #az_iot_provisioning_client to use for this call.
- * @param[in] operation_id The received operation_id from the #az_iot_provisioning_client_register_response response.
+ * @param[in] operation_id The received operation_id from the
+ * #az_iot_provisioning_client_register_response response.
  * @param[out] mqtt_topic A buffer with sufficient capacity to hold the MQTT topic filter. If
  *                        successful, contains a null-terminated string with the topic filter that
  *                        needs to be passed to the MQTT client.
