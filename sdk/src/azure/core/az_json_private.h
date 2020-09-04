@@ -38,10 +38,8 @@ enum
   _az_MAX_UNESCAPED_STRING_SIZE
   = _az_MAX_ESCAPED_STRING_SIZE / _az_MAX_EXPANSION_FACTOR_WHILE_ESCAPING, // 166_666_666 bytes
 
-  _az_MAX_SIZE_FOR_INT32 = 11, // 10 + sign (i.e. -2147483648)
-
   // [-][0-9]{16}.[0-9]{15}, i.e. 1+16+1+15 since _az_MAX_SUPPORTED_FRACTIONAL_DIGITS is 15
-  _az_MAX_SIZE_FOR_DOUBLE = 33,
+  _az_MAX_SIZE_FOR_WRITING_DOUBLE = 33,
 
   // When writing large JSON strings in chunks, ask for at least 64 bytes, to avoid writing one
   // character at a time.

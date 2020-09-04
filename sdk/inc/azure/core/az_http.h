@@ -239,7 +239,8 @@ AZ_NODISCARD az_result az_http_response_get_status_line(
  * will return #AZ_ERROR_HTTP_INVALID_STATE.
  *
  * @param[in,out] ref_response A pointer to an #az_http_response instance.
- * @param[out] out_header A pointer to an #az_pair to receive the header's key and value.
+ * @param[out] out_name A pointer to an #az_span to receive the header's name.
+ * @param[out] out_value A pointer to an #az_span to receive the header's value.
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK A header was returned.
@@ -249,8 +250,10 @@ AZ_NODISCARD az_result az_http_response_get_status_line(
  * @retval #AZ_ERROR_HTTP_INVALID_STATE The #az_http_response instance is in an invalid state.
  * Consider calling #az_http_response_get_status_line() to reset its state.
  */
-AZ_NODISCARD az_result
-az_http_response_get_next_header(az_http_response* ref_response, az_pair* out_header);
+AZ_NODISCARD az_result az_http_response_get_next_header(
+    az_http_response* ref_response,
+    az_span* out_name,
+    az_span* out_value);
 
 /**
  * @brief Returns a span over the HTTP body within an HTTP response.

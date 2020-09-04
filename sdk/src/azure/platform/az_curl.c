@@ -83,21 +83,25 @@ AZ_NODISCARD AZ_INLINE az_result _az_http_client_curl_done(CURL** pp)
  * span in between. Returns error as soon as any of the write operations fails
  *
  * @param writable_buffer pre allocated buffer that will be used to hold header key and value
- * @param header header as an az_pair containing key and value
+ * @param header_name header name
+ * @param header_value header value
  * @param separator symbol to be used between key and value
  * @return az_result
  */
-static AZ_NODISCARD az_result
-_az_span_append_header_to_buffer(az_span writable_buffer, az_pair header, az_span separator)
+static AZ_NODISCARD az_result _az_span_append_header_to_buffer(
+    az_span writable_buffer,
+    az_span header_name,
+    az_span header_value,
+    az_span separator)
 {
   int32_t required_length
-      = az_span_size(header.key) + az_span_size(separator) + az_span_size(header.value) + 1;
+      = az_span_size(header_name) + az_span_size(separator) + az_span_size(header_value) + 1;
 
   _az_RETURN_IF_NOT_ENOUGH_SIZE(writable_buffer, required_length);
 
-  writable_buffer = az_span_copy(writable_buffer, header.key);
+  writable_buffer = az_span_copy(writable_buffer, header_name);
   writable_buffer = az_span_copy(writable_buffer, separator);
-  writable_buffer = az_span_copy(writable_buffer, header.value);
+  writable_buffer = az_span_copy(writable_buffer, header_value);
   az_span_copy_u8(writable_buffer, 0);
 
   return AZ_OK;
@@ -122,17 +126,19 @@ _az_http_client_curl_slist_append(struct curl_slist** ref_list, char const* str)
 }
 
 /**
- * @brief allocate a buffer for a header. Then reads the az_pair header and writes a buffer. Then
- * uses that buffer to set curl header. Header is set only if write operations were OK. Buffer is
- * free after setting curl header.
+ * @brief allocate a buffer for a header. Then reads the header name and value and writes a buffer.
+ * Then uses that buffer to set curl header. Header is set only if write operations were OK. Buffer
+ * can be reused after setting setting curl header.
  *
- * @param header a key and value representing an http header
+ * @param header_name http header name
+ * @param header_value http header value
  * @param ref_list list of headers as curl list
  * @param separator a symbol to be used between key and value for a header
  * @return az_result
  */
 static AZ_NODISCARD az_result _az_http_client_curl_add_header_to_curl_list(
-    az_pair header,
+    az_span header_name,
+    az_span header_value,
     struct curl_slist** ref_list,
     az_span separator)
 {
@@ -141,14 +147,15 @@ static AZ_NODISCARD az_result _az_http_client_curl_add_header_to_curl_list(
   // allocate a buffer for header
   az_span writable_buffer;
   {
-    int32_t const buffer_size = az_span_size(header.key) + az_span_size(separator)
-        + az_span_size(header.value) + 1 /*one for 0 terminated*/;
+    int32_t const buffer_size = az_span_size(header_name) + az_span_size(separator)
+        + az_span_size(header_value) + 1 /*one for 0 terminated*/;
 
     _az_RETURN_IF_FAILED(_az_span_malloc(buffer_size, &writable_buffer));
   }
 
   // write buffer
-  az_result result = _az_span_append_header_to_buffer(writable_buffer, header, separator);
+  az_result result
+      = _az_span_append_header_to_buffer(writable_buffer, header_name, header_value, separator);
 
   // attach header only when write was OK
   if (az_result_succeeded(result))
@@ -213,12 +220,13 @@ _az_http_client_curl_build_headers(az_http_request const* request, struct curl_s
 {
   _az_PRECONDITION_NOT_NULL(request);
 
-  az_pair header;
+  az_span header_name = { 0 };
+  az_span header_value = { 0 };
   for (int32_t offset = 0; offset < az_http_request_headers_count(request); ++offset)
   {
-    _az_RETURN_IF_FAILED(az_http_request_get_header(request, offset, &header));
-    _az_RETURN_IF_FAILED(
-        _az_http_client_curl_add_header_to_curl_list(header, ref_headers, AZ_SPAN_FROM_STR(":")));
+    _az_RETURN_IF_FAILED(az_http_request_get_header(request, offset, &header_name, &header_value));
+    _az_RETURN_IF_FAILED(_az_http_client_curl_add_header_to_curl_list(
+        header_name, header_value, ref_headers, AZ_SPAN_FROM_STR(":")));
   }
 
   return AZ_OK;

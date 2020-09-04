@@ -12,7 +12,9 @@
 ### Breaking Changes
 
 - Rename `az_iot_hub_client_properties` to `az_iot_message_properties` and move it from `az_iot_hub_client.h` to `az_iot_common.h`.
-- Remove `az_pair` from `az_iot_message_properties_next()` in favor of individual name and value `az_span` parameters.
+- Remove `az_pair`, and its usage from az_http_request_append_header(), `az_http_response_get_next_header()`, and `az_iot_message_properties_next()` in favor of individual name and value `az_span` parameters.
+- Remove `az_credential_client_secret` structure, and `az_credential_client_secret_init()` function.
+- Remove `az_platform_atomic_compare_exchange()`.
 - In `az_result.h`, rename `az_failed()` to `az_result_failed()` and `az_succeeded()` to `az_result_succeeded()`.
 - `az_iot_is_success_status()` renamed to `az_iot_status_succeeded()`.
 - `az_iot_is_retriable_status()` renamed to `az_iot_status_retriable()`.

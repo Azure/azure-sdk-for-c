@@ -81,8 +81,6 @@ AZ_NODISCARD az_span az_span_create(uint8_t* ptr, int32_t size);
  * @remark There is no guarantee that the pointer backing this span will be `NULL` and the caller
  * shouldn't rely on it. However, the size will be 0.
  */
-// When updating this macro, also update AZ_PAIR_NULL, which should be using this macro, but can't
-// due to warnings, and so it is using an expansion of this macro instead.
 #define AZ_SPAN_EMPTY                      \
   (az_span)                                \
   {                                        \
@@ -525,43 +523,6 @@ typedef struct
 typedef az_result (*az_span_allocator_fn)(
     az_span_allocator_context* allocator_context,
     az_span* out_next_destination);
-
-/******************************  SPAN PAIR  */
-
-/**
- * @brief Represents a key/value pair of #az_span instances.
- * This is typically used for HTTP query parameters and headers.
- */
-typedef struct
-{
-  az_span key; ///< Key.
-  az_span value; ///< Value.
-} az_pair;
-
-/**
- * @brief An #az_pair instance whose key and value fields are initialized to #AZ_SPAN_EMPTY.
- */
-#define AZ_PAIR_NULL                                    \
-  (az_pair)                                             \
-  {                                                     \
-    .key = { ._internal = { .ptr = NULL, .size = 0 } }, \
-    .value                                              \
-        = {._internal = { .ptr = NULL, .size = 0 } }    \
-  }
-
-/**
- * @brief Returns an #az_pair with its `key` and `value` fields initialized to the specified \p key
- * and \p value parameters.
- *
- * @param[in] key An #az_span whose bytes represent the key.
- * @param[in] value An #az_span whose bytes represent the key's value.
- *
- * @return  An #az_pair with the fields initialized with the parameters' values.
- */
-AZ_NODISCARD AZ_INLINE az_pair az_pair_init(az_span key, az_span value)
-{
-  return (az_pair){ .key = key, .value = value };
-}
 
 #include <azure/core/_az_cfg_suffix.h>
 

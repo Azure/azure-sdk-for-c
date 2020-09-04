@@ -222,7 +222,7 @@ AZ_NODISCARD az_result az_http_request_set_query_parameter(
  * @brief Add a new HTTP header for the request.
  *
  * @param ref_request HTTP request builder that holds the URL to set the query parameter to.
- * @param key Header name (e.g. `"Content-Type"`).
+ * @param name Header name (e.g. `"Content-Type"`).
  * @param value Header value (e.g. `"application/x-www-form-urlencoded"`).
  *
  * @return
@@ -230,13 +230,13 @@ AZ_NODISCARD az_result az_http_request_set_query_parameter(
  *   - *`AZ_ERROR_INSUFFICIENT_SPAN_SIZE`* there isn't enough space in the `p_request->buffer`
  * to add a header.
  *   - *`AZ_ERROR_ARG`*
- *     - `p_request` is _NULL_.
- *     - `key` or `value` are invalid spans (see @ref _az_span_is_valid).
- *     - `key` or `value` are empty.
+ *     - `ref_request` is _NULL_.
+ *     - `name` or `value` are invalid spans (see @ref _az_span_is_valid).
+ *     - `name` or `value` are empty.
  *     - `name`'s or `value`'s buffer overlap resulting `url`'s buffer.
  */
 AZ_NODISCARD az_result
-az_http_request_append_header(az_http_request* ref_request, az_span key, az_span value);
+az_http_request_append_header(az_http_request* ref_request, az_span name, az_span value);
 
 #include <azure/core/_az_cfg_suffix.h>
 
