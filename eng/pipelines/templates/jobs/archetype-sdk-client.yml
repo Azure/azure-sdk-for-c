@@ -22,7 +22,7 @@ jobs:
         build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake'
         AZ_SDK_C_NO_SAMPLES: 'true'
 
-      # Build with no dependencies at all (No samples) - PRECONDITIONS ON
+      # Build with no dependencies at all (No samples) - PRECONDITIONS OFF
       # WARNINGS_AS_ERRORS          ON
       # TRANSPORT_CURL              OFF
       # UNIT_TESTING                OFF
