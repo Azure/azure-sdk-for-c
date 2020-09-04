@@ -298,15 +298,15 @@ void handle_iot_message(mqtt_client_message* msg)
   az_iot_hub_client_method_request method_request;
   az_iot_hub_client_c2d_request c2d_request;
   az_iot_hub_client_twin_response twin_response;
-  if (az_iot_hub_client_methods_parse_received_topic(&client, incoming_topic, &method_request) == AZ_OK)
+  if (az_result_succeeded(az_iot_hub_client_methods_parse_received_topic(&client, incoming_topic, &method_request)))
   {
     //Handle the method request
   }
-  else if (az_iot_hub_client_c2d_parse_received_topic(&client, incoming_topic, &c2d_request) == AZ_OK)
+  else if (az_result_succeeded(az_iot_hub_client_c2d_parse_received_topic(&client, incoming_topic, &c2d_request)))
   {
     //Handle the c2d message
   }
-  else if (az_iot_hub_client_twin_parse_received_topic(&client, incoming_topic, &twin_response) == AZ_OK)
+  else if (az_result_succeeded(az_iot_hub_client_twin_parse_received_topic(&client, incoming_topic, &twin_response)))
   {
     //Handle the twin message
   }

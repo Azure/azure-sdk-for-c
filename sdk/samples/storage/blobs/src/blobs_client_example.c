@@ -68,9 +68,8 @@ int main()
   az_storage_blobs_blob_client client;
   az_storage_blobs_blob_client_options options = az_storage_blobs_blob_client_options_default();
 
-  if (az_storage_blobs_blob_client_init(
-          &client, az_span_create_from_str(getenv(URI_ENV)), AZ_CREDENTIAL_ANONYMOUS, &options)
-      != AZ_OK)
+  if (az_result_failed(az_storage_blobs_blob_client_init(
+          &client, az_span_create_from_str(getenv(URI_ENV)), AZ_CREDENTIAL_ANONYMOUS, &options)))
   {
     printf("\nFailed to init blob client\n");
     return 1;
@@ -79,7 +78,7 @@ int main()
   /******* 2) Create a buffer for response (will be reused for all requests)   *****/
   uint8_t response_buffer[1024 * 4] = { 0 };
   az_http_response http_response;
-  if (az_http_response_init(&http_response, AZ_SPAN_FROM_BUFFER(response_buffer)) != AZ_OK)
+  if (az_result_failed(az_http_response_init(&http_response, AZ_SPAN_FROM_BUFFER(response_buffer))))
   {
     printf("\nFailed to init http response\n");
     return 1;
@@ -100,7 +99,7 @@ int main()
 
     return 1;
   }
-  else if (blob_upload_result != AZ_OK) // Any other error would terminate sample
+  else if (az_result_failed(blob_upload_result)) // Any other error would terminate sample
   {
     printf("\nFailed to upload blob\n");
     return 1;
@@ -109,7 +108,7 @@ int main()
   // 4) get response and parse it
   az_http_response_status_line status_line;
 
-  if (az_http_response_get_status_line(&http_response, &status_line) != AZ_OK)
+  if (az_result_failed(az_http_response_get_status_line(&http_response, &status_line)))
   {
     printf("\nFailed to get status line\n");
     return 1;
@@ -133,7 +132,7 @@ int main()
     {
       break;
     }
-    else if (header_get_result != AZ_OK)
+    else if (az_result_failed(header_get_result))
     {
       printf("\nFailed to get header\n");
       return 1;

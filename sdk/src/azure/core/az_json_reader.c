@@ -544,7 +544,7 @@ AZ_NODISCARD static az_result _az_json_reader_process_number(az_json_reader* ref
     az_result result = AZ_OK;
     if (_az_finished_consuming_json_number(next_byte, AZ_SPAN_FROM_STR(".eE"), &result))
     {
-      if (result == AZ_OK)
+      if (az_result_succeeded(result))
       {
         _az_json_reader_update_state(
             ref_json_reader,
@@ -583,7 +583,7 @@ AZ_NODISCARD static az_result _az_json_reader_process_number(az_json_reader* ref
     az_result result = AZ_OK;
     if (_az_finished_consuming_json_number(next_byte, AZ_SPAN_FROM_STR(".eE"), &result))
     {
-      if (result == AZ_OK)
+      if (az_result_succeeded(result))
       {
         _az_json_reader_update_state(
             ref_json_reader,
@@ -628,7 +628,7 @@ AZ_NODISCARD static az_result _az_json_reader_process_number(az_json_reader* ref
     az_result result = AZ_OK;
     if (_az_finished_consuming_json_number(next_byte, AZ_SPAN_FROM_STR("eE"), &result))
     {
-      if (result == AZ_OK)
+      if (az_result_succeeded(result))
       {
         _az_json_reader_update_state(
             ref_json_reader,
