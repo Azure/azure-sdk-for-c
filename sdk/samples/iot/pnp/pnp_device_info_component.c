@@ -3,6 +3,8 @@
 
 #include "pnp_device_info_component.h"
 
+#include <iot_sample_common.h>
+
 #include <azure/core/az_json.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
@@ -63,7 +65,7 @@ az_result pnp_device_info_build_reported_property(az_span payload, az_span* out_
       az_json_writer_append_double(&jw, total_memory_property_value, DOUBLE_DECIMAL_PLACE_DIGITS));
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
 
-  out_payload = az_json_writer_get_bytes_used_in_destination(&jw);
+  *out_payload = az_json_writer_get_bytes_used_in_destination(&jw);
 
   return AZ_OK;
 }

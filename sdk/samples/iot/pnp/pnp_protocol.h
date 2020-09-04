@@ -13,8 +13,7 @@
 #include <azure/core/az_span.h>
 #include <azure/iot/az_iot_hub_client.h>
 
-
-enum
+typedef enum
 {
   PNP_METHODS_PUBLISH_TOPIC,
   PNP_TELEMETRY_PUBLISH_TOPIC,
@@ -28,8 +27,8 @@ enum
  */
 typedef void (*pnp_property_callback)(
     az_span component_name,
-    const az_json_token* property_name,
-    az_json_reader property_value_as_json,
+    az_json_token const* property_name,
+    az_json_reader* property_value_as_json,
     int32_t version,
     void* user_context_callback);
 
@@ -37,7 +36,6 @@ typedef void (*pnp_property_callback)(
  * @brief Callback which is invoked to append user properties to a payload.
  */
 typedef az_result (*pnp_append_property_callback)(az_json_writer* jw, void* context);
-
 
 /**
  * @brief Gets the MQTT topic that must be used for device to cloud telemetry messages.
@@ -56,8 +54,8 @@ typedef az_result (*pnp_append_property_callback)(az_json_writer* jw, void* cont
  *                                                  \p mqtt_topic. Can be `NULL`.
  * @return #az_result
  */
-az_result pnp_get_telemetry_topic(
-    const az_iot_hub_client* client,
+az_result pnp_get_telemetry_publish_topic(
+    az_iot_hub_client const* client,
     az_iot_message_properties* properties,
     az_span component_name,
     char* mqtt_topic,
@@ -86,7 +84,7 @@ void pnp_parse_command_name(
  * @param[in] context The user context which is passed to the callback.
  * @param[out] out_span The #az_span pointer to the output json payload.
  */
-***az_result pnp_build_reported_property(
+az_result pnp_build_reported_property(
     az_span json_buffer,
     az_span component_name,
     az_span property_name,
@@ -118,9 +116,17 @@ az_result pnp_build_reported_property_with_status(
     az_span ack_description,
     az_span* out_span);
 
-az_result pnp_build_telemetry_message_double(az_span property_name, double property_value, az_span payload, az_span* out_payload)
+az_result pnp_build_telemetry_message_double(
+    az_span property_name,
+    double property_value,
+    az_span payload,
+    az_span* out_payload);
 
-az_result pnp_build_telemetry_message_int32(az_span property_name, int32_t property_value, az_span payload, az_span* out_payload)
+az_result pnp_build_telemetry_message_int32(
+    az_span property_name,
+    int32_t property_value,
+    az_span payload,
+    az_span* out_payload);
 
 /**
  * @brief Iteratively get the next desired property.
@@ -141,6 +147,5 @@ az_result pnp_process_device_twin_message(
     int32_t components_num,
     pnp_property_callback property_callback,
     void* context_ptr);
-
 
 #endif // PNP_PROTOCOL_H

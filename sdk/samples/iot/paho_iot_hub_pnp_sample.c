@@ -53,7 +53,7 @@ static char const iso_spec_time_format[] = "%Y-%m-%dT%H:%M:%S%z"; // ISO8601 Tim
 static az_span const model_id = AZ_SPAN_LITERAL_FROM_STR("dtmi:com:example:Thermostat;1");
 
 // IoT Hub Connection Values
-static int32_t connection_request_id_int = 0;
+static uint32_t connection_request_id_int = 0;
 static char connection_request_id_buffer[16];
 
 // IoT Hub Device Twin Values
@@ -589,13 +589,13 @@ static void process_device_twin_message(az_span message_span, bool is_twin_get)
     // Update device temperature locally and report update to server.
     update_device_temperature_property(desired_temperature, &is_max_temp_changed);
     send_reported_property(
-        twin_desired_temp_property_name, desired_temperature, version_number, confirm);
+        twin_desired_temperature_property_name, desired_temperature, version_number, confirm);
 
     if (is_max_temp_changed)
     {
       confirm = false;
       send_reported_property(
-          twin_reported_max_temp_property_name, device_maximum_temperature, -1, confirm);
+          twin_reported_maximum_temperature_property_name, device_maximum_temperature, -1, confirm);
     }
   }
 }
@@ -657,7 +657,7 @@ static az_result parse_desired_temperature_property(
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
   while (!(temp_found && version_found) && (jr.token.kind != AZ_JSON_TOKEN_END_OBJECT))
   {
-    if (az_json_token_is_text_equal(&jr.token, twin_desired_temp_property_name))
+    if (az_json_token_is_text_equal(&jr.token, twin_desired_temperature_property_name))
     {
       IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
       IOT_SAMPLE_RETURN_IF_FAILED(az_json_token_get_double(&jr.token, out_parsed_temperature));
@@ -891,9 +891,7 @@ static az_result invoke_getMaxMinReport(az_span payload, az_span response, az_sp
 
   // Build command response message.
   uint8_t count = 3;
-  az_span const names[3] = { command_maximum_temperature_name,
-                             command_minimum_temperature_name,
-                             command_average_temperature_name };
+  az_span const names[3] = { command_max_temp_name, command_min_temp_name, command_avg_temp_name };
   double const values[3]
       = { device_maximum_temperature, device_minimum_temperature, device_average_temperature };
   az_span const times[2] = { start_time_span, end_time_span };

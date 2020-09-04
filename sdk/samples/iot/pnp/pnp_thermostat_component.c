@@ -162,27 +162,27 @@ az_result pnp_thermostat_init(
 }
 
 void pnp_thermostat_build_maximum_temperature_reported_property(
-    pnp_thermostat_component const* thermostat_component,
+    pnp_thermostat_component* thermostat_component,
     az_span* out_property_name,
     az_span payload,
     az_span* out_payload)
 {
   az_result rc;
-  *out_property_name = reported_maximum_temperature_property_name;
+  *out_property_name = twin_reported_maximum_temperature_property_name;
 
   if (az_result_failed(
           rc = pnp_build_reported_property(
               payload,
               thermostat_component->component_name,
-              reported_maximum_temperature_property_name,
+              twin_reported_maximum_temperature_property_name,
               append_double_callback,
               &thermostat_component->maximum_temperature,
               out_payload)))
   {
     IOT_SAMPLE_LOG_ERROR(
         "Failed to build `%.*s` reported property payload: az_result return code 0x%08x.",
-        az_span_size(reported_maximum_temperature_property_name),
-        az_span_ptr(reported_maximum_temperature_property_name),
+        az_span_size(twin_reported_maximum_temperature_property_name),
+        az_span_ptr(twin_reported_maximum_temperature_property_name),
         rc);
     exit(rc);
   }
@@ -219,23 +219,19 @@ void pnp_thermostat_build_error_reported_property_with_status(
 
 az_result pnp_thermostat_process_command_request(
     pnp_thermostat_component const* thermostat_component,
-    az_iot_hub_client_method_request const* command_request,
-    az_span command_payload,
+    az_span command_name,
+    az_span command_received_payload,
     az_iot_status* out_status,
     az_span payload,
     az_span* out_payload)
 {
   az_result rc;
-  az_span component_name;
-  az_span command_name;
 
-  pnp_parse_command_name(command_request->name, &component_name, &command_name);
-
-  if (az_span_is_content_equal(thermostat_component->component_name, component_name)
-      && az_span_is_content_equal(report_command_name_span, command_name))
+  if (az_span_is_content_equal(command_getMaxMinReport_name, command_name))
   {
     // Invoke command.
-    rc = invoke_getMaxMinReport(thermostat_component, command_payload, payload, out_payload);
+    rc = invoke_getMaxMinReport(
+        thermostat_component, command_received_payload, payload, out_payload);
     if (rc != AZ_OK)
     {
       *out_status = AZ_IOT_STATUS_BAD_REQUEST;
@@ -258,16 +254,19 @@ void pnp_thermostat_build_telemetry_message(
     az_span payload,
     az_span* out_payload)
 {
+  az_result rc;
+
   if (az_result_failed(
           rc = pnp_build_telemetry_message_double(
               telemetry_temperature_name,
               thermostat_component->current_temperature,
-              publish_message.payload,
-              &publish_message.out_payload)))
+              payload,
+              out_payload)))
   {
     IOT_SAMPLE_LOG_ERROR(
-        "Failed to build Telemetry message for %*.s: az_result return code 0x%08x.",
-        thermostat_component->component_name,
+        "Failed to build Telemetry message for %.*s: az_result return code 0x%08x.",
+        az_span_size(thermostat_component->component_name),
+        az_span_ptr(thermostat_component->component_name),
         rc);
     exit(rc);
   }
@@ -283,7 +282,6 @@ az_result pnp_thermostat_process_property_update(
     az_span* out_payload)
 {
   az_result rc;
-  az_iot_status status = AZ_IOT_STATUS_OK;
   double parsed_property_value = 0;
 
   if (!az_json_token_is_text_equal(property_name, twin_desired_temperature_property_name))
@@ -292,7 +290,8 @@ az_result pnp_thermostat_process_property_update(
   }
   else
   {
-    IOT_SAMPLE_RETURN_IF_FAILED(az_json_token_get_double(&(property_value->token), &parsed_property_value)))
+    IOT_SAMPLE_RETURN_IF_FAILED(
+        az_json_token_get_double(&property_value->token, &parsed_property_value));
 
     // Update variables locally.
     ref_thermostat_component->current_temperature = parsed_property_value;
@@ -332,7 +331,7 @@ az_result pnp_thermostat_process_property_update(
                 (void*)&parsed_property_value,
                 AZ_IOT_STATUS_OK,
                 version,
-                temp_response_success,
+                twin_response_success,
                 out_payload)))
     {
       IOT_SAMPLE_LOG_ERROR(

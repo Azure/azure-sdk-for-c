@@ -14,7 +14,7 @@
 #include <azure/core/az_span.h>
 #include <azure/iot/az_iot_hub_client.h>
 
-#define JSON_DOUBLE_DIGITS 2
+#define DOUBLE_DECIMAL_PLACE_DIGITS 2
 
 // Property values
 static char pnp_properties_buffer[64];
@@ -62,7 +62,7 @@ static az_result visit_component_properties(
         return AZ_ERROR_UNEXPECTED_CHAR;
       }
 
-      property_callback(component_name, &property_name, *jr, version, context_ptr);
+      property_callback(component_name, &property_name, jr, version, context_ptr);
     }
 
     if (jr->token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT)
@@ -198,7 +198,6 @@ void pnp_parse_command_name(
   }
 }
 
-
 // Create a reported property payload
 az_result pnp_build_reported_property(
     az_span json_buffer,
@@ -291,30 +290,43 @@ az_result pnp_build_reported_property_with_status(
   return AZ_OK;
 }
 
-az_result pnp_build_telemetry_message_double(az_span property_name, double property_value, az_span payload, az_span* out_payload)
+az_result pnp_build_telemetry_message_double(
+    az_span property_name,
+    double property_value,
+    az_span payload,
+    az_span* out_payload)
 {
   az_json_writer jw;
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_init(&jw, payload, NULL));
 
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, property_name));
-  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_double(&jw, property_value, DOUBLE_DECIMAL_PLACE_DIGITS));
+  IOT_SAMPLE_RETURN_IF_FAILED(
+      az_json_writer_append_double(&jw, property_value, DOUBLE_DECIMAL_PLACE_DIGITS));
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
 
-  out_payload = az_json_writer_get_bytes_used_in_destination(&jw);
+  *out_payload = az_json_writer_get_bytes_used_in_destination(&jw);
+
+  return AZ_OK;
 }
 
-az_result pnp_build_telemetry_message_int32(az_span property_name, int32_t property_value, az_span payload, az_span* out_payload)
+az_result pnp_build_telemetry_message_int32(
+    az_span property_name,
+    int32_t property_value,
+    az_span payload,
+    az_span* out_payload)
 {
   az_json_writer jw;
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_init(&jw, payload, NULL));
 
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, property_name));
-  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_int32_t(&jw, property_value);
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_int32(&jw, property_value));
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
 
-  out_payload = az_json_writer_get_bytes_used_in_destination(&jw);
+  *out_payload = az_json_writer_get_bytes_used_in_destination(&jw);
+
+  return AZ_OK;
 }
 
 // Process the twin properties and invoke user callback for each property
@@ -385,7 +397,7 @@ az_result pnp_process_device_twin_message(
       }
       else
       {
-        property_callback(AZ_SPAN_EMPTY, &property_name, jr, version, context_ptr);
+        property_callback(AZ_SPAN_EMPTY, &property_name, &jr, version, context_ptr);
       }
     }
     else if (jr.token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT)

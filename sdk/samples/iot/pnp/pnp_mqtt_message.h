@@ -18,8 +18,8 @@ typedef struct
   char* topic;
   size_t* out_topic_length;
   size_t topic_length;
-  az_span out_payload_span;
-  az_span payload_span;
+  az_span out_payload;
+  az_span payload;
 } pnp_mqtt_message;
 
 /*

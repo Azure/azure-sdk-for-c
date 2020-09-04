@@ -32,7 +32,7 @@ az_result pnp_thermostat_init(
     double initial_temperature);
 
 void pnp_thermostat_build_maximum_temperature_reported_property(
-    pnp_thermostat_component const* thermostat_component,
+    pnp_thermostat_component* thermostat_component,
     az_span* out_property_name,
     az_span payload,
     az_span* out_payload);
@@ -46,18 +46,18 @@ void pnp_thermostat_build_error_reported_property_with_status(
     az_span payload,
     az_span* out_payload);
 
-az_result pnp_thermostat_process_command_request(
-    pnp_thermostat_component const* thermostat_component,
-    az_iot_hub_client_method_request const* command_request,
-    az_span command_payload,
-    az_iot_status* out_status
-    paz_span payload,
-    az_span* out_payload);
-
 void pnp_thermostat_build_telemetry_message(
     pnp_thermostat_component const* thermostat_component,
     az_span payload,
-    az_span* out_payload)
+    az_span* out_payload);
+
+az_result pnp_thermostat_process_command_request(
+    pnp_thermostat_component const* thermostat_component,
+    az_span command_name,
+    az_span command_payload,
+    az_iot_status* out_status,
+    az_span payload,
+    az_span* out_payload);
 
 az_result pnp_thermostat_process_property_update(
     pnp_thermostat_component* ref_thermostat_component,
