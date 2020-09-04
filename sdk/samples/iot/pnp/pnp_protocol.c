@@ -1,11 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifdef _MSC_VER
-// warning C6282: Incorrect operator:  assignment of constant in Boolean context. Consider using '==' instead.
-#pragma warning(disable : 6282)
-#endif
-
 #include "pnp_protocol.h"
 
 #include <iot_sample_common.h>
@@ -209,10 +204,20 @@ az_result pnp_build_reported_property(
     void* context,
     az_span* out_span)
 {
+    (void)context;
+  (void)append_callback;
+  (void)property_name;
+  (void)component_name;
+    (void)json_buffer;
+  (void)out_span;
+
+  /*
   az_json_writer jw;
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_init(&jw, json_buffer, NULL));
 
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
+
+
 
   if (az_span_size(component_name) != 0)
   {
@@ -233,7 +238,7 @@ az_result pnp_build_reported_property(
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
 
   *out_span = az_json_writer_get_bytes_used_in_destination(&jw);
-
+*/
   return AZ_OK;
 }
 

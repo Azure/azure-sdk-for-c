@@ -2,8 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 #ifdef _MSC_VER
-// warning C6282: Incorrect operator:  assignment of constant in Boolean context. Consider using '==' instead.
-#pragma warning(disable : 6282)
 #pragma warning(push)
 // warning C4201: nonstandard extension used: nameless struct/union
 #pragma warning(disable : 4201)
@@ -998,23 +996,15 @@ static void temp_controller_build_serial_number_reported_property(
     az_span* out_payload)
 {
   az_result rc;
+  az_span empty_span = AZ_SPAN_EMPTY; // For compilation.
 
-  if (az_result_failed(
-          rc = pnp_build_reported_property(
-              payload,
-              AZ_SPAN_EMPTY,
-              twin_reported_serial_number_property_name,
-              append_string_callback,
-              (void*)&twin_reported_serial_number_property_value,
-              out_payload)))
+  if (az_result_failed(rc = pnp_build_reported_property(payload, empty_span, twin_reported_serial_number_property_name, append_string_callback, (void*)&twin_reported_serial_number_property_value, out_payload)))
   {
-    IOT_SAMPLE_LOG_ERROR(
-        "Failed to build `%.*s` reported property payload: az_result return code 0x%08x.",
-        az_span_size(twin_reported_serial_number_property_name),
-        az_span_ptr(twin_reported_serial_number_property_name),
-        rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to build `%.*s` reported property payload: az_result return code 0x%08x.", az_span_size(twin_reported_serial_number_property_name), az_span_ptr(twin_reported_serial_number_property_name), rc);
     exit(rc);
   }
+
+
 }
 
 static void temp_controller_build_error_reported_property_with_status(

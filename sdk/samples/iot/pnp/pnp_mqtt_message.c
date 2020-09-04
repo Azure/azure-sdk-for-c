@@ -1,11 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#ifdef _MSC_VER
-// warning C6282: Incorrect operator:  assignment of constant in Boolean context. Consider using '==' instead.
-#pragma warning(disable : 6282)
-#endif
-
 #include "pnp_mqtt_message.h"
 
 #include <iot_sample_common.h>
