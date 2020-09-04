@@ -308,7 +308,7 @@ az_result pnp_build_telemetry_message(
 az_result pnp_process_device_twin_message(
     az_span twin_message_span,
     bool is_partial,
-    const az_span** components_ptr,
+    az_span const** components_ptr,
     int32_t components_num,
     pnp_property_callback property_callback,
     void* context_ptr)
