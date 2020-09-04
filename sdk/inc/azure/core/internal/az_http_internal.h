@@ -227,7 +227,7 @@ AZ_NODISCARD az_result az_http_request_set_query_parameter(
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK Success.
- * @retval #AZ_ERROR_INSUFFICIENT_SPAN_SIZE there isn't enough space in the \p ref_request to add a
+ * @retval #AZ_ERROR_INSUFFICIENT_SPAN_SIZE There isn't enough space in the \p ref_request to add a
  * header.
  */
 AZ_NODISCARD az_result
