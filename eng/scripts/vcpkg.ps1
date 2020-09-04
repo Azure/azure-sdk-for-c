@@ -48,11 +48,13 @@ git checkout (Get-Content "$PSScriptRoot/../vcpkg.ref.txt")
 
 if ($IsWindows) {
     .\bootstrap-vcpkg.bat
+    .\vcpkg.exe install $Dependencies.Split(' ')
 } else {
     ./bootstrap-vcpkg.sh
+    ./vcpkg install $Dependencies.Split(' ')
 }
 
-&"./vcpkg install $Dependencies"
+
 
 SetEnvironmentVariable -Name Path -Value "$TargetPath;$env:PATH"
 SetEnvironmentVariable -Name VCPKG_INSTALLATION_ROOT -Value $TargetPath
