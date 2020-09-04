@@ -151,7 +151,7 @@ By default, when building the project with no options, the following static libr
   - az_noplatform
     - A platform abstraction which will compile but returns 0 or does nothing for all platform calls. This ensures the project can be compiled without the need to provide any specific platform implementation. This is useful if you want to use az_core without platform specific functions like `time` or `sleep`.
   - az_nohttp
-    - Library that provides a basic returning error when calling HTTP stack. Similar to az_noplatform, this library ensures the project can be compiled without requiring any HTTP stack implementation. This is useful if you want to use `az_core` without `az_http` functionality.
+    - Library that provides a no-op HTTP stack, returning `AZ_ERROR_DEPENDENCY_NOT_PROVIDED`. Similar to `az_noplatform`, this library ensures the project can be compiled without requiring any HTTP stack implementation. This is useful if you want to use `az_core` without `az_http` functionality.
 
 The following CMake options are available for adding/removing project features.
 
@@ -460,7 +460,7 @@ At the heart of our SDK is, what we refer to as, [Azure Core](https://github.com
 
 - **Logging**: As our SDK performs operations, it can send log messages to a customer-defined callback. Customers can enable this to assist with debugging and diagnosing issues when leveraging our SDK code. See the [Logging SDK Operations](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core#logging-sdk-operations) section of the `Azure Core` README for more information.
 
-- **Contexts**: Contexts offer an I/O cancellation mechanism. Multiple contexts can be composed together in your application's call tree. When a context is canceled, its children are also canceled. See the [Canceling an Operation](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core#canceling-an-operation) section of the `Azure Core` README for more information.
+- **Contexts**: Contexts offer an I/O cancellation mechanism. Multiple contexts can be composed together in your application’s call tree. When a context is canceled, its children are also canceled. See the [Canceling an Operation](https://github.com/Azure/azure-sdk-for-c/tree/master/sdk/docs/core#canceling-an-operation) section of the `Azure Core` README for more information.
 
 - **JSON**: Non-allocating JSON reading and JSON writing data structures and operations.
 
