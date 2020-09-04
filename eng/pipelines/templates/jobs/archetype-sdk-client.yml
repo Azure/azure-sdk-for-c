@@ -6,12 +6,31 @@ jobs:
   condition: and(succeededOrFailed(), ne(variables['Skip.Test'], 'true'))
   strategy:
     matrix:
+      # Build with no dependencies at all (No samples) - PRECONDITIONS ON
+      # WARNINGS_AS_ERRORS          ON
+      # TRANSPORT_CURL              OFF
+      # UNIT_TESTING                OFF
+      # UNIT_TESTING_MOCKS          OFF
+      # TRANSPORT_PAHO              OFF
+      # PRECONDITIONS               ON
+      # LOGGING                     OFF
+      # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_NONE
       Linux_ARM:
         OSVmImage: 'ubuntu-18.04'
         vcpkg.deps: ''
         AptDependencies: 'gcc-arm-none-eabi'
         build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake'
         AZ_SDK_C_NO_SAMPLES: 'true'
+
+      # Build with no dependencies at all (No samples) - PRECONDITIONS OFF
+      # WARNINGS_AS_ERRORS          ON
+      # TRANSPORT_CURL              OFF
+      # UNIT_TESTING                OFF
+      # UNIT_TESTING_MOCKS          OFF
+      # TRANSPORT_PAHO              OFF
+      # PRECONDITIONS               OFF
+      # LOGGING                     OFF
+      # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_NONE
       Linux_ARM_no_preconditions:
         OSVmImage: 'ubuntu-18.04'
         vcpkg.deps: ''
@@ -32,6 +51,11 @@ jobs:
         OSVmImage: 'ubuntu-18.04'
         vcpkg.deps: ''
         AZ_SDK_C_NO_SAMPLES: 'true'
+      Linux_x64_gcc5:
+        OSVmImage: 'ubuntu-16.04'
+        vcpkg.deps: ''
+        AZ_SDK_C_NO_SAMPLES: 'true'
+        CC: '/usr/bin/gcc-5'
       Win_x86:
         OSVmImage: 'windows-2019'
         vcpkg.deps: ''
