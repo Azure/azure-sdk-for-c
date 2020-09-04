@@ -12,8 +12,7 @@ Param (
     [string] $TargetPath ="$env:TEMP/$([guid]::NewGuid())",
 
     [Parameter()]
-    [switch] $CI = ($null -ne $env:SYSTEM_TEAMPROJECTID),
-
+    [switch] $CI = ($null -ne $env:SYSTEM_TEAMPROJECTID)
 )
 
 function OutputWarning {
