@@ -51,6 +51,11 @@ jobs:
         OSVmImage: 'ubuntu-18.04'
         vcpkg.deps: ''
         AZ_SDK_C_NO_SAMPLES: 'true'
+      Linux_x64_gcc5:
+        OSVmImage: 'ubuntu-16.04'
+        vcpkg.deps: ''
+        AZ_SDK_C_NO_SAMPLES: 'true'
+        CC: '/usr/bin/gcc-5'
       Win_x86:
         OSVmImage: 'windows-2019'
         vcpkg.deps: ''
@@ -77,13 +82,6 @@ jobs:
       # PRECONDITIONS               ON
       # LOGGING                     ON
       # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_POSIX / AZ_PLATFORM_IMPL_WIN32
-      Linux_x64_gcc5_with_samples:
-        OSVmImage: 'ubuntu-16.04'
-        vcpkg.deps: 'curl[ssl] paho-mqtt'
-        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
-        build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX'
-        CC: '/usr/bin/gcc-5'
-        CXX: '/usr/bin/g++-5'
       Linux_x64_with_samples:
         OSVmImage: 'ubuntu-18.04'
         vcpkg.deps: 'curl[ssl] paho-mqtt'
