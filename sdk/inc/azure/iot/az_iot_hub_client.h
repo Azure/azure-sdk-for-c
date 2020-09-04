@@ -196,9 +196,9 @@ AZ_NODISCARD az_result az_iot_hub_client_sas_get_signature(
  * @param[out] out_mqtt_password_length __[nullable]__ Contains the string length, in bytes, of
  *                                                     \p mqtt_password. Can be `NULL`.
  * @return An #az_result value indicating the result of the operation.
- * @retval #AZ_OK If the operation was successful. In this case, \p mqtt_password will contain a
+ * @retval #AZ_OK The operation was successful. In this case, \p mqtt_password will contain a
  * null-terminated string with the password that needs to be passed to the MQTT client.
- * @retval #AZ_ERROR_INSUFFICIENT_SPAN_SIZE If \p mqtt_password does not have enough size.
+ * @retval #AZ_ERROR_INSUFFICIENT_SPAN_SIZE The \p mqtt_password does not have enough size.
  */
 AZ_NODISCARD az_result az_iot_hub_client_sas_get_password(
     az_iot_hub_client const* client,
@@ -229,7 +229,7 @@ AZ_NODISCARD az_result az_iot_hub_client_sas_get_password(
  * @param[out] out_mqtt_topic_length __[nullable]__ Contains the string length, in bytes, of
  *                                                  \p mqtt_topic. Can be `NULL`.
  * @return An #az_result value indicating the result of the operation.
- * @retval #AZ_OK If the topic was retrieved successfully.
+ * @retval #AZ_OK The topic was retrieved successfully.
  */
 AZ_NODISCARD az_result az_iot_hub_client_telemetry_get_publish_topic(
     az_iot_hub_client const* client,
@@ -267,9 +267,9 @@ typedef struct
  * @param[out] out_request If the message is a C2D request, this will contain the
  *                         #az_iot_hub_client_c2d_request
  * @return An #az_result value indicating the result of the operation.
- * @retval #AZ_OK If the topic is meant for this feature and the \p out_request was populated
+ * @retval #AZ_OK The topic is meant for this feature and the \p out_request was populated
  * with relevant information.
- * @retval #AZ_ERROR_IOT_TOPIC_NO_MATCH If the topic is not matching the expected format. This could
+ * @retval #AZ_ERROR_IOT_TOPIC_NO_MATCH The topic does not match the expected format. This could
  * be due to either a malformed topic OR the message which came in on this topic is not meant for
  * this feature.
  */
@@ -309,9 +309,9 @@ typedef struct
  * @param[out] out_request If the message is a method request, this will contain the
  *                         #az_iot_hub_client_method_request.
  * @return An #az_result value indicating the result of the operation.
- * @retval #AZ_OK If the topic is meant for this feature and the \p out_request was populated
+ * @retval #AZ_OK The topic is meant for this feature and the \p out_request was populated
  * with relevant information.
- * @retval #AZ_ERROR_IOT_TOPIC_NO_MATCH If the topic is not matching the expected format. This could
+ * @retval #AZ_ERROR_IOT_TOPIC_NO_MATCH The topic does not match the expected format. This could
  * be due to either a malformed topic OR the message which came in on this topic is not meant for
  * this feature.
  */
@@ -334,7 +334,7 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_parse_received_topic(
  * @param[out] out_mqtt_topic_length __[nullable]__ Contains the string length, in bytes, of
  *                                                  \p mqtt_topic. Can be `NULL`.
  * @return An #az_result value indicating the result of the operation.
- * @retval #AZ_OK If the topic was retrieved successfully.
+ * @retval #AZ_OK The topic was retrieved successfully.
  */
 AZ_NODISCARD az_result az_iot_hub_client_methods_response_get_publish_topic(
     az_iot_hub_client const* client,
@@ -398,9 +398,9 @@ typedef struct
  * @param[out] out_twin_response If the message is twin-operation related, this will contain the
  *                         #az_iot_hub_client_twin_response.
  * @return An #az_result value indicating the result of the operation.
- * @retval #AZ_OK If the topic is meant for this feature and the \p out_twin_response was populated
+ * @retval #AZ_OK The topic is meant for this feature and the \p out_twin_response was populated
  * with relevant information.
- * @retval #AZ_ERROR_IOT_TOPIC_NO_MATCH If the topic is not matching the expected format. This could
+ * @retval #AZ_ERROR_IOT_TOPIC_NO_MATCH The topic does not match the expected format. This could
  * be due to either a malformed topic OR the message which came in on this topic is not meant for
  * this feature.
  */
@@ -422,7 +422,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
  * @param[out] out_mqtt_topic_length __[nullable]__ Contains the string length, in bytes, of
  *                                                  \p mqtt_topic. Can be `NULL`.
  * @return An #az_result value indicating the result of the operation.
- * @retval #AZ_OK If the topic was retrieved successfully.
+ * @retval #AZ_OK The topic was retrieved successfully.
  */
 AZ_NODISCARD az_result az_iot_hub_client_twin_document_get_publish_topic(
     az_iot_hub_client const* client,
@@ -445,7 +445,7 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_document_get_publish_topic(
  * @param[out] out_mqtt_topic_length __[nullable]__ Contains the string length, in bytes, of
  *                                                  \p mqtt_topic. Can be `NULL`.
  * @return An #az_result value indicating the result of the operation.
- * @retval #AZ_OK If the topic was retrieved successfully.
+ * @retval #AZ_OK The topic was retrieved successfully.
  */
 AZ_NODISCARD az_result az_iot_hub_client_twin_patch_get_publish_topic(
     az_iot_hub_client const* client,
