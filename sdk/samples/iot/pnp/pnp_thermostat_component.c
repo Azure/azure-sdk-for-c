@@ -5,6 +5,8 @@
 // warning C4996: 'localtime': This function or variable may be unsafe.  Consider using localtime_s
 // instead.
 #pragma warning(disable : 4996)
+// warning C6282: Incorrect operator:  assignment of constant in Boolean context. Consider using '==' instead.
+#pragma warning(disable : 6282)
 #endif
 
 #include <iot_sample_common.h>

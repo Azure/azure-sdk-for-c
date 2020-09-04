@@ -871,16 +871,7 @@ static void handle_command_request(
       = az_span_create((uint8_t*)receive_message->payload, receive_message->payloadlen);
   az_iot_status status = AZ_IOT_STATUS_UNKNOWN;
 
-  // Set the Methods response topic to publish the command response.
-  set_publish_topic(
-      PNP_METHODS_PUBLISH_TOPIC,
-      command_request->request_id,
-      status,
-      AZ_SPAN_EMPTY,
-      publish_message.topic,
-      publish_message.topic_length);
-
-  // Invoke command and retrieve response payload to send to server.
+  // Invoke command and retrieve status and response payload to send to server.
   if (az_span_is_content_equal(thermostat_1.component_name, component_name))
   {
     if (az_result_succeeded(pnp_thermostat_process_command_request(
@@ -922,6 +913,15 @@ static void handle_command_request(
     publish_message.out_payload = command_empty_response_payload;
     status = AZ_IOT_STATUS_NOT_FOUND;
   }
+
+  // Set the Methods response topic to publish the command response.
+  set_publish_topic(
+      PNP_METHODS_PUBLISH_TOPIC,
+      command_request->request_id,
+      status,
+      AZ_SPAN_EMPTY,
+      publish_message.topic,
+      publish_message.topic_length);
 
   // Publish the command response.
   publish_mqtt_message(
@@ -1009,10 +1009,10 @@ static void temp_controller_build_serial_number_reported_property(
               out_payload)))
   {
     IOT_SAMPLE_LOG_ERROR(
-        "Failed to build `%.*s` reported property payload: az_result return code", /* 0x%08x.",*/
+        "Failed to build `%.*s` reported property payload: az_result return code 0x%08x.",
         az_span_size(twin_reported_serial_number_property_name),
-        az_span_ptr(twin_reported_serial_number_property_name));
-       // rc);
+        az_span_ptr(twin_reported_serial_number_property_name),
+        rc);
     exit(rc);
   }
 }
