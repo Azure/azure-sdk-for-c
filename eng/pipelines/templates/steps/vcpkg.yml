@@ -36,7 +36,7 @@ steps:
       filePath: eng/scripts/vcpkg.ps1
       arguments: >-
         -Ref $(VcpkgRef)
-        -Dependencies $(${{ parameters.DependenciesVariableName }})
+        -Dependencies "$(${{ parameters.DependenciesVariableName }})"
         -TargetPath $(Agent.TempDirectory)/vcpkg
         -CI
       pwsh: true
