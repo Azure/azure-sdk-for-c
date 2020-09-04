@@ -21,7 +21,7 @@ An `az_span` is a small data structure (defined in our [az_span.h](../../../sdk/
 - a byte pointer
 - an integer size
 
-Our SDK passes `az_span` instances to functions to ensure that a buffer’s address and size are always passed together; this reduces the chance of bugs. And, since we have the size, operations are fast; for example, we never need to call `strlen` to find the length of a string in order to append to it. Furthermore, when our SDK functions write or copy to an `az_span`, our functions ensure that we never write beyond the size of the buffer; this prevents data corruption. And finally, when reading from an `az_span`, we never read past the `az_span`’s size ensuring that we don’t process uninitialized data.
+Our SDK passes `az_span` instances to functions to ensure that a buffer's address and size are always passed together; this reduces the chance of bugs. And, since we have the size, operations are fast; for example, we never need to call `strlen` to find the length of a string in order to append to it. Furthermore, when our SDK functions write or copy to an `az_span`, our functions ensure that we never write beyond the size of the buffer; this prevents data corruption. And finally, when reading from an `az_span`, we never read past the `az_span`'s size ensuring that we don't process uninitialized data.
 
 Since many of our SDK functions require `az_span` parameters, customers must know how to create `az_span` instances so that you can call functions in our SDK. Here are some examples.
 
@@ -88,7 +88,7 @@ To enable logging, you must first write a callback function that our logging mec
    typedef void (*az_log_fn)(az_log_classification classification, az_span message);
    ```
 
-And then, during your application’s initialization, you must register your function with our SDK by calling this function:
+And then, during your application's initialization, you must register your function with our SDK by calling this function:
 
    ```C
    void az_log_set_listener(az_log_fn listener);

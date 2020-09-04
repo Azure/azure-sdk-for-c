@@ -1,5 +1,4 @@
 $Language = "c"
-$Lang = "c"
 $PackageRepository = "C"
 $packagePattern = "*.json"
 $MetadataUri = ""
@@ -47,5 +46,6 @@ function Publish-c-GithubIODocs ()
     # Those loops are left over from previous versions of this script which were
     # used to publish multiple docs packages in a single invocation.
     $pkgInfo = Get-Content $DocLocation/package-info.json | ConvertFrom-Json
-    Upload-Blobs -DocDir $DocLocation -PkgName 'docs' -DocVersion $pkgInfo.version
+    $releaseTag = RetrieveReleaseTag "C" $PublicArtifactLocation 
+    Upload-Blobs -DocDir $DocLocation -PkgName 'docs' -DocVersion $pkgInfo.version -ReleaseTag $releaseTag
 }
