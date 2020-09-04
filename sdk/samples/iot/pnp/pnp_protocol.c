@@ -295,7 +295,6 @@ az_result pnp_build_telemetry_message(
 {
   az_json_writer jw;
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_init(&jw, json_buffer, NULL));
-
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, property_name));
   IOT_SAMPLE_RETURN_IF_FAILED(append_callback(&jw, property_value));

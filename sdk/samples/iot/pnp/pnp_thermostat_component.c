@@ -326,7 +326,10 @@ az_result pnp_thermostat_process_command_request(
         thermostat_component, command_received_payload, payload, out_payload);
     if (rc != AZ_OK)
     {
+      *out_payload = command_empty_response_payload;
       *out_status = AZ_IOT_STATUS_BAD_REQUEST;
+
+      IOT_SAMPLE_LOG_AZ_SPAN("Bad request when invoking command on Thermostat Sensor component:", command_name);
     }
     else
     {
@@ -335,6 +338,10 @@ az_result pnp_thermostat_process_command_request(
   }
   else
   {
+    *out_payload = command_empty_response_payload;
+    *out_status = AZ_IOT_STATUS_NOT_FOUND;
+
+    IOT_SAMPLE_LOG_AZ_SPAN("Command not supported on Thermostat Sensor component:", command_name);
     rc = AZ_ERROR_ITEM_NOT_FOUND; // Unsupported command or not this component's command
   }
 
