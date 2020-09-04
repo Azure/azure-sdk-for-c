@@ -78,7 +78,7 @@ jobs:
       # LOGGING                     ON
       # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_POSIX / AZ_PLATFORM_IMPL_WIN32
       Linux_x64_gcc5_with_samples:
-        OSVmImage: 'ubuntu-18.04'
+        OSVmImage: 'ubuntu-16.04'
         vcpkg.deps: 'curl[ssl] paho-mqtt'
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX'
