@@ -303,23 +303,19 @@ jobs:
 
   # Validate all the files are saved as ASCII only without a UTF-8 BOM.
   - bash: |
-      shopt -s globstar
-
-      files_with_non_ascii=0
-      for file in . ./* ./**/* ; do
-        if [ ! -d "$file" ]; then
-          echo "Validating that $file file only contains ASCII bytes..."
-          if grep -I --color='auto' -P -n "[^\x00-\x7F]" $file ; then
-            if [[ $file == *"CodeCoverage.cmake"* ]]; then
-              echo "Skipping errors from $file since it contains a name."
-            else
-              ((files_with_non_ascii++))
-            fi
-          fi
-        fi
-      done
-
+      # Run grep recursive excluding git folder and known expected files and save a file with results.
+      grep -I -P -n "[^\x00-\x7F]" -r --exclude-dir ".git" --exclude-dir "docs"  --exclude "*CodeCoverage.cmake*" --exclude "grepResults" . > grepResults
+      
+      # Display results to console.
+      cat grepResults
+      
+      # Each result will produce one line, count how many lines were found.
+      files_with_non_ascii=($(wc -l < grepResults))
+      
+      # Show info about the total files that needs attention.
       echo Files found with non-ASCII characters: $files_with_non_ascii
+      
+      # Return the count. When greater than 0, the step will fail.
       exit $files_with_non_ascii
       
     displayName: Validate Characters are ASCII
