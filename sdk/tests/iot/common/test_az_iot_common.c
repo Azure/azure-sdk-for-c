@@ -286,7 +286,7 @@ static void test_az_span_copy_url_encode_insufficient_size_fail()
 
   assert_int_equal(
       _az_span_copy_url_encode(url_encoded_span, url_decoded_span, &remaining),
-      AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+      AZ_ERROR_NOT_ENOUGH_SPACE);
 }
 
 static void test_az_iot_message_properties_init_succeed(void** state)
@@ -345,7 +345,7 @@ static void test_az_iot_message_properties_append_empty_buffer_fail(void** state
 
   assert_int_equal(
       az_iot_message_properties_append(&props, test_key_one, test_value_one),
-      AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+      AZ_ERROR_NOT_ENOUGH_SPACE);
 }
 
 static void test_az_iot_message_properties_append_small_buffer_fail(void** state)
@@ -359,7 +359,7 @@ static void test_az_iot_message_properties_append_small_buffer_fail(void** state
   assert_int_equal(az_iot_message_properties_init(&props, test_span, 0), AZ_OK);
   assert_int_equal(
       az_iot_message_properties_append(&props, test_key_one, test_value_one),
-      AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+      AZ_ERROR_NOT_ENOUGH_SPACE);
   assert_int_equal(
       az_span_size(props._internal.properties_buffer), sizeof(test_correct_one_key_value) - 2);
 }
@@ -396,7 +396,7 @@ static void test_az_iot_message_properties_append_twice_small_buffer_fail(void**
   assert_int_equal(az_iot_message_properties_append(&props, test_key_one, test_value_one), AZ_OK);
   assert_int_equal(
       az_iot_message_properties_append(&props, test_key_two, test_value_two),
-      AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+      AZ_ERROR_NOT_ENOUGH_SPACE);
   assert_int_equal(props._internal.properties_written, sizeof(test_correct_one_key_value) - 1);
   assert_int_equal(
       az_span_size(props._internal.properties_buffer), sizeof(test_correct_two_key_value) - 2);

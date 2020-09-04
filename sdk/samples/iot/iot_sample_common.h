@@ -72,7 +72,7 @@
     int32_t _iot_sample_req_sz = (required_size);                          \
     if (az_span_size(span) < _iot_sample_req_sz || _iot_sample_req_sz < 0) \
     {                                                                      \
-      return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;                              \
+      return AZ_ERROR_NOT_ENOUGH_SPACE;                              \
     }                                                                      \
   } while (0)
 
@@ -157,7 +157,7 @@ typedef enum
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK All required environment variables successfully read-in.
  * @retval #AZ_ERROR_ARG Sample type or name is undefined, or environment variable is not set.
- * @retval #AZ_ERROR_INSUFFICIENT_SPAN_SIZE Not enough space set aside to store environment
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE Not enough space set aside to store environment
  * variable.
  */
 az_result iot_sample_read_environment_variables(
@@ -176,7 +176,7 @@ az_result iot_sample_read_environment_variables(
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK MQTT endpoint successfully created.
  * @retval #AZ_ERROR_ARG Sample type is undefined.
- * @retval #AZ_ERROR_INSUFFICIENT_SPAN_SIZE Buffer size is not large enough to hold c-string.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE Buffer size is not large enough to hold c-string.
  */
 az_result iot_sample_create_mqtt_endpoint(
     iot_sample_type type,

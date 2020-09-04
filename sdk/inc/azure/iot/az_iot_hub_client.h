@@ -198,7 +198,7 @@ AZ_NODISCARD az_result az_iot_hub_client_sas_get_signature(
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The operation was successful. In this case, \p mqtt_password will contain a
  * null-terminated string with the password that needs to be passed to the MQTT client.
- * @retval #AZ_ERROR_INSUFFICIENT_SPAN_SIZE The \p mqtt_password does not have enough size.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The \p mqtt_password does not have enough size.
  */
 AZ_NODISCARD az_result az_iot_hub_client_sas_get_password(
     az_iot_hub_client const* client,

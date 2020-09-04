@@ -99,7 +99,7 @@ static void test_url_encode_basic(void** state)
     int32_t url_length = 0xFF;
     assert_true(
         _az_span_url_encode(buffer2, AZ_SPAN_FROM_STR("/"), &url_length)
-        == AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+        == AZ_ERROR_NOT_ENOUGH_SPACE);
 
     assert_int_equal(url_length, 0);
     assert_true(az_span_is_content_equal(
@@ -168,7 +168,7 @@ static void test_url_encode_basic(void** state)
     int32_t url_length = 0xFF;
     assert_true(
         _az_span_url_encode(buffer10, AZ_SPAN_FROM_STR("AbC///"), &url_length)
-        == AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+        == AZ_ERROR_NOT_ENOUGH_SPACE);
 
     assert_int_equal(url_length, 0);
     assert_true(az_span_is_content_equal(
@@ -187,7 +187,7 @@ static void test_url_encode_basic(void** state)
     int32_t url_length = 0xFF;
     assert_true(
         _az_span_url_encode(buffer11, AZ_SPAN_FROM_STR("AbC///"), &url_length)
-        == AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+        == AZ_ERROR_NOT_ENOUGH_SPACE);
 
     assert_int_equal(url_length, 0);
     assert_true(az_span_is_content_equal(
@@ -265,7 +265,7 @@ static void test_url_encode_preconditions(void** state)
       int32_t url_length = 0xFF;
       assert_true(
           _az_span_url_encode(buffer5, AZ_SPAN_FROM_STR("1234567890"), &url_length)
-          == AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+          == AZ_ERROR_NOT_ENOUGH_SPACE);
 
       assert_int_equal(url_length, 0);
       assert_true(az_span_is_content_equal(buffer5, AZ_SPAN_FROM_STR("12345")));

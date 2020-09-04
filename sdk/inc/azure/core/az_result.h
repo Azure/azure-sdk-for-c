@@ -62,8 +62,8 @@ typedef enum
   /// Input argument does not comply with the expected range of values.
   AZ_ERROR_ARG = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 1),
 
-  /// The size of the provided span is too small.
-  AZ_ERROR_INSUFFICIENT_SPAN_SIZE = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 2),
+  /// The destination size is too small for the operation.
+  AZ_ERROR_NOT_ENOUGH_SPACE = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 2),
 
   /// Requested functionality is not implemented.
   AZ_ERROR_NOT_IMPLEMENTED = _az_RESULT_MAKE_ERROR(_az_FACILITY_CORE, 3),

@@ -145,7 +145,7 @@ AZ_NODISCARD az_result az_iot_message_properties_init(
  * @param[in] value The value of the property. Must be a valid, non-empty span.
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The operation was performed successfully.
- * @retval #AZ_ERROR_INSUFFICIENT_SPAN_SIZE There was not enough space to append the property.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE There was not enough space to append the property.
  */
 AZ_NODISCARD az_result az_iot_message_properties_append(
     az_iot_message_properties* properties,

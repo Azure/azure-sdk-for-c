@@ -287,7 +287,7 @@ AZ_NODISCARD static az_result _az_json_token_get_string_helper(
   {
     if (*dest_idx >= destination_max_size)
     {
-      return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
+      return AZ_ERROR_NOT_ENOUGH_SPACE;
     }
     uint8_t token_byte = source_ptr[i];
 
@@ -349,7 +349,7 @@ AZ_NODISCARD az_result az_json_token_get_string(
     // We need enough space to add a null terminator.
     if (token_size >= destination_max_size)
     {
-      return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
+      return AZ_ERROR_NOT_ENOUGH_SPACE;
     }
 
     // Contiguous token
@@ -380,7 +380,7 @@ AZ_NODISCARD az_result az_json_token_get_string(
   // We also need enough space to add a null terminator.
   if (token_size / _az_MAX_EXPANSION_FACTOR_WHILE_ESCAPING >= destination_max_size)
   {
-    return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
+    return AZ_ERROR_NOT_ENOUGH_SPACE;
   }
 
   int32_t dest_idx = 0;
@@ -416,7 +416,7 @@ AZ_NODISCARD az_result az_json_token_get_string(
 
   if (dest_idx >= destination_max_size)
   {
-    return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
+    return AZ_ERROR_NOT_ENOUGH_SPACE;
   }
   destination[dest_idx] = 0;
 

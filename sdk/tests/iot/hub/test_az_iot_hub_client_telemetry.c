@@ -213,7 +213,7 @@ test_az_iot_hub_client_telemetry_get_publish_topic_with_options_with_props_small
   assert_true(
       az_iot_hub_client_telemetry_get_publish_topic(
           &client, &props, test_buf, sizeof(test_buf), &test_length)
-      == AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+      == AZ_ERROR_NOT_ENOUGH_SPACE);
 }
 
 static void test_az_iot_hub_client_telemetry_get_publish_topic_no_options_with_props_succeed(
@@ -261,7 +261,7 @@ test_az_iot_hub_client_telemetry_get_publish_topic_no_options_with_props_small_b
   assert_true(
       az_iot_hub_client_telemetry_get_publish_topic(
           &client, &props, test_buf, sizeof(test_buf), &test_length)
-      == AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+      == AZ_ERROR_NOT_ENOUGH_SPACE);
 }
 
 static void
@@ -316,7 +316,7 @@ test_az_iot_hub_client_telemetry_get_publish_topic_with_options_module_id_with_p
   assert_true(
       az_iot_hub_client_telemetry_get_publish_topic(
           &client, &props, test_buf, sizeof(test_buf), &test_length)
-      == AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+      == AZ_ERROR_NOT_ENOUGH_SPACE);
 }
 
 int test_az_iot_hub_client_telemetry()

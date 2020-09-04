@@ -204,7 +204,7 @@ AZ_NODISCARD az_result az_http_request_init(
  *
  * @return
  *   - *`AZ_OK`* success.
- *   - *`AZ_ERROR_INSUFFICIENT_SPAN_SIZE`* the `URL` would grow past the `max_url_size`, should
+ *   - *`AZ_ERROR_NOT_ENOUGH_SPACE`* the `URL` would grow past the `max_url_size`, should
  * the parameter get set.
  *   - *`AZ_ERROR_ARG`*
  *     - `p_request` is _NULL_.
@@ -227,7 +227,7 @@ AZ_NODISCARD az_result az_http_request_set_query_parameter(
  *
  * @return
  *   - *`AZ_OK`* success.
- *   - *`AZ_ERROR_INSUFFICIENT_SPAN_SIZE`* there isn't enough space in the `p_request->buffer`
+ *   - *`AZ_ERROR_NOT_ENOUGH_SPACE`* there isn't enough space in the `p_request->buffer`
  * to add a header.
  *   - *`AZ_ERROR_ARG`*
  *     - `ref_request` is _NULL_.
