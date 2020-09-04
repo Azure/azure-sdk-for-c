@@ -91,7 +91,7 @@ int main()
 
   // This validation is only for the first time SDK client is used. API will return not implemented
   // if samples were built with no_http lib.
-  if (blob_upload_result == AZ_ERROR_NOT_IMPLEMENTED)
+  if (blob_upload_result == AZ_ERROR_DEPENDENCY_NOT_PROVIDED)
   {
     printf("Running sample with no_op HTTP implementation.\nRecompile az_core with an HTTP client "
            "implementation like CURL to see sample sending network requests.\n\n"
