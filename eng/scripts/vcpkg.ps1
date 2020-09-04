@@ -1,5 +1,6 @@
 [CmdletBinding()]
 Param (
+    [Parameter()]
     [ValidateNotNullOrEmpty()]
     [string] $Ref = 'master',
 
@@ -7,9 +8,12 @@ Param (
     [ValidateNotNullOrEmpty()]
     [string] $Dependencies,
 
+    [Parameter()]
     [string] $TargetPath ="$env:TEMP/$([guid]::NewGuid())",
 
-    [boolean] $CI
+    [Parameter()]
+    [switch] $CI = ($null -ne $env:SYSTEM_TEAMPROJECTID),
+
 )
 
 function OutputWarning {
