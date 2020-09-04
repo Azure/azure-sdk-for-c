@@ -7,6 +7,11 @@ parameters:
 steps:
   - pwsh: Write-Host "##vso[task.setvariable variable=VcpkgRef;]$(Get-Content eng/vcpkg.ref.txt)"
     displayName: Set VcpkgRef
+    condition: >-
+      and(
+        succeeded(),
+        not(eq(variables['${{ parameters.DependenciesVariableName }}'], ''))
+      )
 
   - task: Cache@2
     inputs:
