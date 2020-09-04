@@ -8,7 +8,7 @@ steps:
   - pwsh: |
       Write-Host "##vso[task.prependpath]$(Agent.TempDirectory)/vcpkg"
       Write-Host "##vso[task.setvariable variable=VCPKG_INSTALLATION_ROOT;]$(Agent.TempDirectory)/vcpkg"
-      Write-Host "##vso[task.setvariable variable=VcpkgRef;]$(Get-Content eng/vcpkg.ref.txt)"
+      Write-Host "##vso[task.setvariable variable=VcpkgRef;]$(Get-Content eng/vcpkg-ref.txt)"
     displayName: Set Vcpkg Variables
     condition: >-
       and(
