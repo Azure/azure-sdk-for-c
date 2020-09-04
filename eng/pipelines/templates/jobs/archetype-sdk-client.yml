@@ -6,12 +6,31 @@ jobs:
   condition: and(succeededOrFailed(), ne(variables['Skip.Test'], 'true'))
   strategy:
     matrix:
+      # Build with no dependencies at all (No samples) - PRECONDITIONS ON
+      # WARNINGS_AS_ERRORS          ON
+      # TRANSPORT_CURL              OFF
+      # UNIT_TESTING                OFF
+      # UNIT_TESTING_MOCKS          OFF
+      # TRANSPORT_PAHO              OFF
+      # PRECONDITIONS               ON
+      # LOGGING                     OFF
+      # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_NONE
       Linux_ARM:
         OSVmImage: 'ubuntu-18.04'
         vcpkg.deps: ''
         AptDependencies: 'gcc-arm-none-eabi'
         build.args: '-DCMAKE_TOOLCHAIN_FILE=cmake-modules/gcc-arm-toolchain.cmake'
         AZ_SDK_C_NO_SAMPLES: 'true'
+
+      # Build with no dependencies at all (No samples) - PRECONDITIONS ON
+      # WARNINGS_AS_ERRORS          ON
+      # TRANSPORT_CURL              OFF
+      # UNIT_TESTING                OFF
+      # UNIT_TESTING_MOCKS          OFF
+      # TRANSPORT_PAHO              OFF
+      # PRECONDITIONS               OFF
+      # LOGGING                     OFF
+      # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_NONE
       Linux_ARM_no_preconditions:
         OSVmImage: 'ubuntu-18.04'
         vcpkg.deps: ''
@@ -58,6 +77,12 @@ jobs:
       # PRECONDITIONS               ON
       # LOGGING                     ON
       # AZ_PLATFORM_IMPL            AZ_PLATFORM_IMPL_POSIX / AZ_PLATFORM_IMPL_WIN32
+      Linux_x64_gcc5_with_samples:
+        OSVmImage: 'ubuntu-18.04'
+        vcpkg.deps: 'curl[ssl] paho-mqtt'
+        VCPKG_DEFAULT_TRIPLET: 'x64-linux'
+        build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX'
+        CC: '/usr/bin/gcc-5'
       Linux_x64_with_samples:
         OSVmImage: 'ubuntu-18.04'
         vcpkg.deps: 'curl[ssl] paho-mqtt'
