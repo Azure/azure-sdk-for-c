@@ -4,7 +4,7 @@
 /**
  * @file az_iot_hub_client.h
  *
- * @brief definition for the Azure IoT Hub client.
+ * @brief Definition for the Azure IoT Hub client.
  * @remark The IoT Hub MQTT protocol is described at
  * https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-mqtt-support
  *
@@ -45,12 +45,11 @@ typedef struct
   az_span user_agent; /**< The user-agent is a formatted string that will be used for Azure IoT
                          usage statistics. */
   az_span model_id; /**< The model id used to identify the capabilities of a device based on the
-                       Digital Twin document */
+                       Digital Twin document. */
 } az_iot_hub_client_options;
 
 /**
  * @brief Azure IoT Hub Client.
- *
  */
 typedef struct
 {
@@ -78,8 +77,10 @@ AZ_NODISCARD az_iot_hub_client_options az_iot_hub_client_options_default();
  * @param[in] iot_hub_hostname The IoT Hub Hostname.
  * @param[in] device_id The Device ID.
  * @param[in] options A reference to an #az_iot_hub_client_options structure. If `NULL` is passed,
- * `az_iot_hub_client_init()` will use the default options.
- * @return #az_result.
+ * az_iot_hub_client_init() will use the default options. If using custom options, please
+ * initialize first by calling az_iot_hub_client_options_default() and then populating relevant
+ * options with your own values.
+ * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_iot_hub_client_init(
     az_iot_hub_client* client,
@@ -116,7 +117,7 @@ AZ_NODISCARD az_result az_iot_hub_client_init(
  * @param[in] mqtt_user_name_size The size, in bytes of \p mqtt_user_name.
  * @param[out] out_mqtt_user_name_length __[nullable]__ Contains the string length, in bytes, of
  *                                                      \p mqtt_user_name. Can be `NULL`.
- * @return #az_result.
+ * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_iot_hub_client_get_user_name(
     az_iot_hub_client const* client,
@@ -138,7 +139,7 @@ AZ_NODISCARD az_result az_iot_hub_client_get_user_name(
  * @param[in] mqtt_client_id_size The size, in bytes of \p mqtt_client_id.
  * @param[out] out_mqtt_client_id_length __[nullable]__ Contains the string length, in bytes, of
  *                                                      of \p mqtt_client_id. Can be `NULL`.
- * @return #az_result
+ * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_iot_hub_client_get_client_id(
     az_iot_hub_client const* client,
@@ -146,7 +147,7 @@ AZ_NODISCARD az_result az_iot_hub_client_get_client_id(
     size_t mqtt_client_id_size,
     size_t* out_mqtt_client_id_length);
 
-/**
+/*
  *
  * SAS Token APIs
  *
@@ -167,7 +168,7 @@ AZ_NODISCARD az_result az_iot_hub_client_get_client_id(
  * @param[in] token_expiration_epoch_time The time, in seconds, from 1/1/1970.
  * @param[in] signature An empty #az_span with sufficient capacity to hold the SAS signature.
  * @param[out] out_signature The output #az_span containing the SAS signature.
- * @return #az_result
+ * @return An #az_result value indicating the result of the operation.
  */
 AZ_NODISCARD az_result az_iot_hub_client_sas_get_signature(
     az_iot_hub_client const* client,
@@ -183,10 +184,10 @@ AZ_NODISCARD az_result az_iot_hub_client_sas_get_signature(
  * @param[in] client The #az_iot_hub_client to use for this call.
  * @param[in] base64_hmac_sha256_signature The Base64 encoded value of the HMAC-SHA256(signature,
  *                                         SharedAccessKey). The signature is obtained by using
- *                                         #az_iot_hub_client_sas_get_signature.
+ *                                         az_iot_hub_client_sas_get_signature().
  * @param[in] token_expiration_epoch_time The time, in seconds, from 1/1/1970.
  *                                        It MUST be the same value passed to
- *                                        az_iot_hub_client_sas_get_signature.
+ *                                        az_iot_hub_client_sas_get_signature().
  * @param[in] key_name The Shared Access Key Name (Policy Name). This is optional. For security
  *                     reasons we recommend using one key per device instead of using a global
  *                     policy key.
@@ -194,10 +195,10 @@ AZ_NODISCARD az_result az_iot_hub_client_sas_get_signature(
  * @param[in] mqtt_password_size The size, in bytes of \p mqtt_password.
  * @param[out] out_mqtt_password_length __[nullable]__ Contains the string length, in bytes, of
  *                                                     \p mqtt_password. Can be `NULL`.
- * @return #az_result.
- *         #AZ_OK if successful. In this case, `mqtt_password` will contain a null-terminated string
- *           with the password that needs to be passed to the MQTT client.
- *         #AZ_ERROR_INSUFFICIENT_SPAN_SIZE If `mqtt_password` does not have enough size.
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The operation was successful. In this case, \p mqtt_password will contain a
+ * null-terminated string with the password that needs to be passed to the MQTT client.
+ * @retval #AZ_ERROR_INSUFFICIENT_SPAN_SIZE The \p mqtt_password does not have enough size.
  */
 AZ_NODISCARD az_result az_iot_hub_client_sas_get_password(
     az_iot_hub_client const* client,
@@ -208,7 +209,7 @@ AZ_NODISCARD az_result az_iot_hub_client_sas_get_password(
     size_t mqtt_password_size,
     size_t* out_mqtt_password_length);
 
-/**
+/*
  *
  * Telemetry APIs
  *
@@ -227,7 +228,8 @@ AZ_NODISCARD az_result az_iot_hub_client_sas_get_password(
  * @param[in] mqtt_topic_size The size, in bytes of \p mqtt_topic.
  * @param[out] out_mqtt_topic_length __[nullable]__ Contains the string length, in bytes, of
  *                                                  \p mqtt_topic. Can be `NULL`.
- * @return #az_result
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The topic was retrieved successfully.
  */
 AZ_NODISCARD az_result az_iot_hub_client_telemetry_get_publish_topic(
     az_iot_hub_client const* client,
@@ -236,7 +238,7 @@ AZ_NODISCARD az_result az_iot_hub_client_telemetry_get_publish_topic(
     size_t mqtt_topic_size,
     size_t* out_mqtt_topic_length);
 
-/**
+/*
  *
  * Cloud-to-device (C2D) APIs
  *
@@ -258,21 +260,25 @@ typedef struct
 } az_iot_hub_client_c2d_request;
 
 /**
- * @brief Attempts to parse a received message's topic.
+ * @brief Attempts to parse a received message's topic for C2D features.
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
  * @param[in] received_topic An #az_span containing the received topic.
  * @param[out] out_request If the message is a C2D request, this will contain the
  *                         #az_iot_hub_client_c2d_request
- * @return #az_result
- *         - `AZ_ERROR_IOT_TOPIC_NO_MATCH` if the topic is not matching the expected format.
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The topic is meant for this feature and the \p out_request was populated
+ * with relevant information.
+ * @retval #AZ_ERROR_IOT_TOPIC_NO_MATCH The topic does not match the expected format. This could
+ * be due to either a malformed topic OR the message which came in on this topic is not meant for
+ * this feature.
  */
 AZ_NODISCARD az_result az_iot_hub_client_c2d_parse_received_topic(
     az_iot_hub_client const* client,
     az_span received_topic,
     az_iot_hub_client_c2d_request* out_request);
 
-/**
+/*
  *
  * Methods APIs
  *
@@ -296,14 +302,18 @@ typedef struct
 } az_iot_hub_client_method_request;
 
 /**
- * @brief Attempts to parse a received message's topic.
+ * @brief Attempts to parse a received message's topic for method features.
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
  * @param[in] received_topic An #az_span containing the received topic.
  * @param[out] out_request If the message is a method request, this will contain the
  *                         #az_iot_hub_client_method_request.
- * @return #az_result
- *         - `AZ_ERROR_IOT_TOPIC_NO_MATCH` if the topic is not matching the expected format.
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The topic is meant for this feature and the \p out_request was populated
+ * with relevant information.
+ * @retval #AZ_ERROR_IOT_TOPIC_NO_MATCH The topic does not match the expected format. This could
+ * be due to either a malformed topic OR the message which came in on this topic is not meant for
+ * this feature.
  */
 AZ_NODISCARD az_result az_iot_hub_client_methods_parse_received_topic(
     az_iot_hub_client const* client,
@@ -323,7 +333,8 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_parse_received_topic(
  * @param[in] mqtt_topic_size The size, in bytes of \p mqtt_topic.
  * @param[out] out_mqtt_topic_length __[nullable]__ Contains the string length, in bytes, of
  *                                                  \p mqtt_topic. Can be `NULL`.
- * @return #az_result
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The topic was retrieved successfully.
  */
 AZ_NODISCARD az_result az_iot_hub_client_methods_response_get_publish_topic(
     az_iot_hub_client const* client,
@@ -333,7 +344,7 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_response_get_publish_topic(
     size_t mqtt_topic_size,
     size_t* out_mqtt_topic_length);
 
-/**
+/*
  *
  * Twin APIs
  *
@@ -374,20 +385,24 @@ typedef struct
       request_id; /**< Request ID matches the ID specified when issuing a Get or Patch command. */
   az_span version; /**< The Twin object version.
                     * @remark This is only returned when
-                    * response_type==AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES
+                    * `response_type==AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES`
                     * or
-                    * response_type==AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES. */
+                    * `response_type==AZ_IOT_CLIENT_TWIN_RESPONSE_TYPE_REPORTED_PROPERTIES`. */
 } az_iot_hub_client_twin_response;
 
 /**
- * @brief Attempts to parse a received message's topic.
+ * @brief Attempts to parse a received message's topic for twin features.
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
  * @param[in] received_topic An #az_span containing the received topic.
  * @param[out] out_twin_response If the message is twin-operation related, this will contain the
  *                         #az_iot_hub_client_twin_response.
- * @return #az_result
- *         - `AZ_ERROR_IOT_TOPIC_NO_MATCH` if the topic is not matching the expected format.
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The topic is meant for this feature and the \p out_twin_response was populated
+ * with relevant information.
+ * @retval #AZ_ERROR_IOT_TOPIC_NO_MATCH The topic does not match the expected format. This could
+ * be due to either a malformed topic OR the message which came in on this topic is not meant for
+ * this feature.
  */
 AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
     az_iot_hub_client const* client,
@@ -406,7 +421,8 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
  * @param[in] mqtt_topic_size The size, in bytes of \p mqtt_topic.
  * @param[out] out_mqtt_topic_length __[nullable]__ Contains the string length, in bytes, of
  *                                                  \p mqtt_topic. Can be `NULL`.
- * @return #az_result
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The topic was retrieved successfully.
  */
 AZ_NODISCARD az_result az_iot_hub_client_twin_document_get_publish_topic(
     az_iot_hub_client const* client,
@@ -428,7 +444,8 @@ AZ_NODISCARD az_result az_iot_hub_client_twin_document_get_publish_topic(
  * @param[in] mqtt_topic_size The size, in bytes of \p mqtt_topic.
  * @param[out] out_mqtt_topic_length __[nullable]__ Contains the string length, in bytes, of
  *                                                  \p mqtt_topic. Can be `NULL`.
- * @return #az_result
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK The topic was retrieved successfully.
  */
 AZ_NODISCARD az_result az_iot_hub_client_twin_patch_get_publish_topic(
     az_iot_hub_client const* client,

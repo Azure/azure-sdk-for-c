@@ -44,7 +44,7 @@ typedef az_result (*pnp_append_property_callback)(az_json_writer* jw, void* cont
  * @param[in] mqtt_topic_size The size, in bytes of \p mqtt_topic.
  * @param[out] out_mqtt_topic_length __[nullable]__ Contains the string length, in bytes, of
  *                                                  \p mqtt_topic. Can be `NULL`.
- * @return #az_result
+ * @return An #az_result value indicating the result of the operation.
  */
 az_result pnp_get_telemetry_topic(
     const az_iot_hub_client* client,
