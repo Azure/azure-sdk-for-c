@@ -83,6 +83,7 @@ jobs:
         VCPKG_DEFAULT_TRIPLET: 'x64-linux'
         build.args: ' -DTRANSPORT_CURL=ON -DTRANSPORT_PAHO=ON -DAZ_PLATFORM_IMPL=POSIX'
         CC: '/usr/bin/gcc-5'
+        CXX: '/usr/bin/g++-5'
       Linux_x64_with_samples:
         OSVmImage: 'ubuntu-18.04'
         vcpkg.deps: 'curl[ssl] paho-mqtt'
