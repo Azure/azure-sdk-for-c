@@ -394,14 +394,33 @@ jobs:
         }
       displayName: Generate docs
 
-    - pwsh: New-Item -ItemType directory -Path $(Build.ArtifactStagingDirectory) -Name docs
+    - task: PowerShell@2
+      inputs:
+        targetType: filePath
+        filePath: eng/scripts/New-DocsMsArtifact.ps1
+        ignoreLASTEXITCODE: flattenFolders
+        pwsh: true
+        errorActionPreference: stop
+
+      displayName: Generate artifacts for docs.ms
+
+
+    - pwsh: |
+        New-Item -ItemType directory -Path $(Build.ArtifactStagingDirectory) -Name docs
+        New-Item -ItemType directory -Path $(Build.ArtifactStagingDirectory) -Name docs.ms
       displayName: Create doc artifact location
 
     - task: CopyFiles@2
       inputs:
         sourceFolder: docs/html
         targetFolder: $(Build.ArtifactStagingDirectory)/docs
-      displayName: Copy documentation
+      displayName: Copy documentation for publishing on GitHub.io
+
+    - task: CopyFiles@2
+      inputs:
+        sourceFolder: docs/docs.ms
+        targetFolder: $(Build.ArtifactStagingDirectory)/docs.ms
+      displayName: Copy documentation for publishing on docs.ms
 
     - pwsh: |
         $packageInfoPath = Join-Path -Path $(Build.ArtifactStagingDirectory) release-info/package-info.json
@@ -412,3 +431,8 @@ jobs:
       inputs:
         artifactName: docs
         path: $(Build.ArtifactStagingDirectory)/docs
+
+    - task: PublishPipelineArtifact@1
+      inputs:
+        artifactName: docs.ms
+        path: $(Build.ArtifactStagingDirectory)/docs.ms
