@@ -44,7 +44,7 @@ New-Item -ItemType Directory -Path $TargetPath -Force
 pushd $TargetPath
 
 git clone https://github.com/Microsoft/vcpkg .
-git checkout (Get-Content "$PSScriptRoot/../vcpkg.ref.txt")
+git checkout (Get-Content "$PSScriptRoot/../vcpkg-ref.txt")
 
 if ($IsWindows) {
     .\bootstrap-vcpkg.bat
