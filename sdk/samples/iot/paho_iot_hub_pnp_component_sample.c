@@ -158,7 +158,7 @@ static az_result append_string_callback(az_json_writer* jw, void* value);
  * This sample extends the IoT Hub Plug and Play Sample above to mimic a Temperature Controller
  * and connects the IoT Plug and Play enabled device (the Temperature Controller) with the Digital
  * Twin Model ID (DTMI). If a timeout occurs while waiting for a message from the Azure IoT
- * Explorer, the sample will continue. If MQTT_TIMEOUT_RECEIVE_MAX_COUNT timeouts occur
+ * Explorer, the sample will continue. If PNP_MQTT_TIMEOUT_RECEIVE_MAX_COUNT timeouts occur
  * consecutively, the sample will disconnect. X509 self-certification is used.
  *
  * This Temperature Controller is made up of the following components:
@@ -1033,7 +1033,7 @@ static void temp_controller_build_error_reported_property_with_status(
               property_name,
               append_json_token_callback,
               (void*)property_value,
-              status,
+              (int32_t)status,
               version,
               twin_response_failed,
               out_payload)))

@@ -228,7 +228,7 @@ void pnp_thermostat_build_error_reported_property_with_status(
               property_name,
               append_double_callback,
               (void*)property_value,
-              status,
+              (int32_t)status,
               version,
               twin_response_failed,
               out_payload)))
@@ -295,7 +295,7 @@ az_result pnp_thermostat_process_property_update(
                 property_name->slice,
                 append_double_callback,
                 (void*)&parsed_property_value,
-                AZ_IOT_STATUS_OK,
+                (int32_t)AZ_IOT_STATUS_OK,
                 version,
                 twin_response_success,
                 out_payload)))
