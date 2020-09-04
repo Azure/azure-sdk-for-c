@@ -32,7 +32,6 @@ function SetEnvironmentVariable {
     )
 
     if ($CI) {
-        Write-Host "##vso[task.setvariable variable=_$Name;issecret=true;]$($Value)"
         Write-Host "##vso[task.setvariable variable=$Name;]$($Value)"
     } else {
         Write-Verbose "Setting local environment variable: $Name = ***"
