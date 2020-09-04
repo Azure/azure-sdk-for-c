@@ -5,7 +5,7 @@ parameters:
   DependenciesVariableName: vcpkg.deps
 
 steps:
-  - pwsh: Write-Host "##vso[task.setvariable variable=VcpkgRef;]$(Get-Content eng/vpckg.ref.txt)"
+  - pwsh: Write-Host "##vso[task.setvariable variable=VcpkgRef;]$(Get-Content eng/vcpkg.ref.txt)"
     displayName: Set VcpkgRef
 
   - task: Cache@2
