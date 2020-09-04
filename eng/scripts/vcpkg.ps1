@@ -53,7 +53,7 @@ if ($IsWindows) {
     ./bootstrap-vcpkg.sh
 }
 
-./vcpkg install $Dependencies
+./vcpkg install "$Dependencies"
 
 SetEnvironmentVariable -Name Path -Value "$TargetPath;$env:PATH"
 SetEnvironmentVariable -Name VCPKG_INSTALLATION_ROOT -Value $TargetPath
