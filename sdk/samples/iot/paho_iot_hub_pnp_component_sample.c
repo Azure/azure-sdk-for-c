@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 #ifdef _MSC_VER
+// warning C6282: Incorrect operator:  assignment of constant in Boolean context. Consider using '==' instead.
+#pragma warning(disable : 6282)
 #pragma warning(push)
 // warning C4201: nonstandard extension used: nameless struct/union
 #pragma warning(disable : 4201)
