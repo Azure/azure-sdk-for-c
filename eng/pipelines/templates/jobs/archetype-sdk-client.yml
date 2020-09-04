@@ -318,7 +318,7 @@ jobs:
   # Validate all the files are saved as ASCII only without a UTF-8 BOM.
   - bash: |
       # Run grep recursive excluding git folder and known expected files and save a file with results.
-      grep -I -P -n "[^\x00-\x7F]" -r --exclude-dir ".git" --exclude-dir "docs"  --exclude "*CodeCoverage.cmake*" --exclude "grepResults" . > grepResults
+      grep -I -P -n "[^\x00-\x7F]" -r --exclude-dir ".git" --exclude-dir "docs" --exclude-dir "tools" --exclude "*CodeCoverage.cmake*" --exclude "grepResults" . > grepResults
       
       # Display results to console.
       cat grepResults
