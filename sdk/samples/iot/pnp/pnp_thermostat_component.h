@@ -26,17 +26,60 @@ typedef struct
   bool send_maximum_temperature_property;
 } pnp_thermostat_component;
 
+/*
+ * @brief Initialize a #pnp_thermostat_component which holds device thermostat info.
+ *
+ * @param[out] out_thermostat_component A pointer to a #out_thermostat_component instance to
+ *                                      initialize.
+ * @param[in] component_name The name of the component.
+ * @param[in] initial_temperature The initial temperature to set all temperature member variables.
+ *
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK #pnp_thermostat_component is initialied successfully.
+ * @retval #AZ_ERROR_ARG The pointer to the #pnp_thermostat_component instance is NULL.
+ */
 az_result pnp_thermostat_init(
     pnp_thermostat_component* out_thermostat_component,
     az_span component_name,
     double initial_temperature);
 
+/**
+ * @brief Build the thermostat's temperature telemetry message.
+ *
+ * @param[in] thermostat_component A pointer to the themostat component to get data.
+ * @param[out] payload An #az_span with sufficient capacity to hold the json payload.
+ * @param[out] out_payload A pointer to the #az_span containing the output json payload.
+ */
+void pnp_thermostat_build_telemetry_message(
+    pnp_thermostat_component* thermostat_component,
+    az_span payload,
+    az_span* out_payload);
+
+/**
+ * @brief Build the thermostat's maximum temperature reported property message.
+ *
+ * @param[in] thermostat_component A pointer to the themostat component to get data.
+ * @param[out] out_property_name The name of the reported property to be sent.
+ * @param[out] payload An #az_span with sufficient capacity to hold the json payload.
+ * @param[out] out_payload A pointer to the #az_span containing the output json payload.
+ */
 void pnp_thermostat_build_maximum_temperature_reported_property(
     pnp_thermostat_component* thermostat_component,
     az_span* out_property_name,
     az_span payload,
     az_span* out_payload);
 
+/**
+ * @brief Build the thermostat's error message with status.
+ *
+ * @param[in] component_name The name of the component for the reported property.
+ * @param[in] property_name The name of the property for which to send an update.
+ * @param[in] property_value The property value to be appended.
+ * @param[in] status The return status for the error message ack.
+ * @param[in] version The version for the reported property ack.
+ * @param[out] payload An #az_span with sufficient capacity to hold the json payload.
+ * @param[out] out_payload A pointer to the #az_span containing the output json payload.
+ */
 void pnp_thermostat_build_error_reported_property_with_status(
     az_span component_name,
     az_span property_name,
@@ -46,25 +89,45 @@ void pnp_thermostat_build_error_reported_property_with_status(
     az_span payload,
     az_span* out_payload);
 
-void pnp_thermostat_build_telemetry_message(
-    pnp_thermostat_component const* thermostat_component,
-    az_span payload,
-    az_span* out_payload);
-
-az_result pnp_thermostat_process_command_request(
-    pnp_thermostat_component const* thermostat_component,
-    az_span command_name,
-    az_span command_payload,
-    az_iot_status* out_status,
-    az_span payload,
-    az_span* out_payload);
-
+/**
+ * @brief Update the thermostat's member variables and prepare reported property message.
+ *
+ * @param[in,out] ref_thermostat_component A pointer to the themostat component to update data.
+ * @param[in] property_name The name of the property to be updated.
+ * @param[in] property_value The value used for the property update.
+ * @param[in] version The version parsed from the received message, and used to prepare the returned
+ *                    reported property message.
+ * @param[out] payload An #az_span with sufficient capacity to hold the prepared reported property
+ *                     json payload.
+ * @param[out] out_payload A pointer to the #az_span containing the output reported property json
+ *                         payload.
+ */
 az_result pnp_thermostat_process_property_update(
     pnp_thermostat_component* ref_thermostat_component,
-    az_span component_name,
     az_json_token const* property_name,
     az_json_reader const* property_value,
     int32_t version,
+    az_span payload,
+    az_span* out_payload);
+
+/**
+ * @brief Update the thermostat's member variables and prepare reported property message.
+ *
+ * @param[in] thermostat_component A pointer to the themostat on which to invoke the command.
+ * @param[in] command_name The name of the command to be invoked.
+ * @param[in] command_received_payload The received payload to be used by the invoked command.
+ * @param[out] out_status The status resulting from the invoked command, to be used in the command
+ *                        response.
+ * @param[out] payload An #az_span with sufficient capacity to hold the command response json
+ *                    payload.
+ * @param[out] out_payload A pointer to the #az_span containing the output command response json
+ *                         payload.
+ */
+az_result pnp_thermostat_process_command_request(
+    pnp_thermostat_component const* thermostat_component,
+    az_span command_name,
+    az_span command_received_payload,
+    az_iot_status* out_status,
     az_span payload,
     az_span* out_payload);
 

@@ -5,6 +5,8 @@
 
 #include <iot_sample_common.h>
 
+#include <stddef.h>
+
 #include <azure/core/az_json.h>
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>

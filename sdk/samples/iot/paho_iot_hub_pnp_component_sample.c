@@ -137,6 +137,7 @@ static void temp_controller_invoke_reboot(void);
 
 // Callbacks
 static az_result append_string_callback(az_json_writer* jw, void* value);
+static az_result append_int32_callback(az_json_writer* jw, void* value);
 static az_result append_json_token_callback(az_json_writer* jw, void* value);
 static void property_callback(
     az_span component_name,
@@ -1056,8 +1057,8 @@ static void temp_controller_build_telemetry_message(az_span payload, az_span* ou
   int32_t working_set_ram_in_kibibytes = rand() % 128;
 
   if (az_result_failed(
-          rc = pnp_build_telemetry_message_int32(
-              telemetry_working_set_name, working_set_ram_in_kibibytes, payload, out_payload)))
+          rc = pnp_build_telemetry_message(
+              payload, telemetry_working_set_name, append_int32_callback, (void*)&working_set_ram_in_kibibytes, out_payload)))
   {
     IOT_SAMPLE_LOG_ERROR(
         "Failed to build Telemetry message for Temperature Controller: az_result return code "
@@ -1145,7 +1146,6 @@ static void property_callback(
     if (az_result_failed(
             rc = pnp_thermostat_process_property_update(
                 &thermostat_1,
-                component_name,
                 property_name,
                 property_value,
                 version,
@@ -1173,7 +1173,6 @@ static void property_callback(
     if (az_result_failed(
             rc = pnp_thermostat_process_property_update(
                 &thermostat_2,
-                component_name,
                 property_name,
                 property_value,
                 version,
@@ -1242,6 +1241,11 @@ static void property_callback(
 static az_result append_string_callback(az_json_writer* jw, void* value)
 {
   return az_json_writer_append_string(jw, *(az_span*)value);
+}
+
+static az_result append_int32_callback(az_json_writer* jw, void* value)
+{
+  return az_json_writer_append_double(jw, *(double*)value, DOUBLE_DECIMAL_PLACE_DIGITS);
 }
 
 static az_result append_json_token_callback(az_json_writer* jw, void* value)

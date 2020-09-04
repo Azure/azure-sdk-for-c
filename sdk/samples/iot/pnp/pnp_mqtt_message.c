@@ -12,10 +12,10 @@
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
 
-static char publish_topic[128];
-static char publish_payload[512];
+static char publish_topic_buffer[128];
+static char publish_payload_buffer[512];
 static uint32_t request_id_int;
-static char request_id_buffer[10];
+static char request_id_buffer[16];
 
 az_result pnp_mqtt_message_init(pnp_mqtt_message* out_mqtt_message)
 {
@@ -24,10 +24,10 @@ az_result pnp_mqtt_message_init(pnp_mqtt_message* out_mqtt_message)
     return AZ_ERROR_ARG;
   }
 
-  out_mqtt_message->topic = publish_topic;
-  out_mqtt_message->topic_length = sizeof(publish_topic);
+  out_mqtt_message->topic = publish_topic_buffer;
+  out_mqtt_message->topic_length = sizeof(publish_topic_buffer);
   out_mqtt_message->out_topic_length = 0;
-  out_mqtt_message->payload = AZ_SPAN_FROM_BUFFER(publish_payload);
+  out_mqtt_message->payload = AZ_SPAN_FROM_BUFFER(publish_payload_buffer);
   out_mqtt_message->out_payload = out_mqtt_message->payload;
 
   return AZ_OK;

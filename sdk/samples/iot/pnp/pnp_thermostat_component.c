@@ -134,9 +134,7 @@ static az_result invoke_getMaxMinReport(
 
 static az_result append_double_callback(az_json_writer* jw, void* value)
 {
-  double value_as_double = *(double*)value;
-
-  return az_json_writer_append_double(jw, value_as_double, DOUBLE_DECIMAL_PLACE_DIGITS);
+  return az_json_writer_append_double(jw, *(double*)value, DOUBLE_DECIMAL_PLACE_DIGITS);
 }
 
 az_result pnp_thermostat_init(
@@ -159,6 +157,30 @@ az_result pnp_thermostat_init(
   out_thermostat_component->send_maximum_temperature_property = true;
 
   return AZ_OK;
+}
+
+void pnp_thermostat_build_telemetry_message(
+    pnp_thermostat_component* thermostat_component,
+    az_span payload,
+    az_span* out_payload)
+{
+  az_result rc;
+
+  if (az_result_failed(
+          rc = pnp_build_telemetry_message(
+              payload,
+              telemetry_temperature_name,
+              append_double_callback,
+              (void*)&thermostat_component->current_temperature,
+              out_payload)))
+  {
+    IOT_SAMPLE_LOG_ERROR(
+        "Failed to build Telemetry message for %.*s: az_result return code 0x%08x.",
+        az_span_size(thermostat_component->component_name),
+        az_span_ptr(thermostat_component->component_name),
+        rc);
+    exit(rc);
+  }
 }
 
 void pnp_thermostat_build_maximum_temperature_reported_property(
@@ -217,64 +239,8 @@ void pnp_thermostat_build_error_reported_property_with_status(
   }
 }
 
-az_result pnp_thermostat_process_command_request(
-    pnp_thermostat_component const* thermostat_component,
-    az_span command_name,
-    az_span command_received_payload,
-    az_iot_status* out_status,
-    az_span payload,
-    az_span* out_payload)
-{
-  az_result rc;
-
-  if (az_span_is_content_equal(command_getMaxMinReport_name, command_name))
-  {
-    // Invoke command.
-    rc = invoke_getMaxMinReport(
-        thermostat_component, command_received_payload, payload, out_payload);
-    if (rc != AZ_OK)
-    {
-      *out_status = AZ_IOT_STATUS_BAD_REQUEST;
-    }
-    else
-    {
-      *out_status = AZ_IOT_STATUS_OK;
-    }
-  }
-  else
-  {
-    rc = AZ_ERROR_ITEM_NOT_FOUND; // Unsupported command or not this component's command
-  }
-
-  return rc;
-}
-
-void pnp_thermostat_build_telemetry_message(
-    pnp_thermostat_component const* thermostat_component,
-    az_span payload,
-    az_span* out_payload)
-{
-  az_result rc;
-
-  if (az_result_failed(
-          rc = pnp_build_telemetry_message_double(
-              telemetry_temperature_name,
-              thermostat_component->current_temperature,
-              payload,
-              out_payload)))
-  {
-    IOT_SAMPLE_LOG_ERROR(
-        "Failed to build Telemetry message for %.*s: az_result return code 0x%08x.",
-        az_span_size(thermostat_component->component_name),
-        az_span_ptr(thermostat_component->component_name),
-        rc);
-    exit(rc);
-  }
-}
-
 az_result pnp_thermostat_process_property_update(
     pnp_thermostat_component* ref_thermostat_component,
-    az_span component_name,
     az_json_token const* property_name,
     az_json_reader const* property_value,
     int32_t version,
@@ -325,7 +291,7 @@ az_result pnp_thermostat_process_property_update(
     if (az_result_failed(
             rc = pnp_build_reported_property_with_status(
                 payload,
-                component_name,
+                ref_thermostat_component->component_name,
                 property_name->slice,
                 append_double_callback,
                 (void*)&parsed_property_value,
@@ -341,4 +307,36 @@ az_result pnp_thermostat_process_property_update(
   }
 
   return AZ_OK;
+}
+
+az_result pnp_thermostat_process_command_request(
+    pnp_thermostat_component const* thermostat_component,
+    az_span command_name,
+    az_span command_received_payload,
+    az_iot_status* out_status,
+    az_span payload,
+    az_span* out_payload)
+{
+  az_result rc;
+
+  if (az_span_is_content_equal(command_getMaxMinReport_name, command_name))
+  {
+    // Invoke command.
+    rc = invoke_getMaxMinReport(
+        thermostat_component, command_received_payload, payload, out_payload);
+    if (rc != AZ_OK)
+    {
+      *out_status = AZ_IOT_STATUS_BAD_REQUEST;
+    }
+    else
+    {
+      *out_status = AZ_IOT_STATUS_OK;
+    }
+  }
+  else
+  {
+    rc = AZ_ERROR_ITEM_NOT_FOUND; // Unsupported command or not this component's command
+  }
+
+  return rc;
 }

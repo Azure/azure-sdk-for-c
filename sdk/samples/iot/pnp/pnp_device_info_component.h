@@ -8,12 +8,14 @@
 #include <azure/core/az_span.h>
 
 /**
- * @brief Get the payload to send for device info
+ * @brief Build the reported property payload to send for device info.
  *
- * @param client The `az_iot_hub_client` pointer to the hub client.
- * @param mqtt_message The `sample_pnp_mqtt_message` pointer to the struct to be populated.
+ * @param[in] payload An #az_span with sufficient capacity to hold the reported property payload.
+ * @param[out] out_payload A pointer to the #az_span containing the reported property payload.
  *
- * @return An #az_result with the result of the operation.
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK Reported property payload built successfully.
+ * @retval other Initialization of #az_json_writer failed or the buffer is too small.
  */
 az_result pnp_device_info_build_reported_property(az_span payload, az_span* out_payload);
 

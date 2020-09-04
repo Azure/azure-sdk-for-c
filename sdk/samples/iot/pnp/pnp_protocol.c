@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // SPDX-License-Identifier: MIT
 
-#include <iot_sample_common.h>
-
 #include "pnp_protocol.h"
+
+#include <iot_sample_common.h>
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -20,16 +20,16 @@
 static char pnp_properties_buffer[64];
 
 // Device twin values
-static const az_span component_telemetry_prop_span = AZ_SPAN_LITERAL_FROM_STR("$.sub");
-static const az_span desired_temp_response_value_name = AZ_SPAN_LITERAL_FROM_STR("value");
-static const az_span desired_temp_ack_code_name = AZ_SPAN_LITERAL_FROM_STR("ac");
-static const az_span desired_temp_ack_version_name = AZ_SPAN_LITERAL_FROM_STR("av");
-static const az_span desired_temp_ack_description_name = AZ_SPAN_LITERAL_FROM_STR("ad");
-static const az_span component_specifier_name = AZ_SPAN_LITERAL_FROM_STR("__t");
-static const az_span component_specifier_value = AZ_SPAN_LITERAL_FROM_STR("c");
-static const az_span command_separator = AZ_SPAN_LITERAL_FROM_STR("/");
-static const az_span iot_hub_twin_desired_version = AZ_SPAN_LITERAL_FROM_STR("$version");
-static const az_span iot_hub_twin_desired = AZ_SPAN_LITERAL_FROM_STR("desired");
+static az_span const component_telemetry_prop_span = AZ_SPAN_LITERAL_FROM_STR("$.sub");
+static az_span const desired_temp_response_value_name = AZ_SPAN_LITERAL_FROM_STR("value");
+static az_span const desired_temp_ack_code_name = AZ_SPAN_LITERAL_FROM_STR("ac");
+static az_span const desired_temp_ack_version_name = AZ_SPAN_LITERAL_FROM_STR("av");
+static az_span const desired_temp_ack_description_name = AZ_SPAN_LITERAL_FROM_STR("ad");
+static az_span const component_specifier_name = AZ_SPAN_LITERAL_FROM_STR("__t");
+static az_span const component_specifier_value = AZ_SPAN_LITERAL_FROM_STR("c");
+static az_span const command_separator = AZ_SPAN_LITERAL_FROM_STR("/");
+static az_span const iot_hub_twin_desired_version = AZ_SPAN_LITERAL_FROM_STR("$version");
+static az_span const iot_hub_twin_desired = AZ_SPAN_LITERAL_FROM_STR("desired");
 
 // Visit each valid property for the component
 static az_result visit_component_properties(
@@ -143,12 +143,11 @@ static az_result is_component_in_model(
   return AZ_ERROR_UNEXPECTED_CHAR;
 }
 
-// Get the telemetry topic for PnP
 az_result pnp_get_telemetry_publish_topic(
     az_iot_hub_client const* client,
     az_iot_message_properties* properties,
     az_span component_name,
-    char* mqtt_topic,
+    char* out_mqtt_topic,
     size_t mqtt_topic_size,
     size_t* out_mqtt_topic_length)
 {
@@ -171,34 +170,32 @@ az_result pnp_get_telemetry_publish_topic(
   IOT_SAMPLE_RETURN_IF_FAILED(az_iot_hub_client_telemetry_get_publish_topic(
       client,
       az_span_size(component_name) != 0 ? properties : NULL,
-      mqtt_topic,
+      out_mqtt_topic,
       mqtt_topic_size,
       out_mqtt_topic_length));
 
   return AZ_OK;
 }
 
-// Parse the component name and command name from a span
 void pnp_parse_command_name(
     az_span component_command,
-    az_span* component_name,
-    az_span* pnp_command_name)
+    az_span* out_component_name,
+    az_span* out_command_name)
 {
   int32_t index = az_span_find(component_command, command_separator);
   if (index > 0)
   {
-    *component_name = az_span_slice(component_command, 0, index);
-    *pnp_command_name
+    *out_component_name = az_span_slice(component_command, 0, index);
+    *out_command_name
         = az_span_slice(component_command, index + 1, az_span_size(component_command));
   }
   else
   {
-    *component_name = AZ_SPAN_EMPTY;
-    *pnp_command_name = component_command;
+    *out_component_name = AZ_SPAN_EMPTY;
+    *out_command_name = component_command;
   }
 }
 
-// Create a reported property payload
 az_result pnp_build_reported_property(
     az_span json_buffer,
     az_span component_name,
@@ -235,7 +232,6 @@ az_result pnp_build_reported_property(
   return AZ_OK;
 }
 
-// Create a reported property payload with status
 az_result pnp_build_reported_property_with_status(
     az_span json_buffer,
     az_span component_name,
@@ -290,46 +286,26 @@ az_result pnp_build_reported_property_with_status(
   return AZ_OK;
 }
 
-az_result pnp_build_telemetry_message_double(
+az_result pnp_build_telemetry_message(
+    az_span json_buffer,
     az_span property_name,
-    double property_value,
-    az_span payload,
-    az_span* out_payload)
+    pnp_append_property_callback append_callback,
+    void* property_value,
+    az_span* out_span)
 {
   az_json_writer jw;
-  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_init(&jw, payload, NULL));
+  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_init(&jw, json_buffer, NULL));
 
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, property_name));
-  IOT_SAMPLE_RETURN_IF_FAILED(
-      az_json_writer_append_double(&jw, property_value, DOUBLE_DECIMAL_PLACE_DIGITS));
+  IOT_SAMPLE_RETURN_IF_FAILED(append_callback(&jw, property_value));
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
 
-  *out_payload = az_json_writer_get_bytes_used_in_destination(&jw);
+  *out_span = az_json_writer_get_bytes_used_in_destination(&jw);
 
   return AZ_OK;
 }
 
-az_result pnp_build_telemetry_message_int32(
-    az_span property_name,
-    int32_t property_value,
-    az_span payload,
-    az_span* out_payload)
-{
-  az_json_writer jw;
-  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_init(&jw, payload, NULL));
-
-  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_begin_object(&jw));
-  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_property_name(&jw, property_name));
-  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_int32(&jw, property_value));
-  IOT_SAMPLE_RETURN_IF_FAILED(az_json_writer_append_end_object(&jw));
-
-  *out_payload = az_json_writer_get_bytes_used_in_destination(&jw);
-
-  return AZ_OK;
-}
-
-// Process the twin properties and invoke user callback for each property
 az_result pnp_process_device_twin_message(
     az_span twin_message_span,
     bool is_partial,
