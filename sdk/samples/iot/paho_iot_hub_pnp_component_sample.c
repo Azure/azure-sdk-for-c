@@ -1003,8 +1003,6 @@ static void temp_controller_build_serial_number_reported_property(
     IOT_SAMPLE_LOG_ERROR("Failed to build `%.*s` reported property payload: az_result return code 0x%08x.", az_span_size(twin_reported_serial_number_property_name), az_span_ptr(twin_reported_serial_number_property_name), rc);
     exit(rc);
   }
-
-
 }
 
 static void temp_controller_build_error_reported_property_with_status(
