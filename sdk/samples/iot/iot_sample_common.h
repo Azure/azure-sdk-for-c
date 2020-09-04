@@ -72,7 +72,7 @@
     int32_t _iot_sample_req_sz = (required_size);                          \
     if (az_span_size(span) < _iot_sample_req_sz || _iot_sample_req_sz < 0) \
     {                                                                      \
-      return AZ_ERROR_NOT_ENOUGH_SPACE;                              \
+      return AZ_ERROR_NOT_ENOUGH_SPACE;                                    \
     }                                                                      \
   } while (0)
 
@@ -157,8 +157,7 @@ typedef enum
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK All required environment variables successfully read-in.
  * @retval #AZ_ERROR_ARG Sample type or name is undefined, or environment variable is not set.
- * @retval #AZ_ERROR_NOT_ENOUGH_SPACE Not enough space set aside to store environment
- * variable.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE Not enough space set aside to store environment variable.
  */
 az_result iot_sample_read_environment_variables(
     iot_sample_type type,

@@ -44,7 +44,7 @@
     int32_t const _az_req_sz = (required_size);            \
     if (az_span_size(span) < _az_req_sz || _az_req_sz < 0) \
     {                                                      \
-      return AZ_ERROR_NOT_ENOUGH_SPACE;              \
+      return AZ_ERROR_NOT_ENOUGH_SPACE;                    \
     }                                                      \
   } while (0)
 

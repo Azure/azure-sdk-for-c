@@ -1353,16 +1353,12 @@ static void az_span_dtoa_overflow_fails(void** state)
   az_span buff = AZ_SPAN_FROM_BUFFER(raw_buffer);
   az_span o;
 
-  assert_int_equal(
-      az_span_dtoa(az_span_slice(buff, 0, 0), 0, 15, &o), AZ_ERROR_NOT_ENOUGH_SPACE);
-  assert_int_equal(
-      az_span_dtoa(az_span_slice(buff, 0, 0), 1., 15, &o), AZ_ERROR_NOT_ENOUGH_SPACE);
+  assert_int_equal(az_span_dtoa(az_span_slice(buff, 0, 0), 0, 15, &o), AZ_ERROR_NOT_ENOUGH_SPACE);
+  assert_int_equal(az_span_dtoa(az_span_slice(buff, 0, 0), 1., 15, &o), AZ_ERROR_NOT_ENOUGH_SPACE);
   assert_int_equal(
       az_span_dtoa(az_span_slice(buff, 0, 3), 1.e3, 15, &o), AZ_ERROR_NOT_ENOUGH_SPACE);
-  assert_int_equal(
-      az_span_dtoa(az_span_slice(buff, 0, 0), 1, 15, &o), AZ_ERROR_NOT_ENOUGH_SPACE);
-  assert_int_equal(
-      az_span_dtoa(az_span_slice(buff, 0, 1), -1, 15, &o), AZ_ERROR_NOT_ENOUGH_SPACE);
+  assert_int_equal(az_span_dtoa(az_span_slice(buff, 0, 0), 1, 15, &o), AZ_ERROR_NOT_ENOUGH_SPACE);
+  assert_int_equal(az_span_dtoa(az_span_slice(buff, 0, 1), -1, 15, &o), AZ_ERROR_NOT_ENOUGH_SPACE);
   assert_int_equal(
       az_span_dtoa(az_span_slice(buff, 0, 4), 12345, 15, &o), AZ_ERROR_NOT_ENOUGH_SPACE);
   assert_int_equal(
@@ -1375,11 +1371,9 @@ static void az_span_dtoa_overflow_fails(void** state)
       az_span_dtoa(az_span_slice(buff, 0, 16), 0.000000000000001, 15, &o),
       AZ_ERROR_NOT_ENOUGH_SPACE);
   assert_int_equal(
-      az_span_dtoa(az_span_slice(buff, 0, 11), 1.0000000001, 15, &o),
-      AZ_ERROR_NOT_ENOUGH_SPACE);
+      az_span_dtoa(az_span_slice(buff, 0, 11), 1.0000000001, 15, &o), AZ_ERROR_NOT_ENOUGH_SPACE);
   assert_int_equal(
-      az_span_dtoa(az_span_slice(buff, 0, 12), -1.0000000001, 15, &o),
-      AZ_ERROR_NOT_ENOUGH_SPACE);
+      az_span_dtoa(az_span_slice(buff, 0, 12), -1.0000000001, 15, &o), AZ_ERROR_NOT_ENOUGH_SPACE);
   assert_int_equal(
       az_span_dtoa(az_span_slice(buff, 0, 7), 100.001, 15, &o), AZ_ERROR_NOT_ENOUGH_SPACE);
   assert_int_equal(
@@ -1405,28 +1399,22 @@ static void az_span_dtoa_overflow_fails(void** state)
   assert_int_equal(
       az_span_dtoa(az_span_slice(buff, 0, 6), -.34567, 15, &o), AZ_ERROR_NOT_ENOUGH_SPACE);
   assert_int_equal(
-      az_span_dtoa(az_span_slice(buff, 0, 10), 9876.54321, 15, &o),
-      AZ_ERROR_NOT_ENOUGH_SPACE);
+      az_span_dtoa(az_span_slice(buff, 0, 10), 9876.54321, 15, &o), AZ_ERROR_NOT_ENOUGH_SPACE);
   assert_int_equal(
-      az_span_dtoa(az_span_slice(buff, 0, 11), -9876.54321, 15, &o),
-      AZ_ERROR_NOT_ENOUGH_SPACE);
+      az_span_dtoa(az_span_slice(buff, 0, 11), -9876.54321, 15, &o), AZ_ERROR_NOT_ENOUGH_SPACE);
   assert_int_equal(
-      az_span_dtoa(az_span_slice(buff, 0, 10), 987654.321, 15, &o),
-      AZ_ERROR_NOT_ENOUGH_SPACE);
+      az_span_dtoa(az_span_slice(buff, 0, 10), 987654.321, 15, &o), AZ_ERROR_NOT_ENOUGH_SPACE);
   assert_int_equal(
-      az_span_dtoa(az_span_slice(buff, 0, 11), -987654.321, 15, &o),
-      AZ_ERROR_NOT_ENOUGH_SPACE);
+      az_span_dtoa(az_span_slice(buff, 0, 11), -987654.321, 15, &o), AZ_ERROR_NOT_ENOUGH_SPACE);
   assert_int_equal(
-      az_span_dtoa(az_span_slice(buff, 0, 10), 987654.0000321, 15, &o),
-      AZ_ERROR_NOT_ENOUGH_SPACE);
+      az_span_dtoa(az_span_slice(buff, 0, 10), 987654.0000321, 15, &o), AZ_ERROR_NOT_ENOUGH_SPACE);
   assert_int_equal(
       az_span_dtoa(az_span_slice(buff, 0, 9), 2147483647, 15, &o), AZ_ERROR_NOT_ENOUGH_SPACE);
   assert_int_equal(
       az_span_dtoa(az_span_slice(buff, 0, 9), 2 * (double)1073741824, 15, &o),
       AZ_ERROR_NOT_ENOUGH_SPACE);
   assert_int_equal(
-      az_span_dtoa(az_span_slice(buff, 0, 10), -2147483647 - 1, 15, &o),
-      AZ_ERROR_NOT_ENOUGH_SPACE);
+      az_span_dtoa(az_span_slice(buff, 0, 10), -2147483647 - 1, 15, &o), AZ_ERROR_NOT_ENOUGH_SPACE);
   assert_int_equal(
       az_span_dtoa(az_span_slice(buff, 0, 15), 4503599627370496, 15, &o),
       AZ_ERROR_NOT_ENOUGH_SPACE);
@@ -1460,8 +1448,7 @@ static void az_span_dtoa_overflow_fails(void** state)
       az_span_dtoa(az_span_slice(buff, 0, 26), 1000000000000.1234567890123400001, 15, &o),
       AZ_ERROR_NOT_ENOUGH_SPACE);
   assert_int_equal(
-      az_span_dtoa(az_span_slice(buff, 0, 16), 12345.123e-15, 15, &o),
-      AZ_ERROR_NOT_ENOUGH_SPACE);
+      az_span_dtoa(az_span_slice(buff, 0, 16), 12345.123e-15, 15, &o), AZ_ERROR_NOT_ENOUGH_SPACE);
   assert_int_equal(
       az_span_dtoa(az_span_slice(buff, 0, 25), 12345.12300000010e5, 15, &o),
       AZ_ERROR_NOT_ENOUGH_SPACE);

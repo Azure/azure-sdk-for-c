@@ -388,8 +388,8 @@ AZ_NODISCARD az_result az_span_atod(az_span source, double* out_number);
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK Success.
- * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The \p destination is not big enough to contain the
- * copied bytes.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The \p destination is not big enough to contain the copied
+ * bytes.
  */
 AZ_NODISCARD az_result az_span_i32toa(az_span destination, int32_t source, az_span* out_span);
 
@@ -405,8 +405,8 @@ AZ_NODISCARD az_result az_span_i32toa(az_span destination, int32_t source, az_sp
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK Success.
- * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The \p destination is not big enough to contain the
- * copied bytes.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The \p destination is not big enough to contain the copied
+ * bytes.
  */
 AZ_NODISCARD az_result az_span_u32toa(az_span destination, uint32_t source, az_span* out_span);
 
@@ -422,8 +422,8 @@ AZ_NODISCARD az_result az_span_u32toa(az_span destination, uint32_t source, az_s
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK Success.
- * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The \p destination is not big enough to contain the
- * copied bytes.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The \p destination is not big enough to contain the copied
+ * bytes.
  */
 AZ_NODISCARD az_result az_span_i64toa(az_span destination, int64_t source, az_span* out_span);
 
@@ -439,8 +439,8 @@ AZ_NODISCARD az_result az_span_i64toa(az_span destination, int64_t source, az_sp
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK Success.
- * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The \p destination is not big enough to contain the
- * copied bytes.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The \p destination is not big enough to contain the copied
+ * bytes.
  */
 AZ_NODISCARD az_result az_span_u64toa(az_span destination, uint64_t source, az_span* out_span);
 
@@ -458,8 +458,8 @@ AZ_NODISCARD az_result az_span_u64toa(az_span destination, uint64_t source, az_s
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK Success.
- * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The \p destination is not big enough to contain the
- * copied bytes.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The \p destination is not big enough to contain the copied
+ * bytes.
  * @retval #AZ_ERROR_NOT_SUPPORTED The \p source is not a finite decimal number or contains an
  * integer component that is too large and would overflow beyond `2^53 - 1`.
  *

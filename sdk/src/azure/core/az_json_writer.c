@@ -79,8 +79,7 @@ _get_remaining_span(az_json_writer* ref_json_writer, int32_t required_size)
       .minimum_required_size = required_size,
     };
 
-    // No more space left in the destination, let the caller fail with
-    // AZ_ERROR_NOT_ENOUGH_SPACE
+    // No more space left in the destination, let the caller fail with AZ_ERROR_NOT_ENOUGH_SPACE.
     if (!az_result_succeeded(ref_json_writer->_internal.allocator_callback(&context, &remaining)))
     {
       return AZ_SPAN_EMPTY;
@@ -879,8 +878,8 @@ AZ_NODISCARD az_result az_json_writer_append_int32(az_json_writer* ref_json_writ
   }
 
   // Since we asked for the maximum needed space above, this is guaranteed not to fail due to
-  // AZ_ERROR_NOT_ENOUGH_SPACE. Still checking the returned az_result, for other potential
-  // failure cases.
+  // AZ_ERROR_NOT_ENOUGH_SPACE. Still checking the returned az_result, for other potential failure
+  // cases.
   az_span leftover;
   _az_RETURN_IF_FAILED(az_span_i32toa(remaining_json, value, &leftover));
 
@@ -921,8 +920,8 @@ AZ_NODISCARD az_result az_json_writer_append_double(
   }
 
   // Since we asked for the maximum needed space above, this is guaranteed not to fail due to
-  // AZ_ERROR_NOT_ENOUGH_SPACE. Still checking the returned az_result, for other potential
-  // failure cases.
+  // AZ_ERROR_NOT_ENOUGH_SPACE. Still checking the returned az_result, for other potential failure
+  // cases.
   az_span leftover;
   _az_RETURN_IF_FAILED(az_span_dtoa(remaining_json, value, fractional_digits, &leftover));
 

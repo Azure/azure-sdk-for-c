@@ -419,8 +419,7 @@ AZ_NODISCARD az_result az_json_writer_append_string(az_json_writer* ref_json_wri
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The provided \p json_text was appended successfully.
- * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The destination is too small for the provided \p
- * json_text.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The destination is too small for the provided \p json_text.
  * @retval #AZ_ERROR_JSON_INVALID_STATE The \p ref_json_writer is in a state where the \p json_text
  * cannot be appended because it would result in invalid JSON.
  * @retval #AZ_ERROR_UNEXPECTED_END The provided \p json_text is invalid because it is incomplete

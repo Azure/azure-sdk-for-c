@@ -170,8 +170,7 @@ static void test_az_iot_hub_client_telemetry_get_publish_topic_with_props_unfill
       = az_span_create(test_prop_unfilled_buf, sizeof(test_prop_unfilled_buf));
   assert_int_equal(az_iot_message_properties_init(&props, test_prop_unfilled_span, 0), AZ_OK);
   assert_int_equal(
-      az_iot_message_properties_append(
-          &props, AZ_SPAN_FROM_STR("key"), AZ_SPAN_FROM_STR("value")),
+      az_iot_message_properties_append(&props, AZ_SPAN_FROM_STR("key"), AZ_SPAN_FROM_STR("value")),
       AZ_OK);
   assert_int_equal(
       az_iot_message_properties_append(
