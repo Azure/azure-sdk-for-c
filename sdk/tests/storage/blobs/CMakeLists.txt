@@ -9,19 +9,7 @@ set(CMAKE_C_STANDARD 99)
 
 include(AddTestCMocka)
 
-if (${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.13")
-    # Generate map file
-    if(MSVC)
-        add_link_options(/MAP)
-    elseif(CMAKE_C_COMPILER_ID MATCHES "Clang")
-        add_link_options(-Wl,-map,az_storage_blobs_test.map)
-        add_link_options(-Os)
-    else()
-        add_link_options(-Xlinker -Map=az_storage_blobs_test.map)
-        add_link_options(-Os)
-    endif()
-endif()
-
+create_map_file(az_storage_blobs_test.map)
 
 add_cmocka_test(az_storage_blobs_test SOURCES
                 main.c
