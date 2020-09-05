@@ -14,8 +14,6 @@
 #include <azure/core/az_span.h>
 #include <azure/iot/az_iot_hub_client.h>
 
-#define DOUBLE_DECIMAL_PLACE_DIGITS 2
-
 // Property values
 static char pnp_properties_buffer[64];
 
