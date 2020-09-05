@@ -298,10 +298,13 @@ ASALocalRun/
 .mfractor/
 
 # CMake
-build/
+/build/
 /cmake-build-debug
 
-#Doxygen
+# Visual Studio build output
+/out/
+
+# Doxygen
 /[Dd]ocs/
 DoxygenWarningLog.txt
 
