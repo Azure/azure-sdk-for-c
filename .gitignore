@@ -23,6 +23,7 @@ bld/
 [Bb]in/
 [Oo]bj/
 [Ll]og/
+out/
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
@@ -300,9 +301,6 @@ ASALocalRun/
 # CMake
 /build/
 /cmake-build-debug
-
-# Visual Studio build output
-/out/
 
 # Doxygen
 /[Dd]ocs/
