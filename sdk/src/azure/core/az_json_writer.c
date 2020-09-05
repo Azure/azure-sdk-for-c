@@ -80,7 +80,7 @@ _get_remaining_span(az_json_writer* ref_json_writer, int32_t required_size)
     };
 
     // No more space left in the destination, let the caller fail with AZ_ERROR_NOT_ENOUGH_SPACE.
-    if (!az_result_succeeded(ref_json_writer->_internal.allocator_callback(&context, &remaining)))
+    if (az_result_failed(ref_json_writer->_internal.allocator_callback(&context, &remaining)))
     {
       return AZ_SPAN_EMPTY;
     }
