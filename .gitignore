@@ -298,7 +298,7 @@ ASALocalRun/
 .mfractor/
 
 # CMake
-#build/
+build/
 /cmake-build-debug
 
 #Doxygen
