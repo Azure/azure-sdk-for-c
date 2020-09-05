@@ -196,8 +196,8 @@ AZ_NODISCARD az_result az_http_request_get_body(az_http_request const* request, 
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK Success.
- * @retval #AZ_ERROR_INSUFFICIENT_SPAN_SIZE The \p response buffer is not big enough to contain the
- * \p source content.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The \p response buffer is not big enough to contain the \p
+ * source content.
  */
 AZ_NODISCARD az_result az_http_response_append(az_http_response* ref_response, az_span source);
 

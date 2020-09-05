@@ -247,7 +247,7 @@ static void az_iot_provisioning_client_sas_get_password_device_overflow_fails()
           password,
           _az_COUNTOF(password),
           &length),
-      AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+      AZ_ERROR_NOT_ENOUGH_SPACE);
 }
 
 static void az_iot_provisioning_client_sas_get_signature_device_signature_overflow_fails()
@@ -264,7 +264,7 @@ static void az_iot_provisioning_client_sas_get_signature_device_signature_overfl
   assert_int_equal(
       az_iot_provisioning_client_sas_get_signature(
           &client, test_sas_expiry_time_secs, signature, &signature),
-      AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+      AZ_ERROR_NOT_ENOUGH_SPACE);
 }
 
 static int _log_invoked_sas = 0;

@@ -124,7 +124,7 @@ static void test_az_iot_provisioning_client_get_connect_info_insufficient_space_
   size_t client_id_len = 0xBAADC0DE;
   ret = az_iot_provisioning_client_get_client_id(
       &client, client_id, sizeof(client_id), &client_id_len);
-  assert_int_equal(AZ_ERROR_INSUFFICIENT_SPAN_SIZE, ret);
+  assert_int_equal(AZ_ERROR_NOT_ENOUGH_SPACE, ret);
   for (size_t i = 0; i < sizeof(client_id); i++)
   {
     assert_int_equal((uint8_t)0xCC, (uint8_t)client_id[i]);
@@ -141,7 +141,7 @@ static void test_az_iot_provisioning_client_get_connect_info_insufficient_space_
   size_t user_name_len = 0xBAADC0DE;
   ret = az_iot_provisioning_client_get_user_name(
       &client, user_name, sizeof(user_name), &user_name_len);
-  assert_int_equal(AZ_ERROR_INSUFFICIENT_SPAN_SIZE, ret);
+  assert_int_equal(AZ_ERROR_NOT_ENOUGH_SPACE, ret);
   for (size_t i = 0; i < sizeof(user_name); i++)
   {
     assert_int_equal((uint8_t)0xCC, (uint8_t)user_name[i]);
@@ -186,7 +186,7 @@ static void test_az_iot_provisioning_client_get_register_publish_topic_insuffici
   az_result ret = az_iot_provisioning_client_register_get_publish_topic(
       &client, topic, sizeof(topic), &topic_len);
 
-  assert_int_equal(AZ_ERROR_INSUFFICIENT_SPAN_SIZE, ret);
+  assert_int_equal(AZ_ERROR_NOT_ENOUGH_SPACE, ret);
   for (size_t i = 0; i < sizeof(topic); i++)
   {
     assert_int_equal((uint8_t)0xCC, (uint8_t)topic[i]);
@@ -243,7 +243,7 @@ test_az_iot_provisioning_client_get_operation_status_publish_topic_insufficient_
   az_result ret = az_iot_provisioning_client_query_status_get_publish_topic(
       &client, response.operation_id, topic, sizeof(topic), &topic_len);
 
-  assert_int_equal(AZ_ERROR_INSUFFICIENT_SPAN_SIZE, ret);
+  assert_int_equal(AZ_ERROR_NOT_ENOUGH_SPACE, ret);
   for (size_t i = 0; i < sizeof(topic); i++)
   {
     assert_int_equal((uint8_t)0xCC, (uint8_t)topic[i]);

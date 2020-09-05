@@ -22,6 +22,7 @@
 - `az_iot_hub_client_sas_get_password()` parameter `token_expiration_epoch_time` moved to second parameter.
 - `az_iot_provisioning_client_init()` parameter `global_device_endpoint` renamed to `global_device_hostname`.
 - Renamed the macro `AZ_SPAN_NULL` to `AZ_SPAN_EMPTY`.
+- Renamed the `az_result` value `AZ_ERROR_INSUFFICIENT_SPAN_SIZE` to `AZ_ERROR_NOT_ENOUGH_SPACE`.
 
 ### Bug Fixes
 

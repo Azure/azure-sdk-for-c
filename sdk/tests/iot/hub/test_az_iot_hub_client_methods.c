@@ -210,7 +210,7 @@ static void test_az_iot_hub_client_methods_response_get_publish_topic_user_statu
   assert_true(
       az_iot_hub_client_methods_response_get_publish_topic(
           &client, request_id, status, test_buf, sizeof(test_buf), &test_length)
-      == AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+      == AZ_ERROR_NOT_ENOUGH_SPACE);
 }
 
 static void
@@ -228,7 +228,7 @@ test_az_iot_hub_client_methods_response_get_publish_topic_INSUFFICIENT_BUFFER_fo
   assert_true(
       az_iot_hub_client_methods_response_get_publish_topic(
           &client, request_id, status, test_buf, sizeof(test_buf), &test_length)
-      == AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+      == AZ_ERROR_NOT_ENOUGH_SPACE);
 }
 
 static void
@@ -246,7 +246,7 @@ test_az_iot_hub_client_methods_response_get_publish_topic_INSUFFICIENT_BUFFER_fo
   assert_true(
       az_iot_hub_client_methods_response_get_publish_topic(
           &client, request_id, status, test_buf, sizeof(test_buf), &test_length)
-      == AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+      == AZ_ERROR_NOT_ENOUGH_SPACE);
 }
 
 static void
@@ -264,7 +264,7 @@ test_az_iot_hub_client_methods_response_get_publish_topic_INSUFFICIENT_BUFFER_fo
   assert_true(
       az_iot_hub_client_methods_response_get_publish_topic(
           &client, request_id, status, test_buf, sizeof(test_buf), &test_length)
-      == AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+      == AZ_ERROR_NOT_ENOUGH_SPACE);
 }
 
 static void test_az_iot_hub_client_methods_parse_received_topic_succeed()
