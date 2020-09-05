@@ -185,9 +185,9 @@ void pnp_thermostat_build_telemetry_message(
 
 void pnp_thermostat_build_maximum_temperature_reported_property(
     pnp_thermostat_component* thermostat_component,
-    az_span* out_property_name,
     az_span payload,
-    az_span* out_payload)
+    az_span* out_payload,
+    az_span* out_property_name)
 {
   az_result rc;
   *out_property_name = twin_reported_maximum_temperature_property_name;
@@ -313,9 +313,9 @@ az_result pnp_thermostat_process_command_request(
     pnp_thermostat_component const* thermostat_component,
     az_span command_name,
     az_span command_received_payload,
-    az_iot_status* out_status,
     az_span payload,
-    az_span* out_payload)
+    az_span* out_payload,
+    az_iot_status* out_status)
 {
   az_result rc;
 
@@ -329,7 +329,8 @@ az_result pnp_thermostat_process_command_request(
       *out_payload = command_empty_response_payload;
       *out_status = AZ_IOT_STATUS_BAD_REQUEST;
 
-      IOT_SAMPLE_LOG_AZ_SPAN("Bad request when invoking command on Thermostat Sensor component:", command_name);
+      IOT_SAMPLE_LOG_AZ_SPAN(
+          "Bad request when invoking command on Thermostat Sensor component:", command_name);
     }
     else
     {

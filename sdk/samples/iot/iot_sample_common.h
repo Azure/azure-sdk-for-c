@@ -172,8 +172,8 @@ az_result iot_sample_read_environment_variables(
  *
  * @param[in] type The enumerated type of the sample.
  * @param[in] env_vars A pointer to environment variable struct.
- * @param[out] out_endpoint A buffer with sufficient capacity to hold the built endpoint. If
- *                          successful, contains a null-terminated string of the endpoint.
+ * @param[out] endpoint A buffer with sufficient capacity to hold the built endpoint. If
+ * successful, contains a null-terminated string of the endpoint.
  * @param[in] endpoint_size The size of \p out_endpoint in bytes.
  *
  * @return An #az_result value indicating the result of the operation.
@@ -184,7 +184,7 @@ az_result iot_sample_read_environment_variables(
 az_result iot_sample_create_mqtt_endpoint(
     iot_sample_type type,
     iot_sample_environment_variables const* env_vars,
-    char* out_endpoint,
+    char* endpoint,
     size_t endpoint_size);
 
 /*
@@ -207,12 +207,12 @@ uint32_t iot_sample_get_epoch_expiration_time_from_minutes(uint32_t minutes);
  * @brief Generate the base64 encoded and signed signature using HMAC-SHA256 signing.
  *
  * @param[in] sas_base64_encoded_key An #az_span containing the SAS key that will be used for
- *                                   signing.
+ * signing.
  * @param[in] sas_signature An #az_span containing the signature.
- * @param[out] sas_base64_encoded_signed_signature An #az_span with sufficient capacity to hold the
- *                                                 encoded signed signature.
+ * @param[in] sas_base64_encoded_signed_signature An #az_span with sufficient capacity to hold the
+ * encoded signed signature.
  * @param[out] out_sas_base64_encoded_signed_signature A pointer to the #az_span containing the
- *                                                     encoded signed signature.
+ * encoded signed signature.
  */
 void iot_sample_generate_sas_base64_encoded_signed_signature(
     az_span sas_base64_encoded_key,

@@ -122,7 +122,7 @@ static void temp_controller_build_serial_number_reported_property(
 static void temp_controller_build_error_reported_property_with_status(
     az_span component_name,
     az_span property_name,
-    az_json_reader* property_value,
+    az_json_reader* const property_value,
     az_iot_status status,
     int32_t version,
     az_span payload,
@@ -131,13 +131,13 @@ static void temp_controller_build_telemetry_message(az_span payload, az_span* ou
 static az_result temp_controller_process_command_request(
     az_span command_name,
     az_span command_payload,
-    az_iot_status* out_status,
     az_span payload,
-    az_span* out_payload);
+    az_span* out_payload,
+    az_iot_status* out_status);
 static az_result temp_controller_process_property_update(
     az_span component_name,
     az_json_token const* property_name,
-    az_json_reader const* property_value,
+    az_json_reader const* const property_value,
     int32_t version,
     az_span payload,
     az_span* out_payload);
@@ -147,7 +147,7 @@ static void temp_controller_invoke_reboot(void);
 static void property_callback(
     az_span component_name,
     az_json_token const* property_name,
-    az_json_reader* property_value,
+    az_json_reader* const property_value,
     int32_t version,
     void* user_context_callback);
 static az_result append_int32_callback(az_json_writer* jw, void* value);
@@ -585,7 +585,7 @@ static void receive_messages(void)
       // Build the maximum temperature reported property message.
       az_span property_name;
       pnp_thermostat_build_maximum_temperature_reported_property(
-          &thermostat_1, &property_name, publish_message.payload, &publish_message.out_payload);
+          &thermostat_1, publish_message.payload, &publish_message.out_payload, &property_name);
 
       // Publish the maximum temperature reported property update.
       publish_mqtt_message(
@@ -616,7 +616,7 @@ static void receive_messages(void)
       // Build the maximum temperature reported property message.
       az_span property_name;
       pnp_thermostat_build_maximum_temperature_reported_property(
-          &thermostat_2, &property_name, publish_message.payload, &publish_message.out_payload);
+          &thermostat_2, publish_message.payload, &publish_message.out_payload, &property_name);
 
       // Publish the maximum temperature reported property update.
       publish_mqtt_message(
@@ -657,7 +657,6 @@ static void disconnect_mqtt_client_from_iot_hub(void)
 
   MQTTClient_destroy(&mqtt_client);
 }
-
 
 static void set_publish_topic(
     pnp_publish_topic topic,
@@ -719,7 +718,6 @@ static void set_publish_topic(
       IOT_SAMPLE_LOG_ERROR("Publish topic type is undefined.");
   }
 }
-
 
 static void publish_mqtt_message(char const* topic, az_span payload, int qos)
 {
@@ -825,7 +823,6 @@ static void on_message_received(
   }
 }
 
-
 static void handle_device_twin_message(
     MQTTClient_message const* receive_message,
     az_iot_hub_client_twin_response const* twin_response)
@@ -873,12 +870,12 @@ static void handle_command_request(
   if (az_span_is_content_equal(thermostat_1.component_name, component_name))
   {
     if (az_result_succeeded(pnp_thermostat_process_command_request(
-        &thermostat_1,
-        command_name,
-        message_span,
-        &status,
-        publish_message.payload,
-        &publish_message.out_payload)))
+            &thermostat_1,
+            command_name,
+            message_span,
+            publish_message.payload,
+            &publish_message.out_payload,
+            &status)))
     {
       IOT_SAMPLE_LOG_AZ_SPAN("Client invoked command on Temperature Sensor 1:", command_name);
     }
@@ -886,21 +883,24 @@ static void handle_command_request(
   else if (az_span_is_content_equal(thermostat_2.component_name, component_name))
   {
     if (az_result_succeeded(pnp_thermostat_process_command_request(
-        &thermostat_2,
-        command_name,
-        message_span,
-        &status,
-        publish_message.payload,
-        &publish_message.out_payload)))
+            &thermostat_2,
+            command_name,
+            message_span,
+            publish_message.payload,
+            &publish_message.out_payload,
+            &status)))
     {
       IOT_SAMPLE_LOG_AZ_SPAN("Client invoked command on Temperature Sensor 2:", command_name);
     }
-
   }
   else if (az_span_size(component_name) == 0)
   {
     if (az_result_succeeded(temp_controller_process_command_request(
-        command_name, message_span, &status, publish_message.payload, &publish_message.out_payload)))
+            command_name,
+            message_span,
+            publish_message.payload,
+            &publish_message.out_payload,
+            &status)))
     {
       IOT_SAMPLE_LOG_AZ_SPAN("Client invoked command on Temperature Controller:", command_name);
     }
@@ -996,11 +996,22 @@ static void temp_controller_build_serial_number_reported_property(
     az_span* out_payload)
 {
   az_result rc;
-  az_span empty_span = AZ_SPAN_EMPTY; // For compilation.
 
-  if (az_result_failed(rc = pnp_build_reported_property(payload, empty_span, twin_reported_serial_number_property_name, append_string_callback, (void*)&twin_reported_serial_number_property_value, out_payload)))
+  rc = pnp_build_reported_property(
+      payload,
+      AZ_SPAN_EMPTY,
+      twin_reported_serial_number_property_name,
+      append_string_callback,
+      (void*)&twin_reported_serial_number_property_value,
+      out_payload);
+
+  if (az_result_failed(rc))
   {
-    IOT_SAMPLE_LOG_ERROR("Failed to build `%.*s` reported property payload: az_result return code 0x%08x.", az_span_size(twin_reported_serial_number_property_name), az_span_ptr(twin_reported_serial_number_property_name), rc);
+    IOT_SAMPLE_LOG_ERROR(
+        "Failed to build `%.*s` reported property payload: az_result return code 0x%08x.",
+        az_span_size(twin_reported_serial_number_property_name),
+        az_span_ptr(twin_reported_serial_number_property_name),
+        rc);
     exit(rc);
   }
 }
@@ -1008,7 +1019,7 @@ static void temp_controller_build_serial_number_reported_property(
 static void temp_controller_build_error_reported_property_with_status(
     az_span component_name,
     az_span property_name,
-    az_json_reader* property_value,
+    az_json_reader* const property_value,
     az_iot_status status,
     int32_t version,
     az_span payload,
@@ -1042,7 +1053,11 @@ static void temp_controller_build_telemetry_message(az_span payload, az_span* ou
 
   if (az_result_failed(
           rc = pnp_build_telemetry_message(
-              payload, telemetry_working_set_name, append_int32_callback, (void*)&working_set_ram_in_kibibytes, out_payload)))
+              payload,
+              telemetry_working_set_name,
+              append_int32_callback,
+              (void*)&working_set_ram_in_kibibytes,
+              out_payload)))
   {
     IOT_SAMPLE_LOG_ERROR(
         "Failed to build Telemetry message for Temperature Controller: az_result return code "
@@ -1055,9 +1070,9 @@ static void temp_controller_build_telemetry_message(az_span payload, az_span* ou
 static az_result temp_controller_process_command_request(
     az_span command_name,
     az_span command_received_payload,
-    az_iot_status* out_status,
     az_span payload,
-    az_span* out_payload)
+    az_span* out_payload,
+    az_iot_status* out_status)
 {
   (void)command_received_payload; // May be used in future.
   (void)payload; // May be used in future.
@@ -1084,7 +1099,7 @@ static az_result temp_controller_process_command_request(
 az_result temp_controller_process_property_update(
     az_span component_name,
     az_json_token const* property_name,
-    az_json_reader const* property_value,
+    az_json_reader const* const property_value,
     int32_t version,
     az_span payload,
     az_span* out_payload)
@@ -1137,7 +1152,7 @@ static void temp_controller_invoke_reboot(void)
 static void property_callback(
     az_span component_name,
     az_json_token const* property_name,
-    az_json_reader* property_value,
+    az_json_reader* const property_value,
     int32_t version,
     void* user_context_callback)
 {
