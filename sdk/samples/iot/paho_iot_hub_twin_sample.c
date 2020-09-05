@@ -445,7 +445,7 @@ static void handle_device_twin_message(
                   message_span, &property_found, &desired_device_count)))
       {
         IOT_SAMPLE_LOG_ERROR(
-            "Failed to parse for desired devie_count property: az_result return code 0x%08x.", rc);
+            "Failed to parse for desired device_count property: az_result return code 0x%08x.", rc);
         exit(rc);
       }
 
