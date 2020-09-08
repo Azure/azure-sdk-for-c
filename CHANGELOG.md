@@ -38,8 +38,7 @@
 ### Other Changes and Improvements
 
 - Refactor and update IoT samples.
-- Add support to HTTP request set query parameter for customers to tell if the values are are already URL encoded.
-- Optimize for code size URL encoding, appending path to request, and setting query parameters.
+- Optimize the code size for URL encoding and setting HTTP query parameters.
 - Add support for building the SDK on ARM (Cortex M4) and adding it to CI.
 
 ## 1.0.0-preview.4 (2020-08-10)
