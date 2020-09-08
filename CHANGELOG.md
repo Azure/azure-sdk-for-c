@@ -23,6 +23,7 @@
 - `az_iot_retry_calc_delay()` renamed to `az_iot_calculate_retry_delay()`.
 - `az_iot_hub_client_sas_get_password()` parameter `token_expiration_epoch_time` moved to second parameter.
 - `az_iot_provisioning_client_init()` parameter `global_device_endpoint` renamed to `global_device_hostname`.
+- `az_iot_provisioning_client_query_status_get_publish_topic()` now accepts the `operation_id` from the `register_response` as the second parameter instead of the whole `az_iot_provisioning_client_register_response` struct.
 - Renamed the macro `AZ_SPAN_NULL` to `AZ_SPAN_EMPTY`.
 - Renamed the `az_result` value `AZ_ERROR_INSUFFICIENT_SPAN_SIZE` to `AZ_ERROR_NOT_ENOUGH_SPACE`.
 - Removed the helper macros `AZ_RETURN_IF_FAILED()` and `AZ_RETURN_IF_NOT_ENOUGH_SIZE()` from `az_result.h`.
