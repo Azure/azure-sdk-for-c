@@ -8,11 +8,13 @@
 - Add support for system properties for IoT Hub messages to `az_iot_common.h`.
 - Add new HTTP result named `AZ_ERROR_HTTP_END_OF_HEADERS` to designate the end of the headers iterated over by `az_http_response_get_next_header()`.
 - Add new IoT result named `AZ_ERROR_IOT_END_OF_PROPERTIES` to designate the end of the properties iterated over by `az_iot_message_properties_next()`.
+- Add `AZ_IOT_MESSAGE_PROPERTIES_USER_ID` and `AZ_IOT_MESSAGE_PROPERTIES_CREATION_TIME` helper macros.
+- Add new `az_result.h` value `AZ_ERROR_DEPENDENCY_NOT_PROVIDED` which is returned by the platform.
 
 ### Breaking Changes
 
 - Rename `az_iot_hub_client_properties` to `az_iot_message_properties` and move it from `az_iot_hub_client.h` to `az_iot_common.h`.
-- Remove `az_pair`, and its usage from az_http_request_append_header(), `az_http_response_get_next_header()`, and `az_iot_message_properties_next()` in favor of individual name and value `az_span` parameters.
+- Remove `az_pair`, and its usage from `az_http_request_append_header()`, `az_http_response_get_next_header()`, and `az_iot_message_properties_next()` in favor of individual name and value `az_span` parameters.
 - Remove `az_credential_client_secret` structure, and `az_credential_client_secret_init()` function.
 - Remove `az_platform_atomic_compare_exchange()` from platform.
 - In `az_result.h`, rename `az_failed()` to `az_result_failed()` and `az_succeeded()` to `az_result_succeeded()`.
@@ -23,10 +25,23 @@
 - `az_iot_provisioning_client_init()` parameter `global_device_endpoint` renamed to `global_device_hostname`.
 - Renamed the macro `AZ_SPAN_NULL` to `AZ_SPAN_EMPTY`.
 - Renamed the `az_result` value `AZ_ERROR_INSUFFICIENT_SPAN_SIZE` to `AZ_ERROR_NOT_ENOUGH_SPACE`.
+- Made the helper macros `AZ_RETURN_IF_FAILED` and `AZ_RETURN_IF_NOT_ENOUGH_SIZE` internal.
+- Behavioral change to disallow passing `NULL` to `az_context` and update documentation.
+- Removed `AZ_HUB_CLIENT_DEFAULT_MQTT_TELEMETRY_DUPLICATE` and `AZ_HUB_CLIENT_DEFAULT_MQTT_TELEMETRY_RETAIN` from `az_iot_hub_client.h`.
 
 ### Bug Fixes
 
+- Fix the strict-aliasing issue in `_az_isfinite()`.
+- Fix the SDK warnings for the release configurations.
+- Do not use a shared static scratch buffer for JSON token parsing. Instead use stack space.
+
 ### Other Changes and Improvements
+
+- Refactor and update IoT samples.
+- Add support to HTTP request set query parameter for customers to tell if the values are are already URL encoded.
+- Optimize for code size URL encoding, appending path to request, and setting query parameters.
+- Add ARM to the CI matrix.
+- Add map file generation to CI.
 
 ## 1.0.0-preview.4 (2020-08-10)
 
