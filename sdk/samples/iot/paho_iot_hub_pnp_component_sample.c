@@ -116,38 +116,38 @@ static void handle_command_request(
 static void send_telemetry_messages(void);
 
 // Temperature controller functions
+static void temp_controller_build_telemetry_message(az_span payload, az_span* out_payload);
 static void temp_controller_build_serial_number_reported_property(
     az_span payload,
     az_span* out_payload);
 static void temp_controller_build_error_reported_property_with_status(
     az_span component_name,
     az_span property_name,
-    az_json_reader* const property_value,
+    az_json_reader* property_value,
     az_iot_status status,
     int32_t version,
     az_span payload,
     az_span* out_payload);
-static void temp_controller_build_telemetry_message(az_span payload, az_span* out_payload);
+static az_result temp_controller_process_property_update(
+    az_span component_name,
+    az_json_token const* property_name,
+    az_json_reader const* property_value,
+    int32_t version,
+    az_span payload,
+    az_span* out_payload);
 static az_result temp_controller_process_command_request(
     az_span command_name,
     az_span command_payload,
     az_span payload,
     az_span* out_payload,
     az_iot_status* out_status);
-static az_result temp_controller_process_property_update(
-    az_span component_name,
-    az_json_token const* property_name,
-    az_json_reader const* const property_value,
-    int32_t version,
-    az_span payload,
-    az_span* out_payload);
 static void temp_controller_invoke_reboot(void);
 
 // Callbacks
 static void property_callback(
     az_span component_name,
     az_json_token const* property_name,
-    az_json_reader* const property_value,
+    az_json_reader property_value,
     int32_t version,
     void* user_context_callback);
 static az_result append_int32_callback(az_json_writer* jw, void* value);
@@ -991,6 +991,28 @@ static void send_telemetry_messages(void)
   IOT_SAMPLE_LOG_AZ_SPAN("Payload:", publish_message.out_payload);
 }
 
+static void temp_controller_build_telemetry_message(az_span payload, az_span* out_payload)
+{
+  az_result rc;
+
+  int32_t working_set_ram_in_kibibytes = rand() % 128;
+
+  if (az_result_failed(
+          rc = pnp_build_telemetry_message(
+              payload,
+              telemetry_working_set_name,
+              append_int32_callback,
+              (void*)&working_set_ram_in_kibibytes,
+              out_payload)))
+  {
+    IOT_SAMPLE_LOG_ERROR(
+        "Failed to build Telemetry message for Temperature Controller: az_result return code "
+        "0x%08x.",
+        rc);
+    exit(rc);
+  }
+}
+
 static void temp_controller_build_serial_number_reported_property(
     az_span payload,
     az_span* out_payload)
@@ -1019,7 +1041,7 @@ static void temp_controller_build_serial_number_reported_property(
 static void temp_controller_build_error_reported_property_with_status(
     az_span component_name,
     az_span property_name,
-    az_json_reader* const property_value,
+    az_json_reader* property_value,
     az_iot_status status,
     int32_t version,
     az_span payload,
@@ -1045,26 +1067,23 @@ static void temp_controller_build_error_reported_property_with_status(
   }
 }
 
-static void temp_controller_build_telemetry_message(az_span payload, az_span* out_payload)
+az_result temp_controller_process_property_update(
+    az_span component_name,
+    az_json_token const* property_name,
+    az_json_reader const* property_value,
+    int32_t version,
+    az_span payload,
+    az_span* out_payload)
 {
-  az_result rc;
+  // Not implemented because no properties currently supported to update.
+  (void)component_name;
+  (void)property_name;
+  (void)property_value;
+  (void)version;
+  (void)payload;
+  (void)out_payload;
 
-  int32_t working_set_ram_in_kibibytes = rand() % 128;
-
-  if (az_result_failed(
-          rc = pnp_build_telemetry_message(
-              payload,
-              telemetry_working_set_name,
-              append_int32_callback,
-              (void*)&working_set_ram_in_kibibytes,
-              out_payload)))
-  {
-    IOT_SAMPLE_LOG_ERROR(
-        "Failed to build Telemetry message for Temperature Controller: az_result return code "
-        "0x%08x.",
-        rc);
-    exit(rc);
-  }
+  return AZ_ERROR_ITEM_NOT_FOUND;
 }
 
 static az_result temp_controller_process_command_request(
@@ -1094,25 +1113,6 @@ static az_result temp_controller_process_command_request(
   }
 
   return AZ_OK;
-}
-
-az_result temp_controller_process_property_update(
-    az_span component_name,
-    az_json_token const* property_name,
-    az_json_reader const* const property_value,
-    int32_t version,
-    az_span payload,
-    az_span* out_payload)
-{
-  // Not implemented because no properties currently supported to update.
-  (void)component_name;
-  (void)property_name;
-  (void)property_value;
-  (void)version;
-  (void)payload;
-  (void)out_payload;
-
-  return AZ_ERROR_ITEM_NOT_FOUND;
 }
 
 static void temp_controller_invoke_reboot(void)
@@ -1152,7 +1152,7 @@ static void temp_controller_invoke_reboot(void)
 static void property_callback(
     az_span component_name,
     az_json_token const* property_name,
-    az_json_reader* const property_value,
+    az_json_reader property_value,
     int32_t version,
     void* user_context_callback)
 {
@@ -1176,7 +1176,7 @@ static void property_callback(
             rc = pnp_thermostat_process_property_update(
                 &thermostat_1,
                 property_name,
-                property_value,
+                &property_value,
                 version,
                 publish_message.payload,
                 &publish_message.out_payload)))
@@ -1190,7 +1190,7 @@ static void property_callback(
       pnp_thermostat_build_error_reported_property_with_status(
           component_name,
           property_name->slice,
-          property_value,
+          &property_value,
           AZ_IOT_STATUS_NOT_FOUND,
           version,
           publish_message.payload,
@@ -1203,7 +1203,7 @@ static void property_callback(
             rc = pnp_thermostat_process_property_update(
                 &thermostat_2,
                 property_name,
-                property_value,
+                &property_value,
                 version,
                 publish_message.payload,
                 &publish_message.out_payload)))
@@ -1217,7 +1217,7 @@ static void property_callback(
       pnp_thermostat_build_error_reported_property_with_status(
           component_name,
           property_name->slice,
-          property_value,
+          &property_value,
           AZ_IOT_STATUS_NOT_FOUND,
           version,
           publish_message.payload,
@@ -1230,7 +1230,7 @@ static void property_callback(
             rc = temp_controller_process_property_update(
                 component_name,
                 property_name,
-                property_value,
+                &property_value,
                 version,
                 publish_message.payload,
                 &publish_message.out_payload)))
@@ -1245,7 +1245,7 @@ static void property_callback(
       temp_controller_build_error_reported_property_with_status(
           component_name,
           property_name->slice,
-          property_value,
+          &property_value,
           AZ_IOT_STATUS_NOT_FOUND,
           version,
           publish_message.payload,

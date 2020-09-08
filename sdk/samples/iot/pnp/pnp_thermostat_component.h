@@ -83,7 +83,7 @@ void pnp_thermostat_build_maximum_temperature_reported_property(
 void pnp_thermostat_build_error_reported_property_with_status(
     az_span component_name,
     az_span property_name,
-    az_json_reader* const property_value,
+    az_json_reader* property_value,
     az_iot_status status,
     int32_t version,
     az_span payload,
@@ -105,7 +105,7 @@ void pnp_thermostat_build_error_reported_property_with_status(
 az_result pnp_thermostat_process_property_update(
     pnp_thermostat_component* ref_thermostat_component,
     az_json_token const* property_name,
-    az_json_reader const* const property_value,
+    az_json_reader const* property_value,
     int32_t version,
     az_span payload,
     az_span* out_payload);

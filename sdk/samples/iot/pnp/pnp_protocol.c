@@ -60,7 +60,7 @@ static az_result visit_component_properties(
         return AZ_ERROR_UNEXPECTED_CHAR;
       }
 
-      property_callback(component_name, &property_name, jr, version, context_ptr);
+      property_callback(component_name, &property_name, *jr, version, context_ptr);
     }
 
     if (jr->token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT)
@@ -370,7 +370,7 @@ az_result pnp_process_device_twin_message(
       }
       else
       {
-        property_callback(AZ_SPAN_EMPTY, &property_name, &jr, version, context_ptr);
+        property_callback(AZ_SPAN_EMPTY, &property_name, jr, version, context_ptr);
       }
     }
     else if (jr.token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT)
