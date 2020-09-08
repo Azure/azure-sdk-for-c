@@ -26,12 +26,12 @@
 - Renamed the macro `AZ_SPAN_NULL` to `AZ_SPAN_EMPTY`.
 - Renamed the `az_result` value `AZ_ERROR_INSUFFICIENT_SPAN_SIZE` to `AZ_ERROR_NOT_ENOUGH_SPACE`.
 - Removed the helper macros `AZ_RETURN_IF_FAILED()` and `AZ_RETURN_IF_NOT_ENOUGH_SIZE()` from `az_result.h`.
-- Behavioral change to disallow passing `NULL` to `az_context` and update documentation.
-- Removed `AZ_HUB_CLIENT_DEFAULT_MQTT_TELEMETRY_DUPLICATE` and `AZ_HUB_CLIENT_DEFAULT_MQTT_TELEMETRY_RETAIN` from `az_iot_hub_client.h`.
+- Behavioral change to disallow passing `NULL` pointers to `az_context` APIs and update documentation.
+- Removed `AZ_HUB_CLIENT_DEFAULT_MQTT_TELEMETRY_DUPLICATE` and `AZ_HUB_CLIENT_DEFAULT_MQTT_TELEMETRY_RETAIN` named constants from `az_iot_hub_client.h`.
 
 ### Bug Fixes
 
-- Fix the strict-aliasing issue in `_az_isfinite()`.
+- Fix the strict-aliasing issue in `az_span_dtoa()` and `az_span_atod()`.
 - Fix the SDK warnings for the release configurations.
 - Do not use a shared static scratch buffer for JSON token parsing. Instead use stack space.
 
