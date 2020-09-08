@@ -25,7 +25,7 @@
 - `az_iot_provisioning_client_init()` parameter `global_device_endpoint` renamed to `global_device_hostname`.
 - Renamed the macro `AZ_SPAN_NULL` to `AZ_SPAN_EMPTY`.
 - Renamed the `az_result` value `AZ_ERROR_INSUFFICIENT_SPAN_SIZE` to `AZ_ERROR_NOT_ENOUGH_SPACE`.
-- Made the helper macros `AZ_RETURN_IF_FAILED` and `AZ_RETURN_IF_NOT_ENOUGH_SIZE` internal.
+- Removed the helper macros `AZ_RETURN_IF_FAILED()` and `AZ_RETURN_IF_NOT_ENOUGH_SIZE()` from `az_result.h`.
 - Behavioral change to disallow passing `NULL` to `az_context` and update documentation.
 - Removed `AZ_HUB_CLIENT_DEFAULT_MQTT_TELEMETRY_DUPLICATE` and `AZ_HUB_CLIENT_DEFAULT_MQTT_TELEMETRY_RETAIN` from `az_iot_hub_client.h`.
 
@@ -40,8 +40,7 @@
 - Refactor and update IoT samples.
 - Add support to HTTP request set query parameter for customers to tell if the values are are already URL encoded.
 - Optimize for code size URL encoding, appending path to request, and setting query parameters.
-- Add ARM to the CI matrix.
-- Add map file generation to CI.
+- Add support for building the SDK on ARM (Cortex M4) and adding it to CI.
 
 ## 1.0.0-preview.4 (2020-08-10)
 
