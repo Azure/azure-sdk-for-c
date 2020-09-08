@@ -75,7 +75,12 @@ AZ_NODISCARD az_iot_hub_client_options az_iot_hub_client_options_default();
  *
  * @param[out] client The #az_iot_hub_client to use for this call.
  * @param[in] iot_hub_hostname The IoT Hub Hostname.
- * @param[in] device_id The Device ID.
+ * @param[in] device_id The Device ID. If the ID contains any of the following characters, they must
+ * be percent-encoded as follows:
+ *         - `/` : `%2F`
+ *         - `%` : `%25`
+ *         - `#` : `%23`
+ *         - `&` : `%26`
  * @param[in] options A reference to an #az_iot_hub_client_options structure. If `NULL` is passed,
  * the hub client will use the default options. If using custom options, please initialize first by
  * calling az_iot_hub_client_options_default() and then populating relevant options with your own
