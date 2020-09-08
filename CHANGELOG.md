@@ -9,7 +9,7 @@
 - Add new HTTP result named `AZ_ERROR_HTTP_END_OF_HEADERS` to designate the end of the headers iterated over by `az_http_response_get_next_header()`.
 - Add new IoT result named `AZ_ERROR_IOT_END_OF_PROPERTIES` to designate the end of the properties iterated over by `az_iot_message_properties_next()`.
 - Add `AZ_IOT_MESSAGE_PROPERTIES_USER_ID` and `AZ_IOT_MESSAGE_PROPERTIES_CREATION_TIME` helper macros.
-- Add new `az_result.h` value `AZ_ERROR_DEPENDENCY_NOT_PROVIDED` which is returned by the platform.
+- Add new `az_result` value `AZ_ERROR_DEPENDENCY_NOT_PROVIDED` which is returned by the HTTP adapter.
 
 ### Breaking Changes
 
