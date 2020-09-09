@@ -269,7 +269,7 @@ az_result iot_sample_create_mqtt_endpoint(
 
     if ((size_t)required_size > endpoint_size)
     {
-      return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
+      return AZ_ERROR_NOT_ENOUGH_SPACE;
     }
 
     az_span hub_mqtt_endpoint = az_span_create((uint8_t*)out_endpoint, (int32_t)endpoint_size);
@@ -285,7 +285,7 @@ az_result iot_sample_create_mqtt_endpoint(
 
     if ((size_t)required_size > endpoint_size)
     {
-      return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
+      return AZ_ERROR_NOT_ENOUGH_SPACE;
     }
 
     az_span provisioning_mqtt_endpoint
@@ -370,7 +370,7 @@ static az_result decode_base64_bytes(
   }
   else
   {
-    rc = AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
+    rc = AZ_ERROR_NOT_ENOUGH_SPACE;
   }
 
   // Free the BIO chain
@@ -404,7 +404,7 @@ static az_result hmac_sha256_sign_signature(
   }
   else
   {
-    rc = AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
+    rc = AZ_ERROR_NOT_ENOUGH_SPACE;
   }
 
   return rc;
@@ -474,7 +474,7 @@ static az_result base64_encode_bytes(
   }
   else
   {
-    rc = AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
+    rc = AZ_ERROR_NOT_ENOUGH_SPACE;
   }
 
   // Free the BIO chain

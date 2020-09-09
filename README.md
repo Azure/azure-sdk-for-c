@@ -149,9 +149,9 @@ By default, when building the project with no options, the following static libr
   - az_storage_blobs
     - Storage SDK blobs client.
   - az_noplatform
-    - A platform abstraction which will compile but returns `AZ_ERROR_NOT_IMPLEMENTED` for all platform calls. This ensures the project can be compiled without the need to provide any specific platform implementation. This is useful if you want to use az_core without platform specific functions like `mutex` or `time`.
+    - A platform abstraction which will compile but returns 0 or does nothing for all platform calls. This ensures the project can be compiled without the need to provide any specific platform implementation. This is useful if you want to use az_core without platform specific functions like `time` or `sleep`.
   - az_nohttp
-    - Library that provides a basic returning error when calling HTTP stack. Similar to az_noplatform, this library ensures the project can be compiled without requiring any HTTP stack implementation. This is useful if you want to use `az_core` without `az_http` functionality.
+    - Library that provides a no-op HTTP stack, returning `AZ_ERROR_DEPENDENCY_NOT_PROVIDED`. Similar to `az_noplatform`, this library ensures the project can be compiled without requiring any HTTP stack implementation. This is useful if you want to use `az_core` without `az_http` functionality.
 
 The following CMake options are available for adding/removing project features.
 

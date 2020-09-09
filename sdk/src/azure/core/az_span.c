@@ -951,7 +951,7 @@ AZ_NODISCARD az_result _az_span_url_encode(az_span destination, az_span source, 
       if (dest_ptr >= dest_end)
       {
         *out_length = 0;
-        return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
+        return AZ_ERROR_NOT_ENOUGH_SPACE;
       }
 
       *dest_ptr = c;
@@ -962,7 +962,7 @@ AZ_NODISCARD az_result _az_span_url_encode(az_span destination, az_span source, 
       if (dest_ptr >= dest_end - 2)
       {
         *out_length = 0;
-        return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
+        return AZ_ERROR_NOT_ENOUGH_SPACE;
       }
 
       dest_ptr[0] = '%';

@@ -23,6 +23,7 @@ bld/
 [Bb]in/
 [Oo]bj/
 [Ll]og/
+out/
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
@@ -298,10 +299,10 @@ ASALocalRun/
 .mfractor/
 
 # CMake
-build/
+/build/
 /cmake-build-debug
 
-#Doxygen
+# Doxygen
 /[Dd]ocs/
 DoxygenWarningLog.txt
 

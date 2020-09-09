@@ -212,7 +212,7 @@ static void test_az_iot_hub_client_twin_document_get_publish_topic_small_buffer_
   assert_int_equal(
       az_iot_hub_client_twin_document_get_publish_topic(
           &client, test_device_request_id, test_buf, sizeof(test_buf), &test_length),
-      AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+      AZ_ERROR_NOT_ENOUGH_SPACE);
 }
 
 static void test_az_iot_hub_client_twin_patch_get_publish_topic_succeed()
@@ -244,7 +244,7 @@ static void test_az_iot_hub_client_twin_patch_get_publish_topic_small_buffer_fai
   assert_int_equal(
       az_iot_hub_client_twin_patch_get_publish_topic(
           &client, test_device_request_id, test_buf, sizeof(test_buf), &test_length),
-      AZ_ERROR_INSUFFICIENT_SPAN_SIZE);
+      AZ_ERROR_NOT_ENOUGH_SPACE);
 }
 
 static void test_az_iot_hub_client_twin_parse_received_topic_desired_found_succeed()

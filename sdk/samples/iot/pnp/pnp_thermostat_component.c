@@ -324,7 +324,7 @@ az_result pnp_thermostat_process_command_request(
     // Invoke command.
     rc = invoke_getMaxMinReport(
         thermostat_component, command_received_payload, payload, out_payload);
-    if (rc != AZ_OK)
+    if (az_result_failed(rc))
     {
       *out_payload = command_empty_response_payload;
       *out_status = AZ_IOT_STATUS_BAD_REQUEST;
