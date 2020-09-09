@@ -297,8 +297,8 @@ int main(void)
   IOT_SAMPLE_LOG_SUCCESS("Client subscribed to IoT Hub topics.");
 
   // Initializations
-  int rc;
-  if (az_result_failed(rc = pnp_mqtt_message_init(&publish_message)))
+  int rc = pnp_mqtt_message_init(&publish_message);
+  if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR(
         "Failed to initialize pnp_mqtt_message: az_result return code 0x%08x.", rc);
@@ -733,12 +733,16 @@ static void receive_mqtt_message(void)
   }
 }
 
-static void on_message_received(char* topic, int topic_len, MQTTClient_message const* message)
+static void on_message_received(
+    char* topic,
+    int topic_len,
+    MQTTClient_message const* receive_message)
 {
   az_result rc;
 
   az_span const topic_span = az_span_create((uint8_t*)topic, topic_len);
-  az_span const message_span = az_span_create((uint8_t*)message->payload, message->payloadlen);
+  az_span const message_span
+      = az_span_create((uint8_t*)receive_message->payload, receive_message->payloadlen);
 
   az_iot_hub_client_twin_response twin_response;
   az_iot_hub_client_method_request command_request;
@@ -752,7 +756,7 @@ static void on_message_received(char* topic, int topic_len, MQTTClient_message c
     IOT_SAMPLE_LOG_AZ_SPAN("Payload:", message_span);
     IOT_SAMPLE_LOG("Status: %d", twin_response.status);
 
-    handle_device_twin_message(message, &twin_response);
+    handle_device_twin_message(receive_message, &twin_response);
   }
   else
   {
@@ -763,7 +767,7 @@ static void on_message_received(char* topic, int topic_len, MQTTClient_message c
       IOT_SAMPLE_LOG_AZ_SPAN("Topic:", topic_span);
       IOT_SAMPLE_LOG_AZ_SPAN("Payload:", message_span);
 
-      handle_command_request(message, &command_request);
+      handle_command_request(receive_message, &command_request);
     }
     else
     {
