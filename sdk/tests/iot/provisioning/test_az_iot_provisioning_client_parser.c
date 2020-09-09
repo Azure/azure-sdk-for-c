@@ -500,9 +500,6 @@ static void test_az_iot_provisioning_client_logging_succeed()
   az_log_set_classifications(classifications);
   az_log_set_callback(_log_listener);
 
-  assert_int_equal(0, _log_invoked_topic);
-  assert_int_equal(0, _log_invoked_payload);
-
   _log_invoked_topic = 0;
   _log_invoked_payload = 0;
 
@@ -513,6 +510,27 @@ static void test_az_iot_provisioning_client_logging_succeed()
 
   assert_int_equal(_az_BUILT_WITH_LOGGING(1, 0), _log_invoked_topic);
   assert_int_equal(_az_BUILT_WITH_LOGGING(1, 0), _log_invoked_payload);
+
+  az_log_set_callback(NULL);
+  az_log_set_classifications(NULL);
+}
+
+static void test_az_iot_provisioning_client_no_logging_succeed()
+{
+  az_log_classification const classifications[] = { AZ_LOG_END_OF_LIST };
+  az_log_set_classifications(classifications);
+  az_log_set_callback(_log_listener);
+
+  _log_invoked_topic = 0;
+  _log_invoked_payload = 0;
+
+  az_iot_provisioning_client client;
+  az_iot_provisioning_client_register_response response;
+  assert_true(az_result_failed(az_iot_provisioning_client_parse_received_topic_and_payload(
+      &client, _log_received_topic, _log_received_payload, &response)));
+
+  assert_int_equal(_az_BUILT_WITH_LOGGING(0, 0), _log_invoked_topic);
+  assert_int_equal(_az_BUILT_WITH_LOGGING(0, 0), _log_invoked_payload);
 
   az_log_set_callback(NULL);
   az_log_set_classifications(NULL);
@@ -559,6 +577,7 @@ int test_az_iot_provisioning_client_parser()
     cmocka_unit_test(test_az_iot_provisioning_client_parse_operation_status_translate_succeed),
     cmocka_unit_test(test_az_iot_provisioning_client_operation_complete_translate_succeed),
     cmocka_unit_test(test_az_iot_provisioning_client_logging_succeed),
+    cmocka_unit_test(test_az_iot_provisioning_client_no_logging_succeed),
   };
 
   return cmocka_run_group_tests_name("az_iot_provisioning_client_parser", tests, NULL, NULL);
