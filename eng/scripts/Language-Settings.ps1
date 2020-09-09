@@ -37,7 +37,7 @@ function Get-c-PackageInfoFromPackageFile ($pkg, $workingDirectory)
 }
 
 # Stage and Upload Docs to blob Storage
-function Publish-c-GithubIODocs ()
+function Publish-c-GithubIODocs ($DocLocation, $PublicArtifactLocation)
 {
     # The documentation publishing process for C differs from the other
     # languages in this file because this script is invoked for the whole SDK
