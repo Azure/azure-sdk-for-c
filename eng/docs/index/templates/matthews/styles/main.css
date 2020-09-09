@@ -5,7 +5,7 @@
   article h1:first-of-type:before {
     height: 0;
     margin-top: 0;
-  }  
+  }
 }
 
 #search {
@@ -19,8 +19,8 @@
 .sidetoc,
 body .toc,
 .sidefilter,
-.sidetoggle { 
-  background-color: #f9fbe7; 
+.sidetoggle {
+  background-color: #f9fbe7;
 }
 
 .sidenav,
@@ -113,21 +113,21 @@ article h4 {
 .affix ul > li > a:hover,
 .affix ul > li.active > a,
 .affix ul > li > a:focus {
-  color: #563d7c;                 
-  text-decoration: none;          
-  background-color: transparent;  
-  border-left-color: #563d7c; 
+  color: #563d7c;
+  text-decoration: none;
+  background-color: transparent;
+  border-left-color: #563d7c;
 }
 
 /* all active links */
-.affix ul > li.active > a, 
+.affix ul > li.active > a,
 .affix ul > li.active:hover > a,
 .affix ul > li.active:focus >a {
     font-weight: 700;
 }
 
 /* nested active links */
-.affix ul ul > li.active > a, 
+.affix ul ul > li.active > a,
 .affix ul ul > li.active:hover > a,
 .affix ul ul > li.active:focus > a {
     font-weight: 500;
