@@ -35,8 +35,8 @@ AZ_NODISCARD az_storage_blobs_blob_client_options az_storage_blobs_blob_client_o
 
   az_storage_blobs_blob_client_options options = (az_storage_blobs_blob_client_options) {
     ._internal = {
-      .api_version = {
-        ._internal = {
+      .api_version = { 
+        ._internal = { 
           .option_location = _az_http_policy_apiversion_option_location_header,
           .name = AZ_SPAN_FROM_STR("x-ms-version"),
           .version = AZ_STORAGE_API_VERSION,

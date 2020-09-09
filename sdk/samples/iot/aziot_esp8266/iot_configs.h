@@ -10,5 +10,5 @@
 #define IOT_CONFIG_DEVICE_ID            "Device ID"
 #define IOT_CONFIG_DEVICE_KEY           "Device Key"
 
-// Publish 1 message every 2 seconds
+// Publish 1 message every 2 seconds  
 #define TELEMETRY_FREQUENCY_MILLISECS   2000
