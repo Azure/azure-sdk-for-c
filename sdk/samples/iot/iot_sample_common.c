@@ -311,7 +311,6 @@ void iot_sample_sleep_for_seconds(uint32_t seconds)
 #else
   sleep(seconds);
 #endif
-  return;
 }
 
 uint32_t iot_sample_get_epoch_expiration_time_from_minutes(uint32_t minutes)
@@ -324,7 +323,6 @@ static az_result decode_base64_bytes(
     az_span decoded_bytes,
     az_span* out_decoded_bytes)
 {
-  az_result rc;
   BIO* base64_decoder;
   BIO* source_mem_bio;
 
@@ -363,6 +361,7 @@ static az_result decode_base64_bytes(
   int read_data = BIO_read(source_mem_bio, az_span_ptr(decoded_bytes), az_span_size(decoded_bytes));
 
   // Set the output span.
+  az_result rc;
   if (read_data > 0)
   {
     *out_decoded_bytes = az_span_create(az_span_ptr(decoded_bytes), (int32_t)read_data);
@@ -385,8 +384,6 @@ static az_result hmac_sha256_sign_signature(
     az_span signed_signature,
     az_span* out_signed_signature)
 {
-  az_result rc;
-
   unsigned int hmac_encode_len;
   unsigned char const* hmac = HMAC(
       EVP_sha256(),
@@ -397,6 +394,7 @@ static az_result hmac_sha256_sign_signature(
       az_span_ptr(signed_signature),
       &hmac_encode_len);
 
+  az_result rc;
   if (hmac != NULL)
   {
     *out_signed_signature = az_span_create(az_span_ptr(signed_signature), (int32_t)hmac_encode_len);
@@ -415,7 +413,6 @@ static az_result base64_encode_bytes(
     az_span base64_encoded_bytes,
     az_span* out_base64_encoded_bytes)
 {
-  az_result rc;
   BIO* base64_encoder;
   BIO* sink_mem_bio;
   BUF_MEM* encoded_mem_ptr;
@@ -463,6 +460,7 @@ static az_result base64_encode_bytes(
   // Get the pointer to the encoded bytes.
   BIO_get_mem_ptr(base64_encoder, &encoded_mem_ptr);
 
+  az_result rc;
   if ((size_t)az_span_size(base64_encoded_bytes) >= encoded_mem_ptr->length)
   {
     // Copy the bytes to the output and initialize output span.
@@ -491,7 +489,7 @@ void iot_sample_generate_sas_base64_encoded_signed_signature(
 {
   IOT_SAMPLE_PRECONDITION_NOT_NULL(out_sas_base64_encoded_signed_signature);
 
-  int rc;
+  az_result rc;
 
   // Decode the sas base64 encoded key to use for HMAC signing.
   char sas_decoded_key_buffer[64];
@@ -526,6 +524,4 @@ void iot_sample_generate_sas_base64_encoded_signed_signature(
     IOT_SAMPLE_LOG_ERROR("Could not base64 encode the password: az_result return code 0x%04x.", rc);
     exit(rc);
   }
-
-  return;
 }

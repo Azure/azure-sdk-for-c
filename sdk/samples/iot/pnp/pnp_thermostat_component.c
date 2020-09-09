@@ -170,6 +170,7 @@ void pnp_thermostat_build_telemetry_message(
       append_double_callback,
       (void*)&thermostat_component->current_temperature,
       out_payload);
+
   if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR(
@@ -196,6 +197,7 @@ void pnp_thermostat_build_maximum_temperature_reported_property(
       append_double_callback,
       &thermostat_component->maximum_temperature,
       out_payload);
+
   if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR(
@@ -226,6 +228,7 @@ void pnp_thermostat_build_error_reported_property_with_status(
       version,
       twin_response_failed,
       out_payload);
+
   if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR(
@@ -292,6 +295,7 @@ az_result pnp_thermostat_process_property_update(
         version,
         twin_response_success,
         out_payload);
+
     if (az_result_failed(rc))
     {
       IOT_SAMPLE_LOG_ERROR(
@@ -318,6 +322,7 @@ az_result pnp_thermostat_process_command_request(
     // Invoke command.
     rc = invoke_getMaxMinReport(
         thermostat_component, command_received_payload, payload, out_payload);
+
     if (az_result_failed(rc))
     {
       *out_payload = command_empty_response_payload;

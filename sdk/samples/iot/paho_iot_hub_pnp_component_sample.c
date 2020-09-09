@@ -697,6 +697,10 @@ static void receive_mqtt_message(void)
 
   IOT_SAMPLE_LOG("Waiting for command request or device twin message.\n");
 
+  // MQTTCLIENT_SUCCESS or MQTTCLIENT_TOPICNAME_TRUNCATED if a message is received.
+  // MQTTCLIENT_SUCCESS can also indicate that the timeout expired, in which case message is NULL.
+  // MQTTCLIENT_TOPICNAME_TRUNCATED if the topic contains embedded NULL characters.
+  // An error code is returned if there was a problem trying to receive a message.
   rc = MQTTClient_receive(
       mqtt_client, &topic, &topic_len, &receive_message, PNP_MQTT_TIMEOUT_RECEIVE_MS);
   if ((rc != MQTTCLIENT_SUCCESS) && (rc != MQTTCLIENT_TOPICNAME_TRUNCATED))
@@ -813,7 +817,6 @@ static void handle_command_request(
     MQTTClient_message const* receive_message,
     az_iot_hub_client_method_request const* command_request)
 {
-  az_result rc;
   az_span component_name;
   az_span command_name;
   pnp_parse_command_name(command_request->name, &component_name, &command_name);
@@ -825,37 +828,38 @@ static void handle_command_request(
   // Invoke command and retrieve status and response payload to send to server.
   if (az_span_is_content_equal(thermostat_1.component_name, component_name))
   {
-    rc = pnp_thermostat_process_command_request(
-        &thermostat_1,
-        command_name,
-        message_span,
-        publish_message.payload,
-        &publish_message.out_payload,
-        &status);
-    if (az_result_succeeded(rc))
+    if (az_result_succeeded(pnp_thermostat_process_command_request(
+            &thermostat_1,
+            command_name,
+            message_span,
+            publish_message.payload,
+            &publish_message.out_payload,
+            &status)))
     {
       IOT_SAMPLE_LOG_AZ_SPAN("Client invoked command on Temperature Sensor 1:", command_name);
     }
   }
   else if (az_span_is_content_equal(thermostat_2.component_name, component_name))
   {
-    rc = pnp_thermostat_process_command_request(
-        &thermostat_2,
-        command_name,
-        message_span,
-        publish_message.payload,
-        &publish_message.out_payload,
-        &status);
-    if (az_result_succeeded(rc))
+    if (az_result_succeeded(pnp_thermostat_process_command_request(
+            &thermostat_2,
+            command_name,
+            message_span,
+            publish_message.payload,
+            &publish_message.out_payload,
+            &status)))
     {
       IOT_SAMPLE_LOG_AZ_SPAN("Client invoked command on Temperature Sensor 2:", command_name);
     }
   }
   else if (az_span_size(component_name) == 0)
   {
-    rc = temp_controller_process_command_request(
-        command_name, message_span, publish_message.payload, &publish_message.out_payload, &status);
-    if (az_result_succeeded(rc))
+    if (az_result_succeeded(temp_controller_process_command_request(
+            command_name,
+            message_span,
+            publish_message.payload,
+            &publish_message.out_payload,
+            &status)))
     {
       IOT_SAMPLE_LOG_AZ_SPAN("Client invoked command on Temperature Controller:", command_name);
     }
@@ -868,7 +872,7 @@ static void handle_command_request(
   }
 
   // Get the Methods response topic to publish the command response.
-  rc = az_iot_hub_client_methods_response_get_publish_topic(
+  az_result rc = az_iot_hub_client_methods_response_get_publish_topic(
       &hub_client,
       command_request->request_id,
       (uint16_t)status,
@@ -976,6 +980,7 @@ static void temp_controller_build_telemetry_message(az_span payload, az_span* ou
       append_int32_callback,
       (void*)&working_set_ram_in_kibibytes,
       out_payload);
+
   if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR(

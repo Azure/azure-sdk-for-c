@@ -161,11 +161,7 @@ static void send_telemetry_messages_to_iot_hub(void)
   // Get the Telemetry topic to publish the telemetry messages.
   char telemetry_topic_buffer[128];
   rc = az_iot_hub_client_telemetry_get_publish_topic(
-      &hub_client,
-      NULL,
-      telemetry_topic_buffer,
-      sizeof(telemetry_topic_buffer),
-      NULL);
+      &hub_client, NULL, telemetry_topic_buffer, sizeof(telemetry_topic_buffer), NULL);
   if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR("Failed to get the Telemetry topic: az_result return code 0x%08x.", rc);

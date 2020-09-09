@@ -211,6 +211,10 @@ static void receive_method_messages(void)
     IOT_SAMPLE_LOG(" "); // Formatting
     IOT_SAMPLE_LOG("Waiting for method request.\n");
 
+    // MQTTCLIENT_SUCCESS or MQTTCLIENT_TOPICNAME_TRUNCATED if a message is received.
+    // MQTTCLIENT_SUCCESS can also indicate that the timeout expired, in which case message is NULL.
+    // MQTTCLIENT_TOPICNAME_TRUNCATED if the topic contains embedded NULL characters.
+    // An error code is returned if there was a problem trying to receive a message.
     rc = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, MQTT_TIMEOUT_RECEIVE_MS);
     if ((rc != MQTTCLIENT_SUCCESS) && (rc != MQTTCLIENT_TOPICNAME_TRUNCATED))
     {

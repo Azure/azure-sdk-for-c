@@ -383,6 +383,7 @@ static void request_device_twin_document(void)
       twin_document_topic_buffer,
       sizeof(twin_document_topic_buffer),
       NULL);
+
   if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR("Failed to get the Twin Document topic: az_result return code %04x", rc);
@@ -407,6 +408,10 @@ static void receive_messages(void)
     IOT_SAMPLE_LOG(" "); // Formatting
     IOT_SAMPLE_LOG("Waiting for command request or device twin message.\n");
 
+    // MQTTCLIENT_SUCCESS or MQTTCLIENT_TOPICNAME_TRUNCATED if a message is received.
+    // MQTTCLIENT_SUCCESS can also indicate that the timeout expired, in which case message is NULL.
+    // MQTTCLIENT_TOPICNAME_TRUNCATED if the topic contains embedded NULL characters.
+    // An error code is returned if there was a problem trying to receive a message.
     rc = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, MQTT_TIMEOUT_RECEIVE_MS);
     if ((rc != MQTTCLIENT_SUCCESS) && (rc != MQTTCLIENT_TOPICNAME_TRUNCATED))
     {
@@ -787,7 +792,6 @@ static void handle_command_request(
     MQTTClient_message const* message,
     az_iot_hub_client_method_request const* command_request)
 {
-  az_result rc;
   az_span const message_span = az_span_create((uint8_t*)message->payload, message->payloadlen);
 
   if (az_span_is_content_equal(command_getMaxMinReport_name, command_request->name))
@@ -796,8 +800,8 @@ static void handle_command_request(
     az_span command_response_payload = AZ_SPAN_FROM_BUFFER(command_response_payload_buffer);
 
     // Invoke command.
-    rc = invoke_getMaxMinReport(message_span, command_response_payload, &command_response_payload);
-    if (az_result_failed(rc))
+    if (az_result_failed(invoke_getMaxMinReport(
+            message_span, command_response_payload, &command_response_payload)))
     {
       status = AZ_IOT_STATUS_BAD_REQUEST;
     }

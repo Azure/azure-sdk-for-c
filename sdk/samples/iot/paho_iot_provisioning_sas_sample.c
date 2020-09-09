@@ -246,6 +246,10 @@ static void receive_device_registration_status_message(void)
     IOT_SAMPLE_LOG(" "); // Formatting
     IOT_SAMPLE_LOG("Waiting for registration status message.\n");
 
+    // MQTTCLIENT_SUCCESS or MQTTCLIENT_TOPICNAME_TRUNCATED if a message is received.
+    // MQTTCLIENT_SUCCESS can also indicate that the timeout expired, in which case message is NULL.
+    // MQTTCLIENT_TOPICNAME_TRUNCATED if the topic contains embedded NULL characters.
+    // An error code is returned if there was a problem trying to receive a message.
     rc = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, MQTT_TIMEOUT_RECEIVE_MS);
     if ((rc != MQTTCLIENT_SUCCESS) && (rc != MQTTCLIENT_TOPICNAME_TRUNCATED))
     {
@@ -359,8 +363,7 @@ static void handle_device_registration_status_message(
       IOT_SAMPLE_LOG("Last operation status: %d", register_response->status);
       IOT_SAMPLE_LOG_AZ_SPAN("Operation ID:", register_response->operation_id);
       IOT_SAMPLE_LOG("Error code: %u", register_response->registration_state.extended_error_code);
-      IOT_SAMPLE_LOG_AZ_SPAN(
-          "Error message:", register_response->registration_state.error_message);
+      IOT_SAMPLE_LOG_AZ_SPAN("Error message:", register_response->registration_state.error_message);
       IOT_SAMPLE_LOG_AZ_SPAN(
           "Error timestamp:", register_response->registration_state.error_timestamp);
       IOT_SAMPLE_LOG_AZ_SPAN(
