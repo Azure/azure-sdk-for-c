@@ -1,8 +1,8 @@
 ---
 # We'll use defaults from the LLVM style, but with the following differences.
 BasedOnStyle: LLVM
-AlignEscapedNewlines: Left
 AlignAfterOpenBracket: AlwaysBreak
+AlignEscapedNewlines: Left
 AlignOperands: false
 AlignTrailingComments: false
 AllowAllParametersOfDeclarationOnNextLine: false
