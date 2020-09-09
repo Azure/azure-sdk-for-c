@@ -153,6 +153,7 @@ static void connect_mqtt_client_to_iot_hub(void)
     exit(rc);
   }
 }
+
 static void send_telemetry_messages_to_iot_hub(void)
 {
   int rc;
