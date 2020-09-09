@@ -39,9 +39,9 @@
 bool is_device_operational = true;
 
 // * PnP Values *
-// The model id is the JSON document (also called the Digital Twins Model Identifier or DTMI)
-// which defines the capability of your device. The functionality of the device should match what
-// is described in the corresponding DTMI. Should you choose to program your own PnP capable device,
+// The model id is the JSON document (also called the Digital Twins Model Identifier or DTMI) which
+// defines the capability of your device. The functionality of the device should match what is
+// described in the corresponding DTMI. Should you choose to program your own PnP capable device,
 // the functionality would need to match the DTMI and you would need to update the below 'model_id'.
 // Please see the sample README for more information on this DTMI.
 static az_span const model_id
@@ -189,7 +189,7 @@ static az_result append_string_callback(az_json_writer* jw, void* value);
  * temperature reached since boot.
  *
  * On initial bootup of the device, the sample will send the Temperature Controller reported
- * properties to the service.  You will see the following in the device twin JSON.
+ * properties to the service. You will see the following in the device twin JSON.
  *   {
  *     "properties": {
  *       "reported": {
@@ -280,9 +280,9 @@ static az_result append_string_callback(az_json_writer* jw, void* value);
  *     "endTime": "2020-08-18T17:24:32-0700"
  *   }
  *
- * Telemetry: The Temperature Controller sends a JSON message with the property name
- * `workingSet` and a `double` value for the current working set of the device memory in KiB.  Also,
- * each Temperature Sensor sends a JSON message with the property name `temperature` and a `double`
+ * Telemetry: The Temperature Controller sends a JSON message with the property name `workingSet`
+ * and a `double` value for the current working set of the device memory in KiB. Also, each
+ * Temperature Sensor sends a JSON message with the property name `temperature` and a `double`
  * value for the current temperature.
  */
 int main(void)
@@ -475,16 +475,20 @@ static void send_device_info(void)
 
   // Get the Twin Patch topic to send a reported property update.
   rc = az_iot_hub_client_twin_patch_get_publish_topic(
-              &hub_client, pnp_mqtt_get_request_id(), publish_message.topic, publish_message.topic_length, NULL);
+      &hub_client,
+      pnp_mqtt_get_request_id(),
+      publish_message.topic,
+      publish_message.topic_length,
+      NULL);
   if (az_result_failed(rc))
   {
-    IOT_SAMPLE_LOG_ERROR(
-        "Failed to get the Twin Patch topic: az_result return code 0x%08x.", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to get the Twin Patch topic: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
   // Build the device info reported property message.
-  rc = pnp_device_info_build_reported_property(publish_message.payload, &publish_message.out_payload);
+  rc = pnp_device_info_build_reported_property(
+      publish_message.payload, &publish_message.out_payload);
   if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR(
@@ -498,7 +502,7 @@ static void send_device_info(void)
       publish_message.topic, publish_message.out_payload, IOT_SAMPLE_MQTT_PUBLISH_QOS);
   IOT_SAMPLE_LOG_SUCCESS("Client sent reported property message for device info.");
   IOT_SAMPLE_LOG_AZ_SPAN("Payload:", publish_message.out_payload);
-  IOT_SAMPLE_LOG(" "); // Formatting.
+  IOT_SAMPLE_LOG(" "); // Formatting
 
   // Receive the response from the server.
   receive_mqtt_message();
@@ -510,25 +514,30 @@ static void send_serial_number(void)
 
   // Get the Twin Patch topic to send a reported property update.
   rc = az_iot_hub_client_twin_patch_get_publish_topic(
-              &hub_client, pnp_mqtt_get_request_id(), publish_message.topic, publish_message.topic_length, NULL);
+      &hub_client,
+      pnp_mqtt_get_request_id(),
+      publish_message.topic,
+      publish_message.topic_length,
+      NULL);
   if (az_result_failed(rc))
   {
-    IOT_SAMPLE_LOG_ERROR(
-        "Failed to get the Twin Patch topic: az_result return code 0x%08x.", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to get the Twin Patch topic: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
   // Build the serial number reported property message.
-  temp_controller_build_serial_number_reported_property(publish_message.payload, &publish_message.out_payload);
+  temp_controller_build_serial_number_reported_property(
+      publish_message.payload, &publish_message.out_payload);
 
   // Publish the serial number reported property update.
-  publish_mqtt_message(publish_message.topic, publish_message.out_payload, IOT_SAMPLE_MQTT_PUBLISH_QOS);
+  publish_mqtt_message(
+      publish_message.topic, publish_message.out_payload, IOT_SAMPLE_MQTT_PUBLISH_QOS);
   IOT_SAMPLE_LOG_SUCCESS(
       "Client sent `%.*s` reported property message.",
       az_span_size(twin_reported_serial_number_property_name),
       az_span_ptr(twin_reported_serial_number_property_name));
   IOT_SAMPLE_LOG_AZ_SPAN("Payload:", publish_message.out_payload);
-  IOT_SAMPLE_LOG(" "); // Formatting.
+  IOT_SAMPLE_LOG(" "); // Formatting
 
   // Receive the response from the server.
   receive_mqtt_message();
@@ -541,8 +550,12 @@ static void request_device_twin_document(void)
   IOT_SAMPLE_LOG("Client requesting device twin document from service.");
 
   // Set the Twin Document topic to publish the twin document request.
-   rc = az_iot_hub_client_twin_document_get_publish_topic(
-              &hub_client, pnp_mqtt_get_request_id(), publish_message.topic, publish_message.topic_length, NULL);
+  rc = az_iot_hub_client_twin_document_get_publish_topic(
+      &hub_client,
+      pnp_mqtt_get_request_id(),
+      publish_message.topic,
+      publish_message.topic_length,
+      NULL);
   if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR(
@@ -552,7 +565,7 @@ static void request_device_twin_document(void)
 
   // Publish the twin document request.
   publish_mqtt_message(publish_message.topic, AZ_SPAN_EMPTY, IOT_SAMPLE_MQTT_PUBLISH_QOS);
-  IOT_SAMPLE_LOG(" "); // Formatting.
+  IOT_SAMPLE_LOG(" "); // Formatting
 
   // Receive the response from the server.
   receive_mqtt_message();
@@ -570,7 +583,11 @@ static void receive_messages(void)
     {
       // Get the Twin Patch topic to send a reported property update.
       rc = az_iot_hub_client_twin_patch_get_publish_topic(
-                  &hub_client, pnp_mqtt_get_request_id(), publish_message.topic, publish_message.topic_length, NULL);
+          &hub_client,
+          pnp_mqtt_get_request_id(),
+          publish_message.topic,
+          publish_message.topic_length,
+          NULL);
       if (az_result_failed(rc))
       {
         IOT_SAMPLE_LOG_ERROR(
@@ -591,7 +608,7 @@ static void receive_messages(void)
           az_span_size(property_name),
           az_span_ptr(property_name));
       IOT_SAMPLE_LOG_AZ_SPAN("Payload:", publish_message.out_payload);
-      IOT_SAMPLE_LOG(" "); // Formatting.
+      IOT_SAMPLE_LOG(" "); // Formatting
 
       thermostat_1.send_maximum_temperature_property = false; // Only send again if new max set.
 
@@ -603,7 +620,11 @@ static void receive_messages(void)
     {
       // Get the Twin Patch topic to send a reported property update.
       rc = az_iot_hub_client_twin_patch_get_publish_topic(
-                  &hub_client, pnp_mqtt_get_request_id(), publish_message.topic, publish_message.topic_length, NULL);
+          &hub_client,
+          pnp_mqtt_get_request_id(),
+          publish_message.topic,
+          publish_message.topic_length,
+          NULL);
       if (az_result_failed(rc))
       {
         IOT_SAMPLE_LOG_ERROR(
@@ -625,7 +646,7 @@ static void receive_messages(void)
           az_span_size(property_name),
           az_span_ptr(property_name));
       IOT_SAMPLE_LOG_AZ_SPAN("Payload:", publish_message.out_payload);
-      IOT_SAMPLE_LOG(" "); // Formatting.
+      IOT_SAMPLE_LOG(" "); // Formatting
 
       thermostat_2.send_maximum_temperature_property = false; // Only send again if new max set.
 
@@ -633,7 +654,7 @@ static void receive_messages(void)
       receive_mqtt_message();
     }
 
-    // Send telemetry messages.  No response requested from server.
+    // Send telemetry messages. No response requested from server.
     send_telemetry_messages();
     IOT_SAMPLE_LOG(" "); // Formatting.
 
@@ -656,7 +677,8 @@ static void disconnect_mqtt_client_from_iot_hub(void)
 
 static void publish_mqtt_message(char const* topic, az_span payload, int qos)
 {
-  int rc = MQTTClient_publish(mqtt_client, topic, az_span_size(payload), az_span_ptr(payload), qos, 0, NULL);
+  int rc = MQTTClient_publish(
+      mqtt_client, topic, az_span_size(payload), az_span_ptr(payload), qos, 0, NULL);
 
   if (rc != MQTTCLIENT_SUCCESS)
   {
@@ -676,7 +698,7 @@ static void receive_mqtt_message(void)
   IOT_SAMPLE_LOG("Waiting for command request or device twin message.\n");
 
   rc = MQTTClient_receive(
-            mqtt_client, &topic, &topic_len, &receive_message, PNP_MQTT_TIMEOUT_RECEIVE_MS);
+      mqtt_client, &topic, &topic_len, &receive_message, PNP_MQTT_TIMEOUT_RECEIVE_MS);
   if ((rc != MQTTCLIENT_SUCCESS) && (rc != MQTTCLIENT_TOPICNAME_TRUNCATED))
   {
     IOT_SAMPLE_LOG_ERROR("Failed to receive message: MQTTClient return code %d.", rc);
@@ -696,7 +718,7 @@ static void receive_mqtt_message(void)
   else
   {
     IOT_SAMPLE_LOG_SUCCESS("Client received a message from the service.");
-    timeout_counter = 0; // Reset.
+    timeout_counter = 0; // Reset
 
     if (rc == MQTTCLIENT_TOPICNAME_TRUNCATED)
     {
@@ -704,7 +726,7 @@ static void receive_mqtt_message(void)
     }
 
     on_message_received(topic, topic_len, receive_message);
-    IOT_SAMPLE_LOG(" "); // Formatting.
+    IOT_SAMPLE_LOG(" "); // Formatting
 
     MQTTClient_freeMessage(&receive_message);
     MQTTClient_free(topic);
@@ -800,12 +822,12 @@ static void handle_command_request(
   if (az_span_is_content_equal(thermostat_1.component_name, component_name))
   {
     rc = pnp_thermostat_process_command_request(
-            &thermostat_1,
-            command_name,
-            message_span,
-            publish_message.payload,
-            &publish_message.out_payload,
-            &status);
+        &thermostat_1,
+        command_name,
+        message_span,
+        publish_message.payload,
+        &publish_message.out_payload,
+        &status);
     if (az_result_succeeded(rc))
     {
       IOT_SAMPLE_LOG_AZ_SPAN("Client invoked command on Temperature Sensor 1:", command_name);
@@ -814,12 +836,12 @@ static void handle_command_request(
   else if (az_span_is_content_equal(thermostat_2.component_name, component_name))
   {
     rc = pnp_thermostat_process_command_request(
-            &thermostat_2,
-            command_name,
-            message_span,
-            publish_message.payload,
-            &publish_message.out_payload,
-            &status);
+        &thermostat_2,
+        command_name,
+        message_span,
+        publish_message.payload,
+        &publish_message.out_payload,
+        &status);
     if (az_result_succeeded(rc))
     {
       IOT_SAMPLE_LOG_AZ_SPAN("Client invoked command on Temperature Sensor 2:", command_name);
@@ -828,11 +850,7 @@ static void handle_command_request(
   else if (az_span_size(component_name) == 0)
   {
     rc = temp_controller_process_command_request(
-            command_name,
-            message_span,
-            publish_message.payload,
-            &publish_message.out_payload,
-            &status);
+        command_name, message_span, publish_message.payload, &publish_message.out_payload, &status);
     if (az_result_succeeded(rc))
     {
       IOT_SAMPLE_LOG_AZ_SPAN("Client invoked command on Temperature Controller:", command_name);
@@ -847,7 +865,12 @@ static void handle_command_request(
 
   // Get the Methods response topic to publish the command response.
   rc = az_iot_hub_client_methods_response_get_publish_topic(
-              &hub_client, command_request->request_id, (uint16_t)status, publish_message.topic, publish_message.topic_length, NULL);
+      &hub_client,
+      command_request->request_id,
+      (uint16_t)status,
+      publish_message.topic,
+      publish_message.topic_length,
+      NULL);
   if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR(
@@ -869,11 +892,16 @@ static void send_telemetry_messages(void)
 
   // Temperature Sensor 1
   // Get the Telemetry topic to publish the telemetry message.
-  rc = pnp_telemetry_get_publish_topic(&hub_client, NULL, thermostat_1.component_name, publish_message.topic, publish_message.topic_length, NULL);
+  rc = pnp_telemetry_get_publish_topic(
+      &hub_client,
+      NULL,
+      thermostat_1.component_name,
+      publish_message.topic,
+      publish_message.topic_length,
+      NULL);
   if (az_result_failed(rc))
   {
-    IOT_SAMPLE_LOG_ERROR(
-        "Failed to get the Telemetry topic: az_result return code 0x%08x.", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to get the Telemetry topic: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -889,11 +917,16 @@ static void send_telemetry_messages(void)
 
   // Temperature Sensor 2
   // Get the Telemetry topic to publish the telemetry message.
-  rc = pnp_telemetry_get_publish_topic(&hub_client, NULL, thermostat_2.component_name, publish_message.topic, publish_message.topic_length, NULL);
+  rc = pnp_telemetry_get_publish_topic(
+      &hub_client,
+      NULL,
+      thermostat_2.component_name,
+      publish_message.topic,
+      publish_message.topic_length,
+      NULL);
   if (az_result_failed(rc))
   {
-    IOT_SAMPLE_LOG_ERROR(
-        "Failed to get the Telemetry topic: az_result return code 0x%08x.", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to get the Telemetry topic: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -909,11 +942,11 @@ static void send_telemetry_messages(void)
 
   // Temperature Controller
   // Get the Telemetry topic to publish the telemetry message.
-  rc = pnp_telemetry_get_publish_topic(&hub_client, NULL, AZ_SPAN_EMPTY, publish_message.topic, publish_message.topic_length, NULL);
+  rc = pnp_telemetry_get_publish_topic(
+      &hub_client, NULL, AZ_SPAN_EMPTY, publish_message.topic, publish_message.topic_length, NULL);
   if (az_result_failed(rc))
   {
-    IOT_SAMPLE_LOG_ERROR(
-        "Failed to get the Telemetry topic: az_result return code 0x%08x.", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to get the Telemetry topic: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -934,11 +967,11 @@ static void temp_controller_build_telemetry_message(az_span payload, az_span* ou
   int32_t working_set_ram_in_kibibytes = rand() % 128;
 
   rc = pnp_build_telemetry_message(
-              payload,
-              telemetry_working_set_name,
-              append_int32_callback,
-              (void*)&working_set_ram_in_kibibytes,
-              out_payload);
+      payload,
+      telemetry_working_set_name,
+      append_int32_callback,
+      (void*)&working_set_ram_in_kibibytes,
+      out_payload);
   if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR(
@@ -981,11 +1014,16 @@ static void temp_controller_build_error_reported_property_with_status(
     az_span payload,
     az_span* out_payload)
 {
-  az_result rc = pnp_build_reported_property_with_status(payload, component_name, property_name, append_json_token_callback, (void*)property_value,
-              (int32_t)status,
-              version,
-              twin_response_failed,
-              out_payload);
+  az_result rc = pnp_build_reported_property_with_status(
+      payload,
+      component_name,
+      property_name,
+      append_json_token_callback,
+      (void*)property_value,
+      (int32_t)status,
+      version,
+      twin_response_failed,
+      out_payload);
 
   if (az_result_failed(rc))
   {
@@ -1037,7 +1075,7 @@ static az_result temp_controller_process_command_request(
     *out_status = AZ_IOT_STATUS_NOT_FOUND;
 
     IOT_SAMPLE_LOG_AZ_SPAN("Command not supported on Temperature Controller:", command_name);
-    return AZ_ERROR_ITEM_NOT_FOUND; // Unsupported command or not this component's command
+    return AZ_ERROR_ITEM_NOT_FOUND; // Unsupported command
   }
 
   return AZ_OK;
@@ -1090,11 +1128,14 @@ static void property_callback(
 
   // Get the Twin Patch topic to send a property update.
   rc = az_iot_hub_client_twin_patch_get_publish_topic(
-              &hub_client, pnp_mqtt_get_request_id(), publish_message.topic, publish_message.topic_length, NULL);
+      &hub_client,
+      pnp_mqtt_get_request_id(),
+      publish_message.topic,
+      publish_message.topic_length,
+      NULL);
   if (az_result_failed(rc))
   {
-    IOT_SAMPLE_LOG_ERROR(
-        "Failed to get the Twin Patch topic: az_result return code 0x%08x.", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to get the Twin Patch topic: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
@@ -1102,12 +1143,12 @@ static void property_callback(
   if (az_span_is_content_equal(thermostat_1.component_name, component_name))
   {
     rc = pnp_thermostat_process_property_update(
-                &thermostat_1,
-                property_name,
-                &property_value,
-                version,
-                publish_message.payload,
-                &publish_message.out_payload);
+        &thermostat_1,
+        property_name,
+        &property_value,
+        version,
+        publish_message.payload,
+        &publish_message.out_payload);
     if (az_result_failed(rc))
     {
       IOT_SAMPLE_LOG_ERROR(
@@ -1129,12 +1170,12 @@ static void property_callback(
   else if (az_span_is_content_equal(thermostat_2.component_name, component_name))
   {
     rc = pnp_thermostat_process_property_update(
-                &thermostat_2,
-                property_name,
-                &property_value,
-                version,
-                publish_message.payload,
-                &publish_message.out_payload);
+        &thermostat_2,
+        property_name,
+        &property_value,
+        version,
+        publish_message.payload,
+        &publish_message.out_payload);
     if (az_result_failed(rc))
     {
       IOT_SAMPLE_LOG_ERROR(
@@ -1156,12 +1197,12 @@ static void property_callback(
   else if (az_span_size(component_name) == 0)
   {
     rc = temp_controller_process_property_update(
-              component_name,
-              property_name,
-              &property_value,
-              version,
-              publish_message.payload,
-              &publish_message.out_payload);
+        component_name,
+        property_name,
+        &property_value,
+        version,
+        publish_message.payload,
+        &publish_message.out_payload);
     if (az_result_failed(rc))
     {
       IOT_SAMPLE_LOG_ERROR(
