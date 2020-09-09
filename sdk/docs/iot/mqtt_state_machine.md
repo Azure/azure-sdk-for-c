@@ -212,9 +212,9 @@ _Note 2_: To determine the parameters of the exponential with back-off retry str
 In the absence of modeling, we recommend the following default:
 
 ```C
-    min_retry_delay_msec =   1000;
-    max_retry_delay_msec = 100000;
-    max_random_jitter_msec      =   5000;
+    min_retry_delay_msec =     1000;
+    max_retry_delay_msec =   100000;
+    max_random_jitter_msec =   5000;
 ```
 
 For service-level errors, the Provisioning Service is providing a `retry-after` (in seconds) parameter:
