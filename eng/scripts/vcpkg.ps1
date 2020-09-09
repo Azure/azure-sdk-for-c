@@ -12,18 +12,8 @@ Param (
     [string] $TargetPath ="$env:TEMP/$([guid]::NewGuid())",
 
     [Parameter()]
-    [switch] $CI = ($null -ne $env:SYSTEM_TEAMPROJECTID)
+    [switch] $devOpsLogging = ($null -ne $env:SYSTEM_TEAMPROJECTID)
 )
-
-function OutputWarning {
-    param([string] $Output)
-
-    if ($CI) {
-        Write-Host "##vso[task.logissue type=warning]$Output"
-    } else {
-        Write-Warning $Output
-    }
-}
 
 function SetEnvironmentVariable {
     param(
@@ -31,37 +21,32 @@ function SetEnvironmentVariable {
         [string] $Value
     )
 
-    if ($CI) {
-        Write-Host "##vso[task.setvariable variable=$Name;]$($Value)"
+    if ($devOpsLogging) {
+        Write-Host "##vso[task.setvariable variable=$Name]$($Value)"
     } else {
         Write-Verbose "Setting local environment variable: $Name = ***"
         Set-Item -Path "env:$Name" -Value $Value
     }
 }
 
+try {
+    New-Item -ItemType Directory -Path $TargetPath -Force
+    Push-Location $TargetPath
 
-New-Item -ItemType Directory -Path $TargetPath -Force
-pushd $TargetPath
+    git clone https://github.com/Microsoft/vcpkg .
+    git checkout (Get-Content "$PSScriptRoot/../vcpkg-ref.txt")
 
-git clone https://github.com/Microsoft/vcpkg .
-git checkout (Get-Content "$PSScriptRoot/../vcpkg-ref.txt")
+    if ($IsWindows) {
+        .\bootstrap-vcpkg.bat
+        .\vcpkg.exe install $Dependencies.Split(' ')
+    } else {
+        ./bootstrap-vcpkg.sh
+        ./vcpkg install $Dependencies.Split(' ')
+    }
 
-if ($IsWindows) {
-    .\bootstrap-vcpkg.bat
-    .\vcpkg.exe install $Dependencies.Split(' ')
-} else {
-    ./bootstrap-vcpkg.sh
-    ./vcpkg install $Dependencies.Split(' ')
+    SetEnvironmentVariable -Name Path -Value "$TargetPath;$env:PATH"
+    SetEnvironmentVariable -Name VCPKG_INSTALLATION_ROOT -Value $TargetPath
+
+} finally {
+    Pop-Location
 }
-
-
-
-SetEnvironmentVariable -Name Path -Value "$TargetPath;$env:PATH"
-SetEnvironmentVariable -Name VCPKG_INSTALLATION_ROOT -Value $TargetPath
-
-trap {
-    # If there is an error popd out to the original context
-    popd
-}
-
-popd
