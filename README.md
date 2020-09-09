@@ -287,7 +287,7 @@ Follow next steps to install VCPKG and have it linked to cmake. The vcpkg reposi
 git clone https://github.com/Microsoft/vcpkg.git
 # (consider this path as PATH_TO_VCPKG)
 cd vcpkg
-# Checkout the vcpkg ref from the vcpkg.yml file (link above)
+# Checkout the vcpkg ref from the vcpkg-ref.txt file (link above)
 # git checkout <vcpkg ref>
 
 # build vcpkg (remove .bat on Linux/Mac)
@@ -339,7 +339,7 @@ Follow next steps to install VCPKG and have it linked to cmake.  The vcpkg repos
 git clone https://github.com/Microsoft/vcpkg.git
 # (consider this path as PATH_TO_VCPKG)
 cd vcpkg
-# Checkout the vcpkg ref from the vcpkg.yml file (link above)
+# Checkout the vcpkg ref from the vcpkg-ref.txt file (link above)
 # git checkout <vcpkg ref>
 
 # build vcpkg
@@ -396,7 +396,7 @@ Follow next steps to install VCPKG and have it linked to cmake. The vcpkg reposi
 git clone https://github.com/Microsoft/vcpkg.git
 # (consider this path as PATH_TO_VCPKG)
 cd vcpkg
-# Checkout the vcpkg ref from the vcpkg.yml file (link above)
+# Checkout the vcpkg ref from the vcpkg-ref.txt file (link above)
 # git checkout <vcpkg ref>
 
 # build vcpkg
