@@ -15,10 +15,9 @@ add_cmocka_test(az_storage_blobs_test SOURCES
                 main.c
                 az_storage_blobs_unit_tests.c
                 COMPILE_OPTIONS ${DEFAULT_C_COMPILE_FLAGS}
-                LINK_TARGETS                    
+                LINK_TARGETS
                     az_storage_blobs
                     az_core
                     az_nohttp
                     ${PAL}
                 )
-

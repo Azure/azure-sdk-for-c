@@ -36,7 +36,7 @@ az_iot_provisioning_client_register_get_publish_topic --> application_mqtt_publi
 az_iot_provisioning_client_register_get_publish_topic --> application_mqtt_receive
 state application_mqtt_publish <<APP>>
 
-state application_mqtt_receive <<APP>> { 
+state application_mqtt_receive <<APP>> {
 ' MQTT PUB received
     [*] --> az_iot_provisioning_client_parse_received_topic_and_payload: MQTT PUB received from broker (cloud or Edge)
     az_iot_provisioning_client_parse_received_topic_and_payload --> az_iot_provisioning_client_register_response

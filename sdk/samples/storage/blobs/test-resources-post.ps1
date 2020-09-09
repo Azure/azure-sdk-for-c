@@ -13,4 +13,3 @@ $context = New-AzStorageContext -StorageAccountName $storageAccountName
 
 New-Item -Type File -Name "TestBlob" -Force
 Set-AzStorageBlobContent -File "TestBlob" -Container $DeploymentOutputs['CONTAINER_NAME'] -Context $context
-
