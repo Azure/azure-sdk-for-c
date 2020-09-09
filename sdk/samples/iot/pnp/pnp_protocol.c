@@ -141,7 +141,7 @@ static az_result is_component_in_model(
   return AZ_ERROR_UNEXPECTED_CHAR;
 }
 
-az_result pnp_get_telemetry_publish_topic(
+az_result pnp_telemetry_get_publish_topic(
     az_iot_hub_client const* client,
     az_iot_message_properties* properties,
     az_span component_name,

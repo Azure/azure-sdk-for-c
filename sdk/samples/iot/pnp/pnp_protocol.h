@@ -13,14 +13,6 @@
 #include <azure/core/az_span.h>
 #include <azure/iot/az_iot_hub_client.h>
 
-typedef enum
-{
-  PNP_METHODS_PUBLISH_TOPIC,
-  PNP_TELEMETRY_PUBLISH_TOPIC,
-  PNP_TWIN_DOCUMENT_PUBLISH_TOPIC,
-  PNP_TWIN_PATCH_PUBLISH_TOPIC
-} pnp_publish_topic;
-
 /**
  * @brief Callback which is invoked for each property found by the
  * #pnp_process_device_twin_message() API.
@@ -57,7 +49,7 @@ typedef az_result (*pnp_append_property_callback)(az_json_writer* jw, void* cont
  * @retval #AZ_OK Telemetry publish topic was retrieved successfully.
  * @retval other Failure to get the publish topic or initialize \p properties if `NULL`.
  */
-az_result pnp_get_telemetry_publish_topic(
+az_result pnp_telemetry_get_publish_topic(
     az_iot_hub_client const* client,
     az_iot_message_properties* properties,
     az_span component_name,
