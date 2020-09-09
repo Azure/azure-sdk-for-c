@@ -33,7 +33,6 @@
 #define SAMPLE_TYPE PAHO_IOT_HUB
 #define SAMPLE_NAME PAHO_IOT_HUB_PNP_SAMPLE
 
-#define TELEMETRY_SEND_INTERVAL_SEC 1
 #define MQTT_TIMEOUT_RECEIVE_MAX_MESSAGE_COUNT 3
 #define MQTT_TIMEOUT_RECEIVE_MS (8 * 1000)
 #define MQTT_TIMEOUT_DISCONNECT_MS (10 * 1000)
@@ -42,7 +41,7 @@
 #define DEFAULT_START_TEMP_CELSIUS 22.0
 #define DOUBLE_DECIMAL_PLACE_DIGITS 2
 
-static bool is_device_operational = true;
+bool is_device_operational = true;
 static char const iso_spec_time_format[] = "%Y-%m-%dT%H:%M:%S%z"; // ISO8601 Time Format
 
 // * PnP Values *
@@ -54,7 +53,7 @@ static char const iso_spec_time_format[] = "%Y-%m-%dT%H:%M:%S%z"; // ISO8601 Tim
 static az_span const model_id = AZ_SPAN_LITERAL_FROM_STR("dtmi:com:example:Thermostat;1");
 
 // IoT Hub Connection Values
-static int32_t connection_request_id_int = 0;
+static uint32_t connection_request_id_int = 0;
 static char connection_request_id_buffer[16];
 
 // IoT Hub Device Twin Values
@@ -65,16 +64,16 @@ static az_span const twin_value_name = AZ_SPAN_LITERAL_FROM_STR("value");
 static az_span const twin_ack_code_name = AZ_SPAN_LITERAL_FROM_STR("ac");
 static az_span const twin_ack_version_name = AZ_SPAN_LITERAL_FROM_STR("av");
 static az_span const twin_ack_description_name = AZ_SPAN_LITERAL_FROM_STR("ad");
-static az_span const twin_desired_temp_property_name
+static az_span const twin_desired_temperature_property_name
     = AZ_SPAN_LITERAL_FROM_STR("targetTemperature");
-static az_span const twin_reported_max_temp_property_name
+static az_span const twin_reported_maximum_temperature_property_name
     = AZ_SPAN_LITERAL_FROM_STR("maxTempSinceLastReboot");
 
 // IoT Hub Method (Command) Values
 static az_span const command_getMaxMinReport_name = AZ_SPAN_LITERAL_FROM_STR("getMaxMinReport");
-static az_span const command_maximum_temperature_name = AZ_SPAN_LITERAL_FROM_STR("maxTemp");
-static az_span const command_minimum_temperature_name = AZ_SPAN_LITERAL_FROM_STR("minTemp");
-static az_span const command_average_temperature_name = AZ_SPAN_LITERAL_FROM_STR("avgTemp");
+static az_span const command_max_temp_name = AZ_SPAN_LITERAL_FROM_STR("maxTemp");
+static az_span const command_min_temp_name = AZ_SPAN_LITERAL_FROM_STR("minTemp");
+static az_span const command_avg_temp_name = AZ_SPAN_LITERAL_FROM_STR("avgTemp");
 static az_span const command_start_time_name = AZ_SPAN_LITERAL_FROM_STR("startTime");
 static az_span const command_end_time_name = AZ_SPAN_LITERAL_FROM_STR("endTime");
 static az_span const command_empty_response_payload = AZ_SPAN_LITERAL_FROM_STR("{}");
@@ -87,10 +86,10 @@ static az_span const telemetry_temperature_name = AZ_SPAN_LITERAL_FROM_STR("temp
 
 // PnP Device Values
 static double device_current_temperature = DEFAULT_START_TEMP_CELSIUS;
-static double device_temperature_summation = DEFAULT_START_TEMP_CELSIUS;
-static uint32_t device_temperature_count = DEFAULT_START_TEMP_COUNT;
 static double device_maximum_temperature = DEFAULT_START_TEMP_CELSIUS;
 static double device_minimum_temperature = DEFAULT_START_TEMP_CELSIUS;
+static double device_temperature_summation = DEFAULT_START_TEMP_CELSIUS;
+static uint32_t device_temperature_count = DEFAULT_START_TEMP_COUNT;
 static double device_average_temperature = DEFAULT_START_TEMP_CELSIUS;
 
 static iot_sample_environment_variables env_vars;
@@ -109,7 +108,7 @@ static void receive_messages(void);
 static void disconnect_mqtt_client_from_iot_hub(void);
 
 static az_span get_request_id(void);
-static void mqtt_publish_message(char const* topic, az_span payload, int qos);
+static void publish_mqtt_message(char const* topic, az_span payload, int qos);
 static void on_message_received(char* topic, int topic_len, MQTTClient_message const* message);
 
 // Device Twin functions
@@ -394,7 +393,7 @@ static void request_device_twin_document(void)
   }
 
   // Publish the twin document request.
-  mqtt_publish_message(twin_document_topic_buffer, AZ_SPAN_EMPTY, IOT_SAMPLE_MQTT_PUBLISH_QOS);
+  publish_mqtt_message(twin_document_topic_buffer, AZ_SPAN_EMPTY, IOT_SAMPLE_MQTT_PUBLISH_QOS);
 }
 
 static void receive_messages(void)
@@ -467,26 +466,25 @@ static void disconnect_mqtt_client_from_iot_hub(void)
 static az_span get_request_id(void)
 {
   az_result rc;
-  az_span out_span;
-  az_span destination = az_span_create(
+  az_span remainder;
+  az_span out_span = az_span_create(
       (uint8_t*)connection_request_id_buffer, sizeof(connection_request_id_buffer));
 
-  if (az_result_failed(rc = az_span_i32toa(destination, connection_request_id_int++, &out_span)))
+  if (az_result_failed(rc = az_span_u32toa(out_span, connection_request_id_int++, &remainder)))
   {
     IOT_SAMPLE_LOG_ERROR("Failed to get request id: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
-  return az_span_slice(destination, 0, az_span_size(destination) - az_span_size(out_span));
+  return az_span_slice(out_span, 0, az_span_size(out_span) - az_span_size(remainder));
 }
 
-static void mqtt_publish_message(const char* topic, az_span payload, int qos)
+static void publish_mqtt_message(const char* topic, az_span payload, int qos)
 {
   int rc;
-  MQTTClient_deliveryToken token;
 
   if ((rc = MQTTClient_publish(
-           mqtt_client, topic, az_span_size(payload), az_span_ptr(payload), qos, 0, &token))
+           mqtt_client, topic, az_span_size(payload), az_span_ptr(payload), qos, 0, NULL))
       != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR("Failed to publish message: MQTTClient return code %d", rc);
@@ -591,13 +589,13 @@ static void process_device_twin_message(az_span message_span, bool is_twin_get)
     // Update device temperature locally and report update to server.
     update_device_temperature_property(desired_temperature, &is_max_temp_changed);
     send_reported_property(
-        twin_desired_temp_property_name, desired_temperature, version_number, confirm);
+        twin_desired_temperature_property_name, desired_temperature, version_number, confirm);
 
     if (is_max_temp_changed)
     {
       confirm = false;
       send_reported_property(
-          twin_reported_max_temp_property_name, device_maximum_temperature, -1, confirm);
+          twin_reported_maximum_temperature_property_name, device_maximum_temperature, -1, confirm);
     }
   }
 }
@@ -659,7 +657,7 @@ static az_result parse_desired_temperature_property(
   IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
   while (!(temp_found && version_found) && (jr.token.kind != AZ_JSON_TOKEN_END_OBJECT))
   {
-    if (az_json_token_is_text_equal(&jr.token, twin_desired_temp_property_name))
+    if (az_json_token_is_text_equal(&jr.token, twin_desired_temperature_property_name))
     {
       IOT_SAMPLE_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
       IOT_SAMPLE_RETURN_IF_FAILED(az_json_token_get_double(&jr.token, out_parsed_temperature));
@@ -783,7 +781,7 @@ static void send_reported_property(az_span name, double value, int32_t version, 
   }
 
   // Publish the reported property update.
-  mqtt_publish_message(
+  publish_mqtt_message(
       twin_patch_topic_buffer, reported_property_payload, IOT_SAMPLE_MQTT_PUBLISH_QOS);
   IOT_SAMPLE_LOG_SUCCESS("Client published the Twin Patch reported property message.");
   IOT_SAMPLE_LOG_AZ_SPAN("Payload:", reported_property_payload);
@@ -845,7 +843,7 @@ static void send_command_response(
   }
 
   // Publish the command response.
-  mqtt_publish_message(methods_response_topic_buffer, response, IOT_SAMPLE_MQTT_PUBLISH_QOS);
+  publish_mqtt_message(methods_response_topic_buffer, response, IOT_SAMPLE_MQTT_PUBLISH_QOS);
   IOT_SAMPLE_LOG_SUCCESS("Client published the Command response.");
   IOT_SAMPLE_LOG("Status: %d", status);
   IOT_SAMPLE_LOG_AZ_SPAN("Payload:", response);
@@ -893,9 +891,7 @@ static az_result invoke_getMaxMinReport(az_span payload, az_span response, az_sp
 
   // Build command response message.
   uint8_t count = 3;
-  az_span const names[3] = { command_maximum_temperature_name,
-                             command_minimum_temperature_name,
-                             command_average_temperature_name };
+  az_span const names[3] = { command_max_temp_name, command_min_temp_name, command_avg_temp_name };
   double const values[3]
       = { device_maximum_temperature, device_minimum_temperature, device_average_temperature };
   az_span const times[2] = { start_time_span, end_time_span };
@@ -943,7 +939,7 @@ static void send_telemetry_message(void)
   }
 
   // Publish the telemetry message.
-  mqtt_publish_message(telemetry_topic_buffer, telemetry_payload, IOT_SAMPLE_MQTT_PUBLISH_QOS);
+  publish_mqtt_message(telemetry_topic_buffer, telemetry_payload, IOT_SAMPLE_MQTT_PUBLISH_QOS);
   IOT_SAMPLE_LOG_SUCCESS("Client published the Telemetry message.");
   IOT_SAMPLE_LOG_AZ_SPAN("Payload:", telemetry_payload);
 }
