@@ -497,8 +497,8 @@ void iot_sample_generate_sas_base64_encoded_signed_signature(
   char sas_decoded_key_buffer[64];
   az_span sas_decoded_key = AZ_SPAN_FROM_BUFFER(sas_decoded_key_buffer);
 
-  rc = decode_base64_bytes(
-      sas_base64_encoded_key, sas_decoded_key, &sas_decoded_key) if (az_result_failed(rc))
+  rc = decode_base64_bytes(sas_base64_encoded_key, sas_decoded_key, &sas_decoded_key);
+  if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR("Could not decode the SAS key: az_result return code 0x%04x.", rc);
     exit(rc);

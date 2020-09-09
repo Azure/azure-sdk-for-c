@@ -414,7 +414,7 @@ static void generate_sas_key(void)
 
   // Get the signature which will be signed with the decoded key.
   az_span sas_signature = AZ_SPAN_FROM_BUFFER(sas_signature_buffer);
-  az_result rc = az_iot_provisioning_client_sas_get_signature(
+  rc = az_iot_provisioning_client_sas_get_signature(
       &provisioning_client, sas_duration, sas_signature, &sas_signature);
   if (az_result_failed(rc))
   {
