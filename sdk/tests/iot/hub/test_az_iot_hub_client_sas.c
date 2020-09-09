@@ -468,7 +468,7 @@ static void test_az_iot_hub_client_sas_no_logging_succeed()
   az_log_set_classifications(classifications);
   az_log_set_callback(_log_listener);
 
-  _log_invoked_sas = 1;
+  _log_invoked_sas = 0;
 
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
@@ -480,7 +480,7 @@ static void test_az_iot_hub_client_sas_no_logging_succeed()
   assert_true(az_result_succeeded(az_iot_hub_client_sas_get_signature(
       &client, test_sas_expiry_time_secs, signature, &out_signature)));
 
-  assert_int_equal(_az_BUILT_WITH_LOGGING(1, 0), _log_invoked_sas);
+  assert_int_equal(_az_BUILT_WITH_LOGGING(0, 0), _log_invoked_sas);
 
   az_log_set_callback(NULL);
   az_log_set_classifications(NULL);

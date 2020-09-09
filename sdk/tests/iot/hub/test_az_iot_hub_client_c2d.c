@@ -240,7 +240,7 @@ static void test_az_iot_hub_client_c2d_no_logging_succeed()
   az_log_set_classifications(classifications);
   az_log_set_callback(_log_listener);
 
-  _log_invoked_topic = 1;
+  _log_invoked_topic = 0;
 
   az_iot_hub_client client;
   assert_true(az_iot_hub_client_init(&client, test_device_hostname, test_device_id, NULL) == AZ_OK);
@@ -249,7 +249,7 @@ static void test_az_iot_hub_client_c2d_no_logging_succeed()
   assert_int_equal(
       az_iot_hub_client_c2d_parse_received_topic(&client, test_url_no_props, &out_request), AZ_OK);
 
-  assert_int_equal(_az_BUILT_WITH_LOGGING(1, 0), _log_invoked_topic);
+  assert_int_equal(_az_BUILT_WITH_LOGGING(0, 0), _log_invoked_topic);
 
   az_log_set_callback(NULL);
   az_log_set_classifications(NULL);
