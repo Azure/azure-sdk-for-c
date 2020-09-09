@@ -200,8 +200,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_query_status_get_publish_topic
   az_span str_dps_registrations = _az_iot_provisioning_get_str_dps_registrations();
 
   int32_t required_length = az_span_size(str_dps_registrations)
-      + az_span_size(str_get_iotdps_get_operationstatus)
-      + az_span_size(operation_id);
+      + az_span_size(str_get_iotdps_get_operationstatus) + az_span_size(operation_id);
 
   _az_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_topic_span, required_length + (int32_t)sizeof((uint8_t)'\0'));
 
@@ -222,12 +221,12 @@ AZ_INLINE az_iot_provisioning_client_registration_state
 _az_iot_provisioning_registration_result_default()
 {
   return (az_iot_provisioning_client_registration_state){ .assigned_hub_hostname = AZ_SPAN_EMPTY,
-                                                           .device_id = AZ_SPAN_EMPTY,
-                                                           .error_code = AZ_IOT_STATUS_UNKNOWN,
-                                                           .extended_error_code = 0,
-                                                           .error_message = AZ_SPAN_EMPTY,
-                                                           .error_tracking_id = AZ_SPAN_EMPTY,
-                                                           .error_timestamp = AZ_SPAN_EMPTY };
+                                                          .device_id = AZ_SPAN_EMPTY,
+                                                          .error_code = AZ_IOT_STATUS_UNKNOWN,
+                                                          .extended_error_code = 0,
+                                                          .error_message = AZ_SPAN_EMPTY,
+                                                          .error_tracking_id = AZ_SPAN_EMPTY,
+                                                          .error_timestamp = AZ_SPAN_EMPTY };
 }
 
 AZ_INLINE az_iot_status _az_iot_status_from_extended_status(uint32_t extended_status)

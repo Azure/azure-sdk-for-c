@@ -8,10 +8,8 @@
 
 #include <azure/core/_az_cfg_prefix.h>
 
-AZ_NODISCARD AZ_INLINE int32_t _az_retry_calc_delay(
-    int32_t attempt,
-    int32_t retry_delay_msec,
-    int32_t max_retry_delay_msec)
+AZ_NODISCARD AZ_INLINE int32_t
+_az_retry_calc_delay(int32_t attempt, int32_t retry_delay_msec, int32_t max_retry_delay_msec)
 {
   int32_t const exponential_retry_after
       = retry_delay_msec * (attempt <= 30 ? (1 << attempt) : INT32_MAX); // scale exponentially
