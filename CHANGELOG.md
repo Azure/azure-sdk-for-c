@@ -6,7 +6,7 @@
 
 ### Breaking Changes
 
-- Update provisioning client struct member name in `az_iot_provisioning_client_register_response` from `registration_result` to `registration_state` to match recent API naming updates.
+- Update provisioning client struct member name in `az_iot_provisioning_client_register_response` from `registration_result` to `registration_state`.
 
 ### Bug Fixes
 
