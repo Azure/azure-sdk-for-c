@@ -236,7 +236,7 @@ typedef struct
                              * the #az_iot_provisioning_client_operation_status enum. */
   uint32_t retry_after_seconds; /**< Recommended timeout before sending the next MQTT publish. */
   az_iot_provisioning_client_registration_state
-      registration_result; /**< If the operation is complete (success or error), the
+      registration_state; /**< If the operation is complete (success or error), the
                                    registration state will contain the hub and device id in case of
                                    success. */
 } az_iot_provisioning_client_register_response;

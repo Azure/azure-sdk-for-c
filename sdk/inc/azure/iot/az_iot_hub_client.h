@@ -400,10 +400,10 @@ typedef struct
  *
  * @param[in] client The #az_iot_hub_client to use for this call.
  * @param[in] received_topic An #az_span containing the received topic.
- * @param[out] out_twin_response If the message is twin-operation related, this will contain the
+ * @param[out] out_response If the message is twin-operation related, this will contain the
  *                         #az_iot_hub_client_twin_response.
  * @return An #az_result value indicating the result of the operation.
- * @retval #AZ_OK The topic is meant for this feature and the \p out_twin_response was populated
+ * @retval #AZ_OK The topic is meant for this feature and the \p out_response was populated
  * with relevant information.
  * @retval #AZ_ERROR_IOT_TOPIC_NO_MATCH The topic does not match the expected format. This could
  * be due to either a malformed topic OR the message which came in on this topic is not meant for
@@ -412,7 +412,7 @@ typedef struct
 AZ_NODISCARD az_result az_iot_hub_client_twin_parse_received_topic(
     az_iot_hub_client const* client,
     az_span received_topic,
-    az_iot_hub_client_twin_response* out_twin_response);
+    az_iot_hub_client_twin_response* out_response);
 
 /**
  * @brief Gets the MQTT topic that must be used to submit a Twin GET request.
