@@ -30,9 +30,9 @@
 #define MQTT_TIMEOUT_RECEIVE_MS (60 * 1000)
 #define MQTT_TIMEOUT_DISCONNECT_MS (10 * 1000)
 
-static az_span const ping_method_name = AZ_SPAN_LITERAL_FROM_STR("ping");
-static az_span const ping_response = AZ_SPAN_LITERAL_FROM_STR("{\"response\": \"pong\"}");
-static az_span const method_error_payload = AZ_SPAN_LITERAL_FROM_STR("{}");
+static az_span const method_ping_name = AZ_SPAN_LITERAL_FROM_STR("ping");
+static az_span const method_ping_response = AZ_SPAN_LITERAL_FROM_STR("{\"response\": \"pong\"}");
+static az_span const method_empty_response_payload = AZ_SPAN_LITERAL_FROM_STR("{}");
 
 static iot_sample_environment_variables env_vars;
 static az_iot_hub_client hub_client;
@@ -55,7 +55,7 @@ static void handle_method_request(az_iot_hub_client_method_request const* method
 static az_span invoke_ping(void);
 static void send_method_response(
     az_iot_hub_client_method_request const* request,
-    uint16_t status,
+    az_iot_status status,
     az_span response);
 
 /*
@@ -215,7 +215,7 @@ static void receive_method_messages(void)
   for (uint8_t message_count = 0; message_count < MAX_METHOD_MESSAGE_COUNT; message_count++)
   {
     IOT_SAMPLE_LOG(" "); // Formatting
-    IOT_SAMPLE_LOG("Waiting for method message.\n");
+    IOT_SAMPLE_LOG("Waiting for method request.\n");
 
     if (((rc
           = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, MQTT_TIMEOUT_RECEIVE_MS))
@@ -236,12 +236,12 @@ static void receive_method_messages(void)
       topic_len = (int)strlen(topic);
     }
     IOT_SAMPLE_LOG_SUCCESS(
-        "Message #%d: Client received a method message from the service.", message_count + 1);
+        "Message #%d: Client received a method request from the service.", message_count + 1);
 
     // Parse method message and invoke method.
     az_iot_hub_client_method_request method_request;
     parse_method_message(topic, topic_len, message, &method_request);
-    IOT_SAMPLE_LOG_SUCCESS("Client parsed Method message.");
+    IOT_SAMPLE_LOG_SUCCESS("Client parsed method request.");
 
     handle_method_request(&method_request);
 
@@ -292,29 +292,30 @@ static void parse_method_message(
 
 static void handle_method_request(az_iot_hub_client_method_request const* method_request)
 {
-  if (az_span_is_content_equal(ping_method_name, method_request->name))
+  if (az_span_is_content_equal(method_ping_name, method_request->name))
   {
+    // Invoke method.
     az_span response = invoke_ping();
-    IOT_SAMPLE_LOG_SUCCESS("Client invoked 'ping' method.");
+    IOT_SAMPLE_LOG_SUCCESS("Client invoked method 'ping'.");
 
     send_method_response(method_request, AZ_IOT_STATUS_OK, response);
   }
   else
   {
     IOT_SAMPLE_LOG_AZ_SPAN("Method not supported:", method_request->name);
-    send_method_response(method_request, AZ_IOT_STATUS_NOT_FOUND, method_error_payload);
+    send_method_response(method_request, AZ_IOT_STATUS_NOT_FOUND, method_empty_response_payload);
   }
 }
 
 static az_span invoke_ping(void)
 {
   IOT_SAMPLE_LOG("PING!");
-  return ping_response;
+  return method_ping_response;
 }
 
 static void send_method_response(
     az_iot_hub_client_method_request const* method_request,
-    uint16_t status,
+    az_iot_status status,
     az_span response)
 {
   int rc;
@@ -325,7 +326,7 @@ static void send_method_response(
           rc = az_iot_hub_client_methods_response_get_publish_topic(
               &hub_client,
               method_request->request_id,
-              status,
+              (uint16_t)status,
               methods_response_topic_buffer,
               sizeof(methods_response_topic_buffer),
               NULL)))
@@ -341,7 +342,7 @@ static void send_method_response(
            methods_response_topic_buffer,
            az_span_size(response),
            az_span_ptr(response),
-           0,
+           IOT_SAMPLE_MQTT_PUBLISH_QOS,
            0,
            NULL))
       != MQTTCLIENT_SUCCESS)
@@ -350,6 +351,6 @@ static void send_method_response(
     exit(rc);
   }
   IOT_SAMPLE_LOG_SUCCESS("Client published the Methods response.");
-  IOT_SAMPLE_LOG("Status: %u", status);
+  IOT_SAMPLE_LOG("Status: %u", (uint16_t)status);
   IOT_SAMPLE_LOG_AZ_SPAN("Payload:", response);
 }

@@ -370,7 +370,7 @@ AZ_NODISCARD az_result az_span_atod(az_span source, double* out_number)
 
   int32_t size = az_span_size(source);
 
-  _az_PRECONDITION_RANGE(1, size, 99);
+  _az_PRECONDITION_RANGE(1, size, _az_MAX_SIZE_FOR_PARSING_DOUBLE);
 
   // This check is necessary to prevent sscanf from reading bytes past the end of the span, when the
   // span might contain whitespace or other invalid bytes at the start.
@@ -951,7 +951,7 @@ AZ_NODISCARD az_result _az_span_url_encode(az_span destination, az_span source, 
       if (dest_ptr >= dest_end)
       {
         *out_length = 0;
-        return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
+        return AZ_ERROR_NOT_ENOUGH_SPACE;
       }
 
       *dest_ptr = c;
@@ -962,7 +962,7 @@ AZ_NODISCARD az_result _az_span_url_encode(az_span destination, az_span source, 
       if (dest_ptr >= dest_end - 2)
       {
         *out_length = 0;
-        return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
+        return AZ_ERROR_NOT_ENOUGH_SPACE;
       }
 
       dest_ptr[0] = '%';

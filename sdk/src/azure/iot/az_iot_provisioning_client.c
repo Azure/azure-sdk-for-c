@@ -219,7 +219,7 @@ AZ_NODISCARD az_result az_iot_provisioning_client_query_status_get_publish_topic
 }
 
 AZ_INLINE az_iot_provisioning_client_registration_state
-_az_iot_provisioning_registration_result_default()
+_az_iot_provisioning_registration_state_default()
 {
   return (az_iot_provisioning_client_registration_state){ .assigned_hub_hostname = AZ_SPAN_EMPTY,
                                                            .device_id = AZ_SPAN_EMPTY,
@@ -265,7 +265,7 @@ AZ_INLINE az_result _az_iot_provisioning_client_parse_payload_error_code(
   return AZ_ERROR_ITEM_NOT_FOUND;
 }
 
-AZ_INLINE az_result _az_iot_provisioning_client_payload_registration_result_parse(
+AZ_INLINE az_result _az_iot_provisioning_client_payload_registration_state_parse(
     az_json_reader* jr,
     az_iot_provisioning_client_registration_state* out_state)
 {
@@ -353,7 +353,7 @@ AZ_INLINE az_result az_iot_provisioning_client_parse_payload(
     return AZ_ERROR_UNEXPECTED_CHAR;
   }
 
-  out_response->registration_result = _az_iot_provisioning_registration_result_default();
+  out_response->registration_state = _az_iot_provisioning_registration_state_default();
 
   bool found_operation_id = false;
   bool found_operation_status = false;
@@ -385,8 +385,8 @@ AZ_INLINE az_result az_iot_provisioning_client_parse_payload(
     else if (az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("registrationState")))
     {
       _az_RETURN_IF_FAILED(az_json_reader_next_token(&jr));
-      _az_RETURN_IF_FAILED(_az_iot_provisioning_client_payload_registration_result_parse(
-          &jr, &out_response->registration_result));
+      _az_RETURN_IF_FAILED(_az_iot_provisioning_client_payload_registration_state_parse(
+          &jr, &out_response->registration_state));
     }
     else if (az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("trackingId")))
     {
@@ -395,7 +395,7 @@ AZ_INLINE az_result az_iot_provisioning_client_parse_payload(
       {
         return AZ_ERROR_ITEM_NOT_FOUND;
       }
-      out_response->registration_result.error_tracking_id = jr.token.slice;
+      out_response->registration_state.error_tracking_id = jr.token.slice;
     }
     else if (az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("message")))
     {
@@ -404,7 +404,7 @@ AZ_INLINE az_result az_iot_provisioning_client_parse_payload(
       {
         return AZ_ERROR_ITEM_NOT_FOUND;
       }
-      out_response->registration_result.error_message = jr.token.slice;
+      out_response->registration_state.error_message = jr.token.slice;
     }
     else if (az_json_token_is_text_equal(&jr.token, AZ_SPAN_FROM_STR("timestampUtc")))
     {
@@ -413,10 +413,10 @@ AZ_INLINE az_result az_iot_provisioning_client_parse_payload(
       {
         return AZ_ERROR_ITEM_NOT_FOUND;
       }
-      out_response->registration_result.error_timestamp = jr.token.slice;
+      out_response->registration_state.error_timestamp = jr.token.slice;
     }
     else if (az_result_succeeded(_az_iot_provisioning_client_parse_payload_error_code(
-                 &jr, &out_response->registration_result)))
+                 &jr, &out_response->registration_state)))
     {
       found_error = true;
     }

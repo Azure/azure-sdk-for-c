@@ -44,9 +44,6 @@ include(CheckAndIncludeCodeCov)
 
 add_library (
   az_core
-  ${CMAKE_CURRENT_LIST_DIR}/az_aad.c
-  ${CMAKE_CURRENT_LIST_DIR}/az_credential_client_secret.c
-  ${CMAKE_CURRENT_LIST_DIR}/az_credential_token.c
   ${CMAKE_CURRENT_LIST_DIR}/az_context.c
   ${CMAKE_CURRENT_LIST_DIR}/az_http_pipeline.c
   ${CMAKE_CURRENT_LIST_DIR}/az_http_policy.c
@@ -60,7 +57,7 @@ add_library (
   ${CMAKE_CURRENT_LIST_DIR}/az_log.c
   ${CMAKE_CURRENT_LIST_DIR}/az_precondition.c
   ${CMAKE_CURRENT_LIST_DIR}/az_span.c
-  ${CMAKE_CURRENT_LIST_DIR}/az_spinlock.c)
+)
 
 target_include_directories (az_core
   PUBLIC

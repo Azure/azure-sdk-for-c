@@ -66,7 +66,7 @@ void test_az_http_pipeline_policy_telemetry(void** state)
   (void)state;
 
   uint8_t buf[100];
-  uint8_t header_buf[(2 * sizeof(az_pair))];
+  uint8_t header_buf[(2 * sizeof(_az_http_request_header))];
   memset(buf, 0, sizeof(buf));
   memset(header_buf, 0, sizeof(header_buf));
 
@@ -108,7 +108,7 @@ void test_az_http_pipeline_policy_apiversion(void** state)
   (void)state;
 
   uint8_t buf[100];
-  uint8_t header_buf[(2 * sizeof(az_pair))];
+  uint8_t header_buf[(2 * sizeof(_az_http_request_header))];
   memset(buf, 0, sizeof(buf));
   memset(header_buf, 0, sizeof(header_buf));
 
@@ -224,7 +224,7 @@ void test_az_http_pipeline_policy_retry(void** state)
   (void)state;
 
   uint8_t buf[100];
-  uint8_t header_buf[(2 * sizeof(az_pair))];
+  uint8_t header_buf[(2 * sizeof(_az_http_request_header))];
   memset(buf, 0, sizeof(buf));
   memset(header_buf, 0, sizeof(header_buf));
 
@@ -269,7 +269,7 @@ void test_az_http_pipeline_policy_retry_with_header(void** state)
   (void)state;
 
   uint8_t buf[100];
-  uint8_t header_buf[(2 * sizeof(az_pair))];
+  uint8_t header_buf[(2 * sizeof(_az_http_request_header))];
   memset(buf, 0, sizeof(buf));
   memset(header_buf, 0, sizeof(header_buf));
 
@@ -316,7 +316,7 @@ void test_az_http_pipeline_policy_retry_with_header_2(void** state)
   (void)state;
 
   uint8_t buf[100];
-  uint8_t header_buf[(2 * sizeof(az_pair))];
+  uint8_t header_buf[(2 * sizeof(_az_http_request_header))];
   memset(buf, 0, sizeof(buf));
   memset(header_buf, 0, sizeof(header_buf));
 
@@ -357,6 +357,9 @@ void test_az_http_pipeline_policy_retry_with_header_2(void** state)
   assert_return_code(
       az_http_pipeline_policy_retry(policies, &retry_options, &request, &response), AZ_OK);
 }
+
+int64_t __wrap_az_platform_clock_msec();
+int64_t __wrap_az_platform_clock_msec() { return (int64_t)mock(); }
 
 #endif // _az_MOCK_ENABLED
 

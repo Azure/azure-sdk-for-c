@@ -43,24 +43,6 @@ AZ_NODISCARD int64_t az_platform_clock_msec();
  */
 void az_platform_sleep_msec(int32_t milliseconds);
 
-/**
- * @brief Conditionally exchanges values of two pointers in a thread-safe manner.
- *
- * @param[in,out] ref_obj A pointer to a `volatile` pointer that needs to be changed.
- * @param[in] expected An expected value of a value that \p obj is pointing to, prior to exchange.
- * @param[in] desired A value to assign to the value that is pointed by \p obj, if its value equals
- * to \p expected.
- *
- * @return `true` if previous value of \p obj matches the \p expected.
- *
- * @remarks If `*obj` equals to \p expected, its value is being overwritten with \p desired, and no
- * operation otherwise. Returns `true` if the value was overwritten, `false` otherwise.
- */
-AZ_NODISCARD bool az_platform_atomic_compare_exchange(
-    uintptr_t volatile* ref_obj,
-    uintptr_t expected,
-    uintptr_t desired);
-
 #include <azure/core/_az_cfg_suffix.h>
 
 #endif // _az_PLATFORM_H

@@ -129,7 +129,7 @@ AZ_NODISCARD az_result az_iot_hub_client_get_user_name(
   }
   else
   {
-    return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
+    return AZ_ERROR_NOT_ENOUGH_SPACE;
   }
 
   if (out_mqtt_user_name_length)

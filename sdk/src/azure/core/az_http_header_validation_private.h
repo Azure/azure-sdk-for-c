@@ -41,7 +41,7 @@ static const uint8_t az_http_valid_token[256] = {
   0, // 16 ->  data link escape
   0, // 17 ->  device control 1
   0, // 18 ->  device control 2
-  0, // 19 ->  device control 3
+  0, // 19 ->  device control 3
   0, // 20 ->  device control 4
   0, // 21 ->  negative acknowledge
   0, // 22 ->  synchronous idle
@@ -56,18 +56,18 @@ static const uint8_t az_http_valid_token[256] = {
   0, // 31 ->  unit separator
   ' ', // 32 ->  space
   '!', // 33 ->  !
-  0, // 34 ->  “
+  0, // 34 ->  "
   '#', // 35 ->  #
   '$', // 36 ->  $
   '%', // 37 ->  %
   '&', // 38 ->  &
-  '\'', // 39 ->  ‘
+  '\'', // 39 -> '
   0, // 40 ->  (
   0, // 41 ->  )
   '*', // 42 ->  *
   '+', // 43 ->  +
   0, // 44 ->  ,
-  '-', // 45 ->  –
+  '-', // 45 ->  -
   '.', // 46 ->  .
   0, // 47 ->  /
   '0', // 48 ->  0

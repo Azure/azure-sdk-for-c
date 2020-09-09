@@ -32,10 +32,10 @@ Param (
 function Update-Version([AzureEngSemanticVersion]$SemVer, $Unreleased=$True, $ReplaceVersion=$False)
 {
     Write-Output "New Version: $($SemVer)"
-    if ($SemVer.HasValidPrereleaseLabel() -ne $true){
-        Write-Error "Invalid prerelease label"
-        exit 1
-    }
+    # if ($SemVer.HasValidPrereleaseLabel() -ne $true){
+    #     Write-Error "Invalid prerelease label"
+    #     exit 1
+    # }
 
     if ($SemVer.IsPrerelease -eq $true){
         $PrereleaseDefine = "`#define AZ_SDK_VERSION_PRERELEASE `"$($SemVer.PrereleaseLabel).$($SemVer.PrereleaseNumber)`""

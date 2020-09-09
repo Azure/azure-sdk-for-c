@@ -54,8 +54,8 @@ AZ_NODISCARD az_result az_http_request_init(
                                .query_start = query_start == url_length ? 0 : query_start + 1,
                                .headers = headers_buffer,
                                .headers_length = 0,
-                               .max_headers
-                               = az_span_size(headers_buffer) / (int32_t)sizeof(az_pair),
+                               .max_headers = az_span_size(headers_buffer)
+                                   / (int32_t)sizeof(_az_http_request_header),
                                .retry_headers_start_byte_offset = 0,
                                .body = body,
                            } };
@@ -119,27 +119,28 @@ AZ_NODISCARD az_result az_http_request_set_query_parameter(
 }
 
 AZ_NODISCARD az_result
-az_http_request_append_header(az_http_request* ref_request, az_span key, az_span value)
+az_http_request_append_header(az_http_request* ref_request, az_span name, az_span value)
 {
   _az_PRECONDITION_NOT_NULL(ref_request);
 
   // remove whitespace characters from key and value
-  key = _az_span_trim_whitespace(key);
+  name = _az_span_trim_whitespace(name);
   value = _az_span_trim_whitespace(value);
 
-  _az_PRECONDITION_VALID_SPAN(key, 1, false);
+  _az_PRECONDITION_VALID_SPAN(name, 1, false);
 
   // Make this function to only work with valid input for header name
-  _az_PRECONDITION(az_http_is_valid_header_name(key));
+  _az_PRECONDITION(az_http_is_valid_header_name(name));
 
   az_span headers = ref_request->_internal.headers;
-  az_pair header_to_append = az_pair_init(key, value);
+  _az_http_request_header header_to_append = { .name = name, .value = value };
 
   _az_RETURN_IF_NOT_ENOUGH_SIZE(headers, (int32_t)sizeof header_to_append);
 
   az_span_copy(
       az_span_slice_to_end(
-          headers, (int32_t)sizeof(az_pair) * ref_request->_internal.headers_length),
+          headers,
+          (int32_t)sizeof(_az_http_request_header) * ref_request->_internal.headers_length),
       az_span_create((uint8_t*)&header_to_append, sizeof header_to_append));
 
   ref_request->_internal.headers_length++;
@@ -147,18 +148,27 @@ az_http_request_append_header(az_http_request* ref_request, az_span key, az_span
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result
-az_http_request_get_header(az_http_request const* request, int32_t index, az_pair* out_header)
+AZ_NODISCARD az_result az_http_request_get_header(
+    az_http_request const* request,
+    int32_t index,
+    az_span* out_name,
+    az_span* out_value)
 {
   _az_PRECONDITION_NOT_NULL(request);
-  _az_PRECONDITION_NOT_NULL(out_header);
+  _az_PRECONDITION_NOT_NULL(out_name);
+  _az_PRECONDITION_NOT_NULL(out_value);
 
   if (index >= az_http_request_headers_count(request))
   {
     return AZ_ERROR_ARG;
   }
 
-  *out_header = ((az_pair*)az_span_ptr(request->_internal.headers))[index];
+  _az_http_request_header const* const header
+      = &((_az_http_request_header*)az_span_ptr(request->_internal.headers))[index];
+
+  *out_name = header->name;
+  *out_value = header->value;
+
   return AZ_OK;
 }
 

@@ -3,7 +3,7 @@ parameters:
   BuildType: Debug
 
 steps:
-  - script: mkdir build
+  - script: mkdir -p build
     displayName: create working directory
 
   - script: cmake --version

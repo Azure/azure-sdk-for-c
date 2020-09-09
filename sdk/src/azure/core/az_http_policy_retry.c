@@ -75,12 +75,12 @@ AZ_INLINE void _az_http_policy_retry_log(int32_t attempt, int32_t delay_msec)
 AZ_INLINE AZ_NODISCARD int32_t _az_uint32_span_to_int32(az_span span)
 {
   uint32_t value = 0;
-  if (az_result_succeeded(az_span_atou32(span, &value)))
+  if (az_result_failed(az_span_atou32(span, &value)))
   {
-    return value < INT32_MAX ? (int32_t)value : INT32_MAX;
+    return -1;
   }
 
-  return -1;
+  return value < INT32_MAX ? (int32_t)value : INT32_MAX;
 }
 
 AZ_INLINE AZ_NODISCARD az_result _az_http_policy_retry_get_retry_after(
@@ -103,25 +103,27 @@ AZ_INLINE AZ_NODISCARD az_result _az_http_policy_retry_get_retry_after(
     // Try to get the value of retry-after header, if there's one.
     *should_retry = true;
 
-    az_pair header = { 0 };
-    while (az_http_response_get_next_header(ref_response, &header) == AZ_OK)
+    az_span header_name = { 0 };
+    az_span header_value = { 0 };
+    while (az_result_succeeded(
+        az_http_response_get_next_header(ref_response, &header_name, &header_value)))
     {
-      if (az_span_is_content_equal_ignoring_case(header.key, AZ_SPAN_FROM_STR("retry-after-ms"))
+      if (az_span_is_content_equal_ignoring_case(header_name, AZ_SPAN_FROM_STR("retry-after-ms"))
           || az_span_is_content_equal_ignoring_case(
-              header.key, AZ_SPAN_FROM_STR("x-ms-retry-after-ms")))
+              header_name, AZ_SPAN_FROM_STR("x-ms-retry-after-ms")))
       {
         // The value is in milliseconds.
-        int32_t const msec = _az_uint32_span_to_int32(header.value);
+        int32_t const msec = _az_uint32_span_to_int32(header_value);
         if (msec >= 0) // int32_t max == ~24 days
         {
           *retry_after_msec = msec;
           return AZ_OK;
         }
       }
-      else if (az_span_is_content_equal_ignoring_case(header.key, AZ_SPAN_FROM_STR("Retry-After")))
+      else if (az_span_is_content_equal_ignoring_case(header_name, AZ_SPAN_FROM_STR("Retry-After")))
       {
         // The value is either seconds or date.
-        int32_t const seconds = _az_uint32_span_to_int32(header.value);
+        int32_t const seconds = _az_uint32_span_to_int32(header_value);
         if (seconds >= 0) // int32_t max == ~68 years
         {
           *retry_after_msec = (seconds <= (INT32_MAX / _az_TIME_MILLISECONDS_PER_SECOND))

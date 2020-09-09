@@ -200,9 +200,9 @@ For connectivity issues at all layers (TCP, TLS, MQTT) as well as cases where th
 
 ```C
 // The previous operation took operation_msec.
-// The application calculates random_msec between 0 and max_random_msec.
+// The application calculates random_jitter_msec between 0 and max_random_jitter_msec.
 
-int32_t delay_msec = az_iot_calculate_retry_delay(operation_msec, attempt, min_retry_delay_msec, max_retry_delay_msec, random_msec);
+int32_t delay_msec = az_iot_calculate_retry_delay(operation_msec, attempt, min_retry_delay_msec, max_retry_delay_msec, random_jitter_msec);
 ```
 
 _Note 1_: The network stack may have used more time than the recommended delay before timing out. (e.g. The operation timed out after 2 minutes while the delay between operations is 1 second). In this case there is no need to delay the next operation.
@@ -212,9 +212,9 @@ _Note 2_: To determine the parameters of the exponential with back-off retry str
 In the absence of modeling, we recommend the following default:
 
 ```C
-    min_retry_delay_msec =   1000;
-    max_retry_delay_msec = 100000;
-    max_random_msec      =   5000;
+    min_retry_delay_msec =     1000;
+    max_retry_delay_msec =   100000;
+    max_random_jitter_msec =   5000;
 ```
 
 For service-level errors, the Provisioning Service is providing a `retry-after` (in seconds) parameter:
@@ -229,7 +229,7 @@ if ( response.retry_after_seconds > 0 )
 }
 else
 {
-    delay_ms = az_iot_calculate_retry_delay(operation_msec, attempt, min_retry_delay_msec, max_retry_delay_msec, random_msec);
+    delay_ms = az_iot_calculate_retry_delay(operation_msec, attempt, min_retry_delay_msec, max_retry_delay_msec, random_jitter_msec);
 }
 ```
 

@@ -352,8 +352,8 @@ static void handle_device_registration_status_message(
     {
       IOT_SAMPLE_LOG_SUCCESS("Device provisioned:");
       IOT_SAMPLE_LOG_AZ_SPAN(
-          "Hub Hostname:", register_response->registration_result.assigned_hub_hostname);
-      IOT_SAMPLE_LOG_AZ_SPAN("Device Id:", register_response->registration_result.device_id);
+          "Hub Hostname:", register_response->registration_state.assigned_hub_hostname);
+      IOT_SAMPLE_LOG_AZ_SPAN("Device Id:", register_response->registration_state.device_id);
       IOT_SAMPLE_LOG(" "); // Formatting
     }
     else // Unsuccessful assignment (unassigned, failed or disabled states)
@@ -362,14 +362,14 @@ static void handle_device_registration_status_message(
       IOT_SAMPLE_LOG_AZ_SPAN("Registration state:", register_response->operation_status);
       IOT_SAMPLE_LOG("Last operation status: %d", register_response->status);
       IOT_SAMPLE_LOG_AZ_SPAN("Operation ID:", register_response->operation_id);
-      IOT_SAMPLE_LOG("Error code: %u", register_response->registration_result.extended_error_code);
+      IOT_SAMPLE_LOG("Error code: %u", register_response->registration_state.extended_error_code);
       IOT_SAMPLE_LOG_AZ_SPAN(
-          "Error message:", register_response->registration_result.error_message);
+          "Error message:", register_response->registration_state.error_message);
       IOT_SAMPLE_LOG_AZ_SPAN(
-          "Error timestamp:", register_response->registration_result.error_timestamp);
+          "Error timestamp:", register_response->registration_state.error_timestamp);
       IOT_SAMPLE_LOG_AZ_SPAN(
-          "Error tracking ID:", register_response->registration_result.error_tracking_id);
-      exit((int)register_response->registration_result.extended_error_code);
+          "Error tracking ID:", register_response->registration_state.error_tracking_id);
+      exit((int)register_response->registration_state.extended_error_code);
     }
   }
 }
@@ -399,7 +399,8 @@ static void send_operation_query_message(
   iot_sample_sleep_for_seconds(register_response->retry_after_seconds);
 
   // Publish the query status request.
-  if ((rc = MQTTClient_publish(mqtt_client, query_topic_buffer, 0, NULL, 0, 0, NULL))
+  if ((rc = MQTTClient_publish(
+           mqtt_client, query_topic_buffer, 0, NULL, IOT_SAMPLE_MQTT_PUBLISH_QOS, 0, NULL))
       != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR("Failed to publish query status request: MQTTClient return code %d.", rc);
