@@ -53,3 +53,4 @@ copy_files(args.AssetsPath, args.PackagePath)
 
 message('Invoking Doxygen')
 invoke_doxygen(args.DoxygenPath, args.PackagePath)
+

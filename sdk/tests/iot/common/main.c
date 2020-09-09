@@ -14,8 +14,8 @@
 int main()
 {
   int result = 0;
-
+  
   result += test_az_iot_common();
-
+  
   return result;
 }

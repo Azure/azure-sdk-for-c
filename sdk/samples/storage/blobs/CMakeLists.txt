@@ -9,7 +9,7 @@ set(CMAKE_C_STANDARD 99)
 
 # make sure libcurl is available for sample if compile option for libcurl is on
 if(TRANSPORT_CURL)
-  find_package(CURL ${CURL_MIN_REQUIRED_VERSION} CONFIG)
+  find_package(CURL ${CURL_MIN_REQUIRED_VERSION} CONFIG) 
   if(NOT CURL_FOUND)
     find_package(CURL ${CURL_MIN_REQUIRED_VERSION} REQUIRED)
   endif()
