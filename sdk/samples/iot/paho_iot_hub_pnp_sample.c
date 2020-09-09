@@ -45,9 +45,9 @@ bool is_device_operational = true;
 static char const iso_spec_time_format[] = "%Y-%m-%dT%H:%M:%S%z"; // ISO8601 Time Format
 
 // * PnP Values *
-// The model id is the JSON document (also called the Digital Twins Model Identifier or DTMI)
-// which defines the capability of your device. The functionality of the device should match what
-// is described in the corresponding DTMI. Should you choose to program your own PnP capable device,
+// The model id is the JSON document (also called the Digital Twins Model Identifier or DTMI) which
+// defines the capability of your device. The functionality of the device should match what is
+// described in the corresponding DTMI. Should you choose to program your own PnP capable device,
 // the functionality would need to match the DTMI and you would need to update the below 'model_id'.
 // Please see the sample README for more information on this DTMI.
 static az_span const model_id = AZ_SPAN_LITERAL_FROM_STR("dtmi:com:example:Thermostat;1");
@@ -170,10 +170,10 @@ static az_result build_property_payload_with_status(
  *   - A reported property named `maxTempSinceLastReboot` with a `double` value for the highest
  * temperature reached since device boot.
  *
- * To send a device twin desired property message, select your device's Device Twin tab
- * in the Azure IoT Explorer. Add the property targetTemperature along with a corresponding value to
- * the desired section of the JSON. Select Save to update the twin document and send the twin
- * message to the device.
+ * To send a device twin desired property message, select your device's Device Twin tab in the Azure
+ * IoT Explorer. Add the property targetTemperature along with a corresponding value to the desired
+ * section of the JSON. Select Save to update the twin document and send the twin message to the
+ * device.
  *   {
  *     "properties": {
  *       "desired": {
@@ -218,8 +218,8 @@ static az_result build_property_payload_with_status(
  *     "endTime": "2020-08-18T17:24:32-0700"
  *   }
  *
- * Telemetry: Device sends a JSON message with the field name `temperature` and the `double`
- * value of the current temperature.
+ * Telemetry: Device sends a JSON message with the field name `temperature` and the `double` value
+ * of the current temperature.
  */
 int main(void)
 {
@@ -404,7 +404,7 @@ static void receive_messages(void)
   // Continue to receive commands or device twin messages while device is operational.
   while (is_device_operational)
   {
-    IOT_SAMPLE_LOG(" "); // Formatting.
+    IOT_SAMPLE_LOG(" "); // Formatting
     IOT_SAMPLE_LOG("Waiting for command request or device twin message.\n");
 
     rc = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, MQTT_TIMEOUT_RECEIVE_MS);
@@ -427,7 +427,7 @@ static void receive_messages(void)
     else
     {
       IOT_SAMPLE_LOG_SUCCESS("Client received a message from the service.");
-      timeout_counter = 0; // Reset.
+      timeout_counter = 0; // Reset
 
       if (rc == MQTTCLIENT_TOPICNAME_TRUNCATED)
       {
@@ -435,7 +435,7 @@ static void receive_messages(void)
       }
 
       on_message_received(topic, topic_len, message);
-      IOT_SAMPLE_LOG(" "); // Formatting.
+      IOT_SAMPLE_LOG(" "); // Formatting
 
       MQTTClient_freeMessage(&message);
       MQTTClient_free(topic);
@@ -447,9 +447,7 @@ static void receive_messages(void)
 
 static void disconnect_mqtt_client_from_iot_hub(void)
 {
-  int rc;
-
-  rc = MQTTClient_disconnect(mqtt_client, MQTT_TIMEOUT_DISCONNECT_MS);
+  int rc = MQTTClient_disconnect(mqtt_client, MQTT_TIMEOUT_DISCONNECT_MS);
   if (rc != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR("Failed to disconnect MQTT client: MQTTClient return code %d.", rc);
@@ -579,7 +577,7 @@ static void process_device_twin_message(az_span message_span, bool is_twin_get)
 
   if (property_found)
   {
-    IOT_SAMPLE_LOG(" "); // Formatting.
+    IOT_SAMPLE_LOG(" "); // Formatting
 
     bool confirm = true;
     bool is_max_temp_changed;

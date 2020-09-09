@@ -79,7 +79,7 @@ static az_result build_reported_property(
  * A property named `device_count` is supported for this sample. To send a device twin desired
  * property message, select your device's Device Twin tab in the Azure Portal of your IoT Hub. Add
  * the property `device_count` along with a corresponding value to the `desired` section of the
- * JSON. Select Save to udate the twin document and send the twin message to the device.
+ * JSON. Select Save to update the twin document and send the twin message to the device.
  *
  * {
  *   "properties": {
@@ -231,7 +231,7 @@ static void send_and_receive_device_twin_messages(void)
 {
   get_device_twin_document();
   (void)receive_device_twin_message();
-  IOT_SAMPLE_LOG(" "); // Formatting.
+  IOT_SAMPLE_LOG(" "); // Formatting
 
   send_reported_property();
   (void)receive_device_twin_message();
@@ -250,9 +250,7 @@ static void send_and_receive_device_twin_messages(void)
 
 static void disconnect_mqtt_client_from_iot_hub(void)
 {
-  int rc;
-
-  rc = MQTTClient_disconnect(mqtt_client, MQTT_TIMEOUT_DISCONNECT_MS);
+  int rc = MQTTClient_disconnect(mqtt_client, MQTT_TIMEOUT_DISCONNECT_MS);
   if (rc != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR("Failed to disconnect MQTT client: MQTTClient return code %d.", rc);
@@ -393,12 +391,12 @@ static void parse_device_twin_message(
     MQTTClient_message const* message,
     az_iot_hub_client_twin_response* out_twin_response)
 {
-  az_result rc;
   az_span const topic_span = az_span_create((uint8_t*)topic, topic_len);
   az_span const message_span = az_span_create((uint8_t*)message->payload, message->payloadlen);
 
   // Parse message and retrieve twin_response info.
-  rc = az_iot_hub_client_twin_parse_received_topic(&hub_client, topic_span, out_twin_response);
+  az_result rc
+      = az_iot_hub_client_twin_parse_received_topic(&hub_client, topic_span, out_twin_response);
   if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR("Message from unknown topic: az_result return code 0x%08x.", rc);
@@ -415,7 +413,6 @@ static void handle_device_twin_message(
     MQTTClient_message const* message,
     az_iot_hub_client_twin_response const* twin_response)
 {
-  az_result rc;
   az_span const message_span = az_span_create((uint8_t*)message->payload, message->payloadlen);
 
   // Invoke appropriate action per response type (3 types only).
@@ -436,7 +433,7 @@ static void handle_device_twin_message(
       int32_t desired_device_count;
 
       // Parse for the device count property.
-      rc = parse_desired_device_count_property(
+      az_result rc = parse_desired_device_count_property(
           message_span, &property_found, &desired_device_count);
       if (az_result_failed(rc))
       {
@@ -447,12 +444,12 @@ static void handle_device_twin_message(
 
       if (property_found)
       {
-        IOT_SAMPLE_LOG(" "); // Formatting.
+        IOT_SAMPLE_LOG(" "); // Formatting
 
         // Update device count locally and report update to server.
         update_device_count_property(desired_device_count);
         send_reported_property();
-        receive_device_twin_message();
+        (void)receive_device_twin_message();
       }
       break;
   }

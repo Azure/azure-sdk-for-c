@@ -42,8 +42,7 @@ static void send_telemetry_messages_to_iot_hub(void);
 static void disconnect_mqtt_client_from_iot_hub(void);
 
 /*
- * This sample sends five telemetry messages to the Azure IoT Hub.
- * X509 self-certification is used.
+ * This sample sends five telemetry messages to the Azure IoT Hub. X509 self-certification is used.
  */
 int main(void)
 {
@@ -206,9 +205,7 @@ static void send_telemetry_messages_to_iot_hub(void)
 
 static void disconnect_mqtt_client_from_iot_hub(void)
 {
-  int rc;
-
-  rc = MQTTClient_disconnect(mqtt_client, MQTT_TIMEOUT_DISCONNECT_MS);
+  int rc = MQTTClient_disconnect(mqtt_client, MQTT_TIMEOUT_DISCONNECT_MS);
   if (rc != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR("Failed to disconnect MQTT client: MQTTClient return code %d.", rc);

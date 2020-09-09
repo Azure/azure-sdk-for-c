@@ -49,10 +49,10 @@ static void parse_c2d_message(
     az_iot_hub_client_c2d_request* out_c2d_request);
 
 /*
- * This sample receives incoming cloud-to-device (C2D) messages sent from the Azure IoT Hub to
- * the device. It will successfully receive up to MAX_C2D_MESSAGE_COUNT messages sent from the
- * service. If a timeout occurs of TIMEOUT_MQTT_RECEIVE_MS while waiting for a message, the sample
- * will exit. X509 self-certification is used.
+ * This sample receives incoming cloud-to-device (C2D) messages sent from the Azure IoT Hub to the
+ * device. It will successfully receive up to MAX_C2D_MESSAGE_COUNT messages sent from the service.
+ * If a timeout occurs of TIMEOUT_MQTT_RECEIVE_MS while waiting for a message, the sample will exit.
+ * X509 self-certification is used.
  *
  * To send a C2D message, select your device's Message to Device tab in the Azure Portal for your
  * IoT Hub. Enter a message in the Message Body and select Send Message.
@@ -172,10 +172,8 @@ static void connect_mqtt_client_to_iot_hub(void)
 
 static void subscribe_mqtt_client_to_iot_hub_topics(void)
 {
-  int rc;
-
   // Messages received on the C2D topic will be cloud-to-device messages.
-  rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_HUB_CLIENT_C2D_SUBSCRIBE_TOPIC, 1);
+  int rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_HUB_CLIENT_C2D_SUBSCRIBE_TOPIC, 1);
   if (rc != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR("Failed to subscribe to the C2D topic: MQTTClient return code %d.", rc);
@@ -230,9 +228,7 @@ static void receive_c2d_messages(void)
 
 static void disconnect_mqtt_client_from_iot_hub(void)
 {
-  int rc;
-
-  rc = MQTTClient_disconnect(mqtt_client, MQTT_TIMEOUT_DISCONNECT_MS);
+  int rc = MQTTClient_disconnect(mqtt_client, MQTT_TIMEOUT_DISCONNECT_MS);
   if (rc != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR("Failed to disconnect MQTT client: MQTTClient return code %d.", rc);
@@ -248,12 +244,12 @@ static void parse_c2d_message(
     MQTTClient_message const* message,
     az_iot_hub_client_c2d_request* out_c2d_request)
 {
-  az_result rc;
   az_span const topic_span = az_span_create((uint8_t*)topic, topic_len);
   az_span const message_span = az_span_create((uint8_t*)message->payload, message->payloadlen);
 
   // Parse message and retrieve c2d_request info.
-  rc = az_iot_hub_client_c2d_parse_received_topic(&hub_client, topic_span, out_c2d_request);
+  az_result rc
+      = az_iot_hub_client_c2d_parse_received_topic(&hub_client, topic_span, out_c2d_request);
   if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR("Message from unknown topic: az_result return code 0x%08x.", rc);

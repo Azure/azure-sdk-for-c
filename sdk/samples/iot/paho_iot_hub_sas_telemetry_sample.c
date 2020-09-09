@@ -49,8 +49,7 @@ static void disconnect_mqtt_client_from_iot_hub(void);
 static void generate_sas_key(void);
 
 /*
- * This sample sends five telemetry messages to the Azure IoT Hub.
- * SAS certification is used.
+ * This sample sends five telemetry messages to the Azure IoT Hub. SAS certification is used.
  */
 int main(void)
 {
@@ -216,9 +215,7 @@ static void send_telemetry_messages_to_iot_hub(void)
 
 static void disconnect_mqtt_client_from_iot_hub(void)
 {
-  int rc;
-
-  rc = MQTTClient_disconnect(mqtt_client, MQTT_TIMEOUT_DISCONNECT_MS);
+  int rc = MQTTClient_disconnect(mqtt_client, MQTT_TIMEOUT_DISCONNECT_MS);
   if (rc != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR("Failed to disconnect MQTT client: MQTTClient return code %d.", rc);
@@ -247,7 +244,7 @@ static void generate_sas_key(void)
     exit(rc);
   }
 
-  // Generate the encoded, signed signature (b64 encoded, HMAC-SHA256 signing)
+  // Generate the encoded, signed signature (b64 encoded, HMAC-SHA256 signing).
   az_span sas_base64_encoded_signed_signature
       = AZ_SPAN_FROM_BUFFER(sas_base64_encoded_signed_signature_buffer);
   iot_sample_generate_sas_base64_encoded_signed_signature(
@@ -256,7 +253,7 @@ static void generate_sas_key(void)
       sas_base64_encoded_signed_signature,
       &sas_base64_encoded_signed_signature);
 
-  // Get the resulting MQTT password, passing the base64 encoded, HMAC signed bytes
+  // Get the resulting MQTT password, passing the base64 encoded, HMAC signed bytes.
   size_t mqtt_password_length;
   rc = az_iot_hub_client_sas_get_password(
       &hub_client,

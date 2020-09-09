@@ -56,9 +56,8 @@ static void send_operation_query_message(
     az_iot_provisioning_client_register_response const* response);
 
 /*
- * This sample registers a device with the Azure IoT Device Provisioning Service.
- * It will wait to receive the registration status before disconnecting.
- * X509 self-certification is used.
+ * This sample registers a device with the Azure IoT Device Provisioning Service. It will wait to
+ * receive the registration status before disconnecting. X509 self-certification is used.
  */
 int main(void)
 {
@@ -132,11 +131,7 @@ static void create_and_configure_mqtt_client(void)
 
   // Create the Paho MQTT client.
   rc = MQTTClient_create(
-      &mqtt_client,
-      mqtt_endpoint_buffer,
-      mqtt_client_id_buffer,
-      MQTTCLIENT_PERSISTENCE_NONE,
-      NULL);
+      &mqtt_client, mqtt_endpoint_buffer, mqtt_client_id_buffer, MQTTCLIENT_PERSISTENCE_NONE, NULL);
   if (rc != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR("Failed to create MQTT client: MQTTClient return code %d.", rc);
@@ -146,10 +141,8 @@ static void create_and_configure_mqtt_client(void)
 
 static void connect_mqtt_client_to_provisioning_service(void)
 {
-  int rc;
-
   // Get the MQTT client username.
-  rc = az_iot_provisioning_client_get_user_name(
+  int rc = az_iot_provisioning_client_get_user_name(
       &provisioning_client, mqtt_client_username_buffer, sizeof(mqtt_client_username_buffer), NULL);
   if (az_result_failed(rc))
   {
@@ -187,10 +180,9 @@ static void connect_mqtt_client_to_provisioning_service(void)
 
 static void subscribe_mqtt_client_to_provisioning_service_topics(void)
 {
-  int rc;
-
   // Messages received on the Register topic will be registration responses from the server.
-  rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_PROVISIONING_CLIENT_REGISTER_SUBSCRIBE_TOPIC, 1);
+  int rc
+      = MQTTClient_subscribe(mqtt_client, AZ_IOT_PROVISIONING_CLIENT_REGISTER_SUBSCRIBE_TOPIC, 1);
   if (rc != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR(
@@ -237,25 +229,25 @@ static void receive_device_registration_status_message(void)
   MQTTClient_message* message = NULL;
   bool is_operation_complete = false;
 
-  // Continue to parse incoming responses from the provisioning service until the device
-  // has been successfully provisioned or an error occurs.
+  // Continue to parse incoming responses from the provisioning service until the device has been
+  // successfully provisioned or an error occurs.
   do
   {
     IOT_SAMPLE_LOG(" "); // Formatting
     IOT_SAMPLE_LOG("Waiting for registration status message.\n");
 
     rc = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, MQTT_TIMEOUT_RECEIVE_MS);
-    if ((rc != MQTTCLIENT_SUCCESS) && (MQTTCLIENT_TOPICNAME_TRUNCATED != rc))
+    if ((rc != MQTTCLIENT_SUCCESS) && (rc != MQTTCLIENT_TOPICNAME_TRUNCATED))
     {
       IOT_SAMPLE_LOG_ERROR("Failed to receive message: MQTTClient return code %d.", rc);
       exit(rc);
     }
-    else if (NULL == message)
+    else if (message == NULL)
     {
       IOT_SAMPLE_LOG_ERROR("Receive message timeout expired: MQTTClient return code %d.", rc);
       exit(rc);
     }
-    else if (MQTTCLIENT_TOPICNAME_TRUNCATED == rc)
+    else if (rc == MQTTCLIENT_TOPICNAME_TRUNCATED)
     {
       topic_len = (int)strlen(topic);
     }
@@ -279,9 +271,7 @@ static void receive_device_registration_status_message(void)
 
 static void disconnect_mqtt_client_from_provisioning_service(void)
 {
-  int rc;
-
-  rc = MQTTClient_disconnect(mqtt_client, MQTT_TIMEOUT_DISCONNECT_MS);
+  int rc = MQTTClient_disconnect(mqtt_client, MQTT_TIMEOUT_DISCONNECT_MS);
   if (rc != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR("Failed to disconnect MQTT client: MQTTClient return code %d.", rc);
@@ -390,7 +380,7 @@ static void send_operation_query_message(
     exit(rc);
   }
 
-  // IMPORTANT: Wait the recommended retry-after number of seconds before query
+  // IMPORTANT: Wait the recommended retry-after number of seconds before query.
   IOT_SAMPLE_LOG("Querying after %u seconds...", register_response->retry_after_seconds);
   iot_sample_sleep_for_seconds(register_response->retry_after_seconds);
 
