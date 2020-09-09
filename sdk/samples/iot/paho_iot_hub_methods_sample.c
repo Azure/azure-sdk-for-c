@@ -98,8 +98,8 @@ static void create_and_configure_mqtt_client(void)
   int rc;
 
   // Reads in environment variables set by user for purposes of running sample.
-  if (az_result_failed(
-          rc = iot_sample_read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars)))
+  rc = iot_sample_read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars);
+  if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR(
         "Failed to read configuration from environment variables: az_result return code 0x%08x.",
@@ -109,18 +109,17 @@ static void create_and_configure_mqtt_client(void)
 
   // Build an MQTT endpoint c-string.
   char mqtt_endpoint_buffer[128];
-  if (az_result_failed(
-          rc = iot_sample_create_mqtt_endpoint(
-              SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer))))
+  rc = iot_sample_create_mqtt_endpoint(
+      SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer));
+  if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR("Failed to create MQTT endpoint: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
   // Initialize the hub client with the default connection options.
-  if (az_result_failed(
-          rc = az_iot_hub_client_init(
-              &hub_client, env_vars.hub_hostname, env_vars.hub_device_id, NULL)))
+  rc = az_iot_hub_client_init(&hub_client, env_vars.hub_hostname, env_vars.hub_device_id, NULL);
+  if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR("Failed to initialize hub client: az_result return code 0x%08x.", rc);
     exit(rc);
@@ -128,22 +127,18 @@ static void create_and_configure_mqtt_client(void)
 
   // Get the MQTT client id used for the MQTT connection.
   char mqtt_client_id_buffer[128];
-  if (az_result_failed(
-          rc = az_iot_hub_client_get_client_id(
-              &hub_client, mqtt_client_id_buffer, sizeof(mqtt_client_id_buffer), NULL)))
+  rc = az_iot_hub_client_get_client_id(
+      &hub_client, mqtt_client_id_buffer, sizeof(mqtt_client_id_buffer), NULL);
+  if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR("Failed to get MQTT client id: az_result return code 0x%08x.", rc);
     exit(rc);
   }
 
-  // Create the Paho MQTT client
-  if ((rc = MQTTClient_create(
-           &mqtt_client,
-           mqtt_endpoint_buffer,
-           mqtt_client_id_buffer,
-           MQTTCLIENT_PERSISTENCE_NONE,
-           NULL))
-      != MQTTCLIENT_SUCCESS)
+  // Create the Paho MQTT client.
+  rc = MQTTClient_create(
+      &mqtt_client, mqtt_endpoint_buffer, mqtt_client_id_buffer, MQTTCLIENT_PERSISTENCE_NONE, NULL);
+  if (rc != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR("Failed to create MQTT client: MQTTClient return code %d.", rc);
     exit(rc);
@@ -155,9 +150,9 @@ static void connect_mqtt_client_to_iot_hub(void)
   int rc;
 
   // Get the MQTT client username.
-  if (az_result_failed(
-          rc = az_iot_hub_client_get_user_name(
-              &hub_client, mqtt_client_username_buffer, sizeof(mqtt_client_username_buffer), NULL)))
+  rc = az_iot_hub_client_get_user_name(
+      &hub_client, mqtt_client_username_buffer, sizeof(mqtt_client_username_buffer), NULL);
+  if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR("Failed to get MQTT client username: az_result return code 0x%08x.", rc);
     exit(rc);
@@ -179,7 +174,8 @@ static void connect_mqtt_client_to_iot_hub(void)
   mqtt_connect_options.ssl = &mqtt_ssl_options;
 
   // Connect MQTT client to the Azure IoT Hub.
-  if ((rc = MQTTClient_connect(mqtt_client, &mqtt_connect_options)) != MQTTCLIENT_SUCCESS)
+  rc = MQTTClient_connect(mqtt_client, &mqtt_connect_options);
+  if (rc != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR(
         "Failed to connect: MQTTClient return code %d.\n"
@@ -195,11 +191,10 @@ static void subscribe_mqtt_client_to_iot_hub_topics(void)
   int rc;
 
   // Messages received on the Methods topic will be method commands to be invoked.
-  if ((rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_HUB_CLIENT_METHODS_SUBSCRIBE_TOPIC, 1))
-      != MQTTCLIENT_SUCCESS)
+  rc = MQTTClient_subscribe(mqtt_client, AZ_IOT_HUB_CLIENT_METHODS_SUBSCRIBE_TOPIC, 1);
+  if (rc != MQTTCLIENT_SUCCESS)
   {
-    IOT_SAMPLE_LOG_ERROR(
-        "Failed to subscribe to the Methods topic: MQTTClient return code %d.", rc);
+    IOT_SAMPLE_LOG_ERROR("Failed to subscribe to the Methods topic: MQTTClient return code %d.", rc);
     exit(rc);
   }
 }
@@ -217,10 +212,8 @@ static void receive_method_messages(void)
     IOT_SAMPLE_LOG(" "); // Formatting
     IOT_SAMPLE_LOG("Waiting for method request.\n");
 
-    if (((rc
-          = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, MQTT_TIMEOUT_RECEIVE_MS))
-         != MQTTCLIENT_SUCCESS)
-        && (rc != MQTTCLIENT_TOPICNAME_TRUNCATED))
+    rc = MQTTClient_receive(mqtt_client, &topic, &topic_len, &message, MQTT_TIMEOUT_RECEIVE_MS);
+    if ((rc != MQTTCLIENT_SUCCESS) && (rc != MQTTCLIENT_TOPICNAME_TRUNCATED))
     {
       IOT_SAMPLE_LOG_ERROR(
           "Failed to receive message #%d: MQTTClient return code %d.", message_count + 1, rc);
@@ -257,7 +250,8 @@ static void disconnect_mqtt_client_from_iot_hub(void)
 {
   int rc;
 
-  if ((rc = MQTTClient_disconnect(mqtt_client, MQTT_TIMEOUT_DISCONNECT_MS)) != MQTTCLIENT_SUCCESS)
+  rc = MQTTClient_disconnect(mqtt_client, MQTT_TIMEOUT_DISCONNECT_MS);
+  if (rc != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR("Failed to disconnect MQTT client: MQTTClient return code %d.", rc);
     exit(rc);
@@ -277,9 +271,8 @@ static void parse_method_message(
   az_span const message_span = az_span_create((uint8_t*)message->payload, message->payloadlen);
 
   // Parse message and retrieve method_request info.
-  if (az_result_failed(
-          rc = az_iot_hub_client_methods_parse_received_topic(
-              &hub_client, topic_span, out_method_request)))
+  rc = az_iot_hub_client_methods_parse_received_topic(&hub_client, topic_span, out_method_request);
+  if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR("Message from unknown topic: az_result return code 0x%08x.", rc);
     IOT_SAMPLE_LOG_AZ_SPAN("Topic:", topic_span);
@@ -322,14 +315,14 @@ static void send_method_response(
 
   // Get the Methods Response topic to publish the method response.
   char methods_response_topic_buffer[128];
-  if (az_result_failed(
-          rc = az_iot_hub_client_methods_response_get_publish_topic(
-              &hub_client,
-              method_request->request_id,
-              (uint16_t)status,
-              methods_response_topic_buffer,
-              sizeof(methods_response_topic_buffer),
-              NULL)))
+  rc = az_iot_hub_client_methods_response_get_publish_topic(
+      &hub_client,
+      method_request->request_id,
+      (uint16_t)status,
+      methods_response_topic_buffer,
+      sizeof(methods_response_topic_buffer),
+      NULL);
+  if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR(
         "Failed to get the Methods Response topic: az_result return code 0x%08x.", rc);
@@ -337,15 +330,15 @@ static void send_method_response(
   }
 
   // Publish the method response.
-  if ((rc = MQTTClient_publish(
-           mqtt_client,
-           methods_response_topic_buffer,
-           az_span_size(response),
-           az_span_ptr(response),
-           IOT_SAMPLE_MQTT_PUBLISH_QOS,
-           0,
-           NULL))
-      != MQTTCLIENT_SUCCESS)
+  rc = MQTTClient_publish(
+      mqtt_client,
+      methods_response_topic_buffer,
+      az_span_size(response),
+      az_span_ptr(response),
+      IOT_SAMPLE_MQTT_PUBLISH_QOS,
+      0,
+      NULL);
+  if (rc != MQTTCLIENT_SUCCESS)
   {
     IOT_SAMPLE_LOG_ERROR("Failed to publish the Methods response: MQTTClient return code %d.", rc);
     exit(rc);
