@@ -517,8 +517,7 @@ static void test_az_iot_provisioning_client_logging_succeed()
 
 static void test_az_iot_provisioning_client_no_logging_succeed()
 {
-  az_log_classification const classifications[]
-      = { AZ_LOG_END_OF_LIST };
+  az_log_classification const classifications[] = { AZ_LOG_END_OF_LIST };
   az_log_set_classifications(classifications);
   az_log_set_callback(_log_listener);
 
