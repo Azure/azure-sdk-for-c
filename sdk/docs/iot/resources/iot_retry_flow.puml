@@ -20,15 +20,15 @@ state Provisioning <<APP>> {
     Provisioning_app_delay --> Register_Device : retry
     Provisioning_calculate_delay: - response.retry-after
     Provisioning_calculate_delay: - az_iot_calculate_retry_delay
-    
-    ' Provisioning Non-retriable 
+
+    ' Provisioning Non-retriable
     Register_Device --> Provisioning_not_retriable_failure
     state Provisioning_not_retriable_failure<<FAIL>>
     Provisioning_not_retriable_failure --> Provisioning_Rotate_Credentials
     state Provisioning_Rotate_Credentials <<APP>>
     Provisioning_Rotate_Credentials --> Register_Device : retry
     Provisioning_Rotate_Credentials --> [*] : no other credential
-} 
+}
 
 Provisioning --> IoT_Hub : Success
 
@@ -45,7 +45,7 @@ state IoT_Hub <<APP>> {
     Hub_app_delay --> Hub_Operation : retry
     Hub_calculate_delay: - az_iot_calculate_retry_delay
 
-    ' Hub Non-retriable 
+    ' Hub Non-retriable
     Hub_Operation --> Hub_not_retriable_failure
     state Hub_not_retriable_failure<<FAIL>>
     Hub_not_retriable_failure --> [*] : Re-provision

@@ -90,7 +90,7 @@ void test_az_http_pipeline_policy_telemetry(void** state)
   // Create policy options
   _az_http_policy_telemetry_options telemetry = _az_http_policy_telemetry_options_default();
 
-  _az_http_policy policies[1] = {            
+  _az_http_policy policies[1] = {
             {
               ._internal = {
                 .process = test_policy_transport,
@@ -135,7 +135,7 @@ void test_az_http_pipeline_policy_apiversion(void** state)
   api_version._internal.name = AZ_SPAN_FROM_STR("name");
   api_version._internal.version = AZ_SPAN_FROM_STR("version");
 
-  _az_http_policy policies[1] = {            
+  _az_http_policy policies[1] = {
             {
               ._internal = {
                 .process = test_policy_transport,
@@ -248,7 +248,7 @@ void test_az_http_pipeline_policy_retry(void** state)
   // Create policy options
   az_http_policy_retry_options retry_options = _az_http_policy_retry_options_default();
 
-  _az_http_policy policies[1] = {            
+  _az_http_policy policies[1] = {
             {
               ._internal = {
                 .process = test_policy_transport_retry_response,
@@ -295,7 +295,7 @@ void test_az_http_pipeline_policy_retry_with_header(void** state)
   // make just one retry
   retry_options.max_retries = 1;
 
-  _az_http_policy policies[1] = {            
+  _az_http_policy policies[1] = {
             {
               ._internal = {
                 .process = test_policy_transport_retry_response_with_header,
@@ -342,7 +342,7 @@ void test_az_http_pipeline_policy_retry_with_header_2(void** state)
   // make just one retry
   retry_options.max_retries = 1;
 
-  _az_http_policy policies[1] = {            
+  _az_http_policy policies[1] = {
             {
               ._internal = {
                 .process = test_policy_transport_retry_response_with_header_2,
