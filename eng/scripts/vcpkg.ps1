@@ -12,7 +12,7 @@ Param (
     [string] $TargetPath ="$env:TEMP/$([guid]::NewGuid())",
 
     [Parameter()]
-    [switch] $devOpsLogging = ($null -ne $env:SYSTEM_TEAMPROJECTID)
+    [switch] $DevOpsLogging = ($null -ne $env:SYSTEM_TEAMPROJECTID)
 )
 
 function SetEnvironmentVariable {
