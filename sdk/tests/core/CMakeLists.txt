@@ -11,15 +11,16 @@ include(AddTestCMocka)
 
 # -ld link option is only available for gcc
 if(UNIT_TESTING_MOCKS)
-    set(WRAP_FUNCTIONS "-Wl,--wrap=az_platform_clock_msec -Wl,--wrap=az_http_client_send_request")
+    set(WRAP_FUNCTIONS "-Wl,--wrap=az_platform_clock_msec")
 else()
     set(WRAP_FUNCTIONS "")
 endif()
 
+create_map_file(az_core_test.map)
+
 add_cmocka_test(az_core_test SOURCES
                 main.c
                 test_az_context.c
-                test_az_credential_client_secret.c
                 test_az_http.c
                 test_az_json.c
                 test_az_logging.c

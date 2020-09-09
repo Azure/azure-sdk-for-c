@@ -19,5 +19,5 @@ az_http_client_send_request(az_http_request const* request, az_http_response* re
 {
   (void)request;
   (void)ref_response;
-  return AZ_ERROR_NOT_IMPLEMENTED;
+  return AZ_ERROR_DEPENDENCY_NOT_PROVIDED;
 }

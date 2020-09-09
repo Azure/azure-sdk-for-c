@@ -15,6 +15,8 @@ if(TRANSPORT_CURL)
   endif()
 endif()
 
+create_map_file(blobs_client_example.map)
+
 # make keys client example
 add_executable (blobs_client_example src/blobs_client_example.c)
 

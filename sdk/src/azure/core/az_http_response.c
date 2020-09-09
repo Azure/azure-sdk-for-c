@@ -8,6 +8,7 @@
 #include "az_span_private.h"
 #include <azure/core/az_precondition.h>
 #include <azure/core/internal/az_precondition_internal.h>
+#include <azure/core/internal/az_result_internal.h>
 
 #include <azure/core/_az_cfg.h>
 #include <ctype.h>
@@ -60,25 +61,25 @@ _az_get_http_status_line(az_span* ref_span, az_http_response_status_line* out_st
   az_span const space = AZ_SPAN_FROM_STR(" ");
 
   // parse and move reader if success
-  AZ_RETURN_IF_FAILED(_az_is_expected_span(ref_span, start));
-  AZ_RETURN_IF_FAILED(_az_get_digit(ref_span, &out_status_line->major_version));
-  AZ_RETURN_IF_FAILED(_az_is_expected_span(ref_span, dot));
-  AZ_RETURN_IF_FAILED(_az_get_digit(ref_span, &out_status_line->minor_version));
+  _az_RETURN_IF_FAILED(_az_is_expected_span(ref_span, start));
+  _az_RETURN_IF_FAILED(_az_get_digit(ref_span, &out_status_line->major_version));
+  _az_RETURN_IF_FAILED(_az_is_expected_span(ref_span, dot));
+  _az_RETURN_IF_FAILED(_az_get_digit(ref_span, &out_status_line->minor_version));
 
   // SP = " "
-  AZ_RETURN_IF_FAILED(_az_is_expected_span(ref_span, space));
+  _az_RETURN_IF_FAILED(_az_is_expected_span(ref_span, space));
 
   // status-code = 3DIGIT
   {
     uint64_t code = 0;
-    AZ_RETURN_IF_FAILED(az_span_atou64(az_span_create(az_span_ptr(*ref_span), 3), &code));
+    _az_RETURN_IF_FAILED(az_span_atou64(az_span_create(az_span_ptr(*ref_span), 3), &code));
     out_status_line->status_code = (az_http_status_code)code;
     // move reader
     *ref_span = az_span_slice_to_end(*ref_span, 3);
   }
 
   // SP
-  AZ_RETURN_IF_FAILED(_az_is_expected_span(ref_span, space));
+  _az_RETURN_IF_FAILED(_az_is_expected_span(ref_span, space));
 
   // get a pointer to read response until end of reason-phrase is found
   // reason-phrase = *(HTAB / SP / VCHAR / obs-text)
@@ -105,7 +106,7 @@ _az_get_http_status_line(az_span* ref_span, az_http_response_status_line* out_st
   // move position of reader after reason-phrase (parsed done)
   *ref_span = az_span_slice_to_end(*ref_span, offset + 1);
   // CR LF
-  // AZ_RETURN_IF_FAILED(_az_is_expected_span(response, AZ_SPAN_FROM_STR("\r\n")));
+  // _az_RETURN_IF_FAILED(_az_is_expected_span(response, AZ_SPAN_FROM_STR("\r\n")));
 
   return AZ_OK;
 }
@@ -121,7 +122,7 @@ AZ_NODISCARD az_result az_http_response_get_status_line(
   ref_response->_internal.parser.remaining = ref_response->_internal.http_response;
 
   // read an HTTP status line.
-  AZ_RETURN_IF_FAILED(
+  _az_RETURN_IF_FAILED(
       _az_get_http_status_line(&ref_response->_internal.parser.remaining, out_status_line));
 
   // set state.kind of the next HTTP response value.
@@ -130,19 +131,23 @@ AZ_NODISCARD az_result az_http_response_get_status_line(
   return AZ_OK;
 }
 
-AZ_NODISCARD az_result
-az_http_response_get_next_header(az_http_response* ref_response, az_pair* out_header)
+AZ_NODISCARD az_result az_http_response_get_next_header(
+    az_http_response* ref_response,
+    az_span* out_name,
+    az_span* out_value)
 {
   _az_PRECONDITION_NOT_NULL(ref_response);
-  _az_PRECONDITION_NOT_NULL(out_header);
+  _az_PRECONDITION_NOT_NULL(out_name);
+  _az_PRECONDITION_NOT_NULL(out_value);
+
   az_span* reader = &ref_response->_internal.parser.remaining;
   {
     _az_http_response_kind const kind = ref_response->_internal.parser.next_kind;
-    // if reader is expecting to read body (all headers were read), return ITEM_NOT_FOUND so we
-    // know we reach end of headers
+    // if reader is expecting to read body (all headers were read), return
+    // AZ_ERROR_HTTP_END_OF_HEADERS so we know we reach end of headers
     if (kind == _az_HTTP_RESPONSE_KIND_BODY)
     {
-      return AZ_ERROR_ITEM_NOT_FOUND;
+      return AZ_ERROR_HTTP_END_OF_HEADERS;
     }
     // Can't read a header if status line was not previously called,
     // User needs to call az_http_response_status_line() which would reset parser and set kind to
@@ -157,9 +162,9 @@ az_http_response_get_next_header(az_http_response* ref_response, az_pair* out_he
   // We keep state to Headers if current char is not '\r' (there is another header)
   if (az_span_ptr(ref_response->_internal.parser.remaining)[0] == '\r')
   {
-    AZ_RETURN_IF_FAILED(_az_is_expected_span(reader, AZ_SPAN_FROM_STR("\r\n")));
+    _az_RETURN_IF_FAILED(_az_is_expected_span(reader, AZ_SPAN_FROM_STR("\r\n")));
     ref_response->_internal.parser.next_kind = _az_HTTP_RESPONSE_KIND_BODY;
-    return AZ_ERROR_ITEM_NOT_FOUND;
+    return AZ_ERROR_HTTP_END_OF_HEADERS;
   }
 
   // https://tools.ietf.org/html/rfc7230#section-3.2
@@ -189,17 +194,17 @@ az_http_response_get_next_header(az_http_response* ref_response, az_pair* out_he
     }
     if (field_name_length == input_size)
     {
-      return AZ_ERROR_ITEM_NOT_FOUND;
+      return AZ_ERROR_HTTP_CORRUPT_RESPONSE_HEADER;
     }
 
     // form a header name. Reader is currently at char ':'
-    out_header->key = az_span_slice(*reader, 0, field_name_length);
+    *out_name = az_span_slice(*reader, 0, field_name_length);
     // update reader to next position after colon (add one)
     *reader = az_span_slice_to_end(*reader, field_name_length + 1);
 
     // Remove whitespace characters from header name
     // https://github.com/Azure/azure-sdk-for-c/issues/604
-    out_header->key = _az_span_trim_whitespace(out_header->key);
+    *out_name = _az_span_trim_whitespace(*out_name);
 
     // OWS -> remove the optional whitespace characters before header value
     int32_t ows_len = 0;
@@ -215,7 +220,7 @@ az_http_response_get_next_header(az_http_response* ref_response, az_pair* out_he
     }
     if (ows_len == input_size)
     {
-      return AZ_ERROR_ITEM_NOT_FOUND;
+      return AZ_ERROR_HTTP_CORRUPT_RESPONSE_HEADER;
     }
 
     *reader = az_span_slice_to_end(*reader, ows_len);
@@ -244,21 +249,21 @@ az_http_response_get_next_header(az_http_response* ref_response, az_pair* out_he
       {
         continue; // whitespace or tab is accepted. It can be any number after value (OWS)
       }
-      if (c <= ' ')
+      if (c < ' ')
       {
-        return AZ_ERROR_UNEXPECTED_CHAR;
+        return AZ_ERROR_HTTP_CORRUPT_RESPONSE_HEADER;
       }
       offset_value_end = offset; // increasing index only for valid chars,
     }
-    out_header->value = az_span_slice(*reader, 0, offset_value_end);
+    *out_value = az_span_slice(*reader, 0, offset_value_end);
     // moving reader. It is currently after \r was found
     *reader = az_span_slice_to_end(*reader, offset);
 
     // Remove whitespace characters from value https://github.com/Azure/azure-sdk-for-c/issues/604
-    out_header->value = _az_span_trim_whitespace_from_end(out_header->value);
+    *out_value = _az_span_trim_whitespace_from_end(*out_value);
   }
 
-  AZ_RETURN_IF_FAILED(_az_is_expected_span(reader, AZ_SPAN_FROM_STR("\n")));
+  _az_RETURN_IF_FAILED(_az_is_expected_span(reader, AZ_SPAN_FROM_STR("\n")));
 
   return AZ_OK;
 }
@@ -278,7 +283,7 @@ AZ_NODISCARD az_result az_http_response_get_body(az_http_response* ref_response,
     {
       // Reset parser and get status line
       az_http_response_status_line ignore = { 0 };
-      AZ_RETURN_IF_FAILED(az_http_response_get_status_line(ref_response, &ignore));
+      _az_RETURN_IF_FAILED(az_http_response_get_status_line(ref_response, &ignore));
       // update current parsing section
       current_parsing_section = ref_response->_internal.parser.next_kind;
     }
@@ -286,7 +291,8 @@ AZ_NODISCARD az_result az_http_response_get_body(az_http_response* ref_response,
     if (current_parsing_section == _az_HTTP_RESPONSE_KIND_HEADER)
     {
       // Parse and ignore all remaining headers
-      for (az_pair h; az_http_response_get_next_header(ref_response, &h) == AZ_OK;)
+      for (az_span n = { 0 }, v = { 0 };
+           az_result_succeeded(az_http_response_get_next_header(ref_response, &n, &v));)
       {
         // ignoring header
       }
@@ -321,7 +327,7 @@ AZ_NODISCARD az_result az_http_response_append(az_http_response* ref_response, a
 
   az_span remaining = _az_http_response_get_remaining(ref_response);
   int32_t write_size = az_span_size(source);
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(remaining, write_size);
+  _az_RETURN_IF_NOT_ENOUGH_SIZE(remaining, write_size);
 
   remaining = az_span_copy(remaining, source);
   ref_response->_internal.written += write_size;

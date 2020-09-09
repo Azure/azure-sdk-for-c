@@ -9,6 +9,8 @@ set(CMAKE_C_STANDARD 99)
 
 include(AddTestCMocka)
 
+create_map_file(az_iot_provisioning_test.map)
+
 add_cmocka_test(az_iot_provisioning_test SOURCES
                 main.c
                 test_az_iot_provisioning_client.c

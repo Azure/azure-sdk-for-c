@@ -19,7 +19,7 @@ state Provisioning <<APP>> {
     state Provisioning_app_delay<<APP>>
     Provisioning_app_delay --> Register_Device : retry
     Provisioning_calculate_delay: - response.retry-after
-    Provisioning_calculate_delay: - az_iot_retry_calc_delay
+    Provisioning_calculate_delay: - az_iot_calculate_retry_delay
     
     ' Provisioning Non-retriable 
     Register_Device --> Provisioning_not_retriable_failure
@@ -43,7 +43,7 @@ state IoT_Hub <<APP>> {
     Hub_calculate_delay --> Hub_app_delay
     state Hub_app_delay<<APP>>
     Hub_app_delay --> Hub_Operation : retry
-    Hub_calculate_delay: - az_iot_retry_calc_delay
+    Hub_calculate_delay: - az_iot_calculate_retry_delay
 
     ' Hub Non-retriable 
     Hub_Operation --> Hub_not_retriable_failure

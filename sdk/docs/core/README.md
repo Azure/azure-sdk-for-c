@@ -6,13 +6,13 @@ The library allows client libraries to expose common functionality in a consiste
 
 ## Porting the Azure SDK to Another Platform
 
-The `Azure Core` library requires you to implement a few functions to provide platform-specific features such as a clock, a thread sleep, and a mutual-exclusive thread synchronization lock. By default, `Azure Core` ships with no-op versions of these functions, all of which return `AZ_RESULT_NOT_IMPLEMENTED`. The no-op versions allow the Azure SDK to compile successfully so you can verify that your build tool chain is working properly; however, failures occur if you execute the code.
+The `Azure Core` library requires you to implement a few functions to provide platform-specific features such as a clock and thread sleep. By default, `Azure Core` ships with no-op versions of these functions, all of which return 0 or do no operations. The no-op versions allow the Azure SDK to compile successfully so you can verify that your build tool chain is working properly; however, failures may occur if you execute the code.
 
 ## Key Concepts
 
 ### Function Results
 
-Many SDK functions return an `az_result` as defined in [inc/az_result.h](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/inc/azure/core/az_result.h) header file. An `az_result` is a 32-bit enum value. When a function succeeds, it typically returns AZ_OK. When a function fails, it returns an `az_result` symbol prefixed with `AZ_ERROR_`. A few functions return a reason for success; these symbols will be prefixed with `AZ_` but will **not** contain `ERROR` in the symbol. For functions that need to return an `az_result` and some other value; the other value is returned via an output parameter. If you simply want to know if an `az_result` value indicates generic success or failure, call either the `az_succeeded` or `az_failed` function, respectively. Both of these functions take an `az_result` value and return `true` or `false`.
+Many SDK functions return an `az_result` as defined in [inc/az_result.h](https://github.com/Azure/azure-sdk-for-c/blob/master/sdk/inc/azure/core/az_result.h) header file. An `az_result` is a 32-bit enum value. When a function succeeds, it typically returns AZ_OK. When a function fails, it returns an `az_result` symbol prefixed with `AZ_ERROR_`. A few functions return a reason for success; these symbols will be prefixed with `AZ_` but will **not** contain `ERROR` in the symbol. For functions that need to return an `az_result` and some other value; the other value is returned via an output parameter. If you simply want to know if an `az_result` value indicates generic success or failure, call either the `az_result_succeeded` or `az_result_failed` function, respectively. Both of these functions take an `az_result` value and return `true` or `false`.
 
 ### Working with Spans
 
@@ -21,14 +21,14 @@ An `az_span` is a small data structure (defined in our [az_span.h](../../../sdk/
 - a byte pointer
 - an integer size
 
-Our SDK passes `az_span` instances to functions to ensure that a buffer’s address and size are always passed together; this reduces the chance of bugs. And, since we have the size, operations are fast; for example, we never need to call `strlen` to find the length of a string in order to append to it. Furthermore, when our SDK functions write or copy to an `az_span`, our functions ensure that we never write beyond the size of the buffer; this prevents data corruption. And finally, when reading from an `az_span`, we never read past the `az_span`’s size ensuring that we don’t process uninitialized data.
+Our SDK passes `az_span` instances to functions to ensure that a buffer's address and size are always passed together; this reduces the chance of bugs. And, since we have the size, operations are fast; for example, we never need to call `strlen` to find the length of a string in order to append to it. Furthermore, when our SDK functions write or copy to an `az_span`, our functions ensure that we never write beyond the size of the buffer; this prevents data corruption. And finally, when reading from an `az_span`, we never read past the `az_span`'s size ensuring that we don't process uninitialized data.
 
 Since many of our SDK functions require `az_span` parameters, customers must know how to create `az_span` instances so that you can call functions in our SDK. Here are some examples.
 
-Create an empty (or NULL) `az_span`:
+Create an empty `az_span`:
 
 ```C
-az_span span_null = AZ_SPAN_NULL; // size = 0
+az_span empty_span = AZ_SPAN_EMPTY; // size = 0
 ```
 
 Create an `az_span` expression from a byte buffer:
@@ -88,7 +88,7 @@ To enable logging, you must first write a callback function that our logging mec
    typedef void (*az_log_fn)(az_log_classification classification, az_span message);
    ```
 
-And then, during your application’s initialization, you must register your function with our SDK by calling this function:
+And then, during your application's initialization, you must register your function with our SDK by calling this function:
 
    ```C
    void az_log_set_listener(az_log_fn listener);

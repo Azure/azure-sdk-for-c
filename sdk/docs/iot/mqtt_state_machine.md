@@ -56,14 +56,14 @@ If SAS tokens are used the following APIs provide a way to create as well as ref
 _Example:_
 
 ```C
-if(az_failed(az_iot_hub_client_sas_get_signature(client, unix_time + 3600, signature, &signature)));
+if(az_result_failed(az_iot_hub_client_sas_get_signature(client, unix_time + 3600, signature, &signature)));
 {
     // error.
 }
 
 // Application will Base64Encode the HMAC256 of the az_span_ptr(signature) containing az_span_size(signature) bytes with the Shared Access Key.
 
-if(az_failed(az_iot_hub_client_sas_get_password(client, base64_hmac_sha256_signature, NULL, password, password_size, &password_length)))
+if(az_result_failed(az_iot_hub_client_sas_get_password(client, NULL, base64_hmac_sha256_signature, password, password_size, &password_length)))
 {
     // error.
 }
@@ -99,7 +99,7 @@ The application is responsible for filling in the MQTT payload with the format e
 _Example:_
 
 ```C
-if(az_failed(az_iot_hub_client_telemetry_get_publish_topic(client, NULL, topic, topic_size, NULL)))
+if(az_result_failed(az_iot_hub_client_telemetry_get_publish_topic(client, NULL, topic, topic_size, NULL)))
 {
     // error.
 }
@@ -120,19 +120,19 @@ _Example:_
 
     //az_span received_topic is filled by the application.
 
-    if (az_succeeded(az_iot_hub_client_c2d_parse_received_topic(client, received_topic, &c2d_request)))
+    if (az_result_succeeded(az_iot_hub_client_c2d_parse_received_topic(client, received_topic, &c2d_request)))
     {
         // This is a C2D message:
         //  c2d_request.properties contain the properties of the message.
         //  the MQTT message payload contains the data.
     }
-    else if (az_succeeded(ret = az_iot_hub_client_methods_parse_received_topic(client, received_topic, &method_request)))
+    else if (az_result_succeeded(ret = az_iot_hub_client_methods_parse_received_topic(client, received_topic, &method_request)))
     {
         // This is a Method request:
         //  method_request.name contains the method
         //  method_request.request_id contains the request ID that must be used to submit the response using az_iot_hub_client_methods_response_get_publish_topic()
     }
-    else if (az_succeeded(ret = az_iot_hub_client_twin_parse_received_topic(client, received_topic, &twin_response)))
+    else if (az_result_succeeded(ret = az_iot_hub_client_twin_parse_received_topic(client, received_topic, &twin_response)))
     {
         // This is a Twin operation.
         switch (twin_response.response_type)
@@ -175,13 +175,13 @@ The following APIs may be used to determine if the status indicates an error and
 
 ```C
 az_iot_status status = response.status;
-if (az_iot_is_success_status(status))
+if (az_iot_status_succeeded(status))
 {
     // success case
 }
 else
 {
-    if (az_iot_is_retriable_status(status))
+    if (az_iot_status_retriable(status))
     {
         // retry
     }
@@ -200,9 +200,9 @@ For connectivity issues at all layers (TCP, TLS, MQTT) as well as cases where th
 
 ```C
 // The previous operation took operation_msec.
-// The application calculates random_msec between 0 and max_random_msec.
+// The application calculates random_jitter_msec between 0 and max_random_jitter_msec.
 
-int32_t delay_msec = az_iot_retry_calc_delay(operation_msec, attempt, min_retry_delay_msec, max_retry_delay_msec, random_msec);
+int32_t delay_msec = az_iot_calculate_retry_delay(operation_msec, attempt, min_retry_delay_msec, max_retry_delay_msec, random_jitter_msec);
 ```
 
 _Note 1_: The network stack may have used more time than the recommended delay before timing out. (e.g. The operation timed out after 2 minutes while the delay between operations is 1 second). In this case there is no need to delay the next operation.
@@ -212,9 +212,9 @@ _Note 2_: To determine the parameters of the exponential with back-off retry str
 In the absence of modeling, we recommend the following default:
 
 ```C
-    min_retry_delay_msec =   1000;
-    max_retry_delay_msec = 100000;
-    max_random_msec      =   5000;
+    min_retry_delay_msec =     1000;
+    max_retry_delay_msec =   100000;
+    max_random_jitter_msec =   5000;
 ```
 
 For service-level errors, the Provisioning Service is providing a `retry-after` (in seconds) parameter:
@@ -229,7 +229,7 @@ if ( response.retry_after_seconds > 0 )
 }
 else
 {
-    delay_ms = az_iot_retry_calc_delay(operation_msec, attempt, min_retry_delay_msec, max_retry_delay_msec, random_msec);
+    delay_ms = az_iot_calculate_retry_delay(operation_msec, attempt, min_retry_delay_msec, max_retry_delay_msec, random_jitter_msec);
 }
 ```
 

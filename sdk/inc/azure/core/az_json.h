@@ -73,9 +73,11 @@ typedef struct
 
   /// This read-only field gives access to the slice of the JSON text that represents the token
   /// value, and it shouldn't be modified by the caller.
-  /// If the token straddles non-contiguous buffers, this is set to #AZ_SPAN_NULL.
+  /// If the token straddles non-contiguous buffers, this is set to the partial token value
+  /// available in the last segment.
   /// The user can call #az_json_token_copy_into_span() to get the token value into a contiguous
-  /// buffer. In the case of JSON strings, the slice does not include the surrounding quotes.
+  /// buffer.
+  /// In the case of JSON strings, the slice does not include the surrounding quotes.
   az_span slice;
 
   /// This read-only field gives access to the size of the JSON text slice that represents the token
@@ -86,12 +88,17 @@ typedef struct
 
   struct
   {
+    /// A flag to indicate whether the JSON token straddles more than one buffer segment and is
+    /// split amongst non-contiguous buffers. For tokens created from input JSON payloads within a
+    /// contiguous buffer, this field is always false.
+    bool is_multisegment;
+
     /// A flag to indicate whether the JSON string contained any escaped characters, used as an
     /// optimization to avoid redundant checks. It is meaningless for any other token kind.
     bool string_has_escaped_chars;
 
     /// This is the first segment in the entire JSON payload, if it was non-contiguous. Otherwise,
-    /// its set to #AZ_SPAN_NULL.
+    /// its set to #AZ_SPAN_EMPTY.
     az_span* pointer_to_first_buffer;
 
     /// The segment index within the non-contiguous JSON payload where this token starts.
@@ -225,7 +232,7 @@ AZ_NODISCARD az_result az_json_token_get_double(az_json_token const* json_token,
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The string is returned.
  * @retval #AZ_ERROR_JSON_INVALID_STATE The kind is not #AZ_JSON_TOKEN_STRING.
- * @retval #AZ_ERROR_INSUFFICIENT_SPAN_SIZE \p destination does not have enough size.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE \p destination does not have enough size.
  */
 AZ_NODISCARD az_result az_json_token_get_string(
     az_json_token const* json_token,
@@ -385,11 +392,11 @@ az_json_writer_get_bytes_used_in_destination(az_json_writer const* json_writer)
  * @param[in] value The UTF-8 encoded value to be written as a JSON string. The value is escaped
  * before writing.
  *
- * @remarks If \p value is #AZ_SPAN_NULL, the empty JSON string value is written (i.e. "").
+ * @remarks If \p value is #AZ_SPAN_EMPTY, the empty JSON string value is written (i.e. "").
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The string value was appended successfully.
- * @retval #AZ_ERROR_INSUFFICIENT_SPAN_SIZE The buffer is too small.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small.
  */
 AZ_NODISCARD az_result az_json_writer_append_string(az_json_writer* ref_json_writer, az_span value);
 
@@ -412,8 +419,7 @@ AZ_NODISCARD az_result az_json_writer_append_string(az_json_writer* ref_json_wri
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The provided \p json_text was appended successfully.
- * @retval #AZ_ERROR_INSUFFICIENT_SPAN_SIZE The destination is too small for the provided \p
- * json_text.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The destination is too small for the provided \p json_text.
  * @retval #AZ_ERROR_JSON_INVALID_STATE The \p ref_json_writer is in a state where the \p json_text
  * cannot be appended because it would result in invalid JSON.
  * @retval #AZ_ERROR_UNEXPECTED_END The provided \p json_text is invalid because it is incomplete
@@ -435,7 +441,7 @@ az_json_writer_append_json_text(az_json_writer* ref_json_writer, az_span json_te
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The property name was appended successfully.
- * @retval #AZ_ERROR_INSUFFICIENT_SPAN_SIZE The buffer is too small.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small.
  */
 AZ_NODISCARD az_result
 az_json_writer_append_property_name(az_json_writer* ref_json_writer, az_span name);
@@ -449,7 +455,7 @@ az_json_writer_append_property_name(az_json_writer* ref_json_writer, az_span nam
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The boolean was appended successfully.
- * @retval #AZ_ERROR_INSUFFICIENT_SPAN_SIZE The buffer is too small.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small.
  */
 AZ_NODISCARD az_result az_json_writer_append_bool(az_json_writer* ref_json_writer, bool value);
 
@@ -462,7 +468,7 @@ AZ_NODISCARD az_result az_json_writer_append_bool(az_json_writer* ref_json_write
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The number was appended successfully.
- * @retval #AZ_ERROR_INSUFFICIENT_SPAN_SIZE The buffer is too small.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small.
  */
 AZ_NODISCARD az_result az_json_writer_append_int32(az_json_writer* ref_json_writer, int32_t value);
 
@@ -477,7 +483,7 @@ AZ_NODISCARD az_result az_json_writer_append_int32(az_json_writer* ref_json_writ
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK The number was appended successfully.
- * @retval #AZ_ERROR_INSUFFICIENT_SPAN_SIZE The buffer is too small.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small.
  * @retval #AZ_ERROR_NOT_SUPPORTED The \p value contains an integer component that is too large and
  * would overflow beyond `2^53 - 1`.
  *
@@ -503,7 +509,7 @@ AZ_NODISCARD az_result az_json_writer_append_double(
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK `null` was appended successfully.
- * @retval #AZ_ERROR_INSUFFICIENT_SPAN_SIZE The buffer is too small.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small.
  */
 AZ_NODISCARD az_result az_json_writer_append_null(az_json_writer* ref_json_writer);
 
@@ -515,7 +521,7 @@ AZ_NODISCARD az_result az_json_writer_append_null(az_json_writer* ref_json_write
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK Object start was appended successfully.
- * @retval #AZ_ERROR_INSUFFICIENT_SPAN_SIZE The buffer is too small.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small.
  * @retval #AZ_ERROR_JSON_NESTING_OVERFLOW The depth of the JSON exceeds the maximum allowed
  * depth of 64.
  */
@@ -529,7 +535,7 @@ AZ_NODISCARD az_result az_json_writer_append_begin_object(az_json_writer* ref_js
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK Array start was appended successfully.
- * @retval #AZ_ERROR_INSUFFICIENT_SPAN_SIZE The buffer is too small.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small.
  * @retval #AZ_ERROR_JSON_NESTING_OVERFLOW The depth of the JSON exceeds the maximum allowed depth
  * of 64.
  */
@@ -543,7 +549,7 @@ AZ_NODISCARD az_result az_json_writer_append_begin_array(az_json_writer* ref_jso
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK Object end was appended successfully.
- * @retval #AZ_ERROR_INSUFFICIENT_SPAN_SIZE The buffer is too small.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small.
  */
 AZ_NODISCARD az_result az_json_writer_append_end_object(az_json_writer* ref_json_writer);
 
@@ -555,7 +561,7 @@ AZ_NODISCARD az_result az_json_writer_append_end_object(az_json_writer* ref_json
  *
  * @return An #az_result value indicating the result of the operation.
  * @retval #AZ_OK Array end was appended successfully.
- * @retval #AZ_ERROR_INSUFFICIENT_SPAN_SIZE The buffer is too small.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE The buffer is too small.
  */
 AZ_NODISCARD az_result az_json_writer_append_end_array(az_json_writer* ref_json_writer);
 

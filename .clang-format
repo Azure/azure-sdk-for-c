@@ -7,7 +7,7 @@ IncludeBlocks: Preserve
 NamespaceIndentation: None
 PointerAlignment: Left
 AlignAfterOpenBracket: AlwaysBreak
-AlignEscapedNewlines: DontAlign
+AlignEscapedNewlines: Left
 AllowAllParametersOfDeclarationOnNextLine: false
 PenaltyReturnTypeOnItsOwnLine: 300
 BinPackArguments: false

@@ -43,23 +43,39 @@
 
 az_precondition_failed_fn az_precondition_failed_get_callback();
 
+// __analysis_assume() tells MSVC's code analysis tool about the assumptions we have, so it doesn't
+// emit warnings for the statements that we put into _az_PRECONDITION().
+// Code analysis starts to fail with this condition some time around version 19.27; but
+// __analysis_assume() does appear at least as early as version 1920 (The first "Visual Studio
+// 2019"). So, we do __analysis_assume() for MSVCs starting with 2019. We don't want to go much
+// earlier without verifying, because if __analysis_assume() is not available on earlier compiler
+// version, there will be a compilation error.
+// For more info, see
+// https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/using-the--analysis-assume-function-to-suppress-false-defects
+#if _MSC_VER >= 1920
+#define _az_ANALYSIS_ASSUME(statement) __analysis_assume(statement)
+#else
+#define _az_ANALYSIS_ASSUME(statement)
+#endif
+
 #ifdef AZ_NO_PRECONDITION_CHECKING
 #define _az_PRECONDITION(condition)
 #else
-#define _az_PRECONDITION(condition) \
-  do \
-  { \
-    if (!(condition)) \
-    { \
+#define _az_PRECONDITION(condition)            \
+  do                                           \
+  {                                            \
+    if (!(condition))                          \
+    {                                          \
       az_precondition_failed_get_callback()(); \
-    } \
+    }                                          \
+    _az_ANALYSIS_ASSUME(condition);            \
   } while (0)
 #endif // AZ_NO_PRECONDITION_CHECKING
 
-#define _az_PRECONDITION_RANGE(low, arg, max) _az_PRECONDITION((low <= arg && arg <= max))
+#define _az_PRECONDITION_RANGE(low, arg, max) _az_PRECONDITION((low) <= (arg) && (arg) <= (max))
 
-#define _az_PRECONDITION_NOT_NULL(arg) _az_PRECONDITION((arg != NULL))
-#define _az_PRECONDITION_IS_NULL(arg) _az_PRECONDITION((arg == NULL))
+#define _az_PRECONDITION_NOT_NULL(arg) _az_PRECONDITION((arg) != NULL)
+#define _az_PRECONDITION_IS_NULL(arg) _az_PRECONDITION((arg) == NULL)
 
 AZ_NODISCARD AZ_INLINE bool _az_span_is_valid(az_span span, int32_t min_size, bool null_is_valid)
 {

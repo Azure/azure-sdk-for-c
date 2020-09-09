@@ -2,14 +2,14 @@
 // SPDX-License-Identifier: MIT
 
 #include "test_az_iot_hub_client.h"
-#include <azure/iot/az_iot_hub_client.h>
-#include <azure/core/az_log.h>
-#include <azure/core/az_precondition.h>
-#include <azure/core/internal/az_precondition_internal.h>
-#include <azure/core/az_span.h>
 #include <az_test_log.h>
 #include <az_test_precondition.h>
 #include <az_test_span.h>
+#include <azure/core/az_log.h>
+#include <azure/core/az_precondition.h>
+#include <azure/core/az_span.h>
+#include <azure/core/internal/az_precondition_internal.h>
+#include <azure/iot/az_iot_hub_client.h>
 
 #include <setjmp.h>
 #include <stdarg.h>
@@ -53,7 +53,7 @@ static void test_az_iot_hub_client_c2d_parse_received_topic_NULL_client_fail()
       az_iot_hub_client_c2d_parse_received_topic(NULL, received_topic, &out_request));
 }
 
-static void test_az_iot_hub_client_c2d_parse_received_topic_AZ_SPAN_NULL_received_topic_fail(
+static void test_az_iot_hub_client_c2d_parse_received_topic_AZ_SPAN_EMPTY_received_topic_fail(
     void** state)
 {
   (void)state;
@@ -63,7 +63,7 @@ static void test_az_iot_hub_client_c2d_parse_received_topic_AZ_SPAN_NULL_receive
   assert_true(
       az_iot_hub_client_init(&client, test_device_hostname, test_device_id, &options) == AZ_OK);
 
-  az_span received_topic = AZ_SPAN_NULL;
+  az_span received_topic = AZ_SPAN_EMPTY;
 
   az_iot_hub_client_c2d_request out_request;
 
@@ -104,8 +104,8 @@ static void test_az_iot_hub_client_c2d_parse_received_topic_url_decoded_succeed(
   az_span value;
   assert_int_equal(az_iot_message_properties_next(&out_request.properties, &name, &value), AZ_OK);
   assert_true(az_span_is_content_equal(name, AZ_SPAN_FROM_STR("$.mid")));
-  assert_true(az_span_is_content_equal(
-      value, AZ_SPAN_FROM_STR("79eadb01-bd0d-472d-bd35-ccb76e70eab8")));
+  assert_true(
+      az_span_is_content_equal(value, AZ_SPAN_FROM_STR("79eadb01-bd0d-472d-bd35-ccb76e70eab8")));
 
   assert_int_equal(az_iot_message_properties_next(&out_request.properties, &name, &value), AZ_OK);
   assert_true(az_span_is_content_equal(name, AZ_SPAN_FROM_STR("$.to")));
@@ -148,8 +148,7 @@ static void test_az_iot_hub_client_c2d_parse_received_topic_url_encoded_succeed(
 
   assert_int_equal(az_iot_message_properties_next(&out_request.properties, &name, &value), AZ_OK);
   assert_true(az_span_is_content_equal(name, AZ_SPAN_FROM_STR("jkl")));
-  assert_true(
-      az_span_is_content_equal(value, AZ_SPAN_FROM_STR("%2Fsome%2Fthing%2F%3Fbla%3Dbla")));
+  assert_true(az_span_is_content_equal(value, AZ_SPAN_FROM_STR("%2Fsome%2Fthing%2F%3Fbla%3Dbla")));
 }
 
 static void test_az_iot_hub_client_c2d_parse_received_topic_no_props_succeed()
@@ -251,7 +250,7 @@ int test_az_iot_hub_client_c2d()
 #ifndef AZ_NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_az_iot_hub_client_c2d_parse_received_topic_NULL_client_fail),
     cmocka_unit_test(
-        test_az_iot_hub_client_c2d_parse_received_topic_AZ_SPAN_NULL_received_topic_fail),
+        test_az_iot_hub_client_c2d_parse_received_topic_AZ_SPAN_EMPTY_received_topic_fail),
     cmocka_unit_test(test_az_iot_hub_client_c2d_parse_received_topic_NULL_out_request_fail),
 #endif // NO_PRECONDITION_CHECKING
     cmocka_unit_test(test_az_iot_hub_client_c2d_parse_received_topic_url_decoded_succeed),

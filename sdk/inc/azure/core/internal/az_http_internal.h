@@ -67,8 +67,8 @@ _az_http_policy_apiversion_options_default()
 {
   return (_az_http_policy_apiversion_options){
     ._internal = { .option_location = _az_http_policy_apiversion_option_location_header,
-                   .name = AZ_SPAN_NULL,
-                   .version = AZ_SPAN_NULL }
+                   .name = AZ_SPAN_EMPTY,
+                   .version = AZ_SPAN_EMPTY }
   };
 }
 
@@ -168,7 +168,7 @@ AZ_NODISCARD AZ_INLINE az_result _az_http_pipeline_nextpolicy(
  * @param[in] url_length The size of the initial url value within url #az_span.
  * @param[in] headers_buffer The #az_span to be used for storing headers for the request. The total
  * number of headers are calculated automatically based on the size of the buffer.
- * @param[in] body The #az_span buffer that contains a payload for the request. Use #AZ_SPAN_NULL
+ * @param[in] body The #az_span buffer that contains a payload for the request. Use #AZ_SPAN_EMPTY
  * for requests that don't have a body.
  *
  * @return
@@ -204,7 +204,7 @@ AZ_NODISCARD az_result az_http_request_init(
  *
  * @return
  *   - *`AZ_OK`* success.
- *   - *`AZ_ERROR_INSUFFICIENT_SPAN_SIZE`* the `URL` would grow past the `max_url_size`, should
+ *   - *`AZ_ERROR_NOT_ENOUGH_SPACE`* the `URL` would grow past the `max_url_size`, should
  * the parameter get set.
  *   - *`AZ_ERROR_ARG`*
  *     - `p_request` is _NULL_.
@@ -222,21 +222,16 @@ AZ_NODISCARD az_result az_http_request_set_query_parameter(
  * @brief Add a new HTTP header for the request.
  *
  * @param ref_request HTTP request builder that holds the URL to set the query parameter to.
- * @param key Header name (e.g. `"Content-Type"`).
+ * @param name Header name (e.g. `"Content-Type"`).
  * @param value Header value (e.g. `"application/x-www-form-urlencoded"`).
  *
- * @return
- *   - *`AZ_OK`* success.
- *   - *`AZ_ERROR_INSUFFICIENT_SPAN_SIZE`* there isn't enough space in the `p_request->buffer`
- * to add a header.
- *   - *`AZ_ERROR_ARG`*
- *     - `p_request` is _NULL_.
- *     - `key` or `value` are invalid spans (see @ref _az_span_is_valid).
- *     - `key` or `value` are empty.
- *     - `name`'s or `value`'s buffer overlap resulting `url`'s buffer.
+ * @return An #az_result value indicating the result of the operation.
+ * @retval #AZ_OK Success.
+ * @retval #AZ_ERROR_NOT_ENOUGH_SPACE There isn't enough space in the \p ref_request to add a
+ * header.
  */
 AZ_NODISCARD az_result
-az_http_request_append_header(az_http_request* ref_request, az_span key, az_span value);
+az_http_request_append_header(az_http_request* ref_request, az_span name, az_span value);
 
 #include <azure/core/_az_cfg_suffix.h>
 

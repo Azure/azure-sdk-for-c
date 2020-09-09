@@ -5,6 +5,7 @@
 
 #include <azure/core/az_result.h>
 #include <azure/core/az_span.h>
+#include <azure/core/internal/az_result_internal.h>
 #include <azure/core/internal/az_span_internal.h>
 #include <azure/iot/az_iot_hub_client.h>
 #include <azure/iot/internal/az_iot_common_internal.h>
@@ -91,12 +92,13 @@ AZ_NODISCARD az_result az_iot_hub_client_methods_response_get_publish_topic(
       + az_span_size(methods_response_topic_result) + _az_iot_u32toa_size(status)
       + az_span_size(methods_response_topic_properties) + az_span_size(request_id);
 
-  AZ_RETURN_IF_NOT_ENOUGH_SIZE(mqtt_topic_span, required_length + (int32_t)sizeof(null_terminator));
+  _az_RETURN_IF_NOT_ENOUGH_SIZE(
+      mqtt_topic_span, required_length + (int32_t)sizeof(null_terminator));
 
   az_span remainder = az_span_copy(mqtt_topic_span, methods_topic_prefix);
   remainder = az_span_copy(remainder, methods_response_topic_result);
 
-  AZ_RETURN_IF_FAILED(az_span_u32toa(remainder, (uint32_t)status, &remainder));
+  _az_RETURN_IF_FAILED(az_span_u32toa(remainder, (uint32_t)status, &remainder));
 
   remainder = az_span_copy(remainder, methods_response_topic_properties);
   remainder = az_span_copy(remainder, request_id);

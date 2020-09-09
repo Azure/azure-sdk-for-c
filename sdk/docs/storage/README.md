@@ -26,7 +26,6 @@ The library targets made available via CMake are the following:
 
 This [page][samples_storage_blobs_readme] explains samples for the Azure Embedded C SDK Storage Blobs Client.
 
-
 ### Prerequisites
 
 For compiling the Azure SDK for Embedded C for the most common platforms (Windows and Linux), no further prerequisites are necessary.

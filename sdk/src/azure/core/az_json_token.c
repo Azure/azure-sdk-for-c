@@ -2,21 +2,19 @@
 // SPDX-License-Identifier: MIT
 
 #include <azure/core/internal/az_precondition_internal.h>
+#include <azure/core/internal/az_result_internal.h>
 #include <azure/core/internal/az_span_internal.h>
 
 #include "az_json_private.h"
 
+#include "az_span_private.h"
 #include <azure/core/_az_cfg.h>
-
-// Used to copy discontiguous token values into a contiguous buffer, for number parsing.
-// All number types should fit within 99 bytes. Otherwise, they will overflow.
-static uint8_t _az_scratch_buffer[99] = { 0 };
 
 static az_span _az_json_token_copy_into_span_helper(
     az_json_token const* json_token,
     az_span destination)
 {
-  _az_PRECONDITION_IS_NULL(az_span_ptr(json_token->slice));
+  _az_PRECONDITION(json_token->_internal.is_multisegment);
 
   if (json_token->size == 0)
   {
@@ -49,7 +47,7 @@ az_span az_json_token_copy_into_span(az_json_token const* json_token, az_span de
   az_span token_slice = json_token->slice;
 
   // Contiguous token
-  if (az_span_ptr(token_slice) != NULL)
+  if (!json_token->_internal.is_multisegment)
   {
     return az_span_copy(destination, token_slice);
   }
@@ -130,21 +128,21 @@ AZ_NODISCARD static bool _az_json_token_is_text_equal_helper(
       // To do this, we need to encode UTF-16 codepoints (including surrogate pairs) into UTF-8.
       if (token_byte == 'u')
       {
-        *expected_text = AZ_SPAN_NULL;
+        *expected_text = AZ_SPAN_EMPTY;
         return false;
       }
     }
 
     if (token_byte != expected_ptr[i])
     {
-      *expected_text = AZ_SPAN_NULL;
+      *expected_text = AZ_SPAN_EMPTY;
       return false;
     }
 
     token_idx++;
   }
 
-  *expected_text = AZ_SPAN_NULL;
+  *expected_text = AZ_SPAN_EMPTY;
 
   // Only return true if the size of the unescaped token matches the expected size exactly.
   return token_idx == token_size;
@@ -168,7 +166,7 @@ AZ_NODISCARD bool az_json_token_is_text_equal(
   if (!json_token->_internal.string_has_escaped_chars)
   {
     // Contiguous token
-    if (az_span_ptr(token_slice) != NULL)
+    if (!json_token->_internal.is_multisegment)
     {
       return az_span_is_content_equal(token_slice, expected_text);
     }
@@ -214,7 +212,7 @@ AZ_NODISCARD bool az_json_token_is_text_equal(
   bool next_char_escaped = false;
 
   // Contiguous token
-  if (az_span_ptr(token_slice) != NULL)
+  if (!json_token->_internal.is_multisegment)
   {
     return _az_json_token_is_text_equal_helper(token_slice, &expected_text, &next_char_escaped);
   }
@@ -235,14 +233,14 @@ AZ_NODISCARD bool az_json_token_is_text_equal(
     }
 
     if (!_az_json_token_is_text_equal_helper(source, &expected_text, &next_char_escaped)
-        && az_span_ptr(expected_text) == NULL)
+        && az_span_size(expected_text) == 0)
     {
       return false;
     }
   }
 
   // Only return true if we have gone through and compared the entire expected_text.
-  return az_span_ptr(expected_text) == NULL;
+  return az_span_size(expected_text) == 0;
 }
 
 AZ_NODISCARD az_result az_json_token_get_boolean(az_json_token const* json_token, bool* out_value)
@@ -263,7 +261,7 @@ AZ_NODISCARD az_result az_json_token_get_boolean(az_json_token const* json_token
   az_span token_slice = json_token->slice;
 
   // Contiguous token
-  if (az_span_ptr(token_slice) != NULL)
+  if (!json_token->_internal.is_multisegment)
   {
     *out_value = az_span_size(token_slice) == _az_STRING_LITERAL_LEN("true");
   }
@@ -289,7 +287,7 @@ AZ_NODISCARD static az_result _az_json_token_get_string_helper(
   {
     if (*dest_idx >= destination_max_size)
     {
-      return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
+      return AZ_ERROR_NOT_ENOUGH_SPACE;
     }
     uint8_t token_byte = source_ptr[i];
 
@@ -351,11 +349,11 @@ AZ_NODISCARD az_result az_json_token_get_string(
     // We need enough space to add a null terminator.
     if (token_size >= destination_max_size)
     {
-      return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
+      return AZ_ERROR_NOT_ENOUGH_SPACE;
     }
 
     // Contiguous token
-    if (az_span_ptr(token_slice) != NULL)
+    if (!json_token->_internal.is_multisegment)
     {
       // This will add a null terminator.
       az_span_to_str(destination, destination_max_size, token_slice);
@@ -382,16 +380,16 @@ AZ_NODISCARD az_result az_json_token_get_string(
   // We also need enough space to add a null terminator.
   if (token_size / _az_MAX_EXPANSION_FACTOR_WHILE_ESCAPING >= destination_max_size)
   {
-    return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
+    return AZ_ERROR_NOT_ENOUGH_SPACE;
   }
 
   int32_t dest_idx = 0;
   bool next_char_escaped = false;
 
   // Contiguous token
-  if (az_span_ptr(token_slice) != NULL)
+  if (!json_token->_internal.is_multisegment)
   {
-    AZ_RETURN_IF_FAILED(_az_json_token_get_string_helper(
+    _az_RETURN_IF_FAILED(_az_json_token_get_string_helper(
         token_slice, destination, destination_max_size, &dest_idx, &next_char_escaped));
   }
   else
@@ -411,14 +409,14 @@ AZ_NODISCARD az_result az_json_token_get_string(
         source = az_span_slice(source, 0, json_token->_internal.end_buffer_offset);
       }
 
-      AZ_RETURN_IF_FAILED(_az_json_token_get_string_helper(
+      _az_RETURN_IF_FAILED(_az_json_token_get_string_helper(
           source, destination, destination_max_size, &dest_idx, &next_char_escaped));
     }
   }
 
   if (dest_idx >= destination_max_size)
   {
-    return AZ_ERROR_INSUFFICIENT_SPAN_SIZE;
+    return AZ_ERROR_NOT_ENOUGH_SPACE;
   }
   destination[dest_idx] = 0;
 
@@ -444,19 +442,21 @@ az_json_token_get_uint64(az_json_token const* json_token, uint64_t* out_value)
   az_span token_slice = json_token->slice;
 
   // Contiguous token
-  if (az_span_ptr(token_slice) != NULL)
+  if (!json_token->_internal.is_multisegment)
   {
     return az_span_atou64(token_slice, out_value);
   }
 
-  // Token straddles more than one segment
-  az_span scratch = AZ_SPAN_FROM_BUFFER(_az_scratch_buffer);
-
   // Any number that won't fit in the scratch buffer, will overflow.
-  if (az_span_size(scratch) < json_token->size)
+  if (json_token->size > _az_MAX_SIZE_FOR_UINT64)
   {
     return AZ_ERROR_UNEXPECTED_CHAR;
   }
+
+  // Token straddles more than one segment.
+  // Used to copy discontiguous token values into a contiguous buffer, for number parsing.
+  uint8_t scratch_buffer[_az_MAX_SIZE_FOR_UINT64] = { 0 };
+  az_span scratch = AZ_SPAN_FROM_BUFFER(scratch_buffer);
 
   az_span remainder = _az_json_token_copy_into_span_helper(json_token, scratch);
 
@@ -477,19 +477,21 @@ az_json_token_get_uint32(az_json_token const* json_token, uint32_t* out_value)
   az_span token_slice = json_token->slice;
 
   // Contiguous token
-  if (az_span_ptr(token_slice) != NULL)
+  if (!json_token->_internal.is_multisegment)
   {
     return az_span_atou32(token_slice, out_value);
   }
 
-  // Token straddles more than one segment
-  az_span scratch = AZ_SPAN_FROM_BUFFER(_az_scratch_buffer);
-
   // Any number that won't fit in the scratch buffer, will overflow.
-  if (az_span_size(scratch) < json_token->size)
+  if (json_token->size > _az_MAX_SIZE_FOR_UINT32)
   {
     return AZ_ERROR_UNEXPECTED_CHAR;
   }
+
+  // Token straddles more than one segment.
+  // Used to copy discontiguous token values into a contiguous buffer, for number parsing.
+  uint8_t scratch_buffer[_az_MAX_SIZE_FOR_UINT32] = { 0 };
+  az_span scratch = AZ_SPAN_FROM_BUFFER(scratch_buffer);
 
   az_span remainder = _az_json_token_copy_into_span_helper(json_token, scratch);
 
@@ -509,19 +511,21 @@ AZ_NODISCARD az_result az_json_token_get_int64(az_json_token const* json_token, 
   az_span token_slice = json_token->slice;
 
   // Contiguous token
-  if (az_span_ptr(token_slice) != NULL)
+  if (!json_token->_internal.is_multisegment)
   {
     return az_span_atoi64(token_slice, out_value);
   }
 
-  // Token straddles more than one segment
-  az_span scratch = AZ_SPAN_FROM_BUFFER(_az_scratch_buffer);
-
   // Any number that won't fit in the scratch buffer, will overflow.
-  if (az_span_size(scratch) < json_token->size)
+  if (json_token->size > _az_MAX_SIZE_FOR_INT64)
   {
     return AZ_ERROR_UNEXPECTED_CHAR;
   }
+
+  // Token straddles more than one segment.
+  // Used to copy discontiguous token values into a contiguous buffer, for number parsing.
+  uint8_t scratch_buffer[_az_MAX_SIZE_FOR_INT64] = { 0 };
+  az_span scratch = AZ_SPAN_FROM_BUFFER(scratch_buffer);
 
   az_span remainder = _az_json_token_copy_into_span_helper(json_token, scratch);
 
@@ -541,19 +545,21 @@ AZ_NODISCARD az_result az_json_token_get_int32(az_json_token const* json_token, 
   az_span token_slice = json_token->slice;
 
   // Contiguous token
-  if (az_span_ptr(token_slice) != NULL)
+  if (!json_token->_internal.is_multisegment)
   {
     return az_span_atoi32(token_slice, out_value);
   }
 
-  // Token straddles more than one segment
-  az_span scratch = AZ_SPAN_FROM_BUFFER(_az_scratch_buffer);
-
   // Any number that won't fit in the scratch buffer, will overflow.
-  if (az_span_size(scratch) < json_token->size)
+  if (json_token->size > _az_MAX_SIZE_FOR_INT32)
   {
     return AZ_ERROR_UNEXPECTED_CHAR;
   }
+
+  // Token straddles more than one segment.
+  // Used to copy discontiguous token values into a contiguous buffer, for number parsing.
+  uint8_t scratch_buffer[_az_MAX_SIZE_FOR_INT32] = { 0 };
+  az_span scratch = AZ_SPAN_FROM_BUFFER(scratch_buffer);
 
   az_span remainder = _az_json_token_copy_into_span_helper(json_token, scratch);
 
@@ -573,19 +579,21 @@ AZ_NODISCARD az_result az_json_token_get_double(az_json_token const* json_token,
   az_span token_slice = json_token->slice;
 
   // Contiguous token
-  if (az_span_ptr(token_slice) != NULL)
+  if (!json_token->_internal.is_multisegment)
   {
     return az_span_atod(token_slice, out_value);
   }
 
-  // Token straddles more than one segment
-  az_span scratch = AZ_SPAN_FROM_BUFFER(_az_scratch_buffer);
-
   // Any number that won't fit in the scratch buffer, will overflow.
-  if (az_span_size(scratch) < json_token->size)
+  if (json_token->size > _az_MAX_SIZE_FOR_PARSING_DOUBLE)
   {
     return AZ_ERROR_UNEXPECTED_CHAR;
   }
+
+  // Token straddles more than one segment.
+  // Used to copy discontiguous token values into a contiguous buffer, for number parsing.
+  uint8_t scratch_buffer[_az_MAX_SIZE_FOR_PARSING_DOUBLE] = { 0 };
+  az_span scratch = AZ_SPAN_FROM_BUFFER(scratch_buffer);
 
   az_span remainder = _az_json_token_copy_into_span_helper(json_token, scratch);
 
