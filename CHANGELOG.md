@@ -2,6 +2,16 @@
 
 ## 1.0.0-preview.6 (Unreleased)
 
+### New Features
+
+### Breaking Changes
+
+- Update provisioning client struct member name in `az_iot_provisioning_client_register_response` from `registration_result` to `registration_state` to match recent API naming updates.
+
+### Bug Fixes
+
+### Other Changes and Improvements
+
 
 ## 1.0.0-preview.5 (2020-09-08)
 
