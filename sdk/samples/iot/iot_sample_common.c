@@ -63,7 +63,10 @@ static az_span const provisioning_global_endpoint
 //
 // Functions
 //
-void iot_sample_error_log_init(iot_sample_error_log* out_error_log, char* message, az_span parameter)
+void iot_sample_error_log_init(
+    iot_sample_error_log* out_error_log,
+    char* message,
+    az_span parameter)
 {
   if (out_error_log == NULL)
   {
@@ -469,7 +472,8 @@ static void base64_encode_bytes(
   {
     BIO_free(sink_mem_bio);
     BIO_free(base64_encoder);
-    IOT_SAMPLE_LOG_ERROR("Could not base64 encode the password: Failed to push memory through filter.");
+    IOT_SAMPLE_LOG_ERROR(
+        "Could not base64 encode the password: Failed to push memory through filter.");
     exit(1);
   }
 

@@ -1105,12 +1105,12 @@ static void property_callback(
   else if (az_span_is_content_equal(thermostat_2.component_name, component_name))
   {
     if (!pnp_thermostat_process_property_update(
-        &thermostat_2,
-        property_name,
-        &property_value,
-        version,
-        publish_message.payload,
-        &publish_message.out_payload))
+            &thermostat_2,
+            property_name,
+            &property_value,
+            version,
+            publish_message.payload,
+            &publish_message.out_payload))
     {
       IOT_SAMPLE_LOG_ERROR(
           "Temperature Sensor 2 does not support writeable property `%.*s`.",
@@ -1131,12 +1131,12 @@ static void property_callback(
   else if (az_span_size(component_name) == 0)
   {
     if (!temp_controller_process_property_update(
-        component_name,
-        property_name,
-        &property_value,
-        version,
-        publish_message.payload,
-        &publish_message.out_payload))
+            component_name,
+            property_name,
+            &property_value,
+            version,
+            publish_message.payload,
+            &publish_message.out_payload))
     {
       IOT_SAMPLE_LOG_ERROR(
           "Temperature Controller does not support writable property `%.*s`. All writeable "
@@ -1180,7 +1180,8 @@ static az_result append_int32_callback(az_json_writer* jw, void* value)
 static az_result append_json_token_callback(az_json_writer* jw, void* value)
 {
   iot_sample_error_log log;
-  iot_sample_error_log_init(&log, "Failed to append json token callback: az_result return code 0x%08x.", AZ_SPAN_EMPTY);
+  iot_sample_error_log_init(
+      &log, "Failed to append json token callback: az_result return code 0x%08x.", AZ_SPAN_EMPTY);
 
   az_json_token value_token = *(az_json_token*)value;
 

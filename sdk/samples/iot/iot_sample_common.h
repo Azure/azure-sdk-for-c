@@ -161,7 +161,10 @@ extern bool is_device_operational;
  * @param[in] message The message to log.
  * @param[in] parameter The #az_span parameter to be used by the message. May be AZ_SPAN_EMPTY.
  */
-void iot_sample_error_log_init(iot_sample_error_log* out_error_log, char* message, az_span parameter);
+void iot_sample_error_log_init(
+    iot_sample_error_log* out_error_log,
+    char* message,
+    az_span parameter);
 
 /*
  * @brief Reads in environment variables set by user for purposes of running sample.

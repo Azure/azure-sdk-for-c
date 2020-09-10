@@ -38,7 +38,8 @@ static void visit_component_properties(
     void* context_ptr)
 {
   iot_sample_error_log log;
-  iot_sample_error_log_init(&log, "Failed to process device twin message: az_result return code 0x%08x.", AZ_SPAN_EMPTY);
+  iot_sample_error_log_init(
+      &log, "Failed to process device twin message: az_result return code 0x%08x.", AZ_SPAN_EMPTY);
 
   while (az_result_succeeded(az_json_reader_next_token(jr)))
   {
@@ -72,7 +73,8 @@ static void visit_component_properties(
 static bool json_child_token_move(az_json_reader* jr, az_span property_name)
 {
   iot_sample_error_log log;
-  iot_sample_error_log_init(&log, "Failed to process device twin message: az_result return code 0x%08x.", AZ_SPAN_EMPTY);
+  iot_sample_error_log_init(
+      &log, "Failed to process device twin message: az_result return code 0x%08x.", AZ_SPAN_EMPTY);
 
   while (az_result_succeeded(az_json_reader_next_token(jr)))
   {
@@ -130,7 +132,8 @@ void pnp_telemetry_get_publish_topic(
     size_t* out_mqtt_topic_length)
 {
   iot_sample_error_log log;
-  iot_sample_error_log_init(&log, "Failed to get the Telemetry topic: az_result return code 0x%08x.", AZ_SPAN_EMPTY);
+  iot_sample_error_log_init(
+      &log, "Failed to get the Telemetry topic: az_result return code 0x%08x.", AZ_SPAN_EMPTY);
 
   az_iot_message_properties pnp_properties;
 
@@ -188,7 +191,10 @@ void pnp_build_reported_property(
     az_span* out_span)
 {
   iot_sample_error_log log;
-  iot_sample_error_log_init(&log, "Failed to build `%.*s` reported property: az_result return code 0x%08x.", property_name);
+  iot_sample_error_log_init(
+      &log,
+      "Failed to build `%.*s` reported property: az_result return code 0x%08x.",
+      property_name);
 
   az_json_writer jw;
   IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_init(&jw, json_buffer, NULL), log);
@@ -229,7 +235,10 @@ void pnp_build_reported_property_with_status(
     az_span* out_span)
 {
   iot_sample_error_log log;
-  iot_sample_error_log_init(&log, "Failed to build `%.*s` reported property with status: az_result return code 0x%08x.", property_name);
+  iot_sample_error_log_init(
+      &log,
+      "Failed to build `%.*s` reported property with status: az_result return code 0x%08x.",
+      property_name);
 
   az_json_writer jw;
   IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_init(&jw, json_buffer, NULL), log);
@@ -282,7 +291,8 @@ void pnp_build_telemetry_message(
     az_span* out_span)
 {
   iot_sample_error_log log;
-  iot_sample_error_log_init(&log, "Failed to build Telemetry message: az_result return code 0x%08x.", AZ_SPAN_EMPTY);
+  iot_sample_error_log_init(
+      &log, "Failed to build Telemetry message: az_result return code 0x%08x.", AZ_SPAN_EMPTY);
 
   az_json_writer jw;
   IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_init(&jw, json_buffer, NULL), log);
@@ -303,7 +313,8 @@ void pnp_process_device_twin_message(
     void* context_ptr)
 {
   iot_sample_error_log log;
-  iot_sample_error_log_init(&log, "Failed to process device twin message: az_result return code 0x%08x.", AZ_SPAN_EMPTY);
+  iot_sample_error_log_init(
+      &log, "Failed to process device twin message: az_result return code 0x%08x.", AZ_SPAN_EMPTY);
 
   int32_t version;
 

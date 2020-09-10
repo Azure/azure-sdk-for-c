@@ -581,7 +581,10 @@ static bool parse_desired_temperature_property(
     int32_t* out_parsed_version_number)
 {
   iot_sample_error_log log;
-  iot_sample_error_log_init(&log, "Failed to parse for `%.*s` property: az_result return code 0x%08x.", twin_desired_temperature_property_name);
+  iot_sample_error_log_init(
+      &log,
+      "Failed to parse for `%.*s` property: az_result return code 0x%08x.",
+      twin_desired_temperature_property_name);
 
   *out_parsed_temperature = 0.0;
   *out_parsed_version_number = 0;
@@ -835,7 +838,10 @@ static bool invoke_getMaxMinReport(az_span payload, az_span response, az_span* o
 
   // Parse the `since` field in the payload.
   iot_sample_error_log log;
-  iot_sample_error_log_init(&log, "Failed to parse for `since` field in payload: az_result return code 0x%08x.", AZ_SPAN_EMPTY);
+  iot_sample_error_log_init(
+      &log,
+      "Failed to parse for `since` field in payload: az_result return code 0x%08x.",
+      AZ_SPAN_EMPTY);
 
   az_json_reader jr;
   IOT_SAMPLE_EXIT_IF_FAILED(az_json_reader_init(&jr, payload, NULL), log);
@@ -924,7 +930,8 @@ static void build_property_payload(
     az_span* out_property_payload)
 {
   iot_sample_error_log log;
-  iot_sample_error_log_init(&log, "Failed to build property payload: az_result return code 0x%08x.", AZ_SPAN_EMPTY);
+  iot_sample_error_log_init(
+      &log, "Failed to build property payload: az_result return code 0x%08x.", AZ_SPAN_EMPTY);
 
   az_json_writer jw;
   IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_init(&jw, property_payload, NULL), log);
@@ -960,7 +967,10 @@ static void build_property_payload_with_status(
     az_span* out_property_payload)
 {
   iot_sample_error_log log;
-  iot_sample_error_log_init(&log, "Failed to build property payload with status: az_result return code 0x%08x.", AZ_SPAN_EMPTY);
+  iot_sample_error_log_init(
+      &log,
+      "Failed to build property payload with status: az_result return code 0x%08x.",
+      AZ_SPAN_EMPTY);
 
   az_json_writer jw;
   IOT_SAMPLE_EXIT_IF_FAILED(az_json_writer_init(&jw, property_payload, NULL), log);
