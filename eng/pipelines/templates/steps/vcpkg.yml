@@ -6,9 +6,17 @@ parameters:
 
 steps:
   - pwsh: |
-      Write-Host "##vso[task.prependpath]$(Agent.TempDirectory)/vcpkg"
-      Write-Host "##vso[task.setvariable variable=VCPKG_INSTALLATION_ROOT]$(Agent.TempDirectory)/vcpkg"
-      Write-Host "##vso[task.setvariable variable=VcpkgRef]$(Get-Content eng/vcpkg-ref.txt)"
+      $TargetPath = $(Agent.TempDirectory)/vcpkg
+      Remove-Item $TargetPath -Recurse -Force -ErrorAction Ignore
+      New-Item -ItemType Directory -Path $TargetPath  -Force
+
+      $VcpkgCommit = $(Get-Content eng/vcpkg-commit.txt)
+      Write-Host "Target Path for vcpkg: $TargetPath"
+      Write-Host "Vcpkg SHA: $VcpkgCommit"
+
+      Write-Host "##vso[task.prependpath]$TargetPath"
+      Write-Host "##vso[task.setvariable variable=VCPKG_INSTALLATION_ROOT]$TargetPath"
+      Write-Host "##vso[task.setvariable variable=VcpkgCommit]$VcpkgCommit"
     displayName: Set Vcpkg Variables
     condition: >-
       and(
@@ -20,9 +28,10 @@ steps:
     inputs:
       key: >-
         $(Agent.JobName)
-        | "$(VcpkgRef)"
+        | "$(VcpkgCommit)"
         | $(Agent.Os)
         | $(${{ parameters.DependenciesVariableName }})
+        | v2
       path: $(VCPKG_INSTALLATION_ROOT)
       cacheHitVar: VcpkgRestoredFromCache
     displayName: Vcpkg Cache
@@ -38,10 +47,9 @@ steps:
       targetType: filePath
       filePath: eng/scripts/vcpkg.ps1
       arguments: >-
-        -Ref $(VcpkgRef)
+        -Ref $(VcpkgCommit)
         -Dependencies "$(${{ parameters.DependenciesVariableName }})"
-        -TargetPath $(VCPKG_INSTALLATION_ROOT)
-        -DevOpsLogging
+        -VcpkgPath $(VCPKG_INSTALLATION_ROOT)
       pwsh: true
     condition: >-
       and(
