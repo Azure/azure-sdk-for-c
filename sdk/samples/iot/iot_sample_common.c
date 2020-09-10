@@ -271,6 +271,10 @@ void iot_sample_read_environment_variables(
       &(out_env_vars->x509_trust_pem_file_path));
 
   IOT_SAMPLE_LOG(" "); // Formatting
+<<<<<<< HEAD
+=======
+  return AZ_OK;
+>>>>>>> master
 }
 
 void iot_sample_create_mqtt_endpoint(
@@ -382,6 +386,10 @@ static void decode_base64_bytes(
   int read_data = BIO_read(source_mem_bio, az_span_ptr(decoded_bytes), az_span_size(decoded_bytes));
 
   // Set the output span.
+<<<<<<< HEAD
+=======
+  az_result rc;
+>>>>>>> master
   if (read_data > 0)
   {
     *out_decoded_bytes = az_span_create(az_span_ptr(decoded_bytes), (int32_t)read_data);
@@ -412,6 +420,7 @@ static void hmac_sha256_sign_signature(
       az_span_ptr(signed_signature),
       &hmac_encode_len);
 
+  az_result rc;
   if (hmac != NULL)
   {
     *out_signed_signature = az_span_create(az_span_ptr(signed_signature), (int32_t)hmac_encode_len);
@@ -475,6 +484,7 @@ static void base64_encode_bytes(
   // Get the pointer to the encoded bytes.
   BIO_get_mem_ptr(base64_encoder, &encoded_mem_ptr);
 
+  az_result rc;
   if ((size_t)az_span_size(base64_encoded_bytes) >= encoded_mem_ptr->length)
   {
     // Copy the bytes to the output and initialize output span.

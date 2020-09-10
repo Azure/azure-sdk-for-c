@@ -171,7 +171,7 @@ void pnp_thermostat_build_telemetry_message(
     az_span payload,
     az_span* out_payload)
 {
-  az_result rc = pnp_build_telemetry_message(
+  pnp_build_telemetry_message(
       payload,
       telemetry_temperature_name,
       append_double_callback,
