@@ -317,3 +317,6 @@ fingerprint.txt
 
 # Swap Files
 *.swp
+
+# vcpkg
+/vcpkg
