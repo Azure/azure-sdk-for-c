@@ -7,6 +7,7 @@
 ### Breaking Changes
 
 - Update provisioning client struct member name in `az_iot_provisioning_client_register_response` from `registration_result` to `registration_state`.
+- Changed `operation_status` in `az_iot_provisioning_client_register_response` from `az_span` to `az_iot_provisioning_client_operation_status` enum.
 
 ### Bug Fixes
 
