@@ -37,7 +37,11 @@ AZ_INLINE az_span _az_iot_provisioning_get_str_dps_registrations()
   return az_span_slice(_az_iot_provisioning_get_dps_registrations_res(), 0, 19);
 }
 
-AZ_NODISCARD az_iot_provisioning_client_options az_iot_provisioning_client_options_default()
+AZ_NODISCARD az_result _iot_provisioning_client_parse_operation_status(
+    az_span response_operation_status,
+    az_iot_provisioning_client_operation_status* out_operation_status);
+
+    AZ_NODISCARD az_iot_provisioning_client_options az_iot_provisioning_client_options_default()
 {
   return (az_iot_provisioning_client_options){ .user_agent = AZ_SPAN_EMPTY };
 }
