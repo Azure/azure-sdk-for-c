@@ -7,7 +7,10 @@ parameters:
 steps:
   - pwsh: |
       $TargetPath = $(Agent.TempDirectory)/vcpkg
-      Remove-Item -Path $TargetPath -Recurse -Force -ErrorAction Ignore
+      if (Test-Path $TargetPath) {
+        Remove-Item -Path $TargetPath -Recurse -Force -ErrorAction Ignore
+      }
+
       New-Item -ItemType Directory -Path $TargetPath  -Force
 
       $VcpkgCommit = $(Get-Content eng/vcpkg-commit.txt)
