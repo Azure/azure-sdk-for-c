@@ -113,7 +113,7 @@ typedef AZ_NODISCARD az_result (*_az_http_policy_process_fn)(
 
 /**
  * @brief HTTP policy.
- * An HTTP pipeline inside SDK clients is an array of http policies.
+ * An HTTP pipeline inside SDK clients is an array of HTTP policies.
  */
 struct _az_http_policy
 {

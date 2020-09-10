@@ -13,7 +13,7 @@
 
 #define DOUBLE_DECIMAL_PLACE_DIGITS 2
 
-/* Reported property keys and values */
+// Reported property keys and values
 static az_span const software_version_property_name = AZ_SPAN_LITERAL_FROM_STR("swVersion");
 static az_span const software_version_property_value = AZ_SPAN_LITERAL_FROM_STR("1.0.0.0");
 static az_span const manufacturer_property_name = AZ_SPAN_LITERAL_FROM_STR("manufacturer");

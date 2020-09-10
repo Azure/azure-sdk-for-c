@@ -248,7 +248,7 @@ az_result iot_sample_read_environment_variables(
       out_env_vars->x509_trust_pem_file_path,
       &(out_env_vars->x509_trust_pem_file_path)));
 
-  IOT_SAMPLE_LOG(" "); // Formatting.
+  IOT_SAMPLE_LOG(" "); // Formatting
   return AZ_OK;
 }
 
@@ -311,7 +311,6 @@ void iot_sample_sleep_for_seconds(uint32_t seconds)
 #else
   sleep(seconds);
 #endif
-  return;
 }
 
 uint32_t iot_sample_get_epoch_expiration_time_from_minutes(uint32_t minutes)
@@ -324,20 +323,19 @@ static az_result decode_base64_bytes(
     az_span decoded_bytes,
     az_span* out_decoded_bytes)
 {
-  az_result rc;
   BIO* base64_decoder;
   BIO* source_mem_bio;
 
   memset(az_span_ptr(decoded_bytes), 0, (size_t)az_span_size(decoded_bytes));
 
-  // Create a BIO filter to process the bytes
+  // Create a BIO filter to process the bytes.
   base64_decoder = BIO_new(BIO_f_base64());
   if (base64_decoder == NULL)
   {
     return AZ_ERROR_OUT_OF_MEMORY;
   }
 
-  // Get the source BIO to push through the filter
+  // Get the source BIO to push through the filter.
   source_mem_bio
       = BIO_new_mem_buf(az_span_ptr(base64_encoded_bytes), (int)az_span_size(base64_encoded_bytes));
   if (source_mem_bio == NULL)
@@ -346,7 +344,7 @@ static az_result decode_base64_bytes(
     return AZ_ERROR_OUT_OF_MEMORY;
   }
 
-  // Push the memory through the filter
+  // Push the memory through the filter.
   source_mem_bio = BIO_push(base64_decoder, source_mem_bio);
   if (source_mem_bio == NULL)
   {
@@ -355,14 +353,15 @@ static az_result decode_base64_bytes(
     return AZ_ERROR_OUT_OF_MEMORY;
   }
 
-  // Set flags to not have a newline and close the BIO
+  // Set flags to not have a newline and close the BIO.
   BIO_set_flags(source_mem_bio, BIO_FLAGS_BASE64_NO_NL);
   BIO_set_close(source_mem_bio, BIO_CLOSE);
 
-  // Read the memory which was pushed through the filter
+  // Read the memory which was pushed through the filter.
   int read_data = BIO_read(source_mem_bio, az_span_ptr(decoded_bytes), az_span_size(decoded_bytes));
 
-  // Set the output span
+  // Set the output span.
+  az_result rc;
   if (read_data > 0)
   {
     *out_decoded_bytes = az_span_create(az_span_ptr(decoded_bytes), (int32_t)read_data);
@@ -373,7 +372,7 @@ static az_result decode_base64_bytes(
     rc = AZ_ERROR_NOT_ENOUGH_SPACE;
   }
 
-  // Free the BIO chain
+  // Free the BIO chain.
   BIO_free_all(source_mem_bio);
 
   return rc;
@@ -385,8 +384,6 @@ static az_result hmac_sha256_sign_signature(
     az_span signed_signature,
     az_span* out_signed_signature)
 {
-  az_result rc;
-
   unsigned int hmac_encode_len;
   unsigned char const* hmac = HMAC(
       EVP_sha256(),
@@ -397,6 +394,7 @@ static az_result hmac_sha256_sign_signature(
       az_span_ptr(signed_signature),
       &hmac_encode_len);
 
+  az_result rc;
   if (hmac != NULL)
   {
     *out_signed_signature = az_span_create(az_span_ptr(signed_signature), (int32_t)hmac_encode_len);
@@ -415,19 +413,18 @@ static az_result base64_encode_bytes(
     az_span base64_encoded_bytes,
     az_span* out_base64_encoded_bytes)
 {
-  az_result rc;
   BIO* base64_encoder;
   BIO* sink_mem_bio;
   BUF_MEM* encoded_mem_ptr;
 
-  // Create a BIO filter to process the bytes
+  // Create a BIO filter to process the bytes.
   base64_encoder = BIO_new(BIO_f_base64());
   if (base64_encoder == NULL)
   {
     return AZ_ERROR_OUT_OF_MEMORY;
   }
 
-  // Create a memory sink BIO to process bytes to
+  // Create a memory sink BIO to process bytes to.
   sink_mem_bio = BIO_new(BIO_s_mem());
   if (sink_mem_bio == NULL)
   {
@@ -435,7 +432,7 @@ static az_result base64_encode_bytes(
     return AZ_ERROR_OUT_OF_MEMORY;
   }
 
-  // Push the sink to the encoder
+  // Push the sink to the encoder.
   base64_encoder = BIO_push(base64_encoder, sink_mem_bio);
   if (base64_encoder == NULL)
   {
@@ -444,10 +441,10 @@ static az_result base64_encode_bytes(
     return AZ_ERROR_OUT_OF_MEMORY;
   }
 
-  // Set no newline flag for the encoder
+  // Set no newline flag for the encoder.
   BIO_set_flags(base64_encoder, BIO_FLAGS_BASE64_NO_NL);
 
-  // Write the bytes to be encoded
+  // Write the bytes to be encoded.
   int const bytes_written
       = BIO_write(base64_encoder, az_span_ptr(decoded_bytes), (int)az_span_size(decoded_bytes));
   if (bytes_written < 1)
@@ -460,12 +457,13 @@ static az_result base64_encode_bytes(
   // Flush the BIO
   BIO_flush(base64_encoder);
 
-  // Get the pointer to the encoded bytes
+  // Get the pointer to the encoded bytes.
   BIO_get_mem_ptr(base64_encoder, &encoded_mem_ptr);
 
+  az_result rc;
   if ((size_t)az_span_size(base64_encoded_bytes) >= encoded_mem_ptr->length)
   {
-    // Copy the bytes to the output and initialize output span
+    // Copy the bytes to the output and initialize output span.
     memcpy(az_span_ptr(base64_encoded_bytes), encoded_mem_ptr->data, encoded_mem_ptr->length);
     *out_base64_encoded_bytes
         = az_span_create(az_span_ptr(base64_encoded_bytes), (int32_t)encoded_mem_ptr->length);
@@ -477,7 +475,7 @@ static az_result base64_encode_bytes(
     rc = AZ_ERROR_NOT_ENOUGH_SPACE;
   }
 
-  // Free the BIO chain
+  // Free the BIO chain.
   BIO_free_all(base64_encoder);
 
   return rc;
@@ -491,13 +489,14 @@ void iot_sample_generate_sas_base64_encoded_signed_signature(
 {
   IOT_SAMPLE_PRECONDITION_NOT_NULL(out_sas_base64_encoded_signed_signature);
 
-  int rc;
+  az_result rc;
 
   // Decode the sas base64 encoded key to use for HMAC signing.
   char sas_decoded_key_buffer[64];
   az_span sas_decoded_key = AZ_SPAN_FROM_BUFFER(sas_decoded_key_buffer);
-  if (az_result_failed(
-          rc = decode_base64_bytes(sas_base64_encoded_key, sas_decoded_key, &sas_decoded_key)))
+
+  rc = decode_base64_bytes(sas_base64_encoded_key, sas_decoded_key, &sas_decoded_key);
+  if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR("Could not decode the SAS key: az_result return code 0x%04x.", rc);
     exit(rc);
@@ -506,27 +505,23 @@ void iot_sample_generate_sas_base64_encoded_signed_signature(
   // HMAC-SHA256 sign the signature with the decoded key.
   char sas_hmac256_signed_signature_buffer[128];
   az_span sas_hmac256_signed_signature = AZ_SPAN_FROM_BUFFER(sas_hmac256_signed_signature_buffer);
-  if (az_result_failed(
-          rc = hmac_sha256_sign_signature(
-              sas_decoded_key,
-              sas_signature,
-              sas_hmac256_signed_signature,
-              &sas_hmac256_signed_signature)))
+
+  rc = hmac_sha256_sign_signature(
+      sas_decoded_key, sas_signature, sas_hmac256_signed_signature, &sas_hmac256_signed_signature);
+  if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR("Could not sign the signature: az_result return code 0x%04x.", rc);
     exit(rc);
   }
 
   // Base64 encode the result of the HMAC signing.
-  if (az_result_failed(
-          rc = base64_encode_bytes(
-              sas_hmac256_signed_signature,
-              sas_base64_encoded_signed_signature,
-              out_sas_base64_encoded_signed_signature)))
+  rc = base64_encode_bytes(
+      sas_hmac256_signed_signature,
+      sas_base64_encoded_signed_signature,
+      out_sas_base64_encoded_signed_signature);
+  if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR("Could not base64 encode the password: az_result return code 0x%04x.", rc);
     exit(rc);
   }
-
-  return;
 }

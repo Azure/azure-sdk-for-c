@@ -35,12 +35,12 @@ az_result pnp_mqtt_message_init(pnp_mqtt_message* out_mqtt_message)
 
 az_span pnp_mqtt_get_request_id(void)
 {
-  az_result rc;
   az_span remainder;
   az_span out_span = az_span_create((uint8_t*)request_id_buffer, sizeof(request_id_buffer));
 
   // Note that if left to run for a long time, this will overflow and reset back to 0.
-  if (az_result_failed(rc = az_span_u32toa(out_span, request_id_int++, &remainder)))
+  az_result rc = az_span_u32toa(out_span, request_id_int++, &remainder);
+  if (az_result_failed(rc))
   {
     IOT_SAMPLE_LOG_ERROR("Failed to get request id: az_result return code 0x%08x.", rc);
     exit(rc);
